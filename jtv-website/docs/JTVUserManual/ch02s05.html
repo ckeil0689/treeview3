@@ -1,0 +1,92 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Export</title><meta name="generator" content="DocBook XSL-NS Stylesheets V1.75.2"><link rel="home" href="index.html" title="Java TreeView User's Manual"><link rel="up" href="ch02.html" title="Chapter 2. Feature Reference"><link rel="prev" href="ch02s04.html" title="Settings"><link rel="next" href="ch02s06.html" title="Java Treeview Modes"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Export</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch02s04.html">Prev</a> </td><th width="60%" align="center">Chapter 2. Feature Reference</th><td width="20%" align="right"> <a accesskey="n" href="ch02s06.html">Next</a></td></tr></table><hr></div><div class="sect1" title="Export"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ch2_export"></a>Export</h2></div></div></div>
+
+<p> 
+Most displays support output to image formats such as PNG, PPM and JPEG. The dendrogram view also supports export to vector-based postcript files. Additionally, it is possible to export subsets of data to tab-delimitted text, i.e. gene lists and cdts.
+</p>
+<div class="sect2" title="Export of Selected Genes and Data to Tab-Delimited Text"><div class="titlepage"><div><div><h3 class="title"><a name="ch2_export_text"></a>Export of Selected Genes and Data to Tab-Delimited Text</h3></div></div></div>
+
+<p>
+Selected genes and data can be exported to tab delimited text using "Export-&gt;Export to Text File...". The export dialog allows you to select which annotation columns you would like to include, whether you want to include the expression data, and whether you want to include a header line. The default is to print out a simple gene list with no header.
+</p>
+<p>
+</p>
+</div>
+
+<div class="sect2" title="Export of Dendrograms"><div class="titlepage"><div><div><h3 class="title"><a name="ch2_export_dendrogram"></a>Export of Dendrograms</h3></div></div></div>
+
+
+<div class="figure"><a name="DendroExportFigure"></a><p class="title"><b>Figure 2.9. Dendrogram Export Dialog</b></p><div class="figure-contents"> 
+
+<div><img src="figures/DendroExport.gif" alt="Dendrogram Export Dialog"></div>
+</div></div><br class="figure-break">
+
+<p>
+The dendrogram can be exported to either image files or editable Postscript for publication purposes. Postscript can be edited as objects in programs such as Adobe Illustrator, but can get prohibitively large with many genes and arrays. Image files are simply pixels, but can take up less space. To export to Postscript, select "Export-&gt;Export to Postscript" off the menubar. To export to images, select "Export-&gt;Export to Image". The following sections apply to both types of export. Although the above image is a screenshot of Postscript export, the only difference with image export is that there is no Bounding Box option. The purpose of the bounding box is discussed in <a class="xref" href="ch02s05.html#ch2_export_bbox" title="Bounding Box">the section called &#8220;Bounding Box&#8221;</a>.
+</p>
+
+<div class="sect3" title="Headers"><div class="titlepage"><div><div><h4 class="title"><a name="id1581510"></a>Headers</h4></div></div></div>
+
+<p>
+Both gene and array headers can be included in the exported image. The headers can be selected using the listboxes on the left side of the export dialog. Holding down the apple key on a mac, the Alt key on windows, or the Meta key on a unix machine will allow you to select multiple headers, or to deselect all headers.
+</p>
+<p>
+Below the Listboxes is a checkbox which specifies whether the array names are to be output below the gene tree or not.
+</p>
+</div>
+
+<div class="sect3" title="Include Checkboxes"><div class="titlepage"><div><div><h4 class="title"><a name="id1581529"></a>Include Checkboxes</h4></div></div></div>
+
+<p>
+The top half of the column in the middle of the dialog contains checkboxes which control exactly what data in included in the exported image.
+</p>
+<p>
+The "Selection Only" checkbox determines whether just the selected genes and arrays or all genes and arrays are output.
+</p>
+<p>
+The "Gene Tree" and "Array Tree" checkboxes determine whether or not the gene and array trees should be included.
+</p>
+<p>
+The "Data Matrix" checkbox specifies whether or not the actual data matrix should be included.
+</p>
+</div>
+<div class="sect3" title="Size and Scaling"><div class="titlepage"><div><div><h4 class="title"><a name="id1581560"></a>Size and Scaling</h4></div></div></div>
+
+<p>
+The bottom half of the middle column has a few text fields.
+</p>
+<p>
+The "x scale" and "y scale" boxes set the size in pixels of the boxes in the data matrix.
+</p>
+
+<p>
+The "Total Size" boxes contain the total predicted size of the exported image in inches. These fields are not used by the export machinery, and editing them has no effect.
+</p>
+</div>
+
+<div class="sect3" title="Preview"><div class="titlepage"><div><div><h4 class="title"><a name="id1581584"></a>Preview</h4></div></div></div>
+
+<p>
+A preview of the exported image using the current settings is displayed on the right side of the dialog. If the preview takes a long time to render for some reason, it can be disabled with the checkbox below.
+</p>
+</div>
+<div class="sect3" title="Export To"><div class="titlepage"><div><div><h4 class="title"><a name="id1581589"></a>Export To</h4></div></div></div>
+
+<p>
+At the bottom of the export panel is a text field holding a suggested filename to hold the exported image. This field can be edited directly, or another file can be selected using the Browse button to the right.
+</p>
+</div>
+</div>
+<div class="sect2" title="Bounding Box"><div class="titlepage"><div><div><h3 class="title"><a name="ch2_export_bbox"></a>Bounding Box</h3></div></div></div> 
+
+<p>
+The Bounding Box is a part of the PostScript standard which informs postscript renderers of non-standard page sizes. If you have problems seeing all of an exported postscript image then including the bounding box or making it bigger might help. Due to the vagaries of font rendering, there is no easy way for me to predict how long a particular text string is going to be. I take a decent guess, but sometimes the text will get clipped.
+</p>
+<p>
+Corel Draw, Adobe Photoshop, and Adobe Illustrator all support the Bounding Box, and will correctly render exported postscript from Java TreeView.
+</p>
+<p>
+Adobe Distiller ignores the Bounding Box and produces incorrect output on some platforms.
+</p>
+</div>
+
+</div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch02s04.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch02.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch02s06.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Settings </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Java Treeview Modes </td></tr></table></div></body></html>

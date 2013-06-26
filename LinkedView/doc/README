@@ -1,0 +1,22 @@
+This directory contains the documentation for the Java TreeView project.
+
+There are primarily two documents, the user's manual and the programmer's guide, in the respective directories  JTVProgrammerGuide  and JTVUserManual. 
+Please see createAllDoc.pl for details of how this are actually built.
+
+The build sequence for the documentation consists of makins a single-page HTML, a multi-page html document, and a pdf 
+using commands similar to the following:
+
+cd JTVUserManual
+
+xsltproc -o single.html /common/docbook/docbook-xsl-1.65.1/html/docbook.xsl JTVUserManual.xml
+
+xsltproc /common/docbook/docbook-xsl-1.65.1/html/chunk.xsl JTVUserManual.xml 
+
+xsltproc -o JTVUserManual.fo /common/docbook/docbook-xsl-1.65.1/fo/docbook.xsl JTVUserManual.xml 
+/common/docbook/fop-0.20.5/fop.sh -fo JTVUserManual.fo -pdf JTVUserManual.pdf
+
+This process depends upon 
+1) docbook-xsl, a package from the docbook sourceforge project.
+2) xsltproc, which comes with the docbook-utils package on a default redhat install.
+3) FOP, from
+http://xml.apache.org/fop/

@@ -1,0 +1,13 @@
+LinkedView/bin/*
+LinkedView/bundle/*
+LinkedView/applet/*
+LinkedView/target/*
+LinkedView/dist/*
+LinkedView/doc/html/*
+*~
+jtv-website/examples/spellman.jtv
+jtv-website/examples/threshold.jtv
+LinkedView/doc/JTVProgrammerGuide/JTVProgrammerGuide.fo
+LinkedView/doc/JTVUserManual/JTVUserManual.fo
+LinkedView/docbook
+*.pdf

@@ -1,0 +1,1002 @@
+YORF	NAME	FGCOLOR	BGCOLOR	GWEIGHT	Minimal batch vs chemostat (.08 OD)	Minimal batch vs chemostat (.52 OD)	Minimal batch vs chemostat (2.06 OD)	Batch Carbon Limitation (08.5 hr)	Batch Carbon Limitation (10.5 hr)	Batch Carbon Limitation (12.5 hr)	Batch Carbon Limitation (14.5 hr)	Batch Carbon Limitation (16.5 hr)	Batch Carbon Limitation (18.5 hr)	Batch Carbon Limitation (20.5 hr)	Batch Carbon Limitation (32.2 hr)	Batch Carbon Limitation (45.5 hr)	Batch Carbon Limitation Reference Comparison
+BGCOLOR					#FF0FFF	#0FFFFF	#FFFF0F	#FF0FFF	#0FFFFF	#FFFF0F	#FF0FFF	#0FFFFF	#FFFF0F	#FF0FFF	#0FFFFF	#FFFF0F	#FF0FFF
+FGCOLOR					#00F0F0	#FF0050	#F0F000	#005050	#500050	#505000	#005050	#500050	#505000	#005050	#500050	#505000	#005050
+EWEIGHT					1	1	1	1	1	1	1	1	1	1	1	1	1
+YGR100W	MDR1      biological_process unknown RAB GTPase activator	#000000	#55FF55	1		0.46	-0.35	-0.26	-0.23	-0.17		-0.14	0.08	0.26	0.4	0.14	0.47
+YLR071C	"RGR1      transcription, from Pol II promoter RNA polymerase II transcription mediator"	#505000	#55FF55	1	0.91	0.69	-0.55	-0.11	-0.27	-0.23		-0.31		0.44			
+YPL075W	GCR1      glycolysis not yet annotated	#F00000	#55FF55	1	0.8	0.69		-0.14		-0.21	-0.26		0.42		0.81		0.62
+YIL067C	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	1	0.35		-0.22	-0.36	-0.13	-0.25	-0.01		0.45	0.53	0.55	0.63
+YPR189W	SKI3      mRNA catabolism molecular_function unknown	#000000	#55FF55	1	0.43	0.23		0.48	-0.02	0.66	-0.4	-0.07	-0.33	0.21	0.61	0.43	0.19
+YDR167W	"TAF25     transcription initiation, from Pol II promoter* general RNA polymerase II transcription factor"	#505000	#55FF55	1	-0.1	0.88	-0.42	1.04	-0.12	0.86	-1.49	-0.2	0.41	0.61	1.61	1.44	0.18
+YPL180W	SHD7      biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.38	0.34	-0.47	0.02	0.3	0.44	-0.7	-0.6	0.18	0.68	0.63	0.3	-0.15
+YPL153C	RAD53     DNA repair* protein threonine/tyrosine kinase	#0000F0	#55FFFF	1	0.18	0.4		-0.28	0.43	0.28		-0.55	0.3	0.5	0.54	0.56	0.36
+YGL003C	CDH1      ubiquitin-dependent protein degradation* enzyme activator	#000000	#55FF55	1	0.15	0.42	-0.53	-0.61	0.2		-0.7	-0.63		0.76			
+YNL218W	MGS1      biological_process unknown molecular_function unknown	#505000	#55FF55	1	0.22	0.49		-0.24	0			-0.23	-0.04	0.73	0.36	0.53	
+YDL132W	CDC53     ubiquitin-dependent protein degradation* structural protein*	#F00000	#55FF55	1	0.48	0.53	-0.02	-0.01	0.19	0.02	-0.45	-0.34		0.81			0.26
+YDR505C	PSP1      biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	0.4	0.82	-0.74	-0.06	0.26	0.14	0.02	-0.02	0.66	0.36		0.54	-0.26
+FRAGYGL076C-2		#000000	#55FF55	1	0.42	0.67	-0.53	-0.1		0.2					0.58	0.06	
+NORF 70		#505000	#55FF55	1				-0.22	0.13	0.67		-0.47	0.5	0.44		0.23	
+YNL295W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.55	0.64	-0.39			0.55		-0.13	0.32	0.27	0.32	0.32	0.1
+YKL200C		#0000F0	#55FFFF	1	0.65	0.71	-0.24		0.05			-0.58		0.23	0.39		
+YAL002W	VPS8      not yet annotated molecular_function unknown	#000000	#55FF55	1	0.64			-0.04	0.14	-0.04		-0.55	0.28	0.22	0.4	0.3	-0.39
+NORF 74		#505000	#55FF55	1				-0.21	0.09	0.35	0.02	-0.64	0.05	0.19	0.33	0.11	0.07
+YLR278C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.22	0.39	0.03	-0.11	0.09	0.27		-0.89	0.16	0.36	0.69	0.23	
+YKL084W	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.05	0.92	-0.09	-0.1	-0.11	0	-0.19	-0.71	0.19	-0.02	0.5	0.23	0.21
+YNL047C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.16	0.61	-0.49	0.08	0.41	0.17		-1.17	0.27	-0.52	0.68		
+YPR022C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	0.36	0.32	-0.48	0.1	0.49	-0.26		-0.6	0.08	-0.14			-0.06
+YOR055W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.87	0.53	-0.38	-0.12		-0.2	-0.46	-1.3			1.5	-0.33	0.45
+YKR033C	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	1.93	0.88	-0.52	-0.6		-0.59				-0.6			0.41
+YGL092W	NUP145    mRNA-nucleus export* structural protein	#000000	#55FF55	1	0.24	0.39	0	-0.38	0.37	-0.02	-0.27	-0.3	-0.28	0.04	0.07	0.34	0.43
+YML058C-A	biological_process unknown molecular_function unknown	#505000	#55FF55	1	0.34	0.22	0.29	-1.07	0.73			-1.11			0	0.4	
+YDR475C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.26			-0.55	0.63	0.1	-0.66	-0.72	-0.04				-0.08
+YJL108C	PRM10     mating (sensu Saccharomyces) molecular_function unknown	#0000F0	#55FFFF	1	0.1	0.22	0.19	-0.4				-0.44		0.18	0		
+YGL142C	GPI10     phospholipid metabolism not yet annotated	#000000	#55FF55	1	0.13	-0.01	0.38	-0.94	0.56	-0.66	-0.77	-1.39			0.04	1.21	-0.23
+YFL002C	SPB4      35S primary transcript processing* ATP dependent RNA helicase	#505000	#55FF55	1	0.42	0.39	0.2	-0.47	0.11		-0.93	-0.55	0.38	0.18	0.09	0.22	
+YCR023C	biological_process unknown not yet annotated	#F00000	#55FF55	1	0.05	0.43	0.21	-0.29	-0.07		-0.62	-0.35			0.04	0.34	0.05
+YPL062W	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1		0.11		-0.01		-0.22	-0.38	-0.53	0.27	0.38	0.2	0.45	0.23
+YAL017W	FUN31     biological_process unknown protein serine/threonine kinase	#000000	#55FF55	1	0.04	0.12	1.06	-0.33	-0.55	-0.22		-0.73	0.31	0.83	0.55	0.65	
+YKL171W	biological_process unknown not yet annotated	#505000	#55FF55	1		0.4		-0.62	-0.81	-1.01	-0.89	-1.21		1.18	1.17	1.22	
+YNL275W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.12	0.05	0.49	-0.57	-0.75	-0.45			0.22	0.32	0.83	1.03	-0.14
+YGR031W	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1			0.7	-0.33	-0.69	-0.27		-0.29		0.37	0.38	0.76	-0.15
+YLR459W	CDC91     biological_process unknown molecular_function unknown	#000000	#55FF55	1	1.03	0.39	0.54	-0.41	-0.47	-0.48	-0.78	-0.87	-0.71	-0.21	0.9	0.91	-0.16
+YCL017C	NFS1      not yet annotated molecular_function unknown	#505000	#55FF55	1	0.64	0.6	0.97	-0.35	-0.1	-0.4	-1.36	-0.16	-0.33	0.25	0.96	1.59	
+YDL160C	DHH1      transcription RNA helicase	#F00000	#55FF55	1	0.87	0.88	1.15	-0.46	-0.71		-3.12	-1.25	-0.06	0.33	0.99	1.6	0.05
+YJL093C	TOK1      transport not yet annotated	#0000F0	#55FFFF	1	0.5	1.05		-1.01	-0.5			-0.45	-0.79	0.27	0.67	1.92	0.25
+YKL004W	AUR1      sphingolipid metabolism not yet annotated	#000000	#55FF55	1	0.59	0.86	0.38	-0.83	-0.26	-1.39	-2.11	-0.9	-0.87	0.35	1.28	2.33	-0.1
+YEL076W-C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	0.39	0.21	0	-0.48	-0.22	-0.88		-0.2	-0.59	0.33	0.43	1.29	
+YEL075C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.99	0.48	0.18	-0.9	-0.43	-0.8	-0.85	-0.45	-0.25	0.22	0.58	1.03	-0.32
+YOR099W	"KTR1      O-linked glycosylation* alpha-1,2-mannosyltransferase"	#0000F0	#55FFFF	1	0.55	0.62		-0.7	-0.5	-0.96		-0.81	-0.4	-0.03	0.28		
+YER076C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	0.29	0.46		-0.36	-0.4	-0.31		-0.28		0.05	0.17		-0.49
+YDL199C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	0.68	0.83	0.7	-1.94		-1.57	-1.2	-0.57	0.8	1.37	0.86	0.65	-0.05
+YLR462W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.6	1.03	0.15	-1.15	-0.16	-0.85	-0.87	-0.35	0.14	0.52	0.92		-0.01
+YLR142W	PUT1      glutamate biosynthesis* proline dehydrogenase	#0000F0	#55FFFF	1	2.18	2.35	2.67	-2.63	-0.48	-1.87	-2.04	-1.87	-0.55	0.93	1.64	1.79	-0.13
+YOR149C	SMP3      plasmid maintenance molecular_function unknown	#000000	#55FF55	1	0.19	0.91	0.92	-0.77	-0.2	-0.84	-0.94	-0.69	-0.22	0.34	0.38	0.47	0
+YLR162W	biological_process unknown molecular_function unknown	#505000	#55FF55	1	0.88	1.89	2.1	-0.45	-0.26	-1.31				0.67	1.16	0.67	-0.12
+YNL176C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.46	0.83	1.26	-0.47	-0.11	-1.35	-0.9	-0.06	-0.1	0.49	0.84	0.37	-0.22
+YJL165C	HAL5      not yet annotated not yet annotated	#0000F0	#55FFFF	1		0.15		0.1	-0.09	-0.76		-0.31	-0.01	0.2	0.43	0.02	-0.2
+YJL026W	RNR2      DNA replication ribonucleoside-diphosphate reductase	#000000	#55FF55	1	0.01	0.65	1.3	-0.05	-0.95	-2.03		-0.77	-0.11	0.77	0.67	0.53	
+YDL026W	biological_process unknown molecular_function unknown	#505000	#55FF55	1	0.68	0.33	0.73	-0.31	-0.61	-1.85		-0.5	0.37	0.3	0.77	0.45	-0.12
+YBR207W	FTH1      biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.31	0.28	1.29	-0.82	-1.31	-1.73		-0.67	-0.6	-0.05	0.62	0.68	-0.11
+YKR012C	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	0.25	0.24	0.73	-0.2	-0.61			-0.25				0.43	
+YGL131C	biological_process unknown molecular_function unknown	#000000	#55FF55	1				-0.32		-0.49	-0.18	-0.67	-0.61	0.01	0.64	0.94	0.22
+YML002W	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.34	0.57		-0.95	-0.47	-0.54	-0.49	-1.09		-0.68	0.1	0.37	0.06
+YGL051W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.18	0.61	0.3	-0.28	-0.52	-0.85	-0.44	-1.17	0.73	-0.21			
+YLR460C	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	0.3	1.02	0.6	-1.34	-0.89	-1.52	-1.55	-2.13		-0.2	1.23		-0.1
+YOR147W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	0.12	0.88	0.59	-0.58	-0.46	-0.94	-0.56	-1.31	0.09	0.07	0.21		0.12
+YLR085C	ARP6      biological_process unknown molecular_function unknown	#505000	#55FF55	1	0.37	0.7	0.47	-0.2	-0.47	-0.95	-0.89	-0.66		-0.43			
+YLR138W	NHA1      not yet annotated not yet annotated	#F00000	#55FF55	1	0.31	0.84	0.53	-0.32	-1.09				0.49	-0.4			
+SPLYML024W		#0000F0	#55FFFF	1	0.22	1.1			-1.38			-1.06		-0.52	-0.23	0.64	
+YOL027C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	0.31	0.2	0.09	0.25	-0.14	-0.37		-0.32	0.25	0	0.24	-0.11	0.14
+YER089C	PTC2      not yet annotated protein phosphatase type 2C	#505000	#55FF55	1	0.9	0.56	0.44	0.15	0.14	-0.63	-1.02	-0.51	0.11	0.04	0.36		0.27
+YKL044W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	1.59	0.57	0.69	-0.33	0.7	-0.5	-1.35	-0.35	0.01	0.95	-0.05	1.37	-0.23
+YOL104C	NDJ1      not yet annotated molecular_function unknown	#0000F0	#55FFFF	1	2.28		1.15	-0.43		-1.48	-2.24	0.02	0.95	1.24	0.2		
+YCR069W	CPR4      stress response peptidylprolyl isomerase	#000000	#55FF55	1	1.1	0.58	0.98	-0.27	0.2		-1.78	-0.32	0.42	0.9	1.07	0.87	
+YML010W	SPT5      transcription not yet annotated	#505000	#55FF55	1	1.31	0.66	0.68	-0.07	0.21	0.33		-0.26	0.46	1.04	1.16	0.51	0.17
+YDR186C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	1.32	0.77	0.91	-0.07	0.27	0.21		0.21	0.4	0.95	1.16	0.82	0.07
+YDR011W	SNQ2      not yet annotated not yet annotated	#0000F0	#55FFFF	1	1.33	0.96	1.05	-0.24	-0.06	0.25		0.71	0.63	1.2	1.17	0.92	
+YER110C	KAP123    not yet annotated not yet annotated	#000000	#55FF55	1	0.39	0.24	1.55	-0.19	-0.31	-0.34		0.14	-0.22	0.28	-0.04	-0.1	-0.01
+YIL023C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	0.75	1.15	2.35	-1.26	-0.31	-0.87		-0.01	-0.59	0.5	0.03	0.09	0.24
+YGL209W	"MIG2      transcription regulation, from Pol II promoter* DNA binding*"	#F00000	#55FF55	1	1.1	1.34	1.62	-1.17	-0.18	-0.49		-0.47	-0.08	0.03	-0.08	0.03	-0.59
+YBR169C	SSE2      protein folding heat shock protein	#0000F0	#55FFFF	1	1.65	0.27	2.07	-1.46		-0.9	-0.54	-0.39			0.92		-0.31
+YDR456W	NHX1      vacuolar acidification* monovalent inorganic cation transporter	#000000	#55FF55	1				-0.68	-0.62	-0.68	-0.32	-0.12	-0.76	-0.06	0.36	0.61	-0.18
+YAL053W	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.51	0.63	0.51	-1.16	-0.41	-0.42	-0.13	-0.31	-0.8	0.62	1.15	0.67	-0.1
+YOR360C	"PDE2      not yet annotated 3',5'-cyclic-nucleotide phosphodiesterase"	#F00000	#55FF55	1	0.44	0.96	0.72	-0.32	-0.2	0.07	-0.18	-0.19	-1.15	-0.81	1.08	1.9	0.34
+YDR061W	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	0.21	0.55	0.71	-0.22	-0.39	0.3		0.18	-0.43	-0.02	1.07	1.27	0.29
+YIR018W	YAP5      transcription not yet annotated	#000000	#55FF55	1	0.34	0.33	0.11	-0.34	-0.72	0.15	-0.45	0.01	-0.19	0.56	1	1.01	-0.49
+YKL008C	LAC1      not yet annotated molecular_function unknown	#505000	#55FF55	1	0.5	0.22	0.79	-0.45	-0.04	-0.19		-0.59	-0.06	0.29	0.69	1.25	0.22
+YHR151C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1				-1.25	-0.57	-0.06	-0.34	-1.14	-0.24	0.43	1.27	2.43	0
+YLR463C	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	0.49	0.27	0.15	-0.79	-0.27	0.1	-0.43	-0.36	-0.06	0.34	1.1	1.19	-0.19
+YJL094C	KHA1      biological_process unknown molecular_function unknown	#000000	#55FF55	1	0.26	0.84	0.48	-1.77	-0.26	-0.14	-0.95	-0.58	-0.01	1.05	2.87	3.92	-0.37
+YNL296W	KRE25     biological_process unknown molecular_function unknown	#505000	#55FF55	1	0.48	0.93		-0.92	-0.14	0.21		-0.47		0.69	0.69	2.94	-0.06
+YGR246C	"BRF1      transcription initiation, from Pol III promoter RNA polymerase III transcription factor"	#F00000	#55FF55	1	0.18	0.82	0.11		-0.36	0.37	0.35	-0.45		0.68			
+YDR503C	LPP1      phospholipid metabolism not yet annotated	#0000F0	#55FFFF	1	0.01	0.34		0.27	-0.19	-0.47		-0.31			1.1	0.63	
+YGL229C	SAP4      G1/S transition of mitotic cell cycle protein serine/threonine phosphatase	#000000	#55FF55	1	-0.07			0.62	-0.42	-1.05	-0.92	-0.79	-1.08				-0.24
+NORF 46		#505000	#55FF55	1	0.69	0.31	-0.34	-0.5	-0.76	-0.82	0.07	-1.54	-0.32	0.64	0.56	0.13	0.03
+YGL195W	GCN1      not yet annotated not yet annotated	#F00000	#55FF55	1	-0.09	-0.16	-0.06	-0.29	-0.8	-0.07	-0.34	-0.57	0.28	0.13	0.18	0.14	0.21
+YCR092C	MSH3      not yet annotated not yet annotated	#0000F0	#55FFFF	1	0.46	-0.06		-0.22	-0.56	-0.02	-0.23	-1.4	0.34		0.14		0.99
+YJL116C	NCA3      not yet annotated not yet annotated	#000000	#55FF55	1	1.02	0.53		-0.36	-1.4	0.29		-2.51	0.6	-0.24	-0.31		
+YDR430C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	0.18	0.32	0.19	-0.33	-0.52	-0.03	-0.2						0.39
+YJL139C	YUR1      N-linked glycosylation* mannosyltransferase	#F00000	#55FF55	1	0.22	0.8		-0.38	-0.94	0.08	-0.44	-0.68		0.09	0.02		
+YCL053C		#0000F0	#55FFFF	1	0.4	1.52	0.79	-0.22		-0.38	-0.24						1.03
+YMR206W	biological_process unknown molecular_function unknown	#000000	#55FF55	1				-1.06	-1.34			-2.07	1.58	1.56	1.1	0.86	
+NORF 55		#505000	#55FF55	1	0.36	0.34	0.26	-0.2	-0.62	0.3		-0.54	0.43	0.42	0.76	0.27	0.05
+NORF 33		#F00000	#55FF55	1				-0.26	-0.57	0.29	-0.28	-0.52	0.34	0.4	0.38		0.47
+SPLYDL029W		#0000F0	#55FFFF	1	-0.19	0.79		-0.42	-0.96	0.39	-0.53	-0.75			0.76		
+YGR140W	CBF2      mitosis not yet annotated	#000000	#55FF55	1	-0.04	0.47	-0.15	-0.1	-0.83	0.42		-0.75	0.22	0.61	0.59	0.3	0.2
+YER054C	GIP2      not yet annotated not yet annotated	#505000	#55FF55	1	-0.05	1.01	-0.46	-0.07	-0.56	-0.01		-0.93	0.59	1.16	1.13	0.46	0.32
+YPL167C	REV3      DNA repair* zeta DNA polymerase	#F00000	#55FF55	1	-0.79	0.64		-0.08	-0.38	-0.03	0.04	-0.82			0.7		0.24
+YOR068C	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.47	0.19		-0.28	-0.14	-0.13	-0.15	-0.56	0.56	0.46	0.39		0.22
+YLR436C	ECM30     not yet annotated molecular_function unknown	#000000	#55FF55	1	-0.51		0.81	-0.45	-0.56	-0.13		-0.47	0.6	0.44	0.49	0.05	0.05
+YJL141C	YAK1      not yet annotated not yet annotated	#505000	#55FF55	1	-0.04	0.41	1.01	-1.06	-0.44			-0.98	0.52	0.17	0.08	0.24	
+YAR023C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1		0.24	0.68	-1.05	-0.5		0.19	-0.69		0.61			
+YDL190C	UFD2      not yet annotated molecular_function unknown	#0000F0	#55FFFF	1	0.2	0.16	0.47	-0.38	-0.52	-0.33			0.08	0.22	-0.12		0.14
+YML048W	GSF2      not yet annotated molecular_function unknown	#000000	#55FF55	1	1.16	0.24	0.34	0.47	-0.94	-1.56		-0.68	0.5	0.47	0.86	1.1	-0.34
+YMR314W	PRE5      ubiquitin-dependent protein degradation multicatalytic endopeptidase	#505000	#55FF55	1	0.71	0.65	0.19	0.5	-0.91	-0.35	0.21	-0.46	0.44	0.37	0.97	0.85	-0.18
+YDL100C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.57	0.34	-0.08	0.97	-0.93	-0.55	0.42	-0.29	0.08	0.38	1.14	0.86	-0.15
+YOR362C	PRE10     ubiquitin-dependent protein degradation multicatalytic endopeptidase	#0000F0	#55FFFF	1	0.29	0.44	-0.38	0.35	-0.58	-0.7		-0.12	0.38	0.41	0.7	0.58	-0.21
+YGL035C	"MIG1      transcription regulation, from Pol II promoter* DNA binding*"	#000000	#55FF55	1	0.48	0.15	-0.73	0.01	-0.55	-0.74	-0.56	-0.77	0.84	0.06	0.47	0.86	-0.04
+YBR193C	"MED8      transcription, from Pol II promoter RNA polymerase II transcription mediator"	#505000	#55FF55	1	0.15	-0.09	-0.24	0.5	-0.37	-0.69	-0.54	-0.56	0.42	0.09	0.2	0.3	-0.31
+YHR116W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.28	0.44	0.06	0.74		-0.61	-0.96	-0.82	0.24	0.14	0.5	0.69	-0.2
+YKL195W	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	0.01	0.28	0.19	0.69	0	-0.78		-0.81					
+YGL144C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	0.27	-0.06	-0.35	-0.39	0.23	-0.19	-0.09	-0.77		-0.44	-0.1	0.76	-0.22
+YOR014W	RTS1      protein biosynthesis protein phosphatase type 2A	#505000	#55FF55	1	-0.24	-0.15	-0.08	-0.42	0.22			-0.57			0.14	0.55	
+YDR406W	PDR15     not yet annotated not yet annotated	#F00000	#55FF55	1	-0.74	-0.25	-0.08	-1.03	0.39	-0.61	-0.2	-1.17	0.22	-0.82			0.16
+YNR067C	DSE4      biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.43	-0.96	-0.17	-1.05	-0.63	-0.3	-0.68	-1.77				-0.42	
+YLR119W	SRN2      not yet annotated molecular_function unknown	#000000	#55FF55	1	-0.27	-0.74		-0.63				-1.22		-0.13	-0.44		-1.74
+YHR004C	NEM1      nuclear organization and biogenesis not yet annotated	#505000	#55FF55	1	-0.11	-0.25	0.33	-0.08	-0.18		-0.56	-1.41					
+SPLYHR001W-A		#F00000	#55FF55	1				-0.7	-1.51	-0.18			-0.36	0.01	-0.05	0.05	-1.95
+YJL057C	IKS1      not yet annotated protein kinase	#0000F0	#55FFFF	1	-0.22	-0.05	0.14		-0.96	-0.2		-1.82	-0.05	0	0		
+YPL191C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	0.02	-0.05	0.26	0.09	-0.72		-0.38	-1.28			-0.05		
+YJL054W	TIM54     mitochondrial translocation protein transporter	#505000	#55FF55	1	0.06	-0.25		-0.09	-1.27	-0.56	-0.77	-1.09		-0.2	-0.22	-0.31	-1.06
+YBR284W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.25	-0.14	0.82	-0.37	-1.75		-0.99	-1.12					
+YKL006C-A	SFT1      intra Golgi transport v-SNARE	#0000F0	#55FFFF	1		0.01		-0.56	-1.28	0.04	-1.1	-0.95		0.03	-0.37	-0.23	
+YDR517W	GRH1      mitotic spindle checkpoint molecular_function unknown	#000000	#55FF55	1	0.42	-0.09	-0.59	-0.45	-0.75	-0.84		0.17	-0.93	-1.09	-0.6	-0.07	0.36
+YNL004W	HRB1      biological_process unknown heterogeneous nuclear ribonucleoprotein	#505000	#55FF55	1	0.14	0.19	-0.31	-0.34	-1.06	-0.74	0.71	-0.79	-1.24	-0.74	-0.39	-0.09	-0.26
+NORF 96		#F00000	#55FF55	1	0.4	-0.59	0.06	-0.14	-1.66	-1.34		-0.49	-1.43	-0.9	-0.29	0.07	
+YJL062W	LAS21     biological_process unknown not yet annotated	#0000F0	#55FFFF	1	0.15	-0.72	-0.11	-0.26	-0.56	-0.27			-0.79	-0.34	-0.24	-0.06	-0.08
+YJL121C	RPE1      not yet annotated ribulose-phosphate 3-epimerase	#000000	#55FF55	1	0.96	-0.82	-0.83	-0.62	-1.39	-1.07		-0.42	-0.61	0.04	-0.5	-0.31	0.04
+YER017C	AFG3      protein complex assembly* adenosinetriphosphatase*	#505000	#55FF55	1	0.2	-0.23	0.22	-0.27	-1.37	0.02		-0.4	-0.4	-0.13	-0.2	-0.18	0.23
+YLR094C	GIS3      biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.69	-0.14	0.32	-0.44	-1.28	0.34		-0.74	-1.18	-0.84	0.03	-0.24	-0.4
+YDR251W	PAM1      pseudohyphal growth molecular_function unknown	#0000F0	#55FFFF	1	0.65	-0.54	0.38	-0.56	-0.85	-1.16	-0.69	-1.43	-0.71	-0.98	-0.17	0.65	-0.2
+NORF 64		#000000	#55FF55	1		-0.13		-0.32	-0.25	-0.19		-0.52	-0.28	-0.2	-0.08	0.15	
+YPR160W	GPH1      not yet annotated glycine amidinotransferase	#505000	#55FF55	1	1.62	-1.16	1.1	-0.91	-1.55	-1.45	0.5	-2.62	-1.01	-1.43	-1.92	0.42	-0.36
+FRAGYHR016C		#F00000	#55FF55	1		-0.45		0.35	-0.69	-0.34		-1.49	-0.61	-0.72	-0.62	0.05	-0.84
+YKR011C	TOS5      biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	0.48	-0.14	0.21	0.75	-0.95	-0.44	0.28		-0.36	-0.67			-0.76
+YOR039W	CKB2      establishment of cell polarity (sensu Saccharomyces)* casein kinase II	#000000	#55FF55	1	-0.28	0.13	0.02	0.34	-1.15	-1.15	-0.14	-0.89	-0.48	0.12	1.17	0.93	-0.33
+YFR020W	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.19	-0.26	0.11	-0.27	-0.72	-1.09	0.09	-0.52	-0.35	-0.06	0.62	0.65	-0.21
+YBR287W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.58	-0.53	-0.01	-2.01	-2.53	-1.75	-1.39	-2.19	-1.98	-0.38	0.91	1.69	-0.07
+YFR047C	not yet annotated not yet annotated	#0000F0	#55FFFF	1	0.08	0.12		-0.31		-0.3				0.02	0.14	0.39	
+YLR091W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	0.11	0.21	0.25	-0.68	-0.56			-0.44		0.02			
+YLR002C	NOC3      biological_process unknown molecular_function unknown	#505000	#55FF55	1	0.16	0.21		-0.15	-0.93	-0.05			-0.22	0.16	0.05	0.07	-0.23
+YPL161C	BEM4      establishment of cell polarity (sensu Saccharomyces)* molecular_function unknown	#F00000	#55FF55	1	0.04	0.23	-0.19	-0.49	-1.09	0.15	0.22	-0.85		0.16	0.19		
+YCL003W		#0000F0	#55FFFF	1	0.19	-0.01	0.2	-0.35	-1.06	-0.16	0.05	-0.74		0.18	0.25	0.38	0.16
+YMR119W-A	biological_process unknown molecular_function unknown	#000000	#55FF55	1	0.13	-0.19	0.25	0.01	-1.67	0.1		-1.33	-0.24	0.45	0.7	0.1	
+NORF 52		#505000	#55FF55	1	0.02	-0.22	-0.04	-0.11	-1.04	-0.05	0.06	-1.15	-0.12	0.24	0.43	0.12	0.01
+YGR221C	TOS2      biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.37	-0.11	0.39	-0.06	-0.78	-0.34		-1.48		0.07	0.88	0.93	
+YJL037W	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	0.06	0.18	0.94	-0.35	-1.27	0.5		-1.98	0.09	0.28	0.95	1.05	-0.45
+YDR317W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.26	-0.26	0.39	0.05		0.28	-0.19	-0.62			0.54	0.03	
+YLR088W	GAA1      not yet annotated not yet annotated	#505000	#55FF55	1	-0.36	-0.38		-0.05	-0.75			-1.12	-0.47	-0.24			
+YKL138C	MRPL31    protein biosynthesis structural protein of ribosome	#F00000	#55FF55	1	-0.6	0.12	0.57	1.37	-1.76	-0.36		-1.83		-0.74	0.56	1.11	-0.46
+YNL252C	MRPL17    protein biosynthesis structural protein of ribosome	#0000F0	#55FFFF	1	0.37	0.26		0.87	-1.3	-0.28	-0.34	-0.97	-0.7	-0.45	0.3	0.35	-0.13
+YPL115C	BEM3      establishment of cell polarity (sensu Saccharomyces)* signal transducer*	#000000	#55FF55	1	0.5	-0.31	0.59	0.34	-0.5	0.04	-0.1	-0.83	-0.43	-0.63	0.44	0.54	-0.31
+YGR227W	DIE2      not yet annotated not yet annotated	#505000	#55FF55	1	0.51	-0.25	0.64	-0.21	-1.09	-0.08		-1.56	-0.68	-0.37	0.08	0.38	-0.19
+YLR366W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.28	-0.19		0.02		0.15	-0.34	-0.51	-0.33	-0.07	0.03		-0.11
+YMR281W	GPI12     GPI anchor synthesis N-acetylglucosaminylphosphatidylinositol deacetylase	#0000F0	#55FFFF	1	-0.12	-0.98	-0.09	0.2	-1.22	-0.18	-0.16	-1.29	-0.91	-0.24	1.15	1.48	-0.18
+YLR229C	CDC42     establishment of cell polarity (sensu Saccharomyces)* signal transducer*	#000000	#55FF55	1	0	-0.62	-0.17	0.35	-0.82	-0.56	-0.01	-0.47	-0.91	-0.36	0.35	0.53	-0.28
+YPR165W	RHO1      establishment of cell polarity (sensu Saccharomyces)* signal transducer*	#505000	#55FF55	1	-0.39	-0.21	-0.07	0.43	-1.91	-1.28	-0.21	-1.17	-1.18	-0.56	0.63	0.39	-0.21
+YJL143W	TIM17     mitochondrial translocation protein transporter	#F00000	#55FF55	1	-1.34	-0.12	-0.51	0.04	-2.06	-0.82	-0.52	-1.15	-1.29	-0.5	0.34	1.08	
+YNL306W	MRPS18    protein biosynthesis structural protein of ribosome	#0000F0	#55FFFF	1	-0.36	-0.02	-0.82	0.13	-1.65	-0.29		-1.43	-0.87	-0.64	0.22	0.18	
+YJR133W	XPT1      not yet annotated not yet annotated	#000000	#55FF55	1	-0.63	-0.63	-0.58	0.23	-1.25	0.04		-0.81	-0.58	-0.33	0.13	0.03	0.29
+NORF 51		#505000	#55FF55	1	-1.12	-0.57	-0.52	-0.84	-2.24	0.39	-0.16	-3.01	-1.18	-1.25	-0.2	0.18	-0.13
+YER034W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.28	-0.2	-0.2	-0.45	-1.02	0.32	-0.16	-1.08		-0.54	-0.07		-0.48
+YDR461W	MFA1      signal transduction of mating signal (sensu Saccharomyces) pheromone	#0000F0	#55FFFF	1	-0.03	0.18	-0.68	-0.5	-1.47	0.73	0.3	-1.9	-1.77	-1.21	0.3	0.64	
+YJL038C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.49	0.57		-0.33	-1.18	0.57		-1.37	-1.17	-0.46	-0.29	0.46	-1.5
+YKL038W	RGT1      glucose metabolism DNA binding*	#505000	#55FF55	1	0.69	0.72		-0.39	-0.68	0.28		-0.58		0.23	-0.35	0.83	-0.52
+YGR170W	PSD2      not yet annotated phosphatidylserine decarboxylase	#F00000	#55FF55	1	0.35	0.21	-0.28	-0.25	-0.65	0.08	-0.25	-0.88	-0.3	-0.1	-0.35	0.71	-0.16
+YJR159W	SOR1      not yet annotated L-iditol 2-dehydrogenase	#0000F0	#55FFFF	1	-0.1	0.36		0.16	-1.5	-0.1	-0.29	-0.79	-0.98	-0.14	-0.1	1.37	0.22
+YPL063W	biological_process unknown not yet annotated	#000000	#55FF55	1	0.37	0.14	-1.23	0.12	-0.92	-0.18	-0.72	-0.37	-0.47	-0.18	-0.05	1.49	-0.19
+YNL326C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.35	0.07		0.23	-0.46	-0.19	-0.01	-0.6	-0.46	-0.3	-0.02	1.83	0.03
+YCL002C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.32	0.22	0.48	-0.55	-1.06		0.04	-0.9	-0.4	-0.44	0.52	0.59	0.22
+YLR246W	ERF2      not yet annotated molecular_function unknown	#0000F0	#55FFFF	1	-0.03	0.16	0.3	-0.35	-0.44	0.06		-0.26		-0.09	0.47		
+YGL255W	ZRT1      high-affinity zinc ion transport high affinity zinc uptake transporter	#000000	#55FF55	1	-1.49	0.2	2.18	-1.53	-1.59	-0.27		0.27	-1.46	-0.54	1.18	1.17	0.29
+YLR332W	MID2      not yet annotated molecular_function unknown	#505000	#55FF55	1	-0.75	-0.36	1.12	-0.8	-0.64	-1.05		-0.44	-1.57	-1.32	0.23	0.61	0.36
+YFR022W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.18	0.17	0.8	-0.46	0.27	-0.14	-0.53	-0.25	-0.7	-0.26	0.1	0.24	-0.05
+YDR533C	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-2.28	-1.3	1.79	0.04	-0.48	-0.3	-0.01	-0.56	-1.74		0.08	0.16	0.2
+YPL214C	THI6      vitamin B1 biosynthesis hydroxyethylthiazole kinase*	#000000	#55FF55	1	-1.4	-0.66	1.05	0.03	-0.21	-0.22	-0.89	-0.2	-0.08		0.56	0.41	-0.14
+YNL208W	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-1.19	-0.52	0.57	-0.19	-1.22	-0.41		-0.75	0.27	0.53	0.47	0.62	
+YLR087C	CSF1      biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.26			-0.06	-0.56	0		-0.28	0.22	0.41	0.43	0.22	
+YJL067W	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-1.15	-0.69	0.4	0.28	-1.91	-0.1		-0.88		1.21			
+YPR068C	HOS1      establishment and/or maintenance of chromatin architecture* histone deacetylase	#000000	#55FF55	1		-0.5	0.67	0.44	-1.2	0.02	-0.16		0.11	0.77	0.58	0.31	-0.07
+YKR053C	YSR3      sphingolipid metabolism not yet annotated	#505000	#55FF55	1	-1.05	-0.66	0.12	-0.22	-0.76	-1.09		1.05					
+YJL103C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1		-0.74		-0.36	-1.04	-0.99	-0.45			-0.06	0.28	0.73	
+YEL064C	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.7	-0.8		-0.49	-0.52	-0.46		0.16	0.43	0.01	0.47	0.22	-0.41
+YNL334C	SNO2      biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.7	-0.93	-0.18	-0.74	-1.36	-0.26	0.22	-0.26	0.33	-0.7	0.57	0.5	-0.16
+YGL167C	PMR1      transport not yet annotated	#505000	#55FF55	1	-0.23	-0.43		0	-0.38	0.21		-0.15	-0.14	-0.01	0.46	0.19	0.44
+YLR419W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.31	0.01	0.05	-0.04	-0.28	0.39	0	-0.31	0.28	0.08	0.8		0.48
+YDR079W	PET100    cytochrome c oxidase biogenesis molecular_function unknown	#0000F0	#55FFFF	1	-0.01	0.13	0.01	0.33	-1.15	0.19	0.03	-0.4	-0.14	0.21	0.76	1.21	0.6
+YOL016C	CMK2      protein amino acid phosphorylation* calcium/calmodulin-dependent protein kinase	#000000	#55FF55	1	-0.16	-0.68	0.22	-0.1	-0.56	0.29	-0.21	-0.31	-0.52	0.26	0.56	1.18	-0.1
+YPL098C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.96	-1.71		0	-1.92	-0.67		0.21	0.35	0.22	0.91	1.26	0.21
+YPL260W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.43	-1.09	-0.7	0.23	-1.24	-0.39	-0.47	-0.13	0	0.07	0.94	0.88	0.31
+YDR073W	SNF11     chromatin modeling non-specific RNA polymerase II transcription factor	#0000F0	#55FFFF	1	-0.6	-1.02	-0.93	0.16	-0.76	0.18		-0.42	0.54	-0.19	0.88	1.45	0.29
+YDR193W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.15	-0.43	-0.8	-0.16	-0.13	0.01	-0.21	-0.27	-0.34	0.02	0.4	0.38	0.03
+YPL164C	MLH3      not yet annotated not yet annotated	#505000	#55FF55	1	-0.6	-1.41		-0.33		-0.45	-0.53	-0.82		-0.32	0.92	0.56	-0.01
+YER181C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.05	-0.53	-0.48	-0.33		-0.13	-0.18	-0.36		-0.02	0.23		0.17
+YMR258C	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.41	-0.72	-0.33	0.28	-0.7	-0.38	0.28	-1.11	0.12	0.34	0.23	0.9	-0.06
+YER182W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.64	-0.7	-0.93	0.25	-0.54	-0.52	-0.27	-1.73	0.29	0.47	0.87	0.7	0.11
+YER084W	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.82	-0.31	-0.51	-0.23	-0.38	0.05		-0.23	0.12	0.53	0.58	0.36	-0.16
+YOR030W	DFG16     invasive growth molecular_function unknown	#F00000	#55FF55	1	-0.81	-0.22	-0.3	-0.39	-0.42	-0.16	-0.5	-0.55	0.2	0.94	1.01	0.81	
+YGR046W	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.92	-0.34	-0.02	-0.24	-0.16	-0.08		-0.45	0.13	0.34	0.67	0.49	0.51
+YOR352W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-1.02	-0.36	-0.2	-0.12	0.17	-0.43		-0.85	0.52	0.85	1.25	0.62	
+YBR183W	YPC1      sphingolipid metabolism not yet annotated	#505000	#55FF55	1	-0.86	-1.77	0.12	-0.81	-0.2	-0.7		-0.9	0.48	0.55	0.87	0.77	-0.06
+YGL006W	PMC1      transport not yet annotated	#F00000	#55FF55	1	-0.52	-1.23	-0.23	-0.41	-0.47	-0.43	-0.11	-0.86	0.19	0.26	0.72	0.46	-0.2
+YGL045W	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.92	-1.12	-0.22	-0.87	-0.7	-0.63	-0.17	-0.81	-0.22	0.25	0.39	0.63	0.18
+YDR254W	CHL4      not yet annotated molecular_function unknown	#000000	#55FF55	1	-0.69	-0.72	-0.5	-0.41	-0.15	0.02		-0.42	-0.04	0.61		0.43	0.08
+NORF 26		#505000	#55FF55	1		-0.78		-0.28	0	-0.12	-0.09	-0.4	0.01	0.46	0.56	0.62	0.29
+YPL019C	VTC3      not yet annotated not yet annotated	#F00000	#55FF55	1	-1.03	-1.07	-0.92	-0.26	-0.61	0.04		-1.1	0.1	0.69	1.75	1.76	0.31
+YMR317W	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1		-1.16		-0.1	-0.68	0.15	0.12	-0.71		0.83	1.26	2.12	
+YNL092W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.63	-0.44		-0.26	-0.22	0.31		-0.28	-0.6	0.62	0.82	0.98	
+YJL151C	SNA3      biological_process unknown molecular_function unknown	#505000	#55FF55	1	-1.19	-1.15	-0.36	-0.54	-0.82	0.44	0.49	-0.69	-0.34	0.45	1.06	1.28	-0.01
+NORF 75		#F00000	#55FF55	1	-1.19	-1.17	0.17		-0.67	0.16	0.1	-0.82	-0.32	0.24	1.1	1.05	0.23
+YNL093W	YPT53     endocytosis not yet annotated	#0000F0	#55FFFF	1		-2.24	-0.11	-0.92	-0.68	-0.24	0.73		-0.66	1.08	2.16	2.71	
+YGL193C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.99	-1.12	-0.82	-1.41	-0.69	-0.26	0.02	-1.55	-0.64	0.34	1.39	1.8	0.15
+YPR123C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.93	-0.19		-0.37		-0.34	-0.22	-0.68		0.23	0.89		0.04
+YOR220W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-1.58	-0.73	-0.09	-0.52	-0.66	-0.94		-0.98	0.31	0.65	2.14	2.43	-0.31
+YPL141C	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.05	-0.5	0.01	-0.35	-0.42	-0.74	-0.2	-1.05	-0.04	0.31	0.84	1.46	-0.01
+YPR106W	ISR1      not yet annotated protein kinase	#000000	#55FF55	1	-0.27		-0.35	-0.38	0.08	-0.37	-0.09	-1.1	-0.25	0.08	0.99	1.37	-0.16
+YMR004W	MVP1      not yet annotated not yet annotated	#505000	#55FF55	1	-0.15	-0.8	-0.24	-0.21	-0.23	-1.32	-0.61	-0.6	0.45	0.31	0.74	1.74	
+YPL057C	SUR1      mannose-inositol-P-ceramide (MIPC) metabolism not yet annotated	#F00000	#55FF55	1	-1.11	-1.09	-0.21	-0.34	-0.69	-1.61	-1.32	-0.36	0.01	0.74	1.45	2.5	-0.09
+YNL305C	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-1.01	-1.05	-0.61	-1.64	-0.24	-1.62		-0.44	0	0.83	1.09	1.99	0.13
+YLR156W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.87	0.14	-0.1	-0.66		-0.19		-0.8		0.19	0.98	0.96	
+YPL224C	MMT2      not yet annotated not yet annotated	#505000	#55FF55	1	-1.07	-0.09	0.15	-0.37	-0.05	-0.22		-0.39	-0.23	0	1.15	1.14	0.34
+YML066C	SMA2      biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.82	-0.45	0.05	-0.55	-0.47	-0.17	-0.51	-1.07		0.08	0.81		
+YLR350W	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.72	-0.41	0.32	-0.47	-0.11	0.1		-0.73	0.02	0.05	0.44	0.45	0.22
+YHR155W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.34	0.35		-0.17	-0.05	0.22	-0.07	-0.56		0	0.67	0.46	-0.5
+YLR015W	BRE2      transcription transcription factor	#505000	#55FF55	1		0.41	0.08	-0.08	-0.69	1.05		-1.66	-0.67	0.74	1.43	1.74	
+YLR161W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.3	0.13	-0.42	-0.48	-0.48	-0.14	0.2	-1.45	-0.6	0.41		1.26	
+YKL058W	"TOA2      transcription initiation, from Pol II promoter general RNA polymerase II transcription factor"	#0000F0	#55FFFF	1	-0.86	0.25	-0.51	0.29	-0.9	-0.16	-0.28	-0.82	0.01	0.55	1.42	1.51	-0.2
+YLR220W	CCC1      iron homeostasis* molecular_function unknown	#000000	#55FF55	1	-0.03	-0.44		0.37	-0.18	0.04		-0.29	-0.48	0.7	1.75	1.21	-0.78
+YOR191W	RIS1      not yet annotated not yet annotated	#505000	#55FF55	1	-0.22	-0.07		0.22	0.56	-0.03	0.03	-0.41		0.6	1.98	1.2	0.25
+YKL059C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1		-0.19	-0.84	0.18	0.23	-0.35	-0.07		-0.02	0.56	1.34	1.08	-0.05
+YNL323W	LEM3      cell surface receptor linked signal transduction molecular_function unknown	#0000F0	#55FFFF	1	0	0	-0.7	0.47	-0.14	-0.34	0.2		0.16	0.8		1.29	-0.04
+YKL088W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.17	0.32	-0.99	0.4	0.01	-0.79	-0.06	-0.25	-0.31	-0.01	1.07	1.19	0
+YEL038W	UTR4      biological_process unknown molecular_function unknown	#505000	#55FF55	1	0.07	0.22	-1	-0.35	0.05	-0.04		-0.23	-0.2	0.06	0.9	1.32	-0.56
+YHR168W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.08	-0.48	-0.83	-0.19	0.1	-0.4	-0.72	-0.08	0.08	0.18	0.68	0.77	0.03
+YMR272C	SCS7      fatty acid metabolism not yet annotated	#0000F0	#55FFFF	1	0.21	-0.83	-0.11	-0.4	0.09	-0.56	-0.81	-0.67	-0.52	0.02	0.83	1.36	-0.12
+YNL183C	NPR1      transport not yet annotated	#000000	#55FF55	1	0.26	-0.2	0.36	-0.36	0.04	-0.99	-0.79	-0.33	0.23	0	1.01	0.93	-0.17
+YGR023W	MTL1      not yet annotated molecular_function unknown	#505000	#55FF55	1	-1.08	-0.2	0.37	-0.86	0.46	-0.59	-0.45	-1.06	0.14	-0.01	0.33	0.78	-0.17
+YKL176C	LST4      not yet annotated molecular_function unknown	#F00000	#55FF55	1	-1.3	0.14	-0.1	-0.6	0.14	-1.27	-0.69	-0.88	0.11	0.09	0.15		-0.51
+YKL198C	PTK1      polyamine transport not yet annotated	#0000F0	#55FFFF	1	-1.03	0.09	0.04	-0.54	-0.06	-1.03		-0.7		0.24			
+YPR202W	biological_process unknown molecular_function unknown	#000000	#55FF55	1		0.3		-0.95	0.08	-1.39	-0.8	-0.73		0.26	0.54	0.94	
+YKL175W	ZRT3      zinc ion transport* zinc ion transporter	#505000	#55FF55	1	-1.26	-0.31	-0.09	-1.04	-0.58	-1.69	-0.47	0.12	-0.45	-0.05	0.56	1.16	0.01
+YAR019C	CDC15     cell cycle protein kinase	#F00000	#55FF55	1	-0.64	-0.56	-0.24	-0.36	-0.51	-0.64	-0.58	-0.74	-0.65	-0.03	0.23	0.75	-0.07
+YBR036C	CSG2      sphingolipid metabolism not yet annotated	#0000F0	#55FFFF	1	-1.71	-0.65	-0.14	-0.99	-0.48	-2.19		-1.18	-0.92	-0.47	0.34	0.86	-0.03
+YER186C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.73	-0.23	-0.37	-0.28	-0.12	-0.76	0.1	-0.77	-0.98	-0.19	0.36	0.63	-0.11
+YLR117C	CLF1      cell cycle* molecular_function unknown	#505000	#55FF55	1	-0.4	0.31		-0.21	-0.12	-0.45		-0.33	-0.26	-0.19	0.27	0.26	0.08
+YLR270W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.23	-0.34	0.06	-0.26	-0.07	-1.29	-1.21	-1.53	0.37	0.37	-0.28		0.04
+YDR477W	SNF1      protein amino acid phosphorylation* SNF1A/AMP-activated protein kinase	#0000F0	#55FFFF	1	0.26	-0.61	-0.23	0.18	-0.75	-0.98	-0.79	-1.27	0.36	0.26	-0.33	1.45	-0.06
+YGL098W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.05	-0.61	-0.23	0.11	0.22	-0.54		-0.71		0.23	0	1.34	-0.38
+YGR198W	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.1	-0.46	-0.18	-0.04	-0.42	-0.41		-0.6	-0.29	-0.02	-0.42		
+YGL037C	PNC1      biological_process unknown nicotinamidase	#F00000	#55FF55	1	-0.76	-1.4	-0.18	-0.17	-1.5	-2.82	-0.53	-1.97	-0.75	-0.42	-1.62	1.55	0.08
+YLR403W	SFP1      biological_process unknown not yet annotated	#0000F0	#55FFFF	1	0.06	-0.75		-0.61	-0.21	-0.54	-0.2	-0.19		0.19	-0.24	0.64	
+YPR153W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	0.11			-0.5	-0.32	-0.09		0.14		-0.09		1.22	
+YNL332W	THI12     vitamin B1 biosynthesis molecular_function unknown	#505000	#55FF55	1		-0.84			-1.01	-0.36	-0.88	0.3	0.29	-0.15	-0.78		0.03
+YPR195C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.5	-0.31	-0.99	-0.57		0.19	-0.57	-0.37	0.25	0.08	-0.43	0.89	-0.03
+YOR006C	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.09	0.08	-0.35	0.36	-0.43	-0.17	-0.35	-0.21	0.28	0.48	-0.37		0.42
+YPL182C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	0.05	0.65	-0.17	0.12	0.01	0.33	-0.36	-0.33	0.46	1.13		0.59	0.43
+YJL045W	not yet annotated not yet annotated	#505000	#55FF55	1	0.68	1.21		0.97	-0.4	0.64		-0.12	0.32	1.78	-0.24		
+YDL033C	not yet annotated not yet annotated	#F00000	#55FF55	1	0.15	0.62		0.02	-0.41	-0.12	-0.16	-0.5	0.12	0.27		0.28	-0.07
+YLR373C	VID22     not yet annotated molecular_function unknown	#0000F0	#55FFFF	1	0.2	0.66	-0.35	0.01	-0.36		-0.28	-0.32					
+YLR072W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.01	0.83	-0.3	-0.18	-0.46		-0.51	-0.35			-0.44		
+YLR070C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	0.01	0.8	-0.71	-0.65	-0.7	-0.07	-0.08	-0.42	0.44	0.29	-1.2		
+YBR020W	GAL1      galactose metabolism galactokinase	#F00000	#55FF55	1	0.3	0.34	0.54	-0.43	-0.24	-0.12		0.22	0.47	0.84	-0.57	-0.14	0.35
+YER179W	DMC1      meiosis* DNA binding	#0000F0	#55FFFF	1	0.88	0.49	0.61	-0.57	-0.56	0.35	-0.1	0.39	1.75	-0.48	-1.1		-0.3
+YNR013C	PHO91     biological_process unknown molecular_function unknown	#000000	#55FF55	1	0.77	0.69	0.26	-0.77	-0.34	0.14	0.12	0.1		-0.29	-1.19		0.06
+YGL017W	ATE1      ubiquitin-dependent protein degradation* arginyltransferase	#505000	#55FF55	1	0.39	0.6	0.25	-0.09	0.46	0.1	-0.01		0.53	0.29	-0.75	-0.54	-0.04
+YDL038C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.11	0.14	0.63	0.02	0.83	0.16	-0.11	0.01	0.43	0.19	-1.74		0.12
+YPL066W	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1		0.13	0.46	-0.12	-0.21	-0.19			0.6	0.14	-1.3	-0.18	0.29
+FRAGYML056C		#000000	#55FF55	1	0.09	0.9	0.6	0		-0.22	-0.55	-0.06			-1.02		0.38
+YER157W	SEC34     not yet annotated not yet annotated	#505000	#55FF55	1	0.03	0.47	0.48	0.06	0.23	-0.06	-0.16	0.01	0.13	-0.52	-0.81	-0.18	0.28
+YKL216W	URA1      not yet annotated dihydroorotate oxidase	#F00000	#55FF55	1	0.01	0.97	0.42	1.01	-1.14	-0.88		-0.01		-1.12	-1.39		
+YMR186W	HSC82     stress response* chaperone*	#0000F0	#55FFFF	1		0.59	0.65	0.82	-0.92	-1.1		-0.07	1.4			0.11	
+YGR222W	PET54     protein biosynthesis* molecular_function unknown	#000000	#55FF55	1	-0.38	0.95	0.02		-0.37	-0.06		-0.71	0.66	-0.15			
+YER046W	SPO73     biological_process unknown molecular_function unknown	#505000	#55FF55	1				0.26	-0.46	-0.16	0.92	-0.95		-0.16	-0.82		-0.37
+YMR299C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.26	0.75	-0.13	0.17	-0.87	-0.41	0.77	-1.18		-0.19			
+YLR079W	SIC1      not yet annotated not yet annotated	#0000F0	#55FFFF	1	0.02	0.51	0.11	0.22	-0.32	-0.41		-0.78	0.12	0.04			
+YJR125C	ENT3      actin filament organization* cytoskeletal adaptor	#000000	#55FF55	1	0.24		-1.08	0.65	0.44	-0.76	-0.05	-0.69	0.31	0.42	-0.36	-0.76	-0.29
+YDL171C	GLT1      not yet annotated glutamate synthase (NADH)	#505000	#55FF55	1	0.68	0.05	-0.06	0.47	0.3	-0.12	-0.21	-0.29	0.3	0.39	-0.06	-0.41	0.14
+YPL158C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.56	-0.37		0.76		0.18	-0.09	-0.57		-0.02	-0.5		0.13
+YLR363C	NMD4      biological_process unknown not yet annotated	#0000F0	#55FFFF	1	0.14			0.67	0.24	-0.17	-0.01	-0.47	0.29	-0.06	-0.3	0.05	0.13
+YKL212W	SAC1      not yet annotated not yet annotated	#000000	#55FF55	1	0.1	0.24	0.16	0.75	0.2	-0.37	-0.7				-0.49		-0.37
+YKL018W	SWD2      biological_process unknown molecular_function unknown	#505000	#55FF55	1	0.73	-0.08	0.36	0.72	0.11	-0.24	-1.12			0.06	-0.74		
+YHR117W	TOM71     biological_process unknown protein transporter	#F00000	#55FF55	1	0.98	0.22	-0.66	0.49	-0.4	-0.56	-0.27	-0.33	0.61	-0.21	-0.72	-0.46	-0.09
+YPL029W	SUV3      not yet annotated RNA helicase	#0000F0	#55FFFF	1	0.71	-0.04	0.05	0.27	-0.63		-0.44	-0.82		-0.33			-0.76
+YLR268W	SEC22     non-selective vesicle fusion* v-SNARE	#000000	#55FF55	1	0.62	0.07	-0.31	0.18	-0.95	0.41		-0.99		-0.47	-0.4	-0.84	
+YGR244C	LSC2      tricarboxylic acid cycle* succinate--CoA ligase (ADP-forming)	#505000	#55FF55	1	0.2	-0.02	-0.09	0.16	-0.16	0.1		-0.38	0.73	-0.2		-0.21	
+YPR194C	OPT2      oligopeptide transport oligopeptide transporter	#F00000	#55FF55	1	-0.62	1.04		-0.94	-0.68	0.04	-0.35	-0.76		-0.35	0.05	-1.57	0.32
+YAR064W	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.12	0.73	0.08	-0.7		0.1	-0.03	-0.63					0.28
+YJL075C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.01	0.33	-0.07	0.12	0.13	0.75		-0.62	0.36	-0.29	0.24	-0.21	
+YKL057C	NUP120    mRNA-nucleus export* structural protein	#505000	#55FF55	1	0.58	0.29	0.06	-0.22	-0.09	0.3	0.39	-0.76	0.75	-0.18	-0.35	-0.62	
+YIL082W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.83	0.05	0.69	-0.14	0.17	0.17	0.55	-0.53	0.26	-0.16		-0.39	
+YGL052W	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1				-0.55	0.27	0.54	0.86	-0.84		-0.69	-0.59	-0.73	-0.19
+SPLYDL082W		#000000	#55FF55	1	0.11	-0.44	-0.32	-0.59		1.05		-1.65		-1.18	-0.54		
+YIL130W	biological_process unknown molecular_function unknown	#505000	#55FF55	1	0.09	-0.25	0.06	0	-0.11	0.24	0.55	-0.67	0.26	-0.2	-0.26	-0.29	-0.03
+YDL086W	not yet annotated not yet annotated	#F00000	#55FF55	1	0.49	-1.17	0.07	-0.34	0.21	0.06		-0.14	0.41	0.18	-1.24	-1.56	-0.01
+YAR031W	PRM9      mating (sensu Saccharomyces) molecular_function unknown	#0000F0	#55FFFF	1	-0.62	-0.79	0.08	-0.61	-0.31	0.27	0.02	-0.95	1.03	-0.34	-0.88	-0.68	0.01
+YHR122W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.42	-0.3	0.18	-0.37	-0.52	-0.06		-0.52				-0.79	
+YDR453C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.36	-0.74	0.56	-1.33	-1.12	-0.58	-0.41	-1.49	1.26	-0.31		-2.83	-0.11
+YGR044C	RME1      meiosis transcription factor	#F00000	#55FF55	1	-0.42	-0.14	0.1	-0.49	0.01	-0.03		-0.8	0.11	-0.05	-1.37	-1.56	0.38
+YLR315W	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.53	-0.26		-0.61	0.17	0.04		-0.79			-1.39		0.08
+YDL142C	CRD1      lipid biosynthesis* cardiolipin synthase	#000000	#55FF55	1	-0.15	-0.27	0.08	-0.35	0.12	-0.08	0.47	-0.63	0.38	-0.56	-0.77	-1.85	0
+YJR142W	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.29	-0.1	0.47	0.02	-0.19	-0.54	0.34	-0.69	0.35	-0.27	-0.37	-0.87	0.1
+YIR043C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.34	-0.45	0.63	-0.23	-0.68	-0.43	0.5	-0.77	-0.1	0.05	-0.83	-1.01	-0.25
+YAR028W	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.7	-0.27	1.05	-0.18	-0.65	0.07	0.71	-1.13	0.26	-0.47	-1.28	-0.96	-0.37
+YOL150C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.07	0.16	1.35	0.15	-0.61	0.55	1.27	-0.86	0.72	0.2	-1.25	-2.47	-0.13
+YHR079BC		#505000	#55FF55	1		0.1		-0.37	-0.54	0.74		-0.44		0.64		-2.2	-0.04
+YDL150W	"RPC53     transcription, from Pol III promoter DNA-directed RNA polymerase III"	#F00000	#55FF55	1	-0.65	-0.29	0.44	-0.17		0.06	0.41	-0.53	0.43		-0.43	-0.77	0.12
+YBR092C	PHO3      thiamin transport acid phosphatase	#0000F0	#55FFFF	1	-0.81	-0.48	0.61	-0.14	0.33	0.48	0.92	-0.47			-0.31		
+YFL049W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.61	-0.43	-0.02	0.23	0.61			-0.59	0.64	0.53	-0.52	-0.81	
+YDR196C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.43	-0.19	-0.2	0.57	0.18	0.15	1.08	-0.9	1.07	0.97	-0.54	-0.59	-0.61
+YPL178W	CBC2      not yet annotated not yet annotated	#F00000	#55FF55	1	-0.09	-0.55	-0.58	0.44	-0.37	0.12	0.72	-0.33	0.72	0.16	-0.39	-0.29	-0.49
+YMR127C	SAS2      not yet annotated not yet annotated	#0000F0	#55FFFF	1	-0.39	0.03	0.31	0.2	-0.65	-0.1			1.48	0.12	-0.26	-0.46	-0.67
+YAL049C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.25	0.04	0.41	0.25	-0.41	-0.39	0	-0.55	0.41	0.31	-0.34	-0.62	-0.18
+YIR036C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.4	-0.05		0.21	-0.4	-0.49	-0.25	-0.51	0.89	0.92	-0.82		-0.29
+YDR452W	PHM5      not yet annotated not yet annotated	#F00000	#55FF55	1				0.32	-0.12	0.26	0.09	-0.67	0.89	0.73	-0.67	-0.88	-0.51
+YDL205C	HEM3      not yet annotated hydroxymethylbilane synthase	#0000F0	#55FFFF	1	-0.27	0.27	0.17	0.6	0.12		-0.04	-0.71			-0.94		
+YHR194W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.58	0.29	-0.12	-0.56	-0.43	-1.09		-0.61	0.19	0.32	-0.84	-0.61	0
+YGR176W	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.42	0.17		-0.14	-0.3	-0.6	0.34	-0.66				-0.27	
+YBL070C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1		0.41	0.81	-0.28	0.24	-0.4		-0.58	0.2	0.52	-0.45	-0.73	-0.11
+YKL151C	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.44	-0.14	1.25	-0.6	0.02	-0.38		-0.53	0.24	0.36			-0.57
+YDL057W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.3	0.08	0.58	-0.09	-0.07	-0.13	-0.16	-0.17	-0.05	0.3	-0.61	-0.15	0
+YFR003C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	0.13	0	0.23	-0.42	0.52	0.32	0.33	-0.1	0.42	0.05	-0.22	-0.25	-0.28
+YBL095W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.08	0.42	0.53	-0.82	0.91	0.89	0.94	0.02	0.28	-0.35	-1.09	-1.23	0.12
+YGR119C	NUP57     mRNA-nucleus export* structural protein	#0000F0	#55FFFF	1	-0.14	0.64	-0.32	0.17	1.05	0.3	0.46	0.9	0.81	0.22	-0.3	-0.49	0.14
+YDR390C	UBA2      ubiquitin cycle ubiquitin activating enzyme	#000000	#55FF55	1	-0.51	0.33	0.22	-0.03	1.05	0.44		0.44	0.57	0.19	-0.12	-0.61	-0.07
+YDR368W	YPR1      biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.67	0.28	0.58	0.72	1.01	0.03		0.64	0.46	-0.05	-0.14	-1.41	
+YPL095C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-1.74	2.17		1.5	2.09	0.03		1.03		-0.23	-1.14		
+YGL246C	RAI1      biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.16	1.1	0.03	0.45	0.89	0.09		0.08		-0.67		-0.91	-0.67
+YOR251C	not yet annotated not yet annotated	#000000	#55FF55	1	-0.14	0.43		0.32	0.32	0		0.19	0.45	0.1	-0.39	-0.89	
+YLR205C	HMX1      biological_process unknown molecular_function unknown	#505000	#55FF55	1			0.31	0.2	1.41	-0.42	0.79	0.65	1.09	-0.13	-1.31	-1.82	-0.38
+YLR174W	IDP2      glutamate biosynthesis* isocitrate dehydrogenase (NADP+)	#F00000	#55FF55	1	-1.22		1.65	-0.68	1.79	-0.61	1.24	0.94	0.77	-0.68	-1.86	-2.33	-0.44
+YNL239W	LAP3      not yet annotated not yet annotated	#0000F0	#55FFFF	1	-0.21	-0.1	0.55	0.04	0.8	-1.37		0.29	1.1	-0.03	-1.26	-1.15	-0.4
+YHR192W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	0.02	0.43	-0.42		0.02	0.01	0.35	0.19	0.5	0.36	-1.38	-1.52	0.12
+YHL034C	SBP1      RNA processing not yet annotated	#505000	#55FF55	1	-0.04	-0.48	-0.68	0.8	-0.27	-0.01	0.17	0.46	0.5	0.38	-1.06	-1.96	-0.14
+YDR304C	CPR5      stress response peptidylprolyl isomerase	#F00000	#55FF55	1	-0.6	-0.16	-0.04	0.5	0.16	0.41	0.86	-0.12	-0.2	-0.84	-0.75	-2.53	-0.48
+YHR049W	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	0.49	1.21	0.63	0.52	-0.52	0.68	0.61	-0.57	-0.51	-0.28	-0.58	-4.48	0.03
+YMR236W	"TAF17     transcription initiation, from Pol II promoter* general RNA polymerase II transcription factor"	#000000	#55FF55	1	0.89	0.74		0.76	0.17	0.18	0.45	-0.19	-0.21	-0.11	-0.54	-1.98	-0.06
+YNL248C	"RPA49     transcription, from Pol I promoter DNA-directed RNA polymerase I"	#505000	#55FF55	1		2.23	0.57	1.34	-0.21	1.25	0.87	0.82	-0.67	-0.59	-0.29	-3.38	-0.02
+YDR399W	HPT1      not yet annotated not yet annotated	#F00000	#55FF55	1	0.94	0.68	0.47	1.04	-0.74	0.52	0.73	-0.07	-0.65	-0.69	-0.39	-1.61	-0.56
+YBR164C	ARL1      not yet annotated not yet annotated	#0000F0	#55FFFF	1	0.49	1.28	0.45	1.5	-0.04	1.46		0.31				-1.48	
+YGR158C	MTR3      35S primary transcript processing* 3'-5' exoribonuclease	#000000	#55FF55	1	0.4	0.46	0.11	0.98	-0.12	0.62	0.85	0	0.33	-0.17	-0.73		0.11
+YML014W	biological_process unknown molecular_function unknown	#505000	#55FF55	1	0.31	0.24	-0.37	0.52	0.37	0.19	0.48	0.6	0.32	-0.45	-0.67		-0.12
+YJR069C	HAM1      not yet annotated molecular_function unknown	#F00000	#55FF55	1	0.44	0.33	-0.29	0.68	0.31	1.04	0.97	0.76	0.23	-0.31	-0.47	-1.19	-0.65
+YOR253W	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.71	0.66	-0.63	1.07	0.32	0.91	1.68	0.44	-0.01	-0.36	-0.08	-1.1	
+YIL020C	HIS6      histidine biosynthesis 1-(5-phosphoribosyl)-5-[(5-phosphoribosylamino)methylideneamino)imidazole-4-carboxamide isomerase	#000000	#55FF55	1	-0.31	0.28	-0.46	1.01		0.84	1.21	0.44					0.14
+YBL057C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.6	0.28	-0.24	0.24	0.06	0.92		0.58	0.26	-0.12	-0.63		-0.49
+YOR012W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.29	-0.33	0.21	-0.27	0.06	-0.08	0.36	0.11	0.06	-0.48	-0.65	0.03	-1.36
+YOR131C	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.14	-1.01	-0.46	0.29	-0.35	0.27		-0.02	-0.04	-1.14	-1.49		
+YEL066W	HPA3      not yet annotated not yet annotated	#000000	#55FF55	1	0.21	-0.74	-0.56	0.11	-0.49	0.56	0.49	-0.21	-0.07	-0.73	-1.15	-1.66	-1.67
+YOR250C	CLP1      not yet annotated not yet annotated	#505000	#55FF55	1	0.23	-0.61		0.26	0.19			0.47	0.31	-0.49	-0.76	-0.8	
+YMR061W	RNA14     not yet annotated not yet annotated	#F00000	#55FF55	1	-0.05	-1.01	-0.35	-0.52	0.5	-0.48			-0.04	-1.27	-0.43	-1.17	
+YIL062C	ARC15     cell growth and/or maintenance structural protein	#0000F0	#55FFFF	1	-0.45	-0.68	-0.61	0.1	0.17	-0.62	0.14	-1.03	-0.04	-0.8	-0.38	-1.57	
+YHR044C	DOG1      not yet annotated 2-deoxyglucose-6-phosphatase	#000000	#55FF55	1	-0.95	-0.91	-0.34	0.71	-0.36	-0.18	0.2	-1.46	-0.92	-1.45	-0.78	-0.7	-1.43
+YKL201C	MNN4      protein amino acid glycosylation not yet annotated	#505000	#55FF55	1	-0.42	-0.08		-0.34	-0.02	-0.72	0.91	-0.83	-0.53	0.08		-0.8	-0.25
+YPL035C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.25	-0.26	0.03	-0.03	0.75		0.85	-0.78		0.17			-0.61
+YJR149W	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.6	-0.94	0.13	-0.56	1.54	-1.26		-1.35			-0.78		
+YMR163C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.12	-0.3	0.35	-0.25	0.57	-0.67		-0.53		0.05			
+YKL104C	GFA1      not yet annotated glucosamine--fructose-6-phosphate aminotransferase (isomerizing)	#505000	#55FF55	1	-0.77	-0.48	0.02	-0.37	0.66	-0.62		0.06	-1.23	-0.54	-0.53	-0.54	-0.95
+YCR046C	IMG1      protein biosynthesis structural protein of ribosome	#F00000	#55FF55	1	-0.76	-0.12	-0.36	0.6	0.69	-0.41		-0.11	-1.09	-0.46	-0.44		
+YBR236C	ABD1      mRNA capping mRNA (guanine-N7)-methyltransferase	#0000F0	#55FFFF	1	-0.48			0.71	0.6	-0.32	0.68	-0.07					-0.75
+YOR280C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.84	-0.81	0.22	0.35	0.45			-0.05	0.11	0.09	-0.31	-0.39	
+YML016C	PPZ1      sodium ion homeostasis protein serine/threonine phosphatase	#505000	#55FF55	1	-0.66	-0.44	0.2	0.29	0.02	-0.57	0.3	-0.51	-0.04	0.09	-0.19	-0.3	0.03
+YBR251W	MRPS5     protein biosynthesis structural protein of ribosome	#F00000	#55FF55	1	-1.21	-1.1	-0.53	1.01	0.89	-0.53		1.18	-0.14	-0.97	-0.14		
+YOR284W	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.9	-1	-0.49	0.32	1.05	-0.68	0.81	0.76	0.41		-0.04	-0.74	
+YDR388W	RVS167    endocytosis* cytoskeletal protein binding protein	#000000	#55FF55	1	-0.33	-0.67	0.26	-0.13	0.43	-0.44	0.38	0.17	0.36	-0.86	-0.31		-0.19
+YER175C	TMT1      biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.41	-0.22	0.25	-1.07	1.19	-0.54	1.12	0.43	-0.87	-1.09	-1.46	-1.84	-0.17
+YJR095W	SFC1      fumarate transport* succinate/fumarate antiporter	#F00000	#55FF55	1		-1.17	-0.75	-3.75	2.48	0.31	1.54	0.78	0.16	-0.73	-1.87	-3.07	-0.34
+YBR060C	ORC2      DNA replication initiation* DNA replication origin binding	#0000F0	#55FFFF	1	-0.8	-0.69	-0.74	-0.89	0.73	-0.39		0.29	-0.38	0.4	-0.82	-1.3	0.22
+YJR059W	PTK2      polyamine transport not yet annotated	#000000	#55FF55	1	-0.4	-0.66	-0.61	-0.13	0.21	0.23		-0.2	-0.05	-0.19	-0.44	-0.21	0.5
+YLR282C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.86	-0.92	-0.59	0.27	0.63			-0.32	0.24	0.02	-0.72		
+YJR084W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-1.15	-0.85	-0.41	-0.22	0.88	0.38		0.22	0.1	-0.27	-0.74	-0.01	0.63
+YKL179C	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.66	-0.54	-0.65	-0.12	0.7	0.28		0.34	0.2	0.09	-0.47	-0.1	0.56
+YFR043C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.63	-0.8	-0.55	-0.23	0.59	0.16		0.38	0.26	-0.19	-0.26	-0.69	0.18
+YNR068C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.88	-1.39	-0.51	-0.56	0.6	0.56	0.59	0.09	0.29	-0.09	-0.65	-1.09	0.02
+YJR044C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.39	-1.01	-0.66	-0.6	0.32	-0.12	0.19	-0.06	0.29	-0.14	-0.13	-0.84	
+YDR009W	GAL3      transcription regulation* molecular_function unknown	#0000F0	#55FFFF	1	-0.43	-0.72	-0.32	-0.47	0.7	-0.28		0.36	-0.18	0.07	-0.12	-0.24	0.01
+YDL216C	RRI1      biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.26	-0.66	-0.09	-0.28	0.76	-0.44		0.07	0.03	0.23	-0.37		
+YLR306W	UBC12     polyubiquitylation* ubiquitin conjugating enzyme	#505000	#55FF55	1	-0.09	-0.59	-0.29	-0.16	0.72	-0.16	0.35	-0.12		-0.02	-0.19		
+YLR152C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.77	-1.03	-1.16	-0.67	2.01	-0.94		0.1	-0.04	-0.63	-0.5	-0.13	-0.19
+YGR291C	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.52	-0.85	-0.53	0	1.3			0.35	-0.05	-0.42	-0.22	-0.11	
+YEL020C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-1.48	-0.81	-0.43	-0.56	2.53	0.41	0.22	-0.16	0.08	-0.98	-1.45	-1.4	-0.18
+YLR104W	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.77	0.04	-0.37	0.11	1.68	0.33		0.05	0.04	-0.03		-1.15	
+YPR064W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1		-0.12			1.4	0.41	0.01	-0.33	-0.04		-0.03		-0.15
+YIL064W	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.88	-0.17	-0.13	0.31	1.37	0.52		-0.52		-0.27			
+YGR169C	PUS6      biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.05	-0.32	-0.2	0.04	-0.09	0.24	0.19	-0.35	0.48	-0.25	-0.04	-0.33	0.57
+YKL033W	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.08	-0.51	-0.24	-0.52		0.07	-0.19			-0.25	-0.18		
+YMR148W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.02	-0.92	-0.67	-0.7	-0.72	-0.1	-0.05	-0.39	1.45	0.1	-0.63	-0.19	0.51
+NORF 79		#0000F0	#55FFFF	1	0.08	-0.08		-0.54	-0.17	0.08		-0.74	0.58	0.24	-0.41	0.16	0.11
+YNL318C	HXT14     hexose transport galactose transporter	#000000	#55FF55	1				-0.09	-0.43	0.03	-0.41	-0.81	0.67	0.54		0.18	0.18
+YLR265C	NEJ1      biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.1	-0.15	-0.52	-0.04	-0.44	0.04		-1.02					
+YDR523C	SPS1      not yet annotated not yet annotated	#F00000	#55FF55	1	-0.92		0.19	-0.5	-0.23	0.22	-0.22	-0.76		0.01	-0.41	0.34	
+YMR015C	ERG5      ergosterol biosynthesis C-22 sterol desaturase	#0000F0	#55FFFF	1				-0.09	-0.12	0.36		-0.37	0.58		-0.36	0.13	0.41
+YCR029C		#000000	#55FF55	1	-0.26	-0.39	0.48	-0.1	-0.3			-0.69	0.91	-0.05	-0.46		
+YDL006W	PTC1      tRNA splicing* protein phosphatase type 2C	#505000	#55FF55	1	-0.81	-0.54	-0.43	0.1	0.35	0.25	-0.16	-0.55	0.62	-0.35			-0.4
+YLR066W	SPC3      signal peptide processing signal peptidase	#F00000	#55FF55	1	-1.01	-1.36	-0.75	0.28	0.11	0.69	0.73	-0.72	0.64	-0.56	-1.17		0.17
+YOR121C	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-1.76	-2.89	-0.99	-0.21	-0.77	0.55	0.95	-0.95	0.83	-0.51	-2.21	-0.06	-0.07
+YGR025W	biological_process unknown molecular_function unknown	#000000	#55FF55	1		-0.8	-0.36	0.1	0.11	-0.06	0.02	-0.66	0.24	0.17	-0.71		
+YNR034W	SOL1      not yet annotated molecular_function unknown	#505000	#55FF55	1	-0.34	-1.53	-0.73	0.2	0.34	0.1		-0.75		0.52		0.29	0.19
+YJR127C	ZMS1      biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.07	-1.06	0.09	-0.27	0.22	0.18		0.22	0.07	0	-0.39	0.02	0.62
+YPL259C	APM1      not yet annotated not yet annotated	#0000F0	#55FFFF	1	0.22	-0.73	0	-0.17	-0.25	0.04		0.16	-0.19	-0.35	-0.26	0.12	0.39
+YKL209C	STE6      a-factor export ATP-binding cassette (ABC) transporter	#000000	#55FF55	1	0.8	-0.54		-0.14	0.34	0.41		0.29	-0.17	-0.43	-0.64	-0.1	0.26
+YJR102C	VPS25     biological_process unknown molecular_function unknown	#505000	#55FF55	1		-0.44	-0.03	-0.24	-0.12	0.15		-0.17	-0.13	-0.54	-0.97	-0.1	0.76
+YLL055W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.7	-0.69	-0.9	-0.5	0.24	0.66	0.13	-0.41		-1.89	-2.54		
+YJL044C	GYP6      not yet annotated not yet annotated	#0000F0	#55FFFF	1	0.81	0.71	0.05	0.16	-0.36	0.23			-0.24	0.13	-0.77	-0.34	-0.77
+YML097C	VPS9      not yet annotated not yet annotated	#000000	#55FF55	1		0.62		-0.13	-0.57	0.31		-1.93	-0.19		-0.74	0.01	
+FRAGYPL031C		#505000	#55FF55	1			0.27	0.1	-0.4	0.29		-1.06	-0.02	-0.1	-0.27	-0.11	-0.66
+YBR288C	APM3      not yet annotated not yet annotated	#F00000	#55FF55	1	1.02	0.45	0.34	0.48	-0.6	0.44	-0.05	-1.05		0.08	-0.37	0.35	
+YHR052W	CIC1      protein degradation molecular_function unknown	#0000F0	#55FFFF	1	1.07	1.41	0.91	0.9	-0.43	0.98		-3.19	0	0.24	0.41	0.2	-0.71
+YLR242C	ARV1      biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.26	-0.11	0.14	0.22	-0.27	0.89		-1.4	-0.37	-0.32	-0.04	-0.02	-0.64
+YMR053C	STB2      biological_process unknown not yet annotated	#505000	#55FF55	1	-0.05	-0.22	-0.19	0.52	-0.3	0.65		-1.62	-0.22	-0.59	-0.96		
+YKL017C	HCS1      lagging strand elongation DNA helicase	#F00000	#55FF55	1	-0.08	0.16		0.31	-0.64	0.66		-4.29	-0.66	-0.31			
+YLR228C	ECM22     biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.09	-0.15	-0.25		0.12			-1.1		0.04	-0.61	-0.47	
+YDR457W	TOM1      polyubiquitylation* ubiquitin--protein ligase	#000000	#55FF55	1	0.09	0.05	-0.33	0.09	0.14	0.78	0.02	-0.81	-0.22	-0.43	-0.27	-0.27	-0.05
+YDL077C	VAM6      not yet annotated vacuolar carboxypeptidase Y	#505000	#55FF55	1	0	0.08	-0.27	0.5	0.51	0.69	0.08	-0.45			-0.51		0.02
+YKL130C	SHE2      not yet annotated not yet annotated	#F00000	#55FF55	1	-0.14	0	0.17	0.39	0.37	0.28	0.01	-0.77	-0.2	-0.28	-0.37	0.04	0.16
+YDR137W	RGP1      biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.04	0.1	0.39	0.01		0.18		-1.06	-0.27	-0.49	-0.32	-0.05	0.2
+YPR124W	CTR1      transport not yet annotated	#000000	#55FF55	1	-0.63	-1.04	0.18	-0.02	-0.25	0.75		-1.16		-1.17	-0.55	-0.06	
+SPLYBR078W		#505000	#55FF55	1	0.08	-0.47		-0.14	-0.53	0.31		-0.88	-0.44	-0.45	-0.22	-0.03	
+YGR171C	MSM1      not yet annotated methionine--tRNA ligase	#F00000	#55FF55	1	-0.05	-0.43	0.09	-0.17	-0.44	0.06	-0.43	-1.28	-0.18	-0.48	-0.52	-0.31	0.45
+YAL009W	SPO7      meiosis molecular_function unknown	#0000F0	#55FFFF	1	-0.38	-0.07	0.04	0.13	-0.44	0.33	-0.37	-0.77	-0.31	-0.17	-0.34	-0.18	0.32
+YMR074C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.57	-0.08	-0.2	-0.14	-0.47	0.08		-0.51	-0.47	-0.45	-0.26	-0.24	0.38
+YGL259W	YPS5      not yet annotated aspartic-type endopeptidase	#505000	#55FF55	1	-0.38	-0.13	0.25	-0.48	-0.42	-0.11		-0.82	-0.43	-0.03	-0.76	-0.24	0.7
+YHR067W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.28	0.19	-0.01	0	-0.14	-0.26		-0.75	-0.18	-0.5			
+YIL119C	RPI1      vitamin B1 biosynthesis* small GTPase regulatory/interacting protein	#0000F0	#55FFFF	1	-0.81	0.14	0.09	-0.16		-0.58	0.41	-1.75		-1.37			
+YER124C	DSE1      biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.73	0.07	0.24	-0.13	-0.69	-0.42		-2.5	0.32	-0.86	-0.45		
+YJR156C	THI11     vitamin B1 biosynthesis molecular_function unknown	#505000	#55FF55	1	-0.55	0.08	0.91	-0.6	-0.71	-0.11		-2.65	-0.24	-0.2	-1.26	-0.35	0.12
+YDR358W	GGA1      Golgi to vacuole transport molecular_function unknown	#F00000	#55FF55	1	-0.05	-0.2	-0.48	-0.15	-0.35	-0.18	0.46	-1.32	0.25	-0.04	-0.13	-0.11	
+YHR059W	FYV4      biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.14	-0.04	-0.69	0.6	0.39	-0.01		-1.58	-0.67	-0.95	-0.22		
+YBR297W	MAL33     maltose metabolism not yet annotated	#000000	#55FF55	1			-1.47	-0.12	-0.13	0.1		-1.54	-0.66	-0.89	-0.45	-0.41	0.05
+YIL095W	PRK1      protein amino acid phosphorylation* protein serine/threonine kinase	#505000	#55FF55	1	-0.03	-0.07	-1.05	0.07	-0.53	0.18	0.11	-1.15	-0.16	-0.54	-1.19	-0.65	-0.09
+YMR210W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.14	-0.07	-1.01	0.18	-0.82	-0.56	-0.28	-1.4	-0.26	-0.72	-1.58	0.19	0.12
+YGR076C	MRPL25    protein biosynthesis structural protein of ribosome	#0000F0	#55FFFF	1	-0.39	-0.58	-1.1	1.05	-0.62	-0.42	-0.66	-1.52	-0.15	-1.18			
+SPLYLR312W-A		#000000	#55FF55	1	-0.53	0.71	-1.07	0.86		-0.45	-1.03	-1.27		-1.35	-0.86		
+YEL015W	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.26	0.38	-0.45	0.44	-0.3	-0.13	-0.15	-0.8	0.29	-0.36	-0.43	-0.51	0.31
+YDR484W	SAC2      actin filament-based process molecular_function unknown	#F00000	#55FF55	1	-0.26	0.08	-0.55	0.31	-0.36	0.02	0.01	-0.57	0.51	-0.34	-0.39		-0.04
+YLR412W	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.27	0.07	-0.49	0.51	-0.78	0.37		-1.16	0.63	-0.5	-0.19		-0.17
+YIL158W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.78	0	-0.83	1.2	-1.16	0.43		-1.63	0.45	-0.52	-0.64	-0.4	
+YJL013C	MAD3      mitotic spindle checkpoint molecular_function unknown	#505000	#55FF55	1	-0.22	-0.03	-0.57	0.32	-0.46	0.11		-0.86	0.05	-0.09	0.05	0	0.23
+YNL303W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.78	-0.29	-0.44	0.59				-0.8		-0.07	-0.49		
+YGR070W	ROM1      establishment of cell polarity (sensu Saccharomyces)* signal transducer*	#0000F0	#55FFFF	1				0.45	-0.19	0.22		-0.58	-0.03		-0.45	-0.6	-0.2
+YDR071C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.39	0.05	-0.53	0.68	-0.48	0.29	-0.4	-0.69	0.04	0.09	-0.9	-0.69	-0.08
+YPR139C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.3	0.08	-0.51	0.19	-0.11	-0.13	-0.22	-0.7	0.17	-0.08	-0.98	-0.94	0.4
+YKR085C	MRPL20    protein biosynthesis* structural protein of ribosome	#F00000	#55FF55	1	-0.87	-0.22	-0.13	0	-1.26	-0.29		-0.21	0	-1	0.17	-0.77	0.24
+YGL242C	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.78	-0.19	-0.4	-0.03	-0.71	-0.03	0.7	0.42	-0.05	-0.62	0	-0.52	-0.34
+YDR519W	FPR2      biological_process unknown peptidylprolyl isomerase	#000000	#55FF55	1	-0.93	0.08	-0.45	0.38	-1.66	0.21	1.1	0.36	-0.28	-0.51	-0.77	-1.16	-0.13
+YEL068C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	0.15	-0.06	-0.49	0.26	-0.69	-0.22		0.29	0.39	-0.75	-0.35	-0.74	
+YMR194W	RPL36A    protein biosynthesis structural protein of ribosome*	#F00000	#55FF55	1	0.52	-0.05	-1.37		-1.68		1.28	-0.09		-1.01	0.5		-0.19
+YHR013C	ARD1      protein amino acid acetylation peptide alpha-N-acetyltransferase	#0000F0	#55FFFF	1	0.1	0.05	-0.47	0.91	-0.76	0.34		0.1	0.3	-0.5	0.02	-1.39	
+YEL031W	SPF1      transport not yet annotated	#000000	#55FF55	1	0.11	-0.2	-0.18	0.55	-0.42	0.16	0.87	0.2	0.13	-0.19	-0.07	-0.5	-0.47
+YLL066C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	0.77	-0.42	-0.67	-0.01	-0.61	0.47	1.82	0.49	-0.43	-0.64	-0.05	-0.85	-0.03
+YGL145W	TIP20     not yet annotated molecular_function unknown	#F00000	#55FF55	1	-0.06	-0.48	-0.06	0.39	-0.45	-0.06	0.39	-0.06	-0.59		0.05	-0.6	-0.14
+YGR020C	VMA7      vacuolar acidification hydrogen-transporting two-sector ATPase	#0000F0	#55FFFF	1	0.44	-0.66	-1.29	0.81	-0.91	-0.12		-0.44	-0.82	-0.68	-0.9		-0.32
+YMR218C	TRS130    not yet annotated not yet annotated	#000000	#55FF55	1	0.44	-0.26	-0.62	0.65	-0.43		0.9	-0.5		-0.5	-0.67		
+YGR207C	biological_process unknown not yet annotated	#505000	#55FF55	1	0.51	0.14	-0.66	1.29	-0.78	0.57		-0.36	-0.9	-0.31	-0.92		-0.93
+YKL110C	KTI12     not yet annotated molecular_function unknown	#F00000	#55FF55	1	0.26	-0.32	-0.63	1.26	-0.18	0.23	0.69	-0.27	-0.73	-0.24	-0.95		
+YNL154C	YCK2      protein amino acid phosphorylation* casein kinase I	#0000F0	#55FFFF	1	0.63	0.18	-0.52	1.01	-0.45		0.88	-0.95			-0.36	-0.35	
+YNL084C	END3      cytokinesis* cytoskeletal adaptor	#000000	#55FF55	1	-0.12	-0.01	-0.42	1.24	-0.19	0.41		-0.41	-0.01	-0.02	-0.56	-0.53	-0.75
+YPL227C	ALG5      not yet annotated dolichyl-phosphate beta-glucosyltransferase	#505000	#55FF55	1	0.01	-0.07	-0.12	1.61		0.69	1.34	-0.79		-0.71	-0.68		
+YER007C-A	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.18	-0.36	-0.21	1.02	-0.21	0.49		-0.36	-0.39	-0.53	-0.54	-0.54	-0.49
+YER042W	MXR1      oxidative stress response protein-methionine-S-oxide reductase	#0000F0	#55FFFF	1	0.27	-0.06	-0.24	1.08	-1.21	0.2		-0.17	-0.2	-0.22	-0.39	-0.55	
+YER086W	ILV1      not yet annotated threonine dehydratase	#000000	#55FF55	1	0.05	-0.02	-0.01	0.94	-1.83	-0.2		-0.51	-0.85	-0.62	-0.86		
+FRAGYMR225C		#505000	#55FF55	1	-0.4	-0.4		1.26	-1.89	-0.03	-0.91		-1.16	-0.82	-0.68		
+YJL183W	MNN11     biological_process unknown not yet annotated	#F00000	#55FF55	1	0.32	0.66	-0.24	0.34	-0.31	-0.03		0.18	-0.64	-0.51	-0.61	-0.1	0.37
+YJR040W	GEF1      transport not yet annotated	#0000F0	#55FFFF	1	0.73	0.5	0.22	-0.14	-0.52	-0.41	-0.17	-0.68	0.15	-1.28			
+YLR113W	HOG1      not yet annotated not yet annotated	#000000	#55FF55	1	1.36	0.77	-0.04	-0.03	-1.15			-1.4		-2.14		-1.38	
+YLR022C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	0.88	0.72	0.06	-0.1	-0.55	-0.1				-1.49	-1.49	-0.89	0.18
+YKL089W	MIF2      mitosis not yet annotated	#F00000	#55FF55	1	0.4	0.49	-0.17	0.56	0.27	0.13		-0.06	-0.45	-0.35	-1.44	-0.65	0.23
+YGL106W	MLC1      establishment of cell polarity (sensu Saccharomyces)* microfilament motor	#0000F0	#55FFFF	1	0.95	0.72	-0.14	0.98	-0.07	0.48	0.09	-0.59	-0.23	-0.35	-1.5	-1.03	-0.09
+YKL090W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	0.42	0.67	0.07	0.56	-0.19	-0.1	-0.07	-0.76	-0.41	-0.57	-1.11	-1.1	0.11
+YDL143W	CCT4      protein folding* chaperone	#505000	#55FF55	1	0.4	0.75	0.12	0.61	-0.73	-0.37	0.09	-0.44	-0.19	-0.34	-1.39	-1.41	-0.28
+YMR289W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.43	1.19	-0.05	0.88	-1.18	0.05		-0.79	-0.17	-0.68	-1.38		
+YHR063C	PAN5      biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	0.96	1.5	0.32	0.47	-0.66	-0.17	0.25	-0.57			-1.63		
+YKR080W	MTD1      not yet annotated methylenetetrahydrofolate dehydrogenase (NAD+)	#000000	#55FF55	1	0.89	1.05	0.23	0.02	-0.45	0.02		-0.47	-0.7	-0.27	-1.43		0.33
+YDR451C	YHP1      biological_process unknown molecular_function unknown	#505000	#55FF55	1	0.89	1	0.1	0.89	-0.37	-0.07	-0.21	-0.83	-0.74	-0.4	-0.95	-0.37	-0.03
+YNR009W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.59	0.84	0.02	0.93	-0.03	0	-0.08	-0.41	-0.29	-0.22	-0.37	-0.41	0.09
+YLR096W	KIN2      not yet annotated not yet annotated	#0000F0	#55FFFF	1	1.39	0.63	0.65	0.78	-1.04		-0.11	-0.31			-0.79		
+YHR163W	SOL3      not yet annotated molecular_function unknown	#000000	#55FF55	1				1.16	-1.66	-0.43	-0.36	-0.67	-0.82	-2.81			-0.35
+YOL139C	CDC33     protein synthesis initiation* translation initiation factor	#505000	#55FF55	1		0.22	0.12	0.98	-2.01	-0.26	0.09	-1.06	-1.26	-0.92	-0.13	-0.22	-0.17
+YMR228W	"MTF1      transcription, from mitochondrial promoter transcription factor"	#F00000	#55FF55	1	0.39	0.51	0.3	0.41	-1.32	-0.55	0.33	-1.33	-1.07	-0.83	-0.12	-0.27	-0.03
+YDR194C	MSS116    RNA splicing RNA helicase	#0000F0	#55FFFF	1	0.2	0.88	0.05	0.57	-1.48	-0.74	-0.14	-1.23	-1.42	-1.23	-0.41	-0.6	0.09
+YGL005C	COD5      biological_process unknown molecular_function unknown	#000000	#55FF55	1	0.26	0.43	0.18	0.71	-0.82		0.06	-0.85					
+YGL085W	biological_process unknown molecular_function unknown	#505000	#55FF55	1				0.38	-0.52	0.05	0.04	-0.53	-0.36	-0.5	-0.12	-0.03	-0.04
+YDR041W	RSM10     protein biosynthesis structural protein of ribosome	#F00000	#55FF55	1	0.14	0.58	-0.05	1.03	-1.28	-0.66	-0.46	-1.51	-1.57	-1.76	-1.73	-1.25	-0.04
+YNL016W	PUB1      mRNA processing not yet annotated	#0000F0	#55FFFF	1	0.95	0.62	-0.15	0.51	-1.03	-0.43	-0.22	-0.72	-1.14	-1.12	-0.98	-0.5	0.07
+YDL084W	"SUB2      lariat formation, 5'-splice site cleavage ATP dependent RNA helicase*"	#000000	#55FF55	1	1.24	0.79	0.43	0.75	-1.53	-0.93	-0.47	-1.38	-1.38	-1.66	-0.85	-1.17	-0.06
+YDR175C	RSM24     protein biosynthesis structural protein of ribosome	#505000	#55FF55	1	0.6	0.59	0.49	0.92	-0.77	-0.56	-0.36	-0.32	-0.93	-1.19	-0.6	-0.93	0.02
+YNL010W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.64	0.91	1.07	0.79	-2.16	0.18	0.11	-1.05	-1.53	-1.74	-1.32	-1.05	0.1
+YLR195C	NMT1      not yet annotated glycylpeptide N-tetradecanoylytansferase	#0000F0	#55FFFF	1	0.15	0.64	0.44	0.2	-0.88	0.02			-0.65	-0.81	-0.96	-0.24	
+YML056C	IMD4      biological_process unknown IMP dehydrogenase	#000000	#55FF55	1	0.32	1.41		0.41	-1.75	0.36	-0.21	-0.45	-1.38				-0.21
+YMR290C	HAS1      biological_process unknown RNA helicase	#505000	#55FF55	1	1.09	1.53	0.43	0.76	-1.55	0.06	-0.21	-0.27	-0.87	-1.01	-0.72	-0.08	-0.59
+YHR066W	SSF1      not yet annotated molecular_function unknown	#F00000	#55FF55	1	0.83	0.83		0.56	-1.16	0.02		-0.26		-0.54	-0.9		
+YMR309C	NIP1      not yet annotated not yet annotated	#0000F0	#55FFFF	1	1.08	1.38	1.05	1	-0.92	-0.38	0.05	0.19	-0.36	-0.69		-0.65	
+YGR084C	MRP13     protein biosynthesis structural protein of ribosome	#000000	#55FF55	1	0.96	0.99	0.58	1.12	-1.07	-0.66		-0.11	-0.83	-0.84	-1.49	-0.42	-0.07
+YLR150W	STM1      biological_process unknown molecular_function unknown	#505000	#55FF55	1	2.06	0.65	0.66	1.32	-2.4	-0.92	-0.79	-0.07	-1.95	-0.99	-1.44	-1.34	0.04
+YDR508C	GNP1      transport not yet annotated	#F00000	#55FF55	1	3.67	1.83		1.39	-1.77	-0.91	-0.58	0	-1.56	-2.59	-2.4	-1.87	-0.18
+YLR291C	GCD7      protein synthesis initiation translation initiation factor	#0000F0	#55FFFF	1	1.06	0.68	-0.4	0.89	-0.72	-0.56		0.64	-0.84	-1.15	-1.51	-0.89	-0.54
+YER091C	MET6      methionine metabolism 5-methyltetrahydropteroyltriglutamate--homocysteine S-methyltransferase	#000000	#55FF55	1	1.51	1.16	0.28	0.67	-0.9	-0.88		-0.58	-1.38	-0.99	-1.12	-0.12	
+YLR359W	ADE13     not yet annotated adenylosuccinate lyase	#505000	#55FF55	1	2.15	2.37	0.67	0.67	-1.41	-0.67	-0.84	-0.82	-2.17	-1.57	-2.77		-0.14
+YJL213W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	1.39	0.8	0.43	0.21	-1.09	-0.27	-0.5	-0.23	-1.36	-1.91	-1.47	-0.41	0.44
+YPR024W	YME1      mitochondrion organization and biogenesis ATP-dependent peptidase	#0000F0	#55FFFF	1	1.05	1.28	0	-0.31	-0.79	-0.35		-0.5	-1.13	-1.3	-1.16	-0.21	0.37
+YAL023C	PMT2      O-linked glycosylation dolichyl-phosphate-mannose--protein mannosyltransferase	#000000	#55FF55	1	0.81	0.85	-0.15	-0.35	-0.54	-0.64	-1.04	-0.36	-1.39	-1.73	-1.34		-0.14
+YLR249W	YEF3      protein synthesis elongation translation elongation factor	#505000	#55FF55	1	1.3	2.16	1.01	-0.3	-2.04	-1.53		0.34	-1.52	-2.77	-1	-0.63	
+YGR242W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.55	1.31	1.27	0.03	-0.74	-0.31	-0.07	-0.28		-0.87	-0.97	-0.57	
+YDR091C	RLI1      biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	0.78	1.75	0.83	0.24	-0.99	-0.79		-0.55	-0.56	-0.93	-0.87		-0.22
+YGR241C	YAP1802   endocytosis cytoskeletal adaptor	#000000	#55FF55	1	0.16	0.86	0.83		-0.89	-0.34	0.29	-0.48	-0.19	-0.43	-0.44	-0.12	
+YGR125W	biological_process unknown molecular_function unknown	#505000	#55FF55	1	1.09	0.8	-0.27	-0.16	-0.67	-0.2	0.21	-0.77	-0.93	-0.55	-0.42	0.05	0.12
+SPLYPR132W		#F00000	#55FF55	1		1.32		-0.27	-1.37	-0.04	0.48	-1.11	-1.49	-1.28	-0.57	-0.19	
+YKR036C	CAF4      not yet annotated not yet annotated	#0000F0	#55FFFF	1	0.58	0.8	-0.23	-0.23		0.39		-0.29		-0.71	-0.36	-0.02	0.37
+YPL103C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	0.21	0.5		-0.15	-0.35	0.24			-0.66	-0.47	-0.55	-0.03	0.19
+YLR009W	RLP24     biological_process unknown molecular_function unknown	#505000	#55FF55	1	0.41	0.79	0.24	-0.06	-0.91	0.39		-1.1		-1.04	-0.85		
+YKL218C	SRY1      serine metabolism not yet annotated	#F00000	#55FF55	1	1.15	0.87	0.45	0.15	-0.69	0.73	0.62	-0.22	-0.87	-1.2	-0.84	-0.55	
+YLR140W	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	1.51	0.9			-0.53	0.99		-0.4	-0.61	-0.69	-0.41		0.06
+SPLYDL130W		#000000	#55FF55	1	0.41	0.34	-0.03	-0.17		0.31		-0.12				0.04	
+YER087W	biological_process unknown not yet annotated	#505000	#55FF55	1	0.31	0.85	0.23	0.49	-1.56	0.21		-0.38		-0.08	-0.63		
+YGR164W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.59	0.32	0.28	0.24		0.64	0.08	-0.51		-0.32			0.21
+YGL151W	NUT1      not yet annotated not yet annotated	#0000F0	#55FFFF	1	0.98	0.71	0.51	0.51	-1.66	0.87	0.15	-0.64	-1.18		-0.87		
+YGL149W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	1.79	0.33		0.8		0.62	0.34	-0.73	-1.25		-0.99	-1.38	0.29
+YIR030C	DCG1      biological_process unknown not yet annotated	#505000	#55FF55	1	0.82	0.15	-0.06	0.29	-1.41	0.45		-1.38		-0.01	-0.86		
+YGL257C	"MNT2      O-linked glycosylation alpha-1,3-mannosyltransferase"	#F00000	#55FF55	1		-0.09	-0.14	0.14	-0.87	0.27	-0.2	-0.74	-0.56	-0.28	-0.51	-0.34	0.38
+YDR400W	URH1      not yet annotated not yet annotated	#0000F0	#55FFFF	1		0.4	0.68	0.22	-1.55	-0.16	0.32	-0.47	-2.39	-1.57	-0.56	-0.56	-1.39
+YLR172C	DPH5      not yet annotated diphthine synthase	#000000	#55FF55	1	0.53	0.17	0.59	0.28	-0.83	-0.46		-0.21	-0.95	-0.46	-0.1	-0.81	-0.35
+YHR064C	SSZ1      not yet annotated not yet annotated	#505000	#55FF55	1	0.89	0.66	0.51	0.42	-0.62	0.05		-0.67	-0.96	-0.53	-0.58	-1.09	-0.9
+YNL094W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.51	0.15		0.2	-0.32	-0.01	0.45	-0.26	-0.35	-0.42	0.03	-0.31	-0.42
+YPL079W	RPL21B    protein biosynthesis structural protein of ribosome	#0000F0	#55FFFF	1	0.74	-1	-1.17	-0.13	-1.14	0.91		-0.54	-1.43	-1.48	-1.07	-0.74	
+YMR087W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	0.25	-1.31	-0.6	-0.12	-1.16	0.53	0.46	-1.42	-0.76	-1.2	-1.67		-0.23
+YNL043C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-1.16	-1.28	-0.49	-0.44	-2.41	0.13	0.73	-1	-0.96	-1.2	-0.7	-0.35	-0.06
+YNL044W	YIP3      biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.57	-0.61	0.31	-0.32	-2.38	-0.42	-0.17	-1.13	-1.3	-1.43	-0.91	-0.32	-0.32
+YLL015W	BPT1      bilirubin transport bilirubin transporter	#0000F0	#55FFFF	1	-0.23	-0.18	-0.08	-0.02	-1.11	-0.13			-0.49	-0.27	0		
+YPR069C	SPE3      not yet annotated spermidine synthase	#000000	#55FF55	1	-0.27	-0.2	-0.08	0.3	-1.84	0.06	-0.24	-0.57		-0.77	-0.08		0.02
+YGL133W	ITC1      biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.34	-0.13		0.23	-0.9	0.21	-0.29	-0.34	-0.84	-0.11	0	0.01	-0.02
+YER031C	YPT31     not yet annotated not yet annotated	#F00000	#55FF55	1	0.1	-0.17		0.48	-1.65	0.32	-0.28	-0.99	-1.66	-0.46		-0.75	
+YER063W	THO1      not yet annotated molecular_function unknown	#0000F0	#55FFFF	1	-0.04	-0.55	-0.64	0.47	-2.07	0.26		-1.39		-0.44	-0.27	-0.52	
+YBL038W	MRPL16    protein biosynthesis structural protein of ribosome*	#000000	#55FF55	1	-0.66	-0.26	-0.67	0.86	-1.37	-0.04	0.35	-1.45	-1.56	-0.64	0.12	-0.18	-0.12
+YHR173C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.51	-0.35		0.34	-0.96	0.08	-0.03	-1.23	-0.7	-0.4	-0.21	-0.33	0.04
+YLR045C	STU2      microtubule nucleation structural protein of cytoskeleton	#F00000	#55FF55	1	-0.05	-0.28	-0.69	0.32	-0.44	0.1		-0.77	-0.7	-0.32	-0.17	-0.2	-0.17
+YNL070W	TOM7      mitochondrial translocation protein transporter	#0000F0	#55FFFF	1	-1.27	-1.14	-0.75	0.55	-1.43	0.74	0.73	-1.08	-1.66	-1.03	-0.34	-0.17	-0.3
+YGR181W	TIM13     mitochondrial translocation protein transporter	#000000	#55FF55	1	-0.48	-0.77	-0.59	0.5	-1.27	0.21	0.45	-0.6		-0.7	-0.63	-0.41	-0.14
+YLR390W	ECM19     not yet annotated molecular_function unknown	#505000	#55FF55	1	-0.54	-0.89	-0.61	0.35	-1.6	0.29	-0.07	-1.12	-1.35	-1.39	-1.16	-1.14	-0.17
+YGR235C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.89	-0.61	-0.74	0.2	-1.68	0.96	0.37	-1.4	-1.72	-1.16	-0.87	-0.89	-0.05
+YDR007W	TRP1      amino acid metabolism phosphoribosylanthranilate isomerase	#0000F0	#55FFFF	1	-0.98	-0.46	-0.72	-0.06		0.24		-0.76	-1.06	-0.89	-0.63	-0.45	-0.26
+YGR247W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.7	-0.5	-0.45	0.02	-0.86	-0.01	0.16	-0.79	-0.62	-0.45	-0.78		
+YDR115W	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.67	-0.24	-0.89	0.37	-2.04	-0.11		-1.14	-1.42	-1.38	-0.83	-0.3	0.47
+YNR037C	RSM19     protein biosynthesis structural protein of ribosome	#F00000	#55FF55	1	-0.54	0.3	-0.83	1.15	-2.1	-0.05	0.06	-1.2	-1.67	-1.64	-1.05	-0.66	0.02
+YBR187W	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.35	-0.05	-0.51	0.07	-1.61	0.01	-0.17	-1.23	-2.02	-2.03	-1.26	-0.67	-0.08
+YDL081C	RPP1A     protein biosynthesis* structural protein of ribosome	#000000	#55FF55	1	-0.07	0.08	-0.89	0.18	-2.63	0.34	0.27	-1.02	-2.88	-2.24	-1.18	-0.43	-0.1
+YIL076W	SEC28     non-selective vesicle coating not yet annotated	#505000	#55FF55	1	-0.14	-0.55	-0.12	0.33	-1.01	0.7		-0.52	-0.85	-0.58	-0.66	0.01	0.17
+YBR091C	MRS5      mitochondrial translocation protein transporter	#F00000	#55FF55	1	-0.35	-0.37	-0.21	0.9	-1.24	0.64	0.79	-0.92	-0.62	-0.43	-0.53	-0.04	-0.32
+YLR202C	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.53	-0.71	0.32	0.35	-1.74	0.43		-1.3	-1.11	-1.04	-0.28	-0.13	
+YMR184W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.2	-0.09		0.4	-0.93	0.27	0.77	-1.03	-0.74	-0.6	-0.47	-0.2	0.02
+YBR111C	YSA1      biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.24	-0.67	-0.02	0.52	-0.83		0.47	-0.98	-0.89	-0.43	-0.7	-0.6	-0.3
+YDR236C	FMN1      not yet annotated riboflavin kinase	#F00000	#55FF55	1	-0.24	-0.32	0.11	0.21	-0.76	0.3	0.5	-0.9	-0.39	-0.35	-0.31	-0.35	-0.27
+YNL319W	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.5	-0.8	0.22	0	-1.45	0.69		-1.26	-0.35	-0.45	-0.65	-0.79	-0.06
+YBL098W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.16	0.86	-0.29	0.25	-1.23	0.73	0.18	-0.77		-1.51	-1.14		
+YPL097W	MSY1      not yet annotated tyrosine--tRNA ligase	#505000	#55FF55	1	0.12	0.26		-0.13	-0.64	0.36		-0.56	-0.66	-1.22	-0.73	-0.33	
+YOR312C	RPL20B    protein biosynthesis structural protein of ribosome	#F00000	#55FF55	1	0.51	-0.83	-0.62	0.04	-2.39	0.49	-0.27	0.65	-1.48	-1.36	-0.88		0.34
+YLR448W	RPL6B     protein biosynthesis* structural protein of ribosome*	#0000F0	#55FFFF	1	-0.08	-1.02	-0.39		-2.72	1.93		1.13	-1.1	-2.12	-1	-1.14	
+YJR094W-A	RPL43B    protein biosynthesis structural protein of ribosome	#000000	#55FF55	1	-0.69	-0.83	-0.77	0.42	-2.36	1.65		0.21	-0.92	-1.21	-0.91	-0.8	-0.01
+YPL231W	FAS2      fatty acid biosynthesis 3-oxoacyl-[acyl-carrier protein] synthase*	#505000	#55FF55	1	-0.12	-0.23	-0.29	0.33	-0.76	0.32	0.1	0.14	-0.31	-0.22	-0.42	-0.33	0.12
+FRAGYIL133C		#F00000	#55FF55	1	-0.03	-1.36	-1.72	0.83	-2.62	2.02	-0.06	-0.49	-1.74	-1.39	-1.21	-1.26	0.19
+YGR033C	biological_process unknown molecular_function unknown	#0000F0	#55FFFF	1	-0.08	0.31	-0.32	0.18	-0.68	0.52	0.46	-0.45	-0.85	-0.24	-0.15	-0.24	-0.18
+YPL197C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.37	0.01		0.48	-1.6	1.29	0.73	-0.76	-3.07	-0.91	-1	-1	0.29
+YAR075W	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.33	0.11	-0.69	-0.14	-0.78	0.49		0.11	-1.42	-0.66	-0.46	-0.29	0.55
+YDL136W	RPL35B    protein biosynthesis structural protein of ribosome	#F00000	#55FF55	1	-0.08	-0.26	-1.22	0.27	-1.88	1.37		0.42	-1.9	-1.23	-0.41	-0.26	0.02
+YPR043W	RPL43A    protein biosynthesis structural protein of ribosome	#0000F0	#55FFFF	1	0.12	-0.45	-1.63	0.96	-2.79	1.89	0.96	0.16	-2.03	-1.64	-0.74	-0.41	-0.24
+YGL189C	RPS26A    protein biosynthesis structural protein of ribosome	#000000	#55FF55	1	-0.02	-1.15	-1.27	1.4	-2.58	1.34	1.21	-0.1	-2.24	-1.38	-0.69	-0.4	-0.16
+YKR057W	RPS21A    protein biosynthesis structural protein of ribosome	#505000	#55FF55	1	-0.76	-0.7	-1.02	1.03	-2.46	1.58	1.01	-0.03	-1.99	-1.5	-0.31	-0.13	-0.29
+YKR094C	RPL40B    protein biosynthesis* structural protein of ribosome	#F00000	#55FF55	1	0.05	-0.81	-1.44	0.53	-2.39	1.09	1.11	-0.38		-1.42	-0.19	-0.4	
+FRAGYHR141C		#0000F0	#55FFFF	1	-0.11	-0.89	-0.93		-2.09	2.21	1.2	-0.64		-1.26	-1.07		
+YLR185W	RPL37A    protein biosynthesis structural protein of ribosome	#000000	#55FF55	1	-0.03	-0.77	-0.91		-1.95	1.78		-0.13		-1.41	-1.25	-0.23	
+YLR388W	RPS29A    protein biosynthesis structural protein of ribosome	#505000	#55FF55	1	-0.07	-0.69	-0.86	1.51	-2.76	2.4	1.55	-0.28	-2.41	-2.24	-1.33	-0.76	0.19
+YPR044C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.51	-0.54	-0.87		-2.91	1.99	1.13	-0.52	-2	-1.99	-1	-1.06	-0.41
+YDL061C	RPS29B    protein biosynthesis structural protein of ribosome	#0000F0	#55FFFF	1	-0.76	-1.18	-1.03	0.7	-2.88	1.92	1.2	-0.56	-2.16		-1.48	-0.64	
+FRAGYIL069C		#000000	#55FF55	1	-0.74	-0.54	-0.66	1.21	-2.45	1.2		-0.39	-2.13	-1.61	-1.39	-0.4	-0.2
+YPR132W	RPS23B    protein biosynthesis* structural protein of ribosome	#505000	#55FF55	1	0.38	-0.07	-0.31	1.63	-1.23	1.03		0.01	-1.82	-1.82	-0.78	-1.01	-0.53
+YMR242C	RPL20A    protein biosynthesis structural protein of ribosome	#F00000	#55FF55	1	0.82	-0.08	-0.59	1.26	-1.53	1.15	1.48	-0.08	-2.18	-1.84	-0.78	-1	
+FRAGYBR181C		#0000F0	#55FFFF	1	0.52	0.57		1.45	-2.02	1.76		-0.87		-2.4	-2.44	-2.33	
+YLR061W	RPL22A    protein biosynthesis structural protein of ribosome	#000000	#55FF55	1	0.25	0.57	-0.38	1.28	-1.72	1.78	1.68	-0.27		-1.99	-1.8	-1.53	-0.02
+YGR148C	RPL24B    protein biosynthesis structural protein of ribosome*	#505000	#55FF55	1	0.7	0.4	-0.29	1.66	-2.06	1.67	1.48	-0.14	-2.14	-1.53	-0.98	-0.91	-0.21
+YGL031C	RPL24A    protein biosynthesis structural protein of ribosome*	#F00000	#55FF55	1	0.42	0.45	-0.32	1.82	-2.54	1.39	1.54	-0.35	-2.41	-1.82	-1.11	-0.9	-0.2
+YDR450W	RPS18A    protein biosynthesis structural protein of ribosome	#0000F0	#55FFFF	1	0.43	0.68	-0.1	1.48	-2.29	0.67	0.18	-0.76	-2.09	-1.75	-1.28	-0.97	-0.22
+FRAGYPL090C		#000000	#55FF55	1		0.17	-0.08	1.42	-2.77	1.38	0.18	-0.73	-2.79	-2.47	-2.45	-1.29	-0.2
+YEL054C	RPL12A    protein biosynthesis* structural protein of ribosome	#505000	#55FF55	1	0.74	0.33	0.19	1.15	-2.02	0.96	0.48	-0.46	-1.77	-1.37	-1.48	-1.23	-0.07
+YML026C	RPS18B    protein biosynthesis structural protein of ribosome	#F00000	#55FF55	1	0.65	0	-0.16	1.25	-2.62	1.21	0.62	-0.84	-1.92	-1.77	-1.25	-1.16	-0.28
+YDL083C	RPS16B    protein biosynthesis structural protein of ribosome	#0000F0	#AA00FF	1	0.53	-0.26	-0.9	0.46	-2.99	1.48	0.67	-0.55	-2.64	-2.01	-1.25		0
+YMR143W	RPS16A    protein biosynthesis structural protein of ribosome	#000000	#AA00FF	1	0.73	-0.18	-0.58	1	-3.2	1.78	1.25	-0.7	-2.71	-1.76	-1.64	-1.76	-0.04
+YGR034W	RPL26B    protein biosynthesis structural protein of ribosome*	#505000	#AA00FF	1	0.61	-0.14	-0.19	0.51	-2.31	1.09		-0.93		-1.46	-1.53	-1.17	
+FRAGYFR031C-A		#F00000	#55FF55	1	0.53	0.15		0.68	-3.74	2	0.82	-1.26	-3.15	-3.35	-2.94	-2.58	0.02
+YBR191W	RPL21A    protein biosynthesis structural protein of ribosome	#0000F0	#AA00FF	1	0.35	-0.64	-0.27	1.01	-2.15	0.88	0.91	-0.94	-2.05	-2.21	-1.36	-1.51	0.17
+YML073C	RPL6A     protein biosynthesis* structural protein of ribosome*	#000000	#AA00FF	1	0.36	-0.58	-0.34	1.11	-2.54	0.9	1.11	-0.55		-1.88	-1.23	-1.13	-0.21
+YKL006W	RPL14A    protein biosynthesis structural protein of ribosome*	#505000	#AA00FF	1	-0.05	-0.42	-0.88	1.37	-3.33	1.23		-1.15	-2.85	-2.36	-1.66	-1.57	-0.64
+YER117W	RPL23B    protein biosynthesis structural protein of ribosome	#F00000	#AA00FF	1	-0.12	-0.36	-0.56	1.24	-2.17	0.86		-0.26	-1.9	-1.94	-1.41	-1.02	-0.1
+YGR118W	RPS23A    protein biosynthesis* structural protein of ribosome	#0000F0	#AA00FF	1	0.01	0.21	-0.39	1.38	-1.73	1.09	1.05	-0.28	-2.1	-1.7	-1.22	-1.27	-0.54
+YGR085C	RPL11B    protein biosynthesis* structural protein of ribosome	#000000	#AA00FF	1	0.4	-0.38	-0.31	1.29	-1.48	1.42		-0.54	-1.87	-1.73	-1.67	-1.55	-0.19
+FRAGYNL302C		#505000	#55FF55	1	0.73	0.33	-1.02	1.55	-2.71	1.7	1.25	-0.27	-2.49	-2.52	-2.19	-2.07	-0.29
+YPR102C	RPL11A    protein biosynthesis* structural protein of ribosome	#F00000	#AA00FF	1	0.65	-0.18	-0.42	1.42	-1.95	1.27		-0.12	-1.99	-2.07	-1.6	-1.94	-0.21
+YNL302C	RPS19B    protein biosynthesis structural protein of ribosome	#0000F0	#AA00FF	1	0.49	-0.42		1.49	-2.5	1.47	1.16	-0.4	-2.42	-2.19			-0.32
+YGL102C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	0.41	-0.29	-0.24	1.26	-2.69	1.64	1.38	-0.25		-2.34	-1.75	-1.72	-0.19
+FRAGYML026C		#505000	#55FF55	1	0.77	0.21	-0.07	1.52	-2.11	1.47		-0.28	-2.01	-1.89	-1.34	-1.4	-0.62
+YIL069C	RPS24B    protein biosynthesis structural protein of ribosome	#F00000	#AA00FF	1	0.95	0.1	-0.21	0.9	-1.94	1.49	1.01	-0.21	-1.87	-1.34	-1.35	-1.1	-0.38
+YDL082W	RPL13A    protein biosynthesis structural protein of ribosome	#0000F0	#AA00FF	1	1.21	0.01	-0.74	1.13	-2.23	1.05	1.42	-0.24	-1.95	-1.94	-1.7	-1.6	-0.25
+YHR010W	RPL27A    protein biosynthesis structural protein of ribosome	#000000	#AA00FF	1	0.36	0.57	-0.75	1.33	-2.89	1.15	1.73	-0.8		-2.58	-1.72	-1.96	
+FRAGYOR234C		#505000	#55FF55	1	0.34	0.49	-0.1	0.55	-2.38	1.87	1.3	-0.27		-1.95	-0.94	-0.59	-0.25
+YPL142C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.5	0.02	-0.07	1.05	-2.94	1.81	1.28	-0.27	-2.44	-2.11	-1.1	-0.82	0.11
+YPL143W	RPL33A    protein biosynthesis structural protein of ribosome	#0000F0	#AA00FF	1	0.12	0.24	0.01	1.09	-3	1.65	1.25	-0.56	-2.43	-1.81	-0.98	-0.65	
+FRAGYDL083C		#000000	#55FF55	1	0.08	-0.39	-0.45	1.2	-3.16	1.69	0.99	0.25	-2.35	-1.88	-1.07	-0.53	-0.34
+FRAGYML073C		#505000	#55FF55	1	0.39	-0.42	-0.71	1.21	-2.52	1.4	0.87	-0.28	-1.94	-1.96	-1.41	-0.76	-0.01
+YMR142C	RPL13B    protein biosynthesis structural protein of ribosome	#F00000	#AA00FF	1	0.32	-0.38	-0.75	0.92	-2	1.39	1.02	-0.07	-1.91	-1.34	-1.16	-0.76	-0.4
+YER131W	RPS26B    protein biosynthesis structural protein of ribosome	#0000F0	#AA00FF	1	0.54	0.03	-1.27	1.02	-2.74	1.47	1.08	-0.24	-2.11	-1.86	-0.99	-0.62	-0.43
+FRAGYOR312C		#000000	#55FF55	1	0.27	-0.16	-0.7	0.79	-2.26	1.6		-0.71	-1.66	-1.42	-0.93	-0.39	0.08
+YOR167C	RPS28A    protein biosynthesis structural protein of ribosome	#505000	#AA00FF	1	-0.14	-0.17	-0.26	0.71	-2.38	1.54	0.54	-0.96	-1.79	-1.64	-0.88	-0.51	-0.07
+YML024W	RPS17A    protein biosynthesis* structural protein of ribosome	#F00000	#AA00FF	1	-0.22	0.07	-0.18	1.23	-2.35	0.87	0.65	-0.62	-2.1	-1.77	-0.95	-0.43	-0.21
+YOL040C	RPS15     protein biosynthesis structural protein of ribosome	#0000F0	#AA00FF	1	-0.18	0.03	-0.47	1.09	-2.63	1.23		0.02	-1.86	-1.65	-0.71	-1.39	-0.56
+YLR325C	RPL38     protein biosynthesis structural protein of ribosome	#000000	#AA00FF	1	0.13	-0.45	-0.91	1.24	-2.9	0.8	0.84	-0.7	-2.03	-2.4	-1.89	-0.59	-0.31
+YBL092W	RPL32     protein biosynthesis structural protein of ribosome	#505000	#AA00FF	1	0.2	-0.57	-1.08	0.51	-1.79	1	1.12	-0.76	-1	-1.42	-0.85	-0.72	-0.3
+FRAGYOL121C		#F00000	#55FF55	1	0.4	-0.62	-1.78	1.22	-2.88	1.66		-0.26	-1.59	-2.56	-1.94	-2.18	-0.42
+YOL121C	RPS19A    protein biosynthesis structural protein of ribosome	#0000F0	#AA00FF	1	0.37	0.03	-1.42	1.46	-2.68	1.43	2.02	-0.52		-2.45	-2.29		
+YBR048W	RPS11B    protein biosynthesis* structural protein of ribosome	#000000	#AA00FF	1	0.37	-0.57	-0.46	0.58	-2.01	0.83	1.18	0.07	-0.78	-1.42	-0.97	-0.79	0.09
+YDR025W	RPS11A    protein biosynthesis* structural protein of ribosome	#505000	#AA00FF	1	0.81	0.13	-0.2	0.7	-2.01	0.81	1.05	-0.23	-0.94	-1.61	-0.86	-0.44	-0.16
+YBL087C	RPL23A    protein biosynthesis structural protein of ribosome	#F00000	#AA00FF	1	0.56	0.35	0.03	1.5	-1.67	1.35		-0.23	-1.1	-1.91	-0.57	-0.34	0.08
+YLR264W	RPS28B    protein biosynthesis structural protein of ribosome	#0000F0	#AA00FF	1	0.01	0.13	0	1.53	-2.08	1.9	1.7	-0.27	-1.38	-2	-1.09	-0.71	0.12
+YDL191W	RPL35A    protein biosynthesis structural protein of ribosome	#000000	#AA00FF	1	0.02	0.03	-0.89	1.07	-2.25	1.79	1.62	-0.38	-1.42	-1.3	-0.66	-0.38	-0.14
+YHR141C	RPL42B    protein biosynthesis structural protein of ribosome	#505000	#AA00FF	1	0.41	0.41	-0.6	1.3	-1.63	1.84		-0.59	-1.39	-1.22	-0.84	-0.55	-0.03
+YBR189W	RPS9B     protein biosynthesis* structural protein of ribosome	#F00000	#AA00FF	1	0.45	0.34	-0.4	0.61	-1.66	1.18		-0.66	-0.87	-0.83	-0.55	-0.7	-0.05
+FRAGYNL096C		#0000F0	#55FF55	1	0.52	0.08	-0.48	0.36	-2.03	1.84	1.04	-0.62		-1.13			
+NORF 11		#000000	#55FF55	1	-0.55	0.34	-0.95	1.15	-1.52	0.89	0.58	-0.79	-1.72	-1.71	-1.39	-1.2	-0.32
+FRAGYDR447C		#505000	#55FF55	1	-0.62	0.43	-1.05	1.67	-2.58	2.23	0.29	-0.36	-2.42	-1.81	-1.09	-0.56	-0.35
+YNL162W	RPL42A    protein biosynthesis structural protein of ribosome	#F00000	#AA00FF	1	-1.17	-0.23	-0.74	1.44	-1.68	2.42		-0.12	-1.84	-1.7	-1.18	-1.18	
+YDL075W	RPL31A    protein biosynthesis structural protein of ribosome	#0000F0	#AA00FF	1	0.2	-0.75	-1.31	1.39	-1.95	2.33	1.07	-0.1	-1.13	-1.32	-1.15	-0.81	-0.42
+FRAGYHR203C		#000000	#55FF55	1	0.41	-0.04	-0.14	0.47		1.9		-1.1	-1.97	-1.57	-0.76	-1.46	0.42
+FRAGYIL052C		#505000	#55FF55	1	0.89	-0.07	-0.07	-0.02	-2.27	1.75		-0.28	-0.81	-1.41	-0.87	-0.89	
+FRAGYMR142C		#F00000	#55FF55	1	0.38	-0.26	-0.47	-0.07	-2.68	1.6		-0.01	-0.99	-1.64	-1.23	-0.98	-0.23
+YML063W	RPS1B     protein biosynthesis structural protein of ribosome	#0000F0	#AA00FF	1	0.42	-0.25	-0.65	-0.03	-2.5	0.19		0.38	-1.36	-1.94	-1.5	-1.6	0.17
+YDR064W	RPS13     protein biosynthesis structural protein of ribosome	#000000	#AA00FF	1	0.66	-0.02	-0.81	0.32	-2.26	0.79		-0.12	-1.54	-2.33	-1.4	-1.53	-0.13
+YJL177W	RPL17B    protein biosynthesis structural protein of ribosome	#505000	#AA00FF	1	0.76	-0.23	-0.62	0.51	-1.81	0.22		0.12	-1.9	-1.64	-0.86	-1.23	-0.48
+YGL030W	RPL30     protein biosynthesis* structural protein of ribosome	#F00000	#AA00FF	1	0.39	-0.38	-0.49	0.27	-2.83	0.2	2.07	0.08	-2.37	-2.1	-1.22	-1.05	-0.09
+YMR304C-A	biological_process unknown molecular_function unknown	#0000F0	#55FF55	1		-1.39	0.38	-0.57	-1.81	0.02		-0.55	-3.12	-2.93	-1.3	-0.75	0.04
+YDL228C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.43	-0.6	-0.92	0.08	-2.46	0.36		-0.24	-4	-3.56	-1.48	-1.77	-0.73
+YAL003W	EFB1      protein synthesis elongation translation elongation factor	#505000	#55FF55	1	1.08	0	-0.93	1.37	-2.12	-0.2	1.14	0.5	-2.24	-1.31	-1.67	-1.37	-0.07
+YPL090C	RPS6A     protein biosynthesis structural protein of ribosome	#F00000	#AA00FF	1	0.42	0.27	-0.92	0.7	-1.24	0.58	-0.36	-0.15	-1.48	-1.22	-1.11	-1.03	-0.03
+YNL061W	NOP2      rRNA processing RNA methyltransferase	#0000F0	#55FF55	1	-0.06		0.5	0.48	-1.17	0.62		-0.38	-1.02	-0.93	-0.55	-0.82	-0.22
+YMR054W	STV1      vacuolar acidification hydrogen-transporting two-sector ATPase	#000000	#55FF55	1	0.01	0.22	0.31	0.89	-1.44	0.53		-0.47	-1.41	-1.72	-1.32	-1.64	-1.07
+YGL009C	LEU1      not yet annotated 3-isopropylmalate dehydratase	#505000	#55FF55	1	1.44	1.13	-0.22	0.68	-1.67			0.09				-1.38	
+YHR203C	RPS4B     protein biosynthesis structural protein of ribosome	#F00000	#AA00FF	1				0.85	-2.57	0.23	0.77	-0.06	-2.01	-1.94	-1.21	-1.58	0.05
+YNL067W	RPL9B     protein biosynthesis structural protein of ribosome	#0000F0	#AA00FF	1	1.14	0.85	0.37	1.08	-2.02	0.13		-0.29	-2.24	-2.23	-1.03	-1.33	
+YER102W	RPS8B     protein biosynthesis structural protein of ribosome	#000000	#AA00FF	1	0.94	0.25	-0.12	1.23	-2.41	0.13	0.62	-0.72	-2.48	-1.78	-0.99	-1.1	-0.12
+YHR128W	FUR1      pyrimidine salvage uracil phosphoribosyltransferase	#505000	#55FF55	1	0.84	0.11	0.08	1.08	-2.02			-0.18			-0.46		
+YLR076C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.7	0.95	0.12	0.98	-3.12	1.24	1.4	-0.42	-2.49	-1.94	-0.44	-0.7	0.09
+YGL103W	RPL28     protein biosynthesis structural protein of ribosome*	#0000F0	#AA00FF	1	0.81	1.02	0.28	0.71	-1.75	0.91	0.78	-0.38	-2.28	-1.02	-0.83	-0.9	0.04
+FRAGYBL087C		#000000	#55FF55	1	0.82	0.77	0.09	0.33	-2.99	0.67	0.16	-0.61	-2.26	-1.73	-0.51	-0.19	0.09
+YBL072C	RPS8A     protein biosynthesis structural protein of ribosome	#505000	#AA00FF	1	1.42	0.63	0.73	1.09	-2.49	0.1	0.24	-0.12	-2.51	-1.45	-0.58	-0.8	
+YGL135W	RPL1B     protein biosynthesis structural protein of ribosome	#F00000	#AA00FF	1	1.63	0.74	1.24	0.64	-2.25	-0.25	0.32	-0.15	-2.3	-1.79	-0.47	-0.16	0.6
+YLR075W	RPL10     protein biosynthesis* structural protein of ribosome	#0000F0	#AA00FF	1	0.43	0.83	0.19	0.87	-3.06	-0.84	0.24	-0.94	-2.59	-1.92	-0.74	-0.74	-0.06
+YLR029C	RPL15A    protein biosynthesis structural protein of ribosome*	#000000	#AA00FF	1	0.73	0.82		0.98	-3.16	-0.28	0.94	-0.99	-3.65	-2.46	-2.32	-0.7	-0.38
+YPL220W	RPL1A     protein biosynthesis structural protein of ribosome	#505000	#AA00FF	1	-0.23	-0.26	0.34	0.5	-2.4	-0.36	0.35	-0.33	-2.7	-2.36	-1.6	-0.68	0.11
+YPR113W	PIS1      phosphatidylinositol biosynthesis CDP-diacylglycerol-inositol 3-phosphatidyltransferase	#F00000	#55FF55	1	-0.34	0.16	0.33	0.01	-2.13	-0.69		-0.57	-2.75	-2.07	-0.98	-0.01	0.13
+YDR432W	NPL3      not yet annotated not yet annotated	#0000F0	#55FF55	1	0.72	0.91	-0.29	-0.14	-1.58	-0.32		-0.37	-1.73	-1.14	-0.53	-0.39	0.19
+YLR167W	RPS31     protein biosynthesis* structural protein of ribosome	#000000	#AA00FF	1	0.23	-0.32	-0.2	0.33	-4	0.66	0.74	-0.2	-2.73	-2.4	-1.48	-1.48	0.09
+YCLX10C		#505000	#55FF55	1	0.17	0	0.69	0.49	-1.86	-0.28	0.19	0.15	-2.17	-1.89	-1.68	-2.37	0.27
+YHL015W	RPS20     protein biosynthesis structural protein of ribosome	#F00000	#AA00FF	1	0.18	0.63	-0.67	0.98	-2.05	-0.07	1.04	-0.29	-2.13	-3.21	-2.18	-3.17	
+YNL069C	RPL16B    protein biosynthesis structural protein of ribosome*	#0000F0	#AA00FF	1	0.21	-0.32	-0.74	0.74	-3.29	-0.03	0.7	-0.44	-1.57	-2.83	-2.86	-3.25	-0.52
+YLR367W	RPS22B    protein biosynthesis structural protein of ribosome	#000000	#AA00FF	1	0.72	0.65	-0.13	0.96	-4.22	-0.04		-0.52	-2.04	-2.08	-2.45	-2.45	
+YJL190C	RPS22A    protein biosynthesis structural protein of ribosome	#505000	#AA00FF	1	0.75	0.78	0.28	0.59	-2.94	1.19	1	-0.45	-2.63	-3.05	-2.3	-2.83	0.05
+YBR181C	RPS6B     protein biosynthesis structural protein of ribosome	#F00000	#AA00FF	1	0.34	0.23	0.09	0.67	-2.32	-0.16	0.73	-0.54	-2.75	-2.27	-2.39	-2.63	-0.37
+YNL119W	biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	-0.35	-0.25	-0.23	1.26	-2.45	0.51		-0.86	-2.9	-2.58	-2.34	-2.34	
+YDL130W	RPP1B     protein biosynthesis* structural protein of ribosome	#000000	#55FF55	1	-0.27	-0.73	-0.89	0.7	-3.22	0.56	0.37	-0.83	-3.34	-3.06	-2.8	-2.2	-0.27
+YDR382W	RPP2B     protein biosynthesis* structural protein of ribosome	#505000	#55FF55	1	-0.03	-0.61	-0.27	0.41	-3.36	0.25	0.29	-0.65	-2.82	-3.12	-3.15	-2.79	-0.25
+YOL120C	RPL18A    protein biosynthesis structural protein of ribosome	#F00000	#AA00FF	1	0.54	-0.63	-0.29	0.79	-3.42	-0.23	0.36	-0.53	-2.73	-2.86	-2.73	-2.65	0.02
+YNL301C	RPL18B    protein biosynthesis structural protein of ribosome	#0000F0	#AA00FF	1	-0.19	0.1	-0.81		-3.23	-0.16	0.67	-0.62	-2.61	-2.5	-2.34	-2.27	0
+YOR096W	RPS7A     protein biosynthesis structural protein of ribosome	#000000	#AA00FF	1	0.32	0.19	-0.17	1.28	-3.32	0.1	0.42	-0.87	-3.05	-2.2	-1.87	-1.94	0.07
+YOR369C	RPS12     protein biosynthesis structural protein of ribosome	#505000	#AA00FF	1	0.28	-0.33	-0.14		-4.12	0.35		-1.47	-3.64	-3.44	-2.44	-2.3	-0.17
+YGL147C	RPL9A     protein biosynthesis structural protein of ribosome	#F00000	#AA00FF	1				1.02	-2.76	0.61	0.63	-0.77	-2.82		-1.62	-1.55	0.19
+YGL101W	biological_process unknown molecular_function unknown	#0000F0	#55FF55	1				0.96	-2.22	0.75	0.62	-0.76	-2.36		-1.68	-1.55	0.17
+FRAGYNL301C		#000000	#55FF55	1	0.45	0.09		1.06	-2.76	0.52		-0.57	-2.58	-2.26	-2.14		-0.1
+YNL178W	RPS3      protein biosynthesis structural protein of ribosome	#505000	#AA00FF	1	0.63	-0.5	-0.16	0.68	-3.2	0.49	1.21	-0.69	-3.39	-2.63	-2.26	-2.29	
+FRAGYNL069C		#F00000	#55FF55	1	0.61	-0.27	-0.6	0.73	-3.4	0.92	1.18	-0.53	-2.69	-2.32	-2.33	-2.71	-0.15
+FRAGYGL076C-1		#0000F0	#55FF55	1	0.61	-0.39	-0.85		-2.87	0.52	-0.12	-0.35	-2.68	-2	-1.91		0.27
+YKL180W	RPL17A    protein biosynthesis structural protein of ribosome	#000000	#AA00FF	1	0.77	0.28	-0.15	0.9	-2.81	-0.39		0	-2.52	-1.96	-1.12	-1.26	-0.09
+YHL033C	RPL8A     protein biosynthesis structural protein of ribosome	#505000	#AA00FF	1	0.65	0.13	-0.56	1.26	-2.72	-0.12	-0.08	0.25	-2.38	-2.19	-1.79		-0.06
+YLL045C	RPL8B     protein biosynthesis structural protein of ribosome	#F00000	#AA00FF	1	1.23	0.14	-0.57	1.1	-2.19	-0.44		0.22	-2.1	-1.83	-1.56	-1.05	-0.15
+YPL131W	RPL5      protein biosynthesis* structural protein of ribosome*	#0000F0	#AA00FF	1	1.28	0.05		0.69	-2.54	-1.13	-0.26	0.2		-2.68	-2.09	-1.92	-0.09
+YLR441C	RPS1A     protein biosynthesis structural protein of ribosome	#000000	#AA00FF	1	0.7	0.18	-0.31	0.19	-2.07	-0.47		-0.22	-2.11	-1.65	-1.43	-1.05	-0.02
+YOR063W	RPL3      protein biosynthesis* structural protein of ribosome	#505000	#AA00FF	1	1.16	0.97	-0.25	0.2	-3.32	-1.4	0.16	-0.54	-3.97	-3.43	-2.63	-2.72	-0.15
+YGL123W	RPS2      protein biosynthesis* structural protein of ribosome	#F00000	#AA00FF	1	1.12	1.01	-0.18	0.87	-2.9	-0.29	-0.15	-0.31	-3.11	-2.5	-1.96	-2.55	0.2
+YFR031BC		#0000F0	#55FF55	1	1.1	-0.22	-0.61	0.48	-2.63	-0.74		-0.31	-3.33	-3.23	-2.51	-2.92	
+YIL018W	RPL2B     protein biosynthesis structural protein of ribosome	#000000	#AA00FF	1	0.65	0.09	-0.44	0.27	-2.92	-0.62	-0.69	-0.75	-3.19	-3.03	-2.95	-2.19	-0.01
+YFR031C-A	RPL2A     protein biosynthesis structural protein of ribosome	#505000	#AA00FF	1	0.13	-0.04	-0.04	0.39	-2.58	-0.64		-0.88	-2.93	-2.71	-2.65	-2.65	-0.09
+YOL039W	RPP2A     protein biosynthesis* structural protein of ribosome	#F00000	#55FF55	1	0.09	-0.47	-0.62	0.38	-3.04	-0.77		-0.88	-2.78	-2.92	-3.17	-2.8	-0.17
+YLR339C	biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	0.55	-0.88	-0.45	-0.3	-3.21	-0.98		-1.17	-2.96	-2.51	-2.46	-2.34	-0.23
+YKL056C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.07	0.03	-0.04	-0.11	-3.32	-1.09	-0.72	-1.39	-3.18	-2.36	-2.79	-3.34	-0.16
+YMR121C	RPL15B    protein biosynthesis structural protein of ribosome*	#505000	#AA00FF	1	-0.46	-0.64	-1.09	0.65	-2.17	0.2		-0.05	-2.46	-1.88	-1.92		-0.32
+YIL094C	LYS12     lysine biosynthesis not yet annotated	#F00000	#55FF55	1	-0.49	-0.09	-1.38	1.24	-1.71	-0.17	0.08	-0.41	-2.62	-2.11			-0.23
+YAL007C	ERP2      not yet annotated molecular_function unknown	#0000F0	#55FF55	1	-0.55	-0.18	-0.55	1.27	-1.52	-0.37	0.28	-0.58		-1.9		-2.51	
+YGL225W	VRG4      protein amino acid glycosylation not yet annotated	#000000	#55FF55	1	-0.14	0.66	0.05	0.37	-1.29	-0.29	-0.48	-0.26	-2.03	-1.62	-1.49	-1.18	0.13
+YAR074C		#505000	#55FF55	1	-0.49	0.87	0.07	0.14	-1.59	-0.28	-0.42	-0.7	-1.58	-1.65	-1.28	-1.35	0.06
+YMR146C	TIF34     not yet annotated not yet annotated	#F00000	#55FF55	1	0.65	0.4	0.13	0.45	-1.25	-0.38	-0.44	-0.41	-1.06	-1.58	-1.15		-0.58
+YJR123W	RPS5      protein biosynthesis structural protein of ribosome	#0000F0	#AA00FF	1	1	0.39	-0.34	1.02	-2.21	-0.61	0.18	-0.04	-1.28	-1.68	-1.35	-2.14	-0.75
+YJR145C	RPS4A     protein biosynthesis structural protein of ribosome	#000000	#AA00FF	1	1.04	-0.32	-0.16	0.16	-1.49	-0.18		0.16	-1.15	-1.57	-0.8	-1.56	0.14
+YGL076C	RPL7A     protein biosynthesis structural protein of ribosome	#505000	#AA00FF	1	1	-0.17	-0.19	0.29	-1.99	-0.46	-0.53	0.91	-2.63	-1.85	-1.5	-2.4	-0.09
+YMR217W	GUA1      not yet annotated GMP synthase (glutamine hydrolyzing)	#F00000	#55FF55	1	0.78	0.63	0.44	0.22	-1.28	1.15	-0.36	0.16	-1.79	-2.91	-1.98	-2.51	-0.16
+FRAGYOL120C		#0000F0	#55FF55	1	1.34	0.42	0.27	-0.06	-1.75	0.45		0.52	-1.77	-2.46	-1.81	-1.64	
+YDL229W	SSB1      protein biosynthesis chaperone	#000000	#55FF55	1	0.41	0.15	0.21	0.27	-0.83	0.35	0.5	0.36	-1.43	-1.08	-1.18	-0.84	-0.05
+YBL083C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	0.02	0.05	-0.13	-0.22	-1.34	0.85	0.3	0.53		-1.53	-1.82		0.14
+YPL198W	RPL7B     protein biosynthesis structural protein of ribosome	#F00000	#AA00FF	1	0.72	0.04	-0.5		-1.61	0.57		-0.45	-0.49	-1.43	-1.74	-1.41	0.57
+YGL049C	TIF4632   protein synthesis initiation translation initiation factor	#0000F0	#55FF55	1	0.42	-0.15	-0.13	0.81	-0.79	0.04	0.43	-0.34	-0.73	-0.78	-0.47	-0.62	0.16
+YML008C	ERG6      ergosterol biosynthesis delta(24)-sterol C-methyltransferase	#000000	#55FF55	1	0.42	-0.27	-0.26	1.29	-1.13	0.37	0.39	0.52					
+YDR417C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	0.64	-0.3	-0.17	1.1	-1.66	0.33	0.8	0.18	-1.16	-1.95	-1.03	-1.77	-0.59
+YIL078W	THS1      not yet annotated threonine--tRNA ligase	#F00000	#55FF55	1	0.51	0.63	-0.06	0.98	-0.28	0.25		0.2	-0.86	-1.65	-0.68	-1.29	
+YDR487C	RIB3      not yet annotated not yet annotated	#0000F0	#55FF55	1	0.51	-0.16	-0.14	-0.03	-0.27	0.65		-0.22	-0.87	-1.32	-1.09	-1.03	0.15
+YGR094W	VAS1      not yet annotated valine--tRNA ligase	#000000	#55FF55	1	0.52	-0.25	-0.42	0.53	-0.29	0.32		-0.19	-0.8	-0.86	-1.01	-0.93	0.26
+YKL024C	"URA6      nucleobase, nucleoside, nucleotide and nucleic acid metabolism uridine kinase"	#505000	#55FF55	1	0.14	-0.37	-0.24	0.16	0.09	0.27		-0.43	-0.35	-0.64	-0.73	-0.54	
+YAR018C	KIN3      biological_process unknown protein kinase	#F00000	#55FF55	1	0.49	-0.14	-0.53	0.88	-0.22	1.66	0.82	-0.81	-0.72	-1.38	-1.56	-1.54	0.06
+YIL040W	biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	-0.06	-0.51	-0.49	0.01	-0.3	0.81	1.02	-0.52	-0.38	-0.96	-0.81	-0.98	-0.02
+YAL046C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	0.07	-0.53	-0.45	-0.07	-0.53	0.68	0.93	-0.52	-0.48	-1.07	-0.75	-1.42	-0.05
+YBR206W	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.16	-0.44	-0.05	0.56	0.07	0.47	0.95	-0.16		-0.88	-0.63	-1.08	0.17
+YJL188C	BUD19     biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.33	-0.8	-1.17	0.99	-0.52	2.16		-0.34	-1.92	-1.59	-1.83	-1.32	0.08
+YLR062C	BUD28     biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	-0.1	-0.7	-1.79	1.16	-0.53	1.3		-0.09	-2.09	-2.14	-1.49	-1.77	0.25
+YLR008C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	0.03	-0.58	-0.92	0.9	-0.67	0.29		-0.27	-1.52	-1.43	-1.69	-1.11	0.05
+YLR364W	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.54	-0.63	-1.27	1.76	-1.73	0.86	0.94	-0.31	-1.98	-2	-2.13	-2.22	0.02
+YIL133C	RPL16A    protein biosynthesis structural protein of ribosome*	#F00000	#AA00FF	1	-0.43	-1.09	-0.78	1.16	-1.41	1.15		0.56	-1.47	-1.58	-1.01	-1.38	0.11
+YJL055W	biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	-0.4	0.16	-0.19	0.79	-0.62		0.74	-0.21			-0.41	-0.62	
+NORF 32		#000000	#55FF55	1	-0.53	-0.37	-0.16	2.24	-1.87	3.41	1.81	-0.19	-1.2	-1.53	-1.29	-1.1	0.18
+YOR224C	"RPB8      transcription, from Pol II promoter* DNA-directed RNA polymerase III*"	#505000	#55FF55	1	0.02	-0.03	0	0.85	-0.7	1	0.27	-0.39	-0.49	-0.67	-0.71	-0.55	-0.04
+YBL077W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.1	0.11	0.07	0.82	-0.23	2	1.82	-0.15	-1.48	-1.71	-1.2	-1.25	-0.21
+YDR471W	RPL27B    protein biosynthesis structural protein of ribosome	#0000F0	#AA00FF	1	0.53	0.55	-0.59	0.72	-0.87	1.51	1.54	0.29	-1.25	-1.5	-0.75	-1.5	0.24
+YNL096C	RPS7B     protein biosynthesis structural protein of ribosome	#000000	#AA00FF	1	0.96	0.7	-0.01	1.7	-1.38	2.2		0.28	-1.67	-1.91	-1.54	-1.34	
+YBL024W	NCL1      biological_process unknown molecular_function unknown	#505000	#55FF55	1	0.81	0.64	0.18	1.55	-0.52	1.44	0.88	0.44		-1	-1.27		-0.12
+YDL162C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.03	0.5	0.24	0.79			0.36	-0.04			-0.1		
+YPL211W	NIP7      ribosomal large subunit assembly and maintenance* protein binding	#0000F0	#55FF55	1	-0.14	1.43	0.81	1.13	-1.14	1.01	0.84	-0.45	-1.21	-0.94	-0.12	0.03	-0.28
+YIL148W	RPL40A    protein biosynthesis* structural protein of ribosome	#000000	#AA00FF	1				1	-2.57	1.82		-0.71	-1.59	-1.16	-0.44	0.01	-0.14
+FRAGYJR145C		#505000	#55FF55	1	1.42	0.74	0.26		-2.77	2.08	1.02	-0.51	-2.04	-1.68	-0.99		-0.32
+YBR153W	RIB7      not yet annotated not yet annotated	#F00000	#55FF55	1	0.37	0.27	0.26	0.47	-0.88	0.54	0.73	-0.76	-0.56	-0.8	-0.38	-0.38	-0.41
+YDL192W	ARF1      ER to Golgi transport* ARF small monomeric GTPase	#0000F0	#55FF55	1	0.33	0.33	0.1	0.79	-1.28	0.04	0.95	-0.27	-0.64	-0.91	-0.13	-0.48	-0.21
+YPL081W	RPS9A     protein biosynthesis* structural protein of ribosome	#000000	#AA00FF	1	-0.56	0.14	-0.09	0.83	-0.6	0.56	0.3	-0.01	-0.7	-1.54	-0.98	-0.86	0.25
+YBR143C	"SUP45     protein synthesis termination translation release factor, codon specific"	#505000	#55FF55	1	0.21	0.27	-0.54	1.35	-1.02	0.07	-0.14	-0.13	-0.92	-0.93	-0.58	-0.64	0.02
+YLR026C	SED5      non-selective vesicle fusion* t-SNARE	#F00000	#55FF55	1	0.17	0.09	-0.21	0.73	-0.51	-0.1		-0.08	-0.94	-0.67	-0.35	0.01	0.26
+YLR048W	RPS0B     protein biosynthesis* structural protein of ribosome	#0000F0	#AA00FF	1	-0.28	-0.37		0.86	-2.73	-1.6	0.7	-0.31	-1.98	-1.68	-1.35	-1.13	-0.1
+YGL253W	HXK2      glycolysis* hexokinase	#000000	#55FF55	1				1.02	-2.36	-1.28		-0.83	-1.93	-2.55	-2.47	-1.52	0.01
+YKL111C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.25	-0.4	-1.72	0.58	-1.03		1.43	-0.56					
+YGL241W	KAP114    not yet annotated not yet annotated	#F00000	#55FF55	1	0.18	0.09	-0.23	0.03		-0.08	0.6	-1		-0.45			0.02
+YNL167C	SKO1      transcription not yet annotated	#0000F0	#55FF55	1	0.23	-0.25		-0.01	-0.06	-0.29		-1.32	-0.84	-1.09	-1.23	-1.52	
+YPL010W	RET3      not yet annotated not yet annotated	#000000	#55FF55	1	-0.19	-0.18	0.07	0.3	-0.53	-0.4	0.25	-0.69	0.01	-0.93	-0.81	-1.19	
+YMR183C	SSO2      non-selective vesicle fusion* t-SNARE	#505000	#55FF55	1	-0.83	-0.1	0.37	0.64	-0.26	-0.82	0.12	-0.71	-0.16	-0.83	-1.85	-2.11	0.22
+YBL040C	ERD2      not yet annotated not yet annotated	#F00000	#55FF55	1		0.04	-0.27	0.4	-0.51	0.31	0.87	0.2	-0.46	-0.97	-2.08	-2.06	-0.32
+YHR193C	EGD2      nascent polypeptide association chaperone	#0000F0	#55FF55	1	0.5		-0.93	0.94	-0.67	0.69	0.37	-0.16	-0.77		-2.91	-2.66	-0.12
+YPL037C	EGD1      nascent polypeptide association chaperone	#000000	#55FF55	1	0.73	-0.07		1.13	-1.2	0.92	0.74	-0.5	-0.33	-1.27	-2.55	-1.69	-0.23
+YNL058C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	0.25	-0.15	-0.71	0.25	-0.74	0.75	0.59	-1.19		-1.21		-1.8	0
+FRAGYOR122C		#F00000	#55FF55	1	-0.07	-0.46	-0.64	0.19	-0.86	1.32	1.23	-0.54	0.44	-0.75	-2.44	-2.21	0.02
+YEL034W	HYP2      protein synthesis initiation translation initiation factor	#0000F0	#55FF55	1	0.4	-0.87	-0.96	0.41	-1.02	-0.01	1.22	-0.04	0.02	-0.44	-1.87	-2.31	0.21
+YPR021C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.17	-0.99	-0.8	0.36	-1.02	-0.34	0.5	-1.16	-0.45	-1.25	-1.63		-0.18
+YDR174W	HMO1      not yet annotated not yet annotated	#505000	#55FF55	1	-0.08	-0.72	-0.52	0.45	-0.35	-0.35		-0.33	-0.25	-0.48	-0.84	-0.89	0.05
+NORF 21		#F00000	#55FF55	1	-0.83	-1.7	-1.62	1.38	-1.61	0.34	-0.04	-0.49	-1.22	-2.07	-2.3	-2.2	0
+YHR005C-A	MRS11     mitochondrial translocation protein transporter	#0000F0	#55FF55	1	-0.92	-0.94	-2.39	1.28	-2.08	-0.04	-0.22	-1.54	-1.89	-2.21	-2.72	-2.75	0
+YMR023C	MSS1      protein biosynthesis GTP binding	#000000	#55FF55	1	-1.35	-0.91	-1.82	0.51	-1.71	-0.14	0.07	-0.73	-1.02	-1.7	-2.05	-1.62	-0.05
+YLR043C	TRX1      oxidative stress response* thioredoxin	#505000	#55FF55	1	-1.14	-0.82	-0.76	0.27	-1.59	0.3	0.72	-0.79	-0.79	-1.39	-2.18	-2.1	-0.05
+YKL013C	ARC19     cell growth and/or maintenance structural protein	#F00000	#55FF55	1	-1.47	-1.24	-0.38	0.92	-0.88	-0.08		-1.19	-0.37	-0.33	-1.62	-1.93	-0.02
+YOR122C	PFY1      osmotic response* actin monomer binding	#0000F0	#55FF55	1	-1.39	-1.16	-0.65	-0.13	-0.96	0.43	0.61	-0.84	0.29	-0.61	-2.15	-2.44	-0.23
+YGR018C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.3	-0.44	0.05	-0.05	-0.55	0.26	0.03	-1.06	-0.19	-0.23	-0.93	-1.88	-0.15
+YEL0171C		#505000	#55FF55	1	0.11	-0.18	0.51	-0.35	-0.82	-0.29	1.04	-0.78		-1.46	-1.63	-1.91	-0.58
+YNL003C	PET8      biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.65	-0.44	0.31	-0.06	-0.56	0.01	0.77	-0.37	-0.71	-1.36	-1.05	-1.36	-0.27
+YNL217W	biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	-1.18	-0.83	0.58	0.81	-0.52	0.59		-0.93	-1.21	-1.63	-1.36	-1.74	
+YOR079C	ATX2      oxidative stress response not yet annotated	#000000	#55FF55	1	-0.36	-0.61	0.2	0.17	-0.65	0.31	0.11	-0.68	-0.84	-1.35	-0.92	-1.58	0
+NORF 39		#505000	#55FF55	1	-1.13	-0.93	0.69	-0.4	-1.73	0.31	0.95	-0.88	-1.43	-1.38	-1.16	-1.69	-0.08
+YGR200C	ELP2      transcription not yet annotated	#F00000	#55FF55	1		-0.19	0.25	0.15	-1.09	0.42	0.63	-0.76	-0.92	-0.74	-1.58		-0.16
+YOR102W	biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	-0.89	-0.32	-0.17	0.53	-1.08	0.74	0.88	-1.34	-0.6	-0.69	-1.38	-1.75	0.01
+YAL033W	POP5      rRNA processing* ribonuclease P*	#000000	#55FF55	1	-0.25	-0.26	-0.19	0.77	-0.88	1.24	1.11	-1.19	-0.63	-0.72	-1.12	-1.26	0.01
+YDL016C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-1	-1.24	-1.03	-0.32	-1.77	1.4		-0.5	-0.45	-1.5	-0.72	-1.62	
+YCR067C	SED4      not yet annotated not yet annotated	#F00000	#55FF55	1	-0.47	-0.77	-0.11	-0.15	-1.37	0.61	0.38	-0.4	0.17	-1.73	-0.93		0.07
+YCRX10W		#0000F0	#55FF55	1	-0.6	-0.62	-0.65	-0.2	-1.59	-0.04	0.34	-1.6	-0.05	-2.44			
+YBR032W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.16	-0.48	-0.33	-0.34	-1.98	0.2		-0.8	-0.53	-1.97	-0.6	-1.42	
+YLR317W	KRE34     biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.44		-0.35	-1.1	-1.39	-0.23	-0.27	-1.15	-0.45	-1.93		-0.89	-0.09
+YDL198C	YHM1      transport not yet annotated	#F00000	#55FF55	1	-0.75	-0.66	-1.34	-0.46	-0.54	0.47	-0.19	-0.7		-3.34	-2.14	-2.51	-0.31
+FRAGYML085C		#0000F0	#55FF55	1	-0.02	-0.58	-0.63	0.54	-1.74		-0.26	-1.06	0.03	-1.4			
+YML053C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	0.17	-0.34	-0.67	0.74	-1.13	0.43	-0.04	-1.07					
+YPR072W	NOT5      transcription not yet annotated	#505000	#55FF55	1	-0.02	-0.39	-0.59	0.15	-0.04	0.35		0.06	-0.14	-0.7	-0.64	-0.49	0.4
+YKL011C	CCE1      tRNA processing not yet annotated	#F00000	#55FF55	1	-0.25	-0.42	-0.69		-0.23	0.33			-0.16	-0.44	-0.74	-0.44	0.03
+FRAGYPR063C		#0000F0	#55FF55	1	-0.23	-1.06	-1.27		-0.58	0.56		-0.21	0.28	-1.42	-1.83		0.47
+YPR073C	LTP1      not yet annotated acid phosphatase	#000000	#55FF55	1	-0.58	-0.86	-1.03	1.04	-0.12	0.42	0.38	0.05	0.19	-1.25	-1.37	-1.32	0.09
+YDR063W	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.86	-0.83	-0.57	0.28	-0.15	0.19		0.02	-0.01	-0.55	-1.64	-0.47	0.42
+YGR036C	CAX4      not yet annotated molecular_function unknown	#F00000	#55FF55	1	-0.18	-0.41	-0.37	-0.14	-0.06	-0.08		0.13	0.26	-0.6	-1.62	-0.88	0.27
+YNL079C	TPM1      establishment of cell polarity (sensu Saccharomyces)* actin lateral binding	#0000F0	#55FF55	1	-0.22	-0.25	-1.1	0.65	0.13	-0.16	-0.09	-0.1	0.02	-0.73	-0.93	-1.11	-0.29
+YPL094C	"SEC62     SRP-dependent, co-translational membrane targeting, translocation transporter"	#000000	#55FF55	1	-0.32	-0.05	-1.36	0.26	-0.45	-0.18	-0.18	-0.61	0.1	-0.54	-1.85	-1.65	-0.32
+YOR065W	CYT1      oxidative phosphorylation cytochrome c1	#505000	#55FF55	1	-0.95		-1.4	0.18	0.06	-1.07		-0.61	-1.15	-1.78	-2.22	-3.12	-0.66
+YHR001W	OSH7      biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.32	0.27	-0.85	0.22	-0.07	-0.51	-0.45	-0.15	-0.32	-0.44	-0.75	-1.26	0.17
+YAL044C	GCV3      glycine metabolism not yet annotated	#0000F0	#55FF55	1	0.19	0.1	-1.7	0.66	-0.97	0.84	0.57	-0.01	-1.01	-0.75	-1.16	-2.94	0.12
+YKL185W	ASH1      pseudohyphal growth* specific transcriptional repressor	#000000	#55FF55	1	-0.54	-0.3		-0.37	-0.74	0.12		-0.14	-0.98	-1.16	-1.76	-0.9	0.4
+YOL092W	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.6	-0.18	-0.3	-0.36	-0.09	0.33		-0.21	-0.78	-0.87	-1.91	-0.88	0.19
+YLR056W	ERG3      ergosterol biosynthesis C-5 sterol desaturase	#F00000	#55FF55	1	-1.19	-0.84	-0.31	-0.41	0.22	-0.31	1.25	0.61	-1.74	-1.68	-1.87	-1.45	-0.01
+YGR224W	AZR1      transport transporter	#0000F0	#55FF55	1		-0.17	0.08	-0.17	-0.28	-0.52	0.36	-0.26		-0.91		-0.51	
+YGL202W	ARO8      not yet annotated not yet annotated	#000000	#55FF55	1	0.72	-0.1	0.43	-0.21	-0.15	-0.67		-0.04	-1.9	-1.75	-1.24	-1.08	-0.26
+YDL014W	NOP1      rRNA modification* small nuclear ribonucleoprotein	#505000	#55FF55	1	-0.23	0.57	-0.14	0.23	-1.37	0.9		0.1	-0.49	-1.66	-0.75	-0.86	0.13
+YLR344W	RPL26A    protein biosynthesis structural protein of ribosome*	#F00000	#AA00FF	1	0.08	0.03	-0.45	0.45	-0.91	1.45	-1.06	0.1	-0.29	-1.77	-0.7	-1.63	0.05
+YBR219C	biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	0.15	0.1	0.07	0.3	0.05	1.03	-0.46	-0.08	-0.38	-0.46	-0.34	-0.32	-0.06
+FRAGYER003C		#000000	#55FF55	1	0.53	0.36	-0.31	1.07		0.73		-0.07		-1.02	0.06	-0.41	
+YBR106W	PHO88     phosphate transport not yet annotated	#505000	#55FF55	1	0.42	0.96	0.55	0.72	-0.93	0.44		0.06	-0.1	-1.1	0.06	-0.34	0.07
+YLR175W	CBF5      rRNA modification* small nuclear ribonucleoprotein*	#F00000	#55FF55	1	0.61	0.53	0.19	1.03	-1.47	-0.04	0.81	0.01	0.02	-1.42	-0.88	-0.15	
+YMR130W	biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	0.93		0.2	0.89	-1.23	0.29	0.49	-0.73	-0.02	-0.58	-0.38	-0.27	-0.43
+YJL047C	RTT101    not yet annotated molecular_function unknown	#000000	#55FF55	1	-0.23	1.14	-0.64	-0.16	-1.33	0.72	0.49	-0.75	-0.45	0.18	-0.43	-0.33	-0.31
+YGL150C	INO80     biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.15	0.1	-0.61	-0.14	-1.03	0.45	0.35	-0.73			-0.12	-0.22	0.43
+YKR054C	DYN1      mitotic chromosome segregation* motor	#F00000	#55FF55	1	-0.96	0.24	-0.74	0.05	-1.05	0.47	0.03	-0.96	-0.31	0.28	-0.41	-0.59	0.49
+YOR103C	OST2      not yet annotated dolichyl-diphosphooligosaccharide-protein glycosyltransferase	#0000F0	#55FF55	1	-1.19	0.21		0.56	-1.03	0.38	0.18	-1.12	-0.53	-0.63	-1.21	-0.59	-0.07
+YOR342C	biological_process unknown molecular_function unknown	#000000	#55FF55	1		0.36	-0.19	0.65	-0.88	0.19		-1.14		-0.78			
+YOR021C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.36	0.62	0.27	0.76	-0.64	0.02	0.34	-1.2		-0.47	-0.31		-0.68
+YKL066W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-1.17	0.89	-0.02	0.08	-0.97	0.14	-0.09	-1.01	-0.83	-0.4	-0.34	-0.38	-0.09
+YFR042W	biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	-0.46	1.52	-0.02	0.18	-1.27	-0.77	-0.22	-1.42	-0.39	-0.57	-0.93	-0.84	-0.06
+YHR065C	RRP3      mRNA splicing* ATP dependent RNA helicase	#000000	#55FF55	1	-0.26	0.61	-0.09	0.26	-1.12	0		-1.37		-0.33	-0.59	-0.46	
+YMR282C	AEP2      protein biosynthesis molecular_function unknown	#505000	#55FF55	1	-0.27	1.35	-0.06	0.37	-1.07	0.07	0.02	-1.02	-1.19	-0.82	-0.56	-0.13	-0.16
+YLR266C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.19	0.66	0.07	-0.24	-0.47	-0.19			-0.5	-0.62	-0.17	-0.06	
+YDR501W	PLM2      not yet annotated molecular_function unknown	#0000F0	#55FF55	1	0.2	1.09	0.08	-0.02		0.13	-0.29	-0.27					-0.08
+YJL101C	GSH1      not yet annotated glutamate--cysteine ligase	#000000	#55FF55	1	0.18	0.99			-1.07	0.08		-0.46	-0.59	0.22	-0.12		
+YIL140W	AXL2      axial budding* molecular_function unknown	#505000	#55FF55	1	-0.07	0.19	-0.02	0.03	-1.08	-0.11		-0.14	-1.03	0.19	-0.51	-0.48	-0.41
+YLR253W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.43	0.7	0.27	0.52	-2.19	-0.26	-0.45	-1.17	-1.46			-0.47	
+YLR283W	biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	-0.27			0.23		-0.26	-0.28	-0.97		0.73	-0.81		-0.51
+YHR094C	HXT1      hexose transport glucose transporter*	#000000	#55FF55	1	0.14	0.31		0.03	-0.64	-0.71	-0.17	-1.2	-1.06	0.47	-0.56	-0.29	-0.23
+YMR209C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	0	0.62	-0.21	0.67	0.11	0.18	0.21	-0.54	0.66	-0.87	-2.16		0.22
+YIL010W	DOT5      transcription not yet annotated	#F00000	#55FF55	1	0.4	0.02	-0.34	0.83	-0.06	-0.3	0.12	-0.64	-0.41	-1.15	-1.19	-0.52	0.07
+YLR404W	biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	0.43	-0.2	0.34	0.31	-0.15	0.14		0.22	0.05	-0.3	-1.4	-0.52	-0.17
+YGL067W	NPY1      not yet annotated NAD+ pyrophosphatase	#000000	#55FF55	1	0.61	-0.17	0.37	0.44	-0.39	0.34	0.43	0.01	-0.41	-0.81	-1.39	-0.09	-0.07
+YEL001C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	0.41	0.25	0.42	0.45	-0.45	0.31	0.54	-0.42	-0.95	-0.92	-1.12	-0.34	0.21
+YGL039W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.29	-0.17	0.7	0.41	0.24	0.25	0.45	-0.48	-1.05	-1.66		0.22	-0.05
+YOR083W	biological_process unknown molecular_function unknown	#0000F0	#55FF55	1				0	0.1	-0.06		-0.41	-0.04	-0.92	-0.96		
+FRAGYMR116C		#000000	#55FF55	1	-0.2	-0.13	0.77	0.09				-0.91			-1.77		0.52
+YMR173W	DDR48     DNA repair molecular_function unknown	#505000	#55FF55	1	0.12	0.04	0.83	0.3	0.25	-0.27	0.56	-0.09	-0.16	-0.52	-1.45	-0.45	0.11
+YPL091W	GLR1      not yet annotated glutathione reductase (NADPH)	#F00000	#55FF55	1	0.27	0.25		0.19	0.12	-0.1	0.36	-0.31	-0.32	-0.74	-1.29	-0.63	-0.46
+NORF 29		#0000F0	#55FF55	1	-0.21	-0.39		0.17	0.66	0.53	0.96	-0.21	-0.21	-1.71	-2	-1.69	-0.25
+YBR176W	ECM31     not yet annotated 3-methyl-2-oxobutanoate hydroxymethyltransferase	#000000	#55FF55	1	0.28		0.52	-0.08	0.85	0.38		-0.18	-0.41	-1.19		-0.65	-0.41
+YMR195W	ICY1      not yet annotated molecular_function unknown	#505000	#55FF55	1	0.63	0.39	-0.47	-0.64	1.28	0.82		-0.49	-0.38	-1.49	-1.26	-1.48	
+YOR222W	ODC2      transport not yet annotated	#F00000	#55FF55	1	-0.02	0.63	-0.56	-0.12	0.71	0.86	0.14	-0.08	-1.47		-2.32	-1.59	0.02
+YER149C	PEA2      establishment of cell polarity (sensu Saccharomyces)* cytoskeletal regulatory protein binding	#0000F0	#55FF55	1	0.2	0.35	0.29	0.5	0.07	0.38		0.09	-1.29	-0.57	-0.51	-0.17	-0.08
+YLR301W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	0.61	0.75	1.01	1.66	0.16	0.51	0.9	-0.39		-1.12			-0.56
+YDR418W	RPL12B    protein biosynthesis* structural protein of ribosome	#505000	#AA00FF	1	-0.44		1.27	1.29	-1	0.74	1	0.18	-0.98	-1.52	-1.24	-1.59	-0.52
+YGR245C	SDA1      not yet annotated molecular_function unknown	#F00000	#55FF55	1	-0.1	-0.12		0.29	-0.3					-0.44	-0.3	-0.33	
+YGR136W	LSB1      biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	0.65	-0.01	0.79	0.67	-0.16	0.29		-0.64	-0.02	-0.35	-0.59	-0.4	-0.54
+YGR187C	HGH1      biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.04	0.19	0.44	0.45	0.19	0.35	0.54	-0.29		-0.23	-0.6	-0.48	-0.32
+YMR211W	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.07	0.26	0.48	0.52	0.35	0.21	0.36	-0.23	0.19	-0.19	-0.4		-0.24
+YOR137C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.32	0.09	1.98	0.03	-0.49	0.02		0.53	0.1	-0.55	-0.57		
+YER078C	biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	0.05	-0.15	0.79	-0.14		0.21				-0.34	-0.28	-0.68	-0.67
+YOR343C	biological_process unknown molecular_function unknown	#000000	#55FF55	1		-0.38		-0.88	-0.28	-0.4	-1.09	-0.09	-1	-0.05	-0.65		-0.52
+YBR054W	YRO2      biological_process unknown not yet annotated	#505000	#55FF55	1	-1.84	-1.76	3.31	-3.78	-0.19	-2.14		-0.27	-1.86	0.23	-1.99	-2.98	-0.14
+YGR092W	DBF2      cell cycle not yet annotated	#F00000	#55FF55	1	-0.42	-0.26	1.15	0.03	0.09	-0.28		-0.41	-0.32	-0.64	-0.49	-0.44	0.52
+YGR189C	CRH1      biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	-1.08	0.61	2.05	-0.46	-0.87	-0.52		0.14	-1.47	-1.1	-1.54	-1.25	0.12
+YDR055W	PST1      biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.72	-0.82	2.83	-0.97	-1.47	-0.32		0.01	-1.69	-0.93	-1.59	-1.55	-0.03
+YPL111W	CAR1      not yet annotated arginase	#505000	#55FF55	1	-0.45	-0.22	1.99	-0.77	-1.27	-0.59	-0.68	0.09	-0.07	-0.52	-0.55	-0.57	0.01
+YLR194C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.34	-0.34	2.65	-0.58	-0.69	0.19		0.48	-0.81	-0.29	-0.01		
+YKR061W	KTR2      N-linked glycosylation* mannosyltransferase	#0000F0	#55FF55	1	-0.28	0	1.73	-0.05	-0.08	0.36		0.08	-0.48	-0.64	-0.68	-0.7	0.25
+YDR410C	STE14     not yet annotated protein-S isoprenylcysteine O-methyltransferase	#000000	#55FF55	1	-0.07		1.53	0.13	-0.74	0.22		0.25	-0.61	-0.56	-0.75		0.46
+FRAGYML124C		#505000	#55FF55	1	-0.03	-0.92	2.62	0.45	-0.72	0.96		0.05	-0.89		-1.35		0.44
+YPL014W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.94	-1.06	1.14	-0.5	-1.64	-0.2	-0.38	0.23	-0.44	-0.33	-0.6		0.48
+YPL067C	biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	-1.24	-1.25	1.1	-0.69	-1.11	-0.17	-0.48	-0.34	-1.08	-1.02	-1.35	-0.52	-0.29
+YLR414C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.98	-0.82	1	-1.12	-1.54	0.22	0.11	-0.52	-0.49	-1.11	-0.1	-0.61	-0.15
+YDR391C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.69	-1.58	1.26	-0.27	0.02	-0.19		0.57	0.32	-0.84	0.03	-0.92	
+YJL153C	INO1      not yet annotated inositol-3-phosphate synthase	#F00000	#55FF55	1		-3.44	2.83	-0.6	-1.42	-2.02		1.06	-0.3	-0.12	-0.61	-2.13	0.22
+YOL156W	HXT11     hexose transport glucose transporter*	#0000F0	#55FF55	1		-1.27	0.76	-0.23		-1.02		0.92	-0.19	0.5	-0.62		-0.35
+YDR029W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.35	-1.02	-0.42	0.33		-0.03	-0.38	-0.15		0.52			0.3
+YGL057C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.44	-0.62	-0.17	0.29	-0.62		-0.22	-0.07			-0.43	-0.67	
+YNL135C	FPR1      biological_process unknown peptidylprolyl isomerase	#F00000	#55FF55	1	-0.58	-1.66	-0.65	0.19	-1.61	-0.13	-0.24	-0.4	0.42	-0.07	-0.91	-1.05	-0.36
+YGR037C	ACB1      fatty acid metabolism acyl-CoA binding	#0000F0	#55FF55	1	0.01	-0.62	-0.71	0.11	-1.22	0.01		-0.15	0.38	-0.46	-0.42	-0.92	0.17
+YMR058W	FET3      high affinity iron transport multicopper ferroxidase iron transport mediator	#000000	#55FF55	1	0.35	0.08		-0.43	-1.21	-0.48	-0.25	-0.38			-0.66		
+YIR015W	RPR2      tRNA processing ribonuclease P	#505000	#55FF55	1		0.34	-0.41	-0.22	-1.2	-0.28				0.54	-0.41		
+YDR154C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	0.4	0	-0.85	-0.12	-2.07	0.16	0.7	-0.75	-0.14	0.8	-1.03	-2.32	-0.24
+YJR118C	ILM1      not yet annotated molecular_function unknown	#0000F0	#55FF55	1	0	-0.48	-1.11	0.23	-0.56	-0.25	0.2	-0.82	0.23	-0.32	-0.15	-1.45	-0.65
+YHR054C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	0.23	-0.29		0.65	-0.69	-0.18	0.25	-0.51	-0.17	-0.01	-0.11	-0.71	-0.09
+YOR157C	PUP1      ubiquitin-dependent protein degradation multicatalytic endopeptidase	#505000	#55FF55	1	-0.05	-0.03	-0.3	0.69	-0.49	-0.58	0.34	-0.1	0.04	-0.01	-0.2	-0.86	-0.48
+YIL174W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1		-0.57		-0.32	-0.77	-0.16		0.06	0.44	-0.23	-0.31	-0.81	0.17
+YNR020C	biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	-0.5	-0.47	-1.47	-0.03	-0.72	-0.21		0.08	0.3		-0.43		
+YBR294W	SUL1      transport not yet annotated	#000000	#55FF55	1	0.61	-0.69	-3.24	0.08	-2.36	0.11	-1.17	0.52	-0.3	-1.55	-0.15	-0.41	
+YLL037W	biological_process unknown molecular_function unknown	#505000	#55FF55	1	0.19	-0.09	-1.01	-0.26	-0.81	0.32	-0.19	0.31	0.36	-0.15	-0.2		0.22
+YGL263W	COS12     biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.5	-0.27	-1.21	-0.12	-0.09	0.3		0.02	-0.35	-0.37	0.31	0.11	0.65
+YIL024C	biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	-0.54	-0.43	-0.6	-0.11	-0.18	0.26		0.09	-0.19	0.13	0.26	0.02	0.37
+YJR108W	ABM1      not yet annotated molecular_function unknown	#000000	#55FF55	1	-0.75	-0.77		-0.14	0.51	0.21		0.21	-0.15	0.34	0.2	0.03	0.67
+YGL086W	MAD1      mitotic spindle checkpoint molecular_function unknown	#505000	#55FF55	1	-0.3	-0.4	-1.3	-0.14	0.46	0.12	0.31		-0.21	0.25	0.19		0.29
+YHR215W	PHO12     biological_process unknown acid phosphatase	#F00000	#55FF55	1	-0.85	-0.82	-1.39	-0.33	0.24	-0.33	-0.14	-0.49	0.06	0.87	0.14	-0.47	-0.21
+YOL012C	"HTZ1      transcription regulation, from Pol II promoter* chromatin binding"	#0000F0	#55FF55	1	-0.56	-1.07	-2.57	0.09	-0.06	-0.08	-0.14	0.31	-0.22	0.08	0.06	-0.34	-0.1
+YKL202W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.87	-1.13	-2.96	-0.34	0.4	-0.06		-0.26	0.37	0.32	-0.37	-0.32	0.36
+YNL339C	YRF1-6    biological_process unknown not yet annotated	#505000	#55FF55	1	-0.12	-0.27	-0.96	-0.2	0.14	0.15	-0.17	-0.05	0.29	0.21	-0.05	-0.06	0.17
+YPR155C	NCA2      not yet annotated not yet annotated	#F00000	#55FF55	1	-1.24	-1.62	-1.52	-0.42	0.85	-0.25		-0.39	1.04	0.46	-0.35	-0.76	0.21
+YML127W	RSC9      biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	-1.05	-1.66	-2.25	-0.2	0.64	-0.54		-0.37	1.36	0.55	-0.07	-0.13	0.36
+YOR264W	DSE3      biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.69	-1.51	-1.42	-0.24	-0.06	-0.06		-0.88	0.81	0.02	-0.17	-0.29	
+YPL196W	OXR1      biological_process unknown molecular_function unknown	#505000	#55FF55	1	-1.27	-1.05	-1.59	-0.09	-0.28	-0.76		-0.94	1.03	0.7	-0.14	-0.63	
+YNL173C	MDG1      signal transduction of mating signal (sensu Saccharomyces) molecular_function unknown	#F00000	#55FF55	1	-0.65	-1.24	-1.94	0.22	-0.27	-0.2		0.03	0.95	0.38	-0.22	-0.02	0.3
+YJR128W	biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	-1.7	-1.27	-1.41	0.29	0.13	-0.08	-0.53	0.69	1.01	0.12	-0.12	0.03	
+YGL158W	RCK1      biological_process unknown protein kinase	#000000	#55FF55	1	-0.61	-0.77		-0.11	0.27	-0.17		0.22	0.17	-0.12	-0.35	-0.04	
+YER059W	PCL6      cell cycle not yet annotated	#505000	#55FF55	1	-1.55	-1.96	-2.32	0	0.38	0.17		0.06	0.49	-0.59	-0.1		0.18
+YDR540C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.78	-1.04	-0.57	-0.11	0.21	0.29	-0.57	-0.06	0.05	-0.09	-0.18	-0.08	0.13
+YBR285W	biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	-1.7		-1.46	-0.81	0.09	0.02		-0.31	0.61	-0.13	-1	-0.08	0.15
+YML131W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.37	-0.82	-1.29	0.39	-0.17	-0.51	0.22	0.26	0.08	0.04	-0.24	-0.15	-0.68
+YFR002W	NIC96     mRNA-nucleus export* structural protein	#505000	#55FF55	1	-0.42	0.03	-0.72	0.09	-0.62	0.07	-0.05	0.59	0.09	0.37	-0.22	-0.63	0.01
+YMR069W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1		-0.47			-0.59	-0.32	-0.21	0.33		0.43	-0.03		
+YBR298C	MAL31     transport maltose permease	#0000F0	#55FF55	1	-2.48		-1.83	-0.32	-1.3	-0.43		0.58	0.64	1.54	-0.05	-0.63	
+YDR123C	INO2      phospholipid biosynthesis transcription factor	#000000	#55FF55	1	-0.66	-0.15	-0.63	-0.04		-0.15	-0.23	0.18		0.06			
+YLR219W	MSC3      biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.87	-0.16	-0.36	-0.34	-0.65	0.29		0.09	0.08	0.58	0.02	-0.03	
+YAR020C	PAU7      biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.37	-0.67	-0.05	-0.58	-0.47	-0.4	0.66	-0.9	0.69	-0.01	-0.45	-0.34	-0.24
+YJR096W	biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	-1.36	-0.96	0.48	-0.55	0.33	-0.4		-1.91	0.41	0.67	-0.07	-0.51	0.67
+YKR058W	GLG1      glycogen metabolism not yet annotated	#000000	#55FF55	1	-1.6	-1.11	-0.49	-0.87	-1.25	-0.19	-0.04	-2.05	0.5	0.15	-0.11	-0.64	-0.4
+NORF 58		#505000	#55FF55	1	-0.74	-0.49	0.05	-0.32	-0.37	-0.14	0.05	-0.93	0.24	-0.07	-0.06	-0.27	0.17
+YMR271C	URA10     not yet annotated orotate phosphoribosyltransferase	#F00000	#55FF55	1	-1.94	-0.99	0.86	-1	-0.44	-0.12	0.45	-1.52	0.13	0.21	-0.46	-1.2	-0.05
+YOR389W	biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	-2.17	-0.22	0.65	-0.36	-0.93	-0.55		-0.64		0.25	-0.45		-0.04
+YMR090W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-1.67		0.42	-0.89	0.18	-1.73		-0.35	0.7	0.94	0.02	-1.53	
+YHR087W	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-1.81	-2.75	-0.59	-1.68	-0.46	-1.9		-0.51	0.26	0.8	-0.73	-1.98	0.05
+YLR356W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-1.6	-1.32	-0.21	-1.33	-0.04	-0.85		-0.49	-0.01	1.14	-0.09	-0.77	0.05
+YOL052C-A	DDR2      stress response molecular_function unknown	#0000F0	#55FF55	1		-3.66	-1.62	-2.54	-0.58	0.33		-0.19	1.16	1.04	-0.16	-1.4	0.18
+YOL053C		#000000	#55FF55	1	-3.92	-4.32	-2.06	-2.67	-0.85	0.17	0.89	-0.57	1.34	1.13	-0.42	-1.31	0.02
+YMR181C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-2.12	-2.4	-0.5	-1.83	-0.01	-0.3		0.01	0.29	0.74	0.21	-0.16	0.16
+YMR103C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-1.73	-1.68	-0.2	-0.98	-0.76	-0.06	0.13	-0.4	0.45	0.03	-0.57	-0.32	-0.36
+YBR093C	PHO5      phosphate metabolism* acid phosphatase	#0000F0	#55FF55	1	-2.04	-2.34	-0.18	-0.05	0.31	0.03		-0.65		0.33			
+YBL064C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-1.22	-2.02	-0.38	-0.09	0.14	-0.45	0.55	-0.78	0.81	0.59	-0.16	-0.67	-0.14
+YDR258C	HSP78     stress response* chaperone*	#505000	#55FF55	1	-1	-1.44	-0.29	-0.31	-0.83	-0.53	-0.33	0.02	0.17	0.34	0.1	-0.54	0.01
+YOR289W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-1.08	-1.19	0.17	-0.49	-0.7	0	0.01	0.11	-0.12	0.39	-0.1	-0.83	0.56
+YAR071W	PHO11     biological_process unknown acid phosphatase	#0000F0	#55FF55	1	-0.87	-0.81	-0.56	-0.34	0.03	0.53	0.48	-0.85	0.27	0.85	-0.16	-0.66	
+YIL113W	not yet annotated protein tyrosine phosphatase	#000000	#55FF55	1	-0.56	-0.88	-0.73	-1.79	-0.06		-1.1	-1.95	-0.78	-0.09	-0.28	-0.63	-0.02
+FRAGYLR202C		#505000	#55FF55	1	-0.19	-0.44	-0.73	-0.75		-0.69		-1.55	-0.36	0.09	-0.16	0.05	
+YIL015W	BAR1      pheromone degradation aspartic-type endopeptidase	#F00000	#55FF55	1				-0.52	0.26	-1.07	-1.33	-1.52		-0.77	-0.58		-0.41
+YKL022C	CDC16     ubiquitin-dependent protein degradation* ubiquitin--protein ligase*	#0000F0	#55FF55	1	-0.69	-0.46	-0.38	-0.27	0			-0.81				0.06	
+YMR006C	PLB2      not yet annotated lysophospholipase	#000000	#55FF55	1	-0.85	-0.84	-0.96	-0.44	-0.44	-1.37	-2.09	-1.49		-0.18	-0.85		
+YKL100C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-1.28	-1.61	-0.63	-0.69	-1.01	-1.23		-2.31	-0.22	-0.25	-0.85	-0.69	
+YDL206W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.29	-0.64	0.18	-0.64	-0.19	-0.92	-0.43	-1.72		-0.27	-0.27	-0.21	-0.27
+YBL047C	EDE1      biological_process unknown* molecular_function unknown	#0000F0	#55FF55	1	-0.16	0.02	0.08	-0.47	-0.23	-0.76	-0.36	-1	0.08	-0.14	-0.48	0.09	0.1
+YDR005C	MAF1      not yet annotated molecular_function unknown	#000000	#55FF55	1	-0.97	-0.49	-0.34	-0.29	-1.44	-0.98		-0.58	0.04	-0.2	0.19	0.02	-0.23
+YMR155W	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.99	-0.61	-0.11	-1.21	-1.13	-1.19	-0.41	-1.53	0.2	-0.2	0.28		0.22
+YJL059W	YHC3      biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.53	-0.16		-0.6	-1.2	-1.09		-1.28	-0.26	0.59	0.51	0.21	
+YMR105C	PGM2      glycogen metabolism* phosphoglucomutase	#0000F0	#55FF55	1	-1.59	-2.19	-1.54	-2.44	-3.24	-5.24		-4.16	-1.54				-0.03
+YFL008W	SMC1      mitotic chromosome segregation adenosinetriphosphatase*	#000000	#55FF55	1	-0.27	-0.39	-0.2	-0.24		-0.69	0.03	-0.53			0.41		
+YLL039C	UBI4      stress response* protein degradation tagging	#505000	#55FF55	1	0.05	-0.6	-0.09	-0.51	-0.95	-0.62	-0.05	-0.47	-0.04	0.06	0.38	0.35	-0.07
+YBL065W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.06	-0.32	0.25	0.05	-0.65	-0.79	-0.09	-0.75	0.17	0.3		0.34	-0.15
+YER133W	GLC7      meiosis* protein phosphatase type 1	#0000F0	#55FF55	1	-0.08	-0.35	-0.2	0.09	-0.45	-1.26	-0.22	-0.53	0.44	0.11	0.2	0.38	-0.05
+YDL027C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.29	-0.03	-0.53	0.03	-0.98	-1.38	-0.32	-0.7	0.29	0.42	0.56	0.31	-0.18
+YOR267C	biological_process unknown not yet annotated	#505000	#55FF55	1	0.09	-0.49	-0.34	-0.18	-0.08	-1.1	-0.25	-0.86	0.1	0.34	0.36	0.02	-0.3
+YDR096W	GIS1      biological_process unknown transcription factor	#F00000	#55FF55	1	-0.56	-1.17	-0.55	-0.61	-0.09	-2.83	-1.35	-1.7	0.5	-0.18	0.47	0.5	-0.28
+YGR248W	SOL4      biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	-0.58	-0.57	-0.49	-0.89	-0.22	-1.3	0.09	-0.72	0.39	0.07			-0.79
+YLL005C	SPO75     biological_process unknown molecular_function unknown	#000000	#55FF55	1	-1.06	-0.54		-0.32	-0.03	-0.92		-0.07	-0.17	0.09	0.1	-0.15	
+YLL041C	SDH2      tricarboxylic acid cycle* succinate dehydrogenase	#505000	#55FF55	1	-1.44	-1.94	-2.18	-0.32	0.16	-3.29	-0.18	-0.69	-0.55	-0.18	0.07	-0.23	-0.11
+YOL129W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.98	-1.67	-0.75	-0.73	-0.86	-1.01		-0.93	-0.19	-0.09	0.16	0.51	-0.3
+YDR476C	biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	-1.26	-1.44	-1.07	-1.44	-0.95	-1.56	-1.33	-0.44	0	-0.05	0.24	0.75	0.08
+YIL087C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-1.67	-1.59	-0.88	-1.99	-0.69	-1.64	-1.88	-1.23	0.09	0.74	0.26	-0.32	
+YNL237W	YTP1      biological_process unknown molecular_function unknown	#505000	#55FF55	1	-2.29	-2.8	-0.93	-1.88	-0.49	-2.5	-1.5	-1.23	0.01	-0.25	-0.76	-0.74	-0.76
+YJL210W	PEX2      peroxisome organization and biogenesis molecular_function unknown	#F00000	#55FF55	1	-1.31	-2.03	-1.77	-1.37	0.03	-0.93	-1.49	-0.45	-0.06	-0.01	-0.44	-0.14	-0.07
+YDR231C	COX20     respiration not yet annotated	#0000F0	#55FF55	1	-1.04	-0.89	-1.44	-0.4	-0.61	-0.4	-0.53	-0.62	0.06	0.24	0.09	-0.62	
+YPL230W	USV1      biological_process unknown molecular_function unknown	#000000	#55FF55	1	-2.49	-1.96		-1.43	-1.02	-1.49	-0.93	-1.02	0.71	0.33	0.31		0.12
+NORF 8		#505000	#55FF55	1	-3.63	-3.27	-2.47	-1.64	-1.48	-1.54	-1.24	-3.54	0.44	1.07	0.12	-0.84	-0.03
+YOR173W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-2.02		-1.01	-0.79	-0.09	-0.89	0.04	-0.77	0.39	0.66	0.14	-0.44	-0.08
+YKL217W	JEN1      transport lactate transporter	#0000F0	#55FF55	1	-3.19	-2.91	-1.69	-1.8	0.47	-3.46	-2.03	-0.99	2.15	0.17	-0.34	0.09	
+YPL186C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-1.37	-1.37	-1	-0.1	-0.78	-1.41		-0.8	1.22	1.39		-0.22	-0.33
+YLR201C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.55	-0.73	-0.81	0.04	-0.46	-1.36		-0.58	0.48	0.42	0.04	-0.2	
+YDL124W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.94	-0.91		-0.19	-1.38	-1.7	-0.44	-1.04	0.78	0.61	0.49	0.08	-0.22
+YOL071W	biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	-0.96	-1.93	-1.78	0.54	-1.64	-1.35	-0.04	-0.87	0.55	0.69	0.28	-0.19	-0.54
+YAR029W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.82		-0.13	0.19	-0.56	-0.55	0.27	-0.75	-0.3	0.27	0	0.04	-0.2
+YML058W	SML1      mitochondrion organization and biogenesis* molecular_function unknown	#505000	#55FF55	1	-0.62	-1.43	-1.32	-0.4	-0.67	-0.32	-0.01	-0.72	-0.43	-0.09	0.31	0.4	0.25
+YIL077C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.54	-1.27	-1.19	-0.52	-0.39	-0.03		-0.45	-0.18	0.53	0.27	0.43	
+YGL096W	TOS8      biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	-1.14	-1.83	-1.26	-0.75	-0.4	-0.1	0.3	-1.18	-0.47	0.1	0.48	1.05	-0.49
+YDR276C	PMP3      cation transport molecular_function unknown	#000000	#55FF55	1	-1.71	-2.06	-1.95	-1.22	-0.7	-0.47		-1.17	0.32	0.16	0.16	0.61	
+YAR068W	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-2.4	-2.23	-1.41	-1.12	-0.61	-0.58	0.33	-0.25	0.52	-0.09	-0.13	0.3	-0.02
+YOR384W	FRE5      biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-2.33	-1.7		-0.9	-0.44	-0.66		-0.77	-0.74	-0.07	-0.48		0.32
+NORF 6		#0000F0	#55FF55	1	-1.71	-1.59	-0.7	-0.4	-1.39	0.47	0.63	-0.84	-0.65	0.31	-0.16	0.56	-0.12
+YLL017W	SDC25	#000000	#55FF55	1	-1.47	-1.06	-0.69	0.02	-0.78		-0.05	-1.21	-0.07	0.02	-0.36		
+YLR247C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.69		-0.52	0.02	-0.47	0.15		-0.49	0.12	0.11		0.38	
+YPL185W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1		-1.89	-1.02	-0.43	-0.96	0.07	-0.44	-1.4			0.23		
+YLR046C	biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	-1.07	-0.61	-0.5	-0.22	-0.41	-0.11		-0.91	-0.91	-0.04	0.26	0.58	0.01
+YDL079C	MRK1      biological_process unknown protein kinase	#000000	#55FF55	1	-2.21	-1.47	-1.33	-0.4	-2.34	-0.63		-2.82	-0.85	0.4		1.05	
+YOR178C	GAC1      meiosis* protein phosphatase type 1	#505000	#55FF55	1	-1.75	-1.06		-0.54	-1.7	-0.73		-1.82	-0.76	-0.14	-0.05	0.19	-0.52
+FRAGYDL079C		#F00000	#55FF55	1	-3.26	-0.5	-1.99	-0.41	-2.49	-1.17			-1.33	-0.31	0.21	0.04	
+YGR150C	biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	-0.76	-0.37	-0.59	-0.12	-0.68	-0.34	0.4	-0.66	-0.18	-0.1	0.23	0.1	0.17
+YDR230W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-1.01	-0.48	-1.16	-0.46	-0.76	0.02	0.22	-0.39	0.15	0.16	0.13	-0.3	0.08
+YDR286C	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-1.31	-1.71	-1.49	-0.08	-1.22	-0.12	0.27	0.33	-0.34	-0.41	0.09	0.52	-0.47
+YGR205W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.85	-0.86	-0.5	-0.3	-1.22	-0.13	-0.23	0.52	-0.08	-0.37	-0.23		
+YIL050W	PCL7      cell cycle cyclin	#0000F0	#55FF55	1	-0.65	-0.95	-0.32	0.43	-0.9	-0.7	-0.58	-0.48	-0.29	0.14	0.5	-0.02	-0.33
+YHL035C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-1.6	-1.31	-0.47	-0.82	-0.89	-0.43		-0.38	-0.91	-0.22	-0.5	-0.72	-1.94
+YGR007W	MUQ1      not yet annotated cholinephosphate cytidylyltransferase	#505000	#55FF55	1	-1.88	-1.8	-0.85	-0.15	0.23	-1.16	-0.5	-0.27	0.99	0.03	-0.13	-1.29	-2.12
+YFL051C	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.81	-0.6	-0.53	-0.62	0.26	-0.91		0.26	0.16	-0.56	0.17	0.32	
+YOR377W	ATF1      not yet annotated alcohol O-acetyltransferase	#0000F0	#55FF55	1	-0.58	-1.06	-0.31	-0.29		-1.3		1.02	0.42	-0.43	-0.03	-0.54	
+YDR048C	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.89	-0.86	-0.68	-0.24	-0.17	-0.8	0.22	0.71		-0.32	-0.05	-0.31	
+YDL049C	KNH1      not yet annotated not yet annotated	#505000	#55FF55	1	-1.57	-1.76		-0.05	0.06	-1.4	0.08	0.26	0.54	-1.05			-0.09
+YEL041W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-2.22	-1.78	-1.28	0.14	0.18	-2.03		-0.53	0.5	-0.38	-0.44	-0.44	-0.3
+YLR370C	ARC18     actin filament organization structural protein of cytoskeleton	#0000F0	#55FF55	1	-1.06	-0.67	-0.47	0.08	-0.74	-1.34		0.25	0.37	-0.26	-0.19	-0.62	-0.24
+YFR014C	CMK1      protein amino acid phosphorylation* calmodulin-dependent protein kinase I	#000000	#55FF55	1	-0.7	-1.07	-0.79	-0.15	-0.38	-2.27		-0.1	0.38	-0.73	0.07	-0.92	0.43
+YKL208W	CBT1      not yet annotated molecular_function unknown	#505000	#55FF55	1	-1.09	-0.19	0.12	0.28	-0.39	-0.6		0.21	-0.66	-0.43	-0.46	-0.66	-0.39
+YBR056W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-1.77	-1.4	0.24	-0.53	0.13	-0.28		-0.34	0.18	0.25	-1.09	-2.26	
+YBR110W	ALG1      protein amino acid glycosylation not yet annotated	#0000F0	#55FF55	1	-0.94	-0.92	0.27	0.2	0.02	0.03		-0.03	0.03	-0.41	-0.89	-1.58	-0.22
+YEL002C	WBP1      not yet annotated dolichyl-diphosphooligosaccharide-protein glycosyltransferase	#000000	#55FF55	1				0.27	-0.01	-0.46	-1.21	0.08	0.21	-0.03	-0.68	-1.13	-0.21
+YDR032C	PST2      biological_process unknown molecular_function unknown	#505000	#55FF55	1	-1.8	-1.42	-0.78	0.16	-0.43	-0.98		-0.17	0.6	0.24	-1.65	-2.7	-0.36
+YIL041W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-0.68	-0.71	0	0.25	-0.34	-0.13		0.31	0.24	0.18	-0.75	-1.24	0.03
+YJR162C	biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	-1.27	-0.8	-0.53	0.39	-0.16	0.28		0.28	-0.36	-0.47	-1.01	-1.7	0.09
+YDR284C	DPP1      phospholipid metabolism not yet annotated	#000000	#55FF55	1	-0.91	-0.88	-0.69	-0.24	-0.76	-0.03		0.64	-0.56	-0.93	-1.97	-2.41	0.39
+YIR016W	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-1.04	-1.12	-0.97	-0.98	-1.48	0.33	-2.02	-1.35	0.5	-0.23	-1.67	-2	0.27
+YIL043C	CBR1      not yet annotated cytochrome b5 reductase	#F00000	#55FF55	1	-0.83	-0.13	-0.53	-0.07	-1.07	-0.28	-0.31	-0.1	-0.39	-0.27	-1.02	-1.04	0.28
+YLL009C	COX17     cytochrome c oxidase biogenesis* intracellular copper delivery	#0000F0	#55FF55	1	-2.18	-0.6		0.23	-1.75	0.06		-0.89	-0.6	-0.64	-0.25	-1.17	0.06
+YDR031W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-1.36	-0.93	-0.93	0.08	-1.15	0.02	-0.05	-0.64	-0.09	-0.03	-0.8	-0.93	0.27
+YKR074W	biological_process unknown molecular_function unknown	#505000	#55FF55	1	-0.97	-0.88	-0.71	0.26	-1.05	-0.03		-0.75	-0.38	0.09	-0.34	-0.76	0.26
+YPR052C	"NHP6A     transcription regulation, from Pol II promoter* chromatin binding"	#F00000	#55FF55	1	-1	-1.14	-0.79	-0.1	-1.1	0.33	-0.77	-0.93	-1.16	0.04	-1.01	-1.07	-0.3
+YKL037W	biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	-0.63	-0.58	-0.64	-0.21	-0.42	0.32	-0.15	-1.01		-0.19	-0.56		-0.31
+YNL046W	biological_process unknown molecular_function unknown	#000000	#55FF55	1	-0.82	-0.4	-0.09	-0.91	-0.54	0.2	-0.36	-1.63	-1.5	-1.14	-1.68	-1.59	-0.11
+YHR086W	NAM8      not yet annotated not yet annotated	#505000	#55FF55	1	-1	-0.72	-0.52	-0.65	-0.65	-0.48		-0.99	-0.89	-1.04	-1.14		
+YLR252W	biological_process unknown molecular_function unknown	#F00000	#55FF55	1	-1.48	-1.45	-0.31	-1.25	-1.54	-0.79		-2.45	-1.25	-2.04		-3.35	-0.53
+YGL198W	biological_process unknown molecular_function unknown	#0000F0	#55FF55	1	-0.84	-1.3	-0.24	-1.03	-0.14	-0.52	-0.81	-1.18	-0.95	-0.6	-1.3	-1.77	-0.25
+YDL048C	STP4      tRNA splicing molecular_function unknown	#000000	#55FF55	1	-1.97	-1.65	1.14	-1.36	-1.03	-0.38	-0.19	-1.25	-1.72	-1.38	-0.98	-2.32	0.01
+YKL220C	FRE2      iron homeostasis not yet annotated	#505000	#55FF55	1	-0.49	-0.98	0.25	-0.41	-1.03	-0.02			-0.34	-0.3	-0.36		

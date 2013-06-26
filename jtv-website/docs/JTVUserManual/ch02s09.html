@@ -1,0 +1,51 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Karyoscope</title><meta name="generator" content="DocBook XSL-NS Stylesheets V1.75.2"><link rel="home" href="index.html" title="Java TreeView User's Manual"><link rel="up" href="ch02.html" title="Chapter 2. Feature Reference"><link rel="prev" href="ch02s08.html" title="Scatterplot"><link rel="next" href="ch02s10.html" title="Alignment"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Karyoscope</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch02s08.html">Prev</a> </td><th width="60%" align="center">Chapter 2. Feature Reference</th><td width="20%" align="right"> <a accesskey="n" href="ch02s10.html">Next</a></td></tr></table><hr></div><div class="sect1" title="Karyoscope"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ch2_karyoview"></a>Karyoscope</h2></div></div></div>
+
+<div class="figure"><a name="KaryoscopeFigure"></a><p class="title"><b>Figure 2.13. Karyoscope Component Layout</b></p><div class="figure-contents">
+
+<div><img src="figures/Karyoscope.gif" alt="Karyoscope Component Layout"></div>
+</div></div><br class="figure-break">
+
+<p>
+The Karyoscope is one of three views which can be created in the LinkedView application. It can be created by selecting Analysis-&gt;make Karyoscope in LinkedView. There are three major regions to the screen in the Karyoscope. The upper left panel is the parameter panel, the upper right panel is the info panel, and then lower part of the screen is the karyoscope proper.
+</p>
+<p>
+There are several settings which apply to the Karyoscope which have been previously covered, including the Coordinates <a class="xref" href="ch02s04.html#ch2_settings_coordinates" title="Karyoscope Coordinates Settings">the section called &#8220;Karyoscope Coordinates Settings&#8221;</a> and Averaging <a class="xref" href="ch02s04.html#ch2_settings_averaging" title="Karyoscope Averaging Settings">the section called &#8220;Karyoscope Averaging Settings&#8221;</a> and Url <a class="xref" href="ch02s04.html#ch2_settings_url" title="Url Settings">the section called &#8220;Url Settings&#8221;</a> Settings. The remaining features are covered here.
+</p>
+
+<div class="sect2" title="Cursor hinting in Karyoscope"><div class="titlepage"><div><div><h3 class="title"><a name="ch2_karyoview_hint"></a>Cursor hinting in Karyoscope</h3></div></div></div>
+
+<p>
+Moving the mouse around the screen in the Karyoscope will cause information for the nearest gene to be displayed in the info panel. There will be a bright yellow line connecting the cursor to the nearset gene, so you know which one the info applies to. Clicking will activate the url link associated with the gene.
+</p>
+</div>
+
+<div class="sect2" title="Zooming in Karyoscope"><div class="titlepage"><div><div><h3 class="title"><a name="ch2_karyoview_zoom"></a>Zooming in Karyoscope</h3></div></div></div>
+
+<p>
+The layout of the genes in the Karyoscope is determined by the Coordinates Settings and the Parameter Panel. The coordinates settings specify the chromosome, arm and position of each gene. The Parameter panel specifies exactly how to translate this information into an on-screen location.
+</p>
+<p>
+The Pixels Per Map specifies how many pixels each position unit stands for. Making this number larger will stretch out the chromosomes.
+</p>
+<p>
+The Pixels Per Value specifies how many pixels each value unit from the data matix gets. Making this number larger will make the bars higher in the karyoview.
+</p>
+<p>
+The width and height specify the actual width and height of the canvas on which the karyoscope will be drawn. Making these values larger will space out the chromosomes without actually changing the spacing of the bars or their height.
+</p>
+<p>
+Since setting these values manually is tedious, there are two additional ways to navigate, which are preferred for general use. Clicking the "Auto" button in the parameter panel will set the width and height to match the available screen real estate, and then scale the pixels per map and pixels per value appropriately. Selecting a rectanglar region in the Karyoscope causes the screen to zoom in on that location. Technically speaking, it causes the selected region to exactly fill the screen, increasing the pixel per map and pixels per value proportionately.
+</p>
+</div>
+
+<div class="sect2" title="Selection Highlighting in Karyoscope"><div class="titlepage"><div><div><h3 class="title"><a name="ch2_karyoview_sel"></a>Selection Highlighting in Karyoscope</h3></div></div></div>
+
+<p>
+Although there is currently no way to select genes in the Karyoscope, genes which have selected in other views are visibly marked. The type of marking is determined by the settings in the Parameter Panel. You can choose the type and size in pixels of the highlighting from the pulldown menus to the right of "Highlight Selectd with:".
+</p>
+
+<div class="variablelist" title="Karyoscope Selection Highlights"><p class="title"><b>Karyoscope Selection Highlights</b></p><dl><dt><span class="term"> None </span></dt><dd> <p> Do not highlight selected genes. </p> </dd><dt><span class="term"> Circle </span></dt><dd> <p> Highlight selected genes with a solid circle. </p></dd><dt><span class="term"> Disc </span></dt><dd> <p> Highlight selected genes with a 1-pixel thick disk</p></dd></dl></div>
+
+</div>
+
+</div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch02s08.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch02.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch02s10.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Scatterplot </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Alignment</td></tr></table></div></body></html>

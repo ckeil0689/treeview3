@@ -1,0 +1,149 @@
+<project name="JTVSeparateExample" default="plugin" basedir=".">
+
+	<!--- this property should point to the folder containing the Java Treeview
+	installation. It must be 1.1.0 or later, and it must end in a separator char
+	(i.e. "/" on mac os x or linux) 
+	-->
+<property name ="treeview.home"       value="/Users/aloksaldanha/Documents/code/java/LinkedView/TreeView-1.1.0-bin/"/>
+
+<!-- ========== Prerequisite Properties =================================== -->
+
+<property name="app.name"            value="DataTable" />
+<property name="build.home"            value="target" />
+
+<!-- ========== Initialization Properties ================================= -->
+
+
+<!--
+        These property values may optionally be overridden with property
+        settings from an "ant" command line, the "antrc" properties file
+        in your home directory, or from settings in a superior build.xml
+        script.
+-->
+
+
+
+<!-- Should Java compilations set the debug compiler option? -->
+<property name="compile.debug"         value="true" />
+
+<!-- Should Java compilations set the deprecation compiler option? -->
+<property name="compile.deprecation"   value="false" />
+
+<!-- Should Java compilations set the optimize compiler option? -->
+<property name="compile.optimize"      value="false" />
+ 
+<!-- The base directory for distribution targets -->
+<property name="dist.home"             value="dist" />
+
+<!-- directory in which to put output -->
+<property name="app.target"            value="target" />
+
+<!-- copy source? -->
+<property name="app.suppress"            value="true" />
+
+<!-- The source directory for Java compilations related to this app -->
+<property name="app.src"            value="src" />
+
+<!-- The source directory for static content related to this app -->
+<property name="app.static"            value="static" />
+
+<!-- The name of the web application archive file to be produced -->
+<property name="app.jar"            value="${app.name}.jar" />
+
+<property name="app.libs"            value="lib" />
+<!-- ========== Derived Properties ======================================== -->
+
+
+<!--
+        These property values are derived from values defined above, and
+        generally should NOT be overridden by command line settings
+-->
+
+<!-- The class path used for compiling this library -->
+<path id="classpath">
+        <fileset dir="${treeview.home}">
+            <include name="*.jar"/>
+        </fileset>
+	<pathelement location="src"/>
+    <pathelement location="${treeview.home}"/>
+</path>
+
+
+<!-- ========== Executable Targets ======================================== -->
+
+
+
+
+<!--
+        The "prepare" target creates a directory structure in the build target
+        area for the unpacked files associated with this web application
+-->
+<target name="prepare" 
+        description="Prepare target directory">
+  <echo    message="Processing plugin ${app.name}"/>
+  <mkdir   dir="${app.target}" />
+  <mkdir   dir="${dist.home}" />
+</target>
+
+<!--
+        The "compile" target compiles the Java source code of your web
+        application, if and only if the specified source directory
+        actually exists.
+-->
+<target name="compile" depends="prepare"
+        description="Compile Java sources">
+  <echo    message="Compiling plugin ${app.name}"/>
+  <javac   srcdir="${app.src}"
+         destdir="${app.target}"
+           debug="${compile.debug}"
+     deprecation="${compile.deprecation}"
+        optimize="${compile.optimize}">
+    <classpath refid="classpath"/>
+  </javac>
+	  <copy file="${app.src}/jtvexample/plugin/tv_plugins.cd"
+	        todir="${app.target}/jtvexample/plugin">
+	  </copy>
+</target>
+
+
+
+<!--
+
+
+7. Test the deployment
+
+        The "dist" target creates a web application archive containing
+        your completed web application, suitable for deployment on any
+        compatible servlet container.
+-->
+<target name="plugin" depends="compile"
+        description="Create plugin jar file ">
+        
+  <echo    message="Creating plugin jar file for ${app.name}"/>
+  <jar  jarfile="${app.jar}"
+        basedir="${app.target}"
+		>
+  </jar>
+
+</target>
+
+<target name="install" depends="plugin" description="Copy plugin over to java treeview plugins dir">
+	<echo message="Installing plugin"/>
+	  <move  todir="${treeview.home}plugins">
+	    <fileset file="${app.jar}"/>
+	  </move>
+</target>
+<!--
+        The "clean" task deletes any created directories that have resulted
+        from running any of the other targets in this script.
+-->
+
+<target name="clean"
+        description="Clean build and distribution directories">
+  <echo    message="Cleaning app ${app.name}"/>
+  <delete   dir="${app.target}" />
+  <delete   file="${app.jar}" />
+  <delete   dir="${dist.home}" />
+</target>
+
+</project>

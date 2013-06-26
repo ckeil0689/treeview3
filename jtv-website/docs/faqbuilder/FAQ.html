@@ -1,0 +1,98 @@
+<html>
+<head>
+<title>Java TreeView FAQ</title>
+</head>
+<body bgcolor="black"
+         text="white"
+         link="#ffff00"
+        vlink="#ff0000"
+        alink="#ff0000">
+<style>
+<!--
+A:link    {text-decoration: none;      color: #ffff00 }
+A:visited {text-decoration: none;      color: #ffff00 }
+A:active  {text-decoration: underline; color: #ff0000 }
+A:hover   {text-decoration: underline; color: #ff0000 }
+-->
+</style>
+
+
+
+<font face="courier">
+
+<center>
+<font size=+1>
+Java TreeView FAQ
+</font>
+<br>
+<br>
+maintained by  Alok Saldanha &lt;<a href="mailto:alok@genome.stanford.edu">alok@genome.stanford.edu</a>&gt;
+<br>
+<i>last updated by  Alok Tue Oct 23 13:07:27 PDT 2001</i>
+<br><br>
+<hr width=50%>
+<br>
+<dl>
+<dd><a href="#q001"><font size=+2 color="ff0000"><b>1.</b></font>
+ Java TreeView can't see the cdt file I downloaded! It's in the directory, but doesn't show up when I go to the file open dialog.</a></dd>
+<dd><a href="#q002"><font size=+2 color="ff0000"><b>2.</b></font>
+ When I load a new file or click on a new cluster or something, there is some weird drawing artifact, such as old text still being displayed. How can I get rid of this?</a></dd>
+<dd><a href="#q003"><font size=+2 color="ff0000"><b>3.</b></font>
+ MAC ONLY: Why does my freshly installed Java Treeview crash when I open a file?</a></dd>
+<dd><a href="#q004"><font size=+2 color="ff0000"><b>4.</b></font>
+ I have human/mouse/lymphochip genes. How can I link to SOURCE?</a></dd>
+<dd><a href="#q005"><font size=+2 color="ff0000"><b>5.</b></font>
+ How can I select the parent of a node? Up arrow does something counterintuitive.</a></dd>
+<dd><a href="#q006"><font size=+2 color="ff0000"><b>6.</b></font>
+ How can I add associate colors with genes to visualize annotations? </a></dd>
+<dd><a href="#q007"><font size=+2 color="ff0000"><b>7.</b></font>
+ I want to include a picture of the clusters inside a document</a></dd>
+<dd><a href="#q008"><font size=+2 color="ff0000"><b>8.</b></font>
+ I typed something into a text field and closed the dialog window, but the program ignored me. What gives?</a></dd>
+</dl>
+<br><br>
+<hr width="50%">
+<br><br>
+<dl>
+<dd><a name=q001></a><font size=+3 color="ff0000"><b>1.</b></font>
+<font size=+1 color="ffff00"><b> Java TreeView can't see the cdt file I downloaded! It's in the directory, but doesn't show up when I go to the file open dialog.</b></font>
+<br><br><dl><font color="00ffff">
+<dd> Java TreeView will only open files which have a ".cdt" extension. Make sure that your file ends in ".cdt". Note that java treeview can parse ".pcl" files as well, but you must rename them. I will probably change the filename filtering in a later release so that you don't need to  rename pcls. Check the feature page when I get around to making it for  more feature related things.</dd>
+</font></dl><br><br><br>
+<dd><a name=q002></a><font size=+3 color="ff0000"><b>2.</b></font>
+<font size=+1 color="ffff00"><b> When I load a new file or click on a new cluster or something, there is some weird drawing artifact, such as old text still being displayed. How can I get rid of this?</b></font>
+<br><br><dl><font color="00ffff">
+<dd> The workaround is to just resize the component with the weirdness. I will actually fix the bug at some point.</dd>
+</font></dl><br><br><br>
+<dd><a name=q003></a><font size=+3 color="ff0000"><b>3.</b></font>
+<font size=+1 color="ffff00"><b> MAC ONLY: Why does my freshly installed Java Treeview crash when I open a file?</b></font>
+<br><br><dl><font color="00ffff">
+<dd> Try rebooting. I have heard MRJ can be unhappy unless you reboot after the  install.</dd>
+</font></dl><br><br><br>
+<dd><a name=q004></a><font size=+3 color="ff0000"><b>4.</b></font>
+<font size=+1 color="ffff00"><b> I have human/mouse/lymphochip genes. How can I link to SOURCE?</b></font>
+<br><br><dl><font color="00ffff">
+<dd> There should be a preset which is called Source_SUID. Under the document menu, select Gene settings and then click on the appropriate preset. If the preset is mssing, try entering the following custom URL: From Max Diehn, <br> Select Document:Url Options... and enter the following custom format: <pre> http://genome-www4.stanford.edu/cgi-bin/SMD/source/sourceResult?option=CloneID&choice=Gene&criteria=HEADER </pre> This will work if you extract your CDT with clone ID as the unique identifier (which I think is what most people do). If you used LUID as the identifier, then enter the following custom format: <pre> http://genome-www4.stanford.edu/cgi-bin/SMD/source/sourceRedirectLUID.pl?luid=HEADER </pre></dd>
+</font></dl><br><br><br>
+<dd><a name=q005></a><font size=+3 color="ff0000"><b>5.</b></font>
+<font size=+1 color="ffff00"><b> How can I select the parent of a node? Up arrow does something counterintuitive.</b></font>
+<br><br><dl><font color="00ffff">
+<dd> Java TreeView has context-sensitive keyboard event processing. What this means is that the particular tree panel must have the focus in order for it to get the keyboard event. This is necessary, since the up arrow selects the parent node in both the array and gene trees. If it weren't focus-sensative, it wouldn't know which tree to select the parent of. Unless only one tree had a node selected, I suppose. You get the idea. Anyways, moving the mouse over the panel will give it the focus. The panel with the focus should have a heavier black border.</dd>
+</font></dl><br><br><br>
+<dd><a name=q006></a><font size=+3 color="ff0000"><b>6.</b></font>
+<font size=+1 color="ffff00"><b> How can I add associate colors with genes to visualize annotations? </b></font>
+<br><br><dl><font color="00ffff">
+<dd> please see <a href="http://genome-www.stanford.edu/~alok/TreeView/examples/"> http://genome-www.stanford.edu/~alok/TreeView/examples/ </a></dd>
+</font></dl><br><br><br>
+<dd><a name=q007></a><font size=+3 color="ff0000"><b>7.</b></font>
+<font size=+1 color="ffff00"><b> I want to include a picture of the clusters inside a document</b></font>
+<br><br><dl><font color="00ffff">
+<dd> You can export to either postscript or GIF format using the Export menu. Another way is to use screen capture. For the mac, check out <a href="osmacscreen.html"> this </a>.</dd>
+</font></dl><br><br><br>
+<dd><a name=q008></a><font size=+3 color="ff0000"><b>8.</b></font>
+<font size=+1 color="ffff00"><b> I typed something into a text field and closed the dialog window, but the program ignored me. What gives?</b></font>
+<br><br><dl><font color="00ffff">
+<dd> You have stumbled into an issue with how java deals with string input. You basically need to press the enter key after you paste in the url in order for the program to actually register it. This is not particularly elegant... I initially wrote java treeview with a buggy but fast toolkit called AWT. I'm slowly replacing these components with SWING components, which are slightly slower but much more stable. In the meantime, remember to push enter after you change a value in a textfield- this applies to all text fields, including the contrast settings, if you change them directly.</dd>
+</font></dl><br><br><br>
+</dl>
+</body></html>

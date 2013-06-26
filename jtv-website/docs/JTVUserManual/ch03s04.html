@@ -1,0 +1,117 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Miscellaneous Problems</title><meta name="generator" content="DocBook XSL-NS Stylesheets V1.75.2"><link rel="home" href="index.html" title="Java TreeView User's Manual"><link rel="up" href="ch03.html" title="Chapter 3. Troubleshooting"><link rel="prev" href="ch03s03.html" title="Export Problems"><link rel="next" href="bi01.html" title="Bibliography"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Miscellaneous  Problems</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch03s03.html">Prev</a> </td><th width="60%" align="center">Chapter 3. Troubleshooting</th><td width="20%" align="right"> <a accesskey="n" href="bi01.html">Next</a></td></tr></table><hr></div><div class="sect1" title="Miscellaneous Problems"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ch3_misc"></a>Miscellaneous  Problems</h2></div></div></div>
+
+
+<div class="sect2" title="Out of Memory"><div class="titlepage"><div><div><h3 class="title"><a name="ch3_misc_memory"></a>Out of Memory</h3></div></div></div>
+
+<p>
+	Running out of memory is tough to detect and deal with in java, since most of memory allocation is hidden from the java developer. If you are working with large data sets, or on a computer with a small amount of RAM, it is easy to run out of memory because java is not very memory efficient, and more importantly most Java Virtual Machines (JVMs) are too stupid to grow to take up more memory than some default arbitrary maximum.
+</p>
+<p>
+	There are only two possible solutions to the out of memory problem in java. Either I write a platform-specific launcher for each platform that informs the JVM of the extra ram, or you run the application from the command line and tell the JVM about the RAM yourself. Currently, only the latter is supported.
+</p>
+<p>
+	To run the application from the command line, first get to a terminal. This should be obvious to someone on a unix machine. On Mac OS X, run the Terminal program which is in the utilities folder. On Windows, select Start-&gt;run... and then type <span class="command"><strong> cmd &lt;return&gt; </strong></span>. Curously, on Mac OS 9, this problem does not seem to arise. I suspect this is because the OS 9 JVM is smart enough to use the per-file memory settings.
+</p>
+
+<p>
+	Next, switch to the directory containing the java treeview distribution (using either cd or chdir or whatever), and then type
+</p>
+<p>
+<span class="command"><strong> java -Xmx###m -jar TreeViewLauncher.jar </strong></span>
+</p>
+<p>
+Where the number following Xmx is the maximum amount of memory in megabytes that the JVM is to use. You may as well specify the available system RAM; the JVM won't take it unless it needs it. Also, make sure that you're in the directory with the jar files so that the command will work. Check out <a class="xref" href="ch03s04.html#MemComFigure" title="Figure 3.1. Screenshot of Running Java TreeView from the Command Line with 800 Megs of RAM">Figure 3.1, &#8220;Screenshot of Running Java TreeView from the Command Line with 800 Megs of RAM&#8221;</a> for an example.
+</p>
+
+<div class="figure"><a name="MemComFigure"></a><p class="title"><b>Figure 3.1. Screenshot of Running Java TreeView from the Command Line with 800 Megs of RAM</b></p><div class="figure-contents"> 
+
+<div><img src="figures/MemCom.gif" alt="Screenshot of Running Java TreeView from the Command Line with 800 Megs of RAM"></div>
+</div></div><br class="figure-break">
+
+
+</div>
+
+<div class="sect2" title="Displaying Annotations"><div class="titlepage"><div><div><h3 class="title"><a name="ch3_misc_anno"></a> Displaying Annotations </h3></div></div></div>
+
+<p>
+Question: I have two columns before I get to my data, the first being ID(containing accesion number), and the second is "NAME" (containing Unigene ID). The data follows in each column after these two. When treeview loads it up, it only displays the 2nd column "NAME", instead of both columns data when highlighting aspects of the cluster. Is this right?
+</p>
+<p>
+Answer: Yes. TreeView used to display all annotations, but it annoyed some people.
+To specify the ones you want, use Settings-&gt;Annotations...
+</p>
+</div>
+
+<div class="sect2" title="Switching browsers"><div class="titlepage"><div><div><h3 class="title"><a name="ch3_misc_systembrowser"></a>Switching browsers</h3></div></div></div>
+
+
+<p>
+On the windows and mac platforms, the system default browser is used to open urls. In order to change it, you must muck around with your control panel.
+</p>
+<p>
+On unix, there is no notion of a system default web browser, so I just hardcoded in a call to netscape. If you don't have netscape, or you want to use another browser, just alias netscape to that other browser from the shell in which you're launching java treeview. Something like the following should work:
+</p>
+<p>
+<span class="command"><strong> alias netscape mosaic </strong></span>
+</p>
+<p>
+<span class="command"><strong> java -jar TreeViewLauncher.jar </strong></span>
+</p>
+<p>
+If the above doesn't work, then the JVM is spawning a sub-shell to run the call to netscape in. In that case, you need to add the alias to your .profile or equivalent, or perhaps just add a link to your preferred browser such as the following:
+</p>
+<p>
+<span class="command"><strong> ln -s /usr/bin/mosaic netscape </strong></span>
+</p>
+</div>
+<div class="sect2" title="Strange drawing of dendrogram branch lines"><div class="titlepage"><div><div><h3 class="title"><a name="ch3_misc_treeoddity"></a> Strange drawing of dendrogram branch lines </h3></div></div></div>
+
+<div><img src="figures/CuticleCollagensCE_H.gif"></div>
+<p>
+Some people have been thrown off guard by dendrograms such as the one depicted above. The strange appearance of the tree, where the parent node of dpy-8 and col-67 has a lower correlation than its parent, is a correct representation of the clustering algorithm used to generate the tree. Indeed, the correlation between the two genes is .889, whereas the correlation of the next join up is .908. This simply means that the average of dpy-8 and col-67 is more similar to the next node up than they are to each other (and, by implication, than either dpy-8 or col-67 alone are to the next node up).
+</p>
+<p>
+If such behavior disturbs you, please use a different correlation metric, such as complete linkage. Certain other visualization programs, such as the original Treeview, artificially force parent nodes to have a correlation equal to or less than that of their children, but I choose to accurately represent the information in the GTR and ATR files.
+</p>
+</div>
+<div class="sect2" title="Crashing on Mac Os X"><div class="titlepage"><div><div><h3 class="title"><a name="ch3_misc_osx_buserror"></a> Crashing on Mac Os X </h3></div></div></div>
+
+<p>
+Typical symptoms are the application seems to lock up after a fairly innocuous user action, and then the application suddenly quits. If you ware running from the command line, you may see a report of a "bus error" or "segmentation fault". Running "Console", an application that comes with OSX and can be found in the Utilities subfolder of the Applications folder, should reveal something like
+</p>
+<pre class="programlisting">
+May 18 11:27:19 Alok-Saldanhas-Computer /Users/aloksaldanha/Desktop/code/java/LinkedView/bundle/TreeView/Java TreeView.app/Contents/MacOS/JavaApplicationStub: An error report file has been saved as /Users/aloksaldanha/Library/Logs/JavaNativeCrash_pid2964.log.  Please refer to the file for further information.
+
+ 
+May 18 11:27:21 Alok-Saldanhas-Computer crashdump: Crash report written to: /Users/aloksaldanha/Library/Logs/CrashReporter/JavaApplicationStub.crash.log
+
+May 18 11:28:03 Alok-Saldanhas-Computer WindowServer[188]: Reserved range exhausted. (0xbbf4b000 to 0xbc1d1000 goes out of bounds)
+
+May 18 11:28:10 Alok-Saldanhas-Computer /usr/bin/java: An error report file has been saved as /Users/aloksaldanha/Library/Logs/JavaNativeCrash_pid2971.log.  Please refer to the file for further information.
+</pre>
+<p>
+as opposed to
+</p>
+<pre class="programlisting">
+[error] apple.awt.EventQueueExceptionHandler Caught Throwable : 
+[error] java.lang.ArrayIndexOutOfBoundsException: Array index out of range: 52133
+[error] 	at org.gjt.sp.jedit.Buffer.getLineOfOffset(Unknown Source)
+[error] 	at xml.TagHighlight.updateHighlight(Unknown Source)
+[error] 	at xml.TagHighlight.access$000(Unknown Source)
+[error] 	at xml.TagHighlight$1.actionPerformed(Unknown Source)
+[error] 	at javax.swing.Timer.fireActionPerformed(Timer.java:271)
+</pre>
+<p>
+In general, if Java Treeview crashes it is advisable to check the console for messages. The former indicates a bug in the JVM, not in Java Treeview, which at some point I should write up as a formal bug report. Something like the latter indicates a bug in Java Treeview, although this particular instance was another java program. There are at least two causes for the JVM crashes, one of which is somewhat understood. If you are launching Java Treeview by double-clicking a jar file, and you have multiple views open, you could be triggering a bug in the Mac OSX Java libaries related to font rendering. Either run Java Treeview with the following command line:
+</p>
+<pre class="programlisting">
+java -Xmx500m -Dapple.awt.TextAntialiasing=false Treeview.jar
+</pre>
+<p>
+or just use the double-clickable application that comes in the .dmg download.
+</p>
+<p>
+Java Treeview may also crash when you select entries from the most recent file listing. It is not clear what causes this or how to fix it at the moment.
+</p>
+</div>
+</div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch03s03.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch03.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="bi01.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Export Problems </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Bibliography</td></tr></table></div></body></html>

@@ -1,0 +1,126 @@
+<html>
+<head>
+<title>Java TreeView FAQ</title>
+</head>
+<body bgcolor="white"
+         text="black">
+<style>
+<!--
+A:link    {text-decoration: underline; }
+A:active  {text-decoration: underline; color: #ff0000 }
+A:hover   {text-decoration: underline; color: #ff0000 }
+-->
+</style>
+
+
+
+<center>
+<h1>
+Java TreeView FAQ
+</h1>
+<br>
+<br>
+maintained by  Alok Saldanha &lt;<a href="mailto:alokito@users.sourceforge.net">alokito@users.sourceforge.net</a>&gt;
+<br>
+<i>last updated Sun Apr  9 16:53:37 PDT 2006
+</i>
+<br><br>
+</center>
+<hr width=50%>
+<br>
+<dl>
+<dd><font size=+1 color="222222"><b>1.</b></font><a href="#q001">
+ I noticed that I couldn't cut/paste from the  text fields, is there some way to do this?</a></dd>
+<dd><font size=+1 color="222222"><b>2.</b></font><a href="#q002">
+ How can I be notified of updates?</a></dd>
+<dd><font size=+1 color="222222"><b>3.</b></font><a href="#q003">
+ After loading a CDT, I see no colors and the figure is all black.  What do I need to do to get some color?</a></dd>
+<dd><font size=+1 color="222222"><b>4.</b></font><a href="#q004">
+ My file that has a name containing a "_A" or "_G" gives errors mentiong "KAG" and "KGG" files, and doesn't display dendrograms. How can I fix it?</a></dd>
+<dd><font size=+1 color="222222"><b>5.</b></font><a href="#q005">
+ JTV is behaving badly on my windows machine. Can you help me?</a></dd>
+<dd><font size=+1 color="222222"><b>6.</b></font><a href="#q006">
+ What are styles about? Where does the name "Linked" come from?</a></dd>
+<dd><font size=+1 color="222222"><b>7.</b></font><a href="#q007">
+ I have human/mouse/lymphochip genes. How can I link to SOURCE?</a></dd>
+<dd><font size=+1 color="222222"><b>8.</b></font><a href="#q008">
+ How can I select the parent of a node? Up arrow does something counterintuitive.</a></dd>
+<dd><font size=+1 color="222222"><b>9.</b></font><a href="#q009">
+ How can I add associate colors with genes to visualize annotations? </a></dd>
+<dd><font size=+1 color="222222"><b>10.</b></font><a href="#q010">
+ I want to include a picture of the clusters inside a document</a></dd>
+<dd><font size=+1 color="222222"><b>11.</b></font><a href="#q011">
+ I typed something into a text field and closed the dialog window, but the program ignored me. What gives?</a></dd>
+</dl>
+<br><br>
+<hr width="50%">
+<br><br>
+<dl>
+<dd><a name=q001></a><font size=+2 color="222222"><b>1.</b></font>
+<font color="222200"><b> I noticed that I couldn't cut/paste from the  text fields, is there some way to do this?
+<br>If I identify genes or arrays of interest, how do I select and paste them elsewhere?</b></font>
+<br><br><dl><font color="000000">
+<dd> The easiest way to cut and paste genes right now is as follows:<p><ol> <li> Select the genes of interest </li><li> Select Export->Save list<br> </li><li> A preview of the list will appear that can be selected. Press Control-A, Control-C to copy it all to the clipboard </li><li> Click "Cancel" to close the window without saving to disk. </li></ol> Unfortunately, there is so corresponding functionality for arrays at the moment, although a "save arrays" option would make sense.</dd>
+</font></dl><br><br><br>
+<dd><a name=q002></a><font size=+2 color="222222"><b>2.</b></font>
+<font color="222200"><b> How can I be notified of updates?
+</b></font>
+<br><br><dl><font color="000000">
+<dd> There are two options. <ol> <li> If you have a sourceforge account, start monitoring  the project. just go to <p> <a href="https://sourceforge.net/projects/jtreeview/"> https://sourceforge.net/projects/jtreeview/</a><p> and click the "Monitor project" icon</li> <li>If you don't have a sourceforge account, you need to join the jtreeview-announce@lists.sourceforge.net mailing list at<p> <a href="http://lists.sourceforge.net/lists/listinfo/jtreeview-announce"> http://lists.sourceforge.net/lists/listinfo/jtreeview-announce </a> </li></dd>
+</font></dl><br><br><br>
+<dd><a name=q003></a><font size=+2 color="222222"><b>3.</b></font>
+<font color="222200"><b> After loading a CDT, I see no colors and the figure is all black.  What do I need to do to get some color?
+</b></font>
+<br><br><dl><font color="000000">
+<dd> try setting the contrast, under Settings->Pixel Settings... The contrast is the value at which the colors saturate. The default contrast is 3 (8 fold on a log2 scale). If you data has small values, then it will appear black.</dd>
+</font></dl><br><br><br>
+<dd><a name=q004></a><font size=+2 color="222222"><b>4.</b></font>
+<font color="222200"><b> My file that has a name containing a "_A" or "_G" gives errors mentiong "KAG" and "KGG" files, and doesn't display dendrograms. How can I fix it?
+</b></font>
+<br><br><dl><font color="000000">
+<dd> The problem is the _A or _G in the file name.  For reasons that are not worth going into right now, this causes Java Treeview to treat the file as   a k-means clustered file instead of a hierarchical clustered file. This behavior will hopefully go away later. <br> There are two solutions to this problem right now: <ol> <li>When you open the file, select "Linked" or "Classic" in the style   pulldown of the "Open.." dialog. You may not have noticed it, but it's there. Also, treeview will remember what you picked if you select it from the   recent files list.</li> <li>Don't use "_G" or "_A" in your file names. </li> </ol></dd>
+</font></dl><br><br><br>
+<dd><a name=q005></a><font size=+2 color="222222"><b>5.</b></font>
+<font color="222200"><b> JTV is behaving badly on my windows machine. Can you help me?
+</b></font>
+<br><br><dl><font color="000000">
+<dd> Please try installing java from the sun <a href="http://java.sun.com/">website</a>. You just need the "J2SE Desktop Java JRE" edition. If this doesn't help, please send email to the <a href="http://sourceforge.net/mail/?group_id=84593"> jtreeview-users@lists.sourceforge.net</A> mailing list</dd>
+</font></dl><br><br><br>
+<dd><a name=q006></a><font size=+2 color="222222"><b>6.</b></font>
+<font color="222200"><b> What are styles about? Where does the name "Linked" come from?
+</b></font>
+<br><br><dl><font color="000000">
+<dd> Please see <a href="JTVUserManual/ch02s06.html"> this </a> section of the manual for details on the different styles.  The manual is actually a little out of date, as the styles used to be separate programs, but are now just choices on the "File->Open..." dialog. The reason we have styles is because at the outset, it was decided to keep the different user interfaces separate, and in particular to keep a "classic" style for those who may be confused by a more elaborate user interface.  In the future, styles may closely correspond to file types.  In particular, at some point there could be a "SOM" style in addition to the "k-Means", and a more elaborate interfaces for visualizing these other clustering types.</dd>
+</font></dl><br><br><br>
+<dd><a name=q007></a><font size=+2 color="222222"><b>7.</b></font>
+<font color="222200"><b> I have human/mouse/lymphochip genes. How can I link to SOURCE?
+</b></font>
+<br><br><dl><font color="000000">
+<dd> please see <a href="http://jtreeview.sourceforge.net/docs/links.html"> http://jtreeview.sourceforge.net/docs/links.html </a></dd>
+</font></dl><br><br><br>
+<dd><a name=q008></a><font size=+2 color="222222"><b>8.</b></font>
+<font color="222200"><b> How can I select the parent of a node? Up arrow does something counterintuitive.
+</b></font>
+<br><br><dl><font color="000000">
+<dd> Java TreeView has context-sensitive keyboard event processing. What this means is that the particular tree panel must have the focus in order for it to get the keyboard event. This is necessary, since the up arrow selects the parent node in both the array and gene trees. If it weren't focus-sensative, it wouldn't know which tree to select the parent of. Unless only one tree had a node selected, I suppose. You get the idea. Anyways, moving the mouse over the panel will give it the focus. The panel with the focus should have a heavier black border.</dd>
+</font></dl><br><br><br>
+<dd><a name=q009></a><font size=+2 color="222222"><b>9.</b></font>
+<font color="222200"><b> How can I add associate colors with genes to visualize annotations? 
+</b></font>
+<br><br><dl><font color="000000">
+<dd> please see <a href="http://jtreeview.sourceforge.net/examples/index.html"> http://jtreeview.sourceforge.net/examples/index.html </a></dd>
+</font></dl><br><br><br>
+<dd><a name=q010></a><font size=+2 color="222222"><b>10.</b></font>
+<font color="222200"><b> I want to include a picture of the clusters inside a document
+preferably Tex, but not necessarily, it could also be Word.</b></font>
+<br><br><dl><font color="000000">
+<dd> You can export to either postscript or GIF format using the Export menu. Another way is to use screen capture. On Mac OS X, Command-SHIFT-4 lets you capture  rectangular portions of the screen. Please try google for other operating systems.</dd>
+</font></dl><br><br><br>
+<dd><a name=q011></a><font size=+2 color="222222"><b>11.</b></font>
+<font color="222200"><b> I typed something into a text field and closed the dialog window, but the program ignored me. What gives?
+</b></font>
+<br><br><dl><font color="000000">
+<dd> You have stumbled into an issue with how java deals with string input.  You sometimes need to press the enter key after you paste in the url in order for the program to actually register it.  This is not particularly elegant, but if I try to do something fancy to make up for it, I tend to cause other problems on different platforms. Since I don't have a team of programmers working for me, I can't afford to write lots of slick exception handling code. Just remember to push enter after you change a value in a textfield- this applies to all text fields, including the contrast settings, if you change them directly.</dd>
+</font></dl><br><br><br>
+</dl>
+</body></html>

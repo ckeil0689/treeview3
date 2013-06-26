@@ -1,0 +1,118 @@
+<html>
+<head>
+<title>Coming Java TreeView Features</title>
+</head>
+<body bgcolor="black"
+         text="white"
+         link="#ffff00"
+        vlink="#ff0000"
+        alink="#ff0000">
+<style>
+<!--
+A:link    {text-decoration: none;      color: #ffff00 }
+A:visited {text-decoration: none;      color: #ffff00 }
+A:active  {text-decoration: underline; color: #ff0000 }
+A:hover   {text-decoration: underline; color: #ff0000 }
+-->
+</style>
+
+
+
+<font face="courier">
+
+<center>
+<font size=+1>
+Coming Java TreeView Features
+</font>
+<br>
+<br>
+maintained by Alok Saldanha <a href="mailto:alok@genome.stanford.edu"> &lt;alok@genome.stanford.edu&gt; </a>
+<br>
+<i>last updated by Mon Oct 29 14:07:59 PST 2001</i>
+<br><br>
+<hr width=50%>
+<br>
+<dl>
+<dd><a href="#q001"><font size=+2 color="ff0000"><b>1.</b></font>
+Dynamic View Allocation</a></dd>
+<dd><a href="#q004"><font size=+2 color="ff0000"><b>4.</b></font>
+PDF output</a></dd>
+<dd><a href="#q006"><font size=+2 color="ff0000"><b>6.</b></font>
+Array List output</a></dd>
+<dd><a href="#q007"><font size=+2 color="ff0000"><b>7.</b></font>
+Pliant hinting on mouseover of gene name</a></dd>
+<dd><a href="#q012"><font size=+2 color="ff0000"><b>12.</b></font>
+Intelligent Scrolling</a></dd>
+<dd><a href="#q014"><font size=+2 color="ff0000"><b>14.</b></font>
+Annotation Options</a></dd>
+<dd><a href="#q016"><font size=+2 color="ff0000"><b>16.</b></font>
+Ignore blank lines in input files</a></dd>
+<dd><a href="#q017"><font size=+2 color="ff0000"><b>17.</b></font>
+A better bug/feature/faq system!</a></dd>
+</dl>
+<br><br>
+<hr width="50%">
+<br><br>
+<dl>
+<dd><a name=q001></a><font size=+3 color="ff0000"><b>1.</b></font>
+<font size=+1 color="ffff00"><b>Dynamic View Allocation</b></font>
+<br><br><dl><font color="00ffff">
+<dd>Panels should be dynamically allocated, so that other panels can
+dynamically expand to fill the extra space, and thus make better use of available screen real estate. This can most easily be
+achieved by having the Views allocate themselves dynamically, and
+having the MainView arrange them at load time. This would also result in
+faster startup time, as the view currently are allocated at start
+time, not load time.</dd>
+<dd>Planned Implementation Version: <font color="#9999FF"> Beta1 </font> </dd>
+</font></dl><br><br><br>
+<dd><a name=q004></a><font size=+3 color="ff0000"><b>4.</b></font>
+<font size=+1 color="ffff00"><b>PDF output</b></font>
+<br><br><dl><font color="00ffff">
+<dd>This was harder than I thought it would be.</dd>
+<dd>Planned Implementation Version: <font color="#9999FF"> unknown </font> </dd>
+</font></dl><br><br><br>
+<dd><a name=q006></a><font size=+3 color="ff0000"><b>6.</b></font>
+<font size=+1 color="ffff00"><b>Array List output</b></font>
+<br><br><dl><font color="00ffff">
+<dd>Do you want this? Send me email.</dd>
+<dd>Planned Implementation Version: <font color="#9999FF"> unknown </font> </dd>
+</font></dl><br><br><br>
+<dd><a name=q007></a><font size=+3 color="ff0000"><b>7.</b></font>
+<font size=+1 color="ffff00"><b>Pliant hinting on mouseover of gene name</b></font>
+<br><br><dl><font color="00ffff">
+<dd>No Description Yet</dd>
+<dd>Planned Implementation Version: <font color="#9999FF"> unknown </font> </dd>
+</font></dl><br><br><br>
+<dd><a name=q012></a><font size=+3 color="ff0000"><b>12.</b></font>
+<font size=+1 color="ffff00"><b>Intelligent Scrolling</b></font>
+<br><br><dl><font color="00ffff">
+<dd>Currently, redraws everything when scrolling. It would be nice
+to shift up the previously drawn stuff by the right amount, and just
+fill in the new stuff. I don't think this is very easy to do, though.</dd>
+<dd>Planned Implementation Version: <font color="#9999FF"> unknown </font> </dd>
+</font></dl><br><br><br>
+<dd><a name=q014></a><font size=+3 color="ff0000"><b>14.</b></font>
+<font size=+1 color="ffff00"><b>Annotation Options</b></font>
+<br><br><dl><font color="00ffff">
+<dd>Similar to the Url Options menu item, allow users to customize
+the gene/array annotation. Currently, would allow users to not display
+CLID or UID. In the future, could specify which columns/rows of
+annotation are displayed, and how.</dd>
+<dd>Planned Implementation Version: <font color="#9999FF"> unknown </font> </dd>
+</font></dl><br><br><br>
+<dd><a name=q016></a><font size=+3 color="ff0000"><b>16.</b></font>
+<font size=+1 color="ffff00"><b>Ignore blank lines in input files</b></font>
+<br><br><dl><font color="00ffff">
+<dd>Blank lines are sometimes introduced when switching file
+systems. Blank lines are always meaningless to treeview. Therefore,
+they will be ignored.</dd>
+<dd>Planned Implementation Version: <font color="#9999FF"> Beta1 </font> </dd>
+</font></dl><br><br><br>
+<dd><a name=q017></a><font size=+3 color="ff0000"><b>17.</b></font>
+<font size=+1 color="ffff00"><b>A better bug/feature/faq system!</b></font>
+<br><br><dl><font color="00ffff">
+<dd>this system is driving me crazy. I can't be bothered to update it. I want a web database with a nice interface.</dd>
+<dd>Planned Implementation Version: <font color="#9999FF"> unknown. </font> </dd>
+</font></dl><br><br><br>
+</dl>
+</body></html>

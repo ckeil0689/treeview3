@@ -1,0 +1,22 @@
+Mac OS X anti-aliasing:
+
+Dead_Ed writes "So by request, here's what you need to do to disable
+system-wide antialiased text in Mac OS X
+ It's a Terminal "defaults" command, which mean you launch
+ Terminal.app and type the following command in. Be aware that this is
+ a user setting and not a system setting, so it won't affect other
+ users on your system.
+
+defaults write CoreGraphics CGFontDisableAntialiasing YES
+
+Some text will look rather nasty, so just play with what fonts you're
+using and find one that looks decent. To get it back to "normal," you
+can just change to NO:
+
+defaults write CoreGraphics CGFontDisableAntialiasing NO
+
+Enjoy!"
+
+With some experimenting, we have found that, while this works great on
+CRTs (text is less fuzzy), it actually makes text harder to read on
+LCD displays.

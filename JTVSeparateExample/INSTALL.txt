@@ -1,0 +1,15 @@
+To use this example, you need to have the following:
+
+1) Apache Ant
+2) Java Treeview, 1.1.0 or later, "bin" distribution
+
+All you need to do is edit build.xml so that the 
+treeview.home property contains the path to the
+Java Treeview installation folder (i.e. the folder that
+contains the TreeView.jar file)
+
+Then, just type
+
+	ant run
+
+at the command line.

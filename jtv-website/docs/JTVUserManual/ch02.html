@@ -1,0 +1,71 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Chapter 2. Feature Reference</title><meta name="generator" content="DocBook XSL-NS Stylesheets V1.75.2"><link rel="home" href="index.html" title="Java TreeView User's Manual"><link rel="up" href="index.html" title="Java TreeView User's Manual"><link rel="prev" href="ch01s02.html" title="Overview of Java TreeView"><link rel="next" href="ch02s02.html" title="Persistence"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter 2. Feature Reference</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch01s02.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="ch02s02.html">Next</a></td></tr></table><hr></div><div class="chapter" title="Chapter 2. Feature Reference"><div class="titlepage"><div><div><h2 class="title"><a name="ch2"></a>Chapter 2. Feature Reference</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="ch02.html#ch2_flags"> Command Line Options </a></span></dt><dd><dl><dt><span class="sect2"><a href="ch02.html#id1580566">Useful JVM Arguments</a></span></dt><dt><span class="sect2"><a href="ch02.html#id1580567"> Main Program options </a></span></dt><dt><span class="sect2"><a href="ch02.html#id1580676"> Dendrogram export options </a></span></dt></dl></dd><dt><span class="sect1"><a href="ch02s02.html">Persistence</a></span></dt><dd><dl><dt><span class="sect2"><a href="ch02s02.html#id1580926">Document Settings</a></span></dt><dt><span class="sect2"><a href="ch02s02.html#ch2_persistence_global">Global Settings</a></span></dt></dl></dd><dt><span class="sect1"><a href="ch02s03.html">Presets</a></span></dt><dd><dl><dt><span class="sect2"><a href="ch02s03.html#ch2_url_presets">Url Presets</a></span></dt><dt><span class="sect2"><a href="ch02s03.html#ch2_dendroview_color_presets">Dendrogram Color Presets</a></span></dt><dt><span class="sect2"><a href="ch02s03.html#ch2_karyoscope_coordinates_presets">Karyoscope Coordinates Presets</a></span></dt></dl></dd><dt><span class="sect1"><a href="ch02s04.html">Settings</a></span></dt><dd><dl><dt><span class="sect2"><a href="ch02s04.html#ch2_settings_url">Url Settings</a></span></dt><dt><span class="sect2"><a href="ch02s04.html#ch2_settings_dfont">Dendrogram Font Settings</a></span></dt><dt><span class="sect2"><a href="ch02s04.html#ch2_settings_dcolor">Dendrogram Pixel Settings</a></span></dt><dt><span class="sect2"><a href="ch02s04.html#ch2_settings_coordinates">Karyoscope Coordinates Settings</a></span></dt><dt><span class="sect2"><a href="ch02s04.html#ch2_settings_averaging">Karyoscope Averaging Settings</a></span></dt></dl></dd><dt><span class="sect1"><a href="ch02s05.html">Export</a></span></dt><dd><dl><dt><span class="sect2"><a href="ch02s05.html#ch2_export_text">Export of Selected Genes and Data to Tab-Delimited Text</a></span></dt><dt><span class="sect2"><a href="ch02s05.html#ch2_export_dendrogram">Export of Dendrograms</a></span></dt><dt><span class="sect2"><a href="ch02s05.html#ch2_export_bbox">Bounding Box</a></span></dt></dl></dd><dt><span class="sect1"><a href="ch02s06.html">Java Treeview Modes </a></span></dt><dt><span class="sect1"><a href="ch02s07.html">Dendrogram</a></span></dt><dd><dl><dt><span class="sect2"><a href="ch02s07.html#ch2_dendroview_info">Informational Panels</a></span></dt><dt><span class="sect2"><a href="ch02s07.html#ch2_dendroview_selection">Selection in Dendrogram</a></span></dt><dt><span class="sect2"><a href="ch02s07.html#ch2_dendroview_linking">
+Url Linking in Dendrogram
+</a></span></dt><dt><span class="sect2"><a href="ch02s07.html#ch2_dendroview_name_color"> Coloring Gene Names and Array Names </a></span></dt></dl></dd><dt><span class="sect1"><a href="ch02s08.html">Scatterplot</a></span></dt><dd><dl><dt><span class="sect2"><a href="ch02s08.html#ch2_statview_create">Creating a Scatterplot</a></span></dt></dl></dd><dt><span class="sect1"><a href="ch02s09.html">Karyoscope</a></span></dt><dd><dl><dt><span class="sect2"><a href="ch02s09.html#ch2_karyoview_hint">Cursor hinting in Karyoscope</a></span></dt><dt><span class="sect2"><a href="ch02s09.html#ch2_karyoview_zoom">Zooming in Karyoscope</a></span></dt><dt><span class="sect2"><a href="ch02s09.html#ch2_karyoview_sel">Selection Highlighting in Karyoscope</a></span></dt></dl></dd><dt><span class="sect1"><a href="ch02s10.html">Alignment</a></span></dt><dt><span class="sect1"><a href="ch02s11.html">File Formats</a></span></dt><dd><dl><dt><span class="sect2"><a href="ch02s11.html#ch2_file_min">Minimal File Requirements</a></span></dt><dt><span class="sect2"><a href="ch02s11.html#ch2_file_cdt">Generalized CDT File</a></span></dt><dt><span class="sect2"><a href="ch02s11.html#ch2_file_karyoscope"> Coordinates Files for Karyoscope </a></span></dt><dt><span class="sect2"><a href="ch02s11.html#ch2_file_gtr_atr">Tree Files</a></span></dt></dl></dd></dl></div>
+
+<div class="sect1" title="Command Line Options"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ch2_flags"></a> Command Line Options </h2></div></div></div>
+
+
+<div class="sect2" title="Useful JVM Arguments"><div class="titlepage"><div><div><h3 class="title"><a name="id1580566"></a>Useful JVM Arguments</h3></div></div></div>
+
+<p>
+The amount of memory can be specified using the standard arguments to the jvm, i.e. for 500 MB, use
+<span class="command"><strong>
+java -jar -Xmx500m TreeView.jar
+</strong></span>
+</p>
+<p>
+Be aware that for windows, you may need to use javaw instead of java.
+</p>
+</div>
+
+<div class="sect2" title="Main Program options"><div class="titlepage"><div><div><h3 class="title"><a name="id1580567"></a> Main Program options </h3></div></div></div>
+
+<p>
+The main program options have a short and long form. An example command line to open a specified file using the "linked view" style would be
+<span class="command"><strong> java -Xmx500m -jar TreeView.jar -r http://jtreeview.sourceforge.net/examples/DLim_color.cdt </strong></span>
+</p>
+<div class="variablelist" title="Main Program options"><p class="title"><b>Main Program options</b></p><dl><dt><span class="term"> -r &lt;file/url&gt; (--resource=&lt;file/url&gt;) </span></dt><dd> <p> File or url to load. </p> </dd><dt><span class="term"> -t &lt;type&gt; (--type=&lt;type&gt;) </span></dt><dd> <p> Open file with the specified type of viewer. 
+Valid values are "linked" for multiple linked view (by default only dendrogram opens on new files), 
+"kmeans" for k-means, "classic" for the classic, dendrogram only, and "auto" to autodetect (default) </p></dd><dt><span class="term"> -x &lt;plugin&gt; (--export=&lt;plugin&gt; </span></dt><dd> 
+<p> Export image from command line using the specified plugin instead of opening an interactive window.
+This argument requires that a resource to
+export is specified on the command line as well. Currently only the "Dendrogram" plugin is specified. </p></dd></dl></div>
+</div>
+
+<div class="sect2" title="Dendrogram export options"><div class="titlepage"><div><div><h3 class="title"><a name="id1580676"></a> Dendrogram export options </h3></div></div></div>
+
+<p>
+When export to dendrogram is indicated using "-x Dendrogram", main program arguments can be terminated with "--" and additional dendrogram plugin arguments
+can be specified. An example complete command line would be:
+</p>
+<p>
+<span class="command"><strong>
+java -jar TreeView.jar -r ./spellman.cdt -x Dendrogram -- -o /tmp/spellman.png -s 10x1 -a 0 -c 1
+</strong></span>
+</p>
+<div class="variablelist" title="Dendrogram export options"><p class="title"><b>Dendrogram export options </b></p><dl><dt><span class="term"> -o &lt;filename&gt;  (--output=&lt;filename&gt;) </span></dt><dd> <p> (required) Filename to store image output in </p> </dd><dt><span class="term"> -f &lt;imageFormat&gt;  (--=&lt;format&gt;) </span></dt><dd> <p> (optional) set output format, either 'png', 'gif' or 'ps' (defaults to extension of output file)</p> </dd><dt><span class="term"> -s &lt;widthxheight&gt;  (--scaling=&lt;widthxheight&gt;) </span></dt><dd> <p> (optional) set pixel scaling as pixels for each array x pixels for each gene, or 1x10 for one pixel per array column and 10 pixels for each gene row, if you wanted to have gene names in the output </p> </dd><dt><span class="term"> -a &lt;headerIndexes&gt;  (--arrayHeaders=&lt;headerIndexes&gt;) </span></dt><dd> <p> (optional) Comma separated list of array annotations to include in output. Example: -a 0 to include the first row of array annotations in the cdt file. By default no annotations are included. </p> </dd><dt><span class="term"> -g &lt;headerIndexes&gt;  (--geneHeaders=&lt;headerIndexes&gt;) </span></dt><dd> <p> (optional) Comma separated list of gene annotations to include in output. Example: -g 0 to include the first column of array annotations in the cdt file. By default no annotations are included.  </p> </dd><dt><span class="term"> -h &lt;pixels&gt;  (--atrHeight=&lt;pixels&gt;) </span></dt><dd> <p> (optional) Explicitly set the height of the array tree.</p> </dd><dt><span class="term"> -w &lt;pixels&gt;  (--gtrWidth=&lt;pixels&gt;) </span></dt><dd> <p> (optional) Explicitly set the width of the gene tree. </p> </dd><dt><span class="term"> -b  (--below) </span></dt><dd> <p> (optional) boolean argument, moves the array annotations below the array tree </p> </dd><dt><span class="term"> -c &lt;value&gt;  (--contrast=&lt;value&gt;) </span></dt><dd> <p> (optional) Explicitly set the contrast </p> </dd><dt><span class="term"> -l &lt;value&gt;  (--logcenter=&lt;center&gt;) </span></dt><dd> <p> (optional) Take log base 2(data value/&lt;center&gt;) before applying the contrast. Useful if dealing with raw count data. </p> </dd></dl></div>
+<p> Note: Setting the contrast or logcenter values will modify the .jtv file and have a persistent effect when the file is reopened in java treeview </p>
+</div>
+
+<p>
+For operating systems which have a command line, a file or url can be specified. The following example demonstrates how to load the example off the website from the command line:
+<span class="command"><strong>
+java -jar TreeView.jar -r http://jtreeview.sourceforge.net/examples/DLim_color.cdt
+</strong></span>
+</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch01s02.html">Prev</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="ch02s02.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Overview of Java TreeView </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Persistence</td></tr></table></div></body></html>

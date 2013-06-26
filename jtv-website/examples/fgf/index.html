@@ -1,0 +1,44 @@
+<html>
+<head><title> Human FGF Receptor example </title> </head>
+<body>
+<h2> Human FGF Receptor example </h2>
+<p>
+Download fgf_receptors [<a href="fgf_receptors.cdt">cdt</a>] [<a href="fgf_receptors.gtr">gtr</a>]
+</p>
+<p>
+Open in Java TreeView, click on Analysis->Alignment.
+</p>
+<h2> Overview </h2>
+<p>
+The purpose of this example is to demonstrate how to view sequence alignments with java treeview. My purpose was to make a viewer suitable for looking at large alignments of lots of genes. I found the existing tools to be lacking, and realized that it was fairly easy for me to extend java treeview to do what I wanted.
+</p>
+<p>
+By selecting "Settings->PixelSettings..." you can make the global view fit in the available space, seeing the whole alignment at once, a feat I could never manage with the clustalx gui. Also, you can hold down shift to zoom in on a particualr section of the global alignment without having to scroll around on the x- axis in the zoomview.
+</p>
+<h2> How I did it (and you could too)</h2>
+<p>
+I chose as an example the human FGF receptors. I took the following steps:
+<ol>
+<li>Download a list of human fgf receptors from the KOGS database from the url <a href="http://www.ncbi.nlm.nih.gov/COG/new/shokog.cgi?KOG3627"> http://www.ncbi.nlm.nih.gov/COG/new/shokog.cgi?KOG3627 </a> </li>
+
+<li>Download the complete human proteome from <a href="ftp://ftp.ncbi.nih.gov/genomes/H_sapiens/protein/protein.fa.gz"> ftp://ftp.ncbi.nih.gov/genomes/H_sapiens/protein/protein.fa.gz </a></li>
+
+<li> Use the splitFasta.pl script from the helper-scripts package to extract the fgf receptors with the command<br>
+<pre>
+~/perl/splitFasta.pl -l fgf_receptors.lst -o fgf_receptors.fasta human_proteome.fa</pre>
+</li>
+
+<li> Download ClustalX from <a href="ftp://ftp-igbmc.u-strasbg.fr/pub/ClustalX"> ftp://ftp-igbmc.u-strasbg.fr/pub/ClustalX </a> and use to align fgf_receptors.fasta </li>
+
+<li> Run the "aln2cdt.pl" script as follows to convert the .aln and .dnd files into .cdt and .gtr :<br>
+<pre>
+~/perl/aln2cdt.pl  fgf_receptors.aln
+</pre>
+</li>
+</ol>
+
+
+At the end of this process, you will have an fgr_receptors.cdt and fgf_receptors.gtr file, which I have so conveniently provided above.
+</body>
+</html>
+

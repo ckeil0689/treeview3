@@ -1,0 +1,85 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Dendrogram</title><meta name="generator" content="DocBook XSL-NS Stylesheets V1.75.2"><link rel="home" href="index.html" title="Java TreeView User's Manual"><link rel="up" href="ch02.html" title="Chapter 2. Feature Reference"><link rel="prev" href="ch02s06.html" title="Java Treeview Modes"><link rel="next" href="ch02s08.html" title="Scatterplot"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Dendrogram</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch02s06.html">Prev</a> </td><th width="60%" align="center">Chapter 2. Feature Reference</th><td width="20%" align="right"> <a accesskey="n" href="ch02s08.html">Next</a></td></tr></table><hr></div><div class="sect1" title="Dendrogram"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ch2_dendroview"></a>Dendrogram</h2></div></div></div>
+
+<p>
+The Dendrogram is one of three views which can be created in the LinkedView application. It is also the bulk of the TreeView application. The dendrogram has a lot of components, so I've gone ahead and given them names, so that the description of the features will not be confusing.
+</p>
+<div class="figure"><a name="DendrogramFigure"></a><p class="title"><b>Figure 2.10. Dendrogram Component Layout</b></p><div class="figure-contents"> 
+
+<div><img src="figures/Dendrogram.gif" alt="Dendrogram Component Layout"></div>
+</div></div><br class="figure-break">
+
+<div class="sect2" title="Informational Panels"><div class="titlepage"><div><div><h3 class="title"><a name="ch2_dendroview_info"></a>Informational Panels</h3></div></div></div>
+
+<p>
+The status panel displays different information depending upon which component the mouse is over. The hint panel displays hints on how to use the component.
+</p>
+</div>
+
+<div class="sect2" title="Selection in Dendrogram"><div class="titlepage"><div><div><h3 class="title"><a name="ch2_dendroview_selection"></a>Selection in Dendrogram</h3></div></div></div>
+
+<p>
+Genes can be selected in the dendrogram by either clicking and dragging on the global pixels or by clicking on a node in the gene or array trees. A zoomed in view of the selected genes will appear in the Zoom Pixels pane, a yellow rectangle will appear on the global view indicating which genes are selected, and a blue rectangle will appear inside the yellow rectangle indicating which genes are currently visible in the Zoom Pixels pane.
+</p>
+<p>
+Holding down the shift key while dragging on the global pixels will cause the exact range of arrays to be selected; by default all arrays are selected. Once a range is selected, pressing the arrow keys moves the selected rectangle around. Holding down the control key while pressing the arrow keys will grow and shrink the selected rectangle.
+</p>
+<p>
+Clicking on a node in the array or gene trees will select all descendants of the node. The selected node and descendants will be colored in red. At this point, pressing the arrow keys will change which genes are selected. Up will select the parent of the current node, left and right will select the left and right children, and down will select the child with more descendants.
+</p>
+</div>
+<div class="sect2" title="Url Linking in Dendrogram"><div class="titlepage"><div><div><h3 class="title"><a name="ch2_dendroview_linking"></a>
+Url Linking in Dendrogram
+</h3></div></div></div>
+
+<p>
+Provided the url link settings (described in <a class="xref" href="ch02s04.html#ch2_settings_url" title="Url Settings">the section called &#8220;Url Settings&#8221;</a>) are set appropriately, clicking on a gene annotation or an array name will cause a browser window to open with details on the gene or array.
+</p>
+</div>
+<div class="sect2" title="Coloring Gene Names and Array Names"><div class="titlepage"><div><div><h3 class="title"><a name="ch2_dendroview_name_color"></a> Coloring Gene Names and Array Names </h3></div></div></div>
+	
+	<div class="sect3" title="Coloring Gene Names"><div class="titlepage"><div><div><h4 class="title"><a name="ch2_dendroview_namecolor_gene"></a> Coloring Gene Names </h4></div></div></div>
+		
+	<p>
+		To add color to gene names, you must add a column named "FGCOLOR" before the GWEIGHT column. 
+		Don't have a GWEIGHT column? Well, you need to add that immediately before your first array column. For each gene,
+you need to specify a 
+		<a class="xref" href="ch02s07.html#ch2_dendroview_namecolor_hex" title="Hex Codes for Name Coloring">the section called &#8220; Hex Codes for Name Coloring &#8221;</a> 
+		for the color you want that gene's name to appear in. 
+		Clearly, it is a good idea to write some kind of excel
+function which computes it for you, or a perl script or something.
+	</p>
+		</div>
+	<div class="sect3" title="Coloring Array Names"><div class="titlepage"><div><div><h4 class="title"><a name="ch2_dendroview_namecolor_array"></a> Coloring Array Names </h4></div></div></div>
+		
+		<p>
+			To add color to array names, you must add a row named "FGCOLOR" before
+the EWEIGHT row. If you don't have an "EWEIGHT" row, you must it
+immediately before your first row of gene expression data. For each
+column in the EWEIGHT row, you must specify a 
+		<a class="xref" href="ch02s07.html#ch2_dendroview_namecolor_hex" title="Hex Codes for Name Coloring">the section called &#8220; Hex Codes for Name Coloring &#8221;</a> 
+			
+			for the color you want that array's name to appear in.
+
+		</p>
+	</div>
+	<div class="sect3" title="Hex Codes for Name Coloring"><div class="titlepage"><div><div><h4 class="title"><a name="ch2_dendroview_namecolor_hex"></a> Hex Codes for Name Coloring </h4></div></div></div>
+		
+		<p>
+			Hex color codes are commonly used in html documents to specify colors. The format is as follows: #RRGGBB. The RR value is a hex number between 00 and FF which specifies how much red you want. 
+			In other words,
+			</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+					 #FF0000 is pure, bright red
+				</li><li class="listitem">
+					#00FF00 is pure, bright green
+				</li><li class="listitem">
+					#0000FF is pure, bright blue
+				</li></ul></div><p>
+You can of course mix values, and use lower values than FF for less
+intense colors. you can either find colors by trial and error, or do a
+quick web search for hex color codes. It is recommended that you edit
+the cdt file in excel or write a perl script to add the color codes easily.
+	</p>
+
+	</div>
+</div>
+</div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch02s06.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch02.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch02s08.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Java Treeview Modes  </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Scatterplot</td></tr></table></div></body></html>
