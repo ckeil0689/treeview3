@@ -24,6 +24,8 @@ package Cluster;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.ScrollPane;
 import java.io.File;
@@ -33,6 +35,7 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -41,6 +44,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+
+import net.miginfocom.swing.MigLayout;
 
 import edu.stanford.genetics.treeview.BrowserControl;
 import edu.stanford.genetics.treeview.ConfigNode;
@@ -152,11 +157,11 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		
 		//Setting up the ArrayList to display
 		outer = (ClusterModel) dataModel;
-		System.out.println("LOL WHAT? " + outer.nExpr());
 		matrix = outer.getDataMatrix();
 		dataArray = matrix.getExprData();
 		
 		geneList = splitArray(dataArray, outer);
+		System.out.println("NAMES: " + Arrays.toString(outer.geneHeaderInfo.getHeaderArray()[0]));
 		
 		setupViews();
 		
@@ -188,7 +193,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 			
 			geneList.add(Arrays.copyOfRange(array, lower, upper));
 		}
-		
+	
 		return geneList;
 	}
 	
@@ -227,38 +232,6 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 	*/
 	protected ConfigNode getFirst(String name) {
 		return getConfigNode().fetchOrCreate(name);
-	}
-
-	public TreeSelectionI getGeneSelection() {
-		return geneSelection;
-	}
-	public TreeSelectionI getArraySelection() {
-		return arraySelection;
-	}
-	/**
-	 *  This should be called after setDataModel has been set to the appropriate model
-	 * @param arraySelection
-	 */
-	protected void setArraySelection(TreeSelectionI arraySelection) {
-		if (this.arraySelection != null) {
-			this.arraySelection.deleteObserver(this);	
-		}
-		this.arraySelection = arraySelection;
-		arraySelection.addObserver(this);
-		
-	}
-
-	/**
-	 *  This should be called after setDataModel has been set to the appropriate model
-	 * @param geneSelection
-	 */
-	protected void setGeneSelection(TreeSelectionI geneSelection) {
-		if (this.geneSelection != null) {
-			this.geneSelection.deleteObserver(this);	
-		}
-		this.geneSelection = geneSelection;
-		geneSelection.addObserver(this);
-		
 	}
 
 	
@@ -345,143 +318,60 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 	 *
 	 */
 	protected void setupViews() {
-		this.removeAll();
-		
-		clusterPanel = new ClusterPanel("Cluster Table here");
-		statuspanel = new MessagePanel("View Status");
+		this.removeAll();	
 
-		DoubleArrayDrawer dArrayDrawer = new DoubleArrayDrawer();
-		arrayDrawer = dArrayDrawer;
-		((Observable)getDataModel()).addObserver(arrayDrawer);
-		
-	
-		// scrollbars, mostly used by maps
-		globalXscrollbar = new JScrollBar(JScrollBar.HORIZONTAL, 0,1,0,1);
-		globalYscrollbar = new JScrollBar(JScrollBar.VERTICAL,0,1,0,1);
-		zoomXscrollbar = new JScrollBar(JScrollBar.HORIZONTAL, 0,1,0,1);
-		zoomYscrollbar = new JScrollBar(JScrollBar.VERTICAL,0,1,0,1);
+//		doDoubleLayout();
+		//The following two variables simulate data from the .txt tab-delimited files loaded into Cluster
+				//random two-dimensional string array to try out in table
+		this.setLayout(new MigLayout());
+				String[][] geneNames = outer.geneHeaderInfo.getHeaderArray();
+				
+				String[] title = outer.geneHeaderInfo.getNames();
+				
+				//create trial table with demo data to add to JSplitPane
+				//JTable can either accept raw string array data or Vectors
+				//Vectors preferred because they can be resized and optimiz memory allocation
+				System.out.println("Attention: " + geneList.size());
+				JTable table = new JTable(new ClusterTableModel(geneList, outer));
+				table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+				
+				//create a scrollPane with he table in it 
+				JScrollPane tableScroll = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
+						JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+				table.setFillsViewportHeight(true);
+				
+				JTable rowTable = new RowNumberTable(table);
+				
+				System.out.println("Gene Names: " + geneNames.length);
+				JTable geneTable = new JTable(geneNames, title);
+				geneTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+				
+				tableScroll.setRowHeaderView(geneTable);
+				tableScroll.setCorner(JScrollPane.UPPER_LEFT_CORNER, rowTable.getTableHeader());
+				tableScroll.setPreferredSize(new Dimension(viewFrame.getSize()));
+				//create a scrollPane with he table in it 
+				table.setFillsViewportHeight(true);
 
-
-
-		 zoomXmap = new MapContainer();
-		 zoomXmap.setDefaultScale(12.0);
-		 zoomXmap.setScrollbar(zoomXscrollbar);
-		 zoomYmap = new MapContainer();
-		 zoomYmap.setDefaultScale(12.0);
-		 zoomYmap.setScrollbar(zoomYscrollbar);
-
-		 // globalmaps tell globalview, atrview, and gtrview
-		 // where to draw each data point.
-	// the scrollbars "scroll" by communicating with the maps.
-		globalXmap = new MapContainer();
-		globalXmap.setDefaultScale(2.0);
-		globalXmap.setScrollbar(globalXscrollbar);
-		globalYmap = new MapContainer();
-		globalYmap.setDefaultScale(2.0);
-		globalYmap.setScrollbar(globalYscrollbar);
-		
-
-		doDoubleLayout();
-		
+				//creating the split panel with 'left' and 'right' components
+//				JSplitPane innerPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+//						//left, 
+//						tableScroll, right);
+				JPanel innerPanel = new JPanel();
+				innerPanel.setLayout(new MigLayout());
+				innerPanel.add(tableScroll, "grow, push");
+				//adds expansion arrows to central divider
+//				innerPanel.setOneTouchExpandable(true);
+//				innerPanel.setDividerLocation(300);
+				Color lightB = new Color(51,204,255,100);
+				setBackground(lightB);
+				//innerPanel.setBorder(BorderFactory.createTitledBorder("Data Table"));
+				add(innerPanel);
+				//add(innerPanel, "running");
 
 		// reset persistent popups
 		settingsFrame = null;
 		settingsPanel = null;
-		
-		// set data first to avoid adding auto-genereated contrast to documentConfig.
-		dArrayDrawer.setDataMatrix(getDataModel().getDataMatrix());
-		dArrayDrawer.bindConfig(getFirst("ArrayDrawer"));
-	
-		
-		globalXmap.bindConfig(getFirst("GlobalXMap"));
-		globalYmap.bindConfig(getFirst("GlobalYMap"));
-		
-
-		// perhaps I could remember this stuff in the MapContainer...
-		globalXmap.setIndexRange(0, dataModel.getDataMatrix().getNumCol() - 1);
-		globalYmap.setIndexRange(0, dataModel.getDataMatrix().getNumRow() - 1);
-
-		globalXmap.notifyObservers();
-		globalYmap.notifyObservers();
 	}
-
-/**
- * Lays out components in a single DragGridPanel
- *
- */
-	/*
-	private void doSingleLayout() {
-		Rectangle rectangle  = new Rectangle(0, 0, 1, 2);
-
-		DragGridPanel innerPanel = new DragGridPanel(4, 3);
-		innerPanel.setBorderWidth(2);
-		innerPanel.setBorderHeight(2);
-		innerPanel.setMinimumWidth(1);
-		innerPanel.setMinimumHeight(1);
-		innerPanel.setFocusWidth(1);
-		innerPanel.setFocusHeight(1);
-
-		innerPanel.addComponent(statuspanel, rectangle);
-		rectangle.translate(1, 0);
-
-		innerPanel.addComponent(atrview, rectangle);
-		registerView(atrview);
-
-		rectangle.translate(1, 0);
-		rectangle.setSize(1, 1);
-		innerPanel.addComponent(arraynameview, rectangle);
-		registerView(arraynameview);
-		rectangle.translate(0, 1);
-		innerPanel.addComponent(atrzview, rectangle);
-		registerView(atrzview);
-
-		rectangle.setSize(1, 2);
-		rectangle.translate(1, -1);
-		innerPanel.addComponent(hintpanel, rectangle);
-
-		rectangle = new Rectangle(0, 2, 1, 1);
-		JPanel gtrPanel = new JPanel();
-		gtrPanel.setLayout(new BorderLayout());
-		gtrPanel.add(gtrview, BorderLayout.CENTER);
-		gtrPanel.add(new JScrollBar(JScrollBar.HORIZONTAL, 0,1,0,0), BorderLayout.SOUTH);
-		innerPanel.addComponent(gtrPanel, rectangle);
-		gtrview.setHintPanel(hintpanel);
-		gtrview.setStatusPanel(statuspanel);
-		gtrview.setViewFrame(viewFrame);
-
-		// global view
-		rectangle.translate(1, 0);
-		JPanel panel = new JPanel();
-		panel.setLayout(new BorderLayout());
-		panel.add(globalview, BorderLayout.CENTER);
-		panel.add(globalYscrollbar, BorderLayout.EAST);
-		panel.add(globalXscrollbar, BorderLayout.SOUTH);	
-		innerPanel.addComponent(panel, rectangle);
-		globalview.setHintPanel(hintpanel);
-		globalview.setStatusPanel(statuspanel);
-		globalview.setViewFrame(viewFrame);
-
-		// zoom view
-		rectangle.translate(1, 0);
-		JPanel zoompanel = new JPanel();
-		zoompanel.setLayout(new BorderLayout());
-		zoompanel.add(zoomview, BorderLayout.CENTER);
-		zoompanel.add(zoomYscrollbar, BorderLayout.EAST);
-		zoompanel.add(zoomXscrollbar, BorderLayout.SOUTH);	
-		innerPanel.addComponent(zoompanel, rectangle);
-		zoomview.setHintPanel(hintpanel);
-		zoomview.setStatusPanel(statuspanel);
-		zoomview.setViewFrame(viewFrame);
-
-
-
-		rectangle.translate(1, 0);
-		innerPanel.addComponent(textview, rectangle);
-		registerView(textview);
-		add(innerPanel);
-		
-	}
-	*/
 	
 	/**
 	 * Lays out components in two DragGridPanel separated by a
@@ -489,124 +379,52 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 	 *
 	 */
 
-	protected void doDoubleLayout() {
-		//The following two variables simulate data from the .txt tab-delimited files loaded into Cluster
-		//random two-dimensional string array to try out in table
-		String[][] people = {{"Pierce", "Electrician", "43"},{"Monica","Nurse", "34"}, 
-				{"Alfred", "Engineer", "24"}};
-		
-		//string array with column names
-		String[] colNames = {"Name", " Occupation", "Age"};
-		
-		//create trial table with demo data to add to JSplitPane
-		//JTable can either accept raw string array data or Vectors
-		//Vectors preferred because they can be resized and optimiz memory allocation
-		System.out.println("Attention: " + geneList.size());
-		JTable table = new JTable(new ClusterTableModel(geneList, outer));
-		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		
-		//create a scrollPane with he table in it 
-		JScrollPane tableScroll = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
-				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		table.setFillsViewportHeight(true);
-		
-		//creating the two GridPanels
-		DragGridPanel left = new DragGridPanel(2,2);
-		left.setName("LeftDrag");
-		DragGridPanel right = new DragGridPanel(2,3);
-		right.setName("RightDrag");
-		
-	    left.setBorderWidth(2);
-		left.setBorderHeight(2);
-		left.setMinimumWidth(1);
-		left.setMinimumHeight(1);
-		left.setFocusWidth(1);
-		left.setFocusHeight(1);
-
-	    right.setBorderWidth(2);
-		right.setBorderHeight(2);
-		right.setMinimumWidth(1);
-		right.setMinimumHeight(1);
-		right.setFocusWidth(1);
-		right.setFocusHeight(1);
-
-		float lheights []  = new float[2];
-		lheights [0] = (float) .15;
-		lheights[1] = (float) .85;
-		left.setHeights(lheights);
-
-		float lwidths []  = new float[2];
-		lwidths [0] = (float) .35;
-		lwidths[1] = (float) .65;
-		left.setWidths(lwidths);
-
-		float rheights [] = new float[3];
-		rheights[0] = (float).15;
-		rheights[1] = (float).05;
-		rheights[2] = (float).8;
-		right.setHeights(rheights);
-
-		//creating and adding the status panel to left GridPanel
-		Rectangle rectangle  = new Rectangle(0, 0, 1, 1);
-
-		left.addComponent(statuspanel, rectangle);
-		rectangle.translate(1, 0);
-
-		rectangle.translate(-1, 0);
-		
-		rectangle.translate(0, 1);
-
-		rectangle.setSize(1, 2);
-		rectangle.translate(1, -1);
-		right.addComponent(clusterPanel, rectangle);   //clusterPanel added to the right GridPanel object (what is doDoubleLayout() used on?)
-		
-		//creating and adding the GTR Panel to the left GridPanel
-		rectangle = new Rectangle(0, 1, 1, 1);
-		JPanel gtrPanel = new JPanel();
-		gtrPanel.setLayout(new BorderLayout());
-		gtrPanel.add(new JScrollBar(JScrollBar.HORIZONTAL, 0,1,0,1), BorderLayout.SOUTH);
-		left.addComponent(gtrPanel, rectangle);      
-
-
-		// global view
-		rectangle.translate(1, 0);
-		JPanel panel = new JPanel();
-		panel.setLayout(new BorderLayout());
-		panel.add(globalYscrollbar, BorderLayout.EAST);
-		panel.add(globalXscrollbar, BorderLayout.SOUTH);	
-		left.addComponent(panel, rectangle);
-
-
-		// zoom view
-		rectangle.translate(-1, 1);
-		JPanel zoompanel = new JPanel();
-		zoompanel.setLayout(new BorderLayout());
-		zoompanel.add(zoomXscrollbar, BorderLayout.SOUTH);	
-		zoompanel.add(zoomYscrollbar, BorderLayout.EAST);
-		right.addComponent(zoompanel, rectangle);
-
-
-
-		rectangle.translate(1, 0);
-		JPanel textpanel = new JPanel();
-		textpanel.setLayout(new BorderLayout());
-		right.addComponent(textpanel, rectangle);
-
-		//creating the split panel with 'left' and 'right' components
-//		JSplitPane innerPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-//				//left, 
-//				tableScroll, right);
-		JPanel innerPanel = new JPanel();
-		innerPanel.setSize(viewFrame.getSize());
-		innerPanel.add(tableScroll);
-		//adds expansion arrows to central divider
-//		innerPanel.setOneTouchExpandable(true);
-//		innerPanel.setDividerLocation(300);
-		//CardLayout sets up the tabbed organization of plugin-windows
-		setLayout(new CardLayout());
-		add(innerPanel, "running");
-
-	}
+//	protected void doDoubleLayout() {
+//		//The following two variables simulate data from the .txt tab-delimited files loaded into Cluster
+//		//random two-dimensional string array to try out in table
+//		String[][] geneNames = outer.geneHeaderInfo.getHeaderArray();
+//		
+//		String[] title = outer.geneHeaderInfo.getNames();
+//		
+//		//create trial table with demo data to add to JSplitPane
+//		//JTable can either accept raw string array data or Vectors
+//		//Vectors preferred because they can be resized and optimiz memory allocation
+//		System.out.println("Attention: " + geneList.size());
+//		JTable table = new JTable(new ClusterTableModel(geneList, outer));
+//		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+//		
+//		//create a scrollPane with he table in it 
+//		JScrollPane tableScroll = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
+//				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+//		table.setFillsViewportHeight(true);
+//		
+//		JTable rowTable = new RowNumberTable(table);
+//		
+//		System.out.println("Gene Names: " + geneNames.length);
+//		JTable geneTable = new JTable(geneNames, title);
+//		geneTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+//		
+//		tableScroll.setRowHeaderView(geneTable);
+//		tableScroll.setCorner(JScrollPane.UPPER_LEFT_CORNER, rowTable.getTableHeader());
+//		tableScroll.setPreferredSize(new Dimension(getWidth(), getHeight()));
+//		//create a scrollPane with he table in it 
+//		table.setFillsViewportHeight(true);
+//
+//		//creating the split panel with 'left' and 'right' components
+////		JSplitPane innerPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+////				//left, 
+////				tableScroll, right);
+//		JPanel innerPanel = new JPanel();
+//		innerPanel.add(tableScroll);
+//		//adds expansion arrows to central divider
+////		innerPanel.setOneTouchExpandable(true);
+////		innerPanel.setDividerLocation(300);
+//		Color lightB = new Color(0,0,182,155);
+//		setBackground(lightB);
+//		setBorder(BorderFactory.createBevelBorder(1));
+//		add(innerPanel, "running");
+//
+//	}
 
 	
 

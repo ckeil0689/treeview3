@@ -34,5 +34,9 @@ public class ClusterTableModel extends AbstractTableModel{
 
 		return currentModel.getValue(arg0, arg1);
 	}
-
+	
+	@Override
+	public String getColumnName(int pCol) {
+	       return currentModel.arrayHeaderInfo.getHeaderArray()[pCol][0];
+	   }
 }

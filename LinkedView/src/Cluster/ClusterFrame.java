@@ -22,9 +22,12 @@
  */
 package Cluster;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -93,6 +96,10 @@ public class ClusterFrame extends JFrame{
 	ArrayClusterPanel arrayClusterPanel;
 	ClusterOptionsPanel coPanel;
 	
+	Dimension screenSize;
+	Point middle;
+	Point newLocation;
+	
 	//Object of the loaded model and matrix 
 	ClusterModel outer;
 	ClusterModel.ClusterDataMatrix matrix;
@@ -127,12 +134,14 @@ public class ClusterFrame extends JFrame{
 		setLocationRelativeTo(null);
 		setResizable(true);
 		
+		
 		//set layout for initial window
 		mainPanel.setLayout(new MigLayout());
 		
 		//First Window
 		initialPanel = new InitialPanel();
 		mainPanel.add(initialPanel, "grow, push, center");
+		mainPanel.setBackground(new Color(51,204,255,100));
 		
 		//Add the mainPanel to the ContentPane
 		getContentPane().add(mainPanel);
@@ -146,6 +155,11 @@ public class ClusterFrame extends JFrame{
 		
 		//packs items so that the frame fits them
 		pack();
+		screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		middle = new Point(screenSize.width / 2, screenSize.height / 2);
+		newLocation = new Point(middle.x - (getWidth() / 2), 
+		                              middle.y - (getHeight() / 2));
+		setLocation(newLocation);
     }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~New Panels~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
 	
@@ -173,8 +187,8 @@ public class ClusterFrame extends JFrame{
 		public InitialPanel() {
 			this.setLayout(new MigLayout());
 			this.setBorder(BorderFactory.createTitledBorder("Data Information"));
-			setLocationRelativeTo(null);
 			setResizable(true);
+			setBackground(Color.white);
 			
 	    	HeaderInfo infoArray = clusterModel.getArrayHeaderInfo();
 	    	HeaderInfo infoGene = clusterModel.getGeneHeaderInfo();
@@ -183,13 +197,13 @@ public class ClusterFrame extends JFrame{
 	//    	ClusterModel outer = (ClusterModel) clusterModel; 
 	//    	ClusterModel.ClusterDataMatrix matrix = outer.getDataMatrix();
 	//    	
-	    	System.out.println("Matrix Length: " + dataArray.length);
-	    	System.out.println("Matrix Sample: " + Arrays.toString(rangeArray));
+//	    	System.out.println("Matrix Length: " + dataArray.length);
+//	    	System.out.println("Matrix Sample: " + Arrays.toString(rangeArray));
 	    	
 	    	nCols = infoArray.getNumHeaders();
 	    	nRows = infoGene.getNumHeaders();
-	    	System.out.println("Rows: " + nRows);
-	    	System.out.println("Columns: " + nCols);
+//	    	System.out.println("Rows: " + nRows);
+//	    	System.out.println("Columns: " + nCols);
 	    	
 	    	//textpanel
 	//    	JPanel textPane = new JPanel();
@@ -210,11 +224,13 @@ public class ClusterFrame extends JFrame{
 	    	
 	    	label1 = new JLabel("Your file has been loaded!");
 	    	label1.setFont(new Font("Sans Serif", Font.PLAIN, 16));
+	    	label1.setBackground(Color.white);
 	    	this.add(label1, "top, wrap");
 	   
 	    	
 	    	label2 = new JLabel("It appears to have:");
 	    	label2.setFont(new Font("Sans Serif", Font.PLAIN, 16));
+	    	label2.setBackground(Color.white);
 	    	this.add(label2, "wrap");
 	    	
 	//    	this.add(textPane, "wrap, grow, push");
@@ -222,11 +238,15 @@ public class ClusterFrame extends JFrame{
 	    	//panel with dimensions of the dataMatrix
 	    	JPanel numPane = new JPanel();
 	    	numPane.setLayout(new MigLayout());
+	    	numPane.setBackground(Color.white);
 	    	
 	    	numColLabel = new JLabel(nCols + " columns");
+	    	numColLabel.setBackground(Color.white);
 	    	numColLabel.setFont(new Font("Sans Serif", Font.BOLD, 16));
 	    	numPane.add(numColLabel, "span, split 2, center");
+	    	
 	    	numRowLabel = new JLabel(nRows + " rows");
+	    	numRowLabel.setBackground(Color.white);
 	    	numRowLabel.setFont(new Font("Sans Serif", Font.BOLD, 16));
 	    	numPane.add(numRowLabel,  "gapleft 10%");
 	    	
@@ -235,6 +255,7 @@ public class ClusterFrame extends JFrame{
 	    	//buttonPane
 	    	JPanel buttonPane1 = new JPanel();
 	    	buttonPane1.setLayout(new MigLayout());
+	    	buttonPane1.setBackground(Color.white);
 	    	
 	    	loadNew_button = new JButton("Load New File");
 	    	loadNew_button.addActionListener(new ActionListener(){
@@ -278,7 +299,7 @@ public class ClusterFrame extends JFrame{
 	    	
 	    	JPanel buttonPane2 = new JPanel();
 	    	buttonPane2.setLayout(new MigLayout());
-	    	//buttonPane2.setBackground(Color.CYAN);
+	    	buttonPane2.setBackground(Color.white);
 	    	
 	    	yes_button = new JButton("Yes");
 	    	yes_button.addActionListener(new ActionListener(){
@@ -328,9 +349,8 @@ public class ClusterFrame extends JFrame{
 			  public FilterOptionsPanel() {
 				this.setLayout(new MigLayout());
 				this.setBorder(BorderFactory.createTitledBorder("Filtering Data"));
-				setLocationRelativeTo(null);
 				setResizable(false);
-				//setBackground(Color.blue);
+				setBackground(new Color(51,204,255,0));
 		    
 				//Instructions
 				instructions = new JTextArea("Check all filter options which you would like to apply " +
@@ -361,6 +381,7 @@ public class ClusterFrame extends JFrame{
 		    	//panle with all the buttons
 		    	JPanel buttonPane = new JPanel();
 		    	buttonPane.setLayout(new MigLayout());
+		    	buttonPane.setBackground(new Color(51,204,255,0));
 		    	
 		    	//remove button with action listener
 		    	remove_button = new JButton("Remove");
@@ -416,13 +437,14 @@ public class ClusterFrame extends JFrame{
 				this.setLayout(new MigLayout("", "[]push[]"));
 				this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 				setResizable(true);
-				//this.setBackground(Color.BLUE);
+				setBackground(Color.white);
 				
 		    	check1 = new JCheckBox("Data Completeness per Element");
+		    	check1.setBackground(Color.white);
 		    	this.add(check1, "alignx 0%");
 		    	
 		    	JPanel bPane = new JPanel();
-		    	//bPane.setBackground(Color.GREEN);
+		    	bPane.setBackground(Color.white);
 		    	info_button = new JButton("?");
 		    	
 		    	info_button.addActionListener(new ActionListener(){
@@ -442,7 +464,7 @@ public class ClusterFrame extends JFrame{
 		    	
 		    	JPanel valuePane = new JPanel();
 		    	valuePane.setLayout(new MigLayout());
-		    	//valuePane.setBackground(Color.GREEN);
+		    	valuePane.setBackground(Color.white);
 		    	
 		    	label2 = new JLabel();
 		    	label2.setText("Enter Percentage: ");
@@ -472,17 +494,14 @@ public class ClusterFrame extends JFrame{
 					this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 					setSize(this.getSize());
 					setResizable(true);
-					//setBackground(Color.RED);
-			    	
-			    	//textpanel
-			    	JPanel infoPane = new JPanel();
-			    	infoPane.setLayout(new MigLayout());
+					setBackground(Color.white);
 			    	
 			    	check2 = new JCheckBox("Standard Deviation (Gene Vector)");
+			    	check2.setBackground(Color.white);
 			    	this.add(check2, "alignx 0%");
 			    	
 			    	JPanel bPane = new JPanel();
-			    	//bPane.setBackground(Color.GREEN);
+			    	bPane.setBackground(Color.white);
 			    	info_button = new JButton("?");
 			    	
 			    	info_button.addActionListener(new ActionListener(){
@@ -498,10 +517,12 @@ public class ClusterFrame extends JFrame{
 			    	
 			    	JPanel valuePane = new JPanel();
 			    	valuePane.setLayout(new MigLayout());
+			    	valuePane.setBackground(Color.white);
 			    	
 			    	sdField = new JTextField(textFieldSize);
 			    	
 			    	enterLabel = new JLabel();
+			    	enterLabel.setBackground(Color.white);
 			    	enterLabel.setText("Enter a Standard Deviation: ");
 			    	enterLabel.setFont(new Font("Sans Serif", Font.PLAIN, 16));
 			    	
@@ -527,18 +548,14 @@ public class ClusterFrame extends JFrame{
 					this.setLayout(new MigLayout("", "[]push[]"));
 					this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 					setResizable(true);
-					//setBackground(Color.RED);
-			   
-			    	
-			    	//textpanel
-			    	JPanel infoPane = new JPanel();
-			    	infoPane.setLayout(new MigLayout());
+					setBackground(Color.white);
 			    	
 			    	check3 = new JCheckBox("Minimum Amount of Absolute Values");
+			    	check3.setBackground(Color.white);
 			    	this.add(check3, "alignx 0%");
 			    	
 			    	JPanel bPane = new JPanel();
-			    	//bPane.setBackground(Color.GREEN);
+			    	bPane.setBackground(Color.white);
 			    	info_button = new JButton("?");
 			    	
 			    	info_button.addActionListener(new ActionListener(){
@@ -558,6 +575,7 @@ public class ClusterFrame extends JFrame{
 			    	
 			    	JPanel valuePane = new JPanel();
 			    	valuePane.setLayout(new MigLayout());
+			    	valuePane.setBackground(Color.white);
 			    	
 			    	obsvLabel = new JLabel("Enter # of Observations: ");
 			    	obsvLabel.setFont(new Font("Sans Serif", Font.PLAIN, 16));
@@ -590,17 +608,14 @@ public class ClusterFrame extends JFrame{
 					this.setLayout(new MigLayout("", "[]push[]"));
 					this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 					setResizable(true);
-					//setBackground(Color.RED);
-			   
-			    	
-			    	//textpanel
-			    	JPanel infoPane = new JPanel();
-			    	infoPane.setLayout(new MigLayout());
+					setBackground(Color.white);
 			    	
 			    	check4 = new JCheckBox("Difference of Maximum and Minimum Data Values");
+			    	check4.setBackground(Color.white);
 			    	this.add(check4, "alignx 0%");
 			    	
 			    	JPanel bPane = new JPanel();
+			    	bPane.setBackground(Color.white);
 			    	info_button = new JButton("?");
 			    	
 			    	info_button.addActionListener(new ActionListener(){
@@ -617,12 +632,11 @@ public class ClusterFrame extends JFrame{
 			    	diffField = new JTextField(textFieldSize);
 			    	
 			    	JPanel valuePane = new JPanel();
+			    	valuePane.setBackground(Color.white);
 			    	valuePane.setLayout(new MigLayout());
 			    	
 			    	diffLabel = new JLabel("Enter Specified Difference: ");
 			    	diffLabel.setFont(new Font("Sans Serif", Font.PLAIN, 16));
-			    	
-			    	//valuePane.setBackground(Color.GREEN);
 	
 			    	valuePane.add(diffLabel);
 			    	valuePane.add(diffField,"gapleft 5%");
@@ -646,8 +660,8 @@ public class ClusterFrame extends JFrame{
 		public AdjustQPanel() {
 			
 			this.setLayout(new MigLayout());
-			setLocationRelativeTo(null);
 			setResizable(true);
+			setBackground(Color.white);
 	
 			this.setBorder(BorderFactory.createTitledBorder("Data Information"));
 			
@@ -656,16 +670,17 @@ public class ClusterFrame extends JFrame{
 			
 			nCols = infoArray.getNumHeaders();
 			nRows = infoGene.getNumHeaders();
-			System.out.println("Rows: " + nRows);
-			System.out.println("Columns: " + nCols);
+//			System.out.println("Rows: " + nRows);
+//			System.out.println("Columns: " + nCols);
 			
 			//textpanel
 			JPanel textPane = new JPanel();
 			textPane.setLayout(new MigLayout());
-			//textPane.setBackground(Color.MAGENTA);
+			textPane.setBackground(Color.white);
 			
 			label2 = new JLabel("New dataset dimensions:");
 			label2.setFont(new Font("Sans Serif", Font.PLAIN, 16));
+			label2.setBackground(Color.white);
 			textPane.add(label2);
 			
 			this.add(textPane, "wrap, grow, push");
@@ -673,13 +688,16 @@ public class ClusterFrame extends JFrame{
 			//panel with dimensions of the dataMatrix
 			JPanel numPane = new JPanel();
 			numPane.setLayout(new MigLayout());
-			//numPane.setBackground(Color.GREEN);
+			numPane.setBackground(Color.white);
 			
 			numColLabel = new JLabel(nCols + " columns");
 			numColLabel.setFont(new Font("Sans Serif", Font.BOLD, 16));
+			numColLabel.setBackground(Color.white);
 			numPane.add(numColLabel);
+			
 			numRowLabel = new JLabel(nRows + " rows");
 			numRowLabel.setFont(new Font("Sans Serif", Font.BOLD, 16));
+			numRowLabel.setBackground(Color.white);
 			numPane.add(numRowLabel, "gapleft 10%");
 			
 			this.add(numPane, "center, growy, pushy, wrap");
@@ -695,7 +713,7 @@ public class ClusterFrame extends JFrame{
 			
 			JPanel buttonPane2 = new JPanel();
 			buttonPane2.setLayout(new MigLayout());
-			//buttonPane2.setBackground(Color.CYAN);
+			buttonPane2.setBackground(Color.white);
 			
 			//Button to confirm intent to adjust data
 			yes_button = new JButton("Yes");
@@ -749,9 +767,8 @@ public class ClusterFrame extends JFrame{
 				
 				this.setLayout(new MigLayout());
 				this.setBorder(BorderFactory.createTitledBorder("Adjusting Data"));
-				setLocationRelativeTo(null);
 				setResizable(true);
-				//setBackground(Color.blue);
+				setBackground(new Color(51,204,255,0));
 		    
 				//Instructions
 				instructions = new JTextArea("Check all adjustment options which you would like to apply to your dataset, then click 'Adjust'.");
@@ -764,15 +781,18 @@ public class ClusterFrame extends JFrame{
 				//Splitting up the content of this panel into several other panels
 				//Component 1
 				JPanel logPanel = new JPanel();
-				logPanel.setBorder(BorderFactory.createTitledBorder("Log Transform"));
+				logPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 				logPanel.setLayout(new MigLayout("", "[]push[]"));
 		    	logCheck = new JCheckBox("Log Transform");
+		    	logCheck.setBackground(Color.white);
+		    	logPanel.setBackground(Color.white);
 		    	logPanel.add(logCheck, "grow, push");
 		    	
 		    	//Button to receiv more info about the log transform feature
 		    	JPanel bPane = new JPanel();
 		    	info_button = new JButton("?");
 		    	bPane.add(info_button, "alignx 100%");
+		    	bPane.setBackground(Color.white);
 		    	logPanel.add(bPane);
 		    	
 		    	this.add(logPanel,"wrap");
@@ -812,6 +832,7 @@ public class ClusterFrame extends JFrame{
 		    	});
 		    	buttonPane.add(noAdjust_button);
 		    	
+		    	buttonPane.setBackground(new Color(51,204,255,0));
 		    	this.add(buttonPane, "alignx 50%");
 		    	
 			  }
@@ -832,15 +853,18 @@ public class ClusterFrame extends JFrame{
 				
 		  		//set this panel's layout
 		  		this.setLayout(new MigLayout("", "[]push[]"));
-		  		this.setBorder(BorderFactory.createTitledBorder("Genes"));
+		  		this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+		  		setBackground(Color.white);
 		    	
 		  		//create checkbox
 		  		centerGenes = new JCheckBox("Center Genes");
+		  		centerGenes.setBackground(Color.white);
 		  		this.add(centerGenes);
 		  		
 		    	JPanel bPane = new JPanel();
 		    	info_button = new JButton("?");
 		    	bPane.add(info_button, "alignx 100%");
+		    	bPane.setBackground(Color.white);
 		    	this.add(bPane, "wrap");
 		  		
 		  		//Create a new ButtonGroup
@@ -848,7 +872,9 @@ public class ClusterFrame extends JFrame{
 		  		
 		  		mean = new JRadioButton("Mean", true);
 		  		median = new JRadioButton("Median", false);
+		  		mean.setBackground(Color.white);
 		  		mean.setEnabled(false);
+		  		median.setBackground(Color.white);
 		  		median.setEnabled(false);
 		  		
 		  		//add Radio Buttons to ButtonGroup
@@ -877,6 +903,7 @@ public class ClusterFrame extends JFrame{
 		  		});
 		  			
 		  		normGenes = new JCheckBox ("Normalize Genes");
+		  		normGenes.setBackground(Color.white);
 		  		this.add(normGenes);
 		  	}
 	  }
@@ -895,15 +922,18 @@ public class ClusterFrame extends JFrame{
 			public ArrayAdjustPanel() {
 		  		//set this panel's layout
 		  		this.setLayout(new MigLayout("", "[]push[]"));
-		  		this.setBorder(BorderFactory.createTitledBorder("Arrays"));
+		  		this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+		  		setBackground(Color.white);
 		  		
 		  		//create checkbox
 		  		centerArrays = new JCheckBox("Center Arrays");
+		  		centerArrays.setBackground(Color.white);
 		  		this.add(centerArrays);
 		  		
 		    	JPanel bPane = new JPanel();
 		    	info_button = new JButton("?");
 		    	bPane.add(info_button, "alignx 100%");
+		    	bPane.setBackground(Color.white);
 		    	this.add(bPane, "wrap");
 		  		
 		  		//Create a new ButtonGroup
@@ -911,7 +941,9 @@ public class ClusterFrame extends JFrame{
 		  		
 		  		mean = new JRadioButton("Mean", true);
 		  		median = new JRadioButton("Median", false);
+		  		mean.setBackground(Color.white);
 		  		mean.setEnabled(false);
+		  		median.setBackground(Color.white);
 		  		median.setEnabled(false);
 		  		
 		  		//add Radio Buttons to ButtonGroup
@@ -940,6 +972,7 @@ public class ClusterFrame extends JFrame{
 		  		});
 		  			
 		  		normArrays = new JCheckBox ("Normalize Arrays");
+		  		normArrays.setBackground(Color.white);
 		  		this.add(normArrays);
 				}
 	  	}
@@ -953,18 +986,17 @@ public class ClusterFrame extends JFrame{
 				 public ClusterOptionsPanel() {
 					 this.setLayout(new MigLayout());
 					 this.setBorder(BorderFactory.createTitledBorder("Hierarchical Clustering"));
-					 setLocationRelativeTo(null);
 					 setResizable(true);
 					 setTitle("Hierarchical Clustering");
-					 //setBackground(Color.blue);
+					 setBackground(new Color(51,204,255,0));
 					
 					//Component 1
 					geneClusterPanel = new GeneClusterPanel();
-					this.add(geneClusterPanel, "grow, push, split 2");
+					this.add(geneClusterPanel, "center, grow, push, split 2");
 					
 					//Component 2
 					arrayClusterPanel = new ArrayClusterPanel();
-					this.add(arrayClusterPanel, "grow, push, wrap");
+					this.add(arrayClusterPanel, "center, grow, push, wrap");
 					
 					//Component 3
 					JPanel buttonPanel = new JPanel();
@@ -1020,8 +1052,8 @@ public class ClusterFrame extends JFrame{
 			    	buttonPanel.add(average_button);
 			    	
 	
-			    	
-			    	this.add(buttonPanel, "alignx 50%, grow, push");
+			    	buttonPanel.setBackground(Color.white);
+			    	this.add(buttonPanel, "top, alignx 50%, push");
 			    	
 				  }
 				}
@@ -1045,21 +1077,28 @@ public class ClusterFrame extends JFrame{
 			  		this.setLayout(new MigLayout("", "[]push[]"));
 			  		this.setBorder(BorderFactory.createTitledBorder("Genes"));
 					setResizable(true);
+					setBackground(Color.white);
 			  		
 			  		//create checkbox
 			  		clusterGeneCheck = new JCheckBox("Cluster");
+			  		clusterGeneCheck.setBackground(Color.white);
 			  		this.add(clusterGeneCheck);
 			  		
 			    	JPanel bPane = new JPanel();
 			    	info_button = new JButton("?");
-			    	bPane.add(info_button, "alignx 100%");
+			    	bPane.add(info_button, "grow, push, alignx 100%");
+			    	bPane.setBackground(Color.white);
 			    	this.add(bPane, "wrap");
 			  			
 			  		weightGeneCheck = new JCheckBox ("Calculate Weights");
+			  		weightGeneCheck.setBackground(Color.white);
 			  		this.add(weightGeneCheck, "wrap");
 			  		
 			  		geneCombo = new JComboBox(measurements);
+			  		geneCombo.setBackground(Color.white);
+			  		
 			  		similarity = new JLabel("Similarity Metric");
+			  		similarity.setBackground(Color.white);
 			  		
 			  		this.add(similarity, "alignx 50%, span, wrap");
 			  		this.add(geneCombo, "alignx 50%, span");
@@ -1079,21 +1118,27 @@ public class ClusterFrame extends JFrame{
 		  		this.setLayout(new MigLayout("", "[]push[]"));
 		  		this.setBorder(BorderFactory.createTitledBorder("Arrays"));
 				setResizable(true);
+				setBackground(Color.white);
 		  		
 		  		//create checkbox
 		  		clusterArrayCheck = new JCheckBox("Cluster");
+		  		clusterArrayCheck.setBackground(Color.white);
 		  		this.add(clusterArrayCheck);
 		  		
 		    	JPanel bPane = new JPanel();
 		    	info_button = new JButton("?");
 		    	bPane.add(info_button, "alignx 100%");
+		    	bPane.setBackground(Color.white);
 		    	this.add(bPane, "wrap");
 		  			
 		  		weightArrayCheck = new JCheckBox ("Calculate Weights");
+		  		weightArrayCheck.setBackground(Color.white);
 		  		this.add(weightArrayCheck, "wrap");
 		  		
 		  		arrayCombo = new JComboBox(measurements);
+		  		arrayCombo.setBackground(Color.white);
 		  		similarity = new JLabel("Similarity Metric");
+		  		similarity.setBackground(Color.white);
 		  		
 		  		this.add(similarity, "alignx 50%, span, wrap");
 		  		this.add(arrayCombo, "alignx 50%, span");
@@ -1119,6 +1164,7 @@ public class ClusterFrame extends JFrame{
   			mainPanel.revalidate();
   			mainPanel.repaint();
   			this.pack();
+  			setLocation(newLocation);
   			filterOptions.setVisible(true);
 	  		}
 	  		else if(oldPanel == filterOptions){
@@ -1131,6 +1177,7 @@ public class ClusterFrame extends JFrame{
 	  			mainPanel.revalidate();
 	  			mainPanel.repaint();
 	  			this.pack();
+	  			setLocation(newLocation);
 	  			adjustQPanel.setVisible(true);
 	  		}
 	  		
@@ -1144,6 +1191,7 @@ public class ClusterFrame extends JFrame{
 	  			mainPanel.revalidate();
 	  			mainPanel.repaint();
 	  			this.pack();
+	  			setLocation(newLocation);
 	  			aoPanel.setVisible(true);
 	  		}
 	  		else if(oldPanel == aoPanel){
@@ -1152,11 +1200,13 @@ public class ClusterFrame extends JFrame{
 	  			
 	  			coPanel = new ClusterOptionsPanel();
 	  			coPanel.setVisible(true);
-	  			mainPanel.add(coPanel);
+	  			mainPanel.add(coPanel,"grow, push, center");
 	  			
 	  			mainPanel.revalidate();
 	  			mainPanel.repaint();
 	  			this.pack();
+	  			setLocation(newLocation);
+	  			coPanel.setVisible(true);
 	  		}
   		}
   		else if (skip == SKIPA){
@@ -1176,7 +1226,7 @@ public class ClusterFrame extends JFrame{
   			
   			coPanel = new ClusterOptionsPanel();
   			coPanel.setVisible(true);
-  			mainPanel.add(coPanel);
+  			mainPanel.add(coPanel, "grow, push, center");
   			
   			mainPanel.revalidate();
   			mainPanel.repaint();
@@ -1199,7 +1249,8 @@ public class ClusterFrame extends JFrame{
 		
 		int listRep = aoArrays.size();
 		
-		System.out.println("ArrayList Length: "+ listRep);
+		System.out.println("ArrayList Length: " + listRep);
+		System.out.println("ArrayList Element: " + Arrays.toString(aoArrays.get(0)));
 		
 	}
 	
