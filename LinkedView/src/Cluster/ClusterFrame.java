@@ -1247,10 +1247,15 @@ public class ClusterFrame extends JFrame{
 		//begin operations on clusterTarget...
 		List<double[]> aoArrays = clusterTarget.splitArray(currentArray);
 		
+		//use int method to determine the distance/ similarity matrix algorithm
+		//return distance/ similarity matrix and use as input to clustering function
+		
 		int listRep = aoArrays.size();
 		
 		System.out.println("ArrayList Length: " + listRep);
 		System.out.println("ArrayList Element: " + Arrays.toString(aoArrays.get(0)));
+		
+		clusterTarget.euclid(aoArrays);
 		
 	}
 	
