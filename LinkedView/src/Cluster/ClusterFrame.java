@@ -36,6 +36,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -1252,10 +1253,12 @@ public class ClusterFrame extends JFrame{
 		
 		int listRep = aoArrays.size();
 		
-		System.out.println("ArrayList Length: " + listRep);
-		System.out.println("ArrayList Element: " + Arrays.toString(aoArrays.get(0)));
+//		System.out.println("ArrayList Length: " + listRep);
+//		System.out.println("ArrayList Element: " + Arrays.toString(aoArrays.get(0)));
 		
-		clusterTarget.euclid(aoArrays);
+		List<double[]> geneDistances = clusterTarget.euclid(aoArrays);
+		
+		
 		
 	}
 	

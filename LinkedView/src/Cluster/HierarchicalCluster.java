@@ -97,7 +97,7 @@ public class HierarchicalCluster {
     	List <double[]> geneDistanceList = new ArrayList<double[]>();
     	
     	//take a gene
-    	for(int i = 0; i < 3; i++){//fullArray.size()
+    	for(int i = 0; i < fullArray.size(); i++){//fullArray.size()
     		
     		//distances of one gene to all others
     		double[] geneDistance = new double[fullArray.size()];
@@ -127,19 +127,24 @@ public class HierarchicalCluster {
     				sum += element;
     			}
     			
-    			double rootedSum = 0;
-    			rootedSum = Math.sqrt(sum);
+//    			double rootedSum = 0;
+//    			rootedSum = Math.sqrt(sum);
+//    			
+//    			//NOT RIGHT
+//    			geneDistance[j] = rootedSum;
     			
-    			//NOT RIGHT
-    			geneDistance[j] = rootedSum;
+    			double divSum = 0;
+    			divSum = sum/fullArray.size();
+    			
+    			geneDistance[j] = divSum;
     			
     		}
     		
-    		System.out.println("GeneDist Size: " + geneDistance.length);
-    		System.out.println("GeneDist Gene 0: " + geneDistance[0]);
-    		System.out.println("GeneDist Gene 1: " + geneDistance[1]);
-    		System.out.println("GeneDist Gene 2: " + geneDistance[2]);
-    		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+//    		System.out.println("GeneDist Size: " + geneDistance.length);
+//    		System.out.println("GeneDist Gene 0: " + geneDistance[0]);
+//    		System.out.println("GeneDist Gene 1: " + geneDistance[1]);
+//    		System.out.println("GeneDist Gene 2: " + geneDistance[2]);
+//    		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
     		
     		//Now add the gene with all its distances to other genes to the geneDistanceList so that we get
     		//a list with all genes and their distances to the other genes
@@ -151,7 +156,35 @@ public class HierarchicalCluster {
     	
     	System.out.println("GeneDL Length: " + geneDistanceList.size());
     	System.out.println("GeneDL Element 0: " + Arrays.toString(geneDistanceList.get(0)));
+    	System.out.println("GeneList Element Length: " + geneDistanceList.get(0).length);
+    	
+    	double[] fusedArray = concatAll(geneDistanceList.get(0),geneDistanceList);
+    	
+    	System.out.println("Fused Array Length: " + fusedArray.length);
     	
     	return geneDistanceList;
     }
+    
+    public void cluster(){
+    	
+    	//CDT file from Cluster 3.0 adds one column with gene tags according to following rule: 
+    	//(GENE) + (gene number in original dataset starting at 0) + (X) --> Example: First Gene: GENE0X
+    	//Goal of clustering: agglomerative (top-to-bottom
+    }
+    
+    
+    //method to join all gene arrays into one double[] 
+    public static <Double> double[] concatAll(double[] first, List<double[]> rest) {
+    	  int totalLength = first.length;
+    	  for (double[] array : rest) {
+    	    totalLength += array.length;
+    	  }
+    	  double[] result = Arrays.copyOf(first, totalLength);
+    	  int offset = first.length;
+    	  for (double[] array : rest) {
+    	    System.arraycopy(array, 0, result, offset, array.length);
+    	    offset += array.length;
+    	  }
+    	  return result;
+    	}
 }
