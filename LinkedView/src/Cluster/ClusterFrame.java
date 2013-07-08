@@ -36,7 +36,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -51,9 +50,11 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 
 import net.miginfocom.swing.MigLayout;
@@ -62,7 +63,7 @@ import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.TreeSelectionI;
+import edu.stanford.genetics.treeview.SwingWorker;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 /**
  * This class describes the GUI for the Cluster Application. It is separated into several panels which are
@@ -1003,15 +1004,42 @@ public class ClusterFrame extends JFrame{
 					JPanel buttonPanel = new JPanel();
 					buttonPanel.setBorder(BorderFactory.createTitledBorder("Choose Cluster Method"));
 					buttonPanel.setLayout(new MigLayout());
+					
+					//Component 4
+					final JPanel loadPanel = new JPanel();
+					loadPanel.setBorder(BorderFactory.createTitledBorder("Loading"));
+					loadPanel.setLayout(new MigLayout());
 			    	
 			    	//button with action listener
 			    	centroid_button = new JButton("Centroid Linkage");
 			    	centroid_button.addActionListener(new ActionListener(){
-	
+			    		
+			    
 						@Override
 						public void actionPerformed(ActionEvent arg0) {
+							// All on Event Dispatch Thread
+							//Build ProgressBar
+							final JProgressBar pBar = new JProgressBar();
+							pBar.setMinimum(0);
+							pBar.setStringPainted(true);
+							pBar.setIndeterminate(true);
+							pBar.setVisible(true);
 							
-							hCluster(2, dataArray, "What");
+							//Add it to JPanel Object
+							loadPanel.add(pBar, "span, alignx 50%");
+							loadPanel.setBackground(Color.white);
+							coPanel.add(loadPanel);
+							coPanel.revalidate();
+							coPanel.repaint();
+							
+							SwingUtilities.invokeLater(new Runnable() 
+						    {
+						        public void run() 
+						        {
+						        	hCluster(2, dataArray, "What", pBar);
+						        }
+						    });
+
 						}	
 			    	});
 			    	buttonPanel.add(centroid_button);
@@ -1054,7 +1082,7 @@ public class ClusterFrame extends JFrame{
 			    	
 	
 			    	buttonPanel.setBackground(Color.white);
-			    	this.add(buttonPanel, "top, alignx 50%, push");
+			    	this.add(buttonPanel, "top, alignx 50%, push, wrap");
 			    	
 				  }
 				}
@@ -1235,18 +1263,43 @@ public class ClusterFrame extends JFrame{
   		}
   	}
 	
-	
-	/**
-	* Function for the hierarchical clustering operation
-	* 
-	*/
-	private void hCluster(int method, double[] currentArray, String similarityM) {
+  	javax.swing.Timer loadTimer;
+//	/**
+//	* Function for the hierarchical clustering operation
+//	 * @throws LoadException 
+//	* 
+//	*/
+	private void hCluster(int method, final double[] currentArray, String similarityM, final JProgressBar pBar){
 		
+		System.out.println("EventDispatch hCluster: " + javax.swing.SwingUtilities.isEventDispatchThread());
 		//make a HierarchicalCluster object
-		HierarchicalCluster clusterTarget = new HierarchicalCluster((ClusterModel)clusterModel, currentArray, method, similarityM);
+		final HierarchicalCluster clusterTarget = new HierarchicalCluster((ClusterModel)clusterModel, currentArray, method, similarityM);
 		
 		//begin operations on clusterTarget...
-		List<double[]> aoArrays = clusterTarget.splitArray(currentArray);
+		final SwingWorker worker = new SwingWorker() {	
+			//All not on Event Dispatch
+			public Object construct() {
+
+				return clusterTarget.splitArray(currentArray);
+			}
+			
+//				protected void done(){
+//					pBar.dispose();
+//				}
+		};
+		worker.start();
+		final List<double[]> aoArrays = (List<double[]>) worker.get();
+		
+		loadTimer = new javax.swing.Timer(200, new TimerListener());
+		loadTimer.start();
+		
+		// but just in case it doesn't, we'll join on the worker
+		try {
+			worker.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		//use int method to determine the distance/ similarity matrix algorithm
 		//return distance/ similarity matrix and use as input to clustering function
@@ -1255,10 +1308,32 @@ public class ClusterFrame extends JFrame{
 		
 //		System.out.println("ArrayList Length: " + listRep);
 //		System.out.println("ArrayList Element: " + Arrays.toString(aoArrays.get(0)));
+		final SwingWorker worker2 = new SwingWorker() {	
+			//All not on Event Dispatch
+			public Object construct() {
+
+				return clusterTarget.euclid(aoArrays, pBar);
+			}
+			
+//				protected void done(){
+//					pBar.dispose();
+//				}
+		};
+		worker2.start();
+		List<double[]> geneDistances  = (List<double[]>) worker2.get();
 		
-		List<double[]> geneDistances = clusterTarget.euclid(aoArrays);
+		loadTimer = new javax.swing.Timer(200, new TimerListener());
+		loadTimer.start();
 		
+		// but just in case it doesn't, we'll join on the worker
+		try {
+			worker2.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
+		clusterTarget.cluster(geneDistances, pBar);
 		
 	}
 	
@@ -1427,7 +1502,15 @@ public class ClusterFrame extends JFrame{
 //	    			caseBox3.isSelected(), caseBox4.isSelected());
 	    }
 	}
-        
+    
+	class TimerListener implements ActionListener { // manages the FileLoader
+		// this method is invoked every few hundred ms
+		public void actionPerformed(ActionEvent evt) {
+		
+			//Toolkit.getDefaultToolkit().beep();
+
+		}
+	}
 
 //	protected TreeSelectionI geneSelection;
 //	protected TreeViewFrame viewFrame;

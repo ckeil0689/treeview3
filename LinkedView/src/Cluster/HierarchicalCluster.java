@@ -1,11 +1,25 @@
 package Cluster;
 
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+
+import Cluster.ClusterLoader.TimerListener;
+
+import net.miginfocom.swing.MigLayout;
+
 import edu.stanford.genetics.treeview.DataModel;
+import edu.stanford.genetics.treeview.LoadException;
+import edu.stanford.genetics.treeview.LoadProgress2;
+import edu.stanford.genetics.treeview.SwingWorker;
 
 /**
  * This class takes the original uploaded dataArray passed 
@@ -43,6 +57,8 @@ public class HierarchicalCluster {
 		int max = model.nExpr();
 		
 		List<double[]> geneList = new ArrayList<double[]>();
+		
+		System.out.println("EventDispatch SplitArray: " + javax.swing.SwingUtilities.isEventDispatchThread());
 		
 		for(int i = 0; i < array.length/max; i++){
 			
@@ -87,18 +103,21 @@ public class HierarchicalCluster {
 			return DataModel.NODATA;
 		}
 	}
-	//Mutators (set...)
     
 	//Euclidean Distance
-    public List <double[]> euclid(List<double []> fullArray){
+    public List <double[]> euclid(List<double []> fullArray, JProgressBar pBar){
     	
+		System.out.println("EventDispatch Euclid: " + javax.swing.SwingUtilities.isEventDispatchThread());
     	//Local variables
     	//list with all genes and their distances to all other genes
     	List <double[]> geneDistanceList = new ArrayList<double[]>();
     	
+    	pBar.setMaximum(fullArray.size());
+    	
     	//take a gene
     	for(int i = 0; i < fullArray.size(); i++){//fullArray.size()
     		
+    		pBar.setValue(i);
     		//distances of one gene to all others
     		double[] geneDistance = new double[fullArray.size()];
     		double[] gene = fullArray.get(i);
@@ -127,16 +146,16 @@ public class HierarchicalCluster {
     				sum += element;
     			}
     			
-//    			double rootedSum = 0;
-//    			rootedSum = Math.sqrt(sum);
+    			double rootedSum = 0;
+    			rootedSum = Math.sqrt(sum);
+    			
+    			//NOT RIGHT
+    			geneDistance[j] = rootedSum;
+    			
+//    			double divSum = 0;
+//    			divSum = sum/fullArray.size();
 //    			
-//    			//NOT RIGHT
-//    			geneDistance[j] = rootedSum;
-    			
-    			double divSum = 0;
-    			divSum = sum/fullArray.size();
-    			
-    			geneDistance[j] = divSum;
+//    			geneDistance[j] = divSum;
     			
     		}
     		
@@ -164,12 +183,85 @@ public class HierarchicalCluster {
     	
     	return geneDistanceList;
     }
+	
     
-    public void cluster(){
+    public void cluster(List<double[]> geneDList, JProgressBar pBar){
     	
+		System.out.println("EventDispatch Cluster: " + javax.swing.SwingUtilities.isEventDispatchThread());
     	//CDT file from Cluster 3.0 adds one column with gene tags according to following rule: 
     	//(GENE) + (gene number in original dataset starting at 0) + (X) --> Example: First Gene: GENE0X
-    	//Goal of clustering: agglomerative (top-to-bottom
+    	//Goal of clustering: agglomerative (top-to-bottom)
+    	//first: find closest gene of each gene
+    	List<String[]> genePairs = new ArrayList<String[]>();
+    	List<Double> minValues = new ArrayList<Double>();
+
+    	pBar.setMaximum(geneDList.size());
+    	
+    	for(int i = 0; i < geneDList.size(); i++){
+    		
+    		pBar.setValue(i);
+    		double min = 0;	
+    		int pos = 0;
+    		String[] distPair = new String[2];
+    		
+    		double[] gene = geneDList.get(i);
+    		double[]sortedGene = new double[gene.length];
+    		
+    		Double[] gene2 = convert(gene);
+    		
+    		System.arraycopy(gene, 0, sortedGene, 0, gene.length);
+    		Arrays.sort(sortedGene);
+    		
+    		for(int k = 0; k < sortedGene.length; k++){
+    			
+    			if(sortedGene[k] > 0.0){
+    				
+    				min = sortedGene[k];
+    				break;
+    			}
+    		}
+    		
+    		for(int j = 0; j < gene.length; j++){
+    			
+    			if(gene[j] == min){
+    				
+    				pos = j;
+//    				System.out.println("Distance: " + gene[j]);
+//    				System.out.println("Min: " + min);
+//    				System.out.println("Position: " + j);
+    				break;
+    			}
+    		}
+    		
+    		minValues.add(min);
+    		distPair[0] = "GENE" + i + "X";
+    		distPair[1] = "GENE" + pos + "X";
+    		
+    		genePairs.add(distPair);
+    		
+    	}
+    	
+    	//find least distant genes
+    	String[] smallGene = new String[1];
+		for(int k = 0; k < minValues.size(); k++){
+			
+			if(minValues.get(k) == Collections.min(minValues)){
+				
+				smallGene = genePairs.get(k);
+				break;
+			}	
+		}
+		
+		
+		
+		System.out.println("Closest Gene Pair: " + smallGene);
+    	System.out.println("Gene Connections: "+ genePairs.size());
+    	System.out.println("Gene Pair Sample: "+ Arrays.toString(genePairs.get(0)));
+    	System.out.println("Gene Pair Sample: "+ Arrays.toString(genePairs.get(1)));
+    	System.out.println("Gene Pair Sample: "+ Arrays.toString(genePairs.get(2)));
+    	System.out.println("Gene Pair Sample: "+ Arrays.toString(genePairs.get(3)));
+    	System.out.println("MinVal Sample: "+ minValues);
+    	
     }
     
     
@@ -187,4 +279,22 @@ public class HierarchicalCluster {
     	  }
     	  return result;
     	}
+    
+    //erase later
+    public static Double[] convert(double[] chars) {
+        Double[] copy = new Double[chars.length];
+        for(int i = 0; i < copy.length; i++) {
+            copy[i] = Double.valueOf(chars[i]);
+        }
+        return copy;
+    }
+    
+	class TimerListener implements ActionListener { // manages the FileLoader
+		// this method is invoked every few hundred ms
+		public void actionPerformed(ActionEvent evt) {
+		
+			//Toolkit.getDefaultToolkit().beep();
+
+		}
+	}
 }
