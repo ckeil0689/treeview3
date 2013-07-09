@@ -7,10 +7,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.SwingWorker;
 
 import Cluster.ClusterLoader.TimerListener;
 
@@ -19,7 +21,6 @@ import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.LoadProgress2;
-import edu.stanford.genetics.treeview.SwingWorker;
 
 /**
  * This class takes the original uploaded dataArray passed 
@@ -36,6 +37,8 @@ public class HierarchicalCluster {
 	int method;
 	String similarity;
 	
+	javax.swing.Timer loadTimer;
+	
 	IntHeaderInfoCluster headerInfo = new IntHeaderInfoCluster();
 	
 	//Constructor (building the object)
@@ -50,17 +53,21 @@ public class HierarchicalCluster {
 	//Step 1: Create Similarity matrices (one for genes, one for samples) according to all 
 	//the different measurement options (correlation, Euclidean distance etc.)
 	//differentiate between gene and array cluster!
-	public List <double[]> splitArray(double[] array){
+	public List <double[]> splitArray(double[] array, JProgressBar pBar){
 		
 		int lower = 0;
 		int upper = 0;
 		int max = model.nExpr();
+		
+		pBar.setMaximum(array.length/max);
 		
 		List<double[]> geneList = new ArrayList<double[]>();
 		
 		System.out.println("EventDispatch SplitArray: " + javax.swing.SwingUtilities.isEventDispatchThread());
 		
 		for(int i = 0; i < array.length/max; i++){
+			
+			pBar.setValue(i);
 			
 			upper+=max;
 			
@@ -184,7 +191,6 @@ public class HierarchicalCluster {
     	return geneDistanceList;
     }
 	
-    
     public void cluster(List<double[]> geneDList, JProgressBar pBar){
     	
 		System.out.println("EventDispatch Cluster: " + javax.swing.SwingUtilities.isEventDispatchThread());
