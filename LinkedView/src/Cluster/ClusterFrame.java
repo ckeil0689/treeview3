@@ -111,7 +111,7 @@ public class ClusterFrame extends JFrame{
 	
 	//Instance variable in which the loaded data array is being stored
 	private double[] dataArray;
-	double[] rangeArray;
+	private double[] rangeArray;
 	
 	//variables to use for the nextPanel method to distinguish which buttons were pressed
 	public static final int NOSKIP = 0;

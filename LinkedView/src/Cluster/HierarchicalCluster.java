@@ -34,8 +34,8 @@ public class HierarchicalCluster {
 	//Instance variables
 	ClusterModel model;
 	private double[] dataArray;
-	int method;
-	String similarity;
+	private int method;
+	private String similarity;
 	
 	javax.swing.Timer loadTimer;
 	
@@ -112,6 +112,7 @@ public class HierarchicalCluster {
 	}
     
 	//Euclidean Distance
+    //returns Euclidean PROXIMITY MATRIX, N x N;
     public List <double[]> euclid(List<double []> fullArray, JProgressBar pBar){
     	
 		System.out.println("EventDispatch Euclid: " + javax.swing.SwingUtilities.isEventDispatchThread());
@@ -156,7 +157,7 @@ public class HierarchicalCluster {
     			double rootedSum = 0;
     			rootedSum = Math.sqrt(sum);
     			
-    			//NOT RIGHT
+    			//Mathematically RIGHT? Not used in Cluster 3.0 but Euclidean Distance is caalculated this way
     			geneDistance[j] = rootedSum;
     			
 //    			double divSum = 0;
@@ -184,7 +185,7 @@ public class HierarchicalCluster {
     	System.out.println("GeneDL Element 0: " + Arrays.toString(geneDistanceList.get(0)));
     	System.out.println("GeneList Element Length: " + geneDistanceList.get(0).length);
     	
-    	double[] fusedArray = concatAll(geneDistanceList.get(0),geneDistanceList);
+    	double[] fusedArray = concatAll(geneDistanceList.get(0),geneDistanceList.subList(1, geneDistanceList.size()));
     	
     	System.out.println("Fused Array Length: " + fusedArray.length);
     	
@@ -193,13 +194,16 @@ public class HierarchicalCluster {
 	
     public void cluster(List<double[]> geneDList, JProgressBar pBar){
     	
+    	//check if method is on EDT
 		System.out.println("EventDispatch Cluster: " + javax.swing.SwingUtilities.isEventDispatchThread());
+		
     	//CDT file from Cluster 3.0 adds one column with gene tags according to following rule: 
     	//(GENE) + (gene number in original dataset starting at 0) + (X) --> Example: First Gene: GENE0X
     	//Goal of clustering: agglomerative (top-to-bottom)
     	//first: find closest gene of each gene
     	List<String[]> genePairs = new ArrayList<String[]>();
     	List<Double> minValues = new ArrayList<Double>();
+    	List<List<String>> gtrMatrix = new ArrayList<List<String>>();
 
     	pBar.setMaximum(geneDList.size());
     	
@@ -215,9 +219,12 @@ public class HierarchicalCluster {
     		
     		Double[] gene2 = convert(gene);
     		
+    		//find shortest distance value to other gene in current gene
     		System.arraycopy(gene, 0, sortedGene, 0, gene.length);
     		Arrays.sort(sortedGene);
     		
+    		//find first none-zero value in sorted array = shortest distance to other gene
+    		//set min to this value
     		for(int k = 0; k < sortedGene.length; k++){
     			
     			if(sortedGene[k] > 0.0){
@@ -227,6 +234,7 @@ public class HierarchicalCluster {
     			}
     		}
     		
+    		//find position of min in the current gene to figure out which the closest gene is
     		for(int j = 0; j < gene.length; j++){
     			
     			if(gene[j] == min){
@@ -239,34 +247,83 @@ public class HierarchicalCluster {
     			}
     		}
     		
+    		//add the minimum distance value of each gene to minValues
     		minValues.add(min);
+    		
+    		//generate names and the pair of the current gene (i) and the gene closest to it (pos)
     		distPair[0] = "GENE" + i + "X";
     		distPair[1] = "GENE" + pos + "X";
     		
+    		//add the pair to a list
     		genePairs.add(distPair);
     		
     	}
     	
-    	//find least distant genes
-    	String[] smallGene = new String[1];
-		for(int k = 0; k < minValues.size(); k++){
-			
-			if(minValues.get(k) == Collections.min(minValues)){
+    	System.out.println("GenePairs Length: " + genePairs.size());
+    	System.out.println("MinValues Length: " + minValues.size());
+    	
+    	for(int i = 0; i < minValues.size(); i++){ //minValues.size()
+    		
+	    	//find least smallest distance in minValues
+	    	//then associate the smallest distance with the appropriate gene pair
+	    	String[] smallGene = new String[1];
+			for(int k = 0; k < minValues.size(); k++){
 				
-				smallGene = genePairs.get(k);
-				break;
-			}	
-		}
+				if(minValues.get(k) == Collections.min(minValues)){
+					
+					smallGene = genePairs.get(k);
+					minValues.remove(k);
+//					genePairs.remove(k);
+					break;
+				}	
+			}
+			
+			//Give a Node name, add the node name as well as the gene pair (or cluster!) to array
+			//if gene pair is such that one gene is already in a node, add node name
+			List<String> geneLink = new ArrayList<String>();
+			String newNode = "NODE" + (i+1) + "X";
+			geneLink.add(newNode);
+			
+			//Check all elements already added to gtrList
+			for(List<String> element : gtrMatrix){
+				
+				//if any element contains a gene of the current checked pair (smallGene)
+				//add the none-duplicate gene to geneLink
+				//in case it contains both genes already
+				if(element.contains(smallGene[0])){
+					
+					//Gene is replaced with node name of the element it contains
+					smallGene[0] = element.get(0);
+				}
+				else if (element.contains(smallGene[1])){
+					
+					smallGene[1] = element.get(0);
+				}
+				//in case it contains none dont change smallGene
+				else{
+					
+				}
+			}
+			
+			//Add names to geneLink
+			geneLink.add(smallGene[0]);
+			geneLink.add(smallGene[1]);
+			
+			//add connection to gtrMatrix
+			gtrMatrix.add(geneLink);
 		
-		
-		
-		System.out.println("Closest Gene Pair: " + smallGene);
-    	System.out.println("Gene Connections: "+ genePairs.size());
-    	System.out.println("Gene Pair Sample: "+ Arrays.toString(genePairs.get(0)));
-    	System.out.println("Gene Pair Sample: "+ Arrays.toString(genePairs.get(1)));
-    	System.out.println("Gene Pair Sample: "+ Arrays.toString(genePairs.get(2)));
-    	System.out.println("Gene Pair Sample: "+ Arrays.toString(genePairs.get(3)));
-    	System.out.println("MinVal Sample: "+ minValues);
+    	}
+    	
+    	
+		//Test Output
+		//System.out.println("Closest Gene Pair: " + Arrays.toString(smallGene));
+    	System.out.println("Gene Connections: " + genePairs.size());
+    	
+    	for(int i = 0; i < 100; i++){
+    		
+    		System.out.println("GTR Matrix Element " + i + ": " + gtrMatrix.get(i).toString());
+    	}
+    	System.out.println("GTR Matrix Size: " + gtrMatrix.size());
     	
     }
     
