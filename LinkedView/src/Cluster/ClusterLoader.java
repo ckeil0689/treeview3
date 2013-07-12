@@ -272,8 +272,6 @@ public class ClusterLoader implements ProgressTrackable {
 																						// which parses all the data from the fileSet, creates a RecDataCluster
 																						//object and eventually adds the data to that object. It then returns it.
 				
-				System.out.println("TempTable 12,6: " + tempTable.getString(12, 8)); 	//access loaded data directly
-				
 				if (loadProgress.getCanceled()) return;
 				setPhase(1);
 				parseTXT(tempTable);                								//parses the loaded data
@@ -354,8 +352,6 @@ public class ClusterLoader implements ProgressTrackable {
 		int gweightCol = -1;
 		int rectCol = tempVector.getCol();
 
-		System.out.println("rectCol:" + rectCol);
-
 ////	for (int i =0; i < firstLine.length; i++) {
 		for (int i = 0; i < rectCol; i++){
 ////		String s = firstLine[i];
@@ -426,8 +422,6 @@ public class ClusterLoader implements ProgressTrackable {
 		println("loading Array Annotations");
 		String [] arrayPrefix = new String[nExprPrefix];    //not sure what arrayPrefix is but it's 2 units long
 		String [][] aHeaders = new String [nExpr][nExprPrefix];
-		
-		System.out.println("nExpr: " + nExpr); 
 		
 		for (int i = 0; i < nExprPrefix; i++) {
 			String [] tokens = (String []) tempVector.elementAt(i);

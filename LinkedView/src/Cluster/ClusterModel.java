@@ -504,13 +504,6 @@ public class ClusterModel extends Observable implements DataModel {
 		 */
 		public double[] getExprData(){
 			
-			//EDIT OUT JUST FOR TEST
-			System.out.println("ExprData Values:" + exprData[0]);
-			System.out.println(exprData[1]);
-			System.out.println(exprData[2]);
-			System.out.println(exprData[3]);
-			System.out.println(exprData[4]);
-			
 			return exprData;
 		}
 	}

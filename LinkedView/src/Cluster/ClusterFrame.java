@@ -55,11 +55,8 @@ import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.border.EtchedBorder;
-
-import Cluster.HierarchicalCluster.TimerListener;
 
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.DataMatrix;
@@ -1404,71 +1401,71 @@ public class ClusterFrame extends JFrame{
 	JCheckBox caseBox4;
 	
     
-    class NumPanel extends JPanel {	
-    	
-    	/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-		int nRows;
-        int nCols; 
-        JLabel numRowLabel;
-        JLabel numColLabel;
+//    class NumPanel extends JPanel {	
+//    	
+//    	/**
+//		 * 
+//		 */
+//		private static final long serialVersionUID = 1L;
+//		int nRows;
+//        int nCols; 
+//        JLabel numRowLabel;
+//        JLabel numColLabel;
 
         
 //        IntHeaderInfoCluster info = new IntHeaderInfoCluster();
 //        int geneN = info.getNumHeaders();
         
-      public NumPanel() {
-
-    	int strut = 20;
-    	setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
-    	setMaximumSize(new Dimension(400, 50));
-    	
-    	if(clusterModel == null){
-		System.out.println("Hnnnnng");
-    	}else{
-    		System.out.println("Informationics:" + clusterModel);
-    	}
-    	
-    	HeaderInfo infoArray = clusterModel.getArrayHeaderInfo();
-    	HeaderInfo infoGene = clusterModel.getGeneHeaderInfo();
-    	
-    	//Access content directly!
-    	//When accessing the dataMatrix the program does not leave out initial description cells (EWEIGHT etc.)
- 
-    	
-    	DataMatrix dM = clusterModel.getDataMatrix();
-    	double valueD = dM.getValue(0, 213);				//starts with DATA values and with index 0 (first data element: 0, 0)
-    	System.out.println("DataMatrixValue: " + valueD);
-    	
-    	//get the double[] somehow....
-    	
-//    	Accessing header (first two) elements directly
-    	
-    	String[] aName = infoArray.getHeader(6);
-    	System.out.println("aName: " + aName[0]);
-    	System.out.println("aName: " + aName[1]);
-    	
-    	String[] gName = infoGene.getHeader(6);
-    	System.out.println("gName: " + gName[0]);
-    	System.out.println("gName: " + gName[1]);
-    	
-    	nCols = infoArray.getNumHeaders();
-    	nRows = infoGene.getNumHeaders();
-    	System.out.println("Rows: " + nRows);
-    	System.out.println("Columns: " + nCols);
-    	
-    	
-    	numColLabel = new JLabel("Number of Columns: " + nCols);
-    	add(numColLabel);
-    	add(Box.createHorizontalStrut(strut));
-    	numRowLabel = new JLabel("Number of Rows: " + nRows);
-    	add(numRowLabel);
-    	numRowLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-    	numColLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-      }
-    }
+//      public NumPanel() {
+//
+//    	int strut = 20;
+//    	setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+//    	setMaximumSize(new Dimension(400, 50));
+//    	
+//    	if(clusterModel == null){
+//		System.out.println("Hnnnnng");
+//    	}else{
+//    		System.out.println("Informationics:" + clusterModel);
+//    	}
+//    	
+//    	HeaderInfo infoArray = clusterModel.getArrayHeaderInfo();
+//    	HeaderInfo infoGene = clusterModel.getGeneHeaderInfo();
+//    	
+//    	//Access content directly!
+//    	//When accessing the dataMatrix the program does not leave out initial description cells (EWEIGHT etc.)
+// 
+//    	
+//    	DataMatrix dM = clusterModel.getDataMatrix();
+//    	double valueD = dM.getValue(0, 213);				//starts with DATA values and with index 0 (first data element: 0, 0)
+//    	System.out.println("DataMatrixValue: " + valueD);
+//    	
+//    	//get the double[] somehow....
+//    	
+////    	Accessing header (first two) elements directly
+//    	
+//    	String[] aName = infoArray.getHeader(6);
+//    	System.out.println("aName: " + aName[0]);
+//    	System.out.println("aName: " + aName[1]);
+//    	
+//    	String[] gName = infoGene.getHeader(6);
+//    	System.out.println("gName: " + gName[0]);
+//    	System.out.println("gName: " + gName[1]);
+//    	
+//    	nCols = infoArray.getNumHeaders();
+//    	nRows = infoGene.getNumHeaders();
+//    	System.out.println("Rows: " + nRows);
+//    	System.out.println("Columns: " + nCols);
+//    	
+//    	
+//    	numColLabel = new JLabel("Number of Columns: " + nCols);
+//    	add(numColLabel);
+//    	add(Box.createHorizontalStrut(strut));
+//    	numRowLabel = new JLabel("Number of Rows: " + nRows);
+//    	add(numRowLabel);
+//    	numRowLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+//    	numColLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+//      }
+//    }
     
     class ValueTextField extends JTextField implements ActionListener {
 	    /**
