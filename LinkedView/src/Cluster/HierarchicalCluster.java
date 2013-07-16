@@ -6,7 +6,9 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.JFrame;
@@ -36,18 +38,20 @@ public class HierarchicalCluster {
 	private double[] dataArray;
 	private int method;
 	private String similarity;
+	private JFrame frame;
 	
 	javax.swing.Timer loadTimer;
 	
 	IntHeaderInfoCluster headerInfo = new IntHeaderInfoCluster();
 	
 	//Constructor (building the object)
-	public HierarchicalCluster(ClusterModel model, double[] dataArray, int method, String similarity){
+	public HierarchicalCluster(ClusterModel model, double[] dataArray, int method, String similarity, JFrame currentFrame){
 		
 		this.model = model;
 		this.dataArray = dataArray;
 		this.similarity = similarity;
 		this.method = method;
+		this.frame = currentFrame;
 	}
 	
 	//Step 1: Create Similarity matrices (one for genes, one for samples) according to all 
@@ -111,12 +115,14 @@ public class HierarchicalCluster {
     
 	//Euclidean Distance
     //returns Euclidean PROXIMITY MATRIX, N x N;
-    public List <double[]> euclid(List<double []> fullArray, JProgressBar pBar){
+    public List <double[]> euclid(List<double []> fullArray, JProgressBar pBar, JProgressBar pBar2, JProgressBar pBar3){
     	
     	//list with all genes and their distances to all other genes (1455x1455 for sample data)
     	List <double[]> geneDistanceList = new ArrayList<double[]>();
     	
     	pBar.setMaximum(fullArray.size());
+    	pBar2.setMaximum(fullArray.size());
+    	pBar3.setMaximum(fullArray.get(0).length);
     	
     	//take a gene
     	for(int i = 0; i < fullArray.size(); i++){
@@ -134,6 +140,8 @@ public class HierarchicalCluster {
     		//choose a gene for distance comparison
     		for(int j = 0; j < fullArray.size(); j++){
     			
+    			pBar2.setValue(j);
+    			
     			double[] gene2 = fullArray.get(j);
     			
     			//squared differences between elements of 2 genes
@@ -141,6 +149,8 @@ public class HierarchicalCluster {
     			
     			//compare each value of both genes
     			for(int k = 0; k < gene.length; k++){
+    				
+    				pBar3.setValue(k);
     				
     				double sDist = Math.pow((gene[k] - gene2[k]),2);
     				sDiff.add(sDist);
@@ -155,16 +165,16 @@ public class HierarchicalCluster {
     				sum += element;
     			}
     			
-    			double rootedSum = 0;
-    			rootedSum = Math.sqrt(sum);
-    			
-    			//Mathematically RIGHT? Not used in Cluster 3.0 but Euclidean Distance is caalculated this way
-    			geneDistance[j] = rootedSum;
-    			
-//    			double divSum = 0;
-//    			divSum = sum/fullArray.size();
+//    			double rootedSum = 0;
+//    			rootedSum = Math.sqrt(sum);
 //    			
-//    			geneDistance[j] = divSum;
+//    			//Mathematically RIGHT? Not used in Cluster 3.0 but Euclidean Distance is caalculated this way
+//    			geneDistance[j] = rootedSum;
+    			
+    			double divSum = 0;
+    			divSum = sum/fullArray.size();
+    			
+    			geneDistance[j] = divSum;
     			
     		}
     		
@@ -177,9 +187,9 @@ public class HierarchicalCluster {
     	System.out.println("GeneList Element Length: " + geneDistanceList.get(0).length);
     	
     	//Fusing all genes and their distances together to one array
-    	double[] fusedArray = concatAll(geneDistanceList.get(0),geneDistanceList.subList(1, geneDistanceList.size()));
+    	//double[] fusedArray = concatAll(geneDistanceList.get(0),geneDistanceList.subList(1, geneDistanceList.size()));
    
-    	System.out.println("Fused Array Length: " + fusedArray.length);
+    	//System.out.println("Fused Array Length: " + fusedArray.length);
     	
     	return geneDistanceList;
     }
@@ -214,9 +224,6 @@ public class HierarchicalCluster {
     		//set up a sorted array for the current gene
     		double[]sortedGene = new double[gene.length];
     		
-    		//??
-    		Double[] gene2 = convert(gene);
-    		
     		//copy gene to sorted array
     		System.arraycopy(gene, 0, sortedGene, 0, gene.length);
     		
@@ -233,9 +240,6 @@ public class HierarchicalCluster {
     			if(gene[j] == min){
     				
     				pos = j;
-//    				System.out.println("Distance: " + gene[j]);
-//    				System.out.println("Min: " + min);
-//    				System.out.println("Position: " + j);
     				break;
     			}
     		}
@@ -252,20 +256,17 @@ public class HierarchicalCluster {
     		
     	}
     	
-    	System.out.println("GenePairs Length: " + genePairs.size());
-    	System.out.println("MinValues Length: " + minValues.size());
+    	System.out.println("GenePairs Length Pre: " + genePairs.size());
+    	System.out.println("MinValues Length Pre: " + minValues.size());
     	
-    	List<Double> orderedMin = minValues;
+    	List<Double> orderedMin = new ArrayList<Double>(minValues);
     	Collections.sort(orderedMin);
     	
-    	System.out.println("OrderedMin: " + orderedMin);
-    	System.out.println("MinValues: " + minValues);
+//    	System.out.println("OrderedMin: " + orderedMin);
+//    	System.out.println("MinValues: " + minValues);
     	
 //----->//NEED TO CORRECT FOR INCREASING i and SHRINKING minValues (they meet midway and so only half the data gets processed)
-    	for(int i = 0; i < 10; i++){ //orderedMin.size()
-    		
-//    		System.out.println("i: " + i);
-//			System.out.println("MinValues Size: " + minValues.size());
+    	for(int i = 0; i < orderedMin.size() ; i++){  		
     		
 	    	//find least smallest distance in minValues
 	    	//then associate the smallest distance with the appropriate gene pair
@@ -273,28 +274,7 @@ public class HierarchicalCluster {
 	    	
 	    	int k = minValues.indexOf(orderedMin.get(i));
 	    	smallGene = genePairs.get(k);
-	    	
-	    	System.out.println("OrderMin " + i + ": " + orderedMin.get(i));
-	    	System.out.println("k: " + k);
-	    	System.out.println("GenePair k: " + Arrays.toString(genePairs.get(k)));
-//			for(int k = 0; k < orderedMin.size(); k++){
-//				
-//				if(minValues.get(k) == Collections.min(minValues)){
-//					
-//					smallGene = genePairs.get(k);
-//					
-//					System.out.println("k: " + k);
-//					System.out.println("GenePair k: " + Arrays.toString(genePairs.get(k)));
-//			    	System.out.println("MinValues k: " + minValues.get(k));
-//			    	
-//					minValues.remove(k);
-//					genePairs.remove(k);
-//					break;
-//				}	
-//			}
-	    	
-	    	
-			
+
 			//Give a Node name, add the node name as well as the gene pair (or cluster!) to array
 			//if gene pair is such that one gene is already in a node, add node name
 			List<String> geneLink = new ArrayList<String>();
@@ -336,11 +316,11 @@ public class HierarchicalCluster {
 		//System.out.println("Closest Gene Pair: " + Arrays.toString(smallGene));
     	System.out.println("Gene Connections: " + genePairs.size());
     	
-//    	for(int i = 0; i < 100; i++){
-//    		
-//    		System.out.println("GTR Matrix Element " + i + ": " + gtrMatrix.get(i).toString());
-//    	}
     	System.out.println("GTR Matrix Size: " + gtrMatrix.size());
+    	
+    	ClusterFileWriter gtrFile = new ClusterFileWriter(frame);
+    	
+    	gtrFile.writeGTRFile(gtrMatrix);
     	
     }
     
