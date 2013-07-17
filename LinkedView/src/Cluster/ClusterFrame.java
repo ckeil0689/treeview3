@@ -35,7 +35,9 @@ import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -1021,31 +1023,17 @@ public class ClusterFrame extends JFrame{
 							//Build ProgressBar
 							final JProgressBar pBar = new JProgressBar();
 							
-							//REMOVE
-							final JProgressBar pBar2 = new JProgressBar();
-							final JProgressBar pBar3 = new JProgressBar();
-							
 							pBar.setMinimum(0);
 							pBar.setStringPainted(true);
 							pBar.setVisible(true);
-							
-							pBar2.setMinimum(0);
-							pBar2.setStringPainted(true);
-							pBar2.setVisible(true);
-							
-							pBar3.setMinimum(0);
-							pBar3.setStringPainted(true);
-							pBar3.setVisible(true);
 							
 							final JLabel clusterLabel = new JLabel("Clustering");
 							loadPanel.add(clusterLabel, "wrap");
 							
 							//Add it to JPanel Object
-							loadPanel.add(pBar, "push, grow, wrap");
-							loadPanel.add(pBar2, "push, grow, wrap");
-							loadPanel.add(pBar3, "push, grow");
+							loadPanel.add(pBar, "push, grow");
 							loadPanel.setBackground(Color.white);
-							coPanel.add(loadPanel);
+							coPanel.add(loadPanel, "push, grow");
 							mainPanel.revalidate();
 							mainPanel.repaint();
 							ClusterFrame.this.pack();
@@ -1056,7 +1044,7 @@ public class ClusterFrame extends JFrame{
 								public Void doInBackground() {
 
 						        	try {
-										hCluster(2, dataArray, "What", pBar, pBar2, pBar3);
+										hCluster(2, dataArray, "What", pBar);
 									} catch (InterruptedException e) {
 										// TODO Auto-generated catch block
 										e.printStackTrace();
@@ -1299,24 +1287,23 @@ public class ClusterFrame extends JFrame{
   			this.pack();
   		}
   	}
-	
-  	javax.swing.Timer loadTimer;
 
-//	/**
-//	* Function for the hierarchical clustering operation
-//	 * @throws LoadException 
-//	* 
-//	*/
-	private void hCluster(int method, double[] currentArray, String similarityM, JProgressBar pBar, JProgressBar pBar2, JProgressBar pBar3) 
+	private void hCluster(int method, double[] currentArray, String similarityM, JProgressBar pBar) 
 			throws InterruptedException, ExecutionException{
 		
-		System.out.println("EventDispatch hCluster: " + javax.swing.SwingUtilities.isEventDispatchThread());
 		//make a HierarchicalCluster object
 		HierarchicalCluster clusterTarget = new HierarchicalCluster((ClusterModel)clusterModel, 
 				currentArray, method, similarityM, this);
 		
+		List<Double> currentList = new ArrayList<Double>();
+		
+		for(double d : currentArray){
+			
+			currentList.add(d);
+		}
+		
 		//begin operations on clusterTarget...
-		List<double[]> aoArrays = clusterTarget.splitArray(currentArray, pBar);
+		List<List<Double>> aoArrays = clusterTarget.splitArray(currentList, pBar);
 		
 		//use int method to determine the distance/ similarity matrix algorithm
 		//return distance/ similarity matrix and use as input to clustering function
@@ -1326,7 +1313,7 @@ public class ClusterFrame extends JFrame{
 //		System.out.println("ArrayList Length: " + listRep);
 //		System.out.println("ArrayList Element: " + Arrays.toString(aoArrays.get(0)));
 
-		List<double[]> geneDistances  = clusterTarget.euclid(aoArrays, pBar, pBar2, pBar3);
+		List<List<Double>> geneDistances  = clusterTarget.euclid(aoArrays, pBar);
 		
 		clusterTarget.cluster(geneDistances, pBar);
 		
