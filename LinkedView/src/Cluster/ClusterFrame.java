@@ -37,13 +37,10 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -55,6 +52,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
@@ -85,13 +83,14 @@ public class ClusterFrame extends JFrame{
 	protected DataModel clusterModel;
 	
 	//Various GUI Panels
+	JScrollPane scrollPane;
 	JPanel mainPanel = new JPanel();
+	HeaderPanel head1, head2, head3;
 	InitialPanel initialPanel;
 	FilterOptionsPanel filterOptions;
 	RemovePercentPanel percentPanel;
 	RemoveSDPanel sdPanel;
 	RemoveAbsPanel absPanel;
-	AdjustQPanel adjustQPanel;
 	AdjustOptionsPanel aoPanel;
 	MaxMinPanel maxMinPanel;
 	GeneAdjustPanel geneAdjustPanel;
@@ -111,11 +110,6 @@ public class ClusterFrame extends JFrame{
 	//Instance variable in which the loaded data array is being stored
 	private double[] dataArray;
 	private double[] rangeArray;
-	
-	//variables to use for the nextPanel method to distinguish which buttons were pressed
-	public static final int NOSKIP = 0;
-	public static final int SKIPA = 1;
-	public static final int SKIPC = 2;
 	
 	//Constructor
 	protected ClusterFrame(TreeViewFrame f, String title, DataModel dataModel) { 
@@ -138,17 +132,38 @@ public class ClusterFrame extends JFrame{
 		setLocationRelativeTo(null);
 		setResizable(true);
 		
-		
 		//set layout for initial window
 		mainPanel.setLayout(new MigLayout());
 		
 		//First Window
 		initialPanel = new InitialPanel();
-		mainPanel.add(initialPanel, "grow, push, center");
-		mainPanel.setBackground(new Color(51,204,255,100));
+		mainPanel.add(initialPanel, "grow, push, span, wrap");
+		
+		head1 = new HeaderPanel("Step 1");
+		mainPanel.add(head1, "pushx, growx");
+		
+		head2 = new HeaderPanel("Step 2");
+		mainPanel.add(head2, "pushx, growx, wrap");
+		
+		filterOptions = new FilterOptionsPanel();
+		mainPanel.add(filterOptions, "grow, push");
+		
+		aoPanel = new AdjustOptionsPanel();
+		mainPanel.add(aoPanel, "grow, push, wrap");
+		
+		head3 = new HeaderPanel("Step 3");
+		mainPanel.add(head3, "pushx, growx, span, wrap");
+		
+		coPanel = new ClusterOptionsPanel();
+		mainPanel.add(coPanel, "grow, push, span");
+		
+		mainPanel.setBackground(new Color(210, 210, 210, 100));
+		
+		//make mainpanel scrollable by adding it to scrollpane
+		scrollPane = new JScrollPane(mainPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		
 		//Add the mainPanel to the ContentPane
-		getContentPane().add(mainPanel);
+		getContentPane().add(scrollPane);
 		
 		//Makes the frame invisible when the window is closed
 		addWindowListener(new WindowAdapter () {
@@ -173,13 +188,30 @@ public class ClusterFrame extends JFrame{
 	
 	//ComboBoxes
 	JComboBox geneCombo, arrayCombo;
-  
+	
+	class HeaderPanel extends JPanel {
+
+		private static final long serialVersionUID = 1L;
+		
+		JLabel text;
+		
+		public HeaderPanel(String header){
+			
+			this.setLayout(new MigLayout());
+			//this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+			setResizable(true);
+			setBackground(new Color(110, 210, 255, 255));
+			
+			text = new JLabel(header);
+			text.setFont(new Font("Sans Serif", Font.BOLD, 18));
+			
+			this.add(text);
+			
+		}
+	}
 	class InitialPanel extends JPanel {	
 	  
 		private static final long serialVersionUID = 1L;
-		
-	//	private URL rUrl;
-	//	private BufferedImage img;
 		
 		//Instance variables
 		int nRows, nCols; 
@@ -190,67 +222,38 @@ public class ClusterFrame extends JFrame{
 		//Constructor
 		public InitialPanel() {
 			this.setLayout(new MigLayout());
-			this.setBorder(BorderFactory.createTitledBorder("Data Information"));
+			//this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 			setResizable(true);
-			setBackground(Color.white);
+			setBackground(new Color(210, 210, 210, 0));
 			
 	    	HeaderInfo infoArray = clusterModel.getArrayHeaderInfo();
 	    	HeaderInfo infoGene = clusterModel.getGeneHeaderInfo();
 	    	
-	    	//Accessing the loaded matrix
-	//    	ClusterModel outer = (ClusterModel) clusterModel; 
-	//    	ClusterModel.ClusterDataMatrix matrix = outer.getDataMatrix();
-	//    	
-//	    	System.out.println("Matrix Length: " + dataArray.length);
-//	    	System.out.println("Matrix Sample: " + Arrays.toString(rangeArray));
-	    	
 	    	nCols = infoArray.getNumHeaders();
 	    	nRows = infoGene.getNumHeaders();
-//	    	System.out.println("Rows: " + nRows);
-//	    	System.out.println("Columns: " + nCols);
 	    	
-	    	//textpanel
-	//    	JPanel textPane = new JPanel();
-	//    	textPane.setLayout(new MigLayout());
 	    	
-	//        try {
-	//            rUrl = getParent().getClass().getResource("checkmark.png");
-	//            System.out.println(rUrl);
-	//            if (rUrl != null) {
-	//                img = ImageIO.read(rUrl);
-	//            }
-	//        } catch (IOException ex) {
-	//            
-	//        }
-	//    	
-	//    	JLabel picLabel = new JLabel(new ImageIcon(img));
-	//    	textPane.add(picLabel);
-	    	
-	    	label1 = new JLabel("Your file has been loaded!");
+	    	label1 = new JLabel("Loading file successful!");
 	    	label1.setFont(new Font("Sans Serif", Font.PLAIN, 16));
-	    	label1.setBackground(Color.white);
 	    	this.add(label1, "top, wrap");
 	   
 	    	
-	    	label2 = new JLabel("It appears to have:");
+	    	label2 = new JLabel("Matrix Dimensions:");
 	    	label2.setFont(new Font("Sans Serif", Font.PLAIN, 16));
-	    	label2.setBackground(Color.white);
-	    	this.add(label2, "wrap");
-	    	
-	//    	this.add(textPane, "wrap, grow, push");
+	    	this.add(label2);
 	    	
 	    	//panel with dimensions of the dataMatrix
 	    	JPanel numPane = new JPanel();
 	    	numPane.setLayout(new MigLayout());
-	    	numPane.setBackground(Color.white);
+	    	numPane.setBackground(new Color(210, 210, 210, 0));
 	    	
 	    	numColLabel = new JLabel(nCols + " columns");
-	    	numColLabel.setBackground(Color.white);
 	    	numColLabel.setFont(new Font("Sans Serif", Font.BOLD, 16));
+	    	numColLabel.setForeground(new Color(240, 80, 50, 255));
 	    	numPane.add(numColLabel, "span, split 2, center");
 	    	
 	    	numRowLabel = new JLabel(nRows + " rows");
-	    	numRowLabel.setBackground(Color.white);
+	    	numRowLabel.setForeground(new Color(240, 80, 50, 255));
 	    	numRowLabel.setFont(new Font("Sans Serif", Font.BOLD, 16));
 	    	numPane.add(numRowLabel,  "gapleft 10%");
 	    	
@@ -259,7 +262,7 @@ public class ClusterFrame extends JFrame{
 	    	//buttonPane
 	    	JPanel buttonPane1 = new JPanel();
 	    	buttonPane1.setLayout(new MigLayout());
-	    	buttonPane1.setBackground(Color.white);
+	    	buttonPane1.setBackground(new Color(210, 210, 210, 0));
 	    	
 	    	loadNew_button = new JButton("Load New File");
 	    	loadNew_button.addActionListener(new ActionListener(){
@@ -292,53 +295,6 @@ public class ClusterFrame extends JFrame{
 	    	buttonPane1.add(loadNew_button, "alignx 0%");
 	 
 	    	this.add(buttonPane1, "wrap, grow, push");
-	    	
-	    	textArea = new JTextArea("Would you like to filter out unwanted elements?");
-	    	textArea.setFont(new Font("Sans Serif", Font.PLAIN, 16));
-	    	textArea.setLineWrap(false);
-	    	textArea.setOpaque(false);
-	    	textArea.setEditable(false);
-	    	
-	    	this.add(textArea, "alignx 50%, span, wrap");
-	    	
-	    	JPanel buttonPane2 = new JPanel();
-	    	buttonPane2.setLayout(new MigLayout());
-	    	buttonPane2.setBackground(Color.white);
-	    	
-	    	yes_button = new JButton("Yes");
-	    	yes_button.addActionListener(new ActionListener(){
-	
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					
-					nextPanel(initialPanel, NOSKIP);
-				}	
-	    	});
-	    	buttonPane2.add(yes_button);
-	    	
-	    	no_button = new JButton("Skip to 'Adjust Data'");
-	    	no_button.addActionListener(new ActionListener(){
-	
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					
-					nextPanel(initialPanel, SKIPA);
-				}	
-	    	});
-	    	buttonPane2.add(no_button, "wrap");
-	    	
-	    	no2_button = new JButton("Skip to 'Cluster'");
-	    	no2_button.addActionListener(new ActionListener(){
-	
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					
-					nextPanel(initialPanel, SKIPC);
-				}	
-	    	});
-	    	buttonPane2.add(no2_button, "span, alignx 50%");
-	    	
-	    	this.add(buttonPane2, "alignx 50%, span");	
 		  }
 		}
  
@@ -352,18 +308,18 @@ public class ClusterFrame extends JFrame{
 		    
 			  public FilterOptionsPanel() {
 				this.setLayout(new MigLayout());
-				this.setBorder(BorderFactory.createTitledBorder("Filtering Data"));
+				this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 				setResizable(false);
-				setBackground(new Color(51,204,255,0));
+				setBackground(Color.WHITE);
 		    
 				//Instructions
 				instructions = new JTextArea("Check all filter options which you would like to apply " +
 						"to your dataset, then click 'Remove'.");
-				instructions.setFont(new Font("Sans Serif", Font.BOLD, 16));
+				instructions.setFont(new Font("Sans Serif", Font.PLAIN, 16));
 		    	instructions.setLineWrap(false);
 		    	instructions.setOpaque(false);
 		    	instructions.setEditable(false);
-				this.add(instructions, "height :5%:, wrap");
+				this.add(instructions, "wrap");
 				
 				//Inner components of this panel, objects of other inner classes
 				//Component 1 
@@ -385,43 +341,19 @@ public class ClusterFrame extends JFrame{
 		    	//panle with all the buttons
 		    	JPanel buttonPane = new JPanel();
 		    	buttonPane.setLayout(new MigLayout());
-		    	buttonPane.setBackground(new Color(51,204,255,0));
+		    	buttonPane.setBackground(Color.white);
 		    	
 		    	//remove button with action listener
-		    	remove_button = new JButton("Remove");
+		    	remove_button = new JButton("Filter Data");
 		    	remove_button.addActionListener(new ActionListener(){
 	
 					@Override
 					public void actionPerformed(ActionEvent arg0) {
 						
-						nextPanel(filterOptions, NOSKIP);
+						//nextPanel(filterOptions, NOSKIP);
 					}	
 		    	});
 		    	buttonPane.add(remove_button);
-		    	
-		    	//Skip to adjust button
-		    	noFilter_button = new JButton("Skip to 'Adjust Data'");
-		    	noFilter_button.addActionListener(new ActionListener(){
-	
-					@Override
-					public void actionPerformed(ActionEvent arg0) {
-						
-						nextPanel(filterOptions, SKIPA);
-					}	
-		    	});
-		    	buttonPane.add(noFilter_button);
-		    	
-		    	//Skip to Cluster button
-		    	noFilter2_button = new JButton("Skip to 'Cluster'");
-		    	noFilter2_button.addActionListener(new ActionListener(){
-	
-					@Override
-					public void actionPerformed(ActionEvent arg0) {
-						
-						nextPanel(filterOptions, SKIPC);
-					}	
-		    	});
-		    	buttonPane.add(noFilter2_button);
 		    	
 		    	this.add(buttonPane, "span, alignx 50%");	
 			  }
@@ -439,16 +371,16 @@ public class ClusterFrame extends JFrame{
 
 			  public RemovePercentPanel() {
 				this.setLayout(new MigLayout("", "[]push[]"));
-				this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+				//this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 				setResizable(true);
-				setBackground(Color.white);
+				setBackground(new Color(210, 210, 210, 50));
 				
 		    	check1 = new JCheckBox("Data Completeness per Element");
-		    	check1.setBackground(Color.white);
+		    	//check1.setBackground(new Color(210, 210, 210, 0));
 		    	this.add(check1, "alignx 0%");
 		    	
 		    	JPanel bPane = new JPanel();
-		    	bPane.setBackground(Color.white);
+		    	bPane.setBackground(new Color(210, 210, 210, 0));
 		    	info_button = new JButton("?");
 		    	
 		    	info_button.addActionListener(new ActionListener(){
@@ -468,7 +400,7 @@ public class ClusterFrame extends JFrame{
 		    	
 		    	JPanel valuePane = new JPanel();
 		    	valuePane.setLayout(new MigLayout());
-		    	valuePane.setBackground(Color.white);
+		    	valuePane.setBackground(new Color(210, 210, 210, 0));
 		    	
 		    	label2 = new JLabel();
 		    	label2.setText("Enter Percentage: ");
@@ -495,17 +427,17 @@ public class ClusterFrame extends JFrame{
 			    
 				  public RemoveSDPanel() {
 					this.setLayout(new MigLayout("", "[]push[]"));
-					this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+					//this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 					setSize(this.getSize());
 					setResizable(true);
-					setBackground(Color.white);
+					setBackground(new Color(210, 210, 210, 50));
 			    	
 			    	check2 = new JCheckBox("Standard Deviation (Gene Vector)");
-			    	check2.setBackground(Color.white);
+			    	check2.setBackground(new Color(210, 210, 210, 0));
 			    	this.add(check2, "alignx 0%");
 			    	
 			    	JPanel bPane = new JPanel();
-			    	bPane.setBackground(Color.white);
+			    	bPane.setBackground(new Color(210, 210, 210, 0));
 			    	info_button = new JButton("?");
 			    	
 			    	info_button.addActionListener(new ActionListener(){
@@ -521,12 +453,12 @@ public class ClusterFrame extends JFrame{
 			    	
 			    	JPanel valuePane = new JPanel();
 			    	valuePane.setLayout(new MigLayout());
-			    	valuePane.setBackground(Color.white);
+			    	valuePane.setBackground(new Color(210, 210, 210, 0));
 			    	
 			    	sdField = new JTextField(textFieldSize);
 			    	
 			    	enterLabel = new JLabel();
-			    	enterLabel.setBackground(Color.white);
+			    	enterLabel.setBackground(new Color(210, 210, 210, 0));
 			    	enterLabel.setText("Enter a Standard Deviation: ");
 			    	enterLabel.setFont(new Font("Sans Serif", Font.PLAIN, 16));
 			    	
@@ -550,16 +482,16 @@ public class ClusterFrame extends JFrame{
 			    
 				  public RemoveAbsPanel() {
 					this.setLayout(new MigLayout("", "[]push[]"));
-					this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+					//this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 					setResizable(true);
-					setBackground(Color.white);
+					setBackground(new Color(210, 210, 210, 50));
 			    	
 			    	check3 = new JCheckBox("Minimum Amount of Absolute Values");
-			    	check3.setBackground(Color.white);
+			    	check3.setBackground(new Color(210, 210, 210, 0));
 			    	this.add(check3, "alignx 0%");
 			    	
 			    	JPanel bPane = new JPanel();
-			    	bPane.setBackground(Color.white);
+			    	bPane.setBackground(new Color(210, 210, 210, 0));
 			    	info_button = new JButton("?");
 			    	
 			    	info_button.addActionListener(new ActionListener(){
@@ -579,7 +511,7 @@ public class ClusterFrame extends JFrame{
 			    	
 			    	JPanel valuePane = new JPanel();
 			    	valuePane.setLayout(new MigLayout());
-			    	valuePane.setBackground(Color.white);
+			    	valuePane.setBackground(new Color(210, 210, 210, 0));
 			    	
 			    	obsvLabel = new JLabel("Enter # of Observations: ");
 			    	obsvLabel.setFont(new Font("Sans Serif", Font.PLAIN, 16));
@@ -610,16 +542,16 @@ public class ClusterFrame extends JFrame{
 			    
 				  public MaxMinPanel() {
 					this.setLayout(new MigLayout("", "[]push[]"));
-					this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+					//this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 					setResizable(true);
-					setBackground(Color.white);
+					setBackground(new Color(210, 210, 210, 50));
 			    	
 			    	check4 = new JCheckBox("Difference of Maximum and Minimum Data Values");
-			    	check4.setBackground(Color.white);
+			    	check4.setBackground(new Color(210, 210, 210, 0));
 			    	this.add(check4, "alignx 0%");
 			    	
 			    	JPanel bPane = new JPanel();
-			    	bPane.setBackground(Color.white);
+			    	bPane.setBackground(new Color(210, 210, 210, 0));
 			    	info_button = new JButton("?");
 			    	
 			    	info_button.addActionListener(new ActionListener(){
@@ -636,7 +568,7 @@ public class ClusterFrame extends JFrame{
 			    	diffField = new JTextField(textFieldSize);
 			    	
 			    	JPanel valuePane = new JPanel();
-			    	valuePane.setBackground(Color.white);
+			    	valuePane.setBackground(new Color(210, 210, 210, 0));
 			    	valuePane.setLayout(new MigLayout());
 			    	
 			    	diffLabel = new JLabel("Enter Specified Difference: ");
@@ -650,115 +582,6 @@ public class ClusterFrame extends JFrame{
 				  }
 				}
   
-	  class AdjustQPanel extends JPanel {	
-		  
-		private static final long serialVersionUID = 1L;
-		
-		//Instance Variables
-		int nRows, nCols; 
-		JLabel label2, numColLabel, numRowLabel;
-		JButton yes_button, no_button, no2_button, loadNew_button;
-		JTextArea textArea;
-		
-		//Constructor
-		public AdjustQPanel() {
-			
-			this.setLayout(new MigLayout());
-			setResizable(true);
-			setBackground(Color.white);
-	
-			this.setBorder(BorderFactory.createTitledBorder("Data Information"));
-			
-			HeaderInfo infoArray = clusterModel.getArrayHeaderInfo();
-			HeaderInfo infoGene = clusterModel.getGeneHeaderInfo();
-			
-			nCols = infoArray.getNumHeaders();
-			nRows = infoGene.getNumHeaders();
-//			System.out.println("Rows: " + nRows);
-//			System.out.println("Columns: " + nCols);
-			
-			//textpanel
-			JPanel textPane = new JPanel();
-			textPane.setLayout(new MigLayout());
-			textPane.setBackground(Color.white);
-			
-			label2 = new JLabel("New dataset dimensions:");
-			label2.setFont(new Font("Sans Serif", Font.PLAIN, 16));
-			label2.setBackground(Color.white);
-			textPane.add(label2);
-			
-			this.add(textPane, "wrap, grow, push");
-			
-			//panel with dimensions of the dataMatrix
-			JPanel numPane = new JPanel();
-			numPane.setLayout(new MigLayout());
-			numPane.setBackground(Color.white);
-			
-			numColLabel = new JLabel(nCols + " columns");
-			numColLabel.setFont(new Font("Sans Serif", Font.BOLD, 16));
-			numColLabel.setBackground(Color.white);
-			numPane.add(numColLabel);
-			
-			numRowLabel = new JLabel(nRows + " rows");
-			numRowLabel.setFont(new Font("Sans Serif", Font.BOLD, 16));
-			numRowLabel.setBackground(Color.white);
-			numPane.add(numRowLabel, "gapleft 10%");
-			
-			this.add(numPane, "center, growy, pushy, wrap");
-	
-			
-			textArea = new JTextArea("Would you like to mathematically adjust the dataset (log transform, normalizing etc.)?");
-			textArea.setFont(new Font("Sans Serif", Font.PLAIN, 16));
-			textArea.setLineWrap(false);
-			textArea.setOpaque(false);
-			textArea.setEditable(false);
-			this.add(textArea, "alignx 50%, wrap");
-			
-			
-			JPanel buttonPane2 = new JPanel();
-			buttonPane2.setLayout(new MigLayout());
-			buttonPane2.setBackground(Color.white);
-			
-			//Button to confirm intent to adjust data
-			yes_button = new JButton("Yes");
-			yes_button.addActionListener(new ActionListener(){
-		
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					
-					nextPanel(adjustQPanel, NOSKIP);
-				}	
-			});
-			buttonPane2.add(yes_button);
-			
-			//button to skip to clustering
-			no_button = new JButton("Skip to 'Cluster'");
-			no_button.addActionListener(new ActionListener(){
-				
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					
-					nextPanel(adjustQPanel, SKIPC);
-				}	
-			});
-			buttonPane2.add(no_button, "wrap");
-			
-			//button to cancel the entire operation
-			no2_button = new JButton("Cancel");
-			no2_button.addActionListener(new ActionListener(){
-				
-				@Override
-				public void actionPerformed(ActionEvent arg0){
-					ClusterFrame.this.dispatchEvent(new WindowEvent(ClusterFrame.this, WindowEvent.WINDOW_CLOSING));
-				}
-			});
-			
-			buttonPane2.add(no2_button, "alignx 50%, span");
-			
-			this.add(buttonPane2, "alignx 50%, wrap");
-		  	}
-	  }
-  
 	  class AdjustOptionsPanel extends JPanel {	
 	
 			private static final long serialVersionUID = 1L;
@@ -770,13 +593,13 @@ public class ClusterFrame extends JFrame{
 			public AdjustOptionsPanel() {
 				
 				this.setLayout(new MigLayout());
-				this.setBorder(BorderFactory.createTitledBorder("Adjusting Data"));
+				this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 				setResizable(true);
-				setBackground(new Color(51,204,255,0));
+				setBackground(Color.WHITE);
 		    
 				//Instructions
 				instructions = new JTextArea("Check all adjustment options which you would like to apply to your dataset, then click 'Adjust'.");
-				instructions.setFont(new Font("Sans Serif", Font.BOLD, 16));
+				instructions.setFont(new Font("Sans Serif", Font.PLAIN, 16));
 				instructions.setLineWrap(false);
 				instructions.setOpaque(false);
 				instructions.setEditable(false);
@@ -814,29 +637,18 @@ public class ClusterFrame extends JFrame{
 		    	buttonPane.setLayout(new MigLayout());
 		    	
 		    	//button to confirm adjustment operations with action listener
-		    	adjust_button = new JButton("Adjust");
+		    	adjust_button = new JButton("Adjust Data");
 		    	adjust_button.addActionListener(new ActionListener(){
 	
 					@Override
 					public void actionPerformed(ActionEvent arg0) {
 						
-						nextPanel(aoPanel, NOSKIP);
+						//nextPanel(aoPanel, NOSKIP);
 					}	
 		    	});
 		    	buttonPane.add(adjust_button);
 		    	
-		    	noAdjust_button = new JButton("Skip to 'Cluster'");
-		    	noAdjust_button.addActionListener(new ActionListener(){
-	
-					@Override
-					public void actionPerformed(ActionEvent arg0) {
-						
-						nextPanel(aoPanel, SKIPC);
-					}	
-		    	});
-		    	buttonPane.add(noAdjust_button);
-		    	
-		    	buttonPane.setBackground(new Color(51,204,255,0));
+		    	buttonPane.setBackground(Color.WHITE);
 		    	this.add(buttonPane, "alignx 50%");
 		    	
 			  }
@@ -989,10 +801,10 @@ public class ClusterFrame extends JFrame{
 			    
 				 public ClusterOptionsPanel() {
 					 this.setLayout(new MigLayout());
-					 this.setBorder(BorderFactory.createTitledBorder("Hierarchical Clustering"));
+					 this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 					 setResizable(true);
 					 setTitle("Hierarchical Clustering");
-					 setBackground(new Color(51,204,255,0));
+					 setBackground(Color.white);
 					
 					//Component 1
 					geneClusterPanel = new GeneClusterPanel();
@@ -1004,12 +816,12 @@ public class ClusterFrame extends JFrame{
 					
 					//Component 3
 					JPanel buttonPanel = new JPanel();
-					buttonPanel.setBorder(BorderFactory.createTitledBorder("Choose Cluster Method"));
+					//buttonPanel.setBorder(BorderFactory.createTitledBorder("Choose Cluster Method"));
 					buttonPanel.setLayout(new MigLayout());
 					
 					//Component 4
 					final JPanel loadPanel = new JPanel();
-					loadPanel.setBorder(BorderFactory.createTitledBorder("Loading"));
+					//loadPanel.setBorder(BorderFactory.createTitledBorder("Loading"));
 					loadPanel.setLayout(new MigLayout());
 			    	
 			    	//button with action listener
@@ -1025,9 +837,10 @@ public class ClusterFrame extends JFrame{
 							
 							pBar.setMinimum(0);
 							pBar.setStringPainted(true);
+							pBar.setForeground(new Color(100, 200, 255, 255));
 							pBar.setVisible(true);
 							
-							final JLabel clusterLabel = new JLabel("Clustering");
+							final JLabel clusterLabel = new JLabel("Clustering...");
 							loadPanel.add(clusterLabel, "wrap");
 							
 							//Add it to JPanel Object
@@ -1046,10 +859,10 @@ public class ClusterFrame extends JFrame{
 						        	try {
 										hCluster(2, dataArray, "What", pBar);
 									} catch (InterruptedException e) {
-										// TODO Auto-generated catch block
+									
 										e.printStackTrace();
 									} catch (ExecutionException e) {
-										// TODO Auto-generated catch block
+										
 										e.printStackTrace();
 									}
 									return null;
@@ -1057,7 +870,6 @@ public class ClusterFrame extends JFrame{
 								
 								protected void done(){
 									
-									clusterLabel.setForeground(Color.green);
 									clusterLabel.setText("Clustering done!");
 									mainPanel.revalidate();
 									mainPanel.repaint();
@@ -1129,7 +941,7 @@ public class ClusterFrame extends JFrame{
 					
 			  		//set this panel's layout
 			  		this.setLayout(new MigLayout("", "[]push[]"));
-			  		this.setBorder(BorderFactory.createTitledBorder("Genes"));
+			  		//this.setBorder(BorderFactory.createTitledBorder("Genes"));
 					setResizable(true);
 					setBackground(Color.white);
 			  		
@@ -1170,7 +982,7 @@ public class ClusterFrame extends JFrame{
 				
 		  		//set this panel's layout
 		  		this.setLayout(new MigLayout("", "[]push[]"));
-		  		this.setBorder(BorderFactory.createTitledBorder("Arrays"));
+		  		//this.setBorder(BorderFactory.createTitledBorder("Arrays"));
 				setResizable(true);
 				setBackground(Color.white);
 		  		
@@ -1198,95 +1010,6 @@ public class ClusterFrame extends JFrame{
 		  		this.add(arrayCombo, "alignx 50%, span");
 			}
 		}
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	/**
-	 * Erases previous panel from mainPanel and draws a new one on it
-	 * @param the new Panel or dialog to be opened
-	 */
-  	private void nextPanel(JPanel oldPanel, int skip){
-  		
-  		if(skip == NOSKIP){
-  			
-  			if(oldPanel == initialPanel){
- 
-  			
-  			mainPanel.remove(initialPanel);
-  			
-  			filterOptions = new FilterOptionsPanel();
-  			mainPanel.add(filterOptions, "grow, push, center");
-  			
-  			mainPanel.revalidate();
-  			mainPanel.repaint();
-  			this.pack();
-  			setLocation(newLocation);
-  			filterOptions.setVisible(true);
-	  		}
-	  		else if(oldPanel == filterOptions){
-	  			
-	  			mainPanel.remove(filterOptions);
-	  			
-	  			adjustQPanel = new AdjustQPanel();
-	  			mainPanel.add(adjustQPanel, "grow, push, center");
-	  			
-	  			mainPanel.revalidate();
-	  			mainPanel.repaint();
-	  			this.pack();
-	  			setLocation(newLocation);
-	  			adjustQPanel.setVisible(true);
-	  		}
-	  		
-	  		else if(oldPanel == adjustQPanel){
-	  			
-	  			mainPanel.remove(adjustQPanel);
-	  			
-	  			aoPanel = new AdjustOptionsPanel();
-	  			mainPanel.add(aoPanel, "grow, push, center");
-	  			
-	  			mainPanel.revalidate();
-	  			mainPanel.repaint();
-	  			this.pack();
-	  			setLocation(newLocation);
-	  			aoPanel.setVisible(true);
-	  		}
-	  		else if(oldPanel == aoPanel){
-	  			
-	  			mainPanel.remove(aoPanel);
-	  			
-	  			coPanel = new ClusterOptionsPanel();
-	  			coPanel.setVisible(true);
-	  			mainPanel.add(coPanel,"grow, push, center");
-	  			
-	  			mainPanel.revalidate();
-	  			mainPanel.repaint();
-	  			this.pack();
-	  			setLocation(newLocation);
-	  			coPanel.setVisible(true);
-	  		}
-  		}
-  		else if (skip == SKIPA){
-  			mainPanel.remove(oldPanel);
-  			
-  			aoPanel = new AdjustOptionsPanel();
-  			aoPanel.setVisible(true);
-  			mainPanel.add(aoPanel, "grow, push, center");
-  			
-  			mainPanel.revalidate();
-  			mainPanel.repaint();
-  			this.pack();
-  		}
-  		
-  		else if (skip == SKIPC){
-  			mainPanel.remove(oldPanel);
-  			
-  			coPanel = new ClusterOptionsPanel();
-  			coPanel.setVisible(true);
-  			mainPanel.add(coPanel, "grow, push, center");
-  			
-  			mainPanel.revalidate();
-  			mainPanel.repaint();
-  			this.pack();
-  		}
-  	}
 
 	private void hCluster(int method, double[] currentArray, String similarityM, JProgressBar pBar) 
 			throws InterruptedException, ExecutionException{
@@ -1303,7 +1026,7 @@ public class ClusterFrame extends JFrame{
 		}
 		
 		//begin operations on clusterTarget...
-		List<List<Double>> aoArrays = clusterTarget.splitArray(currentList, pBar);
+		List<List<Double>> aoArrays = clusterTarget.splitList(currentList, pBar);
 		
 		//use int method to determine the distance/ similarity matrix algorithm
 		//return distance/ similarity matrix and use as input to clustering function
@@ -1398,101 +1121,7 @@ public class ClusterFrame extends JFrame{
 		fileDialog.setFileFilter(ff);
 		fileDialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
 	 }
-    
-    ValueTextField MaxMin_text;
-	JCheckBox caseBox4;
-	
-    
-//    class NumPanel extends JPanel {	
-//    	
-//    	/**
-//		 * 
-//		 */
-//		private static final long serialVersionUID = 1L;
-//		int nRows;
-//        int nCols; 
-//        JLabel numRowLabel;
-//        JLabel numColLabel;
-
-        
-//        IntHeaderInfoCluster info = new IntHeaderInfoCluster();
-//        int geneN = info.getNumHeaders();
-        
-//      public NumPanel() {
-//
-//    	int strut = 20;
-//    	setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
-//    	setMaximumSize(new Dimension(400, 50));
-//    	
-//    	if(clusterModel == null){
-//		System.out.println("Hnnnnng");
-//    	}else{
-//    		System.out.println("Informationics:" + clusterModel);
-//    	}
-//    	
-//    	HeaderInfo infoArray = clusterModel.getArrayHeaderInfo();
-//    	HeaderInfo infoGene = clusterModel.getGeneHeaderInfo();
-//    	
-//    	//Access content directly!
-//    	//When accessing the dataMatrix the program does not leave out initial description cells (EWEIGHT etc.)
-// 
-//    	
-//    	DataMatrix dM = clusterModel.getDataMatrix();
-//    	double valueD = dM.getValue(0, 213);				//starts with DATA values and with index 0 (first data element: 0, 0)
-//    	System.out.println("DataMatrixValue: " + valueD);
-//    	
-//    	//get the double[] somehow....
-//    	
-////    	Accessing header (first two) elements directly
-//    	
-//    	String[] aName = infoArray.getHeader(6);
-//    	System.out.println("aName: " + aName[0]);
-//    	System.out.println("aName: " + aName[1]);
-//    	
-//    	String[] gName = infoGene.getHeader(6);
-//    	System.out.println("gName: " + gName[0]);
-//    	System.out.println("gName: " + gName[1]);
-//    	
-//    	nCols = infoArray.getNumHeaders();
-//    	nRows = infoGene.getNumHeaders();
-//    	System.out.println("Rows: " + nRows);
-//    	System.out.println("Columns: " + nCols);
-//    	
-//    	
-//    	numColLabel = new JLabel("Number of Columns: " + nCols);
-//    	add(numColLabel);
-//    	add(Box.createHorizontalStrut(strut));
-//    	numRowLabel = new JLabel("Number of Rows: " + nRows);
-//    	add(numRowLabel);
-//    	numRowLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-//    	numColLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-//      }
-//    }
-    
-    class ValueTextField extends JTextField implements ActionListener {
-	    /**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-
-		// why does java make me write this dumb constructor?
-		//cols = size of textfield
-	    ValueTextField(int cols) {super(cols);}
-
-	    public void actionPerformed(ActionEvent e) {
-//	    	removeGenes(getText(), caseBox.isSelected(),caseBox2.isSelected(),
-//	    			caseBox3.isSelected(), caseBox4.isSelected());
-	    }
-	}
-    
-	class TimerListener implements ActionListener { // manages the FileLoader
-		// this method is invoked every few hundred ms
-		public void actionPerformed(ActionEvent evt) {
-		
-			//Toolkit.getDefaultToolkit().beep();
-
-		}
-	}
+  
 
 //	protected TreeSelectionI geneSelection;
 //	protected TreeViewFrame viewFrame;

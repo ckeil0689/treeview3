@@ -55,7 +55,7 @@ public class HierarchicalCluster {
 	//Step 1: Create Similarity matrices (one for genes, one for samples) according to all 
 	//the different measurement options (correlation, Euclidean distance etc.)
 	//differentiate between gene and array cluster!
-	public List <List<Double>> splitArray(List<Double> list, JProgressBar pBar){
+	public List <List<Double>> splitList(List<Double> list, JProgressBar pBar){
 		
 		int lower = 0;
 		int upper = 0;
@@ -119,6 +119,9 @@ public class HierarchicalCluster {
     	List <List<Double>> geneDistanceList = new ArrayList<List<Double>>();
 		
     	double sDist = 0;
+    	double g1 = 0;
+    	double g2 = 0;
+    	double gDiff = 0;
     	
     	pBar.setMaximum(fullList.size());
     	
@@ -128,7 +131,7 @@ public class HierarchicalCluster {
     	//300ms per loop
     	for(int i = 0; i < fullList.size(); i++){
     		
-    		long ms = System.currentTimeMillis();
+    		//long ms = System.currentTimeMillis();
     		
     		//update progressbar
     		pBar.setValue(i);
@@ -148,17 +151,16 @@ public class HierarchicalCluster {
     	    	//squared differences between elements of 2 genes
     			List<Double> sDiff= new ArrayList<Double>();
     			
-    			long ms2 = System.nanoTime();
     			//compare each value of both genes
-    			//runs at 0.11ms - 0.16ms (= 99% of 2nd loop)
-    			//ALL SPEED LOST IN THIS LOOP....DAMNIT
+    			//fixed: now runs at ~40 -60k ns = 0.05ms
     			for(int k = 0; k < gene.size(); k++){
     				
-    				sDist = Math.pow((gene.get(k) - gene2.get(k)),2);
+    				g1 = gene.get(k);
+    				g2 = gene2.get(k);
+    				gDiff = g1 - g2;
+    				sDist = gDiff * gDiff;
     				sDiff.add(sDist);
     			}
-    			
-    			System.out.println("Sum Loop Time: " + (System.nanoTime()-ms2));
     			
     			//sum all the squared value distances up
     			//--> get distance between gene and gene2
@@ -181,7 +183,7 @@ public class HierarchicalCluster {
     			geneDistance.add(divSum);
     		}
     		
-    		System.out.println("#1 Loop Time: " + (System.currentTimeMillis()-ms));
+    		//System.out.println("#1 Loop Time: " + (System.currentTimeMillis()-ms));
 
     		//list with all genes and their distances to the other genes
     		geneDistanceList.add(geneDistance);
