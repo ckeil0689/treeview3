@@ -23,7 +23,8 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.BorderLayout;
-import java.awt.Frame;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.MenuBar;
 import java.awt.event.ActionEvent;
@@ -49,6 +50,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
+
+import net.miginfocom.swing.MigLayout;
 
 import Cluster.ClusterFileSet;
 import Cluster.ClusterFrame;
@@ -87,7 +90,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	private static final long serialVersionUID = 1L;
 
 	/** override in subclasses? */
-	private static String appName = "TreeView Citrus";
+	private static String appName = "TreeView 3.0";
 
 	private ProgramMenu programMenu;
 	public String getAppName() {
@@ -104,17 +107,23 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		loaded = false;
 		setWindowActive(true);
 		waiting = new JPanel();
-		waiting.setLayout(new BoxLayout(waiting, BoxLayout.Y_AXIS));
+		waiting.setLayout(new MigLayout());//new BoxLayout(waiting, BoxLayout.Y_AXIS));
 //		waiting.setAlignmentX((float) 0.5);
 //		waiting.setAlignmentY((float) 0.5);
 		JLabel jl = new JLabel("Hello! How are you Gentlepeople?");
+		jl.setFont(new Font("Sans Serif", Font.PLAIN, 30));
+		jl.setForeground(new Color(50,150,255,250));
 		jl.setAlignmentX((float) 0.5);
 		jl.setAlignmentY((float) 0.5);
-		waiting.add(jl);
+		waiting.add(jl, "wrap, pushx, alignx 50%");
 		jl = new JLabel("Welcome to " + getAppName());
+		jl.setFont(new Font("Sans Serif", Font.PLAIN, 40));
+		jl.setForeground(new Color(50,150,255,250));
 		jl.setAlignmentX((float) 0.5);
 		jl.setAlignmentY((float) 0.5);
-		waiting.add(jl);
+		waiting.add(jl, "span, pushx, alignx 50%");
+
+		waiting.setBackground(Color.WHITE);
 
 		setupPresets();
 		setupMenuBar();
@@ -316,7 +325,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 	protected void setupRunning() {
 		DendroView dv = new DendroView(getDataModel(), this);						//where used? Create a similar function with ClusterView! used in setDataModel
-		//running = dv;
+		running = dv;
 	}
 	
 	protected void setupClusterRunning() {
@@ -361,7 +370,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		// menubar.rebuild...
 		rebuildMainPanelMenu();
 		treeView.rebuildWindowMenus();
-
+		
 		validate();
 		repaint();
 	}
@@ -1117,7 +1126,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 //					clusterfileMru.setLast(fileSet);
 //					clusterfileMru.notifyObservers();
 					setLoaded(true);
-					getClusterDialogWindow(getDataModel()).setVisible(true);
+//					getClusterDialogWindow(getDataModel()).setVisible(true);
 				} catch (LoadException e) {
 					if ((e.getType() != LoadException.INTPARSE)
 							&& (e.getType() != LoadException.NOFILE)) {
