@@ -33,6 +33,8 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -56,6 +58,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.SwingWorker;
 import javax.swing.border.EtchedBorder;
 
@@ -85,8 +88,8 @@ public class ClusterFrame extends JFrame{
 	//Various GUI Panels
 	private JScrollPane scrollPane;
 	private JPanel mainPanel;
-	private QuestionPanel questionPanel;
-	private HeaderPanel head1, head2;
+	//private QuestionPanel questionPanel;
+	private JLabel head1, head2;
 	private FilterOptionsPanel filterOptions;
 	private RemovePercentPanel percentPanel;
 	private RemoveSDPanel sdPanel;
@@ -120,6 +123,8 @@ public class ClusterFrame extends JFrame{
 		matrix = outer.getDataMatrix();
 		dataArray = matrix.getExprData();
 		rangeArray = Arrays.copyOfRange(dataArray, 50, 100);
+		
+		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	
 		
 		//setup frame options
@@ -129,28 +134,31 @@ public class ClusterFrame extends JFrame{
 		//set layout for initial window
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new MigLayout());
+		mainPanel.setBackground(Color.white);
+		mainPanel.setPreferredSize(new Dimension(screenSize.width/2, screenSize.height/2));
 		
-		head1 = new HeaderPanel("Filter Data");
+		head1 = new JLabel("Filter Data >");
+		head1.setFont(new Font("Sans Serif", Font.BOLD, 28));
+		head1.setForeground(new Color(110, 210, 255, 255));
 		mainPanel.add(head1, "pushx, growx, wrap");
+		head1.setVisible(true);
 		
-		questionPanel = new QuestionPanel();
-		questionPanel.setQuestion("Would you like to filter certain elements out of your data?");
-		mainPanel.add(questionPanel, "grow, push, wrap");
+		filterOptions = new FilterOptionsPanel();
 		
-//		filterOptions = new FilterOptionsPanel();
-//		mainPanel.add(filterOptions, "grow, push, wrap");
-//		
-//		head2 = new HeaderPanel("Adjust Data");
-//		mainPanel.add(head2, "pushx, growx, wrap");
-//		
-//		aoPanel = new AdjustOptionsPanel();
-//		mainPanel.add(aoPanel, "grow, push, wrap");
+		head2 = new JLabel("Adjust Data >");
+		head2.setFont(new Font("Sans Serif", Font.BOLD, 28));
+		head2.setForeground(new Color(110, 210, 255, 255));
+		mainPanel.add(head2, "pushx, growx, wrap");
+		head2.setVisible(true);
+		
+		aoPanel = new AdjustOptionsPanel();
 		
 		closeButtonPane = new JPanel();
 		closeButtonPane.setLayout(new MigLayout());
+		closeButtonPane.setVisible(true);
 		
 		
-		close = new JButton("Close");
+		close = new JButton("<< Back");
 		close.addActionListener(new ActionListener(){
 
 			@Override
@@ -161,10 +169,127 @@ public class ClusterFrame extends JFrame{
 			}
 			
 		});
-		closeButtonPane.setBackground(Color.white);
-		closeButtonPane.add(close, "alignx 50%, span");
+		closeButtonPane.setOpaque(false);
+		closeButtonPane.add(close);
 		
-		mainPanel.add(closeButtonPane, "growx, pushx");
+		mainPanel.add(closeButtonPane, "alignx 50%, pushx, bottom");
+		
+		head1.addMouseListener(new MouseListener(){
+
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				
+				if(filterOptions.isShowing()){
+					
+					mainPanel.removeAll();
+					mainPanel.add(head1, "pushx, growx, wrap");
+					mainPanel.add(head2, "pushx, growx, wrap");
+					head1.setText("Filter Data >");
+					head2.setText("Adjust Data >");
+					mainPanel.add(closeButtonPane, "alignx 50%, pushx");
+					mainPanel.revalidate();
+					mainPanel.repaint();
+				}
+				else{
+					mainPanel.removeAll();
+					head1.setText("Filter Data v");
+					mainPanel.add(head1, "pushx, growx, wrap");
+					mainPanel.add(filterOptions, "grow, push, wrap");
+					head2.setText("Adjust Data >");
+					mainPanel.add(head2, "pushx, growx, wrap");
+					mainPanel.add(closeButtonPane, "alignx 50%, pushx");
+					mainPanel.revalidate();
+					mainPanel.repaint();
+				}
+
+
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				
+				head1.setForeground(Color.LIGHT_GRAY);
+				
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				
+				head1.setForeground(new Color(110, 210, 255, 255));
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		
+		head2.addMouseListener(new MouseListener(){
+
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				
+				if(aoPanel.isShowing()){
+					
+					mainPanel.removeAll();
+					mainPanel.add(head1, "alignx 50%, pushx, growx, wrap");
+					mainPanel.add(head2, "alignx 50%, pushx, growx, wrap");
+					head1.setText("Filter Data >");
+					head2.setText("Adjust Data >");
+					mainPanel.add(closeButtonPane, "alignx 50%, pushx");
+					mainPanel.revalidate();
+					mainPanel.repaint();
+				}
+				else{
+					mainPanel.removeAll();
+					head1.setText("Filter Data >");
+					mainPanel.add(head1, "alignx 50%, pushx, growx, wrap");
+					head2.setText("Adjust Data v");
+					mainPanel.add(head2, "alignx 50%, pushx, growx, wrap");
+					mainPanel.add(aoPanel, "grow, push, wrap");
+					mainPanel.add(closeButtonPane, "alignx 50%, pushx");
+					mainPanel.revalidate();
+					mainPanel.repaint();
+				}
+
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				
+				head2.setForeground(Color.LIGHT_GRAY);
+				
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				
+				head2.setForeground(new Color(110, 210, 255, 255));
+				
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		
 		
 		//make mainpanel scrollable by adding it to scrollpane
 		scrollPane = new JScrollPane(mainPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -189,126 +314,6 @@ public class ClusterFrame extends JFrame{
 	private JCheckBox check1, check2, check3, check4, logCheck, centerGenes, normGenes, centerArrays, 
 	  			normArrays;
 
-	
-	class HeaderPanel extends JPanel {
-
-		private static final long serialVersionUID = 1L;
-		
-		private JLabel text;
-		
-		public HeaderPanel(String header){
-			
-			this.setLayout(new MigLayout());
-			setResizable(true);
-			setBackground(new Color(110, 210, 255, 255));
-			
-			text = new JLabel(header);
-			text.setFont(new Font("Sans Serif", Font.BOLD, 18));
-			
-			this.add(text);
-			
-		}
-		
-		public void setColor(Color color){
-			
-			setBackground(color);
-		}
-	}
-	
-	class QuestionPanel extends JPanel {
-
-		private static final long serialVersionUID = 1L;
-		
-		private JTextArea text;
-		private JButton yes, no;
-		private JPanel buttonPane;
-		
-		public QuestionPanel(){
-			
-			this.setLayout(new MigLayout());
-			this.setBackground(Color.white);
-			
-			text = new JTextArea();
-			
-			this.add(text, "grow, push");
-			
-			yes = new JButton("Yes");
-			yes.addActionListener(new ActionListener(){
-
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					if(questionPanel.text.getText() == "Would you like to filter certain elements out of your data?"){
-						
-						mainPanel.remove(questionPanel);
-						
-						filterOptions = new FilterOptionsPanel();
-						mainPanel.add(filterOptions, "grow, push, wrap");
-					}
-					else{
-						mainPanel.remove(questionPanel);
-						mainPanel.remove(head1);
-						
-						head2 = new HeaderPanel("Adjust Data");
-						mainPanel.add(head2, "growx, pushx, span, wrap");
-						
-						aoPanel = new AdjustOptionsPanel();
-						mainPanel.add(aoPanel, "grow, push, wrap");
-					}
-					mainPanel.revalidate();
-					mainPanel.repaint();
-					
-				}
-				
-			});
-			
-			no = new JButton("No");
-			no.addActionListener(new ActionListener(){
-
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					if(questionPanel.text.getText() == "Would you like to filter certain elements out of your data?"){
-						
-						questionPanel.setQuestion("Would you like to perform mathematical adjustments on your data?");
-						mainPanel.remove(head1);
-						
-						head2 = new HeaderPanel("Adjust Data");
-						mainPanel.add(head2, "growx, pushx, span, wrap");
-						
-					}
-					else{
-						
-						questionPanel.setQuestion("All done!");
-						questionPanel.removeButton();
-						
-					}
-					mainPanel.revalidate();
-					mainPanel.repaint();
-					
-				}
-				
-			});
-			
-			buttonPane = new JPanel();
-			buttonPane.setLayout(new MigLayout());
-			
-			buttonPane.add(yes);
-			buttonPane.add(no);
-			
-			this.add(buttonPane);
-			
-		}
-		
-		public void setQuestion(String q){
-			
-			text.setText(q);
-		}
-		
-		public void removeButton(){
-			
-			questionPanel.remove(yes);
-			questionPanel.remove(no);
-		}
-	}
 	
 	 class FilterOptionsPanel extends JPanel {	
 	
