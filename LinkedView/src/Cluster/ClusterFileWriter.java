@@ -16,10 +16,12 @@ public class ClusterFileWriter {
 	private File file;
 	private JFileChooser fc;
 	private JFrame frame;
+	private ClusterModel model;
 	
-	public ClusterFileWriter(JFrame currentFrame){
+	public ClusterFileWriter(JFrame currentFrame, ClusterModel model){
 		
 		this.frame = currentFrame;
+		this.model = model;
 	}
 	
 	public void writeGTRFile(List<List<String>> input){
@@ -52,17 +54,19 @@ public class ClusterFileWriter {
 		
 		try{
 			
-			fc = new JFileChooser();
+//			fc = new JFileChooser();
+//			
+//			fc.setFileFilter(new ClusterFileFilter());
+//			
+//			int returnVal = fc.showSaveDialog(frame);
+//			
+//			if(returnVal == JFileChooser.APPROVE_OPTION){
+//				
+//				file = new File(fc.getSelectedFile() + ".gtr");
+//				
+//			}
 			
-			fc.setFileFilter(new ClusterFileFilter());
-			
-			int returnVal = fc.showSaveDialog(frame);
-			
-			if(returnVal == JFileChooser.APPROVE_OPTION){
-				
-				file = new File(fc.getSelectedFile() + ".gtr");
-				
-			}
+			file = new File(model.getSource().substring(0, model.getSource().length()- 4) + ".gtr");
 				
 			file.createNewFile();
 				
@@ -78,6 +82,12 @@ public class ClusterFileWriter {
 			e.printStackTrace();
 			
 		}
+		
+	}
+	
+	public String getFilePath(){
+		
+		return file.getAbsolutePath();
 	}
 	
 }

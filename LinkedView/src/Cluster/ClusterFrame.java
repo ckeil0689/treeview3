@@ -87,9 +87,8 @@ public class ClusterFrame extends JFrame{
 	
 	//Various GUI Panels
 	private JScrollPane scrollPane;
-	private JPanel mainPanel;
-	//private QuestionPanel questionPanel;
-	private JLabel head1, head2;
+	private JPanel mainPanel, backgroundPanel, closeButtonPane;
+	private JLabel head1, head2, titleLine, description1, description2;
 	private FilterOptionsPanel filterOptions;
 	private RemovePercentPanel percentPanel;
 	private RemoveSDPanel sdPanel;
@@ -98,7 +97,6 @@ public class ClusterFrame extends JFrame{
 	private MaxMinPanel maxMinPanel;
 	private GeneAdjustPanel geneAdjustPanel;
 	private ArrayAdjustPanel arrayAdjustPanel;
-	private JPanel closeButtonPane;
 	private JButton back, close;
 	
 	//Object of the loaded model and matrix 
@@ -124,7 +122,7 @@ public class ClusterFrame extends JFrame{
 		dataArray = matrix.getExprData();
 		rangeArray = Arrays.copyOfRange(dataArray, 50, 100);
 		
-		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		//final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	
 		
 		//setup frame options
@@ -135,18 +133,33 @@ public class ClusterFrame extends JFrame{
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new MigLayout());
 		mainPanel.setBackground(Color.white);
-		mainPanel.setPreferredSize(new Dimension(screenSize.width/2, screenSize.height/2));
 		
-		head1 = new JLabel("Filter Data >");
-		head1.setFont(new Font("Sans Serif", Font.BOLD, 28));
+		backgroundPanel = new JPanel();
+		backgroundPanel.setLayout(new MigLayout());
+		backgroundPanel.setPreferredSize(viewFrame.getSize());
+		
+		titleLine = new JLabel("Advanced Options");
+		titleLine.setFont(new Font("Sans Serif", Font.BOLD, 28));
+		mainPanel.add(titleLine, "pushx, growx, wrap");
+		
+		description1 = new JLabel("This menu allows you to filter out unwanted elements from your dataset.");
+		description1.setFont(new Font("Sans Serif", Font.PLAIN, 22));
+		mainPanel.add(description1, "pushx, growx, wrap");
+		
+		description2 = new JLabel("Additionally, you can perform mathematical adjustments.");
+		description2.setFont(new Font("Sans Serif", Font.PLAIN, 22));
+		mainPanel.add(description2, "pushx, growx, wrap");
+		
+		head1 = new JLabel("Filter Data >>");
+		head1.setFont(new Font("Sans Serif", Font.PLAIN, 28));
 		head1.setForeground(new Color(110, 210, 255, 255));
 		mainPanel.add(head1, "pushx, growx, wrap");
 		head1.setVisible(true);
 		
 		filterOptions = new FilterOptionsPanel();
 		
-		head2 = new JLabel("Adjust Data >");
-		head2.setFont(new Font("Sans Serif", Font.BOLD, 28));
+		head2 = new JLabel("Adjust Data >>");
+		head2.setFont(new Font("Sans Serif", Font.PLAIN, 28));
 		head2.setForeground(new Color(110, 210, 255, 255));
 		mainPanel.add(head2, "pushx, growx, wrap");
 		head2.setVisible(true);
@@ -172,8 +185,6 @@ public class ClusterFrame extends JFrame{
 		closeButtonPane.setOpaque(false);
 		closeButtonPane.add(close);
 		
-		mainPanel.add(closeButtonPane, "alignx 50%, pushx, bottom");
-		
 		head1.addMouseListener(new MouseListener(){
 
 			@Override
@@ -182,22 +193,32 @@ public class ClusterFrame extends JFrame{
 				if(filterOptions.isShowing()){
 					
 					mainPanel.removeAll();
+					mainPanel.add(titleLine, "pushx, growx, wrap");
+					mainPanel.add(description1, "pushx, growx, wrap");
+					mainPanel.add(description2, "pushx, growx, wrap");
 					mainPanel.add(head1, "pushx, growx, wrap");
 					mainPanel.add(head2, "pushx, growx, wrap");
-					head1.setText("Filter Data >");
-					head2.setText("Adjust Data >");
-					mainPanel.add(closeButtonPane, "alignx 50%, pushx");
+					head1.setText("Filter Data >>");
+					head2.setText("Adjust Data >>");
+					head1.setOpaque(false);
+					//mainPanel.add(closeButtonPane, "alignx 50%, pushx");
 					mainPanel.revalidate();
 					mainPanel.repaint();
 				}
 				else{
 					mainPanel.removeAll();
+					mainPanel.add(titleLine, "pushx, growx, wrap");
+					mainPanel.add(description1, "pushx, growx, wrap");
+					mainPanel.add(description2, "pushx, growx, wrap");
 					head1.setText("Filter Data v");
+					head1.setBackground(new Color(110, 210, 255, 255));
+					head1.setForeground(Color.black);
+					head1.setOpaque(true);
 					mainPanel.add(head1, "pushx, growx, wrap");
 					mainPanel.add(filterOptions, "grow, push, wrap");
-					head2.setText("Adjust Data >");
+					head2.setText("Adjust Data >>");
 					mainPanel.add(head2, "pushx, growx, wrap");
-					mainPanel.add(closeButtonPane, "alignx 50%, pushx");
+					//mainPanel.add(closeButtonPane, "alignx 50%, pushx");
 					mainPanel.revalidate();
 					mainPanel.repaint();
 				}
@@ -208,14 +229,26 @@ public class ClusterFrame extends JFrame{
 			@Override
 			public void mouseEntered(MouseEvent arg0) {
 				
-				head1.setForeground(Color.LIGHT_GRAY);
+				if(filterOptions.isShowing()){
+					
+				}
+				else{
+					
+					head1.setForeground(Color.LIGHT_GRAY);
+				}
 				
 			}
 
 			@Override
 			public void mouseExited(MouseEvent arg0) {
 				
-				head1.setForeground(new Color(110, 210, 255, 255));
+				if(filterOptions.isShowing()){
+					
+				}
+				else{
+					
+					head1.setForeground(new Color(110, 210, 255, 255));
+				}
 			}
 
 			@Override
@@ -240,22 +273,32 @@ public class ClusterFrame extends JFrame{
 				if(aoPanel.isShowing()){
 					
 					mainPanel.removeAll();
+					mainPanel.add(titleLine, "pushx, growx, wrap");
+					mainPanel.add(description1, "pushx, growx, wrap");
+					mainPanel.add(description2, "pushx, growx, wrap");
 					mainPanel.add(head1, "alignx 50%, pushx, growx, wrap");
 					mainPanel.add(head2, "alignx 50%, pushx, growx, wrap");
-					head1.setText("Filter Data >");
-					head2.setText("Adjust Data >");
-					mainPanel.add(closeButtonPane, "alignx 50%, pushx");
+					head1.setText("Filter Data >>");
+					head2.setText("Adjust Data >>");
+					head2.setOpaque(false);
+					//mainPanel.add(closeButtonPane, "alignx 50%, pushx");
 					mainPanel.revalidate();
 					mainPanel.repaint();
 				}
 				else{
 					mainPanel.removeAll();
-					head1.setText("Filter Data >");
+					mainPanel.add(titleLine, "pushx, growx, wrap");
+					mainPanel.add(description1, "pushx, growx, wrap");
+					mainPanel.add(description2, "pushx, growx, wrap");
+					head1.setText("Filter Data >>");
 					mainPanel.add(head1, "alignx 50%, pushx, growx, wrap");
 					head2.setText("Adjust Data v");
+					head2.setBackground(new Color(110, 210, 255, 255));
+					head2.setForeground(Color.black);
+					head2.setOpaque(true);
 					mainPanel.add(head2, "alignx 50%, pushx, growx, wrap");
 					mainPanel.add(aoPanel, "grow, push, wrap");
-					mainPanel.add(closeButtonPane, "alignx 50%, pushx");
+					//mainPanel.add(closeButtonPane, "alignx 50%, pushx");
 					mainPanel.revalidate();
 					mainPanel.repaint();
 				}
@@ -265,15 +308,27 @@ public class ClusterFrame extends JFrame{
 			@Override
 			public void mouseEntered(MouseEvent arg0) {
 				
-				head2.setForeground(Color.LIGHT_GRAY);
+				if(aoPanel.isShowing()){
+					
+				}
+				else{
+					
+					head2.setForeground(Color.LIGHT_GRAY);
+				}
+				
 				
 			}
 
 			@Override
 			public void mouseExited(MouseEvent arg0) {
 				
-				head2.setForeground(new Color(110, 210, 255, 255));
-				
+				if(aoPanel.isShowing()){
+					
+				}
+				else{
+					
+					head2.setForeground(new Color(110, 210, 255, 255));
+				}
 			}
 
 			@Override
@@ -290,9 +345,11 @@ public class ClusterFrame extends JFrame{
 			
 		});
 		
+		backgroundPanel.add(mainPanel, "growx, pushx, wrap");
+		backgroundPanel.add(closeButtonPane, "alignx 50%, pushx");
 		
-		//make mainpanel scrollable by adding it to scrollpane
-		scrollPane = new JScrollPane(mainPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		//make scrollable by adding it to scrollpane
+		scrollPane = new JScrollPane(backgroundPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		
 		//Add the mainPanel to the ContentPane
 		getContentPane().add(scrollPane);
@@ -320,7 +377,7 @@ public class ClusterFrame extends JFrame{
 		private static final long serialVersionUID = 1L;
 		
 		private JButton remove_button;
-		private JTextArea instructions;
+		private JLabel instructions;
 		    
 		public FilterOptionsPanel() {
 			
@@ -330,12 +387,9 @@ public class ClusterFrame extends JFrame{
 			setBackground(Color.WHITE);
 	    
 			//Instructions
-			instructions = new JTextArea("Check all filter options which you would like to apply " +
-					"to your dataset, then click 'Remove'.");
-			instructions.setFont(new Font("Sans Serif", Font.PLAIN, 16));
-	    	instructions.setLineWrap(false);
+			instructions = new JLabel("Check all filter options you would like to apply. Then click 'Remove'.");
+			instructions.setFont(new Font("Sans Serif", Font.PLAIN, 22));
 	    	instructions.setOpaque(false);
-	    	instructions.setEditable(false);
 			this.add(instructions, "wrap");
 			
 			//Inner components of this panel, objects of other inner classes
@@ -388,7 +442,6 @@ public class ClusterFrame extends JFrame{
 			  public RemovePercentPanel() {
 				this.setLayout(new MigLayout("", "[]push[]"));
 				setResizable(true);
-				//setBackground(new Color(210, 210, 210, 70));
 				
 		    	check1 = new JCheckBox("Data Completeness per Element");
 		    	check1.setOpaque(false);
@@ -434,7 +487,7 @@ public class ClusterFrame extends JFrame{
 		    	
 		    	label = new JLabel();
 		    	label.setText("Enter Percentage: ");
-		    	label.setFont(new Font("Sans Serif", Font.PLAIN, 16));
+		    	label.setFont(new Font("Sans Serif", Font.PLAIN, 20));
 		    	
 		    	valuePane.add(label, "alignx 0%");
 		    	valuePane.add(percentField);
@@ -455,7 +508,6 @@ public class ClusterFrame extends JFrame{
 				  public RemoveSDPanel() {
 					this.setLayout(new MigLayout("", "[]push[]"));
 					setSize(this.getSize());
-					//setBackground(new Color(210, 210, 210, 70));
 			    	
 			    	check2 = new JCheckBox("Standard Deviation (Gene Vector)");
 			    	check2.setOpaque(false);
@@ -500,7 +552,7 @@ public class ClusterFrame extends JFrame{
 			    	enterLabel = new JLabel();
 			    	enterLabel.setOpaque(false);
 			    	enterLabel.setText("Enter a Standard Deviation: ");
-			    	enterLabel.setFont(new Font("Sans Serif", Font.PLAIN, 16));
+			    	enterLabel.setFont(new Font("Sans Serif", Font.PLAIN, 20));
 			    	
 			    	valuePane.add(enterLabel);
 			    	valuePane.add(sdField, "gapright 15%");
@@ -520,7 +572,6 @@ public class ClusterFrame extends JFrame{
 			    
 				  public RemoveAbsPanel() {
 					this.setLayout(new MigLayout("", "[]push[]"));
-					//setBackground(new Color(210, 210, 210, 70));
 			    	
 			    	check3 = new JCheckBox("Minimum Amount of Absolute Values");
 			    	check3.setOpaque(false);
@@ -580,9 +631,9 @@ public class ClusterFrame extends JFrame{
 			    	valuePane.setOpaque(false);
 			    	
 			    	obsvLabel = new JLabel("Enter # of Observations: ");
-			    	obsvLabel.setFont(new Font("Sans Serif", Font.PLAIN, 16));
+			    	obsvLabel.setFont(new Font("Sans Serif", Font.PLAIN, 20));
 			    	absLabel = new JLabel("Enter Specified Absolute Value: ");
-			    	absLabel.setFont(new Font("Sans Serif", Font.PLAIN, 16));
+			    	absLabel.setFont(new Font("Sans Serif", Font.PLAIN, 20));
 	
 			    	valuePane.add(obsvLabel);
 			    	valuePane.add(obsvField, "wrap, gapleft 5%");
@@ -604,7 +655,6 @@ public class ClusterFrame extends JFrame{
 			    
 				  public MaxMinPanel() {
 					this.setLayout(new MigLayout("", "[]push[]"));
-					//setBackground(new Color(210, 210, 210, 70));
 			    	
 			    	check4 = new JCheckBox("Difference of Maximum and Minimum Data Values");
 			    	check4.setOpaque(false);
@@ -647,7 +697,7 @@ public class ClusterFrame extends JFrame{
 			    	valuePane.setLayout(new MigLayout());
 			    	
 			    	diffLabel = new JLabel("Enter Specified Difference: ");
-			    	diffLabel.setFont(new Font("Sans Serif", Font.PLAIN, 16));
+			    	diffLabel.setFont(new Font("Sans Serif", Font.PLAIN, 20));
 	
 			    	valuePane.add(diffLabel);
 			    	valuePane.add(diffField,"gapleft 5%");
@@ -663,7 +713,7 @@ public class ClusterFrame extends JFrame{
 				
 			//Instance variables
 			private JButton adjust_button, info_button;
-			private JTextArea instructions;
+			private JLabel instructions;
 			    
 			public AdjustOptionsPanel() {
 				
@@ -673,11 +723,9 @@ public class ClusterFrame extends JFrame{
 				setBackground(Color.WHITE);
 		    
 				//Instructions
-				instructions = new JTextArea("Check all adjustment options which you would like to apply to your dataset, then click 'Adjust'.");
-				instructions.setFont(new Font("Sans Serif", Font.PLAIN, 16));
-				instructions.setLineWrap(false);
+				instructions = new JLabel("Check all adjustment options you would like to apply. Then click 'Adjust'.");
+				instructions.setFont(new Font("Sans Serif", Font.PLAIN, 22));
 				instructions.setOpaque(false);
-				instructions.setEditable(false);
 				this.add(instructions, "grow, push, wrap");
 				
 				//Splitting up the content of this panel into several other panels
@@ -686,7 +734,6 @@ public class ClusterFrame extends JFrame{
 				logPanel.setLayout(new MigLayout("", "[]push[]"));
 		    	logCheck = new JCheckBox("Log Transform");
 		    	logCheck.setOpaque(false);
-		    	//logPanel.setBackground(new Color(210, 210, 210, 70));
 		    	logPanel.add(logCheck, "grow, push");
 		    	
 		    	//Button to receiv more info about the log transform feature
@@ -743,10 +790,9 @@ public class ClusterFrame extends JFrame{
 				
 		  		//set this panel's layout
 		  		this.setLayout(new MigLayout("", "[]push[]"));
-		  		//setBackground(new Color(210, 210, 210, 70));
 		    	
 		  		//create checkbox
-		  		centerGenes = new JCheckBox("Center Genes");
+		  		centerGenes = new JCheckBox("Center Elements");
 		  		centerGenes.setOpaque(false);
 		  		this.add(centerGenes);
 		  		
@@ -791,7 +837,7 @@ public class ClusterFrame extends JFrame{
 						}
 		  		});
 		  			
-		  		normGenes = new JCheckBox ("Normalize Genes");
+		  		normGenes = new JCheckBox ("Normalize Elements");
 		  		normGenes.setOpaque(false);
 		  		this.add(normGenes);
 		  	}
@@ -811,7 +857,6 @@ public class ClusterFrame extends JFrame{
 			public ArrayAdjustPanel() {
 				//set this panel's layout
 				this.setLayout(new MigLayout("", "[]push[]"));
-				//setBackground(new Color(210, 210, 210, 70));
 				
 				//create checkbox
 				centerArrays = new JCheckBox("Center Arrays");

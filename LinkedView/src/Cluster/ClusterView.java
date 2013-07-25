@@ -23,23 +23,16 @@
 package Cluster;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -49,11 +42,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.JRadioButton;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 import javax.swing.border.EtchedBorder;
 import javax.swing.plaf.basic.BasicProgressBarUI;
@@ -63,16 +54,17 @@ import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.ConfigNode;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.DataModel;
-
 import edu.stanford.genetics.treeview.ExportException;
+import edu.stanford.genetics.treeview.MainPanel;
+import edu.stanford.genetics.treeview.MainProgramArgs;
+import edu.stanford.genetics.treeview.TreeviewMenuBarI;
+
+
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.MainPanel;
-import edu.stanford.genetics.treeview.MainProgramArgs;
 
 import edu.stanford.genetics.treeview.TreeViewFrame;
-import edu.stanford.genetics.treeview.TreeviewMenuBarI;
 import edu.stanford.genetics.treeview.ViewFrame;
 //Explicitly imported because error (unclear TVModel reference) was thrown
 
@@ -86,7 +78,7 @@ import edu.stanford.genetics.treeview.ViewFrame;
  * @author    	Chris Keil <ckeil@princeton.edu>
  * @version 	0.1
  */
-public class ClusterView extends JPanel implements ConfigNodePersistent, MainPanel, Observer {
+public class ClusterView extends JPanel implements ConfigNodePersistent, MainPanel {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -100,14 +92,6 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 	HeaderPanel head1, head2, head3, head4;
 	InitialPanel initialPanel;
 	InfoPanel infoPanel;
-	FilterOptionsPanel filterOptions;
-	RemovePercentPanel percentPanel;
-	RemoveSDPanel sdPanel;
-	RemoveAbsPanel absPanel;
-	AdjustOptionsPanel aoPanel;
-	MaxMinPanel maxMinPanel;
-	GeneAdjustPanel geneAdjustPanel;
-	ArrayAdjustPanel arrayAdjustPanel;
 	GeneClusterPanel geneClusterPanel;
 	ArrayClusterPanel arrayClusterPanel;
 	ClusterOptionsPanel coPanel;
@@ -119,7 +103,6 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 	
 	//Instance variable in which the loaded data array is being stored
 	private double[] dataArray;
-	private double[] rangeArray;
 	
 	/**
 	 *  Constructor for the DendroView object
@@ -150,7 +133,6 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		outer = (ClusterModel) dataModel;
 		matrix = outer.getDataMatrix();
 		dataArray = matrix.getExprData();
-		rangeArray = Arrays.copyOfRange(dataArray, 50, 100);
 
 		viewFrame.setResizable(true);
 		
@@ -172,7 +154,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		mainPanel.add(coPanel, "growx, pushx, span, wrap");
 		
 		finalPanel = new FinalOptionsPanel();
-		mainPanel.add(finalPanel, "grow, push");
+		mainPanel.add(finalPanel, "growx, pushx");
 		
 		//mainPanel.setBackground(new Color(210, 210, 210, 100));
 		
@@ -203,7 +185,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 			setBackground(new Color(110, 210, 255, 255));
 			
 			text = new JLabel(header);
-			text.setFont(new Font("Sans Serif", Font.BOLD, 22));
+			text.setFont(new Font("Sans Serif", Font.BOLD, 30));
 			
 			this.add(text);
 			
@@ -215,7 +197,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		}
 		
 		public void setSmall(){
-			text.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+			text.setFont(new Font("Sans Serif", Font.PLAIN, 22));
 		}
 	}
 	class InitialPanel extends JPanel {	
@@ -242,12 +224,12 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 	    	
 	    	
 	    	label1 = new JLabel("Loading file successful!");
-	    	label1.setFont(new Font("Sans Serif", Font.PLAIN, 16));
+	    	label1.setFont(new Font("Sans Serif", Font.PLAIN, 22));
 	    	this.add(label1, "top, wrap");
 	   
 	    	
 	    	label2 = new JLabel("Matrix Dimensions:");
-	    	label2.setFont(new Font("Sans Serif", Font.PLAIN, 16));
+	    	label2.setFont(new Font("Sans Serif", Font.PLAIN, 22));
 	    	this.add(label2, "wrap");
 	    	
 	    	//panel with dimensions of the dataMatrix
@@ -256,13 +238,13 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 	    	numPane.setOpaque(false);
 	    	
 	    	numColLabel = new JLabel(nCols + " columns");
-	    	numColLabel.setFont(new Font("Sans Serif", Font.BOLD, 16));
+	    	numColLabel.setFont(new Font("Sans Serif", Font.BOLD, 22));
 	    	numColLabel.setForeground(new Color(240, 80, 50, 255));
 	    	numPane.add(numColLabel, "span, split 2, center");
 	    	
 	    	numRowLabel = new JLabel(nRows + " rows");
 	    	numRowLabel.setForeground(new Color(240, 80, 50, 255));
-	    	numRowLabel.setFont(new Font("Sans Serif", Font.BOLD, 16));
+	    	numRowLabel.setFont(new Font("Sans Serif", Font.BOLD, 22));
 	    	numPane.add(numRowLabel,  "gapleft 10%");
 	    	
 	    	this.add(numPane, "alignx 50%, growy, pushy");
@@ -336,563 +318,12 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 			content.setText(text);
 		}
 	 }
-	
-	 class FilterOptionsPanel extends JPanel {	
-	
-		private static final long serialVersionUID = 1L;
-		
-		JButton remove_button, noFilter_button, noFilter2_button;
-		JTextArea instructions;
-		    
-		public FilterOptionsPanel() {
-			
-			this.setLayout(new MigLayout());
-			this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-			setBackground(Color.WHITE);
-	    
-			//Instructions
-			instructions = new JTextArea("Check all filter options which you would like to apply " +
-					"to your dataset, then click 'Remove'.");
-			instructions.setFont(new Font("Sans Serif", Font.PLAIN, 16));
-	    	instructions.setLineWrap(false);
-	    	instructions.setOpaque(false);
-	    	instructions.setEditable(false);
-			this.add(instructions, "wrap");
-			
-			//Inner components of this panel, objects of other inner classes
-			//Component 1 
-			percentPanel = new RemovePercentPanel();
-			this.add(percentPanel, "push, grow, wrap");
-			
-			//Component 2
-			sdPanel = new RemoveSDPanel();
-			this.add(sdPanel, "push, grow, wrap");
-			
-			//Component 3
-			absPanel = new RemoveAbsPanel();
-			this.add(absPanel, "push, grow, wrap");
-			
-			//Component 3
-			maxMinPanel = new MaxMinPanel();
-			this.add(maxMinPanel, "push, grow, wrap");
-			
-	    	//panle with all the buttons
-	    	JPanel buttonPane = new JPanel();
-	    	buttonPane.setLayout(new MigLayout());
-	    	buttonPane.setBackground(Color.white);
-	    	
-	    	//remove button with action listener
-	    	remove_button = new JButton("Filter Data");
-	    	remove_button.addActionListener(new ActionListener(){
-
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					
-					//nextPanel(filterOptions, NOSKIP);
-				}	
-	    	});
-	    	buttonPane.add(remove_button);
-	    	
-	    	this.add(buttonPane, "span, alignx 50%");	
-		  }
-	  }
-
-	  class RemovePercentPanel extends JPanel {	
-
-		private static final long serialVersionUID = 1L;
-		
-			JLabel label1, label2;
-			JTextArea textArea;
-			JTextField percentField;
-			int textFieldSize = 5;
-			JButton info_button;
-
-			  public RemovePercentPanel() {
-				this.setLayout(new MigLayout("", "[]push[]"));
-				//setBackground(new Color(210, 210, 210, 70));
-				
-		    	check1 = new JCheckBox("Data Completeness per Element");
-		    	check1.setOpaque(false);
-		    	this.add(check1, "alignx 0%");
-		    	
-		    	JPanel bPane = new JPanel();
-		    	bPane.setOpaque(false);
-		    	info_button = new JButton("Info");
-		    	
-		    	info_button.addActionListener(new ActionListener(){
-
-					@Override
-					public void actionPerformed(ActionEvent arg0) {
-						infoPanel.setText("This option removes elements with a specified percentage of missing values.");
-					}	
-		    	});
-		    	
-		    	bPane.add(info_button);
-		    	this.add(bPane, "wrap, pushx, growx");
-		    	
-		    	
-		    	//valuefield
-		    	percentField = new JTextField(textFieldSize);
-		    	percentField.addFocusListener(new FocusListener(){
-
-					@Override
-					public void focusGained(FocusEvent arg0) {
-						check1.setSelected(true);
-						
-					}
-
-					@Override
-					public void focusLost(FocusEvent arg0) {
-						
-					}
-		    		
-		    	});
-		    	
-		    	
-		    	JPanel valuePane = new JPanel();
-		    	valuePane.setLayout(new MigLayout());
-		    	valuePane.setOpaque(false);
-		    	
-		    	label2 = new JLabel();
-		    	label2.setText("Enter Percentage: ");
-		    	label2.setFont(new Font("Sans Serif", Font.PLAIN, 16));
-		    	
-		    	valuePane.add(label2, "alignx 0%");
-		    	valuePane.add(percentField);
-
-		    	this.add(valuePane);
-			  }
-			}
-  
-	  class RemoveSDPanel extends JPanel {	
-	
-			private static final long serialVersionUID = 1L;
-			
-		    int nRows, nCols;
-		    JTextArea textArea;
-			JTextField sdField;
-			JLabel enterLabel;
-			int textFieldSize = 5;
-			JButton info_button;
-			    
-				  public RemoveSDPanel() {
-					this.setLayout(new MigLayout("", "[]push[]"));
-					setSize(this.getSize());
-					//setBackground(new Color(210, 210, 210, 70));
-			    	
-			    	check2 = new JCheckBox("Standard Deviation (Gene Vector)");
-			    	check2.setOpaque(false);
-			    	this.add(check2, "alignx 0%");
-			    	
-			    	JPanel bPane = new JPanel();
-			    	bPane.setOpaque(false);
-			    	info_button = new JButton("Info");
-			    	
-			    	info_button.addActionListener(new ActionListener(){
-	
-						@Override
-						public void actionPerformed(ActionEvent arg0) {
-							infoPanel.setText("This option removes elements with a standard deviation " +
-									"of less than the user specified value.");
-						}
-			    	});
-			    	
-			    	bPane.add(info_button);
-			    	this.add(bPane, " wrap");
-			    	
-			    	JPanel valuePane = new JPanel();
-			    	valuePane.setLayout(new MigLayout());
-			    	valuePane.setOpaque(false);
-			    	
-			    	sdField = new JTextField(textFieldSize);
-			    	sdField.addFocusListener(new FocusListener(){
-
-						@Override
-						public void focusGained(FocusEvent arg0) {
-							check2.setSelected(true);
-							
-						}
-
-						@Override
-						public void focusLost(FocusEvent arg0) {
-							
-							
-						}
-			    		
-			    	});
-			    	
-			    	enterLabel = new JLabel();
-			    	enterLabel.setOpaque(false);
-			    	enterLabel.setText("Enter a Standard Deviation: ");
-			    	enterLabel.setFont(new Font("Sans Serif", Font.PLAIN, 16));
-			    	
-			    	valuePane.add(enterLabel);
-			    	valuePane.add(sdField, "gapright 15%");
-	
-			    	this.add(valuePane, "span");
-				  }
-				}
-  
-	  class RemoveAbsPanel extends JPanel {	
-	
-			private static final long serialVersionUID = 1L;
-			
-		    int nRows, nCols;
-			JLabel label1, numColLabel, numRowLabel, obsvLabel, absLabel;
-			JTextArea textArea;
-			JTextField obsvField, absField;;
-			int textFieldSize = 5;
-			JButton info_button;
-			    
-				  public RemoveAbsPanel() {
-					this.setLayout(new MigLayout("", "[]push[]"));
-					//setBackground(new Color(210, 210, 210, 70));
-			    	
-			    	check3 = new JCheckBox("Minimum Amount of Absolute Values");
-			    	check3.setOpaque(false);
-			    	this.add(check3, "alignx 0%");
-			    	
-			    	JPanel bPane = new JPanel();
-			    	bPane.setOpaque(false);
-			    	info_button = new JButton("Info");
-			    	
-			    	info_button.addActionListener(new ActionListener(){
-	
-						@Override
-						public void actionPerformed(ActionEvent arg0) {
-							
-						}
-			    	});
-			    	
-			    	bPane.add(info_button, "alignx 0%");
-			    	this.add(bPane, "wrap");
-			    	
-			    	obsvField = new JTextField(textFieldSize);
-			    	obsvField.addFocusListener(new FocusListener(){
-
-						@Override
-						public void focusGained(FocusEvent arg0) {
-							check3.setSelected(true);
-							
-						}
-
-						@Override
-						public void focusLost(FocusEvent arg0) {
-							
-							
-						}
-			    		
-			    	});
-			    	
-			    	absField = new JTextField(textFieldSize);
-			    	absField.addFocusListener(new FocusListener(){
-
-						@Override
-						public void focusGained(FocusEvent arg0) {
-							check3.setSelected(true);
-							
-						}
-
-						@Override
-						public void focusLost(FocusEvent arg0) {
-							
-							
-						}
-			    		
-			    	});
-			    	
-			    	JPanel valuePane = new JPanel();
-			    	valuePane.setLayout(new MigLayout());
-			    	valuePane.setOpaque(false);
-			    	
-			    	obsvLabel = new JLabel("Enter # of Observations: ");
-			    	obsvLabel.setFont(new Font("Sans Serif", Font.PLAIN, 16));
-			    	absLabel = new JLabel("Enter Specified Absolute Value: ");
-			    	absLabel.setFont(new Font("Sans Serif", Font.PLAIN, 16));
-	
-			    	valuePane.add(obsvLabel);
-			    	valuePane.add(obsvField, "wrap, gapleft 5%");
-			    	valuePane.add(absLabel);
-			    	valuePane.add(absField, "gapleft 5%");
-	
-			    	this.add(valuePane, "span");
-				  }
-				}
-  
-	  class MaxMinPanel extends JPanel {	
-	
-			private static final long serialVersionUID = 1L;
-			
-		    int nRows, nCols;
-			JLabel label1, numColLabel, numRowLabel, diffLabel;
-			JTextArea textArea;
-			JTextField diffField;;
-			int textFieldSize = 5;
-			JButton info_button;
-			    
-				  public MaxMinPanel() {
-					this.setLayout(new MigLayout("", "[]push[]"));
-					//setBackground(new Color(210, 210, 210, 70));
-			    	
-			    	check4 = new JCheckBox("Difference of Maximum and Minimum Data Values");
-			    	check4.setOpaque(false);
-			    	this.add(check4, "alignx 0%");
-			    	
-			    	JPanel bPane = new JPanel();
-			    	bPane.setOpaque(false);
-			    	info_button = new JButton("Info");
-			    	
-			    	info_button.addActionListener(new ActionListener(){
-	
-						@Override
-						public void actionPerformed(ActionEvent arg0) {
-							
-						}
-			    	});
-			    	
-			    	bPane.add(info_button, "alignx 100%");
-			    	this.add(bPane, "wrap");
-			    	
-			    	diffField = new JTextField(textFieldSize);
-			    	diffField.addFocusListener(new FocusListener(){
-
-						@Override
-						public void focusGained(FocusEvent arg0) {
-							check4.setSelected(true);
-							
-						}
-
-						@Override
-						public void focusLost(FocusEvent arg0) {
-							
-							
-						}
-			    		
-			    	});
-			    	
-			    	JPanel valuePane = new JPanel();
-			    	valuePane.setOpaque(false);
-			    	valuePane.setLayout(new MigLayout());
-			    	
-			    	diffLabel = new JLabel("Enter Specified Difference: ");
-			    	diffLabel.setFont(new Font("Sans Serif", Font.PLAIN, 16));
-	
-			    	valuePane.add(diffLabel);
-			    	valuePane.add(diffField,"gapleft 5%");
-	
-			    	this.add(valuePane);
-			    	
-				  }
-				}
-  
-	  class AdjustOptionsPanel extends JPanel {	
-	
-			private static final long serialVersionUID = 1L;
-				
-			//Instance variables
-			JButton adjust_button, noAdjust_button, info_button;
-			JTextArea instructions;
-			    
-			public AdjustOptionsPanel() {
-				
-				this.setLayout(new MigLayout());
-				this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-				setBackground(Color.WHITE);
-		    
-				//Instructions
-				instructions = new JTextArea("Check all adjustment options which you would like to apply to your dataset, then click 'Adjust'.");
-				instructions.setFont(new Font("Sans Serif", Font.PLAIN, 16));
-				instructions.setLineWrap(false);
-				instructions.setOpaque(false);
-				instructions.setEditable(false);
-				this.add(instructions, "grow, push, wrap");
-				
-				//Splitting up the content of this panel into several other panels
-				//Component 1
-				JPanel logPanel = new JPanel();
-				logPanel.setLayout(new MigLayout("", "[]push[]"));
-		    	logCheck = new JCheckBox("Log Transform");
-		    	logCheck.setOpaque(false);
-		    	//logPanel.setBackground(new Color(210, 210, 210, 70));
-		    	logPanel.add(logCheck, "grow, push");
-		    	
-		    	//Button to receiv more info about the log transform feature
-		    	JPanel bPane = new JPanel();
-		    	info_button = new JButton("Info");
-		    	bPane.add(info_button, "alignx 100%");
-		    	bPane.setOpaque(false);
-		    	logPanel.add(bPane);
-		    	
-		    	this.add(logPanel,"wrap");
-				
-				//Component 2
-				geneAdjustPanel = new GeneAdjustPanel();
-				this.add(geneAdjustPanel, "grow, push, split 2");
-				
-				//Component 3
-				arrayAdjustPanel = new ArrayAdjustPanel();
-				this.add(arrayAdjustPanel, "grow, push, wrap");
-				
-		    	//button panel containing all the buttons for confirmation and navigation
-		    	JPanel buttonPane = new JPanel();
-		    	buttonPane.setLayout(new MigLayout());
-		    	
-		    	//button to confirm adjustment operations with action listener
-		    	adjust_button = new JButton("Adjust Data");
-		    	adjust_button.addActionListener(new ActionListener(){
-	
-					@Override
-					public void actionPerformed(ActionEvent arg0) {
-						
-						//nextPanel(aoPanel, NOSKIP);
-					}	
-		    	});
-		    	buttonPane.add(adjust_button);
-		    	
-		    	buttonPane.setOpaque(false);
-		    	this.add(buttonPane, "alignx 50%");
-		    	
-			  }
-				}
-  
-	  class GeneAdjustPanel extends JPanel {
-		  
-		  //Local variables for this class (might have to take Radiobuttons out!)
-	      JRadioButton mean;
-	      JRadioButton median;
-	      ButtonGroup bg;
-	      JButton info_button;
-	      
-			private static final long serialVersionUID = 1L;
-			
-			//Constructor
-			public GeneAdjustPanel() {
-				
-		  		//set this panel's layout
-		  		this.setLayout(new MigLayout("", "[]push[]"));
-		    	
-		  		//create checkbox
-		  		centerGenes = new JCheckBox("Center Genes");
-		  		centerGenes.setOpaque(false);
-		  		this.add(centerGenes);
-		  		
-		    	JPanel bPane = new JPanel();
-		    	info_button = new JButton("Info");
-		    	bPane.add(info_button, "alignx 100%");
-		    	bPane.setOpaque(false);
-		    	this.add(bPane, "wrap");
-		  		
-		  		//Create a new ButtonGroup
-		  		bg = new ButtonGroup();
-		  		
-		  		mean = new JRadioButton("Mean", true);
-		  		median = new JRadioButton("Median", false);
-		  		mean.setOpaque(false);
-		  		mean.setEnabled(false);
-		  		median.setOpaque(false);
-		  		median.setEnabled(false);
-		  		
-		  		//add Radio Buttons to ButtonGroup
-		  		bg.add(mean);
-		  		bg.add(median);
-		  		
-		  		//Add Buttons to panel
-		  		this.add(mean, "wrap, gapleft 5%");
-		  		this.add(median, "wrap, gapleft 5%");
-		  		
-		  		centerGenes.addItemListener(new ItemListener() {
-		
-						@Override
-						public void itemStateChanged(ItemEvent arg0)
-						{
-							if(mean.isEnabled() == false) {
-		  					
-								mean.setEnabled(true);
-								median.setEnabled(true);
-							}
-							else {	
-								mean.setEnabled(false);
-								median.setEnabled(false);
-							}
-						}
-		  		});
-		  			
-		  		normGenes = new JCheckBox ("Normalize Genes");
-		  		normGenes.setOpaque(false);
-		  		this.add(normGenes);
-		  	}
-	  }
-  
-	  class ArrayAdjustPanel extends JPanel {
-		  
-		  //Local variables for this class
-	      JRadioButton mean;
-	      JRadioButton median;
-	      ButtonGroup bg;
-	      JButton info_button;
-	      
-			private static final long serialVersionUID = 1L;
-			
-			//Constructor
-			public ArrayAdjustPanel() {
-				
-		  		//set this panel's layout
-		  		this.setLayout(new MigLayout("", "[]push[]"));
-		  		
-		  		//create checkbox
-		  		centerArrays = new JCheckBox("Center Arrays");
-		  		centerArrays.setOpaque(false);
-		  		this.add(centerArrays);
-		  		
-		    	JPanel bPane = new JPanel();
-		    	info_button = new JButton("Info");
-		    	bPane.add(info_button, "alignx 100%");
-		    	bPane.setOpaque(false);
-		    	this.add(bPane, "wrap");
-		  		
-		  		//Create a new ButtonGroup
-		  		bg = new ButtonGroup();
-		  		
-		  		mean = new JRadioButton("Mean", true);
-		  		median = new JRadioButton("Median", false);
-		  		mean.setOpaque(false);
-		  		mean.setEnabled(false);
-		  		median.setOpaque(false);
-		  		median.setEnabled(false);
-		  		
-		  		//add Radio Buttons to ButtonGroup
-		  		bg.add(mean);
-		  		bg.add(median);
-		  		
-		  		//Add Buttons to panel
-		  		this.add(mean, "wrap, gapleft 5%");
-		  		this.add(median, "wrap, gapleft 5%");
-		  		
-		  		centerArrays.addItemListener(new ItemListener() {
-		
-						@Override
-						public void itemStateChanged(ItemEvent arg0)
-						{
-							if(mean.isEnabled() == false) {
-		  					
-								mean.setEnabled(true);
-								median.setEnabled(true);
-							}
-							else {	
-								mean.setEnabled(false);
-								median.setEnabled(false);
-							}
-						}
-		  		});
-		  			
-		  		normArrays = new JCheckBox ("Normalize Arrays");
-		  		normArrays.setOpaque(false);
-		  		this.add(normArrays);
-				}
-	  	}
 		
 		class ClusterOptionsPanel extends JPanel {	
 		
+			private ClusterFrame clusterDialog;
+			private JButton advanced_button;
+			
 			private static final long serialVersionUID = 1L;
 			    
 				 public ClusterOptionsPanel() {
@@ -901,7 +332,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 					setBackground(Color.white);
 					
 					//headers
-					head2 = new HeaderPanel("Genes");
+					head2 = new HeaderPanel("Elements");
 					head2.setSmall();
 					head2.setBackground(new Color(110, 210, 255, 150));
 					this.add(head2, "pushx, growx");
@@ -918,7 +349,28 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 					//Component 2
 					arrayClusterPanel = new ArrayClusterPanel();
 					this.add(arrayClusterPanel, "center, grow, push, wrap");
+					
+					//Button Component
+					JPanel buttonPanel = new JPanel();
+					buttonPanel.setLayout(new MigLayout());
+					buttonPanel.setOpaque(false);
+					
+					//Advanced Options Button
+					advanced_button = new JButton("Advanced Options >>");
+					advanced_button.addActionListener(new ActionListener(){
+
+						@Override
+						public void actionPerformed(ActionEvent arg0) {
+							
+							clusterDialog = new ClusterFrameWindow(viewFrame, outer);
+							clusterDialog.setVisible(true);
+							
+						}
+						
+					});
+					buttonPanel.add(advanced_button, "alignx 50%, span, pushx");
 			    	
+					this.add(buttonPanel, "span, pushx, growx");
 				  }
 				}
 		
@@ -939,7 +391,6 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 					
 			  		//set this panel's layout
 			  		this.setLayout(new MigLayout("", "[]push[]"));
-			  		//this.setBorder(BorderFactory.createTitledBorder("Genes"));
 					setBackground(Color.white);
 			  		
 			  		//create checkbox
@@ -1012,9 +463,10 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 			private static final long serialVersionUID = 1L;
 			
 			//Instance variables
-			private JButton cluster_button, advanced_button;
+			private JButton cluster_button;
 			private JComboBox<String> clusterChoice;
-			private ClusterFrame clusterDialog;
+			private JLabel status1, status2;
+			private String path;
 		    
 			//Constructor
 			public FinalOptionsPanel() {
@@ -1023,23 +475,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		
 				//Button Component
 				JPanel buttonPanel = new JPanel();
-				//buttonPanel.setBorder(BorderFactory.createTitledBorder("Choose Cluster Method"));
 				buttonPanel.setLayout(new MigLayout());
-				
-				//Advanced Options Button
-				advanced_button = new JButton("Advanced Options >>");
-				advanced_button.addActionListener(new ActionListener(){
-
-					@Override
-					public void actionPerformed(ActionEvent arg0) {
-						
-						clusterDialog = new ClusterFrameWindow(viewFrame, outer);
-						clusterDialog.setVisible(true);
-						
-					}
-					
-				});
-				buttonPanel.add(advanced_button, "alignx 50%, span, wrap");
 				
 				//ProgressBar Component
 				final JPanel loadPanel = new JPanel();
@@ -1048,12 +484,20 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 				//ClusterChoice ComboBox
 				String[] clusterMethods = {"Single Linkage", "Centroid Linkage", "Average Linkage", "Complete Linkage"};
 				clusterChoice = new JComboBox<String>(clusterMethods);
+				Dimension d = clusterChoice.getPreferredSize();
+				d.setSize(d.getWidth()*2, d.getHeight()*2);
+				clusterChoice.setPreferredSize(d);
+				clusterChoice.setFont(new Font("Sans Serif", Font.PLAIN, 18));
 				clusterChoice.setBackground(Color.white);
 				
-				buttonPanel.add(clusterChoice);
+				buttonPanel.add(clusterChoice, "alignx 50%, wrap");
 				
 		    	//button with action listener
 		    	cluster_button = new JButton("Cluster");
+		  		Dimension d2 = cluster_button.getPreferredSize();
+		  		d2.setSize(d2.getWidth()*2, d2.getHeight()*2);
+		  		cluster_button.setPreferredSize(d2);
+		  		cluster_button.setFont(new Font("Sans Serif", Font.PLAIN, 18));
 		    	cluster_button.addActionListener(new ActionListener(){
 		    		
 		    
@@ -1073,7 +517,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 						pBar.setVisible(true);
 						
 						final JLabel clusterLabel = new JLabel("Clustering...");
-						clusterLabel.setFont(new Font("Sans Serif", Font.PLAIN, 16));
+						clusterLabel.setFont(new Font("Sans Serif", Font.PLAIN, 22));
 						loadPanel.add(clusterLabel, "alignx 50%, span, wrap");
 						
 						//Add it to JPanel Object
@@ -1105,6 +549,15 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 								
 								clusterLabel.setText("Clustering done!");
 								pBar.setForeground(new Color(0, 200, 0, 255));
+								
+								status1 = new JLabel("The file has been saved in the original directory.");
+								status1.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+								loadPanel.add(status1, "growx, pushx, wrap");
+								
+								status2 = new JLabel("File Path: " + path);
+								status2.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+								loadPanel.add(status2, "growx, pushx, wrap");
+								
 								mainPanel.revalidate();
 								mainPanel.repaint();	
 							}
@@ -1112,12 +565,16 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 						worker.execute();	
 					}	
 		    	});
-		    	buttonPanel.add(cluster_button);
+		    	buttonPanel.add(cluster_button, "alignx 50%");
 
 		    	buttonPanel.setOpaque(false);
 		    	this.add(buttonPanel, "alignx 50%, pushx, wrap");
 			  }
-			}	
+			
+			public void setPath(String filePath){
+				path = filePath;
+			}
+		}	
 		
 
 	private void hCluster(int method, double[] currentArray, String similarityM, JProgressBar pBar) 
@@ -1148,6 +605,8 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		List<List<Double>> geneDistances  = clusterTarget.euclid(aoArrays, pBar);
 		
 		clusterTarget.cluster(geneDistances, pBar);
+		
+		finalPanel.setPath(clusterTarget.getFilePath());
 		
 	}
 	
@@ -1292,12 +751,6 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 	protected DataModel getDataModel() {
 		return this.dataModel;
 	}
-	/**
-	 * The following arrays allow translation to and from screen and datamatrix 
-	 * I had to add these in order to have gaps in the dendroview of k-means
-	 */
-	private int [] arrayIndex  = null;
-	private int [] geneIndex   = null;
 
 	protected ConfigNode root;
 	/** Setter for root  - may not work properly
@@ -1308,11 +761,19 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 	public ConfigNode getConfigNode() {
 		return root;
 	}
-
-
-
+	
 	@Override
-	public void update(Observable arg0, Object arg1) {
+	public void populateSettingsMenu(TreeviewMenuBarI menubar) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void populateAnalysisMenu(TreeviewMenuBarI menubar) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void populateExportMenu(TreeviewMenuBarI menubar) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -1327,27 +788,12 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		
 	}
 	@Override
-	public void export(MainProgramArgs args) throws ExportException {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
 	public ImageIcon getIcon() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
-	public void populateSettingsMenu(TreeviewMenuBarI menubar) {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void populateAnalysisMenu(TreeviewMenuBarI menubar) {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void populateExportMenu(TreeviewMenuBarI menubar) {
+	public void export(MainProgramArgs args) throws ExportException {
 		// TODO Auto-generated method stub
 		
 	}

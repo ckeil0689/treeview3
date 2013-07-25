@@ -39,6 +39,7 @@ public class HierarchicalCluster {
 	private int method;
 	private String similarity;
 	private JFrame frame;
+	private String filePath;
 	
 	IntHeaderInfoCluster headerInfo = new IntHeaderInfoCluster();
 	
@@ -319,17 +320,24 @@ public class HierarchicalCluster {
 		
     	}
     	
-    	
 		//Test Output
 		//System.out.println("Closest Gene Pair: " + Arrays.toString(smallGene));
     	System.out.println("Gene Connections: " + genePairs.size());
     	
     	System.out.println("GTR Matrix Size: " + gtrMatrix.size());
     	
-    	ClusterFileWriter gtrFile = new ClusterFileWriter(frame);
+    	ClusterFileWriter gtrFile = new ClusterFileWriter(frame, model);
     	
     	gtrFile.writeGTRFile(gtrMatrix);
     	
+    	filePath = gtrFile.getFilePath();
+    	
+    }
+    
+    
+    public String getFilePath(){
+    	
+    	return filePath;
     }
     
     
