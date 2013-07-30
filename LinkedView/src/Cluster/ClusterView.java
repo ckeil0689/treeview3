@@ -106,6 +106,9 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 	private double[] dataArray;
 	private double[] rangeArray;
 	
+	private boolean isElements = true;
+	private boolean isArrays = false;
+	
 	/**
 	 *  Constructor for the DendroView object
 	 * note this will reuse any existing MainView subnode of the documentconfig.
@@ -632,7 +635,8 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		}
 		
 		//begin operations on clusterTarget...
-		List<List<Double>> aoArrays = clusterTarget.splitList(currentList, pBar);
+		List<List<Double>> sepElements = clusterTarget.splitElements(currentList, pBar);
+		List<List<Double>> sepArrays = clusterTarget.splitArrays(currentList, pBar);
 		
 		//use int method to determine the distance/ similarity matrix algorithm
 		//return distance/ similarity matrix and use as input to clustering function
@@ -642,9 +646,11 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 //		System.out.println("ArrayList Length: " + listRep);
 //		System.out.println("ArrayList Element: " + Arrays.toString(aoArrays.get(0)));
 
-		List<List<Double>> geneDistances  = clusterTarget.euclid(aoArrays, pBar);
+		List<List<Double>> elementDistances  = clusterTarget.euclid(sepElements, pBar);
+		List<List<Double>> arrayDistances  = clusterTarget.euclid(sepArrays, pBar);
 		
-		clusterTarget.cluster(geneDistances, pBar);
+		clusterTarget.cluster(elementDistances, pBar, isElements);
+		clusterTarget.cluster(arrayDistances, pBar, isArrays);
 		
 		finalPanel.setPath(clusterTarget.getFilePath());
 		

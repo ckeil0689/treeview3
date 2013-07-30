@@ -24,7 +24,7 @@ public class ClusterFileWriter {
 		this.model = model;
 	}
 	
-	public void writeGTRFile(List<List<String>> input){
+	public void writeFile(List<List<String>> input, boolean type){
 		
 		String content = "";
 		
@@ -66,7 +66,14 @@ public class ClusterFileWriter {
 //				
 //			}
 			
-			file = new File(model.getSource().substring(0, model.getSource().length()- 4) + ".gtr");
+			if(type){
+			
+				file = new File(model.getSource().substring(0, model.getSource().length()- 4) + ".gtr");
+			}
+			else{
+				
+				file = new File(model.getSource().substring(0, model.getSource().length()- 4) + ".atr");
+			}
 				
 			file.createNewFile();
 				

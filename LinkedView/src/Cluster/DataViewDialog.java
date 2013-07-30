@@ -1,7 +1,6 @@
 package Cluster;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JDialog;
@@ -23,7 +22,7 @@ public class DataViewDialog extends JDialog{
 	ClusterModel.ClusterDataMatrix matrix;
 	
 	private double[] dataArray;
-	private List<double[]> geneList;
+//	private List<List<Double>> geneList;
 	private List<List<Double>> arraysList;
 	
 	public DataViewDialog(ClusterModel model, JFrame mainFrame){
@@ -40,30 +39,26 @@ public class DataViewDialog extends JDialog{
 		
 		matrix = model.getDataMatrix();
 		dataArray = matrix.getExprData();
-		geneList = splitGenes(dataArray, model);
-		splitArrays(dataArray, model);
+		
+		List<Double> gList = new ArrayList<Double>();
+		
+		for(double d : dataArray){
+			
+			gList.add(d);
+		}
+		
+//		geneList = splitGenes(dataArray, model);
+		arraysList = splitArrays(gList, model);
 		
 		String[][] geneNames = model.geneHeaderInfo.getHeaderArray();
 		
 		String[] title = model.geneHeaderInfo.getNames();
 		
-		//create trial table with demo data to add to JSplitPane
-		//JTable can either accept raw string array data or Vectors
-		//Vectors preferred because they can be resized and optimiz memory allocation
-//		JTable table = new JTable(new ClusterTableModel(geneList, model));
-//		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+//		String[][] arrayNames = model.arrayHeaderInfo.getHeaderArray();
 //		
-//		//create a scrollPane with he table in it 
-//		JScrollPane tableScroll = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
-//				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-//		table.setFillsViewportHeight(true);
-//		
-//		JTable rowTable = new RowNumberTable(table);
-//		
-//		JTable geneTable = new JTable(geneNames, title);
+//		String[] title2 = model.arrayHeaderInfo.getNames();
 		
-		//--------------------------------------------------------
-		JTable table = new JTable(new ClusterTableModel(geneList, model));
+		JTable table = new JTable(new ClusterTableModel(arraysList, model));
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		
 		//create a scrollPane with he table in it 
@@ -74,7 +69,7 @@ public class DataViewDialog extends JDialog{
 		JTable rowTable = new RowNumberTable(table);
 		
 		JTable geneTable = new JTable(geneNames, title);
-		//----------------------------------------------------------
+
 		geneTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		
 		tableScroll.setRowHeaderView(geneTable);
@@ -91,71 +86,58 @@ public class DataViewDialog extends JDialog{
 	}
 	
 	//function to split up a long array into smaller arrays
-	public List <double[]> splitGenes(double[] array, ClusterModel model){
+	public List <List<Double>> splitGenes(List<Double> gList, ClusterModel model){
 		
 		int lower = 0;
 		int upper = 0;
 		int max = model.nExpr();
 		
-		List<double[]> geneList = new ArrayList<double[]>();
+		List<List<Double>> geneList = new ArrayList<List<Double>>();
 		
-		for(int i = 0; i < array.length/max; i++){
+		for(int i = 0; i < gList.size()/max; i++){
 			
 			upper+=max;
 			
-			geneList.add(Arrays.copyOfRange(array, lower, upper));
+			geneList.add(gList.subList(lower, upper));
 			
 			lower = upper;
 			
 		}
 		
-		if(upper < array.length -1){
+		if(upper < gList.size() -1){
 			
 			lower = upper;
-			upper = array.length;
+			upper = gList.size();
 			
-			geneList.add(Arrays.copyOfRange(array, lower, upper));
+			geneList.add(gList.subList(lower, upper));
 		}
 	
 		return geneList;
 	}
 	
-	public List <List<Double>> splitArrays(double[] array, ClusterModel model){
+	public List <List<Double>> splitArrays(List<Double> gList, ClusterModel model){
 		
 		//number of arrays/ columns (3277 for test)
 		int max = model.nExpr();
 		int nGenes = model.nGene();
 		
 		arraysList = new ArrayList<List<Double>>();
-		List<Double> sArray = new ArrayList<Double>();
 		
 		//iterate through columns ...max
 		for(int j = 0; j < max; j++){
 			
-			sArray.clear();
+			List<Double> sArray = new ArrayList<Double>();
 			
 			for(int i = 0; i < nGenes; i++){
 				
 				int element = (i * max) + j;
-//				System.out.println("Element: " + element);
-//				System.out.println("Array Element: " + array[element * max]);
 				
-				//gets every 3277th value
-				sArray.add(array[element]);
+				sArray.add(gList.get(element));
 				
 			}
 			
-			System.out.println("j " + j);
-			
 			arraysList.add(sArray);
-			
-			System.out.println("sArray Element: " + sArray.toString());
-			System.out.println("sArray Element Length: " + sArray.size());
 		}
-		
-		System.out.println("arraysList Size: " + arraysList.size());
-		System.out.println("arraysList E1455 Size: " + arraysList.get(1455).size());
-		System.out.println("arraysList E1455: " + arraysList.get(1455).toString());
 	
 		return arraysList;
 	}

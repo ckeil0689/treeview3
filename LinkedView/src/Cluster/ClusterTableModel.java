@@ -10,29 +10,31 @@ public class ClusterTableModel extends AbstractTableModel{
 	private static final long serialVersionUID = 1L;
 	
 	//Instance variables
-	List<double[]> arrayList;
+	List<List<Double>> tableList;
 	ClusterModel currentModel;
 	
-	public ClusterTableModel(List<double[]> arrayList, ClusterModel currentModel){
-		this.arrayList = arrayList; 
+	public ClusterTableModel(List<List<Double>> tableList, ClusterModel currentModel){
+		this.tableList = tableList; 
 		this.currentModel = currentModel;
 	}
+	
+	//Depends on whether elements or arrays are used in DataViewDialog!
 	@Override
 	public int getColumnCount() {
 		
-		return arrayList.get(0).length;
+		return tableList.size();
 	}
 
 	@Override
 	public int getRowCount() {
 		
-		return arrayList.size();
+		return tableList.get(0).size();
 	}
 
 	@Override
 	public Object getValueAt(int arg0, int arg1) {
 
-		return currentModel.getValue(arg0, arg1);
+		return currentModel.getValue(arg1, arg0);
 	}
 	
 	@Override

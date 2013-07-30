@@ -53,10 +53,8 @@ public class HierarchicalCluster {
 		this.frame = currentFrame;
 	}
 	
-	//Step 1: Create Similarity matrices (one for genes, one for samples) according to all 
-	//the different measurement options (correlation, Euclidean distance etc.)
-	//differentiate between gene and array cluster!
-	public List <List<Double>> splitList(List<Double> list, JProgressBar pBar){
+	//getting elements from raw data array
+	public List <List<Double>> splitElements(List<Double> list, JProgressBar pBar){
 		
 		int lower = 0;
 		int upper = 0;
@@ -92,27 +90,38 @@ public class HierarchicalCluster {
 		return geneList;
 	}
 	
+	//getting the arrays from raw data array
+	public List <List<Double>> splitArrays(List<Double> list, JProgressBar pBar){
+		
+		//number of arrays/ columns (3277 for test)
+		int max = model.nExpr();
+		int nGenes = model.nGene();
+		
+		//setting up progressbar
+		pBar.setMaximum(list.size()/max);
+		
+		List<List<Double>> arraysList = new ArrayList<List<Double>>();
+		
+		//iterate through columns ...max
+		for(int j = 0; j < max; j++){
+			
+			pBar.setValue(j);
+			
+			List<Double> sArray = new ArrayList<Double>();
+			
+			for(int i = 0; i < nGenes; i++){
+				
+				int element = (i * max) + j;
+				
+				sArray.add(list.get(element));
+				
+			}
+			
+			arraysList.add(sArray);
+		}
 	
-	
-	
-//	//gene similarity matrix, euclidean distance
-//	//first get an array of arrays for all genes (rows)
-//	public double[] getRow(int rowN){
-//		
-//		return dataArray;
-//	}
-//	
-//	
-//	//get a certain value from the datamatrix
-//    public double getValue(int x, int y) {
-//		int nexpr = model.nExpr();//columns
-//		int ngene = model.nGene();//rows
-//		if ((x < nexpr) && (y < ngene) && (x >= 0) && (y >= 0)) {
-//			return dataArray[x + y * nexpr];
-//		} else {
-//			return DataModel.NODATA;
-//		}
-//	}
+		return arraysList;
+	}
     
 	//Euclidean Distance
     //returns Euclidean PROXIMITY MATRIX, N x N;
@@ -192,8 +201,8 @@ public class HierarchicalCluster {
     	}
     	
     	
-    	System.out.println("GeneDL Length: " + geneDistanceList.size());
-    	System.out.println("GeneList Element Length: " + geneDistanceList.get(0).size());
+    	System.out.println("DL Length: " + geneDistanceList.size());
+    	System.out.println("DL Element Length: " + geneDistanceList.get(0).size());
     	
     	//Fusing all genes and their distances together to one array
     	//double[] fusedArray = concatAll(geneDistanceList.get(0),geneDistanceList.subList(1, geneDistanceList.size()));
@@ -203,7 +212,7 @@ public class HierarchicalCluster {
     	return geneDistanceList;
     }
 	
-    public void cluster(List<List<Double>> geneDList, JProgressBar pBar){
+    public void cluster(List<List<Double>> geneDList, JProgressBar pBar, boolean type){
 		
     	//CDT file from Cluster 3.0 adds one column with gene tags according to following rule: 
     	//(GENE) + (gene number in original dataset starting at 0) + (X) --> Example: First Gene: GENE0X
@@ -211,7 +220,7 @@ public class HierarchicalCluster {
     	
     	List<String[]> genePairs = new ArrayList<String[]>();
     	List<Double> minValues = new ArrayList<Double>();
-    	List<List<String>> gtrMatrix = new ArrayList<List<String>>();
+    	List<List<String>> dataMatrix = new ArrayList<List<String>>();
     	
     	//progressbar maximum = amount of genes
     	pBar.setMaximum(geneDList.size());
@@ -257,15 +266,23 @@ public class HierarchicalCluster {
     		minValues.add(min);
     		
     		//generate names and the pair of the current gene (i) and the gene closest to it (pos)
-    		distPair[0] = "GENE" + i + "X";
-    		distPair[1] = "GENE" + pos + "X";
+    		if(type){
+    			
+	    		distPair[0] = "GENE" + i + "X";
+	    		distPair[1] = "GENE" + pos + "X";
+    		}
+    		else{
+    			
+    			distPair[0] = "ARRY" + i + "X";
+	    		distPair[1] = "ARRY" + pos + "X";
+    		}
     		
     		//add the pair to a list
     		genePairs.add(distPair);
     		
     	}
     	
-    	System.out.println("GenePairs Length Pre: " + genePairs.size());
+    	System.out.println("Pairs Length Pre: " + genePairs.size());
     	System.out.println("MinValues Length Pre: " + minValues.size());
     	
     	List<Double> orderedMin = new ArrayList<Double>(minValues);
@@ -291,7 +308,7 @@ public class HierarchicalCluster {
 			geneLink.add(newNode);
 			
 			//Check all elements already added to gtrList
-			for(List<String> element : gtrMatrix){
+			for(List<String> element : dataMatrix){
 				
 				//if any element contains a gene of the current checked pair (smallGene)
 				//add the none-duplicate gene to geneLink
@@ -316,7 +333,7 @@ public class HierarchicalCluster {
 			geneLink.add(smallGene[1]);
 			
 			//add connection to gtrMatrix
-			gtrMatrix.add(geneLink);
+			dataMatrix.add(geneLink);
 		
     	}
     	
@@ -324,16 +341,14 @@ public class HierarchicalCluster {
 		//System.out.println("Closest Gene Pair: " + Arrays.toString(smallGene));
     	System.out.println("Gene Connections: " + genePairs.size());
     	
-    	System.out.println("GTR Matrix Size: " + gtrMatrix.size());
+    	System.out.println("GTR Matrix Size: " + dataMatrix.size());
     	
-    	ClusterFileWriter gtrFile = new ClusterFileWriter(frame, model);
-    	
-    	gtrFile.writeGTRFile(gtrMatrix);
-    	
-    	filePath = gtrFile.getFilePath();
+    	ClusterFileWriter dataFile = new ClusterFileWriter(frame, model);
+
+    		dataFile.writeFile(dataMatrix, type);
+    		filePath = dataFile.getFilePath();
     	
     }
-    
     
     public String getFilePath(){
     	
