@@ -87,7 +87,7 @@ public class ClusterFrame extends JFrame{
 	
 	//Various GUI Panels
 	private JScrollPane scrollPane;
-	private JPanel mainPanel, backgroundPanel, closeButtonPane;
+	private JPanel mainPanel, backgroundPanel, closeButtonPane, optionsPanel;
 	private JLabel head1, head2, titleLine, description1, description2;
 	private FilterOptionsPanel filterOptions;
 	private RemovePercentPanel percentPanel;
@@ -97,7 +97,7 @@ public class ClusterFrame extends JFrame{
 	private MaxMinPanel maxMinPanel;
 	private GeneAdjustPanel geneAdjustPanel;
 	private ArrayAdjustPanel arrayAdjustPanel;
-	private JButton back, close;
+	private JButton close_button;
 	
 	//Object of the loaded model and matrix 
 	private ClusterModel outer;
@@ -105,7 +105,6 @@ public class ClusterFrame extends JFrame{
 	
 	//Instance variable in which the loaded data array is being stored
 	private double[] dataArray;
-	private double[] rangeArray;
 	
 	//Constructor
 	protected ClusterFrame(TreeViewFrame f, String title, DataModel dataModel) { 
@@ -120,10 +119,6 @@ public class ClusterFrame extends JFrame{
 		outer = (ClusterModel) clusterModel;
 		matrix = outer.getDataMatrix();
 		dataArray = matrix.getExprData();
-		rangeArray = Arrays.copyOfRange(dataArray, 50, 100);
-		
-		//final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-	
 		
 		//setup frame options
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -150,19 +145,26 @@ public class ClusterFrame extends JFrame{
 		description2.setFont(new Font("Sans Serif", Font.PLAIN, 22));
 		mainPanel.add(description2, "pushx, growx, wrap");
 		
+		optionsPanel = new JPanel();
+		optionsPanel.setLayout(new MigLayout());
+		optionsPanel.setOpaque(false);
+		optionsPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+		
 		head1 = new JLabel("Filter Data >>");
 		head1.setFont(new Font("Sans Serif", Font.PLAIN, 28));
-		head1.setForeground(new Color(110, 210, 255, 255));
-		mainPanel.add(head1, "pushx, growx, wrap");
+		head1.setForeground(new Color(60, 180, 220, 255));
+		optionsPanel.add(head1, "pushx, growx, span, wrap");
 		head1.setVisible(true);
 		
 		filterOptions = new FilterOptionsPanel();
 		
 		head2 = new JLabel("Adjust Data >>");
 		head2.setFont(new Font("Sans Serif", Font.PLAIN, 28));
-		head2.setForeground(new Color(110, 210, 255, 255));
-		mainPanel.add(head2, "pushx, growx, wrap");
+		head2.setForeground(new Color(60, 180, 220, 255));
+		optionsPanel.add(head2, "pushx, growx, span");
 		head2.setVisible(true);
+		
+		mainPanel.add(optionsPanel, "grow, push");
 		
 		aoPanel = new AdjustOptionsPanel();
 		
@@ -171,8 +173,14 @@ public class ClusterFrame extends JFrame{
 		closeButtonPane.setVisible(true);
 		
 		
-		close = new JButton("<< Back");
-		close.addActionListener(new ActionListener(){
+		close_button = new JButton("Close");
+		close_button.setOpaque(true);
+		close_button.setBackground(new Color(60, 180, 220, 255));
+		close_button.setForeground(Color.white);
+		Dimension d = close_button.getPreferredSize();
+		d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
+		close_button.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+		close_button.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -183,7 +191,7 @@ public class ClusterFrame extends JFrame{
 			
 		});
 		closeButtonPane.setOpaque(false);
-		closeButtonPane.add(close);
+		closeButtonPane.add(close_button);
 		
 		head1.addMouseListener(new MouseListener(){
 
@@ -192,33 +200,27 @@ public class ClusterFrame extends JFrame{
 				
 				if(filterOptions.isShowing()){
 					
-					mainPanel.removeAll();
-					mainPanel.add(titleLine, "pushx, growx, wrap");
-					mainPanel.add(description1, "pushx, growx, wrap");
-					mainPanel.add(description2, "pushx, growx, wrap");
-					mainPanel.add(head1, "pushx, growx, wrap");
-					mainPanel.add(head2, "pushx, growx, wrap");
+					optionsPanel.removeAll();
+					optionsPanel.add(head1, "pushx, growx, wrap");
+					optionsPanel.add(head2, "pushx, growx, wrap");
 					head1.setText("Filter Data >>");
 					head2.setText("Adjust Data >>");
 					head1.setOpaque(false);
-					//mainPanel.add(closeButtonPane, "alignx 50%, pushx");
 					mainPanel.revalidate();
 					mainPanel.repaint();
 				}
 				else{
-					mainPanel.removeAll();
-					mainPanel.add(titleLine, "pushx, growx, wrap");
-					mainPanel.add(description1, "pushx, growx, wrap");
-					mainPanel.add(description2, "pushx, growx, wrap");
+					optionsPanel.removeAll();
 					head1.setText("Filter Data v");
-					head1.setBackground(new Color(110, 210, 255, 255));
-					head1.setForeground(Color.black);
-					head1.setOpaque(true);
-					mainPanel.add(head1, "pushx, growx, wrap");
-					mainPanel.add(filterOptions, "grow, push, wrap");
+					//head1.setBackground(new Color(110, 210, 255, 255));
+					head1.setForeground(new Color(240, 80, 50, 255));
+					//head1.setOpaque(true);
+					optionsPanel.add(head1, "pushx, growx, wrap");
+					optionsPanel.add(filterOptions, "grow, push, wrap");
 					head2.setText("Adjust Data >>");
-					mainPanel.add(head2, "pushx, growx, wrap");
-					//mainPanel.add(closeButtonPane, "alignx 50%, pushx");
+					head2.setForeground(new Color(60, 180, 220, 255));
+					head2.setOpaque(false);
+					optionsPanel.add(head2, "pushx, growx, wrap");
 					mainPanel.revalidate();
 					mainPanel.repaint();
 				}
@@ -235,6 +237,7 @@ public class ClusterFrame extends JFrame{
 				else{
 					
 					head1.setForeground(Color.LIGHT_GRAY);
+
 				}
 				
 			}
@@ -247,7 +250,7 @@ public class ClusterFrame extends JFrame{
 				}
 				else{
 					
-					head1.setForeground(new Color(110, 210, 255, 255));
+					head1.setForeground(new Color(60, 180, 220, 255));
 				}
 			}
 
@@ -272,33 +275,27 @@ public class ClusterFrame extends JFrame{
 				
 				if(aoPanel.isShowing()){
 					
-					mainPanel.removeAll();
-					mainPanel.add(titleLine, "pushx, growx, wrap");
-					mainPanel.add(description1, "pushx, growx, wrap");
-					mainPanel.add(description2, "pushx, growx, wrap");
-					mainPanel.add(head1, "alignx 50%, pushx, growx, wrap");
-					mainPanel.add(head2, "alignx 50%, pushx, growx, wrap");
+					optionsPanel.removeAll();
+					optionsPanel.add(head1, "alignx 50%, pushx, growx, wrap");
+					optionsPanel.add(head2, "alignx 50%, pushx, growx, wrap");
 					head1.setText("Filter Data >>");
 					head2.setText("Adjust Data >>");
 					head2.setOpaque(false);
-					//mainPanel.add(closeButtonPane, "alignx 50%, pushx");
 					mainPanel.revalidate();
 					mainPanel.repaint();
 				}
 				else{
-					mainPanel.removeAll();
-					mainPanel.add(titleLine, "pushx, growx, wrap");
-					mainPanel.add(description1, "pushx, growx, wrap");
-					mainPanel.add(description2, "pushx, growx, wrap");
+					optionsPanel.removeAll();
 					head1.setText("Filter Data >>");
-					mainPanel.add(head1, "alignx 50%, pushx, growx, wrap");
+					head1.setForeground(new Color(60, 180, 220, 255));
+					head1.setOpaque(false);
+					optionsPanel.add(head1, "alignx 50%, pushx, growx, wrap");
 					head2.setText("Adjust Data v");
-					head2.setBackground(new Color(110, 210, 255, 255));
-					head2.setForeground(Color.black);
-					head2.setOpaque(true);
-					mainPanel.add(head2, "alignx 50%, pushx, growx, wrap");
-					mainPanel.add(aoPanel, "grow, push, wrap");
-					//mainPanel.add(closeButtonPane, "alignx 50%, pushx");
+					//head2.setBackground(new Color(110, 210, 255, 255));
+					head2.setForeground(new Color(240, 80, 50, 255));
+					//head2.setOpaque(false);
+					optionsPanel.add(head2, "alignx 50%, pushx, growx, wrap");
+					optionsPanel.add(aoPanel, "grow, push, wrap");
 					mainPanel.revalidate();
 					mainPanel.repaint();
 				}
@@ -327,7 +324,7 @@ public class ClusterFrame extends JFrame{
 				}
 				else{
 					
-					head2.setForeground(new Color(110, 210, 255, 255));
+					head2.setForeground(new Color(60, 180, 220, 255));
 				}
 			}
 
@@ -390,7 +387,7 @@ public class ClusterFrame extends JFrame{
 			instructions = new JLabel("Check all filter options you would like to apply. Then click 'Remove'.");
 			instructions.setFont(new Font("Sans Serif", Font.PLAIN, 22));
 	    	instructions.setOpaque(false);
-			this.add(instructions, "wrap");
+			//this.add(instructions, "wrap");
 			
 			//Inner components of this panel, objects of other inner classes
 			//Component 1 
@@ -416,6 +413,12 @@ public class ClusterFrame extends JFrame{
 	    	
 	    	//remove button with action listener
 	    	remove_button = new JButton("Filter Data");
+	    	remove_button.setOpaque(true);
+	    	remove_button.setBackground(new Color(60, 180, 220, 255));
+	    	remove_button.setForeground(Color.white);
+			Dimension d = remove_button.getPreferredSize();
+			d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
+			remove_button.setFont(new Font("Sans Serif", Font.PLAIN, 18));
 	    	remove_button.addActionListener(new ActionListener(){
 
 				@Override
@@ -434,35 +437,20 @@ public class ClusterFrame extends JFrame{
 
 		private static final long serialVersionUID = 1L;
 		
-			private JLabel label;
+			private JLabel label, description;
 			private JTextField percentField;
 			private int textFieldSize = 5;
-			private JButton info_button;
 
 			  public RemovePercentPanel() {
 				this.setLayout(new MigLayout("", "[]push[]"));
 				setResizable(true);
 				
-		    	check1 = new JCheckBox("Data Completeness per Element");
+		    	check1 = new JCheckBox("Incomplete Elements");
+		    	check1.setFont(new Font("Sans Serif", Font.BOLD, 18));
+		    	//check1.setForeground(new Color(60, 180, 220, 255));
 		    	check1.setOpaque(false);
-		    	this.add(check1, "alignx 0%");
-		    	
-		    	JPanel bPane = new JPanel();
-		    	bPane.setOpaque(false);
-		    	info_button = new JButton("Info");
-		    	
-		    	info_button.addActionListener(new ActionListener(){
-
-					@Override
-					public void actionPerformed(ActionEvent arg0) {
-						
-					}	
-		    	});
-		    	
-		    	bPane.add(info_button);
-		    	this.add(bPane, "wrap, pushx, growx");
-		    	
-		    	
+		    	this.add(check1, "alignx 0%, wrap");
+		    		    	
 		    	//valuefield
 		    	percentField = new JTextField(textFieldSize);
 		    	percentField.addFocusListener(new FocusListener(){
@@ -479,241 +467,434 @@ public class ClusterFrame extends JFrame{
 					}
 		    		
 		    	});
-		    	
-		    	
+		    			    	
 		    	JPanel valuePane = new JPanel();
 		    	valuePane.setLayout(new MigLayout());
 		    	valuePane.setOpaque(false);
 		    	
 		    	label = new JLabel();
 		    	label.setText("Enter Percentage: ");
-		    	label.setFont(new Font("Sans Serif", Font.PLAIN, 20));
+		    	label.setFont(new Font("Sans Serif", Font.PLAIN, 18));
 		    	
-		    	valuePane.add(label, "alignx 0%");
+		    	valuePane.add(label, "alignx 0%, pushx");
 		    	valuePane.add(percentField);
 
-		    	this.add(valuePane);
+		    	this.add(valuePane, "span, wrap");
+		    	
+		    	description = new JLabel("> ?");
+		    	description.setFont(new Font("Sans Serif", Font.BOLD, 14));
+		    	description.setForeground(new Color(60, 180, 220, 255));
+		    	description.addMouseListener(new MouseListener(){
+
+					@Override
+					public void mouseClicked(MouseEvent arg0) {
+						
+						if(description.getText().equalsIgnoreCase("> ?")){
+							
+							description.setText("< Remove all elements which exceed a percentage limit " +
+									"of missing values in their columns.");
+							description.setFont(new Font("Sans Serif", Font.ITALIC, 14));
+							description.setForeground(Color.black);
+						}
+						else{
+							
+							description.setText("> ?");
+							description.setFont(new Font("Sans Serif", Font.BOLD, 14));
+							description.setForeground(new Color(60, 180, 220, 255));
+						}
+						
+					}
+
+					@Override
+					public void mouseEntered(MouseEvent arg0) {
+						
+						if(description.getText().equalsIgnoreCase("> ?")){
+							
+							description.setForeground(new Color(240, 80, 50, 255));
+							
+						}
+					}
+
+					@Override
+					public void mouseExited(MouseEvent arg0) {
+						
+						if(description.getText().equalsIgnoreCase("> ?")){
+							
+							description.setForeground(new Color(60, 180, 220, 255));
+						}
+					}
+
+					@Override
+					public void mousePressed(MouseEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public void mouseReleased(MouseEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+		    		
+		    	});
+		    	this.add(description);
 			  }
-			}
+	  }
   
 	  class RemoveSDPanel extends JPanel {	
 	
 			private static final long serialVersionUID = 1L;
 			
 			private JTextField sdField;
-			private JLabel enterLabel;
+			private JLabel enterLabel, description;
 			private int textFieldSize = 5;
-			private JButton info_button;
 			    
-				  public RemoveSDPanel() {
-					this.setLayout(new MigLayout("", "[]push[]"));
-					setSize(this.getSize());
-			    	
-			    	check2 = new JCheckBox("Standard Deviation (Gene Vector)");
-			    	check2.setOpaque(false);
-			    	this.add(check2, "alignx 0%");
-			    	
-			    	JPanel bPane = new JPanel();
-			    	bPane.setOpaque(false);
-			    	info_button = new JButton("Info");
-			    	
-			    	info_button.addActionListener(new ActionListener(){
-	
-						@Override
-						public void actionPerformed(ActionEvent arg0) {
-							
-						}
-			    	});
-			    	
-			    	bPane.add(info_button);
-			    	this.add(bPane, " wrap");
-			    	
-			    	JPanel valuePane = new JPanel();
-			    	valuePane.setLayout(new MigLayout());
-			    	valuePane.setOpaque(false);
-			    	
-			    	sdField = new JTextField(textFieldSize);
-			    	sdField.addFocusListener(new FocusListener(){
+			public RemoveSDPanel() {
+					  
+				this.setLayout(new MigLayout("", "[]push[]"));
+				setSize(this.getSize());
+		    	
+		    	check2 = new JCheckBox("Minimum Standard Deviation");
+		    	check2.setFont(new Font("Sans Serif", Font.BOLD, 18));
+		    	//check2.setForeground(new Color(60, 180, 220, 255));
+		    	check2.setOpaque(false);
+		    	this.add(check2, "alignx 0%, wrap");
+		    	
+		    	JPanel valuePane = new JPanel();
+		    	valuePane.setLayout(new MigLayout());
+		    	valuePane.setOpaque(false);
+		    	
+		    	sdField = new JTextField(textFieldSize);
+		    	sdField.addFocusListener(new FocusListener(){
 
-						@Override
-						public void focusGained(FocusEvent arg0) {
-							check2.setSelected(true);
-							
-						}
+					@Override
+					public void focusGained(FocusEvent arg0) {
+						check2.setSelected(true);
+						
+					}
 
-						@Override
-						public void focusLost(FocusEvent arg0) {
+					@Override
+					public void focusLost(FocusEvent arg0) {
+						
+						
+					}
+		    		
+		    	});
+		    	
+		    	enterLabel = new JLabel();
+		    	enterLabel.setOpaque(false);
+		    	enterLabel.setText("Enter a Standard Deviation: ");
+		    	enterLabel.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+		    	
+		    	valuePane.add(enterLabel, "alignx 0%, pushx");
+		    	valuePane.add(sdField);
+
+		    	this.add(valuePane, "span, wrap");
+		    	
+		    	description = new JLabel("> ?");
+		    	description.setFont(new Font("Sans Serif", Font.BOLD, 14));
+		    	description.setForeground(new Color(60, 180, 220, 255));
+		    	description.addMouseListener(new MouseListener(){
+
+					@Override
+					public void mouseClicked(MouseEvent arg0) {
+						
+						if(description.getText().equalsIgnoreCase("> ?")){
 							
+							description.setText("< Remove all elements with standard deviations " +
+									"of their values less than a set value.");
+							description.setFont(new Font("Sans Serif", Font.ITALIC, 14));
+							description.setForeground(Color.black);
+						}
+						else{
+							
+							description.setText("> ?");
+							description.setFont(new Font("Sans Serif", Font.BOLD, 14));
+							description.setForeground(new Color(60, 180, 220, 255));
+						}
+						
+					}
+
+					@Override
+					public void mouseEntered(MouseEvent arg0) {
+						
+						if(description.getText().equalsIgnoreCase("> ?")){
+							
+							description.setForeground(new Color(240, 80, 50, 255));
 							
 						}
-			    		
-			    	});
-			    	
-			    	enterLabel = new JLabel();
-			    	enterLabel.setOpaque(false);
-			    	enterLabel.setText("Enter a Standard Deviation: ");
-			    	enterLabel.setFont(new Font("Sans Serif", Font.PLAIN, 20));
-			    	
-			    	valuePane.add(enterLabel);
-			    	valuePane.add(sdField, "gapright 15%");
-	
-			    	this.add(valuePane, "span");
-				  }
-				}
+					}
+
+					@Override
+					public void mouseExited(MouseEvent arg0) {
+						
+						if(description.getText().equalsIgnoreCase("> ?")){
+							
+							description.setForeground(new Color(60, 180, 220, 255));
+						}
+					}
+
+					@Override
+					public void mousePressed(MouseEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public void mouseReleased(MouseEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+		    		
+		    	});
+		    	this.add(description);
+			}
+	  }
   
 	  class RemoveAbsPanel extends JPanel {	
+		  
 	
 			private static final long serialVersionUID = 1L;
 			
-			private JLabel obsvLabel, absLabel;
+			private JLabel obsvLabel, absLabel, description;
 			private JTextField obsvField, absField;;
 			private int textFieldSize = 5;
-			private JButton info_button;
 			    
-				  public RemoveAbsPanel() {
-					this.setLayout(new MigLayout("", "[]push[]"));
+			public RemoveAbsPanel() {
+				
+				this.setLayout(new MigLayout("", "[]push[]"));
 			    	
-			    	check3 = new JCheckBox("Minimum Amount of Absolute Values");
-			    	check3.setOpaque(false);
-			    	this.add(check3, "alignx 0%");
-			    	
-			    	JPanel bPane = new JPanel();
-			    	bPane.setOpaque(false);
-			    	info_button = new JButton("Info");
-			    	
-			    	info_button.addActionListener(new ActionListener(){
-	
-						@Override
-						public void actionPerformed(ActionEvent arg0) {
-							
-						}
-			    	});
-			    	
-			    	bPane.add(info_button, "alignx 0%");
-			    	this.add(bPane, "wrap");
-			    	
-			    	obsvField = new JTextField(textFieldSize);
-			    	obsvField.addFocusListener(new FocusListener(){
+		    	check3 = new JCheckBox("Observations of Minimum Absolute Values");
+		    	check3.setFont(new Font("Sans Serif", Font.BOLD, 18));
+		    	//check3.setForeground(new Color(60, 180, 220, 255));
+		    	check3.setOpaque(false);
+		    	this.add(check3, "alignx 0%, wrap");
+		    	
+		    	obsvField = new JTextField(textFieldSize);
+		    	obsvField.addFocusListener(new FocusListener(){
 
-						@Override
-						public void focusGained(FocusEvent arg0) {
-							check3.setSelected(true);
-							
-						}
+					@Override
+					public void focusGained(FocusEvent arg0) {
+						check3.setSelected(true);
+						
+					}
 
-						@Override
-						public void focusLost(FocusEvent arg0) {
-							
-							
-						}
-			    		
-			    	});
-			    	
-			    	absField = new JTextField(textFieldSize);
-			    	absField.addFocusListener(new FocusListener(){
+					@Override
+					public void focusLost(FocusEvent arg0) {
+						
+						
+					}
+		    		
+		    	});
+		    	
+		    	absField = new JTextField(textFieldSize);
+		    	absField.addFocusListener(new FocusListener(){
 
-						@Override
-						public void focusGained(FocusEvent arg0) {
-							check3.setSelected(true);
-							
-						}
+					@Override
+					public void focusGained(FocusEvent arg0) {
+						check3.setSelected(true);
+						
+					}
 
-						@Override
-						public void focusLost(FocusEvent arg0) {
+					@Override
+					public void focusLost(FocusEvent arg0) {
+						
+						
+					}
+		    		
+		    	});
+		    	
+		    	JPanel valuePane = new JPanel();
+		    	valuePane.setLayout(new MigLayout());
+		    	valuePane.setOpaque(false);
+		    	
+		    	obsvLabel = new JLabel("Enter # of Observations: ");
+		    	obsvLabel.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+		    	absLabel = new JLabel("Enter Specified Absolute Value: ");
+		    	absLabel.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+
+		    	valuePane.add(obsvLabel, "alignx 0%");
+		    	valuePane.add(obsvField, "wrap");
+		    	valuePane.add(absLabel);
+		    	valuePane.add(absField);
+
+		    	this.add(valuePane, "span, wrap");
+		    	
+		    	description = new JLabel("> ?");
+		    	description.setFont(new Font("Sans Serif", Font.BOLD, 14));
+		    	description.setForeground(new Color(60, 180, 220, 255));
+		    	description.addMouseListener(new MouseListener(){
+
+					@Override
+					public void mouseClicked(MouseEvent arg0) {
+						
+						if(description.getText().equalsIgnoreCase("> ?")){
 							
+							description.setText("< Remove all elements below a minimum amount " +
+		    			"of observations of absolute values less than a specified value.");
+							description.setFont(new Font("Sans Serif", Font.ITALIC, 14));
+							description.setForeground(Color.black);
+						}
+						else{
+							
+							description.setText("> ?");
+							description.setFont(new Font("Sans Serif", Font.BOLD, 14));
+							description.setForeground(new Color(60, 180, 220, 255));
+						}
+						
+					}
+
+					@Override
+					public void mouseEntered(MouseEvent arg0) {
+						
+						if(description.getText().equalsIgnoreCase("> ?")){
+							
+							description.setForeground(new Color(240, 80, 50, 255));
 							
 						}
-			    		
-			    	});
-			    	
-			    	JPanel valuePane = new JPanel();
-			    	valuePane.setLayout(new MigLayout());
-			    	valuePane.setOpaque(false);
-			    	
-			    	obsvLabel = new JLabel("Enter # of Observations: ");
-			    	obsvLabel.setFont(new Font("Sans Serif", Font.PLAIN, 20));
-			    	absLabel = new JLabel("Enter Specified Absolute Value: ");
-			    	absLabel.setFont(new Font("Sans Serif", Font.PLAIN, 20));
-	
-			    	valuePane.add(obsvLabel);
-			    	valuePane.add(obsvField, "wrap, gapleft 5%");
-			    	valuePane.add(absLabel);
-			    	valuePane.add(absField, "gapleft 5%");
-	
-			    	this.add(valuePane, "span");
-				  }
-				}
+					}
+
+					@Override
+					public void mouseExited(MouseEvent arg0) {
+						
+						if(description.getText().equalsIgnoreCase("> ?")){
+							
+							description.setForeground(new Color(60, 180, 220, 255));
+						}
+					}
+
+					@Override
+					public void mousePressed(MouseEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public void mouseReleased(MouseEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+		    		
+		    	});
+		    	this.add(description);
+			}
+	  }
   
 	  class MaxMinPanel extends JPanel {	
 	
 			private static final long serialVersionUID = 1L;
 			
-			private JLabel diffLabel;
+			private JLabel diffLabel, description;
 			private JTextField diffField;;
 			private int textFieldSize = 5;
-			private JButton info_button;
 			    
-				  public MaxMinPanel() {
-					this.setLayout(new MigLayout("", "[]push[]"));
-			    	
-			    	check4 = new JCheckBox("Difference of Maximum and Minimum Data Values");
-			    	check4.setOpaque(false);
-			    	this.add(check4, "alignx 0%");
-			    	
-			    	JPanel bPane = new JPanel();
-			    	bPane.setOpaque(false);
-			    	info_button = new JButton("Info");
-			    	
-			    	info_button.addActionListener(new ActionListener(){
-	
-						@Override
-						public void actionPerformed(ActionEvent arg0) {
-							
-						}
-			    	});
-			    	
-			    	bPane.add(info_button, "alignx 100%");
-			    	this.add(bPane, "wrap");
-			    	
-			    	diffField = new JTextField(textFieldSize);
-			    	diffField.addFocusListener(new FocusListener(){
+			public MaxMinPanel() {
+				
+				this.setLayout(new MigLayout("", "[]push[]"));
+		    	
+		    	check4 = new JCheckBox("Difference of Maximum and Minimum Values");
+		    	check4.setFont(new Font("Sans Serif", Font.BOLD, 18));
+		    	//check4.setForeground(new Color(60, 180, 220, 255));
+		    	check4.setOpaque(false);
+		    	this.add(check4, "alignx 0%, wrap");
+		    	
+		    	diffField = new JTextField(textFieldSize);
+		    	diffField.addFocusListener(new FocusListener(){
 
-						@Override
-						public void focusGained(FocusEvent arg0) {
-							check4.setSelected(true);
-							
-						}
+					@Override
+					public void focusGained(FocusEvent arg0) {
+						check4.setSelected(true);
+						
+					}
 
-						@Override
-						public void focusLost(FocusEvent arg0) {
+					@Override
+					public void focusLost(FocusEvent arg0) {
+						
+						
+					}
+		    		
+		    	});
+		    	
+		    	JPanel valuePane = new JPanel();
+		    	valuePane.setOpaque(false);
+		    	valuePane.setLayout(new MigLayout());
+		    	
+		    	diffLabel = new JLabel("Enter Specified Difference: ");
+		    	diffLabel.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+
+		    	valuePane.add(diffLabel, "alignx 0%" );
+		    	valuePane.add(diffField);
+
+		    	this.add(valuePane, "span, wrap");
+		    	
+		    	description = new JLabel("> ?");
+		    	description.setFont(new Font("Sans Serif", Font.BOLD, 14));
+		    	description.setForeground(new Color(60, 180, 220, 255));
+		    	description.addMouseListener(new MouseListener(){
+
+					@Override
+					public void mouseClicked(MouseEvent arg0) {
+						
+						if(description.getText().equalsIgnoreCase("> ?")){
 							
+							description.setText("< Remove all elements with a difference of their maximum " +
+									"and minimum values below a set value.");
+							description.setFont(new Font("Sans Serif", Font.ITALIC, 14));
+							description.setForeground(Color.black);
+						}
+						else{
+							
+							description.setText("> ?");
+							description.setFont(new Font("Sans Serif", Font.BOLD, 14));
+							description.setForeground(new Color(60, 180, 220, 255));
+						}
+						
+					}
+
+					@Override
+					public void mouseEntered(MouseEvent arg0) {
+						
+						if(description.getText().equalsIgnoreCase("> ?")){
+							
+							description.setForeground(new Color(240, 80, 50, 255));
 							
 						}
-			    		
-			    	});
-			    	
-			    	JPanel valuePane = new JPanel();
-			    	valuePane.setOpaque(false);
-			    	valuePane.setLayout(new MigLayout());
-			    	
-			    	diffLabel = new JLabel("Enter Specified Difference: ");
-			    	diffLabel.setFont(new Font("Sans Serif", Font.PLAIN, 20));
-	
-			    	valuePane.add(diffLabel);
-			    	valuePane.add(diffField,"gapleft 5%");
-	
-			    	this.add(valuePane);
-			    	
-				  }
-				}
+					}
+
+					@Override
+					public void mouseExited(MouseEvent arg0) {
+						
+						if(description.getText().equalsIgnoreCase("> ?")){
+							
+							description.setForeground(new Color(60, 180, 220, 255));
+						}
+					}
+
+					@Override
+					public void mousePressed(MouseEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public void mouseReleased(MouseEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+		    		
+		    	});
+		    	this.add(description);
+		    	
+			}
+	  }
   
 	  class AdjustOptionsPanel extends JPanel {	
 	
 			private static final long serialVersionUID = 1L;
 				
 			//Instance variables
-			private JButton adjust_button, info_button;
-			private JLabel instructions;
+			private JButton adjust_button;
+			private JLabel instructions, title;
 			    
 			public AdjustOptionsPanel() {
 				
@@ -726,22 +907,24 @@ public class ClusterFrame extends JFrame{
 				instructions = new JLabel("Check all adjustment options you would like to apply. Then click 'Adjust'.");
 				instructions.setFont(new Font("Sans Serif", Font.PLAIN, 22));
 				instructions.setOpaque(false);
-				this.add(instructions, "grow, push, wrap");
+				//this.add(instructions, "grow, push, wrap");
 				
 				//Splitting up the content of this panel into several other panels
 				//Component 1
 				JPanel logPanel = new JPanel();
 				logPanel.setLayout(new MigLayout("", "[]push[]"));
+				logPanel.setOpaque(false);
+				
+		  		title = new JLabel("All Data");
+		  		title.setFont(new Font("Sans Serif", Font.PLAIN, 28));
+		  		title.setForeground(new Color(60, 180, 220, 255));
+				logPanel.add(title, "pushx, growx, span, wrap");
+				title.setVisible(true);
+				
 		    	logCheck = new JCheckBox("Log Transform");
 		    	logCheck.setOpaque(false);
+		    	logCheck.setFont(new Font("Sans Serif", Font.BOLD, 18));
 		    	logPanel.add(logCheck, "grow, push");
-		    	
-		    	//Button to receiv more info about the log transform feature
-		    	JPanel bPane = new JPanel();
-		    	info_button = new JButton("Info");
-		    	bPane.add(info_button, "alignx 100%");
-		    	bPane.setOpaque(false);
-		    	logPanel.add(bPane);
 		    	
 		    	this.add(logPanel,"wrap");
 				
@@ -759,6 +942,12 @@ public class ClusterFrame extends JFrame{
 		    	
 		    	//button to confirm adjustment operations with action listener
 		    	adjust_button = new JButton("Adjust Data");
+		    	adjust_button.setOpaque(true);
+		    	adjust_button.setBackground(new Color(60, 180, 220, 255));
+		    	adjust_button.setForeground(Color.white);
+				Dimension d = adjust_button.getPreferredSize();
+				d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
+				adjust_button.setFont(new Font("Sans Serif", Font.PLAIN, 18));
 		    	adjust_button.addActionListener(new ActionListener(){
 	
 					@Override
@@ -772,8 +961,8 @@ public class ClusterFrame extends JFrame{
 		    	buttonPane.setOpaque(false);
 		    	this.add(buttonPane, "alignx 50%");
 		    	
-			  }
-				}
+			}
+	  }
   
 	  class GeneAdjustPanel extends JPanel {
 		  
@@ -781,7 +970,7 @@ public class ClusterFrame extends JFrame{
 		  private JRadioButton mean;
 		  private JRadioButton median;
 		  private ButtonGroup bg;
-		  private JButton info_button;
+		  private JLabel title;
 	      
 			private static final long serialVersionUID = 1L;
 			
@@ -790,23 +979,27 @@ public class ClusterFrame extends JFrame{
 				
 		  		//set this panel's layout
 		  		this.setLayout(new MigLayout("", "[]push[]"));
+		  		this.setOpaque(false);
+		  		
+		  		title = new JLabel("Elements");
+		  		title.setFont(new Font("Sans Serif", Font.PLAIN, 28));
+		  		title.setForeground(new Color(60, 180, 220, 255));
+				this.add(title, "pushx, growx, span, wrap");
+				title.setVisible(true);
 		    	
 		  		//create checkbox
-		  		centerGenes = new JCheckBox("Center Elements");
+		  		centerGenes = new JCheckBox("Center");
+		  		centerGenes.setFont(new Font("Sans Serif", Font.BOLD, 18));
 		  		centerGenes.setOpaque(false);
-		  		this.add(centerGenes);
-		  		
-		    	JPanel bPane = new JPanel();
-		    	info_button = new JButton("Info");
-		    	bPane.add(info_button, "alignx 100%");
-		    	bPane.setOpaque(false);
-		    	this.add(bPane, "wrap");
+		  		this.add(centerGenes, "wrap");
 		  		
 		  		//Create a new ButtonGroup
 		  		bg = new ButtonGroup();
 		  		
 		  		mean = new JRadioButton("Mean", true);
+		  		mean.setFont(new Font("Sans Serif", Font.BOLD, 18));
 		  		median = new JRadioButton("Median", false);
+		  		median.setFont(new Font("Sans Serif", Font.BOLD, 18));
 		  		mean.setOpaque(false);
 		  		mean.setEnabled(false);
 		  		median.setOpaque(false);
@@ -817,8 +1010,8 @@ public class ClusterFrame extends JFrame{
 		  		bg.add(median);
 		  		
 		  		//Add Buttons to panel
-		  		this.add(mean, "wrap, gapleft 5%");
-		  		this.add(median, "wrap, gapleft 5%");
+		  		this.add(mean, "wrap");
+		  		this.add(median, "wrap");
 		  		
 		  		centerGenes.addItemListener(new ItemListener() {
 		
@@ -837,7 +1030,8 @@ public class ClusterFrame extends JFrame{
 						}
 		  		});
 		  			
-		  		normGenes = new JCheckBox ("Normalize Elements");
+		  		normGenes = new JCheckBox ("Normalize");
+		  		normGenes.setFont(new Font("Sans Serif", Font.BOLD, 18));
 		  		normGenes.setOpaque(false);
 		  		this.add(normGenes);
 		  	}
@@ -849,7 +1043,7 @@ public class ClusterFrame extends JFrame{
 	      private JRadioButton mean;
 	      private JRadioButton median;
 	      private ButtonGroup bg;
-	      private JButton info_button;
+	      private JLabel title;
 	      
 	      private static final long serialVersionUID = 1L;
 			
@@ -857,23 +1051,27 @@ public class ClusterFrame extends JFrame{
 			public ArrayAdjustPanel() {
 				//set this panel's layout
 				this.setLayout(new MigLayout("", "[]push[]"));
+				this.setOpaque(false);
+				
+		  		title = new JLabel("Arrays");
+		  		title.setFont(new Font("Sans Serif", Font.PLAIN, 28));
+		  		title.setForeground(new Color(60, 180, 220, 255));
+				this.add(title, "pushx, growx, span, wrap");
+				title.setVisible(true);
 				
 				//create checkbox
-				centerArrays = new JCheckBox("Center Arrays");
+				centerArrays = new JCheckBox("Center");
+				centerArrays.setFont(new Font("Sans Serif", Font.BOLD, 18));
 				centerArrays.setOpaque(false);
-				this.add(centerArrays);
-				
-				JPanel bPane = new JPanel();
-				info_button = new JButton("Info");
-				bPane.add(info_button, "alignx 100%");
-				bPane.setOpaque(false);
-				this.add(bPane, "wrap");
+				this.add(centerArrays, "wrap");
 				
 				//Create a new ButtonGroup
 				bg = new ButtonGroup();
 				
 				mean = new JRadioButton("Mean", true);
+				mean.setFont(new Font("Sans Serif", Font.BOLD, 18));
 				median = new JRadioButton("Median", false);
+				median.setFont(new Font("Sans Serif", Font.BOLD, 18));
 				mean.setOpaque(false);
 				mean.setEnabled(false);
 				median.setOpaque(false);
@@ -884,8 +1082,8 @@ public class ClusterFrame extends JFrame{
 				bg.add(median);
 				
 				//Add Buttons to panel
-				this.add(mean, "wrap, gapleft 5%");
-				this.add(median, "wrap, gapleft 5%");
+				this.add(mean, "wrap");
+				this.add(median, "wrap");
 				
 				centerArrays.addItemListener(new ItemListener() {
 			
@@ -904,11 +1102,12 @@ public class ClusterFrame extends JFrame{
 						}
 				});
 					
-				normArrays = new JCheckBox ("Normalize Arrays");
+				normArrays = new JCheckBox ("Normalize");
+				normArrays.setFont(new Font("Sans Serif", Font.BOLD, 18));
 				normArrays.setOpaque(false);
 				this.add(normArrays);
-				}
-	  		}
+			}
+	}
 	
     /**
      * Remove genes from the originally loaded data set according to

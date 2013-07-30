@@ -29,6 +29,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -103,6 +104,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 	
 	//Instance variable in which the loaded data array is being stored
 	private double[] dataArray;
+	private double[] rangeArray;
 	
 	/**
 	 *  Constructor for the DendroView object
@@ -133,6 +135,9 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		outer = (ClusterModel) dataModel;
 		matrix = outer.getDataMatrix();
 		dataArray = matrix.getExprData();
+		
+		rangeArray = Arrays.copyOfRange(dataArray, 1455, 2900);
+		System.out.println("DataArray Element 1: " + Arrays.toString(rangeArray));
 
 		viewFrame.setResizable(true);
 		
@@ -143,6 +148,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		
 		//header
 		head1 = new HeaderPanel("Hierarchical Clustering");
+		head1.setColor(Color.black);
 		mainPanel.add(head1, "pushx, growx, span, wrap");
 		
 		//Data Info Panel
@@ -156,7 +162,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		finalPanel = new FinalOptionsPanel();
 		mainPanel.add(finalPanel, "growx, pushx");
 		
-		//mainPanel.setBackground(new Color(210, 210, 210, 100));
+		mainPanel.setBackground(new Color(240, 240, 240, 255));
 		
 		//make mainpanel scrollable by adding it to scrollpane
 		scrollPane = new JScrollPane(mainPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -182,10 +188,11 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		public HeaderPanel(String header){
 			
 			this.setLayout(new MigLayout());
-			setBackground(new Color(110, 210, 255, 255));
+			setOpaque(false);
 			
 			text = new JLabel(header);
-			text.setFont(new Font("Sans Serif", Font.BOLD, 30));
+			text.setFont(new Font("Sans Serif", Font.PLAIN, 36));
+			text.setForeground(new Color(60, 180, 220, 255));
 			
 			this.add(text);
 			
@@ -193,7 +200,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		
 		public void setColor(Color color){
 			
-			setBackground(color);
+			text.setForeground(color);
 		}
 		
 		public void setSmall(){
@@ -205,7 +212,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		private static final long serialVersionUID = 1L;
 		
 		//Instance variables
-		int nRows, nCols; 
+		int nRows, nCols, sumMatrix; 
 		JLabel label1, label2, numColLabel, numRowLabel;
 		JButton yes_button, no_button, no2_button, loadNew_button, view_button;
 		JTextArea textArea;
@@ -223,44 +230,62 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 	    	nRows = infoGene.getNumHeaders();
 	    	
 	    	
-	    	label1 = new JLabel("Loading file successful!");
-	    	label1.setFont(new Font("Sans Serif", Font.PLAIN, 22));
+	    	label1 = new JLabel();
+	    	label1.setFont(new Font("Sans Serif", Font.PLAIN, 20));
+	    	if(dataModel.isLoaded()){
+	    		
+	    		label1.setText("Loading file successful!");
+	    	}
+	    	else{
+	    		
+	    		label1.setText("File loading unsuccessful :(");
+	    	}
 	    	this.add(label1, "top, wrap");
 	   
 	    	
 	    	label2 = new JLabel("Matrix Dimensions:");
-	    	label2.setFont(new Font("Sans Serif", Font.PLAIN, 22));
-	    	this.add(label2, "wrap");
+	    	label2.setFont(new Font("Sans Serif", Font.PLAIN, 20));
+	    	this.add(label2, "alignx 50%, wrap");
 	    	
 	    	//panel with dimensions of the dataMatrix
 	    	JPanel numPane = new JPanel();
 	    	numPane.setLayout(new MigLayout());
 	    	numPane.setOpaque(false);
 	    	
-	    	numColLabel = new JLabel(nCols + " columns");
-	    	numColLabel.setFont(new Font("Sans Serif", Font.BOLD, 22));
+	    	numColLabel = new JLabel(nCols + " columns X ");
+	    	numColLabel.setFont(new Font("Sans Serif", Font.BOLD, 20));
 	    	numColLabel.setForeground(new Color(240, 80, 50, 255));
-	    	numPane.add(numColLabel, "span, split 2, center");
+	    	numPane.add(numColLabel, "span, split 2, alignx 50%");
 	    	
 	    	numRowLabel = new JLabel(nRows + " rows");
 	    	numRowLabel.setForeground(new Color(240, 80, 50, 255));
-	    	numRowLabel.setFont(new Font("Sans Serif", Font.BOLD, 22));
-	    	numPane.add(numRowLabel,  "gapleft 10%");
+	    	numRowLabel.setFont(new Font("Sans Serif", Font.BOLD, 20));
+	    	numPane.add(numRowLabel, "wrap");
 	    	
-	    	this.add(numPane, "alignx 50%, growy, pushy");
+	    	sumMatrix = nCols*nRows;
+	    	JLabel sumM = new JLabel("Total Amount of Values: " + sumMatrix);
+	    	sumM.setForeground(new Color(240, 80, 50, 255));
+	    	sumM.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+	    	numPane.add(sumM, "alignx 50%");
+	    	
+	    	this.add(numPane, "alignx 50%, pushx, wrap");
 	
 	    	//buttonPane
-	    	JPanel buttonPane1 = new JPanel();
-	    	buttonPane1.setLayout(new MigLayout());
-	    	buttonPane1.setOpaque(false);
+	    	JPanel buttonPane = new JPanel();
+	    	buttonPane.setLayout(new MigLayout());
+	    	buttonPane.setOpaque(true);
 	    	
 	    	loadNew_button = new JButton("Load New File");
+	    	loadNew_button.setOpaque(true);
+	    	loadNew_button.setBackground(new Color(60, 180, 220, 255));
+	    	loadNew_button.setForeground(Color.white);
+			Dimension d = loadNew_button.getPreferredSize();
+			d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
+			loadNew_button.setFont(new Font("Sans Serif", Font.PLAIN, 18));
 	    	loadNew_button.addActionListener(new ActionListener(){
 	
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					
-					ClusterView.this.removeAll();
 					
 					try {
 						ClusterFileSet fileSet = clusterSelection();
@@ -280,9 +305,15 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 						}
 				}
 	    	});
-	    	buttonPane1.add(loadNew_button, "alignx 0%");
+	    	buttonPane.add(loadNew_button, "alignx 50%, pushx");
 	    	
 	    	view_button = new JButton("View Loaded Data");
+	    	view_button.setOpaque(true);
+	    	view_button.setBackground(new Color(60, 180, 220, 255));
+	    	view_button.setForeground(Color.white);
+			Dimension d2 = view_button.getPreferredSize();
+			d2.setSize(d2.getWidth()*1.5, d2.getHeight()*1.5);
+			view_button.setFont(new Font("Sans Serif", Font.PLAIN, 18));
 	    	view_button.addActionListener(new ActionListener(){
 	
 				@Override
@@ -291,9 +322,9 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 					
 				}	
 	    	});
-	    	buttonPane1.add(view_button);
+	    	buttonPane.add(view_button, "alignx 50%");
 	 
-	    	this.add(buttonPane1, "wrap, grow, push");
+	    	this.add(buttonPane, "alignx 50%, pushx");
 		  }
 		}
 	
@@ -335,12 +366,12 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 					head2 = new HeaderPanel("Elements");
 					head2.setSmall();
 					head2.setBackground(new Color(110, 210, 255, 150));
-					this.add(head2, "pushx, growx");
+					this.add(head2, "alignx 50%, pushx");
 					 
 					head3 = new HeaderPanel("Arrays");
 					head3.setSmall();
 					head3.setBackground(new Color(110, 210, 255, 150));
-					this.add(head3, "pushx, growx, wrap");
+					this.add(head3, "alignx 50%, pushx, wrap");
 					 
 					//Component 1
 					geneClusterPanel = new GeneClusterPanel();
@@ -357,6 +388,13 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 					
 					//Advanced Options Button
 					advanced_button = new JButton("Advanced Options >>");
+					advanced_button.setOpaque(true);
+					advanced_button.setBackground(new Color(60, 180, 220, 255));
+					advanced_button.setForeground(Color.white);
+					Dimension d = advanced_button.getPreferredSize();
+					d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
+					advanced_button.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+					
 					advanced_button.addActionListener(new ActionListener(){
 
 						@Override
@@ -391,20 +429,17 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 					
 			  		//set this panel's layout
 			  		this.setLayout(new MigLayout("", "[]push[]"));
-					setBackground(Color.white);
+					this.setBackground(Color.white);
+					this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 			  		
 			  		//create checkbox
 			  		clusterGeneCheck = new JCheckBox("Cluster");
 			  		clusterGeneCheck.setBackground(Color.white);
-			  		this.add(clusterGeneCheck);
-			  		
-			    	JPanel bPane = new JPanel();
-			    	info_button = new JButton("?");
-			    	bPane.add(info_button, "grow, push, alignx 100%");
-			    	bPane.setBackground(Color.white);
-			    	this.add(bPane, "wrap");
+			  		clusterGeneCheck.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+			  		this.add(clusterGeneCheck, "wrap");
 			  			
 			  		weightGeneCheck = new JCheckBox ("Calculate Weights");
+			  		weightGeneCheck.setFont(new Font("Sans Serif", Font.PLAIN, 18));
 			  		weightGeneCheck.setBackground(Color.white);
 			  		this.add(weightGeneCheck, "wrap");
 			  		
@@ -412,6 +447,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 			  		geneCombo.setBackground(Color.white);
 			  		
 			  		similarity = new JLabel("Similarity Metric");
+			  		similarity.setFont(new Font("Sans Serif", Font.PLAIN, 18));
 			  		similarity.setBackground(Color.white);
 			  		
 			  		this.add(similarity, "alignx 50%, span, wrap");
@@ -430,27 +466,24 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 				
 		  		//set this panel's layout
 		  		this.setLayout(new MigLayout("", "[]push[]"));
-		  		//this.setBorder(BorderFactory.createTitledBorder("Arrays"));
-				setBackground(Color.white);
+				this.setBackground(Color.white);
+				this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		  		
 		  		//create checkbox
 		  		clusterArrayCheck = new JCheckBox("Cluster");
 		  		clusterArrayCheck.setBackground(Color.white);
-		  		this.add(clusterArrayCheck);
-		  		
-		    	JPanel bPane = new JPanel();
-		    	info_button = new JButton("?");
-		    	bPane.add(info_button, "alignx 100%");
-		    	bPane.setBackground(Color.white);
-		    	this.add(bPane, "wrap");
+		  		clusterArrayCheck.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+		  		this.add(clusterArrayCheck, "wrap");
 		  			
 		  		weightArrayCheck = new JCheckBox ("Calculate Weights");
+		  		weightArrayCheck.setFont(new Font("Sans Serif", Font.PLAIN, 18));
 		  		weightArrayCheck.setBackground(Color.white);
 		  		this.add(weightArrayCheck, "wrap");
 		  		
 		  		arrayCombo = new JComboBox<String>(measurements);
 		  		arrayCombo.setBackground(Color.white);
 		  		similarity = new JLabel("Similarity Metric");
+		  		similarity.setFont(new Font("Sans Serif", Font.PLAIN, 18));
 		  		similarity.setBackground(Color.white);
 		  		
 		  		this.add(similarity, "alignx 50%, span, wrap");
@@ -465,7 +498,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 			//Instance variables
 			private JButton cluster_button;
 			private JComboBox<String> clusterChoice;
-			private JLabel status1, status2;
+			private JLabel status1, status2, method;
 			private String path;
 		    
 			//Constructor
@@ -480,12 +513,16 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 				//ProgressBar Component
 				final JPanel loadPanel = new JPanel();
 				loadPanel.setLayout(new MigLayout());
+				
+				method = new JLabel("Method: ");
+				method.setFont(new Font("Sans Serif", Font.PLAIN, 22));
+				buttonPanel.add(method, "alignx 50%, pushx");
 		    	
 				//ClusterChoice ComboBox
 				String[] clusterMethods = {"Single Linkage", "Centroid Linkage", "Average Linkage", "Complete Linkage"};
 				clusterChoice = new JComboBox<String>(clusterMethods);
 				Dimension d = clusterChoice.getPreferredSize();
-				d.setSize(d.getWidth()*2, d.getHeight()*2);
+				d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
 				clusterChoice.setPreferredSize(d);
 				clusterChoice.setFont(new Font("Sans Serif", Font.PLAIN, 18));
 				clusterChoice.setBackground(Color.white);
@@ -497,7 +534,10 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		  		Dimension d2 = cluster_button.getPreferredSize();
 		  		d2.setSize(d2.getWidth()*2, d2.getHeight()*2);
 		  		cluster_button.setPreferredSize(d2);
-		  		cluster_button.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+		  		cluster_button.setFont(new Font("Sans Serif", Font.PLAIN, 20));
+		  		cluster_button.setOpaque(true);
+		  		cluster_button.setBackground(new Color(60, 180, 220, 255));
+		  		cluster_button.setForeground(Color.white);
 		    	cluster_button.addActionListener(new ActionListener(){
 		    		
 		    
@@ -509,7 +549,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 						
 						pBar.setMinimum(0);
 						pBar.setStringPainted(true);
-						pBar.setForeground(new Color(100, 200, 255, 255));
+						pBar.setForeground(new Color(60, 180, 220, 255));
 						pBar.setUI(new BasicProgressBarUI(){
 							protected Color getSelectionBackground(){return Color.black;};
 							protected Color getSelectionForeground(){return Color.white;};
@@ -547,7 +587,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 							
 							protected void done(){
 								
-								clusterLabel.setText("Clustering done!");
+								clusterLabel.setText("Clustering complete!");
 								pBar.setForeground(new Color(0, 200, 0, 255));
 								
 								status1 = new JLabel("The file has been saved in the original directory.");
@@ -555,7 +595,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 								loadPanel.add(status1, "growx, pushx, wrap");
 								
 								status2 = new JLabel("File Path: " + path);
-								status2.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+								status2.setFont(new Font("Sans Serif", Font.ITALIC, 18));
 								loadPanel.add(status2, "growx, pushx, wrap");
 								
 								mainPanel.revalidate();
@@ -565,7 +605,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 						worker.execute();	
 					}	
 		    	});
-		    	buttonPanel.add(cluster_button, "alignx 50%");
+		    	buttonPanel.add(cluster_button, "span, alignx 50%");
 
 		    	buttonPanel.setOpaque(false);
 		    	this.add(buttonPanel, "alignx 50%, pushx, wrap");

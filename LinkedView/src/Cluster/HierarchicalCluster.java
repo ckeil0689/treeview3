@@ -60,6 +60,8 @@ public class HierarchicalCluster {
 		
 		int lower = 0;
 		int upper = 0;
+		
+		//number of arrays
 		int max = model.nExpr();
 		
 		pBar.setMaximum(list.size()/max);
@@ -125,8 +127,6 @@ public class HierarchicalCluster {
     	double gDiff = 0;
     	
     	pBar.setMaximum(fullList.size());
-    	
-    	System.out.println("FullList Length: " + fullList.size());
     	
     	//take a gene
     	//300ms per loop
