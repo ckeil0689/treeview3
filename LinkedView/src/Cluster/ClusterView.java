@@ -501,8 +501,9 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 			//Instance variables
 			private JButton cluster_button;
 			private JComboBox<String> clusterChoice;
-			private JLabel status1, status2, method;
+			private JLabel status1, status2, method, error1, error2;
 			private String path;
+			final JPanel loadPanel;
 		    
 			//Constructor
 			public FinalOptionsPanel() {
@@ -514,7 +515,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 				buttonPanel.setLayout(new MigLayout());
 				
 				//ProgressBar Component
-				final JPanel loadPanel = new JPanel();
+				loadPanel = new JPanel();
 				loadPanel.setLayout(new MigLayout());
 				
 				method = new JLabel("Method: ");
@@ -548,64 +549,91 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 					public void actionPerformed(ActionEvent arg0) {
 						// All on Event Dispatch Thread
 						//Build ProgressBar
-						final JProgressBar pBar = new JProgressBar();
 						
-						pBar.setMinimum(0);
-						pBar.setStringPainted(true);
-						pBar.setForeground(new Color(60, 180, 220, 255));
-						pBar.setUI(new BasicProgressBarUI(){
-							protected Color getSelectionBackground(){return Color.black;};
-							protected Color getSelectionForeground(){return Color.white;};
-						});
-						pBar.setVisible(true);
-						
-						final JLabel clusterLabel = new JLabel("Clustering...");
-						clusterLabel.setFont(new Font("Sans Serif", Font.PLAIN, 22));
-						loadPanel.add(clusterLabel, "alignx 50%, span, wrap");
-						
-						//Add it to JPanel Object
-						loadPanel.add(pBar, "pushx, growx, span");
-						loadPanel.setBackground(Color.white);
-						loadPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-						finalPanel.add(loadPanel, "pushx, growx");
-						mainPanel.revalidate();
-						mainPanel.repaint();
-						
-						final SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {	
+						//needs at least one box to be selected otherwise display error
+						if(clusterGeneCheck.isSelected()||clusterArrayCheck.isSelected()){
 							
-				    		//All not on Event Dispatch
-							public Void doInBackground() {
-
-					        	try {
-									hCluster(2, dataArray, "What", pBar);
-								} catch (InterruptedException e) {
+							loadPanel.removeAll();
+							
+							final JProgressBar pBar = new JProgressBar();
+							
+							pBar.setMinimum(0);
+							pBar.setStringPainted(true);
+							pBar.setForeground(new Color(60, 180, 220, 255));
+							pBar.setUI(new BasicProgressBarUI(){
+								protected Color getSelectionBackground(){return Color.black;};
+								protected Color getSelectionForeground(){return Color.white;};
+							});
+							pBar.setVisible(true);
+							
+							final JLabel clusterLabel = new JLabel("Clustering...");
+							clusterLabel.setFont(new Font("Sans Serif", Font.PLAIN, 22));
+							loadPanel.add(clusterLabel, "alignx 50%, span, wrap");
+							
+							//Add it to JPanel Object
+							loadPanel.add(pBar, "pushx, growx, span");
+							loadPanel.setBackground(Color.white);
+							loadPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+							finalPanel.add(loadPanel, "pushx, growx");
+							mainPanel.revalidate();
+							mainPanel.repaint();
+							
+							final SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {	
 								
-									e.printStackTrace();
-								} catch (ExecutionException e) {
+					    		//All not on Event Dispatch
+								public Void doInBackground() {
+	
+						        	try {
+										hCluster(2, dataArray, "What", pBar);
+									} catch (InterruptedException e) {
 									
-									e.printStackTrace();
+										e.printStackTrace();
+									} catch (ExecutionException e) {
+										
+										e.printStackTrace();
+									}
+									return null;
 								}
-								return null;
-							}
+								
+								protected void done(){
+									
+									clusterLabel.setText("Clustering complete!");
+									pBar.setForeground(new Color(0, 200, 0, 255));
+									
+									status1 = new JLabel("The file has been saved in the original directory.");
+									status1.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+									loadPanel.add(status1, "growx, pushx, wrap");
+									
+									status2 = new JLabel("File Path: " + path);
+									status2.setFont(new Font("Sans Serif", Font.ITALIC, 18));
+									loadPanel.add(status2, "growx, pushx, wrap");
+									
+									mainPanel.revalidate();
+									mainPanel.repaint();	
+								}
+							};
+							worker.execute();
+						}
+						//display error message
+						else{
 							
-							protected void done(){
-								
-								clusterLabel.setText("Clustering complete!");
-								pBar.setForeground(new Color(0, 200, 0, 255));
-								
-								status1 = new JLabel("The file has been saved in the original directory.");
-								status1.setFont(new Font("Sans Serif", Font.PLAIN, 18));
-								loadPanel.add(status1, "growx, pushx, wrap");
-								
-								status2 = new JLabel("File Path: " + path);
-								status2.setFont(new Font("Sans Serif", Font.ITALIC, 18));
-								loadPanel.add(status2, "growx, pushx, wrap");
-								
-								mainPanel.revalidate();
-								mainPanel.repaint();	
-							}
-						};
-						worker.execute();	
+							error1 = new JLabel("Woah, that's too quick!");
+							error1.setFont(new Font("Sans Serif", Font.PLAIN, 22));
+							error1.setForeground(new Color(240, 80, 50, 255));
+							loadPanel.add(error1, "alignx 50%, span, wrap");
+							
+							error2 = new JLabel("Please select either elements, " +
+									"arrays or both to begin clustering!");
+							error2.setFont(new Font("Sans Serif", Font.PLAIN, 22));
+							
+							loadPanel.setBackground(Color.white);
+							loadPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+							loadPanel.add(error2, "alignx 50%, span");
+							finalPanel.add(loadPanel, "alignx 50%, pushx, span");
+							
+							mainPanel.revalidate();
+							mainPanel.repaint();
+						}
 					}	
 		    	});
 		    	buttonPanel.add(cluster_button, "span, alignx 50%");
@@ -623,20 +651,50 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 	private void hCluster(int method, double[] currentArray, String similarityM, JProgressBar pBar) 
 			throws InterruptedException, ExecutionException{
 		
-		//make a HierarchicalCluster object
+		
 		HierarchicalCluster clusterTarget = new HierarchicalCluster((ClusterModel)dataModel, 
 				currentArray, method, similarityM, viewFrame);
 		
+		//declare variables needed for function
 		List<Double> currentList = new ArrayList<Double>();
+		List<List<Double>> sepElements = new ArrayList<List<Double>>();
+		List<List<Double>> sepArrays = new ArrayList<List<Double>>();
+		List<List<Double>> elementDistances  = new ArrayList<List<Double>>();
+		List<List<Double>> arrayDistances = new ArrayList<List<Double>>();
 		
+		//change data array into a list (more flexible, faster access for larger computations)
 		for(double d : currentArray){
 			
 			currentList.add(d);
 		}
 		
-		//begin operations on clusterTarget...
-		List<List<Double>> sepElements = clusterTarget.splitElements(currentList, pBar);
-		List<List<Double>> sepArrays = clusterTarget.splitArrays(currentList, pBar);
+		//if user checked clustering for elements
+		if(clusterGeneCheck.isSelected()){
+			
+			sepElements = clusterTarget.splitElements(currentList, pBar);
+			
+			elementDistances  = measureDistance(clusterTarget, sepElements, (String)geneCombo.getSelectedItem(), pBar);
+			
+			clusterTarget.cluster(elementDistances, pBar, isElements);
+			
+			finalPanel.setPath(clusterTarget.getFilePath());
+			
+		}
+		
+		//if user checked clustering for arrays
+		if(clusterArrayCheck.isSelected()){
+			
+			sepArrays = clusterTarget.splitArrays(currentList, pBar);
+			
+			arrayDistances  = measureDistance(clusterTarget, sepArrays, (String)arrayCombo.getSelectedItem(), pBar);
+			
+			clusterTarget.cluster(arrayDistances, pBar, isArrays);
+			
+			finalPanel.setPath(clusterTarget.getFilePath());
+			
+		}
+		
+
 		
 		//use int method to determine the distance/ similarity matrix algorithm
 		//return distance/ similarity matrix and use as input to clustering function
@@ -645,15 +703,25 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		
 //		System.out.println("ArrayList Length: " + listRep);
 //		System.out.println("ArrayList Element: " + Arrays.toString(aoArrays.get(0)));
-
-		List<List<Double>> elementDistances  = clusterTarget.euclid(sepElements, pBar);
-		List<List<Double>> arrayDistances  = clusterTarget.euclid(sepArrays, pBar);
 		
-		clusterTarget.cluster(elementDistances, pBar, isElements);
-		clusterTarget.cluster(arrayDistances, pBar, isArrays);
+	}
+	
+	public List <List<Double>> measureDistance(HierarchicalCluster target, List<List<Double>> data, 
+			String choice, JProgressBar pBar){
 		
-		finalPanel.setPath(clusterTarget.getFilePath());
+		List<List<Double>> distances = new ArrayList<List<Double>>();
 		
+		switch(choice){
+			
+			case "Euclidean Distance": distances = target.euclid(data, pBar);
+			
+			case "City Block Distance": distances = target.cityBlock(data, pBar);
+			
+			default: break;
+		
+		}
+		
+		return distances;
 	}
 	
 	/**

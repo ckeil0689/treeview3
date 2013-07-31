@@ -123,6 +123,80 @@ public class HierarchicalCluster {
 		return arraysList;
 	}
     
+	public List <List<Double>> spearman(List<List<Double>> fullList, JProgressBar pBar){
+		
+    	//list with all genes and their distances to all other genes (1455x1455 for sample data)
+    	List <List<Double>> distanceList = new ArrayList<List<Double>>();
+
+    	double g1 = 0;
+    	double g2 = 0;
+    	double gDiff = 0;
+    	
+    	pBar.setMaximum(fullList.size());
+    	
+    	//take a gene
+    	for(int i = 0; i < fullList.size(); i++){
+    		
+    		//long ms = System.currentTimeMillis();
+    		
+    		//update progressbar
+    		pBar.setValue(i);
+    		
+    		//refers to one gene with all it's data
+    		List<Double> data = fullList.get(i);
+    		
+    		//distances of one gene to all others
+    		List<Double> dataDistance = new ArrayList<Double>();
+    		
+    		//choose a gene for distance comparison
+    		for(int j = 0; j < fullList.size(); j++){
+    			
+    			List<Double> data2 = fullList.get(j);
+    			
+    	    	//differences between elements of 2 genes
+    			List<Double> sDiff= new ArrayList<Double>();
+    			
+    			//compare each value of both genes
+    			//fixed: now runs at ~40 -60k ns = 0.05ms
+    			for(int k = 0; k < data.size(); k++){
+    				
+    				g1 = data.get(k);
+    				g2 = data2.get(k);
+    				gDiff = g1 - g2;
+    				gDiff = Math.abs(gDiff);
+    				sDiff.add(gDiff);
+    			}
+    			
+    			//sum all the squared value distances up
+    			//--> get distance between gene and gene2
+    			double sum = 0;
+    			
+    			for(double element : sDiff){
+    				sum += element;
+    			}
+    			
+    			dataDistance.add(sum);
+    		}
+    		
+    		//System.out.println("#1 Loop Time: " + (System.currentTimeMillis()-ms));
+
+    		//list with all genes and their distances to the other genes
+    		distanceList.add(dataDistance);
+    		
+    	}
+    	
+    	
+    	System.out.println("CB DL Length: " + distanceList.size());
+    	System.out.println("CB DL Element Length: " + distanceList.get(0).size());
+    	
+    	//Fusing all genes and their distances together to one array
+    	//double[] fusedArray = concatAll(geneDistanceList.get(0),geneDistanceList.subList(1, geneDistanceList.size()));
+   
+    	//System.out.println("Fused Array Length: " + fusedArray.length);
+    	
+    	return distanceList;
+    }
+
 	//Euclidean Distance
     //returns Euclidean PROXIMITY MATRIX, N x N;
     public List <List<Double>> euclid(List<List<Double>> fullList, JProgressBar pBar){
@@ -210,6 +284,80 @@ public class HierarchicalCluster {
     	//System.out.println("Fused Array Length: " + fusedArray.length);
     	
     	return geneDistanceList;
+    }
+    
+    public List <List<Double>> cityBlock(List<List<Double>> fullList, JProgressBar pBar){
+		
+    	//list with all genes and their distances to all other genes (1455x1455 for sample data)
+    	List <List<Double>> distanceList = new ArrayList<List<Double>>();
+
+    	double g1 = 0;
+    	double g2 = 0;
+    	double gDiff = 0;
+    	
+    	pBar.setMaximum(fullList.size());
+    	
+    	//take a gene
+    	for(int i = 0; i < fullList.size(); i++){
+    		
+    		//long ms = System.currentTimeMillis();
+    		
+    		//update progressbar
+    		pBar.setValue(i);
+    		
+    		//refers to one gene with all it's data
+    		List<Double> data = fullList.get(i);
+    		
+    		//distances of one gene to all others
+    		List<Double> dataDistance = new ArrayList<Double>();
+    		
+    		//choose a gene for distance comparison
+    		for(int j = 0; j < fullList.size(); j++){
+    			
+    			List<Double> data2 = fullList.get(j);
+    			
+    	    	//differences between elements of 2 genes
+    			List<Double> sDiff= new ArrayList<Double>();
+    			
+    			//compare each value of both genes
+    			//fixed: now runs at ~40 -60k ns = 0.05ms
+    			for(int k = 0; k < data.size(); k++){
+    				
+    				g1 = data.get(k);
+    				g2 = data2.get(k);
+    				gDiff = g1 - g2;
+    				gDiff = Math.abs(gDiff);
+    				sDiff.add(gDiff);
+    			}
+    			
+    			//sum all the squared value distances up
+    			//--> get distance between gene and gene2
+    			double sum = 0;
+    			
+    			for(double element : sDiff){
+    				sum += element;
+    			}
+    			
+    			dataDistance.add(sum);
+    		}
+    		
+    		//System.out.println("#1 Loop Time: " + (System.currentTimeMillis()-ms));
+
+    		//list with all genes and their distances to the other genes
+    		distanceList.add(dataDistance);
+    		
+    	}
+    	
+    	
+    	System.out.println(" CB DL Length: " + distanceList.size());
+    	System.out.println("CB DL Element Length: " + distanceList.get(0).size());
+    	
+    	//Fusing all genes and their distances together to one array
+    	//double[] fusedArray = concatAll(geneDistanceList.get(0),geneDistanceList.subList(1, geneDistanceList.size()));
+   
+    	//System.out.println("Fused Array Length: " + fusedArray.length);
+    	
+    	return distanceList;
     }
 	
     public void cluster(List<List<Double>> geneDList, JProgressBar pBar, boolean type){
