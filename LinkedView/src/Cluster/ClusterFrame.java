@@ -513,6 +513,10 @@ public class ClusterFrame extends JFrame{
 							description.setForeground(new Color(240, 80, 50, 255));
 							
 						}
+						else{
+							
+							description.setForeground(Color.GRAY);
+						}
 					}
 
 					@Override
@@ -521,6 +525,10 @@ public class ClusterFrame extends JFrame{
 						if(description.getText().equalsIgnoreCase("> ?")){
 							
 							description.setForeground(new Color(60, 180, 220, 255));
+						}
+						else{
+							
+							description.setForeground(Color.BLACK);
 						}
 					}
 
@@ -981,7 +989,7 @@ public class ClusterFrame extends JFrame{
 		  		this.setLayout(new MigLayout("", "[]push[]"));
 		  		this.setOpaque(false);
 		  		
-		  		title = new JLabel("Elements");
+		  		title = new JLabel("Rows");
 		  		title.setFont(new Font("Sans Serif", Font.PLAIN, 28));
 		  		title.setForeground(new Color(60, 180, 220, 255));
 				this.add(title, "pushx, growx, span, wrap");
@@ -1053,7 +1061,7 @@ public class ClusterFrame extends JFrame{
 				this.setLayout(new MigLayout("", "[]push[]"));
 				this.setOpaque(false);
 				
-		  		title = new JLabel("Arrays");
+		  		title = new JLabel("Columns");
 		  		title.setFont(new Font("Sans Serif", Font.PLAIN, 28));
 		  		title.setForeground(new Color(60, 180, 220, 255));
 				this.add(title, "pushx, growx, span, wrap");

@@ -123,14 +123,11 @@ public class HierarchicalCluster {
 		return arraysList;
 	}
     
-	public List <List<Double>> spearman(List<List<Double>> fullList, JProgressBar pBar){
+	//Uncentered Pearson (mean values = 0)
+	public List <List<Double>> pearson(List<List<Double>> fullList, JProgressBar pBar, boolean absolute, boolean centered){
 		
     	//list with all genes and their distances to all other genes (1455x1455 for sample data)
     	List <List<Double>> distanceList = new ArrayList<List<Double>>();
-
-    	double g1 = 0;
-    	double g2 = 0;
-    	double gDiff = 0;
     	
     	pBar.setMaximum(fullList.size());
     	
@@ -145,55 +142,94 @@ public class HierarchicalCluster {
     		//refers to one gene with all it's data
     		List<Double> data = fullList.get(i);
     		
-    		//distances of one gene to all others
-    		List<Double> dataDistance = new ArrayList<Double>();
-    		
-    		//choose a gene for distance comparison
+    		//pearson values of one gene compared to all others
+    		List<Double> pearsonList = new ArrayList<Double>();
+			
+			//second gene for comparison
     		for(int j = 0; j < fullList.size(); j++){
+    			
+    			//initialize needed instance variables
+            	double xi = 0;
+            	double yi = 0;
+            	double mean_x = 0;
+            	double mean_y = 0;
+            	double mean_sumX = 0;
+            	double mean_sumY = 0;
+    			double sumX = 0;
+    			double sumY = 0;
+    			double sumXY = 0;
+    			double sumX_root = 0;
+    			double sumY_root = 0;
+    			double pearson = 0;
+    			double finalVal = 0;
+    			double rootProduct;
     			
     			List<Double> data2 = fullList.get(j);
     			
-    	    	//differences between elements of 2 genes
-    			List<Double> sDiff= new ArrayList<Double>();
+    			if(centered){
+    				
+        			for(double x : data){
+        				
+        				mean_sumX += x;
+        			}
+        			
+        			mean_x = mean_sumX/data.size();
+        			
+        			for(double y : data2){
+        				
+        				mean_sumY += y;
+        			}
+        			
+        			mean_y = mean_sumY/data2.size();
+    			}
+    			else{
+    				
+    				mean_x = 0;
+    				mean_y = 0;
+    			}
     			
     			//compare each value of both genes
-    			//fixed: now runs at ~40 -60k ns = 0.05ms
     			for(int k = 0; k < data.size(); k++){
     				
-    				g1 = data.get(k);
-    				g2 = data2.get(k);
-    				gDiff = g1 - g2;
-    				gDiff = Math.abs(gDiff);
-    				sDiff.add(gDiff);
+    				//part x
+    				xi = data.get(k);
+    				sumX += (xi - mean_x) * (xi - mean_x);
+    				
+    				//part y
+    				yi = data2.get(k);
+    				sumY += (yi - mean_y) * (yi - mean_y);
+    				
+    				//part xy
+    				sumXY += (xi - mean_x) * (yi - mean_y);
     			}
     			
-    			//sum all the squared value distances up
-    			//--> get distance between gene and gene2
-    			double sum = 0;
+    			sumX_root = Math.sqrt(sumX);
+    			sumY_root = Math.sqrt(sumY);
+	    		
+    			//calculate pearson value for current gene pair
+    			rootProduct = (sumX_root * sumY_root);
     			
-    			for(double element : sDiff){
-    				sum += element;
+    			if(absolute){
+    				
+    				finalVal = Math.abs(sumXY/rootProduct);
+    			}
+    			else{
+    				
+    				finalVal = sumXY/rootProduct;
     			}
     			
-    			dataDistance.add(sum);
+    			pearson = 1 - finalVal;
+    			
+	    		pearsonList.add(pearson);
+	    		
     		}
     		
-    		//System.out.println("#1 Loop Time: " + (System.currentTimeMillis()-ms));
-
-    		//list with all genes and their distances to the other genes
-    		distanceList.add(dataDistance);
-    		
+    		distanceList.add(pearsonList);
     	}
     	
-    	
-    	System.out.println("CB DL Length: " + distanceList.size());
-    	System.out.println("CB DL Element Length: " + distanceList.get(0).size());
-    	
-    	//Fusing all genes and their distances together to one array
-    	//double[] fusedArray = concatAll(geneDistanceList.get(0),geneDistanceList.subList(1, geneDistanceList.size()));
-   
-    	//System.out.println("Fused Array Length: " + fusedArray.length);
-    	
+//    	System.out.println("GDL Size (1455?): " + distanceList.size());
+//    	System.out.println("GENE725 vs GENE872: " + distanceList.get(724).get(871));
+//    	System.out.println("GENE872 vs GENE725: " + distanceList.get(871).get(724));
     	return distanceList;
     }
 
@@ -275,8 +311,8 @@ public class HierarchicalCluster {
     	}
     	
     	
-    	System.out.println("DL Length: " + geneDistanceList.size());
-    	System.out.println("DL Element Length: " + geneDistanceList.get(0).size());
+//    	System.out.println("DL Length: " + geneDistanceList.size());
+//    	System.out.println("DL Element Length: " + geneDistanceList.get(0).size());
     	
     	//Fusing all genes and their distances together to one array
     	//double[] fusedArray = concatAll(geneDistanceList.get(0),geneDistanceList.subList(1, geneDistanceList.size()));
@@ -349,8 +385,8 @@ public class HierarchicalCluster {
     	}
     	
     	
-    	System.out.println(" CB DL Length: " + distanceList.size());
-    	System.out.println("CB DL Element Length: " + distanceList.get(0).size());
+//    	System.out.println(" CB DL Length: " + distanceList.size());
+//    	System.out.println("CB DL Element Length: " + distanceList.get(0).size());
     	
     	//Fusing all genes and their distances together to one array
     	//double[] fusedArray = concatAll(geneDistanceList.get(0),geneDistanceList.subList(1, geneDistanceList.size()));
@@ -362,12 +398,15 @@ public class HierarchicalCluster {
 	
     public void cluster(List<List<Double>> geneDList, JProgressBar pBar, boolean type){
 		
-    	//CDT file from Cluster 3.0 adds one column with gene tags according to following rule: 
-    	//(GENE) + (gene number in original dataset starting at 0) + (X) --> Example: First Gene: GENE0X
-    	//Goal of clustering: agglomerative (top-to-bottom)
-    	
+    	//list of genes and their closest partner gene (according to distance measure)
+    	//Structure: {{g1, g2},...,{gX, gY}}
     	List<String[]> genePairs = new ArrayList<String[]>();
+    	
+    	//list of all minimum distances
+    	//Structure: {d1, d2, d3,...,dX}
     	List<Double> minValues = new ArrayList<Double>();
+    	
+    	//
     	List<List<String>> dataMatrix = new ArrayList<List<String>>();
     	
     	//progressbar maximum = amount of genes
@@ -396,9 +435,18 @@ public class HierarchicalCluster {
     		//sort the gene (min to max)
     		Collections.sort(sortedGene);
     		
-    		//find first none-zero value in sorted array = shortest distance to other gene
+    		//find first none-zero value in sorted array = shortest distance to other gene (first value is always 0.0)
+    		//if Gene A is closest to Gene B and Gene B is closest to Gene A (rare!) and the exact minimum value
+    		//already exists in minValues, for the second pair {B, A} the next closest gene/ node is taken.
     		//set min to this value
-    		min = sortedGene.get(1);
+    		if(minValues.contains(sortedGene.get(1))){
+    			
+    			min = sortedGene.get(2);
+    		}
+    		else{
+    			
+    			min = sortedGene.get(1);
+    		}
     		
     		//find position of min in the current gene to figure out which the closest gene is
     		for(int j = 0; j < gene.size(); j++){
@@ -418,6 +466,7 @@ public class HierarchicalCluster {
     			
 	    		distPair[0] = "GENE" + i + "X";
 	    		distPair[1] = "GENE" + pos + "X";
+	    		
     		}
     		else{
     			
@@ -430,14 +479,13 @@ public class HierarchicalCluster {
     		
     	}
     	
-    	System.out.println("Pairs Length Pre: " + genePairs.size());
-    	System.out.println("MinValues Length Pre: " + minValues.size());
+    	System.out.println("GenePair: " + Arrays.toString(genePairs.get(1165)));
+//    	System.out.println("MinValues Length Pre: " + minValues.size());
     	
     	List<Double> orderedMin = new ArrayList<Double>(minValues);
     	Collections.sort(orderedMin);
     	
-//    	System.out.println("OrderedMin: " + orderedMin);
-//    	System.out.println("MinValues: " + minValues);
+    	System.out.println("Ordered Min: " + orderedMin.toString());
     	
 //----->//NEED TO CORRECT FOR INCREASING i and SHRINKING minValues (they meet midway and so only half the data gets processed)
     	for(int i = 0; i < orderedMin.size() ; i++){  		
@@ -454,42 +502,44 @@ public class HierarchicalCluster {
 			List<String> geneLink = new ArrayList<String>();
 			String newNode = "NODE" + (i+1) + "X";
 			geneLink.add(newNode);
+			 
+			//Check all elements previously added (loop) to dataMatrix
+//			for(List<String> element : dataMatrix){
+//				
+//				//if any element contains a gene of the current checked pair (smallGene)
+//				//add the none-duplicate gene to geneLink
+//				if(element.contains(smallGene[0])){
+//					
+//					//Gene is replaced with node name of the element it contains
+//					smallGene[0] = element.get(0);
+//				}
+//				else if (element.contains(smallGene[1])){
+//					
+//					smallGene[1] = element.get(0);
+//				}
+//				//in case it contains none dont change smallGene
+//				else if(element.contains(smallGene[0]) && element.contains(smallGene[1])){
+//					
+//					
+//				}
+//			}
 			
-			//Check all elements already added to gtrList
-			for(List<String> element : dataMatrix){
-				
-				//if any element contains a gene of the current checked pair (smallGene)
-				//add the none-duplicate gene to geneLink
-				//in case it contains both genes already
-				if(element.contains(smallGene[0])){
-					
-					//Gene is replaced with node name of the element it contains
-					smallGene[0] = element.get(0);
-				}
-				else if (element.contains(smallGene[1])){
-					
-					smallGene[1] = element.get(0);
-				}
-				//in case it contains none dont change smallGene
-				else{
-					
-				}
-			}
-			
-			//Add names to geneLink
+			//Add gene names to geneLink
+			//structure: {NODE1X, GENE2X, GENE3X}
 			geneLink.add(smallGene[0]);
 			geneLink.add(smallGene[1]);
 			
-			//add connection to gtrMatrix
+			//add connection to dataMatrix 
+			//structure: {{NODE1X, GENE2X, GENE3X}, ..., {NODE1X, GENE2X, GENE3X}}
 			dataMatrix.add(geneLink);
 		
     	}
     	
 		//Test Output
 		//System.out.println("Closest Gene Pair: " + Arrays.toString(smallGene));
-    	System.out.println("Gene Connections: " + genePairs.size());
-    	
-    	System.out.println("GTR Matrix Size: " + dataMatrix.size());
+//    	System.out.println("Gene Connections: " + genePairs.size());
+//    	
+//    	System.out.println("GTR Matrix Size: " + dataMatrix.size());
     	
     	ClusterFileWriter dataFile = new ClusterFileWriter(frame, model);
 

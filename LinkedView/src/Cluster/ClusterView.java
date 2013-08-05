@@ -366,12 +366,12 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 					setBackground(Color.white);
 					
 					//headers
-					head2 = new HeaderPanel("Elements");
+					head2 = new HeaderPanel("Rows");
 					head2.setSmall();
 					head2.setBackground(new Color(110, 210, 255, 150));
 					this.add(head2, "alignx 50%, pushx");
 					 
-					head3 = new HeaderPanel("Arrays");
+					head3 = new HeaderPanel("Columns");
 					head3.setSmall();
 					head3.setBackground(new Color(110, 210, 255, 150));
 					this.add(head3, "alignx 50%, pushx, wrap");
@@ -416,8 +416,8 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 				}
 		
 		//Options for comboboxes used by 2 classes
-		private String[] measurements = {"Correlation (uncentered)", "Correlation (centered)", "Absolute Correlation (uncentered)",
-				"Absolute Correlation (centered)", "Spearman Rank Correlation", "Kendall's Tau", "Euclidean Distance", "City Block Distance"};
+		private String[] measurements = {"None", "Pearson Correlation (uncentered)", "Pearson Correlation (centered)", "Absolute Correlation (uncentered)",
+				"Absolute Correlation (centered)", "Euclidean Distance", "City Block Distance"};
 	
 		//label used by 2 classes
 		private JLabel similarity;
@@ -439,7 +439,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 			  		clusterGeneCheck = new JCheckBox("Cluster");
 			  		clusterGeneCheck.setBackground(Color.white);
 			  		clusterGeneCheck.setFont(new Font("Sans Serif", Font.PLAIN, 18));
-			  		this.add(clusterGeneCheck, "wrap");
+			  		//this.add(clusterGeneCheck, "wrap");
 			  			
 			  		weightGeneCheck = new JCheckBox ("Calculate Weights");
 			  		weightGeneCheck.setFont(new Font("Sans Serif", Font.PLAIN, 18));
@@ -476,7 +476,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		  		clusterArrayCheck = new JCheckBox("Cluster");
 		  		clusterArrayCheck.setBackground(Color.white);
 		  		clusterArrayCheck.setFont(new Font("Sans Serif", Font.PLAIN, 18));
-		  		this.add(clusterArrayCheck, "wrap");
+		  		//this.add(clusterArrayCheck, "wrap");
 		  			
 		  		weightArrayCheck = new JCheckBox ("Calculate Weights");
 		  		weightArrayCheck.setFont(new Font("Sans Serif", Font.PLAIN, 18));
@@ -547,11 +547,12 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		    
 					@Override
 					public void actionPerformed(ActionEvent arg0) {
-						// All on Event Dispatch Thread
-						//Build ProgressBar
+						
+						String choice = (String)geneCombo.getSelectedItem();
+						String choice2 = (String)arrayCombo.getSelectedItem();
 						
 						//needs at least one box to be selected otherwise display error
-						if(clusterGeneCheck.isSelected()||clusterArrayCheck.isSelected()){
+						if(!choice.contentEquals("None")||!choice2.contentEquals("None")){
 							
 							loadPanel.removeAll();
 							
@@ -574,7 +575,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 							loadPanel.add(pBar, "pushx, growx, span");
 							loadPanel.setBackground(Color.white);
 							loadPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-							finalPanel.add(loadPanel, "pushx, growx");
+							finalPanel.add(loadPanel, "pushx, growx, wrap");
 							mainPanel.revalidate();
 							mainPanel.repaint();
 							
@@ -622,8 +623,8 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 							error1.setForeground(new Color(240, 80, 50, 255));
 							loadPanel.add(error1, "alignx 50%, span, wrap");
 							
-							error2 = new JLabel("Please select either elements, " +
-									"arrays or both to begin clustering!");
+							error2 = new JLabel("Please select either a similarity metric for rows, " +
+									"columns, or both to begin clustering!");
 							error2.setFont(new Font("Sans Serif", Font.PLAIN, 22));
 							
 							loadPanel.setBackground(Color.white);
@@ -651,6 +652,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 	private void hCluster(int method, double[] currentArray, String similarityM, JProgressBar pBar) 
 			throws InterruptedException, ExecutionException{
 		
+		JLabel loadingInfo = new JLabel();
 		
 		HierarchicalCluster clusterTarget = new HierarchicalCluster((ClusterModel)dataModel, 
 				currentArray, method, similarityM, viewFrame);
@@ -668,27 +670,64 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 			currentList.add(d);
 		}
 		
+		String choice = (String)geneCombo.getSelectedItem();
+		String choice2 = (String)arrayCombo.getSelectedItem();
+		
 		//if user checked clustering for elements
-		if(clusterGeneCheck.isSelected()){
+		if(!choice.contentEquals("None")){
+			
+			finalPanel.add(loadingInfo, "alignx 50%, pushx, wrap");
+			
+			loadingInfo.setText("Operation Infos");
+			
+			mainPanel.revalidate();
+			mainPanel.repaint();
+			
+			loadingInfo.setText("Preparing Row Data...");
 			
 			sepElements = clusterTarget.splitElements(currentList, pBar);
 			
-			elementDistances  = measureDistance(clusterTarget, sepElements, (String)geneCombo.getSelectedItem(), pBar);
+			loadingInfo.setText("Creating Row Distance Matrix...");
+			
+			elementDistances  = measureDistance(clusterTarget, sepElements, choice, pBar);
+			
+			loadingInfo.setText("Clustering Row Elements...");
 			
 			clusterTarget.cluster(elementDistances, pBar, isElements);
+			
+			finalPanel.remove(loadingInfo);
+			mainPanel.revalidate();
+			mainPanel.repaint();
 			
 			finalPanel.setPath(clusterTarget.getFilePath());
 			
 		}
 		
 		//if user checked clustering for arrays
-		if(clusterArrayCheck.isSelected()){
+		if(!choice2.contentEquals("None")){
+			
+			finalPanel.add(loadingInfo, "alignx 50%, pushx, wrap");
+			
+			loadingInfo.setText("Operation Infos");
+			
+			mainPanel.revalidate();
+			mainPanel.repaint();
+			
+			loadingInfo.setText("Preparing Column Data...");
 			
 			sepArrays = clusterTarget.splitArrays(currentList, pBar);
 			
-			arrayDistances  = measureDistance(clusterTarget, sepArrays, (String)arrayCombo.getSelectedItem(), pBar);
+			loadingInfo.setText("Creating Column Distance Matrix...");
+			
+			arrayDistances  = measureDistance(clusterTarget, sepArrays, choice2, pBar);
+			
+			loadingInfo.setText("Clustering Column Elements...");
 			
 			clusterTarget.cluster(arrayDistances, pBar, isArrays);
+			
+			finalPanel.remove(loadingInfo);
+			mainPanel.revalidate();
+			mainPanel.repaint();
 			
 			finalPanel.setPath(clusterTarget.getFilePath());
 			
@@ -712,10 +751,24 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		List<List<Double>> distances = new ArrayList<List<Double>>();
 		
 		switch(choice){
+		
+			case "Pearson Correlation (uncentered)": distances = target.pearson(data, pBar, false, false);
+			break;
+			
+			case "Pearson Correlation (centered)": distances = target.pearson(data, pBar, false, true);
+			break;
+			
+			case "Absolute Correlation (uncentered)": distances = target.pearson(data, pBar, true, false);
+			break;
+			
+			case "Absolute Correlation (centered)": distances = target.pearson(data, pBar, true, true);
+			break;
 			
 			case "Euclidean Distance": distances = target.euclid(data, pBar);
+			break;
 			
 			case "City Block Distance": distances = target.cityBlock(data, pBar);
+			break;
 			
 			default: break;
 		
