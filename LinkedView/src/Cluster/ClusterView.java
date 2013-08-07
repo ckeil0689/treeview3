@@ -138,9 +138,6 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		outer = (ClusterModel) dataModel;
 		matrix = outer.getDataMatrix();
 		dataArray = matrix.getExprData();
-		
-		rangeArray = Arrays.copyOfRange(dataArray, 1455, 2900);
-		System.out.println("DataArray Element 1: " + Arrays.toString(rangeArray));
 
 		viewFrame.setResizable(true);
 		

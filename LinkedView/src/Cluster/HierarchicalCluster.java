@@ -439,13 +439,16 @@ public class HierarchicalCluster {
     		//if Gene A is closest to Gene B and Gene B is closest to Gene A (rare!) and the exact minimum value
     		//already exists in minValues, for the second pair {B, A} the next closest gene/ node is taken.
     		//set min to this value
-    		if(minValues.contains(sortedGene.get(1))){
+    		//start at k = 1 because sortedGene.get(0) will always be 0.0 
+    		//(in the matrix, this is the distance between a gene and itself, row vs. column)
+    		for(int k = 1; k < sortedGene.size(); k++ ){
     			
-    			min = sortedGene.get(2);
-    		}
-    		else{
+    			if(!minValues.contains(sortedGene.get(k))){
+        			
+        			min = sortedGene.get(k);
+        			break;
+        		}
     			
-    			min = sortedGene.get(1);
     		}
     		
     		//find position of min in the current gene to figure out which the closest gene is
@@ -479,7 +482,6 @@ public class HierarchicalCluster {
     		
     	}
     	
-    	System.out.println("GenePair: " + Arrays.toString(genePairs.get(1165)));
 //    	System.out.println("MinValues Length Pre: " + minValues.size());
     	
     	List<Double> orderedMin = new ArrayList<Double>(minValues);
@@ -492,7 +494,7 @@ public class HierarchicalCluster {
     		
 	    	//find least smallest distance in minValues
 	    	//then associate the smallest distance with the appropriate gene pair
-	    	String[] smallGene = new String[1];
+	    	String[] smallGene = new String[2];
 	    	
 	    	int k = minValues.indexOf(orderedMin.get(i));
 	    	smallGene = genePairs.get(k);
@@ -504,30 +506,27 @@ public class HierarchicalCluster {
 			geneLink.add(newNode);
 			 
 			//Check all elements previously added (loop) to dataMatrix
-//			for(List<String> element : dataMatrix){
-//				
-//				//if any element contains a gene of the current checked pair (smallGene)
-//				//add the none-duplicate gene to geneLink
-//				if(element.contains(smallGene[0])){
-//					
-//					//Gene is replaced with node name of the element it contains
-//					smallGene[0] = element.get(0);
-//				}
-//				else if (element.contains(smallGene[1])){
-//					
-//					smallGene[1] = element.get(0);
-//				}
-//				//in case it contains none dont change smallGene
-//				else if(element.contains(smallGene[0]) && element.contains(smallGene[1])){
-//					
-//					
-//				}
-//			}
+			for(List<String> element : dataMatrix){
+				
+				//if any element contains a gene of the current checked pair (smallGene)
+				//add the none-duplicate gene to geneLink
+				if(element.contains(smallGene[0])){
+					
+					//Gene is replaced with node name of the element it contains
+					smallGene[0] = element.get(0);
+				}
+				else if (element.contains(smallGene[1])){
+					
+					smallGene[1] = element.get(0);
+				}
+				
+			}
 			
 			//Add gene names to geneLink
 			//structure: {NODE1X, GENE2X, GENE3X}
 			geneLink.add(smallGene[0]);
 			geneLink.add(smallGene[1]);
+			geneLink.add(Double.toString(orderedMin.get(i)));
 			
 			//add connection to dataMatrix 
 			//structure: {{NODE1X, GENE2X, GENE3X}, ..., {NODE1X, GENE2X, GENE3X}}
