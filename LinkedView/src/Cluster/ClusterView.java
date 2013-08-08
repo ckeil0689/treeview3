@@ -545,8 +545,9 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 					@Override
 					public void actionPerformed(ActionEvent arg0) {
 						
-						String choice = (String)geneCombo.getSelectedItem();
-						String choice2 = (String)arrayCombo.getSelectedItem();
+						final String choice = (String)geneCombo.getSelectedItem();
+						final String choice2 = (String)arrayCombo.getSelectedItem();
+						final String clusterMethod = (String)clusterChoice.getSelectedItem();
 						
 						//needs at least one box to be selected otherwise display error
 						if(!choice.contentEquals("None")||!choice2.contentEquals("None")){
@@ -582,7 +583,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 								public Void doInBackground() {
 	
 						        	try {
-										hCluster(2, dataArray, "What", pBar);
+										hCluster(dataArray, clusterMethod, pBar);
 									} catch (InterruptedException e) {
 									
 										e.printStackTrace();
@@ -646,13 +647,13 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		}	
 		
 
-	private void hCluster(int method, double[] currentArray, String similarityM, JProgressBar pBar) 
+	private void hCluster(double[] currentArray, String similarityM, JProgressBar pBar) 
 			throws InterruptedException, ExecutionException{
 		
 		JLabel loadingInfo = new JLabel();
 		
 		HierarchicalCluster clusterTarget = new HierarchicalCluster((ClusterModel)dataModel, 
-				currentArray, method, similarityM, viewFrame);
+				currentArray, similarityM, viewFrame);
 		
 		//declare variables needed for function
 		List<Double> currentList = new ArrayList<Double>();
@@ -690,7 +691,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 			
 			loadingInfo.setText("Clustering Row Elements...");
 			
-			clusterTarget.cluster(elementDistances, pBar, isElements);
+			clusterTarget.cluster(elementDistances, pBar, isElements,similarityM);
 			
 			finalPanel.remove(loadingInfo);
 			mainPanel.revalidate();
@@ -720,7 +721,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 			
 			loadingInfo.setText("Clustering Column Elements...");
 			
-			clusterTarget.cluster(arrayDistances, pBar, isArrays);
+			clusterTarget.cluster(arrayDistances, pBar, isArrays, similarityM);
 			
 			finalPanel.remove(loadingInfo);
 			mainPanel.revalidate();
