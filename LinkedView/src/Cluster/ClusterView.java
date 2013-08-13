@@ -691,7 +691,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 			
 			loadingInfo.setText("Clustering Row Elements...");
 			
-			clusterTarget.cluster(elementDistances, pBar, isElements,similarityM);
+			clusterTarget.cluster(elementDistances, pBar, isElements, similarityM);
 			
 			finalPanel.remove(loadingInfo);
 			mainPanel.revalidate();
