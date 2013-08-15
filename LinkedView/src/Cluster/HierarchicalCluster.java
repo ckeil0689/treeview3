@@ -227,7 +227,7 @@ public class HierarchicalCluster {
     			
     			//using BigDecimal to correct for rounding errors caused by floating point arithmetic (0.0 would be -1.113274672357E-16 for example)
     			pearson2 = new BigDecimal(String.valueOf(pearson1));
-    			pearson2 = pearson2.setScale(7, BigDecimal.ROUND_DOWN);
+    			pearson2 = pearson2.setScale(6, BigDecimal.ROUND_DOWN);
     			
 	    		pearsonList.add(pearson2.doubleValue());
 	    		
@@ -721,13 +721,14 @@ public class HierarchicalCluster {
     		System.out.println("Gene Groups: " + geneGroups.size());
     		
     		//CHANGE LIMIT!!
-    		while(newDList.size() > 1){
+    		while(newDList.size() > 1435){
     		
 	    		double min = 0;
 	    		int row = 0;
 	    		int column = 0;
 	    		List<Double> geneMins = new ArrayList<Double>();
 	    		String[] pair = new String[2];
+	    		
 	    		
 	    		//the row value is just the position of the corresponding column value in columnValues
 	    		List<Integer> columnValues = new ArrayList<Integer>();
@@ -790,7 +791,9 @@ public class HierarchicalCluster {
 	    		//row and column value of the minimum distance value in matrix are now known
 	    		min = newDList.get(row).get(column);
 	    		
-//	    		System.out.println("Min: " + min);
+//	    		System.out.println("newDList: " + newDList.size());
+	    		System.out.println("1 - Min: " + (1 - min));
+	    		System.out.println("NewDList Element: " + newDList.get(10).size());
 	    		
 	    		usedMins.add(min);
 	    		
@@ -815,20 +818,27 @@ public class HierarchicalCluster {
 	    		List<Integer> rowGroup = geneGroups.get(row); //G
 	    		List<Integer> colGroup = geneGroups.get(column); //B
 	    		
-	    		newDList.remove(row);
-	    		newDList.remove(column);
+	    		//the new geneGroup containing the all genes (BG)
+	    		List<Integer> fusedGroup = new ArrayList<Integer>();
+	    		fusedGroup.addAll(rowGroup);
+	    		fusedGroup.addAll(colGroup); 
+	    		
+	    		System.out.println("Gene 1: " + geneGroups.get(row).toString());
+	    		System.out.println("Gene 2: " + geneGroups.get(column).toString());
+	    		
+	    		geneGroups.remove(row);
+	    		geneGroups.remove(column);
+	    		
+	    		geneGroups.add(Collections.min(fusedGroup), fusedGroup);
 	    		
 	    		//next compare the rowGroup to geneGroup column values for each gene in the rowGroup
 	    		//find mean values to add to newClade (which is a new rowGroup)
+	    		//place newClade in newDList, at the same index as fusedGroup in geneGroups
 	    		//BG -->
-	    		for(int i = 0; i < rowGroup.size(); i++){
-	    			
-	    			
-	    		}
-	    		//replace newDList.get(row) with newClade!
 	    		
-	    		
-	  
+	    		//remove old elements first
+	    		newDList.remove(row);
+	    		newDList.remove(column);
 	    		
 	    		for(List<Double> element : newDList){
 	    			
@@ -837,7 +847,41 @@ public class HierarchicalCluster {
 	    		}
 	    		
 	    		
-	    		//now take values from original geneDList and insert new row AC and column AC based on mean values
+	    		//fill newClade with means
+	    		//mean = 0.0 with itself
+	    		//Error in here------------------------------------------------------------
+	    		for(int i = 0; i < geneDList.get(0).size(); i++){
+	    			
+	    			double distanceSum = 0;
+	    			double mean = 0;
+	    			
+	    			if(!fusedGroup.contains(i)){
+	    			
+		    			//select members of the new clade (B & G)	
+			    		for(int j = 0; j < fusedGroup.size(); j++){
+			    				
+			    			int selectedGene = fusedGroup.get(j);
+			    			double distanceVal = geneDList.get(selectedGene).get(i);
+			    			distanceSum += distanceVal;
+			    				
+			    		}
+			    		
+			    		mean = distanceSum/fusedGroup.size();
+		    			
+		    			newClade.add(mean);
+	    			}
+	    		}
+	    		
+//	    		System.out.println("newClade: " + newClade.size());
+	    	
+	    		newDList.add(Collections.min(fusedGroup), newClade);
+	    		
+	    		System.out.println("newDList: " + newDList.size());
+	    		
+	    		for(List<Double> element : newDList){
+	    			
+	    			element.add(Collections.min(fusedGroup), newClade.get(newDList.indexOf(element)));
+	    		}
 	    		
     		}
     	}

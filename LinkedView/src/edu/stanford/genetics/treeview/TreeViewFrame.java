@@ -112,13 +112,13 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 //		waiting.setAlignmentY((float) 0.5);
 		JLabel jl = new JLabel("Hello! How are you Gentlepeople?");
 		jl.setFont(new Font("Sans Serif", Font.PLAIN, 30));
-		jl.setForeground(new Color(50,150,255,250));
+		jl.setForeground(new Color(60, 180, 220, 255));
 		jl.setAlignmentX((float) 0.5);
 		jl.setAlignmentY((float) 0.5);
 		waiting.add(jl, "wrap, pushx, alignx 50%");
 		jl = new JLabel("Welcome to " + getAppName());
 		jl.setFont(new Font("Sans Serif", Font.PLAIN, 40));
-		jl.setForeground(new Color(50,150,255,250));
+		jl.setForeground(new Color(60, 180, 220, 255));
 		jl.setAlignmentX((float) 0.5);
 		jl.setAlignmentY((float) 0.5);
 		waiting.add(jl, "span, pushx, alignx 50%");
