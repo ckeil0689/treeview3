@@ -413,7 +413,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 				}
 		
 		//Options for comboboxes used by 2 classes
-		private String[] measurements = {"None", "Pearson Correlation (uncentered)", "Pearson Correlation (centered)", "Absolute Correlation (uncentered)",
+		private String[] measurements = {"Do Not Cluster", "Pearson Correlation (uncentered)", "Pearson Correlation (centered)", "Absolute Correlation (uncentered)",
 				"Absolute Correlation (centered)", "Euclidean Distance", "City Block Distance"};
 	
 		//label used by 2 classes
@@ -550,7 +550,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 						final String clusterMethod = (String)clusterChoice.getSelectedItem();
 						
 						//needs at least one box to be selected otherwise display error
-						if(!choice.contentEquals("None")||!choice2.contentEquals("None")){
+						if(!choice.contentEquals("Do Not Cluster")||!choice2.contentEquals("Do Not Cluster")){
 							
 							loadPanel.removeAll();
 							
@@ -672,7 +672,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		String choice2 = (String)arrayCombo.getSelectedItem();
 		
 		//if user checked clustering for elements
-		if(!choice.contentEquals("None")){
+		if(!choice.contentEquals("Do Not Cluster")){
 			
 			finalPanel.add(loadingInfo, "alignx 50%, pushx, wrap");
 			
@@ -702,7 +702,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		}
 		
 		//if user checked clustering for arrays
-		if(!choice2.contentEquals("None")){
+		if(!choice2.contentEquals("Do Not Cluster")){
 			
 			finalPanel.add(loadingInfo, "alignx 50%, pushx, wrap");
 			

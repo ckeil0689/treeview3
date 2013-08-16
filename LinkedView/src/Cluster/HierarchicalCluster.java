@@ -719,6 +719,7 @@ public class HierarchicalCluster {
     		
     		//geneGroups should now be as big as newDList, format {{0},{1},{2}...{x}}
     		System.out.println("Gene Groups: " + geneGroups.size());
+
     		
     		//CHANGE LIMIT!!
     		while(newDList.size() > 1435){
@@ -793,8 +794,7 @@ public class HierarchicalCluster {
 	    		
 //	    		System.out.println("newDList: " + newDList.size());
 	    		System.out.println("1 - Min: " + (1 - min));
-	    		System.out.println("NewDList Element: " + newDList.get(10).size());
-	    		
+
 	    		usedMins.add(min);
 	    		
 	    		//now both genes must be joined, a new "matrix" must be created (actually new geneDList)
@@ -823,13 +823,24 @@ public class HierarchicalCluster {
 	    		fusedGroup.addAll(rowGroup);
 	    		fusedGroup.addAll(colGroup); 
 	    		
+	    		System.out.println("row: " + row);
+	    		System.out.println("column: " + column);
+	    		
 	    		System.out.println("Gene 1: " + geneGroups.get(row).toString());
 	    		System.out.println("Gene 2: " + geneGroups.get(column).toString());
 	    		
+	    		//apparently when removing the row element, everything shifts and the column element needs to be adjusted for
+	    		System.out.println("GeneGroups PRE: " + geneGroups.size());
 	    		geneGroups.remove(row);
-	    		geneGroups.remove(column);
+	    		geneGroups.remove(column - 1);
+	    		System.out.println("GeneGroups Mid: " + geneGroups.size());
 	    		
 	    		geneGroups.add(Collections.min(fusedGroup), fusedGroup);
+	    		System.out.println("Gene 1 Post: " + geneGroups.get(row).toString());
+	    		System.out.println("Gene 2 Post: " + geneGroups.get(column).toString());
+	    		System.out.println("Gene 2 +1 Post: " + geneGroups.get(column + 1).toString());
+	    		System.out.println("Gene 2 -1 Post: " + geneGroups.get(column - 1).toString());
+	    		System.out.println("GeneGroups Post: " + geneGroups.size());
 	    		
 	    		//next compare the rowGroup to geneGroup column values for each gene in the rowGroup
 	    		//find mean values to add to newClade (which is a new rowGroup)
@@ -838,41 +849,62 @@ public class HierarchicalCluster {
 	    		
 	    		//remove old elements first
 	    		newDList.remove(row);
-	    		newDList.remove(column);
+	    		newDList.remove(column - 1);
 	    		
 	    		for(List<Double> element : newDList){
 	    			
 	    			element.remove(column);
-	    			element.remove(row);
+	    			element.remove(row - 1);
 	    		}
 	    		
 	    		
 	    		//fill newClade with means
 	    		//mean = 0.0 with itself
 	    		//Error in here------------------------------------------------------------
-	    		for(int i = 0; i < geneDList.get(0).size(); i++){
+	    		//move through geneGroups (the gene to compare the new fused Group with)
+	    		for(int i = 0; i < geneGroups.size(); i++){
 	    			
 	    			double distanceSum = 0;
 	    			double mean = 0;
+	    			double distanceVal = 0;
+	    			int selectedGene = 0;
 	    			
-	    			if(!fusedGroup.contains(i)){
-	    			
+	    			//check if fusedGroup contains the current checked gene (then no mean should be calculated)
+	    			if(Collections.disjoint(geneGroups.get(i), fusedGroup)){
+	    				
 		    			//select members of the new clade (B & G)	
 			    		for(int j = 0; j < fusedGroup.size(); j++){
 			    				
-			    			int selectedGene = fusedGroup.get(j);
-			    			double distanceVal = geneDList.get(selectedGene).get(i);
-			    			distanceSum += distanceVal;
+			    			selectedGene = fusedGroup.get(j);
+			    			
+			    			for(int gene : geneGroups.get(i)){
 			    				
+				    			distanceVal = geneDList.get(selectedGene).get(gene);
+				    			distanceSum += distanceVal;
+				    			
+			    			}
+
 			    		}
 			    		
-			    		mean = distanceSum/fusedGroup.size();
+			    		mean = distanceSum/(fusedGroup.size() * geneGroups.get(i).size()) ;
 		    			
 		    			newClade.add(mean);
 	    			}
+	    			else if(geneGroups.get(i).containsAll(fusedGroup)){
+	    				
+	    				mean = 0.0;
+	    				newClade.add(mean);
+	    			}
+	    			else{
+	    				
+	    				System.out.println("(i): " + i);
+	    				System.out.println("geneGroups.get(i): " + geneGroups.get(i).toString());
+	    				System.out.println("FusedGroup: " + fusedGroup.toString());
+	    				
+	    			}
 	    		}
 	    		
-//	    		System.out.println("newClade: " + newClade.size());
+	    		System.out.println("newClade: " + newClade.size());
 	    	
 	    		newDList.add(Collections.min(fusedGroup), newClade);
 	    		
@@ -882,7 +914,7 @@ public class HierarchicalCluster {
 	    			
 	    			element.add(Collections.min(fusedGroup), newClade.get(newDList.indexOf(element)));
 	    		}
-	    		
+	    		System.out.println("NewDList Element: " + newDList.get(10).size());
     		}
     	}
     	
