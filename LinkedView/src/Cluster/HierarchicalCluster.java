@@ -688,8 +688,6 @@ public class HierarchicalCluster {
     		//list to make sure every loop step uses the next highest min value from geneDList
     		List<Double> usedMins = new ArrayList<Double>();
     		
-    		//1 find shortest distance in entire original matrix
-    		
     		//make deep copy of original geneDList
     		List<List<Double>> newDList = new ArrayList<List<Double>>();
     		
@@ -716,19 +714,16 @@ public class HierarchicalCluster {
     			group.add(i);
     			geneGroups.add(group);
     		}
-    		
-    		//geneGroups should now be as big as newDList, format {{0},{1},{2}...{x}}
-    		System.out.println("Gene Groups: " + geneGroups.size());
 
     		
     		//CHANGE LIMIT!!
-    		while(newDList.size() > 1435){
+    		while(newDList.size() > 1425){
     		
 	    		double min = 0;
 	    		int row = 0;
 	    		int column = 0;
 	    		List<Double> geneMins = new ArrayList<Double>();
-	    		String[] pair = new String[2];
+	    		List<String> pair = new ArrayList<String>();
 	    		
 	    		
 	    		//the row value is just the position of the corresponding column value in columnValues
@@ -792,8 +787,8 @@ public class HierarchicalCluster {
 	    		//row and column value of the minimum distance value in matrix are now known
 	    		min = newDList.get(row).get(column);
 	    		
-//	    		System.out.println("newDList: " + newDList.size());
-	    		System.out.println("1 - Min: " + (1 - min));
+	    		System.out.println("------------------------------------------");
+	    		System.out.println("Min: " + (min));
 
 	    		usedMins.add(min);
 	    		
@@ -823,24 +818,48 @@ public class HierarchicalCluster {
 	    		fusedGroup.addAll(rowGroup);
 	    		fusedGroup.addAll(colGroup); 
 	    		
-	    		System.out.println("row: " + row);
-	    		System.out.println("column: " + column);
+//	    		System.out.println("row: " + row);
+//	    		System.out.println("column: " + column);
 	    		
 	    		System.out.println("Gene 1: " + geneGroups.get(row).toString());
 	    		System.out.println("Gene 2: " + geneGroups.get(column).toString());
 	    		
+	    		//add genes to String array?
+	    		pair.add("NODE" + (geneDList.size()-newDList.size()) + "X");
+	    		
+	    		//check the lists in dataMatrix whether the genePair you want to add now is already
+	    		//in a list from before, if yes connect to LATEST node by repalcing the gene name with the node name
+	    		for(List<String> element : dataMatrix){
+	    			
+	    			if()
+	    		}
+	    		
 	    		//apparently when removing the row element, everything shifts and the column element needs to be adjusted for
-	    		System.out.println("GeneGroups PRE: " + geneGroups.size());
-	    		geneGroups.remove(row);
-	    		geneGroups.remove(column - 1);
-	    		System.out.println("GeneGroups Mid: " + geneGroups.size());
+//	    		System.out.println("GeneGroups PRE: " + geneGroups.size());
+	    		
+	    		//removing in sequence causes the list to be altered such that the second removal (column) is shifted
+	    		//remedy: either remove column - 1 or check every group whether it contains the chosen min-genes and remove them
+	    		if(row > column){
+	    			
+	    			geneGroups.remove(row);
+		    		geneGroups.remove(column);
+		    		
+	    		}
+	    		else{
+	    			
+	    			geneGroups.remove(column);
+	    			geneGroups.remove(row);
+	    		}
+	    		
+	    		
+//	    		System.out.println("GeneGroups Mid: " + geneGroups.size());
 	    		
 	    		geneGroups.add(Collections.min(fusedGroup), fusedGroup);
-	    		System.out.println("Gene 1 Post: " + geneGroups.get(row).toString());
-	    		System.out.println("Gene 2 Post: " + geneGroups.get(column).toString());
-	    		System.out.println("Gene 2 +1 Post: " + geneGroups.get(column + 1).toString());
-	    		System.out.println("Gene 2 -1 Post: " + geneGroups.get(column - 1).toString());
-	    		System.out.println("GeneGroups Post: " + geneGroups.size());
+//	    		System.out.println("Gene 1 Post: " + geneGroups.get(row).toString());
+//	    		System.out.println("Gene 2 Post: " + geneGroups.get(column).toString());
+//	    		System.out.println("Gene 2 +1 Post: " + geneGroups.get(column + 1).toString());
+//	    		System.out.println("Gene 2 -1 Post: " + geneGroups.get(column - 1).toString());
+//	    		System.out.println("GeneGroups Post: " + geneGroups.size());
 	    		
 	    		//next compare the rowGroup to geneGroup column values for each gene in the rowGroup
 	    		//find mean values to add to newClade (which is a new rowGroup)
@@ -870,6 +889,7 @@ public class HierarchicalCluster {
 	    			int selectedGene = 0;
 	    			
 	    			//check if fusedGroup contains the current checked gene (then no mean should be calculated)
+	    			//no elements in common
 	    			if(Collections.disjoint(geneGroups.get(i), fusedGroup)){
 	    				
 		    			//select members of the new clade (B & G)	
@@ -890,6 +910,7 @@ public class HierarchicalCluster {
 		    			
 		    			newClade.add(mean);
 	    			}
+	    			//all elements in common
 	    			else if(geneGroups.get(i).containsAll(fusedGroup)){
 	    				
 	    				mean = 0.0;
