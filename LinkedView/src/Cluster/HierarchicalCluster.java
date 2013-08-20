@@ -416,7 +416,9 @@ public class HierarchicalCluster {
     	List<Double> linkValues = new ArrayList<Double>();
     	
     	//
-    	List<List<String>> dataMatrix = new ArrayList<List<String>>();
+    	List<List<String>> dataTable = new ArrayList<List<String>>();
+    	
+    	List<List<Integer>> geneIntegerTable = new ArrayList<List<Integer>>();
     	
     	//progressbar maximum = amount of genes
     	pBar.setMaximum(geneDList.size());
@@ -519,7 +521,7 @@ public class HierarchicalCluster {
 				geneLink.add(newNode);
 				 
 				//Check all elements previously added (loop) to dataMatrix
-				for(List<String> element : dataMatrix){
+				for(List<String> element : dataTable){
 					
 					//if any element contains a gene of the current checked pair (smallGene)
 					//add the none-duplicate gene to geneLink
@@ -543,7 +545,7 @@ public class HierarchicalCluster {
 				
 				//add connection to dataMatrix 
 				//structure: {{NODE1X, GENE2X, GENE3X}, ..., {NODE1X, GENE2X, GENE3X}}
-				dataMatrix.add(geneLink);
+				dataTable.add(geneLink);
 			
 	    	}
 	    	
@@ -643,7 +645,7 @@ public class HierarchicalCluster {
 				geneLink.add(newNode);
 				 
 				//Check all elements previously added (loop) to dataMatrix
-				for(List<String> element : dataMatrix){
+				for(List<String> element : dataTable){
 					
 					//if any element contains a gene of the current checked pair (smallGene)
 					//add the none-duplicate gene to geneLink
@@ -667,7 +669,7 @@ public class HierarchicalCluster {
 				
 				//add connection to dataMatrix 
 				//structure: {{NODE1X, GENE2X, GENE3X}, ..., {NODE1X, GENE2X, GENE3X}}
-				dataMatrix.add(geneLink);
+				dataTable.add(geneLink);
 			
 	    	}
 	    	
@@ -717,7 +719,7 @@ public class HierarchicalCluster {
 
     		
     		//CHANGE LIMIT!!
-    		while(newDList.size() > 1425){
+    		while(newDList.size() > 0){
     		
 	    		double min = 0;
 	    		int row = 0;
@@ -788,7 +790,7 @@ public class HierarchicalCluster {
 	    		min = newDList.get(row).get(column);
 	    		
 	    		System.out.println("------------------------------------------");
-	    		System.out.println("Min: " + (min));
+//	    		System.out.println("Min: " + (min));
 
 	    		usedMins.add(min);
 	    		
@@ -821,19 +823,62 @@ public class HierarchicalCluster {
 //	    		System.out.println("row: " + row);
 //	    		System.out.println("column: " + column);
 	    		
-	    		System.out.println("Gene 1: " + geneGroups.get(row).toString());
-	    		System.out.println("Gene 2: " + geneGroups.get(column).toString());
+//	    		System.out.println("Gene 1: " + geneGroups.get(row).toString());
+//	    		System.out.println("Gene 2: " + geneGroups.get(column).toString());
 	    		
 	    		//add genes to String array?
-	    		pair.add("NODE" + (geneDList.size()-newDList.size()) + "X");
+	    		String geneRow = "";
+	    		String geneCol = "";
+	    		pair.add("NODE" + (geneDList.size() - newDList.size() + 1) + "X");
 	    		
 	    		//check the lists in dataMatrix whether the genePair you want to add now is already
 	    		//in a list from before, if yes connect to LATEST node by repalcing the gene name with the node name
-	    		for(List<String> element : dataMatrix){
-	    			
-	    			if()
-	    		}
 	    		
+	    		System.out.println("NewDList Size: " + newDList.size());	
+    			if(fusedGroup.size() == 2){
+    				
+    				geneRow = "GENE" + geneGroups.get(row).get(0) + "X"; 
+    				geneCol = "GENE" + geneGroups.get(column).get(0) + "X";
+    			}
+    			else{
+    				
+    				System.out.println("GeneIntegerTable: " + geneIntegerTable.size());
+    				System.out.println("DataTable: " + dataTable.size());
+    				
+    				for(int j = 0; j < geneIntegerTable.size() ; j++){
+    					
+    					if(!Collections.disjoint(geneIntegerTable.get(j), geneGroups.get(column))){
+    						
+    						geneCol = dataTable.get(j).get(0);
+    						break;
+    					}
+    					else{
+    						
+    						geneCol = "GENE" + geneGroups.get(column).get(0) + "X";
+    					}
+    				}
+    				for(int j = 0; j < geneIntegerTable.size() ; j++){
+    					
+    					if(!Collections.disjoint(geneIntegerTable.get(j),geneGroups.get(row))){
+   
+    						geneRow = dataTable.get(j).get(0);
+    						break;
+    					}
+    					else{
+    						geneRow = "GENE" + geneGroups.get(row).get(0) + "X";
+    					}
+    					
+    				}
+    				
+    			}
+	    			
+	    		pair.add(geneCol);
+	    		pair.add(geneRow);
+	    		pair.add(String.valueOf( 1- min));
+	    		
+	    		System.out.println("Data to save: " + pair.toString());
+	    		dataTable.add(pair);
+	    		geneIntegerTable.add(fusedGroup);
 	    		//apparently when removing the row element, everything shifts and the column element needs to be adjusted for
 //	    		System.out.println("GeneGroups PRE: " + geneGroups.size());
 	    		
@@ -851,10 +896,14 @@ public class HierarchicalCluster {
 	    			geneGroups.remove(row);
 	    		}
 	    		
-	    		
+	    		System.out.println("Check 1");
 //	    		System.out.println("GeneGroups Mid: " + geneGroups.size());
 	    		
+	    		System.out.println("fusedGroup Min " + Collections.min(fusedGroup));
+	    		System.out.println("geneGroups size: " + geneGroups.size());
+	    		
 	    		geneGroups.add(Collections.min(fusedGroup), fusedGroup);
+	    		
 //	    		System.out.println("Gene 1 Post: " + geneGroups.get(row).toString());
 //	    		System.out.println("Gene 2 Post: " + geneGroups.get(column).toString());
 //	    		System.out.println("Gene 2 +1 Post: " + geneGroups.get(column + 1).toString());
@@ -864,19 +913,33 @@ public class HierarchicalCluster {
 	    		//next compare the rowGroup to geneGroup column values for each gene in the rowGroup
 	    		//find mean values to add to newClade (which is a new rowGroup)
 	    		//place newClade in newDList, at the same index as fusedGroup in geneGroups
-	    		//BG -->
+	    		//BG --
 	    		
-	    		//remove old elements first
-	    		newDList.remove(row);
-	    		newDList.remove(column - 1);
-	    		
-	    		for(List<Double> element : newDList){
-	    			
-	    			element.remove(column);
-	    			element.remove(row - 1);
-	    		}
-	    		
-	    		
+	    		//remove old elements first;
+    			if(column > row){
+    				
+    	    		newDList.remove(column);
+    	    		newDList.remove(row);
+    	    		
+		    		for(List<Double> element : newDList){
+		    			
+		    			element.remove(column);
+		    			element.remove(row);
+		    		}
+    			}
+    			else{
+    				
+    	    		newDList.remove(row);
+    	    		newDList.remove(column);
+    	    		
+		    		for(List<Double> element : newDList){
+		    			
+		    			element.remove(row);
+		    			element.remove(column);
+		    		}
+		    		
+    			}
+    			
 	    		//fill newClade with means
 	    		//mean = 0.0 with itself
 	    		//Error in here------------------------------------------------------------
@@ -888,9 +951,11 @@ public class HierarchicalCluster {
 	    			double distanceVal = 0;
 	    			int selectedGene = 0;
 	    			
+	    			
 	    			//check if fusedGroup contains the current checked gene (then no mean should be calculated)
 	    			//no elements in common
 	    			if(Collections.disjoint(geneGroups.get(i), fusedGroup)){
+	    				
 	    				
 		    			//select members of the new clade (B & G)	
 			    		for(int j = 0; j < fusedGroup.size(); j++){
@@ -913,6 +978,7 @@ public class HierarchicalCluster {
 	    			//all elements in common
 	    			else if(geneGroups.get(i).containsAll(fusedGroup)){
 	    				
+	    			
 	    				mean = 0.0;
 	    				newClade.add(mean);
 	    			}
@@ -925,17 +991,17 @@ public class HierarchicalCluster {
 	    			}
 	    		}
 	    		
-	    		System.out.println("newClade: " + newClade.size());
+//	    		System.out.println("newClade: " + newClade.size());
 	    	
 	    		newDList.add(Collections.min(fusedGroup), newClade);
 	    		
-	    		System.out.println("newDList: " + newDList.size());
+//	    		System.out.println("newDList: " + newDList.size());
 	    		
 	    		for(List<Double> element : newDList){
 	    			
 	    			element.add(Collections.min(fusedGroup), newClade.get(newDList.indexOf(element)));
 	    		}
-	    		System.out.println("NewDList Element: " + newDList.get(10).size());
+//	    		System.out.println("NewDList Element: " + newDList.get(10).size());
     		}
     	}
     	
@@ -951,11 +1017,11 @@ public class HierarchicalCluster {
 		//System.out.println("Closest Gene Pair: " + Arrays.toString(smallGene));
 //    	System.out.println("Gene Connections: " + genePairs.size());
 //    	
-    	System.out.println("dataMatrix Size: " + dataMatrix.size());
+    	System.out.println("dataMatrix Size: " + dataTable.size());
     	
     	ClusterFileWriter dataFile = new ClusterFileWriter(frame, model);
 
-    		dataFile.writeFile(dataMatrix, type);
+    		dataFile.writeFile(dataTable, type);
     		filePath = dataFile.getFilePath();
     	
     }
