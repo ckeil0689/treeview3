@@ -812,8 +812,18 @@ public class HierarchicalCluster {
 	    		//fill list with the appropriate values (Average linkage = mean). 
 	    		
 	    		//get the 2 groups of genes
-	    		List<Integer> rowGroup = geneGroups.get(row); //G
-	    		List<Integer> colGroup = geneGroups.get(column); //B
+	    		System.out.println("Row: " + row);
+	    		System.out.println("Column: " + column);
+	    		System.out.println("geneGroups size " + geneGroups.size());
+	    		System.out.println("ColumnValues size " + columnValues.size());
+	    		System.out.println("Min Gene Length " + newDList.get(row).size());
+	    		
+	    		//suspected issue: some genes in newDList are 1 elemtn too large and as a result 
+	    		//the column value is too large for geneGroups
+	    		//just tested: previously fused Genes are all 1 size larger than non-fused (??)
+	    		// issue only occurs if one of the 2 current genes is already present in a fused group
+	    		List<Integer> rowGroup = geneGroups.get(row); 
+	    		List<Integer> colGroup = geneGroups.get(column); 
 	    		
 	    		//the new geneGroup containing the all genes (BG)
 	    		List<Integer> fusedGroup = new ArrayList<Integer>();
@@ -835,15 +845,13 @@ public class HierarchicalCluster {
 	    		//in a list from before, if yes connect to LATEST node by repalcing the gene name with the node name
 	    		
 	    		System.out.println("NewDList Size: " + newDList.size());	
+	    		
     			if(fusedGroup.size() == 2){
     				
     				geneRow = "GENE" + geneGroups.get(row).get(0) + "X"; 
     				geneCol = "GENE" + geneGroups.get(column).get(0) + "X";
     			}
     			else{
-    				
-    				System.out.println("GeneIntegerTable: " + geneIntegerTable.size());
-    				System.out.println("DataTable: " + dataTable.size());
     				
     				for(int j = 0; j < geneIntegerTable.size() ; j++){
     					
@@ -874,7 +882,7 @@ public class HierarchicalCluster {
 	    			
 	    		pair.add(geneCol);
 	    		pair.add(geneRow);
-	    		pair.add(String.valueOf( 1- min));
+	    		pair.add(String.valueOf(1 - min));
 	    		
 	    		System.out.println("Data to save: " + pair.toString());
 	    		dataTable.add(pair);
@@ -896,13 +904,19 @@ public class HierarchicalCluster {
 	    			geneGroups.remove(row);
 	    		}
 	    		
-	    		System.out.println("Check 1");
-//	    		System.out.println("GeneGroups Mid: " + geneGroups.size());
-	    		
-	    		System.out.println("fusedGroup Min " + Collections.min(fusedGroup));
-	    		System.out.println("geneGroups size: " + geneGroups.size());
-	    		
-	    		geneGroups.add(Collections.min(fusedGroup), fusedGroup);
+	    		//problematic?
+    			if(rowGroup.contains(Collections.min(fusedGroup))){
+    				
+    				geneGroups.add(row, fusedGroup);
+    			}
+    			else if(colGroup.contains(Collections.min(fusedGroup))){
+
+    				geneGroups.add(column, fusedGroup);
+    			}
+    			else{
+    				
+    				System.out.println("Weird error.");
+    			}
 	    		
 //	    		System.out.println("Gene 1 Post: " + geneGroups.get(row).toString());
 //	    		System.out.println("Gene 2 Post: " + geneGroups.get(column).toString());
@@ -939,7 +953,7 @@ public class HierarchicalCluster {
 		    		}
 		    		
     			}
-    			
+    	
 	    		//fill newClade with means
 	    		//mean = 0.0 with itself
 	    		//Error in here------------------------------------------------------------
@@ -991,16 +1005,38 @@ public class HierarchicalCluster {
 	    			}
 	    		}
 	    		
-//	    		System.out.println("newClade: " + newClade.size());
-	    	
-	    		newDList.add(Collections.min(fusedGroup), newClade);
+	    		System.out.println("newClade: " + newClade.size());
 	    		
+	    		//ISSUE not in this code
+    			if(rowGroup.contains(Collections.min(fusedGroup))){
+    				
+    				
+    				newDList.add(row, newClade);
+    				
+    	    		for(List<Double> element : newDList){
+    	    			
+    	    			element.add(row, newClade.get(newDList.indexOf(element)));
+    	    			
+    	    		}
+    			}
+    			else if(colGroup.contains(Collections.min(fusedGroup))){
+    				
+    				
+    				newDList.add(column, newClade);
+    				
+    	    		for(List<Double> element : newDList){
+    	    			
+    	    			element.add(column, newClade.get(newDList.indexOf(element)));
+    	    			
+    	    		}
+    			}
+    			else{
+    				
+    				System.out.println("Weird error.");
+    			}
+    			
 //	    		System.out.println("newDList: " + newDList.size());
-	    		
-	    		for(List<Double> element : newDList){
-	    			
-	    			element.add(Collections.min(fusedGroup), newClade.get(newDList.indexOf(element)));
-	    		}
+    		
 //	    		System.out.println("NewDList Element: " + newDList.get(10).size());
     		}
     	}
