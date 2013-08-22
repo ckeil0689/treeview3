@@ -907,10 +907,12 @@ public class HierarchicalCluster {
 	    		//problematic?
     			if(rowGroup.contains(Collections.min(fusedGroup))){
     				
+    				System.out.println("RowGroup");
     				geneGroups.add(row, fusedGroup);
     			}
     			else if(colGroup.contains(Collections.min(fusedGroup))){
-
+    				
+    				System.out.println("ColGroup");
     				geneGroups.add(column, fusedGroup);
     			}
     			else{
@@ -956,8 +958,10 @@ public class HierarchicalCluster {
     	
 	    		//fill newClade with means
 	    		//mean = 0.0 with itself
-	    		//Error in here------------------------------------------------------------
 	    		//move through geneGroups (the gene to compare the new fused Group with)
+    			int count = 0;
+    			int count2 = 0;
+    			
 	    		for(int i = 0; i < geneGroups.size(); i++){
 	    			
 	    			double distanceSum = 0;
@@ -969,7 +973,6 @@ public class HierarchicalCluster {
 	    			//check if fusedGroup contains the current checked gene (then no mean should be calculated)
 	    			//no elements in common
 	    			if(Collections.disjoint(geneGroups.get(i), fusedGroup)){
-	    				
 	    				
 		    			//select members of the new clade (B & G)	
 			    		for(int j = 0; j < fusedGroup.size(); j++){
@@ -989,13 +992,14 @@ public class HierarchicalCluster {
 		    			
 		    			newClade.add(mean);
 	    			}
+	    			
 	    			//all elements in common
 	    			else if(geneGroups.get(i).containsAll(fusedGroup)){
 	    				
-	    			
 	    				mean = 0.0;
 	    				newClade.add(mean);
 	    			}
+	    			
 	    			else{
 	    				
 	    				System.out.println("(i): " + i);
@@ -1003,41 +1007,46 @@ public class HierarchicalCluster {
 	    				System.out.println("FusedGroup: " + fusedGroup.toString());
 	    				
 	    			}
+	    			
 	    		}
 	    		
-	    		System.out.println("newClade: " + newClade.size());
-	    		
-	    		//ISSUE not in this code
+	    		//Error in here------------------------------------------------------------
     			if(rowGroup.contains(Collections.min(fusedGroup))){
     				
-    				
-    				newDList.add(row, newClade);
+    				System.out.println("newClade1_RowGroup: " + newClade.size());
     				
     	    		for(List<Double> element : newDList){
     	    			
     	    			element.add(row, newClade.get(newDList.indexOf(element)));
     	    			
     	    		}
+    	    		
+    	    		//needs to come after filling all other elements with a row value, 
+    	    		//since newClade already has it
+    	    		newDList.add(row, newClade);
+    	    		
+    	    		System.out.println("newClade2_RowGroup: " + newClade.size());
     			}
     			else if(colGroup.contains(Collections.min(fusedGroup))){
-    				
-    				
-    				newDList.add(column, newClade);
     				
     	    		for(List<Double> element : newDList){
     	    			
     	    			element.add(column, newClade.get(newDList.indexOf(element)));
     	    			
     	    		}
+    	    		
+    	    		newDList.add(column, newClade);
+    	    		
     			}
     			else{
     				
     				System.out.println("Weird error.");
     			}
     			
-//	    		System.out.println("newDList: " + newDList.size());
-    		
-//	    		System.out.println("NewDList Element: " + newDList.get(10).size());
+    			
+	    		System.out.println("newDList: " + newDList.size());
+	    		System.out.println("geneGroups size 2 " + geneGroups.size());
+	    		System.out.println("Replacement Gene Length " + newDList.get(row).size());
     		}
     	}
     	
