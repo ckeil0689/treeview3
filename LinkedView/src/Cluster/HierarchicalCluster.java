@@ -1,34 +1,19 @@
 package Cluster;
 
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.SwingWorker;
-
-import Cluster.ClusterLoader.TimerListener;
-
-import net.miginfocom.swing.MigLayout;
-
-import edu.stanford.genetics.treeview.DataModel;
-import edu.stanford.genetics.treeview.LoadException;
-import edu.stanford.genetics.treeview.LoadProgress2;
 
 /**
  * This class takes the original uploaded dataArray passed 
  * in the constructor and manipulates it according to mathematical 
- * principles of hierarchical clustering.
+ * principles of hierarchical clustering. It generates files to display dendrograms (.gtr and .atr)
+ * as well as a reordered original data file (.cdt)
  * @author CKeil
  *
  */
@@ -36,25 +21,20 @@ public class HierarchicalCluster {
 	
 	//Instance variables
 	ClusterModel model;
-	private double[] dataArray;
-	private int method;
-	private String similarity;
 	private JFrame frame;
 	private String filePath;
 	
 	IntHeaderInfoCluster headerInfo = new IntHeaderInfoCluster();
 	
 	//Constructor (building the object)
-	public HierarchicalCluster(ClusterModel model, double[] dataArray, String similarity, JFrame currentFrame){
+	public HierarchicalCluster(ClusterModel model, JFrame currentFrame){
 		
 		this.model = model;
-		this.dataArray = dataArray;
-		this.similarity = similarity;
 		this.frame = currentFrame;
 	}
 	
-	//getting elements from raw data array
-	public List <List<Double>> splitElements(List<Double> list, JProgressBar pBar){
+	//getting rows from raw data array
+	public List <List<Double>> splitRows(List<Double> list, JProgressBar pBar){
 		
 		int lower = 0;
 		int upper = 0;
@@ -64,7 +44,7 @@ public class HierarchicalCluster {
 		
 		pBar.setMaximum(list.size()/max);
 		
-		List<List<Double>> geneList = new ArrayList<List<Double>>();
+		List<List<Double>> rowList = new ArrayList<List<Double>>();
 		
 		
 		for(int i = 0; i < list.size()/max; i++){
@@ -73,7 +53,7 @@ public class HierarchicalCluster {
 			
 			upper+=max;
 			
-			geneList.add(list.subList(lower, upper));
+			rowList.add(list.subList(lower, upper));
 			
 			lower = upper;
 			
@@ -84,14 +64,14 @@ public class HierarchicalCluster {
 			lower = upper;
 			upper = list.size();
 			
-			geneList.add(list.subList(lower, upper));
+			rowList.add(list.subList(lower, upper));
 		}
 		
-		return geneList;
+		return rowList;
 	}
 	
-	//getting the arrays from raw data array
-	public List <List<Double>> splitArrays(List<Double> list, JProgressBar pBar){
+	//getting the columns from raw data array
+	public List <List<Double>> splitColumns(List<Double> list, JProgressBar pBar){
 		
 		//number of arrays/ columns (3277 for test)
 		int max = model.nExpr();
@@ -100,7 +80,7 @@ public class HierarchicalCluster {
 		//setting up progressbar
 		pBar.setMaximum(list.size()/max);
 		
-		List<List<Double>> arraysList = new ArrayList<List<Double>>();
+		List<List<Double>> columnsList = new ArrayList<List<Double>>();
 		
 		//iterate through columns ...max
 		for(int j = 0; j < max; j++){
@@ -117,10 +97,10 @@ public class HierarchicalCluster {
 				
 			}
 			
-			arraysList.add(sArray);
+			columnsList.add(sArray);
 		}
 	
-		return arraysList;
+		return columnsList;
 	}
     
 	//Uncentered Pearson (mean values = 0)
@@ -225,7 +205,8 @@ public class HierarchicalCluster {
     			
     			pearson1 = 1.0 - finalVal;
     			
-    			//using BigDecimal to correct for rounding errors caused by floating point arithmetic (0.0 would be -1.113274672357E-16 for example)
+    			//using BigDecimal to correct for rounding errors caused by floating point arithmetic 
+    			//(0.0 would be -1.113274672357E-16 for example)
     			pearson2 = new BigDecimal(String.valueOf(pearson1));
     			pearson2 = pearson2.setScale(6, BigDecimal.ROUND_DOWN);
     			
@@ -236,9 +217,6 @@ public class HierarchicalCluster {
     		distanceList.add(pearsonList);
     	}
     	
-//    	System.out.println("GDL Size (1455?): " + distanceList.size());
-//    	System.out.println("GENE725 vs GENE872: " + distanceList.get(724).get(871));
-//    	System.out.println("GENE872 vs GENE725: " + distanceList.get(871).get(724));
     	return distanceList;
     }
 
@@ -319,15 +297,6 @@ public class HierarchicalCluster {
     		
     	}
     	
-    	
-//    	System.out.println("DL Length: " + geneDistanceList.size());
-//    	System.out.println("DL Element Length: " + geneDistanceList.get(0).size());
-    	
-    	//Fusing all genes and their distances together to one array
-    	//double[] fusedArray = concatAll(geneDistanceList.get(0),geneDistanceList.subList(1, geneDistanceList.size()));
-   
-    	//System.out.println("Fused Array Length: " + fusedArray.length);
-    	
     	return geneDistanceList;
     }
     
@@ -393,479 +362,178 @@ public class HierarchicalCluster {
     		
     	}
     	
-    	
-//    	System.out.println(" CB DL Length: " + distanceList.size());
-//    	System.out.println("CB DL Element Length: " + distanceList.get(0).size());
-    	
-    	//Fusing all genes and their distances together to one array
-    	//double[] fusedArray = concatAll(geneDistanceList.get(0),geneDistanceList.subList(1, geneDistanceList.size()));
-   
-    	//System.out.println("Fused Array Length: " + fusedArray.length);
-    	
     	return distanceList;
     }
 	
+    //method to do the actual clustering of data using the distance matrix previously calculated
     public void cluster(List<List<Double>> geneDList, JProgressBar pBar, boolean type, String method){
-		
-    	//list of genes and their closest partner gene (according to distance measure)
-    	//Structure: {{g1, g2},...,{gX, gY}}
-    	List<String[]> genePairs = new ArrayList<String[]>();
     	
-    	//e.g. for single linkage it's the list of all minimum distances
-    	//Structure: {d1, d2, d3,...,dX}
-    	List<Double> linkValues = new ArrayList<Double>();
-    	
-    	//
+    	//list which stores data to be written to file
     	List<List<String>> dataTable = new ArrayList<List<String>>();
     	
+    	//list with integer representation of genes for references in calculations
     	List<List<Integer>> geneIntegerTable = new ArrayList<List<Integer>>();
     	
-    	//progressbar maximum = amount of genes
+    	//ProgressBar maximum = amount of genes
     	pBar.setMaximum(geneDList.size());
-    	
-    	
-    	//differentiate between methods
-    	if(method.contentEquals("Single Linkage")){
     		
-	    	//go through all genes
-	    	for(int i = 0; i < geneDList.size(); i++){
-	    		
-	    		//update progressbar
-	    		pBar.setValue(i);
-	    		
-	    		//Local variables, initialized
-	    		double min = 0;	
-	    		int pos = 0;
-	    		String[] distPair = new String[2];
-	    		
-	    		//getting the current gene
-	    		List<Double> gene = geneDList.get(i);
-	    		
-	    		//set up a sorted array for the current gene
-	    		List<Double>sortedGene = new ArrayList<Double>();
-	    		
-	    		//copy gene to sorted array
-	    		sortedGene.addAll(gene);
-	    		
-	    		//sort the gene (min to max)
-	    		Collections.sort(sortedGene);
-	    		
-	    		//find first none-zero value in sorted array = shortest distance to other gene (first value is always 0.0)
-	    		//if Gene A is closest to Gene B and Gene B is closest to Gene A (rare!) and the exact minimum value
-	    		//already exists in minValues, for the second pair {B, A} the next closest gene/ node is taken.
-	    		//set min to this value
-	    		//start at k = 1 because sortedGene.get(0) will always be 0.0 
-	    		//(in the matrix, this is the distance between a gene and itself, row vs. column)
-	    		for(int k = 1; k < sortedGene.size(); k++ ){
-	    			
-	    			if(!linkValues.contains(sortedGene.get(k))){
-	        			
-	        			min = sortedGene.get(k);
-	        			break;
-	        		}
-	    			
-	    		}
-	    		
-	    		//find position of min in the current gene to figure out which the closest gene is
-	    		for(int j = 0; j < gene.size(); j++){
-	    			
-	    			if(gene.get(j) == min){
-	    				
-	    				pos = j;
-	    				break;
-	    			}
-	    		}
-	    		
-	    		//add the minimum distance value of each gene to minValues
-	    		linkValues.add(min);
-	    		
-	    		//generate names and the pair of the current gene (i) and the gene closest to it (pos)
-	    		if(type){
-	    			
-		    		distPair[0] = "GENE" + i + "X";
-		    		distPair[1] = "GENE" + pos + "X";
-		    		
-	    		}
-	    		else{
-	    			
-	    			distPair[0] = "ARRY" + i + "X";
-		    		distPair[1] = "ARRY" + pos + "X";
-	    		}
-	    		
-	    		//add the pair to a list
-	    		genePairs.add(distPair);
-	    		
-	    	}
-	    	
-	//    	System.out.println("MinValues Length Pre: " + minValues.size());
-	    	
-	    	List<Double> orderedMin = new ArrayList<Double>(linkValues);
-	    	Collections.sort(orderedMin);
-	    	
-	    	System.out.println("Ordered Min: " + orderedMin.toString());
-	    	
-	//----->//NEED TO CORRECT FOR INCREASING i and SHRINKING minValues (they meet midway and so only half the data gets processed)
-	    	for(int i = 0; i < orderedMin.size() ; i++){  		
-	    		
-		    	//find least smallest distance in minValues
-		    	//then associate the smallest distance with the appropriate gene pair
-		    	String[] smallGene = new String[2];
-		    	
-		    	int k = linkValues.indexOf(orderedMin.get(i));
-		    	smallGene = genePairs.get(k);
-	
-				//Give a Node name, add the node name as well as the gene pair (or cluster!) to array
-				//if gene pair is such that one gene is already in a node, add node name
-				List<String> geneLink = new ArrayList<String>();
-				String newNode = "NODE" + (i+1) + "X";
-				geneLink.add(newNode);
-				 
-				//Check all elements previously added (loop) to dataMatrix
-				for(List<String> element : dataTable){
-					
-					//if any element contains a gene of the current checked pair (smallGene)
-					//add the none-duplicate gene to geneLink
-					if(element.contains(smallGene[0])){
-						
-						//Gene is replaced with node name of the element it contains
-						smallGene[0] = element.get(0);
-					}
-					else if (element.contains(smallGene[1])){
-						
-						smallGene[1] = element.get(0);
-					}
-					
-				}
-				
-				//Add gene names to geneLink
-				//structure: {NODE1X, GENE2X, GENE3X}
-				geneLink.add(smallGene[0]);
-				geneLink.add(smallGene[1]);
-				geneLink.add(Double.toString(orderedMin.get(i)));
-				
-				//add connection to dataMatrix 
-				//structure: {{NODE1X, GENE2X, GENE3X}, ..., {NODE1X, GENE2X, GENE3X}}
-				dataTable.add(geneLink);
+		//list to make sure every loop step uses the next highest min value from geneDList
+		List<Double> usedMins = new ArrayList<Double>();
+		
+		//copy list of geneDList used as starting point for clustering algorithm
+		//this distance list will be mutated as the genes are clustered 
+		//(shrinks by 1 each step as a gene is added to a cluster)
+		List<List<Double>> newDList = new ArrayList<List<Double>>();
+		
+		//make deep copy of original geneDList (so that geneDList won't be mutated)
+		for(int i = 0; i < geneDList.size(); i++){
 			
-	    	}
-	    	
-    	}
-    	//Complete linkage: maximum pairwise distances
-    	else if(method.contentEquals("Complete Linkage")){
-    		
-    		//go through all genes
-	    	for(int i = 0; i < geneDList.size(); i++){
-	    		
-	    		//update progressbar
-	    		pBar.setValue(i);
-	    		
-	    		//Local variables, initialized
-	    		double max = 0;	
-	    		int pos = 0;
-	    		String[] distPair = new String[2];
-	    		
-	    		//getting the current gene
-	    		List<Double> gene = geneDList.get(i);
-	    		
-	    		//set up a sorted array for the current gene
-	    		List<Double>sortedGene = new ArrayList<Double>();
-	    		
-	    		//copy gene to sorted array
-	    		sortedGene.addAll(gene);
-	    		
-	    		//sort the gene (min to max!)
-	    		Collections.sort(sortedGene);
-	    		
-	    		//find maximum value in sorted array = longest distance to other gene (last value is always 0.0)
-	    		//start at k = sortedGene.size() an move downwards k-- because sortedGene.get(k) needs to return the maximum value
-	    		for(int k = sortedGene.size() - 1; k >= 0; k--){
-	    			
-	    			if(!linkValues.contains(sortedGene.get(k))){
-	        			
-	        			max = sortedGene.get(k);
-	        			break;
-	        		}
-	    			
-	    		}
-	    		
-	    		
-	    		//find position of max in the current gene to figure out which the farthest gene is
-	    		for(int j = 0; j < gene.size(); j++){
-	    			
-	    			if(gene.get(j) == max){
-	    				
-	    				pos = j;
-	    				break;
-	    			}
-	    		}
-	    		
-	    		
-	    		//add the minimum distance value of each gene to minValues
-	    		linkValues.add(max);
-	    		
-	 
-	    		
-	    		//generate names and the pair of the current gene (i) and the gene closest to it (pos)
-	    		if(type){
-	    			
-		    		distPair[0] = "GENE" + i + "X";
-		    		distPair[1] = "GENE" + pos + "X";
-		    		
-	    		}
-	    		else{
-	    			
-	    			distPair[0] = "ARRY" + i + "X";
-		    		distPair[1] = "ARRY" + pos + "X";
-	    		}
-	    		
-	    		//add the pair to a list
-	    		genePairs.add(distPair);
-	    		
-	    	}
-	    	
-	//    	System.out.println("MaxValues Length Pre: " + linkValues.size());
-	    	
-	    	List<Double> orderedMax = new ArrayList<Double>(linkValues);
-	    	Collections.sort(orderedMax);
-	    	
-	//----->//NEED TO CORRECT FOR INCREASING i and SHRINKING maxValues (they meet midway and so only half the data gets processed)
-	    	for(int i = orderedMax.size() - 1; i >= 0 ; i--){  		
-	    		
-		    	//find least smallest distance in minValues
-		    	//then associate the smallest distance with the appropriate gene pair
-		    	String[] smallGene = new String[2];
-		    	
-		    	int k = linkValues.indexOf(orderedMax.get(i));
-		    	smallGene = genePairs.get(k);
-	
-				//Give a Node name, add the node name as well as the gene pair (or cluster!) to array
-				//if gene pair is such that one gene is already in a node, add node name
-				List<String> geneLink = new ArrayList<String>();
-				String newNode = "NODE" + (orderedMax.size()- i + 1) + "X";
-				geneLink.add(newNode);
-				 
-				//Check all elements previously added (loop) to dataMatrix
-				for(List<String> element : dataTable){
-					
-					//if any element contains a gene of the current checked pair (smallGene)
-					//add the none-duplicate gene to geneLink
-					if(element.contains(smallGene[0])){
-						
-						//Gene is replaced with node name of the element it contains
-						smallGene[0] = element.get(0);
-					}
-					else if (element.contains(smallGene[1])){
-						
-						smallGene[1] = element.get(0);
-					}
-					
-				}
-				
-				//Add gene names to geneLink
-				//structure: {NODE1X, GENE2X, GENE3X}
-				geneLink.add(smallGene[0]);
-				geneLink.add(smallGene[1]);
-				geneLink.add(Double.toString(orderedMax.get(i)));
-				
-				//add connection to dataMatrix 
-				//structure: {{NODE1X, GENE2X, GENE3X}, ..., {NODE1X, GENE2X, GENE3X}}
-				dataTable.add(geneLink);
+			List<Double> newList = new ArrayList<Double>();
+			newDList.add(newList);
 			
-	    	}
-	    	
-	    	System.out.println("Works!");
-	    	
-    	}
-//---------------------------------------------------------------------------------------------------------------------------------------    	
-    	//Average linkage uses the mean of pairwise distances 
-    	else if(method.contentEquals("Average Linkage")){
-    		
-    		//variables for use:
-    		//distance matrix (every gene and its distances to other genes): geneDList
-    		//Progressbar: pBar
-    		//row or column: type
-    		//List for String arrays: genePairs
-    		//List of String lists containing pair and node info: dataMatrix
-    		
-    		//list to make sure every loop step uses the next highest min value from geneDList
-    		List<Double> usedMins = new ArrayList<Double>();
-    		
-    		//make deep copy of original geneDList
-    		List<List<Double>> newDList = new ArrayList<List<Double>>();
-    		
-    		for(int i = 0; i < geneDList.size(); i++){
-    			
-    			List<Double> newList = new ArrayList<Double>();
-    			newDList.add(newList);
-    			
-    			for(int j = 0; j < geneDList.size(); j++){
-    				
-    				Double e = new Double(geneDList.get(i).get(j));
-    				newList.add(e);
-    			}
-    		}
-    		
-    		//to keep track of the clades and how genes are clustered, make a list of numbers, corresponding to gene names
-    		//(123 = GENE123X) in which genes can be fused if they are being joint
-    		List<List<Integer>> geneGroups = new ArrayList<List<Integer>>();
-    		
-    		//fill list
-    		for(int i = 0; i < newDList.size(); i++){
-    			
-    			List<Integer> group = new ArrayList<Integer>();
-    			group.add(i);
-    			geneGroups.add(group);
-    		}
+			for(int j = 0; j < geneDList.size(); j++){
+				
+				Double e = new Double(geneDList.get(i).get(j));
+				newList.add(e);
+			}
+		}
+		
+		//list of genes in integer representation to keep track of the clades and cluster formation
+		//corresponds to gene names (123 = GENE123X)and is mutated along with newDList
+		//e.g. clustering of GENE0X and GENE 233X: {{0}, ...,{233},...} --> {{0, 233},...}
+		List<List<Integer>> geneGroups = new ArrayList<List<Integer>>();
+		
+		//fill list with integers corresponding to the genes
+		for(int i = 0; i < newDList.size(); i++){
+			
+			List<Integer> group = new ArrayList<Integer>();
+			group.add(i);
+			geneGroups.add(group);
+		}
 
+		//continue process until newDList has a size of 1, which means that there is only 1 cluster
+		//initially every gene is its own cluster
+		while(newDList.size() > 1){
+		
+    		//update ProgressBar
+    		pBar.setValue(geneDList.size() - newDList.size());
     		
-    		//CHANGE LIMIT!!
-    		while(newDList.size() > 0){
+    		//define some local instance variables
+    		double min = 0;
+    		int row = 0;
+    		int column = 0;
+    		double trial = 0;
     		
-	    		double min = 0;
-	    		int row = 0;
-	    		int column = 0;
-	    		List<Double> geneMins = new ArrayList<Double>();
-	    		List<String> pair = new ArrayList<String>();
-	    		
-	    		
-	    		//the row value is just the position of the corresponding column value in columnValues
-	    		List<Integer> columnValues = new ArrayList<Integer>();
-	    		
-	    		double trial = 0;
-	    		
-	    		//for every gene
-	    		for(int j = 0; j < newDList.size(); j++){
-	    			
-	    			List<Double> gene = newDList.get(j);
-	    			
-	    			//take first non-zero value in gene
-	    			for(Double element : gene){
-	        			
-	    				if(element != 0.0){
-	        				
-	        				trial = element;
-	        				break;
-	        			}
-	    			}
-	    			
-	    			//make trial the minimum value of that gene
-	    			//check whether min was used before (in whole matrix)
-	    			for(int k = 0; k < gene.size(); k++){ 
-	    				
-	    				if(gene.get(k) != 0.0){
-	    	
-	    					if(trial > gene.get(k) && !usedMins.contains(gene.get(k))){
-		    					
-		    					trial = gene.get(k);
-		    				}
+    		//list to store the minimum value of each gene at each while-loop iteration
+    		List<Double> geneMins = new ArrayList<Double>();
+    		
+    		//list to store the Strings which represent calculated data (such as gene pairs)
+    		//to be added to dataTable
+    		List<String> pair = new ArrayList<String>();
+
+    		//the row value is just the position of the corresponding column value in columnValues
+    		List<Integer> columnValues = new ArrayList<Integer>();
+    		
+    		//going through every gene (row) in newDList
+    		for(int j = 0; j < newDList.size(); j++){
+    			
+    			//select current gene
+    			List<Double> gene = newDList.get(j);
+    			
+    			//take first non-zero value in gene
+    			for(Double element : gene){
+        			
+    				if(element != 0.0){
+        				
+        				trial = element;
+        				break;
+        			}
+    			}
+    			
+    			//make trial the minimum value of that gene
+    			//check whether min was used before (in whole calculation process)
+    			for(int k = 0; k < gene.size(); k++){ 
+    				
+    				if(gene.get(k) != 0.0){
+    	
+    					if(trial > gene.get(k) && !usedMins.contains(gene.get(k))){
+	    					
+	    					trial = gene.get(k);
 	    				}
-	    				
-	    			}
-	    			
-	    			//minimums of each gene in distance matrix
-	    			//does not contain previously used minimums 
-	    			geneMins.add(trial);
-	    			
-	    			//add the column of each gene's minimum to a list
-	    			columnValues.add(gene.indexOf(trial));
-	    			
-//		    		System.out.println("Trial Index: " + gene.indexOf(trial));
-//		    		System.out.println("Gene: " + j);
-	
-	    		}
-	    		
-	    		//finds the row (gene) which has the minValue
-	    		row = geneMins.indexOf(Collections.min(geneMins));
-	    		
-//	    		System.out.println("geneMins Minimum: " + Collections.min(geneMins));
-	    		
-	    		//finds the column by referring back to values added for each gene
-	    		//knowing the gene with the minimum value (row) allows to find the corresponding column
-	    		column = columnValues.get(row);
-	    		
-//	    		System.out.println("Row: " + row);
-//	    		System.out.println("Col: " + column);
-	    		
-	    		//row and column value of the minimum distance value in matrix are now known
-	    		min = newDList.get(row).get(column);
-	    		
-	    		System.out.println("------------------------------------------");
-//	    		System.out.println("Min: " + (min));
-
-	    		usedMins.add(min);
-	    		
-	    		//now both genes must be joined, a new "matrix" must be created (actually new geneDList)
-	    		
-	    		//if min is in row A and column C, both row A and row C as well as column A and column C
-	    		//are removed and fused into row AC and column AC later
-	    		
-	    		//check if any of the two genes (column, row) are already part of a joint clade in geneGroups
-	    		//then remove THAT clade from newDList
-	    		//but only after taking it to calculate means
-	    		
-	    		
-	    		//now join the 2 genes and add the new joint clade as a row 
-	    		//REMEMBER: length of tree branch would be Min/2 for each gene
-	    		//first, create new List
-	    		List<Double> newClade = new ArrayList<Double>();
-	    		
-	    		//fill list with the appropriate values (Average linkage = mean). 
-	    		
-	    		//get the 2 groups of genes
-	    		System.out.println("Row: " + row);
-	    		System.out.println("Column: " + column);
-	    		System.out.println("geneGroups size " + geneGroups.size());
-	    		System.out.println("ColumnValues size " + columnValues.size());
-	    		System.out.println("Min Gene Length " + newDList.get(row).size());
-	    		
-	    		//suspected issue: some genes in newDList are 1 elemtn too large and as a result 
-	    		//the column value is too large for geneGroups
-	    		//just tested: previously fused Genes are all 1 size larger than non-fused (??)
-	    		// issue only occurs if one of the 2 current genes is already present in a fused group
-	    		List<Integer> rowGroup = geneGroups.get(row); 
-	    		List<Integer> colGroup = geneGroups.get(column); 
-	    		
-	    		//the new geneGroup containing the all genes (BG)
-	    		List<Integer> fusedGroup = new ArrayList<Integer>();
-	    		fusedGroup.addAll(rowGroup);
-	    		fusedGroup.addAll(colGroup); 
-	    		
-//	    		System.out.println("row: " + row);
-//	    		System.out.println("column: " + column);
-	    		
-//	    		System.out.println("Gene 1: " + geneGroups.get(row).toString());
-//	    		System.out.println("Gene 2: " + geneGroups.get(column).toString());
-	    		
-	    		//add genes to String array?
-	    		String geneRow = "";
-	    		String geneCol = "";
-	    		pair.add("NODE" + (geneDList.size() - newDList.size() + 1) + "X");
-	    		
-	    		//check the lists in dataMatrix whether the genePair you want to add now is already
-	    		//in a list from before, if yes connect to LATEST node by repalcing the gene name with the node name
-	    		
-	    		System.out.println("NewDList Size: " + newDList.size());	
-	    		
-    			if(fusedGroup.size() == 2){
-    				
-    				geneRow = "GENE" + geneGroups.get(row).get(0) + "X"; 
-    				geneCol = "GENE" + geneGroups.get(column).get(0) + "X";
+    				}	
     			}
-    			else{
-    				
-    				for(int j = 0; j < geneIntegerTable.size() ; j++){
-    					
-    					if(!Collections.disjoint(geneIntegerTable.get(j), geneGroups.get(column))){
-    						
-    						geneCol = dataTable.get(j).get(0);
-    						break;
-    					}
-    					else{
-    						
-    						geneCol = "GENE" + geneGroups.get(column).get(0) + "X";
+    			
+    			//minimums of each gene in distance matrix
+    			//does not contain previously used minimums 
+    			geneMins.add(trial);
+    			
+    			//add the column of each gene's minimum to a list
+    			columnValues.add(gene.indexOf(trial));
+
+    		}
+    		
+    		//finds the row (gene) which has the minValue
+    		row = geneMins.indexOf(Collections.min(geneMins));
+    		
+    		//finds the column by referring back to values added for each gene
+    		//knowing the gene with the minimum value (row) allows to find the corresponding column
+    		column = columnValues.get(row);
+    		
+    		//row and column value of the minimum distance value in matrix are now known
+    		min = newDList.get(row).get(column);
+
+    		usedMins.add(min);
+
+    		//now join the 2 genes and add the new joint clade as a row 
+    		//REMEMBER: length of tree branch would be Min/2 for each gene
+    		//first, create new List
+    		List<Double> newClade = new ArrayList<Double>();
+    		
+    		//suspected issue: some genes in newDList are 1 elemtn too large and as a result 
+    		//the column value is too large for geneGroups
+    		//just tested: previously fused Genes are all 1 size larger than non-fused (??)
+    		// issue only occurs if one of the 2 current genes is already present in a fused group
+    		List<Integer> rowGroup = geneGroups.get(row); 
+    		List<Integer> colGroup = geneGroups.get(column); 
+    		
+//	    		System.out.println("------------------------------------------");
+//	    		System.out.println("RowGroup: " + rowGroup.toString());
+//	    		System.out.println("ColumnGroup: " + colGroup.toString());
+    		
+    		//the new geneGroup containing the all genes (BG)
+    		List<Integer> fusedGroup = new ArrayList<Integer>();
+    		fusedGroup.addAll(rowGroup);
+    		fusedGroup.addAll(colGroup); 
+    		
+    		//make Strings for String list to be written to data file
+    		String geneRow = "";
+    		String geneCol = "";
+    		pair.add("NODE" + (geneDList.size() - newDList.size() + 1) + "X");
+    		
+    		//check the lists in dataMatrix whether the genePair you want to add now is already
+    		//in a list from before, if yes connect to LATEST node by replacing the gene name with the node name	
+			if(fusedGroup.size() == 2){
+				
+				geneRow = "GENE" + geneGroups.get(row).get(0) + "X"; 
+				geneCol = "GENE" + geneGroups.get(column).get(0) + "X";
+			}
+			else{
+				
+				for(int j = geneIntegerTable.size() - 1; j >= 0; j--){
+					
+					//this currently gets the first node that has a common gene
+					//but it should be the LAST
+					if(!Collections.disjoint(geneIntegerTable.get(j), geneGroups.get(column))){
+						
+						geneCol = dataTable.get(j).get(0);
+						break;
+					}
+					else{
+						
+						geneCol = "GENE" + geneGroups.get(column).get(0) + "X";
     					}
     				}
-    				for(int j = 0; j < geneIntegerTable.size() ; j++){
+    				for(int j = geneIntegerTable.size() - 1; j >= 0; j--){
     					
     					if(!Collections.disjoint(geneIntegerTable.get(j),geneGroups.get(row))){
    
@@ -874,106 +542,90 @@ public class HierarchicalCluster {
     					}
     					else{
     						geneRow = "GENE" + geneGroups.get(row).get(0) + "X";
-    					}
-    					
-    				}
-    				
-    			}
-	    			
-	    		pair.add(geneCol);
-	    		pair.add(geneRow);
-	    		pair.add(String.valueOf(1 - min));
-	    		
-	    		System.out.println("Data to save: " + pair.toString());
-	    		dataTable.add(pair);
-	    		geneIntegerTable.add(fusedGroup);
-	    		//apparently when removing the row element, everything shifts and the column element needs to be adjusted for
-//	    		System.out.println("GeneGroups PRE: " + geneGroups.size());
-	    		
-	    		//removing in sequence causes the list to be altered such that the second removal (column) is shifted
-	    		//remedy: either remove column - 1 or check every group whether it contains the chosen min-genes and remove them
-	    		if(row > column){
-	    			
-	    			geneGroups.remove(row);
-		    		geneGroups.remove(column);
-		    		
-	    		}
-	    		else{
-	    			
-	    			geneGroups.remove(column);
-	    			geneGroups.remove(row);
-	    		}
-	    		
-	    		//problematic?
-    			if(rowGroup.contains(Collections.min(fusedGroup))){
-    				
-    				System.out.println("RowGroup");
-    				geneGroups.add(row, fusedGroup);
-    			}
-    			else if(colGroup.contains(Collections.min(fusedGroup))){
-    				
-    				System.out.println("ColGroup");
-    				geneGroups.add(column, fusedGroup);
-    			}
-    			else{
-    				
-    				System.out.println("Weird error.");
-    			}
-	    		
-//	    		System.out.println("Gene 1 Post: " + geneGroups.get(row).toString());
-//	    		System.out.println("Gene 2 Post: " + geneGroups.get(column).toString());
-//	    		System.out.println("Gene 2 +1 Post: " + geneGroups.get(column + 1).toString());
-//	    		System.out.println("Gene 2 -1 Post: " + geneGroups.get(column - 1).toString());
-//	    		System.out.println("GeneGroups Post: " + geneGroups.size());
-	    		
-	    		//next compare the rowGroup to geneGroup column values for each gene in the rowGroup
-	    		//find mean values to add to newClade (which is a new rowGroup)
-	    		//place newClade in newDList, at the same index as fusedGroup in geneGroups
-	    		//BG --
-	    		
-	    		//remove old elements first;
-    			if(column > row){
-    				
-    	    		newDList.remove(column);
-    	    		newDList.remove(row);
-    	    		
-		    		for(List<Double> element : newDList){
-		    			
-		    			element.remove(column);
-		    			element.remove(row);
-		    		}
-    			}
-    			else{
-    				
-    	    		newDList.remove(row);
-    	    		newDList.remove(column);
-    	    		
-		    		for(List<Double> element : newDList){
-		    			
-		    			element.remove(row);
-		    			element.remove(column);
-		    		}
-		    		
-    			}
-    	
-	    		//fill newClade with means
-	    		//mean = 0.0 with itself
-	    		//move through geneGroups (the gene to compare the new fused Group with)
-    			int count = 0;
-    			int count2 = 0;
+					}
+					
+				}
+				
+			}
     			
-	    		for(int i = 0; i < geneGroups.size(); i++){
+    		pair.add(geneCol);
+    		pair.add(geneRow);
+    		pair.add(String.valueOf(1 - min));
+    		
+	    		System.out.println("------------------------------------------");
+	    		System.out.println("Data to save: " + pair.toString());
+    		
+    		dataTable.add(pair);
+    		geneIntegerTable.add(fusedGroup);
+
+    		//remove element with bigger list position first to avoid list shifting issues
+    		if(row > column){
+    			
+    			geneGroups.remove(row);
+	    		geneGroups.remove(column);
+	    		
+    		}
+    		else{
+    			
+    			geneGroups.remove(column);
+    			geneGroups.remove(row);
+    		}
+
+    		//might need adjustment for different cluster methods
+			if(rowGroup.contains(Collections.min(fusedGroup))){
+				
+				geneGroups.add(row, fusedGroup);
+			}
+			else if(colGroup.contains(Collections.min(fusedGroup))){
+				
+				geneGroups.add(column, fusedGroup);
+			}
+			else{
+				
+				System.out.println("Weird error.");
+			}
+    		
+    		//remove old elements first;
+			if(column > row){
+				
+	    		newDList.remove(column);
+	    		newDList.remove(row);
+	    		
+	    		for(List<Double> element : newDList){
 	    			
-	    			double distanceSum = 0;
-	    			double mean = 0;
-	    			double distanceVal = 0;
-	    			int selectedGene = 0;
+	    			element.remove(column);
+	    			element.remove(row);
+	    		}
+			}
+			else{
+				
+	    		newDList.remove(row);
+	    		newDList.remove(column);
+	    		
+	    		for(List<Double> element : newDList){
 	    			
-	    			
-	    			//check if fusedGroup contains the current checked gene (then no mean should be calculated)
-	    			//no elements in common
-	    			if(Collections.disjoint(geneGroups.get(i), fusedGroup)){
-	    				
+	    			element.remove(row);
+	    			element.remove(column);
+	    		}
+	    		
+			}
+	
+    		//fill newClade with new values
+    		//mean = 0.0 with itself
+    		//move through geneGroups (the gene to compare the new fused Group with
+    		for(int i = 0; i < geneGroups.size(); i++){
+    			
+    			double distanceSum = 0;
+    			double newVal = 0;
+    			double distanceVal = 0;
+    			int selectedGene = 0;
+    			
+    			
+    			//check if fusedGroup contains the current checked gene (then no mean should be calculated)
+    			//no elements in common
+    			if(Collections.disjoint(geneGroups.get(i), fusedGroup)){
+    				
+    				if(method.contentEquals("Average Linkage")){
 		    			//select members of the new clade (B & G)	
 			    		for(int j = 0; j < fusedGroup.size(); j++){
 			    				
@@ -988,81 +640,96 @@ public class HierarchicalCluster {
 
 			    		}
 			    		
-			    		mean = distanceSum/(fusedGroup.size() * geneGroups.get(i).size()) ;
-		    			
-		    			newClade.add(mean);
-	    			}
+			    		//newVal = mean
+			    		newVal = distanceSum/(fusedGroup.size() * geneGroups.get(i).size()) ;
+    				}
+    				else if(method.contentEquals("Single Linkage") || method.contentEquals("Complete Linkage")){
+    					
+    					List<Double> distances = new ArrayList<Double>();
+    					
+    					for(int j = 0; j < fusedGroup.size(); j++){
+		    				
+			    			selectedGene = fusedGroup.get(j);
+			    			
+			    			for(int gene : geneGroups.get(i)){
+			    				
+				    			distanceVal = geneDList.get(selectedGene).get(gene);
+				    			distances.add(distanceVal);
+			    			}
+
+			    		}
+			    		
+    					if(method.contentEquals("Single Linkage")){
+    						
+    						//newVal = min
+    						newVal = Collections.min(distances);
+    					}
+    					else{
+    						
+    						//newVal = max
+    						newVal = Collections.max(distances);
+    					}
+			    
+    				}
 	    			
-	    			//all elements in common
-	    			else if(geneGroups.get(i).containsAll(fusedGroup)){
-	    				
-	    				mean = 0.0;
-	    				newClade.add(mean);
-	    			}
+	    			newClade.add(newVal);
+    			}
+    			
+    			//all elements in common
+    			else if(geneGroups.get(i).containsAll(fusedGroup)){
+    				
+    				newVal = 0.0;
+    				newClade.add(newVal);
+    			}
+    			
+    			else{
+    				
+    				System.out.println("(i): " + i);
+    				System.out.println("geneGroups.get(i): " + geneGroups.get(i).toString());
+    				System.out.println("FusedGroup: " + fusedGroup.toString());
+    				
+    			}
+    			
+    		}
+    		
+			if(rowGroup.contains(Collections.min(fusedGroup))){
+				
+	    		for(List<Double> element : newDList){
 	    			
-	    			else{
-	    				
-	    				System.out.println("(i): " + i);
-	    				System.out.println("geneGroups.get(i): " + geneGroups.get(i).toString());
-	    				System.out.println("FusedGroup: " + fusedGroup.toString());
-	    				
-	    			}
+	    			element.add(row, newClade.get(newDList.indexOf(element)));
 	    			
 	    		}
 	    		
-	    		//Error in here------------------------------------------------------------
-    			if(rowGroup.contains(Collections.min(fusedGroup))){
-    				
-    				System.out.println("newClade1_RowGroup: " + newClade.size());
-    				
-    	    		for(List<Double> element : newDList){
-    	    			
-    	    			element.add(row, newClade.get(newDList.indexOf(element)));
-    	    			
-    	    		}
-    	    		
-    	    		//needs to come after filling all other elements with a row value, 
-    	    		//since newClade already has it
-    	    		newDList.add(row, newClade);
-    	    		
-    	    		System.out.println("newClade2_RowGroup: " + newClade.size());
-    			}
-    			else if(colGroup.contains(Collections.min(fusedGroup))){
-    				
-    	    		for(List<Double> element : newDList){
-    	    			
-    	    			element.add(column, newClade.get(newDList.indexOf(element)));
-    	    			
-    	    		}
-    	    		
-    	    		newDList.add(column, newClade);
-    	    		
-    			}
-    			else{
-    				
-    				System.out.println("Weird error.");
-    			}
-    			
-    			
-	    		System.out.println("newDList: " + newDList.size());
-	    		System.out.println("geneGroups size 2 " + geneGroups.size());
-	    		System.out.println("Replacement Gene Length " + newDList.get(row).size());
-    		}
-    	}
+	    		//needs to come after filling all other elements with a row value, 
+	    		//since newClade already has it
+	    		newDList.add(row, newClade);
+	    		
+			}
+			else if(colGroup.contains(Collections.min(fusedGroup))){
+				
+	    		for(List<Double> element : newDList){
+	    			
+	    			element.add(column, newClade.get(newDList.indexOf(element)));
+	    			
+	    		}
+	    		
+	    		newDList.add(column, newClade);
+	    		
+			}
+			else{
+				
+				System.out.println("Weird error.");
+			}
+			
+		}
     	
-    	
-    	
-    	
-    	else if(method.contentEquals("Centroid Linkage")){
-    		
-    		
-    	}
-    	
-		//Test Output
-		//System.out.println("Closest Gene Pair: " + Arrays.toString(smallGene));
-//    	System.out.println("Gene Connections: " + genePairs.size());
-//    	
-    	System.out.println("dataMatrix Size: " + dataTable.size());
+//    	else if(method.contentEquals("Centroid Linkage")){
+//    		
+//    		
+//    	}
+    
+		
+    	System.out.println("dataTable Size: " + dataTable.size());
     	
     	ClusterFileWriter dataFile = new ClusterFileWriter(frame, model);
 
@@ -1078,7 +745,7 @@ public class HierarchicalCluster {
     
     
     //method to join all gene arrays into one double[] 
-    public static <Double> double[] concatAll(double[] first, List<double[]> rest) {
+    public static double[] concatAll(double[] first, List<double[]> rest) {
     	  int totalLength = first.length;
     	  for (double[] array : rest) {
     	    totalLength += array.length;

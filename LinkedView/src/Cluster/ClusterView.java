@@ -29,7 +29,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -104,10 +103,9 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 	
 	//Instance variable in which the loaded data array is being stored
 	private double[] dataArray;
-	private double[] rangeArray;
 	
-	private boolean isElements = true;
-	private boolean isArrays = false;
+	private boolean isRows = true;
+	private boolean isColumns = false;
 	
 	/**
 	 *  Constructor for the DendroView object
@@ -652,15 +650,14 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		
 		JLabel loadingInfo = new JLabel();
 		
-		HierarchicalCluster clusterTarget = new HierarchicalCluster((ClusterModel)dataModel, 
-				currentArray, similarityM, viewFrame);
+		HierarchicalCluster clusterTarget = new HierarchicalCluster((ClusterModel)dataModel, viewFrame);
 		
 		//declare variables needed for function
 		List<Double> currentList = new ArrayList<Double>();
-		List<List<Double>> sepElements = new ArrayList<List<Double>>();
-		List<List<Double>> sepArrays = new ArrayList<List<Double>>();
-		List<List<Double>> elementDistances  = new ArrayList<List<Double>>();
-		List<List<Double>> arrayDistances = new ArrayList<List<Double>>();
+		List<List<Double>> sepRows = new ArrayList<List<Double>>();
+		List<List<Double>> sepColumns = new ArrayList<List<Double>>();
+		List<List<Double>> rowDistances  = new ArrayList<List<Double>>();
+		List<List<Double>> columnDistances = new ArrayList<List<Double>>();
 		
 		//change data array into a list (more flexible, faster access for larger computations)
 		for(double d : currentArray){
@@ -683,15 +680,15 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 			
 			loadingInfo.setText("Preparing Row Data...");
 			
-			sepElements = clusterTarget.splitElements(currentList, pBar);
+			sepRows = clusterTarget.splitRows(currentList, pBar);
 			
 			loadingInfo.setText("Creating Row Distance Matrix...");
 			
-			elementDistances  = measureDistance(clusterTarget, sepElements, choice, pBar);
+			rowDistances  = measureDistance(clusterTarget, sepRows, choice, pBar);
 			
 			loadingInfo.setText("Clustering Row Elements...");
 			
-			clusterTarget.cluster(elementDistances, pBar, isElements, similarityM);
+			clusterTarget.cluster(rowDistances, pBar, isRows, similarityM);
 			
 			finalPanel.remove(loadingInfo);
 			mainPanel.revalidate();
@@ -713,15 +710,15 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 			
 			loadingInfo.setText("Preparing Column Data...");
 			
-			sepArrays = clusterTarget.splitArrays(currentList, pBar);
+			sepColumns = clusterTarget.splitColumns(currentList, pBar);
 			
 			loadingInfo.setText("Creating Column Distance Matrix...");
 			
-			arrayDistances  = measureDistance(clusterTarget, sepArrays, choice2, pBar);
+			columnDistances  = measureDistance(clusterTarget, sepColumns, choice2, pBar);
 			
 			loadingInfo.setText("Clustering Column Elements...");
 			
-			clusterTarget.cluster(arrayDistances, pBar, isArrays, similarityM);
+			clusterTarget.cluster(columnDistances, pBar, isColumns, similarityM);
 			
 			finalPanel.remove(loadingInfo);
 			mainPanel.revalidate();
