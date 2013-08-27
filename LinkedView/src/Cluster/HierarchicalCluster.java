@@ -4,7 +4,10 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 import javax.swing.JFrame;
 import javax.swing.JProgressBar;
@@ -410,7 +413,10 @@ public class HierarchicalCluster {
 			group.add(i);
 			geneGroups.add(group);
 		}
-
+		
+		//list to return ordered GENE numbers for .cdt creation
+		List<String> reorderedList = new ArrayList<String>();
+		
 		//continue process until newDList has a size of 1, which means that there is only 1 cluster
 		//initially every gene is its own cluster
 		while(newDList.size() > 1){
@@ -510,50 +516,240 @@ public class HierarchicalCluster {
     		String geneCol = "";
     		pair.add("NODE" + (geneDList.size() - newDList.size() + 1) + "X");
     		
+    		
+    		Random random = new Random();
+    		
     		//check the lists in dataMatrix whether the genePair you want to add now is already
     		//in a list from before, if yes connect to LATEST node by replacing the gene name with the node name	
-			if(fusedGroup.size() == 2){
+			if(fusedGroup.size() == 2 && type == true){
+				
+				int last = 0;
+				if(reorderedList.size() > 0){
+					
+					last = reorderedList.size() - 1;
+				}
 				
 				geneRow = "GENE" + geneGroups.get(row).get(0) + "X"; 
 				geneCol = "GENE" + geneGroups.get(column).get(0) + "X";
+				
+				if(reorderedList.contains(geneRow) && reorderedList.contains(geneCol)){
+					
+				}
+				else if(reorderedList.contains(geneRow)){
+					
+					if(random.nextBoolean()){
+						
+						reorderedList.add(0, geneCol);
+					}
+					else{
+					
+						reorderedList.add(last, geneCol);
+					}
+					
+				}
+				else if(reorderedList.contains(geneCol)){
+					
+					if(random.nextBoolean()){
+						
+						reorderedList.add(0, geneRow);
+					}
+					else{
+						
+						reorderedList.add(last, geneRow);
+					}
+				}
+				else{
+					
+					
+					if(random.nextBoolean()){
+						
+						reorderedList.add(0, geneRow);
+						reorderedList.add(1, geneCol);
+					}
+					else{
+						
+						reorderedList.add(last, geneRow);
+						reorderedList.add(reorderedList.size() - 1, geneCol);
+					}
+				}
+				
+			}
+			else if(fusedGroup.size() == 2 && type == false){
+				
+				int last = 0;
+				if(reorderedList.size() > 0){
+					
+					last = reorderedList.size() - 1;
+				}
+				
+				geneRow = "ARRY" + geneGroups.get(row).get(0) + "X"; 
+				geneCol = "ARRY" + geneGroups.get(column).get(0) + "X";
+				
+				if(reorderedList.contains(geneRow) && reorderedList.contains(geneCol)){
+					
+				}
+				else if(reorderedList.contains(geneRow)){
+					
+					if(random.nextBoolean()){
+						
+						reorderedList.add(0, geneCol);
+					}
+					else{
+					
+						reorderedList.add(last, geneCol);
+					}
+					
+				}
+				else if(reorderedList.contains(geneCol)){
+					
+					if(random.nextBoolean()){
+						
+						reorderedList.add(0, geneRow);
+					}
+					else{
+						
+						reorderedList.add(last, geneRow);
+					}
+				}
+				else{
+					
+					if(random.nextBoolean()){
+						reorderedList.add(0, geneRow);
+						reorderedList.add(1, geneCol);
+					}
+					else{
+						
+						reorderedList.add(last, geneRow);
+						reorderedList.add(reorderedList.size() - 1, geneCol);
+					}
+				}
+				
+				
 			}
 			else{
 				
+				String geneCol2 = "";
+				String geneRow2 = "";
+				
 				for(int j = geneIntegerTable.size() - 1; j >= 0; j--){
 					
-					//this currently gets the first node that has a common gene
-					//but it should be the LAST
+					//this currently gets the last node that has a common gene
 					if(!Collections.disjoint(geneIntegerTable.get(j), geneGroups.get(column))){
 						
+						List<Integer> intersect = new ArrayList<Integer>(geneIntegerTable.get(j));
+						intersect.retainAll(geneGroups.get(column));
+						
 						geneCol = dataTable.get(j).get(0);
+						
+						if(type == true){
+							
+							geneCol2 =  "GENE" + intersect.get(0) + "X";
+						}
+						else{
+							geneCol2 =  "ARRY" + intersect.get(0) + "X";
+						}
 						break;
 					}
 					else{
 						
-						geneCol = "GENE" + geneGroups.get(column).get(0) + "X";
-    					}
+						if(type == true){
+							
+							geneCol = "GENE" + geneGroups.get(column).get(0) + "X";
+							geneCol2 = "GENE" + geneGroups.get(column).get(0) + "X";
+						}
+						else{
+							
+							geneCol = "ARRY" + geneGroups.get(column).get(0) + "X";
+							geneCol2 = "ARRY" + geneGroups.get(column).get(0) + "X";
+						}
     				}
-    				for(int j = geneIntegerTable.size() - 1; j >= 0; j--){
+    			}
+    			for(int j = geneIntegerTable.size() - 1; j >= 0; j--){
     					
-    					if(!Collections.disjoint(geneIntegerTable.get(j),geneGroups.get(row))){
-   
-    						geneRow = dataTable.get(j).get(0);
-    						break;
+    				if(!Collections.disjoint(geneIntegerTable.get(j), geneGroups.get(row))){
+    					
+						List<Integer> intersect = new ArrayList<Integer>(geneIntegerTable.get(j));
+						intersect.retainAll(geneGroups.get(row));
+						
+    					geneRow = dataTable.get(j).get(0);
+    					
+    					if(type == true){
+    						
+    						geneRow2 = "GENE" + intersect.get(0) + "X";
     					}
     					else{
+    						
+    						geneRow2 = "ARRY" + intersect.get(0) + "X";
+    					}
+    					break;
+    				}
+    				else{
+    					if(type == true){
+    						
     						geneRow = "GENE" + geneGroups.get(row).get(0) + "X";
+    						geneRow2 = "GENE" + geneGroups.get(row).get(0) + "X";
+    					}
+    					else{
+    						
+    						geneRow = "ARRY" + geneGroups.get(row).get(0) + "X";
+    						geneRow2 = "ARRY" + geneGroups.get(row).get(0) + "X";
+    					}
+    				}
+				}
+    			
+				int last = 0;
+				if(reorderedList.size() > 0){
+					
+					last = reorderedList.size() - 1;
+				}
+    			
+				if(reorderedList.contains(geneRow2) && reorderedList.contains(geneCol2)){
+					
+				}
+				else if(reorderedList.contains(geneRow2)){
+					
+					if(random.nextBoolean()){
+						
+						reorderedList.add(0, geneCol2);
+					}
+					else{
+					
+						reorderedList.add(last, geneCol2);
 					}
 					
 				}
-				
+				else if(reorderedList.contains(geneCol2)){
+					
+					if(random.nextBoolean()){
+						
+						reorderedList.add(0, geneRow2);
+					}
+					else{
+						
+						reorderedList.add(last, geneRow2);
+					}
+				}
+				else{
+					
+					if(random.nextBoolean()){
+						
+						reorderedList.add(0, geneRow2);
+						reorderedList.add(1, geneCol2);
+					}
+					else{
+						
+						reorderedList.add(last, geneRow2);
+						reorderedList.add(reorderedList.size() - 1, geneCol2);
+					}
+				}
 			}
     			
     		pair.add(geneCol);
     		pair.add(geneRow);
     		pair.add(String.valueOf(1 - min));
     		
-	    		System.out.println("------------------------------------------");
-	    		System.out.println("Data to save: " + pair.toString());
+//    		System.out.println("------------------------------------------");
+//    		System.out.println("Data to save: " + pair.toString());
     		
     		dataTable.add(pair);
     		geneIntegerTable.add(fusedGroup);
@@ -722,15 +918,17 @@ public class HierarchicalCluster {
 			}
 			
 		}
-    	
-//    	else if(method.contentEquals("Centroid Linkage")){
-//    		
-//    		
-//    	}
     
 		
-    	System.out.println("dataTable Size: " + dataTable.size());
+    	System.out.println("FINAL reorderedList Size: " + reorderedList.size());
     	
+    	Set<String> set = new HashSet<String>(reorderedList);
+    	
+    	if(set.size()<reorderedList.size()){
+    		System.out.println("Duplicates!");
+    	}
+    	
+    	System.out.println("FINAL reorderedList: " + reorderedList.toString());
     	ClusterFileWriter dataFile = new ClusterFileWriter(frame, model);
 
     		dataFile.writeFile(dataTable, type);
