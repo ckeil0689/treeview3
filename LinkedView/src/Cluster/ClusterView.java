@@ -668,6 +668,9 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		String choice = (String)geneCombo.getSelectedItem();
 		String choice2 = (String)arrayCombo.getSelectedItem();
 		
+		List<String> orderedRows = new ArrayList<String>();
+		List<String> orderedColumns = new ArrayList<String>();
+		
 		//if user checked clustering for elements
 		if(!choice.contentEquals("Do Not Cluster")){
 			
@@ -688,7 +691,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 			
 			loadingInfo.setText("Clustering Row Elements...");
 			
-			clusterTarget.cluster(rowDistances, pBar, isRows, similarityM);
+			orderedRows = clusterTarget.cluster(rowDistances, pBar, isRows, similarityM);
 			
 			finalPanel.remove(loadingInfo);
 			mainPanel.revalidate();
@@ -718,7 +721,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 			
 			loadingInfo.setText("Clustering Column Elements...");
 			
-			clusterTarget.cluster(columnDistances, pBar, isColumns, similarityM);
+			orderedColumns = clusterTarget.cluster(columnDistances, pBar, isColumns, similarityM);
 			
 			finalPanel.remove(loadingInfo);
 			mainPanel.revalidate();
@@ -728,7 +731,9 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 			
 		}
 		
-
+		//also takes list of row elements because only one list can easily be consistently transformed and 
+		//fed into file writer to make a tab-delimited file
+		clusterTarget.generateCDT(sepRows, orderedRows, orderedColumns, choice, choice2);
 		
 		//use int method to determine the distance/ similarity matrix algorithm
 		//return distance/ similarity matrix and use as input to clustering function

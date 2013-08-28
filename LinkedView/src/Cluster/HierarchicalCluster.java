@@ -369,7 +369,7 @@ public class HierarchicalCluster {
     }
 	
     //method to do the actual clustering of data using the distance matrix previously calculated
-    public void cluster(List<List<Double>> geneDList, JProgressBar pBar, boolean type, String method){
+    public List<String> cluster(List<List<Double>> geneDList, JProgressBar pBar, boolean type, String method){
     	
     	//list which stores data to be written to file
     	List<List<String>> dataTable = new ArrayList<List<String>>();
@@ -523,12 +523,6 @@ public class HierarchicalCluster {
     		//in a list from before, if yes connect to LATEST node by replacing the gene name with the node name	
 			if(fusedGroup.size() == 2 && type == true){
 				
-				int last = 0;
-				if(reorderedList.size() > 0){
-					
-					last = reorderedList.size() - 1;
-				}
-				
 				geneRow = "GENE" + geneGroups.get(row).get(0) + "X"; 
 				geneCol = "GENE" + geneGroups.get(column).get(0) + "X";
 				
@@ -543,7 +537,7 @@ public class HierarchicalCluster {
 					}
 					else{
 					
-						reorderedList.add(last, geneCol);
+						reorderedList.add(geneCol);
 					}
 					
 				}
@@ -555,7 +549,7 @@ public class HierarchicalCluster {
 					}
 					else{
 						
-						reorderedList.add(last, geneRow);
+						reorderedList.add(geneRow);
 					}
 				}
 				else{
@@ -568,19 +562,13 @@ public class HierarchicalCluster {
 					}
 					else{
 						
-						reorderedList.add(last, geneRow);
+						reorderedList.add(geneRow);
 						reorderedList.add(reorderedList.size() - 1, geneCol);
 					}
 				}
 				
 			}
 			else if(fusedGroup.size() == 2 && type == false){
-				
-				int last = 0;
-				if(reorderedList.size() > 0){
-					
-					last = reorderedList.size() - 1;
-				}
 				
 				geneRow = "ARRY" + geneGroups.get(row).get(0) + "X"; 
 				geneCol = "ARRY" + geneGroups.get(column).get(0) + "X";
@@ -596,7 +584,7 @@ public class HierarchicalCluster {
 					}
 					else{
 					
-						reorderedList.add(last, geneCol);
+						reorderedList.add(geneCol);
 					}
 					
 				}
@@ -608,7 +596,7 @@ public class HierarchicalCluster {
 					}
 					else{
 						
-						reorderedList.add(last, geneRow);
+						reorderedList.add(geneRow);
 					}
 				}
 				else{
@@ -619,7 +607,7 @@ public class HierarchicalCluster {
 					}
 					else{
 						
-						reorderedList.add(last, geneRow);
+						reorderedList.add(geneRow);
 						reorderedList.add(reorderedList.size() - 1, geneCol);
 					}
 				}
@@ -697,11 +685,6 @@ public class HierarchicalCluster {
     				}
 				}
     			
-				int last = 0;
-				if(reorderedList.size() > 0){
-					
-					last = reorderedList.size() - 1;
-				}
     			
 				if(reorderedList.contains(geneRow2) && reorderedList.contains(geneCol2)){
 					
@@ -714,7 +697,7 @@ public class HierarchicalCluster {
 					}
 					else{
 					
-						reorderedList.add(last, geneCol2);
+						reorderedList.add(geneCol2);
 					}
 					
 				}
@@ -726,7 +709,7 @@ public class HierarchicalCluster {
 					}
 					else{
 						
-						reorderedList.add(last, geneRow2);
+						reorderedList.add(geneRow2);
 					}
 				}
 				else{
@@ -738,7 +721,7 @@ public class HierarchicalCluster {
 					}
 					else{
 						
-						reorderedList.add(last, geneRow2);
+						reorderedList.add(geneRow2);
 						reorderedList.add(reorderedList.size() - 1, geneCol2);
 					}
 				}
@@ -916,7 +899,6 @@ public class HierarchicalCluster {
 				
 				System.out.println("Weird error.");
 			}
-			
 		}
     
 		
@@ -931,9 +913,67 @@ public class HierarchicalCluster {
     	System.out.println("FINAL reorderedList: " + reorderedList.toString());
     	ClusterFileWriter dataFile = new ClusterFileWriter(frame, model);
 
-    		dataFile.writeFile(dataTable, type);
-    		filePath = dataFile.getFilePath();
+		dataFile.writeFile(dataTable, type);
+		filePath = dataFile.getFilePath();
+		
+		return reorderedList;
+ 
+    }
+ 
+    public void generateCDT(List<List<Double>> sepList, List<String> orderedRows, List<String> orderedCols, String choice, String choice2){
     	
+    	System.out.println("Size SepList: " + sepList.size());
+    	System.out.println("Size orderedList: " + orderedRows.size());
+    	
+		//the list containing all the reorganized row-data
+    	List<List<Double>> cdtDataList = new ArrayList<List<Double>>(); 
+    	
+    	//order rows
+    	if(!choice.contentEquals("Do Not Cluster")){
+	    	
+	    	for(int i = 0; i < orderedRows.size(); i++){
+	    		
+		    	String rowElement = orderedRows.get(i);
+		    	String adjusted = rowElement.replaceAll("[\\D]", "");
+		    	
+		    	int index = Integer.parseInt(adjusted);
+		    	
+		    	List<Double> rowData = sepList.get(index);
+		    	
+		    	cdtDataList.add(rowData);
+	    	}
+    	}
+    	//order Columns
+    	if(!choice2.contentEquals("Do Not Cluster")){
+    		
+    		if(cdtDataList.size() == 0){
+    			
+    			cdtDataList.addAll(sepList);
+    		}
+
+    		for(int i = 0; i < orderedCols.size(); i++){
+	    		
+		    	String colElement = orderedCols.get(i);
+		    	String adjusted = colElement.replaceAll("[\\D]", "");
+		    	
+		    	//gets index from ordered list, e.g. ARRY45X --> 45;
+		    	int index = Integer.parseInt(adjusted);
+		    	
+		    	//going through every row
+		    	for(int j = 0; j < cdtDataList.size(); j++){
+		    		
+		    		//swapping position in original column arrangement according to new ordered list
+		    		//if Element 1 in orderedCols is ARRY45X, then element 1 and element 45 will be swapped in every row
+		    		Collections.swap(cdtDataList.get(j), i, index);
+		    	}
+	    	}
+    	}
+    	
+    	System.out.println("Size cdtDataList: " + cdtDataList.size());
+    	System.out.println("cdtDataList Element Size: " + cdtDataList.get(0).size());
+    	System.out.println("cdtDataList Element 1: " + cdtDataList.get(0).toString());
+    	System.out.println("orderedRows: " + orderedRows.toString());
+    	System.out.println("orderedCols: " + orderedCols.toString());
     }
     
     public String getFilePath(){
