@@ -66,10 +66,10 @@ public class ClusterModel extends Observable implements DataModel {
   		hasChanged();
   	}
     // accessor methods	
-	public HeaderInfo getGeneHeaderInfo() {
+	public IntHeaderInfoCluster getGeneHeaderInfo() {
 	  return geneHeaderInfo;
 	}
-	public HeaderInfo getArrayHeaderInfo() {
+	public IntHeaderInfoCluster getArrayHeaderInfo() {
 	  return arrayHeaderInfo;
 	}
 	public ClusterDataMatrix getDataMatrix() {
@@ -149,7 +149,7 @@ public class ClusterModel extends Observable implements DataModel {
     public ClusterModel() {
     	super();
 	  /* build ClusterModel, initially empty... */	
-	  	geneHeaderInfo = new GeneHeaderInfo();
+	  	geneHeaderInfo = new IntHeaderInfoCluster();
 	  	arrayHeaderInfo = new IntHeaderInfoCluster();
 	  	atrHeaderInfo = new IntHeaderInfoCluster();
 		gtrHeaderInfo = new IntHeaderInfoCluster();
@@ -434,7 +434,7 @@ public class ClusterModel extends Observable implements DataModel {
 		
 		
     protected IntHeaderInfoCluster arrayHeaderInfo;
-    protected GeneHeaderInfo geneHeaderInfo;
+    protected IntHeaderInfoCluster geneHeaderInfo;
 	protected IntHeaderInfoCluster atrHeaderInfo;
 	protected IntHeaderInfoCluster gtrHeaderInfo;
 	

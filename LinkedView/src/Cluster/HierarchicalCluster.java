@@ -910,27 +910,72 @@ public class HierarchicalCluster {
     		System.out.println("Duplicates!");
     	}
     	
-    	System.out.println("FINAL reorderedList: " + reorderedList.toString());
+    	//System.out.println("FINAL reorderedList: " + reorderedList.toString());
+    	
     	ClusterFileWriter dataFile = new ClusterFileWriter(frame, model);
-
+    	
+    	//change boolean type to String file ending?
 		dataFile.writeFile(dataTable, type);
 		filePath = dataFile.getFilePath();
 		
 		return reorderedList;
  
     }
- 
+    
+    //orders rows and/ or columns, then makes a reordered List<List<String> using the original data and header input to be written into
+    //a tab-delimited excel file saved as .cdt
     public void generateCDT(List<List<Double>> sepList, List<String> orderedRows, List<String> orderedCols, String choice, String choice2){
     	
-    	System.out.println("Size SepList: " + sepList.size());
-    	System.out.println("Size orderedList: " + orderedRows.size());
+    	//GOAL: generate List<List<String>> which contains all data to be written to an excel file
+    	
+//    	System.out.println("Size SepList: " + sepList.size());
+//    	System.out.println("Size orderedList: " + orderedRows.size());
+    	
+    	//The list of String-lists to be generated for file-writing, contains all data
+    	List<List<String>> finalcdtTable = new ArrayList<List<String>>();
     	
 		//the list containing all the reorganized row-data
     	List<List<Double>> cdtDataList = new ArrayList<List<Double>>(); 
     	
-    	//order rows
+    	//retrieving names and weights of row elements
+    	//format: [[YAL063C, 1.0], ..., [...]]
+    	String[][] rowNames = model.getGeneHeaderInfo().getHeaderArray();
+    	
+//    	System.out.println("Size rowNames: " + model.getGeneHeaderInfo().getNumHeaders());
+//    	System.out.println("rowNames 0: " + Arrays.toString(rowNames[0]));
+    	
+    	//retrieving names and weights of column elements
+    	//format: [[YAL063C, 1.0], ..., [...]]
+    	String[][] colNames = model.getArrayHeaderInfo().getHeaderArray();
+    	
+//    	System.out.println("Size colNames: " + colNames.length);
+//    	System.out.println("colNames 0: " + Arrays.toString(colNames[0]));
+    	
+    	//first transform the String[][] to lists
+    	List<List<String>> rowNameList = new ArrayList<List<String>>();
+    	List<List<String>> colNameList = new ArrayList<List<String>>();
+    	
+    	List<List<String>> rowNameList2 = new ArrayList<List<String>>();
+    	List<List<String>> colNameList2 = new ArrayList<List<String>>();
+    	
+    	if(rowNames.length > 0){
+    		
+	    	for(String[] element : rowNames){
+	    		
+	    		rowNameList.add(Arrays.asList(element));
+	    	}
+    	}
+    	
+    	if(rowNames.length > 0){
+	    	for(String[] element : colNames){
+	    		
+	    		colNameList.add(Arrays.asList(element));
+	    	}
+    	}
+    	
+    	//order row data and names
     	if(!choice.contentEquals("Do Not Cluster")){
-	    	
+    		
 	    	for(int i = 0; i < orderedRows.size(); i++){
 	    		
 		    	String rowElement = orderedRows.get(i);
@@ -941,9 +986,11 @@ public class HierarchicalCluster {
 		    	List<Double> rowData = sepList.get(index);
 		    	
 		    	cdtDataList.add(rowData);
+		    	
+		    	rowNameList2.add(rowNameList.get(index));
 	    	}
     	}
-    	//order Columns
+    	//order column data and names
     	if(!choice2.contentEquals("Do Not Cluster")){
     		
     		if(cdtDataList.size() == 0){
@@ -965,15 +1012,47 @@ public class HierarchicalCluster {
 		    		//swapping position in original column arrangement according to new ordered list
 		    		//if Element 1 in orderedCols is ARRY45X, then element 1 and element 45 will be swapped in every row
 		    		Collections.swap(cdtDataList.get(j), i, index);
+		    		
 		    	}
+		    	
+	    		//reordering names
+		    	colNameList2.add(colNameList.get(index));;
 	    	}
     	}
+    
+//    	System.out.println("Size cdtDataList: " + cdtDataList.size());
+//    	System.out.println("cdtDataList Element Size: " + cdtDataList.get(0).size());
+//    	System.out.println("cdtDataList Element 1: " + cdtDataList.get(0).subList(0, 20).toString());
+  
+     	//System.out.println("orderedRows: " + orderedRows.subList(0, 20).toString());
+    	//System.out.println("orderedCols: " + orderedCols.subList(0, 20).toString());
+    	//System.out.println("rowNameList2: " + rowNameList2.subList(0, 20).toString());
+    	//System.out.println("colNameList2: " + colNameList2.subList(0, 20).toString());
     	
-    	System.out.println("Size cdtDataList: " + cdtDataList.size());
-    	System.out.println("cdtDataList Element Size: " + cdtDataList.get(0).size());
-    	System.out.println("cdtDataList Element 1: " + cdtDataList.get(0).toString());
-    	System.out.println("orderedRows: " + orderedRows.toString());
-    	System.out.println("orderedCols: " + orderedCols.toString());
+    	//transform cdtDataFile from double lists to string lists
+    	List<List<String>> cdtDataStrings = new ArrayList<List<String>>();
+    	
+    	for(List<Double> element : cdtDataList){
+    		
+    		List<String> newStringData = new ArrayList<String>();
+    		
+    		for(Double element2 : element){
+    			
+    			newStringData.add(element2.toString());
+    		}
+    		
+    		cdtDataStrings.add(newStringData);
+    		
+    	}
+    	
+    	System.out.println("cdtDataStrings: " + cdtDataStrings.size());
+    	
+    	//assets to form the final cdt file:
+    	//reordered gene/ arry list (GENE34X...etc.) ---> orderedRows, orderedCols
+    	//reordered gene name and array name lists (YBR043C, 1.0...etc.) ---> rowNameList2, colNameList2
+    	//reordered data values ---> cdtDataStrings
+    	
+    	//next step: fuse them to create the final .CDT-write-ready List<List<String>>
     }
     
     public String getFilePath(){
