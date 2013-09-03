@@ -24,7 +24,7 @@ public class ClusterFileWriter {
 		this.model = model;
 	}
 	
-	public void writeFile(List<List<String>> input, boolean type){
+	public void writeFile(List<List<String>> input, String fileEnd){
 		
 		String content = "";
 		
@@ -54,26 +54,8 @@ public class ClusterFileWriter {
 		
 		try{
 			
-//			fc = new JFileChooser();
-//			
-//			fc.setFileFilter(new ClusterFileFilter());
-//			
-//			int returnVal = fc.showSaveDialog(frame);
-//			
-//			if(returnVal == JFileChooser.APPROVE_OPTION){
-//				
-//				file = new File(fc.getSelectedFile() + ".gtr");
-//				
-//			}
-			
-			if(type){
-			
-				file = new File(model.getSource().substring(0, model.getSource().length()- 4) + ".gtr");
-			}
-			else{
-				
-				file = new File(model.getSource().substring(0, model.getSource().length()- 4) + ".atr");
-			}
+			file = new File(model.getSource().substring(0, model.getSource().length()- 4) + fileEnd);
+
 				
 			file.createNewFile();
 				

@@ -733,7 +733,20 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		
 		//also takes list of row elements because only one list can easily be consistently transformed and 
 		//fed into file writer to make a tab-delimited file
+		finalPanel.add(loadingInfo, "alignx 50%, pushx, wrap");
+		
+		loadingInfo.setText("Generating .CDT file...");
+		
+		mainPanel.revalidate();
+		mainPanel.repaint();
+		
 		clusterTarget.generateCDT(sepRows, orderedRows, orderedColumns, choice, choice2);
+		
+		finalPanel.remove(loadingInfo);
+		mainPanel.revalidate();
+		mainPanel.repaint();
+		
+		finalPanel.setPath(clusterTarget.getFilePath());
 		
 		//use int method to determine the distance/ similarity matrix algorithm
 		//return distance/ similarity matrix and use as input to clustering function

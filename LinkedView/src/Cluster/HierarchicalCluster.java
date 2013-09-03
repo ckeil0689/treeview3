@@ -915,7 +915,15 @@ public class HierarchicalCluster {
     	ClusterFileWriter dataFile = new ClusterFileWriter(frame, model);
     	
     	//change boolean type to String file ending?
-		dataFile.writeFile(dataTable, type);
+    	if(type){
+    		
+    		dataFile.writeFile(dataTable, ".gtr");
+    	}
+    	else{
+    		
+    		dataFile.writeFile(dataTable, ".atr");
+    	}
+    	
 		filePath = dataFile.getFilePath();
 		
 		return reorderedList;
@@ -990,6 +998,10 @@ public class HierarchicalCluster {
 		    	rowNameList2.add(rowNameList.get(index));
 	    	}
     	}
+    	else{
+    		
+    		rowNameList2.addAll(rowNameList);
+    	}
     	//order column data and names
     	if(!choice2.contentEquals("Do Not Cluster")){
     		
@@ -1018,6 +1030,10 @@ public class HierarchicalCluster {
 	    		//reordering names
 		    	colNameList2.add(colNameList.get(index));;
 	    	}
+    	}
+    	else{
+    		
+    		colNameList2.addAll(colNameList);
     	}
     
 //    	System.out.println("Size cdtDataList: " + cdtDataList.size());
@@ -1048,11 +1064,102 @@ public class HierarchicalCluster {
     	System.out.println("cdtDataStrings: " + cdtDataStrings.size());
     	
     	//assets to form the final cdt file:
-    	//reordered gene/ arry list (GENE34X...etc.) ---> orderedRows, orderedCols
-    	//reordered gene name and array name lists (YBR043C, 1.0...etc.) ---> rowNameList2, colNameList2
-    	//reordered data values ---> cdtDataStrings
+    	//reordered gene/ arry List<String> (GENE34X...etc.) ---> orderedRows, orderedCols
+    	//reordered gene name and array name List<List<String>> (YBR043C, 1.0...etc.) ---> rowNameList2, colNameList2
+    	//reordered data values List<List<String>> ((0.0, 0.0, 1.8, 0,7....),...., (0.0, 0.65, ...)) ---> cdtDataStrings
     	
     	//next step: fuse them to create the final .CDT-write-ready List<List<String>>
+    	finalcdtTable.addAll(cdtDataStrings);
+    	
+    	List<String> cdtRowElement1 = new ArrayList<String>();
+    	int buffer = 2;
+    	
+		if(!choice.contentEquals("Do Not Cluster")){
+			
+			cdtRowElement1.add("GID");
+		}
+
+		cdtRowElement1.add("ORF");
+		cdtRowElement1.add("NAME");
+		cdtRowElement1.add("GWEIGHT");
+		
+		for(int i = 0; i < colNameList2.size(); i++){
+			
+			cdtRowElement1.add(colNameList2.get(i).get(0));
+		}
+		
+		finalcdtTable.add(0, cdtRowElement1);
+		
+		if(!choice2.contentEquals("Do Not Cluster")){
+			
+			buffer = 3;
+			
+			List<String> cdtRowElement2 = new ArrayList<String>();
+			
+			cdtRowElement2.add("AID");
+			cdtRowElement2.add("");
+			cdtRowElement2.add("");
+			if(!choice.contentEquals("Do Not Cluster")){
+				cdtRowElement2.add("");
+			}
+			
+			for(int i = 0; i < orderedCols.size(); i++){
+				
+				cdtRowElement2.add(orderedCols.get(i));
+			}
+			
+			finalcdtTable.add(1, cdtRowElement2);	
+		}
+		
+		List<String> cdtRowElement3 = new ArrayList<String>();
+		
+		cdtRowElement3.add("EWEIGHT");
+		cdtRowElement3.add("");
+		cdtRowElement3.add("");
+		if(!choice.contentEquals("Do Not Cluster")){
+			cdtRowElement3.add("");
+		}
+		
+		for(int i = 0; i < colNameList2.size(); i++){
+			
+			cdtRowElement3.add(colNameList2.get(i).get(1));
+		}
+		
+		if(!choice2.contentEquals("Do Not Cluster")){
+			
+			finalcdtTable.add(2, cdtRowElement3);
+		}
+		else{
+			
+			finalcdtTable.add(1, cdtRowElement3);
+		}
+		
+    	for(int i = 0; i < orderedRows.size(); i++){
+    		
+    		finalcdtTable.get(i + buffer).add(0, rowNameList2.get(i).get(0));
+    		finalcdtTable.get(i + buffer).add(1, rowNameList2.get(i).get(0));
+    		finalcdtTable.get(i + buffer).add(2, rowNameList2.get(i).get(1));
+    		
+    		if(!choice.contentEquals("Do Not Cluster")){
+    			
+    			finalcdtTable.get(i + buffer).add(0, orderedRows.get(i));
+    		}
+    			
+    	}
+    	
+    	System.out.println("finalCDT Size: " + finalcdtTable.size());
+    	System.out.println("finalCDT Element Size: " + finalcdtTable.get(4).size());
+    	System.out.println("finalCDT Element 0: " + finalcdtTable.get(0).toString());
+    	System.out.println("finalCDT Element 1: " + finalcdtTable.get(1).toString());
+    	System.out.println("finalCDT Element 4: " + finalcdtTable.get(4).toString());
+    	
+    	//save file as excel tab-delimited file
+    	ClusterFileWriter dataFile = new ClusterFileWriter(frame, model);
+    	
+    	//change boolean type to String file ending?
+		dataFile.writeFile(finalcdtTable, ".cdt");
+		filePath = dataFile.getFilePath();				
+    	
     }
     
     public String getFilePath(){
