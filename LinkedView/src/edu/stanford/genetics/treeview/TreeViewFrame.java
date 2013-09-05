@@ -322,12 +322,13 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		arraySelection = new TreeSelection(nexpr);
 	}
 	
-
+	//starting dendrogram interface
 	protected void setupRunning() {
 		DendroView dv = new DendroView(getDataModel(), this);						//where used? Create a similar function with ClusterView! used in setDataModel
 		running = dv;
 	}
 	
+	//starting the cluster interface
 	protected void setupClusterRunning() {
 		ClusterView cv = new ClusterView(getDataModel(), this);						//where used? Create a similar function with ClusterView! used in setDataModel
 		running = cv;
@@ -1134,7 +1135,10 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 								+ e.getMessage());
 						e.printStackTrace();
 						}
-					}
+				}
+				//-------------------------------------
+
+				//-------------------------------------
 			}
 		});
 		menubar.setAccelerator(KeyEvent.VK_L);
