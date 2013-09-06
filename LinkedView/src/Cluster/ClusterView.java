@@ -650,14 +650,14 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		
 		JLabel loadingInfo = new JLabel();
 		
-		HierarchicalCluster clusterTarget = new HierarchicalCluster((ClusterModel)dataModel, viewFrame);
+//		HierarchicalCluster clusterTarget = new HierarchicalCluster((ClusterModel)dataModel, viewFrame);
 		
 		//declare variables needed for function
 		List<Double> currentList = new ArrayList<Double>();
 		List<List<Double>> sepRows = new ArrayList<List<Double>>();
-		List<List<Double>> sepColumns = new ArrayList<List<Double>>();
+		List<List<Double>> sepCols = new ArrayList<List<Double>>();
 		List<List<Double>> rowDistances  = new ArrayList<List<Double>>();
-		List<List<Double>> columnDistances = new ArrayList<List<Double>>();
+		List<List<Double>> colDistances = new ArrayList<List<Double>>();
 		
 		//change data array into a list (more flexible, faster access for larger computations)
 		for(double d : currentArray){
@@ -669,35 +669,52 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		String choice2 = (String)arrayCombo.getSelectedItem();
 		
 		List<String> orderedRows = new ArrayList<String>();
-		List<String> orderedColumns = new ArrayList<String>();
+		List<String> orderedCols = new ArrayList<String>();
+		
+		DataFormatter formattedData = new DataFormatter((ClusterModel)dataModel, currentList);
 		
 		//if user checked clustering for elements
 		if(!choice.contentEquals("Do Not Cluster")){
 			
 			finalPanel.add(loadingInfo, "alignx 50%, pushx, wrap");
 			
-			loadingInfo.setText("Operation Infos");
+			loadingInfo.setText("Operation Infos...");
 			
 			mainPanel.revalidate();
 			mainPanel.repaint();
 			
 			loadingInfo.setText("Preparing Row Data...");
 			
-			sepRows = clusterTarget.splitRows(currentList, pBar);
+			formattedData.splitRows(pBar);
+			sepRows = formattedData.getRowList();
+//			sepRows = clusterTarget.splitRows(currentList, pBar);
 			
 			loadingInfo.setText("Creating Row Distance Matrix...");
 			
-			rowDistances  = measureDistance(clusterTarget, sepRows, choice, pBar);
+			DistanceMatrixCalculator dCalc = new DistanceMatrixCalculator(sepRows, choice, pBar);
+			
+			dCalc.measureDistance();
+			
+			rowDistances  = dCalc.getDistanceMatrix();
+			
+//			rowDistances  = measureDistance(clusterTarget, sepRows, choice, pBar);
 			
 			loadingInfo.setText("Clustering Row Elements...");
 			
-			orderedRows = clusterTarget.cluster(rowDistances, pBar, isRows, similarityM);
+			ClusterGenerator cGen = new ClusterGenerator((ClusterModel)dataModel, viewFrame, 
+					rowDistances, pBar, isRows, similarityM);
+			
+			cGen.cluster();
+			
+			orderedCols = cGen.getReorderedList();
+			
+//			orderedRows = clusterTarget.cluster(rowDistances, pBar, isRows, similarityM);
 			
 			finalPanel.remove(loadingInfo);
 			mainPanel.revalidate();
 			mainPanel.repaint();
 			
-			finalPanel.setPath(clusterTarget.getFilePath());
+			finalPanel.setPath(cGen.getFilePath());
 			
 		}
 		
@@ -713,21 +730,35 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 			
 			loadingInfo.setText("Preparing Column Data...");
 			
-			sepColumns = clusterTarget.splitColumns(currentList, pBar);
+			formattedData.splitColumns(pBar);
+			sepCols = formattedData.getColList();
+//			sepColumns = clusterTarget.splitColumns(currentList, pBar);
 			
 			loadingInfo.setText("Creating Column Distance Matrix...");
 			
-			columnDistances  = measureDistance(clusterTarget, sepColumns, choice2, pBar);
+			DistanceMatrixCalculator dCalc2 = new DistanceMatrixCalculator(sepCols, choice2, pBar);
+			
+			dCalc2.measureDistance();
+			
+			colDistances  = dCalc2.getDistanceMatrix();
+			
+//			columnDistances  = measureDistance(clusterTarget, sepColumns, choice2, pBar);
 			
 			loadingInfo.setText("Clustering Column Elements...");
 			
-			orderedColumns = clusterTarget.cluster(columnDistances, pBar, isColumns, similarityM);
+			ClusterGenerator cGen2 = new ClusterGenerator((ClusterModel)dataModel, viewFrame, 
+					colDistances, pBar, isColumns, similarityM);
+			
+			cGen2.cluster();
+			
+			orderedCols = cGen2.getReorderedList();
+//			orderedCols = clusterTarget.cluster(colDistances, pBar, isColumns, similarityM);
 			
 			finalPanel.remove(loadingInfo);
 			mainPanel.revalidate();
 			mainPanel.repaint();
 			
-			finalPanel.setPath(clusterTarget.getFilePath());
+			finalPanel.setPath(cGen2.getFilePath());
 			
 		}
 		
@@ -740,55 +771,51 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		mainPanel.revalidate();
 		mainPanel.repaint();
 		
-		clusterTarget.generateCDT(sepRows, orderedRows, orderedColumns, choice, choice2);
+		CDTGenerator cdtGen = new CDTGenerator((ClusterModel)dataModel, viewFrame, sepRows, 
+				orderedRows, orderedCols, choice, choice2);
+		cdtGen.generateCDT();
+		
+//		clusterTarget.generateCDT(sepRows, orderedRows, orderedCols, choice, choice2);
 		
 		finalPanel.remove(loadingInfo);
 		mainPanel.revalidate();
 		mainPanel.repaint();
 		
-		finalPanel.setPath(clusterTarget.getFilePath());
-		
-		//use int method to determine the distance/ similarity matrix algorithm
-		//return distance/ similarity matrix and use as input to clustering function
-		
-		//int listRep = aoArrays.size();
-		
-//		System.out.println("ArrayList Length: " + listRep);
-//		System.out.println("ArrayList Element: " + Arrays.toString(aoArrays.get(0)));
+		finalPanel.setPath(cdtGen.getFilePath());
 		
 	}
 	
-	public List <List<Double>> measureDistance(HierarchicalCluster target, List<List<Double>> data, 
-			String choice, JProgressBar pBar){
-		
-		List<List<Double>> distances = new ArrayList<List<Double>>();
-		
-		switch(choice){
-		
-			case "Pearson Correlation (uncentered)": distances = target.pearson(data, pBar, false, false);
-			break;
-			
-			case "Pearson Correlation (centered)": distances = target.pearson(data, pBar, false, true);
-			break;
-			
-			case "Absolute Correlation (uncentered)": distances = target.pearson(data, pBar, true, false);
-			break;
-			
-			case "Absolute Correlation (centered)": distances = target.pearson(data, pBar, true, true);
-			break;
-			
-			case "Euclidean Distance": distances = target.euclid(data, pBar);
-			break;
-			
-			case "City Block Distance": distances = target.cityBlock(data, pBar);
-			break;
-			
-			default: break;
-		
-		}
-		
-		return distances;
-	}
+//	public List <List<Double>> measureDistance(HierarchicalCluster target, List<List<Double>> data, 
+//			String choice, JProgressBar pBar){
+//		
+//		List<List<Double>> distances = new ArrayList<List<Double>>();
+//		
+//		switch(choice){
+//		
+//			case "Pearson Correlation (uncentered)": distances = target.pearson(data, pBar, false, false);
+//			break;
+//			
+//			case "Pearson Correlation (centered)": distances = target.pearson(data, pBar, false, true);
+//			break;
+//			
+//			case "Absolute Correlation (uncentered)": distances = target.pearson(data, pBar, true, false);
+//			break;
+//			
+//			case "Absolute Correlation (centered)": distances = target.pearson(data, pBar, true, true);
+//			break;
+//			
+//			case "Euclidean Distance": distances = target.euclid(data, pBar);
+//			break;
+//			
+//			case "City Block Distance": distances = target.cityBlock(data, pBar);
+//			break;
+//			
+//			default: break;
+//		
+//		}
+//		
+//		return distances;
+//	}
 	
 	/**
 	* Open a dialog for cluster program 
