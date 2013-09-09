@@ -148,12 +148,13 @@ public class CDTGenerator {
     		
     	}
     	
-    	System.out.println("cdtDataStrings: " + cdtDataStrings.size());
+//    	System.out.println("cdtDataStrings: " + cdtDataStrings.size());
     	
     	//fuse them to create the final .CDT-write-ready List<List<String>>
     	finalcdtTable.addAll(cdtDataStrings);
     	
     	List<String> cdtRowElement1 = new ArrayList<String>();
+    	
     	int buffer = 2;
     	
 		if(!choice.contentEquals("Do Not Cluster")){
@@ -198,6 +199,7 @@ public class CDTGenerator {
 		cdtRowElement3.add("EWEIGHT");
 		cdtRowElement3.add("");
 		cdtRowElement3.add("");
+		
 		if(!choice.contentEquals("Do Not Cluster")){
 			cdtRowElement3.add("");
 		}
@@ -229,11 +231,11 @@ public class CDTGenerator {
     			
     	}
     	
-    	System.out.println("finalCDT Size: " + finalcdtTable.size());
-    	System.out.println("finalCDT Element Size: " + finalcdtTable.get(4).size());
-    	System.out.println("finalCDT Element 0: " + finalcdtTable.get(0).toString());
-    	System.out.println("finalCDT Element 1: " + finalcdtTable.get(1).toString());
-    	System.out.println("finalCDT Element 4: " + finalcdtTable.get(4).toString());
+//    	System.out.println("finalCDT Size: " + finalcdtTable.size());
+//    	System.out.println("finalCDT Element Size: " + finalcdtTable.get(4).size());
+//    	System.out.println("finalCDT Element 0: " + finalcdtTable.get(0).toString());
+//    	System.out.println("finalCDT Element 1: " + finalcdtTable.get(1).toString());
+//    	System.out.println("finalCDT Element 4: " + finalcdtTable.get(4).toString());
     	
     	//save file as excel tab-delimited file
     	ClusterFileWriter dataFile = new ClusterFileWriter(frame, model);

@@ -15,19 +15,21 @@ public class DataFormatter {
 	//Instance variables
 	private ClusterModel model;
 	private List<Double> list;
+	private JProgressBar pBar;
 	
 	private List<List<Double>> rowList = new ArrayList<List<Double>>();
 	private List<List<Double>> colList = new ArrayList<List<Double>>();
 	
 	//Constructor (building the object)
-	public DataFormatter(ClusterModel model, List<Double> list){
+	public DataFormatter(ClusterModel model, List<Double> list, JProgressBar pBar){
 		
 		this.model = model;
 		this.list = list;
+		this.pBar = pBar;
 	}
 	
 	//extracting rows from raw data array
-	public void splitRows(JProgressBar pBar){
+	public void splitRows(){
 		
 		int lower = 0;
 		int upper = 0;
@@ -60,7 +62,7 @@ public class DataFormatter {
 	}
 	
 	//getting the columns from raw data array
-	public void splitColumns(JProgressBar pBar){
+	public void splitColumns(){
 		
 		//number of arrays/ columns (3277 for test)
 		int max = model.nExpr();
