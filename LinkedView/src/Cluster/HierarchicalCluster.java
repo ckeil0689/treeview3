@@ -29,8 +29,8 @@ public class HierarchicalCluster {
 	private JProgressBar pBar;
 	private JLabel loadingInfo;
 	private double[] currentArray;
-	private boolean isRows = true;
-	private boolean isColumns = false;
+	private final String rowString = "GENE"; 
+	private final String colString = "ARRY";
 	private String choice;
 	private String choice2;
 	
@@ -100,7 +100,7 @@ public class HierarchicalCluster {
 			loadingInfo.setText("Clustering Row Elements...");
 			
 			ClusterGenerator cGen = new ClusterGenerator(model, frame, 
-					rowDistances, pBar, isRows, similarityM);
+					rowDistances, pBar, rowString, similarityM);
 			
 			cGen.cluster();
 			
@@ -140,7 +140,7 @@ public class HierarchicalCluster {
 			loadingInfo.setText("Clustering Column Elements...");
 			
 			ClusterGenerator cGen2 = new ClusterGenerator(model, frame, 
-					colDistances, pBar, isColumns, similarityM);
+					colDistances, pBar, colString, similarityM);
 			
 			cGen2.cluster();
 			

@@ -287,7 +287,7 @@ public class DistanceMatrixCalculator {
     			dataDistance.add(sum);
     		}
     		
-    		//System.out.println("#1 Loop Time: " + (System.currentTimeMillis()-ms));
+    		//System.out.println("#1 Loop Time: " + (System.currentTimeMillis()- ms));
 
     		//list with all genes and their distances to the other genes
     		distanceList.add(dataDistance);

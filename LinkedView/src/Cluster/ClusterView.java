@@ -738,7 +738,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 	 */
 	public JPanel getMainPanel(){
 		
-		return this.mainPanel;
+		return mainPanel;
 	}
 	
 	/**
@@ -746,7 +746,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 	 */
 	public FinalOptionsPanel getFinalPanel(){
 		
-		return this.finalPanel;
+		return finalPanel;
 	}
 	
 	/**

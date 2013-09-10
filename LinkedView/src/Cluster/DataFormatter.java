@@ -20,6 +20,7 @@ public class DataFormatter {
 	private List<List<Double>> rowList = new ArrayList<List<Double>>();
 	private List<List<Double>> colList = new ArrayList<List<Double>>();
 	
+	
 	//Constructor (building the object)
 	public DataFormatter(ClusterModel model, List<Double> list, JProgressBar pBar){
 		
