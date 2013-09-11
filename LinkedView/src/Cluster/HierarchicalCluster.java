@@ -99,7 +99,7 @@ public class HierarchicalCluster {
 			
 			loadingInfo.setText("Clustering Row Elements...");
 			
-			ClusterGenerator cGen = new ClusterGenerator(model, frame, 
+			ClusterGenerator2 cGen = new ClusterGenerator2(model, frame, 
 					rowDistances, pBar, rowString, similarityM);
 			
 			cGen.cluster();
@@ -139,7 +139,7 @@ public class HierarchicalCluster {
 			
 			loadingInfo.setText("Clustering Column Elements...");
 			
-			ClusterGenerator cGen2 = new ClusterGenerator(model, frame, 
+			ClusterGenerator2 cGen2 = new ClusterGenerator2(model, frame, 
 					colDistances, pBar, colString, similarityM);
 			
 			cGen2.cluster();
