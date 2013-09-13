@@ -35,6 +35,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.SwingWorker.StateValue;
 
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -526,7 +527,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 					});
 					pBar.setVisible(true);
 					
-					final JLabel clusterLabel = new JLabel("Clustering...");
+					final JLabel clusterLabel = new JLabel("Working...");
 					clusterLabel.setFont(new Font("Sans Serif", Font.PLAIN, 22));
 					loadPanel.add(clusterLabel, "alignx 50%, span, wrap");
 					
@@ -578,6 +579,8 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 							mainPanel.repaint();	
 						}
 					};
+					
+					//start new cluster process
 					worker.execute();
 				}
 				//display error message
