@@ -182,16 +182,16 @@ public class ClusterGenerator2 {
     		//knowing the gene with the minimum value (row) allows to find the corresponding column
     		column = colMinIndexList.get(row);
     		
-    		if(reorderedList.size() > 1445){
-	    		System.out.println("GeneMinList " + geneMinList);
-	    		System.out.println("HDM Size " + halfDMatrix.size());
-	    		System.out.println("Row: " + row);
-	    		System.out.println("Col: " + column);
-				for(List<Double> e : halfDMatrix){
-				
-				System.out.println(e);
-				}
-    		}
+//    		if(reorderedList.size() > 1445){
+//	    		System.out.println("GeneMinList " + geneMinList);
+//	    		System.out.println("HDM Size " + halfDMatrix.size());
+//	    		System.out.println("Row: " + row);
+//	    		System.out.println("Col: " + column);
+//				for(List<Double> e : halfDMatrix){
+//				
+//				System.out.println(e);
+//				}
+//    		}
 			
 			//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     		//row and column value of the minimum distance value in matrix are now known
@@ -498,6 +498,7 @@ public class ClusterGenerator2 {
 				
 				System.out.println("Weird error. Neither rowGroup nor colGroup have a minimum.");
 			}
+			
 		}
 
     	System.out.println("FINAL reorderedList Size: " + reorderedList.size());
@@ -577,11 +578,11 @@ public class ClusterGenerator2 {
 		
 		for(int i = 0; i < deepGene.size(); i++){
 			
-			if(reorderedList.size() > 1445){
-				
-	    		System.out.println("DeepGene " + i + ": " + deepGene.get(i));
-	    	
-			}
+//			if(reorderedList.size() > 1445){
+//				
+//	    		System.out.println("DeepGene " + i + ": " + deepGene.get(i));
+//	    	
+//			}
 			
 			if(!usedMins.contains(deepGene.get(i))){
 				
@@ -590,11 +591,11 @@ public class ClusterGenerator2 {
 			}
 		}
 		
-		if(reorderedList.size() > 1445){
-			
-    		System.out.println("GeneMin: " + geneMin);
-    	
-		}
+//		if(reorderedList.size() > 1445){
+//			
+//    		System.out.println("GeneMin: " + geneMin);
+//    	
+//		}
 		
 		return geneMin;
     }

@@ -143,7 +143,7 @@ public class DistanceMatrixCalculator {
     			//using BigDecimal to correct for rounding errors caused by floating point arithmetic 
     			//(0.0 would be -1.113274672357E-16 for example)
     			pearson2 = new BigDecimal(String.valueOf(pearson1));
-    			pearson2 = pearson2.setScale(6, BigDecimal.ROUND_DOWN);
+    			pearson2 = pearson2.setScale(10, BigDecimal.ROUND_DOWN);
     			
 	    		pearsonList.add(pearson2.doubleValue());
 	    		
