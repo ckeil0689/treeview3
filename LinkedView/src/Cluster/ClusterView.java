@@ -35,7 +35,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.SwingWorker.StateValue;
 
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -50,9 +49,9 @@ import javax.swing.plaf.basic.BasicProgressBarUI;
 import net.miginfocom.swing.MigLayout;
 
 import edu.stanford.genetics.treeview.ConfigNode;
-import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.ExportException;
+import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.MainPanel;
 import edu.stanford.genetics.treeview.MainProgramArgs;
 import edu.stanford.genetics.treeview.TreeviewMenuBarI;
@@ -74,7 +73,7 @@ import edu.stanford.genetics.treeview.ViewFrame;
  * @author    	Chris Keil <ckeil@princeton.edu>
  * @version 	0.1
  */
-public class ClusterView extends JPanel implements ConfigNodePersistent, MainPanel {
+public class ClusterView extends JPanel implements MainPanel {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -457,29 +456,86 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		private static final long serialVersionUID = 1L;
 			
 		//Instance variables
-		private JButton cluster_button;
+		private JButton cluster_button, cancel_button, dendro_button;
 		private JComboBox<String> clusterChoice;
-		private JLabel status1, status2, method, error1, error2;
+		private JLabel status1, status2, method, error1, error2, clusterLabel;
 		private String path;
-		private final JPanel loadPanel;
+		private File file;
+		private String clusterMethod;
+		private JLabel opLabel;
+		private JProgressBar pBar, pBar2;
+		private final JPanel buttonPanel, loadPanel, choicePanel;
+		final SwingWorker<Void, Void> worker;
 		    
 		//Constructor
 		public FinalOptionsPanel() {
 			
 			this.setLayout(new MigLayout());
 			setOpaque(false);
-	
+			
+			//worker thread for calculation off the EDT to give Swing elements time to update properly
+			worker = new SwingWorker<Void, Void>() {	
+				
+				public Void doInBackground() {
+
+		        	try {
+		        		
+		        		HierarchicalCluster clusterTarget = 
+		        				new HierarchicalCluster((ClusterModel)dataModel, viewFrame, 
+		        						ClusterView.this, pBar, pBar2, opLabel, dataArray);
+		        		
+		        		clusterTarget.hCluster(clusterMethod);
+		        		
+					} catch (InterruptedException e) {
+					
+						e.printStackTrace();
+					} catch (ExecutionException e) {
+						
+						e.printStackTrace();
+					}
+					return null;
+				}
+					
+				protected void done(){
+					
+					clusterLabel.setText("Clustering complete!");
+					pBar.setForeground(new Color(0, 200, 0, 255));
+					pBar2.setForeground(new Color(0, 200, 0, 255));
+					
+					cluster_button.setEnabled(true);
+					
+					buttonPanel.remove(cancel_button);
+					buttonPanel.add(cluster_button, "pushx, alignx 50%");
+					buttonPanel.add(dendro_button, "pushx, alignx 50%");
+					
+					status1 = new JLabel("The file has been saved in the original directory.");
+					status1.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+					loadPanel.add(status1, "growx, pushx, wrap");
+					
+					status2 = new JLabel("File Path: " + path);
+					status2.setFont(new Font("Sans Serif", Font.ITALIC, 18));
+					loadPanel.add(status2, "growx, pushx, wrap");
+					
+					mainPanel.revalidate();
+					mainPanel.repaint();	
+				}
+			};
+			
 			//Button Component
-			JPanel buttonPanel = new JPanel();
+			buttonPanel = new JPanel();
 			buttonPanel.setLayout(new MigLayout());
+			
+			choicePanel = new JPanel();
+			choicePanel.setLayout(new MigLayout());
 			
 			//ProgressBar Component
 			loadPanel = new JPanel();
 			loadPanel.setLayout(new MigLayout());
-			
+
+			//distance measure chooser
 			method = new JLabel("Method: ");
 			method.setFont(new Font("Sans Serif", Font.PLAIN, 22));
-			buttonPanel.add(method, "alignx 50%, pushx");
+			choicePanel.add(method, "alignx 50%, pushx");
 	    	
 			//ClusterChoice ComboBox
 			String[] clusterMethods = {"Single Linkage", "Centroid Linkage", "Average Linkage", "Complete Linkage"};
@@ -490,13 +546,41 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 			clusterChoice.setFont(new Font("Sans Serif", Font.PLAIN, 18));
 			clusterChoice.setBackground(Color.white);
 			
-			buttonPanel.add(clusterChoice, "alignx 50%, wrap");
+			choicePanel.add(clusterChoice, "alignx 50%, wrap");
 			
 	    	//button with action listener
-	    	cluster_button = new JButton("Cluster");
-	  		Dimension d2 = cluster_button.getPreferredSize();
+	    	dendro_button = new JButton("Dendrogram");
+	  		Dimension d2 = dendro_button.getPreferredSize();
 	  		d2.setSize(d2.getWidth()*2, d2.getHeight()*2);
-	  		cluster_button.setPreferredSize(d2);
+	  		dendro_button.setPreferredSize(d2);
+	  		dendro_button.setFont(new Font("Sans Serif", Font.PLAIN, 20));
+	  		dendro_button.setOpaque(true);
+	  		dendro_button.setBackground(new Color(60, 180, 220, 255));
+	  		dendro_button.setForeground(Color.white);
+	  		dendro_button.addActionListener(new ActionListener(){
+		    		
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					
+					FileSet fileSet = new FileSet(file.getName(), file.getParent()+
+							 File.separator);
+					try {
+						
+						viewFrame.loadFileSet(fileSet);
+						
+					} catch (LoadException e) {
+						
+						e.printStackTrace();
+					}
+					viewFrame.setLoaded(true);
+				}
+	    	});
+	    	
+	    	//button with action listener
+	    	cluster_button = new JButton("Cluster");
+	  		Dimension d3 = cluster_button.getPreferredSize();
+	  		d3.setSize(d3.getWidth()*2, d3.getHeight()*2);
+	  		cluster_button.setPreferredSize(d3);
 	  		cluster_button.setFont(new Font("Sans Serif", Font.PLAIN, 20));
 	  		cluster_button.setOpaque(true);
 	  		cluster_button.setBackground(new Color(60, 180, 220, 255));
@@ -509,15 +593,16 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 					
 				final String choice = (String)geneCombo.getSelectedItem();
 				final String choice2 = (String)arrayCombo.getSelectedItem();
-				final String clusterMethod = (String)clusterChoice.getSelectedItem();
+				clusterMethod = (String)clusterChoice.getSelectedItem();
 					
 				//needs at least one box to be selected otherwise display error
 				if(!choice.contentEquals("Do Not Cluster")||!choice2.contentEquals("Do Not Cluster")){
-						
+					
 					loadPanel.removeAll();
+					buttonPanel.remove(cluster_button);
 					
-					final JProgressBar pBar = new JProgressBar();
-					
+					//precise progressbar
+					pBar = new JProgressBar();
 					pBar.setMinimum(0);
 					pBar.setStringPainted(true);
 					pBar.setForeground(new Color(60, 180, 220, 255));
@@ -527,58 +612,112 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 					});
 					pBar.setVisible(true);
 					
-					final JLabel clusterLabel = new JLabel("Working...");
+					//general progressbar
+					pBar2 = new JProgressBar();
+					pBar2.setMinimum(0);
+					pBar2.setStringPainted(true);
+					pBar2.setForeground(new Color(60, 180, 220, 255));
+					pBar2.setUI(new BasicProgressBarUI(){
+						protected Color getSelectionBackground(){return Color.black;};
+						protected Color getSelectionForeground(){return Color.white;};
+					});
+					pBar2.setString("Overall Progress");
+					pBar2.setVisible(true);
+					
+					clusterLabel = new JLabel("Working...");
 					clusterLabel.setFont(new Font("Sans Serif", Font.PLAIN, 22));
 					loadPanel.add(clusterLabel, "alignx 50%, span, wrap");
 					
 					//Add it to JPanel Object
-					loadPanel.add(pBar, "pushx, growx, span");
+					loadPanel.add(pBar, "pushx, growx, span, wrap");
+					
+					//Add it to JPanel Object
+					loadPanel.add(pBar2, "pushx, growx, span, wrap");
+					
+					opLabel = new JLabel();
+					loadPanel.add(opLabel, "alignx 50%");
+					
 					loadPanel.setBackground(Color.white);
 					loadPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-					finalPanel.add(loadPanel, "pushx, growx, wrap");
-					mainPanel.revalidate();
-					mainPanel.repaint();
-						
-					//actual calculations, off the EDT
-					final SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {	
-							
-						public Void doInBackground() {
+					
+					finalPanel.remove(buttonPanel);
+					
+					finalPanel.add(loadPanel, "pushx, growx, span, wrap");
+					cluster_button.setEnabled(false);
+					
+					cancel_button = new JButton("Cancel");
+			  		Dimension d2 = cancel_button.getPreferredSize();
+			  		d2.setSize(d2.getWidth()*2, d2.getHeight()*2);
+			  		cancel_button.setPreferredSize(d2);
+			  		cancel_button.setFont(new Font("Sans Serif", Font.PLAIN, 20));
+			  		cancel_button.setOpaque(true);
+			  		cancel_button.setBackground(new Color(60, 180, 220, 255));
+			  		cancel_button.setForeground(Color.white);
+					cancel_button.addActionListener(new ActionListener(){
 
-				        	try {
-				        		
-				        		HierarchicalCluster clusterTarget = 
-				        				new HierarchicalCluster((ClusterModel)dataModel, viewFrame, 
-				        						ClusterView.this, pBar, dataArray);
-				        		
-				        		clusterTarget.hCluster(clusterMethod);
-				        		
-							} catch (InterruptedException e) {
+						@Override
+						public void actionPerformed(ActionEvent arg0) {
 							
-								e.printStackTrace();
-							} catch (ExecutionException e) {
-								
-								e.printStackTrace();
-							}
-							return null;
-						}
-							
-						protected void done(){
-							
-							clusterLabel.setText("Clustering complete!");
-							pBar.setForeground(new Color(0, 200, 0, 255));
-							
-							status1 = new JLabel("The file has been saved in the original directory.");
-							status1.setFont(new Font("Sans Serif", Font.PLAIN, 18));
-							loadPanel.add(status1, "growx, pushx, wrap");
-							
-							status2 = new JLabel("File Path: " + path);
-							status2.setFont(new Font("Sans Serif", Font.ITALIC, 18));
-							loadPanel.add(status2, "growx, pushx, wrap");
+							worker.cancel(true);	
+							cluster_button.setEnabled(true);
+							mainPanel.remove(finalPanel);
+							finalPanel = new FinalOptionsPanel();
+							mainPanel.add(finalPanel, "growx, pushx");
 							
 							mainPanel.revalidate();
 							mainPanel.repaint();	
 						}
-					};
+						
+					});
+					
+					//buttonPanel.add(cluster_button, "pushx");
+					buttonPanel.add(cancel_button, "pushx");
+					
+					finalPanel.add(buttonPanel, "pushx, alignx 50%");
+					
+					mainPanel.revalidate();
+					mainPanel.repaint();
+						
+					//actual calculations, off the EDT
+//					final SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {	
+//							
+//						public Void doInBackground() {
+//
+//				        	try {
+//				        		
+//				        		HierarchicalCluster clusterTarget = 
+//				        				new HierarchicalCluster((ClusterModel)dataModel, viewFrame, 
+//				        						ClusterView.this, pBar, opLabel, opLabel2, opLabel3, dataArray);
+//				        		
+//				        		clusterTarget.hCluster(clusterMethod);
+//				        		
+//							} catch (InterruptedException e) {
+//							
+//								e.printStackTrace();
+//							} catch (ExecutionException e) {
+//								
+//								e.printStackTrace();
+//							}
+//							return null;
+//						}
+//							
+//						protected void done(){
+//							
+//							clusterLabel.setText("Clustering complete!");
+//							pBar.setForeground(new Color(0, 200, 0, 255));
+//							
+//							status1 = new JLabel("The file has been saved in the original directory.");
+//							status1.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+//							loadPanel.add(status1, "growx, pushx, wrap");
+//							
+//							status2 = new JLabel("File Path: " + path);
+//							status2.setFont(new Font("Sans Serif", Font.ITALIC, 18));
+//							loadPanel.add(status2, "growx, pushx, wrap");
+//							
+//							mainPanel.revalidate();
+//							mainPanel.repaint();	
+//						}
+//					};
 					
 					//start new cluster process
 					worker.execute();
@@ -605,15 +744,24 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 				}
 			}	
 	    	});
-	    	buttonPanel.add(cluster_button, "span, alignx 50%");
-	
+	    	buttonPanel.add(cluster_button, "pushx");
+	    	
 	    	buttonPanel.setOpaque(false);
+	    	choicePanel.setOpaque(false);
+	    	
+	    	this.add(choicePanel, "alignx 50%, pushx, wrap");
 	    	this.add(buttonPanel, "alignx 50%, pushx, wrap");
 		}
 		
 		public void setPath(String filePath){
 			path = filePath;
 		}
+		
+		public void setFile(File cdtFile){
+			
+			file = cdtFile;
+		}
+		
 	}	
 	
 	/**
@@ -665,76 +813,7 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 		fileDialog.setFileFilter(ff);
 		fileDialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
 	 }
-	
 
-	/**
-	 *  this function changes the info in the confignode to match the current panel sizes. 
-	 * this is a hack, since I don't know how to intercept panel resizing.
-	 * Actually, in the current layout this isn't even used.
-	 */
-	public void syncConfig() {
-		/*
-		DragGridPanel running   = this;
-		floa	t[] heights         = running.getHeights();
-		ConfigNode heightNodes[]  = root.fetch("Height");
-		for (int i = 0; i < heights.length; i++) {
-			if (i < heightNodes.length) {
-				heightNodes[i].setAttribute("value", (double) heights[i],
-						1.0 / heights.length);
-			} else {
-				ConfigNode n  = root.create("Height");
-					n.setAttribute("value", (double) heights[i],
-							1.0 / heights.length);
-			}
-		}
-
-	float[] widths          = running.getWidths();
-	ConfigNode widthNodes[]   = root.fetch("Width");
-		for (int i = 0; i < widths.length; i++) {
-			if (i < widthNodes.length) {
-				widthNodes[i].setAttribute("value", (double) widths[i],
-						1.0 / widths.length);
-			} else {
-			ConfigNode n  = root.create("Width");
-				n.setAttribute("value", (double) widths[i], 1.0 / widths.length);
-			}
-		}
-*/
-	}
-
-
-	/**
-	 *  binds this dendroView to a particular confignode, resizing the panel sizes
-	 *  appropriately.
-	 *
-	 * @param  configNode  ConfigNode to bind to
-	 */
-
-	public void bindConfig(ConfigNode configNode) {
-		root = configNode;
-		/*
-	ConfigNode heightNodes[]  = root.fetch("Height");
-	ConfigNode widthNodes[]   = root.fetch("Width");
-
-	float heights[];
-	float widths[];
-		if (heightNodes.length != 0) {
-			heights = new float[heightNodes.length];
-			widths = new float[widthNodes.length];
-			for (int i = 0; i < heights.length; i++) {
-				heights[i] = (float) heightNodes[i].getAttribute("value", 1.0 / heights.length);
-			}
-			for (int j = 0; j < widths.length; j++) {
-				widths[j] = (float) widthNodes[j].getAttribute("value", 1.0 / widths.length);
-			}
-		} else {
-			widths = new float[]{2 / 11f, 3 / 11f, 3 / 11f, 3 / 11f};
-			heights = new float[]{3 / 16f, 1 / 16f, 3 / 4f};
-		}
-		setHeights(heights);
-		setWidths(widths);
-		*/
-	}
 	
 	/**
 	 * Get the finalPanel for reference in clustering class
@@ -834,6 +913,11 @@ public class ClusterView extends JPanel implements ConfigNodePersistent, MainPan
 	}
 	@Override
 	public void export(MainProgramArgs args) throws ExportException {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void syncConfig() {
 		// TODO Auto-generated method stub
 		
 	}

@@ -4,23 +4,15 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 
 public class ClusterFileWriter {
 	
 	private File file;
-	private JFileChooser fc;
-	private JFrame frame;
 	private ClusterModel model;
 	
-	public ClusterFileWriter(JFrame currentFrame, ClusterModel model){
+	public ClusterFileWriter(ClusterModel model){
 		
-		this.frame = currentFrame;
 		this.model = model;
 	}
 	
@@ -77,6 +69,11 @@ public class ClusterFileWriter {
 	public String getFilePath(){
 		
 		return file.getAbsolutePath();
+	}
+	
+	public File getFile(){
+		
+		return file;
 	}
 	
 }

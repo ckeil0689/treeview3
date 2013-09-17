@@ -1,11 +1,12 @@
 package Cluster;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.swing.JFrame;
+import javax.swing.JProgressBar;
 
 /**
  * This class is used to generate the .CDT tab delimited file which Java TreeView will use for visualization
@@ -17,25 +18,26 @@ public class CDTGenerator {
 
 	//Instance variables
 	private ClusterModel model;
-	private JFrame frame;
 	private String filePath;
+	private File file;
 	private List<List<Double>> sepList;
 	private List<String> orderedRows;
 	private List<String> orderedCols;
 	private String choice;
 	private String choice2;
+	private JProgressBar pBar;
 	
 	//Constructor (building the object)
-	public CDTGenerator(ClusterModel model, JFrame currentFrame, List<List<Double>> sepList, 
-			List<String> orderedRows, List<String> orderedCols, String choice, String choice2){
+	public CDTGenerator(ClusterModel model, List<List<Double>> sepList, 
+			List<String> orderedRows, List<String> orderedCols, String choice, String choice2, JProgressBar pBar){
 		
 		this.model = model;
-		this.frame = currentFrame;
 		this.sepList = sepList;
 		this.orderedRows = orderedRows;
 		this.orderedCols = orderedCols;
 		this.choice = choice;
 		this.choice2 = choice2;
+		this.pBar = pBar;
 	}
 	
 	public void generateCDT(){
@@ -238,10 +240,12 @@ public class CDTGenerator {
 //    	System.out.println("finalCDT Element 4: " + finalcdtTable.get(4).toString());
     	
     	//save file as excel tab-delimited file
-    	ClusterFileWriter dataFile = new ClusterFileWriter(frame, model);
+    	ClusterFileWriter dataFile = new ClusterFileWriter(model);
     	
     	//change boolean type to String file ending?
 		dataFile.writeFile(finalcdtTable, ".cdt");
+		
+		file = dataFile.getFile();
 		filePath = dataFile.getFilePath();				
     	
     }
@@ -250,4 +254,10 @@ public class CDTGenerator {
     	
     	return filePath;
     }
+    
+	public File getFile(){
+		
+		return file;
+	}
+    
 }

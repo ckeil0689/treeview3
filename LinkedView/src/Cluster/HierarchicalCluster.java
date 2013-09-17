@@ -1,10 +1,12 @@
 package Cluster;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import javax.swing.JFrame;
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -25,9 +27,8 @@ public class HierarchicalCluster {
 	
 	//Instance variables
 	private ClusterModel model;
-	private JFrame frame;
-	private JProgressBar pBar;
-	private JLabel loadingInfo;
+	private JProgressBar pBar, pBar2;
+	private JLabel opLabel;
 	private double[] currentArray;
 	private final String rowString = "GENE"; 
 	private final String colString = "ARRY";
@@ -37,14 +38,20 @@ public class HierarchicalCluster {
 	private FinalOptionsPanel finalPanel;
 	private JPanel mainPanel;
 	
+	private int maxProgress_both = 5;
+	private int maxProgress_single = 3;
+	
+	private int prog_count = 0;
+	
 	//Constructor (building the object)
 	public HierarchicalCluster(ClusterModel model, TreeViewFrame viewFrame, ClusterView cView, 
-			JProgressBar pBar, double[] currentArray){
+			JProgressBar pBar, JProgressBar pBar2, JLabel opLabel, double[] currentArray){
 		
 		this.model = model;
 		this.pBar = pBar;
+		this.pBar2 = pBar2;
+		this.opLabel = opLabel;
 		this.currentArray = currentArray;
-		this.frame = viewFrame;
 		this.finalPanel = cView.getFinalPanel();
 		this.mainPanel = cView.getMainPanel();
 		this.choice = (String)cView.getGeneCombo().getSelectedItem();
@@ -54,7 +61,7 @@ public class HierarchicalCluster {
 	public void hCluster(String similarityM) 
 			throws InterruptedException, ExecutionException{
 		
-		loadingInfo = new JLabel();
+		//loadingInfo = new JLabel();
 		
 		//declare variables needed for function
 		List<Double> currentList = new ArrayList<Double>();
@@ -74,22 +81,30 @@ public class HierarchicalCluster {
 		
 		DataFormatter formattedData = new DataFormatter(model, currentList, pBar);
 		
+		if(!choice.contentEquals("Do Not Cluster") && !choice2.contentEquals("Do Not Cluster")){
+			
+			pBar2.setMaximum(maxProgress_both);
+		}
+		else{
+			
+			pBar2.setMaximum(maxProgress_single);
+		}
+		
 		//if user checked clustering for elements
 		if(!choice.contentEquals("Do Not Cluster")){
 			
-			finalPanel.add(loadingInfo, "alignx 50%, pushx, wrap");
-			
-			loadingInfo.setText("Operation Infos...");
+			opLabel.setFont(new Font("Sans Serif", Font.BOLD, 16));
+			opLabel.setForeground(Color.LIGHT_GRAY);
+			opLabel.setText("Distance Matrix");
 			
 			mainPanel.revalidate();
 			mainPanel.repaint();
 			
-			loadingInfo.setText("Preparing Row Data...");
-			
 			formattedData.splitRows();
 			sepRows = formattedData.getRowList();
 			
-			loadingInfo.setText("Creating Row Distance Matrix...");
+			opLabel.setForeground(new Color(240, 80, 50, 255));
+			opLabel.setText("Calculating Distance Matrix...");
 			
 			DistanceMatrixCalculator dCalc = new DistanceMatrixCalculator(sepRows, choice, pBar);
 			
@@ -97,16 +112,27 @@ public class HierarchicalCluster {
 			
 			rowDistances  = dCalc.getDistanceMatrix();
 			
-			loadingInfo.setText("Clustering Row Elements...");
+			prog_count++;
+			pBar2.setValue(prog_count);
 			
-			ClusterGenerator2 cGen = new ClusterGenerator2(model, frame, 
-					rowDistances, pBar, rowString, similarityM);
+//			opLabel.setForeground(new Color(0, 200, 50));
+//			opLabel.setText("Distance Matrix Done");
+			
+//			opLabel.setForeground(new Color(240, 80, 50, 255));
+			opLabel.setText("Clustering Data...");
+			
+			ClusterGenerator cGen = new ClusterGenerator(model, rowDistances, pBar, 
+					rowString, similarityM);
 			
 			cGen.cluster();
 			
 			orderedRows = cGen.getReorderedList();
 			
-			finalPanel.remove(loadingInfo);
+			prog_count++;
+			pBar2.setValue(prog_count);
+//			opLabel.setForeground(new Color(0, 200, 50));
+//			opLabel.setText("Clustering Done");
+			
 			mainPanel.revalidate();
 			mainPanel.repaint();
 			
@@ -117,19 +143,18 @@ public class HierarchicalCluster {
 		//if user checked clustering for arrays
 		if(!choice2.contentEquals("Do Not Cluster")){
 			
-			finalPanel.add(loadingInfo, "alignx 50%, pushx, wrap");
-			
-			loadingInfo.setText("Operation Infos");
+			opLabel.setFont(new Font("Sans Serif", Font.BOLD, 16));
+			opLabel.setForeground(Color.LIGHT_GRAY);
+			opLabel.setText("Distance Matrix");
 			
 			mainPanel.revalidate();
 			mainPanel.repaint();
 			
-			loadingInfo.setText("Preparing Column Data...");
-			
 			formattedData.splitColumns();
 			sepCols = formattedData.getColList();
 			
-			loadingInfo.setText("Creating Column Distance Matrix...");
+			opLabel.setForeground(new Color(240, 80, 50, 255));
+			opLabel.setText("Calculating Distance Matrix...");
 			
 			DistanceMatrixCalculator dCalc2 = new DistanceMatrixCalculator(sepCols, choice2, pBar);
 			
@@ -137,18 +162,28 @@ public class HierarchicalCluster {
 			
 			colDistances  = dCalc2.getDistanceMatrix();
 			
-			loadingInfo.setText("Clustering Column Elements...");
+			prog_count++;
+			pBar2.setValue(prog_count);
+//			opLabel.setForeground(new Color(0, 200, 50));
+//			opLabel.setText("Distance Matrix Done");
 			
-			ClusterGenerator2 cGen2 = new ClusterGenerator2(model, frame, 
-					colDistances, pBar, colString, similarityM);
+//			opLabel.setForeground(new Color(240, 80, 50, 255));
+			opLabel.setText("Clustering Data...");
+			
+			ClusterGenerator cGen2 = new ClusterGenerator(model, colDistances, pBar, 
+					colString, similarityM);
 			
 			cGen2.cluster();
 			
 			orderedCols = cGen2.getReorderedList();
 			
-			finalPanel.remove(loadingInfo);
+			prog_count++;
+			pBar2.setValue(prog_count);
+//			opLabel.setForeground(new Color(0, 200, 50));
+//			opLabel.setText("Clustering Done");
+			
 			mainPanel.revalidate();
-			mainPanel.repaint();
+			mainPanel.repaint();;
 			
 			finalPanel.setPath(cGen2.getFilePath());
 			
@@ -156,22 +191,28 @@ public class HierarchicalCluster {
 		
 		//also takes list of row elements because only one list can easily be consistently transformed and 
 		//fed into file writer to make a tab-delimited file
-		finalPanel.add(loadingInfo, "alignx 50%, pushx, wrap");
 		
-		loadingInfo.setText("Generating .CDT file...");
+//		opLabel.setForeground(new Color(240, 80, 50, 255));
+		opLabel.setText("Generating Data File...");
 		
 		mainPanel.revalidate();
 		mainPanel.repaint();
 		
-		CDTGenerator cdtGen = new CDTGenerator(model, frame, sepRows, 
-				orderedRows, orderedCols, choice, choice2);
+		CDTGenerator cdtGen = new CDTGenerator(model, sepRows, 
+				orderedRows, orderedCols, choice, choice2, pBar);
 		cdtGen.generateCDT();
 		
-		finalPanel.remove(loadingInfo);
 		mainPanel.revalidate();
 		mainPanel.repaint();
 		
+		opLabel.setForeground(new Color(0, 200, 50));
+		opLabel.setText("Data File Saved");
+		
+		prog_count++;
+		pBar2.setValue(prog_count);
+		
 		finalPanel.setPath(cdtGen.getFilePath());
+		finalPanel.setFile(cdtGen.getFile());
 		
 	}
 }

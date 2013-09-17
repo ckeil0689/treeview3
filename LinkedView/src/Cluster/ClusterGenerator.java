@@ -2,18 +2,13 @@ package Cluster;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
-import javax.swing.JFrame;
 import javax.swing.JProgressBar;
 
 /**
- * This class uses the previously calculated distance matrices and detects gene clusters
- * according to the chosen method. It returns a reordered list of the original data set and 
- * generates a .ATR and/ or .GTR file (depending on what the user chooses to cluster)
+ * Test class to assess whether the operation can work on half a matrix (due to symmetry) 
  * @author CKeil
  *
  */
@@ -21,20 +16,16 @@ public class ClusterGenerator {
 
 	//Instance variables
 	private ClusterModel model;
-	private JFrame frame;
 	private String filePath;
 	private String type;
 	private String method;
 	private JProgressBar pBar;
 	
 	//Distance Matrix
-	private List<List<Double>> dMatrix;
+	private List<List<Double>> dMatrix = new ArrayList<List<Double>>();
 	
 	//Half of the Distance Matrix (since it's symmetrical)
 	private List<List<Double>> halfDMatrix;
-	
-	//Deep copy of dMatrix
-	private List<List<Double>> newDList;
 	
 	//list to keep track of previously used minimum values in the dMatrix
 	private List<Double> usedMins;
@@ -43,11 +34,10 @@ public class ClusterGenerator {
 	private List<String> reorderedList = new ArrayList<String>();
 	
 	//Constructor (building the object)
-	public ClusterGenerator(ClusterModel model, JFrame currentFrame, List<List<Double>> dMatrix, 
+	public ClusterGenerator(ClusterModel model, List<List<Double>> dMatrix, 
 			JProgressBar pBar, String type, String method){
 		
 		this.model = model;
-		this.frame = currentFrame;
 		this.dMatrix = dMatrix;
 		this.type = type;
 		this.method = method;
@@ -70,7 +60,7 @@ public class ClusterGenerator {
 		
 		//this distance list will be mutated as the genes are clustered 
 		//(shrinks by 1 each step as a gene is added to a cluster)
-		newDList = deepCopy(dMatrix);
+		//newDList = deepCopy(dMatrix);
 		
 		halfDMatrix = deepCopy(dMatrix);
 		
@@ -83,7 +73,7 @@ public class ClusterGenerator {
 		List<List<Integer>> geneGroups = new ArrayList<List<Integer>>();
 		
 		//fill list with integers corresponding to the genes
-		for(int i = 0; i < newDList.size(); i++){
+		for(int i = 0; i < halfDMatrix.size(); i++){
 			
 			List<Integer> group = new ArrayList<Integer>();
 			group.add(i);
@@ -92,68 +82,78 @@ public class ClusterGenerator {
 		
 		//continue process until newDList has a size of 1, which means that there is only 1 cluster
 		//initially every gene is its own cluster
-		while(newDList.size() > 1){
-			
+		while(halfDMatrix.size() > 1){
+
     		//update ProgressBar
-    		pBar.setValue(dMatrix.size() - newDList.size());
+    		pBar.setValue(dMatrix.size() - halfDMatrix.size());
     		
     		//local variables
     		double min = 0;
     		int row = 0;
     		int column = 0;
-    		double trial = 0;
+    		double geneMin = 0;
     		
     		//list to store the minimum value of each gene at each while-loop iteration
-    		List<Double> geneMins = new ArrayList<Double>();
+    		List<Double> geneMinList = new ArrayList<Double>();
     		
     		//list to store the Strings which represent calculated data (such as gene pairs)
     		//to be added to dataTable
     		List<String> pair = new ArrayList<String>();
 
     		//the row value is just the position of the corresponding column value in columnValues
-    		List<Integer> columnValues = new ArrayList<Integer>();
+    		List<Integer> colMinIndexList = new ArrayList<Integer>();
     		
+    		long ms2 = System.currentTimeMillis();
     		//going through every gene (row) in newDList
-    		//takes 300-400ms
-    		for(int j = 0; j < newDList.size(); j++){
+    		//takes ~150ms
+    		for(int j = 0; j < halfDMatrix.size(); j++){
     			
     			//select current gene
-    			List<Double> gene = newDList.get(j);
+    			List<Double> gene = halfDMatrix.get(j);
     			
-    			//take first non-zero value in gene
-    			for(Double element : gene){
-        			
-    				if(element != 0.0){
-        				
-        				trial = element;
-        				break;
-        			}
+    			//just avoid the first empty list in the half-distance matrix
+    			if(gene.size() > 0){
+    				
+	    			//make trial the minimum value of that gene
+	    			geneMin = findRowMin(gene);
+	    			
+	    			//minimums of each gene in distance matrix
+	    			//does not contain previously used minimums 
+	    			geneMinList.add(geneMin);
+	    			
+	    			//add the column of each gene's minimum to a list
+	    			colMinIndexList.add(gene.indexOf(geneMin));
+    			
     			}
-    			
-    			//make trial the minimum value of that gene
-    			trial = findRowMin(trial, gene);
-    			
-    			//minimums of each gene in distance matrix
-    			//does not contain previously used minimums 
-    			geneMins.add(trial);
-    			
-    			//add the column of each gene's minimum to a list
-    			columnValues.add(gene.indexOf(trial));
+    			//for the first empty list in the half-distance matrix, add the largest value
+    			//of the last row so it won't be mistaken as a minimum value
+    			else{
+    				
+    				//there's no actual value for the empty top row. Therefore a substitute is added. It is 2x the max size of the greatest
+    				//value of the last distance matrix entry so it an never be a minimum and is effectively ignored
+    				int last = halfDMatrix.size() - 1;
+    				double substitute = Collections.max(halfDMatrix.get(last)) * 2;
+    				
+    				geneMinList.add(substitute);
+    				colMinIndexList.add(halfDMatrix.get(last).indexOf(Collections.max(halfDMatrix.get(last))));
+    			}
 
     		}
     		
+    		System.out.println("Finding all gene minima (1 it.): " + (System.currentTimeMillis()-ms2));
+    		
     		//finds the row (gene) which has the minValue
-    		row = geneMins.indexOf(Collections.min(geneMins));
+    		row = geneMinList.indexOf(Collections.min(geneMinList));
     		
     		//finds the column by referring back to values added for each gene
     		//knowing the gene with the minimum value (row) allows to find the corresponding column
-    		column = columnValues.get(row);
-    		
+    		column = colMinIndexList.get(row);
+			
     		//row and column value of the minimum distance value in matrix are now known
-    		min = newDList.get(row).get(column);
-
+    		min = halfDMatrix.get(row).get(column);
+    		
     		usedMins.add(min);
-
+			
     		//the replacement list for the two removed lists (joint clusters)
     		List<Double> newClade = new ArrayList<Double>();
     		
@@ -172,7 +172,9 @@ public class ClusterGenerator {
     		//make Strings for String list to be written to data file
     		String geneRow = "";
     		String geneCol = "";
-    		pair.add("NODE" + (dMatrix.size() - newDList.size() + 1) + "X");
+    		pair.add("NODE" + (dMatrix.size() - halfDMatrix.size() + 1) + "X");
+    		
+//    		long ms4 = System.currentTimeMillis();
     		
     		//check the lists in dataMatrix whether the genePair you want to add now is already
     		//in a list from before, if yes connect to LATEST node by replacing the gene name with the node name	
@@ -182,7 +184,6 @@ public class ClusterGenerator {
 				geneCol = type + geneGroups.get(column).get(0) + "X";
 
 				fillRList(geneRow, geneCol);
-				
 			}
 			
 			//if size of fusedGroup exceeds 2...
@@ -235,30 +236,31 @@ public class ClusterGenerator {
     					geneRow = dataTable.get(j).get(0);
     					
     					geneRow2 = type + intersect.get(0) + "X";
-
+    				
     					break;
     				}
     				else{
-    						
+    					
+    					//random fix to see what happens
     					geneRow = type + geneGroups.get(row).get(0) + "X";
     					geneRow2 = type + geneGroups.get(row).get(0) + "X";
     				}
 				}
     			
     			fillRList(geneRow2, geneCol2);
-    			
 			}
+			
+//			System.out.println("Find out if NODE: " + (System.currentTimeMillis()-ms4));
 			
     		pair.add(geneCol);
     		pair.add(geneRow);
     		pair.add(String.valueOf(1 - min));
     		
-//    		System.out.println("------------------------------------------");
-//    		System.out.println("Data to save: " + pair.toString());
-    		
     		dataTable.add(pair);
     		geneIntegerTable.add(fusedGroup);
-
+    		
+//    		long ms5 = System.currentTimeMillis();
+    		
     		//remove element with bigger list position first to avoid list shifting issues
     		if(row > column){
     			
@@ -272,7 +274,7 @@ public class ClusterGenerator {
     			geneGroups.remove(row);
     		}
 
-    		//might need adjustment for different cluster methods
+    		
 			if(rowGroup.contains(Collections.min(fusedGroup))){
 				
 				geneGroups.add(row, fusedGroup);
@@ -285,48 +287,57 @@ public class ClusterGenerator {
 				
 				System.out.println("Weird error.");
 			}
-    		
+			
     		//remove old elements first;
 			if(column > row){
 				
-	    		newDList.remove(column);
-	    		newDList.remove(row);
-	    		
-	    		for(List<Double> element : newDList){
+				halfDMatrix.remove(column);
+				halfDMatrix.remove(row);
+				
+	    		for(List<Double> element : halfDMatrix){
 	    			
-	    			element.remove(column);
-	    			element.remove(row);
+	    			if(element.size() > column){
+	    				
+	    				element.remove(column);
+	    			}
 	    		}
 			}
 			else{
 				
-	    		newDList.remove(row);
-	    		newDList.remove(column);
-	    		
-	    		for(List<Double> element : newDList){
+				halfDMatrix.remove(row);
+				halfDMatrix.remove(column);
+				
+	    		for(List<Double> element : halfDMatrix){
 	    			
-	    			element.remove(row);
-	    			element.remove(column);
+	    			if(element.size() > row){
+	    				
+	    				element.remove(row);
+	    			}
 	    		}
 	    		
 			}
-	
+			
+//			System.out.println("Element removals: " + (System.currentTimeMillis()-ms5));
+			
+			long ms6 = System.currentTimeMillis();
+			//newClade is full new element rather than being the size of the row it replaced
     		//fill newClade with new values
     		//mean = 0.0 with itself
-    		//move through geneGroups (the gene to compare the new fused Group with
+    		//move through geneGroups (the gene to compare the new fused Group with)
+			//generation of the newClade to be added, formed from the fusion and linkage of the 2 clustered geneGroups
     		for(int i = 0; i < geneGroups.size(); i++){
     			
     			double distanceSum = 0;
     			double newVal = 0;
     			double distanceVal = 0;
     			int selectedGene = 0;
-    			
-    			
+    		
     			//check if fusedGroup contains the current checked gene (then no mean should be calculated)
     			//no elements in common
     			if(Collections.disjoint(geneGroups.get(i), fusedGroup)){
     				
     				if(method.contentEquals("Average Linkage")){
+    					
 		    			//select members of the new clade (B & G)	
 			    		for(int j = 0; j < fusedGroup.size(); j++){
 			    				
@@ -338,11 +349,11 @@ public class ClusterGenerator {
 				    			distanceSum += distanceVal;
 				    			
 			    			}
-
 			    		}
 			    		
 			    		//newVal = mean
-			    		newVal = distanceSum/(fusedGroup.size() * geneGroups.get(i).size()) ;
+			    		newVal = distanceSum/(fusedGroup.size() * geneGroups.get(i).size());
+			    		
     				}
     				else if(method.contentEquals("Single Linkage") || method.contentEquals("Complete Linkage")){
     					
@@ -382,60 +393,57 @@ public class ClusterGenerator {
     				newVal = 0.0;
     				newClade.add(newVal);
     			}
-    			
+   
     			else{
-    				
-    				System.out.println("(i): " + i);
-    				System.out.println("geneGroups.get(i): " + geneGroups.get(i).toString());
-    				System.out.println("FusedGroup: " + fusedGroup.toString());
-    				
+
     			}
-    			
     		}
     		
+    		System.out.println("NewClade Gen: " + (System.currentTimeMillis()- ms6));
+    		
+    		long ms7 = System.currentTimeMillis();
+    		//first: check whether the row or column contains the smallest gene by index of both (fusedGroup)
+    		//then add a newClade value to each element where newClade intersects (basically adding the column)
 			if(rowGroup.contains(Collections.min(fusedGroup))){
-				
-	    		for(List<Double> element : newDList){
+			
+	    		halfDMatrix.add(row, newClade.subList(0, row));
+	    		
+	    		for(List<Double> element : halfDMatrix){
 	    			
-	    			element.add(row, newClade.get(newDList.indexOf(element)));
+	    			//add to element at index 'row' if the element is bigger than the row value
+	    			//otherwise the element is too small to add a column value
+	    			if(element.size() > row){
 	    			
+	    				element.set(row, newClade.get(halfDMatrix.indexOf(element)));
+	    			}
 	    		}
-	    		
-	    		//needs to come after filling all other elements with a row value, 
-	    		//since newClade already has it
-	    		newDList.add(row, newClade);
-	    		
-			}
-			else if(colGroup.contains(Collections.min(fusedGroup))){
-				
-	    		for(List<Double> element : newDList){
-	    			
-	    			element.add(column, newClade.get(newDList.indexOf(element)));
-	    			
-	    		}
-	    		
-	    		newDList.add(column, newClade);
-	    		
-			}
-			else{
-				
-				System.out.println("Weird error.");
 			}
 			
+			else if(colGroup.contains(Collections.min(fusedGroup))){
+				
+				halfDMatrix.add(column, newClade.subList(0, column));
+				
+	    		for(List<Double> element : halfDMatrix){
+	    			
+	    			if(element.size() > column){
+	    				
+	    				element.set(column, newClade.get(halfDMatrix.indexOf(element))); 
+	    			}
+	    		}
+			}
+			
+			else{
+				
+				System.out.println("Weird error. Neither rowGroup nor colGroup have a minimum.");
+			}
+			
+			System.out.println("Element Adds: " + (System.currentTimeMillis()- ms7));
+			
 		}
-    
-		
+
     	System.out.println("FINAL reorderedList Size: " + reorderedList.size());
     	
-    	Set<String> set = new HashSet<String>(reorderedList);
-    	
-    	if(set.size() < reorderedList.size()){
-    		System.out.println("Duplicates!");
-    	}
-    	
-    	//System.out.println("FINAL reorderedList: " + reorderedList.toString());
-    	
-    	ClusterFileWriter dataFile = new ClusterFileWriter(frame, model);
+    	ClusterFileWriter dataFile = new ClusterFileWriter(model);
     	
     	//generate files for Dendrogram
     	if(type.equalsIgnoreCase("GENE")){
@@ -460,11 +468,10 @@ public class ClusterGenerator {
     	
     	//distance matrices are symmetrical!
     	for(int i = 0; i < distanceMatrix.size(); i++){
+
+    		int stop = distanceMatrix.get(i).size();
     		
-    		int start = i;
-    		int stop = distanceMatrix.size();
-    		
-    		distanceMatrix.get(i).removeAll(distanceMatrix.get(i).subList(start, stop));
+    		distanceMatrix.get(i).subList(i, stop).clear();
     	}
     	
     	return distanceMatrix;
@@ -498,21 +505,53 @@ public class ClusterGenerator {
 	 * check whether min was used before (in whole calculation process)
 	 * @return double trial
 	 */
-    public double findRowMin(double trial, List<Double> gene){
+    public double findRowMin(List<Double> gene){
     	
-		for(int k = 0; k < gene.size(); k++){ 
+		double geneMin = 0.0;
+		
+		//standard collection copy constructor to make deep copy to protect gene
+		List<Double> deepGene = new ArrayList<Double>(gene);
+		
+		for(int i = 0; i < deepGene.size(); i++){
 			
-			if(gene.get(k) != 0.0){
-	
-				if(trial > gene.get(k) && !usedMins.contains(gene.get(k))){
-					
-					trial = gene.get(k);
-				}
-			}	
+			double min = Collections.min(deepGene);
+			
+			if(!usedMins.contains(min)){
+				
+				geneMin = min;
+				break;
+			}
+			else{
+				
+				deepGene.remove(deepGene.indexOf(min));
+			}
 		}
 		
-		return trial;
+		return geneMin;
     }
+    
+//  public double findRowMin_old(List<Double> gene){
+//	
+//	double geneMin = 0.0;
+//	
+//	//standard collection copy constructor to make deep copy to protect gene
+//	List<Double> deepGene = new ArrayList<Double>(gene);
+//	
+//	//Can't sort gene because it needs to remain unchanged
+//	//need deep copy
+//	Collections.sort(deepGene);
+//	
+//	for(int i = 0; i < deepGene.size(); i++){
+//		
+//		if(!usedMins.contains(deepGene.get(i))){
+//			
+//			geneMin = deepGene.get(i);
+//			break;
+//		}
+//	}
+//	
+//	return geneMin;
+//}
     
     /**
      * method to fill reorderedList with the needed data 
