@@ -18,18 +18,22 @@ public class CDTGenerator {
 
 	//Instance variables
 	private ClusterModel model;
-	private String filePath;
 	private File file;
-	private List<List<Double>> sepList;
-	private List<String> orderedRows;
-	private List<String> orderedCols;
-	private String choice;
-	private String choice2;
-	private JProgressBar pBar;
+	private String filePath, choice, choice2;
+	private int buffer = 2;
+	
+	private List<List<Double>> sepList, cdtDataList;
+	
+	private String[][] rowNames, colNames;
+	
+	private List<List<String>> finalcdtTable, rowNameList, colNameList, 
+	rowNameList2, colNameList2, cdtDataStrings;
+	
+	private List<String> orderedRows, orderedCols, cdtRowElement1, cdtRowElement2, cdtRowElement3;
 	
 	//Constructor (building the object)
 	public CDTGenerator(ClusterModel model, List<List<Double>> sepList, 
-			List<String> orderedRows, List<String> orderedCols, String choice, String choice2, JProgressBar pBar){
+			List<String> orderedRows, List<String> orderedCols, String choice, String choice2){
 		
 		this.model = model;
 		this.sepList = sepList;
@@ -37,31 +41,31 @@ public class CDTGenerator {
 		this.orderedCols = orderedCols;
 		this.choice = choice;
 		this.choice2 = choice2;
-		this.pBar = pBar;
 	}
 	
 	public void generateCDT(){
     	
     	//The list of String-lists to be generated for file-writing, contains all data
-    	List<List<String>> finalcdtTable = new ArrayList<List<String>>();
+    	finalcdtTable = new ArrayList<List<String>>();
     	
 		//the list containing all the reorganized row-data
-    	List<List<Double>> cdtDataList = new ArrayList<List<Double>>(); 
+    	cdtDataList = new ArrayList<List<Double>>(); 
     	
     	//retrieving names and weights of row elements
     	//format: [[YAL063C, 1.0], ..., [...]]
-    	String[][] rowNames = model.getGeneHeaderInfo().getHeaderArray();
+    	rowNames = model.getGeneHeaderInfo().getHeaderArray();
     	
     	//retrieving names and weights of column elements
     	//format: [[YAL063C, 1.0], ..., [...]]
-    	String[][] colNames = model.getArrayHeaderInfo().getHeaderArray();
+    	colNames = model.getArrayHeaderInfo().getHeaderArray();
     	
     	//first transform the String[][] to lists
-    	List<List<String>> rowNameList = new ArrayList<List<String>>();
-    	List<List<String>> colNameList = new ArrayList<List<String>>();
+    	rowNameList = new ArrayList<List<String>>();
+    	colNameList = new ArrayList<List<String>>();
     	
-    	List<List<String>> rowNameList2 = new ArrayList<List<String>>();
-    	List<List<String>> colNameList2 = new ArrayList<List<String>>();
+    	rowNameList2 = new ArrayList<List<String>>();
+    	colNameList2 = new ArrayList<List<String>>();
+    	
     	
     	if(rowNames.length > 0){
     		
@@ -71,7 +75,9 @@ public class CDTGenerator {
 	    	}
     	}
     	
-    	if(rowNames.length > 0){
+    	
+    	if(colNames.length > 0){
+    		
 	    	for(String[] element : colNames){
 	    		
 	    		colNameList.add(Arrays.asList(element));
@@ -135,8 +141,9 @@ public class CDTGenerator {
     	}
     	
     	//transform cdtDataFile from double lists to string lists
-    	List<List<String>> cdtDataStrings = new ArrayList<List<String>>();
-    	
+    	cdtDataStrings = new ArrayList<List<String>>();
+
+    	//takes 3k ms
     	for(List<Double> element : cdtDataList){
     		
     		List<String> newStringData = new ArrayList<String>();
@@ -150,14 +157,10 @@ public class CDTGenerator {
     		
     	}
     	
-//    	System.out.println("cdtDataStrings: " + cdtDataStrings.size());
-    	
     	//fuse them to create the final .CDT-write-ready List<List<String>>
     	finalcdtTable.addAll(cdtDataStrings);
     	
-    	List<String> cdtRowElement1 = new ArrayList<String>();
-    	
-    	int buffer = 2;
+    	cdtRowElement1 = new ArrayList<String>();
     	
 		if(!choice.contentEquals("Do Not Cluster")){
 			
@@ -179,7 +182,7 @@ public class CDTGenerator {
 			
 			buffer = 3;
 			
-			List<String> cdtRowElement2 = new ArrayList<String>();
+			cdtRowElement2 = new ArrayList<String>();
 			
 			cdtRowElement2.add("AID");
 			cdtRowElement2.add("");
@@ -196,13 +199,14 @@ public class CDTGenerator {
 			finalcdtTable.add(1, cdtRowElement2);	
 		}
 		
-		List<String> cdtRowElement3 = new ArrayList<String>();
+		cdtRowElement3 = new ArrayList<String>();
 		
 		cdtRowElement3.add("EWEIGHT");
 		cdtRowElement3.add("");
 		cdtRowElement3.add("");
 		
 		if(!choice.contentEquals("Do Not Cluster")){
+			
 			cdtRowElement3.add("");
 		}
 		
@@ -232,12 +236,6 @@ public class CDTGenerator {
     		}
     			
     	}
-    	
-//    	System.out.println("finalCDT Size: " + finalcdtTable.size());
-//    	System.out.println("finalCDT Element Size: " + finalcdtTable.get(4).size());
-//    	System.out.println("finalCDT Element 0: " + finalcdtTable.get(0).toString());
-//    	System.out.println("finalCDT Element 1: " + finalcdtTable.get(1).toString());
-//    	System.out.println("finalCDT Element 4: " + finalcdtTable.get(4).toString());
     	
     	//save file as excel tab-delimited file
     	ClusterFileWriter dataFile = new ClusterFileWriter(model);

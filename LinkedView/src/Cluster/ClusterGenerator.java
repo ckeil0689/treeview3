@@ -24,7 +24,7 @@ public class ClusterGenerator {
 	//Distance Matrix
 	private List<List<Double>> dMatrix = new ArrayList<List<Double>>();
 	
-	//Half of the Distance Matrix (since it's symmetrical)
+	//Half of the Distance Matrix (symmetry)
 	private List<List<Double>> halfDMatrix;
 	
 	//list to keep track of previously used minimum values in the dMatrix
@@ -33,7 +33,13 @@ public class ClusterGenerator {
 	//list to return ordered GENE numbers for .cdt creation
 	private List<String> reorderedList = new ArrayList<String>();
 	
-	//Constructor (building the object)
+	private List<List<Integer>> geneGroups;
+	
+	private List<List<Integer>> geneIntegerTable;
+	
+	private List<List<String>> dataTable;
+	
+	//Constructor
 	public ClusterGenerator(ClusterModel model, List<List<Double>> dMatrix, 
 			JProgressBar pBar, String type, String method){
 		
@@ -44,33 +50,28 @@ public class ClusterGenerator {
 		this.pBar = pBar;
 	}
 	
-	//method to do the actual clustering of data using the distance matrix previously calculated
+	//method for clustering the distance matrix
     public void cluster(){
     	
-    	//ProgressBar maximum = amount of genes
+    	//ProgressBar maximum
     	pBar.setMaximum(dMatrix.size());
     	
-    	//list which stores data to be written to file
-    	List<List<String>> dataTable = new ArrayList<List<String>>();
+    	//data to be written to file
+    	dataTable = new ArrayList<List<String>>();
     	
-    	//list with integer representation of genes for references in calculations (list of fusedGroups)
-    	List<List<Integer>> geneIntegerTable = new ArrayList<List<Integer>>();
-    		
+    	//integer representation of genes for references in calculations (list of fusedGroups)
+    	geneIntegerTable = new ArrayList<List<Integer>>();
+    	
 		usedMins = new ArrayList<Double>();
 		
-		//this distance list will be mutated as the genes are clustered 
-		//(shrinks by 1 each step as a gene is added to a cluster)
-		//newDList = deepCopy(dMatrix);
-		
+		//deep copy of distance matrix to avoid mutation
 		halfDMatrix = deepCopy(dMatrix);
 		
-		//trying to work with half a distance matrix
+		//halving of the distance matrix
 		halfDMatrix = splitMatrix(halfDMatrix);
 		
-		//list of genes in integer representation to keep track of the clades and cluster formation
-		//corresponds to gene names (123 = GENE123X)and is mutated along with newDList
-		//e.g. clustering of GENE0X and GENE 233X: {{0}, ...,{233},...} --> {{0, 233},...}
-		List<List<Integer>> geneGroups = new ArrayList<List<Integer>>();
+		//genes in integer representation to keep track of the clades and cluster formation
+		geneGroups = new ArrayList<List<Integer>>();
 		
 		//fill list with integers corresponding to the genes
 		for(int i = 0; i < halfDMatrix.size(); i++){
@@ -103,7 +104,6 @@ public class ClusterGenerator {
     		//the row value is just the position of the corresponding column value in columnValues
     		List<Integer> colMinIndexList = new ArrayList<Integer>();
     		
-    		long ms2 = System.currentTimeMillis();
     		//going through every gene (row) in newDList
     		//takes ~150ms
     		for(int j = 0; j < halfDMatrix.size(); j++){
@@ -140,27 +140,22 @@ public class ClusterGenerator {
 
     		}
     		
-    		System.out.println("Finding all gene minima (1 it.): " + (System.currentTimeMillis()-ms2));
-    		
-    		//finds the row (gene) which has the minValue
+    		//finds the row (gene) which has the smallest value
     		row = geneMinList.indexOf(Collections.min(geneMinList));
     		
-    		//finds the column by referring back to values added for each gene
-    		//knowing the gene with the minimum value (row) allows to find the corresponding column
+    		//find the corresponding column using gene with the minimum value (row)
     		column = colMinIndexList.get(row);
 			
     		//row and column value of the minimum distance value in matrix are now known
     		min = halfDMatrix.get(row).get(column);
     		
+    		//add used min value to record so the next iterations finds the next higher min
     		usedMins.add(min);
 			
     		//the replacement list for the two removed lists (joint clusters)
     		List<Double> newClade = new ArrayList<Double>();
     		
-    		//suspected issue: some genes in newDList are 1 elemtn too large and as a result 
-    		//the column value is too large for geneGroups
-    		//just tested: previously fused Genes are all 1 size larger than non-fused (??)
-    		// issue only occurs if one of the 2 current genes is already present in a fused group
+    		//get the two clusters to be fused 
     		List<Integer> rowGroup = geneGroups.get(row); 
     		List<Integer> colGroup = geneGroups.get(column); 
     		
@@ -168,98 +163,22 @@ public class ClusterGenerator {
     		List<Integer> fusedGroup = new ArrayList<Integer>();
     		fusedGroup.addAll(rowGroup);
     		fusedGroup.addAll(colGroup); 
-    		
-    		//make Strings for String list to be written to data file
-    		String geneRow = "";
-    		String geneCol = "";
-    		pair.add("NODE" + (dMatrix.size() - halfDMatrix.size() + 1) + "X");
-    		
-//    		long ms4 = System.currentTimeMillis();
-    		
-    		//check the lists in dataMatrix whether the genePair you want to add now is already
-    		//in a list from before, if yes connect to LATEST node by replacing the gene name with the node name	
-			if(fusedGroup.size() == 2){
-					
-				geneRow = type + geneGroups.get(row).get(0) + "X"; 
-				geneCol = type + geneGroups.get(column).get(0) + "X";
-
-				fillRList(geneRow, geneCol);
-			}
+  
+    		//The two connected clusters
+    		List<String> genePair = connectNodes(fusedGroup, rowGroup, colGroup, row, 
+					column);
 			
-			//if size of fusedGroup exceeds 2...
-			else{
-				
-				//variables for?
-				String geneCol2 = "";
-				String geneRow2 = "";
-				
-				//move from top down to find the last fusedGroup (history of clusters) containing any gene
-				//from current colGroup so that the correct NODE-connection can be found
-				for(int j = geneIntegerTable.size() - 1; j >= 0; j--){
-					
-					//this currently gets the last node that has a common element
-					//if the 2 groups have elements in common...
-					if(!Collections.disjoint(geneIntegerTable.get(j), colGroup)){
-						
-						List<Integer> intersect = new ArrayList<Integer>(geneIntegerTable.get(j));
-						intersect.retainAll(colGroup);
-						
-						//assigns NODE # of last fusedGroup containing a colGroup element
-						geneCol = dataTable.get(j).get(0);
-							
-						geneCol2 =  type + intersect.get(0) + "X";
-
-						break;
-					}
-					//if the current fusedGroup in geneIntegerTable does not have any elements
-					//in common with geneGroups.get(column)
-					else{
-							
-						geneCol = type + geneGroups.get(column).get(0) + "X";
-						geneCol2 = type + geneGroups.get(column).get(0) + "X";
-
-    				}
-    			}
-				
-				//move from top down to find the last fusedGroup (history of clusters) containing any gene
-				//from current rowGroup so that the correct NODE-connection can be found
-    			for(int j = geneIntegerTable.size() - 1; j >= 0; j--){
-    				
-					//this currently gets the last node that has a common element
-					//if the 2 groups have elements in common...
-    				if(!Collections.disjoint(geneIntegerTable.get(j), rowGroup)){
-    					
-						List<Integer> intersect = new ArrayList<Integer>(geneIntegerTable.get(j));
-						intersect.retainAll(rowGroup);
-						
-						//assigns NODE # of last fusedGroup containing a rowGroup element
-    					geneRow = dataTable.get(j).get(0);
-    					
-    					geneRow2 = type + intersect.get(0) + "X";
-    				
-    					break;
-    				}
-    				else{
-    					
-    					//random fix to see what happens
-    					geneRow = type + geneGroups.get(row).get(0) + "X";
-    					geneRow2 = type + geneGroups.get(row).get(0) + "X";
-    				}
-				}
-    			
-    			fillRList(geneRow2, geneCol2);
-			}
-			
-//			System.out.println("Find out if NODE: " + (System.currentTimeMillis()-ms4));
-			
-    		pair.add(geneCol);
-    		pair.add(geneRow);
+			//Construct String list to add to dataTable (current cluster)
+			pair.add("NODE" + (dMatrix.size() - halfDMatrix.size() + 1) + "X");
+    		pair.add(genePair.get(0));
+    		pair.add(genePair.get(1));
     		pair.add(String.valueOf(1 - min));
     		
+    		//add note of new cluster to dataTable
     		dataTable.add(pair);
-    		geneIntegerTable.add(fusedGroup);
     		
-//    		long ms5 = System.currentTimeMillis();
+    		//register clustering of the two elements
+    		geneIntegerTable.add(fusedGroup);
     		
     		//remove element with bigger list position first to avoid list shifting issues
     		if(row > column){
@@ -317,91 +236,9 @@ public class ClusterGenerator {
 	    		
 			}
 			
-//			System.out.println("Element removals: " + (System.currentTimeMillis()-ms5));
-			
-			long ms6 = System.currentTimeMillis();
-			//newClade is full new element rather than being the size of the row it replaced
-    		//fill newClade with new values
-    		//mean = 0.0 with itself
-    		//move through geneGroups (the gene to compare the new fused Group with)
-			//generation of the newClade to be added, formed from the fusion and linkage of the 2 clustered geneGroups
-    		for(int i = 0; i < geneGroups.size(); i++){
-    			
-    			double distanceSum = 0;
-    			double newVal = 0;
-    			double distanceVal = 0;
-    			int selectedGene = 0;
+			//newClade is new row with corresponding values depending on the cluster method
+			newClade = newCladeGen(fusedGroup, newClade);
     		
-    			//check if fusedGroup contains the current checked gene (then no mean should be calculated)
-    			//no elements in common
-    			if(Collections.disjoint(geneGroups.get(i), fusedGroup)){
-    				
-    				if(method.contentEquals("Average Linkage")){
-    					
-		    			//select members of the new clade (B & G)	
-			    		for(int j = 0; j < fusedGroup.size(); j++){
-			    				
-			    			selectedGene = fusedGroup.get(j);
-			    			
-			    			for(int gene : geneGroups.get(i)){
-			    				
-				    			distanceVal = dMatrix.get(selectedGene).get(gene);
-				    			distanceSum += distanceVal;
-				    			
-			    			}
-			    		}
-			    		
-			    		//newVal = mean
-			    		newVal = distanceSum/(fusedGroup.size() * geneGroups.get(i).size());
-			    		
-    				}
-    				else if(method.contentEquals("Single Linkage") || method.contentEquals("Complete Linkage")){
-    					
-    					List<Double> distances = new ArrayList<Double>();
-    					
-    					for(int j = 0; j < fusedGroup.size(); j++){
-		    				
-			    			selectedGene = fusedGroup.get(j);
-			    			
-			    			for(int gene : geneGroups.get(i)){
-			    				
-				    			distanceVal = dMatrix.get(selectedGene).get(gene);
-				    			distances.add(distanceVal);
-			    			}
-
-			    		}
-			    		
-    					if(method.contentEquals("Single Linkage")){
-    						
-    						//newVal = min
-    						newVal = Collections.min(distances);
-    					}
-    					else{
-    						
-    						//newVal = max
-    						newVal = Collections.max(distances);
-    					}
-			    
-    				}
-	    			
-	    			newClade.add(newVal);
-    			}
-    			
-    			//all elements in common
-    			else if(geneGroups.get(i).containsAll(fusedGroup)){
-    				
-    				newVal = 0.0;
-    				newClade.add(newVal);
-    			}
-   
-    			else{
-
-    			}
-    		}
-    		
-    		System.out.println("NewClade Gen: " + (System.currentTimeMillis()- ms6));
-    		
-    		long ms7 = System.currentTimeMillis();
     		//first: check whether the row or column contains the smallest gene by index of both (fusedGroup)
     		//then add a newClade value to each element where newClade intersects (basically adding the column)
 			if(rowGroup.contains(Collections.min(fusedGroup))){
@@ -436,12 +273,7 @@ public class ClusterGenerator {
 				
 				System.out.println("Weird error. Neither rowGroup nor colGroup have a minimum.");
 			}
-			
-			System.out.println("Element Adds: " + (System.currentTimeMillis()- ms7));
-			
 		}
-
-    	System.out.println("FINAL reorderedList Size: " + reorderedList.size());
     	
     	ClusterFileWriter dataFile = new ClusterFileWriter(model);
     	
@@ -554,6 +386,108 @@ public class ClusterGenerator {
 //}
     
     /**
+     * This method exists to determine the String name of the current gene pair and to check whether
+     * either of the two genes is already part of a previously formed cluster. In this case the
+     * remaining gene will be connected to that NODE.
+     * @param fusedGroup
+     * @param rowGroup
+     * @param colGroup
+     * @param geneGroups
+     * @param row
+     * @param column
+     * @param geneIntegerTable
+     * @return
+     */
+    public List<String> connectNodes(List<Integer> fusedGroup, List<Integer> rowGroup, 
+    		List<Integer> colGroup, int row, int column){
+    	
+		//make Strings for String list to be written to data file
+		String geneRow = "";
+		String geneCol = "";
+		
+		List<String> dataList = new ArrayList<String>();
+		
+		//check the lists in dataMatrix whether the genePair you want to add now is already
+		//in a list from before, if yes connect to LATEST node by replacing the gene name with the node name	
+		if(fusedGroup.size() == 2){
+				
+			geneRow = type + geneGroups.get(row).get(0) + "X"; 
+			geneCol = type + geneGroups.get(column).get(0) + "X";
+
+			fillRList(geneRow, geneCol);
+		}
+		
+		//if size of fusedGroup exceeds 2...
+		else{
+			
+			//variables for?
+			String geneCol2 = "";
+			String geneRow2 = "";
+			
+			//move from top down to find the last fusedGroup (history of clusters) containing any gene
+			//from current colGroup so that the correct NODE-connection can be found
+			for(int j = geneIntegerTable.size() - 1; j >= 0; j--){
+				
+				//this currently gets the last node that has a common element
+				//if the 2 groups have elements in common...
+				if(!Collections.disjoint(geneIntegerTable.get(j), colGroup)){
+					
+					List<Integer> intersect = new ArrayList<Integer>(geneIntegerTable.get(j));
+					intersect.retainAll(colGroup);
+					
+					//assigns NODE # of last fusedGroup containing a colGroup element
+					geneCol = dataTable.get(j).get(0);
+						
+					geneCol2 =  type + intersect.get(0) + "X";
+
+					break;
+				}
+				//if the current fusedGroup in geneIntegerTable does not have any elements
+				//in common with geneGroups.get(column)
+				else{
+						
+					geneCol = type + geneGroups.get(column).get(0) + "X";
+					geneCol2 = type + geneGroups.get(column).get(0) + "X";
+
+				}
+			}
+			
+			//move from top down to find the last fusedGroup (history of clusters) containing any gene
+			//from current rowGroup so that the correct NODE-connection can be found
+			for(int j = geneIntegerTable.size() - 1; j >= 0; j--){
+				
+				//this currently gets the last node that has a common element
+				//if the 2 groups have elements in common...
+				if(!Collections.disjoint(geneIntegerTable.get(j), rowGroup)){
+					
+					List<Integer> intersect = new ArrayList<Integer>(geneIntegerTable.get(j));
+					intersect.retainAll(rowGroup);
+					
+					//assigns NODE # of last fusedGroup containing a rowGroup element
+					geneRow = dataTable.get(j).get(0);
+					
+					geneRow2 = type + intersect.get(0) + "X";
+				
+					break;
+				}
+				else{
+					
+					//random fix to see what happens
+					geneRow = type + geneGroups.get(row).get(0) + "X";
+					geneRow2 = type + geneGroups.get(row).get(0) + "X";
+				}
+			}
+			
+			fillRList(geneRow2, geneCol2);
+		}
+		
+		dataList.add(geneCol);
+		dataList.add(geneRow);
+		
+		return dataList;
+    }
+    
+    /**
      * method to fill reorderedList with the needed data 
      */
     public void fillRList(String geneRow, String geneCol){
@@ -599,6 +533,101 @@ public class ClusterGenerator {
 				reorderedList.add(reorderedList.size() - 1, geneCol);
 			}
 		}
+    }
+    
+    /**
+     * Method used to generate a new row/col for the distance matrix which is processed. 
+     * The new row/col represents the joint gene pair which has been chosen as the one with
+     * the minimum distance in each iteration. 
+     * The values of the new row/col are calculated according to the chosen cluster method. 
+     * @param fusedGroup
+     * @param geneGroups
+     * @param newClade
+     * @return newClade
+     */
+    public List<Double> newCladeGen(List<Integer> fusedGroup, List<Double> newClade){
+    	
+    	for(int i = 0; i < geneGroups.size(); i++){
+			
+			double distanceSum = 0;
+			double newVal = 0;
+			double distanceVal = 0;
+			int selectedGene = 0;
+			
+			//check if fusedGroup contains the current checked gene (then no mean should be calculated)
+			//no elements in common
+			if(Collections.disjoint(geneGroups.get(i), fusedGroup)){
+				
+				if(method.contentEquals("Average Linkage")){
+					
+	    			//select members of the new clade (B & G)	
+		    		for(int j = 0; j < fusedGroup.size(); j++){
+		    				
+		    			selectedGene = fusedGroup.get(j);
+		    			
+		    			List<Double> currentRow = dMatrix.get(selectedGene);
+		    			
+		    			for(int gene : geneGroups.get(i)){
+		    				
+			    			distanceVal = currentRow.get(gene);
+			    			//dMatrix.get(selectedGene).get(gene);
+			    			distanceSum += distanceVal;
+			    			
+		    			}
+		    		}
+		    		
+		    		//newVal = mean
+		    		newVal = distanceSum/(fusedGroup.size() * geneGroups.get(i).size());
+		    		
+				}
+				else if(method.contentEquals("Single Linkage") || method.contentEquals("Complete Linkage")){
+					
+					List<Double> distances = new ArrayList<Double>();
+					
+					for(int j = 0; j < fusedGroup.size(); j++){
+	    				
+		    			selectedGene = fusedGroup.get(j);
+		    			
+		    			List<Double> currentRow = dMatrix.get(selectedGene);
+		    			
+		    			for(int gene : geneGroups.get(i)){
+		    				
+			    			distanceVal = currentRow.get(gene);
+			    					//dMatrix.get(selectedGene).get(gene);
+			    			distances.add(distanceVal);
+		    			}
+		    			
+		    		}
+		    		
+					if(method.contentEquals("Single Linkage")){
+						
+						//newVal = min
+						newVal = Collections.min(distances);
+					}
+					else{
+						
+						//newVal = max
+						newVal = Collections.max(distances);
+					}
+		    
+				}
+    			
+    			newClade.add(newVal);
+			}
+			
+			//all elements in common
+			else if(geneGroups.get(i).containsAll(fusedGroup)){
+				
+				newVal = 0.0;
+				newClade.add(newVal);
+			}
+
+			else{
+
+			}
+		}
+    
+    	return newClade;
     }
     
     /**

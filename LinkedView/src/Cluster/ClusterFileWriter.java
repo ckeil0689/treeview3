@@ -20,35 +20,45 @@ public class ClusterFileWriter {
 		
 		String content = "";
 		
-		for(int i = 0; i < input.size(); i++){
+		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+		long ms = System.currentTimeMillis();
+		
+		for(List<String> element : input){
 			
 			String listElement = "";
-			String elementPart;
+			String elementPart = "";
+
+			int last = element.size() - 1;
 			
-			for(int j = 0; j < input.get(i).size(); j++){
+			for(int i = 0; i < last; i++){
 				
-				if(j != input.get(i).size() - 1){
-					
-					elementPart = input.get(i).get(j) + "\t";
-				}
-				else{
-					
-					elementPart = input.get(i).get(j) + "\n";
-				}
+//				if(j != last){
+//					
+//					elementPart = row.get(j) + "\t";
+//				}
+//				else{
+//					
+//					elementPart = row.get(j) + "\n";
+//				}
+				
+				elementPart = element.get(i) + "\t";
 				
 				listElement = listElement + elementPart;
-				
 			}
 			
+			elementPart = element.get(last) + "\n";
+			listElement = listElement + elementPart;
+			
 			content = content + listElement;
-		
 		}
+		
+		System.out.println("Generating Content: " + (System.currentTimeMillis() - ms));
+		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 		
 		try{
 			
 			file = new File(model.getSource().substring(0, model.getSource().length()- 4) + fileEnd);
 
-				
 			file.createNewFile();
 				
 			FileWriter fw = new FileWriter(file.getAbsoluteFile());
@@ -63,7 +73,6 @@ public class ClusterFileWriter {
 			e.printStackTrace();
 			
 		}
-		
 	}
 	
 	public String getFilePath(){

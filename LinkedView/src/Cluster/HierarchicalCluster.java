@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -61,8 +60,6 @@ public class HierarchicalCluster {
 	public void hCluster(String similarityM) 
 			throws InterruptedException, ExecutionException{
 		
-		//loadingInfo = new JLabel();
-		
 		//declare variables needed for function
 		List<Double> currentList = new ArrayList<Double>();
 		List<List<Double>> sepRows = new ArrayList<List<Double>>();
@@ -115,10 +112,6 @@ public class HierarchicalCluster {
 			prog_count++;
 			pBar2.setValue(prog_count);
 			
-//			opLabel.setForeground(new Color(0, 200, 50));
-//			opLabel.setText("Distance Matrix Done");
-			
-//			opLabel.setForeground(new Color(240, 80, 50, 255));
 			opLabel.setText("Clustering Data...");
 			
 			ClusterGenerator cGen = new ClusterGenerator(model, rowDistances, pBar, 
@@ -130,8 +123,6 @@ public class HierarchicalCluster {
 			
 			prog_count++;
 			pBar2.setValue(prog_count);
-//			opLabel.setForeground(new Color(0, 200, 50));
-//			opLabel.setText("Clustering Done");
 			
 			mainPanel.revalidate();
 			mainPanel.repaint();
@@ -164,10 +155,7 @@ public class HierarchicalCluster {
 			
 			prog_count++;
 			pBar2.setValue(prog_count);
-//			opLabel.setForeground(new Color(0, 200, 50));
-//			opLabel.setText("Distance Matrix Done");
 			
-//			opLabel.setForeground(new Color(240, 80, 50, 255));
 			opLabel.setText("Clustering Data...");
 			
 			ClusterGenerator cGen2 = new ClusterGenerator(model, colDistances, pBar, 
@@ -179,8 +167,6 @@ public class HierarchicalCluster {
 			
 			prog_count++;
 			pBar2.setValue(prog_count);
-//			opLabel.setForeground(new Color(0, 200, 50));
-//			opLabel.setText("Clustering Done");
 			
 			mainPanel.revalidate();
 			mainPanel.repaint();;
@@ -192,14 +178,13 @@ public class HierarchicalCluster {
 		//also takes list of row elements because only one list can easily be consistently transformed and 
 		//fed into file writer to make a tab-delimited file
 		
-//		opLabel.setForeground(new Color(240, 80, 50, 255));
 		opLabel.setText("Generating Data File...");
 		
 		mainPanel.revalidate();
 		mainPanel.repaint();
 		
 		CDTGenerator cdtGen = new CDTGenerator(model, sepRows, 
-				orderedRows, orderedCols, choice, choice2, pBar);
+				orderedRows, orderedCols, choice, choice2);
 		cdtGen.generateCDT();
 		
 		mainPanel.revalidate();

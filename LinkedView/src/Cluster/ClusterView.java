@@ -98,7 +98,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	private ClusterOptionsPanel coPanel;
 	private FinalOptionsPanel finalPanel;
 	
-	private JCheckBox clusterGeneCheck, weightGeneCheck, clusterArrayCheck, weightArrayCheck;
+	private JCheckBox weightGeneCheck, weightArrayCheck;
 	private JComboBox<String> geneCombo, arrayCombo;
 	
 	//label used by 2 classes
@@ -208,7 +208,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		
 		//Instance variables
 		private int nRows, nCols, sumMatrix; 
-		private JLabel label1, label2, numColLabel, numRowLabel;
+		private JLabel label1, label2, label3, numColLabel, numRowLabel;
 		private JButton loadNew_button, view_button;
 	    
 		//Constructor
@@ -222,7 +222,6 @@ public class ClusterView extends JPanel implements MainPanel {
 	    	
 	    	nCols = infoArray.getNumHeaders();
 	    	nRows = infoGene.getNumHeaders();
-	    	
 	    	
 	    	label1 = new JLabel();
 	    	label1.setFont(new Font("Sans Serif", Font.PLAIN, 20));
@@ -238,7 +237,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	   
 	    	
 	    	label2 = new JLabel("Matrix Dimensions:");
-	    	label2.setFont(new Font("Sans Serif", Font.PLAIN, 20));
+	    	label2.setFont(new Font("Sans Serif", Font.BOLD, 20));
 	    	this.add(label2, "alignx 50%, wrap");
 	    	
 	    	//panel with dimensions of the dataMatrix
@@ -246,21 +245,26 @@ public class ClusterView extends JPanel implements MainPanel {
 	    	numPane.setLayout(new MigLayout());
 	    	numPane.setOpaque(false);
 	    	
-	    	numColLabel = new JLabel(nCols + " columns X ");
+	    	numColLabel = new JLabel(nCols + " columns");
 	    	numColLabel.setFont(new Font("Sans Serif", Font.BOLD, 20));
 	    	numColLabel.setForeground(new Color(240, 80, 50, 255));
-	    	numPane.add(numColLabel, "span, split 2, alignx 50%");
 	    	
-	    	numRowLabel = new JLabel(nRows + " rows");
+	    	numRowLabel = new JLabel(nRows + " rows X ");
 	    	numRowLabel.setForeground(new Color(240, 80, 50, 255));
 	    	numRowLabel.setFont(new Font("Sans Serif", Font.BOLD, 20));
-	    	numPane.add(numRowLabel, "wrap");
+	    	
+	    	numPane.add(numRowLabel, "span, split 2, alignx 50%");
+	    	numPane.add(numColLabel, "wrap");
+	    	
+	    	label3 = new JLabel("Data Points:");
+	    	label3.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+	    	numPane.add(label3, "span, split 2, alignx 50%");
 	    	
 	    	sumMatrix = nCols*nRows;
-	    	JLabel sumM = new JLabel("Total Amount of Values: " + sumMatrix);
+	    	JLabel sumM = new JLabel(Integer.toString(sumMatrix));
 	    	sumM.setForeground(new Color(240, 80, 50, 255));
 	    	sumM.setFont(new Font("Sans Serif", Font.PLAIN, 18));
-	    	numPane.add(sumM, "alignx 50%");
+	    	numPane.add(sumM, "alignx 50%, wrap");
 	    	
 	    	this.add(numPane, "alignx 50%, pushx, wrap");
 	
@@ -323,8 +327,8 @@ public class ClusterView extends JPanel implements MainPanel {
 	
 	class ClusterOptionsPanel extends JPanel {	
 		
-		private ClusterFrame clusterDialog;
-		private JButton advanced_button;
+//		private ClusterFrame clusterDialog;
+//		private JButton advanced_button;
 		
 		private static final long serialVersionUID = 1L;
 			    
@@ -353,33 +357,33 @@ public class ClusterView extends JPanel implements MainPanel {
 			arrayClusterPanel = new ArrayClusterPanel();
 			this.add(arrayClusterPanel, "center, grow, push, wrap");
 			
-			//Button Component
-			JPanel buttonPanel = new JPanel();
-			buttonPanel.setLayout(new MigLayout());
-			buttonPanel.setOpaque(false);
-		
-			//Advanced Options Button
-			advanced_button = new JButton("Advanced Options >>");
-			advanced_button.setOpaque(true);
-			advanced_button.setBackground(new Color(60, 180, 220, 255));
-			advanced_button.setForeground(Color.white);
-			Dimension d = advanced_button.getPreferredSize();
-			d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
-			advanced_button.setFont(new Font("Sans Serif", Font.PLAIN, 18));
-		
-			advanced_button.addActionListener(new ActionListener(){
-		
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				
-				clusterDialog = new ClusterFrameWindow(viewFrame, outer);
-				clusterDialog.setVisible(true);
-				
-				}
-			});
-			buttonPanel.add(advanced_button, "alignx 50%, span, pushx");
-		
-			this.add(buttonPanel, "span, pushx, growx");
+//			//Button Component
+//			JPanel buttonPanel = new JPanel();
+//			buttonPanel.setLayout(new MigLayout());
+//			buttonPanel.setOpaque(false);
+//		
+//			//Advanced Options Button
+//			advanced_button = new JButton("Advanced Options >>");
+//			advanced_button.setOpaque(true);
+//			advanced_button.setBackground(new Color(60, 180, 220, 255));
+//			advanced_button.setForeground(Color.white);
+//			Dimension d = advanced_button.getPreferredSize();
+//			d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
+//			advanced_button.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+//		
+//			advanced_button.addActionListener(new ActionListener(){
+//		
+//			@Override
+//			public void actionPerformed(ActionEvent arg0) {
+//				
+//				clusterDialog = new ClusterFrameWindow(viewFrame, outer);
+//				clusterDialog.setVisible(true);
+//				
+//				}
+//			});
+//			buttonPanel.add(advanced_button, "alignx 50%, span, pushx");
+//		
+//			this.add(buttonPanel, "span, pushx, growx");
 		}
 	}
 	
@@ -393,12 +397,6 @@ public class ClusterView extends JPanel implements MainPanel {
 	  		this.setLayout(new MigLayout("", "[]push[]"));
 			this.setBackground(Color.white);
 			this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-	  		
-	  		//create checkbox
-	  		clusterGeneCheck = new JCheckBox("Cluster");
-	  		clusterGeneCheck.setBackground(Color.white);
-	  		clusterGeneCheck.setFont(new Font("Sans Serif", Font.PLAIN, 18));
-	  		//this.add(clusterGeneCheck, "wrap");
 	  			
 	  		weightGeneCheck = new JCheckBox ("Calculate Weights");
 	  		weightGeneCheck.setFont(new Font("Sans Serif", Font.PLAIN, 18));
@@ -428,12 +426,6 @@ public class ClusterView extends JPanel implements MainPanel {
 	  		this.setLayout(new MigLayout("", "[]push[]"));
 			this.setBackground(Color.white);
 			this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-	  		
-	  		//create checkbox
-	  		clusterArrayCheck = new JCheckBox("Cluster");
-	  		clusterArrayCheck.setBackground(Color.white);
-	  		clusterArrayCheck.setFont(new Font("Sans Serif", Font.PLAIN, 18));
-	  		//this.add(clusterArrayCheck, "wrap");
 	  			
 	  		weightArrayCheck = new JCheckBox ("Calculate Weights");
 	  		weightArrayCheck.setFont(new Font("Sans Serif", Font.PLAIN, 18));
@@ -458,11 +450,9 @@ public class ClusterView extends JPanel implements MainPanel {
 		//Instance variables
 		private JButton cluster_button, cancel_button, dendro_button;
 		private JComboBox<String> clusterChoice;
-		private JLabel status1, status2, method, error1, error2, clusterLabel;
-		private String path;
+		private JLabel status1, status2, method, error1, error2, clusterLabel, opLabel;
+		private String path, clusterMethod;
 		private File file;
-		private String clusterMethod;
-		private JLabel opLabel;
 		private JProgressBar pBar, pBar2;
 		private final JPanel buttonPanel, loadPanel, choicePanel;
 		final SwingWorker<Void, Void> worker;
@@ -473,7 +463,7 @@ public class ClusterView extends JPanel implements MainPanel {
 			this.setLayout(new MigLayout());
 			setOpaque(false);
 			
-			//worker thread for calculation off the EDT to give Swing elements time to update properly
+			//worker thread for calculation off the EDT to give Swing elements time to update
 			worker = new SwingWorker<Void, Void>() {	
 				
 				public Void doInBackground() {
@@ -635,7 +625,7 @@ public class ClusterView extends JPanel implements MainPanel {
 					loadPanel.add(pBar2, "pushx, growx, span, wrap");
 					
 					opLabel = new JLabel();
-					loadPanel.add(opLabel, "alignx 50%");
+					loadPanel.add(opLabel, "alignx 50%, wrap");
 					
 					loadPanel.setBackground(Color.white);
 					loadPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
