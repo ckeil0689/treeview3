@@ -25,8 +25,6 @@ package Cluster;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Point;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -37,36 +35,21 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
-import javax.swing.SwingWorker;
 import javax.swing.border.EtchedBorder;
 
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.DataModel;
-import edu.stanford.genetics.treeview.HeaderInfo;
-import edu.stanford.genetics.treeview.LoadException;
-import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 /**
  * This class describes the GUI for the Cluster Application. It is separated into several panels which are
@@ -99,13 +82,6 @@ public class ClusterFrame extends JFrame{
 	private ArrayAdjustPanel arrayAdjustPanel;
 	private JButton close_button;
 	
-	//Object of the loaded model and matrix 
-	private ClusterModel outer;
-	private ClusterModel.ClusterDataMatrix matrix;
-	
-	//Instance variable in which the loaded data array is being stored
-	private double[] dataArray;
-	
 	//Constructor
 	protected ClusterFrame(TreeViewFrame f, String title, DataModel dataModel) { 
 	  
@@ -115,10 +91,6 @@ public class ClusterFrame extends JFrame{
 		//Initialize instance variables
 		this.viewFrame = f;
 		this.clusterModel = dataModel;
-		
-		outer = (ClusterModel) clusterModel;
-		matrix = outer.getDataMatrix();
-		dataArray = matrix.getExprData();
 		
 		//setup frame options
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -1116,35 +1088,4 @@ public class ClusterFrame extends JFrame{
 				this.add(normArrays);
 			}
 	}
-	
-    /**
-     * Remove genes from the originally loaded data set according to
-     * which checkboxes have been selected.
-     * Is called when apply button is clicked.
-     * 
-     * @param sub
-     * @param caseSensative
-     */
-    private void removeGenes(String sub, boolean casePresent, boolean caseSD,
-    		boolean caseAbsolute, boolean caseMaxMin) {
-		
-		
-		if (casePresent == true){
-			
-			
-		}
-		
-		else if(caseSD == true){
-			
-		}
-		
-		else if(caseAbsolute == true){
-			
-		}
-		
-		else if(caseMaxMin == true){
-	
-		}
-	}
-
 }

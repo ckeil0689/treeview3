@@ -31,8 +31,8 @@ public class HierarchicalCluster {
 	private double[] currentArray;
 	private final String rowString = "GENE"; 
 	private final String colString = "ARRY";
-	private String choice;
-	private String choice2;
+	private String choice, choice2;
+
 	
 	private FinalOptionsPanel finalPanel;
 	private JPanel mainPanel;
@@ -98,6 +98,7 @@ public class HierarchicalCluster {
 			mainPanel.repaint();
 			
 			formattedData.splitRows();
+			
 			sepRows = formattedData.getRowList();
 			
 			opLabel.setForeground(new Color(240, 80, 50, 255));

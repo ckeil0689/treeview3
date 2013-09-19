@@ -6,55 +6,34 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * This class is used to save data from clustering to the local storage by converting it to a tab-delimited string
+ * and using a BufferedWriter.
+ * @author CKeil
+ *
+ */
 public class ClusterFileWriter {
 	
 	private File file;
 	private ClusterModel model;
+	private final String SEPARATOR = "\t";
+	private final String END_OF_ROW = "\n";
 	
 	public ClusterFileWriter(ClusterModel model){
 		
 		this.model = model;
 	}
 	
+	/**
+	 * This methods writes the string from the doParse() method to local storage using the 
+	 * original name of the file and the specified file extension.
+	 * @param input
+	 * @param fileEnd
+	 */
 	public void writeFile(List<List<String>> input, String fileEnd){
-		
-		String content = "";
-		
-		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-		long ms = System.currentTimeMillis();
-		
-		for(List<String> element : input){
-			
-			String listElement = "";
-			String elementPart = "";
 
-			int last = element.size() - 1;
-			
-			for(int i = 0; i < last; i++){
-				
-//				if(j != last){
-//					
-//					elementPart = row.get(j) + "\t";
-//				}
-//				else{
-//					
-//					elementPart = row.get(j) + "\n";
-//				}
-				
-				elementPart = element.get(i) + "\t";
-				
-				listElement = listElement + elementPart;
-			}
-			
-			elementPart = element.get(last) + "\n";
-			listElement = listElement + elementPart;
-			
-			content = content + listElement;
-		}
-		
-		System.out.println("Generating Content: " + (System.currentTimeMillis() - ms));
-		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-		
+		String content = doParse(input);
+
 		try{
 			
 			file = new File(model.getSource().substring(0, model.getSource().length()- 4) + fileEnd);
@@ -73,6 +52,32 @@ public class ClusterFileWriter {
 			e.printStackTrace();
 			
 		}
+	}
+	
+	/**
+	 * A method to parse the String matrix into a tab-delimited string
+	 * @param input
+	 * @return
+	 */
+	public String doParse(List<List<String>> input){
+		
+		StringBuilder sb = new StringBuilder();
+		
+		for(List<String> element : input){
+
+			int last = element.size() - 1;
+			
+			for(int i = 0; i < last; i++){
+				
+				sb.append(element.get(i));
+				sb.append(SEPARATOR);
+			}
+			
+			sb.append(element.get(last));
+			sb.append(END_OF_ROW);
+		}
+		
+		return sb.toString();
 	}
 	
 	public String getFilePath(){

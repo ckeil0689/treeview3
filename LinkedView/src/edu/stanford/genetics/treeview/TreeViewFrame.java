@@ -1123,11 +1123,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 				try {
 					ClusterFileSet fileSet = clusterSelection();
 					loadClusterFileSet(fileSet); 
-//					fileSet = clusterfileMru.addUnique(fileSet); File MRU = most recently used files
-//					clusterfileMru.setLast(fileSet);
-//					clusterfileMru.notifyObservers();
 					setLoaded(true);
-//					getClusterDialogWindow(getDataModel()).setVisible(true);
 				} catch (LoadException e) {
 					if ((e.getType() != LoadException.INTPARSE)
 							&& (e.getType() != LoadException.NOFILE)) {

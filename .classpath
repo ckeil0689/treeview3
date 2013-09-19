@@ -11,5 +11,7 @@
 	<classpathentry kind="lib" path="LinkedView/lib/nanoxml-2.2.2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="C:/Users/CKeil/Downloads/miglayout-4.0-swing.jar"/>
+	<classpathentry kind="lib" path="C:/Users/CKeil/Work/JavaTV3/lib/commons-math3-3.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/CKeil/Work/JavaTV3/lib/miglayout-4.0-swing.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

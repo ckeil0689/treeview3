@@ -107,7 +107,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	//Options for comboboxes used by 2 classes
 	private String[] measurements = {"Do Not Cluster", "Pearson Correlation (uncentered)", 
 			"Pearson Correlation (centered)", "Absolute Correlation (uncentered)", 
-			"Absolute Correlation (centered)", "Euclidean Distance", "City Block Distance"};
+			"Absolute Correlation (centered)", "Spearman Ranked Correlation", "Euclidean Distance", "City Block Distance"};
 	
 	/**
 	 *  Constructor for the DendroView object
@@ -288,9 +288,6 @@ public class ClusterView extends JPanel implements MainPanel {
 					try {
 						ClusterFileSet fileSet = clusterSelection();
 						viewFrame.loadClusterFileSet(fileSet); 
-//						fileSet = clusterfileMru.addUnique(fileSet); File MRU = most recently used files
-//						clusterfileMru.setLast(fileSet);
-//						clusterfileMru.notifyObservers();
 						viewFrame.setLoaded(true);
 					} catch (LoadException e) {
 						if ((e.getType() != LoadException.INTPARSE)
@@ -494,8 +491,6 @@ public class ClusterView extends JPanel implements MainPanel {
 					
 					cluster_button.setEnabled(true);
 					
-					buttonPanel.remove(cancel_button);
-					buttonPanel.add(cluster_button, "pushx, alignx 50%");
 					buttonPanel.add(dendro_button, "pushx, alignx 50%");
 					
 					status1 = new JLabel("The file has been saved in the original directory.");
@@ -584,6 +579,14 @@ public class ClusterView extends JPanel implements MainPanel {
 				final String choice = (String)geneCombo.getSelectedItem();
 				final String choice2 = (String)arrayCombo.getSelectedItem();
 				clusterMethod = (String)clusterChoice.getSelectedItem();
+				
+				if(dendro_button.isVisible()){
+					
+					buttonPanel.remove(dendro_button);
+					
+					mainPanel.revalidate();
+					mainPanel.repaint();
+				}
 					
 				//needs at least one box to be selected otherwise display error
 				if(!choice.contentEquals("Do Not Cluster")||!choice2.contentEquals("Do Not Cluster")){

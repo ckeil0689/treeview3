@@ -10,6 +10,8 @@ import net.miginfocom.swing.MigLayout;
 
 public class ClusterProgressBar extends JDialog{
 
+	private static final long serialVersionUID = 1L;
+	
 	//Instance Variables
 	JProgressBar pBar;
 	static final int MY_MIN = 0;

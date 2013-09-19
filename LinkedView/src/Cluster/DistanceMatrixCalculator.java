@@ -2,9 +2,10 @@ package Cluster;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-
 import javax.swing.JProgressBar;
+
 
 /**
  * This class is used to calculate a distance matrix based on input data.
@@ -152,6 +153,33 @@ public class DistanceMatrixCalculator {
     		distanceList.add(pearsonList);
     	}
     }
+	
+	public void spearman(){
+		
+    	//clearing the distanceList in case the function is somehow called after using another
+    	//distance measure and the object wasn't dumped before
+    	distanceList.clear();
+    	
+    	System.out.println("FullList E 1000 Sample: " + fullList.get(1000).subList(0, 20));
+    	
+    	for(List<Double> row : fullList){
+    		
+    		List<Double> copyRow = new ArrayList<Double>(row);
+    		
+    		Collections.sort(copyRow);
+    		
+    		for(int i = 0; i < copyRow.size(); i++){
+    			
+    			Double rank = (double) i;
+    			row.set(row.indexOf(copyRow.get(i)), rank);
+    		}
+    	}
+    	
+    	System.out.println("FullList E 1000 Sample POST: " + fullList.get(1000).subList(0, 20));
+    	
+    	pearson(false, true);
+    	
+    }
 
 	//Euclidean Distance
     public void euclid(){
@@ -210,12 +238,6 @@ public class DistanceMatrixCalculator {
     			for(double element : sDiff){
     				sum += element;
     			}
-    			
-//	    			double rootedSum = 0;
-//	    			rootedSum = Math.sqrt(sum);
-//	    			
-//	    			//Mathematically RIGHT? Not used in Cluster 3.0 but Euclidean Distance is caalculated this way
-//	    			geneDistance[j] = rootedSum;
     			
     			double divSum = 0;
     			divSum = sum/fullList.size();
@@ -310,6 +332,9 @@ public class DistanceMatrixCalculator {
 			case "Absolute Correlation (centered)": pearson(true, true);
 			break;
 			
+			case "Spearman Ranked Correlation":spearman();
+			break;
+			
 			case "Euclidean Distance": euclid();
 			break;
 			
@@ -319,7 +344,7 @@ public class DistanceMatrixCalculator {
 			default: break;
 		}
 	}
-    
+	
     //Accessor method to retrieve the distance matrix
     public List<List<Double>> getDistanceMatrix(){
     	

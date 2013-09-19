@@ -47,16 +47,11 @@ public class DataViewDialog extends JDialog{
 			gList.add(d);
 		}
 		
-//		geneList = splitGenes(dataArray, model);
 		arraysList = splitArrays(gList, model);
 		
 		String[][] geneNames = model.geneHeaderInfo.getHeaderArray();
 		
 		String[] title = model.geneHeaderInfo.getNames();
-		
-//		String[][] arrayNames = model.arrayHeaderInfo.getHeaderArray();
-//		
-//		String[] title2 = model.arrayHeaderInfo.getNames();
 		
 		JTable table = new JTable(new ClusterTableModel(arraysList, model));
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -74,8 +69,6 @@ public class DataViewDialog extends JDialog{
 		
 		tableScroll.setRowHeaderView(geneTable);
 		tableScroll.setCorner(JScrollPane.UPPER_LEFT_CORNER, rowTable.getTableHeader());
-		//tableScroll.setPreferredSize(new Dimension(viewFrame.getSize()));
-		//create a scrollPane with he table in it 
 		table.setFillsViewportHeight(true);
 		
 		mainPanel.add(tableScroll, "grow, push");
@@ -117,7 +110,7 @@ public class DataViewDialog extends JDialog{
 	
 	public List <List<Double>> splitArrays(List<Double> gList, ClusterModel model){
 		
-		//number of arrays/ columns (3277 for test)
+		//number of rows/ columns
 		int max = model.nExpr();
 		int nGenes = model.nGene();
 		

@@ -30,7 +30,6 @@ import java.net.*;
 import java.util.*;
 import javax.swing.*;
 
-import Cluster.ClusterFileMru;
 import Cluster.ClusterFileSet;
 import Cluster.ClusterFrame;
 import Cluster.ClusterModel;
@@ -759,7 +758,6 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 
 	 /**  The global most recently used object. */
 	 protected FileMru fileMru;
-	 protected ClusterFileMru clusterfileMru;
 	 /**  allows opening of urls in external browser */
 	 protected BrowserControl browserControl = null;
 	 /**  url extractor for genes */

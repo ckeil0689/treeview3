@@ -1,7 +1,6 @@
 package Cluster;
 
 import java.awt.*;
-import java.awt.event.*;
 import java.beans.*;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -15,6 +14,9 @@ import javax.swing.table.*;
 public class RowNumberTable extends JTable
 	implements ChangeListener, PropertyChangeListener
 {
+
+	private static final long serialVersionUID = 1L;
+	
 	private JTable main;
 
 	public RowNumberTable(JTable table)
@@ -119,6 +121,9 @@ public class RowNumberTable extends JTable
 	 */
 	private static class RowNumberRenderer extends DefaultTableCellRenderer
 	{
+
+		private static final long serialVersionUID = 1L;
+
 		public RowNumberRenderer()
 		{
 			setHorizontalAlignment(JLabel.CENTER);
