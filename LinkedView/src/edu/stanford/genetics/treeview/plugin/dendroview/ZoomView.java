@@ -25,8 +25,13 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.Observable;
 
+import javax.imageio.ImageIO;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import edu.stanford.genetics.treeview.*;
@@ -340,6 +345,8 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
 	  geneHI = ghi;
 	  arrayHI = ahi;
 	}
+	
+	
 	protected TreeSelectionI geneSelection;
 	protected TreeSelectionI arraySelection;
     private ArrayDrawer drawer;

@@ -10,8 +10,8 @@ public class ClusterTableModel extends AbstractTableModel{
 	private static final long serialVersionUID = 1L;
 	
 	//Instance variables
-	List<List<Double>> tableList;
-	ClusterModel currentModel;
+	private List<List<Double>> tableList;
+	private ClusterModel currentModel;
 	
 	public ClusterTableModel(List<List<Double>> tableList, ClusterModel currentModel){
 		this.tableList = tableList; 
@@ -39,6 +39,7 @@ public class ClusterTableModel extends AbstractTableModel{
 	
 	@Override
 	public String getColumnName(int pCol) {
-	       return currentModel.arrayHeaderInfo.getHeaderArray()[pCol][0];
-	   }
+		
+	    return currentModel.arrayHeaderInfo.getHeaderArray()[pCol][0];
+	}
 }

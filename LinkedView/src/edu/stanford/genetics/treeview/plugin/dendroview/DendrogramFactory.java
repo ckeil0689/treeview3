@@ -45,7 +45,8 @@ public class DendrogramFactory extends PluginFactory {
 	 * @see edu.stanford.genetics.treeview.PluginFactory#createPlugin(edu.stanford.genetics.treeview.ConfigNode)
 	 */
 	public MainPanel restorePlugin(ConfigNode node, ViewFrame viewFrame) {
-		DendroView dendroView = new DendroView(viewFrame.getDataModel(), node, viewFrame);
+//		DendroView dendroView = new DendroView(viewFrame.getDataModel(), node, viewFrame);
+		DendroView2 dendroView = new DendroView2(viewFrame.getDataModel(), node, viewFrame);
 		dendroView.setName("Dendrogram");
 		return dendroView;
 	}

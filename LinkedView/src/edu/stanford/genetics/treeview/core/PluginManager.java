@@ -21,7 +21,7 @@ public class PluginManager {
 	/** holds global plugin manager 
 	 * I hate static variables, but this one looks necessary.
 	 * */
-	private static PluginManager pluginManager= new PluginManager();
+	private static PluginManager pluginManager = new PluginManager();
 	public static PluginManager getPluginManager() {
 		return pluginManager;
 	}
@@ -234,6 +234,7 @@ public class PluginManager {
 			(i >= 0)) {
 			return (PluginFactory) pluginFactories.elementAt(i);
 		} else {
+			System.out.println("returns null");
 			return null;
 		}
 	}

@@ -32,6 +32,7 @@ import java.util.Observer;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -56,7 +57,7 @@ import edu.stanford.genetics.treeview.model.TVModel;
  * @author     Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.7 $ $Date: 2009-03-23 02:46:51 $
  */
-public class DendroView extends JPanel implements ConfigNodePersistent, MainPanel, Observer {
+public class DendroView2 extends JPanel implements ConfigNodePersistent, MainPanel, Observer {
 	/**
 	 * EDIT
 	 * @author Chris Keil
@@ -71,10 +72,10 @@ public class DendroView extends JPanel implements ConfigNodePersistent, MainPane
 	 * @param  tVModel   model this DendroView is to represent
 	 * @param  vFrame  parent ViewFrame of DendroView
 	 */
-	public DendroView(DataModel tVModel, ViewFrame vFrame) {
+	public DendroView2(DataModel tVModel, ViewFrame vFrame) {
 		this(tVModel, null, vFrame, "Dendrogram");
 	}
-	public DendroView(DataModel tVModel, ConfigNode root, ViewFrame vFrame) {
+	public DendroView2(DataModel tVModel, ConfigNode root, ViewFrame vFrame) {
 		this(tVModel, root, vFrame, "Dendrogram");
 	}
 	/**
@@ -85,9 +86,12 @@ public class DendroView extends JPanel implements ConfigNodePersistent, MainPane
 	 * @param  vFrame  parent ViewFrame of DendroView
 	 * @param  name name of this view.
 	 */
-	public DendroView(DataModel dataModel, ConfigNode root, ViewFrame vFrame, String name) {
+	public DendroView2(DataModel dataModel, ConfigNode root, ViewFrame vFrame, String name) {
 		super.setName(name);
 		viewFrame = vFrame;
+		
+		this.setLayout(new MigLayout());
+		
 		if (root == null) {
 			if (dataModel.getDocumentConfigRoot() != null ) {
 				  bindConfig(dataModel.getDocumentConfigRoot().fetchOrCreate("MainView"));
@@ -157,7 +161,7 @@ public class DendroView extends JPanel implements ConfigNodePersistent, MainPane
 		return groupVector;
 	}
 
-	protected DendroView(int cols, int rows, String name) {
+	protected DendroView2(int cols, int rows, String name) {
 		super.setName(name);
 	}
 	
@@ -612,6 +616,7 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 	 *
 	 */
 	protected void setupViews() {
+		
 		this.removeAll();
 		ColorPresets colorPresets = DendrogramFactory.getColorPresets();
 		colorExtractor = new ColorExtractor();
@@ -628,35 +633,32 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 		((Observable)getDataModel()).addObserver(arrayDrawer);
 		
 		
+		globalview = new GlobalView();
+		
+		// scrollbars, mostly used by maps
+		globalXscrollbar = new JScrollBar(JScrollBar.HORIZONTAL, 0,1,0,1);
+		globalYscrollbar = new JScrollBar(JScrollBar.VERTICAL,0,1,0,1);
+		zoomXscrollbar = new JScrollBar(JScrollBar.HORIZONTAL, 0,1,0,1);
+		zoomYscrollbar = new JScrollBar(JScrollBar.VERTICAL,0,1,0,1);
 
+		
+		zoomXmap = new MapContainer();
+		zoomXmap.setDefaultScale(12.0);
+		zoomXmap.setScrollbar(zoomXscrollbar);
+		zoomYmap = new MapContainer();
+		zoomYmap.setDefaultScale(12.0);
+		zoomYmap.setScrollbar(zoomYscrollbar);
 
-	globalview = new GlobalView();
-	
-	// scrollbars, mostly used by maps
-	globalXscrollbar = new JScrollBar(JScrollBar.HORIZONTAL, 0,1,0,1);
-	globalYscrollbar = new JScrollBar(JScrollBar.VERTICAL,0,1,0,1);
-	zoomXscrollbar = new JScrollBar(JScrollBar.HORIZONTAL, 0,1,0,1);
-	zoomYscrollbar = new JScrollBar(JScrollBar.VERTICAL,0,1,0,1);
-
-
-
-		 zoomXmap = new MapContainer();
-		 zoomXmap.setDefaultScale(12.0);
-		 zoomXmap.setScrollbar(zoomXscrollbar);
-		 zoomYmap = new MapContainer();
-		 zoomYmap.setDefaultScale(12.0);
-		 zoomYmap.setScrollbar(zoomYscrollbar);
-
-		 // globalmaps tell globalview, atrview, and gtrview
-		 // where to draw each data point.
-	// the scrollbars "scroll" by communicating with the maps.
+		// globalmaps tell globalview, atrview, and gtrview
+		// where to draw each data point.
+		// the scrollbars "scroll" by communicating with the maps.
 		globalXmap = new MapContainer();
 		globalXmap.setDefaultScale(2.0);
 		globalXmap.setScrollbar(globalXscrollbar);
 		globalYmap = new MapContainer();
 		globalYmap.setDefaultScale(2.0);
 		globalYmap.setScrollbar(globalYscrollbar);
-
+		
 		globalview.setXMap(globalXmap);
 		globalview.setYMap(globalYmap);
 		
@@ -819,180 +821,74 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 		leftTreeDrawer.notifyObservers();
 
 	}
-/**
- * Lays out components in a single DragGridPanel
- *
- */
-	/*
-	private void doSingleLayout() {
-		Rectangle rectangle  = new Rectangle(0, 0, 1, 2);
-
-		DragGridPanel innerPanel = new DragGridPanel(4, 3);
-		innerPanel.setBorderWidth(2);
-		innerPanel.setBorderHeight(2);
-		innerPanel.setMinimumWidth(1);
-		innerPanel.setMinimumHeight(1);
-		innerPanel.setFocusWidth(1);
-		innerPanel.setFocusHeight(1);
-
-		innerPanel.addComponent(statuspanel, rectangle);
-		rectangle.translate(1, 0);
-
-		innerPanel.addComponent(atrview, rectangle);
-		registerView(atrview);
-
-		rectangle.translate(1, 0);
-		rectangle.setSize(1, 1);
-		innerPanel.addComponent(arraynameview, rectangle);
-		registerView(arraynameview);
-		rectangle.translate(0, 1);
-		innerPanel.addComponent(atrzview, rectangle);
-		registerView(atrzview);
-
-		rectangle.setSize(1, 2);
-		rectangle.translate(1, -1);
-		innerPanel.addComponent(hintpanel, rectangle);
-
-		rectangle = new Rectangle(0, 2, 1, 1);
-		JPanel gtrPanel = new JPanel();
-		gtrPanel.setLayout(new BorderLayout());
-		gtrPanel.add(gtrview, BorderLayout.CENTER);
-		gtrPanel.add(new JScrollBar(JScrollBar.HORIZONTAL, 0,1,0,0), BorderLayout.SOUTH);
-		innerPanel.addComponent(gtrPanel, rectangle);
-		gtrview.setHintPanel(hintpanel);
-		gtrview.setStatusPanel(statuspanel);
-		gtrview.setViewFrame(viewFrame);
-
-		// global view
-		rectangle.translate(1, 0);
-		JPanel panel = new JPanel();
-		panel.setLayout(new BorderLayout());
-		panel.add(globalview, BorderLayout.CENTER);
-		panel.add(globalYscrollbar, BorderLayout.EAST);
-		panel.add(globalXscrollbar, BorderLayout.SOUTH);	
-		innerPanel.addComponent(panel, rectangle);
-		globalview.setHintPanel(hintpanel);
-		globalview.setStatusPanel(statuspanel);
-		globalview.setViewFrame(viewFrame);
-
-		// zoom view
-		rectangle.translate(1, 0);
-		JPanel zoompanel = new JPanel();
-		zoompanel.setLayout(new BorderLayout());
-		zoompanel.add(zoomview, BorderLayout.CENTER);
-		zoompanel.add(zoomYscrollbar, BorderLayout.EAST);
-		zoompanel.add(zoomXscrollbar, BorderLayout.SOUTH);	
-		innerPanel.addComponent(zoompanel, rectangle);
-		zoomview.setHintPanel(hintpanel);
-		zoomview.setStatusPanel(statuspanel);
-		zoomview.setViewFrame(viewFrame);
-
-
-
-		rectangle.translate(1, 0);
-		innerPanel.addComponent(textview, rectangle);
-		registerView(textview);
-		add(innerPanel);
-		
-	}
-	*/
 	
+	protected final int DIVIDER_SIZE = 10;
+	protected final int MAIN_DIV_LOC = 800;
 	/**
 	 * Lays out components in two DragGridPanel separated by a
 	 * JSplitPane, so that you can expand/contract with one click.
 	 *
 	 */
-
 	protected void doDoubleLayout() {
-	  DragGridPanel left = new DragGridPanel(2, 2);
-	  left.setName("LeftDrag");
-	  DragGridPanel right = new DragGridPanel(2,3);
-	 right.setName("RightDrag");
-	    left.setBorderWidth(2);
-		left.setBorderHeight(2);
-		left.setMinimumWidth(1);
-		left.setMinimumHeight(1);
-		left.setFocusWidth(1);
-		left.setFocusHeight(1);
-
-	    right.setBorderWidth(2);
-		right.setBorderHeight(2);
-		right.setMinimumWidth(1);
-		right.setMinimumHeight(1);
-		right.setFocusWidth(1);
-		right.setFocusHeight(1);
-
-		float lheights []  = new float[2];
-		lheights [0] = (float) .15;
-		lheights[1] = (float) .85;
-		left.setHeights(lheights);
-
-		float lwidths []  = new float[2];
-		lwidths [0] = (float) .35;
-		lwidths[1] = (float) .65;
-		left.setWidths(lwidths);
-
-		float rheights [] = new float[4];
-		rheights[0] = (float).15;
-		rheights[1] = (float).05;
-		rheights[2] = (float).8;
-		rheights[3] = (float).8;
-		right.setHeights(rheights);
-
 		
-		Rectangle rectangle  = new Rectangle(0, 0, 1, 1);
-
-		left.addComponent(statuspanel, rectangle);
-		rectangle.translate(1, 0);
-
-		left.addComponent(atrview.getComponent(), rectangle);
+		Dimension left_min = new Dimension(500, 450);
+		Dimension right_min = new Dimension(600, 500);
+		
+		JPanel left = new JPanel();
+		left.setLayout(new MigLayout());
+		left.setMinimumSize(left_min);
+		
+		JPanel right = new JPanel();
+		right.setLayout(new MigLayout());
+		right.setMinimumSize(right_min);
+		
 		registerView(atrview);
-
-		rectangle.translate(-1, 0);
-		right.addComponent(arraynameview.getComponent(), rectangle);
-		registerView(arraynameview);
 		
-		rectangle.translate(0, 1);
-		right.addComponent(atrzview.getComponent(), rectangle);
-		registerView(atrzview);
-
-		rectangle.setSize(1, 2);
-		rectangle.translate(1, -1);
-		right.addComponent(hintpanel, rectangle);
-
-		rectangle = new Rectangle(0, 1, 1, 1);
+		JSplitPane backgroundPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+				left, right);
+		backgroundPanel.setDividerSize(DIVIDER_SIZE);
+		
+		Dimension up_min = new Dimension(500, 200);
+		Dimension down_min = new Dimension(600, 500);
+		
+		JPanel upSide = new JPanel();
+		upSide.setLayout(new MigLayout());
+		upSide.setOpaque(false);
+		upSide.setMinimumSize(up_min);
+		
+		JPanel downSide = new JPanel();
+		downSide.setLayout(new MigLayout());
+		downSide.setOpaque(false);
+		downSide.setMinimumSize(down_min);
+		
+		backgroundPanel.setOneTouchExpandable(true);
+		backgroundPanel.setDividerLocation(MAIN_DIV_LOC);
+		
 		JPanel gtrPanel = new JPanel();
 		gtrPanel.setLayout(new BorderLayout());
 		gtrPanel.add(gtrview, BorderLayout.CENTER);
-		gtrPanel.add(new JScrollBar(JScrollBar.HORIZONTAL, 0,1,0,1), BorderLayout.SOUTH);
-		left.addComponent(gtrPanel, rectangle);
+		gtrPanel.add(new JScrollBar(JScrollBar.HORIZONTAL, 0, 1, 0, 1), BorderLayout.SOUTH);
+		
 		gtrview.setHintPanel(hintpanel);
 		gtrview.setStatusPanel(statuspanel);
 		gtrview.setViewFrame(viewFrame);
 
 		// global view
-		rectangle.translate(1, 0);
-		JPanel panel = new JPanel();
-		panel.setLayout(new BorderLayout());
-		panel.add(globalview, BorderLayout.CENTER);
-		panel.add(globalYscrollbar, BorderLayout.EAST);
-		panel.add(globalXscrollbar, BorderLayout.SOUTH);	
-		left.addComponent(panel, rectangle);
+		ResizablePanel panel = new ResizablePanel();
+		panel.add(globalview, "grow, push");
+		left.add(panel, "grow, push, height 80%:80%:, span, wrap");
 		registerView(globalview);
 
-		// zoom view
-		rectangle.translate(-1, 1);
-		JPanel zoompanel = new JPanel();
-		zoompanel.setLayout(new BorderLayout());
-		zoompanel.add(zoomview, BorderLayout.CENTER);
-		zoompanel.add(zoomXscrollbar, BorderLayout.SOUTH);	
-		zoompanel.add(zoomYscrollbar, BorderLayout.EAST);
-		right.addComponent(zoompanel, rectangle);
-		registerView(zoomview);
+		left.add(statuspanel, "grow, push, height 10%:10%:20%");
 		
-		//rectangle.translate(0, 1);
-		//right.addComponent(buttonPanel, rectangle);
-		JButton saveButton = new JButton("Save Image");
+		JButton saveButton = new JButton("Save Zoomed Image");
+		Dimension d = saveButton.getPreferredSize();
+  		d.setSize(d.getWidth()*2, d.getHeight()*2);
+  		saveButton.setPreferredSize(d);
+  		saveButton.setFont(new Font("Sans Serif", Font.PLAIN, 14));
+  		saveButton.setOpaque(true);
+  		saveButton.setBackground(new Color(60, 180, 220, 255));
+  		saveButton.setForeground(Color.white);
 		saveButton.addActionListener(new ActionListener(){
 
 			@Override
@@ -1009,26 +905,40 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 			}
 		});
 		
-		buttonPanel.add(saveButton);
+		left.add(saveButton);
 		
-		rectangle.translate(1, 0);
+		upSide.add(atrzview, "push, grow, height 15%::, width :70%:70%");
+		registerView(atrzview);
+		
+		upSide.add(hintpanel, "push, grow, height 15%::, width :30%:30%, wrap");
+		
+		upSide.add(arraynameview, "push, grow, height 15%::, width :70%:70%");
+		registerView(arraynameview);
+		
+		// zoom view
+		JPanel zoompanel = new JPanel();
+		zoompanel.setLayout(new BorderLayout());
+		zoompanel.add(zoomview, BorderLayout.CENTER);
+		zoompanel.add(zoomXscrollbar, BorderLayout.SOUTH);	
+		zoompanel.add(zoomYscrollbar, BorderLayout.EAST);
+		downSide.add(zoompanel, "push, grow, width :70%:70%");
+		registerView(zoomview);
+		
 		JPanel textpanel = new JPanel();
 		textpanel.setLayout(new BorderLayout());
 		textpanel.add(textview.getComponent(), BorderLayout.CENTER);
 		
-		//textpanel.add(saveButton);
-		
-		right.addComponent(textpanel, rectangle);
+		downSide.add(textpanel, "push, grow, width 25%:30%:35%");
 		registerView(textview);
-
-		JSplitPane innerPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-				left, right);
-		//adds expansion arrows to central divider
-		innerPanel.setOneTouchExpandable(true);
-		innerPanel.setDividerLocation(300);
-		//CardLayout sets up the tabbed organization of plugin-windows
-		setLayout(new CardLayout());
-		add(innerPanel, "running");
+		
+		JSplitPane level1Pane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+				upSide, downSide);
+		level1Pane.setDividerSize(DIVIDER_SIZE);
+		level1Pane.setOpaque(false);
+		
+		right.add(level1Pane, "push, grow");
+		
+		add(backgroundPanel, "push, grow");
 	}
 
 
@@ -1043,8 +953,6 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 		modelView.setStatusPanel(statuspanel);
 		modelView.setViewFrame(viewFrame);
 	}
-
-	
 
 	// Menus
 	
@@ -1320,16 +1228,16 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 		menu.setAccelerator(KeyEvent.VK_R);
 		menu.setMnemonic(KeyEvent.VK_R);		
 
-		menu.addMenuItem("Summary Window...",new ActionListener() {
-		  public void actionPerformed(ActionEvent e) {
-			  SummaryViewWizard  wizard = new SummaryViewWizard(DendroView.this);
-			  int retval = JOptionPane.showConfirmDialog(DendroView.this, wizard, "Configure Summary", JOptionPane.OK_CANCEL_OPTION);
-			  if (retval == JOptionPane.OK_OPTION) {
-			  	showSubDataModel(wizard.getIndexes());
-			  }
-		  }
-		});
-		menu.setMnemonic(KeyEvent.VK_S);
+//		menu.addMenuItem("Summary Window...",new ActionListener() {
+//		  public void actionPerformed(ActionEvent e) {
+//			  SummaryViewWizard  wizard = new SummaryViewWizard(DendroView2.this);
+//			  int retval = JOptionPane.showConfirmDialog(DendroView2.this, wizard, "Configure Summary", JOptionPane.OK_CANCEL_OPTION);
+//			  if (retval == JOptionPane.OK_OPTION) {
+//			  	showSubDataModel(wizard.getIndexes());
+//			  }
+//		  }
+//		});
+//		menu.setMnemonic(KeyEvent.VK_S);
 	}
 
 	/**
@@ -1520,11 +1428,29 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 
 	public void saveImage(JPanel panel) throws IOException{
 		
-		//Container c = viewFrame.getContentPane();
-		BufferedImage im = new BufferedImage(panel.getWidth(), panel.getHeight(), BufferedImage.TYPE_INT_ARGB);
-		panel.paint(im.getGraphics());
-		ImageIO.write(im, "PNG", new File("sampleImage.png"));
+		File saveFile = new File("savedImage.png");
 		
+		final JFileChooser fc = new JFileChooser();
+		
+		fc.setFileFilter(new FileNameExtensionFilter("PNG", "png"));
+		fc.setSelectedFile(saveFile);
+		int returnVal = fc.showSaveDialog(this);
+		
+		if(returnVal == JFileChooser.APPROVE_OPTION){
+			
+			saveFile = fc.getSelectedFile();
+			
+			String fileName = saveFile.toString();
+			if(!fileName.endsWith(".png")){
+				
+				fileName += ".png";
+				saveFile = new File(fileName);
+			}
+			
+			BufferedImage im = new BufferedImage(panel.getWidth(), panel.getHeight(), BufferedImage.TYPE_INT_ARGB);
+			panel.paint(im.getGraphics());
+			ImageIO.write(im, "PNG", saveFile);
+		}	
 	}
 	
 	protected ViewFrame viewFrame;

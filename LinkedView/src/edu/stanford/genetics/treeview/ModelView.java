@@ -28,6 +28,8 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
+import edu.stanford.genetics.treeview.plugin.dendroview.ResizablePanel;
+
 /**
 * superclass, to hold info and code common to all model views
 *
@@ -36,6 +38,9 @@ import javax.swing.*;
 */
 public abstract class ModelView extends JPanel implements java.util.Observer,
 MouseListener {
+
+	private static final long serialVersionUID = 1L;
+	
 	protected ViewFrame    viewFrame = null;
 	protected MessagePanel hint = null;
 	protected MessagePanel status = null;
@@ -45,6 +50,7 @@ MouseListener {
 	protected boolean      offscreenValid    = false;
 	protected boolean      offscreenChanged  = false;
 	protected Dimension    offscreenSize     = null;
+	
 	/**
 	* holds actual thing to be displayed...
 	*/
@@ -52,6 +58,7 @@ MouseListener {
 	
 	protected ModelView() {
 		super(false);
+		setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 		setBackground(Color.white);
 	}
 	
@@ -171,6 +178,8 @@ MouseListener {
 			return;
 		}
 		
+		setBorder(BorderFactory.createLineBorder(Color.black, 1));
+		
 		Window frame = enclosingWindow();
 		if (frame.isActive()) {
 			requestFocus();
@@ -183,12 +192,15 @@ MouseListener {
 		}
 		hasMouse = true;
 	}
+	
 	/**
 	* keeps track of when mouse not present.
 	*/
 	public void mouseExited(MouseEvent e) {
 		hasMouse = false;
+		setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 	}
+	
 	/* a bunch of stubs so we can claim to be a MouseListener	*/
 	public void mouseClicked(MouseEvent e) {}
 	public void mousePressed(MouseEvent e) {}

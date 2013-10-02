@@ -274,7 +274,7 @@ public class ClusterGenerator {
 				System.out.println("Weird error. Neither rowGroup nor colGroup have a minimum.");
 			}
 		}
-    	
+		
     	ClusterFileWriter dataFile = new ClusterFileWriter(model);
     	
     	//generate files for Dendrogram

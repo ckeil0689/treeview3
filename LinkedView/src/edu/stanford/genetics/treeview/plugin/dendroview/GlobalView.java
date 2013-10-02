@@ -26,6 +26,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.Observable;
 
+import javax.swing.BorderFactory;
+
 import edu.stanford.genetics.treeview.*;
 
 class GlobalView extends ModelViewProduced implements  MouseMotionListener,
@@ -35,11 +37,12 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 	* GlobalView also likes to have an globalxmap and globalymap (both of type MapContainer) to help it figure out where to draw things. It also tries to
 	*/
     public GlobalView() {
-	super();
-	panel = this;
-	addMouseListener(this);
-	addMouseMotionListener(this);
-	addKeyListener(this);
+		super();
+		panel = this;
+		
+		addMouseListener(this);
+		addMouseMotionListener(this);
+		addKeyListener(this);
 
     }
 
@@ -398,58 +401,74 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 
     // Mouse Listener 
     public void mousePressed(MouseEvent e) {
-	if (enclosingWindow().isActive() == false) return;
-
-	startPoint.setLocation(xmap.getIndex(e.getX()),
-			       ymap.getIndex(e.getY()));
-	endPoint.setLocation(startPoint.x, startPoint.y);
-	dragRect.setLocation(startPoint.x, startPoint.y);
-	dragRect.setSize(endPoint.x - dragRect.x,
-			 endPoint.y - dragRect.y);
-
-	drawBand(dragRect);
+		if (enclosingWindow().isActive() == false) return;
+	
+		startPoint.setLocation(xmap.getIndex(e.getX()),
+				       ymap.getIndex(e.getY()));
+		endPoint.setLocation(startPoint.x, startPoint.y);
+		dragRect.setLocation(startPoint.x, startPoint.y);
+		dragRect.setSize(endPoint.x - dragRect.x,
+				 endPoint.y - dragRect.y);
+	
+		drawBand(dragRect);
     }
+    
     public void mouseReleased(MouseEvent e) {
-	if (enclosingWindow().isActive() == false) return;
-	mouseDragged(e);
-	drawBand(dragRect);	
-	if (e.isShiftDown()) {
-	    selectRectangle(startPoint, endPoint);
-	} else {
-	    Point start = new Point(xmap.getMinIndex(),
-				    startPoint.y);
-	    Point end = new Point(xmap.getMaxIndex(),
-				  endPoint.y);
-	    selectRectangle(start, end);
-	}
+		if (enclosingWindow().isActive() == false) return;
+		mouseDragged(e);
+		drawBand(dragRect);	
+		if (e.isShiftDown()) {
+		    selectRectangle(startPoint, endPoint);
+		} else {
+		    Point start = new Point(xmap.getMinIndex(),
+					    startPoint.y);
+		    Point end = new Point(xmap.getMaxIndex(),
+					  endPoint.y);
+		    selectRectangle(start, end);
+		}
     }
+    
+//	@Override
+//	public void mouseEntered(MouseEvent arg0) {
+//		
+//		setBorder(BorderFactory.createLineBorder(Color.orange, 2));	
+//	}
+//	
+//	@Override
+//	public void mouseExited(MouseEvent arg0) {
+//		
+//		setBorder(BorderFactory.createEmptyBorder());
+//	}
+    
     // MouseMotionListener
     public void mouseDragged(MouseEvent e) {
-	// rubber band?
-	drawBand(dragRect);	
-	endPoint.setLocation(xmap.getIndex(e.getX()),
-			     ymap.getIndex(e.getY()));	
-	if (e.isShiftDown()) {
-	    dragRect.setLocation(startPoint.x, startPoint.y);
-	    dragRect.setSize(0,0);
-	    dragRect.add(endPoint.x, endPoint.y);
-	} else {
-	    dragRect.setLocation(xmap.getMinIndex(), startPoint.y);
-	    dragRect.setSize(0,0);
-	    dragRect.add(xmap.getMaxIndex(), endPoint.y);
-	}
-	drawBand(dragRect);
+		// rubber band?
+		drawBand(dragRect);	
+		endPoint.setLocation(xmap.getIndex(e.getX()),
+				     ymap.getIndex(e.getY()));	
+		if (e.isShiftDown()) {
+		    dragRect.setLocation(startPoint.x, startPoint.y);
+		    dragRect.setSize(0,0);
+		    dragRect.add(endPoint.x, endPoint.y);
+		} else {
+		    dragRect.setLocation(xmap.getMinIndex(), startPoint.y);
+		    dragRect.setSize(0,0);
+		    dragRect.add(xmap.getMaxIndex(), endPoint.y);
+		}
+		drawBand(dragRect);
     }
+    
     private void drawBand(Rectangle l) { 
-	Graphics g = getGraphics();
-	g.setXORMode(getBackground());
-	int x = xmap.getPixel(l.x);
-	int y = ymap.getPixel(l.y);
-	int w = xmap.getPixel(l.x + l.width  + 1) - x;
-	int h = ymap.getPixel(l.y + l.height + 1) - y;
-	g.drawRect(x, y, w, h);
-	g.setPaintMode();
+		Graphics g = getGraphics();
+		g.setXORMode(getBackground());
+		int x = xmap.getPixel(l.x);
+		int y = ymap.getPixel(l.y);
+		int w = xmap.getPixel(l.x + l.width  + 1) - x;
+		int h = ymap.getPixel(l.y + l.height + 1) - y;
+		g.drawRect(x, y, w, h);
+		g.setPaintMode();
     }
+    
     // KeyListener 
 	public void keyPressed(KeyEvent e) {
 		int c = e.getKeyCode();

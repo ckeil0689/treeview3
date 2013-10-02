@@ -90,6 +90,7 @@ public class MessagePanel extends JScrollPane {
 		messagecanvas = new MessageCanvas();
 		messagecanvas.setBackground(Color.white);
 		messagecanvas.setForeground(Color.black);
+		messagecanvas.setFont(new Font("Sans Serif", Font.PLAIN, 14));
 		setViewportView(messagecanvas);
 	}
     

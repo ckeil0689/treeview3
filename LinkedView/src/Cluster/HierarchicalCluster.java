@@ -12,7 +12,7 @@ import javax.swing.JProgressBar;
 
 import edu.stanford.genetics.treeview.TreeViewFrame;
 
-import Cluster.ClusterView.FinalOptionsPanel;
+import Cluster.ClusterView2.FinalOptionsPanel;
 
 /**
  * This class takes the original uploaded dataArray passed 
@@ -43,7 +43,7 @@ public class HierarchicalCluster {
 	private int prog_count = 0;
 	
 	//Constructor (building the object)
-	public HierarchicalCluster(ClusterModel model, TreeViewFrame viewFrame, ClusterView cView, 
+	public HierarchicalCluster(ClusterModel model, TreeViewFrame viewFrame, ClusterView2 cView, 
 			JProgressBar pBar, JProgressBar pBar2, JLabel opLabel, double[] currentArray){
 		
 		this.model = model;
@@ -115,7 +115,7 @@ public class HierarchicalCluster {
 			
 			opLabel.setText("Clustering Data...");
 			
-			ClusterGenerator cGen = new ClusterGenerator(model, rowDistances, pBar, 
+			ClusterGenerator2 cGen = new ClusterGenerator2(model, rowDistances, pBar, 
 					rowString, similarityM);
 			
 			cGen.cluster();
@@ -159,7 +159,7 @@ public class HierarchicalCluster {
 			
 			opLabel.setText("Clustering Data...");
 			
-			ClusterGenerator cGen2 = new ClusterGenerator(model, colDistances, pBar, 
+			ClusterGenerator2 cGen2 = new ClusterGenerator2(model, colDistances, pBar, 
 					colString, similarityM);
 			
 			cGen2.cluster();
@@ -190,9 +190,6 @@ public class HierarchicalCluster {
 		
 		mainPanel.revalidate();
 		mainPanel.repaint();
-		
-		opLabel.setForeground(new Color(0, 200, 50));
-		opLabel.setText("Data File Saved");
 		
 		prog_count++;
 		pBar2.setValue(prog_count);

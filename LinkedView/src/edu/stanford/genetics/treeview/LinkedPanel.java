@@ -134,6 +134,7 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 		this.configNode = configNode;
 		restoreState();
 	}
+	
 	public void restoreState() {
 		removeAll();
 		// awlright, setup views...

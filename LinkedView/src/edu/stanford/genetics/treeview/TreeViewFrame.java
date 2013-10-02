@@ -58,6 +58,7 @@ import Cluster.ClusterFrame;
 import Cluster.ClusterModel;
 import Cluster.ClusterFrameWindow;
 import Cluster.ClusterView;
+import Cluster.ClusterView2;
 
 import edu.stanford.genetics.treeview.core.ArrayFinder;
 import edu.stanford.genetics.treeview.core.FileMruEditor;
@@ -74,6 +75,7 @@ import edu.stanford.genetics.treeview.core.TreeViewMenuBar;
 import edu.stanford.genetics.treeview.model.DataModelWriter;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
+import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
 
 /**
  * This class is the main window of Java TreeView.
@@ -135,17 +137,18 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 	protected void setupMenuBar() {
 
-		if (true) {
+//		if (true) {
 		menubar = new TreeViewJMenuBar();
 		setJMenuBar(new JMenuBar());
 		
 		((TreeViewJMenuBar) menubar).setUnderlyingMenuBar(getJMenuBar());
-		} else {
-			menubar = new TreeViewMenuBar();
-			setMenuBar(new MenuBar());
-			
-			((TreeViewMenuBar) menubar).setUnderlyingMenuBar(getMenuBar());
-		}
+//		} 
+//		else {
+//			menubar = new TreeViewMenuBar();
+//			setMenuBar(new MenuBar());
+//			
+//			((TreeViewMenuBar) menubar).setUnderlyingMenuBar(getMenuBar());
+//		}
 		synchronized(menubar) {
 			menubar.addMenu(TreeviewMenuBarI.programMenu);
 			menubar.setMenuMnemonic(KeyEvent.VK_F);
@@ -155,8 +158,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			programMenu = new ProgramMenu(); // rebuilt when fileMru notifies
 			menubar.addMenu(TreeviewMenuBarI.documentMenu);
 			menubar.setMenuMnemonic(KeyEvent.VK_S);
-			menubar.addSubMenu(TreeviewMenuBarI.presetsSubMenu);
-			menubar.setMenuMnemonic(KeyEvent.VK_P);
 			populateSettingsMenu(menubar);
 			menubar.addMenu(TreeviewMenuBarI.analysisMenu);
 			menubar.setMenuMnemonic(KeyEvent.VK_A);
@@ -324,13 +325,15 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	
 	//starting dendrogram interface
 	protected void setupRunning() {
-		DendroView dv = new DendroView(getDataModel(), this);						//where used? Create a similar function with ClusterView! used in setDataModel
-		running = dv;
+//		DendroView dv = new DendroView(getDataModel(), this);						
+//		running = dv;
+		DendroView2 dv2 = new DendroView2(getDataModel(), this);						
+		running = dv2;
 	}
 	
 	//starting the cluster interface
 	protected void setupClusterRunning() {
-		ClusterView cv = new ClusterView(getDataModel(), this);						//where used? Create a similar function with ClusterView! used in setDataModel
+		ClusterView2 cv = new ClusterView2(getDataModel(), this);						
 		running = cv;
 	}
 
@@ -355,7 +358,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		loaded = flag;
 		getContentPane().removeAll();
 		if (loaded) {
-			if (running == null) {													//currently running = null...why? coming from setupRunning() which creates a DendroView
+			if (running == null) {			
 				JOptionPane.showMessageDialog(this, "TreeViewFrame 253: " +
 						"No plugins to display");
 			} else {
@@ -447,7 +450,16 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		presetsFrame.pack();
 	}
 
+	
 	protected void populateSettingsMenu(TreeviewMenuBarI menubar2) {
+//		menubar2.addMenuItem("Edit Preferences...", new ActionListener() {
+//			public void actionPerformed(ActionEvent actionEvent) {
+//				getApp().getPrefs().showEditor();
+//				getApp().getGlobalConfig().store();
+//			}
+//		});
+		menubar2.addSeparator();
+		menubar2.addSubMenu(TreeviewMenuBarI.presetsSubMenu);
 		menubar2.addMenuItem("Gene Url Presets...",new ActionListener() {
 			public void actionPerformed(ActionEvent actionEvent) {
 				if (presetsPanel == null)
@@ -771,13 +783,13 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			});
 			menubar.setMnemonic(KeyEvent.VK_E);
 			
-			menubar.addMenuItem("Edit Preferences...", new ActionListener() {
-				public void actionPerformed(ActionEvent actionEvent) {
-					getApp().getPrefs().showEditor();
-					getApp().getGlobalConfig().store();
-				}
-			});
-			menubar.setMnemonic(KeyEvent.VK_P);
+//			menubar.addMenuItem("Edit Preferences...", new ActionListener() {
+//				public void actionPerformed(ActionEvent actionEvent) {
+//					getApp().getPrefs().showEditor();
+//					getApp().getGlobalConfig().store();
+//				}
+//			});
+//			menubar.setMnemonic(KeyEvent.VK_P);
 
 			menubar.addSeparator();
 			menubar.addMenuItem("Quit Program", new ActionListener() {
@@ -1182,7 +1194,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 * 
 	 * @throws LoadException
 	 */
-	public void setDataModel(DataModel newModel) {									//used to create the dendroview with setupRunning
+	public void setDataModel(DataModel newModel) {									
 		if (dataModel != null)
 			dataModel.clearFileSetListeners();
 		dataModel = newModel;

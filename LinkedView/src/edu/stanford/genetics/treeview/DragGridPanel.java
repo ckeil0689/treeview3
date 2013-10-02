@@ -732,55 +732,56 @@ public class DragGridPanel extends JPanel implements MouseListener,
      * @return true if cursor on a draggable border.
      */
     private boolean onDragBorder(int x, int y) {
-	int col, row;
-
-	curscol = cursrow = 0;		// Which border we are in (i.e. none)
-	// Find out which column we are in
-	for(col = 1; col < xsizes.length; col++) {
-	    if(x <= xpos[col]) {	// In column col - 1, or its border
-		if(x >= xpos[col] - bwidth)
-		    curscol = col;	// In border, so set curscol
-		break;
-	    }
-	}
-	// Find out which row we are in
-	for(row = 1; row < ysizes.length; row++) {
-	    if(y <= ypos[row]) {	// In row row - 1, or its border
-		if(y >= ypos[row] - bheight)
-		    cursrow = row;	// In border, so set cursrow
-		break;
-	    }
-	}
-	// Col is set to the column number to the right of the cursor
-	// Row is set to the row number immediately below the cursor
-	// i.e. if cursor in top left cell, or its border, row and col will both be 1
-
-	int newcursor = 0;			// New mouse cursor shape
-
-	if(curscol > 0 || cursrow > 0) {	// We may be in a border
-	    if(curscol > 0) {		// May be in a column border
-		// Check if components above left and right are different
-		if(components[curscol][row - 1] != components[col - 1][row - 1]
-		   // Also check components below left and right
-		   || (row < ysizes.length && components[curscol][row] != components[col - 1][row]))
-		    newcursor = leftRightCursor;
-		else
-		    curscol = 0;	// In the middle of a component that takes more than 1 cell
-	    }
-	    if(cursrow > 0) {		// May be in a row border
-		// Check if components left above and below are different
-		if(components[col - 1][cursrow] != components[col - 1][row - 1]
-		   // Also check components right above and below
-		   || (col < xsizes.length && components[col][cursrow] != components[col][row - 1])) {
-		    newcursor |= upDownCursor;
-		} else
-		    cursrow = 0;	// In the middle of a component that takes more than 1 cell
-	    }
-	}
-	if(newcursor != currentCursor)
-	    setCursor(newcursor);
-	debug("onDragBorder(" + curscol + "," + cursrow + ")");
-	return (newcursor != 0);
+    	
+		int col, row;
+	
+		curscol = cursrow = 0;		// Which border we are in (i.e. none)
+		// Find out which column we are in
+		for(col = 1; col < xsizes.length; col++) {
+		    if(x <= xpos[col]) {	// In column col - 1, or its border
+			if(x >= xpos[col] - bwidth)
+			    curscol = col;	// In border, so set curscol
+			break;
+		    }
+		}
+		// Find out which row we are in
+		for(row = 1; row < ysizes.length; row++) {
+		    if(y <= ypos[row]) {	// In row row - 1, or its border
+			if(y >= ypos[row] - bheight)
+			    cursrow = row;	// In border, so set cursrow
+			break;
+		    }
+		}
+		// Col is set to the column number to the right of the cursor
+		// Row is set to the row number immediately below the cursor
+		// i.e. if cursor in top left cell, or its border, row and col will both be 1
+	
+		int newcursor = 0;			// New mouse cursor shape
+	
+		if(curscol > 0 || cursrow > 0) {	// We may be in a border
+		    if(curscol > 0) {		// May be in a column border
+			// Check if components above left and right are different
+			if(components[curscol][row - 1] != components[col - 1][row - 1]
+			   // Also check components below left and right
+			   || (row < ysizes.length && components[curscol][row] != components[col - 1][row]))
+			    newcursor = leftRightCursor;
+			else
+			    curscol = 0;	// In the middle of a component that takes more than 1 cell
+		    }
+		    if(cursrow > 0) {		// May be in a row border
+			// Check if components left above and below are different
+			if(components[col - 1][cursrow] != components[col - 1][row - 1]
+			   // Also check components right above and below
+			   || (col < xsizes.length && components[col][cursrow] != components[col][row - 1])) {
+			    newcursor |= upDownCursor;
+			} else
+			    cursrow = 0;	// In the middle of a component that takes more than 1 cell
+		    }
+		}
+		if(newcursor != currentCursor)
+		    setCursor(newcursor);
+		debug("onDragBorder(" + curscol + "," + cursrow + ")");
+		return (newcursor != 0);
     }
 
     /**
