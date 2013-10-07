@@ -491,25 +491,42 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	
 	abstract public ClusterFrame getClusterDialogWindow(DataModel cModel);
 	
+	/**
+	 * Method opens a file chooser dialog
+	 * @return File file
+	 * @throws LoadException
+	 */
+	public File selectFile()throws LoadException {
+		
+		File chosen;
+		
+		JFileChooser fileDialog = new JFileChooser();
+		setupFileDialog(fileDialog);
+		int retVal = fileDialog.showOpenDialog(this);
+		
+		if (retVal == JFileChooser.APPROVE_OPTION) {
+			 
+			chosen = fileDialog.getSelectedFile();
+		}
+		else {
+			 throw new LoadException("File Dialog closed without selection...", 
+					 LoadException.NOFILE);
+		}
+		
+		return chosen;
+	}
 
 	/**
 	* Open a dialog which allows the user to select a new data file
 	*
 	* @return The fileset corresponding to the dataset.
 	*/
-	protected FileSet offerSelection()
-	 throws LoadException
-	 {
-		 FileSet fileSet1; // will be chosen...
-		 
-		 JFileChooser fileDialog = new JFileChooser();
-		 setupFileDialog(fileDialog);
-		 int retVal = fileDialog.showOpenDialog(this);
-		 if (retVal == JFileChooser.APPROVE_OPTION) {
-			 File chosen = fileDialog.getSelectedFile();
-			 
-			 fileSet1 = new FileSet(chosen.getName(), chosen.getParent()+
-					 File.separator);
+	protected FileSet getFileSet(File file){
+		
+		FileSet fileSet1;
+	
+		fileSet1 = new FileSet(file.getName(), file.getParent()+
+				File.separator);
 /*			 
 			 // check existing file nodes...
 			 ConfigNode aconfigNode[] = fileMru.getConfigs();
@@ -522,10 +539,6 @@ public abstract class ViewFrame extends JFrame implements Observer {
 				 }
 			 }
 */
-		 } else {
-			 throw new LoadException("File Dialog closed without selection...", 
-					 LoadException.NOFILE);
-		 }
 		 
 		  /* Don't enforce suffixes...
 		 // see if we match at all...
@@ -549,38 +562,24 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 }
 	
 	/**
-	* Open a dialog for cluster program 
-	* which allows the user to select a new data file
+	* Open a dialog which allows the user to select a new data file
 	*
 	* @return The fileset corresponding to the dataset.
 	*/
-	protected ClusterFileSet clusterSelection()
-	 throws LoadException
-	 {
-		 ClusterFileSet fileSet1; // will be chosen...
-		 
-		 JFileChooser fileDialog = new JFileChooser();
-		 setupClusterFileDialog(fileDialog);
-		 int retVal = fileDialog.showOpenDialog(this);
-		 if (retVal == JFileChooser.APPROVE_OPTION) {
-			 File chosen = fileDialog.getSelectedFile();
-			 
-			 fileSet1 = new ClusterFileSet(chosen.getName(), chosen.getParent()+
-					 File.separator);
-			 
-		 } else {
-			 throw new LoadException("File Dialog closed without selection...", 
-					 LoadException.NOFILE);
-		 }
-		 
+	protected ClusterFileSet getClusterFileSet(File file){
+		
+		ClusterFileSet fileSet1;
+	
+		fileSet1 = new ClusterFileSet(file.getName(), file.getParent()+
+				File.separator);
+
 		 return fileSet1;
 	 }
 	
-
 	 protected void setupFileDialog(JFileChooser fileDialog) {
-		CdtFilter ff = new CdtFilter();
+		//CdtFilter ff = new CdtFilter();
 		try {
-			fileDialog.addChoosableFileFilter(ff);
+			//fileDialog.addChoosableFileFilter(ff);
 			// will fail on pre-1.3 swings
 			fileDialog.setAcceptAllFileFilterUsed(true);
 		} catch (Exception e) {
@@ -595,7 +594,7 @@ public abstract class ViewFrame extends JFrame implements Observer {
 				}
 			});
 		}
-		fileDialog.setFileFilter(ff);
+		//fileDialog.setFileFilter(ff);
 		fileDialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		String string = fileMru.getMostRecentDir();
 		if (string != null) {

@@ -33,7 +33,6 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.UIManager;
 
@@ -85,30 +84,32 @@ public class ClusterView extends JPanel implements MainPanel {
 	//Object of the loaded model and matrix 
 	private ClusterModel outer;
 	private ClusterModel.ClusterDataMatrix matrix;
-	
-	//Instance variable in which the loaded data array is being stored
 	private double[] dataArray;
 	
 	//Various GUI elements
 	private JScrollPane scrollPane;
-	private JPanel mainPanel = new JPanel();
+	private JPanel mainPanel, optionsPanel, buttonPanel;
 	private HeaderPanel head1, head2, head3;
 	private InitialPanel initialPanel;
-	private GeneClusterPanel geneClusterPanel;
-	private ArrayClusterPanel arrayClusterPanel;
 	private ClusterOptionsPanel coPanel;
 	private FinalOptionsPanel finalPanel;
-	
-	private JCheckBox weightGeneCheck, weightArrayCheck;
 	private JComboBox<String> geneCombo, arrayCombo;
 	
 	//label used by 2 classes
 	private JLabel similarity;
 	
 	//Options for comboboxes used by 2 classes
-	private String[] measurements = {"Do Not Cluster", "Pearson Correlation (uncentered)", 
+	private final String[] measurements = {"Do Not Cluster", "Pearson Correlation (uncentered)", 
 			"Pearson Correlation (centered)", "Absolute Correlation (uncentered)", 
 			"Absolute Correlation (centered)", "Spearman Ranked Correlation", "Euclidean Distance", "City Block Distance"};
+	/**
+	 * Colors
+	 */
+	private final Color BLUE1 = new Color(60, 180, 220, 255);
+	private final Color BLUE2 = new Color(110, 210, 255, 150);
+	private final Color GREEN1 = new Color(0, 200, 0, 255);
+	private final Color RED1 = new Color(240, 80, 50, 255);
+	private final Color BG_COLOR = new Color(230, 230, 230, 255);
 	
 	/**
 	 *  Constructor for the DendroView object
@@ -134,6 +135,9 @@ public class ClusterView extends JPanel implements MainPanel {
 	public ClusterView(DataModel dataModel, ConfigNode root, TreeViewFrame vFrame, String name) {
 		
 		super.setName(name);
+		this.setLayout(new MigLayout("ins 0"));
+		this.setBackground(Color.white);
+		
 		viewFrame = vFrame;
 		
 		//Reference to loaded data
@@ -154,35 +158,39 @@ public class ClusterView extends JPanel implements MainPanel {
 
 		viewFrame.setResizable(true);
 		
-		this.setLayout(new MigLayout());
-		
 		//set layout for initial window
-		mainPanel.setLayout(new MigLayout());
+		mainPanel = new JPanel();
+		mainPanel.setLayout(new MigLayout("ins 0"));
+		mainPanel.setBackground(BG_COLOR);
+		
+		//Background Panel for the Cluster Options
+		optionsPanel = new JPanel();
+		optionsPanel.setLayout(new MigLayout());
+		optionsPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+		optionsPanel.setBackground(Color.white);
+		
+		//Panel for the Buttons
+		buttonPanel = new JPanel();
+		buttonPanel.setLayout(new MigLayout());
+		buttonPanel.setOpaque(false);
 		
 		//header
-		head1 = new HeaderPanel("Cluster");
-		head1.setColor(Color.black);
-		mainPanel.add(head1, "pushx, growx, span, wrap");
+		head1 = new HeaderPanel("Cluster ", " Data Preview");
+		head1.setColor(Color.BLACK);
 		
 		//Data Info Panel
 		initialPanel = new InitialPanel();
-		mainPanel.add(initialPanel, "growx, pushx, span, wrap");
-		
-		//Cluster Options Panel
-		coPanel = new ClusterOptionsPanel();
-		//mainPanel.add(coPanel, "growx, pushx, span, wrap");
-		
-		finalPanel = new FinalOptionsPanel();
-		//mainPanel.add(finalPanel, "growx, pushx");
-		
-		mainPanel.setBackground(new Color(240, 240, 240, 255));
 		
 		//make mainpanel scrollable by adding it to scrollpane
 		scrollPane = new JScrollPane(mainPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
-		//Add the mainPanel to the ContentPane
-		this.add(scrollPane, "grow, push");
+		//Add components to mainPanel
+		mainPanel.add(head1, "pushx, alignx 50%, wrap");
+		mainPanel.add(initialPanel, "grow, push, span, wrap");
+		mainPanel.add(buttonPanel, "alignx 50%, height 15%::");
 		
+		//Add the scrollPane to ClusterView2 Panel
+		this.add(scrollPane, "grow, push");
 	}
 	
 	class HeaderPanel extends JPanel {
@@ -190,6 +198,23 @@ public class ClusterView extends JPanel implements MainPanel {
 		private static final long serialVersionUID = 1L;
 		
 		private JLabel text;
+		private JLabel text2;
+		
+		public HeaderPanel(String header, String header2){
+			
+			this.setLayout(new MigLayout());
+			setOpaque(false);
+			
+			text = new JLabel(header);
+			text.setFont(new Font("Sans Serif", Font.PLAIN, 44));
+			
+			text2 = new JLabel(header2);
+			text2.setFont(new Font("Sans Serif", Font.PLAIN, 44));
+			text2.setForeground(BLUE1);
+			
+			this.add(text, "pushx, alignx 50%");
+			this.add(text2, "pushx, alignx 50%");
+		}
 		
 		public HeaderPanel(String header){
 			
@@ -197,16 +222,20 @@ public class ClusterView extends JPanel implements MainPanel {
 			setOpaque(false);
 			
 			text = new JLabel(header);
-			text.setFont(new Font("Sans Serif", Font.PLAIN, 36));
-			text.setForeground(new Color(60, 180, 220, 255));
+			text.setFont(new Font("Sans Serif", Font.PLAIN, 44));
+			text.setForeground(BLUE1);
 			
-			this.add(text);
-			
+			this.add(text, "pushx, alignx 50%");
 		}
 		
 		public void setColor(Color color){
 			
 			text.setForeground(color);
+		}
+		
+		public void setText(String newText){
+			
+			text2.setText(newText);
 		}
 		
 		public void setSmall(){
@@ -220,13 +249,14 @@ public class ClusterView extends JPanel implements MainPanel {
 		
 		//Instance variables
 		private int nRows, nCols, sumMatrix; 
-		private JLabel label1, label2, label3, numColLabel, numRowLabel;
-		private JButton loadNew_button, view_button;
+		private JLabel sumM, label1, label2, label3, numColLabel, numRowLabel;
+		private JButton loadNew_button, cluster_button;
+		private JPanel numPanel;
 	    
 		//Constructor
 		public InitialPanel() {
+			
 			this.setLayout(new MigLayout());
-			//this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 			setOpaque(false);
 			
 	    	HeaderInfo infoArray = dataModel.getArrayHeaderInfo();
@@ -245,53 +275,37 @@ public class ClusterView extends JPanel implements MainPanel {
 	    		
 	    		label1.setText("File loading unsuccessful :(");
 	    	}
-	    	this.add(label1, "top, wrap");
 	   
-	    	
 	    	label2 = new JLabel("Matrix Dimensions:");
 	    	label2.setFont(new Font("Sans Serif", Font.BOLD, 20));
-	    	this.add(label2, "alignx 50%, wrap");
 	    	
-	    	//panel with dimensions of the dataMatrix
-	    	JPanel numPane = new JPanel();
-	    	numPane.setLayout(new MigLayout());
-	    	numPane.setOpaque(false);
+	    	//Matrix Information
+	    	numPanel = new JPanel();
+	    	numPanel.setLayout(new MigLayout());
+	    	numPanel.setOpaque(false);
 	    	
 	    	numColLabel = new JLabel(nCols + " columns");
 	    	numColLabel.setFont(new Font("Sans Serif", Font.BOLD, 20));
-	    	numColLabel.setForeground(new Color(240, 80, 50, 255));
+	    	numColLabel.setForeground(RED1);
 	    	
 	    	numRowLabel = new JLabel(nRows + " rows X ");
-	    	numRowLabel.setForeground(new Color(240, 80, 50, 255));
 	    	numRowLabel.setFont(new Font("Sans Serif", Font.BOLD, 20));
-	    	
-	    	numPane.add(numRowLabel, "span, split 2, alignx 50%");
-	    	numPane.add(numColLabel, "wrap");
+	    	numRowLabel.setForeground(RED1);
 	    	
 	    	label3 = new JLabel("Data Points:");
 	    	label3.setFont(new Font("Sans Serif", Font.PLAIN, 18));
-	    	numPane.add(label3, "span, split 2, alignx 50%");
 	    	
-	    	sumMatrix = nCols*nRows;
-	    	JLabel sumM = new JLabel(Integer.toString(sumMatrix));
-	    	sumM.setForeground(new Color(240, 80, 50, 255));
+	    	sumMatrix = nCols * nRows;
+	    	sumM = new JLabel(Integer.toString(sumMatrix));
 	    	sumM.setFont(new Font("Sans Serif", Font.PLAIN, 18));
-	    	numPane.add(sumM, "alignx 50%, wrap");
-	    	
-	    	this.add(numPane, "alignx 50%, pushx, wrap");
-	
-	    	//buttonPane
-	    	JPanel buttonPane = new JPanel();
-	    	buttonPane.setLayout(new MigLayout());
-	    	buttonPane.setOpaque(true);
-	    	
+	    	sumM.setForeground(RED1);
+	    	 
+	    	//Data Preview
+	    	DataViewPanel dataView = new DataViewPanel(outer);
+
+	    	//Button to load new file
 	    	loadNew_button = new JButton("Load New File");
-	    	loadNew_button.setOpaque(true);
-	    	loadNew_button.setBackground(new Color(60, 180, 220, 255));
-	    	loadNew_button.setForeground(Color.white);
-			Dimension d = loadNew_button.getPreferredSize();
-			d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
-			loadNew_button.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+	    	loadNew_button = setButtonLayout(loadNew_button);
 	    	loadNew_button.addActionListener(new ActionListener(){
 	
 				@Override
@@ -311,26 +325,50 @@ public class ClusterView extends JPanel implements MainPanel {
 						}
 				}
 	    	});
-	    	buttonPane.add(loadNew_button, "alignx 50%, pushx");
 	    	
-	    	view_button = new JButton("View Loaded Data");
-	    	view_button.setOpaque(true);
-	    	view_button.setBackground(new Color(60, 180, 220, 255));
-	    	view_button.setForeground(Color.white);
-			Dimension d2 = view_button.getPreferredSize();
-			d2.setSize(d2.getWidth()*1.5, d2.getHeight()*1.5);
-			view_button.setFont(new Font("Sans Serif", Font.PLAIN, 18));
-	    	view_button.addActionListener(new ActionListener(){
+	    	cluster_button = new JButton("Hierarchical Cluster");
+	    	cluster_button = setButtonLayout(cluster_button);
+			cluster_button.addActionListener(new ActionListener(){
 	
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					new DataViewDialog(outer, viewFrame);
 					
-				}	
+					mainPanel.removeAll();
+					buttonPanel.removeAll();
+					
+					//Cluster Options Panel
+					coPanel = new ClusterOptionsPanel();
+					
+					//Linkage Choice and ProgressBar
+					finalPanel = new FinalOptionsPanel();
+					
+					head1.setText("Options");
+					
+					optionsPanel.add(coPanel, "pushx, alignx 50%, wrap");
+					optionsPanel.add(finalPanel, "pushx, alignx 50%, wrap");
+					
+					mainPanel.add(head1, "alignx 50%, pushx, wrap");
+					mainPanel.add(optionsPanel, "push, alignx 50%, width 70%:70%:70%, height 50%::, wrap");
+					mainPanel.add(buttonPanel, "alignx 50%, height 15%::");
+					
+					mainPanel.revalidate();
+					mainPanel.repaint();
+					
+				}
 	    	});
 	    	
-	    	buttonPane.add(view_button, "alignx 50%");
-	    	this.add(buttonPane, "alignx 50%, pushx");
+			buttonPanel.add(loadNew_button, "alignx 50%, pushx");
+	    	buttonPanel.add(cluster_button, "alignx 50%, pushx");
+	    	
+	    	numPanel.add(numRowLabel, "span, split 2, alignx 50%");
+	    	numPanel.add(numColLabel, "wrap");
+	    	numPanel.add(label3, "span, split 2, alignx 50%");
+	    	numPanel.add(sumM, "alignx 50%, wrap");
+	    	
+	    	this.add(label1, "top, wrap");
+	    	this.add(label2, "alignx 50%, wrap");
+	    	this.add(numPanel, "alignx 50%, pushx, wrap");
+	    	this.add(dataView, "push, grow, alignx 50%");
 		  }
 	}
 	
@@ -338,48 +376,60 @@ public class ClusterView extends JPanel implements MainPanel {
 		
 //		private ClusterFrame clusterDialog;
 //		private JButton advanced_button;
+		private JPanel rowPanel, colPanel;
 		
 		private static final long serialVersionUID = 1L;
 			    
 		public ClusterOptionsPanel() {
 			
+			//Panel Layout
 			this.setLayout(new MigLayout());
-			this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-			setBackground(Color.white);
+			this.setBackground(Color.white);
 			
-			//headers
+			//Header
+			similarity = new JLabel("Similarity Metric");
+	  		similarity.setFont(new Font("Sans Serif", Font.PLAIN, 26));
+	  		similarity.setBackground(Color.white);
+	  		
+	  		//Component for Row Distance Measure Selection
+	  		rowPanel = new JPanel();
+	  		rowPanel.setLayout(new MigLayout());
+	  		rowPanel.setOpaque(false);
+	  		
+	  		//Component for Column Distance Measure Selection
+	  		colPanel = new JPanel();
+	  		colPanel.setLayout(new MigLayout());
+	  		colPanel.setOpaque(false);
+	  		
+			//Labels
 			head2 = new HeaderPanel("Rows");
 			head2.setSmall();
-			head2.setBackground(new Color(110, 210, 255, 150));
-			this.add(head2, "alignx 50%, pushx");
-			 
+			head2.setBackground(BLUE2);
+			
 			head3 = new HeaderPanel("Columns");
 			head3.setSmall();
-			head3.setBackground(new Color(110, 210, 255, 150));
-			this.add(head3, "alignx 50%, pushx, wrap");
+			head3.setBackground(BLUE2);
 			 
-			//Component 1
-			geneClusterPanel = new GeneClusterPanel();
-			this.add(geneClusterPanel, "center, grow, push");
+			//Drop-down menu for row selection
+	  		geneCombo = new JComboBox<String>(measurements);
+	  		geneCombo = setComboLayout(geneCombo);
 		
-			//Component 2
-			arrayClusterPanel = new ArrayClusterPanel();
-			this.add(arrayClusterPanel, "center, grow, push, wrap");
+			//Drop-down menu for column selection
+	  		arrayCombo = new JComboBox<String>(measurements);
+	  		arrayCombo = setComboLayout(arrayCombo);
+	  		
+	  		rowPanel.add(head2, "alignx 50%, span, wrap");
+	  		rowPanel.add(geneCombo, "alignx 50%, grow, push");
+	  		colPanel.add(head3, "alignx 50%, span, wrap");
+			colPanel.add(arrayCombo,"alignx 50%, grow, push");
 			
-//			//Button Component
-//			JPanel buttonPanel = new JPanel();
-//			buttonPanel.setLayout(new MigLayout());
-//			buttonPanel.setOpaque(false);
-//		
+			this.add(similarity, "alignx 50%, span, wrap");
+			this.add(rowPanel, "growx, pushx");
+			this.add(colPanel, "growx, pushx");
+
 //			//Advanced Options Button
 //			advanced_button = new JButton("Advanced Options >>");
-//			advanced_button.setOpaque(true);
-//			advanced_button.setBackground(new Color(60, 180, 220, 255));
-//			advanced_button.setForeground(Color.white);
-//			Dimension d = advanced_button.getPreferredSize();
-//			d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
-//			advanced_button.setFont(new Font("Sans Serif", Font.PLAIN, 18));
-//		
+//			advanced_button = setButtonlayout(advanced_button);
 //			advanced_button.addActionListener(new ActionListener(){
 //		
 //			@Override
@@ -390,65 +440,6 @@ public class ClusterView extends JPanel implements MainPanel {
 //				
 //				}
 //			});
-//			buttonPanel.add(advanced_button, "alignx 50%, span, pushx");
-//		
-//			this.add(buttonPanel, "span, pushx, growx");
-		}
-	}
-	
-	class GeneClusterPanel extends JPanel {
-	      
-		private static final long serialVersionUID = 1L;
-
-		public GeneClusterPanel() {
-					
-	  		//set this panel's layout
-	  		this.setLayout(new MigLayout("", "[]push[]"));
-			this.setBackground(Color.white);
-			this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-	  			
-	  		weightGeneCheck = new JCheckBox ("Calculate Weights");
-	  		weightGeneCheck.setFont(new Font("Sans Serif", Font.PLAIN, 18));
-	  		weightGeneCheck.setBackground(Color.white);
-	  		this.add(weightGeneCheck, "wrap");
-	  		
-	  		geneCombo = new JComboBox<String>(measurements);
-	  		geneCombo.setBackground(Color.white);
-	  		
-	  		similarity = new JLabel("Similarity Metric");
-	  		similarity.setFont(new Font("Sans Serif", Font.PLAIN, 18));
-	  		similarity.setBackground(Color.white);
-	  		
-	  		this.add(similarity, "alignx 50%, span, wrap");
-	  		this.add(geneCombo, "alignx 50%, span");
-		}
-	}
-	  
-	class ArrayClusterPanel extends JPanel {
-	      
-		private static final long serialVersionUID = 1L;
-			
-		//Constructor
-		public ArrayClusterPanel() {
-				
-	  		//set this panel's layout
-	  		this.setLayout(new MigLayout("", "[]push[]"));
-			this.setBackground(Color.white);
-			this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-	  			
-	  		weightArrayCheck = new JCheckBox ("Calculate Weights");
-	  		weightArrayCheck.setFont(new Font("Sans Serif", Font.PLAIN, 18));
-	  		weightArrayCheck.setBackground(Color.white);
-	  		this.add(weightArrayCheck, "wrap");
-	  		
-	  		arrayCombo = new JComboBox<String>(measurements);
-	  		arrayCombo.setBackground(Color.white);
-	  		similarity = new JLabel("Similarity Metric");
-	  		similarity.setFont(new Font("Sans Serif", Font.PLAIN, 18));
-	  		similarity.setBackground(Color.white);
-	  		
-	  		this.add(similarity, "alignx 50%, span, wrap");
-	  		this.add(arrayCombo, "alignx 50%, span");
 		}
 	}
 		
@@ -457,20 +448,21 @@ public class ClusterView extends JPanel implements MainPanel {
 		private static final long serialVersionUID = 1L;
 			
 		//Instance variables
-		private JButton cluster_button, cancel_button, dendro_button;
+		private JButton cluster_button, back_button, cancel_button, dendro_button;
 		private JComboBox<String> clusterChoice;
-		private JLabel status1, status2, method, error1, error2, clusterLabel, opLabel;
+		private JLabel status1, status2, method, error1, error2, opLabel;
+		private JProgressBar pBar, pBar2;
+		private final JPanel loadPanel, choicePanel;
+		private final SwingWorker<Void, Void> worker;
+		private final String[] clusterMethods = {"Single Linkage", "Centroid Linkage", "Average Linkage", "Complete Linkage"};
 		private String path, clusterMethod;
 		private File file;
-		private JProgressBar pBar, pBar2;
-		private final JPanel buttonPanel, loadPanel, choicePanel;
-		final SwingWorker<Void, Void> worker;
 		    
 		//Constructor
 		public FinalOptionsPanel() {
 			
 			this.setLayout(new MigLayout());
-			setOpaque(false);
+			this.setBackground(Color.white);
 			
 			//worker thread for calculation off the EDT to give Swing elements time to update
 			worker = new SwingWorker<Void, Void>() {	
@@ -497,20 +489,21 @@ public class ClusterView extends JPanel implements MainPanel {
 					
 				protected void done(){
 					
-					clusterLabel.setText("Clustering complete!");
-					pBar.setForeground(new Color(0, 200, 0, 255));
-					pBar2.setForeground(new Color(0, 200, 0, 255));
+					pBar.setForeground(GREEN1);
+					pBar2.setForeground(GREEN1);
 					
-					cluster_button.setEnabled(true);
-					
-					buttonPanel.add(dendro_button, "pushx, alignx 50%");
+					loadPanel.remove(opLabel);
+					buttonPanel.remove(cancel_button);
 					
 					status1 = new JLabel("The file has been saved in the original directory.");
 					status1.setFont(new Font("Sans Serif", Font.PLAIN, 18));
-					loadPanel.add(status1, "growx, pushx, wrap");
 					
 					status2 = new JLabel("File Path: " + path);
 					status2.setFont(new Font("Sans Serif", Font.ITALIC, 18));
+					
+					buttonPanel.add(dendro_button, "pushx, alignx 50%");
+					
+					loadPanel.add(status1, "growx, pushx, wrap");
 					loadPanel.add(status2, "growx, pushx, wrap");
 					
 					mainPanel.revalidate();
@@ -518,42 +511,54 @@ public class ClusterView extends JPanel implements MainPanel {
 				}
 			};
 			
-			//Button Component
-			buttonPanel = new JPanel();
-			buttonPanel.setLayout(new MigLayout());
-			
+			//Panel containing the Linkage Choice
 			choicePanel = new JPanel();
 			choicePanel.setLayout(new MigLayout());
+			choicePanel.setBackground(Color.white);
+			
+			//Label
+			method = new JLabel("Linkage Method");
+			method.setFont(new Font("Sans Serif", Font.PLAIN, 26));
+	    	
+			//Linkage choice drop-down menu
+			clusterChoice = new JComboBox<String>(clusterMethods);
+			clusterChoice = setComboLayout(clusterChoice);
 			
 			//ProgressBar Component
 			loadPanel = new JPanel();
 			loadPanel.setLayout(new MigLayout());
-
-			//distance measure chooser
-			method = new JLabel("Method: ");
-			method.setFont(new Font("Sans Serif", Font.PLAIN, 22));
-			choicePanel.add(method, "alignx 50%, pushx");
+			loadPanel.setBackground(Color.white);
+			loadPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 	    	
-			//ClusterChoice ComboBox
-			String[] clusterMethods = {"Single Linkage", "Centroid Linkage", "Average Linkage", "Complete Linkage"};
-			clusterChoice = new JComboBox<String>(clusterMethods);
-			Dimension d = clusterChoice.getPreferredSize();
-			d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
-			clusterChoice.setPreferredSize(d);
-			clusterChoice.setFont(new Font("Sans Serif", Font.PLAIN, 18));
-			clusterChoice.setBackground(Color.white);
+	  		//Button to go back to data preview
+	    	back_button = new JButton("Back");
+	    	back_button = setButtonLayout(back_button);
+			back_button.addActionListener(new ActionListener(){
+	
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					
+					mainPanel.removeAll();
+					optionsPanel.removeAll();
+					buttonPanel.removeAll();
+					
+					head1.setText("Data Preview");
+					
+					initialPanel = new InitialPanel();
+					
+					mainPanel.add(head1, "alignx 50%, pushx, wrap");
+					mainPanel.add(initialPanel, "grow, push, span, wrap");
+					mainPanel.add(buttonPanel, "alignx 50%, height 15%::");
+					
+					mainPanel.revalidate();
+					mainPanel.repaint();
+					
+				}
+	    	});
 			
-			choicePanel.add(clusterChoice, "alignx 50%, wrap");
-			
-	    	//button with action listener
-	    	dendro_button = new JButton("Dendrogram");
-	  		Dimension d2 = dendro_button.getPreferredSize();
-	  		d2.setSize(d2.getWidth()*2, d2.getHeight()*2);
-	  		dendro_button.setPreferredSize(d2);
-	  		dendro_button.setFont(new Font("Sans Serif", Font.PLAIN, 20));
-	  		dendro_button.setOpaque(true);
-	  		dendro_button.setBackground(new Color(60, 180, 220, 255));
-	  		dendro_button.setForeground(Color.white);
+			//Button to show DendroView
+	    	dendro_button = new JButton("Clustergram");
+	    	dendro_button = setButtonLayout(dendro_button);
 	  		dendro_button.addActionListener(new ActionListener(){
 		    		
 				@Override
@@ -573,148 +578,121 @@ public class ClusterView extends JPanel implements MainPanel {
 				}
 	    	});
 	    	
-	    	//button with action listener
+	    	//Button to begin Clustering
 	    	cluster_button = new JButton("Cluster");
-	  		Dimension d3 = cluster_button.getPreferredSize();
-	  		d3.setSize(d3.getWidth()*2, d3.getHeight()*2);
-	  		cluster_button.setPreferredSize(d3);
-	  		cluster_button.setFont(new Font("Sans Serif", Font.PLAIN, 20));
-	  		cluster_button.setOpaque(true);
-	  		cluster_button.setBackground(new Color(60, 180, 220, 255));
-	  		cluster_button.setForeground(Color.white);
+	    	cluster_button = setButtonLayout(cluster_button);
 	    	cluster_button.addActionListener(new ActionListener(){
 		    		
-		    
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-					
-				final String choice = (String)geneCombo.getSelectedItem();
-				final String choice2 = (String)arrayCombo.getSelectedItem();
-				clusterMethod = (String)clusterChoice.getSelectedItem();
-				
-				if(dendro_button.isVisible()){
-					
-					buttonPanel.remove(dendro_button);
-					
-					mainPanel.revalidate();
-					mainPanel.repaint();
-				}
-					
-				//needs at least one box to be selected otherwise display error
-				if(!choice.contentEquals("Do Not Cluster")||!choice2.contentEquals("Do Not Cluster")){
-					
-					loadPanel.removeAll();
-					buttonPanel.remove(cluster_button);
-					
-					//precise progressbar
-					pBar = new JProgressBar();
-					pBar.setMinimum(0);
-					pBar.setStringPainted(true);
-					pBar.setForeground(new Color(60, 180, 220, 255));
-					pBar.setUI(new BasicProgressBarUI(){
-						protected Color getSelectionBackground(){return Color.black;};
-						protected Color getSelectionForeground(){return Color.white;};
-					});
-					pBar.setVisible(true);
-					
-					//general progressbar
-					pBar2 = new JProgressBar();
-					pBar2.setMinimum(0);
-					pBar2.setStringPainted(true);
-					pBar2.setForeground(new Color(60, 180, 220, 255));
-					pBar2.setUI(new BasicProgressBarUI(){
-						protected Color getSelectionBackground(){return Color.black;};
-						protected Color getSelectionForeground(){return Color.white;};
-					});
-					pBar2.setString("Overall Progress");
-					pBar2.setVisible(true);
-					
-					clusterLabel = new JLabel("Working...");
-					clusterLabel.setFont(new Font("Sans Serif", Font.PLAIN, 22));
-					loadPanel.add(clusterLabel, "alignx 50%, span, wrap");
-					
-					//Add it to JPanel Object
-					loadPanel.add(pBar, "pushx, growx, span, wrap");
-					
-					//Add it to JPanel Object
-					loadPanel.add(pBar2, "pushx, growx, span, wrap");
-					
-					opLabel = new JLabel();
-					loadPanel.add(opLabel, "alignx 50%, wrap");
-					
-					loadPanel.setBackground(Color.white);
-					loadPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-					
-					finalPanel.remove(buttonPanel);
-					
-					finalPanel.add(loadPanel, "pushx, growx, span, wrap");
-					cluster_button.setEnabled(false);
-					
-					cancel_button = new JButton("Cancel");
-			  		Dimension d2 = cancel_button.getPreferredSize();
-			  		d2.setSize(d2.getWidth()*2, d2.getHeight()*2);
-			  		cancel_button.setPreferredSize(d2);
-			  		cancel_button.setFont(new Font("Sans Serif", Font.PLAIN, 20));
-			  		cancel_button.setOpaque(true);
-			  		cancel_button.setBackground(new Color(60, 180, 220, 255));
-			  		cancel_button.setForeground(Color.white);
-					cancel_button.addActionListener(new ActionListener(){
-
-						@Override
-						public void actionPerformed(ActionEvent arg0) {
-							
-							worker.cancel(true);	
-							cluster_button.setEnabled(true);
-							mainPanel.remove(finalPanel);
-							finalPanel = new FinalOptionsPanel();
-							mainPanel.add(finalPanel, "growx, pushx");
-							
-							mainPanel.revalidate();
-							mainPanel.repaint();	
-						}
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
 						
-					});
+					final String choice = (String)geneCombo.getSelectedItem();
+					final String choice2 = (String)arrayCombo.getSelectedItem();
+					clusterMethod = (String)clusterChoice.getSelectedItem();
 					
-					//buttonPanel.add(cluster_button, "pushx");
-					buttonPanel.add(cancel_button, "pushx");
-					
-					finalPanel.add(buttonPanel, "pushx, alignx 50%");
-					
-					mainPanel.revalidate();
-					mainPanel.repaint();
-
-					//start new cluster process
-					worker.execute();
-				}
-				//display error message
-				else{
-					
-					error1 = new JLabel("Woah, that's too quick!");
-					error1.setFont(new Font("Sans Serif", Font.PLAIN, 22));
-					error1.setForeground(new Color(240, 80, 50, 255));
-					loadPanel.add(error1, "alignx 50%, span, wrap");
-					
-					error2 = new JLabel("Please select either a similarity metric for rows, " +
-							"columns, or both to begin clustering!");
-					error2.setFont(new Font("Sans Serif", Font.PLAIN, 22));
-					
-					loadPanel.setBackground(Color.white);
-					loadPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-					loadPanel.add(error2, "alignx 50%, span");
-					finalPanel.add(loadPanel, "alignx 50%, pushx, span");
-					
-					mainPanel.revalidate();
-					mainPanel.repaint();
-				}
-			}	
+					if(dendro_button.isVisible()){
+						
+						buttonPanel.remove(dendro_button);
+						
+						mainPanel.revalidate();
+						mainPanel.repaint();
+					}
+						
+					//needs at least one box to be selected otherwise display error
+					if(!choice.contentEquals("Do Not Cluster")||!choice2.contentEquals("Do Not Cluster")){
+						
+						loadPanel.removeAll();
+						buttonPanel.remove(cluster_button);
+						
+						//precise ProgressBar
+						pBar = new JProgressBar();
+						pBar.setMinimum(0);
+						pBar.setStringPainted(true);
+						pBar.setForeground(BLUE1);
+						pBar.setUI(new BasicProgressBarUI(){
+							protected Color getSelectionBackground(){return Color.black;};
+							protected Color getSelectionForeground(){return Color.white;};
+						});
+						pBar.setVisible(true);
+						
+						//overall ProgressBar
+						pBar2 = new JProgressBar();
+						pBar2.setMinimum(0);
+						pBar2.setStringPainted(true);
+						pBar2.setForeground(BLUE1);
+						pBar2.setUI(new BasicProgressBarUI(){
+							protected Color getSelectionBackground(){return Color.black;};
+							protected Color getSelectionForeground(){return Color.white;};
+						});
+						pBar2.setString("Overall Progress");
+						pBar2.setVisible(true);
+						
+						//Status label
+						opLabel = new JLabel();
+						
+						cancel_button = new JButton("Cancel");
+						cancel_button = setButtonLayout(cancel_button);
+						cancel_button.addActionListener(new ActionListener(){
+	
+							@Override
+							public void actionPerformed(ActionEvent arg0) {
+								
+								worker.cancel(true);
+								buttonPanel.removeAll();
+								optionsPanel.remove(finalPanel);
+								optionsPanel.remove(loadPanel);
+								finalPanel = new FinalOptionsPanel();
+								optionsPanel.add(finalPanel, "pushx, alignx 50%, wrap");
+								
+								mainPanel.revalidate();
+								mainPanel.repaint();	
+							}
+							
+						});
+						
+						loadPanel.add(opLabel, "alignx 50%, wrap");
+						loadPanel.add(pBar, "pushx, growx, span, wrap");
+						loadPanel.add(pBar2, "pushx, growx, span, wrap");
+						
+						optionsPanel.add(loadPanel, "pushx, growx, span, wrap");
+						
+						buttonPanel.add(cancel_button, "pushx");
+						mainPanel.add(buttonPanel, "pushx, alignx 50%, height 15%::");
+						
+						mainPanel.revalidate();
+						mainPanel.repaint();
+	
+						//start new cluster process
+						worker.execute();
+					}
+					//display error message
+					else{
+						
+						error1 = new JLabel("Woah, that's too quick!");
+						error1.setFont(new Font("Sans Serif", Font.PLAIN, 22));
+						error1.setForeground(new Color(240, 80, 50, 255));
+						
+						error2 = new JLabel("Please select either a similarity metric for rows, " +
+								"columns, or both to begin clustering!");
+						error2.setFont(new Font("Sans Serif", Font.PLAIN, 22));
+						
+						loadPanel.add(error1, "alignx 50%, span, wrap");
+						loadPanel.add(error2, "alignx 50%, span");
+						optionsPanel.add(loadPanel, "alignx 50%, pushx, span");
+						
+						mainPanel.revalidate();
+						mainPanel.repaint();
+					}
+				}	
 	    	});
-	    	buttonPanel.add(cluster_button, "pushx");
 	    	
-	    	buttonPanel.setOpaque(false);
-	    	choicePanel.setOpaque(false);
+	    	choicePanel.add(method, "alignx 50%, pushx, wrap");
+	    	choicePanel.add(clusterChoice, "alignx 50%, wrap");
 	    	
-	    	this.add(choicePanel, "alignx 50%, pushx, wrap");
-	    	this.add(buttonPanel, "alignx 50%, pushx, wrap");
+	  		buttonPanel.add(back_button, "alignx 50%, pushx");
+	  		buttonPanel.add(cluster_button, "alignx 50%, pushx");
+	  		
+	    	this.add(choicePanel, "alignx 50%, push, grow, wrap");
 		}
 		
 		public void setPath(String filePath){
@@ -757,9 +735,9 @@ public class ClusterView extends JPanel implements MainPanel {
 	 }
 	
 	 protected void setupClusterFileDialog(JFileChooser fileDialog) {
-		TxtFilter ff = new TxtFilter();
+		//TxtFilter ff = new TxtFilter();
 		try {
-			fileDialog.addChoosableFileFilter(ff);
+			//fileDialog.addChoosableFileFilter(ff);
 			// will fail on pre-1.3 swings
 			fileDialog.setAcceptAllFileFilterUsed(true);
 		} catch (Exception e) {
@@ -774,7 +752,7 @@ public class ClusterView extends JPanel implements MainPanel {
 				}
 			});
 		}
-		fileDialog.setFileFilter(ff);
+		//fileDialog.setFileFilter(ff);
 		fileDialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
 	 }
 
@@ -843,6 +821,45 @@ public class ClusterView extends JPanel implements MainPanel {
 	/** Getter for root */
 	public ConfigNode getConfigNode() {
 		return root;
+	}
+	
+	/**
+	 * Setting up a general layout for a button object
+	 * The method is used to make all buttons appear consistent in aesthetics
+	 * @param button
+	 * @return
+	 */
+	public JButton setButtonLayout(JButton button){
+
+		Font buttonFont = new Font("Sans Serif", Font.PLAIN, 20);
+		
+  		Dimension d = button.getPreferredSize();
+  		d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
+  		button.setPreferredSize(d);
+  		
+  		button.setFont(buttonFont);
+  		button.setOpaque(true);
+  		button.setBackground(new Color(60, 180, 220, 255));
+  		button.setForeground(Color.white);
+  		
+  		return button;
+	}
+	
+	/**
+	 * Setting up a general layout for a ComboBox object
+	 * The method is used to make all ComboBoxes appear consistent in aesthetics
+	 * @param combo
+	 * @return
+	 */
+	public JComboBox<String> setComboLayout(JComboBox<String> combo){
+		
+		Dimension d = combo.getPreferredSize();
+		d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
+		combo.setPreferredSize(d);
+		combo.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+		combo.setBackground(Color.white);
+		
+		return combo;
 	}
 	
 	@Override

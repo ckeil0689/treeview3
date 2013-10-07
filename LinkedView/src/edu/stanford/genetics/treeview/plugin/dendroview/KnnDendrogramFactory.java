@@ -38,7 +38,8 @@ public class KnnDendrogramFactory extends PluginFactory {
 	 * @see edu.stanford.genetics.treeview.PluginFactory#createPlugin(edu.stanford.genetics.treeview.ConfigNode)
 	 */
 	public MainPanel restorePlugin(ConfigNode node, ViewFrame viewFrame) {
-		DendroView dendroView = new KnnDendroView((KnnModel) viewFrame.getDataModel(), node, viewFrame);
+//		DendroView dendroView = new KnnDendroView((KnnModel) viewFrame.getDataModel(), node, viewFrame);
+		DendroView2 dendroView = new KnnDendroView(viewFrame.getDataModel(), node, viewFrame);
 		dendroView.setName(getPluginName());
 		return dendroView;
 	}

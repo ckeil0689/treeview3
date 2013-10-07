@@ -26,10 +26,11 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.MenuBar;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.Observable;
@@ -58,7 +59,6 @@ import Cluster.ClusterFrame;
 import Cluster.ClusterModel;
 import Cluster.ClusterFrameWindow;
 import Cluster.ClusterView;
-import Cluster.ClusterView2;
 
 import edu.stanford.genetics.treeview.core.ArrayFinder;
 import edu.stanford.genetics.treeview.core.FileMruEditor;
@@ -71,10 +71,8 @@ import edu.stanford.genetics.treeview.core.MemMonitor;
 import edu.stanford.genetics.treeview.core.MenuHelpPluginsFrame;
 import edu.stanford.genetics.treeview.core.PluginManager;
 import edu.stanford.genetics.treeview.core.TreeViewJMenuBar;
-import edu.stanford.genetics.treeview.core.TreeViewMenuBar;
 import edu.stanford.genetics.treeview.model.DataModelWriter;
 import edu.stanford.genetics.treeview.model.TVModel;
-import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
 
 /**
@@ -93,6 +91,12 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 	/** override in subclasses? */
 	private static String appName = "TreeView 3.0";
+	
+	/**
+	 * Colors
+	 */
+	private final Color BLUE1 = new Color(60, 180, 220, 255);
+	private final Color RED1 = new Color(240, 80, 50, 255);
 
 	private ProgramMenu programMenu;
 	public String getAppName() {
@@ -108,25 +112,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		treeView = treeview;
 		loaded = false;
 		setWindowActive(true);
-		waiting = new JPanel();
-		waiting.setLayout(new MigLayout());//new BoxLayout(waiting, BoxLayout.Y_AXIS));
-//		waiting.setAlignmentX((float) 0.5);
-//		waiting.setAlignmentY((float) 0.5);
-		JLabel jl = new JLabel("Hello! How are you Gentlepeople?");
-		jl.setFont(new Font("Sans Serif", Font.PLAIN, 30));
-		jl.setForeground(new Color(60, 180, 220, 255));
-		jl.setAlignmentX((float) 0.5);
-		jl.setAlignmentY((float) 0.5);
-		waiting.add(jl, "wrap, pushx, alignx 50%");
-		jl = new JLabel("Welcome to " + getAppName());
-		jl.setFont(new Font("Sans Serif", Font.PLAIN, 40));
-		jl.setForeground(new Color(60, 180, 220, 255));
-		jl.setAlignmentX((float) 0.5);
-		jl.setAlignmentY((float) 0.5);
-		waiting.add(jl, "span, pushx, alignx 50%");
-
-		waiting.setBackground(Color.WHITE);
-
+		
+		setupLayout();
 		setupPresets();
 		setupMenuBar();
 		setupFileMru(treeView.getGlobalConfig().getNode("FileMru"));
@@ -152,8 +139,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		synchronized(menubar) {
 			menubar.addMenu(TreeviewMenuBarI.programMenu);
 			menubar.setMenuMnemonic(KeyEvent.VK_F);
-			menubar.addMenu(TreeviewMenuBarI.clusterMenu);
-			populateClusterMenu(menubar);
 			menubar.setMenuMnemonic(KeyEvent.VK_C);
 			programMenu = new ProgramMenu(); // rebuilt when fileMru notifies
 			menubar.addMenu(TreeviewMenuBarI.documentMenu);
@@ -333,7 +318,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	
 	//starting the cluster interface
 	protected void setupClusterRunning() {
-		ClusterView2 cv = new ClusterView2(getDataModel(), this);						
+		ClusterView cv = new ClusterView(getDataModel(), this);						
 		running = cv;
 	}
 
@@ -686,22 +671,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 				menubar.setMenu(TreeviewMenuBarI.programMenu);
 			menubar.addMenuItem("Open...", new ActionListener() {
 				public void actionPerformed(ActionEvent actionEvent) {
-					try {
-						FileSet fileSet = offerSelection();
-						loadFileSet(fileSet);
-						fileSet = fileMru.addUnique(fileSet);
-						fileMru.setLast(fileSet);
-						fileMru.notifyObservers();
-						setLoaded(true);
-					} catch (LoadException e) {
-						if ((e.getType() != LoadException.INTPARSE)
-								&& (e.getType() != LoadException.NOFILE)) {
-							LogBuffer.println("Could not open file: "
-									+ e.getMessage());
-							e.printStackTrace();
-						}
-						// setLoaded(false);
-					}
+					
+					openFile();
 				}
 			});
 			menubar.setAccelerator(KeyEvent.VK_O);
@@ -1124,37 +1095,37 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		*/
 	}
 	
-	/**EDIT 
-	 * @author: Chris Keil
-	 * 
-	 * Adding Menu for Clustering Option
-	 */
-	protected void populateClusterMenu(TreeviewMenuBarI menubar2) {
-		menubar.addMenuItem("Load File for Clustering", new ActionListener() {
-			public void actionPerformed(ActionEvent actionEvent) {
-				try {
-					ClusterFileSet fileSet = clusterSelection();
-					loadClusterFileSet(fileSet); 
-					setLoaded(true);
-				} catch (LoadException e) {
-					if ((e.getType() != LoadException.INTPARSE)
-							&& (e.getType() != LoadException.NOFILE)) {
-						LogBuffer.println("Could not open file: "
-								+ e.getMessage());
-						e.printStackTrace();
-						}
-				}
-				//-------------------------------------
-
-				//-------------------------------------
-			}
-		});
-		menubar.setAccelerator(KeyEvent.VK_L);
-	}
-	
-	/**
-	 * EDIT END
-	 */
+//	/**EDIT 
+//	 * @author: Chris Keil
+//	 * 
+//	 * Adding Menu for Clustering Option
+//	 */
+//	protected void populateClusterMenu(TreeviewMenuBarI menubar2) {
+//		menubar.addMenuItem("Load File for Clustering", new ActionListener() {
+//			public void actionPerformed(ActionEvent actionEvent) {
+//				try {
+//					ClusterFileSet fileSet = clusterSelection();
+//					loadClusterFileSet(fileSet); 
+//					setLoaded(true);
+//				} catch (LoadException e) {
+//					if ((e.getType() != LoadException.INTPARSE)
+//							&& (e.getType() != LoadException.NOFILE)) {
+//						LogBuffer.println("Could not open file: "
+//								+ e.getMessage());
+//						e.printStackTrace();
+//						}
+//				}
+//				//-------------------------------------
+//
+//				//-------------------------------------
+//			}
+//		});
+//		menubar.setAccelerator(KeyEvent.VK_L);
+//	}
+//	
+//	/**
+//	 * EDIT END
+//	 */
 
 	public double noData() {
 		return DataModel.NODATA;
@@ -1172,8 +1143,124 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 	protected DataModel dataModel;
 	
+	
+	public void setupLayout(){
+		
+		JPanel title_bg;
+		JLabel jl, jl2, ques, clus, viz;
+		
+		waiting = new JPanel();
+		waiting.setLayout(new MigLayout());
+		waiting.setBackground(Color.WHITE);
+		
+		title_bg = new JPanel();
+		title_bg.setLayout(new MigLayout());
+		title_bg.setBackground(BLUE1);
+		
+		jl = new JLabel("Hello! How are you Gentlepeople?");
+		jl.setFont(new Font("Sans Serif", Font.PLAIN, 30));
+		jl.setForeground(Color.white);
+		
+		jl2 = new JLabel("Welcome to " + getAppName());
+		jl2.setFont(new Font("Sans Serif", Font.BOLD, 50));
+		jl2.setForeground(Color.white);
+		
+		ques = new JLabel("Choose an Action:");
+		ques.setFont(new Font("Sans Serif", Font.PLAIN, 40));
+		ques.setForeground(Color.black);
+		
+		clus = new JLabel("Cluster");
+		clus.setFont(new Font("Sans Serif", Font.PLAIN, 55));
+		clus.setForeground(BLUE1);
+		
+		viz = new JLabel("Visualize");
+		viz.setFont(new Font("Sans Serif", Font.PLAIN, 55));
+		viz.setForeground(BLUE1);
+		
+		addMListener(clus);
+		addMListener(viz);
+		
+		title_bg.add(jl, "wrap, pushx, alignx 50%");
+		title_bg.add(jl2, "span, push, alignx 50%");
+		
+		waiting.add(title_bg, "span, pushx, growx, alignx 50%, wrap");
+		waiting.add(ques, "push, alignx 50%, span, wrap");
+		waiting.add(clus, "pushx, alignx 50%");
+		waiting.add(viz, "pushx, alignx 50%");
+	}
 
+	public void addMListener(final JLabel label){
+		
+		label.addMouseListener(new MouseListener(){
 
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				
+				openFile();
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				
+				label.setForeground(RED1);
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				
+				label.setForeground(BLUE1);
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				
+				label.setForeground(Color.LIGHT_GRAY);
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				
+				label.setForeground(BLUE1);
+			}
+			
+		});
+	}
+	
+	/**
+	 * This method opens a file dialog to open either the visualization view or the cluster view
+	 * depending on which file type is chosen.
+	 */
+	public void openFile(){
+		
+		try {
+			File file = selectFile();
+			String fileName = file.getName();
+			
+			if(fileName.endsWith("cdt")){
+				
+				FileSet fileSet = getFileSet(file);
+				loadFileSet(fileSet);
+				fileSet = fileMru.addUnique(fileSet);
+				fileMru.setLast(fileSet);
+				fileMru.notifyObservers();
+				setLoaded(true);
+			}
+			else{
+				
+				ClusterFileSet fileSet = getClusterFileSet(file);
+				loadClusterFileSet(fileSet); 
+				setLoaded(true);
+			}
+
+		} catch (LoadException e) {
+			if ((e.getType() != LoadException.INTPARSE)
+					&& (e.getType() != LoadException.NOFILE)) {
+				LogBuffer.println("Could not open file: "
+						+ e.getMessage());
+				e.printStackTrace();
+			}
+		}
+	}
 	/**
 	 * Setter for dataModel, also sets extractors, running.
 	 * 

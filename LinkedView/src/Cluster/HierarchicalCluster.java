@@ -12,7 +12,7 @@ import javax.swing.JProgressBar;
 
 import edu.stanford.genetics.treeview.TreeViewFrame;
 
-import Cluster.ClusterView2.FinalOptionsPanel;
+import Cluster.ClusterView.FinalOptionsPanel;
 
 /**
  * This class takes the original uploaded dataArray passed 
@@ -43,7 +43,7 @@ public class HierarchicalCluster {
 	private int prog_count = 0;
 	
 	//Constructor (building the object)
-	public HierarchicalCluster(ClusterModel model, TreeViewFrame viewFrame, ClusterView2 cView, 
+	public HierarchicalCluster(ClusterModel model, TreeViewFrame viewFrame, ClusterView cView, 
 			JProgressBar pBar, JProgressBar pBar2, JLabel opLabel, double[] currentArray){
 		
 		this.model = model;

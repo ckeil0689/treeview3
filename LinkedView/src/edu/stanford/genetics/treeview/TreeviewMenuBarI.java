@@ -17,14 +17,13 @@ import java.awt.event.ActionListener;
 public abstract class TreeviewMenuBarI {
 	
 	public static final String programMenu = "File";
-	public static final String documentMenu = "Settings";
+	public static final String documentMenu = "Presets";
 	public static final String analysisMenu = "Analysis";
 	public static final String exportMenu = "Export";
 	public static final String presetsSubMenu = "Presets";
 	public static final String windowMenu = "Window";
 	public static final String helpMenu = "Help";
 	public static final String mruSubMenu = "Recent Files";
-	public static final String clusterMenu = "Cluster";
 	
 	/**
 	 * this will make the newly added menu current
