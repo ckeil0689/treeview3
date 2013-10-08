@@ -23,16 +23,16 @@
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.Observable;
 
-import javax.imageio.ImageIO;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JViewport;
+
+import net.miginfocom.swing.MigLayout;
 
 import edu.stanford.genetics.treeview.*;
 /**
@@ -46,19 +46,33 @@ import edu.stanford.genetics.treeview.*;
  * and usage appropriately.
 
 */
-class ZoomView extends ModelViewProduced implements MouseMotionListener {    
-    private int overx, overy;
-
+class ZoomView extends ModelViewProduced implements MouseMotionListener {
+	
+	private static final long serialVersionUID = 1L;
+    
+	protected TreeSelectionI geneSelection, arraySelection;
+	private int overx, overy;
+    private ArrayDrawer drawer;
+    private String [] statustext = new String [] {"Mouseover Selection","",""};
+    private Rectangle sourceRect = new Rectangle();
+    private Rectangle destRect = new Rectangle();
+    private MapContainer xmap, ymap;
+	private HeaderInfo arrayHI, geneHI; // to get gene and array names...
+	
     /**
      * Allocate a new ZoomView
      */
-    public ZoomView() {
-	super();
-	panel = this;
-
-	setToolTipText("This Turns Tooltips On");
-	addMouseListener(this);
-	addMouseMotionListener(this);
+    public ZoomView(){
+    	
+		super();
+		
+		this.setLayout(new MigLayout());
+		panel = this;
+		
+		setToolTipText("This Turns Tooltips On");
+		addMouseListener(this);
+		addMouseMotionListener(this);
+    
     }
 
 	private static final String [] hints = {
@@ -312,14 +326,23 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
 
     // MouseMotionListener
     public void mouseMoved(MouseEvent e) {
-	int ooverx = overx;
-	int oovery = overy;
-	overx = xmap.getIndex(e.getX());
-	overy = ymap.getIndex(e.getY());
-	if (oovery != overy || ooverx != overx)
-	    if (status != null) 
-		status.setMessages(getStatus());
+    	
+		int ooverx = overx;
+		int oovery = overy;
+		overx = xmap.getIndex(e.getX());
+		overy = ymap.getIndex(e.getY());
+		if (oovery != overy || ooverx != overx)
+		    if (status != null) 
+			status.setMessages(getStatus());
     }
+    
+//    @Override
+//    public void mousePressed(MouseEvent e) {
+//        JViewport viewPort = scrollPane.getViewport();
+//        Point vpp = viewPort.getViewPosition();
+//        vpp.translate(10, 10);
+//        panel.scrollRectToVisible(new Rectangle(vpp, viewPort.getSize()));
+//    }
 
 	public String getToolTipText(MouseEvent e) {
 /* Do we want to do mouseovers if value already visible? 
@@ -345,15 +368,5 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
 	  geneHI = ghi;
 	  arrayHI = ahi;
 	}
-	
-	
-	protected TreeSelectionI geneSelection;
-	protected TreeSelectionI arraySelection;
-    private ArrayDrawer drawer;
-    private String [] statustext = new String [] {"Mouseover Selection","",""};
-    private Rectangle sourceRect = new Rectangle();
-    private Rectangle destRect = new Rectangle();
-    private MapContainer xmap, ymap;
-	private HeaderInfo arrayHI, geneHI; // to get gene and array names...
 }
 

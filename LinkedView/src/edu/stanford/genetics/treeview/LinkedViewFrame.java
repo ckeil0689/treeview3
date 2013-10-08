@@ -145,9 +145,7 @@ public class LinkedViewFrame extends TreeViewFrame implements Observer
 				 }
 			 });
 			 ConfigNode documentConfig = getDataModel().getDocumentConfigRoot();
-			 System.out.println("WAHAHHAHAHA");
 			 linkedPanel.setConfigNode(documentConfig.fetchOrCreate("Views"));
-			 System.out.println("hohohohoho");
 			 running = linkedPanel;
 		 } else if (fileSet.getStyle() == FileSet.KMEANS_STYLE) {
 			// make sure selection objects are set up before instantiating plugins

@@ -822,8 +822,14 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 
 	}
 	
-	protected final int DIVIDER_SIZE = 10;
-	protected final int MAIN_DIV_LOC = 800;
+	protected final int DIVIDER_SIZE = 8;
+	protected final int MAIN_DIV_LOC = 700;
+	
+	/**
+	 * Colors
+	 */
+	private final Color BLUE2 = new Color(210, 230, 240, 255);
+	
 	/**
 	 * Lays out components in two DragGridPanel separated by a
 	 * JSplitPane, so that you can expand/contract with one click.
@@ -837,16 +843,18 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 		JPanel left = new JPanel();
 		left.setLayout(new MigLayout());
 		left.setMinimumSize(left_min);
+		left.setBackground(BLUE2);
 		
 		JPanel right = new JPanel();
 		right.setLayout(new MigLayout());
 		right.setMinimumSize(right_min);
-		
-		registerView(atrview);
+		right.setBackground(BLUE2);
 		
 		JSplitPane backgroundPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
 				left, right);
 		backgroundPanel.setDividerSize(DIVIDER_SIZE);
+		backgroundPanel.setOneTouchExpandable(true);
+		backgroundPanel.setDividerLocation(MAIN_DIV_LOC);
 		
 		Dimension up_min = new Dimension(500, 200);
 		Dimension down_min = new Dimension(600, 500);
@@ -861,25 +869,17 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 		downSide.setOpaque(false);
 		downSide.setMinimumSize(down_min);
 		
-		backgroundPanel.setOneTouchExpandable(true);
-		backgroundPanel.setDividerLocation(MAIN_DIV_LOC);
-		
 		JPanel gtrPanel = new JPanel();
 		gtrPanel.setLayout(new BorderLayout());
-		gtrPanel.add(gtrview, BorderLayout.CENTER);
-		gtrPanel.add(new JScrollBar(JScrollBar.HORIZONTAL, 0, 1, 0, 1), BorderLayout.SOUTH);
 		
 		gtrview.setHintPanel(hintpanel);
 		gtrview.setStatusPanel(statuspanel);
 		gtrview.setViewFrame(viewFrame);
 
 		// global view
-		ResizablePanel panel = new ResizablePanel();
-		panel.add(globalview, "grow, push");
-		left.add(panel, "grow, push, height 80%:80%:, span, wrap");
+		JPanel panel = new JPanel();
+		panel.setLayout(new MigLayout("ins 0"));
 		registerView(globalview);
-
-		left.add(statuspanel, "grow, push, height 10%:10%:20%");
 		
 		JButton saveButton = new JButton("Save Zoomed Image");
 		Dimension d = saveButton.getPreferredSize();
@@ -905,43 +905,53 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 			}
 		});
 		
-		left.add(saveButton);
-		
-		upSide.add(atrzview, "push, grow, height 15%::, width :70%:70%");
-		registerView(atrzview);
-		
-		upSide.add(hintpanel, "push, grow, height 15%::, width :30%:30%, wrap");
-		
-		upSide.add(arraynameview, "push, grow, height 15%::, width :70%:70%");
-		registerView(arraynameview);
-		
 		// zoom view
 		JPanel zoompanel = new JPanel();
 		zoompanel.setLayout(new BorderLayout());
-		zoompanel.add(zoomview, BorderLayout.CENTER);
-		zoompanel.add(zoomXscrollbar, BorderLayout.SOUTH);	
-		zoompanel.add(zoomYscrollbar, BorderLayout.EAST);
-		downSide.add(zoompanel, "push, grow, width :70%:70%");
-		registerView(zoomview);
 		
 		JPanel textpanel = new JPanel();
 		textpanel.setLayout(new BorderLayout());
-		textpanel.add(textview.getComponent(), BorderLayout.CENTER);
-		
-		downSide.add(textpanel, "push, grow, width 25%:30%:35%");
-		registerView(textview);
 		
 		JSplitPane level1Pane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
 				upSide, downSide);
 		level1Pane.setDividerSize(DIVIDER_SIZE);
-		level1Pane.setOpaque(false);
+		level1Pane.setBackground(BLUE2);
+		level1Pane.setBorder(null);
+		
+		//Register Views
+		registerView(atrview);
+		registerView(atrzview);
+		registerView(arraynameview);
+		registerView(zoomview);
+		registerView(textview);
+		
+		//Adding Components
+		gtrPanel.add(gtrview, BorderLayout.CENTER);
+		gtrPanel.add(new JScrollBar(JScrollBar.HORIZONTAL, 0, 1, 0, 1), BorderLayout.SOUTH);
+		
+		panel.add(globalview, "grow, push");
+		
+		zoompanel.add(zoomview, BorderLayout.CENTER);
+		zoompanel.add(zoomXscrollbar, BorderLayout.SOUTH);	
+		zoompanel.add(zoomYscrollbar, BorderLayout.EAST);
+		
+		textpanel.add(textview.getComponent(), BorderLayout.CENTER);
+		
+		left.add(panel, "grow, push, height 80%:80%:, span, wrap");
+		left.add(statuspanel, "grow, push, height 10%:10%:20%");
+		left.add(saveButton);
 		
 		right.add(level1Pane, "push, grow");
 		
+		upSide.add(atrzview, "push, grow, height 15%::, width :70%:70%");
+		upSide.add(hintpanel, "push, grow, height 15%::, width :30%:30%, wrap");
+		upSide.add(arraynameview, "push, grow, height 15%::, width :70%:70%");
+		
+		downSide.add(zoompanel, "push, grow, width :70%:70%");
+		downSide.add(textpanel, "push, grow, width 25%:30%:35%");
+
 		add(backgroundPanel, "push, grow");
 	}
-
-
 
 	/**
 	 *  registers a modelview with the hint and status panels, and the viewFrame.

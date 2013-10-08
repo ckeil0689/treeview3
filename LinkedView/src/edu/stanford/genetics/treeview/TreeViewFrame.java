@@ -97,6 +97,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 */
 	private final Color BLUE1 = new Color(60, 180, 220, 255);
 	private final Color RED1 = new Color(240, 80, 50, 255);
+	private final Color GRAY1 = new Color(150, 150, 150, 255);
 
 	private ProgramMenu programMenu;
 	public String getAppName() {
@@ -371,8 +372,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 	public void rebuildMainPanelMenu() {
 		synchronized(menubar) {
-		menubar.setMenu(TreeviewMenuBarI.documentMenu);
-		menubar.removeMenuItems();
+//		menubar.setMenu(TreeviewMenuBarI.documentMenu);
+//		menubar.removeMenuItems();
 		menubar.setMenu(TreeviewMenuBarI.analysisMenu);
 		menubar.removeAll();
 		menubar.setEnabled(true);
@@ -436,16 +437,12 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	}
 
 	
-	protected void populateSettingsMenu(TreeviewMenuBarI menubar2) {
-//		menubar2.addMenuItem("Edit Preferences...", new ActionListener() {
-//			public void actionPerformed(ActionEvent actionEvent) {
-//				getApp().getPrefs().showEditor();
-//				getApp().getGlobalConfig().store();
-//			}
-//		});
-		menubar2.addSeparator();
-		menubar2.addSubMenu(TreeviewMenuBarI.presetsSubMenu);
-		menubar2.addMenuItem("Gene Url Presets...",new ActionListener() {
+	protected void populateSettingsMenu(TreeviewMenuBarI menubar) {
+		
+		menubar.addSeparator();
+//		menubar.addSubMenu(TreeviewMenuBarI.presetsSubMenu);
+		menubar.addMenuItem("Gene Url Presets...",new ActionListener() {
+			
 			public void actionPerformed(ActionEvent actionEvent) {
 				if (presetsPanel == null)
 					setupPresetsPanel();
@@ -454,10 +451,11 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 				presetsFrame.setVisible(true);
 			}
 		});
-		menubar2.setAccelerator(KeyEvent.VK_P);
-		menubar2.setMnemonic(KeyEvent.VK_G);
+		menubar.setAccelerator(KeyEvent.VK_P);
+		menubar.setMnemonic(KeyEvent.VK_G);
 		
-		menubar2.addMenuItem("Array Url Presets...", new ActionListener() {
+		menubar.addMenuItem("Array Url Presets...", new ActionListener() {
+			
 			public void actionPerformed(ActionEvent actionEvent) {
 				if (presetsPanel == null)
 					setupPresetsPanel();
@@ -466,11 +464,12 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 				presetsFrame.setVisible(true);
 			}
 		});
-		menubar2.setMnemonic(KeyEvent.VK_A);
+		menubar.setMnemonic(KeyEvent.VK_A);
 
 		PluginFactory[] plugins = PluginManager.getPluginManager().getPluginFactories();
 		if (plugins.length == 0) {
-			menubar2.addMenuItem("Color Presets...",new ActionListener() {
+			menubar.addMenuItem("Color Presets...",new ActionListener() {
+				
 				public void actionPerformed(ActionEvent actionEvent) {
 					if (presetsPanel == null)
 						setupPresetsPanel();
@@ -479,12 +478,21 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 					presetsFrame.setVisible(true);
 				}
 			});
-			menubar2.setMnemonic(KeyEvent.VK_C);
+			menubar.setMnemonic(KeyEvent.VK_C);
 		} else {
 			for (int i = 0; i < plugins.length; i++) {
-				plugins[i].addPluginConfig(menubar2, this);
+				plugins[i].addPluginConfig(menubar, this);
 			}
 		}
+		
+		menubar.addSeparator();
+		
+		menubar.addMenuItem("Change Menubar", new ActionListener() {
+			public void actionPerformed(ActionEvent actionEvent) {
+				getApp().getPrefs().showEditor();
+				getApp().getGlobalConfig().store();
+			}
+		});
 
 	}
 
@@ -672,29 +680,29 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			menubar.addMenuItem("Open...", new ActionListener() {
 				public void actionPerformed(ActionEvent actionEvent) {
 					
-					openFile();
+					openFile(false, false);
 				}
 			});
 			menubar.setAccelerator(KeyEvent.VK_O);
 			menubar.setMnemonic(KeyEvent.VK_O);
 
-			menubar.addMenuItem("Open Url...", new ActionListener() {
-				public void actionPerformed(ActionEvent actionEvent) {
-					try {
-						FileSet fileSet = offerUrlSelection();
-						loadFileSet(fileSet);
-						fileSet = fileMru.addUnique(fileSet);
-						fileMru.setLast(fileSet);
-						fileMru.notifyObservers();
-						setLoaded(true);
-					} catch (LoadException e) {
-						LogBuffer.println("could not load url: "
-								+ e.getMessage());
-						// setLoaded(false);
-					}
-				}
-			});
-			menubar.setMnemonic(KeyEvent.VK_U);
+//			menubar.addMenuItem("Open Url...", new ActionListener() {
+//				public void actionPerformed(ActionEvent actionEvent) {
+//					try {
+//						FileSet fileSet = offerUrlSelection();
+//						loadFileSet(fileSet);
+//						fileSet = fileMru.addUnique(fileSet);
+//						fileMru.setLast(fileSet);
+//						fileMru.notifyObservers();
+//						setLoaded(true);
+//					} catch (LoadException e) {
+//						LogBuffer.println("could not load url: "
+//								+ e.getMessage());
+//						// setLoaded(false);
+//					}
+//				}
+//			});
+//			menubar.setMnemonic(KeyEvent.VK_U);
 			
 			menubar.addMenuItem("Save",new ActionListener() {
 				public void actionPerformed(ActionEvent actionEvent) {
@@ -1146,11 +1154,11 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	
 	public void setupLayout(){
 		
-		JPanel title_bg;
+		JPanel title_bg, labelPanel;
 		JLabel jl, jl2, ques, clus, viz;
 		
 		waiting = new JPanel();
-		waiting.setLayout(new MigLayout());
+		waiting.setLayout(new MigLayout("ins 0"));
 		waiting.setBackground(Color.WHITE);
 		
 		title_bg = new JPanel();
@@ -1165,9 +1173,13 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		jl2.setFont(new Font("Sans Serif", Font.BOLD, 50));
 		jl2.setForeground(Color.white);
 		
-		ques = new JLabel("Choose an Action:");
-		ques.setFont(new Font("Sans Serif", Font.PLAIN, 40));
-		ques.setForeground(Color.black);
+		labelPanel = new JPanel();
+		labelPanel.setLayout(new MigLayout());
+		labelPanel.setOpaque(false);
+		
+		ques = new JLabel("Cluster or visualize your data?");
+		ques.setFont(new Font("Sans Serif", Font.PLAIN, 45));
+		ques.setForeground(GRAY1);
 		
 		clus = new JLabel("Cluster");
 		clus.setFont(new Font("Sans Serif", Font.PLAIN, 55));
@@ -1177,26 +1189,28 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		viz.setFont(new Font("Sans Serif", Font.PLAIN, 55));
 		viz.setForeground(BLUE1);
 		
-		addMListener(clus);
-		addMListener(viz);
+		addMListener(clus, true, false);
+		addMListener(viz, true, true);
 		
-		title_bg.add(jl, "wrap, pushx, alignx 50%");
-		title_bg.add(jl2, "span, push, alignx 50%");
+		title_bg.add(jl, "push, alignx 50%, span, wrap");
+		title_bg.add(jl2, "push, alignx 50%, span");
 		
-		waiting.add(title_bg, "span, pushx, growx, alignx 50%, wrap");
-		waiting.add(ques, "push, alignx 50%, span, wrap");
+		labelPanel.add(ques, "push, alignx 50%, span, wrap");
+		waiting.add(title_bg, "pushx, growx, alignx 50%, span, height 20%::, wrap");
+		waiting.add(labelPanel, "alignx 50%, height 30%::, span, wrap");
 		waiting.add(clus, "pushx, alignx 50%");
 		waiting.add(viz, "pushx, alignx 50%");
+
 	}
 
-	public void addMListener(final JLabel label){
+	public void addMListener(final JLabel label, final boolean filter, final boolean viz){
 		
 		label.addMouseListener(new MouseListener(){
 
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				
-				openFile();
+				openFile(filter, viz);
 			}
 
 			@Override
@@ -1230,13 +1244,14 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 * This method opens a file dialog to open either the visualization view or the cluster view
 	 * depending on which file type is chosen.
 	 */
-	public void openFile(){
+	public void openFile(boolean filter, boolean viz){
 		
 		try {
-			File file = selectFile();
+			
+			File file = selectFile(filter, viz);
 			String fileName = file.getName();
 			
-			if(fileName.endsWith("cdt")){
+			if(fileName.endsWith("cdt") && viz){
 				
 				FileSet fileSet = getFileSet(file);
 				loadFileSet(fileSet);
@@ -1261,6 +1276,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			}
 		}
 	}
+
 	/**
 	 * Setter for dataModel, also sets extractors, running.
 	 * 

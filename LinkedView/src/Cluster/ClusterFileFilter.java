@@ -3,27 +3,22 @@ package Cluster;
 import java.io.File;
 
 import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class ClusterFileFilter extends FileFilter{
-
-	public ClusterFileFilter(){
 		
-	}
-
+	private final FileFilter filter = 
+			new FileNameExtensionFilter("Tab-Delim Files", "txt", "tsv", "cdt");
 	@Override
 	public boolean accept(File f) {
 		
-		if(f.isDirectory())
-		{
-			return true;
-		}
-		
-		return f.getName().endsWith(".gtr");
+		return filter.accept(f);
 	}
 
 	@Override
 	public String getDescription() {
 		
-		return "GTR files (*.gtr)";
+		return "Tab-Delimited Files";
 	}
+	
 }

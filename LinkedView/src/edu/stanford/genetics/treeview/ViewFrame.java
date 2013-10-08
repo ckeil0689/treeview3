@@ -30,10 +30,9 @@ import java.net.*;
 import java.util.*;
 import javax.swing.*;
 
+import Cluster.ClusterFileFilter;
 import Cluster.ClusterFileSet;
 import Cluster.ClusterFrame;
-import Cluster.ClusterModel;
-import Cluster.TxtFilter;
 import edu.stanford.genetics.treeview.core.FileMru;
 import edu.stanford.genetics.treeview.core.HeaderFinder;
 import edu.stanford.genetics.treeview.model.DataModelWriter;
@@ -496,12 +495,20 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 * @return File file
 	 * @throws LoadException
 	 */
-	public File selectFile()throws LoadException {
+	public File selectFile(boolean filter, boolean viz)throws LoadException {
 		
 		File chosen;
 		
 		JFileChooser fileDialog = new JFileChooser();
-		setupFileDialog(fileDialog);
+		
+		if(filter){
+			
+			setupFileDialog(fileDialog, viz);
+		}
+		else{
+			
+			setupFileDialog(fileDialog);
+		}
 		int retVal = fileDialog.showOpenDialog(this);
 		
 		if (retVal == JFileChooser.APPROVE_OPTION) {
@@ -574,15 +581,20 @@ public abstract class ViewFrame extends JFrame implements Observer {
 				File.separator);
 
 		 return fileSet1;
-	 }
+	}
 	
-	 protected void setupFileDialog(JFileChooser fileDialog) {
-		//CdtFilter ff = new CdtFilter();
+	/**
+	 * Setting up a file dialog without file filters
+	 * @param fileDialog
+	 */
+	protected void setupFileDialog(JFileChooser fileDialog) {
+		
 		try {
-			//fileDialog.addChoosableFileFilter(ff);
+			
 			// will fail on pre-1.3 swings
 			fileDialog.setAcceptAllFileFilterUsed(true);
 		} catch (Exception e) {
+			
 			// hmm... I'll just assume that there's no accept all.
 			fileDialog.addChoosableFileFilter(new javax.swing.filechooser
 					.FileFilter() {
@@ -594,7 +606,6 @@ public abstract class ViewFrame extends JFrame implements Observer {
 				}
 			});
 		}
-		//fileDialog.setFileFilter(ff);
 		fileDialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		String string = fileMru.getMostRecentDir();
 		if (string != null) {
@@ -602,13 +613,30 @@ public abstract class ViewFrame extends JFrame implements Observer {
 		}
 	 }
 	 
-	 protected void setupClusterFileDialog(JFileChooser fileDialog) {
-		TxtFilter ff = new TxtFilter();
-		try {
-			fileDialog.addChoosableFileFilter(ff);
+	/**
+	 * Overloaded setupFileDialog
+	 * Setting up a file choosing dialog with appropriate file filter
+	 * @param fileDialog
+	 * @param viz
+	 */
+	 protected void setupFileDialog(JFileChooser fileDialog, boolean viz) {
+	 
+		CdtFilter ff = new CdtFilter();
+		ClusterFileFilter ff2 = new ClusterFileFilter();
+			
+		try {	
+			if(viz){
+				
+				fileDialog.addChoosableFileFilter(ff);
+			}
+			else{
+				
+				fileDialog.addChoosableFileFilter(ff2);
+			}
 			// will fail on pre-1.3 swings
 			fileDialog.setAcceptAllFileFilterUsed(true);
 		} catch (Exception e) {
+			
 			// hmm... I'll just assume that there's no accept all.
 			fileDialog.addChoosableFileFilter(new javax.swing.filechooser
 					.FileFilter() {
@@ -620,14 +648,20 @@ public abstract class ViewFrame extends JFrame implements Observer {
 				}
 			});
 		}
-		fileDialog.setFileFilter(ff);
+		if(viz){
+			
+			fileDialog.setFileFilter(ff);
+		}
+		else{
+			
+			fileDialog.setFileFilter(ff2);
+		}
 		fileDialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		String string = fileMru.getMostRecentDir();
 		if (string != null) {
 			fileDialog.setCurrentDirectory(new File(string));
 		}
 	 }
-	 
 	 
 	/**
 	 *  Rebuild a particular window menu.

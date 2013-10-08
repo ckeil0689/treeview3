@@ -149,7 +149,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		//setting the UIManager up for Win vs. Mac
 		try{
 			
-			UIManager.setLookAndFeel( UIManager.getCrossPlatformLookAndFeelClassName() );
+			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 		} 
 		catch (Exception e){
 			
