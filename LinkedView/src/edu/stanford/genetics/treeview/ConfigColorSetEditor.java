@@ -33,6 +33,9 @@ import javax.swing.*;
  */
 
 public class ConfigColorSetEditor extends JPanel {
+	
+	private static final long serialVersionUID = 1L;
+	
 	private ConfigColorSet colorSet;
 
 
@@ -69,6 +72,9 @@ public class ConfigColorSetEditor extends JPanel {
 
 	/** this has been superceded by the general ColorPanel class */
 	class ColorPanel extends JPanel {
+
+		private static final long serialVersionUID = 1L;
+		
 		ColorIcon colorIcon;
 		int type;
 

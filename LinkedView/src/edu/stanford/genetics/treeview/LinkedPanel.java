@@ -34,6 +34,9 @@ import javax.swing.event.ChangeListener;
 import edu.stanford.genetics.treeview.core.PluginManager;
 
 public class LinkedPanel extends JTabbedPane implements MainPanel {
+
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * This class enables you to put a MainPanel in a separate window.
 	 * the separate window is not a ViewFrame and should be thought of as
@@ -42,7 +45,11 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 	 * subwindow on top.
 	 */
 	private class MainPanelFrame extends JFrame {
-		MainPanel mainPanel;
+
+		private static final long serialVersionUID = 1L;
+		
+		private MainPanel mainPanel;
+		
 		/**
 		 * @param mp main panel to display
 		 */
@@ -328,7 +335,7 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 	/**
 	 * used to hold list of open mp dialogs
 	 */
-	Vector mpdialogs = new Vector();
+	Vector<JFrame> mpdialogs = new Vector<JFrame>();
 	public void addDialog(MainPanel mp) {
 		final MainPanelFrame nmp = new MainPanelFrame(mp);
 		mpdialogs.add(nmp);
@@ -347,7 +354,7 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 	 * @param mp mainpanel to remove
 	 */
 	public void removeDialog(MainPanel mp) {
-		Enumeration e = mpdialogs.elements();
+		Enumeration<JFrame> e = mpdialogs.elements();
 		while (e.hasMoreElements()) {
 			MainPanelFrame mpd = (MainPanelFrame) e.nextElement();
 			if (mpd.getMainPanel() == mp)
@@ -403,9 +410,9 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 		return null;
 	}
 	public MainPanel[] getMainPanelsByName(String name) {
-		Vector matches = new Vector();
+		Vector<MainPanel> matches = new Vector<MainPanel>();
 		// check the detached plugins
-		Enumeration e = mpdialogs.elements();
+		Enumeration<JFrame> e = mpdialogs.elements();
 		while (e.hasMoreElements()) {
 			MainPanelFrame mpd = (MainPanelFrame) e.nextElement();
 			MainPanel mp = mpd.getMainPanel();
@@ -429,9 +436,9 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 		return ret;
 	}
 	public MainPanel[] getMainPanels() {
-		Vector matches = new Vector();
+		Vector<MainPanel> matches = new Vector<MainPanel>();
 		// check the detached plugins
-		Enumeration e = mpdialogs.elements();
+		Enumeration<JFrame> e = mpdialogs.elements();
 		while (e.hasMoreElements()) {
 			MainPanelFrame mpd = (MainPanelFrame) e.nextElement();
 			MainPanel mp = mpd.getMainPanel();

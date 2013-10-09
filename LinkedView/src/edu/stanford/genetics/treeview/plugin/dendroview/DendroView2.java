@@ -89,7 +89,7 @@ public class DendroView2 extends JPanel implements ConfigNodePersistent, MainPan
 	public DendroView2(DataModel dataModel, ConfigNode root, ViewFrame vFrame, String name) {
 		super.setName(name);
 		viewFrame = vFrame;
-		
+
 		this.setLayout(new MigLayout());
 		
 		if (root == null) {
@@ -828,7 +828,8 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 	/**
 	 * Colors
 	 */
-	private final Color BLUE2 = new Color(210, 230, 240, 255);
+	private final Color RED1 = new Color(240, 80, 50, 255);
+	private final Color BLUE2 = new Color(235, 240, 255, 255);
 	
 	/**
 	 * Lays out components in two DragGridPanel separated by a
@@ -881,9 +882,13 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 		panel.setLayout(new MigLayout("ins 0"));
 		registerView(globalview);
 		
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setLayout(new MigLayout());
+		buttonPanel.setOpaque(false);
+		
 		JButton saveButton = new JButton("Save Zoomed Image");
 		Dimension d = saveButton.getPreferredSize();
-  		d.setSize(d.getWidth()*2, d.getHeight()*2);
+  		d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
   		saveButton.setPreferredSize(d);
   		saveButton.setFont(new Font("Sans Serif", Font.PLAIN, 14));
   		saveButton.setOpaque(true);
@@ -902,6 +907,23 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 					
 					e.printStackTrace();
 				}	
+			}
+		});
+		
+		JButton closeButton = new JButton("Close");
+		Dimension d2 = closeButton.getPreferredSize();
+  		d2.setSize(d2.getWidth()*1.5, d2.getHeight()*1.5);
+  		closeButton.setPreferredSize(d2);
+  		closeButton.setFont(new Font("Sans Serif", Font.PLAIN, 14));
+  		closeButton.setOpaque(true);
+  		closeButton.setBackground(RED1);
+  		closeButton.setForeground(Color.white);
+  		closeButton.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				
+				viewFrame.setLoaded(false);
 			}
 		});
 		
@@ -939,7 +961,11 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 		
 		left.add(panel, "grow, push, height 80%:80%:, span, wrap");
 		left.add(statuspanel, "grow, push, height 10%:10%:20%");
-		left.add(saveButton);
+		
+		buttonPanel.add(saveButton, "span, alignx 50%, wrap");
+		buttonPanel.add(closeButton, "span, alignx 50%");
+		
+		left.add(buttonPanel);
 		
 		right.add(level1Pane, "push, grow");
 		

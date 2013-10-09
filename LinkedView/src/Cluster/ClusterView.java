@@ -185,7 +185,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		scrollPane = new JScrollPane(mainPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
 		//Add components to mainPanel
-		mainPanel.add(head1, "pushx, alignx 50%, wrap");
+		mainPanel.add(head1, "push, alignx 50%, height 8%:8%:8%, wrap");
 		mainPanel.add(initialPanel, "grow, push, span, wrap");
 		mainPanel.add(buttonPanel, "alignx 50%, height 15%::");
 		
@@ -249,8 +249,8 @@ public class ClusterView extends JPanel implements MainPanel {
 		
 		//Instance variables
 		private int nRows, nCols, sumMatrix; 
-		private JLabel sumM, label1, label2, label3, numColLabel, numRowLabel;
-		private JButton loadNew_button, cluster_button;
+		private JLabel sumM, label2, label3, numColLabel, numRowLabel;
+		private JButton loadNew_button, cluster_button, closeButton;
 		private JPanel numPanel;
 	    
 		//Constructor
@@ -264,20 +264,9 @@ public class ClusterView extends JPanel implements MainPanel {
 	    	
 	    	nCols = infoArray.getNumHeaders();
 	    	nRows = infoGene.getNumHeaders();
-	    	
-	    	label1 = new JLabel();
-	    	label1.setFont(new Font("Sans Serif", Font.PLAIN, 20));
-	    	if(dataModel.isLoaded()){
-	    		
-	    		label1.setText("Loading file successful!");
-	    	}
-	    	else{
-	    		
-	    		label1.setText("File loading unsuccessful :(");
-	    	}
 	   
 	    	label2 = new JLabel("Matrix Dimensions:");
-	    	label2.setFont(new Font("Sans Serif", Font.BOLD, 20));
+	    	label2.setFont(new Font("Sans Serif", Font.BOLD, 25));
 	    	
 	    	//Matrix Information
 	    	numPanel = new JPanel();
@@ -356,19 +345,31 @@ public class ClusterView extends JPanel implements MainPanel {
 					
 				}
 	    	});
+			
+			closeButton = new JButton("Close");
+			setButtonLayout(closeButton);
+	  		closeButton.setBackground(RED1);
+	  		closeButton.addActionListener(new ActionListener(){
+
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					
+					viewFrame.setLoaded(false);
+				}
+			});
 	    	
 			buttonPanel.add(loadNew_button, "alignx 50%, pushx");
-	    	buttonPanel.add(cluster_button, "alignx 50%, pushx");
+	    	buttonPanel.add(cluster_button, "alignx 50%, pushx, wrap");
+	    	buttonPanel.add(closeButton, "span, alignx 50%, pushx");
 	    	
 	    	numPanel.add(numRowLabel, "span, split 2, alignx 50%");
 	    	numPanel.add(numColLabel, "wrap");
 	    	numPanel.add(label3, "span, split 2, alignx 50%");
 	    	numPanel.add(sumM, "alignx 50%, wrap");
 	    	
-	    	this.add(label1, "top, wrap");
 	    	this.add(label2, "alignx 50%, wrap");
 	    	this.add(numPanel, "alignx 50%, pushx, wrap");
-	    	this.add(dataView, "push, grow, alignx 50%");
+	    	this.add(dataView, "push, grow, alignx 50%, width 80%:95%:95%");
 		  }
 	}
 	

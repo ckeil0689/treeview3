@@ -11,6 +11,9 @@ import net.miginfocom.swing.MigLayout;
 
 public class CFHelpDialog extends JDialog{
 	
+
+	private static final long serialVersionUID = 1L;
+	
 	public static final int DOPTION_1 = 1;
 	public static final int DOPTION_2 = 2;
 	public static final int DOPTION_3 = 3;

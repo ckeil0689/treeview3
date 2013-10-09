@@ -32,6 +32,9 @@ import javax.swing.*;
  * @version    @version $Revision: 1.6 $ $Date: 2004-12-21 03:28:13 $
  */
 public class CancelableSettingsDialog extends JDialog {
+
+	private static final long serialVersionUID = 1L;
+	
 	SettingsPanel settingsPanel;
 	JDialog settingsFrame;
 
@@ -56,6 +59,9 @@ public class CancelableSettingsDialog extends JDialog {
 
 
 	class ButtonPanel extends JPanel {
+
+		private static final long serialVersionUID = 1L;
+
 		ButtonPanel() {
 			JButton save_button    = new JButton("Save");
 			save_button.addActionListener(

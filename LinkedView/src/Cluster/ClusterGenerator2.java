@@ -3,7 +3,6 @@ package Cluster;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import javax.swing.JProgressBar;
 
@@ -394,16 +393,10 @@ public class ClusterGenerator2 {
 				
 			geneRow = type + geneGroups.get(row).get(0) + "X"; 
 			geneCol = type + geneGroups.get(column).get(0) + "X";
-
-			//fillRList(geneRow, geneCol);
 		}
 		
 		//if size of fusedGroup exceeds 2...
 		else{
-			
-			//variables for?
-			String geneCol2 = "";
-			String geneRow2 = "";
 			
 			//move from top down to find the last fusedGroup (history of clusters) containing any gene
 			//from current colGroup so that the correct NODE-connection can be found
@@ -418,9 +411,6 @@ public class ClusterGenerator2 {
 					
 					//assigns NODE # of last fusedGroup containing a colGroup element
 					geneCol = dataTable.get(j).get(0);
-						
-					geneCol2 =  type + intersect.get(0) + "X";
-
 					break;
 				}
 				//if the current fusedGroup in geneIntegerTable does not have any elements
@@ -428,8 +418,6 @@ public class ClusterGenerator2 {
 				else{
 						
 					geneCol = type + geneGroups.get(column).get(0) + "X";
-					geneCol2 = type + geneGroups.get(column).get(0) + "X";
-
 				}
 			}
 			
@@ -446,20 +434,14 @@ public class ClusterGenerator2 {
 					
 					//assigns NODE # of last fusedGroup containing a rowGroup element
 					geneRow = dataTable.get(j).get(0);
-					
-					geneRow2 = type + intersect.get(0) + "X";
-				
 					break;
 				}
 				else{
 					
 					//random fix to see what happens
 					geneRow = type + geneGroups.get(row).get(0) + "X";
-					geneRow2 = type + geneGroups.get(row).get(0) + "X";
 				}
 			}
-			
-			//fillRList(geneRow2, geneCol2);
 		}
 		
 		dataList.add(geneCol);
@@ -480,54 +462,6 @@ public class ClusterGenerator2 {
     	
     	System.out.println("ROList S: " + reorderedList.size());
     	System.out.println("ROList: " + reorderedList);
-    }
-    
-    /**
-     * method to fill reorderedList with the needed data 
-     */
-    public void fillRList(String geneRow, String geneCol){
-    	
-    	Random random = new Random();
-    	
-    	if(reorderedList.contains(geneRow) && reorderedList.contains(geneCol)){
-			
-		}
-		else if(reorderedList.contains(geneRow)){
-			
-			if(random.nextBoolean()){
-				
-				reorderedList.add(0, geneCol);
-			}
-			else{
-			
-				reorderedList.add(geneCol);
-			}
-			
-		}
-		else if(reorderedList.contains(geneCol)){
-			
-			if(random.nextBoolean()){
-				
-				reorderedList.add(0, geneRow);
-			}
-			else{
-				
-				reorderedList.add(geneRow);
-			}
-		}
-		else{
-			
-			if(random.nextBoolean()){
-				
-				reorderedList.add(0, geneRow);
-				reorderedList.add(1, geneCol);
-			}
-			else{
-				
-				reorderedList.add(geneRow);
-				reorderedList.add(reorderedList.size() - 1, geneCol);
-			}
-		}
     }
     
     /**

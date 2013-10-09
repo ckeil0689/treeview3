@@ -1,11 +1,19 @@
 package Cluster;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -27,14 +35,16 @@ public class DataViewPanel extends JPanel{
 	private List<List<Double>> arraysList;
 	private List<Double> gList;
 	
-	private String[][] geneNames;
-	private String[] title;
+	private String[] geneNames;
+	private String[][] headerArray;
 	
 	/**
 	 * Swing Components
 	 */
-	private JTable table, rowTable, geneTable;
+	private JTable table, headerTable;
 	private JScrollPane tableScroll;
+	
+	private final Color BLUE2 = new Color(210, 230, 240, 255);
 	
 	/**
 	 * Constructor
@@ -49,27 +59,85 @@ public class DataViewPanel extends JPanel{
 		matrix = model.getDataMatrix();
 		dataArray = matrix.getExprData();
 		
+		headerArray = model.getArrayHeaderInfo().getHeaderArray();
+		
 		gList = fillDList(dataArray);
 		arraysList = splitArrays(gList, model);
 		
-		geneNames = model.geneHeaderInfo.getHeaderArray();
-		title = model.geneHeaderInfo.getNames();
+		geneNames = new String[headerArray.length];
+		
+		for(int i = 0; i < headerArray.length; i++){
+			
+			geneNames[i] = headerArray[i][0];
+		}
 		
 		table = new JTable(new ClusterTableModel(arraysList, model));
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		
+		//Table Header Options
+		JTableHeader header = table.getTableHeader();
+		header.setReorderingAllowed(false);
+		header.setBackground(BLUE2);
 		
 		//create a scrollPane with the table in it 
 		tableScroll = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		table.setFillsViewportHeight(true);
 		
-		rowTable = new RowNumberTable(table);
-		geneTable = new JTable(geneNames, title);
+		DefaultTableModel model = new DefaultTableModel(){
 
-		//geneTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public int getColumnCount() {
+                return 1;
+            }
+
+            @Override
+            public boolean isCellEditable(int row, int col) {
+                return false;
+            }
+
+            @Override
+            public int getRowCount() {
+                return table.getRowCount();
+            }
+
+            @Override
+            public Class<?> getColumnClass(int colNum) {
+                switch (colNum) {
+                    case 0:
+                        return String.class;
+                    default:
+                        return super.getColumnClass(colNum);
+                }
+            }
+        };;
+		model.addColumn(geneNames);
 		
-		tableScroll.setRowHeaderView(geneTable);
-		tableScroll.setCorner(JScrollPane.UPPER_LEFT_CORNER, rowTable.getTableHeader());
+		headerTable = new JTable(model);
+		
+		int max = table.getRowCount();
+		for(int i = 0; i < max; i++){
+			
+			headerTable.setValueAt(geneNames[i], i, 0);
+		}
+		
+		headerTable.setShowGrid(true);
+		headerTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        headerTable.setPreferredScrollableViewportSize(new Dimension(100, 0));
+        headerTable.getColumnModel().getColumn(0).setCellRenderer(new TableCellRenderer() {
+
+            @Override
+            public Component getTableCellRendererComponent(JTable x, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+
+                Component component = table.getTableHeader().getDefaultRenderer().getTableCellRendererComponent(table, value, false, false, -1, -2);
+                ((JLabel) component).setHorizontalAlignment(SwingConstants.CENTER);
+                return component;
+            }
+        });
+		
+		tableScroll.setRowHeaderView(headerTable);
 		
 		this.add(tableScroll, "grow, push");
 		this.setVisible(true);

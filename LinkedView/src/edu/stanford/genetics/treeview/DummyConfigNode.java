@@ -33,8 +33,8 @@ import java.util.*;
  * @version $Revision: 1.9 $ $Date: 2005-12-05 05:27:53 $
  */
 public class DummyConfigNode implements ConfigNode {
-	private Vector kids;
-	private Hashtable attr;
+	private Vector<ConfigNode> kids;
+	private Hashtable<String, Object> attr;
 	private String name;
 	private static final String NULLVALUE = "Null String";
 
@@ -59,8 +59,8 @@ public class DummyConfigNode implements ConfigNode {
 	public DummyConfigNode(String tname) {
 		super();
 		name = tname;
-		kids = new Vector();
-		attr = new Hashtable();
+		kids = new Vector<ConfigNode>();
+		attr = new Hashtable<String, Object>();
 	}
 
 

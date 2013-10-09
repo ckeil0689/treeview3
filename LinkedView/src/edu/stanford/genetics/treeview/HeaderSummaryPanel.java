@@ -32,7 +32,11 @@ import javax.swing.event.ListSelectionListener;
 * enables editing of a headerSummary object.
 */
 public class HeaderSummaryPanel extends JPanel  implements SettingsPanel,Observer {
-		private HeaderInfo headerInfo;
+		
+	private static final long serialVersionUID = 1L;
+	
+	private HeaderInfo headerInfo;
+	
 	/** Setter for headerInfo */
 	public void setHeaderInfo(HeaderInfo headerInfo) {
 		if (this.headerInfo != null) this.headerInfo.deleteObserver(this);
@@ -57,7 +61,7 @@ public class HeaderSummaryPanel extends JPanel  implements SettingsPanel,Observe
 	public HeaderSummary getHeaderSummary() {
 		return headerSummary;
 	}
-	private JList headerList = new JList(new String [0]);
+	private JList<String> headerList = new JList<String>(new String [0]);
 	/** Setter for headerList */
 	public void setHeaderList(String [] headers) {
 		if (headers == null) {
@@ -67,13 +71,13 @@ public class HeaderSummaryPanel extends JPanel  implements SettingsPanel,Observe
 		}
 	}
 	/** Getter for headerList */
-	public JList getHeaderList() {
+	public JList<String> getHeaderList() {
 		return headerList;
 	}
 	
 	public void synchronizeFrom() {
 			int [] included = getHeaderSummary().getIncluded();
-			JList list = getHeaderList();
+			JList<String> list = getHeaderList();
 			if (list == null) return;
 			list.clearSelection();
 			for (int i = 0; i < included.length; i++) {

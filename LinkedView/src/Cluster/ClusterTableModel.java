@@ -16,6 +16,7 @@ public class ClusterTableModel extends AbstractTableModel{
 	public ClusterTableModel(List<List<Double>> tableList, ClusterModel currentModel){
 		this.tableList = tableList; 
 		this.currentModel = currentModel;
+
 	}
 	
 	//Depends on whether elements or arrays are used in DataViewDialog!

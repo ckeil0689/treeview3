@@ -41,6 +41,8 @@ import edu.stanford.genetics.treeview.model.KnnModel;
 public class LinkedViewFrame extends TreeViewFrame implements Observer
 {
 
+	private static final long serialVersionUID = 1L;
+	
 	private static String appName = "TreeView 3.0";
 	
 	public String getAppName() {
@@ -178,11 +180,14 @@ public class LinkedViewFrame extends TreeViewFrame implements Observer
 	  *
 	  */
 	 private class FileOptionsPanel extends Box {
-		 private JComboBox dataList;
+
+		private static final long serialVersionUID = 1L;
+		
+		private JComboBox<String> dataList;
 		 private JCheckBox quoteBox;
 		 public FileOptionsPanel() {
 			 super(BoxLayout.Y_AXIS);
-			 dataList = new JComboBox(FileSet.getStyles());	
+			 dataList = new JComboBox<String>(FileSet.getStyles());	
 			 dataList.setEditable(false);
 			 
 			 JPanel stylePanel = new JPanel();

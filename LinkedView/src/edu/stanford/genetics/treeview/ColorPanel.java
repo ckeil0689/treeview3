@@ -33,6 +33,9 @@ import javax.swing.*;
  * @version    @version $Revision: 1.4 $ $Date: 2004-12-21 03:28:13 $
  */
 public class ColorPanel extends JPanel {
+
+	private static final long serialVersionUID = 1L;
+	
 	ColorIcon colorIcon;
 	int type;
 	ColorSetI colorSet;

@@ -40,12 +40,19 @@ import javax.swing.table.AbstractTableModel;
  */
 
 public class GeneListMaker extends JDialog implements ConfigNodePersistent {
+
+	private static final long serialVersionUID = 1L;
+	
 	/**
 	 * @author aloksaldanha
 	 *
 	 * Table model to support preview of data. Probably should base export off of it for simplicity.
 	 */
 	private class GeneListTableModel extends AbstractTableModel {
+
+		private static final long serialVersionUID = 1L;
+		
+
 		/**
 		 * 
 		 * @return call to indicate table structure changed.
@@ -329,7 +336,10 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 		tableModel.dataChanged();
 	}
 	class FieldRow extends JPanel {
-		JList list;
+
+		private static final long serialVersionUID = 1L;
+		
+		JList<String> list;
 		JCheckBox exprBox, headerBox;
 		
 		public void includeAll() {
@@ -353,7 +363,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 		public FieldRow() {
 			super();
 			add(new JLabel("Field(s) to print: "));
-			list = new JList(headerInfo.getNames());
+			list = new JList<String>(headerInfo.getNames());
 			list.addListSelectionListener(notifier);
 			add(list);
 			exprBox = new JCheckBox("Expression Data?");
@@ -365,6 +375,10 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 		}
 	}
 	class FileRow extends JPanel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		JTextField file;
 		public void setFile(String newfile) {
 			file.setText(newfile);

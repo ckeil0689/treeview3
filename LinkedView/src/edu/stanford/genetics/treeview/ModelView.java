@@ -28,8 +28,6 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
-import edu.stanford.genetics.treeview.plugin.dendroview.ResizablePanel;
-
 /**
 * superclass, to hold info and code common to all model views
 *
