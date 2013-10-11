@@ -26,29 +26,30 @@ public class HierarchicalCluster {
 	
 	//Instance variables
 	private ClusterModel model;
-	private JProgressBar pBar, pBar2;
-	private JLabel opLabel;
 	private double[] currentArray;
 	private final String rowString = "GENE"; 
 	private final String colString = "ARRY";
 	private String choice, choice2;
 
-	
+	//GUI Components
 	private FinalOptionsPanel finalPanel;
 	private JPanel mainPanel;
+	private JProgressBar pBar, pBar2, pBar3, pBar4;
+	private JLabel opLabel;
 	
-	private int maxProgress_both = 5;
-	private int maxProgress_single = 3;
-	
-	private int prog_count = 0;
+	//Colors
+	private final Color GREEN1 = new Color(0, 200, 0, 255);
 	
 	//Constructor (building the object)
 	public HierarchicalCluster(ClusterModel model, TreeViewFrame viewFrame, ClusterView cView, 
-			JProgressBar pBar, JProgressBar pBar2, JLabel opLabel, double[] currentArray){
+			JProgressBar pBar, JProgressBar pBar2, JProgressBar pBar3, JProgressBar pBar4, 
+			JLabel opLabel, double[] currentArray){
 		
 		this.model = model;
 		this.pBar = pBar;
 		this.pBar2 = pBar2;
+		this.pBar3 = pBar3;
+		this.pBar4 = pBar4;
 		this.opLabel = opLabel;
 		this.currentArray = currentArray;
 		this.finalPanel = cView.getFinalPanel();
@@ -78,15 +79,6 @@ public class HierarchicalCluster {
 		
 		DataFormatter formattedData = new DataFormatter(model, currentList, pBar);
 		
-		if(!choice.contentEquals("Do Not Cluster") && !choice2.contentEquals("Do Not Cluster")){
-			
-			pBar2.setMaximum(maxProgress_both);
-		}
-		else{
-			
-			pBar2.setMaximum(maxProgress_single);
-		}
-		
 		//if user checked clustering for elements
 		if(!choice.contentEquals("Do Not Cluster")){
 			
@@ -110,20 +102,18 @@ public class HierarchicalCluster {
 			
 			rowDistances  = dCalc.getDistanceMatrix();
 			
-			prog_count++;
-			pBar2.setValue(prog_count);
+			pBar.setForeground(GREEN1);
 			
 			opLabel.setText("Clustering Data...");
 			
-			ClusterGenerator2 cGen = new ClusterGenerator2(model, rowDistances, pBar, 
+			ClusterGenerator2 cGen = new ClusterGenerator2(model, rowDistances, pBar2, 
 					rowString, similarityM);
 			
 			cGen.cluster();
 			
 			orderedRows = cGen.getReorderedList();
 			
-			prog_count++;
-			pBar2.setValue(prog_count);
+			pBar2.setForeground(GREEN1);
 			
 			mainPanel.revalidate();
 			mainPanel.repaint();
@@ -148,26 +138,24 @@ public class HierarchicalCluster {
 			opLabel.setForeground(new Color(240, 80, 50, 255));
 			opLabel.setText("Calculating Distance Matrix...");
 			
-			DistanceMatrixCalculator dCalc2 = new DistanceMatrixCalculator(sepCols, choice2, pBar);
+			DistanceMatrixCalculator dCalc2 = new DistanceMatrixCalculator(sepCols, choice2, pBar3);
 			
 			dCalc2.measureDistance();
 			
 			colDistances  = dCalc2.getDistanceMatrix();
 			
-			prog_count++;
-			pBar2.setValue(prog_count);
+			pBar3.setForeground(GREEN1);
 			
 			opLabel.setText("Clustering Data...");
 			
-			ClusterGenerator2 cGen2 = new ClusterGenerator2(model, colDistances, pBar, 
+			ClusterGenerator2 cGen2 = new ClusterGenerator2(model, colDistances, pBar4, 
 					colString, similarityM);
 			
 			cGen2.cluster();
 			
 			orderedCols = cGen2.getReorderedList();
 			
-			prog_count++;
-			pBar2.setValue(prog_count);
+			pBar4.setForeground(GREEN1);
 			
 			mainPanel.revalidate();
 			mainPanel.repaint();;
@@ -178,7 +166,6 @@ public class HierarchicalCluster {
 		
 		//also takes list of row elements because only one list can easily be consistently transformed and 
 		//fed into file writer to make a tab-delimited file
-		
 		opLabel.setText("Generating Data File...");
 		
 		mainPanel.revalidate();
@@ -190,9 +177,6 @@ public class HierarchicalCluster {
 		
 		mainPanel.revalidate();
 		mainPanel.repaint();
-		
-		prog_count++;
-		pBar2.setValue(prog_count);
 		
 		finalPanel.setPath(cdtGen.getFilePath());
 		finalPanel.setFile(cdtGen.getFile());

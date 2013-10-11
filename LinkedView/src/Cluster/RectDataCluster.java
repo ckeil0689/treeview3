@@ -117,7 +117,7 @@ abstract class Column {
 	protected String name;
 	protected int gap;
 	protected int num;
-	protected ArrayList dataArray;
+	protected ArrayList<Object> dataList;
 	protected boolean isDouble;
 	
 	/**
@@ -126,13 +126,13 @@ abstract class Column {
 	public Column(String name, int gap) {
 		this.name = name;
 		this.gap = gap;
-		dataArray = new ArrayList();
+		dataList = new ArrayList<Object>();
 		num = 0;
 	}
 
 	protected int incIndex(){
 		if (num % gap == 0){
-			dataArray.add(initData());
+			dataList.add(initData());
 		}
 		return (num ++)  % gap;
 	}
@@ -156,7 +156,7 @@ abstract class Column {
 
 	public int addData(String string){
 		int off = incIndex();
-		int ind = dataArray.size() - 1;
+		int ind = dataList.size() - 1;
 		addData(ind, off, string);
 		return num;
 	}
@@ -181,12 +181,12 @@ class DoubleColumn extends Column {
 	}
 	
 	public String getString(int index, int offset){
-		double data = ((double[])dataArray.get(index))[offset];
+		double data = ((double[])dataList.get(index))[offset];
 		return (data == Double.NaN)? null : "" + data;
 	}
 	
 	public double getDouble(int index, int offset){
-		return ((double[])dataArray.get(index))[offset];
+		return ((double[])dataList.get(index))[offset];
 	}
 	
 	protected void addData(int index, int offset, String string){
@@ -200,7 +200,7 @@ class DoubleColumn extends Column {
 			e.printStackTrace();
 			data = Double.NaN;
 		}
-		((double[])dataArray.get(index))[offset] = data;
+		((double[])dataList.get(index))[offset] = data;
 	}
 	
 	protected Object initData(){
@@ -262,12 +262,12 @@ class IntColumn extends Column {
 	 * @see edu.stanford.genetics.treeview.model.lbl.Column#getString(int, int)
 	 */
 	protected String getString(int index, int offset) {
-		double data = ((int[])dataArray.get(index))[offset];
+		double data = ((int[])dataList.get(index))[offset];
 		return (data == 0)? null : "" + data;
 	}
 
 	protected double getDouble(int index, int offset) {
-		return ((int[])dataArray.get(index))[offset];
+		return ((int[])dataList.get(index))[offset];
 	}
 
 	/* (non-Javadoc)
@@ -275,7 +275,7 @@ class IntColumn extends Column {
 	 */
 	protected void addData(int index, int offset, String string) {
 		int data = (string == null)? 0 : Integer.parseInt(string);
-		((int[])dataArray.get(index))[offset] = data;
+		((int[])dataList.get(index))[offset] = data;
 	}
 
 	/* (non-Javadoc)
@@ -297,7 +297,7 @@ class StringColumn extends Column {
 	}
 	
 	protected String getString(int index, int offset){
-		byte[] tmp = ((byte[][])dataArray.get(index))[offset];
+		byte[] tmp = ((byte[][])dataList.get(index))[offset];
 		return (tmp == null) ? null : new String(tmp);
 	}
 
@@ -308,7 +308,7 @@ class StringColumn extends Column {
 
 	protected void addData(int index, int offset, String string){
 		if (string != null){
-			((byte[][])dataArray.get(index))[offset] = string.getBytes();
+			((byte[][])dataList.get(index))[offset] = string.getBytes();
 		}
 	}
 	

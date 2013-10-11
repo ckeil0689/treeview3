@@ -30,18 +30,27 @@ import java.awt.event.*;
  * Clicking the close button hides the window.
  */
 class HidePanel extends Panel {
-    private final Window m_window;
+
+	private static final long serialVersionUID = 1L;
+	
+	private final Window m_window;
+	
     public HidePanel(Window window) {
-	m_window = window;
-	final Button hide_button = new Button("Close");
-	hide_button.addActionListener(new ActionListener() {
-		// called when close button hit
-		public void actionPerformed(ActionEvent evt) {
-		    if(evt.getSource() == hide_button) {
-			m_window.setVisible(false);
-		    }
-		}
-	    });
-	add(hide_button);
+		
+    	m_window = window;
+		final Button hide_button = new Button("Close");
+		
+		hide_button.addActionListener(new ActionListener() {
+			
+			// called when close button hit
+			public void actionPerformed(ActionEvent evt) {
+			    
+				if(evt.getSource() == hide_button) {
+				
+					m_window.setVisible(false);
+			    }
+			}
+		});
+		add(hide_button);
     }
 }

@@ -179,7 +179,7 @@ public class KnnModel extends TVModel implements DataModel {
 	 * @return
 	 */
 	private int [] getCountVector(HeaderInfo headerInfo, int columnIndex) {
-		Vector counts = new Vector();
+		Vector<Integer> counts = new Vector<Integer>();
 		for (int i = 0; i < headerInfo.getNumHeaders(); i++) {
 			Integer group = new Integer(headerInfo.getHeader(i,columnIndex));
 			Integer current = (Integer) counts.elementAt(group.intValue());

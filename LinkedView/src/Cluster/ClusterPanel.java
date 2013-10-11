@@ -34,63 +34,68 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 public class ClusterPanel extends JScrollPane {
-    
-    protected MessageCanvas messagecanvas;
-    protected Vector messages;
+
+	private static final long serialVersionUID = 1L;
+	
+	protected MessageCanvas messagecanvas;
+    protected Vector<String> messages;
 
     private String title;
 
-		class MessageCanvas extends JPanel {
-			
-			public void paintComponent(Graphics g) {
-				
-				int xoff = 0;
-				FontMetrics metrics = getFontMetrics(g.getFont());
-				int ascent = metrics.getAscent();
-				int height = 0;
-				Enumeration e = messages.elements();
-				Dimension size = getSize();
-				g.clearRect(0, 0, size.width, size.height);
-				
-				height += ascent;
-				g.drawString(title,-xoff, height);
+	class MessageCanvas extends JPanel {
 
-				
-				while (e.hasMoreElements()) {
-					String message = (String) e.nextElement();
-					if (message == null) continue;
-					height += ascent;
-					g.drawString(message, -xoff, height);
-				}
-			}
+		private static final long serialVersionUID = 1L;
+
+		public void paintComponent(Graphics g) {
 			
-			public Dimension getPreferredSize() {
-				FontMetrics metrics = getFontMetrics(getFont());
-				int ascent = metrics.getAscent();
-				// for title...
-				int height = ascent;
-				int width = metrics.stringWidth(title);
-				Enumeration e = messages.elements();
-				while (e.hasMoreElements()) {
-					String message = (String) e.nextElement();
-					if (message == null) continue;
-					height += ascent;
-					int length = metrics.stringWidth(message);
-					if (width < length) {width = length;}
-				}
-				return new Dimension(width, height);
-			}
+			int xoff = 0;
+			FontMetrics metrics = getFontMetrics(g.getFont());
+			int ascent = metrics.getAscent();
+			int height = 0;
+			Enumeration<String> e = messages.elements();
+			Dimension size = getSize();
+			g.clearRect(0, 0, size.width, size.height);
 			
-		}	
-		
-		public ClusterPanel() {
-			this(null);
+			height += ascent;
+			g.drawString(title,-xoff, height);
+
+			
+			while (e.hasMoreElements()) {
+				String message = (String) e.nextElement();
+				if (message == null) continue;
+				height += ascent;
+				g.drawString(message, -xoff, height);
+			}
 		}
+		
+		public Dimension getPreferredSize() {
+			FontMetrics metrics = getFontMetrics(getFont());
+			int ascent = metrics.getAscent();
+			// for title...
+			int height = ascent;
+			int width = metrics.stringWidth(title);
+			Enumeration<String> e = messages.elements();
+			while (e.hasMoreElements()) {
+				String message = (String) e.nextElement();
+				if (message == null) continue;
+				height += ascent;
+				int length = metrics.stringWidth(message);
+				if (width < length) {width = length;}
+			}
+			return new Dimension(width, height);
+		}
+		
+	}	
+	
+	public ClusterPanel() {
+		
+		this(null);
+	}
 
 	public ClusterPanel(String t) {
 		super();
 		title = t;
-		messages = new Vector(5,5);
+		messages = new Vector<String>(5,5);
 		messagecanvas = new MessageCanvas();
 		messagecanvas.setBackground(Color.white);
 		messagecanvas.setForeground(Color.black);

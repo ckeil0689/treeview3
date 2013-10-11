@@ -37,31 +37,44 @@ import javax.swing.*;
  *
  */
 public class LoadProgress extends JDialog {
-    private JProgressBar progressBar;
+
+	private static final long serialVersionUID = 1L;
+	
+	private JProgressBar progressBar;
     private JTextArea taskOutput;
     private String newline = "\n";
 	private JButton closeButton;
+	
+	private boolean canceled;
+	
 	public void clear(){
+		
 		taskOutput.setText("");
 	}
+	
     public void println(String s) {
-	taskOutput.append(s + newline);
-	taskOutput.setCaretPosition
+		
+    	taskOutput.append(s + newline);
+		taskOutput.setCaretPosition
 	    (taskOutput.getDocument().getLength());
     }
 	
 	public void setButtonText(String text) {
-	  closeButton.setText(text);
+	  
+		closeButton.setText(text);
 	}
+	
     public void setLength(int i) {
-		setIndeterminate(false);
+		
+    	setIndeterminate(false);
 		if (progressBar.getMaximum() != i) {
 			progressBar.setMinimum(0);
 			progressBar.setMaximum(i);
 		}
     }
     public void setValue(int i) {
-	progressBar.setValue(i);
+    	
+    	progressBar.setValue(i);
     }
     public void setIndeterminate(boolean flag) {
 	// actually, this only works in jdk 1.4 and up...
@@ -69,44 +82,54 @@ public class LoadProgress extends JDialog {
     }
 
     public LoadProgress(String title, Frame f) {
-	super(f, title, true);
-	progressBar = new JProgressBar();
-	progressBar.setValue(0);
-	progressBar.setStringPainted(true);
+    	
+		super(f, title, true);
+		
+		JPanel panel, contentPane;
+		
+		progressBar = new JProgressBar();
+		progressBar.setValue(0);
+		progressBar.setStringPainted(true);
+		
+		taskOutput = new JTextArea(10, 40);
+		taskOutput.setMargin(new Insets(5,5,5,5));
+		taskOutput.setEditable(false);
+		
 	
-	taskOutput = new JTextArea(10, 40);
-	taskOutput.setMargin(new Insets(5,5,5,5));
-	taskOutput.setEditable(false);
+		panel = new JPanel();
+		panel.add(progressBar);
+	    
+		contentPane = new JPanel();
+	        contentPane.setLayout(new BorderLayout());
+	        contentPane.add(panel, BorderLayout.NORTH);
+	        contentPane.add(new JScrollPane(taskOutput), BorderLayout.CENTER);
+	        
+		closeButton = new JButton("Cancel");
+		closeButton.addActionListener( new ActionListener() {
+			
+			public void actionPerformed(ActionEvent e) {
+				setCanceled(true);
+			    LoadProgress.this.dispose();
+			}
+		});
+		
+		panel = new JPanel();
+		panel.add(closeButton);
+		contentPane.add(panel, BorderLayout.SOUTH);
 	
-
-	JPanel panel = new JPanel();
-	panel.add(progressBar);
-    
-	JPanel contentPane = new JPanel();
-        contentPane.setLayout(new BorderLayout());
-        contentPane.add(panel, BorderLayout.NORTH);
-        contentPane.add(new JScrollPane(taskOutput), BorderLayout.CENTER);
-	closeButton = new JButton("Cancel");
-	closeButton.addActionListener( new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			setCanceled(true);
-		    LoadProgress.this.dispose();
-		}
-	    });
-	panel = new JPanel();
-	panel.add(closeButton);
-	contentPane.add(panel, BorderLayout.SOUTH);
-
-        contentPane.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        setContentPane(contentPane);
+	        contentPane.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+	        setContentPane(contentPane);
     }
-	boolean canceled;
+    
 	/** Setter for canceled */
 	public void setCanceled(boolean canceled) {
+		
 		this.canceled = canceled;
 	}
+	
 	/** Getter for canceled */
 	public boolean getCanceled() {
+		
 		return canceled;
 	}
 }

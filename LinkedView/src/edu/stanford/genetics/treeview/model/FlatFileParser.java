@@ -36,34 +36,47 @@ import java.util.*;
 */
 
 public class FlatFileParser {
-	private ProgressTrackable progressTrackable;
-	public ProgressTrackable getProgressTrackable() {
-		return progressTrackable;
-	}
-	public void setProgressTrackable(ProgressTrackable progressTrackable) {
-		this.progressTrackable = progressTrackable;
-	}
 	
+	private ProgressTrackable progressTrackable;
 	private String resource;
-	public String getResource() {
-		return resource;
-	}
-	public void setResource(String resource) {
-		this.resource = resource;
-	}
 	
 	/* resource types */
 	public static final int FILE = 0;
 	public static final int URL = 1;
 	private int resourceType = 0;
+	
+	private boolean cancelled = false;
+	
+	public ProgressTrackable getProgressTrackable() {
+		
+		return progressTrackable;
+	}
+	
+	public void setProgressTrackable(ProgressTrackable progressTrackable) {
+		
+		this.progressTrackable = progressTrackable;
+	}
+	
+	public String getResource() {
+		
+		return resource;
+	}
+	
+	public void setResource(String resource) {
+		
+		this.resource = resource;
+	}
+	
 	public int getResourceType() {
+		
 		return resourceType;
 	}
+	
 	public void setResourceType(int resourceType) {
+		
 		this.resourceType = resourceType;
 	}
 	
-	private boolean cancelled = false;
 	public boolean getCancelled() {
 		return cancelled;
 	}
@@ -71,7 +84,7 @@ public class FlatFileParser {
 		this.cancelled = cancelled;
 	}
 	
-	public Vector loadIntoTable() throws LoadException, IOException {
+	public Vector<String[]> loadIntoTable() throws LoadException, IOException {
 		InputStream stream;
 		if (getResource().startsWith("http://")) {
 			try {
@@ -118,8 +131,8 @@ public class FlatFileParser {
 	}
 	
 	/** returns a list of vectors of String [], representing data from file.*/
-	private Vector loadIntoTable(InputStream inputStream) throws IOException, LoadException {
-		Vector data = new Vector(100,100);
+	private Vector<String[]> loadIntoTable(InputStream inputStream) throws IOException, LoadException {
+		Vector<String[]> data = new Vector<String[]>(100,100);
 		MeteredStream ms = new MeteredStream(inputStream);
 		Reader reader = new BufferedReader(new InputStreamReader(ms));
 		
@@ -128,13 +141,13 @@ public class FlatFileParser {
 		// ignore leading blank lines...
 		while (st.nextToken() == FlatFileStreamTokenizer.TT_EOL) {}
 		st.pushBack();
-		Vector line = new Vector(10, 10);
+		Vector<String> line = new Vector<String>(10, 10);
 		while (st.nextToken() != FlatFileStreamTokenizer.TT_EOF) {
 			if (getCancelled() == true) break; // we're cancelled
 			st.pushBack();
 			loadLine(line,st);
 			String tokens[] = new String[line.size()];
-			Enumeration e = line.elements();
+			Enumeration<String> e = line.elements();
 			for (int i = 0; i < tokens.length; i++) {
 				tokens[i] = (String) e.nextElement();
 			}
@@ -144,7 +157,7 @@ public class FlatFileParser {
 		return data;
 	}
 	
-		private void loadLine(Vector line, FlatFileStreamTokenizer st) 
+		private void loadLine(Vector<String> line, FlatFileStreamTokenizer st) 
 	throws LoadException, IOException {
 		int tt = st.nextToken();
 		while ((tt != FlatFileStreamTokenizer.TT_EOL) && (tt != FlatFileStreamTokenizer.TT_EOF)) {

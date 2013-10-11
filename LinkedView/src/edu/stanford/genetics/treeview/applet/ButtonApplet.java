@@ -35,40 +35,57 @@ import edu.stanford.genetics.treeview.*;
 import edu.stanford.genetics.treeview.reg.RegEngine;
 
 public class ButtonApplet extends Applet {
+
+	private static final long serialVersionUID = 1L;
+	
 	private TreeViewApp app;
+	
 	/**  start method for running as applet */
 	public void start() {
+		
 		super.start();
 		loadPlugins();
+		
 		final String cdtFile = getParameter("cdtFile");
 		String cdtName = getParameter("cdtName");
 		String styleName = getParameter("styleName");
 		final int styleCode;
+		
 		if (styleName == null) {
+			
 			styleCode = FileSet.AUTO_STYLE;
 		} else {
+			
 			styleCode = FileSet.getStyleByName(styleName);
 		}
+		
 		if (cdtName == null) cdtName = cdtFile;
+		
 		if (cdtFile == null) {
+			
 			JOptionPane.showMessageDialog(this, "Must Provide cdtFile parameter in applet tag.");
 			add(new JLabel("Must Provide cdtFile parameter in applet tag."));
 		} else {
+			
 			app = new AppletApp(this, generateGlobalConfig());
 			JButton openButton = new JButton("View " + cdtName);
 			openButton.addActionListener(new ActionListener() {
+				
 				@SuppressWarnings("unused")
 				public void actionPerformed(ActionEvent e) {
 					
 					try {
 						if (cdtFile == null) {
+							
 							app.openNew();
 						} else {
+							
 							FileSet fileSet = new FileSet(makeWellFormedURL(cdtFile),"");
 							fileSet.setStyle(styleCode);
 							app.openNew(fileSet).setVisible(true);
 						}
 					} catch (LoadException ex) {
+						
 						JPanel temp = new JPanel();
 						temp.setLayout(new BoxLayout(temp, BoxLayout.Y_AXIS));
 						temp.add(new JLabel("Problems opening url " + cdtFile));
@@ -89,36 +106,49 @@ public class ButtonApplet extends Applet {
 	 * and just ask the system classloader to instantiate.
 	 */
 	private void loadPlugins() {
+		
 		ClassLoader cl = getClass().getClassLoader();
+		
 		if (getParameter("plugins") == null) {
+			
 			System.out.println("plugin parameter not set");
 			JOptionPane.showMessageDialog(this, "plugin parameter not set");
 			return;
 		}
+		
  		String plugins[] = getParameter("plugins").split(",");
 		int loadStatus[] = new int[plugins.length];
 		boolean showPopup = false;
+		
 		for (int i = 0; i < plugins.length;i++) {
+			
 			try {
-				Class c = cl.loadClass(plugins[i]);
+				
+				Class<?> c = cl.loadClass(plugins[i]);
+				
 				@SuppressWarnings("unused") // the creation of an instance registers it with the manager.
 				PluginFactory pp = (PluginFactory) c.newInstance();
 				loadStatus[i] = 0;
 			} catch (ClassNotFoundException e) {
+				
 				loadStatus[i] = 1;
 				showPopup = true;
 				e.printStackTrace();
 			} catch (InstantiationException e) {
+				
 				loadStatus[i] = 2;
 				showPopup = true;
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {
+				
 				loadStatus[i] = 3;
 				showPopup = true;
 				e.printStackTrace();
 			}
 		}
+		
 		if (showPopup == true) {
+			
 			String message = "";
 			for (int j = 0; j < loadStatus.length; j++) {
 				message += plugins[j];
@@ -149,9 +179,12 @@ public class ButtonApplet extends Applet {
 	* any reason it defaults to a generic XmlConfig.
 	*/
 	private XmlConfig generateGlobalConfig() {
+		
 		XmlConfig globalConfig = null;
 		String url          = getParameter("globalConfig");
+		
 		if (url != null) {
+			
 			try {
 				globalConfig = new XmlConfig(new java.net.URL(url), "ProgramConfig");
 				RegEngine.addBogusComplete(globalConfig.getNode("Registration"));
@@ -163,6 +196,7 @@ public class ButtonApplet extends Applet {
 			}
 
 		}
+		
 		if (globalConfig == null) {
 			globalConfig = new XmlConfig((java.net.URL) null, "ProgramConfig");
 		}
@@ -175,17 +209,18 @@ public class ButtonApplet extends Applet {
 	 * @param  url  url which we do not have authorization for.
 	 */
 	public void urlAccessViolation(String url) {
+		
 		TextArea mp      = new TextArea("Bad URL\n" +
 				"There was a security exception accessing the url\n" + url +
 				"\nremember, applets can only load urls from the same server");
 		final Frame top  = new Frame("Bad URL");
-		top.addWindowListener(
-			new WindowAdapter() {
+		
+		top.addWindowListener(new WindowAdapter(){
 
-				public void windowClosing(WindowEvent windowEvent) {
-					top.dispose();
-				}
-			});
+			public void windowClosing(WindowEvent windowEvent) {
+				top.dispose();
+			}
+		});
 
 		top.add(mp);
 		top.pack();
@@ -198,25 +233,29 @@ public class ButtonApplet extends Applet {
 	 * @param  url  url to show.
 	 */
 	public void showText(java.net.URL url) {
+		
 		try {
-			Reader st        = new InputStreamReader(url.openStream());
+			
+			final Frame top  = new Frame("Show URL");
 			int ch;
-			TextArea mp      = new TextArea();
+			Reader st = new InputStreamReader(url.openStream());;
+			TextArea mp = new TextArea();
 			ch = st.read();
+			
 			while (ch != -1) {
+				
 				char[] cbuf  = new char[1];
 				cbuf[0] = (char) ch;
 				mp.append(new String(cbuf));
 				ch = st.read();
 			}
-			final Frame top  = new Frame("Show URL");
-			top.addWindowListener(
-				new WindowAdapter() {
+			
+			top.addWindowListener(new WindowAdapter(){
 
-					public void windowClosing(WindowEvent windowEvent) {
-						top.dispose();
-					}
-				});
+				public void windowClosing(WindowEvent windowEvent) {
+					top.dispose();
+				}
+			});
 
 			top.add(mp);
 			top.pack();
@@ -246,17 +285,21 @@ public class ButtonApplet extends Applet {
 	 * @see java.applet.Applet#getAppletInfo()
 	 */
 	public String getAppletInfo() {
+		
 		return "Java Treeview Applet (" +TreeViewApp.getVersionTag() +"test )";
 	}
 
 	private String makeWellFormedURL(String rawURL) {
+		
 		if (rawURL.toLowerCase().startsWith("http")) {
+			
 			return rawURL;
 		} else if (rawURL.toLowerCase().startsWith("file")) {
+			
 			return rawURL;
 		} else {
+			
 			return getCodeBase().toString() + rawURL;
 		}
 	}
-
 }

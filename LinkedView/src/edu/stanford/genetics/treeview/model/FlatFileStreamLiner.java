@@ -45,7 +45,7 @@ public class FlatFileStreamLiner{
 	 */
 	private boolean pqs = true;
 	private StreamTokenizer st;
-	private Vector line;
+	private Vector<String> line;
 
 	/**
 	 *  Constructor for the FlatFileStreamTokenizer object
@@ -58,7 +58,7 @@ public class FlatFileStreamLiner{
 		pqs = parseQuotedStrings;
 		st = new StreamTokenizer(reader);
 		resetSyntax();
-		line = new Vector();
+		line = new Vector<String>();
 	   }
 	public void resetSyntax() {
 		st.resetSyntax();

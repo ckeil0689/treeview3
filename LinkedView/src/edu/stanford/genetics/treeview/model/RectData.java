@@ -31,23 +31,28 @@ import edu.stanford.genetics.treeview.LogBuffer;
  * Represents a rectangle of data, where some columns are strings and some columns are doubles.
  */
 public class RectData {
+	
 	private Column[] dataArray;
 	
 	/**
 	 * 
 	 */
 	public RectData(String[] names, ColumnFormat[] formats, int gap) {
+		
 		int col = names.length;
 		dataArray = new Column[col];
+		
 		for (int i = 0; i < names.length; i++){
 			dataArray[i] = ColumnFormat.initColumn(formats[i], names[i], gap);
 		}
 	}
 
 	public int addData(String[] data){
+		
 		int index = 0;
 		int col = getCol();
 		int len = data.length;
+		
 		for (int i = 0; i < col; i++){
 			if (i < len){
 				index = dataArray[i].addData(data[i]);
@@ -59,10 +64,12 @@ public class RectData {
 	}
 	
 	public String getString(int row, int col){
+		
 		return dataArray[col].getString(row);
 	}
 	
 	public double getDouble(int row, int col){
+		
 		return dataArray[col].getDouble(row);
 	}
 
@@ -75,15 +82,18 @@ public class RectData {
 	}
 	
 	public int getCol(){
+		
 		return dataArray.length;
 	}
 	
 	
 	public String getColumnName(int index){
+		
 		return dataArray[index].getName();
 	}
 	//make it works like Vector
 	public Object elementAt(int index){
+		
 		int col = getCol();
 		String[] string = new String[col];
 		if (index == 0){
@@ -99,10 +109,12 @@ public class RectData {
 	}
 	
 	public int size(){
+		
 		return getRow() + 1;
 	}
 	
 	public Object firstElement(){
+		
 		return elementAt(0);
 	}
 }
@@ -115,81 +127,93 @@ public class RectData {
 abstract class Column {
 
 	protected String name;
-	protected int gap;
-	protected int num;
-	protected ArrayList dataArray;
+	protected int gap, num;
+	protected ArrayList<Object> dataList;
 	protected boolean isDouble;
 	
-	/**
-	 * 
-	 */
-	public Column(String name, int gap) {
-		this.name = name;
-		this.gap = gap;
-		dataArray = new ArrayList();
-		num = 0;
-	}
-
-	protected int incIndex(){
-		if (num % gap == 0){
-			dataArray.add(initData());
-		}
-		return (num ++)  % gap;
-	}
-	
-	public String getName(){
-		return name;
-	}
-	
-	public String getString(int index){
-		int ind = index / gap;
-		int off = index % gap;
-		return getString(ind, off);
-	}
-
-	public double getDouble(int index){
-		int ind = index / gap;
-		int off = index % gap;
-		return getDouble(ind, off);
-	
-	}
-
-	public int addData(String string){
-		int off = incIndex();
-		int ind = dataArray.size() - 1;
-		addData(ind, off, string);
-		return num;
-	}
-	
-	public int getNum(){
-		return num;
-	}
-
 	protected abstract ColumnFormat getFormat();
 	protected abstract double getDouble(int index, int offset);
 	protected abstract String getString(int index, int offset);
 	protected abstract void addData(int index, int offset, String string);
 	protected abstract Object initData();
-
 	
+	/**
+	 * 
+	 */
+	public Column(String name, int gap) {
+		
+		this.name = name;
+		this.gap = gap;
+		dataList = new ArrayList<Object>();
+		num = 0;
+	}
+
+	protected int incIndex(){
+		
+		if (num % gap == 0){
+			
+			dataList.add(initData());
+		}
+		
+		return (num ++)  % gap;
+	}
+	
+	public String getName(){
+		
+		return name;
+	}
+	
+	public String getString(int index){
+		
+		int ind = index / gap;
+		int off = index % gap;
+		
+		return getString(ind, off);
+	}
+
+	public double getDouble(int index){
+		
+		int ind = index / gap;
+		int off = index % gap;
+		
+		return getDouble(ind, off);
+	}
+
+	public int addData(String string){
+		
+		int off = incIndex();
+		int ind = dataList.size() - 1;
+		addData(ind, off, string);
+		
+		return num;
+	}
+	
+	public int getNum(){
+		
+		return num;
+	}
 }
 
 class DoubleColumn extends Column {
 
 	public DoubleColumn(String name, int gap) {
+		
 		super(name, gap);
 	}
 	
 	public String getString(int index, int offset){
-		double data = ((double[])dataArray.get(index))[offset];
+		
+		double data = ((double[])dataList.get(index))[offset];
 		return (data == Double.NaN)? null : "" + data;
 	}
 	
 	public double getDouble(int index, int offset){
-		return ((double[])dataArray.get(index))[offset];
+		
+		return ((double[])dataList.get(index))[offset];
 	}
 	
 	protected void addData(int index, int offset, String string){
+		
 		double data;
 		if (string == null) {
 			data = Double.NaN;
@@ -200,31 +224,43 @@ class DoubleColumn extends Column {
 			e.printStackTrace();
 			data = Double.NaN;
 		}
-		((double[])dataArray.get(index))[offset] = data;
+		((double[])dataList.get(index))[offset] = data;
 	}
 	
 	protected Object initData(){
+		
 		return new double[gap];
 	}
 	
 	public ColumnFormat getFormat(){
+		
 		return ColumnFormat.DoubleFormat;
 	}
 }
 
 class ColumnFormat {
+	
+	public static final ColumnFormat StringFormat = new ColumnFormat("String Format");
+	public static final ColumnFormat DoubleFormat = new ColumnFormat("Double Format");
+	public static final ColumnFormat IntFormat = new ColumnFormat("Int Format");
+	
 	private final String name;
+	
 	private ColumnFormat(String name){
+		
 		this.name = name;
 	}
+	
 	/**
 	 * 
 	 */
 	public String toString(){
+		
 		return name;
 	}
 	
 	public static Column initColumn(ColumnFormat format, String name, int gap){
+		
 		if (format == StringFormat){
 			return new StringColumn(name, gap);
 		}else if (format == DoubleFormat){
@@ -233,12 +269,7 @@ class ColumnFormat {
 			return new IntColumn(name, gap);
 		}
 		return null;
-	}
-	
-	public static final ColumnFormat StringFormat = new ColumnFormat("String Format");
-	public static final ColumnFormat DoubleFormat = new ColumnFormat("Double Format");
-	public static final ColumnFormat IntFormat = new ColumnFormat("Int Format");
-	
+	}	
 }
 
 class IntColumn extends Column {
@@ -248,6 +279,7 @@ class IntColumn extends Column {
 	 * @param gap
 	 */
 	public IntColumn(String name, int gap) {
+		
 		super(name, gap);
 	}
 
@@ -255,6 +287,7 @@ class IntColumn extends Column {
 	 * @see edu.stanford.genetics.treeview.model.lbl.Column#getFormat()
 	 */
 	public ColumnFormat getFormat() {
+		
 		return ColumnFormat.IntFormat;
 	}
 
@@ -262,12 +295,14 @@ class IntColumn extends Column {
 	 * @see edu.stanford.genetics.treeview.model.lbl.Column#getString(int, int)
 	 */
 	protected String getString(int index, int offset) {
-		double data = ((int[])dataArray.get(index))[offset];
+		
+		double data = ((int[])dataList.get(index))[offset];
 		return (data == 0)? null : "" + data;
 	}
 
 	protected double getDouble(int index, int offset) {
-		return ((int[])dataArray.get(index))[offset];
+		
+		return ((int[])dataList.get(index))[offset];
 	}
 
 	/* (non-Javadoc)
@@ -275,13 +310,14 @@ class IntColumn extends Column {
 	 */
 	protected void addData(int index, int offset, String string) {
 		int data = (string == null)? 0 : Integer.parseInt(string);
-		((int[])dataArray.get(index))[offset] = data;
+		((int[])dataList.get(index))[offset] = data;
 	}
 
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.model.lbl.Column#initData()
 	 */
 	protected Object initData() {
+		
 		return new int[gap];
 	}
 }
@@ -289,30 +325,37 @@ class IntColumn extends Column {
 class StringColumn extends Column {
 
 	public StringColumn(String name, int gap) {
+		
 		super(name, gap);
 	}
 	
 	protected Object initData(){
+		
 		return new byte[gap][];
 	}
 	
 	protected String getString(int index, int offset){
-		byte[] tmp = ((byte[][])dataArray.get(index))[offset];
+		
+		byte[] tmp = ((byte[][])dataList.get(index))[offset];
 		return (tmp == null) ? null : new String(tmp);
 	}
 
 	protected double getDouble(int index, int offset){
+		
 		String string = getString(index, offset);
 		return (string == null)? Double.NaN : Double.parseDouble(string);
 	}
 
 	protected void addData(int index, int offset, String string){
+		
 		if (string != null){
-			((byte[][])dataArray.get(index))[offset] = string.getBytes();
+			
+			((byte[][])dataList.get(index))[offset] = string.getBytes();
 		}
 	}
 	
 	public ColumnFormat getFormat(){
+		
 		return ColumnFormat.StringFormat;
 	}
 }

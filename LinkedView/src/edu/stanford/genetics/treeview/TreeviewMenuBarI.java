@@ -17,7 +17,7 @@ import java.awt.event.ActionListener;
 public abstract class TreeviewMenuBarI {
 	
 	public static final String programMenu = "File";
-	public static final String documentMenu = "Settings";
+	public static final String documentMenu = "Edit";
 	public static final String analysisMenu = "Analysis";
 	public static final String exportMenu = "Export";
 	//public static final String presetsSubMenu = "Presets";

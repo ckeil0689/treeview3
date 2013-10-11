@@ -107,7 +107,6 @@ public class ClusterView extends JPanel implements MainPanel {
 	 */
 	private final Color BLUE1 = new Color(60, 180, 220, 255);
 	private final Color BLUE2 = new Color(110, 210, 255, 150);
-	private final Color GREEN1 = new Color(0, 200, 0, 255);
 	private final Color RED1 = new Color(240, 80, 50, 255);
 	private final Color BG_COLOR = new Color(230, 230, 230, 255);
 	
@@ -186,7 +185,7 @@ public class ClusterView extends JPanel implements MainPanel {
 
 		//Add components to mainPanel
 		mainPanel.add(head1, "push, alignx 50%, height 8%:8%:8%, wrap");
-		mainPanel.add(initialPanel, "grow, push, span, wrap");
+		mainPanel.add(initialPanel, "grow, pushx, span, wrap");
 		mainPanel.add(buttonPanel, "alignx 50%, height 15%::");
 		
 		//Add the scrollPane to ClusterView2 Panel
@@ -315,7 +314,7 @@ public class ClusterView extends JPanel implements MainPanel {
 				}
 	    	});
 	    	
-	    	cluster_button = new JButton("Hierarchical Cluster");
+	    	cluster_button = new JButton("Hierarchical Cluster >");
 	    	cluster_button = setButtonLayout(cluster_button);
 			cluster_button.addActionListener(new ActionListener(){
 	
@@ -452,7 +451,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		private JButton cluster_button, back_button, cancel_button, dendro_button;
 		private JComboBox<String> clusterChoice;
 		private JLabel status1, status2, method, error1, error2, opLabel;
-		private JProgressBar pBar, pBar2;
+		private JProgressBar pBar, pBar2, pBar3, pBar4, pBar5;
 		private final JPanel loadPanel, choicePanel;
 		private final SwingWorker<Void, Void> worker;
 		private final String[] clusterMethods = {"Single Linkage", "Centroid Linkage", "Average Linkage", "Complete Linkage"};
@@ -474,7 +473,8 @@ public class ClusterView extends JPanel implements MainPanel {
 		        		
 		        		HierarchicalCluster clusterTarget = 
 		        				new HierarchicalCluster(outer, viewFrame, 
-		        						ClusterView.this, pBar, pBar2, opLabel, dataArray);
+		        						ClusterView.this, pBar, pBar2, pBar3, 
+		        						pBar4, opLabel, dataArray);
 		        		
 		        		clusterTarget.hCluster(clusterMethod);
 		        		
@@ -490,9 +490,6 @@ public class ClusterView extends JPanel implements MainPanel {
 					
 				protected void done(){
 					
-					pBar.setForeground(GREEN1);
-					pBar2.setForeground(GREEN1);
-					
 					loadPanel.remove(opLabel);
 					buttonPanel.remove(cancel_button);
 					
@@ -502,6 +499,9 @@ public class ClusterView extends JPanel implements MainPanel {
 					status2 = new JLabel("File Path: " + path);
 					status2.setFont(new Font("Sans Serif", Font.ITALIC, 18));
 					
+					dendro_button.setEnabled(true);
+					buttonPanel.add(back_button, "pushx, alignx 50%");
+					buttonPanel.add(cluster_button, "pushx, alignx 50%");
 					buttonPanel.add(dendro_button, "pushx, alignx 50%");
 					
 					loadPanel.add(status1, "growx, pushx, wrap");
@@ -532,7 +532,7 @@ public class ClusterView extends JPanel implements MainPanel {
 			loadPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 	    	
 	  		//Button to go back to data preview
-	    	back_button = new JButton("Back");
+	    	back_button = new JButton("< Back");
 	    	back_button = setButtonLayout(back_button);
 			back_button.addActionListener(new ActionListener(){
 	
@@ -558,7 +558,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	    	});
 			
 			//Button to show DendroView
-	    	dendro_button = new JButton("Clustergram");
+	    	dendro_button = new JButton("Clustergram > ");
 	    	dendro_button = setButtonLayout(dendro_button);
 	  		dendro_button.addActionListener(new ActionListener(){
 		    		
@@ -591,42 +591,37 @@ public class ClusterView extends JPanel implements MainPanel {
 					final String choice2 = (String)arrayCombo.getSelectedItem();
 					clusterMethod = (String)clusterChoice.getSelectedItem();
 					
-					if(dendro_button.isVisible()){
-						
-						buttonPanel.remove(dendro_button);
-						
-						mainPanel.revalidate();
-						mainPanel.repaint();
-					}
-						
 					//needs at least one box to be selected otherwise display error
 					if(!choice.contentEquals("Do Not Cluster")||!choice2.contentEquals("Do Not Cluster")){
 						
 						loadPanel.removeAll();
 						buttonPanel.remove(cluster_button);
+						buttonPanel.remove(back_button);
 						
 						//precise ProgressBar
 						pBar = new JProgressBar();
-						pBar.setMinimum(0);
-						pBar.setStringPainted(true);
-						pBar.setForeground(BLUE1);
-						pBar.setUI(new BasicProgressBarUI(){
-							protected Color getSelectionBackground(){return Color.black;};
-							protected Color getSelectionForeground(){return Color.white;};
-						});
-						pBar.setVisible(true);
+						pBar = setPBarLayout(pBar);
+						pBar.setString("Row Distance Matrix");
 						
 						//overall ProgressBar
 						pBar2 = new JProgressBar();
-						pBar2.setMinimum(0);
-						pBar2.setStringPainted(true);
-						pBar2.setForeground(BLUE1);
-						pBar2.setUI(new BasicProgressBarUI(){
-							protected Color getSelectionBackground(){return Color.black;};
-							protected Color getSelectionForeground(){return Color.white;};
-						});
-						pBar2.setString("Overall Progress");
-						pBar2.setVisible(true);
+						pBar2 = setPBarLayout(pBar2);
+						pBar2.setString("Row Clustering");
+						
+						//overall ProgressBar
+						pBar3 = new JProgressBar();
+						pBar3 = setPBarLayout(pBar3);
+						pBar3.setString("Column Distance Matrix");
+						
+						//overall ProgressBar
+						pBar4 = new JProgressBar();
+						pBar4 = setPBarLayout(pBar4);
+						pBar4.setString("Column Clustering");
+						
+						//overall ProgressBar
+						pBar5 = new JProgressBar();
+						pBar5 = setPBarLayout(pBar5);
+						pBar5.setString("Saving");
 						
 						//Status label
 						opLabel = new JLabel();
@@ -651,13 +646,32 @@ public class ClusterView extends JPanel implements MainPanel {
 							
 						});
 						
-						loadPanel.add(opLabel, "alignx 50%, wrap");
-						loadPanel.add(pBar, "pushx, growx, span, wrap");
-						loadPanel.add(pBar2, "pushx, growx, span, wrap");
+//						loadPanel.add(opLabel, "alignx 50%, wrap");
+
+						if(!choice.contentEquals("Do Not Cluster")&& !choice2.contentEquals("Do Not Cluster")){
+							
+							loadPanel.add(pBar, "pushx, growx, span, wrap");
+							loadPanel.add(pBar2, "pushx, growx, span, wrap");
+							loadPanel.add(pBar3, "pushx, growx, span, wrap");
+							loadPanel.add(pBar4, "pushx, growx, span, wrap");
+						}
+						else if(!choice.contentEquals("Do Not Cluster")){
+							
+							loadPanel.add(pBar, "pushx, growx, span, wrap");
+							loadPanel.add(pBar2, "pushx, growx, span, wrap");
+						}
+						else if(!choice2.contentEquals("Do Not Cluster")){
+							
+							loadPanel.add(pBar3, "pushx, growx, span, wrap");
+							loadPanel.add(pBar4, "pushx, growx, span, wrap");
+						}
+						
+//						loadPanel.add(pBar5, "pushx, growx, span, wrap");
 						
 						optionsPanel.add(loadPanel, "pushx, growx, span, wrap");
 						
-						buttonPanel.add(cancel_button, "pushx");
+						buttonPanel.add(cancel_button, "pushx, alignx 50%");
+						buttonPanel.add(dendro_button, "pushx, alignx 50%");
 						mainPanel.add(buttonPanel, "pushx, alignx 50%, height 15%::");
 						
 						mainPanel.revalidate();
@@ -690,6 +704,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	    	choicePanel.add(method, "alignx 50%, pushx, wrap");
 	    	choicePanel.add(clusterChoice, "alignx 50%, wrap");
 	    	
+	    	dendro_button.setEnabled(false);
 	  		buttonPanel.add(back_button, "alignx 50%, pushx");
 	  		buttonPanel.add(cluster_button, "alignx 50%, pushx");
 	  		
@@ -861,6 +876,26 @@ public class ClusterView extends JPanel implements MainPanel {
 		combo.setBackground(Color.white);
 		
 		return combo;
+	}
+	
+	/**
+	 * Method to setup a JProgressBar
+	 * @param pBar
+	 * @param text
+	 * @return
+	 */
+	public JProgressBar setPBarLayout(JProgressBar pBar){
+		
+		pBar.setMinimum(0);
+		pBar.setStringPainted(true);
+		pBar.setForeground(BLUE1);
+		pBar.setUI(new BasicProgressBarUI(){
+			protected Color getSelectionBackground(){return Color.black;};
+			protected Color getSelectionForeground(){return Color.white;};
+		});
+		pBar.setVisible(true);
+		
+		return pBar;
 	}
 	
 	@Override

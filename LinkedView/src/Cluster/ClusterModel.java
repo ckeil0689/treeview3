@@ -179,13 +179,13 @@ public class ClusterModel extends Observable implements DataModel {
 		gtrHeaderInfo.hashIDs("NODEID");
 	}
 	
-	protected static Hashtable populateHash(HeaderInfo source, String headerName, Hashtable target) {
+	protected static Hashtable<String, Integer> populateHash(HeaderInfo source, String headerName, Hashtable<String, Integer> target) {
 		int indexCol = source.getIndex(headerName);
 		return populateHash(source, indexCol, target);
 	}
-	 protected static Hashtable populateHash(HeaderInfo source, int indexCol, Hashtable target) {
+	 protected static Hashtable<String, Integer> populateHash(HeaderInfo source, int indexCol, Hashtable<String, Integer> target) {
 		 if (target == null) {
-			 target = new Hashtable((source.getNumHeaders() * 4) /3, .75f);
+			 target = new Hashtable<String, Integer>((source.getNumHeaders() * 4) /3, .75f);
 		 } else {
 			 target.clear();
 		 }

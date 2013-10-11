@@ -244,7 +244,7 @@ public class FlatFileParserCluster {
 		  	br1.close();
 //		    Vector data = new FlatFile2RectData().load2(br);
 		  	BufferedReader br2 = new BufferedReader(new FileReader(args[0]));
-		  	Vector data2 = TestLoad.load(br2);
+		  	Vector<String[]> data2 = TestLoad.load(br2);
 		  	System.out.println("Data2 sie = " + data2.size());
 		  	br2.close();
 		  	for (int i = 0; i < data1.size() && i < 1000; i++){

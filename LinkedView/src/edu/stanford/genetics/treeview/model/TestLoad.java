@@ -20,8 +20,8 @@ import edu.stanford.genetics.treeview.LogBuffer;
  */
 public class TestLoad {
 
-	static public  Vector load(BufferedReader br) throws IOException{
-		Vector data = new Vector(100,100);
+	static public  Vector<String[]> load(BufferedReader br) throws IOException{
+		Vector<String[]> data = new Vector<String[]>(100,100);
 		
 		FlatFileStreamTokenizer st;
 		st = new FlatFileStreamTokenizer(br);
@@ -31,11 +31,11 @@ public class TestLoad {
 		
 		
 		while (st.nextToken() != FlatFileStreamTokenizer.TT_EOF) {
-			Vector line = new Vector(10, 10);
+			Vector<String> line = new Vector<String>(10, 10);
 			st.pushBack();
 			loadLine(line,st);
 			String tokens[] = new String[line.size()];
-			Enumeration e = line.elements();
+			Enumeration<String> e = line.elements();
 			for (int i = 0; i < tokens.length; i++) {
 				tokens[i] = (String) e.nextElement();
 			}
@@ -46,7 +46,7 @@ public class TestLoad {
 		return data;
 	}
 	
-		static public void loadLine(Vector line, FlatFileStreamTokenizer st) 
+		static public void loadLine(Vector<String> line, FlatFileStreamTokenizer st) 
 	throws IOException {
 		int tt = st.nextToken();
 		while ((tt != FlatFileStreamTokenizer.TT_EOL) && (tt != FlatFileStreamTokenizer.TT_EOF)) {

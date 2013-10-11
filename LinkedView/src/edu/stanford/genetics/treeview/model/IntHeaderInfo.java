@@ -15,7 +15,7 @@ public class IntHeaderInfo extends Observable implements HeaderInfo {
 	
 	private String [] prefixArray = new String[0];
 	private String [][] headerArray = new String[0][];
-	private Hashtable id2row = new Hashtable();
+	private Hashtable<String, Integer> id2row = new Hashtable<String, Integer>();
 	
 	public void hashIDs(String header) {
 		int index = getIndex(header);

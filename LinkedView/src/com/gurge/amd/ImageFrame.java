@@ -18,12 +18,16 @@ import java.io.IOException;
  * @author <a href="http://www.gurge.com/amd/">Adam Doppelt</a>
  */
 public class ImageFrame extends Frame {
-    int left = -1;
-    int top;
-    Image image;
+
+	private static final long serialVersionUID = 1L;
+	
+	private int left = -1;
+    private int top;
+    private Image image;
         
     ImageFrame() {
-        setLayout(null);
+        
+    	setLayout(null);
         setSize(100, 100);
     }
 
@@ -31,12 +35,15 @@ public class ImageFrame extends Frame {
      * Set the image from a file.
      */
     public void setImage(File file) throws IOException {
-        // load the image
+        
+    	// load the image
         Image image = getToolkit().getImage(file.getAbsolutePath());
         
         // wait for the image to entirely load
         MediaTracker tracker = new MediaTracker(this);
         tracker.addImage(image, 0);
+        
+        
         try {
             tracker.waitForID(0);
         } catch (InterruptedException e) {
@@ -56,7 +63,8 @@ public class ImageFrame extends Frame {
      * Set the image from an AWT image object.
      */
     public void setImage(Image image) {
-        this.image = image;
+        
+    	this.image = image;
         setVisible(true);
     }
 
@@ -64,7 +72,8 @@ public class ImageFrame extends Frame {
      * Set the image from an indexed color array.
      */
     public void setImage(int palette[], int pixels[][]) {
-        int w = pixels.length;
+        
+    	int w = pixels.length;
         int h = pixels[0].length;
         int pix[] = new int[w * h];
 
@@ -82,7 +91,8 @@ public class ImageFrame extends Frame {
      * Set the image from a 2D RGB pixel array.
      */
     public void setImage(int pixels[][]) {
-        int w = pixels.length;
+        
+    	int w = pixels.length;
         int h = pixels[0].length;
         int pix[] = new int[w * h];
 
@@ -100,30 +110,35 @@ public class ImageFrame extends Frame {
      * Set the image from a 1D RGB pixel array.
      */
     public void setImage(int w, int h, int pix[]) {
-        setImage(createImage(new MemoryImageSource(w, h, pix, 0, w)));
+        
+    	setImage(createImage(new MemoryImageSource(w, h, pix, 0, w)));
     }
 
     /**
      * Get the image.
      */
     public Image getImage() {
-        return image;
+       
+    	return image;
     }
 
     /**
      * Overridden for double buffering.
      */
     public void update(Graphics g) {
-        paint(g);
+        
+    	paint(g);
     }
 
     /**
      * Paint the image.
      */
     public void paint(Graphics g) {
-        // the first time through, figure out where to draw the image
+        
+    	// the first time through, figure out where to draw the image
         if (left == -1) {
-            Insets insets = getInsets();
+            
+        	Insets insets = getInsets();
             left = insets.left;
             top = insets.top;
                 
@@ -134,7 +149,8 @@ public class ImageFrame extends Frame {
     }
 
     public static void main(String args[]) throws IOException {
-        ImageFrame f = new ImageFrame();
+        
+    	ImageFrame f = new ImageFrame();
         f.setImage(new File(args[0]));
     }
 }
