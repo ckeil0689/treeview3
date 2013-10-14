@@ -30,7 +30,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.Observable;
@@ -84,9 +83,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
  *
  */
 public class TreeViewFrame extends ViewFrame implements FileSetListener {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 1L;
 
 	/** override in subclasses? */
@@ -96,21 +93,40 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 * Colors
 	 */
 	private final Color BLUE1 = new Color(60, 180, 220, 255);
-	private final Color RED1 = new Color(240, 80, 50, 255);
+	//private final Color RED1 = new Color(240, 80, 50, 255);
 	private final Color GRAY1 = new Color(150, 150, 150, 255);
-
+	private final Color GRAY2 = new Color(120, 120, 120, 255);
+	
+	/**
+	 * Instance Variables
+	 */
 	private ProgramMenu programMenu;
 	
-	public String getAppName() {
-		
-		return appName;
-	}
+	private boolean loaded;
 
+	protected JPanel waiting;
+	protected MainPanel running;
+
+	protected DataModel dataModel;
+	
+	private TVModel tvModel_gen;
+	private ClusterModel clusterModel_gen;
+	
+	
+	/**
+	 * Constructor
+	 * @param treeview
+	 */
 	public TreeViewFrame(TreeViewApp treeview) {
 		
 		this(treeview, appName);
 	}
-
+	
+	/**
+	 * Main Constructor
+	 * @param treeview
+	 * @param appName
+	 */
 	public TreeViewFrame(TreeViewApp treeview, String appName) {
 		
 		super(appName);
@@ -125,6 +141,11 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 		centerOnscreen();
 		setLoaded(false);
+	}
+	
+	public String getAppName() {
+		
+		return appName;
 	}
 
 	protected void setupMenuBar() {
@@ -164,21 +185,22 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 	protected void setupPresets() {}
 
-	public UrlPresets getGeneUrlPresets() {
+	public UrlPresets getGeneUrlPresets(){
 		
 		return treeView.getGeneUrlPresets();
 	}
 
-	public UrlPresets getArrayUrlPresets() {
+	public UrlPresets getArrayUrlPresets(){
 		
 		return treeView.getArrayUrlPresets();
 	}
 
-	public void closeWindow() {
+	public void closeWindow(){
 		
 		if (running != null) {
 			running.syncConfig();
 		}
+		
 		super.closeWindow();
 	}
 
@@ -289,6 +311,33 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		try {
 			tvModel.loadNewNW(fileSet);
 			setDataModel(tvModel);
+		} catch (LoadException e) {
+			if (e.getType() != LoadException.INTPARSE)
+				JOptionPane.showMessageDialog(this, e);
+			throw e;
+		}
+	}
+	
+	//>>>>>>>>>>>>>>>TEST
+	/**
+	 * r * This is the workhorse. It creates a new DataModel of the file, and
+	 * then sets the Datamodel. A side effect of setting the datamodel is to
+	 * update the running window.
+	 */
+	public void loadGeneralFileSet(FileSet fileSet, ClusterFileSet fileSet2)
+			throws LoadException {
+		
+		tvModel_gen = new TVModel();
+		tvModel_gen.setFrame(this);
+		
+		clusterModel_gen = new ClusterModel();
+		clusterModel_gen.setFrame(this);
+		
+		try {
+			
+			tvModel_gen.loadNew(fileSet);
+			clusterModel_gen.loadNew(fileSet2); 
+
 		} catch (LoadException e) {
 			if (e.getType() != LoadException.INTPARSE)
 				JOptionPane.showMessageDialog(this, e);
@@ -615,6 +664,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	}
 
 	protected void populateExportMenu(TreeviewMenuBarI menubar2) {
+		
 		/*
 		 * MenuItem menuItem2 = new MenuItem("Export to Text File... ");
 		 * menuItem2.addActionListener(new ActionListener() { public void
@@ -763,7 +813,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 					
 					public void actionPerformed(ActionEvent actionEvent) {
 						
-						openFile(false, false);
+						openFile();
+						resetLayout();
 					}
 				});
 				menubar.setAccelerator(KeyEvent.VK_O);
@@ -916,6 +967,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		}
 
 		public void actionPerformed(ActionEvent argActionEvent) {
+			
 			final ActionEvent actionEvent = argActionEvent;
 			Runnable update = new Runnable() {
 				public void run() {
@@ -1193,59 +1245,17 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		*/
 	}
 	
-//	/**EDIT 
-//	 * @author: Chris Keil
-//	 * 
-//	 * Adding Menu for Clustering Option
-//	 */
-//	protected void populateClusterMenu(TreeviewMenuBarI menubar2) {
-//		menubar.addMenuItem("Load File for Clustering", new ActionListener() {
-//			public void actionPerformed(ActionEvent actionEvent) {
-//				try {
-//					ClusterFileSet fileSet = clusterSelection();
-//					loadClusterFileSet(fileSet); 
-//					setLoaded(true);
-//				} catch (LoadException e) {
-//					if ((e.getType() != LoadException.INTPARSE)
-//							&& (e.getType() != LoadException.NOFILE)) {
-//						LogBuffer.println("Could not open file: "
-//								+ e.getMessage());
-//						e.printStackTrace();
-//						}
-//				}
-//				//-------------------------------------
-//
-//				//-------------------------------------
-//			}
-//		});
-//		menubar.setAccelerator(KeyEvent.VK_L);
-//	}
-//	
-//	/**
-//	 * EDIT END
-//	 */
 
 	public double noData() {
 		return DataModel.NODATA;
 	}
 
 	TreeViewApp treeView;
-
-
-
-	private boolean loaded;
-
-	protected JPanel waiting;
-
-	protected MainPanel running;
-
-	protected DataModel dataModel;
-	
 	
 	public void setupLayout(){
 		
-		JPanel title_bg, labelPanel;
-		JLabel jl, jl2, ques, clus, viz;
+		JPanel title_bg;
+		JLabel jl, jl2, load;
 		
 		waiting = new JPanel();
 		waiting.setLayout(new MigLayout("ins 0"));
@@ -1263,13 +1273,41 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		jl2.setFont(new Font("Sans Serif", Font.BOLD, 50));
 		jl2.setForeground(Color.white);
 		
+		load = new JLabel("Load Your Data");
+		load.setFont(new Font("Sans Serif", Font.PLAIN, 45));
+		load.setForeground(BLUE1);
+		
+		addMListener(load);
+		
+		title_bg.add(jl, "push, alignx 50%, span, wrap");
+		title_bg.add(jl2, "push, alignx 50%, span");
+		
+		waiting.add(title_bg, "pushx, growx, alignx 50%, span, height 20%::, wrap");
+		waiting.add(load, "push, span, alignx 50%");
+	}
+	
+	public void resetLayout(){
+		
+		JPanel confirmPanel, labelPanel;
+		JLabel confirm, ques, clus, viz, loadNew;
+		
+		waiting.removeAll();
+		
+		confirmPanel = new JPanel();
+		confirmPanel.setLayout(new MigLayout());
+		confirmPanel.setOpaque(false);
+		
 		labelPanel = new JPanel();
 		labelPanel.setLayout(new MigLayout());
 		labelPanel.setOpaque(false);
 		
+		confirm = new JLabel("Successfully loaded file.");
+		confirm.setFont(new Font("Sans Serif", Font.BOLD, 30));
+		confirm.setForeground(GRAY1);
+		
 		ques = new JLabel("Cluster or visualize your data?");
 		ques.setFont(new Font("Sans Serif", Font.PLAIN, 45));
-		ques.setForeground(GRAY1);
+		ques.setForeground(GRAY2);
 		
 		clus = new JLabel("Cluster");
 		clus.setFont(new Font("Sans Serif", Font.PLAIN, 55));
@@ -1279,54 +1317,69 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		viz.setFont(new Font("Sans Serif", Font.PLAIN, 55));
 		viz.setForeground(BLUE1);
 		
-		addMListener(clus, true, false);
-		addMListener(viz, true, true);
+		loadNew = new JLabel("Load New Data");
+		loadNew.setFont(new Font("Sans Serif", Font.PLAIN, 30));
+		loadNew.setForeground(BLUE1);
 		
-		title_bg.add(jl, "push, alignx 50%, span, wrap");
-		title_bg.add(jl2, "push, alignx 50%, span");
+		addMListener2(clus, false);
+		addMListener2(viz, true);
 		
+		addMListener3(loadNew);
+		
+		confirmPanel.add(confirm, "push, alignx 50%, span, wrap");
+		confirmPanel.add(loadNew, "push, alignx 50%, span");
 		labelPanel.add(ques, "push, alignx 50%, span, wrap");
-		waiting.add(title_bg, "pushx, growx, alignx 50%, span, height 20%::, wrap");
+		
+		waiting.add(confirmPanel, "pushx, alignx 50%, height 15%:15%:, span, wrap");
 		waiting.add(labelPanel, "alignx 50%, height 30%::, span, wrap");
 		waiting.add(clus, "pushx, alignx 50%");
 		waiting.add(viz, "pushx, alignx 50%");
-
-	}
-
-	public void addMListener(final JLabel label, final boolean filter, final boolean viz){
 		
-		label.addMouseListener(new MouseListener(){
+		waiting.repaint();
+		waiting.revalidate();
+	}
+	
+	public void addMListener(final JLabel label){
+		
+		label.addMouseListener(new SSMouseListener(label){
 
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				
-				openFile(filter, viz);
+				openFile();
 			}
+		});
+	}
+
+	public void addMListener2(final JLabel label, final boolean viz){
+		
+		label.addMouseListener(new SSMouseListener(label){
 
 			@Override
-			public void mouseEntered(MouseEvent arg0) {
+			public void mouseClicked(MouseEvent arg0) {
 				
-				label.setForeground(RED1);
+				if(viz){
+					
+					setDataModel(tvModel_gen);
+					setLoaded(true);
+				} else{
+					
+					setClusterDataModel(clusterModel_gen);
+					setLoaded(true);
+				}
 			}
+		});
+	}
+	
+	public void addMListener3(final JLabel label){
+		
+		label.addMouseListener(new SSMouseListener(label){
 
 			@Override
-			public void mouseExited(MouseEvent arg0) {
+			public void mouseClicked(MouseEvent arg0) {
 				
-				label.setForeground(BLUE1);
-			}
-
-			@Override
-			public void mousePressed(MouseEvent arg0) {
-				
-				label.setForeground(Color.LIGHT_GRAY);
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent arg0) {
-				
-				label.setForeground(BLUE1);
-			}
-			
+				openFile();
+			}		
 		});
 	}
 	
@@ -1334,30 +1387,41 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 * This method opens a file dialog to open either the visualization view or the cluster view
 	 * depending on which file type is chosen.
 	 */
-	public void openFile(boolean filter, boolean viz){
+	public void openFile(){
 		
 		try {
 			
-			File file = selectFile(filter, viz);
-			String fileName = file.getName();
+			File file = selectFile();
+			//String fileName = file.getName();
 			
-			if(fileName.endsWith("cdt") && viz){
-				
-				FileSet fileSet = getFileSet(file);
-				loadFileSet(fileSet);
-				fileSet = fileMru.addUnique(fileSet);
-				fileMru.setLast(fileSet);
-				fileMru.notifyObservers();
-				setLoaded(true);
-			}
-			else{
-				
-				ClusterFileSet fileSet = getClusterFileSet(file);
-				loadClusterFileSet(fileSet); 
-				setLoaded(true);
-			}
+//			if(fileName.endsWith("cdt")){
+//				
+//				FileSet fileSet = getFileSet(file);
+//				loadFileSet(fileSet);
+//				fileSet = fileMru.addUnique(fileSet);
+//				fileMru.setLast(fileSet);
+//				fileMru.notifyObservers();
+//				setLoaded(true);
+//			}
+//			else{
+//				
+//				ClusterFileSet fileSet = getClusterFileSet(file);
+//				loadClusterFileSet(fileSet); 
+//				setLoaded(true);
+//			}
+			
+			FileSet fileSet = getFileSet(file);
+			ClusterFileSet fileSet2 = getClusterFileSet(file);
+			
+			loadGeneralFileSet(fileSet, fileSet2);
+			
+			fileSet = fileMru.addUnique(fileSet);
+			fileMru.setLast(fileSet);
+			
+			resetLayout();
 
 		} catch (LoadException e) {
+			
 			if ((e.getType() != LoadException.INTPARSE)
 					&& (e.getType() != LoadException.NOFILE)) {
 				LogBuffer.println("Could not open file: "
@@ -1373,6 +1437,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 * @throws LoadException
 	 */
 	public void setClusterDataModel(DataModel newModel) {									//used to create the dendroview with setupRunning
+		
 		if (dataModel != null)
 			dataModel.clearFileSetListeners();
 		dataModel = newModel;
@@ -1388,6 +1453,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 * @throws LoadException
 	 */
 	public void setDataModel(DataModel newModel) {									
+		
 		if (dataModel != null)
 			dataModel.clearFileSetListeners();
 		dataModel = newModel;
@@ -1400,6 +1466,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	
 	/** Getter for dataModel */
 	public DataModel getDataModel() {
+		
 		return dataModel;
 	}
 	
@@ -1465,13 +1532,14 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 	@Override
 	public void onFileSetMoved(FileSet fileset) {
+		
 		setLoadedTitle();
 	}
 
 	@Override
 	public void onFileSetMoved(ClusterFileSet fileset) {
-		setLoadedTitle();
 		
+		setLoadedTitle();
 	}
 
 }

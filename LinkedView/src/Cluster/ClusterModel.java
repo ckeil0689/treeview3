@@ -36,20 +36,58 @@ import edu.stanford.genetics.treeview.XmlConfig;
 import edu.stanford.genetics.treeview.model.IntHeaderInfo;
 
 public class ClusterModel extends Observable implements DataModel {
-  /*
-   * This not-so-object-oriented hack is in those rare instances
-   * where it is not enough to know that we've got a DataModel.
-   */
-	public String getType() {
-		return "ClusterModel";
-	}
-	/** has model been successfully loaded? */
-	boolean loaded = false;
+  
+	/**
+	 * Instance Variables
+	 */
+	int appendIndex = -1;
+	
+    protected Frame frame;
+    protected ClusterFileSet source = null;
+    protected String  dir = null;
+    protected String  root;
+
+	protected ClusterDataMatrix dataMatrix;
+	
+    protected IntHeaderInfoCluster arrayHeaderInfo, geneHeaderInfo, atrHeaderInfo, gtrHeaderInfo;
+	protected boolean aidFound = false;
+	protected boolean gidFound = false;
+		
+    protected boolean eweightFound = false;
+    protected boolean gweightFound = false;
+    protected XmlConfig documentConfig;
+    
+    private boolean loaded = false;
+	
 	/*
 	 * For cases where we are comparing two models (this needs to be changed).
 	 */
-	ClusterModel compareModel = null;
-	int extraCompareExpr = 0;
+	private ClusterModel compareModel = null;
+	private int extraCompareExpr = 0;
+	
+	/**
+	 * Main constructor
+	 */
+    public ClusterModel(){
+    	
+    	super();
+    	
+	  /* build ClusterModel, initially empty... */	
+	  	geneHeaderInfo = new IntHeaderInfoCluster();
+	  	arrayHeaderInfo = new IntHeaderInfoCluster();
+	  	atrHeaderInfo = new IntHeaderInfoCluster();
+		gtrHeaderInfo = new IntHeaderInfoCluster();
+		dataMatrix = new ClusterDataMatrix();
+    }
+	
+	/*
+	 * This not-so-object-oriented hack is in those rare instances
+	 * where it is not enough to know that we've got a DataModel.
+	 */
+	public String getType() {
+		
+		return "ClusterModel";
+	}
 	
   	public void setModelForCompare(DataModel m)
   	{
@@ -65,246 +103,325 @@ public class ClusterModel extends Observable implements DataModel {
   		}
   		hasChanged();
   	}
+  	
     // accessor methods	
 	public IntHeaderInfoCluster getGeneHeaderInfo() {
-	  return geneHeaderInfo;
+	  
+		return geneHeaderInfo;
 	}
+	
 	public IntHeaderInfoCluster getArrayHeaderInfo() {
-	  return arrayHeaderInfo;
+	  
+		return arrayHeaderInfo;
 	}
+	
 	public ClusterDataMatrix getDataMatrix() {
 		
 		return dataMatrix;
 	}
+	
 	public HeaderInfo getAtrHeaderInfo() {
+		
 		return atrHeaderInfo;
 	}
+	
 	public HeaderInfo getGtrHeaderInfo() {
+		
 		return gtrHeaderInfo;
 	}
+	
     public boolean gweightFound() {
-	return gweightFound;
+	
+    	return gweightFound;
     }
 
-    public int nGene() {return geneHeaderInfo.getNumHeaders();}
-    public int nExpr() {return arrayHeaderInfo.getNumHeaders() + extraCompareExpr;}
+    public int nGene(){
+    	
+    	return geneHeaderInfo.getNumHeaders();
+    }
+    
+    public int nExpr(){
+    	
+    	return arrayHeaderInfo.getNumHeaders() + extraCompareExpr;
+    }
 
 	public void setExprData(double [] newData) {
 		dataMatrix.setExprData(newData);
 	}
     
 	public double getValue(int x, int y) {
+		
 		int nexpr = nExpr();
 		int ngene = nGene();
-		if(x >= nexpr + 2)
-		{
-			if (compareModel != null)
+		
+		if(x >= nexpr + 2){
+			
+			if (compareModel != null){
+				
 				return compareModel.getValue(x - (nexpr + 2), y); // check offsets
+			}
 		}
-		else if(x >= nexpr && y < ngene)
-		{
+		else if(x >= nexpr && y < ngene){
+			
 			return 0; // gray border
 		}
-		if ((x < nexpr && y < ngene) &&	(x >= 0    && y >= 0))
-		{
+		if ((x < nexpr && y < ngene) &&	(x >= 0    && y >= 0)){
+			
 			return dataMatrix.getValue(x, y);
 		}
+		
 		return NODATA;
     }
 
-	public boolean aidFound() {return aidFound;}
-	void aidFound(boolean newVal) {aidFound = newVal;}
-    public boolean gidFound() {return gidFound;};
-	void gidFound(boolean newVal) {gidFound = newVal;}
+	public boolean aidFound(){
+		
+		return aidFound;
+	}
+	
+	public void aidFound(boolean newVal){
+		
+		aidFound = newVal;
+	}
+	
+    public boolean gidFound(){
+    	
+    	return gidFound;
+    };
+    
+	public void gidFound(boolean newVal){
+		
+		gidFound = newVal;
+	}
 
 	public void setSource(ClusterFileSet source) {
+		
 		this.source = source;
 		setChanged();
 	}
+	
 	public String getSource() {
-	  if (source == null) {
-		return "No Data Loaded";
-	  } else {
-		return source.getTxt();
-	  }
+	  
+		if (source == null){
+			return "No Data Loaded";
+		} 
+		else{
+		
+			return source.getTxt();
+		}
 	}
+	
 	public String getName() {
+		
 		return getClusterFileSet().getRoot();
 	}
+	
 	public ClusterFileSet getClusterFileSet() {
-	  return source;
+	  
+		return source;
 	}
+	
 	@Override
 	public void clearFileSetListeners() {
+		
 		source.clearFileSetListeners();
 	}
+	
 	@Override
 	public void addFileSetListener(FileSetListener listener) {
+		
 		source.addFileSetListener(listener);
 	}
-    public XmlConfig getDocumentConfig() {return documentConfig;}
-    public ConfigNode getDocumentConfigRoot() {return documentConfig.getRoot();}
-    public void setDocumentConfig(XmlConfig newVal) { documentConfig = newVal;}
+	
+    public XmlConfig getDocumentConfig(){
+    	
+    	return documentConfig;
+	}
     
-    public ClusterModel() {
-    	super();
-	  /* build ClusterModel, initially empty... */	
-	  	geneHeaderInfo = new IntHeaderInfoCluster();
-	  	arrayHeaderInfo = new IntHeaderInfoCluster();
-	  	atrHeaderInfo = new IntHeaderInfoCluster();
-		gtrHeaderInfo = new IntHeaderInfoCluster();
-		dataMatrix = new ClusterDataMatrix();
+    public ConfigNode getDocumentConfigRoot(){
+    	
+    	return documentConfig.getRoot();
+    }
+    
+    public void setDocumentConfig(XmlConfig newVal){ 
+    	
+    	documentConfig = newVal;
     }
     
     public void setFrame(Frame f) {
-	frame = f;
+	
+    	frame = f;
     }
+    
 	public Frame getFrame() {
+		
 		return frame;
 	}
 
 	protected void hashAIDs() {
+		
 		arrayHeaderInfo.hashIDs("AID");
 	}
 	 
 	protected void hashGIDs() {
+		
 		geneHeaderInfo.hashIDs("GID");
 	}
 	 
 	protected void hashATRs() {
+		
 		atrHeaderInfo.hashIDs("NODEID");
 	}
 	
 	protected void hashGTRs() {
+		
 		gtrHeaderInfo.hashIDs("NODEID");
 	}
 	
 	protected static Hashtable<String, Integer> populateHash(HeaderInfo source, String headerName, Hashtable<String, Integer> target) {
+		
 		int indexCol = source.getIndex(headerName);
 		return populateHash(source, indexCol, target);
 	}
-	 protected static Hashtable<String, Integer> populateHash(HeaderInfo source, int indexCol, Hashtable<String, Integer> target) {
-		 if (target == null) {
-			 target = new Hashtable<String, Integer>((source.getNumHeaders() * 4) /3, .75f);
-		 } else {
-			 target.clear();
-		 }
+	
+	protected static Hashtable<String, Integer> populateHash(HeaderInfo source, int indexCol, Hashtable<String, Integer> target) {
+		
+		if (target == null) {
+			 
+			target = new Hashtable<String, Integer>((source.getNumHeaders() * 4) /3, .75f);
+			
+		} else {
+		
+			target.clear();
+		}
 
-		 if (indexCol <0) indexCol = 0;
-		 for( int i = 0; i < source.getNumHeaders(); i++) {
-			 target.put(source.getHeader(i)[indexCol], new Integer(i)); //puts all the specific infor from source file into Hashtable object
-		 }
+		if (indexCol <0) {
+			 
+			indexCol = 0;
+		}
 		 
-		 return target;
-	 }	 
-	 /**
-	  * Reorders all the arrays in the new ordering.
-	  * @param ordering the new ordering of arrays, must have size equal to number of arrays
-	  */
-	public void reorderArrays(int [] ordering)
-	{
+		for( int i = 0; i < source.getNumHeaders(); i++) {
+			 
+			target.put(source.getHeader(i)[indexCol], new Integer(i)); //puts all the specific infor from source file into Hashtable object
+		}
+		return target;
+	 }	
+	
+	/**
+	 * Reorders all the arrays in the new ordering.
+	 * @param ordering the new ordering of arrays, must have size equal to number of arrays
+	 */
+	public void reorderArrays(int [] ordering){
+		
 		if(ordering == null || 
-				ordering.length != dataMatrix.getNumUnappendedCol()) // make sure input to function makes sense
-		{
+				ordering.length != dataMatrix.getNumUnappendedCol()){
+			
 			return;
 		}
-	
-	
+
 		DataMatrix data = getDataMatrix();
 	
 		double [] temp = new double[data.getNumUnappendedCol()];
-		for(int j = 0; j < data.getNumRow(); j++)
-		{
-			for(int i = 0; i < ordering.length; i++)
-			{
+		for(int j = 0; j < data.getNumRow(); j++){
+			
+			for(int i = 0; i < ordering.length; i++){
+				
 				temp[i] = data.getValue(ordering[i], j);
 			}
-			for(int i = 0; i < ordering.length; i++)
-			{
+			for(int i = 0; i < ordering.length; i++){
+				
 				data.setValue(temp[i], i, j);
 			}
 		}
+		
 		String [][]aHeaders = arrayHeaderInfo.getHeaderArray();
 		String [][] temp2 = new String[aHeaders.length][];
 	
-		for(int i = 0; i < aHeaders.length; i++)
-		{
-			if(i < ordering.length)
-			{
+		for(int i = 0; i < aHeaders.length; i++){
+			
+			if(i < ordering.length){
+				
 				temp2[i] = aHeaders[ordering[i]];
 			}
-			else
-			{
+			else{
+				
 				temp2[i] = aHeaders[i];
 			}
 		}
-		setArrayHeaders(temp2);
-		hashAIDs();
 		
-					
+		setArrayHeaders(temp2);
+		hashAIDs();		
 		setChanged();
 	}
 
-	 /**
-	  * Reorders all the arrays in the new ordering.
-	  * @param ordering the new ordering of arrays, must have size equal to number of arrays
-	  */
-	public void reorderGenes(int [] ordering)
-	{
-		if(ordering == null || 
-				ordering.length != dataMatrix.getNumRow()) // make sure input to function makes sense
-		{
+	/**
+	 * Reorders all the arrays in the new ordering.
+	 * @param ordering the new ordering of arrays, must have size equal to number of arrays
+	 */
+	public void reorderGenes(int [] ordering){
+		
+		if(ordering == null || ordering.length != dataMatrix.getNumRow()){
+			
 			return;
 		}
 		
 		DataMatrix data = getDataMatrix();
 		double [] temp = new double[data.getNumRow()];	
-		for(int j = 0; j < data.getNumUnappendedCol(); j++)
-		{
-			for(int i = 0; i < ordering.length; i++)
-			{
+		
+		for(int j = 0; j < data.getNumUnappendedCol(); j++){
+			
+			for(int i = 0; i < ordering.length; i++){
+				
 				temp[i] = data.getValue(j, ordering[i] );
 			}
-			for(int i = 0; i < ordering.length; i++)
-			{
+			
+			for(int i = 0; i < ordering.length; i++){
+				
 				data.setValue(temp[i], j, i);
 			}
 		}
+		
 		geneHeaderInfo.reorderHeaders(ordering);
 		hashGIDs();
 		setChanged();
 	}
 
-	 public void resetState () {
-		 // reset some state stuff.
-		 //	if (documentConfig != null)
-		 //          documentConfig.store();
-		 documentConfig = null;
-		 setLoaded(false);
-		 aidFound = false;
-		 gidFound = false;
-		 source = null;
+	public void resetState () {
+		
+		//reset some state stuff.
+		//if (documentConfig != null)
+		//documentConfig.store();
+		documentConfig = null;
+		setLoaded(false);
+		aidFound = false;
+		gidFound = false;
+		source = null;
 		 
-		 eweightFound = false;
-		 gweightFound = false;
+		eweightFound = false;
+		gweightFound = false;
 		 
-		 geneHeaderInfo.clear();
-		 arrayHeaderInfo.clear();
-		 atrHeaderInfo.clear();
-		 gtrHeaderInfo.clear();
-		 dataMatrix.clear();
-	 }
+		geneHeaderInfo.clear();
+		arrayHeaderInfo.clear();
+		atrHeaderInfo.clear();
+		gtrHeaderInfo.clear();
+		dataMatrix.clear();
+	}
 	 
-	 public String toString() {
-		 String [] strings = toStrings();
-		 String msg = "";
-		 for (int i = 0; i < strings.length; i++) {
-			 msg += strings[i] + "\n";
-		 }
-		 return msg;
-	 }
+	public String toString() {
+		
+		String [] strings = toStrings();
+		String msg = "";
+		
+		for (int i = 0; i < strings.length; i++) {
+			
+			msg += strings[i] + "\n";
+		}
+		
+		return msg;
+	}
+	
     public String[] toStrings() {
-	String[] msg = {"Selected ClusterModel Stats",
+    	
+    	String[] msg = {"Selected ClusterModel Stats",
 			"Source = " + getSource(),
 			"Nexpr   = " + nExpr(),
 			"NGeneHeader = " + getGeneHeaderInfo().getNumNames(),
@@ -317,24 +434,25 @@ public class ClusterModel extends Observable implements DataModel {
 		return msg;
     }
     
-    public void removeAppended()
-	{
-		if(appendIndex == -1)
-		{
+    public void removeAppended(){
+    	
+		if(appendIndex == -1){
+			
 			return;
 		}
+		
 		int ngene = nGene();
 		int nexpr = nExpr();
 		double [] temp = new double[ngene*appendIndex];
 		
 		int i = 0;
 		
-		for(int g = 0; g < this.dataMatrix.getNumRow(); g++)
-		{
-			for(int e = 0; e < nexpr; e++)
-			{
-				if(e < appendIndex)
-				{
+		for(int g = 0; g < this.dataMatrix.getNumRow(); g++){
+			
+			for(int e = 0; e < nexpr; e++){
+				
+				if(e < appendIndex){
+					
 					temp[i++] = getValue(e, g);
 				}					
 			}
@@ -343,8 +461,8 @@ public class ClusterModel extends Observable implements DataModel {
 		
 		String [][] tempS = new String[appendIndex][];
 		
-		for(int j = 0; j < appendIndex; j++)
-		{
+		for(int j = 0; j < appendIndex; j++){
+			
 			tempS[j] = arrayHeaderInfo.getHeader(j);
 		}
 		
@@ -358,12 +476,13 @@ public class ClusterModel extends Observable implements DataModel {
 	 * Appends a second matrix to this one provided they have the same height. Used for comparison of two data sets where the data is displayed side by side.
 	 * 
 	 */
-	public void append(DataModel m)
-	{
+	public void append(DataModel m){
+		
 		int ngene = nGene();
 		int nexpr = nExpr();
-		if(m == null || m.getDataMatrix().getNumRow() != ngene || appendIndex != -1)
-		{
+		
+		if(m == null || m.getDataMatrix().getNumRow() != ngene || appendIndex != -1){
+			
 			System.out.println("Could not compare.");
 			return;
 		}
@@ -373,47 +492,45 @@ public class ClusterModel extends Observable implements DataModel {
 		
 		int i = 0;
 				
-		for(int g = 0; g < m.getDataMatrix().getNumRow(); g++)
-		{
-			for(int e = 0; e < nexpr + m.getDataMatrix().getNumCol() + 1; e++)
-			{
-				if(e < nexpr)
-				{
+		for(int g = 0; g < m.getDataMatrix().getNumRow(); g++){
+			
+			for(int e = 0; e < nexpr + m.getDataMatrix().getNumCol() + 1; e++){
+				
+				if(e < nexpr){
+					
 					temp[i++] = getValue(e, g);
 				}
-				else if(e < nexpr + 1)
-				{
+				else if(e < nexpr + 1){
+					
 					temp[i++] = DataModel.NODATA;
 				}
-				else
-				{
+				else{
+					
 					temp[i++] = m.getDataMatrix().getValue(e - nexpr - 1, g);
 				}
-				
 			}
 		}
 		
 		String [][] tempS = new String[getArrayHeaderInfo().getNumHeaders() + m.getArrayHeaderInfo().getNumHeaders() + 1][];
 		
 		i = 0;
-		for(int j = 0; j < getArrayHeaderInfo().getNumHeaders(); j++)
-		{
+		for(int j = 0; j < getArrayHeaderInfo().getNumHeaders(); j++){
+			
 			tempS[i++] = getArrayHeaderInfo().getHeader(j);
 		}
 		
 		tempS[i] = new String[getArrayHeaderInfo().getNumNames()];
 		
-		for(int j = 0; j < tempS[i].length; j++)
-		{
+		for(int j = 0; j < tempS[i].length; j++){
+			
 			tempS[i][j] = "-----------------------";
 		}
 		i++;
 		
-		for(int j = 0; j < getArrayHeaderInfo().getNumHeaders(); j++)
-		{
+		for(int j = 0; j < getArrayHeaderInfo().getNumHeaders(); j++){
+			
 			tempS[i++] = getArrayHeaderInfo().getHeader(j);
 		}
-		
 		
 		arrayHeaderInfo.setHeaderArray(tempS);
 		appendIndex = nexpr;
@@ -422,75 +539,66 @@ public class ClusterModel extends Observable implements DataModel {
 		setChanged();
 	}
 
-	int appendIndex = -1;
-	
-    protected Frame frame;
-    protected ClusterFileSet source = null;
-    protected String  dir = null;
-    protected String  root;
-
-	
-	protected ClusterDataMatrix dataMatrix;
-		
-		
-    protected IntHeaderInfoCluster arrayHeaderInfo;
-    protected IntHeaderInfoCluster geneHeaderInfo;
-	protected IntHeaderInfoCluster atrHeaderInfo;
-	protected IntHeaderInfoCluster gtrHeaderInfo;
-	
-	protected boolean aidFound = false;
-	protected boolean gidFound = false;
-		
-    protected boolean eweightFound = false;
-    protected boolean gweightFound = false;
-    protected XmlConfig documentConfig; // holds document config
 	/**
 	 * Really just a thin wrapper around exprData array.
 	 * @author aloksaldanha
 	 *
 	 */
 	class ClusterDataMatrix implements DataMatrix {
+		
 		private boolean modified = false;
 	    private double [] exprData = null;
 
-		public void clear() {
+		public void clear(){
+			
 			exprData = null;
 		}
 
 	    public double getValue(int x, int y) {
-			int nexpr = nExpr();
+			
+	    	int nexpr = nExpr();
 			int ngene = nGene();
-			if ((x < nexpr) && (y < ngene) && (x >= 0) && (y >= 0)) {
+			
+			if ((x < nexpr) && (y < ngene) && (x >= 0) && (y >= 0)){
+				
 				return exprData[x + y * nexpr];
-			} else {
+			}
+			else{
+				
 				return DataModel.NODATA;
 			}
 		}
 		
 	    //used to set the parameter as an 'expression data' array for the model which the model then can access
-		public void setExprData(double[] newData) {
+		public void setExprData(double[] newData){
+			
 			exprData = newData;
 		}
 
-		public void setValue(double value, int x, int y)
-		{
+		public void setValue(double value, int x, int y){
+			
 			exprData[x + y*getNumCol()] = value;
 			setModified(true);
 			setChanged();
 		}
-		public int getNumRow() {
+		
+		public int getNumRow(){
+			
 			return nGene();
 		}
-		public int getNumCol() {
+		
+		public int getNumCol(){
+			
 			return nExpr();
 		}
 		
-		public int getNumUnappendedCol()
-		{
+		public int getNumUnappendedCol(){
+		
 			return appendIndex == -1?getNumCol():appendIndex;
 		}
 
-		public void setModified(boolean modified) {
+		public void setModified(boolean modified){
+			
 			this.modified = modified;
 		}
 

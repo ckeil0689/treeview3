@@ -495,20 +495,14 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 * @return File file
 	 * @throws LoadException
 	 */
-	public File selectFile(boolean filter, boolean viz)throws LoadException {
+	public File selectFile()throws LoadException {
 		
 		File chosen;
 		
 		JFileChooser fileDialog = new JFileChooser();
 		
-		if(filter){
-			
-			setupFileDialog(fileDialog, viz);
-		}
-		else{
-			
-			setupFileDialog(fileDialog);
-		}
+		setupFileDialog(fileDialog);
+		
 		int retVal = fileDialog.showOpenDialog(this);
 		
 		if (retVal == JFileChooser.APPROVE_OPTION) {
@@ -583,35 +577,35 @@ public abstract class ViewFrame extends JFrame implements Observer {
 		 return fileSet1;
 	}
 	
-	/**
-	 * Setting up a file dialog without file filters
-	 * @param fileDialog
-	 */
-	protected void setupFileDialog(JFileChooser fileDialog) {
-		
-		try {
-			
-			// will fail on pre-1.3 swings
-			fileDialog.setAcceptAllFileFilterUsed(true);
-		} catch (Exception e) {
-			
-			// hmm... I'll just assume that there's no accept all.
-			fileDialog.addChoosableFileFilter(new javax.swing.filechooser
-					.FileFilter() {
-				public boolean accept (File f) {
-					return true;
-				}
-				public String getDescription () {
-					return "All Files";
-				}
-			});
-		}
-		fileDialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		String string = fileMru.getMostRecentDir();
-		if (string != null) {
-			fileDialog.setCurrentDirectory(new File(string));
-		}
-	 }
+//	/**
+//	 * Setting up a file dialog without file filters
+//	 * @param fileDialog
+//	 */
+//	protected void setupFileDialog(JFileChooser fileDialog) {
+//		
+//		try {
+//			
+//			// will fail on pre-1.3 swings
+//			fileDialog.setAcceptAllFileFilterUsed(true);
+//		} catch (Exception e) {
+//			
+//			// hmm... I'll just assume that there's no accept all.
+//			fileDialog.addChoosableFileFilter(new javax.swing.filechooser
+//					.FileFilter() {
+//				public boolean accept (File f) {
+//					return true;
+//				}
+//				public String getDescription () {
+//					return "All Files";
+//				}
+//			});
+//		}
+//		fileDialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
+//		String string = fileMru.getMostRecentDir();
+//		if (string != null) {
+//			fileDialog.setCurrentDirectory(new File(string));
+//		}
+//	 }
 	 
 	/**
 	 * Overloaded setupFileDialog
@@ -619,22 +613,16 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 * @param fileDialog
 	 * @param viz
 	 */
-	 protected void setupFileDialog(JFileChooser fileDialog, boolean viz) {
+	 protected void setupFileDialog(JFileChooser fileDialog) {
 	 
-		CdtFilter ff = new CdtFilter();
-		ClusterFileFilter ff2 = new ClusterFileFilter();
+		ClusterFileFilter ff = new ClusterFileFilter();
 			
 		try {	
-			if(viz){
-				
-				fileDialog.addChoosableFileFilter(ff);
-			}
-			else{
-				
-				fileDialog.addChoosableFileFilter(ff2);
-			}
+			
+			fileDialog.addChoosableFileFilter(ff);
 			// will fail on pre-1.3 swings
 			fileDialog.setAcceptAllFileFilterUsed(true);
+			
 		} catch (Exception e) {
 			
 			// hmm... I'll just assume that there's no accept all.
@@ -648,17 +636,13 @@ public abstract class ViewFrame extends JFrame implements Observer {
 				}
 			});
 		}
-		if(viz){
-			
-			fileDialog.setFileFilter(ff);
-		}
-		else{
-			
-			fileDialog.setFileFilter(ff2);
-		}
+		
+		fileDialog.setFileFilter(ff);
 		fileDialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		String string = fileMru.getMostRecentDir();
+		
 		if (string != null) {
+			
 			fileDialog.setCurrentDirectory(new File(string));
 		}
 	 }
@@ -670,23 +654,28 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 *
 	 * Add a menu item for each window which grants that window the foreground when selected.
 	 */
-	 public void rebuildWindowMenu(Vector windows) {
+	 public void rebuildWindowMenu(Vector<JFrame> windows) {
+		 
 		 synchronized (menubar) {
+			 
 			 menubar.setMenu(TreeviewMenuBarI.windowMenu);
 			 menubar.removeAll();
 
 			 int max  = windows.size();
 			 for (int i = 0; i < max; i++) {
+				 
 				 if (i > 8) {
+					 
 					 break;
 				 }// just want first 9 windows...
-				 addFocusItem(windows,i);
+				 addFocusItem(windows, i);
 			 }
 			 menubar.addSeparator();
 
 			 menubar.addMenuItem("New Window", new ActionListener() {
-				 public void actionPerformed(ActionEvent actionEvent)
-				 {
+				
+				 public void actionPerformed(ActionEvent actionEvent){
+					 
 					 createNewFrame().setVisible(true);
 				 }
 			 });
@@ -694,7 +683,9 @@ public abstract class ViewFrame extends JFrame implements Observer {
 			 menubar.setMnemonic(KeyEvent.VK_N);
 
 			 menubar.addMenuItem("Close Window", new ActionListener() {
+				 
 				 public void actionPerformed(ActionEvent actionEvent) {
+					 
 					 closeWindow();
 				 }
 			 });
@@ -709,10 +700,12 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 * perhaps this will change if I add an interface for the App classes.
 	 */
 	 public ViewFrame createNewFrame() {
-	 	return getApp().openNew();
+	 	
+		 return getApp().openNew();
 	 }
 	 
 	 public abstract TreeViewApp getApp();
+	 
 	 /**
 	 *  Constructs a MenuItem which causes the i'th window to be moved to the front.
 	 *
@@ -720,20 +713,29 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 * @param  i  which window to move to the front.
 	 * @return    a menuItem which focuses the i'th window, or null if more than 9 windows.
 	 */
-	 private void addFocusItem(Vector windows, int i) {
-		 int p1                  = i + 1;
+	 private void addFocusItem(Vector<JFrame> windows, int i) {
+		
+		 int p1 = i + 1;
+		 
 		 if (p1 > 9) {
+			 
 			 return;
 		 }
+		 
 		 final ViewFrame source  = (ViewFrame) windows.elementAt(i);
 		 String name;
+		 
 		 if (source.getLoaded()) {
+			 
 			 name = source.getDataModel().getName();
 		 } else {
+			 
 			 name = "Not Loaded";
 		 }
 		 menubar.addMenuItem(name, new ActionListener() {
+			 
 			 public void actionPerformed(ActionEvent e) {
+				 
 				 source.toFront();
 			 }
 		 });

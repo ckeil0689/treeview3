@@ -857,7 +857,7 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 		backgroundPanel.setOneTouchExpandable(true);
 		backgroundPanel.setDividerLocation(MAIN_DIV_LOC);
 		
-		Dimension up_min = new Dimension(500, 200);
+		Dimension up_min = new Dimension(400, 100);
 		Dimension down_min = new Dimension(600, 500);
 		
 		JPanel upSide = new JPanel();
@@ -970,9 +970,9 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 		right.add(level1Pane, "push, grow");
 		
 		upSide.add(atrzview, "push, grow, height 15%::, width :70%:70%");
-		upSide.add(hintpanel, "push, grow, height 15%::, width :30%:30%, wrap");
-		upSide.add(arraynameview, "push, grow, height 15%::, width :70%:70%");
+		upSide.add(hintpanel, "push, grow, height 15%::, width 30%:30%:30%");
 		
+		downSide.add(arraynameview, "pushx, growx, height 15%::, width :70%:70%, wrap");
 		downSide.add(zoompanel, "push, grow, width :70%:70%");
 		downSide.add(textpanel, "push, grow, width 25%:30%:35%");
 

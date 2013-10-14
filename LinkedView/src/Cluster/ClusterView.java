@@ -59,7 +59,6 @@ import edu.stanford.genetics.treeview.TreeviewMenuBarI;
 
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LoadException;
-import edu.stanford.genetics.treeview.LogBuffer;
 
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.ViewFrame;
@@ -111,16 +110,19 @@ public class ClusterView extends JPanel implements MainPanel {
 	private final Color BG_COLOR = new Color(230, 230, 230, 255);
 	
 	/**
-	 *  Constructor for the DendroView object
+	 * Constructor for the DendroView object
 	 * note this will reuse any existing MainView subnode of the documentconfig.
 	 *
-	 * @param  tVModel   model this DendroView is to represent
+	 * @param  cVModel model this ClusterView is to represent
 	 * @param  vFrame  parent ViewFrame of DendroView
 	 */
 	public ClusterView(DataModel cVModel, TreeViewFrame vFrame) {
+		
 		this(cVModel, null, vFrame, "Cluster View");
 	}
+	
 	public ClusterView(DataModel cVModel, ConfigNode root, TreeViewFrame vFrame) {
+		
 		this(cVModel, root, vFrame, "Cluster View");
 	}
 	/**
@@ -249,7 +251,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		//Instance variables
 		private int nRows, nCols, sumMatrix; 
 		private JLabel sumM, label2, label3, numColLabel, numRowLabel;
-		private JButton loadNew_button, cluster_button, closeButton;
+		private JButton cluster_button, closeButton;
 		private JPanel numPanel;
 	    
 		//Constructor
@@ -290,29 +292,6 @@ public class ClusterView extends JPanel implements MainPanel {
 	    	 
 	    	//Data Preview
 	    	DataViewPanel dataView = new DataViewPanel(outer);
-
-	    	//Button to load new file
-	    	loadNew_button = new JButton("Load New File");
-	    	loadNew_button = setButtonLayout(loadNew_button);
-	    	loadNew_button.addActionListener(new ActionListener(){
-	
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					
-					try {
-						ClusterFileSet fileSet = clusterSelection();
-						viewFrame.loadClusterFileSet(fileSet); 
-						viewFrame.setLoaded(true);
-					} catch (LoadException e) {
-						if ((e.getType() != LoadException.INTPARSE)
-								&& (e.getType() != LoadException.NOFILE)) {
-							LogBuffer.println("Could not open file: "
-									+ e.getMessage());
-							e.printStackTrace();
-							}
-						}
-				}
-	    	});
 	    	
 	    	cluster_button = new JButton("Hierarchical Cluster >");
 	    	cluster_button = setButtonLayout(cluster_button);
@@ -356,10 +335,9 @@ public class ClusterView extends JPanel implements MainPanel {
 					viewFrame.setLoaded(false);
 				}
 			});
-	    	
-			buttonPanel.add(loadNew_button, "alignx 50%, pushx");
-	    	buttonPanel.add(cluster_button, "alignx 50%, pushx, wrap");
-	    	buttonPanel.add(closeButton, "span, alignx 50%, pushx");
+	  		
+	  		buttonPanel.add(closeButton, "alignx 50%, pushx");
+	    	buttonPanel.add(cluster_button, "alignx 50%, pushx");
 	    	
 	    	numPanel.add(numRowLabel, "span, split 2, alignx 50%");
 	    	numPanel.add(numColLabel, "wrap");

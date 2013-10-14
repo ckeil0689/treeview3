@@ -59,7 +59,8 @@ public class DataViewPanel extends JPanel{
 		matrix = model.getDataMatrix();
 		dataArray = matrix.getExprData();
 		
-		headerArray = model.getArrayHeaderInfo().getHeaderArray();
+		//headerArray = model.getArrayHeaderInfo().getHeaderArray();
+		headerArray = model.getGeneHeaderInfo().getHeaderArray();
 		
 		gList = fillDList(dataArray);
 		arraysList = splitArrays(gList, model);
@@ -118,6 +119,7 @@ public class DataViewPanel extends JPanel{
 		headerTable = new JTable(model);
 		
 		int max = table.getRowCount();
+		
 		for(int i = 0; i < max; i++){
 			
 			headerTable.setValueAt(geneNames[i], i, 0);
@@ -129,9 +131,11 @@ public class DataViewPanel extends JPanel{
         headerTable.getColumnModel().getColumn(0).setCellRenderer(new TableCellRenderer() {
 
             @Override
-            public Component getTableCellRendererComponent(JTable x, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            public Component getTableCellRendererComponent(JTable x, Object value, boolean isSelected, 
+            		boolean hasFocus, int row, int column) {
 
-                Component component = table.getTableHeader().getDefaultRenderer().getTableCellRendererComponent(table, value, false, false, -1, -2);
+                Component component = table.getTableHeader().getDefaultRenderer()
+                		.getTableCellRendererComponent(table, value, false, false, -1, -2);
                 ((JLabel) component).setHorizontalAlignment(SwingConstants.CENTER);
                 return component;
             }
