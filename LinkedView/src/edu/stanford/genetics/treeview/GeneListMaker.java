@@ -63,6 +63,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 		/* (non-Javadoc)
 		 * @see javax.swing.table.TableModel#getRowCount()
 		 */
+		@Override
 		public int getRowCount() {
 			if (fieldRow.includeHeader()) {
 				return geneSelection.getNSelectedIndexes() + 1;
@@ -74,6 +75,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 		/* (non-Javadoc)
 		 * @see javax.swing.table.TableModel#getColumnCount()
 		 */
+		@Override
 		public int getColumnCount() {
 			int [] selectedPrefix = fieldRow.getSelectedPrefix();
 			if (fieldRow.includeExpr()) {
@@ -86,6 +88,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 		/* (non-Javadoc)
 		 * @see javax.swing.table.TableModel#getValueAt(int, int)
 		 */
+		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			int [] selectedPrefix = fieldRow.getSelectedPrefix();
 			if (fieldRow.includeHeader()) {
@@ -155,18 +158,21 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
     private GeneListTableModel tableModel;
     final private Notifier notifier = new Notifier();
     private class Notifier implements ActionListener, ListSelectionListener {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (tableModel != null)
 				tableModel.dataChanged();
 		}
 
+		@Override
 		public void valueChanged(ListSelectionEvent e) {
 			if (tableModel != null)
 				tableModel.dataChanged();
 		}
     };
     
-    public void bindConfig(ConfigNode configNode)
+    @Override
+	public void bindConfig(ConfigNode configNode)
     {
         root = configNode;
     }
@@ -231,6 +237,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 			JPanel bottom = new JPanel();
 			JButton saveButton = new JButton("Save");
 			saveButton.addActionListener(new ActionListener () {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					GeneListMaker.this.saveList();
 				}
@@ -239,6 +246,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 			
 			JButton cancelButton = new JButton("Cancel");
 			cancelButton.addActionListener(new ActionListener () {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					GeneListMaker.this.dispose();
 				}
@@ -393,6 +401,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 			add(file);
 			JButton chooseButton = new JButton("Browse");
 			chooseButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					try {
 						JFileChooser chooser = new JFileChooser();

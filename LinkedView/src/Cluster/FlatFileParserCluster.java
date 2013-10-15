@@ -165,6 +165,7 @@ public class FlatFileParserCluster {
 			super(is);
 		}
 
+		@Override
 		public int read() throws IOException {
 			incrValue(1);
 			return super.read();
@@ -173,6 +174,7 @@ public class FlatFileParserCluster {
 		// the following should be covered by the more general read...
 		//public int read(byte [] b);
 		
+		@Override
 		public int read(byte [] b, int off, int len) throws IOException {
 			int ret = super.read(b,off,len);
 			if (ret != -1) {
@@ -182,6 +184,7 @@ public class FlatFileParserCluster {
 			return ret;
 		}
 		
+		@Override
 		public long skip(long n) throws IOException {
 			long ret = super.skip(n);
 			if (ret != -1) {
@@ -191,10 +194,12 @@ public class FlatFileParserCluster {
 			return ret;
 		}
 		int markedValue = 0;
+		@Override
 		public void mark(int readLimit) {
 			super.mark(readLimit);
 			markedValue = getValue();
 		}
+		@Override
 		public void reset() throws IOException {
 			super.reset();
 			setValue(markedValue);
@@ -250,7 +255,7 @@ public class FlatFileParserCluster {
 		  	for (int i = 0; i < data1.size() && i < 1000; i++){
 		  		//System.out.println("--------" + i + "-------------");
 		  		String[] str1 = (String[])data1.elementAt(i);
-		  		String[] str2 = (String[])data2.elementAt(i);
+		  		String[] str2 = data2.elementAt(i);
 		  		for (int j = 0; j < str1.length; j++){
 		  			
 		  			if (str1[j] == null && str2[j] == null){
@@ -311,7 +316,7 @@ public class FlatFileParserCluster {
 
 		String[] names = null;//no name is allowed
 		if (st.nextLine()){
-			names = (String[])st.getLineTokens();
+			names = st.getLineTokens();
 		}
 		
 		String[][] lines = new String[testSize][];

@@ -24,8 +24,6 @@ package edu.stanford.genetics.treeview;
 import javax.swing.JLabel;
 
 import Cluster.ClusterFrame;
-import Cluster.ClusterModel;
-
 import edu.stanford.genetics.treeview.core.HeaderFinder;
 
 
@@ -41,19 +39,24 @@ public class TestViewFrame extends ViewFrame {
 	}
 
 
+	@Override
 	public void setLoaded(boolean b) { }
 
 
+	@Override
 	public void update(java.util.Observable obs, java.lang.Object obj) {
 	}
 
+	@Override
 	public double noData() {
 		return 0.0;
 	}
 
+	@Override
 	public UrlPresets getGeneUrlPresets() {
 		return null;
 	}
+	@Override
 	public UrlPresets getArrayUrlPresets() {
 		return null;
 	}
@@ -61,21 +64,26 @@ public class TestViewFrame extends ViewFrame {
 	public edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets getColorPresets(){return null;}
 
 
+	@Override
 	public boolean getLoaded() {
 		return false;
 	}
 
+		@Override
 		public TreeViewApp getApp() {
 			return null;
 		}
 
+	@Override
 	public DataModel getDataModel() {
 		return null;
 	}
 
+	@Override
 	public void setDataModel(DataModel model) {
 	}
 
+	@Override
 	public HeaderFinder getGeneFinder() {
 		return null;
 	}
@@ -84,6 +92,7 @@ public class TestViewFrame extends ViewFrame {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.ViewFrame#scrollToGene(int)
 	 */
+	@Override
 	public void scrollToGene(int i) {
 		// nothing
 		
@@ -93,17 +102,20 @@ public class TestViewFrame extends ViewFrame {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.ViewFrame#scrollToArray(int)
 	 */
+	@Override
 	public void scrollToArray(int i) {
 		// nothing
 		
 	}
 
 
+	@Override
 	public MainPanel[] getMainPanelsByName(String name) {
 		return null;
 	}
 
 
+	@Override
 	public MainPanel[] getMainPanels() {
 		return null;
 	}

@@ -26,8 +26,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.Observable;
 
-import javax.swing.BorderFactory;
-
 import edu.stanford.genetics.treeview.*;
 
 class GlobalView extends ModelViewProduced implements  MouseMotionListener,
@@ -46,13 +44,15 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 
     }
 
-    public Dimension getPreferredSize() {
+    @Override
+	public Dimension getPreferredSize() {
 	Dimension p = new Dimension(xmap.getRequiredPixels(),
 				    ymap.getRequiredPixels());
 	return p;
     }
 
-    public String[]  getStatus() {
+    @Override
+	public String[]  getStatus() {
 	  String [] status = new String[4];
 	  if ((geneSelection == null) || (arraySelection == null)) {
 		  status[0] = "ERROR: GlobalView improperly configured";
@@ -79,6 +79,7 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		"click and drag to select genes",
 		"- hold shift to select arrays too"
 	};
+	@Override
 	public String[]  getHints() {
 		return hints;
 	}
@@ -196,7 +197,8 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
     }
 
 
-    public String viewName() {return "GlobalView";}
+    @Override
+	public String viewName() {return "GlobalView";}
 
     //Canvas Methods
 	protected boolean hasDrawn = false;
@@ -205,6 +207,7 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 	* ArrayDrawer to draw on it directly. The alternative is to have a 
 	* pixel buffer which you update using updatePixels.
 	*/
+	@Override
 	protected void updateBuffer(Graphics g) {
 		if (offscreenChanged) {
 			xmap.setAvailablePixels(offscreenSize.width);
@@ -244,6 +247,7 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 	* pixel buffer. The alternative is to update the graphics object
 	* directly by calling updateBuffer.
 	*/
+	@Override
 	protected void updatePixels() {
 		if (offscreenChanged) {
 			offscreenValid = false;
@@ -274,7 +278,8 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		}
 	}
 
-    public synchronized void paintComposite (Graphics g) {
+    @Override
+	public synchronized void paintComposite (Graphics g) {
 	// composite the rectangles...
 	if (selectionRect != null) {	    
 	    if (zoomRect != null) {
@@ -344,6 +349,7 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 
     
     // Observer Methods
+	@Override
 	public void update(Observable o, Object arg) {
 		if (o == geneSelection) {
 			if (arraySelection.getNSelectedIndexes() == 0) {
@@ -400,7 +406,8 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 	}
 
     // Mouse Listener 
-    public void mousePressed(MouseEvent e) {
+    @Override
+	public void mousePressed(MouseEvent e) {
 		if (enclosingWindow().isActive() == false) return;
 	
 		startPoint.setLocation(xmap.getIndex(e.getX()),
@@ -413,7 +420,8 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		drawBand(dragRect);
     }
     
-    public void mouseReleased(MouseEvent e) {
+    @Override
+	public void mouseReleased(MouseEvent e) {
 		if (enclosingWindow().isActive() == false) return;
 		mouseDragged(e);
 		drawBand(dragRect);	
@@ -441,7 +449,8 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 //	}
     
     // MouseMotionListener
-    public void mouseDragged(MouseEvent e) {
+    @Override
+	public void mouseDragged(MouseEvent e) {
 		// rubber band?
 		drawBand(dragRect);	
 		endPoint.setLocation(xmap.getIndex(e.getX()),
@@ -470,6 +479,7 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
     }
     
     // KeyListener 
+	@Override
 	public void keyPressed(KeyEvent e) {
 		int c = e.getKeyCode();
 		startPoint.setLocation(arraySelection.getMinIndex(), geneSelection.getMinIndex());

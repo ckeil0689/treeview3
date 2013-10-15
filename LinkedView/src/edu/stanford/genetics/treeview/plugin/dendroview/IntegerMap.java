@@ -44,7 +44,8 @@ public abstract class IntegerMap implements ConfigNodePersistent
         root = new DummyConfigNode(type());
     }
 
-    public void bindConfig(ConfigNode configNode)
+    @Override
+	public void bindConfig(ConfigNode configNode)
     {
         root = configNode;
         root.setAttribute("type", type(), null);
@@ -136,7 +137,7 @@ public abstract class IntegerMap implements ConfigNodePersistent
 
     public int getRequiredPixels()
     {
-        return (int)((double)(maxindex - minindex + 1) * getScale());
+        return (int)((maxindex - minindex + 1) * getScale());
     }
 
     // how many pixels per integer, on average?

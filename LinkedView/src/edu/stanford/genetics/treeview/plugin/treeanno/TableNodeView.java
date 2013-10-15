@@ -43,23 +43,29 @@ public class TableNodeView extends ModelView implements ListSelectionListener {
 	 */
 	private class NodeTableModel extends AbstractTableModel {
 
+		@Override
 		public int getRowCount() {
 			return headerInfo.getNumHeaders();
 		}
 
+		@Override
 		public String getColumnName(int i) {
 			return headerInfo.getNames()[i];
 		}
+		@Override
 		public int getColumnCount() {
 			return headerInfo.getNumNames();
 		}
 
+		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			return headerInfo.getHeader(rowIndex, columnIndex);
 		}
+		@Override
 		public void setValueAt(Object val, int row, int col) {
 			headerInfo.setHeader(row, headerInfo.getNames()[col], (String) val);
 		}
+		@Override
 		public boolean isCellEditable(int row, int col) {
 			String [] names = headerInfo.getNames();
 			if (names[col].equals("NODEID")) return false;
@@ -82,13 +88,16 @@ public class TableNodeView extends ModelView implements ListSelectionListener {
 		setLayout(new BorderLayout());
 		add(new JScrollPane(nodeTable), BorderLayout.CENTER);
 	}
+	@Override
 	public String viewName() {
 		return "Tree Node Editor";
 	}
 
+	@Override
 	protected void updateBuffer(Graphics g) {
 		// no buffer here.
 	}
+	@Override
 	public void update(Observable o, Object arg) {
 		update((Object) o, arg);
 	}
@@ -112,6 +121,7 @@ public class TableNodeView extends ModelView implements ListSelectionListener {
 		}
 	}
 
+	@Override
 	public void valueChanged(ListSelectionEvent e) {
 		int row = nodeTable.getSelectedRow();
 		if (row >= 0) {

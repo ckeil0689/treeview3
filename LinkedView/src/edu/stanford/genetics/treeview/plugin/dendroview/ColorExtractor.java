@@ -71,6 +71,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent, 
 	 *
 	 * @param  configNode  confignode to bind to
 	 */
+	@Override
 	public void bindConfig(ConfigNode configNode) {
 		if (root != configNode) {
 			root = configNode;
@@ -93,6 +94,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent, 
 	 *
 	 * @param  contrastValue  The desired contrast value
 	 */
+	@Override
 	public void setContrast(double contrastValue) {
 		if (contrast != contrastValue) {
 			contrast = contrastValue;
@@ -149,6 +151,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent, 
 	 *
 	 * @return    contrastValue The current contrast value
 	 */
+	@Override
 	public double getContrast() {
 		return contrast;
 	}

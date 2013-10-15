@@ -107,6 +107,7 @@ public class LoadProgress extends JDialog {
 		closeButton = new JButton("Cancel");
 		closeButton.addActionListener( new ActionListener() {
 			
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				setCanceled(true);
 			    LoadProgress.this.dispose();

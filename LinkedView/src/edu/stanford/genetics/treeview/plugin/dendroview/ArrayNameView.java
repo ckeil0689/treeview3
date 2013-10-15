@@ -87,12 +87,14 @@ public class ArrayNameView extends ModelView implements MouseListener, FontSelec
 	private JScrollPane scrollPane;
 
 	/* inherit description */
+	@Override
 	public String viewName() {
 		return "ArrayNameView";
 	}
 
 
 	/* inherit description */
+	@Override
 	public String[] getHints() {
 		String[] hints  = {
 				"Click and drag to scroll",
@@ -188,6 +190,7 @@ public class ArrayNameView extends ModelView implements MouseListener, FontSelec
 
 
 	/*inherit description */
+	@Override
 	public void updateBuffer(Graphics g) {
 		updateBuffer(g, offscreenSize);
 	}
@@ -408,6 +411,7 @@ public class ArrayNameView extends ModelView implements MouseListener, FontSelec
 	 *  Expects to see updates only from the map, when the array name spacing changes.
 	 *
 	 */
+	@Override
 	public void update(Observable o, Object arg) {
 		if (o == map || o == dataModel) {
 			selectionChanged();
@@ -422,6 +426,7 @@ public class ArrayNameView extends ModelView implements MouseListener, FontSelec
 	/**
 	 *  Starts external browser if the urlExtractor is enabled.
 	 */
+	@Override
 	public void mouseClicked(MouseEvent e) {
 		if (urlExtractor == null) {
 			return;
@@ -438,24 +443,28 @@ public class ArrayNameView extends ModelView implements MouseListener, FontSelec
 
 	//FontSelectable
 	/*inherit description */
+	@Override
 	public String getFace() {
 		return face;
 	}
 
 
 	/*inherit description */
+	@Override
 	public int getPoints() {
 		return size;
 	}
 
 
 	/*inherit description */
+	@Override
 	public int getStyle() {
 		return style;
 	}
 
 
 	/*inherit description */
+	@Override
 	public void setFace(String string) {
         if ((face == null) ||(!face.equals(string))) {
 			face = string;
@@ -468,6 +477,7 @@ public class ArrayNameView extends ModelView implements MouseListener, FontSelec
 	}
 
 	/*inherit description */
+	@Override
 	public void setPoints(int i) {
 		if (size != i) {
 			size = i;
@@ -481,6 +491,7 @@ public class ArrayNameView extends ModelView implements MouseListener, FontSelec
 
 
 	/*inherit description */
+	@Override
 	public void setStyle(int i) {
 		if (style != i) {
 			style = i;
@@ -503,6 +514,7 @@ public class ArrayNameView extends ModelView implements MouseListener, FontSelec
 	}
 
 	/*inherit description */
+	@Override
 	public void bindConfig(ConfigNode configNode) {
 		root = configNode;
 		if (configNode.fetchFirst("ArraySummary") == null) {

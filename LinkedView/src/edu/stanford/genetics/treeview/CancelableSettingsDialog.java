@@ -66,6 +66,7 @@ public class CancelableSettingsDialog extends JDialog {
 			JButton save_button    = new JButton("Save");
 			save_button.addActionListener(
 				new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						try {
 							settingsPanel.synchronizeTo();
@@ -84,6 +85,7 @@ public class CancelableSettingsDialog extends JDialog {
 			JButton cancel_button  = new JButton("Cancel");
 			cancel_button.addActionListener(
 				new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						settingsPanel.synchronizeFrom();
 						settingsFrame.dispose();

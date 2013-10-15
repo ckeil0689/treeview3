@@ -117,6 +117,7 @@ MouseListener {
 	* This is a stub so that components which work with this will also work with the ModelViewBuffered.
 	* importantly, no buffer is ever actually allocated.
 	*/
+	@Override
 	public synchronized void paintComponent(Graphics g) {
 		Rectangle clip = g.getClipBounds();
 		g.setColor(Color.white);
@@ -153,6 +154,7 @@ MouseListener {
 		return;
 	}
 	
+	@Override
 	public void addNotify() {
 		super.addNotify();
 	}
@@ -170,6 +172,7 @@ MouseListener {
 	*  2) sets status and hint panels appropriately
 	*  3) keeps track of whether we have the mouse.
 	*/
+	@Override
 	public void mouseEntered(MouseEvent e) {
 		if (viewFrame == null) {
 			LogBuffer.println("viewFrame null in ModelView.mouseEntered. Instance " + this);
@@ -194,14 +197,18 @@ MouseListener {
 	/**
 	* keeps track of when mouse not present.
 	*/
+	@Override
 	public void mouseExited(MouseEvent e) {
 		hasMouse = false;
 		setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 	}
 	
 	/* a bunch of stubs so we can claim to be a MouseListener	*/
+	@Override
 	public void mouseClicked(MouseEvent e) {}
+	@Override
 	public void mousePressed(MouseEvent e) {}
+	@Override
 	public void mouseReleased(MouseEvent e) {}
 	public void mouseMoved(MouseEvent e) {} 
 	public void mouseDragged(MouseEvent e) {}	

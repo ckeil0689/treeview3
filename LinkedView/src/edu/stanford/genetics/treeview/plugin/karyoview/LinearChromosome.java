@@ -31,6 +31,7 @@ class LinearChromosome extends Chromosome {
 		leftArm = new ChromosomeLocus[nLeft];
 		rightArm = new ChromosomeLocus[nRight];
 	}
+	@Override
 	public void insertLocus(ChromosomeLocus locus) {
 		ChromosomeLocus rightLocus = null;
 		ChromosomeLocus leftLocus = null;
@@ -83,6 +84,7 @@ class LinearChromosome extends Chromosome {
 		if (rightLocus != null) rightLocus.setLeft(locus);
 
 	}
+	@Override
 	public double getMaxPosition() {
 		double leftMax = (leftArm.length == 0)? 0: 
 			leftArm[leftArm.length - 1].getPosition();
@@ -90,6 +92,7 @@ class LinearChromosome extends Chromosome {
 			rightArm[rightArm.length - 1].getPosition();
 		return (leftMax > rightMax) ? leftMax : rightMax;
 	}
+	@Override
 	public double getMaxPosition(int arm) {
 		ChromosomeLocus end = null;
 		if (arm == ChromosomeLocus.LEFT) {
@@ -99,6 +102,7 @@ class LinearChromosome extends Chromosome {
 		}
 		return (end == null) ? 0.0 : end.getPosition();
 	}
+	@Override
 	public ChromosomeLocus getClosestLocus(int arm, double position) {
 		if (arm == ChromosomeLocus.LEFT) {
 			return getLocusRecursive(position, leftArm, 0, leftArm.length-1);
@@ -107,9 +111,11 @@ class LinearChromosome extends Chromosome {
 		}
 		return null;
 	}
+	@Override
 	public int getType() {
 		return Chromosome.LINEAR;
 	}
+	@Override
 	public ChromosomeLocus getLeftEnd() {
 		if (leftArm.length != 0) {
 			return leftArm[leftArm.length - 1];
@@ -119,6 +125,7 @@ class LinearChromosome extends Chromosome {
 		}
 		return null;
 	}
+	@Override
 	public ChromosomeLocus getRightEnd() {
 		if (rightArm.length != 0) {
 			return rightArm[rightArm.length - 1];
@@ -128,6 +135,7 @@ class LinearChromosome extends Chromosome {
 		}
 		return null;
 	}
+	@Override
 	public ChromosomeLocus getLocus(int arm, int index) {
 		if (arm == ChromosomeLocus.LEFT) {
 			return leftArm[index];

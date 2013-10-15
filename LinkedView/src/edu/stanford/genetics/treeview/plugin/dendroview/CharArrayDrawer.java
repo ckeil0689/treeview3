@@ -109,6 +109,7 @@ public class CharArrayDrawer extends ArrayDrawer {
 	 * @param  scanSize  The scansize for the pixels array (in other words, the width of the image)
 	 * @param  geneOrder the order of the genes. The source rect y values are taken to mean indexes into this array. If the gene order is null, the indexes from the source rect are used as indexes into the data matrix.
 	 */
+	@Override
 	public void paint(int[] pixels, Rectangle source, Rectangle dest, int scanSize, int [] geneOrder) {
 		if (headerInfo == null) {
 			System.out.println("header info wasn't set");
@@ -228,10 +229,12 @@ public class CharArrayDrawer extends ArrayDrawer {
 
 
 	
+	@Override
 	public String getSummary(int x, int y) {
 		return "" +  getChar(x, y);
 	}
 	
+	@Override
 	public boolean isMissing(int x, int y) {
 		String aln = headerInfo.getHeader(y, headerName);
 		@SuppressWarnings("unused") // used to test whether char in bounds
@@ -244,11 +247,13 @@ public class CharArrayDrawer extends ArrayDrawer {
 		return true;
 	}
 	
+	@Override
 	public boolean isEmpty(int x, int y) {
 		return false;
 	}
 
 		/** how many rows are there to draw? */
+	@Override
 	public int getNumRow() {
 		if ((headerInfo != null) && (headerName != null)) {
 			return headerInfo.getNumHeaders();
@@ -257,6 +262,7 @@ public class CharArrayDrawer extends ArrayDrawer {
 	}
 
 	/** how many cols are there to draw? */
+	@Override
 	public int getNumCol() {
 		try {
 			if ((headerInfo != null) && (headerName != null)) {
@@ -284,12 +290,14 @@ public class CharArrayDrawer extends ArrayDrawer {
 	 * @param  y  y coordinate of array element
 	 * @return    color for array element, or nodata if not found
 	 */
+	@Override
 	public Color getColor(int x, int y) {
 		return colorExtractor.getColor(getChar(x, y));
 	}
 
 
 	/**  resets the ArrayDrawer to a default state.  */
+	@Override
 	protected void setDefaults() {
 		headerInfo = null;
 	}

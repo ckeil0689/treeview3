@@ -34,11 +34,13 @@ class GifScatterViewExportPanel extends ScatterViewExportPanel {
 		super(scatterView);
 	}
 
-  public void synchronizeTo() {
+  @Override
+public void synchronizeTo() {
 	save();
   }
   
-  public void synchronizeFrom() {
+  @Override
+public void synchronizeFrom() {
 	// do nothing...
   }
   public void save() {

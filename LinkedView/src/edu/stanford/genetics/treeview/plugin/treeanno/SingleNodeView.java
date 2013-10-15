@@ -46,11 +46,13 @@ public class SingleNodeView extends ModelView {
 		headerInfo.addObserver(this);
 		
 		annoF.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				headerInfo.setHeader(editingIndex,"ANNOTATION", annoF.getText());
 			}
 		});
 		nameF.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				headerInfo.setHeader(editingIndex,"NAME", nameF.getText());
 			}
@@ -74,13 +76,16 @@ public class SingleNodeView extends ModelView {
 		add(mainP);
 	}
 	
+	@Override
 	public String viewName() {
 		return "Single Node Editor";
 	}
 
+	@Override
 	protected void updateBuffer(Graphics g) {
 		// no buffer here.
 	}
+	@Override
 	public void update(Observable o, Object arg) {
 		update((Object) o, arg);
 	}

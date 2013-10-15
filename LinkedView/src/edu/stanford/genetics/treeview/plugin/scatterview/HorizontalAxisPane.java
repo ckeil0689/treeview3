@@ -66,6 +66,7 @@ class HorizontalAxisPane extends JPanel  {
 		add(titleLabel);
 	}
 	
+	@Override
 	public void paintComponent(Graphics g) {
 		titleLabel.setForeground(colorSet.getColor("Axis"));
 	    titleLabel.setBackground(colorSet.getColor("Background"));

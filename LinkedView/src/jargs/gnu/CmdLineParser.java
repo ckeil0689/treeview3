@@ -193,7 +193,8 @@ public class CmdLineParser {
             public IntegerOption( String longForm ) {
                 super(longForm, true);
             }
-            protected Object parseValue( String arg, Locale locale )
+            @Override
+			protected Object parseValue( String arg, Locale locale )
                 throws IllegalOptionValueException {
                 try {
                     return new Integer(arg);
@@ -214,7 +215,8 @@ public class CmdLineParser {
             public LongOption( String longForm ) {
                 super(longForm, true);
             }
-            protected Object parseValue( String arg, Locale locale )
+            @Override
+			protected Object parseValue( String arg, Locale locale )
                 throws IllegalOptionValueException {
                 try {
                     return new Long(arg);
@@ -235,11 +237,12 @@ public class CmdLineParser {
             public DoubleOption( String longForm ) {
                 super(longForm, true);
             }
-            protected Object parseValue( String arg, Locale locale )
+            @Override
+			protected Object parseValue( String arg, Locale locale )
                 throws IllegalOptionValueException {
                 try {
                     NumberFormat format = NumberFormat.getNumberInstance(locale);
-                    Number num = (Number)format.parse(arg);
+                    Number num = format.parse(arg);
                     return new Double(num.doubleValue());
                 }
                 catch (ParseException e) {
@@ -258,7 +261,8 @@ public class CmdLineParser {
             public StringOption( String longForm ) {
                 super(longForm, true);
             }
-            protected Object parseValue( String arg, Locale locale ) {
+            @Override
+			protected Object parseValue( String arg, Locale locale ) {
                 return arg;
             }
         }

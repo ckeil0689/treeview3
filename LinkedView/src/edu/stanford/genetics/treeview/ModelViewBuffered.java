@@ -108,7 +108,8 @@ public abstract class ModelViewBuffered extends ModelView {
      * We apparently need to maintain our own persistent offscreen
      * buffer for speed reasons...
      */
-    public synchronized void paintComponent(Graphics g) {
+    @Override
+	public synchronized void paintComponent(Graphics g) {
 	Rectangle clip = g.getClipBounds();
 //	System.out.println("Entering " + viewName() + " to clip " + clip );
 

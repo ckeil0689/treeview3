@@ -43,6 +43,7 @@ abstract class MapSelector extends Panel implements ActionListener {
 	d = new Dialog(f, getTitle());
 	d.add(this);
 	d.addWindowListener(new WindowAdapter() {
+		@Override
 		public void windowClosing(WindowEvent we) {d.dispose();}
 	    });
 	d.pack();

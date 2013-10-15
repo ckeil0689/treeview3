@@ -58,6 +58,7 @@ public class Preferences implements ConfigNodePersistent {
 	
 	public static int DEFAULT_MacStyleMenubar = 1;
 	private ConfigNode root;
+	@Override
 	public void bindConfig(ConfigNode configNode) {
 			root = configNode;
 	}

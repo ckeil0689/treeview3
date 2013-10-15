@@ -33,6 +33,7 @@ public class ReorderedClusterModel extends Observable implements DataModel {
 	 *
 	 */
 	private class SubDataMatrix implements DataMatrix {
+		@Override
 		public double getValue(int col, int row) {
 			if (geneIndex != null) row = geneIndex[row];
 			if (arrayIndex != null) col = arrayIndex[col];
@@ -43,6 +44,7 @@ public class ReorderedClusterModel extends Observable implements DataModel {
 			}
 		}
 
+		@Override
 		public void setValue(double value, int col, int row) {
 			if (geneIndex != null) row = geneIndex[row];
 			if (arrayIndex != null) col = arrayIndex[col];
@@ -54,6 +56,7 @@ public class ReorderedClusterModel extends Observable implements DataModel {
 			}
 		}
 
+		@Override
 		public int getNumRow() {
 			if (geneIndex != null) 
 				return geneIndex.length;
@@ -61,6 +64,7 @@ public class ReorderedClusterModel extends Observable implements DataModel {
 				return parent.getDataMatrix().getNumRow();
 		}
 
+		@Override
 		public int getNumCol() {
 			if (arrayIndex != null) 
 				return arrayIndex.length;
@@ -68,6 +72,7 @@ public class ReorderedClusterModel extends Observable implements DataModel {
 				return parent.getDataMatrix().getNumCol();
 		}
 
+		@Override
 		public int getNumUnappendedCol() {
 			return parent.getDataMatrix().getNumUnappendedCol();
 		}
@@ -97,6 +102,7 @@ public class ReorderedClusterModel extends Observable implements DataModel {
 			parentHeaderInfo = hi;
 			reorderedIndex = ri;
 		}
+		@Override
 		public String[] getHeader(int i) {
 			int index = reorderedIndex[i];
 			if (index == -1)
@@ -104,12 +110,14 @@ public class ReorderedClusterModel extends Observable implements DataModel {
 			return parentHeaderInfo.getHeader(index);
 		}
 
+		@Override
 		public String getHeader(int i, String name) {
 			int index = reorderedIndex[i];
 			if (index == -1)
 				return null;
 			return parentHeaderInfo.getHeader(index, name);
 		}
+		@Override
 		public String getHeader(int rowIndex, int columnIndex) {
 			String [] header = getHeader(rowIndex);
 			if (header != null)
@@ -118,22 +126,27 @@ public class ReorderedClusterModel extends Observable implements DataModel {
 				return "";
 		}
 
+		@Override
 		public String[] getNames() {
 			return parentHeaderInfo.getNames();
 		}
 
+		@Override
 		public int getNumNames() {
 			return parentHeaderInfo.getNumNames();
 		}
 
+		@Override
 		public int getNumHeaders() {
 			return reorderedIndex.length;
 		}
 
+		@Override
 		public int getIndex(String name) {
 			return parentHeaderInfo.getIndex(name);
 		}
 
+		@Override
 		public int getHeaderIndex(String id) {
 			int parentIndex = parentHeaderInfo.getHeaderIndex(id);
 			if (reorderedIndex[parentIndex] == parentIndex) 
@@ -145,15 +158,21 @@ public class ReorderedClusterModel extends Observable implements DataModel {
 			}
 			return -1;
 		}
+		@Override
 		public void addObserver(Observer o) {
 			parentHeaderInfo.addObserver(o);
 		}
+		@Override
 		public void deleteObserver(Observer o) {
 			parentHeaderInfo.deleteObserver(o);
 		}
+		@Override
 		public boolean addName(String name, int location) {return false;}
+		@Override
 		public boolean setHeader(int i, String name, String value) {return false;}
+		@Override
 		public boolean getModified() {return false;}
+		@Override
 		public void setModified(boolean mod) {}		
 	}
 
@@ -205,6 +224,7 @@ public class ReorderedClusterModel extends Observable implements DataModel {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.DataModel#getDocumentConfig()
 	 */
+	@Override
 	public ConfigNode getDocumentConfigRoot() {
 		return documentConfig;
 	}
@@ -213,6 +233,7 @@ public class ReorderedClusterModel extends Observable implements DataModel {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.DataModel#getSource()
 	 */
+	@Override
 	public String getSource() {
 		return source;
 	}
@@ -220,6 +241,7 @@ public class ReorderedClusterModel extends Observable implements DataModel {
 		source = string;
 	}
 	String name;
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -230,6 +252,7 @@ public class ReorderedClusterModel extends Observable implements DataModel {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.DataModel#setModelForCompare(edu.stanford.genetics.treeview.DataModel)
 	 */
+	@Override
 	public void setModelForCompare(DataModel dm) {
 		// TODO Auto-generated method stub
 
@@ -238,6 +261,7 @@ public class ReorderedClusterModel extends Observable implements DataModel {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.DataModel#getFileSet()
 	 */
+	@Override
 	public FileSet getFileSet() {
 		// TODO Auto-generated method stub
 		return null;
@@ -252,6 +276,7 @@ public class ReorderedClusterModel extends Observable implements DataModel {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.DataModel#getGeneHeaderInfo()
 	 */
+	@Override
 	public HeaderInfo getGeneHeaderInfo() {
 		if (GeneHeaderInfo == null)
 			return parent.getGeneHeaderInfo();
@@ -262,6 +287,7 @@ public class ReorderedClusterModel extends Observable implements DataModel {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.DataModel#getArrayHeaderInfo()
 	 */
+	@Override
 	public HeaderInfo getArrayHeaderInfo() {
 		if (ArrayHeaderInfo == null)
 			return parent.getArrayHeaderInfo();
@@ -272,6 +298,7 @@ public class ReorderedClusterModel extends Observable implements DataModel {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.DataModel#getGtrHeaderInfo()
 	 */
+	@Override
 	public HeaderInfo getGtrHeaderInfo() {
 		if (GtrHeaderInfo == null)
 			return parent.getGtrHeaderInfo();
@@ -282,6 +309,7 @@ public class ReorderedClusterModel extends Observable implements DataModel {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.DataModel#getAtrHeaderInfo()
 	 */
+	@Override
 	public HeaderInfo getAtrHeaderInfo() {
 		if (AtrHeaderInfo == null)
 			return parent.getAtrHeaderInfo();
@@ -292,6 +320,7 @@ public class ReorderedClusterModel extends Observable implements DataModel {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.DataModel#getType()
 	 */
+	@Override
 	public String getType() {
 		return "ReorderedDataModel";
 	}
@@ -299,6 +328,7 @@ public class ReorderedClusterModel extends Observable implements DataModel {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.DataModel#getDataMatrix()
 	 */
+	@Override
 	public DataMatrix getDataMatrix() {
 		return subDataMatrix;
 	}
@@ -306,6 +336,7 @@ public class ReorderedClusterModel extends Observable implements DataModel {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.DataModel#append(edu.stanford.genetics.treeview.DataModel)
 	 */
+	@Override
 	public void append(DataModel m) {
 		// TODO Auto-generated method stub
 
@@ -314,11 +345,13 @@ public class ReorderedClusterModel extends Observable implements DataModel {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.DataModel#removeAppended()
 	 */
+	@Override
 	public void removeAppended() {
 		// TODO Auto-generated method stub
 
 	}
 
+	@Override
 	public boolean aidFound() {
 		if (AtrHeaderInfo == null)
 			return parent.aidFound();
@@ -326,6 +359,7 @@ public class ReorderedClusterModel extends Observable implements DataModel {
 			return false;
 	}
 
+	@Override
 	public boolean gidFound() {
 		// the following causes a mismatch if not all genes were selected.
 		if (GtrHeaderInfo == null)
@@ -333,9 +367,11 @@ public class ReorderedClusterModel extends Observable implements DataModel {
 		else
 			return false;
 	}
+	@Override
 	public boolean getModified() {
 		return false;
 	}
+	@Override
 	public boolean isLoaded() {
 		return true;
 	}

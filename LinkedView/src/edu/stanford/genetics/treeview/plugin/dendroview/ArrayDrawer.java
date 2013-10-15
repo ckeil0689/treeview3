@@ -183,7 +183,8 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 	 * @param  o    Object sending update
 	 * @param  arg  Argument, usually null
 	 */
-	 public void update(Observable o, Object arg) {
+	 @Override
+	public void update(Observable o, Object arg) {
 		 setChanged();
 		 notifyObservers();
 	 }

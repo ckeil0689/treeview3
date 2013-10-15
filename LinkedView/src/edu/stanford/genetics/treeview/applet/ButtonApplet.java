@@ -41,6 +41,7 @@ public class ButtonApplet extends Applet {
 	private TreeViewApp app;
 	
 	/**  start method for running as applet */
+	@Override
 	public void start() {
 		
 		super.start();
@@ -71,6 +72,7 @@ public class ButtonApplet extends Applet {
 			JButton openButton = new JButton("View " + cdtName);
 			openButton.addActionListener(new ActionListener() {
 				
+				@Override
 				@SuppressWarnings("unused")
 				public void actionPerformed(ActionEvent e) {
 					
@@ -217,6 +219,7 @@ public class ButtonApplet extends Applet {
 		
 		top.addWindowListener(new WindowAdapter(){
 
+			@Override
 			public void windowClosing(WindowEvent windowEvent) {
 				top.dispose();
 			}
@@ -252,6 +255,7 @@ public class ButtonApplet extends Applet {
 			
 			top.addWindowListener(new WindowAdapter(){
 
+				@Override
 				public void windowClosing(WindowEvent windowEvent) {
 					top.dispose();
 				}
@@ -268,6 +272,7 @@ public class ButtonApplet extends Applet {
 	/* (non-Javadoc)
 	 * @see java.applet.Applet#getParameterInfo()
 	 */
+	@Override
 	public String[][] getParameterInfo() {
 		
 		 String pinfo[][] = {
@@ -284,6 +289,7 @@ public class ButtonApplet extends Applet {
 	/* (non-Javadoc)
 	 * @see java.applet.Applet#getAppletInfo()
 	 */
+	@Override
 	public String getAppletInfo() {
 		
 		return "Java Treeview Applet (" +TreeViewApp.getVersionTag() +"test )";

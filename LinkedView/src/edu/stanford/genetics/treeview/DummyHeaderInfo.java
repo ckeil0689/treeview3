@@ -29,7 +29,8 @@ public class DummyHeaderInfo implements HeaderInfo {
   String [] header1 = new String [] {"Bob1", "Alice1"};
   String [] header2 = new String [] {"Bob2", "Alice2"};
   String [] header3 = new String [] {"Bob3", "Alice3"};
-  public String[] getHeader(int i) {
+  @Override
+public String[] getHeader(int i) {
 	if (i == 1) {
 	  return header1;
 	}
@@ -45,6 +46,7 @@ public class DummyHeaderInfo implements HeaderInfo {
 	 * @param  i  index of the header to get
 	 * @return    The array of header values
 	 */
+	@Override
 	public String getHeader(int i, String name) {
 	  return (getHeader(i))[getIndex(name)];
 	}
@@ -56,16 +58,20 @@ public class DummyHeaderInfo implements HeaderInfo {
 	 *
 	 * @return    The list of names
 	 */
+	@Override
 	public String[] getNames() {
 	  return names;
 	}
+	@Override
 	public int getNumNames() {
 		return names.length;
 	}
+	@Override
 	public int getNumHeaders() {
 	  return 3;
 	}
 
+	@Override
 	public int getIndex(String name) {
 	  if (name.equals("Bob")) {
 		return 0;
@@ -73,6 +79,7 @@ public class DummyHeaderInfo implements HeaderInfo {
 	  return 1;
 	}
 
+	@Override
 	public int getHeaderIndex(String id) {
 		for (int i = 0; i < getNumHeaders(); i++) {
 			if ((getHeader(i)[0]).equals(id)) {
@@ -84,13 +91,20 @@ public class DummyHeaderInfo implements HeaderInfo {
 	/**
 	 * noop, since this object is static.
 	 */
+	@Override
 	public void addObserver(Observer o) {}		
+	@Override
 	public void deleteObserver(Observer o) {}
+	@Override
 	public boolean addName(String name, int location) {return false;}
+	@Override
 	public boolean setHeader(int i, String name, String value) {return false;}
+	@Override
 	public boolean getModified() {return false;}
+	@Override
 	public void setModified(boolean mod) {}
 
+	@Override
 	public String getHeader(int rowIndex, int columnIndex) {
 		  return (getHeader(rowIndex))[columnIndex];
 	}

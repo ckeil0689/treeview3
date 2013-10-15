@@ -100,7 +100,7 @@ public class FlatFileStreamLiner{
 		int len = line.size();
 		String[] string = new String[len];
 		for (int i = 0; i < len; i++){
-			string[i] = (String)line.get(i);
+			string[i] = line.get(i);
 		}
 		return string;
 	}

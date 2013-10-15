@@ -34,7 +34,8 @@ import edu.stanford.genetics.treeview.*;
  */
 
 public class LeftTreeDrawer extends TreeDrawer {
-    public void paint(Graphics graphics, LinearTransformation xScaleEq, 
+    @Override
+	public void paint(Graphics graphics, LinearTransformation xScaleEq, 
 		      LinearTransformation yScaleEq, Rectangle dest, 
 		      TreeDrawerNode selected) {	
 		if ((getRootNode() == null) || (getRootNode().isLeaf() == true))

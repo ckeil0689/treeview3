@@ -38,6 +38,7 @@ public class CdtFilter extends javax.swing.filechooser.FileFilter implements Fil
 	 * @param  file  File name
 	 * @return       Returns true if file ends with .cdt or .pcl
 	 */
+	@Override
 	public boolean accept(File dir, String file) {
 		dir = null;
 		// don't use dir!!!
@@ -57,6 +58,7 @@ public class CdtFilter extends javax.swing.filechooser.FileFilter implements Fil
 	 * @param  f  the file in question
 	 * @return    returns true if it's a directory, or if it ends in .pcl or .cdt
 	 */
+	@Override
 	public boolean accept(File f) {
 		if (f.isDirectory()) {
 			return true;
@@ -65,6 +67,7 @@ public class CdtFilter extends javax.swing.filechooser.FileFilter implements Fil
 	}
 
 	/* inherit */
+	@Override
 	public String getDescription() {
 		return "CDT or PCL Files";
 	}

@@ -33,6 +33,7 @@ abstract class GroupAverager extends Averager {
 	*/
 	abstract protected ChromosomeLocus [] getContributors(ChromosomeLocus locus);
 	abstract protected String getPre();
+	@Override
 	public String[] getDescription(ChromosomeLocus locus, int col) {
 		HeaderInfo geneInfo = karyoView.getGeneInfo();
 		if (locus == null) {
@@ -69,6 +70,7 @@ abstract class GroupAverager extends Averager {
 		}
 	}
 	
+	@Override
 	public double getValue(ChromosomeLocus locus, int col) {
 		if (locus == null) return 0.0;
 		ChromosomeLocus [] loci = getContributors(locus);

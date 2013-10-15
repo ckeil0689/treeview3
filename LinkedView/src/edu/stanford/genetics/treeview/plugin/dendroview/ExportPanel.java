@@ -193,7 +193,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 	protected int getXmapPixel(double geneIndex) {
 		double dp = arrayMap.getPixel(geneIndex) - arrayMap.getPixel(0);
 		int ret = (int) (dp * getXscale() / arrayMap.getScale());
-		return (int) ret;
+		return ret;
 	}
 	protected boolean geneAnnoInside() {
 		return headerSelectionPanel.geneAnnoInside();
@@ -563,6 +563,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			add(waitingPanel, BorderLayout.CENTER);
 			drawPreview = new JCheckBox("Draw Preview");
 			drawPreview.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					updatePreview();
 				}
@@ -572,6 +573,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		}
 		class DrawingPanel extends JPanel {
 			
+			@Override
 			public void paintComponent(Graphics g) {
 				Dimension size = getSize();
 				int width = estimateWidth();
@@ -1090,14 +1092,17 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		
 		InclusionPanel() {
 			documentListener = new DocumentListener() {
+				@Override
 				public void changedUpdate(DocumentEvent e) {
 					updateSize();
 					if (previewPanel != null) previewPanel.updatePreview();
 				}
+				@Override
 				public void insertUpdate(DocumentEvent e) {
 					updateSize();
 					if (previewPanel != null) previewPanel.updatePreview();
 				}
+				@Override
 				public void removeUpdate(DocumentEvent e) {
 					updateSize();
 					if (previewPanel != null) previewPanel.updatePreview();
@@ -1111,6 +1116,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 			
 			ActionListener syncher = new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					synchEnabled();
 				}
@@ -1191,16 +1197,20 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			add(sizeRow);
 		}
 		class BboxRow extends SizeRow {
+			@Override
 			protected void setupWidgets() {
 				DocumentListener documentListener = new DocumentListener() {
+					@Override
 					public void changedUpdate(DocumentEvent e) {
 						updateSize();
 						if (previewPanel != null) previewPanel.updatePreview();
 					}
+					@Override
 					public void insertUpdate(DocumentEvent e) {
 						updateSize();
 						if (previewPanel != null) previewPanel.updatePreview();
 					}
+					@Override
 					public void removeUpdate(DocumentEvent e) {
 						updateSize();
 						if (previewPanel != null) previewPanel.updatePreview();
@@ -1252,6 +1262,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 				Double inch = new Double(Math.rint(((double) points * 100 )/ conversionFactor)/ 100.0);
 				return inch.toString();
 			}
+			@Override
 			public void setEnabled(boolean flag) {
 				super.setEnabled(flag);
 				xSize.setEnabled(flag);
@@ -1340,6 +1351,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		}
 		
 		
+		@Override
 		public void addNotify() {
 			super.addNotify();
 			inclusionPanel.recalculateBbox();
@@ -1373,6 +1385,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			
 			arrayAnnoInside = new JCheckBox("Below Tree?");
 			arrayAnnoInside.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					inclusionPanel.updateSize();
 					if (previewPanel != null)
@@ -1382,6 +1395,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			add(arrayAnnoInside);
 			
 			ListSelectionListener tmp = new ListSelectionListener() {
+				@Override
 				public void valueChanged(ListSelectionEvent e) {
 					if (inclusionPanel != null) {
 						inclusionPanel.recalculateBbox();
@@ -1429,6 +1443,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			add(fileField);
 			JButton chooseButton = new JButton("Browse");
 			chooseButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					try {
 						JFileChooser chooser = new JFileChooser();
@@ -1465,6 +1480,7 @@ class TestExportPanel extends ExportPanel {
 	MapContainer aMap,MapContainer gMap) {		
 		super(arrayHeaderInfo, geneHeaderInfo, geneSelection, arraySelection, null, null, null, aMap, gMap, false);
 	}
+	@Override
 	public void save() {
 		
 	}

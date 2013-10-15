@@ -680,7 +680,8 @@ public class Quantize {
                         SQUARES[((color >>  0) & 0xFF) - b + MAX_RGB]);
             }
 
-            public String toString() {
+            @Override
+			public String toString() {
                 StringBuffer buf = new StringBuffer();
                 if (parent == this) {
                     buf.append("root");

@@ -47,17 +47,21 @@ class IntervalAverager extends GroupAverager {
 	}
 	
 	
+	@Override
 	public int getType() {
 		return Averager.INTERVAL;
 	}
+	@Override
 	public String getArg() {
 		return "" + getWidth();
 	}
 	
+	@Override
 	protected String getPre() {
 		return  "Interval size " + getWidth() + " units around ";
 	}
 	
+	@Override
 	protected ChromosomeLocus [] getContributors(ChromosomeLocus locus) {
 		ChromosomeLocus leftCand  = locus.getLeft();
 		ChromosomeLocus rightCand = locus.getRight();

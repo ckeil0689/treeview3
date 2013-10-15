@@ -115,6 +115,7 @@ public class LinkedViewApp extends TreeViewApp {
 	}
 	
 	/* inherit description */
+	@Override
 	public ViewFrame openNew() {
 		// setup toplevel
 		LinkedViewFrame tvFrame  =
@@ -125,6 +126,7 @@ public class LinkedViewApp extends TreeViewApp {
 
 
 	/* inherit description */
+	@Override
 	public ViewFrame openNew(FileSet fileSet) throws LoadException {
 		// setup toplevel
 		LinkedViewFrame tvFrame  =
@@ -144,6 +146,7 @@ public class LinkedViewApp extends TreeViewApp {
 	/**
 	* same as above, but doesn't open a loading window (damn deadlocks!)
 	*/
+	@Override
 	public ViewFrame openNewNW(FileSet fileSet) throws LoadException {
 		// setup toplevel
 		LinkedViewFrame tvFrame  = new LinkedViewFrame(this);
@@ -241,6 +244,7 @@ public class LinkedViewApp extends TreeViewApp {
 	 * scanForPlugins that detects this and updates the codebase so 
 	 * that the coordinates settings will be done correctly.
 	 */
+	@Override
 	public URL getCodeBase() {
 		if (codeBase != null) {
 			return codeBase;
@@ -283,6 +287,7 @@ public class LinkedViewApp extends TreeViewApp {
 			return null;
 		}
 	}
+	@Override
 	protected void endProgram() {
 		if (getGlobalConfig() != null) {
 			getGlobalConfig().store();

@@ -132,6 +132,7 @@ class ScatterView extends ModelView  {
 		sp.getComponent().setToolTipText("This Turns Tooltips On");
 		top.setSize(500,500);
 		top.addWindowListener(new WindowAdapter() {
+			@Override
 			public void windowClosing(WindowEvent windowEvent)
 			{
 				System.exit(0);
@@ -254,6 +255,7 @@ class ScatterView extends ModelView  {
 	}
     }
 	/* Zooming stuff */
+	@Override
 	public Dimension getPreferredSize() {
 		Dimension preferredSize =	super.getPreferredSize();
 		/*
@@ -302,7 +304,9 @@ class ScatterView extends ModelView  {
 	}
 
 	/* ModelView stuff */
+	@Override
 	public String viewName() { return "ScatterView";};
+	@Override
 	public void update(java.util.Observable obs ,java.lang.Object obj) {
 		LogBuffer.println("ScatterView got update from " + obs);
 	}
@@ -366,6 +370,7 @@ class ScatterView extends ModelView  {
 	/**
 	* paints component. I used to use an offscreen buffer for reasons that are no longer valid.
 	*/
+	@Override
 	public void paintComponent(Graphics g) {
 		Dimension newsize = getSize();
 		if (newsize == null) { return;}
@@ -449,7 +454,8 @@ class ScatterView extends ModelView  {
 		if (xMaxParameter.getEnabled() == false) xMaxParameter.setValue(xMax);
 		if (yMaxParameter.getEnabled() == false) yMaxParameter.setValue(yMax);
 	}
-    public void updateBuffer(Graphics g) {
+    @Override
+	public void updateBuffer(Graphics g) {
 	  if (justZoomed) {
 		justZoomed = false;
 		scrollPane.getViewport().setViewPosition(zoomPoint);
@@ -580,6 +586,7 @@ class ScatterView extends ModelView  {
 	int closestPoint = -1;
 	int closestDist2 = 1000000;
 	int threshold2 = 10*10;
+	@Override
 	public String getToolTipText(MouseEvent event) {
 		calculateClosest(startPoint);
 		// early return with closest threshold if matches..
@@ -599,6 +606,7 @@ class ScatterView extends ModelView  {
 		return("X = " + x +", " + "Y = "+ y);
 //		return getToolTipText();
 	}
+	@Override
 	public Point getToolTipLocation(MouseEvent event) {
 		if (closestDist2 < threshold2) {
 			try {
@@ -624,8 +632,8 @@ class ScatterView extends ModelView  {
 		JViewport viewport = scrollPane.getViewport();
 		Dimension visible = viewport.getExtentSize();
 		Point r = viewport.getViewPosition();
-		position.setLocation((int)(size.width - mysize.width)/2, (int)0);
-		position.setLocation((int)r.x + (visible.width - mysize.width)/2,(int) 0);
+		position.setLocation((size.width - mysize.width)/2, 0);
+		position.setLocation(r.x + (visible.width - mysize.width)/2,0);
 		position.setForeground(colorSet.getColor("Axis"));
 		position.repaint();
 	}
@@ -636,10 +644,11 @@ class ScatterView extends ModelView  {
 		/* mouse listener */
 	private boolean dragging = false;
     // Mouse Listener 
+	@Override
 	public void mousePressed(MouseEvent e) {
-		startPoint.setLocation((int)e.getX(), (int)e.getY());
-		endPoint.setLocation((int)startPoint.x, (int)startPoint.y);
-		calcRect.setLocation((int)startPoint.x, (int)startPoint.y);
+		startPoint.setLocation(e.getX(), e.getY());
+		endPoint.setLocation(startPoint.x, startPoint.y);
+		calcRect.setLocation(startPoint.x, startPoint.y);
 		calcRect.setSize(0,0);
 		dragRect.setBounds(calcRect);
 		dragRect.setToolTipText("Test dragRect");
@@ -649,6 +658,7 @@ class ScatterView extends ModelView  {
 		dragRect.repaint();
 		dragging = true;
 	}
+	@Override
 	public void mouseReleased(MouseEvent e) {
 		dragging = false;
 		mouseDragged(e);
@@ -677,31 +687,38 @@ class ScatterView extends ModelView  {
 		
 		
 	    /* container listener */
+	@Override
 	public void componentResized(ComponentEvent e) {
 //		debug("componentResized", e);
 		centerPosition();
     }
 
-    public void componentMoved(ComponentEvent e) {
+    @Override
+	public void componentMoved(ComponentEvent e) {
 //	debug("componentMoved", e);
     }
 
-    public void componentShown(ComponentEvent e) {
+    @Override
+	public void componentShown(ComponentEvent e) {
 //	debug("componentShown", e);
     }
 
-    public void componentHidden(ComponentEvent e) {
+    @Override
+	public void componentHidden(ComponentEvent e) {
 //	debug("componentHidden", e);
     }
 
 
 		/* key listener */
+		@Override
 		public void keyPressed (KeyEvent e) {
 				// Invoked when a key has been pressed. 
 		}
+		@Override
 		public void keyReleased (KeyEvent e) {
 				//ÊÊInvoked when a key has been released. 
 		}
+		@Override
 		public void keyTyped (KeyEvent e) {
 				//ÊÊInvoked when a key has been typed
 			switch (e.getKeyChar()) {
@@ -725,12 +742,13 @@ class ScatterView extends ModelView  {
 
     // MouseMotionListener
 	
+	@Override
 	public void mouseDragged(MouseEvent e) {
 		// rubber band?
 		//	drawBand(dragRect.x, dragRect.y, dragRect.width, dragRect.height);
-		endPoint.setLocation((int)e.getX(), (int)e.getY());
+		endPoint.setLocation(e.getX(), e.getY());
 		
-		calcRect.setLocation((int)startPoint.x, (int)startPoint.y);
+		calcRect.setLocation(startPoint.x, startPoint.y);
 		calcRect.setSize(0,0);
 		calcRect.add(endPoint.x, endPoint.y);
 		if (e.isControlDown()) {
@@ -741,23 +759,27 @@ class ScatterView extends ModelView  {
 		
 		dragRect.setBounds(calcRect);
     }
-    public void mouseClicked(java.awt.event.MouseEvent e) {
+    @Override
+	public void mouseClicked(java.awt.event.MouseEvent e) {
     }
-    public void mouseEntered(java.awt.event.MouseEvent e) {	
+    @Override
+	public void mouseEntered(java.awt.event.MouseEvent e) {	
 		requestFocus();
     }
+	@Override
 	public void mouseExited(java.awt.event.MouseEvent e) {
 		position.setText(dataSource.getTitle());
 		centerPosition();
     }
 
+	@Override
 	public void mouseMoved(java.awt.event.MouseEvent e) {
 		if (xTrans == null) return;
 		if (yTrans == null) return;
 		if (dragging) {
 			mouseDragged(e);
 		} else {
-			startPoint.setLocation((int)e.getX(), (int)e.getY());
+			startPoint.setLocation(e.getX(), e.getY());
 		}
 		position.setText(getToolTipText(e));
 		centerPosition();
@@ -778,7 +800,7 @@ class ScatterView extends ModelView  {
 		if (e.getY() > size.height /2) {
 			ty = e.getY() - mySize.height;
 		}
-		position.setLocation((int)tx, (int)ty);
+		position.setLocation(tx, ty);
 //		System.out.println("trackmouse called");
 		position.repaint();
 	}
@@ -827,6 +849,7 @@ class DragRect extends JComponent {
 		return color;
 	}
 	
+	@Override
 	public void paintComponent(Graphics g) {
 		g.setColor(getColor());
 		g.drawRect(0, 0, getWidth()-1, getHeight()-1);
@@ -850,38 +873,48 @@ class DummySource implements SPDataSource {
 	selected = new boolean[10000];
     }
 
-    public int getNumPoints() {
+    @Override
+	public int getNumPoints() {
 	return selected.length;
     }
-    public double getX(int i) throws NoValueException {
+    @Override
+	public double getX(int i) throws NoValueException {
 	return i % xmod;
     }
-    public double getY(int i) throws NoValueException {
+    @Override
+	public double getY(int i) throws NoValueException {
 	return i % ymod;
     }
+	@Override
 	public String getLabel(int i) {
 		return "Dummy " + i;
 	}
-    public java.awt.Color getColor(int i) {
+    @Override
+	public java.awt.Color getColor(int i) {
 	if (selected[i]) {	
 	    return selColor;
 	} else {
 	    return foreColor;
 	}
     }
-    public String getTitle() {
+    @Override
+	public String getTitle() {
 	return "Modulo Fun!";
     }
-    public String getXLabel() {
+    @Override
+	public String getXLabel() {
 	return "Index mod " + xmod;
     }
-    public String getYLabel() {
+    @Override
+	public String getYLabel() {
 	return "Index mod " + ymod;
     }
+	@Override
 	public boolean isSelected(int i) {
 		return selected[i];
 	}
-    public void select(int i) {
+    @Override
+	public void select(int i) {
 	try {
 	    System.out.println("Selected point " + i + " at (" + getX(i) + ", " + getY(i) + ")");
 	} catch (NoValueException e) {
@@ -889,6 +922,7 @@ class DummySource implements SPDataSource {
 	selected[i] = true;
     }
 
+		@Override
 		public void select(double xL, double yL, double xU, double yU) {
 		int n = getNumPoints();
 		for (int i = 0; i < n; i++) {
@@ -904,7 +938,8 @@ class DummySource implements SPDataSource {
 	}
 
 	
-    public void deselectAll() {
+    @Override
+	public void deselectAll() {
 	for (int i = 0; i < selected.length; i++) {
 	    selected[i] = false;
 	}

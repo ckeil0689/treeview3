@@ -106,6 +106,7 @@ public class AtrAnalysisNode extends TreeAnalysisNode {
 	 * @param v the vector to fill with leaves
 	 */
 	
+	@Override
 	public void enumerate(Vector v)
 	{
 		if(left != null)

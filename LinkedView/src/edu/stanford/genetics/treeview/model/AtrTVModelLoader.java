@@ -42,6 +42,7 @@ public class AtrTVModelLoader extends TVModelLoader2 {
 		super(targetModel);
 	}
 	
+	@Override
 	protected void  parseCDT(RectData tempVector) throws LoadException {
 		super.findCdtDimensions(tempVector);
 		super.loadArrayAnnotation(tempVector);

@@ -112,6 +112,7 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		return out;
 	}
 	private ConfigNode root;
+	@Override
 	public void bindConfig(ConfigNode configNode) {
 		root  = configNode;
 		synchronizeFrom();

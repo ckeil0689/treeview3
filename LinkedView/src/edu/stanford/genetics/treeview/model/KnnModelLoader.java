@@ -56,6 +56,7 @@ public class KnnModelLoader extends TVModelLoader2 {
 	 * 
 	 * @see edu.stanford.genetics.treeview.model.TVModelLoader2#run()
 	 */
+	@Override
 	protected void run() {
 		try{
 			KnnModel model = getKnnModel();

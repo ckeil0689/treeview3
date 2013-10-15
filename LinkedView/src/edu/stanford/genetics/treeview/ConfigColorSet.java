@@ -37,6 +37,7 @@ public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 	private String[] types;
 
 	/*inherit description */
+	@Override
 	public String[] getTypes() {
 		return types;
 	}
@@ -82,6 +83,7 @@ public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 	}
 
 	/* inherit description */
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -146,6 +148,7 @@ public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 
 
 	/*inherit description */
+	@Override
 	public void bindConfig(ConfigNode configNode) {
 		this.configNode = configNode;
 		// first, init existing...
@@ -183,6 +186,7 @@ public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 
 
 	/*inherit description */
+	@Override
 	public String toString() {
 		String ret      = "ConfigColorSet " + getName() + "\n";
 		String[] types  = getTypes();
@@ -203,6 +207,7 @@ public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 
 
 	/*inherit description */
+	@Override
 	public Color getColor(int i) {
 		if (i == -1) {
 			return null;
@@ -223,17 +228,19 @@ public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 
 
 	/*inherit description */
+	@Override
 	public void setColor(int i, Color newColor) {
 		colors[i] = newColor;
 		if (configNode != null) {
 			ConfigNode[] colors  = configNode.fetch("Color");
-			colors[i].setAttribute("type", getType(i), (String) "none");
+			colors[i].setAttribute("type", getType(i), "none");
 			colors[i].setAttribute("hex", encodeColor(newColor), defaultColors[i]);
 		}
 	}
 
 
 	/*inherit description */
+	@Override
 	public String getType(int i) {
 		String[] types  = getTypes();
 		return types[i];

@@ -28,10 +28,12 @@ public class GeneFinder extends HeaderFinder {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.HeaderFinder#scrollToIndex(int)
 	 */
+	@Override
 	public void scrollToIndex(int i) {
 		viewFrame.scrollToGene(i);
 	}
 
+	@Override
 	protected void showSubDataModel() {
 		seekAll();
 		viewFrame.showSubDataModel(geneSelection.getSelectedIndexes(),

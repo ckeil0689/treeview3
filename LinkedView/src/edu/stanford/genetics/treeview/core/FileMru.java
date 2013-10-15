@@ -47,6 +47,7 @@ public class FileMru extends java.util.Observable implements ConfigNodePersisten
 	 *
 	 * @param  configNode  Node to be bound to
 	 */
+	@Override
 	public synchronized void bindConfig(ConfigNode configNode) {
 		root = configNode;
 		setChanged();

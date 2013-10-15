@@ -120,6 +120,7 @@ public class FileMruEditor extends JPanel {
 		top.add(this);
 		top.addWindowListener(
 			new WindowAdapter() {
+				@Override
 				public void windowClosing(WindowEvent we) {
 					we.getWindow().dispose();
 				}
@@ -144,6 +145,7 @@ public class FileMruEditor extends JPanel {
 		d.setContentPane(this);
 		d.addWindowListener(
 			new WindowAdapter() {
+				@Override
 				public void windowClosing(WindowEvent we) {
 					we.getWindow().dispose();
 				}
@@ -204,6 +206,7 @@ public class FileMruEditor extends JPanel {
 			list = new JList();
 			list.addListSelectionListener(
 				new ListSelectionListener() {
+					@Override
 					public void valueChanged(ListSelectionEvent e) {
 					int i  = list.getSelectedIndex();
 						//			System.out.println("got selection event, selected is "+i);
@@ -258,6 +261,7 @@ public class FileMruEditor extends JPanel {
 		/**
 		*  removes all filsets.
 		*/
+		@Override
 		public void removeAll() {
 			int max = list.getModel().getSize();
 		  	for (int i = (max - 1); i >= 0; i--) {
@@ -324,6 +328,7 @@ public class FileMruEditor extends JPanel {
 			openButton = new Button("Open");
 			openButton.addActionListener(
 				new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 					}
 				});
@@ -332,6 +337,7 @@ public class FileMruEditor extends JPanel {
 			searchButton = new Button("Find");
 			searchButton.addActionListener(
 				new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						fileSetPanel.searchSelected();
 					}
@@ -341,6 +347,7 @@ public class FileMruEditor extends JPanel {
 			deleteButton = new Button("Remove");
 			deleteButton.addActionListener(
 				new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 					  fileSetPanel.removeSelected();
 					}
@@ -350,6 +357,7 @@ public class FileMruEditor extends JPanel {
 			deleteAllButton = new Button("Remove All");
 			deleteAllButton.addActionListener(
 				new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 					fileSetPanel.removeAll();
 					}
@@ -359,6 +367,7 @@ public class FileMruEditor extends JPanel {
 			closeButton = new Button("Close");
 			closeButton.addActionListener(
 				new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						window.dispose();
 					}

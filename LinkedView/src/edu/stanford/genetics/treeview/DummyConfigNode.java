@@ -44,6 +44,7 @@ public class DummyConfigNode implements ConfigNode {
 	 * @param  tname  name of subnode to create
 	 * @return        newly created node
 	 */
+	@Override
 	public ConfigNode create(String tname) {
 	DummyConfigNode child  = new DummyConfigNode(tname);
 		kids.addElement(child);
@@ -70,6 +71,7 @@ public class DummyConfigNode implements ConfigNode {
 	 * @param  byname  type of nodes to search for
 	 * @return      array of matching nodes
 	 */
+	@Override
 	public ConfigNode[] fetch(String byname) {
 		if (byname == null) {
 			return null;
@@ -86,7 +88,7 @@ public class DummyConfigNode implements ConfigNode {
 
 		for (int i = 0; i < kids.size(); i++) {
 			if (byname.equals(((DummyConfigNode) kids.elementAt(i)).name)) {
-				ret[matching] = (ConfigNode) kids.elementAt(i);
+				ret[matching] = kids.elementAt(i);
 				matching++;
 			}
 		}
@@ -100,10 +102,11 @@ public class DummyConfigNode implements ConfigNode {
 	 * @param  byname  type of node to search for
 	 * @return        first matching node
 	 */
+	@Override
 	public ConfigNode fetchFirst(String byname) {
 		for (int i = 0; i < kids.size(); i++) {
 			if (byname.equals(((DummyConfigNode) kids.elementAt(i)).name)) {
-				return (ConfigNode) kids.elementAt(i);
+				return kids.elementAt(i);
 			}
 		}
 		return null;
@@ -115,6 +118,7 @@ public class DummyConfigNode implements ConfigNode {
 	 *
 	 * @param  configNode  node to remove
 	 */
+	@Override
 	public void remove(ConfigNode configNode) {
 		kids.removeElement(configNode);
 	}
@@ -125,6 +129,7 @@ public class DummyConfigNode implements ConfigNode {
 	 *
 	 * @param  byname type of node to remove
 	 */
+	@Override
 	public void removeAll(String byname) {
 		for (int i = kids.size() - 1; i >= 0; i--) {
 			if (byname.equals(((DummyConfigNode) kids.elementAt(i)).name)) {
@@ -139,6 +144,7 @@ public class DummyConfigNode implements ConfigNode {
 	 *
 	 * @param  configNode  The new last value
 	 */
+	@Override
 	public void setLast(ConfigNode configNode) {
 		kids.removeElement(configNode);
 		kids.addElement(configNode);
@@ -152,6 +158,7 @@ public class DummyConfigNode implements ConfigNode {
 	 * @param  d       a default value to return
 	 * @return         The attribute value
 	 */
+	@Override
 	public double getAttribute(String string, double d) {
 	Object o  = attr.get(string);
 		if ((o == null) || ( o == NULLVALUE)) {
@@ -163,7 +170,8 @@ public class DummyConfigNode implements ConfigNode {
 	/**
 	 * determine if a particular attribute is defined for this node.
 	 */
-	 public boolean hasAttribute(String string) {
+	 @Override
+	public boolean hasAttribute(String string) {
 	   Object o  = attr.get(string);
 	   if (o == null) {
 		 return false;
@@ -179,6 +187,7 @@ public class DummyConfigNode implements ConfigNode {
 	 * @param  i       default int value
 	 * @return         The attribute value
 	 */
+	@Override
 	public int getAttribute(String string, int i) {
 	Object o  = attr.get(string);
 		if ((o == null) || (o == NULLVALUE)) {
@@ -195,6 +204,7 @@ public class DummyConfigNode implements ConfigNode {
 	 * @param  string2  Default value
 	 * @return          The attribute value
 	 */
+	@Override
 	public String getAttribute(String string1, String string2) {
 	Object o  = attr.get(string1);
 		if (o == null) {
@@ -214,6 +224,7 @@ public class DummyConfigNode implements ConfigNode {
 	 * @param  val   The new attribute value
 	 * @param  dval  The default value
 	 */
+	@Override
 	public void setAttribute(String att, double val, double dval) {
 		attr.put(att, new Double(val));
 	}
@@ -226,6 +237,7 @@ public class DummyConfigNode implements ConfigNode {
 	 * @param  val   The new attribute value
 	 * @param  dval  The default value
 	 */
+	@Override
 	public void setAttribute(String att, int val, int dval) {
 		attr.put(att, new Integer(val));
 	}
@@ -238,6 +250,7 @@ public class DummyConfigNode implements ConfigNode {
 	 * @param  val   The new attribute value
 	 * @param  dval  The default value
 	 */
+	@Override
 	public void setAttribute(String att, String val, String dval) {
 		if (att == null ) LogBuffer.println("attibute to DummyConfig was null!");
 		if (val == null) {
@@ -250,6 +263,7 @@ public class DummyConfigNode implements ConfigNode {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.ConfigNode#fetchOrCreate(java.lang.String)
 	 */
+	@Override
 	public ConfigNode fetchOrCreate(String string) {
 		ConfigNode cand = fetchFirst(string);
 		if (cand == null)
@@ -261,6 +275,7 @@ public class DummyConfigNode implements ConfigNode {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.ConfigNode#store()
 	 */
+	@Override
 	public void store() {
 		// null op, since dummy.
 		// System.err.println("Trying to save dummy config")

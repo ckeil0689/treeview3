@@ -28,6 +28,7 @@ public class ControlPanel extends JPanel {
 			add(textField);
 			JButton b_browse = new JButton("Browse...");
 			b_browse.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					JFileChooser chooser = new JFileChooser();
 					chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -40,6 +41,7 @@ public class ControlPanel extends JPanel {
 			add(b_browse);
 			JButton b_load = new JButton("Load");
 			b_load.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					ControlPanel.this.loadCDT();
 				}
@@ -63,12 +65,14 @@ public class ControlPanel extends JPanel {
 			add(new JScrollPane(textArea), BorderLayout.CENTER);
 			JButton b_clear = new JButton("Clear");
 			b_clear.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					textArea.setText("");
 				}
 			});
 			add(b_clear, BorderLayout.SOUTH);
 		}
+		@Override
 		public void update(Observable arg0, Object arg1) {
 			textArea.append("Event " +arg0.toString() + "\n");
 			TreeSelectionI treeSelection = (TreeSelectionI) arg0;
@@ -103,6 +107,7 @@ public class ControlPanel extends JPanel {
 			add(new JScrollPane(textArea), BorderLayout.CENTER);
 			JButton b_clear = new JButton("Send");
 			b_clear.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					String [] ids = extractStrings();
 					selectStrings(ids);

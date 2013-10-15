@@ -48,6 +48,7 @@ public class ScatterPanel extends JPanel implements MainPanel, java.util.Observe
 		this.configNode = configNode;
 	}
 	/** Getter for configNode */
+	@Override
 	public ConfigNode getConfigNode() {
 		return configNode;
 	}
@@ -118,7 +119,8 @@ public class ScatterPanel extends JPanel implements MainPanel, java.util.Observe
 	}
 
     // Observer
-    public void update(Observable o, Object arg) {	
+    @Override
+	public void update(Observable o, Object arg) {	
 	if (o == selection) {
 	    scatterPane.selectionChanged();
 	} else {
@@ -138,6 +140,7 @@ public class ScatterPanel extends JPanel implements MainPanel, java.util.Observe
 		/**
 	 *  This syncronizes the sub compnents with their persistent storage.
 	 */
+	@Override
 	public void syncConfig() {
 	}
 
@@ -147,8 +150,10 @@ public class ScatterPanel extends JPanel implements MainPanel, java.util.Observe
 	 *
 	 * @param  menu  A menu to add items to.
 	 */
+	@Override
 	public void populateSettingsMenu(TreeviewMenuBarI menu) {
 		menu.addMenuItem("Display...", new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				showDisplayPopup();
 			}
@@ -162,6 +167,7 @@ public class ScatterPanel extends JPanel implements MainPanel, java.util.Observe
 	 *
 	 * @param  menu  A menu to add items to.
 	 */
+	@Override
 	public void populateAnalysisMenu(TreeviewMenuBarI menu) {
 	}
 
@@ -171,9 +177,11 @@ public class ScatterPanel extends JPanel implements MainPanel, java.util.Observe
 	 *
 	 * @param  menu  A menu to add items to.
 	 */
+	@Override
 	public void populateExportMenu(TreeviewMenuBarI menu) {
 		menu.addMenuItem("Export to Image...", new ActionListener() {
-		  public void actionPerformed(ActionEvent actionEvent) {
+		  @Override
+		public void actionPerformed(ActionEvent actionEvent) {
 
 			  BitmapScatterViewExportPanel bitmapPanel = new BitmapScatterViewExportPanel
 			(scatterPane);
@@ -193,9 +201,11 @@ public class ScatterPanel extends JPanel implements MainPanel, java.util.Observe
 	 *
 	 * @param  i  Index of gene in cdt to make visible
 	 */
+	@Override
 	public void scrollToGene(int i) {
 		LogBuffer.println("ScatterPanel.scrollToGene not implemented");
 	}
+	@Override
 	public void scrollToArray(int i) {
 		LogBuffer.println("ScatterPanel.scrollToArray not implemented");
 	}
@@ -227,9 +237,11 @@ public class ScatterPanel extends JPanel implements MainPanel, java.util.Observe
 		private int yIndex; // meaningful for RATIO and PREFIX
 		private int yType;
 		
+		@Override
 		public int getNumPoints() {
 			return getViewFrame().getDataModel().getDataMatrix().getNumRow();
 		}
+		@Override
 		public double getX(int i) throws NoValueException {
 			if (xVals == null) setupVals();
 			if (xVals[i] == DataModel.NODATA) throw new NoValueException("NODATA");
@@ -237,17 +249,20 @@ public class ScatterPanel extends JPanel implements MainPanel, java.util.Observe
 			return xVals[i];
 			// return getValue(xType, xIndex, i);
 		}
+		@Override
 		public double getY(int i) throws NoValueException {
 			if (yVals == null) setupVals();
 			if (yVals[i] == DataModel.NODATA) throw new NoValueException("NODATA");
 			return yVals[i];
 			//	return getValue(yType, yIndex, i);
 		}
+		@Override
 		public String getLabel(int geneIndex) {
 			DataModel tvmodel = getViewFrame().getDataModel();
 			HeaderInfo info = tvmodel.getGeneHeaderInfo();
 			return  info.getHeader(geneIndex) [info.getIndex("YORF")];
 		}
+		@Override
 		public Color getColor(int i) {
 			if (getViewFrame().geneIsSelected(i)) {
 				return scatterPane.getColorSet().getColor("Selected");
@@ -255,16 +270,20 @@ public class ScatterPanel extends JPanel implements MainPanel, java.util.Observe
 				return scatterPane.getColorSet().getColor("Data");
 			}
 		}
+		@Override
 		public String getTitle() {
 			return getXLabel() + " vs. " + getYLabel();
 		}
+		@Override
 		public String getXLabel() {
 			return getName(xType, xIndex);
 		}
+		@Override
 		public String getYLabel() {
 			return getName(yType, yIndex);
 		}
 		
+		@Override
 		public void select(int i) {
 			getViewFrame().extendRange(i);
 		}
@@ -279,6 +298,7 @@ public class ScatterPanel extends JPanel implements MainPanel, java.util.Observe
 				yVals[i] = getSimpleValue(yType, yIndex, i);
 			}
 		}
+		@Override
 		public void select(double xL, double yL, double xU, double yU) {
 			if (xVals == null) setupVals();
 			int n = getNumPoints();
@@ -308,9 +328,11 @@ public class ScatterPanel extends JPanel implements MainPanel, java.util.Observe
 				getViewFrame().scrollToGene(first);
 			}
 		}
+		@Override
 		public void deselectAll() {
 			getViewFrame().deselectAll();
 		}
+		@Override
 		public boolean isSelected(int i) {
 			return getViewFrame().geneIsSelected(i);
 		}
@@ -398,6 +420,7 @@ public class ScatterPanel extends JPanel implements MainPanel, java.util.Observe
 	/**
 	 * icon for display in tabbed panel
 	 */
+	@Override
 	public ImageIcon getIcon() {
 		if (scatterIcon == null) {
 			try {
@@ -409,6 +432,7 @@ public class ScatterPanel extends JPanel implements MainPanel, java.util.Observe
 		return scatterIcon;
 	}	
 	
+	@Override
 	public void export(MainProgramArgs args) throws ExportException {
 		throw new ExportException("Export not implemented for plugin " + getName());
 	}

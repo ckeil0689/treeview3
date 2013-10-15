@@ -139,6 +139,7 @@ class KaryoViewParameterPanel extends JPanel {
 			String[] names  = karyoView.getExperiments();
 			pulldown = new JComboBox(names);
 			pulldown.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 						setValues();
 				}
@@ -187,14 +188,17 @@ class KaryoViewParameterPanel extends JPanel {
 		 */
 		public ScalePanel() {
 			DocumentListener documentListener = new DocumentListener() {
+				@Override
 				public void changedUpdate(DocumentEvent e) {
 					 setValues();
 					karyoDrawer.notifyObservers();
 				}
+				@Override
 				public void insertUpdate(DocumentEvent e) {
 					setValues();
 					karyoDrawer.notifyObservers();
 				}
+				@Override
 				public void removeUpdate(DocumentEvent e) {
 					setValues();
 					karyoDrawer.notifyObservers();
@@ -250,14 +254,17 @@ class KaryoViewParameterPanel extends JPanel {
 		public SizePanel() {
 			
 			DocumentListener documentListener = new DocumentListener() {
+				@Override
 				public void changedUpdate(DocumentEvent e) {
 					 setMyValues();
 					karyoDrawer.notifyObservers();
 				}
+				@Override
 				public void insertUpdate(DocumentEvent e) {
 					setMyValues();
 					karyoDrawer.notifyObservers();
 				}
+				@Override
 				public void removeUpdate(DocumentEvent e) {
 					setMyValues();
 					karyoDrawer.notifyObservers();
@@ -291,6 +298,7 @@ class KaryoViewParameterPanel extends JPanel {
 			JButton rescaleButton  = new JButton("Auto");
 			rescaleButton.addActionListener(
 				new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						karyoView.redoScale();
 					}
@@ -362,6 +370,7 @@ class KaryoViewParameterPanel extends JPanel {
 			JButton prev  = new JButton("Display...");
 			prev.addActionListener(
 				new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						karyoPanel.showDisplayPopup();
 					}
@@ -370,6 +379,7 @@ class KaryoViewParameterPanel extends JPanel {
 			JButton same  = new JButton("Coordinates...");
 			same.addActionListener(
 				new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						karyoPanel.showCoordinatesPopup();
 					}
@@ -378,6 +388,7 @@ class KaryoViewParameterPanel extends JPanel {
 			JButton next  = new JButton("Averaging...");
 			next.addActionListener(
 				new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						karyoPanel.showAveragingPopup();
 					}
@@ -414,11 +425,13 @@ class KaryoViewParameterPanel extends JPanel {
 			getValues();
 
 			iconBox.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 						setValues();
 				}
 			});
 			iconSize.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 						setValues();
 				}
@@ -465,6 +478,7 @@ class KaryoViewParameterPanel extends JPanel {
 			JButton prev  = new JButton("Prev");
 			prev.addActionListener(
 				new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						experimentPanel.prev();
 						setValues();
@@ -474,6 +488,7 @@ class KaryoViewParameterPanel extends JPanel {
 			JButton same  = new JButton("Same");
 			same.addActionListener(
 				new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						setValues();
 					}
@@ -482,6 +497,7 @@ class KaryoViewParameterPanel extends JPanel {
 			JButton next  = new JButton("Next");
 			next.addActionListener(
 				new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						experimentPanel.next();
 						setValues();

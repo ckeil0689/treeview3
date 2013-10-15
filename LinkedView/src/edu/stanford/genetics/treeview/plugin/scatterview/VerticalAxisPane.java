@@ -62,6 +62,7 @@ class VerticalAxisPane extends JPanel  {
 		add(new JLabel("y axis"));
 	}
 	
+	@Override
 	public void paintComponent(Graphics g) {
 		Dimension size = getSize();
 	    g.setColor(colorSet.getColor("Background"));

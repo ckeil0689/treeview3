@@ -19,18 +19,22 @@ public class ReorderedTreeSelection extends Observable implements TreeSelectionI
 		p.addObserver(this);
 	}
 	
+	@Override
 	public void resize(int nIndex) {
 		parent.resize(nIndex);
 	}
 
+	@Override
 	public void deselectAllIndexes() {
 		parent.deselectAllIndexes();
 	}
 
+	@Override
 	public void selectAllIndexes() {
 		parent.selectAllIndexes();
 	}
 
+	@Override
 	public void setIndex(int i, boolean b) {
 		if (i >= reorderedIndex.length) i = reorderedIndex.length-1;
 		if (i < 0) i = 0;
@@ -39,6 +43,7 @@ public class ReorderedTreeSelection extends Observable implements TreeSelectionI
 			parent.setIndex(index, b);
 	}
 
+	@Override
 	public boolean isIndexSelected(int i) {
 		int index = reorderedIndex[i];
 		if (index != -1)
@@ -46,6 +51,7 @@ public class ReorderedTreeSelection extends Observable implements TreeSelectionI
 		return false;
 	}
 
+	@Override
 	public int getMinIndex() {
 		int start = parent.getMinIndex();
 		if (start == -1) return -1;
@@ -55,10 +61,12 @@ public class ReorderedTreeSelection extends Observable implements TreeSelectionI
 		return -1;
 	}
 
+	@Override
 	public int[] getSelectedIndexes() {
 		return parent.getSelectedIndexes();
 	}
 
+	@Override
 	public int getMaxIndex() {
 		int stop = parent.getMaxIndex();
 		if (stop == -1) return -1;
@@ -68,10 +76,12 @@ public class ReorderedTreeSelection extends Observable implements TreeSelectionI
 		return -1;
 	}
 
+	@Override
 	public int getNumIndexes() {
 		return reorderedIndex.length;
 	}
 
+	@Override
 	public void selectIndexRange(int min, int max) {
 		while ((reorderedIndex[min] == -1) && (min < reorderedIndex.length))
 			min++;
@@ -81,34 +91,41 @@ public class ReorderedTreeSelection extends Observable implements TreeSelectionI
 			parent.selectIndexRange(reorderedIndex[min], reorderedIndex[max]);
 	}
 
+	@Override
 	public int getNSelectedIndexes() {
 		return parent.getNSelectedIndexes();
 	}
 
+	@Override
 	public void setSelectedNode(String n) {
 		parent.setSelectedNode(n);
 	}
 
+	@Override
 	public String getSelectedNode() {
 		return parent.getSelectedNode();
 	}
 
+	@Override
 	public void notifyObservers() {
 		parent.notifyObservers();
 	}
 	
 	private Vector observers = new Vector();
 
+	@Override
 	public void update(Observable arg0, Object arg1) {
 		Enumeration e = observers.elements();
 		while (e.hasMoreElements())
 			((Observer)e.nextElement()).update(this,arg1);
 	}
 
+	@Override
 	public void addObserver(Observer view) {
 		observers.addElement(view);
 	}
 
+	@Override
 	public void deleteObserver(Observer view) {
 		observers.remove(view);
 	}

@@ -3,6 +3,7 @@
 	<classpathentry kind="src" path="JTVPluginExample/src"/>
 	<classpathentry kind="src" path="JTVSeparateExample/src"/>
 	<classpathentry kind="src" path="LinkedView/src"/>
+	<classpathentry kind="src" path="resources"/>
 	<classpathentry kind="lib" path="jtv-website/examples/nanoxml-2.2.2.jar"/>
 	<classpathentry kind="lib" path="jtv-website/examples/TreeView.jar"/>
 	<classpathentry kind="lib" path="LinkedView/compile_lib/jarbundler-1.8.1.jar"/>

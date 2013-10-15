@@ -30,6 +30,7 @@ import java.net.URL;
 import java.util.Observer;
 
 import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 
 import edu.stanford.genetics.treeview.*;
 import edu.stanford.genetics.treeview.core.MenuHelpPluginsFrame;
@@ -46,6 +47,7 @@ public class AppletViewFrame extends LinkedViewFrame implements Observer {
 
 	private static String appName = "Java TreeView (Applet)";
 	
+	@Override
 	public String getAppName() {
 		
 		return appName;
@@ -62,6 +64,7 @@ public class AppletViewFrame extends LinkedViewFrame implements Observer {
 		browserControl= new AppletBrowserControl(applet);
 	}
 	
+	@Override
 	protected void displayPluginInfo(){
 		
 		MenuHelpPluginsFrame frame = new MenuHelpPluginsFrame(
@@ -75,7 +78,7 @@ public class AppletViewFrame extends LinkedViewFrame implements Observer {
 			frame.setSourceText("Unable to read default plugins directory.");
 		}
 		
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		frame.setVisible(true);
 	}
 	
@@ -91,6 +94,7 @@ public class AppletViewFrame extends LinkedViewFrame implements Observer {
 			appletContext = applet.getAppletContext();
 		}
 
+		@Override
 		public void displayURL(String url) throws IOException {
 			
 			appletContext.showDocument(new URL(url), "_blank");

@@ -58,7 +58,7 @@ public class FlatFileStreamTokenizer extends StreamTokenizer {
 	  	BufferedReader br = new BufferedReader(new FileReader(astring[0]));
 	  	FlatFileStreamTokenizer st = new FlatFileStreamTokenizer(br);
 		st.printToken();
-		while (st.nextToken() != FlatFileStreamTokenizer.TT_EOF) {
+		while (st.nextToken() != StreamTokenizer.TT_EOF) {
 		  st.printToken();
 		}
 		st.printToken();
@@ -119,16 +119,17 @@ public class FlatFileStreamTokenizer extends StreamTokenizer {
 	/**
 	 * @return    String representation of current token
 	 */
+	@Override
 	public String toString() {
 	String msg;
 		switch (ttype) {
-						case FlatFileStreamTokenizer.TT_WORD:
+						case StreamTokenizer.TT_WORD:
 							msg = "Word: " + sval;
 							break;
-						case FlatFileStreamTokenizer.TT_NUMBER:
+						case StreamTokenizer.TT_NUMBER:
 							msg = "Number: " + nval;
 							break;
-						case FlatFileStreamTokenizer.TT_EOL:
+						case StreamTokenizer.TT_EOL:
 							msg = "EOL:";
 							break;
 						case FlatFileStreamTokenizer.TT_NULL:
@@ -157,6 +158,7 @@ public class FlatFileStreamTokenizer extends StreamTokenizer {
 	 * @return                  token type of next token
 	 * @exception  IOException  Thrown by the reader, of course
 	 */
+	@Override
 	public int nextToken() throws IOException {
 		if (printTokens) {
 			printToken();
@@ -215,6 +217,7 @@ public class FlatFileStreamTokenizer extends StreamTokenizer {
 	/**
 	 *  Pushes back current token to be read again.
 	 */
+	@Override
 	public void pushBack() {
 		if (ttype == TT_EOL) {
 			//	    System.out.println("pushback TT_EOL");
@@ -227,6 +230,7 @@ public class FlatFileStreamTokenizer extends StreamTokenizer {
 	/**
 	 * @return    lines read so far
 	 */
+	@Override
 	public int lineno() {
 		return lines;
 	}

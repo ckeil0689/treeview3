@@ -58,7 +58,8 @@ public class UrlEditor {
 	    d.add(new JLabel(getTitle()), BorderLayout.NORTH);
 	    d.add(new ButtonPanel(), BorderLayout.SOUTH);
 	    d.addWindowListener(new WindowAdapter (){
-		    public void windowClosing(WindowEvent we) 
+		    @Override
+			public void windowClosing(WindowEvent we) 
 		    {we.getWindow().setVisible(false);}
 		});
 	    d.pack();
@@ -76,6 +77,7 @@ public class UrlEditor {
 	e.addToFrame(f);
 
 	f.addWindowListener(new WindowAdapter (){
+		@Override
 		public void windowClosing(WindowEvent we) 
 		{System.exit(0);}
 	    });
@@ -98,7 +100,8 @@ public class UrlEditor {
 	ButtonPanel() {
 	    JButton close_button = new JButton("Close");
 	    close_button.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
+		    @Override
+			public void actionPerformed(ActionEvent e) {
 			window.dispose();
 		    }
 		});
@@ -135,7 +138,7 @@ public class UrlEditor {
 		  gbc.gridx = 0;
 		  gbc.gridwidth = 3;
 		  gbc.weighty = 100;
-		  add(new JLabel("Url Presets (Can edit under Program Menu)", JLabel.CENTER), gbc);
+		  add(new JLabel("Url Presets (Can edit under Program Menu)", SwingConstants.CENTER), gbc);
 		  gbc.gridwidth = 1;
 		  for (int i = 0; i < nPresets; i++) {
 		  gbc.gridy++;
@@ -156,6 +159,7 @@ public class UrlEditor {
 		  add(previewField, gbc);
 		  JButton update= new JButton("Update");
 		  update.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 		    updatePreview();
 			}
@@ -205,7 +209,8 @@ public class UrlEditor {
 	    }
 	    addItemListener(this);
 	  }
-	  public void itemStateChanged(ItemEvent e) {
+	  @Override
+	public void itemStateChanged(ItemEvent e) {
 	    updatePreview();
 	  }
     }
@@ -223,6 +228,7 @@ public class UrlEditor {
 		  add(templateField, gbc);
 		  JButton updateButton = new JButton ("Update");
 		  updateButton.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 			  updatePreview();
 			}
@@ -235,7 +241,8 @@ public class UrlEditor {
 		  TemplateField () {
 			super("enter url template");
 			addActionListener(new ActionListener() {
-		    	public void actionPerformed(ActionEvent e) {
+		    	@Override
+				public void actionPerformed(ActionEvent e) {
 				  updatePreview();
 				}
 			});
@@ -253,6 +260,7 @@ public class UrlEditor {
 		  gbc.weightx = 0;
 		  JButton set = new JButton("Set");
 		  set.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 			  templateField.setText(presets.getTemplate(index));
 			  updatePreview();

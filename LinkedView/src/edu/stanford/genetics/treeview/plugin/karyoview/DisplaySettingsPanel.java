@@ -130,12 +130,14 @@ class DisplaySettingsPanel extends JPanel implements SettingsPanel {
 		add(selectedPanel,gc);
 	}
 	
+	@Override
 	public void synchronizeTo() {
 		selectedPanel.setValues();
 		drawPanel.setValues();
 		scalePanel.setValues();
 	}
 	
+	@Override
 	public void synchronizeFrom() {
 		selectedPanel.getValues();
 		drawPanel.getValues();
@@ -148,17 +150,19 @@ class DisplaySettingsPanel extends JPanel implements SettingsPanel {
 	class DrawPanel extends JPanel {
 		JCheckBox lineBox, barBox;
 		DrawPanel() {
-			setAlignmentX(JPanel.LEFT_ALIGNMENT);
+			setAlignmentX(Component.LEFT_ALIGNMENT);
 			lineBox = new JCheckBox("lines");
 			barBox = new JCheckBox("bars");
 			add(lineBox);
 			add(barBox);
 			lineBox.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 						setValues();
 				}
 			});
 			barBox.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 						setValues();
 				}
@@ -185,7 +189,7 @@ class DisplaySettingsPanel extends JPanel implements SettingsPanel {
 		JCheckBox aboveBox, belowBox;
 		JTextField baseField, maxField;
 		ScalePanel() {
-			setAlignmentX(JPanel.LEFT_ALIGNMENT);
+			setAlignmentX(Component.LEFT_ALIGNMENT);
 			aboveBox = new JCheckBox("above");
 			belowBox = new JCheckBox("below");
 			baseField = new JTextField("2.0");
@@ -199,23 +203,31 @@ class DisplaySettingsPanel extends JPanel implements SettingsPanel {
 			add(maxField);
 			
 			aboveBox.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 						setValues();
 				}
 			});
 			belowBox.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 						setValues();
 				}
 			});
 			baseField.getDocument().addDocumentListener(new DocumentListener() {
+				@Override
 				public void insertUpdate  (DocumentEvent e) { setBase();}
+				@Override
 				public void removeUpdate  (DocumentEvent e) { setBase();}
+				@Override
 				public void changedUpdate (DocumentEvent e) { setBase();}
 			});
 			maxField.getDocument().addDocumentListener(new DocumentListener() {
+				@Override
 				public void insertUpdate  (DocumentEvent e) { setMax();}
+				@Override
 				public void removeUpdate  (DocumentEvent e) { setMax();}
+				@Override
 				public void changedUpdate (DocumentEvent e) { setMax();}
 			});
 		}
@@ -288,6 +300,7 @@ class DisplaySettingsPanel extends JPanel implements SettingsPanel {
 			JPanel row3 = new JPanel();
 			JButton loadButton = new JButton("Load...");
 			loadButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					JFileChooser chooser = new JFileChooser();
 					int returnVal = chooser.showOpenDialog(DisplaySettingsPanel.this);
@@ -314,6 +327,7 @@ class DisplaySettingsPanel extends JPanel implements SettingsPanel {
 
 			JButton saveButton = new JButton("Save...");
 			saveButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					JFileChooser chooser = new JFileChooser();
 					int returnVal = chooser.showSaveDialog(DisplaySettingsPanel.this);
@@ -329,6 +343,7 @@ class DisplaySettingsPanel extends JPanel implements SettingsPanel {
 
 			JButton makeButton = new JButton("Make Preset");
 			makeButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					KaryoColorSet temp = new KaryoColorSet();
 			KaryoDrawer karyoDrawer = getKaryoPanel().getKaryoDrawer();
@@ -377,6 +392,7 @@ class DisplaySettingsPanel extends JPanel implements SettingsPanel {
 		  JButton presetButton = new JButton((presets.getPresetNames()) [i]);
 		  final int index = i;
 		  presetButton.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 			  colorPanel.copyStateFrom(presets.getColorSet(index));
 			}
@@ -404,6 +420,7 @@ class DisplaySettingsPanel extends JPanel implements SettingsPanel {
 			colorIcon = new ColorIcon(10, 10, getColor());
 			JButton pushButton = new JButton(getLabel(), colorIcon);
 			pushButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					Color trial = JColorChooser.showDialog(ColorPanel.this, "Pick Color for " + getLabel(), getColor());
 					if (trial != null) {
@@ -461,12 +478,14 @@ class DisplaySettingsPanel extends JPanel implements SettingsPanel {
 			getValues();
 
 			iconBox.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 						setValues();
 				}
 			}
 			);
 			iconSize.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 						setValues();
 				}

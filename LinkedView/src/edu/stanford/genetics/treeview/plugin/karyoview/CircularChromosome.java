@@ -28,42 +28,50 @@ class CircularChromosome extends Chromosome {
 	CircularChromosome(int nCircular) {
 		circularArm = new ChromosomeLocus[nCircular];
 	}
+	@Override
 	public void insertLocus(ChromosomeLocus locus) {
 		if (locus.getArm() == ChromosomeLocus.CIRCULAR) {
 			insertLocusIntoArray(circularArm, locus);
 		}
 	}
+	@Override
 	public double getMaxPosition() {
 		return circularArm[circularArm.length - 1].getPosition();
 	}
+	@Override
 	public double getMaxPosition(int arm) {
 		if (arm == ChromosomeLocus.CIRCULAR) {
 			return getMaxPosition();
 		}
 		return 0.0;
 	}
+	@Override
 	public int getType() {
 		return Chromosome.CIRCULAR;
 	}
 	/**
 	* returns locus at 0 min
 	*/
+	@Override
 	public ChromosomeLocus getLeftEnd() {
 		return circularArm[0];
 	}
 	/**
 	* returns locus at latest min
 	*/
+	@Override
 	public ChromosomeLocus getRightEnd() {
 		return circularArm[circularArm.length - 1];
 	}
 
+	@Override
 	public ChromosomeLocus getClosestLocus(int arm, double position) {
 		if (arm == ChromosomeLocus.CIRCULAR) {
 			return getLocusRecursive(position, circularArm, 0, circularArm.length-1);
 		}
 		return null;
 	}
+	@Override
 	public ChromosomeLocus getLocus(int arm, int index) {
 		if (arm == ChromosomeLocus.CIRCULAR) {
 			return circularArm[index];

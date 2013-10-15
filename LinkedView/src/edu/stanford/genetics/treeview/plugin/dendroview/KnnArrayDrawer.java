@@ -59,6 +59,7 @@ import edu.stanford.genetics.treeview.DataModel;
 public class KnnArrayDrawer extends DoubleArrayDrawer {
 
 	
+	@Override
 	public void recalculateContrast() {
 		double mean  = 0.0;
 		int count    = 0;
@@ -90,6 +91,7 @@ public class KnnArrayDrawer extends DoubleArrayDrawer {
 	 * @param  scanSize  The scansize for the pixels array (in other words, the width of the image)
 	 * @param  geneOrder the order of the genes. The source rect y values are taken to mean indexes into this array. If the gene order is null, the indexes from the source rect are used as indexes into the data matrix.
 	 */
+	@Override
 	public void paint(int[] pixels, Rectangle source, Rectangle dest, int scanSize, int [] geneOrder) {
 		if (dataMatrix == null) {
 			System.out.println("data matrix wasn't set");

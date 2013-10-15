@@ -40,6 +40,7 @@ class BitmapScatterViewExportPanel extends ScatterViewExportPanel {
 		JPanel holder = new JPanel();
 		final JCheckBox appendExt= new JCheckBox("Append Extension?", true);
 		formatPulldown.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (appendExt.isSelected()) {
 					appendExtension();	
@@ -62,11 +63,13 @@ class BitmapScatterViewExportPanel extends ScatterViewExportPanel {
 		}
 	}
 
-  public void synchronizeTo() {
+  @Override
+public void synchronizeTo() {
 	save();
   }
   
-  public void synchronizeFrom() {
+  @Override
+public void synchronizeFrom() {
 	// do nothing...
   }
   public void save() {

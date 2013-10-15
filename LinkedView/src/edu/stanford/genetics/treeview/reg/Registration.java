@@ -45,6 +45,7 @@ public class Registration implements ConfigNodePersistent {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.ConfigNodePersistent#bindConfig(edu.stanford.genetics.treeview.ConfigNode)
 	 */
+	@Override
 	public void bindConfig(ConfigNode configNode) {
 		this.configNode = configNode;
 	}

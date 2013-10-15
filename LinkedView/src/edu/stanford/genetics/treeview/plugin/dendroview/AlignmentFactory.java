@@ -19,6 +19,7 @@ public class AlignmentFactory extends PluginFactory {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.PluginFactory#getName()
 	 */
+	@Override
 	public String getPluginName() {
 		return "Alignment";
 	}
@@ -26,6 +27,7 @@ public class AlignmentFactory extends PluginFactory {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.PluginFactory#createPlugin(edu.stanford.genetics.treeview.ConfigNode)
 	 */
+	@Override
 	public MainPanel restorePlugin(ConfigNode node, ViewFrame viewFrame) {
 		if (node.getAttribute("headerName", null) == null) {
 			return null;
@@ -43,6 +45,7 @@ public class AlignmentFactory extends PluginFactory {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.PluginFactory#configurePlugin(edu.stanford.genetics.treeview.ConfigNode, edu.stanford.genetics.treeview.ViewFrame)
 	 */
+	@Override
 	public boolean configurePlugin(ConfigNode node, ViewFrame viewFrame) {
 		if (viewFrame.getDataModel().getGeneHeaderInfo().getIndex("ALN") >= 0) {
 			node.setAttribute("headerName", "ALN", null);

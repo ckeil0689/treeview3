@@ -24,6 +24,7 @@ package edu.stanford.genetics.treeview;
 
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.*;
 
@@ -65,6 +66,7 @@ public class UrlSettingsPanel extends JPanel implements SettingsPanel {
 	Frame f = new Frame("Url Settings Test");
 	f.add(e);
 	f.addWindowListener(new WindowAdapter (){
+		@Override
 		public void windowClosing(WindowEvent we) 
 		{System.exit(0);}
 	    });
@@ -72,11 +74,13 @@ public class UrlSettingsPanel extends JPanel implements SettingsPanel {
 	f.setVisible(true);
     }
 
+	@Override
 	public void synchronizeFrom() {
 		redoLayout();
 		UrlSettingsPanel.this.setEnabled(urlExtractor.isEnabled());
 	}
 
+	@Override
 	public void synchronizeTo() {
 	  //nothing to do...
 	}
@@ -84,10 +88,11 @@ public class UrlSettingsPanel extends JPanel implements SettingsPanel {
 	  JCheckBox enableBox;
 	  EnablePanel() {
 		setLayout(new BorderLayout());
-			add(new JLabel ("Web Link:", JLabel.LEFT), BorderLayout.NORTH);
+			add(new JLabel ("Web Link:", SwingConstants.LEFT), BorderLayout.NORTH);
 			enableBox = new JCheckBox("Enable", urlExtractor.isEnabled());
 			enableBox.addActionListener(new ActionListener() {
-			  public void actionPerformed(ActionEvent e) {
+			  @Override
+			public void actionPerformed(ActionEvent e) {
 				urlExtractor.setEnabled(enableBox.isSelected());
 				UrlSettingsPanel.this.setEnabled(enableBox.isSelected());
 			  }
@@ -117,6 +122,7 @@ public class UrlSettingsPanel extends JPanel implements SettingsPanel {
 		d.add(new ButtonPanel(), BorderLayout.SOUTH);
 		d.addWindowListener(
 			new WindowAdapter() {
+				@Override
 				public void windowClosing(WindowEvent we) {
 					we.getWindow().dispose();
 				}
@@ -134,6 +140,7 @@ public class UrlSettingsPanel extends JPanel implements SettingsPanel {
 	private HeaderChoice headerChoice;
 	
 	
+	@Override
 	public void setEnabled(boolean b) {
 		  templateField.setEnabled(b);
 		  headerChoice.setEnabled(b);
@@ -161,7 +168,8 @@ public class UrlSettingsPanel extends JPanel implements SettingsPanel {
 		  gbc.weightx = 100;
 		  final JCheckBox enableBox = new JCheckBox("Enable", urlExtractor.isEnabled());
 		  enableBox.addActionListener(new ActionListener() {
-			  public void actionPerformed(ActionEvent e) {
+			  @Override
+			public void actionPerformed(ActionEvent e) {
 				  urlExtractor.setEnabled(enableBox.isSelected());
 				  UrlSettingsPanel.this.setEnabled(enableBox.isSelected());
 			  }
@@ -188,7 +196,8 @@ public class UrlSettingsPanel extends JPanel implements SettingsPanel {
 			JButton presetButton = new JButton((urlPresets.getPresetNames()) [i]);
 			final int index = i;
 			presetButton.addActionListener(new ActionListener() {
-			  public void actionPerformed(ActionEvent e) {
+			  @Override
+			public void actionPerformed(ActionEvent e) {
 				templateField.setText(urlPresets.getTemplate(index));
 				updatePreview();
 			  }
@@ -243,6 +252,7 @@ public class UrlSettingsPanel extends JPanel implements SettingsPanel {
 				}
 				addItemListener(this);
 			}
+			@Override
 			public void itemStateChanged(ItemEvent e) {
 				updatePreview();
 			}
@@ -254,7 +264,8 @@ public class UrlSettingsPanel extends JPanel implements SettingsPanel {
 		  TemplateField () {
 			super("enter url template");
 			addActionListener(new ActionListener() {
-		    	public void actionPerformed(ActionEvent e) {
+		    	@Override
+				public void actionPerformed(ActionEvent e) {
 				  updatePreview();
 				}
 			});
@@ -265,7 +276,8 @@ public class UrlSettingsPanel extends JPanel implements SettingsPanel {
 	ButtonPanel() {
 	    JButton save_button = new JButton("Close");
 	    save_button.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
+		    @Override
+			public void actionPerformed(ActionEvent e) {
 			window.setVisible(false);
 		    }
 		});

@@ -24,6 +24,7 @@ public class LogSettingsPanel extends JPanel implements Observer {
 		logBuffer = buffer;
 		logBuffer.addObserver(this);
 		logBox.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				synchronizeTo();
 			}
@@ -39,6 +40,7 @@ public class LogSettingsPanel extends JPanel implements Observer {
 	private void synchronizeTo() {
 		logBuffer.setLog(logBox.isSelected());
 	}
+	@Override
 	public void update(Observable arg0, Object arg1) {
 		if (arg1 == null)
 			synchronizeFrom();

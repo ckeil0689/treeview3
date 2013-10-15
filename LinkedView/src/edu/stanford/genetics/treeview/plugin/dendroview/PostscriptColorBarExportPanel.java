@@ -39,11 +39,13 @@ public class PostscriptColorBarExportPanel extends ColorBarExportPanel implement
 	super(colorExtractor);
   }
   
-  public void synchronizeTo() {
+  @Override
+public void synchronizeTo() {
 	save();
   }
   
-  public void synchronizeFrom() {
+  @Override
+public void synchronizeFrom() {
 	// do nothing...
   }
   public void save() {
@@ -62,9 +64,11 @@ public class PostscriptColorBarExportPanel extends ColorBarExportPanel implement
   /**
   * indicate to superclass that this type does not have bbox
   */
-  protected boolean hasBbox() { return true;}
+  @Override
+protected boolean hasBbox() { return true;}
   
-  protected String getInitialExtension() {
+  @Override
+protected String getInitialExtension() {
 	return("_colorbar.ps");
   }
 
@@ -139,7 +143,7 @@ public class PostscriptColorBarExportPanel extends ColorBarExportPanel implement
 		}
 		*/
 		for (int i = 0; i < boxes; i++) {
-			double val  = ((double)i*contrast*2.0)/((double)boxes-1) - contrast;
+			double val  = (i*contrast*2.0)/((double)boxes-1) - contrast;
 			Color color =  getColorExtractor().getColor(val);
 			// setcolor
 			ps.println(convertColor(color)+ " sr");
@@ -175,7 +179,7 @@ public class PostscriptColorBarExportPanel extends ColorBarExportPanel implement
 	  ps.println("setfont");
 
 		for (int i = 0; i < boxes; i++) {
-			double val  = ((double)i*contrast*2.0)/((double)boxes-1) - contrast;
+			double val  = (i*contrast*2.0)/((double)boxes-1) - contrast;
 			String out = formatValue(val);
 			if (drawVertical()) {
 				int ly = (int)(i*getYscale());

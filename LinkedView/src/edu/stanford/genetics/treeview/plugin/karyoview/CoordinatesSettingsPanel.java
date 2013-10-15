@@ -58,6 +58,7 @@ class CoordinatesSettingsPanel extends JPanel implements SettingsPanel {
 		configureWidgets();
 		addWidgets();
 	}
+	@Override
 	public void setEnabled(boolean enabled) {
 		fileButton.setEnabled(enabled);
 		originalButton.setEnabled(enabled);
@@ -106,6 +107,7 @@ class CoordinatesSettingsPanel extends JPanel implements SettingsPanel {
 	private void configureWidgets() {
 		originalButton = new JButton("Extract from Cdt");
 		originalButton.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				karyoPanel.useOriginal();
 			}
@@ -118,6 +120,7 @@ class CoordinatesSettingsPanel extends JPanel implements SettingsPanel {
 			JButton presetButton = new JButton((presets.getPresetNames()) [i]);
 			final int index = i;
 			presetButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					switchFileset(presets.getFileSet(index));
 				}
@@ -126,6 +129,7 @@ class CoordinatesSettingsPanel extends JPanel implements SettingsPanel {
 		}
 		fileButton = new JButton("Edit Presets...");
 		fileButton.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				SettingsPanel presetEditor = KaryoscopeFactory.getCoordinatesPresetsEditor();
 				JDialog popup = new JDialog(getFrame(), "Edit Coordinates Presets");
@@ -152,10 +156,12 @@ class CoordinatesSettingsPanel extends JPanel implements SettingsPanel {
 			JOptionPane.showMessageDialog(getFrame(), ex.toString(), "Load Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
+	@Override
 	public void synchronizeTo() {
 		
 	}
 	
+	@Override
 	public void synchronizeFrom() {
 	}
 

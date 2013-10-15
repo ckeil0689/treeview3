@@ -34,6 +34,7 @@ public class PluginManager {
 	public File[] readdir(String s_dir) {
 		File f_dir = new File(s_dir);
 		FileFilter fileFilter = new FileFilter() {
+			@Override
 			public boolean accept(File file) {
 				return file.getName().endsWith("jar");
 			}

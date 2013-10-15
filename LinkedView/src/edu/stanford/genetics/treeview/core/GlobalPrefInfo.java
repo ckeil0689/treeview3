@@ -34,6 +34,7 @@ public class GlobalPrefInfo extends JPanel implements Observer {
 		txtField.setEditable(false);
 		JButton testButton = new JButton("Test!");
 		testButton.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				LogBuffer lb = LogBuffer.getSingleton();
 				boolean origStatus = lb.getLog();
@@ -57,6 +58,7 @@ public class GlobalPrefInfo extends JPanel implements Observer {
 		add(new JScrollPane(logArea), BorderLayout.CENTER);
 	}
 
+	@Override
 	public void update(Observable arg0, Object arg1) {
 		logArea.append((String) arg1);
 		logArea.append("\n");

@@ -39,6 +39,7 @@ class BitmapKaryoViewExportPanel extends KaryoViewExportPanel {
 		JPanel holder = new JPanel();
 		final JCheckBox appendExt= new JCheckBox("Append Extension?", true);
 		formatPulldown.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (appendExt.isSelected()) {
 					appendExtension();	
@@ -61,10 +62,12 @@ class BitmapKaryoViewExportPanel extends KaryoViewExportPanel {
 		}
 	}
 	
+	@Override
 	public void synchronizeTo() {
 		save();
 	}
 	
+	@Override
 	public void synchronizeFrom() {
 		// do nothing...
 	}

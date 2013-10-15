@@ -75,6 +75,7 @@ public class HeaderSummaryPanel extends JPanel  implements SettingsPanel,Observe
 		return headerList;
 	}
 	
+	@Override
 	public void synchronizeFrom() {
 			int [] included = getHeaderSummary().getIncluded();
 			JList<String> list = getHeaderList();
@@ -87,6 +88,7 @@ public class HeaderSummaryPanel extends JPanel  implements SettingsPanel,Observe
 				}
 			}
 	}
+	@Override
 	public void synchronizeTo() {
 		getHeaderSummary().setIncluded(getHeaderList().getSelectedIndices());
 	}
@@ -101,6 +103,7 @@ public class HeaderSummaryPanel extends JPanel  implements SettingsPanel,Observe
 		headerList.setVisibleRowCount(5);
 		add(new JScrollPane(getHeaderList()));
 		ListSelectionListener tmp = new ListSelectionListener() {
+			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				synchronizeTo();
 			}
@@ -112,6 +115,7 @@ public class HeaderSummaryPanel extends JPanel  implements SettingsPanel,Observe
 	/* (non-Javadoc)
 	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
 	 */
+	@Override
 	public void update(Observable o, Object arg) {
 		if (o == headerInfo) {
 			setHeaderList(headerInfo.getNames());

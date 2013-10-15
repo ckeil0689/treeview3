@@ -54,6 +54,7 @@ public class GTRView extends ModelViewBuffered implements
 		"Click to select node",
 		" - use arrow keys to navigate tree",
 	};
+	@Override
 	public String[]  getHints() {
 		return hints;
 	}
@@ -201,7 +202,8 @@ public class GTRView extends ModelViewBuffered implements
 	 /**
 	 * expect updates to come from map, geneSelection and drawer
 	 */
-	 public void update(Observable o, Object arg) {
+	 @Override
+	public void update(Observable o, Object arg) {
 		 if (o == map) {
 			 // System.out.println("Got an update from map");
 			 offscreenValid = false;
@@ -239,9 +241,11 @@ public class GTRView extends ModelViewBuffered implements
 	}
 
     // method from ModelView
-    public String viewName() { return "GTRView";}
+    @Override
+	public String viewName() { return "GTRView";}
 
     // method from ModelView
+		@Override
 		public String[]  getStatus() {
 			String [] status;
 			if (selectedNode != null) {
@@ -269,6 +273,7 @@ public class GTRView extends ModelViewBuffered implements
 		}
 
     // method from ModelView
+	@Override
 	public void updateBuffer(Graphics g) {
 //		System.out.println("GTRView updateBuffer() called offscreenChanged " + offscreenChanged + " valid " + offscreenValid + " yScaleEq " + getYScaleEq());
 		if (offscreenChanged == true) offscreenValid = false;
@@ -303,7 +308,8 @@ public class GTRView extends ModelViewBuffered implements
 
 
     // Mouse Listener 
-    public void mouseClicked(MouseEvent e) {
+    @Override
+	public void mouseClicked(MouseEvent e) {
 	if (enclosingWindow().isActive() == false) return;
 	if ((drawer != null) && (getXScaleEq() != null)) {
 	  if (drawer == null) LogBuffer.println("GTRView.mouseClicked() : drawer is null");
@@ -318,6 +324,7 @@ public class GTRView extends ModelViewBuffered implements
     }
 
 	// method from KeyListener
+	@Override
 	public void keyPressed(KeyEvent e) {
 	  if (selectedNode == null) {return;}
 	  int c = e.getKeyCode();	
@@ -346,7 +353,9 @@ public class GTRView extends ModelViewBuffered implements
 	  }
 
 	}
+	@Override
 	public void keyReleased(KeyEvent e) {}
+	@Override
 	public void keyTyped(KeyEvent e) {}
 	
 	private TreeSelectionI geneSelection;

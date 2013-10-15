@@ -28,32 +28,38 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 
 public class NullMap extends IntegerMap
 {
-    public int getIndex(int i)
+    @Override
+	public int getIndex(int i)
     {
         return 0;
     }
 
-    public int getPixel(int i)
+    @Override
+	public int getPixel(int i)
     {
         return 0;
     }
 
-    public double getScale()
+    @Override
+	public double getScale()
     {
         return 0.0;
     }
 
-    public int getUsedPixels()
+    @Override
+	public int getUsedPixels()
     {
         return 0;
     }
 
-    public int getViewableIndexes()
+    @Override
+	public int getViewableIndexes()
     {
         return 0;
     }
 
-    public String type()
+    @Override
+	public String type()
     {
         return "Null";
     }

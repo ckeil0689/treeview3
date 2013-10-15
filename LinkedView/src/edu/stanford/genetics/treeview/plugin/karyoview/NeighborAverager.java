@@ -53,17 +53,21 @@ package edu.stanford.genetics.treeview.plugin.karyoview;
 	  }
 
 
-	  public int getType() {
+	  @Override
+	public int getType() {
 		  return Averager.NEIGHBOR;
 	  }
-	  public String getPre() {
+	  @Override
+	public String getPre() {
 		  return  getNum() + " Neighbors of ";
 	  }
-	  public String getArg() {
+	  @Override
+	public String getArg() {
 		  return "" + getNum();
 	  }
 
-	  protected ChromosomeLocus [] getContributors(ChromosomeLocus locus) {
+	  @Override
+	protected ChromosomeLocus [] getContributors(ChromosomeLocus locus) {
 		  int num = getNum();
 		  ChromosomeLocus [] ret = new ChromosomeLocus[num];
 		  ChromosomeLocus leftCand  = locus.getLeft();

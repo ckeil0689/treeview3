@@ -23,6 +23,7 @@ package edu.stanford.genetics.treeview;
 
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 
@@ -179,8 +180,10 @@ public abstract class TreeViewApp implements WindowListener {
 
 
 	
-	/**  creates a ViewFrame window  */
+	/**  creates a ViewFrame window  
+	 * @throws LoadException */
 	public ViewFrame openNew() {
+		
 		try {
 			return openNew(null);
 		} catch (LoadException e) {
@@ -195,8 +198,10 @@ public abstract class TreeViewApp implements WindowListener {
 	 *
 	 * @param  fileSet            FileSet to be displayed
 	 * @exception  LoadException  If the fileset cannot be loaded, the window is closed and the exception rethrown.
+	 * @throws LoadException 
 	 */
 	public ViewFrame openNew(FileSet fileSet) throws LoadException {
+		
 		// setup toplevel
 		TreeViewFrame tvFrame  = new TreeViewFrame(this);
 		if (fileSet != null) {
@@ -213,8 +218,10 @@ public abstract class TreeViewApp implements WindowListener {
 	}
 	/**
 	* same as above, but doesn't open a loading window (damn deadlocks!)
+	 * @throws LoadException
 	*/
 	public ViewFrame openNewNW(FileSet fileSet) throws LoadException {
+		
 		// setup toplevel
 		TreeViewFrame tvFrame  = new TreeViewFrame(this);
 		if (fileSet != null) {
@@ -245,8 +252,9 @@ public abstract class TreeViewApp implements WindowListener {
 	 *
 	 * @param  e  A window opening event. Used to add the window to the windows list.
 	 */
+	@Override
 	public void windowOpened(WindowEvent e) {
-		windows.addElement((ViewFrame) e.getWindow());
+		windows.addElement(e.getWindow());
 		rebuildWindowMenus();
 	}
 
@@ -273,6 +281,7 @@ public abstract class TreeViewApp implements WindowListener {
 	 *
 	 * @param  e  A window closing event. Used to remove the window from the windows list.
 	 */
+	@Override
 	public void windowClosed(WindowEvent e) {
 		windows.removeElement(e.getWindow());
 		if (windows.isEmpty() && exitOnWindowsClosed) {
@@ -310,26 +319,31 @@ public abstract class TreeViewApp implements WindowListener {
 	protected abstract void endProgram();
 
 
+	@Override
 	public void windowActivated(WindowEvent e) {
 		//nothing
 	}
 
 
+	@Override
 	public void windowClosing(WindowEvent e) {
 		//nothing
 	}
 
 
+	@Override
 	public void windowDeactivated(WindowEvent e) {
 		//nothing
 	}
 
 
+	@Override
 	public void windowDeiconified(WindowEvent e) {
 		//nothing
 	}
 
 
+	@Override
 	public void windowIconified(WindowEvent e) {
 		//nothing
 	}

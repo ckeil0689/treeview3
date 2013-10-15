@@ -29,7 +29,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Observable;
@@ -40,7 +39,6 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
@@ -112,10 +110,10 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	private TVModel tvModel_gen;
 	private ClusterModel clusterModel_gen;
 	
-	
 	/**
 	 * Constructor
 	 * @param treeview
+	 * @throws IOException 
 	 */
 	public TreeViewFrame(TreeViewApp treeview) {
 		
@@ -126,6 +124,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 * Main Constructor
 	 * @param treeview
 	 * @param appName
+	 * @throws IOException 
 	 */
 	public TreeViewFrame(TreeViewApp treeview, String appName) {
 		
@@ -185,16 +184,19 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 	protected void setupPresets() {}
 
+	@Override
 	public UrlPresets getGeneUrlPresets(){
 		
 		return treeView.getGeneUrlPresets();
 	}
 
+	@Override
 	public UrlPresets getArrayUrlPresets(){
 		
 		return treeView.getArrayUrlPresets();
 	}
 
+	@Override
 	public void closeWindow(){
 		
 		if (running != null) {
@@ -230,11 +232,13 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	}
 	
 
+	@Override
 	public void scrollToGene(int i) {
 		
 		running.scrollToGene(i);
 	}
 
+	@Override
 	public void scrollToArray(int i) {
 		
 		running.scrollToArray(i);
@@ -317,12 +321,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			throw e;
 		}
 	}
-	
-	//>>>>>>>>>>>>>>>TEST
+
 	/**
-	 * r * This is the workhorse. It creates a new DataModel of the file, and
-	 * then sets the Datamodel. A side effect of setting the datamodel is to
-	 * update the running window.
+	 * Creates a new TVModel and a new ClusterModel of the file. 
 	 */
 	public void loadGeneralFileSet(FileSet fileSet, ClusterFileSet fileSet2)
 			throws LoadException {
@@ -392,6 +393,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	}
 
 	// Observer
+	@Override
 	public void update(Observable observable, Object object) {
 		
 		if (observable == fileMru) {
@@ -408,6 +410,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 * This should be called whenever the loaded status changes It's
 	 * responsibility is to change the look of the main view only
 	 */
+	@Override
 	public void setLoaded(boolean flag) {
 		
 		// reset persistent popups
@@ -493,6 +496,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		menubar.setEnabled(true);
 	}
 
+	@Override
 	public boolean getLoaded() {
 		
 		return loaded;
@@ -532,6 +536,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 //		menubar.addSubMenu(TreeviewMenuBarI.presetsSubMenu);
 		menubar.addMenuItem("Gene Url",new ActionListener() {
 			
+			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				if (presetsPanel == null)
 					setupPresetsPanel();
@@ -545,6 +550,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		menubar.addMenuItem("Array Url", new ActionListener() {
 			
+			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				if (presetsPanel == null)
 					setupPresetsPanel();
@@ -559,6 +565,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		if (plugins.length == 0) {
 			menubar.addMenuItem("Color",new ActionListener() {
 				
+				@Override
 				public void actionPerformed(ActionEvent actionEvent) {
 					if (presetsPanel == null)
 						setupPresetsPanel();
@@ -636,6 +643,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		menubar.addMenuItem("Find Genes...", new ActionListener() {
 			
+			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				
 				getGeneFinder().setVisible(true);
@@ -645,6 +653,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		menubar.addMenuItem("Find Arrays...",new ActionListener() {
 			
+			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				
 				getArrayFinder().setVisible(true);
@@ -654,6 +663,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		menubar.addMenuItem("Stats...", new ActionListener() {
 			
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				
 				JOptionPane.showMessageDialog(TreeViewFrame.this,
@@ -680,6 +690,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 		menubar.addMenuItem("Save List", new ActionListener() {
 			
+			@Override
 			public void actionPerformed(ActionEvent actiosnEvent) {
 				
 				if (warnSelectionEmpty()) {
@@ -713,6 +724,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 		menubar.addMenuItem("Save Data", new ActionListener() {
 			
+			@Override
 			public void actionPerformed(ActionEvent actiosnEvent) {
 				
 				if (warnSelectionEmpty()) {
@@ -755,6 +767,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		return true;
 	}
 
+	@Override
 	public TreeViewApp getApp() {
 		
 		return treeView;
@@ -811,6 +824,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 				menubar.setMenu(TreeviewMenuBarI.programMenu);
 				menubar.addMenuItem("Open...", new ActionListener() {
 					
+					@Override
 					public void actionPerformed(ActionEvent actionEvent) {
 						
 						openFile();
@@ -840,6 +854,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			
 				menubar.addMenuItem("Save",new ActionListener() {
 					
+					@Override
 					public void actionPerformed(ActionEvent actionEvent) {
 						
 						doModelSave(true);
@@ -850,6 +865,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	
 				menubar.addMenuItem("Save as..",new ActionListener() {
 					
+					@Override
 					public void actionPerformed(ActionEvent actionEvent) {
 						
 						if (getDataModel().getFileSet() == null) {
@@ -895,6 +911,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 				
 				menubar.addMenuItem("Edit Recent Files...", new ActionListener() {
 					
+					@Override
 					public void actionPerformed(ActionEvent actionEvent) {
 						
 						FileMruEditor fme = new FileMruEditor(fileMru);
@@ -913,6 +930,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	
 				menubar.addSeparator();
 				menubar.addMenuItem("Quit Program", new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent actionEvent) {
 						try {
 							treeView.closeAllWindows();
@@ -966,10 +984,12 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			fileSet = set;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent argActionEvent) {
 			
 			final ActionEvent actionEvent = argActionEvent;
 			Runnable update = new Runnable() {
+				@Override
 				public void run() {
 					try {
 						fileMru.setLast(fileSet);
@@ -1007,6 +1027,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 	private void populateHelpMenu(TreeviewMenuBarI menubar) {
 		menubar.addMenuItem("About...",  new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				/*
 				 * Popup popup = new Popup(TreeViewFrame.this,getAppName(), new
@@ -1031,6 +1052,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 				home.add(new JTextField(TreeViewApp.getUpdateUrl()));
 				JButton yesB = new JButton("Open");
 				yesB.addActionListener(new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent arg0) {
 						displayURL(TreeViewApp.getUpdateUrl());
 					}
@@ -1044,6 +1066,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 				home.add(new JTextField(TreeViewApp.getAnnouncementUrl()));
 				yesB = new JButton("Sign Up");
 				yesB.addActionListener(new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent arg0) {
 						displayURL(TreeViewApp.getAnnouncementUrl());
 					}
@@ -1060,6 +1083,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 		
 		menubar.addMenuItem("Messages...", new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				JPanel inner = new JPanel();
 				inner.setLayout(new BorderLayout());
@@ -1082,6 +1106,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		menubar.setMnemonic(KeyEvent.VK_M);
 
 		menubar.addMenuItem("Documentation...", new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				// Popup popup = new Popup(TreeViewFrame.this, "Java TreeView:
 				// Color", new String [] { "I'm going to add better help
@@ -1098,6 +1123,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 				message.add(new JTextField(docUrl));
 				JButton lButton = new JButton("Launch Browser");
 				lButton.addActionListener(new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						displayURL(docUrl);
 					}
@@ -1109,6 +1135,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		menubar.setMnemonic(KeyEvent.VK_D);
 
 		menubar.addMenuItem("Plugins...",new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				displayPluginInfo();
 			}
@@ -1116,6 +1143,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		menubar.setMnemonic(KeyEvent.VK_P);
 
 		menubar.addMenuItem("Registration...",new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				ConfigNode node = treeView.getGlobalConfig().getNode(
 						"Registration");
@@ -1133,6 +1161,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		menubar.setMnemonic(KeyEvent.VK_R);
 
 		menubar.addMenuItem("Feedback...",new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				JPanel feedback = new JPanel();
 				feedback.setLayout(new BoxLayout(feedback, BoxLayout.Y_AXIS));
@@ -1145,6 +1174,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 				feedback.add(tmp);
 				JButton yesB = new JButton("Report Bug");
 				yesB.addActionListener(new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent arg0) {
 						displayURL(bugsURL);
 					}
@@ -1160,6 +1190,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 				feedback.add(tmp);
 				yesB = new JButton("Request Feature");
 				yesB.addActionListener(new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent arg0) {
 						displayURL(featureURL);
 					}
@@ -1175,6 +1206,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 				feedback.add(tmp);
 				yesB = new JButton("Email Support");
 				yesB.addActionListener(new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent arg0) {
 						displayURL("mailto:"+supportURL);
 					}
@@ -1190,6 +1222,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 				feedback.add(tmp);
 				yesB = new JButton("Browse Archive");
 				yesB.addActionListener(new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent arg0) {
 						displayURL(archiveURL);
 					}
@@ -1204,6 +1237,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 		
 		menubar.addMenuItem("Memory...", new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				MemMonitor m = new MemMonitor();
 				m.start();
@@ -1212,6 +1246,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		menubar.setMnemonic(KeyEvent.VK_M);
 
 		menubar.addMenuItem("Threads...",new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				ThreadListener t = new ThreadListener();
 				t.start();
@@ -1220,6 +1255,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		menubar.setMnemonic(KeyEvent.VK_T);
 		
 		menubar.addMenuItem("Global Pref Info...", new ActionListener () {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				GlobalPrefInfo gpi = new GlobalPrefInfo(getApp());
 				JOptionPane.showMessageDialog(null, 
@@ -1246,16 +1282,22 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	}
 	
 
+	@Override
 	public double noData() {
+		
 		return DataModel.NODATA;
 	}
 
-	TreeViewApp treeView;
+	private TreeViewApp treeView;
 	
-	public void setupLayout(){
+	/**
+	 * This method sets up the Swing layout of the starting screen
+	 * and calls resetLayout() once data has been loaded
+	 */
+	public void setupLayout() {
 		
 		JPanel title_bg;
-		JLabel jl, jl2, load;
+		JLabel jl, jl2;
 		
 		waiting = new JPanel();
 		waiting.setLayout(new MigLayout("ins 0"));
@@ -1273,23 +1315,24 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		jl2.setFont(new Font("Sans Serif", Font.BOLD, 50));
 		jl2.setForeground(Color.white);
 		
-		load = new JLabel("Load Your Data");
-		load.setFont(new Font("Sans Serif", Font.PLAIN, 45));
-		load.setForeground(BLUE1);
-		
-		addMListener(load);
+		String picture = "upload.png";
+		ClickableImage load_Icon = new ClickableImage(this, "Load Your Data", picture);
 		
 		title_bg.add(jl, "push, alignx 50%, span, wrap");
 		title_bg.add(jl2, "push, alignx 50%, span");
 		
 		waiting.add(title_bg, "pushx, growx, alignx 50%, span, height 20%::, wrap");
-		waiting.add(load, "push, span, alignx 50%");
+		waiting.add(load_Icon, "alignx 50%, span");
 	}
 	
+	/**
+	 * This method clears the initial starting frame and adds new components
+	 * to let the user select between options for processing/ viewing his data.
+	 */
 	public void resetLayout(){
 		
 		JPanel confirmPanel, labelPanel;
-		JLabel confirm, ques, clus, viz, loadNew;
+		JLabel confirm, ques;
 		
 		waiting.removeAll();
 		
@@ -1301,86 +1344,34 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		labelPanel.setLayout(new MigLayout());
 		labelPanel.setOpaque(false);
 		
-		confirm = new JLabel("Successfully loaded file.");
+		confirm = new JLabel("Successfully loaded " + tvModel_gen.getName());
 		confirm.setFont(new Font("Sans Serif", Font.BOLD, 30));
 		confirm.setForeground(GRAY1);
 		
-		ques = new JLabel("Cluster or visualize your data?");
+		ques = new JLabel("What would you like to do?");
 		ques.setFont(new Font("Sans Serif", Font.PLAIN, 45));
 		ques.setForeground(GRAY2);
 		
-		clus = new JLabel("Cluster");
-		clus.setFont(new Font("Sans Serif", Font.PLAIN, 55));
-		clus.setForeground(BLUE1);
+		String picture = "cluster.png";
+		ClickableImage clus_icon = new ClickableImage(this, "Cluster", picture, clusterModel_gen);
 		
-		viz = new JLabel("Visualize");
-		viz.setFont(new Font("Sans Serif", Font.PLAIN, 55));
-		viz.setForeground(BLUE1);
+		String picture2 = "viz.png";
+		ClickableImage viz_icon = new ClickableImage(this, "Visualize", picture2, tvModel_gen);
 		
-		loadNew = new JLabel("Load New Data");
-		loadNew.setFont(new Font("Sans Serif", Font.PLAIN, 30));
-		loadNew.setForeground(BLUE1);
-		
-		addMListener2(clus, false);
-		addMListener2(viz, true);
-		
-		addMListener3(loadNew);
+		String picture3 = "upload.png";
+		ClickableImage load_icon = new ClickableImage(this, "Load New File", picture3);
 		
 		confirmPanel.add(confirm, "push, alignx 50%, span, wrap");
-		confirmPanel.add(loadNew, "push, alignx 50%, span");
+		confirmPanel.add(load_icon, "push, alignx 50%, span");
 		labelPanel.add(ques, "push, alignx 50%, span, wrap");
 		
 		waiting.add(confirmPanel, "pushx, alignx 50%, height 15%:15%:, span, wrap");
 		waiting.add(labelPanel, "alignx 50%, height 30%::, span, wrap");
-		waiting.add(clus, "pushx, alignx 50%");
-		waiting.add(viz, "pushx, alignx 50%");
+		waiting.add(clus_icon, "pushx, alignx 50%");
+		waiting.add(viz_icon, "pushx, alignx 50%");
 		
 		waiting.repaint();
 		waiting.revalidate();
-	}
-	
-	public void addMListener(final JLabel label){
-		
-		label.addMouseListener(new SSMouseListener(label){
-
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				
-				openFile();
-			}
-		});
-	}
-
-	public void addMListener2(final JLabel label, final boolean viz){
-		
-		label.addMouseListener(new SSMouseListener(label){
-
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				
-				if(viz){
-					
-					setDataModel(tvModel_gen);
-					setLoaded(true);
-				} else{
-					
-					setClusterDataModel(clusterModel_gen);
-					setLoaded(true);
-				}
-			}
-		});
-	}
-	
-	public void addMListener3(final JLabel label){
-		
-		label.addMouseListener(new SSMouseListener(label){
-
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				
-				openFile();
-			}		
-		});
 	}
 	
 	/**
@@ -1452,6 +1443,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 * 
 	 * @throws LoadException
 	 */
+	@Override
 	public void setDataModel(DataModel newModel) {									
 		
 		if (dataModel != null)
@@ -1465,6 +1457,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	
 	
 	/** Getter for dataModel */
+	@Override
 	public DataModel getDataModel() {
 		
 		return dataModel;
@@ -1486,10 +1479,11 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		} catch (IOException e) {
 			frame.setSourceText("Unable to read default plugins directory.");
 		}
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		frame.setVisible(true);
 	}
 
+	@Override
 	public MainPanel[] getMainPanelsByName(String name) {
 		if (running != null) {
 			// is the current running a match?
@@ -1512,6 +1506,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		return list;
 	}
 
+	@Override
 	public MainPanel[] getMainPanels() {
 		if (running == null) {
 			MainPanel [] list = new MainPanel[0];

@@ -12,6 +12,7 @@ public class ButtonTest {
 		JDialog jd = new JDialog();
 		JButton but = new JButton("Push Me");
 		but.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				LinkedViewApp.main(argv);
 			}

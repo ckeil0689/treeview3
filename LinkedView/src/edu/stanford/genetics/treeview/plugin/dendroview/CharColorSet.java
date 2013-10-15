@@ -120,6 +120,7 @@ public class CharColorSet implements ConfigNodePersistent {
 	/**
 	* sets colors and name to reflect <code>ConfigNode</code>
 	*/
+	@Override
 	public void bindConfig(ConfigNode root) {
 		this.root = root;
 		missing = decodeColor(root.getAttribute("missing", default_missingColor));
@@ -130,6 +131,7 @@ public class CharColorSet implements ConfigNodePersistent {
 	/**
 	 * String represnetation of class.
 	 */
+	@Override
 	public String toString() {
 		return "CharColorSet " + getName() + "\n" +
 				"missing: " + getMissing().toString() + "\t" +

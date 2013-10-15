@@ -128,6 +128,7 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 	 * @param  scanSize  The scansize for the pixels array (in other words, the width of the image)
 	 * @param  geneOrder the order of the genes. The source rect y values are taken to mean indexes into this array. If the gene order is null, the indexes from the source rect are used as indexes into the data matrix.
 	 */
+	@Override
 	public void paint(int[] pixels, Rectangle source, Rectangle dest, int scanSize, int [] geneOrder) {
 		if (dataMatrix == null) {
 			System.out.println("data matrix wasn't set");
@@ -209,19 +210,23 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 		return dataMatrix.getValue(x,y);
 	}
 
+	@Override
 	public String getSummary(int x, int y) {
 		return "" + getValue(x, y);
 	}
 
+	@Override
 	public boolean isMissing(int x, int y) {
 		return (getValue(x, y) == DataModel.NODATA);
 	}
 
+	@Override
 	public boolean isEmpty(int x, int y) {
 		return (getValue(x, y) == DataModel.EMPTY);
 	}
 	
 	/** how many rows are there to draw? */
+	@Override
 	public int getNumRow() {
 		if (dataMatrix != null) {
 			return dataMatrix.getNumRow();
@@ -230,6 +235,7 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 	}
 
 	/** how many cols are there to draw? */
+	@Override
 	public int getNumCol() {
 		if (dataMatrix != null) {
 			return dataMatrix.getNumCol();
@@ -243,12 +249,14 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 	 * @param  y  y coordinate of array element
 	 * @return    color for array element, or DataModel.NODATA if not found
 	 */
+	@Override
 	public Color getColor(int x, int y) {
 		return colorExtractor.getColor(getValue(x, y));
 	}
 
 
 	/**  resets the ArrayDrawer to a default state.  */
+	@Override
 	protected void setDefaults() {
 		dataMatrix = null;
 	}

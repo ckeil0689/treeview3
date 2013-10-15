@@ -344,7 +344,8 @@ public class DragGridPanel extends JPanel implements MouseListener,
     }
     
     /** added by alok 10/9/2001 */
-    public Dimension getPreferredSize() {
+    @Override
+	public Dimension getPreferredSize() {
 		
     	int maxw = 0;
     	
@@ -454,19 +455,22 @@ public class DragGridPanel extends JPanel implements MouseListener,
     }
     
     /** added by alok 9/12/2001 */
-     public void componentAdded(ContainerEvent e){
+     @Override
+	public void componentAdded(ContainerEvent e){
 	
     	 addFocusListenerRecursively(e.getChild());
     }
      
     /** added by alok 9/12/2001 */
-    public void componentRemoved(ContainerEvent e){
+    @Override
+	public void componentRemoved(ContainerEvent e){
     	
     	removeFocusListenerRecursively(e.getChild());
     }
 
     /** Recompute cell sizes from proportional sizes, and resize components. */
-    public void doLayout(){
+    @Override
+	public void doLayout(){
 		
     	int x, y;
 		Dimension s = getSize();
@@ -498,7 +502,8 @@ public class DragGridPanel extends JPanel implements MouseListener,
     //****************************
 
     /** Standard paint routine. */
-    public void paintComponent(Graphics g) {
+    @Override
+	public void paintComponent(Graphics g) {
 		
 //		System.out.println("entering DragGridPanel paint " +getName() + " clip " + clip);
 		Dimension newsize = getSize();
@@ -546,7 +551,8 @@ public class DragGridPanel extends JPanel implements MouseListener,
     }
     
     /** draws focus rectangle, added by alok 9/12/2001*/
-    public void focusGained(FocusEvent e) {
+    @Override
+	public void focusGained(FocusEvent e) {
 		
     	// draw the focus rectangle
 		for(int x = 0; x < xsizes.length; x++) {
@@ -575,7 +581,8 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		}
     }
 
-    public void focusLost(FocusEvent e) {
+    @Override
+	public void focusLost(FocusEvent e) {
 		
     	// undraw the focus rectangle
 		for(int x = 0; x < xsizes.length; x++) {
@@ -661,7 +668,8 @@ public class DragGridPanel extends JPanel implements MouseListener,
     }
 
     /** Standard toString returns "DragGridPanel[x][y]" and Panel info. */
-    public String toString() {
+    @Override
+	public String toString() {
     	
 		Point p = getLocation();
 		return "DragGridPanel(" + p.x + "," + p.y + ")[" + xsizes.length + "][" + ysizes.length + "] " + super.toString();
@@ -672,6 +680,7 @@ public class DragGridPanel extends JPanel implements MouseListener,
     //****************************
 
     /** Change the mouse cursor if over a draggable border. */
+	@Override
 	public void mouseMoved(MouseEvent e) {
 	   
 		debug("mouseMoved", e);
@@ -683,7 +692,8 @@ public class DragGridPanel extends JPanel implements MouseListener,
 	}
 
     /** Select a border to drag. */
-    public void mousePressed(MouseEvent e) {
+    @Override
+	public void mousePressed(MouseEvent e) {
 		
     	debug("mousePressed", e);
     	
@@ -700,7 +710,8 @@ public class DragGridPanel extends JPanel implements MouseListener,
     }
 
     /** Stop dragging a border. */
-    public void mouseReleased(MouseEvent e) {
+    @Override
+	public void mouseReleased(MouseEvent e) {
 		
     	debug("mouseReleased", e);
     	
@@ -719,17 +730,20 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		}
     }
 
-    public void mouseClicked(MouseEvent e) {
+    @Override
+	public void mouseClicked(MouseEvent e) {
 	
     	debug("mouseClicked", e);
     }
 
-    public void mouseEntered(MouseEvent e) {
+    @Override
+	public void mouseEntered(MouseEvent e) {
 	
     	debug("mouseEntered", e);
     }
 
-    public void mouseExited(MouseEvent e) {
+    @Override
+	public void mouseExited(MouseEvent e) {
 		
     	debug("mouseExited", e);
     	
@@ -741,7 +755,8 @@ public class DragGridPanel extends JPanel implements MouseListener,
 	
     boolean resize = false;
     /** If a border is selected, change it's position. */
-    public void mouseDragged(MouseEvent e) {
+    @Override
+	public void mouseDragged(MouseEvent e) {
 		
     	debug("mouseDragged", e);
     	
@@ -801,23 +816,27 @@ public class DragGridPanel extends JPanel implements MouseListener,
     }
 
     /** Called when this container gets resized. */
-    public void componentResized(ComponentEvent e) {
+    @Override
+	public void componentResized(ComponentEvent e) {
 		
     	debug("componentResized", e);
 		doLayout();
     }
 
-    public void componentMoved(ComponentEvent e) {
+    @Override
+	public void componentMoved(ComponentEvent e) {
 	
     	debug("componentMoved", e);
     }
 
-    public void componentShown(ComponentEvent e) {
+    @Override
+	public void componentShown(ComponentEvent e) {
 	
     	debug("componentShown", e);
     }
 
-    public void componentHidden(ComponentEvent e) {
+    @Override
+	public void componentHidden(ComponentEvent e) {
 	
     	debug("componentHidden", e);
     }
@@ -1146,7 +1165,8 @@ class DragBar extends JComponent {
     	mouse.x = x;
 		mouse.y = y;
     }
-    public void paintComponent(Graphics g) {
+    @Override
+	public void paintComponent(Graphics g) {
 		
     	g.setColor(Color.green);
 		g.fillRect(mouse.x, 0, 2, getHeight());

@@ -27,12 +27,14 @@ public class GeneAnnoFactory extends PluginFactory {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.PluginFactory#getName()
 	 */
+@Override
 public String getPluginName() {
 		return "GeneTreeAnno";
 	}
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.PluginFactory#createPlugin(edu.stanford.genetics.treeview.ConfigNode)
 	 */
+	@Override
 	public MainPanel restorePlugin(ConfigNode node, ViewFrame viewFrame) {
 		if (viewFrame.getDataModel().gidFound() == false) {
 			JOptionPane.showMessageDialog(viewFrame, new JTextArea("DataModel does not have a gene tree"));
@@ -49,6 +51,7 @@ public String getPluginName() {
 		}
 	}
 	
+	@Override
 	public boolean configurePlugin(ConfigNode node, ViewFrame viewFrame) {
 		node.setAttribute("tree_type", TreeAnnoPanel.GENE_TREE, TreeAnnoPanel.DEFAULT_TYPE);
 		return true;

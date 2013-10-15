@@ -49,6 +49,7 @@ public class ClusterFileMru extends java.util.Observable implements ConfigNodePe
 	 *
 	 * @param  configNode  Node to be bound to
 	 */
+	@Override
 	public synchronized void bindConfig(ConfigNode configNode) {
 		root = configNode;
 		setChanged();

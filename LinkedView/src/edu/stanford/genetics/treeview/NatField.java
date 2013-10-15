@@ -65,11 +65,14 @@ public class NatField extends JTextField implements KeyListener {
 		max = maximum;
 		addKeyListener(this);
 	}
+	@Override
 	public void keyPressed (KeyEvent evt) {
 	}
+	@Override
 	public void keyReleased (KeyEvent evt) {
 	}
 
+	@Override
 	public void keyTyped(KeyEvent evt) {
 		boolean revert;
 		int new_val = 10;

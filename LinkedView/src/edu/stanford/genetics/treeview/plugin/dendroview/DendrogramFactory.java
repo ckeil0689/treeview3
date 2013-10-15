@@ -37,6 +37,7 @@ public class DendrogramFactory extends PluginFactory {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.PluginFactory#getName()
 	 */
+	@Override
 	public String getPluginName() {
 		return "Dendrogram";
 	}
@@ -44,6 +45,7 @@ public class DendrogramFactory extends PluginFactory {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.PluginFactory#createPlugin(edu.stanford.genetics.treeview.ConfigNode)
 	 */
+	@Override
 	public MainPanel restorePlugin(ConfigNode node, ViewFrame viewFrame) {
 //		DendroView dendroView = new DendroView(viewFrame.getDataModel(), node, viewFrame);
 		DendroView2 dendroView = new DendroView2(viewFrame.getDataModel(), node, viewFrame);
@@ -61,6 +63,7 @@ public class DendrogramFactory extends PluginFactory {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.PluginFactory#setGlobalNode(edu.stanford.genetics.treeview.ConfigNode)
 	 */
+	@Override
 	public void setGlobalNode(ConfigNode node) {
 		super.setGlobalNode(node);
 		colorPresets.bindConfig(node.fetchOrCreate("ColorPresets"));
@@ -73,9 +76,11 @@ public class DendrogramFactory extends PluginFactory {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.PluginFactory#addPluginConfig(java.awt.Menu)
 	 */
+	@Override
 	public void addPluginConfig(TreeviewMenuBarI globalMenu, final ViewFrame frame) {
 		super.addPluginConfig(globalMenu, frame);
 		globalMenu.addMenuItem("Dendrogram Color Presets...", new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				if (cpresetFrame == null) {
 					cpresetFrame = new JFrame("Dendrogram Color Presets");
@@ -105,6 +110,7 @@ public class DendrogramFactory extends PluginFactory {
 		return colorPresets;
 	}
 
+	@Override
 	public boolean configurePlugin(ConfigNode node, ViewFrame viewFrame) {
 		return true;
 	}

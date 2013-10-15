@@ -29,6 +29,7 @@ public class NamedNodeView extends ModelView {
 		/* (non-Javadoc)
 		 * @see javax.swing.ListModel#getSize()
 		 */
+		@Override
 		public int getSize() {
 			return annotated.length;
 		}
@@ -36,6 +37,7 @@ public class NamedNodeView extends ModelView {
 		/* (non-Javadoc)
 		 * @see javax.swing.ListModel#getElementAt(int)
 		 */
+		@Override
 		public Object getElementAt(int index) {
 			return headerInfo.getHeader(annotated[index], "NAME");
 		}
@@ -79,10 +81,12 @@ public class NamedNodeView extends ModelView {
 		}
 	}
 	
+	@Override
 	public String viewName() {
 		return "Annotated Nodes";
 	}
 
+	@Override
 	protected void updateBuffer(Graphics g) {
 		// no buffer here
 	}
@@ -95,6 +99,7 @@ public class NamedNodeView extends ModelView {
 		setLayout(new BorderLayout());
 		rebuildNodeList();
 		nodeList.addListSelectionListener(new ListSelectionListener() {
+			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				int selected = nodeList.getSelectedIndex();
 				if (selected >= 0) {
@@ -106,6 +111,7 @@ public class NamedNodeView extends ModelView {
 		});
 		add(new JScrollPane(nodeList), BorderLayout.CENTER);
 	}
+	@Override
 	public void update(Observable o, Object arg) {
 		update((Object) o, arg);
 	}

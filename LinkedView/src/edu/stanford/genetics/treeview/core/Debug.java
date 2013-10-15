@@ -53,12 +53,12 @@ public class Debug {
 	}
 	public static void print(Object caller, String message) {
 		if (level > 0) {
-			print(caller, message, (Object) "No Argument");	
+			print(caller, message, "No Argument");	
 		}
 	}	
 	public static void print(String message, Object argument) {
 		if (level > 0) {
-			print((Object) "No Caller", message, argument);
+			print("No Caller", message, argument);
 		}
 	}
 	public static void print(String message) {

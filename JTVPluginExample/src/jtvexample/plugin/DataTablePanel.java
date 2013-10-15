@@ -40,6 +40,7 @@ public class DataTablePanel extends JPanel implements MainPanel {
 	private JTable jtable  = null;
 	
 	class GeneSelectionObserver implements Observer {
+		@Override
 		public void update(Observable o, Object arg) {
 			TreeSelectionI geneSelection = viewFrame.getGeneSelection();
 			jtable.setRowSelectionInterval(geneSelection.getMinIndex(), 
@@ -49,6 +50,7 @@ public class DataTablePanel extends JPanel implements MainPanel {
 	
 	class RowSelectionListener implements ListSelectionListener {
 
+		@Override
 		public void valueChanged(ListSelectionEvent arg0) {
 			TreeSelectionI geneSelection = viewFrame.getGeneSelection();
 			@SuppressWarnings("unused")
@@ -87,6 +89,7 @@ public class DataTablePanel extends JPanel implements MainPanel {
 			return ret;
 		}
 
+		@Override
 		public int getColumnCount() {
 			if (viewFrame == null) 
 				return 0;
@@ -96,6 +99,7 @@ public class DataTablePanel extends JPanel implements MainPanel {
 			return model.getArrayHeaderInfo().getNumHeaders() + 1;
 		}
 
+		@Override
 		public int getRowCount() {
 			if (viewFrame == null) 
 				return 0;
@@ -105,6 +109,7 @@ public class DataTablePanel extends JPanel implements MainPanel {
 			return model.getGeneHeaderInfo().getNumHeaders();
 		}
 
+		@Override
 		public Object getValueAt(int row, int col) {
 			if (viewFrame == null) 
 				return new Integer(0);
@@ -144,14 +149,17 @@ public class DataTablePanel extends JPanel implements MainPanel {
 	      jtable.getSelectionModel().addListSelectionListener(new RowSelectionListener());
 	}
 
+	@Override
 	public ConfigNode getConfigNode() {
 		return configNode;
 	}
 
+	@Override
 	public ImageIcon getIcon() {
 		return null;
 	}
 
+	@Override
 	public String getName() {
 		return "DataTable";
 	}
@@ -170,6 +178,7 @@ public class DataTablePanel extends JPanel implements MainPanel {
 		// used for anything...
 		MenuItem bob = new MenuItem("Edit Persistent Value...");
 		bob.addActionListener(new ActionListener(){
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				JTextField value = new JTextField(configNode.getAttribute("bob", "Edit me!"));
 				JOptionPane.showMessageDialog(DataTablePanel.this, value, 
@@ -180,15 +189,18 @@ public class DataTablePanel extends JPanel implements MainPanel {
 		arg0.add(bob);
 	}
 
+	@Override
 	public void scrollToArray(int arg0) {
 		// TODO Auto-generated method stub
 
 	}
 
+	@Override
 	public void scrollToGene(int arg0) {
 		jtable.setRowSelectionInterval(arg0, arg0);
 	}
 
+	@Override
 	public void syncConfig() {
 		// This will be called before the display is closed, so 
 		// values can be saved to the ConfigNode

@@ -68,6 +68,7 @@ public abstract class HeaderFinder extends JDialog {
 	mainPanel.add(new SeekPanel() , BorderLayout.EAST);
 	getContentPane().add(mainPanel);
 	addWindowListener(new WindowAdapter () {
+		@Override
 		public void windowClosing(WindowEvent we) {
 		    setVisible(false);
 		}
@@ -211,7 +212,8 @@ public abstract class HeaderFinder extends JDialog {
 	    // why does java make me write this dumb constructor?
 	    SearchTextField(int cols) {super(cols);}
 
-	    public void actionPerformed(ActionEvent e) {
+	    @Override
+		public void actionPerformed(ActionEvent e) {
 		findGenes(getText(), caseBox.isSelected());
 	    }
 	}
@@ -229,6 +231,7 @@ public abstract class HeaderFinder extends JDialog {
 		}
 		
 		class ListSeeker implements ListSelectionListener {
+			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				results.repaint();
 				seek();
@@ -250,7 +253,8 @@ public abstract class HeaderFinder extends JDialog {
 
  	    seek_button = new JButton("Seek");
 	    seek_button.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent evt) {
+		    @Override
+			public void actionPerformed(ActionEvent evt) {
 			seek();
 		    }
 		});
@@ -258,7 +262,8 @@ public abstract class HeaderFinder extends JDialog {
 	    // add(seek_button);
  	    seekNext_button = new JButton("Next");
 	    seekNext_button.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent evt) {
+		    @Override
+			public void actionPerformed(ActionEvent evt) {
 			seekNext();
 		    }
 		});
@@ -267,7 +272,8 @@ public abstract class HeaderFinder extends JDialog {
 
  	    seekAll_button = new JButton("All");
 	    seekAll_button.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent evt) {
+		    @Override
+			public void actionPerformed(ActionEvent evt) {
 			seekAll();
 		    }
 		});
@@ -275,6 +281,7 @@ public abstract class HeaderFinder extends JDialog {
 		
 		summary_button = new JButton("Summary Popup");
 		summary_button.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent evt) {
 					showSubDataModel();
 			}
@@ -290,7 +297,8 @@ public abstract class HeaderFinder extends JDialog {
 	public ClosePanel () {
  	    JButton close_button = new JButton("Close");
 	    close_button.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
+		    @Override
+			public void actionPerformed(ActionEvent e) {
 			HeaderFinder.this.setVisible(false);
 		    }
 		});

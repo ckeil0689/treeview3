@@ -43,6 +43,7 @@ class HidePanel extends Panel {
 		hide_button.addActionListener(new ActionListener() {
 			
 			// called when close button hit
+			@Override
 			public void actionPerformed(ActionEvent evt) {
 			    
 				if(evt.getSource() == hide_button) {

@@ -59,6 +59,7 @@ public class CharColorExtractor extends Observable implements ConfigNodePersiste
 	 *
 	 * @param  configNode  confignode to bind to
 	 */
+	@Override
 	public void bindConfig(ConfigNode configNode) {
 		root = configNode;
 		ConfigNode cand  = root.fetchFirst("ColorSet");

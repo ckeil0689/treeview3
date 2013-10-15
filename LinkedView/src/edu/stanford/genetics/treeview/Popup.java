@@ -72,6 +72,7 @@ class Popup extends Canvas {
 	d = new Dialog(f, title);
 	parent = f;
 	d.addWindowListener(new WindowAdapter() {
+		@Override
 		public void windowClosing(WindowEvent e) {
 		    d.dispose();
 		}
@@ -89,14 +90,17 @@ class Popup extends Canvas {
 	d.setVisible(true);
     }
 
-    public void addNotify() {super.addNotify(); measure();}
+    @Override
+	public void addNotify() {super.addNotify(); measure();}
 
-    public Dimension getPreferredSize() {
+    @Override
+	public Dimension getPreferredSize() {
 	return new Dimension(max_width + 2*margin_width,
 			     message.length*line_height+2*margin_height);
     }
 
-    public void paint(Graphics g) {
+    @Override
+	public void paint(Graphics g) {
 	Dimension dim = d.getSize();
 	g.setColor(Color.black);
 	//	int height =  (dim.height - total_height) / 2;
@@ -124,6 +128,7 @@ class DisposePanel extends Panel {
 	final Button dispose_button = new Button("Close");
 	dispose_button.addActionListener(new ActionListener() {
 		// called when close button hit
+		@Override
 		public void actionPerformed(ActionEvent evt) {
 		    if(evt.getSource() == dispose_button) {
 			m_window.dispose();

@@ -23,15 +23,11 @@
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.*;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.util.Observable;
 
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JViewport;
-
 import net.miginfocom.swing.MigLayout;
 
 import edu.stanford.genetics.treeview.*;
@@ -78,6 +74,7 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
 	private static final String [] hints = {
 		"Mouse over to get info",
 	};
+	@Override
 	public String[]  getHints() {
 		return hints;
 	}
@@ -100,7 +97,8 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
 	}
 
 	
-    public Dimension getPreferredSize() {
+    @Override
+	public Dimension getPreferredSize() {
 		// return super.getPreferredSize();
 		return new Dimension(xmap.getRequiredPixels(), ymap.getRequiredPixels());
     }
@@ -186,10 +184,12 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
 
 	
     // method from ModelView
-    public String viewName() { return "ZoomView";}
+    @Override
+	public String viewName() { return "ZoomView";}
 
     // method from ModelView
-    public String[]  getStatus() {
+    @Override
+	public String[]  getStatus() {
 		try {
 			if (xmap.contains(overx) && 
 			ymap.contains(overy)) {
@@ -226,6 +226,7 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
     }
 
 		// method from ModelView
+		@Override
 		public void updateBuffer(Graphics g) {	
 			if (offscreenChanged) {
 				xmap.setAvailablePixels(offscreenSize.width);
@@ -254,6 +255,7 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
 			}
 		}
 
+		@Override
 		public void paintComposite(Graphics g) {
 				if (getShowVal()) {
 					// need to draw values on screen!
@@ -266,6 +268,7 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
 				}
 		}
     
+	@Override
 	public void updatePixels() {	
 		if (offscreenChanged) {
 			xmap.setAvailablePixels(offscreenSize.width);
@@ -291,7 +294,8 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
      * Watch for updates from ArrayDrawer and the two maps
      * The appropriate response for both is to trigger a redraw.
      */
-	 public void update(Observable o, Object arg) {	
+	 @Override
+	public void update(Observable o, Object arg) {	
 		 if (o == drawer) {
 			 //	    System.out.println("got drawer update");
 			 offscreenValid = false;
@@ -325,7 +329,8 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
     }
 
     // MouseMotionListener
-    public void mouseMoved(MouseEvent e) {
+    @Override
+	public void mouseMoved(MouseEvent e) {
     	
 		int ooverx = overx;
 		int oovery = overy;
@@ -344,6 +349,7 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
 //        panel.scrollRectToVisible(new Rectangle(vpp, viewPort.getSize()));
 //    }
 
+	@Override
 	public String getToolTipText(MouseEvent e) {
 /* Do we want to do mouseovers if value already visible? 
 		if (getShowVal()) return null; // don't do tooltips and vals at same time.

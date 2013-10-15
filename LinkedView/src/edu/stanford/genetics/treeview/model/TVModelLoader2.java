@@ -41,30 +41,55 @@ public class TVModelLoader2 implements ProgressTrackable {
 		private int phaseLength = 0;
 		private int phaseValue = 0;
 		private String phaseText = "";
+		@Override
 		public boolean getCanceled() {return false;}
+		@Override
 		public LoadException getException() {return null;}
+		@Override
 		public boolean getFinished() {return finished;}
+		@Override
 		public boolean getHadProblem() {return hadProblem;}
+		@Override
 		public int getLength() {return length;}
+		@Override
 		public int getPhaseLength() {return phaseLength;}
+		@Override
 		public String getPhaseText() {return phaseText;}
+		@Override
 		public int getPhaseValue() {return phaseValue;}
+		@Override
 		public int getValue() {return value;}
+		@Override
 		public void incrValue(int i) {value++;}
+		@Override
 		public void println(String s) {System.out.println(s);}
+		@Override
 		public void setButtonText(String text) {}
+		@Override
 		public void setCanceled(boolean canceled) {}
+		@Override
 		public void setException(LoadException exception) {}
+		@Override
 		public void setFinished(boolean finished) {this.finished = finished;}
+		@Override
 		public void setHadProblem(boolean hadProblem) {this.hadProblem = hadProblem;}
+		@Override
 		public void setIndeterminate(boolean flag) {}
+		@Override
 		public void setLength(int i) {this.length = i;}
+		@Override
 		public void setPhase(int i) {this.phaseValue = i;}
+		@Override
 		public void setPhaseLength(int i) {this.phaseLength = i;}
+		@Override
 		public void setPhaseText(String i) {this.phaseText = i;}
+		@Override
 		public void setPhaseValue(int i) {this.phaseValue = i;}
+		@Override
 		public void setPhases(String[] strings) {}
+		@Override
 		public void setValue(int i) {this.value = i;}
+		@Override
 		public void setVisible(boolean b) {}
 	}
 
@@ -101,21 +126,26 @@ public class TVModelLoader2 implements ProgressTrackable {
 	/**
 	* Length in bytes of the input stream, or -1 if not known.
 	*/
+	@Override
 	public void setLength(int length) {
 		loadProgress.setLength(length);
 	}
 	/** Getter for length */
+	@Override
 	public int getLength() {
 		return loadProgress.getLength();
 	}
 	/** Setter for value */
+	@Override
 	public void setValue(int value) {
 		loadProgress.setValue(value);
 	}
 	/** Getter for value */
+	@Override
 	public int getValue() {
 		return loadProgress.getValue();
 	}
+	@Override
 	public void incrValue(int i) {
 		loadProgress.incrValue(i);
 	}
@@ -176,6 +206,7 @@ public class TVModelLoader2 implements ProgressTrackable {
 	}
 	class TimerListener implements ActionListener { // manages the FileLoader
 		// this method is invoked every few hundred ms
+		@Override
 		public void actionPerformed(ActionEvent evt) {
 			if (getCanceled() || getFinished()) {
 				setFinished(true);
@@ -198,6 +229,7 @@ public class TVModelLoader2 implements ProgressTrackable {
 		loadProgress = new LoadProgress2(targetModel.getFileSet().getRoot(), parent);
 		loadProgress.setPhases(phases);
 		final SwingWorker worker = new SwingWorker() {
+			@Override
 			public Object construct() {
 				run();
 				return null;
@@ -665,7 +697,8 @@ public class TVModelLoader2 implements ProgressTrackable {
 //			  LogPanel.println(s);
 //			  if (progressMonitor != null) progressMonitor.setNote(k);
 			  Runnable update = new Runnable() {
-				 public void run() { loadProgress.println(s); }
+				 @Override
+				public void run() { loadProgress.println(s); }
 			 };
 			 SwingUtilities.invokeLater(update);
 		 }
@@ -676,6 +709,7 @@ public class TVModelLoader2 implements ProgressTrackable {
 		final FileSet fileSet = new FileSet(argv[0], "");
 		JButton button = new JButton("load " + argv[0]);
 		button.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				model.setSource(fileSet);
 				TVModelLoader2 loader = new TVModelLoader2(model, frame);
@@ -693,6 +727,7 @@ public class TVModelLoader2 implements ProgressTrackable {
 		frame.pack();
 		frame.setVisible(true);
 		frame.addWindowListener( new WindowAdapter() {
+			@Override
 			public void windowClosing(WindowEvent windowEvent) {
 				System.exit(0);
 			}
@@ -709,6 +744,7 @@ public class TVModelLoader2 implements ProgressTrackable {
 	// how many rows of annotation?
 	protected int nExprPrefix;
 
+	@Override
 	public boolean getCanceled() {
 		return loadProgress.getCanceled();
 	}

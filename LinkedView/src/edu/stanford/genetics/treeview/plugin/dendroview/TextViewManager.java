@@ -109,6 +109,7 @@ public class TextViewManager extends ModelView implements FontSelectable, Proper
 		}
 	}
 	
+	@Override
 	public void update(Observable ob, Object obj)
 	{
 		if(ob == headerSummary)
@@ -125,6 +126,7 @@ public class TextViewManager extends ModelView implements FontSelectable, Proper
 			((TextView)textViews.get(i)).update(ob, obj);			
 		}
 	}
+	@Override
 	public void updateBuffer(Graphics g)
 	{
 		paintAll(g);
@@ -137,6 +139,7 @@ public class TextViewManager extends ModelView implements FontSelectable, Proper
 		}
 	}
 	
+	@Override
 	public String viewName()
 	{
 		return "TextViewManager";
@@ -146,16 +149,19 @@ public class TextViewManager extends ModelView implements FontSelectable, Proper
 	 * Need to override ModelView.setViewFrame to account for the textviews that are contained.
 	 *
 	 */
+	@Override
 	public void setViewFrame(ViewFrame m) {
 		super.setViewFrame(m);
 		for(int i = 0; i < textViews.size(); i++)
 			((TextView)textViews.get(i)).setViewFrame(m);
 	}
+	@Override
 	public void setHintPanel(MessagePanel h) {
 		super.setHintPanel(h);
 		for(int i = 0; i < textViews.size(); i++)
 			((TextView)textViews.get(i)).setHintPanel(h);
 	}
+	@Override
 	public void setStatusPanel(MessagePanel s) {
 		super.setStatusPanel(s);
 		for(int i = 0; i < textViews.size(); i++)
@@ -251,17 +257,21 @@ public class TextViewManager extends ModelView implements FontSelectable, Proper
 		loadDividerLocations();
 	}
 	
+	@Override
 	public String getFace() {
 		return getFont().getName();
     }
-    public int getPoints() {
+    @Override
+	public int getPoints() {
 		return getFont().getSize();
     }
-    public int getStyle() {
+    @Override
+	public int getStyle() {
     		return getFont().getStyle();
     }
     
-    public void setFace(String string) {
+    @Override
+	public void setFace(String string) {
     		for (int i = 0; i < textViews.size(); i++) 	{
     			((TextView)textViews.get(i)).setFace(string);
     		}	
@@ -271,7 +281,8 @@ public class TextViewManager extends ModelView implements FontSelectable, Proper
     		repaint();
     }
     
-    public void setPoints(int size) {
+    @Override
+	public void setPoints(int size) {
     		for(int i = 0; i < textViews.size(); i++) {
 			((TextView)textViews.get(i)).setPoints(size);
 		}	
@@ -281,7 +292,8 @@ public class TextViewManager extends ModelView implements FontSelectable, Proper
         repaint();
     }
     
-    public void setStyle(int style) {
+    @Override
+	public void setStyle(int style) {
     		for(int i = 0; i < textViews.size(); i++) {
 			((TextView)textViews.get(i)).setStyle(style);
 		}	
@@ -371,6 +383,7 @@ public class TextViewManager extends ModelView implements FontSelectable, Proper
 		ignoreDividerChange = false;
 	}
 	
+	@Override
 	public void propertyChange(PropertyChangeEvent pce)
 	{
 		if(!ignoreDividerChange && pce.getPropertyName() == JSplitPane.DIVIDER_LOCATION_PROPERTY)

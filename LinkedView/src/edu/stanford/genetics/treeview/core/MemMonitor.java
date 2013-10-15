@@ -47,6 +47,7 @@ public class MemMonitor extends Frame
 		add("South", clearMem);
 		final MemMonitor top = this;
 		addWindowListener(new WindowAdapter() {
+			@Override
 			public void windowClosing(WindowEvent we) {
 		    top.dispose();
 			}
@@ -60,6 +61,7 @@ public class MemMonitor extends Frame
 		setVisible(true);
 	}
 	
+	@Override
 	public void paint(Graphics g)
 	{
 		g.drawString("Free memory (pre-GC)  = " + Long.toString(freeMem), 
@@ -82,6 +84,7 @@ public class MemMonitor extends Frame
 		g.drawString("All memory in bytes", 15, 135);
 	}
 	
+	@Override
 	public boolean handleEvent(Event e)
 	{
 		if(e.target instanceof Button)

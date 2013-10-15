@@ -45,6 +45,7 @@ public class ScatterplotFactory extends PluginFactory {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.PluginFactory#getPluginName()
 	 */
+	@Override
 	public String getPluginName() {
 		return "Scatterplot";
 	}
@@ -52,6 +53,7 @@ public class ScatterplotFactory extends PluginFactory {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.PluginFactory#restorePlugin(edu.stanford.genetics.treeview.ConfigNode, edu.stanford.genetics.treeview.ViewFrame)
 	 */
+	@Override
 	public MainPanel restorePlugin(ConfigNode node, ViewFrame viewFrame) {
 		ScatterPanel gsp = new ScatterPanel((LinkedViewFrame) viewFrame, node);
 		gsp.setSelection(viewFrame.getGeneSelection());
@@ -68,6 +70,7 @@ public class ScatterplotFactory extends PluginFactory {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.PluginFactory#setGlobalNode(edu.stanford.genetics.treeview.ConfigNode)
 	 */
+	@Override
 	public void setGlobalNode(ConfigNode node) {
 		super.setGlobalNode(node);
 		
@@ -82,9 +85,11 @@ public class ScatterplotFactory extends PluginFactory {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.PluginFactory#addPluginConfig(java.awt.Menu)
 	 */
+	@Override
 	public void addPluginConfig(TreeviewMenuBarI globalMenu, final ViewFrame frame) {
 		super.addPluginConfig(globalMenu, frame);
 		globalMenu.addMenuItem("Scatterplot Color...", new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				if (cpresetFrame == null) {
 					setupPresetsFrame(frame.getApp().getGlobalConfig().getRoot());
@@ -117,6 +122,7 @@ public class ScatterplotFactory extends PluginFactory {
 		return colorPresets;
 	}
 
+	@Override
 	public boolean configurePlugin(ConfigNode node, ViewFrame frame) {
 			GraphDialog gd = new GraphDialog(node, frame);
 			try {
@@ -209,6 +215,7 @@ private class GraphDialog extends JDialog {
 			
 			goButton = new JButton("Go!");
 			goButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					int xtype = xPanel.getType();
 					int xindex = xPanel.getIndex();
@@ -227,6 +234,7 @@ private class GraphDialog extends JDialog {
 			*/
 			closeButton = new JButton("Cancel");
 			closeButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					GraphDialog.this.dispose();
 				}

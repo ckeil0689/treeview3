@@ -32,13 +32,16 @@ public class IntHeaderInfo extends Observable implements HeaderInfo {
 	public void setHeaderArray(String[][] newVal) {
 		headerArray = newVal;
 	}
+	@Override
 	public String [] getNames() { 
 		return prefixArray;
 	}
+	@Override
 	public int getNumNames() {
 		return prefixArray.length;
 	}
 	  
+	@Override
 	public int getNumHeaders() {
 		return getHeaderArray().length;
 	}
@@ -46,7 +49,8 @@ public class IntHeaderInfo extends Observable implements HeaderInfo {
 	  /**
 	  * Returns the header for a given gene and column heading.
 	  */
-	  public String [] getHeader(int gene) {
+	  @Override
+	public String [] getHeader(int gene) {
 		  try{
 			  if (getHeaderArray()[gene] == null) {
 				  return new String[0];
@@ -65,17 +69,20 @@ public class IntHeaderInfo extends Observable implements HeaderInfo {
 	  * Returns the header for a given gene and column heading,
 	  * or null if not present.
 	  */
-	  public String getHeader(int gene, String col) {
+	  @Override
+	public String getHeader(int gene, String col) {
 		int index = getIndex(col);
 		if (index == -1) {
 			return null;
 		}
 		return getHeader(gene, index);
 	  }
+		@Override
 		public String getHeader(int rowIndex, int columnIndex) {
 			  return (getHeader(rowIndex))[columnIndex];
 		}
-		  public int getIndex(String header) {
+		  @Override
+		public int getIndex(String header) {
 				for (int i = 0 ; i < prefixArray.length; i++) {
 				  if (header.equalsIgnoreCase(prefixArray[i]))
 					return i;
@@ -83,6 +90,7 @@ public class IntHeaderInfo extends Observable implements HeaderInfo {
 				return -1;
 			  }
 	  
+		@Override
 		public int getHeaderIndex(String id) {
 			Object ind = id2row.get(id);
 			if (ind == null) {
@@ -98,6 +106,7 @@ public class IntHeaderInfo extends Observable implements HeaderInfo {
 		 * @param index
 		 * @return
 		 */
+		@Override
 		public boolean addName(String name, int index) {
 			int existing = getIndex(name);
 			//already have this header
@@ -144,6 +153,7 @@ public class IntHeaderInfo extends Observable implements HeaderInfo {
 			}
 		}
 		
+		@Override
 		public boolean setHeader(int i, String name, String value) {
 			if (getHeaderArray().length < i) return false;
 			int nameIndex = getIndex(name);
@@ -153,7 +163,9 @@ public class IntHeaderInfo extends Observable implements HeaderInfo {
 			setModified(true);
 			return true;
 		}
+		@Override
 		public boolean getModified() {return modified;}
+		@Override
 		public void setModified(boolean mod) {
 			setChanged();
 			notifyObservers();

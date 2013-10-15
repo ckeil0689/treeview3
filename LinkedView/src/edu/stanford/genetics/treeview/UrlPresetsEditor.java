@@ -58,7 +58,8 @@ public class UrlPresetsEditor extends JPanel implements SettingsPanel {
 		 d.add(new JLabel(getTitle()), BorderLayout.NORTH);
 		 d.add(new ButtonPanel(), BorderLayout.SOUTH);
 		 d.addWindowListener(new WindowAdapter (){
-		   public void windowClosing(WindowEvent we) 
+		   @Override
+		public void windowClosing(WindowEvent we) 
 		   {we.getWindow().setVisible(false);}
 		 });
 		 d.pack();
@@ -74,6 +75,7 @@ public class UrlPresetsEditor extends JPanel implements SettingsPanel {
 	e.addToFrame(f);
 
 	f.addWindowListener(new WindowAdapter (){
+		@Override
 		public void windowClosing(WindowEvent we) 
 		{System.exit(0);}
 	    });
@@ -95,9 +97,11 @@ public class UrlPresetsEditor extends JPanel implements SettingsPanel {
 
 	private PresetEditPanel presetEditPanel;
 
+	@Override
 	public void synchronizeTo() {
 			presetEditPanel.saveAll();
 	}
+	@Override
 	public void synchronizeFrom() {
 			  presetEditPanel.redoLayout();
 	}
@@ -106,7 +110,8 @@ public class UrlPresetsEditor extends JPanel implements SettingsPanel {
 	ButtonPanel() {
 	    JButton save_button = new JButton("Save");
 	    save_button.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
+		    @Override
+			public void actionPerformed(ActionEvent e) {
 			  synchronizeTo();
 			  window.setVisible(false);
 		    }
@@ -115,7 +120,8 @@ public class UrlPresetsEditor extends JPanel implements SettingsPanel {
 
 	    JButton cancel_button = new JButton("Cancel");
 	    cancel_button.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
+		    @Override
+			public void actionPerformed(ActionEvent e) {
 			  synchronizeFrom();
 			  window.setVisible(false);
 		    }
@@ -150,7 +156,7 @@ public class UrlPresetsEditor extends JPanel implements SettingsPanel {
 		  gbc.gridx = 0;
 		  gbc.gridwidth = 4;
 		  gbc.weighty = 100;
-		  add(new JLabel("Modify Url Presets", JLabel.CENTER), gbc);
+		  add(new JLabel("Modify Url Presets", SwingConstants.CENTER), gbc);
 		  gbc.gridwidth = 1;
 		  gbc.weighty = 0;
 		  gbc.gridy = 1;
@@ -239,6 +245,7 @@ public class UrlPresetsEditor extends JPanel implements SettingsPanel {
 		  JRadioButton set = new JRadioButton();
 		  defaultButtons[index] = set;
 		  set.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 			  presets.setDefaultPreset(index);
 			}
@@ -265,6 +272,7 @@ public class UrlPresetsEditor extends JPanel implements SettingsPanel {
 		  JRadioButton set = new JRadioButton();
 		  defaultButtons[index] = set;
 		  set.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 			  presets.setDefaultPreset(-1);
 			}

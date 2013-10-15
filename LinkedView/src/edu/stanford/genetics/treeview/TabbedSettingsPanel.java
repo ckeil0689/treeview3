@@ -34,10 +34,12 @@ import javax.swing.*;
  */
 public class TabbedSettingsPanel extends JTabbedPane implements SettingsPanel {
 
+	@Override
 	public void setSelectedIndex(int i) {
 		synchronizeFrom(i);
 		super.setSelectedIndex(i);
 	}
+	@Override
 	public void synchronizeTo() {
 		int n = getTabCount();
 		for (int i = 0; i < n; i++) {
@@ -50,6 +52,7 @@ public class TabbedSettingsPanel extends JTabbedPane implements SettingsPanel {
 	
 	
 	
+	@Override
 	public void synchronizeFrom() {
 		int n = getTabCount();
 		for (int i = 0; i < n; i++) {

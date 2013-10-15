@@ -44,17 +44,21 @@ package edu.stanford.genetics.treeview.plugin.karyoview;
 	  public NearestAverager(int n) {
 		  setNum(n);
 	  }
-	  public int getType() {
+	  @Override
+	public int getType() {
 		  return Averager.NEAREST;
 	  }
-	  public String getArg() {
+	  @Override
+	public String getArg() {
 		  return "" + getNum();
 	  }
 
-	  protected String getPre() {
+	  @Override
+	protected String getPre() {
 		  return "Nearest " + getNum() + " of ";
 	  }
-	  protected ChromosomeLocus [] getContributors(ChromosomeLocus locus) {
+	  @Override
+	protected ChromosomeLocus [] getContributors(ChromosomeLocus locus) {
 		  ChromosomeLocus [] ret = new ChromosomeLocus[getNum()];
 		  ChromosomeLocus leftCand  = locus.getLeft();
 		  ChromosomeLocus rightCand = locus.getRight();

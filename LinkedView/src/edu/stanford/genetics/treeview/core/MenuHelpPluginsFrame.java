@@ -64,6 +64,7 @@ public class MenuHelpPluginsFrame extends JDialog {
 		dirPanel.add(tf_dir, BorderLayout.CENTER);
 		JButton b_browse = new JButton("Browse...");
 		b_browse.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser chooser = new JFileChooser();
 				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -79,6 +80,7 @@ public class MenuHelpPluginsFrame extends JDialog {
 		
 		JButton b_scan = new JButton("Scan new plugins");
 		b_scan.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				File[] files = PluginManager.getPluginManager().readdir(tf_dir.getText());
 				if (files == null || files.length == 0) {
@@ -95,7 +97,7 @@ public class MenuHelpPluginsFrame extends JDialog {
 		});
 		this.getContentPane().add(b_scan, c);
 		this.pack();
-		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setLocationRelativeTo(frame);
 	}
 }

@@ -47,6 +47,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#resize(int)
 	 */
+	@Override
 	public void resize(int nIndex)  {
 		IntegerSelection temp = new IntegerSelection(nIndex);
 		
@@ -69,6 +70,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#deselectAllIndexes()
 	 */
+	@Override
 	public void deselectAllIndexes() {
 		integerSelection.deselectAll();
 	}
@@ -77,6 +79,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#selectAllIndexes()
 	 */
+	@Override
 	public void selectAllIndexes() {
 		integerSelection.selectAll();
 	}
@@ -85,6 +88,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#setIndex(int, boolean)
 	 */
+	@Override
 	public void setIndex(int i, boolean b) {
 		integerSelection.set(i, b);
 	}
@@ -93,6 +97,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#isIndexSelected(int)
 	 */
+	@Override
 	public boolean isIndexSelected(int i) {
 		return integerSelection.isSelected(i);
 	}
@@ -101,12 +106,14 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#getMinIndex()
 	 */
+	@Override
 	public int getMinIndex() {
 		return integerSelection.getMin();
 	}
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#getSelectedIndexes()
 	 */
+	@Override
 	public int [] getSelectedIndexes() {
 		return integerSelection.getSelectedIndexes();
 	}
@@ -114,6 +121,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#getMaxIndex()
 	 */
+	@Override
 	public int getMaxIndex() {
 		return integerSelection.getMax();
 	}
@@ -122,6 +130,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#getNumIndexes()
 	 */
+	@Override
 	public int getNumIndexes() {
 		return integerSelection.getNSelectable();
 	}
@@ -130,6 +139,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#selectIndexRange(int, int)
 	 */
+	@Override
 	public void selectIndexRange(int min, int max) {
 		if (min > max) {
 			int swap  = min;
@@ -145,6 +155,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#getNSelectedIndexes()
 	 */
+	@Override
 	public int getNSelectedIndexes() {
 		return integerSelection.getNSelected();
 	}
@@ -153,6 +164,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#setSelectedNode(java.lang.String)
 	 */
+	@Override
 	public void setSelectedNode(String n) {
 		if (selectedNode != n) {
 			selectedNode = n;
@@ -164,6 +176,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#getSelectedNode()
 	 */
+	@Override
 	public String getSelectedNode() {
 		return selectedNode;
 	}

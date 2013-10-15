@@ -127,9 +127,11 @@ class DisplaySettingsPanel extends JPanel implements SettingsPanel {
 		add(colorPanel,gc);
 	}
 	
+	@Override
 	public void synchronizeTo() {
 	}
 	
+	@Override
 	public void synchronizeFrom() {
 	}
 	
@@ -216,18 +218,22 @@ class DisplaySettingsPanel extends JPanel implements SettingsPanel {
 				enabledBox.setSelected(axisParameter.getEnabled());
 				
 				enabledBox.addActionListener(new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						setEnabledValue();
 					}
 				});
 
 				valueField.addKeyListener(new KeyListener() {
+					@Override
 					public void keyPressed(KeyEvent e) {
 //						setValue()
 					};
+					@Override
 					public void keyReleased(KeyEvent e) {
 //					setValue()
 					};
+					@Override
 					public void keyTyped(KeyEvent e) {
 							enabledBox.setSelected(true);
 							setEnabledValue();
@@ -235,8 +241,11 @@ class DisplaySettingsPanel extends JPanel implements SettingsPanel {
 				});
 
 				valueField.getDocument().addDocumentListener(new DocumentListener() {
+					@Override
 					public void insertUpdate  (DocumentEvent e) { setValue();}
+					@Override
 					public void removeUpdate  (DocumentEvent e) { setValue();}
+					@Override
 					public void changedUpdate (DocumentEvent e) { setValue();}
 				});				
 				getValues();
@@ -304,6 +313,7 @@ class DisplaySettingsPanel extends JPanel implements SettingsPanel {
 			JPanel row3 = new JPanel();
 			JButton loadButton = new JButton("Load...");
 			loadButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					JFileChooser chooser = new JFileChooser();
 					int returnVal = chooser.showOpenDialog(DisplaySettingsPanel.this);
@@ -323,6 +333,7 @@ class DisplaySettingsPanel extends JPanel implements SettingsPanel {
 
 			JButton saveButton = new JButton("Save...");
 			saveButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					JFileChooser chooser = new JFileChooser();
 					int returnVal = chooser.showSaveDialog(DisplaySettingsPanel.this);
@@ -337,6 +348,7 @@ class DisplaySettingsPanel extends JPanel implements SettingsPanel {
 
 			JButton makeButton = new JButton("Make Preset");
 			makeButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					ScatterColorSet temp = new ScatterColorSet();
 						ScatterColorSet colorSet = scatterPane.getColorSet();
@@ -383,6 +395,7 @@ class DisplaySettingsPanel extends JPanel implements SettingsPanel {
 		  JButton presetButton = new JButton((presets.getPresetNames()) [i]);
 		  final int index = i;
 		  presetButton.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 			  colorPanel.copyStateFrom(presets.getColorSet(index));
 			}
@@ -410,6 +423,7 @@ class DisplaySettingsPanel extends JPanel implements SettingsPanel {
 			colorIcon = new ColorIcon(10, 10, getColor());
 			JButton pushButton = new JButton(getLabel(), colorIcon);
 			pushButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					Color trial = JColorChooser.showDialog(ColorPanel.this, "Pick Color for " + getLabel(), getColor());
 					if (trial != null) {

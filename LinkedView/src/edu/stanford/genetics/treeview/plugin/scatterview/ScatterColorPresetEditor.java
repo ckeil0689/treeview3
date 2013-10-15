@@ -59,7 +59,8 @@ public class ScatterColorPresetEditor extends JPanel implements SettingsPanel {
 		 d.add(new JLabel(getTitle()), BorderLayout.NORTH);
 		 d.add(new ButtonPanel(), BorderLayout.SOUTH);
 		 d.addWindowListener(new WindowAdapter (){
-		   public void windowClosing(WindowEvent we) 
+		   @Override
+		public void windowClosing(WindowEvent we) 
 		   {we.getWindow().dispose();}
 		 });
 		 d.pack();
@@ -91,10 +92,12 @@ public class ScatterColorPresetEditor extends JPanel implements SettingsPanel {
 
 	private PresetEditPanel presetEditPanel;
 
+	@Override
 	public void synchronizeFrom() {
 	  presetEditPanel.initialize();
 	  presetEditPanel.redoLayout();
 	}
+	@Override
 	public void synchronizeTo() {
 	  presetEditPanel.saveAll();
 	}
@@ -103,7 +106,8 @@ public class ScatterColorPresetEditor extends JPanel implements SettingsPanel {
 	ButtonPanel() {
 	    JButton save_button = new JButton("Save");
 	    save_button.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
+		    @Override
+			public void actionPerformed(ActionEvent e) {
 			  synchronizeTo();
 			  window.dispose();
 		    }
@@ -112,7 +116,8 @@ public class ScatterColorPresetEditor extends JPanel implements SettingsPanel {
 
 	    JButton cancel_button = new JButton("Cancel");
 	    cancel_button.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
+		    @Override
+			public void actionPerformed(ActionEvent e) {
 			  synchronizeFrom();
 			  window.dispose();
 		    }
@@ -165,6 +170,7 @@ public class ScatterColorPresetEditor extends JPanel implements SettingsPanel {
 		  JRadioButton set = new JRadioButton();
 		  defaultButtons[index] = set;
 		  set.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 			  presets.setDefaultIndex(index);
 			}
@@ -188,7 +194,7 @@ public class ScatterColorPresetEditor extends JPanel implements SettingsPanel {
 		  gbc.gridx = 0;
 
 		  gbc.weighty = 100;
-		  add(new JLabel("Modify Color Presets", JLabel.CENTER), gbc);
+		  add(new JLabel("Modify Color Presets", SwingConstants.CENTER), gbc);
 		  gbc.weighty = 0;
 		  gbc.gridy = 1;
 		  gbc.gridx = 0;
@@ -207,6 +213,7 @@ public class ScatterColorPresetEditor extends JPanel implements SettingsPanel {
 		  
 		  JButton addP = new JButton("Add New");
 		  addP.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 			  createPreset();
 			}
@@ -217,6 +224,7 @@ public class ScatterColorPresetEditor extends JPanel implements SettingsPanel {
 
 		  JButton addS = new JButton("Add Standards");
 		  addS.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 			ScatterColorSet [] toAdd = ScatterColorPresets.defaultColorSets;
 				for (int i = 0; i < toAdd.length; i++) {
@@ -248,6 +256,7 @@ public class ScatterColorPresetEditor extends JPanel implements SettingsPanel {
 		  gbc.weightx = 0;
 		  JButton rem = new JButton("Remove");
 		  rem.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 			  removePreset(index);
 			}
@@ -343,6 +352,7 @@ public class ScatterColorPresetEditor extends JPanel implements SettingsPanel {
 		  JRadioButton set = new JRadioButton();
 		  tDefaultButtons[newIndex] = set;
 		  set.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 			  presets.setDefaultIndex(newIndex);
 			}

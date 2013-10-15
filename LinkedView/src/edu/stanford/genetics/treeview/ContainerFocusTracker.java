@@ -55,18 +55,21 @@ public class ContainerFocusTracker implements FocusListener, ContainerListener {
 	// Event handling
 	//****************************
 
+	@Override
 	public void componentAdded(ContainerEvent e) {
 		if(debug)
 			System.out.println(container.getName() + " - Adding...");
 		addComponent(e.getChild());
 	}
 
+	@Override
 	public void componentRemoved(ContainerEvent e) {
 		if(debug)
 			System.out.println(container.getName() + " - Removing...");
 		removeComponent(e.getChild());
 	}
 
+	@Override
 	public void focusGained(FocusEvent e) {
 		Component c = e.getComponent();
 
@@ -87,6 +90,7 @@ public class ContainerFocusTracker implements FocusListener, ContainerListener {
 		}
 	}
 
+	@Override
 	public void focusLost(FocusEvent e) {
 	}
 

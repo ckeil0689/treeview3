@@ -49,7 +49,7 @@ public class ATRZoomView extends ModelView implements
 		super();
 
 		panel = new JPanel();
-		scrollbar = new JScrollBar(JScrollBar.VERTICAL, 0, 1, 0, 1);
+		scrollbar = new JScrollBar(Adjustable.VERTICAL, 0, 1, 0, 1);
 		destRect = new Rectangle();
 
 		panel.setLayout(new BorderLayout());
@@ -78,6 +78,7 @@ public class ATRZoomView extends ModelView implements
 
 
 	/*inherit description*/
+	@Override
 	public String[] getHints() {
 		return hints;
 	}
@@ -180,6 +181,7 @@ public class ATRZoomView extends ModelView implements
 	 * @param  o    Observable sending update
 	 * @param  arg  Argument, typically null
 	 */
+	@Override
 	public void update(Observable o, Object arg) {
 		if (o == drawer) {
 			//System.out.println("Got an update from drawer");
@@ -213,6 +215,7 @@ public class ATRZoomView extends ModelView implements
 	 *
 	 * @return    returns name of this ModelView
 	 */
+	@Override
 	public String viewName() {
 		return "ATRZoomView";
 	}
@@ -223,6 +226,7 @@ public class ATRZoomView extends ModelView implements
 	 *
 	 * @return    Text describing selected node correlation
 	 */
+		@Override
 		public String[]  getStatus() {
 			String [] status;
 			if (selectedNode != null) {
@@ -248,6 +252,7 @@ public class ATRZoomView extends ModelView implements
 	 *
 	 * @param  g  Graphics object to draw to
 	 */
+	@Override
 	public void updateBuffer(Graphics g) {
 		if (offscreenChanged == true) {
 			offscreenValid = false;
@@ -300,6 +305,7 @@ public class ATRZoomView extends ModelView implements
 	 *
 	 * @param  e  Mouse clicking event
 	 */
+	@Override
 	public void mouseClicked(MouseEvent e) {
 		if (this == null) {
 			return;
@@ -331,6 +337,7 @@ public class ATRZoomView extends ModelView implements
 	 * right selects right child
 	 * down selects child with most descendants.
 	 */
+	@Override
 	public void keyPressed(KeyEvent e) {
 		if (selectedNode == null) {
 			return;
@@ -376,6 +383,7 @@ public class ATRZoomView extends ModelView implements
 	 *
 	 * @param  e  Key release event
 	 */
+	@Override
 	public void keyReleased(KeyEvent e) { }
 
 
@@ -384,6 +392,7 @@ public class ATRZoomView extends ModelView implements
 	 *
 	 * @param  e  Key type event
 	 */
+	@Override
 	public void keyTyped(KeyEvent e) { }
 
 

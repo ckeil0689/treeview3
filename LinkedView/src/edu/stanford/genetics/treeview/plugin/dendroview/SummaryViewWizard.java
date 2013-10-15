@@ -75,12 +75,15 @@ public class SummaryViewWizard extends JPanel {
 //			textArea  = new JTextField("Paste one ID per row");
 			textArea.setEditable(true);
 			textArea.getDocument().addDocumentListener(new DocumentListener() {
+				@Override
 				public void changedUpdate (DocumentEvent e) {
 					listButton.setSelected(true);
 				}
+				@Override
 				public void insertUpdate (DocumentEvent e) {
 					listButton.setSelected(true);
 				}
+				@Override
 				public void removeUpdate (DocumentEvent e) {
 					listButton.setSelected(true);
 				}

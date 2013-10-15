@@ -48,6 +48,7 @@ public class FixedMap extends IntegerMap {
 	 *
 	 * @param  configNode  ConfigNode to bind to
 	 */
+	@Override
 	public void bindConfig(ConfigNode configNode) {
 		super.bindConfig(configNode);
 		scale = root.getAttribute("scale", default_scale);
@@ -60,8 +61,9 @@ public class FixedMap extends IntegerMap {
 	 * @param  i  the pixel value
 	 * @return    The index value
 	 */
+	@Override
 	public int getIndex(int i) {
-		return (int) ((double) i / scale) + minindex;
+		return (int) (i / scale) + minindex;
 	}
 
 
@@ -71,14 +73,16 @@ public class FixedMap extends IntegerMap {
 	 * @param  i  The index value
 	 * @return    The pixel value
 	 */
+	@Override
 	public int getPixel(int i) {
-		return (int) ((double) (i - minindex) * scale);
+		return (int) ((i - minindex) * scale);
 	}
 
 
 	/**
 	 * @return    The effective scale for the current FillMap
 	 */
+	@Override
 	public double getScale() {
 		return scale;
 	}
@@ -87,12 +91,13 @@ public class FixedMap extends IntegerMap {
 	/**
 	 * @return    The number of pixels currently being used
 	 */
+	@Override
 	public int getUsedPixels() {
 		if (minindex == -1) {
 			return 0;
 		}
-		int i  = (int) ((double) (maxindex - minindex + 1) * scale);
-		int j  = (int) (scale * (int) ((double) availablepixels / scale));
+		int i  = (int) ((maxindex - minindex + 1) * scale);
+		int j  = (int) (scale * (int) (availablepixels / scale));
 		if (i > j) {
 			return j;
 		} else {
@@ -104,8 +109,9 @@ public class FixedMap extends IntegerMap {
 	/**
 	 * @return    The number of indexes currently visible
 	 */
+	@Override
 	public int getViewableIndexes() {
-	int i  = (int) ((double) availablepixels / scale);
+	int i  = (int) (availablepixels / scale);
 		return i;
 	}
 
@@ -134,6 +140,7 @@ public class FixedMap extends IntegerMap {
 	/**
 	 * @return    A short word desribing this type of map
 	 */
+	@Override
 	public String type() {
 		return "Fixed";
 	}

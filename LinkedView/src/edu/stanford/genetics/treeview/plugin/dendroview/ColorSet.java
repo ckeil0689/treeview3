@@ -104,6 +104,7 @@ public class ColorSet implements ConfigNodePersistent {
 	/**
 	* sets colors and name to reflect <code>ConfigNode</code>
 	*/
+	@Override
 	public void bindConfig(ConfigNode root) {
 		this.root = root;
 		up = decodeColor(root.getAttribute("up", default_upColor));
@@ -143,6 +144,7 @@ public class ColorSet implements ConfigNodePersistent {
 
 
 	/*inherit description*/
+	@Override
 	public String toString() {
 		return "ColorSet " + getName() + "\n" +
 				"up: " + getUp().toString() + "\t" +

@@ -54,8 +54,11 @@ public abstract class KaryoViewExportPanel extends JPanel implements SettingsPan
 		private void doUpdate() {
 			previewPanel.updatePreview();
 		}
+		@Override
 		public void changedUpdate(DocumentEvent arg0) {doUpdate();}
+		@Override
 		public void insertUpdate(DocumentEvent arg0) {doUpdate();}
+		@Override
 		public void removeUpdate(DocumentEvent arg0) {doUpdate();}
 	};
 	private DocumentListener scaleChangeListener = new DocumentListener() {
@@ -68,8 +71,11 @@ public abstract class KaryoViewExportPanel extends JPanel implements SettingsPan
 				LogBuffer.logException(e);
 			}
 		}
+		@Override
 		public void changedUpdate(DocumentEvent arg0) {doUpdate();}
+		@Override
 		public void insertUpdate(DocumentEvent arg0) {doUpdate();}
+		@Override
 		public void removeUpdate(DocumentEvent arg0) {doUpdate();}
 	};
 	
@@ -190,6 +196,7 @@ public abstract class KaryoViewExportPanel extends JPanel implements SettingsPan
 			add(new DrawingPanel(), BorderLayout.CENTER);
 			drawPreview = new JCheckBox("Draw Preview");
 			drawPreview.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					updatePreview();
 				}
@@ -208,6 +215,7 @@ public abstract class KaryoViewExportPanel extends JPanel implements SettingsPan
 
 
 			
+			@Override
 			public void paintComponent(Graphics g) {
 				Dimension size = getSize();
 				int width = estimateWidth();
@@ -363,6 +371,7 @@ public abstract class KaryoViewExportPanel extends JPanel implements SettingsPan
 			sizePanel = new SizeRow();
 			scalePanel = new ScaleRow();
 			chrList.addListSelectionListener(new ListSelectionListener() {
+				@Override
 				public void valueChanged(ListSelectionEvent e) {
 					previewPanel.updatePreview();
 					sizePanel.setXsize(estimateWidth());
@@ -459,6 +468,7 @@ public abstract class KaryoViewExportPanel extends JPanel implements SettingsPan
 				if (px.intValue() < 1) return 1;
 				return px.intValue();
 			}
+			@Override
 			public void setEnabled(boolean flag) {
 				super.setEnabled(flag);
 				xSize.setEnabled(flag);
@@ -491,6 +501,7 @@ public abstract class KaryoViewExportPanel extends JPanel implements SettingsPan
 			add(fileField, BorderLayout.CENTER);
 			JButton chooseButton = new JButton("Browse");
 			chooseButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					try {
 						JFileChooser chooser = new JFileChooser();

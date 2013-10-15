@@ -54,14 +54,17 @@ public class WaitScreen extends Canvas {
 	line_widths = new int[message.length];
     }
 
-    public void addNotify() {super.addNotify(); measure();}
+    @Override
+	public void addNotify() {super.addNotify(); measure();}
 
-    public Dimension getPreferredSize() {
+    @Override
+	public Dimension getPreferredSize() {
 	return new Dimension(max_width + 2*margin_width,
 			     message.length*line_height+2*margin_height);
     }
 
-    public void paint(Graphics g) {
+    @Override
+	public void paint(Graphics g) {
 	g.setColor(Color.black);
 	int height =   margin_height/ 2 + line_height;
 	for (int i = 0; i < message.length; i++) {

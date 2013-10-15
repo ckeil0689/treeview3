@@ -190,6 +190,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements 
 
 
 	/*inherit description*/
+	@Override
 	public void bindConfig(ConfigNode configNode) {
 		root = configNode;
 	}
@@ -294,6 +295,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements 
 	 *
 	 * @return    The font value
 	 */
+	@Override
 	public Font getFont() {
 		return new Font("Courier", 0, 12);
 	}
@@ -313,7 +315,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements 
 				value *= 10;
 			}
 			int intVal        = (int) value;
-			double doubleVal  = (double) intVal;
+			double doubleVal  = intVal;
 			for (int i = 0; i < getDecimals(); i++) {
 				doubleVal /= 10;
 			}
@@ -347,7 +349,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements 
 		int boxes                = getNumBoxes();
 		int maxLength            = 0;
 		for (int i = 0; i < boxes; i++) {
-			double val  = ((double) i * contrast * 2.0) / ((double) boxes - 1) - contrast;
+			double val  = (i * contrast * 2.0) / ((double) boxes - 1) - contrast;
 			int length  = fontMetrics.stringWidth(formatValue(val));
 			if (length > maxLength) {
 				maxLength = length;
@@ -397,6 +399,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements 
 			drawPreview = new JCheckBox("Draw Preview");
 			drawPreview.addActionListener(
 				new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						updatePreview();
 					}
@@ -410,6 +413,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements 
 			double scale;
 
 
+			@Override
 			public void paintComponent(Graphics g) {
 				Dimension size  = getSize();
 				int width       = estimateWidth();
@@ -529,9 +533,9 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements 
 		double[] matrix     = new double[getNumBoxes()];
 		double contrast     = getColorExtractor().getContrast();
 		for (int i = 0; i < boxes; i++) {
-			double val  = ((double) i * contrast * 2.0) / ((double) boxes - 1) - contrast;
+			double val  = (i * contrast * 2.0) / ((double) boxes - 1) - contrast;
 			if (drawVertical()) {
-				val = ((double) (getNumBoxes() - i - 1) * contrast * 2.0) / ((double) boxes - 1) - contrast;
+				val = ((getNumBoxes() - i - 1) * contrast * 2.0) / ((double) boxes - 1) - contrast;
 			}
 			matrix[i] = val;
 		}
@@ -627,7 +631,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements 
 		if (drawVertical()) {
 			double spacing  = height / (getNumBoxes());
 			for (int i = 0; i < getNumBoxes(); i++) {
-				double val  = ((double) (getNumBoxes() - i - 1) * contrast * 2.0) / ((double) boxes - 1) - contrast;
+				double val  = ((getNumBoxes() - i - 1) * contrast * 2.0) / ((double) boxes - 1) - contrast;
 				g.drawString(formatValue(val), (int) (x + inset),
 						y + (int) ((i) * spacing + (spacing + numberHeight) / 2));
 			}
@@ -637,7 +641,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements 
 			Graphics backG  = back.getGraphics();
 
 			for (int i = 0; i < getNumBoxes(); i++) {
-				double val  = ((double) i * contrast * 2.0) / ((double) boxes - 1) - contrast;
+				double val  = (i * contrast * 2.0) / ((double) boxes - 1) - contrast;
 				backG.drawString(formatValue(val), y,
 						x + (int) ((i) * spacing + (spacing + numberHeight) / 2));
 				/*
@@ -648,7 +652,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements 
 			}
 			// this flips the backbuffer...
 			back = RotateImageFilter.rotate(this, back);
-			g.drawImage(back, (int) (x), (int) (y - inset), null);
+			g.drawImage(back, (x), (int) (y - inset), null);
 		}
 	}
 
@@ -754,6 +758,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements 
 		SettingsPanel() {
 			documentListener =
 				new DocumentListener() {
+					@Override
 					public void changedUpdate(DocumentEvent e) {
 						updateSize();
 						if (previewPanel != null) {
@@ -762,6 +767,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements 
 					}
 
 
+					@Override
 					public void insertUpdate(DocumentEvent e) {
 						updateSize();
 						if (previewPanel != null) {
@@ -770,6 +776,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements 
 					}
 
 
+					@Override
 					public void removeUpdate(DocumentEvent e) {
 						updateSize();
 						if (previewPanel != null) {
@@ -789,6 +796,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements 
 
 			ActionListener syncher  =
 				new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						updateSize();
 						if (previewPanel != null) {
@@ -855,9 +863,11 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements 
 
 
 		class BboxRow extends SizeRow {
+			@Override
 			protected void setupWidgets() {
 				DocumentListener documentListener  =
 					new DocumentListener() {
+						@Override
 						public void changedUpdate(DocumentEvent e) {
 							updateSize();
 							if (previewPanel != null) {
@@ -866,6 +876,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements 
 						}
 
 
+						@Override
 						public void insertUpdate(DocumentEvent e) {
 							updateSize();
 							if (previewPanel != null) {
@@ -874,6 +885,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements 
 						}
 
 
+						@Override
 						public void removeUpdate(DocumentEvent e) {
 							updateSize();
 							if (previewPanel != null) {
@@ -943,6 +955,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements 
 			}
 
 
+			@Override
 			public void setEnabled(boolean flag) {
 				super.setEnabled(flag);
 				xSize.setEnabled(flag);
@@ -989,6 +1002,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements 
 			JButton chooseButton  = new JButton("Browse");
 			chooseButton.addActionListener(
 				new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						try {
 							JFileChooser chooser  = new JFileChooser();
@@ -1026,16 +1040,20 @@ class SimpleDataMatrix implements DataMatrix {
 		this.nRow = nRow;
 		this.nCol = nCol;
 	}
+	@Override
 	public int getNumRow() {
 		return nRow;
 	}
+	@Override
 	public int getNumCol() {
 		return nCol;
 	}
+	@Override
 	public int getNumUnappendedCol()
 	{
 		return appendIndex == -1?getNumCol():appendIndex;
 	}
+	@Override
 	public double getValue(int x, int y) {
 		return dataMatrix[x + y * nCol];
 	}
@@ -1076,6 +1094,7 @@ class SimpleDataMatrix implements DataMatrix {
 		dataMatrix = temp;
 	}
 	int appendIndex = -1;
+	@Override
 	public void setValue(double value, int x, int y)
 	{
 		dataMatrix[x + y*nCol] = value;

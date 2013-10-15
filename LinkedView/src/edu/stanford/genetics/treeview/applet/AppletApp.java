@@ -23,6 +23,7 @@ public class AppletApp extends TreeViewApp {
 	}
 
 	/* inherit description */
+	@Override
 	public ViewFrame openNew() {
 		// setup toplevel
 		LinkedViewFrame tvFrame  =
@@ -33,6 +34,7 @@ public class AppletApp extends TreeViewApp {
 
 
 	/* inherit description */
+	@Override
 	public ViewFrame openNew(FileSet fileSet) throws LoadException {
 		// setup toplevel
 		LinkedViewFrame tvFrame  =
@@ -52,6 +54,7 @@ public class AppletApp extends TreeViewApp {
 	/**
 	* same as above, but doesn't open a loading window (damn deadlocks!)
 	*/
+	@Override
 	public ViewFrame openNewNW(FileSet fileSet) throws LoadException {
 		// setup toplevel
 		LinkedViewFrame tvFrame  = new AppletViewFrame(this, applet);
@@ -68,10 +71,12 @@ public class AppletApp extends TreeViewApp {
 		return tvFrame;
 	}
 
+	@Override
 	public URL getCodeBase() {
 		return applet.getCodeBase();
 	}
 
+	@Override
 	protected void endProgram() {
 		try {
 			if (getGlobalConfig() != null) {

@@ -22,6 +22,7 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
+import java.awt.Adjustable;
 import java.awt.Menu;
 import java.awt.MenuItem;
 import java.awt.event.ActionEvent;
@@ -101,6 +102,7 @@ public class CharDendroView extends DendroView {
 		
 		MenuItem bitmapItem = new MenuItem("Export to Image...");
 		bitmapItem.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				
 				MapContainer initXmap, initYmap;
@@ -141,6 +143,7 @@ public class CharDendroView extends DendroView {
 	 *  It sets up the views and binds them all to config nodes.
 	 *
 	 */
+	@Override
 	protected void setupViews() {
 
 		CharColorExtractor colorExtractor = new CharColorExtractor();
@@ -163,10 +166,10 @@ public class CharDendroView extends DendroView {
 		
 		
 		// scrollbars, mostly used by maps
-		globalXscrollbar = new JScrollBar(JScrollBar.HORIZONTAL, 0,1,0,1);
-		globalYscrollbar = new JScrollBar(JScrollBar.VERTICAL,0,1,0,1);
-		zoomXscrollbar = new JScrollBar(JScrollBar.HORIZONTAL, 0,1,0,1);
-		zoomYscrollbar = new JScrollBar(JScrollBar.VERTICAL,0,1,0,1);
+		globalXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0,1,0,1);
+		globalYscrollbar = new JScrollBar(Adjustable.VERTICAL,0,1,0,1);
+		zoomXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0,1,0,1);
+		zoomYscrollbar = new JScrollBar(Adjustable.VERTICAL,0,1,0,1);
 
 
 
@@ -268,46 +271,60 @@ class CharHeaderInfo implements HeaderInfo {
 		numChars = n;
 	}
 
+	@Override
 	public String[] getHeader(int i) {
 		holder[0] = "" + i;
 		return holder;
 	}
 
+	@Override
 	public String getHeader(int i, String name) {
 		return "" + i;
 	}
+	@Override
 	public String getHeader(int rowIndex, int columnIndex) {
 		return "" + rowIndex;
 	}
 
+	@Override
 	public String[] getNames() {
 		names[0] = "Column";
 		return names;
 	}
 
+	@Override
 	public int getNumNames() {
 		return 1;
 	}
 
+	@Override
 	public int getNumHeaders() {
 		return numChars;
 	}
 
+	@Override
 	public int getIndex(String name) {
 		return 0;
 	}
 
+	@Override
 	public int getHeaderIndex(String id) {
 		return 0;
 	}
 	/**
 	 * noop, since this object is static.
 	 */
+	@Override
 	public void addObserver(Observer o) {}		
+	@Override
 	public void deleteObserver(Observer o) {}		
+	@Override
 	public boolean addName(String name, int location) {return false;}
+	@Override
 	public boolean setHeader(int i, String name, String value) {return false;}
+	@Override
 	public boolean getModified() {return false;}
+	@Override
 	public void setModified(boolean mod) {}		
 }
 

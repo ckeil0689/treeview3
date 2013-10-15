@@ -95,6 +95,7 @@ public class SettingsPanelHolder extends JPanel {
 		ButtonPanel() {
 		  JButton save_button = new JButton("Save");
 		  save_button.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 			  synchronizeTo();
 			  if (configNode == null) {
@@ -109,6 +110,7 @@ public class SettingsPanelHolder extends JPanel {
 		  
 		  JButton cancel_button = new JButton("Cancel");
 		  cancel_button.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 			  synchronizeFrom();
 			  hideWindow();

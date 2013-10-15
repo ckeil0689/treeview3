@@ -45,26 +45,33 @@ public class AtrTVModel extends TVModel {
 	public AtrTVModel() {
 		super();
 	}
+	@Override
 	public String getType() {
 		return "AtrTVModel";
 	}	
 	
+	@Override
 	public double getValue(int x, int y) {
 		return -1;
 	}
+	@Override
 	public void setExprData(double [] newData) {
 	}
 	ConfigNode documentConfig = new DummyConfigNode("AtrTVModel");
+	@Override
 	public ConfigNode getDocumentConfigRoot() {
 		return documentConfig;
 	}
 	
+	@Override
 	public void setDocumentConfig(XmlConfig newVal) {
 	}
 	
+	@Override
 	public void setFrame(Frame f) {
 	}
 	
+	@Override
 	public Frame getFrame() {
 			return null;
 	}
@@ -73,6 +80,7 @@ public class AtrTVModel extends TVModel {
 		return null;
 	}
 	
+	@Override
 	public void loadNew(FileSet fileSet) throws LoadException {
 		resetState();
 		setSource(fileSet);

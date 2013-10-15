@@ -40,6 +40,7 @@ public class KaryoscopeFactory extends PluginFactory {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.PluginFactory#getPluginName()
 	 */
+	@Override
 	public String getPluginName() {
 		return "Karyoscope";
 	}
@@ -47,6 +48,7 @@ public class KaryoscopeFactory extends PluginFactory {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.PluginFactory#restorePlugin(edu.stanford.genetics.treeview.ConfigNode, edu.stanford.genetics.treeview.ViewFrame)
 	 */
+	@Override
 	public MainPanel restorePlugin(ConfigNode node, ViewFrame viewFrame) {
 		KaryoPanel karyoPanel = new KaryoPanel(viewFrame.getDataModel(), 
 				viewFrame.getGeneSelection(), viewFrame, node);
@@ -65,6 +67,7 @@ public class KaryoscopeFactory extends PluginFactory {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.PluginFactory#setGlobalNode(edu.stanford.genetics.treeview.ConfigNode)
 	 */
+	@Override
 	public void setGlobalNode(ConfigNode node) {
 		super.setGlobalNode(node);
 		
@@ -86,9 +89,11 @@ public class KaryoscopeFactory extends PluginFactory {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.PluginFactory#addPluginConfig(java.awt.Menu)
 	 */
+	@Override
 	public void addPluginConfig(TreeviewMenuBarI globalMenu, final ViewFrame frame) {
 		super.addPluginConfig(globalMenu, frame);
 		globalMenu.addMenuItem("Karyoscope Color...", new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				if (cpresetFrame == null) {
 					setupPresetsFrame(frame.getApp().getGlobalConfig().getRoot());
@@ -109,6 +114,7 @@ public class KaryoscopeFactory extends PluginFactory {
 		}
 		
 		globalMenu.addMenuItem("Karyoscope Coordinates...", new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				if (cpresetFrame == null) {
 					setupPresetsFrame(frame.getApp().getGlobalConfig().getRoot());
@@ -155,6 +161,7 @@ public class KaryoscopeFactory extends PluginFactory {
 		return coordEditor;
 	}
 
+	@Override
 	public boolean configurePlugin(ConfigNode node, ViewFrame viewFrame) {
 		return true;
 	}

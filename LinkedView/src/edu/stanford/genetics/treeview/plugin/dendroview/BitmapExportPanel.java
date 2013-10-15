@@ -64,6 +64,7 @@ public class BitmapExportPanel extends ExportPanel implements SettingsPanel {
 		JPanel holder = new JPanel();
 		final JCheckBox appendExt= new JCheckBox("Append Extension?", true);
 		formatPulldown.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (appendExt.isSelected()) {
 					appendExtension();	
@@ -87,13 +88,16 @@ public class BitmapExportPanel extends ExportPanel implements SettingsPanel {
 	}
 
 	
+	@Override
 	public void synchronizeTo() {
 		save();
 	}
 	
+	@Override
 	public void synchronizeFrom() {
 		// do nothing...
 	}
+	@Override
 	public void save() {
 		try {
 			OutputStream output = new BufferedOutputStream
@@ -127,8 +131,10 @@ public class BitmapExportPanel extends ExportPanel implements SettingsPanel {
 	/**
 	* indicate to superclass that this type does not have bbox
 	*/
+	@Override
 	protected boolean hasBbox() { return false;}
 	
+	@Override
 	protected String getInitialExtension() {
 		return(".png");
 	}

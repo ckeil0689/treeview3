@@ -141,6 +141,7 @@ public class ColorPresets implements ConfigNodePersistent {
 
 
 	/*inherit description */
+	@Override
 	public String toString() {
 		ConfigNode aconfigNode[]  = root.fetch("ColorSet");
 		ColorSet tmp            = new ColorSet();
@@ -217,6 +218,7 @@ public class ColorPresets implements ConfigNodePersistent {
 
 
 	/*inherit description */
+	@Override
 	public void bindConfig(ConfigNode configNode) {
 		root = configNode;
 		int nNames  = getPresetNames().length;

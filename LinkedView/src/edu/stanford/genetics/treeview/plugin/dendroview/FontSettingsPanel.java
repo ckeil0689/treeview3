@@ -25,6 +25,7 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 import edu.stanford.genetics.treeview.*;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.*;
 
@@ -50,6 +51,7 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 		JFrame f = new JFrame("Font Settings Test");
 		f.add(e);
 		f.addWindowListener(new WindowAdapter (){
+			@Override
 			public void windowClosing(WindowEvent we) 
 			{System.exit(0);}
 		});
@@ -57,10 +59,12 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 		f.setVisible(true);
     }
 
+	@Override
 	public void synchronizeFrom() {
 	  setupWidgets();
 	}
 
+	@Override
 	public void synchronizeTo() {
 	  //nothing to do...
 	}
@@ -125,6 +129,7 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 		d.add(new ButtonPanel(d), BorderLayout.SOUTH);
 		d.addWindowListener(
 			new WindowAdapter() {
+				@Override
 				public void windowClosing(WindowEvent we) {
 					we.getWindow().dispose();
 				}
@@ -190,6 +195,7 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 		display_button.addActionListener(
 		new ActionListener() {
 			
+			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				updateExample();
 				synchronizeClient();
@@ -201,7 +207,7 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 		gbc.gridy = 1;
 		gbc.gridwidth = 3;
 		gbc.fill = GridBagConstraints.BOTH;
-		exampleField = new JLabel("Font Example Text", JLabel.CENTER);
+		exampleField = new JLabel("Font Example Text", SwingConstants.CENTER);
 		add(exampleField, gbc);
 	}
 	
@@ -219,7 +225,8 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 		final Window window = w;
 	    JButton save_button = new JButton("Close");
 	    save_button.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
+		    @Override
+			public void actionPerformed(ActionEvent e) {
 			window.setVisible(false);
 		    }
 		});

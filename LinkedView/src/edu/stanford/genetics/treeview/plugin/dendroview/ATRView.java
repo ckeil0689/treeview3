@@ -48,7 +48,7 @@ public class ATRView extends ModelViewBuffered implements
 		super();
 
 		panel = new JPanel();
-		scrollbar = new JScrollBar(JScrollBar.VERTICAL, 0, 1, 0, 1);
+		scrollbar = new JScrollBar(Adjustable.VERTICAL, 0, 1, 0, 1);
 		destRect = new Rectangle();
 
 		panel.setLayout(new BorderLayout());
@@ -68,6 +68,7 @@ public class ATRView extends ModelViewBuffered implements
 
 
 	/*inherit description*/
+	@Override
 	public String[] getHints() {
 		return hints;
 	}
@@ -171,6 +172,7 @@ public class ATRView extends ModelViewBuffered implements
 	 * @param  o    The observable which sent the update
 	 * @param  arg  Argument for this update, typically null.
 	 */
+	@Override
 	public void update(Observable o, Object arg) {
 		if (isEnabled() == false) {
 			return;
@@ -228,6 +230,7 @@ public class ATRView extends ModelViewBuffered implements
 	 *
 	 * @return    name of this subclass of modelview
 	 */
+	@Override
 	public String viewName() {
 		return "ATRView";
 	}
@@ -239,6 +242,7 @@ public class ATRView extends ModelViewBuffered implements
 	 *
 	 * @return    The status value
 	 */
+		@Override
 		public String[]  getStatus() {
 			String [] status;
 			if (selectedNode != null) {
@@ -275,6 +279,7 @@ public class ATRView extends ModelViewBuffered implements
 	}
 
 	/*inherit description*/
+	@Override
 	public void updateBuffer(Graphics g) {
 		if (offscreenChanged == true) {
 			offscreenValid = false;
@@ -312,6 +317,7 @@ public class ATRView extends ModelViewBuffered implements
 	/**
 	 *  When a mouse is clicked, a node is selected.
 	 */
+	@Override
 	public void mouseClicked(MouseEvent e) {
 		if (isEnabled() == false) {
 			return;
@@ -344,6 +350,7 @@ public class ATRView extends ModelViewBuffered implements
 	 * down selects child with most descendants.
 	 *
 	 */
+	@Override
 	public void keyPressed(KeyEvent e) {
 		if (selectedNode == null) {
 			return;
@@ -437,6 +444,7 @@ public class ATRView extends ModelViewBuffered implements
 	 *
 	 * @param  e  The keyevent
 	 */
+	@Override
 	public void keyReleased(KeyEvent e) { }
 
 
@@ -445,6 +453,7 @@ public class ATRView extends ModelViewBuffered implements
 	 *
 	 * @param  e  the keypress.
 	 */
+	@Override
 	public void keyTyped(KeyEvent e) { }
 
 

@@ -34,6 +34,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 
 import javax.swing.JFileChooser;
@@ -183,7 +184,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		initialPanel = new InitialPanel();
 		
 		//make mainpanel scrollable by adding it to scrollpane
-		scrollPane = new JScrollPane(mainPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane = new JScrollPane(mainPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
 		//Add components to mainPanel
 		mainPanel.add(head1, "push, alignx 50%, height 8%:8%:8%, wrap");
@@ -445,6 +446,7 @@ public class ClusterView extends JPanel implements MainPanel {
 			//worker thread for calculation off the EDT to give Swing elements time to update
 			worker = new SwingWorker<Void, Void>() {	
 				
+				@Override
 				public Void doInBackground() {
 
 		        	try {
@@ -466,6 +468,7 @@ public class ClusterView extends JPanel implements MainPanel {
 					return null;
 				}
 					
+				@Override
 				protected void done(){
 					
 					loadPanel.remove(opLabel);
@@ -738,9 +741,11 @@ public class ClusterView extends JPanel implements MainPanel {
 			// hmm... I'll just assume that there's no accept all.
 			fileDialog.addChoosableFileFilter(new javax.swing.filechooser
 					.FileFilter() {
+				@Override
 				public boolean accept (File f) {
 					return true;
 				}
+				@Override
 				public String getDescription () {
 					return "All Files";
 				}
@@ -813,6 +818,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		this.root = root;
 	}
 	/** Getter for root */
+	@Override
 	public ConfigNode getConfigNode() {
 		return root;
 	}
@@ -868,7 +874,9 @@ public class ClusterView extends JPanel implements MainPanel {
 		pBar.setStringPainted(true);
 		pBar.setForeground(BLUE1);
 		pBar.setUI(new BasicProgressBarUI(){
+			@Override
 			protected Color getSelectionBackground(){return Color.black;};
+			@Override
 			protected Color getSelectionForeground(){return Color.white;};
 		});
 		pBar.setVisible(true);

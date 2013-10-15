@@ -108,6 +108,7 @@ public class ScatterColorPresets {
         ConfigNode aconfigNode[] = root.fetch("ScatterColorSet");
 		return aconfigNode.length;
 	}
+	@Override
 	public String toString() {
         ConfigNode aconfigNode[] = root.fetch("ScatterColorSet");
 		ScatterColorSet tmp = new ScatterColorSet();

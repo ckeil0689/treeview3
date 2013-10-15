@@ -1,10 +1,12 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 public class SSMouseListener implements MouseListener{
 	
@@ -12,10 +14,12 @@ public class SSMouseListener implements MouseListener{
 	private final Color RED1 = new Color(240, 80, 50, 255);
 	
 	private JLabel label;
+	private JPanel panel;
 	
-	public SSMouseListener(JLabel label){
+	public SSMouseListener(JPanel panel, JLabel label){
 		
 		this.label = label;
+		this.panel = panel;
 	}
 	
 	@Override
@@ -28,12 +32,14 @@ public class SSMouseListener implements MouseListener{
 	public void mouseEntered(MouseEvent arg0) {
 		
 		label.setForeground(RED1);
+		panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 	}
 
 	@Override
 	public void mouseExited(MouseEvent arg0) {
 		
 		label.setForeground(BLUE1);
+		panel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 	}
 
 	@Override

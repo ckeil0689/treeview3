@@ -84,12 +84,14 @@ public class ClusterModel extends Observable implements DataModel {
 	 * This not-so-object-oriented hack is in those rare instances
 	 * where it is not enough to know that we've got a DataModel.
 	 */
+	@Override
 	public String getType() {
 		
 		return "ClusterModel";
 	}
 	
-  	public void setModelForCompare(DataModel m)
+  	@Override
+	public void setModelForCompare(DataModel m)
   	{
   		if(m == null)
   		{
@@ -105,26 +107,31 @@ public class ClusterModel extends Observable implements DataModel {
   	}
   	
     // accessor methods	
+	@Override
 	public IntHeaderInfoCluster getGeneHeaderInfo() {
 	  
 		return geneHeaderInfo;
 	}
 	
+	@Override
 	public IntHeaderInfoCluster getArrayHeaderInfo() {
 	  
 		return arrayHeaderInfo;
 	}
 	
+	@Override
 	public ClusterDataMatrix getDataMatrix() {
 		
 		return dataMatrix;
 	}
 	
+	@Override
 	public HeaderInfo getAtrHeaderInfo() {
 		
 		return atrHeaderInfo;
 	}
 	
+	@Override
 	public HeaderInfo getGtrHeaderInfo() {
 		
 		return gtrHeaderInfo;
@@ -173,6 +180,7 @@ public class ClusterModel extends Observable implements DataModel {
 		return NODATA;
     }
 
+	@Override
 	public boolean aidFound(){
 		
 		return aidFound;
@@ -183,7 +191,8 @@ public class ClusterModel extends Observable implements DataModel {
 		aidFound = newVal;
 	}
 	
-    public boolean gidFound(){
+    @Override
+	public boolean gidFound(){
     	
     	return gidFound;
     };
@@ -199,6 +208,7 @@ public class ClusterModel extends Observable implements DataModel {
 		setChanged();
 	}
 	
+	@Override
 	public String getSource() {
 	  
 		if (source == null){
@@ -210,11 +220,13 @@ public class ClusterModel extends Observable implements DataModel {
 		}
 	}
 	
+	@Override
 	public String getName() {
 		
 		return getClusterFileSet().getRoot();
 	}
 	
+	@Override
 	public ClusterFileSet getClusterFileSet() {
 	  
 		return source;
@@ -237,7 +249,8 @@ public class ClusterModel extends Observable implements DataModel {
     	return documentConfig;
 	}
     
-    public ConfigNode getDocumentConfigRoot(){
+    @Override
+	public ConfigNode getDocumentConfigRoot(){
     	
     	return documentConfig.getRoot();
     }
@@ -406,6 +419,7 @@ public class ClusterModel extends Observable implements DataModel {
 		dataMatrix.clear();
 	}
 	 
+	@Override
 	public String toString() {
 		
 		String [] strings = toStrings();
@@ -434,7 +448,8 @@ public class ClusterModel extends Observable implements DataModel {
 		return msg;
     }
     
-    public void removeAppended(){
+    @Override
+	public void removeAppended(){
     	
 		if(appendIndex == -1){
 			
@@ -476,6 +491,7 @@ public class ClusterModel extends Observable implements DataModel {
 	 * Appends a second matrix to this one provided they have the same height. Used for comparison of two data sets where the data is displayed side by side.
 	 * 
 	 */
+	@Override
 	public void append(DataModel m){
 		
 		int ngene = nGene();
@@ -554,7 +570,8 @@ public class ClusterModel extends Observable implements DataModel {
 			exprData = null;
 		}
 
-	    public double getValue(int x, int y) {
+	    @Override
+		public double getValue(int x, int y) {
 			
 	    	int nexpr = nExpr();
 			int ngene = nGene();
@@ -575,6 +592,7 @@ public class ClusterModel extends Observable implements DataModel {
 			exprData = newData;
 		}
 
+		@Override
 		public void setValue(double value, int x, int y){
 			
 			exprData[x + y*getNumCol()] = value;
@@ -582,26 +600,31 @@ public class ClusterModel extends Observable implements DataModel {
 			setChanged();
 		}
 		
+		@Override
 		public int getNumRow(){
 			
 			return nGene();
 		}
 		
+		@Override
 		public int getNumCol(){
 			
 			return nExpr();
 		}
 		
+		@Override
 		public int getNumUnappendedCol(){
 		
 			return appendIndex == -1?getNumCol():appendIndex;
 		}
 
+		@Override
 		public void setModified(boolean modified){
 			
 			this.modified = modified;
 		}
 
+		@Override
 		public boolean getModified() {
 			return modified;
 		}
@@ -670,7 +693,8 @@ public class ClusterModel extends Observable implements DataModel {
 	  /**
 	  * There are two special indexes, YORF and NAME.
 	  */
-	  public int getIndex(String header) {
+	  @Override
+	public int getIndex(String header) {
 		  int retval = super.getIndex(header);
 		  if (retval != -1) {
 			  return retval;
@@ -734,12 +758,14 @@ public class ClusterModel extends Observable implements DataModel {
 		gweightFound = b;
 		
 	}
+	@Override
 	public boolean getModified() {
 		return  getGtrHeaderInfo().getModified() ||
 //		getGeneHeaderInfo().getModified() ||
 //		getArrayHeaderInfo().getModified() ||
 		getAtrHeaderInfo().getModified();
 	}
+	@Override
 	public boolean isLoaded() {
 		return loaded;
 	}

@@ -70,6 +70,7 @@ public class ColorPresetEditor extends JPanel implements SettingsPanel {
 			d.add(new ButtonPanel(), BorderLayout.SOUTH);
 			d.addWindowListener(
 				new WindowAdapter() {
+					@Override
 					public void windowClosing(WindowEvent we) {
 						we.getWindow().dispose();
 					}
@@ -132,6 +133,7 @@ public class ColorPresetEditor extends JPanel implements SettingsPanel {
 
 
 	/**  Changes the GUI to represent the state of the presets */
+	@Override
 	public void synchronizeFrom() {
 		presetEditPanel.initialize();
 		presetEditPanel.redoLayout();
@@ -139,6 +141,7 @@ public class ColorPresetEditor extends JPanel implements SettingsPanel {
 
 
 	/**  Changes the presets to match the state of the GUI */
+	@Override
 	public void synchronizeTo() {
 		presetEditPanel.saveAll();
 	}
@@ -149,6 +152,7 @@ public class ColorPresetEditor extends JPanel implements SettingsPanel {
 			JButton save_button    = new JButton("Save");
 			save_button.addActionListener(
 				new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						synchronizeTo();
 						window.dispose();
@@ -159,6 +163,7 @@ public class ColorPresetEditor extends JPanel implements SettingsPanel {
 			JButton cancel_button  = new JButton("Cancel");
 			cancel_button.addActionListener(
 				new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						synchronizeFrom();
 						window.dispose();
@@ -222,6 +227,7 @@ public class ColorPresetEditor extends JPanel implements SettingsPanel {
 			defaultButtons[index] = set;
 			set.addActionListener(
 				new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						presets.setDefaultIndex(index);
 					}
@@ -246,7 +252,7 @@ public class ColorPresetEditor extends JPanel implements SettingsPanel {
 			gbc.gridx = 0;
 
 			gbc.weighty = 100;
-			add(new JLabel("Modify Color Presets", JLabel.CENTER), gbc);
+			add(new JLabel("Modify Color Presets", SwingConstants.CENTER), gbc);
 			gbc.weighty = 0;
 			gbc.gridy = 1;
 			gbc.gridx = 0;
@@ -266,6 +272,7 @@ public class ColorPresetEditor extends JPanel implements SettingsPanel {
 			JButton addP  = new JButton("Add New");
 			addP.addActionListener(
 				new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						createPreset();
 					}
@@ -277,6 +284,7 @@ public class ColorPresetEditor extends JPanel implements SettingsPanel {
 			JButton addS  = new JButton("Add Standards");
 			addS.addActionListener(
 				new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						ColorSet[] toAdd  = ColorPresets.defaultColorSets;
 						for (int i = 0; i < toAdd.length; i++) {
@@ -313,6 +321,7 @@ public class ColorPresetEditor extends JPanel implements SettingsPanel {
 			JButton rem      = new JButton("Remove");
 			rem.addActionListener(
 				new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						removePreset(index);
 					}
@@ -417,6 +426,7 @@ public class ColorPresetEditor extends JPanel implements SettingsPanel {
 			tDefaultButtons[newIndex] = set;
 			set.addActionListener(
 				new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						presets.setDefaultIndex(newIndex);
 					}

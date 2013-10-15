@@ -65,6 +65,7 @@ abstract class TreeDrawer extends Observable implements Observer {
 	 * observing if someone calls setData to a new HeaderInfo.
 	 */
 	private HeaderInfo nodeInfo = null;
+	@Override
 	public void update(Observable o, Object arg) {
 		if (o == nodeInfo) {
 			setChanged();

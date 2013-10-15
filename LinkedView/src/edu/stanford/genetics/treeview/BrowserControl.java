@@ -75,6 +75,7 @@ public abstract class BrowserControl {
 			top.addWindowListener(
 				new WindowAdapter() {
 
+					@Override
 					public void windowClosing(WindowEvent windowEvent) {
 						top.dispose();
 					}
@@ -164,6 +165,7 @@ class Win32BrowserControl extends BrowserControl {
 	 * @exception  IOException  Not thrown by me
 	 */
 
+	@Override
 	public void displayURL(String url) throws IOException {
 		//  This one was my original
 		// String cmd  = WIN_PATH + " " + WIN_FLAG + " " + url;
@@ -227,6 +229,7 @@ class WinNTBrowserControl extends BrowserControl {
 	 * @exception  IOException  Not thrown by me
 	 */
 
+	@Override
 	public void displayURL(String url) throws IOException {
 		//  This one was my original
 		// String cmd  = WIN_PATH + " " + WIN_FLAG + " " + url;
@@ -265,6 +268,7 @@ class UnixBrowserControl extends BrowserControl {
 	 * @exception  IOException  not thrown by me
 	 */
 
+	@Override
 	public void displayURL(String url) throws IOException {
 		String cmd  = UNIX_PATH + " " + UNIX_FLAG + "(" + url + ")";
 		if (isValidUrl(url) == false) {
@@ -330,6 +334,7 @@ class MacBrowserControl extends BrowserControl {
 	 * @exception  IOException  not thrown by me.
 	 */
 
+	@Override
 	public void displayURL(String url) throws IOException {
 //		System.out.println("Mac browser dislaying url " + url);
 		com.apple.mrj.MRJFileUtils.openURL(url);

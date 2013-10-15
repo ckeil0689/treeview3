@@ -47,22 +47,27 @@ public class PostscriptExportPanel extends ExportPanel implements SettingsPanel 
 	  geneMap, false);
 	}
 
-  protected Font getGeneFont() {
+  @Override
+protected Font getGeneFont() {
 	return new Font("Courier", 0, 8);
   }
-  protected Font getArrayFont() {
+  @Override
+protected Font getArrayFont() {
 	return new Font("Courier", 0, 8);
   }
 	
+	@Override
 	public void synchronizeTo() {
 	  save();
 	}
   
-  public void synchronizeFrom() {
+  @Override
+public void synchronizeFrom() {
 	// do nothing...
   }
 
-  public void save() {
+  @Override
+public void save() {
 	try {
 	  PrintStream output = new PrintStream(new BufferedOutputStream
 	  (new FileOutputStream(getFile())));

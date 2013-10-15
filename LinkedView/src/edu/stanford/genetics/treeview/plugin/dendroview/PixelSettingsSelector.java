@@ -128,7 +128,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 			temp2.add(colorExtractorEditor);
 			temp2.add(new CEEButtons());
 			colorPresetsPanel = new ColorPresetsPanel();
-			temp2.add(new JScrollPane(colorPresetsPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
+			temp2.add(new JScrollPane(colorPresetsPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS));
 			gbc.gridx = 1;
 			add(temp2, gbc);
 		}
@@ -170,22 +170,27 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 			}
 
 			fill.addItemListener(new ItemListener() {
+				@Override
 				public void itemStateChanged(ItemEvent evt) {
 					ScalePanel.this.updateCheck();
 				}	    
 			});
 			fixed.addItemListener(new ItemListener() {
+				@Override
 				public void itemStateChanged(ItemEvent evt) {
 					ScalePanel.this.updateCheck();
 				}	    
 			});
 			value.getDocument().addDocumentListener(new DocumentListener() {
+				@Override
 				public void changedUpdate(DocumentEvent e) {
 					ScalePanel.this.updateValue();
 				}
+				@Override
 				public void insertUpdate(DocumentEvent e) {
 					ScalePanel.this.updateValue();
 				}
+				@Override
 				public void removeUpdate(DocumentEvent e) {
 					ScalePanel.this.updateValue();
 				}
@@ -215,9 +220,11 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 			}
 		}
 	}
+	@Override
 	public void synchronizeFrom() {
 		setupWidgets();
 	}
+	@Override
 	public void synchronizeTo() {
 		/* don't do anything?
 		m_contrast.signalAll();
@@ -234,6 +241,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 		final JButton display_button = new JButton("Close");
 		display_button.addActionListener(new ActionListener() {
 			// called when close button hit
+			@Override
 			public void actionPerformed(ActionEvent evt) {
 				if(evt.getSource() == display_button) {
 					synchronizeTo();
@@ -248,6 +256,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 
 		d.addWindowListener(new WindowAdapter() {
 			// called when closed by system menu...
+			@Override
 			public void windowClosing(WindowEvent we) {
 				synchronizeTo();
 				d.dispose();
@@ -274,6 +283,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 
 			JButton loadButton = new JButton("Load...");
 			loadButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					JFileChooser chooser = new JFileChooser();
 					int returnVal = chooser.showOpenDialog(CEEButtons.this);
@@ -293,6 +303,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 
 			JButton saveButton = new JButton("Save...");
 			saveButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					JFileChooser chooser = new JFileChooser();
 					int returnVal = chooser.showSaveDialog(CEEButtons.this);
@@ -313,6 +324,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 
 			JButton makeButton = new JButton("Make Preset");
 			makeButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					ColorSet temp = new ColorSet();
 					colorExtractorEditor.copyStateTo(temp);
@@ -354,6 +366,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 			logCheckBox.setSelected(m_drawer.getLogTransform());
 			logCheckBox.addActionListener(new ActionListener() {
 
+				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					m_drawer.setLogTransform(logCheckBox.isSelected());
 					logTextField.setEnabled(logCheckBox.isSelected());
@@ -366,12 +379,15 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 			logTextField.setText("" +m_drawer.getLogCenter());
 			add(new JLabel("Center:"));
 			logTextField.getDocument().addDocumentListener(new DocumentListener() {
+				@Override
 				public void changedUpdate(DocumentEvent e) {
 					textBoxChanged();
 				}
+				@Override
 				public void insertUpdate(DocumentEvent e) {
 					textBoxChanged();
 				}
+				@Override
 				public void removeUpdate(DocumentEvent e) {
 					textBoxChanged();
 				}
@@ -406,6 +422,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 				JButton presetButton = new JButton((m_presets.getPresetNames()) [i]);
 				final int index = i;
 				presetButton.addActionListener(new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						colorExtractorEditor.copyStateFrom(m_presets.getColorSet(index));
 					}
@@ -464,6 +481,7 @@ class ColorExtractorEditor extends JPanel {
 			colorIcon = new ColorIcon(10, 10, getColor());
 			JButton pushButton = new JButton(getLabel(), colorIcon);
 			pushButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					Color trial = JColorChooser.showDialog(ColorExtractorEditor.this, "Pick Color for " + getLabel(), getColor());
 					if (trial != null)
@@ -532,12 +550,15 @@ class ColorExtractorEditor extends JPanel {
 		public void setColor(Color c) {
 			color = c;
 		}
+		@Override
 		public int getIconHeight() {
 			return height;
 		}
+		@Override
 		public int getIconWidth() {
 			return width;
 		}
+		@Override
 		public void paintIcon(Component c, Graphics g, int x, int y) {
 			Color old = g.getColor();
 			g.setColor(color);

@@ -91,14 +91,14 @@ public class DistanceMatrixCalculator {
         				mean_sumX += x;
         			}
         			
-        			mean_x = mean_sumX/(double)data.size(); //casted int to double
+        			mean_x = mean_sumX/data.size(); //casted int to double
         			
         			for(double y : data2){
         				
         				mean_sumY += y;
         			}
         			
-        			mean_y = mean_sumY/(double)data2.size();
+        			mean_y = mean_sumY/data2.size();
         			
     			}
     			else{//works great in cluster

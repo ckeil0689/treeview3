@@ -36,6 +36,7 @@ public class FillMap extends IntegerMap {
 	 * @param  i  the pixel value
 	 * @return    The index value
 	 */
+	@Override
 	public int getIndex(int i) {
 	  	if (availablepixels == 0) return 0;
 		return i * (maxindex - minindex + 1) / availablepixels + minindex;
@@ -48,6 +49,7 @@ public class FillMap extends IntegerMap {
 	 * @param  i  The index value
 	 * @return    The pixel value
 	 */
+	@Override
 	public int getPixel(int i) {
 		return (i - minindex) * availablepixels / (maxindex - minindex + 1);
 	}
@@ -56,6 +58,7 @@ public class FillMap extends IntegerMap {
 	/**
 	 * @return    The effective scale for the current FillMap
 	 */
+	@Override
 	public double getScale() {
 		return (double) availablepixels / (maxindex - minindex + 1);
 	}
@@ -64,6 +67,7 @@ public class FillMap extends IntegerMap {
 	/**
 	 * @return    The number of pixels currently being used
 	 */
+	@Override
 	public int getUsedPixels() {
 		if (minindex == -1) {
 			return 0;
@@ -76,6 +80,7 @@ public class FillMap extends IntegerMap {
 	/**
 	 * @return    The number of indexes currently visible
 	 */
+	@Override
 	public int getViewableIndexes() {
 		return maxindex - minindex + 1;
 	}
@@ -84,6 +89,7 @@ public class FillMap extends IntegerMap {
 	/**
 	 * @return    A short word desribing this type of map
 	 */
+	@Override
 	public String type() {
 		return "Fill";
 	}

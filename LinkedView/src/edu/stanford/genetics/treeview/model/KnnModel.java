@@ -30,6 +30,7 @@ public class KnnModel extends TVModel implements DataModel {
 	 * This not-so-object-oriented hack is in those rare instances
 	 * where it is not enough to know that we've got a DataModel.
 	 */
+	@Override
 	public String getType() {
 		return "KnnModel";
 	}
@@ -70,6 +71,7 @@ public class KnnModel extends TVModel implements DataModel {
 	 * @param fileSet fileset to load
 	 *
 	 */
+	@Override
 	public void loadNew(FileSet fileSet) 
 	throws LoadException {
 		resetState();
@@ -81,6 +83,7 @@ public class KnnModel extends TVModel implements DataModel {
 	/**
 	 * Don't open a loading window...
 	 */
+	@Override
 	public void loadNewNW(FileSet fileSet) throws LoadException {
 		resetState();
 		setSource(fileSet);
@@ -88,6 +91,7 @@ public class KnnModel extends TVModel implements DataModel {
 		loader.loadIntoNW(); 
 	}
 	
+	@Override
 	public String[] toStrings() {
 		String[] msg = {"Selected KnnModel Stats",
 				"Source = " + source.getCdt(),
@@ -182,7 +186,7 @@ public class KnnModel extends TVModel implements DataModel {
 		Vector<Integer> counts = new Vector<Integer>();
 		for (int i = 0; i < headerInfo.getNumHeaders(); i++) {
 			Integer group = new Integer(headerInfo.getHeader(i,columnIndex));
-			Integer current = (Integer) counts.elementAt(group.intValue());
+			Integer current = counts.elementAt(group.intValue());
 			Integer insertElement = new Integer(1);
 			if (current != null)
 				insertElement = new Integer(current.intValue() + 1);
@@ -190,7 +194,7 @@ public class KnnModel extends TVModel implements DataModel {
 		}
 		int [] cv = new int [counts.size()];
 		for (int i =0; i < cv.length; i++) {
-			cv[i] = ((Integer)counts.elementAt(i)).intValue();
+			cv[i] = counts.elementAt(i).intValue();
 		}
 		return cv;
 	}

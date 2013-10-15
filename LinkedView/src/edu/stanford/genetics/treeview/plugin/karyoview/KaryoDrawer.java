@@ -315,6 +315,7 @@ public class KaryoDrawer extends Observable implements Observer {
 	  geneSelection = null;
 	  mapValues = null;
 	}
+	@Override
 	public void update(Observable o, Object arg) {
 		if (o == geneSelection) {
 			setChanged();

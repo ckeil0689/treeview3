@@ -123,6 +123,7 @@ public class KaryoPanel extends DragGridPanel implements MainPanel {
 	CoordinatesTask coordinatesTask;
 	CoordinatesSettingsPanel coordinatesPanel = null;
 	class TimerListener implements ActionListener { // manages the averagermonitor
+		@Override
 		public void actionPerformed(ActionEvent evt) {
 			if (coordinatesMonitor.isCanceled() || coordinatesTask.done()) {
 				coordinatesMonitor.close();
@@ -154,6 +155,7 @@ public class KaryoPanel extends DragGridPanel implements MainPanel {
 			final DataModel model = tvmodel;
 			setCurrent(0);
 			final SwingWorker worker = new SwingWorker() {
+				@Override
 				public Object construct() {
 					return new ActualTask(model);
 				}
@@ -300,6 +302,7 @@ public class KaryoPanel extends DragGridPanel implements MainPanel {
 	 * @param  component  The component to be added
 	 * @param  rectangle  The location to add it in
 	 */
+	@Override
 	public void addComponent(Component component, Rectangle rectangle) {
 		if (component != null) {
 			addComponent(component, rectangle.x, rectangle.y, rectangle.width, rectangle.height);
@@ -334,6 +337,7 @@ public class KaryoPanel extends DragGridPanel implements MainPanel {
 		/**
 	 *  This makes the persistent storage resemble the compnents, if it doesn't already. 
 	 */
+	@Override
 	public void syncConfig() {
 	}
 
@@ -366,8 +370,10 @@ public class KaryoPanel extends DragGridPanel implements MainPanel {
 	 *
 	 * @param  menu  A menu to add items to.
 	 */
+	@Override
 	public void populateSettingsMenu(TreeviewMenuBarI menu) {
 		menu.addMenuItem("Display...", new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				showDisplayPopup();
 			}
@@ -375,6 +381,7 @@ public class KaryoPanel extends DragGridPanel implements MainPanel {
 		menu.setMnemonic(KeyEvent.VK_D);
 
 		menu.addMenuItem("Averaging...", new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				showAveragingPopup();
 			}
@@ -382,6 +389,7 @@ public class KaryoPanel extends DragGridPanel implements MainPanel {
 		menu.setMnemonic(KeyEvent.VK_A);
 		
 		menu.addMenuItem("Coordinates...", new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				showCoordinatesPopup();
 			}
@@ -389,6 +397,7 @@ public class KaryoPanel extends DragGridPanel implements MainPanel {
 		menu.setMnemonic(KeyEvent.VK_C);
 
 		menu.addMenuItem("Url Links...", new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				SettingsPanel urlPanel = new UrlSettingsPanel(viewFrame.getUrlExtractor() , viewFrame.getGeneUrlPresets());
 				JDialog popup = new ModelessSettingsDialog(viewFrame, "Url Linking", urlPanel);
@@ -405,6 +414,7 @@ public class KaryoPanel extends DragGridPanel implements MainPanel {
 	 *
 	 * @param  menu  A menu to add items to.
 	 */
+	@Override
 	public void populateAnalysisMenu(TreeviewMenuBarI menu) {
 	}
 
@@ -413,9 +423,11 @@ public class KaryoPanel extends DragGridPanel implements MainPanel {
 	 *
 	 * @param  menu  A menu to add items to.
 	 */
+	@Override
 	public void populateExportMenu(TreeviewMenuBarI menu) {
 		menu.addMenuItem("Export to Image...", new ActionListener() {
-		  public void actionPerformed(ActionEvent actionEvent) {
+		  @Override
+		public void actionPerformed(ActionEvent actionEvent) {
 				double origPPM, origPPV; // save since export currently changes these.
 				origPPM = getKaryoDrawer().getPixelPerMap();
 				origPPV = getKaryoDrawer().getPixelPerVal();
@@ -444,9 +456,11 @@ public class KaryoPanel extends DragGridPanel implements MainPanel {
 	 *
 	 * @param  i  Index of gene in cdt to make visible
 	 */
+	@Override
 	public void scrollToGene(int i) {
 		//LogPanel.println("KaryoPanel.scrollToGene not implemented");
 	}
+	@Override
 	public void scrollToArray(int i) {
 		//LogPanel.println("KaryoPanel.scrollToArray not implemented");
 	}
@@ -457,6 +471,7 @@ public class KaryoPanel extends DragGridPanel implements MainPanel {
 		this.configNode = configNode;
 	}
 	/** Getter for configNode */
+	@Override
 	public ConfigNode getConfigNode() {
 		return configNode;
 	}
@@ -513,6 +528,7 @@ private ViewFrame viewFrame;
 	/**
 	 * icon for display in tabbed panel
 	 */
+	@Override
 	public ImageIcon getIcon() {
 		if (karyoIcon == null) {
 			try {
@@ -524,6 +540,7 @@ private ViewFrame viewFrame;
 		return karyoIcon;
 	}
 
+	@Override
 	public void export(MainProgramArgs args) throws ExportException {
 		throw new ExportException("Export not implemented for plugin " + getName());
 	}

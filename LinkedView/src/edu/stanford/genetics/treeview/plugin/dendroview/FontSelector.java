@@ -125,6 +125,7 @@ public class FontSelector extends Panel {
 		display_button = new Button("Display");
 		display_button.addActionListener(
 			new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent actionEvent) {
 				String string  = font_choice.getSelectedItem();
 				int i          = encode_style(style_choice.getSelectedItem());
@@ -214,6 +215,7 @@ public class FontSelector extends Panel {
 		top.add(this);
 		top.addWindowListener(
 			new WindowAdapter() {
+				@Override
 				public void windowClosing(WindowEvent we) {
 					we.getWindow().dispose();
 				}
@@ -233,6 +235,7 @@ public class FontSelector extends Panel {
 		d.add(this);
 		d.addWindowListener(
 			new WindowAdapter() {
+				@Override
 				public void windowClosing(WindowEvent we) {
 					we.getWindow().dispose();
 				}

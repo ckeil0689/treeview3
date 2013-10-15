@@ -19,7 +19,6 @@ import edu.stanford.genetics.treeview.SettingsPanelHolder;
 import edu.stanford.genetics.treeview.TreeviewMenuBarI;
 import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.core.PluginManager;
-import edu.stanford.genetics.treeview.model.KnnModel;
 
 public class KnnDendrogramFactory extends PluginFactory {
 	// presets must be set before static initializer.
@@ -29,6 +28,7 @@ public class KnnDendrogramFactory extends PluginFactory {
 	static {
 		PluginManager.registerPlugin(new KnnDendrogramFactory());
 	}
+	@Override
 	public String getPluginName() {
 		return "KnnDendrogram";
 	}
@@ -37,6 +37,7 @@ public class KnnDendrogramFactory extends PluginFactory {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.PluginFactory#createPlugin(edu.stanford.genetics.treeview.ConfigNode)
 	 */
+	@Override
 	public MainPanel restorePlugin(ConfigNode node, ViewFrame viewFrame) {
 //		DendroView dendroView = new KnnDendroView((KnnModel) viewFrame.getDataModel(), node, viewFrame);
 		DendroView2 dendroView = new KnnDendroView(viewFrame.getDataModel(), node, viewFrame);
@@ -50,6 +51,7 @@ public class KnnDendrogramFactory extends PluginFactory {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.PluginFactory#setGlobalNode(edu.stanford.genetics.treeview.ConfigNode)
 	 */
+	@Override
 	public void setGlobalNode(ConfigNode node) {
 		super.setGlobalNode(node);
 		colorPresets.bindConfig(node.fetchOrCreate("KnnColorPresets"));
@@ -61,9 +63,11 @@ public class KnnDendrogramFactory extends PluginFactory {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.PluginFactory#addPluginConfig(java.awt.Menu)
 	 */
+	@Override
 	public void addPluginConfig(TreeviewMenuBarI globalMenu, final ViewFrame frame) {
 		super.addPluginConfig(globalMenu, frame);
 		globalMenu.addMenuItem("KnnDendrogram Color Presets...", new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				if (cpresetFrame == null) {
 					cpresetFrame = new JFrame("KnnDendrogram Color Presets");
@@ -94,6 +98,7 @@ public class KnnDendrogramFactory extends PluginFactory {
 	}
 
 
+	@Override
 	public boolean configurePlugin(ConfigNode node, ViewFrame viewFrame) {
 		return true;
 	}

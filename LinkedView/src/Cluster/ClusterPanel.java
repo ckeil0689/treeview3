@@ -46,6 +46,7 @@ public class ClusterPanel extends JScrollPane {
 
 		private static final long serialVersionUID = 1L;
 
+		@Override
 		public void paintComponent(Graphics g) {
 			
 			int xoff = 0;
@@ -61,13 +62,14 @@ public class ClusterPanel extends JScrollPane {
 
 			
 			while (e.hasMoreElements()) {
-				String message = (String) e.nextElement();
+				String message = e.nextElement();
 				if (message == null) continue;
 				height += ascent;
 				g.drawString(message, -xoff, height);
 			}
 		}
 		
+		@Override
 		public Dimension getPreferredSize() {
 			FontMetrics metrics = getFontMetrics(getFont());
 			int ascent = metrics.getAscent();
@@ -76,7 +78,7 @@ public class ClusterPanel extends JScrollPane {
 			int width = metrics.stringWidth(title);
 			Enumeration<String> e = messages.elements();
 			while (e.hasMoreElements()) {
-				String message = (String) e.nextElement();
+				String message = e.nextElement();
 				if (message == null) continue;
 				height += ascent;
 				int length = metrics.stringWidth(message);

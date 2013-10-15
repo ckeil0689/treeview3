@@ -33,6 +33,7 @@ public class TVModel extends Observable implements DataModel {
    * This not-so-object-oriented hack is in those rare instances
    * where it is not enough to know that we've got a DataModel.
    */
+	@Override
 	public String getType() {
 		return "TVModel";
 	}
@@ -44,7 +45,8 @@ public class TVModel extends Observable implements DataModel {
 	TVModel compareModel = null;
 	int extraCompareExpr = 0;
 	
-  	public void setModelForCompare(DataModel m)
+  	@Override
+	public void setModelForCompare(DataModel m)
   	{
   		if(m == null)
   		{
@@ -59,12 +61,15 @@ public class TVModel extends Observable implements DataModel {
   		hasChanged();
   	}
     // accessor methods	
+	@Override
 	public HeaderInfo getGeneHeaderInfo() {
 	  return geneHeaderInfo;
 	}
+	@Override
 	public HeaderInfo getArrayHeaderInfo() {
 	  return arrayHeaderInfo;
 	}
+	@Override
 	public DataMatrix getDataMatrix() {
 		
 		if(compareModel != null)
@@ -73,9 +78,11 @@ public class TVModel extends Observable implements DataModel {
 		}
 		return dataMatrix;
 	}
+	@Override
 	public HeaderInfo getAtrHeaderInfo() {
 		return atrHeaderInfo;
 	}
+	@Override
 	public HeaderInfo getGtrHeaderInfo() {
 		return gtrHeaderInfo;
 	}
@@ -109,15 +116,18 @@ public class TVModel extends Observable implements DataModel {
 		return NODATA;
     }
 
+	@Override
 	public boolean aidFound() {return aidFound;}
 	void aidFound(boolean newVal) {aidFound = newVal;}
-    public boolean gidFound() {return gidFound;};
+    @Override
+	public boolean gidFound() {return gidFound;};
 	void gidFound(boolean newVal) {gidFound = newVal;}
 
 	public void setSource(FileSet source) {
 		this.source = source;
 		setChanged();
 	}
+	@Override
 	public String getSource() {
 	  if (source == null) {
 		return "No Data Loaded";
@@ -125,9 +135,11 @@ public class TVModel extends Observable implements DataModel {
 		return source.getCdt();
 	  }
 	}
+	@Override
 	public String getName() {
 		return getFileSet().getRoot();
 	}
+	@Override
 	public FileSet getFileSet() {
 	  return source;
 	}
@@ -140,7 +152,8 @@ public class TVModel extends Observable implements DataModel {
 		source.addFileSetListener(listener);
 	}
     public XmlConfig getDocumentConfig() {return documentConfig;}
-    public ConfigNode getDocumentConfigRoot() {return documentConfig.getRoot();}
+    @Override
+	public ConfigNode getDocumentConfigRoot() {return documentConfig.getRoot();}
     public void setDocumentConfig(XmlConfig newVal) { documentConfig = newVal;}
     public TVModel() {
 	  super();
@@ -290,7 +303,8 @@ public class TVModel extends Observable implements DataModel {
 		 dataMatrix.clear();
 	 }
 	 
-	 public String toString() {
+	 @Override
+	public String toString() {
 		 String [] strings = toStrings();
 		 String msg = "";
 		 for (int i = 0; i < strings.length; i++) {
@@ -362,7 +376,8 @@ public class TVModel extends Observable implements DataModel {
     }
     */
     
-    public void removeAppended()
+    @Override
+	public void removeAppended()
 	{
 		if(appendIndex == -1)
 		{
@@ -403,6 +418,7 @@ public class TVModel extends Observable implements DataModel {
 	 * Appends a second matrix to this one provided they have the same height. Used for comparison of two data sets where the data is displayed side by side.
 	 * 
 	 */
+	@Override
 	public void append(DataModel m)
 	{
 		int ngene = nGene();
@@ -502,7 +518,8 @@ public class TVModel extends Observable implements DataModel {
 			exprData = null;
 		}
 
-	    public double getValue(int x, int y) {
+	    @Override
+		public double getValue(int x, int y) {
 			int nexpr = nExpr();
 			int ngene = nGene();
 			if ((x < nexpr) && (y < ngene) && (x >= 0) && (y >= 0)) {
@@ -516,28 +533,34 @@ public class TVModel extends Observable implements DataModel {
 			exprData = newData;
 		}
 
+		@Override
 		public void setValue(double value, int x, int y)
 		{
 			exprData[x + y*getNumCol()] = value;
 			setModified(true);
 			setChanged();
 		}
+		@Override
 		public int getNumRow() {
 			return nGene();
 		}
+		@Override
 		public int getNumCol() {
 			return nExpr();
 		}
 		
+		@Override
 		public int getNumUnappendedCol()
 		{
 			return appendIndex == -1?getNumCol():appendIndex;
 		}
 
+		@Override
 		public void setModified(boolean modified) {
 			this.modified = modified;
 		}
 
+		@Override
 		public boolean getModified() {
 			return modified;
 		}
@@ -597,7 +620,8 @@ public class TVModel extends Observable implements DataModel {
 	  /**
 	  * There are two special indexes, YORF and NAME.
 	  */
-	  public int getIndex(String header) {
+	  @Override
+	public int getIndex(String header) {
 		  int retval = super.getIndex(header);
 		  if (retval != -1) {
 			  return retval;
@@ -661,12 +685,14 @@ public class TVModel extends Observable implements DataModel {
 		gweightFound = b;
 		
 	}
+	@Override
 	public boolean getModified() {
 		return  getGtrHeaderInfo().getModified() ||
 //		getGeneHeaderInfo().getModified() ||
 //		getArrayHeaderInfo().getModified() ||
 		getAtrHeaderInfo().getModified();
 	}
+	@Override
 	public boolean isLoaded() {
 		return loaded;
 	}

@@ -58,18 +58,21 @@ public class ColorIcon implements Icon {
 	}
 
 	/* inherit description */
+	@Override
 	public int getIconHeight() {
 		return height;
 	}
 
 
 	/* inherit description */
+	@Override
 	public int getIconWidth() {
 		return width;
 	}
 
 
 	/* inherit description */
+	@Override
 	public void paintIcon(Component c, Graphics g, int x, int y) {
 		Color old  = g.getColor();
 		g.setColor(color);

@@ -53,7 +53,8 @@ public class TextView extends ModelView implements FontSelectable,
     KeyListener, AdjustmentListener,
     MouseListener, MouseMotionListener {
 
-    public String[]  getHints() {
+    @Override
+	public String[]  getHints() {
 	String [] hints = {
 	    "Click and drag to scroll",
 	};
@@ -117,13 +118,15 @@ public class TextView extends ModelView implements FontSelectable,
 		panel = scrollPane;
     }
 
-    public String viewName() { return "TextView";}
+    @Override
+	public String viewName() { return "TextView";}
 
     // I bet this isn't used anymore.
     public MenuItem getFontMenuItem() {
 	
 	MenuItem itema = new MenuItem("Gene Font...");
 	itema.addActionListener(new ActionListener() {
+		@Override
 		public void actionPerformed(ActionEvent actionEvent)
 		{
 		    FontSelector fontSelector = new FontSelector
@@ -137,6 +140,7 @@ public class TextView extends ModelView implements FontSelectable,
 
     // Canvas methods
 		
+	@Override
 	public void updateBuffer(Graphics g) {
 		updateBuffer(g, offscreenSize);
 	}
@@ -263,6 +267,7 @@ public class TextView extends ModelView implements FontSelectable,
 	}
 
 	// Observer
+	@Override
 	public void update(Observable o, Object arg) {	
 		if (o == map) {
 		selectionChanged(); // gene locations changed
@@ -275,6 +280,7 @@ public class TextView extends ModelView implements FontSelectable,
 	  }
 	}
     // MouseListener 
+	@Override
 	public void mouseClicked(MouseEvent e) {
 	  if (urlExtractor == null) return;
 	  urlExtractor.setEnabled(true);
@@ -295,24 +301,28 @@ public class TextView extends ModelView implements FontSelectable,
 
     // MouseMotionListener
 
-    public void mousePressed(MouseEvent e) {
+    @Override
+	public void mousePressed(MouseEvent e) {
 	    dragging = true;
 	     
 	     
     }
 
-    public void mouseDragged(MouseEvent e) {
+    @Override
+	public void mouseDragged(MouseEvent e) {
 	if (dragging) {
 //	    int xoff = (e.getX() * (maxlength - offscreenSize.width)) / offscreenSize.width;
 	    // adjustScrollbar(xoff);
 	}
     } 
 
-    public void mouseReleased(MouseEvent e) {
+    @Override
+	public void mouseReleased(MouseEvent e) {
     	dragging = false;
     }
     // KeyListener 
-    public void keyPressed(KeyEvent e) {
+    @Override
+	public void keyPressed(KeyEvent e) {
 	int xoff = 0;//scrollbar.getValue();
 
 	int c = e.getKeyCode();
@@ -331,7 +341,8 @@ public class TextView extends ModelView implements FontSelectable,
 	adjustScrollbar(xoff);
     }
     // AdjustmentListener
-    public void adjustmentValueChanged(AdjustmentEvent evt) {
+    @Override
+	public void adjustmentValueChanged(AdjustmentEvent evt) {
 	offscreenValid = false;
 	repaint();
     }
@@ -343,17 +354,21 @@ public class TextView extends ModelView implements FontSelectable,
 
     
     //FontSelectable
-    public String getFace() {
+    @Override
+	public String getFace() {
         return face;
     }
-    public int getPoints() {
+    @Override
+	public int getPoints() {
         return size;
     }
-    public int getStyle() {
+    @Override
+	public int getStyle() {
         return style;
     }
 
-     public void setFace(String string) {
+     @Override
+	public void setFace(String string) {
         if ((face == null) ||(!face.equals(string))) {
             face = string;
 			if (root != null)
@@ -363,7 +378,8 @@ public class TextView extends ModelView implements FontSelectable,
         }
      }
     
-    public void setPoints(int i) {
+    @Override
+	public void setPoints(int i) {
         if (size != i) {
             size = i;
 			if (root != null)
@@ -373,7 +389,8 @@ public class TextView extends ModelView implements FontSelectable,
         }
     }
 
-    public void setStyle(int i) {
+    @Override
+	public void setStyle(int i) {
         if (style != i) {
             style = i;
 			if (root != null)

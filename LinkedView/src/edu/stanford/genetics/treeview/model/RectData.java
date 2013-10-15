@@ -201,17 +201,20 @@ class DoubleColumn extends Column {
 		super(name, gap);
 	}
 	
+	@Override
 	public String getString(int index, int offset){
 		
 		double data = ((double[])dataList.get(index))[offset];
 		return (data == Double.NaN)? null : "" + data;
 	}
 	
+	@Override
 	public double getDouble(int index, int offset){
 		
 		return ((double[])dataList.get(index))[offset];
 	}
 	
+	@Override
 	protected void addData(int index, int offset, String string){
 		
 		double data;
@@ -227,11 +230,13 @@ class DoubleColumn extends Column {
 		((double[])dataList.get(index))[offset] = data;
 	}
 	
+	@Override
 	protected Object initData(){
 		
 		return new double[gap];
 	}
 	
+	@Override
 	public ColumnFormat getFormat(){
 		
 		return ColumnFormat.DoubleFormat;
@@ -254,6 +259,7 @@ class ColumnFormat {
 	/**
 	 * 
 	 */
+	@Override
 	public String toString(){
 		
 		return name;
@@ -286,6 +292,7 @@ class IntColumn extends Column {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.model.lbl.Column#getFormat()
 	 */
+	@Override
 	public ColumnFormat getFormat() {
 		
 		return ColumnFormat.IntFormat;
@@ -294,12 +301,14 @@ class IntColumn extends Column {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.model.lbl.Column#getString(int, int)
 	 */
+	@Override
 	protected String getString(int index, int offset) {
 		
 		double data = ((int[])dataList.get(index))[offset];
 		return (data == 0)? null : "" + data;
 	}
 
+	@Override
 	protected double getDouble(int index, int offset) {
 		
 		return ((int[])dataList.get(index))[offset];
@@ -308,6 +317,7 @@ class IntColumn extends Column {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.model.lbl.Column#addData(int, int, java.lang.String)
 	 */
+	@Override
 	protected void addData(int index, int offset, String string) {
 		int data = (string == null)? 0 : Integer.parseInt(string);
 		((int[])dataList.get(index))[offset] = data;
@@ -316,6 +326,7 @@ class IntColumn extends Column {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.model.lbl.Column#initData()
 	 */
+	@Override
 	protected Object initData() {
 		
 		return new int[gap];
@@ -329,23 +340,27 @@ class StringColumn extends Column {
 		super(name, gap);
 	}
 	
+	@Override
 	protected Object initData(){
 		
 		return new byte[gap][];
 	}
 	
+	@Override
 	protected String getString(int index, int offset){
 		
 		byte[] tmp = ((byte[][])dataList.get(index))[offset];
 		return (tmp == null) ? null : new String(tmp);
 	}
 
+	@Override
 	protected double getDouble(int index, int offset){
 		
 		String string = getString(index, offset);
 		return (string == null)? Double.NaN : Double.parseDouble(string);
 	}
 
+	@Override
 	protected void addData(int index, int offset, String string){
 		
 		if (string != null){
@@ -354,6 +369,7 @@ class StringColumn extends Column {
 		}
 	}
 	
+	@Override
 	public ColumnFormat getFormat(){
 		
 		return ColumnFormat.StringFormat;

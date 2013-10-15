@@ -98,6 +98,7 @@ public class ScatterParameterPanel extends JPanel {
 			colorsButton = new JButton("Display...");
 			colorsButton.addActionListener(
 				new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						scatterPanel.showDisplayPopup();
 					}
@@ -122,6 +123,7 @@ public class ScatterParameterPanel extends JPanel {
 			sizeCombo = new JComboBox(sizeInts);
 			sizeCombo.setEditable(true);
 			sizeCombo.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					setValues();
 				}
@@ -148,6 +150,7 @@ public class ScatterParameterPanel extends JPanel {
 			drawCombo = new JComboBox(ScatterView.drawStrings);
 			drawCombo.setEditable(false);
 			drawCombo.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					setValues();
 				}
@@ -179,14 +182,18 @@ public class ScatterParameterPanel extends JPanel {
 		}
 		private void addListeners() {
 			zoomBox.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					setValues();
 				}
 			});
 			
 			widthField.addKeyListener(new KeyListener() {
+				@Override
 				public void keyPressed(KeyEvent e) {/* setValue(); */}
+				@Override
 				public void keyReleased(KeyEvent e) {/* setValue(); */}
+				@Override
 				public void keyTyped(KeyEvent e) {
 					zoomBox.setSelected(true);
 					setEnabledValue();
@@ -194,15 +201,21 @@ public class ScatterParameterPanel extends JPanel {
 			});
 			
 			widthField.getDocument().addDocumentListener(new DocumentListener() {
+				@Override
 				public void insertUpdate  (DocumentEvent e) { setZoomValues();}
+				@Override
 				public void removeUpdate  (DocumentEvent e) { setZoomValues();}
+				@Override
 				public void changedUpdate (DocumentEvent e) { setZoomValues();}
 			});				
 			
 			
 			heightField.addKeyListener(new KeyListener() {
+				@Override
 				public void keyPressed(KeyEvent e) {/* setValue(); */}
+				@Override
 				public void keyReleased(KeyEvent e) {/* setValue(); */}
+				@Override
 				public void keyTyped(KeyEvent e) {
 					zoomBox.setSelected(true);
 					setEnabledValue();
@@ -210,8 +223,11 @@ public class ScatterParameterPanel extends JPanel {
 			});
 			
 			heightField.getDocument().addDocumentListener(new DocumentListener() {
+				@Override
 				public void insertUpdate  (DocumentEvent e) { setZoomValues();}
+				@Override
 				public void removeUpdate  (DocumentEvent e) { setZoomValues();}
+				@Override
 				public void changedUpdate (DocumentEvent e) { setZoomValues();}
 			});				
 			

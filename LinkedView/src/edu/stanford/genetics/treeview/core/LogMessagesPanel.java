@@ -30,6 +30,7 @@ public class LogMessagesPanel extends JTextArea implements Observer {
 			append("\n");
 		}
 	}
+	@Override
 	public void update(Observable arg0, Object arg1) {
 		if (arg1 != null) {
 			this.append((String) arg1);

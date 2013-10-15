@@ -179,6 +179,7 @@ public class KaryoView extends ModelView implements Observer {
 		geneInfo = null;
 	}
 	
+	@Override
 	public void update(Observable o, Object arg) {
 		if (o == karyoDrawer) {
 			offscreenValid = false;
@@ -225,6 +226,7 @@ public class KaryoView extends ModelView implements Observer {
 	javax.swing.Timer averageTimer;
 	AveragerTask averagerTask;
 	class TimerListener implements ActionListener { // manages the averagermonitor
+		@Override
 		public void actionPerformed(ActionEvent evt) {
 			if (averagerMonitor.isCanceled() || averagerTask.done()) {
 				averagerMonitor.close();
@@ -253,6 +255,7 @@ public class KaryoView extends ModelView implements Observer {
 		void go() {
 			setCurrent(0);
 			final SwingWorker worker = new SwingWorker() {
+				@Override
 				public Object construct() {
 					return new ActualTask();
 				}
@@ -354,6 +357,7 @@ public class KaryoView extends ModelView implements Observer {
 
 	Averager averager = null;
 	MouseTracker mouseTracker = new MouseTracker();
+	@Override
 	public synchronized void paintComposite (Graphics g) {
 	  mouseTracker.paintComposite(g);
 	}
@@ -361,6 +365,7 @@ public class KaryoView extends ModelView implements Observer {
 	/**
 	* override parent so as to avoid running out of memory at high zooms.
 	*/
+	@Override
 	public void paintComponent(Graphics g) {
 		Dimension newsize = getSize();
 		if (newsize == null) { return;}
@@ -385,6 +390,7 @@ public class KaryoView extends ModelView implements Observer {
 		}
 	}
 	Rectangle clipRect = new Rectangle();
+	@Override
 	public void updateBuffer(Graphics g) {
 	  if (justZoomed) {
 		justZoomed = false;
@@ -408,7 +414,8 @@ public class KaryoView extends ModelView implements Observer {
 	private int posIndex = -1;
 	private int orfIndex = -1;
 	*/
-    public String viewName() {
+    @Override
+	public String viewName() {
 	return "KaryoView";
     }
 
@@ -440,7 +447,8 @@ public class KaryoView extends ModelView implements Observer {
 	  }
 	  return names;
 	}
-    public Dimension getPreferredSize() {
+    @Override
+	public Dimension getPreferredSize() {
 	if (karyoDrawer.getWidth() >= 0) {
 	    Dimension p = new Dimension(karyoDrawer.getWidth(),karyoDrawer.getHeight());
 	    return p;
@@ -529,12 +537,15 @@ public class KaryoView extends ModelView implements Observer {
 	*/
 	class MouseTracker implements MouseMotionListener, MouseListener, KeyListener {
 		/* key listener */
+		@Override
 		public void keyPressed (KeyEvent e) {
 				// Invoked when a key has been pressed. 
 		}
+		@Override
 		public void keyReleased (KeyEvent e) {
 				//  Invoked when a key has been released. 
 		}
+		@Override
 		public void keyTyped (KeyEvent e) {
 			  //	Invoked when a key has been typed.
 			switch (e.getKeyChar()) {
@@ -568,11 +579,13 @@ public class KaryoView extends ModelView implements Observer {
 	  Rectangle highlight = null; // box around tip in which to draw highlight
 
 	  Rectangle repaintRect = new Rectangle();
-	  public void mouseEntered(MouseEvent e) {
+	  @Override
+	public void mouseEntered(MouseEvent e) {
 		  requestFocus();
 	  }
 	  
-	  public void mouseExited(MouseEvent e) {
+	  @Override
+	public void mouseExited(MouseEvent e) {
 		repaint(repaintRect);
 		if (tip != null) {
 			repaintRect.setLocation(tip.x, tip.y);
@@ -587,10 +600,11 @@ public class KaryoView extends ModelView implements Observer {
 		updateStatus(null);
 	  }
 
-	  public void mouseClicked(MouseEvent e) {
+	  @Override
+	public void mouseClicked(MouseEvent e) {
 		  if (viewFrame.windowActive() == false) return;
-		int xpos = (int) e.getX();
-		int ypos = (int) e.getY();
+		int xpos = e.getX();
+		int ypos = e.getY();
 		startPoint.setLocation(xpos, ypos);
 		ChromosomeLocus closest = karyoDrawer.getClosest(startPoint);
 		if (closest != null) {
@@ -605,7 +619,8 @@ public class KaryoView extends ModelView implements Observer {
 	  }	  
 	  
 	  // MouseMotionListener
-	  public void mouseMoved(MouseEvent e) {
+	  @Override
+	public void mouseMoved(MouseEvent e) {
 		int xpos = e.getX();
 		int ypos = e.getY();
 		startPoint.setLocation(xpos, ypos);
@@ -614,7 +629,8 @@ public class KaryoView extends ModelView implements Observer {
 		moveHighlight(closest);
 	  }
 	  // Mouse Listener 
-	  public void mousePressed(MouseEvent e) {
+	  @Override
+	public void mousePressed(MouseEvent e) {
 		  mouseExited(e);
 		if (viewFrame.windowActive() == false) return;
 		// initialize startpoint and endpoint
@@ -627,7 +643,8 @@ public class KaryoView extends ModelView implements Observer {
 		// repaint.
 		repaint(dragRect);
 	  }
-	  public void mouseReleased(MouseEvent e) {
+	  @Override
+	public void mouseReleased(MouseEvent e) {
 		if (viewFrame.windowActive() == false) return;
 		if (dragRect == null) return;
 		mouseDragged(e);
@@ -645,7 +662,8 @@ public class KaryoView extends ModelView implements Observer {
 		}
 	  }
 	  // MouseMotionListener
-	  public void mouseDragged(MouseEvent e) {
+	  @Override
+	public void mouseDragged(MouseEvent e) {
 		// move dragRect
 		
 		if (dragRect == null) {
@@ -678,8 +696,8 @@ public class KaryoView extends ModelView implements Observer {
 		  //				       highlight.width, highlight.height);
 		}
 		if (tip != null) {
-		  int mouseX = (int) startPoint.x;
-		  int mouseY = (int) startPoint.y;
+		  int mouseX = startPoint.x;
+		  int mouseY = startPoint.y;
 		  g.drawLine(mouseX, mouseY, tip.x, tip.y);
 		}
 		if (dragRect != null) {
@@ -774,7 +792,8 @@ public class KaryoView extends ModelView implements Observer {
 	}
     private String [] statusText = new String[5];
     // method from ModelView
-    public String[]  getStatus() {
+    @Override
+	public String[]  getStatus() {
 	return statusText;
     }
 
@@ -816,7 +835,8 @@ public class KaryoView extends ModelView implements Observer {
 		  return karyoView;
 	  }
 	  
-	  public void setEnabled(boolean enabled) {
+	  @Override
+	public void setEnabled(boolean enabled) {
 		  simpleButton.setEnabled(enabled);
 		  nearestButton.setEnabled(enabled);
 		  neighborButton.setEnabled(enabled);
@@ -877,7 +897,8 @@ public class KaryoView extends ModelView implements Observer {
 		  //		  type = new ButtonGroup();
 		  simpleButton = new JButton("No Averaging");
 		  simpleButton.addActionListener(new ActionListener() {
-			  public void actionPerformed(ActionEvent e) {
+			  @Override
+			public void actionPerformed(ActionEvent e) {
 				  karyoView.setSimpleAveraging();
 			  }
 		  });
@@ -886,32 +907,37 @@ public class KaryoView extends ModelView implements Observer {
 		  
 		  nearestButton = new JButton("Nearest :");
 		  nearestButton.addActionListener(new ActionListener() {
-			  public void actionPerformed(ActionEvent e) {
+			  @Override
+			public void actionPerformed(ActionEvent e) {
 				  karyoView.setNearestAveraging(Integer.parseInt(nearestField.getText()));
 			  }
 		  });
 		  
 		  neighborButton = new JButton("Neighbor :");
 		  neighborButton.addActionListener(new ActionListener() {
-			  public void actionPerformed(ActionEvent e) {
+			  @Override
+			public void actionPerformed(ActionEvent e) {
 				  karyoView.setNeighborAveraging(Integer.parseInt(neighborField.getText()));
 			  }
 		  });
 
 		  intervalButton = new JButton("Interval :");
 		  intervalButton.addActionListener(new ActionListener() {
-			  public void actionPerformed(ActionEvent e) {
+			  @Override
+			public void actionPerformed(ActionEvent e) {
 				  Double width = new Double(intervalField.getText());
 				  karyoView.setIntervalAveraging(width.doubleValue());
 			  }
 		  });
 	  }
 	  
-	  public void synchronizeTo() {
+	  @Override
+	public void synchronizeTo() {
 		  
 	  }
 	  
-	  public void synchronizeFrom() {
+	  @Override
+	public void synchronizeFrom() {
 	  }
   }
   

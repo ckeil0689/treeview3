@@ -109,6 +109,7 @@ public abstract class ScatterViewExportPanel extends JPanel implements SettingsP
 		JButton testB = new JButton("Export...");
 		final ScatterViewExportPanel ePanel = new TestExportPanel(scatterView);
 		testB.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				final JDialog popup = new CancelableSettingsDialog
 				(top, "Export to Bitmap", ePanel);
@@ -121,6 +122,7 @@ public abstract class ScatterViewExportPanel extends JPanel implements SettingsP
 		top.getContentPane().add(mainPanel);
 		top.setSize(500,500);
 		top.addWindowListener(new WindowAdapter() {
+			@Override
 			public void windowClosing(WindowEvent windowEvent)
 			{
 				System.exit(0);
@@ -174,6 +176,7 @@ public abstract class ScatterViewExportPanel extends JPanel implements SettingsP
 			add(new DrawingPanel(), BorderLayout.CENTER);
 			drawPreview = new JCheckBox("Draw Preview");
 			drawPreview.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					updatePreview();
 				}
@@ -184,6 +187,7 @@ public abstract class ScatterViewExportPanel extends JPanel implements SettingsP
 		
 		class DrawingPanel extends JPanel {
 			
+			@Override
 			public void paintComponent(Graphics g) {
 				Dimension size = getSize();
 				int width = estimateWidth();
@@ -283,6 +287,7 @@ public abstract class ScatterViewExportPanel extends JPanel implements SettingsP
 			add(fileField, BorderLayout.CENTER);
 			JButton chooseButton = new JButton("Browse");
 			chooseButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					try {
 						JFileChooser chooser = new JFileChooser();
@@ -305,8 +310,10 @@ class TestExportPanel extends ScatterViewExportPanel {
 	TestExportPanel(ScatterView scatterView) {
 		super(scatterView);
 	}
+	@Override
 	public void synchronizeTo() {
 	}
+	@Override
 	public void synchronizeFrom() {
 	}
 }

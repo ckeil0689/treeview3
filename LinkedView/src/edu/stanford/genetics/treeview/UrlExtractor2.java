@@ -90,7 +90,8 @@ public class UrlExtractor2 implements ConfigNodePersistent {
     }
 
 
-    public void bindConfig(ConfigNode configNode)
+    @Override
+	public void bindConfig(ConfigNode configNode)
     {
         root = configNode;
     }

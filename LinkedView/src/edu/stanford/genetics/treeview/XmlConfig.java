@@ -259,7 +259,8 @@ public class XmlConfig {
 	c.store();
     }
     
-    public String toString() {
+    @Override
+	public String toString() {
 	return "XmlConfig object based on file " + file + "\n" 
 	    + " url " + url + "\n" + root;
     }
@@ -270,9 +271,11 @@ public class XmlConfig {
 	public XmlConfigNode(IXMLElement e) {
 	    root = e;
 	}
+	@Override
 	public void store() {
 		XmlConfig.this.store();
 	}
+	@Override
 	public ConfigNode create(String name) {
 	  if (root == null) {
 		  LogBuffer.println("Warning: root is null, creating dummy config node");
@@ -283,6 +286,7 @@ public class XmlConfig {
 	    XmlConfig.this.changed = true;
 	    return new XmlConfigNode(kid);
  	}
+	@Override
 	public ConfigNode[] fetch(String name) {
 	    Vector kids = root.getChildrenNamed(name);
 	    ConfigNode [] ret = new XmlConfigNode[kids.size()];
@@ -292,12 +296,14 @@ public class XmlConfig {
 	    return ret;
 	}
 	
+	@Override
 	public ConfigNode fetchFirst(String string) {
 	  	if (root == null) return null;
 	    IXMLElement kid = root.getFirstChildNamed(string);
 	    if (kid == null) return null;
 	    return new XmlConfigNode(kid);
 	}
+	@Override
 	public ConfigNode fetchOrCreate(String string) {
 		ConfigNode t = fetchFirst(string);
 		// just return if exists
@@ -306,15 +312,18 @@ public class XmlConfig {
 		return create(string);
 	}
 
+	@Override
 	public boolean equals(Object cn) {
 	    return (((XmlConfigNode)cn).root == root);
 	}
     
+	@Override
 	public void remove(ConfigNode configNode) {
 	    root.removeChild(((XmlConfigNode)configNode).root);
 	    XmlConfig.this.changed = true;
 	}
 
+	@Override
 	public void removeAll(String string) {
 	    ConfigNode [] ret = fetch(string);
 	    for (int i = 0; i < ret.length; i++) {
@@ -322,6 +331,7 @@ public class XmlConfig {
 	    }
 	}
 
+	@Override
 	public void setLast(ConfigNode configNode) {
 	    remove(configNode);
 	    root.addChild(((XmlConfigNode) configNode).root);
@@ -331,21 +341,26 @@ public class XmlConfig {
 	/**
 	 * determine if a particular attribute is defined for this node.
 	 */
-	 public boolean hasAttribute(String string) {
+	 @Override
+	public boolean hasAttribute(String string) {
 	   return root.hasAttribute(string);
 	 }
 
+	@Override
 	public double getAttribute(String string, double d) {
 	    Double val = Double.valueOf(root.getAttribute(string, Double.toString(d)));
 	    return val.doubleValue();
 	}
+	@Override
 	public int getAttribute(String string, int i) {
 	    return root.getAttribute(string, i);
 	}
+	@Override
 	public String getAttribute(String string, String dval) {
 	    return root.getAttribute(string, dval);
 	}
 
+	@Override
 	public void setAttribute(String att, double val, double dval) {
 	    double cur = getAttribute(att, dval);
 	    if (cur != val) {
@@ -354,6 +369,7 @@ public class XmlConfig {
 	    }
 	}
 
+	@Override
 	public void setAttribute(String att, int val, int dval) {
 	    int cur = getAttribute(att, dval);
 	    if (cur != val) {
@@ -361,6 +377,7 @@ public class XmlConfig {
 		root.setAttribute(att, Integer.toString(val));
 	    }
 	}
+	@Override
 	public void setAttribute(String att, String val, String dval) {
 	    String cur = getAttribute(att, dval);
 	    if ((cur == null) || (!cur.equals(val))) {
@@ -368,6 +385,7 @@ public class XmlConfig {
 		root.setAttribute(att, val);
 	    }
 	}
+	@Override
 	public String toString() {
 	    String ret = "Root:" + root.getFullName() + "\n";
 	    for (Enumeration e = root.enumerateChildren(); 
@@ -404,25 +422,32 @@ public class XmlConfig {
 		 // in which case, it's bad for observable things to stay around for longer than their observers.
 		 // anyways, the overhead of making a new one is pretty small.
 		 return new WindowListener() {
-				 public void windowActivated(WindowEvent e) {
+				 @Override
+				public void windowActivated(WindowEvent e) {
 					 // nothing...
 				 }
-				 public void windowClosed(WindowEvent e) {
+				 @Override
+				public void windowClosed(WindowEvent e) {
 					 node.store();
 				 }
-				 public void windowClosing(WindowEvent e) {
+				 @Override
+				public void windowClosing(WindowEvent e) {
 					 // nothing...
 				 }
-				 public void windowDeactivated(WindowEvent e) {
+				 @Override
+				public void windowDeactivated(WindowEvent e) {
 					 // nothing...
 				 }
-				 public void windowDeiconified(WindowEvent e) {
+				 @Override
+				public void windowDeiconified(WindowEvent e) {
 					 // nothing...
 				 }
-				 public void windowIconified(WindowEvent e) {
+				 @Override
+				public void windowIconified(WindowEvent e) {
 					 // nothing...
 				 }
-				 public void windowOpened(WindowEvent e) {
+				 @Override
+				public void windowOpened(WindowEvent e) {
 					 // nothing...
 				 }
 		 };

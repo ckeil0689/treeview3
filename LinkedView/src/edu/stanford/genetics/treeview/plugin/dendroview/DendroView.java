@@ -33,8 +33,6 @@ import java.util.Observer;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
-import net.miginfocom.swing.MigLayout;
-
 import edu.stanford.genetics.treeview.*;
 import edu.stanford.genetics.treeview.model.*;
 
@@ -539,9 +537,11 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 		} catch (Exception e) {
 			// hmm... I'll just assume that there's no accept all.
 			fileDialog.addChoosableFileFilter(new javax.swing.filechooser.FileFilter() {
+				@Override
 				public boolean accept (File f) {
 					return true;
 				}
+				@Override
 				public String getDescription () {
 					return "All Files";
 				}
@@ -591,16 +591,19 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 		return zoomYmap;
 	}
 
+	@Override
 	public void scrollToGene(int i) {
 		getGlobalYmap().scrollToIndex(i);
 		getGlobalYmap().notifyObservers();
 	}
+	@Override
 	public void scrollToArray(int i) {
 		getGlobalXmap().scrollToIndex(i);
 		getGlobalXmap().notifyObservers();
 	}
 	
-    public void update(Observable o, Object arg) {
+    @Override
+	public void update(Observable o, Object arg) {
     		if (o == geneSelection) {
     			gtrview.scrollToNode(geneSelection.getSelectedNode());
     		}
@@ -633,10 +636,10 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 	globalview = new GlobalView();
 	
 	// scrollbars, mostly used by maps
-	globalXscrollbar = new JScrollBar(JScrollBar.HORIZONTAL, 0,1,0,1);
-	globalYscrollbar = new JScrollBar(JScrollBar.VERTICAL,0,1,0,1);
-	zoomXscrollbar = new JScrollBar(JScrollBar.HORIZONTAL, 0,1,0,1);
-	zoomYscrollbar = new JScrollBar(JScrollBar.VERTICAL,0,1,0,1);
+	globalXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0,1,0,1);
+	globalYscrollbar = new JScrollBar(Adjustable.VERTICAL,0,1,0,1);
+	zoomXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0,1,0,1);
+	zoomYscrollbar = new JScrollBar(Adjustable.VERTICAL,0,1,0,1);
 
 
 
@@ -964,7 +967,7 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 		JPanel gtrPanel = new JPanel();
 		gtrPanel.setLayout(new BorderLayout());
 		gtrPanel.add(gtrview, BorderLayout.CENTER);
-		gtrPanel.add(new JScrollBar(JScrollBar.HORIZONTAL, 0,1,0,1), BorderLayout.SOUTH);
+		gtrPanel.add(new JScrollBar(Adjustable.HORIZONTAL, 0,1,0,1), BorderLayout.SOUTH);
 		left.addComponent(gtrPanel, rectangle);
 		gtrview.setHintPanel(hintpanel);
 		gtrview.setStatusPanel(statuspanel);
@@ -1048,10 +1051,12 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 
 	// Menus
 	
-		  public void populateExportMenu(TreeviewMenuBarI menu)
+		  @Override
+		public void populateExportMenu(TreeviewMenuBarI menu)
 	  {
 		  	menu.addMenuItem("Export to Postscript...", new ActionListener() {
-		  public void actionPerformed(ActionEvent actionEvent) {
+		  @Override
+		public void actionPerformed(ActionEvent actionEvent) {
 
 			  
 			  MapContainer initXmap, initYmap;
@@ -1073,7 +1078,8 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 		menu.setMnemonic(KeyEvent.VK_X);
 		
 		menu.addMenuItem("Export to Image...", new ActionListener() {
-		  public void actionPerformed(ActionEvent actionEvent) {
+		  @Override
+		public void actionPerformed(ActionEvent actionEvent) {
 
 			  MapContainer initXmap, initYmap;
 			  if ((getArraySelection().getNSelectedIndexes() != 0) || (getGeneSelection().getNSelectedIndexes() != 0)){
@@ -1095,7 +1101,8 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 		menu.setMnemonic(KeyEvent.VK_I);
 
 		menu.addMenuItem("Export ColorBar to Postscript...", new ActionListener() {
-		  public void actionPerformed(ActionEvent actionEvent) {
+		  @Override
+		public void actionPerformed(ActionEvent actionEvent) {
 
 			  PostscriptColorBarExportPanel gcbPanel = new PostscriptColorBarExportPanel(
 			  ((DoubleArrayDrawer) arrayDrawer).getColorExtractor());
@@ -1109,7 +1116,8 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 		menu.setMnemonic(KeyEvent.VK_B);
 
 		menu.addMenuItem("Export ColorBar to Image...",new ActionListener() {
-		  public void actionPerformed(ActionEvent actionEvent) {
+		  @Override
+		public void actionPerformed(ActionEvent actionEvent) {
 
 			  BitmapColorBarExportPanel gcbPanel = new BitmapColorBarExportPanel(
 			  ((DoubleArrayDrawer) arrayDrawer).getColorExtractor());
@@ -1131,6 +1139,7 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 	  
 		private void addSimpleExportOptions(TreeviewMenuBarI menu) {
 			menu.addMenuItem("Save Tree Image", new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent actionEvent) {
 					
 					MapContainer initXmap, initYmap;
@@ -1159,6 +1168,7 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 			menu.setMnemonic(KeyEvent.VK_T);
 			
 			menu.addMenuItem("Save Thumbnail Image", new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent actionEvent) {
 					
 					MapContainer initXmap, initYmap;
@@ -1187,6 +1197,7 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 			menu.setMnemonic(KeyEvent.VK_H);
 			
 			menu.addMenuItem("Save Zoomed Image", new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent actionEvent) {
 					
 					MapContainer initXmap, initYmap;
@@ -1229,9 +1240,11 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 	 *
 	 * @param  menu  menu to add to
 	 */
+	@Override
 	public void populateAnalysisMenu(TreeviewMenuBarI menu) {
 		menu.addMenuItem("Flip Array Tree Node", new ActionListener()
 			{
+				@Override
 				public void actionPerformed(ActionEvent ae)
 				{
 					if (getGtrview().hasFocus())
@@ -1246,6 +1259,7 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 
 		menu.addMenuItem("Flip Gene Tree Node", new ActionListener()
 			{
+				@Override
 				public void actionPerformed(ActionEvent ae)
 				{
 					flipSelectedGTRNode();
@@ -1256,6 +1270,7 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 		
 		menu.addMenuItem("Align to Tree...", new ActionListener()
 			{
+				@Override
 				public void actionPerformed(ActionEvent ae)
 				{
 					try
@@ -1282,6 +1297,7 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 		
 		menu.addMenuItem("Compare to...", new ActionListener()
 			{
+				@Override
 				public void actionPerformed(ActionEvent ae)
 				{
 					try
@@ -1306,6 +1322,7 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 		
 		menu.addMenuItem("Remove comparison", new ActionListener()
 			{
+				@Override
 				public void actionPerformed(ActionEvent ae)
 				{
 					getDataModel().removeAppended();
@@ -1321,7 +1338,8 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 		menu.setMnemonic(KeyEvent.VK_R);		
 
 		menu.addMenuItem("Summary Window...",new ActionListener() {
-		  public void actionPerformed(ActionEvent e) {
+		  @Override
+		public void actionPerformed(ActionEvent e) {
 			  SummaryViewWizard  wizard = new SummaryViewWizard(DendroView.this);
 			  int retval = JOptionPane.showConfirmDialog(DendroView.this, wizard, "Configure Summary", JOptionPane.OK_CANCEL_OPTION);
 			  if (retval == JOptionPane.OK_OPTION) {
@@ -1337,8 +1355,10 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 	 *
 	 * @param  menu  menu to add to
 	 */
+	@Override
 	public void populateSettingsMenu(TreeviewMenuBarI menu) {
 		menu.addMenuItem("Pixel Settings...", new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent actionEvent) {
 				ColorExtractor ce = null;
 				try {
@@ -1361,6 +1381,7 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 		menu.setMnemonic(KeyEvent.VK_X);
 
 		menu.addMenuItem("Url Settings...", new ActionListener() {
+		@Override
 		public void actionPerformed(ActionEvent actionEvent) {
 			// keep refs to settingsPanel, settingsFrame local, since will dispose of self when closed...
 			TabbedSettingsPanel settingsPanel = new TabbedSettingsPanel();
@@ -1382,6 +1403,7 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 	menu.setMnemonic(KeyEvent.VK_U);
 
 	menu.addMenuItem("Font Settings...", new ActionListener() {
+		@Override
 		public void actionPerformed(ActionEvent actionEvent) {
 			// keep ref to settingsFrame local, since will dispose of self when closed...
 			TabbedSettingsPanel settingsPanel = new TabbedSettingsPanel();
@@ -1401,6 +1423,7 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 	menu.setMnemonic(KeyEvent.VK_F);
 
 	menu.addMenuItem("Annotations...", new ActionListener() {
+		@Override
 		public void actionPerformed(ActionEvent actionEvent) {
 			// keep refs to settingsPanel, settingsFrame local, since will dispose of self when closed...
 			TabbedSettingsPanel settingsPanel = new TabbedSettingsPanel();
@@ -1422,7 +1445,8 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 
 			settingsFrame.addWindowListener(XmlConfig.getStoreOnWindowClose(getDataModel().getDocumentConfigRoot()));
 			settingsFrame.addWindowListener(new WindowAdapter() {
-				 public void windowClosed(WindowEvent e) {
+				 @Override
+				public void windowClosed(WindowEvent e) {
 				 	textview.repaint();
 				 	
 					arraynameview.repaint();
@@ -1454,6 +1478,7 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 	 * this is a hack, since I don't know how to intercept panel resizing.
 	 * Actually, in the current layout this isn't even used.
 	 */
+	@Override
 	public void syncConfig() {
 		/*
 		DragGridPanel running   = this;
@@ -1492,6 +1517,7 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 	 * @param  configNode  ConfigNode to bind to
 	 */
 
+	@Override
 	public void bindConfig(ConfigNode configNode) {
 		root = configNode;
 		/*
@@ -1590,6 +1616,7 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 		this.root = root;
 	}
 	/** Getter for root */
+	@Override
 	public ConfigNode getConfigNode() {
 		return root;
 	}
@@ -1603,6 +1630,7 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 	/**
 	 * icon for display in tabbed panel
 	 */
+	@Override
 	public ImageIcon getIcon() {
 		if (treeviewIcon == null)
 			try {
@@ -1661,6 +1689,7 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 		bitmapPanel.setIncludedGeneHeaders(textview.getHeaderSummary().getIncluded());
 		return bitmapPanel;
 	}
+	@Override
 	public void export(MainProgramArgs mainArgs) throws ExportException {
 		DendroviewArgs args = new DendroviewArgs(mainArgs.remainingArgs());
 		if (args.getFilePath() == null) {

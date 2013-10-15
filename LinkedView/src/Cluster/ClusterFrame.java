@@ -46,6 +46,8 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.WindowConstants;
 import javax.swing.border.EtchedBorder;
 
 import net.miginfocom.swing.MigLayout;
@@ -93,7 +95,7 @@ public class ClusterFrame extends JFrame{
 		this.clusterModel = dataModel;
 		
 		//setup frame options
-		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setResizable(true);
 		
 		//set layout for initial window
@@ -318,13 +320,14 @@ public class ClusterFrame extends JFrame{
 		backgroundPanel.add(closeButtonPane, "alignx 50%, pushx");
 		
 		//make scrollable by adding it to scrollpane
-		scrollPane = new JScrollPane(backgroundPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane = new JScrollPane(backgroundPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		
 		//Add the mainPanel to the ContentPane
 		getContentPane().add(scrollPane);
 		
 		//Makes the frame invisible when the window is closed
 		addWindowListener(new WindowAdapter () {
+			@Override
 			public void windowClosing(WindowEvent we) {
 			    setVisible(false);
 			}

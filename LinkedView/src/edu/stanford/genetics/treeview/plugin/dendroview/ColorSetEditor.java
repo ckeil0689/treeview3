@@ -91,6 +91,7 @@ public class ColorSetEditor extends JPanel {
 			JButton pushButton  = new JButton(getLabel(), colorIcon);
 			pushButton.addActionListener(
 				new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						Color trial  = JColorChooser.showDialog(ColorSetEditor.this, "Pick Color for " + getLabel(), getColor());
 						if (trial != null) {

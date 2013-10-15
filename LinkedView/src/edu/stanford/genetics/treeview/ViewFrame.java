@@ -59,6 +59,7 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 * @param  observable  The MainPanel or other thing which changed.
 	 * @param  object      Generally null.
 	 */
+	@Override
 	public abstract void update(Observable observable, Object object);
 
 
@@ -133,16 +134,19 @@ public abstract class ViewFrame extends JFrame implements Observer {
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		addWindowListener(
 			new WindowAdapter() {
+				@Override
 				public void windowActivated(WindowEvent windowEvent) {
 					setWindowActive(true);
 				}
 
 
+				@Override
 				public void windowClosing(WindowEvent windowEvent) {
 					closeWindow();
 				}
 
 
+				@Override
 				public void windowDeactivated(WindowEvent windowEvent) {
 					setWindowActive(false);
 				}
@@ -628,9 +632,11 @@ public abstract class ViewFrame extends JFrame implements Observer {
 			// hmm... I'll just assume that there's no accept all.
 			fileDialog.addChoosableFileFilter(new javax.swing.filechooser
 					.FileFilter() {
+				@Override
 				public boolean accept (File f) {
 					return true;
 				}
+				@Override
 				public String getDescription () {
 					return "All Files";
 				}
@@ -674,7 +680,8 @@ public abstract class ViewFrame extends JFrame implements Observer {
 
 			 menubar.addMenuItem("New Window", new ActionListener() {
 				
-				 public void actionPerformed(ActionEvent actionEvent){
+				 @Override
+				public void actionPerformed(ActionEvent actionEvent){
 					 
 					 createNewFrame().setVisible(true);
 				 }
@@ -684,7 +691,8 @@ public abstract class ViewFrame extends JFrame implements Observer {
 
 			 menubar.addMenuItem("Close Window", new ActionListener() {
 				 
-				 public void actionPerformed(ActionEvent actionEvent) {
+				 @Override
+				public void actionPerformed(ActionEvent actionEvent) {
 					 
 					 closeWindow();
 				 }
@@ -734,7 +742,8 @@ public abstract class ViewFrame extends JFrame implements Observer {
 		 }
 		 menubar.addMenuItem(name, new ActionListener() {
 			 
-			 public void actionPerformed(ActionEvent e) {
+			 @Override
+			public void actionPerformed(ActionEvent e) {
 				 
 				 source.toFront();
 			 }

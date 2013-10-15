@@ -57,18 +57,23 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 			super();
 			mainPanel = mp;
 			final WindowListener listener = new WindowAdapter() {
+				@Override
 				public void windowClosing(WindowEvent e) {
 //					dockMainPanelDialog(MainPanelFrame.this);
 					removeDialog(MainPanelFrame.this);
 				}
+				@Override
 				public void windowClosed(WindowEvent e) {}
+				@Override
 				public void windowIconified(WindowEvent e) {}
+				@Override
 				public void windowDeiconified(WindowEvent e) {}
 			};
 			addWindowListener(listener);
 
 			JButton dockButton = new JButton("Dock");
 			dockButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					removeWindowListener(listener);
 					dockMainPanelDialog(MainPanelFrame.this);
@@ -77,6 +82,7 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 
 			JButton closeButton = new JButton("Close");
 			closeButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					removeWindowListener(listener);
 					removeDialog(MainPanelFrame.this);
@@ -105,6 +111,7 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 		setName("LinkedPanel");
 		setViewFrame(viewFrame);
 		addChangeListener(new ChangeListener() {
+			@Override
 			public void stateChanged(ChangeEvent e) {
 				ConfigNode viewsNode = getConfigNode();
 				if (viewsNode != null) {
@@ -127,6 +134,7 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 	/**
 	 *  This syncronizes the sub compnents with their persistent storage.
 	 */
+	@Override
 	public void syncConfig() {
 		int n = getComponentCount();
 		for (int i = 0; i < n; i++) {
@@ -190,6 +198,7 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 	/**
 	* this method gets the config node on which this component is based, or null.
 	*/
+	@Override
 	public ConfigNode getConfigNode() {
 		return configNode;
 	}
@@ -199,7 +208,8 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 	 *
 	 * @param  menu  A menu to add items to.
 	 */
-	 public void populateSettingsMenu(TreeviewMenuBarI menu) {
+	 @Override
+	public void populateSettingsMenu(TreeviewMenuBarI menu) {
 		 MainPanel panel = (MainPanel) getSelectedComponent();
 		 if (panel != null) {
 			 panel.populateSettingsMenu(menu);
@@ -212,6 +222,7 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 	 *
 	 * @param  menu  A menu to add items to.
 	 */
+	@Override
 	public void populateAnalysisMenu(TreeviewMenuBarI menu) {
 		MainPanel panel = (MainPanel) getSelectedComponent();
 		if (panel != null) {
@@ -222,6 +233,7 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 		for (int i = 0; i < plugins.length; i++) {
 			final PluginFactory thisFactory = plugins[i];
 			menu.addMenuItem(thisFactory.getPluginName(), new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					// MainPanel plugin = 
 					addPlugin(thisFactory);
@@ -230,6 +242,7 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 		}
 		if (plugins.length == 0) {			
 			menu.addMenuItem("No Plugins Found", new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 				}			
 			});
@@ -238,6 +251,7 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 		menu.addSeparator();
 		
 		menu.addMenuItem("Remove Current", new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				removeCurrent();
 			}
@@ -245,6 +259,7 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 		menu.setMnemonic(KeyEvent.VK_R);
 		
 		menu.addMenuItem("Detach Current", new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				detachCurrent();
 			}
@@ -263,7 +278,8 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 	 *
 	 * @param  menu  A menu to add items to.
 	 */
-	 public void populateExportMenu(TreeviewMenuBarI menu) {
+	 @Override
+	public void populateExportMenu(TreeviewMenuBarI menu) {
 		 MainPanel panel = (MainPanel) getSelectedComponent();
 		 if (panel != null) {
 			 if (menu.getItemCount() > 0) menu.addSeparator();					
@@ -277,6 +293,7 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 	 *
 	 * @param  index  Index of gene in cdt to make visible
 	 */
+	@Override
 	public void scrollToGene(int index) {
 		int n = getComponentCount();
 		for (int i = 0; i < n; i++) {
@@ -284,6 +301,7 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 			modelView.scrollToGene(index);
 		}
 	}
+	@Override
 	public void scrollToArray(int index) {
 		int n = getComponentCount();
 		for (int i = 0; i < n; i++) {
@@ -405,6 +423,7 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.MainPanel#getIcon()
 	 */
+	@Override
 	public ImageIcon getIcon() {
 		// can't nest linked panels yet.
 		return null;
@@ -459,6 +478,7 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 		return ret;
 	}
 
+	@Override
 	public void export(MainProgramArgs args) throws ExportException {
 		throw new ExportException("Export not implemented for plugin " + getName());
 	}

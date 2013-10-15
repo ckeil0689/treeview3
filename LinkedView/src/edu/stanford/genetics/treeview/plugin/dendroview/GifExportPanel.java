@@ -48,14 +48,17 @@ public class GifExportPanel extends ExportPanel implements SettingsPanel {
 	geneMap, false);
   }
   
-  public void synchronizeTo() {
+  @Override
+public void synchronizeTo() {
 	save();
   }
   
-  public void synchronizeFrom() {
+  @Override
+public void synchronizeFrom() {
 	// do nothing...
   }
-  public void save() {
+  @Override
+public void save() {
 	  try {
 		  OutputStream output = new BufferedOutputStream
 		  (new FileOutputStream(getFile()));
@@ -71,9 +74,11 @@ public class GifExportPanel extends ExportPanel implements SettingsPanel {
   /**
   * indicate to superclass that this type does not have bbox
   */
-  protected boolean hasBbox() { return false;}
+  @Override
+protected boolean hasBbox() { return false;}
   
-  protected String getInitialExtension() {
+  @Override
+protected String getInitialExtension() {
 	return(".gif");
   }
 

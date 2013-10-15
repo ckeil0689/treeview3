@@ -139,17 +139,17 @@ public class FlatFileParser {
 		FlatFileStreamTokenizer st;
 		st = new FlatFileStreamTokenizer(reader);
 		// ignore leading blank lines...
-		while (st.nextToken() == FlatFileStreamTokenizer.TT_EOL) {}
+		while (st.nextToken() == StreamTokenizer.TT_EOL) {}
 		st.pushBack();
 		Vector<String> line = new Vector<String>(10, 10);
-		while (st.nextToken() != FlatFileStreamTokenizer.TT_EOF) {
+		while (st.nextToken() != StreamTokenizer.TT_EOF) {
 			if (getCancelled() == true) break; // we're cancelled
 			st.pushBack();
 			loadLine(line,st);
 			String tokens[] = new String[line.size()];
 			Enumeration<String> e = line.elements();
 			for (int i = 0; i < tokens.length; i++) {
-				tokens[i] = (String) e.nextElement();
+				tokens[i] = e.nextElement();
 			}
 			data.addElement(tokens);
 			line.removeAllElements();
@@ -160,15 +160,15 @@ public class FlatFileParser {
 		private void loadLine(Vector<String> line, FlatFileStreamTokenizer st) 
 	throws LoadException, IOException {
 		int tt = st.nextToken();
-		while ((tt != FlatFileStreamTokenizer.TT_EOL) && (tt != FlatFileStreamTokenizer.TT_EOF)) {
-			if (tt == FlatFileStreamTokenizer.TT_WORD) {
+		while ((tt != StreamTokenizer.TT_EOL) && (tt != StreamTokenizer.TT_EOF)) {
+			if (tt == StreamTokenizer.TT_WORD) {
 				line.addElement(st.sval);
 			} else if (tt == FlatFileStreamTokenizer.TT_NULL) {
 				line.addElement(null);		
 			} else {
 				String err = "In loadLine, Got token type " + tt + " token " + st.toString() +
 				
-				" expected TT_WORD (" + FlatFileStreamTokenizer.TT_WORD + ") at line " + st.lineno();
+				" expected TT_WORD (" + StreamTokenizer.TT_WORD + ") at line " + st.lineno();
 				throw new LoadException(err, LoadException.CDTPARSE);
 			}
 			tt = st.nextToken();
@@ -210,6 +210,7 @@ public class FlatFileParser {
 			super(is);
 		}
 
+		@Override
 		public int read() throws IOException {
 			incrValue(1);
 			return super.read();
@@ -218,6 +219,7 @@ public class FlatFileParser {
 		// the following should be covered by the more general read...
 		//public int read(byte [] b);
 		
+		@Override
 		public int read(byte [] b, int off, int len) throws IOException {
 			int ret = super.read(b,off,len);
 			if (ret != -1) {
@@ -227,6 +229,7 @@ public class FlatFileParser {
 			return ret;
 		}
 		
+		@Override
 		public long skip(long n) throws IOException {
 			long ret = super.skip(n);
 			if (ret != -1) {
@@ -236,10 +239,12 @@ public class FlatFileParser {
 			return ret;
 		}
 		int markedValue = 0;
+		@Override
 		public void mark(int readLimit) {
 			super.mark(readLimit);
 			markedValue = getValue();
 		}
+		@Override
 		public void reset() throws IOException {
 			super.reset();
 			setValue(markedValue);

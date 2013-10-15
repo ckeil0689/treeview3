@@ -22,12 +22,14 @@ public class ArrayAnnoFactory extends PluginFactory {
 	 /* (non-Javadoc)
 	  * @see edu.stanford.genetics.treeview.PluginFactory#getName()
 		*/
+	@Override
 	public String getPluginName() {
 		return "ArrayTreeAnno";
 	}
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.PluginFactory#createPlugin(edu.stanford.genetics.treeview.ConfigNode)
 	 */
+	@Override
 	public MainPanel restorePlugin(ConfigNode node, ViewFrame viewFrame) {
 		if (viewFrame.getDataModel().aidFound() == false) {
 			JOptionPane.showMessageDialog(viewFrame, new JTextArea("DataModel does not have array tree"));
@@ -47,6 +49,7 @@ public class ArrayAnnoFactory extends PluginFactory {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.PluginFactory#configurePlugin(edu.stanford.genetics.treeview.ConfigNode, edu.stanford.genetics.treeview.ViewFrame)
 	 */
+	@Override
 	public boolean configurePlugin(ConfigNode node, ViewFrame viewFrame) {
 		node.setAttribute("tree_type", TreeAnnoPanel.ARRAY_TREE, TreeAnnoPanel.DEFAULT_TYPE);
 		return true;

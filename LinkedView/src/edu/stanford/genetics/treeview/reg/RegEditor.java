@@ -115,6 +115,7 @@ public class RegEditor extends JPanel {
 			JButton yesB = new JButton("Open in browser");
 			yesB.addActionListener(new ActionListener () {
 
+				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					BrowserControl bc = BrowserControl.getBrowserControl();
 					try {

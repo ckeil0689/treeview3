@@ -160,10 +160,12 @@ public class TreeAnnoPanel extends JPanel implements MainPanel {
 	
 	private ConfigNode root;
 	
+	@Override
 	public void syncConfig() {
 		// nothing to do, since type is static.
 	}
 
+	@Override
 	public ConfigNode getConfigNode() {
 		return root;
 	}
@@ -171,6 +173,7 @@ public class TreeAnnoPanel extends JPanel implements MainPanel {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.MainPanel#populateSettingsMenu(java.awt.Menu)
 	 */
+	@Override
 	public void populateSettingsMenu(TreeviewMenuBarI menu) {
    // no settings
 	}
@@ -178,6 +181,7 @@ public class TreeAnnoPanel extends JPanel implements MainPanel {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.MainPanel#populateAnalysisMenu(java.awt.Menu)
 	 */
+	@Override
 	public void populateAnalysisMenu(TreeviewMenuBarI menu) {
 		// no analysis
 	}
@@ -185,6 +189,7 @@ public class TreeAnnoPanel extends JPanel implements MainPanel {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.MainPanel#populateExportMenu(java.awt.Menu)
 	 */
+	@Override
 	public void populateExportMenu(TreeviewMenuBarI menu) {
 		// no export
 
@@ -193,9 +198,11 @@ public class TreeAnnoPanel extends JPanel implements MainPanel {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.MainPanel#scrollToIndex(int)
 	 */
+	@Override
 	public void scrollToGene(int i) {
 		LogBuffer.println("TreeAnnoPanel.scrollToGene not implemented");
 	}
+	@Override
 	public void scrollToArray(int i) {
 		LogBuffer.println("TreeAnnoPanel.scrollToArray not implemented");
 	}
@@ -208,12 +215,14 @@ public class TreeAnnoPanel extends JPanel implements MainPanel {
 	/**
 	 * icon for display in tabbed panel
 	 */
+	@Override
 	public ImageIcon getIcon() {
 		if (treeviewIcon == null)
 			treeviewIcon = new ImageIcon("images/treeview.gif", "TreeView Icon");
 		return treeviewIcon;
 	}
 
+	@Override
 	public void export(MainProgramArgs args) throws ExportException {
 		throw new ExportException("Export not implemented for plugin " + getName());
 	}

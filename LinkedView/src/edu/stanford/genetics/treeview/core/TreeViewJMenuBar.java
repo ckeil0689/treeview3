@@ -34,6 +34,7 @@ public class TreeViewJMenuBar extends TreeviewMenuBarI {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.TreeviewMenuBarI#addMenu(java.lang.String)
 	 */
+	@Override
 	public Object addMenu(String name) {
 		currentMenu = new JMenu(name);
 		underlyingMenuBar.add(currentMenu);
@@ -43,6 +44,7 @@ public class TreeViewJMenuBar extends TreeviewMenuBarI {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.TreeviewMenuBarI#addMenuItem(java.lang.String, java.awt.event.ActionListener)
 	 */
+	@Override
 	public Object addMenuItem(String name, ActionListener l) {
 		currentMenuItem = new JMenuItem(name);
 		currentMenuItem.addActionListener(l);
@@ -50,6 +52,7 @@ public class TreeViewJMenuBar extends TreeviewMenuBarI {
 		return currentMenuItem;
 	}
 
+	@Override
 	public Object addMenuItem(String name, ActionListener l, int pos) {
 		currentMenuItem = new JMenuItem(name);
 		currentMenuItem.addActionListener(l);
@@ -59,6 +62,7 @@ public class TreeViewJMenuBar extends TreeviewMenuBarI {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.TreeviewMenuBarI#addSubMenu(java.lang.String)
 	 */
+	@Override
 	public Object addSubMenu(String name) {
 		JMenu newMenu = new JMenu( name);
 		currentMenu.add(newMenu);
@@ -69,6 +73,7 @@ public class TreeViewJMenuBar extends TreeviewMenuBarI {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.TreeviewMenuBarI#setAccelerator(int)
 	 */
+	@Override
 	public void setAccelerator(int key) {
 		currentMenuItem.setAccelerator(KeyStroke.getKeyStroke((char) key,
 			    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -77,10 +82,12 @@ public class TreeViewJMenuBar extends TreeviewMenuBarI {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.TreeviewMenuBarI#setMnemonic(int)
 	 */
+	@Override
 	public void setMnemonic(int key) {
 		currentMenuItem.setMnemonic(key);
 	}
 	
+	@Override
 	public void setMenuMnemonic(int key) {
 		currentMenu.setMnemonic(key);
 	}
@@ -88,6 +95,7 @@ public class TreeViewJMenuBar extends TreeviewMenuBarI {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.TreeviewMenuBarI#setMenu(java.lang.String)
 	 */
+	@Override
 	public Object setMenu(String name) {
 		int i;
 		for (i = 0; i < underlyingMenuBar.getMenuCount(); i++) {
@@ -103,6 +111,7 @@ public class TreeViewJMenuBar extends TreeviewMenuBarI {
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.TreeviewMenuBarI#setSubMenu(java.lang.String)
 	 */
+	@Override
 	public Object setSubMenu(String name) {
 		int i;
 		for (i = 0; i < currentMenu.getItemCount(); i++) {
@@ -121,18 +130,22 @@ public class TreeViewJMenuBar extends TreeviewMenuBarI {
 		currentMenu.removeAll();
 	}
 
+	@Override
 	public void addSeparator() {
 		currentMenu.addSeparator();
 	}
 
+	@Override
 	public int getItemCount() {
 		return currentMenu.getItemCount();
 	}
 
+	@Override
 	public void removeAll() {
 		currentMenu.removeAll();
 	}
 
+	@Override
 	public void removeMenuItems() {
 		int i;
 		@SuppressWarnings("unused")
@@ -146,6 +159,7 @@ public class TreeViewJMenuBar extends TreeviewMenuBarI {
 		}
 	}
 
+	@Override
 	public void setEnabled(boolean value) {
 		currentMenu.setEnabled(value);		
 	}

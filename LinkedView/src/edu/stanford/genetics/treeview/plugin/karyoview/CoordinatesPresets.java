@@ -100,6 +100,7 @@ public class CoordinatesPresets {
         ConfigNode aconfigNode[] = root.fetch("FileSet");
 		return aconfigNode.length;
 	}
+	@Override
 	public String toString() {
         ConfigNode aconfigNode[] = root.fetch("FileSet");
 		String ret = "";
@@ -176,7 +177,8 @@ public class CoordinatesPresets {
     				Util.URLtoFilePath(source.getPath())
     				);
     		FileFilter fileFilter = new FileFilter() {
-    			public boolean accept(File file) {
+    			@Override
+				public boolean accept(File file) {
     				return (file.getName().startsWith(".") == false);
     			}
     		};

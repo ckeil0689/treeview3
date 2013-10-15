@@ -83,7 +83,8 @@ public class ThreadListener extends Thread {
 	list_group(out, root_thread_group,"");
     }
     
-    public synchronized void run() {
+    @Override
+	public synchronized void run() {
 	while (runin == true) {
 	    ByteArrayOutputStream os = new ByteArrayOutputStream();
 	    PrintStream ps = new PrintStream(os);
@@ -107,6 +108,7 @@ public class ThreadListener extends Thread {
 	textarea = new TextArea(20, 100);
 	top.add(textarea);
 	top.addWindowListener(new WindowAdapter() {
+		@Override
 		public void windowClosing(WindowEvent e) {
 		    runin = false;
 		    top.dispose();		    

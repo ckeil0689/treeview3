@@ -172,7 +172,8 @@ public abstract class KaryoExportPanel extends javax.swing.JPanel {
 		add(new DrawingPanel(), BorderLayout.CENTER);
 		drawPreview = new JCheckBox("Draw Preview");
 		drawPreview.addActionListener(new ActionListener() {
-		  public void actionPerformed(ActionEvent e) {
+		  @Override
+		public void actionPerformed(ActionEvent e) {
 			updatePreview();
 		  }
 		});
@@ -181,6 +182,7 @@ public abstract class KaryoExportPanel extends javax.swing.JPanel {
 	  }
 	  class DrawingPanel extends JPanel {
 
+		@Override
 		public void paintComponent(Graphics g) {
 		  Dimension size = getSize();
 		  int width = estimateWidth();
@@ -269,15 +271,18 @@ public abstract class KaryoExportPanel extends javax.swing.JPanel {
 
 	  InclusionPanel() {
 		  documentListener = new DocumentListener() {
-			  public void changedUpdate(DocumentEvent e) {
+			  @Override
+			public void changedUpdate(DocumentEvent e) {
 				  updateSize();
 				  if (previewPanel != null) previewPanel.updatePreview();
 			  }
-			  public void insertUpdate(DocumentEvent e) {
+			  @Override
+			public void insertUpdate(DocumentEvent e) {
 				  updateSize();
 				  if (previewPanel != null) previewPanel.updatePreview();
 			  }
-			  public void removeUpdate(DocumentEvent e) {
+			  @Override
+			public void removeUpdate(DocumentEvent e) {
 				  updateSize();
 				  if (previewPanel != null) previewPanel.updatePreview();
 			  }
@@ -290,7 +295,8 @@ public abstract class KaryoExportPanel extends javax.swing.JPanel {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		ActionListener syncher = new ActionListener() {
-		  public void actionPerformed(ActionEvent e) {
+		  @Override
+		public void actionPerformed(ActionEvent e) {
 			synchEnabled();
 		  }
 		};
@@ -324,16 +330,20 @@ public abstract class KaryoExportPanel extends javax.swing.JPanel {
 		add(sizeRow);
 	  }
 	  class BboxRow extends SizeRow {
+		@Override
 		protected void setupWidgets() {
 		 DocumentListener documentListener = new DocumentListener() {
+			@Override
 			public void changedUpdate(DocumentEvent e) {
 			  updateSize();
 		if (previewPanel != null) previewPanel.updatePreview();
 			}
+			@Override
 			public void insertUpdate(DocumentEvent e) {
 			  updateSize();
 		if (previewPanel != null) previewPanel.updatePreview();
 			}
+			@Override
 			public void removeUpdate(DocumentEvent e) {
 			  updateSize();
 		if (previewPanel != null) previewPanel.updatePreview();
@@ -383,6 +393,7 @@ public abstract class KaryoExportPanel extends javax.swing.JPanel {
 		  Double inch = new Double(ySize.getText());
 		  return (int) (inch.doubleValue() * 72);
 		}
+		@Override
 		public void setEnabled(boolean flag) {
 		  super.setEnabled(flag);
 		  xSize.setEnabled(flag);
@@ -414,7 +425,8 @@ public abstract class KaryoExportPanel extends javax.swing.JPanel {
 	    add(fileField);
 	    JButton chooseButton = new JButton("Browse");
 	    chooseButton.addActionListener(new ActionListener() {
-		  public void actionPerformed(ActionEvent e) {
+		  @Override
+		public void actionPerformed(ActionEvent e) {
 			try {
 			  JFileChooser chooser = new JFileChooser();
 			  int returnVal = chooser.showSaveDialog(KaryoExportPanel.this);

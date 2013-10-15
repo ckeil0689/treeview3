@@ -58,6 +58,7 @@ public class ModelessSettingsDialog extends JDialog {
 	  
 		  JButton save_button = new JButton("Close");
 		  save_button.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 			  settingsPanel.synchronizeTo();
 			  settingsFrame.dispose();
@@ -66,6 +67,7 @@ public class ModelessSettingsDialog extends JDialog {
 		  add(save_button);
 	  JButton cancel_button = new JButton("Cancel");
 	  cancel_button.addActionListener(new ActionListener() {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 		  settingsPanel.synchronizeFrom();
 		  settingsFrame.dispose();

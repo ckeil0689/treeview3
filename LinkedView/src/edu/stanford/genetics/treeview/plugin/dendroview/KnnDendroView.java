@@ -22,6 +22,7 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
+import java.awt.Adjustable;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -60,6 +61,7 @@ public class KnnDendroView extends DendroView2 implements ConfigNodePersistent, 
 	 *  It sets up the views and binds them all to config nodes.
 	 *
 	 */
+	@Override
 	protected void setupViews() {
 		DataModel knnModel = getDataModel();
 		hintpanel = new MessagePanel("Usage Hints");
@@ -69,7 +71,7 @@ public class KnnDendroView extends DendroView2 implements ConfigNodePersistent, 
 		ColorPresets colorPresets = DendrogramFactory.getColorPresets();
 		ColorExtractor colorExtractor = new ColorExtractor();
 		colorExtractor.setDefaultColorSet(colorPresets.getDefaultColorSet());
-		colorExtractor.setMissing(KnnModel.NODATA, KnnModel.EMPTY);
+		colorExtractor.setMissing(DataModel.NODATA, DataModel.EMPTY);
 
 		KnnArrayDrawer kArrayDrawer = new KnnArrayDrawer();
 		kArrayDrawer.setColorExtractor(colorExtractor);
@@ -84,10 +86,10 @@ public class KnnDendroView extends DendroView2 implements ConfigNodePersistent, 
 
 
 	// scrollbars, mostly used by maps
-	globalXscrollbar = new JScrollBar(JScrollBar.HORIZONTAL, 0,1,0,1);
-	globalYscrollbar = new JScrollBar(JScrollBar.VERTICAL,0,1,0,1);
-	zoomXscrollbar = new JScrollBar(JScrollBar.HORIZONTAL, 0,1,0,1);
-	zoomYscrollbar = new JScrollBar(JScrollBar.VERTICAL,0,1,0,1);
+	globalXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0,1,0,1);
+	globalYscrollbar = new JScrollBar(Adjustable.VERTICAL,0,1,0,1);
+	zoomXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0,1,0,1);
+	zoomYscrollbar = new JScrollBar(Adjustable.VERTICAL,0,1,0,1);
 
 
 

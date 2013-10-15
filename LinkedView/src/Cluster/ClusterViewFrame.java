@@ -1,6 +1,7 @@
 package Cluster;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Observer;
 
 import javax.swing.JFileChooser;
@@ -14,10 +15,9 @@ public class ClusterViewFrame extends TreeViewFrame implements Observer
 
 	private static final long serialVersionUID = 1L;
 
-	public ClusterViewFrame(TreeViewApp treeview)
-	{
+	public ClusterViewFrame(TreeViewApp treeview) throws IOException {
+		
 		super(treeview);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -26,8 +26,8 @@ public class ClusterViewFrame extends TreeViewFrame implements Observer
 	* @return The fileset corresponding to the dataset.
 	*/
 	protected ClusterFileSet clusterSelection()
-	throws LoadException
-	{
+	throws LoadException {
+		
 		ClusterFileSet fileSet1; // will be chosen...
 		JFileChooser fileDialog = new JFileChooser();
 		setupFileDialog(fileDialog);

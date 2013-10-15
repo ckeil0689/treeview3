@@ -1,5 +1,6 @@
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
+import java.awt.Adjustable;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.AdjustmentEvent;
@@ -14,6 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -39,7 +41,7 @@ implements AdjustmentListener {
 	private void setupWidgets() {	
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		JPanel inner = new JPanel();
-		JLabel font_label = new JLabel("Value:", JLabel.LEFT);
+		JLabel font_label = new JLabel("Value:", SwingConstants.LEFT);
 		inner.add(font_label);
 
 		font_label.setMaximumSize(new Dimension(Short.MAX_VALUE, 
@@ -52,19 +54,22 @@ implements AdjustmentListener {
 		inner.add(contrastTextField);
 
 		contrastTextField.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
 			public void changedUpdate(DocumentEvent e) {
 				updateScrollbarFromText();
 			}
+			@Override
 			public void insertUpdate(DocumentEvent e) {
 				updateScrollbarFromText();
 			}
+			@Override
 			public void removeUpdate(DocumentEvent e) {
 				updateScrollbarFromText();
 			}
 		});
 
 		add(inner);
-		scrollbar = new JScrollBar(JScrollBar.HORIZONTAL);
+		scrollbar = new JScrollBar(Adjustable.HORIZONTAL);
 		scrollbar.setValues((int)(contrast * 100.0), 0, 1, 500);
 		scrollbar.addAdjustmentListener(this);
 		add(scrollbar);
@@ -81,6 +86,7 @@ implements AdjustmentListener {
 			// do nothing if cannot convert
 		}
 	}
+	@Override
 	public void adjustmentValueChanged(AdjustmentEvent evt) {
 		if (!inUpdateScrollbarFromText) {
 			contrastTextField.setText("" +(double) scrollbar.getValue() / 100);	
@@ -103,6 +109,7 @@ implements AdjustmentListener {
 
 
 	class WindowCloser extends WindowAdapter {
+		@Override
 		public void windowClosing(WindowEvent we) {
 			//	parent.store();
 			we.getWindow().dispose();

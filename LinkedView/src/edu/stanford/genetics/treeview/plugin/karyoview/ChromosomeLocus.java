@@ -72,6 +72,7 @@ class ChromosomeLocus {
 	  }
 	}
 	
+	@Override
 	public String toString() {
 	  return "Chr " + chromosome + ", arm " + getText(arm) + ", pos " + position + ", row in cdt " + cdtIndex;
 	}

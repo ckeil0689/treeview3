@@ -162,6 +162,7 @@ public class RegEngine {
 	private void attemptRegistration() throws Exception {
 		loadProgress = new LoadProgress("Registering Java Treeview...", null);
 			final SwingWorker worker = new SwingWorker() {
+				@Override
 				public Object construct() {
 					run();
 					return null;
@@ -349,12 +350,14 @@ public class RegEngine {
 				"Edit Registration Info", true);
 		dialog.setContentPane(holder);
 		cancelButton.addActionListener(new ActionListener(){
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				regEntry.setStatus("deferred");
 				dialog.setVisible(false);
 			}
 		});
 		okButton.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				String err = "";
 				for (int i = 0; i < regEntry.getNumEditableRegKeys();i++) {
@@ -386,6 +389,7 @@ public class RegEngine {
 
 	class TimerListener implements ActionListener { // manages the FileLoader
 		// this method is invoked every few hundred ms
+		@Override
 		public void actionPerformed(ActionEvent evt) {
 //			loadProgress.setValue(getValue());
 			if (loadProgress.getCanceled() || isFinished()) {
@@ -485,6 +489,7 @@ class ExistingRegPanel extends JPanel {
 		/* (non-Javadoc)
 		 * @see javax.swing.table.TableModel#getRowCount()
 		 */
+		@Override
 		public int getRowCount() {
 			return reg.getNumEntries();
 		}
@@ -492,6 +497,7 @@ class ExistingRegPanel extends JPanel {
 		/* (non-Javadoc)
 		 * @see javax.swing.table.TableModel#getColumnCount()
 		 */
+		@Override
 		public int getColumnCount() {
 			// version,status,summary
 			return 3;
@@ -500,6 +506,7 @@ class ExistingRegPanel extends JPanel {
 		/* (non-Javadoc)
 		 * @see javax.swing.table.TableModel#getValueAt(int, int)
 		 */
+		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			Entry entry = reg.getEntry(rowIndex);
 			switch (columnIndex) {
@@ -517,6 +524,7 @@ class ExistingRegPanel extends JPanel {
 		/* (non-Javadoc)
 		 * @see javax.swing.table.TableModel#getColumnName(int)
 		 */
+		@Override
 		public String getColumnName(int column) {
 			switch (column) {
 			case 0:

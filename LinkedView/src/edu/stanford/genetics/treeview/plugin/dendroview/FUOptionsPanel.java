@@ -25,6 +25,7 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 import edu.stanford.genetics.treeview.*;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.*;
 
@@ -63,6 +64,7 @@ public class FUOptionsPanel extends JPanel implements SettingsPanel {
 	Frame f = new Frame(e.getTitle());
 	f.add(e);
 	f.addWindowListener(new WindowAdapter (){
+		@Override
 		public void windowClosing(WindowEvent we) 
 		{System.exit(0);}
 	    });
@@ -70,10 +72,12 @@ public class FUOptionsPanel extends JPanel implements SettingsPanel {
 	f.setVisible(true);
     }
 
+	@Override
 	public void synchronizeFrom() {
 	  setupWidgets();
 	}
 
+	@Override
 	public void synchronizeTo() {
 	  //nothing to do...
 	}
@@ -91,7 +95,7 @@ public class FUOptionsPanel extends JPanel implements SettingsPanel {
 	  gbc.insets = new Insets(5,5,5,5);
 	  gbc.fill = GridBagConstraints.BOTH;
 	  gbc.anchor = GridBagConstraints.NORTHEAST;
-	  innerPanel.add(new JLabel ("Font:", JLabel.LEFT), gbc);
+	  innerPanel.add(new JLabel ("Font:", SwingConstants.LEFT), gbc);
 
 	  gbc.gridy = 2;
 	  gbc.gridx = 0;
@@ -117,10 +121,11 @@ public class FUOptionsPanel extends JPanel implements SettingsPanel {
 	  JCheckBox enableBox;
 	  EnablePanel() {
 		setLayout(new BorderLayout());
-			add(new JLabel ("Web Link:", JLabel.LEFT), BorderLayout.NORTH);
+			add(new JLabel ("Web Link:", SwingConstants.LEFT), BorderLayout.NORTH);
 			enableBox = new JCheckBox("Enable", urlExtractor.isEnabled());
 			enableBox.addActionListener(new ActionListener() {
-			  public void actionPerformed(ActionEvent e) {
+			  @Override
+			public void actionPerformed(ActionEvent e) {
 				urlExtractor.setEnabled(enableBox.isSelected());
 				urlPanel.setEnabled(enableBox.isSelected());
 			  }
@@ -142,6 +147,7 @@ public class FUOptionsPanel extends JPanel implements SettingsPanel {
 		top.add(this);
 		top.addWindowListener(
 			new WindowAdapter() {
+				@Override
 				public void windowClosing(WindowEvent we) {
 					we.getWindow().dispose();
 				}
@@ -210,6 +216,7 @@ public class FUOptionsPanel extends JPanel implements SettingsPanel {
 		d.add(new ButtonPanel(), BorderLayout.SOUTH);
 		d.addWindowListener(
 			new WindowAdapter() {
+				@Override
 				public void windowClosing(WindowEvent we) {
 					we.getWindow().dispose();
 				}
@@ -237,6 +244,7 @@ public class FUOptionsPanel extends JPanel implements SettingsPanel {
 		private HeaderChoice headerChoice;
 
 		
+		@Override
 		public void setEnabled(boolean b) {
 		  templateField.setEnabled(b);
 		  headerChoice.setEnabled(b);
@@ -297,7 +305,8 @@ public class FUOptionsPanel extends JPanel implements SettingsPanel {
 			JButton presetButton = new JButton((presets.getPresetNames()) [i]);
 			final int index = i;
 			presetButton.addActionListener(new ActionListener() {
-			  public void actionPerformed(ActionEvent e) {
+			  @Override
+			public void actionPerformed(ActionEvent e) {
 				templateField.setText(presets.getTemplate(index));
 				updatePreview();
 			  }
@@ -346,7 +355,8 @@ public class FUOptionsPanel extends JPanel implements SettingsPanel {
 		}
 	    addItemListener(this);
 	  }
-	  public void itemStateChanged(ItemEvent e) {
+	  @Override
+	public void itemStateChanged(ItemEvent e) {
 	    updatePreview();
 	  }
     }
@@ -357,7 +367,8 @@ public class FUOptionsPanel extends JPanel implements SettingsPanel {
 		  TemplateField () {
 			super("enter url template");
 			addActionListener(new ActionListener() {
-		    	public void actionPerformed(ActionEvent e) {
+		    	@Override
+				public void actionPerformed(ActionEvent e) {
 				  updatePreview();
 				}
 			});
@@ -463,6 +474,7 @@ public class FUOptionsPanel extends JPanel implements SettingsPanel {
 	  display_button.addActionListener(
 			new ActionListener() {
 			  
+				@Override
 				public void actionPerformed(ActionEvent actionEvent) {
 				  updateExample();
 				  synchronizeClient();
@@ -474,7 +486,7 @@ public class FUOptionsPanel extends JPanel implements SettingsPanel {
 	  gbc.gridy = 1;
 	  gbc.gridwidth = 3;
 	  gbc.fill = GridBagConstraints.BOTH;
-	  exampleField = new JLabel("Example Text", JLabel.CENTER);
+	  exampleField = new JLabel("Example Text", SwingConstants.CENTER);
 	  add(exampleField, gbc);
 	}
 
@@ -494,7 +506,8 @@ public class FUOptionsPanel extends JPanel implements SettingsPanel {
 	ButtonPanel() {
 	    JButton save_button = new JButton("Close");
 	    save_button.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
+		    @Override
+			public void actionPerformed(ActionEvent e) {
 			window.setVisible(false);
 		    }
 		});

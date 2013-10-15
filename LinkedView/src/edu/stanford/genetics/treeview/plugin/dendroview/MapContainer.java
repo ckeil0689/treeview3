@@ -67,7 +67,8 @@ public class MapContainer extends Observable implements Observer, AdjustmentList
 	  return ret;
 	}
     // confignode persistent
-    public void bindConfig(ConfigNode configNode)
+    @Override
+	public void bindConfig(ConfigNode configNode)
     {
         root = configNode;
 	  // first bind subordinate maps...
@@ -148,7 +149,8 @@ public class MapContainer extends Observable implements Observer, AdjustmentList
             setChanged();
     }
 
-    public void adjustmentValueChanged(AdjustmentEvent adjustmentEvent) {
+    @Override
+	public void adjustmentValueChanged(AdjustmentEvent adjustmentEvent) {
         setChanged();
         notifyObservers(scrollbar);
     }
@@ -168,7 +170,8 @@ public class MapContainer extends Observable implements Observer, AdjustmentList
     /** 
      * expect to get updates from selection only
      */
-    public void update(Observable observable, Object object)
+    @Override
+	public void update(Observable observable, Object object)
     {
         System.out.println(new StringBuffer("MapContainer Got an update from unknown ").append(observable).toString());
         notifyObservers(object);

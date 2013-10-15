@@ -38,42 +38,47 @@ import edu.stanford.genetics.treeview.model.KnnModel;
  * This class implements the GUI portion of the LinkedView application 
  * 
  */
-public class LinkedViewFrame extends TreeViewFrame implements Observer
-{
+public class LinkedViewFrame extends TreeViewFrame implements Observer {
 
 	private static final long serialVersionUID = 1L;
 	
 	private static String appName = "TreeView 3.0";
 	
-	public String getAppName() {
-		return appName;
-	}
-	public LinkedViewFrame(LinkedViewApp treeview)
-	{
+	public LinkedViewFrame(LinkedViewApp treeview) {
+		
 		super(treeview, appName);
 	}
-	public LinkedViewFrame(TreeViewApp treeview, String subName)
-	{
+	
+	public LinkedViewFrame(TreeViewApp treeview, String subName) {
+		
 		// sorry this is so ugly, but can't call getAppName until
 		// superclass constructor's done.
 		super(treeview, subName);
 	}
 	
-	
+	@Override
+	public String getAppName() {
+		return appName;
+	}
 
 	private String getStyle(FileSet fileSet) {
+		
 		if (fileSet.getStyle() == FileSet.AUTO_STYLE) {
 			return "auto";
 		}
+		
 		if (fileSet.getStyle() == FileSet.CLASSIC_STYLE) {
 			return "classic";
 		}
+		
 		if (fileSet.getStyle() == FileSet.KMEANS_STYLE) {
 			return "kmeans";
 		}
+		
 		if (fileSet.getStyle() == FileSet.LINKED_STYLE) {
 			return "linked";
 		}
+		
 		return "unknown";
 	}
 	
@@ -83,9 +88,13 @@ public class LinkedViewFrame extends TreeViewFrame implements Observer
 	 * A side effect of setting the datamodel is to
 	 * update the running window.
 	 */
+	@Override
 	public void loadFileSet(FileSet fileSet)  throws LoadException {
+		
 		LogBuffer.println("initial style " + getStyle(fileSet));
+		
 		if (fileSet.getStyle() == FileSet.AUTO_STYLE) {
+			
 			if (fileSet.getKag().equals("") && fileSet.getKgg().equals("")) {
 				super.loadFileSet(fileSet); // loads into TVModel.
 			} else {
@@ -101,6 +110,7 @@ public class LinkedViewFrame extends TreeViewFrame implements Observer
 	} 
 	
 	private void loadKnnModel(FileSet fileSet) throws LoadException {
+		
 		KnnModel knnModel = new KnnModel();
 		knnModel.setFrame(this);
 		try {
@@ -113,7 +123,9 @@ public class LinkedViewFrame extends TreeViewFrame implements Observer
 		}
 	}
 	
-	 protected void setupRunning() {
+	 @Override
+	protected void setupRunning() {
+		 
 		 FileSet fileSet = getDataModel().getFileSet();
 		 if (fileSet == null) {
 		 	//default to linked
@@ -140,7 +152,8 @@ public class LinkedViewFrame extends TreeViewFrame implements Observer
 		 if (fileSet.getStyle() == FileSet.LINKED_STYLE) {
 			 LinkedPanel linkedPanel  = new LinkedPanel(this);
 			 linkedPanel.addChangeListener(new ChangeListener() {
-				 public void stateChanged(ChangeEvent e) {
+				 @Override
+				public void stateChanged(ChangeEvent e) {
 					 // rebulid menus...?
 					 //				 menuBar.rebuildMainPanel();
 					 rebuildMainPanelMenu();
@@ -227,37 +240,45 @@ public class LinkedViewFrame extends TreeViewFrame implements Observer
 	*
 	* @return The fileset corresponding to the dataset.
 	*/
-	protected FileSet offerSelection()
-	throws LoadException
-	{
+	protected FileSet offerSelection() throws LoadException {
+		
 		FileSet fileSet1; // will be chosen...
 		JFileChooser fileDialog = new JFileChooser();
 		setupFileDialog(fileDialog);
+		
 		FileOptionsPanel boxPanel = new FileOptionsPanel();
 		fileDialog.setAccessory(boxPanel); 
+		
 		int retVal = fileDialog.showOpenDialog(this);
 		if (retVal == JFileChooser.APPROVE_OPTION) {
-			File chosen = fileDialog.getSelectedFile();
 			
+			File chosen = fileDialog.getSelectedFile();
 			fileSet1 = new FileSet(chosen.getName(), chosen.getParent()+File.separator);
 		} else {
+			
 			throw new LoadException("File Dialog closed without selection...", LoadException.NOFILE);
 		}
+		
 		fileSet1.setStyle(boxPanel.getSelectedStyleIndex());
 		fileSet1.setParseQuotedStrings(boxPanel.isQuoteSelected());
+		
 		return fileSet1;
 	}
 	
-	  protected FileSet offerUrlSelection()
-	  throws LoadException
-	  {
+	@Override
+	protected FileSet offerUrlSelection()
+	  throws LoadException {
+		  
 		  FileSet fileSet1;
 		  // get string from user...
 		  FileOptionsPanel boxPanel = new FileOptionsPanel();
+		  
 		  Box panel = new Box(BoxLayout.Y_AXIS);
 		  panel.add(boxPanel);
 		  panel.add(new JLabel("Enter a Url:"));
+		  
 		  String urlString = JOptionPane.showInputDialog(this, panel);
+		  
 		  if (urlString != null) {
 			  // must parse out name, parent + sep...
 			  int postfix = urlString.lastIndexOf("/") + 1;
@@ -271,6 +292,7 @@ public class LinkedViewFrame extends TreeViewFrame implements Observer
 		  
 		  fileSet1.setStyle(boxPanel.getSelectedStyleIndex());
 		  fileSet1.setParseQuotedStrings(boxPanel.isQuoteSelected());
+		  
 		  return fileSet1;
 	  }
 }

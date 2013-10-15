@@ -38,6 +38,7 @@ public class MessagePanel extends JScrollPane {
 
 		class MessageCanvas extends JPanel {
 			
+			@Override
 			public void paintComponent(Graphics g) {
 				
 				int xoff = 0;
@@ -60,6 +61,7 @@ public class MessagePanel extends JScrollPane {
 				}
 			}
 			
+			@Override
 			public Dimension getPreferredSize() {
 				FontMetrics metrics = getFontMetrics(getFont());
 				int ascent = metrics.getAscent();
