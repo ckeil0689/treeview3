@@ -100,18 +100,8 @@ public class ClickableImage extends JPanel {
 		this.setLayout(new MigLayout());
 		this.setOpaque(false);
 		
-		int fontSize = 0;
-		
-		if(tvModel_gen == null && clusterModel_gen == null) {
-			
-			fontSize = 30;
-		} else {
-			
-			fontSize = 55;
-		}
-		
 		label = new JLabel(labelText);
-		label.setFont(new Font("Sans Serif", Font.PLAIN, fontSize));
+		label.setFont(new Font("Sans Serif", Font.PLAIN, 60));
 		label.setForeground(BLUE1);
 		
 		classLoader = Thread.currentThread().getContextClassLoader();
@@ -122,8 +112,8 @@ public class ClickableImage extends JPanel {
 			labelImg = ImageIO.read(input);
 			icon = new JLabel(new ImageIcon(labelImg));
 			
-			this.add(label, "push, span, alignx 50%, wrap");
-			this.add(icon, "push, span, alignx 50%");
+			this.add(label, "pushx, span, alignx 50%, wrap");
+			this.add(icon, "pushx, span, alignx 50%");
 			
 		} catch (IOException e) {
 			

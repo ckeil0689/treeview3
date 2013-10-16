@@ -1,12 +1,10 @@
 package Cluster;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
@@ -35,22 +33,19 @@ public class HierarchicalCluster {
 	private FinalOptionsPanel finalPanel;
 	private JPanel mainPanel;
 	private JProgressBar pBar, pBar2, pBar3, pBar4;
-	private JLabel opLabel;
 	
 	//Colors
 	private final Color GREEN1 = new Color(0, 200, 0, 255);
 	
 	//Constructor (building the object)
 	public HierarchicalCluster(ClusterModel model, TreeViewFrame viewFrame, ClusterView cView, 
-			JProgressBar pBar, JProgressBar pBar2, JProgressBar pBar3, JProgressBar pBar4, 
-			JLabel opLabel, double[] currentArray){
+			JProgressBar pBar, JProgressBar pBar2, JProgressBar pBar3, JProgressBar pBar4, double[] currentArray){
 		
 		this.model = model;
 		this.pBar = pBar;
 		this.pBar2 = pBar2;
 		this.pBar3 = pBar3;
 		this.pBar4 = pBar4;
-		this.opLabel = opLabel;
 		this.currentArray = currentArray;
 		this.finalPanel = cView.getFinalPanel();
 		this.mainPanel = cView.getMainPanel();
@@ -82,19 +77,12 @@ public class HierarchicalCluster {
 		//if user checked clustering for elements
 		if(!choice.contentEquals("Do Not Cluster")){
 			
-			opLabel.setFont(new Font("Sans Serif", Font.BOLD, 16));
-			opLabel.setForeground(Color.LIGHT_GRAY);
-			opLabel.setText("Distance Matrix");
-			
 			mainPanel.revalidate();
 			mainPanel.repaint();
 			
 			formattedData.splitRows();
 			
 			sepRows = formattedData.getRowList();
-			
-			opLabel.setForeground(new Color(240, 80, 50, 255));
-			opLabel.setText("Calculating Distance Matrix...");
 			
 			DistanceMatrixCalculator dCalc = new DistanceMatrixCalculator(sepRows, choice, pBar);
 			
@@ -103,8 +91,6 @@ public class HierarchicalCluster {
 			rowDistances  = dCalc.getDistanceMatrix();
 			
 			pBar.setForeground(GREEN1);
-			
-			opLabel.setText("Clustering Data...");
 			
 			ClusterGenerator2 cGen = new ClusterGenerator2(model, rowDistances, pBar2, 
 					rowString, similarityM);
@@ -125,18 +111,11 @@ public class HierarchicalCluster {
 		//if user checked clustering for arrays
 		if(!choice2.contentEquals("Do Not Cluster")){
 			
-			opLabel.setFont(new Font("Sans Serif", Font.BOLD, 16));
-			opLabel.setForeground(Color.LIGHT_GRAY);
-			opLabel.setText("Distance Matrix");
-			
 			mainPanel.revalidate();
 			mainPanel.repaint();
 			
 			formattedData.splitColumns();
 			sepCols = formattedData.getColList();
-			
-			opLabel.setForeground(new Color(240, 80, 50, 255));
-			opLabel.setText("Calculating Distance Matrix...");
 			
 			DistanceMatrixCalculator dCalc2 = new DistanceMatrixCalculator(sepCols, choice2, pBar3);
 			
@@ -145,8 +124,6 @@ public class HierarchicalCluster {
 			colDistances  = dCalc2.getDistanceMatrix();
 			
 			pBar3.setForeground(GREEN1);
-			
-			opLabel.setText("Clustering Data...");
 			
 			ClusterGenerator2 cGen2 = new ClusterGenerator2(model, colDistances, pBar4, 
 					colString, similarityM);
@@ -166,8 +143,6 @@ public class HierarchicalCluster {
 		
 		//also takes list of row elements because only one list can easily be consistently transformed and 
 		//fed into file writer to make a tab-delimited file
-		opLabel.setText("Generating Data File...");
-		
 		mainPanel.revalidate();
 		mainPanel.repaint();
 		

@@ -29,6 +29,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Observable;
@@ -93,7 +94,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	private final Color BLUE1 = new Color(60, 180, 220, 255);
 	//private final Color RED1 = new Color(240, 80, 50, 255);
 	private final Color GRAY1 = new Color(150, 150, 150, 255);
-	private final Color GRAY2 = new Color(120, 120, 120, 255);
+	private final Color GRAY2 = new Color(100, 100, 100, 255);
 	
 	/**
 	 * Instance Variables
@@ -1315,14 +1316,14 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		jl2.setFont(new Font("Sans Serif", Font.BOLD, 50));
 		jl2.setForeground(Color.white);
 		
-		String picture = "upload.png";
-		ClickableImage load_Icon = new ClickableImage(this, "Load Your Data", picture);
+		String picture = "uploadGS.png";
+		ClickableImage load_Icon = new ClickableImage(this, "Load Data", picture);
 		
 		title_bg.add(jl, "push, alignx 50%, span, wrap");
 		title_bg.add(jl2, "push, alignx 50%, span");
 		
 		waiting.add(title_bg, "pushx, growx, alignx 50%, span, height 20%::, wrap");
-		waiting.add(load_Icon, "alignx 50%, span");
+		waiting.add(load_Icon, "push, alignx 50%, span");
 	}
 	
 	/**
@@ -1332,7 +1333,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	public void resetLayout(){
 		
 		JPanel confirmPanel, labelPanel;
-		JLabel confirm, ques;
+		JLabel confirm, ques, loadNew;
 		
 		waiting.removeAll();
 		
@@ -1344,31 +1345,41 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		labelPanel.setLayout(new MigLayout());
 		labelPanel.setOpaque(false);
 		
-		confirm = new JLabel("Successfully loaded " + tvModel_gen.getName());
-		confirm.setFont(new Font("Sans Serif", Font.BOLD, 30));
+		confirm = new JLabel("Loaded File: " + tvModel_gen.getName());
+		confirm.setFont(new Font("Sans Serif", Font.BOLD, 25));
 		confirm.setForeground(GRAY1);
 		
 		ques = new JLabel("What would you like to do?");
-		ques.setFont(new Font("Sans Serif", Font.PLAIN, 45));
+		ques.setFont(new Font("Sans Serif", Font.PLAIN, 50));
 		ques.setForeground(GRAY2);
 		
 		String picture = "cluster.png";
 		ClickableImage clus_icon = new ClickableImage(this, "Cluster", picture, clusterModel_gen);
 		
-		String picture2 = "viz.png";
+		String picture2 = "vizB.png";
 		ClickableImage viz_icon = new ClickableImage(this, "Visualize", picture2, tvModel_gen);
 		
-		String picture3 = "upload.png";
-		ClickableImage load_icon = new ClickableImage(this, "Load New File", picture3);
+		loadNew = new JLabel(" >Load New File");
+		loadNew.setFont(new Font("Sans Serif", Font.BOLD, 25));
+		loadNew.setForeground(BLUE1);
 		
-		confirmPanel.add(confirm, "push, alignx 50%, span, wrap");
-		confirmPanel.add(load_icon, "push, alignx 50%, span");
-		labelPanel.add(ques, "push, alignx 50%, span, wrap");
+		loadNew.addMouseListener(new SSMouseListener(loadNew){
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				
+				openFile();
+			}
+		});
 		
-		waiting.add(confirmPanel, "pushx, alignx 50%, height 15%:15%:, span, wrap");
-		waiting.add(labelPanel, "alignx 50%, height 30%::, span, wrap");
-		waiting.add(clus_icon, "pushx, alignx 50%");
-		waiting.add(viz_icon, "pushx, alignx 50%");
+		confirmPanel.add(confirm, "push, alignx 50%");
+		confirmPanel.add(loadNew, "pushx");
+		labelPanel.add(ques, "alignx 50%, push, grow, span");
+		
+		waiting.add(labelPanel, "push, alignx 50%, span, wrap");
+		waiting.add(clus_icon, "push, grow, alignx 50%");
+		waiting.add(viz_icon, "push, grow, alignx 50%, wrap");
+		waiting.add(confirmPanel, "pushx, alignx 50%, span");
 		
 		waiting.repaint();
 		waiting.revalidate();

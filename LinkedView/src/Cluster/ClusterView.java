@@ -37,7 +37,6 @@ import javax.swing.JComboBox;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -108,7 +107,6 @@ public class ClusterView extends JPanel implements MainPanel {
 	private final Color BLUE1 = new Color(60, 180, 220, 255);
 	private final Color BLUE2 = new Color(110, 210, 255, 150);
 	private final Color RED1 = new Color(240, 80, 50, 255);
-	private final Color BG_COLOR = new Color(230, 230, 230, 255);
 	
 	/**
 	 * Constructor for the DendroView object
@@ -163,7 +161,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		//set layout for initial window
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new MigLayout("ins 0"));
-		mainPanel.setBackground(BG_COLOR);
+		mainPanel.setBackground(Color.white);
 		
 		//Background Panel for the Cluster Options
 		optionsPanel = new JPanel();
@@ -187,8 +185,8 @@ public class ClusterView extends JPanel implements MainPanel {
 		scrollPane = new JScrollPane(mainPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
 		//Add components to mainPanel
-		mainPanel.add(head1, "push, alignx 50%, height 8%:8%:8%, wrap");
-		mainPanel.add(initialPanel, "grow, pushx, span, wrap");
+		mainPanel.add(head1, "pushx, alignx 50%, wrap");
+		mainPanel.add(initialPanel, "grow, push, span, wrap");
 		mainPanel.add(buttonPanel, "alignx 50%, height 15%::");
 		
 		//Add the scrollPane to ClusterView2 Panel
@@ -208,7 +206,7 @@ public class ClusterView extends JPanel implements MainPanel {
 			setOpaque(false);
 			
 			text = new JLabel(header);
-			text.setFont(new Font("Sans Serif", Font.PLAIN, 44));
+			text.setFont(new Font("Sans Serif", Font.BOLD, 44));
 			
 			text2 = new JLabel(header2);
 			text2.setFont(new Font("Sans Serif", Font.PLAIN, 44));
@@ -268,7 +266,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	    	nRows = infoGene.getNumHeaders();
 	   
 	    	label2 = new JLabel("Matrix Dimensions:");
-	    	label2.setFont(new Font("Sans Serif", Font.BOLD, 25));
+	    	label2.setFont(new Font("Sans Serif", Font.PLAIN, 28));
 	    	
 	    	//Matrix Information
 	    	numPanel = new JPanel();
@@ -276,19 +274,19 @@ public class ClusterView extends JPanel implements MainPanel {
 	    	numPanel.setOpaque(false);
 	    	
 	    	numColLabel = new JLabel(nCols + " columns");
-	    	numColLabel.setFont(new Font("Sans Serif", Font.BOLD, 20));
+	    	numColLabel.setFont(new Font("Sans Serif", Font.BOLD, 22));
 	    	numColLabel.setForeground(RED1);
 	    	
 	    	numRowLabel = new JLabel(nRows + " rows X ");
-	    	numRowLabel.setFont(new Font("Sans Serif", Font.BOLD, 20));
+	    	numRowLabel.setFont(new Font("Sans Serif", Font.BOLD, 22));
 	    	numRowLabel.setForeground(RED1);
 	    	
 	    	label3 = new JLabel("Data Points:");
-	    	label3.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+	    	label3.setFont(new Font("Sans Serif", Font.PLAIN, 20));
 	    	
 	    	sumMatrix = nCols * nRows;
 	    	sumM = new JLabel(Integer.toString(sumMatrix));
-	    	sumM.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+	    	sumM.setFont(new Font("Sans Serif", Font.PLAIN, 20));
 	    	sumM.setForeground(RED1);
 	    	 
 	    	//Data Preview
@@ -367,7 +365,7 @@ public class ClusterView extends JPanel implements MainPanel {
 			
 			//Header
 			similarity = new JLabel("Similarity Metric");
-	  		similarity.setFont(new Font("Sans Serif", Font.PLAIN, 26));
+	  		similarity.setFont(new Font("Sans Serif", Font.PLAIN, 28));
 	  		similarity.setBackground(Color.white);
 	  		
 	  		//Component for Row Distance Measure Selection
@@ -429,7 +427,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		//Instance variables
 		private JButton cluster_button, back_button, cancel_button, dendro_button;
 		private JComboBox<String> clusterChoice;
-		private JLabel status1, status2, method, error1, error2, opLabel;
+		private JLabel status1, status2, method, error1, error2;
 		private JProgressBar pBar, pBar2, pBar3, pBar4, pBar5;
 		private final JPanel loadPanel, choicePanel;
 		private final SwingWorker<Void, Void> worker;
@@ -454,7 +452,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		        		HierarchicalCluster clusterTarget = 
 		        				new HierarchicalCluster(outer, viewFrame, 
 		        						ClusterView.this, pBar, pBar2, pBar3, 
-		        						pBar4, opLabel, dataArray);
+		        						pBar4, dataArray);
 		        		
 		        		clusterTarget.hCluster(clusterMethod);
 		        		
@@ -471,7 +469,6 @@ public class ClusterView extends JPanel implements MainPanel {
 				@Override
 				protected void done(){
 					
-					loadPanel.remove(opLabel);
 					buttonPanel.remove(cancel_button);
 					
 					status1 = new JLabel("The file has been saved in the original directory.");
@@ -500,7 +497,7 @@ public class ClusterView extends JPanel implements MainPanel {
 			
 			//Label
 			method = new JLabel("Linkage Method");
-			method.setFont(new Font("Sans Serif", Font.PLAIN, 26));
+			method.setFont(new Font("Sans Serif", Font.PLAIN, 28));
 	    	
 			//Linkage choice drop-down menu
 			clusterChoice = new JComboBox<String>(clusterMethods);
@@ -533,8 +530,7 @@ public class ClusterView extends JPanel implements MainPanel {
 					mainPanel.add(buttonPanel, "alignx 50%, height 15%::");
 					
 					mainPanel.revalidate();
-					mainPanel.repaint();
-					
+					mainPanel.repaint();	
 				}
 	    	});
 			
@@ -579,34 +575,28 @@ public class ClusterView extends JPanel implements MainPanel {
 						buttonPanel.remove(cluster_button);
 						buttonPanel.remove(back_button);
 						
-						//precise ProgressBar
+						//ProgressBars
 						pBar = new JProgressBar();
 						pBar = setPBarLayout(pBar);
 						pBar.setString("Row Distance Matrix");
 						
-						//overall ProgressBar
 						pBar2 = new JProgressBar();
 						pBar2 = setPBarLayout(pBar2);
 						pBar2.setString("Row Clustering");
 						
-						//overall ProgressBar
 						pBar3 = new JProgressBar();
 						pBar3 = setPBarLayout(pBar3);
 						pBar3.setString("Column Distance Matrix");
 						
-						//overall ProgressBar
 						pBar4 = new JProgressBar();
 						pBar4 = setPBarLayout(pBar4);
 						pBar4.setString("Column Clustering");
 						
-						//overall ProgressBar
 						pBar5 = new JProgressBar();
 						pBar5 = setPBarLayout(pBar5);
 						pBar5.setString("Saving");
 						
-						//Status label
-						opLabel = new JLabel();
-						
+						//Button to cancel process
 						cancel_button = new JButton("Cancel");
 						cancel_button = setButtonLayout(cancel_button);
 						cancel_button.addActionListener(new ActionListener(){
@@ -624,10 +614,7 @@ public class ClusterView extends JPanel implements MainPanel {
 								mainPanel.revalidate();
 								mainPanel.repaint();	
 							}
-							
 						});
-						
-//						loadPanel.add(opLabel, "alignx 50%, wrap");
 
 						if(!choice.contentEquals("Do Not Cluster")&& !choice2.contentEquals("Do Not Cluster")){
 							
@@ -638,8 +625,8 @@ public class ClusterView extends JPanel implements MainPanel {
 						}
 						else if(!choice.contentEquals("Do Not Cluster")){
 							
-							loadPanel.add(pBar, "pushx, growx, span, wrap");
-							loadPanel.add(pBar2, "pushx, growx, span, wrap");
+							loadPanel.add(pBar, "push, grow, span, wrap");
+							loadPanel.add(pBar2, "push, grow, span, wrap");
 						}
 						else if(!choice2.contentEquals("Do Not Cluster")){
 							
@@ -649,7 +636,7 @@ public class ClusterView extends JPanel implements MainPanel {
 						
 //						loadPanel.add(pBar5, "pushx, growx, span, wrap");
 						
-						optionsPanel.add(loadPanel, "pushx, growx, span, wrap");
+						optionsPanel.add(loadPanel, "push, grow, span, wrap");
 						
 						buttonPanel.add(cancel_button, "pushx, alignx 50%");
 						buttonPanel.add(dendro_button, "pushx, alignx 50%");
@@ -702,60 +689,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		}
 		
 	}	
-	
-	/**
-	* Open a dialog for cluster program 
-	* which allows the user to select a new data file
-	*
-	* @return The fileset corresponding to the dataset.
-	*/
-	protected ClusterFileSet clusterSelection()
-	 throws LoadException
-	 {
-		 ClusterFileSet fileSet1; // will be chosen...
-		 
-		 JFileChooser fileDialog = new JFileChooser();
-		 setupClusterFileDialog(fileDialog);
-		 int retVal = fileDialog.showOpenDialog(this);
-		 if (retVal == JFileChooser.APPROVE_OPTION) {
-			 File chosen = fileDialog.getSelectedFile();
-			 
-			 fileSet1 = new ClusterFileSet(chosen.getName(), chosen.getParent()+
-					 File.separator);
-			 
-		 } else {
-			 throw new LoadException("File Dialog closed without selection...", 
-					 LoadException.NOFILE);
-		 }
-		 
-		 return fileSet1;
-	 }
-	
-	 protected void setupClusterFileDialog(JFileChooser fileDialog) {
-		//TxtFilter ff = new TxtFilter();
-		try {
-			//fileDialog.addChoosableFileFilter(ff);
-			// will fail on pre-1.3 swings
-			fileDialog.setAcceptAllFileFilterUsed(true);
-		} catch (Exception e) {
-			// hmm... I'll just assume that there's no accept all.
-			fileDialog.addChoosableFileFilter(new javax.swing.filechooser
-					.FileFilter() {
-				@Override
-				public boolean accept (File f) {
-					return true;
-				}
-				@Override
-				public String getDescription () {
-					return "All Files";
-				}
-			});
-		}
-		//fileDialog.setFileFilter(ff);
-		fileDialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
-	 }
 
-	
 	/**
 	 * Get the finalPanel for reference in clustering class
 	 */
@@ -872,6 +806,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		
 		pBar.setMinimum(0);
 		pBar.setStringPainted(true);
+		pBar.setMaximumSize(new Dimension(2000, 40));
 		pBar.setForeground(BLUE1);
 		pBar.setUI(new BasicProgressBarUI(){
 			@Override
