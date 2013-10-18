@@ -23,29 +23,28 @@
 package Cluster;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
+
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
+import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.EtchedBorder;
@@ -54,12 +53,14 @@ import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 /**
- * This class describes the GUI for the Cluster Application. It is separated into several panels which are
+ * This class describes the GUI for the Cluster Application. 
+ * It is separated into several panels which are
  * generated and painted when the user presses the related button.
- * There are also methods bound to buttons which invoke other classes to take over the calculation of
+ * There are also methods bound to buttons 
+ * which invoke other classes to take over the calculation of
  * clustering algorithms etc.
  * 
- * @author ChrisK
+ * @author CKeil
  *
  */
 public class ClusterFrame extends JFrame{
@@ -72,17 +73,30 @@ public class ClusterFrame extends JFrame{
 	
 	//Various GUI Panels
 	private JScrollPane scrollPane;
-	private JPanel mainPanel, backgroundPanel, closeButtonPane, optionsPanel;
-	private JLabel head1, head2, titleLine, description1, description2;
-	private FilterOptionsPanel filterOptions;
-	private RemovePercentPanel percentPanel;
-	private RemoveSDPanel sdPanel;
-	private RemoveAbsPanel absPanel;
-	private AdjustOptionsPanel aoPanel;
-	private MaxMinPanel maxMinPanel;
-	private GeneAdjustPanel geneAdjustPanel;
-	private ArrayAdjustPanel arrayAdjustPanel;
+	private JPanel mainPanel;
+	private JPanel backgroundPanel;
+	private JPanel optionsPanel;
+	private JPanel displayPanel;
+	private JLabel head1; 
+	private JLabel head2;
+	private JLabel head3;
+	private JLabel head4;
+	private JLabel titleLine;
+	private JLabel description;
 	private JButton close_button;
+	
+	private SingleInfoPanel singleInfo = new SingleInfoPanel();
+	private CompleteInfoPanel completeInfo = new CompleteInfoPanel();
+	private AverageInfoPanel averageInfo = new AverageInfoPanel();
+	private CentroidInfoPanel centroidInfo = new CentroidInfoPanel();
+	
+	private final Color BLUE1 = new Color(60, 180, 220, 255);
+	private final Color RED1 = new Color(240, 80, 50, 255);
+	
+	private final String singleClosed = "Single Linkage";
+	private final String completeClosed = "Complete Linkage";
+	private final String averageClosed = "Average Linkage";
+	private final String centroidClosed = "Centroid Linkage";
 	
 	//Constructor
 	protected ClusterFrame(TreeViewFrame f, String title, DataModel dataModel) { 
@@ -95,10 +109,20 @@ public class ClusterFrame extends JFrame{
 		this.clusterModel = dataModel;
 		
 		//setup frame options
-		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		setResizable(true);
+		this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		this.setResizable(true);
 		
-		//set layout for initial window
+		//Makes the frame invisible when the window is closed
+		this.addWindowListener(new WindowAdapter () {
+			
+			@Override
+			public void windowClosing(WindowEvent we) {
+			    
+				setVisible(false);
+			}
+		});
+		
+		//Set layout for initial window
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new MigLayout());
 		mainPanel.setBackground(Color.white);
@@ -107,49 +131,25 @@ public class ClusterFrame extends JFrame{
 		backgroundPanel.setLayout(new MigLayout());
 		backgroundPanel.setPreferredSize(viewFrame.getSize());
 		
-		titleLine = new JLabel("Advanced Options");
-		titleLine.setFont(new Font("Sans Serif", Font.BOLD, 28));
-		mainPanel.add(titleLine, "pushx, growx, wrap");
+		titleLine = new JLabel("Cluster Methods Information");
+		titleLine.setFont(new Font("Sans Serif", Font.BOLD, 30));
 		
-		description1 = new JLabel("This menu allows you to filter out unwanted elements from your dataset.");
-		description1.setFont(new Font("Sans Serif", Font.PLAIN, 22));
-		mainPanel.add(description1, "pushx, growx, wrap");
-		
-		description2 = new JLabel("Additionally, you can perform mathematical adjustments.");
-		description2.setFont(new Font("Sans Serif", Font.PLAIN, 22));
-		mainPanel.add(description2, "pushx, growx, wrap");
+		description = new JLabel("Choose a method to find out more about it.");
+		description.setFont(new Font("Sans Serif", Font.PLAIN, 22));
 		
 		optionsPanel = new JPanel();
 		optionsPanel.setLayout(new MigLayout());
 		optionsPanel.setOpaque(false);
-		optionsPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		
-		head1 = new JLabel("Filter Data >>");
-		head1.setFont(new Font("Sans Serif", Font.PLAIN, 28));
-		head1.setForeground(new Color(60, 180, 220, 255));
-		optionsPanel.add(head1, "pushx, growx, span, wrap");
-		head1.setVisible(true);
-		
-		filterOptions = new FilterOptionsPanel();
-		
-		head2 = new JLabel("Adjust Data >>");
-		head2.setFont(new Font("Sans Serif", Font.PLAIN, 28));
-		head2.setForeground(new Color(60, 180, 220, 255));
-		optionsPanel.add(head2, "pushx, growx, span");
-		head2.setVisible(true);
-		
-		mainPanel.add(optionsPanel, "grow, push");
-		
-		aoPanel = new AdjustOptionsPanel();
-		
-		closeButtonPane = new JPanel();
-		closeButtonPane.setLayout(new MigLayout());
-		closeButtonPane.setVisible(true);
-		
+		displayPanel = new JPanel();
+		displayPanel.setLayout(new MigLayout());
+		displayPanel.setOpaque(false);
+		displayPanel.setBorder(
+				BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		
 		close_button = new JButton("Close");
 		close_button.setOpaque(true);
-		close_button.setBackground(new Color(60, 180, 220, 255));
+		close_button.setBackground(RED1);
 		close_button.setForeground(Color.white);
 		Dimension d = close_button.getPreferredSize();
 		d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
@@ -164,931 +164,233 @@ public class ClusterFrame extends JFrame{
 			}
 			
 		});
-		closeButtonPane.setOpaque(false);
-		closeButtonPane.add(close_button);
 		
-		head1.addMouseListener(new MouseListener(){
-
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				
-				if(filterOptions.isShowing()){
-					
-					optionsPanel.removeAll();
-					optionsPanel.add(head1, "pushx, growx, wrap");
-					optionsPanel.add(head2, "pushx, growx, wrap");
-					head1.setText("Filter Data >>");
-					head2.setText("Adjust Data >>");
-					head1.setOpaque(false);
-					mainPanel.revalidate();
-					mainPanel.repaint();
-				}
-				else{
-					optionsPanel.removeAll();
-					head1.setText("Filter Data v");
-					//head1.setBackground(new Color(110, 210, 255, 255));
-					head1.setForeground(new Color(240, 80, 50, 255));
-					//head1.setOpaque(true);
-					optionsPanel.add(head1, "pushx, growx, wrap");
-					optionsPanel.add(filterOptions, "grow, push, wrap");
-					head2.setText("Adjust Data >>");
-					head2.setForeground(new Color(60, 180, 220, 255));
-					head2.setOpaque(false);
-					optionsPanel.add(head2, "pushx, growx, wrap");
-					mainPanel.revalidate();
-					mainPanel.repaint();
-				}
-
-
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent arg0) {
-				
-				if(filterOptions.isShowing()){
-					
-				}
-				else{
-					
-					head1.setForeground(Color.LIGHT_GRAY);
-
-				}
-				
-			}
-
-			@Override
-			public void mouseExited(MouseEvent arg0) {
-				
-				if(filterOptions.isShowing()){
-					
-				}
-				else{
-					
-					head1.setForeground(new Color(60, 180, 220, 255));
-				}
-			}
-
-			@Override
-			public void mousePressed(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-		});
+		head1 = setupHeadLabel(singleClosed);
+		head2 = setupHeadLabel(completeClosed);
+		head3 = setupHeadLabel(averageClosed);
+		head4 = setupHeadLabel(centroidClosed);
 		
-		head2.addMouseListener(new MouseListener(){
-
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				
-				if(aoPanel.isShowing()){
-					
-					optionsPanel.removeAll();
-					optionsPanel.add(head1, "alignx 50%, pushx, growx, wrap");
-					optionsPanel.add(head2, "alignx 50%, pushx, growx, wrap");
-					head1.setText("Filter Data >>");
-					head2.setText("Adjust Data >>");
-					head2.setOpaque(false);
-					mainPanel.revalidate();
-					mainPanel.repaint();
-				}
-				else{
-					optionsPanel.removeAll();
-					head1.setText("Filter Data >>");
-					head1.setForeground(new Color(60, 180, 220, 255));
-					head1.setOpaque(false);
-					optionsPanel.add(head1, "alignx 50%, pushx, growx, wrap");
-					head2.setText("Adjust Data v");
-					//head2.setBackground(new Color(110, 210, 255, 255));
-					head2.setForeground(new Color(240, 80, 50, 255));
-					//head2.setOpaque(false);
-					optionsPanel.add(head2, "alignx 50%, pushx, growx, wrap");
-					optionsPanel.add(aoPanel, "grow, push, wrap");
-					mainPanel.revalidate();
-					mainPanel.repaint();
-				}
-
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent arg0) {
-				
-				if(aoPanel.isShowing()){
-					
-				}
-				else{
-					
-					head2.setForeground(Color.LIGHT_GRAY);
-				}
-				
-				
-			}
-
-			@Override
-			public void mouseExited(MouseEvent arg0) {
-				
-				if(aoPanel.isShowing()){
-					
-				}
-				else{
-					
-					head2.setForeground(new Color(60, 180, 220, 255));
-				}
-			}
-
-			@Override
-			public void mousePressed(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-		});
+		addMListener(head1, singleInfo);
+		addMListener(head2, completeInfo);
+		addMListener(head3, averageInfo);
+		addMListener(head4, centroidInfo);
+	
+		optionsPanel.add(head1, "pushx, growx, span, wrap");
+		optionsPanel.add(head2, "pushx, growx, span, wrap");
+		optionsPanel.add(head3, "pushx, growx, span, wrap");
+		optionsPanel.add(head4, "pushx, growx, span");
+		
+		mainPanel.add(titleLine, "pushx, growx, span, wrap");
+		mainPanel.add(description, "pushx, growx, span, wrap");
+		mainPanel.add(optionsPanel, "pushx");
+		mainPanel.add(displayPanel, "grow, push");
 		
 		backgroundPanel.add(mainPanel, "growx, pushx, wrap");
-		backgroundPanel.add(closeButtonPane, "alignx 50%, pushx");
+		backgroundPanel.add(close_button, "alignx 50%, pushx");
 		
 		//make scrollable by adding it to scrollpane
-		scrollPane = new JScrollPane(backgroundPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane = new JScrollPane(backgroundPanel, 
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, 
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		
 		//Add the mainPanel to the ContentPane
 		getContentPane().add(scrollPane);
 		
-		//Makes the frame invisible when the window is closed
-		addWindowListener(new WindowAdapter () {
-			@Override
-			public void windowClosing(WindowEvent we) {
-			    setVisible(false);
-			}
-		    });
-		
 		//packs items so that the frame fits them
-		pack();
 		setLocationRelativeTo(null);
+		pack();
     }
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~New Panels~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
 	
-	//Check boxes throughout the GUI, declared outside their panels to increase scope for use in filter/ adjustment/cluster methods
-	private JCheckBox check1, check2, check3, check4, logCheck, centerGenes, normGenes, centerArrays, 
-	  			normArrays;
-
 	
-	 class FilterOptionsPanel extends JPanel {	
-	
+	//Information panels to be shown when labels are clicked
+	/**
+	 * This subclass makes up a JPanel which displays the information
+	 * relevant for the Single Linkage Clustering method.
+	 * @author CKeil
+	 *
+	 */
+	class SingleInfoPanel extends JPanel {	
+		
 		private static final long serialVersionUID = 1L;
 		
-		private JButton remove_button;
-		private JLabel instructions;
+		private JTextArea description;
+		private JLabel advantages;
+		private JTextArea advantages2;
+		private JLabel disadvantages;
+		private JTextArea disadvantages2;
+		private JLabel icon;
+		private BufferedImage labelImg;
+		private ClassLoader classLoader;
+		private InputStream input;
+		private String fileName = "Slink.png";
 		    
-		public FilterOptionsPanel() {
+		public SingleInfoPanel() {
 			
 			this.setLayout(new MigLayout());
-			this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-			setResizable(false);
-			setBackground(Color.WHITE);
-	    
-			//Instructions
-			instructions = new JLabel("Check all filter options you would like to apply. Then click 'Remove'.");
-			instructions.setFont(new Font("Sans Serif", Font.PLAIN, 22));
-	    	instructions.setOpaque(false);
-			//this.add(instructions, "wrap");
+			setOpaque(false);
 			
-			//Inner components of this panel, objects of other inner classes
-			//Component 1 
-			percentPanel = new RemovePercentPanel();
-			this.add(percentPanel, "push, grow, wrap");
+			description = setupContentField("All elements are initially " +
+					"their own cluster. At every step the elements with" +
+					" the shortest distance between them are combined to" +
+					" form a new cluster.");
+		
+			advantages = setupContentLabel("Advantages: ");
 			
-			//Component 2
-			sdPanel = new RemoveSDPanel();
-			this.add(sdPanel, "push, grow, wrap");
+			advantages2 = setupContentField("Add advantages....");
 			
-			//Component 3
-			absPanel = new RemoveAbsPanel();
-			this.add(absPanel, "push, grow, wrap");
+			disadvantages = setupContentLabel("Disadvantages: ");
 			
-			//Component 3
-			maxMinPanel = new MaxMinPanel();
-			this.add(maxMinPanel, "push, grow, wrap");
+			disadvantages2 = setupContentField("The 'chaining phenomenon' " +
+					"causes the resulting clusters to be extremely " +
+					"heterogeneous as they gradually grow. It may become " +
+					"difficult to define useful subdivisions of the data.");
 			
-	    	//panel with all the buttons
-	    	JPanel buttonPane = new JPanel();
-	    	buttonPane.setLayout(new MigLayout());
-	    	buttonPane.setBackground(Color.white);
-	    	
-	    	//remove button with action listener
-	    	remove_button = new JButton("Filter Data");
-	    	remove_button.setOpaque(true);
-	    	remove_button.setBackground(new Color(60, 180, 220, 255));
-	    	remove_button.setForeground(Color.white);
-			Dimension d = remove_button.getPreferredSize();
-			d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
-			remove_button.setFont(new Font("Sans Serif", Font.PLAIN, 18));
-	    	remove_button.addActionListener(new ActionListener(){
-
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					
-					//nextPanel(filterOptions, NOSKIP);
-				}	
-	    	});
-	    	buttonPane.add(remove_button);
-	    	
-	    	this.add(buttonPane, "span, alignx 50%");	
+			this.add(description, "pushx, growx, span, wrap");
+			this.add(advantages);
+			this.add(advantages2, "pushx, growx, wrap");
+			this.add(disadvantages);
+			this.add(disadvantages2, "pushx, growx, wrap");
+			
+			classLoader = Thread.currentThread().getContextClassLoader();
+			input = classLoader.getResourceAsStream(fileName);
+			
+			try {
+				
+				labelImg = ImageIO.read(input);
+				icon = new JLabel(new ImageIcon(labelImg));
+				
+				this.add(icon, "push, alignx 50%");
+				
+			} catch (IOException e) {
+				
+			}
 		  }
-	  }
+	}
 
-	  class RemovePercentPanel extends JPanel {	
+	/**
+	 * This subclass makes up a JPanel which displays the information
+	 * relevant for the Complete Linkage Clustering method.
+	 * @author CKeil
+	 *
+	 */
+	class CompleteInfoPanel extends JPanel {	
 
 		private static final long serialVersionUID = 1L;
 		
-			private JLabel label, description;
-			private JTextField percentField;
-			private int textFieldSize = 5;
-
-			  public RemovePercentPanel() {
-				this.setLayout(new MigLayout("", "[]push[]"));
-				setResizable(true);
-				
-		    	check1 = new JCheckBox("Incomplete Elements");
-		    	check1.setFont(new Font("Sans Serif", Font.BOLD, 18));
-		    	//check1.setForeground(new Color(60, 180, 220, 255));
-		    	check1.setOpaque(false);
-		    	this.add(check1, "alignx 0%, wrap");
-		    		    	
-		    	//valuefield
-		    	percentField = new JTextField(textFieldSize);
-		    	percentField.addFocusListener(new FocusListener(){
-
-					@Override
-					public void focusGained(FocusEvent arg0) {
-						check1.setSelected(true);
-						
-					}
-
-					@Override
-					public void focusLost(FocusEvent arg0) {
-						
-					}
-		    		
-		    	});
-		    			    	
-		    	JPanel valuePane = new JPanel();
-		    	valuePane.setLayout(new MigLayout());
-		    	valuePane.setOpaque(false);
-		    	
-		    	label = new JLabel();
-		    	label.setText("Enter Percentage: ");
-		    	label.setFont(new Font("Sans Serif", Font.PLAIN, 18));
-		    	
-		    	valuePane.add(label, "alignx 0%, pushx");
-		    	valuePane.add(percentField);
-
-		    	this.add(valuePane, "span, wrap");
-		    	
-		    	description = new JLabel("> ?");
-		    	description.setFont(new Font("Sans Serif", Font.BOLD, 14));
-		    	description.setForeground(new Color(60, 180, 220, 255));
-		    	description.addMouseListener(new MouseListener(){
-
-					@Override
-					public void mouseClicked(MouseEvent arg0) {
-						
-						if(description.getText().equalsIgnoreCase("> ?")){
-							
-							description.setText("< Remove all elements which exceed a percentage limit " +
-									"of missing values in their columns.");
-							description.setFont(new Font("Sans Serif", Font.ITALIC, 14));
-							description.setForeground(Color.black);
-						}
-						else{
-							
-							description.setText("> ?");
-							description.setFont(new Font("Sans Serif", Font.BOLD, 14));
-							description.setForeground(new Color(60, 180, 220, 255));
-						}
-						
-					}
-
-					@Override
-					public void mouseEntered(MouseEvent arg0) {
-						
-						if(description.getText().equalsIgnoreCase("> ?")){
-							
-							description.setForeground(new Color(240, 80, 50, 255));
-							
-						}
-						else{
-							
-							description.setForeground(Color.GRAY);
-						}
-					}
-
-					@Override
-					public void mouseExited(MouseEvent arg0) {
-						
-						if(description.getText().equalsIgnoreCase("> ?")){
-							
-							description.setForeground(new Color(60, 180, 220, 255));
-						}
-						else{
-							
-							description.setForeground(Color.BLACK);
-						}
-					}
-
-					@Override
-					public void mousePressed(MouseEvent arg0) {
-						// TODO Auto-generated method stub
-						
-					}
-
-					@Override
-					public void mouseReleased(MouseEvent arg0) {
-						// TODO Auto-generated method stub
-						
-					}
-		    		
-		    	});
-		    	this.add(description);
-			  }
-	  }
-  
-	  class RemoveSDPanel extends JPanel {	
-	
-			private static final long serialVersionUID = 1L;
+		public CompleteInfoPanel() {
 			
-			private JTextField sdField;
-			private JLabel enterLabel, description;
-			private int textFieldSize = 5;
-			    
-			public RemoveSDPanel() {
-					  
-				this.setLayout(new MigLayout("", "[]push[]"));
-				setSize(this.getSize());
-		    	
-		    	check2 = new JCheckBox("Minimum Standard Deviation");
-		    	check2.setFont(new Font("Sans Serif", Font.BOLD, 18));
-		    	//check2.setForeground(new Color(60, 180, 220, 255));
-		    	check2.setOpaque(false);
-		    	this.add(check2, "alignx 0%, wrap");
-		    	
-		    	JPanel valuePane = new JPanel();
-		    	valuePane.setLayout(new MigLayout());
-		    	valuePane.setOpaque(false);
-		    	
-		    	sdField = new JTextField(textFieldSize);
-		    	sdField.addFocusListener(new FocusListener(){
-
-					@Override
-					public void focusGained(FocusEvent arg0) {
-						check2.setSelected(true);
-						
-					}
-
-					@Override
-					public void focusLost(FocusEvent arg0) {
-						
-						
-					}
-		    		
-		    	});
-		    	
-		    	enterLabel = new JLabel();
-		    	enterLabel.setOpaque(false);
-		    	enterLabel.setText("Enter a Standard Deviation: ");
-		    	enterLabel.setFont(new Font("Sans Serif", Font.PLAIN, 18));
-		    	
-		    	valuePane.add(enterLabel, "alignx 0%, pushx");
-		    	valuePane.add(sdField);
-
-		    	this.add(valuePane, "span, wrap");
-		    	
-		    	description = new JLabel("> ?");
-		    	description.setFont(new Font("Sans Serif", Font.BOLD, 14));
-		    	description.setForeground(new Color(60, 180, 220, 255));
-		    	description.addMouseListener(new MouseListener(){
-
-					@Override
-					public void mouseClicked(MouseEvent arg0) {
-						
-						if(description.getText().equalsIgnoreCase("> ?")){
-							
-							description.setText("< Remove all elements with standard deviations " +
-									"of their values less than a set value.");
-							description.setFont(new Font("Sans Serif", Font.ITALIC, 14));
-							description.setForeground(Color.black);
-						}
-						else{
-							
-							description.setText("> ?");
-							description.setFont(new Font("Sans Serif", Font.BOLD, 14));
-							description.setForeground(new Color(60, 180, 220, 255));
-						}
-						
-					}
-
-					@Override
-					public void mouseEntered(MouseEvent arg0) {
-						
-						if(description.getText().equalsIgnoreCase("> ?")){
-							
-							description.setForeground(new Color(240, 80, 50, 255));
-							
-						}
-					}
-
-					@Override
-					public void mouseExited(MouseEvent arg0) {
-						
-						if(description.getText().equalsIgnoreCase("> ?")){
-							
-							description.setForeground(new Color(60, 180, 220, 255));
-						}
-					}
-
-					@Override
-					public void mousePressed(MouseEvent arg0) {
-						// TODO Auto-generated method stub
-						
-					}
-
-					@Override
-					public void mouseReleased(MouseEvent arg0) {
-						// TODO Auto-generated method stub
-						
-					}
-		    		
-		    	});
-		    	this.add(description);
-			}
-	  }
-  
-	  class RemoveAbsPanel extends JPanel {	
-		  
+			this.setLayout(new MigLayout());
+				
+		}
+	}
 	
-			private static final long serialVersionUID = 1L;
-			
-			private JLabel obsvLabel, absLabel, description;
-			private JTextField obsvField, absField;;
-			private int textFieldSize = 5;
-			    
-			public RemoveAbsPanel() {
-				
-				this.setLayout(new MigLayout("", "[]push[]"));
-			    	
-		    	check3 = new JCheckBox("Observations of Minimum Absolute Values");
-		    	check3.setFont(new Font("Sans Serif", Font.BOLD, 18));
-		    	//check3.setForeground(new Color(60, 180, 220, 255));
-		    	check3.setOpaque(false);
-		    	this.add(check3, "alignx 0%, wrap");
-		    	
-		    	obsvField = new JTextField(textFieldSize);
-		    	obsvField.addFocusListener(new FocusListener(){
+	/**
+	 * This subclass makes up a JPanel which displays the information
+	 * relevant for the average Linkage Clustering method.
+	 * @author CKeil
+	 *
+	 */
+	class AverageInfoPanel extends JPanel {	
 
-					@Override
-					public void focusGained(FocusEvent arg0) {
-						check3.setSelected(true);
-						
-					}
-
-					@Override
-					public void focusLost(FocusEvent arg0) {
-						
-						
-					}
-		    		
-		    	});
-		    	
-		    	absField = new JTextField(textFieldSize);
-		    	absField.addFocusListener(new FocusListener(){
-
-					@Override
-					public void focusGained(FocusEvent arg0) {
-						check3.setSelected(true);
-						
-					}
-
-					@Override
-					public void focusLost(FocusEvent arg0) {
-						
-						
-					}
-		    		
-		    	});
-		    	
-		    	JPanel valuePane = new JPanel();
-		    	valuePane.setLayout(new MigLayout());
-		    	valuePane.setOpaque(false);
-		    	
-		    	obsvLabel = new JLabel("Enter # of Observations: ");
-		    	obsvLabel.setFont(new Font("Sans Serif", Font.PLAIN, 18));
-		    	absLabel = new JLabel("Enter Specified Absolute Value: ");
-		    	absLabel.setFont(new Font("Sans Serif", Font.PLAIN, 18));
-
-		    	valuePane.add(obsvLabel, "alignx 0%");
-		    	valuePane.add(obsvField, "wrap");
-		    	valuePane.add(absLabel);
-		    	valuePane.add(absField);
-
-		    	this.add(valuePane, "span, wrap");
-		    	
-		    	description = new JLabel("> ?");
-		    	description.setFont(new Font("Sans Serif", Font.BOLD, 14));
-		    	description.setForeground(new Color(60, 180, 220, 255));
-		    	description.addMouseListener(new MouseListener(){
-
-					@Override
-					public void mouseClicked(MouseEvent arg0) {
-						
-						if(description.getText().equalsIgnoreCase("> ?")){
-							
-							description.setText("< Remove all elements below a minimum amount " +
-		    			"of observations of absolute values less than a specified value.");
-							description.setFont(new Font("Sans Serif", Font.ITALIC, 14));
-							description.setForeground(Color.black);
-						}
-						else{
-							
-							description.setText("> ?");
-							description.setFont(new Font("Sans Serif", Font.BOLD, 14));
-							description.setForeground(new Color(60, 180, 220, 255));
-						}
-						
-					}
-
-					@Override
-					public void mouseEntered(MouseEvent arg0) {
-						
-						if(description.getText().equalsIgnoreCase("> ?")){
-							
-							description.setForeground(new Color(240, 80, 50, 255));
-							
-						}
-					}
-
-					@Override
-					public void mouseExited(MouseEvent arg0) {
-						
-						if(description.getText().equalsIgnoreCase("> ?")){
-							
-							description.setForeground(new Color(60, 180, 220, 255));
-						}
-					}
-
-					@Override
-					public void mousePressed(MouseEvent arg0) {
-						// TODO Auto-generated method stub
-						
-					}
-
-					@Override
-					public void mouseReleased(MouseEvent arg0) {
-						// TODO Auto-generated method stub
-						
-					}
-		    		
-		    	});
-		    	this.add(description);
-			}
-	  }
-  
-	  class MaxMinPanel extends JPanel {	
-	
-			private static final long serialVersionUID = 1L;
-			
-			private JLabel diffLabel, description;
-			private JTextField diffField;;
-			private int textFieldSize = 5;
-			    
-			public MaxMinPanel() {
-				
-				this.setLayout(new MigLayout("", "[]push[]"));
-		    	
-		    	check4 = new JCheckBox("Difference of Maximum and Minimum Values");
-		    	check4.setFont(new Font("Sans Serif", Font.BOLD, 18));
-		    	//check4.setForeground(new Color(60, 180, 220, 255));
-		    	check4.setOpaque(false);
-		    	this.add(check4, "alignx 0%, wrap");
-		    	
-		    	diffField = new JTextField(textFieldSize);
-		    	diffField.addFocusListener(new FocusListener(){
-
-					@Override
-					public void focusGained(FocusEvent arg0) {
-						check4.setSelected(true);
-						
-					}
-
-					@Override
-					public void focusLost(FocusEvent arg0) {
-						
-						
-					}
-		    		
-		    	});
-		    	
-		    	JPanel valuePane = new JPanel();
-		    	valuePane.setOpaque(false);
-		    	valuePane.setLayout(new MigLayout());
-		    	
-		    	diffLabel = new JLabel("Enter Specified Difference: ");
-		    	diffLabel.setFont(new Font("Sans Serif", Font.PLAIN, 18));
-
-		    	valuePane.add(diffLabel, "alignx 0%" );
-		    	valuePane.add(diffField);
-
-		    	this.add(valuePane, "span, wrap");
-		    	
-		    	description = new JLabel("> ?");
-		    	description.setFont(new Font("Sans Serif", Font.BOLD, 14));
-		    	description.setForeground(new Color(60, 180, 220, 255));
-		    	description.addMouseListener(new MouseListener(){
-
-					@Override
-					public void mouseClicked(MouseEvent arg0) {
-						
-						if(description.getText().equalsIgnoreCase("> ?")){
-							
-							description.setText("< Remove all elements with a difference of their maximum " +
-									"and minimum values below a set value.");
-							description.setFont(new Font("Sans Serif", Font.ITALIC, 14));
-							description.setForeground(Color.black);
-						}
-						else{
-							
-							description.setText("> ?");
-							description.setFont(new Font("Sans Serif", Font.BOLD, 14));
-							description.setForeground(new Color(60, 180, 220, 255));
-						}
-						
-					}
-
-					@Override
-					public void mouseEntered(MouseEvent arg0) {
-						
-						if(description.getText().equalsIgnoreCase("> ?")){
-							
-							description.setForeground(new Color(240, 80, 50, 255));
-							
-						}
-					}
-
-					@Override
-					public void mouseExited(MouseEvent arg0) {
-						
-						if(description.getText().equalsIgnoreCase("> ?")){
-							
-							description.setForeground(new Color(60, 180, 220, 255));
-						}
-					}
-
-					@Override
-					public void mousePressed(MouseEvent arg0) {
-						// TODO Auto-generated method stub
-						
-					}
-
-					@Override
-					public void mouseReleased(MouseEvent arg0) {
-						// TODO Auto-generated method stub
-						
-					}
-		    		
-		    	});
-		    	this.add(description);
-		    	
-			}
-	  }
-  
-	  class AdjustOptionsPanel extends JPanel {	
-	
-			private static final long serialVersionUID = 1L;
-				
-			//Instance variables
-			private JButton adjust_button;
-			private JLabel instructions, title;
-			    
-			public AdjustOptionsPanel() {
-				
-				this.setLayout(new MigLayout());
-				this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-				setResizable(true);
-				setBackground(Color.WHITE);
-		    
-				//Instructions
-				instructions = new JLabel("Check all adjustment options you would like to apply. Then click 'Adjust'.");
-				instructions.setFont(new Font("Sans Serif", Font.PLAIN, 22));
-				instructions.setOpaque(false);
-				//this.add(instructions, "grow, push, wrap");
-				
-				//Splitting up the content of this panel into several other panels
-				//Component 1
-				JPanel logPanel = new JPanel();
-				logPanel.setLayout(new MigLayout("", "[]push[]"));
-				logPanel.setOpaque(false);
-				
-		  		title = new JLabel("All Data");
-		  		title.setFont(new Font("Sans Serif", Font.PLAIN, 28));
-		  		title.setForeground(new Color(60, 180, 220, 255));
-				logPanel.add(title, "pushx, growx, span, wrap");
-				title.setVisible(true);
-				
-		    	logCheck = new JCheckBox("Log Transform");
-		    	logCheck.setOpaque(false);
-		    	logCheck.setFont(new Font("Sans Serif", Font.BOLD, 18));
-		    	logPanel.add(logCheck, "grow, push");
-		    	
-		    	this.add(logPanel,"wrap");
-				
-				//Component 2
-				geneAdjustPanel = new GeneAdjustPanel();
-				this.add(geneAdjustPanel, "grow, push, split 2");
-				
-				//Component 3
-				arrayAdjustPanel = new ArrayAdjustPanel();
-				this.add(arrayAdjustPanel, "grow, push, wrap");
-				
-		    	//button panel containing all the buttons for confirmation and navigation
-		    	JPanel buttonPane = new JPanel();
-		    	buttonPane.setLayout(new MigLayout());
-		    	
-		    	//button to confirm adjustment operations with action listener
-		    	adjust_button = new JButton("Adjust Data");
-		    	adjust_button.setOpaque(true);
-		    	adjust_button.setBackground(new Color(60, 180, 220, 255));
-		    	adjust_button.setForeground(Color.white);
-				Dimension d = adjust_button.getPreferredSize();
-				d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
-				adjust_button.setFont(new Font("Sans Serif", Font.PLAIN, 18));
-		    	adjust_button.addActionListener(new ActionListener(){
-	
-					@Override
-					public void actionPerformed(ActionEvent arg0) {
-						
-						//nextPanel(aoPanel, NOSKIP);
-					}	
-		    	});
-		    	buttonPane.add(adjust_button);
-		    	
-		    	buttonPane.setOpaque(false);
-		    	this.add(buttonPane, "alignx 50%");
-		    	
-			}
-	  }
-  
-	  class GeneAdjustPanel extends JPanel {
-		  
-		  //Local variables for this class (might have to take Radiobuttons out!)
-		  private JRadioButton mean;
-		  private JRadioButton median;
-		  private ButtonGroup bg;
-		  private JLabel title;
-	      
-			private static final long serialVersionUID = 1L;
-			
-			//Constructor
-			public GeneAdjustPanel() {
-				
-		  		//set this panel's layout
-		  		this.setLayout(new MigLayout("", "[]push[]"));
-		  		this.setOpaque(false);
-		  		
-		  		title = new JLabel("Rows");
-		  		title.setFont(new Font("Sans Serif", Font.PLAIN, 28));
-		  		title.setForeground(new Color(60, 180, 220, 255));
-				this.add(title, "pushx, growx, span, wrap");
-				title.setVisible(true);
-		    	
-		  		//create checkbox
-		  		centerGenes = new JCheckBox("Center");
-		  		centerGenes.setFont(new Font("Sans Serif", Font.BOLD, 18));
-		  		centerGenes.setOpaque(false);
-		  		this.add(centerGenes, "wrap");
-		  		
-		  		//Create a new ButtonGroup
-		  		bg = new ButtonGroup();
-		  		
-		  		mean = new JRadioButton("Mean", true);
-		  		mean.setFont(new Font("Sans Serif", Font.BOLD, 18));
-		  		median = new JRadioButton("Median", false);
-		  		median.setFont(new Font("Sans Serif", Font.BOLD, 18));
-		  		mean.setOpaque(false);
-		  		mean.setEnabled(false);
-		  		median.setOpaque(false);
-		  		median.setEnabled(false);
-		  		
-		  		//add Radio Buttons to ButtonGroup
-		  		bg.add(mean);
-		  		bg.add(median);
-		  		
-		  		//Add Buttons to panel
-		  		this.add(mean, "wrap");
-		  		this.add(median, "wrap");
-		  		
-		  		centerGenes.addItemListener(new ItemListener() {
+		private static final long serialVersionUID = 1L;
 		
-						@Override
-						public void itemStateChanged(ItemEvent arg0)
-						{
-							if(mean.isEnabled() == false) {
-		  					
-								mean.setEnabled(true);
-								median.setEnabled(true);
-							}
-							else {	
-								mean.setEnabled(false);
-								median.setEnabled(false);
-							}
-						}
-		  		});
-		  			
-		  		normGenes = new JCheckBox ("Normalize");
-		  		normGenes.setFont(new Font("Sans Serif", Font.BOLD, 18));
-		  		normGenes.setOpaque(false);
-		  		this.add(normGenes);
-		  	}
-	  }
-  
-	  class ArrayAdjustPanel extends JPanel {
-		  
-		  //Local variables for this class
-	      private JRadioButton mean;
-	      private JRadioButton median;
-	      private ButtonGroup bg;
-	      private JLabel title;
-	      
-	      private static final long serialVersionUID = 1L;
+		public AverageInfoPanel() {
 			
-			//Constructor
-			public ArrayAdjustPanel() {
-				//set this panel's layout
-				this.setLayout(new MigLayout("", "[]push[]"));
-				this.setOpaque(false);
+			this.setLayout(new MigLayout());
 				
-		  		title = new JLabel("Columns");
-		  		title.setFont(new Font("Sans Serif", Font.PLAIN, 28));
-		  		title.setForeground(new Color(60, 180, 220, 255));
-				this.add(title, "pushx, growx, span, wrap");
-				title.setVisible(true);
-				
-				//create checkbox
-				centerArrays = new JCheckBox("Center");
-				centerArrays.setFont(new Font("Sans Serif", Font.BOLD, 18));
-				centerArrays.setOpaque(false);
-				this.add(centerArrays, "wrap");
-				
-				//Create a new ButtonGroup
-				bg = new ButtonGroup();
-				
-				mean = new JRadioButton("Mean", true);
-				mean.setFont(new Font("Sans Serif", Font.BOLD, 18));
-				median = new JRadioButton("Median", false);
-				median.setFont(new Font("Sans Serif", Font.BOLD, 18));
-				mean.setOpaque(false);
-				mean.setEnabled(false);
-				median.setOpaque(false);
-				median.setEnabled(false);
-				
-				//add Radio Buttons to ButtonGroup
-				bg.add(mean);
-				bg.add(median);
-				
-				//Add Buttons to panel
-				this.add(mean, "wrap");
-				this.add(median, "wrap");
-				
-				centerArrays.addItemListener(new ItemListener() {
+		}
+	}
+	
+	/**
+	 * This subclass makes up a JPanel which displays the information
+	 * relevant for the Centroid Linkage Clustering method.
+	 * @author CKeil
+	 *
+	 */
+	class CentroidInfoPanel extends JPanel {	
+
+		private static final long serialVersionUID = 1L;
+		
+		public CentroidInfoPanel() {
 			
-						@Override
-						public void itemStateChanged(ItemEvent arg0)
-						{
-							if(mean.isEnabled() == false) {
-							
-								mean.setEnabled(true);
-								median.setEnabled(true);
-							}
-							else {	
-								mean.setEnabled(false);
-								median.setEnabled(false);
-							}
-						}
-				});
+			this.setLayout(new MigLayout());
+				
+		}
+	}
+	
+	
+	//Methods
+	public JTextArea setupContentField(String content) {
+		
+		JTextArea field = new JTextArea(content);
+		field.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+		field.setLineWrap(true);
+		field.setBorder(null);
+		field.setOpaque(false);
+		
+		return field;
+	}
+	
+	public JLabel setupContentLabel(String content) {
+		
+		JLabel head = new JLabel(content);
+		head.setFont(new Font("Sans Serif", Font.BOLD, 18));
+		head.setOpaque(false);
+		
+		return head;
+	}
+	
+	public JLabel setupHeadLabel(String closedText){
+		
+		JLabel head = new JLabel(closedText);
+		head.setFont(new Font("Sans Serif", Font.PLAIN, 28));
+		head.setForeground(BLUE1);
+		
+		return head;
+	}   
+	
+	public void addMListener(final JLabel title, final JPanel infoPanel) {
+		
+		title.addMouseListener(new MouseListener(){
+
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				
+				if(infoPanel.isShowing()){
+					displayPanel.removeAll();
 					
-				normArrays = new JCheckBox ("Normalize");
-				normArrays.setFont(new Font("Sans Serif", Font.BOLD, 18));
-				normArrays.setOpaque(false);
-				this.add(normArrays);
+				} else{
+					title.setForeground(RED1);
+					displayPanel.add(infoPanel, "push, grow, span");
+					
+					mainPanel.revalidate();
+					mainPanel.repaint();
+				}
 			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				
+					title.setForeground(RED1);
+					title.setCursor(new Cursor(Cursor.HAND_CURSOR));
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+
+					title.setForeground(BLUE1);
+					title.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				
+				title.setForeground(Color.LIGHT_GRAY);
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {}
+			
+		});
 	}
 }

@@ -58,6 +58,7 @@ public class LinkedViewFrame extends TreeViewFrame implements Observer {
 	
 	@Override
 	public String getAppName() {
+		
 		return appName;
 	}
 

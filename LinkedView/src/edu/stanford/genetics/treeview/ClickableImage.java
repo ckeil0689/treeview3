@@ -53,7 +53,8 @@ public class ClickableImage extends JPanel {
 	 * @param labelText
 	 * @param fileName
 	 */
-	public ClickableImage(TreeViewFrame frame, String labelText, String fileName) {
+	public ClickableImage(TreeViewFrame frame, String labelText, 
+			String fileName) {
 		
 		this(frame, labelText, fileName, tvModel, clusterModel);
 	}
@@ -65,8 +66,8 @@ public class ClickableImage extends JPanel {
 	 * @param fileName
 	 * @param tvModel_gen
 	 */
-	public ClickableImage(TreeViewFrame frame, String labelText, String fileName, 
-			TVModel tvModel_gen) {
+	public ClickableImage(TreeViewFrame frame, String labelText, 
+			String fileName, TVModel tvModel_gen) {
 		
 		this(frame, labelText, fileName, tvModel_gen, clusterModel);
 	}
@@ -78,8 +79,8 @@ public class ClickableImage extends JPanel {
 	 * @param fileName
 	 * @param clusterModel_gen
 	 */
-	public ClickableImage(TreeViewFrame frame, String labelText, String fileName, 
-			ClusterModel clusterModel_gen) {
+	public ClickableImage(TreeViewFrame frame, String labelText, 
+			String fileName, ClusterModel clusterModel_gen) {
 		
 		this(frame, labelText, fileName, tvModel, clusterModel_gen);
 	}
@@ -92,8 +93,9 @@ public class ClickableImage extends JPanel {
 	 * @param tvModel_gen
 	 * @param clusterModel_gen
 	 */
-	public ClickableImage(TreeViewFrame frame, String labelText, String fileName, 
-			TVModel tvModel_gen, ClusterModel clusterModel_gen) {
+	public ClickableImage(TreeViewFrame frame, String labelText, 
+			String fileName, TVModel tvModel_gen, 
+			ClusterModel clusterModel_gen) {
 		
 		this.frame = frame;
 		
@@ -101,7 +103,7 @@ public class ClickableImage extends JPanel {
 		this.setOpaque(false);
 		
 		label = new JLabel(labelText);
-		label.setFont(new Font("Sans Serif", Font.PLAIN, 60));
+		label.setFont(new Font("Sans Serif", Font.PLAIN, 50));
 		label.setForeground(BLUE1);
 		
 		classLoader = Thread.currentThread().getContextClassLoader();
@@ -117,10 +119,9 @@ public class ClickableImage extends JPanel {
 			
 		} catch (IOException e) {
 			
-			e.printStackTrace();
 		}
 		
-		addMListener(label, clusterModel_gen, tvModel_gen);
+		this.addMListener(label, clusterModel_gen, tvModel_gen);
 	}
 	
 	/**

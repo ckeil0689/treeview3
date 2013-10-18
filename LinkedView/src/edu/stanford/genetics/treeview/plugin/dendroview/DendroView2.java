@@ -108,9 +108,7 @@ MainPanel, Observer {
 	 */
 	private int [] arrayIndex  = null;
 	private int [] geneIndex   = null;
-	
 	private DataModel dataModel = null;
-	
 	private TreeSelectionI geneSelection = null;
 	private TreeSelectionI arraySelection = null;
 	
@@ -119,6 +117,17 @@ MainPanel, Observer {
 	
 	private ColorExtractor colorExtractor;
 	
+	/**
+	 * Chained constructor
+	 * Calls setName of the JPanel class
+	 * @param cols
+	 * @param rows
+	 * @param name
+	 */
+	protected DendroView2(int cols, int rows, String name) {
+		
+		super.setName(name);
+	}
 	/**
 	 * Chained constructor for the DendroView object
 	 * note this will reuse any existing MainView subnode of the documentconfig.
@@ -154,49 +163,41 @@ MainPanel, Observer {
 		this.setLayout(new MigLayout());
 		
 		if (root == null) {
-			
 			if (dataModel.getDocumentConfigRoot() != null ) {
-				  
 				bindConfig(dataModel.getDocumentConfigRoot().fetchOrCreate(
 						"MainView"));
-			} 
-			else {
-				  
+				
+			} else { 
 				bindConfig(new DummyConfigNode("MainView"));
+				
 			}
-		} 
-		else {
-			
+		} else {
 			bindConfig(root);
 		}
 		
 		if (dataModel.getArrayHeaderInfo().getIndex("GROUP") != -1) {
-			
 			HeaderInfo headerInfo = dataModel.getArrayHeaderInfo();
 			int groupIndex = headerInfo.getIndex("GROUP");
-			arrayIndex = getGroupVector(headerInfo, groupIndex);
-		} 
-		else {
 			
+			arrayIndex = getGroupVector(headerInfo, groupIndex);
+			
+		} else {
 			arrayIndex = null;
 		}
 		
 		if (dataModel.getGeneHeaderInfo().getIndex("GROUP") != -1) {
-			
 			System.err.println("got gene group header");
 			HeaderInfo headerInfo = dataModel.getGeneHeaderInfo();
 			int groupIndex = headerInfo.getIndex("GROUP");
 			geneIndex = getGroupVector(headerInfo, groupIndex);
-		} 
-		else {
 			
+		} else {
 			geneIndex = null;
 		}
 		
 		if ((arrayIndex != null) ||(geneIndex != null)){
-			
-			dataModel = new ReorderedDataModel(dataModel, geneIndex, 
-					arrayIndex);
+			dataModel = new ReorderedDataModel(
+					dataModel, geneIndex, arrayIndex);
 		}
 		
 		setDataModel(dataModel);
@@ -206,25 +207,21 @@ MainPanel, Observer {
 		if (geneIndex != null) {
 			setGeneSelection(new ReorderedTreeSelection(
 					viewFrame.getGeneSelection(), geneIndex));
-		} 
-		else {
 			
+		} else {
 			setGeneSelection(viewFrame.getGeneSelection());
 		}
 
 		if (arrayIndex != null){
-			
 			setArraySelection(new ReorderedTreeSelection(
 					viewFrame.getArraySelection(), arrayIndex));
-		} 
-		else {
 			
+		} else {
 			setArraySelection(viewFrame.getArraySelection());
 		}
 	}
 	
 	//Methods
-	
 	private int [] getGroupVector(HeaderInfo headerInfo, int groupIndex) {
 		
 		int ngroup = 0;
@@ -255,70 +252,6 @@ MainPanel, Observer {
 		}
 		
 		return groupVector;
-	}
-
-	protected DendroView2(int cols, int rows, String name) {
-		super.setName(name);
-	}
-	
-	/**
-	* always returns an instance of the node, even if it has to create it.
-	*/
-	protected ConfigNode getFirst(String name) {
-		
-		return getConfigNode().fetchOrCreate(name);
-	}
-
-	public TreeSelectionI getGeneSelection() {
-		
-		return geneSelection;
-	}
-	public TreeSelectionI getArraySelection() {
-		
-		return arraySelection;
-	}
-	
-	/**
-	 * This should be called after setDataModel has been set to the 
-	 * appropriate model
-	 * @param arraySelection
-	 */
-	protected void setArraySelection(TreeSelectionI arraySelection) {
-		
-		if (this.arraySelection != null) {
-			
-			this.arraySelection.deleteObserver(this);	
-		}
-		
-		this.arraySelection = arraySelection;
-		arraySelection.addObserver(this);
-		
-		globalview.setArraySelection(arraySelection);
-		zoomview.setArraySelection(arraySelection);
-		atrview.setArraySelection(arraySelection);
-		atrzview.setArraySelection(arraySelection);
-		arraynameview.setArraySelection(arraySelection);
-	}
-
-	/**
-	 * This should be called after setDataModel has been set 
-	 * to the appropriate model
-	 * @param geneSelection
-	 */
-	protected void setGeneSelection(TreeSelectionI geneSelection) {
-		
-		if (this.geneSelection != null) {
-			
-			this.geneSelection.deleteObserver(this);	
-		}
-		
-		this.geneSelection = geneSelection;
-		geneSelection.addObserver(this);
-		
-		globalview.setGeneSelection(geneSelection);
-		zoomview.setGeneSelection(geneSelection);
-		gtrview.setGeneSelection(geneSelection);
-		textview.setGeneSelection(geneSelection);	
 	}
 	
 	/**
@@ -574,8 +507,11 @@ MainPanel, Observer {
 	}
 
 	/**
-	 * Updates the ATRDrawer to reflect changes in the DataMode array order; rebuilds the TreeDrawerNode tree.
-	 * @param selectedID ID of the node selected before a change in tree structure was made. This node is then found and reselected after the ATR tree is rebuilt.
+	 * Updates the ATRDrawer to reflect changes in the DataMode array order; 
+	 * rebuilds the TreeDrawerNode tree.
+	 * @param selectedID ID of the node selected before a change 
+	 * in tree structure was made. This node is then found and 
+	 * reselected after the ATR tree is rebuilt.
 	 */
 	private void updateATRDrawer(String selectedID) {
 		
@@ -619,7 +555,8 @@ MainPanel, Observer {
 			}
 		}
 		
-		TreeDrawerNode arrayNode = invertedTreeDrawer.getRootNode().findNode(selectedID);
+		TreeDrawerNode arrayNode =
+				invertedTreeDrawer.getRootNode().findNode(selectedID);
 		
 		arraySelection.setSelectedNode(arrayNode.getId());
 		atrzview.setSelectedNode(arrayNode);
@@ -640,12 +577,9 @@ MainPanel, Observer {
 		AtrTVModel atrTVModel = new AtrTVModel();
 		 
 		 try {
-			 
 			 atrTVModel.loadNew(fileSet);
-		 } 
-		 catch (LoadException e) {
-			
-			 e.printStackTrace();
+			 
+		 } catch (LoadException e) {
 			 JOptionPane.showMessageDialog(this, e);
 			 throw e;
 		 }
@@ -658,12 +592,9 @@ MainPanel, Observer {
 		TVModel tvModel = new TVModel();
 		 
 		 try {
-			 
 			 tvModel.loadNew(fileSet);
-		 } 
-		 catch (LoadException e) {
 			 
-			 e.printStackTrace();
+		 } catch (LoadException e) {
 			 JOptionPane.showMessageDialog(this, e);
 			 throw e;
 		 }
@@ -692,13 +623,11 @@ MainPanel, Observer {
 		int retVal = fileDialog.showOpenDialog(this);
 		
 		if(retVal == JFileChooser.APPROVE_OPTION) {
-			
 			File chosen = fileDialog.getSelectedFile();
 			fileSet1 = new FileSet(chosen.getName(), 
 					chosen.getParent() + File.separator);
-		}
-		else {
 			
+		} else {
 			throw new LoadException("File Dialog closed without selection...", 
 					LoadException.NOFILE);
 		}
@@ -714,13 +643,11 @@ MainPanel, Observer {
 		
 		CdtFilter ff = new CdtFilter();
 		try {
-			
 			fileDialog.addChoosableFileFilter(ff);
 			// will fail on pre-1.3 swings
 			fileDialog.setAcceptAllFileFilterUsed(true);
-		} 
-		catch (Exception e) {
 			
+		} catch (Exception e) {
 			// hmm... I'll just assume that there's no accept all.
 			fileDialog.addChoosableFileFilter(
 					new javax.swing.filechooser.FileFilter() {
@@ -743,50 +670,6 @@ MainPanel, Observer {
 		fileDialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
 	}
 
-	//Accessors
-	/**
-	 *  Gets the globalXmap attribute of the DendroView object
-	 *
-	 * @return    The globalXmap
-	 */
-	public MapContainer getGlobalXmap() {
-		
-		return globalXmap;
-	}
-
-
-	/**
-	 *  Gets the globalYmap attribute of the DendroView object
-	 *
-	 * @return    The globalYmap
-	 */
-	public MapContainer getGlobalYmap() {
-		
-		return globalYmap;
-	}
-
-
-	/**
-	 *  Gets the zoomXmap attribute of the DendroView object
-	 *
-	 * @return    The zoomXmap
-	 */
-	public MapContainer getZoomXmap() {
-		
-		return zoomXmap;
-	}
-
-
-	/**
-	 *  Gets the zoomYmap attribute of the DendroView object
-	 *
-	 * @return    The zoomYmap
-	 */
-	public MapContainer getZoomYmap() {
-		
-		return zoomYmap;
-	}
-
 	@Override
 	public void scrollToGene(int i) {
 		
@@ -805,15 +688,13 @@ MainPanel, Observer {
 	public void update(Observable o, Object arg) {
 		
     	if (o == geneSelection) {
-			
     		gtrview.scrollToNode(geneSelection.getSelectedNode());
 		}
 	}
     
 	/**
-	 *  This method should be called only during initial setup of the modelview
-	 *
-	 *  It sets up the views and binds them all to config nodes.
+	 *  This method should be called only during initial setup of the ModelView.
+	 *  It sets up the views and binds them all to Config nodes.
 	 *
 	 */
 	protected void setupViews() {
@@ -958,9 +839,7 @@ MainPanel, Observer {
 		DataModel tvmodel =  getDataModel();
 
 		if ((tvmodel != null) && tvmodel.aidFound()) {
-			
 			try {
-			
 				atrview.setEnabled(true);
 				atrzview.setEnabled(true);
 				
@@ -973,12 +852,9 @@ MainPanel, Observer {
 							invertedTreeDrawer.getRootNode(),
 					trHeaderInfo,
 					trHeaderInfo.getIndex("NODECOLOR"));
-					
 				}	
 				
-			} 
-			catch (DendroException e) {
-				
+			} catch (DendroException e) {
 				//LogPanel.println("Had problem setting up the array tree : " 
 				//+ e.getMessage());
 				//e.printStackTrace();
@@ -996,24 +872,20 @@ MainPanel, Observer {
 				atrzview.setEnabled(false);
 				
 				try{
-					
 					invertedTreeDrawer.setData(null, null);
-				} 
-				catch (DendroException ex) {
+					
+				} catch (DendroException ex) {
 					
 				}
 			}
-		} 
-		else {
-			
+		} else {
 			atrview.setEnabled(false);
 			atrzview.setEnabled(false);
 		
 			try{
-				
 				invertedTreeDrawer.setData(null, null);
-			} 
-			catch (DendroException ex) {
+				
+			} catch (DendroException ex) {
 				
 			}
 		}
@@ -1021,22 +893,17 @@ MainPanel, Observer {
 		invertedTreeDrawer.notifyObservers();
 
 		if ((tvmodel != null) && tvmodel.gidFound()) {
-			
 			try {
-				
 				leftTreeDrawer.setData(tvmodel.getGtrHeaderInfo(), 
 						tvmodel.getGeneHeaderInfo());
 				HeaderInfo gtrHeaderInfo = tvmodel.getGtrHeaderInfo();
 				
 				if (gtrHeaderInfo.getIndex("NODECOLOR") >= 0) {
-					
 					TreeColorer.colorUsingHeader (leftTreeDrawer.getRootNode(),
 					tvmodel.getGtrHeaderInfo(),
 					gtrHeaderInfo.getIndex("NODECOLOR"));
 					
-				} 
-				else {
-					
+				} else {
 					TreeColorer.colorUsingLeaf(leftTreeDrawer.getRootNode(),
 							tvmodel.getGeneHeaderInfo(),
 							tvmodel.getGeneHeaderInfo().getIndex("FGCOLOR")
@@ -1044,9 +911,8 @@ MainPanel, Observer {
 				}
 				
 				gtrview.setEnabled(true);
-			} 
-			catch (DendroException e) {
 				
+			} catch (DendroException e) {
 //				LogPanel.println("Had problem setting up the gene tree : 
 //				" + e.getMessage());
 //				e.printStackTrace();
@@ -1063,20 +929,18 @@ MainPanel, Observer {
 				gtrview.setEnabled(false);
 				
 				try{
-					
 					leftTreeDrawer.setData(null, null);
+					
 				} catch (DendroException ex) {
 					
 				}
 			}
-		} 
-		else {
-			
+		} else {
 			gtrview.setEnabled(false);
 			
 			try{
-				
 				leftTreeDrawer.setData(null, null);
+				
 			} catch (DendroException ex) {
 				
 			}
@@ -1161,12 +1025,10 @@ MainPanel, Observer {
 			public void actionPerformed(ActionEvent arg0) {
 				
 				try {
-					
 					saveImage(zoomview);
 					
 				} catch (IOException e) {
 					
-					e.printStackTrace();
 				}	
 			}
 		});
@@ -1269,12 +1131,10 @@ MainPanel, Observer {
 				
 				if ((getArraySelection().getNSelectedIndexes() != 0) || 
 						(getGeneSelection().getNSelectedIndexes() != 0)) {
-					
 					 initXmap = getZoomXmap();
 					 initYmap = getZoomYmap();
-				} 
-				else {
-					
+					 
+				} else {
 					initXmap = getGlobalXmap();
 					initYmap = getGlobalYmap();
 				}
@@ -1299,12 +1159,10 @@ MainPanel, Observer {
 				MapContainer initXmap, initYmap;
 				if ((getArraySelection().getNSelectedIndexes() != 0) || 
 						(getGeneSelection().getNSelectedIndexes() != 0)) {
-					
 					initXmap = getZoomXmap();
 					initYmap = getZoomYmap();
-				} 
-				else {
-					  
+					
+				} else {
 					initXmap = getGlobalXmap();
 					initYmap = getGlobalYmap();
 				}
@@ -1477,6 +1335,7 @@ MainPanel, Observer {
 		getViewFrame().showSubDataModel(indexes, null, null);
 	}
 
+	//Populate Menus
 	/**
 	 *  adds DendroView stuff to Analysis menu
 	 *
@@ -1614,10 +1473,9 @@ MainPanel, Observer {
 				ColorExtractor ce = null;
 			
 				try {
-				
 					ce = ((DoubleArrayDrawer) arrayDrawer).getColorExtractor();
-				} 
-				catch (Exception e) {
+					
+				} catch (Exception e) {
 
 				}
 	
@@ -1846,12 +1704,11 @@ MainPanel, Observer {
 		int returnVal = fc.showSaveDialog(this);
 		
 		if(returnVal == JFileChooser.APPROVE_OPTION){
-			
 			saveFile = fc.getSelectedFile();
 			
 			String fileName = saveFile.toString();
+			
 			if(!fileName.endsWith(".png")){
-				
 				fileName += ".png";
 				saveFile = new File(fileName);
 			}
@@ -1864,72 +1721,6 @@ MainPanel, Observer {
 		}	
 	}
 	
-	/** Setter for viewFrame */
-	public void setViewFrame(ViewFrame viewFrame) {
-		
-		this.viewFrame = viewFrame;
-	}
-	
-	/** Getter for viewFrame */
-	public ViewFrame getViewFrame() {
-		
-		return viewFrame;
-	}
-	
-	/** Setter for dataModel 
-	 * 
-	 * */
-	protected void setDataModel(DataModel dataModel) {
-		
-		this.dataModel = dataModel;
-	}
-	
-	/** 
-	 * 	* gets the model this dendroview is based on
-	 */
-	protected DataModel getDataModel() {
-		
-		return this.dataModel;
-	}
-
-	/** Setter for root  - may not work properly
-	public void setConfigNode(ConfigNode root) {
-		this.root = root;
-	}
-	/** Getter for root */
-	@Override
-	public ConfigNode getConfigNode() {
-		
-		return root;
-	}
-	
-	/**
-	 * icon for display in tabbed panel
-	 */
-	@Override
-	public ImageIcon getIcon() {
-		if (treeviewIcon == null)
-			try {
-				treeviewIcon = new ImageIcon("images/treeview.gif", 
-						"TreeView Icon");
-			} catch (java.security.AccessControlException e) {
-				// need form relative URL somehow...
-			}
-		return treeviewIcon;
-	}
-	public ArrayNameView getArraynameview() {
-		return arraynameview;
-	}
-	public ATRView getAtrview() {
-		return atrview;
-	}
-	public GTRView getGtrview() {
-		return gtrview;
-	}
-	public TextViewManager getTextview() {
-		return textview;
-	}
-
 	/**
 	 * @param initXmap
 	 * @param initYmap
@@ -1983,7 +1774,6 @@ MainPanel, Observer {
 		DendroviewArgs args = new DendroviewArgs(mainArgs.remainingArgs());
 		
 		if (args.getFilePath() == null) {
-			
 			System.err.println("Error, must specify an output file\n");
 			args.printUsage();
 			
@@ -1993,16 +1783,13 @@ MainPanel, Observer {
 		final ExportPanel exporter;
 		
 		if ("ps".equalsIgnoreCase(args.getExportType())) {
-			
 			exporter = setupPostscriptExport(getGlobalXmap(), getGlobalYmap());
-		} 
-		else if ("png".equalsIgnoreCase(args.getExportType()) || 
+			
+		} else if ("png".equalsIgnoreCase(args.getExportType()) || 
 				"gif".equalsIgnoreCase(args.getExportType())) {
-			
 			exporter = setupBitmapExport(getGlobalXmap(), getGlobalYmap());
-		} 
-		else {
 			
+		} else {
 			System.err.println("Error, unrecognized output format " 
 			+ args.getExportType()+  " \n");
 			
@@ -2011,18 +1798,15 @@ MainPanel, Observer {
 		}
 		
 		if (exporter != null) {
-			
 			exporter.setFilePath(args.getFilePath());
 			exporter.setIncludedArrayHeaders(args.getArrayHeaders());
 			exporter.setIncludedGeneHeaders(args.getGeneHeaders());
 			
 			if (args.getXScale() != null) {
-				
 				exporter.setXscale(args.getXScale());
 			}
 			
 			if (args.getYScale() != null) {
-				
 				exporter.setYscale(args.getYScale());
 			}
 			
@@ -2031,17 +1815,14 @@ MainPanel, Observer {
 			}
 			
 			if (args.getGtrWidth() != null) {
-				
 				exporter.setExplicitGtrWidth(args.getGtrWidth());
 			}
 			
 			if (args.getAtrHeight() != null){
-				
 				exporter.setExplicitAtrHeight(args.getAtrHeight());
 			}
 			
 			if (args.getLogcenter() != null) {
-				
 				colorExtractor.setLogCenter(args.getLogcenter());
 				colorExtractor.setLogBase(2.0);
 				colorExtractor.setLogTransform(true);
@@ -2051,4 +1832,187 @@ MainPanel, Observer {
 			exporter.save();
 		}
 	}
+	
+	
+	//Getters
+	/**
+	 * Always returns an instance of the node, even if it has to create it.
+	 */
+	protected ConfigNode getFirst(String name) {
+		
+		return getConfigNode().fetchOrCreate(name);
+	}
+
+	public TreeSelectionI getGeneSelection() {
+		
+		return geneSelection;
+	}
+	
+	public TreeSelectionI getArraySelection() {
+		
+		return arraySelection;
+	}
+	
+	/** 
+	 * Getter for root 
+	 */
+	@Override
+	public ConfigNode getConfigNode() {
+		
+		return root;
+	}
+	
+	/**
+	 * Icon for display in tabbed panel
+	 */
+	@Override
+	public ImageIcon getIcon() {
+		
+		if (treeviewIcon == null)
+			try {
+				treeviewIcon = new ImageIcon("images/treeview.gif", 
+						"TreeView Icon");
+				
+			} catch (java.security.AccessControlException e) {
+				// need form relative URL somehow...
+			}
+		
+		return treeviewIcon;
+	}
+	
+	public ArrayNameView getArraynameview() {
+		return arraynameview;
+	}
+	
+	public ATRView getAtrview() {
+		
+		return atrview;
+	}
+	public GTRView getGtrview() {
+		
+		return gtrview;
+	}
+	
+	public TextViewManager getTextview() {
+		
+		return textview;
+	}
+	
+	/**
+	 *  Gets the globalXmap attribute of the DendroView object
+	 * @return globalXmap
+	 */
+	public MapContainer getGlobalXmap() {
+		
+		return globalXmap;
+	}
+
+	/**
+	 *  Gets the globalYmap attribute of the DendroView object
+	 * @return    The globalYmap
+	 */
+	public MapContainer getGlobalYmap() {
+		
+		return globalYmap;
+	}
+
+	/**
+	 *  Gets the zoomXmap attribute of the DendroView object
+	 * @return zoomXmap
+	 */
+	public MapContainer getZoomXmap() {
+		
+		return zoomXmap;
+	}
+
+	/**
+	 *  Gets the zoomYmap attribute of the DendroView object
+	 * @return zoomYmap
+	 */
+	public MapContainer getZoomYmap() {
+		
+		return zoomYmap;
+	}
+	
+	/** 
+	 * Getter for viewFrame 
+	 */
+	public ViewFrame getViewFrame() {
+		
+		return viewFrame;
+	}
+	
+	/** 
+	 * Gets the model this DendroView is based on
+	 */
+	protected DataModel getDataModel() {
+		
+		return this.dataModel;
+	}
+	
+	
+	//Setters
+	/**
+	 * This should be called after setDataModel has been set to the 
+	 * appropriate model
+	 * @param arraySelection
+	 */
+	protected void setArraySelection(TreeSelectionI arraySelection) {
+		
+		if (this.arraySelection != null) {
+			
+			this.arraySelection.deleteObserver(this);	
+		}
+		
+		this.arraySelection = arraySelection;
+		arraySelection.addObserver(this);
+		
+		globalview.setArraySelection(arraySelection);
+		zoomview.setArraySelection(arraySelection);
+		atrview.setArraySelection(arraySelection);
+		atrzview.setArraySelection(arraySelection);
+		arraynameview.setArraySelection(arraySelection);
+	}
+
+	/**
+	 * This should be called after setDataModel has been set 
+	 * to the appropriate model
+	 * @param geneSelection
+	 */
+	protected void setGeneSelection(TreeSelectionI geneSelection) {
+		
+		if (this.geneSelection != null) {
+			
+			this.geneSelection.deleteObserver(this);	
+		}
+		
+		this.geneSelection = geneSelection;
+		geneSelection.addObserver(this);
+		
+		globalview.setGeneSelection(geneSelection);
+		zoomview.setGeneSelection(geneSelection);
+		gtrview.setGeneSelection(geneSelection);
+		textview.setGeneSelection(geneSelection);	
+	}
+	
+	/** 
+	 * Setter for viewFrame 
+	 */
+	public void setViewFrame(ViewFrame viewFrame) {
+		
+		this.viewFrame = viewFrame;
+	}
+	
+	/** 
+	 * Setter for dataModel 
+	 */
+	protected void setDataModel(DataModel dataModel) {
+		
+		this.dataModel = dataModel;
+	}
+	
+	/** Setter for root  - may not work properly
+	public void setConfigNode(ConfigNode root) {
+		this.root = root;
+	}*/
 }
