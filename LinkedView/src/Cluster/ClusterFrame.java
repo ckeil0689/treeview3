@@ -132,7 +132,7 @@ public class ClusterFrame extends JFrame{
 		backgroundPanel.setPreferredSize(viewFrame.getSize());
 		
 		titleLine = new JLabel("Cluster Methods Information");
-		titleLine.setFont(new Font("Sans Serif", Font.BOLD, 30));
+		titleLine.setFont(new Font("Sans Serif", Font.BOLD, 35));
 		
 		description = new JLabel("Choose a method to find out more about it.");
 		description.setFont(new Font("Sans Serif", Font.PLAIN, 22));
@@ -162,7 +162,6 @@ public class ClusterFrame extends JFrame{
 				ClusterFrame.this.dispose();
 				
 			}
-			
 		});
 		
 		head1 = setupHeadLabel(singleClosed);
@@ -182,10 +181,10 @@ public class ClusterFrame extends JFrame{
 		
 		mainPanel.add(titleLine, "pushx, growx, span, wrap");
 		mainPanel.add(description, "pushx, growx, span, wrap");
-		mainPanel.add(optionsPanel, "pushx");
-		mainPanel.add(displayPanel, "grow, push");
+		mainPanel.add(optionsPanel, "aligny 0%");
+		mainPanel.add(displayPanel, "pushx, growx");
 		
-		backgroundPanel.add(mainPanel, "growx, pushx, wrap");
+		backgroundPanel.add(mainPanel, "pushx, growx, wrap");
 		backgroundPanel.add(close_button, "alignx 50%, pushx");
 		
 		//make scrollable by adding it to scrollpane
@@ -213,58 +212,21 @@ public class ClusterFrame extends JFrame{
 		
 		private static final long serialVersionUID = 1L;
 		
-		private JTextArea description;
-		private JLabel advantages;
-		private JTextArea advantages2;
-		private JLabel disadvantages;
-		private JTextArea disadvantages2;
-		private JLabel icon;
-		private BufferedImage labelImg;
-		private ClassLoader classLoader;
-		private InputStream input;
 		private String fileName = "Slink.png";
+		private String desContent = "All elements are initially " +
+				"their own cluster. At every step the elements with" +
+				" the shortest distance between them are combined to" +
+				" form a new cluster.";
+		private String adv = "Add advantages....";
+		private String dis = "The 'chaining phenomenon' " +
+				"causes the resulting clusters to be extremely " +
+				"heterogeneous as they gradually grow. It may become " +
+				"difficult to define useful subdivisions of the data.";
 		    
 		public SingleInfoPanel() {
 			
-			this.setLayout(new MigLayout());
-			setOpaque(false);
-			
-			description = setupContentField("All elements are initially " +
-					"their own cluster. At every step the elements with" +
-					" the shortest distance between them are combined to" +
-					" form a new cluster.");
-		
-			advantages = setupContentLabel("Advantages: ");
-			
-			advantages2 = setupContentField("Add advantages....");
-			
-			disadvantages = setupContentLabel("Disadvantages: ");
-			
-			disadvantages2 = setupContentField("The 'chaining phenomenon' " +
-					"causes the resulting clusters to be extremely " +
-					"heterogeneous as they gradually grow. It may become " +
-					"difficult to define useful subdivisions of the data.");
-			
-			this.add(description, "pushx, growx, span, wrap");
-			this.add(advantages);
-			this.add(advantages2, "pushx, growx, wrap");
-			this.add(disadvantages);
-			this.add(disadvantages2, "pushx, growx, wrap");
-			
-			classLoader = Thread.currentThread().getContextClassLoader();
-			input = classLoader.getResourceAsStream(fileName);
-			
-			try {
-				
-				labelImg = ImageIO.read(input);
-				icon = new JLabel(new ImageIcon(labelImg));
-				
-				this.add(icon, "push, alignx 50%");
-				
-			} catch (IOException e) {
-				
-			}
-		  }
+			setupClassContent(this, fileName, desContent, adv, dis);
+		}
 	}
 
 	/**
@@ -277,10 +239,14 @@ public class ClusterFrame extends JFrame{
 
 		private static final long serialVersionUID = 1L;
 		
+		private String fileName = "Slink.png";
+		private String desContent = "";
+		private String adv = "";
+		private String dis = "";
+		
 		public CompleteInfoPanel() {
 			
-			this.setLayout(new MigLayout());
-				
+			setupClassContent(this, fileName, desContent, adv, dis);	
 		}
 	}
 	
@@ -294,10 +260,14 @@ public class ClusterFrame extends JFrame{
 
 		private static final long serialVersionUID = 1L;
 		
+		private String fileName = "Slink.png";
+		private String desContent = "";
+		private String adv = "";
+		private String dis = "";
+		
 		public AverageInfoPanel() {
 			
-			this.setLayout(new MigLayout());
-				
+			setupClassContent(this, fileName, desContent, adv, dis);
 		}
 	}
 	
@@ -311,10 +281,14 @@ public class ClusterFrame extends JFrame{
 
 		private static final long serialVersionUID = 1L;
 		
+		private String fileName = "Slink.png";
+		private String desContent = "";
+		private String adv = "";
+		private String dis = "";
+		
 		public CentroidInfoPanel() {
 			
-			this.setLayout(new MigLayout());
-				
+			setupClassContent(this, fileName, desContent, adv, dis);
 		}
 	}
 	
@@ -347,7 +321,54 @@ public class ClusterFrame extends JFrame{
 		head.setForeground(BLUE1);
 		
 		return head;
-	}   
+	}
+	
+	public void setupClassContent(JPanel panel, String fileName,
+			String descContent, String adv, String dis) {
+		
+		JTextArea description;
+		JLabel advantages;
+		JTextArea advantages2;
+		JLabel disadvantages;
+		JTextArea disadvantages2;
+		JLabel icon;
+		BufferedImage labelImg;
+		ClassLoader classLoader;
+		InputStream input;
+		
+		panel.setLayout(new MigLayout());
+		panel.setOpaque(false);
+		
+		description = setupContentField(descContent);
+	
+		advantages = setupContentLabel("Advantages: ");
+		
+		advantages2 = setupContentField(adv);
+		
+		disadvantages = setupContentLabel("Disadvantages: ");
+		
+		disadvantages2 = setupContentField(dis);
+		
+		panel.add(description, "pushx, growx, span, wrap");
+		panel.add(advantages);
+		panel.add(advantages2, "pushx, growx, wrap");
+		panel.add(disadvantages);
+		panel.add(disadvantages2, "pushx, growx, wrap");
+		
+		classLoader = Thread.currentThread().getContextClassLoader();
+		input = classLoader.getResourceAsStream(fileName);
+		
+		try {
+			
+			labelImg = ImageIO.read(input);
+			icon = new JLabel(new ImageIcon(labelImg));
+			
+			panel.add(icon, "push, span, alignx 50%");
+			
+		} catch (IOException e) {
+			
+		}
+	}
 	
 	public void addMListener(final JLabel title, final JPanel infoPanel) {
 		
@@ -356,16 +377,14 @@ public class ClusterFrame extends JFrame{
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				
-				if(infoPanel.isShowing()){
-					displayPanel.removeAll();
-					
-				} else{
-					title.setForeground(RED1);
-					displayPanel.add(infoPanel, "push, grow, span");
-					
-					mainPanel.revalidate();
-					mainPanel.repaint();
-				}
+				displayPanel.removeAll();
+				
+				title.setForeground(RED1);
+				displayPanel.add(infoPanel, "push, grow, span");
+				
+				mainPanel.revalidate();
+				mainPanel.repaint();
+		
 			}
 
 			@Override
