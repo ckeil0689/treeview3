@@ -29,7 +29,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Observer;
 
-import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
 import edu.stanford.genetics.treeview.*;

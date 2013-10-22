@@ -33,6 +33,9 @@ import java.awt.image.MemoryImageSource;
  * Interestingly, but necessarily, it has no dependancy on any models.
  */
 public abstract class ModelViewBuffered extends ModelView {
+
+	private static final long serialVersionUID = 1L;
+	
 	protected int []	   offscreenPixels = null;
     protected Image        offscreenBuffer = null;
     protected Graphics     offscreenGraphics = null;
@@ -41,7 +44,8 @@ public abstract class ModelViewBuffered extends ModelView {
 
 
     protected ModelViewBuffered() {
-		super();
+		
+    	super();
     }
 
     /**

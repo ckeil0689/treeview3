@@ -28,6 +28,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+
 import javax.swing.*;
 
 import Cluster.ClusterFileFilter;
@@ -660,7 +661,7 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 *
 	 * Add a menu item for each window which grants that window the foreground when selected.
 	 */
-	 public void rebuildWindowMenu(Vector<JFrame> windows) {
+	 public void rebuildWindowMenu(Vector<Window> windows) {
 		 
 		 synchronized (menubar) {
 			 
@@ -721,7 +722,7 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 * @param  i  which window to move to the front.
 	 * @return    a menuItem which focuses the i'th window, or null if more than 9 windows.
 	 */
-	 private void addFocusItem(Vector<JFrame> windows, int i) {
+	 private void addFocusItem(Vector<Window> windows, int i) {
 		
 		 int p1 = i + 1;
 		 

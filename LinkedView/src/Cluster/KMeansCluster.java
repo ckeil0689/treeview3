@@ -20,7 +20,7 @@ public class KMeansCluster {
 	private List<List<Double>> dMatrix = new ArrayList<List<Double>>();
 	
 	//Half of the Distance Matrix (symmetry)
-	private List<List<Double>> halfDMatrix;
+	private List<List<Double>> copyDMatrix;
 	
 	//list to return ordered GENE numbers for .cdt creation
 	private List<Integer> clusterIndexList = new ArrayList<Integer>();
@@ -50,44 +50,89 @@ public class KMeansCluster {
 	//method for clustering the distance matrix
     public void cluster() {
     	
+    	List<Double> elementMeanList = new ArrayList<Double>();
+		List<List<Integer>> clusters = new ArrayList<List<Integer>>();
+		
     	//ProgressBar maximum
     	pBar.setMaximum(dMatrix.size());
     	
 		//deep copy of distance matrix to avoid mutation
-		setHalfDMatrix(deepCopy(dMatrix));
+		copyDMatrix = deepCopy(dMatrix);
 		
-		//find random clusterN amount of seed clusters
-		List<List<Integer>> seedList = new ArrayList<List<Integer>>();
+		//Make a list of all means of distances for every gene
+		elementMeanList = generateMeans(copyDMatrix);
 		
-		seedList = initialize();
-		
-		System.out.println(seedList.size());
+		clusters = setSeeds(elementMeanList, clusterN);
+
     }
     
     //Cluster support methods
-    public List<List<Integer>> initialize() {
+    /**
+     * Method to find the mean distances for every row element in 
+     * the distance matrix.
+     * @param matrix
+     * @return
+     */
+    public List<Double> generateMeans(List<List<Double>> matrix) {
     	
-    	List<List<Integer>> seedList = new ArrayList<List<Integer>>();
+    	List<Double> meanList = new ArrayList<Double>();
     	
-    	int size = halfDMatrix.size();
-
-    	for(int i = 0; i < clusterN; i++) {
+    	for(List<Double> row : matrix) {
     		
-    		List<Integer> distancePair = new ArrayList<Integer>();
+    		double sum = 0;
+    		double mean;
     		
-    		int randomIndex1 = new Random().nextInt(size); 
-    		int elementSize = halfDMatrix.get(randomIndex1).size();
-    		int randomIndex2 = new Random().nextInt(elementSize); 
+    		for(Double d : row) {
+    			
+    			sum += d;
+    		}
     		
-    		distancePair.add(randomIndex1);
-    		distancePair.add(randomIndex2);
+    		mean = sum/row.size();
     		
-    		//Needs a check whether the same pair is already contained
-    		//in the list
-    		seedList.add(distancePair);
+    		meanList.add(mean);
     	}
     	
-    	return seedList;
+    	return meanList;
+    }
+    
+    /**
+     * Find random seed clusters to begin assigning distance mean to.
+     * The number of seed clusters is user-specified and designated as 
+     * "clusterN" in this class.
+     * @param meanList
+     * @return
+     */
+    public List<List<Integer>> setSeeds(List<Double> meanList, 
+    		int seedNumber) {
+    	
+    	List<List<Integer>> seedClusters = new ArrayList<List<Integer>>();
+    	List<Integer> indexList = new ArrayList<Integer>();
+    	
+    	for(int i = 0; i < seedNumber; i++) {
+    		
+    		List<Integer> cluster = new ArrayList<Integer>();
+    		
+    		int seedIndex = new Random().nextInt(meanList.size());
+    		
+    		boolean same = false;
+    		for(int e : indexList) {
+    			
+    			if(e == seedIndex) {
+    				
+    				i = i - 1;
+    				same = true;
+    				break;
+    			}
+    		}
+    		
+    		if(!same) {	
+        		indexList.add(seedIndex);
+        		cluster.add(seedIndex);
+            	seedClusters.add(cluster);
+    		}
+    	}
+    	
+    	return seedClusters;
     }
     
     //Other support methods
@@ -114,11 +159,7 @@ public class KMeansCluster {
 		return deepCopy;
     }
     
-    //Getters
-    public List<List<Double>> getHalfDMatrix() {
-    	
-    	return halfDMatrix;
-    }
+
     
     /**
      * Accessor for the reordered list
@@ -136,11 +177,5 @@ public class KMeansCluster {
     public String getFilePath(){
     	
     	return filePath;
-    }
-    
-    //Setters
-    public void setHalfDMatrix(List<List<Double>> matrix) {
-    	
-    	halfDMatrix = matrix;
     }
 }

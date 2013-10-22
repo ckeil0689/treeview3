@@ -22,57 +22,71 @@
  */
 package edu.stanford.genetics.treeview;
 
-
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
+
 /**
 * this is a dialog which displays a modeless settings dialog.
-* it includes a close button, which will dispose of the dialog when it is pressed.
-* it could be extended to include a hide button, which would not dispose but just hide.
+* it includes a close button, which will dispose of the dialog 
+* when it is pressed. It could be extended to include a hide button, 
+* which would not dispose but just hide.
 */
 public class ModelessSettingsDialog extends JDialog {
-  SettingsPanel settingsPanel;
-  JDialog settingsFrame;
 
-  public ModelessSettingsDialog(JFrame frame, String title, SettingsPanel panel) {
-	super(frame, title, false);
-	settingsPanel = panel;
-	settingsFrame = this;
-	JPanel inner = new JPanel();
-	inner.setLayout(new BorderLayout());
-	inner.add((Component) panel, BorderLayout.CENTER);
-	inner.add(new ButtonPanel(), BorderLayout.SOUTH);
-	getContentPane().add(inner); 
-	pack();
-  }
+	private static final long serialVersionUID = 1L;
+	
+	SettingsPanel settingsPanel;
+	JDialog settingsFrame;
+
+	public ModelessSettingsDialog(JFrame frame, String title, 
+			SettingsPanel panel) {
+		
+		super(frame, title, false);
+		settingsPanel = panel;
+		settingsFrame = this;
+		JPanel inner = new JPanel();
+		inner.setLayout(new BorderLayout());
+		inner.add((Component) panel, BorderLayout.CENTER);
+		inner.add(new ButtonPanel(), BorderLayout.SOUTH);
+		getContentPane().add(inner); 
+		pack();
+	}
   
-  @Override
-  public void setVisible(boolean val) {
-	  settingsPanel.synchronizeFrom();
-	  super.setVisible(val);
-  }
+	@Override
+	public void setVisible(boolean val) {
+	  
+		super.setVisible(val);
+		settingsPanel.synchronizeFrom();
+	}
   
-  class ButtonPanel extends JPanel {
-	ButtonPanel() {
+	class ButtonPanel extends JPanel {
+
+		private static final long serialVersionUID = 1L;
+
+		public ButtonPanel() {
 	  
 		  JButton save_button = new JButton("Close");
 		  save_button.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-			  settingsPanel.synchronizeTo();
-			  settingsFrame.dispose();
+			
+			  @Override
+			  public void actionPerformed(ActionEvent e) {
+				  
+				  settingsPanel.synchronizeTo();
+				  settingsFrame.dispose();
 			}
 		  });
 		  add(save_button);
-	  JButton cancel_button = new JButton("Cancel");
-	  cancel_button.addActionListener(new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-		  settingsPanel.synchronizeFrom();
-		  settingsFrame.dispose();
-		}
-	  });
+		  
+		  JButton cancel_button = new JButton("Cancel");
+		  cancel_button.addActionListener(new ActionListener() {
+		
+			  @Override
+			  public void actionPerformed(ActionEvent e) {
+				  settingsPanel.synchronizeFrom();
+				  settingsFrame.dispose();
+			  }
+		  });
 //	  add(cancel_button);
 	}
   }

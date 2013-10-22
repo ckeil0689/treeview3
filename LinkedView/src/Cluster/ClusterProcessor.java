@@ -33,7 +33,7 @@ public class ClusterProcessor {
 	private int col_iterations;
 
 	//GUI Components
-	private FinalOptionsPanel finalPanel;
+	private ClusterOptionsPanel finalPanel;
 	private JPanel mainPanel;
 	private JProgressBar pBar; 
 	private JProgressBar pBar2;
@@ -83,12 +83,16 @@ public class ClusterProcessor {
 	public void cluster(boolean hierarchical) 
 			throws InterruptedException, ExecutionException {
 		
-		//declare variables needed for function
+		//List variables needed for process
 		List<Double> currentList = new ArrayList<Double>();
+		
 		List<List<Double>> sepRows = new ArrayList<List<Double>>();
 		List<List<Double>> sepCols = new ArrayList<List<Double>>();
 		List<List<Double>> rowDistances  = new ArrayList<List<Double>>();
 		List<List<Double>> colDistances = new ArrayList<List<Double>>();
+		
+		List<String> orderedRows = new ArrayList<String>();
+		List<String> orderedCols = new ArrayList<String>();
 		
 		//change data array into a list (more flexible, faster access for 
 		//larger computations)
@@ -97,17 +101,11 @@ public class ClusterProcessor {
 			currentList.add(d);
 		}
 		
-		List<String> orderedRows = new ArrayList<String>();
-		List<String> orderedCols = new ArrayList<String>();
-		
 		DataFormatter formattedData = new DataFormatter(model, 
 				currentList, pBar);
 		
 		//if user checked clustering for elements
 		if(!choice.contentEquals("Do Not Cluster")) {
-			
-			mainPanel.revalidate();
-			mainPanel.repaint();
 			
 			formattedData.splitRows();
 			
@@ -120,31 +118,20 @@ public class ClusterProcessor {
 			
 			rowDistances  = dCalc.getDistanceMatrix();
 			
-//			HCluster cGen = 
-//					new HCluster(model, rowDistances, pBar2, 
-//					rowString, similarityM);
-//			
-//			cGen.cluster();
-			
 			if(hierarchical) {
-				orderedRows = hCluster(rowDistances, rowString, pBar2);//cGen.getReorderedList();
+				orderedRows = hCluster(rowDistances, rowString, pBar2);
 				
 			} else { 
-				orderedCols = kmCluster(rowDistances, rowString, pBar2, 
+				orderedRows = kmCluster(rowDistances, rowString, pBar2, 
 						row_clusterN, row_iterations);
 			}
 			
 			mainPanel.revalidate();
 			mainPanel.repaint();
-			
-			//finalPanel.setPath(cGen.getFilePath());
 		}
 		
 		//if user checked clustering for arrays
 		if(!choice2.contentEquals("Do Not Cluster")) {
-			
-			mainPanel.revalidate();
-			mainPanel.repaint();
 			
 			formattedData.splitColumns();
 			sepCols = formattedData.getColList();
@@ -156,14 +143,8 @@ public class ClusterProcessor {
 			
 			colDistances  = dCalc2.getDistanceMatrix();
 			
-//			HCluster cGen2 = 
-//					new HCluster(model, colDistances, pBar4, 
-//					colString, similarityM);
-//			
-//			cGen2.cluster();
-			
 			if(hierarchical) {
-				orderedCols = hCluster(colDistances, colString, pBar4);//cGen2.getReorderedList();
+				orderedCols = hCluster(colDistances, colString, pBar4);
 				
 			} else {
 				orderedCols = kmCluster(colDistances, colString, pBar4, 
@@ -172,25 +153,20 @@ public class ClusterProcessor {
 			
 			mainPanel.revalidate();
 			mainPanel.repaint();;
-			
-//			finalPanel.setPath(cGen2.getFilePath());
 		}
 		
 		//also takes list of row elements because only one list can easily 
 		//be consistently transformed and fed into file writer 
 		//to make a tab-delimited file
-		mainPanel.revalidate();
-		mainPanel.repaint();
-		
 		CDTGenerator cdtGen = new CDTGenerator(model, sepRows, 
 				orderedRows, orderedCols, choice, choice2);
 		cdtGen.generateCDT();
 		
-		mainPanel.revalidate();
-		mainPanel.repaint();
-		
 		finalPanel.setPath(cdtGen.getFilePath());
 		finalPanel.setFile(cdtGen.getFile());
+		
+		mainPanel.revalidate();
+		mainPanel.repaint();
 	}
 	
 	/**
@@ -203,8 +179,8 @@ public class ClusterProcessor {
 	public List<String> hCluster(List<List<Double>> distances, String type,
 			JProgressBar pBar) {
 		
-		HCluster cGen = 
-				new HCluster(model, distances, pBar, 
+		HierCluster cGen = 
+				new HierCluster(model, distances, pBar, 
 				type, similarityM);
 		
 		cGen.cluster();

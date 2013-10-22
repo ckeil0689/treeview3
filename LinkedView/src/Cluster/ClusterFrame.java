@@ -196,8 +196,10 @@ public class ClusterFrame extends JFrame{
 		getContentPane().add(scrollPane);
 		
 		//packs items so that the frame fits them
-		setLocationRelativeTo(null);
 		pack();
+		
+		//Center JFrame on screen, needs to be used after pack();
+		this.setLocationRelativeTo(null);
     }
 	
 	

@@ -28,51 +28,79 @@ import java.awt.*;
    it's pretty generic. */
 
 public class WaitScreen extends Canvas {
-    int line_height;
-    int line_widths[];
-    int max_width;
-    int total_height;
-    int margin_width = 10;
-    int margin_height = 10;
     
+	private static final long serialVersionUID = 1L;
+	
+	private int line_height;
+	private int line_widths[];
+	private int max_width;
+	private int total_height;
+	private int margin_width = 10;
+	private int margin_height = 10;
     private String message[];
-    private void measure() {
-	FontMetrics fm = this.getFontMetrics(this.getFont());
-	if (fm == null) return;
-	line_height = fm.getHeight();
-	max_width = 0;
-	for (int i = 0; i < message.length; i++) {
-	    line_widths[i] = fm.stringWidth(message[i]);
-	    if (line_widths[i] > max_width) {
-		max_width = line_widths[i];
-	    }
-	}
-	total_height = message.length * line_height;
-    }
+    
     public WaitScreen(String [] m) {
-	message = m;
-	line_widths = new int[message.length];
+		
+    	message = m;
+		line_widths = new int[message.length];
+    }
+    
+    private void measure() {
+    	
+		FontMetrics fm = this.getFontMetrics(this.getFont());
+		
+		if (fm == null) {
+			
+			return;
+		}
+		
+		line_height = fm.getHeight();
+		max_width = 0;
+		for (int i = 0; i < message.length; i++) {
+		    line_widths[i] = fm.stringWidth(message[i]);
+		    
+		    if (line_widths[i] > max_width) {
+		    	max_width = line_widths[i];
+		    }
+		}
+		
+		//total_height = message.length * line_height;
     }
 
     @Override
-	public void addNotify() {super.addNotify(); measure();}
+	public void addNotify() {
+    	
+    	super.addNotify(); measure();
+	}
 
     @Override
 	public Dimension getPreferredSize() {
-	return new Dimension(max_width + 2*margin_width,
+	
+    	return new Dimension(max_width + 2*margin_width,
 			     message.length*line_height+2*margin_height);
     }
 
     @Override
 	public void paint(Graphics g) {
-	g.setColor(Color.black);
-	int height =   margin_height/ 2 + line_height;
-	for (int i = 0; i < message.length; i++) {
-	    g.drawString(message[i], 
-			 (margin_width + max_width - line_widths[i])/2 , 
-			 height);
-	    height += line_height;
-	}
-    }    
+		
+    	g.setColor(Color.black);
+		int height =   margin_height/ 2 + line_height;
+		
+		for (int i = 0; i < message.length; i++) {
+		    g.drawString(message[i], 
+				 (margin_width + max_width - line_widths[i])/2 , 
+				 height);
+		    height += line_height;
+		}
+    }
 
+	public int getTotal_height() {
+		
+		return total_height;
+	}
+
+	public void setTotal_height(int total_height) {
+		
+		this.total_height = total_height;
+	}    
 }

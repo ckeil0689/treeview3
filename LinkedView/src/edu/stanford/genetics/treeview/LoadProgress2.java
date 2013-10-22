@@ -45,12 +45,18 @@ import javax.swing.*;
  * 
  */
 public class LoadProgress2 extends JDialog implements LoadProgress2I {
+
+	private static final long serialVersionUID = 1L;
+	
 	/** set when we encounter a problem in parsing? */
 	private boolean hadProblem = false;
+	
 	/** set when loading has been cancelled */
 	private boolean cancelled;
+	
 	/** We hold fatal exceptions, for access by a reporting thread */
 	LoadException exception = null;
+	
 	/**this is set when thread is finished, either 
 	 * - had problem
 	 * - cancelled
@@ -65,122 +71,17 @@ public class LoadProgress2 extends JDialog implements LoadProgress2I {
 	private JButton closeButton;
 	private boolean indeterminate;
 	private String[] phases;
-	/* (non-Javadoc)
-	 * @see edu.stanford.genetics.treeview.LoadProgress2I#println(java.lang.String)
-	 */
-	@Override
-	public void println(String s) {
-		taskOutput.append(s + newline);
-		taskOutput.setCaretPosition
-		(taskOutput.getDocument().getLength());
-	}
-
 	
-	/* (non-Javadoc)
-	 * @see edu.stanford.genetics.treeview.LoadProgress2I#setPhaseValue(int)
+	/**
+	 * Main constructor
+	 * @param title
+	 * @param f
 	 */
-	@Override
-	public synchronized void setPhaseValue(int i) {
-		phaseBar.setValue(i);
-	}
-	/* (non-Javadoc)
-	 * @see edu.stanford.genetics.treeview.LoadProgress2I#getPhaseValue()
-	 */
-	@Override
-	public int getPhaseValue() {
-		return phaseBar.getValue();
-	}
-	/* (non-Javadoc)
-	 * @see edu.stanford.genetics.treeview.LoadProgress2I#setPhaseLength(int)
-	 */
-	@Override
-	public synchronized void setPhaseLength(int i) {
-		phaseBar.setMinimum(0);
-		phaseBar.setMaximum(i);
-	}
-	/* (non-Javadoc)
-	 * @see edu.stanford.genetics.treeview.LoadProgress2I#getPhaseLength()
-	 */
-	@Override
-	public int getPhaseLength() {
-		return phaseBar.getMaximum();
-	}
-	/* (non-Javadoc)
-	 * @see edu.stanford.genetics.treeview.LoadProgress2I#setPhaseText(java.lang.String)
-	 */
-	@Override
-	public synchronized void setPhaseText(String i) {
-		phaseBar.setString(i);
-	}
-
-
-	/* (non-Javadoc)
-	 * @see edu.stanford.genetics.treeview.LoadProgress2I#setButtonText(java.lang.String)
-	 */
-	@Override
-	public synchronized void setButtonText(String text) {
-		closeButton.setText(text);
-	}
-	/* (non-Javadoc)
-	 * @see edu.stanford.genetics.treeview.LoadProgress2I#setLength(int)
-	 */
-	@Override
-	public synchronized void setLength(int i) {
-		if (i < 0) {
-			setIndeterminate(true);
-		} else {
-			setIndeterminate(false);
-			if (progressBar.getMaximum() != i) {
-				progressBar.setMinimum(0);
-				progressBar.setMaximum(i);
-			}
-		}
-	}
-	/* (non-Javadoc)
-	 * @see edu.stanford.genetics.treeview.LoadProgress2I#getLength()
-	 */
-	@Override
-	public int getLength() {
-		if (indeterminate)
-			return -1;
-		else
-			return progressBar.getMaximum();
-	}
-	/* (non-Javadoc)
-	 * @see edu.stanford.genetics.treeview.LoadProgress2I#setValue(int)
-	 */
-	@Override
-	public synchronized void setValue(int i) {
-		progressBar.setValue(i);
-	}
-	/* (non-Javadoc)
-	 * @see edu.stanford.genetics.treeview.LoadProgress2I#getValue()
-	 */
-	@Override
-	public int getValue() {
-		return progressBar.getValue();
-	}
-	/* (non-Javadoc)
-	 * @see edu.stanford.genetics.treeview.LoadProgress2I#incrValue(int)
-	 */
-	@Override
-	public synchronized void incrValue(int i) {
-		setValue(getValue() + i);
-	}
-	/* (non-Javadoc)
-	 * @see edu.stanford.genetics.treeview.LoadProgress2I#setIndeterminate(boolean)
-	 */
-	@Override
-	public synchronized void setIndeterminate(boolean flag) {
-		// actually, this only works in jdk 1.4 and up...
-		progressBar.setIndeterminate(flag);
-	}
-
 	public LoadProgress2(String title, Frame f) {
+		
 		super(f, title, true);
 		phaseBar = new JProgressBar();
 		phaseBar.setStringPainted(true);
-
 
 		progressBar = new JProgressBar();
 		progressBar.setValue(0);
@@ -189,7 +90,6 @@ public class LoadProgress2 extends JDialog implements LoadProgress2I {
 		taskOutput = new JTextArea(10, 40);
 		taskOutput.setMargin(new Insets(5,5,5,5));
 		taskOutput.setEditable(false);
-
 
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -202,12 +102,15 @@ public class LoadProgress2 extends JDialog implements LoadProgress2I {
 		contentPane.add(new JScrollPane(taskOutput), BorderLayout.CENTER);
 		closeButton = new JButton("Cancel");
 		closeButton.addActionListener( new ActionListener() {
+			
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				
 				setCanceled(true);
 				LoadProgress2.this.dispose();
 			}
 		});
+		
 		panel = new JPanel();
 		panel.add(closeButton);
 		contentPane.add(panel, BorderLayout.SOUTH);
@@ -215,35 +118,185 @@ public class LoadProgress2 extends JDialog implements LoadProgress2I {
 		contentPane.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 		setContentPane(contentPane);
 	}
+	
+	/* (non-Javadoc)
+	 * @see edu.stanford.genetics.treeview.LoadProgress2I
+	 * #println(java.lang.String)
+	 */
+	@Override
+	public void println(String s) {
+		
+		taskOutput.append(s + newline);
+		taskOutput.setCaretPosition
+		(taskOutput.getDocument().getLength());
+	}
+
+	
+	/* (non-Javadoc)
+	 * @see edu.stanford.genetics.treeview.LoadProgress2I#setPhaseValue(int)
+	 */
+	@Override
+	public synchronized void setPhaseValue(int i) {
+		
+		phaseBar.setValue(i);
+	}
+	
+	/* (non-Javadoc)
+	 * @see edu.stanford.genetics.treeview.LoadProgress2I#getPhaseValue()
+	 */
+	@Override
+	public int getPhaseValue() {
+		
+		return phaseBar.getValue();
+	}
+	
+	/* (non-Javadoc)
+	 * @see edu.stanford.genetics.treeview.LoadProgress2I#setPhaseLength(int)
+	 */
+	@Override
+	public synchronized void setPhaseLength(int i) {
+		
+		phaseBar.setMinimum(0);
+		phaseBar.setMaximum(i);
+	}
+	
+	/* (non-Javadoc)
+	 * @see edu.stanford.genetics.treeview.LoadProgress2I#getPhaseLength()
+	 */
+	@Override
+	public int getPhaseLength() {
+		
+		return phaseBar.getMaximum();
+	}
+	
+	/* (non-Javadoc)
+	 * @see edu.stanford.genetics.treeview.LoadProgress2I
+	 * #setPhaseText(java.lang.String)
+	 */
+	@Override
+	public synchronized void setPhaseText(String i) {
+		
+		phaseBar.setString(i);
+	}
+
+	/* (non-Javadoc)
+	 * @see edu.stanford.genetics.treeview.LoadProgress2I
+	 * #setButtonText(java.lang.String)
+	 */
+	@Override
+	public synchronized void setButtonText(String text) {
+		
+		closeButton.setText(text);
+	}
+	
+	/* (non-Javadoc)
+	 * @see edu.stanford.genetics.treeview.LoadProgress2I#setLength(int)
+	 */
+	@Override
+	public synchronized void setLength(int i) {
+		
+		if (i < 0) {
+			setIndeterminate(true);
+			
+		} else {
+			setIndeterminate(false);
+			if (progressBar.getMaximum() != i) {
+				progressBar.setMinimum(0);
+				progressBar.setMaximum(i);
+			}
+		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see edu.stanford.genetics.treeview.LoadProgress2I#getLength()
+	 */
+	@Override
+	public int getLength() {
+		
+		if (indeterminate) {
+			return -1;
+			
+		} else {
+			return progressBar.getMaximum();
+		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see edu.stanford.genetics.treeview.LoadProgress2I#setValue(int)
+	 */
+	@Override
+	public synchronized void setValue(int i) {
+		
+		progressBar.setValue(i);
+	}
+	
+	/* (non-Javadoc)
+	 * @see edu.stanford.genetics.treeview.LoadProgress2I#getValue()
+	 */
+	@Override
+	public int getValue() {
+		
+		return progressBar.getValue();
+	}
+	
+	/* (non-Javadoc)
+	 * @see edu.stanford.genetics.treeview.LoadProgress2I#incrValue(int)
+	 */
+	@Override
+	public synchronized void incrValue(int i) {
+		
+		setValue(getValue() + i);
+	}
+	
+	/* (non-Javadoc)
+	 * @see edu.stanford.genetics.treeview.LoadProgress2I
+	 * #setIndeterminate(boolean)
+	 */
+	@Override
+	public synchronized void setIndeterminate(boolean flag) {
+		
+		// actually, this only works in jdk 1.4 and up...
+		progressBar.setIndeterminate(flag);
+	}
+
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.LoadProgress2I#setCanceled(boolean)
 	 */
 	@Override
 	public synchronized  void setCanceled(boolean canceled) {
+		
 		this.cancelled = canceled;
 		setButtonText("Waiting...");
 	}
+	
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.LoadProgress2I#getCanceled()
 	 */
 	@Override
 	public boolean getCanceled() {
+		
 		return cancelled;
 	}
+	
 	/* (non-Javadoc)
-	 * @see edu.stanford.genetics.treeview.LoadProgress2I#setException(edu.stanford.genetics.treeview.LoadException)
+	 * @see edu.stanford.genetics.treeview.LoadProgress2I
+	 * #setException(edu.stanford.genetics.treeview.LoadException)
 	 */
 	@Override
 	public synchronized void setException(LoadException exception) {
+		
 		this.exception = exception;
 	}
+	
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.LoadProgress2I#getException()
 	 */
 	@Override
 	public LoadException getException() {
+		
 		return exception;
 	}
+	
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.LoadProgress2I#setHadProblem(boolean)
 	 */
@@ -251,18 +304,22 @@ public class LoadProgress2 extends JDialog implements LoadProgress2I {
 	public synchronized void setHadProblem(boolean hadProblem) {
 		this.hadProblem = hadProblem;
 	}
+	
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.LoadProgress2I#getHadProblem()
 	 */
 	@Override
 	public boolean getHadProblem() {
+		
 		return hadProblem;
 	}
+	
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.LoadProgress2I#setFinished(boolean)
 	 */
 	@Override
 	public synchronized  void setFinished(boolean finished) {
+		
 		this.finished = finished;
 		if (getHadProblem() == false) { 
 			// let the host timer decide when to hide us.
@@ -273,36 +330,42 @@ public class LoadProgress2 extends JDialog implements LoadProgress2I {
 			getToolkit().beep();
 		}
 	}
+	
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.LoadProgress2I#getFinished()
 	 */
 	@Override
 	public boolean getFinished() {
+		
 		return finished;
 	}
+	
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.LoadProgress2I#getPhaseText()
 	 */
 	@Override
 	public String getPhaseText() {
+		
 		return phaseBar.getString();
 	}
-
 	
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.LoadProgress2I#setPhase(int)
 	 */
 	@Override
 	public synchronized void setPhase(int i) {
+		
 		setPhaseValue(i+1);
 		setPhaseText(phases[i]);
 	}
 	
 	/* (non-Javadoc)
-	 * @see edu.stanford.genetics.treeview.LoadProgress2I#setPhases(java.lang.String[])
+	 * @see edu.stanford.genetics.treeview.LoadProgress2I
+	 * #setPhases(java.lang.String[])
 	 */
 	@Override
 	public synchronized void setPhases(String[] strings) {
+	
 		phases = strings;
 		setPhaseLength(phases.length);
 	}
@@ -313,16 +376,20 @@ public class LoadProgress2 extends JDialog implements LoadProgress2I {
 	 */
 	@Override
 	public void setVisible(boolean b) {
+		
 		try {
 			super.setVisible(b);
+			
 		} catch (java.lang.ArrayIndexOutOfBoundsException ex) {
 			// this exception is thrown on first load on 64 bit linux.
 			System.out.println("Caught ArrayIndexOutOfBoundsException");
+			
 	} catch (java.lang.IndexOutOfBoundsException ex) {
 		// this exception is thrown on first load on 64 bit linux.
 		System.out.println("Caught IndexOutOfBoundsException");
 	}
-		if (b == false) 
+		if (b == false) {
 			finished = true;
+		}
 	}
 }

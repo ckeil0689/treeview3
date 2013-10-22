@@ -38,6 +38,9 @@ import javax.swing.JPanel;
  */
 public class SettingsPanelHolder extends JPanel {
 
+
+	private static final long serialVersionUID = 1L;
+	
 	private Window window = null;
 	private ConfigNode configNode = null;
 	
@@ -81,43 +84,60 @@ public class SettingsPanelHolder extends JPanel {
 			// ignore
 		}
 	}
+	
 	public void addSettingsPanel(SettingsPanel sP) {
 		add((Component) sP, BorderLayout.CENTER);
 	}
-	  class ButtonPanel extends JPanel {
-	  	private void hideWindow() {
+	
+	class ButtonPanel extends JPanel {
+
+		private static final long serialVersionUID = 1L;
+
+		private void hideWindow() {
 	  		if (window == null) {
-	  			LogBuffer.println("SettingsPanelHolder.hideWindow(): window is null");
+	  			LogBuffer.println("SettingsPanelHolder.hideWindow(): " +
+	  					"window is null");
+	  			
 	  		} else {
-			  window.setVisible(false);
+	  			window.setVisible(false);
 	  		}
 	  	}
-		ButtonPanel() {
-		  JButton save_button = new JButton("Save");
-		  save_button.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-			  synchronizeTo();
-			  if (configNode == null) {
-			  	LogBuffer.println("SettingsPanelHolder.Save: configNode is null");
-			  } else {
-			  	configNode.store();
-			  }
-			  hideWindow();
-			}
-		  });
-		  add(save_button);
-		  
-		  JButton cancel_button = new JButton("Cancel");
-		  cancel_button.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-			  synchronizeFrom();
-			  hideWindow();
-			}
-		  });
-		  add(cancel_button);
+		
+		/**
+		 * Subclass constructor
+		 */
+		public ButtonPanel() {
+			
+			JButton save_button = new JButton("Save");
+			save_button.addActionListener(new ActionListener() {
+			
+				@Override
+				public void actionPerformed(ActionEvent e) {
+				 
+					synchronizeTo();
+					if (configNode == null) {
+						LogBuffer.println("SettingsPanelHolder.Save: " +
+								"configNode is null");
+						
+					} else {
+						configNode.store();
+				  }
+				  hideWindow();
+				}
+			  });
+			  add(save_button);
+			  
+			  JButton cancel_button = new JButton("Cancel");
+			  cancel_button.addActionListener(new ActionListener() {
+			
+				  @Override
+				  public void actionPerformed(ActionEvent e) {
+					  
+					  synchronizeFrom();
+					  hideWindow();
+				  }
+			  });
+			  add(cancel_button);
 		}
-	  }
-
+	}
 }

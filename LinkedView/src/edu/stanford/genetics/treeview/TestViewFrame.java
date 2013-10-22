@@ -32,6 +32,8 @@ import edu.stanford.genetics.treeview.core.HeaderFinder;
  */
 public class TestViewFrame extends ViewFrame {
 
+	private static final long serialVersionUID = 1L;
+
 
 	TestViewFrame() {
 		super("Test Export Panel");

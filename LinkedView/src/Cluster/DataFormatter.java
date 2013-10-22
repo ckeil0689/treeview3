@@ -6,8 +6,9 @@ import java.util.List;
 import javax.swing.JProgressBar;
 
 /**
- * This class is used to make an object which can take in the loaded data in its format as originally coded in
- * Java TreeView's first version and format it for use in the clustering module.
+ * This class is used to make an object which can take in the loaded data 
+ * in its format as originally coded in Java TreeView's first version and 
+ * format it for use in the clustering module.
  * @author CKeil
  */
 public class DataFormatter {
@@ -21,7 +22,8 @@ public class DataFormatter {
 	private List<List<Double>> colList = new ArrayList<List<Double>>();
 	
 	//Constructor (building the object)
-	public DataFormatter(ClusterModel model, List<Double> list, JProgressBar pBar){
+	public DataFormatter(ClusterModel model, List<Double> list, 
+			JProgressBar pBar) {
 		
 		this.model = model;
 		this.list = list;
@@ -29,7 +31,7 @@ public class DataFormatter {
 	}
 	
 	//extracting rows from raw data array
-	public void splitRows(){
+	public void splitRows() {
 		
 		int lower = 0;
 		int upper = 0;
@@ -39,8 +41,7 @@ public class DataFormatter {
 		
 		pBar.setMaximum(list.size()/max);
 		
-		
-		for(int i = 0; i < list.size()/max; i++){
+		for(int i = 0; i < list.size()/max; i++) {
 			
 			pBar.setValue(i);
 			
@@ -49,11 +50,9 @@ public class DataFormatter {
 			rowList.add(list.subList(lower, upper));
 			
 			lower = upper;
-			
 		}
 		
-		if(upper < list.size() -1){
-			
+		if(upper < list.size() -1) {
 			lower = upper;
 			upper = list.size();
 			
@@ -62,28 +61,27 @@ public class DataFormatter {
 	}
 	
 	//getting the columns from raw data array
-	public void splitColumns(){
+	public void splitColumns() {
 		
-		//number of arrays/ columns (3277 for test)
+		//Number of arrays/ columns
 		int max = model.nExpr();
 		int nGenes = model.nGene();
 		
-		//setting up progressbar
+		//Setting up ProgressBar
 		pBar.setMaximum(list.size()/max);
 		
-		//iterate through columns ...max
-		for(int j = 0; j < max; j++){
+		//Iterate through all columns 
+		for(int j = 0; j < max; j++) {
 			
 			pBar.setValue(j);
 			
 			List<Double> sArray = new ArrayList<Double>();
 			
-			for(int i = 0; i < nGenes; i++){
+			for(int i = 0; i < nGenes; i++) {
 				
 				int element = (i * max) + j;
 				
 				sArray.add(list.get(element));
-				
 			}
 			
 			colList.add(sArray);
@@ -91,12 +89,12 @@ public class DataFormatter {
 	}
 	
 	//Accessor methods to return each data list
-	public List<List<Double>> getRowList(){
+	public List<List<Double>> getRowList() {
 		
 		return rowList;
 	}
 	
-	public List<List<Double>> getColList(){
+	public List<List<Double>> getColList() {
 		
 		return colList;
 	}

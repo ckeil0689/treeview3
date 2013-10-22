@@ -288,10 +288,12 @@ public class XmlConfig {
  	}
 	@Override
 	public ConfigNode[] fetch(String name) {
+		
 	    Vector kids = root.getChildrenNamed(name);
 	    ConfigNode [] ret = new XmlConfigNode[kids.size()];
 	    for (int i = 0; i < kids.size(); i++) {
-		ret[i] = new XmlConfigNode((XMLElement) kids.elementAt(i));
+		
+	    	ret[i] = new XmlConfigNode((XMLElement) kids.elementAt(i));
 	    }
 	    return ret;
 	}

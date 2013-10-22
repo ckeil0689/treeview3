@@ -26,67 +26,91 @@ package edu.stanford.genetics.treeview;
 import java.util.*;
 
 public class LogBuffer extends Observable {
+	
 	private static LogBuffer singleton = new LogBuffer();
-	public static void println(String msg) {
-		singleton.log(msg);
-	}
-	public static LogBuffer getSingleton() {
-		return singleton;
-	}
 
 	private ConfigNode root = new DummyConfigNode("LogBuffer");
 	private int defaultLog = 0; // false
-	private Vector buffer = new Vector(100, 100);
+	private Vector<String> buffer = new Vector<String>(100, 100);
+	
 	public void log(String msg) {
+		
 		if (getLog()) {
 			append(msg);
 		}
+		
 		if (getPrint()) {
 			System.out.println(msg);
 		}
 	}
+	
 	private boolean getPrint() {
-		if (root == null)
+		if (root == null) {
 			return true;
-		else
+			
+		} else {
 			return (root.getAttribute("print", 1) == 1);
+		}
 	}
+	
 	/**
 	 *
 	 * @return true if messages are being logged in the buffer
 	 */
 	public boolean getLog() {
+		
 		return (root.getAttribute("log", defaultLog) == 1);
 	}
 	
 	public void setLog(boolean bool) {
+		
 		System.err.println("Before " + getLog() );
-		if (bool == getLog())
+		if (bool == getLog()) {
 			return;
-		if (bool)
+		}
+		
+		if (bool) { 
 			root.setAttribute("log", 1, defaultLog);
-		else
+			
+		} else {
 			root.setAttribute("log", 0, defaultLog);
+		}
+		
 		setChanged();
 		notifyObservers(null);
 		System.err.println("After " + getLog() );
 	}
 	
 	private void append(String msg) {
+		
 		buffer.add(msg);
 		setChanged();
 		notifyObservers(msg);
 	}
-	public Enumeration getMessages() {
+	
+	public Enumeration<String> getMessages() {
+		
 		return buffer.elements();
 	}
+	
 	public static void logException(Exception e) {
+		
 		println(e.getMessage());
 		StackTraceElement [] els =  e.getStackTrace();
 		for (int i = 0; i < els.length; i++) {
 			StackTraceElement el = els[i];
 			println(" - " +el.toString());
 		}
+	}
+	
+	public static void println(String msg) {
+		
+		singleton.log(msg);
+	}
+	
+	public static LogBuffer getSingleton() {
+		
+		return singleton;
 	}
 }
 

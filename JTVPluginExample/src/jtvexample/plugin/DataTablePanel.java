@@ -35,6 +35,9 @@ import edu.stanford.genetics.treeview.TreeviewMenuBarI;
 import edu.stanford.genetics.treeview.ViewFrame;
 
 public class DataTablePanel extends JPanel implements MainPanel {
+
+	private static final long serialVersionUID = 1L;
+	
 	private ConfigNode configNode = null;
 	private ViewFrame viewFrame = null;
 	private JTable jtable  = null;
@@ -65,7 +68,8 @@ public class DataTablePanel extends JPanel implements MainPanel {
 	
 	class ThinTableModel extends AbstractTableModel {
 
-		
+		private static final long serialVersionUID = 1L;
+
 		/* (non-Javadoc)
 		 * @see javax.swing.table.AbstractTableModel#getColumnName(int)
 		 */
@@ -126,27 +130,25 @@ public class DataTablePanel extends JPanel implements MainPanel {
 		
 	}
 	
-	
 	public DataTablePanel(ConfigNode configNode2, ViewFrame viewFrame) {
+		
 		configNode = configNode2;
 		this.viewFrame = viewFrame;
-		
-		
-		
-		
-	      jtable = new JTable(new ThinTableModel());
-	      jtable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-	      jtable.setAutoscrolls(true);
-	      JScrollPane scrollPane = new JScrollPane(jtable);
-	      scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-	      scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-	      setLayout(new BorderLayout());
-	      add(scrollPane, BorderLayout.CENTER);
+
+		jtable = new JTable(new ThinTableModel());
+		jtable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		jtable.setAutoscrolls(true);
+		JScrollPane scrollPane = new JScrollPane(jtable);
+		scrollPane.setHorizontalScrollBarPolicy(
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		scrollPane.setVerticalScrollBarPolicy(
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		setLayout(new BorderLayout());
+		add(scrollPane, BorderLayout.CENTER);  
 	      
+		viewFrame.getGeneSelection().addObserver(new GeneSelectionObserver());
 	      
-	      viewFrame.getGeneSelection().addObserver(new GeneSelectionObserver());
-	      
-	      jtable.getSelectionModel().addListSelectionListener(new RowSelectionListener());
+		jtable.getSelectionModel().addListSelectionListener(new RowSelectionListener());
 	}
 
 	@Override
