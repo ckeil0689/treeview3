@@ -243,10 +243,10 @@ public class ClusterView extends JPanel implements MainPanel {
 			setOpaque(false);
 			
 			text = new JLabel(header);
-			text.setFont(new Font("Sans Serif", Font.BOLD, 44));
+			text.setFont(new Font("Sans Serif", Font.PLAIN, 44));
 			
 			text2 = new JLabel(header2);
-			text2.setFont(new Font("Sans Serif", Font.PLAIN, 44));
+			text2.setFont(new Font("Sans Serif", Font.PLAIN, 35));
 			text2.setForeground(BLUE1);
 			
 			this.add(text, "pushx, alignx 50%");

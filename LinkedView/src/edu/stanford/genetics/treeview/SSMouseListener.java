@@ -64,6 +64,7 @@ public class SSMouseListener implements MouseListener{
 	public void mouseEntered(MouseEvent arg0) {
 		
 		label.setForeground(RED1);
+		label.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
 		if(panel != null) {
 			
@@ -79,6 +80,7 @@ public class SSMouseListener implements MouseListener{
 	public void mouseExited(MouseEvent arg0) {
 		
 		label.setForeground(BLUE1);
+		label.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 		
 		if(panel != null) {
 			

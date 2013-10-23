@@ -27,6 +27,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.*;
+import javax.swing.plaf.basic.BasicProgressBarUI;
+
+import net.miginfocom.swing.MigLayout;
 
 /**
  * This is like the original loadProgress, but it adds a setPhaseValue(int), 
@@ -47,6 +50,8 @@ import javax.swing.*;
 public class LoadProgress2 extends JDialog implements LoadProgress2I {
 
 	private static final long serialVersionUID = 1L;
+	
+	private final static Color BLUE1 = new Color(60, 180, 220, 255);
 	
 	/** set when we encounter a problem in parsing? */
 	private boolean hadProblem = false;
@@ -80,27 +85,28 @@ public class LoadProgress2 extends JDialog implements LoadProgress2I {
 	public LoadProgress2(String title, Frame f) {
 		
 		super(f, title, true);
-		phaseBar = new JProgressBar();
-		phaseBar.setStringPainted(true);
+		phaseBar = setPBarLayout(phaseBar);
 
-		progressBar = new JProgressBar();
-		progressBar.setValue(0);
-		progressBar.setStringPainted(true);
+		progressBar = setPBarLayout(progressBar);
 
 		taskOutput = new JTextArea(10, 40);
 		taskOutput.setMargin(new Insets(5,5,5,5));
 		taskOutput.setEditable(false);
 
 		JPanel panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		panel.add(phaseBar);
-		panel.add(progressBar);
+		panel.setLayout(new MigLayout());
+		panel.setOpaque(false);
+		panel.add(phaseBar, "span, pushx, growx, wrap");
+		panel.add(progressBar, "span, pushx, growx");
 
 		JPanel contentPane = new JPanel();
-		contentPane.setLayout(new BorderLayout());
-		contentPane.add(panel, BorderLayout.NORTH);
-		contentPane.add(new JScrollPane(taskOutput), BorderLayout.CENTER);
+		contentPane.setLayout(new MigLayout());
+		contentPane.add(panel, "span, pushx, growx, wrap");
+		contentPane.add(new JScrollPane(taskOutput), "push, grow, wrap");
+		contentPane.setBackground(Color.white);
+		
 		closeButton = new JButton("Cancel");
+		closeButton = setButtonLayout(closeButton);
 		closeButton.addActionListener( new ActionListener() {
 			
 			@Override
@@ -111,9 +117,11 @@ public class LoadProgress2 extends JDialog implements LoadProgress2I {
 			}
 		});
 		
-		panel = new JPanel();
+		panel = new JPanel(new MigLayout());
+		panel.setOpaque(false);
+		
 		panel.add(closeButton);
-		contentPane.add(panel, BorderLayout.SOUTH);
+		contentPane.add(panel, "alignx 50%, span");
 
 		contentPane.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 		setContentPane(contentPane);
@@ -391,5 +399,55 @@ public class LoadProgress2 extends JDialog implements LoadProgress2I {
 		if (b == false) {
 			finished = true;
 		}
+	}
+	
+	
+	//Layout setups for some Swing elements
+	/**
+	 * Setting up a general layout for a button object
+	 * The method is used to make all buttons appear consistent in aesthetics
+	 * @param button
+	 * @return
+	 */
+	public static JButton setButtonLayout(JButton button){
+		
+		Font buttonFont = new Font("Sans Serif", Font.PLAIN, 16);
+		
+  		Dimension d = button.getPreferredSize();
+  		d.setSize(d.getWidth(), d.getHeight());
+  		button.setPreferredSize(d);
+  		
+  		button.setFont(buttonFont);
+  		button.setOpaque(true);
+  		button.setBackground(BLUE1);
+  		button.setForeground(Color.white);
+  		
+  		return button;
+	}
+	
+	/**
+	 * Method to setup a JProgressBar
+	 * @param pBar
+	 * @param text
+	 * @return
+	 */
+	public JProgressBar setPBarLayout(JProgressBar pBar){
+		
+		final Dimension d = new Dimension(2000, 40);
+		
+		pBar = new JProgressBar();
+		pBar.setMinimum(0);
+		pBar.setStringPainted(true);
+		pBar.setMaximumSize(d);
+		pBar.setForeground(BLUE1);
+		pBar.setUI(new BasicProgressBarUI(){
+			@Override
+			protected Color getSelectionBackground(){return Color.black;};
+			@Override
+			protected Color getSelectionForeground(){return Color.white;};
+		});
+		pBar.setVisible(true);
+		
+		return pBar;
 	}
 }
