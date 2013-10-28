@@ -42,7 +42,7 @@ import edu.stanford.genetics.treeview.model.KnnModel;
  * @author     Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.2 $ $Date: 2006-09-21 17:18:55 $
  */
-public class KnnDendroView extends DendroView2 implements ConfigNodePersistent, 
+public class KnnDendroView2 extends DendroView2 implements ConfigNodePersistent, 
 MainPanel, Observer  {
 
 	private static final long serialVersionUID = 1L;
@@ -53,26 +53,26 @@ MainPanel, Observer  {
 	 * @param  tVModel   model this KnnDendroView is to represent
 	 * @param  vFrame  parent ViewFrame of KnnDendroView
 	 */
-	public KnnDendroView(KnnModel tVModel, ViewFrame vFrame) {
+	public KnnDendroView2(KnnModel tVModel, ViewFrame vFrame) {
 		
 		super(tVModel, vFrame);
 	}
-	public KnnDendroView(DataModel tVModel, ConfigNode root, ViewFrame vFrame) {
+	
+	public KnnDendroView2(DataModel tVModel, ConfigNode root, ViewFrame vFrame) {
 		
 		super(tVModel, root, vFrame, "KnnDendrogram");
 	}
+	
 	/**
-	 *  This method should be called only during initial setup of the modelview
-	 *
-	 *  It sets up the views and binds them all to config nodes.
-	 *
+	 *  This method should be called only during initial setup of the ModelView
+	 *  It sets up the views and binds them all to Config nodes.
 	 */
 	@Override
 	protected void setupViews() {
 		
 		DataModel knnModel = getDataModel();
-		hintpanel = new MessagePanel("Usage Hints");
-		statuspanel = new MessagePanel("View Status");
+		hintpanel = new MessagePanel("Usage Hints", BLUE2);
+		statuspanel = new MessagePanel("Status", BLUE2);
 
 
 		ColorPresets colorPresets = DendrogramFactory.getColorPresets();
@@ -86,30 +86,26 @@ MainPanel, Observer  {
 		//XXX shouldn't need to observer, should be immuable?
 		((Observable) getDataModel()).addObserver(arrayDrawer);
 
+		globalview = new GlobalView();
+
+		// scrollbars, mostly used by maps
+		globalXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0,1,0,1);
+		globalYscrollbar = new JScrollBar(Adjustable.VERTICAL,0,1,0,1);
+		zoomXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0,1,0,1);
+		zoomYscrollbar = new JScrollBar(Adjustable.VERTICAL,0,1,0,1);
 
 
 
-	globalview = new GlobalView();
+		zoomXmap = new MapContainer();
+		zoomXmap.setDefaultScale(12.0);
+		zoomXmap.setScrollbar(zoomXscrollbar);
+		zoomYmap = new MapContainer();
+		zoomYmap.setDefaultScale(12.0);
+		zoomYmap.setScrollbar(zoomYscrollbar);
 
-
-	// scrollbars, mostly used by maps
-	globalXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0,1,0,1);
-	globalYscrollbar = new JScrollBar(Adjustable.VERTICAL,0,1,0,1);
-	zoomXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0,1,0,1);
-	zoomYscrollbar = new JScrollBar(Adjustable.VERTICAL,0,1,0,1);
-
-
-
-		 zoomXmap = new MapContainer();
-		 zoomXmap.setDefaultScale(12.0);
-		 zoomXmap.setScrollbar(zoomXscrollbar);
-		 zoomYmap = new MapContainer();
-		 zoomYmap.setDefaultScale(12.0);
-		 zoomYmap.setScrollbar(zoomYscrollbar);
-
-		 // globalmaps tell globalview, atrview, and gtrview
-		 // where to draw each data point.
-	// the scrollbars "scroll" by communicating with the maps.
+		//globalmaps tell globalview, atrview, and gtrview
+		//where to draw each data point.
+		//the scrollbars "scroll" by communicating with the maps.
 		globalXmap = new MapContainer();
 		globalXmap.setDefaultScale(2.0);
 		globalXmap.setScrollbar(globalXscrollbar);
@@ -119,37 +115,38 @@ MainPanel, Observer  {
 
 		globalview.setXMap(globalXmap);
 		globalview.setYMap(globalYmap);
-
+		
 		globalview.setZoomYMap(getZoomYmap());
 		globalview.setZoomXMap(getZoomXmap());
-
+		
 		arraynameview = new ArrayNameView(getDataModel().getArrayHeaderInfo());
-
+		
 		leftTreeDrawer = new LeftTreeDrawer();
 		gtrview = new GTRView();
 		gtrview.setMap(globalYmap);
 		gtrview.setLeftTreeDrawer(leftTreeDrawer);
-
+			
 		invertedTreeDrawer = new InvertedTreeDrawer();
 		atrview = new ATRView();
 		atrview.setMap(globalXmap);
 		atrview.setInvertedTreeDrawer(invertedTreeDrawer);
-
+		
 		atrzview = new ATRZoomView();
 		atrzview.setZoomMap(getZoomXmap());
 		atrzview.setInvertedTreeDrawer(invertedTreeDrawer);
-
+		
 		zoomview = new ZoomView();
 		zoomview.setYMap(getZoomYmap());
 		zoomview.setXMap(getZoomXmap());
 		zoomview  .setArrayDrawer(arrayDrawer);
 		globalview.setArrayDrawer(arrayDrawer);
-
+		
 		arraynameview.setMapping(getZoomXmap());
 		arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
+		
 
-
-		textview = new TextViewManager(getDataModel().getGeneHeaderInfo(), viewFrame.getUrlExtractor());
+		textview = new TextViewManager(getDataModel().getGeneHeaderInfo(), 
+				viewFrame.getUrlExtractor());
 		textview.setMap(getZoomYmap());
 
 		doDoubleLayout();
@@ -157,14 +154,14 @@ MainPanel, Observer  {
 		// reset persistent popups
 		settingsFrame = null;
 		settingsPanel = null;
-
+		
 		// color extractor
 		colorExtractor.bindConfig(getFirst("ColorExtractor"));
-
+		
 		// set data first to avoid adding auto-genereated contrast to documentConfig.
 		kArrayDrawer.setDataMatrix(knnModel.getDataMatrix());
 		kArrayDrawer.bindConfig(getFirst("ArrayDrawer"));
-
+		 
 		// responsible for adding and removing components...
 		bindTrees();
 		
@@ -188,6 +185,5 @@ MainPanel, Observer  {
 		getZoomXmap().notifyObservers();
 		getZoomYmap().notifyObservers();
 	}
-	
 }
 

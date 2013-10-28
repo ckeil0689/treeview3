@@ -75,9 +75,9 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
     }
 
 	private static final String [] hints = {
-		"use arrow keys to move selection",
-		"click and drag to select genes",
-		"- hold shift to select arrays too"
+		" - Use arrow keys to move selection",
+		" - Click and drag to select genes",
+		" - Hold shift to select arrays too"
 	};
 	@Override
 	public String[]  getHints() {

@@ -9,22 +9,24 @@ import javax.swing.JProgressBar;
 
 /**
  * This class is used to calculate a distance matrix based on input data.
- * It contains several different methods and will return a matrix of distances beween row or column elements,
- * using the parameters which the user has chosen.
+ * It contains several different methods and will return a matrix of distances 
+ * between row or column elements, using the parameters 
+ * which the user has chosen.
  * @author CKeil
  *
  */
 public class DistanceMatrixCalculator {
 	
 	//Instance variables
-	//list with all genes and their distances to all other genes (1455x1455 for sample data)
+	//list with all genes and their distances to all other genes
 	private List <List<Double>> distanceList = new ArrayList<List<Double>>();
 	private List<List<Double>> fullList;
 	private JProgressBar pBar;
 	private String choice;
 	
 	//Constructor
-	public DistanceMatrixCalculator (List<List<Double>> fullList, String choice, JProgressBar pBar){
+	public DistanceMatrixCalculator (List<List<Double>> fullList, 
+			String choice, JProgressBar pBar) {
 		
 		this.fullList = fullList;
 		this.pBar = pBar;
@@ -33,25 +35,25 @@ public class DistanceMatrixCalculator {
 	
 	//Methods to calculate distance matrix
 	/**
-	 * This method generates a distance list based on the Pearson correlation. The parameters allow for selection of different
-	 * versions of the Pearson correlation (absolute Pearson correlation, centered vs. uncentered). 
+	 * This method generates a distance list based on the Pearson correlation. 
+	 * The parameters allow for selection of different versions of the 
+	 * Pearson correlation (absolute Pearson correlation,
+	 * centered vs. uncentered). 
+	 * 
 	 * @param fullList
 	 * @param absolute
 	 * @param centered
 	 * @return List<List<Double> distance matrix
 	 */
-	public void pearson(boolean absolute, boolean centered){
+	public void pearson(boolean absolute, boolean centered) {
     	
     	pBar.setMaximum(fullList.size());
     	
-    	//clearing the distanceList in case the function is somehow called after using another
-    	//distance measure and the object wasn't dumped before
+    	//making sure distanceList is clear
     	distanceList.clear();
     	
     	//take a gene
-    	for(int i = 0; i < fullList.size(); i++){
-    		
-    		//long ms = System.currentTimeMillis();
+    	for(int i = 0; i < fullList.size(); i++) {
     		
     		//update progressbar
     		pBar.setValue(i);
@@ -63,7 +65,7 @@ public class DistanceMatrixCalculator {
     		List<Double> pearsonList = new ArrayList<Double>();
 			
 			//second gene for comparison
-    		for(int j = 0; j < fullList.size(); j++){
+    		for(int j = 0; j < fullList.size(); j++) {
     			
     			//local variables
             	double xi = 0;
@@ -84,8 +86,7 @@ public class DistanceMatrixCalculator {
     			
     			List<Double> data2 = fullList.get(j);
     			
-    			if(centered){//causes issues in cluster(????)
-    				
+    			if(centered) {//causes issues in cluster(????)
         			for(double x : data){
         				
         				mean_sumX += x;
@@ -100,8 +101,7 @@ public class DistanceMatrixCalculator {
         			
         			mean_y = mean_sumY/data2.size();
         			
-    			}
-    			else{//works great in cluster
+    			} else {//works great in cluster
     				
     				mean_x = 0;
     				mean_y = 0;
@@ -131,58 +131,64 @@ public class DistanceMatrixCalculator {
     			rootProduct = (sumX_root * sumY_root);
     			
     			if(absolute){
-    				
     				finalVal = Math.abs(sumXY/rootProduct);
-    			}
-    			else{
     				
+    			} else{
     				finalVal = sumXY/rootProduct;
     			}
     			
     			pearson1 = 1.0 - finalVal;
     			
-    			//using BigDecimal to correct for rounding errors caused by floating point arithmetic 
-    			//(0.0 would be -1.113274672357E-16 for example)
+    			//using BigDecimal to correct for rounding errors caused by 
+    			//floating point arithmetic (0.0 would be 
+    			//-1.113274672357E-16 for example)
     			pearson2 = new BigDecimal(String.valueOf(pearson1));
     			pearson2 = pearson2.setScale(10, BigDecimal.ROUND_DOWN);
     			
 	    		pearsonList.add(pearson2.doubleValue());
-	    		
     		}
     		
     		distanceList.add(pearsonList);
     	}
     }
 	
-	public void spearman(){
+	/**
+	 * This method runs the Spearman Ranked distance measure.
+	 * It ranks the data values by their magnitude and then calls an
+	 * uncentered Pearson correlation distance measure on the data.
+	 */
+	public void spearman() {
 		
-    	//clearing the distanceList in case the function is somehow called after using another
-    	//distance measure and the object wasn't dumped before
+    	//making sure distanceList is clear
     	distanceList.clear();
     	
-    	System.out.println("FullList E 1000 Sample: " + fullList.get(1000).subList(0, 20));
+    	System.out.println("FullList E 1000 Sample: " 
+    	+ fullList.get(1000).subList(0, 20));
     	
-    	for(List<Double> row : fullList){
+    	for(List<Double> row : fullList) {
     		
     		List<Double> copyRow = new ArrayList<Double>(row);
     		
     		Collections.sort(copyRow);
     		
-    		for(int i = 0; i < copyRow.size(); i++){
+    		for(int i = 0; i < copyRow.size(); i++) {
     			
     			Double rank = (double) i;
     			row.set(row.indexOf(copyRow.get(i)), rank);
     		}
     	}
     	
-    	System.out.println("FullList E 1000 Sample POST: " + fullList.get(1000).subList(0, 20));
+    	System.out.println("FullList E 1000 Sample POST: " 
+    	+ fullList.get(1000).subList(0, 20));
     	
-    	pearson(false, true);
-    	
+    	pearson(false, true);	
     }
 
 	//Euclidean Distance
-    public void euclid(){
+	/**
+	 * Euclidean distance measure applied to the data matrix.
+	 */
+    public void euclid() {
 		
     	//local variables
     	double sDist = 0;
@@ -192,14 +198,11 @@ public class DistanceMatrixCalculator {
     	
     	pBar.setMaximum(fullList.size());
     	
-    	//clearing the distanceList in case the function is somehow called after using another
-    	//distance measure and the object wasn't dumped before
+    	//making sure distanceList is empty
     	distanceList.clear();
     	
     	//take a gene
-    	for(int i = 0; i < fullList.size(); i++){
-    		
-    		//long ms = System.currentTimeMillis();
+    	for(int i = 0; i < fullList.size(); i++) {
     		
     		//update progressbar
     		pBar.setValue(i);
@@ -211,8 +214,7 @@ public class DistanceMatrixCalculator {
     		List<Double> geneDistance = new ArrayList<Double>();
     		
     		//choose a gene for distance comparison
-    		//0.15ms per loop
-    		for(int j = 0; j < fullList.size(); j++){
+    		for(int j = 0; j < fullList.size(); j++) {
     			
     			List<Double> gene2 = fullList.get(j);
     			
@@ -220,8 +222,7 @@ public class DistanceMatrixCalculator {
     			List<Double> sDiff= new ArrayList<Double>();
     			
     			//compare each value of both genes
-    			//fixed: now runs at ~40 -60k ns = 0.05ms
-    			for(int k = 0; k < gene.size(); k++){
+    			for(int k = 0; k < gene.size(); k++) {
     				
     				g1 = gene.get(k);
     				g2 = gene2.get(k);
@@ -233,9 +234,7 @@ public class DistanceMatrixCalculator {
     			//sum all the squared value distances up
     			//--> get distance between gene and gene2
     			double sum = 0;
-    			
-    			//runs at ~5000ns or 0.005ms --> irrelevant
-    			for(double element : sDiff){
+    			for(double element : sDiff) {
     				sum += element;
     			}
     			
@@ -244,15 +243,16 @@ public class DistanceMatrixCalculator {
     			
     			geneDistance.add(divSum);
     		}
-    		
-    		//System.out.println("#1 Loop Time: " + (System.currentTimeMillis()-ms));
 
     		//list with all genes and their distances to the other genes
     		distanceList.add(geneDistance);
     	}
     }
     
-    public void cityBlock(){
+    /**
+     * Manhattan Distance measure applied to data matrix
+     */
+    public void cityBlock() {
 
     	//local variables
     	double g1 = 0;
@@ -261,14 +261,11 @@ public class DistanceMatrixCalculator {
     	
     	pBar.setMaximum(fullList.size());
     	
-    	//clearing the distanceList in case the function is somehow called after using another
-    	//distance measure and the object wasn't dumped before
+    	//making sure distanceList is clear
     	distanceList.clear();
     	
     	//take a gene
-    	for(int i = 0; i < fullList.size(); i++){
-    		
-    		//long ms = System.currentTimeMillis();
+    	for(int i = 0; i < fullList.size(); i++) {
     		
     		//update progressbar
     		pBar.setValue(i);
@@ -280,7 +277,7 @@ public class DistanceMatrixCalculator {
     		List<Double> dataDistance = new ArrayList<Double>();
     		
     		//choose a gene for distance comparison
-    		for(int j = 0; j < fullList.size(); j++){
+    		for(int j = 0; j < fullList.size(); j++) {
     			
     			List<Double> data2 = fullList.get(j);
     			
@@ -288,8 +285,7 @@ public class DistanceMatrixCalculator {
     			List<Double> sDiff= new ArrayList<Double>();
     			
     			//compare each value of both genes
-    			//fixed: now runs at ~40 -60k ns = 0.05ms
-    			for(int k = 0; k < data.size(); k++){
+    			for(int k = 0; k < data.size(); k++) {
     				
     				g1 = data.get(k);
     				g2 = data2.get(k);
@@ -301,21 +297,22 @@ public class DistanceMatrixCalculator {
     			//sum all the squared value distances up
     			//--> get distance between gene and gene2
     			double sum = 0;
-    			
     			for(double element : sDiff){
+    				
     				sum += element;
     			}
     			
     			dataDistance.add(sum);
     		}
-    		
-    		//System.out.println("#1 Loop Time: " + (System.currentTimeMillis()- ms));
 
     		//list with all genes and their distances to the other genes
     		distanceList.add(dataDistance);
     	}
     }
     
+    /**
+     * Chooses appropriate distance measure according to user GUI selection.
+     */
 	public void measureDistance(){
 		
 		switch(choice){

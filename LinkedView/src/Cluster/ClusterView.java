@@ -190,7 +190,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		buttonPanel.setOpaque(false);
 		
 		//header
-		head1 = new HeaderPanel("Cluster ", " Data Preview");
+		head1 = new HeaderPanel("Cluster", "Data Preview");
 		head1.setColor(Color.BLACK);
 		
 		//Data Info Panel
@@ -249,7 +249,7 @@ public class ClusterView extends JPanel implements MainPanel {
 			text2.setFont(new Font("Sans Serif", Font.PLAIN, 35));
 			text2.setForeground(BLUE1);
 			
-			this.add(text, "pushx, alignx 50%");
+			this.add(text, "pushx, alignx 50%, wrap");
 			this.add(text2, "pushx, alignx 50%");
 		}
 		
@@ -359,7 +359,7 @@ public class ClusterView extends JPanel implements MainPanel {
 					clusterPanel = new ClusterOptionsPanel(
 							ClusterView.this, true);
 					
-					head1.setText("Hierarchical Cluster ", "Options");
+					head1.setText("Hierarchical Cluster", "Options");
 					
 					optionsPanel.add(doPanel, "pushx, alignx 50%, wrap");
 					optionsPanel.add(clusterPanel, "pushx, alignx 50%, wrap");
@@ -391,10 +391,11 @@ public class ClusterView extends JPanel implements MainPanel {
 					clusterPanel = new ClusterOptionsPanel(
 							ClusterView.this, false);
 					
-					head1.setText("K-Means ", "Options");
+					head1.setText("K-Means", "Options");
 					
-					optionsPanel.add(doPanel, "pushx, alignx 50%, wrap");
-					optionsPanel.add(clusterPanel, "pushx, alignx 50%, wrap");
+					optionsPanel.add(doPanel, "pushx, growx, alignx 50%, wrap");
+					optionsPanel.add(clusterPanel, "pushx, growx, " +
+							"alignx 50%, wrap");
 					
 					mainPanel.add(head1, "alignx 50%, pushx, wrap");
 					mainPanel.add(optionsPanel, "push, alignx 50%, " +
@@ -494,8 +495,8 @@ public class ClusterView extends JPanel implements MainPanel {
 			colPanel.add(arrayCombo,"alignx 50%, grow, push");
 			
 			this.add(similarity, "alignx 50%, span, wrap");
-			this.add(rowPanel, "growx, pushx");
-			this.add(colPanel, "growx, pushx");
+			this.add(rowPanel, "growx, pushx, alignx 50%");
+			this.add(colPanel, "growx, pushx, alignx 50%");
 		}
 	}	
 	
@@ -545,8 +546,9 @@ public class ClusterView extends JPanel implements MainPanel {
 	 * @param text
 	 * @return
 	 */
-	public static JProgressBar setPBarLayout(JProgressBar pBar){
+	public static JProgressBar setPBarLayout(JProgressBar pBar, String text){
 		
+		pBar = new JProgressBar();
 		pBar.setMinimum(0);
 		pBar.setStringPainted(true);
 		pBar.setMaximumSize(new Dimension(2000, 40));
@@ -557,6 +559,7 @@ public class ClusterView extends JPanel implements MainPanel {
 			@Override
 			protected Color getSelectionForeground(){return Color.white;};
 		});
+		pBar.setString(text);
 		pBar.setVisible(true);
 		
 		return pBar;

@@ -54,6 +54,7 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 		 * @param mp main panel to display
 		 */
 		public MainPanelFrame(MainPanel mp) {
+			
 			super();
 			mainPanel = mp;
 			final WindowListener listener = new WindowAdapter() {
@@ -317,6 +318,7 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 	 * @return
 	 */
 	public MainPanel restorePlugin(ConfigNode thisNode, PluginFactory f) {
+		
 		MainPanel plugin =  f.restorePlugin(thisNode, getViewFrame());
 		if (plugin != null) {
 			switch(plugin.getConfigNode().getAttribute("dock", -1)) {
@@ -408,6 +410,7 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 		}
 	}
 	public void removeCurrent() {
+		
 		Component current =  getSelectedComponent();
 		if (current != null) {
 			MainPanel cPanel = (MainPanel) current;

@@ -37,25 +37,40 @@ import edu.stanford.genetics.treeview.*;
 public class GTRView extends ModelViewBuffered implements
     MouseListener, KeyListener {
 
-    /** 
-     * Constructor. You still need to specify a map to have this thing draw.
-     */
-	 public GTRView() {
-	   super();
-	   panel = this;
-	   destRect = new Rectangle();
-	   
-	   addMouseListener(this);
-	   addKeyListener(this);
-	 }
-
-    
+	private static final long serialVersionUID = 1L;
+	
 	private static final String [] hints = {
 		"Click to select node",
-		" - use arrow keys to navigate tree",
+		" - Use arrow keys to navigate tree",
 	};
+	
+	protected HeaderSummary headerSummary = new HeaderSummary();
+	
+	private MapContainer map;
+	private LeftTreeDrawer drawer = null;
+	private TreeDrawerNode selectedNode = null;
+	private Rectangle destRect = null;
+	
+	private TreeSelectionI geneSelection;
+	private LinearTransformation xScaleEq;
+	private LinearTransformation yScaleEq;
+	
+	/** 
+     * Constructor. You still need to specify a map to have this thing draw.
+     */
+	public GTRView() {
+	
+		super();
+		panel = this;
+		destRect = new Rectangle();
+	   
+		addMouseListener(this);
+		addKeyListener(this);
+	}
+
 	@Override
 	public String[]  getHints() {
+		
 		return hints;
 	}
     /** 
@@ -64,10 +79,12 @@ public class GTRView extends ModelViewBuffered implements
      * @param d    The new drawer
      */
     public void setLeftTreeDrawer(LeftTreeDrawer d) {
-	if (drawer != null)
-	    drawer.deleteObserver(this);
-	drawer = d;
-	drawer.addObserver(this);
+		
+    	if (drawer != null) {
+    		drawer.deleteObserver(this);
+    	}
+		drawer = d;
+		drawer.addObserver(this);
     }
 
     /** 
@@ -76,10 +93,12 @@ public class GTRView extends ModelViewBuffered implements
      * @param geneSelection The TreeSelection which is set by selecting genes in the GlobalView
      */
     public void setGeneSelection(TreeSelectionI geneSelection) {
-	  if (this.geneSelection != null)
-	    this.geneSelection.deleteObserver(this);	
-	  this.geneSelection = geneSelection;
-	  this.geneSelection.addObserver(this);
+    	
+    	if (this.geneSelection != null) {
+    		this.geneSelection.deleteObserver(this);	
+    	}
+    	this.geneSelection = geneSelection;
+    	this.geneSelection.addObserver(this);
     }
 
     /** 
@@ -88,14 +107,16 @@ public class GTRView extends ModelViewBuffered implements
      * @param m The new map to be used for determining the spacing
      * between indexes.
      */
-	 public void setMap(MapContainer m) {
-	   if (map != null)
-		 map.deleteObserver(this);
-	   map = m;
-	   map.addObserver(this);
-	   offscreenValid = false;
-	   repaint();
-	 }
+    public void setMap(MapContainer m) {
+	   
+    	if (map != null) {
+    		map.deleteObserver(this);
+    	}
+    	map = m;
+    	map.addObserver(this);
+    	offscreenValid = false;
+    	repaint();
+    }
 
     /** 
      * Synchronizes TreeSelection with selectedNode.
@@ -103,77 +124,97 @@ public class GTRView extends ModelViewBuffered implements
      * sets the TreeSelection to reflect the span of the selected node.
      * sets the selected node of the TreeSelection to this node.
      * Notifies observers.
-	 * Should be called whenever the internal pointer to selected node 
-	 * is changed.
+     * Should be called whenever the internal pointer to selected node 
+     * is changed.
      */
-	 private void synchMap() {
-	   if ((selectedNode != null) && (geneSelection != null)) {	    
-		 int start  = (int) (selectedNode.getLeftLeaf().getIndex());
-		 int end    = (int) (selectedNode.getRightLeaf().getIndex());
-		 geneSelection.deselectAllIndexes();
-		 geneSelection.selectIndexRange(start, end);
-		 geneSelection.setSelectedNode(selectedNode.getId());
-		 geneSelection.notifyObservers();
-	   }
-	   if ((status != null) && hasMouse)
-	   {status.setMessages(getStatus());}
-	 }
+    private void synchMap() {
+		 
+    	if ((selectedNode != null) && (geneSelection != null)) {
+			 
+    		int start  = (int) (selectedNode.getLeftLeaf().getIndex());
+    		int end    = (int) (selectedNode.getRightLeaf().getIndex());
+    		geneSelection.deselectAllIndexes();
+    		geneSelection.selectIndexRange(start, end);
+    		geneSelection.setSelectedNode(selectedNode.getId());
+    		geneSelection.notifyObservers();
+    	}
+    	if ((status != null) && hasMouse) {
+    		status.setMessages(getStatus());}
+    }
 	 
-	 	protected HeaderSummary headerSummary = new HeaderSummary();
-	/** Setter for headerSummary */
+	/** 
+	 * Setter for headerSummary 
+	 * 
+	 */
 	public void setHeaderSummary(HeaderSummary headerSummary) {
+		
 		this.headerSummary = headerSummary;
 	}
-	/** Getter for headerSummary */
+	
+	/** 
+	 * Getter for headerSummary 
+	 */
 	public HeaderSummary getHeaderSummary() {
+		
 		return headerSummary;
 	}
 
-	 public void setSelectedNode(TreeDrawerNode n) {
-		 if (selectedNode == n) return;
-		 if (getYScaleEq() != null) {
-			 if (selectedNode != null) {
-				 drawer.paintSubtree(offscreenGraphics, 
-				 getXScaleEq(), getYScaleEq(),
-				 destRect, selectedNode, false);
-			 }
+	public void setSelectedNode(TreeDrawerNode n) {
+		
+		if (selectedNode == n) {
+			return;
+		}
+		
+		if (getYScaleEq() != null) {
+			
+			if (selectedNode != null) {
+				drawer.paintSubtree(offscreenGraphics, 
+						getXScaleEq(), getYScaleEq(),
+						destRect, selectedNode, false);
+			}
 			 
-			 selectedNode = n;
+			selectedNode = n;
 			 
-			 if (selectedNode != null) {
-				 drawer.paintSubtree(offscreenGraphics, 
-				 getXScaleEq(), getYScaleEq(),
-				 destRect, selectedNode, true);
-			 }
-		 } else {
-			 selectedNode = n;
-		 }
-		 synchMap();
-		 //	   offscreenValid = false;
-		 repaint();
-	 }
-	 private void selectParent() {
-	   TreeDrawerNode current = selectedNode;
-	   selectedNode = current.getParent();
-	   if (selectedNode == null) {
-		   selectedNode = current;
-		   return;
-	   }
-	   if (current == selectedNode.getLeft())
-		   current = selectedNode.getRight();
-	   else
-		   current = selectedNode.getLeft();
-	   drawer.paintSubtree(offscreenGraphics, 
-		getXScaleEq(), getYScaleEq(),
-		destRect, current, true);
-	   drawer.paintSingle(
-	   	offscreenGraphics, getXScaleEq(), getYScaleEq(),
-		destRect, selectedNode, true);
+			if (selectedNode != null) {
+				drawer.paintSubtree(offscreenGraphics, 
+						getXScaleEq(), getYScaleEq(),
+						destRect, selectedNode, true);
+			}
+		} else {
+			selectedNode = n;
+		}
+		synchMap();
+		//	   offscreenValid = false;
+		repaint();
+	}
+	
+	private void selectParent() {
+	
+		TreeDrawerNode current = selectedNode;
+		selectedNode = current.getParent();
+		if (selectedNode == null) {
+			selectedNode = current;
+			return;
+		}
+		if (current == selectedNode.getLeft()) {
+			current = selectedNode.getRight();
+			
+		} else {
+			current = selectedNode.getLeft();
+		}
+	
+		drawer.paintSubtree(offscreenGraphics, 
+				getXScaleEq(), getYScaleEq(),
+				destRect, current, true);
+		drawer.paintSingle(
+				offscreenGraphics, getXScaleEq(), getYScaleEq(),
+				destRect, selectedNode, true);
 			 
-	   synchMap();
-	   repaint();
-	 }
-	 private void selectRight() {
+		synchMap();
+		repaint();
+	}
+	
+	private void selectRight() {
 	   if (selectedNode.isLeaf()) return;
 	   TreeDrawerNode current = selectedNode;
 	   selectedNode = current.getRight();
@@ -358,29 +399,26 @@ public class GTRView extends ModelViewBuffered implements
 	@Override
 	public void keyTyped(KeyEvent e) {}
 	
-	private TreeSelectionI geneSelection;
-	private LinearTransformation xScaleEq;
 	/** Setter for xScaleEq */
 	public void setXScaleEq(LinearTransformation xScaleEq) {
 		this.xScaleEq = xScaleEq;
 	}
+	
 	/** Getter for xScaleEq */
 	public LinearTransformation getXScaleEq() {
 		return xScaleEq;
 	}
-	private LinearTransformation yScaleEq;
+	
 	/** Setter for yScaleEq */
 	public void setYScaleEq(LinearTransformation yScaleEq) {
 		this.yScaleEq = yScaleEq;
 	}
+	
 	/** Getter for yScaleEq */
 	public LinearTransformation getYScaleEq() {
 		return yScaleEq;
 	}
-	private MapContainer map;
-	private LeftTreeDrawer drawer = null;
-	private TreeDrawerNode selectedNode = null;
-	private Rectangle destRect = null;
+
 	/**
 	 * @param nodeName
 	 */

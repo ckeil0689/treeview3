@@ -48,33 +48,40 @@ import edu.stanford.genetics.treeview.*;
  * @author     Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.1 $ $Date: 2006-08-16 19:13:45 $
  */
-public class CharDendroView extends DendroView {
+public class CharDendroView extends DendroView2 {
+
+	private static final long serialVersionUID = 1L;
+	
+	private HeaderInfo charHeaderInfo;
+	
 	/**
 	 *  Constructor for the CharDendroView object
 	 *
 	 * @param  vFrame  parent ViewFrame of CharDendroView
-	 * @param  configNode   node in which to store persistent configuration info (if desired)
+	 * @param  configNode   node in which to store persistent configuration 
+	 * info (if desired)
 	 */
 	public CharDendroView(ViewFrame vFrame, ConfigNode configNode) {
+		
 		super(vFrame.getDataModel(), configNode, vFrame, "CharDendroView");
 		// this is where it gets interesting...
 		setArraySelection(new TreeSelection(arrayDrawer.getNumCol()));
 	}
-	
 
-
-	public void populateExportMenu(Menu menu)
-	{
+	public void populateExportMenu(Menu menu) {
 		/*
-		PostscriptExportPanel doesn't currently support character drawing. Otherwise, this works.
+		PostscriptExportPanel doesn't currently support character drawing. 
+		Otherwise, this works.
 		
-		MenuItem psItem = new MenuItem("Export to Postscript...", new MenuShortcut(KeyEvent.VK_X));
+		MenuItem psItem = new MenuItem("Export to Postscript...", 
+		new MenuShortcut(KeyEvent.VK_X));
 		psItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent actionEvent) {
 				
 				
 				MapContainer initXmap, initYmap;
-				if ((arraySelection.getNSelectedIndexes() != 0) || (geneSelection.getNSelectedIndexes() != 0)){
+				if ((arraySelection.getNSelectedIndexes() != 0) 
+				|| (geneSelection.getNSelectedIndexes() != 0)){
 					initXmap = getZoomXmap();
 					initYmap = getZoomYmap();
 				} else {
@@ -90,9 +97,12 @@ public class CharDendroView extends DendroView {
 				psePanel.setSourceSet(dataModel.getFileSet());
 				psePanel.setGeneFont(textview.getFont());
 				psePanel.setArrayFont(arraynameview.getFont());
-				psePanel.setIncludedArrayHeaders(arraynameview.getHeaderSummary().getIncluded());
-				psePanel.setIncludedGeneHeaders(textview.getHeaderSummary().getIncluded());
-				final JDialog popup = new CancelableSettingsDialog(viewFrame, "Export to Postscript", psePanel);
+				psePanel.setIncludedArrayHeaders(
+				arraynameview.getHeaderSummary().getIncluded());
+				psePanel.setIncludedGeneHeaders(
+				textview.getHeaderSummary().getIncluded());
+				final JDialog popup = new CancelableSettingsDialog(viewFrame, 
+				"Export to Postscript", psePanel);
 				popup.pack();
 				popup.setVisible(true);
 			}
@@ -102,13 +112,16 @@ public class CharDendroView extends DendroView {
 		
 		MenuItem bitmapItem = new MenuItem("Export to Image...");
 		bitmapItem.addActionListener(new ActionListener() {
+			
 			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				
 				MapContainer initXmap, initYmap;
-				if ((getArraySelection().getNSelectedIndexes() != 0) || (getGeneSelection().getNSelectedIndexes() != 0)){
+				if ((getArraySelection().getNSelectedIndexes() != 0) 
+						|| (getGeneSelection().getNSelectedIndexes() != 0)){
 					initXmap = getZoomXmap();
 					initYmap = getZoomYmap();
+					
 				} else {
 					initXmap = getGlobalXmap();
 					initYmap = getGlobalYmap();
@@ -124,10 +137,13 @@ public class CharDendroView extends DendroView {
 				bitmapPanel.setSourceSet(getDataModel().getFileSet());
 				bitmapPanel.setGeneFont(textview.getFont());
 				bitmapPanel.setArrayFont(arraynameview.getFont());
-				bitmapPanel.setIncludedArrayHeaders(arraynameview.getHeaderSummary().getIncluded());
-				bitmapPanel.setIncludedGeneHeaders(textview.getHeaderSummary().getIncluded());
+				bitmapPanel.setIncludedArrayHeaders(
+						arraynameview.getHeaderSummary().getIncluded());
+				bitmapPanel.setIncludedGeneHeaders(
+						textview.getHeaderSummary().getIncluded());
 				
-				final JDialog popup = new CancelableSettingsDialog(viewFrame, "Export to Image", bitmapPanel);
+				final JDialog popup = new CancelableSettingsDialog(viewFrame, 
+						"Export to Image", bitmapPanel);
 				popup.pack();
 				popup.setVisible(true);
 			}
@@ -148,13 +164,15 @@ public class CharDendroView extends DendroView {
 
 		CharColorExtractor colorExtractor = new CharColorExtractor();
 		
-		hintpanel = new MessagePanel("Usage Hints");
-		statuspanel = new MessagePanel("View Status");
+		hintpanel = new MessagePanel("Usage Hints", BLUE2);
+		statuspanel = new MessagePanel("Status", BLUE2);
 
 		CharArrayDrawer cArrayDrawer = new CharArrayDrawer();
 		cArrayDrawer.setColorExtractor(colorExtractor);
-		// set data first to avoid adding auto-genereated contrast to documentConfig.
-		cArrayDrawer.setHeaderInfo(getDataModel().getGeneHeaderInfo(), getConfigNode().getAttribute("headerName", "ALN"));
+		//set data first to avoid adding auto-genereated contrast 
+		//to documentConfig.
+		cArrayDrawer.setHeaderInfo(getDataModel().getGeneHeaderInfo(), 
+				getConfigNode().getAttribute("headerName", "ALN"));
 		arrayDrawer = cArrayDrawer;
 
 
@@ -173,16 +191,16 @@ public class CharDendroView extends DendroView {
 
 
 
-		 zoomXmap = new MapContainer();
-		 zoomXmap.setDefaultScale(12.0);
-		 zoomXmap.setScrollbar(zoomXscrollbar);
-		 zoomYmap = new MapContainer();
-		 zoomYmap.setDefaultScale(12.0);
-		 zoomYmap.setScrollbar(zoomYscrollbar);
+		zoomXmap = new MapContainer();
+		zoomXmap.setDefaultScale(12.0);
+		zoomXmap.setScrollbar(zoomXscrollbar);
+		zoomYmap = new MapContainer();
+		zoomYmap.setDefaultScale(12.0);
+		zoomYmap.setScrollbar(zoomYscrollbar);
 
-		 // globalmaps tell globalview, atrview, and gtrview
-		 // where to draw each data point.
-	// the scrollbars "scroll" by communicating with the maps.
+		//globalmaps tell globalview, atrview, and gtrview
+		//where to draw each data point.
+		//the scrollbars "scroll" by communicating with the maps.
 		globalXmap = new MapContainer();
 		globalXmap.setDefaultScale(2.0);
 		globalXmap.setScrollbar(globalXscrollbar);
@@ -225,7 +243,8 @@ public class CharDendroView extends DendroView {
 
 		arraynameview.setMapping(getZoomXmap());
 
-		textview = new TextViewManager(getDataModel().getGeneHeaderInfo(), viewFrame.getUrlExtractor());
+		textview = new TextViewManager(getDataModel().getGeneHeaderInfo(), 
+				viewFrame.getUrlExtractor());
 		textview.setMap(getZoomYmap());
 
 		doDoubleLayout();
@@ -237,7 +256,6 @@ public class CharDendroView extends DendroView {
 		// urls
 		colorExtractor.bindConfig(getFirst("ColorExtractor"));
 		
-
 		bindTrees();
 		
 		zoomview.setHeaders(getDataModel().getGeneHeaderInfo(), charHeaderInfo);
@@ -261,8 +279,9 @@ public class CharDendroView extends DendroView {
 		getZoomXmap().notifyObservers();
 		getZoomYmap().notifyObservers();
 	}
-	private HeaderInfo charHeaderInfo;
+	
 }
+
 class CharHeaderInfo implements HeaderInfo {
 	String [] holder = new String [1];
 	String [] names = new String [1];

@@ -33,10 +33,12 @@ import java.util.Observer;
  * whereas getNumNames() is the number of headers for each gene.
  *
  * Conceptually, the objects that are annotated (genes, arrays, nodes) can be
- * thought of as rows, and the various names as the headers of columns of information about them.
- * For historical reasons, the actual annotations are called the headers, and the column headers
- * are called names (i.e. names of the annotation). This is because the first HeaderInfo
- * objects represented subtables of the CDT file.
+ * thought of as rows, and the various names as the headers of columns of 
+ * information about them.
+ * For historical reasons, the actual annotations are called the headers, 
+ * and the column headers are called names (i.e. names of the annotation). 
+ * This is because the first HeaderInfo objects represented subtables 
+ * of the CDT file.
  *
  * @author     Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.12 $ $Date: 2005-11-25 07:24:08 $
@@ -59,7 +61,6 @@ public interface HeaderInfo {
 	 */
 	public String getHeader(int i, String name);
 
-
 	/**
 	 *  Gets the names of the headers
 	 *
@@ -71,8 +72,11 @@ public interface HeaderInfo {
 	* The number of headers.
 	*/
 	public int getNumNames();
+	
 	/**
-	 * Gets the number of sets of headers. This will generally be the number things which have headers, i.e. number of genes/arrays/nodes.
+	 * Gets the number of sets of headers. 
+	 * This will generally be the number things which have headers, 
+	 * i.e. number of genes/arrays/nodes.
 	 */
 	public int getNumHeaders();
 
@@ -94,10 +98,13 @@ public interface HeaderInfo {
 	public int getIndex(String name);
 
 	/**
-	* gets the index of a gene/array/node given a value from the first column (the id column). Should have been called "getIndexById" or something.
+	* gets the index of a gene/array/node given a value from the 
+	* first column (the id column). Should have been called 
+	* "getIndexById" or something.
 	*
 	* @param  id	a particular id for a gene or array or node
-	* @return       The index value, for use with getHeader() or similar thing. Returns -1 if no header matching "id" can be found.
+	* @return       The index value, for use with getHeader() or similar thing. 
+	* Returns -1 if no header matching "id" can be found.
 	*/
 	public int getHeaderIndex(String id);
 	
@@ -150,12 +157,12 @@ public interface HeaderInfo {
 	public void setModified(boolean mod);
 
 	/**
-	 * lookup by row and column, which should correspond to position in the names array.
+	 * lookup by row and column, which should correspond to position 
+	 * in the names array.
 	 * @param rowIndex
 	 * @param columnIndex
 	 * @return
 	 */
 	public String getHeader(int rowIndex, int columnIndex);
-	
 }
 

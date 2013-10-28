@@ -73,7 +73,7 @@ public class ATRZoomView extends ModelView implements
 
 	private final static String[] hints = {
 			"Click to select node",
-			" - use arrow keys to navigate tree",
+			" - Use arrow keys to navigate tree",
 			};
 
 

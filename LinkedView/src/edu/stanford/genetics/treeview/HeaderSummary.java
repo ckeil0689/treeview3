@@ -27,43 +27,56 @@ import java.util.Observable;
 * this class generates a single string summary of a HeaderInfo.
 */
 public class HeaderSummary extends Observable implements ConfigNodePersistent {
-	/**
-	 * 
-	 */
+
+	
 	public HeaderSummary() {
+		
 		super();
 	}
+	
 	int [] included = new int [] {1};
 	
 	public void setIncluded(int [] newIncluded) {
+		
 		included = newIncluded;
 		synchronizeTo();
 		setChanged();
 		notifyObservers();
 	}
+	
 	public int [] getIncluded() {
+		
 		return included;
 	}
+	
 	/**
 	* returns the best possible summary for the specified index.
 	*
 	* If no headers are applicable, will return the empty string.
 	*/
 	public String getSummary(HeaderInfo headerInfo, int index) {
+		
 		String [] strings = null;
 		try {
 		    strings = headerInfo.getHeader(index);
+		    
 		} catch (java.lang.ArrayIndexOutOfBoundsException aie) {
-		    LogBuffer.println("index " + index + " out of bounds on headers, continuing");
+		    LogBuffer.println("index " + index 
+		    		+ " out of bounds on headers, continuing");
 			return null;
 		}
-		if (strings == null) return null;
+		
+		if (strings == null) {
+			
+			return null;
+		}
 
 		StringBuffer out = new StringBuffer();
-		int count =0;
+		int count = 0;
 		if (included.length == 0) {
 			return "";
 		}
+		
 		for (int i =0; i < included.length; i++) {
 			try {
 				String test = strings[included[i]];
@@ -76,8 +89,10 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 				// out.append(strings[1]);
 			}
 		}
+		
 		if (count == 0) {
 			return "";
+			
 		} else {
 			return out.toString();
 		}

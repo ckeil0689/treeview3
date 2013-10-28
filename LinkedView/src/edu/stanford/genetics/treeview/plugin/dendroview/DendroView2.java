@@ -99,22 +99,22 @@ MainPanel, Observer {
 	protected ArrayDrawer arrayDrawer;
 	protected ConfigNode root;
 	
-	// persistent popups
+	//persistent popups
 	protected JDialog settingsFrame;
 	protected TabbedSettingsPanel settingsPanel;
+	
+	protected final static Color RED1 = new Color(240, 80, 50, 255);
+	protected final static Color BLUE2 = new Color(235, 240, 255, 255);
+	
 	/*
-	 * The following arrays allow translation to and from screen and datamatrix 
-	 * I had to add these in order to have gaps in the dendroview of k-means
+	 * The following arrays allow translation to and from screen and DataMatrix 
+	 * I had to add these in order to have gaps in the Dendroview of k-means
 	 */
 	private int [] arrayIndex  = null;
 	private int [] geneIndex   = null;
 	private DataModel dataModel = null;
 	private TreeSelectionI geneSelection = null;
 	private TreeSelectionI arraySelection = null;
-	
-	private final Color RED1 = new Color(240, 80, 50, 255);
-	private final Color BLUE2 = new Color(235, 240, 255, 255);
-	
 	private ColorExtractor colorExtractor;
 	
 	/**
@@ -706,8 +706,8 @@ MainPanel, Observer {
 		colorExtractor.setDefaultColorSet(colorPresets.getDefaultColorSet());
 		colorExtractor.setMissing(DataModel.NODATA, DataModel.EMPTY);
 		
-		hintpanel = new MessagePanel("Usage Hints");
-		statuspanel = new MessagePanel("View Status");
+		hintpanel = new MessagePanel("Usage Hints", BLUE2);
+		statuspanel = new MessagePanel("Status", BLUE2);
 		buttonPanel = new JPanel();
 
 		DoubleArrayDrawer dArrayDrawer = new DoubleArrayDrawer();
@@ -784,7 +784,7 @@ MainPanel, Observer {
 
 		doDoubleLayout();
 
-		// reset persistent popups
+		//reset persistent popups
 		settingsFrame = null;
 		settingsPanel = null;
 
@@ -957,11 +957,24 @@ MainPanel, Observer {
 	 */
 	protected void doDoubleLayout() {
 		
-		Dimension left_min, right_min, up_min, down_min, d, d2;
-		JPanel left, right, upSide, downSide, gtrPanel, panel, buttonPanel, 
-		zoompanel, textpanel;
-		JSplitPane backgroundPane, level1Pane;
-		JButton saveButton, closeButton;
+		Dimension left_min;
+		Dimension right_min;
+		Dimension up_min; 
+		Dimension down_min;  
+		Dimension d; 
+		Dimension d2;
+		JPanel left;
+		JPanel right;
+		JPanel upSide;
+		JPanel downSide;
+		JPanel gtrPanel;
+		JPanel panel; 
+		JPanel zoompanel;
+		JPanel textpanel;
+		JSplitPane backgroundPane;
+		JSplitPane level1Pane;
+		JButton saveButton;
+		JButton closeButton;
 		
 		left_min = new Dimension(500, 450);
 		right_min = new Dimension(600, 500);
@@ -1005,11 +1018,6 @@ MainPanel, Observer {
 		// global view
 		panel = new JPanel();
 		panel.setLayout(new MigLayout("ins 0"));
-		registerView(globalview);
-		
-		buttonPanel = new JPanel();
-		buttonPanel.setLayout(new MigLayout());
-		buttonPanel.setOpaque(false);
 		
 		saveButton = new JButton("Save Zoomed Image");
 		d = saveButton.getPreferredSize();
@@ -1064,6 +1072,7 @@ MainPanel, Observer {
 		level1Pane.setBorder(null);
 		
 		//Register Views
+		registerView(globalview);
 		registerView(atrview);
 		registerView(atrzview);
 		registerView(arraynameview);
@@ -1084,20 +1093,18 @@ MainPanel, Observer {
 		textpanel.add(textview.getComponent(), BorderLayout.CENTER);
 		
 		left.add(panel, "grow, push, height 80%:80%:, span, wrap");
-		left.add(statuspanel, "grow, push, height 10%:10%:20%");
 		
-		buttonPanel.add(saveButton, "span, alignx 50%, wrap");
-		buttonPanel.add(closeButton, "span, alignx 50%");
-		
-		left.add(buttonPanel);
+		left.add(hintpanel, "push, grow, height 15%::, width 50%");
+		left.add(statuspanel, "push, grow, width 50%");
 		
 		right.add(level1Pane, "push, grow");
 		
 		upSide.add(atrzview, "push, grow, height 15%::, width :70%:70%");
-		upSide.add(hintpanel, "push, grow, height 15%::, width 30%:30%:30%");
+		upSide.add(closeButton, "pushx, growx");
 		
 		downSide.add(arraynameview, "pushx, growx, height 15%::, " +
-				"width :70%:70%, wrap");
+				"width :70%:70%");
+		downSide.add(saveButton, "pushx, alignx 50%, wrap");
 		downSide.add(zoompanel, "push, grow, width :70%:70%");
 		downSide.add(textpanel, "push, grow, width 25%:30%:35%");
 

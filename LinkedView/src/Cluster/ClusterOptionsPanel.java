@@ -6,16 +6,16 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.text.NumberFormat;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingWorker;
 import javax.swing.border.EtchedBorder;
 
@@ -48,20 +48,20 @@ class ClusterOptionsPanel extends JPanel {
 	private JLabel method;
 	private JLabel error1;
 	private JLabel error2;
-	private JLabel row_clusters;
-	private JLabel col_clusters;
-	private JFormattedTextField enterRC;
-	private JFormattedTextField enterCC;
-	private JLabel row_its;
-	private JLabel col_its;
-	private JFormattedTextField enterRIt;
-	private JFormattedTextField enterCIt;
+	private JLabel clusters;
+	private JSpinner enterRC;
+	private JSpinner enterCC;
+	private JLabel its;
+	private JSpinner enterRIt;
+	private JSpinner enterCIt;
 	private JProgressBar pBar;
 	private JProgressBar pBar2;
 	private JProgressBar pBar3;
 	private JProgressBar pBar4;
 	private JPanel loadPanel;
 	private JPanel choicePanel;
+	private JPanel rowPanel;
+	private JPanel colPanel;
 	private JPanel mainPanel;
 	private JPanel buttonPanel;
 	private JPanel optionsPanel;
@@ -119,11 +119,11 @@ class ClusterOptionsPanel extends JPanel {
 	        	try {
 	        		//Set integers only if KMeans options are shown
 	        		if(!hierarchical) {
-		        		row_clusterN = Integer.parseInt(enterRC.getText());
-		        		col_clusterN = Integer.parseInt(enterCC.getText());
+		        		row_clusterN = (int) enterRC.getValue();
+		        		col_clusterN = (int) enterCC.getValue();
 		        		
-		        		row_iterations = Integer.parseInt(enterRIt.getText());
-		        		col_iterations = Integer.parseInt(enterCIt.getText());
+		        		row_iterations = (int) enterRIt.getValue();
+		        		col_iterations = (int) enterCIt.getValue();
 	        		}
 	        		
 	        		//Setup a ClusterProcessor
@@ -176,6 +176,14 @@ class ClusterOptionsPanel extends JPanel {
 		choicePanel.setLayout(new MigLayout());
 		choicePanel.setBackground(Color.white);
 		
+		rowPanel = new JPanel();
+		rowPanel.setLayout(new MigLayout());
+		rowPanel.setOpaque(false);
+		
+		colPanel = new JPanel();
+		colPanel.setLayout(new MigLayout());
+		colPanel.setOpaque(false);
+		
 		//Label
 		method = new JLabel("Linkage Method");
 		method.setFont(new Font("Sans Serif", Font.PLAIN, 28));
@@ -188,22 +196,16 @@ class ClusterOptionsPanel extends JPanel {
 		clusterChoice = new JComboBox<String>(clusterMethods);
 		clusterChoice = ClusterView.setComboLayout(clusterChoice);
 		
-		row_clusters = new JLabel("Row Clusters #: ");
-		row_clusters.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+		clusters = new JLabel("Clusters: ");
+		clusters.setFont(new Font("Sans Serif", Font.PLAIN, 22));
 		
-		col_clusters = new JLabel("Column Clusters #: ");
-		col_clusters.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+		its = new JLabel("Iterations: ");
+		its.setFont(new Font("Sans Serif", Font.PLAIN, 22));
 		
-		row_its = new JLabel("Row Iterations #: ");
-		row_its.setFont(new Font("Sans Serif", Font.PLAIN, 18));
-		
-		col_its = new JLabel("Column Iterations #: ");
-		col_its.setFont(new Font("Sans Serif", Font.PLAIN, 18));
-		
-		enterRC = setupFormatTxtField();
-		enterCC = setupFormatTxtField();
-		enterRIt = setupFormatTxtField();
-		enterCIt = setupFormatTxtField();
+		enterRC = setupSpinner();
+		enterCC = setupSpinner();
+		enterRIt = setupSpinner();
+		enterCIt = setupSpinner();
 		
 		//ProgressBar Component
 		loadPanel = new JPanel();
@@ -271,7 +273,6 @@ class ClusterOptionsPanel extends JPanel {
 				
 				if(hierarchical) {
 					linkageMethod = (String)clusterChoice.getSelectedItem();
-					
 				}
 				
 				//needs at least one box to be selected 
@@ -285,21 +286,16 @@ class ClusterOptionsPanel extends JPanel {
 					buttonPanel.remove(back_button);
 					
 					//ProgressBars
-					pBar = new JProgressBar();
-					pBar = ClusterView.setPBarLayout(pBar);
-					pBar.setString("Row Distance Matrix");
+					pBar = ClusterView.setPBarLayout(pBar, 
+							"Row Distance Matrix");
 					
-					pBar2 = new JProgressBar();
-					pBar2 = ClusterView.setPBarLayout(pBar2);
-					pBar2.setString("Row Clustering");
+					pBar2 = ClusterView.setPBarLayout(pBar2, "Row Clustering");
 					
-					pBar3 = new JProgressBar();
-					pBar3 = ClusterView.setPBarLayout(pBar3);
-					pBar3.setString("Column Distance Matrix");
+					pBar3 = ClusterView.setPBarLayout(pBar3, 
+							"Column Distance Matrix");
 					
-					pBar4 = new JProgressBar();
-					pBar4 = ClusterView.setPBarLayout(pBar4);
-					pBar4.setString("Column Clustering");
+					pBar4 = ClusterView.setPBarLayout(pBar4, 
+							"Column Clustering");
 					
 					//Button to cancel process
 					cancel_button = new JButton("Cancel");
@@ -385,14 +381,15 @@ class ClusterOptionsPanel extends JPanel {
 	    	choicePanel.add(clusterChoice, "span, alignx 50%, wrap");
 	    	
     	} else {
-    		choicePanel.add(row_clusters, "pushx, growx");
-    		choicePanel.add(col_clusters, "pushx, growx, wrap");
-    		choicePanel.add(enterRC, "pushx, growx");
-    		choicePanel.add(enterCC, "pushx, growx, wrap");
-    		choicePanel.add(row_its, "pushx, growx");
-    		choicePanel.add(col_its, "pushx, growx, wrap");
-    		choicePanel.add(enterRIt, "pushx, growx");
-    		choicePanel.add(enterCIt, "pushx, growx, wrap");
+    		rowPanel.add(enterRC, "alignx 50%, pushx");
+    		rowPanel.add(enterCC, "alignx 50%, pushx");
+    		colPanel.add(enterRIt, "alignx 50%, pushx");
+    		colPanel.add(enterCIt, "alignx 50%, pushx");
+    		
+    		choicePanel.add(clusters, "span, alignx 50%, wrap");
+    		choicePanel.add(rowPanel, "pushx, growx, alignx 50%, wrap");
+    		choicePanel.add(its, "span, alignx 50%, wrap");
+    		choicePanel.add(colPanel, "pushx, growx, alignx 50%");
     	}
     	
     	dendro_button.setEnabled(false);
@@ -406,14 +403,10 @@ class ClusterOptionsPanel extends JPanel {
 	 * Method to setup the look of an editable TextField
 	 * @return
 	 */
-	public JFormattedTextField setupFormatTxtField() {
+	public JSpinner setupSpinner() {
 		
-		final int TEXTFIELD_SIZE = 5;
-		
-		JFormattedTextField jft = 
-				new JFormattedTextField(NumberFormat.INTEGER_FIELD);
-		jft.setValue(0);
-		jft.setColumns(TEXTFIELD_SIZE);
+		SpinnerNumberModel amountChoice = new SpinnerNumberModel(0, 0, 5000, 1);
+		JSpinner jft = new JSpinner(amountChoice);
 		
 		Dimension d = jft.getPreferredSize();
 		d.setSize(d.getWidth()*2, d.getHeight()*2);

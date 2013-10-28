@@ -74,54 +74,83 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
 	private static final String [] hints = {
 		"Mouse over to get info",
 	};
+	
 	@Override
 	public String[]  getHints() {
+		
 		return hints;
 	}
 	
 	/**
-	* showVal indicates whether the zoom should draw the value of each cell on the canvas on top of the corresponding square. Used to display IUPAC symbols for alignment view.
+	* showVal indicates whether the zoom should draw the value of each cell on 
+	* the canvas on top of the corresponding square. Used to display 
+	* IUPAC symbols for alignment view.
 	*/
 	boolean showVal = false;
+	
 	/**
-	* showVal indicates whether the zoom should draw the value of each cell on the canvas on top of the corresponding square. Used to display IUPAC symbols for alignment view.
+	* showVal indicates whether the zoom should draw the value of each cell on 
+	* the canvas on top of the corresponding square. Used to display 
+	* IUPAC symbols for alignment view.
 	*/
 	public boolean getShowVal() {
+		
 		return showVal;
 	}
+	
 	/**
-	* showVal indicates whether the zoom should draw the value of each cell on the canvas on top of the corresponding square. Used to display IUPAC symbols for alignment view.
+	* showVal indicates whether the zoom should draw the value of each cell on 
+	* the canvas on top of the corresponding square. Used to display IUPAC 
+	* symbols for alignment view.
 	*/
 	public void setShowVal(boolean showVal) {
+		
 		this.showVal = showVal;
 	}
 
 	
     @Override
 	public Dimension getPreferredSize() {
-		// return super.getPreferredSize();
-		return new Dimension(xmap.getRequiredPixels(), ymap.getRequiredPixels());
+		
+    	// return super.getPreferredSize();
+		return new Dimension(xmap.getRequiredPixels(), 
+				ymap.getRequiredPixels());
     }
+    
     /** 
      * Set geneSelection
      *
-     * @param geneSelection The TreeSelection which is set by selecting genes in the ZoomView
+     * @param geneSelection The TreeSelection which is set by 
+     * selecting genes in the ZoomView
      */
     public void setGeneSelection(TreeSelectionI geneSelection) {
-	  if (this.geneSelection != null) this.geneSelection.deleteObserver(this);	
-	  this.geneSelection = geneSelection;
-	  if (this.geneSelection != null) this.geneSelection.addObserver(this);
+	  
+    	if (this.geneSelection != null) {
+    		this.geneSelection.deleteObserver(this);	
+    	}
+    	
+    	this.geneSelection = geneSelection;
+    	if (this.geneSelection != null) {
+    		this.geneSelection.addObserver(this);
+    	}
     }
 
-		    /** 
+	/** 
      * Set arraySelection
      *
-     * @param arraySelection The TreeSelection which is set by selecting genes in the ZoomView
+     * @param arraySelection The TreeSelection which is set by selecting genes 
+     * in the ZoomView
      */
     public void setArraySelection(TreeSelectionI arraySelection) {
-	  if (this.arraySelection != null) this.arraySelection.deleteObserver(this);	
-	  this.arraySelection = arraySelection;
-	  if (this.arraySelection != null) this.arraySelection.addObserver(this);
+	  
+    	if (this.arraySelection != null) {
+    		this.arraySelection.deleteObserver(this);	
+    	}
+	  
+    	this.arraySelection = arraySelection;
+    	if (this.arraySelection != null) {
+    		this.arraySelection.addObserver(this);
+    	}
     }
 
     /** 
@@ -130,9 +159,15 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
      * @param arrayDrawer The ArrayDrawer to be used as a source
      */
     public void setArrayDrawer(ArrayDrawer arrayDrawer) {
-		if (drawer != null) drawer.deleteObserver(this);	
+		
+    	if (drawer != null) {
+    		drawer.deleteObserver(this);	
+    	}
+    	
 		drawer = arrayDrawer;
-		if (drawer != null) drawer.addObserver(this);
+		if (drawer != null) {
+			drawer.addObserver(this);
+		}
     }
 
     /** 
@@ -141,7 +176,8 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
      * @return The current ArrayDrawer
      */
     public ArrayDrawer getArrayDrawer() {
-	return drawer;
+    	
+    	return drawer;
     }
 
     /**
@@ -150,9 +186,15 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
      * @param m   the new mapping
      */
     public void setXMap(MapContainer m) {
-	if (xmap != null) xmap.deleteObserver(this);	    
-	xmap = m;
-	if (xmap != null) xmap.addObserver(this);
+	
+    	if (xmap != null) {
+    		xmap.deleteObserver(this);	    
+    	}
+    	
+    	xmap = m;
+    	if (xmap != null) {
+    		xmap.addObserver(this);
+    	}
     }
 
     /**
@@ -161,9 +203,15 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
      * @param m   the new mapping
      */
     public void setYMap(MapContainer m) {
-	if (ymap != null)  ymap.deleteObserver(this);	    
-	ymap = m;
-	if (ymap != null) ymap.addObserver(this);
+	
+    	if (ymap != null)  {
+    		ymap.deleteObserver(this);	    
+    	}
+    	
+    	ymap = m;
+    	if (ymap != null) {
+    		ymap.addObserver(this);
+    	}
     }
 
     /**
@@ -171,33 +219,53 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
      *
      * @return   the current mapping
      */
-    public MapContainer getXMap() {return xmap;}
-    public MapContainer getZoomXmap() {return xmap;}
+    public MapContainer getXMap() {
+    	
+    	return xmap;
+    }
+    
+    public MapContainer getZoomXmap() {
+    	
+    	return xmap;
+    }
 
     /**
      * get the ymapping for this view
      *
      * @return   the current mapping
      */
-    public MapContainer getYMap() {return ymap;}
-    public MapContainer getZoomYmap() {return ymap;}
+    public MapContainer getYMap() {
+    	
+    	return ymap;
+    }
+    
+    public MapContainer getZoomYmap() {
+    	
+    	return ymap;
+    }
 
-	
     // method from ModelView
     @Override
-	public String viewName() { return "ZoomView";}
+	public String viewName() { 
+    	
+    	return "ZoomView";
+    }
 
     // method from ModelView
     @Override
-	public String[]  getStatus() {
-		try {
-			if (xmap.contains(overx) && 
-			ymap.contains(overy)) {
+	public String[] getStatus() {
+    	
+    	try {
+			if (xmap.contains(overx) 
+					&& ymap.contains(overy)) {
 				statustext[0] = "Row:    " + (overy + 1);
+				
 				if (geneHI != null) {
 					int realGene = overy;
 					try {
-						statustext[0] += " (" + geneHI.getHeader(realGene,1) + ")";
+						statustext[0] += " (" + geneHI.getHeader(realGene, 1) //WRONG FOR .TXT
+								+ ")";
+						
 					} catch (java.lang.ArrayIndexOutOfBoundsException e) {
 						statustext[0] += " (N/A)";
 					}
@@ -205,24 +273,29 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
 				statustext[1] = "Column: " + (overx + 1);
 				if (arrayHI != null) {
 					try {
-						statustext[1] += " (" + arrayHI.getHeader(overx, 0) + ")";
+						statustext[1] += " (" + arrayHI.getHeader(overx, 0) 
+								+ ")";
+						
 					} catch (java.lang.ArrayIndexOutOfBoundsException e) {
 						statustext[1] += " (N/A)";
 					}
 				}
 				
 				if (drawer.isMissing(overx, overy)) {
-					statustext[2] = "Value:  No Data";		
+					statustext[2] = "Value:  No Data";	
+					
 				} else if (drawer.isEmpty(overx, overy)) {
 					statustext[2] = "";
+					
 				} else {
-					statustext[2] = "Value:  " + drawer.getSummary(overx, overy);
+					statustext[2] = "Value:  " + drawer.getSummary(overx, 
+							overy);
 				}
 			}
 		} catch (ArrayIndexOutOfBoundsException ex) {
 			// ignore silently?
 		}
-	return statustext;
+    	return statustext;
     }
 
 		// method from ModelView
@@ -371,8 +444,9 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
 	}
 	
 	public void setHeaders(HeaderInfo ghi, HeaderInfo ahi) {
-	  geneHI = ghi;
-	  arrayHI = ahi;
+		
+		geneHI = ghi;
+		arrayHI = ahi;
 	}
 }
 

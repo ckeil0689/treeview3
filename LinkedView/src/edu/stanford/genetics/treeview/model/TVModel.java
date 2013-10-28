@@ -29,252 +29,344 @@ import Cluster.ClusterFileSet;
 import edu.stanford.genetics.treeview.*;
 
 public class TVModel extends Observable implements DataModel {
-  /*
-   * This not-so-object-oriented hack is in those rare instances
-   * where it is not enough to know that we've got a DataModel.
-   */
-	@Override
-	public String getType() {
-		return "TVModel";
-	}
+	
+    protected Frame frame;
+    protected FileSet source = null;
+    protected String  dir = null;
+    protected String  root;
+
+	protected TVDataMatrix dataMatrix;
+			
+    protected IntHeaderInfo arrayHeaderInfo;
+    protected GeneHeaderInfo geneHeaderInfo;
+	protected IntHeaderInfo atrHeaderInfo;
+	protected IntHeaderInfo gtrHeaderInfo;
+	
+	protected boolean aidFound = false;
+	protected boolean gidFound = false;
+		
+    protected boolean eweightFound = false;
+    protected boolean gweightFound = false;
+    protected XmlConfig documentConfig; // holds document config
+    
 	/** has model been successfully loaded? */
-	boolean loaded = false;
+	private boolean loaded = false;
+	private int appendIndex = -1;
+	
 	/*
 	 * For cases where we are comparing two models (this needs to be changed).
 	 */
-	TVModel compareModel = null;
-	int extraCompareExpr = 0;
+	private TVModel compareModel = null;
+	private int extraCompareExpr = 0;
+	
+    public TVModel() {
+  	  
+    	super();
+    	/* build TVModel, initially empty... */	
+    	geneHeaderInfo = new GeneHeaderInfo();
+    	arrayHeaderInfo = new IntHeaderInfo();
+		atrHeaderInfo = new IntHeaderInfo();
+		gtrHeaderInfo = new IntHeaderInfo();
+		dataMatrix = new TVDataMatrix();
+    }
+    
+	/*
+	 * This not-so-object-oriented hack is in those rare instances
+	 * where it is not enough to know that we've got a DataModel.
+	 */
+	@Override
+	public String getType() {
+		
+		return "TVModel";
+	}
 	
   	@Override
-	public void setModelForCompare(DataModel m)
-  	{
-  		if(m == null)
-  		{
+	public void setModelForCompare(DataModel m) {
+  		if(m == null) {
   			compareModel = null;
   			extraCompareExpr = 0;
-  		}
-  		else
-  		{
+  			
+  		} else {
   			compareModel = (TVModel)m;
   			extraCompareExpr = compareModel.nExpr() + 2;
   		}
   		hasChanged();
   	}
+  	
     // accessor methods	
 	@Override
 	public HeaderInfo getGeneHeaderInfo() {
-	  return geneHeaderInfo;
+	  
+		return geneHeaderInfo;
 	}
+	
 	@Override
 	public HeaderInfo getArrayHeaderInfo() {
-	  return arrayHeaderInfo;
+	  
+		return arrayHeaderInfo;
 	}
+	
 	@Override
 	public DataMatrix getDataMatrix() {
 		
-		if(compareModel != null)
-		{
+		if(compareModel != null) {
 			
 		}
 		return dataMatrix;
 	}
+	
 	@Override
 	public HeaderInfo getAtrHeaderInfo() {
+	
 		return atrHeaderInfo;
 	}
+	
 	@Override
 	public HeaderInfo getGtrHeaderInfo() {
+	
 		return gtrHeaderInfo;
 	}
+	
     public boolean gweightFound() {
-	return gweightFound;
+	
+    	return gweightFound;
     }
 
-    public int nGene() {return geneHeaderInfo.getNumHeaders();}
-    public int nExpr() {return arrayHeaderInfo.getNumHeaders() + extraCompareExpr;}
+    public int nGene() {
+    	
+    	return geneHeaderInfo.getNumHeaders();
+    }
+    
+    public int nExpr() {
+    	
+    	return arrayHeaderInfo.getNumHeaders() + extraCompareExpr;
+    }
 
 	public void setExprData(double [] newData) {
+		
 		dataMatrix.setExprData(newData);
 	}
     
 	public double getValue(int x, int y) {
+		
 		int nexpr = nExpr();
 		int ngene = nGene();
-		if(x >= nexpr + 2)
-		{
-			if (compareModel != null)
+		if(x >= nexpr + 2) {
+			if (compareModel != null) {
 				return compareModel.getValue(x - (nexpr + 2), y); // check offsets
-		}
-		else if(x >= nexpr && y < ngene)
-		{
+			}
+			
+		} else if(x >= nexpr && y < ngene) {
 			return 0; // gray border
 		}
-		if ((x < nexpr && y < ngene) &&	(x >= 0    && y >= 0))
-		{
+		
+		if ((x < nexpr && y < ngene) &&	(x >= 0    && y >= 0)) {
 			return dataMatrix.getValue(x, y);
 		}
+		
 		return NODATA;
     }
 
 	@Override
-	public boolean aidFound() {return aidFound;}
-	void aidFound(boolean newVal) {aidFound = newVal;}
+	public boolean aidFound() {
+		
+		return aidFound;
+	}
+	
+	public void aidFound(boolean newVal) {
+		
+		aidFound = newVal;
+	}
+	
     @Override
-	public boolean gidFound() {return gidFound;};
-	void gidFound(boolean newVal) {gidFound = newVal;}
+	public boolean gidFound() {
+    	
+    	return gidFound;
+    }
+    
+	public void gidFound(boolean newVal) {
+		
+		gidFound = newVal;
+	}
 
 	public void setSource(FileSet source) {
 		this.source = source;
 		setChanged();
 	}
+	
 	@Override
 	public String getSource() {
 	  if (source == null) {
-		return "No Data Loaded";
+		  return "No Data Loaded";
+		  
 	  } else {
-		return source.getCdt();
+		  return source.getCdt();
 	  }
 	}
+	
 	@Override
 	public String getName() {
+		
 		return getFileSet().getRoot();
 	}
+	
 	@Override
 	public FileSet getFileSet() {
-	  return source;
+	  
+		return source;
 	}
+	
 	@Override
 	public void clearFileSetListeners() {
+		
 		source.clearFileSetListeners();
 	}
+	
 	@Override
 	public void addFileSetListener(FileSetListener listener) {
+		
 		source.addFileSetListener(listener);
 	}
-    public XmlConfig getDocumentConfig() {return documentConfig;}
+	
+    public XmlConfig getDocumentConfig() {
+    	
+    	return documentConfig;
+    }
+    
     @Override
-	public ConfigNode getDocumentConfigRoot() {return documentConfig.getRoot();}
-    public void setDocumentConfig(XmlConfig newVal) { documentConfig = newVal;}
-    public TVModel() {
-	  super();
-	  /* build TVModel, initially empty... */	
-	  geneHeaderInfo = new GeneHeaderInfo();
-	  arrayHeaderInfo = new IntHeaderInfo();
-		atrHeaderInfo = new IntHeaderInfo();
-		gtrHeaderInfo = new IntHeaderInfo();
-	  dataMatrix = new TVDataMatrix();
+	public ConfigNode getDocumentConfigRoot() {
+    	
+    	return documentConfig.getRoot();
     }
+    
+    public void setDocumentConfig(XmlConfig newVal) { 
+    	
+    	documentConfig = newVal;
+    }
+ 
+    
     public void setFrame(Frame f) {
-	frame = f;
+	
+    	frame = f;
     }
+    
 	public Frame getFrame() {
+		
 		return frame;
 	}
 
 	protected void hashAIDs() {
+		
 		arrayHeaderInfo.hashIDs("AID");
 	}
 	 
 	protected void hashGIDs() {
+		
 		geneHeaderInfo.hashIDs("GID");
 	}
 	 
 	protected void hashATRs() {
+		
 		atrHeaderInfo.hashIDs("NODEID");
 	}
 	
 	protected void hashGTRs() {
+		
 		gtrHeaderInfo.hashIDs("NODEID");
 	}
 	
-	protected static Hashtable<String, Integer> populateHash(HeaderInfo source, String headerName, Hashtable<String, Integer> target) {
+	protected static Hashtable<String, Integer> populateHash(HeaderInfo source, 
+			String headerName, Hashtable<String, Integer> target) {
+		
 		int indexCol = source.getIndex(headerName);
+		
 		return populateHash(source, indexCol, target);
 	}
-	 protected static Hashtable<String, Integer> populateHash(HeaderInfo source, int indexCol, Hashtable<String, Integer> target) {
-		 if (target == null) {
-			 target = new Hashtable<String, Integer>((source.getNumHeaders() * 4) /3, .75f);
+	
+	protected static Hashtable<String, Integer> populateHash(HeaderInfo source, 
+			int indexCol, Hashtable<String, Integer> target) {
+	
+		if (target == null) {
+			 target = new Hashtable<String, Integer>((
+					 source.getNumHeaders() * 4) /3, .75f);
+			 
 		 } else {
 			 target.clear();
 		 }
 
-		 if (indexCol <0) indexCol = 0;
+		 if (indexCol <0) {
+			 indexCol = 0;
+		 }
+		 
 		 for( int i = 0; i < source.getNumHeaders(); i++) {
 			 target.put(source.getHeader(i)[indexCol], new Integer(i));
 		 }
 		 
 		 return target;
-	 }	 
-	 /**
-	  * Reorders all the arrays in the new ordering.
-	  * @param ordering the new ordering of arrays, must have size equal to number of arrays
-	  */
-	public void reorderArrays(int [] ordering)
-	{
-		if(ordering == null || 
-				ordering.length != dataMatrix.getNumUnappendedCol()) // make sure input to function makes sense
-		{
+	 }	
+	
+	/**
+	 * Reorders all the arrays in the new ordering.
+	 * @param ordering the new ordering of arrays, 
+	 * must have size equal to number of arrays.
+	 */
+	public void reorderArrays(int [] ordering) {
+		if(ordering == null 
+				|| ordering.length != dataMatrix.getNumUnappendedCol()) {
+			
 			return;
 		}
-	
 	
 		DataMatrix data = getDataMatrix();
 	
 		double [] temp = new double[data.getNumUnappendedCol()];
-		for(int j = 0; j < data.getNumRow(); j++)
-		{
-			for(int i = 0; i < ordering.length; i++)
-			{
+		for(int j = 0; j < data.getNumRow(); j++) {
+			for(int i = 0; i < ordering.length; i++) {
 				temp[i] = data.getValue(ordering[i], j);
 			}
-			for(int i = 0; i < ordering.length; i++)
-			{
+			
+			for(int i = 0; i < ordering.length; i++) {
 				data.setValue(temp[i], i, j);
 			}
 		}
+		
 		String [][]aHeaders = arrayHeaderInfo.getHeaderArray();
 		String [][] temp2 = new String[aHeaders.length][];
 	
-		for(int i = 0; i < aHeaders.length; i++)
-		{
-			if(i < ordering.length)
-			{
+		for(int i = 0; i < aHeaders.length; i++) {
+			if(i < ordering.length) {
 				temp2[i] = aHeaders[ordering[i]];
-			}
-			else
-			{
+				
+			} else {
 				temp2[i] = aHeaders[i];
 			}
 		}
-		setArrayHeaders(temp2);
-		hashAIDs();
 		
-					
+		setArrayHeaders(temp2);
+		hashAIDs();		
 		setChanged();
 	}
 
-	 /**
-	  * Reorders all the arrays in the new ordering.
-	  * @param ordering the new ordering of arrays, must have size equal to number of arrays
-	  */
-	public void reorderGenes(int [] ordering)
-	{
-		if(ordering == null || 
-				ordering.length != dataMatrix.getNumRow()) // make sure input to function makes sense
-		{
+	/**
+	 * Reorders all the arrays in the new ordering.
+	 * @param ordering the new ordering of arrays, must have size equal to number of arrays
+	 */
+	public void reorderGenes(int [] ordering) {
+		
+		if(ordering == null 
+				|| ordering.length != dataMatrix.getNumRow()) { // make sure input to function makes sense
+			
 			return;
 		}
 		
 		DataMatrix data = getDataMatrix();
 		double [] temp = new double[data.getNumRow()];	
-		for(int j = 0; j < data.getNumUnappendedCol(); j++)
-		{
-			for(int i = 0; i < ordering.length; i++)
-			{
+		for(int j = 0; j < data.getNumUnappendedCol(); j++) {
+			for(int i = 0; i < ordering.length; i++) {
 				temp[i] = data.getValue(j, ordering[i] );
 			}
-			for(int i = 0; i < ordering.length; i++)
-			{
+			
+			for(int i = 0; i < ordering.length; i++) {
 				data.setValue(temp[i], j, i);
 			}
 		}
@@ -283,37 +375,41 @@ public class TVModel extends Observable implements DataModel {
 		setChanged();
 	}
 
-	 public void resetState () {
-		 // reset some state stuff.
-		 //	if (documentConfig != null)
-		 //          documentConfig.store();
-		 documentConfig = null;
-		 setLoaded(false);
-		 aidFound = false;
-		 gidFound = false;
-		 source = null;
+	public void resetState () {
 		 
-		 eweightFound = false;
-		 gweightFound = false;
-		 
-		 geneHeaderInfo.clear();
-		 arrayHeaderInfo.clear();
-		 atrHeaderInfo.clear();
-		 gtrHeaderInfo.clear();
-		 dataMatrix.clear();
-	 }
+		// reset some state stuff.
+		//	if (documentConfig != null)
+		//          documentConfig.store();
+		documentConfig = null;
+		setLoaded(false);
+		aidFound = false;
+		gidFound = false;
+		source = null;
+		
+		eweightFound = false;
+		gweightFound = false;
+		
+		geneHeaderInfo.clear();
+		arrayHeaderInfo.clear();
+		atrHeaderInfo.clear();
+		gtrHeaderInfo.clear();
+		dataMatrix.clear();
+	}
 	 
-	 @Override
+	@Override
 	public String toString() {
-		 String [] strings = toStrings();
-		 String msg = "";
-		 for (int i = 0; i < strings.length; i++) {
-			 msg += strings[i] + "\n";
-		 }
-		 return msg;
-	 }
+		
+		String [] strings = toStrings();
+		String msg = "";
+		for (int i = 0; i < strings.length; i++) {
+			msg += strings[i] + "\n";
+		}
+		return msg;
+	}
+	
     public String[] toStrings() {
-	String[] msg = {"Selected TVModel Stats",
+    	
+    	String[] msg = {"Selected TVModel Stats",
 			"Source = " + getSource(),
 			"Nexpr   = " + nExpr(),
 			"NGeneHeader = " + getGeneHeaderInfo().getNumNames(),
@@ -337,7 +433,7 @@ public class TVModel extends Observable implements DataModel {
 	}
 	*/
 
-	return msg;
+    	return msg;
     }
     /*
     // debug functions
@@ -377,24 +473,22 @@ public class TVModel extends Observable implements DataModel {
     */
     
     @Override
-	public void removeAppended()
-	{
-		if(appendIndex == -1)
-		{
-			return;
+	public void removeAppended() {
+		
+    	if(appendIndex == -1) {
+			
+    		return;
 		}
+    	
 		int ngene = nGene();
 		int nexpr = nExpr();
 		double [] temp = new double[ngene*appendIndex];
 		
 		int i = 0;
 		
-		for(int g = 0; g < this.dataMatrix.getNumRow(); g++)
-		{
-			for(int e = 0; e < nexpr; e++)
-			{
-				if(e < appendIndex)
-				{
+		for(int g = 0; g < this.dataMatrix.getNumRow(); g++) {
+			for(int e = 0; e < nexpr; e++) {
+				if(e < appendIndex) {
 					temp[i++] = getValue(e, g);
 				}					
 			}
@@ -403,8 +497,7 @@ public class TVModel extends Observable implements DataModel {
 		
 		String [][] tempS = new String[appendIndex][];
 		
-		for(int j = 0; j < appendIndex; j++)
-		{
+		for(int j = 0; j < appendIndex; j++) {
 			tempS[j] = arrayHeaderInfo.getHeader(j);
 		}
 		
@@ -419,63 +512,59 @@ public class TVModel extends Observable implements DataModel {
 	 * 
 	 */
 	@Override
-	public void append(DataModel m)
-	{
+	public void append(DataModel m) {
+		
 		int ngene = nGene();
 		int nexpr = nExpr();
-		if(m == null || m.getDataMatrix().getNumRow() != ngene || appendIndex != -1)
-		{
+		if(m == null || m.getDataMatrix().getNumRow() != ngene 
+				|| appendIndex != -1) {
 			System.out.println("Could not compare.");
 			return;
 		}
 		
-		double [] temp = new double[getDataMatrix().getNumRow()* getDataMatrix().getNumCol() + 
-		                            m.getDataMatrix().getNumRow()*(m.getDataMatrix().getNumCol() + 1)];
+		double [] temp = new double[getDataMatrix().getNumRow() 
+		                            * getDataMatrix().getNumCol() 
+		                            + m.getDataMatrix().getNumRow() 
+		                            * (m.getDataMatrix().getNumCol() + 1)];
 		
 		int i = 0;
 				
-		for(int g = 0; g < m.getDataMatrix().getNumRow(); g++)
-		{
-			for(int e = 0; e < nexpr + m.getDataMatrix().getNumCol() + 1; e++)
-			{
-				if(e < nexpr)
-				{
-					temp[i++] = getValue(e, g);
-				}
-				else if(e < nexpr + 1)
-				{
-					temp[i++] = DataModel.NODATA;
-				}
-				else
-				{
-					temp[i++] = m.getDataMatrix().getValue(e - nexpr - 1, g);
-				}
+		for(int g = 0; g < m.getDataMatrix().getNumRow(); g++) {
+			for(int e = 0; e < nexpr + m.getDataMatrix().getNumCol() + 1; e++) {
 				
+				if(e < nexpr) {
+					temp[i++] = getValue(e, g);
+					
+				} else if(e < nexpr + 1) {
+					temp[i++] = DataModel.NODATA;
+					
+				} else {
+					temp[i++] = m.getDataMatrix().getValue(e - nexpr - 1, g);
+				}	
 			}
 		}
 		
-		String [][] tempS = new String[getArrayHeaderInfo().getNumHeaders() + m.getArrayHeaderInfo().getNumHeaders() + 1][];
+		String [][] tempS = new String[getArrayHeaderInfo().getNumHeaders() 
+		                               + m.getArrayHeaderInfo().getNumHeaders() 
+		                               + 1][];
 		
 		i = 0;
-		for(int j = 0; j < getArrayHeaderInfo().getNumHeaders(); j++)
-		{
+		for(int j = 0; j < getArrayHeaderInfo().getNumHeaders(); j++) {
 			tempS[i++] = getArrayHeaderInfo().getHeader(j);
 		}
 		
 		tempS[i] = new String[getArrayHeaderInfo().getNumNames()];
 		
-		for(int j = 0; j < tempS[i].length; j++)
-		{
+		for(int j = 0; j < tempS[i].length; j++) {
 			tempS[i][j] = "-----------------------";
 		}
+		
 		i++;
 		
-		for(int j = 0; j < getArrayHeaderInfo().getNumHeaders(); j++)
-		{
+		for(int j = 0; j < getArrayHeaderInfo().getNumHeaders(); j++) {
 			tempS[i++] = getArrayHeaderInfo().getHeader(j);
 		}
-		
-		
+	
 		arrayHeaderInfo.setHeaderArray(tempS);
 		appendIndex = nexpr;
 		nexpr += m.getDataMatrix().getNumCol() + 1;
@@ -483,169 +572,182 @@ public class TVModel extends Observable implements DataModel {
 		setChanged();
 	}
 
-	int appendIndex = -1;
-	
-    protected Frame frame;
-    protected FileSet source = null;
-    protected String  dir = null;
-    protected String  root;
-
-	
-	protected TVDataMatrix dataMatrix;
-		
-		
-    protected IntHeaderInfo arrayHeaderInfo;
-    protected GeneHeaderInfo geneHeaderInfo;
-	protected IntHeaderInfo atrHeaderInfo;
-	protected IntHeaderInfo gtrHeaderInfo;
-	
-	protected boolean aidFound = false;
-	protected boolean gidFound = false;
-		
-    protected boolean eweightFound = false;
-    protected boolean gweightFound = false;
-    protected XmlConfig documentConfig; // holds document config
 	/**
 	 * Really just a thin wrapper around exprData array.
 	 * @author aloksaldanha
 	 *
 	 */
 	class TVDataMatrix implements DataMatrix {
+		
 		private boolean modified = false;
 	    private double [] exprData = null;
 
 		public void clear() {
+			
 			exprData = null;
 		}
 
 	    @Override
 		public double getValue(int x, int y) {
-			int nexpr = nExpr();
+			
+	    	int nexpr = nExpr();
 			int ngene = nGene();
 			if ((x < nexpr) && (y < ngene) && (x >= 0) && (y >= 0)) {
 				return exprData[x + y * nexpr];
+				
 			} else {
 				return DataModel.NODATA;
 			}
 		}
 		
 		public void setExprData(double[] newData) {
+			
 			exprData = newData;
 		}
 
 		@Override
-		public void setValue(double value, int x, int y)
-		{
+		public void setValue(double value, int x, int y) {
+			
 			exprData[x + y*getNumCol()] = value;
 			setModified(true);
 			setChanged();
 		}
+		
 		@Override
 		public int getNumRow() {
+			
 			return nGene();
 		}
 		@Override
 		public int getNumCol() {
+			
 			return nExpr();
 		}
 		
 		@Override
-		public int getNumUnappendedCol()
-		{
+		public int getNumUnappendedCol() {
+			
 			return appendIndex == -1?getNumCol():appendIndex;
 		}
 
 		@Override
 		public void setModified(boolean modified) {
+			
 			this.modified = modified;
 		}
 
 		@Override
 		public boolean getModified() {
+			
 			return modified;
 		}
 	}
 
 	/** holds actual node information for array tree */
 	public void setAtrHeaders(String [][]atrHeaders) {
+		
 		atrHeaderInfo.setHeaderArray(atrHeaders);
 	}
+	
 	/** holds header row from atr file */
 	public void setAtrPrefix(String [] atrPrefix) {
+		
 		atrHeaderInfo.setPrefixArray(atrPrefix);
 	}
 
 	/** holds actual node information for gene tree */
 	public void setGtrHeaders(String [][] gtrHeaders) {
+		
 		gtrHeaderInfo.setHeaderArray(gtrHeaders);
 	}
 
 	public void setGtrPrefix(String [] gtrPrefix) {
+		
 		gtrHeaderInfo.setPrefixArray(gtrPrefix);
 	}
 
 	public void setArrayHeaders(String [] [] newHeaders) {
+		
 		arrayHeaderInfo.setHeaderArray(newHeaders);
 	}
+	
 	public void setArrayPrefix(String [] newPrefix) {
+		
 		arrayHeaderInfo.setPrefixArray(newPrefix);
 	}
 	
-	
-	
 	class GeneHeaderInfo extends IntHeaderInfo {
 		
-	  public int getAIDIndex() {
-		return 1;
-	  }
-	public int getGIDIndex() {
-		return 0;
-	  }
-	  public int getYorfIndex() {
-		if (getIndex("GID") == -1) {
-		  return 0;
-		} else {
-		  return 1;
+		public int getAIDIndex() {
+			
+			return 1;
 		}
-	  }
+	
+		public int getGIDIndex() {
+		
+			return 0;
+		}
+		
+		public int getYorfIndex() {
+		
+			if (getIndex("GID") == -1) {
+				
+				return 0;
+				
+			} else {
+				return 1;
+			}
+		}
+		
 	  public int getNameIndex() {
-		if (getIndex("GID") == -1) {
-		  return 1;
-		} else {
-		  return 2;
-		}
+		
+		  if (getIndex("GID") == -1) {
+			  return 1;
+		  
+		  } else {
+			  return 2;
+		  }
 	  }
-	  
 	  
 	  /**
 	  * There are two special indexes, YORF and NAME.
 	  */
 	  @Override
-	public int getIndex(String header) {
+	  public int getIndex(String header) {
+		 
 		  int retval = super.getIndex(header);
+		  
 		  if (retval != -1) {
+			  
 			  return retval;
 		  }
+		  
 		  if (header.equals("YORF")) {
+			  
 			  return getYorfIndex();
 		  }	
 
 		  if(header.equals("NAME")) {
+			 
 			  return getNameIndex();
 		  }	
+		  
 		  return -1;
 	  }
 	  
 	}
 
-	void setGenePrefix(String [] newVal) {
-		  geneHeaderInfo.setPrefixArray(newVal);
-	  }
-	  void setGeneHeaders(String [][] newVal) {
-		  geneHeaderInfo.setHeaderArray(newVal);
-	  }
+	public void setGenePrefix(String [] newVal) {
+		  
+		geneHeaderInfo.setPrefixArray(newVal);  
+	}
+	
+	public void setGeneHeaders(String [][] newVal) {
+		  
+		geneHeaderInfo.setHeaderArray(newVal);
+	}
+	
 	// loading stuff follows...
-
     /**
      *
      *
@@ -653,56 +755,73 @@ public class TVModel extends Observable implements DataModel {
      *
      */
 	 public void loadNew(FileSet fileSet) throws LoadException {
+		 
 		 resetState();
 		 setSource(fileSet);
 		 final TVModelLoader2 loader = new TVModelLoader2(this);
 		 loader.loadInto();
-		 if (!isLoaded())
-			 throw new LoadException("Loading Cancelled", LoadException.INTPARSE);
+		 
+		 if (!isLoaded()) {
+			 throw new LoadException("Loading Cancelled", 
+					 LoadException.INTPARSE);
+		 }
 	 }
+	 
 	 /**
 	 * Don't open a loading window...
 	 */
 	 public void loadNewNW(FileSet fileSet) throws LoadException {
+		 
 		 resetState();
 		 setSource(fileSet);
 		 final TVModelLoader2 loader = new TVModelLoader2(this);
 		 loader.loadIntoNW(); 
-		 if (!isLoaded())
-			 throw new LoadException("Loading Cancelled", LoadException.INTPARSE);
+		 
+		 if (!isLoaded()) {
+			 throw new LoadException("Loading Cancelled", 
+					 LoadException.INTPARSE);
+		 }
 	 }
 
-	/**
-	 * @param b
-	 */
-	public void setEweightFound(boolean b) {
+	 /**
+	  * @param b
+	  */
+	 public void setEweightFound(boolean b) {
+		
 		eweightFound = b;
-	}
+	 }	
+	
 	/**
 	 * @param b
 	 */
 	public void setGweightFound(boolean b) {
-		gweightFound = b;
 		
+		gweightFound = b;	
 	}
+	
 	@Override
 	public boolean getModified() {
+		
 		return  getGtrHeaderInfo().getModified() ||
 //		getGeneHeaderInfo().getModified() ||
 //		getArrayHeaderInfo().getModified() ||
 		getAtrHeaderInfo().getModified();
 	}
+	
 	@Override
 	public boolean isLoaded() {
+		
 		return loaded;
 	}
+	
 	public void setLoaded(boolean loaded) {
+		
 		this.loaded = loaded;
 	}
+	
 	@Override
 	public ClusterFileSet getClusterFileSet() {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
-
 }

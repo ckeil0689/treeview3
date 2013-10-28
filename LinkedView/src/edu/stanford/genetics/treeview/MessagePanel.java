@@ -29,19 +29,64 @@ import java.util.Vector;
 
 import javax.swing.*;
 
-public class MessagePanel extends JScrollPane {
+import net.miginfocom.swing.MigLayout;
+
+public class MessagePanel extends JPanel{
 
 	private static final long serialVersionUID = 1L;
 	
 	protected MessageCanvas messagecanvas;
     protected Vector<String> messages;
 
+    private final Color bgColor;
+    private final Color textColor = new Color(90, 90, 90, 255);
+    
     private String title;
-
-	class MessageCanvas extends JPanel {
+    
+    /**
+     * Chained constructor for empty class declaration 
+     */
+    public MessagePanel() {
+		
+		this(null, Color.white);
+	}
+    
+    /**
+     * Main constructor
+     * @param t
+     * @param bgColor
+     */
+	public MessagePanel(String t, Color bgColor) {
+		
+		super();
+		this.setLayout(new MigLayout("ins 0"));
+		this.setOpaque(false);
+		this.bgColor = bgColor;
+		title = t;
+		
+		JLabel header = new JLabel(t);
+		header.setFont(new Font("Sans Serif", Font.BOLD, 16));
+		
+		messages = new Vector<String>(5,5);
+		messagecanvas = new MessageCanvas();
+		messagecanvas.setFont(new Font("Sans Serif", Font.PLAIN, 16));
+		
+		this.add(header, "pushx, span, wrap");
+		this.add(messagecanvas, "pushx, growx");
+	}
+	
+	/**
+	 * MessageCanvas subclass
+	 */
+	public class MessageCanvas extends JPanel {
 
 		private static final long serialVersionUID = 1L;
 
+		public MessageCanvas() {
+			
+			super();
+		}
+		
 		@Override
 		public void paintComponent(Graphics g) {
 			
@@ -50,16 +95,23 @@ public class MessagePanel extends JScrollPane {
 			int ascent = metrics.getAscent();
 			int height = 0;
 			Enumeration<String> e = messages.elements();
+			
 			Dimension size = getSize();
 			g.clearRect(0, 0, size.width, size.height);
 			
-			height += ascent;
-			g.drawString(title,-xoff, height);
+			g.setColor(bgColor);
+			g.fillRect(0, 0, size.width, size.height);
+			
+			//height += ascent;
+			g.setColor(textColor);
+			//g.drawString(title, -xoff, height);
 
 			
 			while (e.hasMoreElements()) {
 				String message = (String) e.nextElement();
-				if (message == null) continue;
+				if (message == null) {
+					continue;
+				}
 				height += ascent;
 				g.drawString(message, -xoff, height);
 			}
@@ -67,6 +119,7 @@ public class MessagePanel extends JScrollPane {
 		
 		@Override
 		public Dimension getPreferredSize() {
+			
 			FontMetrics metrics = getFontMetrics(getFont());
 			int ascent = metrics.getAscent();
 			// for title...
@@ -75,34 +128,21 @@ public class MessagePanel extends JScrollPane {
 			Enumeration<String> e = messages.elements();
 			while (e.hasMoreElements()) {
 				String message = (String) e.nextElement();
-				if (message == null) continue;
+				if (message == null) {
+					continue;
+				}
 				height += ascent;
 				int length = metrics.stringWidth(message);
-				if (width < length) {width = length;}
+				if (width < length) {
+					width = length;
+				}
 			}
 			return new Dimension(width, height);
 		}
-		
 	}	
-		
-	public MessagePanel() {
-			
-		this(null);
-	}
-
-	public MessagePanel(String t) {
-		
-		super();
-		title = t;
-		messages = new Vector<String>(5,5);
-		messagecanvas = new MessageCanvas();
-		messagecanvas.setBackground(Color.white);
-		messagecanvas.setForeground(Color.black);
-		messagecanvas.setFont(new Font("Sans Serif", Font.PLAIN, 14));
-		setViewportView(messagecanvas);
-	}
     
 	public void setMessages(String [] m) {
+		
 		resetMessages();
 		int i;
 		for (i = 0; i < m.length; i++) {
@@ -122,6 +162,7 @@ public class MessagePanel extends JScrollPane {
 	}
 	
 	public void layoutMessages() {
+		
 		revalidate();
 		repaint();
 	}

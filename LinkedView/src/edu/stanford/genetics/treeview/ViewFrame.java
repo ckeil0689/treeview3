@@ -47,11 +47,8 @@ import edu.stanford.genetics.treeview.model.ReorderedDataModel;
  * @version    @version $Revision: 1.37 $ $Date: 2009-08-26 11:48:27 $
  */
 public abstract class ViewFrame extends JFrame implements Observer {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 
+	private static final long serialVersionUID = 1L;
 
 	// must override in subclass...
 	/**
@@ -85,10 +82,13 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 * @param  fileMruNode  Node which will be bound to the FileMru
 	 */
 	protected void setupFileMru(ConfigNode fileMruNode) {
+		
 		fileMru = new FileMru();
 		fileMru.bindConfig(fileMruNode);
+		
 		try {
 			fileMru.removeMoved();
+			
 		} catch (Exception e) {
 			LogBuffer.println("problem checking MRU in ViewFrame constructor: " 
 								+ e.toString());
@@ -106,6 +106,7 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 * @param  rectangle  A rectangle describing the outlines of the screen.
 	 */
 	private void center(Rectangle rectangle) {
+		
 		Dimension dimension  = getSize();
 		setLocation((rectangle.width - dimension.width) / 3 + rectangle.x, 
 				(rectangle.height - dimension.height) / 3 + rectangle.y);
@@ -132,6 +133,7 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 * and close ourselves when closed.
 	 */
 	private void setupWindowListener() {
+		
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		addWindowListener(
 			new WindowAdapter() {
@@ -162,6 +164,7 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 * @param  title  Title for the ViewFrame.
 	 */
 	public ViewFrame(String title) {
+		
 		super(title);
 		setupWindowListener();
 	}
@@ -171,6 +174,7 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 * constructs an untitled <code>ViewFrame</code> 
 	 */
 	public ViewFrame() {
+		
 		super();
 		setupWindowListener();
 	}
@@ -183,6 +187,7 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 * @param  flag  The new windowActive value
 	 */
 	protected void setWindowActive(boolean flag) {
+		
 		windowActive = flag;
 	}
 
@@ -194,6 +199,7 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 * @return    True if window is active.
 	 */
 	public boolean windowActive() {
+		
 		return windowActive;
 	}
 
@@ -249,9 +255,12 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 * @return   The shared TreeSelection object for genes.
 	 */
 	public TreeSelectionI getGeneSelection() {
+		
 		return geneSelection;
 	}
+	
 	protected void setGeneSelection(TreeSelectionI newSelection) {
+		
 		geneSelection = newSelection;
 	}
 
@@ -261,9 +270,12 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 * @return   The shared TreeSelection object for arrays.
 	 */
 	public TreeSelectionI getArraySelection() {
+		
 		return arraySelection;
 	}
+	
 	protected void setArraySelection(TreeSelectionI newSelection) {
+		
 		arraySelection = newSelection;
 	}
 
@@ -287,8 +299,8 @@ public abstract class ViewFrame extends JFrame implements Observer {
 
 
 	/**
-	 *  returns the UrlPresets for the views to make use of when configuring linking
-	 *  for genes
+	 *  returns the UrlPresets for the views to make use of 
+	 *  when configuring linking for genes
 	 *
 	 * @return    The shared <code>UrlPresets</code> object for genes
 	 */
@@ -296,8 +308,8 @@ public abstract class ViewFrame extends JFrame implements Observer {
 
 
 	/**
-	 *  returns the UrlPresets for the views to make use of when configuring linking
-	 *  for arrays
+	 *  returns the UrlPresets for the views to make use of 
+	 *  when configuring linking for arrays
 	 *
 	 * @return    The shared <code>UrlPresets</code> object for arrays
 	 */
@@ -335,32 +347,40 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	public abstract void scrollToGene(int i);
 	public abstract void scrollToArray(int i);
 
-	/**  The shared selection objects */
+	/**  
+	 * The shared selection objects 
+	 */
 	TreeSelectionI geneSelection = null;
 	TreeSelectionI arraySelection = null;
+	
 	public void deselectAll() {
-	  geneSelection.deselectAllIndexes();
-	  arraySelection.deselectAllIndexes();
+	  
+		geneSelection.deselectAllIndexes();
+		arraySelection.deselectAllIndexes();
 	}
-	/***
+	
+	/**
 	* This routine causes all data views to 
 	* select and scroll to a particular gene.
 	*/
 	public void seekGene(int i) {
-	  geneSelection.deselectAllIndexes();
-	  geneSelection.setIndex(i, true);
-	  geneSelection.notifyObservers();
-	  scrollToGene(i);
+		
+		geneSelection.deselectAllIndexes();
+		geneSelection.setIndex(i, true);
+		geneSelection.notifyObservers();
+		scrollToGene(i);
     }
-	/***
+	
+	/**
 	* This routine causes all data views to 
 	* select and scroll to a particular array.
 	*/
 	public void seekArray(int i) {
-	  arraySelection.deselectAllIndexes();
-	  arraySelection.setIndex(i, true);
-	  arraySelection.notifyObservers();
-	  scrollToGene(i);
+		
+		arraySelection.deselectAllIndexes();
+		arraySelection.setIndex(i, true);
+		arraySelection.notifyObservers();
+		scrollToGene(i);
     }
 	
 	/**
@@ -368,16 +388,20 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	* i.
 	*/
 	public void extendRange(int i) {
-	  if (geneSelection.getMinIndex() == -1)
-		seekGene(i);
-	  geneSelection.setIndex(i, true);
-	  geneSelection.notifyObservers();
+	 
+		if (geneSelection.getMinIndex() == -1) {
+			seekGene(i);
+		}
+	  
+		geneSelection.setIndex(i, true);
+		geneSelection.notifyObservers();
 
-	  scrollToGene(i);
+		scrollToGene(i);
     }
 	
     public boolean geneIsSelected(int i) {
-	  return getGeneSelection().isIndexSelected(i);
+	  
+    	return getGeneSelection().isIndexSelected(i);
     }
 
 
@@ -387,6 +411,7 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 * @param  i  index of gene who's url you would like to display.
 	 */
 	public void displayURL(int i) {
+		
 		displayURL(getUrl(i));
 	}
 
@@ -398,6 +423,7 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 * @return    A string representation of the url
 	 */
 	public String getUrl(int i) {
+		
 		if (urlExtractor == null) {
 			return null;
 		}
@@ -412,6 +438,7 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 * @return    A string representation of the url
 	 */
 	public String getArrayUrl(int i) {
+		
 		if (arrayUrlExtractor == null) {
 			return null;
 		}
@@ -425,6 +452,7 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 * @param  string  String representation of the url.
 	 */
 	public void displayURL(String string) {
+		
 		if (string == null) {
 			return;
 		}
@@ -433,29 +461,33 @@ public abstract class ViewFrame extends JFrame implements Observer {
 				browserControl = BrowserControl.getBrowserControl();
 			}
 			browserControl.displayURL(string);
+			
 		} catch (MalformedURLException e) {
-			String message = new StringBuffer("Problem loading url: ").append(e).toString();
+			String message = new StringBuffer(
+					"Problem loading url: ").append(e).toString();
 			LogBuffer.println(message);
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(this,message);
+			
 		} catch (IOException e) {
-			String message = new StringBuffer("Could not load url: ").append(e).toString();
+			String message = new StringBuffer(
+					"Could not load url: ").append(e).toString();
 			LogBuffer.println(message);
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(this,message);
 		}
-
 	}
-
 
 	/**
 	 *  Gets the UrlExtractor for the arrays.
 	 *
-	 * This object is used to convert a given array index into a url string. It can be configured to do this in multiple ways.
+	 * This object is used to convert a given array index into a url string. 
+	 * It can be configured to do this in multiple ways.
 	 *
 	 * @return    The UrlExtractor for the arrays
 	 */
 	public UrlExtractor getArrayUrlExtractor() {
+		
 		return arrayUrlExtractor;
 	}
 
@@ -463,11 +495,13 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	/**
 	 *  Gets the UrlExtractor for the genes.
 	 *
-	 * This object is used to convert a given gene index into a url string. It can be configured to do this in multiple ways.
+	 * This object is used to convert a given gene index into a url string. 
+	 * It can be configured to do this in multiple ways.
 	 *
 	 * @return    The UrlExtractor for the genes
 	 */
 	public UrlExtractor getUrlExtractor() {
+		
 		return urlExtractor;
 	}
 
@@ -478,6 +512,7 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 * @param  ue  The new arrayUrlExtractor value
 	 */
 	public void setArrayUrlExtractor(UrlExtractor ue) {
+		
 		arrayUrlExtractor = ue;
 	}
 
@@ -488,6 +523,7 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 * @param  ue  The new urlExtractor value
 	 */
 	public void setUrlExtractor(UrlExtractor ue) {
+		
 		urlExtractor = ue;
 	}
 
@@ -553,7 +589,8 @@ public abstract class ViewFrame extends JFrame implements Observer {
 				 throw new LoadException(fileSet1.getCdt() + 
 				 " did not end in .cdt or .pcl", LoadException.EXT);
 		 } catch (NullPointerException e) {
-			 throw new LoadException(e + ",most likely, no file selected so cdt is null", LoadException.NOFILE);
+			 throw new LoadException(e + ",most likely, 
+			 no file selected so cdt is null", LoadException.NOFILE);
 		 }
 		 */
 
@@ -565,7 +602,7 @@ public abstract class ViewFrame extends JFrame implements Observer {
 		  fileMru.notifyObservers();
 		  */
 		 return fileSet1;
-	 }
+	}
 	
 	/**
 	* Open a dialog which allows the user to select a new data file
@@ -618,7 +655,7 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 * @param fileDialog
 	 * @param viz
 	 */
-	 protected void setupFileDialog(JFileChooser fileDialog) {
+	protected void setupFileDialog(JFileChooser fileDialog) {
 	 
 		ClusterFileFilter ff = new ClusterFileFilter();
 			
@@ -652,7 +689,7 @@ public abstract class ViewFrame extends JFrame implements Observer {
 			
 			fileDialog.setCurrentDirectory(new File(string));
 		}
-	 }
+	}
 	 
 	/**
 	 *  Rebuild a particular window menu.
@@ -661,7 +698,7 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 *
 	 * Add a menu item for each window which grants that window the foreground when selected.
 	 */
-	 public void rebuildWindowMenu(Vector<Window> windows) {
+	public void rebuildWindowMenu(Vector<Window> windows) {
 		 
 		 synchronized (menubar) {
 			 
@@ -705,7 +742,8 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 
 	 
 	 /**
-	 * currenlty, only the concrete subclass has a reference to the application, and hence can create new frames. 
+	 * currenlty, only the concrete subclass has a reference to 
+	 * the application, and hence can create new frames. 
 	 * perhaps this will change if I add an interface for the App classes.
 	 */
 	 public ViewFrame createNewFrame() {
@@ -716,11 +754,13 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 public abstract TreeViewApp getApp();
 	 
 	 /**
-	 *  Constructs a MenuItem which causes the i'th window to be moved to the front.
+	 *  Constructs a MenuItem which causes the i'th window to 
+	 *  be moved to the front.
 	 *
 	 * @param  windows  a list of windows
 	 * @param  i  which window to move to the front.
-	 * @return    a menuItem which focuses the i'th window, or null if more than 9 windows.
+	 * @return    a menuItem which focuses the i'th window, 
+	 * or null if more than 9 windows.
 	 */
 	 private void addFocusItem(Vector<Window> windows, int i) {
 		
@@ -784,22 +824,25 @@ public abstract class ViewFrame extends JFrame implements Observer {
 		 return 0;
 	 }
 	 
-	  public void showSubDataModel(int[] indexes, String source, String name) {
+	 public void showSubDataModel(int[] indexes, String source, String name) {
 	  	if (indexes.length == 0) {
 	  		JOptionPane.showMessageDialog(this, "No Genes to show summary of!");
 	  		return;
 	  	}
 	  	showSubDataModel(indexes, null, source, name);
-	  }
-	  public void showSubDataModel(int[] geneIndexes,int[] arrayIndexes, String source, String name) {
-		  	ReorderedDataModel dataModel = new ReorderedDataModel(getDataModel(), geneIndexes,  arrayIndexes);
+	 }
+	  
+	 public void showSubDataModel(int[] geneIndexes,int[] arrayIndexes, 
+			  String source, String name) {
+		  	ReorderedDataModel dataModel = new ReorderedDataModel(
+		  			getDataModel(), geneIndexes,  arrayIndexes);
 		  	if (source != null) dataModel.setSource(source);
 		  	if (name != null) dataModel.setName(name);
 		  	ViewFrame window = getApp().openNew();
 		  	window.setDataModel(dataModel);
 		  	window.setLoaded(true);
 		  	window.setVisible(true);
-		  }	 
+	 }	 
 	 
 	 /**  The global most recently used object. */
 	 protected FileMru fileMru;

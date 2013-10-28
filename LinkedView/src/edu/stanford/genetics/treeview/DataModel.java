@@ -34,7 +34,8 @@ import Cluster.ClusterFileSet;
  */
 
 public interface DataModel {
-    public final static double NODATA = -10000000;
+    
+	public final static double NODATA = -10000000;
 	public final static double EMPTY = -20000000;
 
 	/**
@@ -91,8 +92,10 @@ public interface DataModel {
 	/**
 	 *  Gets the HeaderInfo associated with genes for this DataModel.
 	 *
-	  * There are two special indexes, YORF and NAME, which mean the unique id column and the description column, respectively. See TVModel.TVModelHeaderInfo for details.
-	  */
+	 * There are two special indexes, YORF and NAME, which mean the unique 
+	 * id column and the description column, respectively. 
+	 * See TVModel.TVModelHeaderInfo for details.
+	 */
 	public HeaderInfo getGeneHeaderInfo();
 
 
@@ -104,8 +107,10 @@ public interface DataModel {
 	/**
 	 *  Gets the HeaderInfo associated with gene tree for this DataModel.
 	 *
-	  * There are two special indexes, YORF and NAME, which mean the unique id column and the description column, respectively. See TVModel.TVModelHeaderInfo for details.
-	  */
+	 * There are two special indexes, YORF and NAME, which mean the unique 
+	 * id column and the description column, respectively. 
+	 * See TVModel.TVModelHeaderInfo for details.
+	 */
 	public HeaderInfo getGtrHeaderInfo();
 
 

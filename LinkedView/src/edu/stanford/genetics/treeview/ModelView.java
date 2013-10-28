@@ -54,10 +54,14 @@ MouseListener {
 	*/
 	protected JComponent panel;
 	
+	private String[] default_hint = null;
+	private String[] default_status = null;
+	
 	protected ModelView() {
+		
 		super(false);
 		setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
-		setBackground(Color.white);
+		setBackground(Color.white); //NO
 	}
 	
 	/** 
@@ -66,39 +70,55 @@ MouseListener {
 	*
 	* @return String containing name of view.
 	*/
-	abstract public String viewName();
+	public abstract String viewName();
 	
-	public void setViewFrame(ViewFrame m) {viewFrame = m;}
-	public ViewFrame getViewFrame() {return viewFrame;}
-	public void setHintPanel(MessagePanel h) {hint = h;}
-	public void setStatusPanel(MessagePanel s) {status = s;}
+	public void setViewFrame(ViewFrame m) {
+		
+		viewFrame = m;
+	}
 	
-	private String[] default_hint = null;
+	public ViewFrame getViewFrame() {
+		
+		return viewFrame;
+	}
+	
+	public void setHintPanel(MessagePanel h) {
+		
+		hint = h;
+	}
+	
+	public void setStatusPanel(MessagePanel s) {
+		
+		status = s;
+	}
+	
 	public String[]  getHints() {
+		
 		if (default_hint == null) {
 			default_hint = new String [] {"No hints for " + viewName()};
 		}
+		
 		return default_hint;
 	}
 	
-	private String[] default_status = null;
 	/**
 	* Strings describing status to user, suitable for display.
 	*
 	* @return Array of strings, representing status
 	*/
 	public String[]  getStatus() {
+		
 		if (default_status == null) {
-			default_status = new String []
-			{"No status info for " + viewName()};
+			default_status = new String []{"No status info for " + viewName()};
 		}
+		
 		return default_status;
 	}
 	
-	
-	public JComponent getComponent() {return panel;}
-	
-	
+	public JComponent getComponent() {
+		
+		return panel;
+	}
 	
 	/** 
 	* Update the double buffer, if buffered
@@ -108,38 +128,47 @@ MouseListener {
 	* the onscreen size has changed.
 	*
 	*
-	* note: now actually called by paintcomponent to update the swing double buffer.
+	* note: now actually called by paintcomponent to update 
+	* the swing double buffer.
 	
 	*/
 	abstract protected void updateBuffer(Graphics g);
 	
 	/** 
-	* This is a stub so that components which work with this will also work with the ModelViewBuffered.
-	* importantly, no buffer is ever actually allocated.
+	* This is a stub so that components which work with this will also 
+	* work with the ModelViewBuffered.
+	* importantly, no buffer is ever actually allocated. This method is 
+	* used on the zoomed Dendrograms (ATRZoomView).
 	*/
 	@Override
 	public synchronized void paintComponent(Graphics g) {
+		
 		Rectangle clip = g.getClipBounds();
-		g.setColor(Color.white);
+		g.setColor(Color.white); //NO
 		g.fillRect(clip.x,clip.y,clip.width, clip.height);
 		
-		
 		Dimension reqSize = getSize();
-		if (reqSize == null) { return;}
-		// monitor size changes
-		if ((offscreenSize == null) ||
-			(reqSize.width != offscreenSize.width) ||
-			(reqSize.height != offscreenSize.height)) {
-				offscreenChanged = true;
-				offscreenSize = reqSize;
-			}
+		if (reqSize == null) { 
 			
-			if (isEnabled()) {
-				offscreenValid = false;
-				updateBuffer(g);
-				paintComposite(g);
-			}
-			//	System.out.println("Exiting " + viewName() + " to clip " + clip );
+			return;
+		}
+		
+		// monitor size changes
+		if ((offscreenSize == null) 
+				|| (reqSize.width != offscreenSize.width) 
+				|| (reqSize.height != offscreenSize.height)) {
+			
+			offscreenChanged = true;
+			offscreenSize = reqSize;
+		}
+			
+		if (isEnabled()) {
+			offscreenValid = false;
+			updateBuffer(g);
+			paintComposite(g);
+		}
+		
+		//	System.out.println("Exiting " + viewName() + " to clip " + clip );
 	}
 	
 	/** 
@@ -151,19 +180,25 @@ MouseListener {
 	rect and focus rect.
 	*/
 	public void paintComposite(Graphics g) {
+		
 		return;
 	}
 	
 	@Override
 	public void addNotify() {
+		
 		super.addNotify();
 	}
 
 	public Window enclosingWindow() {
-		 Object f = getParent ();
-		  while (! (f instanceof Window))
-		    f = ((Component) f).getParent ();
-		  return  (Window) f;
+		 
+		Object f = getParent ();
+		
+		while (! (f instanceof Window)) {
+			f = ((Component) f).getParent ();
+		}
+		   
+		return  (Window) f;
 	}
 	
 	/**
@@ -174,8 +209,10 @@ MouseListener {
 	*/
 	@Override
 	public void mouseEntered(MouseEvent e) {
+		
 		if (viewFrame == null) {
-			LogBuffer.println("viewFrame null in ModelView.mouseEntered. Instance " + this);
+			LogBuffer.println("viewFrame null in ModelView.mouseEntered. " +
+					"Instance " + this);
 			return;
 		}
 		
@@ -184,13 +221,20 @@ MouseListener {
 		Window frame = enclosingWindow();
 		if (frame.isActive()) {
 			requestFocus();
-			if (hint != null) {hint.setMessages(getHints());}
+			
+			if (hint != null) {
+				hint.setMessages(getHints());
+			}
+			
 			try {
-				if (status != null) {status.setMessages(getStatus());}
+				if (status != null) {
+					status.setMessages(getStatus());
+				}
 			} catch (Exception ex) {
 				JOptionPane.showMessageDialog(this, ex.toString());
 			}
 		}
+		
 		hasMouse = true;
 	}
 	
@@ -199,6 +243,7 @@ MouseListener {
 	*/
 	@Override
 	public void mouseExited(MouseEvent e) {
+		
 		hasMouse = false;
 		setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 	}
@@ -206,13 +251,19 @@ MouseListener {
 	/* a bunch of stubs so we can claim to be a MouseListener	*/
 	@Override
 	public void mouseClicked(MouseEvent e) {}
+	
 	@Override
 	public void mousePressed(MouseEvent e) {}
+	
 	@Override
 	public void mouseReleased(MouseEvent e) {}
+	
 	public void mouseMoved(MouseEvent e) {} 
-	public void mouseDragged(MouseEvent e) {}	
+	
+	public void mouseDragged(MouseEvent e) {}
+	
 	public void keyReleased(KeyEvent e) {}
+	
 	public void keyTyped(KeyEvent e) {}
 }
 

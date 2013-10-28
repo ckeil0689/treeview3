@@ -41,6 +41,8 @@ import edu.stanford.genetics.treeview.*;
  */
 public class ArrayNameView extends ModelView implements MouseListener, FontSelectable, ConfigNodePersistent {
 
+	private static final long serialVersionUID = 1L;
+	
 	private final String d_face        = "Courier";
 	private final int d_style          = 0;
 	private final int d_size           = 12;
@@ -89,6 +91,7 @@ public class ArrayNameView extends ModelView implements MouseListener, FontSelec
 	/* inherit description */
 	@Override
 	public String viewName() {
+		
 		return "ArrayNameView";
 	}
 
@@ -97,7 +100,7 @@ public class ArrayNameView extends ModelView implements MouseListener, FontSelec
 	@Override
 	public String[] getHints() {
 		String[] hints  = {
-				"Click and drag to scroll",
+				" - Click and drag to scroll",
 				};
 		return hints;
 	}
@@ -110,6 +113,7 @@ public class ArrayNameView extends ModelView implements MouseListener, FontSelec
 	 * @param  hInfo  Header containing array names as first row.
 	 */
 	public ArrayNameView(HeaderInfo hInfo) {
+		
 		super();
 		headerInfo = hInfo;
 		headerSummary = new HeaderSummary();

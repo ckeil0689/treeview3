@@ -33,37 +33,60 @@ import edu.stanford.genetics.treeview.*;
  * @author avsegal
  *
  */
-public class TextViewManager extends ModelView implements FontSelectable, PropertyChangeListener {
-
+public class TextViewManager extends ModelView 
+implements FontSelectable, PropertyChangeListener {
 
 	private static final long serialVersionUID = 1L;
-	public TextViewManager(HeaderInfo hI, UrlExtractor uExtractor)
-	{
+	
+	private boolean ignoreDividerChange = false;
+	private UrlExtractor uExtractor;
+//	private JSplitPane last;
+	private Component root;
+//	private JSplitPane firstNotShown;
+//	private TextView lastView;
+	private int numViews;
+	private int numShown;
+	private HeaderInfo hI;
+	private Vector<ModelView> textViews;
+	private ConfigNode configRoot;
+	private HeaderSummary headerSummary = new HeaderSummary();
+	private int dividerLocations [];
+	
+	/**
+	 * Constructor
+	 * @param hI
+	 * @param uExtractor
+	 */
+	public TextViewManager(HeaderInfo hI, UrlExtractor uExtractor) {
+		
 		super();
 		this.hI = hI;
 		this.uExtractor = uExtractor;
+		
 		root = null;
-		textViews = new Vector();
+		textViews = new Vector<ModelView>();
+		
 		panel = new JPanel();
 		panel.setLayout(new GridLayout());
+		
 		dividerLocations = new int[hI.getNumNames() - 1];
-		firstNotShown = null;
+//		firstNotShown = null;
 		numShown = 0;
 				
-		//	  could set up headerSummary...
+		//could set up headerSummary...
 		int GIDIndex = hI.getIndex("GID");
 		if (GIDIndex == -1) {
 			headerSummary.setIncluded(new int [] {1});
+			
 		} else {
 			headerSummary.setIncluded(new int [] {2});
 		}
 		headerSummary.addObserver(this);
-		
 				
 		makeTextViews(hI.getNumNames());
 		
-		for(int i = 0; i < numViews - 1; i++)
-		{
+		for(int i = 0; i < numViews - 1; i++) {
+			
 			dividerLocations[i] = 50;
 		}
 	
@@ -75,18 +98,17 @@ public class TextViewManager extends ModelView implements FontSelectable, Proper
 	/**
 	 * called when confignode or headerSummary is changed.
 	 */
-	private void loadSelection()
-	{		
-		if(configRoot == null)
+	private void loadSelection() {		
+		
+		if(configRoot == null) {
 			return;
+		}
 		
 		ConfigNode [] nodes = configRoot.fetch("Selection");
 		int [] included;
-		if(nodes.length > 0)
-		{
+		if(nodes.length > 0) {
 			included = new int[nodes.length];
-			for(int i = 0; i < nodes.length; i++)
-			{
+			for(int i = 0; i < nodes.length; i++) {
 				included[i] = nodes[i].getAttribute("index", -1);
 			}
 			headerSummary.setIncluded(included);
@@ -96,24 +118,24 @@ public class TextViewManager extends ModelView implements FontSelectable, Proper
 	/**
 	 * called when headers to be displayed are changed.
 	 */
-	private void saveSelection()
-	{
-		if(configRoot == null)
-		{
+	private void saveSelection() {
+		
+		if(configRoot == null) {
 			return;
 		}
+		
 		configRoot.removeAll("Selection");
-		for(int i = 0; i < headerSummary.getIncluded().length; i++)
-		{
-			configRoot.create("Selection").setAttribute("index", headerSummary.getIncluded()[i], -1);
+		
+		for(int i = 0; i < headerSummary.getIncluded().length; i++) {
+			
+			configRoot.create("Selection").setAttribute("index", 
+					headerSummary.getIncluded()[i], -1);
 		}
 	}
 	
 	@Override
-	public void update(Observable ob, Object obj)
-	{
-		if(ob == headerSummary)
-		{
+	public void update(Observable ob, Object obj) {
+		if(ob == headerSummary) {
 			saveSelection();
 			saveDividerLocations();
 			//saveDividerLocationsToConfig();
@@ -121,27 +143,27 @@ public class TextViewManager extends ModelView implements FontSelectable, Proper
 			loadDividerLocations();
 		}
 		
-		for(int i = 0; i < textViews.size(); i++)
-		{
+		for(int i = 0; i < textViews.size(); i++) {
 			((TextView)textViews.get(i)).update(ob, obj);			
 		}
 	}
+	
 	@Override
-	public void updateBuffer(Graphics g)
-	{
+	public void updateBuffer(Graphics g) {
+		
 		paintAll(g);
 	}
 	
 	public void updateBuffer(Image buf) {
-		for(int i = 0; i < textViews.size(); i++)
-		{
+		
+		for(int i = 0; i < textViews.size(); i++) {
 			((TextView)textViews.get(i)).updateBuffer(buf);			
 		}
 	}
 	
 	@Override
-	public String viewName()
-	{
+	public String viewName() {
+		
 		return "TextViewManager";
 	}
 	
@@ -151,261 +173,272 @@ public class TextViewManager extends ModelView implements FontSelectable, Proper
 	 */
 	@Override
 	public void setViewFrame(ViewFrame m) {
+		
 		super.setViewFrame(m);
-		for(int i = 0; i < textViews.size(); i++)
+		for(int i = 0; i < textViews.size(); i++) {
 			((TextView)textViews.get(i)).setViewFrame(m);
+		}
 	}
+	
 	@Override
 	public void setHintPanel(MessagePanel h) {
+		
 		super.setHintPanel(h);
-		for(int i = 0; i < textViews.size(); i++)
+		for(int i = 0; i < textViews.size(); i++) {
 			((TextView)textViews.get(i)).setHintPanel(h);
+		}
 	}
+	
 	@Override
 	public void setStatusPanel(MessagePanel s) {
+		
 		super.setStatusPanel(s);
 		for(int i = 0; i < textViews.size(); i++)
 			((TextView)textViews.get(i)).setStatusPanel(s);
 	}
 	
-	private void makeTextViews(int n)
-	{
+	private void makeTextViews(int n) {
+		
 		numViews = n;
-		for(int i = 0; i < n; i++)
-		{
+		for(int i = 0; i < n; i++) {
+			
 			textViews.add(new TextView(hI, uExtractor, i));
 			((TextView)textViews.lastElement()).setHeaderSummary(headerSummary);
 			headerSummary.addObserver((TextView)textViews.lastElement());
 		}
 	}
-	private void addTextViews(int n)
-	{
+	
+	private void addTextViews(int n) {
+		
 		JSplitPane temp;
 		numShown = n;
 		
-		if(n <= 0)
-		{
+		if(n <= 0) {
 			return;
-		}
-		else if(n == 1)
-		{
+			
+		} else if(n == 1) {
 			root = ((TextView)textViews.get(0)).getComponent();
-		}
-		else
-		{
+			
+		} else {
 			root = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 			((JSplitPane)root).setDividerSize(2);
 			((JSplitPane)root).setBorder(null);
-			((JSplitPane)root).setRightComponent(((TextView)textViews.get(n-1)).getComponent());
-			((JSplitPane)root).setLeftComponent(((TextView)textViews.get(n-2)).getComponent());
-			root.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, this);
+			((JSplitPane)root).setRightComponent(
+					((TextView)textViews.get(n-1)).getComponent());
+			((JSplitPane)root).setLeftComponent(
+					((TextView)textViews.get(n-2)).getComponent());
+			root.addPropertyChangeListener(
+					JSplitPane.DIVIDER_LOCATION_PROPERTY, this);
 			
-			for(int i = n - 3; i >= 0; i--)
-			{
+			for(int i = n - 3; i >= 0; i--) {
+				
 				temp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-				temp.setLeftComponent(((TextView)textViews.get(i)).getComponent());
+				temp.setLeftComponent(
+						((TextView)textViews.get(i)).getComponent());
 				temp.setRightComponent(root);
 				temp.setDividerSize(2);
 				temp.setBorder(null);
-				temp.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, this);
+				temp.addPropertyChangeListener(
+						JSplitPane.DIVIDER_LOCATION_PROPERTY, this);
 				root = temp;
 			}
 		}
+		
 		panel.removeAll();
 		panel.add(root);
 		panel.updateUI();
 	}
 	
 	/**
-	 * Need to override TextView.setGeneSelection() to account for the textviews that are contained.
+	 * Need to override TextView.setGeneSelection() to account 
+	 * for the textviews that are contained.
 	 *
 	 */
-	public void setGeneSelection(TreeSelectionI selection)
-	{
-		for(int i = 0; i < textViews.size(); i++)
-		{
+	public void setGeneSelection(TreeSelectionI selection) {
+		
+		for(int i = 0; i < textViews.size(); i++) {
 			((TextView)textViews.get(i)).setGeneSelection(selection);
 		}
 	}
 	
-	public void setMap(MapContainer zoomYMap)
-	{
-		for(int i = 0; i < textViews.size(); i++)
-		{
+	public void setMap(MapContainer zoomYMap) {
+		
+		for(int i = 0; i < textViews.size(); i++) {
 			((TextView)textViews.get(i)).setMap(zoomYMap);
 		}
 	}
 	
-	public void bindConfig(ConfigNode configNode)
-	{
+	public void bindConfig(ConfigNode configNode) {
+		
 		configRoot = configNode;
-        loadSelection(); // doesn't quite work yet, something more global then this headerSummary needs to be updated.
+        loadSelection(); // doesn't quite work yet, 
+        //something more global then this headerSummary needs to be updated.
         ConfigNode [] viewNodes = configRoot.fetch("TextView");
+        
         for (int i = viewNodes.length; i < textViews.size(); i++) {
         		configRoot.create("TextView");
         }
+        
         viewNodes = configRoot.fetch("TextView");
-		for(int i = 0; i < textViews.size(); i++)
-		{
+		for(int i = 0; i < textViews.size(); i++) {
 			((TextView)textViews.get(i)).bindConfig(viewNodes[i]);
 		}
+		
 		// binding config can change fonts.
 		if (textViews.size() > 0) {
 			setFont(((TextView)textViews.firstElement()).getFont());
 		}
+		
 		loadDividerLocationsFromConfig();
 		loadDividerLocations();
 	}
 	
 	@Override
 	public String getFace() {
+		
 		return getFont().getName();
     }
+	
     @Override
 	public int getPoints() {
-		return getFont().getSize();
+		
+    	return getFont().getSize();
     }
+    
     @Override
 	public int getStyle() {
-    		return getFont().getStyle();
+    		
+    	return getFont().getStyle();
     }
     
     @Override
 	public void setFace(String string) {
-    		for (int i = 0; i < textViews.size(); i++) 	{
-    			((TextView)textViews.get(i)).setFace(string);
-    		}	
-    		if (textViews.size() > 0) {
-    			setFont(((TextView)textViews.firstElement()).getFont());
-    		}
-    		repaint();
+    		
+    	for (int i = 0; i < textViews.size(); i++) {
+    		((TextView)textViews.get(i)).setFace(string);
+    	}	
+    	
+		if (textViews.size() > 0) {
+    		setFont(((TextView)textViews.firstElement()).getFont());
+    	}
+		
+    	repaint();
     }
     
     @Override
 	public void setPoints(int size) {
-    		for(int i = 0; i < textViews.size(); i++) {
+    	
+    	for(int i = 0; i < textViews.size(); i++) {
 			((TextView)textViews.get(i)).setPoints(size);
-		}	
+		}
+    	
 		if (textViews.size() > 0) {
 			setFont(((TextView)textViews.firstElement()).getFont());
 		}
+		
         repaint();
     }
     
     @Override
 	public void setStyle(int style) {
-    		for(int i = 0; i < textViews.size(); i++) {
+    		
+    	for(int i = 0; i < textViews.size(); i++) {
 			((TextView)textViews.get(i)).setStyle(style);
-		}	
+		}
+    	
 		if (textViews.size() > 0) {
 			setFont(((TextView)textViews.firstElement()).getFont());
 		}
+		
         repaint();
     }
     
     public void setHeaderSummary(HeaderSummary headerSummary) {
+    	
     	this.headerSummary = headerSummary;
-    		for(int i = 0; i < textViews.size(); i++) {
+    		
+    	for(int i = 0; i < textViews.size(); i++) {
 			((TextView)textViews.get(i)).setHeaderSummary(headerSummary);
 		}
 	}
+    
 	/** Getter for headerSummary */
 	public HeaderSummary getHeaderSummary() {
+		
 		return headerSummary;
 	}
 	
-	public void saveDividerLocationsToConfig()
-	{
+	public void saveDividerLocationsToConfig() {
+		
 		ConfigNode node = null;
-		if(configRoot != null)
-		{
+		if(configRoot != null) {
 			node = configRoot.fetchFirst("Dividers");
-			if(node == null)
-			{
+			
+			if(node == null) {
 				node = configRoot.create("Dividers");
 			}
-		}
-		else
-		{
+		} else {
 			return;
 		}
-		for(int i = 0; i < numViews - 1; i++)
-		{
-			if(node != null)
-			{
+		
+		for(int i = 0; i < numViews - 1; i++) {
+			
+			if(node != null) {
 				node.setAttribute("Position" + i, dividerLocations[i], -1);
 			}
 		}
 	}
 	
-	public void saveDividerLocations()
-	{
+	public void saveDividerLocations() {
+		
 		Component temp = panel.getComponent(0);
 				
-		for(int i = 0; i < numShown - 1; i++)
-		{
+		for(int i = 0; i < numShown - 1; i++) {
 			
 			dividerLocations[i] = ((JSplitPane)temp).getDividerLocation();
 			temp = ((JSplitPane)temp).getRightComponent();
 		}
 	}
-	public void loadDividerLocationsFromConfig()
-	{	
+	
+	public void loadDividerLocationsFromConfig() {	
+		
 		ConfigNode node = null;
-		if(configRoot != null)
-		{
+		if(configRoot != null) {
 			node = configRoot.fetchFirst("Dividers");
-		}
-		else
-		{
+			
+		} else {
 			return;
 		}
 		
-		for(int i = 0; i < numViews - 1; i++)
-		{
-			if(node != null)
-			{
+		for(int i = 0; i < numViews - 1; i++) {
+			
+			if(node != null) {
 				dividerLocations[i] = node.getAttribute("Position" + i, 50);
 			}
 		}
 	}
-	public void loadDividerLocations()
-	{
+	
+	public void loadDividerLocations() {
+		
 		ignoreDividerChange = true;
 		Component temp = panel.getComponent(0);
 
-		for(int i = 0; i < numShown - 1; i++)
-		{
-			((JSplitPane)temp).setDividerLocation(dividerLocations[i]);
+		for(int i = 0; i < numShown - 1; i++) {
 			
+			((JSplitPane)temp).setDividerLocation(dividerLocations[i]);
 			temp = ((JSplitPane)temp).getRightComponent();
 		}
+		
 		ignoreDividerChange = false;
 	}
 	
 	@Override
-	public void propertyChange(PropertyChangeEvent pce)
-	{
-		if(!ignoreDividerChange && pce.getPropertyName() == JSplitPane.DIVIDER_LOCATION_PROPERTY)
-		{
+	public void propertyChange(PropertyChangeEvent pce) {
+		
+		if(!ignoreDividerChange && pce.getPropertyName() 
+				== JSplitPane.DIVIDER_LOCATION_PROPERTY) {
 			saveDividerLocations();
 			saveDividerLocationsToConfig();
 		}
-	}
-	
-	boolean ignoreDividerChange = false;
-	UrlExtractor uExtractor;
-	JSplitPane last;
-	Component root;
-	JSplitPane firstNotShown;
-	TextView lastView;
-	int numViews;
-	int numShown;
-	HeaderInfo hI;
-	Vector textViews;
-	ConfigNode configRoot;
-	HeaderSummary headerSummary = new HeaderSummary();
-	int dividerLocations [];
-	
-    
+	} 
 }

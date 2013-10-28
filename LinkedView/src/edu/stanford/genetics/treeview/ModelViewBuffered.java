@@ -42,7 +42,6 @@ public abstract class ModelViewBuffered extends ModelView {
 
     protected boolean      rotateOffscreen = false;
 
-
     protected ModelViewBuffered() {
 		
     	super();
@@ -52,6 +51,7 @@ public abstract class ModelViewBuffered extends ModelView {
 	* this method does no management of instance variables.
 	*/
 	public Image ensureCapacity(Image i, Dimension req) {
+		
 		if (i == null) {
 			return createImage(req.width, req.height);
 		}
@@ -59,12 +59,17 @@ public abstract class ModelViewBuffered extends ModelView {
 		int w = i.getWidth(null);
 		int h = i.getHeight(null);
 		if ((w < req.width) || (h < req.height)) {
-			if (w < req.width) { w = req.width;}
-			if (h < req.height) { h = req.height;}
+			if (w < req.width) { 
+				w = req.width;
+			}
+			if (h < req.height) { 
+				h = req.height;
+			}
 			// should I try to free something?
 			Image n = createImage(w, h);
-			n.getGraphics().drawImage(i, 0,0,null);
+			n.getGraphics().drawImage(i, 0, 0, null);
 			return n;
+			
 		} else {
 			return i;
 		}
@@ -73,10 +78,11 @@ public abstract class ModelViewBuffered extends ModelView {
     /**
 	* this method sets up all the instance variables.
 	* XXX - THIS FAILS ON MAC OS X
-	* since mac os x doesn't let you call getGraphics on the Image if it's generated from
-	* a pixels array... hmm...
+	* since mac os x doesn't let you call getGraphics on the Image 
+	* if it's generated from a pixels array... hmm...
 	*/
 	protected void ensureCapacity(Dimension req) {
+		
 		if (offscreenBuffer == null) {
 			createNewBuffer(req.width, req.height);
 		}
@@ -84,29 +90,38 @@ public abstract class ModelViewBuffered extends ModelView {
 		int w = offscreenBuffer.getWidth(null);
 		int h = offscreenBuffer.getHeight(null);
 		if ((w < req.width) || (h < req.height)) {
-			if (w < req.width) { w = req.width;}
-			if (h < req.height) { h = req.height;}
+			if (w < req.width) { 
+				w = req.width;
+			}
+			if (h < req.height) { 
+				h = req.height;
+			}
+			
 			// should I try to free something?
 			createNewBuffer(w,h);
 		}
     }
 
 	private synchronized void createNewBuffer(int w, int h) {
+		
 		offscreenPixels = new int[w * h];
-		MemoryImageSource source = new MemoryImageSource(w, h, offscreenPixels, 0, w);
+		MemoryImageSource source = new MemoryImageSource(w, h, 
+				offscreenPixels, 0, w);
 		source.setAnimated(true);
 		Image n = createImage(source);
+		
 		if (offscreenBuffer != null) {
 			// should I be copying over pixels instead?
-			n.getGraphics().drawImage(offscreenBuffer, 0,0,null);
+			n.getGraphics().drawImage(offscreenBuffer, 0, 0, null);
 		}
 		offscreenBuffer = n;
 		offscreenGraphics = offscreenBuffer.getGraphics();
 	}
+	
     /* 
      * The double buffer in Swing
      * doesn't seem to be persistent across draws. for instance, every
-     * time another window obscures one of ourwindows and then moves,
+     * time another window obscures one of our windows and then moves,
      * a repaint is triggered by most VMs.
      *
      * We apparently need to maintain our own persistent offscreen
@@ -114,55 +129,63 @@ public abstract class ModelViewBuffered extends ModelView {
      */
     @Override
 	public synchronized void paintComponent(Graphics g) {
-	Rectangle clip = g.getClipBounds();
-//	System.out.println("Entering " + viewName() + " to clip " + clip );
-
-	Dimension newsize = getSize();
-	if (newsize == null) { return;}
-
-	Dimension reqSize;
-	reqSize = newsize;
-	// monitor size changes
-	if ((offscreenBuffer == null) ||
-	    (reqSize.width != offscreenSize.width) ||
-	    (reqSize.height != offscreenSize.height)) {
-	    
-	    offscreenSize = reqSize;
-		offscreenBuffer = ensureCapacity(offscreenBuffer, offscreenSize);
-		offscreenGraphics = offscreenBuffer.getGraphics();
-	    try {
-		((Graphics2D) offscreenGraphics).setRenderingHint(
-			RenderingHints.KEY_ANTIALIASING, 
-			RenderingHints.VALUE_ANTIALIAS_OFF);
-	    } catch (java.lang.NoClassDefFoundError err) {
-		// ignore if Graphics2D not found...
-	    }
-	    offscreenChanged = true;
-	} else {
-	    offscreenChanged = false;
-	}
-
-	// update offscreenBuffer if necessary
-	g.setColor(Color.white);
-	g.fillRect(clip.x,clip.y,clip.width, clip.height);
-	if (isEnabled()) {
-	    if ((offscreenSize.width > 0) && (offscreenSize.height > 0)) {
-		updateBuffer(offscreenGraphics);
-		offscreenValid = true;
-	    }
-	} else {
-//	  	System.out.println(viewName() + " not enabled");
-	    Graphics tg= offscreenBuffer.getGraphics();
-	    tg.setColor(Color.white);
-	    tg.fillRect
-		(0, 0, offscreenSize.width, offscreenSize.height);
-	}
+		
+    	Rectangle clip = g.getClipBounds();
+//    	System.out.println("Entering " + viewName() + " to clip " + clip );
 	
-	if (g != offscreenGraphics) { // sometimes paint directly
-	    g.drawImage(offscreenBuffer, 0, 0, this);
-	}
-	paintComposite(g);
-//	System.out.println("Exiting " + viewName() + " to clip " + clip );
+		Dimension newsize = getSize();
+		if (newsize == null) { 
+			return;
+		}
+	
+		Dimension reqSize;
+		reqSize = newsize;
+		
+		// monitor size changes
+		if ((offscreenBuffer == null) 
+				|| (reqSize.width != offscreenSize.width) 
+				|| (reqSize.height != offscreenSize.height)) {
+		    
+		    offscreenSize = reqSize;
+			offscreenBuffer = ensureCapacity(offscreenBuffer, offscreenSize);
+			offscreenGraphics = offscreenBuffer.getGraphics();
+			
+		    try {
+		    	((Graphics2D) offscreenGraphics).setRenderingHint(
+		    			RenderingHints.KEY_ANTIALIASING, 
+		    			RenderingHints.VALUE_ANTIALIAS_OFF);
+		    	
+		    } catch (java.lang.NoClassDefFoundError err) {
+			// ignore if Graphics2D not found...
+		    }
+		    offscreenChanged = true;
+		    
+		} else {
+		    offscreenChanged = false;
+		}
+	
+		// update offscreenBuffer if necessary
+		g.setColor(Color.white); //NO
+		g.fillRect(clip.x,clip.y,clip.width, clip.height);
+		
+		if (isEnabled()) {
+		    if ((offscreenSize.width > 0) && (offscreenSize.height > 0)) {
+				updateBuffer(offscreenGraphics);
+				offscreenValid = true;
+		    }
+		} else {
+//			System.out.println(viewName() + " not enabled");
+		    Graphics tg= offscreenBuffer.getGraphics();
+		    tg.setColor(Color.white); //NO
+		    tg.fillRect
+			(0, 0, offscreenSize.width, offscreenSize.height);
+		}
+		
+		if (g != offscreenGraphics) { // sometimes paint directly
+		    g.drawImage(offscreenBuffer, 0, 0, this);
+		}
+		paintComposite(g);
+	//	System.out.println("Exiting " + viewName() + " to clip " + clip );
     }
     
 }

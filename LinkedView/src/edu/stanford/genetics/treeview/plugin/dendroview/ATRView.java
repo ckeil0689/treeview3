@@ -43,6 +43,10 @@ import edu.stanford.genetics.treeview.*;
 
 public class ATRView extends ModelViewBuffered implements 
 		MouseListener, KeyListener {
+
+	private static final long serialVersionUID = 1L;
+
+
 	/**  Constructor, sets up AWT components  */
 	public ATRView() {
 		super();
@@ -62,9 +66,10 @@ public class ATRView extends ModelViewBuffered implements
 
 
 	private final static String[] hints = {
-			"Click to select node",
-			" - use arrow keys to navigate tree",
-			};
+			
+		" - Click to select node",
+		" - Use arrow keys to navigate tree",
+	};
 
 
 	/*inherit description*/
@@ -237,8 +242,8 @@ public class ATRView extends ModelViewBuffered implements
 
     // method from ModelView
 	/**
-	 *  Gets the status attribute of the ATRView object The status is some information
-	 *  which the user might find useful.
+	 *  Gets the status attribute of the ATRView object. 
+	 *  The status is some information which the user might find useful.
 	 *
 	 * @return    The status value
 	 */
@@ -253,16 +258,19 @@ public class ATRView extends ModelViewBuffered implements
 				} else {
 					int [] nameIndex = getHeaderSummary().getIncluded();
 					status = new String [nameIndex.length * 2];
-					HeaderInfo atrInfo = getViewFrame().getDataModel().getAtrHeaderInfo();
+					HeaderInfo atrInfo = getViewFrame().getDataModel()
+							.getAtrHeaderInfo();
 					String [] names = atrInfo.getNames();
 					for (int i = 0; i < nameIndex.length; i++) {
 						status[2*i] = names[nameIndex[i]] +":";
-						status[2*i+1] = " " +atrInfo.getHeader(atrInfo.getHeaderIndex(selectedNode.getId()))[ nameIndex[i]];
+						status[2*i+1] = " " +atrInfo.getHeader(
+								atrInfo.getHeaderIndex(
+										selectedNode.getId()))[ nameIndex[i]];
 					}
 				}
 			} else {
 				status = new String [2];
-				status[0] = "Select Node to ";
+				status[0] = "Select node to ";
 				status[1] = "view annotation.";
 			}
 			return status;

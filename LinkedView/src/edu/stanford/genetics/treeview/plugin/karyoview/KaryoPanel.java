@@ -46,6 +46,11 @@ import edu.stanford.genetics.treeview.model.TVModel;
  * @version $Revision: 1.7 $ $Date: 2009-09-08 11:24:24 $
  */
 public class KaryoPanel extends DragGridPanel implements MainPanel {
+
+	private static final long serialVersionUID = 1L;
+	
+	private final Color BLUE2 = new Color(235, 240, 255, 255);
+	
 	/**
 	 *  Constructor for the KaryoPanel object
 	 *
@@ -54,7 +59,9 @@ public class KaryoPanel extends DragGridPanel implements MainPanel {
 	 * @param  vFrame  parent ViewFrame of DendroView
 	 * @param configNode config node to take state from and store state in.
 	 */
-	public KaryoPanel(DataModel tvmodel, TreeSelectionI geneSelection, ViewFrame vFrame, ConfigNode configNode) {
+	public KaryoPanel(DataModel tvmodel, TreeSelectionI geneSelection, 
+			ViewFrame vFrame, ConfigNode configNode) {
+		
 		super(2, 3);
 		viewFrame = vFrame;
 
@@ -68,7 +75,7 @@ public class KaryoPanel extends DragGridPanel implements MainPanel {
 		karyoView = new KaryoView(karyoDrawer, tvmodel);
 		karyoView.bindConfig(getFirst("KaryoView"));
 	    parameterPanel = new KaryoViewParameterPanel(karyoDrawer, karyoView, this);
-	    statusPanel = new MessagePanel("View Status");
+	    statusPanel = new MessagePanel("Status", BLUE2);
 
 		windowActive = true;
 		setBorderWidth(2);

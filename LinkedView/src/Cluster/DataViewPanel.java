@@ -68,9 +68,16 @@ public class DataViewPanel extends JPanel{
 		
 		geneNames = new String[headerArray.length];
 		
+		int index = 0;
+		
+		String filePath = model.getSource().toLowerCase();
+		if(filePath.endsWith(".cdt")) {
+			index = 1;
+		}
+		
 		for(int i = 0; i < headerArray.length; i++){
 			
-			geneNames[i] = headerArray[i][0];
+			geneNames[i] = headerArray[i][index];
 		}
 		
 		table = new JTable(new ClusterTableModel(arraysList, model));

@@ -26,6 +26,7 @@ import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.*;
 import java.net.URL;
+import java.util.Arrays;
 
 import javax.swing.*;
 
@@ -505,21 +506,27 @@ public class TVModelLoader2 implements ProgressTrackable {
 	 * @param tempVector RectData contain annotation info
 	 */
 	protected void loadGeneAnnotation(RectData tempVector) {
+		
 		println("loading Gene Annotations");
 		String [] genePrefix = new String[nGenePrefix];
 		String [][] gHeaders = new String [nGene][nGenePrefix];
 		
 		String [] firstLine = (String []) tempVector.elementAt(0);
 		for (int i = 0; i < nGenePrefix; i++) {
+			
 			genePrefix[i] = firstLine[i];
 		}
+		
 		setLength(nGene);
 		for (int i = 0; i < nGene; i++) {
+			
 			setValue(i);
-//			String [] tokens = (String []) tempVector.elementAt(i + nArrayPrefix);
+//			String [] tokens = (String []) tempVector.elementAt(
+			//i + nArrayPrefix);
 			for (int j = 0; j < nGenePrefix; j++) {
+
 //				gHeaders[i][j] = tokens[j];
-				gHeaders[i][j] = tempVector.getString(i+nExprPrefix-1,j);
+				gHeaders[i][j] = tempVector.getString(i + nExprPrefix - 1, j);
 			}
 		}
 		targetModel.setGenePrefix(genePrefix);
