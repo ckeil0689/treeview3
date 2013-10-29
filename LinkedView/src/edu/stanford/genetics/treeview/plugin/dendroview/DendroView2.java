@@ -158,7 +158,8 @@ MainPanel, Observer {
 			String name) {
 		
 		super.setName(name);
-		viewFrame = vFrame;
+		this.viewFrame = vFrame;
+		this.dataModel = dataModel;
 
 		this.setLayout(new MigLayout());
 		
@@ -195,7 +196,7 @@ MainPanel, Observer {
 			geneIndex = null;
 		}
 		
-		if ((arrayIndex != null) ||(geneIndex != null)){
+		if ((arrayIndex != null) || (geneIndex != null)){
 			dataModel = new ReorderedDataModel(
 					dataModel, geneIndex, arrayIndex);
 		}
@@ -778,7 +779,7 @@ MainPanel, Observer {
 		arraynameview.setMapping(getZoomXmap());
 
 		textview = new TextViewManager(getDataModel().getGeneHeaderInfo(), 
-				viewFrame.getUrlExtractor());
+				viewFrame.getUrlExtractor(), getDataModel());
 		
 		textview.setMap(getZoomYmap());
 
@@ -799,6 +800,7 @@ MainPanel, Observer {
 		// this is here because my only subclass shares this code.
 		bindTrees();
 		
+		//Changes Row/ Col number to gene names in Status panel
 		zoomview.setHeaders(getDataModel().getGeneHeaderInfo(), 
 				getDataModel().getArrayHeaderInfo());
 		
@@ -1063,7 +1065,7 @@ MainPanel, Observer {
 		zoompanel.setLayout(new BorderLayout());
 		
 		textpanel = new JPanel();
-		textpanel.setLayout(new BorderLayout());
+		textpanel.setLayout(new MigLayout());
 		
 		level1Pane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
 				upSide, downSide);
@@ -1090,7 +1092,7 @@ MainPanel, Observer {
 		zoompanel.add(zoomXscrollbar, BorderLayout.SOUTH);	
 		zoompanel.add(zoomYscrollbar, BorderLayout.EAST);
 		
-		textpanel.add(textview.getComponent(), BorderLayout.CENTER);
+		textpanel.add(textview.getComponent(), "push, grow");
 		
 		left.add(panel, "grow, push, height 80%:80%:, span, wrap");
 		

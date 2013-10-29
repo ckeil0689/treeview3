@@ -7,8 +7,9 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * This class is used to generate the .CDT tab delimited file which Java TreeView will use for visualization
- * It takes in the previously calculated data and forms String lists to make them writeable.
+ * This class is used to generate the .CDT tab delimited file which 
+ * Java TreeView will use for visualization. It takes in the previously 
+ * calculated data and forms String lists to make them writable.
  * @author CKeil
  *
  */
@@ -17,21 +18,36 @@ public class CDTGenerator {
 	//Instance variables
 	private ClusterModel model;
 	private File file;
-	private String filePath, choice, choice2;
+	
+	private String filePath; 
+	private String choice;
+	private String choice2;
 	private int buffer = 2;
+	private int row_clusterN;
+	private int col_clusterN;
+	private boolean hierarchical;
 	
-	private List<List<Double>> sepList, cdtDataList;
+	private String[][] rowNames; 
+	private String[][] colNames;
 	
-	private String[][] rowNames, colNames;
+	private List<List<Double>> sepList;
+	private List<List<Double>> cdtDataList;
 	
-	private List<List<String>> finalcdtTable, rowNameList, colNameList, 
-	rowNameList2, colNameList2, cdtDataStrings;
+	private List<List<String>> finalcdtTable; 
+	private List<List<String>> rowNameList;
+	private List<List<String>> colNameList;
+	private List<List<String>> rowNameList2;
+	private List<List<String>> colNameList2;
+	private List<List<String>> cdtDataStrings;
 	
-	private List<String> orderedRows, orderedCols, cdtRowElement1, cdtRowElement2, cdtRowElement3;
+	private List<String> orderedRows; 
+	private List<String> orderedCols;
 	
 	//Constructor (building the object)
 	public CDTGenerator(ClusterModel model, List<List<Double>> sepList, 
-			List<String> orderedRows, List<String> orderedCols, String choice, String choice2){
+			List<String> orderedRows, List<String> orderedCols, 
+			String choice, String choice2, boolean hierarchical, 
+			int row_clusterN, int col_clusterN){
 		
 		this.model = model;
 		this.sepList = sepList;
@@ -39,11 +55,15 @@ public class CDTGenerator {
 		this.orderedCols = orderedCols;
 		this.choice = choice;
 		this.choice2 = choice2;
+		this.hierarchical = hierarchical;
+		this.row_clusterN = row_clusterN;
+		this.col_clusterN = col_clusterN;
 	}
 	
 	public void generateCDT(){
     	
-    	//The list of String-lists to be generated for file-writing, contains all data
+    	//The list of String-lists to be generated for file-writing, 
+		//contains all data
     	finalcdtTable = new ArrayList<List<String>>();
     	
 		//the list containing all the reorganized row-data
@@ -61,87 +81,36 @@ public class CDTGenerator {
     	rowNameList = new ArrayList<List<String>>();
     	colNameList = new ArrayList<List<String>>();
     	
+    	//Lists to be filled with reordered strings
     	rowNameList2 = new ArrayList<List<String>>();
     	colNameList2 = new ArrayList<List<String>>();
     	
-    	
-    	if(rowNames.length > 0){
-    		
-	    	for(String[] element : rowNames){
+    	if(rowNames.length > 0) {
+	    	for(String[] element : rowNames) {
 	    		
 	    		rowNameList.add(Arrays.asList(element));
 	    	}
     	}
     	
-    	
-    	if(colNames.length > 0){
-    		
-	    	for(String[] element : colNames){
+    	if(colNames.length > 0) {
+	    	for(String[] element : colNames) {
 	    		
 	    		colNameList.add(Arrays.asList(element));
 	    	}
     	}
     	
-    	//order row data and names
-    	if(!choice.contentEquals("Do Not Cluster")){
+    	//Order Rows and/ or Columns
+    	if(hierarchical) {
+    		orderHierarchical();
     		
-	    	for(int i = 0; i < orderedRows.size(); i++){
-	    		
-		    	String rowElement = orderedRows.get(i);
-		    	String adjusted = rowElement.replaceAll("[\\D]", "");
-		    	
-		    	int index = Integer.parseInt(adjusted);
-		    	
-		    	List<Double> rowData = sepList.get(index);
-		    	
-		    	cdtDataList.add(rowData);
-		    	
-		    	rowNameList2.add(rowNameList.get(index));
-	    	}
-    	}
-    	else{
-    		
-    		rowNameList2.addAll(rowNameList);
-    	}
-    	
-    	//order column data and names
-    	if(!choice2.contentEquals("Do Not Cluster")){
-    		
-    		if(cdtDataList.size() == 0){
-    			
-    			cdtDataList.addAll(sepList);
-    		}
-
-    		for(int i = 0; i < orderedCols.size(); i++){
-	    		
-		    	String colElement = orderedCols.get(i);
-		    	String adjusted = colElement.replaceAll("[\\D]", "");
-		    	
-		    	//gets index from ordered list, e.g. ARRY45X --> 45;
-		    	int index = Integer.parseInt(adjusted);
-		    	
-		    	//going through every row
-		    	for(int j = 0; j < cdtDataList.size(); j++){
-		    		
-		    		//swapping position in original column arrangement according to new ordered list
-		    		//if Element 1 in orderedCols is ARRY45X, then element 1 and element 45 will be swapped in every row
-		    		Collections.swap(cdtDataList.get(j), i, index);
-		    		
-		    	}
-		    	
-	    		//reordering names
-		    	colNameList2.add(colNameList.get(index));;
-	    	}
-    	}
-    	else{
-    		
-    		colNameList2.addAll(colNameList);
+    	} else {
+    		orderKMeans();
     	}
     	
     	//transform cdtDataFile from double lists to string lists
     	cdtDataStrings = new ArrayList<List<String>>();
 
-    	//takes 3k ms
+    	//takes 3k ms...
     	for(List<Double> element : cdtDataList){
     		
     		List<String> newStringData = new ArrayList<String>();
@@ -152,16 +121,192 @@ public class CDTGenerator {
     		}
     		
     		cdtDataStrings.add(newStringData);
-    		
     	}
     	
     	//fuse them to create the final .CDT-write-ready List<List<String>>
+    	//This is the final table with just the data
     	finalcdtTable.addAll(cdtDataStrings);
     	
-    	cdtRowElement1 = new ArrayList<String>();
+    	//Add some string elements, as well as row/ column names
+    	if(hierarchical) {
+    		fillHierarchical();
+    		
+    	} else {
+    		fillKMeans();
+    	}
     	
-		if(!choice.contentEquals("Do Not Cluster")){
+    	//save file as excel tab-delimited file
+    	ClusterFileWriter dataFile = new ClusterFileWriter(model);
+    	
+    	String fileEnd = "";
+    	
+    	if(hierarchical) {
+    		fileEnd = ".cdt";
+    		
+    	} else {
+    		
+        	String rowC = "";
+    		String colC = "";
+    		
+        	if(orderedRows.size() > 0 && orderedCols.size() > 0) {
+        		rowC = "_G" + row_clusterN;
+        		colC = "_A" + col_clusterN;
+        		
+        	} else if (orderedRows.size() > 0) {
+        		rowC = "_G" + row_clusterN;
+        		
+        	} else if (orderedCols.size() > 0) {
+        		colC = "_A" + col_clusterN;
+        	}
+        	
+    		fileEnd = "_K" + rowC + colC + ".CDT";
+    	}
+    	//change boolean type to String file ending?
+		dataFile.writeFile(finalcdtTable, fileEnd);
+		
+		file = dataFile.getFile();
+		filePath = dataFile.getFilePath();				
+    }
+	
+	/**
+	 * This method orders the data if the user decided to use hierarchical
+	 * clustering.
+	 */
+	public void orderHierarchical() {
+		
+		if(!choice.contentEquals("Do Not Cluster")) {
+	    	for(int i = 0; i < orderedRows.size(); i++) {
+	    		
+		    	String rowElement = orderedRows.get(i);
+		    	
+		    	//Regex: Non-digits ('\D') are replaced with "" (no space!)
+		    	//This means: GENE456X -> 456
+		    	String adjusted = rowElement.replaceAll("[\\D]", "");
+		    	
+		    	//Adjusted spring is made into integer which can be used
+		    	//as index
+		    	int index = Integer.parseInt(adjusted);
+		    	
+		    	List<Double> rowData = sepList.get(index);
+		    	
+		    	cdtDataList.add(rowData);
+		    	
+		    	rowNameList2.add(rowNameList.get(index));
+	    	}
+    	} else {
+    		rowNameList2.addAll(rowNameList);
+    	}
+    	
+    	//order column data and names
+    	if(!choice2.contentEquals("Do Not Cluster")) {
+    		if(cdtDataList.size() == 0){
+    			cdtDataList.addAll(sepList);
+    		}
+
+    		for(int i = 0; i < orderedCols.size(); i++) {
+	    		
+		    	String colElement = orderedCols.get(i);
+		    	String adjusted = colElement.replaceAll("[\\D]", "");
+		    	
+		    	//gets index from ordered list, e.g. ARRY45X --> 45;
+		    	int index = Integer.parseInt(adjusted);
+		    	
+		    	//going through every row
+		    	for(int j = 0; j < cdtDataList.size(); j++) {
+		    		
+		    		//swapping position in original column arrangement 
+		    		//according to new ordered list if Element 1 in orderedCols 
+		    		//is ARRY45X, then element 1 and element 45 will 
+		    		//be swapped in every row
+		    		Collections.swap(cdtDataList.get(j), i, index);	
+		    	}
+		    	
+	    		//reordering names
+		    	colNameList2.add(colNameList.get(index));;
+	    	}
+    	} else {
+    		colNameList2.addAll(colNameList);
+    	}
+	}
+	
+	/**
+	 * This method orders the data table if the user decided to use K-Means
+	 * clustering.
+	 */
+	public void orderKMeans() {
+		
+		if(!choice.contentEquals("Do Not Cluster")) {
+			//Make list of gene names to quickly access indexes
+			List<String> geneNames = new ArrayList<String>();
 			
+			for(List<String> geneWeight : rowNameList) {
+				
+				geneNames.add(geneWeight.get(0));
+			}
+			
+			for(int i = 0; i < orderedRows.size(); i++) {
+	    		
+		    	String rowElement = orderedRows.get(i);
+		    	
+		    	//Index of the gene in original data table
+		    	int index = geneNames.indexOf(rowElement);
+		    	
+		    	List<Double> rowData = sepList.get(index);
+		    	
+		    	cdtDataList.add(rowData);
+		    	
+		    	rowNameList2.add(rowNameList.get(index));
+	    	}
+    	} else {
+    		rowNameList2.addAll(rowNameList);
+    	}
+		
+		//order column data and names
+    	if(!choice2.contentEquals("Do Not Cluster")) {
+			//Make list of gene names to quickly access indexes
+			List<String> geneNames = new ArrayList<String>();
+			
+			for(List<String> geneWeight : colNameList) {
+				
+				geneNames.add(geneWeight.get(0));
+			}
+			
+    		if(cdtDataList.size() == 0){
+    			cdtDataList.addAll(sepList);
+    		}
+
+    		//
+    		for(int i = 0; i < orderedCols.size(); i++) {
+	    		
+		    	String colElement = orderedCols.get(i);
+		    	
+		    	int index = geneNames.indexOf(colElement);
+		    	
+		    	//going through every row
+		    	for(int j = 0; j < cdtDataList.size(); j++) {
+		    		
+		    		//swapping position in original column arrangement 
+		    		//according to new ordered list 
+		    		Collections.swap(cdtDataList.get(j), i, index);	
+		    	}
+		    	
+	    		//reordering names
+		    	colNameList2.add(colNameList.get(index));;
+	    	}
+    	} else {
+    		colNameList2.addAll(colNameList);
+    	}
+	}
+	
+	/**
+	 * This method fills the String matrix with names for rows/ columns and
+	 * other elements.
+	 */
+	public void fillHierarchical() {
+		
+		List<String> cdtRowElement1 = new ArrayList<String>();
+    	
+		if(!choice.contentEquals("Do Not Cluster")) {
 			cdtRowElement1.add("GID");
 		}
 
@@ -169,27 +314,30 @@ public class CDTGenerator {
 		cdtRowElement1.add("NAME");
 		cdtRowElement1.add("GWEIGHT");
 		
-		for(int i = 0; i < colNameList2.size(); i++){
+		//Adding column names to first row
+		for(int i = 0; i < colNameList2.size(); i++) {
 			
 			cdtRowElement1.add(colNameList2.get(i).get(0));
 		}
 		
+		//Add first row at index 0 of the final matrix
 		finalcdtTable.add(0, cdtRowElement1);
 		
-		if(!choice2.contentEquals("Do Not Cluster")){
-			
+		
+		if(!choice2.contentEquals("Do Not Cluster")) {
 			buffer = 3;
 			
-			cdtRowElement2 = new ArrayList<String>();
+			List<String> cdtRowElement2 = new ArrayList<String>();
 			
 			cdtRowElement2.add("AID");
 			cdtRowElement2.add("");
 			cdtRowElement2.add("");
-			if(!choice.contentEquals("Do Not Cluster")){
+			if(!choice.contentEquals("Do Not Cluster")) {
 				cdtRowElement2.add("");
 			}
 			
-			for(int i = 0; i < orderedCols.size(); i++){
+			//Fill second row with array element strings ("ARRY3X")
+			for(int i = 0; i < orderedCols.size(); i++) {
 				
 				cdtRowElement2.add(orderedCols.get(i));
 			}
@@ -197,28 +345,25 @@ public class CDTGenerator {
 			finalcdtTable.add(1, cdtRowElement2);	
 		}
 		
-		cdtRowElement3 = new ArrayList<String>();
+		List<String> cdtRowElement3 = new ArrayList<String>();
 		
 		cdtRowElement3.add("EWEIGHT");
 		cdtRowElement3.add("");
 		cdtRowElement3.add("");
 		
 		if(!choice.contentEquals("Do Not Cluster")){
-			
 			cdtRowElement3.add("");
 		}
 		
 		for(int i = 0; i < colNameList2.size(); i++){
-			
+	
 			cdtRowElement3.add(colNameList2.get(i).get(1));
 		}
 		
 		if(!choice2.contentEquals("Do Not Cluster")){
-			
 			finalcdtTable.add(2, cdtRowElement3);
-		}
-		else{
 			
+		} else {
 			finalcdtTable.add(1, cdtRowElement3);
 		}
 		
@@ -231,29 +376,71 @@ public class CDTGenerator {
     		if(!choice.contentEquals("Do Not Cluster")){
     			
     			finalcdtTable.get(i + buffer).add(0, orderedRows.get(i));
-    		}
-    			
+    		}	
     	}
-    	
-    	//save file as excel tab-delimited file
-    	ClusterFileWriter dataFile = new ClusterFileWriter(model);
-    	
-    	//change boolean type to String file ending?
-		dataFile.writeFile(finalcdtTable, ".cdt");
+	}
+	
+	/**
+	 * This method fills the String matrix with names for rows/ columns and
+	 * other elements.
+	 */
+	public void fillKMeans() {
 		
-		file = dataFile.getFile();
-		filePath = dataFile.getFilePath();				
-    	
-    }
+		List<String> cdtRowElement1 = new ArrayList<String>();
+
+		cdtRowElement1.add("ORF");
+		cdtRowElement1.add("NAME");
+		cdtRowElement1.add("GWEIGHT");
+		
+		//Adding column names to first row
+		for(int i = 0; i < colNameList2.size(); i++) {
+			
+			cdtRowElement1.add(colNameList2.get(i).get(0));
+		}
+		
+		//Add first row at index 0 of the final matrix
+		finalcdtTable.add(0, cdtRowElement1);
+		
+		//Fill and add second row
+		List<String> cdtRowElement2 = new ArrayList<String>();
+		
+		cdtRowElement2.add("EWEIGHT");
+		cdtRowElement2.add("");
+		cdtRowElement2.add("");
+		
+		//Fill with weights
+		for(int i = 0; i < colNameList2.size(); i++){
+	
+			cdtRowElement2.add(colNameList2.get(i).get(1));
+		}
+
+		finalcdtTable.add(1, cdtRowElement2);
+	
+		//Add gene names in ORF and NAME columns (0 & 1) and GWeights (2)
+		//buffer is just the amount of rows before the data starts
+    	for(int i = 0; i < orderedRows.size(); i++){
+    		
+    		finalcdtTable.get(i + buffer).add(0, rowNameList2.get(i).get(0));
+    		finalcdtTable.get(i + buffer).add(1, rowNameList2.get(i).get(0));
+    		finalcdtTable.get(i + buffer).add(2, rowNameList2.get(i).get(1));	
+    	}
+	}
     
+	/**
+	 * Gets the filePath for the current source file.
+	 * @return
+	 */
     public String getFilePath(){
     	
     	return filePath;
     }
     
+    /**
+     * Getter for the current source file object.
+     * @return
+     */
 	public File getFile(){
 		
 		return file;
-	}
-    
+	}  
 }

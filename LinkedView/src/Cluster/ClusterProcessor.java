@@ -158,8 +158,10 @@ public class ClusterProcessor {
 		//also takes list of row elements because only one list can easily 
 		//be consistently transformed and fed into file writer 
 		//to make a tab-delimited file
-		CDTGenerator cdtGen = new CDTGenerator(model, sepRows, 
-				orderedRows, orderedCols, choice, choice2);
+		CDTGenerator cdtGen = new CDTGenerator(model, sepRows, orderedRows, 
+					orderedCols, choice, choice2, hierarchical, row_clusterN,
+					col_clusterN);
+		
 		cdtGen.generateCDT();
 		
 		finalPanel.setPath(cdtGen.getFilePath());

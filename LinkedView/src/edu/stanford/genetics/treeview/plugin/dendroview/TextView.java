@@ -202,8 +202,11 @@ public class TextView extends ModelView implements FontSelectable,
 				    if ((geneSelection == null) 
 				    		|| geneSelection.isIndexSelected(j)) {
 					    String [] strings = headerInfo.getHeader(j);
+					    
 					    try {
-					    g.setColor(TreeColorer.getColor(strings[bgColorIndex]));
+					    	g.setColor(TreeColorer.getColor(
+					    			strings[bgColorIndex]));
+					    	
 					    } catch (Exception e) {
 						    // ignore
 					    }

@@ -40,10 +40,7 @@ implements FontSelectable, PropertyChangeListener {
 	
 	private boolean ignoreDividerChange = false;
 	private UrlExtractor uExtractor;
-//	private JSplitPane last;
 	private Component root;
-//	private JSplitPane firstNotShown;
-//	private TextView lastView;
 	private int numViews;
 	private int numShown;
 	private HeaderInfo hI;
@@ -57,11 +54,15 @@ implements FontSelectable, PropertyChangeListener {
 	 * @param hI
 	 * @param uExtractor
 	 */
-	public TextViewManager(HeaderInfo hI, UrlExtractor uExtractor) {
+	public TextViewManager(HeaderInfo hI, UrlExtractor uExtractor, 
+			DataModel model) {
 		
 		super();
 		this.hI = hI;
 		this.uExtractor = uExtractor;
+		
+		//Find out what kind of file was loaded
+		String srcFileType = model.getSource().toLowerCase();
 		
 		root = null;
 		textViews = new Vector<ModelView>();
@@ -75,10 +76,13 @@ implements FontSelectable, PropertyChangeListener {
 				
 		//could set up headerSummary...
 		int GIDIndex = hI.getIndex("GID");
-		if (GIDIndex == -1) {
+		if (GIDIndex == -1 && !srcFileType.endsWith(".cdt")) {
+			headerSummary.setIncluded(new int [] {0}); //changed from {1}???
+			
+		} else if (GIDIndex == -1 && srcFileType.endsWith(".cdt")) {
 			headerSummary.setIncluded(new int [] {1});
 			
-		} else {
+		}else {
 			headerSummary.setIncluded(new int [] {2});
 		}
 		headerSummary.addObserver(this);
@@ -168,7 +172,8 @@ implements FontSelectable, PropertyChangeListener {
 	}
 	
 	/**
-	 * Need to override ModelView.setViewFrame to account for the textviews that are contained.
+	 * Need to override ModelView.setViewFrame to account for the 
+	 * textviews that are contained.
 	 *
 	 */
 	@Override

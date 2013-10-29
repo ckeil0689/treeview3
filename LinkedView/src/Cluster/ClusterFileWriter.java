@@ -7,7 +7,8 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * This class is used to save data from clustering to the local storage by converting it to a tab-delimited string
+ * This class is used to save data from clustering to the local storage 
+ * by converting it to a tab-delimited string
  * and using a BufferedWriter.
  * @author CKeil
  *
@@ -25,8 +26,9 @@ public class ClusterFileWriter {
 	}
 	
 	/**
-	 * This methods writes the string from the doParse() method to local storage using the 
-	 * original name of the file and the specified file extension.
+	 * This methods writes the string from the doParse() method to 
+	 * local storage using the original name of the file and the 
+	 * specified file extension.
 	 * @param input
 	 * @param fileEnd
 	 */
@@ -35,8 +37,8 @@ public class ClusterFileWriter {
 		String content = doParse(input);
 
 		try{
-			
-			file = new File(model.getSource().substring(0, model.getSource().length()- 4) + fileEnd);
+			file = new File(model.getSource().substring(0, 
+					model.getSource().length()- 4) + fileEnd);
 
 			file.createNewFile();
 				
@@ -48,8 +50,6 @@ public class ClusterFileWriter {
 			System.out.println("Done." + file.getAbsolutePath());
 		
 		} catch(IOException e){
-			
-			e.printStackTrace();
 			
 		}
 	}

@@ -40,6 +40,7 @@ public class MessagePanel extends JPanel{
 
     private final Color bgColor;
     private final Color textColor = new Color(90, 90, 90, 255);
+    private final Color labelColor = new Color(178, 129, 0, 255);
     
     private String title;
     
@@ -66,6 +67,7 @@ public class MessagePanel extends JPanel{
 		
 		JLabel header = new JLabel(t);
 		header.setFont(new Font("Sans Serif", Font.BOLD, 16));
+		header.setForeground(labelColor);
 		
 		messages = new Vector<String>(5,5);
 		messagecanvas = new MessageCanvas();
@@ -102,11 +104,8 @@ public class MessagePanel extends JPanel{
 			g.setColor(bgColor);
 			g.fillRect(0, 0, size.width, size.height);
 			
-			//height += ascent;
 			g.setColor(textColor);
-			//g.drawString(title, -xoff, height);
 
-			
 			while (e.hasMoreElements()) {
 				String message = (String) e.nextElement();
 				if (message == null) {
@@ -122,6 +121,7 @@ public class MessagePanel extends JPanel{
 			
 			FontMetrics metrics = getFontMetrics(getFont());
 			int ascent = metrics.getAscent();
+			
 			// for title...
 			int height = ascent;
 			int width = metrics.stringWidth(title);

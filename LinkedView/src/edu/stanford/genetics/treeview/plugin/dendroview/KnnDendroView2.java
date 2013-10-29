@@ -146,7 +146,7 @@ MainPanel, Observer  {
 		
 
 		textview = new TextViewManager(getDataModel().getGeneHeaderInfo(), 
-				viewFrame.getUrlExtractor());
+				viewFrame.getUrlExtractor(), getDataModel());
 		textview.setMap(getZoomYmap());
 
 		doDoubleLayout();

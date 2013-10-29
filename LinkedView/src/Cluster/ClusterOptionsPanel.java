@@ -84,8 +84,7 @@ class ClusterOptionsPanel extends JPanel {
 	private final SwingWorker<Void, Void> worker;
 	private final String[] clusterMethods = {"Single Linkage", 
 			"Centroid Linkage", "Average Linkage", "Complete Linkage"};
-	
-	    
+		    
 	/**
 	 * Constructor
 	 * Setting up layout and functionality for buttons.
@@ -319,7 +318,7 @@ class ClusterOptionsPanel extends JPanel {
 							}
 							
 							optionsPanel.add(cView.getFinalPanel(), 
-									"pushx, alignx 50%, wrap");
+									"pushx, alignx 50%, span, wrap");
 							
 							mainPanel.revalidate();
 							mainPanel.repaint();	
@@ -409,7 +408,7 @@ class ClusterOptionsPanel extends JPanel {
 		JSpinner jft = new JSpinner(amountChoice);
 		
 		Dimension d = jft.getPreferredSize();
-		d.setSize(d.getWidth()*2, d.getHeight()*2);
+		d.setSize(d.getWidth(), d.getHeight()*2);
 		jft.setPreferredSize(d);
 		jft.setFont(new Font("Sans Serif", Font.PLAIN, 18));
 		

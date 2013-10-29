@@ -100,22 +100,29 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 	
 	
 	public String [] getSummaryArray(HeaderInfo headerInfo, int index) {
+		
 		String [] strings = null;
 		try {
 		    strings = headerInfo.getHeader(index);
+		    
 		} catch (java.lang.ArrayIndexOutOfBoundsException aie) {
-		    LogBuffer.println("index " + index + " out of bounds on headers, continuing");
+		    LogBuffer.println("index " + index + " out of bounds on headers, " +
+		    		"continuing");
 			return null;
 		}
-		if (strings == null) return null;
-
 		
-		if (included.length == 0) {
+		if (strings == null) {
 			return null;
 		}
+
+		if (included.length == 0) {
+			
+			return null;
+		}
+		
 		String [] out = new String[included.length];
-		int count =0;
-		for (int i =0; i < included.length; i++) {
+		int count = 0;
+		for (int i = 0; i < included.length; i++) {
 			try {
 				String test = strings[included[i]];
 				out[count] = test;
@@ -126,7 +133,9 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		}
 		return out;
 	}
+	
 	private ConfigNode root;
+	
 	@Override
 	public void bindConfig(ConfigNode configNode) {
 		root  = configNode;

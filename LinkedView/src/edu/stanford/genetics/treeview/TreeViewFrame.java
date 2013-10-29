@@ -307,6 +307,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		try {
 			tvModel_gen.loadNew(fileSet);
 			clusterModel_gen.loadNew(fileSet2); 
+			
 		} catch (LoadException e) {
 			if (e.getType() != LoadException.INTPARSE) {
 				JOptionPane.showMessageDialog(this, e);

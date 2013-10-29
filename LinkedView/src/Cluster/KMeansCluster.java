@@ -81,16 +81,49 @@ public class KMeansCluster {
 			clusterMeans = indexesToMeans(elementMeanList, clusters);
 		}
 		
-		System.out.println("clusters Size:" + clusters.size());
-		
 		//Next Step: Generate CDT and KGG Excel file
-		//Use a StringBuilder
 		List<List<String>> geneGroups = new ArrayList<List<String>>();
 		
 		geneGroups = indexToString(clusters);
 		
-		System.out.println("Group 0: " + geneGroups.get(0));
-
+		List<List<String>> clusterData = new ArrayList<List<String>>();
+		
+		List<String> initial = new ArrayList<String>();
+		
+		String fileEnd;
+		
+		if(type.equalsIgnoreCase("Gene")) {
+			fileEnd = "_K_G" + clusterN + ".kgg";
+			initial.add("ORF");
+			
+		} else {
+			fileEnd = "_K_A" + clusterN + ".kag";
+			initial.add("ARRAY");
+		}
+		
+		initial.add("GROUP");
+		clusterData.add(initial);
+		
+		//Prepare data for writing
+		for(List<String> group : geneGroups) {
+			
+			reorderedList.addAll(group);
+			
+			for(String element : group) {
+				
+				List<String> dataPair = new ArrayList<String>();
+				String index = Integer.toString(geneGroups.indexOf(group));
+				
+				dataPair.add(element);
+				dataPair.add(index);
+				
+				clusterData.add(dataPair);
+			}
+		}
+		
+		ClusterFileWriter fw = new ClusterFileWriter(model);
+		
+		fw.writeFile(clusterData, fileEnd);
     }
     
     //Cluster support methods
