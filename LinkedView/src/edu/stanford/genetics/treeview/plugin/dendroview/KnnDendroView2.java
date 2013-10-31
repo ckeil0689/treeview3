@@ -73,8 +73,7 @@ MainPanel, Observer  {
 		DataModel knnModel = getDataModel();
 		hintpanel = new MessagePanel("Usage Hints", BLUE2);
 		statuspanel = new MessagePanel("Status", BLUE2);
-
-
+		
 		ColorPresets colorPresets = DendrogramFactory.getColorPresets();
 		ColorExtractor colorExtractor = new ColorExtractor();
 		colorExtractor.setDefaultColorSet(colorPresets.getDefaultColorSet());
@@ -93,8 +92,6 @@ MainPanel, Observer  {
 		globalYscrollbar = new JScrollBar(Adjustable.VERTICAL,0,1,0,1);
 		zoomXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0,1,0,1);
 		zoomYscrollbar = new JScrollBar(Adjustable.VERTICAL,0,1,0,1);
-
-
 
 		zoomXmap = new MapContainer();
 		zoomXmap.setDefaultScale(12.0);
@@ -138,13 +135,12 @@ MainPanel, Observer  {
 		zoomview = new ZoomView();
 		zoomview.setYMap(getZoomYmap());
 		zoomview.setXMap(getZoomXmap());
-		zoomview  .setArrayDrawer(arrayDrawer);
+		zoomview.setArrayDrawer(arrayDrawer);
 		globalview.setArrayDrawer(arrayDrawer);
 		
 		arraynameview.setMapping(getZoomXmap());
 		arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
 		
-
 		textview = new TextViewManager(getDataModel().getGeneHeaderInfo(), 
 				viewFrame.getUrlExtractor(), getDataModel());
 		textview.setMap(getZoomYmap());

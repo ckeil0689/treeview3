@@ -46,7 +46,8 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 	/**
 	 * @author aloksaldanha
 	 *
-	 * Table model to support preview of data. Probably should base export off of it for simplicity.
+	 * Table model to support preview of data. 
+	 * Probably should base export off of it for simplicity.
 	 */
 	private class GeneListTableModel extends AbstractTableModel {
 
@@ -347,7 +348,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 
 		private static final long serialVersionUID = 1L;
 		
-		JList<String> list;
+		JList list;
 		JCheckBox exprBox, headerBox;
 		
 		public void includeAll() {
@@ -371,7 +372,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 		public FieldRow() {
 			super();
 			add(new JLabel("Field(s) to print: "));
-			list = new JList<String>(headerInfo.getNames());
+			list = new JList(headerInfo.getNames());
 			list.addListSelectionListener(notifier);
 			add(list);
 			exprBox = new JCheckBox("Expression Data?");

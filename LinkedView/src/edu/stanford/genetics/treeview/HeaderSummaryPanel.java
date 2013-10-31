@@ -61,7 +61,7 @@ public class HeaderSummaryPanel extends JPanel  implements SettingsPanel,Observe
 	public HeaderSummary getHeaderSummary() {
 		return headerSummary;
 	}
-	private JList<String> headerList = new JList<String>(new String [0]);
+	private JList headerList = new JList(new String [0]);
 	/** Setter for headerList */
 	public void setHeaderList(String [] headers) {
 		if (headers == null) {
@@ -71,14 +71,14 @@ public class HeaderSummaryPanel extends JPanel  implements SettingsPanel,Observe
 		}
 	}
 	/** Getter for headerList */
-	public JList<String> getHeaderList() {
+	public JList getHeaderList() {
 		return headerList;
 	}
 	
 	@Override
 	public void synchronizeFrom() {
 			int [] included = getHeaderSummary().getIncluded();
-			JList<String> list = getHeaderList();
+			JList list = getHeaderList();
 			if (list == null) return;
 			list.clearSelection();
 			for (int i = 0; i < included.length; i++) {

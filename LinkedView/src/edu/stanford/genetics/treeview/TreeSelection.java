@@ -25,12 +25,14 @@ package edu.stanford.genetics.treeview;
 import java.util.Observable;
 
 /**
- * A quasi-model independant selection model for leaf indexes as well as internal nodes of  trees.
+ * A quasi-model independant selection model for leaf indexes as well 
+ * as internal nodes of  trees.
  *
  * @author     Alok Saldanha <alok@genome.stanford.edu>
  * @version    @version $Revision: 1.5 $ $Date: 2006-03-20 06:18:43 $
  */
 public class TreeSelection extends Observable implements TreeSelectionI {
+	
 	private IntegerSelection integerSelection;
 	private String selectedNode;
 
@@ -41,6 +43,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	 * @param  nIndex  number of indexes which can be selected
 	 */
 	public TreeSelection(int nIndex) {
+		
 		integerSelection = new IntegerSelection(nIndex);
 	}
 	
@@ -49,19 +52,19 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	 */
 	@Override
 	public void resize(int nIndex)  {
+		
 		IntegerSelection temp = new IntegerSelection(nIndex);
 		
-		for(int i = 0; i < nIndex; i++)
-		{
-			if(i < integerSelection.getNSelectable())
-			{
+		for(int i = 0; i < nIndex; i++) {
+			
+			if(i < integerSelection.getNSelectable()) {
 				temp.set(i, integerSelection.isSelected(i));
-			}
-			else
-			{
+				
+			} else {
 				temp.set(i , false);
 			}
 		}
+		
 		integerSelection = temp;
 		setChanged();
 	}
@@ -72,6 +75,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	 */
 	@Override
 	public void deselectAllIndexes() {
+		
 		integerSelection.deselectAll();
 	}
 
@@ -81,6 +85,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	 */
 	@Override
 	public void selectAllIndexes() {
+		
 		integerSelection.selectAll();
 	}
 
@@ -90,6 +95,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	 */
 	@Override
 	public void setIndex(int i, boolean b) {
+		
 		integerSelection.set(i, b);
 	}
 
@@ -99,6 +105,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	 */
 	@Override
 	public boolean isIndexSelected(int i) {
+		
 		return integerSelection.isSelected(i);
 	}
 
@@ -108,13 +115,16 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	 */
 	@Override
 	public int getMinIndex() {
+		
 		return integerSelection.getMin();
 	}
+	
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#getSelectedIndexes()
 	 */
 	@Override
 	public int [] getSelectedIndexes() {
+		
 		return integerSelection.getSelectedIndexes();
 	}
 
@@ -123,15 +133,16 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	 */
 	@Override
 	public int getMaxIndex() {
+		
 		return integerSelection.getMax();
 	}
-
 
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#getNumIndexes()
 	 */
 	@Override
 	public int getNumIndexes() {
+		
 		return integerSelection.getNSelectable();
 	}
 
@@ -141,12 +152,15 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	 */
 	@Override
 	public void selectIndexRange(int min, int max) {
+		
 		if (min > max) {
 			int swap  = min;
 			min = max;
 			max = swap;
 		}
+		
 		for (int i = min; i <= max; i++) {
+			
 			integerSelection.set(i, true);
 		}
 	}
@@ -157,6 +171,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	 */
 	@Override
 	public int getNSelectedIndexes() {
+		
 		return integerSelection.getNSelected();
 	}
 
@@ -166,6 +181,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	 */
 	@Override
 	public void setSelectedNode(String n) {
+		
 		if (selectedNode != n) {
 			selectedNode = n;
 			setChanged();
@@ -178,6 +194,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	 */
 	@Override
 	public String getSelectedNode() {
+		
 		return selectedNode;
 	}
 
@@ -186,58 +203,73 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	* a class to efficiently model a range of integers which can be selected.
 	*/
 	class IntegerSelection {
+		
 		boolean[] isSelected;
 
-
 		IntegerSelection(int size) {
+			
 			isSelected = new boolean[size];
 			deselectAll();
 		}
 
 
 		public int getNSelectable() {
+			
 			return isSelected.length;
 		}
 
 
 		public int getNSelected() {
 			int n  = 0;
+			
 			for (int i = 0; i < isSelected.length; i++) {
+				
 				if (isSelected[i]) {
 					n++;
 				}
 			}
+			
 			return n;
 		}
+		
 		public int [] getSelectedIndexes() {
+			
 			int nSelected = getNSelected();
 			int [] indexes = new int [nSelected];
 			int curr = 0;
+			
 			for (int i = 0; i < isSelected.length; i++) {
+				
 				if (isSelected[i]) {
 					indexes[curr++] = i;
 				}
 			}
+			
 			return indexes;
 		}
 
 		public void deselectAll() {
+			
 			TreeSelection.this.setChanged();
 			for (int i = 0; i < isSelected.length; i++) {
+				
 				isSelected[i] = false;
 			}
 		}
 
 
 		public void selectAll() {
+			
 			TreeSelection.this.setChanged();
 			for (int i = 0; i < isSelected.length; i++) {
+				
 				isSelected[i] = true;
 			}
 		}
 
 
 		public void set(int i, boolean b) {
+			
 			if ((i >= 0) && (i < isSelected.length)) {
 				TreeSelection.this.setChanged();
 				isSelected[i] = b;
@@ -246,28 +278,35 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 
 
 		public boolean isSelected(int i) {
+			
 			return isSelected[i];
 		}
 
 
 		public int getMin() {
+			
 			int min  = -1;
 			for (int i = 0; i < isSelected.length; i++) {
+				
 				if (isSelected[i]) {
 					return i;
 				}
 			}
+			
 			return min;
 		}
 
 
 		public int getMax() {
+			
 			int max  = -1;
 			for (int i = 0; i < isSelected.length; i++) {
+				
 				if (isSelected[i]) {
 					max = i;
 				}
 			}
+			
 			return max;
 		}
 	}

@@ -7,13 +7,18 @@
  * $Name:  $
  *
  * This file is part of Java TreeView
- * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
+ * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by 
+ * Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
  *
  * This software is provided under the GNU GPL Version 2. In particular, 
  *
- * 1) If you modify a source file, make a comment in it containing your name and the date.
+ * 1) If you modify a source file, make a comment in it containing your name 
+ * and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
- * 3) Developers are encouraged but not required to notify the Java TreeView maintainers at alok@genome.stanford.edu when they make a useful addition. It would be nice if significant contributions could be merged into the main distribution.
+ * 3) Developers are encouraged but not required to notify the 
+ * Java TreeView maintainers at alok@genome.stanford.edu when they make a 
+ * useful addition. It would be nice if significant contributions could 
+ * be merged into the main distribution.
  *
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
@@ -93,8 +98,8 @@ public class ClusterView extends JPanel implements MainPanel {
 	private InitialPanel initialPanel;
 	private DistanceOptionsPanel doPanel;
 	private ClusterOptionsPanel clusterPanel;
-	private JComboBox<String> geneCombo; 
-	private JComboBox<String> arrayCombo;
+	private JComboBox geneCombo; 
+	private JComboBox arrayCombo;
 	
 	//Similarity Measure Label
 	private JLabel similarity;
@@ -482,11 +487,11 @@ public class ClusterView extends JPanel implements MainPanel {
 			head3.setBackground(BLUE2);
 			 
 			//Drop-down menu for row selection
-	  		geneCombo = new JComboBox<String>(measurements);
+	  		geneCombo = new JComboBox(measurements);
 	  		geneCombo = setComboLayout(geneCombo);
 		
 			//Drop-down menu for column selection
-	  		arrayCombo = new JComboBox<String>(measurements);
+	  		arrayCombo = new JComboBox(measurements);
 	  		arrayCombo = setComboLayout(arrayCombo);
 	  		
 	  		rowPanel.add(head2, "alignx 50%, span, wrap");
@@ -529,7 +534,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	 * @param combo
 	 * @return
 	 */
-	public static JComboBox<String> setComboLayout(JComboBox<String> combo){
+	public static JComboBox setComboLayout(JComboBox combo){
 		
 		Dimension d = combo.getPreferredSize();
 		d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
@@ -619,7 +624,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	 * Get the similarity measure choice for row clustering
 	 * @return 
 	 */
-	public JComboBox<String> getGeneCombo(){
+	public JComboBox getGeneCombo(){
 		
 		return geneCombo;
 	}
@@ -628,7 +633,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	 * Get the similarity measure choice for column clustering
 	 * @return 
 	 */
-	public JComboBox<String> getArrayCombo(){
+	public JComboBox getArrayCombo(){
 		
 		return arrayCombo;
 	}

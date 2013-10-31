@@ -48,6 +48,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
 import net.miginfocom.swing.MigLayout;
@@ -130,6 +131,14 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		treeView = treeview;
 		loaded = false;
 		setWindowActive(true);
+		
+		try{
+			UIManager.setLookAndFeel(
+					UIManager.getCrossPlatformLookAndFeelClassName());
+			
+		} catch (Exception e){
+			
+		}
 		
 		setupLayout();
 		setupPresets();
@@ -326,9 +335,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		try {
 			File file = selectFile();
-			FileSet fileSet = getFileSet(file);
-			ClusterFileSet fileSet2 = getClusterFileSet(file);
-			
+			FileSet fileSet = getFileSet(file); //Type: 0 (Auto)
+			ClusterFileSet fileSet2 = getClusterFileSet(file); //Type: 0 (Auto)
 			loadGeneralFileSet(fileSet, fileSet2);
 			
 			fileSet = fileMru.addUnique(fileSet);
@@ -383,8 +391,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 * to it. As a result the View is displayed in the TreeViewFrame
 	 */
 	protected void setupRunning() {
-//		DendroView dv = new DendroView(getDataModel(), this);						
-//		running = dv;
+		
 		DendroView2 dv2 = new DendroView2(getDataModel(), this);						
 		running = dv2;
 	}
@@ -442,7 +449,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		rebuildMainPanelMenu();
 		treeView.rebuildWindowMenus();
 		
-		revalidate();
+		validate();
 		repaint();
 	}
 	
@@ -1514,6 +1521,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 	@Override
 	public MainPanel[] getMainPanelsByName(String name) {
+		
 		if (running != null) {
 			// is the current running a match?
 			if (name.equals(running.getName())) {

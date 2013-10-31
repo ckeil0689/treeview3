@@ -86,15 +86,17 @@ MainPanel, Observer {
 	protected GTRView gtrview;
 	protected ATRView atrview;
 	protected ATRZoomView atrzview;
+	protected GTRZoomView gtrzview;
 	protected InvertedTreeDrawer invertedTreeDrawer;
 	protected LeftTreeDrawer leftTreeDrawer;
 	
-	protected MapContainer globalXmap, globalYmap;
-	protected MapContainer zoomXmap,   zoomYmap;
+	protected MapContainer globalXmap;
+	protected MapContainer globalYmap;
+	protected MapContainer zoomXmap; 
+	protected MapContainer zoomYmap;
 
 	protected MessagePanel hintpanel;
 	protected MessagePanel statuspanel;
-	protected JPanel buttonPanel;
 	protected BrowserControl browserControl;
 	protected ArrayDrawer arrayDrawer;
 	protected ConfigNode root;
@@ -104,6 +106,7 @@ MainPanel, Observer {
 	protected TabbedSettingsPanel settingsPanel;
 	
 	protected final static Color RED1 = new Color(240, 80, 50, 255);
+	protected final static Color BLUE1 = new Color(60, 180, 220, 255);
 	protected final static Color BLUE2 = new Color(235, 240, 255, 255);
 	
 	/*
@@ -486,10 +489,12 @@ MainPanel, Observer {
 			
 			JOptionPane.showMessageDialog(viewFrame, mismatch, 
 					"Tree Construction Error", JOptionPane.ERROR_MESSAGE);
-			gtrview.setEnabled(false);
 			
-			try{
-				
+			gtrview.setEnabled(false);
+			gtrzview.setEnabled(false);
+			
+			
+			try{	
 				leftTreeDrawer.setData(null, null);
 			} 
 			catch (DendroException ex) {
@@ -501,7 +506,8 @@ MainPanel, Observer {
 				leftTreeDrawer.getRootNode().findNode(selectedID);
 		
 		geneSelection.setSelectedNode(arrayNode.getId());
-		gtrview.setSelectedNode(arrayNode);		
+		gtrview.setSelectedNode(arrayNode);
+		gtrzview.setSelectedNode(arrayNode);
 		
 		geneSelection.notifyObservers();
 		leftTreeDrawer.notifyObservers();
@@ -525,7 +531,7 @@ MainPanel, Observer {
 			
 			if (trHeaderInfo.getIndex("NODECOLOR") >= 0) {
 				
-				TreeColorer.colorUsingHeader (invertedTreeDrawer.getRootNode(),
+				TreeColorer.colorUsingHeader(invertedTreeDrawer.getRootNode(),
 				trHeaderInfo,
 				trHeaderInfo.getIndex("NODECOLOR"));
 			}	
@@ -709,7 +715,6 @@ MainPanel, Observer {
 		
 		hintpanel = new MessagePanel("Usage Hints", BLUE2);
 		statuspanel = new MessagePanel("Status", BLUE2);
-		buttonPanel = new JPanel();
 
 		DoubleArrayDrawer dArrayDrawer = new DoubleArrayDrawer();
 		dArrayDrawer.setColorExtractor(colorExtractor);
@@ -753,13 +758,20 @@ MainPanel, Observer {
 		arraynameview = new ArrayNameView(getDataModel().getArrayHeaderInfo());
 		arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
 		arraynameview.setDataModel(getDataModel());
-
+		
+		//GTRViews
 		leftTreeDrawer = new LeftTreeDrawer();
 		gtrview = new GTRView();
 		gtrview.setMap(globalYmap);
 		gtrview.setLeftTreeDrawer(leftTreeDrawer);
 		gtrview.getHeaderSummary().setIncluded(new int [] {0,3});
 		
+		gtrzview = new GTRZoomView();
+		gtrzview.setZoomMap(getZoomYmap());
+		gtrzview.setHeaderSummary(gtrview.getHeaderSummary());
+		gtrzview.setLeftTreeDrawer(leftTreeDrawer);
+		
+		//ATRViews
 		invertedTreeDrawer = new InvertedTreeDrawer();
 		atrview = new ATRView();
 		atrview.setMap(globalXmap);
@@ -770,7 +782,8 @@ MainPanel, Observer {
 		atrzview.setZoomMap(getZoomXmap());
 		atrzview.setHeaderSummary(atrview.getHeaderSummary());
 		atrzview.setInvertedTreeDrawer(invertedTreeDrawer);
-
+		
+		//ZoomView
 		zoomview = new ZoomView();
 		zoomview.setYMap(getZoomYmap());
 		zoomview.setXMap(getZoomXmap());
@@ -812,8 +825,13 @@ MainPanel, Observer {
 		textview.bindConfig(getFirst("TextView"));			
 		
 		arraynameview.bindConfig(getFirst("ArrayNameView"));
+		
 		HeaderSummary atrSummary = atrview.getHeaderSummary();
+		HeaderSummary gtrSummary = gtrview.getHeaderSummary();
+		
 		atrzview.setHeaderSummary(atrSummary);
+		gtrzview.setHeaderSummary(gtrSummary);
+		
 		atrSummary.bindConfig(getFirst("AtrSummary"));
 		gtrview.getHeaderSummary().bindConfig(getFirst("GtrSummary"));
 
@@ -896,6 +914,9 @@ MainPanel, Observer {
 
 		if ((tvmodel != null) && tvmodel.gidFound()) {
 			try {
+				gtrview.setEnabled(true);
+				gtrzview.setEnabled(true);
+				
 				leftTreeDrawer.setData(tvmodel.getGtrHeaderInfo(), 
 						tvmodel.getGeneHeaderInfo());
 				HeaderInfo gtrHeaderInfo = tvmodel.getGtrHeaderInfo();
@@ -912,8 +933,6 @@ MainPanel, Observer {
 							);
 				}
 				
-				gtrview.setEnabled(true);
-				
 			} catch (DendroException e) {
 //				LogPanel.println("Had problem setting up the gene tree : 
 //				" + e.getMessage());
@@ -929,6 +948,7 @@ MainPanel, Observer {
 						"Tree Construction Error", JOptionPane.ERROR_MESSAGE);
 				
 				gtrview.setEnabled(false);
+				gtrzview.setEnabled(false);
 				
 				try{
 					leftTreeDrawer.setData(null, null);
@@ -939,6 +959,7 @@ MainPanel, Observer {
 			}
 		} else {
 			gtrview.setEnabled(false);
+			gtrzview.setEnabled(false);
 			
 			try{
 				leftTreeDrawer.setData(null, null);
@@ -963,20 +984,21 @@ MainPanel, Observer {
 		Dimension right_min;
 		Dimension up_min; 
 		Dimension down_min;  
-		Dimension d; 
-		Dimension d2;
 		JPanel left;
 		JPanel right;
 		JPanel upSide;
 		JPanel downSide;
+		JPanel buttonPanel;
 		JPanel gtrPanel;
-		JPanel panel; 
+		final JPanel panel; 
 		JPanel zoompanel;
 		JPanel textpanel;
 		JSplitPane backgroundPane;
 		JSplitPane level1Pane;
+		JSplitPane gtrPane;
 		JButton saveButton;
 		JButton closeButton;
+		JButton fullScreenButton;
 		
 		left_min = new Dimension(500, 450);
 		right_min = new Dimension(600, 500);
@@ -1016,19 +1038,17 @@ MainPanel, Observer {
 		gtrview.setHintPanel(hintpanel);
 		gtrview.setStatusPanel(statuspanel);
 		gtrview.setViewFrame(viewFrame);
-
-		// global view
+		
+		//ButtonPanel
+		buttonPanel = new JPanel();
+		buttonPanel.setLayout(new MigLayout());
+		buttonPanel.setOpaque(false);
+		
+		//Global view
 		panel = new JPanel();
 		panel.setLayout(new MigLayout("ins 0"));
 		
-		saveButton = new JButton("Save Zoomed Image");
-		d = saveButton.getPreferredSize();
-  		d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
-  		saveButton.setPreferredSize(d);
-  		saveButton.setFont(new Font("Sans Serif", Font.PLAIN, 14));
-  		saveButton.setOpaque(true);
-  		saveButton.setBackground(new Color(60, 180, 220, 255));
-  		saveButton.setForeground(Color.white);
+		saveButton = setButtonLayout("Save Zoomed Image", BLUE1);
 		saveButton.addActionListener(new ActionListener(){
 
 			@Override
@@ -1043,14 +1063,7 @@ MainPanel, Observer {
 			}
 		});
 		
-		closeButton = new JButton("Close");
-		d2 = closeButton.getPreferredSize();
-  		d2.setSize(d2.getWidth()*1.5, d2.getHeight()*1.5);
-  		closeButton.setPreferredSize(d2);
-  		closeButton.setFont(new Font("Sans Serif", Font.PLAIN, 14));
-  		closeButton.setOpaque(true);
-  		closeButton.setBackground(RED1);
-  		closeButton.setForeground(Color.white);
+		closeButton = setButtonLayout("Close", RED1);;
   		closeButton.addActionListener(new ActionListener(){
 
 			@Override
@@ -1060,12 +1073,49 @@ MainPanel, Observer {
 			}
 		});
 		
-		// zoom view
+		fullScreenButton = setButtonLayout("Fullscreen", BLUE1);
+  		fullScreenButton.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				
+				JFrame fullScreen = new JFrame();
+				fullScreen.setDefaultCloseOperation(
+						WindowConstants.DISPOSE_ON_CLOSE);
+				fullScreen.setResizable(true);
+				fullScreen.addWindowListener(new WindowAdapter () {
+					
+					@Override
+					public void windowClosing(WindowEvent we) {
+					    
+						panel.removeAll();
+						panel.add(globalview, "grow, push");
+						panel.add(globalYscrollbar, "push, grow, wrap");
+						panel.add(globalXscrollbar, "push, grow, span");
+						
+						setVisible(false);
+					}
+				});
+							
+				JPanel fullPanel = new JPanel();
+				fullPanel.setLayout(new MigLayout("ins 0"));
+				
+				fullPanel.add(globalview, "push, grow");
+				fullPanel.add(globalYscrollbar, "push, grow, wrap");
+				fullPanel.add(globalXscrollbar, "push, grow, span");
+				
+				fullScreen.getContentPane().add(fullPanel);
+				fullScreen.pack();
+				fullScreen.setVisible(true);
+			}
+		});
+  		
+		//ZoomView
 		zoompanel = new JPanel();
 		zoompanel.setLayout(new BorderLayout());
 		
 		textpanel = new JPanel();
-		textpanel.setLayout(new MigLayout());
+		textpanel.setLayout(new MigLayout("ins 0"));
 		
 		level1Pane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
 				upSide, downSide);
@@ -1077,6 +1127,7 @@ MainPanel, Observer {
 		registerView(globalview);
 		registerView(atrview);
 		registerView(atrzview);
+		registerView(gtrzview);
 		registerView(arraynameview);
 		registerView(zoomview);
 		registerView(textview);
@@ -1087,6 +1138,8 @@ MainPanel, Observer {
 				BorderLayout.SOUTH);
 		
 		panel.add(globalview, "grow, push");
+		panel.add(globalYscrollbar, "push, grow, wrap");
+		panel.add(globalXscrollbar, "push, grow, span");
 		
 		zoompanel.add(zoomview, BorderLayout.CENTER);
 		zoompanel.add(zoomXscrollbar, BorderLayout.SOUTH);	
@@ -1094,21 +1147,26 @@ MainPanel, Observer {
 		
 		textpanel.add(textview.getComponent(), "push, grow");
 		
-		left.add(panel, "grow, push, height 80%:80%:, span, wrap");
+		buttonPanel.add(fullScreenButton, "push, alignx 50%, wrap");
+		buttonPanel.add(closeButton, "push, alignx 50%, wrap");
 		
-		left.add(hintpanel, "push, grow, height 15%::, width 50%");
-		left.add(statuspanel, "push, grow, width 50%");
+		left.add(panel, "grow, push, height 80%:80%:, span, wrap");
+		left.add(hintpanel, "push, grow, height 15%::, width 40%");
+		left.add(statuspanel, "push, grow, width 40%");
+		left.add(buttonPanel, "push, grow");
 		
 		right.add(level1Pane, "push, grow");
 		
-		upSide.add(atrzview, "push, grow, height 15%::, width :70%:70%");
-		upSide.add(closeButton, "pushx, growx");
+		upSide.add(atrzview, "push, grow, height 15%::, width :65%:65%");
+		
+		gtrPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+				textpanel, gtrzview);
 		
 		downSide.add(arraynameview, "pushx, growx, height 15%::, " +
-				"width :70%:70%");
+				"width :65%:65%");
 		downSide.add(saveButton, "pushx, alignx 50%, wrap");
-		downSide.add(zoompanel, "push, grow, width :70%:70%");
-		downSide.add(textpanel, "push, grow, width 25%:30%:35%");
+		downSide.add(zoompanel, "push, grow, width :65%:65%");
+		downSide.add(gtrPane, "push, grow");
 
 		add(backgroundPane, "push, grow");
 	}
@@ -1127,7 +1185,6 @@ MainPanel, Observer {
 	}
 
 	// Menus
-	
 	@Override
 	public void populateExportMenu(TreeviewMenuBarI menu) {
 		
@@ -1890,6 +1947,7 @@ MainPanel, Observer {
 	}
 	
 	public ArrayNameView getArraynameview() {
+		
 		return arraynameview;
 	}
 	
@@ -2001,7 +2059,31 @@ MainPanel, Observer {
 		globalview.setGeneSelection(geneSelection);
 		zoomview.setGeneSelection(geneSelection);
 		gtrview.setGeneSelection(geneSelection);
+		gtrzview.setGeneSelection(geneSelection);
 		textview.setGeneSelection(geneSelection);	
+	}
+	
+	/**
+	 * Setting up a general layout for a button object
+	 * The method is used to make all buttons appear consistent in aesthetics
+	 * @param button
+	 * @return
+	 */
+	public JButton setButtonLayout(String title, Color color){
+
+		Font buttonFont = new Font("Sans Serif", Font.PLAIN, 14);
+		
+		JButton button = new JButton(title);
+  		Dimension d = button.getPreferredSize();
+  		d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
+  		button.setPreferredSize(d);
+  		
+  		button.setFont(buttonFont);
+  		button.setOpaque(true);
+  		button.setBackground(color);
+  		button.setForeground(Color.white);
+  		
+  		return button;
 	}
 	
 	/** 

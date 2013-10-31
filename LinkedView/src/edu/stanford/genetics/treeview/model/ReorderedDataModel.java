@@ -28,6 +28,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 	 *
 	 */
 	private class SubDataMatrix implements DataMatrix {
+		
 		@Override
 		public double getValue(int col, int row) {
 			if (geneIndex != null) row = geneIndex[row];
@@ -46,7 +47,8 @@ public class ReorderedDataModel extends Observable implements DataModel {
 			if ((row == -1) || (col == -1)) {
 				return;
 			} else {
-				LogBuffer.getSingleton().log("Error: cannot modifiy reordered data model");
+				LogBuffer.getSingleton().log("Error: cannot modifiy " +
+						"reordered data model");
 				return;
 			}
 		}
@@ -81,6 +83,12 @@ public class ReorderedDataModel extends Observable implements DataModel {
 		public void setModified(boolean b) {
 			// TODO Auto-generated method stub
 			
+		}
+
+		@Override
+		public int getNumUnappendedRow() {
+			// TODO Auto-generated method stub
+			return 0;
 		}
 
 	}

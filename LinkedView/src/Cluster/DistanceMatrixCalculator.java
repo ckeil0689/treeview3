@@ -314,31 +314,33 @@ public class DistanceMatrixCalculator {
      * Chooses appropriate distance measure according to user GUI selection.
      */
 	public void measureDistance(){
-		
-		switch(choice){
-		
-			case "Pearson Correlation (uncentered)": pearson(false, false);
-			break;
-			
-			case "Pearson Correlation (centered)": pearson(false, true);
-			break;
-			
-			case "Absolute Correlation (uncentered)": pearson(true, false);
-			break;
-			
-			case "Absolute Correlation (centered)": pearson(true, true);
-			break;
-			
-			case "Spearman Ranked Correlation":spearman();
-			break;
-			
-			case "Euclidean Distance": euclid();
-			break;
-			
-			case "City Block Distance": cityBlock();
-			break;
-			
-			default: break;
+
+			if(choice.equalsIgnoreCase("Pearson Correlation (uncentered)")) {
+				pearson(false, false);
+				
+			} else if(choice.equalsIgnoreCase("Pearson Correlation " +
+					"(centered)")) { 
+				pearson(false, true);
+				
+			} else if(choice.equalsIgnoreCase("Absolute Correlation " +
+					"(uncentered)")) {
+				pearson(true, false);
+				
+			} else if(choice.equalsIgnoreCase("Absolute Correlation " +
+					"(centered)")) {
+				pearson(true, true);
+				
+			} else if(choice.equalsIgnoreCase("Spearman Ranked Correlation")) {
+				spearman();
+				
+			} else if(choice.equalsIgnoreCase("Euclidean Distance")) {
+				euclid();
+				
+			} else if(choice.equalsIgnoreCase("City Block Distance")) {
+				cityBlock();
+				
+			} else {
+				
 		}
 	}
 	

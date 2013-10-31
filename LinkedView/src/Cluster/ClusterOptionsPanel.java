@@ -67,9 +67,9 @@ class ClusterOptionsPanel extends JPanel {
 	private JPanel optionsPanel;
 	private HeaderPanel head1;
 	private InitialPanel initialPanel;
-	private JComboBox<String> clusterChoice;
-	private JComboBox<String> geneCombo;
-	private JComboBox<String> arrayCombo;
+	private JComboBox clusterChoice;
+	private JComboBox geneCombo;
+	private JComboBox arrayCombo;
 	
 	private String path;
 	private File file;
@@ -84,6 +84,7 @@ class ClusterOptionsPanel extends JPanel {
 	private final SwingWorker<Void, Void> worker;
 	private final String[] clusterMethods = {"Single Linkage", 
 			"Centroid Linkage", "Average Linkage", "Complete Linkage"};
+	private final Color BLUE2 = new Color(110, 210, 255, 150);
 		    
 	/**
 	 * Constructor
@@ -118,11 +119,11 @@ class ClusterOptionsPanel extends JPanel {
 	        	try {
 	        		//Set integers only if KMeans options are shown
 	        		if(!hierarchical) {
-		        		row_clusterN = (int) enterRC.getValue();
-		        		col_clusterN = (int) enterCC.getValue();
+		        		row_clusterN = (Integer) enterRC.getValue();
+		        		col_clusterN = (Integer) enterCC.getValue();
 		        		
-		        		row_iterations = (int) enterRIt.getValue();
-		        		col_iterations = (int) enterCIt.getValue();
+		        		row_iterations = (Integer) enterRIt.getValue();
+		        		col_iterations = (Integer) enterCIt.getValue();
 	        		}
 	        		
 	        		//Setup a ClusterProcessor
@@ -177,11 +178,11 @@ class ClusterOptionsPanel extends JPanel {
 		
 		rowPanel = new JPanel();
 		rowPanel.setLayout(new MigLayout());
-		rowPanel.setOpaque(false);
+		rowPanel.setBackground(BLUE2);
 		
 		colPanel = new JPanel();
 		colPanel.setLayout(new MigLayout());
-		colPanel.setOpaque(false);
+		colPanel.setBackground(BLUE2);
 		
 		//Label
 		method = new JLabel("Linkage Method");
@@ -192,7 +193,7 @@ class ClusterOptionsPanel extends JPanel {
 				new ClickableIcon(clusterFrame, "infoIcon.png");
     	
 		//Linkage choice drop-down menu
-		clusterChoice = new JComboBox<String>(clusterMethods);
+		clusterChoice = new JComboBox(clusterMethods);
 		clusterChoice = ClusterView.setComboLayout(clusterChoice);
 		
 		clusters = new JLabel("Clusters: ");
@@ -380,14 +381,14 @@ class ClusterOptionsPanel extends JPanel {
 	    	choicePanel.add(clusterChoice, "span, alignx 50%, wrap");
 	    	
     	} else {
+    		rowPanel.add(clusters, "span, alignx 50%, wrap");
     		rowPanel.add(enterRC, "alignx 50%, pushx");
     		rowPanel.add(enterCC, "alignx 50%, pushx");
+    		colPanel.add(its, "span, alignx 50%, wrap");
     		colPanel.add(enterRIt, "alignx 50%, pushx");
     		colPanel.add(enterCIt, "alignx 50%, pushx");
     		
-    		choicePanel.add(clusters, "span, alignx 50%, wrap");
     		choicePanel.add(rowPanel, "pushx, growx, alignx 50%, wrap");
-    		choicePanel.add(its, "span, alignx 50%, wrap");
     		choicePanel.add(colPanel, "pushx, growx, alignx 50%");
     	}
     	

@@ -468,9 +468,6 @@ public class HierCluster {
     		element = type + e + "X";
     		reorderedList.add(element);
     	}
-    	
-    	System.out.println("ROList S: " + reorderedList.size());
-    	System.out.println("ROList: " + reorderedList);
     }
     
     /**

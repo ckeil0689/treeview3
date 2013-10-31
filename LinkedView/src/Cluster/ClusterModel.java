@@ -368,7 +368,8 @@ public class ClusterModel extends Observable implements DataModel {
 
 	/**
 	 * Reorders all the arrays in the new ordering.
-	 * @param ordering the new ordering of arrays, must have size equal to number of arrays
+	 * @param ordering the new ordering of arrays, 
+	 * must have size equal to number of arrays
 	 */
 	public void reorderGenes(int [] ordering){
 		
@@ -616,6 +617,12 @@ public class ClusterModel extends Observable implements DataModel {
 		public int getNumUnappendedCol(){
 		
 			return appendIndex == -1?getNumCol():appendIndex;
+		}
+		
+		@Override
+		public int getNumUnappendedRow(){
+		
+			return appendIndex == -1?getNumRow():appendIndex;
 		}
 
 		@Override

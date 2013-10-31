@@ -26,10 +26,12 @@ import edu.stanford.genetics.treeview.core.PluginManager;
  *
  */
 public class DendrogramFactory extends PluginFactory {
+	
 	// presets must be set before static initializer.
 	private static ColorPresets colorPresets = new ColorPresets();
 	private ColorPresetEditor  cpresetEditor;
 	private JFrame cpresetFrame = null;
+	
 	static {
 		PluginManager.registerPlugin(new DendrogramFactory());
 	}
@@ -43,12 +45,14 @@ public class DendrogramFactory extends PluginFactory {
 	}
 
 	/* (non-Javadoc)
-	 * @see edu.stanford.genetics.treeview.PluginFactory#createPlugin(edu.stanford.genetics.treeview.ConfigNode)
+	 * @see edu.stanford.genetics.treeview.PluginFactory
+	 * #createPlugin(edu.stanford.genetics.treeview.ConfigNode)
 	 */
 	@Override
 	public MainPanel restorePlugin(ConfigNode node, ViewFrame viewFrame) {
-//		DendroView dendroView = new DendroView(viewFrame.getDataModel(), node, viewFrame);
-		DendroView2 dendroView = new DendroView2(viewFrame.getDataModel(), node, viewFrame);
+		
+		DendroView2 dendroView = new DendroView2(viewFrame.getDataModel(), 
+				node, viewFrame);
 		dendroView.setName("Dendrogram");
 		return dendroView;
 	}
@@ -56,12 +60,14 @@ public class DendrogramFactory extends PluginFactory {
 	
 	
 	public DendrogramFactory() {
+		
 		super();
 		cpresetEditor = new ColorPresetEditor(colorPresets);
 	}
 
 	/* (non-Javadoc)
-	 * @see edu.stanford.genetics.treeview.PluginFactory#setGlobalNode(edu.stanford.genetics.treeview.ConfigNode)
+	 * @see edu.stanford.genetics.treeview.PluginFactory
+	 * #setGlobalNode(edu.stanford.genetics.treeview.ConfigNode)
 	 */
 	@Override
 	public void setGlobalNode(ConfigNode node) {

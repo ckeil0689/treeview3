@@ -260,7 +260,7 @@ public class UrlSettingsPanel extends JPanel implements SettingsPanel {
 		previewField.setText("Ex: " + urlExtractor.getUrl(0));
 	}
 
-	private class HeaderChoice extends JComboBox<String> 
+	private class HeaderChoice extends JComboBox 
 	implements ItemListener {
 
 		private static final long serialVersionUID = 1L;

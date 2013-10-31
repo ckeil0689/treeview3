@@ -22,7 +22,9 @@ public class PluginManager {
 	 * I hate static variables, but this one looks necessary.
 	 * */
 	private static PluginManager pluginManager = new PluginManager();
+	
 	public static PluginManager getPluginManager() {
+		
 		return pluginManager;
 	}
 

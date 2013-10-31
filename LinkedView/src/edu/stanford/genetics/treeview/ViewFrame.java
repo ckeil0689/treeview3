@@ -166,6 +166,15 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	public ViewFrame(String title) {
 		
 		super(title);
+		
+		try{
+			UIManager.setLookAndFeel(
+					UIManager.getCrossPlatformLookAndFeelClassName());
+			
+		} catch (Exception e){
+			
+		}
+		
 		setupWindowListener();
 	}
 
@@ -176,6 +185,15 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	public ViewFrame() {
 		
 		super();
+		
+		try{
+			UIManager.setLookAndFeel(
+					UIManager.getCrossPlatformLookAndFeelClassName());
+			
+		} catch (Exception e){
+			
+		}
+		
 		setupWindowListener();
 	}
 

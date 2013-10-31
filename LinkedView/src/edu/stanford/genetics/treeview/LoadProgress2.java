@@ -162,7 +162,7 @@ public class LoadProgress2 extends JDialog implements LoadProgress2I {
 	 * @see edu.stanford.genetics.treeview.LoadProgress2I#setPhaseLength(int)
 	 */
 	@Override
-	public synchronized void setPhaseLength(int i) {
+	public void setPhaseLength(int i) {
 		
 		phaseBar.setMinimum(0);
 		phaseBar.setMaximum(i);
@@ -182,7 +182,7 @@ public class LoadProgress2 extends JDialog implements LoadProgress2I {
 	 * #setPhaseText(java.lang.String)
 	 */
 	@Override
-	public synchronized void setPhaseText(String i) {
+	public void setPhaseText(String i) {
 		
 		phaseBar.setString(i);
 	}
@@ -192,7 +192,7 @@ public class LoadProgress2 extends JDialog implements LoadProgress2I {
 	 * #setButtonText(java.lang.String)
 	 */
 	@Override
-	public synchronized void setButtonText(String text) {
+	public void setButtonText(String text) {
 		
 		closeButton.setText(text);
 	}
@@ -201,7 +201,7 @@ public class LoadProgress2 extends JDialog implements LoadProgress2I {
 	 * @see edu.stanford.genetics.treeview.LoadProgress2I#setLength(int)
 	 */
 	@Override
-	public synchronized void setLength(int i) {
+	public void setLength(int i) {
 		
 		if (i < 0) {
 			setIndeterminate(true);
@@ -326,7 +326,7 @@ public class LoadProgress2 extends JDialog implements LoadProgress2I {
 	 * @see edu.stanford.genetics.treeview.LoadProgress2I#setFinished(boolean)
 	 */
 	@Override
-	public synchronized  void setFinished(boolean finished) {
+	public synchronized void setFinished(boolean finished) {
 		
 		this.finished = finished;
 		if (getHadProblem() == false) { 
@@ -361,7 +361,7 @@ public class LoadProgress2 extends JDialog implements LoadProgress2I {
 	 * @see edu.stanford.genetics.treeview.LoadProgress2I#setPhase(int)
 	 */
 	@Override
-	public synchronized void setPhase(int i) {
+	public void setPhase(int i) {
 		
 		setPhaseValue(i+1);
 		setPhaseText(phases[i]);

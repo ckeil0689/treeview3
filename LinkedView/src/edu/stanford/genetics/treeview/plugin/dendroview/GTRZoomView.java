@@ -1,19 +1,25 @@
 /* BEGIN_HEADER                                              Java TreeView
  *
  * $Author: rqluk $
- * $RCSfile: ATRZoomView.java,v $
+ * $RCSfile: GTRZoomView.java,v $
  * $Revision: 1.1 $
  * $Date: 2006-08-16 19:13:45 $
  * $Name:  $
  *
  * This file is part of Java TreeView
- * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
+ * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. 
+ * Modified by Alex Segal 2004/08/13. Modifications Copyright 
+ * (C) Lawrence Berkeley Lab.
  *
  * This software is provided under the GNU GPL Version 2. In particular,
  *
- * 1) If you modify a source file, make a comment in it containing your name and the date.
+ * 1) If you modify a source file, make a comment in it containing your 
+ * name and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
- * 3) Developers are encouraged but not required to notify the Java TreeView maintainers at alok@genome.stanford.edu when they make a useful addition. It would be nice if significant contributions could be merged into the main distribution.
+ * 3) Developers are encouraged but not required to notify the 
+ * Java TreeView maintainers at alok@genome.stanford.edu when they make 
+ * a useful addition. It would be nice if significant contributions 
+ * could be merged into the main distribution.
  *
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
@@ -43,7 +49,7 @@ import edu.stanford.genetics.treeview.*;
  * @version    $Revision: 1.1 $ $Date: 2006-08-16 19:13:45 $
  */
 
-public class ATRZoomView extends ModelView implements
+public class GTRZoomView extends ModelView implements
 		MouseListener, KeyListener {
 
 	private static final long serialVersionUID = 1L;
@@ -55,18 +61,19 @@ public class ATRZoomView extends ModelView implements
 	
 	protected HeaderSummary headerSummary = new HeaderSummary();
 	
-	private TreeSelectionI arraySelection;
-	private LinearTransformation xScaleEq, yScaleEq;
+	private TreeSelectionI geneSelection;
+	private LinearTransformation xScaleEq;
+	private LinearTransformation yScaleEq;
 	private MapContainer zoomMap;
 	private JScrollBar scrollbar;
-	private InvertedTreeDrawer drawer = null;
+	private LeftTreeDrawer drawer = null;
 	private TreeDrawerNode selectedNode = null;
 	private Rectangle destRect = null;
 	
 	/**  
 	 * Constructor, sets up AWT components  
 	 */
-	public ATRZoomView() {
+	public GTRZoomView() {
 		
 		super();
 
@@ -140,54 +147,53 @@ public class ATRZoomView extends ModelView implements
 
 	private void synchMap() {
 		
-		if ((selectedNode != null) && (arraySelection != null)) {
+		if ((selectedNode != null) && (geneSelection != null)) {
 			int start  = (int) (selectedNode.getLeftLeaf().getIndex());
 			int end    = (int) (selectedNode.getRightLeaf().getIndex());
 			
-			if(viewFrame.getDataModel().getDataMatrix().getNumCol() 
+			if(viewFrame.getDataModel().getDataMatrix().getNumRow() 
 					> viewFrame.getDataModel().getDataMatrix()
-					.getNumUnappendedCol()) {
+					.getNumUnappendedRow()) {
 				end = Math.max(viewFrame.getDataModel()
-						.getDataMatrix().getNumCol(), end); 
+						.getDataMatrix().getNumRow(), end); 
 			}
 			
-			arraySelection.deselectAllIndexes();
-			arraySelection.setSelectedNode(selectedNode.getId());
-			arraySelection.selectIndexRange(start, end);
-			arraySelection.notifyObservers();
+			geneSelection.deselectAllIndexes();
+			geneSelection.setSelectedNode(selectedNode.getId());
+			geneSelection.selectIndexRange(start, end);
+			geneSelection.notifyObservers();
 		}
 	}
 
 	/**
 	 *  Set arraySelection
 	 *
-	 * @param  arraySelection  The TreeSelection which clicking on 
-	 * this tree will modify.
+	 * @param  arraySelection  The TreeSelection which clicking 
+	 * on this tree will modify.
 	 */
-	public void setArraySelection(TreeSelectionI arraySelection) {
+	public void setGeneSelection(TreeSelectionI geneSelection) {
 		
-		if (this.arraySelection != null) {
-			this.arraySelection.deleteObserver(this);
+		if (this.geneSelection != null) {
+			this.geneSelection.deleteObserver(this);
 		}
 		
-		this.arraySelection = arraySelection;
-		this.arraySelection.addObserver(this);
+		this.geneSelection = geneSelection;
+		this.geneSelection.addObserver(this);
 	}
 
-	/**
-	 *  Set the drawer
-	 *
-	 * @param  d  The new drawer
-	 */
-	public void setInvertedTreeDrawer(InvertedTreeDrawer d) {
+    /** 
+     * Set the drawer
+     *
+     * @param d    The new drawer
+     */
+    public void setLeftTreeDrawer(LeftTreeDrawer d) {
 		
-		if (drawer != null) {
-			drawer.deleteObserver(this);
-		}
-		
+    	if (drawer != null) {
+    		drawer.deleteObserver(this);
+    	}
 		drawer = d;
 		drawer.addObserver(this);
-	}
+    }
 
 	/**
 	 *  Set the zoom map
@@ -225,9 +231,9 @@ public class ATRZoomView extends ModelView implements
 			offscreenValid = false;
 			repaint();
 			
-		} else if (o == arraySelection) {
+		} else if (o == geneSelection) {
 			setSelectedNode(drawer.getNodeById(
-					arraySelection.getSelectedNode()));
+					geneSelection.getSelectedNode()));
 			
 		} else {
 			System.out.println(viewName() + "Got an update from unknown " + o);
@@ -255,30 +261,31 @@ public class ATRZoomView extends ModelView implements
 	@Override
 	public String viewName() {
 		
-		return "ATRZoomView";
+		return "GTRZoomView";
 	}
 
 
 	/**
-	 *  Gets some user-interpretatble status information for the ATRZoomView object
+	 *  Gets some user-interpretatble status information for the 
+	 *  ATRZoomView object.
 	 *
 	 * @return    Text describing selected node correlation
 	 */
 	@Override
-	public String[]  getStatus() {
+	public String[] getStatus() {
 			
 		String [] status;
 		if (selectedNode != null) {
 			int [] nameIndex = getHeaderSummary().getIncluded();
 			status = new String [nameIndex.length * 2];
-			HeaderInfo atrInfo = 
-					getViewFrame().getDataModel().getAtrHeaderInfo();
-			String [] names = atrInfo.getNames();
+			HeaderInfo gtrInfo = 
+					getViewFrame().getDataModel().getGtrHeaderInfo();
+			String [] names = gtrInfo.getNames();
 			
 			for (int i = 0; i < nameIndex.length; i++) {
 				status[2*i] = names[nameIndex[i]] +":";
-				status[2*i+1] = " " + atrInfo.getHeader(
-						atrInfo.getHeaderIndex(
+				status[2*i+1] = " " + gtrInfo.getHeader(
+						gtrInfo.getHeaderIndex(
 								selectedNode.getId()))[ nameIndex[i]];
 			}
 		} else {
@@ -303,6 +310,7 @@ public class ATRZoomView extends ModelView implements
 		}
 		
 		if (offscreenValid == false) {
+			
 			if ((drawer != null) && (selectedNode != null)) {
 				zoomMap.setAvailablePixels(offscreenSize.width);
 
@@ -333,8 +341,7 @@ public class ATRZoomView extends ModelView implements
 						drawer.getCorrMax(), destRect.y + destRect.height);
 
 				// draw
-				drawer.paint(g,
-						xScaleEq, yScaleEq,
+				drawer.paint(g, xScaleEq, yScaleEq,
 //						destRect, selectedNode);
 // 5/13/2004 - this allows us to see colors in the zoomed dendrogram.
 						destRect, null);

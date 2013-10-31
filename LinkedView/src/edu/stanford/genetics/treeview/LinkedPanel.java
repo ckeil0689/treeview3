@@ -107,6 +107,7 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 			return mainPanel;
 		}
 	}
+	
 	public LinkedPanel(ViewFrame viewFrame) {
 		super();
 		setName("LinkedPanel");

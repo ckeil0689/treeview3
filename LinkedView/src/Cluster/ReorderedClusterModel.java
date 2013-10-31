@@ -33,6 +33,7 @@ public class ReorderedClusterModel extends Observable implements DataModel {
 	 *
 	 */
 	private class SubDataMatrix implements DataMatrix {
+		
 		@Override
 		public double getValue(int col, int row) {
 			if (geneIndex != null) row = geneIndex[row];
@@ -86,6 +87,12 @@ public class ReorderedClusterModel extends Observable implements DataModel {
 		public void setModified(boolean b) {
 			// TODO Auto-generated method stub
 			
+		}
+
+		@Override
+		public int getNumUnappendedRow() {
+			// TODO Auto-generated method stub
+			return 0;
 		}
 
 	}

@@ -40,6 +40,9 @@ import edu.stanford.genetics.treeview.*;
  * @version    @version $Revision: 1.2 $ $Date: 2008-06-11 01:58:57 $
  */
 public abstract class ColorBarExportPanel extends javax.swing.JPanel implements ConfigNodePersistent {
+
+	private static final long serialVersionUID = 1L;
+
 	private ConfigNode root;
 
 	// external links
@@ -384,6 +387,9 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements 
 
 
 	class PreviewPanel extends JPanel {
+
+		private static final long serialVersionUID = 1L;
+		
 		JCheckBox drawPreview;
 
 
@@ -410,6 +416,9 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements 
 
 
 		class DrawingPanel extends JPanel {
+
+			private static final long serialVersionUID = 1L;
+			
 			double scale;
 
 
@@ -659,6 +668,9 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements 
 
 
 	class SettingsPanel extends JPanel {
+
+		private static final long serialVersionUID = 1L;
+		
 		JCheckBox verticalBox, bboxBox;
 		JTextField xScaleField, yScaleField, decimalsField, numBoxesField;
 
@@ -863,6 +875,9 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements 
 
 
 		class BboxRow extends SizeRow {
+
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			protected void setupWidgets() {
 				DocumentListener documentListener  =
@@ -907,6 +922,9 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements 
 
 
 		class SizeRow extends JPanel {
+
+			private static final long serialVersionUID = 1L;
+			
 			JTextField xSize, ySize;
 
 
@@ -967,6 +985,9 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements 
 
 
 	class FilePanel extends JPanel {
+
+		private static final long serialVersionUID = 1L;
+		
 		private JTextField fileField;
 
 
@@ -1025,6 +1046,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements 
  */
 class TestColorBarExportPanel extends ColorBarExportPanel {
 
+	private static final long serialVersionUID = 1L;
 
 	TestColorBarExportPanel(ColorExtractor colorExtractor) {
 		super(colorExtractor);
@@ -1032,6 +1054,7 @@ class TestColorBarExportPanel extends ColorBarExportPanel {
 }
 
 class SimpleDataMatrix implements DataMatrix {
+	
 	int nRow;
 	int nCol;
 	double [] dataMatrix;
@@ -1108,6 +1131,11 @@ class SimpleDataMatrix implements DataMatrix {
 	public void setModified(boolean b) {
 		// TODO Auto-generated method stub
 		
+	}
+	@Override
+	public int getNumUnappendedRow() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

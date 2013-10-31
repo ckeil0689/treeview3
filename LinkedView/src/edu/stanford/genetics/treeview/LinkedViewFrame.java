@@ -98,6 +98,7 @@ public class LinkedViewFrame extends TreeViewFrame implements Observer {
 			
 			if (fileSet.getKag().equals("") && fileSet.getKgg().equals("")) {
 				super.loadFileSet(fileSet); // loads into TVModel.
+				
 			} else {
 				loadKnnModel(fileSet);
 			}
@@ -114,6 +115,7 @@ public class LinkedViewFrame extends TreeViewFrame implements Observer {
 		
 		KnnModel knnModel = new KnnModel();
 		knnModel.setFrame(this);
+		
 		try {
 			knnModel.loadNew(fileSet);
 			fileSet.setStyle(FileSet.KMEANS_STYLE);
@@ -128,23 +130,31 @@ public class LinkedViewFrame extends TreeViewFrame implements Observer {
 	protected void setupRunning() {
 		 
 		 FileSet fileSet = getDataModel().getFileSet();
+		 LogBuffer.println("FileSet Type LinkedViewFrame: " 
+		 + fileSet.getStyle()); //Auto
+		 
 		 if (fileSet == null) {
 		 	//default to linked
 		 	fileSet = new FileSet(null,null);
 		 	fileSet.setStyle(FileSet.LINKED_STYLE);
+		 	
 		 } else if (fileSet.getStyle() == FileSet.AUTO_STYLE) {
-			 if (getDataModel().getDocumentConfigRoot().fetchFirst("Views") 
+			 if (getDataModel().getDocumentConfigRoot().fetchFirst("Views") //Problem
 					 != null) {
 				 fileSet.setStyle(FileSet.LINKED_STYLE);
+				 
 			 } else {
 				 HeaderInfo geneHeaders = getDataModel().getGeneHeaderInfo();
 				 HeaderInfo arrayHeaders = getDataModel().getArrayHeaderInfo();
-
+			
 				 if ((geneHeaders.getNumNames() > 4) || (
 						 arrayHeaders.getNumNames() > 3)) {
 					 fileSet.setStyle(FileSet.LINKED_STYLE);
+					 
 				 } else {
-					 fileSet.setStyle(FileSet.CLASSIC_STYLE);
+					 //fileSet.setStyle(FileSet.CLASSIC_STYLE);
+					 fileSet.setStyle(FileSet.LINKED_STYLE);
+					
 				 }
 			 }
 		 }
@@ -153,29 +163,38 @@ public class LinkedViewFrame extends TreeViewFrame implements Observer {
 		 if (fileSet.getStyle() == FileSet.LINKED_STYLE) {
 			 LinkedPanel linkedPanel  = new LinkedPanel(this);
 			 linkedPanel.addChangeListener(new ChangeListener() {
+				 
 				 @Override
-				public void stateChanged(ChangeEvent e) {
+				 public void stateChanged(ChangeEvent e) {
+					 
 					 // rebulid menus...?
-					 //				 menuBar.rebuildMainPanel();
+					 //	menuBar.rebuildMainPanel();
 					 rebuildMainPanelMenu();
 				 }
 			 });
 			 ConfigNode documentConfig = getDataModel().getDocumentConfigRoot();
 			 linkedPanel.setConfigNode(documentConfig.fetchOrCreate("Views"));
 			 running = linkedPanel;
+			 
 		 } else if (fileSet.getStyle() == FileSet.KMEANS_STYLE) {
-			// make sure selection objects are set up before instantiating plugins
-			 PluginFactory [] plugins = PluginManager.getPluginManager().getPluginFactories();
+			 //make sure selection objects are set up before instantiating 
+			 //plugins
+			 PluginFactory [] plugins = PluginManager.getPluginManager()
+					 .getPluginFactories();
 			 for (int j =0; j < plugins.length; j++) {
 				 if ("KnnDendrogram".equals(plugins[j].getPluginName())) {
 					 running = plugins[j].restorePlugin(null, this);
 					 break;
 				 }
 			 }
-		 } else  {
-			// make sure selection objects are set up before instantiating plugins
-			 PluginFactory [] plugins = PluginManager.getPluginManager().getPluginFactories();
+		 } else {
+			 //make sure selection objects are set up before instantiating 
+			 //plugins
+			 PluginFactory [] plugins = PluginManager.getPluginManager()
+					 .getPluginFactories();
+			 
 			 for (int j =0; j < plugins.length; j++) {
+				 
 				 if ("Dendrogram".equals(plugins[j].getPluginName())) {
 					 running = plugins[j].restorePlugin(null, this);
 					 break;
@@ -197,11 +216,11 @@ public class LinkedViewFrame extends TreeViewFrame implements Observer {
 
 		private static final long serialVersionUID = 1L;
 		
-		private JComboBox<String> dataList;
+		private JComboBox dataList;
 		 private JCheckBox quoteBox;
 		 public FileOptionsPanel() {
 			 super(BoxLayout.Y_AXIS);
-			 dataList = new JComboBox<String>(FileSet.getStyles());	
+			 dataList = new JComboBox(FileSet.getStyles());	
 			 dataList.setEditable(false);
 			 
 			 JPanel stylePanel = new JPanel();

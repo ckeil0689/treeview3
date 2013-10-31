@@ -26,7 +26,6 @@ import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.*;
 import java.net.URL;
-import java.util.Arrays;
 
 import javax.swing.*;
 
@@ -128,27 +127,54 @@ public class TVModelLoader2 implements ProgressTrackable {
 	* Length in bytes of the input stream, or -1 if not known.
 	*/
 	@Override
-	public void setLength(int length) {
-		loadProgress.setLength(length);
+	public void setLength(final int length) {
+		
+		SwingUtilities.invokeLater(new Runnable() {
+		
+			@Override
+			public void run() {
+				
+				loadProgress.setLength(length);
+			}
+		});
 	}
+	
 	/** Getter for length */
 	@Override
 	public int getLength() {
 		return loadProgress.getLength();
 	}
+	
 	/** Setter for value */
 	@Override
-	public void setValue(int value) {
-		loadProgress.setValue(value);
+	public void setValue(final int value) {
+		
+		SwingUtilities.invokeLater(new Runnable() {
+						
+			@Override
+			public void run() {
+				
+				loadProgress.setValue(value);
+			}
+		});
 	}
+	
 	/** Getter for value */
 	@Override
 	public int getValue() {
 		return loadProgress.getValue();
 	}
+	
 	@Override
-	public void incrValue(int i) {
-		loadProgress.incrValue(i);
+	public void incrValue(final int i) {
+		SwingUtilities.invokeLater(new Runnable() {
+			
+			@Override
+			public void run() {
+				
+				loadProgress.incrValue(i);
+			}
+		});
 	}
 	
 	/** Setter for finished */
@@ -161,27 +187,54 @@ public class TVModelLoader2 implements ProgressTrackable {
 	}
 	
 	/** Setter for phaseValue */
-	public void setPhaseValue(int phaseValue) {
-		loadProgress.setPhaseValue(phaseValue);
+	public void setPhaseValue(final int phaseValue) {
+		
+		SwingUtilities.invokeLater(new Runnable() {
+			
+			@Override
+			public void run() {
+				
+				loadProgress.setPhaseValue(phaseValue);
+			}
+		});
 	}
+	
 	/** Getter for phaseValue */
 	public int getPhaseValue() {
 		return loadProgress.getPhaseValue();
 	}
 	
 	/** Setter for phaseLength */
-	public void setPhaseLength(int phaseLength) {
-		if (loadProgress != null)
-			loadProgress.setPhaseLength(phaseLength);
+	public void setPhaseLength(final int phaseLength) {
+		
+		SwingUtilities.invokeLater(new Runnable() {
+			
+			@Override
+			public void run() {
+			
+				if (loadProgress != null)
+					loadProgress.setPhaseLength(phaseLength);
+				}
+		});
 	}
+	
 	/** Getter for phaseLength */
 	public int getPhaseLength() {
 		return loadProgress.getPhaseLength();
 	}
 	
-	public void setPhaseText(String phaseText) {
-		loadProgress.setPhaseText(phaseText);
+	public void setPhaseText(final String phaseText) {
+		
+		SwingUtilities.invokeLater(new Runnable() {
+			
+			@Override
+			public void run() {
+				
+				loadProgress.setPhaseText(phaseText);
+			}
+		});
 	}
+	
 	/** Getter for phaseText */
 	public String getPhaseText() {
 		return loadProgress.getPhaseText();

@@ -71,8 +71,8 @@ MainPanel, Observer  {
 	protected void setupViews() {
 		
 		DataModel knnModel = getDataModel();
-		hintpanel = new MessagePanel("Usage Hints");
-		statuspanel = new MessagePanel("View Status");
+		hintpanel = new MessagePanel("Usage Hints", BLUE2);
+		statuspanel = new MessagePanel("View Status", BLUE2);
 
 
 		ColorPresets colorPresets = DendrogramFactory.getColorPresets();
@@ -149,7 +149,8 @@ MainPanel, Observer  {
 		arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
 
 
-		textview = new TextViewManager(getDataModel().getGeneHeaderInfo(), viewFrame.getUrlExtractor());
+		textview = new TextViewManager(getDataModel().getGeneHeaderInfo(), 
+				viewFrame.getUrlExtractor(), getDataModel());
 		textview.setMap(getZoomYmap());
 
 		doDoubleLayout();

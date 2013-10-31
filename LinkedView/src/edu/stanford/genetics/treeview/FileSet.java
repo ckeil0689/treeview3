@@ -343,12 +343,15 @@ public class FileSet {
 	public boolean hasStyle() {
 		return node.hasAttribute("style");
 	}
+	
 	public int getStyle() {
 		return node.getAttribute("style", AUTO_STYLE);
 	}
+	
 	public void setStyle(int newStyle) {
 		node.setAttribute("style", newStyle, AUTO_STYLE);
 	}
+	
 	public void setStyle(String newStyle) {
 		if (newStyle == null) {
 			JOptionPane.showMessageDialog(null, "Error: Invalid Style null. " +

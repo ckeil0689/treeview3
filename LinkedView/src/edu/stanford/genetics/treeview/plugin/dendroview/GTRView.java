@@ -73,6 +73,7 @@ public class GTRView extends ModelViewBuffered implements
 		
 		return hints;
 	}
+	
     /** 
      * Set the drawer
      *
@@ -90,7 +91,8 @@ public class GTRView extends ModelViewBuffered implements
     /** 
      * Set geneSelection
      *
-     * @param geneSelection The TreeSelection which is set by selecting genes in the GlobalView
+     * @param geneSelection The TreeSelection which is set by 
+     * selecting genes in the GlobalView
      */
     public void setGeneSelection(TreeSelectionI geneSelection) {
     	
@@ -133,6 +135,7 @@ public class GTRView extends ModelViewBuffered implements
 			 
     		int start  = (int) (selectedNode.getLeftLeaf().getIndex());
     		int end    = (int) (selectedNode.getRightLeaf().getIndex());
+    		
     		geneSelection.deselectAllIndexes();
     		geneSelection.selectIndexRange(start, end);
     		geneSelection.setSelectedNode(selectedNode.getId());

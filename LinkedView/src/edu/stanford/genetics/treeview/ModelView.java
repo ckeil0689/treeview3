@@ -138,7 +138,7 @@ MouseListener {
 	* This is a stub so that components which work with this will also 
 	* work with the ModelViewBuffered.
 	* importantly, no buffer is ever actually allocated. This method is 
-	* used on the zoomed Dendrograms (ATRZoomView).
+	* used on the zoomed Dendrograms (ATRZoomView + GTRZoomView).
 	*/
 	@Override
 	public synchronized void paintComponent(Graphics g) {

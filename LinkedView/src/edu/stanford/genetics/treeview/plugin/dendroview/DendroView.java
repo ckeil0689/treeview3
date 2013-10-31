@@ -62,6 +62,8 @@ public class DendroView extends JPanel implements ConfigNodePersistent, MainPane
 	 */
 	private static final long serialVersionUID = 1L;
 	
+	protected final static Color BLUE2 = new Color(235, 240, 255, 255);
+	
 	/**
 	 *  Constructor for the DendroView object
 	 * note this will reuse any existing MainView subnode of the documentconfig.
@@ -621,8 +623,8 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 		colorExtractor.setDefaultColorSet(colorPresets.getDefaultColorSet());
 		colorExtractor.setMissing(DataModel.NODATA, DataModel.EMPTY);
 		
-		hintpanel = new MessagePanel("Usage Hints");
-		statuspanel = new MessagePanel("View Status");
+		hintpanel = new MessagePanel("Usage Hints", BLUE2);
+		statuspanel = new MessagePanel("View Status", BLUE2);
 		buttonPanel = new JPanel();
 
 		DoubleArrayDrawer dArrayDrawer = new DoubleArrayDrawer();
@@ -699,7 +701,8 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 
 		
 		
-		textview = new TextViewManager(getDataModel().getGeneHeaderInfo(), viewFrame.getUrlExtractor());
+		textview = new TextViewManager(getDataModel().getGeneHeaderInfo(), 
+				viewFrame.getUrlExtractor(), getDataModel());
 		
 		textview.setMap(getZoomYmap());
 		

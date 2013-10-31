@@ -28,13 +28,13 @@ import java.util.Observable;
 */
 public class HeaderSummary extends Observable implements ConfigNodePersistent {
 
+	private ConfigNode root;
+	private int [] included = new int [] {1};
 	
 	public HeaderSummary() {
 		
 		super();
 	}
-	
-	int [] included = new int [] {1};
 	
 	public void setIncluded(int [] newIncluded) {
 		
@@ -68,7 +68,7 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		
 		if (strings == null) {
 			
-			return null;
+			return "";
 		}
 
 		StringBuffer out = new StringBuffer();
@@ -134,25 +134,30 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		return out;
 	}
 	
-	private ConfigNode root;
-	
 	@Override
 	public void bindConfig(ConfigNode configNode) {
 		root  = configNode;
 		synchronizeFrom();
 	}
+	
 	private void synchronizeFrom() {
-		if (root == null) return;
+		
+		if (root == null) {
+			return;
+		}
+		
 		if (root.hasAttribute("included")) {
 			String incString = root.getAttribute("included", "1");
 			if (incString.equals("")) {
 				setIncluded(new int [0]);
+				
 			} else {
 				int numComma = 0;
 				for (int i = 0; i < incString.length(); i++) {
 					if (incString.charAt(i) == ',')
 						numComma++;
 				}
+				
 				int [] array = new int[numComma+1];
 				numComma = 0;
 				int last = 0;
@@ -164,20 +169,32 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 					}
 				}
 				try {
-					array[numComma] = (new Integer(incString.substring(last))).intValue();
+					array[numComma] = (new Integer(
+							incString.substring(last))).intValue();
+					
 				} catch (NumberFormatException e) {
-					LogBuffer.println("HeaderSummary has trouble restoring included list from "+incString);
+					LogBuffer.println("HeaderSummary has trouble " +
+							"restoring included list from "+incString);
 				}
 				setIncluded(array);
 			}
 		}
 	}
+	
 	private void synchronizeTo() {
-		if (root == null) return;
+		
+		if (root == null) {
+			return;
+		}
+		
 		int [] vec = getIncluded();
 		StringBuffer temp = new StringBuffer();
-		if (vec.length > 0) temp.append(vec[0]);
+		if (vec.length > 0) {
+			temp.append(vec[0]);
+		}
+		
 		for (int i = 1; i < vec.length; i++) {
+			
 			temp.append(",");
 			temp.append(vec[i]);
 		}

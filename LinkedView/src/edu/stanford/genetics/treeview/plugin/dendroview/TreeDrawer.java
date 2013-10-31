@@ -118,37 +118,47 @@ abstract class TreeDrawer extends Observable implements Observer {
 	}
 	
 	/**
-	* Set the data from which to draw the tree
-	*
-	
-	* @param nodeInfo The headers from the node file.
-	* There should be one header row per node.
-	* There should be a column named "NODEID", "RIGHT", "LEFT" and one of either
-	* "CORRELATION" or "TIME".
-	
-	* @param rowInfo This is the header info for the rows which the ends of the tree are supposed to line up with.
-	
-	* 
-	*/
-	public void setData(HeaderInfo nodeInfo, HeaderInfo rowInfo) throws DendroException {
+	 * Set the data from which to draw the tree
+	 *
+	 * @param nodeInfo The headers from the node file.
+	 * There should be one header row per node.
+	 * There should be a column named "NODEID", "RIGHT", "LEFT" and one of either
+	 * "CORRELATION" or "TIME".
+	 * @param rowInfo This is the header info for the rows which the ends of 
+	 * the tree are supposed to line up with
+	 * 
+	 */
+	public void setData(HeaderInfo nodeInfo, HeaderInfo rowInfo) 
+			throws DendroException {
+		
 		if (nodeInfo == null) {
 			setDefaults();
 			return;
 		}
-		if (this.nodeInfo != null) this.nodeInfo.deleteObserver(this);
+		
+		if (this.nodeInfo != null) {
+			this.nodeInfo.deleteObserver(this);
+		}
+		
 		this.nodeInfo = nodeInfo;
 		nodeInfo.addObserver(this);
 		
 		leafList = new TreeDrawerNode[rowInfo.getNumHeaders()];
-		id2node = new Hashtable(((nodeInfo.getNumHeaders() * 4) /3)/2, .75f);	
+		id2node = new Hashtable(((nodeInfo.getNumHeaders() * 4) /3)/2, .75f);
+		
 		int nodeIndex = nodeInfo.getIndex("NODEID");
-		if (nodeIndex == -1)
-			throw new DendroException("Could not find header NODEID in tree header info");
+		if (nodeIndex == -1) {
+			throw new DendroException("Could not find header NODEID " +
+					"in tree header info");
+		}
+		
 		for (int j = 0; j < nodeInfo.getNumHeaders() ;j++) {
+			
 			// extract the things we need from the enumeration
 			String newId = nodeInfo.getHeader(j, nodeIndex);
 			String leftId = nodeInfo.getHeader(j, "LEFT");
 			String rightId = nodeInfo.getHeader(j, "RIGHT");
+			
 			// setup the kids
 			TreeDrawerNode newn   = (TreeDrawerNode) id2node.get(newId);
 			TreeDrawerNode leftn  = (TreeDrawerNode) id2node.get(leftId);
@@ -157,23 +167,32 @@ abstract class TreeDrawer extends Observable implements Observer {
 				System.out.println("Symbol '" + newn + 
 				"' appeared twice, building weird tree");
 			}
-			if (leftn == null) { // this means that the identifier for leftn is a new leaf
+			
+			if (leftn == null) { 
+				// this means that the identifier for leftn is a new leaf
 				int val; // stores index (y location)
 				val = rowInfo.getHeaderIndex(leftId);
+				
 				if (val == -1) {
-					throw new DendroException("Identifier " + leftId + " from tree file not found in CDT.");
+					throw new DendroException("Identifier " + leftId 
+							+ " from tree file not found in CDT.");
 				}
+				
 				leftn = new TreeDrawerNode(leftId, 1.0, val);
 				leafList[val] = leftn;
 				id2node.put(leftId, leftn);
 			}
-			if (rightn == null) { // this means that the identifier for rightn is a new leaf
-				//		System.out.println("Looking up " + rightId);
+			
+			if (rightn == null) { 
+				// this means that the identifier for rightn is a new leaf
+				// System.out.println("Looking up " + rightId);
 				int val; // stores index (y location)
 				val = rowInfo.getHeaderIndex(rightId);
 				if (val == -1) {
-					throw new DendroException("Identifier " + rightId + " from tree file not found in CDT!");
+					throw new DendroException("Identifier " + rightId 
+							+ " from tree file not found in CDT!");
 				}
+				
 				rightn = new TreeDrawerNode(rightId, 1.0, val);
 				leafList[val] = rightn;
 				id2node.put(rightId, rightn);
@@ -185,12 +204,14 @@ abstract class TreeDrawer extends Observable implements Observer {
 				leftn = rightn;
 				rightn = swap;
 			}
+			
 			rootNode = new TreeDrawerNode(newId, 0.0, leftn, rightn);
 			leftn.setParent (rootNode);
 			rightn.setParent(rootNode);
 			// finally, insert in tree
 			id2node.put(newId, rootNode);
 		}
+		
 		setBranchHeights(nodeInfo, rowInfo);
 		setChanged();
 	}

@@ -58,7 +58,8 @@ public interface DataMatrix {
 	int getNumRow();
 	
 	/**
-	 * Appends a data matrix to the right of this one. Used for comparison of two data sets.
+	 * Appends a data matrix to the right of this one. Used for 
+	 * comparison of two data sets.
 	 * @param m The DataMatrix being appended.
 	 */
 	
@@ -70,18 +71,24 @@ public interface DataMatrix {
 	int getNumCol();
 	
 	/**
-	 *  Gets the numCol attribute of the DataMatrix object before anything was appended to it.
+	 *  Gets the numCol attribute of the DataMatrix object before anything 
+	 *  was appended to it.
 	 *
-	 * @return    The number of columns (arrays) in this data matrix before anything was appended.
+	 * @return    The number of columns (arrays) in this data matrix before 
+	 * anything was appended.
 	 */
 	int getNumUnappendedCol();
 	
+	int getNumUnappendedRow();
+	
 	/**
-	 * return true if data matrix has been modified and should be written to file.
+	 * return true if data matrix has been modified and should be written 
+	 * to file.
 	 * @return
 	 */
 	boolean getModified();
 
 	void setModified(boolean b);
+
 }
 

@@ -629,6 +629,12 @@ public class TVModel extends Observable implements DataModel {
 			
 			return appendIndex == -1?getNumCol():appendIndex;
 		}
+		
+		@Override
+		public int getNumUnappendedRow() {
+			
+			return appendIndex == -1?getNumRow():appendIndex;
+		}
 
 		@Override
 		public void setModified(boolean modified) {

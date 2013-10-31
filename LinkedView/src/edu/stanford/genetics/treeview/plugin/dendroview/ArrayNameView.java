@@ -196,12 +196,17 @@ public class ArrayNameView extends ModelView implements MouseListener, FontSelec
 	/*inherit description */
 	@Override
 	public void updateBuffer(Graphics g) {
+		
 		updateBuffer(g, offscreenSize);
 	}
+	
 	public void updateBuffer(Image buf) {
-		updateBuffer(buf.getGraphics(), new Dimension(buf.getWidth(null), buf.getHeight(null)));
+		updateBuffer(buf.getGraphics(), new Dimension(buf.getWidth(null), 
+				buf.getHeight(null)));
 	}
+	
 	public void updateBuffer(Graphics g, Dimension offscreenSize) {
+		
 		g.setColor(Color.white);
 		g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
 		g.setColor(Color.black);
@@ -233,7 +238,8 @@ public class ArrayNameView extends ModelView implements MouseListener, FontSelec
 				    } catch (Exception e) {
 					    // ingore...
 				    }
-				    g.fillRect(0, map.getMiddlePixel(j) - ascent / 2, offscreenSize.height, ascent);
+				    g.fillRect(0, map.getMiddlePixel(j) - ascent / 2, 
+				    		offscreenSize.height, ascent);
 		    }
 		    g.setColor(back);
 	    }
