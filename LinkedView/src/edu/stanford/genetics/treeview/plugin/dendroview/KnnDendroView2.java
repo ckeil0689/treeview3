@@ -71,7 +71,6 @@ MainPanel, Observer  {
 	protected void setupViews() {
 		
 		DataModel knnModel = getDataModel();
-		hintpanel = new MessagePanel("Usage Hints", BLUE2);
 		statuspanel = new MessagePanel("Status", BLUE2);
 		
 		ColorPresets colorPresets = DendrogramFactory.getColorPresets();
@@ -88,8 +87,6 @@ MainPanel, Observer  {
 		globalview = new GlobalView();
 
 		// scrollbars, mostly used by maps
-		globalXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0,1,0,1);
-		globalYscrollbar = new JScrollBar(Adjustable.VERTICAL,0,1,0,1);
 		zoomXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0,1,0,1);
 		zoomYscrollbar = new JScrollBar(Adjustable.VERTICAL,0,1,0,1);
 
@@ -105,10 +102,8 @@ MainPanel, Observer  {
 		//the scrollbars "scroll" by communicating with the maps.
 		globalXmap = new MapContainer();
 		globalXmap.setDefaultScale(2.0);
-		globalXmap.setScrollbar(globalXscrollbar);
 		globalYmap = new MapContainer();
 		globalYmap.setDefaultScale(2.0);
-		globalYmap.setScrollbar(globalYscrollbar);
 
 		globalview.setXMap(globalXmap);
 		globalview.setYMap(globalYmap);

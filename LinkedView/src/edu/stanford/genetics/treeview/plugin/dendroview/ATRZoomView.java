@@ -48,11 +48,6 @@ public class ATRZoomView extends ModelView implements
 
 	private static final long serialVersionUID = 1L;
 	
-	private final static String[] hints = {
-		"Click to select node",
-		" - Use arrow keys to navigate tree",
-	};
-	
 	protected HeaderSummary headerSummary = new HeaderSummary();
 	
 	private TreeSelectionI arraySelection;
@@ -94,14 +89,6 @@ public class ATRZoomView extends ModelView implements
 		
 		return headerSummary;
 	}
-
-	/*inherit description*/
-	@Override
-	public String[] getHints() {
-		
-		return hints;
-	}
-
 
 	/**
 	 *  Set the selected node, update the arraySelection, and redraw
@@ -260,7 +247,8 @@ public class ATRZoomView extends ModelView implements
 
 
 	/**
-	 *  Gets some user-interpretatble status information for the ATRZoomView object
+	 *  Gets some user-interpretatble status information for the 
+	 *  ATRZoomView object.
 	 *
 	 * @return    Text describing selected node correlation
 	 */

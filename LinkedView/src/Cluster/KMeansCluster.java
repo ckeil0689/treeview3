@@ -6,10 +6,13 @@ import java.util.Random;
 
 import javax.swing.JProgressBar;
 
+import edu.stanford.genetics.treeview.DataModel;
+import edu.stanford.genetics.treeview.model.TVModel;
+
 public class KMeansCluster {
 
 	//Instance variables
-	private ClusterModel model;
+	private TVModel model;
 	private String filePath;
 	private JProgressBar pBar;
 	private int clusterN = 0;
@@ -36,10 +39,10 @@ public class KMeansCluster {
 	 * @param type
 	 * @param method
 	 */
-	public KMeansCluster(ClusterModel model, List<List<Double>> dMatrix, 
+	public KMeansCluster(DataModel model, List<List<Double>> dMatrix, 
 			JProgressBar pBar, int clusterN, int iterations, String type) {
 		
-		this.model = model;
+		this.model = (TVModel)model;
 		this.dMatrix = dMatrix;
 		this.pBar = pBar;
 		this.clusterN = clusterN;

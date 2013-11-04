@@ -18,8 +18,8 @@ import net.miginfocom.swing.MigLayout;
 
 /**
  * This class creates clickable JPanel with different responses
- * from the MouseListener based on whether they take a DataModel when constructed
- * and if they do, which DataModel (TVModel for DendroView and ClusterModel for ClusterView).
+ * from the MouseListener based on which image is clicked and whether a model
+ * is loaded or not.
  * 
  * @author CKeil
  *
@@ -44,7 +44,6 @@ public class ClickableIcon extends JPanel {
 	 * @param labelText
 	 * @param fileName
 	 * @param tvModel_gen
-	 * @param clusterModel_gen
 	 */
 	public ClickableIcon(ClusterFrame frame, String fileName) {
 		

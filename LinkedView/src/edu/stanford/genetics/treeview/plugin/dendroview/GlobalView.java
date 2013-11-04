@@ -26,19 +26,14 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.Observable;
 
+import net.miginfocom.swing.MigLayout;
+
 import edu.stanford.genetics.treeview.*;
 
 class GlobalView extends ModelViewProduced implements  MouseMotionListener,
     MouseListener, KeyListener {    
 
 	private static final long serialVersionUID = 1L;
-	
-	private static final String [] hints = {
-		
-		" - Use arrow keys to move selection",
-		" - Click and drag to select genes",
-		" - Hold shift to select arrays too"
-	};
 	
 	protected boolean hasDrawn = false;
 	protected TreeSelectionI geneSelection;
@@ -47,7 +42,7 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 	protected MapContainer ymap;
     protected MapContainer zoomXmap;
     protected MapContainer zoomYmap;
-	
+    
     private ArrayDrawer drawer;
 
     /**
@@ -81,6 +76,8 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		
     	super();
 		panel = this;
+		
+		this.setLayout(new MigLayout());
 		
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -120,17 +117,12 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
     	
     	return status;
     }
-	
-	@Override
-	public String[]  getHints() {
-		
-		return hints;
-	}
 
     /** 
      * Set geneSelection
      *
-     * @param geneSelection The TreeSelection which is set by selecting genes in the GlobalView
+     * @param geneSelection The TreeSelection which is set by selecting 
+     * genes in the GlobalView
      */
     public void setGeneSelection(TreeSelectionI geneSelection) {
 	  
@@ -145,7 +137,8 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
     /** 
      * Set arraySelection
      *
-     * @param arraySelection The TreeSelection which is set by selecting arrays in the GlobalView
+     * @param arraySelection The TreeSelection which is set by selecting 
+     * arrays in the GlobalView
      */
     public void setArraySelection(TreeSelectionI arraySelection) {
 	 
@@ -528,28 +521,16 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		drawBand(dragRect);	
 		
 		if (e.isShiftDown()) {
-		    selectRectangle(startPoint, endPoint);
+		    Point start = new Point(xmap.getMinIndex(),
+				    startPoint.y);
+		    Point end = new Point(xmap.getMaxIndex(),
+				  endPoint.y);
+		    selectRectangle(start, end);
 		    
 		} else {
-		    Point start = new Point(xmap.getMinIndex(),
-					    startPoint.y);
-		    Point end = new Point(xmap.getMaxIndex(),
-					  endPoint.y);
-		    selectRectangle(start, end);
+			selectRectangle(startPoint, endPoint);
 		}
     }
-    
-//	@Override
-//	public void mouseEntered(MouseEvent arg0) {
-//		
-//		setBorder(BorderFactory.createLineBorder(Color.orange, 2));	
-//	}
-//	
-//	@Override
-//	public void mouseExited(MouseEvent arg0) {
-//		
-//		setBorder(BorderFactory.createEmptyBorder());
-//	}
     
     // MouseMotionListener
     @Override
@@ -560,14 +541,14 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		endPoint.setLocation(xmap.getIndex(e.getX()), ymap.getIndex(e.getY()));
 		
 		if (e.isShiftDown()) {
+			dragRect.setLocation(xmap.getMinIndex(), startPoint.y);
+		    dragRect.setSize(0,0);
+		    dragRect.add(xmap.getMaxIndex(), endPoint.y);
+	    
+		} else {
 		    dragRect.setLocation(startPoint.x, startPoint.y);
 		    dragRect.setSize(0,0);
 		    dragRect.add(endPoint.x, endPoint.y);
-		    
-		} else {
-		    dragRect.setLocation(xmap.getMinIndex(), startPoint.y);
-		    dragRect.setSize(0,0);
-		    dragRect.add(xmap.getMaxIndex(), endPoint.y);
 		}
 		
 		drawBand(dragRect);
@@ -702,7 +683,8 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		}
 		
 		geneSelection.notifyObservers();
-		arraySelection.notifyObservers();
-		
+		arraySelection.notifyObservers();	
 	}
 }
+
+

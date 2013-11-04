@@ -128,7 +128,9 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 			temp2.add(colorExtractorEditor);
 			temp2.add(new CEEButtons());
 			colorPresetsPanel = new ColorPresetsPanel();
-			temp2.add(new JScrollPane(colorPresetsPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS));
+			temp2.add(new JScrollPane(colorPresetsPanel, 
+					ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
+					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS));
 			gbc.gridx = 1;
 			add(temp2, gbc);
 		}
@@ -156,7 +158,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 			value = new JTextField(Double.toString(ymap.getScale()),5);
 			add(value);
 
-			fill= new JRadioButton("Fill");
+			fill = new JRadioButton("Fill");
 			type.add(fill);
 			add(fill);
 
@@ -170,60 +172,80 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 			}
 
 			fill.addItemListener(new ItemListener() {
+				
 				@Override
 				public void itemStateChanged(ItemEvent evt) {
+					
 					ScalePanel.this.updateCheck();
 				}	    
 			});
+			
 			fixed.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(ItemEvent evt) {
+					
 					ScalePanel.this.updateCheck();
 				}	    
 			});
+			
 			value.getDocument().addDocumentListener(new DocumentListener() {
+				
 				@Override
 				public void changedUpdate(DocumentEvent e) {
+					
 					ScalePanel.this.updateValue();
 				}
+				
 				@Override
 				public void insertUpdate(DocumentEvent e) {
+					
 					ScalePanel.this.updateValue();
 				}
+				
 				@Override
 				public void removeUpdate(DocumentEvent e) {
+					
 					ScalePanel.this.updateValue();
 				}
 			});
 		}
+		
 		public void updateCheck() {
+			
 			if (fixed.isSelected()) {
 				ymap.setMap("Fixed");
 				value.setEnabled(true);
+				
 			} else {
 				ymap.setMap("Fill");
 				value.setEnabled(false);
 			}
+			
 			value.setText(Double.toString(ymap.getScale()));
 			ymap.notifyObservers();
 		}
 
 		public void updateValue() {
+			
 			if (fixed.isSelected()) {
 				try {
 					Double d = new Double(value.getText());
 					ymap.setScale(d.doubleValue());
 					ymap.notifyObservers();
+					
 				} catch (java.lang.NumberFormatException e) {
 					// do nothing if the format is bad...
 				}
 			}
 		}
 	}
+	
 	@Override
 	public void synchronizeFrom() {
+		
 		setupWidgets();
 	}
+	
 	@Override
 	public void synchronizeTo() {
 		/* don't do anything?
@@ -234,6 +256,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 	}
 
 	public JDialog showDialog(JFrame f, String title) {
+		
 		final JDialog d = new JDialog(f, title);
 		d.setLayout(new BorderLayout());
 		d.add(this, BorderLayout.CENTER);
@@ -294,7 +317,9 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 							temp.loadEisen(f);
 							colorExtractorEditor.copyStateFrom(temp);
 						} catch (IOException ex) {
-							JOptionPane.showMessageDialog(CEEButtons.this, "Could not load from " + f.toString() + "\n" + ex);
+							JOptionPane.showMessageDialog(CEEButtons.this, 
+									"Could not load from " + f.toString() 
+									+ "\n" + ex);
 						}
 					}
 				}
@@ -314,7 +339,9 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 							colorExtractorEditor.copyStateTo(temp);
 							temp.saveEisen(f);
 						} catch (IOException ex) {
-							JOptionPane.showMessageDialog(CEEButtons.this, "Could not save to " + f.toString() + "\n" + ex);
+							JOptionPane.showMessageDialog(CEEButtons.this, 
+									"Could not save to " + f.toString() 
+									+ "\n" + ex);
 						}
 
 					}
@@ -483,7 +510,9 @@ class ColorExtractorEditor extends JPanel {
 			pushButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					Color trial = JColorChooser.showDialog(ColorExtractorEditor.this, "Pick Color for " + getLabel(), getColor());
+					Color trial = JColorChooser.showDialog(
+							ColorExtractorEditor.this, "Pick Color for " 
+					+ getLabel(), getColor());
 					if (trial != null)
 						setColor(trial);
 				}

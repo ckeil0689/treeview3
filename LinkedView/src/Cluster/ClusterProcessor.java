@@ -7,6 +7,8 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
+import edu.stanford.genetics.treeview.DataModel;
+
 //import Cluster.ClusterView.FinalOptionsPanel;
 
 /**
@@ -20,7 +22,7 @@ import javax.swing.JProgressBar;
 public class ClusterProcessor {
 	
 	//Instance variables
-	private ClusterModel model;
+	private DataModel model;
 	private double[] currentArray;
 	private final String rowString = "GENE"; 
 	private final String colString = "ARRY";
@@ -56,7 +58,7 @@ public class ClusterProcessor {
 			String similarityM, int row_clusterN, int row_iterations, 
 			int col_clusterN, int col_iterations) {
 		
-		this.model = cView.getClusterModel();
+		this.model = cView.getDataModel();
 		this.pBar = pBar;
 		this.pBar2 = pBar2;
 		this.pBar3 = pBar3;

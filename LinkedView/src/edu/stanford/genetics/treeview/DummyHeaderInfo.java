@@ -109,6 +109,12 @@ public String[] getHeader(int i) {
 		  return (getHeader(rowIndex))[columnIndex];
 	}
 
+	@Override
+	public String[][] getHeaderArray() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	  
 }
 

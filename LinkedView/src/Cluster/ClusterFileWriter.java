@@ -6,6 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
+import edu.stanford.genetics.treeview.DataModel;
+
 /**
  * This class is used to save data from clustering to the local storage 
  * by converting it to a tab-delimited string
@@ -16,11 +18,11 @@ import java.util.List;
 public class ClusterFileWriter {
 	
 	private File file;
-	private ClusterModel model;
+	private DataModel model;
 	private final String SEPARATOR = "\t";
 	private final String END_OF_ROW = "\n";
 	
-	public ClusterFileWriter(ClusterModel model){
+	public ClusterFileWriter(DataModel model){
 		
 		this.model = model;
 	}

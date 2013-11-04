@@ -54,11 +54,6 @@ public class GTRZoomView extends ModelView implements
 
 	private static final long serialVersionUID = 1L;
 	
-	private final static String[] hints = {
-		"Click to select node",
-		" - Use arrow keys to navigate tree",
-	};
-	
 	protected HeaderSummary headerSummary = new HeaderSummary();
 	
 	private TreeSelectionI geneSelection;
@@ -90,25 +85,21 @@ public class GTRZoomView extends ModelView implements
 	}
 
 
-	/** Setter for headerSummary */
+	/** 
+	 * Setter for headerSummary 
+	 */
 	public void setHeaderSummary(HeaderSummary headerSummary) {
 		
 		this.headerSummary = headerSummary;
 	}
 	
-	/** Getter for headerSummary */
+	/** 
+	 * Getter for headerSummary 
+	 */
 	public HeaderSummary getHeaderSummary() {
 		
 		return headerSummary;
 	}
-
-	/*inherit description*/
-	@Override
-	public String[] getHints() {
-		
-		return hints;
-	}
-
 
 	/**
 	 *  Set the selected node, update the arraySelection, and redraw
@@ -240,7 +231,6 @@ public class GTRZoomView extends ModelView implements
 		}
 	}
 
-
 	/**
 	 *  Need to blit another part of the buffer to the screen when 
 	 *  the scrollbar moves.
@@ -252,7 +242,6 @@ public class GTRZoomView extends ModelView implements
 		repaint();
 	}
 
-
 	/**
 	 *  Implementation of abstract method
 	 *
@@ -263,7 +252,6 @@ public class GTRZoomView extends ModelView implements
 		
 		return "GTRZoomView";
 	}
-
 
 	/**
 	 *  Gets some user-interpretatble status information for the 
@@ -448,7 +436,6 @@ public class GTRZoomView extends ModelView implements
 	 */
 	@Override
 	public void keyReleased(KeyEvent e) { }
-
 
 	/**
 	 *  Ignore key types

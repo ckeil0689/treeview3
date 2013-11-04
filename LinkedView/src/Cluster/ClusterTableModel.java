@@ -4,6 +4,9 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
+import edu.stanford.genetics.treeview.DataModel;
+import edu.stanford.genetics.treeview.model.TVModel;
+
 public class ClusterTableModel extends AbstractTableModel{
 	
 
@@ -11,12 +14,13 @@ public class ClusterTableModel extends AbstractTableModel{
 	
 	//Instance variables
 	private List<List<Double>> tableList;
-	private ClusterModel currentModel;
+	private TVModel currentModel;
 	
-	public ClusterTableModel(List<List<Double>> tableList, ClusterModel currentModel){
+	public ClusterTableModel(List<List<Double>> tableList, 
+			DataModel currentModel){
+		
 		this.tableList = tableList; 
-		this.currentModel = currentModel;
-
+		this.currentModel = (TVModel)currentModel;
 	}
 	
 	//Depends on whether elements or arrays are used in DataViewDialog!
@@ -41,6 +45,6 @@ public class ClusterTableModel extends AbstractTableModel{
 	@Override
 	public String getColumnName(int pCol) {
 		
-	    return currentModel.arrayHeaderInfo.getHeaderArray()[pCol][0];
+	    return currentModel.getArrayHeaderInfo().getHeaderArray()[pCol][0];
 	}
 }

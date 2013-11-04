@@ -76,7 +76,7 @@ MainPanel, Observer {
 	protected ScrollPane panes[];
 	protected boolean loaded;
 	
-	protected JScrollBar globalXscrollbar, globalYscrollbar;
+//	protected JScrollBar globalXscrollbar, globalYscrollbar;
     protected GlobalView globalview;
 
     protected JScrollBar zoomXscrollbar, zoomYscrollbar;
@@ -95,7 +95,6 @@ MainPanel, Observer {
 	protected MapContainer zoomXmap; 
 	protected MapContainer zoomYmap;
 
-	protected MessagePanel hintpanel;
 	protected MessagePanel statuspanel;
 	protected BrowserControl browserControl;
 	protected ArrayDrawer arrayDrawer;
@@ -131,6 +130,7 @@ MainPanel, Observer {
 		
 		super.setName(name);
 	}
+	
 	/**
 	 * Chained constructor for the DendroView object
 	 * note this will reuse any existing MainView subnode of the documentconfig.
@@ -411,16 +411,13 @@ MainPanel, Observer {
 	 */
 	public void alignAtrToModel(AtrTVModel model) {
 		
-		try {
-			
+		try {	
 			String selectedID = null;
 			
 			try {
-				
 				selectedID = getArraySelection().getSelectedNode();
-			}
-			catch(NullPointerException npe) {
 				
+			} catch(NullPointerException npe) {
 				npe.printStackTrace();
 			}
 			
@@ -444,9 +441,7 @@ MainPanel, Observer {
 				
 				updateATRDrawer(selectedID);
 			}
-		}
-		catch(Exception e) {
-			
+		} catch(Exception e) {
 			e.printStackTrace();
 			System.out.println(e.toString());
 		}
@@ -464,10 +459,10 @@ MainPanel, Observer {
 	private void updateGTRDrawer(String selectedID) {
 		
 		try {
-			
 			TVModel tvmodel = (TVModel)getDataModel();
 			leftTreeDrawer.setData(tvmodel.getGtrHeaderInfo(), 
 					tvmodel.getGeneHeaderInfo());
+			
 			HeaderInfo trHeaderInfo = tvmodel.getGtrHeaderInfo();
 			
 			if (trHeaderInfo.getIndex("NODECOLOR") >= 0) {
@@ -475,8 +470,7 @@ MainPanel, Observer {
 				trHeaderInfo,
 				trHeaderInfo.getIndex("NODECOLOR"));
 			}	
-		}
-		catch (DendroException e) {
+		} catch (DendroException e) {
 			
 			//LogPanel.println("Had problem setting up the array tree : " 
 			//+ e.getMessage());
@@ -493,11 +487,10 @@ MainPanel, Observer {
 			gtrview.setEnabled(false);
 			gtrzview.setEnabled(false);
 			
-			
 			try{	
 				leftTreeDrawer.setData(null, null);
-			} 
-			catch (DendroException ex) {
+				
+			} catch (DendroException ex) {
 				
 			}
 		}
@@ -523,7 +516,6 @@ MainPanel, Observer {
 	private void updateATRDrawer(String selectedID) {
 		
 		try {
-			
 			TVModel tvmodel = (TVModel)getDataModel();
 			invertedTreeDrawer.setData(tvmodel.getAtrHeaderInfo(), 
 					tvmodel.getArrayHeaderInfo());
@@ -535,8 +527,7 @@ MainPanel, Observer {
 				trHeaderInfo,
 				trHeaderInfo.getIndex("NODECOLOR"));
 			}	
-		}
-		catch (DendroException e) {
+		} catch (DendroException e) {
 			
 			//LogPanel.println("Had problem setting up the array tree : " 
 			//+ e.getMessage());
@@ -554,10 +545,9 @@ MainPanel, Observer {
 			atrzview.setEnabled(false);
 			
 			try{
-				
 				invertedTreeDrawer.setData(null, null);
-			} 
-			catch (DendroException ex) {
+				
+			} catch (DendroException ex) {
 				
 			}
 		}
@@ -713,7 +703,6 @@ MainPanel, Observer {
 		colorExtractor.setDefaultColorSet(colorPresets.getDefaultColorSet());
 		colorExtractor.setMissing(DataModel.NODATA, DataModel.EMPTY);
 		
-		hintpanel = new MessagePanel("Usage Hints", BLUE2);
 		statuspanel = new MessagePanel("Status", BLUE2);
 
 		DoubleArrayDrawer dArrayDrawer = new DoubleArrayDrawer();
@@ -722,10 +711,8 @@ MainPanel, Observer {
 		((Observable)getDataModel()).addObserver(arrayDrawer);
 		
 		// scrollbars, mostly used by maps
-		globalXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0,1,0,1);
-		globalYscrollbar = new JScrollBar(Adjustable.VERTICAL,0,1,0,1);
-		zoomXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0,1,0,1);
-		zoomYscrollbar = new JScrollBar(Adjustable.VERTICAL,0,1,0,1);
+		zoomXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0, 1, 0, 1);
+		zoomYscrollbar = new JScrollBar(Adjustable.VERTICAL, 0, 1, 0, 1);
 
 		zoomXmap = new MapContainer();
 		zoomXmap.setDefaultScale(12.0);
@@ -738,13 +725,11 @@ MainPanel, Observer {
 		// globalmaps tell globalview, atrview, and gtrview
 		// where to draw each data point.
 		// the scrollbars "scroll" by communicating with the maps.
-		globalXmap = new MapContainer();
-		globalXmap.setDefaultScale(2.0);
-		globalXmap.setScrollbar(globalXscrollbar);
+		globalXmap = new MapContainer("Fill");
+		//globalXmap.setDefaultScale(2.0);
 		
-		globalYmap = new MapContainer();
-		globalYmap.setDefaultScale(2.0);
-		globalYmap.setScrollbar(globalYscrollbar);
+		globalYmap = new MapContainer("Fill");
+		//globalYmap.setDefaultScale(2.0);
 		
 		globalview = new GlobalView();
 		globalview.setXMap(globalXmap);
@@ -1035,7 +1020,6 @@ MainPanel, Observer {
 		gtrPanel = new JPanel();
 		gtrPanel.setLayout(new BorderLayout());
 		
-		gtrview.setHintPanel(hintpanel);
 		gtrview.setStatusPanel(statuspanel);
 		gtrview.setViewFrame(viewFrame);
 		
@@ -1090,8 +1074,6 @@ MainPanel, Observer {
 					    
 						panel.removeAll();
 						panel.add(globalview, "grow, push");
-						panel.add(globalYscrollbar, "push, grow, wrap");
-						panel.add(globalXscrollbar, "push, grow, span");
 						
 						setVisible(false);
 					}
@@ -1101,8 +1083,6 @@ MainPanel, Observer {
 				fullPanel.setLayout(new MigLayout("ins 0"));
 				
 				fullPanel.add(globalview, "push, grow");
-				fullPanel.add(globalYscrollbar, "push, grow, wrap");
-				fullPanel.add(globalXscrollbar, "push, grow, span");
 				
 				fullScreen.getContentPane().add(fullPanel);
 				fullScreen.pack();
@@ -1138,8 +1118,6 @@ MainPanel, Observer {
 				BorderLayout.SOUTH);
 		
 		panel.add(globalview, "grow, push");
-		panel.add(globalYscrollbar, "push, grow, wrap");
-		panel.add(globalXscrollbar, "push, grow, span");
 		
 		zoompanel.add(zoomview, BorderLayout.CENTER);
 		zoompanel.add(zoomXscrollbar, BorderLayout.SOUTH);	
@@ -1150,9 +1128,8 @@ MainPanel, Observer {
 		buttonPanel.add(fullScreenButton, "push, alignx 50%, wrap");
 		buttonPanel.add(closeButton, "push, alignx 50%, wrap");
 		
-		left.add(panel, "grow, push, height 80%:80%:, span, wrap");
-		left.add(hintpanel, "push, grow, height 15%::, width 40%");
-		left.add(statuspanel, "push, grow, width 40%");
+		left.add(panel, "grow, push, height 85%, span, wrap");
+		left.add(statuspanel, "pushx, growx, height 15%, width 80%");
 		left.add(buttonPanel, "push, grow");
 		
 		right.add(level1Pane, "push, grow");
@@ -1161,12 +1138,14 @@ MainPanel, Observer {
 		
 		gtrPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
 				textpanel, gtrzview);
+		gtrPane.setDividerSize(5);
+		gtrPane.setDividerLocation(100);
 		
 		downSide.add(arraynameview, "pushx, growx, height 15%::, " +
-				"width :65%:65%");
+				"width 65%");
 		downSide.add(saveButton, "pushx, alignx 50%, wrap");
-		downSide.add(zoompanel, "push, grow, width :65%:65%");
-		downSide.add(gtrPane, "push, grow");
+		downSide.add(zoompanel, "push, grow, width 65%");
+		downSide.add(gtrPane, "push, grow, width 35%");
 
 		add(backgroundPane, "push, grow");
 	}
@@ -1179,7 +1158,6 @@ MainPanel, Observer {
 	 */
 	private void registerView(ModelView modelView) {
 		
-		modelView.setHintPanel(hintpanel);
 		modelView.setStatusPanel(statuspanel);
 		modelView.setViewFrame(viewFrame);
 	}
@@ -1554,7 +1532,9 @@ MainPanel, Observer {
 						"Pixel Settings", pssSelector);
 			 
 				System.out.println("showing popup...");
-			 	popup.addWindowListener(XmlConfig.getStoreOnWindowClose(getDataModel().getDocumentConfigRoot()));	
+			 	popup.addWindowListener(XmlConfig.getStoreOnWindowClose(
+			 			getDataModel().getDocumentConfigRoot()));	
+			 	
 				popup.pack();
 				popup.setVisible(true);
 			}

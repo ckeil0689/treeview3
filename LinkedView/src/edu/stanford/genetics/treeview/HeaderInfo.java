@@ -164,5 +164,7 @@ public interface HeaderInfo {
 	 * @return
 	 */
 	public String getHeader(int rowIndex, int columnIndex);
+
+	public String[][] getHeaderArray();
 }
 

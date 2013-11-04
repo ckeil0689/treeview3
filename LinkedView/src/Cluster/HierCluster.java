@@ -6,6 +6,9 @@ import java.util.List;
 
 import javax.swing.JProgressBar;
 
+import edu.stanford.genetics.treeview.DataModel;
+import edu.stanford.genetics.treeview.model.TVModel;
+
 /**
  * Test class to assess whether the operation can work on 
  * half a matrix (due to symmetry) 
@@ -15,7 +18,7 @@ import javax.swing.JProgressBar;
 public class HierCluster {
 
 	//Instance variables
-	private ClusterModel model;
+	private TVModel model;
 	private String filePath;
 	private String type;
 	private String method;
@@ -45,10 +48,10 @@ public class HierCluster {
 	 * @param type
 	 * @param method
 	 */
-	public HierCluster(ClusterModel model, List<List<Double>> dMatrix, 
+	public HierCluster(DataModel model, List<List<Double>> dMatrix, 
 			JProgressBar pBar, String type, String method) {
 		
-		this.model = model;
+		this.model = (TVModel)model;
 		this.dMatrix = dMatrix;
 		this.type = type;
 		this.method = method;

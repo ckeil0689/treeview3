@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import edu.stanford.genetics.treeview.DataModel;
+
 /**
  * This class is used to generate the .CDT tab delimited file which 
  * Java TreeView will use for visualization. It takes in the previously 
@@ -16,7 +18,7 @@ import java.util.List;
 public class CDTGenerator {
 
 	//Instance variables
-	private ClusterModel model;
+	private DataModel model;
 	private File file;
 	
 	private String filePath; 
@@ -44,7 +46,7 @@ public class CDTGenerator {
 	private List<String> orderedCols;
 	
 	//Constructor (building the object)
-	public CDTGenerator(ClusterModel model, List<List<Double>> sepList, 
+	public CDTGenerator(DataModel model, List<List<Double>> sepList, 
 			List<String> orderedRows, List<String> orderedCols, 
 			String choice, String choice2, boolean hierarchical, 
 			int row_clusterN, int col_clusterN){

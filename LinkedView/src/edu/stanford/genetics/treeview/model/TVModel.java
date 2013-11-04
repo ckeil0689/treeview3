@@ -24,8 +24,6 @@ package edu.stanford.genetics.treeview.model;
 import java.awt.Frame;
 import java.util.*;
 
-import Cluster.ClusterFileSet;
-
 import edu.stanford.genetics.treeview.*;
 
 public class TVModel extends Observable implements DataModel {
@@ -95,13 +93,13 @@ public class TVModel extends Observable implements DataModel {
   	
     // accessor methods	
 	@Override
-	public HeaderInfo getGeneHeaderInfo() {
+	public IntHeaderInfo getGeneHeaderInfo() {
 	  
 		return geneHeaderInfo;
 	}
 	
 	@Override
-	public HeaderInfo getArrayHeaderInfo() {
+	public IntHeaderInfo getArrayHeaderInfo() {
 	  
 		return arrayHeaderInfo;
 	}
@@ -577,7 +575,7 @@ public class TVModel extends Observable implements DataModel {
 	 * @author aloksaldanha
 	 *
 	 */
-	class TVDataMatrix implements DataMatrix {
+	public class TVDataMatrix implements DataMatrix {
 		
 		private boolean modified = false;
 	    private double [] exprData = null;
@@ -603,6 +601,11 @@ public class TVModel extends Observable implements DataModel {
 		public void setExprData(double[] newData) {
 			
 			exprData = newData;
+		}
+		
+		public double[] getExprData() {
+			
+			return exprData;
 		}
 
 		@Override
@@ -823,11 +826,5 @@ public class TVModel extends Observable implements DataModel {
 	public void setLoaded(boolean loaded) {
 		
 		this.loaded = loaded;
-	}
-	
-	@Override
-	public ClusterFileSet getClusterFileSet() {
-		
-		return null;
 	}
 }

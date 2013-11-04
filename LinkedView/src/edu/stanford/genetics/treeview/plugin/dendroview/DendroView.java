@@ -49,17 +49,17 @@ import edu.stanford.genetics.treeview.model.TVModel;
  *  the selected genes, and potentially forms a link between different views,
  *  only one of which is the DendroView.
  *
- * The intention here is that you create this from a model, and never replace that model. If you want to show another file, make another dendroview. All views should of course still listen to the model, since that can still be changed ad libitum.
+ * The intention here is that you create this from a model, and never replace 
+ * that model. If you want to show another file, make another dendroview. 
+ * All views should of course still listen to the model, since that can 
+ * still be changed ad libitum.
  *
  * @author     Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.7 $ $Date: 2009-03-23 02:46:51 $
  */
-public class DendroView extends JPanel implements ConfigNodePersistent, MainPanel, Observer {
-	/**
-	 * EDIT
-	 * @author Chris Keil
-	 * Added static long serial ID
-	 */
+public class DendroView extends JPanel implements ConfigNodePersistent, 
+MainPanel, Observer {
+	
 	private static final long serialVersionUID = 1L;
 	
 	protected final static Color BLUE2 = new Color(235, 240, 255, 255);
@@ -72,69 +72,92 @@ public class DendroView extends JPanel implements ConfigNodePersistent, MainPane
 	 * @param  vFrame  parent ViewFrame of DendroView
 	 */
 	public DendroView(DataModel tVModel, ViewFrame vFrame) {
+		
 		this(tVModel, null, vFrame, "Dendrogram");
 	}
+	
 	public DendroView(DataModel tVModel, ConfigNode root, ViewFrame vFrame) {
+		
 		this(tVModel, root, vFrame, "Dendrogram");
 	}
+	
 	/**
-	 *  Constructor for the DendroView object which binds to an explicit confignode
+	 *  Constructor for the DendroView object which binds to an 
+	 *  explicit confignode.
 	 *
 	 * @param  dataModel   model this DendroView is to represent
 	 * @param  root   Confignode to which to bind this DendroView
 	 * @param  vFrame  parent ViewFrame of DendroView
 	 * @param  name name of this view.
 	 */
-	public DendroView(DataModel dataModel, ConfigNode root, ViewFrame vFrame, String name) {
+	public DendroView(DataModel dataModel, ConfigNode root, ViewFrame vFrame, 
+			String name) {
+		
 		super.setName(name);
 		viewFrame = vFrame;
+		
 		if (root == null) {
 			if (dataModel.getDocumentConfigRoot() != null ) {
-				  bindConfig(dataModel.getDocumentConfigRoot().fetchOrCreate("MainView"));
+				  bindConfig(dataModel.getDocumentConfigRoot()
+						  .fetchOrCreate("MainView"));
+				  
 				} else {
 				  bindConfig(new DummyConfigNode("MainView"));
 				}
 		} else {
 			bindConfig(root);
 		}
+		
 		if (dataModel.getArrayHeaderInfo().getIndex("GROUP") != -1) {
 			HeaderInfo headerInfo = dataModel.getArrayHeaderInfo();
 			int groupIndex = headerInfo.getIndex("GROUP");
 			arrayIndex = getGroupVector(headerInfo, groupIndex);
+			
 		} else {
 			arrayIndex = null;
 		}
+		
 		if (dataModel.getGeneHeaderInfo().getIndex("GROUP") != -1) {
 			System.err.println("got gene group header");
 			HeaderInfo headerInfo = dataModel.getGeneHeaderInfo();
 			int groupIndex = headerInfo.getIndex("GROUP");
 			geneIndex = getGroupVector(headerInfo, groupIndex);
+			
 		} else {
 			geneIndex = null;
 		}
+		
 		if ((arrayIndex != null) ||(geneIndex != null)){
-			dataModel = new ReorderedDataModel(dataModel, geneIndex, arrayIndex);
+			dataModel = new ReorderedDataModel(dataModel, 
+					geneIndex, arrayIndex);
 		}
+		
 		setDataModel(dataModel);
 		
 		setupViews();
 		
 		if (geneIndex != null) {
-			setGeneSelection(new ReorderedTreeSelection(viewFrame.getGeneSelection(), geneIndex));
+			setGeneSelection(new ReorderedTreeSelection(
+					viewFrame.getGeneSelection(), geneIndex));
+			
 		} else {
 			setGeneSelection(viewFrame.getGeneSelection());
 		}
 
 		if (arrayIndex != null){
-			setArraySelection(new ReorderedTreeSelection(viewFrame.getArraySelection(), arrayIndex));
+			setArraySelection(new ReorderedTreeSelection(
+					viewFrame.getArraySelection(), arrayIndex));
+			
 		} else {
 			setArraySelection(viewFrame.getArraySelection());
 		}
 	}
 
 	private int [] getGroupVector(HeaderInfo headerInfo, int groupIndex) {
+		
 		int ngroup = 0;
 		String cur = headerInfo.getHeader(0, groupIndex);
+		
 		for (int i = 0; i < headerInfo.getNumHeaders(); i++) {
 			String test = headerInfo.getHeader(i, groupIndex);
 			if (cur.equals(test) == false) {
@@ -142,6 +165,7 @@ public class DendroView extends JPanel implements ConfigNodePersistent, MainPane
 				ngroup++;
 			}
 		}
+		
 		int [] groupVector = new int[ngroup + headerInfo.getNumHeaders()];
 		ngroup = 0;
 		cur = headerInfo.getHeader(0, groupIndex);
@@ -972,7 +996,6 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 		gtrPanel.add(gtrview, BorderLayout.CENTER);
 		gtrPanel.add(new JScrollBar(Adjustable.HORIZONTAL, 0,1,0,1), BorderLayout.SOUTH);
 		left.addComponent(gtrPanel, rectangle);
-		gtrview.setHintPanel(hintpanel);
 		gtrview.setStatusPanel(statuspanel);
 		gtrview.setViewFrame(viewFrame);
 
@@ -1040,12 +1063,13 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 
 
 	/**
-	 *  registers a modelview with the hint and status panels, and the viewFrame.
+	 *  registers a modelview with the hint and status panels, 
+	 *  and the viewFrame.
 	 *
 	 * @param  modelView  The ModelView to be added
 	 */
 	private void registerView(ModelView modelView) {
-		modelView.setHintPanel(hintpanel);
+		
 		modelView.setStatusPanel(statuspanel);
 		modelView.setViewFrame(viewFrame);
 	}
@@ -1063,15 +1087,20 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 
 			  
 			  MapContainer initXmap, initYmap;
-			  if ((getArraySelection().getNSelectedIndexes() != 0) || (getGeneSelection().getNSelectedIndexes() != 0)){
+			  if ((getArraySelection().getNSelectedIndexes() != 0) 
+					  || (getGeneSelection().getNSelectedIndexes() != 0)){
 				  initXmap = getZoomXmap();
 				  initYmap = getZoomYmap();
 			  } else {
 				  initXmap = getGlobalXmap();
 				  initYmap = getGlobalYmap();
 			  }
-			PostscriptExportPanel psePanel = setupPostscriptExport(initXmap, initYmap);
-			final JDialog popup = new CancelableSettingsDialog(viewFrame, "Export to Postscript", psePanel);
+			  
+			PostscriptExportPanel psePanel = setupPostscriptExport(initXmap, 
+					initYmap);
+			
+			final JDialog popup = new CancelableSettingsDialog(viewFrame, 
+					"Export to Postscript", psePanel);
 			popup.pack();
 			popup.setVisible(true);
 		  }
@@ -1085,7 +1114,8 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 		public void actionPerformed(ActionEvent actionEvent) {
 
 			  MapContainer initXmap, initYmap;
-			  if ((getArraySelection().getNSelectedIndexes() != 0) || (getGeneSelection().getNSelectedIndexes() != 0)){
+			  if ((getArraySelection().getNSelectedIndexes() != 0) 
+					  || (getGeneSelection().getNSelectedIndexes() != 0)){
 				  initXmap = getZoomXmap();
 				  initYmap = getZoomYmap();
 			  } else {
@@ -1093,9 +1123,12 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 				  initYmap = getGlobalYmap();
 			  }
 
-			  BitmapExportPanel bitmapPanel = setupBitmapExport(initXmap, initYmap);
+			  BitmapExportPanel bitmapPanel = setupBitmapExport(initXmap, 
+					  initYmap);
 
-			final JDialog popup = new CancelableSettingsDialog(viewFrame, "Export to Image", bitmapPanel);
+			final JDialog popup = new CancelableSettingsDialog(viewFrame, 
+					"Export to Image", bitmapPanel);
+			
 			popup.pack();
 			popup.setVisible(true);
 		  }

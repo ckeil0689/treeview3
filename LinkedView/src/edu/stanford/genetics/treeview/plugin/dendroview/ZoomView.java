@@ -23,14 +23,19 @@
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.util.Observable;
 
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JViewport;
+
 import net.miginfocom.swing.MigLayout;
 
 import edu.stanford.genetics.treeview.*;
+
 /**
  * Implements zoomed in view of the data array
  * 
@@ -61,25 +66,13 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
     public ZoomView(){
     	
 		super();
-		
 		this.setLayout(new MigLayout());
 		panel = this;
-		
+        
 		setToolTipText("This Turns Tooltips On");
 		addMouseListener(this);
 		addMouseMotionListener(this);
-    
     }
-
-	private static final String [] hints = {
-		"Mouse over to get info",
-	};
-	
-	@Override
-	public String[]  getHints() {
-		
-		return hints;
-	}
 	
 	/**
 	* showVal indicates whether the zoom should draw the value of each cell on 
@@ -316,7 +309,8 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
 				g.setColor(Color.black);
 				
 				
-				destRect.setBounds(0,0,xmap.getUsedPixels(), ymap.getUsedPixels());
+				destRect.setBounds(0,0,xmap.getUsedPixels(), 
+						ymap.getUsedPixels());
 				
 				sourceRect.setBounds(xmap.getIndex(0), ymap.getIndex(0),
 				xmap.getIndex(destRect.width) - xmap.getIndex(0), 
@@ -333,9 +327,12 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
 				if (getShowVal()) {
 					// need to draw values on screen!
 					try {
-						((CharArrayDrawer)drawer).paintChars(g, xmap, ymap, destRect);
+						((CharArrayDrawer)drawer).paintChars(g, xmap, ymap, 
+								destRect);
+						
 					} catch (Exception e) {
-						JOptionPane.showMessageDialog(this, "ZoomView had trouble compositing:" + e);
+						JOptionPane.showMessageDialog(this, 
+								"ZoomView had trouble compositing:" + e);
 						setShowVal(false);
 					}
 				}
@@ -343,12 +340,14 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
     
 	@Override
 	public void updatePixels() {	
+		
 		if (offscreenChanged) {
 			xmap.setAvailablePixels(offscreenSize.width);
 			ymap.setAvailablePixels(offscreenSize.height);
 			xmap.notifyObservers();
 			ymap.notifyObservers();
 		}
+		
 		if (offscreenValid == false) {
 			
 			destRect.setBounds(0,0,xmap.getUsedPixels(), ymap.getUsedPixels());
@@ -357,8 +356,9 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
 			xmap.getIndex(destRect.width) - xmap.getIndex(0), 
 			ymap.getIndex(destRect.height) - ymap.getIndex(0));
 			
-			if ((sourceRect.x >= 0) && (sourceRect.y >= 0))  {
-				drawer.paint(offscreenPixels, sourceRect, destRect, offscreenScanSize);
+			if ((sourceRect.x >= 0) && (sourceRect.y >= 0)) {
+				drawer.paint(offscreenPixels, sourceRect, destRect, 
+						offscreenScanSize);
 			}
 			offscreenSource.newPixels();
 		}
@@ -369,11 +369,14 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
      */
 	 @Override
 	public void update(Observable o, Object arg) {	
+		 
 		 if (o == drawer) {
 			 //	    System.out.println("got drawer update");
 			 offscreenValid = false;
+			 
 		 } else if ((o == xmap) || ( o == ymap)) {
-			 offscreenValid = false;	    
+			 offscreenValid = false;	
+			 
 		 } else if ((o == geneSelection) || (o == arraySelection)) {
 			 /*
 			 if (cdtSelection.getNSelectedArrays() == 0) {
@@ -383,11 +386,16 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
 				}
 			} else {
 				*/
-				// Hmm... it almost seems like you could get rid of the zoom map as a mechanism of communication... but not quite, because the globalview, textview and atrzview depend on it to know what is visible in the zoom window.
+				// Hmm... it almost seems like you could get rid of the 
+			 	//zoom map as a mechanism of communication... but not quite, 
+			 	//because the globalview, textview and atrzview depend on it 
+			 	//to know what is visible in the zoom window.
 				MapContainer zoomXmap = getZoomXmap();
 				MapContainer zoomYmap = getZoomYmap();
-				zoomYmap.setIndexRange(geneSelection.getMinIndex(),  geneSelection.getMaxIndex());
-				zoomXmap.setIndexRange(arraySelection.getMinIndex(), arraySelection.getMaxIndex());
+				zoomYmap.setIndexRange(geneSelection.getMinIndex(),  
+						geneSelection.getMaxIndex());
+				zoomXmap.setIndexRange(arraySelection.getMinIndex(), 
+						arraySelection.getMaxIndex());
 				
 				zoomXmap.notifyObservers();
 				zoomYmap.notifyObservers();

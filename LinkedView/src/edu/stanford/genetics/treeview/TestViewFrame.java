@@ -82,7 +82,7 @@ public class TestViewFrame extends ViewFrame {
 	}
 
 	@Override
-	public void setDataModel(DataModel model) {
+	public void setDataModel(DataModel model, boolean cluster) {
 	}
 
 	@Override

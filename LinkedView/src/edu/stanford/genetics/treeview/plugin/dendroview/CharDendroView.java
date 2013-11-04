@@ -149,8 +149,6 @@ public class CharDendroView extends DendroView2 {
 			}
 		});
 		menu.add(bitmapItem);
-		
-		
 	}
 
 	/**
@@ -164,7 +162,6 @@ public class CharDendroView extends DendroView2 {
 
 		CharColorExtractor colorExtractor = new CharColorExtractor();
 		
-		hintpanel = new MessagePanel("Usage Hints", BLUE2);
 		statuspanel = new MessagePanel("Status", BLUE2);
 
 		CharArrayDrawer cArrayDrawer = new CharArrayDrawer();
@@ -184,12 +181,8 @@ public class CharDendroView extends DendroView2 {
 		
 		
 		// scrollbars, mostly used by maps
-		globalXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0,1,0,1);
-		globalYscrollbar = new JScrollBar(Adjustable.VERTICAL,0,1,0,1);
 		zoomXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0,1,0,1);
 		zoomYscrollbar = new JScrollBar(Adjustable.VERTICAL,0,1,0,1);
-
-
 
 		zoomXmap = new MapContainer();
 		zoomXmap.setDefaultScale(12.0);
@@ -203,10 +196,8 @@ public class CharDendroView extends DendroView2 {
 		//the scrollbars "scroll" by communicating with the maps.
 		globalXmap = new MapContainer();
 		globalXmap.setDefaultScale(2.0);
-		globalXmap.setScrollbar(globalXscrollbar);
 		globalYmap = new MapContainer();
 		globalYmap.setDefaultScale(2.0);
-		globalYmap.setScrollbar(globalYscrollbar);
 
 		globalview.setXMap(globalXmap);
 		globalview.setYMap(globalYmap);
@@ -278,58 +269,70 @@ public class CharDendroView extends DendroView2 {
 		globalYmap.notifyObservers();
 		getZoomXmap().notifyObservers();
 		getZoomYmap().notifyObservers();
-	}
-	
+	}	
 }
 
 class CharHeaderInfo implements HeaderInfo {
+	
 	String [] holder = new String [1];
 	String [] names = new String [1];
 	int numChars;
+	
 	CharHeaderInfo(int n) {
+		
 		numChars = n;
 	}
 
 	@Override
 	public String[] getHeader(int i) {
+		
 		holder[0] = "" + i;
 		return holder;
 	}
 
 	@Override
 	public String getHeader(int i, String name) {
+		
 		return "" + i;
 	}
+	
 	@Override
 	public String getHeader(int rowIndex, int columnIndex) {
+		
 		return "" + rowIndex;
 	}
-
+	
 	@Override
 	public String[] getNames() {
+		
 		names[0] = "Column";
 		return names;
 	}
 
 	@Override
 	public int getNumNames() {
+		
 		return 1;
 	}
 
 	@Override
 	public int getNumHeaders() {
+		
 		return numChars;
 	}
 
 	@Override
 	public int getIndex(String name) {
+		
 		return 0;
 	}
 
 	@Override
 	public int getHeaderIndex(String id) {
+		
 		return 0;
 	}
+	
 	/**
 	 * noop, since this object is static.
 	 */
@@ -344,6 +347,12 @@ class CharHeaderInfo implements HeaderInfo {
 	@Override
 	public boolean getModified() {return false;}
 	@Override
-	public void setModified(boolean mod) {}		
+	public void setModified(boolean mod) {}
+
+	@Override
+	public String[][] getHeaderArray() {
+		// TODO Auto-generated method stub
+		return null;
+	}		
 }
 

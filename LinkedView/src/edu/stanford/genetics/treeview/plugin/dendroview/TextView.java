@@ -515,14 +515,6 @@ public class TextView extends ModelView implements FontSelectable,
         
         getHeaderSummary().bindConfig(root.fetchOrCreate("GeneSummary"));
     }
-    
-	@Override
-	public String[]  getHints() {
-	
-    	String [] hints = {"Click and drag to scroll",};
-	
-    	return hints;
-    }
 
 	/** Setter for headerSummary */
 	public void setHeaderSummary(HeaderSummary headerSummary) {

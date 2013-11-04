@@ -14,8 +14,6 @@ import javax.swing.JPanel;
 
 import edu.stanford.genetics.treeview.model.TVModel;
 
-import Cluster.ClusterModel;
-
 import net.miginfocom.swing.MigLayout;
 
 /**
@@ -38,6 +36,7 @@ public class ClickableImage extends JPanel {
 	private ClassLoader classLoader;
 	private InputStream input;
 	private TreeViewFrame frame;
+	private String labelText;
 	
 	private Color BLUE1 = new Color(60, 180, 220, 255);
 	
@@ -45,7 +44,6 @@ public class ClickableImage extends JPanel {
 	 * Static variables
 	 */
 	private static TVModel tvModel = null;
-	private static ClusterModel clusterModel = null;
 	
 	/**
 	 * Chained constructor for the loading icons
@@ -56,33 +54,7 @@ public class ClickableImage extends JPanel {
 	public ClickableImage(TreeViewFrame frame, String labelText, 
 			String fileName) {
 		
-		this(frame, labelText, fileName, tvModel, clusterModel);
-	}
-	
-	/**
-	 * Chained constructor for the DendroView
-	 * @param frame
-	 * @param labelText
-	 * @param fileName
-	 * @param tvModel_gen
-	 */
-	public ClickableImage(TreeViewFrame frame, String labelText, 
-			String fileName, TVModel tvModel_gen) {
-		
-		this(frame, labelText, fileName, tvModel_gen, clusterModel);
-	}
-	
-	/**
-	 * Chained constructor for the ClusterView
-	 * @param frame
-	 * @param labelText
-	 * @param fileName
-	 * @param clusterModel_gen
-	 */
-	public ClickableImage(TreeViewFrame frame, String labelText, 
-			String fileName, ClusterModel clusterModel_gen) {
-		
-		this(frame, labelText, fileName, tvModel, clusterModel_gen);
+		this(frame, labelText, fileName, tvModel);
 	}
 	
 	/**
@@ -94,13 +66,14 @@ public class ClickableImage extends JPanel {
 	 * @param clusterModel_gen
 	 */
 	public ClickableImage(TreeViewFrame frame, String labelText, 
-			String fileName, TVModel tvModel_gen, 
-			ClusterModel clusterModel_gen) {
+			String fileName, TVModel tvModel_gen) {
 		
 		this.frame = frame;
 		
 		this.setLayout(new MigLayout());
 		this.setOpaque(false);
+		
+		this.labelText = labelText;
 		
 		label = new JLabel(labelText);
 		label.setFont(new Font("Sans Serif", Font.PLAIN, 50));
@@ -121,7 +94,7 @@ public class ClickableImage extends JPanel {
 			
 		}
 		
-		this.addMListener(label, clusterModel_gen, tvModel_gen);
+		this.addMListener(label, tvModel_gen);
 	}
 	
 	/**
@@ -134,26 +107,26 @@ public class ClickableImage extends JPanel {
 	 * @param cModel
 	 * @param tModel
 	 */
-	public void addMListener(final JLabel label, final ClusterModel cModel, 
-			final TVModel tModel){
+	public void addMListener(final JLabel label, final TVModel tModel){
 		
 		this.addMouseListener(new SSMouseListener(this, label){
 
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				
-				if(tModel == null && cModel == null) {
+				if(tModel == null) {
 					
 					frame.openFile();
 					
-				} else if(cModel == null && tModel != null){
+				} else if(tModel != null && labelText.equalsIgnoreCase(
+						"Visualize >")){
 					
-					frame.setDataModel(tModel);
+					frame.setDataModel(tModel, false);
 					frame.setLoaded(true);
 					
 				} else{
 					
-					frame.setClusterDataModel(cModel);
+					frame.setDataModel(tModel, true);
 					frame.setLoaded(true);
 				}
 			}

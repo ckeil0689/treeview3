@@ -5,6 +5,9 @@ import java.util.List;
 
 import javax.swing.JProgressBar;
 
+import edu.stanford.genetics.treeview.DataModel;
+import edu.stanford.genetics.treeview.model.TVModel;
+
 /**
  * This class is used to make an object which can take in the loaded data 
  * in its format as originally coded in Java TreeView's first version and 
@@ -14,7 +17,7 @@ import javax.swing.JProgressBar;
 public class DataFormatter {
 	
 	//Instance variables
-	private ClusterModel model;
+	private TVModel model;
 	private List<Double> list;
 	private JProgressBar pBar;
 	
@@ -22,10 +25,10 @@ public class DataFormatter {
 	private List<List<Double>> colList = new ArrayList<List<Double>>();
 	
 	//Constructor (building the object)
-	public DataFormatter(ClusterModel model, List<Double> list, 
+	public DataFormatter(DataModel model, List<Double> list, 
 			JProgressBar pBar) {
 		
-		this.model = model;
+		this.model = (TVModel)model;
 		this.list = list;
 		this.pBar = pBar;
 	}

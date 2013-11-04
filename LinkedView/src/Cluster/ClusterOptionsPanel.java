@@ -22,6 +22,7 @@ import javax.swing.border.EtchedBorder;
 import net.miginfocom.swing.MigLayout;
 import Cluster.ClusterView.HeaderPanel;
 import Cluster.ClusterView.InitialPanel;
+import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.TreeViewFrame;
@@ -73,7 +74,7 @@ class ClusterOptionsPanel extends JPanel {
 	
 	private String path;
 	private File file;
-	private ClusterModel outer;
+	private DataModel outer;
 	
 	private String linkageMethod = null;
 	private int row_clusterN = 0;
@@ -100,7 +101,7 @@ class ClusterOptionsPanel extends JPanel {
 		this.mainPanel = cView.getMainPanel();
 		this.optionsPanel = cView.getOptionsPanel();
 		this.buttonPanel = cView.getButtonPanel();
-		this.outer = cView.getClusterModel();
+		this.outer = cView.getDataModel();
 		this.geneCombo = cView.getGeneCombo();
 		this.arrayCombo = cView.getArrayCombo();
 		this.initialPanel = cView.getInitialPanel();

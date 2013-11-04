@@ -55,12 +55,14 @@ import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.ExportException;
 import edu.stanford.genetics.treeview.MainPanel;
 import edu.stanford.genetics.treeview.MainProgramArgs;
+import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.TreeviewMenuBarI;
 
 
 import edu.stanford.genetics.treeview.HeaderInfo;
 
 import edu.stanford.genetics.treeview.TreeViewFrame;
+import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 //Explicitly imported because error (unclear TVModel reference) was thrown
 
 /**
@@ -83,8 +85,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	protected ConfigNode root;
 	
 	private TreeViewFrame viewFrame;
-	private ClusterModel outer;
-	private ClusterModel.ClusterDataMatrix matrix;
+	private TVDataMatrix matrix;
 	private double[] dataArray;
 	
 	//Various GUI elements
@@ -158,8 +159,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		this.viewFrame = vFrame;
 		
 		//Reference to loaded data
-		outer = (ClusterModel) dataModel;
-		matrix = outer.getDataMatrix();
+		matrix = (TVDataMatrix)dataModel.getDataMatrix();
 		dataArray = matrix.getExprData();
 		
 		//Setting the UIManager up for Win vs. Mac
@@ -344,7 +344,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	    	sumM.setForeground(RED1);
 	    	 
 	    	//Data Preview
-	    	DataViewPanel dataView = new DataViewPanel(outer);
+	    	DataViewPanel dataView = new DataViewPanel(dataModel);
 	    	
 	    	//Hierarchical Cluster Button
 	    	hcluster_button = new JButton("Hierarchical Cluster >");
@@ -645,11 +645,11 @@ public class ClusterView extends JPanel implements MainPanel {
 	}
 	
 	/** 
-	 * Getter for ClusterModel
+	 * Getter for DataModel
 	 */
-	protected ClusterModel getClusterModel() {
+	protected DataModel getDataModel() {
 		
-		return this.outer;
+		return this.dataModel;
 	}
 	
 	/**
@@ -681,7 +681,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	/** Setter for dataModel 
 	 * 
 	 * */
-	protected void setDataModel(DataModel dataModel) {
+	protected void setDataModel(TVModel dataModel) {
 		
 		this.dataModel = dataModel;
 	}

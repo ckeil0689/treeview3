@@ -39,76 +39,38 @@ import edu.stanford.genetics.treeview.*;
  * @author     Alok Saldanha <alok@genome.stanford.edu>
  * @version    @version $Revision: 1.4 $ $Date: 2010-05-02 13:39:00 $
  */
-public class ArrayNameView extends ModelView implements MouseListener, FontSelectable, ConfigNodePersistent {
+public class ArrayNameView extends ModelView implements MouseListener, 
+FontSelectable, ConfigNodePersistent {
 
 	private static final long serialVersionUID = 1L;
-	
-	private final String d_face        = "Courier";
-	private final int d_style          = 0;
-	private final int d_size           = 12;
 
-	/**  HeaderInfo containing the names of the arrays. */
+	/**  
+	 * HeaderInfo containing the names of the arrays. 
+	 */
 	protected HeaderInfo headerInfo = null;
 	protected DataModel dataModel = null;
-	
-	public HeaderInfo getHeaderInfo() {
-		return headerInfo;
-	}
-	
-	public DataModel getDataModel()
-	{
-		return dataModel;
-	}
-	
-	public void setHeaderInfo(HeaderInfo headerInfo) {
-		this.headerInfo = headerInfo;
-	}
-	
-	public void setDataModel(DataModel dataModel) {
-			
-			if(dataModel != null)
-			{
-				((Observable)dataModel).deleteObserver(this);
-			}
-			this.dataModel = dataModel;
-			((Observable)dataModel).addObserver(this);
-	}
-	
-	private ConfigNode root            = null;
 
 	private String face;
 	private int style;
 	private int size;
-
-	private UrlExtractor urlExtractor  = null;
-	private MapContainer map;
-	private int maxlength              = 0;
-	private boolean backBufferValid    = false;
+	
 	private Image backBuffer;
-
 	private JScrollPane scrollPane;
-
-	/* inherit description */
-	@Override
-	public String viewName() {
-		
-		return "ArrayNameView";
-	}
-
-
-	/* inherit description */
-	@Override
-	public String[] getHints() {
-		String[] hints  = {
-				" - Click and drag to scroll",
-				};
-		return hints;
-	}
-
-
+	private MapContainer map;
+	
+	private int maxlength = 0;
+	private boolean backBufferValid = false;
+	private ConfigNode root = null;
+	private UrlExtractor urlExtractor = null;
+	
+	private final String d_face = "Courier";
+	private final int d_style = 0;
+	private final int d_size = 12;
+	
+	
 	/**
-	 *  Constructs an <code>ArrayNameView</code> with the given <code>HeaderInfo</code> 
-	 * as a source of array names.
+	 *  Constructs an <code>ArrayNameView</code> with the given 
+	 *  <code>HeaderInfo</code> as a source of array names.
 	 *
 	 * @param  hInfo  Header containing array names as first row.
 	 */
@@ -123,32 +85,68 @@ public class ArrayNameView extends ModelView implements MouseListener, FontSelec
 		panel = scrollPane;
 		addMouseListener(this);
 	}
+	
+	
+	public HeaderInfo getHeaderInfo() {
+		
+		return headerInfo;
+	}
+	
+	public DataModel getDataModel() {
+		
+		return dataModel;
+	}
+	
+	public void setHeaderInfo(HeaderInfo headerInfo) {
+		
+		this.headerInfo = headerInfo;
+	}
+	
+	public void setDataModel(DataModel dataModel) {
+			
+			if(dataModel != null) {
+				((Observable)dataModel).deleteObserver(this);
+			}
+			
+			this.dataModel = dataModel;
+			((Observable)dataModel).addObserver(this);
+	}
+
+	/* inherit description */
+	@Override
+	public String viewName() {
+		
+		return "ArrayNameView";
+	}
 
 	// Canvas methods
-	/**  updates a horizontally oriented test buffer, which will later be rotated to make
-	* vertical text.
-	* This is only used in the abscence of Graphics2D
-	*/
+	/**  
+	 * updates a horizontally oriented test buffer, which will later 
+	 * be rotated to make vertical text.
+	 * This is only used in the absence of Graphics2D.
+	 */
 	public void updateBackBuffer() {
-		Graphics g           = backBuffer.getGraphics();
-		int start            = map.getIndex(0);
-		int end              = map.getIndex(map.getUsedPixels()) - 1;
+		
+		Graphics g = backBuffer.getGraphics();
+		int start = map.getIndex(0);
+		int end = map.getIndex(map.getUsedPixels()) - 1;
+		int colorIndex = headerInfo.getIndex("FGCOLOR");
+		int bgColorIndex = headerInfo.getIndex("BGCOLOR");
+		int gidRow = headerInfo.getIndex("GID");
 
 		g.setColor(Color.white);
 		g.fillRect(0, 0, maxlength, offscreenSize.width);
 		g.setColor(Color.black);
 
-		int gidRow           = headerInfo.getIndex("GID");
 		if (gidRow == -1) {
 			gidRow = 0;
 		}
-		int colorIndex       = headerInfo.getIndex("FGCOLOR");
 
 		g.setFont(new Font(face, style, size));
 		FontMetrics metrics  = getFontMetrics(g.getFont());
-		int ascent           = metrics.getAscent();
+		int ascent = metrics.getAscent();
+		
 	    // draw backgrounds first...
-	    int bgColorIndex = headerInfo.getIndex("BGCOLOR");
 	    if (bgColorIndex > 0) {
 		    Color back = g.getColor();
 		    for (int j = start; j < end;j++) {
@@ -157,7 +155,8 @@ public class ArrayNameView extends ModelView implements MouseListener, FontSelec
 				    g.setColor(TreeColorer.getColor(strings[bgColorIndex]));
 				    } catch (Exception e) {
 				    }
-				    g.fillRect(0, map.getMiddlePixel(j) - ascent / 2, maxlength, ascent);
+				    g.fillRect(0, map.getMiddlePixel(j) - ascent / 2, 
+				    		maxlength, ascent);
 		    }
 		    g.setColor(back);
 	    }
@@ -172,7 +171,8 @@ public class ArrayNameView extends ModelView implements MouseListener, FontSelec
 				if (out == null) {
 					continue;
 				}
-				if ((arraySelection == null) || arraySelection.isIndexSelected(j)) {
+				if ((arraySelection == null) 
+						|| arraySelection.isIndexSelected(j)) {
 
 					if (colorIndex > 0) {
 						g.setColor(TreeColorer.getColor(headers[colorIndex]));

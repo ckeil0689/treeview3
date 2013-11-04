@@ -32,7 +32,6 @@ import java.util.*;
 import javax.swing.*;
 
 import Cluster.ClusterFileFilter;
-import Cluster.ClusterFileSet;
 import Cluster.ClusterFrame;
 import edu.stanford.genetics.treeview.core.FileMru;
 import edu.stanford.genetics.treeview.core.HeaderFinder;
@@ -354,7 +353,7 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 * @return    Sets the shared <code>DataModel</code>
 	 * @throws LoadException
 	 */
-	public abstract void setDataModel(DataModel model);
+	public abstract void setDataModel(DataModel model, boolean cluster);
 
 	/**
 	 *  Should scroll all MainPanels in this view frame to the specified gene.
@@ -622,21 +621,6 @@ public abstract class ViewFrame extends JFrame implements Observer {
 		 return fileSet1;
 	}
 	
-	/**
-	* Open a dialog which allows the user to select a new data file
-	*
-	* @return The fileset corresponding to the dataset.
-	*/
-	protected ClusterFileSet getClusterFileSet(File file){
-		
-		ClusterFileSet fileSet1;
-	
-		fileSet1 = new ClusterFileSet(file.getName(), file.getParent()+
-				File.separator);
-
-		 return fileSet1;
-	}
-	
 //	/**
 //	 * Setting up a file dialog without file filters
 //	 * @param fileDialog
@@ -857,7 +841,7 @@ public abstract class ViewFrame extends JFrame implements Observer {
 		  	if (source != null) dataModel.setSource(source);
 		  	if (name != null) dataModel.setName(name);
 		  	ViewFrame window = getApp().openNew();
-		  	window.setDataModel(dataModel);
+		  	window.setDataModel(dataModel, false);
 		  	window.setLoaded(true);
 		  	window.setVisible(true);
 	 }	 

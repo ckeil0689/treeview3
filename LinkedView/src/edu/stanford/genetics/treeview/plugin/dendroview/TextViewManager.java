@@ -186,15 +186,6 @@ implements FontSelectable, PropertyChangeListener {
 	}
 	
 	@Override
-	public void setHintPanel(MessagePanel h) {
-		
-		super.setHintPanel(h);
-		for(int i = 0; i < textViews.size(); i++) {
-			((TextView)textViews.get(i)).setHintPanel(h);
-		}
-	}
-	
-	@Override
 	public void setStatusPanel(MessagePanel s) {
 		
 		super.setStatusPanel(s);

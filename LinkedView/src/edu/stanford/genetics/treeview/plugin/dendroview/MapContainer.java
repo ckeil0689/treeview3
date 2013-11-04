@@ -31,13 +31,14 @@ import javax.swing.JScrollBar;
 
 import edu.stanford.genetics.treeview.*;
 /**
-* MapContainers tell the views which pixel offset to draw each array or gene index at.
-* the scrollbars "scroll" by communicating with the maps.
+* MapContainers tell the views which pixel offset to draw each array or 
+* gene index at the scrollbars "scroll" by communicating with the maps.
 * 
 * This is distinct from which genes are selected (see the TreeSelection object)
 */
-public class MapContainer extends Observable implements Observer, AdjustmentListener,
-						 ConfigNodePersistent {
+public class MapContainer extends Observable implements Observer, 
+AdjustmentListener, ConfigNodePersistent {
+	
     private String default_map = "Fixed";
     private double default_scale = 10.0;
     private IntegerMap current = null;
@@ -51,58 +52,74 @@ public class MapContainer extends Observable implements Observer, AdjustmentList
     private ConfigNode root = null;
     
     public MapContainer() {
-	  fixedMap = new FixedMap();
-	  fillMap = new FillMap();
-	  nullMap = new NullMap();
-	  current = nullMap;
+	 
+    	fixedMap = new FixedMap();
+    	fillMap = new FillMap();
+    	nullMap = new NullMap();
+    	current = nullMap;
     }
+    
     public MapContainer(String type) {
-		this();
+		
+    	this();
 		setMap(type);
 	}
+    
 	private ConfigNode fetchOrCreateNode(String name) {
-	  ConfigNode ret = root.fetchFirst(name);
-	  if (ret == null)
-		ret = root.create(name);
-	  return ret;
+	 
+		ConfigNode ret = root.fetchFirst(name);
+		if (ret == null) {
+			ret = root.create(name);
+		}
+		
+		return ret;
 	}
+	
     // confignode persistent
     @Override
-	public void bindConfig(ConfigNode configNode)
-    {
+	public void bindConfig(ConfigNode configNode) {
+    	
         root = configNode;
-	  // first bind subordinate maps...
-	  fixedMap.bindConfig(fetchOrCreateNode("FixedMap"));
-	  fillMap.bindConfig(fetchOrCreateNode("FillMap"));
-	  nullMap.bindConfig(fetchOrCreateNode("NullMap"));
+        
+        // first bind subordinate maps...
+        fixedMap.bindConfig(fetchOrCreateNode("FixedMap"));
+        fillMap.bindConfig(fetchOrCreateNode("FillMap"));
+        nullMap.bindConfig(fetchOrCreateNode("NullMap"));
 	  
-	  // then, fix self up...
+        // then, fix self up...
         setMap(root.getAttribute("current", default_map));
     }
 	
     public void setDefaultScale(double d) {
-        default_scale = d;
+        
+    	default_scale = d;
 		fixedMap.setDefaultScale(d);
     }
 
 	public void recalculateScale() {
-	  if (root.fetchFirst("FixedMap").hasAttribute("scale")) {
-		if (getScale() < getAvailablePixels())
-			return;
-	  }
-	  int range = getMaxIndex() - getMinIndex() + 1;
-	  double requiredScale = getAvailablePixels() /range;
-	  if (requiredScale > default_scale) {
-		setScale(requiredScale);
-	  }  else {
-		setScale(default_scale);
-	  }
+	  
+		if (root.fetchFirst("FixedMap").hasAttribute("scale")) {
+			if (getScale() < getAvailablePixels()) {
+				return;
+			}
+		}
+		
+		int range = getMaxIndex() - getMinIndex() + 1;
+		double requiredScale = getAvailablePixels() /range;
+		if (requiredScale > default_scale) {
+			setScale(requiredScale);
+			
+		} else {
+			setScale(default_scale);
+		}
 	}
 
     public void setScrollbar(JScrollBar scrollbar) {
+    	
         if (this.scrollbar != null) {
             this.scrollbar.removeAdjustmentListener(this);
 		}
+        
 		this.scrollbar = scrollbar;
 		if (this.scrollbar != null) {
 			this.scrollbar.addAdjustmentListener(this);
@@ -110,26 +127,31 @@ public class MapContainer extends Observable implements Observer, AdjustmentList
 		}
     }
 
-    public IntegerMap setMap(String string)
-    {
-	    if (current.type().equals(string))
-		  return current;
+    public IntegerMap setMap(String string) {
+	    
+    	if (current.type().equals(string)) {
+    		return current;
+    	}
 		 
 		IntegerMap newMap = null;
 		if (nullMap.type().equals(string)) {
 //		  System.out.println("type " + string + " is nullMap");
 		  newMap = nullMap;
 		}
+		
 		if (fillMap.type().equals(string)) {
 //		  System.out.println("type " + string + " is fillMap");
 		  newMap = fillMap;
 		}
+		
 		if (fixedMap.type().equals(string)) {
 //		  System.out.println("type " + string + " is fixedMap");
 		  newMap = fixedMap;
 		}
+		
 		if (newMap == null) {
-		  LogBuffer.println("Couldn't find map matching " + string + " in MapContainer.java");
+		  LogBuffer.println("Couldn't find map matching " + string 
+				  + " in MapContainer.java");
 		  LogBuffer.println("Choices include");
 		  LogBuffer.println(nullMap.type());
 		  LogBuffer.println(fixedMap.type());
@@ -141,29 +163,41 @@ public class MapContainer extends Observable implements Observer, AdjustmentList
         return current;
     }
 
-    /*                      Scrollbar Functions                   */
+    /*                      
+     * Scrollbar Functions                   
+     */
     public void scrollToIndex(int i) {
-        int j = scrollbar.getValue();
+       
+    	int j = scrollbar.getValue();
         scrollbar.setValue(i - scrollbar.getVisibleAmount() / 2);
-        if (j != scrollbar.getValue())
-            setChanged();
+        if (j != scrollbar.getValue()) {
+        	setChanged();
+        }
     }
 
     @Override
 	public void adjustmentValueChanged(AdjustmentEvent adjustmentEvent) {
-        setChanged();
+        
+    	setChanged();
         notifyObservers(scrollbar);
     }
 
     private void setupScrollbar() {
-	  if (scrollbar != null) {
-		  int value = scrollbar.getValue();
-		  int extent = current.getViewableIndexes();
-		  int max = current.getMaxIndex() - current.getMinIndex() + 1;
-		  if (value + extent > max) value = max - extent;
-		  if (value < 0) value = 0;
-		  scrollbar.setValues(value, extent, 0, max);
-		  scrollbar.setBlockIncrement(current.getViewableIndexes());
+	  
+    	if (scrollbar != null) {
+    		int value = scrollbar.getValue();
+    		int extent = current.getViewableIndexes();
+    		int max = current.getMaxIndex() - current.getMinIndex() + 1;
+    		if (value + extent > max) {
+    			value = max - extent;
+    		}
+    		
+    		if (value < 0) {
+    			value = 0;
+    		}
+    		
+    		scrollbar.setValues(value, extent, 0, max);
+    		scrollbar.setBlockIncrement(current.getViewableIndexes());
 	  }
 	 }
 
@@ -171,71 +205,103 @@ public class MapContainer extends Observable implements Observer, AdjustmentList
      * expect to get updates from selection only
      */
     @Override
-	public void update(Observable observable, Object object)
-    {
-        System.out.println(new StringBuffer("MapContainer Got an update from unknown ").append(observable).toString());
+	public void update(Observable observable, Object object) {
+       
+    	System.out.println(new StringBuffer("MapContainer Got an " +
+        		"update from unknown ").append(observable).toString());
         notifyObservers(object);
     }
 
-    public void underlyingChanged()
-    {
-	setupScrollbar();
+    public void underlyingChanged() {
+    	
+    	setupScrollbar();
         setChanged();
     }
 
-    public boolean contains(int i)
-    {
-	return current.contains(i);
+    public boolean contains(int i) {
+	
+    	return current.contains(i);
     }
 
-    /*                      Mapping Functions                      */    
-    
+    /*                      
+     * Mapping Functions                      
+     */    
+  
     // forward all map operations...
     public double getScale() {
-	return current.getScale();
-    }    
+	
+    	return current.getScale();
+    } 
+    
 	public int getPixel(double d) {
-	  int offset = 0;
-	  if (scrollbar != null) offset = scrollbar.getValue();
-	  return current.getPixel(d - offset);
+	  
+		int offset = 0;
+	 	if (scrollbar != null) {
+	 		offset = scrollbar.getValue();
+	 	}
+	  
+	 	return current.getPixel(d - offset);
 	}
+	
     public int getPixel(int i) {
-	  int offset = 0;
-	  if (scrollbar != null) offset = scrollbar.getValue();
-	  return current.getPixel(i - offset);
+	  
+    	int offset = 0;
+    	if (scrollbar != null) {
+    		offset = scrollbar.getValue();
+    	}
+    	
+    	return current.getPixel(i - offset);
     }
+    
     public int getIndex(int pix) {
-	  int index =0;
-	  if (current != null)
-		index = current.getIndex(pix);
-	  if (scrollbar != null)
-		index += scrollbar.getValue();
+	  
+    	int index =0;
+    	if (current != null) {
+    		index = current.getIndex(pix);
+    	}
+    	
+    	if (scrollbar != null) {
+    		index += scrollbar.getValue();
+    	}
+    	
         return  index;
     }
+    
     public boolean isVisible(int i) {
-    		int min = getIndex(0);
-    		int max = getIndex(getAvailablePixels());
-    		if (i < min ) return false;
-    		if (i > max) return false;
-    		return true;
+    		
+    	int min = getIndex(0);
+    	int max = getIndex(getAvailablePixels());
+    	if (i < min ) {
+    		return false;
+    	}
+    	
+    	if (i > max) {
+    		return false;
+    	}
+    	
+    	return true;
     }
     // {return current.getPixel(intval);}
 
     public int getRequiredPixels() {
-        return current.getRequiredPixels();
+        
+    	return current.getRequiredPixels();
     }
 
-    public int getUsedPixels()
-    {
-        return current.getUsedPixels();
+    public int getUsedPixels() {
+        
+    	return current.getUsedPixels();
     }
 
     public void setAvailablePixels(int i) {
-        int j = current.getUsedPixels();
+        
+    	int j = current.getUsedPixels();
         current.setAvailablePixels(i);
         setupScrollbar();
-        if (j != current.getUsedPixels())
-            setChanged();
+        
+        if (j != current.getUsedPixels()) { 
+        	setChanged();
+        }
     }
 
     public void setIndexRange(int i, int j) {
@@ -244,6 +310,7 @@ public class MapContainer extends Observable implements Observer, AdjustmentList
             i = j;
             j = k;
         }
+        
         if (current.getMinIndex() != i || current.getMaxIndex() != j) {
             current.setIndexRange(i, j);
             setupScrollbar();
@@ -251,33 +318,38 @@ public class MapContainer extends Observable implements Observer, AdjustmentList
         }
     }
 
-    public void setScale(double d)
-    {
-    		if (fixedMap.getScale() != d) {
-			fixedMap.setScale(d);
+    public void setScale(double d) {
+    		
+    	if (fixedMap.getScale() != d) {
+    		fixedMap.setScale(d);
 			setupScrollbar();
 			setChanged();
 		}
     }
 
-
     public int getMiddlePixel(int i) {
-        return (getPixel(i) + getPixel(i + 1)) / 2;
+        
+    	return (getPixel(i) + getPixel(i + 1)) / 2;
     }
 
     public int getMaxIndex() {
-        return current.getMaxIndex();
+       
+    	return current.getMaxIndex();
     }
+    
     public int getMinIndex() {
-        return current.getMinIndex();
+        
+    	return current.getMinIndex();
     }
 
     public TreeDrawerNode getSelectedNode()  {
-        return selected;
+        
+    	return selected;
     }
 
     public void setSelectedNode(TreeDrawerNode treeDrawerNode) {
-        if (selected != treeDrawerNode) {
+        
+    	if (selected != treeDrawerNode) {
 	    /*
 	      System.out.println("setindexrange called, start = " + selected);
 	      Throwable t = new Throwable();
@@ -289,23 +361,27 @@ public class MapContainer extends Observable implements Observer, AdjustmentList
     }
 
     public IntegerMap getCurrent() {
-        return current;
+        
+    	return current;
     }
+    
     public int getAvailablePixels() {
-	return current.getAvailablePixels();
+	
+    	return current.getAvailablePixels();
     }
 
 	private void switchMap(IntegerMap integerMap) {
-	  if (current != integerMap) {
-		if (root != null) {
-		  root.setAttribute("current", integerMap.type(), default_map);
+	 
+		if (current != integerMap) {
+			if (root != null) {
+				root.setAttribute("current", integerMap.type(), default_map);
+			}
+			integerMap.setAvailablePixels(current.getAvailablePixels());
+			integerMap.setIndexRange(current.getMinIndex(), 
+					current.getMaxIndex());
+			current = integerMap;
+			setupScrollbar();
+			setChanged();
 		}
-		integerMap.setAvailablePixels(current.getAvailablePixels());
-		integerMap.setIndexRange(current.getMinIndex(), current.getMaxIndex());
-		current = integerMap;
-		setupScrollbar();
-		setChanged();
-	  }
 	}
-
 }

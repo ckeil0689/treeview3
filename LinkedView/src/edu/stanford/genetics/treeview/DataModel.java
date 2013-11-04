@@ -22,7 +22,7 @@
  */
 package edu.stanford.genetics.treeview;
 
-import Cluster.ClusterFileSet;
+import edu.stanford.genetics.treeview.model.IntHeaderInfo;
 
 /**
  *  This file defines the bare bones of what needs to be 
@@ -84,7 +84,6 @@ public interface DataModel {
 	 * @return    The actual <code>Fileset</code> which generated this <code>DataModel</code>
 	 */
 	public FileSet getFileSet();
-	public ClusterFileSet getClusterFileSet();
 	public void clearFileSetListeners();
 	public void addFileSetListener(FileSetListener listener);
 
@@ -96,13 +95,13 @@ public interface DataModel {
 	 * id column and the description column, respectively. 
 	 * See TVModel.TVModelHeaderInfo for details.
 	 */
-	public HeaderInfo getGeneHeaderInfo();
+	public IntHeaderInfo getGeneHeaderInfo();
 
 
 	/**
 	 *  Gets the HeaderInfo associated with arrays for this DataModel.
 	 */
-	public HeaderInfo getArrayHeaderInfo();
+	public IntHeaderInfo getArrayHeaderInfo();
 
 	/**
 	 *  Gets the HeaderInfo associated with gene tree for this DataModel.

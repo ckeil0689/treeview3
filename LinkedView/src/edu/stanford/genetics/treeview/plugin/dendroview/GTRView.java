@@ -37,12 +37,7 @@ import edu.stanford.genetics.treeview.*;
 public class GTRView extends ModelViewBuffered implements
     MouseListener, KeyListener {
 
-	private static final long serialVersionUID = 1L;
-	
-	private static final String [] hints = {
-		"Click to select node",
-		" - Use arrow keys to navigate tree",
-	};
+	private static final long serialVersionUID = 1L;;
 	
 	protected HeaderSummary headerSummary = new HeaderSummary();
 	
@@ -66,12 +61,6 @@ public class GTRView extends ModelViewBuffered implements
 	   
 		addMouseListener(this);
 		addKeyListener(this);
-	}
-
-	@Override
-	public String[]  getHints() {
-		
-		return hints;
 	}
 	
     /** 

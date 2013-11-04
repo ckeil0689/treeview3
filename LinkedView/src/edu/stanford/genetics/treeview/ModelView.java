@@ -40,7 +40,6 @@ MouseListener {
 	private static final long serialVersionUID = 1L;
 	
 	protected ViewFrame    viewFrame = null;
-	protected MessagePanel hint = null;
 	protected MessagePanel status = null;
 	protected boolean      hasMouse = false;
 	
@@ -53,8 +52,7 @@ MouseListener {
 	* holds actual thing to be displayed...
 	*/
 	protected JComponent panel;
-	
-	private String[] default_hint = null;
+
 	private String[] default_status = null;
 	
 	protected ModelView() {
@@ -82,23 +80,9 @@ MouseListener {
 		return viewFrame;
 	}
 	
-	public void setHintPanel(MessagePanel h) {
-		
-		hint = h;
-	}
-	
 	public void setStatusPanel(MessagePanel s) {
 		
 		status = s;
-	}
-	
-	public String[]  getHints() {
-		
-		if (default_hint == null) {
-			default_hint = new String [] {"No hints for " + viewName()};
-		}
-		
-		return default_hint;
 	}
 	
 	/**
@@ -221,10 +205,6 @@ MouseListener {
 		Window frame = enclosingWindow();
 		if (frame.isActive()) {
 			requestFocus();
-			
-			if (hint != null) {
-				hint.setMessages(getHints());
-			}
 			
 			try {
 				if (status != null) {

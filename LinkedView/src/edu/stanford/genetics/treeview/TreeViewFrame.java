@@ -53,9 +53,7 @@ import javax.swing.WindowConstants;
 
 import net.miginfocom.swing.MigLayout;
 
-import Cluster.ClusterFileSet;
 import Cluster.ClusterFrame;
-import Cluster.ClusterModel;
 import Cluster.ClusterFrameWindow;
 import Cluster.ClusterView;
 
@@ -105,10 +103,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	private ClusterFrame clusterDialog = null;
 	
 	private boolean loaded;
-	
-	private TVModel tvModel_gen;
-	private ClusterModel clusterModel_gen;
-	
 	
 	//Constructors
 	/**
@@ -249,30 +243,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		try {
 			tvModel.loadNew(fileSet);
-			setDataModel(tvModel);
-			
-		} catch (LoadException e) {
-			if (e.getType() != LoadException.INTPARSE) {
-				JOptionPane.showMessageDialog(this, e);
-				throw e;
-			}
-		}
-	}
-	
-	/**
-	 * r * This is the workhorse. It creates a new DataModel of the file, and
-	 * then sets the Datamodel. A side effect of setting the datamodel is to
-	 * update the running window.
-	 */
-	public void loadClusterFileSet(ClusterFileSet fileSet) 
-			throws LoadException {
-		
-		ClusterModel clusterModel = new ClusterModel();
-		clusterModel.setFrame(this);
-		
-		try {
-			clusterModel.loadNew(fileSet);    
-			setClusterDataModel(clusterModel);
+			setDataModel(tvModel, false);
 			
 		} catch (LoadException e) {
 			if (e.getType() != LoadException.INTPARSE) {
@@ -292,31 +263,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		try {
 			tvModel.loadNewNW(fileSet);
-			setDataModel(tvModel);
-		} catch (LoadException e) {
-			if (e.getType() != LoadException.INTPARSE) {
-				JOptionPane.showMessageDialog(this, e);
-				throw e;
-			}
-		}
-	}
-
-	/**
-	 * Creates a new TVModel and a new ClusterModel of the file. 
-	 */
-	public void loadGeneralFileSet(FileSet fileSet, ClusterFileSet fileSet2)
-			throws LoadException {
-		
-		tvModel_gen = new TVModel();
-		tvModel_gen.setFrame(this);
-		
-		clusterModel_gen = new ClusterModel();
-		clusterModel_gen.setFrame(this);
-		
-		try {
-			tvModel_gen.loadNew(fileSet);
-			clusterModel_gen.loadNew(fileSet2); 
-			
+			setDataModel(tvModel, false);
 		} catch (LoadException e) {
 			if (e.getType() != LoadException.INTPARSE) {
 				JOptionPane.showMessageDialog(this, e);
@@ -336,8 +283,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		try {
 			File file = selectFile();
 			FileSet fileSet = getFileSet(file); //Type: 0 (Auto)
-			ClusterFileSet fileSet2 = getClusterFileSet(file); //Type: 0 (Auto)
-			loadGeneralFileSet(fileSet, fileSet2);
+			loadFileSet(fileSet);
 			
 			fileSet = fileMru.addUnique(fileSet);
 			fileMru.setLast(fileSet);
@@ -363,6 +309,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 * setupRunning by setDataModel.
 	 */
 	protected void setupExtractors() {
+		
 		DataMatrix matrix = getDataModel().getDataMatrix();
 		int ngene = matrix.getNumRow();
 		int nexpr = matrix.getNumCol();
@@ -402,7 +349,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 */
 	protected void setupClusterRunning() {
 		
-		ClusterView cv = new ClusterView(getDataModel(), this);						
+		ClusterView cv = new ClusterView(getDataModel(), this);
 		running = cv;
 	}
 
@@ -460,6 +407,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 * It also calls methods to populate the subMenus.
 	 */
 	protected void setupMenuBar() {
+		
 		menubar = new TreeViewJMenuBar();
 		setJMenuBar(new JMenuBar());
 		
@@ -491,6 +439,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 * true some subMenus are populated or not.
 	 */
 	public void rebuildMainPanelMenu() {
+		
 		synchronized(menubar) {
 //			menubar.setMenu(TreeviewMenuBarI.documentMenu);
 //			menubar.removeMenuItems();
@@ -1456,7 +1405,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		labelPanel.setLayout(new MigLayout());
 		labelPanel.setOpaque(false);
 		
-		confirm = new JLabel("Loaded File: " + tvModel_gen.getName());
+		confirm = new JLabel("Loaded File: " + dataModel.getName());
 		confirm.setFont(new Font("Sans Serif", Font.BOLD, 25));
 		confirm.setForeground(GRAY1);
 		
@@ -1466,11 +1415,11 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		String picture = "clusterS.png";
 		ClickableImage clus_icon = new ClickableImage(this, "Cluster >", 
-				picture, clusterModel_gen);
+				picture, (TVModel)dataModel);
 		
 		String picture2 = "viz.png";
 		ClickableImage viz_icon = new ClickableImage(this, "Visualize >", 
-				picture2, tvModel_gen);
+				picture2, (TVModel)dataModel);
 		
 		loadNew = new JLabel("  Load New File");
 		loadNew.setFont(new Font("Sans Serif", Font.BOLD, 25));
@@ -1585,12 +1534,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		setLoadedTitle();
 	}
-
-	@Override
-	public void onFileSetMoved(ClusterFileSet fileset) {
-		
-		setLoadedTitle();
-	}
 	
 	//Setters
 	/**
@@ -1604,30 +1547,10 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	
 	/**
 	 * Setter for dataModel, also sets extractors, running.
-	 * 
-	 */
-	public void setClusterDataModel(DataModel newModel) {					
-		
-		if (dataModel != null) { 
-			dataModel.clearFileSetListeners();
-		}
-	
-		dataModel = newModel;
-		
-		if (dataModel != null) {
-			dataModel.addFileSetListener(this);
-		}
-		
-		setupExtractors();
-		setupClusterRunning();
-	}
-	
-	/**
-	 * Setter for dataModel, also sets extractors, running.
 	 * @param DataModel newModel
 	 */
 	@Override
-	public void setDataModel(DataModel newModel) {									
+	public void setDataModel(DataModel newModel, boolean cluster) {									
 		
 		if (dataModel != null) {
 			dataModel.clearFileSetListeners();
@@ -1640,7 +1563,13 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		}
 		
 		setupExtractors();
-		setupRunning();
+		
+		if(cluster) {
+			setupClusterRunning();
+			
+		} else {
+			setupRunning();
+		}
 	}
 	
 	/** 
