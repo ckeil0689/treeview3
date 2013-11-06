@@ -23,14 +23,10 @@
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.*;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.util.Observable;
-
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JViewport;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -363,6 +359,7 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
 			offscreenSource.newPixels();
 		}
 	}
+	
     /**
      * Watch for updates from ArrayDrawer and the two maps
      * The appropriate response for both is to trigger a redraw.
@@ -422,19 +419,39 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
 			status.setMessages(getStatus());
     }
     
-//    @Override
-//    public void mousePressed(MouseEvent e) {
-//        JViewport viewPort = scrollPane.getViewport();
-//        Point vpp = viewPort.getViewPosition();
-//        vpp.translate(10, 10);
-//        panel.scrollRectToVisible(new Rectangle(vpp, viewPort.getSize()));
-//    }
+    Point mousePt;
+    @Override
+    public void mousePressed(MouseEvent e) {
+    	
+    	mousePt = e.getPoint();
+    	this.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    }
+    
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+    	this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+    }
+    
+    @Override
+    public void mouseDragged(MouseEvent e){
+    	
+    	int dx = e.getX() - mousePt.x;
+    	int dy = e.getY() - mousePt.y;
+    	
+    	
+//    	this.revalidate();
+//    	this.repaint();
+//    	getZoomXmap().dragPanel(dx/(getZoomXmap().getScale()*10));
+//    	getZoomYmap().dragPanel(dy/(getZoomYmap().getScale()*10));
+    }
 
 	@Override
 	public String getToolTipText(MouseEvent e) {
-/* Do we want to do mouseovers if value already visible? 
-		if (getShowVal()) return null; // don't do tooltips and vals at same time.
-*/
+		/* Do we want to do mouseovers if value already visible? 
+		if (getShowVal()) return null; 
+		// don't do tooltips and vals at same time.
+		 */
 		String ret = "";
 		if (drawer != null) {
 			int geneRow = overy;

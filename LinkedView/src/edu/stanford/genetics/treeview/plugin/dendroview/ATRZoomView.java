@@ -121,6 +121,8 @@ public class ATRZoomView extends ModelView implements
 		}
 		
 		synchMap();
+		
+		revalidate();
 		repaint();
 	}
 
@@ -230,6 +232,7 @@ public class ATRZoomView extends ModelView implements
 	 */
 	public void adjustmentValueChanged(AdjustmentEvent evt) {
 		
+		revalidate();
 		repaint();
 	}
 

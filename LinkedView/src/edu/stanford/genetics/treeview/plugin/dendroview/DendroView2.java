@@ -119,6 +119,15 @@ MainPanel, Observer {
 	private TreeSelectionI arraySelection = null;
 	private ColorExtractor colorExtractor;
 	
+	private JButton scaleIncX;
+	private JButton scaleIncY;
+	private JButton scaleDecX;
+	private JButton scaleDecY;
+	private JButton scaleDefaultX;
+	private JButton scaleDefaultY;
+	
+	private double default_scale = 13.0;
+	
 	/**
 	 * Chained constructor
 	 * Calls setName of the JPanel class
@@ -773,6 +782,66 @@ MainPanel, Observer {
 		zoomview.setYMap(getZoomYmap());
 		zoomview.setXMap(getZoomXmap());
 		zoomview.setArrayDrawer(arrayDrawer);
+		
+		scaleIncX = setZoomButtonLayout("+", BLUE1);
+		scaleIncX.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				getZoomXmap().setScale(getZoomXmap().getScale() + 1);
+			}
+			
+		});
+		
+		scaleDecX = setZoomButtonLayout("-", BLUE1);
+		scaleDecX.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				getZoomXmap().setScale(getZoomXmap().getScale() - 1);
+			}
+			
+		});
+		
+		scaleDefaultX = setZoomButtonLayout("Reset", BLUE1);
+		scaleDefaultX.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				getZoomXmap().setScale(default_scale);
+			}
+			
+		});
+		
+		scaleIncY = setZoomButtonLayout("+", BLUE1);
+		scaleIncY.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				getZoomYmap().setScale(getZoomYmap().getScale() + 1);
+			}
+			
+		});
+		
+		scaleDecY = setZoomButtonLayout("-", BLUE1);
+		scaleDecY.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				getZoomYmap().setScale(getZoomYmap().getScale() - 1);
+			}
+			
+		});
+		
+		scaleDefaultY = setZoomButtonLayout("Reset", BLUE1);
+		scaleDefaultY.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				getZoomYmap().setScale(default_scale);
+			}
+			
+		});
 
 		arraynameview.setMapping(getZoomXmap());
 
@@ -1103,6 +1172,14 @@ MainPanel, Observer {
 		level1Pane.setBackground(BLUE2);
 		level1Pane.setBorder(null);
 		
+		JPanel scalePaneX = new JPanel();
+		scalePaneX.setLayout(new MigLayout());
+		scalePaneX.setOpaque(false);
+		
+		JPanel scalePaneY = new JPanel();
+		scalePaneY.setLayout(new MigLayout());
+		scalePaneY.setOpaque(false);
+		
 		//Register Views
 		registerView(globalview);
 		registerView(atrview);
@@ -1113,6 +1190,14 @@ MainPanel, Observer {
 		registerView(textview);
 		
 		//Adding Components
+		scalePaneX.add(scaleIncX);
+		scalePaneX.add(scaleDecX);
+		scalePaneX.add(scaleDefaultX);
+		
+		scalePaneY.add(scaleIncY, "alignx 50%, wrap");
+		scalePaneY.add(scaleDecY, "alignx 50%, wrap");
+		scalePaneY.add(scaleDefaultY, "alignx 50%");
+		
 		gtrPanel.add(gtrview, BorderLayout.CENTER);
 		gtrPanel.add(new JScrollBar(Adjustable.HORIZONTAL, 0, 1, 0, 1), 
 				BorderLayout.SOUTH);
@@ -1134,18 +1219,19 @@ MainPanel, Observer {
 		
 		right.add(level1Pane, "push, grow");
 		
-		upSide.add(atrzview, "push, grow, height 15%::, width :65%:65%");
+		upSide.add(atrzview, "push, grow, , height 15%::, width 65%");
 		
 		gtrPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
 				textpanel, gtrzview);
 		gtrPane.setDividerSize(5);
-		gtrPane.setDividerLocation(100);
+		gtrPane.setDividerLocation(200);
 		
 		downSide.add(arraynameview, "pushx, growx, height 15%::, " +
 				"width 65%");
-		downSide.add(saveButton, "pushx, alignx 50%, wrap");
+		downSide.add(scalePaneY, "wrap");
 		downSide.add(zoompanel, "push, grow, width 65%");
-		downSide.add(gtrPane, "push, grow, width 35%");
+		downSide.add(gtrPane, "push, grow, width 35%, wrap");
+		downSide.add(scalePaneX, "pushx, span");
 
 		add(backgroundPane, "push, grow");
 	}
@@ -2058,6 +2144,26 @@ MainPanel, Observer {
   		d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
   		button.setPreferredSize(d);
   		
+  		button.setFont(buttonFont);
+  		button.setOpaque(true);
+  		button.setBackground(color);
+  		button.setForeground(Color.white);
+  		
+  		return button;
+	}
+	
+	/**
+	 * Setting up a general layout for a button object
+	 * The method is used to make all buttons appear consistent in aesthetics
+	 * @param button
+	 * @return
+	 */
+	public JButton setZoomButtonLayout(String title, Color color){
+
+		Font buttonFont = new Font("Sans Serif", Font.BOLD, 16);
+		
+		JButton button = new JButton(title);
+  	
   		button.setFont(buttonFont);
   		button.setOpaque(true);
   		button.setBackground(color);

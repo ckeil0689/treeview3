@@ -355,9 +355,9 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
     	// composite the rectangles...
 		if (selectionRect != null) {	    
 		    if (zoomRect != null) {
-			g.setColor(Color.cyan);
-			g.drawRect(zoomRect.x, zoomRect.y, 
-				   zoomRect.width, zoomRect.height);
+				g.setColor(Color.cyan);
+				g.drawRect(zoomRect.x, zoomRect.y, 
+					   zoomRect.width, zoomRect.height);
 		    }
 		    
 		    g.setColor(Color.yellow);

@@ -220,7 +220,9 @@ abstract class TreeDrawer extends Observable implements Observer {
 	public static final int CORRELATION = 0;
 	/** type of header which can be used to set branch heights */
 	public static final int TIME = 1;
+	
 	public void setBranchHeights(HeaderInfo nodeInfo, HeaderInfo rowInfo) {
+		
 		if (rootNode == null) return;
 		int nameIndex = nodeInfo.getIndex("TIME");
 		int type = TIME;
@@ -242,7 +244,8 @@ abstract class TreeDrawer extends Observable implements Observer {
 			for (int i = 0; i < leafList.length; i++) {
 				double leaf = rootNode.getCorr();
 				try {
-					leaf = parseDouble(rowInfo.getHeader((int) leafList[i].getIndex(), "LEAF"));
+					leaf = parseDouble(rowInfo.getHeader(
+							(int) leafList[i].getIndex(), "LEAF"));
 				} catch (Exception e) {
 				}
 				leafList[i].setCorr(leaf);

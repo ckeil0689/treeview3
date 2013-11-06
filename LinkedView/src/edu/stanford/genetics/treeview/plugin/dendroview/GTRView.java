@@ -237,39 +237,51 @@ public class GTRView extends ModelViewBuffered implements
 	 */
 	 @Override
 	public void update(Observable o, Object arg) {
+		 
 		 if (o == map) {
 			 // System.out.println("Got an update from map");
 			 offscreenValid = false;
 			 repaint();
+			 
 		 }  else if (o == drawer) {
 			 //System.out.println("Got an update from drawer");
 			 offscreenValid = false;
 			 repaint();
+			 
 		 }  else if (o == geneSelection) {
 			 TreeDrawerNode cand = null;
 			 if (geneSelection.getNSelectedIndexes() > 0) {
-					// This clause selects the array node if only a single array is selected.
-				 if (geneSelection.getMinIndex() == geneSelection.getMaxIndex()) {
+				 
+				 // This clause selects the array node if only a 
+				 //single array is selected.
+				 if (geneSelection.getMinIndex() == 
+						 geneSelection.getMaxIndex()) {
 				 	cand = drawer.getLeaf(geneSelection.getMinIndex());
-				 	// this clause selects the root node if all genes are selected.
+				 	
+				 	// this clause selects the root node if 
+				 	//all genes are selected.
 				 } else if (
 						 (geneSelection.getMinIndex() == map.getMinIndex()) 
-						 &&
-						 (geneSelection.getMaxIndex() == map.getMaxIndex())) {
+						 && (geneSelection.getMaxIndex() 
+								 == map.getMaxIndex())) {
 					 cand = drawer.getRootNode();
 				 }
 			 }
-			 if ((cand != null) && (cand.getId() != geneSelection.getSelectedNode())) {
+			 if ((cand != null) && (cand.getId() 
+					 != geneSelection.getSelectedNode())) {
 				 String id = cand.getId();
 				 geneSelection.setSelectedNode(id);
 				 geneSelection.notifyObservers();
+				 
 			 } else{
-				 setSelectedNode(drawer.getNodeById(geneSelection.getSelectedNode()));
+				 setSelectedNode(drawer.getNodeById(
+						 geneSelection.getSelectedNode()));
 			 }
 		 } else {
 			 LogBuffer.println(viewName() + "Got an update from unknown " + o);
 		 }
 	 }
+	 
 	public void setZoomMap(MapContainer m) {
 	}
 

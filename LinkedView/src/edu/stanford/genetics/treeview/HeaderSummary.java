@@ -77,7 +77,7 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 			return "";
 		}
 		
-		for (int i =0; i < included.length; i++) {
+		for (int i = 0; i < included.length; i++) {
 			try {
 				String test = strings[included[i]];
 				if (test != null) {

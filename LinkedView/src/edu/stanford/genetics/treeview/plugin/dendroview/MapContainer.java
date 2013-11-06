@@ -174,6 +174,11 @@ AdjustmentListener, ConfigNodePersistent {
         	setChanged();
         }
     }
+    
+    public JScrollBar getScroll() {
+    	
+    	return scrollbar;
+    }
 
     @Override
 	public void adjustmentValueChanged(AdjustmentEvent adjustmentEvent) {
