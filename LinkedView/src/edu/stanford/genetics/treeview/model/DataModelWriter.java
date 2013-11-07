@@ -31,7 +31,8 @@ public class DataModelWriter {
 	 * @return 
 	 */
 	public Set<DataModelFileType> writeAll(FileSet fileSet) {
-		EnumSet<DataModelFileType> written = EnumSet.noneOf(DataModelFileType.class); 
+		EnumSet<DataModelFileType> written = EnumSet.noneOf(
+				DataModelFileType.class); 
 		if (writeAtr(fileSet.getAtr()))
 			written.add(DataModelFileType.ATR);
 		if (writeGtr(fileSet.getGtr()))
@@ -41,7 +42,8 @@ public class DataModelWriter {
 		return written;
 	}
 	public Set<DataModelFileType> writeIncremental(FileSet fileSet) {
-		EnumSet<DataModelFileType> written = EnumSet.noneOf(DataModelFileType.class); 
+		EnumSet<DataModelFileType> written = EnumSet.noneOf(
+				DataModelFileType.class); 
 		if (dataModel.aidFound() && 
 				dataModel.getAtrHeaderInfo().getModified()) {
 			if (writeAtr(fileSet.getAtr()))
@@ -91,7 +93,8 @@ public class DataModelWriter {
 			}
 			return true;
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(null,"Error writing " + file +" " + e, "Save Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null,"Error writing " + file +" " + e, 
+					"Save Error", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 			return false;
 		}
@@ -109,7 +112,8 @@ public class DataModelWriter {
 			}
 			return true;
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(null,"Error writing " + file +" " + e, "Save Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null,"Error writing " + file +" " + e, 
+					"Save Error", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 			return false;
 		}

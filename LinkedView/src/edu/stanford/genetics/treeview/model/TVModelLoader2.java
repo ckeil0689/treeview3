@@ -95,31 +95,37 @@ public class TVModelLoader2 implements ProgressTrackable {
 
 	// these internal variables are needed by this class only
 	/** frame to block */
-	Frame parent;
+	protected Frame parent;
 	/** model to load into */
-	TVModel targetModel;
+	protected TVModel targetModel;
 
 	private javax.swing.Timer loadTimer;
 
-	LoadProgress2I loadProgress = new DummyLoadProgress();
+	protected LoadProgress2I loadProgress = new DummyLoadProgress();
 	
 	// the following is for the communication between the timer thread and the worker thread.
 	
 	/** Setter for exception */
 	public void setException(LoadException exception) {
+		
 		loadProgress.setException(exception);
 	}
+	
 	/** Getter for exception */
 	public LoadException getException() {
+		
 		return loadProgress.getException();
 	}
 	
 	/** Setter for hadProblem */
 	public void setHadProblem(boolean hadProblem) {
+		
 		loadProgress.setHadProblem(hadProblem);
 	}
+	
 	/** Getter for hadProblem */
 	public boolean getHadProblem() {
+		
 		return loadProgress.getHadProblem();
 	}
 	
@@ -244,6 +250,7 @@ public class TVModelLoader2 implements ProgressTrackable {
 	
 	
 	public TVModelLoader2(TVModel targetModel) {
+		
 		this(targetModel, targetModel.getFrame());
 	}
 	/**
@@ -255,9 +262,11 @@ public class TVModelLoader2 implements ProgressTrackable {
 			"Parsing GTR", "Loading Document Config", "Finished"};
 	
 	public TVModelLoader2(TVModel targetModel, Frame parent) {
+		
 		this.parent = parent;
 		this.targetModel = targetModel;
 	}
+	
 	class TimerListener implements ActionListener { // manages the FileLoader
 		// this method is invoked every few hundred ms
 		@Override
@@ -280,7 +289,8 @@ public class TVModelLoader2 implements ProgressTrackable {
 	}
 	
 	public void loadInto() throws LoadException {
-		loadProgress = new LoadProgress2(targetModel.getFileSet().getRoot(), parent);
+		loadProgress = new LoadProgress2(targetModel.getFileSet().getRoot(), 
+				parent);
 		loadProgress.setPhases(phases);
 		final SwingWorker worker = new SwingWorker() {
 			@Override
@@ -310,11 +320,13 @@ public class TVModelLoader2 implements ProgressTrackable {
 			throw getException();
 		}
 	}
+	
 	/**
 	* Don't open a window.
 	*/
 	public void loadIntoNW() throws LoadException {
-//		loadProgress = new LoadProgress2(targetModel.getFileSet().getRoot(), null);
+
+		//		loadProgress = new LoadProgress2(targetModel.getFileSet().getRoot(), null);
 //		loadProgress.setPhases(phases);
 		run();
 		if (getException() != null) {
@@ -323,6 +335,7 @@ public class TVModelLoader2 implements ProgressTrackable {
 	}
 	
 	protected void setPhase(int i) {
+		
 		loadProgress.setPhase(i);
 	}
 	
@@ -330,6 +343,7 @@ public class TVModelLoader2 implements ProgressTrackable {
 	// progress bar stuff is set within the 
 	// table loading and various parsing routines.
 	protected void run() {
+		
 		try {
 			FileSet fileSet = targetModel.getFileSet();
 			setPhaseLength(phases.length);
@@ -341,18 +355,27 @@ public class TVModelLoader2 implements ProgressTrackable {
 				parser.setProgressTrackable(this);
 				RectData tempTable = parser.loadIntoTable();
 				
-				if (loadProgress.getCanceled()) return;
+				if (loadProgress.getCanceled()) {
+					return;
+				}
 				setPhase(1);
 				parseCDT(tempTable);
+				
 			} catch (LoadException e) {
 				throw e;
+				
 			} catch (Exception e) {
 				// this should never happen!
-				LogBuffer.println("TVModel.ResourceLoader.run() : while parsing cdt got error " + e.getMessage());
+				LogBuffer.println("TVModel.ResourceLoader.run() : " +
+						"while parsing cdt got error " + e.getMessage());
 				e.printStackTrace();
-				throw new LoadException("Error Parsing CDT: " + e, LoadException.CDTPARSE);
+				throw new LoadException("Error Parsing CDT: " + e, 
+						LoadException.CDTPARSE);
 			}
-			if (loadProgress.getCanceled()) return;
+			
+			if (loadProgress.getCanceled()) {
+				return;
+			}
 			
 			setPhase(2);
 			if (targetModel.getArrayHeaderInfo().getIndex("AID") != -1) {

@@ -107,6 +107,7 @@ MainPanel, Observer {
 	protected final static Color RED1 = new Color(240, 80, 50, 255);
 	protected final static Color BLUE1 = new Color(60, 180, 220, 255);
 	protected final static Color BLUE2 = new Color(235, 240, 255, 255);
+	private final static Color BG_COLOR = new Color(252, 252, 252, 255);
 	
 	/*
 	 * The following arrays allow translation to and from screen and DataMatrix 

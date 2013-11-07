@@ -3,12 +3,7 @@ package edu.stanford.genetics.treeview;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
 
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -31,10 +26,7 @@ public class ClickableImage extends JPanel {
 	/**
 	 * Instance variables
 	 */
-	private JLabel label, icon;
-	private BufferedImage labelImg;
-	private ClassLoader classLoader;
-	private InputStream input;
+	private JLabel label;
 	private TreeViewFrame frame;
 	private String labelText;
 	
@@ -51,10 +43,9 @@ public class ClickableImage extends JPanel {
 	 * @param labelText
 	 * @param fileName
 	 */
-	public ClickableImage(TreeViewFrame frame, String labelText, 
-			String fileName) {
+	public ClickableImage(TreeViewFrame frame, String labelText) {
 		
-		this(frame, labelText, fileName, tvModel);
+		this(frame, labelText, tvModel);
 	}
 	
 	/**
@@ -66,7 +57,7 @@ public class ClickableImage extends JPanel {
 	 * @param clusterModel_gen
 	 */
 	public ClickableImage(TreeViewFrame frame, String labelText, 
-			String fileName, TVModel tvModel_gen) {
+			TVModel tvModel_gen) {
 		
 		this.frame = frame;
 		
@@ -78,22 +69,8 @@ public class ClickableImage extends JPanel {
 		label = new JLabel(labelText);
 		label.setFont(new Font("Sans Serif", Font.PLAIN, 50));
 		label.setForeground(BLUE1);
-		
-		classLoader = Thread.currentThread().getContextClassLoader();
-		input = classLoader.getResourceAsStream(fileName);
-		
-		try {
-			
-			labelImg = ImageIO.read(input);
-			icon = new JLabel(new ImageIcon(labelImg));
-			
-			this.add(label, "pushx, span, alignx 50%, wrap");
-			this.add(icon, "pushx, span, alignx 50%");
-			
-		} catch (IOException e) {
-			
-		}
-		
+
+		this.add(label, "pushx, span, alignx 50%");
 		this.addMListener(label, tvModel_gen);
 	}
 	

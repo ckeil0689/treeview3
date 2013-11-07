@@ -79,6 +79,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	//Static Variables
 	private static final long serialVersionUID = 1L;
 	private static final Color BLUE1 = new Color(60, 180, 220, 255);
+	private final static Color BG_COLOR = new Color(252, 252, 252, 255);
 	
 	//Instance
 	protected DataModel dataModel;
@@ -175,19 +176,19 @@ public class ClusterView extends JPanel implements MainPanel {
 		
 		//Set layout for initial window
 		this.setLayout(new MigLayout("ins 0"));
-		this.setBackground(Color.white);
+		this.setBackground(BG_COLOR);
 		
 		//Create background panel
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new MigLayout("ins 0"));
-		mainPanel.setBackground(Color.white);
+		mainPanel.setBackground(BG_COLOR);
 		
 		//Background Panel for the Cluster Options
 		optionsPanel = new JPanel();
 		optionsPanel.setLayout(new MigLayout());
 		optionsPanel.setBorder(
 				BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-		optionsPanel.setBackground(Color.white);
+		optionsPanel.setBackground(BG_COLOR);
 		
 		//Panel for the Buttons
 		buttonPanel = new JPanel();
@@ -248,10 +249,10 @@ public class ClusterView extends JPanel implements MainPanel {
 			setOpaque(false);
 			
 			text = new JLabel(header);
-			text.setFont(new Font("Sans Serif", Font.PLAIN, 44));
+			text.setFont(new Font("Sans Serif", Font.BOLD, 24));
 			
 			text2 = new JLabel(header2);
-			text2.setFont(new Font("Sans Serif", Font.PLAIN, 35));
+			text2.setFont(new Font("Sans Serif", Font.PLAIN, 24));
 			text2.setForeground(BLUE1);
 			
 			this.add(text, "pushx, alignx 50%, wrap");
@@ -320,7 +321,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	    	nRows = infoGene.getNumHeaders();
 	   
 	    	label2 = new JLabel("Matrix Dimensions:");
-	    	label2.setFont(new Font("Sans Serif", Font.PLAIN, 28));
+	    	label2.setFont(new Font("Sans Serif", Font.PLAIN, 24));
 	    	
 	    	//Matrix Information
 	    	numPanel = new JPanel();
@@ -336,11 +337,11 @@ public class ClusterView extends JPanel implements MainPanel {
 	    	numRowLabel.setForeground(RED1);
 	    	
 	    	label3 = new JLabel("Data Points:");
-	    	label3.setFont(new Font("Sans Serif", Font.PLAIN, 20));
+	    	label3.setFont(new Font("Sans Serif", Font.PLAIN, 22));
 	    	
 	    	sumMatrix = nCols * nRows;
 	    	sumM = new JLabel(Integer.toString(sumMatrix));
-	    	sumM.setFont(new Font("Sans Serif", Font.PLAIN, 20));
+	    	sumM.setFont(new Font("Sans Serif", Font.PLAIN, 22));
 	    	sumM.setForeground(RED1);
 	    	 
 	    	//Data Preview
@@ -366,8 +367,8 @@ public class ClusterView extends JPanel implements MainPanel {
 					
 					head1.setText("Hierarchical Cluster", "Options");
 					
-					optionsPanel.add(doPanel, "pushx, alignx 50%, wrap");
-					optionsPanel.add(clusterPanel, "pushx, alignx 50%, wrap");
+					optionsPanel.add(doPanel, "pushx, growx, wrap");
+					optionsPanel.add(clusterPanel, "pushx, growx, wrap");
 					
 					mainPanel.add(head1, "alignx 50%, pushx, wrap");
 					mainPanel.add(optionsPanel, "push, alignx 50%, " +
@@ -398,9 +399,8 @@ public class ClusterView extends JPanel implements MainPanel {
 					
 					head1.setText("K-Means", "Options");
 					
-					optionsPanel.add(doPanel, "pushx, growx, alignx 50%, wrap");
-					optionsPanel.add(clusterPanel, "pushx, growx, " +
-							"alignx 50%, wrap");
+					optionsPanel.add(doPanel, "pushx, growx, wrap");
+					optionsPanel.add(clusterPanel, "pushx, growx, wrap");
 					
 					mainPanel.add(head1, "alignx 50%, pushx, wrap");
 					mainPanel.add(optionsPanel, "push, alignx 50%, " +
@@ -449,8 +449,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		
 		private static final long serialVersionUID = 1L;
 		
-		private JPanel rowPanel;
-		private JPanel colPanel;
+		private JPanel emptyPanel;
 		
 		/**
 		 * Constructor
@@ -460,22 +459,17 @@ public class ClusterView extends JPanel implements MainPanel {
 			
 			//Panel Layout
 			this.setLayout(new MigLayout());
-			this.setBackground(Color.white);
+			this.setBackground(BG_COLOR);
 			
 			//Header
-			similarity = new JLabel("Similarity Metric");
-	  		similarity.setFont(new Font("Sans Serif", Font.PLAIN, 28));
-	  		similarity.setBackground(Color.white);
+			similarity = new JLabel("Similarity Metric: ");
+	  		similarity.setFont(new Font("Sans Serif", Font.PLAIN, 24));
+	  		similarity.setBackground(BG_COLOR);
 	  		
-	  		//Component for Row Distance Measure Selection
-	  		rowPanel = new JPanel();
-	  		rowPanel.setLayout(new MigLayout());
-	  		rowPanel.setOpaque(false);
-	  		
-	  		//Component for Column Distance Measure Selection
-	  		colPanel = new JPanel();
-	  		colPanel.setLayout(new MigLayout());
-	  		colPanel.setOpaque(false);
+	  		//filler component
+	  		emptyPanel = new JPanel();
+	  		emptyPanel.setLayout(new MigLayout());
+	  		emptyPanel.setOpaque(false);
 	  		
 			//Labels
 			head2 = new HeaderPanel("Rows");
@@ -494,14 +488,13 @@ public class ClusterView extends JPanel implements MainPanel {
 	  		arrayCombo = new JComboBox(measurements);
 	  		arrayCombo = setComboLayout(arrayCombo);
 	  		
-	  		rowPanel.add(head2, "alignx 50%, span, wrap");
-	  		rowPanel.add(geneCombo, "alignx 50%, grow, push");
-	  		colPanel.add(head3, "alignx 50%, span, wrap");
-			colPanel.add(arrayCombo,"alignx 50%, grow, push");
-			
-			this.add(similarity, "alignx 50%, span, wrap");
-			this.add(rowPanel, "growx, pushx, alignx 50%");
-			this.add(colPanel, "growx, pushx, alignx 50%");
+	  		this.add(emptyPanel, "pushx, growx");
+	  		this.add(head2, "pushx, growx");
+	  		this.add(head3, "pushx, growx, wrap");
+	  		
+	  		this.add(similarity, "growx, pushx");
+	  		this.add(geneCombo, "growx, pushx");
+	  		this.add(arrayCombo,"growx, pushx");
 		}
 	}	
 	
@@ -522,7 +515,7 @@ public class ClusterView extends JPanel implements MainPanel {
   		
   		button.setFont(buttonFont);
   		button.setOpaque(true);
-  		button.setBackground(new Color(60, 180, 220, 255));
+  		button.setBackground(BLUE1);
   		button.setForeground(Color.white);
   		
   		return button;

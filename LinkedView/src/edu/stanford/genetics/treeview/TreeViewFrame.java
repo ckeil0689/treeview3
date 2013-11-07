@@ -68,6 +68,7 @@ import edu.stanford.genetics.treeview.core.MemMonitor;
 import edu.stanford.genetics.treeview.core.MenuHelpPluginsFrame;
 import edu.stanford.genetics.treeview.core.PluginManager;
 import edu.stanford.genetics.treeview.core.TreeViewJMenuBar;
+import edu.stanford.genetics.treeview.model.CDTCreator;
 import edu.stanford.genetics.treeview.model.DataModelWriter;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
@@ -95,6 +96,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	private final Color BLUE1 = new Color(60, 180, 220, 255);
 	private final Color GRAY1 = new Color(150, 150, 150, 255);
 	private final Color GRAY2 = new Color(100, 100, 100, 255);
+	private final Color BG_COLOR = new Color(252, 252, 252, 255);
 
 	private TreeViewApp treeView;
 	private ProgramMenu programMenu;
@@ -282,6 +284,17 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		try {
 			File file = selectFile();
+			
+			int suffixLength = 3;
+			String fileName = file.getAbsolutePath();
+			String fileType = file.getAbsolutePath().substring(
+					fileName.length() - suffixLength, fileName.length());
+			
+			if(!fileType.equalsIgnoreCase("cdt")) {
+				CDTCreator fileChanger = new CDTCreator(file);
+				fileChanger.readFile();
+			}
+			
 			FileSet fileSet = getFileSet(file); //Type: 0 (Auto)
 			loadFileSet(fileSet);
 			
@@ -1357,7 +1370,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		waiting = new JPanel();
 		waiting.setLayout(new MigLayout("ins 0"));
-		waiting.setBackground(Color.WHITE);
+		waiting.setBackground(BG_COLOR);
 		
 		title_bg = new JPanel();
 		title_bg.setLayout(new MigLayout());
@@ -1365,15 +1378,14 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		jl = new JLabel("Hello! How are you Gentlepeople?");
 		jl.setFont(new Font("Sans Serif", Font.PLAIN, 30));
-		jl.setForeground(Color.white);
+		jl.setForeground(BG_COLOR);
 		
 		jl2 = new JLabel("Welcome to " + getAppName());
 		jl2.setFont(new Font("Sans Serif", Font.BOLD, 50));
-		jl2.setForeground(Color.white);
+		jl2.setForeground(BG_COLOR);
 		
-		String picture = "addFileS.png";
 		ClickableImage load_Icon = new ClickableImage(this, 
-				"Load Data >", picture);
+				"Load Data >");
 		
 		title_bg.add(jl, "push, alignx 50%, span, wrap");
 		title_bg.add(jl2, "push, alignx 50%, span");
@@ -1413,13 +1425,11 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		ques.setFont(new Font("Sans Serif", Font.PLAIN, 50));
 		ques.setForeground(GRAY2);
 		
-		String picture = "clusterS.png";
 		ClickableImage clus_icon = new ClickableImage(this, "Cluster >", 
-				picture, (TVModel)dataModel);
+				(TVModel)dataModel);
 		
-		String picture2 = "viz.png";
-		ClickableImage viz_icon = new ClickableImage(this, "Visualize >", 
-				picture2, (TVModel)dataModel);
+		ClickableImage viz_icon = new ClickableImage(this, "Visualize >",  
+				(TVModel)dataModel);
 		
 		loadNew = new JLabel("  Load New File");
 		loadNew.setFont(new Font("Sans Serif", Font.BOLD, 25));

@@ -37,7 +37,9 @@ import edu.stanford.genetics.treeview.TreeViewFrame;
 class ClusterOptionsPanel extends JPanel {	
 		  
 	private static final long serialVersionUID = 1L;
-		
+
+	private final static Color BG_COLOR = new Color(252, 252, 252, 255);
+	
 	//Instance Variables
 	private TreeViewFrame viewFrame;
 	private JButton cluster_button; 
@@ -85,7 +87,6 @@ class ClusterOptionsPanel extends JPanel {
 	private final SwingWorker<Void, Void> worker;
 	private final String[] clusterMethods = {"Single Linkage", 
 			"Centroid Linkage", "Average Linkage", "Complete Linkage"};
-	private final Color BLUE2 = new Color(110, 210, 255, 150);
 		    
 	/**
 	 * Constructor
@@ -95,7 +96,7 @@ class ClusterOptionsPanel extends JPanel {
 			final boolean hierarchical) {
 		
 		this.setLayout(new MigLayout());
-		this.setBackground(Color.white);
+		this.setBackground(BG_COLOR);
 		
 		this.viewFrame = cView.getViewFrame();
 		this.mainPanel = cView.getMainPanel();
@@ -154,10 +155,10 @@ class ClusterOptionsPanel extends JPanel {
 				
 				status1 = new JLabel("The file has been saved " +
 						"in the original directory.");
-				status1.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+				status1.setFont(new Font("Sans Serif", Font.PLAIN, 22));
 				
 				status2 = new JLabel("File Path: " + path);
-				status2.setFont(new Font("Sans Serif", Font.ITALIC, 18));
+				status2.setFont(new Font("Sans Serif", Font.ITALIC, 22));
 				
 				dendro_button.setEnabled(true);
 				buttonPanel.add(back_button, "pushx, alignx 50%");
@@ -175,19 +176,19 @@ class ClusterOptionsPanel extends JPanel {
 		//Panel containing the Linkage Choice
 		choicePanel = new JPanel();
 		choicePanel.setLayout(new MigLayout());
-		choicePanel.setBackground(Color.white);
+		choicePanel.setOpaque(false);
 		
 		rowPanel = new JPanel();
 		rowPanel.setLayout(new MigLayout());
-		rowPanel.setBackground(BLUE2);
+		rowPanel.setOpaque(false);
 		
 		colPanel = new JPanel();
 		colPanel.setLayout(new MigLayout());
-		colPanel.setBackground(BLUE2);
+		colPanel.setOpaque(false);
 		
 		//Label
-		method = new JLabel("Linkage Method");
-		method.setFont(new Font("Sans Serif", Font.PLAIN, 28));
+		method = new JLabel("Linkage Method:");
+		method.setFont(new Font("Sans Serif", Font.PLAIN, 24));
 		
 		//Clickable Panel to call ClusterFrame
 		ClickableIcon infoIcon = 
@@ -211,7 +212,7 @@ class ClusterOptionsPanel extends JPanel {
 		//ProgressBar Component
 		loadPanel = new JPanel();
 		loadPanel.setLayout(new MigLayout());
-		loadPanel.setBackground(Color.white);
+		loadPanel.setBackground(BG_COLOR);
 		loadPanel.setBorder(
 				BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
     	
@@ -377,17 +378,17 @@ class ClusterOptionsPanel extends JPanel {
     	});
     	
     	if(hierarchical) {
-	    	choicePanel.add(method, "alignx 50%, pushx");
-	    	choicePanel.add(infoIcon, "pushx, alignx 50%, wrap");
-	    	choicePanel.add(clusterChoice, "span, alignx 50%, wrap");
+	    	choicePanel.add(method);
+	    	choicePanel.add(clusterChoice, "growx, pushx");
+	    	choicePanel.add(infoIcon, "pushx");
 	    	
     	} else {
-    		rowPanel.add(clusters, "span, alignx 50%, wrap");
-    		rowPanel.add(enterRC, "alignx 50%, pushx");
-    		rowPanel.add(enterCC, "alignx 50%, pushx");
-    		colPanel.add(its, "span, alignx 50%, wrap");
-    		colPanel.add(enterRIt, "alignx 50%, pushx");
-    		colPanel.add(enterCIt, "alignx 50%, pushx");
+    		rowPanel.add(clusters, "pushx");
+    		rowPanel.add(enterRC, "pushx");
+    		rowPanel.add(enterCC, "pushx");
+    		colPanel.add(its, "pushx");
+    		colPanel.add(enterRIt, "pushx");
+    		colPanel.add(enterCIt, "pushx");
     		
     		choicePanel.add(rowPanel, "pushx, growx, alignx 50%, wrap");
     		choicePanel.add(colPanel, "pushx, growx, alignx 50%");
