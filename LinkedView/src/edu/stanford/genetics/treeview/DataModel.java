@@ -61,6 +61,14 @@ public interface DataModel {
 	 * @return    String representation of file path or url
 	 */
 	public String getSource();
+	
+	/**
+	 *  Gets the file name with extension 
+	 *  <code>DataModel</code> was built from.
+	 *
+	 * @return    String representation of file name with file type
+	 */
+	public String getFileName();
 
 	/**
 	 *  Gets a short name, unique for this <code>DataModel</code>, 

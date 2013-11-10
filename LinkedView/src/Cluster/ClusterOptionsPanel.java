@@ -20,8 +20,7 @@ import javax.swing.SwingWorker;
 import javax.swing.border.EtchedBorder;
 
 import net.miginfocom.swing.MigLayout;
-import Cluster.ClusterView.HeaderPanel;
-import Cluster.ClusterView.InitialPanel;
+//import Cluster.ClusterView.InitialPanel;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LoadException;
@@ -37,7 +36,8 @@ import edu.stanford.genetics.treeview.TreeViewFrame;
 class ClusterOptionsPanel extends JPanel {	
 		  
 	private static final long serialVersionUID = 1L;
-
+	
+	private static final Color RED1 = new Color(240, 80, 50, 255);
 	private final static Color BG_COLOR = new Color(252, 252, 252, 255);
 	
 	//Instance Variables
@@ -46,6 +46,7 @@ class ClusterOptionsPanel extends JPanel {
 	private JButton back_button;
 	private JButton cancel_button;
 	private JButton dendro_button;
+	private JLabel head1;
 	private JLabel status1; 
 	private JLabel status2;
 	private JLabel method;
@@ -62,14 +63,10 @@ class ClusterOptionsPanel extends JPanel {
 	private JProgressBar pBar3;
 	private JProgressBar pBar4;
 	private JPanel loadPanel;
-	private JPanel choicePanel;
-	private JPanel rowPanel;
-	private JPanel colPanel;
 	private JPanel mainPanel;
 	private JPanel buttonPanel;
 	private JPanel optionsPanel;
-	private HeaderPanel head1;
-	private InitialPanel initialPanel;
+//	private InitialPanel initialPanel;
 	private JComboBox clusterChoice;
 	private JComboBox geneCombo;
 	private JComboBox arrayCombo;
@@ -77,6 +74,9 @@ class ClusterOptionsPanel extends JPanel {
 	private String path;
 	private File file;
 	private DataModel outer;
+	
+	private Font fontS;
+	private Font fontL;
 	
 	private String linkageMethod = null;
 	private int row_clusterN = 0;
@@ -105,8 +105,10 @@ class ClusterOptionsPanel extends JPanel {
 		this.outer = cView.getDataModel();
 		this.geneCombo = cView.getGeneCombo();
 		this.arrayCombo = cView.getArrayCombo();
-		this.initialPanel = cView.getInitialPanel();
-		this.head1 = cView.getHeadPanel();
+//		this.initialPanel = cView.getInitialPanel();
+		this.head1 = cView.getTitle();
+		this.fontS = cView.getSmallFont();
+		this.fontL = cView.getLargeFont();
 		
 		final ClusterFrame clusterFrame = 
 				new ClusterFrameWindow(viewFrame, outer);
@@ -155,10 +157,10 @@ class ClusterOptionsPanel extends JPanel {
 				
 				status1 = new JLabel("The file has been saved " +
 						"in the original directory.");
-				status1.setFont(new Font("Sans Serif", Font.PLAIN, 22));
+				status1.setFont(fontS);
 				
 				status2 = new JLabel("File Path: " + path);
-				status2.setFont(new Font("Sans Serif", Font.ITALIC, 22));
+				status2.setFont(fontS);
 				
 				dendro_button.setEnabled(true);
 				buttonPanel.add(back_button, "pushx, alignx 50%");
@@ -172,23 +174,9 @@ class ClusterOptionsPanel extends JPanel {
 				mainPanel.repaint();	
 			}
 		};
-		
-		//Panel containing the Linkage Choice
-		choicePanel = new JPanel();
-		choicePanel.setLayout(new MigLayout());
-		choicePanel.setOpaque(false);
-		
-		rowPanel = new JPanel();
-		rowPanel.setLayout(new MigLayout());
-		rowPanel.setOpaque(false);
-		
-		colPanel = new JPanel();
-		colPanel.setLayout(new MigLayout());
-		colPanel.setOpaque(false);
-		
 		//Label
 		method = new JLabel("Linkage Method:");
-		method.setFont(new Font("Sans Serif", Font.PLAIN, 24));
+		method.setFont(fontL);
 		
 		//Clickable Panel to call ClusterFrame
 		ClickableIcon infoIcon = 
@@ -199,10 +187,10 @@ class ClusterOptionsPanel extends JPanel {
 		clusterChoice = ClusterView.setComboLayout(clusterChoice);
 		
 		clusters = new JLabel("Clusters: ");
-		clusters.setFont(new Font("Sans Serif", Font.PLAIN, 22));
+		clusters.setFont(fontL);
 		
 		its = new JLabel("Iterations: ");
-		its.setFont(new Font("Sans Serif", Font.PLAIN, 22));
+		its.setFont(fontL);
 		
 		enterRC = setupSpinner();
 		enterCC = setupSpinner();
@@ -228,12 +216,12 @@ class ClusterOptionsPanel extends JPanel {
 				optionsPanel.removeAll();
 				buttonPanel.removeAll();
 				
-				head1.setText("Cluster ", "Data Preview");
+				head1.setText("Data Preview");
 				
-				cView.setInitialPanel();
+//				cView.setInitialPanel();
 				
 				mainPanel.add(head1, "alignx 50%, pushx, wrap");
-				mainPanel.add(initialPanel, "grow, push, span, wrap");
+				mainPanel.add(cView, "grow, push, span, wrap");
 				mainPanel.add(buttonPanel, "alignx 50%, height 15%::");
 				
 				mainPanel.revalidate();
@@ -336,15 +324,15 @@ class ClusterOptionsPanel extends JPanel {
 						loadPanel.add(pBar4, "pushx, growx, span, wrap");
 						
 					} else if(!choice.contentEquals("Do Not Cluster")) {
-						loadPanel.add(pBar, "push, grow, span, wrap");
-						loadPanel.add(pBar2, "push, grow, span, wrap");
+						loadPanel.add(pBar, "pushx, growx, span, wrap");
+						loadPanel.add(pBar2, "pushx, growx, span, wrap");
 						
 					} else if(!choice2.contentEquals("Do Not Cluster")) {
 						loadPanel.add(pBar3, "pushx, growx, span, wrap");
 						loadPanel.add(pBar4, "pushx, growx, span, wrap");
 					}
 				
-					optionsPanel.add(loadPanel, "push, grow, span, wrap");
+					optionsPanel.add(loadPanel, "push, growx, span, wrap");
 					
 					buttonPanel.add(cancel_button, "pushx, alignx 50%");
 					buttonPanel.add(dendro_button, "pushx, alignx 50%");
@@ -359,13 +347,13 @@ class ClusterOptionsPanel extends JPanel {
 					
 				} else {
 					error1 = new JLabel("Woah, that's too quick!");
-					error1.setFont(new Font("Sans Serif", Font.PLAIN, 22));
-					error1.setForeground(new Color(240, 80, 50, 255));
+					error1.setFont(fontS);
+					error1.setForeground(RED1);
 					
 					error2 = new JLabel("Please select either a " +
 							"similarity metric for rows, columns, " +
 							"or both to begin clustering!");
-					error2.setFont(new Font("Sans Serif", Font.PLAIN, 22));
+					error2.setFont(fontS);
 					
 					loadPanel.add(error1, "alignx 50%, span, wrap");
 					loadPanel.add(error2, "alignx 50%, span");
@@ -378,27 +366,22 @@ class ClusterOptionsPanel extends JPanel {
     	});
     	
     	if(hierarchical) {
-	    	choicePanel.add(method);
-	    	choicePanel.add(clusterChoice, "growx, pushx");
-	    	choicePanel.add(infoIcon, "pushx");
+	    	this.add(method, "pushx");
+	    	this.add(clusterChoice, "alignx 50%");
+	    	this.add(infoIcon);
 	    	
     	} else {
-    		rowPanel.add(clusters, "pushx");
-    		rowPanel.add(enterRC, "pushx");
-    		rowPanel.add(enterCC, "pushx");
-    		colPanel.add(its, "pushx");
-    		colPanel.add(enterRIt, "pushx");
-    		colPanel.add(enterCIt, "pushx");
-    		
-    		choicePanel.add(rowPanel, "pushx, growx, alignx 50%, wrap");
-    		choicePanel.add(colPanel, "pushx, growx, alignx 50%");
+    		this.add(clusters, "pushx");
+    		this.add(enterRC, "pushx");
+    		this.add(enterCC, "pushx, wrap");
+    		this.add(its, "pushx");
+    		this.add(enterRIt, "pushx");
+    		this.add(enterCIt, "pushx");
     	}
     	
     	dendro_button.setEnabled(false);
   		buttonPanel.add(back_button, "alignx 50%, pushx");
   		buttonPanel.add(cluster_button, "alignx 50%, pushx");
-  		
-    	this.add(choicePanel, "alignx 50%, push, grow, wrap");
 	}
 	
 	/**
@@ -413,7 +396,7 @@ class ClusterOptionsPanel extends JPanel {
 		Dimension d = jft.getPreferredSize();
 		d.setSize(d.getWidth(), d.getHeight()*2);
 		jft.setPreferredSize(d);
-		jft.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+		jft.setFont(fontS);
 		
 		return jft;
 	}

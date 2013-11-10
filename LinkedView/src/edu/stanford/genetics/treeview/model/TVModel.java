@@ -827,4 +827,14 @@ public class TVModel extends Observable implements DataModel {
 		
 		this.loaded = loaded;
 	}
+
+	@Override
+	public String getFileName() {
+		if (source == null) {
+			  return "No Data Loaded";
+			  
+		  } else {
+			  return source.getRoot() + source.getExt();
+		  }
+	}
 }

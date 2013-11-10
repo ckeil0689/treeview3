@@ -317,6 +317,16 @@ public class ReorderedDataModel extends Observable implements DataModel {
 		return source;
 	}
 	
+	@Override
+	public String getFileName() {
+		if (source == null) {
+			  return "No Data Loaded";
+			  
+		  } else {
+			  return source;
+		  }
+	}
+	
 	public void setSource(String string) {
 		
 		source = string;

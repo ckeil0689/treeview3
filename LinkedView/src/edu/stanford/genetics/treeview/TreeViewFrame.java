@@ -301,7 +301,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			fileSet = fileMru.addUnique(fileSet);
 			fileMru.setLast(fileSet);
 			
-			resetLayout();
+			confirmLoaded();
 
 		} catch (LoadException e) {
 			if ((e.getType() != LoadException.INTPARSE)
@@ -1417,7 +1417,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		labelPanel.setLayout(new MigLayout());
 		labelPanel.setOpaque(false);
 		
-		confirm = new JLabel("Loaded File: " + dataModel.getName());
+		confirm = new JLabel("Loaded File: " + dataModel.getFileName());
 		confirm.setFont(new Font("Sans Serif", Font.BOLD, 25));
 		confirm.setForeground(GRAY1);
 		
@@ -1452,6 +1452,24 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		waiting.add(clus_icon, "push, grow, alignx 50%");
 		waiting.add(viz_icon, "push, grow, alignx 50%, wrap");
 		waiting.add(confirmPanel, "pushx, alignx 50%, span");
+		
+		waiting.repaint();
+		waiting.revalidate();
+	}
+	
+	/**
+	 * This method clears the initial starting frame and adds new components
+	 * to let the user select between options for processing/ viewing his data.
+	 */
+	public void confirmLoaded(){
+		
+		LoadCheckView confirmPanel; 
+		
+		waiting.removeAll();
+		
+		confirmPanel = new LoadCheckView(dataModel, this);
+		
+		waiting.add(confirmPanel, "push, grow");
 		
 		waiting.repaint();
 		waiting.revalidate();

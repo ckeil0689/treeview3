@@ -106,8 +106,7 @@ MainPanel, Observer {
 	
 	protected final static Color RED1 = new Color(240, 80, 50, 255);
 	protected final static Color BLUE1 = new Color(60, 180, 220, 255);
-	protected final static Color BLUE2 = new Color(235, 240, 255, 255);
-	private final static Color BG_COLOR = new Color(252, 252, 252, 255);
+	private final static Color BG_COLOR = new Color(235, 240, 255, 255);
 	
 	/*
 	 * The following arrays allow translation to and from screen and DataMatrix 
@@ -713,7 +712,7 @@ MainPanel, Observer {
 		colorExtractor.setDefaultColorSet(colorPresets.getDefaultColorSet());
 		colorExtractor.setMissing(DataModel.NODATA, DataModel.EMPTY);
 		
-		statuspanel = new MessagePanel("Status", BLUE2);
+		statuspanel = new MessagePanel("Status", BG_COLOR);
 
 		DoubleArrayDrawer dArrayDrawer = new DoubleArrayDrawer();
 		dArrayDrawer.setColorExtractor(colorExtractor);
@@ -850,7 +849,8 @@ MainPanel, Observer {
 				viewFrame.getUrlExtractor(), getDataModel());
 		
 		textview.setMap(getZoomYmap());
-
+		
+		//Layout Setup
 		doDoubleLayout();
 
 		//reset persistent popups
@@ -1061,12 +1061,12 @@ MainPanel, Observer {
 		left = new JPanel();
 		left.setLayout(new MigLayout());
 		left.setMinimumSize(left_min);
-		left.setBackground(BLUE2);
+		left.setBackground(BG_COLOR);
 		
 		right = new JPanel();
 		right.setLayout(new MigLayout());
 		right.setMinimumSize(right_min);
-		right.setBackground(BLUE2);
+		right.setBackground(BG_COLOR);
 		
 		backgroundPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
 				left, right);
@@ -1117,7 +1117,7 @@ MainPanel, Observer {
 			}
 		});
 		
-		closeButton = setButtonLayout("Close", RED1);;
+		closeButton = setButtonLayout("< Back", BLUE1);;
   		closeButton.addActionListener(new ActionListener(){
 
 			@Override
@@ -1170,7 +1170,7 @@ MainPanel, Observer {
 		level1Pane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
 				upSide, downSide);
 		level1Pane.setDividerSize(DIVIDER_SIZE);
-		level1Pane.setBackground(BLUE2);
+		level1Pane.setBackground(BG_COLOR);
 		level1Pane.setBorder(null);
 		
 		JPanel scalePaneX = new JPanel();

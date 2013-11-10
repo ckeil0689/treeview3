@@ -58,9 +58,6 @@ import edu.stanford.genetics.treeview.MainProgramArgs;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.TreeviewMenuBarI;
 
-
-import edu.stanford.genetics.treeview.HeaderInfo;
-
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 //Explicitly imported because error (unclear TVModel reference) was thrown
@@ -81,6 +78,10 @@ public class ClusterView extends JPanel implements MainPanel {
 	private static final Color BLUE1 = new Color(60, 180, 220, 255);
 	private final static Color BG_COLOR = new Color(252, 252, 252, 255);
 	
+	//Two Font Sizes
+	private static Font fontS = new Font("Sans Serif", Font.PLAIN, 18);
+	private static Font fontL = new Font("Sans Serif", Font.PLAIN, 24);
+	
 	//Instance
 	protected DataModel dataModel;
 	protected ConfigNode root;
@@ -94,14 +95,15 @@ public class ClusterView extends JPanel implements MainPanel {
 	private JPanel mainPanel;
 	private JPanel optionsPanel;
 	private JPanel buttonPanel;
-	private HeaderPanel head1;
-	private HeaderPanel head2;
-	private HeaderPanel head3;
-	private InitialPanel initialPanel;
+	private JLabel head1;
+	private JLabel head2;
+	private JLabel head3;
+//	private InitialPanel initialPanel;
 	private DistanceOptionsPanel doPanel;
 	private ClusterOptionsPanel clusterPanel;
 	private JComboBox geneCombo; 
 	private JComboBox arrayCombo;
+	private JComboBox clusterType;
 	
 	//Similarity Measure Label
 	private JLabel similarity;
@@ -114,10 +116,9 @@ public class ClusterView extends JPanel implements MainPanel {
 			"Absolute Correlation (centered)", "Spearman Ranked Correlation", 
 			"Euclidean Distance", "City Block Distance"};
 	
-	//Colors
-	private final Color BLUE2 = new Color(110, 210, 255, 150);
-	private final Color RED1 = new Color(240, 80, 50, 255);
-	
+	private final String[] clusterNames = {"Hierarchical Clustering", 
+			"K-Means"};
+
 	/**
 	 * Chained constructor for the ClusterView object
 	 * note this will reuse any existing MainView subnode of the documentconfig.
@@ -196,248 +197,229 @@ public class ClusterView extends JPanel implements MainPanel {
 		buttonPanel.setOpaque(false);
 		
 		//header
-		head1 = new HeaderPanel("Cluster", "Data Preview");
-		head1.setColor(Color.BLACK);
+		head1 = new JLabel("Options");
+		head1.setFont(fontL);
+		head1.setForeground(BLUE1);
 		
-		//Data Info Panel
-		initialPanel = new InitialPanel();
+		clusterType = new JComboBox(clusterNames);
+		clusterType.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				String choice = (String)clusterType.getSelectedItem();
+				
+				mainPanel.removeAll();
+				
+				
+				if(choice.equalsIgnoreCase("Hierarchical Clustering")) {
+					clusterPanel = new ClusterOptionsPanel(
+							ClusterView.this, true);
+				} else {
+					
+					clusterPanel = new ClusterOptionsPanel(
+							ClusterView.this, false);
+				}
+				
+				optionsPanel.add(doPanel, "pushx, growx, wrap");
+				optionsPanel.add(clusterPanel, "pushx, growx, wrap");
+				
+				mainPanel.add(head1, "alignx 50%, pushx, wrap");
+				mainPanel.add(clusterType, "wrap");
+				mainPanel.add(optionsPanel, "push, alignx 50%, " +
+						"width 70%:70%:70%, height 50%::, wrap");
+				
+				mainPanel.add(buttonPanel, "alignx 50%, height 15%::");
+				
+				mainPanel.revalidate();
+				mainPanel.repaint();
+			}
+			
+		});
 		
 		//make mainpanel scrollable by adding it to scrollpane
 		scrollPane = new JScrollPane(mainPanel, 
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, 
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
-		//Add components to mainPanel
-		mainPanel.add(head1, "pushx, alignx 50%, wrap");
-		mainPanel.add(initialPanel, "grow, push, span, wrap");
+		
+		//Cluster Options Panel
+		doPanel = new DistanceOptionsPanel();
+		
+		//Linkage Choice and ProgressBar
+		clusterPanel = new ClusterOptionsPanel(
+				ClusterView.this, true);
+		
+		optionsPanel.add(doPanel, "pushx, growx, wrap");
+		optionsPanel.add(clusterPanel, "pushx, growx, wrap");
+		
+		mainPanel.add(head1, "alignx 50%, pushx, wrap");
+		mainPanel.add(clusterType, "wrap");
+		mainPanel.add(optionsPanel, "push, alignx 50%, " +
+				"width 70%:70%:70%, height 50%::, wrap");
+		
 		mainPanel.add(buttonPanel, "alignx 50%, height 15%::");
 		
 		//Add the scrollPane to ClusterView2 Panel
 		this.add(scrollPane, "grow, push");
 	}
 	
-	/**
-	 * Subclass to setup a JPanel which can be added 
-	 * to the background as a header.
-	 * @author CKeil
-	 *
-	 */
-	class HeaderPanel extends JPanel {
-
-		private static final long serialVersionUID = 1L;
-		
-		private JLabel text;
-		private JLabel text2;
-		
-		/**
-		 * Chained constructor
-		 * @param header
-		 */
-		public HeaderPanel(String header){
-			
-			this(null, header);
-		}
-		
-		/**
-		 * Main constructor
-		 * @param header
-		 * @param header2
-		 */
-		public HeaderPanel(String header, String header2){
-			
-			this.setLayout(new MigLayout());
-			setOpaque(false);
-			
-			text = new JLabel(header);
-			text.setFont(new Font("Sans Serif", Font.BOLD, 24));
-			
-			text2 = new JLabel(header2);
-			text2.setFont(new Font("Sans Serif", Font.PLAIN, 24));
-			text2.setForeground(BLUE1);
-			
-			this.add(text, "pushx, alignx 50%, wrap");
-			this.add(text2, "pushx, alignx 50%");
-		}
-		
-		/**
-		 * Sets the color of the first JLabel
-		 * @param color
-		 */
-		public void setColor(Color color){
-			
-			text.setForeground(color);
-		}
-		
-		/**
-		 * Sets the text of the second JLabel
-		 * @param newText
-		 */
-		public void setText(String newText, String newText2){
-			
-			text.setText(newText);
-			text2.setText(newText2);
-		}
-		
-		/**
-		 * Sets the size of the second JLabel 
-		 */
-		public void setSmall(){
-			
-			text2.setFont(new Font("Sans Serif", Font.PLAIN, 22));
-		}
-	}
-	
-	/**
-	 * Subclass to add the initial JPanel containing some info and the data
-	 * preview table to the background panel.
-	 * @author CKeil
-	 *
-	 */
-	class InitialPanel extends JPanel {	
-	  
-		private static final long serialVersionUID = 1L;
-		
-		//Instance variables
-		private int nRows, nCols, sumMatrix; 
-		private JLabel sumM, label2, label3, numColLabel, numRowLabel;
-		private JButton hcluster_button;
-		private JButton kmcluster_button;
-		private JButton closeButton;
-		private JPanel numPanel;
-	    
-		/**
-		 * Constructor
-		 * Setting up the layout of the panel.
-		 */
-		public InitialPanel() {
-			
-			this.setLayout(new MigLayout());
-			setOpaque(false);
-			
-	    	HeaderInfo infoArray = dataModel.getArrayHeaderInfo();
-	    	HeaderInfo infoGene = dataModel.getGeneHeaderInfo();
-	    	
-	    	nCols = infoArray.getNumHeaders();
-	    	nRows = infoGene.getNumHeaders();
-	   
-	    	label2 = new JLabel("Matrix Dimensions:");
-	    	label2.setFont(new Font("Sans Serif", Font.PLAIN, 24));
-	    	
-	    	//Matrix Information
-	    	numPanel = new JPanel();
-	    	numPanel.setLayout(new MigLayout());
-	    	numPanel.setOpaque(false);
-	    	
-	    	numColLabel = new JLabel(nCols + " columns");
-	    	numColLabel.setFont(new Font("Sans Serif", Font.BOLD, 22));
-	    	numColLabel.setForeground(RED1);
-	    	
-	    	numRowLabel = new JLabel(nRows + " rows X ");
-	    	numRowLabel.setFont(new Font("Sans Serif", Font.BOLD, 22));
-	    	numRowLabel.setForeground(RED1);
-	    	
-	    	label3 = new JLabel("Data Points:");
-	    	label3.setFont(new Font("Sans Serif", Font.PLAIN, 22));
-	    	
-	    	sumMatrix = nCols * nRows;
-	    	sumM = new JLabel(Integer.toString(sumMatrix));
-	    	sumM.setFont(new Font("Sans Serif", Font.PLAIN, 22));
-	    	sumM.setForeground(RED1);
-	    	 
-	    	//Data Preview
-	    	DataViewPanel dataView = new DataViewPanel(dataModel);
-	    	
-	    	//Hierarchical Cluster Button
-	    	hcluster_button = new JButton("Hierarchical Cluster >");
-	    	hcluster_button = setButtonLayout(hcluster_button);
-			hcluster_button.addActionListener(new ActionListener(){
-	
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					
-					mainPanel.removeAll();
-					buttonPanel.removeAll();
-					
-					//Cluster Options Panel
-					doPanel = new DistanceOptionsPanel();
-					
-					//Linkage Choice and ProgressBar
-					clusterPanel = new ClusterOptionsPanel(
-							ClusterView.this, true);
-					
-					head1.setText("Hierarchical Cluster", "Options");
-					
-					optionsPanel.add(doPanel, "pushx, growx, wrap");
-					optionsPanel.add(clusterPanel, "pushx, growx, wrap");
-					
-					mainPanel.add(head1, "alignx 50%, pushx, wrap");
-					mainPanel.add(optionsPanel, "push, alignx 50%, " +
-							"width 70%:70%:70%, height 50%::, wrap");
-					mainPanel.add(buttonPanel, "alignx 50%, height 15%::");
-					
-					mainPanel.revalidate();
-					mainPanel.repaint();
-				}
-	    	});
-			
-			kmcluster_button = new JButton("K-Means >");
-	    	kmcluster_button = setButtonLayout(kmcluster_button);
-			kmcluster_button.addActionListener(new ActionListener(){
-	
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					
-					mainPanel.removeAll();
-					buttonPanel.removeAll();
-					
-					//Cluster Options Panel
-					doPanel = new DistanceOptionsPanel();
-					
-					//Linkage Choice and ProgressBar
-					clusterPanel = new ClusterOptionsPanel(
-							ClusterView.this, false);
-					
-					head1.setText("K-Means", "Options");
-					
-					optionsPanel.add(doPanel, "pushx, growx, wrap");
-					optionsPanel.add(clusterPanel, "pushx, growx, wrap");
-					
-					mainPanel.add(head1, "alignx 50%, pushx, wrap");
-					mainPanel.add(optionsPanel, "push, alignx 50%, " +
-							"width 70%:70%:70%, height 50%::, wrap");
-					mainPanel.add(buttonPanel, "alignx 50%, height 15%::");
-					
-					mainPanel.revalidate();
-					mainPanel.repaint();
-				}
-	    	});
-			
-			closeButton = new JButton("Close");
-			setButtonLayout(closeButton);
-	  		closeButton.setBackground(RED1);
-	  		closeButton.addActionListener(new ActionListener(){
-
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					
-					viewFrame.setLoaded(false);
-				}
-			});
-	  		
-	  		buttonPanel.add(closeButton, "alignx 50%, pushx");
-	    	buttonPanel.add(hcluster_button, "alignx 50%, pushx");
-	    	buttonPanel.add(kmcluster_button, "alignx 50%, pushx");
-	    	
-	    	numPanel.add(numRowLabel, "span, split 2, alignx 50%");
-	    	numPanel.add(numColLabel, "wrap");
-	    	numPanel.add(label3, "span, split 2, alignx 50%");
-	    	numPanel.add(sumM, "alignx 50%, wrap");
-	    	
-	    	this.add(label2, "alignx 50%, wrap");
-	    	this.add(numPanel, "alignx 50%, pushx, wrap");
-	    	this.add(dataView, "push, grow, alignx 50%, width 80%:95%:95%");
-		  }
-	}
+//	/**
+//	 * Subclass to add the initial JPanel containing some info and the data
+//	 * preview table to the background panel.
+//	 * @author CKeil
+//	 *
+//	 */
+//	class InitialPanel extends JPanel {	
+//	  
+//		private static final long serialVersionUID = 1L;
+//		
+//		//Instance variables
+//		private int nRows; 
+//		private int nCols; 
+//		private int sumMatrix; 
+//		private JLabel sumM; 
+//		private JLabel label2; 
+//		private JLabel label3; 
+//		private JLabel numColLabel; 
+//		private JLabel numRowLabel;
+//		private JButton hcluster_button;
+//		private JButton kmcluster_button;
+//		private JButton closeButton;
+//		private JPanel numPanel;
+//	    
+//		/**
+//		 * Constructor
+//		 * Setting up the layout of the panel.
+//		 */
+//		public InitialPanel() {
+//			
+//			this.setLayout(new MigLayout());
+//			setOpaque(false);
+//			
+//	    	HeaderInfo infoArray = dataModel.getArrayHeaderInfo();
+//	    	HeaderInfo infoGene = dataModel.getGeneHeaderInfo();
+//	    	
+//	    	nCols = infoArray.getNumHeaders();
+//	    	nRows = infoGene.getNumHeaders();
+//	   
+//	    	label2 = new JLabel("Matrix Dimensions:");
+//	    	label2.setFont(fontL);
+//	    	
+//	    	//Matrix Information
+//	    	numPanel = new JPanel();
+//	    	numPanel.setLayout(new MigLayout());
+//	    	numPanel.setOpaque(false);
+//	    	
+//	    	numColLabel = new JLabel(nCols + " columns");
+//	    	numColLabel.setFont(fontS);
+//	    	numColLabel.setForeground(RED1);
+//	    	
+//	    	numRowLabel = new JLabel(nRows + " rows X ");
+//	    	numRowLabel.setFont(fontS);
+//	    	numRowLabel.setForeground(RED1);
+//	    	
+//	    	label3 = new JLabel("Data Points:");
+//	    	label3.setFont(fontS);
+//	    	
+//	    	sumMatrix = nCols * nRows;
+//	    	sumM = new JLabel(Integer.toString(sumMatrix));
+//	    	sumM.setFont(fontS);
+//	    	sumM.setForeground(RED1);
+//	    	 
+//	    	//Data Preview
+//	    	DataViewPanel dataView = new DataViewPanel(dataModel);
+//	    	
+//	    	//Hierarchical Cluster Button
+//	    	hcluster_button = new JButton("Hierarchical Cluster >");
+//	    	hcluster_button = setButtonLayout(hcluster_button);
+//			hcluster_button.addActionListener(new ActionListener(){
+//	
+//				@Override
+//				public void actionPerformed(ActionEvent arg0) {
+//					
+//					mainPanel.removeAll();
+//					buttonPanel.removeAll();
+//					
+//					//Cluster Options Panel
+//					doPanel = new DistanceOptionsPanel();
+//					
+//					//Linkage Choice and ProgressBar
+//					clusterPanel = new ClusterOptionsPanel(
+//							ClusterView.this, true);
+//					
+//					head1.setText("Options");
+//					
+//					optionsPanel.add(doPanel, "pushx, growx, wrap");
+//					optionsPanel.add(clusterPanel, "pushx, growx, wrap");
+//					
+//					mainPanel.add(head1, "alignx 50%, pushx, wrap");
+//					mainPanel.add(optionsPanel, "push, alignx 50%, " +
+//							"width 70%:70%:70%, height 50%::, wrap");
+//					mainPanel.add(buttonPanel, "alignx 50%, height 15%::");
+//					
+//					mainPanel.revalidate();
+//					mainPanel.repaint();
+//				}
+//	    	});
+//			
+//			kmcluster_button = new JButton("K-Means >");
+//	    	kmcluster_button = setButtonLayout(kmcluster_button);
+//			kmcluster_button.addActionListener(new ActionListener(){
+//	
+//				@Override
+//				public void actionPerformed(ActionEvent arg0) {
+//					
+//					mainPanel.removeAll();
+//					buttonPanel.removeAll();
+//					
+//					//Cluster Options Panel
+//					doPanel = new DistanceOptionsPanel();
+//					
+//					//Linkage Choice and ProgressBar
+//					clusterPanel = new ClusterOptionsPanel(
+//							ClusterView.this, false);
+//					
+//					head1.setText("Options");
+//					
+//					optionsPanel.add(doPanel, "pushx, growx, wrap");
+//					optionsPanel.add(clusterPanel, "pushx, growx, wrap");
+//					
+//					mainPanel.add(head1, "alignx 50%, pushx, wrap");
+//					mainPanel.add(optionsPanel, "push, alignx 50%, " +
+//							"width 70%:70%:70%, height 50%::, wrap");
+//					mainPanel.add(buttonPanel, "alignx 50%, height 15%::");
+//					
+//					mainPanel.revalidate();
+//					mainPanel.repaint();
+//				}
+//	    	});
+//			
+//			closeButton = new JButton("< Back");
+//			setButtonLayout(closeButton);
+//	  		closeButton.setBackground(BLUE1);
+//	  		closeButton.addActionListener(new ActionListener(){
+//
+//				@Override
+//				public void actionPerformed(ActionEvent arg0) {
+//					
+//					viewFrame.setLoaded(false);
+//				}
+//			});
+//	  		
+//	  		buttonPanel.add(closeButton, "alignx 50%, pushx");
+//	    	buttonPanel.add(hcluster_button, "alignx 50%, pushx");
+//	    	buttonPanel.add(kmcluster_button, "alignx 50%, pushx");
+//	    	
+//	    	numPanel.add(numRowLabel, "span, split 2, alignx 50%");
+//	    	numPanel.add(numColLabel, "wrap");
+//	    	numPanel.add(label3, "span, split 2, alignx 50%");
+//	    	numPanel.add(sumM, "alignx 50%, wrap");
+//	    	
+//	    	this.add(label2, "alignx 50%, wrap");
+//	    	this.add(numPanel, "alignx 50%, pushx, wrap");
+//	    	this.add(dataView, "push, grow, alignx 50%, width 80%:95%:95%");
+//		  }
+//	}
 	
 	/**
 	 * Subclass to be added to the background panel. It offers a choice of 
@@ -463,7 +445,7 @@ public class ClusterView extends JPanel implements MainPanel {
 			
 			//Header
 			similarity = new JLabel("Similarity Metric: ");
-	  		similarity.setFont(new Font("Sans Serif", Font.PLAIN, 24));
+	  		similarity.setFont(fontL);
 	  		similarity.setBackground(BG_COLOR);
 	  		
 	  		//filler component
@@ -472,13 +454,13 @@ public class ClusterView extends JPanel implements MainPanel {
 	  		emptyPanel.setOpaque(false);
 	  		
 			//Labels
-			head2 = new HeaderPanel("Rows");
-			head2.setSmall();
-			head2.setBackground(BLUE2);
+			head2 = new JLabel("Rows");
+			head2.setFont(fontL);
+			head2.setForeground(BLUE1);
 			
-			head3 = new HeaderPanel("Columns");
-			head3.setSmall();
-			head3.setBackground(BLUE2);
+			head3 = new JLabel("Columns");
+			head3.setFont(fontL);
+			head3.setForeground(BLUE1);
 			 
 			//Drop-down menu for row selection
 	  		geneCombo = new JComboBox(measurements);
@@ -488,11 +470,11 @@ public class ClusterView extends JPanel implements MainPanel {
 	  		arrayCombo = new JComboBox(measurements);
 	  		arrayCombo = setComboLayout(arrayCombo);
 	  		
-	  		this.add(emptyPanel, "pushx, growx");
-	  		this.add(head2, "pushx, growx");
-	  		this.add(head3, "pushx, growx, wrap");
+	  		this.add(emptyPanel, "pushx");
+	  		this.add(head2, "pushx");
+	  		this.add(head3, "pushx, wrap");
 	  		
-	  		this.add(similarity, "growx, pushx");
+	  		this.add(similarity, "pushx");
 	  		this.add(geneCombo, "growx, pushx");
 	  		this.add(arrayCombo,"growx, pushx");
 		}
@@ -506,14 +488,12 @@ public class ClusterView extends JPanel implements MainPanel {
 	 * @return
 	 */
 	public static JButton setButtonLayout(JButton button){
-
-		Font buttonFont = new Font("Sans Serif", Font.PLAIN, 20);
 		
   		Dimension d = button.getPreferredSize();
   		d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
   		button.setPreferredSize(d);
   		
-  		button.setFont(buttonFont);
+  		button.setFont(fontS);
   		button.setOpaque(true);
   		button.setBackground(BLUE1);
   		button.setForeground(Color.white);
@@ -530,9 +510,9 @@ public class ClusterView extends JPanel implements MainPanel {
 	public static JComboBox setComboLayout(JComboBox combo){
 		
 		Dimension d = combo.getPreferredSize();
-		d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
+		d.setSize(d.getWidth(), d.getHeight()*1.5);
 		combo.setPreferredSize(d);
-		combo.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+		combo.setFont(fontS);
 		combo.setBackground(Color.white);
 		
 		return combo;
@@ -565,6 +545,21 @@ public class ClusterView extends JPanel implements MainPanel {
 	
 	
 	//Getters
+	public Font getSmallFont() {
+		
+		return fontS;
+	}
+	
+	public Font getLargeFont() {
+		
+		return fontL;
+	}
+	
+	public JLabel getTitle() {
+		
+		return head1;
+	}
+	
 	/**
 	 * Get the mainPanel for reference
 	 */
@@ -573,21 +568,13 @@ public class ClusterView extends JPanel implements MainPanel {
 		return mainPanel;
 	}
 	
-	/**
-	 * Get the optionsPanel for reference
-	 */
-	public HeaderPanel getHeadPanel(){
-		
-		return head1;
-	}
-	
-	/**
-	 * Get the optionsPanel for reference
-	 */
-	public InitialPanel getInitialPanel(){
-		
-		return initialPanel;
-	}
+//	/**
+//	 * Get the optionsPanel for reference
+//	 */
+//	public InitialPanel getInitialPanel(){
+//		
+//		return initialPanel;
+//	}
 	
 	/**
 	 * Get the optionsPanel for reference
@@ -688,13 +675,13 @@ public class ClusterView extends JPanel implements MainPanel {
 		this.root = root;
 	}
 	
-	/**
-	 * Setting up a new InitialPanel
-	 */
-	public void setInitialPanel() {
-		
-		initialPanel = new InitialPanel();
-	}
+//	/**
+//	 * Setting up a new InitialPanel
+//	 */
+//	public void setInitialPanel() {
+//		
+//		initialPanel = new InitialPanel();
+//	}
 	
 	/**
 	 * Setting up a new finalPanel

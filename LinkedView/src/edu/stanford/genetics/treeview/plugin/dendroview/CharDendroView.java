@@ -162,7 +162,7 @@ public class CharDendroView extends DendroView2 {
 
 		CharColorExtractor colorExtractor = new CharColorExtractor();
 		
-		statuspanel = new MessagePanel("Status", BLUE2);
+		statuspanel = new MessagePanel("Status", BLUE1);
 
 		CharArrayDrawer cArrayDrawer = new CharArrayDrawer();
 		cArrayDrawer.setColorExtractor(colorExtractor);
