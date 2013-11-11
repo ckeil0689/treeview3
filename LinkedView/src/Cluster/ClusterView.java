@@ -32,12 +32,17 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JSpinner;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 
 import javax.swing.JLabel;
@@ -53,6 +58,8 @@ import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.ConfigNode;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.ExportException;
+import edu.stanford.genetics.treeview.FileSet;
+import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.MainPanel;
 import edu.stanford.genetics.treeview.MainProgramArgs;
 import edu.stanford.genetics.treeview.model.TVModel;
@@ -73,9 +80,11 @@ import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
  */
 public class ClusterView extends JPanel implements MainPanel {
 	
-	//Static Variables
 	private static final long serialVersionUID = 1L;
+	
+	//Colors
 	private static final Color BLUE1 = new Color(60, 180, 220, 255);
+	private static final Color RED1 = new Color(240, 80, 50, 255);
 	private final static Color BG_COLOR = new Color(252, 252, 252, 255);
 	
 	//Two Font Sizes
@@ -95,12 +104,10 @@ public class ClusterView extends JPanel implements MainPanel {
 	private JPanel mainPanel;
 	private JPanel optionsPanel;
 	private JPanel buttonPanel;
+	private JPanel emptyPanel;
 	private JLabel head1;
 	private JLabel head2;
 	private JLabel head3;
-//	private InitialPanel initialPanel;
-	private DistanceOptionsPanel doPanel;
-	private ClusterOptionsPanel clusterPanel;
 	private JComboBox geneCombo; 
 	private JComboBox arrayCombo;
 	private JComboBox clusterType;
@@ -118,6 +125,44 @@ public class ClusterView extends JPanel implements MainPanel {
 	
 	private final String[] clusterNames = {"Hierarchical Clustering", 
 			"K-Means"};
+	
+	private JButton cluster_button; 
+	private JButton back_button;
+	private JButton cancel_button;
+	private JButton dendro_button;
+	private JLabel status1; 
+	private JLabel status2;
+	private JLabel method;
+	private JLabel error1;
+	private JLabel error2;
+	private JLabel clusters;
+	private JSpinner enterRC;
+	private JSpinner enterCC;
+	private JLabel its;
+	private JSpinner enterRIt;
+	private JSpinner enterCIt;
+	private JProgressBar pBar;
+	private JProgressBar pBar2;
+	private JProgressBar pBar3;
+	private JProgressBar pBar4;
+	private JPanel loadPanel;
+	private JComboBox clusterChoice;
+	private ClickableIcon infoIcon;
+	
+	private String path;
+	private File file;
+	
+	private String linkageMethod = null;
+	private int row_clusterN = 0;
+	private int row_iterations = 0;
+	private int col_clusterN = 0;
+	private int col_iterations = 0;
+	
+	private SwingWorker<Void, Void> worker;
+	private final String[] clusterMethods = {"Single Linkage", 
+			"Centroid Linkage", "Average Linkage", "Complete Linkage"};
+	
+	private final ClusterFrame clusterFrame;
 
 	/**
 	 * Chained constructor for the ClusterView object
@@ -160,6 +205,8 @@ public class ClusterView extends JPanel implements MainPanel {
 		this.dataModel = dataModel;
 		this.viewFrame = vFrame;
 		
+		clusterFrame = new ClusterFrame(viewFrame, "Cluster Information");
+		
 		//Reference to loaded data
 		matrix = (TVDataMatrix)dataModel.getDataMatrix();
 		dataArray = matrix.getExprData();
@@ -176,6 +223,11 @@ public class ClusterView extends JPanel implements MainPanel {
 		viewFrame.setResizable(true);
 		
 		//Set layout for initial window
+		setupLayout();
+	}	
+	
+	public void setupLayout() {
+		
 		this.setLayout(new MigLayout("ins 0"));
 		this.setBackground(BG_COLOR);
 		
@@ -201,31 +253,41 @@ public class ClusterView extends JPanel implements MainPanel {
 		head1.setFont(fontL);
 		head1.setForeground(BLUE1);
 		
-		clusterType = new JComboBox(clusterNames);
+		clusterType = setComboLayout(clusterNames);
 		clusterType.addActionListener(new ActionListener(){
-
+			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				
-				String choice = (String)clusterType.getSelectedItem();
-				
 				mainPanel.removeAll();
+				optionsPanel.removeAll();
 				
+		  		optionsPanel.add(emptyPanel, "pushx");
+		  		optionsPanel.add(head2, "pushx");
+		  		optionsPanel.add(head3, "pushx, wrap");
+		  		
+		  		optionsPanel.add(similarity, "pushx");
+		  		optionsPanel.add(geneCombo, "growx, pushx");
+		  		optionsPanel.add(arrayCombo,"growx, pushx, wrap");
 				
-				if(choice.equalsIgnoreCase("Hierarchical Clustering")) {
-					clusterPanel = new ClusterOptionsPanel(
-							ClusterView.this, true);
+				if(isHierarchical()) {
+			  		
+					optionsPanel.add(method, "pushx");
+					optionsPanel.add(clusterChoice, "width 20%");
+					optionsPanel.add(infoIcon, "pushx, wrap");
+					
 				} else {
 					
-					clusterPanel = new ClusterOptionsPanel(
-							ClusterView.this, false);
+					optionsPanel.add(clusters, "pushx");
+					optionsPanel.add(enterRC, "pushx");
+					optionsPanel.add(enterCC, "pushx, wrap");
+					optionsPanel.add(its, "pushx");
+					optionsPanel.add(enterRIt, "pushx");
+					optionsPanel.add(enterCIt, "pushx, wrap");
 				}
 				
-				optionsPanel.add(doPanel, "pushx, growx, wrap");
-				optionsPanel.add(clusterPanel, "pushx, growx, wrap");
-				
-				mainPanel.add(head1, "alignx 50%, pushx, wrap");
-				mainPanel.add(clusterType, "wrap");
+				mainPanel.add(head1, "alignx 50%, push, wrap");
+				mainPanel.add(clusterType, "alignx 50%, pushx, wrap");
 				mainPanel.add(optionsPanel, "push, alignx 50%, " +
 						"width 70%:70%:70%, height 50%::, wrap");
 				
@@ -234,7 +296,6 @@ public class ClusterView extends JPanel implements MainPanel {
 				mainPanel.revalidate();
 				mainPanel.repaint();
 			}
-			
 		});
 		
 		//make mainpanel scrollable by adding it to scrollpane
@@ -242,18 +303,284 @@ public class ClusterView extends JPanel implements MainPanel {
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, 
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		
-		//Cluster Options Panel
-		doPanel = new DistanceOptionsPanel();
+		similarity = new JLabel("Similarity Metric: ");
+  		similarity.setFont(fontL);
+  		similarity.setBackground(BG_COLOR);
+  		
+  		//filler component
+  		emptyPanel = new JPanel();
+  		emptyPanel.setLayout(new MigLayout());
+  		emptyPanel.setOpaque(false);
+  		
+		//Labels
+		head2 = new JLabel("Rows");
+		head2.setFont(fontL);
+		head2.setForeground(BLUE1);
 		
-		//Linkage Choice and ProgressBar
-		clusterPanel = new ClusterOptionsPanel(
-				ClusterView.this, true);
+		head3 = new JLabel("Columns");
+		head3.setFont(fontL);
+		head3.setForeground(BLUE1);
+		 
+		//Drop-down menu for row selection
+  		geneCombo = setComboLayout(measurements);
+	
+		//Drop-down menu for column selection
+  		arrayCombo = setComboLayout(measurements);
+  		
+  		optionsPanel.add(emptyPanel, "pushx");
+  		optionsPanel.add(head2, "pushx");
+  		optionsPanel.add(head3, "pushx, wrap");
+  		
+  		optionsPanel.add(similarity, "pushx");
+  		optionsPanel.add(geneCombo, "growx, pushx");
+  		optionsPanel.add(arrayCombo,"growx, pushx, wrap");
+  		
+		worker = new SwingWorker<Void, Void>() {	
+			
+			@Override
+			public Void doInBackground() {
+
+	        	try {
+	        		//Set integers only if KMeans options are shown
+	        		if(!isHierarchical()) {
+		        		row_clusterN = (Integer) enterRC.getValue();
+		        		col_clusterN = (Integer) enterCC.getValue();
+		        		
+		        		row_iterations = (Integer) enterRIt.getValue();
+		        		col_iterations = (Integer) enterCIt.getValue();
+	        		}
+	        		
+	        		//Setup a ClusterProcessor
+	        		ClusterProcessor clusterTarget = 
+	        				new ClusterProcessor(ClusterView.this, pBar, pBar2, 
+	        						pBar3, pBar4, linkageMethod, row_clusterN, 
+	        						row_iterations, col_clusterN, 
+	        						col_iterations);
+	        		
+	        		//Begin the actual clustering, hierarchical or kmeans
+	        		clusterTarget.cluster(isHierarchical());
+	        		
+				} catch (InterruptedException e) {
+					
+					
+				} catch (ExecutionException e) {
+					
+				}
+	        	
+				return null;
+			}
+				
+			@Override
+			protected void done(){
+				
+				buttonPanel.remove(cancel_button);
+				
+				status1 = new JLabel("The file has been saved " +
+						"in the original directory.");
+				status1.setFont(fontS);
+				
+				status2 = new JLabel("File Path: " + path);
+				status2.setFont(fontS);
+				
+				dendro_button.setEnabled(true);
+				buttonPanel.add(back_button, "pushx, alignx 50%");
+				buttonPanel.add(cluster_button, "pushx, alignx 50%");
+				buttonPanel.add(dendro_button, "pushx, alignx 50%");
+				
+				loadPanel.add(status1, "growx, pushx, wrap");
+				loadPanel.add(status2, "growx, pushx, wrap");
+				
+				mainPanel.revalidate();
+				mainPanel.repaint();	
+			}
+		};
 		
-		optionsPanel.add(doPanel, "pushx, growx, wrap");
-		optionsPanel.add(clusterPanel, "pushx, growx, wrap");
+		//Label
+		method = new JLabel("Linkage Method:");
+		method.setFont(fontL);
 		
-		mainPanel.add(head1, "alignx 50%, pushx, wrap");
-		mainPanel.add(clusterType, "wrap");
+		//Clickable Panel to call ClusterFrame
+		infoIcon = new ClickableIcon(clusterFrame, "infoIcon.png");
+    	
+		//Linkage choice drop-down menu
+		clusterChoice = setComboLayout(clusterMethods);
+		
+		clusters = new JLabel("Clusters: ");
+		clusters.setFont(fontL);
+		
+		its = new JLabel("Iterations: ");
+		its.setFont(fontL);
+		
+		enterRC = setupSpinner();
+		enterCC = setupSpinner();
+		enterRIt = setupSpinner();
+		enterCIt = setupSpinner();
+		
+		//ProgressBar Component
+		loadPanel = new JPanel();
+		loadPanel.setLayout(new MigLayout());
+		loadPanel.setBackground(BG_COLOR);
+		loadPanel.setBorder(
+				BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+    	
+  		//Button to go back to data preview
+    	back_button = new JButton("< Back");
+    	back_button = ClusterView.setButtonLayout(back_button);
+		back_button.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				
+				viewFrame.setLoaded(false);
+			}
+    	});
+		
+		//Button to show DendroView
+    	dendro_button = new JButton("Clustergram > ");
+    	dendro_button = ClusterView.setButtonLayout(dendro_button);
+  		dendro_button.addActionListener(new ActionListener(){
+	    		
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				
+				FileSet fileSet = new FileSet(file.getName(), 
+						file.getParent() + File.separator);
+				
+				try {
+					viewFrame.loadFileSet(fileSet);
+					
+				} catch (LoadException e) {
+					
+				}
+				viewFrame.setLoaded(true);
+			}
+    	});
+    	
+    	//Button to begin Clustering
+    	cluster_button = new JButton("Cluster");
+    	cluster_button = ClusterView.setButtonLayout(cluster_button);
+    	cluster_button.addActionListener(new ActionListener() {
+	    		
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+					
+				final String choice = (String)geneCombo.getSelectedItem();
+				final String choice2 = (String)arrayCombo.getSelectedItem();
+				
+				if(isHierarchical()) {
+					linkageMethod = (String)clusterChoice.getSelectedItem();
+				}
+				
+				//needs at least one box to be selected 
+				//otherwise display error
+				if(!choice.contentEquals("Do Not Cluster")
+						||!choice2.contentEquals("Do Not Cluster")) {
+					
+					loadPanel.removeAll();
+					dendro_button.setEnabled(false);
+					buttonPanel.remove(cluster_button);
+					buttonPanel.remove(back_button);
+					
+					//ProgressBars
+					pBar = ClusterView.setPBarLayout(pBar, 
+							"Row Distance Matrix");
+					
+					pBar2 = ClusterView.setPBarLayout(pBar2, "Row Clustering");
+					
+					pBar3 = ClusterView.setPBarLayout(pBar3, 
+							"Column Distance Matrix");
+					
+					pBar4 = ClusterView.setPBarLayout(pBar4, 
+							"Column Clustering");
+					
+					//Button to cancel process
+					cancel_button = new JButton("Cancel");
+					cancel_button = ClusterView.setButtonLayout(cancel_button);
+					cancel_button.addActionListener(new ActionListener(){
+
+						@Override
+						public void actionPerformed(ActionEvent arg0) {
+							
+							worker.cancel(true);
+							
+							loadPanel.removeAll();
+							optionsPanel.remove(loadPanel);
+							buttonPanel.remove(dendro_button);
+							
+							mainPanel.revalidate();
+							mainPanel.repaint();	
+						}
+					});
+
+					if(!choice.contentEquals("Do Not Cluster")
+							&& !choice2.contentEquals("Do Not Cluster")) {
+						loadPanel.add(pBar, "pushx, growx, span, wrap");
+						loadPanel.add(pBar2, "pushx, growx, span, wrap");
+						loadPanel.add(pBar3, "pushx, growx, span, wrap");
+						loadPanel.add(pBar4, "pushx, growx, span, wrap");
+						
+					} else if(!choice.contentEquals("Do Not Cluster")) {
+						loadPanel.add(pBar, "pushx, growx, span, wrap");
+						loadPanel.add(pBar2, "pushx, growx, span, wrap");
+						
+					} else if(!choice2.contentEquals("Do Not Cluster")) {
+						loadPanel.add(pBar3, "pushx, growx, span, wrap");
+						loadPanel.add(pBar4, "pushx, growx, span, wrap");
+					}
+				
+					optionsPanel.add(loadPanel, "push, growx, span, wrap");
+					
+					buttonPanel.add(cancel_button, "pushx, alignx 50%");
+					buttonPanel.add(dendro_button, "pushx, alignx 50%");
+					mainPanel.add(buttonPanel, "pushx, alignx 50%, " +
+							"height 15%::");
+					
+					mainPanel.revalidate();
+					mainPanel.repaint();
+
+					//start new cluster process
+					worker.execute();
+					
+				} else {
+					error1 = new JLabel("Woah, that's too quick!");
+					error1.setFont(fontS);
+					error1.setForeground(RED1);
+					
+					error2 = new JLabel("Please select either a " +
+							"similarity metric for rows, columns, " +
+							"or both to begin clustering!");
+					error2.setFont(fontS);
+					
+					loadPanel.add(error1, "alignx 50%, span, wrap");
+					loadPanel.add(error2, "alignx 50%, span");
+					optionsPanel.add(loadPanel, "alignx 50%, pushx, span");
+					
+					mainPanel.revalidate();
+					mainPanel.repaint();
+				}
+			}	
+    	});
+    	
+    	if(isHierarchical()) {
+    		optionsPanel.add(method, "pushx");
+    		optionsPanel.add(clusterChoice, "pushx");
+    		optionsPanel.add(infoIcon, "pushx, wrap");
+	    	
+    	} else {
+    		optionsPanel.add(clusters, "pushx");
+    		optionsPanel.add(enterRC, "pushx");
+    		optionsPanel.add(enterCC, "pushx, wrap");
+    		optionsPanel.add(its, "pushx");
+    		optionsPanel.add(enterRIt, "pushx");
+    		optionsPanel.add(enterCIt, "pushx");
+    	}
+    	
+    	dendro_button.setEnabled(false);
+  		buttonPanel.add(back_button, "alignx 50%, pushx");
+  		buttonPanel.add(cluster_button, "alignx 50%, pushx");
+  		
+  		mainPanel.add(head1, "alignx 50%, span, push, wrap");
+		mainPanel.add(clusterType, "alignx 50%, span, pushx, wrap");
 		mainPanel.add(optionsPanel, "push, alignx 50%, " +
 				"width 70%:70%:70%, height 50%::, wrap");
 		
@@ -262,223 +589,6 @@ public class ClusterView extends JPanel implements MainPanel {
 		//Add the scrollPane to ClusterView2 Panel
 		this.add(scrollPane, "grow, push");
 	}
-	
-//	/**
-//	 * Subclass to add the initial JPanel containing some info and the data
-//	 * preview table to the background panel.
-//	 * @author CKeil
-//	 *
-//	 */
-//	class InitialPanel extends JPanel {	
-//	  
-//		private static final long serialVersionUID = 1L;
-//		
-//		//Instance variables
-//		private int nRows; 
-//		private int nCols; 
-//		private int sumMatrix; 
-//		private JLabel sumM; 
-//		private JLabel label2; 
-//		private JLabel label3; 
-//		private JLabel numColLabel; 
-//		private JLabel numRowLabel;
-//		private JButton hcluster_button;
-//		private JButton kmcluster_button;
-//		private JButton closeButton;
-//		private JPanel numPanel;
-//	    
-//		/**
-//		 * Constructor
-//		 * Setting up the layout of the panel.
-//		 */
-//		public InitialPanel() {
-//			
-//			this.setLayout(new MigLayout());
-//			setOpaque(false);
-//			
-//	    	HeaderInfo infoArray = dataModel.getArrayHeaderInfo();
-//	    	HeaderInfo infoGene = dataModel.getGeneHeaderInfo();
-//	    	
-//	    	nCols = infoArray.getNumHeaders();
-//	    	nRows = infoGene.getNumHeaders();
-//	   
-//	    	label2 = new JLabel("Matrix Dimensions:");
-//	    	label2.setFont(fontL);
-//	    	
-//	    	//Matrix Information
-//	    	numPanel = new JPanel();
-//	    	numPanel.setLayout(new MigLayout());
-//	    	numPanel.setOpaque(false);
-//	    	
-//	    	numColLabel = new JLabel(nCols + " columns");
-//	    	numColLabel.setFont(fontS);
-//	    	numColLabel.setForeground(RED1);
-//	    	
-//	    	numRowLabel = new JLabel(nRows + " rows X ");
-//	    	numRowLabel.setFont(fontS);
-//	    	numRowLabel.setForeground(RED1);
-//	    	
-//	    	label3 = new JLabel("Data Points:");
-//	    	label3.setFont(fontS);
-//	    	
-//	    	sumMatrix = nCols * nRows;
-//	    	sumM = new JLabel(Integer.toString(sumMatrix));
-//	    	sumM.setFont(fontS);
-//	    	sumM.setForeground(RED1);
-//	    	 
-//	    	//Data Preview
-//	    	DataViewPanel dataView = new DataViewPanel(dataModel);
-//	    	
-//	    	//Hierarchical Cluster Button
-//	    	hcluster_button = new JButton("Hierarchical Cluster >");
-//	    	hcluster_button = setButtonLayout(hcluster_button);
-//			hcluster_button.addActionListener(new ActionListener(){
-//	
-//				@Override
-//				public void actionPerformed(ActionEvent arg0) {
-//					
-//					mainPanel.removeAll();
-//					buttonPanel.removeAll();
-//					
-//					//Cluster Options Panel
-//					doPanel = new DistanceOptionsPanel();
-//					
-//					//Linkage Choice and ProgressBar
-//					clusterPanel = new ClusterOptionsPanel(
-//							ClusterView.this, true);
-//					
-//					head1.setText("Options");
-//					
-//					optionsPanel.add(doPanel, "pushx, growx, wrap");
-//					optionsPanel.add(clusterPanel, "pushx, growx, wrap");
-//					
-//					mainPanel.add(head1, "alignx 50%, pushx, wrap");
-//					mainPanel.add(optionsPanel, "push, alignx 50%, " +
-//							"width 70%:70%:70%, height 50%::, wrap");
-//					mainPanel.add(buttonPanel, "alignx 50%, height 15%::");
-//					
-//					mainPanel.revalidate();
-//					mainPanel.repaint();
-//				}
-//	    	});
-//			
-//			kmcluster_button = new JButton("K-Means >");
-//	    	kmcluster_button = setButtonLayout(kmcluster_button);
-//			kmcluster_button.addActionListener(new ActionListener(){
-//	
-//				@Override
-//				public void actionPerformed(ActionEvent arg0) {
-//					
-//					mainPanel.removeAll();
-//					buttonPanel.removeAll();
-//					
-//					//Cluster Options Panel
-//					doPanel = new DistanceOptionsPanel();
-//					
-//					//Linkage Choice and ProgressBar
-//					clusterPanel = new ClusterOptionsPanel(
-//							ClusterView.this, false);
-//					
-//					head1.setText("Options");
-//					
-//					optionsPanel.add(doPanel, "pushx, growx, wrap");
-//					optionsPanel.add(clusterPanel, "pushx, growx, wrap");
-//					
-//					mainPanel.add(head1, "alignx 50%, pushx, wrap");
-//					mainPanel.add(optionsPanel, "push, alignx 50%, " +
-//							"width 70%:70%:70%, height 50%::, wrap");
-//					mainPanel.add(buttonPanel, "alignx 50%, height 15%::");
-//					
-//					mainPanel.revalidate();
-//					mainPanel.repaint();
-//				}
-//	    	});
-//			
-//			closeButton = new JButton("< Back");
-//			setButtonLayout(closeButton);
-//	  		closeButton.setBackground(BLUE1);
-//	  		closeButton.addActionListener(new ActionListener(){
-//
-//				@Override
-//				public void actionPerformed(ActionEvent arg0) {
-//					
-//					viewFrame.setLoaded(false);
-//				}
-//			});
-//	  		
-//	  		buttonPanel.add(closeButton, "alignx 50%, pushx");
-//	    	buttonPanel.add(hcluster_button, "alignx 50%, pushx");
-//	    	buttonPanel.add(kmcluster_button, "alignx 50%, pushx");
-//	    	
-//	    	numPanel.add(numRowLabel, "span, split 2, alignx 50%");
-//	    	numPanel.add(numColLabel, "wrap");
-//	    	numPanel.add(label3, "span, split 2, alignx 50%");
-//	    	numPanel.add(sumM, "alignx 50%, wrap");
-//	    	
-//	    	this.add(label2, "alignx 50%, wrap");
-//	    	this.add(numPanel, "alignx 50%, pushx, wrap");
-//	    	this.add(dataView, "push, grow, alignx 50%, width 80%:95%:95%");
-//		  }
-//	}
-	
-	/**
-	 * Subclass to be added to the background panel. It offers a choice of 
-	 * similarity measures for both the rows and columns of the input matrix.
-	 * @author CKeil
-	 *
-	 */
-	class DistanceOptionsPanel extends JPanel {	
-		
-		private static final long serialVersionUID = 1L;
-		
-		private JPanel emptyPanel;
-		
-		/**
-		 * Constructor
-		 * Setting up layout of this panel.
-		 */
-		public DistanceOptionsPanel() {
-			
-			//Panel Layout
-			this.setLayout(new MigLayout());
-			this.setBackground(BG_COLOR);
-			
-			//Header
-			similarity = new JLabel("Similarity Metric: ");
-	  		similarity.setFont(fontL);
-	  		similarity.setBackground(BG_COLOR);
-	  		
-	  		//filler component
-	  		emptyPanel = new JPanel();
-	  		emptyPanel.setLayout(new MigLayout());
-	  		emptyPanel.setOpaque(false);
-	  		
-			//Labels
-			head2 = new JLabel("Rows");
-			head2.setFont(fontL);
-			head2.setForeground(BLUE1);
-			
-			head3 = new JLabel("Columns");
-			head3.setFont(fontL);
-			head3.setForeground(BLUE1);
-			 
-			//Drop-down menu for row selection
-	  		geneCombo = new JComboBox(measurements);
-	  		geneCombo = setComboLayout(geneCombo);
-		
-			//Drop-down menu for column selection
-	  		arrayCombo = new JComboBox(measurements);
-	  		arrayCombo = setComboLayout(arrayCombo);
-	  		
-	  		this.add(emptyPanel, "pushx");
-	  		this.add(head2, "pushx");
-	  		this.add(head3, "pushx, wrap");
-	  		
-	  		this.add(similarity, "pushx");
-	  		this.add(geneCombo, "growx, pushx");
-	  		this.add(arrayCombo,"growx, pushx");
-		}
-	}	
 	
 	//Layout setups for some Swing elements
 	/**
@@ -490,7 +600,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	public static JButton setButtonLayout(JButton button){
 		
   		Dimension d = button.getPreferredSize();
-  		d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
+  		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
   		button.setPreferredSize(d);
   		
   		button.setFont(fontS);
@@ -507,15 +617,16 @@ public class ClusterView extends JPanel implements MainPanel {
 	 * @param combo
 	 * @return
 	 */
-	public static JComboBox setComboLayout(JComboBox combo){
+	public static JComboBox setComboLayout(String[] combos){
 		
-		Dimension d = combo.getPreferredSize();
-		d.setSize(d.getWidth(), d.getHeight()*1.5);
-		combo.setPreferredSize(d);
-		combo.setFont(fontS);
-		combo.setBackground(Color.white);
+		JComboBox comboBox = new JComboBox(combos);
+		Dimension d = comboBox.getPreferredSize();
+		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
+		comboBox.setPreferredSize(d);
+		comboBox.setFont(fontS);
+		comboBox.setBackground(Color.white);
 		
-		return combo;
+		return comboBox;
 	}
 	
 	/**
@@ -543,6 +654,50 @@ public class ClusterView extends JPanel implements MainPanel {
 		return pBar;
 	}
 	
+	/**
+	 * Method to setup the look of an editable TextField
+	 * @return
+	 */
+	public JSpinner setupSpinner() {
+		
+		SpinnerNumberModel amountChoice = new SpinnerNumberModel(0, 0, 5000, 1);
+		JSpinner jft = new JSpinner(amountChoice);
+		
+		Dimension d = jft.getPreferredSize();
+		d.setSize(d.getWidth(), d.getHeight()*2);
+		jft.setPreferredSize(d);
+		jft.setFont(fontS);
+		
+		return jft;
+	}
+	
+	/**
+	 * Returns the choice of the cluster drop down menu as a string
+	 * @return
+	 */
+	public boolean isHierarchical() {
+		
+		String choice = (String)clusterType.getSelectedItem();
+		return choice.equalsIgnoreCase("Hierarchical Clustering");
+	}
+	
+	/**
+	 * Setter for file path
+	 * @param filePath
+	 */
+	public void setPath(String filePath){
+		
+		path = filePath;
+	}
+	
+	/**
+	 * Setter for file
+	 * @param cdtFile
+	 */
+	public void setFile(File cdtFile){
+		
+		file = cdtFile;
+	}
 	
 	//Getters
 	public Font getSmallFont() {
@@ -568,14 +723,6 @@ public class ClusterView extends JPanel implements MainPanel {
 		return mainPanel;
 	}
 	
-//	/**
-//	 * Get the optionsPanel for reference
-//	 */
-//	public InitialPanel getInitialPanel(){
-//		
-//		return initialPanel;
-//	}
-	
 	/**
 	 * Get the optionsPanel for reference
 	 */
@@ -590,14 +737,6 @@ public class ClusterView extends JPanel implements MainPanel {
 	public JPanel getButtonPanel(){
 		
 		return buttonPanel;
-	}
-	
-	/**
-	 * Get the finalPanel for reference
-	 */
-	public ClusterOptionsPanel getFinalPanel(){
-		
-		return clusterPanel;
 	}
 	
 	/**
@@ -674,31 +813,6 @@ public class ClusterView extends JPanel implements MainPanel {
 		
 		this.root = root;
 	}
-	
-//	/**
-//	 * Setting up a new InitialPanel
-//	 */
-//	public void setInitialPanel() {
-//		
-//		initialPanel = new InitialPanel();
-//	}
-	
-	/**
-	 * Setting up a new finalPanel
-	 */
-	public void setKMPanel() {
-		
-		clusterPanel = new ClusterOptionsPanel(this, false);
-	}
-	
-	/**
-	 * Setting up a new finalPanel
-	 */
-	public void setHPanel() {
-		
-		clusterPanel = new ClusterOptionsPanel(this, true);
-	}
-	
 	
 	//Empty methods
 	@Override

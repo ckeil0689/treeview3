@@ -50,7 +50,6 @@ import javax.swing.WindowConstants;
 import javax.swing.border.EtchedBorder;
 
 import net.miginfocom.swing.MigLayout;
-import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 /**
  * This class describes the GUI for the Cluster Application. 
@@ -69,7 +68,6 @@ public class ClusterFrame extends JFrame{
 	
 	//Frame and Model instance variables declared
 	protected TreeViewFrame viewFrame;
-	protected DataModel clusterModel;
 	
 	//Various GUI Panels
 	private JScrollPane scrollPane;
@@ -99,14 +97,13 @@ public class ClusterFrame extends JFrame{
 	private final String centroidClosed = "Centroid Linkage";
 	
 	//Constructor
-	protected ClusterFrame(TreeViewFrame f, String title, DataModel dataModel) { 
+	protected ClusterFrame(TreeViewFrame f, String title) { 
 	  
 		//Inherit constructor from JFrame, title passed from ClusterFrameWindow  
 		super(title);
 		
 		//Initialize instance variables
 		this.viewFrame = f;
-		this.clusterModel = dataModel;
 		
 		//setup frame options
 		this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -201,8 +198,7 @@ public class ClusterFrame extends JFrame{
 		//Center JFrame on screen, needs to be used after pack();
 		this.setLocationRelativeTo(null);
     }
-	
-	
+
 	//Information panels to be shown when labels are clicked
 	/**
 	 * This subclass makes up a JPanel which displays the information

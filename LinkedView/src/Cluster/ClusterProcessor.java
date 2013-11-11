@@ -22,6 +22,7 @@ import edu.stanford.genetics.treeview.DataModel;
 public class ClusterProcessor {
 	
 	//Instance variables
+	private ClusterView cView;
 	private DataModel model;
 	private double[] currentArray;
 	private final String rowString = "GENE"; 
@@ -35,7 +36,6 @@ public class ClusterProcessor {
 	private int col_iterations;
 
 	//GUI Components
-	private ClusterOptionsPanel finalPanel;
 	private JPanel mainPanel;
 	private JProgressBar pBar; 
 	private JProgressBar pBar2;
@@ -58,13 +58,13 @@ public class ClusterProcessor {
 			String similarityM, int row_clusterN, int row_iterations, 
 			int col_clusterN, int col_iterations) {
 		
+		this.cView = cView;
 		this.model = cView.getDataModel();
 		this.pBar = pBar;
 		this.pBar2 = pBar2;
 		this.pBar3 = pBar3;
 		this.pBar4 = pBar4;
 		this.currentArray = cView.getDataArray();
-		this.finalPanel = cView.getFinalPanel();
 		this.mainPanel = cView.getMainPanel();
 		this.choice = (String)cView.getGeneCombo().getSelectedItem();
 		this.choice2 = (String)cView.getArrayCombo().getSelectedItem();
@@ -166,8 +166,8 @@ public class ClusterProcessor {
 		
 		cdtGen.generateCDT();
 		
-		finalPanel.setPath(cdtGen.getFilePath());
-		finalPanel.setFile(cdtGen.getFile());
+		cView.setPath(cdtGen.getFilePath());
+		cView.setFile(cdtGen.getFile());
 		
 		mainPanel.revalidate();
 		mainPanel.repaint();
@@ -189,7 +189,7 @@ public class ClusterProcessor {
 		
 		cGen.cluster();
 		
-		finalPanel.setPath(cGen.getFilePath());
+		cView.setPath(cGen.getFilePath());
 		
 		return cGen.getReorderedList();
 	}
@@ -212,7 +212,7 @@ public class ClusterProcessor {
 		
 		cGen.cluster();
 		
-		finalPanel.setPath(cGen.getFilePath());
+		cView.setPath(cGen.getFilePath());
 		
 		return cGen.getReorderedList();
 	}

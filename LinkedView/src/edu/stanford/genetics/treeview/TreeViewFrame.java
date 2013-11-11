@@ -53,8 +53,6 @@ import javax.swing.WindowConstants;
 
 import net.miginfocom.swing.MigLayout;
 
-import Cluster.ClusterFrame;
-import Cluster.ClusterFrameWindow;
 import Cluster.ClusterView;
 
 import edu.stanford.genetics.treeview.core.ArrayFinder;
@@ -102,7 +100,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	private ProgramMenu programMenu;
 	private HeaderFinder geneFinder = null;
 	private HeaderFinder arrayFinder = null;
-	private ClusterFrame clusterDialog = null;
 	
 	private boolean loaded;
 	
@@ -155,19 +152,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		}
 		
 		super.closeWindow();
-	}
-	
-	/** 
-	 * Getter for ClusterDialog 
-	 * @param dataModel
-	 * @return ClusterFrame clusterDialog
-	 */
-	@Override
-	public ClusterFrame getClusterDialogWindow(DataModel dataModel) {
-			clusterDialog = new ClusterFrameWindow(
-					TreeViewFrame.this, dataModel); 
-			
-		return clusterDialog;
 	}	
 	
 	//Loading Methods

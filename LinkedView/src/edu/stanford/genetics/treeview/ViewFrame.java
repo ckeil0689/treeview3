@@ -546,8 +546,6 @@ public abstract class ViewFrame extends JFrame implements Observer {
 
 	abstract public HeaderFinder getGeneFinder();
 	
-	abstract public ClusterFrame getClusterDialogWindow(DataModel cModel);
-	
 	/**
 	 * Method opens a file chooser dialog
 	 * @return File file

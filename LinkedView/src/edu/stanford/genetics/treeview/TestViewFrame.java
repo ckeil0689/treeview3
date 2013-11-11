@@ -23,7 +23,6 @@
 package edu.stanford.genetics.treeview;
 import javax.swing.JLabel;
 
-import Cluster.ClusterFrame;
 import edu.stanford.genetics.treeview.core.HeaderFinder;
 
 
@@ -121,13 +120,5 @@ public class TestViewFrame extends ViewFrame {
 	public MainPanel[] getMainPanels() {
 		return null;
 	}
-
-
-	@Override
-	public ClusterFrame getClusterDialogWindow(DataModel cModel) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }
 
