@@ -19,8 +19,9 @@ public class SSMouseListener implements MouseListener{
 	/**
 	 * Instance Variables
 	 */
-	private final Color BLUE1 = new Color(60, 180, 220, 255);
-	private final Color RED1 = new Color(240, 80, 50, 255);
+	private final Color BLUE1 = new Color(6, 163, 220, 255);
+	private final Color BLUE2 = new Color(12, 130, 170, 255);
+	private final Color GRAY1 = new Color(160, 161, 162, 255);
 	
 	private JLabel label;
 	private JPanel panel;
@@ -63,7 +64,7 @@ public class SSMouseListener implements MouseListener{
 	@Override
 	public void mouseEntered(MouseEvent arg0) {
 		
-		label.setForeground(RED1);
+		label.setForeground(BLUE2);
 		label.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
 		if(panel != null) {
@@ -95,7 +96,7 @@ public class SSMouseListener implements MouseListener{
 	@Override
 	public void mousePressed(MouseEvent arg0) {
 		
-		label.setForeground(Color.LIGHT_GRAY);
+		label.setForeground(GRAY1);
 	}
 	
 	/**

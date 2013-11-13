@@ -88,6 +88,11 @@ public class FileSet {
 	}
 
 
+	public FileSet(String dir) {
+		node = new DummyConfigNode("FileSet");
+		setDir(dir);
+	}
+
 	/**
 	 *  Gets the configNode attribute of the FileSet object
 	 *

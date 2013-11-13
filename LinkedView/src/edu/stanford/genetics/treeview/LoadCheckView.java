@@ -5,7 +5,12 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
 
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -24,9 +29,9 @@ class LoadCheckView extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
 	//Colors
-	private static final Color BLUE1 = new Color(60, 180, 220, 255);
+	private static final Color BLUE1 = new Color(6, 163, 220, 255);
 	private static final Color RED1 = new Color(240, 80, 50, 255);
-	private static final Color BG_COLOR = new Color(252, 252, 252, 255);
+	private static final Color BG_COLOR = new Color(255, 255, 255, 255);
 	
 	//Two Font Sizes
 	private static Font fontS = new Font("Sans Serif", Font.PLAIN, 18);
@@ -40,8 +45,16 @@ class LoadCheckView extends JPanel {
 	private JLabel numRowLabel;
 	private JButton loadNewButton;
 	private JButton advanceButton;
+	private JPanel feedbackPanel;
 	private JPanel numPanel;
 	private JPanel buttonPanel;
+	
+	//Variables for checkmark
+	private JLabel success;
+	private JLabel icon;
+	private BufferedImage labelImg;
+	private ClassLoader classLoader;
+	private InputStream input;
     
 	/**
 	 * Constructor
@@ -52,9 +65,30 @@ class LoadCheckView extends JPanel {
 		this.setLayout(new MigLayout());
 		this.setBackground(BG_COLOR);
 		
+		feedbackPanel = new JPanel();
+		feedbackPanel.setLayout(new MigLayout());
+		feedbackPanel.setOpaque(false);
+		
 		if(dataModel != null) {
 			
-		
+			classLoader = Thread.currentThread().getContextClassLoader();
+			input = classLoader.getResourceAsStream("checkmark.png");
+			
+			try {
+				
+				labelImg = ImageIO.read(input);
+				icon = new JLabel(new ImageIcon(labelImg));
+				
+				success = new JLabel("Great, loading successful!");
+				success.setFont(fontL);
+				
+				feedbackPanel.add(success);
+				feedbackPanel.add(icon);
+				
+			} catch (IOException e) {
+				
+			}
+			
 	    	HeaderInfo infoArray = dataModel.getArrayHeaderInfo();
 	    	HeaderInfo infoGene = dataModel.getGeneHeaderInfo();
 	    	
@@ -83,9 +117,8 @@ class LoadCheckView extends JPanel {
 	    	//Data Preview
 	    	DataViewPanel dataView = new DataViewPanel(dataModel);
 	    	
-			loadNewButton = new JButton("Load New File");
+			loadNewButton = new JButton("Load Different File");
 			setButtonLayout(loadNewButton);
-			loadNewButton.setBackground(BLUE1);
 			loadNewButton.addActionListener(new ActionListener(){
 	
 				@Override
@@ -95,9 +128,8 @@ class LoadCheckView extends JPanel {
 				}
 			});
 			
-			advanceButton = new JButton("Next >");
+			advanceButton = new JButton("Continue >");
 			setButtonLayout(advanceButton);
-			advanceButton.setBackground(BLUE1);
 			advanceButton.addActionListener(new ActionListener(){
 	
 				@Override
@@ -114,10 +146,12 @@ class LoadCheckView extends JPanel {
 	    	numPanel.add(numColLabel, "span, wrap");
 	    	numPanel.add(label3);
 	    	
-	    	this.add(numPanel, "span, wrap");
-	    	this.add(dataView, "push, grow, alignx 50%, width ::60%, " +
+	    	this.add(feedbackPanel, "alignx 50%, pushx, span, wrap");
+	    	this.add(numPanel, "span, pushx, growx, alignx 50%, width ::60%, " +
+	    			"wrap");
+	    	this.add(dataView, "span, push, grow, alignx 50%, width ::60%, " +
 	    			"height ::60%, wrap");
-	    	this.add(buttonPanel, "alignx 50%, pushx");
+	    	this.add(buttonPanel, "span, alignx 50%, push");
 	    	
 		} else {
 			

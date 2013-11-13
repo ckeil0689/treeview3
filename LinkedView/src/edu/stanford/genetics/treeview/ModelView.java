@@ -39,6 +39,8 @@ MouseListener {
 
 	private static final long serialVersionUID = 1L;
 	
+	private final Color labelColor = new Color(178, 129, 0, 255);
+	
 	protected ViewFrame    viewFrame = null;
 	protected MessagePanel status = null;
 	protected boolean      hasMouse = false;
@@ -200,7 +202,7 @@ MouseListener {
 			return;
 		}
 		
-		setBorder(BorderFactory.createLineBorder(Color.black, 1));
+		setBorder(BorderFactory.createLineBorder(labelColor, 1));
 		
 		Window frame = enclosingWindow();
 		if (frame.isActive()) {

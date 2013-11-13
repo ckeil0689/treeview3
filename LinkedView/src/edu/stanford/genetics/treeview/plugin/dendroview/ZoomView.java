@@ -23,8 +23,12 @@
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.Observable;
 import javax.swing.JOptionPane;
 
@@ -43,7 +47,8 @@ import edu.stanford.genetics.treeview.*;
  * and usage appropriately.
 
 */
-class ZoomView extends ModelViewProduced implements MouseMotionListener {
+class ZoomView extends ModelViewProduced implements MouseMotionListener, 
+MouseWheelListener, KeyListener {
 	
 	private static final long serialVersionUID = 1L;
     
@@ -68,6 +73,8 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
 		setToolTipText("This Turns Tooltips On");
 		addMouseListener(this);
 		addMouseMotionListener(this);
+		addMouseWheelListener(this);
+		addKeyListener(this);
     }
 	
 	/**
@@ -432,19 +439,6 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
 
     	this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
-    
-    @Override
-    public void mouseDragged(MouseEvent e){
-    	
-    	int dx = e.getX() - mousePt.x;
-    	int dy = e.getY() - mousePt.y;
-    	
-    	
-//    	this.revalidate();
-//    	this.repaint();
-//    	getZoomXmap().dragPanel(dx/(getZoomXmap().getScale()*10));
-//    	getZoomYmap().dragPanel(dy/(getZoomYmap().getScale()*10));
-    }
 
 	@Override
 	public String getToolTipText(MouseEvent e) {
@@ -461,7 +455,10 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
 				} else if (drawer.isEmpty(overx, geneRow)) {
 					ret = null;
 				} else {
-					ret = "" + drawer.getSummary(overx, geneRow);
+					int row = geneRow + 1;
+					int col = overx + 1;
+					ret = "Row: " + row + " Column: " + col + " Value: " 
+					+ drawer.getSummary(overx, geneRow);
 				}
 			}
 		}
@@ -472,6 +469,49 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener {
 		
 		geneHI = ghi;
 		arrayHI = ahi;
+	}
+
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e) {
+		
+		int notches = e.getWheelRotation();
+		int shift = 3;
+		
+		if(notches < 0) {
+			getZoomYmap().scrollBy(-shift);
+			
+		} else {
+			getZoomYmap().scrollBy(shift);
+		}
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		
+		int c = e.getKeyCode();
+		int shift;
+		
+		if (e.isShiftDown()) {
+			shift = 10;
+			
+		} else {
+			shift = 1;
+		}
+		
+		switch (c) {
+		case KeyEvent.VK_LEFT:
+			getZoomXmap().scrollBy(-shift);
+			break;
+		case KeyEvent.VK_RIGHT:
+			getZoomXmap().scrollBy(shift);
+			break;
+		case KeyEvent.VK_UP:
+			getZoomYmap().scrollBy(-shift);
+			break;
+		case KeyEvent.VK_DOWN:
+			getZoomYmap().scrollBy(shift);
+			break;
+		}		
 	}
 }
 

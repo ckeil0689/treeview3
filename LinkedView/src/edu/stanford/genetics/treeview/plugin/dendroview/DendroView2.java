@@ -105,7 +105,7 @@ MainPanel, Observer {
 	protected TabbedSettingsPanel settingsPanel;
 	
 	protected final static Color RED1 = new Color(240, 80, 50, 255);
-	protected final static Color BLUE1 = new Color(60, 180, 220, 255);
+	protected final static Color BLUE1 = new Color(6, 163, 220, 255);
 	private final static Color BG_COLOR = new Color(235, 240, 255, 255);
 	
 	/*
@@ -803,7 +803,7 @@ MainPanel, Observer {
 			
 		});
 		
-		scaleDefaultX = setZoomButtonLayout("Reset", BLUE1);
+		scaleDefaultX = setZoomButtonLayout("0", BLUE1);
 		scaleDefaultX.addActionListener(new ActionListener(){
 
 			@Override
@@ -833,7 +833,7 @@ MainPanel, Observer {
 			
 		});
 		
-		scaleDefaultY = setZoomButtonLayout("Reset", BLUE1);
+		scaleDefaultY = setZoomButtonLayout("0", BLUE1);
 		scaleDefaultY.addActionListener(new ActionListener(){
 
 			@Override
@@ -1181,6 +1181,10 @@ MainPanel, Observer {
 		scalePaneY.setLayout(new MigLayout());
 		scalePaneY.setOpaque(false);
 		
+		JPanel filler = new JPanel();
+		filler.setLayout(new MigLayout());
+		filler.setOpaque(true);
+		
 		//Register Views
 		registerView(globalview);
 		registerView(atrview);
@@ -1220,7 +1224,8 @@ MainPanel, Observer {
 		
 		right.add(level1Pane, "push, grow");
 		
-		upSide.add(atrzview, "push, grow, , height 15%::, width 65%");
+		upSide.add(atrzview, "push, grow, height 15%::, width 65%");
+		upSide.add(filler, "pushx, growx, width 35%");
 		
 		gtrPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
 				textpanel, gtrzview);
@@ -1229,7 +1234,7 @@ MainPanel, Observer {
 		
 		downSide.add(arraynameview, "pushx, growx, height 15%::, " +
 				"width 65%");
-		downSide.add(scalePaneY, "wrap");
+		downSide.add(scalePaneY, "height 15%::, wrap");
 		downSide.add(zoompanel, "push, grow, width 65%");
 		downSide.add(gtrPane, "push, grow, width 35%, wrap");
 		downSide.add(scalePaneX, "pushx, span");
@@ -2161,9 +2166,15 @@ MainPanel, Observer {
 	 */
 	public JButton setZoomButtonLayout(String title, Color color){
 
+		int buttonSide = 30;
+		
 		Font buttonFont = new Font("Sans Serif", Font.BOLD, 16);
 		
 		JButton button = new JButton(title);
+		
+		Dimension d = button.getPreferredSize();
+  		d.setSize(buttonSide, buttonSide);
+  		button.setPreferredSize(d);
   	
   		button.setFont(buttonFont);
   		button.setOpaque(true);

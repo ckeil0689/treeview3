@@ -83,9 +83,9 @@ public class ClusterView extends JPanel implements MainPanel {
 	private static final long serialVersionUID = 1L;
 	
 	//Colors
-	private static final Color BLUE1 = new Color(60, 180, 220, 255);
+	private static final Color BLUE1 = new Color(6, 163, 220, 255);
 	private static final Color RED1 = new Color(240, 80, 50, 255);
-	private final static Color BG_COLOR = new Color(252, 252, 252, 255);
+	private final static Color BG_COLOR = new Color(255, 255, 255, 255);
 	
 	//Two Font Sizes
 	private static Font fontS = new Font("Sans Serif", Font.PLAIN, 18);
@@ -135,6 +135,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	private JLabel method;
 	private JLabel error1;
 	private JLabel error2;
+	private JLabel error3;
 	private JLabel clusters;
 	private JSpinner enterRC;
 	private JSpinner enterCC;
@@ -262,36 +263,9 @@ public class ClusterView extends JPanel implements MainPanel {
 				mainPanel.removeAll();
 				optionsPanel.removeAll();
 				
-		  		optionsPanel.add(emptyPanel, "pushx");
-		  		optionsPanel.add(head2, "pushx");
-		  		optionsPanel.add(head3, "pushx, wrap");
-		  		
-		  		optionsPanel.add(similarity, "pushx");
-		  		optionsPanel.add(geneCombo, "growx, pushx");
-		  		optionsPanel.add(arrayCombo,"growx, pushx, wrap");
+		  		setOptionsPanel();
 				
-				if(isHierarchical()) {
-			  		
-					optionsPanel.add(method, "pushx");
-					optionsPanel.add(clusterChoice, "width 20%");
-					optionsPanel.add(infoIcon, "pushx, wrap");
-					
-				} else {
-					
-					optionsPanel.add(clusters, "pushx");
-					optionsPanel.add(enterRC, "pushx");
-					optionsPanel.add(enterCC, "pushx, wrap");
-					optionsPanel.add(its, "pushx");
-					optionsPanel.add(enterRIt, "pushx");
-					optionsPanel.add(enterCIt, "pushx, wrap");
-				}
-				
-				mainPanel.add(head1, "alignx 50%, push, wrap");
-				mainPanel.add(clusterType, "alignx 50%, pushx, wrap");
-				mainPanel.add(optionsPanel, "push, alignx 50%, " +
-						"width 70%:70%:70%, height 50%::, wrap");
-				
-				mainPanel.add(buttonPanel, "alignx 50%, height 15%::");
+				setMainPanel();
 				
 				mainPanel.revalidate();
 				mainPanel.repaint();
@@ -326,14 +300,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	
 		//Drop-down menu for column selection
   		arrayCombo = setComboLayout(measurements);
-  		
-  		optionsPanel.add(emptyPanel, "pushx");
-  		optionsPanel.add(head2, "pushx");
-  		optionsPanel.add(head3, "pushx, wrap");
-  		
-  		optionsPanel.add(similarity, "pushx");
-  		optionsPanel.add(geneCombo, "growx, pushx");
-  		optionsPanel.add(arrayCombo,"growx, pushx, wrap");
+  
   		
 		worker = new SwingWorker<Void, Void>() {	
 			
@@ -473,8 +440,7 @@ public class ClusterView extends JPanel implements MainPanel {
 				
 				//needs at least one box to be selected 
 				//otherwise display error
-				if(!choice.contentEquals("Do Not Cluster")
-						||!choice2.contentEquals("Do Not Cluster")) {
+				if(checkSelections(choice, choice2)) {
 					
 					loadPanel.removeAll();
 					dendro_button.setEnabled(false);
@@ -542,18 +508,36 @@ public class ClusterView extends JPanel implements MainPanel {
 					worker.execute();
 					
 				} else {
+					loadPanel.removeAll();
 					error1 = new JLabel("Woah, that's too quick!");
 					error1.setFont(fontS);
 					error1.setForeground(RED1);
 					
-					error2 = new JLabel("Please select either a " +
-							"similarity metric for rows, columns, " +
-							"or both to begin clustering!");
+					String hint = "";
+					String hint2 = "";
+					
+					if(isHierarchical()) {
+						hint = "Select at least one similarity metric for " +
+								"either rows or columns to begin clustering!";
+						
+					} else {
+						hint = "Select at least one similarity metric for " +
+								"either rows or columns to begin clustering!";
+						
+						hint2 = "The amount of clusters and iterations must" +
+								"be greater than 0.";
+					}
+					
+					error2 = new JLabel(hint);
 					error2.setFont(fontS);
 					
+					error3 = new JLabel(hint2);
+					error3.setFont(fontS);
+					
 					loadPanel.add(error1, "alignx 50%, span, wrap");
-					loadPanel.add(error2, "alignx 50%, span");
-					optionsPanel.add(loadPanel, "alignx 50%, pushx, span");
+					loadPanel.add(error2, "alignx 50%, span, wrap");
+					loadPanel.add(error3, "alignx 50%, span");
+					optionsPanel.add(loadPanel, "alignx 50%, push, span");
 					
 					mainPanel.revalidate();
 					mainPanel.repaint();
@@ -561,36 +545,61 @@ public class ClusterView extends JPanel implements MainPanel {
 			}	
     	});
     	
-    	if(isHierarchical()) {
-    		optionsPanel.add(method, "pushx");
-    		optionsPanel.add(clusterChoice, "pushx");
-    		optionsPanel.add(infoIcon, "pushx, wrap");
-	    	
-    	} else {
-    		optionsPanel.add(clusters, "pushx");
-    		optionsPanel.add(enterRC, "pushx");
-    		optionsPanel.add(enterCC, "pushx, wrap");
-    		optionsPanel.add(its, "pushx");
-    		optionsPanel.add(enterRIt, "pushx");
-    		optionsPanel.add(enterCIt, "pushx");
-    	}
+    	setOptionsPanel();
     	
     	dendro_button.setEnabled(false);
   		buttonPanel.add(back_button, "alignx 50%, pushx");
   		buttonPanel.add(cluster_button, "alignx 50%, pushx");
   		
-  		mainPanel.add(head1, "alignx 50%, span, push, wrap");
-		mainPanel.add(clusterType, "alignx 50%, span, pushx, wrap");
-		mainPanel.add(optionsPanel, "push, alignx 50%, " +
-				"width 70%:70%:70%, height 50%::, wrap");
-		
-		mainPanel.add(buttonPanel, "alignx 50%, height 15%::");
+  		setMainPanel();
 		
 		//Add the scrollPane to ClusterView2 Panel
 		this.add(scrollPane, "grow, push");
 	}
 	
 	//Layout setups for some Swing elements
+	/**
+	 * Sets up general elements of the mainPanel
+	 */
+	public void setMainPanel() {
+		
+		mainPanel.add(head1, "alignx 50%, push, wrap");
+		mainPanel.add(clusterType, "alignx 50%, pushx, wrap");
+		mainPanel.add(optionsPanel, "push, alignx 50%, " +
+				"width 70%:70%:70%, height 50%::, wrap");
+		mainPanel.add(buttonPanel, "alignx 50%, height 15%::");
+	}
+	
+	/**
+	 * Sets up general elements of the optionsPanel
+	 */
+	public void setOptionsPanel() {
+		
+  		optionsPanel.add(emptyPanel, "pushx");
+  		optionsPanel.add(head2, "alignx 50%, pushx");
+  		optionsPanel.add(head3, "alignx 50%, pushx, wrap");
+  		
+  		optionsPanel.add(similarity, "pushx");
+  		optionsPanel.add(geneCombo, "alignx 50%, pushx");
+  		optionsPanel.add(arrayCombo,"alignx 50%, pushx, wrap");
+  		
+  		if(isHierarchical()) {
+	  		
+			optionsPanel.add(method, "pushx");
+			optionsPanel.add(clusterChoice, "alignx 50%, width 20%");
+			optionsPanel.add(infoIcon, "pushx, wrap");
+			
+		} else {
+			
+			optionsPanel.add(clusters, "pushx");
+			optionsPanel.add(enterRC, "alignx 50%, pushx");
+			optionsPanel.add(enterCC, "alignx 50%, pushx, wrap");
+			optionsPanel.add(its, "pushx");
+			optionsPanel.add(enterRIt, "alignx 50%, pushx");
+			optionsPanel.add(enterCIt, "alignx 50%, pushx, wrap");
+		}
+	}
+	
 	/**
 	 * Setting up a general layout for a button object
 	 * The method is used to make all buttons appear consistent in aesthetics
@@ -679,6 +688,40 @@ public class ClusterView extends JPanel implements MainPanel {
 		
 		String choice = (String)clusterType.getSelectedItem();
 		return choice.equalsIgnoreCase("Hierarchical Clustering");
+	}
+	
+	/**
+	 * Checks whether all needed options are selected to perform clustering.
+	 * @param choice
+	 * @param choice2
+	 * @return
+	 */
+	public boolean checkSelections(String choice, String choice2) {
+		
+		int clustersR = (Integer) enterRC.getValue();
+		int itsR = (Integer) enterRIt.getValue();
+		int clustersC = (Integer) enterCC.getValue();
+		int itsC = (Integer) enterCIt.getValue();
+		
+		if(isHierarchical()) {
+			if(!choice.contentEquals("Do Not Cluster")
+					|| !choice2.contentEquals("Do Not Cluster")){
+						return true;
+						
+					} else {
+						return false;
+					}	
+		} else {
+			if((!choice.contentEquals("Do Not Cluster") 
+					&& (clustersR > 0 && itsR > 0))
+					|| (!choice2.contentEquals("Do Not Cluster")
+					&& (clustersC > 0 && itsC > 0))) {
+				return true;
+				
+			} else {
+				return false;
+			}
+		}
 	}
 	
 	/**

@@ -175,6 +175,15 @@ AdjustmentListener, ConfigNodePersistent {
         }
     }
     
+    public void scrollBy(int i) {
+        
+    	int j = scrollbar.getValue();
+        scrollbar.setValue(j + i);
+        if (j != scrollbar.getValue()) {
+        	setChanged();
+        }
+    }
+    
     public JScrollBar getScroll() {
     	
     	return scrollbar;

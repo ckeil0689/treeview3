@@ -38,7 +38,7 @@ public class FontSelector extends Panel {
 	 */
 	private static final long serialVersionUID = 1L;
 	//FIXME deprecated method.
-	public static final String[] fonts               = Toolkit.getDefaultToolkit().getFontList();
+	public static final String[] fonts = Toolkit.getDefaultToolkit().getFontList();
 	/*
 	 *  {
 	 *  "Courier",

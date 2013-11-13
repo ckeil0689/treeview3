@@ -32,7 +32,6 @@ import java.util.*;
 import javax.swing.*;
 
 import Cluster.ClusterFileFilter;
-import Cluster.ClusterFrame;
 import edu.stanford.genetics.treeview.core.FileMru;
 import edu.stanford.genetics.treeview.core.HeaderFinder;
 import edu.stanford.genetics.treeview.model.DataModelWriter;

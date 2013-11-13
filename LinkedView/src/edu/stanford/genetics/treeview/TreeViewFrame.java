@@ -91,10 +91,10 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	protected JDialog presetsFrame = null; 
 	protected TabbedSettingsPanel presetsPanel = null;
 	
-	private final Color BLUE1 = new Color(60, 180, 220, 255);
-	private final Color GRAY1 = new Color(150, 150, 150, 255);
-	private final Color GRAY2 = new Color(100, 100, 100, 255);
-	private final Color BG_COLOR = new Color(252, 252, 252, 255);
+	private static final Color GRAY1 = new Color(160, 161, 162, 255);
+	private static final Color GRAY2 = new Color(100, 100, 100, 255);
+	private static final Color BLUE1 = new Color(6, 163, 220, 255);
+	private static final Color BG_COLOR = new Color(255, 255, 255, 255);
 
 	private TreeViewApp treeView;
 	private ProgramMenu programMenu;
@@ -1368,7 +1368,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		jl2.setFont(new Font("Sans Serif", Font.BOLD, 50));
 		jl2.setForeground(BG_COLOR);
 		
-		ClickableImage load_Icon = new ClickableImage(this, 
+		ClickableLabel load_Icon = new ClickableLabel(this, 
 				"Load Data >");
 		
 		title_bg.add(jl, "push, alignx 50%, span, wrap");
@@ -1409,10 +1409,10 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		ques.setFont(new Font("Sans Serif", Font.PLAIN, 50));
 		ques.setForeground(GRAY2);
 		
-		ClickableImage clus_icon = new ClickableImage(this, "Cluster >", 
+		ClickableLabel clus_label = new ClickableLabel(this, "Cluster >", 
 				(TVModel)dataModel);
 		
-		ClickableImage viz_icon = new ClickableImage(this, "Visualize >",  
+		ClickableLabel viz_label = new ClickableLabel(this, "Visualize >",  
 				(TVModel)dataModel);
 		
 		loadNew = new JLabel("  Load New File");
@@ -1432,10 +1432,10 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		confirmPanel.add(loadNew, "pushx");
 		labelPanel.add(ques, "alignx 50%, push, grow, span");
 		
-		waiting.add(labelPanel, "push, alignx 50%, span, wrap");
-		waiting.add(clus_icon, "push, grow, alignx 50%");
-		waiting.add(viz_icon, "push, grow, alignx 50%, wrap");
-		waiting.add(confirmPanel, "pushx, alignx 50%, span");
+		waiting.add(labelPanel, "push, alignx 50%, span, height ::10%, wrap");
+		waiting.add(clus_label, "push, alignx 50%");
+		waiting.add(viz_label, "push, alignx 50%, wrap");
+		waiting.add(confirmPanel, "push, alignx 50%, aligny 100%, span");
 		
 		waiting.repaint();
 		waiting.revalidate();
