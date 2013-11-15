@@ -30,7 +30,7 @@ public class ClickableLabel extends JPanel {
 	private TreeViewFrame frame;
 	private String labelText;
 	
-	private Color BLUE1 = new Color(60, 180, 220, 255);
+	private Color BLUE1 = new Color(118, 193, 228, 255);
 	
 	/**
 	 * Static variables

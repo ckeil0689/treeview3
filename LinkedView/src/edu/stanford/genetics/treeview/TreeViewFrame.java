@@ -93,7 +93,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	
 	private static final Color GRAY1 = new Color(160, 161, 162, 255);
 	private static final Color GRAY2 = new Color(100, 100, 100, 255);
-	private static final Color BLUE1 = new Color(6, 163, 220, 255);
+	private static final Color BLUE1 = new Color(118, 193, 228, 255);
 	private static final Color BG_COLOR = new Color(255, 255, 255, 255);
 
 	private TreeViewApp treeView;

@@ -51,7 +51,7 @@ public class LoadProgress2 extends JDialog implements LoadProgress2I {
 
 	private static final long serialVersionUID = 1L;
 	
-	private final static Color BLUE1 = new Color(6, 163, 220, 255);
+	private final static Color BLUE1 = new Color(118, 193, 228, 255);
 	
 	/** set when we encounter a problem in parsing? */
 	private boolean hadProblem = false;

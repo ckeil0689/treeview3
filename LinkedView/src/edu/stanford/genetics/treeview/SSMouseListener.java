@@ -19,8 +19,8 @@ public class SSMouseListener implements MouseListener{
 	/**
 	 * Instance Variables
 	 */
-	private final Color BLUE1 = new Color(6, 163, 220, 255);
-	private final Color BLUE2 = new Color(12, 130, 170, 255);
+	private final Color BLUE1 = new Color(118, 193, 228, 255);
+	private final Color BLUE2 = new Color(6, 180, 250, 255);
 	private final Color GRAY1 = new Color(160, 161, 162, 255);
 	
 	private JLabel label;

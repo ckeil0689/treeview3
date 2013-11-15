@@ -29,7 +29,7 @@ class LoadCheckView extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
 	//Colors
-	private static final Color BLUE1 = new Color(6, 163, 220, 255);
+	private static final Color BLUE1 = new Color(118, 193, 228, 255);
 	private static final Color RED1 = new Color(240, 80, 50, 255);
 	private static final Color BG_COLOR = new Color(255, 255, 255, 255);
 	
@@ -72,14 +72,14 @@ class LoadCheckView extends JPanel {
 		if(dataModel != null) {
 			
 			classLoader = Thread.currentThread().getContextClassLoader();
-			input = classLoader.getResourceAsStream("checkmark.png");
+			input = classLoader.getResourceAsStream("checkmark2.png");
 			
 			try {
 				
 				labelImg = ImageIO.read(input);
 				icon = new JLabel(new ImageIcon(labelImg));
 				
-				success = new JLabel("Great, loading successful!");
+				success = new JLabel("Great, loading was successful!");
 				success.setFont(fontL);
 				
 				feedbackPanel.add(success);

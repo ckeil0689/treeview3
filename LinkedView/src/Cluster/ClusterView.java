@@ -83,7 +83,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	private static final long serialVersionUID = 1L;
 	
 	//Colors
-	private static final Color BLUE1 = new Color(6, 163, 220, 255);
+	private static final Color BLUE1 = new Color(118, 193, 228, 255);
 	private static final Color RED1 = new Color(240, 80, 50, 255);
 	private final static Color BG_COLOR = new Color(255, 255, 255, 255);
 	

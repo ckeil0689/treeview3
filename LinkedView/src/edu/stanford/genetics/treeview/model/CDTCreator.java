@@ -8,12 +8,39 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class transforms any loaded file of non-cdt format to a cdt file
+ * in order to use existing infrastructure in the JTV source code and expanding
+ * the compatibility of loaded files to other delimited file types without
+ * rewriting and adjusting a lot of the source code. The cdt file type used by
+ * Java TreeView assumes a certain format, so any loaded file will be scanned
+ * for the required data and a formatted cdt file is generated.
+ * 
+ * @author CKeil
+ *
+ */
 public class CDTCreator {
 
 	private BufferedReader reader = null;
 	private File file;
 	private ArrayList<List<String>> dataSet;
 	
+	//label positions
+	private List<Integer> gidInd = new ArrayList<Integer>();
+	private List<Integer> aidInd = new ArrayList<Integer>();
+	private List<Integer> orfInd = new ArrayList<Integer>();
+	private List<Integer> gweightInd = new ArrayList<Integer>();
+	private List<Integer> eweightInd = new ArrayList<Integer>();
+	private List<Integer> dataStart = new ArrayList<Integer>();
+	private List<Integer> nameInd = new ArrayList<Integer>();
+	
+	private final String SEPARATOR = "\t";
+	private final String END_OF_ROW = "\n";
+	
+	/**
+	 * Constructor
+	 * @param file
+	 */
 	public CDTCreator(File file) {
 		
 		this.file = file;
@@ -50,7 +77,32 @@ public class CDTCreator {
 			}
 			
 			System.out.println("First row PRE: " + dataSet.get(0));
+			System.out.println("Dataset length " + dataSet.size());
 			
+			//find GWEIGHT and EWEIGHT
+			findLabel(gidInd, "GID");
+			findLabel(aidInd, "AID");
+			findLabel(orfInd, "ORF");
+			findLabel(nameInd, "NAME");
+			findLabel(eweightInd, "EWEIGHT");
+			findLabel(gweightInd, "GWEIGHT");
+			
+			//currently making an assumption rather than actually finding
+			//the beginning of data values...
+			dataStart.add(eweightInd.get(0) + 1);
+			dataStart.add(gweightInd.get(1) + 1);
+			
+			System.out.println("GID: " + gidInd);
+			System.out.println("AID: " + aidInd);
+			System.out.println("ORF: " + orfInd);
+			System.out.println("GWEIGHT: " + gweightInd);
+			System.out.println("EWEIGHT: " + eweightInd);
+			System.out.println("DataStart: " + dataStart);
+			System.out.println("NAME: " + nameInd);
+			
+			String cdt = generateCDT();
+			
+			System.out.println(cdt);
 			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -68,11 +120,130 @@ public class CDTCreator {
 		}
 	}
 	
-	private void findLabels() {
+	private void findLabel(List<Integer> labelPos, String label) {
 		
+		//check for labels in the first 20 rows
+		int threshold = 20;
+		
+		//find GWEIGHT and EWEIGHT
+		for(List<String> row : dataSet) {
+			for(String element : row) {
+				
+				if(element.equalsIgnoreCase(label)) {
+					labelPos.add(dataSet.indexOf(row));
+					labelPos.add(row.indexOf(element));
+					break;
+				}
+			}
+			
+			if(labelPos.size() > 0 || dataSet.indexOf(row) > threshold) {
+				if(labelPos.size() == 0) {
+					labelPos.add(null);
+					labelPos.add(null);
+				}
+				
+				break;
+			}
+		}	
 	}
 	
-	private void generateCDT() {
+	/**
+	 * Composes a .cdt file to further be used by JTV from any tab-delimited
+	 * file. JTV uses the specific .cdt-format with very defined row and column
+	 * elements to display certain data in its various views.
+	 * This function assembles such a .cdt file from the scavenged data of the
+	 * loaded input file. 
+	 */
+	private String generateCDT() {
+		
+		int orfRow = orfInd.get(0);
+		int eweightRow = eweightInd.get(0);
+		int dataCol = dataStart.get(1);
+		int dataRow = dataStart.get(0);
+		
+		String finalCDT = "";
+		
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append("GID");
+		sb.append(SEPARATOR);
+		sb.append("ORF");
+		sb.append(SEPARATOR);
+		sb.append("NAME");
+		sb.append(SEPARATOR);
+		sb.append("GWEIGHT");
+		sb.append(SEPARATOR);
+		
+		//add array name row
+		List<String> arrayNames = dataSet.get(orfRow).subList(
+				dataCol, dataSet.get(orfRow).size());
+		
+		for(String name : arrayNames) {
+			
+			sb.append(name);
+			sb.append(SEPARATOR);
+		}
+		
+		sb.append(END_OF_ROW);
+		
+		//add array id row
+		sb.append("AID");
+		sb.append(SEPARATOR);
+		
+		for(int i = 0; i < dataCol; i++) {
+			
+			sb.append("");
+			sb.append(SEPARATOR);
+		}
+		
+		if(aidInd.get(1) != null) {
+			int aidRow = aidInd.get(0);
+			
+			sb.append(dataSet.get(aidRow).subList(dataCol, 
+					dataSet.get(aidRow).size()));
+			sb.append(END_OF_ROW);
+			
+		} else {
+			for(int i = dataCol; i < dataSet.get(dataRow).size(); i++) {
+				
+				sb.append("");
+				sb.append(SEPARATOR);
+			}
+				sb.append(END_OF_ROW);
+		}
+		
+		//add EWEIGHT row
+		sb.append("EWEIGHT");
+		sb.append(SEPARATOR);
+		
+		for(int i = 0; i < dataStart.get(1); i++) {
+			
+			sb.append("");
+			sb.append(SEPARATOR);
+		}
+		
+		for(int i = dataCol; i < dataSet.get(0).size(); i++) {
+		
+			sb.append(dataSet.get(eweightRow).get(i));
+			sb.append(SEPARATOR);
+		}
+		
+		sb.append(END_OF_ROW);
+		
+		//continue with each data row, just each element + data sublist values
+		//for the size of the dataSet - 3 (amount of rows already filled)
+		
+		finalCDT = sb.toString();
+		
+		return finalCDT;
+	}
+	
+	/**
+	 * Saves a cdt-file, built from the loaded file,
+	 * to the same directory as the loaded file. This file will then be used
+	 * in JTV!
+	 */
+	public void saveCDT(String finalCDT) {
 		
 	}
 	 

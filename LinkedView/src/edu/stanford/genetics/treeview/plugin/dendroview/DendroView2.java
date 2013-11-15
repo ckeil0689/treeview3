@@ -105,7 +105,7 @@ MainPanel, Observer {
 	protected TabbedSettingsPanel settingsPanel;
 	
 	protected final static Color RED1 = new Color(240, 80, 50, 255);
-	protected final static Color BLUE1 = new Color(6, 163, 220, 255);
+	protected final static Color BLUE1 = new Color(118, 193, 228, 255);
 	private final static Color BG_COLOR = new Color(235, 240, 255, 255);
 	
 	/*
@@ -1183,7 +1183,7 @@ MainPanel, Observer {
 		
 		JPanel filler = new JPanel();
 		filler.setLayout(new MigLayout());
-		filler.setOpaque(true);
+		filler.setOpaque(false);
 		
 		//Register Views
 		registerView(globalview);
