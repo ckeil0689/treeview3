@@ -30,6 +30,7 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
  * @version $Revision: 1.1 $ $Date: 2006-08-16 19:13:46 $
  */
 public class FillMap extends IntegerMap {
+	
 	/**
 	 *  Gets the index for a particular pixel.
 	 *
@@ -38,7 +39,11 @@ public class FillMap extends IntegerMap {
 	 */
 	@Override
 	public int getIndex(int i) {
-	  	if (availablepixels == 0) return 0;
+	  	
+		if (availablepixels == 0) {
+	  		return 0;
+	  	}
+	  	
 		return i * (maxindex - minindex + 1) / availablepixels + minindex;
 	}
 
@@ -51,6 +56,7 @@ public class FillMap extends IntegerMap {
 	 */
 	@Override
 	public int getPixel(int i) {
+		
 		return (i - minindex) * availablepixels / (maxindex - minindex + 1);
 	}
 
@@ -60,6 +66,7 @@ public class FillMap extends IntegerMap {
 	 */
 	@Override
 	public double getScale() {
+		
 		return (double) availablepixels / (maxindex - minindex + 1);
 	}
 
@@ -69,8 +76,10 @@ public class FillMap extends IntegerMap {
 	 */
 	@Override
 	public int getUsedPixels() {
+		
 		if (minindex == -1) {
 			return 0;
+			
 		} else {
 			return availablepixels;
 		}
@@ -82,6 +91,7 @@ public class FillMap extends IntegerMap {
 	 */
 	@Override
 	public int getViewableIndexes() {
+		
 		return maxindex - minindex + 1;
 	}
 
@@ -91,6 +101,7 @@ public class FillMap extends IntegerMap {
 	 */
 	@Override
 	public String type() {
+		
 		return "Fill";
 	}
 }

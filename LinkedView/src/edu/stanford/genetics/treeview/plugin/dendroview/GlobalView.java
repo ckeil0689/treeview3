@@ -31,7 +31,7 @@ import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.*;
 
 class GlobalView extends ModelViewProduced implements  MouseMotionListener,
-    MouseListener, KeyListener {    
+    MouseListener, MouseWheelListener, KeyListener {    
 
 	private static final long serialVersionUID = 1L;
 	
@@ -81,6 +81,7 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		
 		addMouseListener(this);
 		addMouseMotionListener(this);
+		addMouseWheelListener(this);
 		addKeyListener(this);
     }
 
@@ -521,10 +522,10 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		drawBand(dragRect);	
 		
 		if (e.isShiftDown()) {
-		    Point start = new Point(xmap.getMinIndex(),
-				    startPoint.y);
-		    Point end = new Point(xmap.getMaxIndex(),
-				  endPoint.y);
+		    Point start = new Point(xmap.getMinIndex(), ymap.getMinIndex());
+				    //startPoint.y);
+		    Point end = new Point(xmap.getMaxIndex(), ymap.getMaxIndex());
+				 //endPoint.y);
 		    selectRectangle(start, end);
 		    
 		} else {
@@ -646,6 +647,41 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		endPoint.y -= overy;
 		
 		selectRectangle(startPoint, endPoint);
+	}
+	
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e) {
+		
+		int notches = e.getWheelRotation();
+		int shift = 3;
+		double zoomVal = 0.5;
+		
+		if(getXMap().getScale() <= 1.0 
+				&& getYMap().getScale() <= 1.0) {
+			zoomVal = 0.1;
+			
+		} else if(getXMap().getScale() <= 0.1 
+				&& getYMap().getScale() <= 0.1) {
+			zoomVal = 0.01;
+		} 
+		
+		if(!e.isControlDown()) {
+			if(notches < 0) {
+				getYMap().scrollBy(-shift);
+				
+			} else {
+				getYMap().scrollBy(shift);
+			}
+		} else {
+			if(notches < 0) {
+				getXMap().setScale(getXMap().getScale() + zoomVal);
+				getYMap().setScale(getYMap().getScale() + zoomVal);
+				
+			} else {
+				getXMap().setScale(getXMap().getScale() - zoomVal);
+				getYMap().setScale(getYMap().getScale() - zoomVal);
+			}
+		}
 	}
 	
 	private void selectRectangle(Point start, Point end) {

@@ -34,7 +34,8 @@ import edu.stanford.genetics.treeview.*;
 /**
  *  Renders the names of the arrays.
  *
- * Actually, renders the first element in a HeaderInfo as vertical text. Could easily be generalized.
+ * Actually, renders the first element in a HeaderInfo as vertical text. 
+ * Could easily be generalized.
  *
  * @author     Alok Saldanha <alok@genome.stanford.edu>
  * @version    @version $Revision: 1.4 $ $Date: 2010-05-02 13:39:00 $

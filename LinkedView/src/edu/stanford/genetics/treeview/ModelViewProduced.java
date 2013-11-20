@@ -45,15 +45,15 @@ public abstract class ModelViewProduced extends ModelView {
 
 
     protected ModelViewProduced() {
-		super();
+		
+    	super();
     }
-
 
     /**
 	* this method sets up all the instance variables.
 	* XXX - THIS FAILS ON MAC OS X
-	* since mac os x doesn't let you call getGraphics on the Image if it's generated from
-	* a pixels array... hmm...
+	* since mac os x doesn't let you call getGraphics on the Image if 
+	* it's generated from a pixels array... hmm...
 	*/
 	protected void ensureCapacity(Dimension req) {
 		if (offscreenBuffer == null) {

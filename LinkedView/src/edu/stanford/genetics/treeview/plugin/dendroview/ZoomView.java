@@ -294,52 +294,55 @@ MouseWheelListener, KeyListener {
     	return statustext;
     }
 
-		// method from ModelView
-		@Override
-		public void updateBuffer(Graphics g) {	
-			if (offscreenChanged) {
-				xmap.setAvailablePixels(offscreenSize.width);
-				ymap.setAvailablePixels(offscreenSize.height);
-				xmap.notifyObservers();
-				ymap.notifyObservers();
-			}
-			if (offscreenValid == false) {
-				
-				// clear the pallette...
-				g.setColor(Color.white);
-				g.fillRect
-				(0,0, offscreenSize.width, offscreenSize.height);
-				g.setColor(Color.black);
-				
-				
-				destRect.setBounds(0,0,xmap.getUsedPixels(), 
-						ymap.getUsedPixels());
-				
-				sourceRect.setBounds(xmap.getIndex(0), ymap.getIndex(0),
-				xmap.getIndex(destRect.width) - xmap.getIndex(0), 
-				ymap.getIndex(destRect.height) - ymap.getIndex(0));
-				
-				if ((sourceRect.x >= 0) && (sourceRect.y >= 0))
-					drawer.paint(g, sourceRect, destRect, null);
-				
+	// method from ModelView
+	@Override
+	public void updateBuffer(Graphics g) {	
+		
+		if (offscreenChanged) {
+			xmap.setAvailablePixels(offscreenSize.width);
+			ymap.setAvailablePixels(offscreenSize.height);
+			xmap.notifyObservers();
+			ymap.notifyObservers();
+		}
+		
+		if (offscreenValid == false) {
+			
+			// clear the pallette...
+			g.setColor(Color.white);
+			g.fillRect
+			(0,0, offscreenSize.width, offscreenSize.height);
+			g.setColor(Color.black);
+			
+			
+			destRect.setBounds(0,0,xmap.getUsedPixels(), 
+					ymap.getUsedPixels());
+			
+			sourceRect.setBounds(xmap.getIndex(0), ymap.getIndex(0),
+			xmap.getIndex(destRect.width) - xmap.getIndex(0), 
+			ymap.getIndex(destRect.height) - ymap.getIndex(0));
+			
+			if ((sourceRect.x >= 0) && (sourceRect.y >= 0)) {
+				drawer.paint(g, sourceRect, destRect, null);
 			}
 		}
+	}
 
-		@Override
-		public void paintComposite(Graphics g) {
-				if (getShowVal()) {
-					// need to draw values on screen!
-					try {
-						((CharArrayDrawer)drawer).paintChars(g, xmap, ymap, 
-								destRect);
-						
-					} catch (Exception e) {
-						JOptionPane.showMessageDialog(this, 
-								"ZoomView had trouble compositing:" + e);
-						setShowVal(false);
-					}
+	@Override
+	public void paintComposite(Graphics g) {
+			
+		if (getShowVal()) {
+				// need to draw values on screen!
+				try {
+					((CharArrayDrawer)drawer).paintChars(g, xmap, ymap, 
+							destRect);
+					
+				} catch (Exception e) {
+					JOptionPane.showMessageDialog(this, 
+							"ZoomView had trouble compositing:" + e);
+					setShowVal(false);
 				}
-		}
+			}
+	}
     
 	@Override
 	public void updatePixels() {	
@@ -476,12 +479,33 @@ MouseWheelListener, KeyListener {
 		
 		int notches = e.getWheelRotation();
 		int shift = 3;
+		double zoomVal = 0.5;
 		
-		if(notches < 0) {
-			getZoomYmap().scrollBy(-shift);
+		if(getZoomXmap().getScale() <= 1.0 
+				&& getZoomYmap().getScale() <= 1.0) {
+			zoomVal = 0.1;
 			
+		} else if(getZoomXmap().getScale() <= 0.1 
+				&& getZoomYmap().getScale() <= 0.1) {
+			zoomVal = 0.01;
+		} 
+		
+		if(!e.isControlDown()) {
+			if(notches < 0) {
+				getZoomYmap().scrollBy(-shift);
+				
+			} else {
+				getZoomYmap().scrollBy(shift);
+			}
 		} else {
-			getZoomYmap().scrollBy(shift);
+			if(notches < 0) {
+				getZoomXmap().setScale(getZoomXmap().getScale() + zoomVal);
+				getZoomYmap().setScale(getZoomYmap().getScale() + zoomVal);
+				
+			} else {
+				getZoomXmap().setScale(getZoomXmap().getScale() - zoomVal);
+				getZoomYmap().setScale(getZoomYmap().getScale() - zoomVal);
+			}
 		}
 	}
 

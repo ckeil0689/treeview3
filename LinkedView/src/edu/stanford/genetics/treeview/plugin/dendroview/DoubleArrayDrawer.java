@@ -55,8 +55,10 @@ import edu.stanford.genetics.treeview.DataModel;
  *
  */
 public class DoubleArrayDrawer extends ArrayDrawer {
+	
 	/**  Constructor does nothing but set defaults  */
 	public DoubleArrayDrawer() {
+		
 		super();
 	}
 
@@ -66,9 +68,11 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 	 * @param  colorExtractor  A ColorExtractor to draw required pixels
 	 */
 	public void setColorExtractor(ColorExtractor colorExtractor) {
+		
 		if (this.colorExtractor != null) {
 			this.colorExtractor.deleteObserver(this);
 		}
+		
 		this.colorExtractor = colorExtractor;
 		colorExtractor.addObserver(this);
 		setChanged();
@@ -81,6 +85,7 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 	 * @return    The colorExtractor value
 	 */
 	public ColorExtractor getColorExtractor() {
+		
 		return colorExtractor;
 	}
 
@@ -91,6 +96,7 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 	 * @param  matrix       A DataMatrix of values to be rendered.
 	 */
 	public void setDataMatrix(DataMatrix  matrix) {
+		
 		if (dataMatrix != matrix) {
 			dataMatrix = matrix;
 			setChanged();
@@ -99,96 +105,143 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 
 	/** sets contrast to 4 times the mean. Works well in practice. */
 	public void recalculateContrast() {
+		
 		double mean  = 0.0;
 		int count    = 0;
 		int nRow = dataMatrix.getNumRow();
 		int nCol = dataMatrix.getNumCol();
+		
 		for (int row = 0; row < nRow; row++) {
+			
 			for (int col = 0; col < nCol; col++) {
+				
 				double val = dataMatrix.getValue(row, col);
-				if (val == DataModel.NODATA) continue;
-				if (val == DataModel.EMPTY) continue;
+				
+				if (val == DataModel.NODATA) {
+					continue;
+				}
+				
+				if (val == DataModel.EMPTY) {
+					continue;
+				}
+				
 				mean += Math.abs(val);
 				count++;
 			}
 		}
-	  
-	  mean /= count;
-
-	  colorExtractor.setContrast(mean * 4);
-	  colorExtractor.notifyObservers();
+		
+		mean /= count;
+		
+		colorExtractor.setContrast(mean * 4);
+		colorExtractor.notifyObservers();
 	}
+	
 	/**
-	 *  Paint the array values onto pixels. This method will do averaging if multiple
-	 *  values map to the same pixel.
+	 *  Paint the array values onto pixels. This method will do averaging if 
+	 *  multiple values map to the same pixel.
 	 *
 	 * @param  pixels    The pixel buffer to draw to.
 	 * @param  source    Specifies Rectangle of values to draw from
 	 * @param  dest      Specifies Rectangle of pixels to draw to
-	 * @param  scanSize  The scansize for the pixels array (in other words, the width of the image)
-	 * @param  geneOrder the order of the genes. The source rect y values are taken to mean indexes into this array. If the gene order is null, the indexes from the source rect are used as indexes into the data matrix.
+	 * @param  scanSize  The scansize for the pixels array (in other words, 
+	 * the width of the image)
+	 * @param  geneOrder the order of the genes. The source rect y values are 
+	 * taken to mean indexes into this array. If the gene order is null, 
+	 * he indexes from the source rect are used as indexes into the data matrix.
 	 */
 	@Override
-	public void paint(int[] pixels, Rectangle source, Rectangle dest, int scanSize, int [] geneOrder) {
+	public void paint(int[] pixels, Rectangle source, Rectangle dest, 
+			int scanSize, int [] geneOrder) {
+		
 		if (dataMatrix == null) {
 			System.out.println("data matrix wasn't set");
 		}
+		
 		// ynext will hold the first pixel of the next block.
-		int ynext       = dest.y;
+		int ynext = dest.y;
+		
 		// geneFirst holds first gene which contributes to this pixel.
-		int geneFirst  = 0;
+		int geneFirst = 0;
+		
 		// gene will hold the last gene to contribute to this pixel.
 		for (int gene = 0; gene < source.height; gene++) {
-			int ystart     = ynext;
+			
+			int ystart = ynext;
 			ynext = dest.y + (dest.height + gene * dest.height) / source.height;
+			
 			// keep incrementing until block is at least one pixel high
 			if (ynext == ystart) {
 				continue;
 			}
+			
 			// xnext will hold the first pixel of the next block.
-			int xnext      = dest.x;
+			int xnext = dest.x;
 
 			// arrayFirst holds first gene which contributes to this pixel.
-			int arrayFirst  = 0;
+			int arrayFirst = 0;
+			
 			for (int array = 0; array < source.width; array++) {
+				
 				int xstart  = xnext;
-				xnext = dest.x + (dest.width + array * dest.width) / source.width;
+				xnext = dest.x + (dest.width + array * dest.width) 
+						/ source.width;
+				
 				if (xnext == xstart) {
 					continue;
 				}
+				
 				try {
 					double val   = 0;
 					int count    = 0;
+					
 					for (int i = geneFirst; i <= gene; i++) {
+						
 						for (int j = arrayFirst; j <= array; j++) {
+							
 							int actualGene = source.y + i;
-							if (geneOrder != null) actualGene = geneOrder[actualGene];
-							double thisVal  = dataMatrix.getValue(j + source.x,  actualGene);
+							if (geneOrder != null) {
+								actualGene = geneOrder[actualGene];
+							}
+							
+							double thisVal = dataMatrix.getValue(j + source.x,  
+									actualGene);
+							
 							if (thisVal == DataModel.EMPTY) {
 								val = DataModel.EMPTY;
 								count =1;
 								break;
 							}
+							
 							if (thisVal != DataModel.NODATA) {
 								count++;
 								val += thisVal;
 							}
 						}
-						if (val == DataModel.EMPTY) break;
+						
+						if (val == DataModel.EMPTY) {
+							break;
+						}
 					}
+					
 					if (count == 0) {
 						val = DataModel.NODATA;
+						
 					} else {
 						val /= count;
 					}
+					
 					int t_color  = colorExtractor.getARGBColor(val);
+					
 					for (int x = xstart; x < xnext; x++) {
+						
 						for (int y = ystart; y < ynext; y++) {
+							
 							pixels[x + y * scanSize] = t_color;
 						}
 					}
 				} catch (java.lang.ArrayIndexOutOfBoundsException e) {
-					//			System.out.println("out of bounds, " + (i + source.x) + ", " + (array + source.y));
+					//System.out.println("out of bounds, " + (i + source.x) + 
+					//", " + (array + source.y));
 				}
 				arrayFirst = array + 1;
 			}

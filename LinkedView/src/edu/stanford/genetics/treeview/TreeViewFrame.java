@@ -269,14 +269,19 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		try {
 			File file = selectFile();
 			
-			int suffixLength = 3;
 			String fileName = file.getAbsolutePath();
+			int dotIndex = fileName.indexOf(".");
+			
+			int suffixLength = fileName.length() - dotIndex;
+			
 			String fileType = file.getAbsolutePath().substring(
 					fileName.length() - suffixLength, fileName.length());
 			
-			if(!fileType.equalsIgnoreCase("cdt")) {
-				CDTCreator fileChanger = new CDTCreator(file);
-				fileChanger.readFile();
+			if(!fileType.equalsIgnoreCase(".cdt")) {
+				CDTCreator fileChanger = new CDTCreator(file, fileType);
+				fileChanger.createFile();
+				
+				file = new File(fileChanger.getFilePath());
 			}
 			
 			FileSet fileSet = getFileSet(file); //Type: 0 (Auto)

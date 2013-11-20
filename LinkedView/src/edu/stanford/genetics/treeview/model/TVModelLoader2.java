@@ -485,6 +485,7 @@ public class TVModelLoader2 implements ProgressTrackable {
 		loadGeneAnnotation(tempVector);
 		loadCdtData(tempVector);
 	}
+	
 	/**
 	 * finds ngene, nexpr, nArrayPrefix, nGenePrefix
 	 * 
@@ -514,7 +515,8 @@ public class TVModelLoader2 implements ProgressTrackable {
 		if (gweightCol == -1) {
 ////		if (firstLine[0].equalsIgnoreCase("GID")) {
 			if (tempVector.getColumnName(0).equalsIgnoreCase("GID")){
-			nGenePrefix = 3;
+				nGenePrefix = 3;
+				
 			} else {
 				nGenePrefix = 2;
 			}
@@ -525,7 +527,7 @@ public class TVModelLoader2 implements ProgressTrackable {
 ////	nexpr = firstLine.length - nGenePrefix;
 		nExpr = rectCol - nGenePrefix;
 		int eweightRow = -1;
-		if (tempVector.getColumnName(0).equalsIgnoreCase("EWEIGHt")){
+		if (tempVector.getColumnName(0).equalsIgnoreCase("EWEIGHT")){
 			eweightRow = 0;
 		}else{
 			int rectRow = tempVector.getRow(); 

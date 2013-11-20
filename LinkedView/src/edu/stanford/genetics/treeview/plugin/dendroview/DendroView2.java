@@ -79,7 +79,10 @@ MainPanel, Observer {
 //	protected JScrollBar globalXscrollbar, globalYscrollbar;
     protected GlobalView globalview;
 
-    protected JScrollBar zoomXscrollbar, zoomYscrollbar;
+    protected JScrollBar globalXscrollbar;
+    protected JScrollBar globalYscrollbar;
+    protected JScrollBar zoomXscrollbar;
+    protected JScrollBar zoomYscrollbar;
 	protected ZoomView zoomview;
 	protected TextViewManager textview;
 	protected ArrayNameView arraynameview;
@@ -125,6 +128,7 @@ MainPanel, Observer {
 	private JButton scaleDecY;
 	private JButton scaleDefaultX;
 	private JButton scaleDefaultY;
+	private JButton scaleDefaultAll;
 	
 	private double default_scale = 13.0;
 	
@@ -720,6 +724,8 @@ MainPanel, Observer {
 		((Observable)getDataModel()).addObserver(arrayDrawer);
 		
 		// scrollbars, mostly used by maps
+		globalXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0,1,0,1);
+		globalYscrollbar = new JScrollBar(Adjustable.VERTICAL,0,1,0,1);
 		zoomXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0, 1, 0, 1);
 		zoomYscrollbar = new JScrollBar(Adjustable.VERTICAL, 0, 1, 0, 1);
 
@@ -735,9 +741,11 @@ MainPanel, Observer {
 		// where to draw each data point.
 		// the scrollbars "scroll" by communicating with the maps.
 		globalXmap = new MapContainer("Fill");
+		globalXmap.setScrollbar(globalXscrollbar);
 		//globalXmap.setDefaultScale(2.0);
 		
 		globalYmap = new MapContainer("Fill");
+		globalYmap.setScrollbar(globalYscrollbar);
 		//globalYmap.setDefaultScale(2.0);
 		
 		globalview = new GlobalView();
@@ -782,6 +790,17 @@ MainPanel, Observer {
 		zoomview.setYMap(getZoomYmap());
 		zoomview.setXMap(getZoomXmap());
 		zoomview.setArrayDrawer(arrayDrawer);
+		
+		scaleDefaultAll = setZoomButtonLayout("All0", BLUE1);
+		scaleDefaultAll.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				getZoomXmap().setScale(default_scale);
+				getZoomYmap().setScale(default_scale);
+			}
+			
+		});
 		
 		scaleIncX = setZoomButtonLayout("+", BLUE1);
 		scaleIncX.addActionListener(new ActionListener(){
@@ -843,12 +862,14 @@ MainPanel, Observer {
 			
 		});
 
-		arraynameview.setMapping(getZoomXmap());
+		//arraynameview.setMapping(getZoomXmap());
+		arraynameview.setMapping(getGlobalXmap());
 
 		textview = new TextViewManager(getDataModel().getGeneHeaderInfo(), 
 				viewFrame.getUrlExtractor(), getDataModel());
 		
-		textview.setMap(getZoomYmap());
+		//textview.setMap(getZoomYmap());
+		textview.setMap(getGlobalYmap());
 		
 		//Layout Setup
 		doDoubleLayout();
@@ -1035,44 +1056,49 @@ MainPanel, Observer {
 	 */
 	protected void doDoubleLayout() {
 		
-		Dimension left_min;
-		Dimension right_min;
+//		Dimension left_min;
+//		Dimension right_min;
 		Dimension up_min; 
 		Dimension down_min;  
-		JPanel left;
-		JPanel right;
+//		JPanel left;
+//		JPanel right;
+		JPanel backgroundPanel;
 		JPanel upSide;
 		JPanel downSide;
 		JPanel buttonPanel;
 		JPanel gtrPanel;
 		final JPanel panel; 
-		JPanel zoompanel;
+//		JPanel zoompanel;
 		JPanel textpanel;
-		JSplitPane backgroundPane;
+//		JSplitPane backgroundPane;
 		JSplitPane level1Pane;
-		JSplitPane gtrPane;
+//		JSplitPane gtrPane;
 		JButton saveButton;
 		JButton closeButton;
 		JButton fullScreenButton;
 		
-		left_min = new Dimension(500, 450);
-		right_min = new Dimension(600, 500);
+//		left_min = new Dimension(500, 450);
+//		right_min = new Dimension(600, 500);
+//		
+//		left = new JPanel();
+//		left.setLayout(new MigLayout());
+//		left.setMinimumSize(left_min);
+//		left.setBackground(BG_COLOR);
 		
-		left = new JPanel();
-		left.setLayout(new MigLayout());
-		left.setMinimumSize(left_min);
-		left.setBackground(BG_COLOR);
+//		right = new JPanel();
+//		right.setLayout(new MigLayout());
+//		right.setMinimumSize(right_min);
+//		right.setBackground(BG_COLOR);
 		
-		right = new JPanel();
-		right.setLayout(new MigLayout());
-		right.setMinimumSize(right_min);
-		right.setBackground(BG_COLOR);
+//		backgroundPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+//				left, right);
+//		backgroundPane.setDividerSize(DIVIDER_SIZE);
+//		backgroundPane.setOneTouchExpandable(true);
+//		backgroundPane.setDividerLocation(MAIN_DIV_LOC);
 		
-		backgroundPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-				left, right);
-		backgroundPane.setDividerSize(DIVIDER_SIZE);
-		backgroundPane.setOneTouchExpandable(true);
-		backgroundPane.setDividerLocation(MAIN_DIV_LOC);
+		backgroundPanel = new JPanel();
+		backgroundPanel.setLayout(new MigLayout());
+		backgroundPanel.setBackground(BG_COLOR);
 		
 		up_min = new Dimension(400, 100);
 		down_min = new Dimension(600, 500);
@@ -1161,8 +1187,8 @@ MainPanel, Observer {
 		});
   		
 		//ZoomView
-		zoompanel = new JPanel();
-		zoompanel.setLayout(new BorderLayout());
+//		zoompanel = new JPanel();
+//		zoompanel.setLayout(new BorderLayout());
 		
 		textpanel = new JPanel();
 		textpanel.setLayout(new MigLayout("ins 0"));
@@ -1202,44 +1228,52 @@ MainPanel, Observer {
 		scalePaneY.add(scaleIncY, "alignx 50%, wrap");
 		scalePaneY.add(scaleDecY, "alignx 50%, wrap");
 		scalePaneY.add(scaleDefaultY, "alignx 50%");
+		scalePaneY.add(scaleDefaultAll, "alignx 50%");
 		
-		gtrPanel.add(gtrview, BorderLayout.CENTER);
-		gtrPanel.add(new JScrollBar(Adjustable.HORIZONTAL, 0, 1, 0, 1), 
-				BorderLayout.SOUTH);
+//		gtrPanel.add(gtrview, BorderLayout.CENTER);
+//		gtrPanel.add(new JScrollBar(Adjustable.HORIZONTAL, 0, 1, 0, 1), 
+//				BorderLayout.SOUTH);
 		
-		panel.add(globalview, "grow, push");
+		panel.add(globalview, "grow, push");	
+		panel.add(globalYscrollbar, "pushy, growy, wrap");
+		panel.add(globalXscrollbar, "pushx, growx, span");
 		
-		zoompanel.add(zoomview, BorderLayout.CENTER);
-		zoompanel.add(zoomXscrollbar, BorderLayout.SOUTH);	
-		zoompanel.add(zoomYscrollbar, BorderLayout.EAST);
+//		zoompanel.add(zoomview, BorderLayout.CENTER);
+//		zoompanel.add(zoomXscrollbar, BorderLayout.SOUTH);	
+//		zoompanel.add(zoomYscrollbar, BorderLayout.EAST);
 		
 		textpanel.add(textview.getComponent(), "push, grow");
 		
 		buttonPanel.add(fullScreenButton, "push, alignx 50%, wrap");
 		buttonPanel.add(closeButton, "push, alignx 50%, wrap");
 		
-		left.add(panel, "grow, push, height 85%, span, wrap");
-		left.add(statuspanel, "pushx, growx, height 15%, width 80%");
-		left.add(buttonPanel, "push, grow");
+		backgroundPanel.add(atrview, "grow, push, span, wrap");
+		backgroundPanel.add(arraynameview, "grow, push, span, wrap");
+		backgroundPanel.add(gtrview, "grow, push");
+		backgroundPanel.add(textpanel, "grow, push");
+		backgroundPanel.add(panel, "grow, push, span, " +
+				"wrap");
+		backgroundPanel.add(statuspanel, "pushx, growx, height 10%, width 80%");
+		backgroundPanel.add(buttonPanel, "push, grow");
 		
-		right.add(level1Pane, "push, grow");
+//		right.add(level1Pane, "push, grow");
 		
-		upSide.add(atrzview, "push, grow, height 15%::, width 65%");
-		upSide.add(filler, "pushx, growx, width 35%");
+//		upSide.add(atrzview, "push, grow, height 15%::, width 65%");
+//		upSide.add(filler, "pushx, growx, width 35%");
 		
-		gtrPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-				textpanel, gtrzview);
-		gtrPane.setDividerSize(5);
-		gtrPane.setDividerLocation(200);
+//		gtrPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+//				textpanel, gtrzview);
+//		gtrPane.setDividerSize(5);
+//		gtrPane.setDividerLocation(200);
 		
-		downSide.add(arraynameview, "pushx, growx, height 15%::, " +
-				"width 65%");
+//		downSide.add(arraynameview, "pushx, growx, height 15%::, " +
+//				"width 65%");
 		downSide.add(scalePaneY, "height 15%::, wrap");
-		downSide.add(zoompanel, "push, grow, width 65%");
-		downSide.add(gtrPane, "push, grow, width 35%, wrap");
+//		downSide.add(zoompanel, "push, grow, width 65%");
+//		downSide.add(gtrPane, "push, grow, width 35%, wrap");
 		downSide.add(scalePaneX, "pushx, span");
 
-		add(backgroundPane, "push, grow");
+		add(backgroundPanel, "push, grow");
 	}
 
 	/**

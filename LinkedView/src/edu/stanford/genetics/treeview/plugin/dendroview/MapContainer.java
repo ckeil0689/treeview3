@@ -137,26 +137,25 @@ AdjustmentListener, ConfigNodePersistent {
 		if (nullMap.type().equals(string)) {
 //		  System.out.println("type " + string + " is nullMap");
 		  newMap = nullMap;
-		}
-		
-		if (fillMap.type().equals(string)) {
+		  
+		} else if (fillMap.type().equals(string)) {
 //		  System.out.println("type " + string + " is fillMap");
 		  newMap = fillMap;
-		}
-		
-		if (fixedMap.type().equals(string)) {
+		  
+		} else if (fixedMap.type().equals(string)) {
 //		  System.out.println("type " + string + " is fixedMap");
 		  newMap = fixedMap;
 		}
 		
 		if (newMap == null) {
-		  LogBuffer.println("Couldn't find map matching " + string 
-				  + " in MapContainer.java");
-		  LogBuffer.println("Choices include");
-		  LogBuffer.println(nullMap.type());
-		  LogBuffer.println(fixedMap.type());
-		  LogBuffer.println(fillMap.type());
-		  newMap = fixedMap;
+			
+			LogBuffer.println("Couldn't find map matching " + string 
+					+ " in MapContainer.java");
+			LogBuffer.println("Choices include");
+			LogBuffer.println(nullMap.type());
+			LogBuffer.println(fixedMap.type());
+			LogBuffer.println(fillMap.type());
+			newMap = fixedMap;
 		}
 
         switchMap(newMap);
@@ -170,6 +169,7 @@ AdjustmentListener, ConfigNodePersistent {
        
     	int j = scrollbar.getValue();
         scrollbar.setValue(i - scrollbar.getVisibleAmount() / 2);
+        
         if (j != scrollbar.getValue()) {
         	setChanged();
         }
@@ -179,6 +179,7 @@ AdjustmentListener, ConfigNodePersistent {
         
     	int j = scrollbar.getValue();
         scrollbar.setValue(j + i);
+        
         if (j != scrollbar.getValue()) {
         	setChanged();
         }

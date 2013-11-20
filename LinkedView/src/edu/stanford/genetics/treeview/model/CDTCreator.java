@@ -1,9 +1,11 @@
 package edu.stanford.genetics.treeview.model;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +36,10 @@ public class CDTCreator {
 	private List<Integer> dataStart = new ArrayList<Integer>();
 	private List<Integer> nameInd = new ArrayList<Integer>();
 	
+	private boolean gid = false;
+	
+	private String fileType = "";
+	private String filePath = "";
 	private final String SEPARATOR = "\t";
 	private final String END_OF_ROW = "\n";
 	
@@ -41,12 +47,13 @@ public class CDTCreator {
 	 * Constructor
 	 * @param file
 	 */
-	public CDTCreator(File file) {
+	public CDTCreator(File file, String fileType) {
 		
 		this.file = file;
+		this.fileType = fileType;
 	}
 	
-	public void readFile() {
+	public void createFile() {
 	
 		try {
 			reader = new BufferedReader(new FileReader(file));
@@ -102,7 +109,9 @@ public class CDTCreator {
 			
 			String cdt = generateCDT();
 			
-			System.out.println(cdt);
+			saveCDT(cdt);
+			
+			//System.out.println(cdt);
 			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -157,16 +166,27 @@ public class CDTCreator {
 	private String generateCDT() {
 		
 		int orfRow = orfInd.get(0);
+		int orfCol = orfInd.get(1);
 		int eweightRow = eweightInd.get(0);
+		int gweightCol = gweightInd.get(1);
 		int dataCol = dataStart.get(1);
 		int dataRow = dataStart.get(0);
+		int gidCol = 0;
+		
+		if(gidInd.get(0) != null) {
+			gidCol = gidInd.get(1);
+			gid = true;
+		}
 		
 		String finalCDT = "";
 		
 		StringBuilder sb = new StringBuilder();
 		
-		sb.append("GID");
-		sb.append(SEPARATOR);
+		if(gid) {
+			sb.append("GID");
+			sb.append(SEPARATOR);
+		}
+	
 		sb.append("ORF");
 		sb.append(SEPARATOR);
 		sb.append("NAME");
@@ -178,38 +198,35 @@ public class CDTCreator {
 		List<String> arrayNames = dataSet.get(orfRow).subList(
 				dataCol, dataSet.get(orfRow).size());
 		
-		for(String name : arrayNames) {
+		for(int i = 0; i < arrayNames.size(); i++) {
 			
-			sb.append(name);
-			sb.append(SEPARATOR);
+			sb.append(arrayNames.get(i));
+			
+			if(i == arrayNames.size() - 1) {
+				sb.append(END_OF_ROW);
+				
+			} else {
+				sb.append(SEPARATOR);
+			}
 		}
-		
-		sb.append(END_OF_ROW);
 		
 		//add array id row
-		sb.append("AID");
-		sb.append(SEPARATOR);
-		
-		for(int i = 0; i < dataCol; i++) {
-			
-			sb.append("");
-			sb.append(SEPARATOR);
-		}
-		
 		if(aidInd.get(1) != null) {
+			sb.append("AID");
+			sb.append(SEPARATOR);
+			
+			for(int i = 0; i < dataCol; i++) {
+				
+				sb.append("");
+				sb.append(SEPARATOR);
+			}
+			
 			int aidRow = aidInd.get(0);
 			
 			sb.append(dataSet.get(aidRow).subList(dataCol, 
 					dataSet.get(aidRow).size()));
 			sb.append(END_OF_ROW);
 			
-		} else {
-			for(int i = dataCol; i < dataSet.get(dataRow).size(); i++) {
-				
-				sb.append("");
-				sb.append(SEPARATOR);
-			}
-				sb.append(END_OF_ROW);
 		}
 		
 		//add EWEIGHT row
@@ -225,15 +242,57 @@ public class CDTCreator {
 		for(int i = dataCol; i < dataSet.get(0).size(); i++) {
 		
 			sb.append(dataSet.get(eweightRow).get(i));
-			sb.append(SEPARATOR);
+			
+			if(i == dataSet.get(0).size() - 1) {
+				sb.append(END_OF_ROW);
+				
+			} else {
+				sb.append(SEPARATOR);
+			}
 		}
-		
-		sb.append(END_OF_ROW);
-		
+
 		//continue with each data row, just each element + data sublist values
 		//for the size of the dataSet - 3 (amount of rows already filled)
+		for(int i = dataRow; i < dataSet.size(); i++) {
+			
+			List<String> row = dataSet.get(i);
+			
+			if(gid) {
+				sb.append(row.get(gidCol));
+				sb.append(SEPARATOR);
+				
+			}
+			
+			sb.append(row.get(orfCol));
+			sb.append(SEPARATOR);
+			
+			if(nameInd.get(0) != null) {
+				sb.append(row.get(nameInd.get(1)));
+				sb.append(SEPARATOR);
+				
+			} else {
+				sb.append(row.get(orfCol));
+				sb.append(SEPARATOR);
+			}
+			
+			sb.append(row.get(gweightCol));
+			sb.append(SEPARATOR);
+			
+			for(int j = dataCol; j < row.size(); j++) {
+				
+				sb.append(row.get(j));
+				if(j == row.size() - 1) {
+					sb.append(END_OF_ROW);
+					
+				} else {
+					sb.append(SEPARATOR);
+				}
+			}
+		}
 		
 		finalCDT = sb.toString();
+		
+		//System.out.println(finalCDT);
 		
 		return finalCDT;
 	}
@@ -243,8 +302,34 @@ public class CDTCreator {
 	 * to the same directory as the loaded file. This file will then be used
 	 * in JTV!
 	 */
-	public void saveCDT(String finalCDT) {
+	public void saveCDT(String content) {
 		
+		String fileEnd = "_adjusted.cdt";
+		String fileName = file.getAbsolutePath().substring(0, 
+				file.getAbsolutePath().length() - fileType.length());
+		
+		try{
+			File file2 = new File(fileName + fileEnd);
+
+			file2.createNewFile();
+				
+			FileWriter fw = new FileWriter(file2.getAbsoluteFile());
+			BufferedWriter bw = new BufferedWriter(fw);
+			
+			bw.write(content);
+			bw.close();
+			
+			filePath = file2.getAbsolutePath();
+			System.out.println("Done." + file2.getAbsolutePath());
+		
+		} catch(IOException e){
+			
+		}	
+	}
+	
+	public String getFilePath() {
+		
+		return filePath;
 	}
 	 
 }
