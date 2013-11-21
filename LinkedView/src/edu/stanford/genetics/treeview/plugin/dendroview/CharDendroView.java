@@ -117,15 +117,15 @@ public class CharDendroView extends DendroView2 {
 			public void actionPerformed(ActionEvent actionEvent) {
 				
 				MapContainer initXmap, initYmap;
-				if ((getArraySelection().getNSelectedIndexes() != 0) 
-						|| (getGeneSelection().getNSelectedIndexes() != 0)){
-					initXmap = getZoomXmap();
-					initYmap = getZoomYmap();
-					
-				} else {
+//				if ((getArraySelection().getNSelectedIndexes() != 0) 
+//						|| (getGeneSelection().getNSelectedIndexes() != 0)){
+//					initXmap = getZoomXmap();
+//					initYmap = getZoomYmap();
+//					
+//				} else {
 					initXmap = getGlobalXmap();
 					initYmap = getGlobalYmap();
-				}
+//				}
 				
 				BitmapExportPanel bitmapPanel = new BitmapExportPanel
 				(arraynameview.getHeaderInfo(), 
@@ -181,15 +181,15 @@ public class CharDendroView extends DendroView2 {
 		
 		
 		// scrollbars, mostly used by maps
-		zoomXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0,1,0,1);
-		zoomYscrollbar = new JScrollBar(Adjustable.VERTICAL,0,1,0,1);
-
-		zoomXmap = new MapContainer();
-		zoomXmap.setDefaultScale(12.0);
-		zoomXmap.setScrollbar(zoomXscrollbar);
-		zoomYmap = new MapContainer();
-		zoomYmap.setDefaultScale(12.0);
-		zoomYmap.setScrollbar(zoomYscrollbar);
+//		zoomXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0,1,0,1);
+//		zoomYscrollbar = new JScrollBar(Adjustable.VERTICAL,0,1,0,1);
+//
+//		zoomXmap = new MapContainer();
+//		zoomXmap.setDefaultScale(12.0);
+//		zoomXmap.setScrollbar(zoomXscrollbar);
+//		zoomYmap = new MapContainer();
+//		zoomYmap.setDefaultScale(12.0);
+//		zoomYmap.setScrollbar(zoomYscrollbar);
 
 		//globalmaps tell globalview, atrview, and gtrview
 		//where to draw each data point.
@@ -202,8 +202,8 @@ public class CharDendroView extends DendroView2 {
 		globalview.setXMap(globalXmap);
 		globalview.setYMap(globalYmap);
 
-		globalview.setZoomYMap(getZoomYmap());
-		globalview.setZoomXMap(getZoomXmap());
+//		globalview.setZoomYMap(getZoomYmap());
+//		globalview.setZoomXMap(getZoomXmap());
 		globalview.setArrayDrawer(arrayDrawer);
 
 		charHeaderInfo = new CharHeaderInfo(arrayDrawer.getNumCol());
@@ -222,21 +222,21 @@ public class CharDendroView extends DendroView2 {
 		atrview.setInvertedTreeDrawer(invertedTreeDrawer);
 		atrview.getHeaderSummary().setIncluded(new int [] {0,3});
 
-		atrzview = new ATRZoomView();
-		atrzview.setZoomMap(getZoomXmap());
-		atrzview.setHeaderSummary(atrview.getHeaderSummary());
-		atrzview.setInvertedTreeDrawer(invertedTreeDrawer);
+//		atrzview = new ATRZoomView();
+//		atrzview.setZoomMap(getZoomXmap());
+//		atrzview.setHeaderSummary(atrview.getHeaderSummary());
+//		atrzview.setInvertedTreeDrawer(invertedTreeDrawer);
+//
+//		zoomview = new ZoomView();
+//		zoomview.setYMap(getZoomYmap());
+//		zoomview.setXMap(getZoomXmap());
+//		zoomview.setArrayDrawer(arrayDrawer);
 
-		zoomview = new ZoomView();
-		zoomview.setYMap(getZoomYmap());
-		zoomview.setXMap(getZoomXmap());
-		zoomview.setArrayDrawer(arrayDrawer);
-
-		arraynameview.setMapping(getZoomXmap());
+//		arraynameview.setMapping(getZoomXmap());
 
 		textview = new TextViewManager(getDataModel().getGeneHeaderInfo(), 
 				viewFrame.getUrlExtractor(), getDataModel());
-		textview.setMap(getZoomYmap());
+//		textview.setMap(getZoomYmap());
 
 		doDoubleLayout();
 		
@@ -249,12 +249,12 @@ public class CharDendroView extends DendroView2 {
 		
 		bindTrees();
 		
-		zoomview.setHeaders(getDataModel().getGeneHeaderInfo(), charHeaderInfo);
-		zoomview.setShowVal(true);
+//		zoomview.setHeaders(getDataModel().getGeneHeaderInfo(), charHeaderInfo);
+//		zoomview.setShowVal(true);
 		globalXmap.bindConfig(getFirst("GlobalXMap"));
 		globalYmap.bindConfig(getFirst("GlobalYMap"));
-		getZoomXmap().bindConfig(getFirst("ZoomXMap"));
-		getZoomYmap().bindConfig(getFirst("ZoomYMap"));
+//		getZoomXmap().bindConfig(getFirst("ZoomXMap"));
+//		getZoomYmap().bindConfig(getFirst("ZoomYMap"));
 
 		textview.bindConfig(getFirst("TextViewParent"));
 //		arraynameview.bindConfig(getFirst("ArrayNameView"));
@@ -262,13 +262,13 @@ public class CharDendroView extends DendroView2 {
 		// perhaps I could remember this stuff in the MapContainer...
 		globalXmap.setIndexRange(0, arrayDrawer.getNumCol() - 1);
 		globalYmap.setIndexRange(0, arrayDrawer.getNumRow() - 1);
-		getZoomXmap().setIndexRange(-1, -1);
-		getZoomYmap().setIndexRange(-1, -1);
+//		getZoomXmap().setIndexRange(-1, -1);
+//		getZoomYmap().setIndexRange(-1, -1);
 
 		globalXmap.notifyObservers();
 		globalYmap.notifyObservers();
-		getZoomXmap().notifyObservers();
-		getZoomYmap().notifyObservers();
+//		getZoomXmap().notifyObservers();
+//		getZoomYmap().notifyObservers();
 	}	
 }
 

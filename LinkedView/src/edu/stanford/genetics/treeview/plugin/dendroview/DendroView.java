@@ -689,8 +689,8 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 		globalview.setXMap(globalXmap);
 		globalview.setYMap(globalYmap);
 		
-		globalview.setZoomYMap(getZoomYmap());
-		globalview.setZoomXMap(getZoomXmap());
+//		globalview.setZoomYMap(getZoomYmap());
+//		globalview.setZoomXMap(getZoomXmap());
 		
 		globalview.setArrayDrawer(arrayDrawer);
 

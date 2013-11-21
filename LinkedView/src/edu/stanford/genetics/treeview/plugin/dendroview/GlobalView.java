@@ -40,10 +40,12 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 	protected TreeSelectionI arraySelection;
 	protected MapContainer xmap;
 	protected MapContainer ymap;
-    protected MapContainer zoomXmap;
-    protected MapContainer zoomYmap;
+//    protected MapContainer zoomXmap;
+//    protected MapContainer zoomYmap;
     
     private ArrayDrawer drawer;
+    private int overx;
+    private int overy;
 
     /**
      * Points to track candidate selected rows/cols
@@ -65,7 +67,7 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
     /**
      * Rectangle to track blue zoom rectangle (pixels)
      */
-    private Rectangle zoomRect = null;
+//    private Rectangle zoomRect = null;
 	
 	/**
 	* GlobalView also likes to have an globalxmap and globalymap 
@@ -78,6 +80,8 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		panel = this;
 		
 		this.setLayout(new MigLayout());
+		
+		setToolTipText("This Turns Tooltips On");
 		
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -227,35 +231,35 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
     }
     
 
-    /** DEPRECATE
-     * set the xmapping for this view
-     *
-     * @param m   the new mapping
-     */
-    public void setZoomXMap(MapContainer m) {
-	
-    	if (zoomXmap != null) {
-    		zoomXmap.deleteObserver(this);	    
-    	}
-	
-    	zoomXmap = m;
-    	zoomXmap.addObserver(this);
-    }
+//    /** DEPRECATE
+//     * set the xmapping for this view
+//     *
+//     * @param m   the new mapping
+//     */
+//    public void setZoomXMap(MapContainer m) {
+//	
+//    	if (zoomXmap != null) {
+//    		zoomXmap.deleteObserver(this);	    
+//    	}
+//	
+//    	zoomXmap = m;
+//    	zoomXmap.addObserver(this);
+//    }
 
-    /** DEPRECATE
-     * set the ymapping for this view
-     *
-     * @param m   the new mapping
-     */
-    public void setZoomYMap(MapContainer m) {
-	
-    	if (zoomYmap != null) {
-    		zoomYmap.deleteObserver(this);	    
-    	}
-    	
-    	zoomYmap = m;
-    	zoomYmap.addObserver(this);
-    }
+//    /** DEPRECATE
+//     * set the ymapping for this view
+//     *
+//     * @param m   the new mapping
+//     */
+//    public void setZoomYMap(MapContainer m) {
+//	
+//    	if (zoomYmap != null) {
+//    		zoomYmap.deleteObserver(this);	    
+//    	}
+//    	
+//    	zoomYmap = m;
+//    	zoomYmap.addObserver(this);
+//    }
 
 
     @Override
@@ -355,11 +359,11 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		
     	// composite the rectangles...
 		if (selectionRect != null) {	    
-		    if (zoomRect != null) {
-				g.setColor(Color.cyan);
-				g.drawRect(zoomRect.x, zoomRect.y, 
-					   zoomRect.width, zoomRect.height);
-		    }
+//		    if (zoomRect != null) {
+//				g.setColor(Color.cyan);
+//				g.drawRect(zoomRect.x, zoomRect.y, 
+//					   zoomRect.width, zoomRect.height);
+//		    }
 		    
 		    g.setColor(Color.yellow);
 		    g.drawRect(selectionRect.x, selectionRect.y, 
@@ -398,35 +402,35 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		}
 	}
 
-    protected void recalculateZoom() {
-		
-    	if (selectionRect == null) {
-    		return;
-    	}
-    	
-		int spx, epx, spy, epy;
-		try {
-		    spx = xmap.getPixel(zoomXmap.getIndex(0));
-		    epx = xmap.getPixel(zoomXmap.getIndex(
-		    		zoomXmap.getUsedPixels())) - 1;
-		    
-		    spy = ymap.getPixel(zoomYmap.getIndex(0));
-		    epy = ymap.getPixel(zoomYmap.getIndex(
-		    		zoomYmap.getUsedPixels())) - 1;
-		    
-		} catch (java.lang.ArithmeticException e) {
-		    // silently ignore div zero exceptions, which arise when 
-		    // some dimension is zero and fillmap is selected...
-		    return;
-		}
-	
-		if (zoomRect == null) {
-			zoomRect = new Rectangle(spx, spy, epx - spx, epy - spy);
-			
-		} else {
-			zoomRect.setBounds(spx, spy, epx - spx, epy - spy);
-		}
-    }
+//    protected void recalculateZoom() {
+//		
+//    	if (selectionRect == null) {
+//    		return;
+//    	}
+//    	
+//		int spx, epx, spy, epy;
+//		try {
+//		    spx = xmap.getPixel(zoomXmap.getIndex(0));
+//		    epx = xmap.getPixel(zoomXmap.getIndex(
+//		    		zoomXmap.getUsedPixels())) - 1;
+//		    
+//		    spy = ymap.getPixel(zoomYmap.getIndex(0));
+//		    epy = ymap.getPixel(zoomYmap.getIndex(
+//		    		zoomYmap.getUsedPixels())) - 1;
+//		    
+//		} catch (java.lang.ArithmeticException e) {
+//		    // silently ignore div zero exceptions, which arise when 
+//		    // some dimension is zero and fillmap is selected...
+//		    return;
+//		}
+//	
+//		if (zoomRect == null) {
+//			zoomRect = new Rectangle(spx, spy, epx - spx, epy - spy);
+//			
+//		} else {
+//			zoomRect.setBounds(spx, spy, epx - spx, epy - spy);
+//		}
+//    }
 
     
     // Observer Methods
@@ -458,28 +462,28 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 			recalculateOverlay();
 			
 		} else if ((o == xmap) || o == ymap) {
-			recalculateZoom(); // it moves around, you see...
+//			recalculateZoom(); // it moves around, you see...
 			recalculateOverlay();
 			offscreenValid = false;
 			
-		} else if ((o == zoomYmap) || (o == zoomXmap)) {
-			recalculateZoom();
-			/*
-			if (o == zoomXmap) {
-				if ((zoomYmap.getUsedPixels() == 0) && (zoomXmap.getUsedPixels() != 0)) {
-					zoomYmap.setIndexRange(ymap.getMinIndex(), ymap.getMaxIndex());
-					zoomYmap.notifyObservers();
-				}
-			} else if (o == zoomYmap) {
-				if ((zoomXmap.getUsedPixels() == 0) && (zoomYmap.getUsedPixels() != 0)) {
-					zoomXmap.setIndexRange(xmap.getMinIndex(), xmap.getMaxIndex());
-					zoomXmap.notifyObservers();
-				}
-			}
-			*/
-			if ((status != null) && hasMouse) {
-				status.setMessages(getStatus());
-			}
+//		} else if ((o == zoomYmap) || (o == zoomXmap)) {
+//			recalculateZoom();
+//			/*
+//			if (o == zoomXmap) {
+//				if ((zoomYmap.getUsedPixels() == 0) && (zoomXmap.getUsedPixels() != 0)) {
+//					zoomYmap.setIndexRange(ymap.getMinIndex(), ymap.getMaxIndex());
+//					zoomYmap.notifyObservers();
+//				}
+//			} else if (o == zoomYmap) {
+//				if ((zoomXmap.getUsedPixels() == 0) && (zoomYmap.getUsedPixels() != 0)) {
+//					zoomXmap.setIndexRange(xmap.getMinIndex(), xmap.getMaxIndex());
+//					zoomXmap.notifyObservers();
+//				}
+//			}
+//			*/
+//			if ((status != null) && hasMouse) {
+//				status.setMessages(getStatus());
+//			}
 			
 		} else if (o == drawer) {
 			/* signal from drawer means that it need to
@@ -555,6 +559,43 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		drawBand(dragRect);
     }
     
+    @Override
+	public void mouseMoved(MouseEvent e) {
+    	
+		int ooverx = overx;
+		int oovery = overy;
+		overx = xmap.getIndex(e.getX());
+		overy = ymap.getIndex(e.getY());
+		if (oovery != overy || ooverx != overx)
+		    if (status != null) 
+			status.setMessages(getStatus());
+    }
+    
+    @Override
+	public String getToolTipText(MouseEvent e) {
+		/* Do we want to do mouseovers if value already visible? 
+		if (getShowVal()) return null; 
+		// don't do tooltips and vals at same time.
+		 */
+		String ret = "";
+		if (drawer != null) {
+			int geneRow = overy;
+			if (xmap.contains(overx) && ymap.contains(overy)) {
+				if (drawer.isMissing(overx, geneRow)) {
+					ret = "No data";
+				} else if (drawer.isEmpty(overx, geneRow)) {
+					ret = null;
+				} else {
+					int row = geneRow + 1;
+					int col = overx + 1;
+					ret = "Row: " + row + " Column: " + col + " Value: " 
+					+ drawer.getSummary(overx, geneRow);
+				}
+			}
+		}
+		return ret;
+	}
+    
     private void drawBand(Rectangle l) { 
 		
     	Graphics g = getGraphics();
@@ -574,79 +615,123 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 	public void keyPressed(KeyEvent e) {
 		
 		int c = e.getKeyCode();
-		startPoint.setLocation(arraySelection.getMinIndex(), 
-				geneSelection.getMinIndex());
-		endPoint.setLocation (arraySelection.getMaxIndex(), 
-				geneSelection.getMaxIndex());
+		int shift;
 		
-		if (e.isControlDown()) {
-			switch (c) {
-				case KeyEvent.VK_UP:
-					startPoint.translate(0, -1); 
-					endPoint.translate(0, 1); 
-					break;
-				case KeyEvent.VK_DOWN:
-					startPoint.translate(0, 1); 
-					endPoint.translate(0, -1); 
-					break;
-				case KeyEvent.VK_LEFT:
-					startPoint.translate(1, 0); 
-					endPoint.translate(-1, 0); 
-					break;
-				case KeyEvent.VK_RIGHT:
-					startPoint.translate(-1, 0); 
-					endPoint.translate(1, 0); 
-					break;
-			}
-		} else {
+		double zoomVal = 0.5;
+		
+		if(getXMap().getScale() <= 1.0 
+				&& getYMap().getScale() <= 1.0) {
+			zoomVal = 0.1;
 			
-			switch (c) {
-				case KeyEvent.VK_UP:
-					startPoint.translate(0, -1); 
-					endPoint.translate(0, -1); 
-					break;
-				case KeyEvent.VK_DOWN:
-					startPoint.translate(0, 1); 
-					endPoint.translate(0, 1); 
-					break;
-				case KeyEvent.VK_LEFT:
-					startPoint.translate(-1, 0); 
-					endPoint.translate(-1, 0); 
-					break;
-				case KeyEvent.VK_RIGHT:
-					startPoint.translate(1, 0); 
-					endPoint.translate(1, 0); 
-					break;
-				case KeyEvent.VK_SHIFT:
-					// should we do something if shift is pressed during drag?
-					break;
-			}
+		} else if(getXMap().getScale() <= 0.1 
+				&& getYMap().getScale() <= 0.1) {
+			zoomVal = 0.01;
+		} 
+		
+		if (e.isShiftDown()) {
+			shift = 10;
+			
+		} else {
+			shift = 1;
 		}
 		
-		// make sure it all fits...
-		int overx = 0; int overy = 0;
-		if (startPoint.x < xmap.getMinIndex()) {
-			overx += startPoint.x - xmap.getMinIndex();
-		}
+		switch (c) {
+		case KeyEvent.VK_LEFT:
+			getXMap().scrollBy(-shift);
+			break;
+		case KeyEvent.VK_RIGHT:
+			getXMap().scrollBy(shift);
+			break;
+		case KeyEvent.VK_UP:
+			getYMap().scrollBy(-shift);
+			break;
+		case KeyEvent.VK_DOWN:
+			getYMap().scrollBy(shift);
+			break;
+		case KeyEvent.VK_MINUS:
+			getXMap().setScale(getXMap().getScale() - zoomVal);
+			getYMap().setScale(getYMap().getScale() - zoomVal);
+			break;
+		case KeyEvent.VK_EQUALS:
+			getXMap().setScale(getXMap().getScale() + zoomVal);
+			getYMap().setScale(getYMap().getScale() + zoomVal);
+			break;
+		}	
 		
-		if (startPoint.y < ymap.getMinIndex()) {
-			overy += startPoint.y - ymap.getMinIndex();
-		}
-		
-		if (endPoint.x > xmap.getMaxIndex()) {
-			overx += endPoint.x - xmap.getMaxIndex();
-		}
-		
-		if (startPoint.y < ymap.getMinIndex()) {
-			overy += startPoint.y - ymap.getMinIndex();
-		}
-		
-		startPoint.x -= overx;
-		endPoint.x -= overx;
-		startPoint.y -= overy;
-		endPoint.y -= overy;
-		
-		selectRectangle(startPoint, endPoint);
+//		int c = e.getKeyCode();
+//		startPoint.setLocation(arraySelection.getMinIndex(), 
+//				geneSelection.getMinIndex());
+//		endPoint.setLocation (arraySelection.getMaxIndex(), 
+//				geneSelection.getMaxIndex());
+//		
+//		if (e.isControlDown()) {
+//			switch (c) {
+//				case KeyEvent.VK_UP:
+//					startPoint.translate(0, -1); 
+//					endPoint.translate(0, 1); 
+//					break;
+//				case KeyEvent.VK_DOWN:
+//					startPoint.translate(0, 1); 
+//					endPoint.translate(0, -1); 
+//					break;
+//				case KeyEvent.VK_LEFT:
+//					startPoint.translate(1, 0); 
+//					endPoint.translate(-1, 0); 
+//					break;
+//				case KeyEvent.VK_RIGHT:
+//					startPoint.translate(-1, 0); 
+//					endPoint.translate(1, 0); 
+//					break;
+//			}
+//		} else {
+//			
+//			switch (c) {
+//				case KeyEvent.VK_UP:
+//					startPoint.translate(0, -1); 
+//					endPoint.translate(0, -1); 
+//					break;
+//				case KeyEvent.VK_DOWN:
+//					startPoint.translate(0, 1); 
+//					endPoint.translate(0, 1); 
+//					break;
+//				case KeyEvent.VK_LEFT:
+//					startPoint.translate(-1, 0); 
+//					endPoint.translate(-1, 0); 
+//					break;
+//				case KeyEvent.VK_RIGHT:
+//					startPoint.translate(1, 0); 
+//					endPoint.translate(1, 0); 
+//					break;
+//				case KeyEvent.VK_SHIFT:
+//					// should we do something if shift is pressed during drag?
+//					break;
+//			}
+//		}
+//		
+//		// make sure it all fits...
+//		int overx = 0; int overy = 0;
+//		if (startPoint.x < xmap.getMinIndex()) {
+//			overx += startPoint.x - xmap.getMinIndex();
+//		}
+//		
+//		if (startPoint.y < ymap.getMinIndex()) {
+//			overy += startPoint.y - ymap.getMinIndex();
+//		}
+//		
+//		if (endPoint.x > xmap.getMaxIndex()) {
+//			overx += endPoint.x - xmap.getMaxIndex();
+//		}
+//		
+//		if (startPoint.y < ymap.getMinIndex()) {
+//			overy += startPoint.y - ymap.getMinIndex();
+//		}
+//		
+//		startPoint.x -= overx;
+//		endPoint.x -= overx;
+//		startPoint.y -= overy;
+//		endPoint.y -= overy;
+//		
+//		selectRectangle(startPoint, endPoint);
 	}
 	
 	@Override

@@ -40,21 +40,33 @@ import edu.stanford.genetics.treeview.*;
 public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * decided to handle updates of Xmlconfig through a windowlistener.
 	 * thus, this just calls the other constructor.
 	 */
-	public PixelSettingsSelector
-	(MapContainer xmap, MapContainer ymap,
+	public PixelSettingsSelector (MapContainer xmap, MapContainer ymap, 
+			ColorExtractor drawer, ColorPresets colorPresets) {
+		
+		this(xmap, ymap, null, null, drawer, colorPresets);
+	}
+	
+	public PixelSettingsSelector (MapContainer xmap, MapContainer ymap,
 			MapContainer xZmap, MapContainer yZmap,
 			ConfigNode config, ColorExtractor drawer,
 			ColorPresets colorPresets) {
+		
 		this(xmap, ymap, xZmap, yZmap, drawer, colorPresets);
 	}
-	public PixelSettingsSelector
-	(MapContainer xmap, MapContainer ymap,
+	
+	public PixelSettingsSelector (MapContainer xmap, MapContainer ymap,
 			MapContainer xZmap, MapContainer yZmap,
 			ColorExtractor drawer,
 			ColorPresets colorPresets) {
+		
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		m_xmap = xmap;
 		m_ymap = ymap;
@@ -64,6 +76,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 		m_presets = colorPresets;
 		setupWidgets();
 	}
+	
 	private void setupWidgets() {
 		removeAll();
 		Border border = BorderFactory.createEtchedBorder();
@@ -85,15 +98,18 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 		gbc.gridx = 1;
 		add(t, gbc);
 
-		gbc.gridy = 1;
-		gbc.gridx = 0;
-		add(new JLabel("Zoom:"), gbc);
-		t = new JPanel();
-		t.setBorder(border);
-		m_xZscale = new ScalePanel(m_xZmap, "X:");
-		t.add(m_xZscale);
-		m_yZscale = new ScalePanel(m_yZmap, "Y:");
-		t.add(m_yZscale);
+		if(m_xZmap != null && m_yZmap != null) {
+			gbc.gridy = 1;
+			gbc.gridx = 0;
+			add(new JLabel("Zoom:"), gbc);
+			t = new JPanel();
+			t.setBorder(border);
+			m_xZscale = new ScalePanel(m_xZmap, "X:");
+			t.add(m_xZscale);
+			m_yZscale = new ScalePanel(m_yZmap, "Y:");
+			t.add(m_yZscale);
+		}
+		
 		gbc.gridy = 1;
 		gbc.gridx = 1;
 		add(t, gbc);
@@ -138,12 +154,18 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 	}
 
 	class ScalePanel extends JPanel {
+		
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		private ButtonGroup type;
 		private JRadioButton fixed, fill;
 		private JTextField value;
 		private MapContainer ymap;
 
 		public ScalePanel(MapContainer xmc, String title) {
+			
 			ymap = xmc;
 
 			setLayout(new GridLayout(3,2));
@@ -302,6 +324,11 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 	ColorPresetsPanel colorPresetsPanel;
 
 	class CEEButtons extends JPanel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
 		CEEButtons() {
 
 			JButton loadButton = new JButton("Load...");
@@ -382,6 +409,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 	}
 	
 	class LogScaleSelector extends JPanel {
+		
 		/**
 		 * I don't use serialization, this is to keep eclipse happy.
 		 */
@@ -438,6 +466,10 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 	 * this class allows the presets to be selected...
 	 */
 	class ColorPresetsPanel extends JPanel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		ColorPresetsPanel() {
 			redoLayout();
 		}
@@ -466,15 +498,24 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
  */
 
 class ColorExtractorEditor extends JPanel {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static final int UP = 0;
 	private static final int ZERO = 1;
 	private static final int DOWN = 2;
 	private static final int MISSING = 3;
 	private ColorExtractor colorExtractor;
 	private ColorPanel colorPanel [] = new ColorPanel[4];
+	
 	public ColorExtractorEditor(ColorExtractor colorExtractor) {
+		
 		this.colorExtractor = colorExtractor;
+		
 		for (int i = 0; i < 4; i++) {
+			
 			colorPanel[i] = new ColorPanel(i);
 			add(colorPanel[i]);
 		}
@@ -483,13 +524,16 @@ class ColorExtractorEditor extends JPanel {
 	}
 
 	public void copyStateFrom(ColorSet source) {
+		
 		colorPanel[UP].setColor(source.getUp());
 		colorPanel[ZERO].setColor(source.getZero());
 		colorPanel[DOWN].setColor(source.getDown());
 		colorPanel[MISSING].setColor(source.getMissing());
 
 	}
+	
 	public void copyStateTo(ColorSet dest) {
+		
 		dest.setUp(colorPanel[UP].getColor());
 		dest.setZero(colorPanel[ZERO].getColor());
 		dest.setDown(colorPanel[DOWN].getColor());
@@ -497,17 +541,25 @@ class ColorExtractorEditor extends JPanel {
 	}
 
 	class ColorPanel extends JPanel {
+
+		private static final long serialVersionUID = 1L;
+		
 		ColorIcon colorIcon;
 		int type;
-		ColorPanel(int i) {
+		
+		public ColorPanel(int i) {
+			
 			type = i;
 			redoComps();
 		} 
+		
 		public void redoComps() {
+			
 			removeAll();
 			colorIcon = new ColorIcon(10, 10, getColor());
 			JButton pushButton = new JButton(getLabel(), colorIcon);
 			pushButton.addActionListener(new ActionListener() {
+				
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					Color trial = JColorChooser.showDialog(
@@ -520,7 +572,9 @@ class ColorExtractorEditor extends JPanel {
 
 			add(pushButton);
 		}
+		
 		private void setColor(Color c) {
+			
 			switch(type) {
 			case UP:
 				colorExtractor.setUpColor(c);
@@ -535,12 +589,15 @@ class ColorExtractorEditor extends JPanel {
 				colorExtractor.setMissingColor(c);
 				break;
 			}
+			
 			colorIcon.setColor(getColor());
 //			redoComps();
 			colorExtractor.notifyObservers();
 			repaint();
 		}
+		
 		private String getLabel() {
+			
 			switch(type) {
 			case UP:
 				return "Positive";
@@ -551,9 +608,12 @@ class ColorExtractorEditor extends JPanel {
 			case MISSING:
 				return "Missing";
 			}
+			
 			return null;
 		}
+		
 		private Color getColor() {
+			
 			switch(type) {
 			case UP:
 				return colorExtractor.getUp();
@@ -564,11 +624,13 @@ class ColorExtractorEditor extends JPanel {
 			case MISSING:
 				return colorExtractor.getMissing();
 			}
+			
 			return null;
 		}
 	}
 
 	class ColorIcon implements Icon {
+		
 		private int width, height;
 		private Color color;
 		ColorIcon(int x, int y, Color c) {
@@ -576,19 +638,27 @@ class ColorExtractorEditor extends JPanel {
 			height = y;
 			color = c;
 		}
+		
 		public void setColor(Color c) {
+			
 			color = c;
 		}
+		
 		@Override
 		public int getIconHeight() {
+			
 			return height;
 		}
+		
 		@Override
 		public int getIconWidth() {
+			
 			return width;
 		}
+		
 		@Override
 		public void paintIcon(Component c, Graphics g, int x, int y) {
+			
 			Color old = g.getColor();
 			g.setColor(color);
 			g.fillRect(x, y, width, height);

@@ -92,17 +92,17 @@ MainPanel, Observer  {
 
 
 	// scrollbars, mostly used by maps
-	zoomXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0,1,0,1);
-	zoomYscrollbar = new JScrollBar(Adjustable.VERTICAL,0,1,0,1);
-
-
-
-		 zoomXmap = new MapContainer();
-		 zoomXmap.setDefaultScale(12.0);
-		 zoomXmap.setScrollbar(zoomXscrollbar);
-		 zoomYmap = new MapContainer();
-		 zoomYmap.setDefaultScale(12.0);
-		 zoomYmap.setScrollbar(zoomYscrollbar);
+//	zoomXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0,1,0,1);
+//	zoomYscrollbar = new JScrollBar(Adjustable.VERTICAL,0,1,0,1);
+//
+//
+//
+//		 zoomXmap = new MapContainer();
+//		 zoomXmap.setDefaultScale(12.0);
+//		 zoomXmap.setScrollbar(zoomXscrollbar);
+//		 zoomYmap = new MapContainer();
+//		 zoomYmap.setDefaultScale(12.0);
+//		 zoomYmap.setScrollbar(zoomYscrollbar);
 
 		 // globalmaps tell globalview, atrview, and gtrview
 		 // where to draw each data point.
@@ -115,8 +115,8 @@ MainPanel, Observer  {
 		globalview.setXMap(globalXmap);
 		globalview.setYMap(globalYmap);
 
-		globalview.setZoomYMap(getZoomYmap());
-		globalview.setZoomXMap(getZoomXmap());
+//		globalview.setZoomYMap(getZoomYmap());
+//		globalview.setZoomXMap(getZoomXmap());
 
 		arraynameview = new ArrayNameView(getDataModel().getArrayHeaderInfo());
 
@@ -130,23 +130,23 @@ MainPanel, Observer  {
 		atrview.setMap(globalXmap);
 		atrview.setInvertedTreeDrawer(invertedTreeDrawer);
 
-		atrzview = new ATRZoomView();
-		atrzview.setZoomMap(getZoomXmap());
-		atrzview.setInvertedTreeDrawer(invertedTreeDrawer);
-
-		zoomview = new ZoomView();
-		zoomview.setYMap(getZoomYmap());
-		zoomview.setXMap(getZoomXmap());
-		zoomview  .setArrayDrawer(arrayDrawer);
+//		atrzview = new ATRZoomView();
+//		atrzview.setZoomMap(getZoomXmap());
+//		atrzview.setInvertedTreeDrawer(invertedTreeDrawer);
+//
+//		zoomview = new ZoomView();
+//		zoomview.setYMap(getZoomYmap());
+//		zoomview.setXMap(getZoomXmap());
+//		zoomview  .setArrayDrawer(arrayDrawer);
 		globalview.setArrayDrawer(arrayDrawer);
 
-		arraynameview.setMapping(getZoomXmap());
+//		arraynameview.setMapping(getZoomXmap());
 		arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
 
 
 		textview = new TextViewManager(getDataModel().getGeneHeaderInfo(), 
 				viewFrame.getUrlExtractor(), getDataModel());
-		textview.setMap(getZoomYmap());
+//		textview.setMap(getZoomYmap());
 
 		doDoubleLayout();
 
@@ -166,8 +166,8 @@ MainPanel, Observer  {
 		
 		globalXmap.bindConfig(getFirst("GlobalXMap"));
 		globalYmap.bindConfig(getFirst("GlobalYMap"));
-		getZoomXmap().bindConfig(getFirst("ZoomXMap"));
-		getZoomYmap().bindConfig(getFirst("ZoomYMap"));
+//		getZoomXmap().bindConfig(getFirst("ZoomXMap"));
+//		getZoomYmap().bindConfig(getFirst("ZoomYMap"));
 
 		textview.bindConfig(getFirst("TextViewParent"));
 		arraynameview.bindConfig(getFirst("ArrayNameView"));
@@ -176,13 +176,13 @@ MainPanel, Observer  {
 		DataMatrix dataMatrix = getDataModel().getDataMatrix();
 		globalXmap.setIndexRange(0, dataMatrix.getNumCol() - 1);
 		globalYmap.setIndexRange(0, dataMatrix.getNumRow() - 1);
-		getZoomXmap().setIndexRange(-1, -1);
-		getZoomYmap().setIndexRange(-1, -1);
+//		getZoomXmap().setIndexRange(-1, -1);
+//		getZoomYmap().setIndexRange(-1, -1);
 
 		globalXmap.notifyObservers();
 		globalYmap.notifyObservers();
-		getZoomXmap().notifyObservers();
-		getZoomYmap().notifyObservers();
+//		getZoomXmap().notifyObservers();
+//		getZoomYmap().notifyObservers();
 	}
 	
 }
