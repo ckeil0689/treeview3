@@ -28,11 +28,6 @@ class LoadCheckView extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	
-	//Colors
-	private static final Color BLUE1 = new Color(118, 193, 228, 255);
-	private static final Color RED1 = new Color(240, 80, 50, 255);
-	private static final Color BG_COLOR = new Color(255, 255, 255, 255);
-	
 	//Two Font Sizes
 	private static Font fontS = new Font("Sans Serif", Font.PLAIN, 18);
 	private static Font fontL = new Font("Sans Serif", Font.PLAIN, 24);
@@ -63,7 +58,7 @@ class LoadCheckView extends JPanel {
 	public LoadCheckView(DataModel dataModel, final TreeViewFrame viewFrame) {
 		
 		this.setLayout(new MigLayout());
-		this.setBackground(BG_COLOR);
+		this.setBackground(GUIColors.BG_COLOR);
 		
 		feedbackPanel = new JPanel();
 		feedbackPanel.setLayout(new MigLayout());
@@ -157,11 +152,11 @@ class LoadCheckView extends JPanel {
 			
 			JLabel warning = new JLabel("Loading unsuccessful.");
 			warning.setFont(fontL);
-			warning.setForeground(RED1);
+			warning.setForeground(GUIColors.RED1);
 			
 			loadNewButton = new JButton("Load New File");
 			setButtonLayout(loadNewButton);
-			loadNewButton.setBackground(BLUE1);
+			loadNewButton.setBackground(GUIColors.BLUE1);
 			loadNewButton.addActionListener(new ActionListener(){
 	
 				@Override
@@ -190,7 +185,7 @@ class LoadCheckView extends JPanel {
   		
   		button.setFont(fontS);
   		button.setOpaque(true);
-  		button.setBackground(BLUE1);
+  		button.setBackground(GUIColors.BLUE1);
   		button.setForeground(Color.white);
   		
   		return button;

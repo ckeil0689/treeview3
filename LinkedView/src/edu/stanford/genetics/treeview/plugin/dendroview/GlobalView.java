@@ -43,6 +43,8 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 //    protected MapContainer zoomXmap;
 //    protected MapContainer zoomYmap;
     
+	private HeaderInfo arrayHI;
+	private HeaderInfo geneHI;
     private ArrayDrawer drawer;
     private int overx;
     private int overy;
@@ -494,6 +496,8 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		} else {
 			 LogBuffer.println("GlobalView got weird update : " + o);
 		}
+		
+		revalidate();
 		repaint();
 	}
 
@@ -578,16 +582,37 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		// don't do tooltips and vals at same time.
 		 */
 		String ret = "";
+		String row = "";
+		String col = "";
+		
 		if (drawer != null) {
+			
 			int geneRow = overy;
+			int geneCol = overx;
+			
 			if (xmap.contains(overx) && ymap.contains(overy)) {
+				
+				if(geneHI != null) {
+					row = geneHI.getHeader(geneRow, 1);
+					
+				} else {
+					row = "N/A";
+				}
+				
+				if(arrayHI != null) {
+					col = arrayHI.getHeader(geneCol, 0);
+					
+				} else {
+					col = "N/A";
+				}
+				
 				if (drawer.isMissing(overx, geneRow)) {
 					ret = "No data";
+					
 				} else if (drawer.isEmpty(overx, geneRow)) {
 					ret = null;
+					
 				} else {
-					int row = geneRow + 1;
-					int col = overx + 1;
 					ret = "Row: " + row + " Column: " + col + " Value: " 
 					+ drawer.getSummary(overx, geneRow);
 				}
@@ -617,17 +642,6 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		int c = e.getKeyCode();
 		int shift;
 		
-		double zoomVal = 0.5;
-		
-		if(getXMap().getScale() <= 1.0 
-				&& getYMap().getScale() <= 1.0) {
-			zoomVal = 0.1;
-			
-		} else if(getXMap().getScale() <= 0.1 
-				&& getYMap().getScale() <= 0.1) {
-			zoomVal = 0.01;
-		} 
-		
 		if (e.isShiftDown()) {
 			shift = 10;
 			
@@ -649,12 +663,12 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 			getYMap().scrollBy(shift);
 			break;
 		case KeyEvent.VK_MINUS:
-			getXMap().setScale(getXMap().getScale() - zoomVal);
-			getYMap().setScale(getYMap().getScale() - zoomVal);
+			zoomOut(getXMap());
+			zoomOut(getYMap());
 			break;
 		case KeyEvent.VK_EQUALS:
-			getXMap().setScale(getXMap().getScale() + zoomVal);
-			getYMap().setScale(getYMap().getScale() + zoomVal);
+			zoomIn(getXMap());
+			zoomIn(getYMap());
 			break;
 		}	
 		
@@ -739,16 +753,6 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		
 		int notches = e.getWheelRotation();
 		int shift = 3;
-		double zoomVal = 0.5;
-		
-		if(getXMap().getScale() <= 1.0 
-				&& getYMap().getScale() <= 1.0) {
-			zoomVal = 0.1;
-			
-		} else if(getXMap().getScale() <= 0.1 
-				&& getYMap().getScale() <= 0.1) {
-			zoomVal = 0.01;
-		} 
 		
 		if(!e.isControlDown()) {
 			if(notches < 0) {
@@ -759,13 +763,51 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 			}
 		} else {
 			if(notches < 0) {
-				getXMap().setScale(getXMap().getScale() + zoomVal);
-				getYMap().setScale(getYMap().getScale() + zoomVal);
+				zoomIn(getXMap());
+				zoomIn(getYMap());
 				
 			} else {
-				getXMap().setScale(getXMap().getScale() - zoomVal);
-				getYMap().setScale(getYMap().getScale() - zoomVal);
+				zoomOut(getXMap());
+				zoomOut(getYMap());
 			}
+		}
+	}
+	
+	private void zoomOut(MapContainer mc) {
+		
+		double zoomVal = 0.5;
+		
+		if(mc.getScale() <= 1.0) {
+			zoomVal = 0.1;
+			
+		} else if(mc.getScale() <= 0.1) {
+			zoomVal = 0.01;
+		} 
+		
+		if(mc.getScale() - zoomVal > mc.getMinScale()) {
+			mc.setScale(mc.getScale() - zoomVal);
+			
+		} else {
+			mc.setScale(mc.getMinScale());
+		}
+	}
+	
+	private void zoomIn(MapContainer mc) {
+		
+		double zoomVal = 0.5;
+		
+		if(mc.getScale() <= 1.0) {
+			zoomVal = 0.1;
+			
+		} else if(mc.getScale() <= 0.1) {
+			zoomVal = 0.01;
+		} 
+		
+		if(mc.getScale() + zoomVal > mc.getMinScale()) {
+			mc.setScale(mc.getScale() + zoomVal);
+			
+		} else {
+			mc.setScale(mc.getMinScale());
 		}
 	}
 	
@@ -805,6 +847,12 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		
 		geneSelection.notifyObservers();
 		arraySelection.notifyObservers();	
+	}
+	
+	public void setHeaders(HeaderInfo ghi, HeaderInfo ahi) {
+		
+		geneHI = ghi;
+		arrayHI = ahi;
 	}
 }
 

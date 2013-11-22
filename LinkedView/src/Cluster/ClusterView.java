@@ -59,6 +59,7 @@ import edu.stanford.genetics.treeview.ConfigNode;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.ExportException;
 import edu.stanford.genetics.treeview.FileSet;
+import edu.stanford.genetics.treeview.GUIColors;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.MainPanel;
 import edu.stanford.genetics.treeview.MainProgramArgs;
@@ -81,11 +82,6 @@ import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 public class ClusterView extends JPanel implements MainPanel {
 	
 	private static final long serialVersionUID = 1L;
-	
-	//Colors
-	private static final Color BLUE1 = new Color(118, 193, 228, 255);
-	private static final Color RED1 = new Color(240, 80, 50, 255);
-	private final static Color BG_COLOR = new Color(255, 255, 255, 255);
 	
 	//Two Font Sizes
 	private static Font fontS = new Font("Sans Serif", Font.PLAIN, 18);
@@ -230,19 +226,19 @@ public class ClusterView extends JPanel implements MainPanel {
 	public void setupLayout() {
 		
 		this.setLayout(new MigLayout("ins 0"));
-		this.setBackground(BG_COLOR);
+		this.setBackground(GUIColors.BG_COLOR);
 		
 		//Create background panel
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new MigLayout("ins 0"));
-		mainPanel.setBackground(BG_COLOR);
+		mainPanel.setBackground(GUIColors.BG_COLOR);
 		
 		//Background Panel for the Cluster Options
 		optionsPanel = new JPanel();
 		optionsPanel.setLayout(new MigLayout());
 		optionsPanel.setBorder(
 				BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-		optionsPanel.setBackground(BG_COLOR);
+		optionsPanel.setBackground(GUIColors.BG_COLOR);
 		
 		//Panel for the Buttons
 		buttonPanel = new JPanel();
@@ -252,7 +248,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		//header
 		head1 = new JLabel("Options");
 		head1.setFont(fontL);
-		head1.setForeground(BLUE1);
+		head1.setForeground(GUIColors.BLUE1);
 		
 		clusterType = setComboLayout(clusterNames);
 		clusterType.addActionListener(new ActionListener(){
@@ -279,7 +275,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		
 		similarity = new JLabel("Similarity Metric: ");
   		similarity.setFont(fontL);
-  		similarity.setBackground(BG_COLOR);
+  		similarity.setBackground(GUIColors.BG_COLOR);
   		
   		//filler component
   		emptyPanel = new JPanel();
@@ -289,11 +285,11 @@ public class ClusterView extends JPanel implements MainPanel {
 		//Labels
 		head2 = new JLabel("Rows");
 		head2.setFont(fontL);
-		head2.setForeground(BLUE1);
+		head2.setForeground(GUIColors.BLUE1);
 		
 		head3 = new JLabel("Columns");
 		head3.setFont(fontL);
-		head3.setForeground(BLUE1);
+		head3.setForeground(GUIColors.BLUE1);
 		 
 		//Drop-down menu for row selection
   		geneCombo = setComboLayout(measurements);
@@ -386,7 +382,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		//ProgressBar Component
 		loadPanel = new JPanel();
 		loadPanel.setLayout(new MigLayout());
-		loadPanel.setBackground(BG_COLOR);
+		loadPanel.setBackground(GUIColors.BG_COLOR);
 		loadPanel.setBorder(
 				BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
     	
@@ -511,7 +507,7 @@ public class ClusterView extends JPanel implements MainPanel {
 					loadPanel.removeAll();
 					error1 = new JLabel("Woah, that's too quick!");
 					error1.setFont(fontS);
-					error1.setForeground(RED1);
+					error1.setForeground(GUIColors.RED1);
 					
 					String hint = "";
 					String hint2 = "";
@@ -614,7 +610,7 @@ public class ClusterView extends JPanel implements MainPanel {
   		
   		button.setFont(fontS);
   		button.setOpaque(true);
-  		button.setBackground(BLUE1);
+  		button.setBackground(GUIColors.BLUE1);
   		button.setForeground(Color.white);
   		
   		return button;
@@ -650,7 +646,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		pBar.setMinimum(0);
 		pBar.setStringPainted(true);
 		pBar.setMaximumSize(new Dimension(2000, 40));
-		pBar.setForeground(BLUE1);
+		pBar.setForeground(GUIColors.BLUE1);
 		pBar.setUI(new BasicProgressBarUI(){
 			@Override
 			protected Color getSelectionBackground(){return Color.black;};

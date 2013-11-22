@@ -23,7 +23,6 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -90,11 +89,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	protected DataModel dataModel;
 	protected JDialog presetsFrame = null; 
 	protected TabbedSettingsPanel presetsPanel = null;
-	
-	private static final Color GRAY1 = new Color(160, 161, 162, 255);
-	private static final Color GRAY2 = new Color(100, 100, 100, 255);
-	private static final Color BLUE1 = new Color(118, 193, 228, 255);
-	private static final Color BG_COLOR = new Color(255, 255, 255, 255);
 
 	private TreeViewApp treeView;
 	private ProgramMenu programMenu;
@@ -1359,19 +1353,19 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		waiting = new JPanel();
 		waiting.setLayout(new MigLayout("ins 0"));
-		waiting.setBackground(BG_COLOR);
+		waiting.setBackground(GUIColors.BG_COLOR);
 		
 		title_bg = new JPanel();
 		title_bg.setLayout(new MigLayout());
-		title_bg.setBackground(BLUE1);
+		title_bg.setBackground(GUIColors.BLUE1);
 		
 		jl = new JLabel("Hello! How are you Gentlepeople?");
 		jl.setFont(new Font("Sans Serif", Font.PLAIN, 30));
-		jl.setForeground(BG_COLOR);
+		jl.setForeground(GUIColors.BG_COLOR);
 		
 		jl2 = new JLabel("Welcome to " + getAppName());
 		jl2.setFont(new Font("Sans Serif", Font.BOLD, 50));
-		jl2.setForeground(BG_COLOR);
+		jl2.setForeground(GUIColors.BG_COLOR);
 		
 		ClickableLabel load_Icon = new ClickableLabel(this, 
 				"Load Data >");
@@ -1408,11 +1402,11 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		confirm = new JLabel("Loaded File: " + dataModel.getFileName());
 		confirm.setFont(new Font("Sans Serif", Font.BOLD, 25));
-		confirm.setForeground(GRAY1);
+		confirm.setForeground(GUIColors.GRAY1);
 		
 		ques = new JLabel("What would you like to do?");
 		ques.setFont(new Font("Sans Serif", Font.PLAIN, 50));
-		ques.setForeground(GRAY2);
+		ques.setForeground(GUIColors.GRAY2);
 		
 		ClickableLabel clus_label = new ClickableLabel(this, "Cluster >", 
 				(TVModel)dataModel);
@@ -1422,7 +1416,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		loadNew = new JLabel("  Load New File");
 		loadNew.setFont(new Font("Sans Serif", Font.BOLD, 25));
-		loadNew.setForeground(BLUE1);
+		loadNew.setForeground(GUIColors.BLUE1);
 		
 		loadNew.addMouseListener(new SSMouseListener(loadNew){
 			

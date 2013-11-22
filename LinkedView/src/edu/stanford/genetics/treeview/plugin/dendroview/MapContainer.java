@@ -39,8 +39,9 @@ import edu.stanford.genetics.treeview.*;
 public class MapContainer extends Observable implements Observer, 
 AdjustmentListener, ConfigNodePersistent {
 	
-    private String default_map = "Fixed";
-    private double default_scale = 10.0;
+    private String default_map = "Fill";
+    private double default_scale = 1.0;
+    private double minScale;
     private IntegerMap current = null;
 
 	private FixedMap fixedMap = null;
@@ -94,6 +95,14 @@ AdjustmentListener, ConfigNodePersistent {
         
     	default_scale = d;
 		fixedMap.setDefaultScale(d);
+    }
+    
+    public void setHome() {
+    	
+    	double pixels = current.getAvailablePixels();
+    	double divider = current.getMaxIndex() - current.getMinIndex() + 1;
+    	minScale = pixels/divider;
+    	setScale(minScale);
     }
 
 	public void recalculateScale() {
@@ -214,7 +223,7 @@ AdjustmentListener, ConfigNodePersistent {
     		scrollbar.setValues(value, extent, 0, max);
     		scrollbar.setBlockIncrement(current.getViewableIndexes());
 	  }
-	 }
+	}
 
     /** 
      * expect to get updates from selection only
@@ -355,6 +364,11 @@ AdjustmentListener, ConfigNodePersistent {
     public int getMinIndex() {
         
     	return current.getMinIndex();
+    }
+    
+    public double getMinScale() {
+    	
+    	return minScale;
     }
 
     public TreeDrawerNode getSelectedNode()  {

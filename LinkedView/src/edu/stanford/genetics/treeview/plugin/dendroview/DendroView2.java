@@ -107,10 +107,6 @@ MainPanel, Observer {
 	protected JDialog settingsFrame;
 	protected TabbedSettingsPanel settingsPanel;
 	
-	protected final static Color RED1 = new Color(240, 80, 50, 255);
-	protected final static Color BLUE1 = new Color(118, 193, 228, 255);
-	private final static Color BG_COLOR = new Color(235, 240, 255, 255);
-	
 	/*
 	 * The following arrays allow translation to and from screen and DataMatrix 
 	 * I had to add these in order to have gaps in the Dendroview of k-means
@@ -716,7 +712,7 @@ MainPanel, Observer {
 		colorExtractor.setDefaultColorSet(colorPresets.getDefaultColorSet());
 		colorExtractor.setMissing(DataModel.NODATA, DataModel.EMPTY);
 		
-		statuspanel = new MessagePanel("Status", BG_COLOR);
+		statuspanel = new MessagePanel("Status", GUIColors.BG_COLOR);
 
 		DoubleArrayDrawer dArrayDrawer = new DoubleArrayDrawer();
 		dArrayDrawer.setColorExtractor(colorExtractor);
@@ -742,15 +738,15 @@ MainPanel, Observer {
 		// the scrollbars "scroll" by communicating with the maps.
 		globalXmap = new MapContainer("Fill");
 		globalXmap.setScrollbar(globalXscrollbar);
-		//globalXmap.setDefaultScale(2.0);
 		
 		globalYmap = new MapContainer("Fill");
 		globalYmap.setScrollbar(globalYscrollbar);
-		//globalYmap.setDefaultScale(2.0);
 		
 		globalview = new GlobalView();
 		globalview.setXMap(globalXmap);
 		globalview.setYMap(globalYmap);
+		globalview.setHeaders(getDataModel().getGeneHeaderInfo(), 
+				getDataModel().getArrayHeaderInfo());
 		
 //		globalview.setZoomYMap(getZoomYmap());
 //		globalview.setZoomXMap(getZoomXmap());
@@ -792,18 +788,18 @@ MainPanel, Observer {
 //		zoomview.setXMap(getZoomXmap());
 //		zoomview.setArrayDrawer(arrayDrawer);
 		
-		scaleDefaultAll = setZoomButtonLayout("0", BLUE1);
+		scaleDefaultAll = setZoomButtonLayout("Reset", GUIColors.BLUE1);
 		scaleDefaultAll.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				getGlobalXmap().setScale(default_scale);
-				getGlobalYmap().setScale(default_scale);
+				getGlobalXmap().setHome();
+				getGlobalYmap().setHome();
 			}
 			
 		});
 		
-		scaleIncX = setZoomButtonLayout("+", BLUE1);
+		scaleIncX = setZoomButtonLayout("+", GUIColors.BLUE1);
 		scaleIncX.addActionListener(new ActionListener(){
 
 			@Override
@@ -813,7 +809,7 @@ MainPanel, Observer {
 			
 		});
 		
-		scaleDecX = setZoomButtonLayout("-", BLUE1);
+		scaleDecX = setZoomButtonLayout("-", GUIColors.BLUE1);
 		scaleDecX.addActionListener(new ActionListener(){
 
 			@Override
@@ -823,7 +819,7 @@ MainPanel, Observer {
 			
 		});
 		
-		scaleDefaultX = setZoomButtonLayout("0", BLUE1);
+		scaleDefaultX = setZoomButtonLayout("Reset", GUIColors.BLUE1);
 		scaleDefaultX.addActionListener(new ActionListener(){
 
 			@Override
@@ -833,7 +829,7 @@ MainPanel, Observer {
 			
 		});
 		
-		scaleIncY = setZoomButtonLayout("+", BLUE1);
+		scaleIncY = setZoomButtonLayout("+", GUIColors.BLUE1);
 		scaleIncY.addActionListener(new ActionListener(){
 
 			@Override
@@ -843,7 +839,7 @@ MainPanel, Observer {
 			
 		});
 		
-		scaleDecY = setZoomButtonLayout("-", BLUE1);
+		scaleDecY = setZoomButtonLayout("-", GUIColors.BLUE1);
 		scaleDecY.addActionListener(new ActionListener(){
 
 			@Override
@@ -853,7 +849,7 @@ MainPanel, Observer {
 			
 		});
 		
-		scaleDefaultY = setZoomButtonLayout("0", BLUE1);
+		scaleDefaultY = setZoomButtonLayout("0", GUIColors.BLUE1);
 		scaleDefaultY.addActionListener(new ActionListener(){
 
 			@Override
@@ -1100,7 +1096,7 @@ MainPanel, Observer {
 		
 		backgroundPanel = new JPanel();
 		backgroundPanel.setLayout(new MigLayout());
-		backgroundPanel.setBackground(BG_COLOR);
+		backgroundPanel.setBackground(GUIColors.BG_COLOR);
 		
 //		up_min = new Dimension(400, 100);
 //		down_min = new Dimension(600, 500);
@@ -1145,7 +1141,7 @@ MainPanel, Observer {
 //			}
 //		});
 		
-		closeButton = setButtonLayout("< Back", BLUE1);;
+		closeButton = setButtonLayout("< Back", GUIColors.BLUE1);;
   		closeButton.addActionListener(new ActionListener(){
 
 			@Override

@@ -30,8 +30,6 @@ public class ClickableLabel extends JPanel {
 	private TreeViewFrame frame;
 	private String labelText;
 	
-	private Color BLUE1 = new Color(118, 193, 228, 255);
-	
 	/**
 	 * Static variables
 	 */
@@ -68,7 +66,7 @@ public class ClickableLabel extends JPanel {
 		
 		label = new JLabel(labelText);
 		label.setFont(new Font("Sans Serif", Font.PLAIN, 50));
-		label.setForeground(BLUE1);
+		label.setForeground(GUIColors.BLUE1);
 
 		this.add(label, "pushx, span, alignx 50%");
 		this.addMListener(label, tvModel_gen);
