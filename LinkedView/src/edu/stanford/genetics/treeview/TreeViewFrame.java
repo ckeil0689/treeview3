@@ -510,7 +510,28 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 */
 	protected void populateSettingsMenu(TreeviewMenuBarI menubar) {
 		menubar.addSeparator();
-//		menubar.addSubMenu(TreeviewMenuBarI.presetsSubMenu);
+		menubar.addSubMenu("Change Theme");
+		menubar.addMenuItem("Daylight", new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				
+				GUIColors.setDayLight();
+				//make static method to change theme?
+			}
+			
+		});
+		menubar.addMenuItem("Night", new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				
+				GUIColors.setNight();
+				//make static method to change theme?
+			}
+			
+		});
+		menubar.setMenu(TreeviewMenuBarI.documentMenu);
 		menubar.addMenuItem("Gene Url",new ActionListener() {
 			
 			@Override
@@ -1357,15 +1378,15 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		title_bg = new JPanel();
 		title_bg.setLayout(new MigLayout());
-		title_bg.setBackground(GUIColors.BLUE1);
+		title_bg.setBackground(GUIColors.BG_COLOR);
 		
 		jl = new JLabel("Hello! How are you Gentlepeople?");
 		jl.setFont(new Font("Sans Serif", Font.PLAIN, 30));
-		jl.setForeground(GUIColors.BG_COLOR);
+		jl.setForeground(GUIColors.BLUE1);
 		
 		jl2 = new JLabel("Welcome to " + getAppName());
 		jl2.setFont(new Font("Sans Serif", Font.BOLD, 50));
-		jl2.setForeground(GUIColors.BG_COLOR);
+		jl2.setForeground(GUIColors.BLUE1);
 		
 		ClickableLabel load_Icon = new ClickableLabel(this, 
 				"Load Data >");
@@ -1431,7 +1452,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		confirmPanel.add(loadNew, "pushx");
 		labelPanel.add(ques, "alignx 50%, push, grow, span");
 		
-		waiting.add(labelPanel, "push, alignx 50%, span, height ::10%, wrap");
+		waiting.add(labelPanel, "push, alignx 50%, aligny 100%, span, wrap");
 		waiting.add(clus_label, "push, alignx 50%");
 		waiting.add(viz_label, "push, alignx 50%, wrap");
 		waiting.add(confirmPanel, "push, alignx 50%, aligny 100%, span");

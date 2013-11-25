@@ -77,7 +77,7 @@ implements FontSelectable, PropertyChangeListener {
 		//could set up headerSummary...
 		int GIDIndex = hI.getIndex("GID");
 		if (GIDIndex == -1 && !srcFileType.endsWith(".cdt")) {
-			headerSummary.setIncluded(new int [] {0}); //changed from {1}???
+			headerSummary.setIncluded(new int [] {1}); //changed from {1}???
 			
 		} else if (GIDIndex == -1 && srcFileType.endsWith(".cdt")) {
 			headerSummary.setIncluded(new int [] {1});
@@ -318,6 +318,7 @@ implements FontSelectable, PropertyChangeListener {
     		setFont(((TextView)textViews.firstElement()).getFont());
     	}
 		
+		revalidate();
     	repaint();
     }
     
@@ -332,6 +333,7 @@ implements FontSelectable, PropertyChangeListener {
 			setFont(((TextView)textViews.firstElement()).getFont());
 		}
 		
+		revalidate();
         repaint();
     }
     
@@ -346,6 +348,7 @@ implements FontSelectable, PropertyChangeListener {
 			setFont(((TextView)textViews.firstElement()).getFont());
 		}
 		
+		revalidate();
         repaint();
     }
     

@@ -43,6 +43,7 @@ import java.util.Observable;
 import javax.swing.JScrollPane;
 
 import edu.stanford.genetics.treeview.ConfigNode;
+import edu.stanford.genetics.treeview.GUIColors;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.ModelView;
@@ -219,7 +220,7 @@ public class TextView extends ModelView implements FontSelectable,
 	
 		    // now, foreground text
 		    int fgColorIndex = headerInfo.getIndex("FGCOLOR");
-		    for (int j = start; j < end;j++) {
+		    for (int j = start; j < end; j++) {
 		    	
 		    	String out = null;
 		    	
@@ -236,7 +237,7 @@ public class TextView extends ModelView implements FontSelectable,
 		    	}
 	
 				if (out != null) {
-					Color back = g.getColor();
+					Color back = GUIColors.BLUE1; //g.getColor();
 					if ((geneSelection == null) 
 							|| geneSelection.isIndexSelected(j)) {
 						String [] strings = headerInfo.getHeader(j);
@@ -432,6 +433,7 @@ public class TextView extends ModelView implements FontSelectable,
 	public void adjustmentValueChanged(AdjustmentEvent evt) {
 	
     	offscreenValid = false;
+    	revalidate();
     	repaint();
     }
     
@@ -439,6 +441,7 @@ public class TextView extends ModelView implements FontSelectable,
 	
     	//	scrollbar.setValue(offset);
     	offscreenValid = false;
+    	revalidate();
     	repaint();
     }
 
@@ -473,13 +476,15 @@ public class TextView extends ModelView implements FontSelectable,
 			}
 			
 			setFont(new Font(face, style, size));
+			revalidate();
             repaint();
         }
     }
     
     @Override
 	public void setPoints(int i) {
-        if (size != i) {
+        
+    	if (size != i) {
             size = i;
             
 			if (root != null) {
@@ -487,6 +492,7 @@ public class TextView extends ModelView implements FontSelectable,
 			}
 			
 			setFont(new Font(face, style, size));
+			revalidate();
             repaint();
         }
     }
@@ -501,6 +507,7 @@ public class TextView extends ModelView implements FontSelectable,
 			}
 			
 			setFont(new Font(face, style, size));
+			revalidate();
             repaint();
         }
     }

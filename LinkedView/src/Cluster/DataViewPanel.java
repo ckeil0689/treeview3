@@ -17,6 +17,7 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 
 import edu.stanford.genetics.treeview.DataModel;
+import edu.stanford.genetics.treeview.GUIColors;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 
@@ -43,13 +44,13 @@ public class DataViewPanel extends JPanel{
 	private String[] geneNames;
 	private String[][] headerArray;
 	
+	private int max = 20;
+	
 	/**
 	 * Swing Components
 	 */
 	private JTable table, headerTable;
 	private JScrollPane tableScroll;
-	
-	private final Color BLUE2 = new Color(210, 230, 240, 255);
 	
 	/**
 	 * Constructor
@@ -70,18 +71,23 @@ public class DataViewPanel extends JPanel{
 		gList = fillDList(dataArray);
 		arraysList = splitArrays(gList, model);
 		
-		geneNames = new String[headerArray.length];
-		
-		int index = 0;
-		
-		String filePath = model.getSource().toLowerCase();
-		if(filePath.endsWith(".cdt")) {
-			index = 1;
+		if(arraysList.size() > max) {
+			
+			arraysList = arraysList.subList(0, max);
 		}
 		
-		for(int i = 0; i < headerArray.length; i++){
+		geneNames = new String[max];//headerArray.length];
+		
+//		int index = 0;
+//		
+//		String filePath = model.getSource().toLowerCase();
+//		if(filePath.endsWith(".cdt")) {
+//			index = 1;
+//		}
+		
+		for(int i = 0; i < max; i++){
 			
-			geneNames[i] = headerArray[i][index];
+			geneNames[i] = headerArray[i][1];
 		}
 		
 		table = new JTable(new ClusterTableModel(arraysList, model));
@@ -90,13 +96,23 @@ public class DataViewPanel extends JPanel{
 		//Table Header Options
 		JTableHeader header = table.getTableHeader();
 		header.setReorderingAllowed(false);
-		header.setBackground(BLUE2);
+		header.setBackground(GUIColors.TABLEHEADERS);
 		
 		//create a scrollPane with the table in it 
 		tableScroll = new JScrollPane(table, 
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		table.setFillsViewportHeight(true);
+		tableScroll.setBackground(Color.white);
+		
+		for(int i = 0; i < max; i++) {
+			
+			table.getColumnModel().getColumn(i).setWidth(table.getColumnModel()
+					.getColumn(i).getPreferredWidth() * 2);
+			
+			table.setRowHeight(i, table.getRowHeight(i) * 2);
+		}
+		
 		
 		DefaultTableModel model = new DefaultTableModel(){
 
@@ -104,22 +120,26 @@ public class DataViewPanel extends JPanel{
 
             @Override
             public int getColumnCount() {
-                return 1;
+                
+            	return 1;
             }
 
             @Override
             public boolean isCellEditable(int row, int col) {
-                return false;
+                
+            	return false;
             }
 
             @Override
             public int getRowCount() {
-                return table.getRowCount();
+                
+            	return max;//table.getRowCount();
             }
 
             @Override
             public Class<?> getColumnClass(int colNum) {
-                switch (colNum) {
+                
+            	switch (colNum) {
                     case 0:
                         return String.class;
                     default:
@@ -131,14 +151,15 @@ public class DataViewPanel extends JPanel{
 		
 		headerTable = new JTable(model);
 		
-		int max = table.getRowCount();
+		//int max = table.getRowCount();
 		
 		for(int i = 0; i < max; i++){
 			
 			headerTable.setValueAt(geneNames[i], i, 0);
+			headerTable.setRowHeight(i, headerTable.getRowHeight(i) * 2);
 		}
 		
-		headerTable.setShowGrid(true);
+		headerTable.setShowGrid(false);
 		headerTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         headerTable.setPreferredScrollableViewportSize(new Dimension(100, 0));
         headerTable.getColumnModel().getColumn(0).setCellRenderer(
@@ -178,46 +199,16 @@ public class DataViewPanel extends JPanel{
 		return doubleList;
 	}
 	
-	//functions to split up a long array into smaller arrays
-	public List <List<Double>> splitGenes(List<Double> gList, TVModel model){
-		
-		int lower = 0;
-		int upper = 0;
-		int max = model.nExpr();
-		
-		List<List<Double>> geneList = new ArrayList<List<Double>>();
-		
-		for(int i = 0; i < gList.size()/max; i++){
-			
-			upper+=max;
-			
-			geneList.add(gList.subList(lower, upper));
-			
-			lower = upper;
-			
-		}
-		
-		if(upper < gList.size() -1){
-			
-			lower = upper;
-			upper = gList.size();
-			
-			geneList.add(gList.subList(lower, upper));
-		}
-	
-		return geneList;
-	}
-	
 	public List <List<Double>> splitArrays(List<Double> gList, TVModel model){
 		
 		//number of rows/ columns
-		int max = model.nExpr();
-		int nGenes = model.nGene();
+		int nArrays = model.nExpr();
+		int nGenes = max; //model.nGene();
 		
 		List <List<Double>> arraysList = new ArrayList<List<Double>>();
 		
 		//iterate through columns ...max
-		for(int j = 0; j < max; j++){
+		for(int j = 0; j < nArrays; j++){
 			
 			List<Double> sArray = new ArrayList<Double>();
 			

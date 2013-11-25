@@ -162,22 +162,25 @@ FontSelectable, ConfigNodePersistent {
 		    g.setColor(back);
 	    }
 
-		Color back           = g.getColor();
+		Color back = g.getColor();
 		for (int j = start; j <= end; j++) {
+			
 			try {
 				String out = headerSummary.getSummary(headerInfo, j);
-			String[] headers  = headerInfo.getHeader(j);
+				String[] headers  = headerInfo.getHeader(j);
 
 				//		System.out.println("Got row " + gidRow + " value " + out);
 				if (out == null) {
 					continue;
 				}
+				
 				if ((arraySelection == null) 
 						|| arraySelection.isIndexSelected(j)) {
 
 					if (colorIndex > 0) {
 						g.setColor(TreeColorer.getColor(headers[colorIndex]));
 					}
+					
 					g.drawString(out, 0, map.getMiddlePixel(j) + ascent / 2);
 					if (colorIndex > 0) {
 						g.setColor(back);
@@ -202,6 +205,7 @@ FontSelectable, ConfigNodePersistent {
 	}
 	
 	public void updateBuffer(Image buf) {
+		
 		updateBuffer(buf.getGraphics(), new Dimension(buf.getWidth(null), 
 				buf.getHeight(null)));
 	}
@@ -228,44 +232,51 @@ FontSelectable, ConfigNodePersistent {
 			FontMetrics metrics = getFontMetrics(g.getFont());
 			int ascent = metrics.getAscent();
 
-	    // draw backgrounds first...
-	    int bgColorIndex = headerInfo.getIndex("BGCOLOR");
-	    if (bgColorIndex > 0) {
-		    Color back = g.getColor();
-		    for (int j = start; j <= end;j++) {
-				    String [] strings = headerInfo.getHeader(j);
-				    try {
-				    g.setColor(TreeColorer.getColor(strings[bgColorIndex]));
-				    } catch (Exception e) {
-					    // ingore...
-				    }
-				    g.fillRect(0, map.getMiddlePixel(j) - ascent / 2, 
-				    		offscreenSize.height, ascent);
+		    // draw backgrounds first...
+		    int bgColorIndex = headerInfo.getIndex("BGCOLOR");
+		    if (bgColorIndex > 0) {
+			    Color back = g.getColor();
+			    for (int j = start; j <= end;j++) {
+					    String [] strings = headerInfo.getHeader(j);
+					    try {
+					    g.setColor(TreeColorer.getColor(strings[bgColorIndex]));
+					    } catch (Exception e) {
+						    // ingore...
+					    }
+					    g.fillRect(0, map.getMiddlePixel(j) - ascent / 2, 
+					    		offscreenSize.height, ascent);
+			    }
+			    g.setColor(back);
 		    }
-		    g.setColor(back);
-	    }
-
-
-
-			Color back = g.getColor();
+		    
+		    //Foreground Text
+			Color back = GUIColors.BLUE1;//g.getColor();
 			for (int j = start;j <= end;j++) {
+				
 				try { 
-			String out = headerSummary.getSummary(headerInfo, j);
-
-			String[] headers  = headerInfo.getHeader(j);
-/*
-			String out        = headers[gidRow];
-			*/
+					String out = headerSummary.getSummary(headerInfo, j);
+					String[] headers = headerInfo.getHeader(j);
+					/*
+					String out        = headers[gidRow];
+					*/
 					if (out != null) {
-						if ((arraySelection == null) || arraySelection.isIndexSelected(j)) {
-							if (colorIndex > 0)
-								g.setColor(TreeColorer.getColor(headers[colorIndex]));
-							g.drawString(out, 0, map.getMiddlePixel(j) + ascent / 2);
-							if (colorIndex > 0)
+						if ((arraySelection == null) 
+								|| arraySelection.isIndexSelected(j)) {
+							if (colorIndex > 0) {
+								g.setColor(TreeColorer.getColor(
+										headers[colorIndex]));
+							}
+							
+							g.drawString(out, 0, map.getMiddlePixel(j) 
+									+ ascent / 2);
+							
+							if (colorIndex > 0) {
 								g.setColor(back);
+							}
 						} else {
 							g.setColor(Color.gray);
-							g.drawString(out, 0, map.getMiddlePixel(j) + ascent / 2);
+							g.drawString(out, 0, map.getMiddlePixel(j) 
+									+ ascent / 2);
 							g.setColor(back);
 						}
 						
@@ -322,7 +333,8 @@ FontSelectable, ConfigNodePersistent {
 				g.drawImage(backBuffer, 0, 0, null);
 			} else {
 				if ((g != null) && (backBuffer != null)) {
-					g.drawImage(backBuffer, 0, offscreenSize.height - maxlength, null);
+					g.drawImage(backBuffer, 0, offscreenSize.height 
+							- maxlength, null);
 				}
 			}
 		}
@@ -336,6 +348,7 @@ FontSelectable, ConfigNodePersistent {
 	 * @param  ue  Will be fed array indexes.
 	 */
 	public void setUrlExtractor(UrlExtractor ue) {
+		
 		urlExtractor = ue;
 	}
 
@@ -346,6 +359,7 @@ FontSelectable, ConfigNodePersistent {
 	 * @param  im  A new mapcontainer.
 	 */
 	public void setMapping(MapContainer im) {
+		
 		if (map != null) {
 			map.deleteObserver(this);
 		}
@@ -361,20 +375,22 @@ FontSelectable, ConfigNodePersistent {
 	 *  to recalculate it's width, and call repaint.
 	 */
 	private void selectionChanged() {
+		
 		offscreenValid = false;
 		backBufferValid = false;
 
-		int start                = map.getMinIndex();
-		int end                  = map.getMaxIndex();
-		int gidRow               = headerInfo.getIndex("GID");
+		int start = map.getMinIndex();
+		int end = map.getMaxIndex();
+		int gidRow = headerInfo.getIndex("GID");
 		if (gidRow == -1) {
 			gidRow = 0;
 		}
-		FontMetrics fontMetrics  = getFontMetrics
-				(new Font(face, style, size));
+		
+		FontMetrics fontMetrics  = getFontMetrics(new Font(face, style, size));
 		maxlength = 1;
 		for (int j = start; j < end; j++) {
-				String out = headerSummary.getSummary(headerInfo, j);
+				
+			String out = headerSummary.getSummary(headerInfo, j);
 /*
 			String[] headers  = headerInfo.getHeader(j);
 				String out        = headers[gidRow];
@@ -382,20 +398,22 @@ FontSelectable, ConfigNodePersistent {
 			if (out == null) {
 				continue;
 			}
+			
 			int length        = fontMetrics.stringWidth(out);
 			if (maxlength < length) {
 				maxlength = length;
 			}
 		}
 
-		Rectangle visible        = getVisibleRect();
+		Rectangle visible = getVisibleRect();
 		setPreferredSize(new Dimension(map.getUsedPixels(), maxlength));
+		
 		revalidate();
-
 		repaint();
 
 		if (maxlength > oldHeight) {
-			//	    System.out.println("old height "  + oldHeight +" new height " + maxlength + ", visible " + visible);
+			//	    System.out.println("old height "  + oldHeight 
+//			+" new height " + maxlength + ", visible " + visible);
 			visible.y += maxlength - oldHeight;
 			//	    System.out.println("new visible " + visible);
 			scrollRectToVisible(visible);
@@ -408,7 +426,8 @@ FontSelectable, ConfigNodePersistent {
 	int end =   map.getIndex(map.getUsedPixels());
  	repaint();
 	if (maxlength > oldHeight) {
-	    //	    System.out.println("old height "  + oldHeight +" new height " + maxlength + ", visible " + visible);
+	    //	    System.out.println("old height "  + oldHeight +" new height " 
+//	     * + maxlength + ", visible " + visible);
 	    visible.y += maxlength - oldHeight;
 	    //	    System.out.println("new visible " + visible);
 	    scrollRectToVisible(visible);
@@ -424,10 +443,13 @@ FontSelectable, ConfigNodePersistent {
 	 */
 	@Override
 	public void update(Observable o, Object arg) {
+		
 		if (o == map || o == dataModel) {
 			selectionChanged();
+			
 		  } else if (o == arraySelection) {
 			selectionChanged(); // which genes are selected changed
+			
 		  } else {
 			System.out.println("ArrayNameView got funny update!");
 		}
@@ -442,9 +464,11 @@ FontSelectable, ConfigNodePersistent {
 		if (urlExtractor == null) {
 			return;
 		}
+		
 		if (urlExtractor.isEnabled() == false) {
 			return;
 		}
+		
 		// now, want mouse click to signal browser...
 		int index  = map.getIndex(e.getX());
 		if (map.contains(index)) {
@@ -456,6 +480,7 @@ FontSelectable, ConfigNodePersistent {
 	/*inherit description */
 	@Override
 	public String getFace() {
+		
 		return face;
 	}
 
@@ -463,6 +488,7 @@ FontSelectable, ConfigNodePersistent {
 	/*inherit description */
 	@Override
 	public int getPoints() {
+		
 		return size;
 	}
 
@@ -470,6 +496,7 @@ FontSelectable, ConfigNodePersistent {
 	/*inherit description */
 	@Override
 	public int getStyle() {
+		
 		return style;
 	}
 
@@ -477,12 +504,14 @@ FontSelectable, ConfigNodePersistent {
 	/*inherit description */
 	@Override
 	public void setFace(String string) {
-        if ((face == null) ||(!face.equals(string))) {
+        
+		if ((face == null) ||(!face.equals(string))) {
 			face = string;
 			if (root != null)
 			root.setAttribute("face", face, d_face);
 			setFont(new Font(face, style, size));
 			backBufferValid = false;
+			revalidate();
 			repaint();
 		}
 	}
@@ -490,12 +519,14 @@ FontSelectable, ConfigNodePersistent {
 	/*inherit description */
 	@Override
 	public void setPoints(int i) {
+		
 		if (size != i) {
 			size = i;
 			if (root != null)
 			root.setAttribute("size", size, d_size);
 			setFont(new Font(face, style, size));
 			backBufferValid = false;
+			revalidate();
 			repaint();
 		}
 	}
@@ -504,51 +535,64 @@ FontSelectable, ConfigNodePersistent {
 	/*inherit description */
 	@Override
 	public void setStyle(int i) {
+		
 		if (style != i) {
 			style = i;
 			backBufferValid = false;
 			if (root != null)
 			root.setAttribute("style", style, d_style);
 			setFont(new Font(face, style, size));
+			revalidate();
 			repaint();
 		}
 	}
 
 	private HeaderSummary headerSummary;
+	
 	/** Setter for headerSummary */
 	public void setHeaderSummary(HeaderSummary headerSummary) {
+		
 		this.headerSummary = headerSummary;
 	}
+	
 	/** Getter for headerSummary */
 	public HeaderSummary getHeaderSummary() {
+		
 		return headerSummary;
 	}
 
 	/*inherit description */
 	@Override
 	public void bindConfig(ConfigNode configNode) {
+		
 		root = configNode;
 		if (configNode.fetchFirst("ArraySummary") == null) {
 			getHeaderSummary().bindConfig(configNode.create("ArraySummary"));
 			getHeaderSummary().setIncluded(new int [] {0});
+			
 		} else {
 			getHeaderSummary().bindConfig(configNode.fetchFirst("ArraySummary"));
 		}
+		
 		setFace(root.getAttribute("face", d_face));
 		setStyle(root.getAttribute("style", d_style));
 		setPoints(root.getAttribute("size", d_size));
 	}
+	
 	private TreeSelectionI arraySelection;
     /** 
      * Set geneSelection
      *
-     * @param geneSelection The TreeSelection which is set by selecting genes in the GlobalView
+     * @param geneSelection The TreeSelection which is set by 
+     * selecting genes in the GlobalView
      */
     public void setArraySelection(TreeSelectionI arraySelection) {
-	  if (this.arraySelection != null)
-	    this.arraySelection.deleteObserver(this);	
-	  this.arraySelection = arraySelection;
-	  this.arraySelection.addObserver(this);
+	  
+    	if (this.arraySelection != null) {
+    		this.arraySelection.deleteObserver(this);	
+    	}
+    	this.arraySelection = arraySelection;
+    	this.arraySelection.addObserver(this);
     }
 }
 

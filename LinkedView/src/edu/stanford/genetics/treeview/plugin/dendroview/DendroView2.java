@@ -1252,18 +1252,18 @@ MainPanel, Observer {
 		
 		textpanel.add(textview.getComponent(), "push, grow");
 		
-		buttonPanel.add(closeButton, "push, alignx 50%, span 1 3");
 		buttonPanel.add(scaleIncY, "span, alignx 50%, wrap");
 		buttonPanel.add(scaleDecX);
 		buttonPanel.add(scaleDefaultAll);
 		buttonPanel.add(scaleIncX, "wrap");
 		buttonPanel.add(scaleDecY, "span, alignx 50%");
 		
-		backgroundPanel.add(buttonPanel, "pushx, growx, width 15%, height 20%::");
+		backgroundPanel.add(closeButton, "pushx, alignx 50%");
+		backgroundPanel.add(buttonPanel, "growx, alignx 50%");
 //		backgroundPanel.add(statuspanel, "pushx, growx, height 20%::");
 		backgroundPanel.add(atrPane, "grow, push, width 75%, height 20%::, " +
 				"wrap");
-		backgroundPanel.add(gtrPane, "grow, width 20%");
+		backgroundPanel.add(gtrPane, "span 2 1, grow, width 20%");
 		backgroundPanel.add(panel, "grow, push, width 75%, height 80%");
 		
 //		right.add(level1Pane, "push, grow");
@@ -2209,14 +2209,15 @@ MainPanel, Observer {
 	 */
 	public JButton setZoomButtonLayout(String title, Color color){
 
-		int buttonSide = 30;
+		int buttonHeight = 30;
+		int buttonWidth = 30;
 		
 		Font buttonFont = new Font("Sans Serif", Font.BOLD, 16);
 		
 		JButton button = new JButton(title);
 		
 		Dimension d = button.getPreferredSize();
-  		d.setSize(buttonSide, buttonSide);
+  		d.setSize(buttonWidth, buttonHeight);
   		button.setPreferredSize(d);
   	
   		button.setFont(buttonFont);

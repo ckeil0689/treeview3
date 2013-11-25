@@ -35,7 +35,8 @@ class LoadCheckView extends JPanel {
 	//Instance variables
 	private int nRows; 
 	private int nCols;
-	private JLabel label3; 
+	private JLabel label3;
+	private JLabel previewLabel;
 	private JLabel numColLabel; 
 	private JLabel numRowLabel;
 	private JButton loadNewButton;
@@ -76,6 +77,7 @@ class LoadCheckView extends JPanel {
 				
 				success = new JLabel("Great, loading was successful!");
 				success.setFont(fontL);
+				success.setForeground(GUIColors.TEXT);
 				
 				feedbackPanel.add(success);
 				feedbackPanel.add(icon);
@@ -97,12 +99,19 @@ class LoadCheckView extends JPanel {
 	    	
 	    	numColLabel = new JLabel("Columns: " + nCols);
 	    	numColLabel.setFont(fontS);
+	    	numColLabel.setForeground(GUIColors.TEXT);
 	    	
 	    	numRowLabel = new JLabel("Rows: " + nRows);
 	    	numRowLabel.setFont(fontS);
+	    	numRowLabel.setForeground(GUIColors.TEXT);
 	    	
 	    	label3 = new JLabel("Data Points: " + nCols * nRows);
 	    	label3.setFont(fontS);
+	    	label3.setForeground(GUIColors.TEXT);
+	    	
+	    	previewLabel = new JLabel("Sample Data Preview");
+	    	previewLabel.setFont(fontL);
+	    	previewLabel.setForeground(GUIColors.TEXT);
 	    	
 	    	//ButtonPanel
 	    	buttonPanel = new JPanel();
@@ -144,6 +153,7 @@ class LoadCheckView extends JPanel {
 	    	this.add(feedbackPanel, "alignx 50%, pushx, span, wrap");
 	    	this.add(numPanel, "span, pushx, growx, alignx 50%, width ::60%, " +
 	    			"wrap");
+	    	this.add(previewLabel, "span, alignx 50%, pushx, wrap");
 	    	this.add(dataView, "span, push, grow, alignx 50%, width ::60%, " +
 	    			"height ::60%, wrap");
 	    	this.add(buttonPanel, "span, alignx 50%, push");
