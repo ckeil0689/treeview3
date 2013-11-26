@@ -59,6 +59,7 @@ class LoadCheckView extends JPanel {
 	public LoadCheckView(DataModel dataModel, final TreeViewFrame viewFrame) {
 		
 		this.setLayout(new MigLayout());
+		this.setOpaque(false);
 		this.setBackground(GUIColors.BG_COLOR);
 		
 		feedbackPanel = new JPanel();

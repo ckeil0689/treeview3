@@ -225,8 +225,8 @@ public class ClusterView extends JPanel implements MainPanel {
 	
 	public void setupLayout() {
 		
+		this.removeAll();
 		this.setLayout(new MigLayout("ins 0"));
-		this.setBackground(GUIColors.BG_COLOR);
 		
 		//Create background panel
 		mainPanel = new JPanel();
@@ -237,8 +237,10 @@ public class ClusterView extends JPanel implements MainPanel {
 		optionsPanel = new JPanel();
 		optionsPanel.setLayout(new MigLayout());
 		optionsPanel.setBorder(
-				BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-		optionsPanel.setBackground(GUIColors.BG_COLOR);
+				BorderFactory.createLineBorder(GUIColors.BORDERS, 
+						EtchedBorder.LOWERED));
+//		optionsPanel.setBackground(GUIColors.BG_COLOR);
+		optionsPanel.setOpaque(false);
 		
 		//Panel for the Buttons
 		buttonPanel = new JPanel();
@@ -260,7 +262,6 @@ public class ClusterView extends JPanel implements MainPanel {
 				optionsPanel.removeAll();
 				
 		  		setOptionsPanel();
-				
 				setMainPanel();
 				
 				mainPanel.revalidate();
@@ -272,10 +273,11 @@ public class ClusterView extends JPanel implements MainPanel {
 		scrollPane = new JScrollPane(mainPanel, 
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, 
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.setOpaque(false);
 		
 		similarity = new JLabel("Similarity Metric: ");
   		similarity.setFont(fontL);
-  		similarity.setBackground(GUIColors.BG_COLOR);
+  		similarity.setForeground(GUIColors.TEXT);
   		
   		//filler component
   		emptyPanel = new JPanel();
@@ -340,9 +342,11 @@ public class ClusterView extends JPanel implements MainPanel {
 				
 				status1 = new JLabel("The file has been saved " +
 						"in the original directory.");
+				status1.setForeground(GUIColors.TEXT);
 				status1.setFont(fontS);
 				
 				status2 = new JLabel("File Path: " + path);
+				status2.setForeground(GUIColors.TEXT);
 				status2.setFont(fontS);
 				
 				dendro_button.setEnabled(true);
@@ -361,6 +365,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		//Label
 		method = new JLabel("Linkage Method:");
 		method.setFont(fontL);
+		method.setForeground(GUIColors.TEXT);
 		
 		//Clickable Panel to call ClusterFrame
 		infoIcon = new ClickableIcon(clusterFrame, "infoIcon.png");
@@ -370,9 +375,11 @@ public class ClusterView extends JPanel implements MainPanel {
 		
 		clusters = new JLabel("Clusters: ");
 		clusters.setFont(fontL);
+		clusters.setForeground(GUIColors.TEXT);
 		
 		its = new JLabel("Iterations: ");
 		its.setFont(fontL);
+		its.setForeground(GUIColors.TEXT);
 		
 		enterRC = setupSpinner();
 		enterCC = setupSpinner();
@@ -382,9 +389,11 @@ public class ClusterView extends JPanel implements MainPanel {
 		//ProgressBar Component
 		loadPanel = new JPanel();
 		loadPanel.setLayout(new MigLayout());
-		loadPanel.setBackground(GUIColors.BG_COLOR);
+//		loadPanel.setBackground(GUIColors.BG_COLOR);
+		loadPanel.setOpaque(false);
 		loadPanel.setBorder(
-				BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+				BorderFactory.createLineBorder(GUIColors.BORDERS, 
+						EtchedBorder.LOWERED));
     	
   		//Button to go back to data preview
     	back_button = new JButton("< Back");
@@ -526,9 +535,11 @@ public class ClusterView extends JPanel implements MainPanel {
 					
 					error2 = new JLabel(hint);
 					error2.setFont(fontS);
+					error2.setForeground(GUIColors.TEXT);
 					
 					error3 = new JLabel(hint2);
 					error3.setFont(fontS);
+					error3.setForeground(GUIColors.TEXT);
 					
 					loadPanel.add(error1, "alignx 50%, span, wrap");
 					loadPanel.add(error2, "alignx 50%, span, wrap");

@@ -1,6 +1,5 @@
 package edu.stanford.genetics.treeview;
 
-import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -92,7 +91,7 @@ public class SSMouseListener implements MouseListener{
 	@Override
 	public void mousePressed(MouseEvent arg0) {
 		
-		label.setForeground(GUIColors.GRAY1);
+		label.setForeground(GUIColors.LIGHTGRAY);
 	}
 	
 	/**

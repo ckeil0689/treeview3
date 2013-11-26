@@ -127,6 +127,10 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			
 		}
 		
+		waiting = new JPanel();
+		waiting.setLayout(new MigLayout("ins 0"));
+		waiting.setBackground(GUIColors.BG_COLOR);
+		
 		setupLayout();
 		setupPresets();
 		setupMenuBar();
@@ -146,7 +150,140 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		}
 		
 		super.closeWindow();
-	}	
+	}
+	
+	//Layout setups
+	/**
+	 * This method sets up the Swing layout of the starting screen
+	 * and calls resetLayout() once data has been loaded
+	 */
+	public void setupLayout() {
+		
+		JPanel mainPanel;
+		JPanel title_bg;
+		JLabel jl; 
+		JLabel jl2;
+		
+		waiting.removeAll();
+		
+		mainPanel = new JPanel();
+		mainPanel.setLayout(new MigLayout());
+		mainPanel.setBackground(GUIColors.BG_COLOR);
+		
+		title_bg = new JPanel();
+		title_bg.setLayout(new MigLayout());
+		title_bg.setOpaque(false);
+		
+		jl = new JLabel("Hello! How are you Gentlepeople?");
+		jl.setFont(new Font("Sans Serif", Font.PLAIN, 30));
+		jl.setForeground(GUIColors.BLUE1);
+		
+		jl2 = new JLabel("Welcome to " + getAppName());
+		jl2.setFont(new Font("Sans Serif", Font.BOLD, 50));
+		jl2.setForeground(GUIColors.BLUE1);
+		
+		ClickableLabel load_Icon = new ClickableLabel(this, 
+				"Load Data >");
+		
+		title_bg.add(jl, "push, alignx 50%, span, wrap");
+		title_bg.add(jl2, "push, alignx 50%, span");
+		
+		mainPanel.add(title_bg, "pushx, growx, alignx 50%, span, " +
+				"height 20%::, wrap");
+		mainPanel.add(load_Icon, "push, alignx 50%, span");
+		
+		waiting.add(mainPanel, "push, grow");
+		
+		waiting.revalidate();
+		waiting.repaint();
+	}
+	
+	/**
+	 * This method clears the initial starting frame and adds new components
+	 * to let the user select between options for processing/ viewing his data.
+	 */
+	public void resetLayout(){
+		
+		JPanel mainPanel;
+		JPanel confirmPanel; 
+		JPanel labelPanel;
+		JLabel confirm;
+		JLabel ques; 
+		JLabel loadNew;
+		
+		waiting.removeAll();
+		
+		mainPanel = new JPanel();
+		mainPanel.setLayout(new MigLayout());
+		mainPanel.setBackground(GUIColors.BG_COLOR);
+		
+		confirmPanel = new JPanel();
+		confirmPanel.setLayout(new MigLayout());
+		confirmPanel.setOpaque(false);
+		
+		labelPanel = new JPanel();
+		labelPanel.setLayout(new MigLayout());
+		labelPanel.setOpaque(false);
+		
+		confirm = new JLabel("Loaded File: " + dataModel.getFileName());
+		confirm.setFont(new Font("Sans Serif", Font.BOLD, 25));
+		confirm.setForeground(GUIColors.LIGHTGRAY);
+		
+		ques = new JLabel("What would you like to do?");
+		ques.setFont(new Font("Sans Serif", Font.PLAIN, 50));
+		ques.setForeground(GUIColors.DARKGRAY);
+		
+		ClickableLabel clus_label = new ClickableLabel(this, "Cluster >", 
+				(TVModel)dataModel);
+		
+		ClickableLabel viz_label = new ClickableLabel(this, "Visualize >",  
+				(TVModel)dataModel);
+		
+		loadNew = new JLabel("  Load New File");
+		loadNew.setFont(new Font("Sans Serif", Font.BOLD, 25));
+		loadNew.setForeground(GUIColors.BLUE1);
+		
+		loadNew.addMouseListener(new SSMouseListener(loadNew){
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				
+				openFile();
+			}
+		});
+		
+		confirmPanel.add(confirm, "push, alignx 50%");
+		confirmPanel.add(loadNew, "pushx");
+		labelPanel.add(ques, "alignx 50%, push, grow, span");
+		
+		mainPanel.add(labelPanel, "push, alignx 50%, aligny 100%, span, wrap");
+		mainPanel.add(clus_label, "push, alignx 50%");
+		mainPanel.add(viz_label, "push, alignx 50%, wrap");
+		mainPanel.add(confirmPanel, "push, alignx 50%, aligny 100%, span");
+		
+		waiting.add(mainPanel, "push, grow");
+		
+		waiting.repaint();
+		waiting.revalidate();
+	}
+	
+	/**
+	 * This method clears the initial starting frame and adds new components
+	 * to let the user select between options for processing/ viewing his data.
+	 */
+	public void confirmLoaded(){
+		
+		LoadCheckView confirmPanel; 
+		
+		waiting.removeAll();
+		
+		confirmPanel = new LoadCheckView(dataModel, this);
+		
+		waiting.add(confirmPanel, "push, grow");
+		
+		waiting.repaint();
+		waiting.revalidate();
+	}
 	
 	//Loading Methods
 	/**
@@ -437,8 +574,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	public void rebuildMainPanelMenu() {
 		
 		synchronized(menubar) {
-//			menubar.setMenu(TreeviewMenuBarI.documentMenu);
-//			menubar.removeMenuItems();
+			menubar.setMenu(TreeviewMenuBarI.documentMenu);
+			menubar.removeMenuItems();
 			menubar.setMenu(TreeviewMenuBarI.analysisMenu);
 			menubar.removeAll();
 			menubar.setEnabled(true);
@@ -454,6 +591,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			
 			if (running != null) {
 				menubar.setMenu(TreeviewMenuBarI.documentMenu);
+				menubar.removeAll();
+				populateSettingsMenu(menubar);
 				running.populateSettingsMenu(menubar);
 				menubar.setMenu(TreeviewMenuBarI.analysisMenu);
 				running.populateAnalysisMenu(menubar);
@@ -509,6 +648,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 * @param menubar
 	 */
 	protected void populateSettingsMenu(TreeviewMenuBarI menubar) {
+		
 		menubar.addSeparator();
 		menubar.addSubMenu("Change Theme");
 		menubar.addMenuItem("Daylight", new ActionListener(){
@@ -517,9 +657,15 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			public void actionPerformed(ActionEvent arg0) {
 				
 				GUIColors.setDayLight();
+				
+				if(dataModel != null) {
+					resetLayout();
+				} else {
+					setupLayout();
+				}
+				//setLoaded(loaded);
 				//make static method to change theme?
 			}
-			
 		});
 		menubar.addMenuItem("Night", new ActionListener(){
 
@@ -527,6 +673,13 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			public void actionPerformed(ActionEvent arg0) {
 				
 				GUIColors.setNight();
+				
+				if(dataModel != null) {
+					resetLayout();
+				} else {
+					setupLayout();
+				}
+				//setLoaded(loaded);
 				//make static method to change theme?
 			}
 			
@@ -536,6 +689,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			
 			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
+				
 				if (presetsPanel == null) {
 					setupPresetsPanel();
 				}
@@ -1359,124 +1513,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	public double noData() {
 		
 		return DataModel.NODATA;
-	}
-	
-	//Layout setups
-	/**
-	 * This method sets up the Swing layout of the starting screen
-	 * and calls resetLayout() once data has been loaded
-	 */
-	public void setupLayout() {
-		
-		JPanel title_bg;
-		JLabel jl; 
-		JLabel jl2;
-		
-		waiting = new JPanel();
-		waiting.setLayout(new MigLayout("ins 0"));
-		waiting.setBackground(GUIColors.BG_COLOR);
-		
-		title_bg = new JPanel();
-		title_bg.setLayout(new MigLayout());
-		title_bg.setBackground(GUIColors.BG_COLOR);
-		
-		jl = new JLabel("Hello! How are you Gentlepeople?");
-		jl.setFont(new Font("Sans Serif", Font.PLAIN, 30));
-		jl.setForeground(GUIColors.BLUE1);
-		
-		jl2 = new JLabel("Welcome to " + getAppName());
-		jl2.setFont(new Font("Sans Serif", Font.BOLD, 50));
-		jl2.setForeground(GUIColors.BLUE1);
-		
-		ClickableLabel load_Icon = new ClickableLabel(this, 
-				"Load Data >");
-		
-		title_bg.add(jl, "push, alignx 50%, span, wrap");
-		title_bg.add(jl2, "push, alignx 50%, span");
-		
-		waiting.add(title_bg, "pushx, growx, alignx 50%, span, " +
-				"height 20%::, wrap");
-		waiting.add(load_Icon, "push, alignx 50%, span");
-	}
-	
-	/**
-	 * This method clears the initial starting frame and adds new components
-	 * to let the user select between options for processing/ viewing his data.
-	 */
-	public void resetLayout(){
-		
-		JPanel confirmPanel; 
-		JPanel labelPanel;
-		JLabel confirm;
-		JLabel ques; 
-		JLabel loadNew;
-		
-		waiting.removeAll();
-		
-		confirmPanel = new JPanel();
-		confirmPanel.setLayout(new MigLayout());
-		confirmPanel.setOpaque(false);
-		
-		labelPanel = new JPanel();
-		labelPanel.setLayout(new MigLayout());
-		labelPanel.setOpaque(false);
-		
-		confirm = new JLabel("Loaded File: " + dataModel.getFileName());
-		confirm.setFont(new Font("Sans Serif", Font.BOLD, 25));
-		confirm.setForeground(GUIColors.GRAY1);
-		
-		ques = new JLabel("What would you like to do?");
-		ques.setFont(new Font("Sans Serif", Font.PLAIN, 50));
-		ques.setForeground(GUIColors.GRAY2);
-		
-		ClickableLabel clus_label = new ClickableLabel(this, "Cluster >", 
-				(TVModel)dataModel);
-		
-		ClickableLabel viz_label = new ClickableLabel(this, "Visualize >",  
-				(TVModel)dataModel);
-		
-		loadNew = new JLabel("  Load New File");
-		loadNew.setFont(new Font("Sans Serif", Font.BOLD, 25));
-		loadNew.setForeground(GUIColors.BLUE1);
-		
-		loadNew.addMouseListener(new SSMouseListener(loadNew){
-			
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				
-				openFile();
-			}
-		});
-		
-		confirmPanel.add(confirm, "push, alignx 50%");
-		confirmPanel.add(loadNew, "pushx");
-		labelPanel.add(ques, "alignx 50%, push, grow, span");
-		
-		waiting.add(labelPanel, "push, alignx 50%, aligny 100%, span, wrap");
-		waiting.add(clus_label, "push, alignx 50%");
-		waiting.add(viz_label, "push, alignx 50%, wrap");
-		waiting.add(confirmPanel, "push, alignx 50%, aligny 100%, span");
-		
-		waiting.repaint();
-		waiting.revalidate();
-	}
-	
-	/**
-	 * This method clears the initial starting frame and adds new components
-	 * to let the user select between options for processing/ viewing his data.
-	 */
-	public void confirmLoaded(){
-		
-		LoadCheckView confirmPanel; 
-		
-		waiting.removeAll();
-		
-		confirmPanel = new LoadCheckView(dataModel, this);
-		
-		waiting.add(confirmPanel, "push, grow");
-		
-		waiting.repaint();
-		waiting.revalidate();
 	}
 	
 	/**

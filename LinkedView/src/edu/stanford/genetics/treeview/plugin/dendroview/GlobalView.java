@@ -754,7 +754,9 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		int notches = e.getWheelRotation();
 		int shift = 3;
 		
-		if(!e.isControlDown()) {
+//		Point mouseXY = MouseInfo.getPointerInfo().getLocation();
+		
+		if(!e.isShiftDown()) {
 			if(notches < 0) {
 				getYMap().scrollBy(-shift);
 				
@@ -765,6 +767,9 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 			if(notches < 0) {
 				zoomIn(getXMap());
 				zoomIn(getYMap());
+				
+//				getXMap().scrollToIndex(mouseXY.x);
+//				getYMap().scrollToIndex(mouseXY.y);
 				
 			} else {
 				zoomOut(getXMap());
@@ -843,6 +848,39 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		for (int i = start.x; i <= end.x; i++) {
 			
 			arraySelection.setIndex(i, true);
+		}
+		
+		//Zooming in when making a selection
+		double scaleFactor = 1;
+		
+		int scrollX = 0; 
+		double newScale;
+		double currentXScale = getXMap().getScale();
+		
+		int scrollY = 0;
+		double newScale2;
+		double currentYScale = getYMap().getScale();
+		
+		if(currentXScale <= 10 && currentYScale <= 10) {
+			scaleFactor = 3;
+			
+		} else if(currentXScale <= 30 && currentYScale <= 30) {
+			scaleFactor = 2;
+			
+		} else {
+			scaleFactor = 1;
+		}
+		newScale = currentXScale * scaleFactor;
+		getXMap().setScale(newScale);
+		
+		newScale2 = currentYScale * scaleFactor;
+		getYMap().setScale(newScale2);
+		
+		if(scaleFactor > 1) {
+			scrollX = (start.x);
+			scrollY = (start.y);
+			getXMap().scrollToIndex(scrollX);
+			getYMap().scrollToIndex(scrollY);
 		}
 		
 		geneSelection.notifyObservers();

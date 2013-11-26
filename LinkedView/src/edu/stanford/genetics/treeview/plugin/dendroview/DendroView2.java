@@ -234,6 +234,467 @@ MainPanel, Observer {
 		}
 	}
 	
+	//Layout
+	/**
+	 *  This method should be called only during initial setup of the ModelView.
+	 *  It sets up the views and binds them all to Config nodes.
+	 *
+	 */
+	protected void setupViews() {
+		
+		this.removeAll();
+		
+		ColorPresets colorPresets = DendrogramFactory.getColorPresets();
+		colorExtractor = new ColorExtractor();
+		colorExtractor.setDefaultColorSet(colorPresets.getDefaultColorSet());
+		colorExtractor.setMissing(DataModel.NODATA, DataModel.EMPTY);
+		
+		statuspanel = new MessagePanel("Status", GUIColors.BG_COLOR);
+		statuspanel.setOpaque(true);
+
+		DoubleArrayDrawer dArrayDrawer = new DoubleArrayDrawer();
+		dArrayDrawer.setColorExtractor(colorExtractor);
+		arrayDrawer = dArrayDrawer;
+		((Observable)getDataModel()).addObserver(arrayDrawer);
+		
+		// scrollbars, mostly used by maps
+		globalXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0,1,0,1);
+		globalYscrollbar = new JScrollBar(Adjustable.VERTICAL,0,1,0,1);
+//		zoomXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0, 1, 0, 1);
+//		zoomYscrollbar = new JScrollBar(Adjustable.VERTICAL, 0, 1, 0, 1);
+
+//		zoomXmap = new MapContainer();
+//		zoomXmap.setDefaultScale(12.0);
+//		zoomXmap.setScrollbar(zoomXscrollbar);
+//		
+//		zoomYmap = new MapContainer();
+//		zoomYmap.setDefaultScale(12.0);
+//		zoomYmap.setScrollbar(zoomYscrollbar);
+
+		// globalmaps tell globalview, atrview, and gtrview
+		// where to draw each data point.
+		// the scrollbars "scroll" by communicating with the maps.
+		globalXmap = new MapContainer("Fill");
+		globalXmap.setScrollbar(globalXscrollbar);
+		
+		globalYmap = new MapContainer("Fill");
+		globalYmap.setScrollbar(globalYscrollbar);
+		
+		globalview = new GlobalView();
+		globalview.setXMap(globalXmap);
+		globalview.setYMap(globalYmap);
+		globalview.setHeaders(getDataModel().getGeneHeaderInfo(), 
+				getDataModel().getArrayHeaderInfo());
+		
+//		globalview.setZoomYMap(getZoomYmap());
+//		globalview.setZoomXMap(getZoomXmap());
+		
+		globalview.setArrayDrawer(arrayDrawer);
+
+		arraynameview = new ArrayNameView(getDataModel().getArrayHeaderInfo());
+		arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
+		arraynameview.setDataModel(getDataModel());
+		
+		//GTRViews
+		leftTreeDrawer = new LeftTreeDrawer();
+		gtrview = new GTRView();
+		gtrview.setOpaque(true);
+		gtrview.setMap(globalYmap);
+		gtrview.setLeftTreeDrawer(leftTreeDrawer);
+		gtrview.getHeaderSummary().setIncluded(new int [] {0,3});
+		
+//		gtrzview = new GTRZoomView();
+//		gtrzview.setZoomMap(getZoomYmap());
+//		gtrzview.setHeaderSummary(gtrview.getHeaderSummary());
+//		gtrzview.setLeftTreeDrawer(leftTreeDrawer);
+		
+		//ATRViews
+		invertedTreeDrawer = new InvertedTreeDrawer();
+		atrview = new ATRView();
+		atrview.setMap(globalXmap);
+		atrview.setInvertedTreeDrawer(invertedTreeDrawer);
+		atrview.getHeaderSummary().setIncluded(new int [] {0,3});
+
+//		atrzview = new ATRZoomView();
+//		atrzview.setZoomMap(getZoomXmap());
+//		atrzview.setHeaderSummary(atrview.getHeaderSummary());
+//		atrzview.setInvertedTreeDrawer(invertedTreeDrawer);
+//		
+//		//ZoomView
+//		zoomview = new ZoomView();
+//		zoomview.setYMap(getZoomYmap());
+//		zoomview.setXMap(getZoomXmap());
+//		zoomview.setArrayDrawer(arrayDrawer);
+		
+		scaleDefaultAll = setZoomButtonLayout("Reset", GUIColors.BLUE1);
+		scaleDefaultAll.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				getGlobalXmap().setHome();
+				getGlobalYmap().setHome();
+			}
+			
+		});
+		
+		scaleIncX = setZoomButtonLayout("+", GUIColors.BLUE1);
+		scaleIncX.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				getGlobalXmap().setScale(getGlobalXmap().getScale() + 1);
+			}
+			
+		});
+		
+		scaleDecX = setZoomButtonLayout("-", GUIColors.BLUE1);
+		scaleDecX.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				getGlobalXmap().setScale(getGlobalXmap().getScale() - 1);
+			}
+			
+		});
+		
+		scaleDefaultX = setZoomButtonLayout("Reset", GUIColors.BLUE1);
+		scaleDefaultX.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				getGlobalXmap().setScale(default_scale);
+			}
+			
+		});
+		
+		scaleIncY = setZoomButtonLayout("+", GUIColors.BLUE1);
+		scaleIncY.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				getGlobalYmap().setScale(getGlobalYmap().getScale() + 1);
+			}
+			
+		});
+		
+		scaleDecY = setZoomButtonLayout("-", GUIColors.BLUE1);
+		scaleDecY.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				getGlobalYmap().setScale(getGlobalYmap().getScale() - 1);
+			}
+			
+		});
+		
+		scaleDefaultY = setZoomButtonLayout("0", GUIColors.BLUE1);
+		scaleDefaultY.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				getGlobalYmap().setScale(default_scale);
+			}
+			
+		});
+
+		//arraynameview.setMapping(getZoomXmap());
+		arraynameview.setMapping(getGlobalXmap());
+
+		textview = new TextViewManager(getDataModel().getGeneHeaderInfo(), 
+				viewFrame.getUrlExtractor(), getDataModel());
+		
+		//textview.setMap(getZoomYmap());
+		textview.setMap(getGlobalYmap());
+		
+		//Layout Setup
+		doDoubleLayout();
+
+		//reset persistent popups
+		settingsFrame = null;
+		settingsPanel = null;
+
+		// urls
+		colorExtractor.bindConfig(getFirst("ColorExtractor"));
+		
+		// set data first to avoid adding auto-genereated 
+		//contrast to documentConfig.
+		dArrayDrawer.setDataMatrix(getDataModel().getDataMatrix());
+		dArrayDrawer.bindConfig(getFirst("ArrayDrawer"));
+
+		// this is here because my only subclass shares this code.
+		bindTrees();
+		
+		//Changes Row/ Col number to gene names in Status panel
+//		zoomview.setHeaders(getDataModel().getGeneHeaderInfo(), 
+//				getDataModel().getArrayHeaderInfo());
+		
+		globalXmap.bindConfig(getFirst("GlobalXMap"));
+		globalYmap.bindConfig(getFirst("GlobalYMap"));
+//		getZoomXmap().bindConfig(getFirst("ZoomXMap"));
+//		getZoomYmap().bindConfig(getFirst("ZoomYMap"));
+
+		textview.bindConfig(getFirst("TextView"));			
+		
+		arraynameview.bindConfig(getFirst("ArrayNameView"));
+		
+		HeaderSummary atrSummary = atrview.getHeaderSummary();
+//		HeaderSummary gtrSummary = gtrview.getHeaderSummary();
+		
+//		atrzview.setHeaderSummary(atrSummary);
+//		gtrzview.setHeaderSummary(gtrSummary);
+		
+		atrSummary.bindConfig(getFirst("AtrSummary"));
+		gtrview.getHeaderSummary().bindConfig(getFirst("GtrSummary"));
+
+		// perhaps I could remember this stuff in the MapContainer...
+		globalXmap.setIndexRange(0, dataModel.getDataMatrix().getNumCol() - 1);
+		globalYmap.setIndexRange(0, dataModel.getDataMatrix().getNumRow() - 1);
+//		getZoomXmap().setIndexRange(-1, -1);
+//		getZoomYmap().setIndexRange(-1, -1);
+
+		globalXmap.notifyObservers();
+		globalYmap.notifyObservers();
+//		getZoomXmap().notifyObservers();
+//		getZoomYmap().notifyObservers();
+	}
+	
+	/**
+	 * Lays out components in two DragGridPanel separated by a
+	 * JSplitPane, so that you can expand/contract with one click.
+	 *
+	 */
+	protected void doDoubleLayout() {
+		
+//		Dimension left_min;
+//		Dimension right_min;
+//		Dimension up_min; 
+//		Dimension down_min;  
+//		JPanel left;
+//		JPanel right;
+		JPanel backgroundPanel;
+//		JPanel upSide;
+//		JPanel downSide;
+		JPanel buttonPanel;
+//		JPanel gtrPanel;
+		final JPanel panel; 
+//		JPanel zoompanel;
+		JPanel textpanel;
+//		JSplitPane backgroundPane;
+//		JSplitPane level1Pane;
+		JSplitPane gtrPane;
+		JSplitPane atrPane;
+//		JButton saveButton;
+		JButton closeButton;
+//		JButton fullScreenButton;
+		
+//		left_min = new Dimension(500, 450);
+//		right_min = new Dimension(600, 500);
+//		
+//		left = new JPanel();
+//		left.setLayout(new MigLayout());
+//		left.setMinimumSize(left_min);
+//		left.setBackground(BG_COLOR);
+		
+//		right = new JPanel();
+//		right.setLayout(new MigLayout());
+//		right.setMinimumSize(right_min);
+//		right.setBackground(BG_COLOR);
+		
+//		backgroundPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+//				left, right);
+//		backgroundPane.setDividerSize(DIVIDER_SIZE);
+//		backgroundPane.setOneTouchExpandable(true);
+//		backgroundPane.setDividerLocation(MAIN_DIV_LOC);
+		
+		backgroundPanel = new JPanel();
+		backgroundPanel.setLayout(new MigLayout());
+		backgroundPanel.setBackground(GUIColors.BG_COLOR);
+		
+//		up_min = new Dimension(400, 100);
+//		down_min = new Dimension(600, 500);
+		
+//		upSide = new JPanel();
+//		upSide.setLayout(new MigLayout());
+//		upSide.setOpaque(false);
+//		upSide.setMinimumSize(up_min);
+//		
+//		downSide = new JPanel();
+//		downSide.setLayout(new MigLayout());
+//		downSide.setOpaque(false);
+//		downSide.setMinimumSize(down_min);
+		
+//		gtrPanel = new JPanel();
+//		gtrPanel.setLayout(new BorderLayout());
+		
+		gtrview.setStatusPanel(statuspanel);
+		gtrview.setViewFrame(viewFrame);
+		
+		//ButtonPanel
+		buttonPanel = new JPanel();
+		buttonPanel.setLayout(new MigLayout());
+		buttonPanel.setOpaque(false);
+		
+		//Global view
+		panel = new JPanel();
+		panel.setLayout(new MigLayout("ins 0"));
+		panel.setOpaque(false);
+		
+//		saveButton = setButtonLayout("Save Zoomed Image", BLUE1);
+//		saveButton.addActionListener(new ActionListener(){
+//
+//			@Override
+//			public void actionPerformed(ActionEvent arg0) {
+//				
+//				try {
+//					saveImage(zoomview);
+//					
+//				} catch (IOException e) {
+//					
+//				}	
+//			}
+//		});
+		
+		closeButton = setButtonLayout("< Back", GUIColors.BLUE1);;
+  		closeButton.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				
+				viewFrame.setLoaded(false);
+			}
+		});
+		
+//		fullScreenButton = setButtonLayout("Fullscreen", BLUE1);
+//  		fullScreenButton.addActionListener(new ActionListener(){
+//
+//			@Override
+//			public void actionPerformed(ActionEvent arg0) {
+//				
+//				JFrame fullScreen = new JFrame();
+//				fullScreen.setDefaultCloseOperation(
+//						WindowConstants.DISPOSE_ON_CLOSE);
+//				fullScreen.setResizable(true);
+//				fullScreen.addWindowListener(new WindowAdapter () {
+//					
+//					@Override
+//					public void windowClosing(WindowEvent we) {
+//					    
+//						panel.removeAll();
+//						panel.add(globalview, "grow, push");
+//						
+//						setVisible(false);
+//					}
+//				});
+//							
+//				JPanel fullPanel = new JPanel();
+//				fullPanel.setLayout(new MigLayout("ins 0"));
+//				
+//				fullPanel.add(globalview, "push, grow");
+//				
+//				fullScreen.getContentPane().add(fullPanel);
+//				fullScreen.pack();
+//				fullScreen.setVisible(true);
+//			}
+//		});
+  		
+		//ZoomView
+//		zoompanel = new JPanel();
+//		zoompanel.setLayout(new BorderLayout());
+		
+		textpanel = new JPanel();
+		textpanel.setLayout(new MigLayout("ins 0"));
+		textpanel.setOpaque(false);
+		
+		gtrPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+				gtrview, textpanel);
+		gtrPane.setDividerSize(DIVIDER_SIZE);
+		gtrPane.setDividerLocation(DIV_LOC);
+		gtrPane.setOpaque(false);
+//		gtrPane.setBackground(Color.white);
+		gtrPane.setBorder(null);
+		
+		atrPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+				atrview, arraynameview);
+		atrPane.setDividerSize(DIVIDER_SIZE);
+		atrPane.setDividerLocation(DIV_LOC);
+//		atrPane.setBackground(Color.white);
+		atrPane.setOpaque(false);
+		atrPane.setBorder(null);
+		
+//		JPanel scalePaneX = new JPanel();
+//		scalePaneX.setLayout(new MigLayout());
+//		scalePaneX.setOpaque(false);
+//		
+//		JPanel scalePaneY = new JPanel();
+//		scalePaneY.setLayout(new MigLayout());
+//		scalePaneY.setOpaque(false);
+		
+//		JPanel filler = new JPanel();
+//		filler.setLayout(new MigLayout());
+//		filler.setOpaque(false);
+		
+		//Register Views
+		registerView(globalview);
+		registerView(atrview);
+//		registerView(atrzview);
+//		registerView(gtrzview);
+		registerView(arraynameview);
+//		registerView(zoomview);
+		registerView(textview);
+		
+		//Adding Components
+//		scalePaneX.add(scaleIncX);
+//		scalePaneX.add(scaleDecX);
+//		scalePaneX.add(scaleDefaultX);
+//		
+//		scalePaneY.add(scaleIncY, "alignx 50%, wrap");
+//		scalePaneY.add(scaleDecY, "alignx 50%, wrap");
+//		scalePaneY.add(scaleDefaultY, "alignx 50%");
+//		scalePaneY.add(scaleDefaultAll, "alignx 50%");
+		
+//		gtrPanel.add(gtrview, BorderLayout.CENTER);
+//		gtrPanel.add(new JScrollBar(Adjustable.HORIZONTAL, 0, 1, 0, 1), 
+//				BorderLayout.SOUTH);
+		
+		panel.add(globalview, "grow, push");	
+		panel.add(globalYscrollbar, "pushy, growy, wrap");
+		panel.add(globalXscrollbar, "pushx, growx, span");
+		
+//		zoompanel.add(zoomview, BorderLayout.CENTER);
+//		zoompanel.add(zoomXscrollbar, BorderLayout.SOUTH);	
+//		zoompanel.add(zoomYscrollbar, BorderLayout.EAST);
+		
+		textpanel.add(textview.getComponent(), "push, grow");
+		
+		buttonPanel.add(scaleIncY, "span, alignx 50%, wrap");
+		buttonPanel.add(scaleDecX);
+		buttonPanel.add(scaleDefaultAll);
+		buttonPanel.add(scaleIncX, "wrap");
+		buttonPanel.add(scaleDecY, "span, alignx 50%");
+		
+		backgroundPanel.add(closeButton, "pushx, alignx 50%");
+		backgroundPanel.add(buttonPanel, "growx, alignx 50%");
+//		backgroundPanel.add(statuspanel, "pushx, growx, height 20%::");
+		backgroundPanel.add(atrPane, "grow, push, width 75%, height 20%::, " +
+				"wrap");
+		backgroundPanel.add(gtrPane, "span 2 1, grow, width 20%");
+		backgroundPanel.add(panel, "grow, push, width 75%, height 80%");
+		
+//		right.add(level1Pane, "push, grow");
+		
+//		upSide.add(atrzview, "push, grow, height 15%::, width 65%");
+//		upSide.add(filler, "pushx, growx, width 35%");
+		
+//		downSide.add(arraynameview, "pushx, growx, height 15%::, " +
+//				"width 65%");
+//		downSide.add(scalePaneY, "height 15%::, wrap");
+//		downSide.add(zoompanel, "push, grow, width 65%");
+//		downSide.add(gtrPane, "push, grow, width 35%, wrap");
+//		downSide.add(scalePaneX, "pushx, span");
+
+		this.add(backgroundPanel, "push, grow");
+	}
+	
 	//Methods
 	private int [] getGroupVector(HeaderInfo headerInfo, int groupIndex) {
 		
@@ -698,227 +1159,7 @@ MainPanel, Observer {
 		}
 	}
     
-	/**
-	 *  This method should be called only during initial setup of the ModelView.
-	 *  It sets up the views and binds them all to Config nodes.
-	 *
-	 */
-	protected void setupViews() {
-		
-		this.removeAll();
-		
-		ColorPresets colorPresets = DendrogramFactory.getColorPresets();
-		colorExtractor = new ColorExtractor();
-		colorExtractor.setDefaultColorSet(colorPresets.getDefaultColorSet());
-		colorExtractor.setMissing(DataModel.NODATA, DataModel.EMPTY);
-		
-		statuspanel = new MessagePanel("Status", GUIColors.BG_COLOR);
 
-		DoubleArrayDrawer dArrayDrawer = new DoubleArrayDrawer();
-		dArrayDrawer.setColorExtractor(colorExtractor);
-		arrayDrawer = dArrayDrawer;
-		((Observable)getDataModel()).addObserver(arrayDrawer);
-		
-		// scrollbars, mostly used by maps
-		globalXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0,1,0,1);
-		globalYscrollbar = new JScrollBar(Adjustable.VERTICAL,0,1,0,1);
-//		zoomXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0, 1, 0, 1);
-//		zoomYscrollbar = new JScrollBar(Adjustable.VERTICAL, 0, 1, 0, 1);
-
-//		zoomXmap = new MapContainer();
-//		zoomXmap.setDefaultScale(12.0);
-//		zoomXmap.setScrollbar(zoomXscrollbar);
-//		
-//		zoomYmap = new MapContainer();
-//		zoomYmap.setDefaultScale(12.0);
-//		zoomYmap.setScrollbar(zoomYscrollbar);
-
-		// globalmaps tell globalview, atrview, and gtrview
-		// where to draw each data point.
-		// the scrollbars "scroll" by communicating with the maps.
-		globalXmap = new MapContainer("Fill");
-		globalXmap.setScrollbar(globalXscrollbar);
-		
-		globalYmap = new MapContainer("Fill");
-		globalYmap.setScrollbar(globalYscrollbar);
-		
-		globalview = new GlobalView();
-		globalview.setXMap(globalXmap);
-		globalview.setYMap(globalYmap);
-		globalview.setHeaders(getDataModel().getGeneHeaderInfo(), 
-				getDataModel().getArrayHeaderInfo());
-		
-//		globalview.setZoomYMap(getZoomYmap());
-//		globalview.setZoomXMap(getZoomXmap());
-		
-		globalview.setArrayDrawer(arrayDrawer);
-
-		arraynameview = new ArrayNameView(getDataModel().getArrayHeaderInfo());
-		arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
-		arraynameview.setDataModel(getDataModel());
-		
-		//GTRViews
-		leftTreeDrawer = new LeftTreeDrawer();
-		gtrview = new GTRView();
-		gtrview.setOpaque(true);
-		gtrview.setMap(globalYmap);
-		gtrview.setLeftTreeDrawer(leftTreeDrawer);
-		gtrview.getHeaderSummary().setIncluded(new int [] {0,3});
-		
-//		gtrzview = new GTRZoomView();
-//		gtrzview.setZoomMap(getZoomYmap());
-//		gtrzview.setHeaderSummary(gtrview.getHeaderSummary());
-//		gtrzview.setLeftTreeDrawer(leftTreeDrawer);
-		
-		//ATRViews
-		invertedTreeDrawer = new InvertedTreeDrawer();
-		atrview = new ATRView();
-		atrview.setMap(globalXmap);
-		atrview.setInvertedTreeDrawer(invertedTreeDrawer);
-		atrview.getHeaderSummary().setIncluded(new int [] {0,3});
-
-//		atrzview = new ATRZoomView();
-//		atrzview.setZoomMap(getZoomXmap());
-//		atrzview.setHeaderSummary(atrview.getHeaderSummary());
-//		atrzview.setInvertedTreeDrawer(invertedTreeDrawer);
-//		
-//		//ZoomView
-//		zoomview = new ZoomView();
-//		zoomview.setYMap(getZoomYmap());
-//		zoomview.setXMap(getZoomXmap());
-//		zoomview.setArrayDrawer(arrayDrawer);
-		
-		scaleDefaultAll = setZoomButtonLayout("Reset", GUIColors.BLUE1);
-		scaleDefaultAll.addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				getGlobalXmap().setHome();
-				getGlobalYmap().setHome();
-			}
-			
-		});
-		
-		scaleIncX = setZoomButtonLayout("+", GUIColors.BLUE1);
-		scaleIncX.addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				getGlobalXmap().setScale(getGlobalXmap().getScale() + 1);
-			}
-			
-		});
-		
-		scaleDecX = setZoomButtonLayout("-", GUIColors.BLUE1);
-		scaleDecX.addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				getGlobalXmap().setScale(getGlobalXmap().getScale() - 1);
-			}
-			
-		});
-		
-		scaleDefaultX = setZoomButtonLayout("Reset", GUIColors.BLUE1);
-		scaleDefaultX.addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				getGlobalXmap().setScale(default_scale);
-			}
-			
-		});
-		
-		scaleIncY = setZoomButtonLayout("+", GUIColors.BLUE1);
-		scaleIncY.addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				getGlobalYmap().setScale(getGlobalYmap().getScale() + 1);
-			}
-			
-		});
-		
-		scaleDecY = setZoomButtonLayout("-", GUIColors.BLUE1);
-		scaleDecY.addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				getGlobalYmap().setScale(getGlobalYmap().getScale() - 1);
-			}
-			
-		});
-		
-		scaleDefaultY = setZoomButtonLayout("0", GUIColors.BLUE1);
-		scaleDefaultY.addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				getGlobalYmap().setScale(default_scale);
-			}
-			
-		});
-
-		//arraynameview.setMapping(getZoomXmap());
-		arraynameview.setMapping(getGlobalXmap());
-
-		textview = new TextViewManager(getDataModel().getGeneHeaderInfo(), 
-				viewFrame.getUrlExtractor(), getDataModel());
-		
-		//textview.setMap(getZoomYmap());
-		textview.setMap(getGlobalYmap());
-		
-		//Layout Setup
-		doDoubleLayout();
-
-		//reset persistent popups
-		settingsFrame = null;
-		settingsPanel = null;
-
-		// urls
-		colorExtractor.bindConfig(getFirst("ColorExtractor"));
-		
-		// set data first to avoid adding auto-genereated 
-		//contrast to documentConfig.
-		dArrayDrawer.setDataMatrix(getDataModel().getDataMatrix());
-		dArrayDrawer.bindConfig(getFirst("ArrayDrawer"));
-
-		// this is here because my only subclass shares this code.
-		bindTrees();
-		
-		//Changes Row/ Col number to gene names in Status panel
-//		zoomview.setHeaders(getDataModel().getGeneHeaderInfo(), 
-//				getDataModel().getArrayHeaderInfo());
-		
-		globalXmap.bindConfig(getFirst("GlobalXMap"));
-		globalYmap.bindConfig(getFirst("GlobalYMap"));
-//		getZoomXmap().bindConfig(getFirst("ZoomXMap"));
-//		getZoomYmap().bindConfig(getFirst("ZoomYMap"));
-
-		textview.bindConfig(getFirst("TextView"));			
-		
-		arraynameview.bindConfig(getFirst("ArrayNameView"));
-		
-		HeaderSummary atrSummary = atrview.getHeaderSummary();
-//		HeaderSummary gtrSummary = gtrview.getHeaderSummary();
-		
-//		atrzview.setHeaderSummary(atrSummary);
-//		gtrzview.setHeaderSummary(gtrSummary);
-		
-		atrSummary.bindConfig(getFirst("AtrSummary"));
-		gtrview.getHeaderSummary().bindConfig(getFirst("GtrSummary"));
-
-		// perhaps I could remember this stuff in the MapContainer...
-		globalXmap.setIndexRange(0, dataModel.getDataMatrix().getNumCol() - 1);
-		globalYmap.setIndexRange(0, dataModel.getDataMatrix().getNumRow() - 1);
-//		getZoomXmap().setIndexRange(-1, -1);
-//		getZoomYmap().setIndexRange(-1, -1);
-
-		globalXmap.notifyObservers();
-		globalYmap.notifyObservers();
-//		getZoomXmap().notifyObservers();
-//		getZoomYmap().notifyObservers();
-	}
 
 	/**
 	* this is meant to be called from setupViews.
@@ -1043,242 +1284,6 @@ MainPanel, Observer {
 		}
 		
 		leftTreeDrawer.notifyObservers();
-	}
-
-	
-	/**
-	 * Lays out components in two DragGridPanel separated by a
-	 * JSplitPane, so that you can expand/contract with one click.
-	 *
-	 */
-	protected void doDoubleLayout() {
-		
-//		Dimension left_min;
-//		Dimension right_min;
-//		Dimension up_min; 
-//		Dimension down_min;  
-//		JPanel left;
-//		JPanel right;
-		JPanel backgroundPanel;
-//		JPanel upSide;
-//		JPanel downSide;
-		JPanel buttonPanel;
-//		JPanel gtrPanel;
-		final JPanel panel; 
-//		JPanel zoompanel;
-		JPanel textpanel;
-//		JSplitPane backgroundPane;
-//		JSplitPane level1Pane;
-		JSplitPane gtrPane;
-		JSplitPane atrPane;
-//		JButton saveButton;
-		JButton closeButton;
-//		JButton fullScreenButton;
-		
-//		left_min = new Dimension(500, 450);
-//		right_min = new Dimension(600, 500);
-//		
-//		left = new JPanel();
-//		left.setLayout(new MigLayout());
-//		left.setMinimumSize(left_min);
-//		left.setBackground(BG_COLOR);
-		
-//		right = new JPanel();
-//		right.setLayout(new MigLayout());
-//		right.setMinimumSize(right_min);
-//		right.setBackground(BG_COLOR);
-		
-//		backgroundPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-//				left, right);
-//		backgroundPane.setDividerSize(DIVIDER_SIZE);
-//		backgroundPane.setOneTouchExpandable(true);
-//		backgroundPane.setDividerLocation(MAIN_DIV_LOC);
-		
-		backgroundPanel = new JPanel();
-		backgroundPanel.setLayout(new MigLayout());
-		backgroundPanel.setBackground(GUIColors.BG_COLOR);
-		
-//		up_min = new Dimension(400, 100);
-//		down_min = new Dimension(600, 500);
-		
-//		upSide = new JPanel();
-//		upSide.setLayout(new MigLayout());
-//		upSide.setOpaque(false);
-//		upSide.setMinimumSize(up_min);
-//		
-//		downSide = new JPanel();
-//		downSide.setLayout(new MigLayout());
-//		downSide.setOpaque(false);
-//		downSide.setMinimumSize(down_min);
-		
-//		gtrPanel = new JPanel();
-//		gtrPanel.setLayout(new BorderLayout());
-		
-		gtrview.setStatusPanel(statuspanel);
-		gtrview.setViewFrame(viewFrame);
-		
-		//ButtonPanel
-		buttonPanel = new JPanel();
-		buttonPanel.setLayout(new MigLayout());
-		buttonPanel.setOpaque(false);
-		
-		//Global view
-		panel = new JPanel();
-		panel.setLayout(new MigLayout("ins 0"));
-		
-//		saveButton = setButtonLayout("Save Zoomed Image", BLUE1);
-//		saveButton.addActionListener(new ActionListener(){
-//
-//			@Override
-//			public void actionPerformed(ActionEvent arg0) {
-//				
-//				try {
-//					saveImage(zoomview);
-//					
-//				} catch (IOException e) {
-//					
-//				}	
-//			}
-//		});
-		
-		closeButton = setButtonLayout("< Back", GUIColors.BLUE1);;
-  		closeButton.addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				
-				viewFrame.setLoaded(false);
-			}
-		});
-		
-//		fullScreenButton = setButtonLayout("Fullscreen", BLUE1);
-//  		fullScreenButton.addActionListener(new ActionListener(){
-//
-//			@Override
-//			public void actionPerformed(ActionEvent arg0) {
-//				
-//				JFrame fullScreen = new JFrame();
-//				fullScreen.setDefaultCloseOperation(
-//						WindowConstants.DISPOSE_ON_CLOSE);
-//				fullScreen.setResizable(true);
-//				fullScreen.addWindowListener(new WindowAdapter () {
-//					
-//					@Override
-//					public void windowClosing(WindowEvent we) {
-//					    
-//						panel.removeAll();
-//						panel.add(globalview, "grow, push");
-//						
-//						setVisible(false);
-//					}
-//				});
-//							
-//				JPanel fullPanel = new JPanel();
-//				fullPanel.setLayout(new MigLayout("ins 0"));
-//				
-//				fullPanel.add(globalview, "push, grow");
-//				
-//				fullScreen.getContentPane().add(fullPanel);
-//				fullScreen.pack();
-//				fullScreen.setVisible(true);
-//			}
-//		});
-  		
-		//ZoomView
-//		zoompanel = new JPanel();
-//		zoompanel.setLayout(new BorderLayout());
-		
-		textpanel = new JPanel();
-		textpanel.setLayout(new MigLayout("ins 0"));
-		
-		statuspanel.setOpaque(true);
-		
-		gtrPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-				gtrview, textpanel);
-		gtrPane.setDividerSize(DIVIDER_SIZE);
-		gtrPane.setDividerLocation(DIV_LOC);
-		gtrPane.setBackground(Color.white);
-		gtrPane.setBorder(null);
-		
-		atrPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-				atrview, arraynameview);
-		atrPane.setDividerSize(DIVIDER_SIZE);
-		atrPane.setDividerLocation(DIV_LOC);
-		atrPane.setBackground(Color.white);
-		atrPane.setBorder(null);
-		
-//		JPanel scalePaneX = new JPanel();
-//		scalePaneX.setLayout(new MigLayout());
-//		scalePaneX.setOpaque(false);
-//		
-//		JPanel scalePaneY = new JPanel();
-//		scalePaneY.setLayout(new MigLayout());
-//		scalePaneY.setOpaque(false);
-		
-//		JPanel filler = new JPanel();
-//		filler.setLayout(new MigLayout());
-//		filler.setOpaque(false);
-		
-		//Register Views
-		registerView(globalview);
-		registerView(atrview);
-//		registerView(atrzview);
-//		registerView(gtrzview);
-		registerView(arraynameview);
-//		registerView(zoomview);
-		registerView(textview);
-		
-		//Adding Components
-//		scalePaneX.add(scaleIncX);
-//		scalePaneX.add(scaleDecX);
-//		scalePaneX.add(scaleDefaultX);
-//		
-//		scalePaneY.add(scaleIncY, "alignx 50%, wrap");
-//		scalePaneY.add(scaleDecY, "alignx 50%, wrap");
-//		scalePaneY.add(scaleDefaultY, "alignx 50%");
-//		scalePaneY.add(scaleDefaultAll, "alignx 50%");
-		
-//		gtrPanel.add(gtrview, BorderLayout.CENTER);
-//		gtrPanel.add(new JScrollBar(Adjustable.HORIZONTAL, 0, 1, 0, 1), 
-//				BorderLayout.SOUTH);
-		
-		panel.add(globalview, "grow, push");	
-		panel.add(globalYscrollbar, "pushy, growy, wrap");
-		panel.add(globalXscrollbar, "pushx, growx, span");
-		
-//		zoompanel.add(zoomview, BorderLayout.CENTER);
-//		zoompanel.add(zoomXscrollbar, BorderLayout.SOUTH);	
-//		zoompanel.add(zoomYscrollbar, BorderLayout.EAST);
-		
-		textpanel.add(textview.getComponent(), "push, grow");
-		
-		buttonPanel.add(scaleIncY, "span, alignx 50%, wrap");
-		buttonPanel.add(scaleDecX);
-		buttonPanel.add(scaleDefaultAll);
-		buttonPanel.add(scaleIncX, "wrap");
-		buttonPanel.add(scaleDecY, "span, alignx 50%");
-		
-		backgroundPanel.add(closeButton, "pushx, alignx 50%");
-		backgroundPanel.add(buttonPanel, "growx, alignx 50%");
-//		backgroundPanel.add(statuspanel, "pushx, growx, height 20%::");
-		backgroundPanel.add(atrPane, "grow, push, width 75%, height 20%::, " +
-				"wrap");
-		backgroundPanel.add(gtrPane, "span 2 1, grow, width 20%");
-		backgroundPanel.add(panel, "grow, push, width 75%, height 80%");
-		
-//		right.add(level1Pane, "push, grow");
-		
-//		upSide.add(atrzview, "push, grow, height 15%::, width 65%");
-//		upSide.add(filler, "pushx, growx, width 35%");
-		
-//		downSide.add(arraynameview, "pushx, growx, height 15%::, " +
-//				"width 65%");
-//		downSide.add(scalePaneY, "height 15%::, wrap");
-//		downSide.add(zoompanel, "push, grow, width 65%");
-//		downSide.add(gtrPane, "push, grow, width 35%, wrap");
-//		downSide.add(scalePaneX, "pushx, span");
-
-		add(backgroundPanel, "push, grow");
 	}
 
 	/**
