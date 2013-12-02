@@ -237,7 +237,7 @@ public class TextView extends ModelView implements FontSelectable,
 		    	}
 	
 				if (out != null) {
-					Color back = GUIColors.BLUE1; //g.getColor();
+					Color back = GUIColors.ELEMENT; //g.getColor();
 					if ((geneSelection == null) 
 							|| geneSelection.isIndexSelected(j)) {
 						String [] strings = headerInfo.getHeader(j);

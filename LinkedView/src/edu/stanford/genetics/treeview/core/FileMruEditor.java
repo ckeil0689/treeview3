@@ -38,6 +38,9 @@ import edu.stanford.genetics.treeview.*;
  * @version $Revision: 1.2 $ $Date: 2010-05-02 13:39:00 $
  */
 public class FileMruEditor extends JPanel {
+
+	private static final long serialVersionUID = 1L;
+	
 	private FileMru client;
 	private Window window;
 	private FileSetPanel fileSetPanel;
@@ -196,6 +199,9 @@ public class FileMruEditor extends JPanel {
 	 * @author     Alok Saldanha <alok@genome.stanford.edu>
 	 */
 	private class FileSetPanel extends JPanel {
+
+		private static final long serialVersionUID = 1L;
+		
 		JList list;
 
 
@@ -318,7 +324,11 @@ public class FileMruEditor extends JPanel {
 	 * @author     Alok Saldanha <alok@genome.stanford.edu>
 	 */
 	private class ButtonPanel extends Panel {
-		private Button openButton, searchButton, deleteButton, deleteAllButton, closeButton;
+
+		private static final long serialVersionUID = 1L;
+		
+		private Button openButton, searchButton, deleteButton, deleteAllButton, 
+		closeButton;
 
 
 		/**

@@ -28,8 +28,10 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.swing.*;
-import javax.swing.border.Border;
+import javax.swing.border.EtchedBorder;
 import javax.swing.event.*;
+
+import net.miginfocom.swing.MigLayout;
 
 import edu.stanford.genetics.treeview.*;
 /**
@@ -67,7 +69,8 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 			ColorExtractor drawer,
 			ColorPresets colorPresets) {
 		
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		this.setLayout(new MigLayout());
+		this.setBackground(GUIColors.BG_COLOR);
 		m_xmap = xmap;
 		m_ymap = ymap;
 		m_xZmap = xZmap;
@@ -78,87 +81,135 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 	}
 	
 	private void setupWidgets() {
+		
+//		removeAll();
+//		Border border = BorderFactory.createEtchedBorder();
+//		setLayout(new GridBagLayout());
+//		GridBagConstraints gbc = new GridBagConstraints();
+//		gbc.fill = GridBagConstraints.BOTH;
+//		gbc.insets = new Insets(5,5,5,5);
+//		// scale stuff:
+//		gbc.gridy = 0;
+//		gbc.gridx = 0;
+//		add(new JLabel("Global:"), gbc);
+//		JPanel t = new JPanel();
+//		t.setBorder(border);
+//		m_xscale = new ScalePanel(m_xmap, "X:");
+//		t.add(m_xscale);
+//		m_yscale = new ScalePanel(m_ymap, "Y:");
+//		t.add(m_yscale);
+//		gbc.gridy = 0;
+//		gbc.gridx = 1;
+//		add(t, gbc);
+//
+//		if(m_xZmap != null && m_yZmap != null) {
+//			gbc.gridy = 1;
+//			gbc.gridx = 0;
+//			add(new JLabel("Zoom:"), gbc);
+//			t = new JPanel();
+//			t.setBorder(border);
+//			m_xZscale = new ScalePanel(m_xZmap, "X:");
+//			t.add(m_xZscale);
+//			m_yZscale = new ScalePanel(m_yZmap, "Y:");
+//			t.add(m_yZscale);
+//		}
+//		
+//		gbc.gridy = 1;
+//		gbc.gridx = 1;
+//		add(t, gbc);
+//
+//		gbc.gridy += 1;
+//		gbc.gridx = 0;
+//		if (m_drawer != null) {
+//			add(new JLabel("Contrast:"), gbc);
+//			m_contrast = new ContrastSelector(m_drawer);
+//			m_contrast.setBorder(border);
+//			gbc.gridx = 1;
+//			add(m_contrast, gbc);
+//
+//
+//			gbc.gridy += 1;
+//			gbc.gridx = 0;
+//			add(new JLabel("LogScale:"), gbc);
+//			m_logscale = new LogScaleSelector();
+//			m_logscale.setBorder(border);
+//			gbc.gridx = 1;
+//			add(m_logscale, gbc);
+//
+//
+//			// color stuff...
+//			gbc.gridy += 1;
+//			add(new JLabel("Colors:"), gbc);
+//			JPanel temp2 = new JPanel();
+//			temp2.setBorder(border);
+//			temp2.setLayout(new BoxLayout(temp2, BoxLayout.Y_AXIS));
+//
+//			colorExtractorEditor = new ColorExtractorEditor(m_drawer);
+//			temp2.add(colorExtractorEditor);
+//			temp2.add(new CEEButtons());
+//			colorPresetsPanel = new ColorPresetsPanel();
+//			temp2.add(new JScrollPane(colorPresetsPanel, 
+//					ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
+//					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS));
+//			gbc.gridx = 1;
+//			add(temp2, gbc);
+//		}
+		
 		removeAll();
-		Border border = BorderFactory.createEtchedBorder();
-		setLayout(new GridBagLayout());
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.insets = new Insets(5,5,5,5);
-		// scale stuff:
-		gbc.gridy = 0;
-		gbc.gridx = 0;
-		add(new JLabel("Global:"), gbc);
-		JPanel t = new JPanel();
-		t.setBorder(border);
+		this.setLayout(new MigLayout());
+		
+		this.add(new JLabel("Global:"), "wrap");
+		JPanel t = setPanelLayout();
+		
 		m_xscale = new ScalePanel(m_xmap, "X:");
-		t.add(m_xscale);
+		t.add(m_xscale, "pushx, growx");
 		m_yscale = new ScalePanel(m_ymap, "Y:");
-		t.add(m_yscale);
-		gbc.gridy = 0;
-		gbc.gridx = 1;
-		add(t, gbc);
-
+		t.add(m_yscale, "pushx");
+		this.add(t, "pushx, growx, wrap");
+		
 		if(m_xZmap != null && m_yZmap != null) {
-			gbc.gridy = 1;
-			gbc.gridx = 0;
-			add(new JLabel("Zoom:"), gbc);
-			t = new JPanel();
-			t.setBorder(border);
+			
+			this.add(new JLabel("Zoom:"));
+			t = setPanelLayout();
 			m_xZscale = new ScalePanel(m_xZmap, "X:");
-			t.add(m_xZscale);
+			t.add(m_xZscale, "pushx");
 			m_yZscale = new ScalePanel(m_yZmap, "Y:");
-			t.add(m_yZscale);
+			t.add(m_yZscale, "pushx");
 		}
 		
-		gbc.gridy = 1;
-		gbc.gridx = 1;
-		add(t, gbc);
-
-		gbc.gridy += 1;
-		gbc.gridx = 0;
+		this.add(t, "pushx, growx, wrap");
+		
 		if (m_drawer != null) {
-			add(new JLabel("Contrast:"), gbc);
+			this.add(new JLabel("Contrast:"), "wrap");
 			m_contrast = new ContrastSelector(m_drawer);
-			m_contrast.setBorder(border);
-			gbc.gridx = 1;
-			add(m_contrast, gbc);
+			this.add(m_contrast, "pushx, growx, wrap");
 
-
-			gbc.gridy += 1;
-			gbc.gridx = 0;
-			add(new JLabel("LogScale:"), gbc);
+			this.add(new JLabel("LogScale:"), "wrap");
 			m_logscale = new LogScaleSelector();
-			m_logscale.setBorder(border);
-			gbc.gridx = 1;
-			add(m_logscale, gbc);
-
-
+			this.add(m_logscale, "pushx, growx, wrap");
+			
 			// color stuff...
-			gbc.gridy += 1;
-			add(new JLabel("Colors:"), gbc);
-			JPanel temp2 = new JPanel();
-			temp2.setBorder(border);
-			temp2.setLayout(new BoxLayout(temp2, BoxLayout.Y_AXIS));
+			this.add(new JLabel("Colors:"), "wrap");
+			JPanel temp2 = setPanelLayout();
 
 			colorExtractorEditor = new ColorExtractorEditor(m_drawer);
-			temp2.add(colorExtractorEditor);
-			temp2.add(new CEEButtons());
+			temp2.add(colorExtractorEditor, "alignx 50%, pushx, wrap");
+			temp2.add(new CEEButtons(), "alignx 50%, pushx, wrap");
+			
 			colorPresetsPanel = new ColorPresetsPanel();
-			temp2.add(new JScrollPane(colorPresetsPanel, 
+			JScrollPane sp = new JScrollPane(colorPresetsPanel, 
 					ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
-					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS));
-			gbc.gridx = 1;
-			add(temp2, gbc);
+					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+			sp.setBackground(GUIColors.BG_COLOR);
+			temp2.add(sp, "alignx 50%, pushx, growx");
+			this.add(temp2, "pushx, growx");
 		}
-
 	}
 
 	class ScalePanel extends JPanel {
 		
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 1L;
+		
 		private ButtonGroup type;
 		private JRadioButton fixed, fill;
 		private JTextField value;
@@ -168,25 +219,29 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 			
 			ymap = xmc;
 
-			setLayout(new GridLayout(3,2));
-			add(new JLabel(title));
-			add(new JPanel());
+			this.setLayout(new MigLayout());
+			this.setOpaque(false);
+			
+			this.add(new JLabel(title), "span, wrap");
 
 			type = new ButtonGroup();
 			fixed = new JRadioButton("Fixed Scale");
+			fixed.setOpaque(false);
 			type.add(fixed);
-			add(fixed);
+			this.add(fixed);
 
-			value = new JTextField(Double.toString(ymap.getScale()),5);
-			add(value);
+			value = new JTextField(Double.toString(ymap.getScale()), 5);
+			this.add(value, "growx, wrap");
 
 			fill = new JRadioButton("Fill");
+			fill.setOpaque(false);
 			type.add(fill);
-			add(fill);
+			this.add(fill, "span");
 
 			if (xmc.getCurrent().type().equals("Fixed")) {
 				fixed.setSelected(true);
 				//		type.setSelectedCheckbox(fixed);
+				
 			} else {
 				fill.setSelected(true);
 //				type.setSelectedCheckbox(fill);
@@ -280,23 +335,25 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 	public JDialog showDialog(JFrame f, String title) {
 		
 		final JDialog d = new JDialog(f, title);
-		d.setLayout(new BorderLayout());
-		d.add(this, BorderLayout.CENTER);
+		d.setLayout(new MigLayout());
+		d.add(this, "push, grow, wrap");
 
-		final JButton display_button = new JButton("Close");
+		final JButton display_button = setButtonLayout("Close");
 		display_button.addActionListener(new ActionListener() {
 			// called when close button hit
 			@Override
 			public void actionPerformed(ActionEvent evt) {
+				
 				if(evt.getSource() == display_button) {
 					synchronizeTo();
 					d.dispose();
 				}
 			}
 		});
+		
 		JPanel p = new JPanel();
 		p.add(display_button);
-		d.add(p, BorderLayout.SOUTH);
+		d.add(p, "pushx, growx, alignx 50%");
 
 
 		d.addWindowListener(new WindowAdapter() {
@@ -331,10 +388,13 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 
 		CEEButtons() {
 
-			JButton loadButton = new JButton("Load...");
+			this.setOpaque(false);
+			JButton loadButton = setButtonLayout("Load...");
 			loadButton.addActionListener(new ActionListener() {
+				
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					
 					JFileChooser chooser = new JFileChooser();
 					int returnVal = chooser.showOpenDialog(CEEButtons.this);
 					if(returnVal == JFileChooser.APPROVE_OPTION) {
@@ -343,6 +403,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 							ColorSet temp = new ColorSet();
 							temp.loadEisen(f);
 							colorExtractorEditor.copyStateFrom(temp);
+							
 						} catch (IOException ex) {
 							JOptionPane.showMessageDialog(CEEButtons.this, 
 									"Could not load from " + f.toString() 
@@ -351,12 +412,14 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 					}
 				}
 			});
-			add(loadButton);
+			this.add(loadButton);
 
-			JButton saveButton = new JButton("Save...");
+			JButton saveButton = setButtonLayout("Save...");
 			saveButton.addActionListener(new ActionListener() {
+				
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					
 					JFileChooser chooser = new JFileChooser();
 					int returnVal = chooser.showSaveDialog(CEEButtons.this);
 					if(returnVal == JFileChooser.APPROVE_OPTION) {
@@ -365,21 +428,23 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 							ColorSet temp = new ColorSet();
 							colorExtractorEditor.copyStateTo(temp);
 							temp.saveEisen(f);
+							
 						} catch (IOException ex) {
 							JOptionPane.showMessageDialog(CEEButtons.this, 
 									"Could not save to " + f.toString() 
 									+ "\n" + ex);
 						}
-
 					}
 				}
 			});
-			add(saveButton);
+			this.add(saveButton);
 
-			JButton makeButton = new JButton("Make Preset");
+			JButton makeButton = setButtonLayout("Make Preset");
 			makeButton.addActionListener(new ActionListener() {
+				
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					
 					ColorSet temp = new ColorSet();
 					colorExtractorEditor.copyStateTo(temp);
 					temp.setName("UserDefined");
@@ -390,10 +455,8 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 					colorPresetsPanel.repaint();
 				}
 			});
-			add(makeButton);
-
+			this.add(makeButton);
 		}
-
 	}
 
 	class ColorSelector extends JPanel {
@@ -403,7 +466,9 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 		private static final long serialVersionUID = 1L;
 
 		ColorSelector() {
-			add(new ColorExtractorEditor(m_drawer));
+			
+			this.setOpaque(false);
+			this.add(new ColorExtractorEditor(m_drawer));
 		}
 
 	}
@@ -414,26 +479,39 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 		 * I don't use serialization, this is to keep eclipse happy.
 		 */
 		private static final long serialVersionUID = 1L;
+		
 		private JTextField logTextField;
 		private JCheckBox logCheckBox;
+		
 		LogScaleSelector() {
+			
+			this.setLayout(new MigLayout());
+			this.setOpaque(false);
+			this.setBorder(BorderFactory.createLineBorder(GUIColors.BORDERS, 
+					EtchedBorder.LOWERED));
+			
 			logCheckBox = new JCheckBox("Log (base 2)");
+			logCheckBox.setBackground(GUIColors.BG_COLOR);
 			logCheckBox.setSelected(m_drawer.getLogTransform());
 			logCheckBox.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
+					
 					m_drawer.setLogTransform(logCheckBox.isSelected());
 					logTextField.setEnabled(logCheckBox.isSelected());
 					m_drawer.setLogBase(2.0);
 					m_drawer.notifyObservers();
 				}
 			});
-			add(logCheckBox);
+			this.add(logCheckBox, "pushx, span, wrap");
+			
 			logTextField = new JTextField(10);
 			logTextField.setText("" +m_drawer.getLogCenter());
-			add(new JLabel("Center:"));
-			logTextField.getDocument().addDocumentListener(new DocumentListener() {
+			this.add(new JLabel("Center:"), "alignx 50%");
+			logTextField.getDocument().addDocumentListener(
+					new DocumentListener() {
+				
 				@Override
 				public void changedUpdate(DocumentEvent e) {
 					textBoxChanged();
@@ -447,16 +525,19 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 					textBoxChanged();
 				}
 			});
-			add(logTextField);
+			this.add(logTextField, "alignx 50%");
 			logTextField.setEnabled(logCheckBox.isSelected());
 			
 		}
+		
 		private void textBoxChanged() {
+			
 			Double d;
 			try {
 				d = new Double(logTextField.getText());
 				m_drawer.setLogCenter(d.doubleValue());
 				m_drawer.notifyObservers();
+				
 			} catch (Exception e) {
 			}
 		}
@@ -466,30 +547,66 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 	 * this class allows the presets to be selected...
 	 */
 	class ColorPresetsPanel extends JPanel {
-		/**
-		 * 
-		 */
+
 		private static final long serialVersionUID = 1L;
+		
 		ColorPresetsPanel() {
+			
 			redoLayout();
 		}
+		
 		public void redoLayout() {
+			
 			removeAll();
+			this.setBackground(GUIColors.BG_COLOR);
 			int nPresets = m_presets.getNumPresets();
 			JButton [] buttons = new JButton[nPresets];
 			for (int i = 0; i < nPresets; i++) {
-				JButton presetButton = new JButton((m_presets.getPresetNames()) [i]);
+				JButton presetButton = setButtonLayout(
+						(m_presets.getPresetNames()) [i]);
 				final int index = i;
 				presetButton.addActionListener(new ActionListener() {
+					
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						colorExtractorEditor.copyStateFrom(m_presets.getColorSet(index));
+						
+						colorExtractorEditor.copyStateFrom(
+								m_presets.getColorSet(index));
 					}
 				});
-				add(presetButton);
+				this.add(presetButton);
+				
 				buttons[index] = presetButton;
 			}
 		}
+	}
+	
+	public JButton setButtonLayout(String title){
+		
+		Font buttonFont = new Font("Sans Serif", Font.PLAIN, 14);
+		
+		JButton button = new JButton(title);
+  		Dimension d = button.getPreferredSize();
+  		d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
+  		button.setPreferredSize(d);
+  		
+  		button.setFont(buttonFont);
+  		button.setOpaque(true);
+  		button.setBackground(GUIColors.ELEMENT);
+  		button.setForeground(GUIColors.BG_COLOR);
+  		
+  		return button;
+	}
+	
+	public JPanel setPanelLayout() {
+		
+		JPanel panel = new JPanel();
+		panel.setLayout(new MigLayout());
+		panel.setBackground(GUIColors.BG_COLOR);
+		panel.setBorder(BorderFactory.createLineBorder(GUIColors.BORDERS, 
+						EtchedBorder.LOWERED));
+		
+		return panel;
 	}
 }
 
@@ -498,11 +615,9 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
  */
 
 class ColorExtractorEditor extends JPanel {
-	
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 1L;
+	
 	private static final int UP = 0;
 	private static final int ZERO = 1;
 	private static final int DOWN = 2;
@@ -513,14 +628,13 @@ class ColorExtractorEditor extends JPanel {
 	public ColorExtractorEditor(ColorExtractor colorExtractor) {
 		
 		this.colorExtractor = colorExtractor;
+		this.setOpaque(false);
 		
 		for (int i = 0; i < 4; i++) {
 			
 			colorPanel[i] = new ColorPanel(i);
 			add(colorPanel[i]);
 		}
-
-
 	}
 
 	public void copyStateFrom(ColorSet source) {
@@ -556,17 +670,30 @@ class ColorExtractorEditor extends JPanel {
 		public void redoComps() {
 			
 			removeAll();
+			this.setOpaque(false);
 			colorIcon = new ColorIcon(10, 10, getColor());
 			JButton pushButton = new JButton(getLabel(), colorIcon);
+			Font buttonFont = new Font("Sans Serif", Font.PLAIN, 14);
+			
+	  		Dimension d = pushButton.getPreferredSize();
+	  		d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
+	  		pushButton.setPreferredSize(d);
+	  		
+	  		pushButton.setFont(buttonFont);
+	  		pushButton.setOpaque(true);
+	  		pushButton.setBackground(GUIColors.ELEMENT);
+	  		pushButton.setForeground(GUIColors.BG_COLOR);
 			pushButton.addActionListener(new ActionListener() {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					
 					Color trial = JColorChooser.showDialog(
 							ColorExtractorEditor.this, "Pick Color for " 
 					+ getLabel(), getColor());
-					if (trial != null)
+					if (trial != null) {
 						setColor(trial);
+					}
 				}
 			});
 

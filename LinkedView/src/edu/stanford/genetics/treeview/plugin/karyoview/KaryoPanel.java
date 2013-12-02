@@ -551,5 +551,10 @@ private ViewFrame viewFrame;
 	public void export(MainProgramArgs args) throws ExportException {
 		throw new ExportException("Export not implemented for plugin " + getName());
 	}
+	@Override
+	public void refresh() {
+		// TODO Auto-generated method stub
+		
+	}
 }
 

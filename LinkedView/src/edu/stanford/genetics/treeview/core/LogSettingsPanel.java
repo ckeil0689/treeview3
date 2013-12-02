@@ -16,6 +16,9 @@ import javax.swing.JPanel;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 public class LogSettingsPanel extends JPanel implements Observer {
+
+	private static final long serialVersionUID = 1L;
+	
 	private LogBuffer logBuffer;
 	private JCheckBox logBox = new JCheckBox("Log Messages");
 	public LogSettingsPanel(LogBuffer buffer) {

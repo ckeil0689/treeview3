@@ -23,6 +23,9 @@
 package edu.stanford.genetics.treeview;
 
 import javax.swing.*;
+
+import net.miginfocom.swing.MigLayout;
+
 import java.awt.event.*;
 import java.awt.*;
 
@@ -46,9 +49,10 @@ public class ModelessSettingsDialog extends JDialog {
 		settingsPanel = panel;
 		settingsFrame = this;
 		JPanel inner = new JPanel();
-		inner.setLayout(new BorderLayout());
-		inner.add((Component) panel, BorderLayout.CENTER);
-		inner.add(new ButtonPanel(), BorderLayout.SOUTH);
+		inner.setLayout(new MigLayout());
+		inner.add((Component) panel, "push, grow, wrap");
+		inner.add(new ButtonPanel(), "pushx, growx, alignx 50%");
+		inner.setBackground(GUIColors.BG_COLOR);
 		getContentPane().add(inner); 
 		pack();
 	}
@@ -65,29 +69,50 @@ public class ModelessSettingsDialog extends JDialog {
 		private static final long serialVersionUID = 1L;
 
 		public ButtonPanel() {
-	  
-		  JButton save_button = new JButton("Close");
-		  save_button.addActionListener(new ActionListener() {
 			
-			  @Override
-			  public void actionPerformed(ActionEvent e) {
+			this.setBackground(GUIColors.BG_COLOR);
+			
+			JButton save_button = setButtonLayout("Close");
+			save_button.addActionListener(new ActionListener() {
+			
+				@Override
+				public void actionPerformed(ActionEvent e) {
 				  
-				  settingsPanel.synchronizeTo();
-				  settingsFrame.dispose();
-			}
-		  });
-		  add(save_button);
+					settingsPanel.synchronizeTo();
+					settingsFrame.dispose();
+				}
+			});
+			add(save_button);
 		  
-		  JButton cancel_button = new JButton("Cancel");
-		  cancel_button.addActionListener(new ActionListener() {
+			JButton cancel_button = setButtonLayout("Cancel");
+			cancel_button.addActionListener(new ActionListener() {
 		
-			  @Override
-			  public void actionPerformed(ActionEvent e) {
-				  settingsPanel.synchronizeFrom();
-				  settingsFrame.dispose();
-			  }
-		  });
-//	  add(cancel_button);
-	}
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					
+					settingsPanel.synchronizeFrom();
+					settingsFrame.dispose();
+				}
+			});
+//			add(cancel_button);
+		}
+		
+		public JButton setButtonLayout(String title){
+			
+			Font buttonFont = new Font("Sans Serif", Font.PLAIN, 14);
+			
+			JButton button = new JButton(title);
+	  		Dimension d = button.getPreferredSize();
+	  		d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
+	  		button.setPreferredSize(d);
+	  		
+	  		button.setFont(buttonFont);
+	  		button.setOpaque(true);
+	  		button.setBackground(GUIColors.ELEMENT);
+	  		button.setForeground(GUIColors.BG_COLOR);
+	  		
+	  		return button;
+		}
+	
   }
 }

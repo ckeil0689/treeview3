@@ -167,20 +167,20 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		waiting.removeAll();
 		
 		mainPanel = new JPanel();
-		mainPanel.setLayout(new MigLayout());
+		mainPanel.setLayout(new MigLayout("ins 0"));
 		mainPanel.setBackground(GUIColors.BG_COLOR);
 		
 		title_bg = new JPanel();
 		title_bg.setLayout(new MigLayout());
-		title_bg.setOpaque(false);
+		title_bg.setBackground(GUIColors.TITLE_BG);
 		
 		jl = new JLabel("Hello! How are you Gentlepeople?");
 		jl.setFont(new Font("Sans Serif", Font.PLAIN, 30));
-		jl.setForeground(GUIColors.BLUE1);
+		jl.setForeground(GUIColors.TITLE_TEXT);
 		
 		jl2 = new JLabel("Welcome to " + getAppName());
 		jl2.setFont(new Font("Sans Serif", Font.BOLD, 50));
-		jl2.setForeground(GUIColors.BLUE1);
+		jl2.setForeground(GUIColors.TITLE_TEXT);
 		
 		ClickableLabel load_Icon = new ClickableLabel(this, 
 				"Load Data >");
@@ -241,7 +241,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		loadNew = new JLabel("  Load New File");
 		loadNew.setFont(new Font("Sans Serif", Font.BOLD, 25));
-		loadNew.setForeground(GUIColors.BLUE1);
+		loadNew.setForeground(GUIColors.ELEMENT);
 		
 		loadNew.addMouseListener(new SSMouseListener(loadNew){
 			
@@ -658,12 +658,16 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 				
 				GUIColors.setDayLight();
 				
-				if(dataModel != null) {
+				if(dataModel != null && running != null) {
 					resetLayout();
+					running.refresh();
+					
+				} else if(dataModel != null && running == null) {
+					resetLayout();
+					
 				} else {
 					setupLayout();
 				}
-				//setLoaded(loaded);
 				//make static method to change theme?
 			}
 		});
@@ -674,12 +678,16 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 				
 				GUIColors.setNight();
 				
-				if(dataModel != null) {
+				if(dataModel != null && running != null) {
 					resetLayout();
+					running.refresh();
+					
+				} else if(dataModel != null && running == null) {
+					resetLayout();
+					
 				} else {
 					setupLayout();
 				}
-				//setLoaded(loaded);
 				//make static method to change theme?
 			}
 			
@@ -1693,6 +1701,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	
 	@Override
 	public HeaderFinder getGeneFinder() {
+		
 		if (geneFinder == null) {
 			geneFinder = new GeneFinder(TreeViewFrame.this, getDataModel()
 					.getGeneHeaderInfo(), getGeneSelection());

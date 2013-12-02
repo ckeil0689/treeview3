@@ -3,12 +3,14 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 import java.awt.Adjustable;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import javax.swing.BoxLayout;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -16,14 +18,19 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.border.EtchedBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import net.miginfocom.swing.MigLayout;
+
 import edu.stanford.genetics.treeview.ContrastSelectable;
+import edu.stanford.genetics.treeview.GUIColors;
 
-class ContrastSelector extends JPanel 
-implements AdjustmentListener {
+class ContrastSelector extends JPanel implements AdjustmentListener {
 
+	private static final long serialVersionUID = 1L;
+	
 	private JTextField contrastTextField;
 	private JFrame top;
 	private JDialog d;
@@ -33,46 +40,87 @@ implements AdjustmentListener {
 	private ContrastSelectable client = null;
 
 	public ContrastSelector(ContrastSelectable c) {
+		
 		client = c;
 		contrast = client.getContrast();
 		setupWidgets();
 	}
 
 	private void setupWidgets() {	
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		
+		this.setLayout(new MigLayout());
+		this.setOpaque(false);
+		this.setBorder(BorderFactory.createLineBorder(GUIColors.BORDERS, 
+				EtchedBorder.LOWERED));
+		
 		JPanel inner = new JPanel();
+		inner.setOpaque(false);
+		inner.setLayout(new MigLayout());
+		
 		JLabel font_label = new JLabel("Value:", SwingConstants.LEFT);
-		inner.add(font_label);
+		inner.add(font_label, "alignx 50%");
 
 		font_label.setMaximumSize(new Dimension(Short.MAX_VALUE, 
 				Short.MAX_VALUE)); 
 		inner.setMaximumSize(new Dimension(Short.MAX_VALUE, 
 				Short.MAX_VALUE)); 
-		contrastTextField = new JTextField(Double.toString(contrast) ,  5);
+		
+		contrastTextField = new JTextField(Double.toString(contrast), 5);
 		contrastTextField.setMaximumSize(new Dimension(Short.MAX_VALUE, 
 				Short.MAX_VALUE)); 
-		inner.add(contrastTextField);
+		inner.add(contrastTextField, "alignx 50%, growx");
 
-		contrastTextField.getDocument().addDocumentListener(new DocumentListener() {
-			@Override
-			public void changedUpdate(DocumentEvent e) {
-				updateScrollbarFromText();
-			}
-			@Override
-			public void insertUpdate(DocumentEvent e) {
-				updateScrollbarFromText();
-			}
-			@Override
-			public void removeUpdate(DocumentEvent e) {
-				updateScrollbarFromText();
-			}
+		contrastTextField.getDocument().addDocumentListener(
+				new DocumentListener() {
+			
+					@Override
+					public void changedUpdate(DocumentEvent e) {
+						updateScrollbarFromText();
+					}
+					@Override
+					public void insertUpdate(DocumentEvent e) {
+						updateScrollbarFromText();
+					}
+					@Override
+					public void removeUpdate(DocumentEvent e) {
+						updateScrollbarFromText();
+					}
 		});
 
-		add(inner);
+		this.add(inner, "pushx, alignx 50%, wrap");
 		scrollbar = new JScrollBar(Adjustable.HORIZONTAL);
+		scrollbar.setBackground(GUIColors.BG_COLOR);
 		scrollbar.setValues((int)(contrast * 100.0), 0, 1, 500);
 		scrollbar.addAdjustmentListener(this);
-		add(scrollbar);
+		this.add(scrollbar, "pushx, growx");
+	}
+	
+	public JButton setButtonLayout(String title){
+		
+		Font buttonFont = new Font("Sans Serif", Font.PLAIN, 14);
+		
+		JButton button = new JButton(title);
+  		Dimension d = button.getPreferredSize();
+  		d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
+  		button.setPreferredSize(d);
+  		
+  		button.setFont(buttonFont);
+  		button.setOpaque(true);
+  		button.setBackground(GUIColors.ELEMENT);
+  		button.setForeground(GUIColors.BG_COLOR);
+  		
+  		return button;
+	}
+	
+	public JPanel setPanelLayout() {
+		
+		JPanel panel = new JPanel();
+		panel.setLayout(new MigLayout());
+		panel.setBackground(GUIColors.BG_COLOR);
+		panel.setBorder(BorderFactory.createLineBorder(GUIColors.BORDERS, 
+						EtchedBorder.LOWERED));
+		
+		return panel;
 	}
 
 	public void signalAll() {

@@ -22,11 +22,8 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import java.awt.Adjustable;
 import java.util.Observable;
 import java.util.Observer;
-
-import javax.swing.JScrollBar;
 
 import edu.stanford.genetics.treeview.*;
 import edu.stanford.genetics.treeview.model.KnnModel;
@@ -71,7 +68,7 @@ MainPanel, Observer  {
 	protected void setupViews() {
 		
 		DataModel knnModel = getDataModel();
-		statuspanel = new MessagePanel("Status", GUIColors.BLUE1);
+		statuspanel = new MessagePanel("Status", GUIColors.ELEMENT);
 		
 		ColorPresets colorPresets = DendrogramFactory.getColorPresets();
 		ColorExtractor colorExtractor = new ColorExtractor();

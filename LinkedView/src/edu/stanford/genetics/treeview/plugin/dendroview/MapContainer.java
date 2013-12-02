@@ -104,6 +104,44 @@ AdjustmentListener, ConfigNodePersistent {
     	minScale = pixels/divider;
     	setScale(minScale);
     }
+    
+    public void zoomOut() {
+		
+		double zoomVal = 0.5;
+		
+		if(this.getScale() <= 1.0) {
+			zoomVal = 0.1;
+			
+		} else if(this.getScale() <= 0.1) {
+			zoomVal = 0.01;
+		} 
+		
+		if(this.getScale() - zoomVal > this.getMinScale()) {
+			this.setScale(this.getScale() - zoomVal);
+			
+		} else {
+			this.setScale(this.getMinScale());
+		}
+	}
+	
+	public void zoomIn() {
+		
+		double zoomVal = 0.5;
+		
+		if(this.getScale() <= 1.0) {
+			zoomVal = 0.1;
+			
+		} else if(this.getScale() <= 0.1) {
+			zoomVal = 0.01;
+		} 
+		
+		if(this.getScale() + zoomVal > this.getMinScale()) {
+			this.setScale(this.getScale() + zoomVal);
+			
+		} else {
+			this.setScale(this.getMinScale());
+		}
+	}
 
 	public void recalculateScale() {
 	  

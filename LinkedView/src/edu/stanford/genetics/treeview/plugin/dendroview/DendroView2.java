@@ -122,11 +122,7 @@ MainPanel, Observer {
 	private JButton scaleIncY;
 	private JButton scaleDecX;
 	private JButton scaleDecY;
-	private JButton scaleDefaultX;
-	private JButton scaleDefaultY;
 	private JButton scaleDefaultAll;
-	
-	private double default_scale = 13.0;
 	
 	/**
 	 * Chained constructor
@@ -326,73 +322,58 @@ MainPanel, Observer {
 //		zoomview.setXMap(getZoomXmap());
 //		zoomview.setArrayDrawer(arrayDrawer);
 		
-		scaleDefaultAll = setZoomButtonLayout("Reset", GUIColors.BLUE1);
+		scaleDefaultAll = setZoomButtonLayout("Reset");
 		scaleDefaultAll.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				
 				getGlobalXmap().setHome();
 				getGlobalYmap().setHome();
 			}
 			
 		});
 		
-		scaleIncX = setZoomButtonLayout("+", GUIColors.BLUE1);
+		scaleIncX = setZoomButtonLayout("+");
 		scaleIncX.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				getGlobalXmap().setScale(getGlobalXmap().getScale() + 1);
+				
+				getGlobalXmap().zoomIn();
 			}
 			
 		});
 		
-		scaleDecX = setZoomButtonLayout("-", GUIColors.BLUE1);
+		scaleDecX = setZoomButtonLayout("-");
 		scaleDecX.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				getGlobalXmap().setScale(getGlobalXmap().getScale() - 1);
+				
+				getGlobalXmap().zoomOut();
 			}
 			
 		});
 		
-		scaleDefaultX = setZoomButtonLayout("Reset", GUIColors.BLUE1);
-		scaleDefaultX.addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				getGlobalXmap().setScale(default_scale);
-			}
-			
-		});
-		
-		scaleIncY = setZoomButtonLayout("+", GUIColors.BLUE1);
+		scaleIncY = setZoomButtonLayout("+");
 		scaleIncY.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				getGlobalYmap().setScale(getGlobalYmap().getScale() + 1);
+				
+				getGlobalYmap().zoomIn();
 			}
 			
 		});
 		
-		scaleDecY = setZoomButtonLayout("-", GUIColors.BLUE1);
+		scaleDecY = setZoomButtonLayout("-");
 		scaleDecY.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				getGlobalYmap().setScale(getGlobalYmap().getScale() - 1);
-			}
-			
-		});
-		
-		scaleDefaultY = setZoomButtonLayout("0", GUIColors.BLUE1);
-		scaleDefaultY.addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				getGlobalYmap().setScale(default_scale);
+				
+				getGlobalYmap().zoomOut();
 			}
 			
 		});
@@ -506,6 +487,8 @@ MainPanel, Observer {
 //		backgroundPane.setOneTouchExpandable(true);
 //		backgroundPane.setDividerLocation(MAIN_DIV_LOC);
 		
+		this.removeAll();
+		
 		backgroundPanel = new JPanel();
 		backgroundPanel.setLayout(new MigLayout());
 		backgroundPanel.setBackground(GUIColors.BG_COLOR);
@@ -554,7 +537,7 @@ MainPanel, Observer {
 //			}
 //		});
 		
-		closeButton = setButtonLayout("< Back", GUIColors.BLUE1);;
+		closeButton = setButtonLayout("< Back");;
   		closeButton.addActionListener(new ActionListener(){
 
 			@Override
@@ -610,28 +593,14 @@ MainPanel, Observer {
 		gtrPane.setDividerSize(DIVIDER_SIZE);
 		gtrPane.setDividerLocation(DIV_LOC);
 		gtrPane.setOpaque(false);
-//		gtrPane.setBackground(Color.white);
 		gtrPane.setBorder(null);
 		
 		atrPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
 				atrview, arraynameview);
 		atrPane.setDividerSize(DIVIDER_SIZE);
 		atrPane.setDividerLocation(DIV_LOC);
-//		atrPane.setBackground(Color.white);
 		atrPane.setOpaque(false);
 		atrPane.setBorder(null);
-		
-//		JPanel scalePaneX = new JPanel();
-//		scalePaneX.setLayout(new MigLayout());
-//		scalePaneX.setOpaque(false);
-//		
-//		JPanel scalePaneY = new JPanel();
-//		scalePaneY.setLayout(new MigLayout());
-//		scalePaneY.setOpaque(false);
-		
-//		JPanel filler = new JPanel();
-//		filler.setLayout(new MigLayout());
-//		filler.setOpaque(false);
 		
 		//Register Views
 		registerView(globalview);
@@ -641,20 +610,6 @@ MainPanel, Observer {
 		registerView(arraynameview);
 //		registerView(zoomview);
 		registerView(textview);
-		
-		//Adding Components
-//		scalePaneX.add(scaleIncX);
-//		scalePaneX.add(scaleDecX);
-//		scalePaneX.add(scaleDefaultX);
-//		
-//		scalePaneY.add(scaleIncY, "alignx 50%, wrap");
-//		scalePaneY.add(scaleDecY, "alignx 50%, wrap");
-//		scalePaneY.add(scaleDefaultY, "alignx 50%");
-//		scalePaneY.add(scaleDefaultAll, "alignx 50%");
-		
-//		gtrPanel.add(gtrview, BorderLayout.CENTER);
-//		gtrPanel.add(new JScrollBar(Adjustable.HORIZONTAL, 0, 1, 0, 1), 
-//				BorderLayout.SOUTH);
 		
 		panel.add(globalview, "grow, push");	
 		panel.add(globalYscrollbar, "pushy, growy, wrap");
@@ -693,6 +648,15 @@ MainPanel, Observer {
 //		downSide.add(scalePaneX, "pushx, span");
 
 		this.add(backgroundPanel, "push, grow");
+		
+		this.revalidate();
+		this.repaint();
+	}
+	
+	@Override
+	public void refresh() {
+		
+		doDoubleLayout();
 	}
 	
 	//Methods
@@ -1159,8 +1123,6 @@ MainPanel, Observer {
 		}
 	}
     
-
-
 	/**
 	* this is meant to be called from setupViews.
 	* It make sure that the trees are generated from the current model,
@@ -2189,8 +2151,8 @@ MainPanel, Observer {
 	 * @param button
 	 * @return
 	 */
-	public JButton setButtonLayout(String title, Color color){
-
+	public JButton setButtonLayout(String title){
+		
 		Font buttonFont = new Font("Sans Serif", Font.PLAIN, 14);
 		
 		JButton button = new JButton(title);
@@ -2200,8 +2162,8 @@ MainPanel, Observer {
   		
   		button.setFont(buttonFont);
   		button.setOpaque(true);
-  		button.setBackground(color);
-  		button.setForeground(Color.white);
+  		button.setBackground(GUIColors.ELEMENT);
+  		button.setForeground(GUIColors.BG_COLOR);
   		
   		return button;
 	}
@@ -2212,7 +2174,7 @@ MainPanel, Observer {
 	 * @param button
 	 * @return
 	 */
-	public JButton setZoomButtonLayout(String title, Color color){
+	public JButton setZoomButtonLayout(String title){
 
 		int buttonHeight = 30;
 		int buttonWidth = 30;
@@ -2227,8 +2189,8 @@ MainPanel, Observer {
   	
   		button.setFont(buttonFont);
   		button.setOpaque(true);
-  		button.setBackground(color);
-  		button.setForeground(Color.white);
+  		button.setBackground(GUIColors.ELEMENT);
+  		button.setForeground(GUIColors.BG_COLOR);
   		
   		return button;
 	}

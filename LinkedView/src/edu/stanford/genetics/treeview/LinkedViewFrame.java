@@ -132,13 +132,8 @@ public class LinkedViewFrame extends TreeViewFrame implements Observer {
 		 FileSet fileSet = getDataModel().getFileSet();
 		 LogBuffer.println("FileSet Type LinkedViewFrame: " 
 		 + fileSet.getStyle()); //Auto
-		 
-		 if (fileSet == null) {
-		 	//default to linked
-		 	fileSet = new FileSet(null,null);
-		 	fileSet.setStyle(FileSet.LINKED_STYLE);
 		 	
-		 } else if (fileSet.getStyle() == FileSet.AUTO_STYLE) {
+		 if (fileSet.getStyle() == FileSet.AUTO_STYLE) {
 			 if (getDataModel().getDocumentConfigRoot().fetchFirst("Views") //Problem
 					 != null) {
 				 fileSet.setStyle(FileSet.LINKED_STYLE);
@@ -157,6 +152,10 @@ public class LinkedViewFrame extends TreeViewFrame implements Observer {
 					
 				 }
 			 }
+		 } else {
+			 //default to linked
+			 fileSet = new FileSet(null,null);
+			 fileSet.setStyle(FileSet.LINKED_STYLE);
 		 }
 		 
 		 
@@ -187,6 +186,7 @@ public class LinkedViewFrame extends TreeViewFrame implements Observer {
 					 break;
 				 }
 			 }
+			 
 		 } else {
 			 //make sure selection objects are set up before instantiating 
 			 //plugins

@@ -71,7 +71,7 @@ MainPanel, Observer  {
 	protected void setupViews() {
 		
 		DataModel knnModel = getDataModel();
-		statuspanel = new MessagePanel("View Status", GUIColors.BLUE1);
+		statuspanel = new MessagePanel("View Status", GUIColors.ELEMENT);
 
 
 		ColorPresets colorPresets = DendrogramFactory.getColorPresets();

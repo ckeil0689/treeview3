@@ -59,7 +59,7 @@ public class SSMouseListener implements MouseListener{
 	@Override
 	public void mouseEntered(MouseEvent arg0) {
 		
-		label.setForeground(GUIColors.BLUE2);
+		label.setForeground(GUIColors.ELEMENT_HOV);
 		label.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
 		if(panel != null) {
@@ -75,7 +75,7 @@ public class SSMouseListener implements MouseListener{
 	@Override
 	public void mouseExited(MouseEvent arg0) {
 		
-		label.setForeground(GUIColors.BLUE1);
+		label.setForeground(GUIColors.ELEMENT);
 		label.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 		
 		if(panel != null) {
@@ -101,7 +101,7 @@ public class SSMouseListener implements MouseListener{
 	@Override
 	public void mouseReleased(MouseEvent arg0) {
 		
-		label.setForeground(GUIColors.BLUE1);
+		label.setForeground(GUIColors.ELEMENT);
 	}
 
 }

@@ -663,12 +663,12 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 			getYMap().scrollBy(shift);
 			break;
 		case KeyEvent.VK_MINUS:
-			zoomOut(getXMap());
-			zoomOut(getYMap());
+			getXMap().zoomOut();
+			getYMap().zoomOut();
 			break;
 		case KeyEvent.VK_EQUALS:
-			zoomIn(getXMap());
-			zoomIn(getYMap());
+			getXMap().zoomIn();
+			getYMap().zoomIn();
 			break;
 		}	
 		
@@ -765,54 +765,16 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 			}
 		} else {
 			if(notches < 0) {
-				zoomIn(getXMap());
-				zoomIn(getYMap());
+				getXMap().zoomIn();
+				getYMap().zoomIn();
 				
 //				getXMap().scrollToIndex(mouseXY.x);
 //				getYMap().scrollToIndex(mouseXY.y);
 				
 			} else {
-				zoomOut(getXMap());
-				zoomOut(getYMap());
+				getXMap().zoomOut();
+				getYMap().zoomOut();
 			}
-		}
-	}
-	
-	private void zoomOut(MapContainer mc) {
-		
-		double zoomVal = 0.5;
-		
-		if(mc.getScale() <= 1.0) {
-			zoomVal = 0.1;
-			
-		} else if(mc.getScale() <= 0.1) {
-			zoomVal = 0.01;
-		} 
-		
-		if(mc.getScale() - zoomVal > mc.getMinScale()) {
-			mc.setScale(mc.getScale() - zoomVal);
-			
-		} else {
-			mc.setScale(mc.getMinScale());
-		}
-	}
-	
-	private void zoomIn(MapContainer mc) {
-		
-		double zoomVal = 0.5;
-		
-		if(mc.getScale() <= 1.0) {
-			zoomVal = 0.1;
-			
-		} else if(mc.getScale() <= 0.1) {
-			zoomVal = 0.01;
-		} 
-		
-		if(mc.getScale() + zoomVal > mc.getMinScale()) {
-			mc.setScale(mc.getScale() + zoomVal);
-			
-		} else {
-			mc.setScale(mc.getMinScale());
 		}
 	}
 	

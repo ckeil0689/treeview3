@@ -34,6 +34,7 @@ import javax.swing.ImageIcon;
  */
 public interface MainPanel {
 	
+	public void refresh();
 	/**
 	 *  This syncronizes the sub compnents with their persistent storage.
 	 */

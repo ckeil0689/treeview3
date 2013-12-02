@@ -11,23 +11,26 @@ import edu.stanford.genetics.treeview.*;
 
 public class MenuHelpPluginsFrame extends JDialog {
 
+	private static final long serialVersionUID = 1L;
+
 	private JTextField tf_dir = new JTextField();
 
 	private JLabel l_pluginlist = new JLabel("");
-
-
 
 	/*
 	 * EFFECTS: Sets <l_pluginslist> text to currently loaded plugins RETURNS: #
 	 * of plugins loaded
 	 */
 	private int setLabelText() {
-		final PluginFactory[] plugins = PluginManager.getPluginManager().getPluginFactories();
+		
+		final PluginFactory[] plugins = PluginManager.getPluginManager()
+				.getPluginFactories();
 		String s = null;
 		int height = 0;
 		if (plugins == null || plugins.length == 0) {
 			s = "No Plugins Found";
 			height = 1;
+			
 		} else {
 			s = "<html><br><ol>";
 			for (int i = 0; i < plugins.length; i++) {
@@ -45,11 +48,13 @@ public class MenuHelpPluginsFrame extends JDialog {
 	 * @param url
 	 */
 	public void setSourceText(String url) {
+		
 		tf_dir.setText(url);
 		MenuHelpPluginsFrame.this.pack();
 	}
 
 	public MenuHelpPluginsFrame(String string, final TreeViewFrame frame) {
+		
 		super(frame, string, false);
 		GridBagLayout gridbag = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();
@@ -66,6 +71,7 @@ public class MenuHelpPluginsFrame extends JDialog {
 		b_browse.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				
 				JFileChooser chooser = new JFileChooser();
 				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			    int returnVal = chooser.showOpenDialog(MenuHelpPluginsFrame.this);
@@ -80,16 +86,19 @@ public class MenuHelpPluginsFrame extends JDialog {
 		
 		JButton b_scan = new JButton("Scan new plugins");
 		b_scan.addActionListener(new ActionListener() {
+			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				File[] files = PluginManager.getPluginManager().readdir(tf_dir.getText());
+				File[] files = PluginManager.getPluginManager().readdir(
+						tf_dir.getText());
 				if (files == null || files.length == 0) {
 					JOptionPane.showMessageDialog(MenuHelpPluginsFrame.this, 
 							"Directory contains no plugins");
 				} else {
 					PluginManager.getPluginManager().loadPlugins(files, true);
 				}
-				PluginManager.getPluginManager().pluginAssignConfigNodes(frame.getApp().getGlobalConfig().getNode("Plugins"));
+				PluginManager.getPluginManager().pluginAssignConfigNodes(
+						frame.getApp().getGlobalConfig().getNode("Plugins"));
 				setLabelText();
 				MenuHelpPluginsFrame.this.validate();
 				frame.rebuildMainPanelMenu();

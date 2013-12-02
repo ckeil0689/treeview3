@@ -417,8 +417,8 @@ public class LoadProgress2 extends JDialog implements LoadProgress2I {
   		
   		button.setFont(buttonFont);
   		button.setOpaque(true);
-  		button.setBackground(GUIColors.BLUE1);
-  		button.setForeground(Color.white);
+  		button.setBackground(GUIColors.ELEMENT);
+  		button.setForeground(GUIColors.BG_COLOR);
   		
   		return button;
 	}
@@ -437,7 +437,7 @@ public class LoadProgress2 extends JDialog implements LoadProgress2I {
 		pBar.setMinimum(0);
 		pBar.setStringPainted(true);
 		pBar.setMaximumSize(d);
-		pBar.setForeground(GUIColors.BLUE1);
+		pBar.setForeground(GUIColors.ELEMENT);
 		pBar.setUI(new BasicProgressBarUI(){
 			@Override
 			protected Color getSelectionBackground(){return Color.black;};

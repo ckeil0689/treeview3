@@ -1,6 +1,5 @@
 package edu.stanford.genetics.treeview;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -59,7 +58,6 @@ class LoadCheckView extends JPanel {
 	public LoadCheckView(DataModel dataModel, final TreeViewFrame viewFrame) {
 		
 		this.setLayout(new MigLayout());
-		this.setOpaque(false);
 		this.setBackground(GUIColors.BG_COLOR);
 		
 		feedbackPanel = new JPanel();
@@ -167,7 +165,7 @@ class LoadCheckView extends JPanel {
 			
 			loadNewButton = new JButton("Load New File");
 			setButtonLayout(loadNewButton);
-			loadNewButton.setBackground(GUIColors.BLUE1);
+			loadNewButton.setBackground(GUIColors.ELEMENT);
 			loadNewButton.addActionListener(new ActionListener(){
 	
 				@Override
@@ -196,8 +194,8 @@ class LoadCheckView extends JPanel {
   		
   		button.setFont(fontS);
   		button.setOpaque(true);
-  		button.setBackground(GUIColors.BLUE1);
-  		button.setForeground(Color.white);
+  		button.setBackground(GUIColors.ELEMENT);
+  		button.setForeground(GUIColors.BG_COLOR);
   		
   		return button;
 	}

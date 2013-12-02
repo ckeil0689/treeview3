@@ -227,4 +227,10 @@ public class TreeAnnoPanel extends JPanel implements MainPanel {
 		throw new ExportException("Export not implemented for plugin " + getName());
 	}
 
+	@Override
+	public void refresh() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

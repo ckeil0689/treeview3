@@ -250,7 +250,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		//header
 		head1 = new JLabel("Options");
 		head1.setFont(fontL);
-		head1.setForeground(GUIColors.BLUE1);
+		head1.setForeground(GUIColors.ELEMENT);
 		
 		clusterType = setComboLayout(clusterNames);
 		clusterType.addActionListener(new ActionListener(){
@@ -287,11 +287,11 @@ public class ClusterView extends JPanel implements MainPanel {
 		//Labels
 		head2 = new JLabel("Rows");
 		head2.setFont(fontL);
-		head2.setForeground(GUIColors.BLUE1);
+		head2.setForeground(GUIColors.ELEMENT);
 		
 		head3 = new JLabel("Columns");
 		head3.setFont(fontL);
-		head3.setForeground(GUIColors.BLUE1);
+		head3.setForeground(GUIColors.ELEMENT);
 		 
 		//Drop-down menu for row selection
   		geneCombo = setComboLayout(measurements);
@@ -562,6 +562,14 @@ public class ClusterView extends JPanel implements MainPanel {
 		
 		//Add the scrollPane to ClusterView2 Panel
 		this.add(scrollPane, "grow, push");
+		
+		this.revalidate();
+		this.repaint();
+	}
+	
+	public void refresh() {
+		
+		setupLayout();
 	}
 	
 	//Layout setups for some Swing elements
@@ -582,28 +590,31 @@ public class ClusterView extends JPanel implements MainPanel {
 	 */
 	public void setOptionsPanel() {
 		
-  		optionsPanel.add(emptyPanel, "pushx");
-  		optionsPanel.add(head2, "alignx 50%, pushx");
-  		optionsPanel.add(head3, "alignx 50%, pushx, wrap");
+  		optionsPanel.add(emptyPanel, "pushx, height 15%::");
+  		optionsPanel.add(head2, "alignx 50%, pushx, height 15%::");
+  		optionsPanel.add(head3, "alignx 50%, pushx, height 15%::, wrap");
   		
-  		optionsPanel.add(similarity, "pushx");
-  		optionsPanel.add(geneCombo, "alignx 50%, pushx");
-  		optionsPanel.add(arrayCombo,"alignx 50%, pushx, wrap");
+  		optionsPanel.add(similarity, "pushx, height 20%::");
+  		optionsPanel.add(geneCombo, "alignx 50%, pushx, growx, height 15%::");
+  		optionsPanel.add(arrayCombo,"alignx 50%, pushx, growx, " +
+  				"height 15%::, wrap");
   		
   		if(isHierarchical()) {
 	  		
-			optionsPanel.add(method, "pushx");
-			optionsPanel.add(clusterChoice, "alignx 50%, width 20%");
-			optionsPanel.add(infoIcon, "pushx, wrap");
+			optionsPanel.add(method, "pushx, height 15%::");
+			optionsPanel.add(clusterChoice, "alignx 50%, growx, " +
+					"height 15%::, width 20%");
+			optionsPanel.add(infoIcon, "pushx, height 15%::, wrap");
 			
 		} else {
 			
-			optionsPanel.add(clusters, "pushx");
-			optionsPanel.add(enterRC, "alignx 50%, pushx");
-			optionsPanel.add(enterCC, "alignx 50%, pushx, wrap");
-			optionsPanel.add(its, "pushx");
-			optionsPanel.add(enterRIt, "alignx 50%, pushx");
-			optionsPanel.add(enterCIt, "alignx 50%, pushx, wrap");
+			optionsPanel.add(clusters, "pushx, growx, height 15%::");
+			optionsPanel.add(enterRC, "alignx 50%, pushx, height 15%::");
+			optionsPanel.add(enterCC, "alignx 50%, pushx, height 15%::, wrap");
+			
+			optionsPanel.add(its, "pushx, height 15%::");
+			optionsPanel.add(enterRIt, "alignx 50%, pushx, height 15%::");
+			optionsPanel.add(enterCIt, "alignx 50%, pushx, height 15%::, wrap");
 		}
 	}
 	
@@ -621,8 +632,8 @@ public class ClusterView extends JPanel implements MainPanel {
   		
   		button.setFont(fontS);
   		button.setOpaque(true);
-  		button.setBackground(GUIColors.BLUE1);
-  		button.setForeground(Color.white);
+  		button.setBackground(GUIColors.ELEMENT);
+  		button.setForeground(GUIColors.BG_COLOR);
   		
   		return button;
 	}
@@ -657,7 +668,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		pBar.setMinimum(0);
 		pBar.setStringPainted(true);
 		pBar.setMaximumSize(new Dimension(2000, 40));
-		pBar.setForeground(GUIColors.BLUE1);
+		pBar.setForeground(GUIColors.ELEMENT);
 		pBar.setUI(new BasicProgressBarUI(){
 			@Override
 			protected Color getSelectionBackground(){return Color.black;};

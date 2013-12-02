@@ -313,7 +313,7 @@ public class ClusterFrame extends JFrame{
 		
 		JLabel head = new JLabel(closedText);
 		head.setFont(new Font("Sans Serif", Font.PLAIN, 28));
-		head.setForeground(GUIColors.BLUE1);
+		head.setForeground(GUIColors.ELEMENT);
 		
 		return head;
 	}
@@ -392,7 +392,7 @@ public class ClusterFrame extends JFrame{
 			@Override
 			public void mouseExited(MouseEvent arg0) {
 
-					title.setForeground(GUIColors.BLUE1);
+					title.setForeground(GUIColors.ELEMENT);
 					title.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
 

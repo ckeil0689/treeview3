@@ -1,6 +1,5 @@
 package edu.stanford.genetics.treeview;
 
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.MouseEvent;
 
@@ -66,7 +65,7 @@ public class ClickableLabel extends JPanel {
 		
 		label = new JLabel(labelText);
 		label.setFont(new Font("Sans Serif", Font.PLAIN, 50));
-		label.setForeground(GUIColors.BLUE1);
+		label.setForeground(GUIColors.ELEMENT);
 
 		this.add(label, "pushx, span, alignx 50%");
 		this.addMListener(label, tvModel_gen);
