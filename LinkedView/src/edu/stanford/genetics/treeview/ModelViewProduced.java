@@ -36,12 +36,12 @@ public abstract class ModelViewProduced extends ModelView {
 
 	private static final long serialVersionUID = 1L;
 	
-	protected int []	   offscreenPixels = null;
+	protected int [] offscreenPixels = null;
 	protected MemoryImageSource offscreenSource = null;
-    protected Image        offscreenBuffer = null;
-    protected Graphics     offscreenGraphics = null;
+    protected Image offscreenBuffer = null;
+    protected Graphics offscreenGraphics = null;
 	protected int offscreenScanSize = 0;
-    protected boolean      rotateOffscreen = false;
+    protected boolean rotateOffscreen = false;
 
 
     protected ModelViewProduced() {
@@ -56,14 +56,22 @@ public abstract class ModelViewProduced extends ModelView {
 	* it's generated from a pixels array... hmm...
 	*/
 	protected void ensureCapacity(Dimension req) {
+		
 		if (offscreenBuffer == null) {
 			createNewBuffer(req.width, req.height);
+			
 		} else {
 			int w = offscreenBuffer.getWidth(null);
 			int h = offscreenBuffer.getHeight(null);
 			if ((w < req.width) || (h < req.height)) {
-				if (w < req.width) { w = req.width;}
-				if (h < req.height) { h = req.height;}
+				if (w < req.width) { 
+					w = req.width;
+				}
+				
+				if (h < req.height) { 
+					h = req.height;
+				}
+			
 				// should I try to free something?
 				createNewBuffer(w,h);
 			}
@@ -71,6 +79,7 @@ public abstract class ModelViewProduced extends ModelView {
     }
 
 	private synchronized void createNewBuffer(int w, int h) {
+		
 		// should I be copy over pixels instead?
 		offscreenPixels = new int[w * h];
 		offscreenScanSize = w;
@@ -78,6 +87,7 @@ public abstract class ModelViewProduced extends ModelView {
 		offscreenSource.setAnimated(true);
 		offscreenBuffer = createImage(offscreenSource);
 	}
+	
     /* 
      * The double buffer in Swing
      * doesn't seem to be persistent across draws. for instance, every
@@ -89,31 +99,36 @@ public abstract class ModelViewProduced extends ModelView {
      */
 	 @Override
 	public synchronized void paintComponent(Graphics g) {
+		 
 		 //Rectangle clip = g.getClipBounds();
 		 //	System.out.println("Entering " + viewName() + " to clip " + clip );
 		 
 		 Dimension newsize = getSize();
-		 if (newsize == null) { return;}
+		 if (newsize == null) { 
+			 return;
+		 }
 		 
 		 Dimension reqSize;
 		 reqSize = newsize;
 		 // monitor size changes
 		 if ((offscreenBuffer == null) ||
-			 (reqSize.width != offscreenSize.width) ||
-			 (reqSize.height != offscreenSize.height)) {
-				 
+			 (reqSize.width != offscreenSize.width)
+			 || (reqSize.height != offscreenSize.height)) {
 			 offscreenSize = reqSize;
 			 ensureCapacity(offscreenSize);
 			 offscreenChanged = true;
 			 offscreenValid = false;
+			 
 		 } else {
 			 offscreenChanged = false;
 		 }
+		 
 		 // update offscreenBuffer if necessary
 		 int backgoundInt = (255 << 24) | (255 << 16) | (255 << 8) | 255;
 		 for (int i =0; i < offscreenPixels.length; i++) {
 			 offscreenPixels[i] = backgoundInt;
 		 }
+		 
 		 if (isEnabled()) {
 			 if ((offscreenSize.width > 0) && (offscreenSize.height > 0)) {
 				 updatePixels();

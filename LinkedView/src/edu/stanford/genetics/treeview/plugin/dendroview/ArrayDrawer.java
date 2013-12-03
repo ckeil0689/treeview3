@@ -24,8 +24,8 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.*;
 import java.util.*;
-
 import edu.stanford.genetics.treeview.*;
+
 /**
  *  Class for Drawing A Colored Grid Representation of a Matrix.
  *
@@ -48,6 +48,8 @@ import edu.stanford.genetics.treeview.*;
  */
 public abstract class ArrayDrawer extends Observable implements Observer {
 
+	private ConfigNode root;
+	
 	/**
 	 *  Get Color for a given array element
 	 *
@@ -76,19 +78,25 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 	public abstract int getNumCol();
 
 	/**
-	 *  Paint the array values onto pixels. This method will do averaging if multiple
-	 *  values map to the same pixel.
+	 *  Paint the array values onto pixels. This method will do averaging 
+	 *  if multiple values map to the same pixel.
 	 *
 	 * @param  pixels    The pixel buffer to draw to.
 	 * @param  source    Specifies Rectangle of values to draw from
 	 * @param  dest      Specifies Rectangle of pixels to draw to
-	 * @param  scanSize  The scansize for the pixels array (in other words, the width of the image)
-	 * @param  geneOrder the order of the genes. The source rect y values are taken to mean indexes into this array. If the gene order is null, the indexes from the source rect are used as indexes into the data matrix.
+	 * @param  scanSize  The scansize for the pixels array 
+	 * (in other words, the width of the image)
+	 * @param  geneOrder the order of the genes. The source rect y values 
+	 * are taken to mean indexes into this array. If the gene order is null, 
+	 * the indexes from the source rect are used as indexes 
+	 * into the data matrix.
 	 */
-	public abstract void paint(int[] pixels, Rectangle source, Rectangle dest, int scanSize, int [] geneOrder);
+	public abstract void paint(int[] pixels, Rectangle source, Rectangle dest, 
+			int scanSize, int [] geneOrder);
 
 	/**  Constructor does nothing but set defaults  */
 	public ArrayDrawer() {
+		
 		setDefaults();
 	}
 
@@ -99,6 +107,7 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 	 * @param  configNode  confignode to bind to
 	 */
 	public void bindConfig(ConfigNode configNode) {
+		
 		root = configNode;
 	}
 
@@ -108,9 +117,12 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 	 * @param  g       The Graphics element to draw on
 	 * @param  source  Specifies Rectangle of values to draw from
 	 * @param  dest    Specifies Rectangle of pixels to draw to
-	 * @param geneOrder a desired reordered subset of the genes, or null if you want order from cdt.
+	 * @param geneOrder a desired reordered subset of the genes, 
+	 * or null if you want order from cdt.
 	 */
-	public void paint(Graphics g, Rectangle source, Rectangle dest, int [] geneOrder) {
+	public void paint(Graphics g, Rectangle source, Rectangle dest, 
+			int [] geneOrder) {
+		
 		int ynext  = dest.y;
 		for (int j = 0; j < source.height; j++) {
 			int ystart  = ynext;
@@ -124,13 +136,17 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 				int height  = ynext - ystart;
 				if ((width > 0) && (height > 0)) {
 					try {
-							int actualGene = source.y + j;
-							if (geneOrder != null) actualGene = geneOrder[actualGene];
+						int actualGene = source.y + j;
+						if (geneOrder != null) {
+							actualGene = geneOrder[actualGene];
+						}
 						Color t_color  = getColor(i + source.x,actualGene);
 						g.setColor(t_color);
 						g.fillRect(xstart, ystart, width, height);
+						
 					} catch (java.lang.ArrayIndexOutOfBoundsException e) {
-						//			System.out.println("out of bounds, " + (i + source.x) + ", " + (j + source.y));
+//						System.out.println("out of bounds, " + (i + source.x) 
+//								+ ", " + (j + source.y));
 					}
 				}
 			}
@@ -145,9 +161,12 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 	 * @param  pixels    The pixel buffer to draw to.
 	 * @param  source    Specifies Rectangle of values to draw from
 	 * @param  dest      Specifies Rectangle of pixels to draw to
-	 * @param  scanSize  The scansize for the pixels array (in other words, the width of the image)
+	 * @param  scanSize  The scansize for the pixels array 
+	 * (in other words, the width of the image)
 	 */
-	public void paint(int[] pixels, Rectangle source, Rectangle dest, int scanSize) {
+	public void paint(int[] pixels, Rectangle source, Rectangle dest, 
+			int scanSize) {
+		
 		paint(pixels, source, dest, scanSize, null);
 	}
 
@@ -161,16 +180,22 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 	 * @param  ymap  Mapping from indexes to pixels
 	 * @param  x     x coordinate of data in array
 	 * @param  y     y coordinate of data in array
-	 * @param geneOrder a desired reordered subset of the genes, or null if you want order from cdt.
+	 * @param geneOrder a desired reordered subset of the genes, 
+	 * or null if you want order from cdt.
 	 */
 	public void paintPixel(Graphics g, MapContainer xmap, MapContainer ymap,
 			int x, int y, int [] geneOrder) {
+		
 		try {
-							int actualGene =ymap.getIndex(y);
-							if (geneOrder != null) actualGene = geneOrder[actualGene];
+			int actualGene =ymap.getIndex(y);
+			if (geneOrder != null) {
+				actualGene = geneOrder[actualGene];
+			}
+			
 			Color t_color  = getColor(xmap.getIndex(x), actualGene);
 			g.setColor(t_color);
 			g.fillRect(x, y, 1, 1);
+			
 		} catch (java.lang.ArrayIndexOutOfBoundsException e) {
 		}
 	}
@@ -185,15 +210,18 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 	 */
 	 @Override
 	public void update(Observable o, Object arg) {
+		 
 		 setChanged();
 		 notifyObservers();
 	 }
 
-	private ConfigNode root;
 	public ConfigNode getRoot() {
+		
 		return root;
 	}
+	
 	public void setRoot(ConfigNode root) {
+		
 		this.root = root;
 	}
 }

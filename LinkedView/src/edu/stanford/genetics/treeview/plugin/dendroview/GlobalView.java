@@ -26,6 +26,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.Observable;
 
+import javax.swing.SwingUtilities;
+
 import net.miginfocom.swing.MigLayout;
 
 import edu.stanford.genetics.treeview.*;
@@ -42,7 +44,7 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 	protected MapContainer ymap;
 //    protected MapContainer zoomXmap;
 //    protected MapContainer zoomYmap;
-    
+	private String [] statustext = new String [] {"Mouseover Selection","",""};
 	private HeaderInfo arrayHI;
 	private HeaderInfo geneHI;
     private ArrayDrawer drawer;
@@ -99,30 +101,76 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
     	return p;
     }
 
+//    @Override
+//	public String[] getStatus() {
+//	  
+//    	String [] status = new String[4];
+//    	if ((geneSelection == null) || (arraySelection == null)) {
+//    		status[0] = "ERROR: GlobalView improperly configured";
+//    		status[1] = " geneSelection is null";
+//    		status[2] = " thus, gene selection will not work.";
+//    		status[3] = "";
+//    		
+//    	} else {
+//    		int sx = arraySelection.getMinIndex();
+//    		int ex = arraySelection.getMaxIndex();
+//		  
+//    		int sy = geneSelection.getMinIndex();
+//    		int ey = geneSelection.getMaxIndex();
+//		  
+//    		status[0] = (ey - sy + 1)  + " genes selected";
+//    		status[1] = (ex - sx + 1) + " arrays selected";
+//    		status[2] = "Genes from " + sy + " to " + ey;
+//    		status[3] = "Arrays from " + sx + " to " + ex;
+//    	}
+//    	
+//    	return status;
+//    }
+    
     @Override
 	public String[] getStatus() {
-	  
-    	String [] status = new String[4];
-    	if ((geneSelection == null) || (arraySelection == null)) {
-    		status[0] = "ERROR: GlobalView improperly configured";
-    		status[1] = " geneSelection is null";
-    		status[2] = " thus, gene selection will not work.";
-    		status[3] = "";
-    		
-    	} else {
-    		int sx = arraySelection.getMinIndex();
-    		int ex = arraySelection.getMaxIndex();
-		  
-    		int sy = geneSelection.getMinIndex();
-    		int ey = geneSelection.getMaxIndex();
-		  
-    		status[0] = (ey - sy + 1)  + " genes selected";
-    		status[1] = (ex - sx + 1) + " arrays selected";
-    		status[2] = "Genes from " + sy + " to " + ey;
-    		status[3] = "Arrays from " + sx + " to " + ex;
-    	}
     	
-    	return status;
+    	try {
+			if (xmap.contains(overx) 
+					&& ymap.contains(overy)) {
+				statustext[0] = "Row:    " + (overy + 1);
+				
+				if (geneHI != null) {
+					int realGene = overy;
+					try {
+						statustext[0] += " (" + geneHI.getHeader(realGene, 1)
+								+ ")";
+						
+					} catch (java.lang.ArrayIndexOutOfBoundsException e) {
+						statustext[0] += " (N/A)";
+					}
+				}
+				statustext[1] = "Column: " + (overx + 1);
+				if (arrayHI != null) {
+					try {
+						statustext[1] += " (" + arrayHI.getHeader(overx, 0) 
+								+ ")";
+						
+					} catch (java.lang.ArrayIndexOutOfBoundsException e) {
+						statustext[1] += " (N/A)";
+					}
+				}
+				
+				if (drawer.isMissing(overx, overy)) {
+					statustext[2] = "Value:  No Data";	
+					
+				} else if (drawer.isEmpty(overx, overy)) {
+					statustext[2] = "";
+					
+				} else {
+					statustext[2] = "Value:  " + drawer.getSummary(overx, 
+							overy);
+				}
+			}
+		} catch (ArrayIndexOutOfBoundsException ex) {
+			// ignore silently?
+		}
+    	return statustext;
     }
 
     /** 
@@ -377,10 +425,7 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		
 		if ((geneSelection == null) || (arraySelection == null)) {
 			return;
-			
-		} else {
 		}
-		
 		
 		int spx, spy, epx, epy;
 		spx = xmap.getPixel(arraySelection.getMinIndex());
@@ -402,6 +447,9 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		} else {
 			selectionRect.setBounds(spx, spy, epx - spx, epy - spy);
 		}
+		
+		revalidate();
+		repaint();
 	}
 
 //    protected void recalculateZoom() {
@@ -529,16 +577,23 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		mouseDragged(e);
 		drawBand(dragRect);	
 		
-		if (e.isShiftDown()) {
-		    Point start = new Point(xmap.getMinIndex(), ymap.getMinIndex());
-				    //startPoint.y);
-		    Point end = new Point(xmap.getMaxIndex(), ymap.getMaxIndex());
-				 //endPoint.y);
-		    selectRectangle(start, end);
-		    
+		if(SwingUtilities.isLeftMouseButton(e)) {
+			if (e.isShiftDown()) {
+			    Point start = new Point(xmap.getMinIndex(), ymap.getMinIndex());
+					    //startPoint.y);
+			    Point end = new Point(xmap.getMaxIndex(), ymap.getMaxIndex());
+					 //endPoint.y);
+			    selectRectangle(start, end);
+			    
+			} else {
+				selectRectangle(startPoint, endPoint);
+			}
 		} else {
-			selectRectangle(startPoint, endPoint);
+			selectAndZoom(startPoint, endPoint);
 		}
+		
+		revalidate();
+		repaint();
     }
     
     // MouseMotionListener
@@ -570,9 +625,11 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		int oovery = overy;
 		overx = xmap.getIndex(e.getX());
 		overy = ymap.getIndex(e.getY());
-		if (oovery != overy || ooverx != overx)
-		    if (status != null) 
-			status.setMessages(getStatus());
+		if (oovery != overy || ooverx != overx) {
+			if (status != null) {
+		    	status.setMessages(getStatus());
+		    }
+		}
     }
     
     @Override
@@ -670,7 +727,10 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 			getXMap().zoomIn();
 			getYMap().zoomIn();
 			break;
-		}	
+		}
+		
+		revalidate();
+		repaint();
 		
 //		int c = e.getKeyCode();
 //		startPoint.setLocation(arraySelection.getMinIndex(), 
@@ -748,6 +808,10 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 //		selectRectangle(startPoint, endPoint);
 	}
 	
+	/**
+	 * Zooming when the mouse wheel is used in conjunction with the shift key.
+	 * Vertical scrolling if the shift key is not pressed.
+	 */
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		
@@ -776,8 +840,16 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 				getYMap().zoomOut();
 			}
 		}
+		
+		revalidate();
+		repaint();
 	}
 	
+	/**
+	 * Selecting a rectangular area in GlobalView
+	 * @param start
+	 * @param end
+	 */
 	private void selectRectangle(Point start, Point end) {
 		
 		// sort so that ep is upper left corner
@@ -812,6 +884,20 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 			arraySelection.setIndex(i, true);
 		}
 		
+		geneSelection.notifyObservers();
+		arraySelection.notifyObservers();	
+	}
+	
+	/**
+	 * When the right mouse button is used to select a rectangle in GlobalView,
+	 * the view will be zoomed to the area that has been selected.
+	 * @param start
+	 * @param end
+	 */
+	public void selectAndZoom(Point start, Point end) {
+		
+		selectRectangle(start, end);
+		
 		//Zooming in when making a selection
 		double scaleFactor = 1;
 		
@@ -824,29 +910,29 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		double currentYScale = getYMap().getScale();
 		
 		if(currentXScale <= 10 && currentYScale <= 10) {
-			scaleFactor = 3;
+			scaleFactor = 2;
 			
 		} else if(currentXScale <= 30 && currentYScale <= 30) {
-			scaleFactor = 2;
+			scaleFactor = 1.5;
 			
 		} else {
 			scaleFactor = 1;
 		}
+		
 		newScale = currentXScale * scaleFactor;
 		getXMap().setScale(newScale);
 		
 		newScale2 = currentYScale * scaleFactor;
 		getYMap().setScale(newScale2);
 		
+		//Scrolling to remain in the selected area when updating scale (zoom)
 		if(scaleFactor > 1) {
-			scrollX = (start.x);
-			scrollY = (start.y);
+			scrollX = (end.x + start.x)/2;
+			scrollY = (end.y + start.y)/2;
+			
 			getXMap().scrollToIndex(scrollX);
 			getYMap().scrollToIndex(scrollY);
 		}
-		
-		geneSelection.notifyObservers();
-		arraySelection.notifyObservers();	
 	}
 	
 	public void setHeaders(HeaderInfo ghi, HeaderInfo ahi) {

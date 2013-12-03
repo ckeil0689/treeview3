@@ -65,11 +65,14 @@ MainPanel, Observer {
 	
 	//Static Variables
 	private static final long serialVersionUID = 1L;
+	
+	private static Font fontS = new Font("Sans Serif", Font.PLAIN, 18);
+	private static Font fontL = new Font("Sans Serif", Font.PLAIN, 24);
 	private static ImageIcon treeviewIcon = null;
 	
 	//Instance Variables
 	protected final int DIVIDER_SIZE = 5;
-	protected final int DIV_LOC = 80;
+	protected final int DIV_LOC = 120;
 	
 	protected ViewFrame viewFrame;
 	
@@ -460,6 +463,8 @@ MainPanel, Observer {
 		final JPanel panel; 
 //		JPanel zoompanel;
 		JPanel textpanel;
+		JPanel navPanel;
+		JPanel finderPanel;
 //		JSplitPane backgroundPane;
 //		JSplitPane level1Pane;
 		JSplitPane gtrPane;
@@ -583,6 +588,34 @@ MainPanel, Observer {
 		//ZoomView
 //		zoompanel = new JPanel();
 //		zoompanel.setLayout(new BorderLayout());
+  		
+		navPanel = new JPanel();
+		navPanel.setLayout(new MigLayout());
+		navPanel.setOpaque(true);
+		
+		finderPanel = new JPanel();
+		finderPanel.setLayout(new MigLayout());
+		finderPanel.setOpaque(false);
+		
+		JLabel genef = new JLabel("Find Row Element: ");
+		genef.setFont(fontS);
+		String[] genefHeaders = {""};
+		JComboBox genefBox = setComboLayout(genefHeaders);
+		JButton genefButton = setButtonLayout("Go!");
+		
+		JLabel arrayf = new JLabel("Find Column Element: ");
+		arrayf.setFont(fontS);
+		String[] arrayfHeaders = {""};
+		JComboBox arrayfBox = setComboLayout(arrayfHeaders);
+		JButton arrayfButton = setButtonLayout("Go!");
+		
+		finderPanel.add(genef, "span, wrap, pushx");
+		finderPanel.add(genefBox, "growx, pushx, growx");
+		finderPanel.add(genefButton, "wrap");
+		
+		finderPanel.add(arrayf, "span, wrap, pushx");
+		finderPanel.add(arrayfBox, "growx, pushx, growx");
+		finderPanel.add(arrayfButton);
 		
 		textpanel = new JPanel();
 		textpanel.setLayout(new MigLayout("ins 0"));
@@ -627,13 +660,15 @@ MainPanel, Observer {
 		buttonPanel.add(scaleIncX, "wrap");
 		buttonPanel.add(scaleDecY, "span, alignx 50%");
 		
-		backgroundPanel.add(closeButton, "pushx, alignx 50%");
-		backgroundPanel.add(buttonPanel, "growx, alignx 50%");
-//		backgroundPanel.add(statuspanel, "pushx, growx, height 20%::");
-		backgroundPanel.add(atrPane, "grow, push, width 75%, height 20%::, " +
-				"wrap");
-		backgroundPanel.add(gtrPane, "span 2 1, grow, width 20%");
-		backgroundPanel.add(panel, "grow, push, width 75%, height 80%");
+		navPanel.add(buttonPanel, "push, alignx 50%, wrap");
+		navPanel.add(finderPanel, "push, alignx 50%, wrap");
+		navPanel.add(closeButton, "push, alignx 50%");
+		
+		backgroundPanel.add(statuspanel, "pushx, growx, height 20%::");
+		backgroundPanel.add(atrPane, "grow, push, width 62%, height 20%::");
+		backgroundPanel.add(navPanel, "span 1 3, grow, push, width 13%, wrap");
+		backgroundPanel.add(gtrPane, "grow, width 20%");
+		backgroundPanel.add(panel, "grow, push, width 62%, height 80%");
 		
 //		right.add(level1Pane, "push, grow");
 		
@@ -2193,6 +2228,24 @@ MainPanel, Observer {
   		button.setForeground(GUIColors.BG_COLOR);
   		
   		return button;
+	}
+	
+	/**
+	 * Setting up a general layout for a ComboBox object
+	 * The method is used to make all ComboBoxes appear consistent in aesthetics
+	 * @param combo
+	 * @return
+	 */
+	public static JComboBox setComboLayout(String[] combos){
+		
+		JComboBox comboBox = new JComboBox(combos);
+		Dimension d = comboBox.getPreferredSize();
+		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
+		comboBox.setPreferredSize(d);
+		comboBox.setFont(fontS);
+		comboBox.setBackground(Color.white);
+		
+		return comboBox;
 	}
 	
 	/** 

@@ -31,14 +31,15 @@ import edu.stanford.genetics.treeview.*;
  * @version $Revision: 1.1 $ $Date: 2006-08-16 19:13:45 $
  */
 public class FixedMap extends IntegerMap {
+	
 	private double default_scale;
 	private double scale;
-
 
 	/**
 	 *  constructs new FixedMap
 	 */
 	public FixedMap() {
+		
 		default_scale = 10.0;
 	}
 
@@ -50,6 +51,7 @@ public class FixedMap extends IntegerMap {
 	 */
 	@Override
 	public void bindConfig(ConfigNode configNode) {
+		
 		super.bindConfig(configNode);
 		scale = root.getAttribute("scale", default_scale);
 	}
@@ -63,6 +65,7 @@ public class FixedMap extends IntegerMap {
 	 */
 	@Override
 	public int getIndex(int i) {
+		
 		return (int) (i / scale) + minindex;
 	}
 
@@ -75,6 +78,7 @@ public class FixedMap extends IntegerMap {
 	 */
 	@Override
 	public int getPixel(int i) {
+		
 		return (int) ((i - minindex) * scale);
 	}
 
@@ -84,6 +88,7 @@ public class FixedMap extends IntegerMap {
 	 */
 	@Override
 	public double getScale() {
+		
 		return scale;
 	}
 
@@ -93,13 +98,16 @@ public class FixedMap extends IntegerMap {
 	 */
 	@Override
 	public int getUsedPixels() {
+		
 		if (minindex == -1) {
 			return 0;
 		}
+		
 		int i  = (int) ((maxindex - minindex + 1) * scale);
 		int j  = (int) (scale * (int) (availablepixels / scale));
 		if (i > j) {
 			return j;
+			
 		} else {
 			return i;
 		}
@@ -111,7 +119,8 @@ public class FixedMap extends IntegerMap {
 	 */
 	@Override
 	public int getViewableIndexes() {
-	int i  = (int) (availablepixels / scale);
+	
+		int i  = (int) (availablepixels / scale);
 		return i;
 	}
 
@@ -122,6 +131,7 @@ public class FixedMap extends IntegerMap {
 	 * @param  d  The new defaultScale value
 	 */
 	public void setDefaultScale(double d) {
+		
 		default_scale = d;
 	}
 
@@ -132,6 +142,7 @@ public class FixedMap extends IntegerMap {
 	 * @param  d  The new scale value
 	 */
 	public void setScale(double d) {
+		
 		scale = d;
 		root.setAttribute("scale", scale, default_scale);
 	}
@@ -142,6 +153,7 @@ public class FixedMap extends IntegerMap {
 	 */
 	@Override
 	public String type() {
+		
 		return "Fixed";
 	}
 }

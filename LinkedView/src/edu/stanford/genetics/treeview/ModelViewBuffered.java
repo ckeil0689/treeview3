@@ -36,11 +36,11 @@ public abstract class ModelViewBuffered extends ModelView {
 
 	private static final long serialVersionUID = 1L;
 	
-	protected int []	   offscreenPixels = null;
-    protected Image        offscreenBuffer = null;
-    protected Graphics     offscreenGraphics = null;
+	protected int [] offscreenPixels = null;
+    protected Image offscreenBuffer = null;
+    protected Graphics offscreenGraphics = null;
 
-    protected boolean      rotateOffscreen = false;
+    protected boolean rotateOffscreen = false;
 
     protected ModelViewBuffered() {
 		

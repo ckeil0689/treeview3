@@ -24,6 +24,7 @@ package edu.stanford.genetics.treeview;
 
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Vector;
 
@@ -39,8 +40,8 @@ public class MessagePanel extends JPanel{
     protected Vector<String> messages;
 
     private final Color bgColor;
-    private final Color textColor = new Color(90, 90, 90, 255);
-    private final Color labelColor = new Color(178, 129, 0, 255);
+    private final Color textColor = GUIColors.TEXT;
+    private final Color labelColor = GUIColors.ELEMENT;
     
     private String title;
     
@@ -49,7 +50,7 @@ public class MessagePanel extends JPanel{
      */
     public MessagePanel() {
 		
-		this(null, Color.white);
+		this(null, GUIColors.BG_COLOR);
 	}
     
     /**
@@ -61,17 +62,16 @@ public class MessagePanel extends JPanel{
 		
 		super();
 		this.setLayout(new MigLayout("ins 0"));
-		this.setOpaque(false);
 		this.bgColor = bgColor;
+		this.setBackground(bgColor);
 		title = t;
 		
 		JLabel header = new JLabel(t);
-		header.setFont(new Font("Sans Serif", Font.BOLD, 16));
+		header.setFont(new Font("Sans Serif", Font.BOLD, 18));
 		header.setForeground(labelColor);
 		
-		messages = new Vector<String>(5,5);
+		messages = new Vector<String>(5, 5);
 		messagecanvas = new MessageCanvas();
-		messagecanvas.setFont(new Font("Sans Serif", Font.PLAIN, 16));
 		
 		this.add(header, "pushx, span, wrap");
 		this.add(messagecanvas, "pushx, growx");
@@ -83,20 +83,55 @@ public class MessagePanel extends JPanel{
 	public class MessageCanvas extends JPanel {
 
 		private static final long serialVersionUID = 1L;
+		
+		private JLabel row;
+		private JLabel col;
+		private JLabel val;
+		private JLabel last;
+		
+		private ArrayList<JLabel> labelList;
 
 		public MessageCanvas() {
 			
 			super();
+			this.setLayout(new MigLayout("ins 0"));
+			
+			row = setupLabel();
+			this.add(row, "pushx, wrap");
+			
+			col = setupLabel();
+			this.add(col, "pushx, wrap");
+			
+			val = setupLabel();
+			this.add(val, "pushx, wrap");
+			
+			last = setupLabel();
+			this.add(last, "pushx");
+			
+			labelList = new ArrayList<JLabel>();
+			labelList.add(row);
+			labelList.add(col);
+			labelList.add(val);
+			labelList.add(last);
+		}
+		
+		public JLabel setupLabel() {
+			
+			JLabel label = new JLabel();
+			label.setFont(new Font("Sans Serif", Font.PLAIN, 16));
+			label.setForeground(GUIColors.TEXT);
+			
+			return label;
 		}
 		
 		@Override
 		public void paintComponent(Graphics g) {
 			
-			int xoff = 0;
-			FontMetrics metrics = getFontMetrics(g.getFont());
-			int ascent = metrics.getAscent();
-			int height = 0;
-			Enumeration<String> e = messages.elements();
+//			int xoff = 0;
+//			FontMetrics metrics = getFontMetrics(g.getFont());
+//			int ascent = metrics.getAscent();
+//			int height = 0;
+//			Enumeration<String> e = messages.elements();
 			
 			Dimension size = getSize();
 			g.clearRect(0, 0, size.width, size.height);
@@ -106,14 +141,29 @@ public class MessagePanel extends JPanel{
 			
 			g.setColor(textColor);
 
-			while (e.hasMoreElements()) {
-				String message = (String) e.nextElement();
-				if (message == null) {
-					continue;
-				}
-				height += ascent;
-				g.drawString(message, -xoff, height);
+//			while (e.hasMoreElements()) {
+//				String message = (String) e.nextElement();
+//				if (message == null) {
+//					continue;
+//				}
+			
+			//resetting labels
+			for(JLabel label : labelList) {
+				
+				label.setText("");
 			}
+			
+			//Setting text for all labels
+			for(String message : messages) {
+				
+				labelList.get(messages.indexOf(message)).setText(message);
+			}
+			
+			this.revalidate();
+			this.repaint();
+//				height += ascent;
+//				g.drawString(message, -xoff, height);
+//			}
 		}
 		
 		@Override

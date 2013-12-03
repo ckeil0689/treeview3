@@ -218,6 +218,7 @@ public class GTRView extends ModelViewBuffered implements
 	    synchMap();
 		repaint();
 	 }
+	
 	 private void selectLeft() {
 		 if (selectedNode.isLeaf()) return;
 		 TreeDrawerNode current = selectedNode;
