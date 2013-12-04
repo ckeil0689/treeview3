@@ -13,7 +13,7 @@ import edu.stanford.genetics.treeview.ViewFrame;
  * @author aloksaldanha
  *
  */
-public class ArrayFinder extends HeaderFinder {
+public class ArrayFinderPanel extends HeaderFinderPanel {
 
 	private static final long serialVersionUID = 1L;
 
@@ -22,10 +22,10 @@ public class ArrayFinder extends HeaderFinder {
 	 * @param hI
 	 * @param geneSelection
 	 */
-	public ArrayFinder(ViewFrame f, HeaderInfo hI, 
+	public ArrayFinderPanel(ViewFrame f, HeaderInfo hI, 
 			TreeSelectionI geneSelection) {
 		
-		super(f, hI, geneSelection, "Search Array Text for Substring");
+		super(f, hI, geneSelection, "Column");
 	}
 
 	/* (non-Javadoc)
@@ -38,16 +38,4 @@ public class ArrayFinder extends HeaderFinder {
 			viewFrame.scrollToArray(i);
 		}
 	}
-
-	@Override
-	protected void showSubDataModel() {
-		
-		seekAll();
-		viewFrame.showSubDataModel(null, geneSelection.getSelectedIndexes(),
-				search_text.getText() + " matches in " 
-		+ viewFrame.getDataModel().getSource(),
-				search_text.getText() + " matches in " 
-		+ viewFrame.getDataModel().getName());
-	}
-
 }

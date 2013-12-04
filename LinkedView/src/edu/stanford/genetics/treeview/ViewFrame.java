@@ -821,27 +821,36 @@ public abstract class ViewFrame extends JFrame implements Observer {
 				return KeyEvent.VK_9;
 		 }
 		 return 0;
-	 }
+	}
 	 
-	 public void showSubDataModel(int[] indexes, String source, String name) {
-	  	if (indexes.length == 0) {
-	  		JOptionPane.showMessageDialog(this, "No Genes to show summary of!");
-	  		return;
-	  	}
-	  	showSubDataModel(indexes, null, source, name);
-	 }
+	public void showSubDataModel(int[] indexes, String source, String name) {
+		 
+		if (indexes.length == 0) {
+			JOptionPane.showMessageDialog(this, "No Genes to show summary of!");
+			return;
+		}
+		
+		showSubDataModel(indexes, null, source, name);
+	}
 	  
-	 public void showSubDataModel(int[] geneIndexes,int[] arrayIndexes, 
-			  String source, String name) {
-		  	ReorderedDataModel dataModel = new ReorderedDataModel(
-		  			getDataModel(), geneIndexes,  arrayIndexes);
-		  	if (source != null) dataModel.setSource(source);
-		  	if (name != null) dataModel.setName(name);
-		  	ViewFrame window = getApp().openNew();
-		  	window.setDataModel(dataModel, false);
-		  	window.setLoaded(true);
-		  	window.setVisible(true);
-	 }	 
+	public void showSubDataModel(int[] geneIndexes,int[] arrayIndexes, 
+			String source, String name) {
+		
+		ReorderedDataModel dataModel = new ReorderedDataModel(
+				getDataModel(), geneIndexes,  arrayIndexes);
+		if (source != null) {
+			dataModel.setSource(source);
+		}
+		
+		if (name != null) {
+			dataModel.setName(name);
+		}
+		
+		ViewFrame window = getApp().openNew();
+		window.setDataModel(dataModel, false);
+		window.setLoaded(true);
+		window.setVisible(true);
+	}	 
 	 
 	 /**  The global most recently used object. */
 	 protected FileMru fileMru;

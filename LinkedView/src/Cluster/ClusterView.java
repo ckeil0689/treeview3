@@ -590,31 +590,29 @@ public class ClusterView extends JPanel implements MainPanel {
 	 */
 	public void setOptionsPanel() {
 		
-  		optionsPanel.add(emptyPanel, "pushx, height 15%::");
-  		optionsPanel.add(head2, "alignx 50%, pushx, height 15%::");
-  		optionsPanel.add(head3, "alignx 50%, pushx, height 15%::, wrap");
+  		optionsPanel.add(emptyPanel, "pushx, height 10%::");
+  		optionsPanel.add(head2, "alignx 50%, pushx, height 10%::");
+  		optionsPanel.add(head3, "alignx 50%, pushx, height 10%::, wrap");
   		
   		optionsPanel.add(similarity, "pushx, height 20%::");
-  		optionsPanel.add(geneCombo, "alignx 50%, pushx, growx, height 15%::");
-  		optionsPanel.add(arrayCombo,"alignx 50%, pushx, growx, " +
-  				"height 15%::, wrap");
+  		optionsPanel.add(geneCombo, "alignx 50%, pushx, growx");
+  		optionsPanel.add(arrayCombo,"alignx 50%, pushx, growx, wrap");
   		
   		if(isHierarchical()) {
 	  		
 			optionsPanel.add(method, "pushx, height 15%::");
-			optionsPanel.add(clusterChoice, "alignx 50%, growx, " +
-					"height 15%::, width 20%");
-			optionsPanel.add(infoIcon, "pushx, height 15%::, wrap");
+			optionsPanel.add(clusterChoice, "alignx 50%, growx, width 20%");
+			optionsPanel.add(infoIcon, "pushx, wrap");
 			
 		} else {
 			
 			optionsPanel.add(clusters, "pushx, growx, height 15%::");
-			optionsPanel.add(enterRC, "alignx 50%, pushx, height 15%::");
-			optionsPanel.add(enterCC, "alignx 50%, pushx, height 15%::, wrap");
+			optionsPanel.add(enterRC, "alignx 50%, pushx");
+			optionsPanel.add(enterCC, "alignx 50%, pushx, wrap");
 			
 			optionsPanel.add(its, "pushx, height 15%::");
-			optionsPanel.add(enterRIt, "alignx 50%, pushx, height 15%::");
-			optionsPanel.add(enterCIt, "alignx 50%, pushx, height 15%::, wrap");
+			optionsPanel.add(enterRIt, "alignx 50%, pushx");
+			optionsPanel.add(enterCIt, "alignx 50%, pushx, wrap");
 		}
 	}
 	

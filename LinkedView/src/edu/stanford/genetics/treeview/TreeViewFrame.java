@@ -59,6 +59,7 @@ import edu.stanford.genetics.treeview.core.FileMruEditor;
 import edu.stanford.genetics.treeview.core.GeneFinder;
 import edu.stanford.genetics.treeview.core.GlobalPrefInfo;
 import edu.stanford.genetics.treeview.core.HeaderFinder;
+import edu.stanford.genetics.treeview.core.HeaderFinderPanel;
 import edu.stanford.genetics.treeview.core.LogMessagesPanel;
 import edu.stanford.genetics.treeview.core.LogSettingsPanel;
 import edu.stanford.genetics.treeview.core.MemMonitor;

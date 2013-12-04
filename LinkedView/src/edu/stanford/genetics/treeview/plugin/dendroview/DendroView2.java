@@ -37,6 +37,12 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import net.miginfocom.swing.MigLayout;
 
 import edu.stanford.genetics.treeview.*;
+import edu.stanford.genetics.treeview.core.ArrayFinder;
+import edu.stanford.genetics.treeview.core.ArrayFinderPanel;
+import edu.stanford.genetics.treeview.core.GeneFinder;
+import edu.stanford.genetics.treeview.core.GeneFinderPanel;
+import edu.stanford.genetics.treeview.core.HeaderFinder;
+import edu.stanford.genetics.treeview.core.HeaderFinderPanel;
 import edu.stanford.genetics.treeview.model.*;
 
 //Explicitly imported because error (unclear TVModel reference) was thrown
@@ -126,6 +132,9 @@ MainPanel, Observer {
 	private JButton scaleDecX;
 	private JButton scaleDecY;
 	private JButton scaleDefaultAll;
+	
+	private HeaderFinderPanel geneFinderPanel = null;
+	private HeaderFinderPanel arrayFinderPanel = null;
 	
 	/**
 	 * Chained constructor
@@ -591,31 +600,31 @@ MainPanel, Observer {
   		
 		navPanel = new JPanel();
 		navPanel.setLayout(new MigLayout());
-		navPanel.setOpaque(true);
+		navPanel.setOpaque(false);
 		
-		finderPanel = new JPanel();
-		finderPanel.setLayout(new MigLayout());
-		finderPanel.setOpaque(false);
-		
-		JLabel genef = new JLabel("Find Row Element: ");
-		genef.setFont(fontS);
-		String[] genefHeaders = {""};
-		JComboBox genefBox = setComboLayout(genefHeaders);
-		JButton genefButton = setButtonLayout("Go!");
-		
-		JLabel arrayf = new JLabel("Find Column Element: ");
-		arrayf.setFont(fontS);
-		String[] arrayfHeaders = {""};
-		JComboBox arrayfBox = setComboLayout(arrayfHeaders);
-		JButton arrayfButton = setButtonLayout("Go!");
-		
-		finderPanel.add(genef, "span, wrap, pushx");
-		finderPanel.add(genefBox, "growx, pushx, growx");
-		finderPanel.add(genefButton, "wrap");
-		
-		finderPanel.add(arrayf, "span, wrap, pushx");
-		finderPanel.add(arrayfBox, "growx, pushx, growx");
-		finderPanel.add(arrayfButton);
+//		finderPanel = new JPanel();
+//		finderPanel.setLayout(new MigLayout());
+//		finderPanel.setOpaque(false);
+//		
+//		JLabel genef = new JLabel("Find Row Element: ");
+//		genef.setFont(fontS);
+//		String[] genefHeaders = {""};
+//		JComboBox genefBox = setComboLayout(genefHeaders);
+//		JButton genefButton = setButtonLayout("Go!");
+//		
+//		JLabel arrayf = new JLabel("Find Column Element: ");
+//		arrayf.setFont(fontS);
+//		String[] arrayfHeaders = {""};
+//		JComboBox arrayfBox = setComboLayout(arrayfHeaders);
+//		JButton arrayfButton = setButtonLayout("Go!");
+//		
+//		finderPanel.add(genef, "span, wrap, pushx");
+//		finderPanel.add(genefBox, "growx, push, growx");
+//		finderPanel.add(genefButton, "wrap");
+//		
+//		finderPanel.add(arrayf, "span, wrap, pushx");
+//		finderPanel.add(arrayfBox, "growx, push, growx");
+//		finderPanel.add(arrayfButton);
 		
 		textpanel = new JPanel();
 		textpanel.setLayout(new MigLayout("ins 0"));
@@ -660,8 +669,10 @@ MainPanel, Observer {
 		buttonPanel.add(scaleIncX, "wrap");
 		buttonPanel.add(scaleDecY, "span, alignx 50%");
 		
+		navPanel.add(getGeneFinderPanel(), "push, alignx 50%, wrap");
+		navPanel.add(getArrayFinderPanel(), "push, alignx 50%, wrap");
+//		navPanel.add(finderPanel, "push, alignx 50%, wrap");
 		navPanel.add(buttonPanel, "push, alignx 50%, wrap");
-		navPanel.add(finderPanel, "push, alignx 50%, wrap");
 		navPanel.add(closeButton, "push, alignx 50%");
 		
 		backgroundPanel.add(statuspanel, "pushx, growx, height 20%::");
@@ -2262,6 +2273,32 @@ MainPanel, Observer {
 	protected void setDataModel(DataModel dataModel) {
 		
 		this.dataModel = dataModel;
+	}
+	
+	public HeaderFinderPanel getGeneFinderPanel() {
+		
+		if (geneFinderPanel == null) {
+			geneFinderPanel = new GeneFinderPanel(viewFrame, 
+					getDataModel().getGeneHeaderInfo(), 
+					viewFrame.getGeneSelection());
+		}
+		
+		return geneFinderPanel;
+	}
+	
+	/** 
+	 * Getter for geneFinderPanel 
+	 * @return HeaderFinderPanel arrayFinderPanel
+	 */
+	public HeaderFinderPanel getArrayFinderPanel() {
+		
+		if (arrayFinderPanel == null) {
+			
+			arrayFinderPanel = new ArrayFinderPanel(viewFrame, 
+					getDataModel().getArrayHeaderInfo(), 
+					viewFrame.getArraySelection());
+		}
+		return arrayFinderPanel;
 	}
 	
 	/** Setter for root  - may not work properly

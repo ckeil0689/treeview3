@@ -47,6 +47,18 @@ public abstract class HeaderFinder extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 	
+	protected TreeSelectionI geneSelection;
+	protected ViewFrame viewFrame;
+	
+    private JButton search_button, seek_button, seekNext_button, seekAll_button, 
+    summary_button;
+    private ResultsPanel rpanel;
+    private HeaderInfo headerInfo;
+    private int choices[];
+    private int nchoices = 0;
+    private JList results;
+	private DefaultListModel resultsModel;
+	
 	//"Search Gene Text for Substring"
 	protected HeaderFinder(ViewFrame f, HeaderInfo hI, 
 			TreeSelectionI geneSelection, String title) {
@@ -128,7 +140,7 @@ public abstract class HeaderFinder extends JDialog {
     
 	public void seekAll() {
 		
-		results.setSelectionInterval(0,resultsModel.getSize()-1);
+		results.setSelectionInterval(0, resultsModel.getSize() - 1);
 		int [] selected = results.getSelectedIndices();
 		geneSelection.setSelectedNode(null);
 		geneSelection.deselectAllIndexes();
@@ -153,7 +165,8 @@ public abstract class HeaderFinder extends JDialog {
 		resultsModel.removeAllElements();
 		
 		int jmax  = headerInfo.getNumHeaders();
-		int idIndex = headerInfo.getIndex("YORF"); 
+		int idIndex = headerInfo.getIndex("YORF");
+		
 		//actually, just 0, or 1 if 0 is GID.
 		for  (int j = 0; j < jmax; j++) {
 			String [] headers = headerInfo.getHeader(j);
@@ -319,36 +332,44 @@ public abstract class HeaderFinder extends JDialog {
 	
 	 	    seek_button = new JButton("Seek");
 		    seek_button.addActionListener(new ActionListener() {
-			    @Override
+			    
+		    	@Override
 				public void actionPerformed(ActionEvent evt) {
-				seek();
+				
+		    		seek();
 			    }
 			});
 	
 		    // add(seek_button);
 	 	    seekNext_button = new JButton("Next");
 		    seekNext_button.addActionListener(new ActionListener() {
-			    @Override
+			    
+		    	@Override
 				public void actionPerformed(ActionEvent evt) {
-				seekNext();
+				
+		    		seekNext();
 			    }
 			});
 		    add(seekNext_button);
 	
 	 	    seekAll_button = new JButton("All");
 		    seekAll_button.addActionListener(new ActionListener() {
-			    @Override
+			    
+		    	@Override
 				public void actionPerformed(ActionEvent evt) {
-				seekAll();
+				
+		    		seekAll();
 			    }
 			});
 		    add(seekAll_button);
 			
 			summary_button = new JButton("Summary Popup");
 			summary_button.addActionListener(new ActionListener() {
+				
 				@Override
 				public void actionPerformed(ActionEvent evt) {
-						showSubDataModel();
+						
+					showSubDataModel();
 				}
 	
 			});
@@ -378,15 +399,4 @@ public abstract class HeaderFinder extends JDialog {
     }
         
 	protected abstract void showSubDataModel();
-
-	protected TreeSelectionI geneSelection;
-	protected ViewFrame viewFrame;
-    private JButton search_button, seek_button, seekNext_button, seekAll_button, 
-    summary_button;
-    private ResultsPanel rpanel;
-    private HeaderInfo headerInfo;
-    private int choices[];
-    private int nchoices = 0;
-    private JList results;
-	private DefaultListModel resultsModel;
 }

@@ -86,30 +86,31 @@ public class TextView extends ModelView implements FontSelectable,
 	*/
     public TextView(HeaderInfo hI, UrlExtractor uExtractor) {
 		
-    	super();
-		urlExtractor = uExtractor;
-		headerInfo = hI;
-		col = -1;
-		
-	//  could set up headerSummary...
-		int GIDIndex = headerInfo.getIndex("GID");
-		if (GIDIndex == -1) {
-			headerSummary.setIncluded(new int [] {1});
-			
-		} else {
-			headerSummary.setIncluded(new int [] {2});
-		}
-	
-	//	int yorfIndex = headerInfo.getIndex("YORF");
-	//	int nameIndex = headerInfo.getIndex("NAME");
-	
-		addMouseListener(this);
-		addMouseMotionListener(this);
-		addKeyListener(this);
-		
-		scrollPane = new JScrollPane(this);
-		scrollPane.setBorder(null);
-		panel = scrollPane;
+    	this(hI, uExtractor, -1);
+//    	super();
+//		urlExtractor = uExtractor;
+//		headerInfo = hI;
+//		col = -1;
+//		
+//	//  could set up headerSummary...
+//		int GIDIndex = headerInfo.getIndex("GID");
+//		if (GIDIndex == -1) {
+//			headerSummary.setIncluded(new int [] {1});
+//			
+//		} else {
+//			headerSummary.setIncluded(new int [] {2});
+//		}
+//	
+//	//	int yorfIndex = headerInfo.getIndex("YORF");
+//	//	int nameIndex = headerInfo.getIndex("NAME");
+//	
+//		addMouseListener(this);
+//		addMouseMotionListener(this);
+//		addKeyListener(this);
+//		
+//		scrollPane = new JScrollPane(this);
+//		scrollPane.setBorder(null);
+//		panel = scrollPane;
     }
     
     
