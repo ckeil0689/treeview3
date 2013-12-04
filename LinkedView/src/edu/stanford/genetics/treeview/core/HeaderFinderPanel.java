@@ -28,6 +28,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.swing.*;
 
@@ -66,6 +68,7 @@ public abstract class HeaderFinderPanel extends JPanel {
 	private DefaultListModel resultsModel;
 	
 	private JLabel genef;
+	private ArrayList<String> geneList;
 	private String[] genefHeaders = {""};
 	private JComboBox genefBox;
 	private JButton genefButton;
@@ -112,7 +115,16 @@ public abstract class HeaderFinderPanel extends JPanel {
 		
 		genef = new JLabel("Find " + type + " Element: ");
 		genef.setFont(fontS);
+		
+		geneList = new ArrayList<String>();
 		genefHeaders = getGenes(hA);
+		
+		for(String gene : genefHeaders) {
+			
+			geneList.add(gene);
+		}
+		
+		Arrays.sort(genefHeaders);
 		genefBox = setComboLayout(genefHeaders);
 		genefButton = setButtonLayout("Go!");
 		genefButton.addActionListener(new ActionListener(){
@@ -242,8 +254,9 @@ public abstract class HeaderFinderPanel extends JPanel {
 		geneSelection.deselectAllIndexes();
 		
 		//for (int i = 0; i < selected.length; i++) {
-			
-			geneSelection.setIndex(0, true);//choices[selected[i]], true);
+		int geneIndex = 0;
+		geneIndex = geneList.indexOf((String)genefBox.getSelectedItem());
+		geneSelection.setIndex(geneIndex, true);//choices[selected[i]], true);
 		//}
 		
 		geneSelection.notifyObservers();
@@ -304,7 +317,8 @@ public abstract class HeaderFinderPanel extends JPanel {
 		
 		int jmax = headerInfo.getNumHeaders();
 		for (int j = 0; j < jmax; j++) {
-			String []strings = headerInfo.getHeader(j);
+			
+			String[] strings = headerInfo.getHeader(j);
 			if (strings == null) {
 				continue;
 			}
@@ -316,7 +330,7 @@ public abstract class HeaderFinderPanel extends JPanel {
 				}
 				
 				String cand;
-				cand = strings[i].toLowerCase();
+				cand = strings[i].toUpperCase();
 				
 				if (cand.indexOf(sub) >= 0) {
 					match = true;
