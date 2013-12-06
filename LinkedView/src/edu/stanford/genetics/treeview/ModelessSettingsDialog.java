@@ -52,7 +52,7 @@ public class ModelessSettingsDialog extends JDialog {
 		inner.setLayout(new MigLayout());
 		inner.add((Component) panel, "push, grow, wrap");
 		inner.add(new ButtonPanel(), "pushx, growx, alignx 50%");
-		inner.setBackground(GUIColors.BG_COLOR);
+		inner.setBackground(GUIParams.BG_COLOR);
 		getContentPane().add(inner); 
 		pack();
 	}
@@ -70,7 +70,7 @@ public class ModelessSettingsDialog extends JDialog {
 
 		public ButtonPanel() {
 			
-			this.setBackground(GUIColors.BG_COLOR);
+			this.setBackground(GUIParams.BG_COLOR);
 			
 			JButton save_button = setButtonLayout("Close");
 			save_button.addActionListener(new ActionListener() {
@@ -108,8 +108,8 @@ public class ModelessSettingsDialog extends JDialog {
 	  		
 	  		button.setFont(buttonFont);
 	  		button.setOpaque(true);
-	  		button.setBackground(GUIColors.ELEMENT);
-	  		button.setForeground(GUIColors.BG_COLOR);
+	  		button.setBackground(GUIParams.ELEMENT);
+	  		button.setForeground(GUIParams.BG_COLOR);
 	  		
 	  		return button;
 		}

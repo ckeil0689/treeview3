@@ -70,7 +70,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 			ColorPresets colorPresets) {
 		
 		this.setLayout(new MigLayout());
-		this.setBackground(GUIColors.BG_COLOR);
+		this.setBackground(GUIParams.BG_COLOR);
 		m_xmap = xmap;
 		m_ymap = ymap;
 		m_xZmap = xZmap;
@@ -200,7 +200,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 			JScrollPane sp = new JScrollPane(colorPresetsPanel, 
 					ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
 					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-			sp.setBackground(GUIColors.BG_COLOR);
+			sp.setBackground(GUIParams.BG_COLOR);
 			temp2.add(sp, "alignx 50%, pushx, growx");
 			this.add(temp2, "pushx, growx");
 		}
@@ -487,11 +487,11 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 			
 			this.setLayout(new MigLayout());
 			this.setOpaque(false);
-			this.setBorder(BorderFactory.createLineBorder(GUIColors.BORDERS, 
+			this.setBorder(BorderFactory.createLineBorder(GUIParams.BORDERS, 
 					EtchedBorder.LOWERED));
 			
 			logCheckBox = new JCheckBox("Log (base 2)");
-			logCheckBox.setBackground(GUIColors.BG_COLOR);
+			logCheckBox.setBackground(GUIParams.BG_COLOR);
 			logCheckBox.setSelected(m_drawer.getLogTransform());
 			logCheckBox.addActionListener(new ActionListener() {
 
@@ -558,7 +558,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 		public void redoLayout() {
 			
 			removeAll();
-			this.setBackground(GUIColors.BG_COLOR);
+			this.setBackground(GUIParams.BG_COLOR);
 			int nPresets = m_presets.getNumPresets();
 			JButton [] buttons = new JButton[nPresets];
 			for (int i = 0; i < nPresets; i++) {
@@ -592,8 +592,8 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
   		
   		button.setFont(buttonFont);
   		button.setOpaque(true);
-  		button.setBackground(GUIColors.ELEMENT);
-  		button.setForeground(GUIColors.BG_COLOR);
+  		button.setBackground(GUIParams.ELEMENT);
+  		button.setForeground(GUIParams.BG_COLOR);
   		
   		return button;
 	}
@@ -602,8 +602,8 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 		
 		JPanel panel = new JPanel();
 		panel.setLayout(new MigLayout());
-		panel.setBackground(GUIColors.BG_COLOR);
-		panel.setBorder(BorderFactory.createLineBorder(GUIColors.BORDERS, 
+		panel.setBackground(GUIParams.BG_COLOR);
+		panel.setBorder(BorderFactory.createLineBorder(GUIParams.BORDERS, 
 						EtchedBorder.LOWERED));
 		
 		return panel;
@@ -681,8 +681,8 @@ class ColorExtractorEditor extends JPanel {
 	  		
 	  		pushButton.setFont(buttonFont);
 	  		pushButton.setOpaque(true);
-	  		pushButton.setBackground(GUIColors.ELEMENT);
-	  		pushButton.setForeground(GUIColors.BG_COLOR);
+	  		pushButton.setBackground(GUIParams.ELEMENT);
+	  		pushButton.setForeground(GUIParams.BG_COLOR);
 			pushButton.addActionListener(new ActionListener() {
 				
 				@Override

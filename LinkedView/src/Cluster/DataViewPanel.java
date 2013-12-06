@@ -17,7 +17,7 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 
 import edu.stanford.genetics.treeview.DataModel;
-import edu.stanford.genetics.treeview.GUIColors;
+import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 
@@ -96,7 +96,7 @@ public class DataViewPanel extends JPanel{
 		//Table Header Options
 		JTableHeader header = table.getTableHeader();
 		header.setReorderingAllowed(false);
-		header.setBackground(GUIColors.TABLEHEADERS);
+		header.setBackground(GUIParams.TABLEHEADERS);
 		
 		//create a scrollPane with the table in it 
 		tableScroll = new JScrollPane(table, 

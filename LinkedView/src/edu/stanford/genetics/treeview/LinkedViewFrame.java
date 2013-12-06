@@ -119,7 +119,7 @@ public class LinkedViewFrame extends TreeViewFrame implements Observer {
 		try {
 			knnModel.loadNew(fileSet);
 			fileSet.setStyle(FileSet.KMEANS_STYLE);
-			setDataModel(knnModel, false);
+			setDataModel(knnModel, false, true);
 		} catch (LoadException e) {
 			JOptionPane.showMessageDialog(this, e);
 			throw e;

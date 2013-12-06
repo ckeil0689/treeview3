@@ -22,6 +22,7 @@
 */
 package edu.stanford.genetics.treeview.model;
 
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.*;
@@ -29,81 +30,48 @@ import java.net.URL;
 
 import javax.swing.*;
 
+import net.miginfocom.swing.MigLayout;
+
 import edu.stanford.genetics.treeview.*;
 import edu.stanford.genetics.treeview.SwingWorker;
 
 public class TVModelLoader2 implements ProgressTrackable {
-	public class DummyLoadProgress implements LoadProgress2I {
-		private boolean finished = false;
-		private boolean hadProblem = false;
-		private int length = 0;
-		private int value = 0;
-		private int phaseLength = 0;
-		private int phaseValue = 0;
-		private String phaseText = "";
-		@Override
-		public boolean getCanceled() {return false;}
-		@Override
-		public LoadException getException() {return null;}
-		@Override
-		public boolean getFinished() {return finished;}
-		@Override
-		public boolean getHadProblem() {return hadProblem;}
-		@Override
-		public int getLength() {return length;}
-		@Override
-		public int getPhaseLength() {return phaseLength;}
-		@Override
-		public String getPhaseText() {return phaseText;}
-		@Override
-		public int getPhaseValue() {return phaseValue;}
-		@Override
-		public int getValue() {return value;}
-		@Override
-		public void incrValue(int i) {value++;}
-		@Override
-		public void println(String s) {System.out.println(s);}
-		@Override
-		public void setButtonText(String text) {}
-		@Override
-		public void setCanceled(boolean canceled) {}
-		@Override
-		public void setException(LoadException exception) {}
-		@Override
-		public void setFinished(boolean finished) {this.finished = finished;}
-		@Override
-		public void setHadProblem(boolean hadProblem) {this.hadProblem = hadProblem;}
-		@Override
-		public void setIndeterminate(boolean flag) {}
-		@Override
-		public void setLength(int i) {this.length = i;}
-		@Override
-		public void setPhase(int i) {this.phaseValue = i;}
-		@Override
-		public void setPhaseLength(int i) {this.phaseLength = i;}
-		@Override
-		public void setPhaseText(String i) {this.phaseText = i;}
-		@Override
-		public void setPhaseValue(int i) {this.phaseValue = i;}
-		@Override
-		public void setPhases(String[] strings) {}
-		@Override
-		public void setValue(int i) {this.value = i;}
-		@Override
-		public void setVisible(boolean b) {}
-	}
-
+	
 	// these internal variables are needed by this class only
 	/** frame to block */
 	protected Frame parent;
+	
 	/** model to load into */
 	protected TVModel targetModel;
-
-	private javax.swing.Timer loadTimer;
-
-	protected LoadProgress2I loadProgress = new DummyLoadProgress();
 	
-	// the following is for the communication between the timer thread and the worker thread.
+	protected LoadProgress2I loadProgress = new DummyLoadProgress();
+	protected FlatFileParser2 parser = new FlatFileParser2();
+	
+	private javax.swing.Timer loadTimer;
+	
+	/**
+	 * @param strings
+	 */
+	private String [] phases = new String [] {"Loading Cdt",
+			"Parsing Cdt", "Loading ATR", "Parsing ATR", "Loading GTR", 
+			"Parsing GTR", "Loading Document Config", "Finished"};
+	
+	private static Font fontS = new Font("Sans Serif", Font.PLAIN, 18);
+	
+	
+	public TVModelLoader2(TVModel targetModel) {
+		
+		this(targetModel, targetModel.getFrame());
+	}
+	
+	public TVModelLoader2(TVModel targetModel, Frame parent) {
+		
+		this.parent = parent;
+		this.targetModel = targetModel;
+	}
+	
+	// the following is for the communication between the timer thread 
+	//and the worker thread.
 	
 	/** Setter for exception */
 	public void setException(LoadException exception) {
@@ -148,6 +116,7 @@ public class TVModelLoader2 implements ProgressTrackable {
 	/** Getter for length */
 	@Override
 	public int getLength() {
+		
 		return loadProgress.getLength();
 	}
 	
@@ -168,11 +137,13 @@ public class TVModelLoader2 implements ProgressTrackable {
 	/** Getter for value */
 	@Override
 	public int getValue() {
+		
 		return loadProgress.getValue();
 	}
 	
 	@Override
 	public void incrValue(final int i) {
+		
 		SwingUtilities.invokeLater(new Runnable() {
 			
 			@Override
@@ -185,10 +156,13 @@ public class TVModelLoader2 implements ProgressTrackable {
 	
 	/** Setter for finished */
 	public void setFinished(boolean finished) {
+		
 		loadProgress.setFinished(finished);
 	}
+	
 	/** Getter for finished */
 	public boolean getFinished() {
+		
 		return loadProgress.getFinished();
 	}
 	
@@ -207,6 +181,7 @@ public class TVModelLoader2 implements ProgressTrackable {
 	
 	/** Getter for phaseValue */
 	public int getPhaseValue() {
+		
 		return loadProgress.getPhaseValue();
 	}
 	
@@ -226,6 +201,7 @@ public class TVModelLoader2 implements ProgressTrackable {
 	
 	/** Getter for phaseLength */
 	public int getPhaseLength() {
+		
 		return loadProgress.getPhaseLength();
 	}
 	
@@ -243,44 +219,171 @@ public class TVModelLoader2 implements ProgressTrackable {
 	
 	/** Getter for phaseText */
 	public String getPhaseText() {
+		
 		return loadProgress.getPhaseText();
 	}
 	
-	protected FlatFileParser2 parser = new FlatFileParser2();
-	
-	
-	public TVModelLoader2(TVModel targetModel) {
+public class DummyLoadProgress implements LoadProgress2I {
 		
-		this(targetModel, targetModel.getFrame());
-	}
-	/**
-	 * @param strings
-	 */
-
-	private String [] phases = new String [] {"Loading Cdt",
-			"Parsing Cdt", "Loading ATR", "Parsing ATR", "Loading GTR", 
-			"Parsing GTR", "Loading Document Config", "Finished"};
-	
-	public TVModelLoader2(TVModel targetModel, Frame parent) {
+		private boolean finished = false;
+		private boolean hadProblem = false;
+		private int length = 0;
+		private int value = 0;
+		private int phaseLength = 0;
+		private int phaseValue = 0;
+		private String phaseText = "";
 		
-		this.parent = parent;
-		this.targetModel = targetModel;
+		@Override
+		public boolean getCanceled() {
+			
+			return false;
+		}
+		
+		@Override
+		public LoadException getException() {
+			
+			return null;
+		}
+		
+		@Override
+		public boolean getFinished() {
+			
+			return finished;
+		}
+		
+		@Override
+		public boolean getHadProblem() {
+			
+			return hadProblem;
+		}
+		
+		@Override
+		public int getLength() {
+			
+			return length;
+		}
+		
+		@Override
+		public int getPhaseLength() {
+			
+			return phaseLength;
+		}
+		
+		@Override
+		public String getPhaseText() {
+			
+			return phaseText;
+		}
+		
+		@Override
+		public int getPhaseValue() {
+			
+			return phaseValue;
+		}
+		
+		@Override
+		public int getValue() {
+			
+			return value;
+		}
+		
+		@Override
+		public void incrValue(int i) {
+			
+			value++;
+		}
+		
+		@Override
+		public void println(String s) {
+			
+			System.out.println(s);
+		}
+		
+		@Override
+		public void setButtonText(String text) {}
+		
+		@Override
+		public void setCanceled(boolean canceled) {}
+		
+		@Override
+		public void setException(LoadException exception) {}
+		
+		@Override
+		public void setFinished(boolean finished) {
+			
+			this.finished = finished;
+		}
+		
+		@Override
+		public void setHadProblem(boolean hadProblem) {
+			
+			this.hadProblem = hadProblem;
+		}
+		
+		@Override
+		public void setIndeterminate(boolean flag) {}
+		
+		@Override
+		public void setLength(int i) {
+			
+			this.length = i;
+		}
+		
+		@Override
+		public void setPhase(int i) {
+			
+			this.phaseValue = i;
+		}
+		
+		@Override
+		public void setPhaseLength(int i) {
+			
+			this.phaseLength = i;
+		}
+		
+		@Override
+		public void setPhaseText(String i) {
+			
+			this.phaseText = i;
+		}
+		
+		@Override
+		public void setPhaseValue(int i) {
+			
+			this.phaseValue = i;
+		}
+		
+		@Override
+		public void setPhases(String[] strings) {}
+		
+		@Override
+		public void setValue(int i) {
+			
+			this.value = i;
+		}
+		
+		@Override
+		public void setVisible(boolean b) {}
 	}
 	
 	class TimerListener implements ActionListener { // manages the FileLoader
+		
 		// this method is invoked every few hundred ms
 		@Override
 		public void actionPerformed(ActionEvent evt) {
+			
 			if (getCanceled() || getFinished()) {
 				setFinished(true);
 				loadTimer.stop();
 				if (getHadProblem() == false) { 
 					loadProgress.setVisible(false);
+					
 				} else {
 					loadProgress.setButtonText("Dismiss");
 					Toolkit.getDefaultToolkit().beep();
-					try {
-					((LoadProgress2) loadProgress).getToolkit().beep();
+					try {	
+						((LoadProgress2) loadProgress).getToolkit().beep();
+					
 					} catch (Exception e) {
 					}
 				}
@@ -289,16 +392,20 @@ public class TVModelLoader2 implements ProgressTrackable {
 	}
 	
 	public void loadInto() throws LoadException {
+		
 		loadProgress = new LoadProgress2(targetModel.getFileSet().getRoot(), 
 				parent);
 		loadProgress.setPhases(phases);
 		final SwingWorker worker = new SwingWorker() {
+			
 			@Override
 			public Object construct() {
+				
 				run();
 				return null;
 			}
 		};
+		
 		// start up the worker thread
 		worker.start();
 		loadTimer = new javax.swing.Timer(200, new TimerListener());
@@ -311,8 +418,9 @@ public class TVModelLoader2 implements ProgressTrackable {
 		// but just in case it doesn't, we'll join on the worker
 		try {
 			worker.join();
+			
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+			//Bad exception handling
 			e.printStackTrace();
 		}
 		// System.out.println("loadNew 6, ex: " + fileLoader.getException());
@@ -326,7 +434,8 @@ public class TVModelLoader2 implements ProgressTrackable {
 	*/
 	public void loadIntoNW() throws LoadException {
 
-		//		loadProgress = new LoadProgress2(targetModel.getFileSet().getRoot(), null);
+//		loadProgress = new LoadProgress2(targetModel.getFileSet().getRoot(), 
+//		null);
 //		loadProgress.setPhases(phases);
 		run();
 		if (getException() != null) {
@@ -389,6 +498,7 @@ public class TVModelLoader2 implements ProgressTrackable {
 					targetModel.hashAIDs();
 					targetModel.hashATRs();
 					targetModel.aidFound(true);
+					
 				} catch (Exception e) {
 					println("error parsing ATR: " + e.getMessage());
 					e.printStackTrace();
@@ -414,6 +524,7 @@ public class TVModelLoader2 implements ProgressTrackable {
 					targetModel.hashGIDs();
 					targetModel.hashGTRs();
 					targetModel.gidFound(true);
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 					println("error parsing GTR: " + e.getMessage());
@@ -433,22 +544,28 @@ public class TVModelLoader2 implements ProgressTrackable {
 				
 				XmlConfig documentConfig;
 				if (xmlFile.startsWith("http:")) {
-					documentConfig = new XmlConfig(new URL(xmlFile), "DocumentConfig");
+					documentConfig = new XmlConfig(new URL(xmlFile), 
+							"DocumentConfig");
+					
 				} else {
 					documentConfig = new XmlConfig(xmlFile, "DocumentConfig");
 				}
 				targetModel.setDocumentConfig(documentConfig);
+				
 			} catch (Exception e) {
 				targetModel.setDocumentConfig(null);
 				println("Got exception " + e);
 				setHadProblem(true);
 			}
-			if (loadProgress.getCanceled()) return;
+			if (loadProgress.getCanceled()) {
+				return;
+			}
 			setPhase(7);
 			if (getException() == null) {
 				/*	
 				if (!fileLoader.getCompleted()) {
-					throw new LoadException("Parse not Completed", LoadException.INTPARSE);
+					throw new LoadException("Parse not Completed", 
+					LoadException.INTPARSE);
 				}
 				//System.out.println("f had no exceptoin set");
 				*/
@@ -457,11 +574,35 @@ public class TVModelLoader2 implements ProgressTrackable {
 			}
 			targetModel.setLoaded(true);
 			//	ActionEvent(this, 0, "none",0);
+			
 		} catch (java.lang.OutOfMemoryError ex) {
-							JPanel temp = new JPanel();
-							temp. add(new JLabel("Out of memory, allocate more RAM"));
-							temp. add(new JLabel("see Chapter 3 of Help->Documentation... for Out of Memory"));
-							JOptionPane.showMessageDialog(parent,  temp);
+			
+			JDialog dialog = new JDialog(parent);
+			dialog.setLocationRelativeTo(null);
+			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			
+			JPanel temp = new JPanel();
+			temp.setLayout(new MigLayout());
+			temp.setBackground(GUIParams.BG_COLOR);
+			
+			JLabel l1 = new JLabel("Out of memory, allocate more RAM");
+			l1.setForeground(GUIParams.TEXT);
+			l1.setFont(fontS);
+			temp.add(l1, "pushx, wrap");
+			
+			JLabel l2 = new JLabel("see Chapter 3 of Help->Documentation... " +
+					"for Out of Memory");
+			l2.setForeground(GUIParams.TEXT);
+			l2.setFont(fontS);
+			temp.add(l2, "pushx");
+			
+			dialog.add(temp);
+			
+			dialog.pack();
+			dialog.setVisible(true);
+			
+			//JOptionPane.showMessageDialog(parent,  temp);
+			
 		} catch (LoadException e) {
 			setException(e);
 			println("error parsing File: " + e.getMessage());

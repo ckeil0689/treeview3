@@ -62,7 +62,10 @@ public class TestViewFrame extends ViewFrame {
 		return null;
 	}
 // hmmm this is kind of an insane dependancy... should get rid of it, methinks.
-	public edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets getColorPresets(){return null;}
+	public edu.stanford.genetics.treeview.plugin.dendroview
+	.ColorPresets getColorPresets(){
+		return null;
+	}
 
 
 	@Override
@@ -81,7 +84,8 @@ public class TestViewFrame extends ViewFrame {
 	}
 
 	@Override
-	public void setDataModel(DataModel model, boolean cluster) {
+	public void setDataModel(DataModel model, boolean cluster, 
+			boolean hierarchical) {
 	}
 
 	@Override

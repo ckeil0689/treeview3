@@ -40,8 +40,8 @@ public class MessagePanel extends JPanel{
     protected Vector<String> messages;
 
     private final Color bgColor;
-    private final Color textColor = GUIColors.TEXT;
-    private final Color labelColor = GUIColors.ELEMENT;
+    private final Color textColor = GUIParams.TEXT;
+    private final Color labelColor = GUIParams.ELEMENT;
     
     private String title;
     
@@ -50,7 +50,7 @@ public class MessagePanel extends JPanel{
      */
     public MessagePanel() {
 		
-		this(null, GUIColors.BG_COLOR);
+		this(null, GUIParams.PANEL_BG);
 	}
     
     /**
@@ -61,9 +61,10 @@ public class MessagePanel extends JPanel{
 	public MessagePanel(String t, Color bgColor) {
 		
 		super();
-		this.setLayout(new MigLayout("ins 0"));
+		this.setLayout(new MigLayout());
 		this.bgColor = bgColor;
 		this.setBackground(bgColor);
+		this.setBorder(BorderFactory.createEtchedBorder());
 		title = t;
 		
 		JLabel header = new JLabel(t);
@@ -119,7 +120,7 @@ public class MessagePanel extends JPanel{
 			
 			JLabel label = new JLabel();
 			label.setFont(new Font("Sans Serif", Font.PLAIN, 16));
-			label.setForeground(GUIColors.TEXT);
+			label.setForeground(GUIParams.TEXT);
 			
 			return label;
 		}

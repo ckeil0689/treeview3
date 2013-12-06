@@ -25,7 +25,7 @@ import javax.swing.event.DocumentListener;
 import net.miginfocom.swing.MigLayout;
 
 import edu.stanford.genetics.treeview.ContrastSelectable;
-import edu.stanford.genetics.treeview.GUIColors;
+import edu.stanford.genetics.treeview.GUIParams;
 
 class ContrastSelector extends JPanel implements AdjustmentListener {
 
@@ -50,7 +50,7 @@ class ContrastSelector extends JPanel implements AdjustmentListener {
 		
 		this.setLayout(new MigLayout());
 		this.setOpaque(false);
-		this.setBorder(BorderFactory.createLineBorder(GUIColors.BORDERS, 
+		this.setBorder(BorderFactory.createLineBorder(GUIParams.BORDERS, 
 				EtchedBorder.LOWERED));
 		
 		JPanel inner = new JPanel();
@@ -89,7 +89,7 @@ class ContrastSelector extends JPanel implements AdjustmentListener {
 
 		this.add(inner, "pushx, alignx 50%, wrap");
 		scrollbar = new JScrollBar(Adjustable.HORIZONTAL);
-		scrollbar.setBackground(GUIColors.BG_COLOR);
+		scrollbar.setBackground(GUIParams.BG_COLOR);
 		scrollbar.setValues((int)(contrast * 100.0), 0, 1, 500);
 		scrollbar.addAdjustmentListener(this);
 		this.add(scrollbar, "pushx, growx");
@@ -106,8 +106,8 @@ class ContrastSelector extends JPanel implements AdjustmentListener {
   		
   		button.setFont(buttonFont);
   		button.setOpaque(true);
-  		button.setBackground(GUIColors.ELEMENT);
-  		button.setForeground(GUIColors.BG_COLOR);
+  		button.setBackground(GUIParams.ELEMENT);
+  		button.setForeground(GUIParams.BG_COLOR);
   		
   		return button;
 	}
@@ -116,8 +116,8 @@ class ContrastSelector extends JPanel implements AdjustmentListener {
 		
 		JPanel panel = new JPanel();
 		panel.setLayout(new MigLayout());
-		panel.setBackground(GUIColors.BG_COLOR);
-		panel.setBorder(BorderFactory.createLineBorder(GUIColors.BORDERS, 
+		panel.setBackground(GUIParams.BG_COLOR);
+		panel.setBorder(BorderFactory.createLineBorder(GUIParams.BORDERS, 
 						EtchedBorder.LOWERED));
 		
 		return panel;

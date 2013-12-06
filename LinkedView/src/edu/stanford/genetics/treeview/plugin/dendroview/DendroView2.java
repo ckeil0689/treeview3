@@ -37,11 +37,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import net.miginfocom.swing.MigLayout;
 
 import edu.stanford.genetics.treeview.*;
-import edu.stanford.genetics.treeview.core.ArrayFinder;
 import edu.stanford.genetics.treeview.core.ArrayFinderPanel;
-import edu.stanford.genetics.treeview.core.GeneFinder;
 import edu.stanford.genetics.treeview.core.GeneFinderPanel;
-import edu.stanford.genetics.treeview.core.HeaderFinder;
 import edu.stanford.genetics.treeview.core.HeaderFinderPanel;
 import edu.stanford.genetics.treeview.model.*;
 
@@ -72,8 +69,6 @@ MainPanel, Observer {
 	//Static Variables
 	private static final long serialVersionUID = 1L;
 	
-	private static Font fontS = new Font("Sans Serif", Font.PLAIN, 18);
-	private static Font fontL = new Font("Sans Serif", Font.PLAIN, 24);
 	private static ImageIcon treeviewIcon = null;
 	
 	//Instance Variables
@@ -257,8 +252,7 @@ MainPanel, Observer {
 		colorExtractor.setDefaultColorSet(colorPresets.getDefaultColorSet());
 		colorExtractor.setMissing(DataModel.NODATA, DataModel.EMPTY);
 		
-		statuspanel = new MessagePanel("Status", GUIColors.BG_COLOR);
-		statuspanel.setOpaque(true);
+		statuspanel = new MessagePanel("Status", GUIParams.PANEL_BG);
 
 		DoubleArrayDrawer dArrayDrawer = new DoubleArrayDrawer();
 		dArrayDrawer.setColorExtractor(colorExtractor);
@@ -473,7 +467,6 @@ MainPanel, Observer {
 //		JPanel zoompanel;
 		JPanel textpanel;
 		JPanel navPanel;
-		JPanel finderPanel;
 //		JSplitPane backgroundPane;
 //		JSplitPane level1Pane;
 		JSplitPane gtrPane;
@@ -505,7 +498,7 @@ MainPanel, Observer {
 		
 		backgroundPanel = new JPanel();
 		backgroundPanel.setLayout(new MigLayout());
-		backgroundPanel.setBackground(GUIColors.BG_COLOR);
+		backgroundPanel.setBackground(GUIParams.BG_COLOR);
 		
 //		up_min = new Dimension(400, 100);
 //		down_min = new Dimension(600, 500);
@@ -600,31 +593,8 @@ MainPanel, Observer {
   		
 		navPanel = new JPanel();
 		navPanel.setLayout(new MigLayout());
-		navPanel.setOpaque(false);
-		
-//		finderPanel = new JPanel();
-//		finderPanel.setLayout(new MigLayout());
-//		finderPanel.setOpaque(false);
-//		
-//		JLabel genef = new JLabel("Find Row Element: ");
-//		genef.setFont(fontS);
-//		String[] genefHeaders = {""};
-//		JComboBox genefBox = setComboLayout(genefHeaders);
-//		JButton genefButton = setButtonLayout("Go!");
-//		
-//		JLabel arrayf = new JLabel("Find Column Element: ");
-//		arrayf.setFont(fontS);
-//		String[] arrayfHeaders = {""};
-//		JComboBox arrayfBox = setComboLayout(arrayfHeaders);
-//		JButton arrayfButton = setButtonLayout("Go!");
-//		
-//		finderPanel.add(genef, "span, wrap, pushx");
-//		finderPanel.add(genefBox, "growx, push, growx");
-//		finderPanel.add(genefButton, "wrap");
-//		
-//		finderPanel.add(arrayf, "span, wrap, pushx");
-//		finderPanel.add(arrayfBox, "growx, push, growx");
-//		finderPanel.add(arrayfButton);
+		navPanel.setBackground(GUIParams.PANEL_BG);
+		navPanel.setBorder(BorderFactory.createEtchedBorder());
 		
 		textpanel = new JPanel();
 		textpanel.setLayout(new MigLayout("ins 0"));
@@ -663,16 +633,22 @@ MainPanel, Observer {
 		
 		textpanel.add(textview.getComponent(), "push, grow");
 		
+		JLabel adjScale = new JLabel("Adjust Scale:");
+		adjScale.setFont(GUIParams.FONTS);
+		adjScale.setForeground(GUIParams.TEXT);
+		
+		buttonPanel.add(adjScale, "pushx, span, wrap");
 		buttonPanel.add(scaleIncY, "span, alignx 50%, wrap");
-		buttonPanel.add(scaleDecX);
-		buttonPanel.add(scaleDefaultAll);
-		buttonPanel.add(scaleIncX, "wrap");
+		buttonPanel.add(scaleDecX, "pushx");
+		buttonPanel.add(scaleDefaultAll, "pushx");
+		buttonPanel.add(scaleIncX, "pushx, wrap");
 		buttonPanel.add(scaleDecY, "span, alignx 50%");
 		
-		navPanel.add(getGeneFinderPanel(), "push, alignx 50%, wrap");
-		navPanel.add(getArrayFinderPanel(), "push, alignx 50%, wrap");
-//		navPanel.add(finderPanel, "push, alignx 50%, wrap");
-		navPanel.add(buttonPanel, "push, alignx 50%, wrap");
+		navPanel.add(getGeneFinderPanel(), "pushx, alignx 50%, " +
+				"height 10%::, wrap");
+		navPanel.add(getArrayFinderPanel(), "pushx, alignx 50%, " +
+				"height 10%::, wrap");
+		navPanel.add(buttonPanel, "push, growx, alignx 50%, wrap");
 		navPanel.add(closeButton, "push, alignx 50%");
 		
 		backgroundPanel.add(statuspanel, "pushx, growx, height 20%::");
@@ -2208,8 +2184,8 @@ MainPanel, Observer {
   		
   		button.setFont(buttonFont);
   		button.setOpaque(true);
-  		button.setBackground(GUIColors.ELEMENT);
-  		button.setForeground(GUIColors.BG_COLOR);
+  		button.setBackground(GUIParams.ELEMENT);
+  		button.setForeground(GUIParams.BG_COLOR);
   		
   		return button;
 	}
@@ -2235,8 +2211,8 @@ MainPanel, Observer {
   	
   		button.setFont(buttonFont);
   		button.setOpaque(true);
-  		button.setBackground(GUIColors.ELEMENT);
-  		button.setForeground(GUIColors.BG_COLOR);
+  		button.setBackground(GUIParams.ELEMENT);
+  		button.setForeground(GUIParams.BG_COLOR);
   		
   		return button;
 	}
@@ -2253,7 +2229,7 @@ MainPanel, Observer {
 		Dimension d = comboBox.getPreferredSize();
 		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
 		comboBox.setPreferredSize(d);
-		comboBox.setFont(fontS);
+		comboBox.setFont(GUIParams.FONTS);
 		comboBox.setBackground(Color.white);
 		
 		return comboBox;

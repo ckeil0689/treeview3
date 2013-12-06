@@ -23,12 +23,12 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Observable;
@@ -59,7 +59,6 @@ import edu.stanford.genetics.treeview.core.FileMruEditor;
 import edu.stanford.genetics.treeview.core.GeneFinder;
 import edu.stanford.genetics.treeview.core.GlobalPrefInfo;
 import edu.stanford.genetics.treeview.core.HeaderFinder;
-import edu.stanford.genetics.treeview.core.HeaderFinderPanel;
 import edu.stanford.genetics.treeview.core.LogMessagesPanel;
 import edu.stanford.genetics.treeview.core.LogSettingsPanel;
 import edu.stanford.genetics.treeview.core.MemMonitor;
@@ -91,6 +90,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	protected JDialog presetsFrame = null; 
 	protected TabbedSettingsPanel presetsPanel = null;
 
+	private LoadCheckView confirmPanel;
 	private TreeViewApp treeView;
 	private ProgramMenu programMenu;
 	private HeaderFinder geneFinder = null;
@@ -130,7 +130,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		waiting = new JPanel();
 		waiting.setLayout(new MigLayout("ins 0"));
-		waiting.setBackground(GUIColors.BG_COLOR);
+		waiting.setBackground(GUIParams.BG_COLOR);
 		
 		setupLayout();
 		setupPresets();
@@ -169,29 +169,33 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new MigLayout("ins 0"));
-		mainPanel.setBackground(GUIColors.BG_COLOR);
+		mainPanel.setBackground(GUIParams.BG_COLOR);
 		
 		title_bg = new JPanel();
 		title_bg.setLayout(new MigLayout());
-		title_bg.setBackground(GUIColors.TITLE_BG);
+		title_bg.setBackground(GUIParams.TITLE_BG);
 		
 		jl = new JLabel("Hello! How are you Gentlepeople?");
 		jl.setFont(new Font("Sans Serif", Font.PLAIN, 30));
-		jl.setForeground(GUIColors.TITLE_TEXT);
+		jl.setForeground(GUIParams.TITLE_TEXT);
 		
 		jl2 = new JLabel("Welcome to " + getAppName());
 		jl2.setFont(new Font("Sans Serif", Font.BOLD, 50));
-		jl2.setForeground(GUIColors.TITLE_TEXT);
+		jl2.setForeground(GUIParams.TITLE_TEXT);
 		
 		ClickableLabel load_Icon = new ClickableLabel(this, 
 				"Load Data >");
+		
+		ClickableLabel pref_Icon = new ClickableLabel(this, 
+				"Preferences > ");
 		
 		title_bg.add(jl, "push, alignx 50%, span, wrap");
 		title_bg.add(jl2, "push, alignx 50%, span");
 		
 		mainPanel.add(title_bg, "pushx, growx, alignx 50%, span, " +
 				"height 20%::, wrap");
-		mainPanel.add(load_Icon, "push, alignx 50%, span");
+		mainPanel.add(load_Icon, "push, alignx 50%");
+		mainPanel.add(pref_Icon, "push, alignx 50%");
 		
 		waiting.add(mainPanel, "push, grow");
 		
@@ -199,82 +203,80 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		waiting.repaint();
 	}
 	
-	/**
-	 * This method clears the initial starting frame and adds new components
-	 * to let the user select between options for processing/ viewing his data.
-	 */
-	public void resetLayout(){
-		
-		JPanel mainPanel;
-		JPanel confirmPanel; 
-		JPanel labelPanel;
-		JLabel confirm;
-		JLabel ques; 
-		JLabel loadNew;
-		
-		waiting.removeAll();
-		
-		mainPanel = new JPanel();
-		mainPanel.setLayout(new MigLayout());
-		mainPanel.setBackground(GUIColors.BG_COLOR);
-		
-		confirmPanel = new JPanel();
-		confirmPanel.setLayout(new MigLayout());
-		confirmPanel.setOpaque(false);
-		
-		labelPanel = new JPanel();
-		labelPanel.setLayout(new MigLayout());
-		labelPanel.setOpaque(false);
-		
-		confirm = new JLabel("Loaded File: " + dataModel.getFileName());
-		confirm.setFont(new Font("Sans Serif", Font.BOLD, 25));
-		confirm.setForeground(GUIColors.LIGHTGRAY);
-		
-		ques = new JLabel("What would you like to do?");
-		ques.setFont(new Font("Sans Serif", Font.PLAIN, 50));
-		ques.setForeground(GUIColors.DARKGRAY);
-		
-		ClickableLabel clus_label = new ClickableLabel(this, "Cluster >", 
-				(TVModel)dataModel);
-		
-		ClickableLabel viz_label = new ClickableLabel(this, "Visualize >",  
-				(TVModel)dataModel);
-		
-		loadNew = new JLabel("  Load New File");
-		loadNew.setFont(new Font("Sans Serif", Font.BOLD, 25));
-		loadNew.setForeground(GUIColors.ELEMENT);
-		
-		loadNew.addMouseListener(new SSMouseListener(loadNew){
-			
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				
-				openFile();
-			}
-		});
-		
-		confirmPanel.add(confirm, "push, alignx 50%");
-		confirmPanel.add(loadNew, "pushx");
-		labelPanel.add(ques, "alignx 50%, push, grow, span");
-		
-		mainPanel.add(labelPanel, "push, alignx 50%, aligny 100%, span, wrap");
-		mainPanel.add(clus_label, "push, alignx 50%");
-		mainPanel.add(viz_label, "push, alignx 50%, wrap");
-		mainPanel.add(confirmPanel, "push, alignx 50%, aligny 100%, span");
-		
-		waiting.add(mainPanel, "push, grow");
-		
-		waiting.repaint();
-		waiting.revalidate();
-	}
+//	/**
+//	 * This method clears the initial starting frame and adds new components
+//	 * to let the user select between options for processing/ viewing his data.
+//	 */
+//	public void resetLayout(){
+//		
+//		JPanel mainPanel;
+//		JPanel confirmPanel; 
+//		JPanel labelPanel;
+//		JLabel confirm;
+//		JLabel ques; 
+//		JLabel loadNew;
+//		
+//		waiting.removeAll();
+//		
+//		mainPanel = new JPanel();
+//		mainPanel.setLayout(new MigLayout());
+//		mainPanel.setBackground(GUIParams.BG_COLOR);
+//		
+//		confirmPanel = new JPanel();
+//		confirmPanel.setLayout(new MigLayout());
+//		confirmPanel.setOpaque(false);
+//		
+//		labelPanel = new JPanel();
+//		labelPanel.setLayout(new MigLayout());
+//		labelPanel.setOpaque(false);
+//		
+//		confirm = new JLabel("Loaded File: " + dataModel.getFileName());
+//		confirm.setFont(new Font("Sans Serif", Font.BOLD, 25));
+//		confirm.setForeground(GUIParams.LIGHTGRAY);
+//		
+//		ques = new JLabel("What would you like to do?");
+//		ques.setFont(new Font("Sans Serif", Font.PLAIN, 50));
+//		ques.setForeground(GUIParams.DARKGRAY);
+//		
+//		ClickableLabel clus_label = new ClickableLabel(this, "Cluster >", 
+//				(TVModel)dataModel);
+//		
+//		ClickableLabel viz_label = new ClickableLabel(this, "Visualize >",  
+//				(TVModel)dataModel);
+//		
+//		loadNew = new JLabel("  Load New File");
+//		loadNew.setFont(new Font("Sans Serif", Font.BOLD, 25));
+//		loadNew.setForeground(GUIParams.ELEMENT);
+//		
+//		loadNew.addMouseListener(new SSMouseListener(loadNew){
+//			
+//			@Override
+//			public void mouseClicked(MouseEvent e) {
+//				
+//				openFile();
+//			}
+//		});
+//		
+//		confirmPanel.add(confirm, "push, alignx 50%");
+//		confirmPanel.add(loadNew, "pushx");
+//		labelPanel.add(ques, "alignx 50%, push, grow, span");
+//		
+//		mainPanel.add(labelPanel, "push, alignx 50%, aligny 100%, span, wrap");
+//		mainPanel.add(clus_label, "push, alignx 50%");
+//		mainPanel.add(viz_label, "push, alignx 50%, wrap");
+//		mainPanel.add(confirmPanel, "push, alignx 50%, aligny 100%, span");
+//		
+//		waiting.add(mainPanel, "push, grow");
+//		
+//		waiting.repaint();
+//		waiting.revalidate();
+//	}
 	
 	/**
 	 * This method clears the initial starting frame and adds new components
 	 * to let the user select between options for processing/ viewing his data.
 	 */
-	public void confirmLoaded(){
-		
-		LoadCheckView confirmPanel; 
+	public void confirmLoaded(){ 
 		
 		waiting.removeAll();
 		
@@ -361,7 +363,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		try {
 			tvModel.loadNew(fileSet);
-			setDataModel(tvModel, false);
+			setDataModel(tvModel, false, true);
 			
 		} catch (LoadException e) {
 			if (e.getType() != LoadException.INTPARSE) {
@@ -381,7 +383,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		try {
 			tvModel.loadNewNW(fileSet);
-			setDataModel(tvModel, false);
+			setDataModel(tvModel, false, true);
 		} catch (LoadException e) {
 			if (e.getType() != LoadException.INTPARSE) {
 				JOptionPane.showMessageDialog(this, e);
@@ -481,9 +483,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 * Generates a ClusterView object and sets the current running MainPanel
 	 * to it. As a result the View is displayed in the TreeViewFrame
 	 */
-	protected void setupClusterRunning() {
+	protected void setupClusterRunning(boolean hierarchical) {
 		
-		ClusterView cv = new ClusterView(getDataModel(), this);
+		ClusterView cv = new ClusterView(getDataModel(), this, hierarchical);
 		running = cv;
 	}
 
@@ -550,11 +552,13 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		synchronized(menubar) {
 			menubar.addMenu(TreeviewMenuBarI.programMenu);
 			menubar.setMenuMnemonic(KeyEvent.VK_F);
-			menubar.setMenuMnemonic(KeyEvent.VK_C);
 			programMenu = new ProgramMenu(); // rebuilt when fileMru notifies
 			menubar.addMenu(TreeviewMenuBarI.documentMenu);
 			menubar.setMenuMnemonic(KeyEvent.VK_S);
 			populateSettingsMenu(menubar);
+			menubar.addMenu(TreeviewMenuBarI.clusterMenu);
+			menubar.setMenuMnemonic(KeyEvent.VK_C);
+			populateClusterMenu(menubar);
 			menubar.addMenu(TreeviewMenuBarI.analysisMenu);
 			menubar.setMenuMnemonic(KeyEvent.VK_A);
 			menubar.addMenu(TreeviewMenuBarI.exportMenu);
@@ -642,6 +646,56 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		presetsFrame.pack();
 	}
 	
+	//Setting up cluster menu
+	protected void populateClusterMenu(TreeviewMenuBarI menubar) {
+		
+		final JDialog dialog = new JDialog (TreeViewFrame.this);
+		dialog.setLocationRelativeTo(null);
+		dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		
+		JPanel panel = new JPanel();
+		panel.setLayout(new MigLayout());
+		panel.setBackground(GUIParams.BG_COLOR);
+		
+		JLabel l1 = new JLabel("Please load data first.");
+		l1.setFont(GUIParams.FONTS);
+		l1.setForeground(GUIParams.TEXT);
+		
+		menubar.addMenuItem("Hierarchical", new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				
+				if(dataModel != null) {
+					TreeViewFrame.this.setDataModel((TVModel)dataModel, true, 
+							true);
+					TreeViewFrame.this.setLoaded(true);
+					
+				} else {
+					dialog.setVisible(true);
+				}
+			}
+			
+			
+		});
+		menubar.addMenuItem("K-Means", new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				if(dataModel != null) {
+					TreeViewFrame.this.setDataModel((TVModel)dataModel, true, 
+							false);
+					TreeViewFrame.this.setLoaded(true);
+					
+				} else {
+					dialog.setVisible(true);
+				}
+				
+			}	
+		});
+	}
+	
 	//Populating various menus
 	/**
 	 * This methods populates the Settings menu with several MenuItems
@@ -657,14 +711,14 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				
-				GUIColors.setDayLight();
+				GUIParams.setDayLight();
 				
 				if(dataModel != null && running != null) {
-					resetLayout();
+					confirmPanel.setupLayout();
 					running.refresh();
 					
-				} else if(dataModel != null && running == null) {
-					resetLayout();
+				} else if(dataModel != null && running == null){
+					confirmPanel.setupLayout();
 					
 				} else {
 					setupLayout();
@@ -677,14 +731,14 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				
-				GUIColors.setNight();
+				GUIParams.setNight();
 				
 				if(dataModel != null && running != null) {
-					resetLayout();
+					confirmPanel.setupLayout();
 					running.refresh();
 					
-				} else if(dataModel != null && running == null) {
-					resetLayout();
+				} else if(dataModel != null && running == null){
+					confirmPanel.setupLayout();
 					
 				} else {
 					setupLayout();
@@ -1219,14 +1273,70 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			written =  writer.writeAll(getDataModel().getFileSet());
 		}
 		
+		final JDialog dialog = new JDialog(TreeViewFrame.this);
+		dialog.setTitle("Information");
+		dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		dialog.setLocationRelativeTo(null);
+		
+		JPanel panel = new JPanel();
+		panel.setLayout(new MigLayout());
+		panel.setBackground(GUIParams.BG_COLOR);
+		
+		Font font = new Font("Sans Serif", Font.PLAIN, 14);
+		JButton button = new JButton("OK");
+		Dimension d = button.getPreferredSize();
+  		d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
+  		button.setPreferredSize(d);
+  		button.setFont(font);
+  		button.setOpaque(true);
+  		button.setBackground(GUIParams.ELEMENT);
+  		button.setForeground(GUIParams.BG_COLOR);
+  		button.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				dialog.dispose();
+			}
+  		});
+		
 		if (written.isEmpty()) {
-			JOptionPane.showMessageDialog(TreeViewFrame.this, 
-					"No Model changes were written\nOnly the following " +
-					"changes require explicit saving:\n\n"+
-					" - Tree Node flips (Analysis->Flip " +
-					"Array/Gene Tree Node)\n" +
-					" - Tree Node Annotations " +
-					"(Analysis->Array/Gene TreeAnno)\n");
+			JLabel l1 = new JLabel("No Model changes were written.");
+			l1.setFont(font);
+			l1.setForeground(GUIParams.TEXT);
+			
+			JLabel l2 = new JLabel("Only the following changes require " +
+					"explicit saving:");
+			l2.setFont(font);
+			l2.setForeground(GUIParams.TEXT);
+			
+			JLabel l3 = new JLabel("- Tree Node flips (Analysis->Flip " +
+					"Array/Gene Tree Node)");
+			l3.setFont(font);
+			l3.setForeground(GUIParams.TEXT);
+			
+			JLabel l4 = new JLabel("- Tree Node Annotations " +
+					"(Analysis->Array/Gene TreeAnno)");
+			l4.setFont(font);
+			l4.setForeground(GUIParams.TEXT);
+			
+			panel.add(l1, "pushx, wrap");
+			panel.add(l2, "pushx, wrap");
+			panel.add(l3, "pushx, wrap");
+			panel.add(l4, "pushx, wrap");
+			panel.add(button, "pushx, alignx 50%");
+			
+			dialog.add(panel, "push, grow");
+			
+			dialog.pack();
+			dialog.setVisible(true);
+			
+//			JOptionPane.showMessageDialog(TreeViewFrame.this, dialog);
+//					"No Model changes were written\nOnly the following " +
+//					"changes require explicit saving:\n\n"+
+//					" - Tree Node flips (Analysis->Flip " +
+//					"Array/Gene Tree Node)\n" +
+//					" - Tree Node Annotations " +
+//					"(Analysis->Array/Gene TreeAnno)\n");
 			return false;
 			
 		} else {
@@ -1248,7 +1358,19 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 				}
 			}
 			
-			JOptionPane.showMessageDialog(TreeViewFrame.this, msg);
+			JLabel l1 = new JLabel(msg);
+			l1.setFont(font);
+			l1.setForeground(GUIParams.TEXT);
+			
+			panel.add(l1, "pushx, wrap");
+			panel.add(button, "pushx, alignx 50%");
+			
+			dialog.add(panel, "push, grow");
+			
+			dialog.pack();
+			dialog.setVisible(true);
+//			
+//			JOptionPane.showMessageDialog(TreeViewFrame.this, msg);
 			return true;
 		}
 	}
@@ -1273,7 +1395,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 					public void actionPerformed(ActionEvent actionEvent) {
 						
 						openFile();
-						resetLayout();
 					}
 				});
 				menubar.setAccelerator(KeyEvent.VK_O);
@@ -1627,7 +1748,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 * @param DataModel newModel
 	 */
 	@Override
-	public void setDataModel(DataModel newModel, boolean cluster) {									
+	public void setDataModel(DataModel newModel, boolean cluster, 
+			boolean hierarchical) {									
 		
 		if (dataModel != null) {
 			dataModel.clearFileSetListeners();
@@ -1642,7 +1764,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		setupExtractors();
 		
 		if(cluster) {
-			setupClusterRunning();
+			setupClusterRunning(hierarchical);
 			
 		} else {
 			setupRunning();
@@ -1733,5 +1855,4 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	
 	//Empty Methods
 	protected void setupPresets() {}
-
 }

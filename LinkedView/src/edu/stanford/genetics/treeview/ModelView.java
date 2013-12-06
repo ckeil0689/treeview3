@@ -61,7 +61,7 @@ MouseListener {
 		
 		super(false);
 		setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
-		setBackground(GUIColors.BG_COLOR); //NO
+		setBackground(GUIParams.BG_COLOR); //NO
 	}
 	
 	/** 

@@ -250,7 +250,7 @@ FontSelectable, ConfigNodePersistent {
 		    }
 		    
 		    //Foreground Text
-			Color back = GUIColors.ELEMENT;//g.getColor();
+			Color back = GUIParams.ELEMENT;//g.getColor();
 			for (int j = start;j <= end;j++) {
 				
 				try { 

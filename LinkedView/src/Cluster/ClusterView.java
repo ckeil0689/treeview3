@@ -29,7 +29,6 @@ package Cluster;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -59,7 +58,7 @@ import edu.stanford.genetics.treeview.ConfigNode;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.ExportException;
 import edu.stanford.genetics.treeview.FileSet;
-import edu.stanford.genetics.treeview.GUIColors;
+import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.MainPanel;
 import edu.stanford.genetics.treeview.MainProgramArgs;
@@ -83,10 +82,6 @@ public class ClusterView extends JPanel implements MainPanel {
 	
 	private static final long serialVersionUID = 1L;
 	
-	//Two Font Sizes
-	private static Font fontS = new Font("Sans Serif", Font.PLAIN, 18);
-	private static Font fontL = new Font("Sans Serif", Font.PLAIN, 24);
-	
 	//Instance
 	protected DataModel dataModel;
 	protected ConfigNode root;
@@ -94,6 +89,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	private TreeViewFrame viewFrame;
 	private TVDataMatrix matrix;
 	private double[] dataArray;
+	private boolean hierarchical;
 	
 	//Various GUI elements
 	private JScrollPane scrollPane;
@@ -168,9 +164,10 @@ public class ClusterView extends JPanel implements MainPanel {
 	 * @param  cVModel model this ClusterView is to represent
 	 * @param  vFrame  parent ViewFrame of DendroView
 	 */
-	public ClusterView(DataModel cVModel, TreeViewFrame vFrame) {
+	public ClusterView(DataModel cVModel, TreeViewFrame vFrame, 
+			boolean hierarchical) {
 		
-		this(cVModel, null, vFrame, "Cluster View");
+		this(cVModel, null, vFrame, "Cluster View", hierarchical);
 	}
 	
 	/**
@@ -180,9 +177,9 @@ public class ClusterView extends JPanel implements MainPanel {
 	 * @param vFrame
 	 */
 	public ClusterView(DataModel cVModel, ConfigNode root, 
-			TreeViewFrame vFrame) {
+			TreeViewFrame vFrame, boolean hierarchical) {
 		
-		this(cVModel, root, vFrame, "Cluster View");
+		this(cVModel, root, vFrame, "Cluster View", hierarchical);
 	}
 	
 	/**
@@ -195,12 +192,13 @@ public class ClusterView extends JPanel implements MainPanel {
 	 * @param  name name of this view.
 	 */
 	public ClusterView(DataModel dataModel, ConfigNode root, 
-			TreeViewFrame vFrame, String name) {
+			TreeViewFrame vFrame, String name, boolean hierarchical) {
 		
 		super.setName(name);
 		
 		this.dataModel = dataModel;
 		this.viewFrame = vFrame;
+		this.hierarchical = hierarchical;
 		
 		clusterFrame = new ClusterFrame(viewFrame, "Cluster Information");
 		
@@ -231,15 +229,13 @@ public class ClusterView extends JPanel implements MainPanel {
 		//Create background panel
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new MigLayout("ins 0"));
-		mainPanel.setBackground(GUIColors.BG_COLOR);
+		mainPanel.setBackground(GUIParams.BG_COLOR);
 		
 		//Background Panel for the Cluster Options
 		optionsPanel = new JPanel();
 		optionsPanel.setLayout(new MigLayout());
-		optionsPanel.setBorder(
-				BorderFactory.createLineBorder(GUIColors.BORDERS, 
-						EtchedBorder.LOWERED));
-//		optionsPanel.setBackground(GUIColors.BG_COLOR);
+		optionsPanel.setBorder(BorderFactory.createLineBorder(
+				GUIParams.BORDERS, EtchedBorder.LOWERED));
 		optionsPanel.setOpaque(false);
 		
 		//Panel for the Buttons
@@ -249,10 +245,16 @@ public class ClusterView extends JPanel implements MainPanel {
 		
 		//header
 		head1 = new JLabel("Options");
-		head1.setFont(fontL);
-		head1.setForeground(GUIColors.ELEMENT);
+		head1.setFont(GUIParams.FONTL);
+		head1.setForeground(GUIParams.ELEMENT);
 		
 		clusterType = setComboLayout(clusterNames);
+		if(hierarchical) {
+			clusterType.setSelectedIndex(0);
+			
+		} else {
+			clusterType.setSelectedIndex(1);
+		}
 		clusterType.addActionListener(new ActionListener(){
 			
 			@Override
@@ -276,8 +278,8 @@ public class ClusterView extends JPanel implements MainPanel {
 		scrollPane.setOpaque(false);
 		
 		similarity = new JLabel("Similarity Metric: ");
-  		similarity.setFont(fontL);
-  		similarity.setForeground(GUIColors.TEXT);
+  		similarity.setFont(GUIParams.FONTL);
+  		similarity.setForeground(GUIParams.TEXT);
   		
   		//filler component
   		emptyPanel = new JPanel();
@@ -286,12 +288,12 @@ public class ClusterView extends JPanel implements MainPanel {
   		
 		//Labels
 		head2 = new JLabel("Rows");
-		head2.setFont(fontL);
-		head2.setForeground(GUIColors.ELEMENT);
+		head2.setFont(GUIParams.FONTL);
+		head2.setForeground(GUIParams.ELEMENT);
 		
 		head3 = new JLabel("Columns");
-		head3.setFont(fontL);
-		head3.setForeground(GUIColors.ELEMENT);
+		head3.setFont(GUIParams.FONTL);
+		head3.setForeground(GUIParams.ELEMENT);
 		 
 		//Drop-down menu for row selection
   		geneCombo = setComboLayout(measurements);
@@ -342,12 +344,12 @@ public class ClusterView extends JPanel implements MainPanel {
 				
 				status1 = new JLabel("The file has been saved " +
 						"in the original directory.");
-				status1.setForeground(GUIColors.TEXT);
-				status1.setFont(fontS);
+				status1.setForeground(GUIParams.TEXT);
+				status1.setFont(GUIParams.FONTS);
 				
 				status2 = new JLabel("File Path: " + path);
-				status2.setForeground(GUIColors.TEXT);
-				status2.setFont(fontS);
+				status2.setForeground(GUIParams.TEXT);
+				status2.setFont(GUIParams.FONTS);
 				
 				dendro_button.setEnabled(true);
 				buttonPanel.add(back_button, "pushx, alignx 50%");
@@ -364,8 +366,8 @@ public class ClusterView extends JPanel implements MainPanel {
 		
 		//Label
 		method = new JLabel("Linkage Method:");
-		method.setFont(fontL);
-		method.setForeground(GUIColors.TEXT);
+		method.setFont(GUIParams.FONTL);
+		method.setForeground(GUIParams.TEXT);
 		
 		//Clickable Panel to call ClusterFrame
 		infoIcon = new ClickableIcon(clusterFrame, "infoIcon.png");
@@ -374,12 +376,12 @@ public class ClusterView extends JPanel implements MainPanel {
 		clusterChoice = setComboLayout(clusterMethods);
 		
 		clusters = new JLabel("Clusters: ");
-		clusters.setFont(fontL);
-		clusters.setForeground(GUIColors.TEXT);
+		clusters.setFont(GUIParams.FONTL);
+		clusters.setForeground(GUIParams.TEXT);
 		
 		its = new JLabel("Iterations: ");
-		its.setFont(fontL);
-		its.setForeground(GUIColors.TEXT);
+		its.setFont(GUIParams.FONTL);
+		its.setForeground(GUIParams.TEXT);
 		
 		enterRC = setupSpinner();
 		enterCC = setupSpinner();
@@ -389,10 +391,9 @@ public class ClusterView extends JPanel implements MainPanel {
 		//ProgressBar Component
 		loadPanel = new JPanel();
 		loadPanel.setLayout(new MigLayout());
-//		loadPanel.setBackground(GUIColors.BG_COLOR);
 		loadPanel.setOpaque(false);
 		loadPanel.setBorder(
-				BorderFactory.createLineBorder(GUIColors.BORDERS, 
+				BorderFactory.createLineBorder(GUIParams.BORDERS, 
 						EtchedBorder.LOWERED));
     	
   		//Button to go back to data preview
@@ -515,8 +516,8 @@ public class ClusterView extends JPanel implements MainPanel {
 				} else {
 					loadPanel.removeAll();
 					error1 = new JLabel("Woah, that's too quick!");
-					error1.setFont(fontS);
-					error1.setForeground(GUIColors.RED1);
+					error1.setFont(GUIParams.FONTS);
+					error1.setForeground(GUIParams.RED1);
 					
 					String hint = "";
 					String hint2 = "";
@@ -534,12 +535,12 @@ public class ClusterView extends JPanel implements MainPanel {
 					}
 					
 					error2 = new JLabel(hint);
-					error2.setFont(fontS);
-					error2.setForeground(GUIColors.TEXT);
+					error2.setFont(GUIParams.FONTS);
+					error2.setForeground(GUIParams.TEXT);
 					
 					error3 = new JLabel(hint2);
-					error3.setFont(fontS);
-					error3.setForeground(GUIColors.TEXT);
+					error3.setFont(GUIParams.FONTS);
+					error3.setForeground(GUIParams.TEXT);
 					
 					loadPanel.add(error1, "alignx 50%, span, wrap");
 					loadPanel.add(error2, "alignx 50%, span, wrap");
@@ -628,10 +629,10 @@ public class ClusterView extends JPanel implements MainPanel {
   		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
   		button.setPreferredSize(d);
   		
-  		button.setFont(fontS);
+  		button.setFont(GUIParams.FONTS);
   		button.setOpaque(true);
-  		button.setBackground(GUIColors.ELEMENT);
-  		button.setForeground(GUIColors.BG_COLOR);
+  		button.setBackground(GUIParams.ELEMENT);
+  		button.setForeground(GUIParams.BG_COLOR);
   		
   		return button;
 	}
@@ -648,7 +649,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		Dimension d = comboBox.getPreferredSize();
 		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
 		comboBox.setPreferredSize(d);
-		comboBox.setFont(fontS);
+		comboBox.setFont(GUIParams.FONTS);
 		comboBox.setBackground(Color.white);
 		
 		return comboBox;
@@ -666,7 +667,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		pBar.setMinimum(0);
 		pBar.setStringPainted(true);
 		pBar.setMaximumSize(new Dimension(2000, 40));
-		pBar.setForeground(GUIColors.ELEMENT);
+		pBar.setForeground(GUIParams.ELEMENT);
 		pBar.setUI(new BasicProgressBarUI(){
 			@Override
 			protected Color getSelectionBackground(){return Color.black;};
@@ -691,7 +692,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		Dimension d = jft.getPreferredSize();
 		d.setSize(d.getWidth(), d.getHeight()*2);
 		jft.setPreferredSize(d);
-		jft.setFont(fontS);
+		jft.setFont(GUIParams.FONTS);
 		
 		return jft;
 	}
@@ -703,7 +704,8 @@ public class ClusterView extends JPanel implements MainPanel {
 	public boolean isHierarchical() {
 		
 		String choice = (String)clusterType.getSelectedItem();
-		return choice.equalsIgnoreCase("Hierarchical Clustering");
+		hierarchical = choice.equalsIgnoreCase("Hierarchical Clustering");
+		return hierarchical;
 	}
 	
 	/**
@@ -756,17 +758,6 @@ public class ClusterView extends JPanel implements MainPanel {
 	public void setFile(File cdtFile){
 		
 		file = cdtFile;
-	}
-	
-	//Getters
-	public Font getSmallFont() {
-		
-		return fontS;
-	}
-	
-	public Font getLargeFont() {
-		
-		return fontL;
 	}
 	
 	public JLabel getTitle() {

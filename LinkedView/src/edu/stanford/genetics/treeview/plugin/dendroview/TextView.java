@@ -43,7 +43,7 @@ import java.util.Observable;
 import javax.swing.JScrollPane;
 
 import edu.stanford.genetics.treeview.ConfigNode;
-import edu.stanford.genetics.treeview.GUIColors;
+import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.ModelView;
@@ -238,7 +238,7 @@ public class TextView extends ModelView implements FontSelectable,
 		    	}
 	
 				if (out != null) {
-					Color back = GUIColors.ELEMENT; //g.getColor();
+					Color back = GUIParams.ELEMENT; //g.getColor();
 					if ((geneSelection == null) 
 							|| geneSelection.isIndexSelected(j)) {
 						String [] strings = headerInfo.getHeader(j);

@@ -50,7 +50,7 @@ import javax.swing.WindowConstants;
 import javax.swing.border.EtchedBorder;
 
 import net.miginfocom.swing.MigLayout;
-import edu.stanford.genetics.treeview.GUIColors;
+import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 /**
  * This class describes the GUI for the Cluster Application. 
@@ -120,7 +120,7 @@ public class ClusterFrame extends JFrame{
 		//Set layout for initial window
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new MigLayout());
-		mainPanel.setBackground(GUIColors.BG_COLOR);
+		mainPanel.setBackground(GUIParams.BG_COLOR);
 		
 		backgroundPanel = new JPanel();
 		backgroundPanel.setLayout(new MigLayout());
@@ -144,7 +144,7 @@ public class ClusterFrame extends JFrame{
 		
 		close_button = new JButton("Close");
 		close_button.setOpaque(true);
-		close_button.setBackground(GUIColors.RED1);
+		close_button.setBackground(GUIParams.RED1);
 		close_button.setForeground(Color.white);
 		Dimension d = close_button.getPreferredSize();
 		d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
@@ -313,7 +313,7 @@ public class ClusterFrame extends JFrame{
 		
 		JLabel head = new JLabel(closedText);
 		head.setFont(new Font("Sans Serif", Font.PLAIN, 28));
-		head.setForeground(GUIColors.ELEMENT);
+		head.setForeground(GUIParams.ELEMENT);
 		
 		return head;
 	}
@@ -374,7 +374,7 @@ public class ClusterFrame extends JFrame{
 				
 				displayPanel.removeAll();
 				
-				title.setForeground(GUIColors.RED1);
+				title.setForeground(GUIParams.RED1);
 				displayPanel.add(infoPanel, "push, grow, span");
 				
 				mainPanel.revalidate();
@@ -385,14 +385,14 @@ public class ClusterFrame extends JFrame{
 			@Override
 			public void mouseEntered(MouseEvent arg0) {
 				
-					title.setForeground(GUIColors.LIGHTGRAY);
+					title.setForeground(GUIParams.LIGHTGRAY);
 					title.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			}
 
 			@Override
 			public void mouseExited(MouseEvent arg0) {
 
-					title.setForeground(GUIColors.ELEMENT);
+					title.setForeground(GUIParams.ELEMENT);
 					title.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
 

@@ -101,7 +101,7 @@ public class LoadProgress2 extends JDialog implements LoadProgress2I {
 		contentPane.setLayout(new MigLayout());
 		contentPane.add(panel, "span, pushx, growx, wrap");
 		contentPane.add(new JScrollPane(taskOutput), "push, grow, wrap");
-		contentPane.setBackground(GUIColors.BG_COLOR);
+		contentPane.setBackground(GUIParams.BG_COLOR);
 		
 		closeButton = new JButton("Cancel");
 		closeButton = setButtonLayout(closeButton);
@@ -417,8 +417,8 @@ public class LoadProgress2 extends JDialog implements LoadProgress2I {
   		
   		button.setFont(buttonFont);
   		button.setOpaque(true);
-  		button.setBackground(GUIColors.ELEMENT);
-  		button.setForeground(GUIColors.BG_COLOR);
+  		button.setBackground(GUIParams.ELEMENT);
+  		button.setForeground(GUIParams.BG_COLOR);
   		
   		return button;
 	}
@@ -437,7 +437,7 @@ public class LoadProgress2 extends JDialog implements LoadProgress2I {
 		pBar.setMinimum(0);
 		pBar.setStringPainted(true);
 		pBar.setMaximumSize(d);
-		pBar.setForeground(GUIColors.ELEMENT);
+		pBar.setForeground(GUIParams.ELEMENT);
 		pBar.setUI(new BasicProgressBarUI(){
 			@Override
 			protected Color getSelectionBackground(){return Color.black;};

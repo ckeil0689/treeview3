@@ -352,7 +352,8 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 * @return    Sets the shared <code>DataModel</code>
 	 * @throws LoadException
 	 */
-	public abstract void setDataModel(DataModel model, boolean cluster);
+	public abstract void setDataModel(DataModel model, boolean cluster, 
+			boolean hierarchical);
 
 	/**
 	 *  Should scroll all MainPanels in this view frame to the specified gene.
@@ -847,7 +848,7 @@ public abstract class ViewFrame extends JFrame implements Observer {
 		}
 		
 		ViewFrame window = getApp().openNew();
-		window.setDataModel(dataModel, false);
+		window.setDataModel(dataModel, false, false);
 		window.setLoaded(true);
 		window.setVisible(true);
 	}	 

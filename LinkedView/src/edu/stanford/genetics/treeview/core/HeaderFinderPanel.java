@@ -35,18 +35,18 @@ import javax.swing.*;
 
 import net.miginfocom.swing.MigLayout;
 
-import edu.stanford.genetics.treeview.GUIColors;
+import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.ViewFrame;
-import edu.stanford.genetics.treeview.core.HeaderFinder.ResultsPanel.ListSeeker;
+
 /**
- *  The purpose of this class is to allow searching on HeaderInfo objects.
- * The display of the headers and the matching is handled by this class,
- * whereas the actual manipulation of the selection objects and the 
- * associated views is handled by the relevant subclass.
+ * This class allows users to look for row or column elements by choosing
+ * them in a drop down menu. The menu is populated with headers from the 
+ * loaded data matrix. The class is abstract and a basis for the GeneFinderPanel
+ * class as well as the ArrayFinderPanel class. 
  * 
- * @author aloksaldanha
+ * It extends JPanel and can be used as a Swing component.
  *
  */
 public abstract class HeaderFinderPanel extends JPanel {
@@ -58,14 +58,9 @@ public abstract class HeaderFinderPanel extends JPanel {
 	protected TreeSelectionI geneSelection;
 	protected ViewFrame viewFrame;
 	
-//    private JButton search_button, seek_button, seekNext_button, seekAll_button, 
-//    summary_button;
-//    private ResultsPanel rpanel;
     private HeaderInfo headerInfo;
     private int choices[];
     private int nchoices = 0;
-    private JList results;
-	private DefaultListModel resultsModel;
 	
 	private JLabel genef;
 	private ArrayList<String> geneList;
@@ -90,30 +85,13 @@ public abstract class HeaderFinderPanel extends JPanel {
 		this.geneSelection = geneSelection;
 		choices = new int[hI.getNumHeaders()]; // could be wasteful of ram...
 	
-//		JPanel mainPanel = new JPanel();
-//		mainPanel.setLayout(new BorderLayout());
-//		mainPanel.add(new SearchPanel(), BorderLayout.NORTH);
-//		
-//		rpanel = new ResultsPanel();
-//		mainPanel.add(new JScrollPane(rpanel), BorderLayout.CENTER);
-//		
-//		mainPanel.add(new ClosePanel(), BorderLayout.SOUTH);
-//	
-//		mainPanel.add(new SeekPanel() , BorderLayout.EAST);
-//		getContentPane().add(mainPanel);
-//		addWindowListener(new WindowAdapter () {
-//			@Override
-//			public void windowClosing(WindowEvent we) {
-//			    setVisible(false);
-//			}
-//		    });
-//		pack();
 		this.setLayout(new MigLayout());
-		this.setOpaque(true);
+		this.setOpaque(false);
 		
 		String[][] hA = headerInfo.getHeaderArray();
 		
 		genef = new JLabel("Find " + type + " Element: ");
+		genef.setForeground(GUIParams.TEXT);
 		genef.setFont(fontS);
 		
 		geneList = new ArrayList<String>();
@@ -135,13 +113,12 @@ public abstract class HeaderFinderPanel extends JPanel {
 		    	String gene = genefBox.getSelectedItem().toString();
 		    	findGenes(gene);
 		    	seekAll();
-		    	//showSubDataModel();
 		    }
 		});
 		
-		this.add(genef, "span, wrap, pushx");
-		this.add(genefBox, "growx, push, growx");
-		this.add(genefButton);
+		this.add(genef, "span, pushx, wrap");
+		this.add(genefBox, "growx, pushx, width 70%");
+		this.add(genefButton, "pushx, width 20%");
     }
 	
 	/**
@@ -153,6 +130,7 @@ public abstract class HeaderFinderPanel extends JPanel {
 	public String[] getGenes(String[][] hA) {
 		
 		String[] geneArray = new String[headerInfo.getNumHeaders()];
+		String[] names = headerInfo.getNames();
 		int idIndex = headerInfo.getIndex("ORF");
 		
 		for(int i = 0; i < hA.length; i++) {
@@ -181,8 +159,8 @@ public abstract class HeaderFinderPanel extends JPanel {
   		
   		button.setFont(buttonFont);
   		button.setOpaque(true);
-  		button.setBackground(GUIColors.ELEMENT);
-  		button.setForeground(GUIColors.BG_COLOR);
+  		button.setBackground(GUIParams.ELEMENT);
+  		button.setForeground(GUIParams.BG_COLOR);
   		
   		return button;
 	}
@@ -204,116 +182,27 @@ public abstract class HeaderFinderPanel extends JPanel {
 		
 		return comboBox;
 	}
-    
-//	/**
-//	* selects all the genes which are currently selected in the results panel.
-//	*/
-//	private void seek() {
-//		
-//		int first = rpanel.getFirstSelectedIndex(); 
-//		// in some jdks, selected index is set to -1 between selections.
-//		if (first == -1) {
-//			return;
-//		}
-//		
-//		int [] selected = results.getSelectedIndices();
-//		if (selected.length == 0) {
-//			return;
-//		}
-//
-//		geneSelection.deselectAllIndexes();
-//		for (int i = 0; i < selected.length; i++) {
-//			geneSelection.setIndex(choices[selected[i]], true);
-//		}
-//		geneSelection.notifyObservers();
-//		scrollToIndex(choices[first]);
-//	}
 	
-	/* 		if (viewFrame != null)
-	viewFrame.scrollToGene(choices[first]);
-	*/
-	
-//    private void seekNext() {
-//    	
-//		int currentIndex = rpanel.getFirstSelectedIndex();
-//		if (currentIndex == -1) {
-//			return; // no current selection.
-//		}
-//		
-//		int nextIndex = (currentIndex + 1) % resultsModel.getSize();
-//		rpanel.setSelectedIndex(nextIndex);
-//		results.ensureIndexIsVisible(nextIndex);
-//		seek();
-//    }
-//    
 	public void seekAll() {
 		
-		//results.setSelectionInterval(0, resultsModel.getSize() - 1);
-		int [] selected = {0};//results.getSelectedIndices();
+		int [] selected = {0};
 		geneSelection.setSelectedNode(null);
 		geneSelection.deselectAllIndexes();
 		
-		//for (int i = 0; i < selected.length; i++) {
 		int geneIndex = 0;
 		geneIndex = geneList.indexOf((String)genefBox.getSelectedItem());
-		geneSelection.setIndex(geneIndex, true);//choices[selected[i]], true);
-		//}
+		geneSelection.setIndex(geneIndex, true);
 		
 		geneSelection.notifyObservers();
-		//results.repaint();
 		
 		if ((viewFrame != null) && (selected.length > 0)) {
-			scrollToIndex(choices[selected[0]]);
-				
-		}
-	}
-	
-	/**
-	* selects all genes which match the specified id in their id column...
-	*/
-	public void findGenesById(String [] subs) {
-		
-		nchoices = 0;
-		//resultsModel.removeAllElements();
-		
-		int jmax  = headerInfo.getNumHeaders();
-		int idIndex = headerInfo.getIndex("YORF"); 
-		
-		//actually, just 0, or 1 if 0 is GID.
-		for  (int j = 0; j < jmax; j++) {
-			String [] headers = headerInfo.getHeader(j);
-			if (headers == null) {
-				continue;
-			}
-			
-			String id = headers[idIndex];
-			if (id == null) {
-				continue;
-			}
-			
-			boolean match = false;
-			for (int i=0; i < subs.length; i++) {
-				if (subs[i] == null) {
-					System.out.println("eek! HeaderFinder substring " + i 
-							+ " was null!");
-				}
-				
-				if (id.indexOf(subs[i]) >= 0) {
-					match = true;
-					break;
-				}
-			}
-			
-			if (match) {
-				selectGene(j);
-			}
+			scrollToIndex(choices[selected[0]]);		
 		}
 	}
 	
     private void findGenes(String sub) {
 		
     	nchoices = 0;
-		//resultsModel.removeAllElements();
 		
 		int jmax = headerInfo.getNumHeaders();
 		for (int j = 0; j < jmax; j++) {
@@ -346,131 +235,21 @@ public abstract class HeaderFinderPanel extends JPanel {
 
 	private void selectGene(int j) {
 		
-		String [] strings = headerInfo.getHeader(j);
-		String id = "";
-		for (int i = 1; i < strings.length; i++) {		    
-			if (strings[i] != null) {
-				id += strings[i] + "; ";
-			}
-		}
+//		String [] strings = headerInfo.getHeader(j);
+//		String id = "";
+//		for (int i = 1; i < strings.length; i++) {		    
+//			if (strings[i] != null) {
+//				id += strings[i] + "; ";
+//			}
+//		}
+//		
+//		if (strings[0] != null) {
+//			id += strings[0] + "; ";
+//		}
 		
-		if (strings[0] != null) {
-			id += strings[0] + "; ";
-		}
-		
-		//resultsModel.addElement(id);
 		choices[nchoices++] = j;
 	}
   
 	abstract public void scrollToIndex(int i);
-    
-//	class ResultsPanel extends JPanel {
-//
-//		private static final long serialVersionUID = 1L;
-//		
-//		public ResultsPanel() {
-//
-////			setLayout(new BorderLayout());
-//			resultsModel = new DefaultListModel();
-//			results = new JList(resultsModel);
-//			results.setVisibleRowCount(10);
-//			results.addListSelectionListener(new ListSeeker());
-////			add(results, BorderLayout.CENTER);
-//			add(results);
-//		}
-//		
-//		class ListSeeker implements ListSelectionListener {
-//			@Override
-//			public void valueChanged(ListSelectionEvent e) {
-//				results.repaint();
-//				seek();
-//			}
-//		}
-//		
-//		public int getFirstSelectedIndex() {return results.getSelectedIndex();}
-//		public int [] getSelectedIndices() {return results.getSelectedIndices();}
-//		public void setSelectedIndex(int i) {results.setSelectedIndex(i);}
-//	}
 
-//    class SeekPanel extends JPanel {
-//
-//		private static final long serialVersionUID = 1L;
-//
-//		public SeekPanel () {
-//			
-//			super();
-//			setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)); 
-//		    search_button = new JButton("Search");
-//		    search_button.addActionListener(search_text);
-//		    add(search_button);
-//	
-//	 	    seek_button = new JButton("Seek");
-//		    seek_button.addActionListener(new ActionListener() {
-//			    
-//		    	@Override
-//				public void actionPerformed(ActionEvent evt) {
-//				
-//		    		seek();
-//			    }
-//			});
-//	
-//		    // add(seek_button);
-//	 	    seekNext_button = new JButton("Next");
-//		    seekNext_button.addActionListener(new ActionListener() {
-//			    
-//		    	@Override
-//				public void actionPerformed(ActionEvent evt) {
-//				
-//		    		seekNext();
-//			    }
-//			});
-//		    add(seekNext_button);
-//	
-//	 	    seekAll_button = new JButton("All");
-//		    seekAll_button.addActionListener(new ActionListener() {
-//			    
-//		    	@Override
-//				public void actionPerformed(ActionEvent evt) {
-//				
-//		    		seekAll();
-//			    }
-//			});
-//		    add(seekAll_button);
-//			
-//			summary_button = new JButton("Summary Popup");
-//			summary_button.addActionListener(new ActionListener() {
-//				
-//				@Override
-//				public void actionPerformed(ActionEvent evt) {
-//						
-//					showSubDataModel();
-//				}
-//	
-//			});
-//			add(summary_button);
-//	
-//			add(Box.createVerticalGlue());
-//		}
-//    }
-
-//    class ClosePanel extends JPanel {
-//
-//		private static final long serialVersionUID = 1L;
-//
-//		public ClosePanel () {
-//	 	    
-//			JButton close_button = new JButton("Close");
-//		    close_button.addActionListener(new ActionListener() {
-//			   
-//		    	@Override
-//				public void actionPerformed(ActionEvent e) {
-//		    		
-//		    		HeaderFinderPanel.this.setVisible(false);
-//			    }
-//			});
-//		    add(close_button);
-//		}
-//    }
-        
-//	protected abstract void showSubDataModel();
 }

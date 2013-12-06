@@ -14,6 +14,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import edu.stanford.genetics.treeview.model.TVModel;
+
 import net.miginfocom.swing.MigLayout;
 import Cluster.DataViewPanel;
 
@@ -50,6 +52,11 @@ class LoadCheckView extends JPanel {
 	private BufferedImage labelImg;
 	private ClassLoader classLoader;
 	private InputStream input;
+	private TreeViewFrame viewFrame;
+
+	private TVModel tvModel = null;
+	private DataModel dataModel = null;
+	private DataViewPanel dataView;
     
 	/**
 	 * Constructor
@@ -58,7 +65,19 @@ class LoadCheckView extends JPanel {
 	public LoadCheckView(DataModel dataModel, final TreeViewFrame viewFrame) {
 		
 		this.setLayout(new MigLayout());
-		this.setBackground(GUIColors.BG_COLOR);
+		
+		this.tvModel = (TVModel)dataModel;
+		this.dataModel = dataModel;
+		this.viewFrame = viewFrame;
+		this.dataView = new DataViewPanel(dataModel);
+		
+		this.setupLayout();
+	}
+	
+	public void setupLayout() {
+		
+		this.removeAll();
+		this.setBackground(GUIParams.BG_COLOR);
 		
 		feedbackPanel = new JPanel();
 		feedbackPanel.setLayout(new MigLayout());
@@ -76,7 +95,7 @@ class LoadCheckView extends JPanel {
 				
 				success = new JLabel("Great, loading was successful!");
 				success.setFont(fontL);
-				success.setForeground(GUIColors.TEXT);
+				success.setForeground(GUIParams.TEXT);
 				
 				feedbackPanel.add(success);
 				feedbackPanel.add(icon);
@@ -98,28 +117,25 @@ class LoadCheckView extends JPanel {
 	    	
 	    	numColLabel = new JLabel("Columns: " + nCols);
 	    	numColLabel.setFont(fontS);
-	    	numColLabel.setForeground(GUIColors.TEXT);
+	    	numColLabel.setForeground(GUIParams.TEXT);
 	    	
 	    	numRowLabel = new JLabel("Rows: " + nRows);
 	    	numRowLabel.setFont(fontS);
-	    	numRowLabel.setForeground(GUIColors.TEXT);
+	    	numRowLabel.setForeground(GUIParams.TEXT);
 	    	
 	    	label3 = new JLabel("Data Points: " + nCols * nRows);
 	    	label3.setFont(fontS);
-	    	label3.setForeground(GUIColors.TEXT);
+	    	label3.setForeground(GUIParams.TEXT);
 	    	
 	    	previewLabel = new JLabel("Sample Data Preview");
 	    	previewLabel.setFont(fontL);
-	    	previewLabel.setForeground(GUIColors.TEXT);
+	    	previewLabel.setForeground(GUIParams.TEXT);
 	    	
 	    	//ButtonPanel
 	    	buttonPanel = new JPanel();
 	    	buttonPanel.setLayout(new MigLayout());
 	    	buttonPanel.setOpaque(false);
-	    	 
-	    	//Data Preview
-	    	DataViewPanel dataView = new DataViewPanel(dataModel);
-	    	
+	  
 			loadNewButton = new JButton("Load Different File");
 			setButtonLayout(loadNewButton);
 			loadNewButton.addActionListener(new ActionListener(){
@@ -138,7 +154,9 @@ class LoadCheckView extends JPanel {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					
-					viewFrame.resetLayout();
+					//viewFrame.resetLayout();
+					viewFrame.setDataModel(tvModel, false, true);
+					viewFrame.setLoaded(true);
 				}
 			});
 	  		
@@ -157,15 +175,17 @@ class LoadCheckView extends JPanel {
 	    			"height ::60%, wrap");
 	    	this.add(buttonPanel, "span, alignx 50%, push");
 	    	
+	    	this.revalidate();
+	    	this.repaint();
+	    	
 		} else {
-			
 			JLabel warning = new JLabel("Loading unsuccessful.");
 			warning.setFont(fontL);
-			warning.setForeground(GUIColors.RED1);
+			warning.setForeground(GUIParams.RED1);
 			
 			loadNewButton = new JButton("Load New File");
 			setButtonLayout(loadNewButton);
-			loadNewButton.setBackground(GUIColors.ELEMENT);
+			loadNewButton.setBackground(GUIParams.ELEMENT);
 			loadNewButton.addActionListener(new ActionListener(){
 	
 				@Override
@@ -177,8 +197,11 @@ class LoadCheckView extends JPanel {
 			
 			this.add(warning, "alignx 50%, span, wrap");
 			this.add(loadNewButton, "alignx 50%");
+			
+			this.revalidate();
+	    	this.repaint();
 		}
-	  }
+	}
 	
 	/**
 	 * Setting up a general layout for a button object
@@ -194,8 +217,8 @@ class LoadCheckView extends JPanel {
   		
   		button.setFont(fontS);
   		button.setOpaque(true);
-  		button.setBackground(GUIColors.ELEMENT);
-  		button.setForeground(GUIColors.BG_COLOR);
+  		button.setBackground(GUIParams.ELEMENT);
+  		button.setForeground(GUIParams.BG_COLOR);
   		
   		return button;
 	}

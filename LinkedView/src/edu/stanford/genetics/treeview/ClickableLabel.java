@@ -27,7 +27,6 @@ public class ClickableLabel extends JPanel {
 	 */
 	private JLabel label;
 	private TreeViewFrame frame;
-	private String labelText;
 	
 	/**
 	 * Static variables
@@ -61,11 +60,9 @@ public class ClickableLabel extends JPanel {
 		this.setLayout(new MigLayout());
 		this.setOpaque(false);
 		
-		this.labelText = labelText;
-		
 		label = new JLabel(labelText);
 		label.setFont(new Font("Sans Serif", Font.PLAIN, 50));
-		label.setForeground(GUIColors.ELEMENT);
+		label.setForeground(GUIParams.ELEMENT);
 
 		this.add(label, "pushx, span, alignx 50%");
 		this.addMListener(label, tvModel_gen);
@@ -87,22 +84,8 @@ public class ClickableLabel extends JPanel {
 
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				
-				if(tModel == null) {
 					
-					frame.openFile();
-					
-				} else if(tModel != null && labelText.equalsIgnoreCase(
-						"Visualize >")){
-					
-					frame.setDataModel(tModel, false);
-					frame.setLoaded(true);
-					
-				} else{
-					
-					frame.setDataModel(tModel, true);
-					frame.setLoaded(true);
-				}
+				frame.openFile();
 			}
 		});
 	}
