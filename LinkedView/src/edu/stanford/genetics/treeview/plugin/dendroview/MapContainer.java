@@ -105,6 +105,13 @@ AdjustmentListener, ConfigNodePersistent {
     	setScale(minScale);
     }
     
+    public void setMinScale() {
+    	
+    	double pixels = current.getAvailablePixels();
+    	double divider = current.getMaxIndex() - current.getMinIndex() + 1;
+    	minScale = pixels/divider;
+    }
+    
     public void zoomOut() {
 		
 		double zoomVal = 0.5;

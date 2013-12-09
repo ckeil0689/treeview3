@@ -33,6 +33,8 @@ import java.util.Arrays;
 
 import javax.swing.*;
 
+import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
+
 import net.miginfocom.swing.MigLayout;
 
 import edu.stanford.genetics.treeview.GUIParams;
@@ -179,6 +181,8 @@ public abstract class HeaderFinderPanel extends JPanel {
 		comboBox.setPreferredSize(d);
 		comboBox.setFont(fontS);
 		comboBox.setBackground(Color.white);
+		
+		AutoCompleteDecorator.decorate(comboBox);
 		
 		return comboBox;
 	}

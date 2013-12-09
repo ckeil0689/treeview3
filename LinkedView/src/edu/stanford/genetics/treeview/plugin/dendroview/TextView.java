@@ -40,7 +40,10 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.Observable;
 
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+
+import net.miginfocom.swing.MigLayout;
 
 import edu.stanford.genetics.treeview.ConfigNode;
 import edu.stanford.genetics.treeview.GUIParams;
@@ -78,6 +81,7 @@ public class TextView extends ModelView implements FontSelectable,
     private boolean dragging = false;
     
     private JScrollPane scrollPane;
+    private JLabel l1;
 
 	/**
 	* should really take a HeaderSummary instead of HeaderInfo, 
@@ -87,36 +91,13 @@ public class TextView extends ModelView implements FontSelectable,
     public TextView(HeaderInfo hI, UrlExtractor uExtractor) {
 		
     	this(hI, uExtractor, -1);
-//    	super();
-//		urlExtractor = uExtractor;
-//		headerInfo = hI;
-//		col = -1;
-//		
-//	//  could set up headerSummary...
-//		int GIDIndex = headerInfo.getIndex("GID");
-//		if (GIDIndex == -1) {
-//			headerSummary.setIncluded(new int [] {1});
-//			
-//		} else {
-//			headerSummary.setIncluded(new int [] {2});
-//		}
-//	
-//	//	int yorfIndex = headerInfo.getIndex("YORF");
-//	//	int nameIndex = headerInfo.getIndex("NAME");
-//	
-//		addMouseListener(this);
-//		addMouseMotionListener(this);
-//		addKeyListener(this);
-//		
-//		scrollPane = new JScrollPane(this);
-//		scrollPane.setBorder(null);
-//		panel = scrollPane;
     }
     
     
     public TextView(HeaderInfo hI, UrlExtractor uExtractor, int col) {
 		
     	super();
+    	this.setLayout(new MigLayout());
 		urlExtractor = uExtractor;
 		headerInfo = hI;
 		this.col = col;
@@ -136,6 +117,11 @@ public class TextView extends ModelView implements FontSelectable,
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addKeyListener(this);
+		
+		l1 = new JLabel();
+		l1.setFont(GUIParams.FONTS);
+		l1.setForeground(GUIParams.TEXT);
+		this.add(l1, "alignx 50%, aligny 50%, push");
 		
 		scrollPane = new JScrollPane(this);
 		scrollPane.setBorder(null);
@@ -183,89 +169,96 @@ public class TextView extends ModelView implements FontSelectable,
 	public void updateBuffer(Graphics g, Dimension offscreenSize) {
 		
 		// clear the pallette...
-		g.setColor(Color.white);
-		g.fillRect(0,0, offscreenSize.width, offscreenSize.height);
-		g.setColor(Color.black);
-		
-		if ((map.getMinIndex() >= 0) 
-				&& (offscreenSize.height > 0)) {
-		    
-		    int start = map.getIndex(0);
-		    int end =   map.getIndex(map.getUsedPixels());
-		    g.setFont(new Font(face, style, size));
-		    FontMetrics metrics = getFontMetrics(g.getFont());
-		    int ascent = metrics.getAscent();
-		    
-		    // draw backgrounds first...
-		    int bgColorIndex = headerInfo.getIndex("BGCOLOR");
-		    if (bgColorIndex > 0) {
-			    Color back = g.getColor();
-			    for (int j = start; j < end;j++) {
-				    if ((geneSelection == null) 
-				    		|| geneSelection.isIndexSelected(j)) {
-					    String [] strings = headerInfo.getHeader(j);
-					    
-					    try {
-					    	g.setColor(TreeColorer.getColor(
-					    			strings[bgColorIndex]));
-					    	
-					    } catch (Exception e) {
-						    // ignore
+		if(map.getScale() > 12.0){
+			
+			l1.setText("");
+			
+			g.setColor(Color.white);
+			g.fillRect(0,0, offscreenSize.width, offscreenSize.height);
+			g.setColor(Color.black);
+			
+			if ((map.getMinIndex() >= 0) 
+					&& (offscreenSize.height > 0)) {
+			    
+			    int start = map.getIndex(0);
+			    int end =   map.getIndex(map.getUsedPixels());
+			    g.setFont(new Font(face, style, size));
+			    FontMetrics metrics = getFontMetrics(g.getFont());
+			    int ascent = metrics.getAscent();
+			    
+			    // draw backgrounds first...
+			    int bgColorIndex = headerInfo.getIndex("BGCOLOR");
+			    if (bgColorIndex > 0) {
+				    Color back = g.getColor();
+				    for (int j = start; j < end;j++) {
+					    if ((geneSelection == null) 
+					    		|| geneSelection.isIndexSelected(j)) {
+						    String [] strings = headerInfo.getHeader(j);
+						    
+						    try {
+						    	g.setColor(TreeColorer.getColor(
+						    			strings[bgColorIndex]));
+						    	
+						    } catch (Exception e) {
+							    // ignore
+						    }
+						    g.fillRect(0, map.getMiddlePixel(j) - ascent / 2, 
+						    		offscreenSize.width, ascent);
 					    }
-					    g.fillRect(0, map.getMiddlePixel(j) - ascent / 2, 
-					    		offscreenSize.width, ascent);
 				    }
+				    g.setColor(back);
 			    }
-			    g.setColor(back);
-		    }
-	
-		    // now, foreground text
-		    int fgColorIndex = headerInfo.getIndex("FGCOLOR");
-		    for (int j = start; j < end; j++) {
-		    	
-		    	String out = null;
-		    	
-		    	if(col == -1) {
-		    		out = headerSummary.getSummary(headerInfo, j);
-		    		
-		    	} else {
-		    		String [] summaryArray = 
-		    				headerSummary.getSummaryArray(headerInfo, j);
-		    		
-		    		if ((summaryArray != null) && (col < summaryArray.length)) {
-		    			out = summaryArray[col];
-		    		}
-		    	}
-	
-				if (out != null) {
-					Color back = GUIParams.ELEMENT; //g.getColor();
-					if ((geneSelection == null) 
-							|| geneSelection.isIndexSelected(j)) {
-						String [] strings = headerInfo.getHeader(j);
-						
-						if (fgColorIndex > 0) {
-							g.setColor(TreeColorer.getColor(
-									strings[fgColorIndex]));
-						}
-						
-						g.drawString(out, 0, 
-								map.getMiddlePixel(j) + ascent / 2);
-						
-						if (fgColorIndex > 0) {
+		
+			    // now, foreground text
+			    int fgColorIndex = headerInfo.getIndex("FGCOLOR");
+			    for (int j = start; j < end; j++) {
+			    	
+			    	String out = null;
+			    	
+			    	if(col == -1) {
+			    		out = headerSummary.getSummary(headerInfo, j);
+			    		
+			    	} else {
+			    		String [] summaryArray = 
+			    				headerSummary.getSummaryArray(headerInfo, j);
+			    		
+			    		if ((summaryArray != null) && (col < summaryArray.length)) {
+			    			out = summaryArray[col];
+			    		}
+			    	}
+		
+					if (out != null) {
+						Color back = GUIParams.ELEMENT; //g.getColor();
+						if ((geneSelection == null) 
+								|| geneSelection.isIndexSelected(j)) {
+							String [] strings = headerInfo.getHeader(j);
+							
+							if (fgColorIndex > 0) {
+								g.setColor(TreeColorer.getColor(
+										strings[fgColorIndex]));
+							}
+							
+							g.drawString(out, 0, 
+									map.getMiddlePixel(j) + ascent / 2);
+							
+							if (fgColorIndex > 0) {
+								g.setColor(back);
+							}
+						} else {
+							g.setColor(Color.gray);
+							g.drawString(out, 0, 
+									map.getMiddlePixel(j) + ascent / 2);
 							g.setColor(back);
 						}
-					} else {
-						g.setColor(Color.gray);
-						g.drawString(out, 0, 
-								map.getMiddlePixel(j) + ascent / 2);
-						g.setColor(back);
 					}
-				}
-		    }
-		} else {		
-			// some kind of blank default image?
-		    // backG.drawString("Select something already!", 0, 
-			//offscreenSize.height / 2 );
+			    }
+			} else {		
+				// some kind of blank default image?
+			    // backG.drawString("Select something already!", 0, 
+				//offscreenSize.height / 2 );
+			}
+		} else {
+			l1.setText("Zoom for Names");
 		}
     }
 

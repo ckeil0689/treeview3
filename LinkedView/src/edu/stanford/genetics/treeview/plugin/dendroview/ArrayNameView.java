@@ -27,7 +27,10 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.Observable;
 
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+
+import net.miginfocom.swing.MigLayout;
 
 import edu.stanford.genetics.treeview.*;
 
@@ -68,6 +71,8 @@ FontSelectable, ConfigNodePersistent {
 	private final int d_style = 0;
 	private final int d_size = 12;
 	
+	private JLabel l1;
+	
 	
 	/**
 	 *  Constructs an <code>ArrayNameView</code> with the given 
@@ -78,12 +83,19 @@ FontSelectable, ConfigNodePersistent {
 	public ArrayNameView(HeaderInfo hInfo) {
 		
 		super();
+		this.setLayout(new MigLayout());
 		headerInfo = hInfo;
 		headerSummary = new HeaderSummary();
 		headerSummary.setIncluded(new int [] {0});
 		scrollPane = new JScrollPane(this);
 		scrollPane.setBorder(null);
 		panel = scrollPane;
+		
+		l1 = new JLabel();
+		l1.setFont(GUIParams.FONTS);
+		l1.setForeground(GUIParams.TEXT);
+		this.add(l1, "alignx 50%, aligny 50%, push");
+		
 		addMouseListener(this);
 	}
 	
@@ -216,128 +228,134 @@ FontSelectable, ConfigNodePersistent {
 		g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
 		g.setColor(Color.black);
 
-
-		/* This code is for java2.it's worth supporting two ways. */
-		try {
-			Graphics2D g2d = (Graphics2D) g;
-			g2d.rotate(-90 * 3.14159/180);
-			g2d.translate(-offscreenSize.height, 0);
-
-			int start            = map.getIndex(0);
-			int end              = map.getIndex(map.getUsedPixels()) - 1;
-			int gidRow           = headerInfo.getIndex("GID");
-			if (gidRow == -1) {gidRow = 0;}
-			int colorIndex       = headerInfo.getIndex("FGCOLOR");
-			g.setFont(new Font(face, style, size));
-			FontMetrics metrics = getFontMetrics(g.getFont());
-			int ascent = metrics.getAscent();
-
-		    // draw backgrounds first...
-		    int bgColorIndex = headerInfo.getIndex("BGCOLOR");
-		    if (bgColorIndex > 0) {
-			    Color back = g.getColor();
-			    for (int j = start; j <= end;j++) {
-					    String [] strings = headerInfo.getHeader(j);
-					    try {
-					    g.setColor(TreeColorer.getColor(strings[bgColorIndex]));
-					    } catch (Exception e) {
-						    // ingore...
-					    }
-					    g.fillRect(0, map.getMiddlePixel(j) - ascent / 2, 
-					    		offscreenSize.height, ascent);
+		if(map.getScale() > 12.0) {
+			l1.setText("");
+			
+			/* This code is for java2.it's worth supporting two ways. */
+			try {
+				Graphics2D g2d = (Graphics2D) g;
+				g2d.rotate(-90 * 3.14159/180);
+				g2d.translate(-offscreenSize.height, 0);
+	
+				int start            = map.getIndex(0);
+				int end              = map.getIndex(map.getUsedPixels()) - 1;
+				int gidRow           = headerInfo.getIndex("GID");
+				if (gidRow == -1) {gidRow = 0;}
+				int colorIndex       = headerInfo.getIndex("FGCOLOR");
+				g.setFont(new Font(face, style, size));
+				FontMetrics metrics = getFontMetrics(g.getFont());
+				int ascent = metrics.getAscent();
+	
+			    // draw backgrounds first...
+			    int bgColorIndex = headerInfo.getIndex("BGCOLOR");
+			    if (bgColorIndex > 0) {
+				    Color back = g.getColor();
+				    for (int j = start; j <= end;j++) {
+						    String [] strings = headerInfo.getHeader(j);
+						    try {
+						    g.setColor(TreeColorer.getColor(strings[bgColorIndex]));
+						    } catch (Exception e) {
+							    // ingore...
+						    }
+						    g.fillRect(0, map.getMiddlePixel(j) - ascent / 2, 
+						    		offscreenSize.height, ascent);
+				    }
+				    g.setColor(back);
 			    }
-			    g.setColor(back);
-		    }
-		    
-		    //Foreground Text
-			Color back = GUIParams.ELEMENT;//g.getColor();
-			for (int j = start;j <= end;j++) {
-				
-				try { 
-					String out = headerSummary.getSummary(headerInfo, j);
-					String[] headers = headerInfo.getHeader(j);
-					/*
-					String out        = headers[gidRow];
-					*/
-					if (out != null) {
-						if ((arraySelection == null) 
-								|| arraySelection.isIndexSelected(j)) {
-							if (colorIndex > 0) {
-								g.setColor(TreeColorer.getColor(
-										headers[colorIndex]));
-							}
-							
-							g.drawString(out, 0, map.getMiddlePixel(j) 
-									+ ascent / 2);
-							
-							if (colorIndex > 0) {
+			    
+			    //Foreground Text
+				Color back = GUIParams.ELEMENT;//g.getColor();
+				for (int j = start;j <= end;j++) {
+					
+					try { 
+						String out = headerSummary.getSummary(headerInfo, j);
+						String[] headers = headerInfo.getHeader(j);
+						/*
+						String out        = headers[gidRow];
+						*/
+						if (out != null) {
+							if ((arraySelection == null) 
+									|| arraySelection.isIndexSelected(j)) {
+								if (colorIndex > 0) {
+									g.setColor(TreeColorer.getColor(
+											headers[colorIndex]));
+								}
+								
+								g.drawString(out, 0, map.getMiddlePixel(j) 
+										+ ascent / 2);
+								
+								if (colorIndex > 0) {
+									g.setColor(back);
+								}
+							} else {
+								g.setColor(Color.gray);
+								g.drawString(out, 0, map.getMiddlePixel(j) 
+										+ ascent / 2);
 								g.setColor(back);
 							}
-						} else {
-							g.setColor(Color.gray);
-							g.drawString(out, 0, map.getMiddlePixel(j) 
-									+ ascent / 2);
-							g.setColor(back);
+							
 						}
-						
+					} catch (java.lang.ArrayIndexOutOfBoundsException e) {
 					}
-				} catch (java.lang.ArrayIndexOutOfBoundsException e) {
 				}
-			}
-			g2d.translate(offscreenSize.height, 0);
-			g2d.rotate(90 * 3.14159/180);
-			
-		} catch (java.lang.NoClassDefFoundError e) {
-			
-			if (backBufferValid == false) {
-				int tstart  = map.getIndex(0);
-				int tend    = map.getIndex(map.getUsedPixels());
-				if ((tstart >= 0 && tend > tstart) &&
-				(offscreenSize.width > 0)) {
-					
-					/* Should have been done by selectionChanged()
-					String [][] aHeaders = model.getArrayHeaders();
-					int gidRow = model.getGIDIndex();
-					int colorIndex = model.getRowIndex("FGCOLOR");
-					
-					g.setFont(new Font(face, style, size));
-					FontMetrics metrics = getFontMetrics(g.getFont());
-					int ascent = metrics.getAscent();
-					
-					// calculate maxlength
-					maxlength = 1;
-					// for some reason, stop at end -1?
-					int start = map.getMinIndex();
-					int end = map.getMaxIndex();
-					for (int j = start;j < end;j++) {
-						String out = aHeaders[j][gidRow];
-						if (out == null) continue;
-						int length = metrics.stringWidth(out);
-						if (maxlength < length) {
-							maxlength = length;
-						}
-					}
-					*/
-					
-					backBuffer = createImage(maxlength, offscreenSize.width);
-					updateBackBuffer();// this flips the backbuffer...
-					
-				} else {
-					// some kind of blank default image?
-				}
-				backBufferValid = true;
+				g2d.translate(offscreenSize.height, 0);
+				g2d.rotate(90 * 3.14159/180);
 				
-			}
-			
-			if (offscreenSize.height < maxlength) {
-				g.drawImage(backBuffer, 0, 0, null);
-			} else {
-				if ((g != null) && (backBuffer != null)) {
-					g.drawImage(backBuffer, 0, offscreenSize.height 
-							- maxlength, null);
+			} catch (java.lang.NoClassDefFoundError e) {
+				
+				if (backBufferValid == false) {
+					int tstart  = map.getIndex(0);
+					int tend    = map.getIndex(map.getUsedPixels());
+					if ((tstart >= 0 && tend > tstart) &&
+					(offscreenSize.width > 0)) {
+						
+						/* Should have been done by selectionChanged()
+						String [][] aHeaders = model.getArrayHeaders();
+						int gidRow = model.getGIDIndex();
+						int colorIndex = model.getRowIndex("FGCOLOR");
+						
+						g.setFont(new Font(face, style, size));
+						FontMetrics metrics = getFontMetrics(g.getFont());
+						int ascent = metrics.getAscent();
+						
+						// calculate maxlength
+						maxlength = 1;
+						// for some reason, stop at end -1?
+						int start = map.getMinIndex();
+						int end = map.getMaxIndex();
+						for (int j = start;j < end;j++) {
+							String out = aHeaders[j][gidRow];
+							if (out == null) continue;
+							int length = metrics.stringWidth(out);
+							if (maxlength < length) {
+								maxlength = length;
+							}
+						}
+						*/
+						
+						backBuffer = createImage(maxlength, offscreenSize.width);
+						updateBackBuffer();// this flips the backbuffer...
+						
+					} else {
+						// some kind of blank default image?
+					}
+					backBufferValid = true;
+					
+				}
+				
+				if (offscreenSize.height < maxlength) {
+					g.drawImage(backBuffer, 0, 0, null);
+				} else {
+					if ((g != null) && (backBuffer != null)) {
+						g.drawImage(backBuffer, 0, offscreenSize.height 
+								- maxlength, null);
+					}
 				}
 			}
+		} else {
+			l1.setText("Zoom for Names");
 		}
+		//end of if
 
 	}
 

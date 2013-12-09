@@ -32,7 +32,7 @@ import javax.swing.*;
 
 import net.miginfocom.swing.MigLayout;
 
-public class MessagePanel extends JPanel{
+public class MessagePanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	

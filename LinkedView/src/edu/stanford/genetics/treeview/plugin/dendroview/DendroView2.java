@@ -462,6 +462,7 @@ MainPanel, Observer {
 //		JPanel upSide;
 //		JPanel downSide;
 		JPanel buttonPanel;
+		JPanel crossPanel;
 //		JPanel gtrPanel;
 		final JPanel panel; 
 //		JPanel zoompanel;
@@ -523,6 +524,10 @@ MainPanel, Observer {
 		buttonPanel = new JPanel();
 		buttonPanel.setLayout(new MigLayout());
 		buttonPanel.setOpaque(false);
+		
+		crossPanel = new JPanel();
+		crossPanel.setLayout(new MigLayout());
+		crossPanel.setOpaque(false);
 		
 		//Global view
 		panel = new JPanel();
@@ -637,12 +642,14 @@ MainPanel, Observer {
 		adjScale.setFont(GUIParams.FONTS);
 		adjScale.setForeground(GUIParams.TEXT);
 		
-		buttonPanel.add(adjScale, "pushx, span, wrap");
-		buttonPanel.add(scaleIncY, "span, alignx 50%, wrap");
-		buttonPanel.add(scaleDecX, "pushx");
-		buttonPanel.add(scaleDefaultAll, "pushx");
-		buttonPanel.add(scaleIncX, "pushx, wrap");
-		buttonPanel.add(scaleDecY, "span, alignx 50%");
+		crossPanel.add(scaleIncY, "span, alignx 50%, wrap");
+		crossPanel.add(scaleDecX);
+		crossPanel.add(scaleDefaultAll);
+		crossPanel.add(scaleIncX, "wrap");
+		crossPanel.add(scaleDecY, "span, alignx 50%");
+		
+		buttonPanel.add(adjScale, "pushx, wrap");
+		buttonPanel.add(crossPanel, "pushx, alignx 50%");
 		
 		navPanel.add(getGeneFinderPanel(), "pushx, alignx 50%, " +
 				"height 10%::, wrap");
