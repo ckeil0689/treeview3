@@ -14,8 +14,6 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import edu.stanford.genetics.treeview.model.TVModel;
-
 import net.miginfocom.swing.MigLayout;
 import Cluster.DataViewPanel;
 
@@ -53,8 +51,7 @@ class LoadCheckView extends JPanel {
 	private ClassLoader classLoader;
 	private InputStream input;
 	private TreeViewFrame viewFrame;
-
-	private TVModel tvModel = null;
+	
 	private DataModel dataModel = null;
 	private DataViewPanel dataView;
     
@@ -65,8 +62,7 @@ class LoadCheckView extends JPanel {
 	public LoadCheckView(DataModel dataModel, final TreeViewFrame viewFrame) {
 		
 		this.setLayout(new MigLayout());
-		
-		this.tvModel = (TVModel)dataModel;
+
 		this.dataModel = dataModel;
 		this.viewFrame = viewFrame;
 		this.dataView = new DataViewPanel(dataModel);
@@ -157,7 +153,7 @@ class LoadCheckView extends JPanel {
 				public void actionPerformed(ActionEvent arg0) {
 					
 					//viewFrame.resetLayout();
-					viewFrame.setDataModel(tvModel, false, true);
+					//viewFrame.setDataModel(tvModel, false, true);
 					viewFrame.setLoaded(true);
 				}
 			});

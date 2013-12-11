@@ -53,14 +53,17 @@ MouseWheelListener, KeyListener {
 	private static final long serialVersionUID = 1L;
     
 	protected TreeSelectionI geneSelection, arraySelection;
-	private int overx, overy;
+	private int overx;
+	private int overy;
     private ArrayDrawer drawer;
     private String [] statustext = new String [] {"Mouseover Selection", "", 
-    		"", "Current Map: Zoom"};
+    		"", "Active Map: Zoom"};
     private Rectangle sourceRect = new Rectangle();
     private Rectangle destRect = new Rectangle();
-    private MapContainer xmap, ymap;
-	private HeaderInfo arrayHI, geneHI; // to get gene and array names...
+    private MapContainer xmap; 
+    private MapContainer ymap;
+	private HeaderInfo arrayHI; 
+	private HeaderInfo geneHI; // to get gene and array names...
 	
     /**
      * Allocate a new ZoomView
@@ -221,7 +224,7 @@ MouseWheelListener, KeyListener {
     	return xmap;
     }
     
-    public MapContainer getZoomXmap() {
+    public MapContainer getZoomXMap() {
     	
     	return xmap;
     }
@@ -236,7 +239,7 @@ MouseWheelListener, KeyListener {
     	return ymap;
     }
     
-    public MapContainer getZoomYmap() {
+    public MapContainer getZoomYMap() {
     	
     	return ymap;
     }
@@ -313,7 +316,6 @@ MouseWheelListener, KeyListener {
 			g.fillRect
 			(0,0, offscreenSize.width, offscreenSize.height);
 			g.setColor(Color.black);
-			
 			
 			destRect.setBounds(0,0,xmap.getUsedPixels(), 
 					ymap.getUsedPixels());
@@ -398,8 +400,8 @@ MouseWheelListener, KeyListener {
 			 	//zoom map as a mechanism of communication... but not quite, 
 			 	//because the globalview, textview and atrzview depend on it 
 			 	//to know what is visible in the zoom window.
-				MapContainer zoomXmap = getZoomXmap();
-				MapContainer zoomYmap = getZoomYmap();
+				MapContainer zoomXmap = getZoomXMap();
+				MapContainer zoomYmap = getZoomYMap();
 				zoomYmap.setIndexRange(geneSelection.getMinIndex(),  
 						geneSelection.getMaxIndex());
 				zoomXmap.setIndexRange(arraySelection.getMinIndex(), 
@@ -510,9 +512,9 @@ MouseWheelListener, KeyListener {
 			getYMap().zoomIn();
 			break;
 		}
-		
-		revalidate();
-		repaint();	
+
+		this.revalidate();
+		this.repaint();	
 	}
 	
 	@Override
@@ -523,24 +525,24 @@ MouseWheelListener, KeyListener {
 		
 		if(!e.isShiftDown()) {
 			if(notches < 0) {
-				getYMap().scrollBy(-shift);
+				getZoomYMap().scrollBy(-shift);
 				
 			} else {
-				getYMap().scrollBy(shift);
+				getZoomYMap().scrollBy(shift);
 			}
 		} else {
 			if(notches < 0) {
-				getXMap().zoomIn();
-				getYMap().zoomIn();
+				getZoomXMap().zoomIn();
+				getZoomYMap().zoomIn();
 				
 			} else {
-				getXMap().zoomOut();
-				getYMap().zoomOut();
+				getZoomXMap().zoomOut();
+				getZoomYMap().zoomOut();
 			}
 		}
 		
-		revalidate();
-		repaint();
+		this.revalidate();
+		this.repaint();
 	}
 }
 

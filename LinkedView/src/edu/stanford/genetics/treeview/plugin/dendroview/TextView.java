@@ -290,10 +290,13 @@ public class TextView extends ModelView implements FontSelectable,
 		if (map != null) {
 			map.addObserver(this);
 		}
+		
+		this.revalidate();
+		this.repaint();
     }
 
-    /** This method is called when the selection is changed. It causes the component to 
-     * recalculate it's width, and call repaint.
+    /** This method is called when the selection is changed. It causes 
+     * the component to recalculate it's width, and call repaint.
      */
 	private void selectionChanged() {
 		 

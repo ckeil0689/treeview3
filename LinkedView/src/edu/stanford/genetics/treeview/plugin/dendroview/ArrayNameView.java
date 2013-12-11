@@ -380,13 +380,16 @@ FontSelectable, ConfigNodePersistent {
 	 *
 	 * @param  im  A new mapcontainer.
 	 */
-	public void setMapping(MapContainer im) {
+	public void setMap(MapContainer im) {
 		
 		if (map != null) {
 			map.deleteObserver(this);
 		}
 		map = im;
 		map.addObserver(this);
+		
+		this.revalidate();
+		this.repaint();
 	}
 
 

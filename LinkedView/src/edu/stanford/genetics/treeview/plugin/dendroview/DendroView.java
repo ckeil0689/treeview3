@@ -721,7 +721,7 @@ private int [] SetupInvertedArray(int num, int leftIndex, int rightIndex) {
 		zoomview.setXMap(getZoomXmap());
 		zoomview.setArrayDrawer(arrayDrawer);
 
-		arraynameview.setMapping(getZoomXmap());
+		arraynameview.setMap(getZoomXmap());
 
 		
 		

@@ -146,17 +146,17 @@ MainPanel, Observer {
 	private HeaderFinderPanel geneFinderPanel = null;
 	private HeaderFinderPanel arrayFinderPanel = null;
 	
-	/**
-	 * Chained constructor
-	 * Calls setName of the JPanel class
-	 * @param cols
-	 * @param rows
-	 * @param name
-	 */
-	protected DendroView2(int cols, int rows, String name) {
-		
-		super.setName(name);
-	}
+//	/**
+//	 * Chained constructor
+//	 * Calls setName of the JPanel class
+//	 * @param cols
+//	 * @param rows
+//	 * @param name
+//	 */
+//	protected DendroView2(int cols, int rows, String name) {
+//		
+//		super.setName(name);
+//	}
 	
 	/**
 	 * Chained constructor for the DendroView object
@@ -179,7 +179,7 @@ MainPanel, Observer {
 	 *  Constructor for the DendroView object which 
 	 *  binds to an explicit confignode.
 	 *
-	 * @param  dataModel   model this DendroView is to represent
+	 * @param  dataModel model this DendroView is to represent
 	 * @param  root   Confignode to which to bind this DendroView
 	 * @param  vFrame  parent ViewFrame of DendroView
 	 * @param  name name of this view.
@@ -424,7 +424,7 @@ MainPanel, Observer {
 			}
 		});
 
-		arraynameview.setMapping(getGlobalXmap());
+		arraynameview.setMap(getGlobalXmap());
 
 		textview = new TextViewManager(getDataModel().getGeneHeaderInfo(), 
 				viewFrame.getUrlExtractor(), getDataModel());
@@ -502,6 +502,7 @@ MainPanel, Observer {
 		JButton closeButton;
 		final JButton zoomButton;
 //		JButton fullScreenButton;
+		JLabel nav;
 		
 		this.removeAll();
 		
@@ -558,7 +559,10 @@ MainPanel, Observer {
 			public void actionPerformed(ActionEvent arg0) {
 				
 				if(zoomed) {
-					arraynameview.setMapping(getGlobalXmap());
+					getZoomXmap().setHome();
+					getZoomYmap().setHome();
+					
+					arraynameview.setMap(getGlobalXmap());
 					textview.setMap(getGlobalYmap());
 					
 					panel.removeAll();
@@ -573,7 +577,10 @@ MainPanel, Observer {
 					zoomButton.setText("Zoom Map");
 					
 				} else {
-					arraynameview.setMapping(getZoomXmap());
+					getZoomXmap().setHome();
+					getZoomYmap().setHome();
+					
+					arraynameview.setMap(getZoomXmap());
 					textview.setMap(getZoomYmap());
 					
 					panel.removeAll();
@@ -594,6 +601,10 @@ MainPanel, Observer {
 		navPanel.setLayout(new MigLayout());
 		navPanel.setBackground(GUIParams.PANEL_BG);
 		navPanel.setBorder(BorderFactory.createEtchedBorder());
+		
+		nav = new JLabel("Navigation");
+		nav.setFont(GUIParams.HEADER);
+		nav.setForeground(GUIParams.ELEMENT);
 		
 		textpanel = new JPanel();
 		textpanel.setLayout(new MigLayout("ins 0"));
@@ -646,6 +657,7 @@ MainPanel, Observer {
 		buttonPanel.add(adjScale, "pushx, wrap");
 		buttonPanel.add(crossPanel, "pushx, alignx 50%");
 		
+		navPanel.add(nav, "span, wrap");
 		navPanel.add(getGeneFinderPanel(), "pushx, alignx 50%, " +
 				"height 10%::, wrap");
 		navPanel.add(getArrayFinderPanel(), "pushx, alignx 50%, " +
@@ -661,15 +673,15 @@ MainPanel, Observer {
 		backgroundPanel.add(panel, "grow, push, width 62%, height 80%");
 
 		this.add(backgroundPanel, "push, grow");
-		
-		this.revalidate();
-		this.repaint();
 	}
 	
 	@Override
 	public void refresh() {
 		
 		doDoubleLayout();
+		
+		this.revalidate();
+		this.repaint();
 	}
 	
 	//Methods
@@ -1634,14 +1646,10 @@ MainPanel, Observer {
 
 				}
 	
-//				PixelSettingsSelector pssSelector = 
-//						new PixelSettingsSelector(globalXmap, globalYmap,
-//							getZoomXmap(), getZoomYmap(), 
-//							ce, DendrogramFactory.getColorPresets());
-				
 				PixelSettingsSelector pssSelector = 
-						new PixelSettingsSelector(globalXmap, globalYmap, ce, 
-								DendrogramFactory.getColorPresets());
+						new PixelSettingsSelector(globalXmap, globalYmap,
+							getZoomXmap(), getZoomYmap(), 
+							ce, DendrogramFactory.getColorPresets());
 
 				JDialog popup = new ModelessSettingsDialog(viewFrame, 
 						"Pixel Settings", pssSelector);

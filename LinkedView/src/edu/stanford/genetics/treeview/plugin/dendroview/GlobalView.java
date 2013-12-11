@@ -45,7 +45,7 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
     protected MapContainer zoomXmap;
     protected MapContainer zoomYmap;
 	private String [] statustext = new String [] {"Mouseover Selection", 
-			"", "", "Current Map: Global"};
+			"", "", "Active Map: Global"};
 	private HeaderInfo arrayHI;
 	private HeaderInfo geneHI;
     private ArrayDrawer drawer;
@@ -72,7 +72,7 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
     /**
      * Rectangle to track blue zoom rectangle (pixels)
      */
-    private Rectangle zoomRect = null;
+   // private Rectangle zoomRect = null;
 	
 	/**
 	* GlobalView also likes to have an globalxmap and globalymap 
@@ -411,11 +411,11 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		
     	// composite the rectangles...
 		if (selectionRect != null) {	    
-		    if (zoomRect != null) {
-				g.setColor(Color.cyan);
-				g.drawRect(zoomRect.x, zoomRect.y, 
-					   zoomRect.width, zoomRect.height);
-		    }
+//		    if (zoomRect != null) {
+//				g.setColor(Color.cyan);
+//				g.drawRect(zoomRect.x, zoomRect.y, 
+//					   zoomRect.width, zoomRect.height);
+//		    }
 		    
 		    g.setColor(Color.yellow);
 		    g.drawRect(selectionRect.x, selectionRect.y, 
@@ -460,28 +460,28 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
     		return;
     	}
     	
-		int spx, epx, spy, epy;
-		try {
-		    spx = xmap.getPixel(zoomXmap.getIndex(0));
-		    epx = xmap.getPixel(zoomXmap.getIndex(
-		    		zoomXmap.getUsedPixels())) - 1;
-		    
-		    spy = ymap.getPixel(zoomYmap.getIndex(0));
-		    epy = ymap.getPixel(zoomYmap.getIndex(
-		    		zoomYmap.getUsedPixels())) - 1;
-		    
-		} catch (java.lang.ArithmeticException e) {
-		    // silently ignore div zero exceptions, which arise when 
-		    // some dimension is zero and fillmap is selected...
-		    return;
-		}
+		//int spx, epx, spy, epy;
+//		try {
+//		    spx = xmap.getPixel(zoomXmap.getIndex(0));
+//		    epx = xmap.getPixel(zoomXmap.getIndex(
+//		    		zoomXmap.getUsedPixels())) - 1;
+//		    
+//		    spy = ymap.getPixel(zoomYmap.getIndex(0));
+//		    epy = ymap.getPixel(zoomYmap.getIndex(
+//		    		zoomYmap.getUsedPixels())) - 1;
+//		    
+//		} catch (java.lang.ArithmeticException e) {
+//		    // silently ignore div zero exceptions, which arise when 
+//		    // some dimension is zero and fillmap is selected...
+//		    return;
+//		}
 	
-		if (zoomRect == null) {
-			zoomRect = new Rectangle(spx, spy, epx - spx, epy - spy);
-			
-		} else {
-			zoomRect.setBounds(spx, spy, epx - spx, epy - spy);
-		}
+//		if (zoomRect == null) {
+//			zoomRect = new Rectangle(spx, spy, epx - spx, epy - spy);
+//			
+//		} else {
+//			zoomRect.setBounds(spx, spy, epx - spx, epy - spy);
+//		}
     }
 
     
@@ -955,13 +955,12 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 	@Override
 	public void componentResized(ComponentEvent arg0) {
 		
-		//xmap.recalculateScale();
-		xmap.setMinScale();
-		ymap.setMinScale();
-		
 		xmap.setScale(xmap.getScale());
 		//ymap.recalculateScale();
 		ymap.setScale(ymap.getScale());
+		
+		this.repaint();
+		this.revalidate();
 	}
 
 	@Override

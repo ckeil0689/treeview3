@@ -25,10 +25,10 @@ import edu.stanford.genetics.treeview.app.LinkedViewApp;
 /**
  *  This class is a hollow shell that runs the package-scoped app.
  */
-public class LinkedView 
-{
-	public static void main(String astring[])
-	{
+public class LinkedView  {
+	
+	public static void main(String astring[]) {
+		
 		LinkedViewApp.main(astring);
 	}
 }

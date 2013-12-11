@@ -8,6 +8,7 @@ public class GUIParams {
 	//Default
 	public static Font FONTS = new Font("Sans Serif", Font.PLAIN, 18);
 	public static Font FONTL = new Font("Sans Serif", Font.PLAIN, 24);
+	public static Font HEADER = new Font("Sans Serif", Font.BOLD, 18);
 	
 	public static Color PANEL_BG = new Color(240, 240, 240, 255);
 	public static Color LIGHTGRAY = new Color(190, 190, 190, 255);

@@ -40,8 +40,6 @@ public class MessagePanel extends JPanel {
     protected Vector<String> messages;
 
     private final Color bgColor;
-    private final Color textColor = GUIParams.TEXT;
-    private final Color labelColor = GUIParams.ELEMENT;
     
     private String title;
     
@@ -68,8 +66,8 @@ public class MessagePanel extends JPanel {
 		title = t;
 		
 		JLabel header = new JLabel(t);
-		header.setFont(new Font("Sans Serif", Font.BOLD, 18));
-		header.setForeground(labelColor);
+		header.setFont(GUIParams.HEADER);
+		header.setForeground(GUIParams.ELEMENT);
 		
 		messages = new Vector<String>(5, 5);
 		messagecanvas = new MessageCanvas();
@@ -140,7 +138,7 @@ public class MessagePanel extends JPanel {
 			g.setColor(bgColor);
 			g.fillRect(0, 0, size.width, size.height);
 			
-			g.setColor(textColor);
+			g.setColor(GUIParams.TEXT);
 
 //			while (e.hasMoreElements()) {
 //				String message = (String) e.nextElement();

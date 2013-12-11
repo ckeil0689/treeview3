@@ -126,7 +126,7 @@ public class LinkedViewFrame extends TreeViewFrame implements Observer {
 		}
 	}
 	
-	 @Override
+	@Override
 	protected void setupRunning() {
 		 
 		 FileSet fileSet = getDataModel().getFileSet();
@@ -157,7 +157,6 @@ public class LinkedViewFrame extends TreeViewFrame implements Observer {
 			 fileSet = new FileSet(null,null);
 			 fileSet.setStyle(FileSet.LINKED_STYLE);
 		 }
-		 
 		 
 		 if (fileSet.getStyle() == FileSet.LINKED_STYLE) {
 			 LinkedPanel linkedPanel  = new LinkedPanel(this);
@@ -201,60 +200,69 @@ public class LinkedViewFrame extends TreeViewFrame implements Observer {
 				 }
 			 }
 		 }
-		LogBuffer.println("final style " + getStyle(fileSet));
+		 LogBuffer.println("final style " + getStyle(fileSet));	 
     }
 	 
-	 /**
-	  * This class implements controls for file opening options.
-	  * It is factored into a separate class because it is used by
-	  * both the offerSelection() and offerUrlSelection dialogs.
-	  * 
-	  * @author aloksaldanha
-	  *
-	  */
-	 private class FileOptionsPanel extends Box {
+	/**
+	 * This class implements controls for file opening options.
+	 * It is factored into a separate class because it is used by
+	 * both the offerSelection() and offerUrlSelection dialogs.
+	 * 
+	 * @author aloksaldanha
+	 *
+	 */
+	private class FileOptionsPanel extends Box {
 
 		private static final long serialVersionUID = 1L;
 		
 		private JComboBox dataList;
-		 private JCheckBox quoteBox;
-		 public FileOptionsPanel() {
-			 super(BoxLayout.Y_AXIS);
-			 dataList = new JComboBox(FileSet.getStyles());	
-			 dataList.setEditable(false);
+		private JCheckBox quoteBox;
+		 
+		public FileOptionsPanel() {
 			 
-			 JPanel stylePanel = new JPanel();
-			 JLabel style = new JLabel("Style:");
-			 stylePanel.add(style);
-			 stylePanel.add(dataList);
+			super(BoxLayout.Y_AXIS);
+			dataList = new JComboBox(FileSet.getStyles());	
+			dataList.setEditable(false);
+			 
+			JPanel stylePanel = new JPanel();
+			JLabel style = new JLabel("Style:");
+			stylePanel.add(style);
+			stylePanel.add(dataList);
 				
-			 JPanel quotePanel = new JPanel();
-			 quoteBox = new JCheckBox("Parse quoted strings");
-			 quotePanel.add(quoteBox);
+			JPanel quotePanel = new JPanel();
+			quoteBox = new JCheckBox("Parse quoted strings");
+			quotePanel.add(quoteBox);
 
-			 // values from last time...
-			 quoteBox.setSelected(fileMru.getParseQuotedStrings());
-			 dataList.setSelectedIndex(fileMru.getStyle());
+			// values from last time...
+			quoteBox.setSelected(fileMru.getParseQuotedStrings());
+			dataList.setSelectedIndex(fileMru.getStyle());
 				
-			 add(stylePanel);
-			 add(quotePanel);
-			 add(Box.createGlue());
-			 try {
-				 setBorder(BorderFactory.createTitledBorder("Options"));
-			 } catch (Exception e) {
-				 LogBuffer.println("Could not create border in LinkedViewFrame.offerSelection");
-			 }
-		 }
-		 public int getSelectedStyleIndex() {
-			 fileMru.setStyle(dataList.getSelectedIndex());
-			 return dataList.getSelectedIndex();
-		 }
+			this.add(stylePanel);
+			this.add(quotePanel);
+			this.add(Box.createGlue());
+			
+			try {
+				setBorder(BorderFactory.createTitledBorder("Options"));
+				
+			} catch (Exception e) {
+				LogBuffer.println("Could not create border in " +
+						"LinkedViewFrame.offerSelection");
+			}
+		}
+		
+		public int getSelectedStyleIndex() {
+			
+			fileMru.setStyle(dataList.getSelectedIndex());
+			return dataList.getSelectedIndex();
+		}
+		
 		public boolean isQuoteSelected() {
+			
 			fileMru.setParseQuotedStrings(quoteBox.isSelected());
 			return quoteBox.isSelected();
 		}
-
-	 }
+	}
+	
 	/**
 	* Open a dialog which allows the user to select a new data file
 	*
@@ -271,12 +279,13 @@ public class LinkedViewFrame extends TreeViewFrame implements Observer {
 		
 		int retVal = fileDialog.showOpenDialog(this);
 		if (retVal == JFileChooser.APPROVE_OPTION) {
-			
 			File chosen = fileDialog.getSelectedFile();
-			fileSet1 = new FileSet(chosen.getName(), chosen.getParent()+File.separator);
-		} else {
+			fileSet1 = new FileSet(chosen.getName(), 
+					chosen.getParent() + File.separator);
 			
-			throw new LoadException("File Dialog closed without selection...", LoadException.NOFILE);
+		} else {
+			throw new LoadException("File Dialog closed without selection...", 
+					LoadException.NOFILE);
 		}
 		
 		fileSet1.setStyle(boxPanel.getSelectedStyleIndex());
@@ -286,8 +295,7 @@ public class LinkedViewFrame extends TreeViewFrame implements Observer {
 	}
 	
 	@Override
-	protected FileSet offerUrlSelection()
-	  throws LoadException {
+	protected FileSet offerUrlSelection() throws LoadException {
 		  
 		  FileSet fileSet1;
 		  // get string from user...

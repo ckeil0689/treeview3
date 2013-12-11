@@ -35,6 +35,9 @@ import javax.swing.event.*;
 * It makes most of the relevant variables accessible to subclasses through protected methods.
 */
 public abstract class ExportPanel extends javax.swing.JPanel {
+
+	private static final long serialVersionUID = 1L;
+
 	private ConfigNode root;
 	
 	// external links
@@ -542,6 +545,10 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 	}
 	
 	class PreviewPanel extends JPanel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		JCheckBox drawPreview;
 		DrawingPanel drawingPanel;
 		WaitScreen waitingPanel;
@@ -573,6 +580,11 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		}
 		class DrawingPanel extends JPanel {
 			
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void paintComponent(Graphics g) {
 				Dimension size = getSize();
@@ -825,7 +837,8 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		TextView anv = new TextView(geneHeaderInfo, null);
 		anv.setMap(tempMap);
 		anv.setHeaderSummary(headerSelectionPanel.getGeneSummary());
-		Image buf = new BufferedImage(width + getBorderPixels(), height + getBorderPixels(), BufferedImage.TYPE_INT_ARGB); 
+		Image buf = new BufferedImage(width + getBorderPixels(), height 
+				+ getBorderPixels(), BufferedImage.TYPE_INT_ARGB); 
 		System.out.println("setting font for genes to " + getGeneFont());
 		anv.setFace(getGeneFont().getName());
 		anv.setStyle(getGeneFont().getStyle());
@@ -866,7 +879,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		anv.setStyle(getArrayFont().getStyle());
 		anv.setPoints(getArrayFont().getSize());
 		anv.setHeaderSummary(headerSelectionPanel.getArraySummary());
-		anv.setMapping(tempMap);
+		anv.setMap(tempMap);
 		Image buf = new BufferedImage(width + getBorderPixels(), height + getBorderPixels(), BufferedImage.TYPE_INT_ARGB); 
 		buf.getGraphics().setFont(getArrayFont());
 		anv.updateBuffer(buf);
@@ -927,6 +940,10 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 	
 	
 	class InclusionPanel extends JPanel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		JCheckBox gtrBox, atrBox, dataBox, bboxBox, charBox;
 		JTextField xScaleField, yScaleField;
 		JTextField borderField;
@@ -1197,6 +1214,11 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			add(sizeRow);
 		}
 		class BboxRow extends SizeRow {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			protected void setupWidgets() {
 				DocumentListener documentListener = new DocumentListener() {
@@ -1228,6 +1250,10 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			}
 		}
 		class SizeRow extends JPanel {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
 			JTextField xSize, ySize;
 			public SizeRow() {
 				setupWidgets();
@@ -1273,6 +1299,10 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 	}
 	
 	class HeaderSelectionPanel extends JPanel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		private JCheckBox geneAnnoInside, arrayAnnoInside;
 		private HeaderSummary geneSummary = new HeaderSummary();
 		public HeaderSummary getGeneSummary() {
@@ -1422,6 +1452,10 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 	}
 	
 	class FilePanel extends JPanel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		private JTextField fileField;
 		String getFilePath() {
 			return fileField.getText();
@@ -1471,6 +1505,10 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 }
 
 class TestExportPanel extends ExportPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	TestExportPanel(MapContainer aMap, MapContainer gMap) {
 		this(new DummyHeaderInfo(), new DummyHeaderInfo(), new TreeSelection(4),new TreeSelection(5), aMap, gMap);
 	}

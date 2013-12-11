@@ -36,11 +36,18 @@ public class DendrogramFactory extends PluginFactory {
 		PluginManager.registerPlugin(new DendrogramFactory());
 	}
 
+	public DendrogramFactory() {
+		
+		super();
+		cpresetEditor = new ColorPresetEditor(colorPresets);
+	}
+	
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.PluginFactory#getName()
 	 */
 	@Override
 	public String getPluginName() {
+		
 		return "Dendrogram";
 	}
 
@@ -56,14 +63,6 @@ public class DendrogramFactory extends PluginFactory {
 		dendroView.setName("Dendrogram");
 		return dendroView;
 	}
-	
-	
-	
-	public DendrogramFactory() {
-		
-		super();
-		cpresetEditor = new ColorPresetEditor(colorPresets);
-	}
 
 	/* (non-Javadoc)
 	 * @see edu.stanford.genetics.treeview.PluginFactory
@@ -71,26 +70,36 @@ public class DendrogramFactory extends PluginFactory {
 	 */
 	@Override
 	public void setGlobalNode(ConfigNode node) {
+		
 		super.setGlobalNode(node);
 		colorPresets.bindConfig(node.fetchOrCreate("ColorPresets"));
+		
 		if (colorPresets.getNumPresets() == 0) {
 		  colorPresets.addDefaultPresets();
 		}
+		
 		cpresetEditor.synchronizeFrom();
 	}
 
 	/* (non-Javadoc)
-	 * @see edu.stanford.genetics.treeview.PluginFactory#addPluginConfig(java.awt.Menu)
+	 * @see edu.stanford.genetics.treeview
+	 * .PluginFactory#addPluginConfig(java.awt.Menu)
 	 */
 	@Override
-	public void addPluginConfig(TreeviewMenuBarI globalMenu, final ViewFrame frame) {
+	public void addPluginConfig(TreeviewMenuBarI globalMenu, 
+			final ViewFrame frame) {
+		
 		super.addPluginConfig(globalMenu, frame);
-		globalMenu.addMenuItem("Dendrogram Color Presets...", new ActionListener() {
+		globalMenu.addMenuItem("Dendrogram Color Presets...", 
+				new ActionListener() {
+			
 			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
+				
 				if (cpresetFrame == null) {
 					cpresetFrame = new JFrame("Dendrogram Color Presets");
-					SettingsPanelHolder holder = new SettingsPanelHolder(cpresetFrame, 
+					SettingsPanelHolder holder = new SettingsPanelHolder(
+							cpresetFrame, 
 							frame.getApp().getGlobalConfig().getRoot());
 					holder.addSettingsPanel(cpresetEditor);
 					cpresetFrame.getContentPane().add(holder);
@@ -103,21 +112,26 @@ public class DendrogramFactory extends PluginFactory {
 	}
 	
 	/* (non-Javadoc)
-	 * @see edu.stanford.genetics.treeview.PluginFactory#setGlobalNode(edu.stanford.genetics.treeview.ConfigNode)
+	 * @see edu.stanford.genetics.treeview.PluginFactory#setGlobalNode(
+	 * edu.stanford.genetics.treeview.ConfigNode)
 	 */
 	public SettingsPanel getPresetEditor () {
+		
 		return cpresetEditor;
 	}
+	
 	/**
 	 * mechanism by which Dendroview can access the presets.
 	 * @return color presets for dendrogram view
 	 */
 	public static ColorPresets getColorPresets() {
+		
 		return colorPresets;
 	}
 
 	@Override
 	public boolean configurePlugin(ConfigNode node, ViewFrame viewFrame) {
+		
 		return true;
 	}
 

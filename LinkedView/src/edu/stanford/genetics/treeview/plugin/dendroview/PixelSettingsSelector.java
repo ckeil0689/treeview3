@@ -50,12 +50,6 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 	 * decided to handle updates of Xmlconfig through a windowlistener.
 	 * thus, this just calls the other constructor.
 	 */
-	public PixelSettingsSelector (MapContainer xmap, MapContainer ymap, 
-			ColorExtractor drawer, ColorPresets colorPresets) {
-		
-		this(xmap, ymap, null, null, drawer, colorPresets);
-	}
-	
 	public PixelSettingsSelector (MapContainer xmap, MapContainer ymap,
 			MapContainer xZmap, MapContainer yZmap,
 			ConfigNode config, ColorExtractor drawer,
@@ -82,79 +76,6 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 	
 	private void setupWidgets() {
 		
-//		removeAll();
-//		Border border = BorderFactory.createEtchedBorder();
-//		setLayout(new GridBagLayout());
-//		GridBagConstraints gbc = new GridBagConstraints();
-//		gbc.fill = GridBagConstraints.BOTH;
-//		gbc.insets = new Insets(5,5,5,5);
-//		// scale stuff:
-//		gbc.gridy = 0;
-//		gbc.gridx = 0;
-//		add(new JLabel("Global:"), gbc);
-//		JPanel t = new JPanel();
-//		t.setBorder(border);
-//		m_xscale = new ScalePanel(m_xmap, "X:");
-//		t.add(m_xscale);
-//		m_yscale = new ScalePanel(m_ymap, "Y:");
-//		t.add(m_yscale);
-//		gbc.gridy = 0;
-//		gbc.gridx = 1;
-//		add(t, gbc);
-//
-//		if(m_xZmap != null && m_yZmap != null) {
-//			gbc.gridy = 1;
-//			gbc.gridx = 0;
-//			add(new JLabel("Zoom:"), gbc);
-//			t = new JPanel();
-//			t.setBorder(border);
-//			m_xZscale = new ScalePanel(m_xZmap, "X:");
-//			t.add(m_xZscale);
-//			m_yZscale = new ScalePanel(m_yZmap, "Y:");
-//			t.add(m_yZscale);
-//		}
-//		
-//		gbc.gridy = 1;
-//		gbc.gridx = 1;
-//		add(t, gbc);
-//
-//		gbc.gridy += 1;
-//		gbc.gridx = 0;
-//		if (m_drawer != null) {
-//			add(new JLabel("Contrast:"), gbc);
-//			m_contrast = new ContrastSelector(m_drawer);
-//			m_contrast.setBorder(border);
-//			gbc.gridx = 1;
-//			add(m_contrast, gbc);
-//
-//
-//			gbc.gridy += 1;
-//			gbc.gridx = 0;
-//			add(new JLabel("LogScale:"), gbc);
-//			m_logscale = new LogScaleSelector();
-//			m_logscale.setBorder(border);
-//			gbc.gridx = 1;
-//			add(m_logscale, gbc);
-//
-//
-//			// color stuff...
-//			gbc.gridy += 1;
-//			add(new JLabel("Colors:"), gbc);
-//			JPanel temp2 = new JPanel();
-//			temp2.setBorder(border);
-//			temp2.setLayout(new BoxLayout(temp2, BoxLayout.Y_AXIS));
-//
-//			colorExtractorEditor = new ColorExtractorEditor(m_drawer);
-//			temp2.add(colorExtractorEditor);
-//			temp2.add(new CEEButtons());
-//			colorPresetsPanel = new ColorPresetsPanel();
-//			temp2.add(new JScrollPane(colorPresetsPanel, 
-//					ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
-//					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS));
-//			gbc.gridx = 1;
-//			add(temp2, gbc);
-//		}
-		
 		removeAll();
 		this.setLayout(new MigLayout());
 		
@@ -169,14 +90,13 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 		
 		if(m_xZmap != null && m_yZmap != null) {
 			
-			this.add(new JLabel("Zoom:"));
+			this.add(new JLabel("Zoom:"), "wrap");
 			t = setPanelLayout();
 			m_xZscale = new ScalePanel(m_xZmap, "X:");
-			t.add(m_xZscale, "pushx");
+			t.add(m_xZscale, "pushx, growx");
 			m_yZscale = new ScalePanel(m_yZmap, "Y:");
-			t.add(m_yZscale, "pushx");
+			t.add(m_yZscale, "pushx, growx");
 		}
-		
 		this.add(t, "pushx, growx, wrap");
 		
 		if (m_drawer != null) {

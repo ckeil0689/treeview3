@@ -41,28 +41,30 @@ import javax.swing.UnsupportedLookAndFeelException;
  *  - hold link to global XmlConfig object
  *  - hold gene and array url preset objects
  *  - keep track of all open windows
- *  - at one point, it kept track of plugins, but now the PluginManager does that.
+ *  - at one point, it kept track of plugins, but now the PluginManager 
+ *  does that.
  *  
- *  The actual Gui handling of a given
- *  window is done by TreeViewFrame, which represents a single document. Because
- *  multiple documents can be open at a given time, there can be multiple TVFrame
- *  objects. however, there can be only one TreeView object. what this really means
- *  is that TreeView itself just manages two resources, the window list and the global
- *  config. Anything that effects these resources should bottleneck through TreeView.
+ *  The actual Gui handling of a given window is done by TreeViewFrame, 
+ *  which represents a single document. 
+ *  Because multiple documents can be open at a given time, there can be 
+ *  multiple TVFrame objects. However, there can be only one TreeView object. 
+ *  What this really means is that TreeView itself just manages two resources, 
+ *  the window list and the global config. 
+ *  Anything that effects these resources should bottleneck through TreeView.
  *  
- *  1/16/2003 by popular demand (with the exception of my advisor) I have decided
- *  to try and make an applet version. as a first cut, I'm just going to make this
- *  class extend applet and pop open a jframe.
+ *  1/16/2003 by popular demand (with the exception of my advisor) I have 
+ *  decided to try and make an applet version. As a first cut, 
+ *  I'm just going to make this class extend applet and pop open a JFrame.
  *
- * 9/24/2003 this has now been superceded by the applet.ButtonApplet class.
+ *  9/24/2003 this has now been superceded by the applet.ButtonApplet class.
  *  
- * @author     Alok Saldanha <alok@genome.stanford.edu>
- * @version   $Revision: 1.16 $ $Date: 2010-05-11 13:31:51 $
+ *  @author     Alok Saldanha <alok@genome.stanford.edu>
+ *  @version   $Revision: 1.16 $ $Date: 2010-05-11 13:31:51 $
  */
 public abstract class TreeViewApp implements WindowListener {
 
 	/**  Version of application */
-	public final static String versionTag  = "1.1.6";
+	public final static String versionTag  = "3.0";
 	
 	// url of homepage to go for updates
 	protected static String updateUrl = 
@@ -312,9 +314,11 @@ public abstract class TreeViewApp implements WindowListener {
 	}
 
 	/**
-	 *  A WindowListener, which allows other windows to react to another window being closed.
+	 *  A WindowListener, which allows other windows to react to another 
+	 *  window being closed.
 	 *
-	 * @param  e  A window closing event. Used to remove the window from the windows list.
+	 * @param  e  A window closing event. Used to remove the window 
+	 * from the windows list.
 	 */
 	@Override
 	public void windowClosed(WindowEvent e) {
