@@ -98,6 +98,7 @@ public class TextView extends ModelView implements FontSelectable,
 		
     	super();
     	this.setLayout(new MigLayout());
+    	this.setOpaque(false);
 		urlExtractor = uExtractor;
 		headerInfo = hI;
 		this.col = col;
@@ -168,14 +169,14 @@ public class TextView extends ModelView implements FontSelectable,
 	
 	public void updateBuffer(Graphics g, Dimension offscreenSize) {
 		
+		g.setColor(GUIParams.BG_COLOR);//Color.white);
+		g.fillRect(0,0, offscreenSize.width, offscreenSize.height);
+		g.setColor(GUIParams.TEXT);//Color.black);
+		
 		// clear the pallette...
 		if(map.getScale() > 12.0){
 			
 			l1.setText("");
-			
-			g.setColor(Color.white);
-			g.fillRect(0,0, offscreenSize.width, offscreenSize.height);
-			g.setColor(Color.black);
 			
 			if ((map.getMinIndex() >= 0) 
 					&& (offscreenSize.height > 0)) {
@@ -222,7 +223,8 @@ public class TextView extends ModelView implements FontSelectable,
 			    		String [] summaryArray = 
 			    				headerSummary.getSummaryArray(headerInfo, j);
 			    		
-			    		if ((summaryArray != null) && (col < summaryArray.length)) {
+			    		if ((summaryArray != null) 
+			    				&& (col < summaryArray.length)) {
 			    			out = summaryArray[col];
 			    		}
 			    	}
@@ -245,7 +247,7 @@ public class TextView extends ModelView implements FontSelectable,
 								g.setColor(back);
 							}
 						} else {
-							g.setColor(Color.gray);
+							g.setColor(GUIParams.LIGHTGRAY);//Color.gray);
 							g.drawString(out, 0, 
 									map.getMiddlePixel(j) + ascent / 2);
 							g.setColor(back);
@@ -381,7 +383,8 @@ public class TextView extends ModelView implements FontSelectable,
 	public void mouseDragged(MouseEvent e) {
 	
     	if (dragging) {
-//	    int xoff = (e.getX() * (maxlength - offscreenSize.width)) / offscreenSize.width;
+//	    int xoff = (e.getX() * (maxlength - offscreenSize.width)) 
+//    		/ offscreenSize.width;
 	    // adjustScrollbar(xoff);
     	}
     } 

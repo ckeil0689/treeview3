@@ -55,7 +55,8 @@ MouseWheelListener, KeyListener {
 	protected TreeSelectionI geneSelection, arraySelection;
 	private int overx, overy;
     private ArrayDrawer drawer;
-    private String [] statustext = new String [] {"Mouseover Selection","",""};
+    private String [] statustext = new String [] {"Mouseover Selection", "", 
+    		"", "Current Map: Zoom"};
     private Rectangle sourceRect = new Rectangle();
     private Rectangle destRect = new Rectangle();
     private MapContainer xmap, ymap;
@@ -475,41 +476,6 @@ MouseWheelListener, KeyListener {
 	}
 
 	@Override
-	public void mouseWheelMoved(MouseWheelEvent e) {
-		
-		int notches = e.getWheelRotation();
-		int shift = 3;
-		double zoomVal = 0.5;
-		
-		if(getZoomXmap().getScale() <= 1.0 
-				&& getZoomYmap().getScale() <= 1.0) {
-			zoomVal = 0.1;
-			
-		} else if(getZoomXmap().getScale() <= 0.1 
-				&& getZoomYmap().getScale() <= 0.1) {
-			zoomVal = 0.01;
-		} 
-		
-		if(!e.isControlDown()) {
-			if(notches < 0) {
-				getZoomYmap().scrollBy(-shift);
-				
-			} else {
-				getZoomYmap().scrollBy(shift);
-			}
-		} else {
-			if(notches < 0) {
-				getZoomXmap().setScale(getZoomXmap().getScale() + zoomVal);
-				getZoomYmap().setScale(getZoomYmap().getScale() + zoomVal);
-				
-			} else {
-				getZoomXmap().setScale(getZoomXmap().getScale() - zoomVal);
-				getZoomYmap().setScale(getZoomYmap().getScale() - zoomVal);
-			}
-		}
-	}
-
-	@Override
 	public void keyPressed(KeyEvent e) {
 		
 		int c = e.getKeyCode();
@@ -524,18 +490,57 @@ MouseWheelListener, KeyListener {
 		
 		switch (c) {
 		case KeyEvent.VK_LEFT:
-			getZoomXmap().scrollBy(-shift);
+			getXMap().scrollBy(-shift);
 			break;
 		case KeyEvent.VK_RIGHT:
-			getZoomXmap().scrollBy(shift);
+			getXMap().scrollBy(shift);
 			break;
 		case KeyEvent.VK_UP:
-			getZoomYmap().scrollBy(-shift);
+			getYMap().scrollBy(-shift);
 			break;
 		case KeyEvent.VK_DOWN:
-			getZoomYmap().scrollBy(shift);
+			getYMap().scrollBy(shift);
 			break;
-		}		
+		case KeyEvent.VK_MINUS:
+			getXMap().zoomOut();
+			getYMap().zoomOut();
+			break;
+		case KeyEvent.VK_EQUALS:
+			getXMap().zoomIn();
+			getYMap().zoomIn();
+			break;
+		}
+		
+		revalidate();
+		repaint();	
+	}
+	
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e) {
+		
+		int notches = e.getWheelRotation();
+		int shift = 3;
+		
+		if(!e.isShiftDown()) {
+			if(notches < 0) {
+				getYMap().scrollBy(-shift);
+				
+			} else {
+				getYMap().scrollBy(shift);
+			}
+		} else {
+			if(notches < 0) {
+				getXMap().zoomIn();
+				getYMap().zoomIn();
+				
+			} else {
+				getXMap().zoomOut();
+				getYMap().zoomOut();
+			}
+		}
+		
+		revalidate();
+		repaint();
 	}
 }
 

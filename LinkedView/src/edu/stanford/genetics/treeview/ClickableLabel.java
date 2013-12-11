@@ -27,6 +27,7 @@ public class ClickableLabel extends JPanel {
 	 */
 	private JLabel label;
 	private TreeViewFrame frame;
+	private String labelText;
 	
 	/**
 	 * Static variables
@@ -56,6 +57,7 @@ public class ClickableLabel extends JPanel {
 			TVModel tvModel_gen) {
 		
 		this.frame = frame;
+		this.labelText = labelText;
 		
 		this.setLayout(new MigLayout());
 		this.setOpaque(false);
@@ -85,7 +87,13 @@ public class ClickableLabel extends JPanel {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 					
-				frame.openFile();
+				if(labelText.equalsIgnoreCase("Load Data >")) {
+					frame.openFile();
+				
+				} else if(labelText.equalsIgnoreCase("Preferences >")){
+					
+				}
+				
 			}
 		});
 	}

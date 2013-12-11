@@ -51,6 +51,6 @@ public class GUIParams {
 		ELEMENT_HOV = new Color(255, 174, 77, 255);
 		BG_COLOR = new Color(20, 20, 20, 255);
 		RED1 = new Color(240, 80, 50, 255);
-		TABLEHEADERS = new Color(191, 235, 255, 255);
+		TABLEHEADERS = new Color(255, 205, 120, 255);
 	}
 }

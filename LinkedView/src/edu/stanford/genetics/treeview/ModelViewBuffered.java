@@ -165,7 +165,7 @@ public abstract class ModelViewBuffered extends ModelView {
 		}
 	
 		// update offscreenBuffer if necessary
-		g.setColor(Color.white); //NO
+		g.setColor(GUIParams.BG_COLOR);//Color.white); //NO
 		g.fillRect(clip.x,clip.y,clip.width, clip.height);
 		
 		if (isEnabled()) {
@@ -176,7 +176,7 @@ public abstract class ModelViewBuffered extends ModelView {
 		} else {
 //			System.out.println(viewName() + " not enabled");
 		    Graphics tg= offscreenBuffer.getGraphics();
-		    tg.setColor(Color.white); //NO
+		    tg.setColor(GUIParams.BG_COLOR);//Color.white); //NO
 		    tg.fillRect
 			(0, 0, offscreenSize.width, offscreenSize.height);
 		}

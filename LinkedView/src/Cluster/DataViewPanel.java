@@ -1,6 +1,5 @@
 package Cluster;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.util.ArrayList;
@@ -28,7 +27,7 @@ import net.miginfocom.swing.MigLayout;
  * @author CKeil
  *
  */
-public class DataViewPanel extends JPanel{
+public class DataViewPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -44,13 +43,18 @@ public class DataViewPanel extends JPanel{
 	private String[] geneNames;
 	private String[][] headerArray;
 	
+	/**
+	 * Limit of rows/ columns for preview to display
+	 */
 	private int max = 20;
 	
 	/**
 	 * Swing Components
 	 */
 	private JTable table, headerTable;
+	private JTableHeader header;
 	private JScrollPane tableScroll;
+	
 	
 	/**
 	 * Constructor
@@ -65,7 +69,6 @@ public class DataViewPanel extends JPanel{
 		matrix = (TVDataMatrix)model.getDataMatrix();
 		dataArray = matrix.getExprData();
 		
-		//headerArray = model.getArrayHeaderInfo().getHeaderArray();
 		headerArray = model.getGeneHeaderInfo().getHeaderArray();
 		
 		gList = fillDList(dataArray);
@@ -76,14 +79,7 @@ public class DataViewPanel extends JPanel{
 			arraysList = arraysList.subList(0, max);
 		}
 		
-		geneNames = new String[max];//headerArray.length];
-		
-//		int index = 0;
-//		
-//		String filePath = model.getSource().toLowerCase();
-//		if(filePath.endsWith(".cdt")) {
-//			index = 1;
-//		}
+		geneNames = new String[max];
 		
 		for(int i = 0; i < max; i++){
 			
@@ -94,7 +90,7 @@ public class DataViewPanel extends JPanel{
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		
 		//Table Header Options
-		JTableHeader header = table.getTableHeader();
+		header = table.getTableHeader();
 		header.setReorderingAllowed(false);
 		header.setBackground(GUIParams.TABLEHEADERS);
 		
@@ -103,7 +99,7 @@ public class DataViewPanel extends JPanel{
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		table.setFillsViewportHeight(true);
-		tableScroll.setBackground(Color.white);
+		tableScroll.setBackground(GUIParams.BG_COLOR);
 		
 		for(int i = 0; i < max; i++) {
 			
@@ -186,6 +182,17 @@ public class DataViewPanel extends JPanel{
 		this.setVisible(true);
 	}
 	
+	/**
+	 * Repaint the swing components of this class, used to change the theme.
+	 */
+	public void refresh() {
+		
+		header.setBackground(GUIParams.TABLEHEADERS);
+		tableScroll.setBackground(GUIParams.BG_COLOR);
+		
+		this.revalidate();
+		this.repaint();
+	}
 	
 	public List<Double> fillDList(double[] array){
 		

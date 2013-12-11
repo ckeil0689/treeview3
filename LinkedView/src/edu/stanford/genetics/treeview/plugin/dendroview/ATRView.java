@@ -86,6 +86,7 @@ public class ATRView extends ModelViewBuffered implements
 	 * @param  n  The new node to be selected Does nothing if the node is already selected.
 	 */
 	public void setSelectedNode(TreeDrawerNode n) {
+	
 		if (selectedNode == n) {
 			return;
 		}
@@ -182,9 +183,6 @@ public class ATRView extends ModelViewBuffered implements
 		map.addObserver(this);
 	}
 
-
-
-
 	/**
 	 *  expect updates to come from map, arraySelection and drawer
 	 *
@@ -238,6 +236,9 @@ public class ATRView extends ModelViewBuffered implements
 		} else {
 			System.out.println(viewName() + "Got an update from unknown " + o);
 		}
+		
+		this.revalidate();
+		this.repaint();
 	}
 
 

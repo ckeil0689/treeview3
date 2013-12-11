@@ -84,6 +84,7 @@ FontSelectable, ConfigNodePersistent {
 		
 		super();
 		this.setLayout(new MigLayout());
+		
 		headerInfo = hInfo;
 		headerSummary = new HeaderSummary();
 		headerSummary.setIncluded(new int [] {0});
@@ -147,9 +148,9 @@ FontSelectable, ConfigNodePersistent {
 		int bgColorIndex = headerInfo.getIndex("BGCOLOR");
 		int gidRow = headerInfo.getIndex("GID");
 
-		g.setColor(Color.white);
+		g.setColor(GUIParams.BG_COLOR);//Color.white);
 		g.fillRect(0, 0, maxlength, offscreenSize.width);
-		g.setColor(Color.black);
+		g.setColor(GUIParams.TEXT);//Color.black);
 
 		if (gidRow == -1) {
 			gidRow = 0;
@@ -198,7 +199,7 @@ FontSelectable, ConfigNodePersistent {
 						g.setColor(back);
 					}
 				} else {
-					g.setColor(Color.gray);
+					g.setColor(GUIParams.LIGHTGRAY);//Color.gray);
 					g.drawString(out, 0, map.getMiddlePixel(j) + ascent / 2);
 					g.setColor(back);
 				}
@@ -224,9 +225,9 @@ FontSelectable, ConfigNodePersistent {
 	
 	public void updateBuffer(Graphics g, Dimension offscreenSize) {
 		
-		g.setColor(Color.white);
+		g.setColor(GUIParams.BG_COLOR);//Color.white);
 		g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
-		g.setColor(Color.black);
+		g.setColor(GUIParams.TEXT);//Color.black);
 
 		if(map.getScale() > 12.0) {
 			l1.setText("");
@@ -253,7 +254,9 @@ FontSelectable, ConfigNodePersistent {
 				    for (int j = start; j <= end;j++) {
 						    String [] strings = headerInfo.getHeader(j);
 						    try {
-						    g.setColor(TreeColorer.getColor(strings[bgColorIndex]));
+						    g.setColor(TreeColorer.getColor(
+						    		strings[bgColorIndex]));
+						    
 						    } catch (Exception e) {
 							    // ingore...
 						    }
@@ -288,7 +291,7 @@ FontSelectable, ConfigNodePersistent {
 									g.setColor(back);
 								}
 							} else {
-								g.setColor(Color.gray);
+								g.setColor(GUIParams.LIGHTGRAY);//Color.gray);
 								g.drawString(out, 0, map.getMiddlePixel(j) 
 										+ ascent / 2);
 								g.setColor(back);
@@ -333,7 +336,8 @@ FontSelectable, ConfigNodePersistent {
 						}
 						*/
 						
-						backBuffer = createImage(maxlength, offscreenSize.width);
+						backBuffer = createImage(maxlength, 
+								offscreenSize.width);
 						updateBackBuffer();// this flips the backbuffer...
 						
 					} else {

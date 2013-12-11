@@ -79,6 +79,8 @@ class LoadCheckView extends JPanel {
 		this.removeAll();
 		this.setBackground(GUIParams.BG_COLOR);
 		
+		dataView.refresh();
+		
 		feedbackPanel = new JPanel();
 		feedbackPanel.setLayout(new MigLayout());
 		feedbackPanel.setOpaque(false);
