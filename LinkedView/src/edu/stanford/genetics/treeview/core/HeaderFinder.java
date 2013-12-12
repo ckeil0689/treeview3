@@ -50,8 +50,11 @@ public abstract class HeaderFinder extends JDialog {
 	protected TreeSelectionI geneSelection;
 	protected ViewFrame viewFrame;
 	
-    private JButton search_button, seek_button, seekNext_button, seekAll_button, 
-    summary_button;
+    private JButton search_button;
+    private JButton seek_button;
+    private JButton seekNext_button;
+    private JButton seekAll_button; 
+    private JButton summary_button;
     private ResultsPanel rpanel;
     private HeaderInfo headerInfo;
     private int choices[];

@@ -450,8 +450,8 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 			selectionRect.setBounds(spx, spy, epx - spx, epy - spy);
 		}
 		
-		revalidate();
-		repaint();
+		this.revalidate();
+		this.repaint();
 	}
 
     protected void recalculateZoom() {
@@ -510,7 +510,7 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 					geneSelection.notifyObservers();
 					return;
 				}
-			} 
+			}
 			recalculateOverlay();
 			
 		} else if ((o == xmap) || o == ymap) {
@@ -522,13 +522,17 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 			recalculateZoom();
 			/*
 			if (o == zoomXmap) {
-				if ((zoomYmap.getUsedPixels() == 0) && (zoomXmap.getUsedPixels() != 0)) {
-					zoomYmap.setIndexRange(ymap.getMinIndex(), ymap.getMaxIndex());
+				if ((zoomYmap.getUsedPixels() == 0) 
+				&& (zoomXmap.getUsedPixels() != 0)) {
+					zoomYmap.setIndexRange(ymap.getMinIndex(), 
+					ymap.getMaxIndex());
 					zoomYmap.notifyObservers();
 				}
 			} else if (o == zoomYmap) {
-				if ((zoomXmap.getUsedPixels() == 0) && (zoomYmap.getUsedPixels() != 0)) {
-					zoomXmap.setIndexRange(xmap.getMinIndex(), xmap.getMaxIndex());
+				if ((zoomXmap.getUsedPixels() == 0) 
+				&& (zoomYmap.getUsedPixels() != 0)) {
+					zoomXmap.setIndexRange(xmap.getMinIndex(), 
+					xmap.getMaxIndex());
 					zoomXmap.notifyObservers();
 				}
 			}
@@ -547,8 +551,8 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 			 LogBuffer.println("GlobalView got weird update : " + o);
 		}
 		
-		revalidate();
-		repaint();
+		this.revalidate();
+		this.repaint();
 	}
 
     // Mouse Listener 
@@ -594,8 +598,8 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 			selectAndZoom(startPoint, endPoint);
 		}
 		
-		revalidate();
-		repaint();
+		this.revalidate();
+		this.repaint();
     }
     
     // MouseMotionListener
@@ -731,8 +735,8 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 			break;
 		}
 		
-		revalidate();
-		repaint();
+		this.revalidate();
+		this.repaint();
 		
 //		int c = e.getKeyCode();
 //		startPoint.setLocation(arraySelection.getMinIndex(), 
@@ -950,11 +954,18 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 	@Override
 	public void componentResized(ComponentEvent arg0) {
 		
-		double scaleFactorX = xmap.getScale()/ xmap.getMinScale();
+		double scaleFactorX = 1.0;
+		double scaleFactorY = 1.0;
+				
+		if(xmap.getMinScale() > 0.0) {
+			scaleFactorX = xmap.getScale()/ xmap.getMinScale();
+		}
 		xmap.setHome();
 		xmap.setScale(xmap.getMinScale() * scaleFactorX);
 		
-		double scaleFactorY = ymap.getScale()/ ymap.getMinScale();
+		if(ymap.getMinScale() > 0.0) {
+			scaleFactorY = ymap.getScale()/ ymap.getMinScale();
+		}
 		ymap.setHome();
 		ymap.setScale(ymap.getMinScale() * scaleFactorY);
 		

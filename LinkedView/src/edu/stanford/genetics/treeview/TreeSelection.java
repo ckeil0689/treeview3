@@ -257,7 +257,6 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 			}
 		}
 
-
 		public void selectAll() {
 			
 			TreeSelection.this.setChanged();
@@ -267,7 +266,6 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 			}
 		}
 
-
 		public void set(int i, boolean b) {
 			
 			if ((i >= 0) && (i < isSelected.length)) {
@@ -276,12 +274,10 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 			}
 		}
 
-
 		public boolean isSelected(int i) {
 			
 			return isSelected[i];
 		}
-
 
 		public int getMin() {
 			
@@ -295,7 +291,6 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 			
 			return min;
 		}
-
 
 		public int getMax() {
 			

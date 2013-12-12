@@ -558,11 +558,18 @@ MouseWheelListener, KeyListener, ComponentListener {
 	@Override
 	public void componentResized(ComponentEvent e) {
 		
-		double scaleFactorX = xmap.getScale()/ xmap.getMinScale();
+		double scaleFactorX = 1.0;
+		double scaleFactorY = 1.0;
+				
+		if(xmap.getMinScale() > 0.0) {
+			scaleFactorX = xmap.getScale()/ xmap.getMinScale();
+		}
 		xmap.setHome();
 		xmap.setScale(xmap.getMinScale() * scaleFactorX);
 		
-		double scaleFactorY = ymap.getScale()/ ymap.getMinScale();
+		if(ymap.getMinScale() > 0.0) {
+			scaleFactorY = ymap.getScale()/ ymap.getMinScale();
+		}
 		ymap.setHome();
 		ymap.setScale(ymap.getMinScale() * scaleFactorY);
 		

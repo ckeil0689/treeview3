@@ -2127,7 +2127,7 @@ MainPanel, Observer {
 	 * appropriate model
 	 * @param arraySelection
 	 */
-	protected void setArraySelection(TreeSelectionI arraySelection) {
+	public void setArraySelection(TreeSelectionI arraySelection) {
 		
 		if (this.arraySelection != null) {
 			
@@ -2149,7 +2149,7 @@ MainPanel, Observer {
 	 * to the appropriate model
 	 * @param geneSelection
 	 */
-	protected void setGeneSelection(TreeSelectionI geneSelection) {
+	public void setGeneSelection(TreeSelectionI geneSelection) {
 		
 		if (this.geneSelection != null) {
 			
@@ -2252,7 +2252,7 @@ MainPanel, Observer {
 	public HeaderFinderPanel getGeneFinderPanel() {
 		
 		if (geneFinderPanel == null) {
-			geneFinderPanel = new GeneFinderPanel(viewFrame, 
+			geneFinderPanel = new GeneFinderPanel(viewFrame, this, 
 					getDataModel().getGeneHeaderInfo(), 
 					viewFrame.getGeneSelection());
 		}
@@ -2268,7 +2268,7 @@ MainPanel, Observer {
 		
 		if (arrayFinderPanel == null) {
 			
-			arrayFinderPanel = new ArrayFinderPanel(viewFrame, 
+			arrayFinderPanel = new ArrayFinderPanel(viewFrame, this,
 					getDataModel().getArrayHeaderInfo(), 
 					viewFrame.getArraySelection());
 		}
