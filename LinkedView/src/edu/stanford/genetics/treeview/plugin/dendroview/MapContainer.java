@@ -120,7 +120,7 @@ AdjustmentListener, ConfigNodePersistent {
 			zoomVal = 0.1;
 			
 		} else if(this.getScale() <= 0.1) {
-			zoomVal = 0.01;
+			zoomVal = 0.05;
 		} 
 		
 		if(this.getScale() - zoomVal > this.getMinScale()) {
@@ -139,7 +139,7 @@ AdjustmentListener, ConfigNodePersistent {
 			zoomVal = 0.1;
 			
 		} else if(this.getScale() <= 0.1) {
-			zoomVal = 0.01;
+			zoomVal = 0.05;
 		} 
 		
 		if(this.getScale() + zoomVal > this.getMinScale()) {

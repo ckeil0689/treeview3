@@ -199,7 +199,7 @@ FontSelectable, ConfigNodePersistent {
 						g.setColor(back);
 					}
 				} else {
-					g.setColor(GUIParams.LIGHTGRAY);//Color.gray);
+					g.setColor(GUIParams.DARKGRAY);//Color.gray);
 					g.drawString(out, 0, map.getMiddlePixel(j) + ascent / 2);
 					g.setColor(back);
 				}

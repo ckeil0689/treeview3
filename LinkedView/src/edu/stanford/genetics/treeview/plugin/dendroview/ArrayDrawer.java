@@ -140,7 +140,7 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 						if (geneOrder != null) {
 							actualGene = geneOrder[actualGene];
 						}
-						Color t_color  = getColor(i + source.x,actualGene);
+						Color t_color  = getColor(i + source.x, actualGene);
 						g.setColor(t_color);
 						g.fillRect(xstart, ystart, width, height);
 						
@@ -187,7 +187,7 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 			int x, int y, int [] geneOrder) {
 		
 		try {
-			int actualGene =ymap.getIndex(y);
+			int actualGene = ymap.getIndex(y);
 			if (geneOrder != null) {
 				actualGene = geneOrder[actualGene];
 			}
@@ -202,18 +202,19 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 
 
 	/**
-	 *  This drawer can only draw from a single, unchangng model This method may not
-	 *  be necessary. Neither may the observer/observable stuff.
+	 *  This drawer can only draw from a single, unchanging model. 
+	 *  This method may not be necessary. Neither may the observer/observable 
+	 *  stuff.
 	 *
-	 * @param  o    Object sending update
-	 * @param  arg  Argument, usually null
+	 *  @param  o    Object sending update
+	 *  @param  arg  Argument, usually null
 	 */
-	 @Override
+	@Override
 	public void update(Observable o, Object arg) {
 		 
-		 setChanged();
-		 notifyObservers();
-	 }
+		setChanged();
+		notifyObservers();
+	}
 
 	public ConfigNode getRoot() {
 		

@@ -23,6 +23,8 @@
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.*;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -48,7 +50,7 @@ import edu.stanford.genetics.treeview.*;
 
 */
 class ZoomView extends ModelViewProduced implements MouseMotionListener, 
-MouseWheelListener, KeyListener {
+MouseWheelListener, KeyListener, ComponentListener {
 	
 	private static final long serialVersionUID = 1L;
     
@@ -75,6 +77,7 @@ MouseWheelListener, KeyListener {
 		panel = this;
         
 		setToolTipText("This Turns Tooltips On");
+		addComponentListener(this);
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addMouseWheelListener(this);
@@ -544,5 +547,28 @@ MouseWheelListener, KeyListener {
 		this.revalidate();
 		this.repaint();
 	}
+
+	//Component Listeners
+	@Override
+	public void componentHidden(ComponentEvent e) {}
+
+	@Override
+	public void componentMoved(ComponentEvent e) {}
+
+	@Override
+	public void componentResized(ComponentEvent e) {
+		
+		double scaleFactorX = xmap.getScale()/ xmap.getMinScale();
+		xmap.setHome();
+		xmap.setScale(xmap.getMinScale() * scaleFactorX);
+		
+		double scaleFactorY = ymap.getScale()/ ymap.getMinScale();
+		ymap.setHome();
+		ymap.setScale(ymap.getMinScale() * scaleFactorY);
+		
+	}
+
+	@Override
+	public void componentShown(ComponentEvent e) {}
 }
 

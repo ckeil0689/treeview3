@@ -940,34 +940,30 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		arrayHI = ahi;
 	}
 
+	//Component Listeners
 	@Override
-	public void componentHidden(ComponentEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void componentHidden(ComponentEvent arg0) {}
 
 	@Override
-	public void componentMoved(ComponentEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void componentMoved(ComponentEvent arg0) {}
 
 	@Override
 	public void componentResized(ComponentEvent arg0) {
 		
-		xmap.setScale(xmap.getScale());
-		//ymap.recalculateScale();
-		ymap.setScale(ymap.getScale());
+		double scaleFactorX = xmap.getScale()/ xmap.getMinScale();
+		xmap.setHome();
+		xmap.setScale(xmap.getMinScale() * scaleFactorX);
+		
+		double scaleFactorY = ymap.getScale()/ ymap.getMinScale();
+		ymap.setHome();
+		ymap.setScale(ymap.getMinScale() * scaleFactorY);
 		
 		this.repaint();
 		this.revalidate();
 	}
 
 	@Override
-	public void componentShown(ComponentEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void componentShown(ComponentEvent arg0) {}
 }
 
 
