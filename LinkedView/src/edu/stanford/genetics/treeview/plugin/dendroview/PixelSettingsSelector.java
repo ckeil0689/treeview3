@@ -46,6 +46,12 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	public PixelSettingsSelector (MapContainer xmap, MapContainer ymap,
+			ColorExtractor drawer, ColorPresets colorPresets) {
+		
+		this(xmap, ymap, null, null, drawer, colorPresets);
+	}
+	
 	/**
 	 * decided to handle updates of Xmlconfig through a windowlistener.
 	 * thus, this just calls the other constructor.

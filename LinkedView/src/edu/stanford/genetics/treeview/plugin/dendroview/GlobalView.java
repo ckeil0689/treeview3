@@ -26,6 +26,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.Observable;
 
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 import net.miginfocom.swing.MigLayout;
@@ -33,7 +35,7 @@ import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.*;
 
 class GlobalView extends ModelViewProduced implements  MouseMotionListener,
-    MouseListener, MouseWheelListener, KeyListener, ComponentListener {    
+    MouseListener, MouseWheelListener, KeyListener {    
 
 	private static final long serialVersionUID = 1L;
 	
@@ -51,6 +53,7 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
     private ArrayDrawer drawer;
     private int overx;
     private int overy;
+    private JScrollPane scrollPane; 
 
     /**
      * Points to track candidate selected rows/cols
@@ -82,17 +85,29 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
     public GlobalView() {
 		
     	super();
-		panel = this;
+		//panel = this;
 		
 		this.setLayout(new MigLayout());
 		
-		setToolTipText("This Turns Tooltips On");
+		scrollPane = new JScrollPane(panel);
+		this.add(scrollPane);
 		
-		addComponentListener(this);
+		setToolTipText("This Turns Tooltips On");
+
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addMouseWheelListener(this);
 		addKeyListener(this);
+    }
+    
+    public JScrollBar getXScroll() {
+    	
+    	return scrollPane.getHorizontalScrollBar();
+    }
+    
+    public JScrollBar getYScroll() {
+    	
+    	return scrollPane.getVerticalScrollBar();
     }
 
     @Override
@@ -262,56 +277,56 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
     	ymap.addObserver(this);
     }
 
-    /**
-     * get the xmapping for this view
-     *
-     * @return  the current mapping
-     */
-    public MapContainer getXMap() {
-    	
-    	return xmap;
-    }
-
-    /**
-     * get the ymapping for this view
-     *
-     * @return   the current mapping
-     */
-    public MapContainer getYMap() {
-    	
-    	return ymap;
-    }
+//    /**
+//     * get the xmapping for this view
+//     *
+//     * @return  the current mapping
+//     */
+//    public MapContainer getXMap() {
+//    	
+//    	return xmap;
+//    }
+//
+//    /**
+//     * get the ymapping for this view
+//     *
+//     * @return   the current mapping
+//     */
+//    public MapContainer getYMap() {
+//    	
+//    	return ymap;
+//    }
     
 
-    /** DEPRECATE
-     * set the xmapping for this view
-     *
-     * @param m   the new mapping
-     */
-    public void setZoomXMap(MapContainer m) {
-	
-    	if (zoomXmap != null) {
-    		zoomXmap.deleteObserver(this);	    
-    	}
-	
-    	zoomXmap = m;
-    	zoomXmap.addObserver(this);
-    }
-
-    /** DEPRECATE
-     * set the ymapping for this view
-     *
-     * @param m   the new mapping
-     */
-    public void setZoomYMap(MapContainer m) {
-	
-    	if (zoomYmap != null) {
-    		zoomYmap.deleteObserver(this);	    
-    	}
-    	
-    	zoomYmap = m;
-    	zoomYmap.addObserver(this);
-    }
+//    /** DEPRECATE
+//     * set the xmapping for this view
+//     *
+//     * @param m   the new mapping
+//     */
+//    public void setZoomXMap(MapContainer m) {
+//	
+//    	if (zoomXmap != null) {
+//    		zoomXmap.deleteObserver(this);	    
+//    	}
+//	
+//    	zoomXmap = m;
+//    	zoomXmap.addObserver(this);
+//    }
+//
+//    /** DEPRECATE
+//     * set the ymapping for this view
+//     *
+//     * @param m   the new mapping
+//     */
+//    public void setZoomYMap(MapContainer m) {
+//	
+//    	if (zoomYmap != null) {
+//    		zoomYmap.deleteObserver(this);	    
+//    	}
+//    	
+//    	zoomYmap = m;
+//    	zoomYmap.addObserver(this);
+//    }
 
 
     @Override
@@ -595,7 +610,7 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 				selectRectangle(startPoint, endPoint);
 			}
 		} else {
-			selectAndZoom(startPoint, endPoint);
+			//selectAndZoom(startPoint, endPoint);
 		}
 		
 		this.revalidate();
@@ -714,24 +729,24 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		
 		switch (c) {
 		case KeyEvent.VK_LEFT:
-			getXMap().scrollBy(-shift);
+			xmap.scrollBy(-shift);
 			break;
 		case KeyEvent.VK_RIGHT:
-			getXMap().scrollBy(shift);
+			xmap.scrollBy(shift);
 			break;
 		case KeyEvent.VK_UP:
-			getYMap().scrollBy(-shift);
+			ymap.scrollBy(-shift);
 			break;
 		case KeyEvent.VK_DOWN:
-			getYMap().scrollBy(shift);
+			ymap.scrollBy(shift);
 			break;
 		case KeyEvent.VK_MINUS:
-			getXMap().zoomOut();
-			getYMap().zoomOut();
+			xmap.zoomOut();
+			ymap.zoomOut();
 			break;
 		case KeyEvent.VK_EQUALS:
-			getXMap().zoomIn();
-			getYMap().zoomIn();
+			xmap.zoomIn();
+			ymap.zoomIn();
 			break;
 		}
 		
@@ -824,28 +839,26 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		int notches = e.getWheelRotation();
 		int shift = 3;
 		
-//		Point mouseXY = MouseInfo.getPointerInfo().getLocation();
-		
 		if(!e.isShiftDown()) {
 			if(notches < 0) {
-				getYMap().scrollBy(-shift);
+				ymap.scrollBy(-shift);
 				
 			} else {
-				getYMap().scrollBy(shift);
+				ymap.scrollBy(shift);
 			}
 		} else {
 			if(notches < 0) {
-				getXMap().zoomIn();
-				getYMap().zoomIn();
+				xmap.zoomIn();
+				ymap.zoomIn();
 				
 			} else {
-				getXMap().zoomOut();
-				getYMap().zoomOut();
+				xmap.zoomOut();
+				ymap.zoomOut();
 			}
 		}
 		
-		revalidate();
-		repaint();
+		this.revalidate();
+		this.repaint();
 	}
 	
 	/**
@@ -892,89 +905,55 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 	}
 	
 	/**
-	 * When the right mouse button is used to select a rectangle in GlobalView,
-	 * the view will be zoomed to the area that has been selected.
-	 * @param start
-	 * @param end
+	 * Uses the array- and geneSelection and currently available pixels on
+	 * screen retrieved from the MapContainer objects to calculate a new
+	 * scale and zoom in on it by working in conjunction with 
+	 * centerSelection().
 	 */
-	public void selectAndZoom(Point start, Point end) {
+	public void zoomSelection(){
 		
-		selectRectangle(start, end);
+		double newScale = 0.0;
+		double newScale2 = 0.0;
 		
-		//Zooming in when making a selection
-		double scaleFactor = 1;
+		int arrayIndexes = arraySelection.getNSelectedIndexes();
+		int geneIndexes = geneSelection.getNSelectedIndexes();
 		
-		int scrollX = 0; 
-		double newScale;
-		double currentXScale = getXMap().getScale();
-		
-		int scrollY = 0;
-		double newScale2;
-		double currentYScale = getYMap().getScale();
-		
-		if(currentXScale <= 10 && currentYScale <= 10) {
-			scaleFactor = 2;
+		if(arrayIndexes > 0 && geneIndexes > 0) {
+			newScale = xmap.getAvailablePixels()/ arrayIndexes;
+			xmap.setScale(newScale);
 			
-		} else if(currentXScale <= 30 && currentYScale <= 30) {
-			scaleFactor = 1.5;
-			
-		} else {
-			scaleFactor = 1;
-		}
-		
-		newScale = currentXScale * scaleFactor;
-		getXMap().setScale(newScale);
-		
-		newScale2 = currentYScale * scaleFactor;
-		getYMap().setScale(newScale2);
-		
-		//Scrolling to remain in the selected area when updating scale (zoom)
-		if(scaleFactor > 1) {
-			scrollX = (end.x + start.x)/2;
-			scrollY = (end.y + start.y)/2;
-			
-			getXMap().scrollToIndex(scrollX);
-			getYMap().scrollToIndex(scrollY);
+			newScale2 = ymap.getAvailablePixels()/ geneIndexes;
+			ymap.setScale(newScale2);
 		}
 	}
 	
+	/**
+	 * Scrolls to the center of the selected rectangle
+	 */
+	public void centerSelection() {
+		
+		int scrollX;
+		int scrollY;
+		
+		if(startPoint != null && endPoint != null) {
+			scrollX = (endPoint.x + startPoint.x)/2;
+			scrollY = (endPoint.y + startPoint.y)/2;
+				
+			xmap.scrollToIndex(scrollX);
+			ymap.scrollToIndex(scrollY);
+		}
+	}
+	
+	/**
+	 * Sets the gene header instance variables of GlobalView.
+	 * @param ghi
+	 * @param ahi
+	 */
 	public void setHeaders(HeaderInfo ghi, HeaderInfo ahi) {
 		
 		geneHI = ghi;
 		arrayHI = ahi;
 	}
-
-	//Component Listeners
-	@Override
-	public void componentHidden(ComponentEvent arg0) {}
-
-	@Override
-	public void componentMoved(ComponentEvent arg0) {}
-
-	@Override
-	public void componentResized(ComponentEvent arg0) {
-		
-		double scaleFactorX = 1.0;
-		double scaleFactorY = 1.0;
-				
-		if(xmap.getMinScale() > 0.0) {
-			scaleFactorX = xmap.getScale()/ xmap.getMinScale();
-		}
-		xmap.setHome();
-		xmap.setScale(xmap.getMinScale() * scaleFactorX);
-		
-		if(ymap.getMinScale() > 0.0) {
-			scaleFactorY = ymap.getScale()/ ymap.getMinScale();
-		}
-		ymap.setHome();
-		ymap.setScale(ymap.getMinScale() * scaleFactorY);
-		
-		this.repaint();
-		this.revalidate();
-	}
-
-	@Override
-	public void componentShown(ComponentEvent arg0) {}
 }
 
 

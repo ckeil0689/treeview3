@@ -69,7 +69,7 @@ public abstract class HeaderFinderPanel extends JPanel {
 	private String[] genefHeaders = {""};
 	private JComboBox genefBox;
 	private JButton genefButton;
-	private JButton deselectButton;
+//	private JButton deselectButton;
 	
 	//"Search Gene Text for Substring"
 	public HeaderFinderPanel(ViewFrame f, HeaderInfo hI, 
@@ -119,22 +119,22 @@ public abstract class HeaderFinderPanel extends JPanel {
 		    }
 		});
 		
-		deselectButton = setButtonLayout("Deselect");
-		deselectButton.addActionListener(new ActionListener(){
-			
-		    @Override
-			public void actionPerformed(ActionEvent e) {
-			
-		    	geneSelection.setSelectedNode(null);
-		    	geneSelection.deselectAllIndexes();
-		    	geneSelection.notifyObservers();
-		    }
-		});
+//		deselectButton = setButtonLayout("Deselect");
+//		deselectButton.addActionListener(new ActionListener(){
+//			
+//		    @Override
+//			public void actionPerformed(ActionEvent e) {
+//			
+//		    	geneSelection.setSelectedNode(null);
+//		    	geneSelection.deselectAllIndexes();
+//		    	geneSelection.notifyObservers();
+//		    }
+//		});
 		
 		this.add(genef, "pushx, span, wrap");
 		this.add(genefBox, "growx, pushx, width 70%");
 		this.add(genefButton, "pushx, width 20%, wrap");
-		this.add(deselectButton, "pushx");
+//		this.add(deselectButton, "pushx");
     }
 	
 	/**

@@ -82,7 +82,7 @@ MainPanel, Observer {
 
 	//Map Views
     protected GlobalView globalview;
-	protected ZoomView zoomview;
+//	protected ZoomView zoomview;
 	
 	//Trees
 	protected GTRView gtrview;
@@ -95,8 +95,8 @@ MainPanel, Observer {
 
     protected JScrollBar globalXscrollbar;
     protected JScrollBar globalYscrollbar;
-    protected JScrollBar zoomXscrollbar;
-    protected JScrollBar zoomYscrollbar;
+//    protected JScrollBar zoomXscrollbar;
+//    protected JScrollBar zoomYscrollbar;
     
     //Drawers
     protected ArrayDrawer arrayDrawer;
@@ -106,8 +106,8 @@ MainPanel, Observer {
 	//MapContainers
 	protected MapContainer globalXmap;
 	protected MapContainer globalYmap;
-	protected MapContainer zoomXmap; 
-	protected MapContainer zoomYmap;
+//	protected MapContainer zoomXmap; 
+//	protected MapContainer zoomYmap;
 
 	protected MessagePanel statuspanel;
 	protected BrowserControl browserControl;
@@ -133,7 +133,7 @@ MainPanel, Observer {
 	
 	
 	private ColorExtractor colorExtractor;
-	private boolean zoomed = false;
+//	private boolean zoomed = false;
 	
 	//Buttons
 	private JButton scaleIncX;
@@ -276,31 +276,24 @@ MainPanel, Observer {
 		//Set up status panel
 		statuspanel = new MessagePanel("Status", GUIParams.PANEL_BG);
 		
-		// scrollbars, mostly used by maps
-		globalXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0,1,0,1);
-		globalYscrollbar = new JScrollBar(Adjustable.VERTICAL,0,1,0,1);
+//		zoomXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0, 1, 0, 1);
+//		zoomYscrollbar = new JScrollBar(Adjustable.VERTICAL, 0, 1, 0, 1);
 		
-		zoomXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0, 1, 0, 1);
-		zoomYscrollbar = new JScrollBar(Adjustable.VERTICAL, 0, 1, 0, 1);
-
+		//Zoom maps to set up data points (colored by arraydrawer)
+//		zoomXmap = new MapContainer();
+//		zoomXmap.setDefaultScale(12.0);
+//		zoomXmap.setScrollbar(zoomXscrollbar);
+//		
+//		zoomYmap = new MapContainer();
+//		zoomYmap.setDefaultScale(12.0);
+//		zoomYmap.setScrollbar(zoomYscrollbar);
+		
 		// globalmaps tell globalview, atrview, and gtrview
 		// where to draw each data point.
 		// the scrollbars "scroll" by communicating with the maps.
 		globalXmap = new MapContainer("Fill");
-		globalXmap.setScrollbar(globalXscrollbar);
-		
 		globalYmap = new MapContainer("Fill");
-		globalYmap.setScrollbar(globalYscrollbar);
-		
-		//Zoom maps to set up data points (colored by arraydrawer)
-		zoomXmap = new MapContainer();
-		zoomXmap.setDefaultScale(12.0);
-		zoomXmap.setScrollbar(zoomXscrollbar);
-		
-		zoomYmap = new MapContainer();
-		zoomYmap.setDefaultScale(12.0);
-		zoomYmap.setScrollbar(zoomYscrollbar);
-		
+				
 		//Create the Global view (JPanel to display)
 		globalview = new GlobalView();
 		globalview.setXMap(globalXmap);
@@ -308,18 +301,25 @@ MainPanel, Observer {
 		globalview.setHeaders(getDataModel().getGeneHeaderInfo(), 
 				getDataModel().getArrayHeaderInfo());
 		
+		// scrollbars, mostly used by maps
+		globalXscrollbar = globalview.getXScroll();
+		globalXmap.setScrollbar(globalXscrollbar);
+		
+		globalYscrollbar = globalview.getYScroll();
+		globalYmap.setScrollbar(globalYscrollbar);
+		
 		//Set the Zoom maps for GlobalView 
-		globalview.setZoomXMap(zoomXmap);
-		globalview.setZoomYMap(zoomYmap);
+//		globalview.setZoomXMap(zoomXmap);
+//		globalview.setZoomYMap(zoomYmap);
 		
 		//Set the drawer for GlobalView
 		globalview.setArrayDrawer(arrayDrawer);
 		
 		//Set up ZoomView
-		zoomview = new ZoomView();
-		zoomview.setYMap(getZoomYmap());
-		zoomview.setXMap(getZoomXmap());
-		zoomview.setArrayDrawer(arrayDrawer);
+//		zoomview = new ZoomView();
+//		zoomview.setXMap(getZoomXmap());
+//		zoomview.setYMap(getZoomYmap());
+//		zoomview.setArrayDrawer(arrayDrawer);
 
 		//Set up the column name display
 		arraynameview = new ArrayNameView(getDataModel().getArrayHeaderInfo());
@@ -352,14 +352,14 @@ MainPanel, Observer {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				
-				if(zoomed) {
-					getZoomXmap().setHome();
-					getZoomYmap().setHome();
-					
-				} else {
+//				if(zoomed) {
+//					getZoomXmap().setHome();
+//					getZoomYmap().setHome();
+//					
+//				} else {
 					getGlobalXmap().setHome();
 					getGlobalYmap().setHome();
-				}
+//				}
 			}
 		});
 		
@@ -369,12 +369,12 @@ MainPanel, Observer {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				
-				if(zoomed) {
-					getZoomXmap().zoomIn();
-				
-				} else {
+//				if(zoomed) {
+//					getZoomXmap().zoomIn();
+//				
+//				} else {
 					getGlobalXmap().zoomIn();
-				}
+//				}
 			}
 		});
 		
@@ -384,12 +384,12 @@ MainPanel, Observer {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 		
-				if(zoomed) {
-					getZoomXmap().zoomOut();
-					
-				} else {
+//				if(zoomed) {
+//					getZoomXmap().zoomOut();
+//					
+//				} else {
 					getGlobalXmap().zoomOut();
-				}
+//				}
 			
 			}
 		});
@@ -400,12 +400,12 @@ MainPanel, Observer {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				
-				if(zoomed) {
-					getZoomYmap().zoomIn();
-					
-				} else {
+//				if(zoomed) {
+//					getZoomYmap().zoomIn();
+//					
+//				} else {
 					getGlobalYmap().zoomIn();
-				}
+//				}
 			}	
 		});
 		
@@ -415,12 +415,12 @@ MainPanel, Observer {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				
-				if(zoomed) {
-					getZoomYmap().zoomOut();
-					
-				} else {
+//				if(zoomed) {
+//					getZoomYmap().zoomOut();
+//					
+//				} else {
 					getGlobalYmap().zoomOut();
-				}
+//				}
 			}
 		});
 
@@ -451,13 +451,13 @@ MainPanel, Observer {
 		bindTrees();
 		
 		//Changes Row/ Col number to gene names in Status panel
-		zoomview.setHeaders(getDataModel().getGeneHeaderInfo(), 
-				getDataModel().getArrayHeaderInfo());
+//		zoomview.setHeaders(getDataModel().getGeneHeaderInfo(), 
+//				getDataModel().getArrayHeaderInfo());
 		
 		globalXmap.bindConfig(getFirst("GlobalXMap"));
 		globalYmap.bindConfig(getFirst("GlobalYMap"));
-		getZoomXmap().bindConfig(getFirst("ZoomXMap"));
-		getZoomYmap().bindConfig(getFirst("ZoomYMap"));
+//		getZoomXmap().bindConfig(getFirst("ZoomXMap"));
+//		getZoomYmap().bindConfig(getFirst("ZoomYMap"));
 
 		textview.bindConfig(getFirst("TextView"));			
 		
@@ -473,13 +473,13 @@ MainPanel, Observer {
 		// perhaps I could remember this stuff in the MapContainer...
 		globalXmap.setIndexRange(0, dataModel.getDataMatrix().getNumCol() - 1);
 		globalYmap.setIndexRange(0, dataModel.getDataMatrix().getNumRow() - 1);
-		getZoomXmap().setIndexRange(-1, -1);
-		getZoomYmap().setIndexRange(-1, -1);
+//		getZoomXmap().setIndexRange(-1, -1);
+//		getZoomYmap().setIndexRange(-1, -1);
 
 		globalXmap.notifyObservers();
 		globalYmap.notifyObservers();
-		getZoomXmap().notifyObservers();
-		getZoomYmap().notifyObservers();
+//		getZoomXmap().notifyObservers();
+//		getZoomYmap().notifyObservers();
 	}
 	
 	/**
@@ -493,7 +493,7 @@ MainPanel, Observer {
 		JPanel buttonPanel;
 		JPanel crossPanel;
 		final JPanel panel; 
-		JPanel zoompanel;
+//		JPanel zoompanel;
 		JPanel textpanel;
 		JPanel navPanel;
 		JSplitPane gtrPane;
@@ -501,6 +501,7 @@ MainPanel, Observer {
 //		JButton saveButton;
 		JButton closeButton;
 		final JButton zoomButton;
+		JButton deselectButton;
 //		JButton fullScreenButton;
 		JLabel nav;
 		
@@ -558,43 +559,34 @@ MainPanel, Observer {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				
-				if(zoomed) {
-					getZoomXmap().setHome();
-					getZoomYmap().setHome();
+				globalview.zoomSelection();
+				globalview.centerSelection();
 					
-					arraynameview.setMap(getGlobalXmap());
-					textview.setMap(getGlobalYmap());
+				//zoomed = false;
+				//zoomButton.setText("Zoom Map");
+							
+				panel.revalidate();
+				panel.repaint();
 					
-					panel.removeAll();
-					panel.add(globalview, "grow, push");	
-					panel.add(globalYscrollbar, "pushy, growy, wrap");
-					panel.add(globalXscrollbar, "pushx, growx, span");
-					
-					panel.revalidate();
-					panel.repaint();
-					
-					zoomed = false;
-					zoomButton.setText("Zoom Map");
-					
-				} else {
-					getZoomXmap().setHome();
-					getZoomYmap().setHome();
-					
-					arraynameview.setMap(getZoomXmap());
-					textview.setMap(getZoomYmap());
-					
-					panel.removeAll();
-					panel.add(zoomview, "grow, push");	
-					panel.add(zoomYscrollbar, "pushy, growy, wrap");
-					panel.add(zoomXscrollbar, "pushx, growx, span");
-					
-					panel.revalidate();
-					panel.repaint();
-					
-					zoomed = true;
-					zoomButton.setText("Global Map");
-				}
+				//zoomed = true;
 			}
+		});
+  		
+		deselectButton = setButtonLayout("Deselect");
+		deselectButton.addActionListener(new ActionListener(){
+			
+		    @Override
+			public void actionPerformed(ActionEvent e) {
+			
+		    	geneSelection.setSelectedNode(null);
+		    	geneSelection.deselectAllIndexes();
+		    	
+		    	arraySelection.setSelectedNode(null);
+		    	arraySelection.deselectAllIndexes();
+		    	
+		    	geneSelection.notifyObservers();
+		    	arraySelection.notifyObservers();
+		    }
 		});
   		
 		navPanel = new JPanel();
@@ -628,7 +620,7 @@ MainPanel, Observer {
 		registerView(globalview);
 		registerView(atrview);
 		registerView(arraynameview);
-		registerView(zoomview);
+//		registerView(zoomview);
 		registerView(textview);
 //		registerView(atrzview);
 		
@@ -636,11 +628,11 @@ MainPanel, Observer {
 		panel.add(globalYscrollbar, "pushy, growy, wrap");
 		panel.add(globalXscrollbar, "pushx, growx, span");
 		
-		zoompanel = new JPanel();
-		zoompanel.setLayout(new MigLayout());
-		zoompanel.add(zoomview, BorderLayout.CENTER);
-		zoompanel.add(zoomXscrollbar, BorderLayout.SOUTH);	
-		zoompanel.add(zoomYscrollbar, BorderLayout.EAST);
+//		zoompanel = new JPanel();
+//		zoompanel.setLayout(new MigLayout());
+//		zoompanel.add(zoomview, BorderLayout.CENTER);
+//		zoompanel.add(zoomXscrollbar, BorderLayout.SOUTH);	
+//		zoompanel.add(zoomYscrollbar, BorderLayout.EAST);
 		
 		textpanel.add(textview.getComponent(), "push, grow");
 		
@@ -663,7 +655,8 @@ MainPanel, Observer {
 		navPanel.add(getArrayFinderPanel(), "pushx, alignx 50%, " +
 				"height 10%::, wrap");
 		navPanel.add(buttonPanel, "push, growx, alignx 50%, wrap");
-		navPanel.add(zoomButton, "push, alignx 50%, wrap");
+		navPanel.add(zoomButton, "pushx, alignx 50%, wrap");
+		navPanel.add(deselectButton, "pushx, alignx 50%, wrap");
 		navPanel.add(closeButton, "push, alignx 50%");
 		
 		backgroundPanel.add(statuspanel, "pushx, growx, height 20%::");
@@ -1648,7 +1641,7 @@ MainPanel, Observer {
 	
 				PixelSettingsSelector pssSelector = 
 						new PixelSettingsSelector(globalXmap, globalYmap,
-							getZoomXmap(), getZoomYmap(), 
+//							getZoomXmap(), getZoomYmap(), 
 							ce, DendrogramFactory.getColorPresets());
 
 				JDialog popup = new ModelessSettingsDialog(viewFrame, 
@@ -2086,23 +2079,23 @@ MainPanel, Observer {
 		return globalYmap;
 	}
 
-	/**
-	 *  Gets the zoomXmap attribute of the DendroView object
-	 * @return zoomXmap
-	 */
-	public MapContainer getZoomXmap() {
-		
-		return zoomXmap;
-	}
-
-	/**
-	 *  Gets the zoomYmap attribute of the DendroView object
-	 * @return zoomYmap
-	 */
-	public MapContainer getZoomYmap() {
-		
-		return zoomYmap;
-	}
+//	/**
+//	 *  Gets the zoomXmap attribute of the DendroView object
+//	 * @return zoomXmap
+//	 */
+//	public MapContainer getZoomXmap() {
+//		
+//		return zoomXmap;
+//	}
+//
+//	/**
+//	 *  Gets the zoomYmap attribute of the DendroView object
+//	 * @return zoomYmap
+//	 */
+//	public MapContainer getZoomYmap() {
+//		
+//		return zoomYmap;
+//	}
 	
 	/** 
 	 * Getter for viewFrame 
@@ -2138,7 +2131,7 @@ MainPanel, Observer {
 		arraySelection.addObserver(this);
 		
 		globalview.setArraySelection(arraySelection);
-		zoomview.setArraySelection(arraySelection);
+//		zoomview.setArraySelection(arraySelection);
 		atrview.setArraySelection(arraySelection);
 //		atrzview.setArraySelection(arraySelection);
 		arraynameview.setArraySelection(arraySelection);
@@ -2160,7 +2153,7 @@ MainPanel, Observer {
 		geneSelection.addObserver(this);
 		
 		globalview.setGeneSelection(geneSelection);
-		zoomview.setGeneSelection(geneSelection);
+//		zoomview.setGeneSelection(geneSelection);
 		gtrview.setGeneSelection(geneSelection);
 		textview.setGeneSelection(geneSelection);	
 	}

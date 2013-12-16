@@ -118,10 +118,7 @@ AdjustmentListener, ConfigNodePersistent {
 		
 		if(this.getScale() <= 1.0) {
 			zoomVal = 0.1;
-			
-		} else if(this.getScale() <= 0.1) {
-			zoomVal = 0.05;
-		} 
+		}
 		
 		if(this.getScale() - zoomVal > this.getMinScale()) {
 			this.setScale(this.getScale() - zoomVal);
@@ -136,10 +133,7 @@ AdjustmentListener, ConfigNodePersistent {
 		double zoomVal = 0.5;
 		
 		if(this.getScale() <= 1.0) {
-			zoomVal = 0.1;
-			
-		} else if(this.getScale() <= 0.1) {
-			zoomVal = 0.05;
+			zoomVal = 0.1;	
 		} 
 		
 		if(this.getScale() + zoomVal > this.getMinScale()) {
@@ -401,16 +395,28 @@ AdjustmentListener, ConfigNodePersistent {
     	return (getPixel(i) + getPixel(i + 1)) / 2;
     }
 
+    /**
+     * Get maximum amount of data points on entire MapContainer
+     * @return
+     */
     public int getMaxIndex() {
        
     	return current.getMaxIndex();
     }
     
+    /**
+     * Get minimum amount of data points on entire MapContainer
+     * @return
+     */
     public int getMinIndex() {
         
     	return current.getMinIndex();
     }
     
+    /**
+     * Get smallest scale
+     * @return
+     */
     public double getMinScale() {
     	
     	return minScale;
