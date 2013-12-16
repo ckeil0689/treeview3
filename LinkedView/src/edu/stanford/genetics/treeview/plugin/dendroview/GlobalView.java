@@ -35,7 +35,7 @@ import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.*;
 
 class GlobalView extends ModelViewProduced implements  MouseMotionListener,
-    MouseListener, MouseWheelListener, KeyListener {    
+    MouseListener, MouseWheelListener, KeyListener, ComponentListener {    
 
 	private static final long serialVersionUID = 1L;
 	
@@ -94,6 +94,7 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		
 		setToolTipText("This Turns Tooltips On");
 
+		addComponentListener(this);
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addMouseWheelListener(this);
@@ -578,14 +579,17 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
     		return;
     	}
 	
-		startPoint.setLocation(xmap.getIndex(e.getX()),
-				       ymap.getIndex(e.getY()));
-		endPoint.setLocation(startPoint.x, startPoint.y);
-		dragRect.setLocation(startPoint.x, startPoint.y);
-		dragRect.setSize(endPoint.x - dragRect.x,
-				 endPoint.y - dragRect.y);
-	
-		drawBand(dragRect);
+    	//if left button is used
+    	if(SwingUtilities.isLeftMouseButton(e)) {
+			startPoint.setLocation(xmap.getIndex(e.getX()),
+					       ymap.getIndex(e.getY()));
+			endPoint.setLocation(startPoint.x, startPoint.y);
+			dragRect.setLocation(startPoint.x, startPoint.y);
+			dragRect.setSize(endPoint.x - dragRect.x,
+					 endPoint.y - dragRect.y);
+		
+			drawBand(dragRect);
+    	}
     }
     
     @Override
@@ -593,12 +597,13 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		
     	if (enclosingWindow().isActive() == false) {
     		return;
-    	}
-    	
-		mouseDragged(e);
-		drawBand(dragRect);	
+    	}	
 		
+		//When left button is used
 		if(SwingUtilities.isLeftMouseButton(e)) {
+			mouseDragged(e);
+			drawBand(dragRect);
+			
 			if (e.isShiftDown()) {
 			    Point start = new Point(xmap.getMinIndex(), ymap.getMinIndex());
 					    //startPoint.y);
@@ -610,7 +615,7 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 				selectRectangle(startPoint, endPoint);
 			}
 		} else {
-			//selectAndZoom(startPoint, endPoint);
+			//do something else?
 		}
 		
 		this.revalidate();
@@ -621,22 +626,25 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
     @Override
 	public void mouseDragged(MouseEvent e) {
 		
-    	//rubber band?
-		drawBand(dragRect);	
-		endPoint.setLocation(xmap.getIndex(e.getX()), ymap.getIndex(e.getY()));
-		
-		if (e.isShiftDown()) {
-			dragRect.setLocation(xmap.getMinIndex(), startPoint.y);
-		    dragRect.setSize(0,0);
-		    dragRect.add(xmap.getMaxIndex(), endPoint.y);
-	    
-		} else {
-		    dragRect.setLocation(startPoint.x, startPoint.y);
-		    dragRect.setSize(0,0);
-		    dragRect.add(endPoint.x, endPoint.y);
-		}
-		
-		drawBand(dragRect);
+    	//When left button is used
+    	if(SwingUtilities.isLeftMouseButton(e)) {
+	    	//rubber band?
+			drawBand(dragRect);	
+			endPoint.setLocation(xmap.getIndex(e.getX()), ymap.getIndex(e.getY()));
+			
+			if (e.isShiftDown()) {
+				dragRect.setLocation(xmap.getMinIndex(), startPoint.y);
+			    dragRect.setSize(0,0);
+			    dragRect.add(xmap.getMaxIndex(), endPoint.y);
+		    
+			} else {
+			    dragRect.setLocation(startPoint.x, startPoint.y);
+			    dragRect.setSize(0,0);
+			    dragRect.add(endPoint.x, endPoint.y);
+			}
+			
+			drawBand(dragRect);
+    	}
     }
     
     @Override
@@ -752,81 +760,6 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		
 		this.revalidate();
 		this.repaint();
-		
-//		int c = e.getKeyCode();
-//		startPoint.setLocation(arraySelection.getMinIndex(), 
-//				geneSelection.getMinIndex());
-//		endPoint.setLocation (arraySelection.getMaxIndex(), 
-//				geneSelection.getMaxIndex());
-//		
-//		if (e.isControlDown()) {
-//			switch (c) {
-//				case KeyEvent.VK_UP:
-//					startPoint.translate(0, -1); 
-//					endPoint.translate(0, 1); 
-//					break;
-//				case KeyEvent.VK_DOWN:
-//					startPoint.translate(0, 1); 
-//					endPoint.translate(0, -1); 
-//					break;
-//				case KeyEvent.VK_LEFT:
-//					startPoint.translate(1, 0); 
-//					endPoint.translate(-1, 0); 
-//					break;
-//				case KeyEvent.VK_RIGHT:
-//					startPoint.translate(-1, 0); 
-//					endPoint.translate(1, 0); 
-//					break;
-//			}
-//		} else {
-//			
-//			switch (c) {
-//				case KeyEvent.VK_UP:
-//					startPoint.translate(0, -1); 
-//					endPoint.translate(0, -1); 
-//					break;
-//				case KeyEvent.VK_DOWN:
-//					startPoint.translate(0, 1); 
-//					endPoint.translate(0, 1); 
-//					break;
-//				case KeyEvent.VK_LEFT:
-//					startPoint.translate(-1, 0); 
-//					endPoint.translate(-1, 0); 
-//					break;
-//				case KeyEvent.VK_RIGHT:
-//					startPoint.translate(1, 0); 
-//					endPoint.translate(1, 0); 
-//					break;
-//				case KeyEvent.VK_SHIFT:
-//					// should we do something if shift is pressed during drag?
-//					break;
-//			}
-//		}
-//		
-//		// make sure it all fits...
-//		int overx = 0; int overy = 0;
-//		if (startPoint.x < xmap.getMinIndex()) {
-//			overx += startPoint.x - xmap.getMinIndex();
-//		}
-//		
-//		if (startPoint.y < ymap.getMinIndex()) {
-//			overy += startPoint.y - ymap.getMinIndex();
-//		}
-//		
-//		if (endPoint.x > xmap.getMaxIndex()) {
-//			overx += endPoint.x - xmap.getMaxIndex();
-//		}
-//		
-//		if (startPoint.y < ymap.getMinIndex()) {
-//			overy += startPoint.y - ymap.getMinIndex();
-//		}
-//		
-//		startPoint.x -= overx;
-//		endPoint.x -= overx;
-//		startPoint.y -= overy;
-//		endPoint.y -= overy;
-//		
-//		selectRectangle(startPoint, endPoint);
 	}
 	
 	/**
@@ -938,10 +871,24 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		if(startPoint != null && endPoint != null) {
 			scrollX = (endPoint.x + startPoint.x)/2;
 			scrollY = (endPoint.y + startPoint.y)/2;
+			
+			System.out.println("SX: " + scrollX);
 				
 			xmap.scrollToIndex(scrollX);
 			ymap.scrollToIndex(scrollY);
 		}
+	}
+	
+	/**
+	 * Scrolls to the center of the selected rectangle
+	 */
+	public void centerView(int scrollX, int scrollY) {
+				
+		scrollX = scrollX + (xmap.getScroll().getVisibleAmount()/2);
+		scrollY = scrollY + (ymap.getScroll().getVisibleAmount()/2);
+		
+		xmap.scrollToIndex(scrollX);
+		ymap.scrollToIndex(scrollY);
 	}
 	
 	/**
@@ -954,6 +901,46 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		geneHI = ghi;
 		arrayHI = ahi;
 	}
+	
+	//Component Listeners
+	@Override
+	public void componentHidden(ComponentEvent arg0) {}
+
+	@Override
+	public void componentMoved(ComponentEvent arg0) {}
+
+	//Keep view centered and zoomed on visible part, also refreshing the 
+	//MapContainer with setHome to always fill out the entire GlobalView 
+	//panel
+	@Override
+	public void componentResized(ComponentEvent arg0) {
+		
+		double scaleFactorX = 1.0;
+		double scaleFactorY = 1.0;
+		
+		int scrollX = xmap.getScroll().getValue();
+		int scrollY = ymap.getScroll().getValue();
+		
+		if(xmap.getMinScale() > 0.0) {
+			scaleFactorX = xmap.getScale()/ xmap.getMinScale();
+		}
+		xmap.setHome();
+		xmap.setScale(xmap.getMinScale() * scaleFactorX);
+		
+		if(ymap.getMinScale() > 0.0) {
+			scaleFactorY = ymap.getScale()/ ymap.getMinScale();
+		}
+		ymap.setHome();
+		ymap.setScale(ymap.getMinScale() * scaleFactorY);
+		
+		centerView(scrollX, scrollY);
+		
+		this.repaint();
+		this.revalidate();
+	}
+
+	@Override
+	public void componentShown(ComponentEvent arg0) {}
 }
 
 
