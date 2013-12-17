@@ -112,32 +112,51 @@ AdjustmentListener, ConfigNodePersistent {
     	minScale = pixels/divider;
     }
     
-    public void zoomOut() {
+    /**
+     * Method to zoom out of the MapContainer and set the scale for drawing
+     * lower than before. 
+     * It's important to take the range of genes displayed on screen 
+     * (range of scrollbar -> visibleAmount()) into account, as well as 
+     * the amount of available pixels on screen. Otherwise there will be 
+     * drawing and selection issues.
+     * @param double zoomVal
+     */
+    public void zoomOut(double zoomVal) {
 		
-		double zoomVal = 0.5;
+		double newScale = 0.0;
 		
-		if(this.getScale() <= 1.0) {
-			zoomVal = 0.1;
-		}
-		
-		if(this.getScale() - zoomVal > this.getMinScale()) {
-			this.setScale(this.getScale() - zoomVal);
+		if((scrollbar.getVisibleAmount() < scrollbar.getVisibleAmount() 
+				+ zoomVal) && (scrollbar.getVisibleAmount() + zoomVal) 
+				< scrollbar.getMaximum()) {
+			
+			newScale = getAvailablePixels()/ (scrollbar.getVisibleAmount() 
+					+ zoomVal);
+			this.setScale(newScale);
 			
 		} else {
 			this.setScale(this.getMinScale());
 		}
 	}
 	
-	public void zoomIn() {
+    /**
+     * Method to zoom in to the MapContainer and set the scale for drawing
+     * higher than before. 
+     * It's important to take the range of genes displayed on screen 
+     * (range of scrollbar -> visibleAmount()) into account, as well as 
+     * the amount of available pixels on screen. Otherwise there will be 
+     * drawing and selection issues.
+     * @param double zoomVal
+     */
+	public void zoomIn(double zoomVal) {
+
+		double newScale = 0.0;
 		
-		double zoomVal = 0.5;
-		
-		if(this.getScale() <= 1.0) {
-			zoomVal = 0.1;	
-		} 
-		
-		if(this.getScale() + zoomVal > this.getMinScale()) {
-			this.setScale(this.getScale() + zoomVal);
+		if((scrollbar.getVisibleAmount() > scrollbar.getVisibleAmount() 
+				- zoomVal) && (scrollbar.getVisibleAmount() - zoomVal) 
+				> scrollbar.getMinimum()) {
+			newScale = getAvailablePixels()/ (scrollbar.getVisibleAmount() 
+					- zoomVal);
+			this.setScale(newScale);
 			
 		} else {
 			this.setScale(this.getMinScale());

@@ -291,8 +291,8 @@ MainPanel, Observer {
 		// globalmaps tell globalview, atrview, and gtrview
 		// where to draw each data point.
 		// the scrollbars "scroll" by communicating with the maps.
-		globalXmap = new MapContainer("Fill");
-		globalYmap = new MapContainer("Fill");
+		globalXmap = new MapContainer("Fixed");
+		globalYmap = new MapContainer("Fixed");
 				
 		//Create the Global view (JPanel to display)
 		globalview = new GlobalView();
@@ -352,29 +352,19 @@ MainPanel, Observer {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				
-//				if(zoomed) {
-//					getZoomXmap().setHome();
-//					getZoomYmap().setHome();
-//					
-//				} else {
-					getGlobalXmap().setHome();
-					getGlobalYmap().setHome();
-//				}
+				getGlobalXmap().setHome();
+				getGlobalYmap().setHome();
 			}
 		});
 		
+		final double zoomVal = 1.0;
 		scaleIncX = setZoomButtonLayout("+");
 		scaleIncX.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				
-//				if(zoomed) {
-//					getZoomXmap().zoomIn();
-//				
-//				} else {
-					getGlobalXmap().zoomIn();
-//				}
+
+				getGlobalXmap().zoomIn(zoomVal);
 			}
 		});
 		
@@ -384,13 +374,7 @@ MainPanel, Observer {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 		
-//				if(zoomed) {
-//					getZoomXmap().zoomOut();
-//					
-//				} else {
-					getGlobalXmap().zoomOut();
-//				}
-			
+				getGlobalXmap().zoomOut(zoomVal);
 			}
 		});
 		
@@ -399,13 +383,8 @@ MainPanel, Observer {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				
-//				if(zoomed) {
-//					getZoomYmap().zoomIn();
-//					
-//				} else {
-					getGlobalYmap().zoomIn();
-//				}
+			
+				getGlobalYmap().zoomIn(zoomVal);
 			}	
 		});
 		
@@ -414,13 +393,8 @@ MainPanel, Observer {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				
-//				if(zoomed) {
-//					getZoomYmap().zoomOut();
-//					
-//				} else {
-					getGlobalYmap().zoomOut();
-//				}
+			
+				getGlobalYmap().zoomOut(zoomVal);
 			}
 		});
 
@@ -502,7 +476,6 @@ MainPanel, Observer {
 		JButton closeButton;
 		final JButton zoomButton;
 		JButton deselectButton;
-//		JButton fullScreenButton;
 		JLabel nav;
 		
 		this.removeAll();
@@ -553,7 +526,7 @@ MainPanel, Observer {
 			}
 		});
   		
-		zoomButton = setButtonLayout("Zoom Selection");;
+		zoomButton = setButtonLayout("Zoom Selection");
   		zoomButton.addActionListener(new ActionListener(){
 
 			@Override
@@ -562,13 +535,8 @@ MainPanel, Observer {
 				globalview.zoomSelection();
 				globalview.centerSelection();
 					
-				//zoomed = false;
-				//zoomButton.setText("Zoom Map");
-							
 				panel.revalidate();
 				panel.repaint();
-					
-				//zoomed = true;
 			}
 		});
   		

@@ -67,6 +67,7 @@ public abstract class HeaderFinderPanel extends JPanel {
 	private JLabel genef;
 	private ArrayList<String> geneList;
 	private String[] genefHeaders = {""};
+	private String type;
 	private JComboBox genefBox;
 	private JButton genefButton;
 //	private JButton deselectButton;
@@ -86,6 +87,7 @@ public abstract class HeaderFinderPanel extends JPanel {
 		this.viewFrame = null;
 		this.headerInfo = hI;
 		this.geneSelection = geneSelection;
+		this.type = type;
 		choices = new int[hI.getNumHeaders()]; // could be wasteful of ram...
 	
 		this.setLayout(new MigLayout());
@@ -119,22 +121,9 @@ public abstract class HeaderFinderPanel extends JPanel {
 		    }
 		});
 		
-//		deselectButton = setButtonLayout("Deselect");
-//		deselectButton.addActionListener(new ActionListener(){
-//			
-//		    @Override
-//			public void actionPerformed(ActionEvent e) {
-//			
-//		    	geneSelection.setSelectedNode(null);
-//		    	geneSelection.deselectAllIndexes();
-//		    	geneSelection.notifyObservers();
-//		    }
-//		});
-		
 		this.add(genef, "pushx, span, wrap");
 		this.add(genefBox, "growx, pushx, width 70%");
 		this.add(genefButton, "pushx, width 20%, wrap");
-//		this.add(deselectButton, "pushx");
     }
 	
 	/**
@@ -146,8 +135,22 @@ public abstract class HeaderFinderPanel extends JPanel {
 	public String[] getGenes(String[][] hA) {
 		
 		String[] geneArray = new String[headerInfo.getNumHeaders()];
-		String[] names = headerInfo.getNames();
-		int idIndex = headerInfo.getIndex("ORF");
+		int idIndex = 0;
+		
+		if(type.equalsIgnoreCase("Row")){
+			if(headerInfo.getIndex("ORF") != -1) {
+				idIndex = headerInfo.getIndex("ORF");
+			}
+		} else {
+			if(headerInfo.getIndex("GID") != -1) {
+				idIndex = headerInfo.getIndex("GID");
+				
+			} else {
+				if(headerInfo.getIndex("ORF") != -1) {
+					idIndex = headerInfo.getIndex("ORF");
+				}
+			}
+		}
 		
 		for(int i = 0; i < hA.length; i++) {
 			

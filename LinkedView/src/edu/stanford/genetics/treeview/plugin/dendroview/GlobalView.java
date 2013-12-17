@@ -90,7 +90,7 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		this.setLayout(new MigLayout());
 		
 		scrollPane = new JScrollPane(panel);
-		this.add(scrollPane);
+		//this.add(scrollPane);
 		
 		setToolTipText("This Turns Tooltips On");
 
@@ -405,13 +405,13 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		}
 		
 		if (offscreenValid == false) {
-			Rectangle destRect = new Rectangle
-			(0,0, xmap.getUsedPixels(), ymap.getUsedPixels());
+			Rectangle destRect = new Rectangle(0, 0, xmap.getUsedPixels(), 
+					ymap.getUsedPixels());
 			
-			Rectangle sourceRect = new Rectangle
-			(xmap.getIndex(0), ymap.getIndex(0),
-			xmap.getIndex(destRect.width) - xmap.getIndex(0), 
-			ymap.getIndex(destRect.height) - ymap.getIndex(0));
+			Rectangle sourceRect = new Rectangle(xmap.getIndex(0), 
+					ymap.getIndex(0), xmap.getIndex(destRect.width) 
+					- xmap.getIndex(0), ymap.getIndex(destRect.height) - 
+					ymap.getIndex(0));
 
 			if ((sourceRect.x >= 0) && (sourceRect.y >= 0)) {
 				drawer.paint(offscreenPixels, sourceRect, 
@@ -735,6 +735,17 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 			shift = 1;
 		}
 		
+		double zoomValX = 10.0;
+		double zoomValY = 10.0;
+		
+		if(xmap.getScale() >= 10) {
+			zoomValX = 1.0;
+		}
+		
+		if(ymap.getScale() >= 10) {
+			zoomValY = 1.0;
+		}
+		
 		switch (c) {
 		case KeyEvent.VK_LEFT:
 			xmap.scrollBy(-shift);
@@ -749,12 +760,12 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 			ymap.scrollBy(shift);
 			break;
 		case KeyEvent.VK_MINUS:
-			xmap.zoomOut();
-			ymap.zoomOut();
+			xmap.zoomOut(zoomValX);
+			ymap.zoomOut(zoomValY);
 			break;
 		case KeyEvent.VK_EQUALS:
-			xmap.zoomIn();
-			ymap.zoomIn();
+			xmap.zoomIn(zoomValX);
+			ymap.zoomIn(zoomValY);
 			break;
 		}
 		
@@ -771,6 +782,16 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		
 		int notches = e.getWheelRotation();
 		int shift = 3;
+		double zoomValX = 10.0;
+		double zoomValY = 10.0;
+		
+		if(xmap.getScale() >= 10) {
+			zoomValX = 1.0;
+		}
+		
+		if(ymap.getScale() >= 10) {
+			zoomValY = 1.0;
+		}
 		
 		if(!e.isShiftDown()) {
 			if(notches < 0) {
@@ -781,12 +802,12 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 			}
 		} else {
 			if(notches < 0) {
-				xmap.zoomIn();
-				ymap.zoomIn();
+				xmap.zoomIn(zoomValX);
+				ymap.zoomIn(zoomValY);
 				
 			} else {
-				xmap.zoomOut();
-				ymap.zoomOut();
+				xmap.zoomOut(zoomValX);
+				ymap.zoomOut(zoomValY);
 			}
 		}
 		

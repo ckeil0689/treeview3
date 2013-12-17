@@ -18,13 +18,13 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
 public class GeneFinderPanel extends HeaderFinderPanel {
 
 	private static final long serialVersionUID = 1L;
-
+	
 	/**
 	 * @param f
 	 * @param hI
 	 * @param geneSelection
 	 */
-	public GeneFinderPanel(ViewFrame f, DendroView2 dv, HeaderInfo hI, 
+	public GeneFinderPanel(ViewFrame f, DendroView2 dv, HeaderInfo hI,
 			TreeSelectionI geneSelection) {
 		
 		super(f, hI, geneSelection, "Row");
