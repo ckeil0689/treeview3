@@ -331,7 +331,7 @@ public class ATRView extends ModelViewBuffered implements
 			map.setAvailablePixels(offscreenSize.width);
 
 			// clear the pallette...
-			g.setColor(Color.white);
+			g.setColor(GUIParams.BG_COLOR);
 			g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
 			g.setColor(Color.black);
 
@@ -346,9 +346,7 @@ public class ATRView extends ModelViewBuffered implements
 					drawer.getCorrMax(), destRect.y + destRect.height);
 
 			// draw
-			drawer.paint(g,
-					xScaleEq, yScaleEq,
-					destRect, selectedNode);
+			drawer.paint(g, xScaleEq, yScaleEq, destRect, selectedNode);
 			
 		} else {
 			//	    System.out.println("didn't update buffer: valid = 
@@ -426,8 +424,8 @@ public class ATRView extends ModelViewBuffered implements
 			
 			case KeyEvent.VK_DOWN:
 				if (selectedNode.isLeaf() == false) {
-					TreeDrawerNode right  = selectedNode.getRight();
-					TreeDrawerNode left   = selectedNode.getLeft();
+					TreeDrawerNode right = selectedNode.getRight();
+					TreeDrawerNode left = selectedNode.getLeft();
 					
 					if (right.getRange() > left.getRange()) {
 						selectRight();

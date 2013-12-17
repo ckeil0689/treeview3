@@ -53,62 +53,87 @@ import java.util.*;
 * I may later extend this class to support rotations about an arbitrary node.
 */
 abstract class TreeDrawer extends Observable implements Observer {
-	/**
-	* Constructor does nothing but set defaults
-	*/
-	public TreeDrawer() {
-		setDefaults();
-	}
+	
+	/** type of header which can be used to set branch heights */
+	public static final int CORRELATION = 0;
+	/** type of header which can be used to set branch heights */
+	public static final int TIME = 1;
 	
 	/**
 	 * used to keep track of the HeaderInfo we're observing, so we can stop
 	 * observing if someone calls setData to a new HeaderInfo.
 	 */
 	private HeaderInfo nodeInfo = null;
+	
+	private double corrMin;
+	private double corrMax;
+	private TreeDrawerNode[] leafList;
+	private TreeDrawerNode rootNode;
+	private Hashtable<String, TreeDrawerNode> id2node;
+	
+	/**
+	* Constructor does nothing but set defaults
+	*/
+	public TreeDrawer() {
+		
+		setDefaults();
+	}
+	
 	@Override
 	public void update(Observable o, Object arg) {
+		
 		if (o == nodeInfo) {
 			setChanged();
 			notifyObservers();
+			
 		} else {
-			LogBuffer.println("TreeDrawer got update from unexpected observable " + o);
+			LogBuffer.println("TreeDrawer got update from unexpected " +
+					"observable " + o);
 		}
 	}
+	
 	/**
 	* Accessor for the root node
 	*
 	* @return root node
 	*/    
 	public TreeDrawerNode getRootNode() {
+		
 		return rootNode;
 	}
 	
-	private double corrMin;
 	/**
 	* this somewhat misnamed method returns the minimum branch value
 	*/
 	public double getCorrMin() {
+		
 		return corrMin;
 	}
+	
 	public void setCorrMin(double corrMin) {
+		
 		this.corrMin = corrMin;
 	}
 
-	private double corrMax;
 	/**
 	* this somewhat misnamed method returns the maximum branch value
 	*/
 	public double getCorrMax() {
+		
 		return corrMax;
 	}
+	
 	public void setCorrMax(double corrMax) {
+		
 		this.corrMax = corrMax;
 	}
 
 	public TreeDrawerNode getLeaf(int i) {
+		
 		if (leafList != null) {
 			try {
 				return leafList[i];
+				
 			} catch (Exception e) {
 				System.out.println("Got exception " + e);
 				e.printStackTrace();
@@ -144,7 +169,8 @@ abstract class TreeDrawer extends Observable implements Observer {
 		nodeInfo.addObserver(this);
 		
 		leafList = new TreeDrawerNode[rowInfo.getNumHeaders()];
-		id2node = new Hashtable(((nodeInfo.getNumHeaders() * 4) /3)/2, .75f);
+		id2node = new Hashtable<String, TreeDrawerNode>(
+				((nodeInfo.getNumHeaders() * 4) /3)/2, .75f);
 		
 		int nodeIndex = nodeInfo.getIndex("NODEID");
 		if (nodeIndex == -1) {
@@ -160,9 +186,10 @@ abstract class TreeDrawer extends Observable implements Observer {
 			String rightId = nodeInfo.getHeader(j, "RIGHT");
 			
 			// setup the kids
-			TreeDrawerNode newn   = (TreeDrawerNode) id2node.get(newId);
-			TreeDrawerNode leftn  = (TreeDrawerNode) id2node.get(leftId);
+			TreeDrawerNode newn = (TreeDrawerNode) id2node.get(newId);
+			TreeDrawerNode leftn = (TreeDrawerNode) id2node.get(leftId);
 			TreeDrawerNode rightn = (TreeDrawerNode) id2node.get(rightId);
+			
 			if (newn != null) {
 				System.out.println("Symbol '" + newn + 
 				"' appeared twice, building weird tree");
@@ -216,14 +243,12 @@ abstract class TreeDrawer extends Observable implements Observer {
 		setChanged();
 	}
 	
-	/** type of header which can be used to set branch heights */
-	public static final int CORRELATION = 0;
-	/** type of header which can be used to set branch heights */
-	public static final int TIME = 1;
-	
 	public void setBranchHeights(HeaderInfo nodeInfo, HeaderInfo rowInfo) {
 		
-		if (rootNode == null) return;
+		if (rootNode == null) {
+			return;
+		}
+		
 		int nameIndex = nodeInfo.getIndex("TIME");
 		int type = TIME;
 		if (nameIndex == -1) {
@@ -237,16 +262,21 @@ abstract class TreeDrawer extends Observable implements Observer {
 			setCorrMin(rootNode.getMinCorr());
 			setCorrMax(1.0);
 			for (int i = 0; i < leafList.length; i++) {
-				if (leafList[i] != null)
+				
+				if (leafList[i] != null) {
 					leafList[i].setCorr(getCorrMax());
+				}
 			}
 		} else {
 			for (int i = 0; i < leafList.length; i++) {
+				
 				double leaf = rootNode.getCorr();
 				try {
 					leaf = parseDouble(rowInfo.getHeader(
 							(int) leafList[i].getIndex(), "LEAF"));
+					
 				} catch (Exception e) {
+					
 				}
 				leafList[i].setCorr(leaf);
 			}
@@ -254,43 +284,56 @@ abstract class TreeDrawer extends Observable implements Observer {
 			setCorrMax(rootNode.getMaxCorr());
 
 			for (int i = 0; i < leafList.length; i++) {
-				// similar to the correlation case, makes the leaves extend all the way to the end.
+				
+				// similar to the correlation case, makes the leaves extend 
+				// all the way to the end.
 				double leaf = getCorrMax();
 				try {
-					leaf = parseDouble(rowInfo.getHeader((int) leafList[i].getIndex(), "LEAF"));
+					leaf = parseDouble(rowInfo.getHeader(
+							(int) leafList[i].getIndex(), "LEAF"));
 				} catch (Exception e) {
 				}
 
 				leafList[i].setCorr(leaf);
 
-				// This would set the leaf's branch length to be the same as it's parent...
+				// This would set the leaf's branch length to be the same 
+				// as it's parent...
 				// leafList[i].setCorr(leafList[i].getParent().getCorr());
 
 				// this makes the leaf end at the midpoint of the previous two.
-				//leafList[i].setCorr((getCorrMax() + leafList[i].getParent().getCorr()) / 2);
-
+				// leafList[i].setCorr((getCorrMax() + 
+				// leafList[i].getParent().getCorr()) / 2);
 			}
 		}
 	}
-	public void setBranchHeightsIter(HeaderInfo nodeInfo, int nameIndex, int type, TreeDrawerNode start) {
-		Stack remaining = new Stack();
+	
+	public void setBranchHeightsIter(HeaderInfo nodeInfo, int nameIndex, 
+			int type, TreeDrawerNode start) {
+		
+		Stack<TreeDrawerNode> remaining = new Stack<TreeDrawerNode>();
 		remaining.push(start);
+		
 		while (remaining.empty() == false) {
+			
 			TreeDrawerNode current = (TreeDrawerNode) remaining.pop();
 			if (current.isLeaf()) {
 				// will get handled in a linear-time routine...
+				
 			} else {
 				int j = nodeInfo.getHeaderIndex(current.getId());
 				Double d = new Double(nodeInfo.getHeader(j)[nameIndex]);
 				double corr = d.doubleValue();
 				if (type == CORRELATION) {
 					if ((corr  < -1.0) || (corr > 1.0)) {
-						System.out.println("Got illegal correlation " + corr + " at line j");
+						System.out.println("Got illegal correlation " 
+								+ corr + " at line j");
 					}
 					current.setCorr(corr);
+					
 				} else {
 					current.setCorr(corr);
 				}
+				
 				remaining.push(current.getLeft());
 				remaining.push(current.getRight());
 			}
@@ -307,27 +350,37 @@ abstract class TreeDrawer extends Observable implements Observer {
 	* @param dest         Specifies Rectangle of pixels to draw to
 	* @param selected     A selected node
 	* 
-	* the actual implementation of this depends, of course, on the orientation of the tree.
+	* the actual implementation of this depends, of course, on the orientation 
+	* of the tree.
 	*/
 	abstract public void paint(Graphics graphics, LinearTransformation xScaleEq, 
-	LinearTransformation yScaleEq, Rectangle dest, 
-	TreeDrawerNode selected);
+	LinearTransformation yScaleEq, Rectangle dest, TreeDrawerNode selected);
 	
 	/**
 	* Get the closest node to the given (index, correlation) pair.
 	*
 	*/
 	public TreeDrawerNode getClosest(double index, double corr, double weight) {
-		if (rootNode == null) return null;
-		IterativeClosestFinder rcf = new IterativeClosestFinder(index, corr, weight);
+		
+		if (rootNode == null) {
+			return null;
+		}
+		
+		IterativeClosestFinder rcf = new IterativeClosestFinder(index, 
+				corr, weight);
 		return rcf.find(rootNode);
 	}
+	
 	/**
 	 *  Get node by Id
 	 *  returns null if no matching id
 	 */
 	public TreeDrawerNode getNodeById(String id) {
-		if (id == null) return null;
+		
+		if (id == null) {
+			return null;
+		}
+		
 		return (TreeDrawerNode)id2node.get(id);
  	}
 	
@@ -341,15 +394,21 @@ abstract class TreeDrawer extends Observable implements Observer {
 	*/
 	class IterativeClosestFinder {
 		
+		private double index;
+		private double correlation;
+		private double weight;
+		
 		/**
 		* The constructor sets the variables
 		*
 		* @param ind        The index for which to search
 		* @param corr  The correlation for which to search
-		* @param wei        The relative weight to assign to correlation. The distance function will be sqrt((delta(corr) * weight) ^2 + (delta(index))^2)
+		* @param wei        The relative weight to assign to correlation. 
+		* The distance function will be 
+		* sqrt((delta(corr) * weight) ^2 + (delta(index))^2)
 		*/
-		public IterativeClosestFinder(double ind, double corr, 
-		double wei) {
+		public IterativeClosestFinder(double ind, double corr, double wei) {
+			
 			index = ind;
 			correlation = corr;
 			weight = wei;
@@ -359,34 +418,44 @@ abstract class TreeDrawer extends Observable implements Observer {
 		* the find method actually finds the node
 		*/
 		public TreeDrawerNode find(TreeDrawerNode startNode) {
-			if (startNode.isLeaf())
+			
+			if (startNode.isLeaf()) {
 				return startNode;
+			}
 			TreeDrawerNode closest = startNode;
 			
 			// some stack allocation...
-			Stack remaining = new Stack();
+			Stack<TreeDrawerNode> remaining = new Stack<TreeDrawerNode>();
 			remaining.push(startNode);
+			
 			while (remaining.empty() == false) {
 				
 				TreeDrawerNode testN = (TreeDrawerNode) remaining.pop();
 
-				if (testN.getDist(index, correlation, weight) < closest.getDist(index,correlation,weight))
+				if (testN.getDist(index, correlation, weight) 
+						< closest.getDist(index,correlation,weight)) {
 					closest = testN;
+				}
 				
 				// lots of stack allocation...
 				TreeDrawerNode left = testN.getLeft();
 				TreeDrawerNode right = testN.getRight();
-				if (left.isLeaf() == false) remaining.push(left);
-				if (right.isLeaf() == false) remaining.push(right);
+				if (left.isLeaf() == false) {
+					remaining.push(left);
+				}
+				
+				if (right.isLeaf() == false) {
+					remaining.push(right);
+				}
 			}
 						
 			return closest;
 		}
-		private double index, correlation, weight;
 	}
 	
 	
 	private void setDefaults() {
+		
 		id2node = null;
 		rootNode = null;
 		leafList = null;
@@ -394,10 +463,6 @@ abstract class TreeDrawer extends Observable implements Observer {
 		nodeInfo = null;
 		setChanged();
 	}
-	
-	private TreeDrawerNode [] leafList;
-	private TreeDrawerNode rootNode;
-	private Hashtable id2node;
 	
 	public static double parseDouble (String string) {
 			Double val = Double.valueOf(string);

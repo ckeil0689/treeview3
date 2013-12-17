@@ -44,7 +44,7 @@ public class TreeDrawerNode {
     private TreeDrawerNode left = null;
     private TreeDrawerNode right = null;
     private String id = null;
-    private Color color = Color.black;
+    private Color color = GUIParams.TEXT;
 	
 	/**
 	* returns maximum correlation value (really branch height) for this subtree 
