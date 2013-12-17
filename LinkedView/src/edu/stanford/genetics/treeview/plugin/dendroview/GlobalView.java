@@ -47,7 +47,7 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
     protected MapContainer zoomXmap;
     protected MapContainer zoomYmap;
 	private String [] statustext = new String [] {"Mouseover Selection", 
-			"", "", "Active Map: Global"};
+			"", ""};
 	private HeaderInfo arrayHI;
 	private HeaderInfo geneHI;
     private ArrayDrawer drawer;
@@ -71,6 +71,16 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
      * Rectangle to track yellow selected rectangle (pixels)
      */
     private Rectangle selectionRect = null;
+    
+    /**
+     * Rectangle to be used as indicator for row selection
+     */
+    private Rectangle rowIndicatorRect = null;
+    
+    /**
+     * Rectangle to be used as indicator for column selection
+     */
+    private Rectangle colIndicatorRect = null;
 
     /**
      * Rectangle to track blue zoom rectangle (pixels)
@@ -436,6 +446,15 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		    g.setColor(Color.yellow);
 		    g.drawRect(selectionRect.x, selectionRect.y, 
 			       selectionRect.width, selectionRect.height);
+		    
+		    if(xmap.getScale() < 8.0 && ymap.getScale() < 8.0 
+		    		&& (rowIndicatorRect != null && colIndicatorRect != null)) {
+		    	g.setColor(GUIParams.ELEMENT);
+			    g.drawRect(rowIndicatorRect.x, rowIndicatorRect.y, 
+			    		rowIndicatorRect.width, rowIndicatorRect.height);
+			    g.drawRect(colIndicatorRect.x, colIndicatorRect.y, 
+			    		colIndicatorRect.width, colIndicatorRect.height);
+		    }
 		}
     }
     
@@ -516,6 +535,7 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 				}
 			}
 			recalculateOverlay();
+			drawGeneIndicator();
 			
 		} else if (o == arraySelection) {
 			if (geneSelection.getNSelectedIndexes() == 0) {
@@ -528,10 +548,12 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 				}
 			}
 			recalculateOverlay();
+			drawGeneIndicator();
 			
 		} else if ((o == xmap) || o == ymap) {
 			recalculateZoom(); // it moves around, you see...
 			recalculateOverlay();
+			drawGeneIndicator();
 			offscreenValid = false;
 			
 		} else if ((o == zoomYmap) || (o == zoomXmap)) {
@@ -719,6 +741,70 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		
 		g.drawRect(x, y, w, h);
 		g.setPaintMode();
+    }
+    
+    /**
+     * Draws a visual indicator line/ filled rectangle to display the
+     * location of a certain target in the GlobalView to aid the user.
+     */
+    private void drawGeneIndicator() {
+    	
+		if ((geneSelection == null) || (arraySelection == null)) {
+			return;
+		}
+		
+    	if(geneSelection.getNSelectedIndexes() == 1 
+    			&& arraySelection.getNSelectedIndexes() == 1) {
+    		
+    		int spx; 
+    		int spy; 
+    		int epx;
+    		int epy;
+    		
+    		//first for row
+    		spx = xmap.getPixel(arraySelection.getMinIndex());
+    		// last pixel of last block
+    		epx = xmap.getPixel(arraySelection.getMaxIndex() + 1) - 1; 
+    		
+    		
+    		spy = ymap.getPixel(ymap.getMinIndex());
+    		epy = ymap.getPixel(ymap.getMaxIndex() + 1) - 1;
+    		
+    		if (epy < spy) {
+    			epy = spy; 
+    			// correct for roundoff error above
+    		}
+    		
+    		if (rowIndicatorRect == null) {
+    			rowIndicatorRect = new Rectangle(spx, spy, epx - spx, 
+    					epy - spy);
+    			
+    		} else {
+    			rowIndicatorRect.setBounds(spx, spy, epx - spx, epy - spy);
+    		}
+    		
+    		//Now for column
+    		spx = xmap.getPixel(xmap.getMinIndex());
+    		// last pixel of last block
+    		epx = xmap.getPixel(xmap.getMaxIndex() + 1) - 1; 
+    		
+    		
+    		spy = ymap.getPixel(geneSelection.getMinIndex());
+    		epy = ymap.getPixel(geneSelection.getMaxIndex() + 1) - 1;
+    		
+    		if (epy < spy) {
+    			epy = spy; 
+    			// correct for roundoff error above
+    		}
+    		
+    		if (colIndicatorRect == null) {
+    			colIndicatorRect = new Rectangle(spx, spy, epx - spx, 
+    					epy - spy);
+    			
+    		} else {
+    			colIndicatorRect.setBounds(spx, spy, epx - spx, epy - spy);
+    		}
+    	}
     }
     
     //KeyListener 

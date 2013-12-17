@@ -152,8 +152,6 @@ class LoadCheckView extends JPanel {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					
-					//viewFrame.resetLayout();
-					//viewFrame.setDataModel(tvModel, false, true);
 					viewFrame.setLoaded(true);
 				}
 			});

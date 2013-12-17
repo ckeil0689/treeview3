@@ -669,10 +669,16 @@ public class ClusterView extends JPanel implements MainPanel {
 		pBar.setMaximumSize(new Dimension(2000, 40));
 		pBar.setForeground(GUIParams.ELEMENT);
 		pBar.setUI(new BasicProgressBarUI(){
+			
 			@Override
-			protected Color getSelectionBackground(){return Color.black;};
+			protected Color getSelectionBackground(){
+				return GUIParams.PROGRESS1;
+			};
+			
 			@Override
-			protected Color getSelectionForeground(){return Color.white;};
+			protected Color getSelectionForeground(){
+				return GUIParams.PROGRESS2;
+			};
 		});
 		pBar.setString(text);
 		pBar.setVisible(true);

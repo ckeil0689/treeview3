@@ -22,6 +22,8 @@ public class GUIParams {
 	public static Color BG_COLOR = new Color(20, 20, 20, 255);
 	public static Color RED1 = new Color(240, 80, 50, 255);
 	public static Color TABLEHEADERS = new Color(255, 205, 120, 255);
+	public static Color PROGRESS1 = new Color(60, 60, 60, 255);
+	public static Color PROGRESS2 = new Color(60, 60, 60, 255);
 	
 	public static void setDayLight() {
 		
@@ -37,6 +39,8 @@ public class GUIParams {
 		BG_COLOR = new Color(254, 254, 254, 255);
 		RED1 = new Color(240, 80, 50, 255);
 		TABLEHEADERS = new Color(191, 235, 255, 255);
+		PROGRESS1 = new Color(0, 0, 0, 255);
+		PROGRESS2 = new Color(254, 254, 254, 255);
 	}
 	
 	public static void setNight() {
@@ -53,5 +57,7 @@ public class GUIParams {
 		BG_COLOR = new Color(20, 20, 20, 255);
 		RED1 = new Color(240, 80, 50, 255);
 		TABLEHEADERS = new Color(255, 205, 120, 255);
+		PROGRESS1 = new Color(60, 60, 60, 255);
+		PROGRESS2 = new Color(60, 60, 60, 255);
 	}
 }

@@ -487,9 +487,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			menubar.addMenu(TreeviewMenuBarI.documentMenu);
 			menubar.setMenuMnemonic(KeyEvent.VK_S);
 			populateSettingsMenu(menubar);
-			menubar.addMenu(TreeviewMenuBarI.clusterMenu);
+			menubar.addMenu(TreeviewMenuBarI.viewsMenu);
 			menubar.setMenuMnemonic(KeyEvent.VK_C);
-			populateClusterMenu(menubar);
+			populateViewsMenu(menubar);
 			menubar.addMenu(TreeviewMenuBarI.analysisMenu);
 			menubar.setMenuMnemonic(KeyEvent.VK_A);
 			menubar.addMenu(TreeviewMenuBarI.exportMenu);
@@ -592,6 +592,57 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		l1.setFont(GUIParams.FONTS);
 		l1.setForeground(GUIParams.TEXT);
 		
+//		menubar.addMenuItem("Hierarchical", new ActionListener(){
+//
+//			@Override
+//			public void actionPerformed(ActionEvent arg0) {
+//				
+//				if(dataModel != null) {
+//					TreeViewFrame.this.setDataModel((TVModel)dataModel, true, 
+//							true);
+//					TreeViewFrame.this.setLoaded(true);
+//					
+//				} else {
+//					dialog.setVisible(true);
+//				}
+//			}
+//			
+//			
+//		});
+//		menubar.addMenuItem("K-Means", new ActionListener(){
+//
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				
+//				if(dataModel != null) {
+//					TreeViewFrame.this.setDataModel((TVModel)dataModel, true, 
+//							false);
+//					TreeViewFrame.this.setLoaded(true);
+//					
+//				} else {
+//					dialog.setVisible(true);
+//				}
+//				
+//			}	
+//		});
+	}
+	
+	//Setting up dendro menu
+	protected void populateViewsMenu(TreeviewMenuBarI menubar) {
+		
+		final JDialog dialog = new JDialog (TreeViewFrame.this);
+		dialog.setLocationRelativeTo(null);
+		dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		
+		JPanel panel = new JPanel();
+		panel.setLayout(new MigLayout());
+		panel.setBackground(GUIParams.BG_COLOR);
+		
+		JLabel l1 = new JLabel("Please load data first.");
+		l1.setFont(GUIParams.FONTS);
+		l1.setForeground(GUIParams.TEXT);
+		
+		menubar.addSubMenu(TreeviewMenuBarI.clusterSubMenu);
 		menubar.addMenuItem("Hierarchical", new ActionListener(){
 
 			@Override
@@ -622,8 +673,25 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 				} else {
 					dialog.setVisible(true);
 				}
-				
 			}	
+		});
+		
+		menubar.setMenu(TreeviewMenuBarI.viewsMenu);
+		menubar.addSubMenu("Visualize");
+		menubar.addMenuItem("Display Clustergram", new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				
+				if(dataModel != null) {
+					TreeViewFrame.this.setDataModel((TVModel)dataModel, false, 
+							true);
+					TreeViewFrame.this.setLoaded(true);
+					
+				} else {
+					dialog.setVisible(true);
+				}
+			}
 		});
 	}
 	
@@ -870,6 +938,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 * @param menubar
 	 */
 	private void populateHelpMenu(TreeviewMenuBarI menubar) {
+		
 		menubar.addMenuItem("About...",  new ActionListener() {
 			
 			@Override
