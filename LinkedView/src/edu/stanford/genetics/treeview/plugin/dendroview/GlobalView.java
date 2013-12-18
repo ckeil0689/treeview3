@@ -24,6 +24,7 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.Ellipse2D;
 import java.util.Observable;
 
 import javax.swing.JScrollBar;
@@ -72,15 +73,20 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
      */
     private Rectangle selectionRect = null;
     
-    /**
-     * Rectangle to be used as indicator for row selection
-     */
-    private Rectangle rowIndicatorRect = null;
+//    /**
+//     * Rectangle to be used as indicator for row selection
+//     */
+//    private Rectangle rowIndicatorRect = null;
+//    
+//    /**
+//     * Rectangle to be used as indicator for column selection
+//     */
+//    private Rectangle colIndicatorRect = null;
     
     /**
-     * Rectangle to be used as indicator for column selection
+     * Circle to be used as indicator for selection
      */
-    private Rectangle colIndicatorRect = null;
+    private Ellipse2D.Double indicatorCircle = null;
 
     /**
      * Rectangle to track blue zoom rectangle (pixels)
@@ -447,13 +453,22 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		    g.drawRect(selectionRect.x, selectionRect.y, 
 			       selectionRect.width, selectionRect.height);
 		    
-		    if(xmap.getScale() < 8.0 && ymap.getScale() < 8.0 
-		    		&& (rowIndicatorRect != null && colIndicatorRect != null)) {
-		    	g.setColor(GUIParams.ELEMENT);
-			    g.drawRect(rowIndicatorRect.x, rowIndicatorRect.y, 
-			    		rowIndicatorRect.width, rowIndicatorRect.height);
-			    g.drawRect(colIndicatorRect.x, colIndicatorRect.y, 
-			    		colIndicatorRect.width, colIndicatorRect.height);
+//		    if(xmap.getScale() < 8.0 && ymap.getScale() < 8.0 
+//		    		&& (rowIndicatorRect != null && colIndicatorRect != null)) {
+//		    	g.setColor(GUIParams.ELEMENT);
+//			    g.drawRect(rowIndicatorRect.x, rowIndicatorRect.y, 
+//			    		rowIndicatorRect.width, rowIndicatorRect.height);
+//			    g.drawRect(colIndicatorRect.x, colIndicatorRect.y, 
+//			    		colIndicatorRect.width, colIndicatorRect.height);
+//		    }
+		    
+		    if(indicatorCircle != null) {
+		    	Graphics2D g2 = (Graphics2D)g;
+		    	g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+		    		    RenderingHints.VALUE_ANTIALIAS_ON);
+		    	g2.setColor(GUIParams.RED1);
+		    	g2.setStroke(new BasicStroke(3));
+			    g2.draw(indicatorCircle);
 		    }
 		}
     }
@@ -535,7 +550,8 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 				}
 			}
 			recalculateOverlay();
-			drawGeneIndicator();
+			//drawGeneIndicator();
+			drawIndicatorCircle();
 			
 		} else if (o == arraySelection) {
 			if (geneSelection.getNSelectedIndexes() == 0) {
@@ -548,12 +564,14 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 				}
 			}
 			recalculateOverlay();
-			drawGeneIndicator();
+			//drawGeneIndicator();
+			drawIndicatorCircle();
 			
 		} else if ((o == xmap) || o == ymap) {
 			recalculateZoom(); // it moves around, you see...
 			recalculateOverlay();
-			drawGeneIndicator();
+			//drawGeneIndicator();
+			drawIndicatorCircle();
 			offscreenValid = false;
 			
 		} else if ((o == zoomYmap) || (o == zoomXmap)) {
@@ -743,67 +761,107 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		g.setPaintMode();
     }
     
+//    /**
+//     * Draws a visual indicator line/ filled rectangle to display the
+//     * location of a certain target in the GlobalView to aid the user.
+//     */
+//    private void drawGeneIndicator() {
+//    	
+//    	int spx = 0; 
+//		int spy = 0; 
+//		int epx = 0;
+//		int epy = 0; 
+//		
+//		if (geneSelection == null || arraySelection == null) {
+//			return;
+//			
+//		} else if(geneSelection.getNSelectedIndexes() == 1 
+//    			&& arraySelection.getNSelectedIndexes() == 1) {
+//    		
+//    		//first for row
+//    		spx = xmap.getPixel(arraySelection.getMinIndex());
+//    		// last pixel of last block
+//    		epx = xmap.getPixel(arraySelection.getMaxIndex() + 1) - 1; 
+//    		
+//    		
+//    		spy = ymap.getPixel(ymap.getMinIndex());
+//    		epy = ymap.getPixel(ymap.getMaxIndex() + 1) - 1;
+//    		
+//    		if (epy < spy) {
+//    			epy = spy; 
+//    			// correct for roundoff error above
+//    		}
+//    		
+//    		if (rowIndicatorRect == null) {
+//    			rowIndicatorRect = new Rectangle(spx, spy, epx - spx, 
+//    					epy - spy);
+//    			
+//    		} else {
+//    			rowIndicatorRect.setBounds(spx, spy, epx - spx, epy - spy);
+//    		}
+//    		
+//    		//Now for column
+//    		spx = xmap.getPixel(xmap.getMinIndex());
+//    		// last pixel of last block
+//    		epx = xmap.getPixel(xmap.getMaxIndex() + 1) - 1; 
+//    		
+//    		
+//    		spy = ymap.getPixel(geneSelection.getMinIndex());
+//    		epy = ymap.getPixel(geneSelection.getMaxIndex() + 1) - 1;
+//    		
+//    		if (epy < spy) {
+//    			epy = spy; 
+//    			// correct for roundoff error above
+//    		}
+//    		
+//    		if (colIndicatorRect == null) {
+//    			colIndicatorRect = new Rectangle(spx, spy, epx - spx, 
+//    					epy - spy);
+//    			
+//    		} else {
+//    			colIndicatorRect.setBounds(spx, spy, epx - spx, epy - spy);
+//    		}
+//    	} else if (rowIndicatorRect != null && colIndicatorRect != null){
+//    		rowIndicatorRect.setBounds(spx, spy, epx - spx, epy - spy);
+//    		colIndicatorRect.setBounds(spx, spy, epx - spx, epy - spy);
+//    	}
+//    }
+    
     /**
-     * Draws a visual indicator line/ filled rectangle to display the
-     * location of a certain target in the GlobalView to aid the user.
+     * Draws a circle if the user selects one rectangle in the clustergram
+     * to indicate the position of this rectangle.
      */
-    private void drawGeneIndicator() {
+    private void drawIndicatorCircle() {
     	
-		if ((geneSelection == null) || (arraySelection == null)) {
-			return;
-		}
+    	double x = 0; 
+		double y = 0; 
+		double w = 0;
+		double h = 0; 
 		
-    	if(geneSelection.getNSelectedIndexes() == 1 
+		if (geneSelection == null || arraySelection == null) {
+			return;
+			
+		} else if(geneSelection.getNSelectedIndexes() == 1 
     			&& arraySelection.getNSelectedIndexes() == 1) {
     		
-    		int spx; 
-    		int spy; 
-    		int epx;
-    		int epy;
+			//Width and height of rectangle which spans the Ellipse2D object
+			w = xmap.getUsedPixels() * 0.05;
+			h = w;
+			
+			//Get coords for center of circle
+			x = xmap.getPixel(arraySelection.getSelectedIndexes()[0]) 
+					- (w /2) + (xmap.getScale()/2);
+			y = ymap.getPixel(geneSelection.getSelectedIndexes()[0]) 
+					- (h /2) + (ymap.getScale()/2);
     		
-    		//first for row
-    		spx = xmap.getPixel(arraySelection.getMinIndex());
-    		// last pixel of last block
-    		epx = xmap.getPixel(arraySelection.getMaxIndex() + 1) - 1; 
-    		
-    		
-    		spy = ymap.getPixel(ymap.getMinIndex());
-    		epy = ymap.getPixel(ymap.getMaxIndex() + 1) - 1;
-    		
-    		if (epy < spy) {
-    			epy = spy; 
-    			// correct for roundoff error above
-    		}
-    		
-    		if (rowIndicatorRect == null) {
-    			rowIndicatorRect = new Rectangle(spx, spy, epx - spx, 
-    					epy - spy);
+    		if (indicatorCircle == null) {
+    			indicatorCircle = new Ellipse2D.Double(x, y, w, h);
     			
     		} else {
-    			rowIndicatorRect.setBounds(spx, spy, epx - spx, epy - spy);
+    			indicatorCircle.setFrame(x, y, w, h);
     		}
-    		
-    		//Now for column
-    		spx = xmap.getPixel(xmap.getMinIndex());
-    		// last pixel of last block
-    		epx = xmap.getPixel(xmap.getMaxIndex() + 1) - 1; 
-    		
-    		
-    		spy = ymap.getPixel(geneSelection.getMinIndex());
-    		epy = ymap.getPixel(geneSelection.getMaxIndex() + 1) - 1;
-    		
-    		if (epy < spy) {
-    			epy = spy; 
-    			// correct for roundoff error above
-    		}
-    		
-    		if (colIndicatorRect == null) {
-    			colIndicatorRect = new Rectangle(spx, spy, epx - spx, 
-    					epy - spy);
-    			
-    		} else {
-    			colIndicatorRect.setBounds(spx, spy, epx - spx, epy - spy);
-    		}
+    	} else if (indicatorCircle != null){
+    		indicatorCircle.setFrame(x, y, w, h);
     	}
     }
     

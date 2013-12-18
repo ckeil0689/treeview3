@@ -38,8 +38,8 @@ public class CDTGenerator {
 	private List<List<String>> finalcdtTable; 
 	private List<List<String>> rowNameList;
 	private List<List<String>> colNameList;
-	private List<List<String>> rowNameList2;
-	private List<List<String>> colNameList2;
+	private List<List<String>> rowNameListOrdered;
+	private List<List<String>> colNameListOrdered;
 	private List<List<String>> cdtDataStrings;
 	
 	private List<String> orderedRows; 
@@ -84,8 +84,8 @@ public class CDTGenerator {
     	colNameList = new ArrayList<List<String>>();
     	
     	//Lists to be filled with reordered strings
-    	rowNameList2 = new ArrayList<List<String>>();
-    	colNameList2 = new ArrayList<List<String>>();
+    	rowNameListOrdered = new ArrayList<List<String>>();
+    	colNameListOrdered = new ArrayList<List<String>>();
     	
     	if(rowNames.length > 0) {
 	    	for(String[] element : rowNames) {
@@ -193,10 +193,11 @@ public class CDTGenerator {
 		    	
 		    	cdtDataList.add(rowData);
 		    	
-		    	rowNameList2.add(rowNameList.get(index));
+		    	//Order the row names
+		    	rowNameListOrdered.add(rowNameList.get(index));
 	    	}
     	} else {
-    		rowNameList2.addAll(rowNameList);
+    		rowNameListOrdered.addAll(rowNameList);
     	}
     	
     	//order column data and names
@@ -223,11 +224,11 @@ public class CDTGenerator {
 		    		Collections.swap(cdtDataList.get(j), i, index);	
 		    	}
 		    	
-	    		//reordering names
-		    	colNameList2.add(colNameList.get(index));;
+	    		//reordering column names
+		    	colNameListOrdered.add(colNameList.get(index));;
 	    	}
     	} else {
-    		colNameList2.addAll(colNameList);
+    		colNameListOrdered.addAll(colNameList);
     	}
 	}
 	
@@ -257,10 +258,10 @@ public class CDTGenerator {
 		    	
 		    	cdtDataList.add(rowData);
 		    	
-		    	rowNameList2.add(rowNameList.get(index));
+		    	rowNameListOrdered.add(rowNameList.get(index));
 	    	}
     	} else {
-    		rowNameList2.addAll(rowNameList);
+    		rowNameListOrdered.addAll(rowNameList);
     	}
 		
 		//order column data and names
@@ -293,10 +294,10 @@ public class CDTGenerator {
 		    	}
 		    	
 	    		//reordering names
-		    	colNameList2.add(colNameList.get(index));;
+		    	colNameListOrdered.add(colNameList.get(index));;
 	    	}
     	} else {
-    		colNameList2.addAll(colNameList);
+    		colNameListOrdered.addAll(colNameList);
     	}
 	}
 	
@@ -317,14 +318,13 @@ public class CDTGenerator {
 		cdtRowElement1.add("GWEIGHT");
 		
 		//Adding column names to first row
-		for(int i = 0; i < colNameList2.size(); i++) {
+		for(int i = 0; i < colNameListOrdered.size(); i++) {
 			
-			cdtRowElement1.add(colNameList2.get(i).get(0));
+			cdtRowElement1.add(colNameListOrdered.get(i).get(0));
 		}
 		
 		//Add first row at index 0 of the final matrix
 		finalcdtTable.add(0, cdtRowElement1);
-		
 		
 		if(!choice2.contentEquals("Do Not Cluster")) {
 			buffer = 3;
@@ -334,6 +334,7 @@ public class CDTGenerator {
 			cdtRowElement2.add("AID");
 			cdtRowElement2.add("");
 			cdtRowElement2.add("");
+			
 			if(!choice.contentEquals("Do Not Cluster")) {
 				cdtRowElement2.add("");
 			}
@@ -357,9 +358,9 @@ public class CDTGenerator {
 			cdtRowElement3.add("");
 		}
 		
-		for(int i = 0; i < colNameList2.size(); i++){
+		for(int i = 0; i < colNameListOrdered.size(); i++){
 	
-			cdtRowElement3.add(colNameList2.get(i).get(1));
+			cdtRowElement3.add(colNameListOrdered.get(i).get(1));
 		}
 		
 		if(!choice2.contentEquals("Do Not Cluster")){
@@ -369,12 +370,17 @@ public class CDTGenerator {
 			finalcdtTable.add(1, cdtRowElement3);
 		}
 		
+		//Adding the values for GID, ORF, NAME, GWEIGHT
     	for(int i = 0; i < orderedRows.size(); i++){
     		
-    		finalcdtTable.get(i + buffer).add(0, rowNameList2.get(i).get(0));
-    		finalcdtTable.get(i + buffer).add(1, rowNameList2.get(i).get(0));
-    		finalcdtTable.get(i + buffer).add(2, rowNameList2.get(i).get(1));
+    		finalcdtTable.get(i + buffer).add(0, 
+    				rowNameListOrdered.get(i).get(0));
+    		finalcdtTable.get(i + buffer).add(1, 
+    				rowNameListOrdered.get(i).get(1));
+    		finalcdtTable.get(i + buffer).add(2, 
+    				rowNameListOrdered.get(i).get(2));
     		
+    		//??? what?
     		if(!choice.contentEquals("Do Not Cluster")){
     			
     			finalcdtTable.get(i + buffer).add(0, orderedRows.get(i));
@@ -395,9 +401,9 @@ public class CDTGenerator {
 		cdtRowElement1.add("GWEIGHT");
 		
 		//Adding column names to first row
-		for(int i = 0; i < colNameList2.size(); i++) {
+		for(int i = 0; i < colNameListOrdered.size(); i++) {
 			
-			cdtRowElement1.add(colNameList2.get(i).get(0));
+			cdtRowElement1.add(colNameListOrdered.get(i).get(0));
 		}
 		
 		//Add first row at index 0 of the final matrix
@@ -411,9 +417,9 @@ public class CDTGenerator {
 		cdtRowElement2.add("");
 		
 		//Fill with weights
-		for(int i = 0; i < colNameList2.size(); i++){
+		for(int i = 0; i < colNameListOrdered.size(); i++){
 	
-			cdtRowElement2.add(colNameList2.get(i).get(1));
+			cdtRowElement2.add(colNameListOrdered.get(i).get(1));
 		}
 
 		finalcdtTable.add(1, cdtRowElement2);
@@ -422,9 +428,9 @@ public class CDTGenerator {
 		//buffer is just the amount of rows before the data starts
     	for(int i = 0; i < orderedRows.size(); i++){
     		
-    		finalcdtTable.get(i + buffer).add(0, rowNameList2.get(i).get(0));
-    		finalcdtTable.get(i + buffer).add(1, rowNameList2.get(i).get(0));
-    		finalcdtTable.get(i + buffer).add(2, rowNameList2.get(i).get(1));	
+    		finalcdtTable.get(i + buffer).add(0, rowNameListOrdered.get(i).get(0));
+    		finalcdtTable.get(i + buffer).add(1, rowNameListOrdered.get(i).get(0));
+    		finalcdtTable.get(i + buffer).add(2, rowNameListOrdered.get(i).get(1));	
     	}
 	}
     
