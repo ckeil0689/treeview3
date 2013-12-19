@@ -150,7 +150,6 @@ public class CDTCreator {
 					labelPos.add(null);
 					labelPos.add(null);
 				}
-				
 				break;
 			}
 		}	

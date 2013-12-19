@@ -85,7 +85,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 		removeAll();
 		this.setLayout(new MigLayout());
 		
-		this.add(new JLabel("Global:"), "wrap");
+		this.add(makeLabel("Global:"), "wrap");
 		JPanel t = setPanelLayout();
 		
 		m_xscale = new ScalePanel(m_xmap, "X:");
@@ -96,7 +96,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 		
 		if(m_xZmap != null && m_yZmap != null) {
 			
-			this.add(new JLabel("Zoom:"), "wrap");
+			this.add(makeLabel("Zoom:"), "wrap");
 			t = setPanelLayout();
 			m_xZscale = new ScalePanel(m_xZmap, "X:");
 			t.add(m_xZscale, "pushx, growx");
@@ -106,16 +106,16 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 		this.add(t, "pushx, growx, wrap");
 		
 		if (m_drawer != null) {
-			this.add(new JLabel("Contrast:"), "wrap");
+			this.add(makeLabel("Contrast:"), "wrap");
 			m_contrast = new ContrastSelector(m_drawer);
 			this.add(m_contrast, "pushx, growx, wrap");
 
-			this.add(new JLabel("LogScale:"), "wrap");
+			this.add(makeLabel("LogScale:"), "wrap");
 			m_logscale = new LogScaleSelector();
 			this.add(m_logscale, "pushx, growx, wrap");
 			
 			// color stuff...
-			this.add(new JLabel("Colors:"), "wrap");
+			this.add(makeLabel("Colors:"), "wrap");
 			JPanel temp2 = setPanelLayout();
 
 			colorExtractorEditor = new ColorExtractorEditor(m_drawer);
@@ -148,10 +148,11 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 			this.setLayout(new MigLayout());
 			this.setOpaque(false);
 			
-			this.add(new JLabel(title), "span, wrap");
+			this.add(makeLabel(title), "span, wrap");
 
 			type = new ButtonGroup();
 			fixed = new JRadioButton("Fixed Scale");
+			fixed.setForeground(GUIParams.TEXT);
 			fixed.setOpaque(false);
 			type.add(fixed);
 			this.add(fixed);
@@ -160,6 +161,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 			this.add(value, "growx, wrap");
 
 			fill = new JRadioButton("Fill");
+			fill.setForeground(GUIParams.TEXT);
 			fill.setOpaque(false);
 			type.add(fill);
 			this.add(fill, "span");
@@ -418,6 +420,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 			
 			logCheckBox = new JCheckBox("Log (base 2)");
 			logCheckBox.setBackground(GUIParams.BG_COLOR);
+			logCheckBox.setForeground(GUIParams.TEXT);
 			logCheckBox.setSelected(m_drawer.getLogTransform());
 			logCheckBox.addActionListener(new ActionListener() {
 
@@ -434,7 +437,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 			
 			logTextField = new JTextField(10);
 			logTextField.setText("" +m_drawer.getLogCenter());
-			this.add(new JLabel("Center:"), "alignx 50%");
+			this.add(makeLabel("Center:"), "alignx 50%");
 			logTextField.getDocument().addDocumentListener(
 					new DocumentListener() {
 				
@@ -452,8 +455,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 				}
 			});
 			this.add(logTextField, "alignx 50%");
-			logTextField.setEnabled(logCheckBox.isSelected());
-			
+			logTextField.setEnabled(logCheckBox.isSelected());	
 		}
 		
 		private void textBoxChanged() {
@@ -522,6 +524,18 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
   		button.setForeground(GUIParams.BG_COLOR);
   		
   		return button;
+	}
+	
+	public JLabel makeLabel(String title){
+		
+		Font buttonFont = new Font("Sans Serif", Font.PLAIN, 14);
+		
+		JLabel label = new JLabel(title);
+  		
+  		label.setFont(buttonFont);
+  		label.setForeground(GUIParams.TEXT);
+  		
+  		return label;
 	}
 	
 	public JPanel setPanelLayout() {

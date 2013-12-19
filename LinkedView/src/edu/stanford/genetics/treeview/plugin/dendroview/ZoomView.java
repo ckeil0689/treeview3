@@ -507,12 +507,12 @@ MouseWheelListener, KeyListener, ComponentListener {
 			getYMap().scrollBy(shift);
 			break;
 		case KeyEvent.VK_MINUS:
-			getXMap().zoomOut(shift);
-			getYMap().zoomOut(shift);
+//			getXMap().zoomOut(shift);
+//			getYMap().zoomOut(shift);
 			break;
 		case KeyEvent.VK_EQUALS:
-			getXMap().zoomIn(shift);
-			getYMap().zoomIn(shift);
+//			getXMap().zoomIn(shift);
+//			getYMap().zoomIn(shift);
 			break;
 		}
 
@@ -535,12 +535,12 @@ MouseWheelListener, KeyListener, ComponentListener {
 			}
 		} else {
 			if(notches < 0) {
-				getZoomXMap().zoomIn(shift);
-				getZoomYMap().zoomIn(shift);
+//				getZoomXMap().zoomIn(shift);
+//				getZoomYMap().zoomIn(shift);
 				
 			} else {
-				getZoomXMap().zoomOut(shift);
-				getZoomYMap().zoomOut(shift);
+//				getZoomXMap().zoomOut(shift);
+//				getZoomYMap().zoomOut(shift);
 			}
 		}
 		

@@ -106,12 +106,11 @@ public class ClusterProcessor {
 		DataFormatter formattedData = new DataFormatter(model, 
 				currentList, pBar);
 		
+		formattedData.splitRows();
+		sepRows = formattedData.getRowList();
+		
 		//if user checked clustering for elements
 		if(!choice.contentEquals("Do Not Cluster")) {
-			
-			formattedData.splitRows();
-			
-			sepRows = formattedData.getRowList();
 			
 			DistanceMatrixCalculator dCalc = 
 					new DistanceMatrixCalculator(sepRows, choice, pBar);
@@ -160,9 +159,9 @@ public class ClusterProcessor {
 		//also takes list of row elements because only one list can easily 
 		//be consistently transformed and fed into file writer 
 		//to make a tab-delimited file
-		CDTGenerator cdtGen = new CDTGenerator(model, sepRows, orderedRows, 
-					orderedCols, choice, choice2, hierarchical, row_clusterN,
-					col_clusterN);
+		CDTGenerator cdtGen = new CDTGenerator(model, sepRows, 
+				orderedRows, orderedCols, choice, choice2, hierarchical, 
+				row_clusterN, col_clusterN);
 		
 		cdtGen.generateCDT();
 		

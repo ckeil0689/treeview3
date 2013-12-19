@@ -121,21 +121,23 @@ AdjustmentListener, ConfigNodePersistent {
      * drawing and selection issues.
      * @param double zoomVal
      */
-    public void zoomOut(double zoomVal) {
+    public void zoomOut() {
 		
 		double newScale = 0.0;
+		double zoomVal = 1.0;
 		
-		if((scrollbar.getVisibleAmount() < scrollbar.getVisibleAmount() 
-				+ zoomVal) && (scrollbar.getVisibleAmount() + zoomVal) 
-				< scrollbar.getMaximum()) {
-			
-			newScale = getAvailablePixels()/ (scrollbar.getVisibleAmount() 
-					+ zoomVal);
-			this.setScale(newScale);
-			
-		} else {
-			this.setScale(this.getMinScale());
+		if(getScale() < 8.0) {
+			zoomVal = 10.0;
 		}
+		
+		newScale = getAvailablePixels()/ (scrollbar.getVisibleAmount() 
+				+ zoomVal);
+		
+		if(newScale < minScale) {
+			newScale = minScale;
+		}
+		
+		this.setScale(newScale);
 	}
 	
     /**
@@ -147,20 +149,24 @@ AdjustmentListener, ConfigNodePersistent {
      * drawing and selection issues.
      * @param double zoomVal
      */
-	public void zoomIn(double zoomVal) {
+	public void zoomIn() {
 
+		double maxScale = getScale();
 		double newScale = 0.0;
+		double zoomVal = 1.0;
 		
-		if((scrollbar.getVisibleAmount() > scrollbar.getVisibleAmount() 
-				- zoomVal) && (scrollbar.getVisibleAmount() - zoomVal) 
-				> scrollbar.getMinimum()) {
-			newScale = getAvailablePixels()/ (scrollbar.getVisibleAmount() 
-					- zoomVal);
-			this.setScale(newScale);
-			
-		} else {
-			this.setScale(this.getMinScale());
+		if(getScale() < 8.0) {
+			zoomVal = 10.0;
 		}
+		
+		newScale = getAvailablePixels()/ (scrollbar.getVisibleAmount() 
+				- zoomVal);
+		
+		if(scrollbar.getVisibleAmount() <= 1) {
+			newScale = maxScale;
+		}
+		
+		this.setScale(newScale);
 	}
 
 	public void recalculateScale() {

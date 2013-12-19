@@ -58,6 +58,7 @@ class ContrastSelector extends JPanel implements AdjustmentListener {
 		inner.setLayout(new MigLayout());
 		
 		JLabel font_label = new JLabel("Value:", SwingConstants.LEFT);
+		font_label.setForeground(GUIParams.TEXT);
 		inner.add(font_label, "alignx 50%");
 
 		font_label.setMaximumSize(new Dimension(Short.MAX_VALUE, 

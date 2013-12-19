@@ -356,15 +356,14 @@ MainPanel, Observer {
 				getGlobalYmap().setHome();
 			}
 		});
-		
-		final double zoomVal = 1.0;
+
 		scaleIncX = setZoomButtonLayout("+");
 		scaleIncX.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 
-				getGlobalXmap().zoomIn(zoomVal);
+				getGlobalXmap().zoomIn();
 			}
 		});
 		
@@ -374,7 +373,7 @@ MainPanel, Observer {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 		
-				getGlobalXmap().zoomOut(zoomVal);
+				getGlobalXmap().zoomOut();
 			}
 		});
 		
@@ -384,7 +383,7 @@ MainPanel, Observer {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 			
-				getGlobalYmap().zoomIn(zoomVal);
+				getGlobalYmap().zoomIn();
 			}	
 		});
 		
@@ -394,7 +393,7 @@ MainPanel, Observer {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 			
-				getGlobalYmap().zoomOut(zoomVal);
+				getGlobalYmap().zoomOut();
 			}
 		});
 
@@ -470,6 +469,7 @@ MainPanel, Observer {
 //		JPanel zoompanel;
 		JPanel textpanel;
 		JPanel navPanel;
+		JPanel contrastPanel;
 		JSplitPane gtrPane;
 		JSplitPane atrPane;
 //		JButton saveButton;
@@ -477,6 +477,7 @@ MainPanel, Observer {
 		final JButton zoomButton;
 		JButton deselectButton;
 		JLabel nav;
+		JLabel contrast;
 		
 		this.removeAll();
 		
@@ -566,6 +567,15 @@ MainPanel, Observer {
 		nav.setFont(GUIParams.HEADER);
 		nav.setForeground(GUIParams.ELEMENT);
 		
+		contrastPanel = new JPanel();
+		contrastPanel.setLayout(new MigLayout());
+		contrastPanel.setBackground(GUIParams.PANEL_BG);
+		contrastPanel.setBorder(BorderFactory.createEtchedBorder());
+		
+		contrast = new JLabel("Contrast");
+		contrast.setFont(GUIParams.HEADER);
+		contrast.setForeground(GUIParams.ELEMENT);
+		
 		textpanel = new JPanel();
 		textpanel.setLayout(new MigLayout("ins 0"));
 		textpanel.setOpaque(false);
@@ -627,11 +637,25 @@ MainPanel, Observer {
 		navPanel.add(deselectButton, "pushx, alignx 50%, wrap");
 		navPanel.add(closeButton, "push, alignx 50%");
 		
+		ColorExtractor ce = null;
+		
+		try {
+			ce = ((DoubleArrayDrawer) arrayDrawer).getColorExtractor();
+			
+		} catch (Exception e) {
+
+		}
+		
+		contrastPanel.add(contrast, "span, wrap");
+		ContrastSelector m_contrast = new ContrastSelector(ce);
+		contrastPanel.add(m_contrast, "pushx, growx");
+		
 		backgroundPanel.add(statuspanel, "pushx, growx, height 20%::");
 		backgroundPanel.add(atrPane, "grow, push, width 62%, height 20%::");
-		backgroundPanel.add(navPanel, "span 1 3, grow, push, width 13%, wrap");
+		backgroundPanel.add(contrastPanel, "grow, push, width 13%, wrap");
 		backgroundPanel.add(gtrPane, "grow, width 20%");
 		backgroundPanel.add(panel, "grow, push, width 62%, height 80%");
+		backgroundPanel.add(navPanel, "span 1 2, grow, push, width 13%");
 
 		this.add(backgroundPanel, "push, grow");
 	}

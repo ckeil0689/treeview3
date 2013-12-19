@@ -70,7 +70,6 @@ public abstract class HeaderFinderPanel extends JPanel {
 	private String type;
 	private JComboBox genefBox;
 	private JButton genefButton;
-//	private JButton deselectButton;
 	
 	//"Search Gene Text for Substring"
 	public HeaderFinderPanel(ViewFrame f, HeaderInfo hI, 
@@ -122,7 +121,7 @@ public abstract class HeaderFinderPanel extends JPanel {
 		});
 		
 		this.add(genef, "pushx, span, wrap");
-		this.add(genefBox, "growx, pushx, width 70%");
+		this.add(genefBox, "pushx, width 70%");
 		this.add(genefButton, "pushx, width 20%, wrap");
     }
 	
@@ -198,6 +197,7 @@ public abstract class HeaderFinderPanel extends JPanel {
 		comboBox.setPreferredSize(d);
 		comboBox.setFont(fontS);
 		comboBox.setBackground(Color.white);
+		comboBox.setEditable(true);
 		
 		AutoCompleteDecorator.decorate(comboBox);
 		

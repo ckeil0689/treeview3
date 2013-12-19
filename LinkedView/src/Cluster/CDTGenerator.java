@@ -24,7 +24,8 @@ public class CDTGenerator {
 	private String filePath; 
 	private String choice;
 	private String choice2;
-	private int buffer = 2;
+	private int aidBuffer = 2;
+	private int gidBuffer = 2;
 	private int row_clusterN;
 	private int col_clusterN;
 	private boolean hierarchical;
@@ -46,7 +47,7 @@ public class CDTGenerator {
 	private List<String> orderedCols;
 	
 	//Constructor (building the object)
-	public CDTGenerator(DataModel model, List<List<Double>> sepList, 
+	public CDTGenerator(DataModel model, List<List<Double>> sepList,
 			List<String> orderedRows, List<String> orderedCols, 
 			String choice, String choice2, boolean hierarchical, 
 			int row_clusterN, int col_clusterN){
@@ -202,6 +203,7 @@ public class CDTGenerator {
     	
     	//order column data and names
     	if(!choice2.contentEquals("Do Not Cluster")) {
+    		
     		if(cdtDataList.size() == 0){
     			cdtDataList.addAll(sepList);
     		}
@@ -327,7 +329,7 @@ public class CDTGenerator {
 		finalcdtTable.add(0, cdtRowElement1);
 		
 		if(!choice2.contentEquals("Do Not Cluster")) {
-			buffer = 3;
+			aidBuffer = 3;
 			
 			List<String> cdtRowElement2 = new ArrayList<String>();
 			
@@ -335,6 +337,7 @@ public class CDTGenerator {
 			cdtRowElement2.add("");
 			cdtRowElement2.add("");
 			
+			//????
 			if(!choice.contentEquals("Do Not Cluster")) {
 				cdtRowElement2.add("");
 			}
@@ -370,20 +373,20 @@ public class CDTGenerator {
 			finalcdtTable.add(1, cdtRowElement3);
 		}
 		
-		//Adding the values for GID, ORF, NAME, GWEIGHT
-    	for(int i = 0; i < orderedRows.size(); i++){
+		//if(!choice.contentEquals("Do Not Cluster")) {
+		//Adding the values for ORF, NAME, GWEIGHT
+    	for(int i = 0; i < cdtDataStrings.size(); i++){
     		
-    		finalcdtTable.get(i + buffer).add(0, 
+    		finalcdtTable.get(i + aidBuffer).add(0, 
     				rowNameListOrdered.get(i).get(0));
-    		finalcdtTable.get(i + buffer).add(1, 
+    		finalcdtTable.get(i + aidBuffer).add(1, 
     				rowNameListOrdered.get(i).get(1));
-    		finalcdtTable.get(i + buffer).add(2, 
+    		finalcdtTable.get(i + aidBuffer).add(2, 
     				rowNameListOrdered.get(i).get(2));
     		
-    		//??? what?
+    		//Adding GID names
     		if(!choice.contentEquals("Do Not Cluster")){
-    			
-    			finalcdtTable.get(i + buffer).add(0, orderedRows.get(i));
+    			finalcdtTable.get(i + aidBuffer).add(0, orderedRows.get(i));
     		}	
     	}
 	}
@@ -428,9 +431,12 @@ public class CDTGenerator {
 		//buffer is just the amount of rows before the data starts
     	for(int i = 0; i < orderedRows.size(); i++){
     		
-    		finalcdtTable.get(i + buffer).add(0, rowNameListOrdered.get(i).get(0));
-    		finalcdtTable.get(i + buffer).add(1, rowNameListOrdered.get(i).get(0));
-    		finalcdtTable.get(i + buffer).add(2, rowNameListOrdered.get(i).get(1));	
+    		finalcdtTable.get(i + aidBuffer).add(0, 
+    				rowNameListOrdered.get(i).get(0));
+    		finalcdtTable.get(i + aidBuffer).add(1, 
+    				rowNameListOrdered.get(i).get(0));
+    		finalcdtTable.get(i + aidBuffer).add(2, 
+    				rowNameListOrdered.get(i).get(1));	
     	}
 	}
     

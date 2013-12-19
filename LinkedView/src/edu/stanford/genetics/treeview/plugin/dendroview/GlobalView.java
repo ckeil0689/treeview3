@@ -841,8 +841,9 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		if (geneSelection == null || arraySelection == null) {
 			return;
 			
-		} else if(geneSelection.getNSelectedIndexes() == 1 
-    			&& arraySelection.getNSelectedIndexes() == 1) {
+		} else if((geneSelection.getNSelectedIndexes() == 1 
+    			&& arraySelection.getNSelectedIndexes() == 1) 
+    			&& (xmap.getScale() < 10.0 && ymap.getScale() < 10.0)) {
     		
 			//Width and height of rectangle which spans the Ellipse2D object
 			w = xmap.getUsedPixels() * 0.05;
@@ -879,17 +880,6 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 			shift = 1;
 		}
 		
-		double zoomValX = 10.0;
-		double zoomValY = 10.0;
-		
-		if(xmap.getScale() >= 10) {
-			zoomValX = 1.0;
-		}
-		
-		if(ymap.getScale() >= 10) {
-			zoomValY = 1.0;
-		}
-		
 		switch (c) {
 		case KeyEvent.VK_LEFT:
 			xmap.scrollBy(-shift);
@@ -904,12 +894,12 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 			ymap.scrollBy(shift);
 			break;
 		case KeyEvent.VK_MINUS:
-			xmap.zoomOut(zoomValX);
-			ymap.zoomOut(zoomValY);
+			xmap.zoomOut();
+			ymap.zoomOut();
 			break;
 		case KeyEvent.VK_EQUALS:
-			xmap.zoomIn(zoomValX);
-			ymap.zoomIn(zoomValY);
+			xmap.zoomIn();
+			ymap.zoomIn();
 			break;
 		}
 		
@@ -926,16 +916,6 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		
 		int notches = e.getWheelRotation();
 		int shift = 3;
-		double zoomValX = 10.0;
-		double zoomValY = 10.0;
-		
-		if(xmap.getScale() >= 10) {
-			zoomValX = 1.0;
-		}
-		
-		if(ymap.getScale() >= 10) {
-			zoomValY = 1.0;
-		}
 		
 		if(!e.isShiftDown()) {
 			if(notches < 0) {
@@ -946,12 +926,12 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 			}
 		} else {
 			if(notches < 0) {
-				xmap.zoomIn(zoomValX);
-				ymap.zoomIn(zoomValY);
+				xmap.zoomIn();
+				ymap.zoomIn();
 				
 			} else {
-				xmap.zoomOut(zoomValX);
-				ymap.zoomOut(zoomValY);
+				xmap.zoomOut();
+				ymap.zoomOut();
 			}
 		}
 		
