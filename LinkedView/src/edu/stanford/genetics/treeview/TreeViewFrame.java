@@ -215,6 +215,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		waiting.add(confirmPanel, "push, grow");
 		
+		System.out.println(getLoaded());
+		this.rebuildMainPanelMenu();
+		
 		waiting.repaint();
 		waiting.revalidate();
 	}
@@ -489,7 +492,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			populateSettingsMenu(menubar);
 			menubar.addMenu(TreeviewMenuBarI.viewsMenu);
 			menubar.setMenuMnemonic(KeyEvent.VK_C);
-			populateViewsMenu(menubar);
+//			populateViewsMenu(menubar);
 			menubar.addMenu(TreeviewMenuBarI.analysisMenu);
 			menubar.setMenuMnemonic(KeyEvent.VK_A);
 			menubar.addMenu(TreeviewMenuBarI.exportMenu);
@@ -517,6 +520,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			menubar.setEnabled(true);
 			menubar.setMenu(TreeviewMenuBarI.exportMenu);
 			menubar.removeAll();
+			menubar.setMenu(TreeviewMenuBarI.viewsMenu);
+			menubar.removeAll();
 		}
 		
 		if (getLoaded()) {
@@ -524,6 +529,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			populateAnalysisMenu(menubar);
 			menubar.setMenu(TreeviewMenuBarI.exportMenu);
 			populateExportMenu(menubar);
+			//populate views menu when data is loaded
+			menubar.setMenu(TreeviewMenuBarI.viewsMenu);
+			populateViewsMenu(menubar);
 			
 			if (running != null) {
 				menubar.setMenu(TreeviewMenuBarI.documentMenu);

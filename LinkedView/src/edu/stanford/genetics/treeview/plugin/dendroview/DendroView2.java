@@ -206,6 +206,7 @@ MainPanel, Observer {
 			bindConfig(root);
 		}
 		
+		//For K-Means 
 		if (dataModel.getArrayHeaderInfo().getIndex("GROUP") != -1) {
 			HeaderInfo headerInfo = dataModel.getArrayHeaderInfo();
 			int groupIndex = headerInfo.getIndex("GROUP");

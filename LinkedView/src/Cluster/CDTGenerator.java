@@ -25,7 +25,6 @@ public class CDTGenerator {
 	private String choice;
 	private String choice2;
 	private int aidBuffer = 2;
-	private int gidBuffer = 2;
 	private int row_clusterN;
 	private int col_clusterN;
 	private boolean hierarchical;
@@ -244,9 +243,9 @@ public class CDTGenerator {
 			//Make list of gene names to quickly access indexes
 			List<String> geneNames = new ArrayList<String>();
 			
-			for(List<String> geneWeight : rowNameList) {
+			for(List<String> geneHeaders : rowNameList) {
 				
-				geneNames.add(geneWeight.get(0));
+				geneNames.add(geneHeaders.get(0));
 			}
 			
 			for(int i = 0; i < orderedRows.size(); i++) {
@@ -434,9 +433,9 @@ public class CDTGenerator {
     		finalcdtTable.get(i + aidBuffer).add(0, 
     				rowNameListOrdered.get(i).get(0));
     		finalcdtTable.get(i + aidBuffer).add(1, 
-    				rowNameListOrdered.get(i).get(0));
+    				rowNameListOrdered.get(i).get(1));
     		finalcdtTable.get(i + aidBuffer).add(2, 
-    				rowNameListOrdered.get(i).get(1));	
+    				rowNameListOrdered.get(i).get(2));	
     	}
 	}
     

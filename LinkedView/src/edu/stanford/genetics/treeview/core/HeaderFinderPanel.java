@@ -87,7 +87,7 @@ public abstract class HeaderFinderPanel extends JPanel {
 		this.headerInfo = hI;
 		this.geneSelection = geneSelection;
 		this.type = type;
-		choices = new int[hI.getNumHeaders()]; // could be wasteful of ram...
+		this.choices = new int[hI.getNumHeaders()]; // could be wasteful of ram...
 	
 		this.setLayout(new MigLayout());
 		this.setOpaque(false);
@@ -133,7 +133,7 @@ public abstract class HeaderFinderPanel extends JPanel {
 	 */
 	public String[] getGenes(String[][] hA) {
 		
-		String[] geneArray = new String[headerInfo.getNumHeaders()];
+		String[] geneArray = new String[hA.length];
 		int idIndex = 0;
 		
 		if(type.equalsIgnoreCase("Row")){

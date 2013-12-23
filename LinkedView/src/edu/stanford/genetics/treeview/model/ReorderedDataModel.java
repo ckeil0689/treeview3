@@ -22,10 +22,10 @@ import edu.stanford.genetics.treeview.*;
  */
 public class ReorderedDataModel extends Observable implements DataModel {
 	
-	private HeaderInfo GtrHeaderInfo;
-	private HeaderInfo GeneHeaderInfo;
-	private HeaderInfo AtrHeaderInfo;
-	private HeaderInfo ArrayHeaderInfo;
+	private IntHeaderInfo gtrHeaderInfo;
+	private IntHeaderInfo geneHeaderInfo;
+	private IntHeaderInfo atrHeaderInfo;
+	private IntHeaderInfo arrayHeaderInfo;
 	private DataMatrix subDataMatrix = new SubDataMatrix();
 	private DataModel parent;
 	private int [] geneIndex;
@@ -57,20 +57,20 @@ public class ReorderedDataModel extends Observable implements DataModel {
 		this.geneIndex = geneIndex;
 		this.arrayIndex = arrayIndex;
 		if (geneIndex != null) {
-			GeneHeaderInfo = new ReorderedHeaderInfo(source.getGeneHeaderInfo(), 
+			geneHeaderInfo = new ReorderedHeaderInfo(source.getGeneHeaderInfo(), 
 					geneIndex);
-			GtrHeaderInfo = new ReorderedHeaderInfo(source.getGtrHeaderInfo(), 
+			gtrHeaderInfo = new ReorderedHeaderInfo(source.getGtrHeaderInfo(), 
 					geneIndex);
 		}
 		
 		if (arrayIndex != null) {
-			ArrayHeaderInfo = new ReorderedHeaderInfo(
+			arrayHeaderInfo = new ReorderedHeaderInfo(
 					source.getArrayHeaderInfo(), arrayIndex);
-			AtrHeaderInfo = new ReorderedHeaderInfo(source.getAtrHeaderInfo(), 
+			atrHeaderInfo = new ReorderedHeaderInfo(source.getAtrHeaderInfo(), 
 					arrayIndex);
 		}
 		
-		this.parent =source;
+		this.parent = source;
 		this.source = "Subset " + parent.getSource();
 		this.name = "Subset of " + parent.getName();
 		// this should really be set to a clone of the parent's document config.
@@ -171,7 +171,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 	 * 
 	 * Represents reordered HeaderInfo of parent.
 	 */
-	private class ReorderedHeaderInfo implements HeaderInfo {
+	private class ReorderedHeaderInfo extends IntHeaderInfo {//implements HeaderInfo {
 		
 		private HeaderInfo parentHeaderInfo;
 		private int [] reorderedIndex;
@@ -294,7 +294,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 		@Override
 		public String[][] getHeaderArray() {
 			
-			return null;
+			return parentHeaderInfo.getHeaderArray();//null;
 		}		
 	}
 	
@@ -371,13 +371,13 @@ public class ReorderedDataModel extends Observable implements DataModel {
 	 * @see edu.stanford.genetics.treeview.DataModel#getGeneHeaderInfo()
 	 */
 	@Override
-	public IntHeaderInfo getGeneHeaderInfo() {
+	public IntHeaderInfo getGeneHeaderInfo() { //IntHeaderInfo
 		
-		if (GeneHeaderInfo == null) {
+		if (geneHeaderInfo == null) {
 			return parent.getGeneHeaderInfo();
 			
 		} else {
-			return (IntHeaderInfo)GeneHeaderInfo;
+			return geneHeaderInfo; //(IntHeaderInfo)
 		}
 	}
 
@@ -387,11 +387,11 @@ public class ReorderedDataModel extends Observable implements DataModel {
 	@Override
 	public IntHeaderInfo getArrayHeaderInfo() {
 		
-		if (ArrayHeaderInfo == null) {
+		if (arrayHeaderInfo == null) {
 			return parent.getArrayHeaderInfo();
 			
 		} else {
-			return (IntHeaderInfo) ArrayHeaderInfo;
+			return arrayHeaderInfo;//(IntHeaderInfo)
 		}
 	}
 	
@@ -401,11 +401,11 @@ public class ReorderedDataModel extends Observable implements DataModel {
 	@Override
 	public HeaderInfo getGtrHeaderInfo() {
 		
-		if (GtrHeaderInfo == null) {
+		if (gtrHeaderInfo == null) {
 			return parent.getGtrHeaderInfo();
 			
 		} else {
-			return GtrHeaderInfo;
+			return gtrHeaderInfo;
 		}
 	}
 
@@ -415,11 +415,11 @@ public class ReorderedDataModel extends Observable implements DataModel {
 	@Override
 	public HeaderInfo getAtrHeaderInfo() {
 		
-		if (AtrHeaderInfo == null) {
+		if (atrHeaderInfo == null) {
 			return parent.getAtrHeaderInfo();
 			
 		} else {
-			return AtrHeaderInfo;
+			return atrHeaderInfo;
 		}
 	}
 
@@ -457,7 +457,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 	@Override
 	public boolean aidFound() {
 		
-		if (AtrHeaderInfo == null) {
+		if (atrHeaderInfo == null) {
 			return parent.aidFound();
 			
 		} else {
@@ -469,7 +469,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 	public boolean gidFound() {
 		
 		// the following causes a mismatch if not all genes were selected.
-		if (GtrHeaderInfo == null) {
+		if (gtrHeaderInfo == null) {
 			return parent.gidFound();
 			
 		} else {

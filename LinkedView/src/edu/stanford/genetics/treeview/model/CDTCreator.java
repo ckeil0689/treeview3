@@ -167,6 +167,7 @@ public class CDTCreator {
 		int orfRow = orfInd.get(0);
 		int orfCol = orfInd.get(1);
 		int eweightRow = eweightInd.get(0);
+		int eweightCol = eweightInd.get(1);
 		int gweightCol = gweightInd.get(1);
 		int dataCol = dataStart.get(1);
 		int dataRow = dataStart.get(0);
@@ -232,7 +233,8 @@ public class CDTCreator {
 		sb.append("EWEIGHT");
 		sb.append(SEPARATOR);
 		
-		for(int i = 0; i < dataStart.get(1); i++) {
+		//start at 1 because EWEIGHT takes position 0
+		for(int i = eweightCol + 1; i < dataStart.get(1); i++) {
 			
 			sb.append("");
 			sb.append(SEPARATOR);
