@@ -12,7 +12,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import Cluster.ClusterFrame;
+import edu.stanford.genetics.treeview.TreeViewFrame;
+
+import Cluster.MethodInfoFrame;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -35,7 +37,7 @@ public class ClickableIcon extends JPanel {
 	private BufferedImage labelImg;
 	private ClassLoader classLoader;
 	private InputStream input;
-	private ClusterFrame frame;
+	private TreeViewFrame viewFrame;
 	
 	
 	/**
@@ -45,12 +47,11 @@ public class ClickableIcon extends JPanel {
 	 * @param fileName
 	 * @param tvModel_gen
 	 */
-	public ClickableIcon(ClusterFrame frame, String fileName) {
-		
-		this.frame = frame;
+	public ClickableIcon(TreeViewFrame f, String fileName) {
 		
 		this.setLayout(new MigLayout());
 		this.setOpaque(false);
+		this.viewFrame = f;
 		
 		classLoader = Thread.currentThread().getContextClassLoader();
 		input = classLoader.getResourceAsStream(fileName);
@@ -86,7 +87,9 @@ public class ClickableIcon extends JPanel {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				
-				frame.setVisible(true);
+				MethodInfoFrame infoFrame = new MethodInfoFrame(viewFrame, 
+						"Cluster Information");
+				infoFrame.setVisible(true);
 			}
 
 			@Override

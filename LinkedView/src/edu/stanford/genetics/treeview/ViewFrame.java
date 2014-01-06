@@ -133,8 +133,8 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	private void setupWindowListener() {
 		
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		addWindowListener(
-			new WindowAdapter() {
+		addWindowListener(new WindowAdapter() {
+			
 				@Override
 				public void windowActivated(WindowEvent windowEvent) {
 					setWindowActive(true);
@@ -143,7 +143,11 @@ public abstract class ViewFrame extends JFrame implements Observer {
 
 				@Override
 				public void windowClosing(WindowEvent windowEvent) {
-					closeWindow();
+					
+					ExitConfirmDialog confirm = 
+							new ExitConfirmDialog(ViewFrame.this);
+					confirm.setVisible(true);
+					//closeWindow();
 				}
 
 

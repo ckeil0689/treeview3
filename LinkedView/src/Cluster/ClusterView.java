@@ -154,8 +154,6 @@ public class ClusterView extends JPanel implements MainPanel {
 	private SwingWorker<Void, Void> worker;
 	private final String[] clusterMethods = {"Single Linkage", 
 			"Centroid Linkage", "Average Linkage", "Complete Linkage"};
-	
-	private final ClusterFrame clusterFrame;
 
 	/**
 	 * Chained constructor for the ClusterView object
@@ -199,8 +197,6 @@ public class ClusterView extends JPanel implements MainPanel {
 		this.dataModel = dataModel;
 		this.viewFrame = vFrame;
 		this.hierarchical = hierarchical;
-		
-		clusterFrame = new ClusterFrame(viewFrame, "Cluster Information");
 		
 		//Reference to loaded data
 		matrix = (TVDataMatrix)dataModel.getDataMatrix();
@@ -369,8 +365,8 @@ public class ClusterView extends JPanel implements MainPanel {
 		method.setFont(GUIParams.FONTL);
 		method.setForeground(GUIParams.TEXT);
 		
-		//Clickable Panel to call ClusterFrame
-		infoIcon = new ClickableIcon(clusterFrame, "infoIcon.png");
+		//Clickable Panel to call InfoFrame
+		infoIcon = new ClickableIcon(viewFrame, "infoIcon.png");
     	
 		//Linkage choice drop-down menu
 		clusterChoice = setComboLayout(clusterMethods);

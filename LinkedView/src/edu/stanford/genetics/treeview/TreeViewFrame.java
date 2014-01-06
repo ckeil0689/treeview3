@@ -216,7 +216,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		waiting.add(confirmPanel, "push, grow");
 		
 		System.out.println(getLoaded());
-		this.rebuildMainPanelMenu();
+		rebuildMainPanelMenu();
 		
 		waiting.repaint();
 		waiting.revalidate();
