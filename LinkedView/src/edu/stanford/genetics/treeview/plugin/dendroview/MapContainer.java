@@ -39,7 +39,7 @@ import edu.stanford.genetics.treeview.*;
 public class MapContainer extends Observable implements Observer, 
 AdjustmentListener, ConfigNodePersistent {
 	
-    private String default_map = "Fill";
+    private String default_map = "Fixed";
     private double default_scale = 1.0;
     private double minScale;
     private IntegerMap current = null;

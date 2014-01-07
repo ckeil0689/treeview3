@@ -276,6 +276,7 @@ MainPanel, Observer {
 		
 		//Set up status panel
 		statuspanel = new MessagePanel("Status", GUIParams.PANEL_BG);
+		statuspanel.setMinimumSize(new Dimension(300,200));
 		
 //		zoomXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0, 1, 0, 1);
 //		zoomYscrollbar = new JScrollBar(Adjustable.VERTICAL, 0, 1, 0, 1);
@@ -466,7 +467,8 @@ MainPanel, Observer {
 		JPanel backgroundPanel;
 		JPanel buttonPanel;
 		JPanel crossPanel;
-		final JPanel panel; 
+		JPanel fillPanel1; 
+		JPanel fillPanel2;
 //		JPanel zoompanel;
 		JPanel textpanel;
 		JPanel navPanel;
@@ -498,10 +500,12 @@ MainPanel, Observer {
 		crossPanel.setLayout(new MigLayout());
 		crossPanel.setOpaque(false);
 		
-		//Global view
-		panel = new JPanel();
-		panel.setLayout(new MigLayout("ins 0"));
-		panel.setOpaque(false);
+		//Filling panels to complement MigLayout
+		fillPanel1 = new JPanel();
+		fillPanel1.setOpaque(false);
+		
+		fillPanel2 = new JPanel();
+		fillPanel2.setOpaque(false);
 		
 //		saveButton = setButtonLayout("Save Zoomed Image", BLUE1);
 //		saveButton.addActionListener(new ActionListener(){
@@ -537,8 +541,8 @@ MainPanel, Observer {
 				globalview.zoomSelection();
 				globalview.centerSelection();
 					
-				panel.revalidate();
-				panel.repaint();
+//				gvPanel.revalidate();
+//				gvPanel.repaint();
 			}
 		});
   		
@@ -603,9 +607,9 @@ MainPanel, Observer {
 		registerView(textview);
 //		registerView(atrzview);
 		
-		panel.add(globalview, "grow, push");	
-		panel.add(globalYscrollbar, "pushy, growy, wrap");
-		panel.add(globalXscrollbar, "pushx, growx, span");
+//		gvPanel.add(globalview, "grow, push");	
+//		gvPanel.add(globalYscrollbar, "pushy, growy, wrap");
+//		gvPanel.add(globalXscrollbar, "pushx, growx, span");
 		
 //		zoompanel = new JPanel();
 //		zoompanel.setLayout(new MigLayout());
@@ -653,10 +657,16 @@ MainPanel, Observer {
 		
 		backgroundPanel.add(statuspanel, "pushx, growx, height 20%::");
 		backgroundPanel.add(atrPane, "grow, push, width 62%, height 20%::");
-		backgroundPanel.add(contrastPanel, "grow, push, width 13%, wrap");
+		backgroundPanel.add(contrastPanel, "span 2, grow, push, width 13%, wrap");
 		backgroundPanel.add(gtrPane, "grow, width 20%");
-		backgroundPanel.add(panel, "grow, push, width 62%, height 80%");
-		backgroundPanel.add(navPanel, "span 1 2, grow, push, width 13%");
+		backgroundPanel.add(globalview, "push, grow, width 62%");
+		backgroundPanel.add(globalYscrollbar, "pushy, growy");
+//		backgroundPanel.add(gvPanel, "grow, push, width 62%, height 80%");
+//		backgroundPanel.add(navPanel, "span 1 2, grow, push, width 13%");
+		backgroundPanel.add(navPanel, "grow, push, width 13%, wrap");
+		backgroundPanel.add(fillPanel1, "growx, pushx");
+		backgroundPanel.add(globalXscrollbar, "growx, pushx");
+		backgroundPanel.add(fillPanel2, "growx, pushx");
 
 		this.add(backgroundPanel, "push, grow");
 	}

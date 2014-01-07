@@ -29,11 +29,13 @@ import java.util.Observable;
 
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
 import net.miginfocom.swing.MigLayout;
 
 import edu.stanford.genetics.treeview.*;
+import edu.stanford.genetics.treeview.core.ScrollablePanel;
 
 class GlobalView extends ModelViewProduced implements  MouseMotionListener,
     MouseListener, MouseWheelListener, KeyListener, ComponentListener {    
@@ -73,16 +75,6 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
      */
     private Rectangle selectionRect = null;
     
-//    /**
-//     * Rectangle to be used as indicator for row selection
-//     */
-//    private Rectangle rowIndicatorRect = null;
-//    
-//    /**
-//     * Rectangle to be used as indicator for column selection
-//     */
-//    private Rectangle colIndicatorRect = null;
-    
     /**
      * Circle to be used as indicator for selection
      */
@@ -105,8 +97,9 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		
 		this.setLayout(new MigLayout());
 		
-		scrollPane = new JScrollPane(panel);
-		//this.add(scrollPane);
+		scrollPane = new JScrollPane((ScrollablePanel)panel, 
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		
 		setToolTipText("This Turns Tooltips On");
 
@@ -645,10 +638,8 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 			drawBand(dragRect);
 			
 			if (e.isShiftDown()) {
-			    Point start = new Point(xmap.getMinIndex(), ymap.getMinIndex());
-					    //startPoint.y);
-			    Point end = new Point(xmap.getMaxIndex(), ymap.getMaxIndex());
-					 //endPoint.y);
+			    Point start = new Point(xmap.getMinIndex(), startPoint.y);
+			    Point end = new Point(xmap.getMaxIndex(), endPoint.y);
 			    selectRectangle(start, end);
 			    
 			} else {
@@ -670,7 +661,8 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
     	if(SwingUtilities.isLeftMouseButton(e)) {
 	    	//rubber band?
 			drawBand(dragRect);	
-			endPoint.setLocation(xmap.getIndex(e.getX()), ymap.getIndex(e.getY()));
+			endPoint.setLocation(xmap.getIndex(e.getX()), 
+					ymap.getIndex(e.getY()));
 			
 			if (e.isShiftDown()) {
 				dragRect.setLocation(xmap.getMinIndex(), startPoint.y);
@@ -760,72 +752,6 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		g.drawRect(x, y, w, h);
 		g.setPaintMode();
     }
-    
-//    /**
-//     * Draws a visual indicator line/ filled rectangle to display the
-//     * location of a certain target in the GlobalView to aid the user.
-//     */
-//    private void drawGeneIndicator() {
-//    	
-//    	int spx = 0; 
-//		int spy = 0; 
-//		int epx = 0;
-//		int epy = 0; 
-//		
-//		if (geneSelection == null || arraySelection == null) {
-//			return;
-//			
-//		} else if(geneSelection.getNSelectedIndexes() == 1 
-//    			&& arraySelection.getNSelectedIndexes() == 1) {
-//    		
-//    		//first for row
-//    		spx = xmap.getPixel(arraySelection.getMinIndex());
-//    		// last pixel of last block
-//    		epx = xmap.getPixel(arraySelection.getMaxIndex() + 1) - 1; 
-//    		
-//    		
-//    		spy = ymap.getPixel(ymap.getMinIndex());
-//    		epy = ymap.getPixel(ymap.getMaxIndex() + 1) - 1;
-//    		
-//    		if (epy < spy) {
-//    			epy = spy; 
-//    			// correct for roundoff error above
-//    		}
-//    		
-//    		if (rowIndicatorRect == null) {
-//    			rowIndicatorRect = new Rectangle(spx, spy, epx - spx, 
-//    					epy - spy);
-//    			
-//    		} else {
-//    			rowIndicatorRect.setBounds(spx, spy, epx - spx, epy - spy);
-//    		}
-//    		
-//    		//Now for column
-//    		spx = xmap.getPixel(xmap.getMinIndex());
-//    		// last pixel of last block
-//    		epx = xmap.getPixel(xmap.getMaxIndex() + 1) - 1; 
-//    		
-//    		
-//    		spy = ymap.getPixel(geneSelection.getMinIndex());
-//    		epy = ymap.getPixel(geneSelection.getMaxIndex() + 1) - 1;
-//    		
-//    		if (epy < spy) {
-//    			epy = spy; 
-//    			// correct for roundoff error above
-//    		}
-//    		
-//    		if (colIndicatorRect == null) {
-//    			colIndicatorRect = new Rectangle(spx, spy, epx - spx, 
-//    					epy - spy);
-//    			
-//    		} else {
-//    			colIndicatorRect.setBounds(spx, spy, epx - spx, epy - spy);
-//    		}
-//    	} else if (rowIndicatorRect != null && colIndicatorRect != null){
-//    		rowIndicatorRect.setBounds(spx, spy, epx - spx, epy - spy);
-//    		colIndicatorRect.setBounds(spx, spy, epx - spx, epy - spy);
-//    	}
-//    }
     
     /**
      * Draws a circle if the user selects one rectangle in the clustergram

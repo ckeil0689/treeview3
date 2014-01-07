@@ -473,7 +473,9 @@ public class ClusterView extends JPanel implements MainPanel {
 							
 							loadPanel.removeAll();
 							optionsPanel.remove(loadPanel);
+							buttonPanel.remove(cancel_button);
 							buttonPanel.remove(dendro_button);
+							cluster_button.setEnabled(true);
 							
 							mainPanel.revalidate();
 							mainPanel.repaint();	

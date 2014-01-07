@@ -112,7 +112,7 @@ public class MethodInfoFrame extends JFrame {
 		Toolkit toolkit = Toolkit.getDefaultToolkit();
 		Dimension mainDim = toolkit.getScreenSize();
 		Rectangle rectangle = new Rectangle(mainDim);
-		mainDim.setSize(rectangle.width * 1/2, rectangle.height * 3/4);
+		mainDim.setSize(rectangle.height, rectangle.height * 3/4);
 		
 		//setup frame options
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);

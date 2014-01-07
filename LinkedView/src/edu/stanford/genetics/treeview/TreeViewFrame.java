@@ -458,6 +458,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			}
 			
 		} else {
+			if(running instanceof ClusterView) {
+				setDataModel((TVModel)dataModel, true, true);
+			}
 			getContentPane().add(waiting);
 			setTitle(getAppName());
 		}
