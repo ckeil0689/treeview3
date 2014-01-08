@@ -33,6 +33,7 @@ import java.util.*;
  * @version $Revision: 1.9 $ $Date: 2005-12-05 05:27:53 $
  */
 public class DummyConfigNode implements ConfigNode {
+	
 	private Vector<ConfigNode> kids;
 	private Hashtable<String, Object> attr;
 	private String name;
@@ -46,7 +47,9 @@ public class DummyConfigNode implements ConfigNode {
 	 */
 	@Override
 	public ConfigNode create(String tname) {
-	DummyConfigNode child  = new DummyConfigNode(tname);
+		
+		DummyConfigNode child  = new DummyConfigNode(tname);
+		
 		kids.addElement(child);
 		return child;
 	}
@@ -58,12 +61,12 @@ public class DummyConfigNode implements ConfigNode {
 	 * @param  tname  name of the (parentless) node to create
 	 */
 	public DummyConfigNode(String tname) {
+		
 		super();
 		name = tname;
 		kids = new Vector<ConfigNode>();
 		attr = new Hashtable<String, Object>();
 	}
-
 
 	/**
 	 *  fetch all nodes with the name
@@ -73,10 +76,13 @@ public class DummyConfigNode implements ConfigNode {
 	 */
 	@Override
 	public ConfigNode[] fetch(String byname) {
+		
 		if (byname == null) {
 			return null;
 		}
-	int matching      = 0;
+		
+		int matching = 0;
+		
 		for (int i = 0; i < kids.size(); i++) {
 			if (byname.equals(((DummyConfigNode) kids.elementAt(i)).name)) {
 				matching++;

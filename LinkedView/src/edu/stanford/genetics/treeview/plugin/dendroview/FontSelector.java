@@ -33,23 +33,12 @@ import edu.stanford.genetics.treeview.NatField;
  * @version $Revision: 1.2 $ $Date: 2008-06-11 01:58:57 $
  */
 public class FontSelector extends Panel {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 1L;
-	//FIXME deprecated method.
-	public static final String[] fonts = Toolkit.getDefaultToolkit().getFontList();
-	/*
-	 *  {
-	 *  "Courier",
-	 *  "Default",
-	 *  "Dialog",
-	 *  "DialogInput",
-	 *  "Helvetica",
-	 *  "TimesRoman",
-	 *  "ZapfDingbats"
-	 *  };
-	 */
+
+	public static final Font[] fonts = 
+			GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
+
 	private String title;
 	private Choice font_choice;
 	private Choice style_choice;
@@ -61,7 +50,19 @@ public class FontSelector extends Panel {
 
 	String size_prop, face_prop, style_prop;
 
-
+	/**
+	 *  Constructor for the FontSelector object
+	 *
+	 * @param  fs    FontSelectable to modify
+	 * @param  name  Title for the titlebar
+	 */
+	public FontSelector(FontSelectable fs, String name) {
+		
+		title = name;
+		client = fs;
+		setupWidgets();
+	}
+	
 	/**
 	 *  Place component using gridbaglayout
 	 *
@@ -73,11 +74,10 @@ public class FontSelector extends Panel {
 	 * @param  anchor  anchor direction
 	 * @return         GridBagConstraints used
 	 */
-	private GridBagConstraints
-			place(GridBagLayout gbl, Component comp,
+	private GridBagConstraints place(GridBagLayout gbl, Component comp,
 			int x, int y, int width, int anchor) {
 
-	GridBagConstraints gbc  = new GridBagConstraints();
+		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = x;
 		gbc.gridy = y;
 		gbc.gridwidth = width;
@@ -87,54 +87,58 @@ public class FontSelector extends Panel {
 		return gbc;
 	}
 
-
-
 	/**
 	 *  Sets up widgets
 	 */
 	private void setupWidgets() {
-	GridBagLayout gbl  = new GridBagLayout();
+	
+		GridBagLayout gbl = new GridBagLayout();
 		setLayout(gbl);
-
-	Label font_label   = new Label("Font:", Label.LEFT);
+		
+		Label font_label = new Label("Font:", Label.LEFT);
 		add(font_label);
-
+		
 		font_choice = new Choice();
 		for (int i = 0; i < fonts.length; ++i) {
-			font_choice.addItem(fonts[i]);
+			
+			font_choice.addItem(fonts[i].getFontName());
 		}
+		
 		font_choice.select(client.getFace());
 		add(font_choice);
 
-	Label style_label  = new Label("Style:", Label.LEFT);
+		Label style_label  = new Label("Style:", Label.LEFT);
 		add(style_label);
 
 		style_choice = new Choice();
 		for (int i = 0; i < styles.length; ++i) {
+			
 			style_choice.addItem(styles[i]);
 		}
 		style_choice.select(decode_style(client.getStyle()));
 		add(style_choice);
 
-	Label size_label   = new Label("Size:", Label.LEFT);
+		Label size_label   = new Label("Size:", Label.LEFT);
 		add(size_label);
 
 		size_field = new NatField(client.getPoints(), 3);
 		add(size_field);
 
 		display_button = new Button("Display");
-		display_button.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent actionEvent) {
-				String string  = font_choice.getSelectedItem();
-				int i          = encode_style(style_choice.getSelectedItem());
-				int size       = size_field.getNat();
-					client.setFace(string);
-					client.setStyle(i);
-					client.setPoints(size);
-				}
-			});
+		display_button.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent actionEvent) {
+			
+				String string = font_choice.getSelectedItem();
+				int i = encode_style(style_choice.getSelectedItem());
+				int size = size_field.getNat();
+				
+				client.setFace(string);
+				client.setStyle(i);
+				client.setPoints(size);
+			}
+		});
 		add(display_button);
 
 		place(gbl, font_label, 0, 0, 1, GridBagConstraints.WEST);
@@ -146,46 +150,46 @@ public class FontSelector extends Panel {
 		place(gbl, display_button, 0, 3, 2, GridBagConstraints.WEST);
 	}
 
-
-//
-// the allowed font styles
-//
+	// the allowed font styles
 	/**
 	 *  Description of the Field
 	 */
 	public final static String[] styles  = {
-			"Plain",
-			"Italic",
-			"Bold",
-			"Bold Italic"
-			};
+	
+		"Plain",
+		"Italic",
+		"Bold",
+		"Bold Italic"
+	};
 
 	/**
-	* turn a style number from class java.awt.Font into a string
+	 * turn a style number from class java.awt.Font into a string
 	 *
 	 * @param  style  style index
 	 * @return        string description
 	 */
 	public final static String decode_style(int style) {
+		
 		switch (style) {
-						case Font.PLAIN:
-							return styles[0];
-						case Font.ITALIC:
-							return styles[1];
-						case Font.BOLD:
-							return styles[2];
-						default:
-							return styles[3];
+		case Font.PLAIN:
+			return styles[0];
+		case Font.ITALIC:
+			return styles[1];
+		case Font.BOLD:
+			return styles[2];
+		default:
+			return styles[3];
 		}
 	}
 
 	/**
-	* turn a string into a style number
+	 * turn a string into a style number
 	 *
 	 * @param  style  string description
 	 * @return        integer encoded representation
 	 */
 	public final static int encode_style(String style) {
+	
 		return
 				style == styles[0] ? Font.PLAIN :
 				style == styles[1] ? Font.ITALIC :
@@ -193,37 +197,24 @@ public class FontSelector extends Panel {
 				Font.BOLD + Font.ITALIC;
 	}
 
-
-	/**
-	 *  Constructor for the FontSelector object
-	 *
-	 * @param  fs    FontSelectable to modify
-	 * @param  name  Title for the titlebar
-	 */
-	public FontSelector(FontSelectable fs, String name) {
-		title = name;
-		client = fs;
-		setupWidgets();
-	}
-
-
 	/**
 	 *  Create a toplevel font selecting frame
 	 */
 	public void makeTop() {
+	
 		top = new Frame(getTitle());
 		top.add(this);
-		top.addWindowListener(
-			new WindowAdapter() {
-				@Override
-				public void windowClosing(WindowEvent we) {
-					we.getWindow().dispose();
-				}
-			});
+		top.addWindowListener(new WindowAdapter() {
+			
+			@Override
+			public void windowClosing(WindowEvent we) {
+			
+				we.getWindow().dispose();
+			}
+		});
 		top.pack();
 		top.setVisible(true);
 	}
-
 
 	/**
 	 *  Create a blocking font selecting dialog
@@ -231,24 +222,25 @@ public class FontSelector extends Panel {
 	 * @param  f  frame to block
 	 */
 	public void showDialog(Frame f) {
+		
 		d = new Dialog(f, getTitle());
 		d.add(this);
-		d.addWindowListener(
-			new WindowAdapter() {
-				@Override
-				public void windowClosing(WindowEvent we) {
-					we.getWindow().dispose();
-				}
-			});
+		d.addWindowListener(new WindowAdapter() {
+			
+			@Override
+			public void windowClosing(WindowEvent we) {
+				we.getWindow().dispose();
+			}
+		});
 		d.pack();
 		d.setVisible(true);
 	}
 
-
 	/**
-	 * @return    The title of this FontSelector
+	 * @return The title of this FontSelector
 	 */
 	protected String getTitle() {
+		
 		return title;
 	}
 }

@@ -30,6 +30,7 @@ import java.awt.*;
  * @version    @version $Revision: 1.5 $ $Date: 2004-12-21 03:28:14 $
  */
 public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
+	
 	private ConfigNode configNode;
 
 	private Color[] colors;
@@ -118,7 +119,9 @@ public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 	 * @param  types          types supported by this color set.
 	 * @param  defaultColors  default colors for this color set.
 	 */
-	public ConfigColorSet(String defaultName, String[] types, String[] defaultColors) {
+	public ConfigColorSet(String defaultName, String[] types, 
+			String[] defaultColors) {
+		
 		setDefaultName(defaultName);
 		setTypes(types);
 		setDefaultColors(defaultColors);
@@ -150,6 +153,7 @@ public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 	/*inherit description */
 	@Override
 	public void bindConfig(ConfigNode configNode) {
+		
 		this.configNode = configNode;
 		// first, init existing...
 		Color[] oldColors        = new Color[types.length];

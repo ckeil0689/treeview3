@@ -63,7 +63,7 @@ public class TextView extends ModelView implements FontSelectable,
 	protected HeaderSummary headerSummary = new HeaderSummary();
 	
     private final int scrollstep = 5;
-    private final String d_face = "Courier";
+    private final String d_face = "Dialog";
     private final int d_style = 0;
     private final int d_size = 12;
     
@@ -230,7 +230,7 @@ public class TextView extends ModelView implements FontSelectable,
 			    	}
 		
 					if (out != null) {
-						Color back = GUIParams.ELEMENT; //g.getColor();
+						Color fore = GUIParams.ELEMENT; //g.getColor();
 						if ((geneSelection == null) 
 								|| geneSelection.isIndexSelected(j)) {
 							String [] strings = headerInfo.getHeader(j);
@@ -240,17 +240,22 @@ public class TextView extends ModelView implements FontSelectable,
 										strings[fgColorIndex]));
 							}
 							
-							g.drawString(out, 0, 
+							g.setColor(fore);
+							//right-aligned text
+							g.drawString(out, offscreenSize.width 
+									- metrics.stringWidth(out), //0, 
 									map.getMiddlePixel(j) + ascent / 2);
 							
 							if (fgColorIndex > 0) {
-								g.setColor(back);
+								g.setColor(fore);
 							}
 						} else {
-							g.setColor(GUIParams.DARKGRAY);//Color.gray);
-							g.drawString(out, 0, 
+							g.setColor(GUIParams.TEXT);
+							//right-aligned text
+							g.drawString(out, offscreenSize.width 
+									- metrics.stringWidth(out),//0, 
 									map.getMiddlePixel(j) + ascent / 2);
-							g.setColor(back);
+							//g.setColor(fore);
 						}
 					}
 			    }

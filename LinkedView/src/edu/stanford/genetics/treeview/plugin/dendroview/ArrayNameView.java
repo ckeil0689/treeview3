@@ -238,11 +238,11 @@ FontSelectable, ConfigNodePersistent {
 				g2d.rotate(-90 * 3.14159/180);
 				g2d.translate(-offscreenSize.height, 0);
 	
-				int start            = map.getIndex(0);
-				int end              = map.getIndex(map.getUsedPixels()) - 1;
-				int gidRow           = headerInfo.getIndex("GID");
+				int start = map.getIndex(0);
+				int end  = map.getIndex(map.getUsedPixels()) - 1;
+				int gidRow = headerInfo.getIndex("GID");
 				if (gidRow == -1) {gidRow = 0;}
-				int colorIndex       = headerInfo.getIndex("FGCOLOR");
+				int colorIndex = headerInfo.getIndex("FGCOLOR");
 				g.setFont(new Font(face, style, size));
 				FontMetrics metrics = getFontMetrics(g.getFont());
 				int ascent = metrics.getAscent();
@@ -267,8 +267,8 @@ FontSelectable, ConfigNodePersistent {
 			    }
 			    
 			    //Foreground Text
-				Color back = GUIParams.ELEMENT;//g.getColor();
-				for (int j = start;j <= end;j++) {
+				Color fore = GUIParams.ELEMENT;//g.getColor();
+				for (int j = start; j <= end; j++) {
 					
 					try { 
 						String out = headerSummary.getSummary(headerInfo, j);
@@ -284,17 +284,18 @@ FontSelectable, ConfigNodePersistent {
 											headers[colorIndex]));
 								}
 								
+								g.setColor(fore);
 								g.drawString(out, 0, map.getMiddlePixel(j) 
 										+ ascent / 2);
 								
 								if (colorIndex > 0) {
-									g.setColor(back);
+									g.setColor(fore);
 								}
 							} else {
-								g.setColor(GUIParams.DARKGRAY);//Color.gray);
+								g.setColor(GUIParams.TEXT);
 								g.drawString(out, 0, map.getMiddlePixel(j) 
 										+ ascent / 2);
-								g.setColor(back);
+								//g.setColor(fore);
 							}
 							
 						}
@@ -343,8 +344,7 @@ FontSelectable, ConfigNodePersistent {
 					} else {
 						// some kind of blank default image?
 					}
-					backBufferValid = true;
-					
+					backBufferValid = true;		
 				}
 				
 				if (offscreenSize.height < maxlength) {
@@ -360,7 +360,6 @@ FontSelectable, ConfigNodePersistent {
 			l1.setText("Zoom for Names");
 		}
 		//end of if
-
 	}
 
 

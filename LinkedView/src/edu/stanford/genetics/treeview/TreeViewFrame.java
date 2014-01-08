@@ -442,6 +442,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 */
 	@Override
 	public void setLoaded(boolean flag) {
+		
 		//reset persistent popups
 		setGeneFinder(null);
 		loaded = flag;

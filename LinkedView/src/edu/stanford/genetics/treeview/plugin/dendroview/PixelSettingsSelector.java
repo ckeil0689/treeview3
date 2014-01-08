@@ -309,9 +309,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 	ColorPresetsPanel colorPresetsPanel;
 
 	class CEEButtons extends JPanel {
-		/**
-		 * 
-		 */
+
 		private static final long serialVersionUID = 1L;
 
 		CEEButtons() {
@@ -384,6 +382,17 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 				}
 			});
 			this.add(makeButton);
+			
+			JButton resetButton = setButtonLayout("Reset Presets");
+			resetButton.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					
+					m_presets.reset();
+				}
+			});
+			this.add(resetButton);
 		}
 	}
 

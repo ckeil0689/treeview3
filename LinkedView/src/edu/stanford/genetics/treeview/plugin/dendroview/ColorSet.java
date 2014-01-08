@@ -27,7 +27,8 @@ import java.io.*;
 
 import edu.stanford.genetics.treeview.*;
 /**
- *  This class represents a set of colors which can be used by a color extractor to translate data values into colors. 
+ *  This class represents a set of colors which can be used by a color extractor 
+ *  to translate data values into colors. 
  * 
  * NOTE: This class has been superceded by
  *  the ConfigColorSet in the edu.stanford.genetics.treeview package, although I
@@ -37,22 +38,24 @@ import edu.stanford.genetics.treeview.*;
  * @version    @version $Revision: 1.1 $ $Date: 2006-08-16 19:13:45 $
  */
 public class ColorSet implements ConfigNodePersistent {
-	private String default_upColor       = "#FF0000";
-	private String default_zeroColor     = "#000000";
-	private String default_downColor     = "#00FF00";
-	private String default_missingColor  = "#909090";
-	private String default_emptyColor    = "#FFFFFF";
-	private String default_name          = null;
+	
+	private String default_upColor = "#FF0000";
+	private String default_zeroColor = "#000000";
+	private String default_downColor = "#00FF00";
+	private String default_missingColor = "#909090";
+	private String default_emptyColor = "#FFFFFF";
+	private String default_name = null;
 
 	private String name;
 	private Color up, zero, down, missing, empty;
-	private ConfigNode root              = null;
+	private ConfigNode root = null;
 
 
 	/**  Constructor for the ColorSet object,
 	*   uses default values
 	*/
 	public ColorSet() {
+		
 		super();
 		setDefaults();
 	}
@@ -68,7 +71,9 @@ public class ColorSet implements ConfigNodePersistent {
 	 * @param  missing  string representing inital missing color
 	 * @param  empty    string representing inital empty color
 	 */
-	public ColorSet(String name, String up, String zero, String down, String missing, String empty) {
+	public ColorSet(String name, String up, String zero, String down, 
+			String missing, String empty) {
+		
 		super();
 		setName(name);
 		setUp(up);
@@ -80,6 +85,7 @@ public class ColorSet implements ConfigNodePersistent {
 
 
 	private void setDefaults() {
+		
 		up = decodeColor(default_upColor);
 		zero = decodeColor(default_zeroColor);
 		down = decodeColor(default_downColor);
@@ -92,6 +98,7 @@ public class ColorSet implements ConfigNodePersistent {
 	 * copies colors and name from other color set.
 	 */
 	public void copyStateFrom(ColorSet other) {
+		
 		setUp(other.getUp());
 		setZero(other.getZero());
 		setDown(other.getDown());
@@ -106,6 +113,7 @@ public class ColorSet implements ConfigNodePersistent {
 	*/
 	@Override
 	public void bindConfig(ConfigNode root) {
+		
 		this.root = root;
 		up = decodeColor(root.getAttribute("up", default_upColor));
 		zero = decodeColor(root.getAttribute("zero", default_zeroColor));
@@ -124,6 +132,7 @@ public class ColorSet implements ConfigNodePersistent {
 	 * @param  argv  optional arguments from command line.
 	 */
 	public final static void main(String[] argv) {
+		
 		ColorSet test  = new ColorSet();
 		try {
 			test.loadEisen(argv[0]);

@@ -75,7 +75,7 @@ public class DendrogramFactory extends PluginFactory {
 		colorPresets.bindConfig(node.fetchOrCreate("ColorPresets"));
 		
 		if (colorPresets.getNumPresets() == 0) {
-		  colorPresets.addDefaultPresets();
+			colorPresets.addDefaultPresets();
 		}
 		
 		cpresetEditor.synchronizeFrom();

@@ -459,7 +459,7 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		    	Graphics2D g2 = (Graphics2D)g;
 		    	g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 		    		    RenderingHints.VALUE_ANTIALIAS_ON);
-		    	g2.setColor(GUIParams.RED1);
+		    	g2.setColor(Color.white);//GUIParams.RED1);
 		    	g2.setStroke(new BasicStroke(3));
 			    g2.draw(indicatorCircle);
 		    }
