@@ -446,15 +446,6 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		    g.drawRect(selectionRect.x, selectionRect.y, 
 			       selectionRect.width, selectionRect.height);
 		    
-//		    if(xmap.getScale() < 8.0 && ymap.getScale() < 8.0 
-//		    		&& (rowIndicatorRect != null && colIndicatorRect != null)) {
-//		    	g.setColor(GUIParams.ELEMENT);
-//			    g.drawRect(rowIndicatorRect.x, rowIndicatorRect.y, 
-//			    		rowIndicatorRect.width, rowIndicatorRect.height);
-//			    g.drawRect(colIndicatorRect.x, colIndicatorRect.y, 
-//			    		colIndicatorRect.width, colIndicatorRect.height);
-//		    }
-		    
 		    if(indicatorCircle != null) {
 		    	Graphics2D g2 = (Graphics2D)g;
 		    	g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -528,7 +519,7 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
     }
 
     
-    // Observer Methods
+    //Observer Methods
 	@Override
 	public void update(Observable o, Object arg) {
 		
@@ -986,23 +977,18 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 	@Override
 	public void componentResized(ComponentEvent arg0) {
 		
-		double scaleFactorX = 1.0;
-		double scaleFactorY = 1.0;
-		
 		int scrollX = xmap.getScroll().getValue();
 		int scrollY = ymap.getScroll().getValue();
 		
-		if(xmap.getMinScale() > 0.0) {
-			scaleFactorX = xmap.getScale()/ xmap.getMinScale();
+		if(xmap.getAvailablePixels() > xmap.getUsedPixels() 
+				&& xmap.getScale() == xmap.getMinScale()) {
+			xmap.setHome();
 		}
-		xmap.setHome();
-		xmap.setScale(xmap.getMinScale() * scaleFactorX);
 		
-		if(ymap.getMinScale() > 0.0) {
-			scaleFactorY = ymap.getScale()/ ymap.getMinScale();
+		if(ymap.getAvailablePixels() > ymap.getUsedPixels()
+				&& ymap.getScale() == ymap.getMinScale()) {
+			ymap.setHome();
 		}
-		ymap.setHome();
-		ymap.setScale(ymap.getMinScale() * scaleFactorY);
 		
 		centerView(scrollX, scrollY);
 		

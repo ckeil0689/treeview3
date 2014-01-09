@@ -451,6 +451,11 @@ MainPanel, Observer {
 //		getZoomXmap().setIndexRange(-1, -1);
 //		getZoomYmap().setIndexRange(-1, -1);
 
+		//Ensuring window resizing works with GlobalView
+		//(based on available pixels)
+		globalXmap.setHome();
+		globalYmap.setHome();
+		
 		globalXmap.notifyObservers();
 		globalYmap.notifyObservers();
 //		getZoomXmap().notifyObservers();
@@ -540,9 +545,6 @@ MainPanel, Observer {
 				
 				globalview.zoomSelection();
 				globalview.centerSelection();
-					
-//				gvPanel.revalidate();
-//				gvPanel.repaint();
 			}
 		});
   		
@@ -607,10 +609,6 @@ MainPanel, Observer {
 		registerView(textview);
 //		registerView(atrzview);
 		
-//		gvPanel.add(globalview, "grow, push");	
-//		gvPanel.add(globalYscrollbar, "pushy, growy, wrap");
-//		gvPanel.add(globalXscrollbar, "pushx, growx, span");
-		
 //		zoompanel = new JPanel();
 //		zoompanel.setLayout(new MigLayout());
 //		zoompanel.add(zoomview, BorderLayout.CENTER);
@@ -657,13 +655,11 @@ MainPanel, Observer {
 		
 		backgroundPanel.add(statuspanel, "pushx, growx, height 20%::");
 		backgroundPanel.add(atrPane, "grow, push, width 62%, height 20%::");
-		backgroundPanel.add(contrastPanel, "span 2, grow, push, width 13%, wrap");
+		backgroundPanel.add(contrastPanel, "span 2, grow, push, wrap");
 		backgroundPanel.add(gtrPane, "grow, width 20%");
 		backgroundPanel.add(globalview, "push, grow, width 62%");
 		backgroundPanel.add(globalYscrollbar, "pushy, growy");
-//		backgroundPanel.add(gvPanel, "grow, push, width 62%, height 80%");
-//		backgroundPanel.add(navPanel, "span 1 2, grow, push, width 13%");
-		backgroundPanel.add(navPanel, "grow, push, width 13%, wrap");
+		backgroundPanel.add(navPanel, "grow, wrap");
 		backgroundPanel.add(fillPanel1, "growx, pushx");
 		backgroundPanel.add(globalXscrollbar, "growx, pushx");
 		backgroundPanel.add(fillPanel2, "growx, pushx");

@@ -124,14 +124,14 @@ AdjustmentListener, ConfigNodePersistent {
     public void zoomOut() {
 		
 		double newScale = 0.0;
-		double zoomVal = 1.0;
+		double zoomVal = 1.3;
 		
 		if(getScale() < 8.0) {
-			zoomVal = 10.0;
+			zoomVal = 1.8;
 		}
 		
-		newScale = getAvailablePixels()/ (scrollbar.getVisibleAmount() 
-				+ zoomVal);
+		newScale = roundScale(getAvailablePixels()
+				/ (scrollbar.getVisibleAmount() * zoomVal));
 		
 		if(newScale < minScale) {
 			newScale = minScale;
@@ -151,22 +151,38 @@ AdjustmentListener, ConfigNodePersistent {
      */
 	public void zoomIn() {
 
-		double maxScale = getScale();
+		double minAllowedTiles = 4.0;
+		double maxScale = getAvailablePixels()/minAllowedTiles;
 		double newScale = 0.0;
-		double zoomVal = 1.0;
+		double zoomVal = 0.75;
 		
 		if(getScale() < 8.0) {
-			zoomVal = 10.0;
+			zoomVal = 0.6;
 		}
 		
-		newScale = getAvailablePixels()/ (scrollbar.getVisibleAmount() 
-				- zoomVal);
+		//Recalculating scale
+		newScale = roundScale(getAvailablePixels()
+				/ (scrollbar.getVisibleAmount() * zoomVal));
 		
-		if(scrollbar.getVisibleAmount() <= 1) {
+		if(newScale > maxScale) {
 			newScale = maxScale;
 		}
 		
 		this.setScale(newScale);
+	}
+	
+	/**
+	 * 
+	 * @param scale
+	 * @return
+	 */
+	public double roundScale(double scale) {
+		
+		double fittedScale = 1.0;
+		
+		fittedScale = Math.round(scale * 2)/ 2;
+		
+		return fittedScale;	
 	}
 
 	public void recalculateScale() {
