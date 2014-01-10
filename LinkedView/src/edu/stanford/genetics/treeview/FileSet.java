@@ -22,93 +22,96 @@
  */
 package edu.stanford.genetics.treeview;
 
-import java.io.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.JOptionPane;
 
 /**
- *  Encapsulates a set of files corresponding to a typical hierarchical cluster
- *  analysis. Such things are always based upon a cdt or pcl file.
+ * Encapsulates a set of files corresponding to a typical hierarchical cluster
+ * analysis. Such things are always based upon a cdt or pcl file.
  * <p>
- *  The following attributes are meaningful to the FileSet: 
+ * The following attributes are meaningful to the FileSet:
  * <ul>
- * <li>dir: The directory of the fileset </li>
- * <li> root: The root of the fileset </li> 
- * <li> cdt: The extension for the generalized cdt file </li>
-  * <li> atr: The extension for the atr </li>
-  * <li> jtv: The extension for the jtv </li>
+ * <li>dir: The directory of the fileset</li>
+ * <li>root: The root of the fileset</li>
+ * <li>cdt: The extension for the generalized cdt file</li>
+ * <li>atr: The extension for the atr</li>
+ * <li>jtv: The extension for the jtv</li>
  * </ul>
- *
- * @author     Alok Saldanha <alok@genome.stanford.edu>
+ * 
+ * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.15 $ $Date: 2008-06-11 01:58:57 $
-
- * Note: Should be flexible enough to have a url base instead of dir (1/16/2003)
+ * 
+ *          Note: Should be flexible enough to have a url base instead of dir
+ *          (1/16/2003)
  */
 
 public class FileSet {
-	private ConfigNode node  = null;
-
+	private ConfigNode node = null;
 
 	public boolean isUrl() {
 		return getDir().startsWith("http");
 	}
 
 	public boolean hasMoved() {
-		if (isUrl()) return false;
+		if (isUrl())
+			return false;
 		try {
-			File f = new File(getCdt());
+			final File f = new File(getCdt());
 			return !(f.exists());
-		} catch (Exception e) {
+		} catch (final Exception e) {
 		}
 		return true;
 	}
-	
+
 	/**
-	 *  Constructor for the FileSet object
-	 *
-	 * @param  configNode  ConfigNode to base this fileset on.
+	 * Constructor for the FileSet object
+	 * 
+	 * @param configNode
+	 *            ConfigNode to base this fileset on.
 	 */
-	public FileSet(ConfigNode configNode) {
+	public FileSet(final ConfigNode configNode) {
 		node = configNode;
 	}
 
-
 	/**
-	 *  Make fileset based upon unrooted DummyConfigNode with the specified values
-	 *
-	 * @param  string1  name of cdt which this fileset is based on
-	 * @param  string2  directory to find file in.
+	 * Make fileset based upon unrooted DummyConfigNode with the specified
+	 * values
+	 * 
+	 * @param string1
+	 *            name of cdt which this fileset is based on
+	 * @param string2
+	 *            directory to find file in.
 	 */
-	public FileSet(String cdt, String dir) {
+	public FileSet(final String cdt, final String dir) {
 		node = new DummyConfigNode("FileSet");
 		setCdt(cdt);
 		setDir(dir);
 	}
 
-
-	public FileSet(String dir) {
+	public FileSet(final String dir) {
 		node = new DummyConfigNode("FileSet");
 		setDir(dir);
 	}
 
 	/**
-	 *  Gets the configNode attribute of the FileSet object
-	 *
-	 * @return    The configNode value
+	 * Gets the configNode attribute of the FileSet object
+	 * 
+	 * @return The configNode value
 	 */
 	public ConfigNode getConfigNode() {
 		return node;
 	}
 
-
 	/**
-	 *  Copies state from another fileset
-	 *
-	 * @param  fileSet  FileSet to copy state from
+	 * Copies state from another fileset
+	 * 
+	 * @param fileSet
+	 *            FileSet to copy state from
 	 */
-	public void copyState(FileSet fileSet) {
+	public void copyState(final FileSet fileSet) {
 		setRoot(fileSet.getRoot());
 		setDir(fileSet.getDir());
 		setExt(fileSet.getExt());
@@ -116,197 +119,189 @@ public class FileSet {
 		setStyle(fileSet.getStyle());
 	}
 
-
 	/**
-	 * @return    String representation of fileset
+	 * @return String representation of fileset
 	 */
 	@Override
 	public String toString() {
 		return getCdt();
 	}
 
-
 	/**
-	 *  Determines equality by looking at the cdt base alone.
-	 *
-	 * @param  fileSet  FileSet to compare to
-	 * @return          true if equal
+	 * Determines equality by looking at the cdt base alone.
+	 * 
+	 * @param fileSet
+	 *            FileSet to compare to
+	 * @return true if equal
 	 */
-	public boolean equals(FileSet fileSet) {
+	public boolean equals(final FileSet fileSet) {
 		return getCdt().equals(fileSet.getCdt());
 	}
 
-
 	/**
-	 * @return    The complete path of the atr file
+	 * @return The complete path of the atr file
 	 */
 	public String getAtr() {
 		return getDir() + getRoot() + node.getAttribute("atr", ".atr");
 	}
 
-
 	/**
-	 * @return    The complete path of the cdt file
+	 * @return The complete path of the cdt file
 	 */
 	public String getCdt() {
 		return getDir() + getRoot() + getExt();
 	}
 
-
 	/**
-	 * @return    The directory in which the files of the fileset are found
+	 * @return The directory in which the files of the fileset are found
 	 */
 	public String getDir() {
 		return node.getAttribute("dir", "");
 	}
 
-
 	/**
-	 * @return    The complete path of the gtr file
+	 * @return The complete path of the gtr file
 	 */
 	public String getGtr() {
 		return getDir() + getRoot() + node.getAttribute("gtr", ".gtr");
 	}
 
-
 	/**
-	 * @return    The complete path of the jtv file
+	 * @return The complete path of the jtv file
 	 */
 	public String getJtv() {
 		return getDir() + getRoot() + node.getAttribute("jtv", ".jtv");
 	}
 
-
 	/**
-		 * @return    The root of the fileset, 
-		 * i.e. "test" if the fileset is based on "test.cdt".
-
+	 * @return The root of the fileset, i.e. "test" if the fileset is based on
+	 *         "test.cdt".
 	 */
 	public String getRoot() {
 		return node.getAttribute("root", "");
 	}
 
-
 	/**
-	 * @return    The extension associated with the base of the fileset 
-	 * (i.e. "cdt" for one based on "test.cdt", 
-	 * "pcl" for one based on "test.pcl"
+	 * @return The extension associated with the base of the fileset (i.e. "cdt"
+	 *         for one based on "test.cdt", "pcl" for one based on "test.pcl"
 	 */
 	public String getExt() {
 		return node.getAttribute("cdt", ".cdt");
 	}
 
 	/**
-	 * @return    The logical name of the fileset 
+	 * @return The logical name of the fileset
 	 */
 	public String getName() {
 		return node.getAttribute("name", "No name");
 	}
 
-
 	/**
-	 *  Sets the base of the FileSet object. Parses out extension, root
-	 *
-	 * @param  string1  Name of base of the FileSet
+	 * Sets the base of the FileSet object. Parses out extension, root
+	 * 
+	 * @param string1
+	 *            Name of base of the FileSet
 	 */
-	public void setCdt(String string1) {
+	public void setCdt(final String string1) {
 		if (string1 != null) {
 			setRoot(string1.substring(0, string1.length() - 4));
 			setExt(string1.substring(string1.length() - 4, string1.length()));
 		}
 	}
 
-
 	/**
-	 *  Sets the root of the FileSet object.
-	 *  i.e. the filename without extendsion.
-	 *
-	 * @param  string  The new root value
+	 * Sets the root of the FileSet object. i.e. the filename without
+	 * extendsion.
+	 * 
+	 * @param string
+	 *            The new root value
 	 */
-	public void setRoot(String string) {
+	public void setRoot(final String string) {
 		node.setAttribute("root", string, "");
 	}
 
-
 	/**
-	 *  Sets the dir in which this fileset can be found
-	 *
-	 * @param  string  The new dir value
+	 * Sets the dir in which this fileset can be found
+	 * 
+	 * @param string
+	 *            The new dir value
 	 */
-	public void setDir(String string) {
+	public void setDir(final String string) {
 		node.setAttribute("dir", string, "");
 	}
 
-
 	/**
-	 *  Sets the extension associated with the base of the fileset.
-	 *
-	 * @param  string  The new ext value
+	 * Sets the extension associated with the base of the fileset.
+	 * 
+	 * @param string
+	 *            The new ext value
 	 */
-	public void setExt(String string) {
+	public void setExt(final String string) {
 		node.setAttribute("cdt", string, ".cdt");
 	}
-	
-		/**
-	 * @return    The logical name of the fileset 
+
+	/**
+	 * @return The logical name of the fileset
 	 */
-	public void setName(String string) {
+	public void setName(final String string) {
 		node.setAttribute("name", string, "No name");
 	}
 
-	/** 
-	* Used to display gene clusters for knn clustering
-	*/
-     public String getKgg() {
-       String filename = getRoot();
-       int postfix = filename.lastIndexOf("_K");
-       if (filename.indexOf("_G",postfix) == -1) return "";
-       int arrayid = filename.indexOf("_A",postfix);
-       if (arrayid!=-1) {
-           filename = filename.substring(0,arrayid);
-       }
-       return getDir() + filename + node.getAttribute("kgg", ".kgg");
-     }
- 
 	/**
-	* Used to display array clusters for knn clustering
-	*/
-     public String getKag() {
-       String filename = getRoot();
-       int postfix = filename.lastIndexOf("_K");
-       int arrayid = filename.indexOf("_A");
-       if (arrayid == -1) return "";
-       int geneid = filename.indexOf("_G",postfix);
-       if (geneid!=-1) {
-           filename = filename.substring(0,geneid)+filename.substring(arrayid);
-       }
-       return getDir() + filename + node.getAttribute("kag", ".kag");
-     }
- 
- 
- // the following concerns types which you can open as...
- 	public static final int AUTO_STYLE    = 0;
- 	public static final int CLASSIC_STYLE = 1;
- 	public static final int KMEANS_STYLE  = 2;
- 	public static final int LINKED_STYLE  = 3;
+	 * Used to display gene clusters for knn clustering
+	 */
+	public String getKgg() {
+		String filename = getRoot();
+		final int postfix = filename.lastIndexOf("_K");
+		if (filename.indexOf("_G", postfix) == -1)
+			return "";
+		final int arrayid = filename.indexOf("_A", postfix);
+		if (arrayid != -1) {
+			filename = filename.substring(0, arrayid);
+		}
+		return getDir() + filename + node.getAttribute("kgg", ".kgg");
+	}
+
+	/**
+	 * Used to display array clusters for knn clustering
+	 */
+	public String getKag() {
+		String filename = getRoot();
+		final int postfix = filename.lastIndexOf("_K");
+		final int arrayid = filename.indexOf("_A");
+		if (arrayid == -1)
+			return "";
+		final int geneid = filename.indexOf("_G", postfix);
+		if (geneid != -1) {
+			filename = filename.substring(0, geneid)
+					+ filename.substring(arrayid);
+		}
+		return getDir() + filename + node.getAttribute("kag", ".kag");
+	}
+
+	// the following concerns types which you can open as...
+	public static final int AUTO_STYLE = 0;
+	public static final int CLASSIC_STYLE = 1;
+	public static final int KMEANS_STYLE = 2;
+	public static final int LINKED_STYLE = 3;
 	private static final String validStyles = "auto|classic|kmeans|linked";
-	private static final String [] validStylesArray = {"Auto", "Classic", 
-		"Kmeans", "Linked"};
-	
-	
+	private static final String[] validStylesArray = { "Auto", "Classic",
+			"Kmeans", "Linked" };
+
 	/**
-	 *  returns string array of valid style names
+	 * returns string array of valid style names
 	 */
 	public static String[] getStyles() {
-	 return validStylesArray;
+		return validStylesArray;
 	}
-	
+
 	/**
 	 * 
-	 * @param i integer code for style
+	 * @param i
+	 *            integer code for style
 	 * @return string representing style, or null if code not found.
 	 */
-	public static String getStyleByIndex(int i) {
+	public static String getStyleByIndex(final int i) {
 		switch (i) {
 		case AUTO_STYLE:
 			return "auto";
@@ -320,27 +315,29 @@ public class FileSet {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * 
-	 * @param name string representation of style, one of validStyles
+	 * @param name
+	 *            string representation of style, one of validStyles
 	 * @return int representing style, or -1 if style not found.
 	 */
-	public static int getStyleByName(String name) {
- 		if (name.equalsIgnoreCase("auto")) {
- 			return AUTO_STYLE;
- 		} else if (name.equalsIgnoreCase("classic")) {
- 			return CLASSIC_STYLE;
- 		} else if (name.equalsIgnoreCase("kmeans")) {
- 			return KMEANS_STYLE;
- 		} else  if (name.equalsIgnoreCase("linked")) {
- 			return LINKED_STYLE;
- 		} else {
- 			JOptionPane.showMessageDialog(null, "Error: Invalid Style "+
- 					name+". Valid styles " + validStyles);
- 			return -1;
- 		}
- 	}
+	public static int getStyleByName(final String name) {
+		if (name.equalsIgnoreCase("auto")) {
+			return AUTO_STYLE;
+		} else if (name.equalsIgnoreCase("classic")) {
+			return CLASSIC_STYLE;
+		} else if (name.equalsIgnoreCase("kmeans")) {
+			return KMEANS_STYLE;
+		} else if (name.equalsIgnoreCase("linked")) {
+			return LINKED_STYLE;
+		} else {
+			JOptionPane.showMessageDialog(null, "Error: Invalid Style " + name
+					+ ". Valid styles " + validStyles);
+			return -1;
+		}
+	}
+
 	/**
 	 * 
 	 * @return does this fileset have a specified style?
@@ -348,52 +345,56 @@ public class FileSet {
 	public boolean hasStyle() {
 		return node.hasAttribute("style");
 	}
-	
+
 	public int getStyle() {
 		return node.getAttribute("style", AUTO_STYLE);
 	}
-	
-	public void setStyle(int newStyle) {
+
+	public void setStyle(final int newStyle) {
 		node.setAttribute("style", newStyle, AUTO_STYLE);
 	}
-	
-	public void setStyle(String newStyle) {
+
+	public void setStyle(final String newStyle) {
 		if (newStyle == null) {
-			JOptionPane.showMessageDialog(null, "Error: Invalid Style null. " +
-					"Valid styles " + validStyles);
+			JOptionPane.showMessageDialog(null, "Error: Invalid Style null. "
+					+ "Valid styles " + validStyles);
 		} else {
-			int style = getStyleByName(newStyle);
+			final int style = getStyleByName(newStyle);
 			if (style != -1) {
 				setStyle(style);
 			}
 		}
 	}
-	
+
 	// the following concerns whether quoted strings are parsed
 	public static final int PARSE_QUOTED = 1;
-	public void setParseQuotedStrings(boolean parseQuote) {
+
+	public void setParseQuotedStrings(final boolean parseQuote) {
 		if (parseQuote) {
 			node.setAttribute("quotes", 1, PARSE_QUOTED);
-		} else  {
+		} else {
 			node.setAttribute("quotes", 0, PARSE_QUOTED);
 		}
 	}
+
 	public boolean getParseQuotedStrings() {
 		return (node.getAttribute("quotes", PARSE_QUOTED) == 1);
 	}
-	
+
 	List<FileSetListener> fileSetListeners = new ArrayList<FileSetListener>();
-	public void addFileSetListener(FileSetListener listener) {
+
+	public void addFileSetListener(final FileSetListener listener) {
 		fileSetListeners.add(listener);
 	}
+
 	public void clearFileSetListeners() {
 		fileSetListeners.clear();
 	}
+
 	public void notifyMoved() {
-		for (FileSetListener listener : fileSetListeners) {
+		for (final FileSetListener listener : fileSetListeners) {
 			listener.onFileSetMoved(this);
 		}
 	}
-	
-}
 
+}

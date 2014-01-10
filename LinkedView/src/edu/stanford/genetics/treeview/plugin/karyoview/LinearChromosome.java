@@ -22,78 +22,88 @@
  */
 package edu.stanford.genetics.treeview.plugin.karyoview;
 
-
 class LinearChromosome extends Chromosome {
-	ChromosomeLocus [] leftArm;
-	ChromosomeLocus [] rightArm;
-	LinearChromosome(int nLeft, int nRight) {
-//		System.out.println("Linear chromosome (" + nLeft + ", " + nRight + ")");
+	ChromosomeLocus[] leftArm;
+	ChromosomeLocus[] rightArm;
+
+	LinearChromosome(final int nLeft, final int nRight) {
+		// System.out.println("Linear chromosome (" + nLeft + ", " + nRight +
+		// ")");
 		leftArm = new ChromosomeLocus[nLeft];
 		rightArm = new ChromosomeLocus[nRight];
 	}
+
 	@Override
-	public void insertLocus(ChromosomeLocus locus) {
+	public void insertLocus(final ChromosomeLocus locus) {
 		ChromosomeLocus rightLocus = null;
 		ChromosomeLocus leftLocus = null;
 		if (locus.getArm() == ChromosomeLocus.LEFT) {
-			int point = insertLocusIntoArray(leftArm, locus);
+			final int point = insertLocusIntoArray(leftArm, locus);
 			if (point == -1) {
-				System.out.println("could not fit locus on right arm which has length " + rightArm.length);
+				System.out
+						.println("could not fit locus on right arm which has length "
+								+ rightArm.length);
 			} else {
 				// find right...
 				if (point == 0) {
-					rightLocus = (rightArm.length == 0)? null: rightArm[0];
+					rightLocus = (rightArm.length == 0) ? null : rightArm[0];
 				} else {
-					rightLocus = leftArm[point-1];
+					rightLocus = leftArm[point - 1];
 				}
-				
-				//find left ...
-				if (point == leftArm.length-1) {
+
+				// find left ...
+				if (point == leftArm.length - 1) {
 					leftLocus = null;
 				} else {
-					leftLocus = leftArm[point+1];
+					leftLocus = leftArm[point + 1];
 				}
 			}
 		} else if (locus.getArm() == ChromosomeLocus.RIGHT) {
-			int point = insertLocusIntoArray(rightArm, locus);
+			final int point = insertLocusIntoArray(rightArm, locus);
 			if (point == -1) {
-				System.out.println("could not fit locus on right arm which has length " + rightArm.length + " which contains ");
+				System.out
+						.println("could not fit locus on right arm which has length "
+								+ rightArm.length + " which contains ");
 				for (int i = 0; i < rightArm.length; i++) {
 					System.out.println(rightArm[i].toString());
 				}
-				
+
 			} else {
 				// find left...
 				if (point == 0) {
-					leftLocus = (leftArm.length == 0)? null : leftArm[0];
+					leftLocus = (leftArm.length == 0) ? null : leftArm[0];
 				} else {
-					leftLocus = rightArm[point-1];
+					leftLocus = rightArm[point - 1];
 				}
-				
-				//find right ...
-				if (point == rightArm.length-1) {
+
+				// find right ...
+				if (point == rightArm.length - 1) {
 					rightLocus = null;
 				} else {
-					rightLocus = rightArm[point+1];
+					rightLocus = rightArm[point + 1];
 				}
 			}
 		}
 		locus.setLeft(leftLocus);
 		locus.setRight(rightLocus);
-		if (leftLocus != null) leftLocus.setRight(locus);
-		if (rightLocus != null) rightLocus.setLeft(locus);
+		if (leftLocus != null)
+			leftLocus.setRight(locus);
+		if (rightLocus != null)
+			rightLocus.setLeft(locus);
 
 	}
+
 	@Override
 	public double getMaxPosition() {
-		double leftMax = (leftArm.length == 0)? 0: 
-			leftArm[leftArm.length - 1].getPosition();
-		double rightMax = (rightArm.length == 0)? 0: 
-			rightArm[rightArm.length - 1].getPosition();
+		final double leftMax = (leftArm.length == 0) ? 0
+				: leftArm[leftArm.length - 1].getPosition();
+		final double rightMax = (rightArm.length == 0) ? 0
+				: rightArm[rightArm.length - 1].getPosition();
 		return (leftMax > rightMax) ? leftMax : rightMax;
 	}
+
 	@Override
-	public double getMaxPosition(int arm) {
+	public double getMaxPosition(final int arm) {
 		ChromosomeLocus end = null;
 		if (arm == ChromosomeLocus.LEFT) {
 			end = getLeftEnd();
@@ -102,19 +112,22 @@ class LinearChromosome extends Chromosome {
 		}
 		return (end == null) ? 0.0 : end.getPosition();
 	}
+
 	@Override
-	public ChromosomeLocus getClosestLocus(int arm, double position) {
+	public ChromosomeLocus getClosestLocus(final int arm, final double position) {
 		if (arm == ChromosomeLocus.LEFT) {
-			return getLocusRecursive(position, leftArm, 0, leftArm.length-1);
+			return getLocusRecursive(position, leftArm, 0, leftArm.length - 1);
 		} else if (arm == ChromosomeLocus.RIGHT) {
-			return getLocusRecursive(position, rightArm, 0, rightArm.length-1);
+			return getLocusRecursive(position, rightArm, 0, rightArm.length - 1);
 		}
 		return null;
 	}
+
 	@Override
 	public int getType() {
 		return Chromosome.LINEAR;
 	}
+
 	@Override
 	public ChromosomeLocus getLeftEnd() {
 		if (leftArm.length != 0) {
@@ -125,6 +138,7 @@ class LinearChromosome extends Chromosome {
 		}
 		return null;
 	}
+
 	@Override
 	public ChromosomeLocus getRightEnd() {
 		if (rightArm.length != 0) {
@@ -135,8 +149,9 @@ class LinearChromosome extends Chromosome {
 		}
 		return null;
 	}
+
 	@Override
-	public ChromosomeLocus getLocus(int arm, int index) {
+	public ChromosomeLocus getLocus(final int arm, final int index) {
 		if (arm == ChromosomeLocus.LEFT) {
 			return leftArm[index];
 		} else if (arm == ChromosomeLocus.RIGHT) {

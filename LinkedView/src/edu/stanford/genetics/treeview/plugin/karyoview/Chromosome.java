@@ -25,13 +25,14 @@ package edu.stanford.genetics.treeview.plugin.karyoview;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
-* represents the loci in just one chromosome...
-*/
+ * represents the loci in just one chromosome...
+ */
 abstract class Chromosome {
 	final public static int LINEAR = 1;
 	final public static int CIRCULAR = 1;
-	
+
 	abstract public ChromosomeLocus getLeftEnd();
+
 	abstract public ChromosomeLocus getRightEnd();
 
 	public boolean isEmpty() {
@@ -41,77 +42,90 @@ abstract class Chromosome {
 			return false;
 		}
 	}
+
 	abstract public int getType();
-	
+
 	abstract public double getMaxPosition();
+
 	abstract public double getMaxPosition(int arm);
+
 	abstract public ChromosomeLocus getClosestLocus(int arm, double position);
+
 	abstract public ChromosomeLocus getLocus(int arm, int index);
+
 	abstract public void insertLocus(ChromosomeLocus locus);
+
 	/**
-  * this internal routine is used to insert a locus into an array, maintaining the property that a
-  * locus with minimal position is at index 0, and that there is a non-decreasing position as the
-  * indexes increase. The array may include null values.
-  *
-  * @return the index inserted into or -1 on failure to insert.
-  */
-  protected int insertLocusIntoArray(ChromosomeLocus [] array, ChromosomeLocus locus) {
-//	System.out.println("Inserting " + locus.toString());
-	for (int point = 0; point < array.length; point++) {
-//	  System.out.print("Checking " + point + "... ");
-	  if (array[point] == null) {
-		// easy case, insert and return.
-//	  System.out.println("inserting");
-		
-		array[point] = locus;
- 		return point;
-	  }
-//	  System.out.print("Found " + array[point].toString());
-	  if (array[point].getPosition() > locus.getPosition()) {
-//		System.out.println(", decided to backtrack ");
-		// we need to push everyone up...
-		for (int j = array.length-1; j > point; j--) {
-///		  System.out.println("moving " + (j-1) + " to " + j);
-		  array[j] = array[j-1];
+	 * this internal routine is used to insert a locus into an array,
+	 * maintaining the property that a locus with minimal position is at index
+	 * 0, and that there is a non-decreasing position as the indexes increase.
+	 * The array may include null values.
+	 * 
+	 * @return the index inserted into or -1 on failure to insert.
+	 */
+	protected int insertLocusIntoArray(final ChromosomeLocus[] array,
+			final ChromosomeLocus locus) {
+		// System.out.println("Inserting " + locus.toString());
+		for (int point = 0; point < array.length; point++) {
+			// System.out.print("Checking " + point + "... ");
+			if (array[point] == null) {
+				// easy case, insert and return.
+				// System.out.println("inserting");
+
+				array[point] = locus;
+				return point;
+			}
+			// System.out.print("Found " + array[point].toString());
+			if (array[point].getPosition() > locus.getPosition()) {
+				// System.out.println(", decided to backtrack ");
+				// we need to push everyone up...
+				for (int j = array.length - 1; j > point; j--) {
+					// / System.out.println("moving " + (j-1) + " to " + j);
+					array[j] = array[j - 1];
+				}
+				array[point] = locus;
+				return point;
+			}
+			// System.out.println(", decided to continue ");
 		}
-		array[point] = locus;
-		return point;
-	  }
-//		System.out.println(", decided to continue ");
+		System.out.println(" array " + array);
+		LogBuffer
+				.println("Error in Genome.insertLocusIntoArray(): we weren't about to fit locus "
+						+ locus
+						+ " into data structure on account of not allocating enough space");
+		return -1;
 	}
-	System.out.println(" array " + array  ); 
-	LogBuffer.println("Error in Genome.insertLocusIntoArray(): we weren't about to fit locus " + locus + " into data structure on account of not allocating enough space");
-	return -1;
-  }
 
-  /**
-  * just bisect and recurse. Bottoms out when min == max....
-  */
-  
-  protected ChromosomeLocus getLocusRecursive(double position, ChromosomeLocus [] array, int min, int max) {
-//	System.out.println("Recursing " + min +" , " + max + " for " + position);
-	if (min  == max) {
-	//  System.out.println("bottomed out at "+min+"... ");
-	  return array[min]; // bottom out
+	/**
+	 * just bisect and recurse. Bottoms out when min == max....
+	 */
+
+	protected ChromosomeLocus getLocusRecursive(final double position,
+			final ChromosomeLocus[] array, final int min, final int max) {
+		// System.out.println("Recursing " + min +" , " + max + " for " +
+		// position);
+		if (min == max) {
+			// System.out.println("bottomed out at "+min+"... ");
+			return array[min]; // bottom out
+		}
+		final int midL = (max + min) / 2; // rightmost member of left interval
+		final int midR = midL + 1; // leftmost member of right interval.
+		if (array[midL].getPosition() > position) { // we're on the left for
+													// sure...
+			return getLocusRecursive(position, array, min, midL);
+		}
+		if (array[midR].getPosition() < position) { // we're on the right for
+													// sure...
+			return getLocusRecursive(position, array, midR, max);
+		}
+		// System.out.println("struck gold at "+midL+"... ");
+		// we've struck gold! We're between the midL and midR!
+		final double distL = Math.abs(array[midL].getPosition() - position);
+		final double distR = Math.abs(array[midR].getPosition() - position);
+		if (distL > distR) {
+			return array[midR];
+		} else {
+			return array[midL];
+		}
 	}
-	int midL = (max + min) /2; // rightmost member of left interval
-	int midR = midL + 1;       // leftmost member of right interval.
-	if (array[midL].getPosition() > position) { // we're on the left for sure...
-	  return getLocusRecursive(position, array, min, midL);
-	}
-	if (array[midR].getPosition() < position) { // we're on the right for sure...
-	  return getLocusRecursive(position, array, midR, max);
-	}
-//	  System.out.println("struck gold at "+midL+"... ");
-	// we've struck gold! We're between the midL and midR!
-	double distL = Math.abs(array[midL].getPosition() - position); 
-	double distR = Math.abs(array[midR].getPosition() - position); 
-	if (distL > distR) {
-	  return array[midR];
-	} else  {
-	  return array[midL];
-	}
-  }
 }
-
-

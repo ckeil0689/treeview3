@@ -22,41 +22,50 @@
  */
 package edu.stanford.genetics.treeview.plugin.scatterview;
 
-import edu.stanford.genetics.treeview.*;
+import edu.stanford.genetics.treeview.ConfigNode;
+
 class AxisInfo {
 	private ConfigNode configNode;
+
 	/** Setter for configNode */
-	public void setConfigNode(ConfigNode configNode) {
+	public void setConfigNode(final ConfigNode configNode) {
 		this.configNode = configNode;
 		initParameters();
 	}
+
 	/** Getter for configNode */
 	public ConfigNode getConfigNode() {
 		return configNode;
 	}
-	
+
 	private String title;
+
 	/** Setter for title */
-	public void setTitle(String title) {
+	public void setTitle(final String title) {
 		this.title = title;
 	}
+
 	/** Getter for title */
 	public String getTitle() {
 		return title;
 	}
-	
+
 	/**
-	* The type of this axis, either x or y.
-	*/
-	private String defaultType = "No Type";
+	 * The type of this axis, either x or y.
+	 */
+	private final String defaultType = "No Type";
+
 	public String getType() {
 		return configNode.getAttribute("type", defaultType);
 	}
-	public void setType(String type) {
+
+	public void setType(final String type) {
 		configNode.setAttribute("type", type, defaultType);
 	}
-	private AxisParameter [] axisParameters;
-	AxisInfo(ConfigNode config) {
+
+	private AxisParameter[] axisParameters;
+
+	AxisInfo(final ConfigNode config) {
 		setConfigNode(config);
 	}
 
@@ -67,28 +76,28 @@ class AxisInfo {
 			axisParameters[i] = null;
 		}
 		// copy over existing
-		ConfigNode [] existing = configNode.fetch("AxisParameter");
+		final ConfigNode[] existing = configNode.fetch("AxisParameter");
 		for (int i = 0; i < existing.length; i++) {
-			AxisParameter temp = new AxisParameter(existing[i]);
+			final AxisParameter temp = new AxisParameter(existing[i]);
 			axisParameters[temp.getType()] = temp;
 		}
 		// fill in blanks...
 		for (int i = 0; i < axisParameters.length; i++) {
 			if (axisParameters[i] == null) {
-				ConfigNode newNode = configNode.create("AxisParameter");
+				final ConfigNode newNode = configNode.create("AxisParameter");
 				axisParameters[i] = new AxisParameter(newNode);
 				axisParameters[i].setType(i);
 			}
 		}
 	}
 
-	public AxisParameter getAxisParameter(int type) {
+	public AxisParameter getAxisParameter(final int type) {
 		return axisParameters[type];
 	}
-	
-	public void copyStateFrom(AxisInfo other) {
+
+	public void copyStateFrom(final AxisInfo other) {
 		setType(other.getType());
-		for (int i =0; i < axisParameters.length; i++) {
+		for (int i = 0; i < axisParameters.length; i++) {
 			axisParameters[i].copyStateFrom(other.getAxisParameter(i));
 		}
 	}

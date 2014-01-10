@@ -22,45 +22,51 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Component;
+import java.awt.Dialog;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Panel;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 abstract class MapSelector extends Panel implements ActionListener {
 
-    private Dialog d;
+	private Dialog d;
 
-    public MapSelector(MapContainer mapContainer)
-    {
-        setupWidgets();
-    }
+	public MapSelector(final MapContainer mapContainer) {
+		setupWidgets();
+	}
 
+	abstract protected void setupWidgets();
 
+	abstract protected String getTitle();
 
-    abstract protected void setupWidgets();
-    abstract protected String getTitle();
-    
-    public void showDialog(Frame f) {
-	d = new Dialog(f, getTitle());
-	d.add(this);
-	d.addWindowListener(new WindowAdapter() {
-		@Override
-		public void windowClosing(WindowEvent we) {d.dispose();}
-	    });
-	d.pack();
-	d.setVisible(true);
-    }
-    
-    GridBagConstraints
-	place(GridBagLayout gbl, Component comp,
-	      int x, int y, int width, int anchor) {
-	
-	GridBagConstraints gbc = new GridBagConstraints();
-	gbc.gridx = x;
-	gbc.gridy = y;
-	gbc.gridwidth = width;
-	gbc.anchor = anchor;
-	gbc.fill = GridBagConstraints.BOTH;
-	gbl.setConstraints(comp, gbc);
-	return gbc;
-    }
+	public void showDialog(final Frame f) {
+		d = new Dialog(f, getTitle());
+		d.add(this);
+		d.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(final WindowEvent we) {
+				d.dispose();
+			}
+		});
+		d.pack();
+		d.setVisible(true);
+	}
+
+	GridBagConstraints place(final GridBagLayout gbl, final Component comp,
+			final int x, final int y, final int width, final int anchor) {
+
+		final GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = x;
+		gbc.gridy = y;
+		gbc.gridwidth = width;
+		gbc.anchor = anchor;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbl.setConstraints(comp, gbc);
+		return gbc;
+	}
 }

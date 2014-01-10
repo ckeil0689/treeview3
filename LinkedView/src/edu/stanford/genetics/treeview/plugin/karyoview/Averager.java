@@ -22,55 +22,62 @@
  */
 package edu.stanford.genetics.treeview.plugin.karyoview;
 
-import edu.stanford.genetics.treeview.*;
+import edu.stanford.genetics.treeview.ConfigNode;
+import edu.stanford.genetics.treeview.DummyConfigNode;
 
 /**
-* this base class doesn't actually average. All other methods should subclass.
-*/
+ * this base class doesn't actually average. All other methods should subclass.
+ */
 class Averager {
 	public final static int SIMPLE = 0;
 	public final static int NEAREST = 1;
 	public final static int NEIGHBOR = 2;
 	public final static int INTERVAL = 3;
-	
+
 	protected KaryoView karyoView;
+
 	/** Setter for karyoView */
-	public void setKaryoView(KaryoView karyoView) {
+	public void setKaryoView(final KaryoView karyoView) {
 		this.karyoView = karyoView;
 	}
+
 	/** Getter for karyoView */
 	public KaryoView getKaryoView() {
 		return karyoView;
 	}
-	
-	  private ConfigNode configNode = new DummyConfigNode("Averager");
-	  /** Setter for configNode */
-	  public void bindConfig(ConfigNode configNode) {
-		  this.configNode = configNode;
-	  }
-	  /** Getter for configNode */
-	  public ConfigNode getConfigNode() {
-		  return configNode;
-	  }
 
-	
-	
-	protected String [] message = new String [2];
-	public String[] getDescription(ChromosomeLocus locus, int col) {
-		int row = locus.getCdtIndex();
-		message[0] = "Gene " + getKaryoView().getGeneInfo().getHeader(row, "YORF");
+	private ConfigNode configNode = new DummyConfigNode("Averager");
+
+	/** Setter for configNode */
+	public void bindConfig(final ConfigNode configNode) {
+		this.configNode = configNode;
+	}
+
+	/** Getter for configNode */
+	public ConfigNode getConfigNode() {
+		return configNode;
+	}
+
+	protected String[] message = new String[2];
+
+	public String[] getDescription(final ChromosomeLocus locus, final int col) {
+		final int row = locus.getCdtIndex();
+		message[0] = "Gene "
+				+ getKaryoView().getGeneInfo().getHeader(row, "YORF");
 		message[1] = "No averaging";
 		return message;
 	}
-	public double getValue(ChromosomeLocus locus,int col) {
-		int row = locus.getCdtIndex();
+
+	public double getValue(final ChromosomeLocus locus, final int col) {
+		final int row = locus.getCdtIndex();
 		return karyoView.getDataMatrix().getValue(col, row);
 	}
+
 	public int getType() {
 		return Averager.SIMPLE;
 	}
+
 	public String getArg() {
 		return null;
 	}
 }
-

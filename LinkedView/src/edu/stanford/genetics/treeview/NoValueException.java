@@ -22,13 +22,13 @@
  */
 package edu.stanford.genetics.treeview;
 
-
-public class NoValueException extends Exception {// when no value can be returned...
+public class NoValueException extends Exception {// when no value can be
+													// returned...
 
 	private static final long serialVersionUID = 1L;
 
-	public NoValueException(String s) {
-		
+	public NoValueException(final String s) {
+
 		super(s);
-    }
+	}
 }

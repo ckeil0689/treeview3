@@ -27,15 +27,19 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import javax.swing.*;
-
-import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
+
+import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.HeaderInfo;
@@ -43,234 +47,238 @@ import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.ViewFrame;
 
 /**
- * This class allows users to look for row or column elements by choosing
- * them in a drop down menu. The menu is populated with headers from the 
- * loaded data matrix. The class is abstract and a basis for the GeneFinderPanel
- * class as well as the ArrayFinderPanel class. 
+ * This class allows users to look for row or column elements by choosing them
+ * in a drop down menu. The menu is populated with headers from the loaded data
+ * matrix. The class is abstract and a basis for the GeneFinderPanel class as
+ * well as the ArrayFinderPanel class.
  * 
  * It extends JPanel and can be used as a Swing component.
- *
+ * 
  */
 public abstract class HeaderFinderPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private static Font fontS = new Font("Sans Serif", Font.PLAIN, 18);
-	
+
 	protected TreeSelectionI geneSelection;
 	protected ViewFrame viewFrame;
-	
-    private HeaderInfo headerInfo;
-    private int choices[];
-    private int nchoices = 0;
-	
-	private JLabel genef;
-	private ArrayList<String> geneList;
-	private String[] genefHeaders = {""};
-	private String type;
-	private JComboBox genefBox;
-	private JButton genefButton;
-	
-	//"Search Gene Text for Substring"
-	public HeaderFinderPanel(ViewFrame f, HeaderInfo hI, 
-			TreeSelectionI geneSelection, String type) {
-		
+
+	private final HeaderInfo headerInfo;
+	private final int choices[];
+	private int nchoices = 0;
+
+	private final JLabel genef;
+	private final ArrayList<String> geneList;
+	private String[] genefHeaders = { "" };
+	private final String type;
+	private final JComboBox genefBox;
+	private final JButton genefButton;
+
+	// "Search Gene Text for Substring"
+	public HeaderFinderPanel(final ViewFrame f, final HeaderInfo hI,
+			final TreeSelectionI geneSelection, final String type) {
+
 		this((Frame) f, hI, geneSelection, type);
 		this.viewFrame = f;
 	}
-	
-	private HeaderFinderPanel(Frame f, HeaderInfo hI, 
-			final TreeSelectionI geneSelection, String type) {
-	
+
+	private HeaderFinderPanel(final Frame f, final HeaderInfo hI,
+			final TreeSelectionI geneSelection, final String type) {
+
 		super();
 		this.viewFrame = null;
 		this.headerInfo = hI;
 		this.geneSelection = geneSelection;
 		this.type = type;
-		this.choices = new int[hI.getNumHeaders()]; // could be wasteful of ram...
-	
+		this.choices = new int[hI.getNumHeaders()]; // could be wasteful of
+													// ram...
+
 		this.setLayout(new MigLayout());
 		this.setOpaque(false);
-		
-		String[][] hA = headerInfo.getHeaderArray();
-		
+
+		final String[][] hA = headerInfo.getHeaderArray();
+
 		genef = new JLabel("Find " + type + " Element: ");
 		genef.setForeground(GUIParams.TEXT);
 		genef.setFont(fontS);
-		
+
 		geneList = new ArrayList<String>();
 		genefHeaders = getGenes(hA);
-		
-		for(String gene : genefHeaders) {
-			
+
+		for (final String gene : genefHeaders) {
+
 			geneList.add(gene);
 		}
-		
+
 		Arrays.sort(genefHeaders);
 		genefBox = setComboLayout(genefHeaders);
 		genefButton = setButtonLayout("Go!");
-		genefButton.addActionListener(new ActionListener(){
-			
-		    @Override
-			public void actionPerformed(ActionEvent e) {
-			
-		    	String gene = genefBox.getSelectedItem().toString();
-		    	findGenes(gene);
-		    	seekAll();
-		    }
+		genefButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+
+				final String gene = genefBox.getSelectedItem().toString();
+				findGenes(gene);
+				seekAll();
+			}
 		});
-		
+
 		this.add(genef, "pushx, span, wrap");
 		this.add(genefBox, "pushx, width 70%");
 		this.add(genefButton, "pushx, width 20%, wrap");
-    }
-	
+	}
+
 	/**
-	 * Extracts the header infos into a String array, so the array can
-	 * fill the comboBox with values to choose from.
+	 * Extracts the header infos into a String array, so the array can fill the
+	 * comboBox with values to choose from.
+	 * 
 	 * @param hA
 	 * @return
 	 */
-	public String[] getGenes(String[][] hA) {
-		
-		String[] geneArray = new String[hA.length];
+	public String[] getGenes(final String[][] hA) {
+
+		final String[] geneArray = new String[hA.length];
 		int idIndex = 0;
-		
-		if(type.equalsIgnoreCase("Row")){
-			if(headerInfo.getIndex("ORF") != -1) {
+
+		if (type.equalsIgnoreCase("Row")) {
+			if (headerInfo.getIndex("ORF") != -1) {
 				idIndex = headerInfo.getIndex("ORF");
 			}
 		} else {
-			if(headerInfo.getIndex("GID") != -1) {
+			if (headerInfo.getIndex("GID") != -1) {
 				idIndex = headerInfo.getIndex("GID");
-				
+
 			} else {
-				if(headerInfo.getIndex("ORF") != -1) {
+				if (headerInfo.getIndex("ORF") != -1) {
 					idIndex = headerInfo.getIndex("ORF");
 				}
 			}
 		}
-		
-		for(int i = 0; i < hA.length; i++) {
-			
-			String yorf = hA[i][idIndex];
+
+		for (int i = 0; i < hA.length; i++) {
+
+			final String yorf = hA[i][idIndex];
 			geneArray[i] = yorf;
 		}
-		
+
 		return geneArray;
 	}
-	
+
 	/**
-	 * Setting up a general layout for a button object
-	 * The method is used to make all buttons appear consistent in aesthetics
+	 * Setting up a general layout for a button object The method is used to
+	 * make all buttons appear consistent in aesthetics
+	 * 
 	 * @param button
 	 * @return
 	 */
-	public JButton setButtonLayout(String title){
-		
-		Font buttonFont = new Font("Sans Serif", Font.PLAIN, 14);
-		
-		JButton button = new JButton(title);
-  		Dimension d = button.getPreferredSize();
-  		d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
-  		button.setPreferredSize(d);
-  		
-  		button.setFont(buttonFont);
-  		button.setOpaque(true);
-  		button.setBackground(GUIParams.ELEMENT);
-  		button.setForeground(GUIParams.BG_COLOR);
-  		
-  		return button;
+	public JButton setButtonLayout(final String title) {
+
+		final Font buttonFont = new Font("Sans Serif", Font.PLAIN, 14);
+
+		final JButton button = new JButton(title);
+		final Dimension d = button.getPreferredSize();
+		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
+		button.setPreferredSize(d);
+
+		button.setFont(buttonFont);
+		button.setOpaque(true);
+		button.setBackground(GUIParams.ELEMENT);
+		button.setForeground(GUIParams.BG_COLOR);
+
+		return button;
 	}
-	
+
 	/**
-	 * Setting up a general layout for a ComboBox object
-	 * The method is used to make all ComboBoxes appear consistent in aesthetics
+	 * Setting up a general layout for a ComboBox object The method is used to
+	 * make all ComboBoxes appear consistent in aesthetics
+	 * 
 	 * @param combo
 	 * @return
 	 */
-	public JComboBox setComboLayout(String[] combos){
-		
-		JComboBox comboBox = new JComboBox(combos);
-		Dimension d = comboBox.getPreferredSize();
+	public JComboBox setComboLayout(final String[] combos) {
+
+		final JComboBox comboBox = new JComboBox(combos);
+		final Dimension d = comboBox.getPreferredSize();
 		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
 		comboBox.setPreferredSize(d);
 		comboBox.setFont(fontS);
 		comboBox.setBackground(Color.white);
 		comboBox.setEditable(true);
-		
+
 		AutoCompleteDecorator.decorate(comboBox);
-		
+
 		return comboBox;
 	}
-	
+
 	public void seekAll() {
-		
-		int [] selected = {0};
+
+		final int[] selected = { 0 };
 		geneSelection.setSelectedNode(null);
 		geneSelection.deselectAllIndexes();
-		
+
 		int geneIndex = 0;
-		geneIndex = geneList.indexOf((String)genefBox.getSelectedItem());
+		geneIndex = geneList.indexOf(genefBox.getSelectedItem());
 		geneSelection.setIndex(geneIndex, true);
-		
+
 		geneSelection.notifyObservers();
-		
+
 		if ((viewFrame != null) && (selected.length > 0)) {
-			scrollToIndex(choices[selected[0]]);		
+			scrollToIndex(choices[selected[0]]);
 		}
 	}
-	
-    private void findGenes(String sub) {
-		
-    	nchoices = 0;
-		
-		int jmax = headerInfo.getNumHeaders();
+
+	private void findGenes(final String sub) {
+
+		nchoices = 0;
+
+		final int jmax = headerInfo.getNumHeaders();
 		for (int j = 0; j < jmax; j++) {
-			
-			String[] strings = headerInfo.getHeader(j);
+
+			final String[] strings = headerInfo.getHeader(j);
 			if (strings == null) {
 				continue;
 			}
-			
+
 			boolean match = false;
 			for (int i = 0; i < strings.length; i++) {
 				if (strings[i] == null) {
 					continue;
 				}
-				
+
 				String cand;
 				cand = strings[i].toUpperCase();
-				
+
 				if (cand.indexOf(sub) >= 0) {
 					match = true;
 					break;
 				}
 			}
-			
+
 			if (match) {
 				selectGene(j);
 			}
 		}
 	}
 
-	private void selectGene(int j) {
-		
-//		String [] strings = headerInfo.getHeader(j);
-//		String id = "";
-//		for (int i = 1; i < strings.length; i++) {		    
-//			if (strings[i] != null) {
-//				id += strings[i] + "; ";
-//			}
-//		}
-//		
-//		if (strings[0] != null) {
-//			id += strings[0] + "; ";
-//		}
-		
+	private void selectGene(final int j) {
+
+		// String [] strings = headerInfo.getHeader(j);
+		// String id = "";
+		// for (int i = 1; i < strings.length; i++) {
+		// if (strings[i] != null) {
+		// id += strings[i] + "; ";
+		// }
+		// }
+		//
+		// if (strings[0] != null) {
+		// id += strings[0] + "; ";
+		// }
+
 		choices[nchoices++] = j;
 	}
-  
+
 	abstract public void scrollToIndex(int i);
 
 }

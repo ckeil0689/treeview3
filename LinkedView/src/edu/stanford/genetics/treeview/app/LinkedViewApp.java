@@ -20,6 +20,7 @@
  *
  * END_HEADER */
 package edu.stanford.genetics.treeview.app;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -27,7 +28,6 @@ import java.net.URL;
 
 import javax.swing.JOptionPane;
 
-//import edu.stanford.genetics.treeview.ConfigNode;
 import edu.stanford.genetics.treeview.ExportException;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LinkedViewFrame;
@@ -41,115 +41,115 @@ import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.XmlConfig;
 import edu.stanford.genetics.treeview.core.PluginManager;
 
+//import edu.stanford.genetics.treeview.ConfigNode;
 
 /**
- * Main class of LinkedView application. 
- * Mostly manages windows, and communication between windows, 
- * as well as communication between them.
- *
- * There are two differences between this class and the TreeViewApp
- * - which <code>ViewFrame</code> they use. 
- *   <code>LinkedViewApp</code> uses <code>LinkedViewFrame</code>.
- *   
+ * Main class of LinkedView application. Mostly manages windows, and
+ * communication between windows, as well as communication between them.
+ * 
+ * There are two differences between this class and the TreeViewApp - which
+ * <code>ViewFrame</code> they use. <code>LinkedViewApp</code> uses
+ * <code>LinkedViewFrame</code>.
+ * 
  * - LinkedViewApp scans for plugins explicitly, TreeViewApp doesn't anymore
  * 
- * @author     Alok Saldanha <alok@genome.stanford.edu>
- * @version    $Revision: 1.34 $ $Date: 2010-05-02 13:55:11 $
+ * @author Alok Saldanha <alok@genome.stanford.edu>
+ * @version $Revision: 1.34 $ $Date: 2010-05-02 13:55:11 $
  */
 public class LinkedViewApp extends TreeViewApp {
-	
+
 	private MainProgramArgs args;
 	private URL codeBase = null;
-	
-	/**  Constructor for the LinkedViewApp object */
-	//"edu.stanford.genetics.treeview.plugin.scatterview.ScatterplotFactory"
-	//"edu.stanford.genetics.treeview.plugin.treeanno.GeneAnnoFactory",
-	//"edu.stanford.genetics.treeview.plugin.treeanno.ArrayAnnoFactory"
-	//"edu.stanford.genetics.treeview.plugin.karyoview.KaryoscopeFactory"
+
+	/** Constructor for the LinkedViewApp object */
+	// "edu.stanford.genetics.treeview.plugin.scatterview.ScatterplotFactory"
+	// "edu.stanford.genetics.treeview.plugin.treeanno.GeneAnnoFactory",
+	// "edu.stanford.genetics.treeview.plugin.treeanno.ArrayAnnoFactory"
+	// "edu.stanford.genetics.treeview.plugin.karyoview.KaryoscopeFactory"
 	public LinkedViewApp() {
-		
+
 		super();// does not call XmlConfig constructor
 		scanForPlugins();
 	}
-	
+
 	/**
-	* Constructor for the TreeViewApp object
-	* takes configuration from the passed in XmlConfig.
-	*/
-	public LinkedViewApp(XmlConfig xmlConfig) {
-		
+	 * Constructor for the TreeViewApp object takes configuration from the
+	 * passed in XmlConfig.
+	 */
+	public LinkedViewApp(final XmlConfig xmlConfig) {
+
 		super(xmlConfig, false);
 		scanForPlugins();
 	}
-	
+
 	private void scanForPlugins() {
-		
-		URL fileURL = getCodeBase();
+
+		final URL fileURL = getCodeBase();
 		String dir = Util.URLtoFilePath(fileURL.getPath() + "/plugins");
 		File[] files = PluginManager.getPluginManager().readdir(dir);
 		if (files == null) {
-			LogBuffer.println("Directory "+dir+" returned null");
-			File f_currdir = new File(".");
+			LogBuffer.println("Directory " + dir + " returned null");
+			final File f_currdir = new File(".");
 			try {
-				dir = f_currdir.getCanonicalPath() + File.separator  
-						+ "plugins" + File.separator;
-				LogBuffer.println("failing over to "+dir);
+				dir = f_currdir.getCanonicalPath() + File.separator + "plugins"
+						+ File.separator;
+				LogBuffer.println("failing over to " + dir);
 				files = PluginManager.getPluginManager().readdir(dir);
 				if (files != null) {
 					setCodeBase(f_currdir.toURI().toURL());
 				}
-			} catch (IOException e1) {
+			} catch (final IOException e1) {
 				// this might happen when the dir is bad.
 				e1.printStackTrace();
 			}
 		}
 		if (files == null || files.length == 0) {
-			LogBuffer.println("Directory "+dir+" contains no plugins");
-			
+			LogBuffer.println("Directory " + dir + " contains no plugins");
+
 		} else {
 			PluginManager.getPluginManager().loadPlugins(files, false);
 		}
 		PluginManager.getPluginManager().pluginAssignConfigNodes(
 				getGlobalConfig().getNode("Plugins"));
 	}
-	
-//	private void dealWithRegistration() {
-//		
-//		ConfigNode node = getGlobalConfig().getNode("Registration");
-//		if (node != null) {
-//			try {
-//				edu.stanford.genetics.treeview.reg.RegEngine.verify(node);
-//				getGlobalConfig().store();
-//				
-//			} catch (Exception e) {
-//				JOptionPane.showMessageDialog(null, "registration error "+e);
-//				LogBuffer.println("registration error "+e);
-//				e.printStackTrace();
-//			}
-//		}		
-//	}
-	
+
+	// private void dealWithRegistration() {
+	//
+	// ConfigNode node = getGlobalConfig().getNode("Registration");
+	// if (node != null) {
+	// try {
+	// edu.stanford.genetics.treeview.reg.RegEngine.verify(node);
+	// getGlobalConfig().store();
+	//
+	// } catch (Exception e) {
+	// JOptionPane.showMessageDialog(null, "registration error "+e);
+	// LogBuffer.println("registration error "+e);
+	// e.printStackTrace();
+	// }
+	// }
+	// }
+
 	/* inherit description */
 	@Override
 	public ViewFrame openNew() {
-		
+
 		// setup toplevel
-		LinkedViewFrame tvFrame = new LinkedViewFrame(this);
+		final LinkedViewFrame tvFrame = new LinkedViewFrame(this);
 		tvFrame.addWindowListener(this);
 		return tvFrame;
 	}
 
 	/* inherit description */
 	@Override
-	public ViewFrame openNew(FileSet fileSet) throws LoadException {
-		
+	public ViewFrame openNew(final FileSet fileSet) throws LoadException {
+
 		// setup toplevel
-		LinkedViewFrame tvFrame = new LinkedViewFrame(this);
+		final LinkedViewFrame tvFrame = new LinkedViewFrame(this);
 		try {
 			tvFrame.loadFileSet(fileSet);
 			tvFrame.setLoaded(true);
-			
-		} catch (LoadException e) {
+
+		} catch (final LoadException e) {
 			tvFrame.dispose();
 			throw e;
 		}
@@ -159,19 +159,19 @@ public class LinkedViewApp extends TreeViewApp {
 	}
 
 	/**
-	* same as above, but doesn't open a loading window (damn deadlocks!)
-	*/
+	 * same as above, but doesn't open a loading window (damn deadlocks!)
+	 */
 	@Override
-	public ViewFrame openNewNW(FileSet fileSet) throws LoadException {
-		
+	public ViewFrame openNewNW(final FileSet fileSet) throws LoadException {
+
 		// setup toplevel
-		LinkedViewFrame tvFrame = new LinkedViewFrame(this);
+		final LinkedViewFrame tvFrame = new LinkedViewFrame(this);
 		if (fileSet != null) {
 			try {
 				tvFrame.loadFileSetNW(fileSet);
 				tvFrame.setLoaded(true);
-				
-			} catch (LoadException e) {
+
+			} catch (final LoadException e) {
 				tvFrame.dispose();
 				throw e;
 			}
@@ -179,12 +179,12 @@ public class LinkedViewApp extends TreeViewApp {
 		tvFrame.addWindowListener(this);
 		return tvFrame;
 	}
-	
-	protected void standardStartup(String astring[]) {
-		
+
+	protected void standardStartup(final String astring[]) {
+
 		args = new MainProgramArgs(astring);
 		final String sFilePath = args.getFilePath();
-		
+
 		// setup toplevel
 		if (sFilePath != null) {
 			final String frameType = args.getFrameType();
@@ -192,24 +192,24 @@ public class LinkedViewApp extends TreeViewApp {
 
 			FileSet fileSet;
 			if (sFilePath.startsWith("http://")) {
-				fileSet = new FileSet(sFilePath,"");
-				
+				fileSet = new FileSet(sFilePath, "");
+
 			} else {
-				File file = new File(sFilePath);
-				fileSet = new FileSet(file.getName(), file.getParent() 
+				final File file = new File(sFilePath);
+				fileSet = new FileSet(file.getName(), file.getParent()
 						+ File.separator);
 			}
 			fileSet.setStyle(frameType);
 
 			try {
-				ViewFrame tvFrame = openNewNW(fileSet);
+				final ViewFrame tvFrame = openNewNW(fileSet);
 				tvFrame.setVisible(true);
 				// tvFrame.loadNW(fileSet);
 				if (exportType != null) {
 					try {
 						attemptExport(exportType, tvFrame);
-						
-					} catch (ExportException e) {
+
+					} catch (final ExportException e) {
 						System.err.println(e.getMessage());
 						e.printStackTrace(System.err);
 					}
@@ -217,84 +217,87 @@ public class LinkedViewApp extends TreeViewApp {
 					endProgram();
 					return;
 				}
-			} catch (LoadException e) {
+			} catch (final LoadException e) {
 				e.printStackTrace();
 			}
 		} else {
 			if (args.getExportType() == null) {
 				openNew().setVisible(true);
 			} else {
-				System.err.println("Must specify file/url to load " +
-						"(using -r) when specifying export with -x");
+				System.err.println("Must specify file/url to load "
+						+ "(using -r) when specifying export with -x");
 			}
 		}
 	}
-	
-	private boolean attemptExport(final String exportType, ViewFrame tvFrame) 
-			throws ExportException {
-		
-		for (MainPanel mainPanel :tvFrame.getMainPanels()) {
+
+	private boolean attemptExport(final String exportType,
+			final ViewFrame tvFrame) throws ExportException {
+
+		for (final MainPanel mainPanel : tvFrame.getMainPanels()) {
 			if (exportType.equalsIgnoreCase(mainPanel.getName())) {
 				mainPanel.export(args);
 				return true;
 			}
 		}
-		System.err.println("Error exporting, could not find plugin of type " 
-		+ exportType);
+		System.err.println("Error exporting, could not find plugin of type "
+				+ exportType);
 		return false;
 	}
-	
-	/**
-	 *  Main method for TreeView application.
-	 *
-	 * Usage: java -jar treeview.jar -r <my cdt> -t [auto|classic|kmeans|linked].
-	 *
-	 * uses auto by default.
-	 *
-	 * @param  astring  Standard argument string.
-	 */
-	public static void main(String astring[]) {
 
-		LinkedViewApp statView = new LinkedViewApp();
-		//statView.dealWithRegistration();
-		
+	/**
+	 * Main method for TreeView application.
+	 * 
+	 * Usage: java -jar treeview.jar -r <my cdt> -t
+	 * [auto|classic|kmeans|linked].
+	 * 
+	 * uses auto by default.
+	 * 
+	 * @param astring
+	 *            Standard argument string.
+	 */
+	public static void main(final String astring[]) {
+
+		final LinkedViewApp statView = new LinkedViewApp();
+		// statView.dealWithRegistration();
+
 		// setup toplevel
 		statView.standardStartup(astring);
 	}
-	
-	private void setCodeBase(URL url) {
-		
+
+	private void setCodeBase(final URL url) {
+
 		codeBase = url;
 	}
 
 	/**
-	 * sometimes the location of the jar is not the location where
-	 * the plugins and coordiates can be found. This is particularly
-	 * the case with mac os X.I have added detection code in 
-	 * scanForPlugins that detects this and updates the codebase so 
-	 * that the coordinates settings will be done correctly.
+	 * sometimes the location of the jar is not the location where the plugins
+	 * and coordiates can be found. This is particularly the case with mac os
+	 * X.I have added detection code in scanForPlugins that detects this and
+	 * updates the codebase so that the coordinates settings will be done
+	 * correctly.
 	 */
 	@Override
 	public URL getCodeBase() {
-		
+
 		if (codeBase != null) {
 			return codeBase;
 		}
 		try {
 			// from http://weblogs.java.net/blog/ljnelson/archive/2004/09/
-			//cheap_hack_i_re.html
+			// cheap_hack_i_re.html
 			URL location;
-			String classLocation = LinkedViewApp.class.getName().replace('.', 
-					'/') + ".class";
-			
-			ClassLoader loader = LinkedViewApp.class.getClassLoader();
+			final String classLocation = LinkedViewApp.class.getName().replace(
+					'.', '/')
+					+ ".class";
+
+			final ClassLoader loader = LinkedViewApp.class.getClassLoader();
 			if (loader == null) {
 				location = ClassLoader.getSystemResource(classLocation);
-				
+
 			} else {
 				location = loader.getResource(classLocation);
 			}
-			
+
 			String token = null;
 			if (location != null && "jar".equals(location.getProtocol())) {
 				String urlString = location.toString();
@@ -304,7 +307,8 @@ public class LinkedViewApp extends TreeViewApp {
 						urlString = urlString.substring("jar:".length(),
 								lastBangIndex);
 						if (urlString != null) {
-							int lastSlashIndex = urlString.lastIndexOf("/");
+							final int lastSlashIndex = urlString
+									.lastIndexOf("/");
 							if (lastSlashIndex >= 0) {
 								token = urlString.substring(0, lastSlashIndex);
 							}
@@ -312,23 +316,23 @@ public class LinkedViewApp extends TreeViewApp {
 					}
 				}
 			}
-			
+
 			if (token == null) {
 				return (new File(".")).toURI().toURL();
-				
+
 			} else {
 				return new URL(token);
 			}
-		} catch (MalformedURLException e) {
+		} catch (final MalformedURLException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, e);
 			return null;
 		}
 	}
-	
+
 	@Override
 	protected void endProgram() {
-		
+
 		if (getGlobalConfig() != null) {
 			getGlobalConfig().store();
 		}
@@ -336,4 +340,3 @@ public class LinkedViewApp extends TreeViewApp {
 		System.exit(0);
 	}
 }
-

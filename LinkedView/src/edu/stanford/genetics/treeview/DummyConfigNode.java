@@ -22,46 +22,48 @@
  */
 package edu.stanford.genetics.treeview;
 
+import java.util.Hashtable;
+import java.util.Vector;
 
-import java.util.*;
 // vector
 
 /**
- *  This interface defines a ConfigNode without persistence...
- *
- * @author     Alok Saldanha <alok@genome.stanford.edu>
+ * This interface defines a ConfigNode without persistence...
+ * 
+ * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.9 $ $Date: 2005-12-05 05:27:53 $
  */
 public class DummyConfigNode implements ConfigNode {
-	
-	private Vector<ConfigNode> kids;
-	private Hashtable<String, Object> attr;
-	private String name;
+
+	private final Vector<ConfigNode> kids;
+	private final Hashtable<String, Object> attr;
+	private final String name;
 	private static final String NULLVALUE = "Null String";
 
 	/**
-	 *  create and return a subnode which has the indicated name
-	 *
-	 * @param  tname  name of subnode to create
-	 * @return        newly created node
+	 * create and return a subnode which has the indicated name
+	 * 
+	 * @param tname
+	 *            name of subnode to create
+	 * @return newly created node
 	 */
 	@Override
-	public ConfigNode create(String tname) {
-		
-		DummyConfigNode child  = new DummyConfigNode(tname);
-		
+	public ConfigNode create(final String tname) {
+
+		final DummyConfigNode child = new DummyConfigNode(tname);
+
 		kids.addElement(child);
 		return child;
 	}
 
-
 	/**
-	 *  Constructor for the DummyConfigNode object
-	 *
-	 * @param  tname  name of the (parentless) node to create
+	 * Constructor for the DummyConfigNode object
+	 * 
+	 * @param tname
+	 *            name of the (parentless) node to create
 	 */
-	public DummyConfigNode(String tname) {
-		
+	public DummyConfigNode(final String tname) {
+
 		super();
 		name = tname;
 		kids = new Vector<ConfigNode>();
@@ -69,27 +71,28 @@ public class DummyConfigNode implements ConfigNode {
 	}
 
 	/**
-	 *  fetch all nodes with the name
-	 *
-	 * @param  byname  type of nodes to search for
-	 * @return      array of matching nodes
+	 * fetch all nodes with the name
+	 * 
+	 * @param byname
+	 *            type of nodes to search for
+	 * @return array of matching nodes
 	 */
 	@Override
-	public ConfigNode[] fetch(String byname) {
-		
+	public ConfigNode[] fetch(final String byname) {
+
 		if (byname == null) {
 			return null;
 		}
-		
+
 		int matching = 0;
-		
+
 		for (int i = 0; i < kids.size(); i++) {
 			if (byname.equals(((DummyConfigNode) kids.elementAt(i)).name)) {
 				matching++;
 			}
 		}
 
-	ConfigNode[] ret  = new DummyConfigNode[matching];
+		final ConfigNode[] ret = new DummyConfigNode[matching];
 		matching = 0;
 
 		for (int i = 0; i < kids.size(); i++) {
@@ -101,15 +104,15 @@ public class DummyConfigNode implements ConfigNode {
 		return ret;
 	}
 
-
 	/**
-	 *  fetch first node by name
-	 *
-	 * @param  byname  type of node to search for
-	 * @return        first matching node
+	 * fetch first node by name
+	 * 
+	 * @param byname
+	 *            type of node to search for
+	 * @return first matching node
 	 */
 	@Override
-	public ConfigNode fetchFirst(String byname) {
+	public ConfigNode fetchFirst(final String byname) {
 		for (int i = 0; i < kids.size(); i++) {
 			if (byname.equals(((DummyConfigNode) kids.elementAt(i)).name)) {
 				return kids.elementAt(i);
@@ -118,25 +121,25 @@ public class DummyConfigNode implements ConfigNode {
 		return null;
 	}
 
-
 	/**
-	 *  remove particular subnode
-	 *
-	 * @param  configNode  node to remove
+	 * remove particular subnode
+	 * 
+	 * @param configNode
+	 *            node to remove
 	 */
 	@Override
-	public void remove(ConfigNode configNode) {
+	public void remove(final ConfigNode configNode) {
 		kids.removeElement(configNode);
 	}
 
-
 	/**
-	 *  remove all subnodes by name
-	 *
-	 * @param  byname type of node to remove
+	 * remove all subnodes by name
+	 * 
+	 * @param byname
+	 *            type of node to remove
 	 */
 	@Override
-	public void removeAll(String byname) {
+	public void removeAll(final String byname) {
 		for (int i = kids.size() - 1; i >= 0; i--) {
 			if (byname.equals(((DummyConfigNode) kids.elementAt(i)).name)) {
 				kids.removeElementAt(i);
@@ -144,30 +147,31 @@ public class DummyConfigNode implements ConfigNode {
 		}
 	}
 
-
 	/**
-	 *  set attribute to be last in list
-	 *
-	 * @param  configNode  The new last value
+	 * set attribute to be last in list
+	 * 
+	 * @param configNode
+	 *            The new last value
 	 */
 	@Override
-	public void setLast(ConfigNode configNode) {
+	public void setLast(final ConfigNode configNode) {
 		kids.removeElement(configNode);
 		kids.addElement(configNode);
 	}
 
-
 	/**
-	 *  get double attribute
-	 *
-	 * @param  string  name of attribude
-	 * @param  d       a default value to return
-	 * @return         The attribute value
+	 * get double attribute
+	 * 
+	 * @param string
+	 *            name of attribude
+	 * @param d
+	 *            a default value to return
+	 * @return The attribute value
 	 */
 	@Override
-	public double getAttribute(String string, double d) {
-	Object o  = attr.get(string);
-		if ((o == null) || ( o == NULLVALUE)) {
+	public double getAttribute(final String string, final double d) {
+		final Object o = attr.get(string);
+		if ((o == null) || (o == NULLVALUE)) {
 			return d;
 		}
 		return ((Double) o).doubleValue();
@@ -176,43 +180,46 @@ public class DummyConfigNode implements ConfigNode {
 	/**
 	 * determine if a particular attribute is defined for this node.
 	 */
-	 @Override
-	public boolean hasAttribute(String string) {
-	   Object o  = attr.get(string);
-	   if (o == null) {
-		 return false;
-	   } else {
-		 return true;
-	   }
-	 }
-	 
+	@Override
+	public boolean hasAttribute(final String string) {
+		final Object o = attr.get(string);
+		if (o == null) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
 	/**
-	 *  get int attribute
-	 *
-	 * @param  string  name of attribue
-	 * @param  i       default int value
-	 * @return         The attribute value
+	 * get int attribute
+	 * 
+	 * @param string
+	 *            name of attribue
+	 * @param i
+	 *            default int value
+	 * @return The attribute value
 	 */
 	@Override
-	public int getAttribute(String string, int i) {
-	Object o  = attr.get(string);
+	public int getAttribute(final String string, final int i) {
+		final Object o = attr.get(string);
 		if ((o == null) || (o == NULLVALUE)) {
 			return i;
 		}
 		return ((Integer) o).intValue();
 	}
 
-
 	/**
-	 *  get String attribute
-	 *
-	 * @param  string1  attribute to get
-	 * @param  string2  Default value
-	 * @return          The attribute value
+	 * get String attribute
+	 * 
+	 * @param string1
+	 *            attribute to get
+	 * @param string2
+	 *            Default value
+	 * @return The attribute value
 	 */
 	@Override
-	public String getAttribute(String string1, String string2) {
-	Object o  = attr.get(string1);
+	public String getAttribute(final String string1, final String string2) {
+		final Object o = attr.get(string1);
 		if (o == null) {
 			return string2;
 		}
@@ -222,63 +229,75 @@ public class DummyConfigNode implements ConfigNode {
 		return (String) o;
 	}
 
-
 	/**
-	 *  set double attribute
-	 *
-	 * @param  att   name of attribute
-	 * @param  val   The new attribute value
-	 * @param  dval  The default value
+	 * set double attribute
+	 * 
+	 * @param att
+	 *            name of attribute
+	 * @param val
+	 *            The new attribute value
+	 * @param dval
+	 *            The default value
 	 */
 	@Override
-	public void setAttribute(String att, double val, double dval) {
+	public void setAttribute(final String att, final double val,
+			final double dval) {
 		attr.put(att, new Double(val));
 	}
 
-
 	/**
-	 *  set int attribute
-	 *
-	 * @param  att   name of attribute
-	 * @param  val   The new attribute value
-	 * @param  dval  The default value
+	 * set int attribute
+	 * 
+	 * @param att
+	 *            name of attribute
+	 * @param val
+	 *            The new attribute value
+	 * @param dval
+	 *            The default value
 	 */
 	@Override
-	public void setAttribute(String att, int val, int dval) {
+	public void setAttribute(final String att, final int val, final int dval) {
 		attr.put(att, new Integer(val));
 	}
 
-
 	/**
-	 *  set String attribute
-	 *
-	 * @param  att   name of attribute
-	 * @param  val   The new attribute value
-	 * @param  dval  The default value
+	 * set String attribute
+	 * 
+	 * @param att
+	 *            name of attribute
+	 * @param val
+	 *            The new attribute value
+	 * @param dval
+	 *            The default value
 	 */
 	@Override
-	public void setAttribute(String att, String val, String dval) {
-		if (att == null ) LogBuffer.println("attibute to DummyConfig was null!");
+	public void setAttribute(final String att, String val, final String dval) {
+		if (att == null)
+			LogBuffer.println("attibute to DummyConfig was null!");
 		if (val == null) {
 			val = NULLVALUE;
 		}
 		attr.put(att, val);
 	}
 
-
-	/* (non-Javadoc)
-	 * @see edu.stanford.genetics.treeview.ConfigNode#fetchOrCreate(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * edu.stanford.genetics.treeview.ConfigNode#fetchOrCreate(java.lang.String)
 	 */
 	@Override
-	public ConfigNode fetchOrCreate(String string) {
-		ConfigNode cand = fetchFirst(string);
+	public ConfigNode fetchOrCreate(final String string) {
+		final ConfigNode cand = fetchFirst(string);
 		if (cand == null)
 			return create(string);
-		else 
+		else
 			return cand;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.stanford.genetics.treeview.ConfigNode#store()
 	 */
 	@Override
@@ -287,4 +306,3 @@ public class DummyConfigNode implements ConfigNode {
 		// System.err.println("Trying to save dummy config")
 	}
 }
-

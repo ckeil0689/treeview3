@@ -1,87 +1,101 @@
 /* BEGIN_HEADER                                              Java TreeView
-*
-* $Author: alokito $
-* $RCSfile: TreeColorer.java,v $
-* $Revision: 1.2 $
-* $Date: 2007-07-13 02:33:47 $
-* $Name:  $
-*
-* This file is part of Java TreeView
-* Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
-*
-* This software is provided under the GNU GPL Version 2. In particular, 
-*
-* 1) If you modify a source file, make a comment in it containing your name and the date.
-* 2) If you distribute a modified version, you must do it under the GPL 2.
-* 3) Developers are encouraged but not required to notify the Java TreeView maintainers at alok@genome.stanford.edu when they make a useful addition. It would be nice if significant contributions could be merged into the main distribution.
-*
-* A full copy of the license can be found in gpl.txt or online at
-* http://www.gnu.org/licenses/gpl.txt
-*
-* END_HEADER 
-*/
+ *
+ * $Author: alokito $
+ * $RCSfile: TreeColorer.java,v $
+ * $Revision: 1.2 $
+ * $Date: 2007-07-13 02:33:47 $
+ * $Name:  $
+ *
+ * This file is part of Java TreeView
+ * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
+ *
+ * This software is provided under the GNU GPL Version 2. In particular, 
+ *
+ * 1) If you modify a source file, make a comment in it containing your name and the date.
+ * 2) If you distribute a modified version, you must do it under the GPL 2.
+ * 3) Developers are encouraged but not required to notify the Java TreeView maintainers at alok@genome.stanford.edu when they make a useful addition. It would be nice if significant contributions could be merged into the main distribution.
+ *
+ * A full copy of the license can be found in gpl.txt or online at
+ * http://www.gnu.org/licenses/gpl.txt
+ *
+ * END_HEADER 
+ */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import edu.stanford.genetics.treeview.*;
+import java.awt.Color;
+
+import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.TreeDrawerNode;
 
 /**
-* This class simply colors in trees.
-* It's a pretty non-OO class.
-*/
-import java.awt.Color;
+ * This class simply colors in trees. It's a pretty non-OO class.
+ */
 public class TreeColorer {
 	private static int colorInd;
-	private static String [][] headers; // used when inferring node colors from gene colors
-	private static HeaderInfo headerInfo; // used when coloring using column from GTR.
+	private static String[][] headers; // used when inferring node colors from
+										// gene colors
+	private static HeaderInfo headerInfo; // used when coloring using column
+											// from GTR.
+
 	/**
 	 * 
 	 * @param rootNode
 	 * @param geneHeaderInfo
 	 */
-	public static void colorUsingHeader(TreeDrawerNode rootNode, HeaderInfo geneHeaderInfo) {
-		int index = geneHeaderInfo.getIndex("FGCOLOR");
-		if (index < 0) return;
+	public static void colorUsingHeader(final TreeDrawerNode rootNode,
+			final HeaderInfo geneHeaderInfo) {
+		final int index = geneHeaderInfo.getIndex("FGCOLOR");
+		if (index < 0)
+			return;
 		colorUsingHeader(rootNode, geneHeaderInfo, index);
 	}
+
 	/**
 	 * colors using header stored in nodes of tree
 	 * 
-	 * @param root root node of tree
-	 * @param h headerInfo of tree
-	 * @param ci index into columns of tree's header info
+	 * @param root
+	 *            root node of tree
+	 * @param h
+	 *            headerInfo of tree
+	 * @param ci
+	 *            index into columns of tree's header info
 	 */
-	public static final synchronized void colorUsingHeader (TreeDrawerNode root, HeaderInfo h, int ci) {
+	public static final synchronized void colorUsingHeader(
+			final TreeDrawerNode root, final HeaderInfo h, final int ci) {
 		colorInd = ci;
-		headerInfo =h;
+		headerInfo = h;
 		if (headerInfo == null) {
-	    LogBuffer.println("TreeColorer: headers null");
+			LogBuffer.println("TreeColorer: headers null");
 			return;
 		}
 		if (colorInd < 0) {
-	    LogBuffer.println("TreeColorer: colorInd < 0");
+			LogBuffer.println("TreeColorer: colorInd < 0");
 			return;
 		}
 		if (root == null) {
-	    LogBuffer.println("TreeColorer: root null");
+			LogBuffer.println("TreeColorer: root null");
 			return;
 		}
 		recursiveColorUsingHeader(root);
 	}
-	private static final void recursiveColorUsingHeader(TreeDrawerNode node) {
-		//wrong index			
-		//String [] headers = headerInfo.getHeader((int) node.getIndex());
+
+	private static final void recursiveColorUsingHeader(
+			final TreeDrawerNode node) {
+		// wrong index
+		// String [] headers = headerInfo.getHeader((int) node.getIndex());
 		if (node.isLeaf()) {
 			return;
 		} else {
-			int index = headerInfo.getHeaderIndex(node.getId());
+			final int index = headerInfo.getHeaderIndex(node.getId());
 			if (index < 0) {
-				LogBuffer.println("Problem finding node " +node.getId());
+				LogBuffer.println("Problem finding node " + node.getId());
 			}
-			String [] headers = headerInfo.getHeader(index);
-			
-			String color = headers[colorInd];
+			final String[] headers = headerInfo.getHeader(index);
+
+			final String color = headers[colorInd];
 			node.setColor(parseColor(color));
-			
+
 			recursiveColorUsingHeader(node.getLeft());
 			recursiveColorUsingHeader(node.getRight());
 		}
@@ -89,13 +103,15 @@ public class TreeColorer {
 
 	/**
 	 * colors using leaf nodes
+	 * 
 	 * @param root
 	 * @param h
 	 * @param ci
 	 */
-	public static final synchronized void colorUsingLeaf(TreeDrawerNode root, HeaderInfo h, int ci) {
+	public static final synchronized void colorUsingLeaf(
+			final TreeDrawerNode root, final HeaderInfo h, final int ci) {
 		colorInd = ci;
-		headerInfo =h;
+		headerInfo = h;
 		if (headerInfo == null) {
 			LogBuffer.println("headers null");
 			return;
@@ -106,49 +122,54 @@ public class TreeColorer {
 		}
 		recursiveColorUsingLeaf(root);
 	}
-	public static final synchronized void colorize (TreeDrawerNode root, String [][] h, int ci) {
+
+	public static final synchronized void colorize(final TreeDrawerNode root,
+			final String[][] h, final int ci) {
 		colorInd = ci;
-		headers =h;
+		headers = h;
 		if (headers == null) {
-			//	    System.out.println("headers null");
+			// System.out.println("headers null");
 			return;
 		}
 		if (colorInd < 0) {
-			//	    System.out.println("colorInd < 0");
+			// System.out.println("colorInd < 0");
 			return;
 		}
 		recursiveColor(root);
 	}
-	private static final void recursiveColorUsingLeaf(TreeDrawerNode node) {
+
+	private static final void recursiveColorUsingLeaf(final TreeDrawerNode node) {
 		if (node.isLeaf()) {
-			//	    System.out.println("coloring leaf");
-			node.setColor(parseColor(headerInfo.getHeader((int) node.getIndex(),colorInd)));
+			// System.out.println("coloring leaf");
+			node.setColor(parseColor(headerInfo.getHeader(
+					(int) node.getIndex(), colorInd)));
 		} else {
 			recursiveColorUsingLeaf(node.getLeft());
 			recursiveColorUsingLeaf(node.getRight());
 			majorityColor(node);
-			//	    node.setColor(synthesizeColor(node.getLeft(), node.getRight()));
+			// node.setColor(synthesizeColor(node.getLeft(), node.getRight()));
 		}
 	}
-	
-	private static final void recursiveColor(TreeDrawerNode node) {
+
+	private static final void recursiveColor(final TreeDrawerNode node) {
 		if (node.isLeaf()) {
-			//	    System.out.println("coloring leaf");
+			// System.out.println("coloring leaf");
 			node.setColor(parseColor(headers[(int) node.getIndex()][colorInd]));
 		} else {
 			recursiveColor(node.getLeft());
 			recursiveColor(node.getRight());
 			majorityColor(node);
-			//	    node.setColor(synthesizeColor(node.getLeft(), node.getRight()));
+			// node.setColor(synthesizeColor(node.getLeft(), node.getRight()));
 		}
 	}
-	
-	private static String [] colornames = new String[100];
-	private static Color [] colors = new Color[100];
-	private static final void majorityColor(TreeDrawerNode node) {
-		int [] count = new int[100];
-		int min = (int) node.getMinIndex();
-		int max = (int) node.getMaxIndex();
+
+	private static String[] colornames = new String[100];
+	private static Color[] colors = new Color[100];
+
+	private static final void majorityColor(final TreeDrawerNode node) {
+		final int[] count = new int[100];
+		final int min = (int) node.getMinIndex();
+		final int max = (int) node.getMaxIndex();
 		for (int i = min; i < max; i++) {
 			String color;
 			if (headers == null) {
@@ -156,25 +177,27 @@ public class TreeColorer {
 			} else {
 				color = headers[i][colorInd];
 			}
-			int index = getIndex(color);
+			final int index = getIndex(color);
 			count[index]++;
 		}
-		// now, get max 
+		// now, get max
 		int maxI = 0;
-		for (int i =0; colornames[i] != null; i++) {
-			//	    System.out.println("colornames[" + i +"] = "+ colornames[i]);
+		for (int i = 0; colornames[i] != null; i++) {
+			// System.out.println("colornames[" + i +"] = "+ colornames[i]);
 			if (count[i] > count[maxI]) {
 				maxI = i;
 			}
 		}
 		node.setColor(colors[maxI]);
 	}
-	public static Color getColor(String color) {
+
+	public static Color getColor(final String color) {
 		return colors[getIndex(color)];
 	}
-	private static int getIndex(String color) {
+
+	private static int getIndex(final String color) {
 		int i;
-		for (i = 0; i< colornames.length; i++) {
+		for (i = 0; i < colornames.length; i++) {
 			if (colornames[i] == null) {
 				break;
 			} else if (colornames[i].equals(color)) {
@@ -186,15 +209,13 @@ public class TreeColorer {
 		colors[i] = parseColor(colornames[i]);
 		return i;
 	}
-	
-	
-	private static final Color parseColor(String colorString) {
+
+	private static final Color parseColor(final String colorString) {
 		try {
-			return Color.decode(colorString); //will this work?
-		} catch (Exception e) {
+			return Color.decode(colorString); // will this work?
+		} catch (final Exception e) {
 			return Color.gray;
 		}
 	}
-	
-}
 
+}

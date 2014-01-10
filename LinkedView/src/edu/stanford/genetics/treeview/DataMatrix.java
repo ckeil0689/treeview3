@@ -24,66 +24,76 @@
 package edu.stanford.genetics.treeview;
 
 /**
- *  Description of the Interface
- *
- * Provides a simple interface to the actual gene expression data, using the same indexes as the corresponding HeaderInfo objects.
- *
- 
- * @author     aloksaldanha
+ * Description of the Interface
+ * 
+ * Provides a simple interface to the actual gene expression data, using the
+ * same indexes as the corresponding HeaderInfo objects.
+ * 
+ * 
+ * @author aloksaldanha
  */
 public interface DataMatrix {
 	/**
-	 *  Gets the value attribute of the DataMatrix object
-	 *
-	 * @param  row  row (gene) of interest
-	 * @param  col  column (array) of interest
-	 * @return      The value at the row/col, or possibly some special "missing data" value, as defined by the constants in DataModel.
+	 * Gets the value attribute of the DataMatrix object
+	 * 
+	 * @param row
+	 *            row (gene) of interest
+	 * @param col
+	 *            column (array) of interest
+	 * @return The value at the row/col, or possibly some special "missing data"
+	 *         value, as defined by the constants in DataModel.
 	 */
 	double getValue(int col, int row);
 
 	/**
-	 *  Sets the value attribute of an element in the DataMatrix object
-	 *
-	 * @param  value  value to be set
-	 * @param  row  row (gene) of interest
-	 * @param  col  column (array) of interest
+	 * Sets the value attribute of an element in the DataMatrix object
+	 * 
+	 * @param value
+	 *            value to be set
+	 * @param row
+	 *            row (gene) of interest
+	 * @param col
+	 *            column (array) of interest
 	 */
 	void setValue(double value, int col, int row);
 
 	/**
-	 *  Gets the numRow attribute of the DataMatrix object
-	 *
-	 * @return    The number of rows (genes) in this data matrix.
+	 * Gets the numRow attribute of the DataMatrix object
+	 * 
+	 * @return The number of rows (genes) in this data matrix.
 	 */
 	int getNumRow();
-	
+
 	/**
-	 * Appends a data matrix to the right of this one. Used for 
-	 * comparison of two data sets.
-	 * @param m The DataMatrix being appended.
+	 * Appends a data matrix to the right of this one. Used for comparison of
+	 * two data sets.
+	 * 
+	 * @param m
+	 *            The DataMatrix being appended.
 	 */
-	
+
 	/**
-	 *  Gets the numCol attribute of the DataMatrix object
-	 *
-	 * @return    The number of columns (arrays) in this data matrix.
+	 * Gets the numCol attribute of the DataMatrix object
+	 * 
+	 * @return The number of columns (arrays) in this data matrix.
 	 */
 	int getNumCol();
-	
+
 	/**
-	 *  Gets the numCol attribute of the DataMatrix object before anything 
-	 *  was appended to it.
-	 *
-	 * @return    The number of columns (arrays) in this data matrix before 
-	 * anything was appended.
+	 * Gets the numCol attribute of the DataMatrix object before anything was
+	 * appended to it.
+	 * 
+	 * @return The number of columns (arrays) in this data matrix before
+	 *         anything was appended.
 	 */
 	int getNumUnappendedCol();
-	
+
 	int getNumUnappendedRow();
-	
+
 	/**
-	 * return true if data matrix has been modified and should be written 
-	 * to file.
+	 * return true if data matrix has been modified and should be written to
+	 * file.
+	 * 
 	 * @return
 	 */
 	boolean getModified();
@@ -91,4 +101,3 @@ public interface DataMatrix {
 	void setModified(boolean b);
 
 }
-

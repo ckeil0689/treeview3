@@ -22,37 +22,50 @@
  */
 package edu.stanford.genetics.treeview;
 
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 
-import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
-/** This class is designed to save lists of genes to a file.  
- *
- * The class will pop up a window and prompt the user for further
- * interaction before killing itself like a good slave.
+/**
+ * This class is designed to save lists of genes to a file.
+ * 
+ * The class will pop up a window and prompt the user for further interaction
+ * before killing itself like a good slave.
  */
 
 public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	/**
 	 * @author aloksaldanha
-	 *
-	 * Table model to support preview of data. 
-	 * Probably should base export off of it for simplicity.
+	 * 
+	 *         Table model to support preview of data. Probably should base
+	 *         export off of it for simplicity.
 	 */
 	private class GeneListTableModel extends AbstractTableModel {
 
 		private static final long serialVersionUID = 1L;
-		
 
 		/**
 		 * 
@@ -61,7 +74,10 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 		public void dataChanged() {
 			fireTableStructureChanged();
 		}
-		/* (non-Javadoc)
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see javax.swing.table.TableModel#getRowCount()
 		 */
 		@Override
@@ -73,12 +89,14 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 			}
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see javax.swing.table.TableModel#getColumnCount()
 		 */
 		@Override
 		public int getColumnCount() {
-			int [] selectedPrefix = fieldRow.getSelectedPrefix();
+			final int[] selectedPrefix = fieldRow.getSelectedPrefix();
 			if (fieldRow.includeExpr()) {
 				return nArray + selectedPrefix.length;
 			} else {
@@ -86,45 +104,50 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 			}
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see javax.swing.table.TableModel#getValueAt(int, int)
 		 */
 		@Override
-		public Object getValueAt(int rowIndex, int columnIndex) {
-			int [] selectedPrefix = fieldRow.getSelectedPrefix();
+		public Object getValueAt(int rowIndex, final int columnIndex) {
+			final int[] selectedPrefix = fieldRow.getSelectedPrefix();
 			if (fieldRow.includeHeader()) {
 				if (rowIndex == 0) {
-					String [] pNames = headerInfo.getNames();
+					final String[] pNames = headerInfo.getNames();
 					if (columnIndex < selectedPrefix.length) {
 						// gene annotation column headers
 						return pNames[selectedPrefix[columnIndex]];
 					} else if (fieldRow.includeExpr()) {
 						// array headers
-	    					int gidRow = aHeaderInfo.getIndex("GID");
-	    					if (gidRow == -1) gidRow = 0;
-	    					String [] headers = aHeaderInfo.getHeader(columnIndex-selectedPrefix.length);
-	    					return headers[gidRow];
+						int gidRow = aHeaderInfo.getIndex("GID");
+						if (gidRow == -1)
+							gidRow = 0;
+						final String[] headers = aHeaderInfo
+								.getHeader(columnIndex - selectedPrefix.length);
+						return headers[gidRow];
 					}
 				} else if (rowIndex == 1 && eRow != -1) {
-					//eweight
-					if ((selectedPrefix.length > 0 )&&(columnIndex == 0)) {
+					// eweight
+					if ((selectedPrefix.length > 0) && (columnIndex == 0)) {
 						return "EWEIGHT";
 					} else if (columnIndex < selectedPrefix.length) {
 						return "";
 					} else {
-						String [] headers = aHeaderInfo.getHeader(columnIndex-selectedPrefix.length);
-    						return headers[eRow];
-    					}
+						final String[] headers = aHeaderInfo
+								.getHeader(columnIndex - selectedPrefix.length);
+						return headers[eRow];
+					}
 				} else {
 					rowIndex--;
 				}
 			}
 			if (columnIndex < selectedPrefix.length) {
-				String [] headers = headerInfo.getHeader(rowIndex + top);
+				final String[] headers = headerInfo.getHeader(rowIndex + top);
 				return headers[selectedPrefix[columnIndex]];
 			} else {
-				double val = dataMatrix.getValue(columnIndex - selectedPrefix.length,  
-						rowIndex +top);
+				final double val = dataMatrix.getValue(columnIndex
+						- selectedPrefix.length, rowIndex + top);
 				if (val == DataModel.NODATA) {
 					return null;
 				}
@@ -134,241 +157,255 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 				return new Double(val);
 			}
 			/*
-			for (int i = top; i <= bot; i++) {
-    			if (geneSelection.isIndexSelected(i) == false) continue;
-    			String [] headers = headerInfo.getHeader(i);
-    			output.print(headers[selectedPrefix[0]]);
-    			for (int j = 1; j < selectedPrefix.length; j++) {
-    				output.print("\t");
-    				output.print(headers[selectedPrefix[j]]);
-    			}
-    			if (fieldRow.includeExpr()) {
-    				for (int j = 0; j < nArray; j++) {
-    					output.print("\t");
-    					double val = dataMatrix.getValue(j,  i);
-    					if (val != noData)
-    						output.print(val);
-    				}
-    			}
-    			output.print("\n");
-    			*/
+			 * for (int i = top; i <= bot; i++) { if
+			 * (geneSelection.isIndexSelected(i) == false) continue; String []
+			 * headers = headerInfo.getHeader(i);
+			 * output.print(headers[selectedPrefix[0]]); for (int j = 1; j <
+			 * selectedPrefix.length; j++) { output.print("\t");
+			 * output.print(headers[selectedPrefix[j]]); } if
+			 * (fieldRow.includeExpr()) { for (int j = 0; j < nArray; j++) {
+			 * output.print("\t"); double val = dataMatrix.getValue(j, i); if
+			 * (val != noData) output.print(val); } } output.print("\n");
+			 */
 		}
 
 	}
-    private ConfigNode root = null;
-    private GeneListTableModel tableModel;
-    final private Notifier notifier = new Notifier();
-    private class Notifier implements ActionListener, ListSelectionListener {
+
+	private ConfigNode root = null;
+	private final GeneListTableModel tableModel;
+	final private Notifier notifier = new Notifier();
+
+	private class Notifier implements ActionListener, ListSelectionListener {
 		@Override
-		public void actionPerformed(ActionEvent e) {
+		public void actionPerformed(final ActionEvent e) {
 			if (tableModel != null)
 				tableModel.dataChanged();
 		}
 
 		@Override
-		public void valueChanged(ListSelectionEvent e) {
+		public void valueChanged(final ListSelectionEvent e) {
 			if (tableModel != null)
 				tableModel.dataChanged();
 		}
-    };
-    
-    @Override
-	public void bindConfig(ConfigNode configNode)
-    {
-        root = configNode;
-    }
-    public ConfigNode createSubNode()
-    {
-        return root.create("File");
-    }
+	};
+
+	@Override
+	public void bindConfig(final ConfigNode configNode) {
+		root = configNode;
+	}
+
+	public ConfigNode createSubNode() {
+		return root.create("File");
+	}
+
 	public String getFile() {
-	  if (root == null) {
-		return defaultFile;
-	  } else {
-		return root.getAttribute("file", defaultFile);
-	  }
+		if (root == null) {
+			return defaultFile;
+		} else {
+			return root.getAttribute("file", defaultFile);
+		}
 	}
-    FileRow fileRow = null;
-    public void setFile(String newdir) {
-	root.setAttribute("file", newdir, "                    ");
-	if (fileRow != null) {
-	    fileRow.setFile(newdir);
+
+	FileRow fileRow = null;
+
+	public void setFile(final String newdir) {
+		root.setAttribute("file", newdir, "                    ");
+		if (fileRow != null) {
+			fileRow.setFile(newdir);
+		}
 	}
-    }
-    private  TreeSelectionI geneSelection;
-    private HeaderInfo headerInfo, aHeaderInfo;
+
+	private final TreeSelectionI geneSelection;
+	private final HeaderInfo headerInfo;
+	private HeaderInfo aHeaderInfo;
 	private int nArray = 0;
 	private DataMatrix dataMatrix = null;
 	private double noData;
-	private String defaultFile;
-    public GeneListMaker(JFrame f, TreeSelectionI n, HeaderInfo hI, String dd) {
+	private final String defaultFile;
+
+	public GeneListMaker(final JFrame f, final TreeSelectionI n,
+			final HeaderInfo hI, final String dd) {
 		super(f, "Gene Text Export", true);
 		geneSelection = n;
 		headerInfo = hI;
 		defaultFile = dd;
-		
-		
-			top = geneSelection.getMinIndex();
-			bot = geneSelection.getMaxIndex();
-			if (top > bot) {
-				int swap = top;
-				top = bot;
-				bot = swap;
-			}
-			String [] first = headerInfo.getHeader(top);
-			String [] last = headerInfo.getHeader(bot);
-			int yorf = headerInfo.getIndex("YORF");
-			fieldRow = new FieldRow();
-			fieldRow.setSelectedIndex(yorf);
-			fileRow = new FileRow();
-			JPanel center = new JPanel();
-			center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
-			center.add(new JLabel("Genes from " + first[yorf] + " to " + last[yorf] + " selected"));
-			tableModel = new GeneListTableModel();
-			JTable jTable =new JTable(tableModel);
-			jTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-			center.add(new JScrollPane(jTable));
-			center.add(fieldRow);
-			center.add(fileRow);
-			
-			
-			getContentPane().setLayout(new BorderLayout());
-			getContentPane().add(center, BorderLayout.CENTER);
-			
-			JPanel bottom = new JPanel();
-			JButton saveButton = new JButton("Save");
-			saveButton.addActionListener(new ActionListener () {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					GeneListMaker.this.saveList();
-				}
-			});
-			bottom.add(saveButton);
-			
-			JButton cancelButton = new JButton("Cancel");
-			cancelButton.addActionListener(new ActionListener () {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					GeneListMaker.this.dispose();
-				}
-			});
-			bottom.add(cancelButton);
-			getContentPane().add(bottom, BorderLayout.SOUTH);
 
-    }
-	public void setDataMatrix(DataMatrix data, HeaderInfo ahi, double noData) {
-	  this.dataMatrix = data;
-	  this.nArray = dataMatrix.getNumCol();
-	  this.aHeaderInfo = ahi;
-	  this.eRow = aHeaderInfo.getIndex("EWEIGHT");
-	  this.noData = noData;
+		top = geneSelection.getMinIndex();
+		bot = geneSelection.getMaxIndex();
+		if (top > bot) {
+			final int swap = top;
+			top = bot;
+			bot = swap;
+		}
+		final String[] first = headerInfo.getHeader(top);
+		final String[] last = headerInfo.getHeader(bot);
+		final int yorf = headerInfo.getIndex("YORF");
+		fieldRow = new FieldRow();
+		fieldRow.setSelectedIndex(yorf);
+		fileRow = new FileRow();
+		final JPanel center = new JPanel();
+		center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
+		center.add(new JLabel("Genes from " + first[yorf] + " to " + last[yorf]
+				+ " selected"));
+		tableModel = new GeneListTableModel();
+		final JTable jTable = new JTable(tableModel);
+		jTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		center.add(new JScrollPane(jTable));
+		center.add(fieldRow);
+		center.add(fileRow);
+
+		getContentPane().setLayout(new BorderLayout());
+		getContentPane().add(center, BorderLayout.CENTER);
+
+		final JPanel bottom = new JPanel();
+		final JButton saveButton = new JButton("Save");
+		saveButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				GeneListMaker.this.saveList();
+			}
+		});
+		bottom.add(saveButton);
+
+		final JButton cancelButton = new JButton("Cancel");
+		cancelButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				GeneListMaker.this.dispose();
+			}
+		});
+		bottom.add(cancelButton);
+		getContentPane().add(bottom, BorderLayout.SOUTH);
+
 	}
 
-    FieldRow fieldRow;
-    int top, bot, eRow;
-    private void saveList() {
-    	try {
-    		int [] selectedPrefix = fieldRow.getSelectedPrefix();
-    		if (selectedPrefix.length == 0) return;
-    		setFile(fileRow.getFile());
-    		PrintStream output = new PrintStream(new BufferedOutputStream
-    				(new FileOutputStream(new File(fileRow.getFile()))));
-    		
-    		if (fieldRow.includeHeader()) {
-    			// gid row...
-    			String [] pNames = headerInfo.getNames();
-    			output.print(pNames[selectedPrefix[0]]);
-    			for (int j = 1; j < selectedPrefix.length; j++) {
-    				output.print("\t");
-    				output.print(pNames[selectedPrefix[j]]);
-    			}
-    			if (fieldRow.includeExpr()) {
-    				int gidRow = aHeaderInfo.getIndex("GID");
-    				if (gidRow == -1) gidRow = 0;
-    				for (int j = 0; j < nArray; j++) {
-    					output.print("\t");
-    					try {
-    						String [] headers = aHeaderInfo.getHeader(j);
-    						String out = headers[gidRow];
-    						output.print(out);
-    					} catch(java.lang.ArrayIndexOutOfBoundsException e) {
-    					}
-    				}
-    				output.print("\n");		  
-    				//EWEIGHT row
-    				output.print("EWEIGHT");
-    				for (int j = 1; j < selectedPrefix.length; j++) {
-    					output.print("\t");
-    				}			
-    				int eRow = aHeaderInfo.getIndex("EWEIGHT");
-    				for (int j = 0; j < nArray; j++) {
-    					output.print("\t");
-    					try {
-    						String [] headers = aHeaderInfo.getHeader(j);
-    						String out = headers[eRow];
-    						output.print(out);
-    					} catch(java.lang.ArrayIndexOutOfBoundsException e) {
-    						output.print("1");
-    					}
-    				}
-    			}
-    			output.print("\n");		  
-    		}
-    		for (int i = top; i <= bot; i++) {
-    			if (geneSelection.isIndexSelected(i) == false) continue;
-    			String [] headers = headerInfo.getHeader(i);
-    			output.print(headers[selectedPrefix[0]]);
-    			for (int j = 1; j < selectedPrefix.length; j++) {
-    				output.print("\t");
-    				output.print(headers[selectedPrefix[j]]);
-    			}
-    			if (fieldRow.includeExpr()) {
-    				for (int j = 0; j < nArray; j++) {
-    					output.print("\t");
-    					double val = dataMatrix.getValue(j,  i);
-    					if (val != noData)
-    						output.print(val);
-    				}
-    			}
-    			output.print("\n");
-    		}
-    		output.close();
-    		dispose();
-    	} catch (Exception e) {
-    		e.printStackTrace();
-    		LogBuffer.println("In GeneListMaker.saveList(), got exception " + e);
-    	}
+	public void setDataMatrix(final DataMatrix data, final HeaderInfo ahi,
+			final double noData) {
+		this.dataMatrix = data;
+		this.nArray = dataMatrix.getNumCol();
+		this.aHeaderInfo = ahi;
+		this.eRow = aHeaderInfo.getIndex("EWEIGHT");
+		this.noData = noData;
+	}
 
-    }
+	FieldRow fieldRow;
+	int top, bot, eRow;
+
+	private void saveList() {
+		try {
+			final int[] selectedPrefix = fieldRow.getSelectedPrefix();
+			if (selectedPrefix.length == 0)
+				return;
+			setFile(fileRow.getFile());
+			final PrintStream output = new PrintStream(
+					new BufferedOutputStream(new FileOutputStream(new File(
+							fileRow.getFile()))));
+
+			if (fieldRow.includeHeader()) {
+				// gid row...
+				final String[] pNames = headerInfo.getNames();
+				output.print(pNames[selectedPrefix[0]]);
+				for (int j = 1; j < selectedPrefix.length; j++) {
+					output.print("\t");
+					output.print(pNames[selectedPrefix[j]]);
+				}
+				if (fieldRow.includeExpr()) {
+					int gidRow = aHeaderInfo.getIndex("GID");
+					if (gidRow == -1)
+						gidRow = 0;
+					for (int j = 0; j < nArray; j++) {
+						output.print("\t");
+						try {
+							final String[] headers = aHeaderInfo.getHeader(j);
+							final String out = headers[gidRow];
+							output.print(out);
+						} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
+						}
+					}
+					output.print("\n");
+					// EWEIGHT row
+					output.print("EWEIGHT");
+					for (int j = 1; j < selectedPrefix.length; j++) {
+						output.print("\t");
+					}
+					final int eRow = aHeaderInfo.getIndex("EWEIGHT");
+					for (int j = 0; j < nArray; j++) {
+						output.print("\t");
+						try {
+							final String[] headers = aHeaderInfo.getHeader(j);
+							final String out = headers[eRow];
+							output.print(out);
+						} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
+							output.print("1");
+						}
+					}
+				}
+				output.print("\n");
+			}
+			for (int i = top; i <= bot; i++) {
+				if (geneSelection.isIndexSelected(i) == false)
+					continue;
+				final String[] headers = headerInfo.getHeader(i);
+				output.print(headers[selectedPrefix[0]]);
+				for (int j = 1; j < selectedPrefix.length; j++) {
+					output.print("\t");
+					output.print(headers[selectedPrefix[j]]);
+				}
+				if (fieldRow.includeExpr()) {
+					for (int j = 0; j < nArray; j++) {
+						output.print("\t");
+						final double val = dataMatrix.getValue(j, i);
+						if (val != noData)
+							output.print(val);
+					}
+				}
+				output.print("\n");
+			}
+			output.close();
+			dispose();
+		} catch (final Exception e) {
+			e.printStackTrace();
+			LogBuffer
+					.println("In GeneListMaker.saveList(), got exception " + e);
+		}
+
+	}
+
 	public void includeAll() {
 		fieldRow.includeAll();
 		tableModel.dataChanged();
 	}
+
 	class FieldRow extends JPanel {
 
 		private static final long serialVersionUID = 1L;
-		
+
 		JList list;
 		JCheckBox exprBox, headerBox;
-		
+
 		public void includeAll() {
-			list.setSelectionInterval(0, (headerInfo.getNames()).length-1);
+			list.setSelectionInterval(0, (headerInfo.getNames()).length - 1);
 			exprBox.setSelected(true);
 			headerBox.setSelected(true);
-			
+
 		}
-		public int [] getSelectedPrefix() {
+
+		public int[] getSelectedPrefix() {
 			return list.getSelectedIndices();
 		}
-		public void setSelectedIndex(int i) {
+
+		public void setSelectedIndex(final int i) {
 			list.setSelectedIndex(i);
 		}
+
 		public boolean includeExpr() {
 			return exprBox.isSelected();
 		}
+
 		public boolean includeHeader() {
 			return headerBox.isSelected();
 		}
+
 		public FieldRow() {
 			super();
 			add(new JLabel("Field(s) to print: "));
@@ -383,42 +420,48 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 			add(headerBox);
 		}
 	}
+
 	class FileRow extends JPanel {
 		/**
 		 * 
 		 */
 		private static final long serialVersionUID = 1L;
 		JTextField file;
-		public void setFile(String newfile) {
+
+		public void setFile(final String newfile) {
 			file.setText(newfile);
 		}
-		public String  getFile() {
+
+		public String getFile() {
 			return file.getText();
 		}
+
 		public FileRow() {
 			super();
 			add(new JLabel("Export To: "));
 			file = new JTextField(GeneListMaker.this.getFile());
 			add(file);
-			JButton chooseButton = new JButton("Browse");
+			final JButton chooseButton = new JButton("Browse");
 			chooseButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					try {
-						JFileChooser chooser = new JFileChooser();
+						final JFileChooser chooser = new JFileChooser();
 						chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-						int returnVal = chooser.showOpenDialog(GeneListMaker.this);
-						if(returnVal == JFileChooser.APPROVE_OPTION) {
+						final int returnVal = chooser
+								.showOpenDialog(GeneListMaker.this);
+						if (returnVal == JFileChooser.APPROVE_OPTION) {
 							if (chooser.getSelectedFile().isDirectory()) {
-								File currentF = new File(getFile());
-								GeneListMaker.this.setFile(chooser.getSelectedFile().getCanonicalPath() +
-										File.separator+
-										currentF.getName());
+								final File currentF = new File(getFile());
+								GeneListMaker.this.setFile(chooser
+										.getSelectedFile().getCanonicalPath()
+										+ File.separator + currentF.getName());
 							} else {
-								GeneListMaker.this.setFile(chooser.getSelectedFile().getCanonicalPath());
+								GeneListMaker.this.setFile(chooser
+										.getSelectedFile().getCanonicalPath());
 							}
 						}
-					} catch (java.io.IOException ex) {
+					} catch (final java.io.IOException ex) {
 						System.out.println("Got exception " + ex);
 					}
 				}

@@ -22,55 +22,51 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-
 /**
- *  Interface for things which I want to change the font of
- *
- * @author     Alok Saldanha <alok@genome.stanford.edu>
+ * Interface for things which I want to change the font of
+ * 
+ * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.1 $ $Date: 2006-08-16 19:13:45 $
  */
 public abstract interface FontSelectable {
 	/**
-	 * @return    The current face
+	 * @return The current face
 	 */
 	public abstract String getFace();
 
-
 	/**
-	 * @return    The current point size
+	 * @return The current point size
 	 */
 	public abstract int getPoints();
 
-
 	/**
-	 * @return    The current style
+	 * @return The current style
 	 */
 	public abstract int getStyle();
 
-
 	public abstract java.awt.Font getFont();
-	
+
 	/**
-	* sets the face
-	*
-	 * @param  string  The new face value
+	 * sets the face
+	 * 
+	 * @param string
+	 *            The new face value
 	 */
 	public abstract void setFace(String string);
 
-
 	/**
-	 *  Sets the point size
-	 *
-	 * @param  i  The new points value
+	 * Sets the point size
+	 * 
+	 * @param i
+	 *            The new points value
 	 */
 	public abstract void setPoints(int i);
 
-
 	/**
-	 *  Sets the style
-	 *
-	 * @param  i  The new style value
+	 * Sets the style
+	 * 
+	 * @param i
+	 *            The new style value
 	 */
 	public abstract void setStyle(int i);
 }
-

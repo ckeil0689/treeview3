@@ -22,64 +22,63 @@
  */
 package edu.stanford.genetics.treeview;
 
-
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.image.MemoryImageSource;
 
 /**
  * superclass, to hold info and code common to all model views
- *
- * This adds buffer management to the modelview.
- * Interestingly, but necessarily, it has no dependancy on any models.
+ * 
+ * This adds buffer management to the modelview. Interestingly, but necessarily,
+ * it has no dependancy on any models.
  */
 public abstract class ModelViewProduced extends ModelView {
 
 	private static final long serialVersionUID = 1L;
-	
-	protected int [] offscreenPixels = null;
+
+	protected int[] offscreenPixels = null;
 	protected MemoryImageSource offscreenSource = null;
-    protected Image offscreenBuffer = null;
-    protected Graphics offscreenGraphics = null;
+	protected Image offscreenBuffer = null;
+	protected Graphics offscreenGraphics = null;
 	protected int offscreenScanSize = 0;
-    protected boolean rotateOffscreen = false;
+	protected boolean rotateOffscreen = false;
 
+	protected ModelViewProduced() {
 
-    protected ModelViewProduced() {
-		
-    	super();
-    }
+		super();
+	}
 
-    /**
-	* this method sets up all the instance variables.
-	* XXX - THIS FAILS ON MAC OS X
-	* since mac os x doesn't let you call getGraphics on the Image if 
-	* it's generated from a pixels array... hmm...
-	*/
-	protected void ensureCapacity(Dimension req) {
-		
+	/**
+	 * this method sets up all the instance variables. XXX - THIS FAILS ON MAC
+	 * OS X since mac os x doesn't let you call getGraphics on the Image if it's
+	 * generated from a pixels array... hmm...
+	 */
+	protected void ensureCapacity(final Dimension req) {
+
 		if (offscreenBuffer == null) {
 			createNewBuffer(req.width, req.height);
-			
+
 		} else {
 			int w = offscreenBuffer.getWidth(null);
 			int h = offscreenBuffer.getHeight(null);
 			if ((w < req.width) || (h < req.height)) {
-				if (w < req.width) { 
+				if (w < req.width) {
 					w = req.width;
 				}
-				
-				if (h < req.height) { 
+
+				if (h < req.height) {
 					h = req.height;
 				}
-			
+
 				// should I try to free something?
-				createNewBuffer(w,h);
+				createNewBuffer(w, h);
 			}
 		}
-    }
+	}
 
-	private synchronized void createNewBuffer(int w, int h) {
-		
+	private synchronized void createNewBuffer(final int w, final int h) {
+
 		// should I be copy over pixels instead?
 		offscreenPixels = new int[w * h];
 		offscreenScanSize = w;
@@ -87,63 +86,61 @@ public abstract class ModelViewProduced extends ModelView {
 		offscreenSource.setAnimated(true);
 		offscreenBuffer = createImage(offscreenSource);
 	}
-	
-    /* 
-     * The double buffer in Swing
-     * doesn't seem to be persistent across draws. for instance, every
-     * time another window obscures one of ourwindows and then moves,
-     * a repaint is triggered by most VMs.
-     *
-     * We apparently need to maintain our own persistent offscreen
-     * buffer for speed reasons...
-     */
-	 @Override
-	public synchronized void paintComponent(Graphics g) {
-		 
-		 //Rectangle clip = g.getClipBounds();
-		 //	System.out.println("Entering " + viewName() + " to clip " + clip );
-		 
-		 Dimension newsize = getSize();
-		 if (newsize == null) { 
-			 return;
-		 }
-		 
-		 Dimension reqSize;
-		 reqSize = newsize;
-		 // monitor size changes
-		 if ((offscreenBuffer == null) ||
-			 (reqSize.width != offscreenSize.width)
-			 || (reqSize.height != offscreenSize.height)) {
-			 offscreenSize = reqSize;
-			 ensureCapacity(offscreenSize);
-			 offscreenChanged = true;
-			 offscreenValid = false;
-			 
-		 } else {
-			 offscreenChanged = false;
-		 }
-		 
-		 // update offscreenBuffer if necessary
-		 int backgoundInt = (255 << 24) | (255 << 16) | (255 << 8) | 255;
-		 for (int i =0; i < offscreenPixels.length; i++) {
-			 offscreenPixels[i] = backgoundInt;
-		 }
-		 
-		 if (isEnabled()) {
-			 if ((offscreenSize.width > 0) && (offscreenSize.height > 0)) {
-				 updatePixels();
-				 offscreenValid = true;
-			 }
-		 }
-		 
-		 g.drawImage(offscreenBuffer, 0, 0, null);
-		 paintComposite(g);
-		 //	System.out.println("Exiting " + viewName() + " to clip " + clip );
-	 }
-    
+
+	/*
+	 * The double buffer in Swing doesn't seem to be persistent across draws.
+	 * for instance, every time another window obscures one of ourwindows and
+	 * then moves, a repaint is triggered by most VMs.
+	 * 
+	 * We apparently need to maintain our own persistent offscreen buffer for
+	 * speed reasons...
+	 */
+	@Override
+	public synchronized void paintComponent(final Graphics g) {
+
+		// Rectangle clip = g.getClipBounds();
+		// System.out.println("Entering " + viewName() + " to clip " + clip );
+
+		final Dimension newsize = getSize();
+		if (newsize == null) {
+			return;
+		}
+
+		Dimension reqSize;
+		reqSize = newsize;
+		// monitor size changes
+		if ((offscreenBuffer == null) || (reqSize.width != offscreenSize.width)
+				|| (reqSize.height != offscreenSize.height)) {
+			offscreenSize = reqSize;
+			ensureCapacity(offscreenSize);
+			offscreenChanged = true;
+			offscreenValid = false;
+
+		} else {
+			offscreenChanged = false;
+		}
+
+		// update offscreenBuffer if necessary
+		final int backgoundInt = (255 << 24) | (255 << 16) | (255 << 8) | 255;
+		for (int i = 0; i < offscreenPixels.length; i++) {
+			offscreenPixels[i] = backgoundInt;
+		}
+
+		if (isEnabled()) {
+			if ((offscreenSize.width > 0) && (offscreenSize.height > 0)) {
+				updatePixels();
+				offscreenValid = true;
+			}
+		}
+
+		g.drawImage(offscreenBuffer, 0, 0, null);
+		paintComposite(g);
+		// System.out.println("Exiting " + viewName() + " to clip " + clip );
+	}
+
 	/**
-	* method to update the offscreenPixels.
-	* don't forget to call offscreenSource.newPixels(); !
-	*/
+	 * method to update the offscreenPixels. don't forget to call
+	 * offscreenSource.newPixels(); !
+	 */
 	abstract protected void updatePixels();
 }

@@ -1,4 +1,3 @@
-
 /* BEGIN_HEADER                                              Java TreeView
  *
  * $Author: alokito $
@@ -23,33 +22,49 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Observable;
 
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
 import net.miginfocom.swing.MigLayout;
-
-import edu.stanford.genetics.treeview.*;
+import edu.stanford.genetics.treeview.ConfigNode;
+import edu.stanford.genetics.treeview.ConfigNodePersistent;
+import edu.stanford.genetics.treeview.DataModel;
+import edu.stanford.genetics.treeview.GUIParams;
+import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.HeaderSummary;
+import edu.stanford.genetics.treeview.ModelView;
+import edu.stanford.genetics.treeview.RotateImageFilter;
+import edu.stanford.genetics.treeview.TreeSelectionI;
+import edu.stanford.genetics.treeview.UrlExtractor;
 
 /**
- *  Renders the names of the arrays.
- *
- * Actually, renders the first element in a HeaderInfo as vertical text. 
- * Could easily be generalized.
- *
- * @author     Alok Saldanha <alok@genome.stanford.edu>
- * @version    @version $Revision: 1.4 $ $Date: 2010-05-02 13:39:00 $
+ * Renders the names of the arrays.
+ * 
+ * Actually, renders the first element in a HeaderInfo as vertical text. Could
+ * easily be generalized.
+ * 
+ * @author Alok Saldanha <alok@genome.stanford.edu>
+ * @version @version $Revision: 1.4 $ $Date: 2010-05-02 13:39:00 $
  */
-public class ArrayNameView extends ModelView implements MouseListener, 
-FontSelectable, ConfigNodePersistent {
+public class ArrayNameView extends ModelView implements MouseListener,
+		FontSelectable, ConfigNodePersistent {
 
 	private static final long serialVersionUID = 1L;
 
-	/**  
-	 * HeaderInfo containing the names of the arrays. 
+	/**
+	 * HeaderInfo containing the names of the arrays.
 	 */
 	protected HeaderInfo headerInfo = null;
 	protected DataModel dataModel = null;
@@ -57,301 +72,295 @@ FontSelectable, ConfigNodePersistent {
 	private String face;
 	private int style;
 	private int size;
-	
+
 	private Image backBuffer;
-	private JScrollPane scrollPane;
+	private final JScrollPane scrollPane;
 	private MapContainer map;
-	
+
 	private int maxlength = 0;
 	private boolean backBufferValid = false;
 	private ConfigNode root = null;
 	private UrlExtractor urlExtractor = null;
-	
+
 	private final String d_face = "Courier";
 	private final int d_style = 0;
 	private final int d_size = 12;
-	
-	private JLabel l1;
-	
-	
+
+	private final JLabel l1;
+
 	/**
-	 *  Constructs an <code>ArrayNameView</code> with the given 
-	 *  <code>HeaderInfo</code> as a source of array names.
-	 *
-	 * @param  hInfo  Header containing array names as first row.
+	 * Constructs an <code>ArrayNameView</code> with the given
+	 * <code>HeaderInfo</code> as a source of array names.
+	 * 
+	 * @param hInfo
+	 *            Header containing array names as first row.
 	 */
-	public ArrayNameView(HeaderInfo hInfo) {
-		
+	public ArrayNameView(final HeaderInfo hInfo) {
+
 		super();
 		this.setLayout(new MigLayout());
-		
+
 		headerInfo = hInfo;
 		headerSummary = new HeaderSummary();
-		headerSummary.setIncluded(new int [] {0});
+		headerSummary.setIncluded(new int[] { 0 });
 		scrollPane = new JScrollPane(this);
 		scrollPane.setBorder(null);
 		panel = scrollPane;
-		
+
 		l1 = new JLabel();
 		l1.setFont(GUIParams.FONTS);
 		l1.setForeground(GUIParams.TEXT);
 		this.add(l1, "alignx 50%, aligny 50%, push");
-		
+
 		addMouseListener(this);
 	}
-	
-	
+
 	public HeaderInfo getHeaderInfo() {
-		
+
 		return headerInfo;
 	}
-	
+
 	public DataModel getDataModel() {
-		
+
 		return dataModel;
 	}
-	
-	public void setHeaderInfo(HeaderInfo headerInfo) {
-		
+
+	public void setHeaderInfo(final HeaderInfo headerInfo) {
+
 		this.headerInfo = headerInfo;
 	}
-	
-	public void setDataModel(DataModel dataModel) {
-			
-			if(dataModel != null) {
-				((Observable)dataModel).deleteObserver(this);
-			}
-			
-			this.dataModel = dataModel;
-			((Observable)dataModel).addObserver(this);
+
+	public void setDataModel(final DataModel dataModel) {
+
+		if (dataModel != null) {
+			((Observable) dataModel).deleteObserver(this);
+		}
+
+		this.dataModel = dataModel;
+		((Observable) dataModel).addObserver(this);
 	}
 
 	/* inherit description */
 	@Override
 	public String viewName() {
-		
+
 		return "ArrayNameView";
 	}
 
 	// Canvas methods
-	/**  
-	 * updates a horizontally oriented test buffer, which will later 
-	 * be rotated to make vertical text.
-	 * This is only used in the absence of Graphics2D.
+	/**
+	 * updates a horizontally oriented test buffer, which will later be rotated
+	 * to make vertical text. This is only used in the absence of Graphics2D.
 	 */
 	public void updateBackBuffer() {
-		
-		Graphics g = backBuffer.getGraphics();
-		int start = map.getIndex(0);
-		int end = map.getIndex(map.getUsedPixels()) - 1;
-		int colorIndex = headerInfo.getIndex("FGCOLOR");
-		int bgColorIndex = headerInfo.getIndex("BGCOLOR");
+
+		final Graphics g = backBuffer.getGraphics();
+		final int start = map.getIndex(0);
+		final int end = map.getIndex(map.getUsedPixels()) - 1;
+		final int colorIndex = headerInfo.getIndex("FGCOLOR");
+		final int bgColorIndex = headerInfo.getIndex("BGCOLOR");
 		int gidRow = headerInfo.getIndex("GID");
 
-		g.setColor(GUIParams.BG_COLOR);//Color.white);
+		g.setColor(GUIParams.BG_COLOR);// Color.white);
 		g.fillRect(0, 0, maxlength, offscreenSize.width);
-		g.setColor(GUIParams.TEXT);//Color.black);
+		g.setColor(GUIParams.TEXT);// Color.black);
 
 		if (gidRow == -1) {
 			gidRow = 0;
 		}
 
 		g.setFont(new Font(face, style, size));
-		FontMetrics metrics  = getFontMetrics(g.getFont());
-		int ascent = metrics.getAscent();
-		
-	    // draw backgrounds first...
-	    if (bgColorIndex > 0) {
-		    Color back = g.getColor();
-		    for (int j = start; j < end;j++) {
-				    String [] strings = headerInfo.getHeader(j);
-				    try {
-				    g.setColor(TreeColorer.getColor(strings[bgColorIndex]));
-				    } catch (Exception e) {
-				    }
-				    g.fillRect(0, map.getMiddlePixel(j) - ascent / 2, 
-				    		maxlength, ascent);
-		    }
-		    g.setColor(back);
-	    }
+		final FontMetrics metrics = getFontMetrics(g.getFont());
+		final int ascent = metrics.getAscent();
 
-		Color back = g.getColor();
+		// draw backgrounds first...
+		if (bgColorIndex > 0) {
+			final Color back = g.getColor();
+			for (int j = start; j < end; j++) {
+				final String[] strings = headerInfo.getHeader(j);
+				try {
+					g.setColor(TreeColorer.getColor(strings[bgColorIndex]));
+				} catch (final Exception e) {
+				}
+				g.fillRect(0, map.getMiddlePixel(j) - ascent / 2, maxlength,
+						ascent);
+			}
+			g.setColor(back);
+		}
+
+		final Color back = g.getColor();
 		for (int j = start; j <= end; j++) {
-			
-			try {
-				String out = headerSummary.getSummary(headerInfo, j);
-				String[] headers  = headerInfo.getHeader(j);
 
-				//		System.out.println("Got row " + gidRow + " value " + out);
+			try {
+				final String out = headerSummary.getSummary(headerInfo, j);
+				final String[] headers = headerInfo.getHeader(j);
+
+				// System.out.println("Got row " + gidRow + " value " + out);
 				if (out == null) {
 					continue;
 				}
-				
-				if ((arraySelection == null) 
+
+				if ((arraySelection == null)
 						|| arraySelection.isIndexSelected(j)) {
 
 					if (colorIndex > 0) {
 						g.setColor(TreeColorer.getColor(headers[colorIndex]));
 					}
-					
+
 					g.drawString(out, 0, map.getMiddlePixel(j) + ascent / 2);
 					if (colorIndex > 0) {
 						g.setColor(back);
 					}
 				} else {
-					g.setColor(GUIParams.DARKGRAY);//Color.gray);
+					g.setColor(GUIParams.DARKGRAY);// Color.gray);
 					g.drawString(out, 0, map.getMiddlePixel(j) + ascent / 2);
 					g.setColor(back);
 				}
-			} catch (java.lang.ArrayIndexOutOfBoundsException e) {
+			} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 			}
 		}
 		backBuffer = RotateImageFilter.rotate(this, backBuffer);
 	}
 
-
-	/*inherit description */
+	/* inherit description */
 	@Override
-	public void updateBuffer(Graphics g) {
-		
+	public void updateBuffer(final Graphics g) {
+
 		updateBuffer(g, offscreenSize);
 	}
-	
-	public void updateBuffer(Image buf) {
-		
-		updateBuffer(buf.getGraphics(), new Dimension(buf.getWidth(null), 
-				buf.getHeight(null)));
-	}
-	
-	public void updateBuffer(Graphics g, Dimension offscreenSize) {
-		
-		g.setColor(GUIParams.BG_COLOR);//Color.white);
-		g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
-		g.setColor(GUIParams.TEXT);//Color.black);
 
-		if(map.getScale() > 12.0) {
+	public void updateBuffer(final Image buf) {
+
+		updateBuffer(buf.getGraphics(),
+				new Dimension(buf.getWidth(null), buf.getHeight(null)));
+	}
+
+	public void updateBuffer(final Graphics g, final Dimension offscreenSize) {
+
+		g.setColor(GUIParams.BG_COLOR);// Color.white);
+		g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
+		g.setColor(GUIParams.TEXT);// Color.black);
+
+		if (map.getScale() > 12.0) {
 			l1.setText("");
-			
+
 			/* This code is for java2.it's worth supporting two ways. */
 			try {
-				Graphics2D g2d = (Graphics2D) g;
-				g2d.rotate(-90 * 3.14159/180);
+				final Graphics2D g2d = (Graphics2D) g;
+				g2d.rotate(-90 * 3.14159 / 180);
 				g2d.translate(-offscreenSize.height, 0);
-	
-				int start = map.getIndex(0);
-				int end  = map.getIndex(map.getUsedPixels()) - 1;
+
+				final int start = map.getIndex(0);
+				final int end = map.getIndex(map.getUsedPixels()) - 1;
 				int gidRow = headerInfo.getIndex("GID");
-				if (gidRow == -1) {gidRow = 0;}
-				int colorIndex = headerInfo.getIndex("FGCOLOR");
+				if (gidRow == -1) {
+					gidRow = 0;
+				}
+				final int colorIndex = headerInfo.getIndex("FGCOLOR");
 				g.setFont(new Font(face, style, size));
-				FontMetrics metrics = getFontMetrics(g.getFont());
-				int ascent = metrics.getAscent();
-	
-			    // draw backgrounds first...
-			    int bgColorIndex = headerInfo.getIndex("BGCOLOR");
-			    if (bgColorIndex > 0) {
-				    Color back = g.getColor();
-				    for (int j = start; j <= end;j++) {
-						    String [] strings = headerInfo.getHeader(j);
-						    try {
-						    g.setColor(TreeColorer.getColor(
-						    		strings[bgColorIndex]));
-						    
-						    } catch (Exception e) {
-							    // ingore...
-						    }
-						    g.fillRect(0, map.getMiddlePixel(j) - ascent / 2, 
-						    		offscreenSize.height, ascent);
-				    }
-				    g.setColor(back);
-			    }
-			    
-			    //Foreground Text
-				Color fore = GUIParams.ELEMENT;//g.getColor();
+				final FontMetrics metrics = getFontMetrics(g.getFont());
+				final int ascent = metrics.getAscent();
+
+				// draw backgrounds first...
+				final int bgColorIndex = headerInfo.getIndex("BGCOLOR");
+				if (bgColorIndex > 0) {
+					final Color back = g.getColor();
+					for (int j = start; j <= end; j++) {
+						final String[] strings = headerInfo.getHeader(j);
+						try {
+							g.setColor(TreeColorer
+									.getColor(strings[bgColorIndex]));
+
+						} catch (final Exception e) {
+							// ingore...
+						}
+						g.fillRect(0, map.getMiddlePixel(j) - ascent / 2,
+								offscreenSize.height, ascent);
+					}
+					g.setColor(back);
+				}
+
+				// Foreground Text
+				final Color fore = GUIParams.ELEMENT;// g.getColor();
 				for (int j = start; j <= end; j++) {
-					
-					try { 
-						String out = headerSummary.getSummary(headerInfo, j);
-						String[] headers = headerInfo.getHeader(j);
+
+					try {
+						final String out = headerSummary.getSummary(headerInfo,
+								j);
+						final String[] headers = headerInfo.getHeader(j);
 						/*
-						String out        = headers[gidRow];
-						*/
+						 * String out = headers[gidRow];
+						 */
 						if (out != null) {
-							if ((arraySelection == null) 
+							if ((arraySelection == null)
 									|| arraySelection.isIndexSelected(j)) {
 								if (colorIndex > 0) {
-									g.setColor(TreeColorer.getColor(
-											headers[colorIndex]));
+									g.setColor(TreeColorer
+											.getColor(headers[colorIndex]));
 								}
-								
+
 								g.setColor(fore);
-								g.drawString(out, 0, map.getMiddlePixel(j) 
+								g.drawString(out, 0, map.getMiddlePixel(j)
 										+ ascent / 2);
-								
+
 								if (colorIndex > 0) {
 									g.setColor(fore);
 								}
 							} else {
 								g.setColor(GUIParams.TEXT);
-								g.drawString(out, 0, map.getMiddlePixel(j) 
+								g.drawString(out, 0, map.getMiddlePixel(j)
 										+ ascent / 2);
-								//g.setColor(fore);
+								// g.setColor(fore);
 							}
-							
+
 						}
-					} catch (java.lang.ArrayIndexOutOfBoundsException e) {
+					} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 					}
 				}
 				g2d.translate(offscreenSize.height, 0);
-				g2d.rotate(90 * 3.14159/180);
-				
-			} catch (java.lang.NoClassDefFoundError e) {
-				
+				g2d.rotate(90 * 3.14159 / 180);
+
+			} catch (final java.lang.NoClassDefFoundError e) {
+
 				if (backBufferValid == false) {
-					int tstart  = map.getIndex(0);
-					int tend    = map.getIndex(map.getUsedPixels());
-					if ((tstart >= 0 && tend > tstart) &&
-					(offscreenSize.width > 0)) {
-						
-						/* Should have been done by selectionChanged()
-						String [][] aHeaders = model.getArrayHeaders();
-						int gidRow = model.getGIDIndex();
-						int colorIndex = model.getRowIndex("FGCOLOR");
-						
-						g.setFont(new Font(face, style, size));
-						FontMetrics metrics = getFontMetrics(g.getFont());
-						int ascent = metrics.getAscent();
-						
-						// calculate maxlength
-						maxlength = 1;
-						// for some reason, stop at end -1?
-						int start = map.getMinIndex();
-						int end = map.getMaxIndex();
-						for (int j = start;j < end;j++) {
-							String out = aHeaders[j][gidRow];
-							if (out == null) continue;
-							int length = metrics.stringWidth(out);
-							if (maxlength < length) {
-								maxlength = length;
-							}
-						}
-						*/
-						
-						backBuffer = createImage(maxlength, 
-								offscreenSize.width);
+					final int tstart = map.getIndex(0);
+					final int tend = map.getIndex(map.getUsedPixels());
+					if ((tstart >= 0 && tend > tstart)
+							&& (offscreenSize.width > 0)) {
+
+						/*
+						 * Should have been done by selectionChanged() String
+						 * [][] aHeaders = model.getArrayHeaders(); int gidRow =
+						 * model.getGIDIndex(); int colorIndex =
+						 * model.getRowIndex("FGCOLOR");
+						 * 
+						 * g.setFont(new Font(face, style, size)); FontMetrics
+						 * metrics = getFontMetrics(g.getFont()); int ascent =
+						 * metrics.getAscent();
+						 * 
+						 * // calculate maxlength maxlength = 1; // for some
+						 * reason, stop at end -1? int start =
+						 * map.getMinIndex(); int end = map.getMaxIndex(); for
+						 * (int j = start;j < end;j++) { String out =
+						 * aHeaders[j][gidRow]; if (out == null) continue; int
+						 * length = metrics.stringWidth(out); if (maxlength <
+						 * length) { maxlength = length; } }
+						 */
+
+						backBuffer = createImage(maxlength, offscreenSize.width);
 						updateBackBuffer();// this flips the backbuffer...
-						
+
 					} else {
 						// some kind of blank default image?
 					}
-					backBufferValid = true;		
+					backBufferValid = true;
 				}
-				
+
 				if (offscreenSize.height < maxlength) {
 					g.drawImage(backBuffer, 0, 0, null);
 				} else {
 					if ((g != null) && (backBuffer != null)) {
-						g.drawImage(backBuffer, 0, offscreenSize.height 
+						g.drawImage(backBuffer, 0, offscreenSize.height
 								- maxlength, null);
 					}
 				}
@@ -359,180 +368,173 @@ FontSelectable, ConfigNodePersistent {
 		} else {
 			l1.setText("Zoom for Names");
 		}
-		//end of if
+		// end of if
 	}
 
-
 	/**
-	 *  Sets the urlExtractor to be used when an array name is clicked on.
-	 *
-	 * @param  ue  Will be fed array indexes.
+	 * Sets the urlExtractor to be used when an array name is clicked on.
+	 * 
+	 * @param ue
+	 *            Will be fed array indexes.
 	 */
-	public void setUrlExtractor(UrlExtractor ue) {
-		
+	public void setUrlExtractor(final UrlExtractor ue) {
+
 		urlExtractor = ue;
 	}
 
-
 	/**
-	 *  Used to space the array names.
-	 *
-	 * @param  im  A new mapcontainer.
+	 * Used to space the array names.
+	 * 
+	 * @param im
+	 *            A new mapcontainer.
 	 */
-	public void setMap(MapContainer im) {
-		
+	public void setMap(final MapContainer im) {
+
 		if (map != null) {
 			map.deleteObserver(this);
 		}
 		map = im;
 		map.addObserver(this);
-		
+
 		this.revalidate();
 		this.repaint();
 	}
 
-
 	private int oldHeight = 0;
 
 	/**
-	 *  This method is called when the selection is changed. It causes the component
-	 *  to recalculate it's width, and call repaint.
+	 * This method is called when the selection is changed. It causes the
+	 * component to recalculate it's width, and call repaint.
 	 */
 	private void selectionChanged() {
-		
+
 		offscreenValid = false;
 		backBufferValid = false;
 
-		int start = map.getMinIndex();
-		int end = map.getMaxIndex();
+		final int start = map.getMinIndex();
+		final int end = map.getMaxIndex();
 		int gidRow = headerInfo.getIndex("GID");
 		if (gidRow == -1) {
 			gidRow = 0;
 		}
-		
-		FontMetrics fontMetrics  = getFontMetrics(new Font(face, style, size));
+
+		final FontMetrics fontMetrics = getFontMetrics(new Font(face, style,
+				size));
 		maxlength = 1;
 		for (int j = start; j < end; j++) {
-				
-			String out = headerSummary.getSummary(headerInfo, j);
-/*
-			String[] headers  = headerInfo.getHeader(j);
-				String out        = headers[gidRow];
-				*/
+
+			final String out = headerSummary.getSummary(headerInfo, j);
+			/*
+			 * String[] headers = headerInfo.getHeader(j); String out =
+			 * headers[gidRow];
+			 */
 			if (out == null) {
 				continue;
 			}
-			
-			int length        = fontMetrics.stringWidth(out);
+
+			final int length = fontMetrics.stringWidth(out);
 			if (maxlength < length) {
 				maxlength = length;
 			}
 		}
 
-		Rectangle visible = getVisibleRect();
+		final Rectangle visible = getVisibleRect();
 		setPreferredSize(new Dimension(map.getUsedPixels(), maxlength));
-		
+
 		revalidate();
 		repaint();
 
 		if (maxlength > oldHeight) {
-			//	    System.out.println("old height "  + oldHeight 
-//			+" new height " + maxlength + ", visible " + visible);
+			// System.out.println("old height " + oldHeight
+			// +" new height " + maxlength + ", visible " + visible);
 			visible.y += maxlength - oldHeight;
-			//	    System.out.println("new visible " + visible);
+			// System.out.println("new visible " + visible);
 			scrollRectToVisible(visible);
 		}
 		oldHeight = maxlength;
 
-		/* The rest is done inside paintComponent...
-	// calculate maxlength
-	int start = map.getIndex(0);
-	int end =   map.getIndex(map.getUsedPixels());
- 	repaint();
-	if (maxlength > oldHeight) {
-	    //	    System.out.println("old height "  + oldHeight +" new height " 
-//	     * + maxlength + ", visible " + visible);
-	    visible.y += maxlength - oldHeight;
-	    //	    System.out.println("new visible " + visible);
-	    scrollRectToVisible(visible);
-	}
-	oldHeight = maxlength;
-	*/
+		/*
+		 * The rest is done inside paintComponent... // calculate maxlength int
+		 * start = map.getIndex(0); int end = map.getIndex(map.getUsedPixels());
+		 * repaint(); if (maxlength > oldHeight) { //
+		 * System.out.println("old height " + oldHeight +" new height " // * +
+		 * maxlength + ", visible " + visible); visible.y += maxlength -
+		 * oldHeight; // System.out.println("new visible " + visible);
+		 * scrollRectToVisible(visible); } oldHeight = maxlength;
+		 */
 	}
 
 	// Observer
 	/**
-	 *  Expects to see updates only from the map, when the array name spacing changes.
-	 *
+	 * Expects to see updates only from the map, when the array name spacing
+	 * changes.
+	 * 
 	 */
 	@Override
-	public void update(Observable o, Object arg) {
-		
+	public void update(final Observable o, final Object arg) {
+
 		if (o == map || o == dataModel) {
 			selectionChanged();
-			
-		  } else if (o == arraySelection) {
+
+		} else if (o == arraySelection) {
 			selectionChanged(); // which genes are selected changed
-			
-		  } else {
+
+		} else {
 			System.out.println("ArrayNameView got funny update!");
 		}
 	}
 
 	// MouseListener
 	/**
-	 *  Starts external browser if the urlExtractor is enabled.
+	 * Starts external browser if the urlExtractor is enabled.
 	 */
 	@Override
-	public void mouseClicked(MouseEvent e) {
+	public void mouseClicked(final MouseEvent e) {
 		if (urlExtractor == null) {
 			return;
 		}
-		
+
 		if (urlExtractor.isEnabled() == false) {
 			return;
 		}
-		
+
 		// now, want mouse click to signal browser...
-		int index  = map.getIndex(e.getX());
+		final int index = map.getIndex(e.getX());
 		if (map.contains(index)) {
 			viewFrame.displayURL(urlExtractor.getUrl(index));
 		}
 	}
 
-	//FontSelectable
-	/*inherit description */
+	// FontSelectable
+	/* inherit description */
 	@Override
 	public String getFace() {
-		
+
 		return face;
 	}
 
-
-	/*inherit description */
+	/* inherit description */
 	@Override
 	public int getPoints() {
-		
+
 		return size;
 	}
 
-
-	/*inherit description */
+	/* inherit description */
 	@Override
 	public int getStyle() {
-		
+
 		return style;
 	}
 
-
-	/*inherit description */
+	/* inherit description */
 	@Override
-	public void setFace(String string) {
-        
-		if ((face == null) ||(!face.equals(string))) {
+	public void setFace(final String string) {
+
+		if ((face == null) || (!face.equals(string))) {
 			face = string;
 			if (root != null)
-			root.setAttribute("face", face, d_face);
+				root.setAttribute("face", face, d_face);
 			setFont(new Font(face, style, size));
 			backBufferValid = false;
 			revalidate();
@@ -540,14 +542,14 @@ FontSelectable, ConfigNodePersistent {
 		}
 	}
 
-	/*inherit description */
+	/* inherit description */
 	@Override
-	public void setPoints(int i) {
-		
+	public void setPoints(final int i) {
+
 		if (size != i) {
 			size = i;
 			if (root != null)
-			root.setAttribute("size", size, d_size);
+				root.setAttribute("size", size, d_size);
 			setFont(new Font(face, style, size));
 			backBufferValid = false;
 			revalidate();
@@ -555,16 +557,15 @@ FontSelectable, ConfigNodePersistent {
 		}
 	}
 
-
-	/*inherit description */
+	/* inherit description */
 	@Override
-	public void setStyle(int i) {
-		
+	public void setStyle(final int i) {
+
 		if (style != i) {
 			style = i;
 			backBufferValid = false;
 			if (root != null)
-			root.setAttribute("style", style, d_style);
+				root.setAttribute("style", style, d_style);
 			setFont(new Font(face, style, size));
 			revalidate();
 			repaint();
@@ -572,51 +573,53 @@ FontSelectable, ConfigNodePersistent {
 	}
 
 	private HeaderSummary headerSummary;
-	
+
 	/** Setter for headerSummary */
-	public void setHeaderSummary(HeaderSummary headerSummary) {
-		
+	public void setHeaderSummary(final HeaderSummary headerSummary) {
+
 		this.headerSummary = headerSummary;
 	}
-	
+
 	/** Getter for headerSummary */
 	public HeaderSummary getHeaderSummary() {
-		
+
 		return headerSummary;
 	}
 
-	/*inherit description */
+	/* inherit description */
 	@Override
-	public void bindConfig(ConfigNode configNode) {
-		
+	public void bindConfig(final ConfigNode configNode) {
+
 		root = configNode;
 		if (configNode.fetchFirst("ArraySummary") == null) {
 			getHeaderSummary().bindConfig(configNode.create("ArraySummary"));
-			getHeaderSummary().setIncluded(new int [] {0});
-			
+			getHeaderSummary().setIncluded(new int[] { 0 });
+
 		} else {
-			getHeaderSummary().bindConfig(configNode.fetchFirst("ArraySummary"));
+			getHeaderSummary()
+					.bindConfig(configNode.fetchFirst("ArraySummary"));
 		}
-		
+
 		setFace(root.getAttribute("face", d_face));
 		setStyle(root.getAttribute("style", d_style));
 		setPoints(root.getAttribute("size", d_size));
 	}
-	
-	private TreeSelectionI arraySelection;
-    /** 
-     * Set geneSelection
-     *
-     * @param geneSelection The TreeSelection which is set by 
-     * selecting genes in the GlobalView
-     */
-    public void setArraySelection(TreeSelectionI arraySelection) {
-	  
-    	if (this.arraySelection != null) {
-    		this.arraySelection.deleteObserver(this);	
-    	}
-    	this.arraySelection = arraySelection;
-    	this.arraySelection.addObserver(this);
-    }
-}
 
+	private TreeSelectionI arraySelection;
+
+	/**
+	 * Set geneSelection
+	 * 
+	 * @param geneSelection
+	 *            The TreeSelection which is set by selecting genes in the
+	 *            GlobalView
+	 */
+	public void setArraySelection(final TreeSelectionI arraySelection) {
+
+		if (this.arraySelection != null) {
+			this.arraySelection.deleteObserver(this);
+		}
+		this.arraySelection = arraySelection;
+		this.arraySelection.addObserver(this);
+	}
+}

@@ -22,7 +22,6 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import java.awt.Adjustable;
 import java.awt.Menu;
 import java.awt.MenuItem;
 import java.awt.event.ActionEvent;
@@ -31,118 +30,112 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.JDialog;
-import javax.swing.JScrollBar;
 
-import edu.stanford.genetics.treeview.*;
+import edu.stanford.genetics.treeview.CancelableSettingsDialog;
+import edu.stanford.genetics.treeview.ConfigNode;
+import edu.stanford.genetics.treeview.GUIParams;
+import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.MessagePanel;
+import edu.stanford.genetics.treeview.TreeSelection;
+import edu.stanford.genetics.treeview.ViewFrame;
 
 /**
- *  This class encapsulates a dendrogram view, which is the classic Eisen
- *  treeview. It uses a drag grid panel to lay out a bunch of linked
- *  visualizations of the data, a la Eisen. In addition to laying out
- *  components, it also manages the GlobalZoomMap. This is necessary since both
- *  the GTRView (gene tree) and KnnGlobalView need to know where to lay out genes
- *  using the same map. The zoom map is managed by the ViewFrame- it represents
- *  the selected genes, and potentially forms a link between different views,
- *  only one of which is the KnnDendroView.
- *
- * @author     Alok Saldanha <alok@genome.stanford.edu>
+ * This class encapsulates a dendrogram view, which is the classic Eisen
+ * treeview. It uses a drag grid panel to lay out a bunch of linked
+ * visualizations of the data, a la Eisen. In addition to laying out components,
+ * it also manages the GlobalZoomMap. This is necessary since both the GTRView
+ * (gene tree) and KnnGlobalView need to know where to lay out genes using the
+ * same map. The zoom map is managed by the ViewFrame- it represents the
+ * selected genes, and potentially forms a link between different views, only
+ * one of which is the KnnDendroView.
+ * 
+ * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.1 $ $Date: 2006-08-16 19:13:45 $
  */
 public class CharDendroView extends DendroView2 {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private HeaderInfo charHeaderInfo;
-	
+
 	/**
-	 *  Constructor for the CharDendroView object
-	 *
-	 * @param  vFrame  parent ViewFrame of CharDendroView
-	 * @param  configNode   node in which to store persistent configuration 
-	 * info (if desired)
+	 * Constructor for the CharDendroView object
+	 * 
+	 * @param vFrame
+	 *            parent ViewFrame of CharDendroView
+	 * @param configNode
+	 *            node in which to store persistent configuration info (if
+	 *            desired)
 	 */
-	public CharDendroView(ViewFrame vFrame, ConfigNode configNode) {
-		
+	public CharDendroView(final ViewFrame vFrame, final ConfigNode configNode) {
+
 		super(vFrame.getDataModel(), configNode, vFrame, "CharDendroView");
 		// this is where it gets interesting...
 		setArraySelection(new TreeSelection(arrayDrawer.getNumCol()));
 	}
 
-	public void populateExportMenu(Menu menu) {
+	public void populateExportMenu(final Menu menu) {
 		/*
-		PostscriptExportPanel doesn't currently support character drawing. 
-		Otherwise, this works.
-		
-		MenuItem psItem = new MenuItem("Export to Postscript...", 
-		new MenuShortcut(KeyEvent.VK_X));
-		psItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent actionEvent) {
-				
-				
-				MapContainer initXmap, initYmap;
-				if ((arraySelection.getNSelectedIndexes() != 0) 
-				|| (geneSelection.getNSelectedIndexes() != 0)){
-					initXmap = getZoomXmap();
-					initYmap = getZoomYmap();
-				} else {
-					initXmap = getGlobalXmap();
-					initYmap = getGlobalYmap();
-				}
-				PostscriptExportPanel psePanel = new PostscriptExportPanel
-				(arraynameview.getHeaderInfo(), 
-				getModel().getGeneHeaderInfo(),
-				geneSelection, arraySelection,
-				invertedTreeDrawer,
-				leftTreeDrawer, arrayDrawer, initXmap, initYmap);
-				psePanel.setSourceSet(dataModel.getFileSet());
-				psePanel.setGeneFont(textview.getFont());
-				psePanel.setArrayFont(arraynameview.getFont());
-				psePanel.setIncludedArrayHeaders(
-				arraynameview.getHeaderSummary().getIncluded());
-				psePanel.setIncludedGeneHeaders(
-				textview.getHeaderSummary().getIncluded());
-				final JDialog popup = new CancelableSettingsDialog(viewFrame, 
-				"Export to Postscript", psePanel);
-				popup.pack();
-				popup.setVisible(true);
-			}
-		});
-		menu.add(psItem);
-		*/
-		
-		MenuItem bitmapItem = new MenuItem("Export to Image...");
+		 * PostscriptExportPanel doesn't currently support character drawing.
+		 * Otherwise, this works.
+		 * 
+		 * MenuItem psItem = new MenuItem("Export to Postscript...", new
+		 * MenuShortcut(KeyEvent.VK_X)); psItem.addActionListener(new
+		 * ActionListener() { public void actionPerformed(ActionEvent
+		 * actionEvent) {
+		 * 
+		 * 
+		 * MapContainer initXmap, initYmap; if
+		 * ((arraySelection.getNSelectedIndexes() != 0) ||
+		 * (geneSelection.getNSelectedIndexes() != 0)){ initXmap =
+		 * getZoomXmap(); initYmap = getZoomYmap(); } else { initXmap =
+		 * getGlobalXmap(); initYmap = getGlobalYmap(); } PostscriptExportPanel
+		 * psePanel = new PostscriptExportPanel (arraynameview.getHeaderInfo(),
+		 * getModel().getGeneHeaderInfo(), geneSelection, arraySelection,
+		 * invertedTreeDrawer, leftTreeDrawer, arrayDrawer, initXmap, initYmap);
+		 * psePanel.setSourceSet(dataModel.getFileSet());
+		 * psePanel.setGeneFont(textview.getFont());
+		 * psePanel.setArrayFont(arraynameview.getFont());
+		 * psePanel.setIncludedArrayHeaders(
+		 * arraynameview.getHeaderSummary().getIncluded());
+		 * psePanel.setIncludedGeneHeaders(
+		 * textview.getHeaderSummary().getIncluded()); final JDialog popup = new
+		 * CancelableSettingsDialog(viewFrame, "Export to Postscript",
+		 * psePanel); popup.pack(); popup.setVisible(true); } });
+		 * menu.add(psItem);
+		 */
+
+		final MenuItem bitmapItem = new MenuItem("Export to Image...");
 		bitmapItem.addActionListener(new ActionListener() {
-			
+
 			@Override
-			public void actionPerformed(ActionEvent actionEvent) {
-				
+			public void actionPerformed(final ActionEvent actionEvent) {
+
 				MapContainer initXmap, initYmap;
-//				if ((getArraySelection().getNSelectedIndexes() != 0) 
-//						|| (getGeneSelection().getNSelectedIndexes() != 0)){
-//					initXmap = getZoomXmap();
-//					initYmap = getZoomYmap();
-//					
-//				} else {
-					initXmap = getGlobalXmap();
-					initYmap = getGlobalYmap();
-//				}
-				
-				BitmapExportPanel bitmapPanel = new BitmapExportPanel
-				(arraynameview.getHeaderInfo(), 
-				getDataModel().getGeneHeaderInfo(),
-				getGeneSelection(), getArraySelection(),
-				invertedTreeDrawer,
-				leftTreeDrawer, arrayDrawer, initXmap, initYmap,
-				true);
+				// if ((getArraySelection().getNSelectedIndexes() != 0)
+				// || (getGeneSelection().getNSelectedIndexes() != 0)){
+				// initXmap = getZoomXmap();
+				// initYmap = getZoomYmap();
+				//
+				// } else {
+				initXmap = getGlobalXmap();
+				initYmap = getGlobalYmap();
+				// }
+
+				final BitmapExportPanel bitmapPanel = new BitmapExportPanel(
+						arraynameview.getHeaderInfo(), getDataModel()
+								.getGeneHeaderInfo(), getGeneSelection(),
+						getArraySelection(), invertedTreeDrawer,
+						leftTreeDrawer, arrayDrawer, initXmap, initYmap, true);
 				bitmapPanel.setSourceSet(getDataModel().getFileSet());
 				bitmapPanel.setGeneFont(textview.getFont());
 				bitmapPanel.setArrayFont(arraynameview.getFont());
-				bitmapPanel.setIncludedArrayHeaders(
-						arraynameview.getHeaderSummary().getIncluded());
-				bitmapPanel.setIncludedGeneHeaders(
-						textview.getHeaderSummary().getIncluded());
-				
-				final JDialog popup = new CancelableSettingsDialog(viewFrame, 
+				bitmapPanel.setIncludedArrayHeaders(arraynameview
+						.getHeaderSummary().getIncluded());
+				bitmapPanel.setIncludedGeneHeaders(textview.getHeaderSummary()
+						.getIncluded());
+
+				final JDialog popup = new CancelableSettingsDialog(viewFrame,
 						"Export to Image", bitmapPanel);
 				popup.pack();
 				popup.setVisible(true);
@@ -152,48 +145,44 @@ public class CharDendroView extends DendroView2 {
 	}
 
 	/**
-	 *  This method should be called only during initial setup of the modelview
-	 *
-	 *  It sets up the views and binds them all to config nodes.
-	 *
+	 * This method should be called only during initial setup of the modelview
+	 * 
+	 * It sets up the views and binds them all to config nodes.
+	 * 
 	 */
 	@Override
 	protected void setupViews() {
 
-		CharColorExtractor colorExtractor = new CharColorExtractor();
-		
+		final CharColorExtractor colorExtractor = new CharColorExtractor();
+
 		statuspanel = new MessagePanel("Status", GUIParams.ELEMENT);
 
-		CharArrayDrawer cArrayDrawer = new CharArrayDrawer();
+		final CharArrayDrawer cArrayDrawer = new CharArrayDrawer();
 		cArrayDrawer.setColorExtractor(colorExtractor);
-		//set data first to avoid adding auto-genereated contrast 
-		//to documentConfig.
-		cArrayDrawer.setHeaderInfo(getDataModel().getGeneHeaderInfo(), 
+		// set data first to avoid adding auto-genereated contrast
+		// to documentConfig.
+		cArrayDrawer.setHeaderInfo(getDataModel().getGeneHeaderInfo(),
 				getConfigNode().getAttribute("headerName", "ALN"));
 		arrayDrawer = cArrayDrawer;
 
-
-
-
-		((Observable)getDataModel()).addObserver(arrayDrawer);
+		((Observable) getDataModel()).addObserver(arrayDrawer);
 
 		globalview = new GlobalView();
-		
-		
-		// scrollbars, mostly used by maps
-//		zoomXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0,1,0,1);
-//		zoomYscrollbar = new JScrollBar(Adjustable.VERTICAL,0,1,0,1);
-//
-//		zoomXmap = new MapContainer();
-//		zoomXmap.setDefaultScale(12.0);
-//		zoomXmap.setScrollbar(zoomXscrollbar);
-//		zoomYmap = new MapContainer();
-//		zoomYmap.setDefaultScale(12.0);
-//		zoomYmap.setScrollbar(zoomYscrollbar);
 
-		//globalmaps tell globalview, atrview, and gtrview
-		//where to draw each data point.
-		//the scrollbars "scroll" by communicating with the maps.
+		// scrollbars, mostly used by maps
+		// zoomXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0,1,0,1);
+		// zoomYscrollbar = new JScrollBar(Adjustable.VERTICAL,0,1,0,1);
+		//
+		// zoomXmap = new MapContainer();
+		// zoomXmap.setDefaultScale(12.0);
+		// zoomXmap.setScrollbar(zoomXscrollbar);
+		// zoomYmap = new MapContainer();
+		// zoomYmap.setDefaultScale(12.0);
+		// zoomYmap.setScrollbar(zoomYscrollbar);
+
+		// globalmaps tell globalview, atrview, and gtrview
+		// where to draw each data point.
+		// the scrollbars "scroll" by communicating with the maps.
 		globalXmap = new MapContainer();
 		globalXmap.setDefaultScale(2.0);
 		globalYmap = new MapContainer();
@@ -202,8 +191,8 @@ public class CharDendroView extends DendroView2 {
 		globalview.setXMap(globalXmap);
 		globalview.setYMap(globalYmap);
 
-//		globalview.setZoomYMap(getZoomYmap());
-//		globalview.setZoomXMap(getZoomXmap());
+		// globalview.setZoomYMap(getZoomYmap());
+		// globalview.setZoomXMap(getZoomXmap());
 		globalview.setArrayDrawer(arrayDrawer);
 
 		charHeaderInfo = new CharHeaderInfo(arrayDrawer.getNumCol());
@@ -214,145 +203,159 @@ public class CharDendroView extends DendroView2 {
 		gtrview = new GTRView();
 		gtrview.setMap(globalYmap);
 		gtrview.setLeftTreeDrawer(leftTreeDrawer);
-		gtrview.getHeaderSummary().setIncluded(new int [] {0,3});
-		
+		gtrview.getHeaderSummary().setIncluded(new int[] { 0, 3 });
+
 		invertedTreeDrawer = new InvertedTreeDrawer();
 		atrview = new ATRView();
 		atrview.setMap(globalXmap);
 		atrview.setInvertedTreeDrawer(invertedTreeDrawer);
-		atrview.getHeaderSummary().setIncluded(new int [] {0,3});
+		atrview.getHeaderSummary().setIncluded(new int[] { 0, 3 });
 
-//		atrzview = new ATRZoomView();
-//		atrzview.setZoomMap(getZoomXmap());
-//		atrzview.setHeaderSummary(atrview.getHeaderSummary());
-//		atrzview.setInvertedTreeDrawer(invertedTreeDrawer);
-//
-//		zoomview = new ZoomView();
-//		zoomview.setYMap(getZoomYmap());
-//		zoomview.setXMap(getZoomXmap());
-//		zoomview.setArrayDrawer(arrayDrawer);
+		// atrzview = new ATRZoomView();
+		// atrzview.setZoomMap(getZoomXmap());
+		// atrzview.setHeaderSummary(atrview.getHeaderSummary());
+		// atrzview.setInvertedTreeDrawer(invertedTreeDrawer);
+		//
+		// zoomview = new ZoomView();
+		// zoomview.setYMap(getZoomYmap());
+		// zoomview.setXMap(getZoomXmap());
+		// zoomview.setArrayDrawer(arrayDrawer);
 
-//		arraynameview.setMapping(getZoomXmap());
+		// arraynameview.setMapping(getZoomXmap());
 
-		textview = new TextViewManager(getDataModel().getGeneHeaderInfo(), 
+		textview = new TextViewManager(getDataModel().getGeneHeaderInfo(),
 				viewFrame.getUrlExtractor(), getDataModel());
-//		textview.setMap(getZoomYmap());
+		// textview.setMap(getZoomYmap());
 
 		doDoubleLayout();
-		
+
 		// reset persistent popups
 		settingsFrame = null;
 		settingsPanel = null;
 
 		// urls
 		colorExtractor.bindConfig(getFirst("ColorExtractor"));
-		
+
 		bindTrees();
-		
-//		zoomview.setHeaders(getDataModel().getGeneHeaderInfo(), charHeaderInfo);
-//		zoomview.setShowVal(true);
+
+		// zoomview.setHeaders(getDataModel().getGeneHeaderInfo(),
+		// charHeaderInfo);
+		// zoomview.setShowVal(true);
 		globalXmap.bindConfig(getFirst("GlobalXMap"));
 		globalYmap.bindConfig(getFirst("GlobalYMap"));
-//		getZoomXmap().bindConfig(getFirst("ZoomXMap"));
-//		getZoomYmap().bindConfig(getFirst("ZoomYMap"));
+		// getZoomXmap().bindConfig(getFirst("ZoomXMap"));
+		// getZoomYmap().bindConfig(getFirst("ZoomYMap"));
 
 		textview.bindConfig(getFirst("TextViewParent"));
-//		arraynameview.bindConfig(getFirst("ArrayNameView"));
+		// arraynameview.bindConfig(getFirst("ArrayNameView"));
 
 		// perhaps I could remember this stuff in the MapContainer...
 		globalXmap.setIndexRange(0, arrayDrawer.getNumCol() - 1);
 		globalYmap.setIndexRange(0, arrayDrawer.getNumRow() - 1);
-//		getZoomXmap().setIndexRange(-1, -1);
-//		getZoomYmap().setIndexRange(-1, -1);
+		// getZoomXmap().setIndexRange(-1, -1);
+		// getZoomYmap().setIndexRange(-1, -1);
 
 		globalXmap.notifyObservers();
 		globalYmap.notifyObservers();
-//		getZoomXmap().notifyObservers();
-//		getZoomYmap().notifyObservers();
-	}	
+		// getZoomXmap().notifyObservers();
+		// getZoomYmap().notifyObservers();
+	}
 }
 
 class CharHeaderInfo implements HeaderInfo {
-	
-	String [] holder = new String [1];
-	String [] names = new String [1];
+
+	String[] holder = new String[1];
+	String[] names = new String[1];
 	int numChars;
-	
-	CharHeaderInfo(int n) {
-		
+
+	CharHeaderInfo(final int n) {
+
 		numChars = n;
 	}
 
 	@Override
-	public String[] getHeader(int i) {
-		
+	public String[] getHeader(final int i) {
+
 		holder[0] = "" + i;
 		return holder;
 	}
 
 	@Override
-	public String getHeader(int i, String name) {
-		
+	public String getHeader(final int i, final String name) {
+
 		return "" + i;
 	}
-	
+
 	@Override
-	public String getHeader(int rowIndex, int columnIndex) {
-		
+	public String getHeader(final int rowIndex, final int columnIndex) {
+
 		return "" + rowIndex;
 	}
-	
+
 	@Override
 	public String[] getNames() {
-		
+
 		names[0] = "Column";
 		return names;
 	}
 
 	@Override
 	public int getNumNames() {
-		
+
 		return 1;
 	}
 
 	@Override
 	public int getNumHeaders() {
-		
+
 		return numChars;
 	}
 
 	@Override
-	public int getIndex(String name) {
-		
+	public int getIndex(final String name) {
+
 		return 0;
 	}
 
 	@Override
-	public int getHeaderIndex(String id) {
-		
+	public int getHeaderIndex(final String id) {
+
 		return 0;
 	}
-	
+
 	/**
 	 * noop, since this object is static.
 	 */
 	@Override
-	public void addObserver(Observer o) {}		
+	public void addObserver(final Observer o) {
+	}
+
 	@Override
-	public void deleteObserver(Observer o) {}		
+	public void deleteObserver(final Observer o) {
+	}
+
 	@Override
-	public boolean addName(String name, int location) {return false;}
+	public boolean addName(final String name, final int location) {
+		return false;
+	}
+
 	@Override
-	public boolean setHeader(int i, String name, String value) {return false;}
+	public boolean setHeader(final int i, final String name, final String value) {
+		return false;
+	}
+
 	@Override
-	public boolean getModified() {return false;}
+	public boolean getModified() {
+		return false;
+	}
+
 	@Override
-	public void setModified(boolean mod) {}
+	public void setModified(final boolean mod) {
+	}
 
 	@Override
 	public String[][] getHeaderArray() {
 		// TODO Auto-generated method stub
 		return null;
-	}		
+	}
 }
-

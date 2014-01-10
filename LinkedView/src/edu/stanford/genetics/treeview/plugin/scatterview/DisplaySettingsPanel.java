@@ -22,96 +22,135 @@
  */
 package edu.stanford.genetics.treeview.plugin.scatterview;
 
-import edu.stanford.genetics.treeview.*;
-import edu.stanford.genetics.treeview.app.*;
+import java.awt.Color;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.io.File;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.border.*;
-import java.io.*;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JColorChooser;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.border.EtchedBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
+import edu.stanford.genetics.treeview.ColorIcon;
+import edu.stanford.genetics.treeview.DummyConfigNode;
+import edu.stanford.genetics.treeview.LinkedViewFrame;
+import edu.stanford.genetics.treeview.SettingsPanel;
+import edu.stanford.genetics.treeview.ViewFrame;
+import edu.stanford.genetics.treeview.app.LinkedViewApp;
 
 class DisplaySettingsPanel extends JPanel implements SettingsPanel {
 	private ScatterColorPresets presets;
+
 	/** Setter for presets */
-	public void setPresets(ScatterColorPresets presets) {
+	public void setPresets(final ScatterColorPresets presets) {
 		this.presets = presets;
 	}
+
 	/** Getter for presets */
 	public ScatterColorPresets getPresets() {
 		return presets;
 	}
-	
-	
+
 	private HorizontalAxisPane horizontalAxisPane = null;
 	private VerticalAxisPane verticalAxisPane = null;
-	
+
 	private ScatterView scatterPane;
+
 	/** Setter for scatterPane */
-	public void setScatterView(ScatterView scatterPane) {
+	public void setScatterView(final ScatterView scatterPane) {
 		this.scatterPane = scatterPane;
 	}
+
 	/** Getter for scatterPane */
 	public ScatterView getScatterView() {
 		return scatterPane;
 	}
-	
-	public static final void main(String [] argv) {
-		LinkedViewApp statview = new LinkedViewApp();
-		LinkedViewFrame testf = new LinkedViewFrame(statview);
 
-		ScatterPanel kp = new ScatterPanel(testf, new DummyConfigNode("Display Settings Panel"));
-		ScatterColorPresets kcp = new ScatterColorPresets();
+	public static final void main(final String[] argv) {
+		final LinkedViewApp statview = new LinkedViewApp();
+		final LinkedViewFrame testf = new LinkedViewFrame(statview);
 
+		final ScatterPanel kp = new ScatterPanel(testf, new DummyConfigNode(
+				"Display Settings Panel"));
+		final ScatterColorPresets kcp = new ScatterColorPresets();
 
-		DisplaySettingsPanel panel = new DisplaySettingsPanel(kp.getScatterPane(), kcp, testf);
+		final DisplaySettingsPanel panel = new DisplaySettingsPanel(
+				kp.getScatterPane(), kcp, testf);
 		panel.revalidate();
-		JFrame test = new JFrame("Test Display Settings Panel");
+		final JFrame test = new JFrame("Test Display Settings Panel");
 		test.getContentPane().add(panel);
 		test.pack();
 		test.setVisible(true);
 	}
-	
-	
-	public DisplaySettingsPanel(ScatterView scatterPane, ScatterColorPresets presets, ViewFrame frame) {
-			this (scatterPane, presets, frame, (HorizontalAxisPane) null, (VerticalAxisPane) null);
-		}
-	public DisplaySettingsPanel(ScatterView scatterPane, ScatterColorPresets presets, ViewFrame frame, HorizontalAxisPane horizontalAxisPane, VerticalAxisPane verticalAxisPane) {
-			this (scatterPane, presets, scatterPane.getXAxisInfo(), scatterPane.getYAxisInfo(), frame, horizontalAxisPane, verticalAxisPane);
-		}
-	public DisplaySettingsPanel(ScatterView scatterPane, ScatterColorPresets presets, 
-		AxisInfo xAxisInfo, AxisInfo yAxisInfo, ViewFrame frame, HorizontalAxisPane horizontalAxisPane, VerticalAxisPane verticalAxisPane) {
-			this.horizontalAxisPane = horizontalAxisPane;
-			this.verticalAxisPane = verticalAxisPane;
-			setScatterView(scatterPane);
-			setPresets(presets);
-			setFrame(frame);
-			addWidgets();
+
+	public DisplaySettingsPanel(final ScatterView scatterPane,
+			final ScatterColorPresets presets, final ViewFrame frame) {
+		this(scatterPane, presets, frame, (HorizontalAxisPane) null,
+				(VerticalAxisPane) null);
 	}
 
-	private ViewFrame frame  = null;
+	public DisplaySettingsPanel(final ScatterView scatterPane,
+			final ScatterColorPresets presets, final ViewFrame frame,
+			final HorizontalAxisPane horizontalAxisPane,
+			final VerticalAxisPane verticalAxisPane) {
+		this(scatterPane, presets, scatterPane.getXAxisInfo(), scatterPane
+				.getYAxisInfo(), frame, horizontalAxisPane, verticalAxisPane);
+	}
+
+	public DisplaySettingsPanel(final ScatterView scatterPane,
+			final ScatterColorPresets presets, final AxisInfo xAxisInfo,
+			final AxisInfo yAxisInfo, final ViewFrame frame,
+			final HorizontalAxisPane horizontalAxisPane,
+			final VerticalAxisPane verticalAxisPane) {
+		this.horizontalAxisPane = horizontalAxisPane;
+		this.verticalAxisPane = verticalAxisPane;
+		setScatterView(scatterPane);
+		setPresets(presets);
+		setFrame(frame);
+		addWidgets();
+	}
+
+	private ViewFrame frame = null;
+
 	/** Setter for frame */
-	public void setFrame(ViewFrame frame) {
+	public void setFrame(final ViewFrame frame) {
 		this.frame = frame;
 	}
+
 	/** Getter for frame */
 	public ViewFrame getFrame() {
 		return frame;
 	}
+
 	private AxisPanel xAxisPanel, yAxisPanel;
 	private ColorConfigPanel colorPanel;
 	private ColorPresetsPanel colorPresetsPanel;
+
 	private void addWidgets() {
 		setLayout(new GridBagLayout());
-		GridBagConstraints gc = new GridBagConstraints();
+		final GridBagConstraints gc = new GridBagConstraints();
 		gc.weightx = 100;
 		gc.weighty = 100;
 		gc.gridx = 0;
 		gc.gridy = 0;
 		gc.gridwidth = 1;
 		gc.gridheight = 1;
-		
+
 		gc.gridx = 0;
 		gc.gridy = 0;
 		xAxisPanel = new AxisPanel(scatterPane.getXAxisInfo());
@@ -119,70 +158,74 @@ class DisplaySettingsPanel extends JPanel implements SettingsPanel {
 		gc.gridx = 1;
 		yAxisPanel = new AxisPanel(scatterPane.getYAxisInfo());
 		add(yAxisPanel, gc);
-		
+
 		gc.gridx = 0;
 		gc.gridy = 1;
 		gc.gridwidth = 2;
 		colorPanel = new ColorConfigPanel();
-		add(colorPanel,gc);
+		add(colorPanel, gc);
 	}
-	
+
 	@Override
 	public void synchronizeTo() {
 	}
-	
+
 	@Override
 	public void synchronizeFrom() {
 	}
-	
+
 	/**
-	* panel which allows setting of axis parameters
-	*/
+	 * panel which allows setting of axis parameters
+	 */
 	class AxisPanel extends JPanel {
-		
+
 		/**
-		* all info is stored in the axis info
-		*/
+		 * all info is stored in the axis info
+		 */
 		AxisInfo axisInfo;
-		
+
 		/**
-		* Panel to configure Minimum Value for axis
-		*/
+		 * Panel to configure Minimum Value for axis
+		 */
 		ParameterPanel minPanel;
-		
+
 		/**
-		* Panel to configure Maximum Value for axis
-		*/
+		 * Panel to configure Maximum Value for axis
+		 */
 		ParameterPanel maxPanel;
-		
+
 		/**
-		* Panel to configure Minor tick spacing for axis
-		*/
+		 * Panel to configure Minor tick spacing for axis
+		 */
 		ParameterPanel minorPanel;
-		
+
 		/**
-		* Panel to configure Major tick spacing for axis
-		*/
+		 * Panel to configure Major tick spacing for axis
+		 */
 		ParameterPanel majorPanel;
-		
-		AxisPanel(AxisInfo axisInfo) {
+
+		AxisPanel(final AxisInfo axisInfo) {
 			this.axisInfo = axisInfo;
 
 			setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 			add(new JLabel(axisInfo.getType() + " Axis"));
-			
-			minPanel = new ParameterPanel(axisInfo.getAxisParameter(AxisParameter.MIN));
-			maxPanel = new ParameterPanel(axisInfo.getAxisParameter(AxisParameter.MAX));
-			minorPanel = new ParameterPanel(axisInfo.getAxisParameter(AxisParameter.MINOR));
-			majorPanel = new ParameterPanel(axisInfo.getAxisParameter(AxisParameter.MAJOR));
-			
+
+			minPanel = new ParameterPanel(
+					axisInfo.getAxisParameter(AxisParameter.MIN));
+			maxPanel = new ParameterPanel(
+					axisInfo.getAxisParameter(AxisParameter.MAX));
+			minorPanel = new ParameterPanel(
+					axisInfo.getAxisParameter(AxisParameter.MINOR));
+			majorPanel = new ParameterPanel(
+					axisInfo.getAxisParameter(AxisParameter.MAJOR));
+
 			add(minPanel);
 			add(maxPanel);
 			add(minorPanel);
 			add(majorPanel);
-			
+
 		}
-		
+
 		public void getValues() {
 			minPanel.getValues();
 			maxPanel.getValues();
@@ -190,77 +233,88 @@ class DisplaySettingsPanel extends JPanel implements SettingsPanel {
 			minorPanel.getValues();
 			revalidate();
 		}
-		
+
 		public void setValues() {
-			minPanel.  setValues();
-			maxPanel.  setValues();
+			minPanel.setValues();
+			maxPanel.setValues();
 			majorPanel.setValues();
 			minorPanel.setValues();
 		}
 
 		class ParameterPanel extends JPanel {
-			private AxisParameter axisParameter;
-		/**
-		* text fields to hold value for parameter
-		*/
-		private JTextField valueField;
-		/**
-		* checkbox to enable/disable parameter
-		*/
-		private JCheckBox enabledBox;
-		
-		
-		ParameterPanel(AxisParameter axisParameter) {
+			private final AxisParameter axisParameter;
+			/**
+			 * text fields to hold value for parameter
+			 */
+			private final JTextField valueField;
+			/**
+			 * checkbox to enable/disable parameter
+			 */
+			private final JCheckBox enabledBox;
+
+			ParameterPanel(final AxisParameter axisParameter) {
 				this.axisParameter = axisParameter;
-				
+
 				valueField = new JTextField("" + axisParameter.getValue());
 				enabledBox = new JCheckBox(axisParameter.getName());
 				enabledBox.setSelected(axisParameter.getEnabled());
-				
+
 				enabledBox.addActionListener(new ActionListener() {
 					@Override
-					public void actionPerformed(ActionEvent e) {
+					public void actionPerformed(final ActionEvent e) {
 						setEnabledValue();
 					}
 				});
 
 				valueField.addKeyListener(new KeyListener() {
 					@Override
-					public void keyPressed(KeyEvent e) {
-//						setValue()
+					public void keyPressed(final KeyEvent e) {
+						// setValue()
 					};
+
 					@Override
-					public void keyReleased(KeyEvent e) {
-//					setValue()
+					public void keyReleased(final KeyEvent e) {
+						// setValue()
 					};
+
 					@Override
-					public void keyTyped(KeyEvent e) {
-							enabledBox.setSelected(true);
-							setEnabledValue();
+					public void keyTyped(final KeyEvent e) {
+						enabledBox.setSelected(true);
+						setEnabledValue();
 					}
 				});
 
-				valueField.getDocument().addDocumentListener(new DocumentListener() {
-					@Override
-					public void insertUpdate  (DocumentEvent e) { setValue();}
-					@Override
-					public void removeUpdate  (DocumentEvent e) { setValue();}
-					@Override
-					public void changedUpdate (DocumentEvent e) { setValue();}
-				});				
+				valueField.getDocument().addDocumentListener(
+						new DocumentListener() {
+							@Override
+							public void insertUpdate(final DocumentEvent e) {
+								setValue();
+							}
+
+							@Override
+							public void removeUpdate(final DocumentEvent e) {
+								setValue();
+							}
+
+							@Override
+							public void changedUpdate(final DocumentEvent e) {
+								setValue();
+							}
+						});
 				getValues();
 				add(enabledBox);
 				add(valueField);
 			}
-			
+
 			public void getValues() {
 				enabledBox.setSelected(axisParameter.getEnabled());
 				valueField.setText("" + axisParameter.getValue());
 			}
 
 			public void setEnabledValue() {
-				boolean current = axisParameter.getEnabled();
-				if (current == enabledBox.isSelected()) return;
+				final boolean current = axisParameter.getEnabled();
+				if (current == enabledBox.isSelected())
+					return;
 
 				axisParameter.setEnabled(enabledBox.isSelected());
 				if (enabledBox.isSelected()) {
@@ -269,59 +323,66 @@ class DisplaySettingsPanel extends JPanel implements SettingsPanel {
 					repaintScatterView();
 				}
 			}
+
 			public void setValue() {
-				if (enabledBox.isSelected() == false) return;
+				if (enabledBox.isSelected() == false)
+					return;
 				try {
-					Double temp = new Double(valueField.getText());
-					double current = axisParameter.getValue();
-					if (current == temp.doubleValue()) return;
+					final Double temp = new Double(valueField.getText());
+					final double current = axisParameter.getValue();
+					if (current == temp.doubleValue())
+						return;
 					axisParameter.setValue(temp.doubleValue());
-				} catch (java.lang.NumberFormatException e) {
+				} catch (final java.lang.NumberFormatException e) {
 				}
 				repaintScatterView();
 			}
+
 			public void setValues() {
 				setEnabledValue();
 				setValue();
 			}
 		}
 	}
-	
+
 	/**
-	* Panel which allows configuration of all colors
-	*/
+	 * Panel which allows configuration of all colors
+	 */
 	class ColorConfigPanel extends JPanel {
-		private final ColorPanel []  colorPanels = new ColorPanel[6];
+		private final ColorPanel[] colorPanels = new ColorPanel[6];
+
 		ColorConfigPanel() {
 			try {
-				setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-			} catch (java.lang.NoSuchMethodError err) {
+				setBorder(BorderFactory
+						.createEtchedBorder(EtchedBorder.LOWERED));
+			} catch (final java.lang.NoSuchMethodError err) {
 				// god damn MRJ for os 9.
 			}
-			for (int i =0;i <4;i++) {
+			for (int i = 0; i < 4; i++) {
 				colorPanels[i] = new ColorPanel(i);
 			}
 			setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-			JPanel row1 = new JPanel();
+			final JPanel row1 = new JPanel();
 			row1.add(colorPanels[0]);
 			row1.add(colorPanels[1]);
 			row1.add(colorPanels[2]);
 			row1.add(colorPanels[3]);
 			add(row1);
-			
-			
-			JPanel row3 = new JPanel();
-			JButton loadButton = new JButton("Load...");
+
+			final JPanel row3 = new JPanel();
+			final JButton loadButton = new JButton("Load...");
 			loadButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent e) {
-					JFileChooser chooser = new JFileChooser();
-					int returnVal = chooser.showOpenDialog(DisplaySettingsPanel.this);
-					if(returnVal == JFileChooser.APPROVE_OPTION) {
-						File f = chooser.getSelectedFile();
-						ScatterColorSet colorSet = scatterPane.getColorSet();
+				public void actionPerformed(final ActionEvent e) {
+					final JFileChooser chooser = new JFileChooser();
+					final int returnVal = chooser
+							.showOpenDialog(DisplaySettingsPanel.this);
+					if (returnVal == JFileChooser.APPROVE_OPTION) {
+						final File f = chooser.getSelectedFile();
+						final ScatterColorSet colorSet = scatterPane
+								.getColorSet();
 						colorSet.load(f.getPath());
-						for (int i =0;i <6;i++) {
+						for (int i = 0; i < 6; i++) {
 							colorPanels[i].redoColor();
 						}
 						repaint();
@@ -331,27 +392,29 @@ class DisplaySettingsPanel extends JPanel implements SettingsPanel {
 			});
 			row3.add(loadButton);
 
-			JButton saveButton = new JButton("Save...");
+			final JButton saveButton = new JButton("Save...");
 			saveButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent e) {
-					JFileChooser chooser = new JFileChooser();
-					int returnVal = chooser.showSaveDialog(DisplaySettingsPanel.this);
-					if(returnVal == JFileChooser.APPROVE_OPTION) {
-						File f = chooser.getSelectedFile();
-						ScatterColorSet colorSet = scatterPane.getColorSet();
-							colorSet.save(f.getPath());
+				public void actionPerformed(final ActionEvent e) {
+					final JFileChooser chooser = new JFileChooser();
+					final int returnVal = chooser
+							.showSaveDialog(DisplaySettingsPanel.this);
+					if (returnVal == JFileChooser.APPROVE_OPTION) {
+						final File f = chooser.getSelectedFile();
+						final ScatterColorSet colorSet = scatterPane
+								.getColorSet();
+						colorSet.save(f.getPath());
 					}
 				}
 			});
 			row3.add(saveButton);
 
-			JButton makeButton = new JButton("Make Preset");
+			final JButton makeButton = new JButton("Make Preset");
 			makeButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent e) {
-					ScatterColorSet temp = new ScatterColorSet();
-						ScatterColorSet colorSet = scatterPane.getColorSet();
+				public void actionPerformed(final ActionEvent e) {
+					final ScatterColorSet temp = new ScatterColorSet();
+					final ScatterColorSet colorSet = scatterPane.getColorSet();
 					temp.copyStateFrom(colorSet);
 					temp.setName("UserDefined");
 					presets.addColorSet(temp);
@@ -367,89 +430,107 @@ class DisplaySettingsPanel extends JPanel implements SettingsPanel {
 			add(new JScrollPane(colorPresetsPanel));
 			revalidate();
 		}
-		public void copyStateFrom(ScatterColorSet otherSet) {
-						ScatterColorSet colorSet = scatterPane.getColorSet();
+
+		public void copyStateFrom(final ScatterColorSet otherSet) {
+			final ScatterColorSet colorSet = scatterPane.getColorSet();
 			colorSet.copyStateFrom(otherSet);
-			for (int i =0;i <4;i++) {
+			for (int i = 0; i < 4; i++) {
 				colorPanels[i].redoColor();
 			}
 			repaint();
 			repaintScatterView();
 		}
-		public void getValues() {}
-		public void setValues() {}
+
+		public void getValues() {
+		}
+
+		public void setValues() {
+		}
 	}
 
 	/**
-	* this class allows the presets to be selected...
-	*/
+	 * this class allows the presets to be selected...
+	 */
 	class ColorPresetsPanel extends JPanel {
-	  ColorPresetsPanel() {
-		redoLayout();
-	  }
-	  public void redoLayout() {
-		removeAll();
-		int nPresets = presets.getNumPresets();
-		JButton [] buttons = new JButton[nPresets];
-		for (int i = 0; i < nPresets; i++) {
-		  JButton presetButton = new JButton((presets.getPresetNames()) [i]);
-		  final int index = i;
-		  presetButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-			  colorPanel.copyStateFrom(presets.getColorSet(index));
-			}
-		  });
-		  add(presetButton);
-		  buttons[index] = presetButton;
+		ColorPresetsPanel() {
+			redoLayout();
 		}
-	  }
+
+		public void redoLayout() {
+			removeAll();
+			final int nPresets = presets.getNumPresets();
+			final JButton[] buttons = new JButton[nPresets];
+			for (int i = 0; i < nPresets; i++) {
+				final JButton presetButton = new JButton(
+						(presets.getPresetNames())[i]);
+				final int index = i;
+				presetButton.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(final ActionEvent e) {
+						colorPanel.copyStateFrom(presets.getColorSet(index));
+					}
+				});
+				add(presetButton);
+				buttons[index] = presetButton;
+			}
+		}
 	}
+
 	/**
-	* inner class, must be inner so it can notify scatterPane when it changes the colorSet.
-	*/
+	 * inner class, must be inner so it can notify scatterPane when it changes
+	 * the colorSet.
+	 */
 	public class ColorPanel extends JPanel {
 		ColorIcon colorIcon;
 		int type;
-		public ColorPanel(int i) {
+
+		public ColorPanel(final int i) {
 			type = i;
 			redoComps();
-		} 
+		}
+
 		public void redoColor() {
 			colorIcon.setColor(getColor());
 		}
+
 		public void redoComps() {
 			removeAll();
 			colorIcon = new ColorIcon(10, 10, getColor());
-			JButton pushButton = new JButton(getLabel(), colorIcon);
+			final JButton pushButton = new JButton(getLabel(), colorIcon);
 			pushButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent e) {
-					Color trial = JColorChooser.showDialog(ColorPanel.this, "Pick Color for " + getLabel(), getColor());
+				public void actionPerformed(final ActionEvent e) {
+					final Color trial = JColorChooser.showDialog(
+							ColorPanel.this, "Pick Color for " + getLabel(),
+							getColor());
 					if (trial != null) {
 						setColor(trial);
 						repaintScatterView();
 					}
 				}
 			});
-			
+
 			add(pushButton);
 		}
-		private void setColor(Color c) {
-						ScatterColorSet colorSet = scatterPane.getColorSet();
+
+		private void setColor(final Color c) {
+			final ScatterColorSet colorSet = scatterPane.getColorSet();
 			colorSet.setColor(type, c);
 			colorIcon.setColor(getColor());
 			repaint();
 		}
+
 		private String getLabel() {
-						ScatterColorSet colorSet = scatterPane.getColorSet();
+			final ScatterColorSet colorSet = scatterPane.getColorSet();
 			return colorSet.getType(type);
 		}
+
 		private Color getColor() {
-						ScatterColorSet colorSet = scatterPane.getColorSet();
+			final ScatterColorSet colorSet = scatterPane.getColorSet();
 			return colorSet.getColor(type);
 		}
 	}
+
 	private void repaintScatterView() {
 		scatterPane.setOffscreenValid(false);
 		scatterPane.repaint();
@@ -460,6 +541,5 @@ class DisplaySettingsPanel extends JPanel implements SettingsPanel {
 			verticalAxisPane.repaint();
 		}
 	}
-	
-}
 
+}

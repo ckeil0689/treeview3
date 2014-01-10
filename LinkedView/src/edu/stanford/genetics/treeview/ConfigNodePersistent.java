@@ -23,20 +23,20 @@
 package edu.stanford.genetics.treeview;
 
 /**
- *  Defines an interface by which objects can be bound to ConfigNodes.
- *
- * @author     Alok Saldanha <alok@genome.stanford.edu>
- * @version    $Revision: 1.5 $ $Date: 2004-12-21 03:28:13 $
+ * Defines an interface by which objects can be bound to ConfigNodes.
+ * 
+ * @author Alok Saldanha <alok@genome.stanford.edu>
+ * @version $Revision: 1.5 $ $Date: 2004-12-21 03:28:13 $
  */
 public interface ConfigNodePersistent {
 	/**
-	 *  Should bind implementing object to suppled confignode. As it is bound, the object
-	 *  should change its state information to match that in the confignode. Furthermore,
-	 *  once bound it should store all its state information in the confignode, so as
-	 *  to maintain persistence across runs.
-	 *
-	 * @param  configNode  config node to bind to.
+	 * Should bind implementing object to suppled confignode. As it is bound,
+	 * the object should change its state information to match that in the
+	 * confignode. Furthermore, once bound it should store all its state
+	 * information in the confignode, so as to maintain persistence across runs.
+	 * 
+	 * @param configNode
+	 *            config node to bind to.
 	 */
 	public void bindConfig(ConfigNode configNode);
 }
-

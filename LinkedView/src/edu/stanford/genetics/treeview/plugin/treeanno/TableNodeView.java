@@ -15,7 +15,9 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
-import edu.stanford.genetics.treeview.*;
+import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.ModelView;
+import edu.stanford.genetics.treeview.TreeSelectionI;
 
 /**
  * class to allow editing of TreeViewNodes, altough could easily be generalized
@@ -23,21 +25,22 @@ import edu.stanford.genetics.treeview.*;
  */
 public class TableNodeView extends ModelView implements ListSelectionListener {
 
-	private NodeTableModel tableModel;
+	private final NodeTableModel tableModel;
 	private TreeSelectionI selection;
-	private JTable nodeTable;
-	private HeaderInfo headerInfo;
-	
-	public void setSelection(TreeSelectionI sel) {
+	private final JTable nodeTable;
+	private final HeaderInfo headerInfo;
+
+	public void setSelection(final TreeSelectionI sel) {
 		if (selection != null) {
-			selection.deleteObserver(this);	
+			selection.deleteObserver(this);
 		}
 		selection = sel;
 		selection.addObserver(this);
 		if (selection != null) {
 			update(selection, null);
 		}
-	}	
+	}
+
 	/**
 	 * display table representing headerinfo contents.
 	 */
@@ -49,36 +52,44 @@ public class TableNodeView extends ModelView implements ListSelectionListener {
 		}
 
 		@Override
-		public String getColumnName(int i) {
+		public String getColumnName(final int i) {
 			return headerInfo.getNames()[i];
 		}
+
 		@Override
 		public int getColumnCount() {
 			return headerInfo.getNumNames();
 		}
 
 		@Override
-		public Object getValueAt(int rowIndex, int columnIndex) {
+		public Object getValueAt(final int rowIndex, final int columnIndex) {
 			return headerInfo.getHeader(rowIndex, columnIndex);
 		}
+
 		@Override
-		public void setValueAt(Object val, int row, int col) {
+		public void setValueAt(final Object val, final int row, final int col) {
 			headerInfo.setHeader(row, headerInfo.getNames()[col], (String) val);
 		}
+
 		@Override
-		public boolean isCellEditable(int row, int col) {
-			String [] names = headerInfo.getNames();
-			if (names[col].equals("NODEID")) return false;
-			if (names[col].equals("LEFT")) return false;
-			if (names[col].equals("RIGHT")) return false;
-			if (names[col].equals("CORRELATION")) return false;
+		public boolean isCellEditable(final int row, final int col) {
+			final String[] names = headerInfo.getNames();
+			if (names[col].equals("NODEID"))
+				return false;
+			if (names[col].equals("LEFT"))
+				return false;
+			if (names[col].equals("RIGHT"))
+				return false;
+			if (names[col].equals("CORRELATION"))
+				return false;
 			return true;
 		}
 	}
+
 	/**
 	 * @param nodeInfo
 	 */
-	public TableNodeView(HeaderInfo nodeInfo) {
+	public TableNodeView(final HeaderInfo nodeInfo) {
 		headerInfo = nodeInfo;
 		headerInfo.addObserver(this);
 		tableModel = new NodeTableModel();
@@ -88,44 +99,48 @@ public class TableNodeView extends ModelView implements ListSelectionListener {
 		setLayout(new BorderLayout());
 		add(new JScrollPane(nodeTable), BorderLayout.CENTER);
 	}
+
 	@Override
 	public String viewName() {
 		return "Tree Node Editor";
 	}
 
 	@Override
-	protected void updateBuffer(Graphics g) {
+	protected void updateBuffer(final Graphics g) {
 		// no buffer here.
 	}
+
 	@Override
-	public void update(Observable o, Object arg) {
+	public void update(final Observable o, final Object arg) {
 		update((Object) o, arg);
 	}
-	public void update(Object o, Object arg) {
+
+	public void update(final Object o, final Object arg) {
 
 		if (o == selection) {
 			nodeTable.clearSelection();
-			String nodeName = selection.getSelectedNode();
+			final String nodeName = selection.getSelectedNode();
 			if (nodeName != null) {
-				int index = headerInfo.getHeaderIndex(nodeName);
+				final int index = headerInfo.getHeaderIndex(nodeName);
 				if (index >= 0) {
-					nodeTable.changeSelection(index,0,false, false);
-					nodeTable.changeSelection(index,headerInfo.getNumNames(),false, true);
+					nodeTable.changeSelection(index, 0, false, false);
+					nodeTable.changeSelection(index, headerInfo.getNumNames(),
+							false, true);
 				}
 			}
 		} else if (o == headerInfo) {
 			// dumb table model, doesn't keep things selected.
-			int index = nodeTable.getSelectedRow();
+			final int index = nodeTable.getSelectedRow();
 			tableModel.fireTableStructureChanged();
-			nodeTable.changeSelection(index,0,false, false);
+			nodeTable.changeSelection(index, 0, false, false);
 		}
 	}
 
 	@Override
-	public void valueChanged(ListSelectionEvent e) {
-		int row = nodeTable.getSelectedRow();
+	public void valueChanged(final ListSelectionEvent e) {
+		final int row = nodeTable.getSelectedRow();
 		if (row >= 0) {
-			String name = headerInfo.getHeader(row, 0);
+			final String name = headerInfo.getHeader(row, 0);
 			selection.setSelectedNode(name);
 			selection.notifyObservers();
 		}

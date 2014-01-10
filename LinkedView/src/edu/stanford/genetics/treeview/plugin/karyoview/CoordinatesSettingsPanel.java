@@ -22,65 +22,87 @@
  */
 package edu.stanford.genetics.treeview.plugin.karyoview;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
-import edu.stanford.genetics.treeview.*;
+import edu.stanford.genetics.treeview.FileSet;
+import edu.stanford.genetics.treeview.LoadException;
+import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.SettingsPanel;
+import edu.stanford.genetics.treeview.SettingsPanelHolder;
+import edu.stanford.genetics.treeview.ViewFrame;
 
 class CoordinatesSettingsPanel extends JPanel implements SettingsPanel {
 	private KaryoPanel karyoPanel;
+
 	/** Setter for karyoPanel */
-	public void setKaryoPanel(KaryoPanel karyoPanel) {
+	public void setKaryoPanel(final KaryoPanel karyoPanel) {
 		this.karyoPanel = karyoPanel;
 	}
+
 	/** Getter for karyoPanel */
 	public KaryoPanel getKaryoPanel() {
 		return karyoPanel;
 	}
-	
+
 	private CoordinatesPresets coordinatesPresets;
+
 	/** Setter for coordinatesPresets */
-	public void setCoordinatesPresets(CoordinatesPresets coordinatesPresets) {
+	public void setCoordinatesPresets(
+			final CoordinatesPresets coordinatesPresets) {
 		this.coordinatesPresets = coordinatesPresets;
 	}
+
 	/** Getter for coordinatesPresets */
 	public CoordinatesPresets getCoordinatesPresets() {
 		return coordinatesPresets;
 	}
 
-	public CoordinatesSettingsPanel(KaryoPanel karyoPanel, CoordinatesPresets coordsPresets, ViewFrame frame) {
+	public CoordinatesSettingsPanel(final KaryoPanel karyoPanel,
+			final CoordinatesPresets coordsPresets, final ViewFrame frame) {
 		setKaryoPanel(karyoPanel);
 		setCoordinatesPresets(coordsPresets);
 		setFrame(frame);
 		configureWidgets();
 		addWidgets();
 	}
+
 	@Override
-	public void setEnabled(boolean enabled) {
+	public void setEnabled(final boolean enabled) {
 		fileButton.setEnabled(enabled);
 		originalButton.setEnabled(enabled);
-		for (int i =0; i < presetButtons.length; i++) {
+		for (int i = 0; i < presetButtons.length; i++) {
 			presetButtons[i].setEnabled(enabled);
 		}
 	}
+
 	private JButton fileButton, originalButton;
-	private JButton [] presetButtons;
-	private ViewFrame frame  = null;
+	private JButton[] presetButtons;
+	private ViewFrame frame = null;
+
 	/** Setter for frame */
-	public void setFrame(ViewFrame frame) {
+	public void setFrame(final ViewFrame frame) {
 		this.frame = frame;
 	}
+
 	/** Getter for frame */
 	public ViewFrame getFrame() {
 		return frame;
 	}
+
 	private void addWidgets() {
 		this.removeAll();
 		setLayout(new GridBagLayout());
-		GridBagConstraints gc = new GridBagConstraints();
+		final GridBagConstraints gc = new GridBagConstraints();
 		gc.weightx = 100;
 		gc.weighty = 100;
 		gc.gridx = 0;
@@ -89,39 +111,42 @@ class CoordinatesSettingsPanel extends JPanel implements SettingsPanel {
 		gc.gridheight = 1;
 
 		add(originalButton, gc);
-		
-		JPanel presetPanel = new JPanel();
-		for (int i =0; i < presetButtons.length;i++) {
+
+		final JPanel presetPanel = new JPanel();
+		for (int i = 0; i < presetButtons.length; i++) {
 			presetPanel.add(presetButtons[i]);
 		}
 		presetPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 		gc.gridy = 1;
-		//		  add(new JScrollPane(presetPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS), gbc);
+		// add(new JScrollPane(presetPanel,
+		// JScrollPane.VERTICAL_SCROLLBAR_NEVER,
+		// JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS), gbc);
 
 		add(presetPanel, gc);
 		gc.gridy = 2;
 		add(fileButton, gc);
 
 	}
-	
+
 	private void configureWidgets() {
 		originalButton = new JButton("Extract from Cdt");
 		originalButton.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				karyoPanel.useOriginal();
 			}
 		});
 
 		final CoordinatesPresets presets = getCoordinatesPresets();
-		int nPresets = presets.getNumPresets();
+		final int nPresets = presets.getNumPresets();
 		presetButtons = new JButton[nPresets];
 		for (int i = 0; i < nPresets; i++) {
-			JButton presetButton = new JButton((presets.getPresetNames()) [i]);
+			final JButton presetButton = new JButton(
+					(presets.getPresetNames())[i]);
 			final int index = i;
 			presetButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					switchFileset(presets.getFileSet(index));
 				}
 			});
@@ -130,10 +155,13 @@ class CoordinatesSettingsPanel extends JPanel implements SettingsPanel {
 		fileButton = new JButton("Edit Presets...");
 		fileButton.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				SettingsPanel presetEditor = KaryoscopeFactory.getCoordinatesPresetsEditor();
-				JDialog popup = new JDialog(getFrame(), "Edit Coordinates Presets");
-				SettingsPanelHolder holder = new SettingsPanelHolder(popup, getFrame().getApp().getGlobalConfig().getRoot());
+			public void actionPerformed(final ActionEvent e) {
+				final SettingsPanel presetEditor = KaryoscopeFactory
+						.getCoordinatesPresetsEditor();
+				final JDialog popup = new JDialog(getFrame(),
+						"Edit Coordinates Presets");
+				final SettingsPanelHolder holder = new SettingsPanelHolder(
+						popup, getFrame().getApp().getGlobalConfig().getRoot());
 				holder.addSettingsPanel(presetEditor);
 				popup.getContentPane().add(holder);
 				popup.setModal(true);
@@ -146,21 +174,25 @@ class CoordinatesSettingsPanel extends JPanel implements SettingsPanel {
 			}
 		});
 	}
-	private void switchFileset(FileSet fileSet1) {
-		try { 
+
+	private void switchFileset(final FileSet fileSet1) {
+		try {
 			setEnabled(false);
 			karyoPanel.getGenome(fileSet1);
-		} catch (LoadException ex) {
+		} catch (final LoadException ex) {
 			setEnabled(true);
-			LogBuffer.println("CoordinatesSettingsPanel got error" + ex.toString());
-			JOptionPane.showMessageDialog(getFrame(), ex.toString(), "Load Error", JOptionPane.ERROR_MESSAGE);
+			LogBuffer.println("CoordinatesSettingsPanel got error"
+					+ ex.toString());
+			JOptionPane.showMessageDialog(getFrame(), ex.toString(),
+					"Load Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
+
 	@Override
 	public void synchronizeTo() {
-		
+
 	}
-	
+
 	@Override
 	public void synchronizeFrom() {
 	}

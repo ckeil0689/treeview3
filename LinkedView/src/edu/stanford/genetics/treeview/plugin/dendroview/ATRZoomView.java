@@ -22,47 +22,59 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Adjustable;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Rectangle;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Observable;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 
-import edu.stanford.genetics.treeview.*;
+import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.HeaderSummary;
+import edu.stanford.genetics.treeview.LinearTransformation;
+import edu.stanford.genetics.treeview.ModelView;
+import edu.stanford.genetics.treeview.TreeDrawerNode;
+import edu.stanford.genetics.treeview.TreeSelectionI;
 
 /**
- *  Draws an array tree to show the relations between arrays.
- *  This object requires a MapContainer to figure out the offsets 
- *  for the arrays. Furthermore, it sets up a scrollbar to scroll the tree, 
- *  although there is currently no way to specify how large you would like the 
- *  scrollable area to be, so the height is just set to match the 
- *  available space.
- *
- * @author     Alok Saldanha <alok@genome.stanford.edu>
- * @version    $Revision: 1.1 $ $Date: 2006-08-16 19:13:45 $
+ * Draws an array tree to show the relations between arrays. This object
+ * requires a MapContainer to figure out the offsets for the arrays.
+ * Furthermore, it sets up a scrollbar to scroll the tree, although there is
+ * currently no way to specify how large you would like the scrollable area to
+ * be, so the height is just set to match the available space.
+ * 
+ * @author Alok Saldanha <alok@genome.stanford.edu>
+ * @version $Revision: 1.1 $ $Date: 2006-08-16 19:13:45 $
  */
 
-public class ATRZoomView extends ModelView implements
-		MouseListener, KeyListener {
+public class ATRZoomView extends ModelView implements MouseListener,
+		KeyListener {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	protected HeaderSummary headerSummary = new HeaderSummary();
-	
+
 	private TreeSelectionI arraySelection;
 	private LinearTransformation xScaleEq, yScaleEq;
 	private MapContainer zoomMap;
-	private JScrollBar scrollbar;
+	private final JScrollBar scrollbar;
 	private InvertedTreeDrawer drawer = null;
 	private TreeDrawerNode selectedNode = null;
 	private Rectangle destRect = null;
-	
-	/**  
-	 * Constructor, sets up AWT components  
+
+	/**
+	 * Constructor, sets up AWT components
 	 */
 	public ATRZoomView() {
-		
+
 		super();
 
 		panel = new JPanel();
@@ -77,69 +89,62 @@ public class ATRZoomView extends ModelView implements
 		addKeyListener(this);
 	}
 
-
 	/** Setter for headerSummary */
-	public void setHeaderSummary(HeaderSummary headerSummary) {
-		
+	public void setHeaderSummary(final HeaderSummary headerSummary) {
+
 		this.headerSummary = headerSummary;
 	}
-	
+
 	/** Getter for headerSummary */
 	public HeaderSummary getHeaderSummary() {
-		
+
 		return headerSummary;
 	}
 
 	/**
-	 *  Set the selected node, update the arraySelection, and redraw
-	 *Does nothing if the node is already selected.
-	 *
-	 * @param  n  The new node to be selected. 
+	 * Set the selected node, update the arraySelection, and redraw Does nothing
+	 * if the node is already selected.
+	 * 
+	 * @param n
+	 *            The new node to be selected.
 	 */
-	public void setSelectedNode(TreeDrawerNode n) {
-		
+	public void setSelectedNode(final TreeDrawerNode n) {
+
 		if (selectedNode == n) {
-			
+
 			return;
 		}
-		
+
 		/*
-		if (selectedNode != null)
-		 drawer.paintSubtree(offscreenGraphics,
-		 xScaleEq, yScaleEq,
-		 destRect, selectedNode, false);
-		selectedNode = n;
-	   if (selectedNode != null)
-		 drawer.paintSubtree(offscreenGraphics,
-		xScaleEq, yScaleEq,
-		destRect, selectedNode, true);
-		*/
+		 * if (selectedNode != null) drawer.paintSubtree(offscreenGraphics,
+		 * xScaleEq, yScaleEq, destRect, selectedNode, false); selectedNode = n;
+		 * if (selectedNode != null) drawer.paintSubtree(offscreenGraphics,
+		 * xScaleEq, yScaleEq, destRect, selectedNode, true);
+		 */
 		selectedNode = n;
 		offscreenValid = false;
 		if ((status != null) && hasMouse) {
 			status.setMessages(getStatus());
 		}
-		
+
 		synchMap();
-		
+
 		revalidate();
 		repaint();
 	}
 
-
 	private void synchMap() {
-		
+
 		if ((selectedNode != null) && (arraySelection != null)) {
-			int start  = (int) (selectedNode.getLeftLeaf().getIndex());
-			int end    = (int) (selectedNode.getRightLeaf().getIndex());
-			
-			if(viewFrame.getDataModel().getDataMatrix().getNumCol() 
-					> viewFrame.getDataModel().getDataMatrix()
-					.getNumUnappendedCol()) {
-				end = Math.max(viewFrame.getDataModel()
-						.getDataMatrix().getNumCol(), end); 
+			final int start = (int) (selectedNode.getLeftLeaf().getIndex());
+			int end = (int) (selectedNode.getRightLeaf().getIndex());
+
+			if (viewFrame.getDataModel().getDataMatrix().getNumCol() > viewFrame
+					.getDataModel().getDataMatrix().getNumUnappendedCol()) {
+				end = Math.max(viewFrame.getDataModel().getDataMatrix()
+						.getNumCol(), end);
 			}
-			
+
 			arraySelection.deselectAllIndexes();
 			arraySelection.setSelectedNode(selectedNode.getId());
 			arraySelection.selectIndexRange(start, end);
@@ -148,151 +153,152 @@ public class ATRZoomView extends ModelView implements
 	}
 
 	/**
-	 *  Set arraySelection
-	 *
-	 * @param  arraySelection  The TreeSelection which clicking on 
-	 * this tree will modify.
+	 * Set arraySelection
+	 * 
+	 * @param arraySelection
+	 *            The TreeSelection which clicking on this tree will modify.
 	 */
-	public void setArraySelection(TreeSelectionI arraySelection) {
-		
+	public void setArraySelection(final TreeSelectionI arraySelection) {
+
 		if (this.arraySelection != null) {
 			this.arraySelection.deleteObserver(this);
 		}
-		
+
 		this.arraySelection = arraySelection;
 		this.arraySelection.addObserver(this);
 	}
 
 	/**
-	 *  Set the drawer
-	 *
-	 * @param  d  The new drawer
+	 * Set the drawer
+	 * 
+	 * @param d
+	 *            The new drawer
 	 */
-	public void setInvertedTreeDrawer(InvertedTreeDrawer d) {
-		
+	public void setInvertedTreeDrawer(final InvertedTreeDrawer d) {
+
 		if (drawer != null) {
 			drawer.deleteObserver(this);
 		}
-		
+
 		drawer = d;
 		drawer.addObserver(this);
 	}
 
 	/**
-	 *  Set the zoom map
-	 *
-	 *  Specifies where to draw leaves of tree.
+	 * Set the zoom map
+	 * 
+	 * Specifies where to draw leaves of tree.
 	 */
-	public void setZoomMap(MapContainer m) {
-		
+	public void setZoomMap(final MapContainer m) {
+
 		if (zoomMap != null) {
 			zoomMap.deleteObserver(this);
 		}
-		
+
 		zoomMap = m;
 		zoomMap.addObserver(this);
 	}
 
-
 	/**
-	 *  expect updates to come from arraySelection, zoomMap and drawer
-	 *
-	 * @param  o    Observable sending update
-	 * @param  arg  Argument, typically null
+	 * expect updates to come from arraySelection, zoomMap and drawer
+	 * 
+	 * @param o
+	 *            Observable sending update
+	 * @param arg
+	 *            Argument, typically null
 	 */
 	@Override
-	public void update(Observable o, Object arg) {
-		
+	public void update(final Observable o, final Object arg) {
+
 		if (o == drawer) {
-			//System.out.println("Got an update from drawer");
+			// System.out.println("Got an update from drawer");
 			offscreenValid = false;
 			repaint();
-			
+
 		} else if (o == zoomMap) {
 			// will call offscreenvalid, repaint() itself
 			// could have been a translation...
 			offscreenValid = false;
 			repaint();
-			
+
 		} else if (o == arraySelection) {
-			setSelectedNode(drawer.getNodeById(
-					arraySelection.getSelectedNode()));
-			
+			setSelectedNode(drawer
+					.getNodeById(arraySelection.getSelectedNode()));
+
 		} else {
 			System.out.println(viewName() + "Got an update from unknown " + o);
 		}
 	}
 
-
 	/**
-	 *  Need to blit another part of the buffer to the screen when 
-	 *  the scrollbar moves.
-	 *
-	 * @param  evt  scrollbar adjustment event
+	 * Need to blit another part of the buffer to the screen when the scrollbar
+	 * moves.
+	 * 
+	 * @param evt
+	 *            scrollbar adjustment event
 	 */
-	public void adjustmentValueChanged(AdjustmentEvent evt) {
-		
+	public void adjustmentValueChanged(final AdjustmentEvent evt) {
+
 		revalidate();
 		repaint();
 	}
 
-
 	/**
-	 *  Implementation of abstract method
-	 *
-	 * @return    returns name of this ModelView
+	 * Implementation of abstract method
+	 * 
+	 * @return returns name of this ModelView
 	 */
 	@Override
 	public String viewName() {
-		
+
 		return "ATRZoomView";
 	}
 
-
 	/**
-	 *  Gets some user-interpretatble status information for the 
-	 *  ATRZoomView object.
-	 *
-	 * @return    Text describing selected node correlation
+	 * Gets some user-interpretatble status information for the ATRZoomView
+	 * object.
+	 * 
+	 * @return Text describing selected node correlation
 	 */
 	@Override
-	public String[]  getStatus() {
-			
-		String [] status;
+	public String[] getStatus() {
+
+		String[] status;
 		if (selectedNode != null) {
-			int [] nameIndex = getHeaderSummary().getIncluded();
-			status = new String [nameIndex.length * 2];
-			HeaderInfo atrInfo = 
-					getViewFrame().getDataModel().getAtrHeaderInfo();
-			String [] names = atrInfo.getNames();
-			
+			final int[] nameIndex = getHeaderSummary().getIncluded();
+			status = new String[nameIndex.length * 2];
+			final HeaderInfo atrInfo = getViewFrame().getDataModel()
+					.getAtrHeaderInfo();
+			final String[] names = atrInfo.getNames();
+
 			for (int i = 0; i < nameIndex.length; i++) {
-				status[2*i] = names[nameIndex[i]] +":";
-				status[2*i+1] = " " + atrInfo.getHeader(
-						atrInfo.getHeaderIndex(
-								selectedNode.getId()))[ nameIndex[i]];
+				status[2 * i] = names[nameIndex[i]] + ":";
+				status[2 * i + 1] = " "
+						+ atrInfo.getHeader(atrInfo.getHeaderIndex(selectedNode
+								.getId()))[nameIndex[i]];
 			}
 		} else {
-			status = new String [2];
+			status = new String[2];
 			status[0] = "Select Node to ";
 			status[1] = "view annotation.";
 		}
-		
+
 		return status;
 	}
 
 	/**
-	 *  updates buffer to reflect current state
-	 *
-	 * @param  g  Graphics object to draw to
+	 * updates buffer to reflect current state
+	 * 
+	 * @param g
+	 *            Graphics object to draw to
 	 */
 	@Override
-	public void updateBuffer(Graphics g) {
-		
+	public void updateBuffer(final Graphics g) {
+
 		if (offscreenChanged == true) {
 			offscreenValid = false;
 		}
-		
+
 		if (offscreenValid == false) {
 			if ((drawer != null) && (selectedNode != null)) {
 				zoomMap.setAvailablePixels(offscreenSize.width);
@@ -307,27 +313,27 @@ public class ATRZoomView extends ModelView implements
 					return;
 				}
 
-				//	calculate Scaling
-				destRect.setBounds(0, 0, zoomMap.getUsedPixels(), 
+				// calculate Scaling
+				destRect.setBounds(0, 0, zoomMap.getUsedPixels(),
 						offscreenSize.height);
-				
+
 				g.setClip(destRect.x, destRect.y, destRect.width,
 						destRect.height);
-				
-				xScaleEq = new LinearTransformation
-						(zoomMap.getIndex(destRect.x), destRect.x,
+
+				xScaleEq = new LinearTransformation(
+						zoomMap.getIndex(destRect.x), destRect.x,
 						zoomMap.getIndex(destRect.x + destRect.width),
 						destRect.x + destRect.width);
-				
-				yScaleEq = new LinearTransformation
-						(selectedNode.getMinCorr(), destRect.y,
-						drawer.getCorrMax(), destRect.y + destRect.height);
+
+				yScaleEq = new LinearTransformation(selectedNode.getMinCorr(),
+						destRect.y, drawer.getCorrMax(), destRect.y
+								+ destRect.height);
 
 				// draw
-				drawer.paint(g,
-						xScaleEq, yScaleEq,
-//						destRect, selectedNode);
-// 5/13/2004 - this allows us to see colors in the zoomed dendrogram.
+				drawer.paint(g, xScaleEq, yScaleEq,
+				// destRect, selectedNode);
+				// 5/13/2004 - this allows us to see colors in the zoomed
+				// dendrogram.
 						destRect, null);
 			} else {
 				// most likely, no selection...
@@ -339,107 +345,108 @@ public class ATRZoomView extends ModelView implements
 	}
 
 	/**
-	 *  On mouseclick, select a node
-	 *
-	 * @param  e  Mouse clicking event
+	 * On mouseclick, select a node
+	 * 
+	 * @param e
+	 *            Mouse clicking event
 	 */
 	@Override
-	public void mouseClicked(MouseEvent e) {
-		
+	public void mouseClicked(final MouseEvent e) {
+
 		if (this == null) {
 			return;
 		}
-		
+
 		if (isEnabled() == false) {
 			return;
 		}
-		
+
 		if (enclosingWindow().isActive() == false) {
 			return;
 		}
-		
+
 		if (drawer != null) {
 			// the trick is translating back to the normalized space...
 			setSelectedNode(drawer.getClosest(
 					xScaleEq.inverseTransform(e.getX()),
 					yScaleEq.inverseTransform(e.getY()),
-			// weight must have correlation slope on top
+					// weight must have correlation slope on top
 					yScaleEq.getSlope() / xScaleEq.getSlope()));
 		}
 	}
 
 	// method from KeyListener
 	/**
-	 *  Use keypress to navigate nodes
-	 *
-	 * up selects parent of current.
-	 * left selects left child.
-	 * right selects right child
-	 * down selects child with most descendants.
+	 * Use keypress to navigate nodes
+	 * 
+	 * up selects parent of current. left selects left child. right selects
+	 * right child down selects child with most descendants.
 	 */
 	@Override
-	public void keyPressed(KeyEvent e) {
-		
+	public void keyPressed(final KeyEvent e) {
+
 		if (selectedNode == null) {
 			return;
 		}
 
-		int c = e.getKeyCode();
-		TreeDrawerNode cand  = null;
-		
+		final int c = e.getKeyCode();
+		TreeDrawerNode cand = null;
+
 		switch (c) {
-		
-			case KeyEvent.VK_UP:
-				cand = selectedNode.getParent();
-				break;
-				
-			// hey, the tree is upside down!
-			case KeyEvent.VK_LEFT:
-				if (selectedNode.isLeaf() == false) {
-					cand = selectedNode.getRight();
+
+		case KeyEvent.VK_UP:
+			cand = selectedNode.getParent();
+			break;
+
+		// hey, the tree is upside down!
+		case KeyEvent.VK_LEFT:
+			if (selectedNode.isLeaf() == false) {
+				cand = selectedNode.getRight();
+			}
+			break;
+
+		case KeyEvent.VK_RIGHT:
+			if (selectedNode.isLeaf() == false) {
+				cand = selectedNode.getLeft();
+			}
+			break;
+
+		case KeyEvent.VK_DOWN:
+			if (selectedNode.isLeaf() == false) {
+				final TreeDrawerNode right = selectedNode.getRight();
+				final TreeDrawerNode left = selectedNode.getLeft();
+
+				if (right.getRange() > left.getRange()) {
+					cand = right;
+				} else {
+					cand = left;
 				}
-				break;
-				
-			case KeyEvent.VK_RIGHT:
-				if (selectedNode.isLeaf() == false) {
-					cand = selectedNode.getLeft();
-				}
-				break;
-				
-			case KeyEvent.VK_DOWN:
-				if (selectedNode.isLeaf() == false) {
-					TreeDrawerNode right  = selectedNode.getRight();
-					TreeDrawerNode left   = selectedNode.getLeft();
-					
-					if (right.getRange() > left.getRange()) {
-						cand = right;
-					} else {
-						cand = left;
-					}
-				}
-				break;
+			}
+			break;
 		}
-		
+
 		if (cand != null) {
 			setSelectedNode(cand);
 		}
 	}
 
 	/**
-	 *  Ignore key releases
-	 *
-	 * @param  e  Key release event
+	 * Ignore key releases
+	 * 
+	 * @param e
+	 *            Key release event
 	 */
 	@Override
-	public void keyReleased(KeyEvent e) { }
-
+	public void keyReleased(final KeyEvent e) {
+	}
 
 	/**
-	 *  Ignore key types
-	 *
-	 * @param  e  Key type event
+	 * Ignore key types
+	 * 
+	 * @param e
+	 *            Key type event
 	 */
 	@Override
-	public void keyTyped(KeyEvent e) { }
+	public void keyTyped(final KeyEvent e) {
+	}
 }
-

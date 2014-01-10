@@ -29,52 +29,60 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
- * a class that plots a vertical axis given an axis info and a scatter color set.
+ * a class that plots a vertical axis given an axis info and a scatter color
+ * set.
  */
-class HorizontalAxisPane extends JPanel  {
-	
+class HorizontalAxisPane extends JPanel {
+
 	private AxisInfo axisInfo;
+
 	/** Setter for axisInfo */
-	public void setAxisInfo(AxisInfo axisInfo) {
+	public void setAxisInfo(final AxisInfo axisInfo) {
 		this.axisInfo = axisInfo;
 		titleLabel.setText(axisInfo.getTitle());
 		System.out.println("setting label text to " + axisInfo.getTitle());
 		titleLabel.invalidate();
 		titleLabel.revalidate();
 	}
+
 	/** Getter for axisInfo */
 	public AxisInfo getAxisInfo() {
 		return axisInfo;
 	}
+
 	private ScatterColorSet colorSet;
+
 	/** Setter for colorSet */
-	public void setColorSet(ScatterColorSet colorSet) {
+	public void setColorSet(final ScatterColorSet colorSet) {
 		this.colorSet = colorSet;
 	}
+
 	/** Getter for colorSet */
 	public ScatterColorSet getColorSet() {
 		return colorSet;
 	}
+
 	JLabel titleLabel = new JLabel();
+
 	/**
-	* You'll want to create this after you set the config node for the scatterPane, since it keeps
-	* it's own pointers to the axis info and color set.
-	*/
-	HorizontalAxisPane(AxisInfo axisInfo, ScatterColorSet colorSet) {
+	 * You'll want to create this after you set the config node for the
+	 * scatterPane, since it keeps it's own pointers to the axis info and color
+	 * set.
+	 */
+	HorizontalAxisPane(final AxisInfo axisInfo, final ScatterColorSet colorSet) {
 		setAxisInfo(axisInfo);
 		setColorSet(colorSet);
 		add(titleLabel);
 	}
-	
+
 	@Override
-	public void paintComponent(Graphics g) {
+	public void paintComponent(final Graphics g) {
 		titleLabel.setForeground(colorSet.getColor("Axis"));
-	    titleLabel.setBackground(colorSet.getColor("Background"));
-		Dimension size = getSize();
-	    g.setColor(colorSet.getColor("Background"));
-	    g.fillRect(0,0,size.width, size.height);
-	    g.setColor(colorSet.getColor("Axis"));
-		g.drawLine(0, size.height/2, size.width, size.height/2);
+		titleLabel.setBackground(colorSet.getColor("Background"));
+		final Dimension size = getSize();
+		g.setColor(colorSet.getColor("Background"));
+		g.fillRect(0, 0, size.width, size.height);
+		g.setColor(colorSet.getColor("Axis"));
+		g.drawLine(0, size.height / 2, size.width, size.height / 2);
 	}
 }
-

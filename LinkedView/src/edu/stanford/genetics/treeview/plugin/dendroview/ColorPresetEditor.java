@@ -22,157 +22,165 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Dialog;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
-import javax.swing.*;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 import edu.stanford.genetics.treeview.DummyConfigNode;
 import edu.stanford.genetics.treeview.SettingsPanel;
+
 /**
- *  This class allows graphical editing of ColorPresets Also included is a class
- *  to pop up a configuration window.
- *
- * @author     Alok Saldanha <alok@genome.stanford.edu>
- * @version    @version $Revision: 1.2 $ $Date: 2006-10-17 22:17:17 $
+ * This class allows graphical editing of ColorPresets Also included is a class
+ * to pop up a configuration window.
+ * 
+ * @author Alok Saldanha <alok@genome.stanford.edu>
+ * @version @version $Revision: 1.2 $ $Date: 2006-10-17 22:17:17 $
  */
 public class ColorPresetEditor extends JPanel implements SettingsPanel {
-	private ColorPresets presets;
+	private final ColorPresets presets;
 	private Window window;
 
-
 	/**
-	 *  This class is to enable editing of a UrlPresets object. XXX HACK I botched the design
-	 *  pretty badly here, but I'm too busy to clean it up now.
-	 *
-	 * @param  up  Description of the Parameter
+	 * This class is to enable editing of a UrlPresets object. XXX HACK I
+	 * botched the design pretty badly here, but I'm too busy to clean it up
+	 * now.
+	 * 
+	 * @param up
+	 *            Description of the Parameter
 	 */
-	public ColorPresetEditor(ColorPresets up) {
+	public ColorPresetEditor(final ColorPresets up) {
 		super();
 		presets = up;
 		presetEditPanel = new PresetEditPanel();
 		add(presetEditPanel);
 	}
 
-
 	/**
-	 *  pops up a configuration dialog.
-	 *
-	 * @param  f  Description of the Parameter
+	 * pops up a configuration dialog.
+	 * 
+	 * @param f
+	 *            Description of the Parameter
 	 */
-	public void showConfig(Frame f) {
+	public void showConfig(final Frame f) {
 		if (window == null) {
-			Dialog d  = new Dialog(f, getTitle(), true);
+			final Dialog d = new Dialog(f, getTitle(), true);
 			d.setLayout(new BorderLayout());
 			d.add(new JScrollPane(presetEditPanel));
-//		 d.add(presetEditPanel);
+			// d.add(presetEditPanel);
 			d.add(new JLabel(getTitle()), BorderLayout.NORTH);
 			d.add(new ButtonPanel(), BorderLayout.SOUTH);
-			d.addWindowListener(
-				new WindowAdapter() {
-					@Override
-					public void windowClosing(WindowEvent we) {
-						we.getWindow().dispose();
-					}
-				});
+			d.addWindowListener(new WindowAdapter() {
+				@Override
+				public void windowClosing(final WindowEvent we) {
+					we.getWindow().dispose();
+				}
+			});
 			d.pack();
 			window = d;
 		}
 		window.setVisible(true);
 	}
 
-
 	/**
-	 *  Test program, prints out results of editing on exit.
-	 *
-	 * @param  argv  ignored
+	 * Test program, prints out results of editing on exit.
+	 * 
+	 * @param argv
+	 *            ignored
 	 */
-	public static void main(String[] argv) {
-		final ColorPresets p  = new ColorPresets(new DummyConfigNode("ColorPresets"));
-		ColorPresetEditor e   = new ColorPresetEditor(p);
-		Frame f               = new Frame(e.getTitle());
+	public static void main(final String[] argv) {
+		final ColorPresets p = new ColorPresets(new DummyConfigNode(
+				"ColorPresets"));
+		final ColorPresetEditor e = new ColorPresetEditor(p);
+		final Frame f = new Frame(e.getTitle());
 		e.showConfig(f);
 		System.out.println("on exit, presets were\n" + p.toString());
 		System.exit(0);
 	}
 
-
 	/**
-	 *  Adds this editor pane to the specified frame.
+	 * Adds this editor pane to the specified frame.
 	 */
-	public void addToFrame(Frame f) {
+	public void addToFrame(final Frame f) {
 		f.setLayout(new BorderLayout());
 		presetEditPanel = new PresetEditPanel();
 		f.add(new JScrollPane(presetEditPanel));
-		//	f.add(new Label(getTitle(),Label.CENTER), BorderLayout.NORTH);
+		// f.add(new Label(getTitle(),Label.CENTER), BorderLayout.NORTH);
 		f.add(new ButtonPanel(), BorderLayout.SOUTH);
 		window = f;
 	}
 
-
 	private String title = "Color Preset Editor";
 
-
 	/**
-	* The title to be displayed when this panel is in a window.
+	 * The title to be displayed when this panel is in a window.
 	 */
 	public String getTitle() {
 		return title;
 	}
 
-
 	/**
-	* The title to be displayed when this panel is in a window.
+	 * The title to be displayed when this panel is in a window.
 	 */
-	public void setTitle(String s) {
+	public void setTitle(final String s) {
 		title = s;
 	}
 
-
 	private PresetEditPanel presetEditPanel;
 
-
-	/**  Changes the GUI to represent the state of the presets */
+	/** Changes the GUI to represent the state of the presets */
 	@Override
 	public void synchronizeFrom() {
 		presetEditPanel.initialize();
 		presetEditPanel.redoLayout();
 	}
 
-
-	/**  Changes the presets to match the state of the GUI */
+	/** Changes the presets to match the state of the GUI */
 	@Override
 	public void synchronizeTo() {
 		presetEditPanel.saveAll();
 	}
-	//inner classes
+
+	// inner classes
 
 	private class ButtonPanel extends JPanel {
 		ButtonPanel() {
-			JButton save_button    = new JButton("Save");
-			save_button.addActionListener(
-				new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						synchronizeTo();
-						window.dispose();
-					}
-				});
+			final JButton save_button = new JButton("Save");
+			save_button.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					synchronizeTo();
+					window.dispose();
+				}
+			});
 			add(save_button);
 
-			JButton cancel_button  = new JButton("Cancel");
-			cancel_button.addActionListener(
-				new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						synchronizeFrom();
-						window.dispose();
-					}
-				});
+			final JButton cancel_button = new JButton("Cancel");
+			cancel_button.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					synchronizeFrom();
+					window.dispose();
+				}
+			});
 			add(cancel_button);
 		}
 	}
-
 
 	private class PresetEditPanel extends JPanel {
 		PresetEditPanel() {
@@ -180,16 +188,14 @@ public class ColorPresetEditor extends JPanel implements SettingsPanel {
 			redoLayout();
 		}
 
-
 		private GridBagConstraints gbc;
 		private JRadioButton[] defaultButtons;
 		private JTextField[] presetNames;
 		private ColorSet[] presetColors;
-		private ButtonGroup bob = new ButtonGroup();
-
+		private final ButtonGroup bob = new ButtonGroup();
 
 		private void initialize() {
-			int nPresets  = presets.getNumPresets();
+			final int nPresets = presets.getNumPresets();
 			defaultButtons = new JRadioButton[nPresets];
 			presetNames = new JTextField[nPresets];
 			presetColors = new ColorSet[nPresets];
@@ -199,7 +205,8 @@ public class ColorPresetEditor extends JPanel implements SettingsPanel {
 				bob.add(defaultButtons[i]);
 			}
 			if (nPresets > 0) {
-				if (presets.getDefaultIndex() == -1 || presets.getDefaultIndex() >= defaultButtons.length) {
+				if (presets.getDefaultIndex() == -1
+						|| presets.getDefaultIndex() >= defaultButtons.length) {
 					defaultButtons[0].setSelected(true);
 				} else {
 					defaultButtons[presets.getDefaultIndex()].setSelected(true);
@@ -207,40 +214,38 @@ public class ColorPresetEditor extends JPanel implements SettingsPanel {
 			}
 		}
 
-
 		/**
-		 *  Creates components and copies state from presets for preset i...
-		 *
-		 * @param  i  index of the preset
+		 * Creates components and copies state from presets for preset i...
+		 * 
+		 * @param i
+		 *            index of the preset
 		 */
-		private void initializePreset(int i) {
-			final int index             = i;
-			final ColorSet colorSet     = new ColorSet();
-			final JTextField nameField  = new JTextField();
+		private void initializePreset(final int i) {
+			final int index = i;
+			final ColorSet colorSet = new ColorSet();
+			final JTextField nameField = new JTextField();
 			nameField.setText((presets.getPresetNames())[index]);
 			presetNames[index] = nameField;
 
 			colorSet.copyStateFrom(presets.getColorSet(index));
 			presetColors[index] = colorSet;
 
-			JRadioButton set            = new JRadioButton();
+			final JRadioButton set = new JRadioButton();
 			defaultButtons[index] = set;
-			set.addActionListener(
-				new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						presets.setDefaultIndex(index);
-					}
-				});
+			set.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					presets.setDefaultIndex(index);
+				}
+			});
 		}
 
-
 		/**
-		 *  Assumes that defaultButtons, presetNames, and presetColors have been properly
-		 *  set up.
+		 * Assumes that defaultButtons, presetNames, and presetColors have been
+		 * properly set up.
 		 */
 		public void redoLayout() {
-			int nPresets  = defaultButtons.length - 1;
+			final int nPresets = defaultButtons.length - 1;
 			removeAll();
 			setLayout(new GridBagLayout());
 			gbc = new GridBagConstraints();
@@ -269,29 +274,27 @@ public class ColorPresetEditor extends JPanel implements SettingsPanel {
 
 			gbc.gridy++;
 
-			JButton addP  = new JButton("Add New");
-			addP.addActionListener(
-				new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						createPreset();
-					}
-				});
+			final JButton addP = new JButton("Add New");
+			addP.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					createPreset();
+				}
+			});
 			gbc.gridy++;
 			gbc.gridx = 2;
 			add(addP, gbc);
 
-			JButton addS  = new JButton("Add Standards");
-			addS.addActionListener(
-				new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						ColorSet[] toAdd  = ColorPresets.defaultColorSets;
-						for (int i = 0; i < toAdd.length; i++) {
-							addPreset(toAdd[i]);
-						}
+			final JButton addS = new JButton("Add Standards");
+			addS.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final ColorSet[] toAdd = ColorPresets.defaultColorSets;
+					for (int i = 0; i < toAdd.length; i++) {
+						addPreset(toAdd[i]);
 					}
-				});
+				}
+			});
 			gbc.gridy++;
 			gbc.gridx = 2;
 			add(addS, gbc);
@@ -300,15 +303,15 @@ public class ColorPresetEditor extends JPanel implements SettingsPanel {
 			repaint();
 		}
 
-
 		/**
-		 *  This just adds a preset to the GUI, assuming that presetNames, presetColors
-		 *  and defaultButtons are properly set up...
-		 *
-		 * @param  i  The index of the preset to add
+		 * This just adds a preset to the GUI, assuming that presetNames,
+		 * presetColors and defaultButtons are properly set up...
+		 * 
+		 * @param i
+		 *            The index of the preset to add
 		 */
-		private void addPreset(int i) {
-			final int index  = i;
+		private void addPreset(final int i) {
+			final int index = i;
 			gbc.gridx = 0;
 			add(presetNames[index], gbc);
 
@@ -318,28 +321,26 @@ public class ColorPresetEditor extends JPanel implements SettingsPanel {
 
 			gbc.gridx = 2;
 			gbc.weightx = 0;
-			JButton rem      = new JButton("Remove");
-			rem.addActionListener(
-				new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						removePreset(index);
-					}
-				});
+			final JButton rem = new JButton("Remove");
+			rem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					removePreset(index);
+				}
+			});
 			add(rem, gbc);
 
 			gbc.gridx = 3;
 			add(defaultButtons[index], gbc);
 		}
 
-
 		private void saveAll() {
 			// first, make sure that there's the same number of presets...
-			int n  = presetNames.length - 1;//number of presets to be
-			int o  = presets.getNumPresets();// current number of presets...
+			final int n = presetNames.length - 1;// number of presets to be
+			int o = presets.getNumPresets();// current number of presets...
 
 			while (n > o) {// need to add more presets...
-				ColorSet temp  = new ColorSet();
+				final ColorSet temp = new ColorSet();
 				temp.setName("Preset" + o);
 				presets.addColorSet(temp);
 				o++;
@@ -360,12 +361,12 @@ public class ColorPresetEditor extends JPanel implements SettingsPanel {
 		}
 
 		// this removes a preset
-		private void removePreset(int mark) {
-			ColorSet[] tPresetColors        = new ColorSet[presetColors.length - 1];
-			JTextField[] tPresetNames       = new JTextField[presetNames.length - 1];
-			JRadioButton[] tDefaultButtons  = new JRadioButton[defaultButtons.length - 1];
+		private void removePreset(final int mark) {
+			final ColorSet[] tPresetColors = new ColorSet[presetColors.length - 1];
+			final JTextField[] tPresetNames = new JTextField[presetNames.length - 1];
+			final JRadioButton[] tDefaultButtons = new JRadioButton[defaultButtons.length - 1];
 			for (int i = 0; i < tPresetColors.length; i++) {
-				int j  = i;
+				int j = i;
 				if (i >= mark) {
 					j++;
 				}
@@ -374,7 +375,7 @@ public class ColorPresetEditor extends JPanel implements SettingsPanel {
 				tDefaultButtons[i] = defaultButtons[j];
 			}
 			bob.remove(defaultButtons[mark]);
-			int selectedIndex               = 0;
+			int selectedIndex = 0;
 			for (int i = 0; i < (defaultButtons.length); i++) {
 				if (defaultButtons[i] == null) {
 					continue;
@@ -396,18 +397,18 @@ public class ColorPresetEditor extends JPanel implements SettingsPanel {
 			redoLayout();
 
 		}
+
 		// this creates a brand new preset and adds stuff to the GUI for it...
 
 		private void createPreset() {
-			ColorSet toAdd  = new ColorSet();
+			final ColorSet toAdd = new ColorSet();
 			addPreset(toAdd);
 		}
 
-
-		private void addPreset(ColorSet toAdd) {
-			ColorSet[] tPresetColors        = new ColorSet[presetColors.length + 1];
-			JTextField[] tPresetNames       = new JTextField[presetNames.length + 1];
-			JRadioButton[] tDefaultButtons  = new JRadioButton[defaultButtons.length + 1];
+		private void addPreset(final ColorSet toAdd) {
+			final ColorSet[] tPresetColors = new ColorSet[presetColors.length + 1];
+			final JTextField[] tPresetNames = new JTextField[presetNames.length + 1];
+			final JRadioButton[] tDefaultButtons = new JRadioButton[defaultButtons.length + 1];
 			for (int i = 0; i < presetColors.length; i++) {
 				tPresetColors[i] = presetColors[i];
 				tPresetNames[i] = presetNames[i];
@@ -415,22 +416,21 @@ public class ColorPresetEditor extends JPanel implements SettingsPanel {
 			}
 
 			// for null...
-			final int newIndex              = tPresetNames.length - 2;
+			final int newIndex = tPresetNames.length - 2;
 			tPresetColors[newIndex + 1] = tPresetColors[newIndex];
 			tPresetNames[newIndex + 1] = presetNames[newIndex];
 			tDefaultButtons[newIndex + 1] = tDefaultButtons[newIndex];
 
 			tPresetNames[newIndex] = new JTextField("Preset" + newIndex);
 			tPresetColors[newIndex] = toAdd;
-			JRadioButton set                = new JRadioButton();
+			final JRadioButton set = new JRadioButton();
 			tDefaultButtons[newIndex] = set;
-			set.addActionListener(
-				new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						presets.setDefaultIndex(newIndex);
-					}
-				});
+			set.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					presets.setDefaultIndex(newIndex);
+				}
+			});
 			bob.add(set);
 
 			presetNames = tPresetNames;
@@ -440,31 +440,17 @@ public class ColorPresetEditor extends JPanel implements SettingsPanel {
 		}
 
 		/*
-		private void addNonePreset(int i) {
-		  final int index = i;
-		  final JTextField templateField = new JTextField();
-		  final JTextField nameField = new JTextField();
-		  gbc.gridx = 0;
-		  nameField.setText("None");
-		  presetNames[index] = nameField;
-		  add(nameField, gbc);
-		  gbc.gridx = 1;
-		  gbc.weightx = 100;
-//		  templateField.setText(presets.getTemplate(index));
-		  presetTemplates[index] = null;
-//		  add(templateField, gbc);
-		  gbc.gridx = 2;
-		  gbc.weightx = 0;
-		  JRadioButton set = new JRadioButton();
-		  defaultButtons[index] = set;
-		  set.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			  presets.setDefaultPreset(-1);
-			}
-		  });
-		  add(set, gbc);
-		}
-	*/
+		 * private void addNonePreset(int i) { final int index = i; final
+		 * JTextField templateField = new JTextField(); final JTextField
+		 * nameField = new JTextField(); gbc.gridx = 0;
+		 * nameField.setText("None"); presetNames[index] = nameField;
+		 * add(nameField, gbc); gbc.gridx = 1; gbc.weightx = 100; //
+		 * templateField.setText(presets.getTemplate(index));
+		 * presetTemplates[index] = null; // add(templateField, gbc); gbc.gridx
+		 * = 2; gbc.weightx = 0; JRadioButton set = new JRadioButton();
+		 * defaultButtons[index] = set; set.addActionListener(new
+		 * ActionListener() { public void actionPerformed(ActionEvent e) {
+		 * presets.setDefaultPreset(-1); } }); add(set, gbc); }
+		 */
 	}
 }
-

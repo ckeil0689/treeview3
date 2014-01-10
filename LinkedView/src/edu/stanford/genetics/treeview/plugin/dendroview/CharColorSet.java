@@ -26,49 +26,53 @@ import java.awt.Color;
 
 import edu.stanford.genetics.treeview.ConfigNode;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
+
 /**
- *  This class represents a set of colors which can be used by a color extractor to translate char
- * values into colors. The max char value is set by a constant, usually 128.
+ * This class represents a set of colors which can be used by a color extractor
+ * to translate char values into colors. The max char value is set by a
+ * constant, usually 128.
  * 
- *
- * @author     Alok Saldanha <alok@genome.stanford.edu>
- * @version    @version $Revision: 1.1 $ $Date: 2006-08-16 19:13:46 $
+ * 
+ * @author Alok Saldanha <alok@genome.stanford.edu>
+ * @version @version $Revision: 1.1 $ $Date: 2006-08-16 19:13:46 $
  */
 public class CharColorSet implements ConfigNodePersistent {
-	public static final int maxChar = 128; // maximum char value which can be translated
+	public static final int maxChar = 128; // maximum char value which can be
+											// translated
 
-	private String default_missingColor  = "#FFFFFF";
-	private String default_emptyColor    = "#FFFFFF";
-	private String default_name          = null;
+	private final String default_missingColor = "#FFFFFF";
+	private final String default_emptyColor = "#FFFFFF";
+	private final String default_name = null;
 	private String name;
 	private Color missing, empty;
-	private Color charColors [] = new Color[maxChar]; // holds char colors
-	private ConfigNode root              = null;
+	private final Color charColors[] = new Color[maxChar]; // holds char colors
+	private ConfigNode root = null;
 
-
-	/**  Constructor for the ColorSet object,
-	*   uses default values
-	*/
+	/**
+	 * Constructor for the ColorSet object, uses default values
+	 */
 	public CharColorSet() {
 		super();
 		setAADefaults();
 	}
 
-
 	/**
-	 *  Constructor for the ColorSet object
-	 *
-	 * @param  name     inital name
-	 * @param  missing  string representing inital missing color
-	 * @param  empty    string representing inital empty color
+	 * Constructor for the ColorSet object
+	 * 
+	 * @param name
+	 *            inital name
+	 * @param missing
+	 *            string representing inital missing color
+	 * @param empty
+	 *            string representing inital empty color
 	 */
-	public CharColorSet(String name, String missing, String empty) {
+	public CharColorSet(final String name, final String missing,
+			final String empty) {
 		this();
 		setName(name);
 		setMissing(missing);
 		setEmpty(empty);
 	}
-
 
 	private void setAADefaults() {
 		missing = decodeColor(default_missingColor);
@@ -99,45 +103,43 @@ public class CharColorSet implements ConfigNodePersistent {
 		charColors['P'] = decodeColor("#DC9682");
 		for (char i = 0; i < maxChar; i++) {
 			if (charColors[i] != null) {
-				String uc = "" + i;
-				String lc = uc.toLowerCase();
+				final String uc = "" + i;
+				final String lc = uc.toLowerCase();
 				charColors[lc.charAt(0)] = charColors[i];
 			}
 		}
 	}
 
-
 	/**
 	 * copies colors and name from other color set.
 	 */
-	public void copyStateFrom(CharColorSet other) {
+	public void copyStateFrom(final CharColorSet other) {
 		setMissing(other.getMissing());
 		setEmpty(other.getEmpty());
 		setName(other.getName());
 	}
 
-
 	/**
-	* sets colors and name to reflect <code>ConfigNode</code>
-	*/
+	 * sets colors and name to reflect <code>ConfigNode</code>
+	 */
 	@Override
-	public void bindConfig(ConfigNode root) {
+	public void bindConfig(final ConfigNode root) {
 		this.root = root;
-		missing = decodeColor(root.getAttribute("missing", default_missingColor));
+		missing = decodeColor(root
+				.getAttribute("missing", default_missingColor));
 		empty = decodeColor(root.getAttribute("empty", default_emptyColor));
 		name = root.getAttribute("name", default_name);
-	} 
+	}
 
 	/**
 	 * String represnetation of class.
 	 */
 	@Override
 	public String toString() {
-		return "CharColorSet " + getName() + "\n" +
-				"missing: " + getMissing().toString() + "\t" +
-				"empty: " + getEmpty().toString() + "\t";
+		return "CharColorSet " + getName() + "\n" + "missing: "
+				+ getMissing().toString() + "\t" + "empty: "
+				+ getEmpty().toString() + "\t";
 	}
-
 
 	/**
 	 * Color for missing values.
@@ -146,7 +148,6 @@ public class CharColorSet implements ConfigNodePersistent {
 		return missing;
 	}
 
-
 	/**
 	 * Color for empty values.
 	 */
@@ -154,21 +155,20 @@ public class CharColorSet implements ConfigNodePersistent {
 		return empty;
 	}
 
-
 	/**
-	* The name of this color set
+	 * The name of this color set
 	 */
 	public String getName() {
 		return name;
 	}
 
-
-	public Color getColor(char c) {
+	public Color getColor(final char c) {
 		Color cand = null;
 		if (c < maxChar) {
 			cand = charColors[c];
 		} else {
-			System.out.println("passed in char " + c + " greater than maxChar " + maxChar + " to CharColorSet.java");
+			System.out.println("passed in char " + c + " greater than maxChar "
+					+ maxChar + " to CharColorSet.java");
 		}
 
 		if (cand == null) {
@@ -176,84 +176,83 @@ public class CharColorSet implements ConfigNodePersistent {
 		}
 		return cand;
 	}
-	
+
 	/**
 	 * Color for missing values.
 	 */
-	public void setMissing(String newString) {
+	public void setMissing(final String newString) {
 		missing = decodeColor(newString);
 		if (root != null) {
 			root.setAttribute("missing", newString, default_missingColor);
 		}
 	}
 
-
 	/**
 	 * Color for empty values.
 	 */
-	public void setEmpty(String newString) {
+	public void setEmpty(final String newString) {
 		empty = decodeColor(newString);
 		if (root != null) {
 			root.setAttribute("empty", newString, default_emptyColor);
 		}
 	}
-	public void setColor(char c, String newString) {
+
+	public void setColor(final char c, final String newString) {
 	}
 
 	/**
 	 * Color for missing values.
 	 */
-	public void setMissing(Color newColor) {
+	public void setMissing(final Color newColor) {
 		missing = newColor;
 		if (root != null) {
-			root.setAttribute("missing", encodeColor(missing), default_missingColor);
+			root.setAttribute("missing", encodeColor(missing),
+					default_missingColor);
 		}
 	}
-
 
 	/**
 	 * Color for empty values.
 	 */
-	public void setEmpty(Color newColor) {
+	public void setEmpty(final Color newColor) {
 		empty = newColor;
 		if (root != null) {
 			root.setAttribute("empty", encodeColor(empty), default_emptyColor);
 		}
 	}
 
-	public void setColor(char c, Color newColor) {
+	public void setColor(final char c, final Color newColor) {
 	}
 
 	/**
-	* The name of this color set
+	 * The name of this color set
 	 */
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 		if (root != null) {
 			root.setAttribute("name", name, default_name);
 		}
 	}
 
-
 	/**
-	 *  Convert a color from a hex string to a Java <code>Color</code> object.
-	 *
-	 * @param  colorString  hex string, such as #FF11FF
-	 * @return              The corresponding java color object.
+	 * Convert a color from a hex string to a Java <code>Color</code> object.
+	 * 
+	 * @param colorString
+	 *            hex string, such as #FF11FF
+	 * @return The corresponding java color object.
 	 */
-	public final static Color decodeColor(String colorString) {
+	public final static Color decodeColor(final String colorString) {
 		return ColorSet.decodeColor(colorString);
 	}
 
-
 	/**
 	 * Convert a java <code>Color</code> object to a hex string.
-	 *
-	 * @param  color  A java color object
-	 * @return        The corresponding hex string
+	 * 
+	 * @param color
+	 *            A java color object
+	 * @return The corresponding hex string
 	 */
-	public final static String encodeColor(Color color) {
+	public final static String encodeColor(final Color color) {
 		return ColorSet.encodeColor(color);
 	}
 }
-

@@ -20,7 +20,7 @@
  *
  * END_HEADER
  */
- 
+
 package edu.stanford.genetics.treeview.model;
 
 /**
@@ -30,12 +30,14 @@ package edu.stanford.genetics.treeview.model;
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
 
-
 import java.awt.Frame;
 import java.awt.MenuItem;
 
-import edu.stanford.genetics.treeview.*;
-
+import edu.stanford.genetics.treeview.ConfigNode;
+import edu.stanford.genetics.treeview.DummyConfigNode;
+import edu.stanford.genetics.treeview.FileSet;
+import edu.stanford.genetics.treeview.LoadException;
+import edu.stanford.genetics.treeview.XmlConfig;
 
 public class AtrTVModel extends TVModel {
 
@@ -45,47 +47,51 @@ public class AtrTVModel extends TVModel {
 	public AtrTVModel() {
 		super();
 	}
+
 	@Override
 	public String getType() {
 		return "AtrTVModel";
-	}	
-	
+	}
+
 	@Override
-	public double getValue(int x, int y) {
+	public double getValue(final int x, final int y) {
 		return -1;
 	}
+
 	@Override
-	public void setExprData(double [] newData) {
+	public void setExprData(final double[] newData) {
 	}
+
 	ConfigNode documentConfig = new DummyConfigNode("AtrTVModel");
+
 	@Override
 	public ConfigNode getDocumentConfigRoot() {
 		return documentConfig;
 	}
-	
+
 	@Override
-	public void setDocumentConfig(XmlConfig newVal) {
+	public void setDocumentConfig(final XmlConfig newVal) {
 	}
-	
+
 	@Override
-	public void setFrame(Frame f) {
+	public void setFrame(final Frame f) {
 	}
-	
+
 	@Override
 	public Frame getFrame() {
-			return null;
+		return null;
 	}
-	
+
 	public MenuItem getStatMenuItem() {
 		return null;
 	}
-	
+
 	@Override
-	public void loadNew(FileSet fileSet) throws LoadException {
+	public void loadNew(final FileSet fileSet) throws LoadException {
 		resetState();
 		setSource(fileSet);
 		final AtrTVModelLoader loader = new AtrTVModelLoader(this);
-		loader.loadInto(); 
+		loader.loadInto();
 	}
-	
+
 }

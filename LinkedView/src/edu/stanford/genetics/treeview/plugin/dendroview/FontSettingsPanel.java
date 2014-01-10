@@ -28,22 +28,40 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import edu.stanford.genetics.treeview.*;
-
-import javax.swing.*;
-
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Arrays;
 
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+
+import edu.stanford.genetics.treeview.DummyHeaderInfo;
+import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.NatField;
+import edu.stanford.genetics.treeview.SettingsPanel;
+import edu.stanford.genetics.treeview.UrlExtractor;
+
 /**
-* This class allows selection of Fonts for a FontSelectable.
-*/
+ * This class allows selection of Fonts for a FontSelectable.
+ */
 public class FontSettingsPanel extends JPanel implements SettingsPanel {
 
 	private static final long serialVersionUID = 1L;
-	
-	private FontSelectable client;
+
+	private final FontSelectable client;
 	private JComboBox font_choice;
 	private JComboBox style_choice;
 	private NatField size_field;
@@ -52,63 +70,61 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 
 	String size_prop, face_prop, style_prop;
 
-	public FontSettingsPanel(FontSelectable fs) {
-		
+	public FontSettingsPanel(final FontSelectable fs) {
+
 		client = fs;
 		setupWidgets();
 		updateExample();
 	}
-	
-	public static void main(String [] argv) {
-		
-		HeaderInfo hi = new DummyHeaderInfo();
-		UrlExtractor ue = new UrlExtractor(hi);
-		
-		FontSelectable fs = new TextView(hi, ue);
+
+	public static void main(final String[] argv) {
+
+		final HeaderInfo hi = new DummyHeaderInfo();
+		final UrlExtractor ue = new UrlExtractor(hi);
+
+		final FontSelectable fs = new TextView(hi, ue);
 		fs.setPoints(10);
-		FontSettingsPanel e  = new FontSettingsPanel(fs);
-		JFrame f = new JFrame("Font Settings Test");
+		final FontSettingsPanel e = new FontSettingsPanel(fs);
+		final JFrame f = new JFrame("Font Settings Test");
 		f.add(e);
-		f.addWindowListener(new WindowAdapter (){
+		f.addWindowListener(new WindowAdapter() {
 			@Override
-			public void windowClosing(WindowEvent we) 
-			{System.exit(0);}
+			public void windowClosing(final WindowEvent we) {
+				System.exit(0);
+			}
 		});
 		f.pack();
 		f.setVisible(true);
-    }
+	}
 
 	@Override
 	public void synchronizeFrom() {
-	  
+
 		setupWidgets();
 	}
 
 	@Override
 	public void synchronizeTo() {
-	  //nothing to do...
+		// nothing to do...
 	}
 
-	//the allowed font styles
+	// the allowed font styles
 	/**
-	 *  Description of the Field
+	 * Description of the Field
 	 */
-	public final static String[] styles  = {
-			
-		"Plain",
-		"Italic",
-		"Bold",
-		"Bold Italic"
-	};
-	
+	public final static String[] styles = {
+
+	"Plain", "Italic", "Bold", "Bold Italic" };
+
 	/**
 	 * turn a style number from class java.awt.Font into a string
-	 *
-	 * @param  style  style index
-	 * @return        string description
+	 * 
+	 * @param style
+	 *            style index
+	 * @return string description
 	 */
-	public final static String decode_style(int style) {
-		
+	public final static String decode_style(final int style) {
+
 		switch (style) {
 		case Font.PLAIN:
 			return styles[0];
@@ -120,110 +136,110 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 			return styles[3];
 		}
 	}
-	
+
 	/**
 	 * turn a string into a style number
-	 *
-	 * @param  style  string description
-	 * @return        integer encoded representation
+	 * 
+	 * @param style
+	 *            string description
+	 * @return integer encoded representation
 	 */
-	public final static int encode_style(String style) {
-		
-		return
-				style == styles[0] ? Font.PLAIN :
-				style == styles[1] ? Font.ITALIC :
-				style == styles[2] ? Font.BOLD :
-				Font.BOLD + Font.ITALIC;
+	public final static int encode_style(final String style) {
+
+		return style == styles[0] ? Font.PLAIN
+				: style == styles[1] ? Font.ITALIC
+						: style == styles[2] ? Font.BOLD : Font.BOLD
+								+ Font.ITALIC;
 	}
 
 	/**
-	 *  Create a blocking dialog containing this component
-	 *
-	 * @param  f  frame to block
+	 * Create a blocking dialog containing this component
+	 * 
+	 * @param f
+	 *            frame to block
 	 */
-	public void showDialog(Frame f, String title) {
-		
-		JDialog d = new JDialog(f, title);
+	public void showDialog(final Frame f, final String title) {
+
+		final JDialog d = new JDialog(f, title);
 		d.setLayout(new BorderLayout());
 		d.add(this, BorderLayout.CENTER);
 		d.add(new ButtonPanel(d), BorderLayout.SOUTH);
-		d.addWindowListener(
-			new WindowAdapter() {
-				@Override
-				public void windowClosing(WindowEvent we) {
-					we.getWindow().dispose();
-				}
-			});
+		d.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(final WindowEvent we) {
+				we.getWindow().dispose();
+			}
+		});
 		d.pack();
 		d.setVisible(true);
 	}
-	
+
 	private void setupFontChoice() {
-		
-		Font[] fonts = FontSelector.fonts;
-		String[] fontNames = new String[fonts.length];
-		for(Font f : fonts) {
-			
+
+		final Font[] fonts = FontSelector.fonts;
+		final String[] fontNames = new String[fonts.length];
+		for (final Font f : fonts) {
+
 			fontNames[Arrays.asList(fonts).indexOf(f)] = f.getName();
 		}
-		
+
 		font_choice = new JComboBox(fontNames);
 		font_choice.setSelectedItem(client.getFace());
 	}
-	
+
 	private void setupStyleChoice() {
-		
+
 		style_choice = new JComboBox(styles);
 		style_choice.setSelectedItem(decode_style(client.getStyle()));
 	}
-	
+
 	private void synchronizeClient() {
-		
-		String string = (String) font_choice.getSelectedItem();
-		int i = encode_style((String) style_choice.getSelectedItem());
-		int size = size_field.getNat();
-		
+
+		final String string = (String) font_choice.getSelectedItem();
+		final int i = encode_style((String) style_choice.getSelectedItem());
+		final int size = size_field.getNat();
+
 		client.setFace(string);
 		client.setStyle(i);
 		client.setPoints(size);
 	}
-	
+
 	/**
-	*  Sets up widgets
-	*/
+	 * Sets up widgets
+	 */
 	private void setupWidgets() {
-		
+
 		removeAll();
-		GridBagLayout gbl  = new GridBagLayout();
+		final GridBagLayout gbl = new GridBagLayout();
 		setLayout(gbl);
-		GridBagConstraints gbc  = new GridBagConstraints();
+		final GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.gridwidth = 1;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		
+
 		setupFontChoice();
 		add(font_choice, gbc);
-		
+
 		setupStyleChoice();
 		gbc.gridx = 1;
 		add(style_choice, gbc);
-		
+
 		size_field = new NatField(client.getPoints(), 3);
 		gbc.gridx = 2;
 		add(size_field, gbc);
-		
+
 		display_button = new JButton("Set");
 		display_button.addActionListener(new ActionListener() {
-			
+
 			@Override
-			public void actionPerformed(ActionEvent actionEvent) {
-				
+			public void actionPerformed(final ActionEvent actionEvent) {
+
 				updateExample();
 				synchronizeClient();
 			}
 		});
-		
+
 		gbc.gridx = 3;
 		add(display_button, gbc);
 		gbc.gridx = 0;
@@ -233,36 +249,35 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 		exampleField = new JLabel("Font Example Text", SwingConstants.CENTER);
 		add(exampleField, gbc);
 	}
-	
+
 	private void updateExample() {
-		
-		String string = (String)font_choice.getSelectedItem();
-		int i = encode_style((String)style_choice.getSelectedItem());
-		int size = size_field.getNat();
-//	    System.out.println("Setting size to " + size);
-		exampleField.setFont(new Font(string, i, size) );
+
+		final String string = (String) font_choice.getSelectedItem();
+		final int i = encode_style((String) style_choice.getSelectedItem());
+		final int size = size_field.getNat();
+		// System.out.println("Setting size to " + size);
+		exampleField.setFont(new Font(string, i, size));
 		exampleField.revalidate();
 		exampleField.repaint();
 	}
-	
+
 	private class ButtonPanel extends JPanel {
 
 		private static final long serialVersionUID = 1L;
 
-		ButtonPanel(Window w) {
-		
+		ButtonPanel(final Window w) {
+
 			final Window window = w;
-			JButton save_button = new JButton("Close");
+			final JButton save_button = new JButton("Close");
 			save_button.addActionListener(new ActionListener() {
-			
+
 				@Override
-				public void actionPerformed(ActionEvent e) {
-					
+				public void actionPerformed(final ActionEvent e) {
+
 					window.setVisible(false);
 				}
 			});
 			add(save_button);
-		}    
+		}
 	}
 }
-

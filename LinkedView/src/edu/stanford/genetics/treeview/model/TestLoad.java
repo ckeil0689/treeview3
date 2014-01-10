@@ -11,59 +11,61 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 import edu.stanford.genetics.treeview.LogBuffer;
+
 /**
  * @author gcong
- *
- *
- *
- *
- *
+ * 
+ * 
+ * 
+ * 
+ * 
  */
 public class TestLoad {
 
-	static public  Vector<String[]> load(BufferedReader br) throws IOException{
-		Vector<String[]> data = new Vector<String[]>(100,100);
-		
+	static public Vector<String[]> load(final BufferedReader br)
+			throws IOException {
+		final Vector<String[]> data = new Vector<String[]>(100, 100);
+
 		FlatFileStreamTokenizer st;
 		st = new FlatFileStreamTokenizer(br);
 		// ignore leading blank lines...
-		while (st.nextToken() == StreamTokenizer.TT_EOL) {}
+		while (st.nextToken() == StreamTokenizer.TT_EOL) {
+		}
 		st.pushBack();
-		
-		
+
 		while (st.nextToken() != StreamTokenizer.TT_EOF) {
-			Vector<String> line = new Vector<String>(10, 10);
+			final Vector<String> line = new Vector<String>(10, 10);
 			st.pushBack();
-			loadLine(line,st);
-			String tokens[] = new String[line.size()];
-			Enumeration<String> e = line.elements();
+			loadLine(line, st);
+			final String tokens[] = new String[line.size()];
+			final Enumeration<String> e = line.elements();
 			for (int i = 0; i < tokens.length; i++) {
 				tokens[i] = e.nextElement();
 			}
 			data.addElement(tokens);
-			//data.addElement(line);
+			// data.addElement(line);
 			line.removeAllElements();
 		}
 		return data;
 	}
-	
-		static public void loadLine(Vector<String> line, FlatFileStreamTokenizer st) 
-	throws IOException {
+
+	static public void loadLine(final Vector<String> line,
+			final FlatFileStreamTokenizer st) throws IOException {
 		int tt = st.nextToken();
 		while ((tt != StreamTokenizer.TT_EOL) && (tt != StreamTokenizer.TT_EOF)) {
 			if (tt == StreamTokenizer.TT_WORD) {
 				line.addElement(st.sval);
-				//line.addElement("012345678");
-				//line.addElement("" + Math.random());
+				// line.addElement("012345678");
+				// line.addElement("" + Math.random());
 			} else if (tt == FlatFileStreamTokenizer.TT_NULL) {
-				line.addElement(null);		
+				line.addElement(null);
 			} else {
-				LogBuffer.println("In loadLine, Got token type " + tt + " token " + st.toString() +
-				" expected TT_WORD (" + StreamTokenizer.TT_WORD + ") at line " + st.lineno());
-				
+				LogBuffer.println("In loadLine, Got token type " + tt
+						+ " token " + st.toString() + " expected TT_WORD ("
+						+ StreamTokenizer.TT_WORD + ") at line " + st.lineno());
+
 			}
 			tt = st.nextToken();
 		}
 	}
 }
-

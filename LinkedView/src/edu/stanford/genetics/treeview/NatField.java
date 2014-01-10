@@ -22,7 +22,6 @@
  */
 package edu.stanford.genetics.treeview;
 
-
 // NatField: custom Java component: text field that constrains input
 // to be numeric.
 // Copyright (C) Lemma 1 Ltd. 1997
@@ -54,66 +53,68 @@ public class NatField extends JTextField implements KeyListener {
 	private int val;
 	private int max = -1;
 
-	public NatField(int num, int cols) {
-		
+	public NatField(final int num, final int cols) {
+
 		super(Integer.toString(num < 0 ? 0 : num), cols);
 		val = num < 0 ? 0 : num;
 		addKeyListener(this);
 	}
 
-	public NatField(int num, int cols, int maximum) {
-		
+	public NatField(final int num, final int cols, final int maximum) {
+
 		super(Integer.toString(num < 0 ? 0 : num), cols);
 		val = num < 0 ? 0 : num;
 		max = maximum;
 		addKeyListener(this);
 	}
-	
-	@Override
-	public void keyPressed (KeyEvent evt) {}
-	
-	@Override
-	public void keyReleased (KeyEvent evt) {}
 
 	@Override
-	public void keyTyped(KeyEvent evt) {
-		
+	public void keyPressed(final KeyEvent evt) {
+	}
+
+	@Override
+	public void keyReleased(final KeyEvent evt) {
+	}
+
+	@Override
+	public void keyTyped(final KeyEvent evt) {
+
 		boolean revert;
 		int new_val = 10;
-		
+
 		try {
 			new_val = Integer.parseInt(getText());
 			revert = false;
 
-			if(new_val < 0) { // revert if negative
-			  revert = true;
+			if (new_val < 0) { // revert if negative
+				revert = true;
 			}
-			
-			if(max > 0 && new_val > max) { // revert to max if too big
-			  val = max;
-			  revert = true;
+
+			if (max > 0 && new_val > max) { // revert to max if too big
+				val = max;
+				revert = true;
 			}
-		} catch (NumberFormatException e) {
-		  int len = getText().length();
-		  if (len != 0) {
-			  revert = true; // revert if can't convert;
-		  }  else {
-			revert = false;
-			val = 0;
-		  }
+		} catch (final NumberFormatException e) {
+			final int len = getText().length();
+			if (len != 0) {
+				revert = true; // revert if can't convert;
+			} else {
+				revert = false;
+				val = 0;
+			}
 		}
-		
-		if(revert) {
-//		  System.out.println("Reverting value..");
+
+		if (revert) {
+			// System.out.println("Reverting value..");
 			setText(Integer.toString(val));
 		} else {
-//		  System.out.println("keeping value.." + new_val);
+			// System.out.println("keeping value.." + new_val);
 			val = new_val;
 		}
 	}
 
 	public int getNat() {
-	 
+
 		keyTyped(null);
 		return val;
 	}

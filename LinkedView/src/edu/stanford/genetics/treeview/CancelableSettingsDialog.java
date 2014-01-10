@@ -21,38 +21,51 @@
  * END_HEADER
  */
 package edu.stanford.genetics.treeview;
-import java.awt.*;
-import java.awt.event.*;
 
-import javax.swing.*;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
+
 /**
- *  this is a dialog which displays a single cancelable settings panel
- *
- * @author     Alok Saldanha <alok@genome.stanford.edu>
- * @version    @version $Revision: 1.6 $ $Date: 2004-12-21 03:28:13 $
+ * this is a dialog which displays a single cancelable settings panel
+ * 
+ * @author Alok Saldanha <alok@genome.stanford.edu>
+ * @version @version $Revision: 1.6 $ $Date: 2004-12-21 03:28:13 $
  */
 public class CancelableSettingsDialog extends JDialog {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	SettingsPanel settingsPanel;
 	JDialog settingsFrame;
 
 	/**
-	 *
-	 * @param  frame  <code>JFrame</code> to block on
-	 * @param  title  a title for the dialog
-	 * @param  panel  A <code>SettingsPanel</code> to feature in the dialog.
+	 * 
+	 * @param frame
+	 *            <code>JFrame</code> to block on
+	 * @param title
+	 *            a title for the dialog
+	 * @param panel
+	 *            A <code>SettingsPanel</code> to feature in the dialog.
 	 */
-	public CancelableSettingsDialog(JFrame frame, String title, 
-			SettingsPanel panel) {
-		
+	public CancelableSettingsDialog(final JFrame frame, final String title,
+			final SettingsPanel panel) {
+
 		super(frame, title, true);
 		settingsPanel = panel;
 		settingsFrame = this;
-		JPanel inner  = new JPanel();
+		final JPanel inner = new JPanel();
 		inner.setLayout(new MigLayout());
 		inner.add((Component) panel, "push, grow, wrap");
 		inner.add(new ButtonPanel(), "pushx, growx, alignx 50%");
@@ -61,70 +74,68 @@ public class CancelableSettingsDialog extends JDialog {
 		pack();
 	}
 
-
 	class ButtonPanel extends JPanel {
 
 		private static final long serialVersionUID = 1L;
 
 		ButtonPanel() {
-			
+
 			this.setBackground(GUIParams.BG_COLOR);
-			
-			JButton save_button = setButtonLayout("Save");
+
+			final JButton save_button = setButtonLayout("Save");
 			save_button.addActionListener(new ActionListener() {
-					
+
 				@Override
-				public void actionPerformed(ActionEvent e) {
-					
+				public void actionPerformed(final ActionEvent e) {
+
 					try {
 						settingsPanel.synchronizeTo();
 						settingsFrame.dispose();
-						
-					} catch (java.lang.OutOfMemoryError ex) {
-						
-						JPanel temp = new JPanel();
-						temp. add(new JLabel("Out of memory, try smaller " +
-								"pixel settings or allocate more RAM"));
-						temp. add(new JLabel("see Chapter 3 of " +
-								"Help->Documentation... for Out of Memory " +
-								"and Image Export)"));
-							
+
+					} catch (final java.lang.OutOfMemoryError ex) {
+
+						final JPanel temp = new JPanel();
+						temp.add(new JLabel("Out of memory, try smaller "
+								+ "pixel settings or allocate more RAM"));
+						temp.add(new JLabel("see Chapter 3 of "
+								+ "Help->Documentation... for Out of Memory "
+								+ "and Image Export)"));
+
 						JOptionPane.showMessageDialog(
-								CancelableSettingsDialog.this,  temp);
+								CancelableSettingsDialog.this, temp);
 					}
 				}
 			});
 			add(save_button);
 
-			JButton cancel_button  = setButtonLayout("Cancel");
+			final JButton cancel_button = setButtonLayout("Cancel");
 			cancel_button.addActionListener(new ActionListener() {
-					
+
 				@Override
-				public void actionPerformed(ActionEvent e) {
-					
+				public void actionPerformed(final ActionEvent e) {
+
 					settingsPanel.synchronizeFrom();
 					settingsFrame.dispose();
 				}
 			});
 			add(cancel_button);
 		}
-		
-		public JButton setButtonLayout(String title){
-			
-			Font buttonFont = new Font("Sans Serif", Font.PLAIN, 14);
-			
-			JButton button = new JButton(title);
-	  		Dimension d = button.getPreferredSize();
-	  		d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
-	  		button.setPreferredSize(d);
-	  		
-	  		button.setFont(buttonFont);
-	  		button.setOpaque(true);
-	  		button.setBackground(GUIParams.ELEMENT);
-	  		button.setForeground(GUIParams.BG_COLOR);
-	  		
-	  		return button;
+
+		public JButton setButtonLayout(final String title) {
+
+			final Font buttonFont = new Font("Sans Serif", Font.PLAIN, 14);
+
+			final JButton button = new JButton(title);
+			final Dimension d = button.getPreferredSize();
+			d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
+			button.setPreferredSize(d);
+
+			button.setFont(buttonFont);
+			button.setOpaque(true);
+			button.setBackground(GUIParams.ELEMENT);
+			button.setForeground(GUIParams.BG_COLOR);
+
+			return button;
 		}
 	}
 }
-

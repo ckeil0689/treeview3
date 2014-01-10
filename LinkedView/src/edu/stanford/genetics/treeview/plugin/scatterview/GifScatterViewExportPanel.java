@@ -23,54 +23,61 @@
 package edu.stanford.genetics.treeview.plugin.scatterview;
 
 import java.awt.Image;
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 
-import com.gurge.amd.*;
+import com.gurge.amd.GIFEncoder;
+import com.gurge.amd.Quantize;
+import com.gurge.amd.TestQuantize;
 
 import edu.stanford.genetics.treeview.LogBuffer;
 
 class GifScatterViewExportPanel extends ScatterViewExportPanel {
-	GifScatterViewExportPanel(ScatterView scatterView) {
+	GifScatterViewExportPanel(final ScatterView scatterView) {
 		super(scatterView);
 	}
 
-  @Override
-public void synchronizeTo() {
-	save();
-  }
-  
-  @Override
-public void synchronizeFrom() {
-	// do nothing...
-  }
-  public void save() {
-	  try {
-		  OutputStream output = new BufferedOutputStream
-		  (new FileOutputStream(getFile()));
-		  
-		  write(output);
-		  
-		  output.close();
-	  } catch (Exception e) {
-		  LogBuffer.println("GIF ColorBar Export Panel caught exception " + e);
-	  }
-  }
- 
-	/**
-	* Save image to the currently selected file...
-	*/
-	public void write(OutputStream output) {
-		Image i = generateImage();
+	@Override
+	public void synchronizeTo() {
+		save();
+	}
+
+	@Override
+	public void synchronizeFrom() {
+		// do nothing...
+	}
+
+	public void save() {
 		try {
-			int pixels[][] = TestQuantize.getPixels(i);
+			final OutputStream output = new BufferedOutputStream(
+					new FileOutputStream(getFile()));
+
+			write(output);
+
+			output.close();
+		} catch (final Exception e) {
+			LogBuffer
+					.println("GIF ColorBar Export Panel caught exception " + e);
+		}
+	}
+
+	/**
+	 * Save image to the currently selected file...
+	 */
+	public void write(final OutputStream output) {
+		final Image i = generateImage();
+		try {
+			final int pixels[][] = TestQuantize.getPixels(i);
 			// quant... probably unnecessary here...
-			int palette[] = Quantize.quantizeImage(pixels, 256);
-			GIFEncoder enc = new GIFEncoder(createImage(TestQuantize.makeImage(palette, pixels)));
+			final int palette[] = Quantize.quantizeImage(pixels, 256);
+			final GIFEncoder enc = new GIFEncoder(
+					createImage(TestQuantize.makeImage(palette, pixels)));
 			enc.Write(output);
-		} catch (Exception e) {
-			LogBuffer.println("In GifScatterViewExportPanel.synchronizeTo() got exception " + e);
+		} catch (final Exception e) {
+			LogBuffer
+					.println("In GifScatterViewExportPanel.synchronizeTo() got exception "
+							+ e);
 		}
 	}
 }
-
-

@@ -21,8 +21,9 @@
  * END_HEADER 
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
+
 public class DendroException extends Exception {
-	DendroException(String s) {
+	DendroException(final String s) {
 		super(s);
 	}
 }

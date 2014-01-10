@@ -22,77 +22,79 @@
  */
 package edu.stanford.genetics.treeview;
 
-
-/** This is the second url extraction class I'm writing.  It's
- * designed to do less... I'm going to make UrlPresets and UrlEditor
- * as well.  
+/**
+ * This is the second url extraction class I'm writing. It's designed to do
+ * less... I'm going to make UrlPresets and UrlEditor as well.
  */
 
-public class UrlExtractor2 implements ConfigNodePersistent {    
-    private ConfigNode root;
-    private UrlPresets presets;
-    /**
-     * This class must have a config node to stash data in, even if
-     * it's a dummy. It also needs UrlPresets to infer templates from styles
-     */
-    public UrlExtractor2(ConfigNode n, UrlPresets p) {
-	root = n;
-	presets = p;
-    }
-    
-    /**
-     * returns the text of the header which is to be used for
-     * filling out the url template.
-     */
-    public String getColHeader() {
-	String ret = root.getAttribute("header", null);
-	return ret;
-    }
+public class UrlExtractor2 implements ConfigNodePersistent {
+	private ConfigNode root;
+	private final UrlPresets presets;
 
-    public void setColHeader(String head) {
-	root.setAttribute("header", head, null);
-    }
-    
-    /**
-     * most common use, fills in current template with val
-     */
-    public String substitute(String val) {
-	String temp = getTemplate();
-	if (temp == null) return null;
-	if (val == null) return null;
-	int into = temp.indexOf("HEADER");
-	if (into < 0) return temp;	    
-	return temp.substring(0, into) + val + temp.substring(into+6);
-    }
-    
-    public String getTemplate() {
-	String ret = root.getAttribute("template", null);
-	if (ret != null) return ret;
-	
-	// try style preset
-	if (ret == null)
-	    ret = presets.getTemplate(root.getAttribute("style", "None"));
+	/**
+	 * This class must have a config node to stash data in, even if it's a
+	 * dummy. It also needs UrlPresets to infer templates from styles
+	 */
+	public UrlExtractor2(final ConfigNode n, final UrlPresets p) {
+		root = n;
+		presets = p;
+	}
 
-	// try custom
-	if (ret == null) 
-	    ret = root.getAttribute("custom", null);
+	/**
+	 * returns the text of the header which is to be used for filling out the
+	 * url template.
+	 */
+	public String getColHeader() {
+		final String ret = root.getAttribute("header", null);
+		return ret;
+	}
 
-	// okay, first preset...
-	if (ret == null) 
-	    ret = presets.getTemplate(0);
-	
-	root.setAttribute("template", ret, null);
-	return ret;
-    }
+	public void setColHeader(final String head) {
+		root.setAttribute("header", head, null);
+	}
 
-    public void setTemplate(String ret) {
-	root.setAttribute("template", ret, null);
-    }
+	/**
+	 * most common use, fills in current template with val
+	 */
+	public String substitute(final String val) {
+		final String temp = getTemplate();
+		if (temp == null)
+			return null;
+		if (val == null)
+			return null;
+		final int into = temp.indexOf("HEADER");
+		if (into < 0)
+			return temp;
+		return temp.substring(0, into) + val + temp.substring(into + 6);
+	}
 
+	public String getTemplate() {
+		String ret = root.getAttribute("template", null);
+		if (ret != null)
+			return ret;
 
-    @Override
-	public void bindConfig(ConfigNode configNode)
-    {
-        root = configNode;
-    }
+		// try style preset
+		if (ret == null)
+			ret = presets.getTemplate(root.getAttribute("style", "None"));
+
+		// try custom
+		if (ret == null)
+			ret = root.getAttribute("custom", null);
+
+		// okay, first preset...
+		if (ret == null)
+			ret = presets.getTemplate(0);
+
+		root.setAttribute("template", ret, null);
+		return ret;
+	}
+
+	public void setTemplate(final String ret) {
+		root.setAttribute("template", ret, null);
+	}
+
+	@Override
+	public void bindConfig(final ConfigNode configNode) {
+		root = configNode;
+	}
 }

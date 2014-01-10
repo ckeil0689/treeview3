@@ -5,7 +5,9 @@
  */
 package edu.stanford.genetics.treeview.core;
 
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.JTextArea;
 
@@ -16,26 +18,29 @@ public class LogMessagesPanel extends JTextArea implements Observer {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private LogBuffer logBuffer;
-	public LogMessagesPanel(LogBuffer buffer) {
+	private final LogBuffer logBuffer;
+
+	public LogMessagesPanel(final LogBuffer buffer) {
 		super(null, 20, 50);
 		logBuffer = buffer;
 		logBuffer.addObserver(this);
 		synchronizeFrom();
 	}
+
 	private void synchronizeFrom() {
-		Enumeration elements = logBuffer.getMessages();
+		final Enumeration elements = logBuffer.getMessages();
 		while (elements.hasMoreElements()) {
 			append((String) elements.nextElement());
 			append("\n");
 		}
 	}
+
 	@Override
-	public void update(Observable arg0, Object arg1) {
+	public void update(final Observable arg0, final Object arg1) {
 		if (arg1 != null) {
 			this.append((String) arg1);
 			this.append("\n");
 		}
 	}
-	
+
 }

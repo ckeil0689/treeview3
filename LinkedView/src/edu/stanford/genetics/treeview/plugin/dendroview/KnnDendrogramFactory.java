@@ -21,111 +21,122 @@ import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.core.PluginManager;
 
 public class KnnDendrogramFactory extends PluginFactory {
-	
+
 	// presets must be set before static initializer.
 	private static ColorPresets colorPresets = new ColorPresets();
-	private ColorPresetEditor  cpresetEditor;
+	private final ColorPresetEditor cpresetEditor;
 	private JFrame cpresetFrame = null;
-	
+
 	static {
-		
+
 		PluginManager.registerPlugin(new KnnDendrogramFactory());
 	}
-	
+
 	@Override
 	public String getPluginName() {
-		
+
 		return "KnnDendrogram";
 	}
 
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.stanford.genetics.treeview
 	 * .PluginFactory#createPlugin(edu.stanford.genetics.treeview.ConfigNode)
 	 */
 	@Override
-	public MainPanel restorePlugin(ConfigNode node, ViewFrame viewFrame) {
+	public MainPanel restorePlugin(final ConfigNode node,
+			final ViewFrame viewFrame) {
 
-		//DendroView dendroView = new KnnDendroView(
-		//(KnnModel) viewFrame.getDataModel(), node, viewFrame);
-		DendroView2 dendroView = new KnnDendroView2(viewFrame.getDataModel(), 
-				node, viewFrame);
+		// DendroView dendroView = new KnnDendroView(
+		// (KnnModel) viewFrame.getDataModel(), node, viewFrame);
+		final DendroView2 dendroView = new KnnDendroView2(
+				viewFrame.getDataModel(), node, viewFrame);
 		dendroView.setName(getPluginName());
 		return dendroView;
 	}
-	
+
 	public KnnDendrogramFactory() {
-		
+
 		super();
 		cpresetEditor = new ColorPresetEditor(colorPresets);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.stanford.genetics.treeview
 	 * .PluginFactory#setGlobalNode(edu.stanford.genetics.treeview.ConfigNode)
 	 */
 	@Override
-	public void setGlobalNode(ConfigNode node) {
-		
+	public void setGlobalNode(final ConfigNode node) {
+
 		super.setGlobalNode(node);
 		colorPresets.bindConfig(node.fetchOrCreate("KnnColorPresets"));
 		if (colorPresets.getNumPresets() == 0) {
-		  colorPresets.addDefaultPresets();
+			colorPresets.addDefaultPresets();
 		}
 		cpresetEditor.synchronizeFrom();
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.stanford.genetics.treeview
 	 * .PluginFactory#addPluginConfig(java.awt.Menu)
 	 */
 	@Override
-	public void addPluginConfig(TreeviewMenuBarI globalMenu, 
+	public void addPluginConfig(final TreeviewMenuBarI globalMenu,
 			final ViewFrame frame) {
-		
+
 		super.addPluginConfig(globalMenu, frame);
-		globalMenu.addMenuItem("KnnDendrogram Color Presets...", 
+		globalMenu.addMenuItem("KnnDendrogram Color Presets...",
 				new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent actionEvent) {
-				
-				if (cpresetFrame == null) {
-					cpresetFrame = new JFrame("KnnDendrogram Color Presets");
-					SettingsPanelHolder holder = new SettingsPanelHolder(
-							cpresetFrame, 
-							frame.getApp().getGlobalConfig().getRoot());
-					holder.addSettingsPanel(cpresetEditor);
-					cpresetFrame.getContentPane().add(holder);
-				}
-				cpresetFrame.pack();
-				cpresetFrame.setVisible(true);
-			}
-		});
+
+					@Override
+					public void actionPerformed(final ActionEvent actionEvent) {
+
+						if (cpresetFrame == null) {
+							cpresetFrame = new JFrame(
+									"KnnDendrogram Color Presets");
+							final SettingsPanelHolder holder = new SettingsPanelHolder(
+									cpresetFrame, frame.getApp()
+											.getGlobalConfig().getRoot());
+							holder.addSettingsPanel(cpresetEditor);
+							cpresetFrame.getContentPane().add(holder);
+						}
+						cpresetFrame.pack();
+						cpresetFrame.setVisible(true);
+					}
+				});
 		globalMenu.setMnemonic(KeyEvent.VK_N);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.stanford.genetics.treeview
 	 * .PluginFactory#setGlobalNode(edu.stanford.genetics.treeview.ConfigNode)
 	 */
-	public SettingsPanel getPresetEditor () {
-		
+	public SettingsPanel getPresetEditor() {
+
 		return cpresetEditor;
 	}
-	
+
 	/**
 	 * mechanism by which Dendroview can access the presets.
+	 * 
 	 * @return color presets for dendrogram view
 	 */
 	public static ColorPresets getColorPresets() {
-		
+
 		return colorPresets;
 	}
 
 	@Override
-	public boolean configurePlugin(ConfigNode node, ViewFrame viewFrame) {
-		
+	public boolean configurePlugin(final ConfigNode node,
+			final ViewFrame viewFrame) {
+
 		return true;
 	}
 }

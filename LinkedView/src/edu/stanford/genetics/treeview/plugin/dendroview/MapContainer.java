@@ -1,4 +1,4 @@
-	/* BEGIN_HEADER                                              Java TreeView
+/* BEGIN_HEADER                                              Java TreeView
  *
  * $Author: rqluk $
  * $RCSfile: MapContainer.java,v $
@@ -29,216 +29,222 @@ import java.util.Observer;
 
 import javax.swing.JScrollBar;
 
-import edu.stanford.genetics.treeview.*;
+import edu.stanford.genetics.treeview.ConfigNode;
+import edu.stanford.genetics.treeview.ConfigNodePersistent;
+import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.TreeDrawerNode;
+
 /**
-* MapContainers tell the views which pixel offset to draw each array or 
-* gene index at the scrollbars "scroll" by communicating with the maps.
-* 
-* This is distinct from which genes are selected (see the TreeSelection object)
-*/
-public class MapContainer extends Observable implements Observer, 
-AdjustmentListener, ConfigNodePersistent {
-	
-    private String default_map = "Fixed";
-    private double default_scale = 1.0;
-    private double minScale;
-    private IntegerMap current = null;
+ * MapContainers tell the views which pixel offset to draw each array or gene
+ * index at the scrollbars "scroll" by communicating with the maps.
+ * 
+ * This is distinct from which genes are selected (see the TreeSelection object)
+ */
+public class MapContainer extends Observable implements Observer,
+		AdjustmentListener, ConfigNodePersistent {
+
+	private final String default_map = "Fixed";
+	private double default_scale = 1.0;
+	private double minScale;
+	private IntegerMap current = null;
 
 	private FixedMap fixedMap = null;
 	private FillMap fillMap = null;
 	private NullMap nullMap = null;
 
-    private JScrollBar scrollbar = null;
-    private TreeDrawerNode selected = null;
-    private ConfigNode root = null;
-    
-    public MapContainer() {
-	 
-    	fixedMap = new FixedMap();
-    	fillMap = new FillMap();
-    	nullMap = new NullMap();
-    	current = nullMap;
-    }
-    
-    public MapContainer(String type) {
-		
-    	this();
+	private JScrollBar scrollbar = null;
+	private TreeDrawerNode selected = null;
+	private ConfigNode root = null;
+
+	public MapContainer() {
+
+		fixedMap = new FixedMap();
+		fillMap = new FillMap();
+		nullMap = new NullMap();
+		current = nullMap;
+	}
+
+	public MapContainer(final String type) {
+
+		this();
 		setMap(type);
 	}
-    
-	private ConfigNode fetchOrCreateNode(String name) {
-	 
+
+	private ConfigNode fetchOrCreateNode(final String name) {
+
 		ConfigNode ret = root.fetchFirst(name);
 		if (ret == null) {
 			ret = root.create(name);
 		}
-		
+
 		return ret;
 	}
-	
-    // confignode persistent
-    @Override
-	public void bindConfig(ConfigNode configNode) {
-    	
-        root = configNode;
-        
-        // first bind subordinate maps...
-        fixedMap.bindConfig(fetchOrCreateNode("FixedMap"));
-        fillMap.bindConfig(fetchOrCreateNode("FillMap"));
-        nullMap.bindConfig(fetchOrCreateNode("NullMap"));
-	  
-        // then, fix self up...
-        setMap(root.getAttribute("current", default_map));
-    }
-	
-    public void setDefaultScale(double d) {
-        
-    	default_scale = d;
+
+	// confignode persistent
+	@Override
+	public void bindConfig(final ConfigNode configNode) {
+
+		root = configNode;
+
+		// first bind subordinate maps...
+		fixedMap.bindConfig(fetchOrCreateNode("FixedMap"));
+		fillMap.bindConfig(fetchOrCreateNode("FillMap"));
+		nullMap.bindConfig(fetchOrCreateNode("NullMap"));
+
+		// then, fix self up...
+		setMap(root.getAttribute("current", default_map));
+	}
+
+	public void setDefaultScale(final double d) {
+
+		default_scale = d;
 		fixedMap.setDefaultScale(d);
-    }
-    
-    public void setHome() {
-    	
-    	double pixels = current.getAvailablePixels();
-    	double divider = current.getMaxIndex() - current.getMinIndex() + 1;
-    	minScale = pixels/divider;
-    	setScale(minScale);
-    }
-    
-    public void setMinScale() {
-    	
-    	double pixels = current.getAvailablePixels();
-    	double divider = current.getMaxIndex() - current.getMinIndex() + 1;
-    	minScale = pixels/divider;
-    }
-    
-    /**
-     * Method to zoom out of the MapContainer and set the scale for drawing
-     * lower than before. 
-     * It's important to take the range of genes displayed on screen 
-     * (range of scrollbar -> visibleAmount()) into account, as well as 
-     * the amount of available pixels on screen. Otherwise there will be 
-     * drawing and selection issues.
-     * @param double zoomVal
-     */
-    public void zoomOut() {
-		
+	}
+
+	public void setHome() {
+
+		final double pixels = current.getAvailablePixels();
+		final double divider = current.getMaxIndex() - current.getMinIndex()
+				+ 1;
+		minScale = pixels / divider;
+		setScale(minScale);
+	}
+
+	public void setMinScale() {
+
+		final double pixels = current.getAvailablePixels();
+		final double divider = current.getMaxIndex() - current.getMinIndex()
+				+ 1;
+		minScale = pixels / divider;
+	}
+
+	/**
+	 * Method to zoom out of the MapContainer and set the scale for drawing
+	 * lower than before. It's important to take the range of genes displayed on
+	 * screen (range of scrollbar -> visibleAmount()) into account, as well as
+	 * the amount of available pixels on screen. Otherwise there will be drawing
+	 * and selection issues.
+	 * 
+	 * @param double zoomVal
+	 */
+	public void zoomOut() {
+
 		double newScale = 0.0;
 		double zoomVal = 1.3;
-		
-		if(getScale() < 8.0) {
+
+		if (getScale() < 8.0) {
 			zoomVal = 1.8;
 		}
-		
+
 		newScale = roundScale(getAvailablePixels()
 				/ (scrollbar.getVisibleAmount() * zoomVal));
-		
-		if(newScale < minScale) {
+
+		if (newScale < minScale) {
 			newScale = minScale;
 		}
-		
+
 		this.setScale(newScale);
 	}
-	
-    /**
-     * Method to zoom in to the MapContainer and set the scale for drawing
-     * higher than before. 
-     * It's important to take the range of genes displayed on screen 
-     * (range of scrollbar -> visibleAmount()) into account, as well as 
-     * the amount of available pixels on screen. Otherwise there will be 
-     * drawing and selection issues.
-     * @param double zoomVal
-     */
+
+	/**
+	 * Method to zoom in to the MapContainer and set the scale for drawing
+	 * higher than before. It's important to take the range of genes displayed
+	 * on screen (range of scrollbar -> visibleAmount()) into account, as well
+	 * as the amount of available pixels on screen. Otherwise there will be
+	 * drawing and selection issues.
+	 * 
+	 * @param double zoomVal
+	 */
 	public void zoomIn() {
 
-		double minAllowedTiles = 4.0;
-		double maxScale = getAvailablePixels()/minAllowedTiles;
+		final double minAllowedTiles = 4.0;
+		final double maxScale = getAvailablePixels() / minAllowedTiles;
 		double newScale = 0.0;
 		double zoomVal = 0.75;
-		
-		if(getScale() < 8.0) {
+
+		if (getScale() < 8.0) {
 			zoomVal = 0.6;
 		}
-		
-		//Recalculating scale
+
+		// Recalculating scale
 		newScale = roundScale(getAvailablePixels()
 				/ (scrollbar.getVisibleAmount() * zoomVal));
-		
-		if(newScale > maxScale) {
+
+		if (newScale > maxScale) {
 			newScale = maxScale;
 		}
-		
+
 		this.setScale(newScale);
 	}
-	
+
 	/**
 	 * 
 	 * @param scale
 	 * @return
 	 */
-	public double roundScale(double scale) {
-		
+	public double roundScale(final double scale) {
+
 		double fittedScale = 1.0;
-		
-		fittedScale = Math.round(scale * 2)/ 2;
-		
-		return fittedScale;	
+
+		fittedScale = Math.round(scale * 2) / 2;
+
+		return fittedScale;
 	}
 
 	public void recalculateScale() {
-	  
+
 		if (root.fetchFirst("FixedMap").hasAttribute("scale")) {
 			if (getScale() < getAvailablePixels()) {
 				return;
 			}
 		}
-		
-		int range = getMaxIndex() - getMinIndex() + 1;
-		double requiredScale = getAvailablePixels() /range;
+
+		final int range = getMaxIndex() - getMinIndex() + 1;
+		final double requiredScale = getAvailablePixels() / range;
 		if (requiredScale > default_scale) {
 			setScale(requiredScale);
-			
+
 		} else {
 			setScale(default_scale);
 		}
 	}
 
-    public void setScrollbar(JScrollBar scrollbar) {
-    	
-        if (this.scrollbar != null) {
-            this.scrollbar.removeAdjustmentListener(this);
+	public void setScrollbar(final JScrollBar scrollbar) {
+
+		if (this.scrollbar != null) {
+			this.scrollbar.removeAdjustmentListener(this);
 		}
-        
+
 		this.scrollbar = scrollbar;
 		if (this.scrollbar != null) {
 			this.scrollbar.addAdjustmentListener(this);
 			setupScrollbar();
 		}
-    }
+	}
 
-    public IntegerMap setMap(String string) {
-	    
-    	if (current.type().equals(string)) {
-    		return current;
-    	}
-		 
+	public IntegerMap setMap(final String string) {
+
+		if (current.type().equals(string)) {
+			return current;
+		}
+
 		IntegerMap newMap = null;
 		if (nullMap.type().equals(string)) {
-//		  System.out.println("type " + string + " is nullMap");
-		  newMap = nullMap;
-		  
+			// System.out.println("type " + string + " is nullMap");
+			newMap = nullMap;
+
 		} else if (fillMap.type().equals(string)) {
-//		  System.out.println("type " + string + " is fillMap");
-		  newMap = fillMap;
-		  
+			// System.out.println("type " + string + " is fillMap");
+			newMap = fillMap;
+
 		} else if (fixedMap.type().equals(string)) {
-//		  System.out.println("type " + string + " is fixedMap");
-		  newMap = fixedMap;
+			// System.out.println("type " + string + " is fixedMap");
+			newMap = fixedMap;
 		}
-		
+
 		if (newMap == null) {
-			
-			LogBuffer.println("Couldn't find map matching " + string 
+
+			LogBuffer.println("Couldn't find map matching " + string
 					+ " in MapContainer.java");
 			LogBuffer.println("Choices include");
 			LogBuffer.println(nullMap.type());
@@ -247,258 +253,261 @@ AdjustmentListener, ConfigNodePersistent {
 			newMap = fixedMap;
 		}
 
-        switchMap(newMap);
-        return current;
-    }
-
-    /*                      
-     * Scrollbar Functions                   
-     */
-    public void scrollToIndex(int i) {
-       
-    	int j = scrollbar.getValue();
-        scrollbar.setValue(i - scrollbar.getVisibleAmount() / 2);
-        
-        if (j != scrollbar.getValue()) {
-        	setChanged();
-        }
-    }
-    
-    public void scrollBy(int i) {
-        
-    	int j = scrollbar.getValue();
-        scrollbar.setValue(j + i);
-        
-        if (j != scrollbar.getValue()) {
-        	setChanged();
-        }
-    }
-    
-    public JScrollBar getScroll() {
-    	
-    	return scrollbar;
-    }
-
-    @Override
-	public void adjustmentValueChanged(AdjustmentEvent adjustmentEvent) {
-        
-    	setChanged();
-        notifyObservers(scrollbar);
-    }
-
-    private void setupScrollbar() {
-	  
-    	if (scrollbar != null) {
-    		int value = scrollbar.getValue();
-    		int extent = current.getViewableIndexes();
-    		int max = current.getMaxIndex() - current.getMinIndex() + 1;
-    		if (value + extent > max) {
-    			value = max - extent;
-    		}
-    		
-    		if (value < 0) {
-    			value = 0;
-    		}
-    		
-    		scrollbar.setValues(value, extent, 0, max);
-    		scrollbar.setBlockIncrement(current.getViewableIndexes());
-	  }
+		switchMap(newMap);
+		return current;
 	}
 
-    /** 
-     * expect to get updates from selection only
-     */
-    @Override
-	public void update(Observable observable, Object object) {
-       
-    	System.out.println(new StringBuffer("MapContainer Got an " +
-        		"update from unknown ").append(observable).toString());
-        notifyObservers(object);
-    }
+	/*
+	 * Scrollbar Functions
+	 */
+	public void scrollToIndex(final int i) {
 
-    public void underlyingChanged() {
-    	
-    	setupScrollbar();
-        setChanged();
-    }
+		final int j = scrollbar.getValue();
+		scrollbar.setValue(i - scrollbar.getVisibleAmount() / 2);
 
-    public boolean contains(int i) {
-	
-    	return current.contains(i);
-    }
+		if (j != scrollbar.getValue()) {
+			setChanged();
+		}
+	}
 
-    /*                      
-     * Mapping Functions                      
-     */    
-  
-    // forward all map operations...
-    public double getScale() {
-	
-    	return current.getScale();
-    } 
-    
-	public int getPixel(double d) {
-	  
+	public void scrollBy(final int i) {
+
+		final int j = scrollbar.getValue();
+		scrollbar.setValue(j + i);
+
+		if (j != scrollbar.getValue()) {
+			setChanged();
+		}
+	}
+
+	public JScrollBar getScroll() {
+
+		return scrollbar;
+	}
+
+	@Override
+	public void adjustmentValueChanged(final AdjustmentEvent adjustmentEvent) {
+
+		setChanged();
+		notifyObservers(scrollbar);
+	}
+
+	private void setupScrollbar() {
+
+		if (scrollbar != null) {
+			int value = scrollbar.getValue();
+			final int extent = current.getViewableIndexes();
+			final int max = current.getMaxIndex() - current.getMinIndex() + 1;
+			if (value + extent > max) {
+				value = max - extent;
+			}
+
+			if (value < 0) {
+				value = 0;
+			}
+
+			scrollbar.setValues(value, extent, 0, max);
+			scrollbar.setBlockIncrement(current.getViewableIndexes());
+		}
+	}
+
+	/**
+	 * expect to get updates from selection only
+	 */
+	@Override
+	public void update(final Observable observable, final Object object) {
+
+		System.out.println(new StringBuffer("MapContainer Got an "
+				+ "update from unknown ").append(observable).toString());
+		notifyObservers(object);
+	}
+
+	public void underlyingChanged() {
+
+		setupScrollbar();
+		setChanged();
+	}
+
+	public boolean contains(final int i) {
+
+		return current.contains(i);
+	}
+
+	/*
+	 * Mapping Functions
+	 */
+
+	// forward all map operations...
+	public double getScale() {
+
+		return current.getScale();
+	}
+
+	public int getPixel(final double d) {
+
 		int offset = 0;
-	 	if (scrollbar != null) {
-	 		offset = scrollbar.getValue();
-	 	}
-	  
-	 	return current.getPixel(d - offset);
+		if (scrollbar != null) {
+			offset = scrollbar.getValue();
+		}
+
+		return current.getPixel(d - offset);
 	}
-	
-    public int getPixel(int i) {
-	  
-    	int offset = 0;
-    	if (scrollbar != null) {
-    		offset = scrollbar.getValue();
-    	}
-    	
-    	return current.getPixel(i - offset);
-    }
-    
-    public int getIndex(int pix) {
-	  
-    	int index =0;
-    	if (current != null) {
-    		index = current.getIndex(pix);
-    	}
-    	
-    	if (scrollbar != null) {
-    		index += scrollbar.getValue();
-    	}
-    	
-        return  index;
-    }
-    
-    public boolean isVisible(int i) {
-    		
-    	int min = getIndex(0);
-    	int max = getIndex(getAvailablePixels());
-    	if (i < min ) {
-    		return false;
-    	}
-    	
-    	if (i > max) {
-    		return false;
-    	}
-    	
-    	return true;
-    }
-    // {return current.getPixel(intval);}
 
-    public int getRequiredPixels() {
-        
-    	return current.getRequiredPixels();
-    }
+	public int getPixel(final int i) {
 
-    public int getUsedPixels() {
-        
-    	return current.getUsedPixels();
-    }
+		int offset = 0;
+		if (scrollbar != null) {
+			offset = scrollbar.getValue();
+		}
 
-    public void setAvailablePixels(int i) {
-        
-    	int j = current.getUsedPixels();
-        current.setAvailablePixels(i);
-        setupScrollbar();
-        
-        if (j != current.getUsedPixels()) { 
-        	setChanged();
-        }
-    }
+		return current.getPixel(i - offset);
+	}
 
-    public void setIndexRange(int i, int j) {
-        if (i > j) {
-            int k = i;
-            i = j;
-            j = k;
-        }
-        
-        if (current.getMinIndex() != i || current.getMaxIndex() != j) {
-            current.setIndexRange(i, j);
-            setupScrollbar();
-            setChanged();
-        }
-    }
+	public int getIndex(final int pix) {
 
-    public void setScale(double d) {
-    		
-    	if (fixedMap.getScale() != d) {
-    		fixedMap.setScale(d);
+		int index = 0;
+		if (current != null) {
+			index = current.getIndex(pix);
+		}
+
+		if (scrollbar != null) {
+			index += scrollbar.getValue();
+		}
+
+		return index;
+	}
+
+	public boolean isVisible(final int i) {
+
+		final int min = getIndex(0);
+		final int max = getIndex(getAvailablePixels());
+		if (i < min) {
+			return false;
+		}
+
+		if (i > max) {
+			return false;
+		}
+
+		return true;
+	}
+
+	// {return current.getPixel(intval);}
+
+	public int getRequiredPixels() {
+
+		return current.getRequiredPixels();
+	}
+
+	public int getUsedPixels() {
+
+		return current.getUsedPixels();
+	}
+
+	public void setAvailablePixels(final int i) {
+
+		final int j = current.getUsedPixels();
+		current.setAvailablePixels(i);
+		setupScrollbar();
+
+		if (j != current.getUsedPixels()) {
+			setChanged();
+		}
+	}
+
+	public void setIndexRange(int i, int j) {
+		if (i > j) {
+			final int k = i;
+			i = j;
+			j = k;
+		}
+
+		if (current.getMinIndex() != i || current.getMaxIndex() != j) {
+			current.setIndexRange(i, j);
 			setupScrollbar();
 			setChanged();
 		}
-    }
+	}
 
-    public int getMiddlePixel(int i) {
-        
-    	return (getPixel(i) + getPixel(i + 1)) / 2;
-    }
+	public void setScale(final double d) {
 
-    /**
-     * Get maximum amount of data points on entire MapContainer
-     * @return
-     */
-    public int getMaxIndex() {
-       
-    	return current.getMaxIndex();
-    }
-    
-    /**
-     * Get minimum amount of data points on entire MapContainer
-     * @return
-     */
-    public int getMinIndex() {
-        
-    	return current.getMinIndex();
-    }
-    
-    /**
-     * Get smallest scale
-     * @return
-     */
-    public double getMinScale() {
-    	
-    	return minScale;
-    }
+		if (fixedMap.getScale() != d) {
+			fixedMap.setScale(d);
+			setupScrollbar();
+			setChanged();
+		}
+	}
 
-    public TreeDrawerNode getSelectedNode()  {
-        
-    	return selected;
-    }
+	public int getMiddlePixel(final int i) {
 
-    public void setSelectedNode(TreeDrawerNode treeDrawerNode) {
-        
-    	if (selected != treeDrawerNode) {
-	    /*
-	      System.out.println("setindexrange called, start = " + selected);
-	      Throwable t = new Throwable();
-	      t.printStackTrace();
-	    */
-            selected = treeDrawerNode;
-            setChanged();
-        }
-    }
+		return (getPixel(i) + getPixel(i + 1)) / 2;
+	}
 
-    public IntegerMap getCurrent() {
-        
-    	return current;
-    }
-    
-    public int getAvailablePixels() {
-	
-    	return current.getAvailablePixels();
-    }
+	/**
+	 * Get maximum amount of data points on entire MapContainer
+	 * 
+	 * @return
+	 */
+	public int getMaxIndex() {
 
-	private void switchMap(IntegerMap integerMap) {
-	 
+		return current.getMaxIndex();
+	}
+
+	/**
+	 * Get minimum amount of data points on entire MapContainer
+	 * 
+	 * @return
+	 */
+	public int getMinIndex() {
+
+		return current.getMinIndex();
+	}
+
+	/**
+	 * Get smallest scale
+	 * 
+	 * @return
+	 */
+	public double getMinScale() {
+
+		return minScale;
+	}
+
+	public TreeDrawerNode getSelectedNode() {
+
+		return selected;
+	}
+
+	public void setSelectedNode(final TreeDrawerNode treeDrawerNode) {
+
+		if (selected != treeDrawerNode) {
+			/*
+			 * System.out.println("setindexrange called, start = " + selected);
+			 * Throwable t = new Throwable(); t.printStackTrace();
+			 */
+			selected = treeDrawerNode;
+			setChanged();
+		}
+	}
+
+	public IntegerMap getCurrent() {
+
+		return current;
+	}
+
+	public int getAvailablePixels() {
+
+		return current.getAvailablePixels();
+	}
+
+	private void switchMap(final IntegerMap integerMap) {
+
 		if (current != integerMap) {
 			if (root != null) {
 				root.setAttribute("current", integerMap.type(), default_map);
 			}
 			integerMap.setAvailablePixels(current.getAvailablePixels());
-			integerMap.setIndexRange(current.getMinIndex(), 
+			integerMap.setIndexRange(current.getMinIndex(),
 					current.getMaxIndex());
 			current = integerMap;
 			setupScrollbar();

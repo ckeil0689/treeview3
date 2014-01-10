@@ -8,99 +8,102 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
- * This class implements MouseListener and overrides its methods
- * to produce custom clickable JPanels in the TV 3.0 GUI.
+ * This class implements MouseListener and overrides its methods to produce
+ * custom clickable JPanels in the TV 3.0 GUI.
+ * 
  * @author CKeil
- *
+ * 
  */
-public class SSMouseListener implements MouseListener{
-	
+public class SSMouseListener implements MouseListener {
+
 	/**
 	 * Instance Variables
 	 */
-	private JLabel label;
-	private JPanel panel;
-	
+	private final JLabel label;
+	private final JPanel panel;
+
 	/**
 	 * Chained Constructor
+	 * 
 	 * @param label
 	 */
-	public SSMouseListener(JLabel label){
-		
-		this(null, label);	
+	public SSMouseListener(final JLabel label) {
+
+		this(null, label);
 	}
-	
+
 	/**
 	 * Main Constructor
+	 * 
 	 * @param panel
 	 * @param label
 	 */
-	public SSMouseListener(JPanel panel, JLabel label){
-		
+	public SSMouseListener(final JPanel panel, final JLabel label) {
+
 		this.label = label;
 		this.panel = panel;
 	}
-	
+
 	/**
-	 * This method will be overriden at implementation.
-	 * The class can be used for multiple purposes (aka different methods
-	 * can be called when different JPanels are clicked).
+	 * This method will be overriden at implementation. The class can be used
+	 * for multiple purposes (aka different methods can be called when different
+	 * JPanels are clicked).
 	 */
 	@Override
-	public void mouseClicked(MouseEvent e) {
-		
+	public void mouseClicked(final MouseEvent e) {
+
 		// to be overridden
 	}
-	
+
 	/**
-	 * Aesthetic change to the JPanel when the user 
-	 * enters the mouse. Mouse Cursor changes appearance as well.
+	 * Aesthetic change to the JPanel when the user enters the mouse. Mouse
+	 * Cursor changes appearance as well.
 	 */
 	@Override
-	public void mouseEntered(MouseEvent arg0) {
-		
+	public void mouseEntered(final MouseEvent arg0) {
+
 		label.setForeground(GUIParams.ELEMENT_HOV);
 		label.setCursor(new Cursor(Cursor.HAND_CURSOR));
-		
-		if(panel != null) {
-			
+
+		if (panel != null) {
+
 			panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		}
 	}
-	
+
 	/**
-	 * Aesthetic change to the JPanel when the user 
-	 * exits the mouse. Mouse Cursor changes appearance as well.
+	 * Aesthetic change to the JPanel when the user exits the mouse. Mouse
+	 * Cursor changes appearance as well.
 	 */
 	@Override
-	public void mouseExited(MouseEvent arg0) {
-		
+	public void mouseExited(final MouseEvent arg0) {
+
 		label.setForeground(GUIParams.ELEMENT);
 		label.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-		
-		if(panel != null) {
-			
+
+		if (panel != null) {
+
 			panel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 		}
 	}
-	
+
 	/**
-	 * Aesthetic change to the JPanel when the user 
-	 * presses the mouse (left click).
+	 * Aesthetic change to the JPanel when the user presses the mouse (left
+	 * click).
 	 */
 	@Override
-	public void mousePressed(MouseEvent arg0) {
-		
+	public void mousePressed(final MouseEvent arg0) {
+
 		label.setForeground(GUIParams.LIGHTGRAY);
 	}
-	
+
 	/**
-	 * Aesthetic change to the JPanel when the user 
-	 * releases a pressed mouse button.
+	 * Aesthetic change to the JPanel when the user releases a pressed mouse
+	 * button.
 	 */
 	@Override
-	public void mouseReleased(MouseEvent arg0) {
-		
+	public void mouseReleased(final MouseEvent arg0) {
+
 		label.setForeground(GUIParams.ELEMENT);
 	}
 

@@ -23,57 +23,68 @@
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.Color;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-import edu.stanford.genetics.treeview.*;
+import edu.stanford.genetics.treeview.ConfigNode;
+import edu.stanford.genetics.treeview.ConfigNodePersistent;
+
 /**
- *  This class represents a set of colors which can be used by a color extractor 
- *  to translate data values into colors. 
+ * This class represents a set of colors which can be used by a color extractor
+ * to translate data values into colors.
  * 
- * NOTE: This class has been superceded by
- *  the ConfigColorSet in the edu.stanford.genetics.treeview package, although I
- *  am not likely to actually rewrite any of this code spontaneously.
- *
- * @author     Alok Saldanha <alok@genome.stanford.edu>
- * @version    @version $Revision: 1.1 $ $Date: 2006-08-16 19:13:45 $
+ * NOTE: This class has been superceded by the ConfigColorSet in the
+ * edu.stanford.genetics.treeview package, although I am not likely to actually
+ * rewrite any of this code spontaneously.
+ * 
+ * @author Alok Saldanha <alok@genome.stanford.edu>
+ * @version @version $Revision: 1.1 $ $Date: 2006-08-16 19:13:45 $
  */
 public class ColorSet implements ConfigNodePersistent {
-	
-	private String default_upColor = "#FF0000";
-	private String default_zeroColor = "#000000";
-	private String default_downColor = "#00FF00";
-	private String default_missingColor = "#909090";
-	private String default_emptyColor = "#FFFFFF";
-	private String default_name = null;
+
+	private final String default_upColor = "#FF0000";
+	private final String default_zeroColor = "#000000";
+	private final String default_downColor = "#00FF00";
+	private final String default_missingColor = "#909090";
+	private final String default_emptyColor = "#FFFFFF";
+	private final String default_name = null;
 
 	private String name;
 	private Color up, zero, down, missing, empty;
 	private ConfigNode root = null;
 
-
-	/**  Constructor for the ColorSet object,
-	*   uses default values
-	*/
+	/**
+	 * Constructor for the ColorSet object, uses default values
+	 */
 	public ColorSet() {
-		
+
 		super();
 		setDefaults();
 	}
 
-
 	/**
-	 *  Constructor for the ColorSet object
-	 *
-	 * @param  name     inital name
-	 * @param  up       string representing inital up color
-	 * @param  zero     string representing inital down color
-	 * @param  down     string representing inital zero color
-	 * @param  missing  string representing inital missing color
-	 * @param  empty    string representing inital empty color
+	 * Constructor for the ColorSet object
+	 * 
+	 * @param name
+	 *            inital name
+	 * @param up
+	 *            string representing inital up color
+	 * @param zero
+	 *            string representing inital down color
+	 * @param down
+	 *            string representing inital zero color
+	 * @param missing
+	 *            string representing inital missing color
+	 * @param empty
+	 *            string representing inital empty color
 	 */
-	public ColorSet(String name, String up, String zero, String down, 
-			String missing, String empty) {
-		
+	public ColorSet(final String name, final String up, final String zero,
+			final String down, final String missing, final String empty) {
+
 		super();
 		setName(name);
 		setUp(up);
@@ -83,9 +94,8 @@ public class ColorSet implements ConfigNodePersistent {
 		setEmpty(empty);
 	}
 
-
 	private void setDefaults() {
-		
+
 		up = decodeColor(default_upColor);
 		zero = decodeColor(default_zeroColor);
 		down = decodeColor(default_downColor);
@@ -93,12 +103,11 @@ public class ColorSet implements ConfigNodePersistent {
 		empty = decodeColor(default_emptyColor);
 	}
 
-
 	/**
 	 * copies colors and name from other color set.
 	 */
-	public void copyStateFrom(ColorSet other) {
-		
+	public void copyStateFrom(final ColorSet other) {
+
 		setUp(other.getUp());
 		setZero(other.getZero());
 		setDown(other.getDown());
@@ -107,86 +116,86 @@ public class ColorSet implements ConfigNodePersistent {
 		setName(other.getName());
 	}
 
-
 	/**
-	* sets colors and name to reflect <code>ConfigNode</code>
-	*/
+	 * sets colors and name to reflect <code>ConfigNode</code>
+	 */
 	@Override
-	public void bindConfig(ConfigNode root) {
-		
+	public void bindConfig(final ConfigNode root) {
+
 		this.root = root;
 		up = decodeColor(root.getAttribute("up", default_upColor));
 		zero = decodeColor(root.getAttribute("zero", default_zeroColor));
 		down = decodeColor(root.getAttribute("down", default_downColor));
-		missing = decodeColor(root.getAttribute("missing", default_missingColor));
+		missing = decodeColor(root
+				.getAttribute("missing", default_missingColor));
 		empty = decodeColor(root.getAttribute("empty", default_emptyColor));
 		name = root.getAttribute("name", default_name);
 	}
-
 
 	/**
 	 * Simple test program, prints out default color set using toString.
 	 * 
 	 * if argument present, saves EisenFormat to specified file.
 	 * 
-	 * @param  argv  optional arguments from command line.
+	 * @param argv
+	 *            optional arguments from command line.
 	 */
-	public final static void main(String[] argv) {
-		
-		ColorSet test  = new ColorSet();
+	public final static void main(final String[] argv) {
+
+		final ColorSet test = new ColorSet();
 		try {
 			test.loadEisen(argv[0]);
 			test.setName(argv[0]);
 			System.out.println(test.toString());
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			System.out.println("Couldn't load file " + argv[0] + ": " + e);
 		}
 		if (argv.length > 1) {
 			try {
 				test.saveEisen(argv[1]);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				System.out.println("Couldn't save file " + argv[1] + ": " + e);
 			}
 
 		}
 	}
 
-
-	/*inherit description*/
+	/* inherit description */
 	@Override
 	public String toString() {
-		return "ColorSet " + getName() + "\n" +
-				"up: " + getUp().toString() + "\t" +
-				"zero: " + getZero().toString() + "\t" +
-				"down: " + getDown().toString() + "\t" +
-				"missing: " + getMissing().toString() + "\t" +
-				"empty: " + getEmpty().toString() + "\t";
+		return "ColorSet " + getName() + "\n" + "up: " + getUp().toString()
+				+ "\t" + "zero: " + getZero().toString() + "\t" + "down: "
+				+ getDown().toString() + "\t" + "missing: "
+				+ getMissing().toString() + "\t" + "empty: "
+				+ getEmpty().toString() + "\t";
 	}
 
-
 	/**
-	 *  extract values from Eisen-formatted file specified by the string argument The
-	 *  Eisen format is a 16 byte file. The first four bytes are interpreted as RBGA
-	 *  values specifying red, green, blue and alpha values from 0-255 (00 - FF in base
-	 *  16) for up-regulated genes, the next four are the values for unchanged, then
-	 *  down regulated, then the color for missing values.
-	 *
-	 * @param  file             file to load from
-	 * @exception  IOException  throw if problems with file
+	 * extract values from Eisen-formatted file specified by the string argument
+	 * The Eisen format is a 16 byte file. The first four bytes are interpreted
+	 * as RBGA values specifying red, green, blue and alpha values from 0-255
+	 * (00 - FF in base 16) for up-regulated genes, the next four are the values
+	 * for unchanged, then down regulated, then the color for missing values.
+	 * 
+	 * @param file
+	 *            file to load from
+	 * @exception IOException
+	 *                throw if problems with file
 	 */
-	public void loadEisen(String file) throws IOException {
+	public void loadEisen(final String file) throws IOException {
 		loadEisen(new File(file));
 	}
 
-
 	/**
-	 *  extract values from Eisen-formatted file
-	 *
-	 * @param  file             file to load from
-	 * @exception  IOException  throw if problems with file
+	 * extract values from Eisen-formatted file
+	 * 
+	 * @param file
+	 *            file to load from
+	 * @exception IOException
+	 *                throw if problems with file
 	 */
-	public void loadEisen(File file) throws IOException {
-		FileInputStream stream  = new FileInputStream(file);
+	public void loadEisen(final File file) throws IOException {
+		final FileInputStream stream = new FileInputStream(file);
 		up = unpackEisen(stream);
 		zero = unpackEisen(stream);
 		down = unpackEisen(stream);
@@ -194,26 +203,28 @@ public class ColorSet implements ConfigNodePersistent {
 		stream.close();
 	}
 
-
 	/**
-	 *  save values to Eisen-formatted file specified by the String
-	 *
-	 * @param  file             file to store to
-	 * @exception  IOException  throw if problems with file
+	 * save values to Eisen-formatted file specified by the String
+	 * 
+	 * @param file
+	 *            file to store to
+	 * @exception IOException
+	 *                throw if problems with file
 	 */
-	public void saveEisen(String file) throws IOException {
+	public void saveEisen(final String file) throws IOException {
 		saveEisen(new File(file));
 	}
 
-
 	/**
-	 *  save values to Eisen-formatted file sp
-	 *
-	 * @param  file             file to store to
-	 * @exception  IOException  throw if problems with file
+	 * save values to Eisen-formatted file sp
+	 * 
+	 * @param file
+	 *            file to store to
+	 * @exception IOException
+	 *                throw if problems with file
 	 */
-	public void saveEisen(File file) throws IOException {
-		FileOutputStream stream  = new FileOutputStream(file);
+	public void saveEisen(final File file) throws IOException {
+		final FileOutputStream stream = new FileOutputStream(file);
 		packEisen(up, stream);
 		packEisen(zero, stream);
 		packEisen(down, stream);
@@ -221,23 +232,21 @@ public class ColorSet implements ConfigNodePersistent {
 		stream.close();
 	}
 
-
-	private Color unpackEisen(InputStream stream) throws IOException {
-		int red    = stream.read();
-		int green  = stream.read();
-		int blue   = stream.read();
-		int alpha  = stream.read();
+	private Color unpackEisen(final InputStream stream) throws IOException {
+		final int red = stream.read();
+		final int green = stream.read();
+		final int blue = stream.read();
+		final int alpha = stream.read();
 		return new Color(red, green, blue, alpha);
 	}
 
-
-	private void packEisen(Color out, OutputStream stream) throws IOException {
+	private void packEisen(final Color out, final OutputStream stream)
+			throws IOException {
 		stream.write(out.getRed());
 		stream.write(out.getGreen());
 		stream.write(out.getBlue());
 		stream.write(out.getAlpha());
 	}
-
 
 	/**
 	 * Color for positive values.
@@ -246,14 +255,12 @@ public class ColorSet implements ConfigNodePersistent {
 		return up;
 	}
 
-
 	/**
 	 * color for zero values
 	 */
 	public Color getZero() {
 		return zero;
 	}
-
 
 	/**
 	 * Color for negative values.
@@ -262,14 +269,12 @@ public class ColorSet implements ConfigNodePersistent {
 		return down;
 	}
 
-
 	/**
 	 * Color for missing values.
 	 */
 	public Color getMissing() {
 		return missing;
 	}
-
 
 	/**
 	 * Color for empty values.
@@ -278,205 +283,191 @@ public class ColorSet implements ConfigNodePersistent {
 		return empty;
 	}
 
-
 	/**
-	* The name of this color set
+	 * The name of this color set
 	 */
 	public String getName() {
 		return name;
 	}
 
-
 	/**
 	 * Color for positive values.
 	 */
-	public void setUp(String newString) {
+	public void setUp(final String newString) {
 		up = decodeColor(newString);
 		if (root != null) {
 			root.setAttribute("up", newString, default_upColor);
 		}
 	}
 
-
 	/**
 	 * color for zero values
 	 */
-	public void setZero(String newString) {
+	public void setZero(final String newString) {
 		zero = decodeColor(newString);
 		if (root != null) {
 			root.setAttribute("zero", newString, default_zeroColor);
 		}
 	}
 
-
 	/**
 	 * Color for negative values.
 	 */
-	public void setDown(String newString) {
+	public void setDown(final String newString) {
 		down = decodeColor(newString);
 		if (root != null) {
 			root.setAttribute("down", newString, default_downColor);
 		}
 	}
 
-
 	/**
 	 * Color for missing values.
 	 */
-	public void setMissing(String newString) {
+	public void setMissing(final String newString) {
 		missing = decodeColor(newString);
 		if (root != null) {
 			root.setAttribute("missing", newString, default_missingColor);
 		}
 	}
 
-
 	/**
 	 * Color for empty values.
 	 */
-	public void setEmpty(String newString) {
+	public void setEmpty(final String newString) {
 		empty = decodeColor(newString);
 		if (root != null) {
 			root.setAttribute("empty", newString, default_emptyColor);
 		}
 	}
 
-
 	/**
 	 * Color for positive values.
 	 */
-	public void setUp(Color newColor) {
+	public void setUp(final Color newColor) {
 		up = newColor;
 		if (root != null) {
 			root.setAttribute("up", encodeColor(up), default_upColor);
 		}
 	}
 
-
 	/**
 	 * color for zero values
 	 */
-	public void setZero(Color newColor) {
+	public void setZero(final Color newColor) {
 		zero = newColor;
 		if (root != null) {
 			root.setAttribute("zero", encodeColor(zero), default_zeroColor);
 		}
 	}
 
-
 	/**
 	 * Color for negative values.
 	 */
-	public void setDown(Color newColor) {
+	public void setDown(final Color newColor) {
 		down = newColor;
 		if (root != null) {
 			root.setAttribute("down", encodeColor(down), default_downColor);
 		}
 	}
 
-
 	/**
 	 * Color for missing values.
 	 */
-	public void setMissing(Color newColor) {
+	public void setMissing(final Color newColor) {
 		missing = newColor;
 		if (root != null) {
-			root.setAttribute("missing", encodeColor(missing), default_missingColor);
+			root.setAttribute("missing", encodeColor(missing),
+					default_missingColor);
 		}
 	}
-
 
 	/**
 	 * Color for empty values.
 	 */
-	public void setEmpty(Color newColor) {
+	public void setEmpty(final Color newColor) {
 		empty = newColor;
 		if (root != null) {
 			root.setAttribute("empty", encodeColor(empty), default_emptyColor);
 		}
 	}
 
-
 	/**
-	* The name of this color set
+	 * The name of this color set
 	 */
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 		if (root != null) {
 			root.setAttribute("name", name, default_name);
 		}
 	}
 
-
 	/**
-	 *  Convert a color from a hex string to a Java <code>Color</code> object.
-	 *
-	 * @param  colorString  hex string, such as #FF11FF
-	 * @return              The corresponding java color object.
+	 * Convert a color from a hex string to a Java <code>Color</code> object.
+	 * 
+	 * @param colorString
+	 *            hex string, such as #FF11FF
+	 * @return The corresponding java color object.
 	 */
-	public final static Color decodeColor(String colorString) {
-		return Color.decode(colorString);//will this work?
+	public final static Color decodeColor(final String colorString) {
+		return Color.decode(colorString);// will this work?
 	}
-
 
 	/**
 	 * Convert a java <code>Color</code> object to a hex string.
-	 *
-	 * @param  color  A java color object
-	 * @return        The corresponding hex string
+	 * 
+	 * @param color
+	 *            A java color object
+	 * @return The corresponding hex string
 	 */
-	public final static String encodeColor(Color color) {
-		int red    = color.getRed();
-		int green  = color.getGreen();
-		int blue   = color.getBlue();
+	public final static String encodeColor(final Color color) {
+		final int red = color.getRed();
+		final int green = color.getGreen();
+		final int blue = color.getBlue();
 
 		return "#" + hex(red) + hex(green) + hex(blue);
 	}
 
-
-	private final static String hex(int buf) {
-		int hi   = buf / 16;
-		int low  = buf % 16;
+	private final static String hex(final int buf) {
+		final int hi = buf / 16;
+		final int low = buf % 16;
 		return hexChar(hi) + hexChar(low);
 	}
 
-
-	private final static String hexChar(int i) {
+	private final static String hexChar(final int i) {
 		switch (i) {
-						case 0:
-							return "0";
-						case 1:
-							return "1";
-						case 2:
-							return "2";
-						case 3:
-							return "3";
-						case 4:
-							return "4";
-						case 5:
-							return "5";
-						case 6:
-							return "6";
-						case 7:
-							return "7";
-						case 8:
-							return "8";
-						case 9:
-							return "9";
-						case 10:
-							return "A";
-						case 11:
-							return "B";
-						case 12:
-							return "C";
-						case 13:
-							return "D";
-						case 14:
-							return "E";
-						case 15:
-							return "F";
+		case 0:
+			return "0";
+		case 1:
+			return "1";
+		case 2:
+			return "2";
+		case 3:
+			return "3";
+		case 4:
+			return "4";
+		case 5:
+			return "5";
+		case 6:
+			return "6";
+		case 7:
+			return "7";
+		case 8:
+			return "8";
+		case 9:
+			return "9";
+		case 10:
+			return "A";
+		case 11:
+			return "B";
+		case 12:
+			return "C";
+		case 13:
+			return "D";
+		case 14:
+			return "E";
+		case 15:
+			return "F";
 		}
 		return "F";
 	}
 }
-

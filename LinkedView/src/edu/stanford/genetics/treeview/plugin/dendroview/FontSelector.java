@@ -22,62 +22,85 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Button;
+import java.awt.Choice;
+import java.awt.Component;
+import java.awt.Dialog;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.GraphicsEnvironment;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Label;
+import java.awt.Panel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import edu.stanford.genetics.treeview.NatField;
+
 /**
- *  Allows selection of fonts for a FontSelectable
- *
- * @author     Alok Saldanha <alok@genome.stanford.edu>
+ * Allows selection of fonts for a FontSelectable
+ * 
+ * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.2 $ $Date: 2008-06-11 01:58:57 $
  */
 public class FontSelector extends Panel {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final Font[] fonts = 
-			GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
+	public static final Font[] fonts = GraphicsEnvironment
+			.getLocalGraphicsEnvironment().getAllFonts();
 
-	private String title;
+	private final String title;
 	private Choice font_choice;
 	private Choice style_choice;
 	private NatField size_field;
 	private Button display_button;
 	private Frame top;
 	private Dialog d;
-	private FontSelectable client;
+	private final FontSelectable client;
 
 	String size_prop, face_prop, style_prop;
 
 	/**
-	 *  Constructor for the FontSelector object
-	 *
-	 * @param  fs    FontSelectable to modify
-	 * @param  name  Title for the titlebar
+	 * Constructor for the FontSelector object
+	 * 
+	 * @param fs
+	 *            FontSelectable to modify
+	 * @param name
+	 *            Title for the titlebar
 	 */
-	public FontSelector(FontSelectable fs, String name) {
-		
+	public FontSelector(final FontSelectable fs, final String name) {
+
 		title = name;
 		client = fs;
 		setupWidgets();
 	}
-	
-	/**
-	 *  Place component using gridbaglayout
-	 *
-	 * @param  gbl     Layout to use
-	 * @param  comp    Compnent to layout
-	 * @param  x       x coordinate in layout
-	 * @param  y       y coordinate in layout
-	 * @param  width   width in layout
-	 * @param  anchor  anchor direction
-	 * @return         GridBagConstraints used
-	 */
-	private GridBagConstraints place(GridBagLayout gbl, Component comp,
-			int x, int y, int width, int anchor) {
 
-		GridBagConstraints gbc = new GridBagConstraints();
+	/**
+	 * Place component using gridbaglayout
+	 * 
+	 * @param gbl
+	 *            Layout to use
+	 * @param comp
+	 *            Compnent to layout
+	 * @param x
+	 *            x coordinate in layout
+	 * @param y
+	 *            y coordinate in layout
+	 * @param width
+	 *            width in layout
+	 * @param anchor
+	 *            anchor direction
+	 * @return GridBagConstraints used
+	 */
+	private GridBagConstraints place(final GridBagLayout gbl,
+			final Component comp, final int x, final int y, final int width,
+			final int anchor) {
+
+		final GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = x;
 		gbc.gridy = y;
 		gbc.gridwidth = width;
@@ -88,37 +111,37 @@ public class FontSelector extends Panel {
 	}
 
 	/**
-	 *  Sets up widgets
+	 * Sets up widgets
 	 */
 	private void setupWidgets() {
-	
-		GridBagLayout gbl = new GridBagLayout();
+
+		final GridBagLayout gbl = new GridBagLayout();
 		setLayout(gbl);
-		
-		Label font_label = new Label("Font:", Label.LEFT);
+
+		final Label font_label = new Label("Font:", Label.LEFT);
 		add(font_label);
-		
+
 		font_choice = new Choice();
 		for (int i = 0; i < fonts.length; ++i) {
-			
+
 			font_choice.addItem(fonts[i].getFontName());
 		}
-		
+
 		font_choice.select(client.getFace());
 		add(font_choice);
 
-		Label style_label  = new Label("Style:", Label.LEFT);
+		final Label style_label = new Label("Style:", Label.LEFT);
 		add(style_label);
 
 		style_choice = new Choice();
 		for (int i = 0; i < styles.length; ++i) {
-			
+
 			style_choice.addItem(styles[i]);
 		}
 		style_choice.select(decode_style(client.getStyle()));
 		add(style_choice);
 
-		Label size_label   = new Label("Size:", Label.LEFT);
+		final Label size_label = new Label("Size:", Label.LEFT);
 		add(size_label);
 
 		size_field = new NatField(client.getPoints(), 3);
@@ -126,14 +149,14 @@ public class FontSelector extends Panel {
 
 		display_button = new Button("Display");
 		display_button.addActionListener(new ActionListener() {
-			
+
 			@Override
-			public void actionPerformed(ActionEvent actionEvent) {
-			
-				String string = font_choice.getSelectedItem();
-				int i = encode_style(style_choice.getSelectedItem());
-				int size = size_field.getNat();
-				
+			public void actionPerformed(final ActionEvent actionEvent) {
+
+				final String string = font_choice.getSelectedItem();
+				final int i = encode_style(style_choice.getSelectedItem());
+				final int size = size_field.getNat();
+
 				client.setFace(string);
 				client.setStyle(i);
 				client.setPoints(size);
@@ -152,24 +175,21 @@ public class FontSelector extends Panel {
 
 	// the allowed font styles
 	/**
-	 *  Description of the Field
+	 * Description of the Field
 	 */
-	public final static String[] styles  = {
-	
-		"Plain",
-		"Italic",
-		"Bold",
-		"Bold Italic"
-	};
+	public final static String[] styles = {
+
+	"Plain", "Italic", "Bold", "Bold Italic" };
 
 	/**
 	 * turn a style number from class java.awt.Font into a string
-	 *
-	 * @param  style  style index
-	 * @return        string description
+	 * 
+	 * @param style
+	 *            style index
+	 * @return string description
 	 */
-	public final static String decode_style(int style) {
-		
+	public final static String decode_style(final int style) {
+
 		switch (style) {
 		case Font.PLAIN:
 			return styles[0];
@@ -184,31 +204,31 @@ public class FontSelector extends Panel {
 
 	/**
 	 * turn a string into a style number
-	 *
-	 * @param  style  string description
-	 * @return        integer encoded representation
+	 * 
+	 * @param style
+	 *            string description
+	 * @return integer encoded representation
 	 */
-	public final static int encode_style(String style) {
-	
-		return
-				style == styles[0] ? Font.PLAIN :
-				style == styles[1] ? Font.ITALIC :
-				style == styles[2] ? Font.BOLD :
-				Font.BOLD + Font.ITALIC;
+	public final static int encode_style(final String style) {
+
+		return style == styles[0] ? Font.PLAIN
+				: style == styles[1] ? Font.ITALIC
+						: style == styles[2] ? Font.BOLD : Font.BOLD
+								+ Font.ITALIC;
 	}
 
 	/**
-	 *  Create a toplevel font selecting frame
+	 * Create a toplevel font selecting frame
 	 */
 	public void makeTop() {
-	
+
 		top = new Frame(getTitle());
 		top.add(this);
 		top.addWindowListener(new WindowAdapter() {
-			
+
 			@Override
-			public void windowClosing(WindowEvent we) {
-			
+			public void windowClosing(final WindowEvent we) {
+
 				we.getWindow().dispose();
 			}
 		});
@@ -217,18 +237,19 @@ public class FontSelector extends Panel {
 	}
 
 	/**
-	 *  Create a blocking font selecting dialog
-	 *
-	 * @param  f  frame to block
+	 * Create a blocking font selecting dialog
+	 * 
+	 * @param f
+	 *            frame to block
 	 */
-	public void showDialog(Frame f) {
-		
+	public void showDialog(final Frame f) {
+
 		d = new Dialog(f, getTitle());
 		d.add(this);
 		d.addWindowListener(new WindowAdapter() {
-			
+
 			@Override
-			public void windowClosing(WindowEvent we) {
+			public void windowClosing(final WindowEvent we) {
 				we.getWindow().dispose();
 			}
 		});
@@ -240,8 +261,7 @@ public class FontSelector extends Panel {
 	 * @return The title of this FontSelector
 	 */
 	protected String getTitle() {
-		
+
 		return title;
 	}
 }
-

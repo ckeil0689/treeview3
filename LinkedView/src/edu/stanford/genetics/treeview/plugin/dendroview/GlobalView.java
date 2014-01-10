@@ -22,8 +22,23 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.geom.Ellipse2D;
 import java.util.Observable;
 
@@ -33,74 +48,75 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
 import net.miginfocom.swing.MigLayout;
+import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.ModelViewProduced;
+import edu.stanford.genetics.treeview.TreeSelectionI;
 
-import edu.stanford.genetics.treeview.*;
-import edu.stanford.genetics.treeview.core.ScrollablePanel;
-
-class GlobalView extends ModelViewProduced implements  MouseMotionListener,
-    MouseListener, MouseWheelListener, KeyListener, ComponentListener {    
+class GlobalView extends ModelViewProduced implements MouseMotionListener,
+		MouseListener, MouseWheelListener, KeyListener, ComponentListener {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	protected boolean hasDrawn = false;
 	protected TreeSelectionI geneSelection;
 	protected TreeSelectionI arraySelection;
 	protected MapContainer xmap;
 	protected MapContainer ymap;
-    protected MapContainer zoomXmap;
-    protected MapContainer zoomYmap;
-	private String [] statustext = new String [] {"Mouseover Selection", 
-			"", ""};
+	protected MapContainer zoomXmap;
+	protected MapContainer zoomYmap;
+	private final String[] statustext = new String[] { "Mouseover Selection",
+			"", "" };
 	private HeaderInfo arrayHI;
 	private HeaderInfo geneHI;
-    private ArrayDrawer drawer;
-    private int overx;
-    private int overy;
-    private JScrollPane scrollPane; 
+	private ArrayDrawer drawer;
+	private int overx;
+	private int overy;
+	private final JScrollPane scrollPane;
 
-    /**
-     * Points to track candidate selected rows/cols
-     * should reflect where the mouse has actually been
-     */
-    private Point startPoint = new Point();
-    private Point endPoint = new Point();
-
-    /**
-     * This rectangle keeps track of where the drag rect was drawn
-     */
-    private Rectangle dragRect = new Rectangle();
-    
-    /**
-     * Rectangle to track yellow selected rectangle (pixels)
-     */
-    private Rectangle selectionRect = null;
-    
-    /**
-     * Circle to be used as indicator for selection
-     */
-    private Ellipse2D.Double indicatorCircle = null;
-
-    /**
-     * Rectangle to track blue zoom rectangle (pixels)
-     */
-   // private Rectangle zoomRect = null;
-	
 	/**
-	* GlobalView also likes to have an globalxmap and globalymap 
-	* (both of type MapContainer) to help it figure out where to draw things. 
-	* It also tries to
-	*/
-    public GlobalView() {
-		
-    	super();
-		//panel = this;
-		
+	 * Points to track candidate selected rows/cols should reflect where the
+	 * mouse has actually been
+	 */
+	private final Point startPoint = new Point();
+	private final Point endPoint = new Point();
+
+	/**
+	 * This rectangle keeps track of where the drag rect was drawn
+	 */
+	private final Rectangle dragRect = new Rectangle();
+
+	/**
+	 * Rectangle to track yellow selected rectangle (pixels)
+	 */
+	private Rectangle selectionRect = null;
+
+	/**
+	 * Circle to be used as indicator for selection
+	 */
+	private Ellipse2D.Double indicatorCircle = null;
+
+	/**
+	 * Rectangle to track blue zoom rectangle (pixels)
+	 */
+	// private Rectangle zoomRect = null;
+
+	/**
+	 * GlobalView also likes to have an globalxmap and globalymap (both of type
+	 * MapContainer) to help it figure out where to draw things. It also tries
+	 * to
+	 */
+	public GlobalView() {
+
+		super();
+		// panel = this;
+
 		this.setLayout(new MigLayout());
-		
-		scrollPane = new JScrollPane((ScrollablePanel)panel, 
-				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
+
+		scrollPane = new JScrollPane(panel,
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		
+
 		setToolTipText("This Turns Tooltips On");
 
 		addComponentListener(this);
@@ -108,295 +124,296 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 		addMouseMotionListener(this);
 		addMouseWheelListener(this);
 		addKeyListener(this);
-    }
-    
-    public JScrollBar getXScroll() {
-    	
-    	return scrollPane.getHorizontalScrollBar();
-    }
-    
-    public JScrollBar getYScroll() {
-    	
-    	return scrollPane.getVerticalScrollBar();
-    }
+	}
 
-    @Override
+	public JScrollBar getXScroll() {
+
+		return scrollPane.getHorizontalScrollBar();
+	}
+
+	public JScrollBar getYScroll() {
+
+		return scrollPane.getVerticalScrollBar();
+	}
+
+	@Override
 	public Dimension getPreferredSize() {
-	
-    	Dimension p = new Dimension(xmap.getRequiredPixels(),
-				    ymap.getRequiredPixels());
-    	return p;
-    }
 
-//    @Override
-//	public String[] getStatus() {
-//	  
-//    	String [] status = new String[4];
-//    	if ((geneSelection == null) || (arraySelection == null)) {
-//    		status[0] = "ERROR: GlobalView improperly configured";
-//    		status[1] = " geneSelection is null";
-//    		status[2] = " thus, gene selection will not work.";
-//    		status[3] = "";
-//    		
-//    	} else {
-//    		int sx = arraySelection.getMinIndex();
-//    		int ex = arraySelection.getMaxIndex();
-//		  
-//    		int sy = geneSelection.getMinIndex();
-//    		int ey = geneSelection.getMaxIndex();
-//		  
-//    		status[0] = (ey - sy + 1)  + " genes selected";
-//    		status[1] = (ex - sx + 1) + " arrays selected";
-//    		status[2] = "Genes from " + sy + " to " + ey;
-//    		status[3] = "Arrays from " + sx + " to " + ex;
-//    	}
-//    	
-//    	return status;
-//    }
-    
-    @Override
+		final Dimension p = new Dimension(xmap.getRequiredPixels(),
+				ymap.getRequiredPixels());
+		return p;
+	}
+
+	// @Override
+	// public String[] getStatus() {
+	//
+	// String [] status = new String[4];
+	// if ((geneSelection == null) || (arraySelection == null)) {
+	// status[0] = "ERROR: GlobalView improperly configured";
+	// status[1] = " geneSelection is null";
+	// status[2] = " thus, gene selection will not work.";
+	// status[3] = "";
+	//
+	// } else {
+	// int sx = arraySelection.getMinIndex();
+	// int ex = arraySelection.getMaxIndex();
+	//
+	// int sy = geneSelection.getMinIndex();
+	// int ey = geneSelection.getMaxIndex();
+	//
+	// status[0] = (ey - sy + 1) + " genes selected";
+	// status[1] = (ex - sx + 1) + " arrays selected";
+	// status[2] = "Genes from " + sy + " to " + ey;
+	// status[3] = "Arrays from " + sx + " to " + ex;
+	// }
+	//
+	// return status;
+	// }
+
+	@Override
 	public String[] getStatus() {
-    	
-    	try {
-			if (xmap.contains(overx) 
-					&& ymap.contains(overy)) {
+
+		try {
+			if (xmap.contains(overx) && ymap.contains(overy)) {
 				statustext[0] = "Row:    " + (overy + 1);
-				
+
 				if (geneHI != null) {
-					int realGene = overy;
+					final int realGene = overy;
 					try {
 						statustext[0] += " (" + geneHI.getHeader(realGene, 1)
 								+ ")";
-						
-					} catch (java.lang.ArrayIndexOutOfBoundsException e) {
+
+					} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 						statustext[0] += " (N/A)";
 					}
 				}
 				statustext[1] = "Column: " + (overx + 1);
 				if (arrayHI != null) {
 					try {
-						statustext[1] += " (" + arrayHI.getHeader(overx, 0) 
+						statustext[1] += " (" + arrayHI.getHeader(overx, 0)
 								+ ")";
-						
-					} catch (java.lang.ArrayIndexOutOfBoundsException e) {
+
+					} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 						statustext[1] += " (N/A)";
 					}
 				}
-				
+
 				if (drawer.isMissing(overx, overy)) {
-					statustext[2] = "Value:  No Data";	
-					
+					statustext[2] = "Value:  No Data";
+
 				} else if (drawer.isEmpty(overx, overy)) {
 					statustext[2] = "";
-					
+
 				} else {
-					statustext[2] = "Value:  " + drawer.getSummary(overx, 
-							overy);
+					statustext[2] = "Value:  "
+							+ drawer.getSummary(overx, overy);
 				}
-			}	
-		} catch (ArrayIndexOutOfBoundsException ex) {
+			}
+		} catch (final ArrayIndexOutOfBoundsException ex) {
 			// ignore silently?
 		}
-    	return statustext;
-    }
+		return statustext;
+	}
 
-    /** 
-     * Set geneSelection
-     *
-     * @param geneSelection The TreeSelection which is set by selecting 
-     * genes in the GlobalView
-     */
-    public void setGeneSelection(TreeSelectionI geneSelection) {
-	  
-    	if (this.geneSelection != null) {
-    		this.geneSelection.deleteObserver(this);	
-    	}
-    	
-    	this.geneSelection = geneSelection;
-    	this.geneSelection.addObserver(this);
-    }
-    
-    /** 
-     * Set arraySelection
-     *
-     * @param arraySelection The TreeSelection which is set by selecting 
-     * arrays in the GlobalView
-     */
-    public void setArraySelection(TreeSelectionI arraySelection) {
-	 
-    	if (this.arraySelection != null) {
-    		this.arraySelection.deleteObserver(this);	
-    	}
-    	
-    	this.arraySelection = arraySelection;
-    	this.arraySelection.addObserver(this);
-    }
+	/**
+	 * Set geneSelection
+	 * 
+	 * @param geneSelection
+	 *            The TreeSelection which is set by selecting genes in the
+	 *            GlobalView
+	 */
+	public void setGeneSelection(final TreeSelectionI geneSelection) {
 
-    /** 
-     * Set ArrayDrawer
-     *
-     * @param arrayDrawer The ArrayDrawer to be used as a source
-     */
-    public void setArrayDrawer(ArrayDrawer arrayDrawer) {
-	
-    	if (drawer != null) {
-    		drawer.deleteObserver(this);	
-    	}
-    	
+		if (this.geneSelection != null) {
+			this.geneSelection.deleteObserver(this);
+		}
+
+		this.geneSelection = geneSelection;
+		this.geneSelection.addObserver(this);
+	}
+
+	/**
+	 * Set arraySelection
+	 * 
+	 * @param arraySelection
+	 *            The TreeSelection which is set by selecting arrays in the
+	 *            GlobalView
+	 */
+	public void setArraySelection(final TreeSelectionI arraySelection) {
+
+		if (this.arraySelection != null) {
+			this.arraySelection.deleteObserver(this);
+		}
+
+		this.arraySelection = arraySelection;
+		this.arraySelection.addObserver(this);
+	}
+
+	/**
+	 * Set ArrayDrawer
+	 * 
+	 * @param arrayDrawer
+	 *            The ArrayDrawer to be used as a source
+	 */
+	public void setArrayDrawer(final ArrayDrawer arrayDrawer) {
+
+		if (drawer != null) {
+			drawer.deleteObserver(this);
+		}
+
 		drawer = arrayDrawer;
 		drawer.addObserver(this);
-    }
+	}
 
-    /** 
-     * Get ArrayDrawer
-     *
-     * @return The current ArrayDrawer
-     */
-    public ArrayDrawer getArrayDrawer() {
-	
-    	return drawer;
-    }
-
-    /** DEPRECATE
-     * set the xmapping for this view
-     *
-     * @param m   the new mapping
-     */
-    public void setXMap(MapContainer m) {
-	
-    	if (xmap != null) {
-    		xmap.deleteObserver(this);	    
-    	}
-    	
-    	xmap = m;
-    	xmap.addObserver(this);
-    }
-
-    /** DEPRECATE
-     * set the ymapping for this view
-     *
-     * @param m   the new mapping
-     */
-    public void setYMap(MapContainer m) {
-	
-    	if (ymap != null) {
-    		ymap.deleteObserver(this);	    
-    	}
-	
-    	ymap = m;
-    	ymap.addObserver(this);
-    }
-
-//    /**
-//     * get the xmapping for this view
-//     *
-//     * @return  the current mapping
-//     */
-//    public MapContainer getXMap() {
-//    	
-//    	return xmap;
-//    }
-//
-//    /**
-//     * get the ymapping for this view
-//     *
-//     * @return   the current mapping
-//     */
-//    public MapContainer getYMap() {
-//    	
-//    	return ymap;
-//    }
-    
-
-//    /** DEPRECATE
-//     * set the xmapping for this view
-//     *
-//     * @param m   the new mapping
-//     */
-//    public void setZoomXMap(MapContainer m) {
-//	
-//    	if (zoomXmap != null) {
-//    		zoomXmap.deleteObserver(this);	    
-//    	}
-//	
-//    	zoomXmap = m;
-//    	zoomXmap.addObserver(this);
-//    }
-//
-//    /** DEPRECATE
-//     * set the ymapping for this view
-//     *
-//     * @param m   the new mapping
-//     */
-//    public void setZoomYMap(MapContainer m) {
-//	
-//    	if (zoomYmap != null) {
-//    		zoomYmap.deleteObserver(this);	    
-//    	}
-//    	
-//    	zoomYmap = m;
-//    	zoomYmap.addObserver(this);
-//    }
-
-
-    @Override
-	public String viewName() {
-    	
-    	return "GlobalView";
-    }
-
-    //Canvas Methods
 	/**
-	* This method updates the graphics object directly by asking the 
-	* ArrayDrawer to draw on it directly. The alternative is to have a 
-	* pixel buffer which you update using updatePixels.
-	*/
+	 * Get ArrayDrawer
+	 * 
+	 * @return The current ArrayDrawer
+	 */
+	public ArrayDrawer getArrayDrawer() {
+
+		return drawer;
+	}
+
+	/**
+	 * DEPRECATE set the xmapping for this view
+	 * 
+	 * @param m
+	 *            the new mapping
+	 */
+	public void setXMap(final MapContainer m) {
+
+		if (xmap != null) {
+			xmap.deleteObserver(this);
+		}
+
+		xmap = m;
+		xmap.addObserver(this);
+	}
+
+	/**
+	 * DEPRECATE set the ymapping for this view
+	 * 
+	 * @param m
+	 *            the new mapping
+	 */
+	public void setYMap(final MapContainer m) {
+
+		if (ymap != null) {
+			ymap.deleteObserver(this);
+		}
+
+		ymap = m;
+		ymap.addObserver(this);
+	}
+
+	// /**
+	// * get the xmapping for this view
+	// *
+	// * @return the current mapping
+	// */
+	// public MapContainer getXMap() {
+	//
+	// return xmap;
+	// }
+	//
+	// /**
+	// * get the ymapping for this view
+	// *
+	// * @return the current mapping
+	// */
+	// public MapContainer getYMap() {
+	//
+	// return ymap;
+	// }
+
+	// /** DEPRECATE
+	// * set the xmapping for this view
+	// *
+	// * @param m the new mapping
+	// */
+	// public void setZoomXMap(MapContainer m) {
+	//
+	// if (zoomXmap != null) {
+	// zoomXmap.deleteObserver(this);
+	// }
+	//
+	// zoomXmap = m;
+	// zoomXmap.addObserver(this);
+	// }
+	//
+	// /** DEPRECATE
+	// * set the ymapping for this view
+	// *
+	// * @param m the new mapping
+	// */
+	// public void setZoomYMap(MapContainer m) {
+	//
+	// if (zoomYmap != null) {
+	// zoomYmap.deleteObserver(this);
+	// }
+	//
+	// zoomYmap = m;
+	// zoomYmap.addObserver(this);
+	// }
+
 	@Override
-	protected void updateBuffer(Graphics g) {
-		
+	public String viewName() {
+
+		return "GlobalView";
+	}
+
+	// Canvas Methods
+	/**
+	 * This method updates the graphics object directly by asking the
+	 * ArrayDrawer to draw on it directly. The alternative is to have a pixel
+	 * buffer which you update using updatePixels.
+	 */
+	@Override
+	protected void updateBuffer(final Graphics g) {
+
 		if (offscreenChanged) {
 			xmap.setAvailablePixels(offscreenSize.width);
 			ymap.setAvailablePixels(offscreenSize.height);
-			
+
 			if (hasDrawn == false) {
 				// total kludge, but addnotify isn't working correctly...
 				xmap.recalculateScale();
 				ymap.recalculateScale();
 				hasDrawn = true;
 			}
-			
+
 			xmap.notifyObservers();
 			ymap.notifyObservers();
 		}
-		
+
 		if (offscreenValid == false) {
 			// clear the pallette...
 			g.setColor(Color.white);
-			g.fillRect(0,0, offscreenSize.width, offscreenSize.height);
+			g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
 			g.setColor(Color.black);
-			
-			Rectangle destRect = new Rectangle
-			(0,0,xmap.getUsedPixels(), ymap.getUsedPixels());
-			
-			Rectangle sourceRect = new Rectangle
-			(xmap.getIndex(0), ymap.getIndex(0),
-			xmap.getIndex(destRect.width) - xmap.getIndex(0), 
-			ymap.getIndex(destRect.height) - ymap.getIndex(0));
-			
+
+			final Rectangle destRect = new Rectangle(0, 0,
+					xmap.getUsedPixels(), ymap.getUsedPixels());
+
+			final Rectangle sourceRect = new Rectangle(xmap.getIndex(0),
+					ymap.getIndex(0), xmap.getIndex(destRect.width)
+							- xmap.getIndex(0), ymap.getIndex(destRect.height)
+							- ymap.getIndex(0));
+
 			if ((sourceRect.x >= 0) && (sourceRect.y >= 0)) {
 				drawer.paint(g, sourceRect, destRect, null);
 			}
 		}
-    }
+	}
 
-	/** 
-	* This method updates a 
-	* pixel buffer. The alternative is to update the graphics object
-	* directly by calling updateBuffer.
-	*/
+	/**
+	 * This method updates a pixel buffer. The alternative is to update the
+	 * graphics object directly by calling updateBuffer.
+	 */
 	@Override
 	protected void updatePixels() {
-		
+
 		if (offscreenChanged) {
 			offscreenValid = false;
 			xmap.setAvailablePixels(offscreenSize.width);
@@ -408,121 +425,119 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 				ymap.recalculateScale();
 				hasDrawn = true;
 			}
-			
+
 			xmap.notifyObservers();
 			ymap.notifyObservers();
 		}
-		
+
 		if (offscreenValid == false) {
-			Rectangle destRect = new Rectangle(0, 0, xmap.getUsedPixels(), 
-					ymap.getUsedPixels());
-			
-			Rectangle sourceRect = new Rectangle(xmap.getIndex(0), 
-					ymap.getIndex(0), xmap.getIndex(destRect.width) 
-					- xmap.getIndex(0), ymap.getIndex(destRect.height) - 
-					ymap.getIndex(0));
+			final Rectangle destRect = new Rectangle(0, 0,
+					xmap.getUsedPixels(), ymap.getUsedPixels());
+
+			final Rectangle sourceRect = new Rectangle(xmap.getIndex(0),
+					ymap.getIndex(0), xmap.getIndex(destRect.width)
+							- xmap.getIndex(0), ymap.getIndex(destRect.height)
+							- ymap.getIndex(0));
 
 			if ((sourceRect.x >= 0) && (sourceRect.y >= 0)) {
-				drawer.paint(offscreenPixels, sourceRect, 
-						destRect, offscreenScanSize);
+				drawer.paint(offscreenPixels, sourceRect, destRect,
+						offscreenScanSize);
 			}
-			
+
 			offscreenSource.newPixels();
 		}
 	}
 
-    @Override
-	public synchronized void paintComposite (Graphics g) {
-		
-    	// composite the rectangles...
-		if (selectionRect != null) {	    
-//		    if (zoomRect != null) {
-//				g.setColor(Color.cyan);
-//				g.drawRect(zoomRect.x, zoomRect.y, 
-//					   zoomRect.width, zoomRect.height);
-//		    }
-		    
-		    g.setColor(Color.yellow);
-		    g.drawRect(selectionRect.x, selectionRect.y, 
-			       selectionRect.width, selectionRect.height);
-		    
-		    if(indicatorCircle != null) {
-		    	Graphics2D g2 = (Graphics2D)g;
-		    	g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-		    		    RenderingHints.VALUE_ANTIALIAS_ON);
-		    	g2.setColor(Color.white);//GUIParams.RED1);
-		    	g2.setStroke(new BasicStroke(3));
-			    g2.draw(indicatorCircle);
-		    }
+	@Override
+	public synchronized void paintComposite(final Graphics g) {
+
+		// composite the rectangles...
+		if (selectionRect != null) {
+			// if (zoomRect != null) {
+			// g.setColor(Color.cyan);
+			// g.drawRect(zoomRect.x, zoomRect.y,
+			// zoomRect.width, zoomRect.height);
+			// }
+
+			g.setColor(Color.yellow);
+			g.drawRect(selectionRect.x, selectionRect.y, selectionRect.width,
+					selectionRect.height);
+
+			if (indicatorCircle != null) {
+				final Graphics2D g2 = (Graphics2D) g;
+				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+						RenderingHints.VALUE_ANTIALIAS_ON);
+				g2.setColor(Color.white);// GUIParams.RED1);
+				g2.setStroke(new BasicStroke(3));
+				g2.draw(indicatorCircle);
+			}
 		}
-    }
-    
+	}
+
 	protected void recalculateOverlay() {
-		
+
 		if ((geneSelection == null) || (arraySelection == null)) {
 			return;
 		}
-		
+
 		int spx, spy, epx, epy;
 		spx = xmap.getPixel(arraySelection.getMinIndex());
 		// last pixel of last block
-		epx = xmap.getPixel(arraySelection.getMaxIndex() + 1) - 1; 
-		
-		
+		epx = xmap.getPixel(arraySelection.getMaxIndex() + 1) - 1;
+
 		spy = ymap.getPixel(geneSelection.getMinIndex());
 		epy = ymap.getPixel(geneSelection.getMaxIndex() + 1) - 1;
-		
+
 		if (epy < spy) {
-			epy = spy; 
+			epy = spy;
 			// correct for roundoff error above
 		}
-		
+
 		if (selectionRect == null) {
 			selectionRect = new Rectangle(spx, spy, epx - spx, epy - spy);
-			
+
 		} else {
 			selectionRect.setBounds(spx, spy, epx - spx, epy - spy);
 		}
-		
+
 		this.revalidate();
 		this.repaint();
 	}
 
-    protected void recalculateZoom() {
-		
-    	if (selectionRect == null) {
-    		return;
-    	}
-    	
-		//int spx, epx, spy, epy;
-//		try {
-//		    spx = xmap.getPixel(zoomXmap.getIndex(0));
-//		    epx = xmap.getPixel(zoomXmap.getIndex(
-//		    		zoomXmap.getUsedPixels())) - 1;
-//		    
-//		    spy = ymap.getPixel(zoomYmap.getIndex(0));
-//		    epy = ymap.getPixel(zoomYmap.getIndex(
-//		    		zoomYmap.getUsedPixels())) - 1;
-//		    
-//		} catch (java.lang.ArithmeticException e) {
-//		    // silently ignore div zero exceptions, which arise when 
-//		    // some dimension is zero and fillmap is selected...
-//		    return;
-//		}
-	
-//		if (zoomRect == null) {
-//			zoomRect = new Rectangle(spx, spy, epx - spx, epy - spy);
-//			
-//		} else {
-//			zoomRect.setBounds(spx, spy, epx - spx, epy - spy);
-//		}
-    }
+	protected void recalculateZoom() {
 
-    
-    //Observer Methods
+		if (selectionRect == null) {
+			return;
+		}
+
+		// int spx, epx, spy, epy;
+		// try {
+		// spx = xmap.getPixel(zoomXmap.getIndex(0));
+		// epx = xmap.getPixel(zoomXmap.getIndex(
+		// zoomXmap.getUsedPixels())) - 1;
+		//
+		// spy = ymap.getPixel(zoomYmap.getIndex(0));
+		// epy = ymap.getPixel(zoomYmap.getIndex(
+		// zoomYmap.getUsedPixels())) - 1;
+		//
+		// } catch (java.lang.ArithmeticException e) {
+		// // silently ignore div zero exceptions, which arise when
+		// // some dimension is zero and fillmap is selected...
+		// return;
+		// }
+
+		// if (zoomRect == null) {
+		// zoomRect = new Rectangle(spx, spy, epx - spx, epy - spy);
+		//
+		// } else {
+		// zoomRect.setBounds(spx, spy, epx - spx, epy - spy);
+		// }
+	}
+
+	// Observer Methods
 	@Override
-	public void update(Observable o, Object arg) {
-		
+	public void update(final Observable o, final Object arg) {
+
 		if (o == geneSelection) {
 			if (arraySelection.getNSelectedIndexes() == 0) {
 				if (geneSelection.getNSelectedIndexes() != 0) {
@@ -534,9 +549,9 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 				}
 			}
 			recalculateOverlay();
-			//drawGeneIndicator();
+			// drawGeneIndicator();
 			drawIndicatorCircle();
-			
+
 		} else if (o == arraySelection) {
 			if (geneSelection.getNSelectedIndexes() == 0) {
 				if (arraySelection.getNSelectedIndexes() != 0) {
@@ -548,255 +563,248 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 				}
 			}
 			recalculateOverlay();
-			//drawGeneIndicator();
+			// drawGeneIndicator();
 			drawIndicatorCircle();
-			
+
 		} else if ((o == xmap) || o == ymap) {
 			recalculateZoom(); // it moves around, you see...
 			recalculateOverlay();
-			//drawGeneIndicator();
+			// drawGeneIndicator();
 			drawIndicatorCircle();
 			offscreenValid = false;
-			
+
 		} else if ((o == zoomYmap) || (o == zoomXmap)) {
 			recalculateZoom();
 			/*
-			if (o == zoomXmap) {
-				if ((zoomYmap.getUsedPixels() == 0) 
-				&& (zoomXmap.getUsedPixels() != 0)) {
-					zoomYmap.setIndexRange(ymap.getMinIndex(), 
-					ymap.getMaxIndex());
-					zoomYmap.notifyObservers();
-				}
-			} else if (o == zoomYmap) {
-				if ((zoomXmap.getUsedPixels() == 0) 
-				&& (zoomYmap.getUsedPixels() != 0)) {
-					zoomXmap.setIndexRange(xmap.getMinIndex(), 
-					xmap.getMaxIndex());
-					zoomXmap.notifyObservers();
-				}
-			}
-			*/
+			 * if (o == zoomXmap) { if ((zoomYmap.getUsedPixels() == 0) &&
+			 * (zoomXmap.getUsedPixels() != 0)) {
+			 * zoomYmap.setIndexRange(ymap.getMinIndex(), ymap.getMaxIndex());
+			 * zoomYmap.notifyObservers(); } } else if (o == zoomYmap) { if
+			 * ((zoomXmap.getUsedPixels() == 0) && (zoomYmap.getUsedPixels() !=
+			 * 0)) { zoomXmap.setIndexRange(xmap.getMinIndex(),
+			 * xmap.getMaxIndex()); zoomXmap.notifyObservers(); } }
+			 */
 			if ((status != null) && hasMouse) {
 				status.setMessages(getStatus());
 			}
-			
+
 		} else if (o == drawer) {
-			/* signal from drawer means that it need to
-			draw something different. 
-			*/
+			/*
+			 * signal from drawer means that it need to draw something
+			 * different.
+			 */
 			offscreenValid = false;
-			
+
 		} else {
-			 LogBuffer.println("GlobalView got weird update : " + o);
+			LogBuffer.println("GlobalView got weird update : " + o);
 		}
-		
+
 		this.revalidate();
 		this.repaint();
 	}
 
-    // Mouse Listener 
-    @Override
-	public void mousePressed(MouseEvent e) {
-		
-    	if (enclosingWindow().isActive() == false) {
-    		return;
-    	}
-	
-    	//if left button is used
-    	if(SwingUtilities.isLeftMouseButton(e)) {
+	// Mouse Listener
+	@Override
+	public void mousePressed(final MouseEvent e) {
+
+		if (enclosingWindow().isActive() == false) {
+			return;
+		}
+
+		// if left button is used
+		if (SwingUtilities.isLeftMouseButton(e)) {
 			startPoint.setLocation(xmap.getIndex(e.getX()),
-					       ymap.getIndex(e.getY()));
+					ymap.getIndex(e.getY()));
 			endPoint.setLocation(startPoint.x, startPoint.y);
 			dragRect.setLocation(startPoint.x, startPoint.y);
-			dragRect.setSize(endPoint.x - dragRect.x,
-					 endPoint.y - dragRect.y);
-		
+			dragRect.setSize(endPoint.x - dragRect.x, endPoint.y - dragRect.y);
+
 			drawBand(dragRect);
-    	}
-    }
-    
-    @Override
-	public void mouseReleased(MouseEvent e) {
-		
-    	if (enclosingWindow().isActive() == false) {
-    		return;
-    	}	
-		
-		//When left button is used
-		if(SwingUtilities.isLeftMouseButton(e)) {
+		}
+	}
+
+	@Override
+	public void mouseReleased(final MouseEvent e) {
+
+		if (enclosingWindow().isActive() == false) {
+			return;
+		}
+
+		// When left button is used
+		if (SwingUtilities.isLeftMouseButton(e)) {
 			mouseDragged(e);
 			drawBand(dragRect);
-			
+
 			if (e.isShiftDown()) {
-			    Point start = new Point(xmap.getMinIndex(), startPoint.y);
-			    Point end = new Point(xmap.getMaxIndex(), endPoint.y);
-			    selectRectangle(start, end);
-			    
+				final Point start = new Point(xmap.getMinIndex(), startPoint.y);
+				final Point end = new Point(xmap.getMaxIndex(), endPoint.y);
+				selectRectangle(start, end);
+
 			} else {
 				selectRectangle(startPoint, endPoint);
 			}
 		} else {
-			//do something else?
+			// do something else?
 		}
-		
+
 		this.revalidate();
 		this.repaint();
-    }
-    
-    // MouseMotionListener
-    @Override
-	public void mouseDragged(MouseEvent e) {
-		
-    	//When left button is used
-    	if(SwingUtilities.isLeftMouseButton(e)) {
-	    	//rubber band?
-			drawBand(dragRect);	
-			endPoint.setLocation(xmap.getIndex(e.getX()), 
+	}
+
+	// MouseMotionListener
+	@Override
+	public void mouseDragged(final MouseEvent e) {
+
+		// When left button is used
+		if (SwingUtilities.isLeftMouseButton(e)) {
+			// rubber band?
+			drawBand(dragRect);
+			endPoint.setLocation(xmap.getIndex(e.getX()),
 					ymap.getIndex(e.getY()));
-			
+
 			if (e.isShiftDown()) {
 				dragRect.setLocation(xmap.getMinIndex(), startPoint.y);
-			    dragRect.setSize(0,0);
-			    dragRect.add(xmap.getMaxIndex(), endPoint.y);
-		    
+				dragRect.setSize(0, 0);
+				dragRect.add(xmap.getMaxIndex(), endPoint.y);
+
 			} else {
-			    dragRect.setLocation(startPoint.x, startPoint.y);
-			    dragRect.setSize(0,0);
-			    dragRect.add(endPoint.x, endPoint.y);
+				dragRect.setLocation(startPoint.x, startPoint.y);
+				dragRect.setSize(0, 0);
+				dragRect.add(endPoint.x, endPoint.y);
 			}
-			
+
 			drawBand(dragRect);
-    	}
-    }
-    
-    @Override
-	public void mouseMoved(MouseEvent e) {
-    	
-		int ooverx = overx;
-		int oovery = overy;
+		}
+	}
+
+	@Override
+	public void mouseMoved(final MouseEvent e) {
+
+		final int ooverx = overx;
+		final int oovery = overy;
 		overx = xmap.getIndex(e.getX());
 		overy = ymap.getIndex(e.getY());
 		if (oovery != overy || ooverx != overx) {
 			if (status != null) {
-		    	status.setMessages(getStatus());
-		    }
+				status.setMessages(getStatus());
+			}
 		}
-    }
-    
-    @Override
-	public String getToolTipText(MouseEvent e) {
-		/* Do we want to do mouseovers if value already visible? 
-		if (getShowVal()) return null; 
-		// don't do tooltips and vals at same time.
+	}
+
+	@Override
+	public String getToolTipText(final MouseEvent e) {
+		/*
+		 * Do we want to do mouseovers if value already visible? if
+		 * (getShowVal()) return null; // don't do tooltips and vals at same
+		 * time.
 		 */
 		String ret = "";
 		String row = "";
 		String col = "";
-		
+
 		if (drawer != null) {
-			
-			int geneRow = overy;
-			int geneCol = overx;
-			
+
+			final int geneRow = overy;
+			final int geneCol = overx;
+
 			if (xmap.contains(overx) && ymap.contains(overy)) {
-				
-				if(geneHI != null) {
+
+				if (geneHI != null) {
 					row = geneHI.getHeader(geneRow, 1);
-					
+
 				} else {
 					row = "N/A";
 				}
-				
-				if(arrayHI != null) {
+
+				if (arrayHI != null) {
 					col = arrayHI.getHeader(geneCol, 0);
-					
+
 				} else {
 					col = "N/A";
 				}
-				
+
 				if (drawer.isMissing(overx, geneRow)) {
 					ret = "No data";
-					
+
 				} else if (drawer.isEmpty(overx, geneRow)) {
 					ret = null;
-					
+
 				} else {
-					ret = "Row: " + row + " Column: " + col + " Value: " 
-					+ drawer.getSummary(overx, geneRow);
+					ret = "Row: " + row + " Column: " + col + " Value: "
+							+ drawer.getSummary(overx, geneRow);
 				}
 			}
 		}
 		return ret;
 	}
-    
-    private void drawBand(Rectangle l) { 
-		
-    	Graphics g = getGraphics();
+
+	private void drawBand(final Rectangle l) {
+
+		final Graphics g = getGraphics();
 		g.setXORMode(getBackground());
-		
-		int x = xmap.getPixel(l.x);
-		int y = ymap.getPixel(l.y);
-		int w = xmap.getPixel(l.x + l.width  + 1) - x;
-		int h = ymap.getPixel(l.y + l.height + 1) - y;
-		
+
+		final int x = xmap.getPixel(l.x);
+		final int y = ymap.getPixel(l.y);
+		final int w = xmap.getPixel(l.x + l.width + 1) - x;
+		final int h = ymap.getPixel(l.y + l.height + 1) - y;
+
 		g.drawRect(x, y, w, h);
 		g.setPaintMode();
-    }
-    
-    /**
-     * Draws a circle if the user selects one rectangle in the clustergram
-     * to indicate the position of this rectangle.
-     */
-    private void drawIndicatorCircle() {
-    	
-    	double x = 0; 
-		double y = 0; 
+	}
+
+	/**
+	 * Draws a circle if the user selects one rectangle in the clustergram to
+	 * indicate the position of this rectangle.
+	 */
+	private void drawIndicatorCircle() {
+
+		double x = 0;
+		double y = 0;
 		double w = 0;
-		double h = 0; 
-		
+		double h = 0;
+
 		if (geneSelection == null || arraySelection == null) {
 			return;
-			
-		} else if((geneSelection.getNSelectedIndexes() == 1 
-    			&& arraySelection.getNSelectedIndexes() == 1) 
-    			&& (xmap.getScale() < 10.0 && ymap.getScale() < 10.0)) {
-    		
-			//Width and height of rectangle which spans the Ellipse2D object
+
+		} else if ((geneSelection.getNSelectedIndexes() == 1 && arraySelection
+				.getNSelectedIndexes() == 1)
+				&& (xmap.getScale() < 10.0 && ymap.getScale() < 10.0)) {
+
+			// Width and height of rectangle which spans the Ellipse2D object
 			w = xmap.getUsedPixels() * 0.05;
 			h = w;
-			
-			//Get coords for center of circle
-			x = xmap.getPixel(arraySelection.getSelectedIndexes()[0]) 
-					- (w /2) + (xmap.getScale()/2);
-			y = ymap.getPixel(geneSelection.getSelectedIndexes()[0]) 
-					- (h /2) + (ymap.getScale()/2);
-    		
-    		if (indicatorCircle == null) {
-    			indicatorCircle = new Ellipse2D.Double(x, y, w, h);
-    			
-    		} else {
-    			indicatorCircle.setFrame(x, y, w, h);
-    		}
-    	} else if (indicatorCircle != null){
-    		indicatorCircle.setFrame(x, y, w, h);
-    	}
-    }
-    
-    //KeyListener 
+
+			// Get coords for center of circle
+			x = xmap.getPixel(arraySelection.getSelectedIndexes()[0]) - (w / 2)
+					+ (xmap.getScale() / 2);
+			y = ymap.getPixel(geneSelection.getSelectedIndexes()[0]) - (h / 2)
+					+ (ymap.getScale() / 2);
+
+			if (indicatorCircle == null) {
+				indicatorCircle = new Ellipse2D.Double(x, y, w, h);
+
+			} else {
+				indicatorCircle.setFrame(x, y, w, h);
+			}
+		} else if (indicatorCircle != null) {
+			indicatorCircle.setFrame(x, y, w, h);
+		}
+	}
+
+	// KeyListener
 	@Override
-	public void keyPressed(KeyEvent e) {
-		
-		int c = e.getKeyCode();
+	public void keyPressed(final KeyEvent e) {
+
+		final int c = e.getKeyCode();
 		int shift;
-		
+
 		if (e.isShiftDown()) {
 			shift = 10;
-			
+
 		} else {
 			shift = 1;
 		}
-		
+
 		switch (c) {
 		case KeyEvent.VK_LEFT:
 			xmap.scrollBy(-shift);
@@ -819,185 +827,187 @@ class GlobalView extends ModelViewProduced implements  MouseMotionListener,
 			ymap.zoomIn();
 			break;
 		}
-		
+
 		this.revalidate();
 		this.repaint();
 	}
-	
+
 	/**
 	 * Zooming when the mouse wheel is used in conjunction with the shift key.
 	 * Vertical scrolling if the shift key is not pressed.
 	 */
 	@Override
-	public void mouseWheelMoved(MouseWheelEvent e) {
-		
-		int notches = e.getWheelRotation();
-		int shift = 3;
-		
-		if(!e.isShiftDown()) {
-			if(notches < 0) {
+	public void mouseWheelMoved(final MouseWheelEvent e) {
+
+		final int notches = e.getWheelRotation();
+		final int shift = 3;
+
+		if (!e.isShiftDown()) {
+			if (notches < 0) {
 				ymap.scrollBy(-shift);
-				
+
 			} else {
 				ymap.scrollBy(shift);
 			}
 		} else {
-			if(notches < 0) {
+			if (notches < 0) {
 				xmap.zoomIn();
 				ymap.zoomIn();
-				
+
 			} else {
 				xmap.zoomOut();
 				ymap.zoomOut();
 			}
 		}
-		
+
 		this.revalidate();
 		this.repaint();
 	}
-	
+
 	/**
 	 * Selecting a rectangular area in GlobalView
+	 * 
 	 * @param start
 	 * @param end
 	 */
-	private void selectRectangle(Point start, Point end) {
-		
+	private void selectRectangle(final Point start, final Point end) {
+
 		// sort so that ep is upper left corner
 		if (end.x < start.x) {
-			int x = end.x;
+			final int x = end.x;
 			end.x = start.x;
 			start.x = x;
 		}
-		
+
 		if (end.y < start.y) {
-			int y = end.y;
+			final int y = end.y;
 			end.y = start.y;
 			start.y = y;
 		}
-		
+
 		// nodes
 		geneSelection.setSelectedNode(null);
 		// genes...
 		geneSelection.deselectAllIndexes();
-		
+
 		for (int i = start.y; i <= end.y; i++) {
-			
+
 			geneSelection.setIndex(i, true);
 		}
-		
+
 		// arrays...
 		arraySelection.setSelectedNode(null);
 		arraySelection.deselectAllIndexes();
-		
+
 		for (int i = start.x; i <= end.x; i++) {
-			
+
 			arraySelection.setIndex(i, true);
 		}
-		
+
 		geneSelection.notifyObservers();
-		arraySelection.notifyObservers();	
+		arraySelection.notifyObservers();
 	}
-	
+
 	/**
 	 * Uses the array- and geneSelection and currently available pixels on
-	 * screen retrieved from the MapContainer objects to calculate a new
-	 * scale and zoom in on it by working in conjunction with 
-	 * centerSelection().
+	 * screen retrieved from the MapContainer objects to calculate a new scale
+	 * and zoom in on it by working in conjunction with centerSelection().
 	 */
-	public void zoomSelection(){
-		
+	public void zoomSelection() {
+
 		double newScale = 0.0;
 		double newScale2 = 0.0;
-		
-		int arrayIndexes = arraySelection.getNSelectedIndexes();
-		int geneIndexes = geneSelection.getNSelectedIndexes();
-		
-		if(arrayIndexes > 0 && geneIndexes > 0) {
-			newScale = xmap.getAvailablePixels()/ arrayIndexes;
+
+		final int arrayIndexes = arraySelection.getNSelectedIndexes();
+		final int geneIndexes = geneSelection.getNSelectedIndexes();
+
+		if (arrayIndexes > 0 && geneIndexes > 0) {
+			newScale = xmap.getAvailablePixels() / arrayIndexes;
 			xmap.setScale(newScale);
-			
-			newScale2 = ymap.getAvailablePixels()/ geneIndexes;
+
+			newScale2 = ymap.getAvailablePixels() / geneIndexes;
 			ymap.setScale(newScale2);
 		}
 	}
-	
+
 	/**
 	 * Scrolls to the center of the selected rectangle
 	 */
 	public void centerSelection() {
-		
+
 		int scrollX;
 		int scrollY;
-		
-		if(startPoint != null && endPoint != null) {
-			scrollX = (endPoint.x + startPoint.x)/2;
-			scrollY = (endPoint.y + startPoint.y)/2;
-			
+
+		if (startPoint != null && endPoint != null) {
+			scrollX = (endPoint.x + startPoint.x) / 2;
+			scrollY = (endPoint.y + startPoint.y) / 2;
+
 			System.out.println("SX: " + scrollX);
-				
+
 			xmap.scrollToIndex(scrollX);
 			ymap.scrollToIndex(scrollY);
 		}
 	}
-	
+
 	/**
 	 * Scrolls to the center of the selected rectangle
 	 */
 	public void centerView(int scrollX, int scrollY) {
-				
-		scrollX = scrollX + (xmap.getScroll().getVisibleAmount()/2);
-		scrollY = scrollY + (ymap.getScroll().getVisibleAmount()/2);
-		
+
+		scrollX = scrollX + (xmap.getScroll().getVisibleAmount() / 2);
+		scrollY = scrollY + (ymap.getScroll().getVisibleAmount() / 2);
+
 		xmap.scrollToIndex(scrollX);
 		ymap.scrollToIndex(scrollY);
 	}
-	
+
 	/**
 	 * Sets the gene header instance variables of GlobalView.
+	 * 
 	 * @param ghi
 	 * @param ahi
 	 */
-	public void setHeaders(HeaderInfo ghi, HeaderInfo ahi) {
-		
+	public void setHeaders(final HeaderInfo ghi, final HeaderInfo ahi) {
+
 		geneHI = ghi;
 		arrayHI = ahi;
 	}
-	
-	//Component Listeners
+
+	// Component Listeners
 	@Override
-	public void componentHidden(ComponentEvent arg0) {}
+	public void componentHidden(final ComponentEvent arg0) {
+	}
 
 	@Override
-	public void componentMoved(ComponentEvent arg0) {}
+	public void componentMoved(final ComponentEvent arg0) {
+	}
 
-	//Keep view centered and zoomed on visible part, also refreshing the 
-	//MapContainer with setHome to always fill out the entire GlobalView 
-	//panel
+	// Keep view centered and zoomed on visible part, also refreshing the
+	// MapContainer with setHome to always fill out the entire GlobalView
+	// panel
 	@Override
-	public void componentResized(ComponentEvent arg0) {
-		
-		int scrollX = xmap.getScroll().getValue();
-		int scrollY = ymap.getScroll().getValue();
-		
-		if(xmap.getAvailablePixels() > xmap.getUsedPixels() 
+	public void componentResized(final ComponentEvent arg0) {
+
+		final int scrollX = xmap.getScroll().getValue();
+		final int scrollY = ymap.getScroll().getValue();
+
+		if (xmap.getAvailablePixels() > xmap.getUsedPixels()
 				&& xmap.getScale() == xmap.getMinScale()) {
 			xmap.setHome();
 		}
-		
-		if(ymap.getAvailablePixels() > ymap.getUsedPixels()
+
+		if (ymap.getAvailablePixels() > ymap.getUsedPixels()
 				&& ymap.getScale() == ymap.getMinScale()) {
 			ymap.setHome();
 		}
-		
+
 		centerView(scrollX, scrollY);
-		
+
 		this.repaint();
 		this.revalidate();
 	}
 
 	@Override
-	public void componentShown(ComponentEvent arg0) {}
+	public void componentShown(final ComponentEvent arg0) {
+	}
 }
-
-

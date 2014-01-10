@@ -31,73 +31,76 @@ import java.util.Observer;
 
 import javax.swing.WindowConstants;
 
-import edu.stanford.genetics.treeview.*;
+import edu.stanford.genetics.treeview.BrowserControl;
+import edu.stanford.genetics.treeview.LinkedViewFrame;
+import edu.stanford.genetics.treeview.TreeViewApp;
 import edu.stanford.genetics.treeview.core.MenuHelpPluginsFrame;
 
 /**
- *  A subclass of ViewFrame designed to run in a browser. Very similar to TreeViewFrame.
- *
- * @author     Alok Saldanha <alok@genome.stanford.edu>
- * @version    @version $Revision: 1.10 $ $Date: 2006-10-03 06:19:12 $
+ * A subclass of ViewFrame designed to run in a browser. Very similar to
+ * TreeViewFrame.
+ * 
+ * @author Alok Saldanha <alok@genome.stanford.edu>
+ * @version @version $Revision: 1.10 $ $Date: 2006-10-03 06:19:12 $
  */
 public class AppletViewFrame extends LinkedViewFrame implements Observer {
 
 	private static final long serialVersionUID = 1L;
 
 	private static String appName = "Java TreeView (Applet)";
-	
+
 	@Override
 	public String getAppName() {
-		
+
 		return appName;
 	}
-	
+
 	/**
-	 *  Sets up widgets.
-	 *
-	 * @param  treeview application which spawned this window.
+	 * Sets up widgets.
+	 * 
+	 * @param treeview
+	 *            application which spawned this window.
 	 */
-	public AppletViewFrame(TreeViewApp treeview, Applet applet){
-		
+	public AppletViewFrame(final TreeViewApp treeview, final Applet applet) {
+
 		super(treeview, appName);
-		browserControl= new AppletBrowserControl(applet);
+		browserControl = new AppletBrowserControl(applet);
 	}
-	
+
 	@Override
-	protected void displayPluginInfo(){
-		
-		MenuHelpPluginsFrame frame = new MenuHelpPluginsFrame(
+	protected void displayPluginInfo() {
+
+		final MenuHelpPluginsFrame frame = new MenuHelpPluginsFrame(
 				"Current Plugins", this);
 		try {
 			URL f_currdir;
 			f_currdir = new URL(".");
 			frame.setSourceText(f_currdir.getPath() + "/plugins");
-		} catch (MalformedURLException e1) {
+		} catch (final MalformedURLException e1) {
 			e1.printStackTrace();
 			frame.setSourceText("Unable to read default plugins directory.");
 		}
-		
+
 		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		frame.setVisible(true);
 	}
-	
+
 	/**
 	 * subclass for applets
 	 */
 	class AppletBrowserControl extends BrowserControl {
-		
-		private AppletContext appletContext;
-		
-		public AppletBrowserControl(Applet applet) {
-			
+
+		private final AppletContext appletContext;
+
+		public AppletBrowserControl(final Applet applet) {
+
 			appletContext = applet.getAppletContext();
 		}
 
 		@Override
-		public void displayURL(String url) throws IOException {
-			
+		public void displayURL(final String url) throws IOException {
+
 			appletContext.showDocument(new URL(url), "_blank");
 		}
 	}
 }
-

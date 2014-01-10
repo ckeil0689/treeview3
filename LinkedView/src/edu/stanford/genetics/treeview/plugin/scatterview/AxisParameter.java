@@ -22,80 +22,89 @@
  */
 package edu.stanford.genetics.treeview.plugin.scatterview;
 
-import edu.stanford.genetics.treeview.*;
+import edu.stanford.genetics.treeview.ConfigNode;
 
 class AxisParameter {
 	private ConfigNode configNode;
+
 	/** Setter for configNode */
-	public void setConfigNode(ConfigNode configNode) {
+	public void setConfigNode(final ConfigNode configNode) {
 		this.configNode = configNode;
 	}
+
 	/** Getter for configNode */
 	public ConfigNode getConfigNode() {
 		return configNode;
 	}
-	
-	public static final int MIN   = 0;
-	public static final int MAX   = 1;
+
+	public static final int MIN = 0;
+	public static final int MAX = 1;
 	public static final int MINOR = 2;
 	public static final int MAJOR = 3;
 
 	/**
-	* the type of this parameter
-	*/
-	private int defaultType = 0;
+	 * the type of this parameter
+	 */
+	private final int defaultType = 0;
+
 	public int getType() {
 		return configNode.getAttribute("type", defaultType);
 	}
-	public void setType(int type) {
+
+	public void setType(final int type) {
 		configNode.setAttribute("type", type, defaultType);
 	}
 
 	/**
-	* the name of this parameter
-	*/
+	 * the name of this parameter
+	 */
 	public String getName() {
-		switch(getType()) {
-			case MIN:
-				return "Min";
-			case MAX:
-				return "Max";
-			case MINOR:
-				return "Minor";
-			case MAJOR:
-				return "Major";
+		switch (getType()) {
+		case MIN:
+			return "Min";
+		case MAX:
+			return "Max";
+		case MINOR:
+			return "Minor";
+		case MAJOR:
+			return "Major";
 		}
 		return "Unknown";
 	}
 
 	/**
-	* is this parameter enabled?
-	*/
-	private int defaultEnabled = 0;
+	 * is this parameter enabled?
+	 */
+	private final int defaultEnabled = 0;
+
 	public boolean getEnabled() {
 		return (configNode.getAttribute("enabled", defaultEnabled) == 1);
 	}
-	public void setEnabled(boolean b) {
-		int val = (b)?1:0;
+
+	public void setEnabled(final boolean b) {
+		final int val = (b) ? 1 : 0;
 		configNode.setAttribute("enabled", val, defaultEnabled);
 	}
-	
+
 	/**
-	* what is the value for the parameter?
-	*/
-	private double defaultValue = 1.0;
+	 * what is the value for the parameter?
+	 */
+	private final double defaultValue = 1.0;
+
 	public double getValue() {
 		return configNode.getAttribute("value", defaultValue);
 	}
-	public void setValue(double value) {
+
+	public void setValue(final double value) {
 		configNode.setAttribute("value", value, defaultValue);
 	}
-	
-	AxisParameter(ConfigNode config) {
+
+	AxisParameter(final ConfigNode config) {
 		setConfigNode(config);
-		
+
 	}
-	public void copyStateFrom(AxisParameter other) {
+
+	public void copyStateFrom(final AxisParameter other) {
 		setType(other.getType());
 		setEnabled(other.getEnabled());
 		setValue(other.getValue());

@@ -22,40 +22,56 @@
  */
 package edu.stanford.genetics.treeview;
 
+import java.awt.BorderLayout;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
-import javax.swing.*;
-
-import java.awt.*;
-import java.awt.event.*;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 /**
-* This class displays editable Url settings.
-*
-* It requires a UrlExtractor, HeaderInfo and optionally a UrlPresets
-*/
+ * This class displays editable Url settings.
+ * 
+ * It requires a UrlExtractor, HeaderInfo and optionally a UrlPresets
+ */
 public class UrlSettingsPanel extends JPanel implements SettingsPanel {
 
 	private static final long serialVersionUID = 1L;
-	
-	private UrlExtractor urlExtractor;
+
+	private final UrlExtractor urlExtractor;
 	private UrlPresets urlPresets = null;
-	private HeaderInfo headerInfo;
+	private final HeaderInfo headerInfo;
 	private JDialog d;
-    private Window window;
-    
+	private Window window;
+
 	private JButton[] buttons;
 	private JTextField previewField;
-	private TemplateField templateField;
+	private final TemplateField templateField;
 	private HeaderChoice headerChoice;
 	private GridBagConstraints gbc;
-    
-	public UrlSettingsPanel(UrlExtractor ue, UrlPresets up) {
-		
+
+	public UrlSettingsPanel(final UrlExtractor ue, final UrlPresets up) {
+
 		this(ue, ue.getHeaderInfo(), up);
 	}
-	
-	public UrlSettingsPanel(UrlExtractor ue, HeaderInfo hi, UrlPresets up) {
-		
+
+	public UrlSettingsPanel(final UrlExtractor ue, final HeaderInfo hi,
+			final UrlPresets up) {
+
 		super();
 		urlExtractor = ue;
 		urlPresets = up;
@@ -68,120 +84,121 @@ public class UrlSettingsPanel extends JPanel implements SettingsPanel {
 		UrlSettingsPanel.this.setEnabled(urlExtractor.isEnabled());
 	}
 
-    public static void main(String [] argv) {
-		
-    	UrlPresets p = new UrlPresets(new DummyConfigNode("UrlPresets"));
-		HeaderInfo hi = new DummyHeaderInfo();
-		UrlExtractor ue = new UrlExtractor(hi);
-	
-		UrlSettingsPanel e  = new UrlSettingsPanel( ue, hi, p);
-		Frame f = new Frame("Url Settings Test");
+	public static void main(final String[] argv) {
+
+		final UrlPresets p = new UrlPresets(new DummyConfigNode("UrlPresets"));
+		final HeaderInfo hi = new DummyHeaderInfo();
+		final UrlExtractor ue = new UrlExtractor(hi);
+
+		final UrlSettingsPanel e = new UrlSettingsPanel(ue, hi, p);
+		final Frame f = new Frame("Url Settings Test");
 		f.add(e);
-		f.addWindowListener(new WindowAdapter (){
-			
+		f.addWindowListener(new WindowAdapter() {
+
 			@Override
-			public void windowClosing(WindowEvent we) {
-				
+			public void windowClosing(final WindowEvent we) {
+
 				System.exit(0);
 			}
 		});
 		f.pack();
 		f.setVisible(true);
-    }
+	}
 
 	@Override
 	public void synchronizeFrom() {
-		
+
 		redoLayout();
 		UrlSettingsPanel.this.setEnabled(urlExtractor.isEnabled());
 	}
 
 	@Override
 	public void synchronizeTo() {
-	  //nothing to do...
+		// nothing to do...
 	}
-	
+
 	class EnablePanel extends JPanel {
 
 		private static final long serialVersionUID = 1L;
-		
+
 		JCheckBox enableBox;
+
 		public EnablePanel() {
-			
+
 			setLayout(new BorderLayout());
-			
-			add(new JLabel ("Web Link:", SwingConstants.LEFT), 
+
+			add(new JLabel("Web Link:", SwingConstants.LEFT),
 					BorderLayout.NORTH);
-			
+
 			enableBox = new JCheckBox("Enable", urlExtractor.isEnabled());
 			enableBox.addActionListener(new ActionListener() {
-			  
+
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					urlExtractor.setEnabled(enableBox.isSelected());
 					UrlSettingsPanel.this.setEnabled(enableBox.isSelected());
 				}
 			});
 			add(enableBox, BorderLayout.CENTER);
 		}
-		
+
 		public boolean isSelected() {
-			
+
 			return enableBox.isSelected();
 		}
 	}
 
 	/**
-	 *  Create a blocking dialog containing this component
-	 *
-	 * @param  f  frame to block
+	 * Create a blocking dialog containing this component
+	 * 
+	 * @param f
+	 *            frame to block
 	 */
-	public void showDialog(Frame f, String title) {
-		
+	public void showDialog(final Frame f, final String title) {
+
 		d = new JDialog(f, title);
 		window = d;
 		d.setLayout(new BorderLayout());
 		d.add(this, BorderLayout.CENTER);
 		d.add(new ButtonPanel(), BorderLayout.SOUTH);
 		d.addWindowListener(new WindowAdapter() {
-				
+
 			@Override
-			public void windowClosing(WindowEvent we) {
-				
+			public void windowClosing(final WindowEvent we) {
+
 				we.getWindow().dispose();
 			}
 		});
 		d.pack();
 		d.setVisible(true);
 	}
-	
-	public void showDialog(Frame f) {
-		
+
+	public void showDialog(final Frame f) {
+
 		showDialog(f, "Url Settings Test");
 	}
-	
+
 	@Override
-	public void setEnabled(boolean b) {
-		  
+	public void setEnabled(final boolean b) {
+
 		templateField.setEnabled(b);
 		headerChoice.setEnabled(b);
 		previewField.setEnabled(b);
 		for (int i = 0; i < buttons.length; i++) {
-			if (buttons[i] != null){
+			if (buttons[i] != null) {
 				buttons[i].setEnabled(b);
-			}  
+			}
 		}
 	}
 
-	
 	public void redoLayout() {
-		
-		String [] preset;
+
+		String[] preset;
 		preset = urlPresets.getPresetNames();
-		int nPresets = preset.length;
+		final int nPresets = preset.length;
 		removeAll();
 		setLayout(new GridBagLayout());
-		
+
 		gbc = new GridBagConstraints();
 		gbc.gridwidth = 1;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -189,48 +206,48 @@ public class UrlSettingsPanel extends JPanel implements SettingsPanel {
 		gbc.gridy = 0;
 		gbc.gridx = 0;
 		gbc.weightx = 100;
-		final JCheckBox enableBox = new JCheckBox("Enable", urlExtractor.isEnabled());
+		final JCheckBox enableBox = new JCheckBox("Enable",
+				urlExtractor.isEnabled());
 		enableBox.addActionListener(new ActionListener() {
-			
-			
+
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				
+			public void actionPerformed(final ActionEvent e) {
+
 				urlExtractor.setEnabled(enableBox.isSelected());
 				UrlSettingsPanel.this.setEnabled(enableBox.isSelected());
 			}
 		});
 		add(enableBox, gbc);
-		
-		gbc.gridx  = 1;
+
+		gbc.gridx = 1;
 		add(templateField, gbc);
-		
-		gbc.gridx  = 2;
-		headerChoice  = new HeaderChoice();
+
+		gbc.gridx = 2;
+		headerChoice = new HeaderChoice();
 		gbc.fill = GridBagConstraints.NONE;
 		gbc.weightx = 0;
 		add(headerChoice, gbc);
-		
-		gbc.gridx  = 0;
+
+		gbc.gridx = 0;
 		gbc.gridy = 1;
 		gbc.gridwidth = 3;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		previewField = new JTextField("Ex: " + urlExtractor.getUrl(0));
-//		  previewField = new JTextField(urlExtractor.substitute(tester));
+		// previewField = new JTextField(urlExtractor.substitute(tester));
 		previewField.setEditable(false);
 		add(previewField, gbc);
-		
-		JPanel presetPanel = new JPanel();
+
+		final JPanel presetPanel = new JPanel();
 		buttons = new JButton[nPresets];
 		for (int i = 0; i < nPresets; i++) {
-			JButton presetButton = new JButton(
-					(urlPresets.getPresetNames()) [i]);
+			final JButton presetButton = new JButton(
+					(urlPresets.getPresetNames())[i]);
 			final int index = i;
 			presetButton.addActionListener(new ActionListener() {
-			  
+
 				@Override
-				public void actionPerformed(ActionEvent e) {
-					
+				public void actionPerformed(final ActionEvent e) {
+
 					templateField.setText(urlPresets.getTemplate(index));
 					updatePreview();
 				}
@@ -238,37 +255,38 @@ public class UrlSettingsPanel extends JPanel implements SettingsPanel {
 			presetPanel.add(presetButton);
 			buttons[index] = presetButton;
 		}
-		
+
 		gbc.gridy = 2;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weighty = 100;
 		gbc.weightx = 100;
-//		  add(new JScrollPane(presetPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS), gbc);
+		// add(new JScrollPane(presetPanel,
+		// JScrollPane.VERTICAL_SCROLLBAR_NEVER,
+		// JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS), gbc);
 		add(presetPanel, gbc);
 
 		try {
 			headerChoice.setSelectedIndex(urlExtractor.getIndex());
-			
-		  } catch(  java.lang.IllegalArgumentException e) {
-		  }
+
+		} catch (final java.lang.IllegalArgumentException e) {
+		}
 	}
 
 	private void updatePreview() {
-		
+
 		urlExtractor.setUrlTemplate(templateField.getText());
 		urlExtractor.setIndex(headerChoice.getSelectedIndex());
 		previewField.setText("Ex: " + urlExtractor.getUrl(0));
 	}
 
-	private class HeaderChoice extends JComboBox 
-	implements ItemListener {
+	private class HeaderChoice extends JComboBox implements ItemListener {
 
 		private static final long serialVersionUID = 1L;
-		
+
 		public HeaderChoice() {
-			
+
 			super();
-			String [] headers;
+			String[] headers;
 			int lastI;
 			if (headerInfo != null) {
 				headers = headerInfo.getNames();
@@ -277,60 +295,58 @@ public class UrlSettingsPanel extends JPanel implements SettingsPanel {
 					lastI--;
 				}
 			} else {
-				headers = new String [] {"Dummy1", "Dummy2", "Dummy3"};
+				headers = new String[] { "Dummy1", "Dummy2", "Dummy3" };
 				lastI = headers.length;
 			}
-				
+
 			for (int i = 0; i < lastI; i++) {
 				if (headers[i] == null) {
 					addItem("-- NULL --");
-					
+
 				} else {
 					addItem(headers[i]);
 				}
 			}
-				addItemListener(this);
+			addItemListener(this);
 		}
-		
+
 		@Override
-		public void itemStateChanged(ItemEvent e) {
-			
+		public void itemStateChanged(final ItemEvent e) {
+
 			updatePreview();
 		}
 	}
-    
-
 
 	private class TemplateField extends JTextField {
 
 		private static final long serialVersionUID = 1L;
 
-		public TemplateField () {
-			
+		public TemplateField() {
+
 			super("enter url template");
 			addActionListener(new ActionListener() {
-		    	
+
 				@Override
-				public void actionPerformed(ActionEvent e) {
-				  
+				public void actionPerformed(final ActionEvent e) {
+
 					updatePreview();
 				}
 			});
 		}
 	}
-	
+
 	private class ButtonPanel extends JPanel {
-	
+
 		private static final long serialVersionUID = 1L;
 
 		public ButtonPanel() {
-			
-			JButton save_button = new JButton("Close");
+
+			final JButton save_button = new JButton("Close");
 			save_button.addActionListener(new ActionListener() {
-		    
+
 				@Override
-				public void actionPerformed(ActionEvent e) {
-					
+				public void actionPerformed(final ActionEvent e) {
+
 					window.setVisible(false);
 				}
 			});

@@ -22,12 +22,24 @@
  */
 package edu.stanford.genetics.treeview;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import javax.swing.*;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -36,26 +48,26 @@ import edu.stanford.genetics.treeview.core.PluginManager;
 public class LinkedPanel extends JTabbedPane implements MainPanel {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private ViewFrame viewFrame;
 	private ConfigNode configNode = null;
-	
+
 	/**
 	 * used to hold list of open mp dialogs
 	 */
-	private Vector<JFrame> mpdialogs = new Vector<JFrame>();
-	
-	public LinkedPanel(ViewFrame viewFrame) {
-		
+	private final Vector<JFrame> mpdialogs = new Vector<JFrame>();
+
+	public LinkedPanel(final ViewFrame viewFrame) {
+
 		super();
 		setName("LinkedPanel");
 		setViewFrame(viewFrame);
 		addChangeListener(new ChangeListener() {
-			
+
 			@Override
-			public void stateChanged(ChangeEvent e) {
-				
-				ConfigNode viewsNode = getConfigNode();
+			public void stateChanged(final ChangeEvent e) {
+
+				final ConfigNode viewsNode = getConfigNode();
 				if (viewsNode != null) {
 					viewsNode.setAttribute("selected", getSelectedIndex(), 0);
 				}
@@ -64,232 +76,238 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 	}
 
 	/** Setter for viewFrame */
-	public void setViewFrame(ViewFrame viewFrame) {
-		
+	public void setViewFrame(final ViewFrame viewFrame) {
+
 		this.viewFrame = viewFrame;
 	}
-	
+
 	/** Getter for viewFrame */
 	public ViewFrame getViewFrame() {
-		
+
 		return viewFrame;
 	}
 
 	/**
-	 *  This syncronizes the sub compnents with their persistent storage.
+	 * This syncronizes the sub compnents with their persistent storage.
 	 */
 	@Override
 	public void syncConfig() {
-		
-		int n = getComponentCount();
+
+		final int n = getComponentCount();
 		for (int i = 0; i < n; i++) {
-			MainPanel modelView = (MainPanel) getComponentAt(i);
+			final MainPanel modelView = (MainPanel) getComponentAt(i);
 			modelView.syncConfig();
 		}
 	}
-	
+
 	/** Setter for configNode */
-	public void setConfigNode(ConfigNode configNode) {
-		
+	public void setConfigNode(final ConfigNode configNode) {
+
 		this.configNode = configNode;
 		restoreState();
 	}
-	
+
 	public void restoreState() {
-		
+
 		this.removeAll();
 		// alright, setup views...
-		ConfigNode viewsNode = getConfigNode();
+		final ConfigNode viewsNode = getConfigNode();
 		if (viewsNode != null) {
-			ConfigNode [] viewNodes = viewsNode.fetch("View");
-			PluginFactory [] plugins = PluginManager.getPluginManager()
+			final ConfigNode[] viewNodes = viewsNode.fetch("View");
+			final PluginFactory[] plugins = PluginManager.getPluginManager()
 					.getPluginFactories();
-			
+
 			for (int i = 0; i < viewNodes.length; i++) {
-				ConfigNode thisNode = viewNodes[i];
+				final ConfigNode thisNode = viewNodes[i];
 				String thisType = thisNode.getAttribute("type", null);
-				
+
 				// check to see if covered by plugin...
-				for (int j =0; j < plugins.length; j++) {
+				for (int j = 0; j < plugins.length; j++) {
 					if (thisType.equals(plugins[j].getPluginName())) {
 						restorePlugin(thisNode, plugins[j]);
 						thisType = null; // forestall further adds
 						break;
 					}
 				}
-				
+
 				if (thisType == null) {
 					// do nothing...
-					
+
 				} else {
-					LogBuffer.println(viewFrame.getDataModel().getSource() + 
-							": encountered unknown View of type " + thisType);
+					LogBuffer.println(viewFrame.getDataModel().getSource()
+							+ ": encountered unknown View of type " + thisType);
 				}
 			}
 		}
-		
+
 		if (getComponentCount() == 0) {
 			PluginFactory foo = PluginManager.getPluginManager()
 					.getPluginFactory(0);
-			PluginFactory [] plugins = PluginManager.getPluginManager()
+			final PluginFactory[] plugins = PluginManager.getPluginManager()
 					.getPluginFactories();
-			
-			for (int i = 0 ; i < plugins.length; i++) {	
+
+			for (int i = 0; i < plugins.length; i++) {
 				if ("Dendrogram".equals(plugins[i].getPluginName())) {
 					foo = plugins[i];
 				}
 			}
-			
+
 			if (foo != null) {
 				addPlugin(foo);
-				
+
 			} else {
 				JOptionPane.showMessageDialog(this, "No plugins loaded");
 			}
 		}
-		
+
 		if (getComponentCount() > 0) {
-			int selected = viewsNode.getAttribute("selected", 0);
+			final int selected = viewsNode.getAttribute("selected", 0);
 			setSelectedIndex(selected);
 		}
 	}
-	
+
 	/**
-	* this method gets the config node on which this component is based, or null.
-	*/
+	 * this method gets the config node on which this component is based, or
+	 * null.
+	 */
 	@Override
 	public ConfigNode getConfigNode() {
-		
+
 		return configNode;
 	}
 
 	/**
-	 *  Add items related to settings
-	 *
-	 * @param  menu  A menu to add items to.
-	 */
-	 @Override
-	public void populateSettingsMenu(TreeviewMenuBarI menu) {
-		 
-		 MainPanel panel = (MainPanel) getSelectedComponent();
-		 if (panel != null) {
-			 panel.populateSettingsMenu(menu);
-		 }
-	 }
-
-	/**
-	 *  Add items which do some kind of analysis
-	 *
-	 * @param  menu  A menu to add items to.
+	 * Add items related to settings
+	 * 
+	 * @param menu
+	 *            A menu to add items to.
 	 */
 	@Override
-	public void populateAnalysisMenu(TreeviewMenuBarI menu) {
-		
-		MainPanel panel = (MainPanel) getSelectedComponent();
+	public void populateSettingsMenu(final TreeviewMenuBarI menu) {
+
+		final MainPanel panel = (MainPanel) getSelectedComponent();
+		if (panel != null) {
+			panel.populateSettingsMenu(menu);
+		}
+	}
+
+	/**
+	 * Add items which do some kind of analysis
+	 * 
+	 * @param menu
+	 *            A menu to add items to.
+	 */
+	@Override
+	public void populateAnalysisMenu(final TreeviewMenuBarI menu) {
+
+		final MainPanel panel = (MainPanel) getSelectedComponent();
 		if (panel != null) {
 			panel.populateAnalysisMenu(menu);
 		}
-		
+
 		if (menu.getItemCount() > 0) {
 			menu.addSeparator();
 		}
-		
-		PluginFactory [] plugins = PluginManager.getPluginManager()
+
+		final PluginFactory[] plugins = PluginManager.getPluginManager()
 				.getPluginFactories();
 		for (int i = 0; i < plugins.length; i++) {
 			final PluginFactory thisFactory = plugins[i];
 			menu.addMenuItem(thisFactory.getPluginName(), new ActionListener() {
-				
+
 				@Override
-				public void actionPerformed(ActionEvent e) {
-					
-					// MainPanel plugin = 
+				public void actionPerformed(final ActionEvent e) {
+
+					// MainPanel plugin =
 					addPlugin(thisFactory);
 				}
 			});
 		}
-		
-		if (plugins.length == 0) {			
+
+		if (plugins.length == 0) {
 			menu.addMenuItem("No Plugins Found", new ActionListener() {
-				
+
 				@Override
-				public void actionPerformed(ActionEvent e) {}			
+				public void actionPerformed(final ActionEvent e) {
+				}
 			});
 		}
-		
+
 		if (menu.getItemCount() > 0) {
 			menu.addSeparator();
 		}
 		menu.addSeparator();
-		
+
 		menu.addMenuItem("Remove Current", new ActionListener() {
-			
+
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				
+			public void actionPerformed(final ActionEvent e) {
+
 				removeCurrent();
 			}
 		});
 		menu.setMnemonic(KeyEvent.VK_R);
-		
+
 		menu.addMenuItem("Detach Current", new ActionListener() {
-			
+
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				
+			public void actionPerformed(final ActionEvent e) {
+
 				detachCurrent();
 			}
 		});
 		menu.setMnemonic(KeyEvent.VK_D);
-		
+
 		/*
-		MenuItem menuItem2 = getModel().getStatMenuItem();
-		menu.add(menuItem2);
-		*/
+		 * MenuItem menuItem2 = getModel().getStatMenuItem();
+		 * menu.add(menuItem2);
+		 */
 	}
 
 	/**
-	 *  Add items which allow for export, if any.
-	 *
-	 * @param  menu  A menu to add items to.
-	 */
-	 @Override
-	public void populateExportMenu(TreeviewMenuBarI menu) {
-		
-		 MainPanel panel = (MainPanel) getSelectedComponent();
-		 if (panel != null) {
-			 if (menu.getItemCount() > 0) {
-				 menu.addSeparator();					
-			 }
-			 panel.populateExportMenu(menu);
-		 }
-	 }
-
-	/**
-	 *  ensure a particular index is visible. Used by Find.
-	 *
-	 * @param  index  Index of gene in cdt to make visible
+	 * Add items which allow for export, if any.
+	 * 
+	 * @param menu
+	 *            A menu to add items to.
 	 */
 	@Override
-	public void scrollToGene(int index) {
-		
-		int n = getComponentCount();
+	public void populateExportMenu(final TreeviewMenuBarI menu) {
+
+		final MainPanel panel = (MainPanel) getSelectedComponent();
+		if (panel != null) {
+			if (menu.getItemCount() > 0) {
+				menu.addSeparator();
+			}
+			panel.populateExportMenu(menu);
+		}
+	}
+
+	/**
+	 * ensure a particular index is visible. Used by Find.
+	 * 
+	 * @param index
+	 *            Index of gene in cdt to make visible
+	 */
+	@Override
+	public void scrollToGene(final int index) {
+
+		final int n = getComponentCount();
 		for (int i = 0; i < n; i++) {
-			MainPanel modelView = (MainPanel) getComponentAt(i);
+			final MainPanel modelView = (MainPanel) getComponentAt(i);
 			modelView.scrollToGene(index);
 		}
 	}
-	
+
 	@Override
-	public void scrollToArray(int index) {
-		
-		int n = getComponentCount();
+	public void scrollToArray(final int index) {
+
+		final int n = getComponentCount();
 		for (int i = 0; i < n; i++) {
-			MainPanel modelView = (MainPanel) getComponentAt(i);
+			final MainPanel modelView = (MainPanel) getComponentAt(i);
 			modelView.scrollToArray(index);
 		}
 	}
-	
+
 	/**
 	 * used to add existing instances, with state stored in confignode
 	 * 
@@ -297,51 +315,52 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 	 * @param f
 	 * @return
 	 */
-	public MainPanel restorePlugin(ConfigNode thisNode, PluginFactory f) {
-		
-		MainPanel plugin =  f.restorePlugin(thisNode, getViewFrame());
+	public MainPanel restorePlugin(final ConfigNode thisNode,
+			final PluginFactory f) {
+
+		final MainPanel plugin = f.restorePlugin(thisNode, getViewFrame());
 		if (plugin != null) {
-			switch(plugin.getConfigNode().getAttribute("dock", -1)) {
-				case 0:
-					addDialog(plugin);
-					break;
-				case 1:
-					addTab(plugin);
-					setSelectedComponent((Component) plugin);
-					break;
-				case -1:
-					addTab(plugin);
-					setSelectedComponent((Component) plugin);
-				 	break;
+			switch (plugin.getConfigNode().getAttribute("dock", -1)) {
+			case 0:
+				addDialog(plugin);
+				break;
+			case 1:
+				addTab(plugin);
+				setSelectedComponent((Component) plugin);
+				break;
+			case -1:
+				addTab(plugin);
+				setSelectedComponent((Component) plugin);
+				break;
 			}
 		}
 		return plugin;
 	}
-	
+
 	/**
 	 * used to add new instances of the plugin
 	 */
-	public MainPanel addPlugin(PluginFactory f) {
-		
-		ConfigNode thisNode = getConfigNode().create("View");
+	public MainPanel addPlugin(final PluginFactory f) {
+
+		final ConfigNode thisNode = getConfigNode().create("View");
 		thisNode.setAttribute("type", f.getPluginName(), null);
 		f.configurePlugin(thisNode, getViewFrame());
 		return restorePlugin(thisNode, f);
 	}
 
-	public void addTab(MainPanel mp) {
-		
-		addTab(mp.getName(), mp.getIcon(), (Component) mp, 
+	public void addTab(final MainPanel mp) {
+
+		addTab(mp.getName(), mp.getIcon(), (Component) mp,
 				"What's this button do?");
 		mp.getConfigNode().setAttribute("dock", 1, -1);
 	}
 
-	public void addDialog(MainPanel mp) {
-		
+	public void addDialog(final MainPanel mp) {
+
 		final MainPanelFrame nmp = new MainPanelFrame(mp);
 		mpdialogs.add(nmp);
-		Rectangle r = viewFrame.getBounds();
-		r.height -=10;
+		final Rectangle r = viewFrame.getBounds();
+		r.height -= 10;
 		r.width -= 10;
 		r.x += 10;
 		r.y += 10;
@@ -349,225 +368,233 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 		nmp.setVisible(true);
 		mp.getConfigNode().setAttribute("dock", 0, -1);
 	}
-	
+
 	/**
 	 * removed ConfigNode of mainpanel as well as dialog window
 	 * 
-	 * @param mp mainpanel to remove
+	 * @param mp
+	 *            mainpanel to remove
 	 */
-	public void removeDialog(MainPanel mp) {
-		
-		Enumeration<JFrame> e = mpdialogs.elements();
+	public void removeDialog(final MainPanel mp) {
+
+		final Enumeration<JFrame> e = mpdialogs.elements();
 		while (e.hasMoreElements()) {
-			MainPanelFrame mpd = (MainPanelFrame) e.nextElement();
+			final MainPanelFrame mpd = (MainPanelFrame) e.nextElement();
 			if (mpd.getMainPanel() == mp) {
 				removeDialog(mpd);
 			}
 		}
 	}
-	
+
 	/**
 	 * removed ConfigNode of mainpanel as well as dialog window
 	 * 
-	 * @param mp mainpanel to remove
+	 * @param mp
+	 *            mainpanel to remove
 	 */
-	public void removeDialog(MainPanelFrame mpd) {
-		
+	public void removeDialog(final MainPanelFrame mpd) {
+
 		mpdialogs.remove(mpd);
-		ConfigNode viewsNode = getConfigNode();
+		final ConfigNode viewsNode = getConfigNode();
 		viewsNode.remove(mpd.getMainPanel().getConfigNode());
 		mpd.dispose();
 	}
-	
-	public void dockMainPanelDialog(MainPanelFrame mpd) {
-		
-		MainPanel mp = mpd.getMainPanel();
+
+	public void dockMainPanelDialog(final MainPanelFrame mpd) {
+
+		final MainPanel mp = mpd.getMainPanel();
 		mpdialogs.remove(mpd);
 		mpd.setVisible(false);
 		addTab(mp);
 		mpd.dispose();
 		mp.getConfigNode().setAttribute("dock", 1, -1);
 	}
-	
+
 	public void detachCurrent() {
-		
-		Component current =  getSelectedComponent();
+
+		final Component current = getSelectedComponent();
 		if (current != null) {
-			MainPanel mp = (MainPanel) current;
+			final MainPanel mp = (MainPanel) current;
 			remove(current);
 			addDialog(mp);
 			mp.getConfigNode().setAttribute("dock", 0, -1);
 		}
 	}
-	
+
 	public void removeCurrent() {
-		
-		Component current =  getSelectedComponent();
+
+		final Component current = getSelectedComponent();
 		if (current != null) {
-			MainPanel cPanel = (MainPanel) current;
+			final MainPanel cPanel = (MainPanel) current;
 			cPanel.syncConfig();
-			ConfigNode viewsNode = getConfigNode();
+			final ConfigNode viewsNode = getConfigNode();
 			viewsNode.remove(cPanel.getConfigNode());
 			remove(current);
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.stanford.genetics.treeview.MainPanel#getIcon()
 	 */
 	@Override
 	public ImageIcon getIcon() {
-		
+
 		// can't nest linked panels yet.
 		return null;
 	}
-	
-	public MainPanel[] getMainPanelsByName(String name) {
-		
-		Vector<MainPanel> matches = new Vector<MainPanel>();
-		
+
+	public MainPanel[] getMainPanelsByName(final String name) {
+
+		final Vector<MainPanel> matches = new Vector<MainPanel>();
+
 		// check the detached plugins
-		Enumeration<JFrame> e = mpdialogs.elements();
+		final Enumeration<JFrame> e = mpdialogs.elements();
 		while (e.hasMoreElements()) {
-			MainPanelFrame mpd = (MainPanelFrame) e.nextElement();
-			MainPanel mp = mpd.getMainPanel();
+			final MainPanelFrame mpd = (MainPanelFrame) e.nextElement();
+			final MainPanel mp = mpd.getMainPanel();
 			if (name.equals(mp.getName())) {
 				matches.add(mp);
 			}
 		}
-		
-		Component [] docked = this.getComponents();
+
+		final Component[] docked = this.getComponents();
 
 		// check the docked plugins
-		for (int i =0; i < docked.length; i++) {
-			MainPanel mp = (MainPanel) docked[i];
+		for (int i = 0; i < docked.length; i++) {
+			final MainPanel mp = (MainPanel) docked[i];
 			if (name.equals(mp.getName())) {
 				matches.add(mp);
 			}
 		}
-		
-		Object [] comps = matches.toArray();
-		MainPanel [] ret = new MainPanel[comps.length];
-		for (int i = 0 ; i < comps.length; i++) {
+
+		final Object[] comps = matches.toArray();
+		final MainPanel[] ret = new MainPanel[comps.length];
+		for (int i = 0; i < comps.length; i++) {
 			ret[i] = (MainPanel) comps[i];
 		}
 		return ret;
 	}
-	
+
 	public MainPanel[] getMainPanels() {
-		
-		Vector<MainPanel> matches = new Vector<MainPanel>();
-		
+
+		final Vector<MainPanel> matches = new Vector<MainPanel>();
+
 		// check the detached plugins
-		Enumeration<JFrame> e = mpdialogs.elements();
+		final Enumeration<JFrame> e = mpdialogs.elements();
 		while (e.hasMoreElements()) {
-			MainPanelFrame mpd = (MainPanelFrame) e.nextElement();
-			MainPanel mp = mpd.getMainPanel();
+			final MainPanelFrame mpd = (MainPanelFrame) e.nextElement();
+			final MainPanel mp = mpd.getMainPanel();
 			matches.add(mp);
 		}
-		Component [] docked = this.getComponents();
+		final Component[] docked = this.getComponents();
 
 		// check the docked plugins
-		for (int i =0; i < docked.length; i++) {
-			MainPanel mp = (MainPanel) docked[i];
+		for (int i = 0; i < docked.length; i++) {
+			final MainPanel mp = (MainPanel) docked[i];
 			matches.add(mp);
 		}
-		
-		Object [] comps = matches.toArray();
-		MainPanel [] ret = new MainPanel[comps.length];
-		for (int i = 0 ; i < comps.length; i++) {
+
+		final Object[] comps = matches.toArray();
+		final MainPanel[] ret = new MainPanel[comps.length];
+		for (int i = 0; i < comps.length; i++) {
 			ret[i] = (MainPanel) comps[i];
 		}
 		return ret;
 	}
 
 	@Override
-	public void export(MainProgramArgs args) throws ExportException {
-		
-		throw new ExportException("Export not implemented for plugin " 
-		+ getName());
+	public void export(final MainProgramArgs args) throws ExportException {
+
+		throw new ExportException("Export not implemented for plugin "
+				+ getName());
 	}
-	
+
 	/**
 	 * Refreshing the current active linked panel
 	 */
 	@Override
 	public void refresh() {
-		
+
 		restoreState();
 		this.revalidate();
 		this.repaint();
 	}
 
 	/**
-	 * This class enables you to put a MainPanel in a separate window.
-	 * the separate window is not a ViewFrame and should be thought of as
-	 * subordinate to the ViewFrame that holds the LinkedPanel, although
-	 * there's no way to enforce that from java without always having the
-	 * subwindow on top.
+	 * This class enables you to put a MainPanel in a separate window. the
+	 * separate window is not a ViewFrame and should be thought of as
+	 * subordinate to the ViewFrame that holds the LinkedPanel, although there's
+	 * no way to enforce that from java without always having the subwindow on
+	 * top.
 	 */
 	private class MainPanelFrame extends JFrame {
 
 		private static final long serialVersionUID = 1L;
-		
-		private MainPanel mainPanel;
-		
+
+		private final MainPanel mainPanel;
+
 		/**
-		 * @param mp main panel to display
+		 * @param mp
+		 *            main panel to display
 		 */
-		public MainPanelFrame(MainPanel mp) {
-			
+		public MainPanelFrame(final MainPanel mp) {
+
 			super();
 			mainPanel = mp;
 			final WindowListener listener = new WindowAdapter() {
-				
+
 				@Override
-				public void windowClosing(WindowEvent e) {
-//					
+				public void windowClosing(final WindowEvent e) {
+					//
 					dockMainPanelDialog(MainPanelFrame.this);
 					removeDialog(MainPanelFrame.this);
 				}
-				
+
 				@Override
-				public void windowClosed(WindowEvent e) {}
-				
+				public void windowClosed(final WindowEvent e) {
+				}
+
 				@Override
-				public void windowIconified(WindowEvent e) {}
-				
+				public void windowIconified(final WindowEvent e) {
+				}
+
 				@Override
-				public void windowDeiconified(WindowEvent e) {}
+				public void windowDeiconified(final WindowEvent e) {
+				}
 			};
 			addWindowListener(listener);
 
-			JButton dockButton = new JButton("Dock");
+			final JButton dockButton = new JButton("Dock");
 			dockButton.addActionListener(new ActionListener() {
-				
+
 				@Override
-				public void actionPerformed(ActionEvent e) {
-					
+				public void actionPerformed(final ActionEvent e) {
+
 					removeWindowListener(listener);
 					dockMainPanelDialog(MainPanelFrame.this);
 				}
 			});
 
-			JButton closeButton = new JButton("Close");
+			final JButton closeButton = new JButton("Close");
 			closeButton.addActionListener(new ActionListener() {
-				
+
 				@Override
-				public void actionPerformed(ActionEvent e) {
-					
+				public void actionPerformed(final ActionEvent e) {
+
 					removeWindowListener(listener);
 					removeDialog(MainPanelFrame.this);
 				}
 			});
-			
-			JPanel buttonPanel = new JPanel();
+
+			final JPanel buttonPanel = new JPanel();
 			buttonPanel.add(dockButton);
 			buttonPanel.add(closeButton);
-			
+
 			getContentPane().setLayout(new BorderLayout());
 			getContentPane().add(buttonPanel, BorderLayout.SOUTH);
-			getContentPane().add((Component) mainPanel,BorderLayout.CENTER);
+			getContentPane().add((Component) mainPanel, BorderLayout.CENTER);
 			setTitle(mp.getName() + ": " + viewFrame.getDataModel().getSource());
 		}
 
@@ -575,7 +602,7 @@ public class LinkedPanel extends JTabbedPane implements MainPanel {
 		 * @return main panel displayed by dialog
 		 */
 		public MainPanel getMainPanel() {
-			
+
 			return mainPanel;
 		}
 	}

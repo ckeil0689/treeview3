@@ -22,95 +22,95 @@
  */
 package edu.stanford.genetics.treeview;
 
-
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Observable;
+import java.util.Vector;
 
 public class LogBuffer extends Observable {
-	
+
 	private static LogBuffer singleton = new LogBuffer();
 
-	private ConfigNode root = new DummyConfigNode("LogBuffer");
-	private int defaultLog = 0; // false
-	private Vector<String> buffer = new Vector<String>(100, 100);
-	
-	public void log(String msg) {
-		
+	private final ConfigNode root = new DummyConfigNode("LogBuffer");
+	private final int defaultLog = 0; // false
+	private final Vector<String> buffer = new Vector<String>(100, 100);
+
+	public void log(final String msg) {
+
 		if (getLog()) {
 			append(msg);
 		}
-		
+
 		if (getPrint()) {
 			System.out.println(msg);
 		}
 	}
-	
+
 	private boolean getPrint() {
 		if (root == null) {
 			return true;
-			
+
 		} else {
 			return (root.getAttribute("print", 1) == 1);
 		}
 	}
-	
+
 	/**
-	 *
+	 * 
 	 * @return true if messages are being logged in the buffer
 	 */
 	public boolean getLog() {
-		
+
 		return (root.getAttribute("log", defaultLog) == 1);
 	}
-	
-	public void setLog(boolean bool) {
-		
-		System.err.println("Before " + getLog() );
+
+	public void setLog(final boolean bool) {
+
+		System.err.println("Before " + getLog());
 		if (bool == getLog()) {
 			return;
 		}
-		
-		if (bool) { 
+
+		if (bool) {
 			root.setAttribute("log", 1, defaultLog);
-			
+
 		} else {
 			root.setAttribute("log", 0, defaultLog);
 		}
-		
+
 		setChanged();
 		notifyObservers(null);
-		System.err.println("After " + getLog() );
+		System.err.println("After " + getLog());
 	}
-	
-	private void append(String msg) {
-		
+
+	private void append(final String msg) {
+
 		buffer.add(msg);
 		setChanged();
 		notifyObservers(msg);
 	}
-	
+
 	public Enumeration<String> getMessages() {
-		
+
 		return buffer.elements();
 	}
-	
-	public static void logException(Exception e) {
-		
+
+	public static void logException(final Exception e) {
+
 		println(e.getMessage());
-		StackTraceElement [] els =  e.getStackTrace();
+		final StackTraceElement[] els = e.getStackTrace();
 		for (int i = 0; i < els.length; i++) {
-			StackTraceElement el = els[i];
-			println(" - " +el.toString());
+			final StackTraceElement el = els[i];
+			println(" - " + el.toString());
 		}
 	}
-	
-	public static void println(String msg) {
-		
+
+	public static void println(final String msg) {
+
 		singleton.log(msg);
 	}
-	
+
 	public static LogBuffer getSingleton() {
-		
+
 		return singleton;
 	}
 }
-

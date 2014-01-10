@@ -24,63 +24,66 @@ package edu.stanford.genetics.treeview;
 
 import java.util.Observer;
 
-
 public class DummyHeaderInfo implements HeaderInfo {
-  String [] header1 = new String [] {"Bob1", "Alice1"};
-  String [] header2 = new String [] {"Bob2", "Alice2"};
-  String [] header3 = new String [] {"Bob3", "Alice3"};
-  @Override
-public String[] getHeader(int i) {
-	if (i == 1) {
-	  return header1;
+	String[] header1 = new String[] { "Bob1", "Alice1" };
+	String[] header2 = new String[] { "Bob2", "Alice2" };
+	String[] header3 = new String[] { "Bob3", "Alice3" };
+
+	@Override
+	public String[] getHeader(final int i) {
+		if (i == 1) {
+			return header1;
+		}
+		if (i == 2) {
+			return header2;
+		}
+		return header3;
 	}
-	if (i == 2) {
-	  return header2;
-	}
-	  return header3;
-  }
 
 	/**
-	 *  Gets the header info for gene/array i, col name
-	 *
-	 * @param  i  index of the header to get
-	 * @return    The array of header values
+	 * Gets the header info for gene/array i, col name
+	 * 
+	 * @param i
+	 *            index of the header to get
+	 * @return The array of header values
 	 */
 	@Override
-	public String getHeader(int i, String name) {
-	  return (getHeader(i))[getIndex(name)];
+	public String getHeader(final int i, final String name) {
+		return (getHeader(i))[getIndex(name)];
 	}
 
+	String[] names = new String[] { "Bob", "Alice" };
 
-	String [] names = new String [] {"Bob", "Alice"};
 	/**
-	 *  Gets the names of the headers
-	 *
-	 * @return    The list of names
+	 * Gets the names of the headers
+	 * 
+	 * @return The list of names
 	 */
 	@Override
 	public String[] getNames() {
-	  return names;
+		return names;
 	}
+
 	@Override
 	public int getNumNames() {
 		return names.length;
 	}
+
 	@Override
 	public int getNumHeaders() {
-	  return 3;
+		return 3;
 	}
 
 	@Override
-	public int getIndex(String name) {
-	  if (name.equals("Bob")) {
-		return 0;
-	  }
-	  return 1;
+	public int getIndex(final String name) {
+		if (name.equals("Bob")) {
+			return 0;
+		}
+		return 1;
 	}
 
 	@Override
-	public int getHeaderIndex(String id) {
+	public int getHeaderIndex(final String id) {
 		for (int i = 0; i < getNumHeaders(); i++) {
 			if ((getHeader(i)[0]).equals(id)) {
 				return i;
@@ -88,25 +91,40 @@ public String[] getHeader(int i) {
 		}
 		return -1;
 	}
+
 	/**
 	 * noop, since this object is static.
 	 */
 	@Override
-	public void addObserver(Observer o) {}		
-	@Override
-	public void deleteObserver(Observer o) {}
-	@Override
-	public boolean addName(String name, int location) {return false;}
-	@Override
-	public boolean setHeader(int i, String name, String value) {return false;}
-	@Override
-	public boolean getModified() {return false;}
-	@Override
-	public void setModified(boolean mod) {}
+	public void addObserver(final Observer o) {
+	}
 
 	@Override
-	public String getHeader(int rowIndex, int columnIndex) {
-		  return (getHeader(rowIndex))[columnIndex];
+	public void deleteObserver(final Observer o) {
+	}
+
+	@Override
+	public boolean addName(final String name, final int location) {
+		return false;
+	}
+
+	@Override
+	public boolean setHeader(final int i, final String name, final String value) {
+		return false;
+	}
+
+	@Override
+	public boolean getModified() {
+		return false;
+	}
+
+	@Override
+	public void setModified(final boolean mod) {
+	}
+
+	@Override
+	public String getHeader(final int rowIndex, final int columnIndex) {
+		return (getHeader(rowIndex))[columnIndex];
 	}
 
 	@Override
@@ -115,7 +133,4 @@ public String[] getHeader(int i) {
 		return null;
 	}
 
-	  
 }
-
-

@@ -22,71 +22,78 @@
  */
 package edu.stanford.genetics.treeview;
 
-import java.io.*;
+import java.io.File;
 
 /**
- *  Encapsulates a set of files corresponding to a typical hierarchical cluster
- *  analysis. Such things are always based upon a cdt or pcl file.
+ * Encapsulates a set of files corresponding to a typical hierarchical cluster
+ * analysis. Such things are always based upon a cdt or pcl file.
  * <p>
- *  The following attributes are meaningful to the FileSet: 
+ * The following attributes are meaningful to the FileSet:
  * <ul>
- * <li>dir: The directory of the fileset </li>
- * <li> root: The root of the fileset </li> 
- * <li> cdt: The extension for the generalized cdt file </li>
-  * <li> atr: The extension for the atr </li>
-  * <li> jtv: The extension for the jtv </li>
+ * <li>dir: The directory of the fileset</li>
+ * <li>root: The root of the fileset</li>
+ * <li>cdt: The extension for the generalized cdt file</li>
+ * <li>atr: The extension for the atr</li>
+ * <li>jtv: The extension for the jtv</li>
  * </ul>
- *
- * @author     Alok Saldanha <alok@genome.stanford.edu>
+ * 
+ * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.15 $ $Date: 2008-06-11 01:58:57 $
-
- * Note: Should be flexible enough to have a url base instead of dir (1/16/2003)
+ * 
+ *          Note: Should be flexible enough to have a url base instead of dir
+ *          (1/16/2003)
  */
 
-public class CDTFileSet extends FileSet{
-	private ConfigNode node  = null;
+public class CDTFileSet extends FileSet {
+	private ConfigNode node = null;
 
-
+	@Override
 	public boolean hasMoved() {
-		if (isUrl()) return false;
+		if (isUrl())
+			return false;
 		try {
-			File f = new File(getCdt());
+			final File f = new File(getCdt());
 			return !(f.exists());
-		} catch (Exception e) {
+		} catch (final Exception e) {
 		}
 		return true;
 	}
-	
+
 	/**
-	 *  Constructor for the FileSet object
-	 *
-	 * @param  configNode  ConfigNode to base this fileset on.
+	 * Constructor for the FileSet object
+	 * 
+	 * @param configNode
+	 *            ConfigNode to base this fileset on.
 	 */
-	public CDTFileSet(ConfigNode configNode) {
-		
+	public CDTFileSet(final ConfigNode configNode) {
+
 		super(configNode);
 		node = configNode;
 	}
 
 	/**
-	 *  Make fileset based upon unrooted DummyConfigNode with the specified values
-	 *
-	 * @param  string1  name of cdt which this fileset is based on
-	 * @param  string2  directory to find file in.
+	 * Make fileset based upon unrooted DummyConfigNode with the specified
+	 * values
+	 * 
+	 * @param string1
+	 *            name of cdt which this fileset is based on
+	 * @param string2
+	 *            directory to find file in.
 	 */
-	public CDTFileSet(String cdt, String dir) {
-		
+	public CDTFileSet(final String cdt, final String dir) {
+
 		super(dir);
 		node = new DummyConfigNode("FileSet");
 		setCdt(cdt);
 	}
 
 	/**
-	 *  Copies state from another fileset
-	 *
-	 * @param  fileSet  FileSet to copy state from
+	 * Copies state from another fileset
+	 * 
+	 * @param fileSet
+	 *            FileSet to copy state from
 	 */
-	public void copyState(CDTFileSet fileSet) {
+	public void copyState(final CDTFileSet fileSet) {
 		setRoot(fileSet.getRoot());
 		setDir(fileSet.getDir());
 		setExt(fileSet.getExt());
@@ -95,44 +102,49 @@ public class CDTFileSet extends FileSet{
 	}
 
 	/**
-	 * @return    String representation of fileset
+	 * @return String representation of fileset
 	 */
+	@Override
 	public String toString() {
 		return getCdt();
 	}
 
 	/**
-	 *  Determines equality by looking at the cdt base alone.
-	 *
-	 * @param  fileSet  FileSet to compare to
-	 * @return          true if equal
+	 * Determines equality by looking at the cdt base alone.
+	 * 
+	 * @param fileSet
+	 *            FileSet to compare to
+	 * @return true if equal
 	 */
-	public boolean equals(CDTFileSet fileSet) {
+	public boolean equals(final CDTFileSet fileSet) {
 		return getCdt().equals(fileSet.getCdt());
 	}
 
 	/**
-	 * @return    The complete path of the cdt file
+	 * @return The complete path of the cdt file
 	 */
+	@Override
 	public String getCdt() {
 		return getDir() + getRoot() + getExt();
 	}
 
 	/**
-	 * @return    The extension associated with the base of the fileset 
-	 * (i.e. "cdt" for one based on "test.cdt", 
-	 * "pcl" for one based on "test.pcl"
+	 * @return The extension associated with the base of the fileset (i.e. "cdt"
+	 *         for one based on "test.cdt", "pcl" for one based on "test.pcl"
 	 */
+	@Override
 	public String getExt() {
 		return node.getAttribute("cdt", ".cdt");
 	}
 
 	/**
-	 *  Sets the base of the FileSet object. Parses out extension, root
-	 *
-	 * @param  string1  Name of base of the FileSet
+	 * Sets the base of the FileSet object. Parses out extension, root
+	 * 
+	 * @param string1
+	 *            Name of base of the FileSet
 	 */
-	public void setCdt(String string1) {
+	@Override
+	public void setCdt(final String string1) {
 		if (string1 != null) {
 			setRoot(string1.substring(0, string1.length() - 4));
 			setExt(string1.substring(string1.length() - 4, string1.length()));
@@ -140,20 +152,20 @@ public class CDTFileSet extends FileSet{
 	}
 
 	/**
-	 *  Sets the extension associated with the base of the fileset.
-	 *
-	 * @param  string  The new ext value
+	 * Sets the extension associated with the base of the fileset.
+	 * 
+	 * @param string
+	 *            The new ext value
 	 */
-	public void setExt(String string) {
+	@Override
+	public void setExt(final String string) {
 		node.setAttribute("cdt", string, ".cdt");
 	}
- 
- // the following concerns types which you can open as...
- 	public static final int AUTO_STYLE    = 0;
- 	public static final int CLASSIC_STYLE = 1;
- 	public static final int KMEANS_STYLE  = 2;
- 	public static final int LINKED_STYLE  = 3;
 
-	
+	// the following concerns types which you can open as...
+	public static final int AUTO_STYLE = 0;
+	public static final int CLASSIC_STYLE = 1;
+	public static final int KMEANS_STYLE = 2;
+	public static final int LINKED_STYLE = 3;
+
 }
-

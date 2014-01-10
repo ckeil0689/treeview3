@@ -22,20 +22,24 @@
  */
 package edu.stanford.genetics.treeview.plugin.karyoview;
 
-import edu.stanford.genetics.treeview.*;
+import edu.stanford.genetics.treeview.ConfigColorSet;
+import edu.stanford.genetics.treeview.ConfigNode;
+import edu.stanford.genetics.treeview.XmlConfig;
 
 /**
-* color set for karyoscope view
-*/
+ * color set for karyoscope view
+ */
 class KaryoColorSet extends ConfigColorSet {
-	private static final String [] types = new String [] {"Up", "Down", "Highlight", "Genome", "Background", "Line"};
+	private static final String[] types = new String[] { "Up", "Down",
+			"Highlight", "Genome", "Background", "Line" };
 
-	private static final String [] defaults = new String [] {"#FF0000","#00FF00","#FFFF00", "#FFFFFF", "#000000", "#A0A0A0"};
+	private static final String[] defaults = new String[] { "#FF0000",
+			"#00FF00", "#FFFF00", "#FFFFFF", "#000000", "#A0A0A0" };
 	private static final String defaultName = "KaryoColorSet";
-	
-	KaryoColorSet(String name, 
-	String up, String down, String high, 
-	String genome, String back, String line) {
+
+	KaryoColorSet(final String name, final String up, final String down,
+			final String high, final String genome, final String back,
+			final String line) {
 		this(name);
 		setColor(0, decodeColor(up));
 		setColor(1, decodeColor(down));
@@ -44,27 +48,29 @@ class KaryoColorSet extends ConfigColorSet {
 		setColor(4, decodeColor(back));
 		setColor(5, decodeColor(line));
 	}
+
 	KaryoColorSet() {
 		this("KaryoColorSet");
 	}
-	KaryoColorSet(String name) {
+
+	KaryoColorSet(final String name) {
 		super(defaultName, types, defaults);
 		setName(name);
 	}
-	
-	public void save(String file) {
-		XmlConfig config = new XmlConfig(file, "KaryoColorSet");
-		ConfigNode newNode = config.getNode("ConfigColorSet");
-		KaryoColorSet tempSet = new KaryoColorSet();
+
+	public void save(final String file) {
+		final XmlConfig config = new XmlConfig(file, "KaryoColorSet");
+		final ConfigNode newNode = config.getNode("ConfigColorSet");
+		final KaryoColorSet tempSet = new KaryoColorSet();
 		tempSet.bindConfig(newNode);
 		tempSet.copyStateFrom(this);
 		config.store();
 	}
-	
-	public void load(String file) {
-		XmlConfig config = new XmlConfig(file, "KaryoColorSet");
-		ConfigNode newNode = config.getNode("ConfigColorSet");
-		KaryoColorSet tempSet = new KaryoColorSet();
+
+	public void load(final String file) {
+		final XmlConfig config = new XmlConfig(file, "KaryoColorSet");
+		final ConfigNode newNode = config.getNode("ConfigColorSet");
+		final KaryoColorSet tempSet = new KaryoColorSet();
 		tempSet.bindConfig(newNode);
 		copyStateFrom(tempSet);
 	}

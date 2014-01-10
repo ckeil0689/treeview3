@@ -21,203 +21,218 @@
  * END_HEADER 
  */
 package edu.stanford.genetics.treeview.model;
+
 import java.util.Vector;
 
-import edu.stanford.genetics.treeview.*;
+import edu.stanford.genetics.treeview.DataModel;
+import edu.stanford.genetics.treeview.FileSet;
+import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.LoadException;
 
 public class KnnModel extends TVModel implements DataModel {
 	/**
-	 * This not-so-object-oriented hack is in those rare instances
-	 * where it is not enough to know that we've got a DataModel.
+	 * This not-so-object-oriented hack is in those rare instances where it is
+	 * not enough to know that we've got a DataModel.
 	 */
 	@Override
 	public String getType() {
 		return "KnnModel";
 	}
-	
+
 	// accessor methods
 	public int getNumArrayClusters() {
 		return aClusterMembers.length;
 	}
+
 	public int getNumGeneClusters() {
 		return gClusterMembers.length;
 	}
-	
-	public int [] getArrayClusters() {
-		if (aClusterMembers==null) return null;
-		int n = aClusterMembers.length;
-		int[] clusters = new int[n];
+
+	public int[] getArrayClusters() {
+		if (aClusterMembers == null)
+			return null;
+		final int n = aClusterMembers.length;
+		final int[] clusters = new int[n];
 		for (int i = 0; i < n; i++)
 			clusters[i] = aClusterMembers[i].length;
 		return clusters;
 	};
-	public int [] getGeneClusters() {
-		if (gClusterMembers==null) return null;
-		int n = gClusterMembers.length;
-		int[] clusters = new int[n];
+
+	public int[] getGeneClusters() {
+		if (gClusterMembers == null)
+			return null;
+		final int n = gClusterMembers.length;
+		final int[] clusters = new int[n];
 		for (int i = 0; i < n; i++)
 			clusters[i] = gClusterMembers[i].length;
 		return clusters;
 	};
-	
+
 	public KnnModel() {
 		super();
-		/* build KnnModel, initially empty... */	
+		/* build KnnModel, initially empty... */
 	}
-	
+
 	/**
-	 *
-	 *
-	 * @param fileSet fileset to load
-	 *
+	 * 
+	 * 
+	 * @param fileSet
+	 *            fileset to load
+	 * 
 	 */
 	@Override
-	public void loadNew(FileSet fileSet) 
-	throws LoadException {
+	public void loadNew(final FileSet fileSet) throws LoadException {
 		resetState();
 		setSource(fileSet);
 		final KnnModelLoader loader = new KnnModelLoader(this);
-		loader.loadInto(); 
+		loader.loadInto();
 	}
-	
+
 	/**
 	 * Don't open a loading window...
 	 */
 	@Override
-	public void loadNewNW(FileSet fileSet) throws LoadException {
+	public void loadNewNW(final FileSet fileSet) throws LoadException {
 		resetState();
 		setSource(fileSet);
 		final KnnModelLoader loader = new KnnModelLoader(this);
-		loader.loadIntoNW(); 
+		loader.loadIntoNW();
 	}
-	
+
 	@Override
 	public String[] toStrings() {
-		String[] msg = {"Selected KnnModel Stats",
-				"Source = " + source.getCdt(),
-				"Nexpr   = " + nExpr(),
+		final String[] msg = { "Selected KnnModel Stats",
+				"Source = " + source.getCdt(), "Nexpr   = " + nExpr(),
 				"NGeneHeader = " + getGeneHeaderInfo().getNumNames(),
-				"Ngene   = " + nGene(),
-				"eweight  = " + eweightFound,
-				"gweight  = " + gweightFound,
-				"aid  = " + aidFound,
-				"gid  = " + gidFound
-				};
-		
+				"Ngene   = " + nGene(), "eweight  = " + eweightFound,
+				"gweight  = " + gweightFound, "aid  = " + aidFound,
+				"gid  = " + gidFound };
+
 		/*
-		 Enumeration e = genePrefix.elements();
-		 msg += "GPREFIX: " + e.nextElement();
-		 for (; e.hasMoreElements() ;) {
-		 msg += " " + e.nextElement();
-		 }
-		 
-		 e = aHeaders.elements();
-		 msg += "\naHeaders: " + e.nextElement();
-		 for (; e.hasMoreElements() ;) {
-		 msg += ":" + e.nextElement();
-		 }
+		 * Enumeration e = genePrefix.elements(); msg += "GPREFIX: " +
+		 * e.nextElement(); for (; e.hasMoreElements() ;) { msg += " " +
+		 * e.nextElement(); }
+		 * 
+		 * e = aHeaders.elements(); msg += "\naHeaders: " + e.nextElement(); for
+		 * (; e.hasMoreElements() ;) { msg += ":" + e.nextElement(); }
 		 */
-		
+
 		return msg;
 	}
+
 	static final int gap = 1;
+
 	/**
 	 * This method adds a GROUP column to the CDT
 	 * 
-	 * @param tempTable - RectData object with two columns, the first of gene names and the second of group membership
-	 * @param ptype the parse type for error reporting.
+	 * @param tempTable
+	 *            - RectData object with two columns, the first of gene names
+	 *            and the second of group membership
+	 * @param ptype
+	 *            the parse type for error reporting.
 	 */
-	public void setGClusters(RectData tempTable, int ptype) {
-		HeaderInfo geneHeader = getGeneHeaderInfo();
-		boolean result = checkCorrespondence(tempTable, geneHeader, ptype);
+	public void setGClusters(final RectData tempTable, final int ptype) {
+		final HeaderInfo geneHeader = getGeneHeaderInfo();
+		final boolean result = checkCorrespondence(tempTable, geneHeader, ptype);
 		if (result) {
-			geneHeader.addName("GROUP", geneHeader.getNumNames()-1);
+			geneHeader.addName("GROUP", geneHeader.getNumNames() - 1);
 			for (int row = 0; row < geneHeader.getNumHeaders(); row++)
 				geneHeader.setHeader(row, "GROUP", tempTable.getString(row, 1));
 		}
 	}
-	public void setAClusters(RectData tempTable, int kagparse) {
-		HeaderInfo arrayHeader = getArrayHeaderInfo();
-		boolean result = checkCorrespondence(tempTable, arrayHeader, kagparse);
+
+	public void setAClusters(final RectData tempTable, final int kagparse) {
+		final HeaderInfo arrayHeader = getArrayHeaderInfo();
+		final boolean result = checkCorrespondence(tempTable, arrayHeader,
+				kagparse);
 		if (result) {
-			arrayHeader.addName("GROUP", arrayHeader.getNumNames()-1);
+			arrayHeader.addName("GROUP", arrayHeader.getNumNames() - 1);
 			for (int row = 0; row < arrayHeader.getNumHeaders(); row++)
-				arrayHeader.setHeader(row, "GROUP", tempTable.getString(row, 1));
+				arrayHeader
+						.setHeader(row, "GROUP", tempTable.getString(row, 1));
 		}
 	}
+
 	public void parseClusters() throws LoadException {
-		gClusterMembers =calculateMembership
-		(getGeneHeaderInfo(), "GROUP");
-		aClusterMembers =calculateMembership
-		(getArrayHeaderInfo(), "GROUP");
+		gClusterMembers = calculateMembership(getGeneHeaderInfo(), "GROUP");
+		aClusterMembers = calculateMembership(getArrayHeaderInfo(), "GROUP");
 	}
-	public int [][] calculateMembership(HeaderInfo headerInfo, String column) {
-		int groupIndex = headerInfo.getIndex(column);
-		if (groupIndex < 0) return null;
-		int [] counts = getCountVector(headerInfo, groupIndex);
-		int [][]members = new int [counts.length][]; 
-		for (int i = 0 ; i < counts.length; i++) {
+
+	public int[][] calculateMembership(final HeaderInfo headerInfo,
+			final String column) {
+		final int groupIndex = headerInfo.getIndex(column);
+		if (groupIndex < 0)
+			return null;
+		final int[] counts = getCountVector(headerInfo, groupIndex);
+		final int[][] members = new int[counts.length][];
+		for (int i = 0; i < counts.length; i++) {
 			members[i] = new int[counts[i]];
 		}
 		populateMembers(members, headerInfo, groupIndex);
 		return members;
 	}
-	private void populateMembers(int[][] members, HeaderInfo headerInfo, int index) {
-		int [] counts = new int[members.length];
+
+	private void populateMembers(final int[][] members,
+			final HeaderInfo headerInfo, final int index) {
+		final int[] counts = new int[members.length];
 		for (int i = 0; i < counts.length; i++)
 			counts[i] = 0;
 		for (int i = 0; i < headerInfo.getNumHeaders(); i++) {
-			Integer group = new Integer(headerInfo.getHeader(i,index));
-			int g = group.intValue();
+			final Integer group = new Integer(headerInfo.getHeader(i, index));
+			final int g = group.intValue();
 			members[g][counts[g]] = i;
 			counts[g]++;
 		}
 	}
 
 	/**
-	 * For a column of ints, returns the number of occurrences of 
-	 * each int in the column.
+	 * For a column of ints, returns the number of occurrences of each int in
+	 * the column.
 	 * 
 	 * @param headerInfo
 	 * @param columnIndex
 	 * @return
 	 */
-	private int [] getCountVector(HeaderInfo headerInfo, int columnIndex) {
-		Vector<Integer> counts = new Vector<Integer>();
+	private int[] getCountVector(final HeaderInfo headerInfo,
+			final int columnIndex) {
+		final Vector<Integer> counts = new Vector<Integer>();
 		for (int i = 0; i < headerInfo.getNumHeaders(); i++) {
-			Integer group = new Integer(headerInfo.getHeader(i,columnIndex));
-			Integer current = counts.elementAt(group.intValue());
+			final Integer group = new Integer(headerInfo.getHeader(i,
+					columnIndex));
+			final Integer current = counts.elementAt(group.intValue());
 			Integer insertElement = new Integer(1);
 			if (current != null)
 				insertElement = new Integer(current.intValue() + 1);
 			counts.insertElementAt(insertElement, group.intValue());
 		}
-		int [] cv = new int [counts.size()];
-		for (int i =0; i < cv.length; i++) {
+		final int[] cv = new int[counts.size()];
+		for (int i = 0; i < cv.length; i++) {
 			cv[i] = counts.elementAt(i).intValue();
 		}
 		return cv;
 	}
+
 	/**
 	 * check to see that the order of names in the first column of the temptable
 	 * matches the headerinfo.
+	 * 
 	 * @param tempTable
 	 * @param headerInfo
 	 * @param ptype
 	 * @return true if it matches
 	 */
-	private boolean checkCorrespondence(RectData tempTable, HeaderInfo headerInfo, int ptype) {
+	private boolean checkCorrespondence(final RectData tempTable,
+			final HeaderInfo headerInfo, final int ptype) {
 		return true;
 	}
 
 	/**
 	 * holds membership of the gene clusters
 	 */
-	private int [] gClusterMembers[];
+	private int[] gClusterMembers[];
 	/**
 	 * holds membership of the array clusters
 	 */
-	private int [] aClusterMembers[];
-	
-}
+	private int[] aClusterMembers[];
 
+}

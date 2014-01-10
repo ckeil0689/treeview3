@@ -18,33 +18,37 @@ import edu.stanford.genetics.treeview.LogBuffer;
 public class LogSettingsPanel extends JPanel implements Observer {
 
 	private static final long serialVersionUID = 1L;
-	
-	private LogBuffer logBuffer;
-	private JCheckBox logBox = new JCheckBox("Log Messages");
-	public LogSettingsPanel(LogBuffer buffer) {
+
+	private final LogBuffer logBuffer;
+	private final JCheckBox logBox = new JCheckBox("Log Messages");
+
+	public LogSettingsPanel(final LogBuffer buffer) {
 		super();
 		add(logBox);
 		logBuffer = buffer;
 		logBuffer.addObserver(this);
 		logBox.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				synchronizeTo();
 			}
 
 		});
-		
-		synchronizeFrom();	
+
+		synchronizeFrom();
 	}
+
 	private void synchronizeFrom() {
 		if (logBox.isSelected() != logBuffer.getLog())
 			logBox.setSelected(logBuffer.getLog());
 	}
+
 	private void synchronizeTo() {
 		logBuffer.setLog(logBox.isSelected());
 	}
+
 	@Override
-	public void update(Observable arg0, Object arg1) {
+	public void update(final Observable arg0, final Object arg1) {
 		if (arg1 == null)
 			synchronizeFrom();
 	}

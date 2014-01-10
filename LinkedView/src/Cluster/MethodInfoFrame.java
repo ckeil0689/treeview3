@@ -61,292 +61,297 @@ import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.core.ScrollablePanel;
+
 /**
- * This frame is a GUI which contains explanation of cluster methods along
- * with useful information to help people understand the advantages and
- * disadvantages of various clustering methods.
+ * This frame is a GUI which contains explanation of cluster methods along with
+ * useful information to help people understand the advantages and disadvantages
+ * of various clustering methods.
  * 
  * @author CKeil
- *
+ * 
  */
 public class MethodInfoFrame extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	
-	//Frame and Model instance variables declared
+
+	// Frame and Model instance variables declared
 	protected TreeViewFrame viewFrame;
-	
-	//Various GUI Panels
-	private JScrollPane scrollPane;
-	private ScrollablePanel mainPanel;
-	private JPanel optionsPanel;
-	private JPanel displayPanel;
-	private JLabel head1; 
-	private JLabel head2;
-	private JLabel head3;
-	private JLabel head4;
-	private JLabel titleLine;
-	private TextDisplay description;
-	private JButton close_button;
-	
-	private SingleInfoPanel singleInfo = new SingleInfoPanel();
-	private CompleteInfoPanel completeInfo = new CompleteInfoPanel();
-	private AverageInfoPanel averageInfo = new AverageInfoPanel();
-	private CentroidInfoPanel centroidInfo = new CentroidInfoPanel();
-	
-	private String singleClosed = "Single Linkage";
-	private String completeClosed = "Complete Linkage";
-	private String averageClosed = "Average Linkage";
-	private String centroidClosed = "Centroid Linkage";
-	
-	//Constructor
-	protected MethodInfoFrame(TreeViewFrame f, String title) { 
-	  
-		//Inherit constructor from JFrame, title passed from ClusterFrameWindow  
+
+	// Various GUI Panels
+	private final JScrollPane scrollPane;
+	private final ScrollablePanel mainPanel;
+	private final JPanel optionsPanel;
+	private final JPanel displayPanel;
+	private final JLabel head1;
+	private final JLabel head2;
+	private final JLabel head3;
+	private final JLabel head4;
+	private final JLabel titleLine;
+	private final TextDisplay description;
+	private final JButton close_button;
+
+	private final SingleInfoPanel singleInfo = new SingleInfoPanel();
+	private final CompleteInfoPanel completeInfo = new CompleteInfoPanel();
+	private final AverageInfoPanel averageInfo = new AverageInfoPanel();
+	private final CentroidInfoPanel centroidInfo = new CentroidInfoPanel();
+
+	private final String singleClosed = "Single Linkage";
+	private final String completeClosed = "Complete Linkage";
+	private final String averageClosed = "Average Linkage";
+	private final String centroidClosed = "Centroid Linkage";
+
+	// Constructor
+	protected MethodInfoFrame(final TreeViewFrame f, final String title) {
+
+		// Inherit constructor from JFrame, title passed from ClusterFrameWindow
 		super(title);
-		
-		//Initialize instance variables
+
+		// Initialize instance variables
 		this.viewFrame = f;
-		
-		//Setting preferred size for the mainPanel
-		Toolkit toolkit = Toolkit.getDefaultToolkit();
-		Dimension mainDim = toolkit.getScreenSize();
-		Rectangle rectangle = new Rectangle(mainDim);
-		mainDim.setSize(rectangle.height, rectangle.height * 3/4);
-		
-		//setup frame options
+
+		// Setting preferred size for the mainPanel
+		final Toolkit toolkit = Toolkit.getDefaultToolkit();
+		final Dimension mainDim = toolkit.getScreenSize();
+		final Rectangle rectangle = new Rectangle(mainDim);
+		mainDim.setSize(rectangle.height, rectangle.height * 3 / 4);
+
+		// setup frame options
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setResizable(false);
-		
-		//Makes the frame invisible when the window is closed
-		this.addWindowListener(new WindowAdapter () {
-			
+
+		// Makes the frame invisible when the window is closed
+		this.addWindowListener(new WindowAdapter() {
+
 			@Override
-			public void windowClosing(WindowEvent we) {
-			    
+			public void windowClosing(final WindowEvent we) {
+
 				MethodInfoFrame.this.dispose();
 			}
 		});
-		
-		//Set layout for initial window
+
+		// Set layout for initial window
 		mainPanel = new ScrollablePanel();
 		mainPanel.setLayout(new MigLayout());
 		mainPanel.setBackground(GUIParams.BG_COLOR);
 		mainPanel.setPreferredSize(mainDim);
-		
+
 		titleLine = new JLabel("Cluster Methods Information");
 		titleLine.setFont(new Font("Sans Serif", Font.BOLD, 35));
 		titleLine.setForeground(GUIParams.TEXT);
-		
-		description = new TextDisplay("Choose a method to find out more " +
-				"about it. All described methods are agglomerative " +
-				"hierarchical clustering, meaning each data point starts as " +
-				"its own cluster. These methods make it possible to generate " +
-				"dendrograms which depict the sequence of cluster fusion.");
+
+		description = new TextDisplay(
+				"Choose a method to find out more "
+						+ "about it. All described methods are agglomerative "
+						+ "hierarchical clustering, meaning each data point starts as "
+						+ "its own cluster. These methods make it possible to generate "
+						+ "dendrograms which depict the sequence of cluster fusion.");
 		description.setFont(new Font("Sans Serif", Font.PLAIN, 22));
 		description.setForeground(GUIParams.TEXT);
-		
+
 		optionsPanel = new JPanel();
 		optionsPanel.setLayout(new MigLayout());
 		optionsPanel.setOpaque(false);
-		
+
 		displayPanel = new ScrollablePanel();
 		displayPanel.setLayout(new MigLayout());
 		displayPanel.setOpaque(false);
-		displayPanel.setBorder(
-				BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+		displayPanel.setBorder(BorderFactory
+				.createEtchedBorder(EtchedBorder.LOWERED));
 		displayPanel.add(singleInfo, "push, grow");
-		
+
 		close_button = new JButton("Close");
 		close_button.setOpaque(true);
 		close_button.setBackground(GUIParams.RED1);
 		close_button.setForeground(Color.white);
-		Dimension d = close_button.getPreferredSize();
-		d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
+		final Dimension d = close_button.getPreferredSize();
+		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
 		close_button.setFont(new Font("Sans Serif", Font.PLAIN, 18));
-		close_button.addActionListener(new ActionListener(){
+		close_button.addActionListener(new ActionListener() {
 
 			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				
+			public void actionPerformed(final ActionEvent arg0) {
+
 				MethodInfoFrame.this.dispose();
 			}
 		});
-		
+
 		head1 = setupHeadLabel(singleClosed);
 		head2 = setupHeadLabel(completeClosed);
 		head3 = setupHeadLabel(averageClosed);
 		head4 = setupHeadLabel(centroidClosed);
-		
+
 		addMListener(head1, singleInfo);
 		addMListener(head2, completeInfo);
 		addMListener(head3, averageInfo);
 		addMListener(head4, centroidInfo);
-	
+
 		optionsPanel.add(head1, "pushx, growx, span, wrap");
 		optionsPanel.add(head2, "pushx, growx, span, wrap");
 		optionsPanel.add(head3, "pushx, growx, span, wrap");
 		optionsPanel.add(head4, "pushx, growx, span, wrap");
 		optionsPanel.add(close_button, "pushx, span, wrap");
-		
+
 		mainPanel.add(titleLine, "pushx, growx, span, wrap");
 		mainPanel.add(description, "pushx, growx, span, wrap");
 		mainPanel.add(optionsPanel, "aligny 0%, width 20%");
 		mainPanel.add(displayPanel, "width 80%, pushx, grow");
-		
-		//make scrollable by adding it to scrollpane
-		scrollPane = new JScrollPane(mainPanel, 
-				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, 
+
+		// make scrollable by adding it to scrollpane
+		scrollPane = new JScrollPane(mainPanel,
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		
-		//Add the mainPanel to the ContentPane
+
+		// Add the mainPanel to the ContentPane
 		getContentPane().add(scrollPane);
-		
-		//packs items so that the frame fits them
+
+		// packs items so that the frame fits them
 		pack();
-		
-		//Center JFrame on screen, needs to be used after pack();
+
+		// Center JFrame on screen, needs to be used after pack();
 		setLocationRelativeTo(null);
-    }
+	}
 
-	//Information panels to be shown when labels are clicked
+	// Information panels to be shown when labels are clicked
 	/**
-	 * This subclass makes up a JPanel which displays the information
-	 * relevant for the Single Linkage Clustering method.
+	 * This subclass makes up a JPanel which displays the information relevant
+	 * for the Single Linkage Clustering method.
+	 * 
 	 * @author CKeil
-	 *
+	 * 
 	 */
-	class SingleInfoPanel extends JPanel {	
-		
+	class SingleInfoPanel extends JPanel {
+
 		private static final long serialVersionUID = 1L;
-		
-		private String fileName = "Slink.png";
-		private String desContent = "At every step a link is made between " +
-				"the two clusters separated by the shortest distance. " +
-				"The distances between clusters are defined by the two " +
-				"elements closest to each other. Thus, a new larger cluster " +
-				"is formed.";
-		private String adv = "Add advantages....";
-		private String dis = "The 'chaining phenomenon', resulting from " +
-				"gradual addition of the closest element, sometimes forces " +
-				"two clusters together due to single elements being close " +
-				"while many other elements in the clusters may be very " +
-				"distant. This may cause the resulting clusters to be " +
-				"extremely heterogeneous. It may become difficult to define " +
-				"useful subdivisions of the data.";
-		    
+
+		private final String fileName = "Slink.png";
+		private final String desContent = "At every step a link is made between "
+				+ "the two clusters separated by the shortest distance. "
+				+ "The distances between clusters are defined by the two "
+				+ "elements closest to each other. Thus, a new larger cluster "
+				+ "is formed.";
+		private final String adv = "Add advantages....";
+		private final String dis = "The 'chaining phenomenon', resulting from "
+				+ "gradual addition of the closest element, sometimes forces "
+				+ "two clusters together due to single elements being close "
+				+ "while many other elements in the clusters may be very "
+				+ "distant. This may cause the resulting clusters to be "
+				+ "extremely heterogeneous. It may become difficult to define "
+				+ "useful subdivisions of the data.";
+
 		public SingleInfoPanel() {
-			
+
 			setupClassContent(this, fileName, desContent, adv, dis);
 		}
 	}
 
 	/**
-	 * This subclass makes up a JPanel which displays the information
-	 * relevant for the Complete Linkage Clustering method.
+	 * This subclass makes up a JPanel which displays the information relevant
+	 * for the Complete Linkage Clustering method.
+	 * 
 	 * @author CKeil
-	 *
+	 * 
 	 */
-	class CompleteInfoPanel extends JPanel {	
+	class CompleteInfoPanel extends JPanel {
 
 		private static final long serialVersionUID = 1L;
-		
-		private String fileName = "Slink.png";
-		private String desContent = "At every step a link is made between " +
-				"the two clusters separated by the shortest distance. " +
-				"The distances between clusters are defined by the two " +
-				"elements furthest away from each other. Thus, a new larger " +
-				"cluster is formed."; 
-		private String adv = "Avoids chaining phenomenon from the single " +
-				"linkage method. Tends to find compact clusters with " +
-				"approximately equal diameters.";
-		private String dis = "";
-		
+
+		private final String fileName = "Slink.png";
+		private final String desContent = "At every step a link is made between "
+				+ "the two clusters separated by the shortest distance. "
+				+ "The distances between clusters are defined by the two "
+				+ "elements furthest away from each other. Thus, a new larger "
+				+ "cluster is formed.";
+		private final String adv = "Avoids chaining phenomenon from the single "
+				+ "linkage method. Tends to find compact clusters with "
+				+ "approximately equal diameters.";
+		private final String dis = "";
+
 		public CompleteInfoPanel() {
-			
-			setupClassContent(this, fileName, desContent, adv, dis);	
+
+			setupClassContent(this, fileName, desContent, adv, dis);
 		}
 	}
-	
+
 	/**
-	 * This subclass makes up a JPanel which displays the information
-	 * relevant for the average Linkage Clustering method.
+	 * This subclass makes up a JPanel which displays the information relevant
+	 * for the average Linkage Clustering method.
+	 * 
 	 * @author CKeil
-	 *
+	 * 
 	 */
-	class AverageInfoPanel extends JPanel {	
+	class AverageInfoPanel extends JPanel {
 
 		private static final long serialVersionUID = 1L;
-		
-		private String fileName = "Slink.png";
-		private String desContent = "At every step a link is made between " +
-				"the two elements (one per cluster) which are closest " +
-				"to each other. The distance between two clusters is defined " +
-				"as the mean distance between their elements." +
-				"When two clusters are combined, a new larger cluster " +
-				"is formed.";
-		private String adv = "";
-		private String dis = "";
-		
+
+		private final String fileName = "Slink.png";
+		private final String desContent = "At every step a link is made between "
+				+ "the two elements (one per cluster) which are closest "
+				+ "to each other. The distance between two clusters is defined "
+				+ "as the mean distance between their elements."
+				+ "When two clusters are combined, a new larger cluster "
+				+ "is formed.";
+		private final String adv = "";
+		private final String dis = "";
+
 		public AverageInfoPanel() {
-			
+
 			setupClassContent(this, fileName, desContent, adv, dis);
 		}
 	}
-	
+
 	/**
-	 * This subclass makes up a JPanel which displays the information
-	 * relevant for the Centroid Linkage Clustering method.
+	 * This subclass makes up a JPanel which displays the information relevant
+	 * for the Centroid Linkage Clustering method.
+	 * 
 	 * @author CKeil
-	 *
+	 * 
 	 */
-	class CentroidInfoPanel extends JPanel {	
+	class CentroidInfoPanel extends JPanel {
 
 		private static final long serialVersionUID = 1L;
-		
-		private String fileName = "Slink.png";
-		private String desContent = "";
-		private String adv = "";
-		private String dis = "";
-		
+
+		private final String fileName = "Slink.png";
+		private final String desContent = "";
+		private final String adv = "";
+		private final String dis = "";
+
 		public CentroidInfoPanel() {
-			
+
 			setupClassContent(this, fileName, desContent, adv, dis);
 		}
 	}
-	
-	
-	//Methods
-	public TextDisplay setupContentField(String content) {
-		
-		TextDisplay field = new TextDisplay(content);
+
+	// Methods
+	public TextDisplay setupContentField(final String content) {
+
+		final TextDisplay field = new TextDisplay(content);
 		field.setFont(new Font("Sans Serif", Font.PLAIN, 18));
-		
+
 		return field;
 	}
-	
-	public JLabel setupContentLabel(String content) {
-		
-		JLabel head = new JLabel(content);
+
+	public JLabel setupContentLabel(final String content) {
+
+		final JLabel head = new JLabel(content);
 		head.setFont(new Font("Sans Serif", Font.BOLD, 18));
 		head.setForeground(GUIParams.TEXT);
 		head.setOpaque(false);
-		
+
 		return head;
 	}
-	
-	public JLabel setupHeadLabel(String closedText){
-		
-		JLabel head = new JLabel(closedText);
+
+	public JLabel setupHeadLabel(final String closedText) {
+
+		final JLabel head = new JLabel(closedText);
 		head.setFont(new Font("Sans Serif", Font.PLAIN, 28));
 		head.setForeground(GUIParams.ELEMENT);
-		
+
 		return head;
 	}
-	
-	public void setupClassContent(JPanel panel, String fileName,
-			String descContent, String adv, String dis) {
-		
+
+	public void setupClassContent(final JPanel panel, final String fileName,
+			final String descContent, final String adv, final String dis) {
+
 		TextDisplay description;
 		JLabel advantages;
 		TextDisplay advantages2;
@@ -356,81 +361,82 @@ public class MethodInfoFrame extends JFrame {
 		BufferedImage labelImg;
 		ClassLoader classLoader;
 		InputStream input;
-		
+
 		panel.setLayout(new MigLayout());
 		panel.setOpaque(false);
-		
+
 		description = setupContentField(descContent);
-	
+
 		advantages = setupContentLabel("Advantages: ");
-		
+
 		advantages2 = setupContentField(adv);
-		
+
 		disadvantages = setupContentLabel("Disadvantages: ");
-		
+
 		disadvantages2 = setupContentField(dis);
-		
+
 		panel.add(description, "pushx, growx, span, wrap");
 		panel.add(advantages);
 		panel.add(advantages2, "pushx, growx, wrap");
 		panel.add(disadvantages);
 		panel.add(disadvantages2, "pushx, growx, wrap");
-		
+
 		classLoader = Thread.currentThread().getContextClassLoader();
 		input = classLoader.getResourceAsStream(fileName);
-		
+
 		try {
-			
+
 			labelImg = ImageIO.read(input);
 			icon = new JLabel(new ImageIcon(labelImg));
-			
+
 			panel.add(icon, "push, span");
-			
-		} catch (IOException e) {
-			
+
+		} catch (final IOException e) {
+
 		}
 	}
-	
+
 	public void addMListener(final JLabel title, final JPanel infoPanel) {
-		
-		title.addMouseListener(new MouseListener(){
+
+		title.addMouseListener(new MouseListener() {
 
 			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				
+			public void mouseClicked(final MouseEvent arg0) {
+
 				displayPanel.removeAll();
-				
+
 				title.setForeground(GUIParams.RED1);
 				displayPanel.add(infoPanel, "push, grow");
-				
+
 				mainPanel.revalidate();
 				mainPanel.repaint();
-		
+
 			}
 
 			@Override
-			public void mouseEntered(MouseEvent arg0) {
-				
-					title.setForeground(GUIParams.LIGHTGRAY);
-					title.setCursor(new Cursor(Cursor.HAND_CURSOR));
+			public void mouseEntered(final MouseEvent arg0) {
+
+				title.setForeground(GUIParams.LIGHTGRAY);
+				title.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			}
 
 			@Override
-			public void mouseExited(MouseEvent arg0) {
+			public void mouseExited(final MouseEvent arg0) {
 
-					title.setForeground(GUIParams.ELEMENT);
-					title.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+				title.setForeground(GUIParams.ELEMENT);
+				title.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
 
 			@Override
-			public void mousePressed(MouseEvent arg0) {
-				
+			public void mousePressed(final MouseEvent arg0) {
+
 				title.setForeground(Color.LIGHT_GRAY);
 			}
 
 			@Override
-			public void mouseReleased(MouseEvent arg0) {}
-			
+			public void mouseReleased(final MouseEvent arg0) {
+			}
+
 		});
 	}
 }

@@ -22,137 +22,153 @@
  */
 package edu.stanford.genetics.treeview;
 
+import java.awt.BorderLayout;
+import java.awt.Choice;
+import java.awt.Dialog;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Panel;
+import java.awt.TextField;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
-import java.awt.*;
-import java.awt.event.*;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
-import javax.swing.*;
 /**
- * This class extracts Urls from HeaderInfo.
- * Also included is a class to pop up a configuration window.
+ * This class extracts Urls from HeaderInfo. Also included is a class to pop up
+ * a configuration window.
  */
 public class UrlEditor {
-   
-	private UrlExtractor extractor;
-    private UrlPresets presets;
-    private Window window;
-    private HeaderInfo headerInfo;
 
-    /**
-     * This class must be constructed around a HeaderInfo
-     */
-    public UrlEditor(UrlExtractor ue, UrlPresets up, HeaderInfo hI) {
-	 
-    	super();
-    	extractor = ue;
-    	presets = up;
-    	headerInfo = hI;
-    }
-    
-    /**
-     * pops up a configuration dialog.
-     */
-    public void showConfig(Frame f) {
-	
-    	if (window == null) {
-		    Dialog d = new Dialog(f, getTitle(), false);
-		    d.setLayout(new BorderLayout());
-		    d.add(new UrlEditPanel());
-		    d.add(new JLabel(getTitle()), BorderLayout.NORTH);
-		    d.add(new ButtonPanel(), BorderLayout.SOUTH);
-		    d.addWindowListener(new WindowAdapter (){
-		    	
-			    @Override
-				public void windowClosing(WindowEvent we) {
-			    	
-			    	we.getWindow().setVisible(false);}
+	private final UrlExtractor extractor;
+	private final UrlPresets presets;
+	private Window window;
+	private final HeaderInfo headerInfo;
+
+	/**
+	 * This class must be constructed around a HeaderInfo
+	 */
+	public UrlEditor(final UrlExtractor ue, final UrlPresets up,
+			final HeaderInfo hI) {
+
+		super();
+		extractor = ue;
+		presets = up;
+		headerInfo = hI;
+	}
+
+	/**
+	 * pops up a configuration dialog.
+	 */
+	public void showConfig(final Frame f) {
+
+		if (window == null) {
+			final Dialog d = new Dialog(f, getTitle(), false);
+			d.setLayout(new BorderLayout());
+			d.add(new UrlEditPanel());
+			d.add(new JLabel(getTitle()), BorderLayout.NORTH);
+			d.add(new ButtonPanel(), BorderLayout.SOUTH);
+			d.addWindowListener(new WindowAdapter() {
+
+				@Override
+				public void windowClosing(final WindowEvent we) {
+
+					we.getWindow().setVisible(false);
+				}
 			});
-		    d.pack();
-		    window = d;
-    	}
-    	
-    	window.setVisible(true);
-    }
+			d.pack();
+			window = d;
+		}
 
-    public static void main(String [] argv) {
-		
-    	UrlPresets p = new UrlPresets(new DummyConfigNode("UrlPresets"));
-		UrlEditor e  = new UrlEditor(new UrlExtractor(null), 
-					     p,
-					     null);
-		Frame f = new Frame(getTitle());
+		window.setVisible(true);
+	}
+
+	public static void main(final String[] argv) {
+
+		final UrlPresets p = new UrlPresets(new DummyConfigNode("UrlPresets"));
+		final UrlEditor e = new UrlEditor(new UrlExtractor(null), p, null);
+		final Frame f = new Frame(getTitle());
 		e.addToFrame(f);
-	
-		f.addWindowListener(new WindowAdapter () {
-			
+
+		f.addWindowListener(new WindowAdapter() {
+
 			@Override
-			public void windowClosing(WindowEvent we) {
-				
+			public void windowClosing(final WindowEvent we) {
+
 				System.exit(0);
 			}
 		});
-		
+
 		f.pack();
 		f.setVisible(true);
-    }
+	}
 
-    public void addToFrame(Frame f) {
-		
-    	f.setLayout(new BorderLayout());
+	public void addToFrame(final Frame f) {
+
+		f.setLayout(new BorderLayout());
 		f.add(new UrlEditPanel());
-		//	f.add(new Label(getTitle(),Label.CENTER), BorderLayout.NORTH);
+		// f.add(new Label(getTitle(),Label.CENTER), BorderLayout.NORTH);
 		f.add(new ButtonPanel(), BorderLayout.SOUTH);
 		window = f;
-    }
+	}
 
-    private static String getTitle() {
-    	
-    	return "Url Link Editor";
-    }
+	private static String getTitle() {
 
-    //Inner classes
-    private class ButtonPanel extends Panel {
+		return "Url Link Editor";
+	}
+
+	// Inner classes
+	private class ButtonPanel extends Panel {
 
 		private static final long serialVersionUID = 1L;
 
 		public ButtonPanel() {
-		    
-    		JButton close_button = new JButton("Close");
-		    close_button.addActionListener(new ActionListener() {
-			    
-		    	@Override
-				public void actionPerformed(ActionEvent e) {
-				
-		    		window.dispose();
-			    }
+
+			final JButton close_button = new JButton("Close");
+			close_button.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+
+					window.dispose();
+				}
 			});
-		    add(close_button);
-    	}
-    } 
-    
-    private class UrlEditPanel extends Panel {
+			add(close_button);
+		}
+	}
+
+	private class UrlEditPanel extends Panel {
 
 		private static final long serialVersionUID = 1L;
-		
+
 		private GridBagConstraints gbc;
 		private HeaderChoice headerChoice;
 		private TemplateField templateField;
-    	
-    	public UrlEditPanel () {
-			
-    		redoLayout();
+
+		public UrlEditPanel() {
+
+			redoLayout();
 			templateField.setText(extractor.getUrlTemplate());
 			headerChoice.select(extractor.getIndex());
 			updatePreview();
-    	}
-	  
-    	public void redoLayout() {
-			  
-    		String [] preset;
+		}
+
+		public void redoLayout() {
+
+			String[] preset;
 			preset = presets.getPresetNames();
-			int nPresets = preset.length;
+			final int nPresets = preset.length;
 			removeAll();
-			
+
 			setLayout(new GridBagLayout());
 			gbc = new GridBagConstraints();
 			gbc.weighty = 100;
@@ -162,7 +178,7 @@ public class UrlEditor {
 			gbc.gridy = 0;
 			gbc.weighty = 0;
 			addTemplate();
-			gbc.gridy  = 1;
+			gbc.gridy = 1;
 			addHeader();
 			gbc.gridy = 2;
 			addPreview();
@@ -170,21 +186,21 @@ public class UrlEditor {
 			gbc.gridx = 0;
 			gbc.gridwidth = 3;
 			gbc.weighty = 100;
-			add(new JLabel("Url Presets (Can edit under Program Menu)", 
+			add(new JLabel("Url Presets (Can edit under Program Menu)",
 					SwingConstants.CENTER), gbc);
 			gbc.gridwidth = 1;
-			
+
 			for (int i = 0; i < nPresets; i++) {
 				gbc.gridy++;
 				addPreset(i);
 			}
-	  	}
+		}
 
 		String tester = "YAL039W";
 		JTextField previewField;
-		
+
 		private void addPreview() {
-		  
+
 			gbc.gridx = 0;
 			gbc.weightx = 0;
 			add(new JLabel("Preview:"), gbc);
@@ -193,77 +209,76 @@ public class UrlEditor {
 			previewField = new JTextField(extractor.substitute(tester));
 			previewField.setEditable(false);
 			add(previewField, gbc);
-			JButton update= new JButton("Update");
+			final JButton update = new JButton("Update");
 			update.addActionListener(new ActionListener() {
-				
+
 				@Override
-				public void actionPerformed(ActionEvent e) {
-			    
+				public void actionPerformed(final ActionEvent e) {
+
 					updatePreview();
 				}
 			});
 			gbc.gridx = 2;
 			gbc.weightx = 0;
-			//		  add(update, gbc);
+			// add(update, gbc);
 		}
 
 		private void updatePreview() {
-		  
+
 			extractor.setUrlTemplate(templateField.getText());
 			extractor.setIndex(headerChoice.getSelectedIndex());
 			previewField.setText(extractor.getUrl(0));
 		}
 
 		private void addHeader() {
-		 
+
 			gbc.gridx = 0;
 			gbc.weightx = 0;
 			add(new JLabel("Header:"), gbc);
 			gbc.gridx = 1;
 			gbc.weightx = 100;
-			headerChoice  = new HeaderChoice();
+			headerChoice = new HeaderChoice();
 			add(headerChoice, gbc);
 		}
- 
 
 		private class HeaderChoice extends Choice implements ItemListener {
-	  
+
 			private static final long serialVersionUID = 1L;
-			
+
 			public HeaderChoice() {
-			    
+
 				super();
-			    String [] headers;
+				String[] headers;
 				int lastI;
-	    
+
 				if (headerInfo != null) {
 					headers = headerInfo.getNames();
 					lastI = headers.length;
-		  
+
 					if (headerInfo.getIndex("GWEIGHT") != -1) {
 						lastI--;
 					}
 				} else {
-				  headers = new String [] {"Dummy1", "Dummy2", "Dummy3"};
-				  lastI = headers.length;
+					headers = new String[] { "Dummy1", "Dummy2", "Dummy3" };
+					lastI = headers.length;
 				}
 
-			    for (int i = 0; i < lastI; i++) {
-				 
-			    	add(headers[i]);
-			    }
-			    addItemListener(this);
+				for (int i = 0; i < lastI; i++) {
+
+					add(headers[i]);
+				}
+				addItemListener(this);
 			}
-			
+
 			@Override
-			public void itemStateChanged(ItemEvent e) {
-				
+			public void itemStateChanged(final ItemEvent e) {
+
 				updatePreview();
 			}
 		}
-    
+
 		private void addTemplate() {
-		  
+
 			gbc.gridx = 0;
 			gbc.weightx = 0;
 			add(new JLabel("Template:"), gbc);
@@ -271,61 +286,60 @@ public class UrlEditor {
 			gbc.weightx = 100;
 			templateField = new TemplateField();
 			add(templateField, gbc);
-			JButton updateButton = new JButton ("Update");
+			final JButton updateButton = new JButton("Update");
 			updateButton.addActionListener(new ActionListener() {
-				
+
 				@Override
-				public void actionPerformed(ActionEvent e) {
-					
+				public void actionPerformed(final ActionEvent e) {
+
 					updatePreview();
 				}
 			});
-		  
+
 			gbc.gridx = 2;
 			gbc.weightx = 0;
 			add(updateButton, gbc);
 		}
-		
+
 		private class TemplateField extends TextField {
 
 			private static final long serialVersionUID = 1L;
 
-			public TemplateField () {
-			
+			public TemplateField() {
+
 				super("enter url template");
 				addActionListener(new ActionListener() {
-					
+
 					@Override
-					public void actionPerformed(ActionEvent e) {
-						
+					public void actionPerformed(final ActionEvent e) {
+
 						updatePreview();
 					}
 				});
 			}
 		}
 
-		private void addPreset(int i) {
-			  
+		private void addPreset(final int i) {
+
 			final int index = i;
 			gbc.gridx = 0;
-			add(new JLabel((presets.getPresetNames()) [index]), gbc);
+			add(new JLabel((presets.getPresetNames())[index]), gbc);
 			gbc.gridx = 1;
 			gbc.weightx = 100;
 			add(new JTextField(presets.getTemplate(index)), gbc);
 			gbc.gridx = 2;
 			gbc.weightx = 0;
-			JButton set = new JButton("Set");
+			final JButton set = new JButton("Set");
 			set.addActionListener(new ActionListener() {
-			
+
 				@Override
-				public void actionPerformed(ActionEvent e) {
-					
+				public void actionPerformed(final ActionEvent e) {
+
 					templateField.setText(presets.getTemplate(index));
-				  updatePreview();
+					updatePreview();
 				}
 			});
 			add(set, gbc);
 		}
 	}
 }
-

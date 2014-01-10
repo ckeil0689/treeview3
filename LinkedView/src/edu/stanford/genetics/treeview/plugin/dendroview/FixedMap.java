@@ -22,139 +22,134 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import edu.stanford.genetics.treeview.*;
+import edu.stanford.genetics.treeview.ConfigNode;
 
 /**
- *  Maps integers (gene index) to pixels using a fixed scale
- *
- * @author     Alok Saldanha <alok@genome.stanford.edu>
+ * Maps integers (gene index) to pixels using a fixed scale
+ * 
+ * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.1 $ $Date: 2006-08-16 19:13:45 $
  */
 public class FixedMap extends IntegerMap {
-	
+
 	private double default_scale;
 	private double scale;
 
 	/**
-	 *  constructs new FixedMap
+	 * constructs new FixedMap
 	 */
 	public FixedMap() {
-		
+
 		default_scale = 10.0;
 	}
 
-
 	/**
-	 *  For persistance of scale, bind to a ConfigNode
-	 *
-	 * @param  configNode  ConfigNode to bind to
+	 * For persistance of scale, bind to a ConfigNode
+	 * 
+	 * @param configNode
+	 *            ConfigNode to bind to
 	 */
 	@Override
-	public void bindConfig(ConfigNode configNode) {
-		
+	public void bindConfig(final ConfigNode configNode) {
+
 		super.bindConfig(configNode);
 		scale = root.getAttribute("scale", default_scale);
 	}
 
-
 	/**
-	 *  Gets the index for a particular pixel.
-	 *
-	 * @param  i  the pixel value
-	 * @return    The index value
+	 * Gets the index for a particular pixel.
+	 * 
+	 * @param i
+	 *            the pixel value
+	 * @return The index value
 	 */
 	@Override
-	public int getIndex(int i) {
-		
+	public int getIndex(final int i) {
+
 		return (int) (i / scale) + minindex;
 	}
 
-
 	/**
-	 *  Gets the pixel for a particular index
-	 *
-	 * @param  i  The index value
-	 * @return    The pixel value
+	 * Gets the pixel for a particular index
+	 * 
+	 * @param i
+	 *            The index value
+	 * @return The pixel value
 	 */
 	@Override
-	public int getPixel(int i) {
-		
+	public int getPixel(final int i) {
+
 		return (int) ((i - minindex) * scale);
 	}
 
-
 	/**
-	 * @return    The effective scale for the current FillMap
+	 * @return The effective scale for the current FillMap
 	 */
 	@Override
 	public double getScale() {
-		
+
 		return scale;
 	}
 
-
 	/**
-	 * @return    The number of pixels currently being used
+	 * @return The number of pixels currently being used
 	 */
 	@Override
 	public int getUsedPixels() {
-		
+
 		if (minindex == -1) {
 			return 0;
 		}
-		
-		int i  = (int) ((maxindex - minindex + 1) * scale);
-		int j  = (int) (scale * (int) (availablepixels / scale));
+
+		final int i = (int) ((maxindex - minindex + 1) * scale);
+		final int j = (int) (scale * (int) (availablepixels / scale));
 		if (i > j) {
 			return j;
-			
+
 		} else {
 			return i;
 		}
 	}
 
-
 	/**
-	 * @return    The number of indexes currently visible
+	 * @return The number of indexes currently visible
 	 */
 	@Override
 	public int getViewableIndexes() {
-	
-		int i  = (int) (availablepixels / scale);
+
+		final int i = (int) (availablepixels / scale);
 		return i;
 	}
 
-
 	/**
-	 *  Sets the defaultScale attribute of the FixedMap object
-	 *
-	 * @param  d  The new defaultScale value
+	 * Sets the defaultScale attribute of the FixedMap object
+	 * 
+	 * @param d
+	 *            The new defaultScale value
 	 */
-	public void setDefaultScale(double d) {
-		
+	public void setDefaultScale(final double d) {
+
 		default_scale = d;
 	}
 
-
 	/**
-	 *  set scaling value
-	 *
-	 * @param  d  The new scale value
+	 * set scaling value
+	 * 
+	 * @param d
+	 *            The new scale value
 	 */
-	public void setScale(double d) {
-		
+	public void setScale(final double d) {
+
 		scale = d;
 		root.setAttribute("scale", scale, default_scale);
 	}
 
-
 	/**
-	 * @return    A short word desribing this type of map
+	 * @return A short word desribing this type of map
 	 */
 	@Override
 	public String type() {
-		
+
 		return "Fixed";
 	}
 }
-

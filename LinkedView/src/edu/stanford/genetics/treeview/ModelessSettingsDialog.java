@@ -22,97 +22,103 @@
  */
 package edu.stanford.genetics.treeview;
 
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
 
-import java.awt.event.*;
-import java.awt.*;
-
 /**
-* this is a dialog which displays a modeless settings dialog.
-* it includes a close button, which will dispose of the dialog 
-* when it is pressed. It could be extended to include a hide button, 
-* which would not dispose but just hide.
-*/
+ * this is a dialog which displays a modeless settings dialog. it includes a
+ * close button, which will dispose of the dialog when it is pressed. It could
+ * be extended to include a hide button, which would not dispose but just hide.
+ */
 public class ModelessSettingsDialog extends JDialog {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	SettingsPanel settingsPanel;
 	JDialog settingsFrame;
 
-	public ModelessSettingsDialog(JFrame frame, String title, 
-			SettingsPanel panel) {
-		
+	public ModelessSettingsDialog(final JFrame frame, final String title,
+			final SettingsPanel panel) {
+
 		super(frame, title, false);
 		settingsPanel = panel;
 		settingsFrame = this;
-		JPanel inner = new JPanel();
+		final JPanel inner = new JPanel();
 		inner.setLayout(new MigLayout());
 		inner.add((Component) panel, "push, grow, wrap");
 		inner.add(new ButtonPanel(), "pushx, growx, alignx 50%");
 		inner.setBackground(GUIParams.BG_COLOR);
-		getContentPane().add(inner); 
+		getContentPane().add(inner);
 		pack();
 	}
-  
+
 	@Override
-	public void setVisible(boolean val) {
-	  
+	public void setVisible(final boolean val) {
+
 		super.setVisible(val);
 		settingsPanel.synchronizeFrom();
 	}
-  
+
 	class ButtonPanel extends JPanel {
 
 		private static final long serialVersionUID = 1L;
 
 		public ButtonPanel() {
-			
+
 			this.setBackground(GUIParams.BG_COLOR);
-			
-			JButton save_button = setButtonLayout("Close");
-			save_button.addActionListener(new ActionListener() {
-			
+
+			final JButton close_button = setButtonLayout("Close");
+			close_button.addActionListener(new ActionListener() {
+
 				@Override
-				public void actionPerformed(ActionEvent e) {
-				  
+				public void actionPerformed(final ActionEvent e) {
+
 					settingsPanel.synchronizeTo();
 					settingsFrame.dispose();
 				}
 			});
-			add(save_button);
-		  
-			JButton cancel_button = setButtonLayout("Cancel");
+			add(close_button);
+
+			final JButton cancel_button = setButtonLayout("Cancel");
 			cancel_button.addActionListener(new ActionListener() {
-		
+
 				@Override
-				public void actionPerformed(ActionEvent e) {
-					
+				public void actionPerformed(final ActionEvent e) {
+
 					settingsPanel.synchronizeFrom();
 					settingsFrame.dispose();
 				}
 			});
-//			add(cancel_button);
+			// add(cancel_button);
 		}
-		
-		public JButton setButtonLayout(String title){
-			
-			Font buttonFont = new Font("Sans Serif", Font.PLAIN, 14);
-			
-			JButton button = new JButton(title);
-	  		Dimension d = button.getPreferredSize();
-	  		d.setSize(d.getWidth()*1.5, d.getHeight()*1.5);
-	  		button.setPreferredSize(d);
-	  		
-	  		button.setFont(buttonFont);
-	  		button.setOpaque(true);
-	  		button.setBackground(GUIParams.ELEMENT);
-	  		button.setForeground(GUIParams.BG_COLOR);
-	  		
-	  		return button;
+
+		public JButton setButtonLayout(final String title) {
+
+			final Font buttonFont = new Font("Sans Serif", Font.PLAIN, 14);
+
+			final JButton button = new JButton(title);
+			final Dimension d = button.getPreferredSize();
+			d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
+			button.setPreferredSize(d);
+
+			button.setFont(buttonFont);
+			button.setOpaque(true);
+			button.setBackground(GUIParams.RED1);
+			button.setForeground(Color.white);
+
+			return button;
 		}
-	
-  }
+
+	}
 }

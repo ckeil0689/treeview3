@@ -25,92 +25,106 @@ package edu.stanford.genetics.treeview.core;
 // for summary view...
 import java.awt.BorderLayout;
 import java.awt.Frame;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.ViewFrame;
+
 /**
- *  The purpose of this class is to allow searching on HeaderInfo objects.
- * The display of the headers and the matching is handled by this class,
- * whereas the actual manipulation of the selection objects and the 
- * associated views is handled by the relevant subclass.
+ * The purpose of this class is to allow searching on HeaderInfo objects. The
+ * display of the headers and the matching is handled by this class, whereas the
+ * actual manipulation of the selection objects and the associated views is
+ * handled by the relevant subclass.
  * 
  * @author aloksaldanha
- *
+ * 
  */
 public abstract class HeaderFinder extends JDialog {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	protected TreeSelectionI geneSelection;
 	protected ViewFrame viewFrame;
-	
-    private JButton search_button;
-    private JButton seek_button;
-    private JButton seekNext_button;
-    private JButton seekAll_button; 
-    private JButton summary_button;
-    private ResultsPanel rpanel;
-    private HeaderInfo headerInfo;
-    private int choices[];
-    private int nchoices = 0;
-    private JList results;
+
+	private JButton search_button;
+	private JButton seek_button;
+	private JButton seekNext_button;
+	private JButton seekAll_button;
+	private JButton summary_button;
+	private final ResultsPanel rpanel;
+	private final HeaderInfo headerInfo;
+	private final int choices[];
+	private int nchoices = 0;
+	private JList results;
 	private DefaultListModel resultsModel;
-	
-	//"Search Gene Text for Substring"
-	protected HeaderFinder(ViewFrame f, HeaderInfo hI, 
-			TreeSelectionI geneSelection, String title) {
-		
+
+	// "Search Gene Text for Substring"
+	protected HeaderFinder(final ViewFrame f, final HeaderInfo hI,
+			final TreeSelectionI geneSelection, final String title) {
+
 		this((Frame) f, hI, geneSelection, title);
 		this.viewFrame = f;
 	}
-	
-	private HeaderFinder(Frame f, HeaderInfo hI, TreeSelectionI geneSelection, 
-		  String title) {
-	
+
+	private HeaderFinder(final Frame f, final HeaderInfo hI,
+			final TreeSelectionI geneSelection, final String title) {
+
 		super(f, title);
 		this.viewFrame = null;
 		this.headerInfo = hI;
 		this.geneSelection = geneSelection;
 		choices = new int[hI.getNumHeaders()]; // could be wasteful of ram...
-	
-		JPanel mainPanel = new JPanel();
+
+		final JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new BorderLayout());
 		mainPanel.add(new SearchPanel(), BorderLayout.NORTH);
-		
+
 		rpanel = new ResultsPanel();
 		mainPanel.add(new JScrollPane(rpanel), BorderLayout.CENTER);
-		
+
 		mainPanel.add(new ClosePanel(), BorderLayout.SOUTH);
-	
-		mainPanel.add(new SeekPanel() , BorderLayout.EAST);
+
+		mainPanel.add(new SeekPanel(), BorderLayout.EAST);
 		getContentPane().add(mainPanel);
-		addWindowListener(new WindowAdapter () {
+		addWindowListener(new WindowAdapter() {
 			@Override
-			public void windowClosing(WindowEvent we) {
-			    setVisible(false);
+			public void windowClosing(final WindowEvent we) {
+				setVisible(false);
 			}
-		    });
+		});
 		pack();
-    }
-    
+	}
+
 	/**
-	* selects all the genes which are currently selected in the results panel.
-	*/
+	 * selects all the genes which are currently selected in the results panel.
+	 */
 	private void seek() {
-		
-		int first = rpanel.getFirstSelectedIndex(); 
+
+		final int first = rpanel.getFirstSelectedIndex();
 		// in some jdks, selected index is set to -1 between selections.
 		if (first == -1) {
 			return;
 		}
-		
-		int [] selected = results.getSelectedIndices();
+
+		final int[] selected = results.getSelectedIndices();
 		if (selected.length == 0) {
 			return;
 		}
@@ -122,284 +136,295 @@ public abstract class HeaderFinder extends JDialog {
 		geneSelection.notifyObservers();
 		scrollToIndex(choices[first]);
 	}
-	
-	/* 		if (viewFrame != null)
-	viewFrame.scrollToGene(choices[first]);
-	*/
+
+	/*
+	 * if (viewFrame != null) viewFrame.scrollToGene(choices[first]);
+	 */
 	abstract public void scrollToIndex(int i);
-	
-    private void seekNext() {
-    	
-		int currentIndex = rpanel.getFirstSelectedIndex();
+
+	private void seekNext() {
+
+		final int currentIndex = rpanel.getFirstSelectedIndex();
 		if (currentIndex == -1) {
 			return; // no current selection.
 		}
-		
-		int nextIndex = (currentIndex + 1) % resultsModel.getSize();
+
+		final int nextIndex = (currentIndex + 1) % resultsModel.getSize();
 		rpanel.setSelectedIndex(nextIndex);
 		results.ensureIndexIsVisible(nextIndex);
 		seek();
-    }
-    
+	}
+
 	public void seekAll() {
-		
+
 		results.setSelectionInterval(0, resultsModel.getSize() - 1);
-		int [] selected = results.getSelectedIndices();
+		final int[] selected = results.getSelectedIndices();
 		geneSelection.setSelectedNode(null);
 		geneSelection.deselectAllIndexes();
-		
+
 		for (int i = 0; i < selected.length; i++) {
 			geneSelection.setIndex(choices[selected[i]], true);
 		}
-		
+
 		geneSelection.notifyObservers();
 		results.repaint();
 		if ((viewFrame != null) && (selected.length > 0)) {
 			scrollToIndex(choices[selected[0]]);
 		}
 	}
-	
+
 	/**
-	* selects all genes which match the specified id in their id column...
-	*/
-	public void findGenesById(String [] subs) {
-		
+	 * selects all genes which match the specified id in their id column...
+	 */
+	public void findGenesById(final String[] subs) {
+
 		nchoices = 0;
 		resultsModel.removeAllElements();
-		
-		int jmax  = headerInfo.getNumHeaders();
-		int idIndex = headerInfo.getIndex("YORF");
-		
-		//actually, just 0, or 1 if 0 is GID.
-		for  (int j = 0; j < jmax; j++) {
-			String [] headers = headerInfo.getHeader(j);
+
+		final int jmax = headerInfo.getNumHeaders();
+		final int idIndex = headerInfo.getIndex("YORF");
+
+		// actually, just 0, or 1 if 0 is GID.
+		for (int j = 0; j < jmax; j++) {
+			final String[] headers = headerInfo.getHeader(j);
 			if (headers == null) {
 				continue;
 			}
-			
-			String id = headers[idIndex];
+
+			final String id = headers[idIndex];
 			if (id == null) {
 				continue;
 			}
-			
+
 			boolean match = false;
-			for (int i=0; i < subs.length; i++) {
+			for (int i = 0; i < subs.length; i++) {
 				if (subs[i] == null) {
-					System.out.println("eek! HeaderFinder substring " + i 
+					System.out.println("eek! HeaderFinder substring " + i
 							+ " was null!");
 				}
-				
+
 				if (id.indexOf(subs[i]) >= 0) {
 					match = true;
 					break;
 				}
 			}
-			
+
 			if (match) {
 				selectGene(j);
 			}
 		}
 	}
-	
-    private void findGenes(String sub, boolean caseSensative) {
-		
-    	nchoices = 0;
+
+	private void findGenes(String sub, final boolean caseSensative) {
+
+		nchoices = 0;
 		resultsModel.removeAllElements();
-		
+
 		if (caseSensative == false) {
 			sub = sub.toLowerCase();
 		}
-		
-		int jmax = headerInfo.getNumHeaders();
+
+		final int jmax = headerInfo.getNumHeaders();
 		for (int j = 0; j < jmax; j++) {
-			String []strings = headerInfo.getHeader(j);
+			final String[] strings = headerInfo.getHeader(j);
 			if (strings == null) {
 				continue;
 			}
-			
+
 			boolean match = false;
 			for (int i = 0; i < strings.length; i++) {
 				if (strings[i] == null) {
 					continue;
 				}
-				
+
 				String cand;
 				if (caseSensative) {
 					cand = strings[i];
-					
+
 				} else {
 					cand = strings[i].toLowerCase();
 				}
-				
+
 				if (cand.indexOf(sub) >= 0) {
 					match = true;
 					break;
 				}
 			}
-			
+
 			if (match) {
 				selectGene(j);
 			}
 		}
 	}
 
-	private void selectGene(int j) {
-		
-		String [] strings = headerInfo.getHeader(j);
+	private void selectGene(final int j) {
+
+		final String[] strings = headerInfo.getHeader(j);
 		String id = "";
-		for (int i = 1; i < strings.length; i++) {		    
+		for (int i = 1; i < strings.length; i++) {
 			if (strings[i] != null) {
 				id += strings[i] + "; ";
 			}
 		}
-		
+
 		if (strings[0] != null) {
 			id += strings[0] + "; ";
 		}
-		
+
 		resultsModel.addElement(id);
 		choices[nchoices++] = j;
 	}
-	
+
 	SearchTextField search_text;
 	JCheckBox caseBox;
-    class SearchPanel extends JPanel {	
+
+	class SearchPanel extends JPanel {
 
 		private static final long serialVersionUID = 1L;
 
 		public SearchPanel() {
-		    JLabel instr = new JLabel ("Enter Substring:");
-		    add(instr);
-		    
-		    search_text = new SearchTextField(10);
-		    search_text.addActionListener(search_text);
-		    add(search_text);
+			final JLabel instr = new JLabel("Enter Substring:");
+			add(instr);
+
+			search_text = new SearchTextField(10);
+			search_text.addActionListener(search_text);
+			add(search_text);
 			caseBox = new JCheckBox("Case Sensitive?");
 			add(caseBox);
-		 }
+		}
 	}
-    
+
 	class SearchTextField extends JTextField implements ActionListener {
 
 		private static final long serialVersionUID = 1L;
 
 		// why does java make me write this dumb constructor?
-	    SearchTextField(int cols) {super(cols);}
+		SearchTextField(final int cols) {
+			super(cols);
+		}
 
-	    @Override
-		public void actionPerformed(ActionEvent e) {
-		
-	    	findGenes(getText(), caseBox.isSelected());
-	    }
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+
+			findGenes(getText(), caseBox.isSelected());
+		}
 	}
-    
+
 	class ResultsPanel extends JPanel {
 
 		private static final long serialVersionUID = 1L;
-		
+
 		public ResultsPanel() {
 
-//			setLayout(new BorderLayout());
+			// setLayout(new BorderLayout());
 			resultsModel = new DefaultListModel();
 			results = new JList(resultsModel);
 			results.setVisibleRowCount(10);
 			results.addListSelectionListener(new ListSeeker());
-//			add(results, BorderLayout.CENTER);
+			// add(results, BorderLayout.CENTER);
 			add(results);
 		}
-		
+
 		class ListSeeker implements ListSelectionListener {
 			@Override
-			public void valueChanged(ListSelectionEvent e) {
+			public void valueChanged(final ListSelectionEvent e) {
 				results.repaint();
 				seek();
 			}
 		}
-		
-		public int getFirstSelectedIndex() {return results.getSelectedIndex();}
-		public int [] getSelectedIndices() {return results.getSelectedIndices();}
-		public void setSelectedIndex(int i) {results.setSelectedIndex(i);}
+
+		public int getFirstSelectedIndex() {
+			return results.getSelectedIndex();
+		}
+
+		public int[] getSelectedIndices() {
+			return results.getSelectedIndices();
+		}
+
+		public void setSelectedIndex(final int i) {
+			results.setSelectedIndex(i);
+		}
 	}
 
-    class SeekPanel extends JPanel {
+	class SeekPanel extends JPanel {
 
 		private static final long serialVersionUID = 1L;
 
-		public SeekPanel () {
-			
+		public SeekPanel() {
+
 			super();
-			setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)); 
-		    search_button = new JButton("Search");
-		    search_button.addActionListener(search_text);
-		    add(search_button);
-	
-	 	    seek_button = new JButton("Seek");
-		    seek_button.addActionListener(new ActionListener() {
-			    
-		    	@Override
-				public void actionPerformed(ActionEvent evt) {
-				
-		    		seek();
-			    }
+			setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+			search_button = new JButton("Search");
+			search_button.addActionListener(search_text);
+			add(search_button);
+
+			seek_button = new JButton("Seek");
+			seek_button.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(final ActionEvent evt) {
+
+					seek();
+				}
 			});
-	
-		    // add(seek_button);
-	 	    seekNext_button = new JButton("Next");
-		    seekNext_button.addActionListener(new ActionListener() {
-			    
-		    	@Override
-				public void actionPerformed(ActionEvent evt) {
-				
-		    		seekNext();
-			    }
+
+			// add(seek_button);
+			seekNext_button = new JButton("Next");
+			seekNext_button.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(final ActionEvent evt) {
+
+					seekNext();
+				}
 			});
-		    add(seekNext_button);
-	
-	 	    seekAll_button = new JButton("All");
-		    seekAll_button.addActionListener(new ActionListener() {
-			    
-		    	@Override
-				public void actionPerformed(ActionEvent evt) {
-				
-		    		seekAll();
-			    }
+			add(seekNext_button);
+
+			seekAll_button = new JButton("All");
+			seekAll_button.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(final ActionEvent evt) {
+
+					seekAll();
+				}
 			});
-		    add(seekAll_button);
-			
+			add(seekAll_button);
+
 			summary_button = new JButton("Summary Popup");
 			summary_button.addActionListener(new ActionListener() {
-				
+
 				@Override
-				public void actionPerformed(ActionEvent evt) {
-						
+				public void actionPerformed(final ActionEvent evt) {
+
 					showSubDataModel();
 				}
-	
+
 			});
 			add(summary_button);
-	
+
 			add(Box.createVerticalGlue());
 		}
-    }
+	}
 
-    class ClosePanel extends JPanel {
+	class ClosePanel extends JPanel {
 
 		private static final long serialVersionUID = 1L;
 
-		public ClosePanel () {
-	 	    
-			JButton close_button = new JButton("Close");
-		    close_button.addActionListener(new ActionListener() {
-			   
-		    	@Override
-				public void actionPerformed(ActionEvent e) {
-		    		
-		    		HeaderFinder.this.setVisible(false);
-			    }
+		public ClosePanel() {
+
+			final JButton close_button = new JButton("Close");
+			close_button.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+
+					HeaderFinder.this.setVisible(false);
+				}
 			});
-		    add(close_button);
+			add(close_button);
 		}
-    }
-        
+	}
+
 	protected abstract void showSubDataModel();
 }

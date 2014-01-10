@@ -21,50 +21,57 @@
  * END_HEADER
  */
 package edu.stanford.genetics.treeview;
-import java.awt.*;
-import java.awt.event.*;
 
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JColorChooser;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
 /**
- *  This class allows editing of a color set.
- *
- * @author     Alok Saldanha <alok@genome.stanford.edu>
- * @version    @version $Revision: 1.4 $ $Date: 2004-12-21 03:28:14 $
+ * This class allows editing of a color set.
+ * 
+ * @author Alok Saldanha <alok@genome.stanford.edu>
+ * @version @version $Revision: 1.4 $ $Date: 2004-12-21 03:28:14 $
  */
 
 public class ConfigColorSetEditor extends JPanel {
-	
-	private static final long serialVersionUID = 1L;
-	
-	private ConfigColorSet colorSet;
 
+	private static final long serialVersionUID = 1L;
+
+	private final ConfigColorSet colorSet;
 
 	/**
-	 *  Constructor for the ConfigColorSetEditor object
-	 *
-	 * @param  colorSet  A ConfigColorSet to be edited
+	 * Constructor for the ConfigColorSetEditor object
+	 * 
+	 * @param colorSet
+	 *            A ConfigColorSet to be edited
 	 */
-	public ConfigColorSetEditor(ConfigColorSet colorSet) {
+	public ConfigColorSetEditor(final ConfigColorSet colorSet) {
 		this.colorSet = colorSet;
-		String[] types  = colorSet.getTypes();
+		final String[] types = colorSet.getTypes();
 		for (int i = 0; i < types.length; i++) {
 			add(new ColorPanel(i));
 		}
 	}
 
-
 	/**
-	 *  A simple test program. Allowed editing, and prints out the results.
-	 *
-	 * @param  argv  none required.
+	 * A simple test program. Allowed editing, and prints out the results.
+	 * 
+	 * @param argv
+	 *            none required.
 	 */
-	public final static void main(String[] argv) {
-		String[] types            = new String[]{"Up", "Down", "Left", "Right"};
-		String[] colors           = new String[]{"#FF0000", "#FFFF00", "#FF00FF", "#00FFFF"};
+	public final static void main(final String[] argv) {
+		final String[] types = new String[] { "Up", "Down", "Left", "Right" };
+		final String[] colors = new String[] { "#FF0000", "#FFFF00", "#FF00FF",
+				"#00FFFF" };
 
-		ConfigColorSet temp       = new ConfigColorSet("Bob", types, colors);
-		ConfigColorSetEditor cse  = new ConfigColorSetEditor(temp);
-		JFrame frame              = new JFrame("ColorSetEditor Test");
+		final ConfigColorSet temp = new ConfigColorSet("Bob", types, colors);
+		final ConfigColorSetEditor cse = new ConfigColorSetEditor(temp);
+		final JFrame frame = new JFrame("ColorSetEditor Test");
 		frame.getContentPane().add(cse);
 		frame.pack();
 		frame.setVisible(true);
@@ -74,47 +81,43 @@ public class ConfigColorSetEditor extends JPanel {
 	class ColorPanel extends JPanel {
 
 		private static final long serialVersionUID = 1L;
-		
+
 		ColorIcon colorIcon;
 		int type;
 
-
-		ColorPanel(int i) {
+		ColorPanel(final int i) {
 			type = i;
 			redoComps();
 		}
 
-
 		public void redoComps() {
 			removeAll();
 			colorIcon = new ColorIcon(10, 10, getColor());
-			JButton pushButton  = new JButton(getLabel(), colorIcon);
-			pushButton.addActionListener(
-				new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						Color trial  = JColorChooser.showDialog(ConfigColorSetEditor.this, "Pick Color for " + getLabel(), getColor());
-						if (trial != null) {
-							setColor(trial);
-						}
+			final JButton pushButton = new JButton(getLabel(), colorIcon);
+			pushButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final Color trial = JColorChooser.showDialog(
+							ConfigColorSetEditor.this, "Pick Color for "
+									+ getLabel(), getColor());
+					if (trial != null) {
+						setColor(trial);
 					}
-				});
+				}
+			});
 
 			add(pushButton);
 		}
 
-
-		private void setColor(Color c) {
+		private void setColor(final Color c) {
 			colorSet.setColor(type, c);
 			colorIcon.setColor(getColor());
 			repaint();
 		}
 
-
 		private String getLabel() {
 			return colorSet.getType(type);
 		}
-
 
 		private Color getColor() {
 			return colorSet.getColor(type);
@@ -122,4 +125,3 @@ public class ConfigColorSetEditor extends JPanel {
 	}
 
 }
-

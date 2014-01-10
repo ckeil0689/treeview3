@@ -9,10 +9,9 @@ import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.ViewFrame;
 
-
 /**
  * @author aloksaldanha
- *
+ * 
  */
 public class GeneFinder extends HeaderFinder {
 
@@ -23,30 +22,31 @@ public class GeneFinder extends HeaderFinder {
 	 * @param hI
 	 * @param geneSelection
 	 */
-	public GeneFinder(ViewFrame f, HeaderInfo hI, 
-			TreeSelectionI geneSelection) {
-		
+	public GeneFinder(final ViewFrame f, final HeaderInfo hI,
+			final TreeSelectionI geneSelection) {
+
 		super(f, hI, geneSelection, "Search Gene Text for Substring");
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.stanford.genetics.treeview.HeaderFinder#scrollToIndex(int)
 	 */
 	@Override
-	public void scrollToIndex(int i) {
-		
+	public void scrollToIndex(final int i) {
+
 		viewFrame.scrollToGene(i);
 	}
 
 	@Override
 	protected void showSubDataModel() {
-		
+
 		seekAll();
 		viewFrame.showSubDataModel(geneSelection.getSelectedIndexes(),
-				search_text.getText() +" matches in " 
-		+ viewFrame.getDataModel().getSource(),
-				search_text.getText() +" matches in " 
-		+ viewFrame.getDataModel().getName()
-		);
+				search_text.getText() + " matches in "
+						+ viewFrame.getDataModel().getSource(),
+				search_text.getText() + " matches in "
+						+ viewFrame.getDataModel().getName());
 	}
 }

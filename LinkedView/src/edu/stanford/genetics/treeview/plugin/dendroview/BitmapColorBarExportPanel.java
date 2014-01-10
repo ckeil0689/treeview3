@@ -25,28 +25,41 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 
-import javax.swing.*;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
 
-import edu.stanford.genetics.treeview.*;
+import edu.stanford.genetics.treeview.BitmapWriter;
+import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.SettingsPanel;
 
 /**
-*  Subclass of ColorBarExportPanel which outputs a bitmap version of color bar scale
-*
-*/
-public class BitmapColorBarExportPanel extends ColorBarExportPanel implements SettingsPanel {
+ * Subclass of ColorBarExportPanel which outputs a bitmap version of color bar
+ * scale
+ * 
+ */
+public class BitmapColorBarExportPanel extends ColorBarExportPanel implements
+		SettingsPanel {
 	JComboBox formatPulldown = new JComboBox(BitmapWriter.formats);
+
 	// I wish I could just inherit this...
-	public BitmapColorBarExportPanel(ColorExtractor colorExtractor) {
+	public BitmapColorBarExportPanel(final ColorExtractor colorExtractor) {
 		super(colorExtractor);
-		JPanel holder = new JPanel();
-		final JCheckBox appendExt= new JCheckBox("Append Extension?", true);
+		final JPanel holder = new JPanel();
+		final JCheckBox appendExt = new JCheckBox("Append Extension?", true);
 		formatPulldown.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				if (appendExt.isSelected()) {
-					appendExtension();	
+					appendExtension();
 				}
 			}
 		});
@@ -55,54 +68,60 @@ public class BitmapColorBarExportPanel extends ColorBarExportPanel implements Se
 		holder.add(appendExt);
 		add(holder);
 	}
-  
+
 	private void appendExtension() {
-		String fileName = getFilePath();
-		int extIndex = fileName.lastIndexOf('.');
-		int dirIndex = fileName.lastIndexOf(File.separatorChar);
-		if  (extIndex > dirIndex) {
-			setFilePath(fileName.substring(0, extIndex) + "." + formatPulldown.getSelectedItem());
+		final String fileName = getFilePath();
+		final int extIndex = fileName.lastIndexOf('.');
+		final int dirIndex = fileName.lastIndexOf(File.separatorChar);
+		if (extIndex > dirIndex) {
+			setFilePath(fileName.substring(0, extIndex) + "."
+					+ formatPulldown.getSelectedItem());
 		} else {
 			setFilePath(fileName + "." + formatPulldown.getSelectedItem());
 		}
 	}
 
-  @Override
-public void synchronizeTo() {
-	save();
-  }
-  
-  @Override
-public void synchronizeFrom() {
+	@Override
+	public void synchronizeTo() {
+		save();
+	}
+
+	@Override
+	public void synchronizeFrom() {
 		// do nothing...
-  }
-  public void save() {
+	}
+
+	public void save() {
 		try {
-			OutputStream output = new BufferedOutputStream
-			(new FileOutputStream(getFile()));
-			BufferedImage i = generateImage();
-			String format = (String) formatPulldown.getSelectedItem();
-			@SuppressWarnings("unused") // ignore success, could keep window open on failure if save could indicate success.
-			boolean success = BitmapWriter.writeBitmap(i, format, output, this);
-			
+			final OutputStream output = new BufferedOutputStream(
+					new FileOutputStream(getFile()));
+			final BufferedImage i = generateImage();
+			final String format = (String) formatPulldown.getSelectedItem();
+			@SuppressWarnings("unused")
+			// ignore success, could keep window open on failure if save could
+			// indicate success.
+			final boolean success = BitmapWriter.writeBitmap(i, format, output,
+					this);
+
 			output.close();
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(this, 
-			new JTextArea("Colorbar Image export had problem " +  e ));
+		} catch (final Exception e) {
+			JOptionPane.showMessageDialog(this, new JTextArea(
+					"Colorbar Image export had problem " + e));
 			LogBuffer.println("Exception " + e);
 			e.printStackTrace();
 		}
-  }
-  /**
-  * indicate to superclass that this type does not have bbox
-  */
-  @Override
-protected boolean hasBbox() { return false;}
-  
+	}
+
+	/**
+	 * indicate to superclass that this type does not have bbox
+	 */
+	@Override
+	protected boolean hasBbox() {
+		return false;
+	}
+
 	@Override
 	protected String getInitialExtension() {
-		return("_colorbar.png");
-  }
+		return ("_colorbar.png");
+	}
 }
-
-

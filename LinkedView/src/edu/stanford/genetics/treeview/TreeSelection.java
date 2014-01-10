@@ -25,285 +25,303 @@ package edu.stanford.genetics.treeview;
 import java.util.Observable;
 
 /**
- * A quasi-model independant selection model for leaf indexes as well 
- * as internal nodes of  trees.
- *
- * @author     Alok Saldanha <alok@genome.stanford.edu>
- * @version    @version $Revision: 1.5 $ $Date: 2006-03-20 06:18:43 $
+ * A quasi-model independant selection model for leaf indexes as well as
+ * internal nodes of trees.
+ * 
+ * @author Alok Saldanha <alok@genome.stanford.edu>
+ * @version @version $Revision: 1.5 $ $Date: 2006-03-20 06:18:43 $
  */
 public class TreeSelection extends Observable implements TreeSelectionI {
-	
+
 	private IntegerSelection integerSelection;
 	private String selectedNode;
 
-
 	/**
-	 *  Constructor for the TreeSelection object
-	 *
-	 * @param  nIndex  number of indexes which can be selected
+	 * Constructor for the TreeSelection object
+	 * 
+	 * @param nIndex
+	 *            number of indexes which can be selected
 	 */
-	public TreeSelection(int nIndex) {
-		
+	public TreeSelection(final int nIndex) {
+
 		integerSelection = new IntegerSelection(nIndex);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#resize(int)
 	 */
 	@Override
-	public void resize(int nIndex)  {
-		
-		IntegerSelection temp = new IntegerSelection(nIndex);
-		
-		for(int i = 0; i < nIndex; i++) {
-			
-			if(i < integerSelection.getNSelectable()) {
+	public void resize(final int nIndex) {
+
+		final IntegerSelection temp = new IntegerSelection(nIndex);
+
+		for (int i = 0; i < nIndex; i++) {
+
+			if (i < integerSelection.getNSelectable()) {
 				temp.set(i, integerSelection.isSelected(i));
-				
+
 			} else {
-				temp.set(i , false);
+				temp.set(i, false);
 			}
 		}
-		
+
 		integerSelection = temp;
 		setChanged();
 	}
 
 	// index methods
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#deselectAllIndexes()
 	 */
 	@Override
 	public void deselectAllIndexes() {
-		
+
 		integerSelection.deselectAll();
 	}
 
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#selectAllIndexes()
 	 */
 	@Override
 	public void selectAllIndexes() {
-		
+
 		integerSelection.selectAll();
 	}
 
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#setIndex(int, boolean)
 	 */
 	@Override
-	public void setIndex(int i, boolean b) {
-		
+	public void setIndex(final int i, final boolean b) {
+
 		integerSelection.set(i, b);
 	}
 
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#isIndexSelected(int)
 	 */
 	@Override
-	public boolean isIndexSelected(int i) {
-		
+	public boolean isIndexSelected(final int i) {
+
 		return integerSelection.isSelected(i);
 	}
 
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#getMinIndex()
 	 */
 	@Override
 	public int getMinIndex() {
-		
+
 		return integerSelection.getMin();
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#getSelectedIndexes()
 	 */
 	@Override
-	public int [] getSelectedIndexes() {
-		
+	public int[] getSelectedIndexes() {
+
 		return integerSelection.getSelectedIndexes();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#getMaxIndex()
 	 */
 	@Override
 	public int getMaxIndex() {
-		
+
 		return integerSelection.getMax();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#getNumIndexes()
 	 */
 	@Override
 	public int getNumIndexes() {
-		
+
 		return integerSelection.getNSelectable();
 	}
 
-
-	/* (non-Javadoc)
-	 * @see edu.stanford.genetics.treeview.TreeSelectionI#selectIndexRange(int, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see edu.stanford.genetics.treeview.TreeSelectionI#selectIndexRange(int,
+	 * int)
 	 */
 	@Override
 	public void selectIndexRange(int min, int max) {
-		
+
 		if (min > max) {
-			int swap  = min;
+			final int swap = min;
 			min = max;
 			max = swap;
 		}
-		
+
 		for (int i = min; i <= max; i++) {
-			
+
 			integerSelection.set(i, true);
 		}
 	}
 
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#getNSelectedIndexes()
 	 */
 	@Override
 	public int getNSelectedIndexes() {
-		
+
 		return integerSelection.getNSelected();
 	}
 
 	// node methods
-	/* (non-Javadoc)
-	 * @see edu.stanford.genetics.treeview.TreeSelectionI#setSelectedNode(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * edu.stanford.genetics.treeview.TreeSelectionI#setSelectedNode(java.lang
+	 * .String)
 	 */
 	@Override
-	public void setSelectedNode(String n) {
-		
+	public void setSelectedNode(final String n) {
+
 		if (selectedNode != n) {
 			selectedNode = n;
 			setChanged();
 		}
 	}
 
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#getSelectedNode()
 	 */
 	@Override
 	public String getSelectedNode() {
-		
+
 		return selectedNode;
 	}
 
-
 	/**
-	* a class to efficiently model a range of integers which can be selected.
-	*/
+	 * a class to efficiently model a range of integers which can be selected.
+	 */
 	class IntegerSelection {
-		
+
 		boolean[] isSelected;
 
-		IntegerSelection(int size) {
-			
+		IntegerSelection(final int size) {
+
 			isSelected = new boolean[size];
 			deselectAll();
 		}
 
-
 		public int getNSelectable() {
-			
+
 			return isSelected.length;
 		}
 
-
 		public int getNSelected() {
-			int n  = 0;
-			
+			int n = 0;
+
 			for (int i = 0; i < isSelected.length; i++) {
-				
+
 				if (isSelected[i]) {
 					n++;
 				}
 			}
-			
+
 			return n;
 		}
-		
-		public int [] getSelectedIndexes() {
-			
-			int nSelected = getNSelected();
-			int [] indexes = new int [nSelected];
+
+		public int[] getSelectedIndexes() {
+
+			final int nSelected = getNSelected();
+			final int[] indexes = new int[nSelected];
 			int curr = 0;
-			
+
 			for (int i = 0; i < isSelected.length; i++) {
-				
+
 				if (isSelected[i]) {
 					indexes[curr++] = i;
 				}
 			}
-			
+
 			return indexes;
 		}
 
 		public void deselectAll() {
-			
+
 			TreeSelection.this.setChanged();
 			for (int i = 0; i < isSelected.length; i++) {
-				
+
 				isSelected[i] = false;
 			}
 		}
 
 		public void selectAll() {
-			
+
 			TreeSelection.this.setChanged();
 			for (int i = 0; i < isSelected.length; i++) {
-				
+
 				isSelected[i] = true;
 			}
 		}
 
-		public void set(int i, boolean b) {
-			
+		public void set(final int i, final boolean b) {
+
 			if ((i >= 0) && (i < isSelected.length)) {
 				TreeSelection.this.setChanged();
 				isSelected[i] = b;
 			}
 		}
 
-		public boolean isSelected(int i) {
-			
+		public boolean isSelected(final int i) {
+
 			return isSelected[i];
 		}
 
 		public int getMin() {
-			
-			int min  = -1;
+
+			final int min = -1;
 			for (int i = 0; i < isSelected.length; i++) {
-				
+
 				if (isSelected[i]) {
 					return i;
 				}
 			}
-			
+
 			return min;
 		}
 
 		public int getMax() {
-			
-			int max  = -1;
+
+			int max = -1;
 			for (int i = 0; i < isSelected.length; i++) {
-				
+
 				if (isSelected[i]) {
 					max = i;
 				}
 			}
-			
+
 			return max;
 		}
 	}
 }
-

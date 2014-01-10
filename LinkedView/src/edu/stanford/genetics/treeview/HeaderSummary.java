@@ -23,178 +23,180 @@
 package edu.stanford.genetics.treeview;
 
 import java.util.Observable;
+
 /**
-* this class generates a single string summary of a HeaderInfo.
-*/
+ * this class generates a single string summary of a HeaderInfo.
+ */
 public class HeaderSummary extends Observable implements ConfigNodePersistent {
 
 	private ConfigNode root;
-	private int [] included = new int [] {1};
-	
+	private int[] included = new int[] { 1 };
+
 	public HeaderSummary() {
-		
+
 		super();
 	}
-	
-	public void setIncluded(int [] newIncluded) {
-		
+
+	public void setIncluded(final int[] newIncluded) {
+
 		included = newIncluded;
 		synchronizeTo();
 		setChanged();
 		notifyObservers();
 	}
-	
-	public int [] getIncluded() {
-		
+
+	public int[] getIncluded() {
+
 		return included;
 	}
-	
+
 	/**
-	* returns the best possible summary for the specified index.
-	*
-	* If no headers are applicable, will return the empty string.
-	*/
-	public String getSummary(HeaderInfo headerInfo, int index) {
-		
-		String [] strings = null;
+	 * returns the best possible summary for the specified index.
+	 * 
+	 * If no headers are applicable, will return the empty string.
+	 */
+	public String getSummary(final HeaderInfo headerInfo, final int index) {
+
+		String[] strings = null;
 		try {
-		    strings = headerInfo.getHeader(index);
-		    
-		} catch (java.lang.ArrayIndexOutOfBoundsException aie) {
-		    LogBuffer.println("index " + index 
-		    		+ " out of bounds on headers, continuing");
+			strings = headerInfo.getHeader(index);
+
+		} catch (final java.lang.ArrayIndexOutOfBoundsException aie) {
+			LogBuffer.println("index " + index
+					+ " out of bounds on headers, continuing");
 			return null;
 		}
-		
+
 		if (strings == null) {
-			
+
 			return "";
 		}
 
-		StringBuffer out = new StringBuffer();
+		final StringBuffer out = new StringBuffer();
 		int count = 0;
 		if (included.length == 0) {
 			return "";
 		}
-		
+
 		for (int i = 0; i < included.length; i++) {
 			try {
-				String test = strings[included[i]];
+				final String test = strings[included[i]];
 				if (test != null) {
-					if (count != 0) out.append(", ");
+					if (count != 0)
+						out.append(", ");
 					out.append(test);
 					count++;
 				}
-			} catch (java.lang.ArrayIndexOutOfBoundsException aie) {
+			} catch (final java.lang.ArrayIndexOutOfBoundsException aie) {
 				// out.append(strings[1]);
 			}
 		}
-		
+
 		if (count == 0) {
 			return "";
-			
+
 		} else {
 			return out.toString();
 		}
 	}
-	
-	
-	public String [] getSummaryArray(HeaderInfo headerInfo, int index) {
-		
-		String [] strings = null;
+
+	public String[] getSummaryArray(final HeaderInfo headerInfo, final int index) {
+
+		String[] strings = null;
 		try {
-		    strings = headerInfo.getHeader(index);
-		    
-		} catch (java.lang.ArrayIndexOutOfBoundsException aie) {
-		    LogBuffer.println("index " + index + " out of bounds on headers, " +
-		    		"continuing");
+			strings = headerInfo.getHeader(index);
+
+		} catch (final java.lang.ArrayIndexOutOfBoundsException aie) {
+			LogBuffer.println("index " + index + " out of bounds on headers, "
+					+ "continuing");
 			return null;
 		}
-		
+
 		if (strings == null) {
 			return null;
 		}
 
 		if (included.length == 0) {
-			
+
 			return null;
 		}
-		
-		String [] out = new String[included.length];
+
+		final String[] out = new String[included.length];
 		int count = 0;
 		for (int i = 0; i < included.length; i++) {
 			try {
-				String test = strings[included[i]];
+				final String test = strings[included[i]];
 				out[count] = test;
 				count++;
-			} catch (java.lang.ArrayIndexOutOfBoundsException aie) {
+			} catch (final java.lang.ArrayIndexOutOfBoundsException aie) {
 				// out.append(strings[1]);
 			}
 		}
 		return out;
 	}
-	
+
 	@Override
-	public void bindConfig(ConfigNode configNode) {
-		root  = configNode;
+	public void bindConfig(final ConfigNode configNode) {
+		root = configNode;
 		synchronizeFrom();
 	}
-	
+
 	private void synchronizeFrom() {
-		
+
 		if (root == null) {
 			return;
 		}
-		
+
 		if (root.hasAttribute("included")) {
-			String incString = root.getAttribute("included", "1");
+			final String incString = root.getAttribute("included", "1");
 			if (incString.equals("")) {
-				setIncluded(new int [0]);
-				
+				setIncluded(new int[0]);
+
 			} else {
 				int numComma = 0;
 				for (int i = 0; i < incString.length(); i++) {
 					if (incString.charAt(i) == ',')
 						numComma++;
 				}
-				
-				int [] array = new int[numComma+1];
+
+				final int[] array = new int[numComma + 1];
 				numComma = 0;
 				int last = 0;
 				for (int i = 0; i < incString.length(); i++) {
 					if (incString.charAt(i) == ',') {
-						Integer x = new Integer(incString.substring(last, i));
+						final Integer x = new Integer(incString.substring(last,
+								i));
 						array[numComma++] = x.intValue();
-						last = i+1;
+						last = i + 1;
 					}
 				}
 				try {
-					array[numComma] = (new Integer(
-							incString.substring(last))).intValue();
-					
-				} catch (NumberFormatException e) {
-					LogBuffer.println("HeaderSummary has trouble " +
-							"restoring included list from "+incString);
+					array[numComma] = (new Integer(incString.substring(last)))
+							.intValue();
+
+				} catch (final NumberFormatException e) {
+					LogBuffer.println("HeaderSummary has trouble "
+							+ "restoring included list from " + incString);
 				}
 				setIncluded(array);
 			}
 		}
 	}
-	
+
 	private void synchronizeTo() {
-		
+
 		if (root == null) {
 			return;
 		}
-		
-		int [] vec = getIncluded();
-		StringBuffer temp = new StringBuffer();
+
+		final int[] vec = getIncluded();
+		final StringBuffer temp = new StringBuffer();
 		if (vec.length > 0) {
 			temp.append(vec[0]);
 		}
-		
+
 		for (int i = 1; i < vec.length; i++) {
-			
+
 			temp.append(",");
 			temp.append(vec[i]);
 		}

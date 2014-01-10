@@ -25,70 +25,84 @@ package edu.stanford.genetics.treeview.applet;
 import java.applet.Applet;
 import java.awt.Frame;
 import java.awt.TextArea;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
-import edu.stanford.genetics.treeview.*;
+import edu.stanford.genetics.treeview.FileSet;
+import edu.stanford.genetics.treeview.LoadException;
+import edu.stanford.genetics.treeview.PluginFactory;
+import edu.stanford.genetics.treeview.TreeViewApp;
+import edu.stanford.genetics.treeview.XmlConfig;
 import edu.stanford.genetics.treeview.reg.RegEngine;
 
 public class ButtonApplet extends Applet {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private TreeViewApp app;
-	
-	/**  start method for running as applet */
+
+	/** start method for running as applet */
 	@Override
 	public void start() {
-		
+
 		super.start();
 		loadPlugins();
-		
+
 		final String cdtFile = getParameter("cdtFile");
 		String cdtName = getParameter("cdtName");
-		String styleName = getParameter("styleName");
+		final String styleName = getParameter("styleName");
 		final int styleCode;
-		
+
 		if (styleName == null) {
-			
+
 			styleCode = FileSet.AUTO_STYLE;
 		} else {
-			
+
 			styleCode = FileSet.getStyleByName(styleName);
 		}
-		
-		if (cdtName == null) cdtName = cdtFile;
-		
+
+		if (cdtName == null)
+			cdtName = cdtFile;
+
 		if (cdtFile == null) {
-			
-			JOptionPane.showMessageDialog(this, "Must Provide cdtFile parameter in applet tag.");
+
+			JOptionPane.showMessageDialog(this,
+					"Must Provide cdtFile parameter in applet tag.");
 			add(new JLabel("Must Provide cdtFile parameter in applet tag."));
 		} else {
-			
+
 			app = new AppletApp(this, generateGlobalConfig());
-			JButton openButton = new JButton("View " + cdtName);
+			final JButton openButton = new JButton("View " + cdtName);
 			openButton.addActionListener(new ActionListener() {
-				
+
 				@Override
 				@SuppressWarnings("unused")
-				public void actionPerformed(ActionEvent e) {
-					
+				public void actionPerformed(final ActionEvent e) {
+
 					try {
 						if (cdtFile == null) {
-							
+
 							app.openNew();
 						} else {
-							
-							FileSet fileSet = new FileSet(makeWellFormedURL(cdtFile),"");
+
+							final FileSet fileSet = new FileSet(
+									makeWellFormedURL(cdtFile), "");
 							fileSet.setStyle(styleCode);
 							app.openNew(fileSet).setVisible(true);
 						}
-					} catch (LoadException ex) {
-						
-						JPanel temp = new JPanel();
+					} catch (final LoadException ex) {
+
+						final JPanel temp = new JPanel();
 						temp.setLayout(new BoxLayout(temp, BoxLayout.Y_AXIS));
 						temp.add(new JLabel("Problems opening url " + cdtFile));
 						temp.add(new JLabel("" + ex));
@@ -97,60 +111,61 @@ public class ButtonApplet extends Applet {
 				}
 			});
 			add(openButton);
-			
+
 		}
 		repaint();
 	}
 
 	/**
-	 * unfortunately, I cannot instantiate classloader within applet
-	 * so instead we assume that the plugin jar is in the classpath
-	 * and just ask the system classloader to instantiate.
+	 * unfortunately, I cannot instantiate classloader within applet so instead
+	 * we assume that the plugin jar is in the classpath and just ask the system
+	 * classloader to instantiate.
 	 */
 	private void loadPlugins() {
-		
-		ClassLoader cl = getClass().getClassLoader();
-		
+
+		final ClassLoader cl = getClass().getClassLoader();
+
 		if (getParameter("plugins") == null) {
-			
+
 			System.out.println("plugin parameter not set");
 			JOptionPane.showMessageDialog(this, "plugin parameter not set");
 			return;
 		}
-		
- 		String plugins[] = getParameter("plugins").split(",");
-		int loadStatus[] = new int[plugins.length];
+
+		final String plugins[] = getParameter("plugins").split(",");
+		final int loadStatus[] = new int[plugins.length];
 		boolean showPopup = false;
-		
-		for (int i = 0; i < plugins.length;i++) {
-			
+
+		for (int i = 0; i < plugins.length; i++) {
+
 			try {
-				
-				Class<?> c = cl.loadClass(plugins[i]);
-				
-				@SuppressWarnings("unused") // the creation of an instance registers it with the manager.
-				PluginFactory pp = (PluginFactory) c.newInstance();
+
+				final Class<?> c = cl.loadClass(plugins[i]);
+
+				@SuppressWarnings("unused")
+				// the creation of an instance registers it with the manager.
+				final PluginFactory pp = (PluginFactory) c.newInstance();
 				loadStatus[i] = 0;
-			} catch (ClassNotFoundException e) {
-				
+			} catch (final ClassNotFoundException e) {
+
 				loadStatus[i] = 1;
 				showPopup = true;
 				e.printStackTrace();
-			} catch (InstantiationException e) {
-				
+			} catch (final InstantiationException e) {
+
 				loadStatus[i] = 2;
 				showPopup = true;
 				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				
+			} catch (final IllegalAccessException e) {
+
 				loadStatus[i] = 3;
 				showPopup = true;
 				e.printStackTrace();
 			}
 		}
-		
+
 		if (showPopup == true) {
-			
+
 			String message = "";
 			for (int j = 0; j < loadStatus.length; j++) {
 				message += plugins[j];
@@ -175,52 +190,55 @@ public class ButtonApplet extends Applet {
 	}
 
 	/**
-	* This subroutine generates a globalconfig to be used in applet mode.
-	* <p>
-	* It first tries to load getCodeBase() + "globalConfig.xml", and if that falls through for
-	* any reason it defaults to a generic XmlConfig.
-	*/
+	 * This subroutine generates a globalconfig to be used in applet mode.
+	 * <p>
+	 * It first tries to load getCodeBase() + "globalConfig.xml", and if that
+	 * falls through for any reason it defaults to a generic XmlConfig.
+	 */
 	private XmlConfig generateGlobalConfig() {
-		
+
 		XmlConfig globalConfig = null;
-		String url          = getParameter("globalConfig");
-		
+		final String url = getParameter("globalConfig");
+
 		if (url != null) {
-			
+
 			try {
-				globalConfig = new XmlConfig(new java.net.URL(url), "ProgramConfig");
-				RegEngine.addBogusComplete(globalConfig.getNode("Registration"));
-			} catch (java.net.MalformedURLException e) {
-			} catch (java.security.AccessControlException sec) {
+				globalConfig = new XmlConfig(new java.net.URL(url),
+						"ProgramConfig");
+				RegEngine
+						.addBogusComplete(globalConfig.getNode("Registration"));
+			} catch (final java.net.MalformedURLException e) {
+			} catch (final java.security.AccessControlException sec) {
 				urlAccessViolation(url + "\n" + sec);
-			} catch (Exception ex) {
+			} catch (final Exception ex) {
 				urlAccessViolation(ex.toString());
 			}
 
 		}
-		
+
 		if (globalConfig == null) {
 			globalConfig = new XmlConfig((java.net.URL) null, "ProgramConfig");
 		}
 		return globalConfig;
 	}
-	
+
 	/**
-	 *  Called when a url is improperly accessed. Pops up a window the hard way.
-	 *
-	 * @param  url  url which we do not have authorization for.
+	 * Called when a url is improperly accessed. Pops up a window the hard way.
+	 * 
+	 * @param url
+	 *            url which we do not have authorization for.
 	 */
-	public void urlAccessViolation(String url) {
-		
-		TextArea mp      = new TextArea("Bad URL\n" +
-				"There was a security exception accessing the url\n" + url +
-				"\nremember, applets can only load urls from the same server");
-		final Frame top  = new Frame("Bad URL");
-		
-		top.addWindowListener(new WindowAdapter(){
+	public void urlAccessViolation(final String url) {
+
+		final TextArea mp = new TextArea("Bad URL\n"
+				+ "There was a security exception accessing the url\n" + url
+				+ "\nremember, applets can only load urls from the same server");
+		final Frame top = new Frame("Bad URL");
+
+		top.addWindowListener(new WindowAdapter() {
 
 			@Override
-			public void windowClosing(WindowEvent windowEvent) {
+			public void windowClosing(final WindowEvent windowEvent) {
 				top.dispose();
 			}
 		});
@@ -231,32 +249,34 @@ public class ButtonApplet extends Applet {
 	}
 
 	/**
-	 *  Pops up a window with the html source of a url.
-	 *
-	 * @param  url  url to show.
+	 * Pops up a window with the html source of a url.
+	 * 
+	 * @param url
+	 *            url to show.
 	 */
-	public void showText(java.net.URL url) {
-		
+	public void showText(final java.net.URL url) {
+
 		try {
-			
-			final Frame top  = new Frame("Show URL");
+
+			final Frame top = new Frame("Show URL");
 			int ch;
-			Reader st = new InputStreamReader(url.openStream());;
-			TextArea mp = new TextArea();
+			final Reader st = new InputStreamReader(url.openStream());
+			;
+			final TextArea mp = new TextArea();
 			ch = st.read();
-			
+
 			while (ch != -1) {
-				
-				char[] cbuf  = new char[1];
+
+				final char[] cbuf = new char[1];
 				cbuf[0] = (char) ch;
 				mp.append(new String(cbuf));
 				ch = st.read();
 			}
-			
-			top.addWindowListener(new WindowAdapter(){
+
+			top.addWindowListener(new WindowAdapter() {
 
 				@Override
-				public void windowClosing(WindowEvent windowEvent) {
+				public void windowClosing(final WindowEvent windowEvent) {
 					top.dispose();
 				}
 			});
@@ -265,46 +285,50 @@ public class ButtonApplet extends Applet {
 			top.pack();
 			top.setVisible(true);
 
-		} catch (java.io.IOException e) {
+		} catch (final java.io.IOException e) {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.applet.Applet#getParameterInfo()
 	 */
 	@Override
 	public String[][] getParameterInfo() {
-		
-		 String pinfo[][] = {
-				 {"plugins",    "urls",    "comma separated list of plugin urls"},
-				 {"cdtFile", "url", "cdt file to display"},
-				 {"cdtName",   "String",     "name to display on button"},
-				 {"style", "String", "name of style with which to display this file"},
-				 {"globalConfig", "url", "url of global config"}
-			 };
+
+		final String pinfo[][] = {
+				{ "plugins", "urls", "comma separated list of plugin urls" },
+				{ "cdtFile", "url", "cdt file to display" },
+				{ "cdtName", "String", "name to display on button" },
+				{ "style", "String",
+						"name of style with which to display this file" },
+				{ "globalConfig", "url", "url of global config" } };
 		return pinfo;
 	}
-	
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.applet.Applet#getAppletInfo()
 	 */
 	@Override
 	public String getAppletInfo() {
-		
-		return "Java Treeview Applet (" +TreeViewApp.getVersionTag() +"test )";
+
+		return "Java Treeview Applet (" + TreeViewApp.getVersionTag()
+				+ "test )";
 	}
 
-	private String makeWellFormedURL(String rawURL) {
-		
+	private String makeWellFormedURL(final String rawURL) {
+
 		if (rawURL.toLowerCase().startsWith("http")) {
-			
+
 			return rawURL;
 		} else if (rawURL.toLowerCase().startsWith("file")) {
-			
+
 			return rawURL;
 		} else {
-			
+
 			return getCodeBase().toString() + rawURL;
 		}
 	}

@@ -8,7 +8,10 @@
  */
 package edu.stanford.genetics.treeview.core;
 
-import java.awt.*;
+import java.awt.Menu;
+import java.awt.MenuBar;
+import java.awt.MenuItem;
+import java.awt.MenuShortcut;
 import java.awt.event.ActionListener;
 
 import edu.stanford.genetics.treeview.TreeviewMenuBarI;
@@ -18,35 +21,49 @@ public class TreeViewMenuBar extends TreeviewMenuBarI {
 	private Menu currentMenu;
 	private MenuItem currentMenuItem;
 
-	/* (non-Javadoc)
-	 * @see edu.stanford.genetics.treeview.TreeviewMenuBarI#getUnderlyingMenuBar()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * edu.stanford.genetics.treeview.TreeviewMenuBarI#getUnderlyingMenuBar()
 	 */
 	public MenuBar getUnderlyingMenuBar() {
 		return underlyingMenuBar;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.stanford.genetics.treeview.TreeviewMenuBarI#setUnderlyingMenuBar(java.awt.MenuBar)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * edu.stanford.genetics.treeview.TreeviewMenuBarI#setUnderlyingMenuBar(
+	 * java.awt.MenuBar)
 	 */
-	public void setUnderlyingMenuBar(MenuBar underlyingMenuBar) {
+	public void setUnderlyingMenuBar(final MenuBar underlyingMenuBar) {
 		this.underlyingMenuBar = underlyingMenuBar;
 	}
-	
-	/* (non-Javadoc)
-	 * @see edu.stanford.genetics.treeview.TreeviewMenuBarI#addMenu(java.lang.String)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * edu.stanford.genetics.treeview.TreeviewMenuBarI#addMenu(java.lang.String)
 	 */
 	@Override
-	public Object addMenu(String name) {
+	public Object addMenu(final String name) {
 		currentMenu = new Menu(name);
 		underlyingMenuBar.add(currentMenu);
 		return currentMenu;
 	}
-	
-	/* (non-Javadoc)
-	 * @see edu.stanford.genetics.treeview.TreeviewMenuBarI#addMenuItem(java.lang.String, java.awt.event.ActionListener)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * edu.stanford.genetics.treeview.TreeviewMenuBarI#addMenuItem(java.lang
+	 * .String, java.awt.event.ActionListener)
 	 */
 	@Override
-	public Object addMenuItem(String name, ActionListener l) {
+	public Object addMenuItem(final String name, final ActionListener l) {
 		currentMenuItem = new MenuItem(name);
 		currentMenuItem.addActionListener(l);
 		currentMenu.add(currentMenuItem);
@@ -54,44 +71,57 @@ public class TreeViewMenuBar extends TreeviewMenuBarI {
 	}
 
 	@Override
-	public Object addMenuItem(String name, ActionListener l, int pos) {
+	public Object addMenuItem(final String name, final ActionListener l,
+			final int pos) {
 		currentMenuItem = new MenuItem(name);
 		currentMenuItem.addActionListener(l);
 		currentMenu.insert(currentMenuItem, pos);
 		return currentMenuItem;
 	}
-	/* (non-Javadoc)
-	 * @see edu.stanford.genetics.treeview.TreeviewMenuBarI#addSubMenu(java.lang.String)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * edu.stanford.genetics.treeview.TreeviewMenuBarI#addSubMenu(java.lang.
+	 * String)
 	 */
 	@Override
-	public Object addSubMenu(String name) {
-		Menu newMenu = new Menu(name);
+	public Object addSubMenu(final String name) {
+		final Menu newMenu = new Menu(name);
 		currentMenu.add(newMenu);
 		currentMenu = newMenu;
 		return currentMenu;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.stanford.genetics.treeview.TreeviewMenuBarI#setAccelerator(int)
 	 */
 	@Override
-	public void setAccelerator(int key) {
+	public void setAccelerator(final int key) {
 		currentMenuItem.setShortcut(new MenuShortcut(key));
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.stanford.genetics.treeview.TreeviewMenuBarI#setMnemonic(int)
 	 */
 	@Override
-	public void setMnemonic(int key) {
-//		currentMenuItem.setShortcut(new MenuShortcut(key));
+	public void setMnemonic(final int key) {
+		// currentMenuItem.setShortcut(new MenuShortcut(key));
 	}
-	
-	/* (non-Javadoc)
-	 * @see edu.stanford.genetics.treeview.TreeviewMenuBarI#setMenu(java.lang.String)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * edu.stanford.genetics.treeview.TreeviewMenuBarI#setMenu(java.lang.String)
 	 */
 	@Override
-	public Object setMenu(String name) {
+	public Object setMenu(final String name) {
 		int i;
 		for (i = 0; i < underlyingMenuBar.getMenuCount(); i++) {
 			if (underlyingMenuBar.getMenu(i).getLabel() == name) {
@@ -102,11 +132,15 @@ public class TreeViewMenuBar extends TreeviewMenuBarI {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.stanford.genetics.treeview.TreeviewMenuBarI#setSubMenu(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * edu.stanford.genetics.treeview.TreeviewMenuBarI#setSubMenu(java.lang.
+	 * String)
 	 */
 	@Override
-	public Object setSubMenu(String name) {
+	public Object setSubMenu(final String name) {
 		int i;
 		for (i = 0; i < currentMenu.getItemCount(); i++) {
 			if (currentMenu.getItem(i).getLabel() == name) {
@@ -117,7 +151,9 @@ public class TreeViewMenuBar extends TreeviewMenuBarI {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.stanford.genetics.treeview.TreeviewMenuBarI#clearMenu()
 	 */
 	public void clearMenu() {
@@ -142,19 +178,20 @@ public class TreeViewMenuBar extends TreeviewMenuBarI {
 	@Override
 	public void removeMenuItems() {
 		int i;
-		@SuppressWarnings("unused") // used to throw an exception
+		@SuppressWarnings("unused")
+		// used to throw an exception
 		Menu testItem;
-		for (i = currentMenu.getItemCount()-1; i >=0; i--) {
+		for (i = currentMenu.getItemCount() - 1; i >= 0; i--) {
 			try {
 				testItem = (Menu) currentMenu.getItem(i);
-			} catch (Exception e) {
-				currentMenu.remove(i);				
+			} catch (final Exception e) {
+				currentMenu.remove(i);
 			}
 		}
 	}
 
 	@Override
-	public void setEnabled(boolean value) {
-		currentMenu.setEnabled(value);		
+	public void setEnabled(final boolean value) {
+		currentMenu.setEnabled(value);
 	}
 }

@@ -22,47 +22,52 @@
  */
 package edu.stanford.genetics.treeview.plugin.scatterview;
 
-import edu.stanford.genetics.treeview.*;
+import edu.stanford.genetics.treeview.ConfigColorSet;
+import edu.stanford.genetics.treeview.ConfigNode;
+import edu.stanford.genetics.treeview.XmlConfig;
 
 /**
-* color set for scatterplot view
-*/
+ * color set for scatterplot view
+ */
 class ScatterColorSet extends ConfigColorSet {
-	private static final String [] types = new String [] {"Background", "Axis", "Data", "Selected"};
+	private static final String[] types = new String[] { "Background", "Axis",
+			"Data", "Selected" };
 
-	private static final String [] defaults = new String [] {"#000000","#00FF00","#FFFF00", "#FFFFFF"};
+	private static final String[] defaults = new String[] { "#000000",
+			"#00FF00", "#FFFF00", "#FFFFFF" };
 	private static final String defaultName = "ScatterColorSet";
-	
-	ScatterColorSet(String name, 
-	String back, String axis, String data, 
-	String sel) {
+
+	ScatterColorSet(final String name, final String back, final String axis,
+			final String data, final String sel) {
 		this(name);
 		setColor(0, decodeColor(back));
 		setColor(1, decodeColor(axis));
 		setColor(2, decodeColor(data));
 		setColor(3, decodeColor(sel));
 	}
+
 	ScatterColorSet() {
 		this("ScatterColorSet");
 	}
-	ScatterColorSet(String name) {
+
+	ScatterColorSet(final String name) {
 		super(defaultName, types, defaults);
 		setName(name);
 	}
-	
-	public void save(String file) {
-		XmlConfig config = new XmlConfig(file, "ScatterColorSet");
-		ConfigNode newNode = config.getNode("ConfigColorSet");
-		ScatterColorSet tempSet = new ScatterColorSet();
+
+	public void save(final String file) {
+		final XmlConfig config = new XmlConfig(file, "ScatterColorSet");
+		final ConfigNode newNode = config.getNode("ConfigColorSet");
+		final ScatterColorSet tempSet = new ScatterColorSet();
 		tempSet.bindConfig(newNode);
 		tempSet.copyStateFrom(this);
 		config.store();
 	}
-	
-	public void load(String file) {
-		XmlConfig config = new XmlConfig(file, "ScatterColorSet");
-		ConfigNode newNode = config.getNode("ConfigColorSet");
-		ScatterColorSet tempSet = new ScatterColorSet();
+
+	public void load(final String file) {
+		final XmlConfig config = new XmlConfig(file, "ScatterColorSet");
+		final ConfigNode newNode = config.getNode("ConfigColorSet");
+		final ScatterColorSet tempSet = new ScatterColorSet();
 		tempSet.bindConfig(newNode);
 		copyStateFrom(tempSet);
 	}

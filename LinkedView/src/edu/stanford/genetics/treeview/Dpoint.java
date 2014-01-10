@@ -22,85 +22,82 @@
  */
 package edu.stanford.genetics.treeview;
 
-
 /**
- *  Class to represent pair of doubles
- *
- * @author     Alok Saldanha <alok@genome.stanford.edu>
+ * Class to represent pair of doubles
+ * 
+ * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.4 $ $Date: 2004-12-21 03:28:14 $
  */
 public class Dpoint {
-	//point who's location is stored in doubles...
+	// point who's location is stored in doubles...
 	/**
-	 *  actual pair of doubles
+	 * actual pair of doubles
 	 */
 	protected double x, y;
 
-
 	/**
-	 *  Constructor for the Dpoint object
-	 *
-	 * @param  dx  first val in pair
-	 * @param  dy  second val in pair
+	 * Constructor for the Dpoint object
+	 * 
+	 * @param dx
+	 *            first val in pair
+	 * @param dy
+	 *            second val in pair
 	 */
-	public Dpoint(double dx, double dy) {
+	public Dpoint(final double dx, final double dy) {
 		x = dx;
 		y = dy;
 	}
 
-
 	/**
-	 *  Gets the x attribute of the Dpoint object
-	 *
-	 * @return    The x value
+	 * Gets the x attribute of the Dpoint object
+	 * 
+	 * @return The x value
 	 */
 	public double getX() {
 		return x;
 	}
 
-
 	/**
-	 *  Gets the y attribute of the Dpoint object
-	 *
-	 * @return    The y value
+	 * Gets the y attribute of the Dpoint object
+	 * 
+	 * @return The y value
 	 */
 	public double getY() {
 		return y;
 	}
 
-
 	/**
-	 *  Sometimes we want to scale the x and take the int part
-	 *
-	 * @param  s  multiplicative scaling factor
-	 * @return    int part of product
+	 * Sometimes we want to scale the x and take the int part
+	 * 
+	 * @param s
+	 *            multiplicative scaling factor
+	 * @return int part of product
 	 */
-	public int scaledX(double s) {
+	public int scaledX(final double s) {
 		return (int) (x * s);
 	}
 
-
 	/**
-	 *  Sometimes we want to scale the y and take the int part
-	 *
-	 * @param  s  multiplicative scaling factor
-	 * @return    int part of product
+	 * Sometimes we want to scale the y and take the int part
+	 * 
+	 * @param s
+	 *            multiplicative scaling factor
+	 * @return int part of product
 	 */
-	public int scaledY(double s) {
+	public int scaledY(final double s) {
 		return (int) (y * s);
 	}
 
-
 	/**
-	 *  Gets the dist to another point
-	 *
-	 * @param  dp  the other point
-	 * @return     The distance to dp
+	 * Gets the dist to another point
+	 * 
+	 * @param dp
+	 *            the other point
+	 * @return The distance to dp
 	 */
-	public double getDist(Dpoint dp) {
-	double dx  = x - dp.getX();
-	double dy  = y - dp.getY();
+	public double getDist(final Dpoint dp) {
+		final double dx = x - dp.getX();
+		final double dy = y - dp.getY();
 		return dx * dx + dy * dy;
 	}
 }
-

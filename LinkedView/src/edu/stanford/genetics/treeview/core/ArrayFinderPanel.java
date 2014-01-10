@@ -12,7 +12,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
 
 /**
  * @author aloksaldanha
- *
+ * 
  */
 public class ArrayFinderPanel extends HeaderFinderPanel {
 
@@ -23,18 +23,20 @@ public class ArrayFinderPanel extends HeaderFinderPanel {
 	 * @param hI
 	 * @param geneSelection
 	 */
-	public ArrayFinderPanel(ViewFrame f, DendroView2 dv, HeaderInfo hI, 
-			TreeSelectionI geneSelection) {
-		
+	public ArrayFinderPanel(final ViewFrame f, final DendroView2 dv,
+			final HeaderInfo hI, final TreeSelectionI geneSelection) {
+
 		super(f, hI, geneSelection, "Column");
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.stanford.genetics.treeview.HeaderFinder#scrollToIndex(int)
 	 */
 	@Override
-	public void scrollToIndex(int i) {
-		
+	public void scrollToIndex(final int i) {
+
 		if (viewFrame != null) {
 			viewFrame.scrollToArray(i);
 		}

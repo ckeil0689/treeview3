@@ -22,24 +22,28 @@
  */
 package edu.stanford.genetics.treeview;
 
-import java.io.*;
+import java.io.File;
+import java.io.FilenameFilter;
 
 /**
- *  Class to filter through files for .cdt and .pcl files.
- *
- * @author     Alok Saldanha <alok@genome.stanford.edu>
- * @version    $Revision: 1.5 $ $Date: 2004-12-21 03:28:14 $
+ * Class to filter through files for .cdt and .pcl files.
+ * 
+ * @author Alok Saldanha <alok@genome.stanford.edu>
+ * @version $Revision: 1.5 $ $Date: 2004-12-21 03:28:14 $
  */
-public class CdtFilter extends javax.swing.filechooser.FileFilter implements FilenameFilter {
+public class CdtFilter extends javax.swing.filechooser.FileFilter implements
+		FilenameFilter {
 	/**
-	 *  from the <code>FilenameFilter</code> interface.
-	 *
-	 * @param  dir   Directory to look in
-	 * @param  file  File name
-	 * @return       Returns true if file ends with .cdt or .pcl
+	 * from the <code>FilenameFilter</code> interface.
+	 * 
+	 * @param dir
+	 *            Directory to look in
+	 * @param file
+	 *            File name
+	 * @return Returns true if file ends with .cdt or .pcl
 	 */
 	@Override
-	public boolean accept(File dir, String file) {
+	public boolean accept(File dir, final String file) {
 		dir = null;
 		// don't use dir!!!
 		if (file.toLowerCase().endsWith(".cdt")) {
@@ -51,15 +55,15 @@ public class CdtFilter extends javax.swing.filechooser.FileFilter implements Fil
 		return false;
 	}
 
-
 	/**
-	 *  accepts or rejects files and directories
-	 *
-	 * @param  f  the file in question
-	 * @return    returns true if it's a directory, or if it ends in .pcl or .cdt
+	 * accepts or rejects files and directories
+	 * 
+	 * @param f
+	 *            the file in question
+	 * @return returns true if it's a directory, or if it ends in .pcl or .cdt
 	 */
 	@Override
-	public boolean accept(File f) {
+	public boolean accept(final File f) {
 		if (f.isDirectory()) {
 			return true;
 		}
@@ -73,4 +77,3 @@ public class CdtFilter extends javax.swing.filechooser.FileFilter implements Fil
 	}
 
 }
-

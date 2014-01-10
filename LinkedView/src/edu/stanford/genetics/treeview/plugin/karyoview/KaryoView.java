@@ -22,50 +22,86 @@
  */
 package edu.stanford.genetics.treeview.plugin.karyoview;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.Observable;
 import java.util.Observer;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.JViewport;
+import javax.swing.ProgressMonitor;
 
-import edu.stanford.genetics.treeview.*;
+import edu.stanford.genetics.treeview.ConfigNode;
+import edu.stanford.genetics.treeview.DataMatrix;
+import edu.stanford.genetics.treeview.DataModel;
+import edu.stanford.genetics.treeview.DummyConfigNode;
+import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.ModelView;
+import edu.stanford.genetics.treeview.SettingsPanel;
 import edu.stanford.genetics.treeview.SwingWorker;
 
-
 /**
- * This class is a model view that displays the karyoscope view for a
- * single experiment in the dataset.
- *
+ * This class is a model view that displays the karyoscope view for a single
+ * experiment in the dataset.
+ * 
  * There is really quite a lot of complexity involved. I have decided to factor
  * out all knowledge of where things are positioned into the KaryoDrawer class.
- *
- * I have retained knowledge of averaging in this class, as well as most of the 
+ * 
+ * I have retained knowledge of averaging in this class, as well as most of the
  * component mechanics. This is to facilitate the use of KaryoDrawer for drawing
  * to images with configurable parameters.
  */
 
 public class KaryoView extends ModelView implements Observer {
-    
+
 	private KaryoViewParameterPanel parameterPanel = null;
-	public KaryoViewParameterPanel getParameterPanel(){return parameterPanel;}
-	public void setParameterPanel(KaryoViewParameterPanel p) { parameterPanel = p;}
-	
-    /**
-     * current experiment column to view 
-     */
-    private int currentCol = 0;
-    public int getCurrentCol() { return currentCol;}
-    public void setCurrentCol(int n) { 
-		if (currentCol == n) return;
+
+	public KaryoViewParameterPanel getParameterPanel() {
+		return parameterPanel;
+	}
+
+	public void setParameterPanel(final KaryoViewParameterPanel p) {
+		parameterPanel = p;
+	}
+
+	/**
+	 * current experiment column to view
+	 */
+	private int currentCol = 0;
+
+	public int getCurrentCol() {
+		return currentCol;
+	}
+
+	public void setCurrentCol(final int n) {
+		if (currentCol == n)
+			return;
 		currentCol = n;
 		recalculateAverages();
 		offscreenValid = false;
 	}
 
 	private KaryoDrawer karyoDrawer = null;
+
 	/** Setter for karyoDrawer */
-	public void setKaryoDrawer(KaryoDrawer karyoDrawer) {
+	public void setKaryoDrawer(final KaryoDrawer karyoDrawer) {
 		if (this.karyoDrawer != null) {
 			this.karyoDrawer.deleteObserver(this);
 		}
@@ -74,103 +110,125 @@ public class KaryoView extends ModelView implements Observer {
 			this.karyoDrawer.addObserver(this);
 		}
 	}
+
 	/** Getter for karyoDrawer */
 	public KaryoDrawer getKaryoDrawer() {
 		return karyoDrawer;
 	}
-	
+
 	/* averaging accessors */
-	private AveragerSettingsPanel averagerSettingsPanel;
+	private final AveragerSettingsPanel averagerSettingsPanel;
+
 	public SettingsPanel getAveragerSettingsPanel() {
 		return averagerSettingsPanel;
 	}
+
 	public int getAveragingType() {
 		return averager.getType();
 	}
+
 	public String getAveragingArg() {
 		return averager.getArg();
 	}
-	private int defaultAverager = Averager.INTERVAL;
+
+	private final int defaultAverager = Averager.INTERVAL;
+
 	public void setSimpleAveraging() {
 		averagerSettingsPanel.setEnabled(false);
-		configNode.setAttribute("averager", simpleAverager.getType(), defaultAverager);
+		configNode.setAttribute("averager", simpleAverager.getType(),
+				defaultAverager);
 		recalculateAverages();
 	}
-	public void setNearestAveraging(int num) {
+
+	public void setNearestAveraging(final int num) {
 		averagerSettingsPanel.setEnabled(false);
-		configNode.setAttribute("averager", nearestAverager.getType(), defaultAverager);
-		 nearestAverager.setNum(num);
-		 recalculateAverages();
+		configNode.setAttribute("averager", nearestAverager.getType(),
+				defaultAverager);
+		nearestAverager.setNum(num);
+		recalculateAverages();
 	}
-	public void setNeighborAveraging(int num) {
+
+	public void setNeighborAveraging(final int num) {
 		averagerSettingsPanel.setEnabled(false);
-		configNode.setAttribute("averager", neighborAverager.getType(), defaultAverager);
-		 neighborAverager.setNum(num);
-		 recalculateAverages();
+		configNode.setAttribute("averager", neighborAverager.getType(),
+				defaultAverager);
+		neighborAverager.setNum(num);
+		recalculateAverages();
 	}
-	public void setIntervalAveraging(double width) {
+
+	public void setIntervalAveraging(final double width) {
 		averagerSettingsPanel.setEnabled(false);
-		configNode.setAttribute("averager", intervalAverager.getType(), defaultAverager);
-		 intervalAverager.setWidth(width);
-		 recalculateAverages();
+		configNode.setAttribute("averager", intervalAverager.getType(),
+				defaultAverager);
+		intervalAverager.setWidth(width);
+		recalculateAverages();
 	}
-	
-	private Averager getAverager(int type) {
-		switch(type) {
-			case Averager.SIMPLE:
-				return simpleAverager;
-			case Averager.NEAREST:
-				return nearestAverager;
-			case Averager.NEIGHBOR:
-				return neighborAverager;
-			case Averager.INTERVAL:
-				return intervalAverager;
+
+	private Averager getAverager(final int type) {
+		switch (type) {
+		case Averager.SIMPLE:
+			return simpleAverager;
+		case Averager.NEAREST:
+			return nearestAverager;
+		case Averager.NEIGHBOR:
+			return neighborAverager;
+		case Averager.INTERVAL:
+			return intervalAverager;
 		}
 		return getAverager(defaultAverager);
 	}
-	
-    /* Some private state variables... */
-	private Averager         simpleAverager;
-	private NeighborAverager neighborAverager;
-	private NearestAverager  nearestAverager;
-	private IntervalAverager intervalAverager;
+
+	/* Some private state variables... */
+	private final Averager simpleAverager;
+	private final NeighborAverager neighborAverager;
+	private final NearestAverager nearestAverager;
+	private final IntervalAverager intervalAverager;
 	private JScrollPane scrollPane;
 	private DataMatrix dataMatrix;
+
 	/** Setter for dataMatrix */
-	public void setDataMatrix(DataMatrix dataMatrix) {
+	public void setDataMatrix(final DataMatrix dataMatrix) {
 		this.dataMatrix = dataMatrix;
 	}
+
 	/** Getter for dataMatrix */
 	public DataMatrix getDataMatrix() {
 		return dataMatrix;
 	}
+
 	/** Getter for numCol */
 	public int getNumCol() {
 		return dataMatrix.getNumCol();
 	}
+
 	private double nodata;
+
 	/** Setter for nodata */
-	public void setNodata(double nodata) {
+	public void setNodata(final double nodata) {
 		this.nodata = nodata;
 	}
+
 	/** Getter for nodata */
 	public double getNodata() {
 		return nodata;
 	}
- private HeaderInfo experimentInfo;
+
+	private HeaderInfo experimentInfo;
 	private HeaderInfo geneInfo;
+
 	/** Setter for geneInfo */
-	public void setGeneInfo(HeaderInfo geneInfo) {
+	public void setGeneInfo(final HeaderInfo geneInfo) {
 		this.geneInfo = geneInfo;
 	}
+
 	/** Getter for geneInfo */
 	public HeaderInfo getGeneInfo() {
 		return geneInfo;
 	}
 
 	/**
-	* removes any pointers to exteral objects to aid GC
-	*/
+	 * removes any pointers to exteral objects to aid GC
+	 */
 	public void cleanup() {
 		dataMatrix = null;
 		scrollPane = null;
@@ -178,9 +236,9 @@ public class KaryoView extends ModelView implements Observer {
 		experimentInfo = null;
 		geneInfo = null;
 	}
-	
+
 	@Override
-	public void update(Observable o, Object arg) {
+	public void update(final Observable o, final Object arg) {
 		if (o == karyoDrawer) {
 			offscreenValid = false;
 			revalidate();
@@ -189,17 +247,17 @@ public class KaryoView extends ModelView implements Observer {
 			LogBuffer.println("KaryoView got weird update from " + o);
 		}
 	}
-	
-    /**
-     * for viewing DataModels
-     */
-	public KaryoView(KaryoDrawer karyoDrawer, DataModel tvmodel) {
+
+	/**
+	 * for viewing DataModels
+	 */
+	public KaryoView(final KaryoDrawer karyoDrawer, final DataModel tvmodel) {
 		setKaryoDrawer(karyoDrawer);
 		dataMatrix = tvmodel.getDataMatrix();
 		nodata = DataModel.NODATA;
 		experimentInfo = tvmodel.getArrayHeaderInfo();
 		geneInfo = tvmodel.getGeneHeaderInfo();
-		
+
 		simpleAverager = new Averager();
 		simpleAverager.setKaryoView(this);
 		nearestAverager = new NearestAverager();
@@ -222,12 +280,15 @@ public class KaryoView extends ModelView implements Observer {
 		addMouseListener(mouseTracker);
 		addKeyListener(mouseTracker);
 	}
+
 	ProgressMonitor averagerMonitor;
 	javax.swing.Timer averageTimer;
 	AveragerTask averagerTask;
-	class TimerListener implements ActionListener { // manages the averagermonitor
+
+	class TimerListener implements ActionListener { // manages the
+													// averagermonitor
 		@Override
-		public void actionPerformed(ActionEvent evt) {
+		public void actionPerformed(final ActionEvent evt) {
 			if (averagerMonitor.isCanceled() || averagerTask.done()) {
 				averagerMonitor.close();
 				averagerTask.stop();
@@ -244,14 +305,15 @@ public class KaryoView extends ModelView implements Observer {
 			repaint();
 		}
 	}
+
 	class AveragerTask {
 		private int current = 0;
 		private String statMessage;
-		
-		
+
 		/**
-		* Called to start the task. I don't know why we bother with the ActualTask class, so don't ask.
-		*/
+		 * Called to start the task. I don't know why we bother with the
+		 * ActualTask class, so don't ask.
+		 */
 		void go() {
 			setCurrent(0);
 			final SwingWorker worker = new SwingWorker() {
@@ -262,39 +324,40 @@ public class KaryoView extends ModelView implements Observer {
 			};
 			worker.start();
 		}
-		
-		
+
 		/**
-		* Called from ProgressBarDemo to find out how much work needs
-		* to be done.
-		*/
+		 * Called from ProgressBarDemo to find out how much work needs to be
+		 * done.
+		 */
 		int getLengthOfTask() {
 			return karyoDrawer.getGenome().getNumLoci();
 		}
-		
+
 		/**
-		* Called from ProgressBarDemo to find out how much has been done.
-		*/
+		 * Called from ProgressBarDemo to find out how much has been done.
+		 */
 		int getCurrent() {
 			return current;
 		}
-		void setCurrent(int i) {
+
+		void setCurrent(final int i) {
 			current = i;
 		}
-		public void incrCurrent() { 
+
+		public void incrCurrent() {
 			current++;
 		}
+
 		/**
-		* called to stop the averaging on a cancel...
-		*/
+		 * called to stop the averaging on a cancel...
+		 */
 		void stop() {
 			current = getLengthOfTask();
 		}
-		
-		
+
 		/**
-		* Called from ProgressBarDemo to find out if the task has completed.
-		*/
+		 * Called from ProgressBarDemo to find out if the task has completed.
+		 */
 		boolean done() {
 			if (current >= getLengthOfTask()) {
 				return true;
@@ -302,54 +365,62 @@ public class KaryoView extends ModelView implements Observer {
 				return false;
 			}
 		}
-		
+
 		String getMessage() {
 			return statMessage;
 		}
+
 		class ActualTask {
 			ActualTask() {
 				karyoDrawer.setNodata(nodata);
-				Genome genome = karyoDrawer.getGenome();
-				int nchr = genome.getMaxChromosome();
+				final Genome genome = karyoDrawer.getGenome();
+				final int nchr = genome.getMaxChromosome();
 				setCurrent(0);
-//				System.out.println("Actual task started, length " + getLengthOfTask());
+				// System.out.println("Actual task started, length " +
+				// getLengthOfTask());
 				for (int i = 1; i <= nchr; i++) {
 					statMessage = "Processing Chromosome " + i;
-					ChromosomeLocus start = genome.getChromosome(i).getLeftEnd();
+					final ChromosomeLocus start = genome.getChromosome(i)
+							.getLeftEnd();
 					if (start == null) { // nothing on chromosome...
 						continue;
 					}
 					ChromosomeLocus current = start;
-					int currentCol = getCurrentCol();
-					double nodata = getNodata();
-					do  {
-						if (done()) break;
+					final int currentCol = getCurrentCol();
+					final double nodata = getNodata();
+					do {
+						if (done())
+							break;
 						if (current.getCdtIndex() != -1) {
 							try {
-								karyoDrawer.setMapValue(current, averager.getValue(current, currentCol));
-							} catch (java.lang.ArrayIndexOutOfBoundsException e) {
+								karyoDrawer.setMapValue(current,
+										averager.getValue(current, currentCol));
+							} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 								karyoDrawer.setMapValue(current, nodata);
 							}
 						} else {
 							karyoDrawer.setMapValue(current, nodata);
 						}
 						current = current.getRight();
-						
+
 						incrCurrent();
 					} while ((current != start) && (current != null));
-					if (done()) break;
+					if (done())
+						break;
 				}
 				stop();
 			}
 		}
 	}
+
 	public void recalculateAverages() {
-		averager = getAverager(configNode.getAttribute("averager", defaultAverager));
+		averager = getAverager(configNode.getAttribute("averager",
+				defaultAverager));
 		// only need to calculate averages for loci which are in genome...
 		averagerTask = new AveragerTask();
 		averagerMonitor = new ProgressMonitor(this,
-		"Calculating Averaged Values",
-		"Note", 0, averagerTask.getLengthOfTask());
+				"Calculating Averaged Values", "Note", 0,
+				averagerTask.getLengthOfTask());
 		averagerMonitor.setProgress(0);
 		averagerTask.go();
 		averageTimer.start();
@@ -357,19 +428,22 @@ public class KaryoView extends ModelView implements Observer {
 
 	Averager averager = null;
 	MouseTracker mouseTracker = new MouseTracker();
+
 	@Override
-	public synchronized void paintComposite (Graphics g) {
-	  mouseTracker.paintComposite(g);
+	public synchronized void paintComposite(final Graphics g) {
+		mouseTracker.paintComposite(g);
 	}
-	
+
 	/**
-	* override parent so as to avoid running out of memory at high zooms.
-	*/
+	 * override parent so as to avoid running out of memory at high zooms.
+	 */
 	@Override
-	public void paintComponent(Graphics g) {
-		Dimension newsize = getSize();
-		if (newsize == null) { return;}
-		//		karyoDrawer.notifyObservers();
+	public void paintComponent(final Graphics g) {
+		final Dimension newsize = getSize();
+		if (newsize == null) {
+			return;
+		}
+		// karyoDrawer.notifyObservers();
 		if (karyoDrawer.getPixelPerVal() == 0) {
 			if (getKaryoDrawer().getGenome().getMaxChromosome() > 0) {
 				if (getKaryoDrawer().getGenome().getNonemptyCount() > 0) {
@@ -379,59 +453,58 @@ public class KaryoView extends ModelView implements Observer {
 				}
 			}
 		}
-//		System.out.println("repaint called on KaryoView " + newsize);
+		// System.out.println("repaint called on KaryoView " + newsize);
 		// update offscreenBuffer if necessary
 		g.setColor(Color.white);
-		g.fillRect(0,0,newsize.width, newsize.height);
+		g.fillRect(0, 0, newsize.width, newsize.height);
 		if (isEnabled()) {
 			offscreenValid = false;
 			updateBuffer(g);
 			paintComposite(g);
 		}
 	}
+
 	Rectangle clipRect = new Rectangle();
+
 	@Override
-	public void updateBuffer(Graphics g) {
-	  if (justZoomed) {
-		justZoomed = false;
-		scrollPane.getViewport().setViewPosition(zoomPoint);
-		repaint();
-		return;
-	  }
-	  try {
-		  clipRect = g.getClipBounds(clipRect);
-	  } catch (java.lang.NoSuchMethodError e) {
-		  clipRect.setBounds(g.getClipBounds());
-	  }
-	  karyoDrawer.paint(g, clipRect);
+	public void updateBuffer(final Graphics g) {
+		if (justZoomed) {
+			justZoomed = false;
+			scrollPane.getViewport().setViewPosition(zoomPoint);
+			repaint();
+			return;
+		}
+		try {
+			clipRect = g.getClipBounds(clipRect);
+		} catch (final java.lang.NoSuchMethodError e) {
+			clipRect.setBounds(g.getClipBounds());
+		}
+		karyoDrawer.paint(g, clipRect);
 	}
-	
-	
+
 	/*
-	private int nChromosomes = 0;
-	private int chrIndex = -1;
-	private int armIndex = -1;
-	private int posIndex = -1;
-	private int orfIndex = -1;
-	*/
-    @Override
+	 * private int nChromosomes = 0; private int chrIndex = -1; private int
+	 * armIndex = -1; private int posIndex = -1; private int orfIndex = -1;
+	 */
+	@Override
 	public String viewName() {
-	return "KaryoView";
-    }
+		return "KaryoView";
+	}
 
 	/**
-	* This method is called to make the karyoview fit on the screen. 
-	* It will set the desired width and height, and then ask the KaryoDrawer
-	* to adjust the pixels per value and pixels per row to something sensible.
-	*/
+	 * This method is called to make the karyoview fit on the screen. It will
+	 * set the desired width and height, and then ask the KaryoDrawer to adjust
+	 * the pixels per value and pixels per row to something sensible.
+	 */
 	Rectangle repaintRect = new Rectangle();
+
 	public void redoScale() {
-//		Exception e = new Exception();		e.printStackTrace();
-		Dimension size = scrollPane.getViewport().getExtentSize();
+		// Exception e = new Exception(); e.printStackTrace();
+		final Dimension size = scrollPane.getViewport().getExtentSize();
 		karyoDrawer.setWidth(size.width);
 		karyoDrawer.setHeight(size.height);
 		karyoDrawer.autoScale();
-		
+
 		revalidate();
 		repaintRect.setBounds(0, 0, size.width, size.height);
 		repaint(repaintRect);
@@ -440,28 +513,31 @@ public class KaryoView extends ModelView implements Observer {
 			parameterPanel.getValues();
 		}
 	}
-    public String [] getExperiments() {
-	  String [] names = new String[getNumCol()];
-	  for (int i = 0; i < getNumCol();i++) {
-		names[i] = experimentInfo.getHeader(i)[0];
-	  }
-	  return names;
-	}
-    @Override
-	public Dimension getPreferredSize() {
-	if (karyoDrawer.getWidth() >= 0) {
-	    Dimension p = new Dimension(karyoDrawer.getWidth(),karyoDrawer.getHeight());
-	    return p;
-	} else {
-	    return super.getPreferredSize();
-	}
-    }
 
-	public boolean isChromosomeVisible(int i) {
-	  JViewport viewport = scrollPane.getViewport();
-	  Rectangle clipRect = viewport.getViewRect();
-		int min = karyoDrawer.minVisibleChromosome(clipRect);
-		int max = karyoDrawer.maxVisibleChromosome(clipRect);
+	public String[] getExperiments() {
+		final String[] names = new String[getNumCol()];
+		for (int i = 0; i < getNumCol(); i++) {
+			names[i] = experimentInfo.getHeader(i)[0];
+		}
+		return names;
+	}
+
+	@Override
+	public Dimension getPreferredSize() {
+		if (karyoDrawer.getWidth() >= 0) {
+			final Dimension p = new Dimension(karyoDrawer.getWidth(),
+					karyoDrawer.getHeight());
+			return p;
+		} else {
+			return super.getPreferredSize();
+		}
+	}
+
+	public boolean isChromosomeVisible(final int i) {
+		final JViewport viewport = scrollPane.getViewport();
+		final Rectangle clipRect = viewport.getViewRect();
+		final int min = karyoDrawer.minVisibleChromosome(clipRect);
+		final int max = karyoDrawer.maxVisibleChromosome(clipRect);
 		System.out.println("min " + min + " max " + max);
 		if (i <= max && i >= min) {
 			return true;
@@ -469,314 +545,336 @@ public class KaryoView extends ModelView implements Observer {
 			return false;
 		}
 	}
-	
-	private boolean justZoomed = false;
-	private Point zoomPoint = new Point();
-	private void zoomRectangle(Rectangle r) {
-	  JViewport viewport = scrollPane.getViewport();
-	  Dimension visible = viewport.getExtentSize();
-	  // calculate scale factors...
-	  double sx = (double) visible.width / r.width;
-	  double sy = (double) visible.height / r.height;
 
-	  /*
-	  Dimension scrollPaneSize = scrollPane.getSize();
-	  Dimension viewportSize = viewport.getSize();
-	  Dimension viewSize = viewport.getViewSize();
-	  System.out.println("scrollPaneSize " + scrollPaneSize);
-	  System.out.println("viewPort " + viewport);
-	  System.out.println("viewportSize " + viewportSize);
-	  System.out.println("extentSize " + visible);
-	  System.out.println("viewSize " + viewSize);
-	  System.out.println("zoomto " + r);
-	  */
-//	  System.out.println("was " + getPreferredSize());
-	  karyoDrawer.setWidth((int) (karyoDrawer.getWidth()  * sx));
-	  karyoDrawer.setHeight((int) (karyoDrawer.getHeight() * sy));
-	  karyoDrawer.setPixelPerMap(sx * karyoDrawer.getPixelPerMap());
-	  karyoDrawer.setPixelPerVal(sy * karyoDrawer.getPixelPerVal());
-//	  System.out.println("now " + getPreferredSize());
-	  revalidate();
-	  zoomPoint.setLocation((int) (sx * r.x), 
-	  						(int) (sy * r.y));
-	  justZoomed = true;
-	  scrollPane.repaint();
-	  if (parameterPanel != null) {
-		  parameterPanel.getValues();
-	  }
-	}
-	/**
-	* Zoom with the specified factor, keeping the specified point in the same relative place.
-	*
-	* If the point is null, it keeps the center in the same place.
-	*/
-	private void zoomFactor(double factor, Point point) {
-		JViewport viewport = scrollPane.getViewport();
-		Dimension visible = viewport.getExtentSize();
-		Point r = viewport.getViewPosition();
-		if (point == null) {
-			point = new Point(r.x + visible.width/2, r.y + visible.height/2);
-		}
-		// zooms view out...
-		karyoDrawer.setWidth((int) (karyoDrawer.getWidth()      * factor));
-		karyoDrawer.setHeight((int) (karyoDrawer.getHeight()    * factor));
-		karyoDrawer.setPixelPerMap(karyoDrawer.getPixelPerMap() * factor);
-		karyoDrawer.setPixelPerVal(karyoDrawer.getPixelPerVal() * factor);
+	private boolean justZoomed = false;
+	private final Point zoomPoint = new Point();
+
+	private void zoomRectangle(final Rectangle r) {
+		final JViewport viewport = scrollPane.getViewport();
+		final Dimension visible = viewport.getExtentSize();
+		// calculate scale factors...
+		final double sx = (double) visible.width / r.width;
+		final double sy = (double) visible.height / r.height;
+
+		/*
+		 * Dimension scrollPaneSize = scrollPane.getSize(); Dimension
+		 * viewportSize = viewport.getSize(); Dimension viewSize =
+		 * viewport.getViewSize(); System.out.println("scrollPaneSize " +
+		 * scrollPaneSize); System.out.println("viewPort " + viewport);
+		 * System.out.println("viewportSize " + viewportSize);
+		 * System.out.println("extentSize " + visible);
+		 * System.out.println("viewSize " + viewSize);
+		 * System.out.println("zoomto " + r);
+		 */
+		// System.out.println("was " + getPreferredSize());
+		karyoDrawer.setWidth((int) (karyoDrawer.getWidth() * sx));
+		karyoDrawer.setHeight((int) (karyoDrawer.getHeight() * sy));
+		karyoDrawer.setPixelPerMap(sx * karyoDrawer.getPixelPerMap());
+		karyoDrawer.setPixelPerVal(sy * karyoDrawer.getPixelPerVal());
+		// System.out.println("now " + getPreferredSize());
 		revalidate();
-		zoomPoint.setLocation((int) (point.x*factor - (point.x - r.x)), 
-							(int) (point.y*factor - (point.y - r.y)));
+		zoomPoint.setLocation((int) (sx * r.x), (int) (sy * r.y));
 		justZoomed = true;
 		scrollPane.repaint();
 		if (parameterPanel != null) {
 			parameterPanel.getValues();
 		}
 	}
+
 	/**
-	* follows mouse around, communicates with KaryoView by calling drawBad
-	* and being called by paintComposite()
-	*/
-	class MouseTracker implements MouseMotionListener, MouseListener, KeyListener {
+	 * Zoom with the specified factor, keeping the specified point in the same
+	 * relative place.
+	 * 
+	 * If the point is null, it keeps the center in the same place.
+	 */
+	private void zoomFactor(final double factor, Point point) {
+		final JViewport viewport = scrollPane.getViewport();
+		final Dimension visible = viewport.getExtentSize();
+		final Point r = viewport.getViewPosition();
+		if (point == null) {
+			point = new Point(r.x + visible.width / 2, r.y + visible.height / 2);
+		}
+		// zooms view out...
+		karyoDrawer.setWidth((int) (karyoDrawer.getWidth() * factor));
+		karyoDrawer.setHeight((int) (karyoDrawer.getHeight() * factor));
+		karyoDrawer.setPixelPerMap(karyoDrawer.getPixelPerMap() * factor);
+		karyoDrawer.setPixelPerVal(karyoDrawer.getPixelPerVal() * factor);
+		revalidate();
+		zoomPoint.setLocation((int) (point.x * factor - (point.x - r.x)),
+				(int) (point.y * factor - (point.y - r.y)));
+		justZoomed = true;
+		scrollPane.repaint();
+		if (parameterPanel != null) {
+			parameterPanel.getValues();
+		}
+	}
+
+	/**
+	 * follows mouse around, communicates with KaryoView by calling drawBad and
+	 * being called by paintComposite()
+	 */
+	class MouseTracker implements MouseMotionListener, MouseListener,
+			KeyListener {
 		/* key listener */
 		@Override
-		public void keyPressed (KeyEvent e) {
-				// Invoked when a key has been pressed. 
+		public void keyPressed(final KeyEvent e) {
+			// Invoked when a key has been pressed.
 		}
+
 		@Override
-		public void keyReleased (KeyEvent e) {
-				//ÊÊInvoked when a key has been released. 
+		public void keyReleased(final KeyEvent e) {
+			// ÊÊInvoked when a key has been released.
 		}
+
 		@Override
-		public void keyTyped (KeyEvent e) {
-			  //	Invoked when a key has been typed.
+		public void keyTyped(final KeyEvent e) {
+			// Invoked when a key has been typed.
 			switch (e.getKeyChar()) {
-				case '-':
-					zoomFactor(0.5, startPoint);
-					startPoint.x = (int)(startPoint.x * 0.5);
-					startPoint.y = (int)(startPoint.y * 0.5);
-					mouseMoved(new MouseEvent (KaryoView.this, MouseEvent.MOUSE_MOVED, 10, 0, 
-					startPoint.x, startPoint.y, 1, false));
-					break;
-				case '+':
-					zoomFactor(2.0, startPoint);
-					startPoint.x = (int)(startPoint.x * 2.0);
-					startPoint.y = (int)(startPoint.y * 2.0);
-					mouseMoved(new MouseEvent (KaryoView.this, MouseEvent.MOUSE_MOVED, 10, 0, 
-					startPoint.x, startPoint.y, 1, false));
-					break;
+			case '-':
+				zoomFactor(0.5, startPoint);
+				startPoint.x = (int) (startPoint.x * 0.5);
+				startPoint.y = (int) (startPoint.y * 0.5);
+				mouseMoved(new MouseEvent(KaryoView.this,
+						MouseEvent.MOUSE_MOVED, 10, 0, startPoint.x,
+						startPoint.y, 1, false));
+				break;
+			case '+':
+				zoomFactor(2.0, startPoint);
+				startPoint.x = (int) (startPoint.x * 2.0);
+				startPoint.y = (int) (startPoint.y * 2.0);
+				mouseMoved(new MouseEvent(KaryoView.this,
+						MouseEvent.MOUSE_MOVED, 10, 0, startPoint.x,
+						startPoint.y, 1, false));
+				break;
 			}
 		}
 
 		Point startPoint = new Point();
-	  Point endPoint = new Point();
-	  /* dragRect is non-null when the mouse is dragging */
-	  Rectangle dragRect = null;
+		Point endPoint = new Point();
+		/* dragRect is non-null when the mouse is dragging */
+		Rectangle dragRect = null;
 
-	  /*
-	   * tip and highlight are non-null when the mouse is in the view
-	   * they are also set to null when the mouse is released on a zoom
-	   */
-	  Point tip = null;           // keeps track of the tip of the  most recent gene
-	  Rectangle highlight = null; // box around tip in which to draw highlight
+		/*
+		 * tip and highlight are non-null when the mouse is in the view they are
+		 * also set to null when the mouse is released on a zoom
+		 */
+		Point tip = null; // keeps track of the tip of the most recent gene
+		Rectangle highlight = null; // box around tip in which to draw highlight
 
-	  Rectangle repaintRect = new Rectangle();
-	  @Override
-	public void mouseEntered(MouseEvent e) {
-		  requestFocus();
-	  }
-	  
-	  @Override
-	public void mouseExited(MouseEvent e) {
-		repaint(repaintRect);
-		if (tip != null) {
-			repaintRect.setLocation(tip.x, tip.y);
+		Rectangle repaintRect = new Rectangle();
+
+		@Override
+		public void mouseEntered(final MouseEvent e) {
+			requestFocus();
 		}
-		repaintRect.setSize(0,0);
-		if (highlight != null) {
-			repaintRect.add(highlight);
-		}
-		tip       = null;
-		highlight = null;
-		repaint(repaintRect);
-		updateStatus(null);
-	  }
 
-	  @Override
-	public void mouseClicked(MouseEvent e) {
-		  if (viewFrame.windowActive() == false) return;
-		int xpos = e.getX();
-		int ypos = e.getY();
-		startPoint.setLocation(xpos, ypos);
-		ChromosomeLocus closest = karyoDrawer.getClosest(startPoint);
-		if (closest != null) {
-			int closestIndex = closest.getCdtIndex();
-			if (closestIndex != -1) {
-				if (viewFrame != null) {
-					viewFrame.displayURL(closestIndex);
+		@Override
+		public void mouseExited(final MouseEvent e) {
+			repaint(repaintRect);
+			if (tip != null) {
+				repaintRect.setLocation(tip.x, tip.y);
+			}
+			repaintRect.setSize(0, 0);
+			if (highlight != null) {
+				repaintRect.add(highlight);
+			}
+			tip = null;
+			highlight = null;
+			repaint(repaintRect);
+			updateStatus(null);
+		}
+
+		@Override
+		public void mouseClicked(final MouseEvent e) {
+			if (viewFrame.windowActive() == false)
+				return;
+			final int xpos = e.getX();
+			final int ypos = e.getY();
+			startPoint.setLocation(xpos, ypos);
+			final ChromosomeLocus closest = karyoDrawer.getClosest(startPoint);
+			if (closest != null) {
+				final int closestIndex = closest.getCdtIndex();
+				if (closestIndex != -1) {
+					if (viewFrame != null) {
+						viewFrame.displayURL(closestIndex);
+					}
+				}
+
+			}
+		}
+
+		// MouseMotionListener
+		@Override
+		public void mouseMoved(final MouseEvent e) {
+			final int xpos = e.getX();
+			final int ypos = e.getY();
+			startPoint.setLocation(xpos, ypos);
+			final ChromosomeLocus closest = karyoDrawer.getClosest(startPoint);
+			updateStatus(closest);
+			moveHighlight(closest);
+		}
+
+		// Mouse Listener
+		@Override
+		public void mousePressed(final MouseEvent e) {
+			mouseExited(e);
+			if (viewFrame.windowActive() == false)
+				return;
+			// initialize startpoint and endpoint
+			startPoint.setLocation(e.getX(), e.getY());
+			endPoint.setLocation(startPoint.x, startPoint.y);
+			// setup dragrect
+			dragRect = new Rectangle();
+			dragRect.setLocation(startPoint.x, startPoint.y);
+			dragRect.setSize(endPoint.x - dragRect.x, endPoint.y - dragRect.y);
+			// repaint.
+			repaint(dragRect);
+		}
+
+		@Override
+		public void mouseReleased(final MouseEvent e) {
+			if (viewFrame.windowActive() == false)
+				return;
+			if (dragRect == null)
+				return;
+			mouseDragged(e);
+			repaintRect.setBounds(dragRect);
+			// need to set null for repaint....
+			tip = null;
+			highlight = null;
+			dragRect = null;
+			// System.out.println("Repainting rect");
+			repaint(repaintRect);
+			if (repaintRect.width > 3) {
+				if (repaintRect.height > 3) {
+					zoomRectangle(repaintRect);
 				}
 			}
-			
 		}
-	  }	  
-	  
-	  // MouseMotionListener
-	  @Override
-	public void mouseMoved(MouseEvent e) {
-		int xpos = e.getX();
-		int ypos = e.getY();
-		startPoint.setLocation(xpos, ypos);
-		ChromosomeLocus closest = karyoDrawer.getClosest(startPoint);
-		updateStatus(closest);
-		moveHighlight(closest);
-	  }
-	  // Mouse Listener 
-	  @Override
-	public void mousePressed(MouseEvent e) {
-		  mouseExited(e);
-		if (viewFrame.windowActive() == false) return;
-		// initialize startpoint and endpoint
-		startPoint.setLocation(e.getX(), e.getY());
-		endPoint.setLocation(startPoint.x, startPoint.y);
-		// setup dragrect
-		dragRect = new Rectangle();
-		dragRect.setLocation(startPoint.x, startPoint.y);
-		dragRect.setSize(endPoint.x - dragRect.x, endPoint.y - dragRect.y);
-		// repaint.
-		repaint(dragRect);
-	  }
-	  @Override
-	public void mouseReleased(MouseEvent e) {
-		if (viewFrame.windowActive() == false) return;
-		if (dragRect == null) return;
-		mouseDragged(e);
-		repaintRect.setBounds(dragRect);
-		// need to set null for repaint....
-		tip = null;
-		highlight = null;
-		dragRect = null;
-//		System.out.println("Repainting rect");
-		repaint(repaintRect);
-		if (repaintRect.width > 3) {
-		  if (repaintRect.height > 3) {
-			zoomRectangle(repaintRect);
-		  }
+
+		// MouseMotionListener
+		@Override
+		public void mouseDragged(final MouseEvent e) {
+			// move dragRect
+
+			if (dragRect == null) {
+				LogBuffer.println("dragRect null");
+				return;
+			}
+			endPoint.setLocation(e.getX(), e.getY());
+			dragRect.setLocation(startPoint.x, startPoint.y);
+			dragRect.setSize(0, 0);
+			dragRect.add(endPoint.x, endPoint.y);
+
+			// animate!
+			repaint(repaintRect);
+			repaintRect.setBounds(dragRect);
+			repaintRect.grow(1, 1);
+			repaint(repaintRect);
 		}
-	  }
-	  // MouseMotionListener
-	  @Override
-	public void mouseDragged(MouseEvent e) {
-		// move dragRect
-		
-		if (dragRect == null) {
-			LogBuffer.println("dragRect null");
+
+		public void paintComposite(final Graphics g) {
+			// composite the rectangles...
+			if (highlight != null) {
+				g.setColor(karyoDrawer.getKaryoColorSet().getColor("Highlight"));
+				final int lx = highlight.x;
+				final int ux = lx + highlight.width;
+				final int uy = highlight.y;
+				final int ly = uy + highlight.height;
+				g.drawLine(lx, ly, ux, uy);
+				g.drawLine(lx, uy, ux, ly);
+				// g.fillRect(highlight.x, highlight.y,
+				// highlight.width, highlight.height);
+			}
+			if (tip != null) {
+				final int mouseX = startPoint.x;
+				final int mouseY = startPoint.y;
+				g.drawLine(mouseX, mouseY, tip.x, tip.y);
+			}
+			if (dragRect != null) {
+				drawBand(dragRect, g);
+			}
+		}
+
+		private void drawBand(final Rectangle l, final Graphics g) {
+			g.setColor(Color.yellow);
+			// g.setXORMode(getBackground()); doesn't work. don't know why not -
+			// probbaly not using setBackground()???
+			g.drawRect(l.x, l.y, l.width, l.height);
+			g.setPaintMode();
+		}
+
+		private void removeHighlight() { // don't you love english?
+			highlight = null;
+			tip = null;
+			repaint(repaintRect);
 			return;
 		}
-		endPoint.setLocation(e.getX(), e.getY());
-		dragRect.setLocation(startPoint.x, startPoint.y);
-		dragRect.setSize(0,0);
-		dragRect.add(endPoint.x, endPoint.y);
 
-		// animate!
-		repaint(repaintRect);	
-		repaintRect.setBounds(dragRect);
-		repaintRect.grow(1,1);
-		repaint(repaintRect);
-	  }
-	  
-	  public void paintComposite (Graphics g) {
-		// composite the rectangles...
-		if (highlight != null) {
-		  g.setColor(karyoDrawer.getKaryoColorSet().getColor("Highlight"));
-		  int lx = highlight.x;
-		  int  ux = lx + highlight.width;
-		  int uy = highlight.y;
-		  int  ly = uy + highlight.height;
-		  g.drawLine(lx,ly,ux,uy);
-		  g.drawLine(lx,uy,ux,ly);
-		  //		    g.fillRect(highlight.x, highlight.y, 
-		  //				       highlight.width, highlight.height);
-		}
-		if (tip != null) {
-		  int mouseX = startPoint.x;
-		  int mouseY = startPoint.y;
-		  g.drawLine(mouseX, mouseY, tip.x, tip.y);
-		}
-		if (dragRect != null) {
-		  drawBand(dragRect, g);
-		}
-	  }
-	  private void drawBand(Rectangle l, Graphics g) { 
-		  g.setColor(Color.yellow);
-//		  g.setXORMode(getBackground()); doesn't work. don't know why not - probbaly not using setBackground()???
-		g.drawRect(l.x, l.y, l.width, l.height);
-		g.setPaintMode();
-	  }
+		private void moveHighlight(final ChromosomeLocus locus) {
+			if (locus == null) {
+				removeHighlight();
+				return;
+			}
 
-	  private void removeHighlight() { // don't you love english?
-		  highlight = null;
-		  tip = null;
-		  repaint(repaintRect);
-		  return;
-	  }
-	  private void moveHighlight(ChromosomeLocus locus) {
-		  if (locus == null) {
-			  removeHighlight();
-			  return;
-		  }
-		  
-		  double val = 0;
-		  try {
-			  val = averager.getValue(locus, getCurrentCol());
-		  } catch (Exception e) {
-			  removeHighlight();
-			  return;
-		  }
-		  
-		  if (val == nodata) {
-			  removeHighlight();
-			  return;
-		  }
-		  
-		  // locate pixel of top of gene...
-		  tip = karyoDrawer.getEnd(locus);
-		  
-		  if (highlight == null) {
-			  highlight = new Rectangle();
-		  }
-		  highlight.setBounds(tip.x-5, tip.y-5, 11, 11);
-		  // 	  System.out.println("moved highlight to " + geneX + ", " + geneY + " locus " + locus.toString());
-		  repaint(repaintRect);
-		  repaintRect.setLocation(tip.x, tip.y);
-		  repaintRect.setSize(0,0);
-		  repaintRect.add(highlight);
-		  repaintRect.add(tip);
-		  repaintRect.add(startPoint);
-		  repaintRect.grow(1,1);
-		  repaint(repaintRect);
-	  }
+			double val = 0;
+			try {
+				val = averager.getValue(locus, getCurrentCol());
+			} catch (final Exception e) {
+				removeHighlight();
+				return;
+			}
+
+			if (val == nodata) {
+				removeHighlight();
+				return;
+			}
+
+			// locate pixel of top of gene...
+			tip = karyoDrawer.getEnd(locus);
+
+			if (highlight == null) {
+				highlight = new Rectangle();
+			}
+			highlight.setBounds(tip.x - 5, tip.y - 5, 11, 11);
+			// System.out.println("moved highlight to " + geneX + ", " + geneY +
+			// " locus " + locus.toString());
+			repaint(repaintRect);
+			repaintRect.setLocation(tip.x, tip.y);
+			repaintRect.setSize(0, 0);
+			repaintRect.add(highlight);
+			repaintRect.add(tip);
+			repaintRect.add(startPoint);
+			repaintRect.grow(1, 1);
+			repaint(repaintRect);
+		}
 	}
-	private void updateStatus(ChromosomeLocus locus) {
+
+	private void updateStatus(final ChromosomeLocus locus) {
 		if (locus == null) {
 			statusText[0] = "KeyBoard Shortcuts:";
 			statusText[1] = "";
 			statusText[2] = "'+' zooms in on mouse";
 			statusText[3] = "'-' zooms out on mouse";
 			statusText[4] = "";
-			//			LogPanel.println("KaryoView.updateStatus(): Locus was " + locus);
+			// LogPanel.println("KaryoView.updateStatus(): Locus was " + locus);
 		} else {
-			int chr = locus.getChromosome();
-			int arm = locus.getArm();
-			double pos = locus.getPosition();
-			int closestIndex = locus.getCdtIndex();
-			statusText[0] = "Cursor is over Chromosome " + chr + " arm " + arm + " position " + pos;
+			final int chr = locus.getChromosome();
+			final int arm = locus.getArm();
+			final double pos = locus.getPosition();
+			final int closestIndex = locus.getCdtIndex();
+			statusText[0] = "Cursor is over Chromosome " + chr + " arm " + arm
+					+ " position " + pos;
 			if (closestIndex != -1) {
-				statusText[1] = geneInfo.getHeader(closestIndex,"NAME");
-				double val = karyoDrawer.getMapValue(closestIndex);
+				statusText[1] = geneInfo.getHeader(closestIndex, "NAME");
+				final double val = karyoDrawer.getMapValue(closestIndex);
 				if (val == nodata) {
 					statusText[2] = "Value: No Data";
 				} else {
 					statusText[2] = "Value: " + val;
 				}
-				String [] desc = averager.getDescription(locus, getCurrentCol());
+				final String[] desc = averager.getDescription(locus,
+						getCurrentCol());
 				statusText[3] = desc[0];
 				statusText[4] = desc[1];
 			} else {
@@ -787,168 +885,178 @@ public class KaryoView extends ModelView implements Observer {
 			}
 		}
 		if (status != null) {
-			status.setMessages(getStatus());	
+			status.setMessages(getStatus());
 		}
 	}
-    private String [] statusText = new String[5];
-    // method from ModelView
-    @Override
-	public String[]  getStatus() {
-	return statusText;
-    }
 
+	private final String[] statusText = new String[5];
 
-	  private ConfigNode configNode = new DummyConfigNode("KaryoView");
-	  /** Setter for configNode */
-	  public void bindConfig(ConfigNode configNode) {
-		  this.configNode = configNode;
-		  simpleAverager.bindConfig(  getFirst("SimpleAverager"));
-		  intervalAverager.bindConfig(getFirst("IntervalAverager"));
-		  nearestAverager.bindConfig( getFirst("NearestAverager"));
-		  neighborAverager.bindConfig( getFirst("NeighborAverager"));
-	  }
-	  /** Getter for configNode */
-	  public ConfigNode getConfigNode() {
-		  return configNode;
-	  }
-
-	  	/**
-	* always returns an instance of the node, even if it has to create it.
-	*/
-	private ConfigNode getFirst(String name) {
-		ConfigNode cand = getConfigNode().fetchFirst(name);
-		return (cand == null)? getConfigNode().create(name) : cand;
+	// method from ModelView
+	@Override
+	public String[] getStatus() {
+		return statusText;
 	}
 
-  /**
-  * Inner class to manage the settings of the extant averagers.
-  */
-  private class AveragerSettingsPanel extends JPanel implements SettingsPanel {
-	  private KaryoView karyoView;
-	  /** Setter for karyoView */
-	  public void setKaryoView(KaryoView karyoView) {
-		  this.karyoView = karyoView;
-	  }
-	  /** Getter for karyoView */
-	  @SuppressWarnings("unused")
-	public KaryoView getKaryoView() {
-		  return karyoView;
-	  }
-	  
-	  @Override
-	public void setEnabled(boolean enabled) {
-		  simpleButton.setEnabled(enabled);
-		  nearestButton.setEnabled(enabled);
-		  neighborButton.setEnabled(enabled);
-		  intervalButton.setEnabled(enabled);
-		  
-		  nearestField.setEnabled(enabled);
-		  neighborField.setEnabled(enabled);
-		  intervalField.setEnabled(enabled);
-	  }
-	  
-	  private JButton simpleButton, nearestButton, neighborButton, intervalButton;
-	  private JTextField nearestField, neighborField, intervalField;
-	  public AveragerSettingsPanel(KaryoView karyoView) {
-		  setKaryoView(karyoView);
-		  configureWidgets();
-		  addWidgets();
-	  }
-	  private void addWidgets() {
-		  setLayout(new GridBagLayout());
-		  GridBagConstraints gc = new GridBagConstraints();
-		  gc.weightx = 100;
-		  gc.weighty = 100;
-		  gc.gridx = 0;
-		  gc.gridy = 0;
-		  gc.gridwidth = 1;
-		  gc.gridheight = 1;
-		  add(new JLabel("Options"));
-		  gc.gridy = 1;
-		  add(simpleButton, gc);
+	private ConfigNode configNode = new DummyConfigNode("KaryoView");
 
-		  gc.gridy = 2;
-		  add(nearestButton, gc);
-		  gc.gridy = 3;
-		  add(neighborButton, gc);
-		  gc.gridy = 4;
-		  add(intervalButton, gc);
+	/** Setter for configNode */
+	public void bindConfig(final ConfigNode configNode) {
+		this.configNode = configNode;
+		simpleAverager.bindConfig(getFirst("SimpleAverager"));
+		intervalAverager.bindConfig(getFirst("IntervalAverager"));
+		nearestAverager.bindConfig(getFirst("NearestAverager"));
+		neighborAverager.bindConfig(getFirst("NeighborAverager"));
+	}
 
-		  gc.gridx = 1;
-		  gc.gridy = 0;
-		  add(new JLabel("Options"));
-		  gc.gridy = 2;
-		  add(nearestField, gc);
-		  gc.gridy = 3;
-		  add(neighborField, gc);
-		  gc.gridy = 4;
-		  add(intervalField, gc);
-	  }
-	  private void configureWidgets() {
-		  // fields to enter data in
-		  nearestField = new JTextField("" + nearestAverager.getNum());
-		  neighborField = new JTextField("" + neighborAverager.getNum());
-		  intervalField = new JTextField("" + intervalAverager.getWidth());
-		  nearestField.setColumns(5);
-		  neighborField.setColumns(5);
-		  intervalField.setColumns(5);
-		  // buttons to choose from...
-		  
-		  //		  type = new ButtonGroup();
-		  simpleButton = new JButton("No Averaging");
-		  simpleButton.addActionListener(new ActionListener() {
-			  @Override
-			public void actionPerformed(ActionEvent e) {
-				  karyoView.setSimpleAveraging();
-			  }
-		  });
-		  
-		  //		  type.add(simpleButton);
-		  
-		  nearestButton = new JButton("Nearest :");
-		  nearestButton.addActionListener(new ActionListener() {
-			  @Override
-			public void actionPerformed(ActionEvent e) {
-				  karyoView.setNearestAveraging(Integer.parseInt(nearestField.getText()));
-			  }
-		  });
-		  
-		  neighborButton = new JButton("Neighbor :");
-		  neighborButton.addActionListener(new ActionListener() {
-			  @Override
-			public void actionPerformed(ActionEvent e) {
-				  karyoView.setNeighborAveraging(Integer.parseInt(neighborField.getText()));
-			  }
-		  });
+	/** Getter for configNode */
+	public ConfigNode getConfigNode() {
+		return configNode;
+	}
 
-		  intervalButton = new JButton("Interval :");
-		  intervalButton.addActionListener(new ActionListener() {
-			  @Override
-			public void actionPerformed(ActionEvent e) {
-				  Double width = new Double(intervalField.getText());
-				  karyoView.setIntervalAveraging(width.doubleValue());
-			  }
-		  });
-	  }
-	  
-	  @Override
-	public void synchronizeTo() {
-		  
-	  }
-	  
-	  @Override
-	public void synchronizeFrom() {
-	  }
-  }
-  
-  
+	/**
+	 * always returns an instance of the node, even if it has to create it.
+	 */
+	private ConfigNode getFirst(final String name) {
+		final ConfigNode cand = getConfigNode().fetchFirst(name);
+		return (cand == null) ? getConfigNode().create(name) : cand;
+	}
+
+	/**
+	 * Inner class to manage the settings of the extant averagers.
+	 */
+	private class AveragerSettingsPanel extends JPanel implements SettingsPanel {
+		private KaryoView karyoView;
+
+		/** Setter for karyoView */
+		public void setKaryoView(final KaryoView karyoView) {
+			this.karyoView = karyoView;
+		}
+
+		/** Getter for karyoView */
+		@SuppressWarnings("unused")
+		public KaryoView getKaryoView() {
+			return karyoView;
+		}
+
+		@Override
+		public void setEnabled(final boolean enabled) {
+			simpleButton.setEnabled(enabled);
+			nearestButton.setEnabled(enabled);
+			neighborButton.setEnabled(enabled);
+			intervalButton.setEnabled(enabled);
+
+			nearestField.setEnabled(enabled);
+			neighborField.setEnabled(enabled);
+			intervalField.setEnabled(enabled);
+		}
+
+		private JButton simpleButton, nearestButton, neighborButton,
+				intervalButton;
+		private JTextField nearestField, neighborField, intervalField;
+
+		public AveragerSettingsPanel(final KaryoView karyoView) {
+			setKaryoView(karyoView);
+			configureWidgets();
+			addWidgets();
+		}
+
+		private void addWidgets() {
+			setLayout(new GridBagLayout());
+			final GridBagConstraints gc = new GridBagConstraints();
+			gc.weightx = 100;
+			gc.weighty = 100;
+			gc.gridx = 0;
+			gc.gridy = 0;
+			gc.gridwidth = 1;
+			gc.gridheight = 1;
+			add(new JLabel("Options"));
+			gc.gridy = 1;
+			add(simpleButton, gc);
+
+			gc.gridy = 2;
+			add(nearestButton, gc);
+			gc.gridy = 3;
+			add(neighborButton, gc);
+			gc.gridy = 4;
+			add(intervalButton, gc);
+
+			gc.gridx = 1;
+			gc.gridy = 0;
+			add(new JLabel("Options"));
+			gc.gridy = 2;
+			add(nearestField, gc);
+			gc.gridy = 3;
+			add(neighborField, gc);
+			gc.gridy = 4;
+			add(intervalField, gc);
+		}
+
+		private void configureWidgets() {
+			// fields to enter data in
+			nearestField = new JTextField("" + nearestAverager.getNum());
+			neighborField = new JTextField("" + neighborAverager.getNum());
+			intervalField = new JTextField("" + intervalAverager.getWidth());
+			nearestField.setColumns(5);
+			neighborField.setColumns(5);
+			intervalField.setColumns(5);
+			// buttons to choose from...
+
+			// type = new ButtonGroup();
+			simpleButton = new JButton("No Averaging");
+			simpleButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					karyoView.setSimpleAveraging();
+				}
+			});
+
+			// type.add(simpleButton);
+
+			nearestButton = new JButton("Nearest :");
+			nearestButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					karyoView.setNearestAveraging(Integer.parseInt(nearestField
+							.getText()));
+				}
+			});
+
+			neighborButton = new JButton("Neighbor :");
+			neighborButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					karyoView.setNeighborAveraging(Integer
+							.parseInt(neighborField.getText()));
+				}
+			});
+
+			intervalButton = new JButton("Interval :");
+			intervalButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final Double width = new Double(intervalField.getText());
+					karyoView.setIntervalAveraging(width.doubleValue());
+				}
+			});
+		}
+
+		@Override
+		public void synchronizeTo() {
+
+		}
+
+		@Override
+		public void synchronizeFrom() {
+		}
+	}
+
 }
 
 /**
  * just for parsing chromosome info...
  */
 class KaryoParseException extends Exception {
-    public KaryoParseException(String m) {
-	super(m);
-    }
+	public KaryoParseException(final String m) {
+		super(m);
+	}
 }

@@ -21,11 +21,14 @@ import java.util.List;
  * @author CKeil
  * 
  */
-public class CDTCreator {
+public class CDTCreator2 {
 
 	private BufferedReader reader = null;
-	private final File file;
+	private BufferedReader customReader = null;
+	private File file = null;
+	private File customFile = null;
 	private ArrayList<List<String>> dataSet;
+	private ArrayList<List<String>> customDataSet;
 
 	// label positions
 	private final List<Integer> gidInd = new ArrayList<Integer>();
@@ -34,7 +37,12 @@ public class CDTCreator {
 	private final List<Integer> gweightInd = new ArrayList<Integer>();
 	private final List<Integer> eweightInd = new ArrayList<Integer>();
 	private final List<Integer> dataStart = new ArrayList<Integer>();
+	private final List<Integer> customDataStart = new ArrayList<Integer>();
 	private final List<Integer> nameInd = new ArrayList<Integer>();
+	
+	//For custom
+	private final List<Integer> customOrfInd = new ArrayList<Integer>();
+	private final List<Integer> customNameInd = new ArrayList<Integer>();
 
 	private boolean gid = false;
 
@@ -48,9 +56,22 @@ public class CDTCreator {
 	 * 
 	 * @param file
 	 */
-	public CDTCreator(final File file, final String fileType) {
+	public CDTCreator2(final File file, final String fileType) {
 
 		this.file = file;
+		this.fileType = fileType;
+	}
+	
+	/**
+	 * Constructor for custom ORF/ NAME lists
+	 * 
+	 * @param file
+	 */
+	public CDTCreator2(final File file, final File file2, 
+			final String fileType) {
+
+		this.file = file;
+		this.customFile = file2;
 		this.fileType = fileType;
 	}
 
@@ -59,52 +80,53 @@ public class CDTCreator {
 		try {
 			reader = new BufferedReader(new FileReader(file));
 
-			String line;
-			final ArrayList<String[]> dataExtract = new ArrayList<String[]>();
+			final ArrayList<String[]> dataExtract = extractData(reader);
 
-			// Reading the data separated by tab delimited \t
-			while ((line = reader.readLine()) != null) {
+			//Arrays to ArrayLists
+			dataSet = transformArray(dataExtract);
 
-				final String[] row = line.split("\t");
-				dataExtract.add(row);
-			}
-
-			// Making the Array matrix to an ArrayList matrix
-			dataSet = new ArrayList<List<String>>();
-
-			for (final String[] row : dataExtract) {
-
-				final ArrayList<String> newRow = new ArrayList<String>();
-
-				for (final String element : row) {
-
-					newRow.add(element);
-				}
-
-				dataSet.add(newRow);
-			}
-
-			// find GWEIGHT and EWEIGHT
-			findLabel(gidInd, "GID");
-			findLabel(aidInd, "AID");
-			findLabel(orfInd, "ORF");
-			findLabel(nameInd, "NAME");
-			findLabel(eweightInd, "EWEIGHT");
-			findLabel(gweightInd, "GWEIGHT");
+			//Find positions of labels in the data set
+			findLabel(gidInd, dataSet, "GID");
+			findLabel(aidInd, dataSet, "AID");
+			findLabel(orfInd, dataSet, "ORF");
+			findLabel(nameInd, dataSet, "NAME");
+			findLabel(eweightInd, dataSet, "EWEIGHT");
+			findLabel(gweightInd, dataSet, "GWEIGHT");
 
 			// currently making an assumption rather than actually finding
 			// the beginning of data values...
 			dataStart.add(eweightInd.get(0) + 1);
 			dataStart.add(gweightInd.get(1) + 1);
+			
+			if(customFile != null) {
+				customReader = new BufferedReader(new FileReader(customFile));
+				
+				final ArrayList<String[]> customDataExtract = 
+						extractData(customReader);
+				
+				customDataSet = transformArray(customDataExtract);
+				
+				findLabel(customOrfInd, customDataSet, "ORF");
+				findLabel(customNameInd, customDataSet, "NAME");
+				
+				if(customOrfInd.get(0) == null) {
+					customOrfInd.set(0, 0);
+					customOrfInd.set(1, 0);
+				}
+				
+				if(customNameInd.get(0) == null) {
+					customNameInd.set(0, 0);
+					customNameInd.set(1, 1);
+				}
+				
+				replaceLabels();
+			}
 
 			final String cdt = generateCDT();
 
 			saveCDT(cdt);
 
 		} catch (final FileNotFoundException e) {
-			e.printStackTrace();
-
-		} catch (final IOException e) {
 			e.printStackTrace();
 
 		} finally {
@@ -117,7 +139,15 @@ public class CDTCreator {
 		}
 	}
 
-	private void findLabel(final List<Integer> labelPos, final String label) {
+	/**
+	 * Finds the positions of given labels in the data set and assigns the
+	 * values to instance variables for further use.
+	 * @param labelPos
+	 * @param dataSet
+	 * @param label
+	 */
+	private void findLabel(final List<Integer> labelPos, 
+			ArrayList<List<String>> dataSet, final String label) {
 
 		// check for labels in the first 20 rows
 		final int threshold = 20;
@@ -292,7 +322,15 @@ public class CDTCreator {
 	 */
 	public void saveCDT(final String content) {
 
-		final String fileEnd = "_adjusted.cdt";
+		final String fileEnd;
+		
+		if(customFile == null) {
+			fileEnd = "_adjusted.cdt";
+			
+		} else {
+			fileEnd = "_custom.cdt";
+		}
+		
 		final String fileName = file.getAbsolutePath().substring(0,
 				file.getAbsolutePath().length() - fileType.length());
 
@@ -314,7 +352,81 @@ public class CDTCreator {
 
 		}
 	}
+	
+	/**
+	 * Reading the data separated by tab delimited \t
+	 * @param reader
+	 * @param dataExtract
+	 * @return
+	 */
+	public ArrayList<String[]> extractData(BufferedReader reader) {
+		
+		ArrayList<String[]> dataExtract = new ArrayList<String[]>();
+		String line;
+		
+		try {
+			while ((line = reader.readLine()) != null) {
+	
+				final String[] row = line.split("\t");
+				dataExtract.add(row);
+			}
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
 
+		return dataExtract;
+	}
+	
+	/**
+	 * Transforms Array matrix to ArrayList matrix
+	 * @param dataExtract
+	 * @return
+	 */
+	public ArrayList<List<String>> transformArray(
+			ArrayList<String[]> dataExtract) {
+		
+		ArrayList<List<String>> dataSet = new ArrayList<List<String>>();
+		
+		for (final String[] row : dataExtract) {
+
+			final ArrayList<String> newRow = new ArrayList<String>();
+
+			for (final String element : row) {
+
+				newRow.add(element);
+			}
+
+			dataSet.add(newRow);
+		}
+		
+		return dataSet;
+	}
+	
+	/**
+	 * Replaces original ORF/ NAME labels with custom labels
+	 */
+	public void replaceLabels() {
+		
+		final int dataRow = dataStart.get(0);
+		final int orfCol = orfInd.get(1);
+		final int nameCol = nameInd.get(1);
+		final int customOrfCol = customOrfInd.get(1);
+		final int customNameCol = customNameInd.get(1);
+		
+		for (int i = dataRow; i < dataSet.size(); i++) {
+
+			final List<String> row = dataSet.get(i);
+			final List<String> customRow = customDataSet.get(i - dataRow);
+			
+			row.set(orfCol, customRow.get(customOrfCol));
+			row.set(nameCol, customRow.get(customNameCol));
+		}
+	}
+
+	/**
+	 * Getter for file path
+	 * @return
+	 */
 	public String getFilePath() {
 
 		return filePath;

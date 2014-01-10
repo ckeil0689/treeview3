@@ -25,54 +25,61 @@ package edu.stanford.genetics.treeview.plugin.karyoview;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 /**
- *  This class graphically represents the state of the KaryoView, and allows the
- *  user to muck with it.
- *
- * @author     Alok Saldanha <alok@genome.stanford.edu>
+ * This class graphically represents the state of the KaryoView, and allows the
+ * user to muck with it.
+ * 
+ * @author Alok Saldanha <alok@genome.stanford.edu>
  */
 class KaryoViewParameterPanel extends JPanel {
 	/**
-	 *  Client which this panel will configure
+	 * Client which this panel will configure
 	 */
-	private KaryoView karyoView;
+	private final KaryoView karyoView;
 	/**
-	 *  Client which this panel will configure
+	 * Client which this panel will configure
 	 */
-	private KaryoDrawer karyoDrawer;
+	private final KaryoDrawer karyoDrawer;
 	/**
-	 *  Used only to open some popups...
+	 * Used only to open some popups...
 	 */
-	private KaryoPanel karyoPanel;
+	private final KaryoPanel karyoPanel;
 	/**
-	 *  Inner class, GUI to control Y Range
+	 * Inner class, GUI to control Y Range
 	 */
-//	private ScalePanel scalePanel;
+	// private ScalePanel scalePanel;
 	/**
-	 *  Inner class, GUI to control X and Y Scale settings
+	 * Inner class, GUI to control X and Y Scale settings
 	 */
-	private SizePanel sizePanel;
+	private final SizePanel sizePanel;
 	/**
-	 *  Inner class, GUI to set the experiment which is being viewed
+	 * Inner class, GUI to set the experiment which is being viewed
 	 */
-	private ExperimentPanel experimentPanel;
+	private final ExperimentPanel experimentPanel;
 
 	/**
-	* Inner class, GUI to deal with selected genes.
-	*/ 
+	 * Inner class, GUI to deal with selected genes.
+	 */
 
-	private PopupPanel popupPanel;
+	private final PopupPanel popupPanel;
 
 	/**
-	 *  Constructor for the KaryoViewParameterPanel object
-	 *
-	 * @param  kView  Client which this panel will configure
+	 * Constructor for the KaryoViewParameterPanel object
+	 * 
+	 * @param kView
+	 *            Client which this panel will configure
 	 */
-	public KaryoViewParameterPanel(KaryoDrawer kDrawer, KaryoView kView, KaryoPanel kPanel) {
+	public KaryoViewParameterPanel(final KaryoDrawer kDrawer,
+			final KaryoView kView, final KaryoPanel kPanel) {
 		super();
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		karyoDrawer = kDrawer;
@@ -80,68 +87,59 @@ class KaryoViewParameterPanel extends JPanel {
 		karyoPanel = kPanel;
 		experimentPanel = new ExperimentPanel();
 		add(experimentPanel);
-//		scalePanel = new ScalePanel();
-//		add(scalePanel);
+		// scalePanel = new ScalePanel();
+		// add(scalePanel);
 		sizePanel = new SizePanel();
 		add(sizePanel);
 		popupPanel = new PopupPanel();
 		add(popupPanel);
-//		add(new ButtonPanel());
-/*
-		JPanel detailPanel    = new JPanel();
-		JButton detailButton  = new JButton("More Settings...");
-		detailButton.addActionListener(
-			new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					showDetailPopup();
-				}
-			});
-		detailPanel.add(detailButton);
-		add(detailPanel);
-*/
+		// add(new ButtonPanel());
+		/*
+		 * JPanel detailPanel = new JPanel(); JButton detailButton = new
+		 * JButton("More Settings..."); detailButton.addActionListener( new
+		 * ActionListener() { public void actionPerformed(ActionEvent e) {
+		 * showDetailPopup(); } }); detailPanel.add(detailButton);
+		 * add(detailPanel);
+		 */
 	}
 
-
 	/**
-	 *  Causes the KaryoViewParameterPanel object to load values from the client
+	 * Causes the KaryoViewParameterPanel object to load values from the client
 	 */
 	public void getValues() {
-//		scalePanel.getValues();
+		// scalePanel.getValues();
 		sizePanel.getValues();
 		experimentPanel.getValues();
-//		popupPanel.getValues();
+		// popupPanel.getValues();
 	}
-
 
 	/**
-	 *  Causes the KaryoViewParameterPanel object to send values to the client.
+	 * Causes the KaryoViewParameterPanel object to send values to the client.
 	 */
 	public void setValues() {
-//		scalePanel.setValues();
+		// scalePanel.setValues();
 		sizePanel.setValues();
 		experimentPanel.setValues();
-//		popupPanel.setValues();
+		// popupPanel.setValues();
 		karyoDrawer.notifyObservers();
 	}
-
 
 	class ExperimentPanel extends JPanel {
 		JComboBox pulldown;
 
-
 		/**
-		 *  Constructor for the ExperimentPanel object
+		 * Constructor for the ExperimentPanel object
 		 */
 		public ExperimentPanel() {
 			setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-			JPanel holder = new JPanel();
+			final JPanel holder = new JPanel();
 			holder.add(new JLabel("Experiment:"));
-			String[] names  = karyoView.getExperiments();
+			final String[] names = karyoView.getExperiments();
 			pulldown = new JComboBox(names);
 			pulldown.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent e) {
-						setValues();
+				public void actionPerformed(final ActionEvent e) {
+					setValues();
 				}
 			});
 			holder.add(pulldown);
@@ -150,159 +148,149 @@ class KaryoViewParameterPanel extends JPanel {
 			add(new ButtonPanel());
 		}
 
-
 		public void next() {
-			int nextIndex  = pulldown.getSelectedIndex() + 1;
-			int count      = pulldown.getItemCount();
+			final int nextIndex = pulldown.getSelectedIndex() + 1;
+			final int count = pulldown.getItemCount();
 			pulldown.setSelectedIndex(nextIndex % count);
 		}
 
-
 		public void prev() {
-			int newval  = pulldown.getSelectedIndex() - 1;
+			final int newval = pulldown.getSelectedIndex() - 1;
 			if (newval >= 0) {
 				pulldown.setSelectedIndex(newval);
 			}
 		}
 
-
 		public void getValues() {
 			try {
 				pulldown.setSelectedIndex(karyoView.getCurrentCol());
-			} catch (java.lang.IllegalArgumentException e) {
+			} catch (final java.lang.IllegalArgumentException e) {
 			}
 		}
-
 
 		public void setValues() {
 			karyoView.setCurrentCol(pulldown.getSelectedIndex());
 		}
 	}
 
-
 	class ScalePanel extends JPanel {
 		JTextField ppmField, ppvField;
 
 		/**
-		 *  Constructor for the ScalePanel object
+		 * Constructor for the ScalePanel object
 		 */
 		public ScalePanel() {
-			DocumentListener documentListener = new DocumentListener() {
+			final DocumentListener documentListener = new DocumentListener() {
 				@Override
-				public void changedUpdate(DocumentEvent e) {
-					 setValues();
-					karyoDrawer.notifyObservers();
-				}
-				@Override
-				public void insertUpdate(DocumentEvent e) {
+				public void changedUpdate(final DocumentEvent e) {
 					setValues();
 					karyoDrawer.notifyObservers();
 				}
+
 				@Override
-				public void removeUpdate(DocumentEvent e) {
+				public void insertUpdate(final DocumentEvent e) {
+					setValues();
+					karyoDrawer.notifyObservers();
+				}
+
+				@Override
+				public void removeUpdate(final DocumentEvent e) {
 					setValues();
 					karyoDrawer.notifyObservers();
 				}
 			};
 
 			add(new JLabel("Pixels per map: "));
-			Double tmin  = new Double(karyoDrawer.getPixelPerMap());
+			final Double tmin = new Double(karyoDrawer.getPixelPerMap());
 			ppmField = new JTextField(tmin.toString());
 			ppmField.setColumns(5);
 			add(ppmField);
 			add(new JLabel("Pixels per Value: "));
-			Double tmax  = new Double(karyoDrawer.getPixelPerVal());
+			final Double tmax = new Double(karyoDrawer.getPixelPerVal());
 			ppvField = new JTextField(tmax.toString());
 			ppvField.setColumns(5);
 			add(ppvField);
-			
+
 			getValues();
-			 ppmField.getDocument().addDocumentListener(documentListener);
-			 ppvField.getDocument().addDocumentListener(documentListener);
+			ppmField.getDocument().addDocumentListener(documentListener);
+			ppvField.getDocument().addDocumentListener(documentListener);
 		}
 
-
 		public void getValues() {
-			double tmin  = karyoDrawer.getPixelPerMap();
-			double tmax  = karyoDrawer.getPixelPerVal();
+			final double tmin = karyoDrawer.getPixelPerMap();
+			final double tmax = karyoDrawer.getPixelPerVal();
 			ppmField.setText(reformatDouble(tmin));
 			ppvField.setText(reformatDouble(tmax));
 			revalidate();
 		}
 
-
 		public void setValues() {
 			try {
-				Double tmin  = new Double(ppmField.getText());
-				Double tmax  = new Double(ppvField.getText());
+				final Double tmin = new Double(ppmField.getText());
+				final Double tmax = new Double(ppvField.getText());
 				karyoDrawer.setPixelPerMap(tmin.doubleValue());
 				karyoDrawer.setPixelPerVal(tmax.doubleValue());
-			} catch (java.lang.NumberFormatException e) {
+			} catch (final java.lang.NumberFormatException e) {
 				// ignore...
 			}
 		}
 	}
 
-
 	class SizePanel extends JPanel {
 		JTextField widthField, heightField;
-		private ScalePanel scalePanel;
+		private final ScalePanel scalePanel;
 
 		/**
-		 *  Constructor for the SizePanel object
+		 * Constructor for the SizePanel object
 		 */
 		public SizePanel() {
-			
-			DocumentListener documentListener = new DocumentListener() {
+
+			final DocumentListener documentListener = new DocumentListener() {
 				@Override
-				public void changedUpdate(DocumentEvent e) {
-					 setMyValues();
-					karyoDrawer.notifyObservers();
-				}
-				@Override
-				public void insertUpdate(DocumentEvent e) {
+				public void changedUpdate(final DocumentEvent e) {
 					setMyValues();
 					karyoDrawer.notifyObservers();
 				}
+
 				@Override
-				public void removeUpdate(DocumentEvent e) {
+				public void insertUpdate(final DocumentEvent e) {
+					setMyValues();
+					karyoDrawer.notifyObservers();
+				}
+
+				@Override
+				public void removeUpdate(final DocumentEvent e) {
 					setMyValues();
 					karyoDrawer.notifyObservers();
 				}
 			};
 
 			setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-			JPanel holder = new JPanel();
+			final JPanel holder = new JPanel();
 			holder.add(new JLabel("Size"));
 			holder.add(new JLabel("Width"));
 			widthField = new JTextField();
 			widthField.setColumns(5);
-
 
 			holder.add(widthField);
 			holder.add(new JLabel("Height"));
 			heightField = new JTextField();
 			heightField.setColumns(5);
 			holder.add(heightField);
-/*			
-						JButton same  = new JButton("Update");
-			same.addActionListener(
-				new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						setValues();
-					}
-				});
-
-				holder.add(same);
-				*/
-			JButton rescaleButton  = new JButton("Auto");
-			rescaleButton.addActionListener(
-				new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						karyoView.redoScale();
-					}
-				});
+			/*
+			 * JButton same = new JButton("Update"); same.addActionListener( new
+			 * ActionListener() { public void actionPerformed(ActionEvent e) {
+			 * setValues(); } });
+			 * 
+			 * holder.add(same);
+			 */
+			final JButton rescaleButton = new JButton("Auto");
+			rescaleButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					karyoView.redoScale();
+				}
+			});
 			holder.add(rescaleButton);
 			scalePanel = new ScalePanel();
 			getValues();
@@ -310,41 +298,37 @@ class KaryoViewParameterPanel extends JPanel {
 
 			add(scalePanel);
 			/*
-			* The following weirdness results if you use a documentListener here.
-			*
-			* setSize() forces a call to revalidate(), which causes an implicit resize.
-			* the implicit resize here causes a call to getValue();
-			* getValue() calls setText(), which then calls setSize();
-			*/
-			
-			 widthField.getDocument().addDocumentListener(documentListener);
-			 heightField.getDocument().addDocumentListener(documentListener);
+			 * The following weirdness results if you use a documentListener
+			 * here.
+			 * 
+			 * setSize() forces a call to revalidate(), which causes an implicit
+			 * resize. the implicit resize here causes a call to getValue();
+			 * getValue() calls setText(), which then calls setSize();
+			 */
+
+			widthField.getDocument().addDocumentListener(documentListener);
+			heightField.getDocument().addDocumentListener(documentListener);
 		}
 
-		
-		
-		
 		public void getValues() {
-			int width = karyoDrawer.getWidth();
-			int height = karyoDrawer.getHeight();
-//			LogPanel.println("got height " + height + " width " + width);
-//			Exception e = new Exception(); e.printStackTrace();
+			final int width = karyoDrawer.getWidth();
+			final int height = karyoDrawer.getHeight();
+			// LogPanel.println("got height " + height + " width " + width);
+			// Exception e = new Exception(); e.printStackTrace();
 			widthField.setText(reformatInt(width));
 			heightField.setText(reformatInt(height));
 			scalePanel.getValues();
 			revalidate();
 		}
 
-
-
 		public void setMyValues() {
 			try {
-				Double tx  = new Double(widthField.getText());
-				Double ty  = new Double(heightField.getText());
+				final Double tx = new Double(widthField.getText());
+				final Double ty = new Double(heightField.getText());
 				karyoDrawer.setWidth((int) tx.doubleValue());
 				karyoDrawer.setHeight((int) ty.doubleValue());
 				karyoDrawer.notifyObservers();
-			} catch (java.lang.NumberFormatException e) {
+			} catch (final java.lang.NumberFormatException e) {
 				// ignore...
 			}
 		}
@@ -352,88 +336,86 @@ class KaryoViewParameterPanel extends JPanel {
 		public void setValues() {
 			try {
 				scalePanel.setValues();
-				Double tx  = new Double(widthField.getText());
-				Double ty  = new Double(heightField.getText());
+				final Double tx = new Double(widthField.getText());
+				final Double ty = new Double(heightField.getText());
 				karyoDrawer.setWidth((int) tx.doubleValue());
 				karyoDrawer.setHeight((int) ty.doubleValue());
 				karyoDrawer.notifyObservers();
-			} catch (java.lang.NumberFormatException e) {
+			} catch (final java.lang.NumberFormatException e) {
 				// ignore...
 			}
 		}
 	}
+
 	class PopupPanel extends JPanel {
 		/**
-		 *  Constructor for the ButtonPanel object
+		 * Constructor for the ButtonPanel object
 		 */
 		public PopupPanel() {
-			JButton prev  = new JButton("Display...");
-			prev.addActionListener(
-				new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						karyoPanel.showDisplayPopup();
-					}
-				});
+			final JButton prev = new JButton("Display...");
+			prev.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					karyoPanel.showDisplayPopup();
+				}
+			});
 
-			JButton same  = new JButton("Coordinates...");
-			same.addActionListener(
-				new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						karyoPanel.showCoordinatesPopup();
-					}
-				});
+			final JButton same = new JButton("Coordinates...");
+			same.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					karyoPanel.showCoordinatesPopup();
+				}
+			});
 
-			JButton next  = new JButton("Averaging...");
-			next.addActionListener(
-				new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						karyoPanel.showAveragingPopup();
-					}
-				});
+			final JButton next = new JButton("Averaging...");
+			next.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					karyoPanel.showAveragingPopup();
+				}
+			});
 
 			add(prev);
 			add(same);
 			add(next);
 		}
 	}
+
 	class SelectedPanel extends JPanel {
 		JComboBox iconBox, iconSize;
 
 		/**
-		 *  Constructor for the SizePanel object
+		 * Constructor for the SizePanel object
 		 */
 		public SelectedPanel() {
 			iconBox = new JComboBox();
-			String [] types = karyoDrawer.getIconTypes();
-			for (int i = 0; i <types.length ; i++) {
-				iconBox.addItem(types[i]);				
+			final String[] types = karyoDrawer.getIconTypes();
+			for (int i = 0; i < types.length; i++) {
+				iconBox.addItem(types[i]);
 			}
-			
 
 			iconSize = new JComboBox();
-			int [] sizes = karyoDrawer.getIconSizes();
-			for (int i = 0 ; i < sizes.length; i++) {
+			final int[] sizes = karyoDrawer.getIconSizes();
+			for (int i = 0; i < sizes.length; i++) {
 				iconSize.addItem(reformatInt(sizes[i]));
 			}
 			add(new JLabel("Highlight Selected with "));
 			add(iconBox);
 			add(iconSize);
-			
+
 			getValues();
 
 			iconBox.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent e) {
-						setValues();
+				public void actionPerformed(final ActionEvent e) {
+					setValues();
 				}
 			});
 			iconSize.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent e) {
-						setValues();
+				public void actionPerformed(final ActionEvent e) {
+					setValues();
 				}
 			});
 		}
@@ -451,58 +433,55 @@ class KaryoViewParameterPanel extends JPanel {
 		}
 	}
 
-	private static String reformatInt(int td) {
-		Integer tx  = new Integer(td);
+	private static String reformatInt(final int td) {
+		final Integer tx = new Integer(td);
 		return tx.toString();
 	}
-	private static String reformatDouble(double td) {
+
+	private static String reformatDouble(final double td) {
 		int order = 1;
 		if (Math.abs(td) < 0.0001) {
-			Double tx  = new Double(td);
+			final Double tx = new Double(td);
 			return tx.toString();
-		} 
+		}
 		while (Math.abs(td * order) < 1000) {
 			order *= 10;
 		}
-		int val    = (int) (td * order);
-		Double tx  = new Double(((double) val) / order);
+		final int val = (int) (td * order);
+		final Double tx = new Double(((double) val) / order);
 		return tx.toString();
 	}
 
-
 	class ButtonPanel extends JPanel {
 		/**
-		 *  Constructor for the ButtonPanel object
+		 * Constructor for the ButtonPanel object
 		 */
 		public ButtonPanel() {
-			JButton prev  = new JButton("Prev");
-			prev.addActionListener(
-				new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						experimentPanel.prev();
-						setValues();
-					}
-				});
+			final JButton prev = new JButton("Prev");
+			prev.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					experimentPanel.prev();
+					setValues();
+				}
+			});
 
-			JButton same  = new JButton("Same");
-			same.addActionListener(
-				new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						setValues();
-					}
-				});
+			final JButton same = new JButton("Same");
+			same.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					setValues();
+				}
+			});
 
-			JButton next  = new JButton("Next");
-			next.addActionListener(
-				new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						experimentPanel.next();
-						setValues();
-					}
-				});
+			final JButton next = new JButton("Next");
+			next.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					experimentPanel.next();
+					setValues();
+				}
+			});
 
 			add(prev);
 			add(same);
@@ -510,4 +489,3 @@ class KaryoViewParameterPanel extends JPanel {
 		}
 	}
 }
-

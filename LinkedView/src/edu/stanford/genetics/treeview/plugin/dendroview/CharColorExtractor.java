@@ -21,76 +21,79 @@
  * END_HEADER
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
-import java.awt.*;
 
-import java.util.*;
+import java.awt.Color;
+import java.util.Observable;
 
-import edu.stanford.genetics.treeview.*;
+import edu.stanford.genetics.treeview.ConfigNode;
+import edu.stanford.genetics.treeview.ConfigNodePersistent;
 
 /**
- *  The purpose of this class is to convert a character into a color.
- *
- * @author     Alok Saldanha <alok@genome.stanford.edu>
- * @version    @version $Revision: 1.1 $ $Date: 2006-08-16 19:13:45 $
+ * The purpose of this class is to convert a character into a color.
+ * 
+ * @author Alok Saldanha <alok@genome.stanford.edu>
+ * @version @version $Revision: 1.1 $ $Date: 2006-08-16 19:13:45 $
  */
 
-public class CharColorExtractor extends Observable implements ConfigNodePersistent {
-	private static CharColorSet defaultColorSet     = new CharColorSet();
-	private final CharColorSet colorSet;// Will be backed by confignode when we get one...
+public class CharColorExtractor extends Observable implements
+		ConfigNodePersistent {
+	private static CharColorSet defaultColorSet = new CharColorSet();
+	private final CharColorSet colorSet;// Will be backed by confignode when we
+										// get one...
 
-	/**  Constructor for the CharColorExtractor object */
+	/** Constructor for the CharColorExtractor object */
 	public CharColorExtractor() {
-		// set a default defaultColorSet... should be superceded by a user setting...
+		// set a default defaultColorSet... should be superceded by a user
+		// setting...
 		colorSet = new CharColorSet();
 		colorSet.copyStateFrom(defaultColorSet);
 	}
 
 	/**
-	 *  Sets the default colors to be used if a config node if a config node is not bound to us.
-	 *  Also used in setDefaults() to figure out what the default colors are.
+	 * Sets the default colors to be used if a config node if a config node is
+	 * not bound to us. Also used in setDefaults() to figure out what the
+	 * default colors are.
 	 */
-	public void setDefaultColorSet(CharColorSet set) {
+	public void setDefaultColorSet(final CharColorSet set) {
 		defaultColorSet = set;
 	}
 
-
 	/**
-	 *  binds this CharColorExtractor to a particular ConfigNode. This makes colors persistent
-	 *
-	 * @param  configNode  confignode to bind to
+	 * binds this CharColorExtractor to a particular ConfigNode. This makes
+	 * colors persistent
+	 * 
+	 * @param configNode
+	 *            confignode to bind to
 	 */
 	@Override
-	public void bindConfig(ConfigNode configNode) {
+	public void bindConfig(final ConfigNode configNode) {
 		root = configNode;
-		ConfigNode cand  = root.fetchFirst("ColorSet");
+		ConfigNode cand = root.fetchFirst("ColorSet");
 		if (cand == null) {
 			cand = root.create("CharColorSet");
 		}
 		colorSet.bindConfig(cand);
 	}
 
-
 	/**
-	 *  The color for missing data.
+	 * The color for missing data.
 	 */
 	public Color getMissing() {
 		return colorSet.getMissing();
 	}
 
-
 	/**
-	 * The empty is a color to be used for cells which do not correspond to data, like in
-	 * the KnnView. These cells are just used for spacing.
+	 * The empty is a color to be used for cells which do not correspond to
+	 * data, like in the KnnView. These cells are just used for spacing.
 	 */
 	public Color getEmpty() {
 		return colorSet.getEmpty();
 	}
 
-
 	/**
-	 *  The color for chars. 
+	 * The color for chars.
 	 */
-	public void setColor(char c, String newString) {
+	public void setColor(final char c, final String newString) {
 		if (ColorSet.encodeColor(colorSet.getColor(c)).equals(newString)) {
 			return;
 		}
@@ -99,9 +102,9 @@ public class CharColorExtractor extends Observable implements ConfigNodePersiste
 	}
 
 	/**
-	 *  The color for missing data.
+	 * The color for missing data.
 	 */
-	public void setMissingColor(String newString) {
+	public void setMissingColor(final String newString) {
 		if (ColorSet.encodeColor(colorSet.getMissing()).equals(newString)) {
 			return;
 		}
@@ -109,10 +112,10 @@ public class CharColorExtractor extends Observable implements ConfigNodePersiste
 		setChanged();
 	}
 
-
 	/**
-	 * The empty is a color to be used for cells which do not correspond to data	 */
-	public void setEmptyColor(String newString) {
+	 * The empty is a color to be used for cells which do not correspond to data
+	 */
+	public void setEmptyColor(final String newString) {
 		if (newString == null) {
 			return;
 		}
@@ -123,21 +126,21 @@ public class CharColorExtractor extends Observable implements ConfigNodePersiste
 		setChanged();
 	}
 
-
 	/**
-	 *  The color for chars. 
+	 * The color for chars.
 	 */
-	public void setColor(char c, Color newColor) {
+	public void setColor(final char c, final Color newColor) {
 		if (colorSet.getColor(c).equals(newColor)) {
 			return;
 		}
 		colorSet.setColor(c, newColor);
 		setChanged();
 	}
+
 	/**
-	 *  The color for missing data.
+	 * The color for missing data.
 	 */
-	public void setMissingColor(Color newColor) {
+	public void setMissingColor(final Color newColor) {
 		if (colorSet.getMissing().equals(newColor)) {
 			return;
 		}
@@ -145,11 +148,11 @@ public class CharColorExtractor extends Observable implements ConfigNodePersiste
 		setChanged();
 	}
 
-
 	/**
-	 *  Set emptyColor value for future draws
-	 * The empty is a color to be used for cells which do not correspond to data	 */
-	public void setEmptyColor(Color newColor) {
+	 * Set emptyColor value for future draws The empty is a color to be used for
+	 * cells which do not correspond to data
+	 */
+	public void setEmptyColor(final Color newColor) {
 		if (newColor == null) {
 			return;
 		}
@@ -160,53 +163,51 @@ public class CharColorExtractor extends Observable implements ConfigNodePersiste
 		setChanged();
 	}
 
-
 	/**
-	 *  Gets the color corresponding to a particular char.
-	 *
-	 * @param  c     char representing value we want color for
-	 * @return       The color value
+	 * Gets the color corresponding to a particular char.
+	 * 
+	 * @param c
+	 *            char representing value we want color for
+	 * @return The color value
 	 */
-	public Color getColor(char c) {
+	public Color getColor(final char c) {
 		return colorSet.getColor(c);
 	}
 
-
 	/**
-	 *  Gets the floatColor attribute of the ColorExtractor object
-	 *
-	 * @param  c     char representing value we want color for
-	 * @return       The floatColor value
+	 * Gets the floatColor attribute of the ColorExtractor object
+	 * 
+	 * @param c
+	 *            char representing value we want color for
+	 * @return The floatColor value
 	 */
-	public float[] getFloatColor(char c) {
+	public float[] getFloatColor(final char c) {
 		return getColor(c).getComponents(null);
 	}
 
-
-	/**  prints out a description of the state to standard out*/
+	/** prints out a description of the state to standard out */
 	public void printSelf() {
 		System.out.println("missingColor " + getMissing());
 		System.out.println("emptyColor " + getEmpty());
 	}
 
-
 	/**
-	 *  Gets the aRGBColor attribute of the ColorExtractor object
-	 *
-	 * @param  c  Description of the Parameter
-	 * @return       The aRGBColor value
+	 * Gets the aRGBColor attribute of the ColorExtractor object
+	 * 
+	 * @param c
+	 *            Description of the Parameter
+	 * @return The aRGBColor value
 	 */
-	public int getARGBColor(char c) {
+	public int getARGBColor(final char c) {
 		return getColor(c).getRGB();
 	}
 
-
-	/**  resets the ColorExtractor to a default state.  */
+	/** resets the ColorExtractor to a default state. */
 	public void setDefaults() {
 		setMissingColor(ColorSet.encodeColor(defaultColorSet.getMissing()));
 		setEmptyColor(ColorSet.encodeColor(defaultColorSet.getEmpty()));
 		setChanged();
 	}
+
 	private ConfigNode root;
 }
-

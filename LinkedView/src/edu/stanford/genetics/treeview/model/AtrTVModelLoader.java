@@ -20,33 +20,31 @@
  *
  * END_HEADER
  */
- 
-package edu.stanford.genetics.treeview.model;
 
+package edu.stanford.genetics.treeview.model;
 
 import edu.stanford.genetics.treeview.LoadException;
 
-
 /**
  * @author avsegal
- *
- * To change the template for this generated type comment go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ * 
+ *         To change the template for this generated type comment go to
+ *         Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
 public class AtrTVModelLoader extends TVModelLoader2 {
 
 	/**
 	 * @param targetModel
 	 */
-	public AtrTVModelLoader(AtrTVModel targetModel) {
+	public AtrTVModelLoader(final AtrTVModel targetModel) {
 		super(targetModel);
 	}
-	
+
 	@Override
-	protected void  parseCDT(RectData tempVector) throws LoadException {
+	protected void parseCDT(final RectData tempVector) throws LoadException {
 		super.findCdtDimensions(tempVector);
 		super.loadArrayAnnotation(tempVector);
 		super.loadGeneAnnotation(tempVector);
 	}
-	
+
 }

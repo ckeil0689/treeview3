@@ -1,125 +1,180 @@
 /* BEGIN_HEADER                                              Java TreeView
-*
-* $Author: alokito $
-* $RCSfile: KaryoViewExportPanel.java,v $
-* $Revision: 1.2 $
-* $Date: 2009-09-08 11:24:24 $
-* $Name:  $
-*
-* This file is part of Java TreeView
-* Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
-*
-* This software is provided under the GNU GPL Version 2. In particular, 
-*
-* 1) If you modify a source file, make a comment in it containing your name and the date.
-* 2) If you distribute a modified version, you must do it under the GPL 2.
-* 3) Developers are encouraged but not required to notify the Java TreeView maintainers at alok@genome.stanford.edu when they make a useful addition. It would be nice if significant contributions could be merged into the main distribution.
-*
-* A full copy of the license can be found in gpl.txt or online at
-* http://www.gnu.org/licenses/gpl.txt
-*
-* END_HEADER 
-*/
+ *
+ * $Author: alokito $
+ * $RCSfile: KaryoViewExportPanel.java,v $
+ * $Revision: 1.2 $
+ * $Date: 2009-09-08 11:24:24 $
+ * $Name:  $
+ *
+ * This file is part of Java TreeView
+ * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
+ *
+ * This software is provided under the GNU GPL Version 2. In particular, 
+ *
+ * 1) If you modify a source file, make a comment in it containing your name and the date.
+ * 2) If you distribute a modified version, you must do it under the GPL 2.
+ * 3) Developers are encouraged but not required to notify the Java TreeView maintainers at alok@genome.stanford.edu when they make a useful addition. It would be nice if significant contributions could be merged into the main distribution.
+ *
+ * A full copy of the license can be found in gpl.txt or online at
+ * http://www.gnu.org/licenses/gpl.txt
+ *
+ * END_HEADER 
+ */
 package edu.stanford.genetics.treeview.plugin.karyoview;
 
-import edu.stanford.genetics.treeview.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
 
-import javax.swing.*;
-import java.io.*;
-import java.awt.*;
-import java.awt.image.*;
-import java.awt.event.*;
-import javax.swing.event.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+import edu.stanford.genetics.treeview.ConfigNode;
+import edu.stanford.genetics.treeview.FileSet;
+import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.SettingsPanel;
+
 /**
-* This class is a superclass which implements a GUI for selection of options relating to output. 
-* It makes most of the relevant variables accessible to subclasses through protected methods.
-*
-* The chooseable widgets should consist of a
+ * This class is a superclass which implements a GUI for selection of options
+ * relating to output. It makes most of the relevant variables accessible to
+ * subclasses through protected methods.
+ * 
+ * The chooseable widgets should consist of a
+ * 
+ * - listbox full of chromosomes to choose from initially with just the visible
+ * ones chosen. - field values to indicate the x scale and y scale, relative to
+ * the current displayed image. - non-editable field values indicating the
+ * predicted total size.
+ */
 
-* - listbox full of chromosomes to choose from initially with just the visible ones chosen.
-* - field values to indicate the x scale and y scale, relative to the current displayed image.
-* - non-editable field values indicating the predicted total size.
-*/
-
-public abstract class KaryoViewExportPanel extends JPanel implements SettingsPanel {
+public abstract class KaryoViewExportPanel extends JPanel implements
+		SettingsPanel {
 	private ConfigNode root;
-	
+
 	// external links
-	private KaryoView karyoView;        // we're not doing anything clever here...
-	private FileSet sourceSet;          // FileSet from which current data was constructed.
-	
-	
+	private final KaryoView karyoView; // we're not doing anything clever
+										// here...
+	private FileSet sourceSet; // FileSet from which current data was
+								// constructed.
+
 	// callbacks for editing export params
-	private DocumentListener sizeChangeListener = new DocumentListener() {
+	private final DocumentListener sizeChangeListener = new DocumentListener() {
 		private void doUpdate() {
 			previewPanel.updatePreview();
 		}
+
 		@Override
-		public void changedUpdate(DocumentEvent arg0) {doUpdate();}
+		public void changedUpdate(final DocumentEvent arg0) {
+			doUpdate();
+		}
+
 		@Override
-		public void insertUpdate(DocumentEvent arg0) {doUpdate();}
+		public void insertUpdate(final DocumentEvent arg0) {
+			doUpdate();
+		}
+
 		@Override
-		public void removeUpdate(DocumentEvent arg0) {doUpdate();}
+		public void removeUpdate(final DocumentEvent arg0) {
+			doUpdate();
+		}
 	};
-	private DocumentListener scaleChangeListener = new DocumentListener() {
+	private final DocumentListener scaleChangeListener = new DocumentListener() {
 		private void doUpdate() {
 			try {
-				karyoView.getKaryoDrawer().setPixelPerMap(inclusionPanel.getPixelsPerMap());
-				karyoView.getKaryoDrawer().setPixelPerVal(inclusionPanel.getPixelsPerVal());
+				karyoView.getKaryoDrawer().setPixelPerMap(
+						inclusionPanel.getPixelsPerMap());
+				karyoView.getKaryoDrawer().setPixelPerVal(
+						inclusionPanel.getPixelsPerVal());
 				previewPanel.updatePreview();
-			} catch(Exception e) {
+			} catch (final Exception e) {
 				LogBuffer.logException(e);
 			}
 		}
+
 		@Override
-		public void changedUpdate(DocumentEvent arg0) {doUpdate();}
+		public void changedUpdate(final DocumentEvent arg0) {
+			doUpdate();
+		}
+
 		@Override
-		public void insertUpdate(DocumentEvent arg0) {doUpdate();}
+		public void insertUpdate(final DocumentEvent arg0) {
+			doUpdate();
+		}
+
 		@Override
-		public void removeUpdate(DocumentEvent arg0) {doUpdate();}
+		public void removeUpdate(final DocumentEvent arg0) {
+			doUpdate();
+		}
 	};
-	
+
 	// accessors
-	
+
 	public FileSet getSourceSet() {
 		return sourceSet;
 	}
-	public void setSourceSet( FileSet fs) {
+
+	public void setSourceSet(final FileSet fs) {
 		sourceSet = fs;
 		if (filePanel != null) {
 			filePanel.setFilePath(getInitialFilePath());
 		}
 	}
-	
-	
+
 	/*
-	* for communication with subclass...
-	*/
+	 * for communication with subclass...
+	 */
 	// components
 	private FilePanel filePanel;
 	private InclusionPanel inclusionPanel;
 	private PreviewPanel previewPanel;
-	
+
 	// accessors for configuration information
-	
+
 	protected File getFile() {
 		return filePanel.getFile();
 	}
+
 	public String getFilePath() {
 		return filePanel.getFilePath();
 	}
-	public void setFilePath(String newFile) {
+
+	public void setFilePath(final String newFile) {
 		filePanel.setFilePath(newFile);
 	}
+
 	protected String getInitialExtension() {
 		return ".png";
 	}
+
 	protected String getInitialFilePath() {
 		String defaultPath = null;
 		if (sourceSet == null) {
-			defaultPath = System.getProperty("user.home") + System.getProperty("file.separator")  + "scatterplot" + getInitialExtension();
+			defaultPath = System.getProperty("user.home")
+					+ System.getProperty("file.separator") + "scatterplot"
+					+ getInitialExtension();
 		} else {
-			defaultPath = sourceSet.getDir() + sourceSet.getRoot() + getInitialExtension();
+			defaultPath = sourceSet.getDir() + sourceSet.getRoot()
+					+ getInitialExtension();
 		}
 		if (root == null) {
 			return defaultPath;
@@ -127,31 +182,31 @@ public abstract class KaryoViewExportPanel extends JPanel implements SettingsPan
 			return root.getAttribute("file", defaultPath);
 		}
 	}
-	
-	
+
 	/**
-	* This export panel literally just prints out the image to the specified file, with no configuration possible.
-	*/
-	public KaryoViewExportPanel(KaryoView karyoView) {
+	 * This export panel literally just prints out the image to the specified
+	 * file, with no configuration possible.
+	 */
+	public KaryoViewExportPanel(final KaryoView karyoView) {
 		this.karyoView = karyoView;
 		setupWidgets();
 		inclusionPanel.synchSelected();
 		inclusionPanel.synchEnabled();
 	}
-	public void bindConfig(ConfigNode configNode)
-	{
+
+	public void bindConfig(final ConfigNode configNode) {
 		root = configNode;
 	}
-	public ConfigNode createSubNode()
-	{
+
+	public ConfigNode createSubNode() {
 		return root.create("File");
 	}
-	
+
 	private void setupWidgets() {
 		inclusionPanel = new InclusionPanel();
 		previewPanel = new PreviewPanel();
-		previewPanel.setMinimumSize(new Dimension(100,100));
-		
+		previewPanel.setMinimumSize(new Dimension(100, 100));
+
 		Box upperPanel; // holds major widget panels
 		upperPanel = new Box(BoxLayout.X_AXIS);
 		inclusionPanel.setAlignmentY(Component.CENTER_ALIGNMENT);
@@ -164,32 +219,35 @@ public abstract class KaryoViewExportPanel extends JPanel implements SettingsPan
 		filePanel = new FilePanel(getInitialFilePath());
 		add(filePanel);
 	}
-	
+
 	public int estimateHeight() {
-//		return inclusionPanel.estimateHeight();
+		// return inclusionPanel.estimateHeight();
 		try {
-		return inclusionPanel.getImgHeight();
-	} catch (Exception e) {
-		LogBuffer.logException(e);
-		return 0;
-	}
-	}
-	public int estimateWidth() {
-//		return inclusionPanel.estimateWidth();
-		try {
-			return inclusionPanel.getImgWidth();
-		} catch (Exception e) {
+			return inclusionPanel.getImgHeight();
+		} catch (final Exception e) {
 			LogBuffer.logException(e);
 			return 0;
 		}
 	}
-	
+
+	public int estimateWidth() {
+		// return inclusionPanel.estimateWidth();
+		try {
+			return inclusionPanel.getImgWidth();
+		} catch (final Exception e) {
+			LogBuffer.logException(e);
+			return 0;
+		}
+	}
+
 	class PreviewPanel extends JPanel {
 
 		JCheckBox drawPreview;
+
 		public void updatePreview() {
 			repaint();
 		}
+
 		PreviewPanel() {
 			setLayout(new BorderLayout());
 			add(new JLabel("Preview"), BorderLayout.NORTH);
@@ -197,35 +255,33 @@ public abstract class KaryoViewExportPanel extends JPanel implements SettingsPan
 			drawPreview = new JCheckBox("Draw Preview");
 			drawPreview.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					updatePreview();
 				}
 			});
-			if (estimateHeight() < 2000 && estimateWidth() <1000) {
+			if (estimateHeight() < 2000 && estimateWidth() < 1000) {
 				drawPreview.setSelected(true);
 			} else {
 				drawPreview.setSelected(false);
 			}
 			add(drawPreview, BorderLayout.SOUTH);
 		}
-		
-		
-		
+
 		class DrawingPanel extends JPanel {
 
-
-			
 			@Override
-			public void paintComponent(Graphics g) {
-				Dimension size = getSize();
+			public void paintComponent(final Graphics g) {
+				final Dimension size = getSize();
 				int width = estimateWidth();
 				int height = estimateHeight();
 				if ((width == 0) || (height == 0)) {
 					return;
 				}
-				// if the width * size.height is greater than the the height *size.width
-				// then if we make width = size.width, the height will be less than size.height.
-				if (width *size.height > height * size.width) {
+				// if the width * size.height is greater than the the height
+				// *size.width
+				// then if we make width = size.width, the height will be less
+				// than size.height.
+				if (width * size.height > height * size.width) {
 					height = (height * size.width) / width;
 					width = size.width;
 				} else { // otherwise, the converse is true.
@@ -234,203 +290,245 @@ public abstract class KaryoViewExportPanel extends JPanel implements SettingsPan
 				}
 				if ((drawPreview == null) || drawPreview.isSelected()) {
 					try {
-						Image i = generateImage();
-						g.drawImage(i,0,0,width,height, Color.white, null);
-					} catch (java.lang.OutOfMemoryError ex) {
-						JOptionPane.showMessageDialog(this, "Out of memory, Disabling preview");
+						final Image i = generateImage();
+						g.drawImage(i, 0, 0, width, height, Color.white, null);
+					} catch (final java.lang.OutOfMemoryError ex) {
+						JOptionPane.showMessageDialog(this,
+								"Out of memory, Disabling preview");
 						drawPreview.setSelected(false);
 					}
 				} else {
 					g.setColor(Color.red);
-					//			g.drawOval(0,0,width,height);
-					int [] xPoints = new int[4];
-					int [] yPoints = new int[4];
-					xPoints[0] = 0; xPoints[1] = 5; xPoints[2] = width; xPoints[3] = width - 5;
-					yPoints[0] = 5; yPoints[1] = 0; yPoints[2] = height -5; yPoints[3] = height;
-					
+					// g.drawOval(0,0,width,height);
+					final int[] xPoints = new int[4];
+					final int[] yPoints = new int[4];
+					xPoints[0] = 0;
+					xPoints[1] = 5;
+					xPoints[2] = width;
+					xPoints[3] = width - 5;
+					yPoints[0] = 5;
+					yPoints[1] = 0;
+					yPoints[2] = height - 5;
+					yPoints[3] = height;
+
 					g.fillPolygon(xPoints, yPoints, 4);
-					yPoints[0] = height-5; yPoints[1] = height; yPoints[2] = 5; yPoints[3] = 0;
+					yPoints[0] = height - 5;
+					yPoints[1] = height;
+					yPoints[2] = 5;
+					yPoints[3] = 0;
 					g.fillPolygon(xPoints, yPoints, 4);
-					
+
 				}
 			}
 		}
 	}
+
 	protected BufferedImage generateImage() {
-		int width = estimateWidth();
-		int height = estimateHeight();
-		int [] chromosomes = inclusionPanel.getSelectedChromosomes();
-		//Image nascent = createImage(width, height);
-		BufferedImage nascent = new BufferedImage(width, height,               BufferedImage.TYPE_INT_ARGB);
-		
-		
-		
-		if (chromosomes.length == 0) return nascent;
-		int perChr = height/chromosomes.length;
-		
-		Graphics gr = nascent.getGraphics();
-		Rectangle r = new Rectangle(0,0,width,height);
+		final int width = estimateWidth();
+		final int height = estimateHeight();
+		final int[] chromosomes = inclusionPanel.getSelectedChromosomes();
+		// Image nascent = createImage(width, height);
+		final BufferedImage nascent = new BufferedImage(width, height,
+				BufferedImage.TYPE_INT_ARGB);
+
+		if (chromosomes.length == 0)
+			return nascent;
+		final int perChr = height / chromosomes.length;
+
+		final Graphics gr = nascent.getGraphics();
+		final Rectangle r = new Rectangle(0, 0, width, height);
 		gr.setClip(r);
-		KaryoDrawer karyoDrawer = karyoView.getKaryoDrawer();
-		Genome genome = karyoDrawer.getGenome();
-		Rectangle dest = new Rectangle();
+		final KaryoDrawer karyoDrawer = karyoView.getKaryoDrawer();
+		final Genome genome = karyoDrawer.getGenome();
+		final Rectangle dest = new Rectangle();
 		dest.x = 0;
 		dest.y = 0;
 		dest.width = width;
 		dest.height = perChr;
-		
+
 		for (int i = 0; i < chromosomes.length; i++) {
 			karyoDrawer.paintBackground(nascent.getGraphics(), dest);
 			dest.y += perChr;
 		}
-		
+
 		dest.y = 0;
 		for (int i = 0; i < chromosomes.length; i++) {
-			karyoDrawer.paintChromosome(nascent.getGraphics(), genome.getChromosome(chromosomes[i]), dest);
+			karyoDrawer.paintChromosome(nascent.getGraphics(),
+					genome.getChromosome(chromosomes[i]), dest);
 			dest.y += perChr;
 		}
 		return nascent;
 	}
-	
+
 	int inset = 5;
+
 	class InclusionPanel extends JPanel {
 		public void synchEnabled() {
 		}
+
 		public void synchSelected() {
 		}
-		public int [] getSelectedChromosomes() {
-			Object [] selectedI = chrList.getSelectedValues();
-			int [] chrs = new int[selectedI.length];
-			for(int i = 0; i < selectedI.length; i++) {
+
+		public int[] getSelectedChromosomes() {
+			final Object[] selectedI = chrList.getSelectedValues();
+			final int[] chrs = new int[selectedI.length];
+			for (int i = 0; i < selectedI.length; i++) {
 				chrs[i] = ((Integer) selectedI[i]).intValue();
 			}
 			return chrs;
 		}
+
 		public int getImgHeight() {
 			return sizePanel.ySize();
 		}
+
 		public int getImgWidth() {
 			return sizePanel.xSize();
 		}
+
 		public double getPixelsPerMap() {
 			return scalePanel.getPixelPerMap();
 		}
+
 		public double getPixelsPerVal() {
 			return scalePanel.getPixelPerVal();
 		}
-		public void setPixelsPerMap(double ppm) {
+
+		public void setPixelsPerMap(final double ppm) {
 			scalePanel.setPixelPerMap(ppm);
 		}
-		public void setPixelsPerVal(double ppm) {
+
+		public void setPixelsPerVal(final double ppm) {
 			scalePanel.setPixelPerVal(ppm);
 		}
-		
-		
+
 		private int estimateHeight() {
-			int perChr = karyoView.getHeight() / karyoView.getKaryoDrawer().getGenome().getMaxChromosome();
-			int [] selected = getSelectedChromosomes();
-			return (perChr + 2*inset) * selected.length;
+			final int perChr = karyoView.getHeight()
+					/ karyoView.getKaryoDrawer().getGenome().getMaxChromosome();
+			final int[] selected = getSelectedChromosomes();
+			return (perChr + 2 * inset) * selected.length;
 		}
+
 		private int estimateWidth() {
-			int [] selected = getSelectedChromosomes();
+			final int[] selected = getSelectedChromosomes();
 			int max = 0;
-			KaryoDrawer karyoDrawer = karyoView.getKaryoDrawer();
-			Genome genome = karyoDrawer.getGenome();
-			for (int i =0 ;i < selected.length; i++) {
-				int dist = karyoDrawer.getFarthestEndDistance(genome.getChromosome(selected[i]));
-				if (dist > max) max = dist;
+			final KaryoDrawer karyoDrawer = karyoView.getKaryoDrawer();
+			final Genome genome = karyoDrawer.getGenome();
+			for (int i = 0; i < selected.length; i++) {
+				final int dist = karyoDrawer.getFarthestEndDistance(genome
+						.getChromosome(selected[i]));
+				if (dist > max)
+					max = dist;
 			}
-			
-			return (max +inset)*2;
+
+			return (max + inset) * 2;
 		}
+
 		InclusionPanel() {
 			setupWidgets();
 		}
+
 		JList chrList;
 		SizeRow sizePanel;
 		ScaleRow scalePanel;
+
 		private void setupWidgets() {
 			setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-			JLabel chrLabel  = new JLabel("Chromosomes:");
+			final JLabel chrLabel = new JLabel("Chromosomes:");
 			chrLabel.setAlignmentX(CENTER_ALIGNMENT);
 			add(chrLabel);
-			int num = karyoView.getKaryoDrawer().getGenome().getMaxChromosome();
-			Integer [] chromosomes = new Integer[num];
+			final int num = karyoView.getKaryoDrawer().getGenome()
+					.getMaxChromosome();
+			final Integer[] chromosomes = new Integer[num];
 			for (int i = 0; i < num; i++) {
-				chromosomes[i] = new Integer(i+1);
+				chromosomes[i] = new Integer(i + 1);
 			}
 			chrList = new JList(chromosomes);
 			chrList.setAlignmentX(CENTER_ALIGNMENT);
 			for (int i = 0; i < num; i++) {
-				if (karyoView.isChromosomeVisible(i+1)) {
-					chrList.addSelectionInterval(i,i);
+				if (karyoView.isChromosomeVisible(i + 1)) {
+					chrList.addSelectionInterval(i, i);
 				}
 			}
-			
-			// make sure JList set up before SizeRow, so can init vals properly...
+
+			// make sure JList set up before SizeRow, so can init vals
+			// properly...
 			sizePanel = new SizeRow();
 			scalePanel = new ScaleRow();
 			chrList.addListSelectionListener(new ListSelectionListener() {
 				@Override
-				public void valueChanged(ListSelectionEvent e) {
+				public void valueChanged(final ListSelectionEvent e) {
 					previewPanel.updatePreview();
 					sizePanel.setXsize(estimateWidth());
 					sizePanel.setYsize(estimateHeight());
 				}
 			});
 			add(chrList);
-			
-			JLabel multLabel  = new JLabel("Use shift or alt to select multiple");
+
+			final JLabel multLabel = new JLabel(
+					"Use shift or alt to select multiple");
 			multLabel.setAlignmentX(CENTER_ALIGNMENT);
 			add(multLabel);
 			add(sizePanel);
 			add(scalePanel);
 		}
+
 		class ScaleRow extends JPanel {
 			JTextField ppmField, ppvField;
+
 			public ScaleRow() {
 				setupWidgets();
 			}
+
 			private void setupWidgets() {
 				add(new JLabel("Pixels per map:"));
-				ppmField = new JTextField("" +karyoView.getKaryoDrawer().getPixelPerMap());
+				ppmField = new JTextField(""
+						+ karyoView.getKaryoDrawer().getPixelPerMap());
 				ppmField.getDocument().addDocumentListener(scaleChangeListener);
 				add(ppmField);
-				
+
 				add(new JLabel("Pixels per value:"));
-				ppvField = new JTextField("" +karyoView.getKaryoDrawer().getPixelPerVal());
+				ppvField = new JTextField(""
+						+ karyoView.getKaryoDrawer().getPixelPerVal());
 				ppvField.getDocument().addDocumentListener(scaleChangeListener);
 				add(ppvField);
 			}
+
 			public double getPixelPerMap() {
-				Double px = new Double(ppmField.getText());
+				final Double px = new Double(ppmField.getText());
 				return px.doubleValue();
 			}
-			
+
 			public double getPixelPerVal() {
-				Double px = new Double(ppvField.getText());
+				final Double px = new Double(ppvField.getText());
 				return px.doubleValue();
 			}
-			public void setPixelPerMap(double ppm) {
+
+			public void setPixelPerMap(final double ppm) {
 				ppmField.setText("" + ppm);
 			}
-			public void setPixelPerVal(double ppv) {
+
+			public void setPixelPerVal(final double ppv) {
 				ppvField.setText("" + ppv);
 			}
 		}
+
 		class SizeRow extends JPanel {
 			JTextField xSize, ySize;
+
 			/**
-			*	 make sure JList set up before SizeRow, so can init vals properly...
-			*/
+			 * make sure JList set up before SizeRow, so can init vals
+			 * properly...
+			 */
 			public SizeRow() {
 				setupWidgets();
 			}
+
 			protected void setupWidgets() {
 				add(new JLabel("Total Size:"));
-				xSize = new JTextField(""+estimateWidth(), 5);
-				ySize = new JTextField(""+estimateHeight(), 5);
-				
+				xSize = new JTextField("" + estimateWidth(), 5);
+				ySize = new JTextField("" + estimateHeight(), 5);
+
 				xSize.getDocument().addDocumentListener(sizeChangeListener);
 				ySize.getDocument().addDocumentListener(sizeChangeListener);
 				add(xSize);
@@ -438,78 +536,87 @@ public abstract class KaryoViewExportPanel extends JPanel implements SettingsPan
 				add(ySize);
 				add(new JLabel("(pixels)"));
 			}
-			
-			
+
 			int xSize() {
-				Integer px = new Integer(xSize.getText());
-				if (px.intValue() < 1) return 1;
+				final Integer px = new Integer(xSize.getText());
+				if (px.intValue() < 1)
+					return 1;
 				return px.intValue();
 			}
-			
-			void setXsize(int points) {
-				//xSize.setText(convert(points));
+
+			void setXsize(final int points) {
+				// xSize.setText(convert(points));
 				xSize.setText("" + points);
 			}
-			void setYsize(int points) {
-				//		  ySize.setText(convert(points));
+
+			void setYsize(final int points) {
+				// ySize.setText(convert(points));
 				ySize.setText("" + points);
 			}
+
 			/**
-			* converts points into inches, with 72 points/inch
-			*/
+			 * converts points into inches, with 72 points/inch
+			 */
 			/*
-			private String convert(int points) {
-				Double inch = new Double(Math.rint(((double) points * 100 )/ 72)/ 100.0);
-				return inch.toString();
-			}
-			*/
+			 * private String convert(int points) { Double inch = new
+			 * Double(Math.rint(((double) points * 100 )/ 72)/ 100.0); return
+			 * inch.toString(); }
+			 */
 			int ySize() {
-				Integer px = new Integer(ySize.getText());
-				if (px.intValue() < 1) return 1;
+				final Integer px = new Integer(ySize.getText());
+				if (px.intValue() < 1)
+					return 1;
 				return px.intValue();
 			}
+
 			@Override
-			public void setEnabled(boolean flag) {
+			public void setEnabled(final boolean flag) {
 				super.setEnabled(flag);
 				xSize.setEnabled(flag);
 				ySize.setEnabled(flag);
 			}
-			
+
 		}
 	}
-	
+
 	class FilePanel extends JPanel {
-		private JTextField fileField;
+		private final JTextField fileField;
+
 		String getFilePath() {
 			return fileField.getText();
 		}
+
 		File getFile() {
 			return new File(getFilePath());
 		}
-		void setFilePath(String fp) {
+
+		void setFilePath(final String fp) {
 			fileField.setText(fp);
 			fileField.invalidate();
 			fileField.revalidate();
 			fileField.repaint();
-			
+
 		}
-		public FilePanel(String initial) {
+
+		public FilePanel(final String initial) {
 			super();
 			setLayout(new BorderLayout());
 			add(new JLabel("Export To Png: "), BorderLayout.WEST);
 			fileField = new JTextField(initial);
 			add(fileField, BorderLayout.CENTER);
-			JButton chooseButton = new JButton("Browse");
+			final JButton chooseButton = new JButton("Browse");
 			chooseButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					try {
-						JFileChooser chooser = new JFileChooser();
-						int returnVal = chooser.showSaveDialog(KaryoViewExportPanel.this);
-						if(returnVal == JFileChooser.APPROVE_OPTION) {
-							fileField.setText(chooser.getSelectedFile().getCanonicalPath());
+						final JFileChooser chooser = new JFileChooser();
+						final int returnVal = chooser
+								.showSaveDialog(KaryoViewExportPanel.this);
+						if (returnVal == JFileChooser.APPROVE_OPTION) {
+							fileField.setText(chooser.getSelectedFile()
+									.getCanonicalPath());
 						}
-					} catch (java.io.IOException ex) {
+					} catch (final java.io.IOException ex) {
 						LogBuffer.println("Got exception " + ex);
 					}
 				}
@@ -517,17 +624,11 @@ public abstract class KaryoViewExportPanel extends JPanel implements SettingsPan
 			add(chooseButton, BorderLayout.EAST);
 		}
 	}
-	
+
 }
 /*
-class TestExportPanel extends KaryoViewExportPanel {
-	TestExportPanel(KaryoView karyoView) {
-		super(karyoView);
-	}
-	public void synchronizeTo() {
-	}
-	public void synchronizeFrom() {
-	}
-}
-*/
+ * class TestExportPanel extends KaryoViewExportPanel {
+ * TestExportPanel(KaryoView karyoView) { super(karyoView); } public void
+ * synchronizeTo() { } public void synchronizeFrom() { } }
+ */
 

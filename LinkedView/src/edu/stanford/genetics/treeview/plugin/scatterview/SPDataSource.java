@@ -22,28 +22,36 @@
  */
 package edu.stanford.genetics.treeview.plugin.scatterview;
 
-import edu.stanford.genetics.treeview.*;
+import edu.stanford.genetics.treeview.NoValueException;
 
 /**
  * a class to define the kind of data I want to make scatter plots with
  */
 public interface SPDataSource {
 	// general layout.
-    public String getTitle();
-    public String getXLabel();
-    public String getYLabel();
+	public String getTitle();
+
+	public String getXLabel();
+
+	public String getYLabel();
 
 	// information about points
-    public int getNumPoints();
-    public double getX(int i) throws NoValueException;
-    public double getY(int i) throws NoValueException;
-    public java.awt.Color getColor(int i);
+	public int getNumPoints();
+
+	public double getX(int i) throws NoValueException;
+
+	public double getY(int i) throws NoValueException;
+
+	public java.awt.Color getColor(int i);
+
 	public boolean isSelected(int i);
+
 	public String getLabel(int i);
 
 	// stuff with selection.
-    public void select(int i);
-    public void select(double xL, double yL, double xU, double yU);
-    public void deselectAll();
-}
+	public void select(int i);
 
+	public void select(double xL, double yL, double xU, double yU);
+
+	public void deselectAll();
+}

@@ -21,31 +21,30 @@
  * END_HEADER
  */
 package edu.stanford.genetics.treeview;
+
 import javax.swing.JLabel;
 
 import edu.stanford.genetics.treeview.core.HeaderFinder;
 
-
 /**
- *  Internal test class, used only by <code>main</code> test case.
+ * Internal test class, used only by <code>main</code> test case.
  */
 public class TestViewFrame extends ViewFrame {
 
 	private static final long serialVersionUID = 1L;
-
 
 	TestViewFrame() {
 		super("Test Export Panel");
 		getContentPane().add(new JLabel("test        test"));
 	}
 
+	@Override
+	public void setLoaded(final boolean b) {
+	}
 
 	@Override
-	public void setLoaded(boolean b) { }
-
-
-	@Override
-	public void update(java.util.Observable obs, java.lang.Object obj) {
+	public void update(final java.util.Observable obs,
+			final java.lang.Object obj) {
 	}
 
 	@Override
@@ -57,26 +56,27 @@ public class TestViewFrame extends ViewFrame {
 	public UrlPresets getGeneUrlPresets() {
 		return null;
 	}
+
 	@Override
 	public UrlPresets getArrayUrlPresets() {
 		return null;
 	}
-// hmmm this is kind of an insane dependancy... should get rid of it, methinks.
-	public edu.stanford.genetics.treeview.plugin.dendroview
-	.ColorPresets getColorPresets(){
+
+	// hmmm this is kind of an insane dependancy... should get rid of it,
+	// methinks.
+	public edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets getColorPresets() {
 		return null;
 	}
-
 
 	@Override
 	public boolean getLoaded() {
 		return false;
 	}
 
-		@Override
-		public TreeViewApp getApp() {
-			return null;
-		}
+	@Override
+	public TreeViewApp getApp() {
+		return null;
+	}
 
 	@Override
 	public DataModel getDataModel() {
@@ -84,8 +84,8 @@ public class TestViewFrame extends ViewFrame {
 	}
 
 	@Override
-	public void setDataModel(DataModel model, boolean cluster, 
-			boolean hierarchical) {
+	public void setDataModel(final DataModel model, final boolean cluster,
+			final boolean hierarchical) {
 	}
 
 	@Override
@@ -93,36 +93,35 @@ public class TestViewFrame extends ViewFrame {
 		return null;
 	}
 
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.stanford.genetics.treeview.ViewFrame#scrollToGene(int)
 	 */
 	@Override
-	public void scrollToGene(int i) {
+	public void scrollToGene(final int i) {
 		// nothing
-		
+
 	}
 
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see edu.stanford.genetics.treeview.ViewFrame#scrollToArray(int)
 	 */
 	@Override
-	public void scrollToArray(int i) {
+	public void scrollToArray(final int i) {
 		// nothing
-		
-	}
 
+	}
 
 	@Override
-	public MainPanel[] getMainPanelsByName(String name) {
+	public MainPanel[] getMainPanelsByName(final String name) {
 		return null;
 	}
-
 
 	@Override
 	public MainPanel[] getMainPanels() {
 		return null;
 	}
 }
-

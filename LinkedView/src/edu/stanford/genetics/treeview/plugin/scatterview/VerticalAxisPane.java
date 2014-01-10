@@ -29,46 +29,52 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
- * a class that plots a vertical axis given an axis info and a scatter color set.
+ * a class that plots a vertical axis given an axis info and a scatter color
+ * set.
  */
-class VerticalAxisPane extends JPanel  {
-	
+class VerticalAxisPane extends JPanel {
+
 	private AxisInfo axisInfo;
+
 	/** Setter for axisInfo */
-	public void setAxisInfo(AxisInfo axisInfo) {
+	public void setAxisInfo(final AxisInfo axisInfo) {
 		this.axisInfo = axisInfo;
 	}
+
 	/** Getter for axisInfo */
 	public AxisInfo getAxisInfo() {
 		return axisInfo;
 	}
+
 	private ScatterColorSet colorSet;
+
 	/** Setter for colorSet */
-	public void setColorSet(ScatterColorSet colorSet) {
+	public void setColorSet(final ScatterColorSet colorSet) {
 		this.colorSet = colorSet;
 	}
+
 	/** Getter for colorSet */
 	public ScatterColorSet getColorSet() {
 		return colorSet;
 	}
 
 	/**
-	* You'll want to create this after you set the config node for the scatterPane, since it keeps
-	* it's own pointers to the axis info and color set.
-	*/
-	VerticalAxisPane(AxisInfo axisInfo, ScatterColorSet colorSet) {
+	 * You'll want to create this after you set the config node for the
+	 * scatterPane, since it keeps it's own pointers to the axis info and color
+	 * set.
+	 */
+	VerticalAxisPane(final AxisInfo axisInfo, final ScatterColorSet colorSet) {
 		setAxisInfo(axisInfo);
 		setColorSet(colorSet);
 		add(new JLabel("y axis"));
 	}
-	
+
 	@Override
-	public void paintComponent(Graphics g) {
-		Dimension size = getSize();
-	    g.setColor(colorSet.getColor("Background"));
-	    g.fillRect(0,0,size.width, size.height);
-	    g.setColor(colorSet.getColor("Axis"));
-		g.drawLine(size.width/2, 0, size.width/2, size.height);
+	public void paintComponent(final Graphics g) {
+		final Dimension size = getSize();
+		g.setColor(colorSet.getColor("Background"));
+		g.fillRect(0, 0, size.width, size.height);
+		g.setColor(colorSet.getColor("Axis"));
+		g.drawLine(size.width / 2, 0, size.width / 2, size.height);
 	}
 }
-

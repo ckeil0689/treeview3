@@ -11,6 +11,7 @@ public interface LoadProgress2I {
 
 	/**
 	 * sets value of phase progress bar
+	 * 
 	 * @param i
 	 */
 	public abstract void setPhaseValue(int i);
@@ -19,6 +20,7 @@ public interface LoadProgress2I {
 
 	/**
 	 * sets length of phase progress bar
+	 * 
 	 * @param i
 	 */
 	public abstract void setPhaseLength(int i);
@@ -27,6 +29,7 @@ public interface LoadProgress2I {
 
 	/**
 	 * sets test of phase bar
+	 * 
 	 * @param i
 	 */
 	public abstract void setPhaseText(String i);
@@ -35,6 +38,7 @@ public interface LoadProgress2I {
 
 	/**
 	 * makes progress bar determinate, sets length to particular value
+	 * 
 	 * @param i
 	 */
 	public abstract void setLength(int i);
@@ -43,6 +47,7 @@ public interface LoadProgress2I {
 
 	/**
 	 * sets value of progress bar
+	 * 
 	 * @param i
 	 */
 	public abstract void setValue(int i);
@@ -53,6 +58,7 @@ public interface LoadProgress2I {
 
 	/**
 	 * sets determinate state of progress bar
+	 * 
 	 * @param flag
 	 */
 	public abstract void setIndeterminate(boolean flag);
