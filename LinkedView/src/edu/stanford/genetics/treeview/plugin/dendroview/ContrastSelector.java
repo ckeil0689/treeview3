@@ -3,14 +3,12 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 import java.awt.Adjustable;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -58,10 +56,11 @@ class ContrastSelector extends JPanel implements AdjustmentListener {
 
 		final JLabel font_label = new JLabel("Value:", SwingConstants.LEFT);
 		font_label.setForeground(GUIParams.TEXT);
+		font_label.setFont(GUIParams.FONTS);
 		inner.add(font_label, "alignx 50%");
 
-		font_label.setMaximumSize(new Dimension(Short.MAX_VALUE,
-				Short.MAX_VALUE));
+//		font_label.setMaximumSize(new Dimension(Short.MAX_VALUE,
+//				Short.MAX_VALUE));
 		inner.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
 
 		contrastTextField = new JTextField(Double.toString(contrast), 5);
@@ -94,23 +93,6 @@ class ContrastSelector extends JPanel implements AdjustmentListener {
 		scrollbar.setValues((int) (contrast * 100.0), 0, 1, 500);
 		scrollbar.addAdjustmentListener(this);
 		this.add(scrollbar, "pushx, growx");
-	}
-
-	public JButton setButtonLayout(final String title) {
-
-		final Font buttonFont = new Font("Sans Serif", Font.PLAIN, 14);
-
-		final JButton button = new JButton(title);
-		final Dimension d = button.getPreferredSize();
-		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
-		button.setPreferredSize(d);
-
-		button.setFont(buttonFont);
-		button.setOpaque(true);
-		button.setBackground(GUIParams.ELEMENT);
-		button.setForeground(GUIParams.BG_COLOR);
-
-		return button;
 	}
 
 	public JPanel setPanelLayout() {

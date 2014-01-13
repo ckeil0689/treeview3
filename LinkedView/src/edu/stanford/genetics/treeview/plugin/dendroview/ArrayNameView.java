@@ -32,6 +32,7 @@ import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.geom.AffineTransform;
 import java.util.Observable;
 
 import javax.swing.JLabel;
@@ -247,7 +248,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 			/* This code is for java2.it's worth supporting two ways. */
 			try {
 				final Graphics2D g2d = (Graphics2D) g;
-				g2d.rotate(-90 * 3.14159 / 180);
+				g2d.rotate(-Math.PI/ 2);
 				g2d.translate(-offscreenSize.height, 0);
 
 				final int start = map.getIndex(0);
@@ -317,8 +318,8 @@ public class ArrayNameView extends ModelView implements MouseListener,
 					} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 					}
 				}
-				g2d.translate(offscreenSize.height, 0);
-				g2d.rotate(90 * 3.14159 / 180);
+//				g2d.translate(offscreenSize.height, 0);
+//				g2d.rotate(90 * Math.PI / 180);
 
 			} catch (final java.lang.NoClassDefFoundError e) {
 
@@ -370,6 +371,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		}
 		// end of if
 	}
+	
 
 	/**
 	 * Sets the urlExtractor to be used when an array name is clicked on.

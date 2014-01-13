@@ -65,10 +65,11 @@ public class MessagePanel extends JPanel {
 	public MessagePanel(final String t, final Color bgColor) {
 
 		super();
-		this.setLayout(new MigLayout());
 		this.bgColor = bgColor;
-		this.setBackground(bgColor);
-		this.setBorder(BorderFactory.createEtchedBorder());
+		//setBackground(bgColor);
+		setBorder(null);//BorderFactory.createEtchedBorder());
+		setOpaque(false);
+		setLayout(new MigLayout());
 		title = t;
 
 		final JLabel header = new JLabel(t);
@@ -123,7 +124,7 @@ public class MessagePanel extends JPanel {
 		public JLabel setupLabel() {
 
 			final JLabel label = new JLabel();
-			label.setFont(new Font("Sans Serif", Font.PLAIN, 16));
+			label.setFont(GUIParams.FONTS);
 			label.setForeground(GUIParams.TEXT);
 
 			return label;

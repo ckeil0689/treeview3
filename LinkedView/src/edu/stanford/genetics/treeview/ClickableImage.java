@@ -98,12 +98,12 @@ public class ClickableImage extends JPanel {
 				} else if(tModel != null && labelText.equalsIgnoreCase(
 						"Visualize >")){
 					
-					frame.setDataModel(tModel, false);
+					frame.setDataModel(tModel, false, true);
 					frame.setLoaded(true);
 					
 				} else{
 					
-					frame.setDataModel(tModel, true);
+					frame.setDataModel(tModel, true, true);
 					frame.setLoaded(true);
 				}
 			}

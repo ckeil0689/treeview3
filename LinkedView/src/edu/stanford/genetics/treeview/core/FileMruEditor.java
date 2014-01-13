@@ -23,7 +23,6 @@
 package edu.stanford.genetics.treeview.core;
 
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -65,7 +64,7 @@ public class FileMruEditor extends JPanel {
 	private FileSetPanel fileSetPanel;
 	private ButtonPanel buttonPanel;
 
-	private static String[] options = new String[] { "Find...", "Remove",
+	private static String[] options = new String[] {"Find...", "Remove",
 			"Cancel" };
 	/**
 	 * Constant signifying what type of action to take. Used to keep track of
@@ -90,6 +89,7 @@ public class FileMruEditor extends JPanel {
 	 *            the FileMru to be edited
 	 */
 	public FileMruEditor(final FileMru fm) {
+		
 		super();
 		client = fm;
 		setupWidgets();
@@ -374,7 +374,7 @@ public class FileMruEditor extends JPanel {
 			this.setLayout(new MigLayout());
 			this.setOpaque(false);
 
-			openButton = setButtonLayout("Open");
+			openButton = GUIParams.setButtonLayout("Open");
 			openButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -384,7 +384,7 @@ public class FileMruEditor extends JPanel {
 			});
 			// this.add(openButton); not sure about this...
 
-			searchButton = setButtonLayout("Find");
+			searchButton = GUIParams.setButtonLayout("Find");
 			searchButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -395,7 +395,7 @@ public class FileMruEditor extends JPanel {
 			});
 			this.add(searchButton, "pushx");
 
-			deleteButton = setButtonLayout("Remove");
+			deleteButton = GUIParams.setButtonLayout("Remove");
 			deleteButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -404,7 +404,7 @@ public class FileMruEditor extends JPanel {
 			});
 			this.add(deleteButton, "pushx");
 
-			deleteAllButton = setButtonLayout("Remove All");
+			deleteAllButton = GUIParams.setButtonLayout("Remove All");
 			deleteAllButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -414,7 +414,7 @@ public class FileMruEditor extends JPanel {
 			});
 			this.add(deleteAllButton, "pushx");
 
-			closeButton = setButtonLayout("Close");
+			closeButton = GUIParams.setButtonLayout("Close");
 			closeButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -436,30 +436,6 @@ public class FileMruEditor extends JPanel {
 
 			deleteButton.setEnabled(thingsSelected);
 			searchButton.setEnabled(thingsSelected);
-		}
-
-		/**
-		 * Setting up a general layout for a button object The method is used to
-		 * make all buttons appear consistent in aesthetics.
-		 * 
-		 * @param button
-		 * @return
-		 */
-		public JButton setButtonLayout(final String title) {
-
-			final Font buttonFont = new Font("Sans Serif", Font.PLAIN, 14);
-
-			final JButton button = new JButton(title);
-			final Dimension d = button.getPreferredSize();
-			d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
-			button.setPreferredSize(d);
-
-			button.setFont(buttonFont);
-			button.setOpaque(true);
-			button.setBackground(GUIParams.ELEMENT);
-			button.setForeground(GUIParams.BG_COLOR);
-
-			return button;
 		}
 	}
 

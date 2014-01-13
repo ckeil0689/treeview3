@@ -23,8 +23,6 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -82,7 +80,7 @@ public class CancelableSettingsDialog extends JDialog {
 
 			this.setBackground(GUIParams.BG_COLOR);
 
-			final JButton save_button = setButtonLayout("Save");
+			final JButton save_button = GUIParams.setButtonLayout("Save");
 			save_button.addActionListener(new ActionListener() {
 
 				@Override
@@ -108,7 +106,7 @@ public class CancelableSettingsDialog extends JDialog {
 			});
 			add(save_button);
 
-			final JButton cancel_button = setButtonLayout("Cancel");
+			final JButton cancel_button = GUIParams.setButtonLayout("Cancel");
 			cancel_button.addActionListener(new ActionListener() {
 
 				@Override
@@ -119,23 +117,6 @@ public class CancelableSettingsDialog extends JDialog {
 				}
 			});
 			add(cancel_button);
-		}
-
-		public JButton setButtonLayout(final String title) {
-
-			final Font buttonFont = new Font("Sans Serif", Font.PLAIN, 14);
-
-			final JButton button = new JButton(title);
-			final Dimension d = button.getPreferredSize();
-			d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
-			button.setPreferredSize(d);
-
-			button.setFont(buttonFont);
-			button.setOpaque(true);
-			button.setBackground(GUIParams.ELEMENT);
-			button.setForeground(GUIParams.BG_COLOR);
-
-			return button;
 		}
 	}
 }

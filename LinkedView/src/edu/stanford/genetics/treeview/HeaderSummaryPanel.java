@@ -22,8 +22,6 @@
  */
 package edu.stanford.genetics.treeview;
 
-import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -84,7 +82,7 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 			}
 		};
 		
-		JButton custom_button = setButtonLayout("Use Custom Labels");
+		JButton custom_button = GUIParams.setButtonLayout("Use Custom Labels");
 		custom_button.addActionListener(new ActionListener() {
 
 			@Override
@@ -112,7 +110,7 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 
 					file = new File(fileChanger.getFilePath());
 					
-					FileSet fileSet = viewFrame.getFileSet(file); // Type: 0 (Auto)
+					FileSet fileSet = viewFrame.getFileSet(file);
 					viewFrame.loadFileSet(fileSet);
 
 					fileSet = viewFrame.getFileMRU().addUnique(fileSet);
@@ -215,22 +213,5 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 			LogBuffer.println("HeaderSummaryPanel got update from unexpected "
 					+ "observable " + o);
 		}
-	}
-	
-	public JButton setButtonLayout(final String title) {
-
-		final Font buttonFont = new Font("Sans Serif", Font.PLAIN, 14);
-
-		final JButton button = new JButton(title);
-		final Dimension d = button.getPreferredSize();
-		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
-		button.setPreferredSize(d);
-
-		button.setFont(buttonFont);
-		button.setOpaque(true);
-		button.setBackground(GUIParams.ELEMENT);
-		button.setForeground(GUIParams.BG_COLOR);
-
-		return button;
 	}
 }

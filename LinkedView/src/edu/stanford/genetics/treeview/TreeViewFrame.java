@@ -39,6 +39,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
@@ -64,7 +65,6 @@ import edu.stanford.genetics.treeview.core.MemMonitor;
 import edu.stanford.genetics.treeview.core.MenuHelpPluginsFrame;
 import edu.stanford.genetics.treeview.core.PluginManager;
 import edu.stanford.genetics.treeview.core.TreeViewJMenuBar;
-import edu.stanford.genetics.treeview.model.CDTCreator;
 import edu.stanford.genetics.treeview.model.CDTCreator2;
 import edu.stanford.genetics.treeview.model.DataModelWriter;
 import edu.stanford.genetics.treeview.model.TVModel;
@@ -142,6 +142,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		setupFileMru(treeView.getGlobalConfig().getNode("FileMru"));
 
 		centerOnscreen();
+		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		setLoaded(false);
 	}
 

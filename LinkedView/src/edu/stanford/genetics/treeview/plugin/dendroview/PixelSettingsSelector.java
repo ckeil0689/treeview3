@@ -293,7 +293,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 		d.setLayout(new MigLayout());
 		d.add(this, "push, grow, wrap");
 
-		final JButton display_button = setButtonLayout("Close");
+		final JButton display_button = GUIParams.setButtonLayout("Close");
 		display_button.addActionListener(new ActionListener() {
 			// called when close button hit
 			@Override
@@ -341,7 +341,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 		CEEButtons() {
 
 			this.setOpaque(false);
-			final JButton loadButton = setButtonLayout("Load...");
+			final JButton loadButton = GUIParams.setButtonLayout("Load...");
 			loadButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -367,7 +367,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 			});
 			this.add(loadButton);
 
-			final JButton saveButton = setButtonLayout("Save...");
+			final JButton saveButton = GUIParams.setButtonLayout("Save...");
 			saveButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -393,7 +393,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 			});
 			this.add(saveButton);
 
-			final JButton makeButton = setButtonLayout("Make Preset");
+			final JButton makeButton = GUIParams.setButtonLayout("Make Preset");
 			makeButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -411,7 +411,8 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 			});
 			this.add(makeButton);
 
-			final JButton resetButton = setButtonLayout("Reset Presets");
+			final JButton resetButton = GUIParams.setButtonLayout(
+					"Reset Presets");
 			resetButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -529,8 +530,8 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 			final int nPresets = m_presets.getNumPresets();
 			final JButton[] buttons = new JButton[nPresets];
 			for (int i = 0; i < nPresets; i++) {
-				final JButton presetButton = setButtonLayout((m_presets
-						.getPresetNames())[i]);
+				final JButton presetButton = GUIParams.setButtonLayout((
+						m_presets.getPresetNames())[i]);
 				final int index = i;
 				presetButton.addActionListener(new ActionListener() {
 
@@ -546,23 +547,6 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 				buttons[index] = presetButton;
 			}
 		}
-	}
-
-	public JButton setButtonLayout(final String title) {
-
-		final Font buttonFont = new Font("Sans Serif", Font.PLAIN, 14);
-
-		final JButton button = new JButton(title);
-		final Dimension d = button.getPreferredSize();
-		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
-		button.setPreferredSize(d);
-
-		button.setFont(buttonFont);
-		button.setOpaque(true);
-		button.setBackground(GUIParams.ELEMENT);
-		button.setForeground(GUIParams.BG_COLOR);
-
-		return button;
 	}
 
 	public JLabel makeLabel(final String title) {

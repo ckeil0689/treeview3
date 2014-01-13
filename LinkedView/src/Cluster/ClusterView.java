@@ -27,7 +27,6 @@
  */
 package Cluster;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -48,7 +47,6 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
-import javax.swing.plaf.basic.BasicProgressBarUI;
 
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.ConfigNode;
@@ -249,7 +247,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		head1.setFont(GUIParams.FONTL);
 		head1.setForeground(GUIParams.ELEMENT);
 
-		clusterType = setComboLayout(clusterNames);
+		clusterType = GUIParams.setComboLayout(clusterNames);
 		if (hierarchical) {
 			clusterType.setSelectedIndex(0);
 
@@ -297,10 +295,10 @@ public class ClusterView extends JPanel implements MainPanel {
 		head3.setForeground(GUIParams.ELEMENT);
 
 		// Drop-down menu for row selection
-		geneCombo = setComboLayout(measurements);
+		geneCombo = GUIParams.setComboLayout(measurements);
 
 		// Drop-down menu for column selection
-		arrayCombo = setComboLayout(measurements);
+		arrayCombo = GUIParams.setComboLayout(measurements);
 
 		worker = new SwingWorker<Void, Void>() {
 
@@ -371,7 +369,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		infoIcon = new ClickableIcon(viewFrame, "infoIcon.png");
 
 		// Linkage choice drop-down menu
-		clusterChoice = setComboLayout(clusterMethods);
+		clusterChoice = GUIParams.setComboLayout(clusterMethods);
 
 		clusters = new JLabel("Clusters: ");
 		clusters.setFont(GUIParams.FONTL);
@@ -394,8 +392,7 @@ public class ClusterView extends JPanel implements MainPanel {
 				EtchedBorder.LOWERED));
 
 		// Button to go back to data preview
-		back_button = new JButton("< Back");
-		back_button = ClusterView.setButtonLayout(back_button);
+		back_button = GUIParams.setButtonLayout("< Back");
 		back_button.addActionListener(new ActionListener() {
 
 			@Override
@@ -406,8 +403,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		});
 
 		// Button to show DendroView
-		dendro_button = new JButton("Clustergram > ");
-		dendro_button = ClusterView.setButtonLayout(dendro_button);
+		dendro_button = GUIParams.setButtonLayout("Clustergram > ");
 		dendro_button.addActionListener(new ActionListener() {
 
 			@Override
@@ -427,8 +423,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		});
 
 		// Button to begin Clustering
-		cluster_button = new JButton("Cluster");
-		cluster_button = ClusterView.setButtonLayout(cluster_button);
+		cluster_button = GUIParams.setButtonLayout("Cluster");
 		cluster_button.addActionListener(new ActionListener() {
 
 			@Override
@@ -451,20 +446,16 @@ public class ClusterView extends JPanel implements MainPanel {
 					buttonPanel.remove(back_button);
 
 					// ProgressBars
-					pBar = ClusterView.setPBarLayout(pBar,
-							"Row Distance Matrix");
+					pBar = GUIParams.setPBarLayout("Row Distance Matrix");
 
-					pBar2 = ClusterView.setPBarLayout(pBar2, "Row Clustering");
+					pBar2 = GUIParams.setPBarLayout("Row Clustering");
 
-					pBar3 = ClusterView.setPBarLayout(pBar3,
-							"Column Distance Matrix");
+					pBar3 = GUIParams.setPBarLayout("Column Distance Matrix");
 
-					pBar4 = ClusterView.setPBarLayout(pBar4,
-							"Column Clustering");
+					pBar4 = GUIParams.setPBarLayout("Column Clustering");
 
 					// Button to cancel process
-					cancel_button = new JButton("Cancel");
-					cancel_button = ClusterView.setButtonLayout(cancel_button);
+					cancel_button = GUIParams.setButtonLayout("Cancel");
 					cancel_button.addActionListener(new ActionListener() {
 
 						@Override
@@ -477,7 +468,10 @@ public class ClusterView extends JPanel implements MainPanel {
 							buttonPanel.remove(cancel_button);
 							buttonPanel.remove(dendro_button);
 							cluster_button.setEnabled(true);
-
+							
+							viewFrame.setLoaded(false);
+							viewFrame.setLoaded(true);
+							
 							mainPanel.revalidate();
 							mainPanel.repaint();
 						}
@@ -618,79 +612,6 @@ public class ClusterView extends JPanel implements MainPanel {
 	}
 
 	/**
-	 * Setting up a general layout for a button object The method is used to
-	 * make all buttons appear consistent in aesthetics
-	 * 
-	 * @param button
-	 * @return
-	 */
-	public static JButton setButtonLayout(final JButton button) {
-
-		final Dimension d = button.getPreferredSize();
-		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
-		button.setPreferredSize(d);
-
-		button.setFont(GUIParams.FONTS);
-		button.setOpaque(true);
-		button.setBackground(GUIParams.ELEMENT);
-		button.setForeground(GUIParams.BG_COLOR);
-
-		return button;
-	}
-
-	/**
-	 * Setting up a general layout for a ComboBox object The method is used to
-	 * make all ComboBoxes appear consistent in aesthetics
-	 * 
-	 * @param combo
-	 * @return
-	 */
-	public static JComboBox setComboLayout(final String[] combos) {
-
-		final JComboBox comboBox = new JComboBox(combos);
-		final Dimension d = comboBox.getPreferredSize();
-		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
-		comboBox.setPreferredSize(d);
-		comboBox.setFont(GUIParams.FONTS);
-		comboBox.setBackground(Color.white);
-
-		return comboBox;
-	}
-
-	/**
-	 * Method to setup a JProgressBar
-	 * 
-	 * @param pBar
-	 * @param text
-	 * @return
-	 */
-	public static JProgressBar setPBarLayout(JProgressBar pBar,
-			final String text) {
-
-		pBar = new JProgressBar();
-		pBar.setMinimum(0);
-		pBar.setStringPainted(true);
-		pBar.setMaximumSize(new Dimension(2000, 40));
-		pBar.setForeground(GUIParams.ELEMENT);
-		pBar.setUI(new BasicProgressBarUI() {
-
-			@Override
-			protected Color getSelectionBackground() {
-				return GUIParams.PROGRESS1;
-			};
-
-			@Override
-			protected Color getSelectionForeground() {
-				return GUIParams.PROGRESS2;
-			};
-		});
-		pBar.setString(text);
-		pBar.setVisible(true);
-
-		return pBar;
-	}
-
-	/**
 	 * Method to setup the look of an editable TextField
 	 * 
 	 * @return
@@ -744,8 +665,10 @@ public class ClusterView extends JPanel implements MainPanel {
 				return false;
 			}
 		} else {
-			if ((!choice.contentEquals("Do Not Cluster") && (clustersR > 0 && itsR > 0))
-					|| (!choice2.contentEquals("Do Not Cluster") && (clustersC > 0 && itsC > 0))) {
+			if ((!choice.contentEquals("Do Not Cluster") 
+					&& (clustersR > 0 && itsR > 0))
+					|| (!choice2.contentEquals("Do Not Cluster") 
+							&& (clustersC > 0 && itsC > 0))) {
 				return true;
 
 			} else {

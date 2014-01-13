@@ -1,7 +1,13 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JProgressBar;
+import javax.swing.plaf.basic.BasicProgressBarUI;
 
 public class GUIParams {
 
@@ -59,5 +65,81 @@ public class GUIParams {
 		TABLEHEADERS = new Color(255, 205, 120, 255);
 		PROGRESS1 = new Color(60, 60, 60, 255);
 		PROGRESS2 = new Color(60, 60, 60, 255);
+	}
+	
+	public static JButton setButtonLayout(String title) {
+		
+		//final Font buttonFont = new Font("Sans Serif", Font.PLAIN, 14);
+
+		final JButton button = new JButton(title);
+		final Dimension d = button.getPreferredSize();
+		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
+		button.setPreferredSize(d);
+		button.setBorder(null);
+
+		button.setFont(FONTS);
+		button.setOpaque(true);
+		
+		if(title.equalsIgnoreCase("Close")) {
+			button.setBackground(GUIParams.RED1);
+			button.setForeground(Color.white);
+			
+		} else {
+			button.setBackground(GUIParams.ELEMENT);
+			button.setForeground(GUIParams.BG_COLOR);
+		} 
+
+		return button;
+	}
+	
+	/**
+	 * Method to setup a JProgressBar
+	 * 
+	 * @param pBar
+	 * @param text
+	 * @return
+	 */
+	public static JProgressBar setPBarLayout(final String text) {
+
+		JProgressBar pBar = new JProgressBar();
+		pBar.setMinimum(0);
+		pBar.setStringPainted(true);
+		pBar.setMaximumSize(new Dimension(2000, 40));
+		pBar.setForeground(GUIParams.ELEMENT);
+		pBar.setUI(new BasicProgressBarUI() {
+
+			@Override
+			protected Color getSelectionBackground() {
+				return GUIParams.PROGRESS1;
+			};
+
+			@Override
+			protected Color getSelectionForeground() {
+				return GUIParams.PROGRESS2;
+			};
+		});
+		pBar.setString(text);
+		pBar.setVisible(true);
+
+		return pBar;
+	}
+	
+	/**
+	 * Setting up a general layout for a ComboBox object The method is used to
+	 * make all ComboBoxes appear consistent in aesthetics
+	 * 
+	 * @param combo
+	 * @return
+	 */
+	public static JComboBox setComboLayout(final String[] combos) {
+
+		final JComboBox comboBox = new JComboBox(combos);
+		final Dimension d = comboBox.getPreferredSize();
+		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
+		comboBox.setPreferredSize(d);
+		comboBox.setFont(GUIParams.FONTS);
+		comboBox.setBackground(Color.white);
+
+		return comboBox;
 	}
 }

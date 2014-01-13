@@ -22,7 +22,6 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.ScrollPane;
@@ -43,7 +42,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -326,7 +324,7 @@ public class DendroView2 extends JPanel implements ConfigNodePersistent,
 		((Observable) getDataModel()).addObserver(arrayDrawer);
 
 		// Set up status panel
-		statuspanel = new MessagePanel("Status", GUIParams.PANEL_BG);
+		statuspanel = new MessagePanel("Status", GUIParams.BG_COLOR);
 		statuspanel.setMinimumSize(new Dimension(300, 200));
 
 		// zoomXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0, 1, 0, 1);
@@ -399,7 +397,7 @@ public class DendroView2 extends JPanel implements ConfigNodePersistent,
 		// atrzview.setHeaderSummary(atrview.getHeaderSummary());
 		// atrzview.setInvertedTreeDrawer(invertedTreeDrawer);
 
-		scaleDefaultAll = setZoomButtonLayout("Reset");
+		scaleDefaultAll = GUIParams.setButtonLayout("Reset");
 		scaleDefaultAll.addActionListener(new ActionListener() {
 
 			@Override
@@ -410,7 +408,7 @@ public class DendroView2 extends JPanel implements ConfigNodePersistent,
 			}
 		});
 
-		scaleIncX = setZoomButtonLayout("+");
+		scaleIncX = GUIParams.setButtonLayout("+");
 		scaleIncX.addActionListener(new ActionListener() {
 
 			@Override
@@ -420,7 +418,7 @@ public class DendroView2 extends JPanel implements ConfigNodePersistent,
 			}
 		});
 
-		scaleDecX = setZoomButtonLayout("-");
+		scaleDecX = GUIParams.setButtonLayout("-");
 		scaleDecX.addActionListener(new ActionListener() {
 
 			@Override
@@ -430,7 +428,7 @@ public class DendroView2 extends JPanel implements ConfigNodePersistent,
 			}
 		});
 
-		scaleIncY = setZoomButtonLayout("+");
+		scaleIncY = GUIParams.setButtonLayout("+");
 		scaleIncY.addActionListener(new ActionListener() {
 
 			@Override
@@ -440,7 +438,7 @@ public class DendroView2 extends JPanel implements ConfigNodePersistent,
 			}
 		});
 
-		scaleDecY = setZoomButtonLayout("-");
+		scaleDecY = GUIParams.setButtonLayout("-");
 		scaleDecY.addActionListener(new ActionListener() {
 
 			@Override
@@ -525,14 +523,13 @@ public class DendroView2 extends JPanel implements ConfigNodePersistent,
 		JPanel crossPanel;
 		JPanel fillPanel1;
 		JPanel fillPanel2;
-		// JPanel zoompanel;
+		JPanel finderPanel;
 		JPanel textpanel;
 		JPanel navPanel;
 		JPanel contrastPanel;
 		JSplitPane gtrPane;
 		JSplitPane atrPane;
 		// JButton saveButton;
-		JButton closeButton;
 		final JButton zoomButton;
 		JButton deselectButton;
 		JLabel nav;
@@ -577,19 +574,7 @@ public class DendroView2 extends JPanel implements ConfigNodePersistent,
 		// }
 		// }
 		// });
-
-		closeButton = setButtonLayout("< Back");
-		;
-		closeButton.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-
-				viewFrame.setLoaded(false);
-			}
-		});
-
-		zoomButton = setButtonLayout("Zoom Selection");
+		zoomButton = GUIParams.setButtonLayout("Zoom Selection");
 		zoomButton.addActionListener(new ActionListener() {
 
 			@Override
@@ -600,7 +585,7 @@ public class DendroView2 extends JPanel implements ConfigNodePersistent,
 			}
 		});
 
-		deselectButton = setButtonLayout("Deselect");
+		deselectButton = GUIParams.setButtonLayout("Deselect");
 		deselectButton.addActionListener(new ActionListener() {
 
 			@Override
@@ -619,8 +604,9 @@ public class DendroView2 extends JPanel implements ConfigNodePersistent,
 
 		navPanel = new JPanel();
 		navPanel.setLayout(new MigLayout());
-		navPanel.setBackground(GUIParams.PANEL_BG);
-		navPanel.setBorder(BorderFactory.createEtchedBorder());
+		//navPanel.setBackground(GUIParams.PANEL_BG);
+		navPanel.setOpaque(false);
+		navPanel.setBorder(null);//BorderFactory.createEtchedBorder());
 
 		nav = new JLabel("Navigation");
 		nav.setFont(GUIParams.HEADER);
@@ -628,8 +614,9 @@ public class DendroView2 extends JPanel implements ConfigNodePersistent,
 
 		contrastPanel = new JPanel();
 		contrastPanel.setLayout(new MigLayout());
-		contrastPanel.setBackground(GUIParams.PANEL_BG);
-		contrastPanel.setBorder(BorderFactory.createEtchedBorder());
+		//contrastPanel.setBackground(GUIParams.PANEL_BG);
+		contrastPanel.setOpaque(false);
+		contrastPanel.setBorder(null);//BorderFactory.createEtchedBorder());
 
 		contrast = new JLabel("Contrast");
 		contrast.setFont(GUIParams.HEADER);
@@ -638,7 +625,11 @@ public class DendroView2 extends JPanel implements ConfigNodePersistent,
 		textpanel = new JPanel();
 		textpanel.setLayout(new MigLayout("ins 0"));
 		textpanel.setOpaque(false);
-
+		
+		finderPanel = new JPanel();
+		finderPanel.setLayout(new MigLayout());
+		finderPanel.setOpaque(false);
+		
 		gtrPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, gtrview,
 				textpanel);
 		gtrPane.setDividerSize(DIVIDER_SIZE);
@@ -681,16 +672,15 @@ public class DendroView2 extends JPanel implements ConfigNodePersistent,
 
 		buttonPanel.add(adjScale, "pushx, wrap");
 		buttonPanel.add(crossPanel, "pushx, alignx 50%");
+		
+		finderPanel.add(getGeneFinderPanel(), "pushx, alignx 50%, wrap");
+		finderPanel.add(getArrayFinderPanel(), "pushx, alignx 50%");
 
 		navPanel.add(nav, "span, wrap");
-		navPanel.add(getGeneFinderPanel(), "pushx, alignx 50%, "
-				+ "height 10%::, wrap");
-		navPanel.add(getArrayFinderPanel(), "pushx, alignx 50%, "
-				+ "height 10%::, wrap");
+		navPanel.add(finderPanel, "pushx, alignx 50%, wrap");
 		navPanel.add(buttonPanel, "push, growx, alignx 50%, wrap");
 		navPanel.add(zoomButton, "pushx, alignx 50%, wrap");
-		navPanel.add(deselectButton, "pushx, alignx 50%, wrap");
-		navPanel.add(closeButton, "push, alignx 50%");
+		navPanel.add(deselectButton, "pushx, alignx 50%");
 
 		ColorExtractor ce = null;
 
@@ -703,6 +693,7 @@ public class DendroView2 extends JPanel implements ConfigNodePersistent,
 
 		contrastPanel.add(contrast, "span, wrap");
 		final ContrastSelector m_contrast = new ContrastSelector(ce);
+		m_contrast.setBorder(null);
 		contrastPanel.add(m_contrast, "pushx, growx");
 
 		backgroundPanel.add(statuspanel, "pushx, growx, height 20%::");
@@ -710,11 +701,11 @@ public class DendroView2 extends JPanel implements ConfigNodePersistent,
 		backgroundPanel.add(contrastPanel, "span 2, grow, push, wrap");
 		backgroundPanel.add(gtrPane, "grow, width 20%");
 		backgroundPanel.add(globalview, "push, grow, width 62%");
-		backgroundPanel.add(globalYscrollbar, "pushy, growy");
-		backgroundPanel.add(navPanel, "grow, wrap");
+		backgroundPanel.add(globalYscrollbar, "pushy, growy, width 1%");
+		backgroundPanel.add(navPanel, "push, grow, width 17%, wrap");
 		backgroundPanel.add(fillPanel1, "growx, pushx");
 		backgroundPanel.add(globalXscrollbar, "growx, pushx");
-		backgroundPanel.add(fillPanel2, "growx, pushx");
+		backgroundPanel.add(fillPanel2, "span 2, growx, pushx");
 
 		this.add(backgroundPanel, "push, grow");
 	}
@@ -2171,77 +2162,6 @@ public class DendroView2 extends JPanel implements ConfigNodePersistent,
 		// zoomview.setGeneSelection(geneSelection);
 		gtrview.setGeneSelection(geneSelection);
 		textview.setGeneSelection(geneSelection);
-	}
-
-	/**
-	 * Setting up a general layout for a button object The method is used to
-	 * make all buttons appear consistent in aesthetics
-	 * 
-	 * @param button
-	 * @return
-	 */
-	public JButton setButtonLayout(final String title) {
-
-		final Font buttonFont = new Font("Sans Serif", Font.PLAIN, 14);
-
-		final JButton button = new JButton(title);
-		final Dimension d = button.getPreferredSize();
-		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
-		button.setPreferredSize(d);
-
-		button.setFont(buttonFont);
-		button.setOpaque(true);
-		button.setBackground(GUIParams.ELEMENT);
-		button.setForeground(GUIParams.BG_COLOR);
-
-		return button;
-	}
-
-	/**
-	 * Setting up a general layout for a button object The method is used to
-	 * make all buttons appear consistent in aesthetics
-	 * 
-	 * @param button
-	 * @return
-	 */
-	public JButton setZoomButtonLayout(final String title) {
-
-		final int buttonHeight = 30;
-		final int buttonWidth = 30;
-
-		final Font buttonFont = new Font("Sans Serif", Font.BOLD, 16);
-
-		final JButton button = new JButton(title);
-
-		final Dimension d = button.getPreferredSize();
-		d.setSize(buttonWidth, buttonHeight);
-		button.setPreferredSize(d);
-
-		button.setFont(buttonFont);
-		button.setOpaque(true);
-		button.setBackground(GUIParams.ELEMENT);
-		button.setForeground(GUIParams.BG_COLOR);
-
-		return button;
-	}
-
-	/**
-	 * Setting up a general layout for a ComboBox object The method is used to
-	 * make all ComboBoxes appear consistent in aesthetics
-	 * 
-	 * @param combo
-	 * @return
-	 */
-	public static JComboBox setComboLayout(final String[] combos) {
-
-		final JComboBox comboBox = new JComboBox(combos);
-		final Dimension d = comboBox.getPreferredSize();
-		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
-		comboBox.setPreferredSize(d);
-		comboBox.setFont(GUIParams.FONTS);
-		comboBox.setBackground(Color.white);
-
-		return comboBox;
 	}
 
 	/**

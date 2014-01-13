@@ -1,6 +1,5 @@
 package edu.stanford.genetics.treeview;
 
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -135,8 +134,7 @@ class LoadCheckView extends JPanel {
 			buttonPanel.setLayout(new MigLayout());
 			buttonPanel.setOpaque(false);
 
-			loadNewButton = new JButton("Load Different File");
-			setButtonLayout(loadNewButton);
+			loadNewButton = GUIParams.setButtonLayout("Load Different File");
 			loadNewButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -146,8 +144,7 @@ class LoadCheckView extends JPanel {
 				}
 			});
 
-			advanceButton = new JButton("Continue >");
-			setButtonLayout(advanceButton);
+			advanceButton = GUIParams.setButtonLayout("Continue >");
 			advanceButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -180,8 +177,7 @@ class LoadCheckView extends JPanel {
 			warning.setFont(fontL);
 			warning.setForeground(GUIParams.RED1);
 
-			loadNewButton = new JButton("Load New File");
-			setButtonLayout(loadNewButton);
+			loadNewButton = GUIParams.setButtonLayout("Load New File");
 			loadNewButton.setBackground(GUIParams.ELEMENT);
 			loadNewButton.addActionListener(new ActionListener() {
 
@@ -198,26 +194,5 @@ class LoadCheckView extends JPanel {
 			this.revalidate();
 			this.repaint();
 		}
-	}
-
-	/**
-	 * Setting up a general layout for a button object The method is used to
-	 * make all buttons appear consistent in aesthetics
-	 * 
-	 * @param button
-	 * @return
-	 */
-	public static JButton setButtonLayout(final JButton button) {
-
-		final Dimension d = button.getPreferredSize();
-		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
-		button.setPreferredSize(d);
-
-		button.setFont(fontS);
-		button.setOpaque(true);
-		button.setBackground(GUIParams.ELEMENT);
-		button.setForeground(GUIParams.BG_COLOR);
-
-		return button;
 	}
 }

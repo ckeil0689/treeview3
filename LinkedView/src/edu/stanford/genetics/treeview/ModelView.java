@@ -32,7 +32,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -47,8 +46,6 @@ public abstract class ModelView extends JPanel implements java.util.Observer,
 		MouseListener {
 
 	private static final long serialVersionUID = 1L;
-
-	private final Color labelColor = new Color(178, 129, 0, 255);
 
 	protected ViewFrame viewFrame = null;
 	protected MessagePanel status = null;
@@ -69,7 +66,7 @@ public abstract class ModelView extends JPanel implements java.util.Observer,
 	protected ModelView() {
 
 		super(false);
-		setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
+		//setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 		setBackground(GUIParams.BG_COLOR);
 	}
 
@@ -207,7 +204,7 @@ public abstract class ModelView extends JPanel implements java.util.Observer,
 			return;
 		}
 
-		setBorder(BorderFactory.createLineBorder(labelColor, 1));
+		//setBorder(BorderFactory.createLineBorder(labelColor, 1));
 
 		final Window frame = enclosingWindow();
 		if (frame.isActive()) {
@@ -232,7 +229,7 @@ public abstract class ModelView extends JPanel implements java.util.Observer,
 	public void mouseExited(final MouseEvent e) {
 
 		hasMouse = false;
-		setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
+		//setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 	}
 
 	/* a bunch of stubs so we can claim to be a MouseListener */

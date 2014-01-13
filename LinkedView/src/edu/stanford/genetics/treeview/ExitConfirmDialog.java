@@ -1,6 +1,5 @@
 package edu.stanford.genetics.treeview;
 
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -31,7 +30,7 @@ public class ExitConfirmDialog extends JFrame {
 		prompt.setForeground(GUIParams.TEXT);
 		prompt.setFont(GUIParams.FONTS);
 
-		final JButton ok = setButtonLayout(new JButton("Yes"));
+		final JButton ok = GUIParams.setButtonLayout("Yes");
 		ok.addActionListener(new ActionListener() {
 
 			@Override
@@ -46,19 +45,6 @@ public class ExitConfirmDialog extends JFrame {
 
 		getContentPane().add(mainPanel);
 		pack();
-		setLocationRelativeTo(null);
-	}
-
-	public JButton setButtonLayout(final JButton button) {
-
-		final Dimension d = button.getPreferredSize();
-		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
-		button.setPreferredSize(d);
-
-		button.setFont(GUIParams.FONTS);
-		button.setBackground(GUIParams.ELEMENT);
-		button.setForeground(GUIParams.BG_COLOR);
-
-		return button;
+		setLocationRelativeTo(view);
 	}
 }

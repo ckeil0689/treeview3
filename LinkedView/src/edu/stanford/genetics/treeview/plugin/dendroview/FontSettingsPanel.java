@@ -31,8 +31,6 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -46,9 +44,11 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
+
+import net.miginfocom.swing.MigLayout;
 
 import edu.stanford.genetics.treeview.DummyHeaderInfo;
+import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.NatField;
 import edu.stanford.genetics.treeview.SettingsPanel;
@@ -183,13 +183,13 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 			fontNames[Arrays.asList(fonts).indexOf(f)] = f.getName();
 		}
 
-		font_choice = new JComboBox(fontNames);
+		font_choice = GUIParams.setComboLayout(fontNames);
 		font_choice.setSelectedItem(client.getFace());
 	}
 
 	private void setupStyleChoice() {
 
-		style_choice = new JComboBox(styles);
+		style_choice = GUIParams.setComboLayout(styles);
 		style_choice.setSelectedItem(decode_style(client.getStyle()));
 	}
 
@@ -210,26 +210,19 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 	private void setupWidgets() {
 
 		removeAll();
-		final GridBagLayout gbl = new GridBagLayout();
-		setLayout(gbl);
-		final GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.gridwidth = 1;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
+		setLayout(new MigLayout());
+		setBackground(GUIParams.BG_COLOR);
 
 		setupFontChoice();
-		add(font_choice, gbc);
+		add(font_choice, "pushx");
 
 		setupStyleChoice();
-		gbc.gridx = 1;
-		add(style_choice, gbc);
+		add(style_choice, "pushx");
 
 		size_field = new NatField(client.getPoints(), 3);
-		gbc.gridx = 2;
-		add(size_field, gbc);
+		add(size_field, "pushx, wrap");
 
-		display_button = new JButton("Set");
+		display_button = GUIParams.setButtonLayout("Set");
 		display_button.addActionListener(new ActionListener() {
 
 			@Override
@@ -239,15 +232,11 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 				synchronizeClient();
 			}
 		});
-
-		gbc.gridx = 3;
-		add(display_button, gbc);
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.gridwidth = 3;
-		gbc.fill = GridBagConstraints.BOTH;
-		exampleField = new JLabel("Font Example Text", SwingConstants.CENTER);
-		add(exampleField, gbc);
+		add(display_button, "push");
+		
+		exampleField = new JLabel("Font Example Text");
+		exampleField.setForeground(GUIParams.TEXT);
+		add(exampleField, "span");
 	}
 
 	private void updateExample() {
@@ -268,8 +257,8 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 		ButtonPanel(final Window w) {
 
 			final Window window = w;
-			final JButton save_button = new JButton("Close");
-			save_button.addActionListener(new ActionListener() {
+			final JButton close_button = GUIParams.setButtonLayout("Close");
+			close_button.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -277,7 +266,7 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 					window.setVisible(false);
 				}
 			});
-			add(save_button);
+			add(close_button);
 		}
 	}
 }

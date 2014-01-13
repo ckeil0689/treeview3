@@ -185,7 +185,6 @@ public class CDTCreator2 {
 		final int orfRow = orfInd.get(0);
 		final int orfCol = orfInd.get(1);
 		final int eweightRow = eweightInd.get(0);
-		final int eweightCol = eweightInd.get(1);
 		final int gweightCol = gweightInd.get(1);
 		final int dataCol = dataStart.get(1);
 		final int dataRow = dataStart.get(0);
@@ -252,7 +251,7 @@ public class CDTCreator2 {
 		sb.append(SEPARATOR);
 
 		// start at 1 because EWEIGHT takes position 0
-		for (int i = eweightCol + 1; i < dataStart.get(1); i++) {
+		for (int i = 0; i < dataCol; i++) {
 
 			sb.append("");
 			sb.append(SEPARATOR);
@@ -416,11 +415,40 @@ public class CDTCreator2 {
 		for (int i = dataRow; i < dataSet.size(); i++) {
 
 			final List<String> row = dataSet.get(i);
-			final List<String> customRow = customDataSet.get(i - dataRow);
 			
-			row.set(orfCol, customRow.get(customOrfCol));
-			row.set(nameCol, customRow.get(customNameCol));
+			for(List<String> labels : customDataSet) {
+				
+				if(checkSubString(row.get(orfCol), 
+						labels.get(customOrfCol))) {
+					row.set(orfCol, labels.get(customOrfCol));
+				}
+				
+				if(checkSubString(row.get(nameCol), 
+						labels.get(customNameCol))) {
+					row.set(nameCol, labels.get(customNameCol));
+				}
+			}
 		}
+	}
+	
+	/**
+	 * Checking a custom string whether it contains 
+	 * @param original
+	 * @param custom
+	 * @return
+	 */
+	public boolean checkSubString(String original, String custom) {
+		
+		boolean match = false;
+		int nameLength = 7;
+		
+		if(custom != null || original != null) {
+			if(custom.contains(original.substring(0, nameLength))){
+				match = true;
+			}
+		}
+		
+		return match;
 	}
 
 	/**

@@ -22,9 +22,6 @@
  */
 package edu.stanford.genetics.treeview;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Insets;
 import java.awt.Toolkit;
@@ -38,7 +35,6 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.plaf.basic.BasicProgressBarUI;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -94,9 +90,9 @@ public class LoadProgress2 extends JDialog implements LoadProgress2I {
 	public LoadProgress2(final String title, final Frame f) {
 
 		super(f, title, true);
-		phaseBar = setPBarLayout(phaseBar);
+		phaseBar = GUIParams.setPBarLayout("Loading");
 
-		progressBar = setPBarLayout(progressBar);
+		progressBar = GUIParams.setPBarLayout("Loading");
 
 		taskOutput = new JTextArea(10, 40);
 		taskOutput.setMargin(new Insets(5, 5, 5, 5));
@@ -114,8 +110,7 @@ public class LoadProgress2 extends JDialog implements LoadProgress2I {
 		contentPane.add(new JScrollPane(taskOutput), "push, grow, wrap");
 		contentPane.setBackground(GUIParams.BG_COLOR);
 
-		closeButton = new JButton("Cancel");
-		closeButton = setButtonLayout(closeButton);
+		closeButton = GUIParams.setButtonLayout("Cancel");
 		closeButton.addActionListener(new ActionListener() {
 
 			@Override
@@ -455,64 +450,5 @@ public class LoadProgress2 extends JDialog implements LoadProgress2I {
 		if (b == false) {
 			finished = true;
 		}
-	}
-
-	// Layout setups for some Swing elements
-	/**
-	 * Setting up a general layout for a button object The method is used to
-	 * make all buttons appear consistent in aesthetics
-	 * 
-	 * @param button
-	 * @return
-	 */
-	public static JButton setButtonLayout(final JButton button) {
-
-		final Font buttonFont = new Font("Sans Serif", Font.PLAIN, 16);
-
-		final Dimension d = button.getPreferredSize();
-		d.setSize(d.getWidth(), d.getHeight());
-		button.setPreferredSize(d);
-
-		button.setFont(buttonFont);
-		button.setOpaque(true);
-		button.setBackground(GUIParams.ELEMENT);
-		button.setForeground(GUIParams.BG_COLOR);
-
-		return button;
-	}
-
-	/**
-	 * Method to setup a JProgressBar
-	 * 
-	 * @param pBar
-	 * @param text
-	 * @return
-	 */
-	public JProgressBar setPBarLayout(JProgressBar pBar) {
-
-		final Dimension d = new Dimension(2000, 40);
-
-		pBar = new JProgressBar();
-		pBar.setMinimum(0);
-		pBar.setStringPainted(true);
-		pBar.setMaximumSize(d);
-		pBar.setForeground(GUIParams.ELEMENT);
-		pBar.setUI(new BasicProgressBarUI() {
-
-			@Override
-			protected Color getSelectionBackground() {
-
-				return GUIParams.PROGRESS1;
-			};
-
-			@Override
-			protected Color getSelectionForeground() {
-
-				return GUIParams.PROGRESS2;
-			};
-		});
-		pBar.setVisible(true);
-
-		return pBar;
 	}
 }

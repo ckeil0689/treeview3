@@ -208,7 +208,7 @@ public class MethodInfoFrame extends JFrame {
 		pack();
 
 		// Center JFrame on screen, needs to be used after pack();
-		setLocationRelativeTo(null);
+		setLocationRelativeTo(viewFrame);
 	}
 
 	// Information panels to be shown when labels are clicked

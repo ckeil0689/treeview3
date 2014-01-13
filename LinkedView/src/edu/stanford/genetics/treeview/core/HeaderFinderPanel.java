@@ -94,8 +94,8 @@ public abstract class HeaderFinderPanel extends JPanel {
 		this.choices = new int[hI.getNumHeaders()]; // could be wasteful of
 													// ram...
 
-		this.setLayout(new MigLayout());
-		this.setOpaque(false);
+		setLayout(new MigLayout());
+		setOpaque(false);
 
 		final String[][] hA = headerInfo.getHeaderArray();
 
@@ -112,8 +112,11 @@ public abstract class HeaderFinderPanel extends JPanel {
 		}
 
 		Arrays.sort(genefHeaders);
-		genefBox = setComboLayout(genefHeaders);
-		genefButton = setButtonLayout("Go!");
+		genefBox = GUIParams.setComboLayout(genefHeaders);
+		genefBox.setEditable(true);
+		AutoCompleteDecorator.decorate(genefBox);
+		
+		genefButton = GUIParams.setButtonLayout("Go!");
 		genefButton.addActionListener(new ActionListener() {
 
 			@Override
@@ -125,9 +128,9 @@ public abstract class HeaderFinderPanel extends JPanel {
 			}
 		});
 
-		this.add(genef, "pushx, span, wrap");
-		this.add(genefBox, "pushx, width 70%");
-		this.add(genefButton, "pushx, width 20%, wrap");
+		add(genef, "pushx, span, wrap");
+		add(genefBox, "pushx, width 70%");
+		add(genefButton, "pushx, width 20%, wrap");
 	}
 
 	/**
@@ -164,52 +167,6 @@ public abstract class HeaderFinderPanel extends JPanel {
 		}
 
 		return geneArray;
-	}
-
-	/**
-	 * Setting up a general layout for a button object The method is used to
-	 * make all buttons appear consistent in aesthetics
-	 * 
-	 * @param button
-	 * @return
-	 */
-	public JButton setButtonLayout(final String title) {
-
-		final Font buttonFont = new Font("Sans Serif", Font.PLAIN, 14);
-
-		final JButton button = new JButton(title);
-		final Dimension d = button.getPreferredSize();
-		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
-		button.setPreferredSize(d);
-
-		button.setFont(buttonFont);
-		button.setOpaque(true);
-		button.setBackground(GUIParams.ELEMENT);
-		button.setForeground(GUIParams.BG_COLOR);
-
-		return button;
-	}
-
-	/**
-	 * Setting up a general layout for a ComboBox object The method is used to
-	 * make all ComboBoxes appear consistent in aesthetics
-	 * 
-	 * @param combo
-	 * @return
-	 */
-	public JComboBox setComboLayout(final String[] combos) {
-
-		final JComboBox comboBox = new JComboBox(combos);
-		final Dimension d = comboBox.getPreferredSize();
-		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
-		comboBox.setPreferredSize(d);
-		comboBox.setFont(fontS);
-		comboBox.setBackground(Color.white);
-		comboBox.setEditable(true);
-
-		AutoCompleteDecorator.decorate(comboBox);
-
-		return comboBox;
 	}
 
 	public void seekAll() {

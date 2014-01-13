@@ -22,10 +22,7 @@
  */
 package edu.stanford.genetics.treeview;
 
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -78,7 +75,7 @@ public class ModelessSettingsDialog extends JDialog {
 
 			this.setBackground(GUIParams.BG_COLOR);
 
-			final JButton close_button = setButtonLayout("Close");
+			final JButton close_button = GUIParams.setButtonLayout("Close");
 			close_button.addActionListener(new ActionListener() {
 
 				@Override
@@ -90,7 +87,7 @@ public class ModelessSettingsDialog extends JDialog {
 			});
 			add(close_button);
 
-			final JButton cancel_button = setButtonLayout("Cancel");
+			final JButton cancel_button = GUIParams.setButtonLayout("Cancel");
 			cancel_button.addActionListener(new ActionListener() {
 
 				@Override
@@ -102,23 +99,5 @@ public class ModelessSettingsDialog extends JDialog {
 			});
 			// add(cancel_button);
 		}
-
-		public JButton setButtonLayout(final String title) {
-
-			final Font buttonFont = new Font("Sans Serif", Font.PLAIN, 14);
-
-			final JButton button = new JButton(title);
-			final Dimension d = button.getPreferredSize();
-			d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
-			button.setPreferredSize(d);
-
-			button.setFont(buttonFont);
-			button.setOpaque(true);
-			button.setBackground(GUIParams.RED1);
-			button.setForeground(Color.white);
-
-			return button;
-		}
-
 	}
 }
