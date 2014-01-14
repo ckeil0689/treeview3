@@ -135,7 +135,7 @@ public abstract class ModelView extends JPanel implements java.util.Observer,
 	public synchronized void paintComponent(final Graphics g) {
 
 		final Rectangle clip = g.getClipBounds();
-		g.setColor(Color.white); // NO
+		g.setColor(Color.white);
 		g.fillRect(clip.x, clip.y, clip.width, clip.height);
 
 		final Dimension reqSize = getSize();
@@ -204,8 +204,6 @@ public abstract class ModelView extends JPanel implements java.util.Observer,
 			return;
 		}
 
-		//setBorder(BorderFactory.createLineBorder(labelColor, 1));
-
 		final Window frame = enclosingWindow();
 		if (frame.isActive()) {
 			requestFocus();
@@ -229,7 +227,6 @@ public abstract class ModelView extends JPanel implements java.util.Observer,
 	public void mouseExited(final MouseEvent e) {
 
 		hasMouse = false;
-		//setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 	}
 
 	/* a bunch of stubs so we can claim to be a MouseListener */

@@ -39,7 +39,6 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
@@ -141,8 +140,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		setupMenuBar();
 		setupFileMru(treeView.getGlobalConfig().getNode("FileMru"));
 
-		centerOnscreen();
-		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		setupFrameSize();
+		//centerOnscreen();
 		setLoaded(false);
 	}
 
@@ -187,10 +186,11 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		jl2.setFont(new Font("Sans Serif", Font.BOLD, 50));
 		jl2.setForeground(GUIParams.TITLE_TEXT);
 
-		final ClickableLabel load_Icon = new ClickableLabel(this, "Load Data >");
+		final ClickableLabel load_Icon = new ClickableLabel(this, 
+				"Load Data >");
 
 		final ClickableLabel pref_Icon = new ClickableLabel(this,
-				"Preferences > ");
+				"Preferences >");
 
 		title_bg.add(jl, "push, alignx 50%, span, wrap");
 		title_bg.add(jl2, "push, alignx 50%, span");
@@ -595,56 +595,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 		presetsFrame.getContentPane().add(innerPanel);
 		presetsFrame.pack();
-	}
-
-	// Setting up cluster menu
-	protected void populateClusterMenu(final TreeviewMenuBarI menubar) {
-
-		final JDialog dialog = new JDialog(TreeViewFrame.this);
-		dialog.setLocationRelativeTo(null);
-		dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-
-		final JPanel panel = new JPanel();
-		panel.setLayout(new MigLayout());
-		panel.setBackground(GUIParams.BG_COLOR);
-
-		final JLabel l1 = new JLabel("Please load data first.");
-		l1.setFont(GUIParams.FONTS);
-		l1.setForeground(GUIParams.TEXT);
-
-		// menubar.addMenuItem("Hierarchical", new ActionListener(){
-		//
-		// @Override
-		// public void actionPerformed(ActionEvent arg0) {
-		//
-		// if(dataModel != null) {
-		// TreeViewFrame.this.setDataModel((TVModel)dataModel, true,
-		// true);
-		// TreeViewFrame.this.setLoaded(true);
-		//
-		// } else {
-		// dialog.setVisible(true);
-		// }
-		// }
-		//
-		//
-		// });
-		// menubar.addMenuItem("K-Means", new ActionListener(){
-		//
-		// @Override
-		// public void actionPerformed(ActionEvent e) {
-		//
-		// if(dataModel != null) {
-		// TreeViewFrame.this.setDataModel((TVModel)dataModel, true,
-		// false);
-		// TreeViewFrame.this.setLoaded(true);
-		//
-		// } else {
-		// dialog.setVisible(true);
-		// }
-		//
-		// }
-		// });
 	}
 
 	// Setting up dendro menu

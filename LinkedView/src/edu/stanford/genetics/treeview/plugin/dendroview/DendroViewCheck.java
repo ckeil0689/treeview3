@@ -22,6 +22,8 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -106,7 +108,7 @@ import edu.stanford.genetics.treeview.model.TVModel;
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.7 $ $Date: 2009-03-23 02:46:51 $
  */
-public class DendroView2 extends JPanel implements ConfigNodePersistent, 
+public class DendroViewCheck extends JPanel implements ConfigNodePersistent, 
 ComponentListener,MainPanel, Observer {
 
 	// Static Variables
@@ -208,12 +210,12 @@ ComponentListener,MainPanel, Observer {
 	 * @param vFrame
 	 *            parent ViewFrame of DendroView
 	 */
-	public DendroView2(final DataModel tVModel, final ViewFrame vFrame) {
+	public DendroViewCheck(final DataModel tVModel, final ViewFrame vFrame) {
 
 		this(tVModel, null, vFrame, "Dendrogram");
 	}
 
-	public DendroView2(final DataModel tVModel, final ConfigNode root,
+	public DendroViewCheck(final DataModel tVModel, final ConfigNode root,
 			final ViewFrame vFrame) {
 
 		this(tVModel, root, vFrame, "Dendrogram");
@@ -232,14 +234,14 @@ ComponentListener,MainPanel, Observer {
 	 * @param name
 	 *            name of this view.
 	 */
-	public DendroView2(DataModel dataModel, final ConfigNode root,
+	public DendroViewCheck(DataModel dataModel, final ConfigNode root,
 			final ViewFrame vFrame, final String name) {
 
 		super.setName(name);
 		this.viewFrame = vFrame;
 		this.dataModel = dataModel;
 
-		this.setLayout(new MigLayout("ins 0"));
+		this.setLayout(new BorderLayout());
 
 		if (root == null) {
 			if (dataModel.getDocumentConfigRoot() != null) {
@@ -328,7 +330,7 @@ ComponentListener,MainPanel, Observer {
 		dArrayDrawer.bindConfig(getFirst("ArrayDrawer"));
 
 		// Set up status panel
-		statuspanel = new MessagePanel("Status", GUIParams.BG_COLOR);
+		//statuspanel = new MessagePanel("Status", GUIParams.BG_COLOR);
 		//statuspanel.setMinimumSize(new Dimension(300, 200));
 
 		// globalmaps tell globalview, atrview, and gtrview
@@ -620,7 +622,7 @@ ComponentListener,MainPanel, Observer {
 		contrast.setForeground(GUIParams.ELEMENT);
 
 		textpanel = new JPanel();
-		textpanel.setLayout(new MigLayout("ins 0"));
+		//textpanel.setLayout(new MigLayout("ins 0"));
 		textpanel.setOpaque(false);
 		
 		finderPanel = new JPanel();
@@ -662,8 +664,8 @@ ComponentListener,MainPanel, Observer {
 		buttonPanel.add(adjScale, "pushx, wrap");
 		buttonPanel.add(crossPanel, "pushx, alignx 50%");
 		
-		finderPanel.add(getGeneFinderPanel(), "width 100%, height 50%, wrap");
-		finderPanel.add(getArrayFinderPanel(), "width 100%, height 50%");
+//		finderPanel.add(getGeneFinderPanel(), "width 100%, height 50%, wrap");
+//		finderPanel.add(getArrayFinderPanel(), "width 100%, height 50%");
 
 		navPanel.add(nav, "span, wrap");
 		navPanel.add(finderPanel, "push, height 30%, alignx 50%, wrap");
@@ -671,21 +673,19 @@ ComponentListener,MainPanel, Observer {
 		navPanel.add(deselectButton, "pushx, alignx 50%, wrap");
 		navPanel.add(buttonPanel, "push, height 30%, alignx 50%");
 		
-		add(statuspanel, "pushx, width 20%, height 20%");
-		add(atrPane, "grow, push, width 62%, height 20%");
-		add(fillPanel3, "span 2, growx, pushx, width 18%, " +
-				"height 20%, wrap");
-		add(gtrPane, "grow, width 20%, height 79%");
-		add(globalview, "push, grow, width 62%, height 79%");
-		add(globalYscrollbar, "pushy, growy, width 1%, " +
-				"height 79%");
-		add(navPanel, "push, grow, width 17%, height 79%, " +
-				"wrap");
-		add(fillPanel1, "growx, pushx, width 20%, height 1%");
-		add(globalXscrollbar, "growx, pushx, width 62%, " +
-				"height 1%");
-		add(fillPanel2, "span 2, growx, pushx, width 18%, " +
-				"height 1%");
+		//add(statuspanel, "pushx, width 20%, height 20%");
+		add(atrPane, BorderLayout.NORTH);
+		//add(fillPanel3, "span 2, growx, pushx, width 18%, " +
+			//	"height 20%, wrap");
+		add(gtrPane, BorderLayout.WEST);
+		add(globalview, BorderLayout.CENTER);
+		add(globalYscrollbar, BorderLayout.EAST);
+		//add(navPanel, "push, grow, width 17%, height 79%, " +
+			//	"wrap");
+		//add(fillPanel1, "growx, pushx, width 20%, height 1%");
+		add(globalXscrollbar, BorderLayout.SOUTH);
+		//add(fillPanel2, "span 2, growx, pushx, width 18%, " +
+				//"height 1%");
 	}
 
 	@Override
@@ -2158,32 +2158,32 @@ ComponentListener,MainPanel, Observer {
 		this.dataModel = dataModel;
 	}
 
-	public HeaderFinderPanel getGeneFinderPanel() {
-
-		if (geneFinderPanel == null) {
-			geneFinderPanel = new GeneFinderPanel(viewFrame, this,
-					getDataModel().getGeneHeaderInfo(),
-					viewFrame.getGeneSelection());
-		}
-
-		return geneFinderPanel;
-	}
-
-	/**
-	 * Getter for geneFinderPanel
-	 * 
-	 * @return HeaderFinderPanel arrayFinderPanel
-	 */
-	public HeaderFinderPanel getArrayFinderPanel() {
-
-		if (arrayFinderPanel == null) {
-
-			arrayFinderPanel = new ArrayFinderPanel(viewFrame, this,
-					getDataModel().getArrayHeaderInfo(),
-					viewFrame.getArraySelection());
-		}
-		return arrayFinderPanel;
-	}
+//	public HeaderFinderPanel getGeneFinderPanel() {
+//
+//		if (geneFinderPanel == null) {
+//			geneFinderPanel = new GeneFinderPanel(viewFrame, this,
+//					getDataModel().getGeneHeaderInfo(),
+//					viewFrame.getGeneSelection());
+//		}
+//
+//		return geneFinderPanel;
+//	}
+//
+//	/**
+//	 * Getter for geneFinderPanel
+//	 * 
+//	 * @return HeaderFinderPanel arrayFinderPanel
+//	 */
+//	public HeaderFinderPanel getArrayFinderPanel() {
+//
+//		if (arrayFinderPanel == null) {
+//
+//			arrayFinderPanel = new ArrayFinderPanel(viewFrame, this,
+//					getDataModel().getArrayHeaderInfo(),
+//					viewFrame.getArraySelection());
+//		}
+//		return arrayFinderPanel;
+//	}
 
 	/**
 	 * Setter for root - may not work properly public void

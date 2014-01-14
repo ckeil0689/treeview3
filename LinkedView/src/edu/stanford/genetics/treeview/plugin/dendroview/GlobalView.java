@@ -30,8 +30,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -55,7 +53,7 @@ import edu.stanford.genetics.treeview.ModelViewProduced;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 
 class GlobalView extends ModelViewProduced implements MouseMotionListener,
-		MouseListener, MouseWheelListener, KeyListener, ComponentListener {
+		MouseListener, MouseWheelListener, KeyListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -120,7 +118,7 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 
 		setToolTipText("This Turns Tooltips On");
 
-		addComponentListener(this);
+		//addComponentListener(this);
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addMouseWheelListener(this);
@@ -973,43 +971,5 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 
 		geneHI = ghi;
 		arrayHI = ahi;
-	}
-
-	// Component Listeners
-	@Override
-	public void componentHidden(final ComponentEvent arg0) {
-	}
-
-	@Override
-	public void componentMoved(final ComponentEvent arg0) {
-	}
-
-	// Keep view centered and zoomed on visible part, also refreshing the
-	// MapContainer with setHome to always fill out the entire GlobalView
-	// panel
-	@Override
-	public void componentResized(final ComponentEvent arg0) {
-
-		final int scrollX = xmap.getScroll().getValue();
-		final int scrollY = ymap.getScroll().getValue();
-
-		if (xmap.getAvailablePixels() > xmap.getUsedPixels()
-				&& xmap.getScale() == xmap.getMinScale()) {
-			xmap.setHome();
-		}
-
-		if (ymap.getAvailablePixels() > ymap.getUsedPixels()
-				&& ymap.getScale() == ymap.getMinScale()) {
-			ymap.setHome();
-		}
-
-		centerView(scrollX, scrollY);
-
-		this.repaint();
-		this.revalidate();
-	}
-
-	@Override
-	public void componentShown(final ComponentEvent arg0) {
 	}
 }

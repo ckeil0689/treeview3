@@ -5,16 +5,17 @@ import java.awt.Dimension;
 import java.awt.Font;
 
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JProgressBar;
 import javax.swing.plaf.basic.BasicProgressBarUI;
+
+import edu.stanford.genetics.treeview.core.AutoComboBox;
 
 public class GUIParams {
 
 	// Default
-	public static Font FONTS = new Font("Sans Serif", Font.PLAIN, 18);
-	public static Font FONTL = new Font("Sans Serif", Font.PLAIN, 24);
-	public static Font HEADER = new Font("Sans Serif", Font.BOLD, 18);
+	public static Font FONTS = new Font("Sans Serif", Font.PLAIN, 14);
+	public static Font FONTL = new Font("Sans Serif", Font.PLAIN, 22);
+	public static Font HEADER = new Font("Sans Serif", Font.BOLD, 16);
 
 	public static Color PANEL_BG = new Color(60, 60, 60, 255);
 	public static Color LIGHTGRAY = new Color(180, 180, 180, 255);
@@ -74,7 +75,7 @@ public class GUIParams {
 		final JButton button = new JButton(title);
 		final Dimension d = button.getPreferredSize();
 		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
-		button.setPreferredSize(d);
+		button.setMinimumSize(d);
 		button.setBorder(null);
 
 		button.setFont(FONTS);
@@ -131,9 +132,9 @@ public class GUIParams {
 	 * @param combo
 	 * @return
 	 */
-	public static JComboBox setComboLayout(final String[] combos) {
+	public static AutoComboBox setComboLayout(final String[] combos) {
 
-		final JComboBox comboBox = new JComboBox(combos);
+		final AutoComboBox comboBox = new AutoComboBox(combos);
 		final Dimension d = comboBox.getPreferredSize();
 		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
 		comboBox.setPreferredSize(d);

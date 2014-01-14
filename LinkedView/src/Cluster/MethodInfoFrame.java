@@ -159,13 +159,7 @@ public class MethodInfoFrame extends JFrame {
 				.createEtchedBorder(EtchedBorder.LOWERED));
 		displayPanel.add(singleInfo, "push, grow");
 
-		close_button = new JButton("Close");
-		close_button.setOpaque(true);
-		close_button.setBackground(GUIParams.RED1);
-		close_button.setForeground(Color.white);
-		final Dimension d = close_button.getPreferredSize();
-		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
-		close_button.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+		close_button = GUIParams.setButtonLayout("Close");
 		close_button.addActionListener(new ActionListener() {
 
 			@Override

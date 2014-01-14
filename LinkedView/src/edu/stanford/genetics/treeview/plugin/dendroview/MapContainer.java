@@ -115,7 +115,7 @@ public class MapContainer extends Observable implements Observer,
 		final double pixels = current.getAvailablePixels();
 		final double divider = current.getMaxIndex() - current.getMinIndex()
 				+ 1;
-		minScale = pixels / divider;
+		minScale = roundScale(pixels/ divider);
 	}
 
 	/**
@@ -163,7 +163,7 @@ public class MapContainer extends Observable implements Observer,
 		double zoomVal = 0.75;
 
 		if (getScale() < 8.0) {
-			zoomVal = 0.6;
+			zoomVal = 0.5;
 		}
 
 		// Recalculating scale

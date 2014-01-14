@@ -398,7 +398,8 @@ public class ClusterView extends JPanel implements MainPanel {
 			@Override
 			public void actionPerformed(final ActionEvent arg0) {
 
-				viewFrame.setLoaded(false);
+				viewFrame.setDataModel(dataModel, false, true);
+				viewFrame.setLoaded(true);
 			}
 		});
 

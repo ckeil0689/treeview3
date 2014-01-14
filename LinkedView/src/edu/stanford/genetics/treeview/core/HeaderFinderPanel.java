@@ -23,8 +23,6 @@
 package edu.stanford.genetics.treeview.core;
 
 // for summary view...
-import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
@@ -33,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -72,7 +69,7 @@ public abstract class HeaderFinderPanel extends JPanel {
 	private final ArrayList<String> geneList;
 	private String[] genefHeaders = { "" };
 	private final String type;
-	private final JComboBox genefBox;
+	private final AutoComboBox genefBox;
 	private final JButton genefButton;
 
 	// "Search Gene Text for Substring"
@@ -128,9 +125,9 @@ public abstract class HeaderFinderPanel extends JPanel {
 			}
 		});
 
-		add(genef, "pushx, span, wrap");
-		add(genefBox, "pushx, width 70%");
-		add(genefButton, "pushx, width 20%, wrap");
+		add(genef, "span, wrap");
+		add(genefBox, "width 75%");
+		add(genefButton, "width 25%, wrap");
 	}
 
 	/**

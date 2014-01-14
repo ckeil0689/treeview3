@@ -24,6 +24,8 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
+import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.Window;
@@ -60,6 +62,45 @@ import edu.stanford.genetics.treeview.model.ReorderedDataModel;
 public abstract class ViewFrame extends JFrame implements Observer {
 
 	private static final long serialVersionUID = 1L;
+	
+	/**
+	 * Constructor for the ViewFrame object Sets title and window listeners
+	 * 
+	 * @param title
+	 *            Title for the ViewFrame.
+	 */
+	public ViewFrame(final String title) {
+
+		super(title);
+
+		try {
+			UIManager.setLookAndFeel(UIManager
+					.getCrossPlatformLookAndFeelClassName());
+
+		} catch (final Exception e) {
+
+		}
+
+		setupWindowListener();
+	}
+
+	/**
+	 * constructs an untitled <code>ViewFrame</code>
+	 */
+	public ViewFrame() {
+
+		super();
+
+		try {
+			UIManager.setLookAndFeel(UIManager
+					.getCrossPlatformLookAndFeelClassName());
+
+		} catch (final Exception e) {
+
+		}
+
+		setupWindowListener();
+	}
 
 	// must override in subclass...
 	/**
@@ -135,8 +176,26 @@ public abstract class ViewFrame extends JFrame implements Observer {
 		final Rectangle rectangle = new Rectangle(dimension);
 
 		// XXX should drag out of global config
-		setSize(rectangle.width * 3 / 4, rectangle.height * 4 / 5);
+		//setSize(rectangle.width * 3 / 4, rectangle.height * 4 / 5);
 		center(rectangle);
+	}
+	
+	/**
+	 * To maximize the application on startup, considering taskbar. 
+	 */
+	public void setupFrameSize() {
+		
+		final Toolkit toolkit = Toolkit.getDefaultToolkit();
+		final Dimension screenSize = toolkit.getScreenSize();
+		final Insets screenInsets = toolkit.getScreenInsets(
+				GraphicsEnvironment.getLocalGraphicsEnvironment()
+				.getScreenDevices()[0].getDefaultConfiguration());
+		final int taskbarHeight = screenInsets.bottom;
+		
+		setSize(new Dimension(screenSize.width, screenSize.height 
+				- taskbarHeight));
+		setMinimumSize(new Dimension(screenSize.width * 2/ 3, 
+				screenSize.height * 2/ 3));
 	}
 
 	/**
@@ -167,45 +226,6 @@ public abstract class ViewFrame extends JFrame implements Observer {
 				setWindowActive(false);
 			}
 		});
-	}
-
-	/**
-	 * Constructor for the ViewFrame object Sets title and window listeners
-	 * 
-	 * @param title
-	 *            Title for the ViewFrame.
-	 */
-	public ViewFrame(final String title) {
-
-		super(title);
-
-		try {
-			UIManager.setLookAndFeel(UIManager
-					.getCrossPlatformLookAndFeelClassName());
-
-		} catch (final Exception e) {
-
-		}
-
-		setupWindowListener();
-	}
-
-	/**
-	 * constructs an untitled <code>ViewFrame</code>
-	 */
-	public ViewFrame() {
-
-		super();
-
-		try {
-			UIManager.setLookAndFeel(UIManager
-					.getCrossPlatformLookAndFeelClassName());
-
-		} catch (final Exception e) {
-
-		}
-
-		setupWindowListener();
 	}
 
 	/**
