@@ -209,20 +209,19 @@ public abstract class ViewFrame extends JFrame implements Observer {
 
 			@Override
 			public void windowActivated(final WindowEvent windowEvent) {
+				
 				setWindowActive(true);
 			}
 
 			@Override
 			public void windowClosing(final WindowEvent windowEvent) {
 
-				final ExitConfirmDialog confirm = new ExitConfirmDialog(
-						ViewFrame.this);
-				confirm.setVisible(true);
-				// closeWindow();
+				closeWindow();
 			}
 
 			@Override
 			public void windowDeactivated(final WindowEvent windowEvent) {
+				
 				setWindowActive(false);
 			}
 		});
@@ -258,15 +257,19 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	private boolean windowActive;
 
 	/**
-	 * close window cleanly. causes documentConfig to be stored.
+	 * checks if DataModel has been modified. Stores a configFile when
+	 * closing the window.
 	 */
 	public void closeWindow() {
+		
 		try {
 			final DataModel dataModel = getDataModel();
+			
 			if (dataModel != null) {
 				if (dataModel.getModified()) {
 					final int option = JOptionPane.showConfirmDialog(this,
 							"DataModel is modified. Do you wish to save?");
+					
 					switch (option) {
 					case JOptionPane.YES_OPTION:
 						final DataModelWriter writer = new DataModelWriter(
@@ -289,8 +292,9 @@ public abstract class ViewFrame extends JFrame implements Observer {
 		} catch (final Exception e) {
 			System.out.println("ViewFrame.closeWindow() Got exception: " + e);
 		}
-		System.out.println("ViewFrame.dispose");
-		dispose();
+		
+		final ExitConfirmDialog confirm = new ExitConfirmDialog(this);
+		confirm.setVisible(true);
 	}
 
 	/**

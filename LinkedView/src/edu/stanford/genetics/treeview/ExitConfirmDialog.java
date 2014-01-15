@@ -36,7 +36,7 @@ public class ExitConfirmDialog extends JFrame {
 			@Override
 			public void actionPerformed(final ActionEvent arg0) {
 
-				view.closeWindow();
+				view.dispose();
 			}
 		});
 

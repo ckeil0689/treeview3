@@ -63,7 +63,7 @@ public class DendrogramFactory extends PluginFactory {
 	public MainPanel restorePlugin(final ConfigNode node,
 			final ViewFrame viewFrame) {
 
-		final DendroViewCheck dendroView = new DendroViewCheck(
+		final DendroView2 dendroView = new DendroView2(
 				viewFrame.getDataModel(), node, viewFrame);
 		dendroView.setName("Dendrogram");
 		return dendroView;

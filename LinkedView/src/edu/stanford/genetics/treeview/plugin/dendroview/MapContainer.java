@@ -130,14 +130,26 @@ public class MapContainer extends Observable implements Observer,
 	public void zoomOut() {
 
 		double newScale = 0.0;
-		double zoomVal = 1.3;
+		double zoomVal = 1;
 
-		if (getScale() < 8.0) {
-			zoomVal = 1.8;
+		if (scrollbar.getVisibleAmount() <= 20) {
+			zoomVal = 1;
+			
+		} else if (scrollbar.getVisibleAmount() <= 100) {
+			zoomVal = 5;
+			
+		} else if (scrollbar.getVisibleAmount() <= 500) {
+			zoomVal = 20;
+			
+		} else if (scrollbar.getVisibleAmount() <= 1000) {
+			zoomVal = 50;
+			
+		} else if (scrollbar.getVisibleAmount() <= 6000) {
+			zoomVal = 100;
 		}
 
-		newScale = roundScale(getAvailablePixels()
-				/ (scrollbar.getVisibleAmount() * zoomVal));
+		newScale = getAvailablePixels()
+				/ (scrollbar.getVisibleAmount() + zoomVal);
 
 		if (newScale < minScale) {
 			newScale = minScale;
@@ -160,15 +172,27 @@ public class MapContainer extends Observable implements Observer,
 		final double minAllowedTiles = 4.0;
 		final double maxScale = getAvailablePixels() / minAllowedTiles;
 		double newScale = 0.0;
-		double zoomVal = 0.75;
+		double zoomVal = 1;
 
-		if (getScale() < 8.0) {
-			zoomVal = 0.5;
+		if (scrollbar.getVisibleAmount() <= 20) {
+			zoomVal = 1;
+			
+		} else if (scrollbar.getVisibleAmount() <= 100) {
+			zoomVal = 5;
+			
+		} else if (scrollbar.getVisibleAmount() <= 500) {
+			zoomVal = 20;
+			
+		} else if (scrollbar.getVisibleAmount() <= 1000) {
+			zoomVal = 50;
+			
+		} else if (scrollbar.getVisibleAmount() <= 6000) {
+			zoomVal = 100;
 		}
 
 		// Recalculating scale
-		newScale = roundScale(getAvailablePixels()
-				/ (scrollbar.getVisibleAmount() * zoomVal));
+		newScale = getAvailablePixels()
+				/ (scrollbar.getVisibleAmount() - zoomVal);
 
 		if (newScale > maxScale) {
 			newScale = maxScale;
