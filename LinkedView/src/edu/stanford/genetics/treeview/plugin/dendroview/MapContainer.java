@@ -169,7 +169,7 @@ public class MapContainer extends Observable implements Observer,
 	 */
 	public void zoomIn() {
 
-		final double minAllowedTiles = 4.0;
+		final double minAllowedTiles = 1;
 		final double maxScale = getAvailablePixels() / minAllowedTiles;
 		double newScale = 0.0;
 		double zoomVal = 1;

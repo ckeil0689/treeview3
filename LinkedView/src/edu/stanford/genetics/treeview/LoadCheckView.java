@@ -84,7 +84,7 @@ class LoadCheckView extends JPanel {
 		if (dataModel != null) {
 
 			classLoader = Thread.currentThread().getContextClassLoader();
-			input = classLoader.getResourceAsStream("checkmark2.png");
+			input = classLoader.getResourceAsStream("checkIcon.png");
 
 			try {
 
@@ -134,7 +134,8 @@ class LoadCheckView extends JPanel {
 			buttonPanel.setLayout(new MigLayout());
 			buttonPanel.setOpaque(false);
 
-			loadNewButton = GUIParams.setButtonLayout("Load Different File");
+			loadNewButton = GUIParams.setButtonLayout("Load Different File", 
+					null);
 			loadNewButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -144,7 +145,7 @@ class LoadCheckView extends JPanel {
 				}
 			});
 
-			advanceButton = GUIParams.setButtonLayout("Continue >");
+			advanceButton = GUIParams.setButtonLayout(null, "forwardIcon.png");
 			advanceButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -173,11 +174,12 @@ class LoadCheckView extends JPanel {
 			this.repaint();
 
 		} else {
+			
 			final JLabel warning = new JLabel("Loading unsuccessful.");
 			warning.setFont(fontL);
 			warning.setForeground(GUIParams.RED1);
 
-			loadNewButton = GUIParams.setButtonLayout("Load New File");
+			loadNewButton = GUIParams.setButtonLayout("Load New File", null);
 			loadNewButton.setBackground(GUIParams.ELEMENT);
 			loadNewButton.addActionListener(new ActionListener() {
 

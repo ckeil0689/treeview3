@@ -22,7 +22,6 @@
  */
 package edu.stanford.genetics.treeview.plugin.karyoview;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -75,8 +74,6 @@ public class KaryoPanel extends DragGridPanel implements MainPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private final Color BLUE2 = new Color(235, 240, 255, 255);
-
 	/**
 	 * Constructor for the KaryoPanel object
 	 * 
@@ -107,7 +104,7 @@ public class KaryoPanel extends DragGridPanel implements MainPanel {
 		karyoView.bindConfig(getFirst("KaryoView"));
 		parameterPanel = new KaryoViewParameterPanel(karyoDrawer, karyoView,
 				this);
-		statusPanel = new MessagePanel("Status", BLUE2);
+		statusPanel = new MessagePanel();
 
 		windowActive = true;
 		setBorderWidth(2);

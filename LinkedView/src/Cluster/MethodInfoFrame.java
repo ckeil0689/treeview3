@@ -159,7 +159,7 @@ public class MethodInfoFrame extends JFrame {
 				.createEtchedBorder(EtchedBorder.LOWERED));
 		displayPanel.add(singleInfo, "push, grow");
 
-		close_button = GUIParams.setButtonLayout("Close");
+		close_button = GUIParams.setButtonLayout("Close", null);
 		close_button.addActionListener(new ActionListener() {
 
 			@Override

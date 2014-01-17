@@ -174,7 +174,7 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 
 		try {
 			if (xmap.contains(overx) && ymap.contains(overy)) {
-				statustext[0] = "Row:    " + (overy + 1);
+				statustext[0] = "Row: ";// + (overy + 1);
 
 				if (geneHI != null) {
 					final int realGene = overy;
@@ -186,7 +186,7 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 						statustext[0] += " (N/A)";
 					}
 				}
-				statustext[1] = "Column: " + (overx + 1);
+				statustext[1] = "Column: ";// + (overx + 1);
 				if (arrayHI != null) {
 					try {
 						statustext[1] += " (" + arrayHI.getHeader(overx, 0)

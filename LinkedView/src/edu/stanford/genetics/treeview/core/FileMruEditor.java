@@ -374,7 +374,7 @@ public class FileMruEditor extends JPanel {
 			this.setLayout(new MigLayout());
 			this.setOpaque(false);
 
-			openButton = GUIParams.setButtonLayout("Open");
+			openButton = GUIParams.setButtonLayout("Open", null);
 			openButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -384,7 +384,7 @@ public class FileMruEditor extends JPanel {
 			});
 			// this.add(openButton); not sure about this...
 
-			searchButton = GUIParams.setButtonLayout("Find");
+			searchButton = GUIParams.setButtonLayout("Find", null);
 			searchButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -395,7 +395,7 @@ public class FileMruEditor extends JPanel {
 			});
 			this.add(searchButton, "pushx");
 
-			deleteButton = GUIParams.setButtonLayout("Remove");
+			deleteButton = GUIParams.setButtonLayout("Remove", null);
 			deleteButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -404,7 +404,7 @@ public class FileMruEditor extends JPanel {
 			});
 			this.add(deleteButton, "pushx");
 
-			deleteAllButton = GUIParams.setButtonLayout("Remove All");
+			deleteAllButton = GUIParams.setButtonLayout("Remove All", null);
 			deleteAllButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -414,7 +414,7 @@ public class FileMruEditor extends JPanel {
 			});
 			this.add(deleteAllButton, "pushx");
 
-			closeButton = GUIParams.setButtonLayout("Close");
+			closeButton = GUIParams.setButtonLayout("Close", null);
 			closeButton.addActionListener(new ActionListener() {
 
 				@Override

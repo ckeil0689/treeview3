@@ -23,7 +23,6 @@
 package edu.stanford.genetics.treeview.core;
 
 // for summary view...
-import java.awt.Font;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -55,8 +54,6 @@ import edu.stanford.genetics.treeview.ViewFrame;
 public abstract class HeaderFinderPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-
-	private static Font fontS = new Font("Sans Serif", Font.PLAIN, 18);
 
 	protected TreeSelectionI geneSelection;
 	protected ViewFrame viewFrame;
@@ -96,9 +93,9 @@ public abstract class HeaderFinderPanel extends JPanel {
 
 		final String[][] hA = headerInfo.getHeaderArray();
 
-		genef = new JLabel("Find " + type + " Element: ");
+		genef = new JLabel("Search " + type + " Labels: ");
 		genef.setForeground(GUIParams.TEXT);
-		genef.setFont(fontS);
+		genef.setFont(GUIParams.FONTS);
 
 		geneList = new ArrayList<String>();
 		genefHeaders = getGenes(hA);
@@ -113,7 +110,7 @@ public abstract class HeaderFinderPanel extends JPanel {
 		genefBox.setEditable(true);
 		AutoCompleteDecorator.decorate(genefBox);
 		
-		genefButton = GUIParams.setButtonLayout("Go!");
+		genefButton = GUIParams.setButtonLayout(null, "searchIcon.png");
 		genefButton.addActionListener(new ActionListener() {
 
 			@Override
@@ -126,8 +123,8 @@ public abstract class HeaderFinderPanel extends JPanel {
 		});
 
 		add(genef, "span, wrap");
-		add(genefBox, "width 75%");
-		add(genefButton, "width 25%, wrap");
+		add(genefBox, "width 85%");
+		add(genefButton, "width 15%, wrap");
 	}
 
 	/**

@@ -80,7 +80,7 @@ public class KnnDendroView extends DendroView2 implements ConfigNodePersistent,
 	protected void setupViews() {
 
 		final DataModel knnModel = getDataModel();
-		statuspanel = new MessagePanel("View Status", GUIParams.ELEMENT);
+		statuspanel = new MessagePanel();
 
 		final ColorPresets colorPresets = DendrogramFactory.getColorPresets();
 		final ColorExtractor colorExtractor = new ColorExtractor();

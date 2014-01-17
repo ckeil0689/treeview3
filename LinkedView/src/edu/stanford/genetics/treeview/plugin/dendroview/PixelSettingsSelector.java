@@ -50,6 +50,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EtchedBorder;
@@ -96,68 +97,80 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 			final MapContainer ymap, final MapContainer xZmap,
 			final MapContainer yZmap, final ColorExtractor drawer,
 			final ColorPresets colorPresets) {
-
-		this.setLayout(new MigLayout());
-		this.setBackground(GUIParams.BG_COLOR);
-		m_xmap = xmap;
-		m_ymap = ymap;
-		m_xZmap = xZmap;
-		m_yZmap = yZmap;
-		m_drawer = drawer;
-		m_presets = colorPresets;
+		
+		super();
+		
+		this.m_xmap = xmap;
+		this.m_ymap = ymap;
+		this.m_xZmap = xZmap;
+		this.m_yZmap = yZmap;
+		this.m_drawer = drawer;
+		this.m_presets = colorPresets;
+		
+		setLayout(new MigLayout());
+		setOpaque(false);
 		setupWidgets();
 	}
 
 	private void setupWidgets() {
 
 		removeAll();
-		this.setLayout(new MigLayout());
-
-		this.add(makeLabel("Global:"), "wrap");
-		JPanel t = setPanelLayout();
+		
+		JTabbedPane tabPane = new JTabbedPane();
+		
+		JPanel tab_Pixels = setPanelLayout();
+		JPanel tab_Contrast = setPanelLayout();
+		JPanel tab_log = setPanelLayout();
+		JPanel tab_colors = setPanelLayout();
+		
+		tab_Pixels.add(makeLabel("Global:"), "wrap");
 
 		m_xscale = new ScalePanel(m_xmap, "X:");
-		t.add(m_xscale, "pushx, growx");
+		tab_Pixels.add(m_xscale, "pushx, growx");
 		m_yscale = new ScalePanel(m_ymap, "Y:");
-		t.add(m_yscale, "pushx");
-		this.add(t, "pushx, growx, wrap");
+		tab_Pixels.add(m_yscale, "pushx");
 
 		if (m_xZmap != null && m_yZmap != null) {
 
-			this.add(makeLabel("Zoom:"), "wrap");
-			t = setPanelLayout();
+			tab_Pixels.add(makeLabel("Zoom:"), "wrap");
 			m_xZscale = new ScalePanel(m_xZmap, "X:");
-			t.add(m_xZscale, "pushx, growx");
+			tab_Pixels.add(m_xZscale, "pushx, growx");
 			m_yZscale = new ScalePanel(m_yZmap, "Y:");
-			t.add(m_yZscale, "pushx, growx");
+			tab_Pixels.add(m_yZscale, "pushx, growx");
 		}
-		this.add(t, "pushx, growx, wrap");
+		tabPane.addTab("Scale", tab_Pixels);
 
 		if (m_drawer != null) {
-			this.add(makeLabel("Contrast:"), "wrap");
+			tab_Contrast.add(makeLabel("Contrast:"), "wrap");
 			m_contrast = new ContrastSelector(m_drawer);
-			this.add(m_contrast, "pushx, growx, wrap");
+			tab_Contrast.add(m_contrast, "pushx, growx");
+			
+			tabPane.addTab("Contrast", tab_Contrast);
 
-			this.add(makeLabel("LogScale:"), "wrap");
+			tab_log.add(makeLabel("LogScale:"), "wrap");
 			m_logscale = new LogScaleSelector();
-			this.add(m_logscale, "pushx, growx, wrap");
+			tab_log.add(m_logscale, "pushx, growx");
+			
+			tabPane.addTab("LogScale", tab_log);
 
 			// color stuff...
-			this.add(makeLabel("Colors:"), "wrap");
-			final JPanel temp2 = setPanelLayout();
+			tab_colors.add(makeLabel("Colors:"), "wrap");
 
 			colorExtractorEditor = new ColorExtractorEditor(m_drawer);
-			temp2.add(colorExtractorEditor, "alignx 50%, pushx, wrap");
-			temp2.add(new CEEButtons(), "alignx 50%, pushx, wrap");
+			tab_colors.add(colorExtractorEditor, "alignx 50%, pushx, wrap");
+			tab_colors.add(new CEEButtons(), "alignx 50%, pushx, wrap");
 
 			colorPresetsPanel = new ColorPresetsPanel();
 			final JScrollPane sp = new JScrollPane(colorPresetsPanel,
 					ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-			sp.setBackground(GUIParams.BG_COLOR);
-			temp2.add(sp, "alignx 50%, pushx, growx");
-			this.add(temp2, "pushx, growx");
+			sp.setOpaque(false);
+			tab_colors.add(sp, "alignx 50%, pushx, growx");
+			
+			tabPane.addTab("Colors", tab_colors);
 		}
+		
+		add(tabPane, "push, grow");
 	}
 
 	class ScalePanel extends JPanel {
@@ -293,7 +306,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 		d.setLayout(new MigLayout());
 		d.add(this, "push, grow, wrap");
 
-		final JButton display_button = GUIParams.setButtonLayout("Close");
+		final JButton display_button = GUIParams.setButtonLayout("Close", null);
 		display_button.addActionListener(new ActionListener() {
 			// called when close button hit
 			@Override
@@ -341,7 +354,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 		CEEButtons() {
 
 			this.setOpaque(false);
-			final JButton loadButton = GUIParams.setButtonLayout("Load...");
+			final JButton loadButton = GUIParams.setButtonLayout("Load", null);
 			loadButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -367,7 +380,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 			});
 			this.add(loadButton);
 
-			final JButton saveButton = GUIParams.setButtonLayout("Save...");
+			final JButton saveButton = GUIParams.setButtonLayout("Save", null);
 			saveButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -393,7 +406,8 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 			});
 			this.add(saveButton);
 
-			final JButton makeButton = GUIParams.setButtonLayout("Make Preset");
+			final JButton makeButton = GUIParams.setButtonLayout("Make Preset", 
+					null);
 			makeButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -412,7 +426,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 			this.add(makeButton);
 
 			final JButton resetButton = GUIParams.setButtonLayout(
-					"Reset Presets");
+					"Reset Presets", null);
 			resetButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -531,7 +545,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 			final JButton[] buttons = new JButton[nPresets];
 			for (int i = 0; i < nPresets; i++) {
 				final JButton presetButton = GUIParams.setButtonLayout((
-						m_presets.getPresetNames())[i]);
+						m_presets.getPresetNames())[i], null);
 				final int index = i;
 				presetButton.addActionListener(new ActionListener() {
 
@@ -565,9 +579,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 
 		final JPanel panel = new JPanel();
 		panel.setLayout(new MigLayout());
-		panel.setBackground(GUIParams.BG_COLOR);
-		panel.setBorder(BorderFactory.createLineBorder(GUIParams.BORDERS,
-				EtchedBorder.LOWERED));
+		panel.setOpaque(false);
 
 		return panel;
 	}
@@ -635,17 +647,9 @@ class ColorExtractorEditor extends JPanel {
 			removeAll();
 			this.setOpaque(false);
 			colorIcon = new ColorIcon(10, 10, getColor());
-			final JButton pushButton = new JButton(getLabel(), colorIcon);
-			final Font buttonFont = new Font("Sans Serif", Font.PLAIN, 14);
-
-			final Dimension d = pushButton.getPreferredSize();
-			d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
-			pushButton.setPreferredSize(d);
-
-			pushButton.setFont(buttonFont);
-			pushButton.setOpaque(true);
-			pushButton.setBackground(GUIParams.ELEMENT);
-			pushButton.setForeground(GUIParams.BG_COLOR);
+			final JButton pushButton = GUIParams.setButtonLayout(getLabel(), 
+					null);
+			pushButton.setIcon(colorIcon);
 			pushButton.addActionListener(new ActionListener() {
 
 				@Override

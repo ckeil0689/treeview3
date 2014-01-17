@@ -22,16 +22,11 @@
  */
 package edu.stanford.genetics.treeview;
 
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Vector;
 
-import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -44,42 +39,22 @@ public class MessagePanel extends JPanel {
 	protected MessageCanvas messagecanvas;
 	protected Vector<String> messages;
 
-	private final Color bgColor;
-
-	private final String title;
-
-	/**
-	 * Chained constructor for empty class declaration
-	 */
-	public MessagePanel() {
-
-		this(null, GUIParams.PANEL_BG);
-	}
-
 	/**
 	 * Main constructor
 	 * 
 	 * @param t
 	 * @param bgColor
 	 */
-	public MessagePanel(final String t, final Color bgColor) {
+	public MessagePanel() {
 
 		super();
-		this.bgColor = bgColor;
-		//setBackground(bgColor);
-		setBorder(null);//BorderFactory.createEtchedBorder());
+		setBorder(null);
 		setOpaque(false);
 		setLayout(new MigLayout());
-		title = t;
-
-		final JLabel header = new JLabel(t);
-		header.setFont(GUIParams.HEADER);
-		header.setForeground(GUIParams.ELEMENT);
 
 		messages = new Vector<String>(5, 5);
 		messagecanvas = new MessageCanvas();
 
-		this.add(header, "pushx, span, wrap");
 		this.add(messagecanvas, "pushx, growx");
 	}
 
@@ -142,7 +117,7 @@ public class MessagePanel extends JPanel {
 			final Dimension size = getSize();
 			g.clearRect(0, 0, size.width, size.height);
 
-			g.setColor(bgColor);
+			g.setColor(GUIParams.BG_COLOR);
 			g.fillRect(0, 0, size.width, size.height);
 
 			g.setColor(GUIParams.TEXT);
@@ -172,29 +147,29 @@ public class MessagePanel extends JPanel {
 			// }
 		}
 
-		@Override
-		public Dimension getPreferredSize() {
-
-			final FontMetrics metrics = getFontMetrics(getFont());
-			final int ascent = metrics.getAscent();
-
-			// for title...
-			int height = ascent;
-			int width = metrics.stringWidth(title);
-			final Enumeration<String> e = messages.elements();
-			while (e.hasMoreElements()) {
-				final String message = e.nextElement();
-				if (message == null) {
-					continue;
-				}
-				height += ascent;
-				final int length = metrics.stringWidth(message);
-				if (width < length) {
-					width = length;
-				}
-			}
-			return new Dimension(width, height);
-		}
+//		@Override
+//		public Dimension getPreferredSize() {
+//
+//			final FontMetrics metrics = getFontMetrics(getFont());
+//			final int ascent = metrics.getAscent();
+//
+//			// for title...
+//			int height = ascent;
+//			int width = metrics.stringWidth(title);
+//			final Enumeration<String> e = messages.elements();
+//			while (e.hasMoreElements()) {
+//				final String message = e.nextElement();
+//				if (message == null) {
+//					continue;
+//				}
+//				height += ascent;
+//				final int length = metrics.stringWidth(message);
+//				if (width < length) {
+//					width = length;
+//				}
+//			}
+//			return new Dimension(width, height);
+//		}
 	}
 
 	public void setMessages(final String[] m) {

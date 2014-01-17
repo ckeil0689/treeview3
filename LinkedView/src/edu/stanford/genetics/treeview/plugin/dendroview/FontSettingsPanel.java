@@ -222,7 +222,7 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 		size_field = new NatField(client.getPoints(), 3);
 		add(size_field, "pushx, wrap");
 
-		display_button = GUIParams.setButtonLayout("Set");
+		display_button = GUIParams.setButtonLayout("Set", null);
 		display_button.addActionListener(new ActionListener() {
 
 			@Override
@@ -257,7 +257,8 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 		ButtonPanel(final Window w) {
 
 			final Window window = w;
-			final JButton close_button = GUIParams.setButtonLayout("Close");
+			final JButton close_button = GUIParams.setButtonLayout("Close", 
+					null);
 			close_button.addActionListener(new ActionListener() {
 
 				@Override

@@ -110,7 +110,7 @@ public class LoadProgress2 extends JDialog implements LoadProgress2I {
 		contentPane.add(new JScrollPane(taskOutput), "push, grow, wrap");
 		contentPane.setBackground(GUIParams.BG_COLOR);
 
-		closeButton = GUIParams.setButtonLayout("Cancel");
+		closeButton = GUIParams.setButtonLayout("Cancel", null);
 		closeButton.addActionListener(new ActionListener() {
 
 			@Override

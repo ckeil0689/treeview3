@@ -25,7 +25,7 @@ public class ClickableLabel extends JPanel {
 	/**
 	 * Instance variables
 	 */
-	private final JLabel label;
+
 	private final TreeViewFrame frame;
 	private final String labelText;
 
@@ -60,16 +60,18 @@ public class ClickableLabel extends JPanel {
 
 		this.frame = frame;
 		this.labelText = labelText;
+		
+		JLabel label;
 
-		this.setLayout(new MigLayout());
-		this.setOpaque(false);
+		setLayout(new MigLayout());
+		setOpaque(false);
 
 		label = new JLabel(labelText);
 		label.setFont(new Font("Sans Serif", Font.PLAIN, 50));
 		label.setForeground(GUIParams.ELEMENT);
-
-		this.add(label, "pushx, span, alignx 50%");
-		this.addMListener(label, tvModel_gen);
+		
+		add(label, "pushx, alignx 50%");
+		addMListener(label, tvModel_gen);
 	}
 
 	/**

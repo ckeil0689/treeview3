@@ -115,7 +115,8 @@ ComponentListener,MainPanel, Observer {
 	private static ImageIcon treeviewIcon = null;
 
 	// Instance Variables
-	protected final int DIVIDER_SIZE = 1;
+	protected int gtr_div_size = 0;
+	protected int atr_div_size = 0;
 
 	protected ViewFrame viewFrame;
 
@@ -124,12 +125,10 @@ ComponentListener,MainPanel, Observer {
 
 	// Map Views
 	protected GlobalView globalview;
-	// protected ZoomView zoomview;
 
 	// Trees
 	protected GTRView gtrview;
 	protected ATRView atrview;
-	// protected ATRZoomView atrzview;
 
 	// Row and Column names
 	protected TextViewManager textview;
@@ -137,8 +136,6 @@ ComponentListener,MainPanel, Observer {
 
 	protected JScrollBar globalXscrollbar;
 	protected JScrollBar globalYscrollbar;
-	// protected JScrollBar zoomXscrollbar;
-	// protected JScrollBar zoomYscrollbar;
 
 	// Drawers
 	protected ArrayDrawer arrayDrawer;
@@ -148,8 +145,6 @@ ComponentListener,MainPanel, Observer {
 	// MapContainers
 	protected MapContainer globalXmap;
 	protected MapContainer globalYmap;
-	// protected MapContainer zoomXmap;
-	// protected MapContainer zoomYmap;
 
 	protected MessagePanel statuspanel;
 	protected BrowserControl browserControl;
@@ -174,14 +169,6 @@ ComponentListener,MainPanel, Observer {
 	private TreeSelectionI arraySelection = null;
 
 	private ColorExtractor colorExtractor;
-	// private boolean zoomed = false;
-
-	// Buttons
-	private JButton scaleIncX;
-	private JButton scaleIncY;
-	private JButton scaleDecX;
-	private JButton scaleDecY;
-	private JButton scaleDefaultAll;
 
 	// JPanels for gene search
 	private HeaderFinderPanel geneFinderPanel = null;
@@ -239,8 +226,8 @@ ComponentListener,MainPanel, Observer {
 		this.viewFrame = vFrame;
 		this.dataModel = dataModel;
 
-		this.setLayout(new MigLayout("ins 0"));
-
+		setLayout(new MigLayout("ins 0"));
+		
 		if (root == null) {
 			if (dataModel.getDocumentConfigRoot() != null) {
 				bindConfig(dataModel.getDocumentConfigRoot().fetchOrCreate(
@@ -274,15 +261,17 @@ ComponentListener,MainPanel, Observer {
 		} else {
 			geneIndex = null;
 		}
+		
+		setDataModel(dataModel);
+		setupViews();
+		doDoubleLayout();
+		addComponentListener(this);
+
 
 		if ((arrayIndex != null) || (geneIndex != null)) {
-			dataModel = new ReorderedDataModel(dataModel, geneIndex, arrayIndex);
+			dataModel = new ReorderedDataModel(dataModel, geneIndex, 
+					arrayIndex);
 		}
-
-		setDataModel(dataModel);
-
-		setupViews();
-		addComponentListener(this);
 
 		if (geneIndex != null) {
 			setGeneSelection(new ReorderedTreeSelection(
@@ -309,9 +298,6 @@ ComponentListener,MainPanel, Observer {
 	 */
 	protected void setupViews() {
 
-		// Reset layout of this frame
-		removeAll();
-
 		final ColorPresets colorPresets = DendrogramFactory.getColorPresets();
 		colorExtractor = new ColorExtractor();
 		colorExtractor.setDefaultColorSet(colorPresets.getDefaultColorSet());
@@ -328,8 +314,7 @@ ComponentListener,MainPanel, Observer {
 		dArrayDrawer.bindConfig(getFirst("ArrayDrawer"));
 
 		// Set up status panel
-		statuspanel = new MessagePanel("Status", GUIParams.BG_COLOR);
-		//statuspanel.setMinimumSize(new Dimension(300, 200));
+		statuspanel = new MessagePanel();
 
 		// globalmaps tell globalview, atrview, and gtrview
 		// where to draw each data point.
@@ -351,38 +336,6 @@ ComponentListener,MainPanel, Observer {
 
 		globalYscrollbar = globalview.getYScroll();
 		globalYmap.setScrollbar(globalYscrollbar);
-
-		// Set up ZoomView
-		// zoomview = new ZoomView();
-		// zoomview.setXMap(getZoomXmap());
-		// zoomview.setYMap(getZoomYmap());
-		// zoomview.setArrayDrawer(arrayDrawer);
-		
-		// zoomXscrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0, 1, 0, 1);
-		// zoomYscrollbar = new JScrollBar(Adjustable.VERTICAL, 0, 1, 0, 1);
-
-		// Zoom maps to set up data points (colored by arraydrawer)
-		// zoomXmap = new MapContainer();
-		// zoomXmap.setDefaultScale(12.0);
-		// zoomXmap.setScrollbar(zoomXscrollbar);
-		//
-		// zoomYmap = new MapContainer();
-		// zoomYmap.setDefaultScale(12.0);
-		// zoomYmap.setScrollbar(zoomYscrollbar);
-		
-		// Set the Zoom maps for GlobalView
-		// globalview.setZoomXMap(zoomXmap);
-		// globalview.setZoomYMap(zoomYmap);
-		
-		// Changes Row/ Col number to gene names in Status panel
-		// zoomview.setHeaders(getDataModel().getGeneHeaderInfo(),
-		// getDataModel().getArrayHeaderInfo());
-		
-		// Set up ATRZoomView
-		// atrzview = new ATRZoomView();
-		// atrzview.setZoomMap(getZoomXmap());
-		// atrzview.setHeaderSummary(atrview.getHeaderSummary());
-		// atrzview.setInvertedTreeDrawer(invertedTreeDrawer);
 
 		// Set up the column name display
 		arraynameview = new ArrayNameView(getDataModel().getArrayHeaderInfo());
@@ -411,66 +364,12 @@ ComponentListener,MainPanel, Observer {
 		
 		final HeaderSummary atrSummary = atrview.getHeaderSummary();
 		
-		// atrzview.setHeaderSummary(atrSummary);
-		
 		// Register Views
 		registerView(globalview);
 		registerView(atrview);
 		registerView(arraynameview);
 		registerView(textview);
-		// registerView(zoomview);
-		// registerView(atrzview);
-
-		scaleDefaultAll = GUIParams.setButtonLayout("Reset");
-		scaleDefaultAll.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-
-				getGlobalXmap().setHome();
-				getGlobalYmap().setHome();
-			}
-		});
-
-		scaleIncX = GUIParams.setButtonLayout("+");
-		scaleIncX.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-
-				getGlobalXmap().zoomIn();
-			}
-		});
-
-		scaleDecX = GUIParams.setButtonLayout("-");
-		scaleDecX.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-
-				getGlobalXmap().zoomOut();
-			}
-		});
-
-		scaleIncY = GUIParams.setButtonLayout("+");
-		scaleIncY.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-
-				getGlobalYmap().zoomIn();
-			}
-		});
-
-		scaleDecY = GUIParams.setButtonLayout("-");
-		scaleDecY.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-
-				getGlobalYmap().zoomOut();
-			}
-		});
+		registerView(gtrview);
 
 		// reset persistent popups
 		settingsFrame = null;
@@ -488,14 +387,10 @@ ComponentListener,MainPanel, Observer {
 		arraynameview.bindConfig(getFirst("ArrayNameView"));
 		atrSummary.bindConfig(getFirst("AtrSummary"));
 		gtrview.getHeaderSummary().bindConfig(getFirst("GtrSummary"));
-		// getZoomXmap().bindConfig(getFirst("ZoomXMap"));
-		// getZoomYmap().bindConfig(getFirst("ZoomYMap"));
 
 		// perhaps I could remember this stuff in the MapContainer...
 		globalXmap.setIndexRange(0, dataModel.getDataMatrix().getNumCol() - 1);
 		globalYmap.setIndexRange(0, dataModel.getDataMatrix().getNumRow() - 1);
-		// getZoomXmap().setIndexRange(-1, -1);
-		// getZoomYmap().setIndexRange(-1, -1);
 
 		// Ensuring window resizing works with GlobalView
 		globalXmap.setHome();
@@ -503,11 +398,6 @@ ComponentListener,MainPanel, Observer {
 
 		globalXmap.notifyObservers();
 		globalYmap.notifyObservers();
-		// getZoomXmap().notifyObservers();
-		// getZoomYmap().notifyObservers();
-		
-		// Layout Setup
-		doDoubleLayout();
 	}
 
 	/**
@@ -518,64 +408,86 @@ ComponentListener,MainPanel, Observer {
 		//Components for layout setup
 		JPanel buttonPanel;
 		JPanel crossPanel;
-		JPanel fillPanel1;
-		JPanel fillPanel2;
-		JPanel fillPanel3;
 		JPanel finderPanel;
 		JPanel textpanel;
 		JPanel navPanel;
 		JSplitPane gtrPane;
 		JSplitPane atrPane;
-		// JButton saveButton;
+		
+		JPanel fillPanel1;
+		JPanel fillPanel2;
+		JPanel fillPanel3;
+		
 		final JButton zoomButton;
 		JButton deselectButton;
-		JLabel nav;
-		JLabel contrast;
+		JButton scaleIncX;
+		JButton scaleIncY;
+		JButton scaleDecX;
+		JButton scaleDecY;
+		JButton scaleDefaultAll;
 
 		// Clear panel
 		removeAll();
 		
 		setBackground(GUIParams.BG_COLOR);
 
-		gtrview.setStatusPanel(statuspanel);
-		gtrview.setViewFrame(viewFrame);
-
-		// ButtonPanel
-		buttonPanel = new JPanel();
-		buttonPanel.setLayout(new MigLayout());
-		buttonPanel.setOpaque(false);
-
-		crossPanel = new JPanel();
-		crossPanel.setLayout(new MigLayout());
-		crossPanel.setOpaque(false);
-
-		// Filling panels to complement MigLayout
-		fillPanel1 = new JPanel();
-		fillPanel1.setOpaque(false);
-
-		fillPanel2 = new JPanel();
-		fillPanel2.setOpaque(false);
+//		gtrview.setStatusPanel(statuspanel);
+//		gtrview.setViewFrame(viewFrame);
 		
-		fillPanel3 = new JPanel();
-		fillPanel3.setOpaque(false);
+		//Buttons
+		scaleDefaultAll = GUIParams.setButtonLayout(null, "homeIcon.png");
+		scaleDefaultAll.addActionListener(new ActionListener() {
 
-		// saveButton = setButtonLayout("Save Zoomed Image", BLUE1);
-		// saveButton.addActionListener(new ActionListener(){
-		//
-		// @Override
-		// public void actionPerformed(ActionEvent arg0) {
-		//
-		// try {
-		// saveImage(zoomview);
-		//
-		// } catch (IOException e) {
-		//
-		// }
-		// }
-		// });
+			@Override
+			public void actionPerformed(final ActionEvent arg0) {
+
+				getGlobalXmap().setHome();
+				getGlobalYmap().setHome();
+			}
+		});
+
+		scaleIncX = GUIParams.setButtonLayout(null, "zoomInIcon.png");
+		scaleIncX.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent arg0) {
+
+				getGlobalXmap().zoomIn();
+			}
+		});
+
+		scaleDecX = GUIParams.setButtonLayout(null, "zoomOutIcon.png");
+		scaleDecX.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent arg0) {
+
+				getGlobalXmap().zoomOut();
+			}
+		});
+
+		scaleIncY = GUIParams.setButtonLayout(null, "zoomInIcon.png");
+		scaleIncY.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent arg0) {
+
+				getGlobalYmap().zoomIn();
+			}
+		});
+
+		scaleDecY = GUIParams.setButtonLayout(null, "zoomOutIcon.png");
+		scaleDecY.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent arg0) {
+
+				getGlobalYmap().zoomOut();
+			}
+		});
 		
-		//Button for zooming selected area
-		zoomButton = GUIParams.setButtonLayout("Zoom Selection");
+		zoomButton = GUIParams.setButtonLayout("Zoom Selection", 
+				"fullScreenIcon.png");
 		zoomButton.addActionListener(new ActionListener() {
 
 			@Override
@@ -587,7 +499,7 @@ ComponentListener,MainPanel, Observer {
 		});
 
 		//Button to deselect the current selection
-		deselectButton = GUIParams.setButtonLayout("Deselect");
+		deselectButton = GUIParams.setButtonLayout("Deselect", null);
 		deselectButton.addActionListener(new ActionListener() {
 
 			@Override
@@ -604,54 +516,61 @@ ComponentListener,MainPanel, Observer {
 			}
 		});
 
-		//Panel to hold the navigation interface
+		// Panels
+		buttonPanel = new JPanel();
+		buttonPanel.setLayout(new MigLayout());
+		buttonPanel.setOpaque(false);
+
+		crossPanel = new JPanel();
+		crossPanel.setLayout(new MigLayout());
+		crossPanel.setOpaque(false);
+
+		fillPanel1 = new JPanel();
+		fillPanel1.setOpaque(false);
+
+		fillPanel2 = new JPanel();
+		fillPanel2.setOpaque(false);
+		
+		fillPanel3 = new JPanel();
+		fillPanel3.setOpaque(false);
+		
 		navPanel = new JPanel();
 		navPanel.setLayout(new MigLayout());
-		//navPanel.setBackground(GUIParams.PANEL_BG);
 		navPanel.setOpaque(false);
-		navPanel.setBorder(null);//BorderFactory.createEtchedBorder());
-
-		nav = new JLabel("Navigation");
-		nav.setFont(GUIParams.HEADER);
-		nav.setForeground(GUIParams.ELEMENT);
-
-		contrast = new JLabel("Contrast");
-		contrast.setFont(GUIParams.HEADER);
-		contrast.setForeground(GUIParams.ELEMENT);
+		navPanel.setBorder(null);
 
 		textpanel = new JPanel();
 		textpanel.setLayout(new MigLayout("ins 0"));
 		textpanel.setOpaque(false);
 		
 		finderPanel = new JPanel();
-		finderPanel.setLayout(new MigLayout("ins 0"));
+		finderPanel.setLayout(new MigLayout());
 		finderPanel.setOpaque(false);
 		
 		gtrPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, gtrview,
 				textpanel);
-		gtrPane.setDividerSize(DIVIDER_SIZE);
 		gtrPane.setResizeWeight(0.5);
 		gtrPane.setOpaque(false);
 		gtrPane.setBorder(null);
+		
+		if(gtrview.isEnabled()) {
+			gtr_div_size = 3;
+		}
+		gtrPane.setDividerSize(gtr_div_size);
 
 		atrPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, atrview,
 				arraynameview);
-		atrPane.setDividerSize(DIVIDER_SIZE);
 		atrPane.setResizeWeight(0.5);
 		atrPane.setOpaque(false);
 		atrPane.setBorder(null);
-
-		// zoompanel = new JPanel();
-		// zoompanel.setLayout(new MigLayout());
-		// zoompanel.add(zoomview, BorderLayout.CENTER);
-		// zoompanel.add(zoomXscrollbar, BorderLayout.SOUTH);
-		// zoompanel.add(zoomYscrollbar, BorderLayout.EAST);
-
+		
+		if(atrview.isEnabled()) {
+			atr_div_size = 3;
+		}
+		atrPane.setDividerSize(atr_div_size);
+		
+		// Adding Components onto each other
 		textpanel.add(textview.getComponent(), "push, grow");
-
-		final JLabel adjScale = new JLabel("Adjust Scale:");
-		adjScale.setFont(GUIParams.FONTS);
-		adjScale.setForeground(GUIParams.TEXT);
 
 		crossPanel.add(scaleIncY, "span, alignx 50%, wrap");
 		crossPanel.add(scaleDecX);
@@ -659,42 +578,44 @@ ComponentListener,MainPanel, Observer {
 		crossPanel.add(scaleIncX, "wrap");
 		crossPanel.add(scaleDecY, "span, alignx 50%");
 
-		buttonPanel.add(adjScale, "pushx, wrap");
-		buttonPanel.add(crossPanel, "pushx, alignx 50%");
+		buttonPanel.add(crossPanel, "pushx, alignx 50%, wrap");
+		buttonPanel.add(zoomButton, "pushx, alignx 50%, wrap");
+		buttonPanel.add(deselectButton, "pushx, alignx 50%");
 		
-		finderPanel.add(getGeneFinderPanel(), "width 100%, height 50%, wrap");
-		finderPanel.add(getArrayFinderPanel(), "width 100%, height 50%");
+		finderPanel.add(getGeneFinderPanel(), "pushx, w 80%, h 50%, " +
+				"alignx 50%, wrap");
+		finderPanel.add(getArrayFinderPanel(), "pushx, w 80%, h 50%, " +
+				"alignx 50%");
 
-		navPanel.add(nav, "span, wrap");
-		navPanel.add(finderPanel, "push, height 30%, alignx 50%, wrap");
-		navPanel.add(zoomButton, "pushx, alignx 50%, wrap");
-		navPanel.add(deselectButton, "pushx, alignx 50%, wrap");
-		navPanel.add(buttonPanel, "push, height 30%, alignx 50%");
+		navPanel.add(buttonPanel, "pushy, h 30%, w 90%, alignx 50%, " +
+				"aligny 50%");
 		
-		add(statuspanel, "pushx, width 20%, height 20%");
-		add(atrPane, "grow, push, width 62%, height 20%");
-		add(fillPanel3, "span 2, growx, pushx, width 18%, " +
-				"height 20%, wrap");
-		add(gtrPane, "grow, width 20%, height 79%");
-		add(globalview, "push, grow, width 62%, height 79%");
-		add(globalYscrollbar, "pushy, growy, width 1%, " +
-				"height 79%");
-		add(navPanel, "push, grow, width 17%, height 79%, " +
-				"wrap");
-		add(fillPanel1, "growx, pushx, width 20%, height 1%");
-		add(globalXscrollbar, "growx, pushx, width 62%, " +
-				"height 1%");
-		add(fillPanel2, "span 2, growx, pushx, width 18%, " +
-				"height 1%");
+		add(statuspanel, "w 20%, h 20%");
+		add(atrPane, "w 62%, h 20%");
+		add(fillPanel1, "w 1%, h 20%");
+		add(finderPanel, "w 17%, h 20%, wrap");
+		add(gtrPane, "w 20%, h 79%");
+		add(globalview, "w 62%, h 79%");
+		add(globalYscrollbar, "w 1%, h 79%");
+		add(navPanel, "w 17%, h 79%, wrap");
+		add(fillPanel2, "w 20%, h 1%");
+		add(globalXscrollbar, "w 62%, h 1%");
+		add(fillPanel3, "span 2, w 18%, h 1%");
 	}
 
 	@Override
 	public void refresh() {
 
-		doDoubleLayout();
-
-		this.revalidate();
-		this.repaint();
+		if(dataModel != null) {
+			setupViews();
+			doDoubleLayout();
+	
+			this.revalidate();
+			this.repaint();
+		
+		} else {
+			return;
+		}
 	}
 
 	// Methods
@@ -1176,7 +1097,6 @@ ComponentListener,MainPanel, Observer {
 		if ((tvmodel != null) && tvmodel.aidFound()) {
 			try {
 				atrview.setEnabled(true);
-				// atrzview.setEnabled(true);
 
 				invertedTreeDrawer.setData(tvmodel.getAtrHeaderInfo(),
 						tvmodel.getArrayHeaderInfo());
@@ -1203,7 +1123,6 @@ ComponentListener,MainPanel, Observer {
 						"Tree Construction Error", JOptionPane.ERROR_MESSAGE);
 
 				atrview.setEnabled(false);
-				// atrzview.setEnabled(false);
 
 				try {
 					invertedTreeDrawer.setData(null, null);
@@ -1214,7 +1133,6 @@ ComponentListener,MainPanel, Observer {
 			}
 		} else {
 			atrview.setEnabled(false);
-			// atrzview.setEnabled(false);
 
 			try {
 				invertedTreeDrawer.setData(null, null);
@@ -1229,7 +1147,6 @@ ComponentListener,MainPanel, Observer {
 		if ((tvmodel != null) && tvmodel.gidFound()) {
 			try {
 				gtrview.setEnabled(true);
-				// gtrzview.setEnabled(true);
 
 				leftTreeDrawer.setData(tvmodel.getGtrHeaderInfo(),
 						tvmodel.getGeneHeaderInfo());
@@ -1261,7 +1178,6 @@ ComponentListener,MainPanel, Observer {
 						"Tree Construction Error", JOptionPane.ERROR_MESSAGE);
 
 				gtrview.setEnabled(false);
-				// gtrzview.setEnabled(false);
 
 				try {
 					leftTreeDrawer.setData(null, null);
@@ -1272,7 +1188,6 @@ ComponentListener,MainPanel, Observer {
 			}
 		} else {
 			gtrview.setEnabled(false);
-			// gtrzview.setEnabled(false);
 
 			try {
 				leftTreeDrawer.setData(null, null);
@@ -1649,10 +1564,10 @@ ComponentListener,MainPanel, Observer {
 
 				}
 
-				final PixelSettingsSelector pssSelector = new PixelSettingsSelector(
-						globalXmap, globalYmap,
-						// getZoomXmap(), getZoomYmap(),
-						ce, DendrogramFactory.getColorPresets());
+				final PixelSettingsSelector pssSelector = 
+						new PixelSettingsSelector(
+						globalXmap, globalYmap, ce, 
+						DendrogramFactory.getColorPresets());
 
 				final JDialog popup = new ModelessSettingsDialog(viewFrame,
 						"Pixel Settings", pssSelector);

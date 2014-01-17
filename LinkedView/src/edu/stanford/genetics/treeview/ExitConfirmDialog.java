@@ -30,7 +30,7 @@ public class ExitConfirmDialog extends JFrame {
 		prompt.setForeground(GUIParams.TEXT);
 		prompt.setFont(GUIParams.FONTS);
 
-		final JButton ok = GUIParams.setButtonLayout("Yes");
+		final JButton ok = GUIParams.setButtonLayout("Yes", null);
 		ok.addActionListener(new ActionListener() {
 
 			@Override

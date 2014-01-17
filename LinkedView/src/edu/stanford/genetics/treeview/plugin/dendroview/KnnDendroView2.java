@@ -78,7 +78,7 @@ public class KnnDendroView2 extends DendroView2 implements
 	protected void setupViews() {
 
 		final DataModel knnModel = getDataModel();
-		statuspanel = new MessagePanel("Status", GUIParams.ELEMENT);
+		statuspanel = new MessagePanel();
 
 		final ColorPresets colorPresets = DendrogramFactory.getColorPresets();
 		final ColorExtractor colorExtractor = new ColorExtractor();

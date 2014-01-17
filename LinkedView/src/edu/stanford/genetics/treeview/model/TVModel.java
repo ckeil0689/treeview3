@@ -198,12 +198,14 @@ public class TVModel extends Observable implements DataModel {
 	}
 
 	public void setSource(final FileSet source) {
+		
 		this.source = source;
 		setChanged();
 	}
 
 	@Override
 	public String getSource() {
+		
 		if (source == null) {
 			return "No Data Loaded";
 

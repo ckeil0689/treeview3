@@ -27,7 +27,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.MenuItem;
 import java.awt.event.ActionEvent;
@@ -168,19 +167,14 @@ public class TextView extends ModelView implements FontSelectable, KeyListener,
 
 	public void updateBuffer(final Graphics g, final Dimension offscreenSize) {
 
-		g.setColor(GUIParams.BG_COLOR);// Color.white);
+		g.setColor(GUIParams.BG_COLOR);
 		g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
-		g.setColor(GUIParams.TEXT);// Color.black);
+		g.setColor(GUIParams.TEXT);
 
 		// clear the pallette...
 		if (map.getScale() > 12.0) {
 
 			l1.setText("");
-			
-			//TEST
-//			final Graphics2D g2d = (Graphics2D) g;
-//			g2d.rotate(-Math.PI/ 2);
-//			g2d.translate(-offscreenSize.height, 0);
 
 			if ((map.getMinIndex() >= 0) && (offscreenSize.height > 0)) {
 

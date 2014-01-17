@@ -3,9 +3,15 @@ package edu.stanford.genetics.treeview;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Image;
+import java.io.IOException;
+import java.io.InputStream;
 
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JProgressBar;
+import javax.swing.SwingConstants;
 import javax.swing.plaf.basic.BasicProgressBarUI;
 
 import edu.stanford.genetics.treeview.core.AutoComboBox;
@@ -14,8 +20,7 @@ public class GUIParams {
 
 	// Default
 	public static Font FONTS = new Font("Sans Serif", Font.PLAIN, 14);
-	public static Font FONTL = new Font("Sans Serif", Font.PLAIN, 22);
-	public static Font HEADER = new Font("Sans Serif", Font.BOLD, 16);
+	public static Font FONTL = new Font("Sans Serif", Font.PLAIN, 20);
 
 	public static Color PANEL_BG = new Color(60, 60, 60, 255);
 	public static Color LIGHTGRAY = new Color(180, 180, 180, 255);
@@ -68,27 +73,49 @@ public class GUIParams {
 		PROGRESS2 = new Color(60, 60, 60, 255);
 	}
 	
-	public static JButton setButtonLayout(String title) {
+	public static JButton setButtonLayout(String title, String iconFileName) {
+
+		final JButton button = new JButton();
 		
-		//final Font buttonFont = new Font("Sans Serif", Font.PLAIN, 14);
-
-		final JButton button = new JButton(title);
-		final Dimension d = button.getPreferredSize();
-		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
-		button.setMinimumSize(d);
-		button.setBorder(null);
-
+		// Basic layout
 		button.setFont(FONTS);
-		button.setOpaque(true);
+		button.setBorder(null);
 		
-		if(title.equalsIgnoreCase("Close")) {
-			button.setBackground(GUIParams.RED1);
-			button.setForeground(Color.white);
+		// Set button color first
+		button.setBackground(GUIParams.ELEMENT);
+		button.setForeground(GUIParams.BG_COLOR);
+		
+		// Check if button has a title and change color if it's "Close" 
+		if(title != null) {
+			button.setText(title);
 			
-		} else {
-			button.setBackground(GUIParams.ELEMENT);
-			button.setForeground(GUIParams.BG_COLOR);
+			if(title.equalsIgnoreCase("Close")) {
+				button.setBackground(GUIParams.RED1);
+				button.setForeground(Color.white);	
+			} 
+		}
+		
+		// If provided, add icon to button
+		if(iconFileName != null) {		
+			try {
+				ClassLoader classLoader = Thread.currentThread()
+						.getContextClassLoader();
+				InputStream input = classLoader
+						.getResourceAsStream(iconFileName);
+				
+			    Image img = ImageIO.read(input);
+			    button.setIcon(new ImageIcon(img));
+			    
+			    button.setHorizontalTextPosition(SwingConstants.LEFT);
+		
+			  } catch (IOException ex) {
+			  }
 		} 
+		
+		final Dimension d = button.getPreferredSize();
+		d.setSize(d.getWidth()* 1.5, d.getHeight() * 1.5);
+		button.setMinimumSize(new Dimension(40, 40));
+		button.setPreferredSize(d);
 
 		return button;
 	}

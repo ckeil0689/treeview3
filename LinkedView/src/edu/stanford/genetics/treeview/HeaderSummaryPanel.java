@@ -82,7 +82,8 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 			}
 		};
 		
-		JButton custom_button = GUIParams.setButtonLayout("Use Custom Labels");
+		JButton custom_button = GUIParams.setButtonLayout("Use Custom Labels", 
+				null);
 		custom_button.addActionListener(new ActionListener() {
 
 			@Override

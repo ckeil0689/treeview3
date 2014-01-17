@@ -47,40 +47,48 @@ import edu.stanford.genetics.treeview.ProgressTrackable;
  */
 
 public class FlatFileParser2 {
+	
+	/* resource types */
+	public static final int FILE = 0;
+	public static final int URL = 1;
+	
+	private int resourceType = 0;
+	
 	private ProgressTrackable progressTrackable;
+	private String resource;
 
 	public ProgressTrackable getProgressTrackable() {
+		
 		return progressTrackable;
 	}
 
 	public void setProgressTrackable(final ProgressTrackable progressTrackable) {
+		
 		this.progressTrackable = progressTrackable;
 	}
 
-	private String resource;
-
 	public String getResource() {
+		
 		return resource;
 	}
 
 	public void setResource(final String resource) {
+		
 		this.resource = resource;
 	}
 
-	/* resource types */
-	public static final int FILE = 0;
-	public static final int URL = 1;
-	private int resourceType = 0;
-
 	public int getResourceType() {
+		
 		return resourceType;
 	}
 
 	public void setResourceType(final int resourceType) {
+		
 		this.resourceType = resourceType;
 	}
 
 	public RectData loadIntoTable() throws LoadException, IOException {
+		
 		InputStream stream;
 		if (getResource().startsWith("http://")) {
 			try {
@@ -103,20 +111,24 @@ public class FlatFileParser2 {
 	}
 
 	private void setLength(final int i) {
+		
 		if (progressTrackable != null) {
 			progressTrackable.setLength(i);
 		}
 	}
 
 	private void setValue(final int i) {
+		
 		if (progressTrackable != null) {
 			progressTrackable.setValue(i);
 		}
 	}
 
 	private int getValue() {
+		
 		if (progressTrackable != null) {
 			return progressTrackable.getValue();
+			
 		} else {
 			return 0;
 		}
@@ -124,6 +136,7 @@ public class FlatFileParser2 {
 	}
 
 	private void incrValue(final int i) {
+		
 		if (progressTrackable != null) {
 			progressTrackable.incrValue(i);
 		}
@@ -132,6 +145,7 @@ public class FlatFileParser2 {
 	/** returns a list of vectors of String [], representing data from file. */
 	private RectData loadIntoTable(final InputStream inputStream)
 			throws IOException, LoadException {
+		
 		final MeteredStream ms = new MeteredStream(inputStream);
 		final BufferedReader reader = new BufferedReader(new InputStreamReader(
 				ms));
@@ -140,13 +154,16 @@ public class FlatFileParser2 {
 
 	/** opens a stream from the resource */
 	private InputStream openStream() throws LoadException {
+		
 		InputStream is;
 		final String file = getResource();
+		
 		if (getResourceType() == FILE) {
 			try {
 				final File fd = new File(file);
 				is = new MeteredStream(new FileInputStream(fd));
 				setLength((int) fd.length());
+				
 			} catch (final Exception ioe) {
 				throw new LoadException("File " + file
 						+ " could not be opened: " + ioe.getMessage(),
@@ -156,8 +173,10 @@ public class FlatFileParser2 {
 			try {
 				final java.net.URL url = new java.net.URL(file);
 				final java.net.URLConnection conn = url.openConnection();
+				
 				is = new MeteredStream(conn.getInputStream());
 				setLength(conn.getContentLength());
+				
 			} catch (final IOException ioe2) {
 				throw new LoadException("Url " + file
 						+ " could not be opened: " + ioe2.getMessage(),
@@ -169,11 +188,13 @@ public class FlatFileParser2 {
 
 	class MeteredStream extends FilterInputStream {
 		MeteredStream(final InputStream is) {
+			
 			super(is);
 		}
 
 		@Override
 		public int read() throws IOException {
+			
 			incrValue(1);
 			return super.read();
 		}
@@ -184,6 +205,7 @@ public class FlatFileParser2 {
 		@Override
 		public int read(final byte[] b, final int off, final int len)
 				throws IOException {
+			
 			final int ret = super.read(b, off, len);
 			if (ret != -1) {
 				// for some reason, got factor of two error in sizes...
@@ -194,6 +216,7 @@ public class FlatFileParser2 {
 
 		@Override
 		public long skip(final long n) throws IOException {
+			
 			final long ret = super.skip(n);
 			if (ret != -1) {
 				// for some reason, got factor of two error in sizes...
@@ -206,12 +229,14 @@ public class FlatFileParser2 {
 
 		@Override
 		public void mark(final int readLimit) {
+			
 			super.mark(readLimit);
 			markedValue = getValue();
 		}
 
 		@Override
 		public void reset() throws IOException {
+			
 			super.reset();
 			setValue(markedValue);
 		}
@@ -246,6 +271,7 @@ public class FlatFileParser2 {
  * 
  */
 class FlatFileReader {
+	
 	static final char DEFAULT_SEP = '\t';
 	static final int DEFAULT_TESTSIZE = 10;
 	static final int DEFAULT_GAPSIZE = 1000;
