@@ -435,7 +435,7 @@ ComponentListener,MainPanel, Observer {
 //		gtrview.setViewFrame(viewFrame);
 		
 		//Buttons
-		scaleDefaultAll = GUIParams.setButtonLayout(null, "homeIcon.png");
+		scaleDefaultAll = GUIParams.setButtonLayout(null, "homeIcon");
 		scaleDefaultAll.addActionListener(new ActionListener() {
 
 			@Override
@@ -446,7 +446,7 @@ ComponentListener,MainPanel, Observer {
 			}
 		});
 
-		scaleIncX = GUIParams.setButtonLayout(null, "zoomInIcon.png");
+		scaleIncX = GUIParams.setButtonLayout(null, "zoomInIcon");
 		scaleIncX.addActionListener(new ActionListener() {
 
 			@Override
@@ -456,7 +456,7 @@ ComponentListener,MainPanel, Observer {
 			}
 		});
 
-		scaleDecX = GUIParams.setButtonLayout(null, "zoomOutIcon.png");
+		scaleDecX = GUIParams.setButtonLayout(null, "zoomOutIcon");
 		scaleDecX.addActionListener(new ActionListener() {
 
 			@Override
@@ -466,7 +466,7 @@ ComponentListener,MainPanel, Observer {
 			}
 		});
 
-		scaleIncY = GUIParams.setButtonLayout(null, "zoomInIcon.png");
+		scaleIncY = GUIParams.setButtonLayout(null, "zoomInIcon");
 		scaleIncY.addActionListener(new ActionListener() {
 
 			@Override
@@ -476,7 +476,7 @@ ComponentListener,MainPanel, Observer {
 			}
 		});
 
-		scaleDecY = GUIParams.setButtonLayout(null, "zoomOutIcon.png");
+		scaleDecY = GUIParams.setButtonLayout(null, "zoomOutIcon");
 		scaleDecY.addActionListener(new ActionListener() {
 
 			@Override
@@ -487,7 +487,7 @@ ComponentListener,MainPanel, Observer {
 		});
 		
 		zoomButton = GUIParams.setButtonLayout("Zoom Selection", 
-				"fullScreenIcon.png");
+				"fullScreenIcon");
 		zoomButton.addActionListener(new ActionListener() {
 
 			@Override

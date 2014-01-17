@@ -110,7 +110,7 @@ public abstract class HeaderFinderPanel extends JPanel {
 		genefBox.setEditable(true);
 		AutoCompleteDecorator.decorate(genefBox);
 		
-		genefButton = GUIParams.setButtonLayout(null, "searchIcon.png");
+		genefButton = GUIParams.setButtonLayout(null, "searchIcon");
 		genefButton.addActionListener(new ActionListener() {
 
 			@Override

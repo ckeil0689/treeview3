@@ -19,6 +19,7 @@ import edu.stanford.genetics.treeview.core.AutoComboBox;
 public class GUIParams {
 
 	// Default
+	public static String QUESTIONICON = "questionIcon_dark.png";
 	public static Font FONTS = new Font("Sans Serif", Font.PLAIN, 14);
 	public static Font FONTL = new Font("Sans Serif", Font.PLAIN, 20);
 
@@ -36,8 +37,14 @@ public class GUIParams {
 	public static Color TABLEHEADERS = new Color(255, 205, 120, 255);
 	public static Color PROGRESS1 = new Color(60, 60, 60, 255);
 	public static Color PROGRESS2 = new Color(60, 60, 60, 255);
+	
+	private static boolean dark = true;
 
 	public static void setDayLight() {
+		
+		dark = false;
+		
+		QUESTIONICON = "questionIcon_light.png";
 
 		PANEL_BG = new Color(240, 240, 240, 255);
 		LIGHTGRAY = new Color(140, 140, 140, 255);
@@ -57,6 +64,10 @@ public class GUIParams {
 
 	public static void setNight() {
 
+		dark = true;
+		
+		QUESTIONICON = "questionIcon_dark.png";
+		
 		PANEL_BG = new Color(60, 60, 60, 255);
 		LIGHTGRAY = new Color(180, 180, 180, 255);
 		DARKGRAY = new Color(200, 200, 200, 255);
@@ -96,12 +107,27 @@ public class GUIParams {
 		}
 		
 		// If provided, add icon to button
-		if(iconFileName != null) {		
+		if(iconFileName != null) {	
+			
+			String iconType;
+			
+			if(!iconFileName.substring(iconFileName.length() - 4, 
+					iconFileName.length() - 1).equalsIgnoreCase("png")) {
+				if(dark) {
+					iconType = "_dark.png";
+					
+				} else {
+					iconType = "_light.png";
+				}
+			} else {
+				iconType = "";
+			}
+			
 			try {
 				ClassLoader classLoader = Thread.currentThread()
 						.getContextClassLoader();
 				InputStream input = classLoader
-						.getResourceAsStream(iconFileName);
+						.getResourceAsStream(iconFileName + iconType);
 				
 			    Image img = ImageIO.read(input);
 			    button.setIcon(new ImageIcon(img));

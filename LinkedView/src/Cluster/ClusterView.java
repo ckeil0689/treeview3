@@ -366,7 +366,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		method.setForeground(GUIParams.TEXT);
 
 		// Clickable Panel to call InfoFrame
-		infoIcon = new ClickableIcon(viewFrame, "questionIcon.png");
+		infoIcon = new ClickableIcon(viewFrame, GUIParams.QUESTIONICON);
 
 		// Linkage choice drop-down menu
 		clusterChoice = GUIParams.setComboLayout(clusterMethods);
@@ -392,7 +392,7 @@ public class ClusterView extends JPanel implements MainPanel {
 				EtchedBorder.LOWERED));
 
 		// Button to go back to data preview
-		back_button = GUIParams.setButtonLayout(null, "backwardIcon.png");
+		back_button = GUIParams.setButtonLayout(null, "backwardIcon");
 		back_button.addActionListener(new ActionListener() {
 
 			@Override
@@ -405,7 +405,7 @@ public class ClusterView extends JPanel implements MainPanel {
 
 		// Button to show DendroView
 		dendro_button = GUIParams.setButtonLayout("Clustergram", 
-				"forwardIcon.png");
+				"forwardIcon");
 		dendro_button.addActionListener(new ActionListener() {
 
 			@Override
