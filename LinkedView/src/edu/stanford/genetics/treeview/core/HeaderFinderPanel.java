@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
@@ -61,8 +60,7 @@ public abstract class HeaderFinderPanel extends JPanel {
 	private final HeaderInfo headerInfo;
 	private final int choices[];
 	private int nchoices = 0;
-
-	private final JLabel genef;
+	
 	private final ArrayList<String> geneList;
 	private String[] genefHeaders = { "" };
 	private final String type;
@@ -93,20 +91,28 @@ public abstract class HeaderFinderPanel extends JPanel {
 
 		final String[][] hA = headerInfo.getHeaderArray();
 
-		genef = new JLabel("Search " + type + " Labels: ");
-		genef.setForeground(GUIParams.TEXT);
-		genef.setFont(GUIParams.FONTS);
+		String genef = "Search " + type + " Labels... ";
 
 		geneList = new ArrayList<String>();
 		genefHeaders = getGenes(hA);
-
+		
+		String [] labeledHeaders = new String[genefHeaders.length + 1];
+		
+		labeledHeaders[0] = genef;
+		
+		Arrays.sort(genefHeaders);
+		
+		for(int i = 0; i < genefHeaders.length; i++) {
+			
+			labeledHeaders[i + 1] = genefHeaders[i];
+		}
+		
 		for (final String gene : genefHeaders) {
 
 			geneList.add(gene);
 		}
 
-		Arrays.sort(genefHeaders);
-		genefBox = GUIParams.setComboLayout(genefHeaders);
+		genefBox = GUIParams.setComboLayout(labeledHeaders);
 		genefBox.setEditable(true);
 		AutoCompleteDecorator.decorate(genefBox);
 		
@@ -122,7 +128,6 @@ public abstract class HeaderFinderPanel extends JPanel {
 			}
 		});
 
-		add(genef, "span, wrap");
 		add(genefBox, "width 85%");
 		add(genefButton, "width 15%, wrap");
 	}

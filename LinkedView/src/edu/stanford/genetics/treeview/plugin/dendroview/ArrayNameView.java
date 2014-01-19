@@ -84,7 +84,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 	private ConfigNode root = null;
 	private UrlExtractor urlExtractor = null;
 
-	private final String d_face = "Courier";
+	private final String d_face = "Dialog";
 	private final int d_style = 0;
 	private final int d_size = 12;
 

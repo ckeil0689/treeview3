@@ -2,38 +2,54 @@ package edu.stanford.genetics.treeview.core;
 
 import java.awt.Dimension;
 import java.awt.FontMetrics;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.MutableComboBoxModel;
 
-public class AutoComboBox extends JComboBox {
+public class AutoComboBox extends JComboBox implements FocusListener{
 
 	private static final long serialVersionUID = 1L;
 	
 	private boolean layingOut;
     private boolean isAutoPopupWidth = true;
     private int popupWidth;
+    private String label;
+    private MutableComboBoxModel model;
 
     public AutoComboBox(Vector<String> items) {
         
     	super(items);
+    	this.label = items.get(0);
+    	
+    	model = (MutableComboBoxModel)getModel();
     }
 
     public AutoComboBox(ArrayList<String> items) {
         
     	this(items.toArray());
+    	this.label = items.get(0);
+    	
+    	model = (MutableComboBoxModel)getModel();
     }
     
     public AutoComboBox(Object[] items) {
         
     	super(items);
+    	this.label = (String)items[0];
+    	
+    	model = (MutableComboBoxModel)getModel();
     }
 
     public AutoComboBox(ComboBoxModel comboBoxModel) {
         
     	super(comboBoxModel);
+    	
+    	model = (MutableComboBoxModel)getModel();
     }
 
     /**
@@ -109,12 +125,26 @@ public class AutoComboBox extends JComboBox {
     }
 
     /**
-     * Indicates whether the popup width is automatically optimised before display.
+     * Indicates whether the popup width is automatically optimised 
+     * before display.
      *
-     * @return true if the popup width is automatically optimised, false if not.
+     * @return true if the popup width is automatically optimised, 
+     * false if not.
      */
     public boolean isAutoPopupWidth() {
        
     	return isAutoPopupWidth;
     }
+
+	@Override
+	public void focusGained(FocusEvent arg0) {
+		
+		model.removeElement(0);
+	}
+
+	@Override
+	public void focusLost(FocusEvent arg0) {
+		
+		model.insertElementAt(label, 0);
+	}
 }

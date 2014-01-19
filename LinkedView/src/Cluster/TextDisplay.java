@@ -18,6 +18,7 @@ public class TextDisplay extends JTextArea {
 
 		super(text);
 		setOpaque(false);
+		setFont(GUIParams.FONTS);
 		setForeground(GUIParams.TEXT);
 		setEditable(false);
 		setBorder(null);

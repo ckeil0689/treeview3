@@ -84,6 +84,14 @@ public class GUIParams {
 		PROGRESS2 = new Color(60, 60, 60, 255);
 	}
 	
+	/**
+	 * Creates a button with a title and icon if desired. The method 
+	 * centralizes the layout setting for buttons so that all buttons will
+	 * look similar.
+	 * @param title
+	 * @param iconFileName
+	 * @return
+	 */
 	public static JButton setButtonLayout(String title, String iconFileName) {
 
 		final JButton button = new JButton();
@@ -188,9 +196,6 @@ public class GUIParams {
 	public static AutoComboBox setComboLayout(final String[] combos) {
 
 		final AutoComboBox comboBox = new AutoComboBox(combos);
-		final Dimension d = comboBox.getPreferredSize();
-		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
-		comboBox.setPreferredSize(d);
 		comboBox.setFont(GUIParams.FONTS);
 		comboBox.setBackground(Color.white);
 

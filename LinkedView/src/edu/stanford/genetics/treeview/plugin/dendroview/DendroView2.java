@@ -582,9 +582,9 @@ ComponentListener,MainPanel, Observer {
 		buttonPanel.add(zoomButton, "pushx, alignx 50%, wrap");
 		buttonPanel.add(deselectButton, "pushx, alignx 50%");
 		
-		finderPanel.add(getGeneFinderPanel(), "pushx, w 80%, h 50%, " +
+		finderPanel.add(getGeneFinderPanel(), "push, w 80%, h 30%, " +
 				"alignx 50%, wrap");
-		finderPanel.add(getArrayFinderPanel(), "pushx, w 80%, h 50%, " +
+		finderPanel.add(getArrayFinderPanel(), "push, w 80%, h 30%, " +
 				"alignx 50%");
 
 		navPanel.add(buttonPanel, "pushy, h 30%, w 90%, alignx 50%, " +

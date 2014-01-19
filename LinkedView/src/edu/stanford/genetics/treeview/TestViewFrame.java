@@ -84,8 +84,8 @@ public class TestViewFrame extends ViewFrame {
 	}
 
 	@Override
-	public void setDataModel(final DataModel model, final boolean cluster,
-			final boolean hierarchical) {
+	public void setDataModel(final DataModel model) {//, final boolean cluster,
+			//final boolean hierarchical) {
 	}
 
 	@Override

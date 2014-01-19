@@ -52,6 +52,7 @@ import javax.swing.WindowConstants;
 
 import net.miginfocom.swing.MigLayout;
 import Cluster.ClusterView;
+import Cluster.ClusterViewFrame;
 import edu.stanford.genetics.treeview.core.ArrayFinder;
 import edu.stanford.genetics.treeview.core.FileMru;
 import edu.stanford.genetics.treeview.core.FileMruEditor;
@@ -305,7 +306,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 		try {
 			tvModel.loadNew(fileSet);
-			setDataModel(tvModel, false, true);
+			setDataModel(tvModel);//, false, true);
 
 		} catch (final LoadException e) {
 			if (e.getType() != LoadException.INTPARSE) {
@@ -325,7 +326,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 		try {
 			tvModel.loadNewNW(fileSet);
-			setDataModel(tvModel, false, true);
+			setDataModel(tvModel);//, false, true);
 		} catch (final LoadException e) {
 			if (e.getType() != LoadException.INTPARSE) {
 				JOptionPane.showMessageDialog(this, e);
@@ -468,9 +469,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			}
 
 		} else {
-			if (running instanceof ClusterView) {
-				setDataModel(dataModel, true, true);
-			}
+//			if (running instanceof ClusterView) {
+//				setDataModel(dataModel, true, true);
+//			}
 			getContentPane().add(waiting);
 			setTitle(getAppName());
 		}
@@ -619,8 +620,12 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			public void actionPerformed(final ActionEvent arg0) {
 
 				if (dataModel != null) {
-					TreeViewFrame.this.setDataModel(dataModel, true, true);
-					TreeViewFrame.this.setLoaded(true);
+					ClusterViewFrame clusterViewFrame = 
+							new ClusterViewFrame(dataModel, TreeViewFrame.this, 
+									true);
+					clusterViewFrame.setVisible(true);
+//					TreeViewFrame.this.setDataModel(dataModel, true, true);
+//					TreeViewFrame.this.setLoaded(true);
 
 				} else {
 					dialog.setVisible(true);
@@ -634,8 +639,12 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			public void actionPerformed(final ActionEvent e) {
 
 				if (dataModel != null) {
-					TreeViewFrame.this.setDataModel(dataModel, true, false);
-					TreeViewFrame.this.setLoaded(true);
+					ClusterViewFrame clusterViewFrame = 
+							new ClusterViewFrame(dataModel, TreeViewFrame.this, 
+									false);
+					clusterViewFrame.setVisible(true);
+//					TreeViewFrame.this.setDataModel(dataModel);//, true, false);
+//					TreeViewFrame.this.setLoaded(true);
 
 				} else {
 					dialog.setVisible(true);
@@ -651,7 +660,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			public void actionPerformed(final ActionEvent arg0) {
 
 				if (dataModel != null) {
-					TreeViewFrame.this.setDataModel(dataModel, false, true);
+					TreeViewFrame.this.setDataModel(dataModel);//, false, true);
 					TreeViewFrame.this.setLoaded(true);
 
 				} else {
@@ -1713,8 +1722,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 *            newModel
 	 */
 	@Override
-	public void setDataModel(final DataModel newModel, final boolean cluster,
-			final boolean hierarchical) {
+	public void setDataModel(final DataModel newModel) {//, final boolean cluster,
+			//final boolean hierarchical) {
 
 		if (dataModel != null) {
 			dataModel.clearFileSetListeners();
@@ -1728,12 +1737,12 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 		setupExtractors();
 
-		if (cluster) {
-			setupClusterRunning(hierarchical);
-
-		} else {
+//		if (cluster) {
+//			setupClusterRunning(hierarchical);
+//
+//		} else {
 			setupRunning();
-		}
+//		}
 	}
 
 	/**
