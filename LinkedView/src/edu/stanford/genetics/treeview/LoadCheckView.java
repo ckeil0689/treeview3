@@ -145,7 +145,8 @@ class LoadCheckView extends JPanel {
 				}
 			});
 
-			advanceButton = GUIParams.setButtonLayout(null, "forwardIcon");
+			advanceButton = GUIParams.setButtonLayout("Continue", 
+					"forwardIcon");
 			advanceButton.addActionListener(new ActionListener() {
 
 				@Override

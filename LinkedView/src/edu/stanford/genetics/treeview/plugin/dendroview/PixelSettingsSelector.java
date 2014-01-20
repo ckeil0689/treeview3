@@ -24,7 +24,6 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
@@ -36,7 +35,6 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 
-import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -50,10 +48,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.border.EtchedBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -69,9 +65,6 @@ import edu.stanford.genetics.treeview.SettingsPanel;
  */
 public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public PixelSettingsSelector(final MapContainer xmap,
@@ -116,61 +109,57 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 
 		removeAll();
 		
-		JTabbedPane tabPane = new JTabbedPane();
+		JPanel pixels = setPanelLayout();
+		JPanel contrast = setPanelLayout();
+		JPanel log = setPanelLayout();
+		JPanel colors = setPanelLayout();
 		
-		JPanel tab_Pixels = setPanelLayout();
-		JPanel tab_Contrast = setPanelLayout();
-		JPanel tab_log = setPanelLayout();
-		JPanel tab_colors = setPanelLayout();
-		
-		tab_Pixels.add(makeLabel("Global:"), "wrap");
+		pixels.add(GUIParams.setupHeader("Pixel Scale"), "span, wrap");
 
 		m_xscale = new ScalePanel(m_xmap, "X:");
-		tab_Pixels.add(m_xscale, "pushx, growx");
+		pixels.add(m_xscale, "pushx, growx");
 		m_yscale = new ScalePanel(m_ymap, "Y:");
-		tab_Pixels.add(m_yscale, "pushx");
+		pixels.add(m_yscale, "pushx");
 
 		if (m_xZmap != null && m_yZmap != null) {
 
-			tab_Pixels.add(makeLabel("Zoom:"), "wrap");
+			pixels.add(makeLabel("Zoom:"), "wrap");
 			m_xZscale = new ScalePanel(m_xZmap, "X:");
-			tab_Pixels.add(m_xZscale, "pushx, growx");
+			pixels.add(m_xZscale, "pushx, growx");
 			m_yZscale = new ScalePanel(m_yZmap, "Y:");
-			tab_Pixels.add(m_yZscale, "pushx, growx");
+			pixels.add(m_yZscale, "pushx, growx");
 		}
-		tabPane.addTab("Scale", tab_Pixels);
+		add(pixels, "push, w 90%, wrap");
 
 		if (m_drawer != null) {
-			tab_Contrast.add(makeLabel("Contrast:"), "wrap");
+			contrast.add(GUIParams.setupHeader("Contrast"), "wrap");
 			m_contrast = new ContrastSelector(m_drawer);
-			tab_Contrast.add(m_contrast, "pushx, growx");
+			contrast.add(m_contrast, "pushx, growx");
 			
-			tabPane.addTab("Contrast", tab_Contrast);
+			add(contrast, "push, w 90%, wrap");
 
-			tab_log.add(makeLabel("LogScale:"), "wrap");
+			log.add(GUIParams.setupHeader("LogScale"), "wrap");
 			m_logscale = new LogScaleSelector();
-			tab_log.add(m_logscale, "pushx, growx");
+			log.add(m_logscale, "pushx, growx");
 			
-			tabPane.addTab("LogScale", tab_log);
+			add(log, "push, w 90%, wrap");
 
 			// color stuff...
-			tab_colors.add(makeLabel("Colors:"), "wrap");
+			colors.add(GUIParams.setupHeader("Colors"), "wrap");
 
 			colorExtractorEditor = new ColorExtractorEditor(m_drawer);
-			tab_colors.add(colorExtractorEditor, "alignx 50%, pushx, wrap");
-			tab_colors.add(new CEEButtons(), "alignx 50%, pushx, wrap");
+			colors.add(colorExtractorEditor, "alignx 50%, pushx, wrap");
+			colors.add(new CEEButtons(), "alignx 50%, pushx, wrap");
 
 			colorPresetsPanel = new ColorPresetsPanel();
 			final JScrollPane sp = new JScrollPane(colorPresetsPanel,
 					ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 			sp.setOpaque(false);
-			tab_colors.add(sp, "alignx 50%, pushx, growx");
+			colors.add(sp, "alignx 50%, pushx, growx");
 			
-			tabPane.addTab("Colors", tab_colors);
+			add(colors, "push, w 90%");
 		}
-		
-		add(tabPane, "push, grow");
 	}
 
 	class ScalePanel extends JPanel {
@@ -467,8 +456,6 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 
 			this.setLayout(new MigLayout());
 			this.setOpaque(false);
-			this.setBorder(BorderFactory.createLineBorder(GUIParams.BORDERS,
-					EtchedBorder.LOWERED));
 
 			logCheckBox = new JCheckBox("Log (base 2)");
 			logCheckBox.setBackground(GUIParams.BG_COLOR);
@@ -485,11 +472,11 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 					m_drawer.notifyObservers();
 				}
 			});
-			this.add(logCheckBox, "pushx, span, wrap");
+			add(logCheckBox, "pushx, span, wrap");
 
 			logTextField = new JTextField(10);
 			logTextField.setText("" + m_drawer.getLogCenter());
-			this.add(makeLabel("Center:"), "alignx 50%");
+			add(makeLabel("Center:"), "alignx 50%");
 			logTextField.getDocument().addDocumentListener(
 					new DocumentListener() {
 
@@ -508,7 +495,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 							textBoxChanged();
 						}
 					});
-			this.add(logTextField, "alignx 50%");
+			add(logTextField);
 			logTextField.setEnabled(logCheckBox.isSelected());
 		}
 

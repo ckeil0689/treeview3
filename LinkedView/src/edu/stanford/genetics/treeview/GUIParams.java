@@ -4,12 +4,14 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.io.IOException;
 import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
 import javax.swing.plaf.basic.BasicProgressBarUI;
@@ -46,7 +48,7 @@ public class GUIParams {
 		
 		QUESTIONICON = "questionIcon_light.png";
 
-		PANEL_BG = new Color(240, 240, 240, 255);
+		PANEL_BG = new Color(220, 220, 220, 255);
 		LIGHTGRAY = new Color(140, 140, 140, 255);
 		DARKGRAY = new Color(180, 180, 180, 255);
 		TEXT = new Color(20, 20, 20, 255);
@@ -148,7 +150,14 @@ public class GUIParams {
 		
 		final Dimension d = button.getPreferredSize();
 		d.setSize(d.getWidth()* 1.5, d.getHeight() * 1.5);
-		button.setMinimumSize(new Dimension(40, 40));
+		
+		if(iconFileName != null) {
+			button.setMinimumSize(new Dimension(40, 40));
+		
+		} else {
+			button.setMinimumSize(new Dimension(80, 40));
+		}
+		
 		button.setPreferredSize(d);
 
 		return button;
@@ -196,9 +205,35 @@ public class GUIParams {
 	public static AutoComboBox setComboLayout(final String[] combos) {
 
 		final AutoComboBox comboBox = new AutoComboBox(combos);
-		comboBox.setFont(GUIParams.FONTS);
+		comboBox.setFont(FONTS);
 		comboBox.setBackground(Color.white);
 
 		return comboBox;
+	}
+	
+	/**
+	 * Returns the size of the current screen.
+	 * @return Dimension size
+	 */
+	public static Dimension getScreenSize() {
+		
+		final Toolkit toolkit = Toolkit.getDefaultToolkit();
+		final Dimension dimension = toolkit.getScreenSize();
+		
+		return dimension;
+	}
+	
+	/**
+	 * Creates a header label.
+	 * @param title
+	 * @return
+	 */
+	public static JLabel setupHeader(String title) {
+		
+		JLabel header = new JLabel(title);
+		header.setFont(FONTL);
+		header.setForeground(ELEMENT);
+		
+		return header;
 	}
 }

@@ -1,8 +1,6 @@
 package Cluster;
 
 import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -10,6 +8,7 @@ import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
 import edu.stanford.genetics.treeview.DataModel;
+import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 
 public class ClusterViewFrame extends JFrame {
@@ -25,11 +24,10 @@ public class ClusterViewFrame extends JFrame {
 		
 		this.clusterView = new ClusterView(dataModel, viewFrame, hierarchical);
 		
-		// Setting preferred size for the mainPanel
-//		final Toolkit toolkit = Toolkit.getDefaultToolkit();
-//		final Dimension mainDim = toolkit.getScreenSize();
-//		final Rectangle rectangle = new Rectangle(mainDim);
-//		mainDim.setSize(rectangle.height, rectangle.height * 3 / 4);
+		// Setting preferred size for the ContentPane of this frame
+		final Dimension mainDim = GUIParams.getScreenSize();
+		getContentPane().setPreferredSize(new Dimension(mainDim.width * 1/2, 
+				mainDim.height * 1/2));
 
 		// setup frame options
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);

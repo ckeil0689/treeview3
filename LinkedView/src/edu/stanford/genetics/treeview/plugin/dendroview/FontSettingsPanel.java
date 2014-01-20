@@ -45,6 +45,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
+
 import net.miginfocom.swing.MigLayout;
 
 import edu.stanford.genetics.treeview.DummyHeaderInfo;
@@ -184,6 +186,8 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 		}
 
 		font_choice = GUIParams.setComboLayout(fontNames);
+		font_choice.setEditable(true);
+		AutoCompleteDecorator.decorate(font_choice);
 		font_choice.setSelectedItem(client.getFace());
 	}
 

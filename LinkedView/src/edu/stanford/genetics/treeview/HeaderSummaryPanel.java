@@ -61,7 +61,7 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 		this.viewFrame = frame;
 
 		setLayout(new MigLayout());
-		setBackground(GUIParams.BG_COLOR);
+		setOpaque(false);
 		
 		JLabel label = new JLabel("Select headers to display:");
 		label.setFont(GUIParams.FONTS);

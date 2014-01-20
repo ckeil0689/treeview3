@@ -28,8 +28,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -63,23 +61,20 @@ import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
-import edu.stanford.genetics.treeview.HeaderSummaryPanel;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.MainPanel;
 import edu.stanford.genetics.treeview.MainProgramArgs;
 import edu.stanford.genetics.treeview.MessagePanel;
 import edu.stanford.genetics.treeview.ModelView;
-import edu.stanford.genetics.treeview.ModelessSettingsDialog;
+import edu.stanford.genetics.treeview.PreferencesMenu;
 import edu.stanford.genetics.treeview.ReorderedTreeSelection;
 import edu.stanford.genetics.treeview.TabbedSettingsPanel;
 import edu.stanford.genetics.treeview.TreeDrawerNode;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.TreeviewMenuBarI;
-import edu.stanford.genetics.treeview.UrlSettingsPanel;
 import edu.stanford.genetics.treeview.ViewFrame;
-import edu.stanford.genetics.treeview.XmlConfig;
 import edu.stanford.genetics.treeview.core.ArrayFinderPanel;
 import edu.stanford.genetics.treeview.core.GeneFinderPanel;
 import edu.stanford.genetics.treeview.core.HeaderFinderPanel;
@@ -1517,10 +1512,6 @@ ComponentListener,MainPanel, Observer {
 						.getNumCol() - 1);
 				globalXmap.notifyObservers();
 
-				// zoomXmap.setIndexRange(0,
-				// getDataModel().getDataMatrix().getNumCol() - 1);
-				// zoomXmap.notifyObservers();
-
 				((Observable) getDataModel()).notifyObservers();
 			}
 		});
@@ -1549,147 +1540,158 @@ ComponentListener,MainPanel, Observer {
 	 */
 	@Override
 	public void populateSettingsMenu(final TreeviewMenuBarI menu) {
-
-		menu.addMenuItem("Pixel Settings...", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent actionEvent) {
-
-				ColorExtractor ce = null;
-
-				try {
-					ce = ((DoubleArrayDrawer) arrayDrawer).getColorExtractor();
-
-				} catch (final Exception e) {
-
-				}
-
-				final PixelSettingsSelector pssSelector = 
-						new PixelSettingsSelector(
-						globalXmap, globalYmap, ce, 
-						DendrogramFactory.getColorPresets());
-
-				final JDialog popup = new ModelessSettingsDialog(viewFrame,
-						"Pixel Settings", pssSelector);
-
-				System.out.println("showing popup...");
-				popup.addWindowListener(XmlConfig
-						.getStoreOnWindowClose(getDataModel()
-								.getDocumentConfigRoot()));
-
-				popup.pack();
-				popup.setVisible(true);
-			}
-		}, 0);
-		menu.setMnemonic(KeyEvent.VK_X);
-
-		menu.addMenuItem("Url Settings...", new ActionListener() {
+		
+		menu.addMenuItem("Preferences", new ActionListener() {
 
 			@Override
-			public void actionPerformed(final ActionEvent actionEvent) {
-
-				// keep refs to settingsPanel, settingsFrame local,
-				// since will dispose of self when closed...
-				final TabbedSettingsPanel settingsPanel = new TabbedSettingsPanel();
-
-				final UrlSettingsPanel genePanel = new UrlSettingsPanel(
-						viewFrame.getUrlExtractor(), viewFrame
-								.getGeneUrlPresets());
-				settingsPanel.addSettingsPanel("Gene", genePanel);
-
-				final UrlSettingsPanel arrayPanel = new UrlSettingsPanel(
-						viewFrame.getArrayUrlExtractor(), viewFrame
-								.getArrayUrlPresets());
-				settingsPanel.addSettingsPanel("Array", arrayPanel);
-
-				final JDialog settingsFrame = new ModelessSettingsDialog(
-						viewFrame, "Url Settings", settingsPanel);
-
-				settingsFrame.addWindowListener(XmlConfig
-						.getStoreOnWindowClose(getDataModel()
-								.getDocumentConfigRoot()));
-				settingsFrame.pack();
-				settingsFrame.setVisible(true);
+			public void actionPerformed(final ActionEvent arg0) {
+				
+				PreferencesMenu preferences = new PreferencesMenu(
+						(TreeViewFrame)viewFrame, DendroView2.this);
+				preferences.setVisible(true);
 			}
-		}, 0);
-		menu.setMnemonic(KeyEvent.VK_U);
+		});
 
-		menu.addMenuItem("Font Settings...", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent actionEvent) {
-
-				// keep ref to settingsFrame local,
-				// since will dispose of self when closed...
-				final TabbedSettingsPanel settingsPanel = new TabbedSettingsPanel();
-
-				final FontSettingsPanel genePanel = new FontSettingsPanel(
-						textview);
-				settingsPanel.addSettingsPanel("Gene", genePanel);
-
-				final FontSettingsPanel arrayPanel = new FontSettingsPanel(
-						arraynameview);
-				settingsPanel.addSettingsPanel("Array", arrayPanel);
-
-				final JDialog settingsFrame = new ModelessSettingsDialog(
-						viewFrame, "Font Settings", settingsPanel);
-				settingsFrame.addWindowListener(XmlConfig
-						.getStoreOnWindowClose(getDataModel()
-								.getDocumentConfigRoot()));
-				settingsFrame.pack();
-				settingsFrame.setVisible(true);
-			}
-		}, 0);
-		menu.setMnemonic(KeyEvent.VK_F);
-
-		menu.addMenuItem("Annotations...", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent actionEvent) {
-				// keep refs to settingsPanel, settingsFrame local,
-				// since will dispose of self when closed...
-				final TabbedSettingsPanel settingsPanel = new TabbedSettingsPanel();
-
-				final HeaderSummaryPanel genePanel = new HeaderSummaryPanel(
-						getDataModel().getGeneHeaderInfo(), textview
-								.getHeaderSummary(), (TreeViewFrame)viewFrame);
-				settingsPanel.addSettingsPanel("Gene", genePanel);
-
-				final HeaderSummaryPanel arrayPanel = new HeaderSummaryPanel(
-						arraynameview.getHeaderInfo(), arraynameview
-								.getHeaderSummary(), (TreeViewFrame)viewFrame);
-				settingsPanel.addSettingsPanel("Array", arrayPanel);
-
-				final HeaderSummaryPanel atrPanel = new HeaderSummaryPanel(
-						getDataModel().getAtrHeaderInfo(), atrview
-								.getHeaderSummary(), (TreeViewFrame)viewFrame);
-				settingsPanel.addSettingsPanel("Array Tree", atrPanel);
-
-				final HeaderSummaryPanel gtrPanel = new HeaderSummaryPanel(
-						getDataModel().getGtrHeaderInfo(), gtrview
-								.getHeaderSummary(), (TreeViewFrame)viewFrame);
-				settingsPanel.addSettingsPanel("Gene Tree", gtrPanel);
-
-				final JDialog settingsFrame = new ModelessSettingsDialog(
-						viewFrame, "Annotation Settings", settingsPanel);
-
-				settingsFrame.addWindowListener(XmlConfig
-						.getStoreOnWindowClose(getDataModel()
-								.getDocumentConfigRoot()));
-				settingsFrame.addWindowListener(new WindowAdapter() {
-
-					@Override
-					public void windowClosed(final WindowEvent e) {
-
-						textview.repaint();
-						arraynameview.repaint();
-					}
-				});
-				settingsFrame.pack();
-				settingsFrame.setVisible(true);
-			}
-		}, 0);
-		menu.setMnemonic(KeyEvent.VK_A);
+//		menu.addMenuItem("Pixel Settings...", new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent actionEvent) {
+//
+//				ColorExtractor ce = null;
+//
+//				try {
+//					ce = ((DoubleArrayDrawer) arrayDrawer).getColorExtractor();
+//
+//				} catch (final Exception e) {
+//
+//				}
+//
+//				final PixelSettingsSelector pssSelector = 
+//						new PixelSettingsSelector(
+//						globalXmap, globalYmap, ce, 
+//						DendrogramFactory.getColorPresets());
+//
+//				final JDialog popup = new ModelessSettingsDialog(viewFrame,
+//						"Pixel Settings", pssSelector);
+//
+//				System.out.println("showing popup...");
+//				popup.addWindowListener(XmlConfig
+//						.getStoreOnWindowClose(getDataModel()
+//								.getDocumentConfigRoot()));
+//
+//				popup.pack();
+//				popup.setVisible(true);
+//			}
+//		}, 0);
+//		menu.setMnemonic(KeyEvent.VK_X);
+//
+//		menu.addMenuItem("Url Settings...", new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent actionEvent) {
+//
+//				// keep refs to settingsPanel, settingsFrame local,
+//				// since will dispose of self when closed...
+//				final TabbedSettingsPanel settingsPanel = new TabbedSettingsPanel();
+//
+//				final UrlSettingsPanel genePanel = new UrlSettingsPanel(
+//						viewFrame.getUrlExtractor(), viewFrame
+//								.getGeneUrlPresets());
+//				settingsPanel.addSettingsPanel("Gene", genePanel);
+//
+//				final UrlSettingsPanel arrayPanel = new UrlSettingsPanel(
+//						viewFrame.getArrayUrlExtractor(), viewFrame
+//								.getArrayUrlPresets());
+//				settingsPanel.addSettingsPanel("Array", arrayPanel);
+//
+//				final JDialog settingsFrame = new ModelessSettingsDialog(
+//						viewFrame, "Url Settings", settingsPanel);
+//
+//				settingsFrame.addWindowListener(XmlConfig
+//						.getStoreOnWindowClose(getDataModel()
+//								.getDocumentConfigRoot()));
+//				settingsFrame.pack();
+//				settingsFrame.setVisible(true);
+//			}
+//		}, 0);
+//		menu.setMnemonic(KeyEvent.VK_U);
+//
+//		menu.addMenuItem("Font Settings...", new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent actionEvent) {
+//
+//				// keep ref to settingsFrame local,
+//				// since will dispose of self when closed...
+//				final TabbedSettingsPanel settingsPanel = new TabbedSettingsPanel();
+//
+//				final FontSettingsPanel genePanel = new FontSettingsPanel(
+//						textview);
+//				settingsPanel.addSettingsPanel("Gene", genePanel);
+//
+//				final FontSettingsPanel arrayPanel = new FontSettingsPanel(
+//						arraynameview);
+//				settingsPanel.addSettingsPanel("Array", arrayPanel);
+//
+//				final JDialog settingsFrame = new ModelessSettingsDialog(
+//						viewFrame, "Font Settings", settingsPanel);
+//				settingsFrame.addWindowListener(XmlConfig
+//						.getStoreOnWindowClose(getDataModel()
+//								.getDocumentConfigRoot()));
+//				settingsFrame.pack();
+//				settingsFrame.setVisible(true);
+//			}
+//		}, 0);
+//		menu.setMnemonic(KeyEvent.VK_F);
+//
+//		menu.addMenuItem("Annotations...", new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent actionEvent) {
+//				// keep refs to settingsPanel, settingsFrame local,
+//				// since will dispose of self when closed...
+//				final TabbedSettingsPanel settingsPanel = new TabbedSettingsPanel();
+//
+//				final HeaderSummaryPanel genePanel = new HeaderSummaryPanel(
+//						getDataModel().getGeneHeaderInfo(), textview
+//								.getHeaderSummary(), (TreeViewFrame)viewFrame);
+//				settingsPanel.addSettingsPanel("Gene", genePanel);
+//
+//				final HeaderSummaryPanel arrayPanel = new HeaderSummaryPanel(
+//						arraynameview.getHeaderInfo(), arraynameview
+//								.getHeaderSummary(), (TreeViewFrame)viewFrame);
+//				settingsPanel.addSettingsPanel("Array", arrayPanel);
+//
+//				final HeaderSummaryPanel atrPanel = new HeaderSummaryPanel(
+//						getDataModel().getAtrHeaderInfo(), atrview
+//								.getHeaderSummary(), (TreeViewFrame)viewFrame);
+//				settingsPanel.addSettingsPanel("Array Tree", atrPanel);
+//
+//				final HeaderSummaryPanel gtrPanel = new HeaderSummaryPanel(
+//						getDataModel().getGtrHeaderInfo(), gtrview
+//								.getHeaderSummary(), (TreeViewFrame)viewFrame);
+//				settingsPanel.addSettingsPanel("Gene Tree", gtrPanel);
+//
+//				final JDialog settingsFrame = new ModelessSettingsDialog(
+//						viewFrame, "Annotation Settings", settingsPanel);
+//
+//				settingsFrame.addWindowListener(XmlConfig
+//						.getStoreOnWindowClose(getDataModel()
+//								.getDocumentConfigRoot()));
+//				settingsFrame.addWindowListener(new WindowAdapter() {
+//
+//					@Override
+//					public void windowClosed(final WindowEvent e) {
+//
+//						textview.repaint();
+//						arraynameview.repaint();
+//					}
+//				});
+//				settingsFrame.pack();
+//				settingsFrame.setVisible(true);
+//			}
+//		}, 0);
+//		menu.setMnemonic(KeyEvent.VK_A);
 
 		/*
 		 * MenuItem urlItem = new MenuItem("Url Options...");
@@ -2009,6 +2011,15 @@ ComponentListener,MainPanel, Observer {
 	protected DataModel getDataModel() {
 
 		return this.dataModel;
+	}
+	
+	/**
+	 * Getter for ArrayDrawer object.
+	 * @return
+	 */
+	public ArrayDrawer getArrayDrawer() {
+		
+		return arrayDrawer;
 	}
 
 	// Setters

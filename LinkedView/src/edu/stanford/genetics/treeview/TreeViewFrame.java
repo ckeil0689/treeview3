@@ -23,7 +23,6 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -679,49 +678,20 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 */
 	protected void populateSettingsMenu(final TreeviewMenuBarI menubar) {
 
+		if(running == null) {
+			menubar.addMenuItem("Preferences", new ActionListener() {
+	
+				@Override
+				public void actionPerformed(final ActionEvent arg0) {
+					
+					PreferencesMenu preferences = new PreferencesMenu(
+							TreeViewFrame.this);
+					preferences.setVisible(true);
+				}
+			});
+		}
 		menubar.addSeparator();
-		menubar.addSubMenu("Change Theme");
-		menubar.addMenuItem("Daylight", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-
-				GUIParams.setDayLight();
-
-				if (dataModel != null && running != null) {
-					confirmPanel.setupLayout();
-					running.refresh();
-
-				} else if (dataModel != null && running == null) {
-					confirmPanel.setupLayout();
-
-				} else {
-					setupLayout();
-				}
-				// make static method to change theme?
-			}
-		});
-		menubar.addMenuItem("Night", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-
-				GUIParams.setNight();
-
-				if (dataModel != null && running != null) {
-					confirmPanel.setupLayout();
-					running.refresh();
-
-				} else if (dataModel != null && running == null) {
-					confirmPanel.setupLayout();
-
-				} else {
-					setupLayout();
-				}
-				// make static method to change theme?
-			}
-
-		});
+		
 		menubar.setMenu(TreeviewMenuBarI.documentMenu);
 		menubar.addMenuItem("Gene Url", new ActionListener() {
 
@@ -1253,15 +1223,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		panel.setLayout(new MigLayout());
 		panel.setBackground(GUIParams.BG_COLOR);
 
-		final Font font = new Font("Sans Serif", Font.PLAIN, 14);
-		final JButton button = new JButton("OK");
-		final Dimension d = button.getPreferredSize();
-		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
-		button.setPreferredSize(d);
-		button.setFont(font);
-		button.setOpaque(true);
-		button.setBackground(GUIParams.ELEMENT);
-		button.setForeground(GUIParams.BG_COLOR);
+		final JButton button = GUIParams.setButtonLayout("OK", null);
 		button.addActionListener(new ActionListener() {
 
 			@Override
@@ -1272,22 +1234,22 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 		if (written.isEmpty()) {
 			final JLabel l1 = new JLabel("No Model changes were written.");
-			l1.setFont(font);
+			l1.setFont(GUIParams.FONTS);
 			l1.setForeground(GUIParams.TEXT);
 
 			final JLabel l2 = new JLabel("Only the following changes require "
 					+ "explicit saving:");
-			l2.setFont(font);
+			l2.setFont(GUIParams.FONTS);
 			l2.setForeground(GUIParams.TEXT);
 
 			final JLabel l3 = new JLabel("- Tree Node flips (Analysis->Flip "
 					+ "Array/Gene Tree Node)");
-			l3.setFont(font);
+			l3.setFont(GUIParams.FONTS);
 			l3.setForeground(GUIParams.TEXT);
 
 			final JLabel l4 = new JLabel("- Tree Node Annotations "
 					+ "(Analysis->Array/Gene TreeAnno)");
-			l4.setFont(font);
+			l4.setFont(GUIParams.FONTS);
 			l4.setForeground(GUIParams.TEXT);
 
 			panel.add(l1, "pushx, wrap");
@@ -1330,7 +1292,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			}
 
 			final JLabel l1 = new JLabel(msg);
-			l1.setFont(font);
+			l1.setFont(GUIParams.FONTS);
 			l1.setForeground(GUIParams.TEXT);
 
 			panel.add(l1, "pushx, wrap");
@@ -1832,6 +1794,16 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	public FileMru getFileMRU() {
 		
 		return fileMru;
+	}
+	
+	public MainPanel getRunning() {
+		
+		return running;
+	}
+	
+	public LoadCheckView getConfirmPanel() {
+		
+		return confirmPanel;
 	}
 
 	// Empty Methods

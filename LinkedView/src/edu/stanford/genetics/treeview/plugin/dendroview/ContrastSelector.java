@@ -8,7 +8,6 @@ import java.awt.event.AdjustmentListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import javax.swing.BorderFactory;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -16,7 +15,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.border.EtchedBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -47,8 +45,6 @@ class ContrastSelector extends JPanel implements AdjustmentListener {
 
 		this.setLayout(new MigLayout());
 		this.setOpaque(false);
-		this.setBorder(BorderFactory.createLineBorder(GUIParams.BORDERS,
-				EtchedBorder.LOWERED));
 
 		final JPanel inner = new JPanel();
 		inner.setOpaque(false);
@@ -58,9 +54,7 @@ class ContrastSelector extends JPanel implements AdjustmentListener {
 		font_label.setForeground(GUIParams.TEXT);
 		font_label.setFont(GUIParams.FONTS);
 		inner.add(font_label, "alignx 50%");
-
-//		font_label.setMaximumSize(new Dimension(Short.MAX_VALUE,
-//				Short.MAX_VALUE));
+		
 		inner.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
 
 		contrastTextField = new JTextField(Double.toString(contrast), 5);
@@ -100,8 +94,6 @@ class ContrastSelector extends JPanel implements AdjustmentListener {
 		final JPanel panel = new JPanel();
 		panel.setLayout(new MigLayout());
 		panel.setBackground(GUIParams.BG_COLOR);
-		panel.setBorder(BorderFactory.createLineBorder(GUIParams.BORDERS,
-				EtchedBorder.LOWERED));
 
 		return panel;
 	}
