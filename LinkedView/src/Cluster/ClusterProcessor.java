@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
 import edu.stanford.genetics.treeview.DataModel;
+import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 
 //import Cluster.ClusterView.FinalOptionsPanel;
 
@@ -67,7 +68,7 @@ public class ClusterProcessor {
 		this.pBar2 = pBar2;
 		this.pBar3 = pBar3;
 		this.pBar4 = pBar4;
-		this.currentArray = cView.getDataArray();
+//		this.currentArray = cView.getDataArray();
 		this.mainPanel = cView.getMainPanel();
 		this.choice = (String) cView.getGeneCombo().getSelectedItem();
 		this.choice2 = (String) cView.getArrayCombo().getSelectedItem();
@@ -76,6 +77,9 @@ public class ClusterProcessor {
 		this.row_iterations = row_iterations;
 		this.col_clusterN = col_clusterN;
 		this.col_iterations = col_iterations;
+		
+		TVDataMatrix matrix = (TVDataMatrix) model.getDataMatrix();
+		currentArray = matrix.getExprData();
 	}
 
 	/**

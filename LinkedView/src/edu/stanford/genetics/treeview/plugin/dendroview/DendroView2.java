@@ -2124,14 +2124,8 @@ ComponentListener,MainPanel, Observer {
 		public void componentMoved(final ComponentEvent arg0) {
 		}
 
-		// Keep view centered and zoomed on visible part, also refreshing the
-		// MapContainer with setHome to always fill out the entire GlobalView
-		// panel
 		@Override
 		public void componentResized(final ComponentEvent arg0) {
-
-			final int scrollX = globalXmap.getScroll().getValue();
-			final int scrollY = globalYmap.getScroll().getValue();
 
 			if (globalXmap.getAvailablePixels() > globalXmap.getUsedPixels()
 					&& globalXmap.getScale() == globalXmap.getMinScale()) {
@@ -2142,8 +2136,6 @@ ComponentListener,MainPanel, Observer {
 					&& globalYmap.getScale() == globalYmap.getMinScale()) {
 				globalYmap.setHome();
 			}
-
-			globalview.centerView(scrollX, scrollY);
 
 			this.repaint();
 			this.revalidate();

@@ -10,7 +10,13 @@ import javax.swing.WindowConstants;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.TreeViewFrame;
+import edu.stanford.genetics.treeview.model.TVModel;
 
+/**
+ * Frame set up for ClusterView.
+ * @author CKeil
+ *
+ */
 public class ClusterViewFrame extends JFrame {
 	
 	private static final long serialVersionUID = 1L;
@@ -22,7 +28,7 @@ public class ClusterViewFrame extends JFrame {
 		
 		super("Hierarchical Clustering");
 		
-		this.clusterView = new ClusterView(dataModel, viewFrame, hierarchical);
+		clusterView = new ClusterView(dataModel, viewFrame, hierarchical);
 		
 		// Setting preferred size for the ContentPane of this frame
 		final Dimension mainDim = GUIParams.getScreenSize();
@@ -44,8 +50,17 @@ public class ClusterViewFrame extends JFrame {
 		
 		getContentPane().add(clusterView);
 		
-		setLocationRelativeTo(viewFrame);
 		pack();	
+		setLocationRelativeTo(viewFrame);
+	}
+	
+	/**
+	 * Returns the loaded instance of ClusterView
+	 * @return ClusterView clusterView
+	 */
+	public ClusterView getClusterView() {
+		
+			return clusterView;
 	}
 
 	

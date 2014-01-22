@@ -66,7 +66,8 @@ public abstract class TreeViewApp implements WindowListener {
 	protected static String updateUrl = "http://jtreeview.sourceforge.net";
 
 	// url of announcements mailing list
-	protected static String announcementUrl = "http://lists.sourceforge.net/lists/listinfo/jtreeview-announce";
+	protected static String announcementUrl = "http://lists.sourceforge.net/" +
+			"lists/listinfo/jtreeview-announce";
 
 	/** holds all open windows */
 	protected java.util.Vector<Window> windows;

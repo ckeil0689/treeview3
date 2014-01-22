@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -13,6 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import edu.stanford.genetics.treeview.model.CDTCreator2;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
@@ -357,6 +359,51 @@ public class PreferencesMenu extends JFrame {
 					viewFrame.getDataModel().getGtrHeaderInfo(), 
 					dendroView.getGtrview().getHeaderSummary(), viewFrame);
 			
+			final JButton custom_button = GUIParams.setButtonLayout(
+					"Use Custom Labels", null);
+			custom_button.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					
+					File customFile;
+					FileSet loadedSet = viewFrame.getDataModel().getFileSet();
+					File file = new File(loadedSet.getDir() 
+							+ loadedSet.getRoot() + loadedSet.getExt());
+					
+					try {
+						customFile = viewFrame.selectFile();
+						
+						final String fileName = file.getAbsolutePath();
+						final int dotIndex = fileName.indexOf(".");
+
+						final int suffixLength = fileName.length() - dotIndex;
+
+						final String fileType = file.getAbsolutePath()
+								.substring(fileName.length() - suffixLength, 
+										fileName.length());
+						
+						final CDTCreator2 fileChanger = new CDTCreator2(file, 
+								customFile, fileType);
+						fileChanger.createFile();
+
+						file = new File(fileChanger.getFilePath());
+						
+						FileSet fileSet = viewFrame.getFileSet(file);
+						viewFrame.loadFileSet(fileSet);
+
+						fileSet = viewFrame.getFileMRU().addUnique(fileSet);
+						viewFrame.getFileMRU().setLast(fileSet);
+
+						viewFrame.confirmLoaded();
+						
+					} catch (LoadException e) {
+						e.printStackTrace();
+					}
+				}
+				
+			});
+			
 			JLabel rows = GUIParams.setupHeader("Rows");
 			JLabel cols = GUIParams.setupHeader("Columns");
 			JLabel rTrees = GUIParams.setupHeader("Row Trees");
@@ -364,6 +411,7 @@ public class PreferencesMenu extends JFrame {
 			
 			panel.add(rows, "span, wrap");
 			panel.add(genePanel, "pushx, alignx 50%, w 95%, span, wrap");
+			panel.add(custom_button, "pushx, alignx 50%, span, wrap");
 			
 			panel.add(cols, "span, wrap");
 			panel.add(arrayPanel, "pushx, alignx 50%, w 95%, span, wrap");

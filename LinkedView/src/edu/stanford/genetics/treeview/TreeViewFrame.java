@@ -50,6 +50,7 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
 import net.miginfocom.swing.MigLayout;
+import Cluster.ClusterController;
 import Cluster.ClusterView;
 import Cluster.ClusterViewFrame;
 import edu.stanford.genetics.treeview.core.ArrayFinder;
@@ -462,15 +463,13 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 				JOptionPane.showMessageDialog(this, "TreeViewFrame 253: "
 						+ "No plugins to display");
 			} else {
+				confirmPanel = null;
 				getContentPane().add((JComponent) running);
 				setLoadedTitle();
 				treeView.getGlobalConfig().store();
 			}
 
 		} else {
-//			if (running instanceof ClusterView) {
-//				setDataModel(dataModel, true, true);
-//			}
 			getContentPane().add(waiting);
 			setTitle(getAppName());
 		}
@@ -619,12 +618,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			public void actionPerformed(final ActionEvent arg0) {
 
 				if (dataModel != null) {
-					ClusterViewFrame clusterViewFrame = 
-							new ClusterViewFrame(dataModel, TreeViewFrame.this, 
-									true);
-					clusterViewFrame.setVisible(true);
-//					TreeViewFrame.this.setDataModel(dataModel, true, true);
-//					TreeViewFrame.this.setLoaded(true);
+					setupClusterView(true);
 
 				} else {
 					dialog.setVisible(true);
@@ -638,12 +632,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			public void actionPerformed(final ActionEvent e) {
 
 				if (dataModel != null) {
-					ClusterViewFrame clusterViewFrame = 
-							new ClusterViewFrame(dataModel, TreeViewFrame.this, 
-									false);
-					clusterViewFrame.setVisible(true);
-//					TreeViewFrame.this.setDataModel(dataModel);//, true, false);
-//					TreeViewFrame.this.setLoaded(true);
+					setupClusterView(false);
 
 				} else {
 					dialog.setVisible(true);
@@ -667,6 +656,27 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 				}
 			}
 		});
+	}
+	
+	/**
+	 * Opens the ClusterViewFrame with either the options for hierarchical
+	 * clustering or K-Means, depending on the boolean parameter.
+	 * @param hierarchical
+	 */
+	public void setupClusterView(boolean hierarchical) {
+		
+		// Making a new Window to display clustering components
+		ClusterViewFrame clusterViewFrame = 
+				new ClusterViewFrame(dataModel, TreeViewFrame.this, 
+						hierarchical);
+		
+		// Creating the Controller for this view.
+		ClusterController clusControl = 
+				new ClusterController((TVModel)dataModel, 
+						clusterViewFrame.getClusterView());
+		
+		// Make the clustering window visible.
+		clusterViewFrame.setVisible(true);
 	}
 
 	// Populating various menus
@@ -1698,13 +1708,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		}
 
 		setupExtractors();
-
-//		if (cluster) {
-//			setupClusterRunning(hierarchical);
-//
-//		} else {
-			setupRunning();
-//		}
+		setupRunning();
 	}
 
 	/**

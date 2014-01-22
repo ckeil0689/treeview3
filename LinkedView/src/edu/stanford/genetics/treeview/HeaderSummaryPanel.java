@@ -82,50 +82,50 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 			}
 		};
 		
-		JButton custom_button = GUIParams.setButtonLayout("Use Custom Labels", 
-				null);
-		custom_button.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				
-				File customFile;
-				FileSet loadedSet = viewFrame.getDataModel().getFileSet();
-				File file = new File(loadedSet.getDir() + loadedSet.getRoot() 
-						+ loadedSet.getExt());
-				
-				try {
-					customFile = viewFrame.selectFile();
-					
-					final String fileName = file.getAbsolutePath();
-					final int dotIndex = fileName.indexOf(".");
-
-					final int suffixLength = fileName.length() - dotIndex;
-
-					final String fileType = file.getAbsolutePath().substring(
-							fileName.length() - suffixLength, fileName.length());
-					
-					final CDTCreator2 fileChanger = new CDTCreator2(file, 
-							customFile, fileType);
-					fileChanger.createFile();
-
-					file = new File(fileChanger.getFilePath());
-					
-					FileSet fileSet = viewFrame.getFileSet(file);
-					viewFrame.loadFileSet(fileSet);
-
-					fileSet = viewFrame.getFileMRU().addUnique(fileSet);
-					viewFrame.getFileMRU().setLast(fileSet);
-
-					viewFrame.confirmLoaded();
-					
-				} catch (LoadException e) {
-					e.printStackTrace();
-				}
-			}
-			
-		});
-		add(custom_button);
+//		JButton custom_button = GUIParams.setButtonLayout("Use Custom Labels", 
+//				null);
+//		custom_button.addActionListener(new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(ActionEvent arg0) {
+//				
+//				File customFile;
+//				FileSet loadedSet = viewFrame.getDataModel().getFileSet();
+//				File file = new File(loadedSet.getDir() + loadedSet.getRoot() 
+//						+ loadedSet.getExt());
+//				
+//				try {
+//					customFile = viewFrame.selectFile();
+//					
+//					final String fileName = file.getAbsolutePath();
+//					final int dotIndex = fileName.indexOf(".");
+//
+//					final int suffixLength = fileName.length() - dotIndex;
+//
+//					final String fileType = file.getAbsolutePath().substring(
+//							fileName.length() - suffixLength, fileName.length());
+//					
+//					final CDTCreator2 fileChanger = new CDTCreator2(file, 
+//							customFile, fileType);
+//					fileChanger.createFile();
+//
+//					file = new File(fileChanger.getFilePath());
+//					
+//					FileSet fileSet = viewFrame.getFileSet(file);
+//					viewFrame.loadFileSet(fileSet);
+//
+//					fileSet = viewFrame.getFileMRU().addUnique(fileSet);
+//					viewFrame.getFileMRU().setLast(fileSet);
+//
+//					viewFrame.confirmLoaded();
+//					
+//				} catch (LoadException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//			
+//		});
+//		add(custom_button);
 		getHeaderList().addListSelectionListener(tmp);
 		synchronizeFrom();
 	}
@@ -206,6 +206,7 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 	 */
 	@Override
 	public void update(final Observable o, final Object arg) {
+		
 		if (o == headerInfo) {
 			setHeaderList(headerInfo.getNames());
 			synchronizeFrom();

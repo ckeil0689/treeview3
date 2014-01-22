@@ -180,6 +180,10 @@ public class LinkedViewApp extends TreeViewApp {
 		return tvFrame;
 	}
 
+	/**
+	 * Method that sets up the initial View
+	 * @param astring
+	 */
 	protected void standardStartup(final String astring[]) {
 
 		args = new MainProgramArgs(astring);
