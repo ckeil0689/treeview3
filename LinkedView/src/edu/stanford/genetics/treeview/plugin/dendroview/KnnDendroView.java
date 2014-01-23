@@ -46,7 +46,7 @@ import edu.stanford.genetics.treeview.model.KnnModel;
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.2 $ $Date: 2006-09-21 17:18:55 $
  */
-public class KnnDendroView extends DendroView2 implements ConfigNodePersistent,
+public class KnnDendroView extends DendroView implements ConfigNodePersistent,
 		MainPanel, Observer {
 
 	private static final long serialVersionUID = 1L;

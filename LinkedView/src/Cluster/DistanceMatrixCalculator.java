@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.swing.JProgressBar;
-
 /**
  * This class is used to calculate a distance matrix based on input data. It
  * contains several different methods and will return a matrix of distances
@@ -20,18 +18,23 @@ public class DistanceMatrixCalculator {
 
 	// Instance variables
 	// list with all genes and their distances to all other genes
-	private final List<List<Double>> distanceList = new ArrayList<List<Double>>();
+	private final List<List<Double>> distanceList = 
+			new ArrayList<List<Double>>();
 	private final List<List<Double>> fullList;
-	private final JProgressBar pBar;
+	
+	private final ClusterView clusterView;
 	private final String choice;
+	private final int pBarNum;
 
 	// Constructor
-	public DistanceMatrixCalculator(final List<List<Double>> fullList,
-			final String choice, final JProgressBar pBar) {
+	public DistanceMatrixCalculator(final List<List<Double>> fullList, 
+			final String choice, final ClusterView clusterView, 
+			final int pBarNum) {
 
 		this.fullList = fullList;
-		this.pBar = pBar;
 		this.choice = choice;
+		this.clusterView = clusterView;
+		this.pBarNum = pBarNum;
 	}
 
 	// Methods to calculate distance matrix
@@ -47,7 +50,7 @@ public class DistanceMatrixCalculator {
 	 */
 	public void pearson(final boolean absolute, final boolean centered) {
 
-		pBar.setMaximum(fullList.size());
+		clusterView.setPBarMax(fullList.size(), pBarNum);
 
 		// making sure distanceList is clear
 		distanceList.clear();
@@ -56,7 +59,7 @@ public class DistanceMatrixCalculator {
 		for (int i = 0; i < fullList.size(); i++) {
 
 			// update progressbar
-			pBar.setValue(i);
+			clusterView.updatePBar(i, pBarNum);
 
 			// refers to one gene with all it's data
 			final List<Double> data = fullList.get(i);
@@ -194,7 +197,7 @@ public class DistanceMatrixCalculator {
 		double g2 = 0;
 		double gDiff = 0;
 
-		pBar.setMaximum(fullList.size());
+		clusterView.setPBarMax(fullList.size(), pBarNum);
 
 		// making sure distanceList is empty
 		distanceList.clear();
@@ -203,7 +206,7 @@ public class DistanceMatrixCalculator {
 		for (int i = 0; i < fullList.size(); i++) {
 
 			// update progressbar
-			pBar.setValue(i);
+			clusterView.updatePBar(i, pBarNum);
 
 			// refers to one gene with all it's data
 			final List<Double> gene = fullList.get(i);
@@ -257,7 +260,7 @@ public class DistanceMatrixCalculator {
 		double g2 = 0;
 		double gDiff = 0;
 
-		pBar.setMaximum(fullList.size());
+		clusterView.setPBarMax(fullList.size(), pBarNum);
 
 		// making sure distanceList is clear
 		distanceList.clear();
@@ -266,7 +269,7 @@ public class DistanceMatrixCalculator {
 		for (int i = 0; i < fullList.size(); i++) {
 
 			// update progressbar
-			pBar.setValue(i);
+			clusterView.updatePBar(i, pBarNum);
 
 			// refers to one gene with all it's data
 			final List<Double> data = fullList.get(i);
@@ -312,7 +315,7 @@ public class DistanceMatrixCalculator {
 	 * Chooses appropriate distance measure according to user GUI selection.
 	 */
 	public void measureDistance() {
-
+		
 		if (choice.equalsIgnoreCase("Pearson Correlation (uncentered)")) {
 			pearson(false, false);
 

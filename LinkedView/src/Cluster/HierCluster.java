@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.swing.JProgressBar;
-
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.model.TVModel;
 
@@ -20,10 +18,10 @@ public class HierCluster {
 
 	// Instance variables
 	private final TVModel model;
+	private final ClusterView clusterView;
 	private String filePath;
 	private final String type;
-	private final String method;
-	private final JProgressBar pBar;
+	private final int pBarNum;
 
 	// Distance Matrix
 	private List<List<Double>> dMatrix = new ArrayList<List<Double>>();
@@ -50,21 +48,21 @@ public class HierCluster {
 	 * @param type
 	 * @param method
 	 */
-	public HierCluster(final DataModel model, final List<List<Double>> dMatrix,
-			final JProgressBar pBar, final String type, final String method) {
+	public HierCluster(final DataModel model, final ClusterView clusterView, 
+			final List<List<Double>> dMatrix, final String type, int pBarNum) {
 
 		this.model = (TVModel) model;
+		this.clusterView = clusterView;
 		this.dMatrix = dMatrix;
 		this.type = type;
-		this.method = method;
-		this.pBar = pBar;
+		this.pBarNum = pBarNum;
 	}
 
 	// method for clustering the distance matrix
 	public void cluster() {
 
 		// ProgressBar maximum
-		pBar.setMaximum(dMatrix.size());
+		clusterView.setPBarMax(dMatrix.size(), pBarNum);
 
 		// data to be written to file
 		dataTable = new ArrayList<List<String>>();
@@ -99,7 +97,8 @@ public class HierCluster {
 		while (halfDMatrix.size() > 1) {
 
 			// update ProgressBar
-			pBar.setValue(dMatrix.size() - halfDMatrix.size());
+			clusterView.updatePBar(dMatrix.size() - halfDMatrix.size(), 
+					pBarNum);
 
 			// local variables
 			double min = 0;
@@ -494,6 +493,8 @@ public class HierCluster {
 	public List<Double> newCladeGen(final List<Integer> fusedGroup,
 			final List<Double> newClade) {
 
+		String linkMethod = clusterView.getLinkageMethod();
+		
 		for (int i = 0; i < geneGroups.size(); i++) {
 
 			double distanceSum = 0;
@@ -505,7 +506,7 @@ public class HierCluster {
 			// (then no mean should be calculated) no elements in common
 			if (Collections.disjoint(geneGroups.get(i), fusedGroup)) {
 
-				if (method.contentEquals("Average Linkage")) {
+				if (linkMethod.contentEquals("Average Linkage")) {
 					// select members of the new clade (B & G)
 					for (int j = 0; j < fusedGroup.size(); j++) {
 
@@ -527,8 +528,8 @@ public class HierCluster {
 					newVal = distanceSum
 							/ (fusedGroup.size() * geneGroups.get(i).size());
 
-				} else if (method.contentEquals("Single Linkage")
-						|| method.contentEquals("Complete Linkage")) {
+				} else if (linkMethod.contentEquals("Single Linkage")
+						|| linkMethod.contentEquals("Complete Linkage")) {
 
 					final List<Double> distances = new ArrayList<Double>();
 
@@ -548,7 +549,7 @@ public class HierCluster {
 
 					}
 
-					if (method.contentEquals("Single Linkage")) {
+					if (linkMethod.contentEquals("Single Linkage")) {
 						// newVal = min
 						newVal = Collections.min(distances);
 

@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import javax.swing.JProgressBar;
-
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.model.TVModel;
 
@@ -13,11 +11,13 @@ public class KMeansCluster {
 
 	// Instance variables
 	private final TVModel model;
+	private final ClusterView clusterView;
+	
 	private String filePath;
-	private final JProgressBar pBar;
-	private int clusterN = 0;
-	private int iterations = 0;
 	private String type = "";
+	private final int pBarNum;
+	private final int clusterN;
+	private final int iterations;
 
 	// Distance Matrix
 	private List<List<Double>> dMatrix = new ArrayList<List<Double>>();
@@ -40,16 +40,17 @@ public class KMeansCluster {
 	 * @param type
 	 * @param method
 	 */
-	public KMeansCluster(final DataModel model,
-			final List<List<Double>> dMatrix, final JProgressBar pBar,
-			final int clusterN, final int iterations, final String type) {
+	public KMeansCluster(final DataModel model, final ClusterView clusterView,
+			final List<List<Double>> dMatrix, final String type, int clusterN, 
+			int iterations, final int pBarNum) {
 
 		this.model = (TVModel) model;
+		this.clusterView = clusterView;
 		this.dMatrix = dMatrix;
-		this.pBar = pBar;
+		this.type = type;
 		this.clusterN = clusterN;
 		this.iterations = iterations;
-		this.type = type;
+		this.pBarNum = pBarNum;
 	}
 
 	// method for clustering the distance matrix
@@ -60,7 +61,7 @@ public class KMeansCluster {
 		List<List<Double>> clusterMeans = new ArrayList<List<Double>>();
 
 		// ProgressBar maximum
-		pBar.setMaximum(dMatrix.size());
+		clusterView.setPBarMax(dMatrix.size(), pBarNum);
 
 		// deep copy of distance matrix to avoid mutation
 		copyDMatrix = deepCopy(dMatrix);
@@ -214,7 +215,7 @@ public class KMeansCluster {
 	 */
 	public List<List<Integer>> assignMeansVals(final List<Double> meanList) {
 
-		pBar.setValue(0);
+		clusterView.updatePBar(0, pBarNum);
 
 		final List<List<Integer>> clusters = new ArrayList<List<Integer>>();
 
@@ -237,7 +238,7 @@ public class KMeansCluster {
 
 			final int geneID = meanList.indexOf(mean);
 
-			pBar.setValue(geneID);
+			clusterView.updatePBar(geneID, pBarNum);
 
 			final List<Integer> meanIndexes = new ArrayList<Integer>();
 

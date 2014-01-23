@@ -309,7 +309,11 @@ public class ArrayNameView extends ModelView implements MouseListener,
 //								g2d.drawString(out, 0, map.getMiddlePixel(j) 
 //										+ ascent / 2);
 								
-								g2d.drawGlyphVector(g2d.getFont().createGlyphVector(frc, out), 0, map.getMiddlePixel(j) 
+								// Unknown Mac OS X issue with drawString, 
+								// mysteriously fixed by this.
+								g2d.drawGlyphVector(g2d.getFont()
+										.createGlyphVector(frc, out), 0, 
+										map.getMiddlePixel(j) 
 										+ ascent / 2);
 
 								if (colorIndex > 0) {
@@ -320,7 +324,12 @@ public class ArrayNameView extends ModelView implements MouseListener,
 //								g2d.drawString(out, 0, map.getMiddlePixel(j) 
 //										+ ascent / 2);
 								// g.setColor(fore);
-								g2d.drawGlyphVector(g2d.getFont().createGlyphVector(frc, out), 0, map.getMiddlePixel(j) 
+								
+								// Unknown Mac OS X issue with drawString, 
+								// mysteriously fixed by this. 
+								g2d.drawGlyphVector(g2d.getFont()
+										.createGlyphVector(frc, out), 0, 
+										map.getMiddlePixel(j) 
 										+ ascent / 2);
 							}
 
@@ -330,8 +339,6 @@ public class ArrayNameView extends ModelView implements MouseListener,
 				}
 				
 				g2d.setTransform(orig);
-//				g2d.translate(offscreenSize.height, 0);
-//				g2d.rotate(Math.PI / 2);
 
 			} catch (final java.lang.NoClassDefFoundError e) {
 

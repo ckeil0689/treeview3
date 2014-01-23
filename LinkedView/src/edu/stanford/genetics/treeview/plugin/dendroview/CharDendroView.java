@@ -52,7 +52,7 @@ import edu.stanford.genetics.treeview.ViewFrame;
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.1 $ $Date: 2006-08-16 19:13:45 $
  */
-public class CharDendroView extends DendroView2 {
+public class CharDendroView extends DendroView {
 
 	private static final long serialVersionUID = 1L;
 

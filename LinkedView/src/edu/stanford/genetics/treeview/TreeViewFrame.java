@@ -50,7 +50,7 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
 import net.miginfocom.swing.MigLayout;
-import Cluster.ClusterController;
+import Cluster.ClusterViewController;
 import Cluster.ClusterView;
 import Cluster.ClusterViewFrame;
 import edu.stanford.genetics.treeview.core.ArrayFinder;
@@ -68,7 +68,7 @@ import edu.stanford.genetics.treeview.core.TreeViewJMenuBar;
 import edu.stanford.genetics.treeview.model.CDTCreator2;
 import edu.stanford.genetics.treeview.model.DataModelWriter;
 import edu.stanford.genetics.treeview.model.TVModel;
-import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
+import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 
 /**
  * This class is the main window of Java TreeView. In practice, it serves as the
@@ -220,8 +220,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		confirmPanel = new LoadCheckView(dataModel, this);
 
 		waiting.add(confirmPanel, "push, grow");
-
-		System.out.println(getLoaded());
+		
 		rebuildMainPanelMenu();
 
 		waiting.repaint();
@@ -362,6 +361,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			}
 
 			FileSet fileSet = getFileSet(file); // Type: 0 (Auto)
+			
+			// Loading TVModel
 			loadFileSet(fileSet);
 
 			fileSet = fileMru.addUnique(fileSet);
@@ -417,7 +418,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 */
 	protected void setupRunning() {
 
-		final DendroView2 dv2 = new DendroView2(getDataModel(), this);
+		final DendroView dv2 = new DendroView(getDataModel(), this);
 		running = dv2;
 	}
 
@@ -503,7 +504,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			populateSettingsMenu(menubar);
 			menubar.addMenu(TreeviewMenuBarI.viewsMenu);
 			menubar.setMenuMnemonic(KeyEvent.VK_C);
-			// populateViewsMenu(menubar);
 			menubar.addMenu(TreeviewMenuBarI.analysisMenu);
 			menubar.setMenuMnemonic(KeyEvent.VK_A);
 			menubar.addMenu(TreeviewMenuBarI.exportMenu);
@@ -671,8 +671,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 						hierarchical);
 		
 		// Creating the Controller for this view.
-		ClusterController clusControl = 
-				new ClusterController((TVModel)dataModel, 
+		ClusterViewController clusControl = 
+				new ClusterViewController((TVModel)dataModel, 
 						clusterViewFrame.getClusterView());
 		
 		// Make the clustering window visible.
@@ -1694,8 +1694,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 *            newModel
 	 */
 	@Override
-	public void setDataModel(final DataModel newModel) {//, final boolean cluster,
-			//final boolean hierarchical) {
+	public void setDataModel(final DataModel newModel) {
 
 		if (dataModel != null) {
 			dataModel.clearFileSetListeners();

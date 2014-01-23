@@ -10,7 +10,6 @@ import javax.swing.WindowConstants;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.TreeViewFrame;
-import edu.stanford.genetics.treeview.model.TVModel;
 
 /**
  * Frame set up for ClusterView.
@@ -33,7 +32,9 @@ public class ClusterViewFrame extends JFrame {
 		// Setting preferred size for the ContentPane of this frame
 		final Dimension mainDim = GUIParams.getScreenSize();
 		getContentPane().setPreferredSize(new Dimension(mainDim.width * 1/2, 
-				mainDim.height * 1/2));
+				mainDim.height * 3/4));
+		
+		setMinimumSize(new Dimension(800, 600));
 
 		// setup frame options
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);

@@ -20,15 +20,14 @@ public class CDTGenerator {
 
 	// Instance variables
 	private final DataModel model;
+	private final ClusterView clusterView;
 	private File file;
 
 	private String filePath;
-	private final String choice;
-	private final String choice2;
 	private int aidBuffer = 2;
-	private final int row_clusterN;
-	private final int col_clusterN;
 	private final boolean hierarchical;
+	private String choice;
+	private String choice2;
 
 	private String[][] rowNames;
 	private String[][] colNames;
@@ -47,21 +46,18 @@ public class CDTGenerator {
 	private final List<String> orderedCols;
 
 	// Constructor (building the object)
-	public CDTGenerator(final DataModel model,
+	public CDTGenerator(final DataModel model, final ClusterView clusterView,
 			final List<List<Double>> sepList, final List<String> orderedRows,
-			final List<String> orderedCols, final String choice,
-			final String choice2, final boolean hierarchical,
-			final int row_clusterN, final int col_clusterN) {
+			final List<String> orderedCols, final boolean hierarchical) {
 
 		this.model = model;
+		this.clusterView = clusterView;
 		this.sepList = sepList;
 		this.orderedRows = orderedRows;
 		this.orderedCols = orderedCols;
-		this.choice = choice;
-		this.choice2 = choice2;
 		this.hierarchical = hierarchical;
-		this.row_clusterN = row_clusterN;
-		this.col_clusterN = col_clusterN;
+		this.choice = clusterView.getRowSimilarity();
+		this.choice2 = clusterView.getColSimilarity();
 	}
 
 	public void generateCDT() {
@@ -151,6 +147,11 @@ public class CDTGenerator {
 
 			String rowC = "";
 			String colC = "";
+			
+			Integer[] spinnerInput = clusterView.getSpinnerValues();
+			
+			int row_clusterN = spinnerInput[0];
+			int col_clusterN = spinnerInput[2];
 
 			if (orderedRows.size() > 0 && orderedCols.size() > 0) {
 				rowC = "_G" + row_clusterN;
@@ -177,7 +178,7 @@ public class CDTGenerator {
 	 * clustering.
 	 */
 	public void orderHierarchical() {
-
+		
 		if (!choice.contentEquals("Do Not Cluster")) {
 			for (int i = 0; i < orderedRows.size(); i++) {
 
@@ -201,7 +202,7 @@ public class CDTGenerator {
 		} else {
 			rowNameListOrdered.addAll(rowNameList);
 		}
-
+		
 		// order column data and names
 		if (!choice2.contentEquals("Do Not Cluster")) {
 
@@ -241,7 +242,7 @@ public class CDTGenerator {
 	 * clustering.
 	 */
 	public void orderKMeans() {
-
+		
 		if (!choice.contentEquals("Do Not Cluster")) {
 			// Make list of gene names to quickly access indexes
 			final List<String> geneNames = new ArrayList<String>();
@@ -267,7 +268,7 @@ public class CDTGenerator {
 		} else {
 			rowNameListOrdered.addAll(rowNameList);
 		}
-
+		
 		// order column data and names
 		if (!choice2.contentEquals("Do Not Cluster")) {
 			// Make list of gene names to quickly access indexes
@@ -313,7 +314,7 @@ public class CDTGenerator {
 	public void fillHierarchical() {
 
 		final List<String> cdtRowElement1 = new ArrayList<String>();
-
+		
 		if (!choice.contentEquals("Do Not Cluster")) {
 			cdtRowElement1.add("GID");
 		}

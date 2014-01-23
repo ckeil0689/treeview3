@@ -40,11 +40,11 @@ import javax.swing.text.Segment;
  */
 
 public class SummaryViewWizard extends JPanel {
-	private final DendroView2 dendroView;
+	private final DendroView dendroView;
 	private final GeneListPanel geneListPanel;
 	private final JRadioButton selectionButton, listButton;
 
-	public SummaryViewWizard(final DendroView2 dendroView) {
+	public SummaryViewWizard(final DendroView dendroView) {
 		this.dendroView = dendroView;
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		geneListPanel = new GeneListPanel();

@@ -3,8 +3,6 @@ package Cluster;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JProgressBar;
-
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.model.TVModel;
 
@@ -19,19 +17,21 @@ public class DataFormatter {
 
 	// Instance variables
 	private final TVModel model;
+	private final ClusterView clusterView;
 	private final List<Double> list;
-	private final JProgressBar pBar;
+	private final int rowPBar = 1;
+	private final int colPBar = 3;
 
 	private final List<List<Double>> rowList = new ArrayList<List<Double>>();
 	private final List<List<Double>> colList = new ArrayList<List<Double>>();
 
 	// Constructor (building the object)
-	public DataFormatter(final DataModel model, final List<Double> list,
-			final JProgressBar pBar) {
+	public DataFormatter(final DataModel model, final ClusterView clusterView, 
+			final List<Double> list) {
 
 		this.model = (TVModel) model;
+		this.clusterView = clusterView;
 		this.list = list;
-		this.pBar = pBar;
 	}
 
 	// extracting rows from raw data array
@@ -41,13 +41,13 @@ public class DataFormatter {
 		int upper = 0;
 
 		// number of arrays
-		final int max = model.nExpr();
+		final int max = list.size() / model.nExpr();
 
-		pBar.setMaximum(list.size() / max);
+		clusterView.setPBarMax(max, rowPBar);
 
 		for (int i = 0; i < list.size() / max; i++) {
 
-			pBar.setValue(i);
+			clusterView.updatePBar(i, rowPBar);
 
 			upper += max;
 
@@ -68,16 +68,16 @@ public class DataFormatter {
 	public void splitColumns() {
 
 		// Number of arrays/ columns
-		final int max = model.nExpr();
+		final int max = list.size() / model.nExpr();
 		final int nGenes = model.nGene();
 
 		// Setting up ProgressBar
-		pBar.setMaximum(list.size() / max);
+		clusterView.setPBarMax(max, colPBar);
 
 		// Iterate through all columns
 		for (int j = 0; j < max; j++) {
 
-			pBar.setValue(j);
+			clusterView.updatePBar(j, colPBar);
 
 			final List<Double> sArray = new ArrayList<Double>();
 

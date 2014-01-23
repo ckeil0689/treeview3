@@ -8,7 +8,7 @@ package edu.stanford.genetics.treeview.core;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.ViewFrame;
-import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
+import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 
 /**
  * @author aloksaldanha
@@ -23,7 +23,7 @@ public class GeneFinderPanel extends HeaderFinderPanel {
 	 * @param hI
 	 * @param geneSelection
 	 */
-	public GeneFinderPanel(final ViewFrame f, final DendroView2 dv,
+	public GeneFinderPanel(final ViewFrame f, final DendroView dv,
 			final HeaderInfo hI, final TreeSelectionI geneSelection) {
 
 		super(f, hI, geneSelection, "Row");

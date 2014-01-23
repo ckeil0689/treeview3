@@ -103,18 +103,16 @@ public class MapContainer extends Observable implements Observer,
 
 	public void setHome() {
 
-		final double pixels = current.getAvailablePixels();
-		final double divider = current.getMaxIndex() - current.getMinIndex()
-				+ 1;
+		final double pixels = getAvailablePixels();
+		final double divider = getMaxIndex() - getMinIndex();
 		minScale = pixels / divider;
 		setScale(minScale);
 	}
 
 	public void setMinScale() {
 
-		final double pixels = current.getAvailablePixels();
-		final double divider = current.getMaxIndex() - current.getMinIndex()
-				+ 1;
+		final double pixels = getAvailablePixels();
+		final double divider = getMaxIndex() - getMinIndex();
 		minScale = roundScale(pixels/ divider);
 	}
 
@@ -155,7 +153,7 @@ public class MapContainer extends Observable implements Observer,
 			newScale = minScale;
 		}
 
-		this.setScale(newScale);
+		setScale(newScale);
 	}
 
 	/**
@@ -198,7 +196,7 @@ public class MapContainer extends Observable implements Observer,
 			newScale = maxScale;
 		}
 
-		this.setScale(newScale);
+		setScale(newScale);
 	}
 
 	/**

@@ -16,7 +16,7 @@ import javax.swing.JScrollPane;
 
 import edu.stanford.genetics.treeview.model.CDTCreator2;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
-import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
+import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
 import edu.stanford.genetics.treeview.plugin.dendroview.DoubleArrayDrawer;
 import edu.stanford.genetics.treeview.plugin.dendroview.FontSettingsPanel;
@@ -30,7 +30,7 @@ public class PreferencesMenu extends JFrame {
 	
 	private TreeViewFrame viewFrame;
 	private JPanel leftPanel;
-	private DendroView2 dendroView;
+	private DendroView dendroView;
 	private JButton ok_button;
 	
 	// Menus
@@ -49,7 +49,7 @@ public class PreferencesMenu extends JFrame {
 		this(viewFrame, null);
 	}
 	
-	public PreferencesMenu(TreeViewFrame viewFrame, DendroView2 dendroView) {
+	public PreferencesMenu(TreeViewFrame viewFrame, DendroView dendroView) {
 		
 		super("Preferences");
 		
@@ -58,8 +58,16 @@ public class PreferencesMenu extends JFrame {
 		
 		// Setting preferred size for the ContentPane of this frame
 		final Dimension mainDim = GUIParams.getScreenSize();
-		getContentPane().setPreferredSize(new Dimension(mainDim.width * 1/3, 
-				mainDim.height * 3/4));
+		
+		int width = mainDim.width * 1/2;
+		
+		if(width > 640) {
+			width = 640;
+		}
+		
+		int height = mainDim.height * 3/4;
+		
+		getContentPane().setPreferredSize(new Dimension(width, height));
 		
 		setLayout(new MigLayout());
 		
@@ -313,7 +321,9 @@ public class PreferencesMenu extends JFrame {
 			
 			if (viewFrame.getDataModel() != null 
 					&& viewFrame.getRunning() != null) {
-				viewFrame.getConfirmPanel().setupLayout();
+				if(viewFrame.getConfirmPanel() != null) {
+					viewFrame.getConfirmPanel().setupLayout();
+				}
 				viewFrame.getRunning().refresh();
 
 			} else if (viewFrame.getDataModel() != null 

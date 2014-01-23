@@ -619,6 +619,16 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 			dragRect.setSize(endPoint.x - dragRect.x, endPoint.y - dragRect.y);
 
 			drawBand(dragRect);
+			
+		} else if (SwingUtilities.isRightMouseButton(e)) {
+			geneSelection.setSelectedNode(null);
+			geneSelection.deselectAllIndexes();
+
+			arraySelection.setSelectedNode(null);
+			arraySelection.deselectAllIndexes();
+
+			geneSelection.notifyObservers();
+			arraySelection.notifyObservers();
 		}
 	}
 

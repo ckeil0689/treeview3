@@ -177,82 +177,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		// Setting up the interactive components so they can be added 
 		// to the layout.
 		setupInteractiveComponents();
-
-//		// Component for similarity measure options
-//		similarityPanel = new JPanel();
-//		similarityPanel.setLayout(new MigLayout());
-//		similarityPanel.setOpaque(false);
-//		
-//		JLabel similarity = new JLabel("Similarity Metric");
-//		similarity.setFont(GUIParams.FONTL);
-//		similarity.setForeground(GUIParams.ELEMENT);
-//
-//		// Labels
-//		JLabel head2 = new JLabel("Rows:");
-//		head2.setFont(GUIParams.FONTS);
-//		head2.setForeground(GUIParams.TEXT);
-//
-//		JLabel head3 = new JLabel("Columns:");
-//		head3.setFont(GUIParams.FONTS);
-//		head3.setForeground(GUIParams.TEXT);
-//		
-//		similarityPanel.add(similarity, "w 100%, span, wrap");
-//		similarityPanel.add(head2, "h 10%, w 10%");
-//		similarityPanel.add(geneCombo, "w 40%, wrap");
-//		similarityPanel.add(head3, "h 10%, w 10%");
-//		similarityPanel.add(arrayCombo, "w 40%");
-//		
-//		// Component for linkage choices
-//		linkagePanel = new JPanel();
-//		linkagePanel.setLayout(new MigLayout());
-//		linkagePanel.setOpaque(false);
-//
-//		// Label
-//		JLabel method = new JLabel("Linkage Method");
-//		method.setFont(GUIParams.FONTL);
-//		method.setForeground(GUIParams.ELEMENT);
-//
-//		// Clickable Panel to call InfoFrame
-//		infoIcon = new ClickableIcon(viewFrame, GUIParams.QUESTIONICON);
-//		
-//		linkagePanel.add(method, "span, wrap");
-//		linkagePanel.add(clusterChoice, "w 40%");
-//		linkagePanel.add(infoIcon, "w 10%");
-//		
-//		// Component for K-Means options
-//		kMeansPanel = new JPanel();
-//		kMeansPanel.setLayout(new MigLayout());
-//		kMeansPanel.setOpaque(false);
-//		
-//		JLabel kMeans = new JLabel("K-Means Options");
-//		kMeans.setFont(GUIParams.FONTL);
-//		kMeans.setForeground(GUIParams.ELEMENT);
-//
-//		JLabel clusters = new JLabel("Clusters: ");
-//		clusters.setFont(GUIParams.FONTS);
-//		clusters.setForeground(GUIParams.TEXT);
-//
-//		JLabel its = new JLabel("Iterations: ");
-//		its.setFont(GUIParams.FONTS);
-//		its.setForeground(GUIParams.TEXT);
-//		
-//		kMeansPanel.add(kMeans, "span, wrap");
-//		
-//		kMeansPanel.add(clusters, "w 10%, h 15%");
-//		kMeansPanel.add(enterRC, "w 5%");
-//		kMeansPanel.add(enterCC, "w 5%, wrap");
-//
-//		kMeansPanel.add(its, "w 10%, h 15%");
-//		kMeansPanel.add(enterRIt, "w 5%");
-//		kMeansPanel.add(enterCIt, "w 5%");
-
-//		// ProgressBar Component
-//		loadPanel = new JPanel();
-//		loadPanel.setLayout(new MigLayout());
-//		loadPanel.setOpaque(false);
-//		loadPanel.setBorder(BorderFactory.createLineBorder(GUIParams.BORDERS,
-//				EtchedBorder.LOWERED));
-
+		
 		setupInnerPanels();
 		setOptionsPanel(hierarchical);
 		setMainPanel();
@@ -274,8 +199,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	 * Sets the JPanels to null because JVM does not garbage-collect Swing
 	 * components unless the parent frame is disposed.
 	 */
-	@Override
-	public void refresh() {
+	public void reset() {
 
 		scrollPane = null;
 		mainPanel = null;
@@ -287,6 +211,15 @@ public class ClusterView extends JPanel implements MainPanel {
 		loadPanel = null;
 		
 		setupLayout();
+	}
+	
+	/**
+	 * Revalidates and repaints the mainPanel.
+	 */
+	public void refresh() {
+		
+		mainPanel.revalidate();
+		mainPanel.repaint();
 	}
 	
 	/**
@@ -614,41 +547,6 @@ public class ClusterView extends JPanel implements MainPanel {
 
 		this.root = root;
 	}
-
-	// Empty methods
-	@Override
-	public void populateSettingsMenu(final TreeviewMenuBarI menubar) {
-	}
-
-	@Override
-	public void populateAnalysisMenu(final TreeviewMenuBarI menubar) {
-	}
-
-	@Override
-	public void populateExportMenu(final TreeviewMenuBarI menubar) {
-	}
-
-	@Override
-	public void scrollToGene(final int i) {
-	}
-
-	@Override
-	public void scrollToArray(final int i) {
-	}
-
-	@Override
-	public ImageIcon getIcon() {
-
-		return null;
-	}
-
-	@Override
-	public void export(final MainProgramArgs args) throws ExportException {
-	}
-
-	@Override
-	public void syncConfig() {
-	}
 	
 	// Implementing methods to connect with Controller
 	/**
@@ -672,6 +570,8 @@ public class ClusterView extends JPanel implements MainPanel {
 
 		setOptionsPanel(hierarchical);
 		setMainPanel();
+		
+		scrollPane.setViewportView(mainPanel);
 
 		mainPanel.revalidate();
 		mainPanel.repaint();
@@ -693,8 +593,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	 */
 	public void visualizeData() {
 		
-		final JFrame topFrame = (JFrame) SwingUtilities
-				.getWindowAncestor(this);
+		JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
 		
 		final FileSet fileSet = new FileSet(file.getName(), file
 				.getParent() + File.separator);
@@ -823,7 +722,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		TextDisplay error2 = new TextDisplay(hint2);
 		TextDisplay error3 = new TextDisplay(hint3);
 
-		loadPanel.add(error1, "w 90%, alignx 50%, span, wrap");
+		loadPanel.add(error1, "pushx, w 90%, alignx 50%, span, wrap");
 		loadPanel.add(error2, "w 90%, span, wrap");
 		loadPanel.add(error3, "w 90%, span");
 		
@@ -911,21 +810,97 @@ public class ClusterView extends JPanel implements MainPanel {
 		return spinnerValues;
 	}
 	
+//	/**
+//	 * Returns the loaded ProgressBars used as indicators in clustering.
+//	 * @return
+//	 */
+//	public JProgressBar[] getProgressBars() {
+//		
+//		int pbars = 4;
+//		JProgressBar[] progressbarArray = new JProgressBar[pbars];
+//		
+//		progressbarArray[0] = pBar;
+//		progressbarArray[1] = pBar2;
+//		progressbarArray[2] = pBar3;
+//		progressbarArray[3] = pBar4;
+//		
+//		return progressbarArray;
+//	}
+	
 	/**
-	 * Returns the loaded ProgressBars used as indicators in clustering.
-	 * @return
+	 * Sets the maximum for the JProgressBar to be used.
+	 * pBarNum specifies which of the 4 pBars in ClusterView is addressed.
+	 * @param max
+	 * @param pBarNum
 	 */
-	public JProgressBar[] getProgressBars() {
+	public void setPBarMax(int max, int pBarNum) {
 		
-		int pbars = 4;
-		JProgressBar[] progressbarArray = new JProgressBar[pbars];
+		switch(pBarNum) {
 		
-		progressbarArray[0] = pBar;
-		progressbarArray[1] = pBar2;
-		progressbarArray[2] = pBar3;
-		progressbarArray[3] = pBar4;
+		case 1:	pBar.setMaximum(max);
+				break;
+		case 2:	pBar2.setMaximum(max);
+				break;
+		case 3:	pBar3.setMaximum(max);
+				break;
+		case 4:	pBar4.setMaximum(max);
+				break;
+		}
+	}
+	
+	/**
+	 * Updates the value of the specified JProgressBar in ClusterView.
+	 * @param i
+	 * @param pBarNum
+	 */
+	public void updatePBar(int i, int pBarNum) {
 		
-		return progressbarArray;
+		switch(pBarNum) {
+		
+		case 1:	pBar.setValue(i);
+				break;
+		case 2:	pBar2.setValue(i);
+				break;
+		case 3:	pBar3.setValue(i);
+				break;
+		case 4:	pBar4.setValue(i);
+				break;
+		}
+	}
+	
+	// Empty methods
+	@Override
+	public void populateSettingsMenu(final TreeviewMenuBarI menubar) {
+	}
+
+	@Override
+	public void populateAnalysisMenu(final TreeviewMenuBarI menubar) {
+	}
+
+	@Override
+	public void populateExportMenu(final TreeviewMenuBarI menubar) {
+	}
+
+	@Override
+	public void scrollToGene(final int i) {
+	}
+
+	@Override
+	public void scrollToArray(final int i) {
+	}
+
+	@Override
+	public ImageIcon getIcon() {
+
+		return null;
+	}
+
+	@Override
+	public void export(final MainProgramArgs args) throws ExportException {
+	}
+
+	@Override
+	public void syncConfig() {
 	}
 
 }

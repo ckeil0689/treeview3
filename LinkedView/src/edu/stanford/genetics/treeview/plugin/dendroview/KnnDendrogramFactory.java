@@ -50,7 +50,7 @@ public class KnnDendrogramFactory extends PluginFactory {
 
 		// DendroView dendroView = new KnnDendroView(
 		// (KnnModel) viewFrame.getDataModel(), node, viewFrame);
-		final DendroView2 dendroView = new KnnDendroView2(
+		final DendroView dendroView = new KnnDendroView2(
 				viewFrame.getDataModel(), node, viewFrame);
 		dendroView.setName(getPluginName());
 		return dendroView;
