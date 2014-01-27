@@ -117,6 +117,7 @@ public abstract class HeaderFinderPanel extends JPanel {
 		AutoCompleteDecorator.decorate(genefBox);
 		
 		genefButton = GUIParams.setButtonLayout(null, "searchIcon");
+		genefButton.setToolTipText("Highlights the selected label.");
 		genefButton.addActionListener(new ActionListener() {
 
 			@Override

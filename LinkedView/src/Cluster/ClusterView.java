@@ -98,14 +98,17 @@ public class ClusterView extends JPanel implements MainPanel {
 	private JButton cluster_button;
 	private JButton cancel_button;
 	private JButton dendro_button;
+	
 	private JSpinner enterRC;
 	private JSpinner enterCC;
 	private JSpinner enterRIt;
 	private JSpinner enterCIt;
+	
 	private JProgressBar pBar;
 	private JProgressBar pBar2;
 	private JProgressBar pBar3;
 	private JProgressBar pBar4;
+	
 	private ClickableIcon infoIcon;
 
 	private String path;

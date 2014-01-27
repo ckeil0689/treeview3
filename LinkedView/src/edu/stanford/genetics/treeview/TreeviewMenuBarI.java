@@ -26,6 +26,7 @@ public abstract class TreeviewMenuBarI {
 	public static final String mruSubMenu = "Recent Files";
 	public static final String clusterSubMenu = "Cluster";
 	public static final String vizSubMenu = "Visualize";
+	public static final String prefSubMenu = "Preferences";
 
 	/**
 	 * this will make the newly added menu current

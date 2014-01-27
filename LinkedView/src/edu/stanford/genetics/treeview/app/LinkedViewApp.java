@@ -36,6 +36,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.MainPanel;
 import edu.stanford.genetics.treeview.MainProgramArgs;
 import edu.stanford.genetics.treeview.TreeViewApp;
+import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.Util;
 import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.XmlConfig;
@@ -134,7 +135,8 @@ public class LinkedViewApp extends TreeViewApp {
 	public ViewFrame openNew() {
 
 		// setup toplevel
-		final LinkedViewFrame tvFrame = new LinkedViewFrame(this);
+//		final LinkedViewFrame tvFrame = new LinkedViewFrame(this);
+		final TreeViewFrame tvFrame = new TreeViewFrame(this);
 		tvFrame.addWindowListener(this);
 		return tvFrame;
 	}
@@ -144,7 +146,9 @@ public class LinkedViewApp extends TreeViewApp {
 	public ViewFrame openNew(final FileSet fileSet) throws LoadException {
 
 		// setup toplevel
-		final LinkedViewFrame tvFrame = new LinkedViewFrame(this);
+//		final LinkedViewFrame tvFrame = new LinkedViewFrame(this);
+		final TreeViewFrame tvFrame = new TreeViewFrame(this);
+		
 		try {
 			tvFrame.loadFileSet(fileSet);
 			tvFrame.setLoaded(true);
@@ -165,7 +169,9 @@ public class LinkedViewApp extends TreeViewApp {
 	public ViewFrame openNewNW(final FileSet fileSet) throws LoadException {
 
 		// setup toplevel
-		final LinkedViewFrame tvFrame = new LinkedViewFrame(this);
+//		final LinkedViewFrame tvFrame = new LinkedViewFrame(this);
+		final TreeViewFrame tvFrame = new TreeViewFrame(this);
+		
 		if (fileSet != null) {
 			try {
 				tvFrame.loadFileSetNW(fileSet);
@@ -261,6 +267,10 @@ public class LinkedViewApp extends TreeViewApp {
 	 */
 	public static void main(final String astring[]) {
 
+		System.setProperty("apple.laf.useScreenMenuBar", "true");
+        System.setProperty("com.apple.mrj.application.apple.menu.about.name", 
+        		"TreeView3");
+        
 		final LinkedViewApp statView = new LinkedViewApp();
 		// statView.dealWithRegistration();
 

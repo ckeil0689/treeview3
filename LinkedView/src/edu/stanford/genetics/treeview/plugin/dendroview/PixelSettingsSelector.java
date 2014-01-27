@@ -116,10 +116,10 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 		
 		pixels.add(GUIParams.setupHeader("Pixel Scale"), "span, wrap");
 
-		m_xscale = new ScalePanel(m_xmap, "X:");
-		pixels.add(m_xscale, "pushx, growx");
-		m_yscale = new ScalePanel(m_ymap, "Y:");
-		pixels.add(m_yscale, "pushx");
+		m_xscale = new ScalePanel(m_xmap, "X-Scale:");
+		pixels.add(m_xscale, "w 50%");
+		m_yscale = new ScalePanel(m_ymap, "Y-Scale:");
+		pixels.add(m_yscale, "w 50%");
 
 		if (m_xZmap != null && m_yZmap != null) {
 
@@ -166,8 +166,8 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 
 		private static final long serialVersionUID = 1L;
 
-		private final ButtonGroup type;
-		private final JRadioButton fixed, fill;
+		//private final ButtonGroup type;
+		//private final JRadioButton fixed, fill;
 		private final JTextField value;
 		private final MapContainer ymap;
 
@@ -178,50 +178,50 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 			this.setLayout(new MigLayout());
 			this.setOpaque(false);
 
-			this.add(makeLabel(title), "span, wrap");
+			add(makeLabel(title), "span, wrap");
 
-			type = new ButtonGroup();
-			fixed = new JRadioButton("Fixed Scale");
-			fixed.setForeground(GUIParams.TEXT);
-			fixed.setOpaque(false);
-			type.add(fixed);
-			this.add(fixed);
+//			type = new ButtonGroup();
+//			fixed = new JRadioButton("Fixed Scale");
+//			fixed.setForeground(GUIParams.TEXT);
+//			fixed.setOpaque(false);
+//			type.add(fixed);
+//			this.add(fixed);
 
 			value = new JTextField(Double.toString(ymap.getScale()), 5);
-			this.add(value, "growx, wrap");
+			add(value, "w 95%, wrap");
 
-			fill = new JRadioButton("Fill");
-			fill.setForeground(GUIParams.TEXT);
-			fill.setOpaque(false);
-			type.add(fill);
-			this.add(fill, "span");
+//			fill = new JRadioButton("Fill");
+//			fill.setForeground(GUIParams.TEXT);
+//			fill.setOpaque(false);
+//			type.add(fill);
+//			this.add(fill, "span");
 
-			if (xmc.getCurrent().type().equals("Fixed")) {
-				fixed.setSelected(true);
-				// type.setSelectedCheckbox(fixed);
-
-			} else {
-				fill.setSelected(true);
-				// type.setSelectedCheckbox(fill);
-
-			}
-
-			fill.addItemListener(new ItemListener() {
-
-				@Override
-				public void itemStateChanged(final ItemEvent evt) {
-
-					ScalePanel.this.updateCheck();
-				}
-			});
-
-			fixed.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent evt) {
-
-					ScalePanel.this.updateCheck();
-				}
-			});
+//			if (xmc.getCurrent().type().equals("Fixed")) {
+//				fixed.setSelected(true);
+//				// type.setSelectedCheckbox(fixed);
+//
+//			} else {
+//				fill.setSelected(true);
+//				// type.setSelectedCheckbox(fill);
+//
+//			}
+//
+//			fill.addItemListener(new ItemListener() {
+//
+//				@Override
+//				public void itemStateChanged(final ItemEvent evt) {
+//
+//					ScalePanel.this.updateCheck();
+//				}
+//			});
+//
+//			fixed.addItemListener(new ItemListener() {
+//				@Override
+//				public void itemStateChanged(final ItemEvent evt) {
+//
+//					ScalePanel.this.updateCheck();
+//				}
+//			});
 
 			value.getDocument().addDocumentListener(new DocumentListener() {
 
@@ -245,24 +245,24 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 			});
 		}
 
-		public void updateCheck() {
-
-			if (fixed.isSelected()) {
-				ymap.setMap("Fixed");
-				value.setEnabled(true);
-
-			} else {
-				ymap.setMap("Fill");
-				value.setEnabled(false);
-			}
-
-			value.setText(Double.toString(ymap.getScale()));
-			ymap.notifyObservers();
-		}
+//		public void updateCheck() {
+//
+//			if (fixed.isSelected()) {
+//				ymap.setMap("Fixed");
+//				value.setEnabled(true);
+//
+//			} else {
+//				ymap.setMap("Fill");
+//				value.setEnabled(false);
+//			}
+//
+//			value.setText(Double.toString(ymap.getScale()));
+//			ymap.notifyObservers();
+//		}
 
 		public void updateValue() {
 
-			if (fixed.isSelected()) {
+			//if (fixed.isSelected()) {
 				try {
 					final Double d = new Double(value.getText());
 					ymap.setScale(d.doubleValue());
@@ -272,7 +272,7 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 					// do nothing if the format is bad...
 				}
 			}
-		}
+		//}
 	}
 
 	@Override

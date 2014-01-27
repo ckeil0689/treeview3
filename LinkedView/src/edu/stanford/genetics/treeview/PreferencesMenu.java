@@ -44,12 +44,13 @@ public class PreferencesMenu extends JFrame {
 	 * Chained constructor in case DendroView isn't available
 	 * @param viewFrame
 	 */
-	public PreferencesMenu(TreeViewFrame viewFrame) {
+	public PreferencesMenu(TreeViewFrame viewFrame, String menuTitle) {
 		
-		this(viewFrame, null);
+		this(viewFrame, null, menuTitle);
 	}
 	
-	public PreferencesMenu(TreeViewFrame viewFrame, DendroView dendroView) {
+	public PreferencesMenu(TreeViewFrame viewFrame, DendroView dendroView, 
+			String menuTitle) {
 		
 		super("Preferences");
 		
@@ -82,7 +83,7 @@ public class PreferencesMenu extends JFrame {
 			}
 		});
 		
-		setupLayout();
+		setupLayout(menuTitle);
 		
 		pack();
 		setLocationRelativeTo(viewFrame);
@@ -91,7 +92,7 @@ public class PreferencesMenu extends JFrame {
 	/**
 	 * Sets up the layout for the menu.
 	 */
-	public void setupLayout() {
+	public void setupLayout(String startMenu) {
 		
 		getContentPane().removeAll();
 		
@@ -116,7 +117,27 @@ public class PreferencesMenu extends JFrame {
 		setupMenuHeaders();
 		
 		getContentPane().add(leftPanel, "pushy, aligny 0%, w 20%, h 75%");
-		getContentPane().add(themeSettings, "w 79%, h 95%, wrap");
+		
+		if(startMenu.equalsIgnoreCase("Theme") && themeSettings != null) {
+			getContentPane().add(themeSettings, "w 79%, h 95%, wrap");
+		
+		} else if(startMenu.equalsIgnoreCase("Fonts") 
+				&& fontSettings != null) {
+			getContentPane().add(fontSettings, "w 79%, h 95%, wrap");
+			
+		} else if(startMenu.equalsIgnoreCase("URL") 
+				&& urlSettings != null) {
+			getContentPane().add(urlSettings, "w 79%, h 95%, wrap");
+		
+		} else if(startMenu.equalsIgnoreCase("Labels") 
+				&& annotationSettings != null) {
+			getContentPane().add(annotationSettings, "w 79%, h 95%, wrap");
+			
+		} else if(startMenu.equalsIgnoreCase("Heat Map") 
+				&& pixelSettings != null) {
+			getContentPane().add(pixelSettings, "w 79%, h 95%, wrap");
+		}
+		
 		getContentPane().add(ok_button, "pushx, alignx 100%, span");
 		
 		validate();
@@ -204,19 +225,13 @@ public class PreferencesMenu extends JFrame {
 			panel.setLayout(new MigLayout());
 			panel.setBackground(GUIParams.BG_COLOR);
 			
-			final FontSettingsPanel genePanel = new FontSettingsPanel(
-					dendroView.getTextview());
-
-			final FontSettingsPanel arrayPanel = new FontSettingsPanel(
-					dendroView.getArraynameview());
+			final FontSettingsPanel fontChangePanel = new FontSettingsPanel(
+					dendroView.getTextview(), dendroView.getArraynameview());
 			
-			JLabel rowFont = GUIParams.setupHeader("Row Font");
-			JLabel colFont = GUIParams.setupHeader("Column Font");
+			JLabel labelFont = GUIParams.setupHeader("Set Label Font:");
 			
-			panel.add(rowFont, "span, wrap");
-			panel.add(genePanel, "pushx, alignx 50%, w 95%, wrap");
-			panel.add(colFont, "span, wrap");
-			panel.add(arrayPanel, "pushx, alignx 50%, w 95%");
+			panel.add(labelFont, "span, wrap");
+			panel.add(fontChangePanel, "pushx, alignx 50%, w 95%");
 			
 			setViewportView(panel);
 		}
@@ -317,7 +332,7 @@ public class PreferencesMenu extends JFrame {
 		
 		public void resetTheme() {
 			
-			PreferencesMenu.this.setupLayout();
+			PreferencesMenu.this.setupLayout("Theme");
 			
 			if (viewFrame.getDataModel() != null 
 					&& viewFrame.getRunning() != null) {
@@ -333,6 +348,8 @@ public class PreferencesMenu extends JFrame {
 			} else {
 				viewFrame.setupLayout();
 			}
+			
+			PreferencesMenu.this.dispose();
 		}
 	}
 	

@@ -386,7 +386,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 				}
 			}
 		} else {
-			l1.setText("Zoom for Names");
+			l1.setText("Zoom to show Column Labels");
 		}
 		// end of if
 	}

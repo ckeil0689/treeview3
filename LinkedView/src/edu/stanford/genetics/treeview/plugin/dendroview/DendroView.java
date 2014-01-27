@@ -428,6 +428,7 @@ ComponentListener, MainPanel, Observer {
 		
 		//Buttons
 		scaleDefaultAll = GUIParams.setButtonLayout(null, "homeIcon");
+		scaleDefaultAll.setToolTipText("Resets the zoomed view.");
 		scaleDefaultAll.addActionListener(new ActionListener() {
 
 			@Override
@@ -439,6 +440,7 @@ ComponentListener, MainPanel, Observer {
 		});
 
 		scaleIncX = GUIParams.setButtonLayout(null, "zoomInIcon");
+		scaleIncX.setToolTipText("Zooms in on X-axis.");
 		scaleIncX.addActionListener(new ActionListener() {
 
 			@Override
@@ -449,6 +451,7 @@ ComponentListener, MainPanel, Observer {
 		});
 
 		scaleDecX = GUIParams.setButtonLayout(null, "zoomOutIcon");
+		scaleDecX .setToolTipText("Zooms out of X-axis.");
 		scaleDecX.addActionListener(new ActionListener() {
 
 			@Override
@@ -459,6 +462,7 @@ ComponentListener, MainPanel, Observer {
 		});
 
 		scaleIncY = GUIParams.setButtonLayout(null, "zoomInIcon");
+		scaleIncY.setToolTipText("Zooms in on Y-axis.");
 		scaleIncY.addActionListener(new ActionListener() {
 
 			@Override
@@ -469,6 +473,7 @@ ComponentListener, MainPanel, Observer {
 		});
 
 		scaleDecY = GUIParams.setButtonLayout(null, "zoomOutIcon");
+		scaleDecY.setToolTipText("Zooms out of Y-axis.");
 		scaleDecY.addActionListener(new ActionListener() {
 
 			@Override
@@ -478,8 +483,9 @@ ComponentListener, MainPanel, Observer {
 			}
 		});
 		
-		zoomButton = GUIParams.setButtonLayout("Zoom Selection", 
+		zoomButton = GUIParams.setButtonLayout("Zoom On Selection", 
 				"fullscreenIcon");
+		zoomButton.setToolTipText("Zooms into the selected area.");
 		zoomButton.addActionListener(new ActionListener() {
 
 			@Override
@@ -561,19 +567,20 @@ ComponentListener, MainPanel, Observer {
 				"alignx 50%");
 
 		navPanel.add(buttonPanel, "pushy, h 30%, w 90%, alignx 50%, " +
-				"aligny 50%");
+				"aligny 0%, wrap");
+		navPanel.add(finderPanel, "pushy, h 30%, w 90%, alignx 50%, " +
+				"aligny 0%");
 		
 		add(statuspanel, "w 20%, h 20%");
 		add(atrPane, "w 62%, h 20%");
-		add(fillPanel1, "w 1%, h 20%");
-		add(finderPanel, "w 17%, h 20%, wrap");
-		add(gtrPane, "w 20%, h 79%");
-		add(globalview, "w 62%, h 79%");
-		add(globalYscrollbar, "w 1%, h 79%");
-		add(navPanel, "w 17%, h 79%, wrap");
-		add(fillPanel2, "w 20%, h 1%");
-		add(globalXscrollbar, "w 62%, h 1%");
-		add(fillPanel3, "span 2, w 18%, h 1%");
+		add(fillPanel1, "span 2, w 18%, h 20%, wrap");
+		add(gtrPane, "w 20%, h 75%");
+		add(globalview, "w 62%, h 75%");
+		add(globalYscrollbar, "w 1%, h 75%");
+		add(navPanel, "w 17%, h 75%, wrap");
+		add(fillPanel2, "w 20%, h 5%");
+		add(globalXscrollbar, "pushy, aligny 0%, w 62%, h 1%");
+		add(fillPanel3, "span 2, w 18%, h 5%");
 		
 		// Ensuring window resizing works with GlobalView
 		globalXmap.setHome();
@@ -1255,7 +1262,8 @@ ComponentListener, MainPanel, Observer {
 					@Override
 					public void actionPerformed(final ActionEvent actionEvent) {
 
-						final PostscriptColorBarExportPanel gcbPanel = new PostscriptColorBarExportPanel(
+						final PostscriptColorBarExportPanel gcbPanel = 
+								new PostscriptColorBarExportPanel(
 								((DoubleArrayDrawer) arrayDrawer)
 										.getColorExtractor());
 
@@ -1275,7 +1283,8 @@ ComponentListener, MainPanel, Observer {
 			@Override
 			public void actionPerformed(final ActionEvent actionEvent) {
 
-				final BitmapColorBarExportPanel gcbPanel = new BitmapColorBarExportPanel(
+				final BitmapColorBarExportPanel gcbPanel = 
+						new BitmapColorBarExportPanel(
 						((DoubleArrayDrawer) arrayDrawer).getColorExtractor());
 
 				gcbPanel.setSourceSet(getDataModel().getFileSet());
@@ -1408,97 +1417,97 @@ ComponentListener, MainPanel, Observer {
 	@Override
 	public void populateAnalysisMenu(final TreeviewMenuBarI menu) {
 
-		menu.addMenuItem("Flip Array Tree Node", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent ae) {
-
-				if (getGtrview().hasFocus()) {
-
-					flipSelectedGTRNode();
-				} else {
-
-					flipSelectedATRNode();
-				}
-			}
-		});
-		menu.setAccelerator(KeyEvent.VK_L);
-		menu.setMnemonic(KeyEvent.VK_A);
-
-		menu.addMenuItem("Flip Gene Tree Node", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent ae) {
-
-				flipSelectedGTRNode();
-			}
-		});
-		menu.setMnemonic(KeyEvent.VK_G);
-
-		menu.addMenuItem("Align to Tree...", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent ae) {
-
-				try {
-
-					final FileSet fileSet = offerATRFileSelection();
-					final AtrTVModel atrModel = makeAtrModel(fileSet);
-
-					alignAtrToModel(atrModel);
-				} catch (final LoadException e) {
-
-					if ((e.getType() != LoadException.INTPARSE)
-							&& (e.getType() != LoadException.NOFILE)) {
-						LogBuffer.println("Could not open file: "
-								+ e.getMessage());
-						e.printStackTrace();
-					}
-				}
-			}
-		});
-		menu.setAccelerator(KeyEvent.VK_A);
-		menu.setMnemonic(KeyEvent.VK_G);
-
-		menu.addMenuItem("Compare to...", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent ae) {
-
-				try {
-
-					final FileSet fileSet = offerATRFileSelection();
-					final TVModel tvModel = makeCdtModel(fileSet);
-					compareToModel(tvModel);
-				} catch (final LoadException e) {
-
-					if ((e.getType() != LoadException.INTPARSE)
-							&& (e.getType() != LoadException.NOFILE)) {
-						LogBuffer.println("Could not open file: "
-								+ e.getMessage());
-						e.printStackTrace();
-					}
-				}
-			}
-		});
-		menu.setAccelerator(KeyEvent.VK_C);
-		menu.setMnemonic(KeyEvent.VK_C);
-
-		menu.addMenuItem("Remove comparison", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent ae) {
-
-				getDataModel().removeAppended();
-				globalXmap.setIndexRange(0, getDataModel().getDataMatrix()
-						.getNumCol() - 1);
-				globalXmap.notifyObservers();
-
-				((Observable) getDataModel()).notifyObservers();
-			}
-		});
-		menu.setAccelerator(KeyEvent.VK_R);
-		menu.setMnemonic(KeyEvent.VK_R);
+//		menu.addMenuItem("Flip Array Tree Node", new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent ae) {
+//
+//				if (getGtrview().hasFocus()) {
+//
+//					flipSelectedGTRNode();
+//				} else {
+//
+//					flipSelectedATRNode();
+//				}
+//			}
+//		});
+//		menu.setAccelerator(KeyEvent.VK_L);
+//		menu.setMnemonic(KeyEvent.VK_A);
+//
+//		menu.addMenuItem("Flip Gene Tree Node", new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent ae) {
+//
+//				flipSelectedGTRNode();
+//			}
+//		});
+//		menu.setMnemonic(KeyEvent.VK_G);
+//
+//		menu.addMenuItem("Align to Tree...", new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent ae) {
+//
+//				try {
+//
+//					final FileSet fileSet = offerATRFileSelection();
+//					final AtrTVModel atrModel = makeAtrModel(fileSet);
+//
+//					alignAtrToModel(atrModel);
+//				} catch (final LoadException e) {
+//
+//					if ((e.getType() != LoadException.INTPARSE)
+//							&& (e.getType() != LoadException.NOFILE)) {
+//						LogBuffer.println("Could not open file: "
+//								+ e.getMessage());
+//						e.printStackTrace();
+//					}
+//				}
+//			}
+//		});
+//		menu.setAccelerator(KeyEvent.VK_A);
+//		menu.setMnemonic(KeyEvent.VK_G);
+//
+//		menu.addMenuItem("Compare to...", new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent ae) {
+//
+//				try {
+//
+//					final FileSet fileSet = offerATRFileSelection();
+//					final TVModel tvModel = makeCdtModel(fileSet);
+//					compareToModel(tvModel);
+//				} catch (final LoadException e) {
+//
+//					if ((e.getType() != LoadException.INTPARSE)
+//							&& (e.getType() != LoadException.NOFILE)) {
+//						LogBuffer.println("Could not open file: "
+//								+ e.getMessage());
+//						e.printStackTrace();
+//					}
+//				}
+//			}
+//		});
+//		menu.setAccelerator(KeyEvent.VK_C);
+//		menu.setMnemonic(KeyEvent.VK_C);
+//
+//		menu.addMenuItem("Remove comparison", new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent ae) {
+//
+//				getDataModel().removeAppended();
+//				globalXmap.setIndexRange(0, getDataModel().getDataMatrix()
+//						.getNumCol() - 1);
+//				globalXmap.notifyObservers();
+//
+//				((Observable) getDataModel()).notifyObservers();
+//			}
+//		});
+//		menu.setAccelerator(KeyEvent.VK_R);
+//		menu.setMnemonic(KeyEvent.VK_R);
 
 		// menu.addMenuItem("Summary Window...",new ActionListener() {
 		// public void actionPerformed(ActionEvent e) {
@@ -1523,16 +1532,25 @@ ComponentListener, MainPanel, Observer {
 	@Override
 	public void populateSettingsMenu(final TreeviewMenuBarI menu) {
 		
-		menu.addMenuItem("Preferences", new ActionListener() {
+		final TreeViewFrame tvFrame = (TreeViewFrame) viewFrame;
+		
+		menu.addMenuItem("Row/ Column Labels", new ActionListener() {
 
 			@Override
 			public void actionPerformed(final ActionEvent arg0) {
 				
-				PreferencesMenu preferences = new PreferencesMenu(
-						(TreeViewFrame)viewFrame, DendroView.this);
-				preferences.setVisible(true);
+				tvFrame.openPrefMenu("Labels");
 			}
 		}, 0);
+		
+		menu.addMenuItem("Heat Map", new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent arg0) {
+				
+				tvFrame.openPrefMenu("Heat Map");
+			}
+		}, 1);
 
 //		menu.addMenuItem("Pixel Settings...", new ActionListener() {
 //

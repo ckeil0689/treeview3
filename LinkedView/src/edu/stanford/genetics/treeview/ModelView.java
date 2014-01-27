@@ -211,7 +211,7 @@ public abstract class ModelView extends JPanel implements java.util.Observer,
 			try {
 				if (status != null) {
 					status.setMessages(getStatus());
-				}
+				} 
 			} catch (final Exception ex) {
 				JOptionPane.showMessageDialog(this, ex.toString());
 			}

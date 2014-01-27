@@ -64,17 +64,19 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 	private static final long serialVersionUID = 1L;
 
 	private final FontSelectable client;
+	private final FontSelectable client2;
 	private JComboBox font_choice;
 	private JComboBox style_choice;
 	private NatField size_field;
-	private JButton display_button;
 	private JLabel exampleField;
 
 	String size_prop, face_prop, style_prop;
 
-	public FontSettingsPanel(final FontSelectable fs) {
+	public FontSettingsPanel(final FontSelectable fs, 
+			final FontSelectable fs2) {
 
 		client = fs;
+		client2 = fs2;
 		setupWidgets();
 		updateExample();
 	}
@@ -85,8 +87,9 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 		final UrlExtractor ue = new UrlExtractor(hi);
 
 		final FontSelectable fs = new TextView(hi, ue);
+		final FontSelectable fs2 = new ArrayNameView(hi);
 		fs.setPoints(10);
-		final FontSettingsPanel e = new FontSettingsPanel(fs);
+		final FontSettingsPanel e = new FontSettingsPanel(fs, fs2);
 		final JFrame f = new JFrame("Font Settings Test");
 		f.add(e);
 		f.addWindowListener(new WindowAdapter() {
@@ -189,12 +192,14 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 		font_choice.setEditable(true);
 		AutoCompleteDecorator.decorate(font_choice);
 		font_choice.setSelectedItem(client.getFace());
+		font_choice.addActionListener(new SelectionListener());
 	}
 
 	private void setupStyleChoice() {
 
 		style_choice = GUIParams.setComboLayout(styles);
 		style_choice.setSelectedItem(decode_style(client.getStyle()));
+		style_choice.addActionListener(new SelectionListener());
 	}
 
 	private void synchronizeClient() {
@@ -206,6 +211,10 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 		client.setFace(string);
 		client.setStyle(i);
 		client.setPoints(size);
+		
+		client2.setFace(string);
+		client2.setStyle(i);
+		client2.setPoints(size);
 	}
 
 	/**
@@ -224,19 +233,8 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 		add(style_choice, "pushx");
 
 		size_field = new NatField(client.getPoints(), 3);
+		size_field.addActionListener(new SelectionListener());
 		add(size_field, "pushx, wrap");
-
-		display_button = GUIParams.setButtonLayout("Set", null);
-		display_button.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent actionEvent) {
-
-				updateExample();
-				synchronizeClient();
-			}
-		});
-		add(display_button, "push");
 		
 		exampleField = new JLabel("Font Example Text");
 		exampleField.setForeground(GUIParams.TEXT);
@@ -273,5 +271,23 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 			});
 			add(close_button);
 		}
+	}
+	
+	/**
+	 * Listener to remove need for a button. When the user chooses a value
+	 * for a Swing component with this listener, the font is automatically
+	 * updated.
+	 * @author CKeil
+	 *
+	 */
+	class SelectionListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			
+			updateExample();
+			synchronizeClient();
+		}
+		
 	}
 }

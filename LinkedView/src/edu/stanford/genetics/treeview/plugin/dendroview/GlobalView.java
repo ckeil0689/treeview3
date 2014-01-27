@@ -179,8 +179,7 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 				if (geneHI != null) {
 					final int realGene = overy;
 					try {
-						statustext[0] += " (" + geneHI.getHeader(realGene, 1)
-								+ ")";
+						statustext[0] += geneHI.getHeader(realGene, 1);
 
 					} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 						statustext[0] += " (N/A)";
@@ -189,8 +188,7 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 				statustext[1] = "Column: ";// + (overx + 1);
 				if (arrayHI != null) {
 					try {
-						statustext[1] += " (" + arrayHI.getHeader(overx, 0)
-								+ ")";
+						statustext[1] += arrayHI.getHeader(overx, 0);
 
 					} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 						statustext[1] += " (N/A)";
@@ -630,6 +628,18 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 			geneSelection.notifyObservers();
 			arraySelection.notifyObservers();
 		}
+	}
+	
+	@Override
+	public void mouseExited(final MouseEvent e) {
+		
+		hasMouse = false;
+		
+		statustext[0] = "Row: -";
+		statustext[1] = "Column: -";
+		statustext[2] = "Value: -";
+		
+		status.setMessages(statustext);
 	}
 
 	@Override

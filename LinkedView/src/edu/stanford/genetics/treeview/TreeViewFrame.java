@@ -7,13 +7,19 @@
  * $Name:  $
  *
  * This file is part of Java TreeView
- * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
+ * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. 
+ * Modified by Alex Segal 2004/08/13. Modifications Copyright (C) 
+ * Lawrence Berkeley Lab.
  *
  * This software is provided under the GNU GPL Version 2. In particular, 
  *
- * 1) If you modify a source file, make a comment in it containing your name and the date.
+ * 1) If you modify a source file, make a comment in it containing your name 
+ * and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
- * 3) Developers are encouraged but not required to notify the Java TreeView maintainers at alok@genome.stanford.edu when they make a useful addition. It would be nice if significant contributions could be merged into the main distribution.
+ * 3) Developers are encouraged but not required to notify the Java TreeView 
+ * maintainers at alok@genome.stanford.edu when they make a useful addition. 
+ * It would be nice if significant contributions could be merged into 
+ * the main distribution.
  *
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
@@ -501,9 +507,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			programMenu = new ProgramMenu(); // rebuilt when fileMru notifies
 			menubar.addMenu(TreeviewMenuBarI.documentMenu);
 			menubar.setMenuMnemonic(KeyEvent.VK_S);
-			populateSettingsMenu(menubar);
-			menubar.addMenu(TreeviewMenuBarI.viewsMenu);
-			menubar.setMenuMnemonic(KeyEvent.VK_C);
+			//populateSettingsMenu(menubar);
 			menubar.addMenu(TreeviewMenuBarI.analysisMenu);
 			menubar.setMenuMnemonic(KeyEvent.VK_A);
 			menubar.addMenu(TreeviewMenuBarI.exportMenu);
@@ -540,9 +544,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			populateAnalysisMenu(menubar);
 			menubar.setMenu(TreeviewMenuBarI.exportMenu);
 			populateExportMenu(menubar);
-			// populate views menu when data is loaded
-			menubar.setMenu(TreeviewMenuBarI.viewsMenu);
-			populateViewsMenu(menubar);
 
 			if (running != null) {
 				menubar.setMenu(TreeviewMenuBarI.documentMenu);
@@ -597,66 +598,66 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	}
 
 	// Setting up dendro menu
-	protected void populateViewsMenu(final TreeviewMenuBarI menubar) {
-
-		final JDialog dialog = new JDialog(TreeViewFrame.this);
-		dialog.setLocationRelativeTo(null);
-		dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-
-		final JPanel panel = new JPanel();
-		panel.setLayout(new MigLayout());
-		panel.setBackground(GUIParams.BG_COLOR);
-
-		final JLabel l1 = new JLabel("Please load data first.");
-		l1.setFont(GUIParams.FONTS);
-		l1.setForeground(GUIParams.TEXT);
-
-		menubar.addSubMenu(TreeviewMenuBarI.clusterSubMenu);
-		menubar.addMenuItem("Hierarchical", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-
-				if (dataModel != null) {
-					setupClusterView(true);
-
-				} else {
-					dialog.setVisible(true);
-				}
-			}
-
-		});
-		menubar.addMenuItem("K-Means", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-
-				if (dataModel != null) {
-					setupClusterView(false);
-
-				} else {
-					dialog.setVisible(true);
-				}
-			}
-		});
-
-		menubar.setMenu(TreeviewMenuBarI.viewsMenu);
-		menubar.addSubMenu("Visualize");
-		menubar.addMenuItem("Display Clustergram", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-
-				if (dataModel != null) {
-					TreeViewFrame.this.setDataModel(dataModel);//, false, true);
-					TreeViewFrame.this.setLoaded(true);
-
-				} else {
-					dialog.setVisible(true);
-				}
-			}
-		});
-	}
+//	protected void populateViewsMenu(final TreeviewMenuBarI menubar) {
+//
+//		final JDialog dialog = new JDialog(TreeViewFrame.this);
+//		dialog.setLocationRelativeTo(null);
+//		dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+//
+//		final JPanel panel = new JPanel();
+//		panel.setLayout(new MigLayout());
+//		panel.setBackground(GUIParams.BG_COLOR);
+//
+//		final JLabel l1 = new JLabel("Please load data first.");
+//		l1.setFont(GUIParams.FONTS);
+//		l1.setForeground(GUIParams.TEXT);
+//
+//		menubar.addSubMenu(TreeviewMenuBarI.clusterSubMenu);
+//		menubar.addMenuItem("Hierarchical", new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent arg0) {
+//
+//				if (dataModel != null) {
+//					setupClusterView(true);
+//
+//				} else {
+//					dialog.setVisible(true);
+//				}
+//			}
+//
+//		});
+//		menubar.addMenuItem("K-Means", new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent e) {
+//
+//				if (dataModel != null) {
+//					setupClusterView(false);
+//
+//				} else {
+//					dialog.setVisible(true);
+//				}
+//			}
+//		});
+//
+//		menubar.setMenu(TreeviewMenuBarI.viewsMenu);
+//		menubar.addSubMenu("Visualize");
+//		menubar.addMenuItem("Display Clustergram", new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent arg0) {
+//
+//				if (dataModel != null) {
+//					TreeViewFrame.this.setDataModel(dataModel);//, false, true);
+//					TreeViewFrame.this.setLoaded(true);
+//
+//				} else {
+//					dialog.setVisible(true);
+//				}
+//			}
+//		});
+//	}
 	
 	/**
 	 * Opens the ClusterViewFrame with either the options for hierarchical
@@ -688,73 +689,81 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 */
 	protected void populateSettingsMenu(final TreeviewMenuBarI menubar) {
 
-		if(running == null) {
-			menubar.addMenuItem("Preferences", new ActionListener() {
-	
-				@Override
-				public void actionPerformed(final ActionEvent arg0) {
-					
-					PreferencesMenu preferences = new PreferencesMenu(
-							TreeViewFrame.this);
-					preferences.setVisible(true);
-				}
-			});
-		}
-		menubar.addSeparator();
-		
 		menubar.setMenu(TreeviewMenuBarI.documentMenu);
-		menubar.addMenuItem("Gene Url", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent actionEvent) {
-
-				if (presetsPanel == null) {
-					setupPresetsPanel();
-				}
-
-				presetsPanel.synchronizeFrom();
-				presetsPanel.setSelectedIndex(0);
-				presetsFrame.setVisible(true);
-			}
-		});
-		menubar.setAccelerator(KeyEvent.VK_P);
-		menubar.setMnemonic(KeyEvent.VK_G);
-
-		menubar.addMenuItem("Array Url", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent actionEvent) {
-				if (presetsPanel == null) {
-					setupPresetsPanel();
-				}
-				presetsPanel.synchronizeFrom();
-				presetsPanel.setSelectedIndex(1);
-				presetsFrame.setVisible(true);
-			}
-		});
-		menubar.setMnemonic(KeyEvent.VK_A);
-
-		final PluginFactory[] plugins = PluginManager.getPluginManager()
-				.getPluginFactories();
-
-		if (plugins.length == 0) {
-			menubar.addMenuItem("Color", new ActionListener() {
-
-				@Override
-				public void actionPerformed(final ActionEvent actionEvent) {
-					if (presetsPanel == null)
-						setupPresetsPanel();
-					presetsPanel.synchronizeFrom();
-					presetsPanel.setSelectedIndex(2);
-					presetsFrame.setVisible(true);
-				}
-			});
-			menubar.setMnemonic(KeyEvent.VK_C);
+		
+		if(running == null) {
+			menubar.setEnabled(false);
+			
 		} else {
-			for (int i = 0; i < plugins.length; i++) {
-				plugins[i].addPluginConfig(menubar, this);
-			}
+			menubar.setEnabled(true);
 		}
+		
+//		if(running == null) {
+//			menubar.addMenuItem("Preferences", new ActionListener() {
+//	
+//				@Override
+//				public void actionPerformed(final ActionEvent arg0) {
+//					
+//					PreferencesMenu preferences = new PreferencesMenu(
+//							TreeViewFrame.this, "Theme");
+//					preferences.setVisible(true);
+//				}
+//			});
+//		}
+//		menubar.addSeparator();
+		
+//		menubar.addMenuItem("Gene Url", new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent actionEvent) {
+//
+//				if (presetsPanel == null) {
+//					setupPresetsPanel();
+//				}
+//
+//				presetsPanel.synchronizeFrom();
+//				presetsPanel.setSelectedIndex(0);
+//				presetsFrame.setVisible(true);
+//			}
+//		});
+//		menubar.setAccelerator(KeyEvent.VK_P);
+//		menubar.setMnemonic(KeyEvent.VK_G);
+//
+//		menubar.addMenuItem("Array Url", new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent actionEvent) {
+//				if (presetsPanel == null) {
+//					setupPresetsPanel();
+//				}
+//				presetsPanel.synchronizeFrom();
+//				presetsPanel.setSelectedIndex(1);
+//				presetsFrame.setVisible(true);
+//			}
+//		});
+//		menubar.setMnemonic(KeyEvent.VK_A);
+//
+//		final PluginFactory[] plugins = PluginManager.getPluginManager()
+//				.getPluginFactories();
+//
+//		if (plugins.length == 0) {
+//			menubar.addMenuItem("Color", new ActionListener() {
+//
+//				@Override
+//				public void actionPerformed(final ActionEvent actionEvent) {
+//					if (presetsPanel == null)
+//						setupPresetsPanel();
+//					presetsPanel.synchronizeFrom();
+//					presetsPanel.setSelectedIndex(2);
+//					presetsFrame.setVisible(true);
+//				}
+//			});
+//			menubar.setMnemonic(KeyEvent.VK_C);
+//		} else {
+//			for (int i = 0; i < plugins.length; i++) {
+//				plugins[i].addPluginConfig(menubar, this);
+//			}
+//		}
 
 		// menubar.addSeparator();
 		//
@@ -859,25 +868,98 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 */
 	protected void populateAnalysisMenu(final TreeviewMenuBarI menubar2) {
 
-		menubar.addMenuItem("Find Genes...", new ActionListener() {
+//		menubar.addMenuItem("Find Genes...", new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent actionEvent) {
+//
+//				getGeneFinder().setVisible(true);
+//			}
+//		});
+//		menubar.setAccelerator(KeyEvent.VK_G);
+//
+//		menubar.addMenuItem("Find Arrays...", new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent actionEvent) {
+//
+//				getArrayFinder().setVisible(true);
+//			}
+//		});
+//		menubar.setAccelerator(KeyEvent.VK_A);
+		
+		final JDialog dialog = new JDialog(TreeViewFrame.this);
+		dialog.setLocationRelativeTo(TreeViewFrame.this);
+		dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+
+		final JPanel panel = new JPanel();
+		panel.setLayout(new MigLayout());
+		panel.setBackground(GUIParams.BG_COLOR);
+
+		final JLabel l1 = new JLabel("Not yet added.");
+		l1.setFont(GUIParams.FONTS);
+		l1.setForeground(GUIParams.TEXT);
+		
+		panel.add(l1, "push, alignx 50%");
+		dialog.add(panel);
+
+		menubar.addSubMenu(TreeviewMenuBarI.clusterSubMenu);
+		menubar.addMenuItem("Hierarchical", new ActionListener() {
 
 			@Override
-			public void actionPerformed(final ActionEvent actionEvent) {
+			public void actionPerformed(final ActionEvent arg0) {
 
-				getGeneFinder().setVisible(true);
+				if (dataModel != null) {
+					setupClusterView(true);
+
+				} else {
+					dialog.setVisible(true);
+				}
 			}
-		});
-		menubar.setAccelerator(KeyEvent.VK_G);
 
-		menubar.addMenuItem("Find Arrays...", new ActionListener() {
+		});
+		menubar.addMenuItem("K-Means", new ActionListener() {
 
 			@Override
-			public void actionPerformed(final ActionEvent actionEvent) {
+			public void actionPerformed(final ActionEvent e) {
 
-				getArrayFinder().setVisible(true);
+				if (dataModel != null) {
+					setupClusterView(false);
+
+				} else {
+					dialog.setVisible(true);
+				}
 			}
 		});
-		menubar.setAccelerator(KeyEvent.VK_A);
+
+		menubar.setMenu(TreeviewMenuBarI.analysisMenu);
+		menubar.addSubMenu("Visualize");
+		menubar.addMenuItem("Display Clustergram", new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent arg0) {
+
+				if (dataModel != null) {
+					TreeViewFrame.this.setDataModel(dataModel);
+					TreeViewFrame.this.setLoaded(true);
+
+				} else {
+					dialog.setVisible(true);
+				}
+			}
+		});
+		
+		menubar.setMenu(TreeviewMenuBarI.analysisMenu);
+		menubar.addSeparator();
+		
+		menubar.addMenuItem("Functional Enrichment", new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent arg0) {
+
+				dialog.setVisible(true);
+			}
+		});
 
 		menubar.addMenuItem("Stats...", new ActionListener() {
 
@@ -1444,19 +1526,19 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 				menubar.setMenuMnemonic(KeyEvent.VK_R);
 				menubar.setMenu(TreeviewMenuBarI.programMenu);
 
-				menubar.addMenuItem("Edit Recent Files...",
-						new ActionListener() {
-
-							@Override
-							public void actionPerformed(
-									final ActionEvent actionEvent) {
-
-								final FileMruEditor fme = new FileMruEditor(
-										fileMru);
-								fme.showDialog(TreeViewFrame.this);
-							}
-						});
-				menubar.setMnemonic(KeyEvent.VK_E);
+//				menubar.addMenuItem("Edit Recent Files...",
+//						new ActionListener() {
+//
+//							@Override
+//							public void actionPerformed(
+//									final ActionEvent actionEvent) {
+//
+//								final FileMruEditor fme = new FileMruEditor(
+//										fileMru);
+//								fme.showDialog(TreeViewFrame.this);
+//							}
+//						});
+//				menubar.setMnemonic(KeyEvent.VK_E);
 
 				// menubar.addMenuItem("Edit Preferences...",
 				// new ActionListener() {
@@ -1468,6 +1550,41 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 				// menubar.setMnemonic(KeyEvent.VK_P);
 
 				menubar.addSeparator();
+				
+				if(running == null) {
+					menubar.addSubMenu(TreeviewMenuBarI.prefSubMenu);
+					
+					menubar.addMenuItem("Theme", new ActionListener() {
+			
+						@Override
+						public void actionPerformed(final ActionEvent arg0) {
+							
+							openPrefMenu("Theme");
+						}
+					});
+					
+//					menubar.addMenuItem("Fonts", new ActionListener() {
+//						
+//						@Override
+//						public void actionPerformed(final ActionEvent arg0) {
+//							
+//							openPrefMenu("Fonts");
+//						}
+//					});
+//					
+//					menubar.addMenuItem("URL", new ActionListener() {
+//						
+//						@Override
+//						public void actionPerformed(final ActionEvent arg0) {
+//							
+//							openPrefMenu("URL");
+//						}
+//					});
+				}
+				
+				menubar.setMenu(TreeviewMenuBarI.programMenu);
+				menubar.addSeparator();
+				
 				menubar.addMenuItem("Quit Program", new ActionListener() {
 					@Override
 					public void actionPerformed(final ActionEvent actionEvent) {
@@ -1507,6 +1624,22 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 							new FileSet(aconfigNode[j - 1]));
 					menubar.addMenuItem(astring[j - 1], fileMenuListener);
 				}
+				
+				menubar.addSeparator();
+				menubar.addMenuItem("Edit Recent Files...", 
+						new ActionListener() {
+
+							@Override
+							public void actionPerformed(
+									final ActionEvent actionEvent) {
+
+								final FileMruEditor fme = new FileMruEditor(
+										fileMru);
+								fme.showDialog(TreeViewFrame.this);
+							}
+						});
+				
+				menubar.setMnemonic(KeyEvent.VK_E);
 			}
 			/*
 			 * add(mruItem);
@@ -1515,6 +1648,25 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			 * 
 			 * add(exitItem);
 			 */
+		}
+	}
+	
+	/**
+	 * Opens the preferences menu and sets the displayed menu to
+	 * the specified option using a string as identification.
+	 * @param menu
+	 */
+	public void openPrefMenu(String menu) {
+		
+		if(running == null || !(running instanceof DendroView)) {
+			PreferencesMenu preferences = new PreferencesMenu(
+					TreeViewFrame.this, menu);
+			preferences.setVisible(true);
+		
+		} else {
+			PreferencesMenu preferences = new PreferencesMenu(
+					TreeViewFrame.this, (DendroView)running, menu);
+			preferences.setVisible(true);
 		}
 	}
 
