@@ -587,22 +587,19 @@ ComponentListener, MainPanel, Observer {
 		globalYmap.setHome();
 	}
 
+	// Methods
+	
 	@Override
 	public void refresh() {
-
-		if(dataModel != null) {
-			setupViews();
-			doDoubleLayout();
-	
-			this.revalidate();
-			this.repaint();
 		
-		} else {
-			return;
-		}
+		removeAll();
+		setupViews();
+		doDoubleLayout();
+		
+		revalidate();
+		repaint();
 	}
-
-	// Methods
+	
 	private int[] getGroupVector(final HeaderInfo headerInfo,
 			final int groupIndex) {
 

@@ -29,6 +29,7 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -535,8 +536,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			menubar.setEnabled(true);
 			menubar.setMenu(TreeviewMenuBarI.exportMenu);
 			menubar.removeAll();
-			menubar.setMenu(TreeviewMenuBarI.viewsMenu);
-			menubar.removeAll();
 		}
 
 		if (getLoaded()) {
@@ -544,12 +543,15 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			populateAnalysisMenu(menubar);
 			menubar.setMenu(TreeviewMenuBarI.exportMenu);
 			populateExportMenu(menubar);
+			menubar.setMenu(TreeviewMenuBarI.programMenu);
 
 			if (running != null) {
+				programMenu.populatePreferencesMenu(menubar);
 				menubar.setMenu(TreeviewMenuBarI.documentMenu);
 				menubar.removeAll();
 				populateSettingsMenu(menubar);
 				running.populateSettingsMenu(menubar);
+				menubar.setMenu(TreeviewMenuBarI.programMenu);
 				menubar.setMenu(TreeviewMenuBarI.analysisMenu);
 				running.populateAnalysisMenu(menubar);
 				menubar.setMenu(TreeviewMenuBarI.exportMenu);
@@ -596,68 +598,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		presetsFrame.getContentPane().add(innerPanel);
 		presetsFrame.pack();
 	}
-
-	// Setting up dendro menu
-//	protected void populateViewsMenu(final TreeviewMenuBarI menubar) {
-//
-//		final JDialog dialog = new JDialog(TreeViewFrame.this);
-//		dialog.setLocationRelativeTo(null);
-//		dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-//
-//		final JPanel panel = new JPanel();
-//		panel.setLayout(new MigLayout());
-//		panel.setBackground(GUIParams.BG_COLOR);
-//
-//		final JLabel l1 = new JLabel("Please load data first.");
-//		l1.setFont(GUIParams.FONTS);
-//		l1.setForeground(GUIParams.TEXT);
-//
-//		menubar.addSubMenu(TreeviewMenuBarI.clusterSubMenu);
-//		menubar.addMenuItem("Hierarchical", new ActionListener() {
-//
-//			@Override
-//			public void actionPerformed(final ActionEvent arg0) {
-//
-//				if (dataModel != null) {
-//					setupClusterView(true);
-//
-//				} else {
-//					dialog.setVisible(true);
-//				}
-//			}
-//
-//		});
-//		menubar.addMenuItem("K-Means", new ActionListener() {
-//
-//			@Override
-//			public void actionPerformed(final ActionEvent e) {
-//
-//				if (dataModel != null) {
-//					setupClusterView(false);
-//
-//				} else {
-//					dialog.setVisible(true);
-//				}
-//			}
-//		});
-//
-//		menubar.setMenu(TreeviewMenuBarI.viewsMenu);
-//		menubar.addSubMenu("Visualize");
-//		menubar.addMenuItem("Display Clustergram", new ActionListener() {
-//
-//			@Override
-//			public void actionPerformed(final ActionEvent arg0) {
-//
-//				if (dataModel != null) {
-//					TreeViewFrame.this.setDataModel(dataModel);//, false, true);
-//					TreeViewFrame.this.setLoaded(true);
-//
-//				} else {
-//					dialog.setVisible(true);
-//				}
-//			}
-//		});
-//	}
 	
 	/**
 	 * Opens the ClusterViewFrame with either the options for hierarchical
@@ -866,7 +806,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 * 
 	 * @param menubar2
 	 */
-	protected void populateAnalysisMenu(final TreeviewMenuBarI menubar2) {
+	protected void populateAnalysisMenu(final TreeviewMenuBarI menubar) {
 
 //		menubar.addMenuItem("Find Genes...", new ActionListener() {
 //
@@ -889,6 +829,11 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 //		menubar.setAccelerator(KeyEvent.VK_A);
 		
 		final JDialog dialog = new JDialog(TreeViewFrame.this);
+		
+		Dimension screenSize = GUIParams.getScreenSize();
+		dialog.setSize(new Dimension(screenSize.width * 1/2, 
+				screenSize.height * 1/2));
+		
 		dialog.setLocationRelativeTo(TreeViewFrame.this);
 		dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
@@ -896,7 +841,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		panel.setLayout(new MigLayout());
 		panel.setBackground(GUIParams.BG_COLOR);
 
-		final JLabel l1 = new JLabel("Not yet added.");
+		final JLabel l1 = new JLabel("Work in progress.");
 		l1.setFont(GUIParams.FONTS);
 		l1.setForeground(GUIParams.TEXT);
 		
@@ -1524,72 +1469,25 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 				menubar.addSubMenu(TreeviewMenuBarI.mruSubMenu);
 				menubar.setMenuMnemonic(KeyEvent.VK_R);
+				
 				menubar.setMenu(TreeviewMenuBarI.programMenu);
-
-//				menubar.addMenuItem("Edit Recent Files...",
-//						new ActionListener() {
-//
-//							@Override
-//							public void actionPerformed(
-//									final ActionEvent actionEvent) {
-//
-//								final FileMruEditor fme = new FileMruEditor(
-//										fileMru);
-//								fme.showDialog(TreeViewFrame.this);
-//							}
-//						});
-//				menubar.setMnemonic(KeyEvent.VK_E);
-
-				// menubar.addMenuItem("Edit Preferences...",
-				// new ActionListener() {
-				// public void actionPerformed(ActionEvent actionEvent) {
-				// getApp().getPrefs().showEditor();
-				// getApp().getGlobalConfig().store();
-				// }
-				// });
-				// menubar.setMnemonic(KeyEvent.VK_P);
 
 				menubar.addSeparator();
 				
-				if(running == null) {
-					menubar.addSubMenu(TreeviewMenuBarI.prefSubMenu);
-					
-					menubar.addMenuItem("Theme", new ActionListener() {
-			
-						@Override
-						public void actionPerformed(final ActionEvent arg0) {
-							
-							openPrefMenu("Theme");
-						}
-					});
-					
-//					menubar.addMenuItem("Fonts", new ActionListener() {
-//						
-//						@Override
-//						public void actionPerformed(final ActionEvent arg0) {
-//							
-//							openPrefMenu("Fonts");
-//						}
-//					});
-//					
-//					menubar.addMenuItem("URL", new ActionListener() {
-//						
-//						@Override
-//						public void actionPerformed(final ActionEvent arg0) {
-//							
-//							openPrefMenu("URL");
-//						}
-//					});
-				}
+				menubar.addSubMenu(TreeviewMenuBarI.prefSubMenu);
+				
+				populatePreferencesMenu(menubar);
 				
 				menubar.setMenu(TreeviewMenuBarI.programMenu);
 				menubar.addSeparator();
 				
 				menubar.addMenuItem("Quit Program", new ActionListener() {
+					
 					@Override
 					public void actionPerformed(final ActionEvent actionEvent) {
 						try {
 							treeView.closeAllWindows();
+							
 						} catch (final Exception e) {
 							System.out
 									.println("While trying to exit, got error "
@@ -1620,8 +1518,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 				final String astring[] = fileMru.getFileNames();
 
 				for (int j = aconfigNode.length; j > 0; j--) {
-					final FileMenuListener fileMenuListener = new FileMenuListener(
-							new FileSet(aconfigNode[j - 1]));
+					final FileMenuListener fileMenuListener = 
+							new FileMenuListener(new FileSet(aconfigNode[j 
+							                                             - 1]));
 					menubar.addMenuItem(astring[j - 1], fileMenuListener);
 				}
 				
@@ -1649,7 +1548,53 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			 * add(exitItem);
 			 */
 		}
+		
+		public void populatePreferencesMenu(final TreeviewMenuBarI menubar) {
+
+			menubar.setSubMenu(TreeviewMenuBarI.prefSubMenu);
+			menubar.removeAll();
+			
+			if(running == null) {
+				menubar.addMenuItem("Theme", new ActionListener() {
+		
+					@Override
+					public void actionPerformed(final ActionEvent arg0) {
+						
+						openPrefMenu("Theme");
+					}
+				});
+			} else {
+				menubar.addMenuItem("Theme", new ActionListener() {
+					
+					@Override
+					public void actionPerformed(final ActionEvent arg0) {
+						
+						openPrefMenu("Theme");
+					}
+				});
+				
+				menubar.addMenuItem("Fonts", new ActionListener() {
+					
+					@Override
+					public void actionPerformed(final ActionEvent arg0) {
+						
+						openPrefMenu("Fonts");
+					}
+				});
+				
+				menubar.addMenuItem("URL", new ActionListener() {
+					
+					@Override
+					public void actionPerformed(final ActionEvent arg0) {
+						
+						openPrefMenu("URL");
+					}
+				});
+			}
+		}
 	}
+	
+
 	
 	/**
 	 * Opens the preferences menu and sets the displayed menu to

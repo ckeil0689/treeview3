@@ -78,6 +78,7 @@ public class FUOptionsPanel extends JPanel implements SettingsPanel {
 
 	public FUOptionsPanel(final FontSelectable fs, final UrlExtractor ue,
 			final UrlPresets up, final HeaderInfo hi) {
+		
 		fontSelectable = fs;
 		urlExtractor = ue;
 		urlPresets = up;
@@ -151,7 +152,7 @@ public class FUOptionsPanel extends JPanel implements SettingsPanel {
 
 		gbc.gridy = 1;
 		gbc.gridx = 1;
-		innerPanel.add(new FontSettingsPanel(fontSelectable), gbc);
+		innerPanel.add(new FontSettingsPanel(fontSelectable, null), gbc);
 
 		gbc.gridy = 3;
 		gbc.weightx = 100;

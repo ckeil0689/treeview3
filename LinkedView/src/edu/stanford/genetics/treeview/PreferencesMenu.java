@@ -339,7 +339,9 @@ public class PreferencesMenu extends JFrame {
 				if(viewFrame.getConfirmPanel() != null) {
 					viewFrame.getConfirmPanel().setupLayout();
 				}
-				viewFrame.getRunning().refresh();
+				//viewFrame.getRunning().refresh();
+				viewFrame.setupRunning();
+				viewFrame.setLoaded(true);
 
 			} else if (viewFrame.getDataModel() != null 
 					&& viewFrame.getRunning() == null) {
