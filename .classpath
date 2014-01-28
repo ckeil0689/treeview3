@@ -2,13 +2,13 @@
 <classpath>
 	<classpathentry kind="src" path="LinkedView/src"/>
 	<classpathentry kind="src" path="resources"/>
-	<classpathentry kind="lib" path="LinkedView/compile_lib/jarbundler-1.8.1.jar"/>
-	<classpathentry kind="lib" path="LinkedView/compile_lib/xercesImpl.jar"/>
 	<classpathentry kind="lib" path="LinkedView/compile_lib/xml-apis.jar"/>
-	<classpathentry kind="lib" path="LinkedView/lib/nanoxml-2.2.2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="C:/Users/CKeil/Work/JavaTV3/lib/commons-math3-3.2.jar"/>
-	<classpathentry kind="lib" path="C:/Users/CKeil/Work/JavaTV3/lib/miglayout-4.0-swing.jar"/>
-	<classpathentry kind="lib" path="lib/swingx-core-1.6.2-AutoCompletition.jar"/>
+	<classpathentry kind="lib" path="compile_lib/commons-math3-3.2.jar"/>
+	<classpathentry kind="lib" path="compile_lib/jarbundler-1.8.1.jar"/>
+	<classpathentry kind="lib" path="compile_lib/miglayout-4.0-swing.jar"/>
+	<classpathentry kind="lib" path="compile_lib/nanoxml-2.2.2.jar"/>
+	<classpathentry kind="lib" path="compile_lib/swingx-core-1.6.2-AutoCompletition.jar"/>
+	<classpathentry kind="lib" path="compile_lib/xercesImpl.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
