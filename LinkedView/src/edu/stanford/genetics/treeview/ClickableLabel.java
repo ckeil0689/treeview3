@@ -2,6 +2,7 @@ package edu.stanford.genetics.treeview;
 
 import java.awt.Font;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -93,7 +94,13 @@ public class ClickableLabel extends JPanel {
 			public void mouseClicked(final MouseEvent arg0) {
 
 				if (labelText.equalsIgnoreCase("Load Data >")) {
-					frame.openFile();
+					try {
+						frame.openFile();
+						
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 
 				} else if (labelText.equalsIgnoreCase("Preferences >")) {
 

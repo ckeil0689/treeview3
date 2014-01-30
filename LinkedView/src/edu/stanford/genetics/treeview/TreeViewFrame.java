@@ -73,6 +73,7 @@ import edu.stanford.genetics.treeview.core.MenuHelpPluginsFrame;
 import edu.stanford.genetics.treeview.core.PluginManager;
 import edu.stanford.genetics.treeview.core.TreeViewJMenuBar;
 import edu.stanford.genetics.treeview.model.CDTCreator2;
+import edu.stanford.genetics.treeview.model.CDTCreator3;
 import edu.stanford.genetics.treeview.model.DataModelWriter;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
@@ -344,10 +345,11 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	/**
 	 * This method opens a file dialog to open either the visualization view or
 	 * the cluster view depending on which file type is chosen.
+	 * @throws IOException 
 	 * 
 	 * @throws LoadException
 	 */
-	public void openFile() {
+	public void openFile() throws IOException {
 
 		try {
 			File file = selectFile();
@@ -361,7 +363,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 					fileName.length() - suffixLength, fileName.length());
 
 			if (!fileType.equalsIgnoreCase(".cdt")) {
-				final CDTCreator2 fileChanger = new CDTCreator2(file, fileType);
+				final CDTCreator3 fileChanger = new CDTCreator3(file, fileType);
 				fileChanger.createFile();
 
 				file = new File(fileChanger.getFilePath());
@@ -911,8 +913,10 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 
-				JOptionPane.showMessageDialog(TreeViewFrame.this,
-						new JTextArea(getDataModel().toString()));
+//				JOptionPane.showMessageDialog(TreeViewFrame.this,
+//						new JTextArea(getDataModel().toString()));
+				StatsPanel stats = new StatsPanel(TreeViewFrame.this);
+				stats.setVisible(true);
 			}
 		});
 		menubar.setAccelerator(KeyEvent.VK_S);
@@ -1295,7 +1299,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			panel.add(l4, "pushx, wrap");
 			panel.add(button, "pushx, alignx 50%");
 
-			dialog.add(panel, "push, grow");
+			dialog.add(panel);
 
 			dialog.pack();
 			dialog.setVisible(true);
@@ -1365,7 +1369,13 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 					@Override
 					public void actionPerformed(final ActionEvent actionEvent) {
 
-						openFile();
+						try {
+							openFile();
+							
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 				});
 				menubar.setAccelerator(KeyEvent.VK_O);

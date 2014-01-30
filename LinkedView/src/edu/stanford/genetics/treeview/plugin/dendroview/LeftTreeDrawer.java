@@ -171,7 +171,8 @@ public class LeftTreeDrawer extends TreeDrawer {
 
 			if (dest != null) {
 				minInd = (int) yScaleEq.inverseTransform(dest.y);
-				maxInd = (int) yScaleEq.inverseTransform(dest.y + dest.height) + 1;
+				maxInd = (int) yScaleEq.inverseTransform(dest.y + dest.height) 
+						+ 1;
 			}
 		}
 

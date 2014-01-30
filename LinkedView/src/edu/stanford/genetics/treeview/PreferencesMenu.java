@@ -6,15 +6,18 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import edu.stanford.genetics.treeview.model.CDTCreator2;
+import edu.stanford.genetics.treeview.model.CDTCreator3;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
@@ -412,7 +415,7 @@ public class PreferencesMenu extends JFrame {
 								.substring(fileName.length() - suffixLength, 
 										fileName.length());
 						
-						final CDTCreator2 fileChanger = new CDTCreator2(file, 
+						final CDTCreator3 fileChanger = new CDTCreator3(file, 
 								customFile, fileType);
 						fileChanger.createFile();
 
@@ -423,10 +426,17 @@ public class PreferencesMenu extends JFrame {
 
 						fileSet = viewFrame.getFileMRU().addUnique(fileSet);
 						viewFrame.getFileMRU().setLast(fileSet);
-
-						viewFrame.confirmLoaded();
+						
+						PreferencesMenu.this.dispose();
+						viewFrame.setLoaded(false);
+						viewFrame.setLoaded(true);
+						
+//						viewFrame.confirmLoaded();
 						
 					} catch (LoadException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}

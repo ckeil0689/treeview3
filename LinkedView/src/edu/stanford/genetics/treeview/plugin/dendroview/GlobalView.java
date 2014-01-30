@@ -464,7 +464,7 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 				final Graphics2D g2 = (Graphics2D) g;
 				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 						RenderingHints.VALUE_ANTIALIAS_ON);
-				g2.setColor(Color.white);// GUIParams.RED1);
+				g2.setColor(Color.white);
 				g2.setStroke(new BasicStroke(3));
 				g2.draw(indicatorCircle);
 			}
@@ -596,8 +596,8 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 			LogBuffer.println("GlobalView got weird update : " + o);
 		}
 
-		this.revalidate();
-		this.repaint();
+		revalidate();
+		repaint();
 	}
 
 	// Mouse Listener

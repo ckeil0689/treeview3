@@ -141,7 +141,13 @@ class LoadCheckView extends JPanel {
 				@Override
 				public void actionPerformed(final ActionEvent arg0) {
 
-					viewFrame.openFile();
+					try {
+						viewFrame.openFile();
+						
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 			});
 
@@ -187,7 +193,13 @@ class LoadCheckView extends JPanel {
 				@Override
 				public void actionPerformed(final ActionEvent arg0) {
 
-					viewFrame.openFile();
+					try {
+						viewFrame.openFile();
+						
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 			});
 
