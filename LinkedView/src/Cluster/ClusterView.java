@@ -78,7 +78,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	protected ConfigNode root;
 
 	private TreeViewFrame viewFrame;
-	private boolean hierarchical;
+	//private boolean hierarchical;
 
 	// Various GUI elements
 	private JScrollPane scrollPane;
@@ -126,10 +126,9 @@ public class ClusterView extends JPanel implements MainPanel {
 	 * @param vFrame
 	 *            parent ViewFrame of DendroView
 	 */
-	public ClusterView(final DataModel cVModel, final TreeViewFrame vFrame,
-			final boolean hierarchical) {
+	public ClusterView(final DataModel cVModel, final TreeViewFrame vFrame) {
 
-		this(cVModel, null, vFrame, "Cluster View", hierarchical);
+		this(cVModel, null, vFrame, "Cluster View");
 	}
 
 	/**
@@ -140,9 +139,9 @@ public class ClusterView extends JPanel implements MainPanel {
 	 * @param vFrame
 	 */
 	public ClusterView(final DataModel cVModel, final ConfigNode root,
-			final TreeViewFrame vFrame, final boolean hierarchical) {
+			final TreeViewFrame vFrame) {
 
-		this(cVModel, root, vFrame, "Cluster View", hierarchical);
+		this(cVModel, root, vFrame, "Cluster View");
 	}
 
 	/**
@@ -159,14 +158,12 @@ public class ClusterView extends JPanel implements MainPanel {
 	 *            name of this view.
 	 */
 	public ClusterView (final DataModel dataModel, final ConfigNode root,
-			final TreeViewFrame vFrame, final String name,
-			final boolean hierarchical) {
+			final TreeViewFrame vFrame, final String name) {
 
 		super.setName(name);
 
 		this.dataModel = dataModel;
 		this.viewFrame = vFrame;
-		this.hierarchical = hierarchical;
 
 		// Set layout for initial window
 		setupLayout();
@@ -182,7 +179,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		setupInteractiveComponents();
 		
 		setupInnerPanels();
-		setOptionsPanel(hierarchical);
+		setOptionsPanel();
 		setMainPanel();
 		
 		// make mainpanel scrollable by adding it to scrollpane
@@ -256,12 +253,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		
 		clusterType = GUIParams.setComboLayout(clusterNames);
 		
-		if (hierarchical) {
-			clusterType.setSelectedIndex(0);
-
-		} else {
-			clusterType.setSelectedIndex(1);
-		}
+		clusterType.setSelectedIndex(0);
 		
 		String[] measurements = { "Do Not Cluster",
 				"Pearson Correlation (uncentered)",
@@ -319,7 +311,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	/**
 	 * Sets up general elements of the optionsPanel
 	 */
-	public void setOptionsPanel(boolean hierarchical) {
+	public void setOptionsPanel() {
 
 		// Background Panel for the Cluster Options
 		optionsPanel = new JPanel();
@@ -337,7 +329,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		
 		optionsPanel.add(similarityPanel, "pushy, h 20%, span, wrap");
 
-		if (hierarchical) {
+		if (clusterType.getSelectedIndex() == 0) {
 			optionsPanel.add(linkagePanel, "pushy, h 20%, span, wrap");
 
 		} else {
@@ -571,7 +563,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		mainPanel.removeAll();
 		optionsPanel.removeAll();
 
-		setOptionsPanel(hierarchical);
+		setOptionsPanel();
 		setMainPanel();
 		
 		scrollPane.setViewportView(mainPanel);

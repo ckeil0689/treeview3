@@ -36,8 +36,6 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import edu.stanford.genetics.treeview.model.CDTCreator2;
-
 import net.miginfocom.swing.MigLayout;
 
 /**

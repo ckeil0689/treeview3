@@ -72,7 +72,6 @@ import edu.stanford.genetics.treeview.core.MemMonitor;
 import edu.stanford.genetics.treeview.core.MenuHelpPluginsFrame;
 import edu.stanford.genetics.treeview.core.PluginManager;
 import edu.stanford.genetics.treeview.core.TreeViewJMenuBar;
-import edu.stanford.genetics.treeview.model.CDTCreator2;
 import edu.stanford.genetics.treeview.model.CDTCreator3;
 import edu.stanford.genetics.treeview.model.DataModelWriter;
 import edu.stanford.genetics.treeview.model.TVModel;
@@ -313,7 +312,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 		try {
 			tvModel.loadNew(fileSet);
-			setDataModel(tvModel);//, false, true);
+			setDataModel(tvModel);
 
 		} catch (final LoadException e) {
 			if (e.getType() != LoadException.INTPARSE) {
@@ -363,10 +362,11 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 					fileName.length() - suffixLength, fileName.length());
 
 			if (!fileType.equalsIgnoreCase(".cdt")) {
-				final CDTCreator3 fileChanger = new CDTCreator3(file, fileType);
-				fileChanger.createFile();
+				final CDTCreator3 fileTransformer = new CDTCreator3(file, 
+						fileType);
+				fileTransformer.createFile();
 
-				file = new File(fileChanger.getFilePath());
+				file = new File(fileTransformer.getFilePath());
 			}
 
 			FileSet fileSet = getFileSet(file); // Type: 0 (Auto)
@@ -435,10 +435,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 * Generates a ClusterView object and sets the current running MainPanel to
 	 * it. As a result the View is displayed in the TreeViewFrame
 	 */
-	protected void setupClusterRunning(final boolean hierarchical) {
+	protected void setupClusterRunning() {
 
-		final ClusterView cv = new ClusterView(getDataModel(), this,
-				hierarchical);
+		final ClusterView cv = new ClusterView(getDataModel(), this);
 		running = cv;
 	}
 
@@ -606,12 +605,11 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 * clustering or K-Means, depending on the boolean parameter.
 	 * @param hierarchical
 	 */
-	public void setupClusterView(boolean hierarchical) {
+	public void setupClusterView() {
 		
 		// Making a new Window to display clustering components
 		ClusterViewFrame clusterViewFrame = 
-				new ClusterViewFrame(dataModel, TreeViewFrame.this, 
-						hierarchical);
+				new ClusterViewFrame(dataModel, TreeViewFrame.this);
 		
 		// Creating the Controller for this view.
 		ClusterViewController clusControl = 
@@ -850,45 +848,13 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		panel.add(l1, "push, alignx 50%");
 		dialog.add(panel);
 
-		menubar.addSubMenu(TreeviewMenuBarI.clusterSubMenu);
-		menubar.addMenuItem("Hierarchical", new ActionListener() {
+		menubar.addMenuItem("Cluster", new ActionListener() {
 
 			@Override
 			public void actionPerformed(final ActionEvent arg0) {
 
 				if (dataModel != null) {
-					setupClusterView(true);
-
-				} else {
-					dialog.setVisible(true);
-				}
-			}
-
-		});
-		menubar.addMenuItem("K-Means", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-
-				if (dataModel != null) {
-					setupClusterView(false);
-
-				} else {
-					dialog.setVisible(true);
-				}
-			}
-		});
-
-		menubar.setMenu(TreeviewMenuBarI.analysisMenu);
-		menubar.addSubMenu("Visualize");
-		menubar.addMenuItem("Display Clustergram", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-
-				if (dataModel != null) {
-					TreeViewFrame.this.setDataModel(dataModel);
-					TreeViewFrame.this.setLoaded(true);
+					setupClusterView();
 
 				} else {
 					dialog.setVisible(true);
@@ -1604,8 +1570,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		}
 	}
 	
-
-	
 	/**
 	 * Opens the preferences menu and sets the displayed menu to
 	 * the specified option using a string as identification.
@@ -1801,13 +1765,14 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 *            newModel
 	 */
 	@Override
-	public void setDataModel(final DataModel newModel) {
+	public void setDataModel(DataModel newModel) {
 
 		if (dataModel != null) {
 			dataModel.clearFileSetListeners();
 		}
 
 		dataModel = newModel;
+		newModel = null;
 
 		if (dataModel != null) {
 			dataModel.addFileSetListener(this);

@@ -83,7 +83,9 @@ public class ClusterProcessor {
 		// also takes list of row elements because only one list can easily
 		// be consistently transformed and fed into file writer
 		// to make a tab-delimited file
-		final CDTGenerator cdtGen = new CDTGenerator(tvModel, clusterView, 
+		
+		//works until here (but check for correctness!)
+		final CDTGenerator2 cdtGen = new CDTGenerator2(tvModel, clusterView, 
 				sepRows, orderedRows, orderedCols, hierarchical);
 
 		cdtGen.generateCDT();
@@ -105,7 +107,7 @@ public class ClusterProcessor {
 	public List<String> hCluster(final List<List<Double>> distances,
 			final String type, final int pBarNum) {
 
-		final HierCluster cGen = new HierCluster(tvModel, clusterView, 
+		final HierCluster2 cGen = new HierCluster2(tvModel, clusterView, 
 				distances, type, pBarNum);
 
 		cGen.cluster();
@@ -217,13 +219,13 @@ public class ClusterProcessor {
 		rowDistances = dCalc.getDistanceMatrix();
 
 		pBarNum = 2;
-		
-		Integer[] spinnerInput = clusterView.getSpinnerValues();
 				
 		if (hierarchical) {
 			orderedRows = hCluster(rowDistances, rowString, pBarNum);
 
 		} else {
+			Integer[] spinnerInput = clusterView.getSpinnerValues();
+			
 			orderedRows = kmCluster(rowDistances, rowString, spinnerInput[0], 
 					spinnerInput[1], pBarNum);
 		}

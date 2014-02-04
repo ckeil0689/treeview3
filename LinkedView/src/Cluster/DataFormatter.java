@@ -41,15 +41,18 @@ public class DataFormatter {
 		int upper = 0;
 
 		// number of arrays
-		final int max = list.size() / model.nExpr();
+		final int nCols = list.size() / model.nGene();
+		
+		// number of rows
+		final int nRows = list.size() / nCols;
 
-		clusterView.setPBarMax(max, rowPBar);
+		clusterView.setPBarMax(nRows, rowPBar);
 
-		for (int i = 0; i < list.size() / max; i++) {
+		for (int i = 0; i < nRows; i++) {
 
 			clusterView.updatePBar(i, rowPBar);
 
-			upper += max;
+			upper += nCols;
 
 			rowList.add(list.subList(lower, upper));
 
@@ -68,22 +71,22 @@ public class DataFormatter {
 	public void splitColumns() {
 
 		// Number of arrays/ columns
-		final int max = list.size() / model.nExpr();
-		final int nGenes = model.nGene();
+		final int nCols = list.size() / model.nGene();
+		final int nRows = model.nGene();
 
 		// Setting up ProgressBar
-		clusterView.setPBarMax(max, colPBar);
+		clusterView.setPBarMax(nCols, colPBar);
 
 		// Iterate through all columns
-		for (int j = 0; j < max; j++) {
+		for (int j = 0; j < nCols; j++) {
 
 			clusterView.updatePBar(j, colPBar);
 
 			final List<Double> sArray = new ArrayList<Double>();
 
-			for (int i = 0; i < nGenes; i++) {
+			for (int i = 0; i < nRows; i++) {
 
-				final int element = (i * max) + j;
+				final int element = (i * nCols) + j;
 
 				sArray.add(list.get(element));
 			}

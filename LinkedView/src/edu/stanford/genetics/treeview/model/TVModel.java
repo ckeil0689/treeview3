@@ -89,6 +89,7 @@ public class TVModel extends Observable implements DataModel {
 
 	@Override
 	public void setModelForCompare(final DataModel m) {
+		
 		if (m == null) {
 			compareModel = null;
 			extraCompareExpr = 0;

@@ -22,12 +22,11 @@ public class ClusterViewFrame extends JFrame {
 	
 	private ClusterView clusterView;
 
-	public ClusterViewFrame(DataModel dataModel, TreeViewFrame viewFrame, 
-			boolean hierarchical) {
+	public ClusterViewFrame(DataModel dataModel, TreeViewFrame viewFrame) {
 		
 		super("Hierarchical Clustering");
 		
-		clusterView = new ClusterView(dataModel, viewFrame, hierarchical);
+		clusterView = new ClusterView(dataModel, viewFrame);
 		
 		// Setting preferred size for the ContentPane of this frame
 		final Dimension mainDim = GUIParams.getScreenSize();

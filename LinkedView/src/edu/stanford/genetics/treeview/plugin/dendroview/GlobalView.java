@@ -635,9 +635,10 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 		
 		hasMouse = false;
 		
-		statustext[0] = "Row: -";
-		statustext[1] = "Column: -";
-		statustext[2] = "Value: -";
+		// Display empty field
+		statustext[0] = "";
+		statustext[1] = "";
+		statustext[2] = "";
 		
 		status.setMessages(statustext);
 	}
@@ -961,8 +962,6 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 		if (startPoint != null && endPoint != null) {
 			scrollX = (endPoint.x + startPoint.x) / 2;
 			scrollY = (endPoint.y + startPoint.y) / 2;
-
-			System.out.println("SX: " + scrollX);
 
 			xmap.scrollToIndex(scrollX);
 			ymap.scrollToIndex(scrollY);

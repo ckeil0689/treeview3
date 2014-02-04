@@ -10,13 +10,11 @@ import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import edu.stanford.genetics.treeview.model.CDTCreator2;
 import edu.stanford.genetics.treeview.model.CDTCreator3;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
@@ -136,7 +134,7 @@ public class PreferencesMenu extends JFrame {
 				&& annotationSettings != null) {
 			getContentPane().add(annotationSettings, "w 79%, h 95%, wrap");
 			
-		} else if(startMenu.equalsIgnoreCase("Heat Map") 
+		} else if(startMenu.equalsIgnoreCase("Color Settings") 
 				&& pixelSettings != null) {
 			getContentPane().add(pixelSettings, "w 79%, h 95%, wrap");
 		}
@@ -162,7 +160,7 @@ public class PreferencesMenu extends JFrame {
 		MenuPanel url = new MenuPanel("URL", this);
 		leftPanel.add(url, "pushx, w 90%, h 10%, alignx 50%, span, wrap");
 		
-		MenuPanel heatMap = new MenuPanel("Heat Map", this);
+		MenuPanel heatMap = new MenuPanel("Color Settings", this);
 		leftPanel.add(heatMap, "pushx, w 90%, h 10%, alignx 50%, span");
 	}
 	
@@ -486,7 +484,8 @@ public class PreferencesMenu extends JFrame {
 		} else if(title.equalsIgnoreCase("Font") && fontSettings != null) {
 			getContentPane().add(fontSettings, "w 79%, h 95%, wrap");
 		
-		} else if(title.equalsIgnoreCase("Heat Map") && pixelSettings != null) {
+		} else if(title.equalsIgnoreCase("Color Settings") 
+				&& pixelSettings != null) {
 			getContentPane().add(pixelSettings, "w 79%, h 95%, wrap");
 		
 		} else if(title.equalsIgnoreCase("URL") && urlSettings != null) {

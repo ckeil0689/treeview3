@@ -101,7 +101,8 @@ public abstract class ModelView extends JPanel implements java.util.Observer,
 	public String[] getStatus() {
 
 		if (default_status == null) {
-			default_status = new String[] { "No status info for " + viewName() };
+			default_status = new String[] {""};
+			//"No status info for " + viewName() };
 		}
 
 		return default_status;

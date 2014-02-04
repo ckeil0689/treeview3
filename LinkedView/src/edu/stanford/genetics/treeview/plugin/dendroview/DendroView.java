@@ -561,15 +561,14 @@ ComponentListener, MainPanel, Observer {
 		buttonPanel.add(crossPanel, "pushx, alignx 50%, wrap");
 		buttonPanel.add(zoomButton, "pushx, alignx 50%");
 		
-		finderPanel.add(getGeneFinderPanel(), "push, w 100%, h 30%, " +
+		finderPanel.add(getGeneFinderPanel(), "pushx, w 100%, h 30%, " +
 				"alignx 50%, wrap");
-		finderPanel.add(getArrayFinderPanel(), "push, w 100%, h 30%, " +
+		finderPanel.add(getArrayFinderPanel(), "pushx, w 100%, h 30%, " +
 				"alignx 50%");
 
-		navPanel.add(buttonPanel, "pushy, h 30%, w 90%, alignx 50%, " +
-				"aligny 0%, wrap");
-		navPanel.add(finderPanel, "pushy, h 30%, w 90%, alignx 50%, " +
-				"aligny 0%");
+		navPanel.add(buttonPanel, "h 20%, w 90%, alignx 50%, wrap");
+		navPanel.add(finderPanel, "pushy, h 20%, w 90%, alignx 50%, " +
+				"aligny 10%");
 		
 		add(statuspanel, "w 20%, h 20%");
 		add(atrPane, "w 62%, h 20%");
@@ -1531,7 +1530,7 @@ ComponentListener, MainPanel, Observer {
 		
 		final TreeViewFrame tvFrame = (TreeViewFrame) viewFrame;
 		
-		menu.addMenuItem("Row/ Column Labels", new ActionListener() {
+		menu.addMenuItem("Row and Column Labels", new ActionListener() {
 
 			@Override
 			public void actionPerformed(final ActionEvent arg0) {
@@ -1540,12 +1539,12 @@ ComponentListener, MainPanel, Observer {
 			}
 		}, 0);
 		
-		menu.addMenuItem("Heat Map", new ActionListener() {
+		menu.addMenuItem("Color Settings", new ActionListener() {
 
 			@Override
 			public void actionPerformed(final ActionEvent arg0) {
 				
-				tvFrame.openPrefMenu("Heat Map");
+				tvFrame.openPrefMenu("Color Settings");
 			}
 		}, 1);
 

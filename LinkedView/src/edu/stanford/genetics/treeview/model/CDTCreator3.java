@@ -1,15 +1,14 @@
 package edu.stanford.genetics.treeview.model;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
+
+import Cluster.ClusterFileWriter2;
 
 /**
  * This class transforms any loaded file of non-cdt format to a cdt file in
@@ -38,7 +37,6 @@ public class CDTCreator3 {
 	private final List<Integer> gweightInd = new ArrayList<Integer>();
 	private final List<Integer> eweightInd = new ArrayList<Integer>();
 	private final List<Integer> dataStart = new ArrayList<Integer>();
-	private final List<Integer> customDataStart = new ArrayList<Integer>();
 	private final List<Integer> nameInd = new ArrayList<Integer>();
 	
 	//For custom
@@ -46,13 +44,13 @@ public class CDTCreator3 {
 	private final List<Integer> customNameInd = new ArrayList<Integer>();
 
 	private boolean gid = false;
+	private int rowSize;
 
 	private String fileType = "";
 	private String filePath = "";
-	private final String SEPARATOR = "\t";
-	private final String END_OF_ROW = "\n";
 	
-	private BufferedWriter bw;
+	// Buffered writer
+	private ClusterFileWriter2 bw;
 
 	/**
 	 * Constructor
@@ -87,6 +85,7 @@ public class CDTCreator3 {
 
 			//Arrays to ArrayLists
 			dataSet = transformArray(dataExtract);
+			rowSize = dataSet.get(0).size();
 
 			//Find positions of labels in the data set
 			findLabel(gidInd, dataSet, "GID");
@@ -129,8 +128,6 @@ public class CDTCreator3 {
 			generateCDT();
 			
 			bw.close();
-			
-			System.out.println("Done." + filePath);
 
 		} catch (final FileNotFoundException e) {
 			e.printStackTrace();
@@ -180,8 +177,9 @@ public class CDTCreator3 {
 	}
 
 	/**
-	 * Composes a .cdt file to further be used by JTV from any tab-delimited
-	 * file. JTV uses the specific .cdt-format with very defined row and column
+	 * Composes a .cdt file to further be used by TreeView 
+	 * (currently tab-delim only). 
+	 * TreeView uses the specific .cdt-format with very defined row and column
 	 * elements to display certain data in its various views. This function
 	 * assembles such a .cdt file from the scavenged data of the loaded input
 	 * file.
@@ -192,55 +190,42 @@ public class CDTCreator3 {
 		final int orfRow = orfInd.get(0);
 		final int orfCol = orfInd.get(1);
 		final int eweightRow = eweightInd.get(0);
+		final int eweightCol = eweightInd.get(1);
 		final int gweightCol = gweightInd.get(1);
 		final int dataCol = dataStart.get(1);
 		final int dataRow = dataStart.get(0);
 		int gidCol = 0;
+		
+		List<String> rowElement = new ArrayList<String>(rowSize);
 
 		if (gidInd.get(0) != null) {
 			gidCol = gidInd.get(1);
 			gid = true;
 		}
 
-//		String finalCDT = "";
-
 		if (gid) {
-			bw.write("GID");
-			bw.write(SEPARATOR);
-		}
-
-		bw.write("ORF");
-		bw.write(SEPARATOR);
-		bw.write("NAME");
-		bw.write(SEPARATOR);
-		bw.write("GWEIGHT");
-		bw.write(SEPARATOR);
-
+			rowElement.add("GID");
+		} 
+		
+		rowElement.add("ORF");
+		rowElement.add("NAME");
+		rowElement.add("GWEIGHT");
+		
 		// add array name row
-		final List<String> arrayNames = dataSet.get(orfRow).subList(dataCol,
-				dataSet.get(orfRow).size());
-
-		for (int i = 0; i < arrayNames.size(); i++) {
-
-			bw.write(arrayNames.get(i));
-
-			if (i == arrayNames.size() - 1) {
-				bw.write(END_OF_ROW);
-
-			} else {
-				bw.write(SEPARATOR);
-			}
-		}
+		rowElement.addAll(dataSet.get(orfRow).subList(dataCol,
+				dataSet.get(orfRow).size()));
+		
+		bw.writeContent(rowElement);
+		
+		rowElement = new ArrayList<String>(rowSize);
 
 		// add array id row
 		if (aidInd.get(1) != null) {
-			bw.write("AID");
-			bw.write(SEPARATOR);
-
+			rowElement.add("AID");
+			
 			for (int i = 0; i < dataCol; i++) {
 
-				bw.write("");
-				bw.write(SEPARATOR);
+				rowElement.add("");
 			}
 
 			final int aidRow = aidInd.get(0);
@@ -248,80 +233,64 @@ public class CDTCreator3 {
 			List<String> aidList = dataSet.get(aidRow).subList(dataCol,
 					dataSet.get(aidRow).size());
 			
-			for(String aidString : aidList) {
-				bw.write(aidString);
-			}
+			rowElement.addAll(aidList);
 			
-			bw.write(END_OF_ROW);
+			bw.writeContent(rowElement);
 		}
 
 		// add EWEIGHT row
-		bw.write("EWEIGHT");
-		bw.write(SEPARATOR);
+		rowElement = new ArrayList<String>(rowSize);
+		
+		rowElement.add("EWEIGHT");
 
 		// start at 1 because EWEIGHT takes position 0
-		for (int i = 0; i < dataCol; i++) {
+		for (int i = eweightCol + 1; i < dataCol; i++) {
 
-			bw.write("");
-			bw.write(SEPARATOR);
+			rowElement.add("");
 		}
-
-		for (int i = dataCol; i < dataSet.get(0).size(); i++) {
-
-			bw.write(dataSet.get(eweightRow).get(i));
-
-			if (i == dataSet.get(0).size() - 1) {
-				bw.write(END_OF_ROW);
-
-			} else {
-				bw.write(SEPARATOR);
-			}
-		}
-
+		
+		rowElement.addAll(dataSet.get(eweightRow).subList(dataCol, 
+				dataSet.get(0).size()));
+		
+		bw.writeContent(rowElement);
+		
 		// continue with each data row, just each element + data sublist values
-		// for the size of the dataSet - 3 (amount of rows already filled)
-		for (int i = dataRow; i < dataSet.size(); i++) {
+		// for the size of the dataSet - dataCol(amount of rows already filled)
+		int dataLineN = dataSet.size();
+		for (int i = dataRow; i < dataLineN; i++) {
 
-			final List<String> row = dataSet.get(i);
+			List<String> fullRow = dataSet.get(i);
+			rowElement = new ArrayList<String>();
 
 			if (gid) {
-				bw.write(row.get(gidCol));
-				bw.write(SEPARATOR);
-
+				rowElement.add(0, fullRow.get(gidCol));
 			}
-
-			bw.write(row.get(orfCol));
-			bw.write(SEPARATOR);
+			
+			if(orfInd != null) {
+				rowElement.add(fullRow.get(orfCol));
+				
+			} else {
+				rowElement.add("ORF label missing");
+			}
 
 			if (nameInd.get(0) != null) {
-				bw.write(row.get(nameInd.get(1)));
-				bw.write(SEPARATOR);
+				rowElement.add(fullRow.get(nameInd.get(1)));
 
+			} else if (orfInd != null){
+				rowElement.add(fullRow.get(orfCol));
+				
 			} else {
-				bw.write(row.get(orfCol));
-				bw.write(SEPARATOR);
+				rowElement.add("ORF and NAME labels missing");
 			}
 
-			bw.write(row.get(gweightCol));
-			bw.write(SEPARATOR);
-
-			for (int j = dataCol; j < row.size(); j++) {
-
-				bw.write(row.get(j));
-				if (j == row.size() - 1) {
-					bw.write(END_OF_ROW);
-
-				} else {
-					bw.write(SEPARATOR);
-				}
-			}
+			rowElement.add(fullRow.get(gweightCol));
+			rowElement.addAll(fullRow.subList(dataCol, rowSize));
+			
+			// Check whether it's the last line
+			bw.writeContent(rowElement);
 		}
-
-		//finalCDT = sb.toString();
-
-		// System.out.println(finalCDT);
-
-		//return finalCDT;
+		
+		bw.closeWriter();
 	}
 
 	/**
@@ -344,20 +313,14 @@ public class CDTCreator3 {
 
 		try {
 			final File file2 = new File(fileName + fileEnd);
-
 			file2.createNewFile();
-
-			final FileOutputStream fos = 
-					new FileOutputStream(file2.getAbsoluteFile(), true);
-			final OutputStreamWriter fw = new OutputStreamWriter(fos, "UTF-8");
-			bw = new BufferedWriter(fw);
-
-			filePath = file2.getAbsolutePath();
 			
-//			System.out.println("Done." + file2.getAbsolutePath());
+			filePath = file2.getAbsolutePath();
+
+			bw = new ClusterFileWriter2(file2);
 
 		} catch (final IOException e) {
-
+			e.printStackTrace();
 		}
 	}
 	
