@@ -23,6 +23,7 @@
 package edu.stanford.genetics.treeview.model;
 
 import java.awt.Frame;
+import java.io.FileNotFoundException;
 import java.util.Hashtable;
 import java.util.Observable;
 
@@ -771,8 +772,13 @@ public class TVModel extends Observable implements DataModel {
 
 		resetState();
 		setSource(fileSet);
-		final TVModelLoader2 loader = new TVModelLoader2(this);
-		loader.loadInto();
+		
+		// Loader object, gets this TVModel passed to set instance variables
+//		final TVModelLoader2 loader = new TVModelLoader2(this);
+//		loader.loadInto();
+		
+		NewModelLoader loader = new NewModelLoader(this);
+		loader.loadFile();
 
 		if (!isLoaded()) {
 			throw new LoadException("Loading Cancelled", LoadException.INTPARSE);

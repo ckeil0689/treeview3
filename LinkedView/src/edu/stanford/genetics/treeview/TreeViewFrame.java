@@ -307,10 +307,12 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 */
 	public void loadFileSet(final FileSet fileSet) throws LoadException {
 
+		// Make TVModel object
 		final TVModel tvModel = new TVModel();
 		tvModel.setFrame(this);
 
 		try {
+			// load instance variables of TVModel with data
 			tvModel.loadNew(fileSet);
 			setDataModel(tvModel);
 

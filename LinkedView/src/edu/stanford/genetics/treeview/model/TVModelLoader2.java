@@ -779,6 +779,7 @@ public class TVModelLoader2 implements ProgressTrackable {
 	}
 
 	protected void loadCdtData(final RectData tempVector) {
+		
 		println("Parsing strings into doubles...");
 		setLength(nGene);
 		final double[] exprData = new double[nGene * nExpr];
@@ -826,7 +827,6 @@ public class TVModelLoader2 implements ProgressTrackable {
 			}
 		}
 		targetModel.setExprData(exprData);
-
 	}
 
 	protected double makeDouble(final String s) throws NumberFormatException {

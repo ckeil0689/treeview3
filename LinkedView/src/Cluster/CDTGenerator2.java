@@ -36,7 +36,6 @@ public class CDTGenerator2 {
 	private final List<List<Double>> sepList;
 	private List<List<Double>> cdtDataDoubles;
 
-//	private List<List<String>> finalcdtTable;
 	private List<List<String>> rowNameList;
 	private List<List<String>> colNameList;
 	private List<List<String>> rowNameListOrdered;
@@ -71,10 +70,6 @@ public class CDTGenerator2 {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		// The list of String-lists to be generated for file-writing,
-		// contains all data
-//		finalcdtTable = new ArrayList<List<String>>();
 
 		// the list containing all the reorganized row-data
 		cdtDataDoubles = new ArrayList<List<Double>>();
@@ -132,10 +127,6 @@ public class CDTGenerator2 {
 
 			cdtDataStrings.add(newStringData);
 		}
-
-		// fuse them to create the final .CDT-write-ready List<List<String>>
-		// This is the final table with just the data
-//		finalcdtTable.addAll(cdtDataStrings);
 
 		// Add some string elements, as well as row/ column names
 		if (hierarchical) {
@@ -351,9 +342,6 @@ public class CDTGenerator2 {
 
 			cdtRow1.add(colNameListOrdered.get(i).get(0));
 		}
-
-		// Add first row at index 0 of the final matrix
-//		finalcdtTable.add(0, cdtRow1);
 		
 		// write every row to buffered writer
 		bufferedWriter.writeContent(cdtRow1);
@@ -367,7 +355,6 @@ public class CDTGenerator2 {
 			cdtRow2.add("");
 			cdtRow2.add("");
 
-			// ????
 			if (!choice.contentEquals("Do Not Cluster")) {
 				cdtRow2.add("");
 			}
@@ -378,7 +365,6 @@ public class CDTGenerator2 {
 				cdtRow2.add(orderedCols.get(i));
 			}
 
-//			finalcdtTable.add(1, cdtRow2);
 			bufferedWriter.writeContent(cdtRow2);
 		}
 
@@ -396,29 +382,14 @@ public class CDTGenerator2 {
 
 			cdtRow3.add(colNameListOrdered.get(i).get(1));
 		}
-
-//		if (!choice2.contentEquals("Do Not Cluster")) {
-//			finalcdtTable.add(2, cdtRow3);
-//
-//		} else {
-//			finalcdtTable.add(1, cdtRow3);
-//		}
 		
 		bufferedWriter.writeContent(cdtRow3);
 
 		// if(!choice.contentEquals("Do Not Cluster")) {
 		// Adding the values for ORF, NAME, GWEIGHT
 		for (int i = 0; i < cdtDataStrings.size(); i++) {
-
-			System.out.println(i);
-//			finalcdtTable.get(i + aidBuffer).add(0,
-//					rowNameListOrdered.get(i).get(0));
-//			finalcdtTable.get(i + aidBuffer).add(1,
-//					rowNameListOrdered.get(i).get(1));
-//			finalcdtTable.get(i + aidBuffer).add(2,
-//					rowNameListOrdered.get(i).get(2));
 			
-			List<String> row = cdtDataStrings.get(i);// + aidBuffer);
+			List<String> row = cdtDataStrings.get(i);
 			
 			row.add(0, rowNameListOrdered.get(i).get(0));
 			row.add(1, rowNameListOrdered.get(i).get(1));
@@ -450,9 +421,6 @@ public class CDTGenerator2 {
 
 			cdtRow1.add(colNameListOrdered.get(i).get(0));
 		}
-
-		// Add first row at index 0 of the final matrix
-//		finalcdtTable.add(0, cdtRow1);
 		
 		bufferedWriter.writeContent(cdtRow1);
 
@@ -468,8 +436,6 @@ public class CDTGenerator2 {
 
 			cdtRow2.add(colNameListOrdered.get(i).get(1));
 		}
-
-//		finalcdtTable.add(1, cdtRow2);
 		
 		bufferedWriter.writeContent(cdtRow2);
 
@@ -479,13 +445,6 @@ public class CDTGenerator2 {
 		for (int i = 0; i < dataLineN; i++) {
 
 			List<String> row = cdtDataStrings.get(i + aidBuffer);
-			
-//			finalcdtTable.get(i + aidBuffer).add(0,
-//					rowNameListOrdered.get(i).get(0));
-//			finalcdtTable.get(i + aidBuffer).add(1,
-//					rowNameListOrdered.get(i).get(1));
-//			finalcdtTable.get(i + aidBuffer).add(2,
-//					rowNameListOrdered.get(i).get(2));
 			
 			row.add(0, rowNameListOrdered.get(i).get(0));
 			row.add(1, rowNameListOrdered.get(i).get(1));
