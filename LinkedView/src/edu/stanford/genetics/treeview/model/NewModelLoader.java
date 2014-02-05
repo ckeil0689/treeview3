@@ -9,6 +9,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
+import javax.swing.SwingWorker;
+
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 
@@ -31,22 +33,27 @@ public class NewModelLoader {
 	
 	public void loadFile() {
 		
-		try{
-			final FileSet fileSet = targetModel.getFileSet();
-			
-			FileInputStream fis = new FileInputStream(fileSet.getCdt());
-	        DataInputStream in = new DataInputStream(fis);
-	        BufferedReader br = new BufferedReader(new InputStreamReader(in));
-	        
-	        // Get data from file into String and double arrays
-	        extractData(br);
-	   
-	        // Analyze loaded data to find out details about used labels etc.
-	        findDimensions();
-	        
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
+//			System.out.println("Starting load.");
+//			// Read data from specified file location
+//			final FileSet fileSet = targetModel.getFileSet();
+//			
+//			FileInputStream fis = new FileInputStream(fileSet.getCdt());
+//	        DataInputStream in = new DataInputStream(fis);
+//	        BufferedReader br = new BufferedReader(new InputStreamReader(in));
+//	        
+//	        // Get data from file into String and double arrays 
+//	        // Put the arrays in ArrayLists for later access.
+//	        System.out.println("Starting extract.");
+//	        extractData(br);
+//	   
+//	        // Set all the needed instance variables for the Model using 
+//	        // the loaded data.
+//	        System.out.println("Starting model settings.");
+		
+		ExtractionWorker worker = new ExtractionWorker();
+		worker.execute();
+		
+		findDimensions();
 	}
 	
 	/**
@@ -210,5 +217,46 @@ public class NewModelLoader {
 	public void findDimensions() {
 		
 		
+	}
+	
+	/**
+	 * Worker thread to run extraction task in background.
+	 * @author CKeil
+	 *
+	 */
+	class ExtractionWorker extends SwingWorker<Void, Void> {
+	   
+		protected Void doInBackground() throws Exception {
+	       
+			try {
+				System.out.println("Starting load.");
+				// Read data from specified file location
+				final FileSet fileSet = targetModel.getFileSet();
+				
+				FileInputStream fis = new FileInputStream(fileSet.getCdt());
+		        DataInputStream in = new DataInputStream(fis);
+		        BufferedReader br = new BufferedReader(new InputStreamReader(in));
+		        
+		        // Get data from file into String and double arrays 
+		        // Put the arrays in ArrayLists for later access.
+		        System.out.println("Starting extract.");
+		        extractData(br);
+		        
+	        } catch(FileNotFoundException e) {
+	        	e.printStackTrace();
+	        }
+	 
+			return null;
+	    }
+
+	    protected void done(){
+	    	
+	        try{
+	        	System.out.println("Done extracting.");
+	        	
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
 	}
 }
