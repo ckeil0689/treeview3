@@ -12,10 +12,10 @@ public class ClusterTableModel extends AbstractTableModel {
 	private static final long serialVersionUID = 1L;
 
 	// Instance variables
-	private final List<List<Double>> tableList;
+	private final List<double[]> tableList;
 	private final TVModel currentModel;
 
-	public ClusterTableModel(final List<List<Double>> tableList,
+	public ClusterTableModel(final List<double[]> tableList,
 			final DataModel currentModel) {
 
 		this.tableList = tableList;
@@ -26,13 +26,13 @@ public class ClusterTableModel extends AbstractTableModel {
 	@Override
 	public int getColumnCount() {
 
-		return tableList.size();
+		return tableList.get(0).length;
 	}
 
 	@Override
 	public int getRowCount() {
 
-		return tableList.get(0).size();
+		return tableList.size();
 	}
 
 	@Override

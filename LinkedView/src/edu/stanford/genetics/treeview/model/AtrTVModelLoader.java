@@ -31,7 +31,7 @@ import edu.stanford.genetics.treeview.LoadException;
  *         To change the template for this generated type comment go to
  *         Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
-public class AtrTVModelLoader extends TVModelLoader2 {
+public class AtrTVModelLoader extends NewModelLoader { //TVModelLoader2 {
 
 	/**
 	 * @param targetModel
@@ -40,11 +40,11 @@ public class AtrTVModelLoader extends TVModelLoader2 {
 		super(targetModel);
 	}
 
-	@Override
-	protected void parseCDT(final RectData tempVector) throws LoadException {
-		super.findCdtDimensions(tempVector);
-		super.loadArrayAnnotation(tempVector);
-		super.loadGeneAnnotation(tempVector);
-	}
+//	@Override
+//	protected void parseCDT(final RectData tempVector) throws LoadException {
+//		super.findCdtDimensions(tempVector);
+//		super.loadArrayAnnotation(tempVector);
+//		super.loadGeneAnnotation(tempVector);
+//	}
 
 }

@@ -30,6 +30,14 @@ public class CDTCreator3 {
 	private ArrayList<List<String>> dataSet;
 	private ArrayList<List<String>> customDataSet;
 
+	// booleans
+	boolean hasGID = false;
+	boolean hasAID = false;
+	boolean hasORF = false;
+	boolean hasName = false;
+	boolean hasGWeight = false; 
+	boolean hasEWeight = false;
+	
 	// label positions
 	private final List<Integer> gidInd = new ArrayList<Integer>();
 	private final List<Integer> aidInd = new ArrayList<Integer>();
@@ -162,6 +170,25 @@ public class CDTCreator3 {
 				if (element.equalsIgnoreCase(label)) {
 					labelPos.add(dataSet.indexOf(row));
 					labelPos.add(row.indexOf(element));
+					
+					if(label.equalsIgnoreCase("GID")) {
+						hasGID = true;
+					
+					} else if(label.equalsIgnoreCase("AID")) {
+						hasAID = true;
+						
+					} else if(label.equalsIgnoreCase("ORF")) {
+						hasORF = true;
+						
+					} else if(label.equalsIgnoreCase("NAME")) {
+						hasName = true;
+						
+					} else if(label.equalsIgnoreCase("GWEIGHT")) {
+						hasGWeight = true;
+						
+					} else if(label.equalsIgnoreCase("EWEIGHT")) {
+						hasEWeight = true;
+					}
 					break;
 				}
 			}
@@ -198,12 +225,7 @@ public class CDTCreator3 {
 		
 		List<String> rowElement = new ArrayList<String>(rowSize);
 
-		if (gidInd.get(0) != null) {
-			gidCol = gidInd.get(1);
-			gid = true;
-		}
-
-		if (gid) {
+		if (hasGID) {
 			rowElement.add("GID");
 		} 
 		
@@ -220,7 +242,7 @@ public class CDTCreator3 {
 		rowElement = new ArrayList<String>(rowSize);
 
 		// add array id row
-		if (aidInd.get(1) != null) {
+		if (hasAID) {
 			rowElement.add("AID");
 			
 			for (int i = 0; i < dataCol; i++) {
@@ -244,7 +266,7 @@ public class CDTCreator3 {
 		rowElement.add("EWEIGHT");
 
 		// start at 1 because EWEIGHT takes position 0
-		for (int i = eweightCol + 1; i < dataCol; i++) {
+		for (int i = eweightCol; i < dataCol; i++) {
 
 			rowElement.add("");
 		}

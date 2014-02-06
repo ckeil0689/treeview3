@@ -146,16 +146,33 @@ public class ClusterProcessor {
 	 * transforms it to a List<Double> object for further procedures.
 	 * @return List<Double>
 	 */
+//	public List<Double> matrixToList() {
+//		
+//		final List<Double> dataList = new ArrayList<Double>();
+//		
+//		TVDataMatrix matrix = (TVDataMatrix) tvModel.getDataMatrix();
+//		final double[] currentArray = matrix.getExprData();
+//		
+//		for (final double d : currentArray) {
+//
+//			dataList.add(d);
+//		}
+//		
+//		return dataList;
+//	}
+	
 	public List<Double> matrixToList() {
 		
 		final List<Double> dataList = new ArrayList<Double>();
 		
 		TVDataMatrix matrix = (TVDataMatrix) tvModel.getDataMatrix();
-		final double[] currentArray = matrix.getExprData();
+		final ArrayList<double[]> dataArrays = matrix.getExprData();
 		
-		for (final double d : currentArray) {
-
-			dataList.add(d);
+		for(double[] array : dataArrays) {
+			for (final double d : array) {
+	
+				dataList.add(d);
+			}
 		}
 		
 		return dataList;

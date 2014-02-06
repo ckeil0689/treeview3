@@ -32,6 +32,7 @@ package edu.stanford.genetics.treeview.model;
 
 import java.awt.Frame;
 import java.awt.MenuItem;
+import java.util.ArrayList;
 
 import edu.stanford.genetics.treeview.ConfigNode;
 import edu.stanford.genetics.treeview.DummyConfigNode;
@@ -58,8 +59,12 @@ public class AtrTVModel extends TVModel {
 		return -1;
 	}
 
+//	@Override
+//	public void setExprData(final double[] newData) {
+//	}
+	
 	@Override
-	public void setExprData(final double[] newData) {
+	public void setExprData(final ArrayList<double[]> newData) {
 	}
 
 	ConfigNode documentConfig = new DummyConfigNode("AtrTVModel");
@@ -91,7 +96,8 @@ public class AtrTVModel extends TVModel {
 		resetState();
 		setSource(fileSet);
 		final AtrTVModelLoader loader = new AtrTVModelLoader(this);
-		loader.loadInto();
+//		loader.loadInto();
+		loader.loadFile();
 	}
 
 }

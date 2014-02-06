@@ -36,8 +36,6 @@ public class DataViewPanel extends JPanel {
 	 */
 	private TVModel model;
 	private TVDataMatrix matrix;
-	private double[] dataArray;
-	private List<List<Double>> arraysList;
 	private List<Double> gList;
 
 	private String[] geneNames;
@@ -67,16 +65,17 @@ public class DataViewPanel extends JPanel {
 		this.setLayout(new MigLayout("ins 0"));
 
 		matrix = (TVDataMatrix) model.getDataMatrix();
-		dataArray = matrix.getExprData();
+		ArrayList<double[]> dataArrays = matrix.getExprData();
 
 		headerArray = model.getGeneHeaderInfo().getHeaderArray();
 
-		gList = fillDList(dataArray);
-		arraysList = splitArrays(gList, model);
+//		gList = fillDList(dataArray);
+//		arraysList = splitArrays(gList, model);
+		List<double[]> arraysList = new ArrayList<double[]>();
 
-		if (arraysList.size() > max) {
+		if (dataArrays.size() > max) {
 
-			arraysList = arraysList.subList(0, max);
+			arraysList = dataArrays.subList(0, max);
 		}
 
 		geneNames = new String[max];
@@ -212,31 +211,31 @@ public class DataViewPanel extends JPanel {
 		return doubleList;
 	}
 
-	public List<List<Double>> splitArrays(final List<Double> gList,
-			final TVModel model) {
-
-		// number of rows/ columns
-		final int nArrays = model.nExpr();
-		final int nGenes = max; // model.nGene();
-
-		final List<List<Double>> arraysList = new ArrayList<List<Double>>();
-
-		// iterate through columns ...max
-		for (int j = 0; j < nArrays; j++) {
-
-			final List<Double> sArray = new ArrayList<Double>();
-
-			for (int i = 0; i < nGenes; i++) {
-
-				final int element = (i * max) + j;
-
-				sArray.add(gList.get(element));
-
-			}
-
-			arraysList.add(sArray);
-		}
-
-		return arraysList;
-	}
+//	public List<List<Double>> splitArrays(final List<Double> gList,
+//			final TVModel model) {
+//
+//		// number of rows/ columns
+//		final int nArrays = model.nExpr();
+//		final int nGenes = max; // model.nGene();
+//
+//		final List<List<Double>> arraysList = new ArrayList<List<Double>>();
+//
+//		// iterate through columns ...max
+//		for (int j = 0; j < nArrays; j++) {
+//
+//			final List<Double> sArray = new ArrayList<Double>();
+//
+//			for (int i = 0; i < nGenes; i++) {
+//
+//				final int element = (i * max) + j;
+//
+//				sArray.add(gList.get(element));
+//
+//			}
+//
+//			arraysList.add(sArray);
+//		}
+//
+//		return arraysList;
+//	}
 }

@@ -49,6 +49,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -102,6 +103,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	private HeaderFinder geneFinder = null;
 	private HeaderFinder arrayFinder = null;
 
+	private JProgressBar loadBar;
+	
 	private boolean loaded;
 
 	// Constructors
@@ -213,6 +216,36 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		waiting.revalidate();
 		waiting.repaint();
 	}
+	
+	public void setLoading() {
+		
+		waiting.removeAll();
+		
+		JPanel mainPanel;
+		
+		mainPanel = new JPanel();
+		mainPanel.setLayout(new MigLayout("ins 0"));
+		mainPanel.setBackground(GUIParams.BG_COLOR);
+		
+		loadBar = GUIParams.setPBarLayout("Loading File");
+		
+		mainPanel.add(loadBar, "push, w 70%");
+		
+		waiting.add(mainPanel, "push, grow");
+		
+		waiting.revalidate();
+		waiting.repaint();
+	}
+	
+	public void updateLoadBar(int i) {
+		
+		loadBar.setValue(i);
+	}
+	
+	public void setLoadBarMax(int max) {
+		
+		loadBar.setMaximum(max);
+	}
 
 	/**
 	 * This method clears the initial starting frame and adds new components to
@@ -314,7 +347,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		try {
 			// load instance variables of TVModel with data
 			tvModel.loadNew(fileSet);
-			setDataModel(tvModel);
+//			setDataModel(tvModel);
 
 		} catch (final LoadException e) {
 			if (e.getType() != LoadException.INTPARSE) {
@@ -373,13 +406,15 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 			FileSet fileSet = getFileSet(file); // Type: 0 (Auto)
 			
+			setLoading();
+			
 			// Loading TVModel
 			loadFileSet(fileSet);
 
 			fileSet = fileMru.addUnique(fileSet);
 			fileMru.setLast(fileSet);
 
-			confirmLoaded();
+//			confirmLoaded();
 
 		} catch (final LoadException e) {
 			if ((e.getType() != LoadException.INTPARSE)
