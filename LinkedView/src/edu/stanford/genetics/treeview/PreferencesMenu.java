@@ -414,7 +414,7 @@ public class PreferencesMenu extends JFrame {
 										fileName.length());
 						
 						final CDTCreator3 fileChanger = new CDTCreator3(file, 
-								customFile, fileType);
+								customFile, fileType, viewFrame);
 						fileChanger.createFile();
 
 						file = new File(fileChanger.getFilePath());

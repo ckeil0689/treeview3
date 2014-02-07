@@ -35,6 +35,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.Observable;
@@ -102,8 +103,15 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	private ProgramMenu programMenu;
 	private HeaderFinder geneFinder = null;
 	private HeaderFinder arrayFinder = null;
+	
+	// Interactive GUI Components (except menubar)
+	private ClickablePanel load_Icon;
 
 	private JProgressBar loadBar;
+	private JLabel loadLabel;
+	
+	private JButton loadNewButton;
+	private JButton advanceButton;
 	
 	private boolean loaded;
 
@@ -152,7 +160,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		setupFileMru(treeView.getGlobalConfig().getNode("FileMru"));
 
 		setupFrameSize();
-		//centerOnscreen();
 		setLoaded(false);
 	}
 
@@ -178,6 +185,12 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		JPanel title_bg;
 		JLabel jl;
 		JLabel jl2;
+		
+		loadNewButton = GUIParams.setButtonLayout("Load Different File", 
+				null);
+
+		advanceButton = GUIParams.setButtonLayout("Continue", 
+				"forwardIcon");
 
 		waiting.removeAll();
 
@@ -197,11 +210,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		jl2.setFont(new Font("Sans Serif", Font.BOLD, 50));
 		jl2.setForeground(GUIParams.TITLE_TEXT);
 
-		final ClickableLabel load_Icon = new ClickableLabel(this, 
-				"Load Data >");
-
-		final ClickableLabel pref_Icon = new ClickableLabel(this,
-				"Preferences >");
+		load_Icon = new ClickablePanel ("Load Data >");
 
 		title_bg.add(jl, "push, alignx 50%, span, wrap");
 		title_bg.add(jl2, "push, alignx 50%, span");
@@ -209,7 +218,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		mainPanel.add(title_bg, "pushx, growx, alignx 50%, span, "
 				+ "height 20%::, wrap");
 		mainPanel.add(load_Icon, "push, alignx 50%");
-		mainPanel.add(pref_Icon, "push, alignx 50%");
 
 		waiting.add(mainPanel, "push, grow");
 
@@ -217,6 +225,10 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		waiting.repaint();
 	}
 	
+	/**
+	 * Displays a panel with a label and JProgressBar to indicate loading
+	 * progress and give feedback in case of loading errors.
+	 */
 	public void setLoading() {
 		
 		waiting.removeAll();
@@ -227,9 +239,14 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		mainPanel.setLayout(new MigLayout("ins 0"));
 		mainPanel.setBackground(GUIParams.BG_COLOR);
 		
-		loadBar = GUIParams.setPBarLayout("Loading File");
+		loadLabel = new JLabel();
+		loadLabel.setFont(GUIParams.FONTL);
+		loadLabel.setForeground(GUIParams.TEXT);
 		
-		mainPanel.add(loadBar, "push, w 70%");
+		loadBar = GUIParams.setPBarLayout();
+		
+		mainPanel.add(loadLabel, "push, alignx 50%, aligny 100%, wrap");
+		mainPanel.add(loadBar, "push, w 70%, alignx 50%, aligny 0%");
 		
 		waiting.add(mainPanel, "push, grow");
 		
@@ -237,14 +254,80 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		waiting.repaint();
 	}
 	
+	// GUI ComponentListeners
+	/**
+	 * Equipping the load_Icon with a MouseListener
+	 * @param loadData
+	 */
+	public void addLoadListener(MouseListener loadData) {
+		
+		load_Icon.addMouseListener(loadData);
+	}
+	
+	/**
+	 * Equipping the "Load New File" button with a ActionListener
+	 * @param loadNew
+	 */
+	public void addLoadListener(ActionListener loadNew) {
+		
+		loadNewButton.addActionListener(loadNew);
+	}
+	
+	/**
+	 * Equipping the "Continue" button with a ActionListener
+	 * @param loadNew
+	 */
+	public void addContinueListener(ActionListener cont) {
+		
+		advanceButton.addActionListener(cont);
+	}
+	
+	/**
+	 * Access TreeViewFrame's load_Icon panel.
+	 * @return
+	 */
+	public ClickablePanel getLoadIcon() {
+		
+		return load_Icon;
+	}
+	
+	/**
+	 * Updates the loading bar by setting it to i.
+	 * @param i
+	 */
 	public void updateLoadBar(int i) {
 		
 		loadBar.setValue(i);
 	}
 	
+	/**
+	 * Resets the loading bar to 0.
+	 * @param i
+	 */
+	public void resetLoadBar() {
+		
+		loadBar.setValue(0);
+	}
+	
+	/**
+	 * Sets the maximum of the loading bar.
+	 * @param max
+	 */
 	public void setLoadBarMax(int max) {
 		
 		loadBar.setMaximum(max);
+	}
+	
+	/**
+	 * Changes the text of the loading label.
+	 * @param text
+	 */
+	public void setLoadLabel(String text) {
+		
+		loadLabel.setText(text);
+		
+		waiting.revalidate();
+		waiting.repaint();
 	}
 
 	/**
@@ -257,7 +340,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		waiting.removeAll();
 
-		confirmPanel = new LoadCheckView(dataModel, this);
+		confirmPanel = new LoadCheckView((TVModel)dataModel, 
+				loadNewButton, advanceButton);
+//		LoadCheckController loadController = new LoadCheckController(this);
 
 		waiting.add(confirmPanel, "push, grow");
 		
@@ -265,6 +350,11 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 		waiting.repaint();
 		waiting.revalidate();
+	}
+	
+	public LoadCheckView getLoadCheckView() {
+		
+		return confirmPanel;
 	}
 
 	// Loading Methods
@@ -376,53 +466,51 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		}
 	}
 
-	/**
-	 * This method opens a file dialog to open either the visualization view or
-	 * the cluster view depending on which file type is chosen.
-	 * @throws IOException 
-	 * 
-	 * @throws LoadException
-	 */
-	public void openFile() throws IOException {
-
-		try {
-			File file = selectFile();
-
-			final String fileName = file.getAbsolutePath();
-			final int dotIndex = fileName.indexOf(".");
-
-			final int suffixLength = fileName.length() - dotIndex;
-
-			final String fileType = file.getAbsolutePath().substring(
-					fileName.length() - suffixLength, fileName.length());
-
-			if (!fileType.equalsIgnoreCase(".cdt")) {
-				final CDTCreator3 fileTransformer = new CDTCreator3(file, 
-						fileType);
-				fileTransformer.createFile();
-
-				file = new File(fileTransformer.getFilePath());
-			}
-
-			FileSet fileSet = getFileSet(file); // Type: 0 (Auto)
-			
-			setLoading();
-			
-			// Loading TVModel
-			loadFileSet(fileSet);
-
-			fileSet = fileMru.addUnique(fileSet);
-			fileMru.setLast(fileSet);
-
-//			confirmLoaded();
-
-		} catch (final LoadException e) {
-			if ((e.getType() != LoadException.INTPARSE)
-					&& (e.getType() != LoadException.NOFILE)) {
-				LogBuffer.println("Could not open file: " + e.getMessage());
-			}
-		}
-	}
+//	/**
+//	 * This method opens a file dialog to open either the visualization view or
+//	 * the cluster view depending on which file type is chosen.
+//	 * @throws IOException 
+//	 * 
+//	 * @throws LoadException
+//	 */
+//	public void openFile() throws IOException {
+//
+//		try {
+//			File file = selectFile();
+//
+//			final String fileName = file.getAbsolutePath();
+//			final int dotIndex = fileName.indexOf(".");
+//
+//			final int suffixLength = fileName.length() - dotIndex;
+//
+//			final String fileType = file.getAbsolutePath().substring(
+//					fileName.length() - suffixLength, fileName.length());
+//			
+//			setLoading();
+//
+//			if (!fileType.equalsIgnoreCase(".cdt")) {
+//				final CDTCreator3 fileTransformer = new CDTCreator3(file, 
+//						fileType, this);
+//				fileTransformer.createFile();
+//
+//				file = new File(fileTransformer.getFilePath());
+//			}
+//
+//			FileSet fileSet = getFileSet(file); // Type: 0 (Auto)
+//			
+//			// Loading TVModel
+//			loadFileSet(fileSet);
+//
+//			fileSet = fileMru.addUnique(fileSet);
+//			fileMru.setLast(fileSet);
+//
+//		} catch (final LoadException e) {
+//			if ((e.getType() != LoadException.INTPARSE)
+//					&& (e.getType() != LoadException.NOFILE)) {
+//				LogBuffer.println("Could not open file: " + e.getMessage());
+//			}
+//		}
+//	}
 
 	// Methods to setup views
 	/**
@@ -1372,13 +1460,13 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 					@Override
 					public void actionPerformed(final ActionEvent actionEvent) {
 
-						try {
-							openFile();
-							
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
+//						try {
+//							openFile();
+//							
+//						} catch (IOException e) {
+//							// TODO Auto-generated catch block
+//							e.printStackTrace();
+//						}
 					}
 				});
 				menubar.setAccelerator(KeyEvent.VK_O);
@@ -1798,25 +1886,29 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	/**
 	 * Setter for dataModel, also sets extractors, running.
 	 * 
-	 * @param DataModel
-	 *            newModel
+	 * @param DataModel newModel
 	 */
 	@Override
 	public void setDataModel(DataModel newModel) {
 
-		if (dataModel != null) {
-			dataModel.clearFileSetListeners();
+		if(newModel != null) {
+			if (dataModel != null) {
+				dataModel.clearFileSetListeners();
+			}
+	
+			dataModel = newModel;
+			newModel = null;
+	
+			if (dataModel != null) {
+				dataModel.addFileSetListener(this);
+			}
+	
+			setupExtractors();
+			setupRunning();
+			
+		} else {
+			setLoaded(false);
 		}
-
-		dataModel = newModel;
-		newModel = null;
-
-		if (dataModel != null) {
-			dataModel.addFileSetListener(this);
-		}
-
-		setupExtractors();
-		setupRunning();
 	}
 
 	/**

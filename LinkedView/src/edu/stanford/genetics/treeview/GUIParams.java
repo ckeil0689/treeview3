@@ -170,12 +170,12 @@ public class GUIParams {
 	 * @param text
 	 * @return
 	 */
-	public static JProgressBar setPBarLayout(final String text) {
+	public static JProgressBar setPBarLayout() {
 
 		JProgressBar pBar = new JProgressBar();
 		pBar.setMinimum(0);
 		pBar.setStringPainted(true);
-		pBar.setMaximumSize(new Dimension(2000, 40));
+		pBar.setMaximumSize(new Dimension(2000, 20));
 		pBar.setForeground(GUIParams.ELEMENT);
 		pBar.setUI(new BasicProgressBarUI() {
 
@@ -189,7 +189,6 @@ public class GUIParams {
 				return GUIParams.PROGRESS2;
 			};
 		});
-		pBar.setString(text);
 		pBar.setVisible(true);
 
 		return pBar;

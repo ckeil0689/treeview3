@@ -239,13 +239,13 @@ public class ClusterView extends JPanel implements MainPanel {
 		cancel_button = GUIParams.setButtonLayout("Cancel", null);
 		
 		// ProgressBars for clustering process
-		pBar = GUIParams.setPBarLayout("Row Distance Matrix");
+		pBar = GUIParams.setPBarLayout();
 
-		pBar2 = GUIParams.setPBarLayout("Row Clustering");
+		pBar2 = GUIParams.setPBarLayout();
 
-		pBar3 = GUIParams.setPBarLayout("Column Distance Matrix");
+		pBar3 = GUIParams.setPBarLayout();
 
-		pBar4 = GUIParams.setPBarLayout("Column Clustering");
+		pBar4 = GUIParams.setPBarLayout();
 		
 		// ComboBox to choose cluster method
 		String[] clusterNames = { "Hierarchical Clustering",
@@ -804,23 +804,6 @@ public class ClusterView extends JPanel implements MainPanel {
 		
 		return spinnerValues;
 	}
-	
-//	/**
-//	 * Returns the loaded ProgressBars used as indicators in clustering.
-//	 * @return
-//	 */
-//	public JProgressBar[] getProgressBars() {
-//		
-//		int pbars = 4;
-//		JProgressBar[] progressbarArray = new JProgressBar[pbars];
-//		
-//		progressbarArray[0] = pBar;
-//		progressbarArray[1] = pBar2;
-//		progressbarArray[2] = pBar3;
-//		progressbarArray[3] = pBar4;
-//		
-//		return progressbarArray;
-//	}
 	
 	/**
 	 * Sets the maximum for the JProgressBar to be used.

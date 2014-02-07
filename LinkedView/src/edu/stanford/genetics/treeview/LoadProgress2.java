@@ -90,9 +90,9 @@ public class LoadProgress2 extends JDialog implements LoadProgress2I {
 	public LoadProgress2(final String title, final Frame f) {
 
 		super(f, title, true);
-		phaseBar = GUIParams.setPBarLayout("Loading");
+		phaseBar = GUIParams.setPBarLayout();
 
-		progressBar = GUIParams.setPBarLayout("Loading");
+		progressBar = GUIParams.setPBarLayout();
 
 		taskOutput = new JTextArea(10, 40);
 		taskOutput.setMargin(new Insets(5, 5, 5, 5));

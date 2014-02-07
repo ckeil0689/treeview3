@@ -1,12 +1,17 @@
 package edu.stanford.genetics.treeview.model;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import edu.stanford.genetics.treeview.TreeViewFrame;
 
 import Cluster.ClusterFileWriter2;
 
@@ -23,10 +28,11 @@ import Cluster.ClusterFileWriter2;
  */
 public class CDTCreator3 {
 
+	private TreeViewFrame tvFrame;
 	private BufferedReader reader = null;
 	private BufferedReader customReader = null;
-	private File file = null;
-	private File customFile = null;
+	private File file;
+	private File customFile;
 	private ArrayList<List<String>> dataSet;
 	private ArrayList<List<String>> customDataSet;
 
@@ -65,10 +71,10 @@ public class CDTCreator3 {
 	 * 
 	 * @param file
 	 */
-	public CDTCreator3(final File file, final String fileType) {
+	public CDTCreator3(final File file, final String fileType, 
+			final TreeViewFrame tvFrame) {
 
-		this.file = file;
-		this.fileType = fileType;
+		this(file, null, fileType, tvFrame);
 	}
 	
 	/**
@@ -77,25 +83,36 @@ public class CDTCreator3 {
 	 * @param file
 	 */
 	public CDTCreator3(final File file, final File file2, 
-			final String fileType) {
+			final String fileType, final TreeViewFrame tvFrame) {
 
 		this.file = file;
 		this.customFile = file2;
 		this.fileType = fileType;
+		this.tvFrame = tvFrame;
 	}
 
 	public void createFile() throws IOException {
 
 		try {
+			// Loading screen
+			tvFrame.setLoadLabel("Transforming file to CDT format...");
+			tvFrame.resetLoadBar();
+			
+			// Count file lines for loadBar
+			int pBarMax = count(file.getAbsolutePath());
+			tvFrame.setLoadBarMax(pBarMax);
+			
 			reader = new BufferedReader(new FileReader(file));
 
 			final ArrayList<String[]> dataExtract = extractData(reader);
 
 			//Arrays to ArrayLists
+			tvFrame.setLoadLabel("Preparing dataset.");
 			dataSet = transformArray(dataExtract);
 			rowSize = dataSet.get(0).size();
 
 			//Find positions of labels in the data set
+			tvFrame.setLoadLabel("Checking for labels.");
 			findLabel(gidInd, dataSet, "GID");
 			findLabel(aidInd, dataSet, "AID");
 			findLabel(orfInd, dataSet, "ORF");
@@ -132,7 +149,10 @@ public class CDTCreator3 {
 				replaceLabels();
 			}
 
-			setupCDT();
+			tvFrame.setLoadLabel("Setting up file details.");
+			setupFile();
+			
+			tvFrame.setLoadLabel("Writing CDT file...");
 			generateCDT();
 			
 			bw.close();
@@ -222,6 +242,7 @@ public class CDTCreator3 {
 		final int dataCol = dataStart.get(1);
 		final int dataRow = dataStart.get(0);
 		int gidCol = 0;
+		int line = 0;
 		
 		List<String> rowElement = new ArrayList<String>(rowSize);
 
@@ -238,6 +259,7 @@ public class CDTCreator3 {
 				dataSet.get(orfRow).size()));
 		
 		bw.writeContent(rowElement);
+		line++;
 		
 		rowElement = new ArrayList<String>(rowSize);
 
@@ -258,6 +280,7 @@ public class CDTCreator3 {
 			rowElement.addAll(aidList);
 			
 			bw.writeContent(rowElement);
+			line++;
 		}
 
 		// add EWEIGHT row
@@ -275,6 +298,7 @@ public class CDTCreator3 {
 				dataSet.get(0).size()));
 		
 		bw.writeContent(rowElement);
+		line++;
 		
 		// continue with each data row, just each element + data sublist values
 		// for the size of the dataSet - dataCol(amount of rows already filled)
@@ -310,6 +334,8 @@ public class CDTCreator3 {
 			
 			// Check whether it's the last line
 			bw.writeContent(rowElement);
+			line++;
+			tvFrame.updateLoadBar(line);
 		}
 		
 		bw.closeWriter();
@@ -319,7 +345,7 @@ public class CDTCreator3 {
 	 * Saves a cdt-file, built from the loaded file, to the same directory as
 	 * the loaded file. This file will then be used in JTV!
 	 */
-	public void setupCDT() {
+	public void setupFile() {
 
 		final String fileEnd;
 		
@@ -443,6 +469,40 @@ public class CDTCreator3 {
 		}
 		
 		return match;
+	}
+	
+	/**
+	 * Count amount of lines in the file to be loaded so that the progressBar
+	 * can get correct values for extractData().
+	 * Code from StackOverflow (https://stackoverflow.com/questions/453018).
+	 * @param filename
+	 * @return
+	 * @throws IOException
+	 */
+	public int count(String filename) throws IOException {
+	    
+		InputStream is = new BufferedInputStream(new FileInputStream(filename));
+	    
+		try {
+	        byte[] c = new byte[1024];
+	        int count = 0;
+	        int readChars = 0;
+	        boolean empty = true;
+	        
+	        while ((readChars = is.read(c)) != -1) {
+	            empty = false;
+	            
+	            for (int i = 0; i < readChars; ++i) {
+	                if (c[i] == '\n') {
+	                    ++count;
+	                }
+	            }
+	        }
+	        return (count == 0 && !empty) ? 1 : count;
+	        
+	    } finally {
+	        is.close();
+	    }
 	}
 
 	/**

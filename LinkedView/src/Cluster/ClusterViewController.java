@@ -45,36 +45,11 @@ public class ClusterViewController {
 
 			@Override
 			public Void doInBackground() {
-
-//				int row_clusterN = 0;
-//				int col_clusterN = 0;
-//				int row_iterations = 0;
-//				int col_iterations = 0;
 				
 				try {
-//					Integer[] spinnerValues = clusterView.getSpinnerValues();
-//					
-//					// Set integers only if KMeans options are shown
-//					if (!isHierarchical()) {
-//						row_clusterN = spinnerValues[0];
-//						col_clusterN = spinnerValues[1];
-//
-//						row_iterations = spinnerValues[2];
-//						col_iterations = spinnerValues[3];
-//					}
-//					
-//					JProgressBar pBar = clusterView.getProgressBars()[0];
-//					JProgressBar pBar2 = clusterView.getProgressBars()[1];
-//					JProgressBar pBar3 = clusterView.getProgressBars()[2];
-//					JProgressBar pBar4 = clusterView.getProgressBars()[3];
-
 					// Setup a ClusterProcessor
 					final ClusterProcessor clusterTarget = 
 							new ClusterProcessor(clusterView, tvModel);
-//						, pBar, pBar2, pBar3, pBar4, 
-//									clusterView.getLinkageMethod(), 
-//									row_clusterN, row_iterations, col_clusterN, 
-//									col_iterations);
 
 					// Begin the actual clustering, hierarchical or kmeans
 					clusterTarget.cluster(isHierarchical());

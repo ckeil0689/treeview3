@@ -1,8 +1,6 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,6 +10,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
+import edu.stanford.genetics.treeview.model.TVModel;
 
 import net.miginfocom.swing.MigLayout;
 import Cluster.DataViewPanel;
@@ -50,30 +50,29 @@ class LoadCheckView extends JPanel {
 	private BufferedImage labelImg;
 	private ClassLoader classLoader;
 	private InputStream input;
-	private final TreeViewFrame viewFrame;
 
-	private DataModel dataModel = null;
+	private TVModel dataModel = null;
 	private final DataViewPanel dataView;
 
 	/**
 	 * Constructor Setting up the layout of the panel.
 	 */
-	public LoadCheckView(final DataModel dataModel,
-			final TreeViewFrame viewFrame) {
+	public LoadCheckView(final TVModel model, JButton load, JButton cont) {
 
-		this.setLayout(new MigLayout());
-
-		this.dataModel = dataModel;
-		this.viewFrame = viewFrame;
+		this.dataModel = model;
 		this.dataView = new DataViewPanel(dataModel);
+		this.loadNewButton = load;
+		this.advanceButton = cont;
 
-		this.setupLayout();
+		setupLayout();
 	}
 
 	public void setupLayout() {
 
-		this.removeAll();
-		this.setBackground(GUIParams.BG_COLOR);
+		setLayout(new MigLayout());
+		
+		removeAll();
+		setBackground(GUIParams.BG_COLOR);
 
 		dataView.refresh();
 
@@ -99,7 +98,8 @@ class LoadCheckView extends JPanel {
 				feedbackPanel.add(icon);
 
 			} catch (final IOException e) {
-
+				System.out.println("Icon for loading success could not" +
+						"be retrieved.");
 			}
 
 			final HeaderInfo infoArray = dataModel.getArrayHeaderInfo();
@@ -134,33 +134,11 @@ class LoadCheckView extends JPanel {
 			buttonPanel.setLayout(new MigLayout());
 			buttonPanel.setOpaque(false);
 
-			loadNewButton = GUIParams.setButtonLayout("Load Different File", 
-					null);
-			loadNewButton.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(final ActionEvent arg0) {
-
-					try {
-						viewFrame.openFile();
-						
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			});
-
-			advanceButton = GUIParams.setButtonLayout("Continue", 
-					"forwardIcon");
-			advanceButton.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(final ActionEvent arg0) {
-
-					viewFrame.setLoaded(true);
-				}
-			});
+//			loadNewButton = GUIParams.setButtonLayout("Load Different File", 
+//					null);
+//
+//			advanceButton = GUIParams.setButtonLayout("Continue", 
+//					"forwardIcon");
 
 			buttonPanel.add(loadNewButton, "alignx 50%, pushx");
 			buttonPanel.add(advanceButton, "alignx 50%, pushx");
@@ -169,16 +147,16 @@ class LoadCheckView extends JPanel {
 			numPanel.add(numColLabel, "span, wrap");
 			numPanel.add(label3);
 
-			this.add(feedbackPanel, "alignx 50%, pushx, span, wrap");
-			this.add(numPanel, "span, pushx, growx, alignx 50%, width ::60%, "
+			add(feedbackPanel, "alignx 50%, pushx, span, wrap");
+			add(numPanel, "span, pushx, growx, alignx 50%, width ::60%, "
 					+ "wrap");
-			this.add(previewLabel, "span, alignx 50%, pushx, wrap");
-			this.add(dataView, "span, push, grow, alignx 50%, width ::60%, "
+			add(previewLabel, "span, alignx 50%, pushx, wrap");
+			add(dataView, "span, push, grow, alignx 50%, width ::60%, "
 					+ "height ::60%, wrap");
-			this.add(buttonPanel, "span, alignx 50%, push");
+			add(buttonPanel, "span, alignx 50%, push");
 
-			this.revalidate();
-			this.repaint();
+			revalidate();
+			repaint();
 
 		} else {
 			
@@ -188,26 +166,12 @@ class LoadCheckView extends JPanel {
 
 			loadNewButton = GUIParams.setButtonLayout("Load New File", null);
 			loadNewButton.setBackground(GUIParams.ELEMENT);
-			loadNewButton.addActionListener(new ActionListener() {
 
-				@Override
-				public void actionPerformed(final ActionEvent arg0) {
+			add(warning, "alignx 50%, span, wrap");
+			add(loadNewButton, "alignx 50%");
 
-					try {
-						viewFrame.openFile();
-						
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			});
-
-			this.add(warning, "alignx 50%, span, wrap");
-			this.add(loadNewButton, "alignx 50%");
-
-			this.revalidate();
-			this.repaint();
+			revalidate();
+			repaint();
 		}
 	}
 }

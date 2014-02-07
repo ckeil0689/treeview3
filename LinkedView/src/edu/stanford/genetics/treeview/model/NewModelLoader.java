@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
@@ -32,9 +31,6 @@ public class NewModelLoader {
 	private int dataStartRow;
 	private int dataStartCol;
 	
-	private int gidCol;
-	private int aidRow;
-	
 	private boolean gidFound = false;
 	private boolean aidFound = false;
 	private boolean eWeightFound = false;
@@ -51,81 +47,17 @@ public class NewModelLoader {
 		
 		LoadWorker worker = new LoadWorker();
 		worker.execute();
-		
-//		try {
-//			System.out.println("Starting load.");
-//			// Read data from specified file location
-//			
-//			int loadBarMax = count(fileSet.getCdt());
-//			frame.setLoadBarMax(loadBarMax);
-//			
-//			FileInputStream fis = new FileInputStream(fileSet.getCdt());
-//	        DataInputStream in = new DataInputStream(fis);
-//	        BufferedReader br = new BufferedReader(new InputStreamReader(in));
-//	        
-//	        // Get data from file into String and double arrays 
-//	        // Put the arrays in ArrayLists for later access.
-//	        System.out.println("Starting extract.");
-//	        extractData(br);
-//	        
-//        } catch(FileNotFoundException e) {
-//        	e.printStackTrace();
-//        	
-//        } catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		
-//		
-//		// Parse the CDT File
-//		parseCDT();
-//		
-//		// If present, parse ATR File
-//		if(aidFound) {
-//			parseATR();
-//		
-//		} else {
-//			targetModel.aidFound(false);
-//		}
-//		
-//		// If present, parse GTR File
-//		if(gidFound) {
-//			parseGTR();
-//			
-//		} else {
-//			targetModel.gidFound(false);
-//		}
-//		
-//		// Load Config File
-//		try {
-//			final String xmlFile = targetModel.getFileSet().getJtv();
-//
-//			XmlConfig documentConfig;
-//			if (xmlFile.startsWith("http:")) {
-//				documentConfig = new XmlConfig(new URL(xmlFile),
-//						"DocumentConfig");
-//
-//			} else {
-//				documentConfig = new XmlConfig(xmlFile, "DocumentConfig");
-//			}
-//			targetModel.setDocumentConfig(documentConfig);
-//
-//		} catch (final Exception e) {
-//			targetModel.setDocumentConfig(null);
-//			e.printStackTrace();
-//		}
-//		
-//		targetModel.setLoaded(true);
 	}
 	
 	public void load() {
 		
 		try {
-			System.out.println("Starting load.");
 			// Read data from specified file location
-			
+			frame.resetLoadBar();
 			int loadBarMax = count(fileSet.getCdt());
 			frame.setLoadBarMax(loadBarMax);
+			
+			frame.setLoadLabel("Loading Data into TreeView.");
 			
 			FileInputStream fis = new FileInputStream(fileSet.getCdt());
 	        DataInputStream in = new DataInputStream(fis);
@@ -137,35 +69,43 @@ public class NewModelLoader {
 	        extractData(br);
 	        
         } catch(FileNotFoundException e) {
+        	System.out.println("CDT file could not be found.");
         	e.printStackTrace();
         	
         } catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+        	System.out.println("CDT file could not be loaded into " +
+        			"BufferedReader.");
+        	e.printStackTrace();
 		}
 		
 		
 		// Parse the CDT File
+		frame.setLoadLabel("Making sense of CDT file.");
 		parseCDT();
 		
 		// If present, parse ATR File
 		if(aidFound) {
+			frame.setLoadLabel("Reading ATR file.");
 			parseATR();
 		
 		} else {
+			System.out.println("No ATR file found for this CDT file.");
 			targetModel.aidFound(false);
 		}
 		
 		// If present, parse GTR File
 		if(gidFound) {
+			frame.setLoadLabel("Reading GTR file.");
 			parseGTR();
 			
 		} else {
+			System.out.println("No GTR file found for this CDT file.");
 			targetModel.gidFound(false);
 		}
 		
 		// Load Config File
 		try {
+			frame.setLoadLabel("Loading configuration file.");
 			final String xmlFile = targetModel.getFileSet().getJtv();
 
 			XmlConfig documentConfig;
