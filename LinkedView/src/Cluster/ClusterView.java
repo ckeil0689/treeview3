@@ -111,9 +111,6 @@ public class ClusterView extends JPanel implements MainPanel {
 	
 	private ClickableIcon infoIcon;
 
-	private String path;
-	private File file;
-
 	private final String[] clusterMethods = { "Single Linkage",
 			"Centroid Linkage", "Average Linkage", "Complete Linkage" };
 
@@ -126,9 +123,9 @@ public class ClusterView extends JPanel implements MainPanel {
 	 * @param vFrame
 	 *            parent ViewFrame of DendroView
 	 */
-	public ClusterView(final DataModel cVModel, final TreeViewFrame vFrame) {
+	public ClusterView(final TreeViewFrame vFrame) {
 
-		this(cVModel, null, vFrame, "Cluster View");
+		this(null, vFrame, "Cluster View");
 	}
 
 	/**
@@ -138,10 +135,9 @@ public class ClusterView extends JPanel implements MainPanel {
 	 * @param root
 	 * @param vFrame
 	 */
-	public ClusterView(final DataModel cVModel, final ConfigNode root,
-			final TreeViewFrame vFrame) {
+	public ClusterView(final ConfigNode root, final TreeViewFrame vFrame) {
 
-		this(cVModel, root, vFrame, "Cluster View");
+		this(root, vFrame, "Cluster View");
 	}
 
 	/**
@@ -157,13 +153,13 @@ public class ClusterView extends JPanel implements MainPanel {
 	 * @param name
 	 *            name of this view.
 	 */
-	public ClusterView (final DataModel dataModel, final ConfigNode root,
-			final TreeViewFrame vFrame, final String name) {
+	public ClusterView (final ConfigNode root, final TreeViewFrame vFrame, 
+			final String name) {
 
 		super.setName(name);
 
-		this.dataModel = dataModel;
 		this.viewFrame = vFrame;
+		this.dataModel = viewFrame.getDataModel();
 
 		// Set layout for initial window
 		setupLayout();
@@ -421,33 +417,10 @@ public class ClusterView extends JPanel implements MainPanel {
 		final SpinnerNumberModel amountChoice = new SpinnerNumberModel(0, 0,
 				5000, 1);
 		final JSpinner jft = new JSpinner(amountChoice);
-
-//		final Dimension d = jft.getPreferredSize();
-//		d.setSize(d.getWidth(), d.getHeight() * 2);
-//		jft.setPreferredSize(d);
+		
 		jft.setFont(GUIParams.FONTS);
 
 		return jft;
-	}
-
-	/**
-	 * Setter for file path
-	 * 
-	 * @param filePath
-	 */
-	public void setPath(final String filePath) {
-
-		path = filePath;
-	}
-
-	/**
-	 * Setter for file
-	 * 
-	 * @param cdtFile
-	 */
-	public void setFile(final File cdtFile) {
-
-		file = cdtFile;
 	}
 
 	/**
@@ -582,26 +555,26 @@ public class ClusterView extends JPanel implements MainPanel {
 		dendro_button.addActionListener(visual);
 	}
 	
-	/**
-	 * Sets a new DendroView with the new data loaded into TVModel, displaying
-	 * an updated HeatMap. It should also close the ClusterViewFrame.
-	 */
-	public void visualizeData() {
-		
-		JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-		
-		final FileSet fileSet = new FileSet(file.getName(), file
-				.getParent() + File.separator);
-
-		try {
-			viewFrame.loadFileSet(fileSet);
-
-		} catch (final LoadException e) {
-
-		}
-		viewFrame.setLoaded(true);
-		topFrame.dispose();
-	}
+//	/**
+//	 * Sets a new DendroView with the new data loaded into TVModel, displaying
+//	 * an updated HeatMap. It should also close the ClusterViewFrame.
+//	 */
+//	public void visualizeData() {
+//		
+//		JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+//		
+//		final FileSet fileSet = new FileSet(file.getName(), file
+//				.getParent() + File.separator);
+//
+//		try {
+//			viewFrame.loadFileSet(fileSet);
+//
+//		} catch (final LoadException e) {
+//
+//		}
+//		viewFrame.setLoaded(true);
+//		topFrame.dispose();
+//	}
 	
 	/**
 	 * Adds a listener to cluster_button to register user interaction and
@@ -732,14 +705,14 @@ public class ClusterView extends JPanel implements MainPanel {
 	 * Changes of the layout when the worker thread in controller has completed 
 	 * its calculations. (worker calls done())
 	 */
-	public void displayCompleted() {
+	public void displayCompleted(String finalFilePath) {
 		
 		buttonPanel.remove(cancel_button);
 
 		TextDisplay status1 = new TextDisplay("The file has been saved "
 				+ "in the original directory.");
 
-		TextDisplay status2 = new TextDisplay("File Path: " + path);
+		TextDisplay status2 = new TextDisplay("File Path: " + finalFilePath);
 
 		dendro_button.setEnabled(true);
 		buttonPanel.add(cluster_button, "pushx, alignx 50%");

@@ -342,7 +342,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 		confirmPanel = new LoadCheckView((TVModel)dataModel, 
 				loadNewButton, advanceButton);
-//		LoadCheckController loadController = new LoadCheckController(this);
 
 		waiting.add(confirmPanel, "push, grow");
 		
@@ -392,22 +391,22 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		return fileSet1;
 	}
 
-	/**
-	 * Loads a FileSet and calls setLoaded(true) to reset the MainPanel.
-	 * 
-	 * @param fileSet
-	 * @throws LoadException
-	 */
-	public void load(FileSet fileSet) throws LoadException {
-
-		loadFileSet(fileSet);
-
-		fileSet = fileMru.addUnique(fileSet);
-		fileMru.setLast(fileSet);
-		fileMru.notifyObservers();
-
-		setLoaded(true);
-	}
+//	/**
+//	 * Loads a FileSet and calls setLoaded(true) to reset the MainPanel.
+//	 * 
+//	 * @param fileSet
+//	 * @throws LoadException
+//	 */
+//	public void load(FileSet fileSet) throws LoadException {
+//
+//		loadFileSet(fileSet);
+//
+//		fileSet = fileMru.addUnique(fileSet);
+//		fileMru.setLast(fileSet);
+//		fileMru.notifyObservers();
+//
+//		setLoaded(true);
+//	}
 
 	/**
 	 * To load any fileset without using the event queue thread
@@ -423,29 +422,29 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		setLoaded(true);
 	}
 
-	/**
-	 * r * This is the workhorse. It creates a new DataModel of the file, and
-	 * then sets the Datamodel. A side effect of setting the datamodel is to
-	 * update the running window.
-	 */
-	public void loadFileSet(final FileSet fileSet) throws LoadException {
-
-		// Make TVModel object
-		final TVModel tvModel = new TVModel();
-		tvModel.setFrame(this);
-
-		try {
-			// load instance variables of TVModel with data
-			tvModel.loadNew(fileSet);
-//			setDataModel(tvModel);
-
-		} catch (final LoadException e) {
-			if (e.getType() != LoadException.INTPARSE) {
-				JOptionPane.showMessageDialog(this, e);
-				throw e;
-			}
-		}
-	}
+//	/**
+//	 * r * This is the workhorse. It creates a new DataModel of the file, and
+//	 * then sets the Datamodel. A side effect of setting the datamodel is to
+//	 * update the running window.
+//	 */
+//	public void loadFileSet(final FileSet fileSet) throws LoadException {
+//
+//		// Make TVModel object
+//		final TVModel tvModel = new TVModel();
+//		tvModel.setFrame(this);
+//
+//		try {
+//			// load instance variables of TVModel with data
+//			tvModel.loadNew(fileSet);
+////			setDataModel(tvModel);
+//
+//		} catch (final LoadException e) {
+//			if (e.getType() != LoadException.INTPARSE) {
+//				JOptionPane.showMessageDialog(this, e);
+//				throw e;
+//			}
+//		}
+//	}
 
 	/**
 	 * To load any FileSet without using the event queue thread
@@ -513,57 +512,67 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 //	}
 
 	// Methods to setup views
+//	/**
+//	 * Sets up the following: 1) urlExtractor, an object that generates urls
+//	 * from gene indexes 2) arrayUrlExtractor, similarly 3) geneSelection and 4)
+//	 * arraySelection, the two selection objects. It is important that these are
+//	 * set up before any plugins are instantiated. This is called before
+//	 * setupRunning by setDataModel.
+//	 */
+//	protected void setupExtractors() {
+//
+//		final DataMatrix matrix = getDataModel().getDataMatrix();
+//		final int ngene = matrix.getNumRow();
+//		final int nexpr = matrix.getNumCol();
+//
+//		final ConfigNode documentConfig = getDataModel()
+//				.getDocumentConfigRoot();
+//		// extractors...
+//		final UrlPresets genePresets = getGeneUrlPresets();
+//		final UrlExtractor urlExtractor = new UrlExtractor(getDataModel()
+//				.getGeneHeaderInfo(), genePresets);
+//		urlExtractor.bindConfig(documentConfig.fetchOrCreate("UrlExtractor"));
+//		setUrlExtractor(urlExtractor);
+//
+//		final UrlPresets arrayPresets = getArrayUrlPresets();
+//		final UrlExtractor arrayUrlExtractor = new UrlExtractor(getDataModel()
+//				.getArrayHeaderInfo(), arrayPresets);
+//		arrayUrlExtractor.bindConfig(documentConfig
+//				.fetchOrCreate("ArrayUrlExtractor"));
+//		setArrayUrlExtractor(arrayUrlExtractor);
+//
+//		geneSelection = new TreeSelection(ngene);
+//		arraySelection = new TreeSelection(nexpr);
+//	}
+
+//	/**
+//	 * Generates a DendroView object and sets the current running MainPanel to
+//	 * it. As a result the View is displayed in the TreeViewFrame
+//	 */
+//	protected void setupRunning() {
+//
+//		final DendroView dv2 = new DendroView(getDataModel(), this);
+//		running = dv2;
+//	}
+
+//	/**
+//	 * Generates a ClusterView object and sets the current running MainPanel to
+//	 * it. As a result the View is displayed in the TreeViewFrame
+//	 */
+//	protected void setupClusterRunning() {
+//
+//		final ClusterView cv = new ClusterView(getDataModel(), this);
+//		running = cv;
+//	}
+	
 	/**
-	 * Sets up the following: 1) urlExtractor, an object that generates urls
-	 * from gene indexes 2) arrayUrlExtractor, similarly 3) geneSelection and 4)
-	 * arraySelection, the two selection objects. It is important that these are
-	 * set up before any plugins are instantiated. This is called before
-	 * setupRunning by setDataModel.
+	 * Sets the currently running panel for TVFrame. TVFrame is updated by
+	 * setLoaded(true).
+	 * @param panel
 	 */
-	protected void setupExtractors() {
-
-		final DataMatrix matrix = getDataModel().getDataMatrix();
-		final int ngene = matrix.getNumRow();
-		final int nexpr = matrix.getNumCol();
-
-		final ConfigNode documentConfig = getDataModel()
-				.getDocumentConfigRoot();
-		// extractors...
-		final UrlPresets genePresets = getGeneUrlPresets();
-		final UrlExtractor urlExtractor = new UrlExtractor(getDataModel()
-				.getGeneHeaderInfo(), genePresets);
-		urlExtractor.bindConfig(documentConfig.fetchOrCreate("UrlExtractor"));
-		setUrlExtractor(urlExtractor);
-
-		final UrlPresets arrayPresets = getArrayUrlPresets();
-		final UrlExtractor arrayUrlExtractor = new UrlExtractor(getDataModel()
-				.getArrayHeaderInfo(), arrayPresets);
-		arrayUrlExtractor.bindConfig(documentConfig
-				.fetchOrCreate("ArrayUrlExtractor"));
-		setArrayUrlExtractor(arrayUrlExtractor);
-
-		geneSelection = new TreeSelection(ngene);
-		arraySelection = new TreeSelection(nexpr);
-	}
-
-	/**
-	 * Generates a DendroView object and sets the current running MainPanel to
-	 * it. As a result the View is displayed in the TreeViewFrame
-	 */
-	protected void setupRunning() {
-
-		final DendroView dv2 = new DendroView(getDataModel(), this);
-		running = dv2;
-	}
-
-	/**
-	 * Generates a ClusterView object and sets the current running MainPanel to
-	 * it. As a result the View is displayed in the TreeViewFrame
-	 */
-	protected void setupClusterRunning() {
-
-		final ClusterView cv = new ClusterView(getDataModel(), this);
-		running = cv;
+	public void setRunning(MainPanel panel) {
+		
+		running = panel;
 	}
 
 	// Observer
@@ -699,51 +708,51 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		menubar.setEnabled(true);
 	}
 
-	/**
-	 * This method sets up a JDialog to call an option for the user to change
-	 * some of the presets.
-	 */
-	protected void setupPresetsPanel() {
-
-		presetsFrame = new JDialog(TreeViewFrame.this, "Presets", true);
-		presetsPanel = new TabbedSettingsPanel();
-
-		UrlPresetsEditor presetEditor = new UrlPresetsEditor(
-				getGeneUrlPresets());
-		presetEditor.setTitle("Gene Url");
-		presetsPanel.addSettingsPanel("Gene", presetEditor);
-
-		presetEditor = new UrlPresetsEditor(getArrayUrlPresets());
-		presetEditor.setTitle("Array Url");
-		presetsPanel.addSettingsPanel("Array", presetEditor);
-
-		final SettingsPanelHolder innerPanel = new SettingsPanelHolder(
-				presetsFrame, getApp().getGlobalConfig().getRoot());
-		innerPanel.addSettingsPanel(presetsPanel);
-
-		presetsFrame.getContentPane().add(innerPanel);
-		presetsFrame.pack();
-	}
+//	/**
+//	 * This method sets up a JDialog to call an option for the user to change
+//	 * some of the presets.
+//	 */
+//	protected void setupPresetsPanel() {
+//
+//		presetsFrame = new JDialog(TreeViewFrame.this, "Presets", true);
+//		presetsPanel = new TabbedSettingsPanel();
+//
+//		UrlPresetsEditor presetEditor = new UrlPresetsEditor(
+//				getGeneUrlPresets());
+//		presetEditor.setTitle("Gene Url");
+//		presetsPanel.addSettingsPanel("Gene", presetEditor);
+//
+//		presetEditor = new UrlPresetsEditor(getArrayUrlPresets());
+//		presetEditor.setTitle("Array Url");
+//		presetsPanel.addSettingsPanel("Array", presetEditor);
+//
+//		final SettingsPanelHolder innerPanel = new SettingsPanelHolder(
+//				presetsFrame, getApp().getGlobalConfig().getRoot());
+//		innerPanel.addSettingsPanel(presetsPanel);
+//
+//		presetsFrame.getContentPane().add(innerPanel);
+//		presetsFrame.pack();
+//	}
 	
-	/**
-	 * Opens the ClusterViewFrame with either the options for hierarchical
-	 * clustering or K-Means, depending on the boolean parameter.
-	 * @param hierarchical
-	 */
-	public void setupClusterView() {
-		
-		// Making a new Window to display clustering components
-		ClusterViewFrame clusterViewFrame = 
-				new ClusterViewFrame(dataModel, TreeViewFrame.this);
-		
-		// Creating the Controller for this view.
-		ClusterViewController clusControl = 
-				new ClusterViewController((TVModel)dataModel, 
-						clusterViewFrame.getClusterView());
-		
-		// Make the clustering window visible.
-		clusterViewFrame.setVisible(true);
-	}
+//	/**
+//	 * Opens the ClusterViewFrame with either the options for hierarchical
+//	 * clustering or K-Means, depending on the boolean parameter.
+//	 * @param hierarchical
+//	 */
+//	public void setupClusterView() {
+//		
+//		// Making a new Window to display clustering components
+//		ClusterViewFrame clusterViewFrame = 
+//				new ClusterViewFrame(dataModel, TreeViewFrame.this);
+//		
+//		// Creating the Controller for this view.
+//		ClusterViewController clusControl = 
+//				new ClusterViewController((TVModel)dataModel, 
+//						clusterViewFrame.getClusterView());
+//		
+//		// Make the clustering window visible.
+//		clusterViewFrame.setVisible(true);
+//	}
 
 	// Populating various menus
 	/**
@@ -979,7 +988,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			public void actionPerformed(final ActionEvent arg0) {
 
 				if (dataModel != null) {
-					setupClusterView();
+//					setupClusterView();
+					System.out.println("Cant load ClusterView right now.");
 
 				} else {
 					dialog.setVisible(true);
@@ -1721,6 +1731,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 * 
 	 */
 	class FileMenuListener implements ActionListener {
+		
 		private final FileSet fileSet;
 
 		/**
@@ -1882,34 +1893,40 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 		setTitle(getAppName() + " : " + dataModel.getSource());
 	}
-
-	/**
-	 * Setter for dataModel, also sets extractors, running.
-	 * 
-	 * @param DataModel newModel
-	 */
+	
 	@Override
-	public void setDataModel(DataModel newModel) {
-
-		if(newModel != null) {
-			if (dataModel != null) {
-				dataModel.clearFileSetListeners();
-			}
-	
-			dataModel = newModel;
-			newModel = null;
-	
-			if (dataModel != null) {
-				dataModel.addFileSetListener(this);
-			}
-	
-			setupExtractors();
-			setupRunning();
-			
-		} else {
-			setLoaded(false);
-		}
+	public void setDataModel(DataModel model) {
+		
+		this.dataModel = model;
 	}
+
+//	/**
+//	 * Setter for dataModel, also sets extractors, running.
+//	 * 
+//	 * @param DataModel newModel
+//	 */
+//	@Override
+//	public void setDataModel(DataModel newModel) {
+//
+//		if(newModel != null) {
+//			if (dataModel != null) {
+//				dataModel.clearFileSetListeners();
+//			}
+//	
+//			dataModel = newModel;
+//			newModel = null;
+//	
+//			if (dataModel != null) {
+//				dataModel.addFileSetListener(this);
+//			}
+//	
+//			setupExtractors();
+//			setupRunning();
+//			
+//		} else {
+//			setLoaded(false);
+//		}
+//	}
 
 	/**
 	 * Setter for geneFinder
@@ -1926,6 +1943,16 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	public void setArrayFinder(final HeaderFinder geneFinder) {
 
 		this.geneFinder = geneFinder;
+	}
+	
+	public void setArraySelection(TreeSelection aSelect) {
+		
+		this.arraySelection = aSelect;
+	}
+	
+	public void setGeneSelection(TreeSelection aSelect) {
+		
+		this.geneSelection = aSelect;
 	}
 
 	// Getters
@@ -1989,22 +2016,37 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		return arrayFinder;
 	}
 
+	/**
+	 * Returns TVFrame's instance of dataModel
+	 */
 	@Override
 	public DataModel getDataModel() {
 
 		return dataModel;
 	}
 	
+	/**
+	 * Returns TVFrame's instance of FileMRU
+	 * @return
+	 */
 	public FileMru getFileMRU() {
 		
 		return fileMru;
 	}
 	
+	/**
+	 * Returns the parent JPanel of TVFrame which holds the different views.
+	 * @return
+	 */
 	public MainPanel getRunning() {
 		
 		return running;
 	}
 	
+	/**
+	 * Returns TVFrame's instance of the LoadCheckView panel.
+	 * @return
+	 */
 	public LoadCheckView getConfirmPanel() {
 		
 		return confirmPanel;

@@ -2,9 +2,17 @@ package Cluster;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.concurrent.ExecutionException;
+
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import edu.stanford.genetics.treeview.FileSet;
+import edu.stanford.genetics.treeview.LoadException;
+import edu.stanford.genetics.treeview.TVFrameController;
+import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.model.TVModel;
 
 /**
@@ -15,15 +23,20 @@ import edu.stanford.genetics.treeview.model.TVModel;
  * @author CKeil
  *
  */
-public class ClusterViewController {
+public class ClusterViewController extends TVFrameController {
 
 	private TVModel tvModel;
+	private TreeViewFrame tvFrame;
 	private ClusterView clusterView;
 	private SwingWorker<Void, Void> worker;
 	
-	public ClusterViewController(TVModel model, ClusterView view) {
+	private String finalFilePath;
+	
+	public ClusterViewController(ClusterView view, TreeViewFrame tvFrame) {
 		
-		this.tvModel = model;
+		super(tvFrame);
+		this.tvFrame = tvFrame;
+		this.tvModel = (TVModel)tvFrame.getDataModel();
 		this.clusterView = view;
 		
 		setupWorkerThread();
@@ -46,19 +59,15 @@ public class ClusterViewController {
 			@Override
 			public Void doInBackground() {
 				
-				try {
-					// Setup a ClusterProcessor
-					final ClusterProcessor clusterTarget = 
-							new ClusterProcessor(clusterView, tvModel);
+				// Setup a ClusterProcessor
+				final ClusterProcessor clusterTarget = 
+						new ClusterProcessor(clusterView, tvModel);
 
-					// Begin the actual clustering, hierarchical or kmeans
-					clusterTarget.cluster(isHierarchical());
+				// Begin the actual clustering, hierarchical or kmeans
+				finalFilePath = clusterTarget.cluster(
+						isHierarchical());
 
-				} catch (final InterruptedException e) {
-
-				} catch (final ExecutionException e) {
-
-				}
+				clusterView.refresh();
 
 				return null;
 			}
@@ -66,7 +75,7 @@ public class ClusterViewController {
 			@Override
 			protected void done() {
 
-				clusterView.displayCompleted();
+				clusterView.displayCompleted(finalFilePath);
 			}
 		};
 	}
@@ -166,9 +175,32 @@ public class ClusterViewController {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
-			clusterView.visualizeData();
+			visualizeData();
 		}
 		
+		/**
+		 * Sets a new DendroView with the new data loaded into TVModel, displaying
+		 * an updated HeatMap. It should also close the ClusterViewFrame.
+		 */
+		public void visualizeData() {
+			
+			JFrame topFrame = (JFrame) SwingUtilities
+					.getWindowAncestor(clusterView);
+			
+			File file = new File(finalFilePath);
+			
+			final FileSet fileSet = new FileSet(file.getName(), file
+					.getParent() + File.separator);
+
+			try {
+				loadFileSet(fileSet);
+
+			} catch (final LoadException e) {
+
+			}
+			tvFrame.setLoaded(true);
+			topFrame.dispose();
+		}
 	}
 	
 	/**

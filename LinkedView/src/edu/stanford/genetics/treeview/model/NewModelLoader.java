@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 import javax.swing.SwingWorker;
 
 import edu.stanford.genetics.treeview.FileSet;
+import edu.stanford.genetics.treeview.TVFrameController;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.XmlConfig;
 
@@ -43,13 +44,7 @@ public class NewModelLoader {
 		this.fileSet = model.getFileSet();
 	}
 	
-	public void loadFile() {
-		
-		LoadWorker worker = new LoadWorker();
-		worker.execute();
-	}
-	
-	public void load() {
+	public TVModel load() {
 		
 		try {
 			// Read data from specified file location
@@ -124,6 +119,7 @@ public class NewModelLoader {
 		}
 		
 		targetModel.setLoaded(true);
+		return targetModel;
 	}
 	
 	/**
@@ -512,17 +508,15 @@ public class NewModelLoader {
 		protected void done() {
 
 			try {
+				// Wait for worker to finish.
 				get();
+				
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
+				
 			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-			frame.setDataModel(targetModel);
-			frame.confirmLoaded();
 		}
 		
 	}

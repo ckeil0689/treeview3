@@ -154,7 +154,7 @@ public class LinkedViewApp extends TreeViewApp {
 		final TVFrameController tvController = new TVFrameController(tvFrame);
 		
 		try {
-			tvFrame.loadFileSet(fileSet);
+			tvController.loadFileSet(fileSet);
 			tvFrame.setLoaded(true);
 
 		} catch (final LoadException e) {

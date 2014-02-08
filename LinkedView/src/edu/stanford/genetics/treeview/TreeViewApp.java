@@ -242,9 +242,10 @@ public abstract class TreeViewApp implements WindowListener {
 
 		// setup toplevel
 		final TreeViewFrame tvFrame = new TreeViewFrame(this);
+		final TVFrameController tvController = new TVFrameController(tvFrame);
 		if (fileSet != null) {
 			try {
-				tvFrame.loadFileSet(fileSet);
+				tvController.loadFileSet(fileSet);
 				tvFrame.setLoaded(true);
 
 			} catch (final LoadException e) {

@@ -36,7 +36,6 @@ public class DataViewPanel extends JPanel {
 	 */
 	private TVModel model;
 	private TVDataMatrix matrix;
-	private List<Double> gList;
 
 	private String[] geneNames;
 	private String[][] headerArray;
@@ -69,8 +68,6 @@ public class DataViewPanel extends JPanel {
 
 		headerArray = model.getGeneHeaderInfo().getHeaderArray();
 
-//		gList = fillDList(dataArray);
-//		arraysList = splitArrays(gList, model);
 		List<double[]> arraysList = new ArrayList<double[]>();
 
 		if (dataArrays.size() > max) {
@@ -130,7 +127,7 @@ public class DataViewPanel extends JPanel {
 			@Override
 			public int getRowCount() {
 
-				return max;// table.getRowCount();
+				return max;
 			}
 
 			@Override
@@ -148,8 +145,6 @@ public class DataViewPanel extends JPanel {
 		model.addColumn(geneNames);
 
 		headerTable = new JTable(model);
-
-		// int max = table.getRowCount();
 
 		for (int i = 0; i < max; i++) {
 
@@ -210,32 +205,4 @@ public class DataViewPanel extends JPanel {
 
 		return doubleList;
 	}
-
-//	public List<List<Double>> splitArrays(final List<Double> gList,
-//			final TVModel model) {
-//
-//		// number of rows/ columns
-//		final int nArrays = model.nExpr();
-//		final int nGenes = max; // model.nGene();
-//
-//		final List<List<Double>> arraysList = new ArrayList<List<Double>>();
-//
-//		// iterate through columns ...max
-//		for (int j = 0; j < nArrays; j++) {
-//
-//			final List<Double> sArray = new ArrayList<Double>();
-//
-//			for (int i = 0; i < nGenes; i++) {
-//
-//				final int element = (i * max) + j;
-//
-//				sArray.add(gList.get(element));
-//
-//			}
-//
-//			arraysList.add(sArray);
-//		}
-//
-//		return arraysList;
-//	}
 }

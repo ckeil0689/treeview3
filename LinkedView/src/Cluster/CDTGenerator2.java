@@ -24,7 +24,6 @@ public class CDTGenerator2 {
 	private final ClusterView clusterView;
 
 	private String filePath;
-	private File file;
 	private int aidBuffer = 2;
 	private final boolean hierarchical;
 	private String choice;
@@ -175,7 +174,7 @@ public class CDTGenerator2 {
 			fileEnd = "_K" + rowC + colC + ".CDT";
 		}
 				
-		file = new File(model.getSource().substring(0,
+		File file = new File(model.getSource().substring(0,
 				model.getSource().length() - 4) + fileEnd);
 		
 		file.createNewFile();
@@ -463,15 +462,5 @@ public class CDTGenerator2 {
 	public String getFilePath() {
 
 		return filePath;
-	}
-
-	/**
-	 * Getter for the current source file object.
-	 * 
-	 * @return
-	 */
-	public File getFile() {
-
-		return file;
 	}
 }

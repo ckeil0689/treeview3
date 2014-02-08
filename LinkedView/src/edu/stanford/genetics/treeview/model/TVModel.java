@@ -27,6 +27,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Observable;
+import java.util.concurrent.ExecutionException;
 
 import edu.stanford.genetics.treeview.ConfigNode;
 import edu.stanford.genetics.treeview.DataMatrix;
@@ -804,9 +805,12 @@ public class TVModel extends Observable implements DataModel {
 	 * 
 	 * @param fileSet
 	 *            fileset to load
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
 	 * 
 	 */
-	public void loadNew(final FileSet fileSet) throws LoadException {
+	public void loadNew(final FileSet fileSet) throws LoadException, 
+	InterruptedException, ExecutionException {
 
 		resetState();
 		setSource(fileSet);
@@ -816,7 +820,7 @@ public class TVModel extends Observable implements DataModel {
 //		loader.loadInto();
 		
 		NewModelLoader loader = new NewModelLoader(this);
-		loader.loadFile();
+		loader.load();
 
 		if (!isLoaded()) {
 			throw new LoadException("Loading Cancelled", LoadException.INTPARSE);

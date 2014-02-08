@@ -49,12 +49,13 @@ public class ClusterProcessor {
 	 * Main method to iterate through the various processes of clustering which
 	 * are done by other classes.
 	 * 
+	 * Returns the filePath of the newly clustered file.
+	 * 
 	 * @param similarityM
 	 * @throws InterruptedException
 	 * @throws ExecutionException
 	 */
-	public void cluster(final boolean hierarchical)
-			throws InterruptedException, ExecutionException {
+	public String cluster(final boolean hierarchical) {
 		
 		// List variables needed for process
 		final List<Double> unformattedDataList = matrixToList();
@@ -89,11 +90,13 @@ public class ClusterProcessor {
 				sepRows, orderedRows, orderedCols, hierarchical);
 
 		cdtGen.generateCDT();
+		
+		return cdtGen.getFilePath();
 
-		clusterView.setPath(cdtGen.getFilePath());
-		clusterView.setFile(cdtGen.getFile());
-
-		clusterView.refresh();
+//		clusterView.setPath(cdtGen.getFilePath());
+//		clusterView.setFile(cdtGen.getFile());
+//
+//		clusterView.refresh();
 	}
 
 	/**
@@ -111,8 +114,6 @@ public class ClusterProcessor {
 				distances, type, pBarNum);
 
 		cGen.cluster();
-
-		clusterView.setPath(cGen.getFilePath());
 
 		return cGen.getReorderedList();
 	}
@@ -135,8 +136,6 @@ public class ClusterProcessor {
 				distances, type, clusterN, iterations, pBarNum);
 
 		cGen.cluster();
-
-		clusterView.setPath(cGen.getFilePath());
 
 		return cGen.getReorderedList();
 	}
