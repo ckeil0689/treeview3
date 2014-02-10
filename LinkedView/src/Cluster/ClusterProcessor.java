@@ -165,7 +165,7 @@ public class ClusterProcessor {
 		final List<Double> dataList = new ArrayList<Double>();
 		
 		TVDataMatrix matrix = (TVDataMatrix) tvModel.getDataMatrix();
-		final ArrayList<double[]> dataArrays = matrix.getExprData();
+		final double[][] dataArrays = matrix.getExprData();
 		
 		for(double[] array : dataArrays) {
 			for (final double d : array) {

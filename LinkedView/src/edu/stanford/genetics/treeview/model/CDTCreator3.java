@@ -11,6 +11,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import Views.LoadProgressView;
+
 import edu.stanford.genetics.treeview.TreeViewFrame;
 
 import Cluster.ClusterFileWriter2;
@@ -29,6 +31,7 @@ import Cluster.ClusterFileWriter2;
 public class CDTCreator3 {
 
 	private TreeViewFrame tvFrame;
+	private LoadProgressView loadProgView;
 	private BufferedReader reader = null;
 	private BufferedReader customReader = null;
 	private File file;
@@ -89,30 +92,31 @@ public class CDTCreator3 {
 		this.customFile = file2;
 		this.fileType = fileType;
 		this.tvFrame = tvFrame;
+		this.loadProgView = tvFrame.getLoadProgView();
 	}
 
 	public void createFile() throws IOException {
 
 		try {
 			// Loading screen
-			tvFrame.setLoadLabel("Transforming file to CDT format...");
-			tvFrame.resetLoadBar();
+			loadProgView.setLoadLabel("Transforming file to CDT format...");
+			loadProgView.resetLoadBar();
 			
 			// Count file lines for loadBar
 			int pBarMax = count(file.getAbsolutePath());
-			tvFrame.setLoadBarMax(pBarMax);
+			loadProgView.setLoadBarMax(pBarMax);
 			
 			reader = new BufferedReader(new FileReader(file));
 
 			final ArrayList<String[]> dataExtract = extractData(reader);
 
 			//Arrays to ArrayLists
-			tvFrame.setLoadLabel("Preparing dataset.");
+			loadProgView.setLoadLabel("Preparing dataset.");
 			dataSet = transformArray(dataExtract);
 			rowSize = dataSet.get(0).size();
 
 			//Find positions of labels in the data set
-			tvFrame.setLoadLabel("Checking for labels.");
+			loadProgView.setLoadLabel("Checking for labels.");
 			findLabel(gidInd, dataSet, "GID");
 			findLabel(aidInd, dataSet, "AID");
 			findLabel(orfInd, dataSet, "ORF");
@@ -149,10 +153,10 @@ public class CDTCreator3 {
 				replaceLabels();
 			}
 
-			tvFrame.setLoadLabel("Setting up file details.");
+			loadProgView.setLoadLabel("Setting up file details.");
 			setupFile();
 			
-			tvFrame.setLoadLabel("Writing CDT file...");
+			loadProgView.setLoadLabel("Writing CDT file...");
 			generateCDT();
 			
 			bw.close();
@@ -335,7 +339,7 @@ public class CDTCreator3 {
 			// Check whether it's the last line
 			bw.writeContent(rowElement);
 			line++;
-			tvFrame.updateLoadBar(line);
+			loadProgView.updateLoadBar(line);
 		}
 		
 		bw.closeWriter();

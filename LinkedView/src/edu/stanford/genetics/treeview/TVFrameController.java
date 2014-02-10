@@ -12,14 +12,23 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 
+import Views.LoadProgressView;
+import Views.WelcomeView;
+
 import Cluster.ClusterProcessor;
 import Cluster.ClusterViewController;
 import Cluster.ClusterViewFrame;
 
 import edu.stanford.genetics.treeview.model.CDTCreator3;
 import edu.stanford.genetics.treeview.model.TVModel;
+import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 
+/**
+ * This class controls user interaction with TVFrame and its views.
+ * @author CKeil
+ *
+ */
 public class TVFrameController {
 
 	private TreeViewFrame tvFrame;
@@ -27,17 +36,20 @@ public class TVFrameController {
 	private SwingWorker<Void, Void> worker;
 	private String fileType;
 	
-	public TVFrameController(TreeViewFrame tvFrame) {
+	public TVFrameController(TreeViewFrame tvFrame, TVModel model) {
 		
 		this.tvFrame = tvFrame;
+		this.model = model;
 		
 		setupWorkerThread();
 		
-		// add listeners to TVFrame
-		tvFrame.addLoadListener(new LoadPanelListener(tvFrame.getLoadIcon(), 
-				tvFrame.getLoadIcon().getLabel()));
-		tvFrame.addLoadListener(new LoadListener());
-		tvFrame.addContinueListener(new ContinueListener());
+		// Get the Views from TVFrame
+		WelcomeView welcomeView = tvFrame.getWelcomeView();
+		
+		// add listeners to Views
+		welcomeView.addLoadListener(new LoadPanelListener(
+				welcomeView.getLoadIcon(), 
+				welcomeView.getLoadIcon().getLabel()));
 	}
 	
 	/**
@@ -56,7 +68,10 @@ public class TVFrameController {
 		public void mouseClicked(MouseEvent arg0) {
 
 			// Setting screen for loading bar.
-			tvFrame.setLoading();
+			if(tvFrame.getLoaded()) {
+				tvFrame.setLoaded(false);
+			}
+			tvFrame.setView("LoadProgressView");
 			worker.execute();
 		}	
 	}
@@ -66,7 +81,7 @@ public class TVFrameController {
 	 * @author CKeil
 	 *
 	 */
-	class LoadListener implements ActionListener {
+	class LoadButtonListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
@@ -74,7 +89,10 @@ public class TVFrameController {
 			tvFrame.setDataModel(null);
 			
 			// Setting screen for loading bar.
-			tvFrame.setLoading();
+			if(tvFrame.getLoaded()) {
+				tvFrame.setLoaded(false);
+			}
+			tvFrame.setView("LoadProgressView");
 			worker.execute();
 		}	
 	}
@@ -90,6 +108,7 @@ public class TVFrameController {
 		public void actionPerformed(ActionEvent arg0) {
 
 			if(tvFrame.getDataModel() != null) {
+				tvFrame.setView("DendroView");
 				tvFrame.setLoaded(true);
 				
 			} else {
@@ -117,7 +136,12 @@ public class TVFrameController {
 			@Override
 			protected void done() {
 
-				setDataModel(model);
+				if(model.getDataMatrix().getNumRow() > 0) {
+					setDataModel(model);
+					
+				} else {
+					System.out.println("No datamatrix set by worker thread.");
+				}
 			}
 		};
 	}
@@ -171,6 +195,7 @@ public class TVFrameController {
 			System.out.println("Could not generate CDT file. Cause: " +
 					e.getCause());
 			e.printStackTrace();
+			
 		} catch (LoadException e) {
 			System.out.println("Loading the FileSet was interrupted. " +
 					"Cause: " + e.getCause());
@@ -203,7 +228,7 @@ public class TVFrameController {
 	public void loadFileSet(final FileSet fileSet) throws LoadException {
 
 		// Make TVModel object
-		model = new TVModel();
+//		model = new TVModel();
 		model.setFrame(tvFrame);
 
 		try {
@@ -222,6 +247,73 @@ public class TVFrameController {
 		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+	
+	// Loading Methods
+	/**
+	 * Allows user to load a file from a URL
+	 * 
+	 * @return FileSet
+	 * @throws LoadException
+	 */
+	protected FileSet offerUrlSelection() throws LoadException {
+
+		FileSet fileSet1;
+		/*
+		 * JTextField textField = new JTextField(); JPanel prompt = new
+		 * JPanel(); prompt.setLayout(new BorderLayout()); prompt.add(new
+		 * JLabel("Enter a Url"), BorderLayout.NORTH); prompt.add(textField,
+		 * BorderLayout.CENTER);
+		 */
+		// get string from user...
+		final String urlString = JOptionPane.showInputDialog(this,
+				"Enter a Url");
+
+		if (urlString != null) {
+			// must parse out name, parent + sep...
+			final int postfix = urlString.lastIndexOf("/") + 1;
+			final String name = urlString.substring(postfix);
+			final String parent = urlString.substring(0, postfix);
+			fileSet1 = new FileSet(name, parent);
+
+		} else {
+			throw new LoadException("Input Dialog closed without selection...",
+					LoadException.NOFILE);
+		}
+
+		return fileSet1;
+	}
+
+	/**
+	 * To load any fileset without using the event queue thread
+	 */
+	public void loadNW(FileSet fileSet) throws LoadException {
+
+		loadFileSetNW(fileSet);
+
+		fileSet = tvFrame.getFileMRU().addUnique(fileSet);
+		tvFrame.getFileMRU().setLast(fileSet);
+		tvFrame.getFileMRU().notifyObservers();
+
+		tvFrame.setLoaded(true);
+	}
+
+	/**
+	 * To load any FileSet without using the event queue thread
+	 */
+	public void loadFileSetNW(final FileSet fileSet) throws LoadException {
+
+		model.setFrame(tvFrame);
+
+		try {
+			model.loadNewNW(fileSet);
+			setDataModel(model);
+		} catch (final LoadException e) {
+			if (e.getType() != LoadException.INTPARSE) {
+				JOptionPane.showMessageDialog(tvFrame, e);
+				throw e;
+			}
 		}
 	}
 	
@@ -297,22 +389,16 @@ public class TVFrameController {
 				tvFrame.getDataModel().addFileSetListener(tvFrame);
 			}
 	
-			tvFrame.confirmLoaded();
+			tvFrame.setView("LoadCheckView");
+			tvFrame.getLoadCheckView().addLoadListener(
+					new LoadButtonListener());
+			tvFrame.getLoadCheckView().addContinueListener(
+					new ContinueListener());;
+					
 			setupExtractors();
-			setupRunning();
 			
 		} else {
 			tvFrame.setLoaded(false);
 		}
-	}
-	
-	/**
-	 * Generates a DendroView object and sets the current running MainPanel to
-	 * it. As a result the View is displayed in the TreeViewFrame
-	 */
-	protected void setupRunning() {
-
-		final DendroView dv2 = new DendroView(tvFrame.getDataModel(), tvFrame);
-		tvFrame.setRunning(dv2);
 	}
 }

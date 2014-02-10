@@ -129,7 +129,7 @@ public class LeftTreeDrawer extends TreeDrawer {
 	 */
 	class NodeDrawer {
 
-		private final Color sel_color = GUIParams.ELEMENT;
+		private final Color sel_color = GUIParams.MAIN;
 		private Graphics graphics;
 		private TreeDrawerNode selected;
 		private LinearTransformation xT;

@@ -1,6 +1,7 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.Font;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,18 +52,16 @@ class LoadCheckView extends JPanel {
 	private ClassLoader classLoader;
 	private InputStream input;
 
-	private TVModel dataModel = null;
+	private TVModel dataModel;
 	private final DataViewPanel dataView;
 
 	/**
 	 * Constructor Setting up the layout of the panel.
 	 */
-	public LoadCheckView(final TVModel model, JButton load, JButton cont) {
+	public LoadCheckView(final TVModel model) {
 
 		this.dataModel = model;
-		this.dataView = new DataViewPanel(dataModel);
-		this.loadNewButton = load;
-		this.advanceButton = cont;
+		this.dataView = new DataViewPanel(model);
 
 		setupLayout();
 	}
@@ -73,6 +72,12 @@ class LoadCheckView extends JPanel {
 		
 		removeAll();
 		setBackground(GUIParams.BG_COLOR);
+		
+		loadNewButton = GUIParams.setButtonLayout("Load Different File", 
+				null);
+
+		advanceButton = GUIParams.setButtonLayout("Continue", 
+				"forwardIcon");
 
 		dataView.refresh();
 
@@ -134,12 +139,6 @@ class LoadCheckView extends JPanel {
 			buttonPanel.setLayout(new MigLayout());
 			buttonPanel.setOpaque(false);
 
-//			loadNewButton = GUIParams.setButtonLayout("Load Different File", 
-//					null);
-//
-//			advanceButton = GUIParams.setButtonLayout("Continue", 
-//					"forwardIcon");
-
 			buttonPanel.add(loadNewButton, "alignx 50%, pushx");
 			buttonPanel.add(advanceButton, "alignx 50%, pushx");
 
@@ -165,7 +164,7 @@ class LoadCheckView extends JPanel {
 			warning.setForeground(GUIParams.RED1);
 
 			loadNewButton = GUIParams.setButtonLayout("Load New File", null);
-			loadNewButton.setBackground(GUIParams.ELEMENT);
+			loadNewButton.setBackground(GUIParams.MAIN);
 
 			add(warning, "alignx 50%, span, wrap");
 			add(loadNewButton, "alignx 50%");
@@ -173,5 +172,23 @@ class LoadCheckView extends JPanel {
 			revalidate();
 			repaint();
 		}
+	}
+	
+	/**
+	 * Equipping the "Load New File" button with a ActionListener
+	 * @param loadNew
+	 */
+	public void addLoadListener(ActionListener loadNew) {
+		
+		loadNewButton.addActionListener(loadNew);
+	}
+	
+	/**
+	 * Equipping the "Continue" button with a ActionListener
+	 * @param loadNew
+	 */
+	public void addContinueListener(ActionListener cont) {
+		
+		advanceButton.addActionListener(cont);
 	}
 }

@@ -289,7 +289,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		// header
 		JLabel head1 = new JLabel("Options");
 		head1.setFont(GUIParams.FONTL);
-		head1.setForeground(GUIParams.ELEMENT);
+		head1.setForeground(GUIParams.MAIN);
 		
 		// Panel for the Buttons
 		buttonPanel = new JPanel();
@@ -345,7 +345,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		
 		JLabel similarity = new JLabel("Similarity Metric");
 		similarity.setFont(GUIParams.FONTL);
-		similarity.setForeground(GUIParams.ELEMENT);
+		similarity.setForeground(GUIParams.MAIN);
 
 		// Labels
 		JLabel head2 = new JLabel("Rows:");
@@ -370,7 +370,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		// Label
 		JLabel method = new JLabel("Linkage Method");
 		method.setFont(GUIParams.FONTL);
-		method.setForeground(GUIParams.ELEMENT);
+		method.setForeground(GUIParams.MAIN);
 
 		// Clickable Panel to call InfoFrame
 		infoIcon = new ClickableIcon(viewFrame, GUIParams.QUESTIONICON);
@@ -386,7 +386,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		
 		JLabel kMeans = new JLabel("K-Means Options");
 		kMeans.setFont(GUIParams.FONTL);
-		kMeans.setForeground(GUIParams.ELEMENT);
+		kMeans.setForeground(GUIParams.MAIN);
 
 		JLabel clusters = new JLabel("Clusters: ");
 		clusters.setFont(GUIParams.FONTS);

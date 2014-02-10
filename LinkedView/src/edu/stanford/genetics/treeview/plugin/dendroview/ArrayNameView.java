@@ -48,6 +48,7 @@ import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.RotateImageFilter;
+import edu.stanford.genetics.treeview.TreeSelection;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.UrlExtractor;
 
@@ -82,7 +83,9 @@ public class ArrayNameView extends ModelView implements MouseListener,
 	private int maxlength = 0;
 	private boolean backBufferValid = false;
 	private ConfigNode root = null;
-	private UrlExtractor urlExtractor = null;
+//	private UrlExtractor urlExtractor = null;
+	private TreeSelectionI arraySelection;
+	private TreeSelectionI geneSelection;
 
 	private final String d_face = "Dialog";
 	private final int d_style = 0;
@@ -287,7 +290,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 				}
 
 				// Foreground Text
-				final Color fore = GUIParams.ELEMENT;// g.getColor();
+				final Color fore = GUIParams.MAIN;// g.getColor();
 				for (int j = start; j <= end; j++) {
 
 					try {
@@ -392,16 +395,16 @@ public class ArrayNameView extends ModelView implements MouseListener,
 	}
 	
 
-	/**
-	 * Sets the urlExtractor to be used when an array name is clicked on.
-	 * 
-	 * @param ue
-	 *            Will be fed array indexes.
-	 */
-	public void setUrlExtractor(final UrlExtractor ue) {
-
-		urlExtractor = ue;
-	}
+//	/**
+//	 * Sets the urlExtractor to be used when an array name is clicked on.
+//	 * 
+//	 * @param ue
+//	 *            Will be fed array indexes.
+//	 */
+//	public void setUrlExtractor(final UrlExtractor ue) {
+//
+//		urlExtractor = ue;
+//	}
 
 	/**
 	 * Used to space the array names.
@@ -497,7 +500,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		if (o == map || o == dataModel) {
 			selectionChanged();
 
-		} else if (o == arraySelection) {
+		} else if (o == arraySelection || o == geneSelection) {
 			selectionChanged(); // which genes are selected changed
 
 		} else {
@@ -511,19 +514,39 @@ public class ArrayNameView extends ModelView implements MouseListener,
 	 */
 	@Override
 	public void mouseClicked(final MouseEvent e) {
-		if (urlExtractor == null) {
-			return;
-		}
-
-		if (urlExtractor.isEnabled() == false) {
-			return;
-		}
-
-		// now, want mouse click to signal browser...
+//		if (urlExtractor == null) {
+//			return;
+//		}
+//
+//		if (urlExtractor.isEnabled() == false) {
+//			return;
+//		}
+//
+//		// now, want mouse click to signal browser...
+//		final int index = map.getIndex(e.getX());
+//		if (map.contains(index)) {
+//			viewFrame.displayURL(urlExtractor.getUrl(index));
+//		}
 		final int index = map.getIndex(e.getX());
-		if (map.contains(index)) {
-			viewFrame.displayURL(urlExtractor.getUrl(index));
+		if(geneSelection.getNSelectedIndexes() 
+				== geneSelection.getNumIndexes() 
+				&& geneSelection.isIndexSelected(index)) {
+			geneSelection.deselectAllIndexes();
+			arraySelection.deselectAllIndexes();
+			
+		} else if(geneSelection.getNSelectedIndexes() > 0) {
+			geneSelection.deselectAllIndexes();
+			arraySelection.deselectAllIndexes();
+			arraySelection.setIndex(index, true);
+			geneSelection.selectAllIndexes();
+			
+		} else {
+			arraySelection.setIndex(index, true);
+			geneSelection.selectAllIndexes();
 		}
+		
+		geneSelection.notifyObservers();
+		arraySelection.notifyObservers();
 	}
 
 	// FontSelectable
@@ -626,8 +649,6 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		setPoints(root.getAttribute("size", d_size));
 	}
 
-	private TreeSelectionI arraySelection;
-
 	/**
 	 * Set geneSelection
 	 * 
@@ -642,5 +663,21 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		}
 		this.arraySelection = arraySelection;
 		this.arraySelection.addObserver(this);
+	}
+	
+	/**
+	 * Set geneSelection
+	 * 
+	 * @param geneSelection
+	 *            The TreeSelection which is set by selecting genes in the
+	 *            GlobalView
+	 */
+	public void setGeneSelection(final TreeSelectionI arraySelection) {
+
+		if (this.geneSelection != null) {
+			this.geneSelection.deleteObserver(this);
+		}
+		this.geneSelection = arraySelection;
+		this.geneSelection.addObserver(this);
 	}
 }

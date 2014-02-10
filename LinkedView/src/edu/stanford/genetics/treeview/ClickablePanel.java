@@ -41,7 +41,7 @@ public class ClickablePanel extends JPanel {
 
 		label = new JLabel(labelText);
 		label.setFont(new Font("Sans Serif", Font.PLAIN, 50));
-		label.setForeground(GUIParams.ELEMENT);
+		label.setForeground(GUIParams.MAIN);
 		
 		add(label, "pushx, alignx 50%");
 	}

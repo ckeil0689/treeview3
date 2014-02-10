@@ -28,6 +28,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.Hashtable;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
@@ -158,7 +159,15 @@ public class KaryoPanel extends DragGridPanel implements MainPanel {
 	public void getGenome(final FileSet fileSet) throws LoadException {
 		final TVModel model = new TVModel();
 		model.setFrame(viewFrame);
-		model.loadNew(fileSet);
+		try {
+			model.loadNew(fileSet);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		getGenome(model);
 	}
 

@@ -124,4 +124,10 @@ public class TestViewFrame extends ViewFrame {
 	public MainPanel[] getMainPanels() {
 		return null;
 	}
+
+	@Override
+	public void setView(String name) {
+		// TODO Auto-generated method stub
+		
+	}
 }

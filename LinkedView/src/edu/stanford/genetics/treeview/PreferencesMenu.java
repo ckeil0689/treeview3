@@ -340,16 +340,14 @@ public class PreferencesMenu extends JFrame {
 				if(viewFrame.getConfirmPanel() != null) {
 					viewFrame.getConfirmPanel().setupLayout();
 				}
-				//viewFrame.getRunning().refresh();
-				viewFrame.setupRunning();
-				viewFrame.setLoaded(true);
+				viewFrame.setView("DendroView");
 
 			} else if (viewFrame.getDataModel() != null 
 					&& viewFrame.getRunning() == null) {
 				viewFrame.getConfirmPanel().setupLayout();
 
 			} else {
-				viewFrame.setupLayout();
+				viewFrame.setView("WelcomeView");
 			}
 			
 			PreferencesMenu.this.dispose();
@@ -428,8 +426,6 @@ public class PreferencesMenu extends JFrame {
 						PreferencesMenu.this.dispose();
 						viewFrame.setLoaded(false);
 						viewFrame.setLoaded(true);
-						
-//						viewFrame.confirmLoaded();
 						
 					} catch (LoadException e) {
 						e.printStackTrace();

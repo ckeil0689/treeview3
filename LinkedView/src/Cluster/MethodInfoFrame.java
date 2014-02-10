@@ -336,7 +336,7 @@ public class MethodInfoFrame extends JFrame {
 
 		final JLabel head = new JLabel(closedText);
 		head.setFont(new Font("Sans Serif", Font.PLAIN, 28));
-		head.setForeground(GUIParams.ELEMENT);
+		head.setForeground(GUIParams.MAIN);
 
 		return head;
 	}
@@ -415,7 +415,7 @@ public class MethodInfoFrame extends JFrame {
 			@Override
 			public void mouseExited(final MouseEvent arg0) {
 
-				title.setForeground(GUIParams.ELEMENT);
+				title.setForeground(GUIParams.MAIN);
 				title.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
 

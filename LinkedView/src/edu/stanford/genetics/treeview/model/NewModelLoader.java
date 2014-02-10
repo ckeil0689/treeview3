@@ -15,20 +15,23 @@ import java.util.regex.Pattern;
 
 import javax.swing.SwingWorker;
 
+import Views.LoadProgressView;
+
 import edu.stanford.genetics.treeview.FileSet;
-import edu.stanford.genetics.treeview.TVFrameController;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.XmlConfig;
 
 public class NewModelLoader {
 
-	private TVModel targetModel;
+	protected TVModel targetModel;
 	private FileSet fileSet;
-	private TreeViewFrame frame;
+	protected TreeViewFrame frame;
+	protected LoadProgressView loadProgView;
 	
-	private ArrayList<String[]> stringLabels;
-	private ArrayList<double[]> doubleData;
+	protected String[][] stringLabels;
+	private double[][] doubleData;
 	
+	private int lineNum;
 	private int dataStartRow;
 	private int dataStartCol;
 	
@@ -42,17 +45,18 @@ public class NewModelLoader {
 		this.targetModel = model;
 		this.frame = (TreeViewFrame)model.getFrame();
 		this.fileSet = model.getFileSet();
+		this.loadProgView = frame.getLoadProgView();
 	}
 	
 	public TVModel load() {
 		
 		try {
 			// Read data from specified file location
-			frame.resetLoadBar();
-			int loadBarMax = count(fileSet.getCdt());
-			frame.setLoadBarMax(loadBarMax);
+			loadProgView.resetLoadBar();
+			lineNum = count(fileSet.getCdt());
+			loadProgView.setLoadBarMax(lineNum);
 			
-			frame.setLoadLabel("Loading Data into TreeView.");
+			loadProgView.setLoadLabel("Loading Data into TreeView.");
 			
 			FileInputStream fis = new FileInputStream(fileSet.getCdt());
 	        DataInputStream in = new DataInputStream(fis);
@@ -75,12 +79,12 @@ public class NewModelLoader {
 		
 		
 		// Parse the CDT File
-		frame.setLoadLabel("Making sense of CDT file.");
+		loadProgView.setLoadLabel("Making sense of CDT file.");
 		parseCDT();
 		
 		// If present, parse ATR File
 		if(aidFound) {
-			frame.setLoadLabel("Reading ATR file.");
+			loadProgView.setLoadLabel("Reading ATR file.");
 			parseATR();
 		
 		} else {
@@ -90,7 +94,7 @@ public class NewModelLoader {
 		
 		// If present, parse GTR File
 		if(gidFound) {
-			frame.setLoadLabel("Reading GTR file.");
+			loadProgView.setLoadLabel("Reading GTR file.");
 			parseGTR();
 			
 		} else {
@@ -100,7 +104,7 @@ public class NewModelLoader {
 		
 		// Load Config File
 		try {
-			frame.setLoadLabel("Loading configuration file.");
+			loadProgView.setLoadLabel("Loading configuration file.");
 			final String xmlFile = targetModel.getFileSet().getJtv();
 
 			XmlConfig documentConfig;
@@ -193,8 +197,7 @@ public class NewModelLoader {
 		     "[\\x00-\\x20]*");// Optional trailing "whitespace"
 
 		  
-		stringLabels = new ArrayList<String[]>();
-		doubleData = new ArrayList<double[]>();
+		stringLabels = new String[lineNum][];
 		
 		String line;
 		dataStartRow = 0;
@@ -206,7 +209,7 @@ public class NewModelLoader {
 		try {
 			while ((line = reader.readLine()) != null) {
 				
-				frame.updateLoadBar(rowN);
+				loadProgView.updateLoadBar(rowN);
 	
 				// load line as String array
 				final String[] lineAsStrings = line.split("\t");
@@ -260,9 +263,10 @@ public class NewModelLoader {
 					}
 					
 					// handle line in which data has been found
-					stringLabels.add(labels);
+					stringLabels[rowN] = labels;
 					
 					if(dataFound) {
+						doubleData = new double[lineNum - dataStartRow][];
 						dataValues = new double[lineAsStrings.length 
 						                        - dataStartCol];
 						
@@ -284,7 +288,7 @@ public class NewModelLoader {
 							}
 						}
 						
-						doubleData.add(dataValues);
+						doubleData[rowN - dataStartRow] = dataValues;
 					}
 					
 				} else {
@@ -315,10 +319,9 @@ public class NewModelLoader {
 						}
 					}
 					
-					stringLabels.add(labels);
-					doubleData.add(dataValues);
+					stringLabels[rowN] = labels;
+					doubleData[rowN - dataStartRow] = dataValues;
 				} 
-				
 				rowN++;
 			}
 			
@@ -352,11 +355,11 @@ public class NewModelLoader {
 		targetModel.setEweightFound(eWeightFound);
 		targetModel.setGweightFound(gWeightFound);
 		
-		int nExpr = doubleData.get(0).length;
+		int nExpr = doubleData[0].length;
 		int nExprPrefix = dataStartRow;
 		
 		int nGenePrefix = dataStartCol;
-		int nGene = doubleData.size();
+		int nGene = doubleData.length;
 		
 		// Set Array Prefix and Headers
 		final String[] arrayPrefix = new String[nExprPrefix];
@@ -365,9 +368,9 @@ public class NewModelLoader {
 		// fill prefix array
 		for(int i = 0; i < nExprPrefix; i++) {
 			
-			arrayPrefix[i] = stringLabels.get(i)[0];
+			arrayPrefix[i] = stringLabels[i][0];
 			
-			String[] labelRow = stringLabels.get(i);
+			String[] labelRow = stringLabels[i];
 			
 			// fill column header array
 			for(int j = 0; j < nExpr; j++) {
@@ -385,21 +388,17 @@ public class NewModelLoader {
 		// Fill row prefix array
 		for(int i = 0; i < nGenePrefix; i++) {
 			
-			genePrefix[i] = stringLabels.get(0)[i];
+			genePrefix[i] = stringLabels[0][i];
 		}
 		
 		// Fill Header array
 		for (int i = 0; i < nGene; i++) {
 			
-			gHeaders[i] = stringLabels.get(i + nExprPrefix);
+			gHeaders[i] = stringLabels[i + nExprPrefix];
 		}
 		
 		targetModel.setGenePrefix(genePrefix);
 		targetModel.setGeneHeaders(gHeaders);
-		
-//		final double[] exprData = concatAll(doubleData);
-		
-//		targetModel.setExprData(exprData);
 		targetModel.setExprData(doubleData);
 	}
 	

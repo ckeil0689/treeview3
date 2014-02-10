@@ -23,8 +23,6 @@
 package edu.stanford.genetics.treeview.model;
 
 import java.awt.Frame;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Observable;
 import java.util.concurrent.ExecutionException;
@@ -158,7 +156,7 @@ public class TVModel extends Observable implements DataModel {
 //		dataMatrix.setExprData(newData);
 //	}
 	
-	public void setExprData(final ArrayList<double[]> newData) {
+	public void setExprData(final double[][] newData) {
 
 		dataMatrix.setExprData(newData);
 	}
@@ -589,7 +587,7 @@ public class TVModel extends Observable implements DataModel {
 
 		private boolean modified = false;
 //		private double[] exprData = null;
-		private ArrayList<double[]> exprData = null;
+		private double[][] exprData = null;
 
 		public void clear() {
 
@@ -615,7 +613,7 @@ public class TVModel extends Observable implements DataModel {
 			final int nexpr = nExpr();
 			final int ngene = nGene();
 			if ((x < nexpr) && (y < ngene) && (x >= 0) && (y >= 0)) {
-				return exprData.get(y)[x];
+				return exprData[y][x];
 
 			} else {
 				return DataModel.NODATA;
@@ -627,7 +625,7 @@ public class TVModel extends Observable implements DataModel {
 //			exprData = newData;
 //		}
 		
-		public void setExprData(final ArrayList<double[]> newData) {
+		public void setExprData(final double[][] newData) {
 
 			exprData = newData;
 		}
@@ -637,7 +635,7 @@ public class TVModel extends Observable implements DataModel {
 //			return exprData;
 //		}
 		
-		public ArrayList<double[]> getExprData() {
+		public double[][] getExprData() {
 
 			return exprData;
 		}
@@ -653,7 +651,7 @@ public class TVModel extends Observable implements DataModel {
 		@Override
 		public void setValue(final double value, final int x, final int y) {
 
-			exprData.get(x)[y] = value;
+			exprData[x][y] = value;
 			setModified(true);
 			setChanged();
 		}

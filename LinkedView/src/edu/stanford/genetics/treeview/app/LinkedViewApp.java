@@ -42,6 +42,7 @@ import edu.stanford.genetics.treeview.Util;
 import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.XmlConfig;
 import edu.stanford.genetics.treeview.core.PluginManager;
+import edu.stanford.genetics.treeview.model.TVModel;
 
 //import edu.stanford.genetics.treeview.ConfigNode;
 
@@ -139,7 +140,9 @@ public class LinkedViewApp extends TreeViewApp {
 //		final LinkedViewFrame tvFrame = new LinkedViewFrame(this);
 		final TreeViewFrame tvFrame = new TreeViewFrame(this);
 		tvFrame.addWindowListener(this);
-		final TVFrameController tvController = new TVFrameController(tvFrame);
+		final TVModel model = new TVModel();
+		final TVFrameController tvController = new TVFrameController(tvFrame, 
+				model);
 		
 		return tvFrame;
 	}
@@ -151,7 +154,9 @@ public class LinkedViewApp extends TreeViewApp {
 		// setup toplevel
 //		final LinkedViewFrame tvFrame = new LinkedViewFrame(this);
 		final TreeViewFrame tvFrame = new TreeViewFrame(this);
-		final TVFrameController tvController = new TVFrameController(tvFrame);
+		final TVModel model = new TVModel();
+		final TVFrameController tvController = new TVFrameController(tvFrame, 
+				model);
 		
 		try {
 			tvController.loadFileSet(fileSet);
@@ -175,10 +180,13 @@ public class LinkedViewApp extends TreeViewApp {
 		// setup toplevel
 //		final LinkedViewFrame tvFrame = new LinkedViewFrame(this);
 		final TreeViewFrame tvFrame = new TreeViewFrame(this);
+		final TVModel model = new TVModel();
+		final TVFrameController tvController = new TVFrameController(tvFrame, 
+				model);
 		
 		if (fileSet != null) {
 			try {
-				tvFrame.loadFileSetNW(fileSet);
+				tvController.loadFileSetNW(fileSet);
 				tvFrame.setLoaded(true);
 
 			} catch (final LoadException e) {

@@ -64,15 +64,17 @@ public class DataViewPanel extends JPanel {
 		this.setLayout(new MigLayout("ins 0"));
 
 		matrix = (TVDataMatrix) model.getDataMatrix();
-		ArrayList<double[]> dataArrays = matrix.getExprData();
+		double[][] dataArrays = matrix.getExprData();
 
 		headerArray = model.getGeneHeaderInfo().getHeaderArray();
 
 		List<double[]> arraysList = new ArrayList<double[]>();
 
-		if (dataArrays.size() > max) {
+		if (dataArrays.length > max) {
 
-			arraysList = dataArrays.subList(0, max);
+			for(int i = 0; i < max; i++) {
+				arraysList.add(dataArrays[i]);
+			}
 		}
 
 		geneNames = new String[max];

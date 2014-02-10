@@ -3,7 +3,6 @@ package edu.stanford.genetics.treeview;
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.IOException;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -79,7 +78,7 @@ public class SSMouseListener implements MouseListener {
 	@Override
 	public void mouseExited(final MouseEvent arg0) {
 
-		label.setForeground(GUIParams.ELEMENT);
+		label.setForeground(GUIParams.MAIN);
 		label.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
 		if (panel != null) {
@@ -105,7 +104,7 @@ public class SSMouseListener implements MouseListener {
 	@Override
 	public void mouseReleased(final MouseEvent arg0) {
 
-		label.setForeground(GUIParams.ELEMENT);
+		label.setForeground(GUIParams.MAIN);
 	}
 
 }

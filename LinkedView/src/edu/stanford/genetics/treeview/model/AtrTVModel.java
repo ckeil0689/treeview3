@@ -64,7 +64,7 @@ public class AtrTVModel extends TVModel {
 //	}
 	
 	@Override
-	public void setExprData(final ArrayList<double[]> newData) {
+	public void setExprData(final double[][] newData) {
 	}
 
 	ConfigNode documentConfig = new DummyConfigNode("AtrTVModel");
@@ -97,7 +97,7 @@ public class AtrTVModel extends TVModel {
 		setSource(fileSet);
 		final AtrTVModelLoader loader = new AtrTVModelLoader(this);
 //		loader.loadInto();
-		loader.loadFile();
+		loader.load();
 	}
 
 }

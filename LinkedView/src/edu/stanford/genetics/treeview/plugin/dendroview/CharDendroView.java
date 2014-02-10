@@ -197,7 +197,7 @@ public class CharDendroView extends DendroView {
 
 		charHeaderInfo = new CharHeaderInfo(arrayDrawer.getNumCol());
 		arraynameview = new ArrayNameView(charHeaderInfo);
-		arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
+//		arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
 
 		leftTreeDrawer = new LeftTreeDrawer();
 		gtrview = new GTRView();

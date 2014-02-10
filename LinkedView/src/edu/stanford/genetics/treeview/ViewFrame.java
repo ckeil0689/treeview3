@@ -574,6 +574,8 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	}
 
 	abstract public HeaderFinder getGeneFinder();
+	
+	abstract public void setView(String name);
 
 	/**
 	 * Method opens a file chooser dialog
@@ -583,7 +585,7 @@ public abstract class ViewFrame extends JFrame implements Observer {
 	 */
 	public File selectFile() throws LoadException {
 
-		File chosen;
+		File chosen = null;
 
 		final JFileChooser fileDialog = new JFileChooser();
 
@@ -595,8 +597,10 @@ public abstract class ViewFrame extends JFrame implements Observer {
 
 			chosen = fileDialog.getSelectedFile();
 		} else {
-			throw new LoadException("File Dialog closed without selection...",
-					LoadException.NOFILE);
+//			throw new LoadException("File Dialog closed without selection...",
+//					LoadException.NOFILE);
+			System.out.println("File Dialog closed without selection...");
+			setView("WelcomeView");
 		}
 
 		return chosen;

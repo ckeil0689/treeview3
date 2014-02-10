@@ -58,6 +58,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
+import Views.LoadProgressView;
+import Views.WelcomeView;
+
 import net.miginfocom.swing.MigLayout;
 import Cluster.ClusterViewController;
 import Cluster.ClusterView;
@@ -98,20 +101,16 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	protected JDialog presetsFrame = null;
 	protected TabbedSettingsPanel presetsPanel = null;
 
-	private LoadCheckView confirmPanel;
 	private final TreeViewApp treeView;
 	private ProgramMenu programMenu;
 	private HeaderFinder geneFinder = null;
 	private HeaderFinder arrayFinder = null;
 	
-	// Interactive GUI Components (except menubar)
-	private ClickablePanel load_Icon;
-
-	private JProgressBar loadBar;
-	private JLabel loadLabel;
-	
-	private JButton loadNewButton;
-	private JButton advanceButton;
+	// Different Views
+	private WelcomeView welcomeView;
+	private LoadProgressView loadProgView;
+	private LoadCheckView confirmPanel;
+	private DendroView dendroView;
 	
 	private boolean loaded;
 
@@ -154,7 +153,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		waiting.setLayout(new MigLayout("ins 0"));
 		waiting.setBackground(GUIParams.BG_COLOR);
 
-		setupLayout();
+		setView("WelcomeView");
+		
 		setupPresets();
 		setupMenuBar();
 		setupFileMru(treeView.getGlobalConfig().getNode("FileMru"));
@@ -173,233 +173,152 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 		super.closeWindow();
 	}
-
-	// Layout setups
-	/**
-	 * This method sets up the Swing layout of the starting screen and calls
-	 * resetLayout() once data has been loaded
+	
+	// Setting different views
+	/** 
+	 * Choosing JPanel to be displayed.
 	 */
-	public void setupLayout() {
-
-		JPanel mainPanel;
-		JPanel title_bg;
-		JLabel jl;
-		JLabel jl2;
+	@Override
+	public void setView(String viewName) {
 		
-		loadNewButton = GUIParams.setButtonLayout("Load Different File", 
-				null);
-
-		advanceButton = GUIParams.setButtonLayout("Continue", 
-				"forwardIcon");
-
-		waiting.removeAll();
-
-		mainPanel = new JPanel();
-		mainPanel.setLayout(new MigLayout("ins 0"));
-		mainPanel.setBackground(GUIParams.BG_COLOR);
-
-		title_bg = new JPanel();
-		title_bg.setLayout(new MigLayout());
-		title_bg.setBackground(GUIParams.TITLE_BG);
-
-		jl = new JLabel("Hello! How are you Gentlepeople?");
-		jl.setFont(new Font("Sans Serif", Font.PLAIN, 30));
-		jl.setForeground(GUIParams.TITLE_TEXT);
-
-		jl2 = new JLabel("Welcome to " + getAppName());
-		jl2.setFont(new Font("Sans Serif", Font.BOLD, 50));
-		jl2.setForeground(GUIParams.TITLE_TEXT);
-
-		load_Icon = new ClickablePanel ("Load Data >");
-
-		title_bg.add(jl, "push, alignx 50%, span, wrap");
-		title_bg.add(jl2, "push, alignx 50%, span");
-
-		mainPanel.add(title_bg, "pushx, growx, alignx 50%, span, "
-				+ "height 20%::, wrap");
-		mainPanel.add(load_Icon, "push, alignx 50%");
-
-		waiting.add(mainPanel, "push, grow");
-
-		waiting.revalidate();
-		waiting.repaint();
+		resetViews();
+		
+		JPanel view = new JPanel();
+		
+		// Set view dependent of 'loaded'
+		if(!viewName.equalsIgnoreCase("DendroView")) {
+			if(viewName.equalsIgnoreCase("WelcomeView")) {
+				welcomeView = new WelcomeView(this);
+				view = welcomeView;
+				
+			} else if(viewName.equalsIgnoreCase("LoadProgressView")) {
+				loadProgView = new LoadProgressView(this);
+				view = loadProgView;
+			
+			} else if(viewName.equalsIgnoreCase("LoadCheckView")) {
+				confirmPanel = new LoadCheckView((TVModel)dataModel);
+				view = confirmPanel;
+				
+			} else {
+				view.setLayout(new MigLayout());
+				view.setOpaque(false);
+				
+				JLabel error = new JLabel("No view could be loaded.");
+				error.setFont(GUIParams.FONTL);
+				error.setForeground(GUIParams.TEXT);
+				
+				view.add(error, "push, alignx 50%");
+			}
+			
+			displayView(view);
+			
+		} else {
+			dendroView = new DendroView((TVModel)dataModel, this);
+			setRunning(dendroView);
+		}
 	}
 	
 	/**
-	 * Displays a panel with a label and JProgressBar to indicate loading
-	 * progress and give feedback in case of loading errors.
+	 * Sets all views to null to free up memory.
 	 */
-	public void setLoading() {
+	public void resetViews() {
 		
-		waiting.removeAll();
-		
-		JPanel mainPanel;
-		
-		mainPanel = new JPanel();
-		mainPanel.setLayout(new MigLayout("ins 0"));
-		mainPanel.setBackground(GUIParams.BG_COLOR);
-		
-		loadLabel = new JLabel();
-		loadLabel.setFont(GUIParams.FONTL);
-		loadLabel.setForeground(GUIParams.TEXT);
-		
-		loadBar = GUIParams.setPBarLayout();
-		
-		mainPanel.add(loadLabel, "push, alignx 50%, aligny 100%, wrap");
-		mainPanel.add(loadBar, "push, w 70%, alignx 50%, aligny 0%");
-		
-		waiting.add(mainPanel, "push, grow");
-		
-		waiting.revalidate();
-		waiting.repaint();
-	}
-	
-	// GUI ComponentListeners
-	/**
-	 * Equipping the load_Icon with a MouseListener
-	 * @param loadData
-	 */
-	public void addLoadListener(MouseListener loadData) {
-		
-		load_Icon.addMouseListener(loadData);
+		welcomeView = null;
+		loadProgView = null;
 	}
 	
 	/**
-	 * Equipping the "Load New File" button with a ActionListener
-	 * @param loadNew
+	 * Setting the JPanel to be displayed within TVFrame
+	 * @param view
 	 */
-	public void addLoadListener(ActionListener loadNew) {
-		
-		loadNewButton.addActionListener(loadNew);
-	}
-	
-	/**
-	 * Equipping the "Continue" button with a ActionListener
-	 * @param loadNew
-	 */
-	public void addContinueListener(ActionListener cont) {
-		
-		advanceButton.addActionListener(cont);
-	}
-	
-	/**
-	 * Access TreeViewFrame's load_Icon panel.
-	 * @return
-	 */
-	public ClickablePanel getLoadIcon() {
-		
-		return load_Icon;
-	}
-	
-	/**
-	 * Updates the loading bar by setting it to i.
-	 * @param i
-	 */
-	public void updateLoadBar(int i) {
-		
-		loadBar.setValue(i);
-	}
-	
-	/**
-	 * Resets the loading bar to 0.
-	 * @param i
-	 */
-	public void resetLoadBar() {
-		
-		loadBar.setValue(0);
-	}
-	
-	/**
-	 * Sets the maximum of the loading bar.
-	 * @param max
-	 */
-	public void setLoadBarMax(int max) {
-		
-		loadBar.setMaximum(max);
-	}
-	
-	/**
-	 * Changes the text of the loading label.
-	 * @param text
-	 */
-	public void setLoadLabel(String text) {
-		
-		loadLabel.setText(text);
-		
-		waiting.revalidate();
-		waiting.repaint();
-	}
-
-	/**
-	 * This method clears the initial starting frame and adds new components to
-	 * let the user select between options for processing/ viewing his data.
-	 */
-	public void confirmLoaded() {
-
-		setLoaded(false);
+	public void displayView(JPanel view) {
 		
 		waiting.removeAll();
-
-		confirmPanel = new LoadCheckView((TVModel)dataModel, 
-				loadNewButton, advanceButton);
-
-		waiting.add(confirmPanel, "push, grow");
 		
-		rebuildMainPanelMenu();
-
-		waiting.repaint();
+		waiting.add(view, "push, grow");
+		
 		waiting.revalidate();
+		waiting.repaint();
 	}
 	
+	// Getters for Views
+	/**
+	 * Return TVFrame's current WelcomeView instance
+	 * @return welcomeView
+	 */
+	public WelcomeView getWelcomeView() {
+		
+		return welcomeView;
+	}
+	
+	/**
+	 * Return TVFrame's current LoadProgressView instance
+	 * @return loadProgView
+	 */
+	public LoadProgressView getLoadProgView() {
+		
+		return loadProgView;
+	}
+	
+	/**
+	 * Return TVFrame's current LoadCheckView instance
+	 * @return confirmPanel
+	 */
 	public LoadCheckView getLoadCheckView() {
 		
 		return confirmPanel;
 	}
-
-	// Loading Methods
+	
 	/**
-	 * Allows user to load a file from a URL
-	 * 
-	 * @return FileSet
-	 * @throws LoadException
+	 * Return TVFrame's current DendroView instance
+	 * @return dendroView
 	 */
-	protected FileSet offerUrlSelection() throws LoadException {
-
-		FileSet fileSet1;
-		/*
-		 * JTextField textField = new JTextField(); JPanel prompt = new
-		 * JPanel(); prompt.setLayout(new BorderLayout()); prompt.add(new
-		 * JLabel("Enter a Url"), BorderLayout.NORTH); prompt.add(textField,
-		 * BorderLayout.CENTER);
-		 */
-		// get string from user...
-		final String urlString = JOptionPane.showInputDialog(this,
-				"Enter a Url");
-
-		if (urlString != null) {
-			// must parse out name, parent + sep...
-			final int postfix = urlString.lastIndexOf("/") + 1;
-			final String name = urlString.substring(postfix);
-			final String parent = urlString.substring(0, postfix);
-			fileSet1 = new FileSet(name, parent);
-
-		} else {
-			throw new LoadException("Input Dialog closed without selection...",
-					LoadException.NOFILE);
-		}
-
-		return fileSet1;
+	public DendroView getDendroView() {
+		
+		return dendroView;
 	}
 
+//	// Loading Methods
 //	/**
-//	 * Loads a FileSet and calls setLoaded(true) to reset the MainPanel.
+//	 * Allows user to load a file from a URL
 //	 * 
-//	 * @param fileSet
+//	 * @return FileSet
 //	 * @throws LoadException
 //	 */
-//	public void load(FileSet fileSet) throws LoadException {
+//	protected FileSet offerUrlSelection() throws LoadException {
 //
-//		loadFileSet(fileSet);
+//		FileSet fileSet1;
+//		/*
+//		 * JTextField textField = new JTextField(); JPanel prompt = new
+//		 * JPanel(); prompt.setLayout(new BorderLayout()); prompt.add(new
+//		 * JLabel("Enter a Url"), BorderLayout.NORTH); prompt.add(textField,
+//		 * BorderLayout.CENTER);
+//		 */
+//		// get string from user...
+//		final String urlString = JOptionPane.showInputDialog(this,
+//				"Enter a Url");
+//
+//		if (urlString != null) {
+//			// must parse out name, parent + sep...
+//			final int postfix = urlString.lastIndexOf("/") + 1;
+//			final String name = urlString.substring(postfix);
+//			final String parent = urlString.substring(0, postfix);
+//			fileSet1 = new FileSet(name, parent);
+//
+//		} else {
+//			throw new LoadException("Input Dialog closed without selection...",
+//					LoadException.NOFILE);
+//		}
+//
+//		return fileSet1;
+//	}
+//
+//	/**
+//	 * To load any fileset without using the event queue thread
+//	 */
+//	public void loadNW(FileSet fileSet) throws LoadException {
+//
+//		loadFileSetNW(fileSet);
 //
 //		fileSet = fileMru.addUnique(fileSet);
 //		fileMru.setLast(fileSet);
@@ -407,162 +326,24 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 //
 //		setLoaded(true);
 //	}
-
-	/**
-	 * To load any fileset without using the event queue thread
-	 */
-	public void loadNW(FileSet fileSet) throws LoadException {
-
-		loadFileSetNW(fileSet);
-
-		fileSet = fileMru.addUnique(fileSet);
-		fileMru.setLast(fileSet);
-		fileMru.notifyObservers();
-
-		setLoaded(true);
-	}
-
-//	/**
-//	 * r * This is the workhorse. It creates a new DataModel of the file, and
-//	 * then sets the Datamodel. A side effect of setting the datamodel is to
-//	 * update the running window.
-//	 */
-//	public void loadFileSet(final FileSet fileSet) throws LoadException {
 //
-//		// Make TVModel object
+//	/**
+//	 * To load any FileSet without using the event queue thread
+//	 */
+//	public void loadFileSetNW(final FileSet fileSet) throws LoadException {
+//
 //		final TVModel tvModel = new TVModel();
 //		tvModel.setFrame(this);
 //
 //		try {
-//			// load instance variables of TVModel with data
-//			tvModel.loadNew(fileSet);
-////			setDataModel(tvModel);
-//
+//			tvModel.loadNewNW(fileSet);
+//			setDataModel(tvModel);//, false, true);
 //		} catch (final LoadException e) {
 //			if (e.getType() != LoadException.INTPARSE) {
 //				JOptionPane.showMessageDialog(this, e);
 //				throw e;
 //			}
 //		}
-//	}
-
-	/**
-	 * To load any FileSet without using the event queue thread
-	 */
-	public void loadFileSetNW(final FileSet fileSet) throws LoadException {
-
-		final TVModel tvModel = new TVModel();
-		tvModel.setFrame(this);
-
-		try {
-			tvModel.loadNewNW(fileSet);
-			setDataModel(tvModel);//, false, true);
-		} catch (final LoadException e) {
-			if (e.getType() != LoadException.INTPARSE) {
-				JOptionPane.showMessageDialog(this, e);
-				throw e;
-			}
-		}
-	}
-
-//	/**
-//	 * This method opens a file dialog to open either the visualization view or
-//	 * the cluster view depending on which file type is chosen.
-//	 * @throws IOException 
-//	 * 
-//	 * @throws LoadException
-//	 */
-//	public void openFile() throws IOException {
-//
-//		try {
-//			File file = selectFile();
-//
-//			final String fileName = file.getAbsolutePath();
-//			final int dotIndex = fileName.indexOf(".");
-//
-//			final int suffixLength = fileName.length() - dotIndex;
-//
-//			final String fileType = file.getAbsolutePath().substring(
-//					fileName.length() - suffixLength, fileName.length());
-//			
-//			setLoading();
-//
-//			if (!fileType.equalsIgnoreCase(".cdt")) {
-//				final CDTCreator3 fileTransformer = new CDTCreator3(file, 
-//						fileType, this);
-//				fileTransformer.createFile();
-//
-//				file = new File(fileTransformer.getFilePath());
-//			}
-//
-//			FileSet fileSet = getFileSet(file); // Type: 0 (Auto)
-//			
-//			// Loading TVModel
-//			loadFileSet(fileSet);
-//
-//			fileSet = fileMru.addUnique(fileSet);
-//			fileMru.setLast(fileSet);
-//
-//		} catch (final LoadException e) {
-//			if ((e.getType() != LoadException.INTPARSE)
-//					&& (e.getType() != LoadException.NOFILE)) {
-//				LogBuffer.println("Could not open file: " + e.getMessage());
-//			}
-//		}
-//	}
-
-	// Methods to setup views
-//	/**
-//	 * Sets up the following: 1) urlExtractor, an object that generates urls
-//	 * from gene indexes 2) arrayUrlExtractor, similarly 3) geneSelection and 4)
-//	 * arraySelection, the two selection objects. It is important that these are
-//	 * set up before any plugins are instantiated. This is called before
-//	 * setupRunning by setDataModel.
-//	 */
-//	protected void setupExtractors() {
-//
-//		final DataMatrix matrix = getDataModel().getDataMatrix();
-//		final int ngene = matrix.getNumRow();
-//		final int nexpr = matrix.getNumCol();
-//
-//		final ConfigNode documentConfig = getDataModel()
-//				.getDocumentConfigRoot();
-//		// extractors...
-//		final UrlPresets genePresets = getGeneUrlPresets();
-//		final UrlExtractor urlExtractor = new UrlExtractor(getDataModel()
-//				.getGeneHeaderInfo(), genePresets);
-//		urlExtractor.bindConfig(documentConfig.fetchOrCreate("UrlExtractor"));
-//		setUrlExtractor(urlExtractor);
-//
-//		final UrlPresets arrayPresets = getArrayUrlPresets();
-//		final UrlExtractor arrayUrlExtractor = new UrlExtractor(getDataModel()
-//				.getArrayHeaderInfo(), arrayPresets);
-//		arrayUrlExtractor.bindConfig(documentConfig
-//				.fetchOrCreate("ArrayUrlExtractor"));
-//		setArrayUrlExtractor(arrayUrlExtractor);
-//
-//		geneSelection = new TreeSelection(ngene);
-//		arraySelection = new TreeSelection(nexpr);
-//	}
-
-//	/**
-//	 * Generates a DendroView object and sets the current running MainPanel to
-//	 * it. As a result the View is displayed in the TreeViewFrame
-//	 */
-//	protected void setupRunning() {
-//
-//		final DendroView dv2 = new DendroView(getDataModel(), this);
-//		running = dv2;
-//	}
-
-//	/**
-//	 * Generates a ClusterView object and sets the current running MainPanel to
-//	 * it. As a result the View is displayed in the TreeViewFrame
-//	 */
-//	protected void setupClusterRunning() {
-//
-//		final ClusterView cv = new ClusterView(getDataModel(), this);
-//		running = cv;
 //	}
 	
 	/**

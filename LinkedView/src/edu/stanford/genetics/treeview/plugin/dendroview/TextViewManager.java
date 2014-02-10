@@ -273,6 +273,18 @@ public class TextViewManager extends ModelView implements FontSelectable,
 			((TextView) textViews.get(i)).setGeneSelection(selection);
 		}
 	}
+	
+	/**
+	 * Need to override TextView.setGeneSelection() to account for the textviews
+	 * that are contained.
+	 * 
+	 */
+	public void setArraySelection(final TreeSelectionI selection) {
+
+		for (int i = 0; i < textViews.size(); i++) {
+			((TextView) textViews.get(i)).setArraySelection(selection);
+		}
+	}
 
 	public void setMap(final MapContainer zoomYMap) {
 

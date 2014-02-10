@@ -72,6 +72,7 @@ public class TextView extends ModelView implements FontSelectable, KeyListener,
 	private int size;
 
 	private TreeSelectionI geneSelection;
+	private TreeSelectionI arraySelection;
 	private MapContainer map;
 	private final UrlExtractor urlExtractor;
 	private int maxlength = 0;
@@ -234,7 +235,7 @@ public class TextView extends ModelView implements FontSelectable, KeyListener,
 					}
 
 					if (out != null) {
-						final Color fore = GUIParams.ELEMENT; // g.getColor();
+						final Color fore = GUIParams.MAIN; // g.getColor();
 						if ((geneSelection == null)
 								|| geneSelection.isIndexSelected(j)) {
 							final String[] strings = headerInfo.getHeader(j);
@@ -293,6 +294,22 @@ public class TextView extends ModelView implements FontSelectable, KeyListener,
 
 		this.geneSelection = geneSelection;
 		this.geneSelection.addObserver(this);
+	}
+	
+	/**
+	 * Set geneSelection
+	 * 
+	 * @param geneSelection
+	 *            The TreeSelection which is set by selecting genes in the
+	 *            GlobalView
+	 */
+	public void setArraySelection(final TreeSelectionI arraySelection) {
+
+		if (this.arraySelection != null) {
+			this.arraySelection.deleteObserver(this);
+		}
+		this.arraySelection = arraySelection;
+		this.arraySelection.addObserver(this);
 	}
 
 	public void setMap(final MapContainer im) {
@@ -354,7 +371,7 @@ public class TextView extends ModelView implements FontSelectable, KeyListener,
 		if (o == map) {
 			selectionChanged(); // gene locations changed
 
-		} else if (o == geneSelection) {
+		} else if (o == geneSelection || o == arraySelection) {
 			selectionChanged(); // which genes are selected changed
 
 		} else if (o == headerSummary) { // annotation selection changed
@@ -369,27 +386,48 @@ public class TextView extends ModelView implements FontSelectable, KeyListener,
 	@Override
 	public void mouseClicked(final MouseEvent e) {
 
-		if (urlExtractor == null) {
-			return;
-		}
-
-		urlExtractor.setEnabled(true);
-
-		if (urlExtractor.isEnabled() == false) {
-			return;
-		}
-
-		// now, want mouse click to signal browser...
+//		if (urlExtractor == null) {
+//			return;
+//		}
+//
+//		urlExtractor.setEnabled(true);
+//
+//		if (urlExtractor.isEnabled() == false) {
+//			return;
+//		}
+//
+//		// now, want mouse click to signal browser...
+//		final int index = map.getIndex(e.getY());
+//		if (map.contains(index)) {
+//			if (col != -1) {
+//				viewFrame.displayURL(urlExtractor.getUrl(index,
+//						headerInfo.getNames()[col]));
+//
+//			} else {
+//				viewFrame.displayURL(urlExtractor.getUrl(index));
+//			}
+//		}
 		final int index = map.getIndex(e.getY());
-		if (map.contains(index)) {
-			if (col != -1) {
-				viewFrame.displayURL(urlExtractor.getUrl(index,
-						headerInfo.getNames()[col]));
-
-			} else {
-				viewFrame.displayURL(urlExtractor.getUrl(index));
-			}
+		
+		if(arraySelection.getNSelectedIndexes() 
+				== arraySelection.getNumIndexes() 
+				&& arraySelection.isIndexSelected(index)) {
+			arraySelection.deselectAllIndexes();
+			geneSelection.deselectAllIndexes();
+		
+		} else if(arraySelection.getNSelectedIndexes() > 0) {
+			arraySelection.deselectAllIndexes();
+			geneSelection.deselectAllIndexes();
+			geneSelection.setIndex(index, true);
+			arraySelection.selectAllIndexes();
+			
+		} else {
+			geneSelection.setIndex(index, true);
+			arraySelection.selectAllIndexes();
 		}
+		
+		arraySelection.notifyObservers();
+		geneSelection.notifyObservers();
 	}
 
 	// MouseMotionListener

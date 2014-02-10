@@ -31,6 +31,8 @@ import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import edu.stanford.genetics.treeview.model.TVModel;
+
 /**
  * This class defines the treeview application. In practice, it holds the common
  * functionality of the LinkedViewApp and the AppletApp.
@@ -242,7 +244,9 @@ public abstract class TreeViewApp implements WindowListener {
 
 		// setup toplevel
 		final TreeViewFrame tvFrame = new TreeViewFrame(this);
-		final TVFrameController tvController = new TVFrameController(tvFrame);
+		final TVModel model = new TVModel();
+		final TVFrameController tvController = new TVFrameController(tvFrame, 
+				model);
 		if (fileSet != null) {
 			try {
 				tvController.loadFileSet(fileSet);
@@ -266,9 +270,12 @@ public abstract class TreeViewApp implements WindowListener {
 
 		// setup toplevel
 		final TreeViewFrame tvFrame = new TreeViewFrame(this);
+		final TVModel model = new TVModel();
+		final TVFrameController tvController = new TVFrameController(tvFrame, 
+				model);
 		if (fileSet != null) {
 			try {
-				tvFrame.loadFileSetNW(fileSet);
+				tvController.loadFileSetNW(fileSet);
 				tvFrame.setLoaded(true);
 
 			} catch (final LoadException e) {

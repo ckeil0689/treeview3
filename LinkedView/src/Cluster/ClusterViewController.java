@@ -34,7 +34,7 @@ public class ClusterViewController extends TVFrameController {
 	
 	public ClusterViewController(ClusterView view, TreeViewFrame tvFrame) {
 		
-		super(tvFrame);
+		super(tvFrame, (TVModel)tvFrame.getDataModel());
 		this.tvFrame = tvFrame;
 		this.tvModel = (TVModel)tvFrame.getDataModel();
 		this.clusterView = view;

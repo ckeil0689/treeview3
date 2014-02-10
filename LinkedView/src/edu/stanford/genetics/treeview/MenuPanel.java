@@ -43,7 +43,7 @@ public class MenuPanel extends JPanel implements MouseListener {
 	public void mouseEntered(MouseEvent arg0) {
 		
 		this.setCursor(new Cursor(Cursor.HAND_CURSOR));
-		label.setForeground(GUIParams.ELEMENT);
+		label.setForeground(GUIParams.MAIN);
 	}
 
 	@Override

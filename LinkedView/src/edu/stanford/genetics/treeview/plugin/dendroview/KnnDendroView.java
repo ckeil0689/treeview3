@@ -145,7 +145,7 @@ public class KnnDendroView extends DendroView implements ConfigNodePersistent,
 		globalview.setArrayDrawer(arrayDrawer);
 
 		// arraynameview.setMapping(getZoomXmap());
-		arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
+//		arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
 
 		textview = new TextViewManager(getDataModel().getGeneHeaderInfo(),
 				viewFrame.getUrlExtractor(), getDataModel());

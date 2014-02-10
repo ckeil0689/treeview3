@@ -121,7 +121,7 @@ class InvertedTreeDrawer extends TreeDrawer {
 	 */
 	class NodeDrawer {
 
-		private final Color sel_color = GUIParams.ELEMENT;
+		private final Color sel_color = GUIParams.MAIN;
 		private final Graphics graphics;
 		private final TreeDrawerNode selected;
 		private final LinearTransformation xT, yT;

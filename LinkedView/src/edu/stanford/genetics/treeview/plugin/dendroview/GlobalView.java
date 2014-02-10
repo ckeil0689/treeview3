@@ -660,9 +660,15 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 				final Point end = new Point(xmap.getMaxIndex(), endPoint.y);
 				selectRectangle(start, end);
 
+			} else if (e.isControlDown()) {
+				final Point start = new Point(startPoint.x, ymap.getMinIndex());
+				final Point end = new Point(endPoint.x, ymap.getMaxIndex());
+				selectRectangle(start, end);
+				
 			} else {
 				selectRectangle(startPoint, endPoint);
 			}
+			
 		} else {
 			// do something else?
 		}
@@ -762,7 +768,7 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 
 		final Graphics g = getGraphics();
 		g.setXORMode(getBackground());
-		g.setColor(GUIParams.ELEMENT);
+		g.setColor(GUIParams.MAIN);
 
 		final int x = xmap.getPixel(l.x);
 		final int y = ymap.getPixel(l.y);

@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.concurrent.ExecutionException;
 
 import javax.imageio.ImageIO;
 import javax.swing.Box;
@@ -334,7 +335,7 @@ ComponentListener, MainPanel, Observer {
 
 		// Set up the column name display
 		arraynameview = new ArrayNameView(getDataModel().getArrayHeaderInfo());
-		arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
+//		arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
 		arraynameview.setDataModel(getDataModel());
 		arraynameview.setMap(getGlobalXmap());
 
@@ -966,6 +967,12 @@ ComponentListener, MainPanel, Observer {
 		} catch (final LoadException e) {
 			JOptionPane.showMessageDialog(this, e);
 			throw e;
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		return tvModel;
@@ -2039,6 +2046,7 @@ ComponentListener, MainPanel, Observer {
 		// zoomview.setArraySelection(arraySelection);
 		atrview.setArraySelection(arraySelection);
 		// atrzview.setArraySelection(arraySelection);
+		textview.setArraySelection(arraySelection);
 		arraynameview.setArraySelection(arraySelection);
 	}
 
@@ -2062,6 +2070,7 @@ ComponentListener, MainPanel, Observer {
 		// zoomview.setGeneSelection(geneSelection);
 		gtrview.setGeneSelection(geneSelection);
 		textview.setGeneSelection(geneSelection);
+		arraynameview.setGeneSelection(geneSelection);
 	}
 
 	/**
