@@ -43,6 +43,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
@@ -169,6 +170,10 @@ ComponentListener, MainPanel, Observer {
 	// JPanels for gene search
 	private HeaderFinderPanel geneFinderPanel = null;
 	private HeaderFinderPanel arrayFinderPanel = null;
+	
+	// JMenuItems
+	private JMenuItem colorMenuItem;
+	private JMenuItem annotationsMenuItem;
 
 	// /**
 	// * Chained constructor
@@ -1203,101 +1208,104 @@ ComponentListener, MainPanel, Observer {
 	@Override
 	public void populateExportMenu(final TreeviewMenuBarI menu) {
 
-		menu.addMenuItem("Export to Postscript...", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent actionEvent) {
-
-				MapContainer initXmap, initYmap;
-
-				// if ((getArraySelection().getNSelectedIndexes() != 0) ||
-				// (getGeneSelection().getNSelectedIndexes() != 0)) {
-				// initXmap = getZoomXmap();
-				// initYmap = getZoomYmap();
-				//
-				// } else {
-				initXmap = getGlobalXmap();
-				initYmap = getGlobalYmap();
-				// }
-
-				final PostscriptExportPanel psePanel = setupPostscriptExport(
-						initXmap, initYmap);
-
-				final JDialog popup = new CancelableSettingsDialog(viewFrame,
-						"Export to Postscript", psePanel);
-				popup.pack();
-				popup.setVisible(true);
-			}
-		});
+		menu.addMenuItem("Export to Postscript...");
+//		, new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent actionEvent) {
+//
+//				MapContainer initXmap, initYmap;
+//
+//				// if ((getArraySelection().getNSelectedIndexes() != 0) ||
+//				// (getGeneSelection().getNSelectedIndexes() != 0)) {
+//				// initXmap = getZoomXmap();
+//				// initYmap = getZoomYmap();
+//				//
+//				// } else {
+//				initXmap = getGlobalXmap();
+//				initYmap = getGlobalYmap();
+//				// }
+//
+//				final PostscriptExportPanel psePanel = setupPostscriptExport(
+//						initXmap, initYmap);
+//
+//				final JDialog popup = new CancelableSettingsDialog(viewFrame,
+//						"Export to Postscript", psePanel);
+//				popup.pack();
+//				popup.setVisible(true);
+//			}
+//		});
 		menu.setAccelerator(KeyEvent.VK_X);
 		menu.setMnemonic(KeyEvent.VK_X);
 
-		menu.addMenuItem("Export to Image...", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent actionEvent) {
-
-				MapContainer initXmap, initYmap;
-				// if ((getArraySelection().getNSelectedIndexes() != 0) ||
-				// (getGeneSelection().getNSelectedIndexes() != 0)) {
-				// initXmap = getZoomXmap();
-				// initYmap = getZoomYmap();
-				//
-				// } else {
-				initXmap = getGlobalXmap();
-				initYmap = getGlobalYmap();
-				// }
-
-				final BitmapExportPanel bitmapPanel = setupBitmapExport(
-						initXmap, initYmap);
-
-				final JDialog popup = new CancelableSettingsDialog(viewFrame,
-						"Export to Image", bitmapPanel);
-				popup.pack();
-				popup.setVisible(true);
-			}
-		});
+		menu.addMenuItem("Export to Image...");
+//		, new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent actionEvent) {
+//
+//				MapContainer initXmap, initYmap;
+//				// if ((getArraySelection().getNSelectedIndexes() != 0) ||
+//				// (getGeneSelection().getNSelectedIndexes() != 0)) {
+//				// initXmap = getZoomXmap();
+//				// initYmap = getZoomYmap();
+//				//
+//				// } else {
+//				initXmap = getGlobalXmap();
+//				initYmap = getGlobalYmap();
+//				// }
+//
+//				final BitmapExportPanel bitmapPanel = setupBitmapExport(
+//						initXmap, initYmap);
+//
+//				final JDialog popup = new CancelableSettingsDialog(viewFrame,
+//						"Export to Image", bitmapPanel);
+//				popup.pack();
+//				popup.setVisible(true);
+//			}
+//		});
 		menu.setMnemonic(KeyEvent.VK_I);
 
-		menu.addMenuItem("Export ColorBar to Postscript...",
-				new ActionListener() {
-
-					@Override
-					public void actionPerformed(final ActionEvent actionEvent) {
-
-						final PostscriptColorBarExportPanel gcbPanel = 
-								new PostscriptColorBarExportPanel(
-								((DoubleArrayDrawer) arrayDrawer)
-										.getColorExtractor());
-
-						gcbPanel.setSourceSet(getDataModel().getFileSet());
-
-						final JDialog popup = new CancelableSettingsDialog(
-								viewFrame, "Export ColorBar to Postscript",
-								gcbPanel);
-						popup.pack();
-						popup.setVisible(true);
-					}
-				});
+		menu.addMenuItem("Export ColorBar to Postscript...");
+//		, new ActionListener() {
+//
+//					@Override
+//					public void actionPerformed(final ActionEvent actionEvent) {
+//
+//						final PostscriptColorBarExportPanel gcbPanel = 
+//								new PostscriptColorBarExportPanel(
+//								((DoubleArrayDrawer) arrayDrawer)
+//										.getColorExtractor());
+//
+//						gcbPanel.setSourceSet(getDataModel().getFileSet());
+//
+//						final JDialog popup = new CancelableSettingsDialog(
+//								viewFrame, "Export ColorBar to Postscript",
+//								gcbPanel);
+//						popup.pack();
+//						popup.setVisible(true);
+//					}
+//				});
 		menu.setMnemonic(KeyEvent.VK_B);
 
-		menu.addMenuItem("Export ColorBar to Image...", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent actionEvent) {
-
-				final BitmapColorBarExportPanel gcbPanel = 
-						new BitmapColorBarExportPanel(
-						((DoubleArrayDrawer) arrayDrawer).getColorExtractor());
-
-				gcbPanel.setSourceSet(getDataModel().getFileSet());
-
-				final JDialog popup = new CancelableSettingsDialog(viewFrame,
-						"Export ColorBar to Image", gcbPanel);
-				popup.pack();
-				popup.setVisible(true);
-			}
-		});
+		menu.addMenuItem("Export ColorBar to Image...");
+//		, new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent actionEvent) {
+//
+//				final BitmapColorBarExportPanel gcbPanel = 
+//						new BitmapColorBarExportPanel(
+//						((DoubleArrayDrawer) arrayDrawer).getColorExtractor());
+//
+//				gcbPanel.setSourceSet(getDataModel().getFileSet());
+//
+//				final JDialog popup = new CancelableSettingsDialog(viewFrame,
+//						"Export ColorBar to Image", gcbPanel);
+//				popup.pack();
+//				popup.setVisible(true);
+//			}
+//		});
 		menu.setMnemonic(KeyEvent.VK_M);
 
 		menu.addSeparator();
@@ -1306,66 +1314,68 @@ ComponentListener, MainPanel, Observer {
 
 	private void addSimpleExportOptions(final TreeviewMenuBarI menu) {
 
-		menu.addMenuItem("Save Tree Image", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent actionEvent) {
-
-				MapContainer initXmap, initYmap;
-				initXmap = getGlobalXmap();
-				initYmap = getGlobalYmap();
-
-				final BitmapExportPanel bitmapPanel = new BitmapExportPanel(
-						arraynameview.getHeaderInfo(), getDataModel()
-								.getGeneHeaderInfo(), getGeneSelection(),
-						getArraySelection(), invertedTreeDrawer,
-						leftTreeDrawer, arrayDrawer, initXmap, initYmap);
-
-				bitmapPanel.setGeneFont(textview.getFont());
-				bitmapPanel.setArrayFont(arraynameview.getFont());
-				bitmapPanel.setSourceSet(getDataModel().getFileSet());
-				bitmapPanel.setDrawSelected(false);
-				bitmapPanel.includeData(false);
-				bitmapPanel.includeAtr(false);
-				bitmapPanel.deselectHeaders();
-
-				final JDialog popup = new CancelableSettingsDialog(viewFrame,
-						"Export to Image", bitmapPanel);
-				popup.pack();
-				popup.setVisible(true);
-			}
-		});
+		menu.addMenuItem("Save Tree Image");
+//		, new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent actionEvent) {
+//
+//				MapContainer initXmap, initYmap;
+//				initXmap = getGlobalXmap();
+//				initYmap = getGlobalYmap();
+//
+//				final BitmapExportPanel bitmapPanel = new BitmapExportPanel(
+//						arraynameview.getHeaderInfo(), getDataModel()
+//								.getGeneHeaderInfo(), getGeneSelection(),
+//						getArraySelection(), invertedTreeDrawer,
+//						leftTreeDrawer, arrayDrawer, initXmap, initYmap);
+//
+//				bitmapPanel.setGeneFont(textview.getFont());
+//				bitmapPanel.setArrayFont(arraynameview.getFont());
+//				bitmapPanel.setSourceSet(getDataModel().getFileSet());
+//				bitmapPanel.setDrawSelected(false);
+//				bitmapPanel.includeData(false);
+//				bitmapPanel.includeAtr(false);
+//				bitmapPanel.deselectHeaders();
+//
+//				final JDialog popup = new CancelableSettingsDialog(viewFrame,
+//						"Export to Image", bitmapPanel);
+//				popup.pack();
+//				popup.setVisible(true);
+//			}
+//		});
 		menu.setMnemonic(KeyEvent.VK_T);
 
-		menu.addMenuItem("Save Thumbnail Image", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent actionEvent) {
-
-				MapContainer initXmap, initYmap;
-				initXmap = getGlobalXmap();
-				initYmap = getGlobalYmap();
-
-				final BitmapExportPanel bitmapPanel = new BitmapExportPanel(
-						arraynameview.getHeaderInfo(), getDataModel()
-								.getGeneHeaderInfo(), getGeneSelection(),
-						getArraySelection(), invertedTreeDrawer,
-						leftTreeDrawer, arrayDrawer, initXmap, initYmap);
-
-				bitmapPanel.setSourceSet(getDataModel().getFileSet());
-				bitmapPanel.setGeneFont(textview.getFont());
-				bitmapPanel.setArrayFont(arraynameview.getFont());
-				bitmapPanel.setDrawSelected(false);
-				bitmapPanel.includeGtr(false);
-				bitmapPanel.includeAtr(false);
-				bitmapPanel.deselectHeaders();
-
-				final JDialog popup = new CancelableSettingsDialog(viewFrame,
-						"Export To Image", bitmapPanel);
-				popup.pack();
-				popup.setVisible(true);
-			}
-		});
+		menu.addMenuItem("Save Thumbnail Image");
+//		, new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent actionEvent) {
+//
+//				MapContainer initXmap, initYmap;
+//				initXmap = getGlobalXmap();
+//				initYmap = getGlobalYmap();
+//
+//				final BitmapExportPanel bitmapPanel = new BitmapExportPanel(
+//						arraynameview.getHeaderInfo(), getDataModel()
+//								.getGeneHeaderInfo(), getGeneSelection(),
+//						getArraySelection(), invertedTreeDrawer,
+//						leftTreeDrawer, arrayDrawer, initXmap, initYmap);
+//
+//				bitmapPanel.setSourceSet(getDataModel().getFileSet());
+//				bitmapPanel.setGeneFont(textview.getFont());
+//				bitmapPanel.setArrayFont(arraynameview.getFont());
+//				bitmapPanel.setDrawSelected(false);
+//				bitmapPanel.includeGtr(false);
+//				bitmapPanel.includeAtr(false);
+//				bitmapPanel.deselectHeaders();
+//
+//				final JDialog popup = new CancelableSettingsDialog(viewFrame,
+//						"Export To Image", bitmapPanel);
+//				popup.pack();
+//				popup.setVisible(true);
+//			}
+//		});
 		menu.setMnemonic(KeyEvent.VK_H);
 
 		// menu.addMenuItem("Save Zoomed Image", new ActionListener() {
@@ -1537,173 +1547,14 @@ ComponentListener, MainPanel, Observer {
 		
 		final TreeViewFrame tvFrame = (TreeViewFrame) viewFrame;
 		
-		menu.addMenuItem("Row and Column Labels", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-				
-				tvFrame.openPrefMenu("Labels");
-			}
-		}, 0);
+		annotationsMenuItem = (JMenuItem) menu.addMenuItem(
+				"Row and Column Labels", 0);
+		menu.setMnemonic(KeyEvent.VK_R);
+		tvFrame.addToMenuList(annotationsMenuItem);
 		
-		menu.addMenuItem("Color Settings", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-				
-				tvFrame.openPrefMenu("Color Settings");
-			}
-		}, 1);
-
-//		menu.addMenuItem("Pixel Settings...", new ActionListener() {
-//
-//			@Override
-//			public void actionPerformed(final ActionEvent actionEvent) {
-//
-//				ColorExtractor ce = null;
-//
-//				try {
-//					ce = ((DoubleArrayDrawer) arrayDrawer).getColorExtractor();
-//
-//				} catch (final Exception e) {
-//
-//				}
-//
-//				final PixelSettingsSelector pssSelector = 
-//						new PixelSettingsSelector(
-//						globalXmap, globalYmap, ce, 
-//						DendrogramFactory.getColorPresets());
-//
-//				final JDialog popup = new ModelessSettingsDialog(viewFrame,
-//						"Pixel Settings", pssSelector);
-//
-//				System.out.println("showing popup...");
-//				popup.addWindowListener(XmlConfig
-//						.getStoreOnWindowClose(getDataModel()
-//								.getDocumentConfigRoot()));
-//
-//				popup.pack();
-//				popup.setVisible(true);
-//			}
-//		}, 0);
-//		menu.setMnemonic(KeyEvent.VK_X);
-//
-//		menu.addMenuItem("Url Settings...", new ActionListener() {
-//
-//			@Override
-//			public void actionPerformed(final ActionEvent actionEvent) {
-//
-//				// keep refs to settingsPanel, settingsFrame local,
-//				// since will dispose of self when closed...
-//				final TabbedSettingsPanel settingsPanel = new TabbedSettingsPanel();
-//
-//				final UrlSettingsPanel genePanel = new UrlSettingsPanel(
-//						viewFrame.getUrlExtractor(), viewFrame
-//								.getGeneUrlPresets());
-//				settingsPanel.addSettingsPanel("Gene", genePanel);
-//
-//				final UrlSettingsPanel arrayPanel = new UrlSettingsPanel(
-//						viewFrame.getArrayUrlExtractor(), viewFrame
-//								.getArrayUrlPresets());
-//				settingsPanel.addSettingsPanel("Array", arrayPanel);
-//
-//				final JDialog settingsFrame = new ModelessSettingsDialog(
-//						viewFrame, "Url Settings", settingsPanel);
-//
-//				settingsFrame.addWindowListener(XmlConfig
-//						.getStoreOnWindowClose(getDataModel()
-//								.getDocumentConfigRoot()));
-//				settingsFrame.pack();
-//				settingsFrame.setVisible(true);
-//			}
-//		}, 0);
-//		menu.setMnemonic(KeyEvent.VK_U);
-//
-//		menu.addMenuItem("Font Settings...", new ActionListener() {
-//
-//			@Override
-//			public void actionPerformed(final ActionEvent actionEvent) {
-//
-//				// keep ref to settingsFrame local,
-//				// since will dispose of self when closed...
-//				final TabbedSettingsPanel settingsPanel = new TabbedSettingsPanel();
-//
-//				final FontSettingsPanel genePanel = new FontSettingsPanel(
-//						textview);
-//				settingsPanel.addSettingsPanel("Gene", genePanel);
-//
-//				final FontSettingsPanel arrayPanel = new FontSettingsPanel(
-//						arraynameview);
-//				settingsPanel.addSettingsPanel("Array", arrayPanel);
-//
-//				final JDialog settingsFrame = new ModelessSettingsDialog(
-//						viewFrame, "Font Settings", settingsPanel);
-//				settingsFrame.addWindowListener(XmlConfig
-//						.getStoreOnWindowClose(getDataModel()
-//								.getDocumentConfigRoot()));
-//				settingsFrame.pack();
-//				settingsFrame.setVisible(true);
-//			}
-//		}, 0);
-//		menu.setMnemonic(KeyEvent.VK_F);
-//
-//		menu.addMenuItem("Annotations...", new ActionListener() {
-//
-//			@Override
-//			public void actionPerformed(final ActionEvent actionEvent) {
-//				// keep refs to settingsPanel, settingsFrame local,
-//				// since will dispose of self when closed...
-//				final TabbedSettingsPanel settingsPanel = new TabbedSettingsPanel();
-//
-//				final HeaderSummaryPanel genePanel = new HeaderSummaryPanel(
-//						getDataModel().getGeneHeaderInfo(), textview
-//								.getHeaderSummary(), (TreeViewFrame)viewFrame);
-//				settingsPanel.addSettingsPanel("Gene", genePanel);
-//
-//				final HeaderSummaryPanel arrayPanel = new HeaderSummaryPanel(
-//						arraynameview.getHeaderInfo(), arraynameview
-//								.getHeaderSummary(), (TreeViewFrame)viewFrame);
-//				settingsPanel.addSettingsPanel("Array", arrayPanel);
-//
-//				final HeaderSummaryPanel atrPanel = new HeaderSummaryPanel(
-//						getDataModel().getAtrHeaderInfo(), atrview
-//								.getHeaderSummary(), (TreeViewFrame)viewFrame);
-//				settingsPanel.addSettingsPanel("Array Tree", atrPanel);
-//
-//				final HeaderSummaryPanel gtrPanel = new HeaderSummaryPanel(
-//						getDataModel().getGtrHeaderInfo(), gtrview
-//								.getHeaderSummary(), (TreeViewFrame)viewFrame);
-//				settingsPanel.addSettingsPanel("Gene Tree", gtrPanel);
-//
-//				final JDialog settingsFrame = new ModelessSettingsDialog(
-//						viewFrame, "Annotation Settings", settingsPanel);
-//
-//				settingsFrame.addWindowListener(XmlConfig
-//						.getStoreOnWindowClose(getDataModel()
-//								.getDocumentConfigRoot()));
-//				settingsFrame.addWindowListener(new WindowAdapter() {
-//
-//					@Override
-//					public void windowClosed(final WindowEvent e) {
-//
-//						textview.repaint();
-//						arraynameview.repaint();
-//					}
-//				});
-//				settingsFrame.pack();
-//				settingsFrame.setVisible(true);
-//			}
-//		}, 0);
-//		menu.setMnemonic(KeyEvent.VK_A);
-//
-//		/*
-//		 * MenuItem urlItem = new MenuItem("Url Options...");
-//		 * urlItem.addActionListener( new ActionListener() { public void
-//		 * actionPerformed(ActionEvent actionEvent) { UrlEditor urlEditor = new
-//		 * UrlEditor(urlExtractor, viewFrame.getGeneUrlPresets(),
-//		 * dataModel.getGeneHeaderInfo()); urlEditor.showConfig(viewFrame);
-//		 * dataModel.getDocumentConfig().store(); } }); menu.add(urlItem);
-//		 */
+		colorMenuItem = (JMenuItem) menu.addMenuItem("Color Settings", 1); 
+		menu.setMnemonic(KeyEvent.VK_C);
+		tvFrame.addToMenuList(colorMenuItem);
 	}
 
 	/**
@@ -1741,6 +1592,7 @@ ComponentListener, MainPanel, Observer {
 
 	@Override
 	public void bindConfig(final ConfigNode configNode) {
+		
 		root = configNode;
 		/*
 		 * ConfigNode heightNodes[] = root.fetch("Height"); ConfigNode
@@ -2043,9 +1895,7 @@ ComponentListener, MainPanel, Observer {
 		arraySelection.addObserver(this);
 
 		globalview.setArraySelection(arraySelection);
-		// zoomview.setArraySelection(arraySelection);
 		atrview.setArraySelection(arraySelection);
-		// atrzview.setArraySelection(arraySelection);
 		textview.setArraySelection(arraySelection);
 		arraynameview.setArraySelection(arraySelection);
 	}
@@ -2067,7 +1917,6 @@ ComponentListener, MainPanel, Observer {
 		geneSelection.addObserver(this);
 
 		globalview.setGeneSelection(geneSelection);
-		// zoomview.setGeneSelection(geneSelection);
 		gtrview.setGeneSelection(geneSelection);
 		textview.setGeneSelection(geneSelection);
 		arraynameview.setGeneSelection(geneSelection);

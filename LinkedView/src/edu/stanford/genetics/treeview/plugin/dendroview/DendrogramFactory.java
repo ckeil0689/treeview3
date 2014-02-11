@@ -99,25 +99,25 @@ public class DendrogramFactory extends PluginFactory {
 			final ViewFrame frame) {
 
 		super.addPluginConfig(globalMenu, frame);
-		globalMenu.addMenuItem("Dendrogram Color Presets...",
-				new ActionListener() {
-
-					@Override
-					public void actionPerformed(final ActionEvent actionEvent) {
-
-						if (cpresetFrame == null) {
-							cpresetFrame = new JFrame(
-									"Dendrogram Color Presets");
-							final SettingsPanelHolder holder = new SettingsPanelHolder(
-									cpresetFrame, frame.getApp()
-											.getGlobalConfig().getRoot());
-							holder.addSettingsPanel(cpresetEditor);
-							cpresetFrame.getContentPane().add(holder);
-						}
-						cpresetFrame.pack();
-						cpresetFrame.setVisible(true);
-					}
-				});
+		globalMenu.addMenuItem("Dendrogram Color Presets...");
+//		, new ActionListener() {
+//
+//					@Override
+//					public void actionPerformed(final ActionEvent actionEvent) {
+//
+//						if (cpresetFrame == null) {
+//							cpresetFrame = new JFrame(
+//									"Dendrogram Color Presets");
+//							final SettingsPanelHolder holder = new SettingsPanelHolder(
+//									cpresetFrame, frame.getApp()
+//											.getGlobalConfig().getRoot());
+//							holder.addSettingsPanel(cpresetEditor);
+//							cpresetFrame.getContentPane().add(holder);
+//						}
+//						cpresetFrame.pack();
+//						cpresetFrame.setVisible(true);
+//					}
+//				});
 		globalMenu.setMnemonic(KeyEvent.VK_D);
 	}
 

@@ -411,7 +411,7 @@ public class TextView extends ModelView implements FontSelectable, KeyListener,
 		
 		if(arraySelection.getNSelectedIndexes() 
 				== arraySelection.getNumIndexes() 
-				&& arraySelection.isIndexSelected(index)) {
+				&& geneSelection.isIndexSelected(index)) {
 			arraySelection.deselectAllIndexes();
 			geneSelection.deselectAllIndexes();
 		

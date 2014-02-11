@@ -62,14 +62,15 @@ import edu.stanford.genetics.treeview.model.TVModel;
 public abstract class TreeViewApp implements WindowListener {
 
 	/** Version of application */
-	public final static String versionTag = "3.0";
+	public final static String versionTag = "0.1";
 
 	// url of homepage to go for updates
-	protected static String updateUrl = "http://jtreeview.sourceforge.net";
+	protected static String updateUrl = "https://www.princeton.edu/~abarysh/" +
+			"treeview/";
 
 	// url of announcements mailing list
-	protected static String announcementUrl = "http://lists.sourceforge.net/" +
-			"lists/listinfo/jtreeview-announce";
+	protected static String announcementUrl = "https://www.princeton.edu/" +
+			"~abarysh/treeview/";
 
 	/** holds all open windows */
 	protected java.util.Vector<Window> windows;

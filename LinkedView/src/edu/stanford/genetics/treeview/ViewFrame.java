@@ -745,25 +745,27 @@ public abstract class ViewFrame extends JFrame implements Observer {
 			}
 			menubar.addSeparator();
 
-			menubar.addMenuItem("New Window", new ActionListener() {
-
-				@Override
-				public void actionPerformed(final ActionEvent actionEvent) {
-
-					createNewFrame().setVisible(true);
-				}
-			});
+			menubar.addMenuItem("New Window");
+//			, new ActionListener() {
+//
+//				@Override
+//				public void actionPerformed(final ActionEvent actionEvent) {
+//
+//					createNewFrame().setVisible(true);
+//				}
+//			});
 			menubar.setAccelerator(KeyEvent.VK_N);
 			menubar.setMnemonic(KeyEvent.VK_N);
 
-			menubar.addMenuItem("Close Window", new ActionListener() {
-
-				@Override
-				public void actionPerformed(final ActionEvent actionEvent) {
-
-					closeWindow();
-				}
-			});
+			menubar.addMenuItem("Close Window");
+//			, new ActionListener() {
+//
+//				@Override
+//				public void actionPerformed(final ActionEvent actionEvent) {
+//
+//					closeWindow();
+//				}
+//			});
 			menubar.setAccelerator(KeyEvent.VK_W);
 			menubar.setMnemonic(KeyEvent.VK_W);
 		}
@@ -811,14 +813,15 @@ public abstract class ViewFrame extends JFrame implements Observer {
 
 			name = "Not Loaded";
 		}
-		menubar.addMenuItem(name, new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-
-				source.toFront();
-			}
-		});
+		menubar.addMenuItem(name);
+//		, new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent e) {
+//
+//				source.toFront();
+//			}
+//		});
 		menubar.setAccelerator(getKey(p1));
 	}
 

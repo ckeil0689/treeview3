@@ -5,12 +5,16 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 
 import Views.LoadProgressView;
 import Views.WelcomeView;
@@ -18,6 +22,7 @@ import Views.WelcomeView;
 import Cluster.ClusterProcessor;
 import Cluster.ClusterViewController;
 import Cluster.ClusterViewFrame;
+import Controllers.MenubarActions;
 
 import edu.stanford.genetics.treeview.model.CDTCreator3;
 import edu.stanford.genetics.treeview.model.TVModel;
@@ -34,6 +39,7 @@ public class TVFrameController {
 	private TreeViewFrame tvFrame;
 	private TVModel model;
 	private SwingWorker<Void, Void> worker;
+	private File file;
 	private String fileType;
 	
 	public TVFrameController(TreeViewFrame tvFrame, TVModel model) {
@@ -41,7 +47,9 @@ public class TVFrameController {
 		this.tvFrame = tvFrame;
 		this.model = model;
 		
-		setupWorkerThread();
+//		setupWorkerThread();
+		
+		tvFrame.addMenuActionListeners(new TVMenuListener());
 		
 		// Get the Views from TVFrame
 		WelcomeView welcomeView = tvFrame.getWelcomeView();
@@ -71,8 +79,7 @@ public class TVFrameController {
 			if(tvFrame.getLoaded()) {
 				tvFrame.setLoaded(false);
 			}
-			tvFrame.setView("LoadProgressView");
-			worker.execute();
+			openFile();
 		}	
 	}
 	
@@ -92,8 +99,7 @@ public class TVFrameController {
 			if(tvFrame.getLoaded()) {
 				tvFrame.setLoaded(false);
 			}
-			tvFrame.setView("LoadProgressView");
-			worker.execute();
+			openFile();
 		}	
 	}
 	
@@ -109,12 +115,37 @@ public class TVFrameController {
 
 			if(tvFrame.getDataModel() != null) {
 				tvFrame.setView("DendroView");
-				tvFrame.setLoaded(true);
+//				tvFrame.setLoaded(true);
+				tvFrame.addMenuActionListeners(new TVMenuListener());
 				
 			} else {
 				System.out.println("Couldn't continue, dataModel is null.");
 			}
 		}	
+	}
+	
+	class TVMenuListener implements ActionListener {
+
+		private MenubarActions menuActions;
+		
+		public TVMenuListener() {
+			
+			menuActions =  new MenubarActions(tvFrame, 
+					TVFrameController.this);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			
+			ArrayList<JMenuItem> menuList = tvFrame.getMenus();
+			
+			for(JMenuItem menuItem : menuList) {
+				if(e.getSource() ==  menuItem) {
+					
+					menuActions.execute(menuItem.getText());
+				}
+			}
+		}
 	}
 	
 	/**
@@ -129,7 +160,50 @@ public class TVFrameController {
 			@Override
 			public Void doInBackground() {
 				
-				openFile();
+				try {
+					final String fileName = file.getAbsolutePath();
+					final int dotIndex = fileName.indexOf(".");
+
+					final int suffixLength = fileName.length() - dotIndex;
+
+					fileType = file.getAbsolutePath().substring(
+							fileName.length() - suffixLength, 
+							fileName.length());
+				
+					if (!fileType.equalsIgnoreCase(".cdt")) {
+						
+						
+							final CDTCreator3 fileTransformer = 
+									new CDTCreator3(file, fileType, tvFrame);
+							
+							fileTransformer.createFile();
+			
+							file = new File(fileTransformer.getFilePath());
+							
+					}
+					FileSet fileSet = tvFrame.getFileSet(file);
+				
+					// Loading TVModel
+					loadFileSet(fileSet);
+					
+					if(fileSet != null) {
+						fileSet = tvFrame.getFileMRU().addUnique(fileSet);
+						tvFrame.getFileMRU().setLast(fileSet);
+						
+					} else {
+						System.out.println("FileSet is null.");
+					}
+					
+				} catch (IOException e) {
+					System.out.println("Could not generate CDT file. Cause: " +
+							e.getCause());
+					e.printStackTrace();
+					
+				} catch (LoadException e) {
+					System.out.println("Loading the FileSet was interrupted. " +
+							"Cause: " + e.getCause());
+					e.printStackTrace();
+				}
 				return null;
 			}
 
@@ -154,47 +228,14 @@ public class TVFrameController {
 	 * @throws LoadException
 	 */
 	public void openFile() {
+	
+		setupWorkerThread();
 		
-		File file;
 		try {
 			file = tvFrame.selectFile();
-			final String fileName = file.getAbsolutePath();
-			final int dotIndex = fileName.indexOf(".");
-
-			final int suffixLength = fileName.length() - dotIndex;
-
-			fileType = file.getAbsolutePath().substring(
-					fileName.length() - suffixLength, 
-					fileName.length());
-		
-			if (!fileType.equalsIgnoreCase(".cdt")) {
-				
-				
-					final CDTCreator3 fileTransformer = 
-							new CDTCreator3(file, fileType, tvFrame);
-					
-					fileTransformer.createFile();
-	
-					file = new File(fileTransformer.getFilePath());
-					
-			}
-			FileSet fileSet = tvFrame.getFileSet(file);
-		
-			// Loading TVModel
-			loadFileSet(fileSet);
-			
-			if(fileSet != null) {
-				fileSet = tvFrame.getFileMRU().addUnique(fileSet);
-				tvFrame.getFileMRU().setLast(fileSet);
-				
-			} else {
-				System.out.println("FileSet is null.");
-			}
-			
-		} catch (IOException e) {
-			System.out.println("Could not generate CDT file. Cause: " +
-					e.getCause());
-			e.printStackTrace();
+			tvFrame.setView("LoadProgressView");
+			tvFrame.setLoaded(false);
+			worker.execute();
 			
 		} catch (LoadException e) {
 			System.out.println("Loading the FileSet was interrupted. " +
@@ -234,6 +275,7 @@ public class TVFrameController {
 		try {
 			// load instance variables of TVModel with data
 			// use worker thread
+			
 			model.loadNew(fileSet);
 
 		} catch (final LoadException e) {
@@ -398,7 +440,84 @@ public class TVFrameController {
 			setupExtractors();
 			
 		} else {
+			tvFrame.setDataModel(null);
 			tvFrame.setLoaded(false);
 		}
+	}
+	
+	/**
+	 * Opens an instance of GeneListMaker used to save a list of genes.
+	 */
+	public void saveList() {
+		
+		if (warnSelectionEmpty()) {
+			final FileSet source = tvFrame.getDataModel().getFileSet();
+			String def = tvFrame.getDataModel().getName() + "_list.txt";
+		
+			if (source != null) {
+		
+				def = source.getDir() + source.getRoot() + "_list.txt";
+			}
+		
+			final GeneListMaker t = new GeneListMaker(tvFrame,
+					tvFrame.getGeneSelection(), tvFrame.getDataModel()
+							.getGeneHeaderInfo(), def);
+		
+			t.setDataMatrix(tvFrame.getDataModel().getDataMatrix(),
+					tvFrame.getDataModel().getArrayHeaderInfo(),
+					DataModel.NODATA);
+		
+			t.bindConfig(tvFrame.getDataModel().getDocumentConfigRoot()
+					.fetchOrCreate("GeneListMaker"));
+		
+			t.pack();
+			t.setVisible(true);
+		}
+	}
+	
+	/**
+	 * Opens instance of GeneListMaker to save data.
+	 */
+	public void saveData() {
+		
+		if (warnSelectionEmpty()) {
+			final FileSet source = tvFrame.getDataModel().getFileSet();
+
+			final GeneListMaker t = new GeneListMaker(tvFrame,
+					tvFrame.getGeneSelection(), tvFrame.getDataModel()
+							.getGeneHeaderInfo(), source.getDir()
+							+ source.getRoot() + "_data.cdt");
+
+			t.setDataMatrix(tvFrame.getDataModel().getDataMatrix(),
+					tvFrame.getDataModel().getArrayHeaderInfo(),
+					DataModel.NODATA);
+
+			t.bindConfig(tvFrame.getDataModel().getDocumentConfigRoot()
+					.fetchOrCreate("GeneListMaker"));
+
+			t.includeAll();
+			t.pack();
+			t.setVisible(true);
+		}
+	}
+	
+	/**
+	 * Generates a warning message if TreeSelectionI object is null and returns
+	 * false in that case.
+	 * 
+	 * @return boolean
+	 */
+	public boolean warnSelectionEmpty() {
+
+		final TreeSelectionI treeSelection = tvFrame.getGeneSelection();
+
+		if ((treeSelection == null)
+				|| (treeSelection.getNSelectedIndexes() <= 0)) {
+
+			JOptionPane.showMessageDialog(tvFrame,
+					"Cannot generate gene list, no gene selected");
+			return false;
+		}
+		return true;
 	}
 }

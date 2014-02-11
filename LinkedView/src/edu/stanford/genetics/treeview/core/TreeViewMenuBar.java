@@ -62,19 +62,35 @@ public class TreeViewMenuBar extends TreeviewMenuBarI {
 	 * edu.stanford.genetics.treeview.TreeviewMenuBarI#addMenuItem(java.lang
 	 * .String, java.awt.event.ActionListener)
 	 */
+//	@Override
+//	public Object addMenuItem(final String name, final ActionListener l) {
+//		currentMenuItem = new MenuItem(name);
+//		currentMenuItem.addActionListener(l);
+//		currentMenu.add(currentMenuItem);
+//		return currentMenuItem;
+//	}
+//
+//	@Override
+//	public Object addMenuItem(final String name, final ActionListener l,
+//			final int pos) {
+//		currentMenuItem = new MenuItem(name);
+//		currentMenuItem.addActionListener(l);
+//		currentMenu.insert(currentMenuItem, pos);
+//		return currentMenuItem;
+//	}
+//	
 	@Override
-	public Object addMenuItem(final String name, final ActionListener l) {
+	public Object addMenuItem(final String name) {
+		
 		currentMenuItem = new MenuItem(name);
-		currentMenuItem.addActionListener(l);
 		currentMenu.add(currentMenuItem);
 		return currentMenuItem;
 	}
 
 	@Override
-	public Object addMenuItem(final String name, final ActionListener l,
-			final int pos) {
+	public Object addMenuItem(final String name, final int pos) {
+		
 		currentMenuItem = new MenuItem(name);
-		currentMenuItem.addActionListener(l);
 		currentMenu.insert(currentMenuItem, pos);
 		return currentMenuItem;
 	}

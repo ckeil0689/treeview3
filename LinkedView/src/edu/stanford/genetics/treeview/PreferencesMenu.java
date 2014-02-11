@@ -130,7 +130,7 @@ public class PreferencesMenu extends JFrame {
 				&& urlSettings != null) {
 			getContentPane().add(urlSettings, "w 79%, h 95%, wrap");
 		
-		} else if(startMenu.equalsIgnoreCase("Labels") 
+		} else if(startMenu.equalsIgnoreCase("Row and Column Labels") 
 				&& annotationSettings != null) {
 			getContentPane().add(annotationSettings, "w 79%, h 95%, wrap");
 			
@@ -340,6 +340,7 @@ public class PreferencesMenu extends JFrame {
 				if(viewFrame.getConfirmPanel() != null) {
 					viewFrame.getConfirmPanel().setupLayout();
 				}
+				viewFrame.setLoaded(false);
 				viewFrame.setView("DendroView");
 
 			} else if (viewFrame.getDataModel() != null 

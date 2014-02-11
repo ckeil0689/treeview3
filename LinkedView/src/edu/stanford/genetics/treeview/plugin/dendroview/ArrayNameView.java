@@ -48,9 +48,7 @@ import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.RotateImageFilter;
-import edu.stanford.genetics.treeview.TreeSelection;
 import edu.stanford.genetics.treeview.TreeSelectionI;
-import edu.stanford.genetics.treeview.UrlExtractor;
 
 /**
  * Renders the names of the arrays.
@@ -530,7 +528,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		final int index = map.getIndex(e.getX());
 		if(geneSelection.getNSelectedIndexes() 
 				== geneSelection.getNumIndexes() 
-				&& geneSelection.isIndexSelected(index)) {
+				&& arraySelection.isIndexSelected(index)) {
 			geneSelection.deselectAllIndexes();
 			arraySelection.deselectAllIndexes();
 			

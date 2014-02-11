@@ -12,6 +12,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
+import javax.swing.event.MenuListener;
 
 import edu.stanford.genetics.treeview.TreeviewMenuBarI;
 
@@ -65,23 +66,49 @@ public class TreeViewJMenuBar extends TreeviewMenuBarI {
 	 * edu.stanford.genetics.treeview.TreeviewMenuBarI#addMenuItem(java.lang
 	 * .String, java.awt.event.ActionListener)
 	 */
+//	@Override
+//	public Object addMenuItem(final String name, final ActionListener l) {
+//		
+//		currentMenuItem = new JMenuItem(name);
+//		currentMenuItem.addActionListener(l);
+//		currentMenu.add(currentMenuItem);
+//		return currentMenuItem;
+//	}
+//
+//	@Override
+//	public Object addMenuItem(final String name, final ActionListener l,
+//			final int pos) {
+//		
+//		currentMenuItem = new JMenuItem(name);
+//		currentMenuItem.addActionListener(l);
+//		currentMenu.insert(currentMenuItem, pos);
+//		return currentMenuItem;
+//	}
+	
 	@Override
-	public Object addMenuItem(final String name, final ActionListener l) {
+	public Object addMenuItem(final String name) {
 		
 		currentMenuItem = new JMenuItem(name);
-		currentMenuItem.addActionListener(l);
 		currentMenu.add(currentMenuItem);
 		return currentMenuItem;
 	}
 
 	@Override
-	public Object addMenuItem(final String name, final ActionListener l,
-			final int pos) {
+	public Object addMenuItem(final String name, final int pos) {
 		
 		currentMenuItem = new JMenuItem(name);
-		currentMenuItem.addActionListener(l);
 		currentMenu.insert(currentMenuItem, pos);
 		return currentMenuItem;
+	}
+	
+	/**
+	 * Adds a MenuListener to the currently active menu.
+	 * @param listener
+	 */
+	@Override
+	public void addMenuListener(MenuListener listener) {
+		
+		currentMenu.addMenuListener(listener);
 	}
 
 	/*
@@ -197,6 +224,7 @@ public class TreeViewJMenuBar extends TreeviewMenuBarI {
 
 	@Override
 	public void removeMenuItems() {
+		
 		int i;
 		@SuppressWarnings("unused")
 		JMenu testItem;

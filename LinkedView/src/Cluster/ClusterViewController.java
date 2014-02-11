@@ -6,6 +6,7 @@ import java.io.File;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
@@ -23,18 +24,20 @@ import edu.stanford.genetics.treeview.model.TVModel;
  * @author CKeil
  *
  */
-public class ClusterViewController extends TVFrameController {
+public class ClusterViewController {
 
 	private TVModel tvModel;
 	private TreeViewFrame tvFrame;
 	private ClusterView clusterView;
-	private SwingWorker<Void, Void> worker;
+	
+	private SwingWorker<Void, Void> clusterWorker;
+	private SwingWorker<Void, Void> loadWorker;
 	
 	private String finalFilePath;
+	private FileSet fileSet;
 	
 	public ClusterViewController(ClusterView view, TreeViewFrame tvFrame) {
 		
-		super(tvFrame, (TVModel)tvFrame.getDataModel());
 		this.tvFrame = tvFrame;
 		this.tvModel = (TVModel)tvFrame.getDataModel();
 		this.clusterView = view;
@@ -54,7 +57,7 @@ public class ClusterViewController extends TVFrameController {
 	 */
 	public void setupWorkerThread() {
 		
-		worker = new SwingWorker<Void, Void>() {
+		clusterWorker = new SwingWorker<Void, Void>() {
 
 			@Override
 			public Void doInBackground() {
@@ -80,6 +83,46 @@ public class ClusterViewController extends TVFrameController {
 		};
 	}
 	
+	public void setupLoadWorkerThread() {
+		
+		loadWorker = new SwingWorker<Void, Void>() {
+
+			@Override
+			protected Void doInBackground() throws Exception {
+				
+				loadFileSet(fileSet);
+				return null;
+			}
+			
+			@Override
+			protected void done() {
+				
+				tvFrame.setView("DendroView");
+				tvFrame.setLoaded(true);
+			}
+		};
+	}
+	
+	public void loadFileSet(final FileSet fileSet) throws LoadException {
+
+		tvModel.setFrame(tvFrame);
+
+		try {
+			tvModel.loadNew(fileSet);
+
+		} catch (final LoadException e) {
+			if (e.getType() != LoadException.INTPARSE) {
+				JOptionPane.showMessageDialog(tvFrame, e);
+				throw e;
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	// Define Listeners as inner classes
 	/**
 	 * Defines what happens if the user clicks the 'Cluster' button in
@@ -103,7 +146,7 @@ public class ClusterViewController extends TVFrameController {
 						linkageMethod);
 				
 				// Start the worker
-				worker.execute();
+				clusterWorker.execute();
 				
 			} else {
 				clusterView.showError(isHierarchical());
@@ -189,16 +232,13 @@ public class ClusterViewController extends TVFrameController {
 			
 			File file = new File(finalFilePath);
 			
-			final FileSet fileSet = new FileSet(file.getName(), file
-					.getParent() + File.separator);
+			fileSet = new FileSet(file.getName(), file.getParent() 
+					+ File.separator);
 
-			try {
-				loadFileSet(fileSet);
-
-			} catch (final LoadException e) {
-
-			}
-			tvFrame.setLoaded(true);
+			
+			setupLoadWorkerThread();
+			loadWorker.execute();
+			
 			topFrame.dispose();
 		}
 	}
@@ -213,7 +253,7 @@ public class ClusterViewController extends TVFrameController {
 		
 		public void actionPerformed(ActionEvent e) {
 			
-			worker.cancel(true);
+			clusterWorker.cancel(true);
 			clusterView.cancel();
 		}
 	}

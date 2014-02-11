@@ -90,25 +90,25 @@ public class KnnDendrogramFactory extends PluginFactory {
 			final ViewFrame frame) {
 
 		super.addPluginConfig(globalMenu, frame);
-		globalMenu.addMenuItem("KnnDendrogram Color Presets...",
-				new ActionListener() {
-
-					@Override
-					public void actionPerformed(final ActionEvent actionEvent) {
-
-						if (cpresetFrame == null) {
-							cpresetFrame = new JFrame(
-									"KnnDendrogram Color Presets");
-							final SettingsPanelHolder holder = new SettingsPanelHolder(
-									cpresetFrame, frame.getApp()
-											.getGlobalConfig().getRoot());
-							holder.addSettingsPanel(cpresetEditor);
-							cpresetFrame.getContentPane().add(holder);
-						}
-						cpresetFrame.pack();
-						cpresetFrame.setVisible(true);
-					}
-				});
+		globalMenu.addMenuItem("KnnDendrogram Color Presets...");
+//		, new ActionListener() {
+//
+//					@Override
+//					public void actionPerformed(final ActionEvent actionEvent) {
+//
+//						if (cpresetFrame == null) {
+//							cpresetFrame = new JFrame(
+//									"KnnDendrogram Color Presets");
+//							final SettingsPanelHolder holder = new SettingsPanelHolder(
+//									cpresetFrame, frame.getApp()
+//											.getGlobalConfig().getRoot());
+//							holder.addSettingsPanel(cpresetEditor);
+//							cpresetFrame.getContentPane().add(holder);
+//						}
+//						cpresetFrame.pack();
+//						cpresetFrame.setVisible(true);
+//					}
+//				});
 		globalMenu.setMnemonic(KeyEvent.VK_N);
 	}
 

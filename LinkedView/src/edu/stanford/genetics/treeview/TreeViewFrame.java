@@ -38,6 +38,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Set;
 
@@ -48,6 +49,7 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -57,7 +59,9 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
+import javax.swing.event.MenuListener;
 
+import Views.LoadCheckView;
 import Views.LoadProgressView;
 import Views.WelcomeView;
 
@@ -93,7 +97,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 	// Instance Variables
 	private static final long serialVersionUID = 1L;
-	private static String appName = "TreeView 3.0";
+	private static String appName = "TreeView 3";
 
 	protected JPanel waiting;
 	protected MainPanel running;
@@ -111,6 +115,22 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	private LoadProgressView loadProgView;
 	private LoadCheckView confirmPanel;
 	private DendroView dendroView;
+	
+	// Menu Items
+	private ArrayList<JMenuItem> menuList;
+	private JMenuItem openMenuItem;
+	private JMenuItem saveListMenuItem;
+	private JMenuItem clusterMenuItem;
+	private JMenuItem themeMenuItem;
+	private JMenuItem fontMenuItem;
+	private JMenuItem urlMenuItem;
+	private JMenuItem quitMenuItem;
+	private JMenuItem statsMenuItem;
+	private JMenuItem functionalEMenuItem;
+	private JMenuItem logMenuItem;
+	private JMenuItem saveDataMenuItem;
+	private JMenuItem aboutMenuItem;
+	private JMenuItem documentMenuItem;
 	
 	private boolean loaded;
 
@@ -215,6 +235,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		} else {
 			dendroView = new DendroView((TVModel)dataModel, this);
 			setRunning(dendroView);
+			setLoaded(true);
 		}
 	}
 	
@@ -225,6 +246,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		welcomeView = null;
 		loadProgView = null;
+		confirmPanel = null;
+		dendroView = null;
 	}
 	
 	/**
@@ -239,6 +262,181 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		waiting.revalidate();
 		waiting.repaint();
+	}
+	
+	/**
+	 * Opens the ClusterViewFrame with either the options for hierarchical
+	 * clustering or K-Means, depending on the boolean parameter.
+	 * @param hierarchical
+	 */
+	public void setupClusterView() {
+		
+		// Making a new Window to display clustering components
+		ClusterViewFrame clusterViewFrame = 
+				new ClusterViewFrame(TreeViewFrame.this);
+		
+		// Creating the Controller for this view.
+		ClusterViewController clusControl = 
+				new ClusterViewController(clusterViewFrame.getClusterView(), 
+						TreeViewFrame.this);
+		
+		// Make the clustering window visible.
+		clusterViewFrame.setVisible(true);
+	}
+	
+	/**
+	 * Opens the preferences menu and sets the displayed menu to
+	 * the specified option using a string as identification.
+	 * @param menu
+	 */
+	public void openPrefMenu(String menu) {
+		
+		if(running == null || !(running instanceof DendroView)) {
+			PreferencesMenu preferences = new PreferencesMenu(
+					TreeViewFrame.this, menu);
+			preferences.setVisible(true);
+		
+		} else {
+			PreferencesMenu preferences = new PreferencesMenu(
+					TreeViewFrame.this, (DendroView)running, menu);
+			preferences.setVisible(true);
+		}
+	}
+	
+	/**
+	 * Shows a panel which displays the current stats of the loaded model.
+	 */
+	public void openStatsView() {
+		
+		StatsPanel stats = new StatsPanel(TreeViewFrame.this);
+		stats.setVisible(true);
+	}
+	
+	/**
+	 * Displays messages in a JDialog which were logged by TreeView.
+	 */
+	public void showLogMessages() {
+		
+		final JPanel inner = new JPanel();
+		inner.setLayout(new BorderLayout());
+		inner.add(new JLabel("JTV Messages"), BorderLayout.NORTH);
+		inner.add(
+				new JScrollPane(new LogMessagesPanel(LogBuffer
+						.getSingleton())), BorderLayout.CENTER);
+
+		final LogBuffer buffer = LogBuffer.getSingleton();
+		buffer.setLog(true);
+		inner.add(new LogSettingsPanel(buffer), BorderLayout.SOUTH);
+
+		final JDialog top = new JDialog(TreeViewFrame.this,
+				"JTV Messages", false);
+		top.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		top.setContentPane(inner);
+		top.pack();
+		top.setLocationRelativeTo(TreeViewFrame.this);
+		top.setVisible(true);
+	}
+	
+	/**
+	 * Displays a window with some helpful information about TreeView 3.
+	 */
+	public void showAboutWindow() {
+		
+		final JPanel message = new JPanel();
+		message.setLayout(new GridLayout(0, 1));
+		message.add(new JLabel(getAppName() + " was created by Chris Keil "
+				+ "based on Alok Saldhana's Java TreeView."));
+		message.add(new JLabel("Version: "
+				+ TreeViewApp.getVersionTag()));
+
+		JPanel home = new JPanel();
+		home.add(new JLabel("Homepage"));
+		home.add(new JTextField(TreeViewApp.getUpdateUrl()));
+
+		JButton yesB = new JButton("Open");
+		yesB.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent arg0) {
+				displayURL(TreeViewApp.getUpdateUrl());
+			}
+
+		});
+		home.add(yesB);
+		message.add(home);
+
+		home = new JPanel();
+		home.add(new JLabel("Announcements"));
+		home.add(new JTextField(TreeViewApp.getAnnouncementUrl()));
+
+		yesB = new JButton("Sign Up");
+		yesB.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent arg0) {
+				displayURL(TreeViewApp.getAnnouncementUrl());
+			}
+
+		});
+		home.add(yesB);
+		message.add(home);
+
+		JOptionPane.showMessageDialog(TreeViewFrame.this, message,
+				"About...", JOptionPane.INFORMATION_MESSAGE);
+	}
+	
+	/**
+	 * opens a helpful screen with links to documentation for TreeView.
+	 */
+	public void showDocumentation() {
+		
+		final JPanel message = new JPanel();
+		message.setLayout(new BoxLayout(message, BoxLayout.Y_AXIS));
+		message.add(new JLabel(getAppName()
+				+ " documentation is available from the website."));
+
+		final String docUrl = TreeViewApp.getUpdateUrl()
+				+ "/manual.html";
+		message.add(new JTextField(docUrl));
+
+		final JButton lButton = new JButton("Launch Browser");
+		lButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+
+				displayURL(docUrl);
+			}
+		});
+		message.add(lButton);
+		JOptionPane.showMessageDialog(TreeViewFrame.this, message);
+	}
+	
+	/**
+	 * Shows a "Work in Progress" message for unfinished components.
+	 */
+	public void displayWIP() {
+		
+		final JDialog dialog = new JDialog(TreeViewFrame.this);
+		
+		Dimension screenSize = GUIParams.getScreenSize();
+		dialog.setSize(new Dimension(screenSize.width * 1/2, 
+				screenSize.height * 1/2));
+		
+		dialog.setLocationRelativeTo(TreeViewFrame.this);
+		dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+
+		final JPanel panel = new JPanel();
+		panel.setLayout(new MigLayout());
+		panel.setBackground(GUIParams.BG_COLOR);
+
+		final JLabel l1 = new JLabel("Work in progress.");
+		l1.setFont(GUIParams.FONTS);
+		l1.setForeground(GUIParams.TEXT);
+		
+		panel.add(l1, "push, alignx 50%");
+		dialog.add(panel);
+		
+		dialog.setVisible(true);
 	}
 	
 	// Getters for Views
@@ -277,74 +475,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		return dendroView;
 	}
-
-//	// Loading Methods
-//	/**
-//	 * Allows user to load a file from a URL
-//	 * 
-//	 * @return FileSet
-//	 * @throws LoadException
-//	 */
-//	protected FileSet offerUrlSelection() throws LoadException {
-//
-//		FileSet fileSet1;
-//		/*
-//		 * JTextField textField = new JTextField(); JPanel prompt = new
-//		 * JPanel(); prompt.setLayout(new BorderLayout()); prompt.add(new
-//		 * JLabel("Enter a Url"), BorderLayout.NORTH); prompt.add(textField,
-//		 * BorderLayout.CENTER);
-//		 */
-//		// get string from user...
-//		final String urlString = JOptionPane.showInputDialog(this,
-//				"Enter a Url");
-//
-//		if (urlString != null) {
-//			// must parse out name, parent + sep...
-//			final int postfix = urlString.lastIndexOf("/") + 1;
-//			final String name = urlString.substring(postfix);
-//			final String parent = urlString.substring(0, postfix);
-//			fileSet1 = new FileSet(name, parent);
-//
-//		} else {
-//			throw new LoadException("Input Dialog closed without selection...",
-//					LoadException.NOFILE);
-//		}
-//
-//		return fileSet1;
-//	}
-//
-//	/**
-//	 * To load any fileset without using the event queue thread
-//	 */
-//	public void loadNW(FileSet fileSet) throws LoadException {
-//
-//		loadFileSetNW(fileSet);
-//
-//		fileSet = fileMru.addUnique(fileSet);
-//		fileMru.setLast(fileSet);
-//		fileMru.notifyObservers();
-//
-//		setLoaded(true);
-//	}
-//
-//	/**
-//	 * To load any FileSet without using the event queue thread
-//	 */
-//	public void loadFileSetNW(final FileSet fileSet) throws LoadException {
-//
-//		final TVModel tvModel = new TVModel();
-//		tvModel.setFrame(this);
-//
-//		try {
-//			tvModel.loadNewNW(fileSet);
-//			setDataModel(tvModel);//, false, true);
-//		} catch (final LoadException e) {
-//			if (e.getType() != LoadException.INTPARSE) {
-//				JOptionPane.showMessageDialog(this, e);
-//				throw e;
-//			}
-//		}
-//	}
 	
 	/**
 	 * Sets the currently running panel for TVFrame. TVFrame is updated by
@@ -406,13 +536,15 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		repaint();
 	}
 
-	// Methods to setup MenuBar
+	// Methods to setup Menubar
 	/**
 	 * This method sets up the main MenuBar with all the subMenus. It also calls
 	 * methods to populate the subMenus.
 	 */
 	protected void setupMenuBar() {
 
+		menuList = new ArrayList<JMenuItem>();
+		
 		menubar = new TreeViewJMenuBar();
 		setJMenuBar(new JMenuBar());
 
@@ -424,7 +556,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			programMenu = new ProgramMenu(); // rebuilt when fileMru notifies
 			menubar.addMenu(TreeviewMenuBarI.documentMenu);
 			menubar.setMenuMnemonic(KeyEvent.VK_S);
-			//populateSettingsMenu(menubar);
 			menubar.addMenu(TreeviewMenuBarI.analysisMenu);
 			menubar.setMenuMnemonic(KeyEvent.VK_A);
 			menubar.addMenu(TreeviewMenuBarI.exportMenu);
@@ -514,26 +645,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 //		presetsFrame.getContentPane().add(innerPanel);
 //		presetsFrame.pack();
 //	}
-	
-//	/**
-//	 * Opens the ClusterViewFrame with either the options for hierarchical
-//	 * clustering or K-Means, depending on the boolean parameter.
-//	 * @param hierarchical
-//	 */
-//	public void setupClusterView() {
-//		
-//		// Making a new Window to display clustering components
-//		ClusterViewFrame clusterViewFrame = 
-//				new ClusterViewFrame(dataModel, TreeViewFrame.this);
-//		
-//		// Creating the Controller for this view.
-//		ClusterViewController clusControl = 
-//				new ClusterViewController((TVModel)dataModel, 
-//						clusterViewFrame.getClusterView());
-//		
-//		// Make the clustering window visible.
-//		clusterViewFrame.setVisible(true);
-//	}
 
 	// Populating various menus
 	/**
@@ -545,27 +656,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	protected void populateSettingsMenu(final TreeviewMenuBarI menubar) {
 
 		menubar.setMenu(TreeviewMenuBarI.documentMenu);
-		
-		if(running == null) {
-			menubar.setEnabled(false);
-			
-		} else {
-			menubar.setEnabled(true);
-		}
-		
-//		if(running == null) {
-//			menubar.addMenuItem("Preferences", new ActionListener() {
-//	
-//				@Override
-//				public void actionPerformed(final ActionEvent arg0) {
-//					
-//					PreferencesMenu preferences = new PreferencesMenu(
-//							TreeViewFrame.this, "Theme");
-//					preferences.setVisible(true);
-//				}
-//			});
-//		}
-//		menubar.addSeparator();
 		
 //		menubar.addMenuItem("Gene Url", new ActionListener() {
 //
@@ -651,69 +741,15 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		 * exportMenu.add(menuItem2);
 		 */
 
-		menubar.addMenuItem("Save List", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent actiosnEvent) {
-
-				if (warnSelectionEmpty()) {
-
-					final ViewFrame viewFrame = TreeViewFrame.this;
-					final FileSet source = getDataModel().getFileSet();
-					String def = getDataModel().getName() + "_list.txt";
-
-					if (source != null) {
-
-						def = source.getDir() + source.getRoot() + "_list.txt";
-					}
-
-					final GeneListMaker t = new GeneListMaker(viewFrame,
-							getGeneSelection(), getDataModel()
-									.getGeneHeaderInfo(), def);
-
-					t.setDataMatrix(getDataModel().getDataMatrix(),
-							getDataModel().getArrayHeaderInfo(),
-							DataModel.NODATA);
-
-					t.bindConfig(getDataModel().getDocumentConfigRoot()
-							.fetchOrCreate("GeneListMaker"));
-
-					t.pack();
-					t.setVisible(true);
-				}
-			}
-		});
+		// Save List Menu
+		saveListMenuItem = (JMenuItem) menubar.addMenuItem("Save List");
 		menubar.setMnemonic(KeyEvent.VK_L);
+		menuList.add(saveListMenuItem);
 
-		menubar.addMenuItem("Save Data", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent actiosnEvent) {
-
-				if (warnSelectionEmpty()) {
-
-					final ViewFrame viewFrame = TreeViewFrame.this;
-					final FileSet source = getDataModel().getFileSet();
-
-					final GeneListMaker t = new GeneListMaker(viewFrame,
-							getGeneSelection(), getDataModel()
-									.getGeneHeaderInfo(), source.getDir()
-									+ source.getRoot() + "_data.cdt");
-
-					t.setDataMatrix(getDataModel().getDataMatrix(),
-							getDataModel().getArrayHeaderInfo(),
-							DataModel.NODATA);
-
-					t.bindConfig(getDataModel().getDocumentConfigRoot()
-							.fetchOrCreate("GeneListMaker"));
-
-					t.includeAll();
-					t.pack();
-					t.setVisible(true);
-				}
-			}
-		});
+		// Save Data Menu
+		saveDataMenuItem = (JMenuItem) menubar.addMenuItem("Save Data"); 
 		menubar.setMnemonic(KeyEvent.VK_D);
+		menuList.add(saveDataMenuItem);
 	}
 
 	/**
@@ -723,85 +759,24 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 */
 	protected void populateAnalysisMenu(final TreeviewMenuBarI menubar) {
 
-//		menubar.addMenuItem("Find Genes...", new ActionListener() {
-//
-//			@Override
-//			public void actionPerformed(final ActionEvent actionEvent) {
-//
-//				getGeneFinder().setVisible(true);
-//			}
-//		});
-//		menubar.setAccelerator(KeyEvent.VK_G);
-//
-//		menubar.addMenuItem("Find Arrays...", new ActionListener() {
-//
-//			@Override
-//			public void actionPerformed(final ActionEvent actionEvent) {
-//
-//				getArrayFinder().setVisible(true);
-//			}
-//		});
-//		menubar.setAccelerator(KeyEvent.VK_A);
-		
-		final JDialog dialog = new JDialog(TreeViewFrame.this);
-		
-		Dimension screenSize = GUIParams.getScreenSize();
-		dialog.setSize(new Dimension(screenSize.width * 1/2, 
-				screenSize.height * 1/2));
-		
-		dialog.setLocationRelativeTo(TreeViewFrame.this);
-		dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-
-		final JPanel panel = new JPanel();
-		panel.setLayout(new MigLayout());
-		panel.setBackground(GUIParams.BG_COLOR);
-
-		final JLabel l1 = new JLabel("Work in progress.");
-		l1.setFont(GUIParams.FONTS);
-		l1.setForeground(GUIParams.TEXT);
-		
-		panel.add(l1, "push, alignx 50%");
-		dialog.add(panel);
-
-		menubar.addMenuItem("Cluster", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-
-				if (dataModel != null) {
-//					setupClusterView();
-					System.out.println("Cant load ClusterView right now.");
-
-				} else {
-					dialog.setVisible(true);
-				}
-			}
-		});
+		// Cluster Menu
+		clusterMenuItem = (JMenuItem) menubar.addMenuItem("Cluster");
+		menubar.setAccelerator(KeyEvent.VK_C);
+		menuList.add(clusterMenuItem);
 		
 		menubar.setMenu(TreeviewMenuBarI.analysisMenu);
 		menubar.addSeparator();
 		
-		menubar.addMenuItem("Functional Enrichment", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-
-				dialog.setVisible(true);
-			}
-		});
-
-		menubar.addMenuItem("Stats...", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-
-//				JOptionPane.showMessageDialog(TreeViewFrame.this,
-//						new JTextArea(getDataModel().toString()));
-				StatsPanel stats = new StatsPanel(TreeViewFrame.this);
-				stats.setVisible(true);
-			}
-		});
+		// Functional Enrichment Menu
+		functionalEMenuItem = (JMenuItem) menubar.addMenuItem(
+				"Functional Enrichment");
+		menubar.setAccelerator(KeyEvent.VK_F);
+		menuList.add(functionalEMenuItem);
+		
+		// Stats Menu
+		statsMenuItem = (JMenuItem) menubar.addMenuItem("Stats");
 		menubar.setAccelerator(KeyEvent.VK_S);
+		menuList.add(statsMenuItem);
 	}
 
 	/**
@@ -811,279 +786,210 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 */
 	private void populateHelpMenu(final TreeviewMenuBarI menubar) {
 
-		menubar.addMenuItem("About...", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent actionEvent) {
-				/*
-				 * Popup popup = new Popup(TreeViewFrame.this,getAppName(), new
-				 * String [] { "Java TreeView was created by Alok
-				 * (alok@genome).", "It is an extensible, crossplatform port of
-				 * Eisen's TreeView.", "Version: " +
-				 * TreeViewApp.getVersionTag(), "Homepage:
-				 * http://genetics.stanford.edu/~alok/TreeView/" });
-				 */
-				final JPanel message = new JPanel();
-				// message.setLayout(new BoxLayout(message, BoxLayout.Y_AXIS));
-				message.setLayout(new GridLayout(0, 1));
-				message.add(new JLabel(getAppName() + " was created by Alok "
-						+ "(alokito@users.sourceforge.net)."));
-				message.add(new JLabel("Version: "
-						+ TreeViewApp.getVersionTag()));
-
-				JPanel home = new JPanel();
-				home.add(new JLabel("Homepage"));
-				home.add(new JTextField(TreeViewApp.getUpdateUrl()));
-
-				JButton yesB = new JButton("Open");
-				yesB.addActionListener(new ActionListener() {
-
-					@Override
-					public void actionPerformed(final ActionEvent arg0) {
-						displayURL(TreeViewApp.getUpdateUrl());
-					}
-
-				});
-				home.add(yesB);
-				message.add(home);
-
-				home = new JPanel();
-				home.add(new JLabel("Announcements"));
-				home.add(new JTextField(TreeViewApp.getAnnouncementUrl()));
-
-				yesB = new JButton("Sign Up");
-				yesB.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(final ActionEvent arg0) {
-						displayURL(TreeViewApp.getAnnouncementUrl());
-					}
-
-				});
-				home.add(yesB);
-				message.add(home);
-
-				JOptionPane.showMessageDialog(TreeViewFrame.this, message,
-						"About...", JOptionPane.INFORMATION_MESSAGE);
-			}
-		});
+		aboutMenuItem = (JMenuItem) menubar.addMenuItem("About...");
+		menuList.add(aboutMenuItem);
 		menubar.setMnemonic(KeyEvent.VK_A);
 
-		menubar.addMenuItem("Messages...", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-
-				final JPanel inner = new JPanel();
-				inner.setLayout(new BorderLayout());
-				inner.add(new JLabel("JTV Messages"), BorderLayout.NORTH);
-				inner.add(
-						new JScrollPane(new LogMessagesPanel(LogBuffer
-								.getSingleton())), BorderLayout.CENTER);
-
-				final LogBuffer buffer = LogBuffer.getSingleton();
-				buffer.setLog(true);
-				inner.add(new LogSettingsPanel(buffer), BorderLayout.SOUTH);
-
-				final JDialog top = new JDialog(TreeViewFrame.this,
-						"JTV Messages", false);
-				top.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-				top.setContentPane(inner);
-				top.pack();
-				top.setLocationRelativeTo(TreeViewFrame.this);
-				top.setVisible(true);
-			}
-		});
+		logMenuItem = (JMenuItem) menubar.addMenuItem("Show Log");
+		menuList.add(logMenuItem);
 		menubar.setMnemonic(KeyEvent.VK_M);
 
-		menubar.addMenuItem("Documentation...", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent actionEvent) {
-				// Popup popup = new Popup(TreeViewFrame.this, "Java TreeView:
-				// Color", new String [] { "I'm going to add better help
-				// later.", "For now, point a web browser at index.html in the
-				// doc subdirectory of the Java TreeView folder.", "(that is, if
-				// it doesn't open automatically...)" });
-				// String classPath = System.getProperty("java.class.path");
-				final JPanel message = new JPanel();
-				message.setLayout(new BoxLayout(message, BoxLayout.Y_AXIS));
-				message.add(new JLabel(getAppName()
-						+ " documentation is available from the website."));
-
-				final String docUrl = TreeViewApp.getUpdateUrl()
-						+ "/manual.html";
-				message.add(new JTextField(docUrl));
-
-				final JButton lButton = new JButton("Launch Browser");
-				lButton.addActionListener(new ActionListener() {
-
-					@Override
-					public void actionPerformed(final ActionEvent e) {
-
-						displayURL(docUrl);
-					}
-				});
-				message.add(lButton);
-				JOptionPane.showMessageDialog(TreeViewFrame.this, message);
-			}
-		});
+		documentMenuItem = (JMenuItem) menubar.addMenuItem("Documentation...");
+//		, new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent actionEvent) {
+//				// Popup popup = new Popup(TreeViewFrame.this, "Java TreeView:
+//				// Color", new String [] { "I'm going to add better help
+//				// later.", "For now, point a web browser at index.html in the
+//				// doc subdirectory of the Java TreeView folder.", "(that is, if
+//				// it doesn't open automatically...)" });
+//				// String classPath = System.getProperty("java.class.path");
+//				final JPanel message = new JPanel();
+//				message.setLayout(new BoxLayout(message, BoxLayout.Y_AXIS));
+//				message.add(new JLabel(getAppName()
+//						+ " documentation is available from the website."));
+//
+//				final String docUrl = TreeViewApp.getUpdateUrl()
+//						+ "/manual.html";
+//				message.add(new JTextField(docUrl));
+//
+//				final JButton lButton = new JButton("Launch Browser");
+//				lButton.addActionListener(new ActionListener() {
+//
+//					@Override
+//					public void actionPerformed(final ActionEvent e) {
+//
+//						displayURL(docUrl);
+//					}
+//				});
+//				message.add(lButton);
+//				JOptionPane.showMessageDialog(TreeViewFrame.this, message);
+//			}
+//		});
 		menubar.setMnemonic(KeyEvent.VK_D);
 
-		menubar.addMenuItem("Plugins...", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent actionEvent) {
-
-				displayPluginInfo();
-			}
-		});
+		menubar.addMenuItem("Plugins...");
+//		, new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent actionEvent) {
+//
+//				displayPluginInfo();
+//			}
+//		});
 		menubar.setMnemonic(KeyEvent.VK_P);
 
-		menubar.addMenuItem("Registration...", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent actionEvent) {
-
-				final ConfigNode node = treeView.getGlobalConfig().getNode(
-						"Registration");
-				if (node != null) {
-					try {
-						edu.stanford.genetics.treeview.reg.RegEngine
-								.reverify(node);
-					} catch (final Exception e) {
-						LogBuffer.println("registration error " + e);
-						e.printStackTrace();
-					}
-				}
-			}
-		});
+		menubar.addMenuItem("Registration...");
+//		, new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent actionEvent) {
+//
+//				final ConfigNode node = treeView.getGlobalConfig().getNode(
+//						"Registration");
+//				if (node != null) {
+//					try {
+//						edu.stanford.genetics.treeview.reg.RegEngine
+//								.reverify(node);
+//					} catch (final Exception e) {
+//						LogBuffer.println("registration error " + e);
+//						e.printStackTrace();
+//					}
+//				}
+//			}
+//		});
 		menubar.setMnemonic(KeyEvent.VK_R);
 
-		menubar.addMenuItem("Feedback...", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent actionEvent) {
-				final JPanel feedback = new JPanel();
-				feedback.setLayout(new BoxLayout(feedback, BoxLayout.Y_AXIS));
-
-				JComponent tmp = new JLabel("Please report bugs at ");
-				tmp.setAlignmentX((float) 0.0);
-				feedback.add(tmp);
-
-				final String bugsURL = "http://sourceforge.net/"
-						+ "tracker/?group_id=84593&atid=573298";
-				tmp = new JTextField(bugsURL);
-				// tmp.setAlignmentX((float) 1.0);
-				feedback.add(tmp);
-
-				JButton yesB = new JButton("Report Bug");
-				yesB.addActionListener(new ActionListener() {
-
-					@Override
-					public void actionPerformed(final ActionEvent arg0) {
-
-						displayURL(bugsURL);
-					}
-				});
-				feedback.add(yesB);
-
-				tmp = new JLabel("Please request features at ");
-				tmp.setAlignmentX((float) 0.0);
-				feedback.add(tmp);
-
-				final String featureURL = "https://sourceforge.net/"
-						+ "tracker/?group_id=84593&atid=573301";
-				tmp = new JTextField(featureURL);
-				// tmp.setAlignmentX((float) 1.0);
-				feedback.add(tmp);
-
-				yesB = new JButton("Request Feature");
-				yesB.addActionListener(new ActionListener() {
-
-					@Override
-					public void actionPerformed(final ActionEvent arg0) {
-
-						displayURL(featureURL);
-					}
-				});
-				feedback.add(yesB);
-
-				tmp = new JLabel("For support, send email to ");
-				tmp.setAlignmentX((float) 0.0);
-				feedback.add(tmp);
-				final String supportURL = "jtreeview-users@lists.sourceforge.net";
-				tmp = new JTextField(supportURL);
-				// tmp.setAlignmentX((float) 1.0);
-				feedback.add(tmp);
-				yesB = new JButton("Email Support");
-				yesB.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(final ActionEvent arg0) {
-						displayURL("mailto:" + supportURL);
-					}
-				});
-				feedback.add(yesB);
-
-				tmp = new JLabel("You may also search the list archives at ");
-				tmp.setAlignmentX((float) 0.0);
-				feedback.add(tmp);
-
-				final String archiveURL = "http://sourceforge.net/"
-						+ "mailarchive/forum.php?forum_id=36027";
-				tmp = new JTextField(archiveURL);
-				// tmp.setAlignmentX((float) 1.0);
-				feedback.add(tmp);
-
-				yesB = new JButton("Browse Archive");
-				yesB.addActionListener(new ActionListener() {
-
-					@Override
-					public void actionPerformed(final ActionEvent arg0) {
-
-						displayURL(archiveURL);
-					}
-				});
-				feedback.add(yesB);
-
-				JOptionPane.showMessageDialog(TreeViewFrame.this, feedback,
-						"Feedback...", JOptionPane.INFORMATION_MESSAGE);
-			}
-		});
+		menubar.addMenuItem("Feedback...");
+//		, new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent actionEvent) {
+//				final JPanel feedback = new JPanel();
+//				feedback.setLayout(new BoxLayout(feedback, BoxLayout.Y_AXIS));
+//
+//				JComponent tmp = new JLabel("Please report bugs at ");
+//				tmp.setAlignmentX((float) 0.0);
+//				feedback.add(tmp);
+//
+//				final String bugsURL = "http://sourceforge.net/"
+//						+ "tracker/?group_id=84593&atid=573298";
+//				tmp = new JTextField(bugsURL);
+//				// tmp.setAlignmentX((float) 1.0);
+//				feedback.add(tmp);
+//
+//				JButton yesB = new JButton("Report Bug");
+//				yesB.addActionListener(new ActionListener() {
+//
+//					@Override
+//					public void actionPerformed(final ActionEvent arg0) {
+//
+//						displayURL(bugsURL);
+//					}
+//				});
+//				feedback.add(yesB);
+//
+//				tmp = new JLabel("Please request features at ");
+//				tmp.setAlignmentX((float) 0.0);
+//				feedback.add(tmp);
+//
+//				final String featureURL = "https://sourceforge.net/"
+//						+ "tracker/?group_id=84593&atid=573301";
+//				tmp = new JTextField(featureURL);
+//				// tmp.setAlignmentX((float) 1.0);
+//				feedback.add(tmp);
+//
+//				yesB = new JButton("Request Feature");
+//				yesB.addActionListener(new ActionListener() {
+//
+//					@Override
+//					public void actionPerformed(final ActionEvent arg0) {
+//
+//						displayURL(featureURL);
+//					}
+//				});
+//				feedback.add(yesB);
+//
+//				tmp = new JLabel("For support, send email to ");
+//				tmp.setAlignmentX((float) 0.0);
+//				feedback.add(tmp);
+//				final String supportURL = "jtreeview-users@lists.sourceforge.net";
+//				tmp = new JTextField(supportURL);
+//				// tmp.setAlignmentX((float) 1.0);
+//				feedback.add(tmp);
+//				yesB = new JButton("Email Support");
+//				yesB.addActionListener(new ActionListener() {
+//					@Override
+//					public void actionPerformed(final ActionEvent arg0) {
+//						displayURL("mailto:" + supportURL);
+//					}
+//				});
+//				feedback.add(yesB);
+//
+//				tmp = new JLabel("You may also search the list archives at ");
+//				tmp.setAlignmentX((float) 0.0);
+//				feedback.add(tmp);
+//
+//				final String archiveURL = "http://sourceforge.net/"
+//						+ "mailarchive/forum.php?forum_id=36027";
+//				tmp = new JTextField(archiveURL);
+//				// tmp.setAlignmentX((float) 1.0);
+//				feedback.add(tmp);
+//
+//				yesB = new JButton("Browse Archive");
+//				yesB.addActionListener(new ActionListener() {
+//
+//					@Override
+//					public void actionPerformed(final ActionEvent arg0) {
+//
+//						displayURL(archiveURL);
+//					}
+//				});
+//				feedback.add(yesB);
+//
+//				JOptionPane.showMessageDialog(TreeViewFrame.this, feedback,
+//						"Feedback...", JOptionPane.INFORMATION_MESSAGE);
+//			}
+//		});
 		menubar.setMnemonic(KeyEvent.VK_F);
 		menubar.addSeparator();
 
-		menubar.addMenuItem("Memory...", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-
-				final MemMonitor m = new MemMonitor();
-				m.start();
-			}
-		});
+		menubar.addMenuItem("Memory...");
+//		, new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent e) {
+//
+//				final MemMonitor m = new MemMonitor();
+//				m.start();
+//			}
+//		});
 		menubar.setMnemonic(KeyEvent.VK_M);
 
-		menubar.addMenuItem("Threads...", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-
-				final ThreadListener t = new ThreadListener();
-				t.start();
-			}
-		});
+		menubar.addMenuItem("Threads...");
+//		, new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent e) {
+//
+//				final ThreadListener t = new ThreadListener();
+//				t.start();
+//			}
+//		});
 		menubar.setMnemonic(KeyEvent.VK_T);
 
-		menubar.addMenuItem("Global Pref Info...", new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-
-				final GlobalPrefInfo gpi = new GlobalPrefInfo(getApp());
-				JOptionPane.showMessageDialog(null, gpi, "Global Pref Info...",
-						JOptionPane.INFORMATION_MESSAGE);
-			}
-		});
+		menubar.addMenuItem("Global Pref Info...");
+//		, new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent e) {
+//
+//				final GlobalPrefInfo gpi = new GlobalPrefInfo(getApp());
+//				JOptionPane.showMessageDialog(null, gpi, "Global Pref Info...",
+//						JOptionPane.INFORMATION_MESSAGE);
+//			}
+//		});
 
 		/*
 		 * This is to help debug plugin instance naming. MenuItem pluginSearch =
@@ -1100,26 +1006,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	}
 
 	// Various Methods
-	/**
-	 * Generates a warning message if TreeSelectionI object is null and returns
-	 * false in that case.
-	 * 
-	 * @return boolean
-	 */
-	public boolean warnSelectionEmpty() {
-
-		final TreeSelectionI treeSelection = getGeneSelection();
-
-		if ((treeSelection == null)
-				|| (treeSelection.getNSelectedIndexes() <= 0)) {
-
-			JOptionPane.showMessageDialog(this,
-					"Cannot generate gene list, no gene selected");
-			return false;
-		}
-		return true;
-	}
-
 	/**
 	 * 
 	 * @param incremental
@@ -1246,22 +1132,13 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			synchronized (menubar) {
 
 				menubar.setMenu(TreeviewMenuBarI.programMenu);
-				menubar.addMenuItem("Open...", new ActionListener() {
-
-					@Override
-					public void actionPerformed(final ActionEvent actionEvent) {
-
-//						try {
-//							openFile();
-//							
-//						} catch (IOException e) {
-//							// TODO Auto-generated catch block
-//							e.printStackTrace();
-//						}
-					}
-				});
+				
+				// Open new file Menu
+				openMenuItem = (JMenuItem) menubar.addMenuItem("Open");
 				menubar.setAccelerator(KeyEvent.VK_O);
 				menubar.setMnemonic(KeyEvent.VK_O);
+				menuList.add(openMenuItem);
+			
 
 				// menubar.addMenuItem("Open Url...", new ActionListener() {
 				// public void actionPerformed(ActionEvent actionEvent) {
@@ -1281,83 +1158,85 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 				// });
 				// menubar.setMnemonic(KeyEvent.VK_U);
 
-				menubar.addMenuItem("Save", new ActionListener() {
-
-					@Override
-					public void actionPerformed(final ActionEvent actionEvent) {
-
-						doModelSave(true);
-					}
-				});
+				menubar.addMenuItem("Save");
+//				, new ActionListener() {
+//
+//					@Override
+//					public void actionPerformed(final ActionEvent actionEvent) {
+//
+//						doModelSave(true);
+//					}
+//				});
 				menubar.setMnemonic(KeyEvent.VK_S);
 				menubar.setAccelerator(KeyEvent.VK_S);
 
-				menubar.addMenuItem("Save as..", new ActionListener() {
-
-					@Override
-					public void actionPerformed(final ActionEvent actionEvent) {
-
-						if (getDataModel().getFileSet() == null) {
-							JOptionPane.showMessageDialog(TreeViewFrame.this,
-									"Saving of datamodels not backed by "
-											+ "files is not yet supported.");
-
-						} else {
-							final JFileChooser fileDialog = new JFileChooser();
-							final CdtFilter ff = new CdtFilter();
-							fileDialog.setFileFilter(ff);
-
-							final String string = getDataModel().getFileSet()
-									.getDir();
-
-							if (string != null) {
-
-								fileDialog
-										.setCurrentDirectory(new File(string));
-							}
-
-							final int retVal = fileDialog
-									.showSaveDialog(TreeViewFrame.this);
-
-							if (retVal == JFileChooser.APPROVE_OPTION) {
-								final File chosen = fileDialog
-										.getSelectedFile();
-								String name = chosen.getName();
-
-								if (!name.toLowerCase().endsWith(".cdt")
-										&& !name.toLowerCase().endsWith(".pcl")) {
-									name += ".cdt";
-								}
-
-								FileSet fileSet2 = new FileSet(name, chosen
-										.getParent() + File.separator);
-								fileSet2.copyState(getDataModel().getFileSet());
-
-								final FileSet fileSet1 = new FileSet(name,
-										chosen.getParent() + File.separator);
-								fileSet1.setName(getDataModel().getFileSet()
-										.getName());
-
-								getDataModel().getFileSet().copyState(fileSet1);
-								doModelSave(false);
-
-								getDataModel().getFileSet().notifyMoved();
-								fileMru.removeDuplicates(getDataModel()
-										.getFileSet());
-								fileSet2 = fileMru.addUnique(fileSet2);
-								fileMru.setLast(getDataModel().getFileSet());
-								rebuild();
-
-								if (getDataModel() instanceof TVModel) {
-									((TVModel) getDataModel())
-											.getDocumentConfig().setFile(
-													getDataModel().getFileSet()
-															.getJtv());
-								}
-							}
-						}
-					}
-				});
+				menubar.addMenuItem("Save as..");
+//				, new ActionListener() {
+//
+//					@Override
+//					public void actionPerformed(final ActionEvent actionEvent) {
+//
+//						if (getDataModel().getFileSet() == null) {
+//							JOptionPane.showMessageDialog(TreeViewFrame.this,
+//									"Saving of datamodels not backed by "
+//											+ "files is not yet supported.");
+//
+//						} else {
+//							final JFileChooser fileDialog = new JFileChooser();
+//							final CdtFilter ff = new CdtFilter();
+//							fileDialog.setFileFilter(ff);
+//
+//							final String string = getDataModel().getFileSet()
+//									.getDir();
+//
+//							if (string != null) {
+//
+//								fileDialog
+//										.setCurrentDirectory(new File(string));
+//							}
+//
+//							final int retVal = fileDialog
+//									.showSaveDialog(TreeViewFrame.this);
+//
+//							if (retVal == JFileChooser.APPROVE_OPTION) {
+//								final File chosen = fileDialog
+//										.getSelectedFile();
+//								String name = chosen.getName();
+//
+//								if (!name.toLowerCase().endsWith(".cdt")
+//										&& !name.toLowerCase().endsWith(".pcl")) {
+//									name += ".cdt";
+//								}
+//
+//								FileSet fileSet2 = new FileSet(name, chosen
+//										.getParent() + File.separator);
+//								fileSet2.copyState(getDataModel().getFileSet());
+//
+//								final FileSet fileSet1 = new FileSet(name,
+//										chosen.getParent() + File.separator);
+//								fileSet1.setName(getDataModel().getFileSet()
+//										.getName());
+//
+//								getDataModel().getFileSet().copyState(fileSet1);
+//								doModelSave(false);
+//
+//								getDataModel().getFileSet().notifyMoved();
+//								fileMru.removeDuplicates(getDataModel()
+//										.getFileSet());
+//								fileSet2 = fileMru.addUnique(fileSet2);
+//								fileMru.setLast(getDataModel().getFileSet());
+//								rebuild();
+//
+//								if (getDataModel() instanceof TVModel) {
+//									((TVModel) getDataModel())
+//											.getDocumentConfig().setFile(
+//													getDataModel().getFileSet()
+//															.getJtv());
+//								}
+//							}
+//						}
+//					}
+//				});
 
 				menubar.addSubMenu(TreeviewMenuBarI.mruSubMenu);
 				menubar.setMenuMnemonic(KeyEvent.VK_R);
@@ -1373,21 +1252,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 				menubar.setMenu(TreeviewMenuBarI.programMenu);
 				menubar.addSeparator();
 				
-				menubar.addMenuItem("Quit Program", new ActionListener() {
-					
-					@Override
-					public void actionPerformed(final ActionEvent actionEvent) {
-						try {
-							treeView.closeAllWindows();
-							
-						} catch (final Exception e) {
-							System.out
-									.println("While trying to exit, got error "
-											+ e);
-							System.exit(1);
-						}
-					}
-				});
+				// Quit Program Menu
+				quitMenuItem = (JMenuItem)menubar.addMenuItem("Quit Program");
+				menuList.add(quitMenuItem);
 				menubar.setMnemonic(KeyEvent.VK_Q);
 				menubar.setAccelerator(KeyEvent.VK_Q);
 			}
@@ -1413,22 +1280,23 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 					final FileMenuListener fileMenuListener = 
 							new FileMenuListener(new FileSet(aconfigNode[j 
 							                                             - 1]));
-					menubar.addMenuItem(astring[j - 1], fileMenuListener);
+					menubar.addMenuItem(astring[j - 1]);
+//					, fileMenuListener);
 				}
 				
 				menubar.addSeparator();
-				menubar.addMenuItem("Edit Recent Files...", 
-						new ActionListener() {
-
-							@Override
-							public void actionPerformed(
-									final ActionEvent actionEvent) {
-
-								final FileMruEditor fme = new FileMruEditor(
-										fileMru);
-								fme.showDialog(TreeViewFrame.this);
-							}
-						});
+				menubar.addMenuItem("Edit Recent Files...");
+//				, new ActionListener() {
+//
+//							@Override
+//							public void actionPerformed(
+//									final ActionEvent actionEvent) {
+//
+//								final FileMruEditor fme = new FileMruEditor(
+//										fileMru);
+//								fme.showDialog(TreeViewFrame.this);
+//							}
+//						});
 				
 				menubar.setMnemonic(KeyEvent.VK_E);
 			}
@@ -1441,67 +1309,29 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			 */
 		}
 		
+		/**
+		 * Adds MenuItems to the Preferences subMenu.
+		 * @param menubar
+		 */
 		public void populatePreferencesMenu(final TreeviewMenuBarI menubar) {
 
 			menubar.setSubMenu(TreeviewMenuBarI.prefSubMenu);
 			menubar.removeAll();
 			
 			if(running == null) {
-				menubar.addMenuItem("Theme", new ActionListener() {
-		
-					@Override
-					public void actionPerformed(final ActionEvent arg0) {
-						
-						openPrefMenu("Theme");
-					}
-				});
+				themeMenuItem = (JMenuItem)menubar.addMenuItem("Theme");
+				menuList.add(themeMenuItem);
+				
 			} else {
-				menubar.addMenuItem("Theme", new ActionListener() {
-					
-					@Override
-					public void actionPerformed(final ActionEvent arg0) {
-						
-						openPrefMenu("Theme");
-					}
-				});
+				themeMenuItem = (JMenuItem)menubar.addMenuItem("Theme");
+				menuList.add(themeMenuItem);
 				
-				menubar.addMenuItem("Fonts", new ActionListener() {
-					
-					@Override
-					public void actionPerformed(final ActionEvent arg0) {
-						
-						openPrefMenu("Fonts");
-					}
-				});
+				fontMenuItem = (JMenuItem)menubar.addMenuItem("Fonts");
+				menuList.add(fontMenuItem);
 				
-				menubar.addMenuItem("URL", new ActionListener() {
-					
-					@Override
-					public void actionPerformed(final ActionEvent arg0) {
-						
-						openPrefMenu("URL");
-					}
-				});
+				urlMenuItem = (JMenuItem)menubar.addMenuItem("URL");
+				menuList.add(urlMenuItem);
 			}
-		}
-	}
-	
-	/**
-	 * Opens the preferences menu and sets the displayed menu to
-	 * the specified option using a string as identification.
-	 * @param menu
-	 */
-	public void openPrefMenu(String menu) {
-		
-		if(running == null || !(running instanceof DendroView)) {
-			PreferencesMenu preferences = new PreferencesMenu(
-					TreeViewFrame.this, menu);
-			preferences.setVisible(true);
-		
-		} else {
-			PreferencesMenu preferences = new PreferencesMenu(
-					TreeViewFrame.this, (DendroView)running, menu);
-			preferences.setVisible(true);
 		}
 	}
 
@@ -1627,6 +1457,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 	@Override
 	public MainPanel[] getMainPanels() {
+		
 		if (running == null) {
 			final MainPanel[] list = new MainPanel[0];
 			return list;
@@ -1681,34 +1512,26 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		this.dataModel = model;
 	}
 
-//	/**
-//	 * Setter for dataModel, also sets extractors, running.
-//	 * 
-//	 * @param DataModel newModel
-//	 */
-//	@Override
-//	public void setDataModel(DataModel newModel) {
-//
-//		if(newModel != null) {
-//			if (dataModel != null) {
-//				dataModel.clearFileSetListeners();
-//			}
-//	
-//			dataModel = newModel;
-//			newModel = null;
-//	
-//			if (dataModel != null) {
-//				dataModel.addFileSetListener(this);
-//			}
-//	
-//			setupExtractors();
-//			setupRunning();
-//			
-//		} else {
-//			setLoaded(false);
-//		}
-//	}
-
+	// Adding MenuActionListeners
+	public void addMenuActionListeners(ActionListener listener) {
+		
+		for(JMenuItem item : menuList){
+			
+			if(item.getActionListeners().length == 0) {
+				item.addActionListener(listener);
+			}
+		}
+	}
+	
+	/**
+	 * used for the views to add some exclusive JMenuItems
+	 * @param menu
+	 */
+	public void addToMenuList(JMenuItem menu) {
+		
+		menuList.add(menu);
+	}
+	
 	/**
 	 * Setter for geneFinder
 	 * 
@@ -1795,6 +1618,11 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 					.getArrayHeaderInfo(), getArraySelection());
 		}
 		return arrayFinder;
+	}
+	
+	public ArrayList<JMenuItem> getMenus() {
+		
+		return menuList;
 	}
 
 	/**
