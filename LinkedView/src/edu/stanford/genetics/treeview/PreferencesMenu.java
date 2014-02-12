@@ -338,14 +338,14 @@ public class PreferencesMenu extends JFrame {
 			if (viewFrame.getDataModel() != null 
 					&& viewFrame.getRunning() != null) {
 				if(viewFrame.getConfirmPanel() != null) {
-					viewFrame.getConfirmPanel().setupLayout();
+					viewFrame.setView("LoadCheckView");
 				}
 				viewFrame.setLoaded(false);
 				viewFrame.setView("DendroView");
 
 			} else if (viewFrame.getDataModel() != null 
 					&& viewFrame.getRunning() == null) {
-				viewFrame.getConfirmPanel().setupLayout();
+				viewFrame.setView("LoadCheckView");
 
 			} else {
 				viewFrame.setView("WelcomeView");
@@ -412,26 +412,12 @@ public class PreferencesMenu extends JFrame {
 								.substring(fileName.length() - suffixLength, 
 										fileName.length());
 						
-						final CDTCreator3 fileChanger = new CDTCreator3(file, 
-								customFile, fileType, viewFrame);
-						fileChanger.createFile();
-
-						file = new File(fileChanger.getFilePath());
-						
-						FileSet fileSet = viewFrame.getFileSet(file);
-						viewFrame.loadFileSet(fileSet);
-
-						fileSet = viewFrame.getFileMRU().addUnique(fileSet);
-						viewFrame.getFileMRU().setLast(fileSet);
+						// Next: read file, return string arrays with new names
+						// Then: update currently loaded model.
 						
 						PreferencesMenu.this.dispose();
-						viewFrame.setLoaded(false);
-						viewFrame.setLoaded(true);
 						
 					} catch (LoadException e) {
-						e.printStackTrace();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}

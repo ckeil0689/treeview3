@@ -14,6 +14,8 @@ import java.awt.MenuItem;
 import java.awt.MenuShortcut;
 import java.awt.event.ActionListener;
 
+import javax.swing.event.MenuListener;
+
 import edu.stanford.genetics.treeview.TreeviewMenuBarI;
 
 public class TreeViewMenuBar extends TreeviewMenuBarI {
@@ -209,5 +211,11 @@ public class TreeViewMenuBar extends TreeviewMenuBarI {
 	@Override
 	public void setEnabled(final boolean value) {
 		currentMenu.setEnabled(value);
+	}
+
+	@Override
+	public void addMenuListener(MenuListener listener) {
+		// TODO Auto-generated method stub
+		
 	}
 }

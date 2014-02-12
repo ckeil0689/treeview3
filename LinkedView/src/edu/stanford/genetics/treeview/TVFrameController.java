@@ -2,32 +2,33 @@ package edu.stanford.genetics.treeview;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 
-import Views.LoadProgressView;
 import Views.WelcomeView;
 
-import Cluster.ClusterProcessor;
 import Cluster.ClusterViewController;
 import Cluster.ClusterViewFrame;
 import Controllers.MenubarActions;
 
 import edu.stanford.genetics.treeview.model.CDTCreator3;
+import edu.stanford.genetics.treeview.model.DataModelWriter;
 import edu.stanford.genetics.treeview.model.TVModel;
-import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
-import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 
 /**
  * This class controls user interaction with TVFrame and its views.
@@ -40,24 +41,42 @@ public class TVFrameController {
 	private TVModel model;
 	private SwingWorker<Void, Void> worker;
 	private File file;
+	private FileSet fileMenuSet;
 	private String fileType;
 	
 	public TVFrameController(TreeViewFrame tvFrame, TVModel model) {
 		
 		this.tvFrame = tvFrame;
 		this.model = model;
+	
+//		tvFrame.addMenuActionListeners(new TVMenuListener());
+//		tvFrame.addFileMenuListeners(new FileMenuListener());
 		
-//		setupWorkerThread();
+		addViewListeners();
+	}
+	
+	/**
+	 * Adds listeners to views that are instantiated in TVFrame.
+	 */
+	public void addViewListeners() {
 		
 		tvFrame.addMenuActionListeners(new TVMenuListener());
+		tvFrame.addFileMenuListeners(new FileMenuListener());
 		
-		// Get the Views from TVFrame
-		WelcomeView welcomeView = tvFrame.getWelcomeView();
+		if(tvFrame.getWelcomeView() != null) {
+			System.out.println("Welcome Listener added.");
+			tvFrame.getWelcomeView().addLoadListener(new LoadPanelListener(
+					tvFrame.getWelcomeView().getLoadIcon(), 
+					tvFrame.getWelcomeView().getLoadIcon().getLabel()));
+		}
 		
-		// add listeners to Views
-		welcomeView.addLoadListener(new LoadPanelListener(
-				welcomeView.getLoadIcon(), 
-				welcomeView.getLoadIcon().getLabel()));
+		if(tvFrame.getLoadCheckView() != null) {
+			System.out.println("LoadCheck Listener added.");
+			tvFrame.getLoadCheckView().addLoadListener(
+					new LoadButtonListener());
+			tvFrame.getLoadCheckView().addContinueListener(
+					new ContinueListener());
+		}
 	}
 	
 	/**
@@ -115,7 +134,6 @@ public class TVFrameController {
 
 			if(tvFrame.getDataModel() != null) {
 				tvFrame.setView("DendroView");
-//				tvFrame.setLoaded(true);
 				tvFrame.addMenuActionListeners(new TVMenuListener());
 				
 			} else {
@@ -160,28 +178,34 @@ public class TVFrameController {
 			@Override
 			public Void doInBackground() {
 				
+				FileSet fileSet = null;
 				try {
-					final String fileName = file.getAbsolutePath();
-					final int dotIndex = fileName.indexOf(".");
-
-					final int suffixLength = fileName.length() - dotIndex;
-
-					fileType = file.getAbsolutePath().substring(
-							fileName.length() - suffixLength, 
-							fileName.length());
+					if(fileMenuSet == null) {
+						final String fileName = file.getAbsolutePath();
+						final int dotIndex = fileName.indexOf(".");
+	
+						final int suffixLength = fileName.length() - dotIndex;
+	
+						fileType = file.getAbsolutePath().substring(
+								fileName.length() - suffixLength, 
+								fileName.length());
+					
+						if (!fileType.equalsIgnoreCase(".cdt")) {
+							
+							
+								final CDTCreator3 fileTransformer = 
+										new CDTCreator3(file, fileType, tvFrame);
+								
+								fileTransformer.createFile();
 				
-					if (!fileType.equalsIgnoreCase(".cdt")) {
+								file = new File(fileTransformer.getFilePath());
+								
+						}
+						fileSet = tvFrame.getFileSet(file);
 						
-						
-							final CDTCreator3 fileTransformer = 
-									new CDTCreator3(file, fileType, tvFrame);
-							
-							fileTransformer.createFile();
-			
-							file = new File(fileTransformer.getFilePath());
-							
+					} else {
+						fileSet = fileMenuSet;
 					}
-					FileSet fileSet = tvFrame.getFileSet(file);
 				
 					// Loading TVModel
 					loadFileSet(fileSet);
@@ -210,11 +234,15 @@ public class TVFrameController {
 			@Override
 			protected void done() {
 
+				fileMenuSet = null;
+				
 				if(model.getDataMatrix().getNumRow() > 0) {
 					setDataModel(model);
 					
 				} else {
 					System.out.println("No datamatrix set by worker thread.");
+					tvFrame.setView("WelcomeView");
+					addViewListeners();
 				}
 			}
 		};
@@ -269,13 +297,10 @@ public class TVFrameController {
 	public void loadFileSet(final FileSet fileSet) throws LoadException {
 
 		// Make TVModel object
-//		model = new TVModel();
 		model.setFrame(tvFrame);
 
 		try {
 			// load instance variables of TVModel with data
-			// use worker thread
-			
 			model.loadNew(fileSet);
 
 		} catch (final LoadException e) {
@@ -284,10 +309,9 @@ public class TVFrameController {
 				throw e;
 			}
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			
 		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -351,6 +375,7 @@ public class TVFrameController {
 		try {
 			model.loadNewNW(fileSet);
 			setDataModel(model);
+			
 		} catch (final LoadException e) {
 			if (e.getType() != LoadException.INTPARSE) {
 				JOptionPane.showMessageDialog(tvFrame, e);
@@ -432,10 +457,7 @@ public class TVFrameController {
 			}
 	
 			tvFrame.setView("LoadCheckView");
-			tvFrame.getLoadCheckView().addLoadListener(
-					new LoadButtonListener());
-			tvFrame.getLoadCheckView().addContinueListener(
-					new ContinueListener());;
+			addViewListeners();
 					
 			setupExtractors();
 			
@@ -519,5 +541,171 @@ public class TVFrameController {
 			return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * Saves the current model, GUI handled by TVFrame.
+	 * @param incremental
+	 * @return
+	 */
+	public boolean doModelSave(final boolean incremental) {
+
+		final DataModelWriter writer = 
+				new DataModelWriter(tvFrame.getDataModel());
+		final Set<DataModelFileType> written;
+
+		if (incremental) {
+			written = writer.writeIncremental(
+					tvFrame.getDataModel().getFileSet());
+
+		} else {
+			written = writer.writeAll(tvFrame.getDataModel().getFileSet());
+		}
+
+
+		if (written.isEmpty()) {
+			tvFrame.openSaveDialog(written.isEmpty(), null);
+			return false;
+
+		} else {
+			String msg = "Model changes were written to ";
+			int i = 0;
+
+			for (final DataModelFileType type : written) {
+				msg += type.name();
+				i++;
+
+				if (i == written.size()) {
+					// nothing after last one.
+
+				} else if (i + 1 == written.size()) {
+					msg += " and ";
+
+				} else {
+					msg += ",";
+				}
+			}
+ 
+			tvFrame.openSaveDialog(written.isEmpty(), msg);
+			return true;
+		}
+	}
+	
+	/**
+	 * Saves the model as a user specified file.
+	 */
+	public void saveModelAs() {
+		
+		if (tvFrame.getDataModel().getFileSet() == null) {
+			JOptionPane.showMessageDialog(tvFrame,
+					"Saving of datamodels not backed by "
+							+ "files is not yet supported.");
+	
+		} else {
+			final JFileChooser fileDialog = new JFileChooser();
+			final CdtFilter ff = new CdtFilter();
+			fileDialog.setFileFilter(ff);
+	
+			final String string = tvFrame.getDataModel().getFileSet()
+					.getDir();
+	
+			if (string != null) {
+	
+				fileDialog
+						.setCurrentDirectory(new File(string));
+			}
+	
+			final int retVal = fileDialog
+					.showSaveDialog(tvFrame);
+	
+			if (retVal == JFileChooser.APPROVE_OPTION) {
+				final File chosen = fileDialog
+						.getSelectedFile();
+				String name = chosen.getName();
+	
+				if (!name.toLowerCase().endsWith(".cdt")
+						&& !name.toLowerCase().endsWith(".pcl")) {
+					name += ".cdt";
+				}
+	
+				FileSet fileSet2 = new FileSet(name, chosen
+						.getParent() + File.separator);
+				fileSet2.copyState(tvFrame.getDataModel().getFileSet());
+	
+				final FileSet fileSet1 = new FileSet(name,
+						chosen.getParent() + File.separator);
+				fileSet1.setName(tvFrame.getDataModel().getFileSet()
+						.getName());
+	
+				tvFrame.getDataModel().getFileSet().copyState(fileSet1);
+				doModelSave(false);
+	
+				tvFrame.getDataModel().getFileSet().notifyMoved();
+				tvFrame.getFileMRU().removeDuplicates(tvFrame.getDataModel()
+						.getFileSet());
+				fileSet2 = tvFrame.getFileMRU().addUnique(fileSet2);
+				tvFrame.getFileMRU().setLast(
+						tvFrame.getDataModel().getFileSet());
+				tvFrame.rebuildProgramMenu();
+				tvFrame.addFileMenuListeners(new FileMenuListener());
+	
+				if (tvFrame.getDataModel() instanceof TVModel) {
+					((TVModel) tvFrame.getDataModel())
+					.getDocumentConfig().setFile(tvFrame.getDataModel()
+							.getFileSet().getJtv());
+				}
+			}
+		}
+	}
+	
+	/**
+	 * This class is an ActionListener which overrides the run() function.
+	 */
+	class FileMenuListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(final ActionEvent actionEvent) {
+
+			tvFrame.getFileMRU().setLast(tvFrame.getFileMenuSet());
+			tvFrame.getFileMRU().notifyObservers();
+
+			if (tvFrame.getRunning() != null) {
+				tvFrame.getRunning().syncConfig();
+			}
+			fileMenuSet = tvFrame.getFileMenuSet();
+			
+			setupWorkerThread();
+			tvFrame.setView("LoadProgressView");
+			worker.execute();
+
+//					} catch (final LoadException e) {
+//						if (e.getType() == LoadException.INTPARSE) {
+//							
+//						} else {
+//							final int result = FileMruEditor.offerSearch(
+//									tvFrame.getFileMenuSet(), 
+//									tvFrame, "Could not Load " 
+//											+ tvFrame.getFileMenuSet().getCdt());
+//
+//							if (result == FileMruEditor.FIND) {
+//								tvFrame.getFileMRU().notifyFileSetModified();
+//								tvFrame.getFileMRU().notifyObservers();
+//
+//								actionPerformed(actionEvent); // REPROCESS...
+//								return; // EARLY RETURN
+//
+//							} else if (result == FileMruEditor.REMOVE) {
+//								tvFrame.getFileMRU().removeFileSet(
+//										tvFrame.getFileMenuSet());
+//								tvFrame.getFileMRU().notifyObservers();
+//							}
+//						}
+//						tvFrame.setLoaded(false);
+//					}
+					// dataModel.notifyObservers();
+//				}
+//			};
+//			SwingUtilities.invokeLater(update);
+		}
 	}
 }

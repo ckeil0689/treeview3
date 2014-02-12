@@ -21,7 +21,6 @@ public class HierCluster {
 	private final ClusterView clusterView;
 	private String filePath;
 	private final String type;
-	private final int pBarNum;
 
 	// Distance Matrix
 	private List<List<Double>> dMatrix = new ArrayList<List<Double>>();
@@ -49,20 +48,20 @@ public class HierCluster {
 	 * @param method
 	 */
 	public HierCluster(final DataModel model, final ClusterView clusterView, 
-			final List<List<Double>> dMatrix, final String type, int pBarNum) {
+			final List<List<Double>> dMatrix, final String type) {
 
 		this.model = (TVModel) model;
 		this.clusterView = clusterView;
 		this.dMatrix = dMatrix;
 		this.type = type;
-		this.pBarNum = pBarNum;
 	}
 
 	// method for clustering the distance matrix
 	public void cluster() {
 
 		// ProgressBar maximum
-		clusterView.setPBarMax(dMatrix.size(), pBarNum);
+		clusterView.setLoadText("Clustering data...");
+		clusterView.setPBarMax(dMatrix.size());
 
 		// data to be written to file
 		dataTable = new ArrayList<List<String>>();
@@ -97,8 +96,7 @@ public class HierCluster {
 		while (halfDMatrix.size() > 1) {
 
 			// update ProgressBar
-			clusterView.updatePBar(dMatrix.size() - halfDMatrix.size(), 
-					pBarNum);
+			clusterView.updatePBar(dMatrix.size() - halfDMatrix.size());
 
 			// local variables
 			double min = 0;

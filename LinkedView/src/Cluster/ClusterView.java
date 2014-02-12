@@ -28,13 +28,11 @@
 package Cluster;
 
 import java.awt.event.ActionListener;
-import java.io.File;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -42,16 +40,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.ConfigNode;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.ExportException;
-import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.GUIParams;
-import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.MainPanel;
 import edu.stanford.genetics.treeview.MainProgramArgs;
 import edu.stanford.genetics.treeview.TreeViewFrame;
@@ -74,11 +69,9 @@ public class ClusterView extends JPanel implements MainPanel {
 	private static final long serialVersionUID = 1L;
 
 	// Instance
-	protected DataModel dataModel;
+	private TreeViewFrame tvFrame;
+	protected TVModel dataModel;
 	protected ConfigNode root;
-
-	private TreeViewFrame viewFrame;
-	//private boolean hierarchical;
 
 	// Various GUI elements
 	private JScrollPane scrollPane;
@@ -104,10 +97,8 @@ public class ClusterView extends JPanel implements MainPanel {
 	private JSpinner enterRIt;
 	private JSpinner enterCIt;
 	
+	private JLabel loadLabel;
 	private JProgressBar pBar;
-	private JProgressBar pBar2;
-	private JProgressBar pBar3;
-	private JProgressBar pBar4;
 	
 	private ClickableIcon infoIcon;
 
@@ -123,9 +114,9 @@ public class ClusterView extends JPanel implements MainPanel {
 	 * @param vFrame
 	 *            parent ViewFrame of DendroView
 	 */
-	public ClusterView(final TreeViewFrame vFrame) {
+	public ClusterView(final TreeViewFrame tvFrame) {
 
-		this(null, vFrame, "Cluster View");
+		this(null, tvFrame, "Cluster View");
 	}
 
 	/**
@@ -135,9 +126,9 @@ public class ClusterView extends JPanel implements MainPanel {
 	 * @param root
 	 * @param vFrame
 	 */
-	public ClusterView(final ConfigNode root, final TreeViewFrame vFrame) {
+	public ClusterView(final ConfigNode root, final TreeViewFrame tvFrame) {
 
-		this(root, vFrame, "Cluster View");
+		this(root, tvFrame, "Cluster View");
 	}
 
 	/**
@@ -153,13 +144,13 @@ public class ClusterView extends JPanel implements MainPanel {
 	 * @param name
 	 *            name of this view.
 	 */
-	public ClusterView (final ConfigNode root, final TreeViewFrame vFrame, 
+	public ClusterView (final ConfigNode root, final TreeViewFrame tvFrame, 
 			final String name) {
 
 		super.setName(name);
 
-		this.viewFrame = vFrame;
-		this.dataModel = viewFrame.getDataModel();
+		this.tvFrame = tvFrame;
+		this.dataModel = (TVModel)tvFrame.getDataModel();
 
 		// Set layout for initial window
 		setupLayout();
@@ -234,14 +225,12 @@ public class ClusterView extends JPanel implements MainPanel {
 		// Button to cancel worker thread in the controller
 		cancel_button = GUIParams.setButtonLayout("Cancel", null);
 		
-		// ProgressBars for clustering process
+		// Label for cluster process
+		loadLabel = new JLabel();
+		loadLabel.setFont(GUIParams.FONTS);
+		loadLabel.setForeground(GUIParams.TEXT);
+		// ProgressBar for clustering process
 		pBar = GUIParams.setPBarLayout();
-
-		pBar2 = GUIParams.setPBarLayout();
-
-		pBar3 = GUIParams.setPBarLayout();
-
-		pBar4 = GUIParams.setPBarLayout();
 		
 		// ComboBox to choose cluster method
 		String[] clusterNames = { "Hierarchical Clustering",
@@ -373,7 +362,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		method.setForeground(GUIParams.MAIN);
 
 		// Clickable Panel to call InfoFrame
-		infoIcon = new ClickableIcon(viewFrame, GUIParams.QUESTIONICON);
+		infoIcon = new ClickableIcon(tvFrame, GUIParams.QUESTIONICON);
 		
 		linkagePanel.add(method, "span, wrap");
 		linkagePanel.add(clusterChoice, "w 40%");
@@ -470,7 +459,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	/** Getter for viewFrame */
 	public TreeViewFrame getViewFrame() {
 
-		return viewFrame;
+		return tvFrame;
 	}
 
 	/**
@@ -494,7 +483,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	/** Setter for viewFrame */
 	public void setViewFrame(final TreeViewFrame viewFrame) {
 
-		this.viewFrame = viewFrame;
+		this.tvFrame = viewFrame;
 	}
 
 	/**
@@ -634,29 +623,25 @@ public class ClusterView extends JPanel implements MainPanel {
 		buttonPanel.remove(dendro_button);
 		cluster_button.setEnabled(true);
 		
-		viewFrame.setLoaded(false);
-		viewFrame.setLoaded(true);
+		tvFrame.setLoaded(false);
+		tvFrame.setLoaded(true);
 		
 		mainPanel.revalidate();
 		mainPanel.repaint();
 	}
 	
+	/**
+	 * Adds a load progress bar to loadpanel if a similarity measure has been
+	 * selected.
+	 * @param choice
+	 * @param choice2
+	 */
 	public void setLoadPanel(String choice, String choice2) {
 		
 		if (!choice.contentEquals("Do Not Cluster")
-				&& !choice2.contentEquals("Do Not Cluster")) {
+				|| !choice2.contentEquals("Do Not Cluster")) {
+			loadPanel.add(loadLabel, "pushx, alignx 50%, wrap");
 			loadPanel.add(pBar, "pushx, w 90%, alignx 50%, wrap");
-			loadPanel.add(pBar2, "pushx, w 90%, alignx 50%, wrap");
-			loadPanel.add(pBar3, "pushx, w 90%, alignx 50%, wrap");
-			loadPanel.add(pBar4, "pushx, w 90%, alignx 50%, wrap");
-
-		} else if (!choice.contentEquals("Do Not Cluster")) {
-			loadPanel.add(pBar, "pushx, w 90%, alignx 50%, wrap");
-			loadPanel.add(pBar2, "pushx, w 90%, alignx 50%, wrap");
-
-		} else if (!choice2.contentEquals("Do Not Cluster")) {
-			loadPanel.add(pBar3, "pushx, w 90%, alignx 50%, wrap");
-			loadPanel.add(pBar4, "pushx, w 90%, alignx 50%, wrap");
 		}
 	}
 	
@@ -779,44 +764,30 @@ public class ClusterView extends JPanel implements MainPanel {
 	}
 	
 	/**
-	 * Sets the maximum for the JProgressBar to be used.
-	 * pBarNum specifies which of the 4 pBars in ClusterView is addressed.
-	 * @param max
-	 * @param pBarNum
+	 * Defines the text to be displayed by loadLabel in ClusterView.
+	 * @param text
 	 */
-	public void setPBarMax(int max, int pBarNum) {
+	public void setLoadText(String text) {
 		
-		switch(pBarNum) {
-		
-		case 1:	pBar.setMaximum(max);
-				break;
-		case 2:	pBar2.setMaximum(max);
-				break;
-		case 3:	pBar3.setMaximum(max);
-				break;
-		case 4:	pBar4.setMaximum(max);
-				break;
-		}
+		loadLabel.setText(text);
 	}
 	
 	/**
-	 * Updates the value of the specified JProgressBar in ClusterView.
-	 * @param i
-	 * @param pBarNum
+	 * Sets the maximum for the JProgressBar.
+	 * @param max
 	 */
-	public void updatePBar(int i, int pBarNum) {
+	public void setPBarMax(int max) {
 		
-		switch(pBarNum) {
+		pBar.setMaximum(max);
+	}
+	
+	/**
+	 * Updates the value of the JProgressBar in ClusterView.
+	 * @param i
+	 */
+	public void updatePBar(int i) {
 		
-		case 1:	pBar.setValue(i);
-				break;
-		case 2:	pBar2.setValue(i);
-				break;
-		case 3:	pBar3.setValue(i);
-				break;
-		case 4:	pBar4.setValue(i);
-				break;
-		}
+		pBar.setValue(i);
 	}
 	
 	// Empty methods

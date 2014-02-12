@@ -11,16 +11,44 @@ import edu.stanford.genetics.treeview.ClickablePanel;
 import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 
-public class WelcomeView extends JPanel {
-
-	private static final long serialVersionUID = 1L;
+public class WelcomeView {
 	
+	private TreeViewFrame tvFrame;
 	private ClickablePanel load_Icon;
+	private JPanel welcomePanel;
 
 	public WelcomeView(TreeViewFrame tvFrame) {
 		
-		setLayout(new MigLayout("ins 0"));
-		setOpaque(false);
+		this.tvFrame = tvFrame;
+	}
+	
+	/**
+	 * Access TreeViewFrame's load_Icon panel.
+	 * @return
+	 */
+	public ClickablePanel getLoadIcon() {
+		
+		return load_Icon;
+	}
+	
+	/**
+	 * Equipping the load_Icon with a MouseListener
+	 * @param loadData
+	 */
+	public void addLoadListener(MouseListener loadData) {
+		
+		load_Icon.addMouseListener(loadData);
+	}
+	
+	/**
+	 * Returns the panel of this view instance, which contains all the content.
+	 * @return
+	 */
+	public JPanel makeWelcomePanel() {
+		
+		welcomePanel = new JPanel();
+		welcomePanel.setLayout(new MigLayout("ins 0"));
+		welcomePanel.setBackground(GUIParams.BG_COLOR);
 		
 		JPanel title_bg;
 		JLabel jl;
@@ -43,26 +71,10 @@ public class WelcomeView extends JPanel {
 		title_bg.add(jl, "push, alignx 50%, span, wrap");
 		title_bg.add(jl2, "push, alignx 50%, span");
 
-		add(title_bg, "pushx, growx, alignx 50%, span, "
+		welcomePanel.add(title_bg, "pushx, growx, alignx 50%, span, "
 				+ "height 20%::, wrap");
-		add(load_Icon, "push, alignx 50%");
-	}
-	
-	/**
-	 * Access TreeViewFrame's load_Icon panel.
-	 * @return
-	 */
-	public ClickablePanel getLoadIcon() {
+		welcomePanel.add(load_Icon, "push, alignx 50%");
 		
-		return load_Icon;
-	}
-	
-	/**
-	 * Equipping the load_Icon with a MouseListener
-	 * @param loadData
-	 */
-	public void addLoadListener(MouseListener loadData) {
-		
-		load_Icon.addMouseListener(loadData);
+		return welcomePanel;
 	}
 }

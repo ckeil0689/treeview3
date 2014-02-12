@@ -38,6 +38,7 @@ import edu.stanford.genetics.treeview.ContrastSelectable;
 
 public class ColorExtractor extends Observable implements ConfigNodePersistent,
 		ContrastSelectable {
+	
 	private ColorSet defaultColorSet;
 	private final double default_contrast = 3.0;
 	private final ColorSet colorSet = new ColorSet();// Will be backed by
@@ -69,6 +70,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	 * default colors are.
 	 */
 	public void setDefaultColorSet(final ColorSet set) {
+		
 		defaultColorSet = set;
 	}
 
@@ -81,6 +83,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	 */
 	@Override
 	public void bindConfig(final ConfigNode configNode) {
+		
 		if (root != configNode) {
 			root = configNode;
 			ConfigNode cand = root.fetchFirst("ColorSet");
@@ -105,6 +108,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	 */
 	@Override
 	public void setContrast(final double contrastValue) {
+		
 		if (contrast != contrastValue) {
 			contrast = contrastValue;
 			if (root != null) {
@@ -115,6 +119,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	}
 
 	public void setLogTransform(final boolean transform) {
+		
 		if (transform != m_logTranform) {
 			m_logTranform = transform;
 			if (root != null) {
@@ -125,6 +130,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	}
 
 	public void setLogCenter(final double center) {
+		
 		if (m_logCenter != center) {
 			m_logCenter = center;
 			if (root != null) {
@@ -135,10 +141,12 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	}
 
 	public double getLogCenter() {
+		
 		return m_logCenter;
 	}
 
 	public void setLogBase(final double base) {
+		
 		if (m_logBase != base) {
 			m_logBase = base;
 			m_logBaseDivisor = Math.log(base);
@@ -150,10 +158,12 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	}
 
 	public double getLogBase() {
+		
 		return m_logBase;
 	}
 
 	public boolean getLogTransform() {
+		
 		return m_logTranform;
 	}
 
@@ -164,6 +174,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	 */
 	@Override
 	public double getContrast() {
+		
 		return contrast;
 	}
 

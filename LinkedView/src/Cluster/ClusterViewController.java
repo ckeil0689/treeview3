@@ -237,6 +237,7 @@ public class ClusterViewController {
 
 			
 			setupLoadWorkerThread();
+			tvFrame.setLoaded(false);
 			loadWorker.execute();
 			
 			topFrame.dispose();

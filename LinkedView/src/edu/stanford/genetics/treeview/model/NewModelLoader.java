@@ -295,6 +295,7 @@ public class NewModelLoader {
 					labels = new String[dataStartCol];
 					dataValues = new double[lineAsStrings.length 
 					                        - dataStartCol];
+					
 					for(int i = 0; i < dataStartCol; i++) {
 						
 						String element = lineAsStrings[i];
@@ -302,21 +303,16 @@ public class NewModelLoader {
 						labels[i] = element;
 					}
 					
-					for(int i = 0; i < lineAsStrings.length - dataStartCol; 
+					for(int i = 0; i < lineAsStrings.length - dataStartCol;
 							i++) {
 						
 						String element = lineAsStrings[i + dataStartCol];
 						
-						if (i >= dataStartCol) { 
-							// handle parseDouble error somehow? 
-							// using the Pattern.matches method screws up 
-							// loading time by a factor of 1000....
-							double val = Double.parseDouble(element);
-							dataValues[i] = val;
-							
-						} else {
-							dataValues[i] = 0;
-						}
+						// handle parseDouble error somehow? 
+						// using the Pattern.matches method screws up 
+						// loading time by a factor of 1000....
+						double val = Double.parseDouble(element);
+						dataValues[i] = val;
 					}
 					
 					stringLabels[rowN] = labels;

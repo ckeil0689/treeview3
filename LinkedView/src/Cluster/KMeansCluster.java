@@ -15,7 +15,6 @@ public class KMeansCluster {
 	
 	private String filePath;
 	private String type = "";
-	private final int pBarNum;
 	private final int clusterN;
 	private final int iterations;
 
@@ -42,7 +41,7 @@ public class KMeansCluster {
 	 */
 	public KMeansCluster(final DataModel model, final ClusterView clusterView,
 			final List<List<Double>> dMatrix, final String type, int clusterN, 
-			int iterations, final int pBarNum) {
+			int iterations) {
 
 		this.model = (TVModel) model;
 		this.clusterView = clusterView;
@@ -50,7 +49,6 @@ public class KMeansCluster {
 		this.type = type;
 		this.clusterN = clusterN;
 		this.iterations = iterations;
-		this.pBarNum = pBarNum;
 	}
 
 	// method for clustering the distance matrix
@@ -61,7 +59,8 @@ public class KMeansCluster {
 		List<List<Double>> clusterMeans = new ArrayList<List<Double>>();
 
 		// ProgressBar maximum
-		clusterView.setPBarMax(dMatrix.size(), pBarNum);
+		clusterView.setLoadText("Clustering data...");
+		clusterView.setPBarMax(dMatrix.size());
 
 		// deep copy of distance matrix to avoid mutation
 		copyDMatrix = deepCopy(dMatrix);
@@ -215,7 +214,7 @@ public class KMeansCluster {
 	 */
 	public List<List<Integer>> assignMeansVals(final List<Double> meanList) {
 
-		clusterView.updatePBar(0, pBarNum);
+		clusterView.updatePBar(0);
 
 		final List<List<Integer>> clusters = new ArrayList<List<Integer>>();
 
@@ -238,7 +237,7 @@ public class KMeansCluster {
 
 			final int geneID = meanList.indexOf(mean);
 
-			clusterView.updatePBar(geneID, pBarNum);
+			clusterView.updatePBar(geneID);
 
 			final List<Integer> meanIndexes = new ArrayList<Integer>();
 

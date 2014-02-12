@@ -32,6 +32,15 @@ public class MenubarActions {
 		if(name.equalsIgnoreCase("Open")) {
 			controller.openFile();
 			
+		} else if(name.equalsIgnoreCase("Save")) {
+			controller.doModelSave(true);
+			
+		} else if(name.equalsIgnoreCase("Save As")) {
+			controller.saveModelAs();
+			
+		} else if(name.equalsIgnoreCase("Edit Recent Files")) {
+			tvFrame.showRecentFileEditor();
+			
 		} else if(name.equalsIgnoreCase("Quit Program")) {
 			try {
 				tvFrame.getApp().closeAllWindows();

@@ -1,6 +1,5 @@
 package Views;
 
-import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -26,35 +25,15 @@ import Cluster.DataViewPanel;
  * @author CKeil
  * 
  */
-public class LoadCheckView extends JPanel {
-
-	private static final long serialVersionUID = 1L;
-
-	// Two Font Sizes
-	private static Font fontS = new Font("Sans Serif", Font.PLAIN, 18);
-	private static Font fontL = new Font("Sans Serif", Font.PLAIN, 24);
+public class LoadCheckView {
 
 	// Instance variables
-	private int nRows;
-	private int nCols;
-	private JLabel label3;
-	private JLabel previewLabel;
-	private JLabel numColLabel;
-	private JLabel numRowLabel;
+	private JPanel loadCheckPanel;
+	
 	private JButton loadNewButton;
 	private JButton advanceButton;
-	private JPanel feedbackPanel;
-	private JPanel numPanel;
-	private JPanel buttonPanel;
 
-	// Variables for checkmark
-	private JLabel success;
-	private JLabel icon;
-	private BufferedImage labelImg;
-	private ClassLoader classLoader;
-	private InputStream input;
-
-	private TVModel dataModel;
+	private TVModel tvModel;
 	private final DataViewPanel dataView;
 
 	/**
@@ -62,18 +41,40 @@ public class LoadCheckView extends JPanel {
 	 */
 	public LoadCheckView(final TVModel model) {
 
-		this.dataModel = model;
+		this.tvModel = model;
 		this.dataView = new DataViewPanel(model);
-
-		setupLayout();
 	}
 
-	public void setupLayout() {
+	/**
+	 * Returns the JPanel which contains the content of LoadCheckView.
+	 */
+	public JPanel makeLoadCheckView() {
 
-		setLayout(new MigLayout());
+		// Variables
+		JPanel feedbackPanel;
+		JPanel numPanel;
+		JPanel buttonPanel;
 		
-		removeAll();
-		setBackground(GUIParams.BG_COLOR);
+		JLabel label3;
+		JLabel previewLabel;
+		JLabel numColLabel;
+		JLabel numRowLabel;
+		
+		int nRows;
+		int nCols;
+		
+		// Loading checkmark image
+		JLabel success;
+		JLabel icon;
+		BufferedImage labelImg;
+		ClassLoader classLoader;
+		InputStream input;
+		
+		loadCheckPanel = new JPanel();
+		loadCheckPanel.setLayout(new MigLayout());
+		loadCheckPanel.setBackground(GUIParams.BG_COLOR);
+		
+		loadCheckPanel.removeAll();
 		
 		loadNewButton = GUIParams.setButtonLayout("Load Different File", 
 				null);
@@ -87,7 +88,7 @@ public class LoadCheckView extends JPanel {
 		feedbackPanel.setLayout(new MigLayout());
 		feedbackPanel.setOpaque(false);
 
-		if (dataModel != null) {
+		if (tvModel != null) {
 
 			classLoader = Thread.currentThread().getContextClassLoader();
 			input = classLoader.getResourceAsStream("checkIcon.png");
@@ -98,7 +99,7 @@ public class LoadCheckView extends JPanel {
 				icon = new JLabel(new ImageIcon(labelImg));
 
 				success = new JLabel("Great, loading was successful!");
-				success.setFont(fontL);
+				success.setFont(GUIParams.FONTL);
 				success.setForeground(GUIParams.TEXT);
 
 				feedbackPanel.add(success);
@@ -109,8 +110,8 @@ public class LoadCheckView extends JPanel {
 						"be retrieved.");
 			}
 
-			final HeaderInfo infoArray = dataModel.getArrayHeaderInfo();
-			final HeaderInfo infoGene = dataModel.getGeneHeaderInfo();
+			final HeaderInfo infoArray = tvModel.getArrayHeaderInfo();
+			final HeaderInfo infoGene = tvModel.getGeneHeaderInfo();
 
 			nCols = infoArray.getNumHeaders();
 			nRows = infoGene.getNumHeaders();
@@ -121,19 +122,19 @@ public class LoadCheckView extends JPanel {
 			numPanel.setOpaque(false);
 
 			numColLabel = new JLabel("Columns: " + nCols);
-			numColLabel.setFont(fontS);
+			numColLabel.setFont(GUIParams.FONTS);
 			numColLabel.setForeground(GUIParams.TEXT);
 
 			numRowLabel = new JLabel("Rows: " + nRows);
-			numRowLabel.setFont(fontS);
+			numRowLabel.setFont(GUIParams.FONTS);
 			numRowLabel.setForeground(GUIParams.TEXT);
 
 			label3 = new JLabel("Data Points: " + nCols * nRows);
-			label3.setFont(fontS);
+			label3.setFont(GUIParams.FONTS);
 			label3.setForeground(GUIParams.TEXT);
 
 			previewLabel = new JLabel("Sample Data Preview");
-			previewLabel.setFont(fontL);
+			previewLabel.setFont(GUIParams.FONTL);
 			previewLabel.setForeground(GUIParams.TEXT);
 
 			// ButtonPanel
@@ -148,32 +149,34 @@ public class LoadCheckView extends JPanel {
 			numPanel.add(numColLabel, "span, wrap");
 			numPanel.add(label3);
 
-			add(feedbackPanel, "alignx 50%, pushx, span, wrap");
-			add(numPanel, "span, pushx, growx, alignx 50%, width ::60%, "
-					+ "wrap");
-			add(previewLabel, "span, alignx 50%, pushx, wrap");
-			add(dataView, "span, push, grow, alignx 50%, width ::60%, "
-					+ "height ::60%, wrap");
-			add(buttonPanel, "span, alignx 50%, push");
+			loadCheckPanel.add(feedbackPanel, "alignx 50%, pushx, span, wrap");
+			loadCheckPanel.add(numPanel, "span, pushx, growx, alignx 50%, " +
+					"width ::60%, wrap");
+			loadCheckPanel.add(previewLabel, "span, alignx 50%, pushx, wrap");
+			loadCheckPanel.add(dataView, "span, push, grow, alignx 50%, " +
+					"width ::60%, height ::60%, wrap");
+			loadCheckPanel.add(buttonPanel, "span, alignx 50%, push");
 
-			revalidate();
-			repaint();
+			loadCheckPanel.revalidate();
+			loadCheckPanel.repaint();
 
 		} else {
 			
 			final JLabel warning = new JLabel("Loading unsuccessful.");
-			warning.setFont(fontL);
+			warning.setFont(GUIParams.FONTL);
 			warning.setForeground(GUIParams.RED1);
 
 			loadNewButton = GUIParams.setButtonLayout("Load New File", null);
 			loadNewButton.setBackground(GUIParams.MAIN);
 
-			add(warning, "alignx 50%, span, wrap");
-			add(loadNewButton, "alignx 50%");
+			loadCheckPanel.add(warning, "alignx 50%, span, wrap");
+			loadCheckPanel.add(loadNewButton, "alignx 50%");
 
-			revalidate();
-			repaint();
+			loadCheckPanel.revalidate();
+			loadCheckPanel.repaint();
 		}
+		
+		return loadCheckPanel;
 	}
 	
 	/**

@@ -23,7 +23,6 @@ public class HierCluster2 {
 	private final ClusterView clusterView;
 	private String filePath;
 	private final String type;
-	private final int pBarNum;
 	private int wholeMSize;
 
 	// Distance Matrix
@@ -59,13 +58,12 @@ public class HierCluster2 {
 	 * @param method
 	 */
 	public HierCluster2(final DataModel model, final ClusterView clusterView, 
-			final List<List<Double>> dMatrix, final String type, int pBarNum) {
+			final List<List<Double>> dMatrix, final String type) {
 
 		this.model = (TVModel) model;
 		this.clusterView = clusterView;
 		this.halfDMatrix = dMatrix;
 		this.type = type;
-		this.pBarNum = pBarNum;
 	}
 
 	// method for clustering the distance matrix
@@ -81,7 +79,8 @@ public class HierCluster2 {
 		wholeMSize = halfDMatrix.size();
 		
 		// ProgressBar maximum
-		clusterView.setPBarMax(wholeMSize, pBarNum);
+		clusterView.setLoadText("Clustering data...");
+		clusterView.setPBarMax(wholeMSize);
 
 		// data to be written to file
 		dataTable = new ArrayList<List<String>>();
@@ -120,8 +119,7 @@ public class HierCluster2 {
 		while (halfDMatrix.size() > finalClusterN) {
 
 			// update ProgressBar
-			clusterView.updatePBar(wholeMSize - halfDMatrix.size(), 
-					pBarNum);
+			clusterView.updatePBar(wholeMSize - halfDMatrix.size());
 
 			// local variables
 			double min = 0;

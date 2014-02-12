@@ -92,11 +92,6 @@ public class ClusterProcessor {
 		cdtGen.generateCDT();
 		
 		return cdtGen.getFilePath();
-
-//		clusterView.setPath(cdtGen.getFilePath());
-//		clusterView.setFile(cdtGen.getFile());
-//
-//		clusterView.refresh();
 	}
 
 	/**
@@ -108,10 +103,10 @@ public class ClusterProcessor {
 	 * @return
 	 */
 	public List<String> hCluster(final List<List<Double>> distances,
-			final String type, final int pBarNum) {
+			final String type) {
 
 		final HierCluster2 cGen = new HierCluster2(tvModel, clusterView, 
-				distances, type, pBarNum);
+				distances, type);
 
 		cGen.cluster();
 
@@ -129,11 +124,10 @@ public class ClusterProcessor {
 	 * @return
 	 */
 	public List<String> kmCluster(final List<List<Double>> distances,
-			final String type, final int clusterN, final int iterations, 
-			final int pBarNum) {
+			final String type, final int clusterN, final int iterations) {
 
 		final KMeansCluster cGen = new KMeansCluster(tvModel, clusterView, 
-				distances, type, clusterN, iterations, pBarNum);
+				distances, type, clusterN, iterations);
 
 		cGen.cluster();
 
@@ -145,21 +139,6 @@ public class ClusterProcessor {
 	 * transforms it to a List<Double> object for further procedures.
 	 * @return List<Double>
 	 */
-//	public List<Double> matrixToList() {
-//		
-//		final List<Double> dataList = new ArrayList<Double>();
-//		
-//		TVDataMatrix matrix = (TVDataMatrix) tvModel.getDataMatrix();
-//		final double[] currentArray = matrix.getExprData();
-//		
-//		for (final double d : currentArray) {
-//
-//			dataList.add(d);
-//		}
-//		
-//		return dataList;
-//	}
-	
 	public List<Double> matrixToList() {
 		
 		final List<Double> dataList = new ArrayList<Double>();
@@ -224,26 +203,21 @@ public class ClusterProcessor {
 		final String choice = clusterView.getRowSimilarity();
 		final String rowString = "GENE";
 		
-		int pBarNum = 1;
-		
 		final DistanceMatrixCalculator dCalc = 
-				new DistanceMatrixCalculator(sepRows, choice, clusterView, 
-						pBarNum);
+				new DistanceMatrixCalculator(sepRows, choice, clusterView);
 
 		dCalc.measureDistance();
 
 		rowDistances = dCalc.getDistanceMatrix();
-
-		pBarNum = 2;
 				
 		if (hierarchical) {
-			orderedRows = hCluster(rowDistances, rowString, pBarNum);
+			orderedRows = hCluster(rowDistances, rowString);
 
 		} else {
 			Integer[] spinnerInput = clusterView.getSpinnerValues();
 			
 			orderedRows = kmCluster(rowDistances, rowString, spinnerInput[0], 
-					spinnerInput[1], pBarNum);
+					spinnerInput[1]);
 		}
 
 		clusterView.refresh();
@@ -258,26 +232,21 @@ public class ClusterProcessor {
 		final String choice2 = clusterView.getColSimilarity();
 		final String colString = "ARRY";
 		
-		int pBarNum = 3;
-		
 		final DistanceMatrixCalculator dCalc = 
-				new DistanceMatrixCalculator(sepCols, choice2, clusterView, 
-						pBarNum);
+				new DistanceMatrixCalculator(sepCols, choice2, clusterView);
 
 		dCalc.measureDistance();
 
 		colDistances = dCalc.getDistanceMatrix();
-
-		pBarNum = 4;
 		
 		Integer[] spinnerInput = clusterView.getSpinnerValues();
 		
 		if (hierarchical) {
-			orderedCols = hCluster(colDistances, colString, pBarNum);
+			orderedCols = hCluster(colDistances, colString);
 
 		} else {
 			orderedCols = kmCluster(colDistances, colString, spinnerInput[2], 
-					spinnerInput[3], pBarNum);
+					spinnerInput[3]);
 		}
 
 		clusterView.refresh();

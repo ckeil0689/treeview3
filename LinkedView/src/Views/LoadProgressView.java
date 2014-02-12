@@ -7,23 +7,27 @@ import javax.swing.JProgressBar;
 import net.miginfocom.swing.MigLayout;
 
 import edu.stanford.genetics.treeview.GUIParams;
-import edu.stanford.genetics.treeview.TreeViewFrame;
 
 /**
  * Displays a panel with a label and JProgressBar to indicate loading
  * progress and give feedback in case of loading errors.
  */
-public class LoadProgressView extends JPanel {
-
-	private static final long serialVersionUID = 1L;
+public class LoadProgressView {
 	
+	private JPanel loadProgPanel;
 	private JProgressBar loadBar;
 	private JLabel loadLabel;
-
-	public LoadProgressView(TreeViewFrame tvFrame) {
+	
+	/**
+	 * Returns the JPanel of LoadProgressView's instance which contains all
+	 * the GUI components.
+	 * @return
+	 */
+	public JPanel makeLoadProgView() {
 		
-		setLayout(new MigLayout("ins 0"));
-		setOpaque(false);
+		loadProgPanel = new JPanel();
+		loadProgPanel.setLayout(new MigLayout("ins 0"));
+		loadProgPanel.setOpaque(false);
 		
 		loadLabel = new JLabel();
 		loadLabel.setFont(GUIParams.FONTL);
@@ -31,8 +35,10 @@ public class LoadProgressView extends JPanel {
 		
 		loadBar = GUIParams.setPBarLayout();
 		
-		add(loadLabel, "push, alignx 50%, aligny 100%, wrap");
-		add(loadBar, "push, w 70%, alignx 50%, aligny 0%");
+		loadProgPanel.add(loadLabel, "push, alignx 50%, aligny 100%, wrap");
+		loadProgPanel.add(loadBar, "push, w 70%, alignx 50%, aligny 0%");
+		
+		return loadProgPanel;
 	}
 	
 	// LoadBar functions
@@ -70,8 +76,5 @@ public class LoadProgressView extends JPanel {
 	public void setLoadLabel(String text) {
 		
 		loadLabel.setText(text);
-		
-		revalidate();
-		repaint();
 	}
 }

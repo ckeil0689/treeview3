@@ -52,7 +52,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.BrowserControl;
-import edu.stanford.genetics.treeview.CancelableSettingsDialog;
 import edu.stanford.genetics.treeview.CdtFilter;
 import edu.stanford.genetics.treeview.ConfigNode;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
@@ -64,12 +63,10 @@ import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LoadException;
-import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.MainPanel;
 import edu.stanford.genetics.treeview.MainProgramArgs;
 import edu.stanford.genetics.treeview.MessagePanel;
 import edu.stanford.genetics.treeview.ModelView;
-import edu.stanford.genetics.treeview.PreferencesMenu;
 import edu.stanford.genetics.treeview.ReorderedTreeSelection;
 import edu.stanford.genetics.treeview.TabbedSettingsPanel;
 import edu.stanford.genetics.treeview.TreeDrawerNode;
@@ -174,18 +171,6 @@ ComponentListener, MainPanel, Observer {
 	// JMenuItems
 	private JMenuItem colorMenuItem;
 	private JMenuItem annotationsMenuItem;
-
-	// /**
-	// * Chained constructor
-	// * Calls setName of the JPanel class
-	// * @param cols
-	// * @param rows
-	// * @param name
-	// */
-	// protected DendroView2(int cols, int rows, String name) {
-	//
-	// super.setName(name);
-	// }
 
 	/**
 	 * Chained constructor for the DendroView object note this will reuse any
@@ -312,6 +297,7 @@ ComponentListener, MainPanel, Observer {
 		// set data first to avoid adding auto-generated
 		// contrast to documentConfig.
 		dArrayDrawer.setDataMatrix(getDataModel().getDataMatrix());
+		dArrayDrawer.recalculateContrast();
 		dArrayDrawer.bindConfig(getFirst("ArrayDrawer"));
 
 		// Set up status panel

@@ -19,8 +19,6 @@ public class DataFormatter {
 	private final TVModel model;
 	private final ClusterView clusterView;
 	private final List<Double> list;
-	private final int rowPBar = 1;
-	private final int colPBar = 3;
 
 	private final List<List<Double>> rowList = new ArrayList<List<Double>>();
 	private final List<List<Double>> colList = new ArrayList<List<Double>>();
@@ -45,12 +43,13 @@ public class DataFormatter {
 		
 		// number of rows
 		final int nRows = list.size() / nCols;
-
-		clusterView.setPBarMax(nRows, rowPBar);
+		
+		clusterView.setLoadText("Finding data rows...");
+		clusterView.setPBarMax(nRows);
 
 		for (int i = 0; i < nRows; i++) {
 
-			clusterView.updatePBar(i, rowPBar);
+			clusterView.updatePBar(i);
 
 			upper += nCols;
 
@@ -75,12 +74,13 @@ public class DataFormatter {
 		final int nRows = model.nGene();
 
 		// Setting up ProgressBar
-		clusterView.setPBarMax(nCols, colPBar);
+		clusterView.setLoadText("Finding data columns...");
+		clusterView.setPBarMax(nCols);
 
 		// Iterate through all columns
 		for (int j = 0; j < nCols; j++) {
 
-			clusterView.updatePBar(j, colPBar);
+			clusterView.updatePBar(j);
 
 			final List<Double> sArray = new ArrayList<Double>();
 
