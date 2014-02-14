@@ -66,7 +66,7 @@ public class MenuHelpPluginsFrame extends JDialog {
 
 	public MenuHelpPluginsFrame(final String string, final TreeViewFrame frame) {
 
-		super(frame, string, false);
+		super(frame.getAppFrame(), string, false);
 		final GridBagLayout gridbag = new GridBagLayout();
 		final GridBagConstraints c = new GridBagConstraints();
 		c.gridwidth = GridBagConstraints.REMAINDER;
@@ -120,6 +120,6 @@ public class MenuHelpPluginsFrame extends JDialog {
 		this.getContentPane().add(b_scan, c);
 		this.pack();
 		this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		setLocationRelativeTo(frame);
+		setLocationRelativeTo(frame.getAppFrame());
 	}
 }

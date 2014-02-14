@@ -39,7 +39,7 @@ public class AlignmentFactory extends PluginFactory {
 	 */
 	@Override
 	public MainPanel restorePlugin(final ConfigNode node,
-			final ViewFrame viewFrame) {
+			final TreeViewFrame viewFrame) {
 		if (node.getAttribute("headerName", null) == null) {
 			return null;
 		} else {
@@ -63,15 +63,16 @@ public class AlignmentFactory extends PluginFactory {
 	@Override
 	public boolean configurePlugin(final ConfigNode node,
 			final ViewFrame viewFrame) {
+		
 		if (viewFrame.getDataModel().getGeneHeaderInfo().getIndex("ALN") >= 0) {
 			node.setAttribute("headerName", "ALN", null);
 			return true;
+			
 		} else {
-			JOptionPane
-					.showMessageDialog(
-							viewFrame,
-							new JTextArea(
-									"Cannot find aligned sequence.\nPlease put aligned sequence in column titled \"ALN\"."));
+			JOptionPane.showMessageDialog(viewFrame.getAppFrame(),
+							new JTextArea("Cannot find aligned sequence.\n" +
+									"Please put aligned sequence in column " +
+									"titled \"ALN\"."));
 			return false;
 		}
 	}

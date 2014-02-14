@@ -11,15 +11,15 @@ import javax.swing.WindowConstants;
 
 import net.miginfocom.swing.MigLayout;
 
-public class ExitConfirmDialog extends JFrame {
-
-	private static final long serialVersionUID = 1L;
+public class ExitConfirmDialog {
+	
+	private JFrame exitFrame;
 
 	public ExitConfirmDialog(final ViewFrame view) {
 
-		super("Confirm Exit");
-		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		setResizable(false);
+		exitFrame = new JFrame("Confirm Exit");
+		exitFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		exitFrame.setResizable(false);
 
 		final JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new MigLayout());
@@ -36,15 +36,24 @@ public class ExitConfirmDialog extends JFrame {
 			@Override
 			public void actionPerformed(final ActionEvent arg0) {
 
-				view.dispose();
+				view.getAppFrame().dispose();
 			}
 		});
 
 		mainPanel.add(prompt, "push, alignx 50%, span, wrap");
 		mainPanel.add(ok, "alignx 50%");
 
-		getContentPane().add(mainPanel);
-		pack();
-		setLocationRelativeTo(view);
+		exitFrame.getContentPane().add(mainPanel);
+		exitFrame.pack();
+		exitFrame.setLocationRelativeTo(view.getAppFrame());
+	}
+	
+	/**
+	 * Sets the visibility of exitFrame;
+	 * @param visible
+	 */
+	public void setVisible(boolean visible) {
+		
+		exitFrame.setVisible(visible);
 	}
 }

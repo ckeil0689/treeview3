@@ -2,8 +2,6 @@ package edu.stanford.genetics.treeview;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
@@ -12,15 +10,12 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
-
-import Views.WelcomeView;
 
 import Cluster.ClusterViewController;
 import Cluster.ClusterViewFrame;
@@ -37,8 +32,10 @@ import edu.stanford.genetics.treeview.model.TVModel;
  */
 public class TVFrameController {
 
-	private TreeViewFrame tvFrame;
 	private TVModel model;
+	private TreeViewFrame tvFrame;
+	private JFrame applicationFrame;
+	
 	private SwingWorker<Void, Void> worker;
 	private File file;
 	private FileSet fileMenuSet;
@@ -46,11 +43,9 @@ public class TVFrameController {
 	
 	public TVFrameController(TreeViewFrame tvFrame, TVModel model) {
 		
-		this.tvFrame = tvFrame;
 		this.model = model;
-	
-//		tvFrame.addMenuActionListeners(new TVMenuListener());
-//		tvFrame.addFileMenuListeners(new FileMenuListener());
+		this.tvFrame = tvFrame;
+		this.applicationFrame = tvFrame.getAppFrame();
 		
 		addViewListeners();
 	}
@@ -134,6 +129,7 @@ public class TVFrameController {
 
 			if(tvFrame.getDataModel() != null) {
 				tvFrame.setView("DendroView");
+				tvFrame.setLoaded(true);
 				tvFrame.addMenuActionListeners(new TVMenuListener());
 				
 			} else {
@@ -238,6 +234,8 @@ public class TVFrameController {
 				
 				if(model.getDataMatrix().getNumRow() > 0) {
 					setDataModel(model);
+					tvFrame.setView("LoadCheckView");
+					addViewListeners();
 					
 				} else {
 					System.out.println("No datamatrix set by worker thread.");
@@ -305,7 +303,7 @@ public class TVFrameController {
 
 		} catch (final LoadException e) {
 			if (e.getType() != LoadException.INTPARSE) {
-				JOptionPane.showMessageDialog(tvFrame, e);
+				JOptionPane.showMessageDialog(applicationFrame, e);
 				throw e;
 			}
 		} catch (InterruptedException e) {
@@ -349,39 +347,6 @@ public class TVFrameController {
 		}
 
 		return fileSet1;
-	}
-
-	/**
-	 * To load any fileset without using the event queue thread
-	 */
-	public void loadNW(FileSet fileSet) throws LoadException {
-
-		loadFileSetNW(fileSet);
-
-		fileSet = tvFrame.getFileMRU().addUnique(fileSet);
-		tvFrame.getFileMRU().setLast(fileSet);
-		tvFrame.getFileMRU().notifyObservers();
-
-		tvFrame.setLoaded(true);
-	}
-
-	/**
-	 * To load any FileSet without using the event queue thread
-	 */
-	public void loadFileSetNW(final FileSet fileSet) throws LoadException {
-
-		model.setFrame(tvFrame);
-
-		try {
-			model.loadNewNW(fileSet);
-			setDataModel(model);
-			
-		} catch (final LoadException e) {
-			if (e.getType() != LoadException.INTPARSE) {
-				JOptionPane.showMessageDialog(tvFrame, e);
-				throw e;
-			}
-		}
 	}
 	
 	/**
@@ -431,7 +396,7 @@ public class TVFrameController {
 		// Creating the Controller for this view.
 		ClusterViewController clusControl = 
 				new ClusterViewController(clusterViewFrame.getClusterView(), 
-						tvFrame);
+						tvFrame, this);
 		
 		// Make the clustering window visible.
 		clusterViewFrame.setVisible(true);
@@ -456,8 +421,8 @@ public class TVFrameController {
 				tvFrame.getDataModel().addFileSetListener(tvFrame);
 			}
 	
-			tvFrame.setView("LoadCheckView");
-			addViewListeners();
+//			tvFrame.setView("LoadCheckView");
+//			addViewListeners();
 					
 			setupExtractors();
 			
@@ -481,7 +446,7 @@ public class TVFrameController {
 				def = source.getDir() + source.getRoot() + "_list.txt";
 			}
 		
-			final GeneListMaker t = new GeneListMaker(tvFrame,
+			final GeneListMaker t = new GeneListMaker(applicationFrame,
 					tvFrame.getGeneSelection(), tvFrame.getDataModel()
 							.getGeneHeaderInfo(), def);
 		
@@ -505,7 +470,7 @@ public class TVFrameController {
 		if (warnSelectionEmpty()) {
 			final FileSet source = tvFrame.getDataModel().getFileSet();
 
-			final GeneListMaker t = new GeneListMaker(tvFrame,
+			final GeneListMaker t = new GeneListMaker(applicationFrame,
 					tvFrame.getGeneSelection(), tvFrame.getDataModel()
 							.getGeneHeaderInfo(), source.getDir()
 							+ source.getRoot() + "_data.cdt");
@@ -536,7 +501,7 @@ public class TVFrameController {
 		if ((treeSelection == null)
 				|| (treeSelection.getNSelectedIndexes() <= 0)) {
 
-			JOptionPane.showMessageDialog(tvFrame,
+			JOptionPane.showMessageDialog(applicationFrame,
 					"Cannot generate gene list, no gene selected");
 			return false;
 		}
@@ -597,7 +562,7 @@ public class TVFrameController {
 	public void saveModelAs() {
 		
 		if (tvFrame.getDataModel().getFileSet() == null) {
-			JOptionPane.showMessageDialog(tvFrame,
+			JOptionPane.showMessageDialog(applicationFrame,
 					"Saving of datamodels not backed by "
 							+ "files is not yet supported.");
 	
@@ -616,7 +581,7 @@ public class TVFrameController {
 			}
 	
 			final int retVal = fileDialog
-					.showSaveDialog(tvFrame);
+					.showSaveDialog(applicationFrame);
 	
 			if (retVal == JFileChooser.APPROVE_OPTION) {
 				final File chosen = fileDialog
@@ -707,5 +672,14 @@ public class TVFrameController {
 //			};
 //			SwingUtilities.invokeLater(update);
 		}
+	}
+	
+	/**
+	 * Returns TVFrameController's model.
+	 * @return
+	 */
+	public TVModel getTVControllerModel() {
+		
+		return model;
 	}
 }

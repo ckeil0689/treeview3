@@ -31,11 +31,11 @@ import edu.stanford.genetics.treeview.core.HeaderFinder;
  */
 public class TestViewFrame extends ViewFrame {
 
-	private static final long serialVersionUID = 1L;
-
 	TestViewFrame() {
+		
 		super("Test Export Panel");
-		getContentPane().add(new JLabel("test        test"));
+		super.getAppFrame().getContentPane().add(
+				new JLabel("test        test"));
 	}
 
 	@Override
@@ -115,15 +115,15 @@ public class TestViewFrame extends ViewFrame {
 
 	}
 
-	@Override
-	public MainPanel[] getMainPanelsByName(final String name) {
-		return null;
-	}
-
-	@Override
-	public MainPanel[] getMainPanels() {
-		return null;
-	}
+//	@Override
+//	public MainPanel[] getMainPanelsByName(final String name) {
+//		return null;
+//	}
+//
+//	@Override
+//	public MainPanel[] getMainPanels() {
+//		return null;
+//	}
 
 	@Override
 	public void setView(String name) {

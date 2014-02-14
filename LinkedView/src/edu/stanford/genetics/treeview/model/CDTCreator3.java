@@ -30,7 +30,6 @@ import Cluster.ClusterFileWriter2;
  */
 public class CDTCreator3 {
 
-	private TreeViewFrame tvFrame;
 	private LoadProgressView loadProgView;
 	private BufferedReader reader = null;
 	private BufferedReader customReader = null;
@@ -91,7 +90,6 @@ public class CDTCreator3 {
 		this.file = file;
 		this.customFile = file2;
 		this.fileType = fileType;
-		this.tvFrame = tvFrame;
 		this.loadProgView = tvFrame.getLoadProgView();
 	}
 
@@ -293,7 +291,7 @@ public class CDTCreator3 {
 		rowElement.add("EWEIGHT");
 
 		// start at 1 because EWEIGHT takes position 0
-		for (int i = eweightCol; i < dataCol; i++) {
+		for (int i = eweightCol + 1; i < dataCol; i++) {
 
 			rowElement.add("");
 		}

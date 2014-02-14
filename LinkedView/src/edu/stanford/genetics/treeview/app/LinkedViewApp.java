@@ -30,16 +30,13 @@ import javax.swing.JOptionPane;
 
 import edu.stanford.genetics.treeview.ExportException;
 import edu.stanford.genetics.treeview.FileSet;
-import edu.stanford.genetics.treeview.LinkedViewFrame;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.MainPanel;
 import edu.stanford.genetics.treeview.MainProgramArgs;
 import edu.stanford.genetics.treeview.TVFrameController;
 import edu.stanford.genetics.treeview.TreeViewApp;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.Util;
-import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.XmlConfig;
 import edu.stanford.genetics.treeview.core.PluginManager;
 import edu.stanford.genetics.treeview.model.TVModel;
@@ -134,13 +131,13 @@ public class LinkedViewApp extends TreeViewApp {
 
 	/* inherit description */
 	@Override
-	public ViewFrame openNew() {
+	public TreeViewFrame openNew() {
 
 		// setup toplevel
 //		final LinkedViewFrame tvFrame = new LinkedViewFrame(this);
-		final TreeViewFrame tvFrame = new TreeViewFrame(this);
-		tvFrame.addWindowListener(this);
 		final TVModel model = new TVModel();
+		final TreeViewFrame tvFrame = new TreeViewFrame(this);
+//		tvFrame.addWindowListener(this);
 		final TVFrameController tvController = new TVFrameController(tvFrame, 
 				model);
 		
@@ -149,7 +146,7 @@ public class LinkedViewApp extends TreeViewApp {
 
 	/* inherit description */
 	@Override
-	public ViewFrame openNew(final FileSet fileSet) throws LoadException {
+	public TreeViewFrame openNew(final FileSet fileSet) throws LoadException {
 
 		// setup toplevel
 //		final LinkedViewFrame tvFrame = new LinkedViewFrame(this);
@@ -163,38 +160,11 @@ public class LinkedViewApp extends TreeViewApp {
 			tvFrame.setLoaded(true);
 
 		} catch (final LoadException e) {
-			tvFrame.dispose();
+			tvFrame.getAppFrame().dispose();
 			throw e;
 		}
 
-		tvFrame.addWindowListener(this);
-		return tvFrame;
-	}
-
-	/**
-	 * same as above, but doesn't open a loading window (damn deadlocks!)
-	 */
-	@Override
-	public ViewFrame openNewNW(final FileSet fileSet) throws LoadException {
-
-		// setup toplevel
-//		final LinkedViewFrame tvFrame = new LinkedViewFrame(this);
-		final TreeViewFrame tvFrame = new TreeViewFrame(this);
-		final TVModel model = new TVModel();
-		final TVFrameController tvController = new TVFrameController(tvFrame, 
-				model);
-		
-		if (fileSet != null) {
-			try {
-				tvController.loadFileSetNW(fileSet);
-				tvFrame.setLoaded(true);
-
-			} catch (final LoadException e) {
-				tvFrame.dispose();
-				throw e;
-			}
-		}
-		tvFrame.addWindowListener(this);
+//		tvFrame.addWindowListener(this);
 		return tvFrame;
 	}
 
@@ -224,9 +194,10 @@ public class LinkedViewApp extends TreeViewApp {
 			fileSet.setStyle(frameType);
 
 			try {
-				final ViewFrame tvFrame = openNewNW(fileSet);
-				tvFrame.setVisible(true);
-				// tvFrame.loadNW(fileSet);
+				System.out.println("StandardStartup LOAD attempted.");
+				final TreeViewFrame tvFrame = openNew(fileSet);
+//				tvFrame.setVisible(true);
+//				tvFrame.load(fileSet);
 				if (exportType != null) {
 					try {
 						attemptExport(exportType, tvFrame);
@@ -235,7 +206,7 @@ public class LinkedViewApp extends TreeViewApp {
 						System.err.println(e.getMessage());
 						e.printStackTrace(System.err);
 					}
-					tvFrame.setVisible(false);
+					tvFrame.getAppFrame().setVisible(false);
 					endProgram();
 					return;
 				}
@@ -244,7 +215,7 @@ public class LinkedViewApp extends TreeViewApp {
 			}
 		} else {
 			if (args.getExportType() == null) {
-				openNew().setVisible(true);
+				openNew().getAppFrame().setVisible(true);
 			} else {
 				System.err.println("Must specify file/url to load "
 						+ "(using -r) when specifying export with -x");
@@ -253,14 +224,18 @@ public class LinkedViewApp extends TreeViewApp {
 	}
 
 	private boolean attemptExport(final String exportType,
-			final ViewFrame tvFrame) throws ExportException {
+			final TreeViewFrame tvFrame) throws ExportException {
 
-		for (final MainPanel mainPanel : tvFrame.getMainPanels()) {
-			if (exportType.equalsIgnoreCase(mainPanel.getName())) {
-				mainPanel.export(args);
+//		for (final MainPanel mainPanel : tvFrame.getMainPanels()) {
+//			if (exportType.equalsIgnoreCase(mainPanel.getName())) {
+//				mainPanel.export(args);
+//				return true;
+//			}
+			if (exportType.equalsIgnoreCase(tvFrame.getRunning().getName())) {
+				tvFrame.getRunning().export(args);
 				return true;
 			}
-		}
+//		}
 		System.err.println("Error exporting, could not find plugin of type "
 				+ exportType);
 		return false;
@@ -281,7 +256,7 @@ public class LinkedViewApp extends TreeViewApp {
 
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
         System.setProperty("com.apple.mrj.application.apple.menu.about.name", 
-        		"TreeView3");
+        		"TreeView 3");
         
 		final LinkedViewApp statView = new LinkedViewApp();
 		// statView.dealWithRegistration();
@@ -362,7 +337,7 @@ public class LinkedViewApp extends TreeViewApp {
 		if (getGlobalConfig() != null) {
 			getGlobalConfig().store();
 		}
-		closeAllWindows();
+//		closeAllWindows();
 		System.exit(0);
 	}
 }

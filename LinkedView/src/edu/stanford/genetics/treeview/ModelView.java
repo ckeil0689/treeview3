@@ -33,6 +33,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
@@ -48,6 +49,7 @@ public abstract class ModelView extends JPanel implements java.util.Observer,
 	private static final long serialVersionUID = 1L;
 
 	protected ViewFrame viewFrame = null;
+	protected JFrame applicationFrame = null;
 	protected MessagePanel status = null;
 	protected boolean hasMouse = false;
 
@@ -66,7 +68,6 @@ public abstract class ModelView extends JPanel implements java.util.Observer,
 	protected ModelView() {
 
 		super(false);
-		//setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 		setBackground(GUIParams.BG_COLOR);
 	}
 
@@ -81,6 +82,7 @@ public abstract class ModelView extends JPanel implements java.util.Observer,
 	public void setViewFrame(final ViewFrame m) {
 
 		viewFrame = m;
+		applicationFrame = m.getAppFrame();
 	}
 
 	public ViewFrame getViewFrame() {

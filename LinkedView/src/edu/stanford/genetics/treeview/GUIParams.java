@@ -48,7 +48,7 @@ public class GUIParams {
 		LIGHTGRAY = new Color(140, 140, 140, 255);
 		DARKGRAY = new Color(180, 180, 180, 255);
 		TEXT = new Color(20, 20, 20, 255);
-		MAIN = new Color(4, 118, 189, 255);
+		MAIN = new Color(30, 144, 255, 255);
 		BORDERS = new Color(100, 100, 100, 255);
 		ELEMENT_HOV = new Color(122, 214, 255, 255);
 		BG_COLOR = new Color(254, 254, 254, 255);

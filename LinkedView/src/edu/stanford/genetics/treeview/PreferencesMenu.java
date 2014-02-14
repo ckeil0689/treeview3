@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -15,7 +14,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import edu.stanford.genetics.treeview.model.CDTCreator3;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
@@ -25,11 +23,13 @@ import edu.stanford.genetics.treeview.plugin.dendroview.PixelSettingsSelector;
 
 import net.miginfocom.swing.MigLayout;
 
-public class PreferencesMenu extends JFrame {
-
-	private static final long serialVersionUID = 1L;
+public class PreferencesMenu {
 	
-	private TreeViewFrame viewFrame;
+	private TreeViewFrame tvFrame;
+	private JFrame applicationFrame;
+	private JFrame menuFrame;
+	
+	private JPanel basisPanel;
 	private JPanel leftPanel;
 	private DendroView dendroView;
 	private JButton ok_button;
@@ -45,18 +45,28 @@ public class PreferencesMenu extends JFrame {
 	 * Chained constructor in case DendroView isn't available
 	 * @param viewFrame
 	 */
-	public PreferencesMenu(TreeViewFrame viewFrame, String menuTitle) {
+	public PreferencesMenu(TreeViewFrame tvFrame, String menuTitle) {
 		
-		this(viewFrame, null, menuTitle);
+		this(tvFrame, null, menuTitle);
 	}
 	
-	public PreferencesMenu(TreeViewFrame viewFrame, DendroView dendroView, 
+	/**
+	 * Main constructor for Preferences Menu
+	 * @param tvFrame
+	 * @param dendroView
+	 * @param menuTitle
+	 */
+	public PreferencesMenu(TreeViewFrame tvFrame, DendroView dendroView, 
 			String menuTitle) {
 		
-		super("Preferences");
-		
-		this.viewFrame = viewFrame;
+		this.tvFrame = tvFrame;
+		this.applicationFrame = tvFrame.getAppFrame();
 		this.dendroView = dendroView;
+		
+		menuFrame = new JFrame("Preferences");
+		
+		basisPanel = new JPanel();
+		basisPanel.setLayout(new MigLayout());
 		
 		// Setting preferred size for the ContentPane of this frame
 		final Dimension mainDim = GUIParams.getScreenSize();
@@ -69,25 +79,36 @@ public class PreferencesMenu extends JFrame {
 		
 		int height = mainDim.height * 3/4;
 		
-		getContentPane().setPreferredSize(new Dimension(width, height));
+		basisPanel.setPreferredSize(
+				new Dimension(width, height));
 		
-		setLayout(new MigLayout());
 		
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		menuFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
-		this.addWindowListener(new WindowAdapter() {
+		menuFrame.addWindowListener(new WindowAdapter() {
 			
 			@Override
 			public void windowClosing(final WindowEvent we) {
 				
-				PreferencesMenu.this.dispose();
+				menuFrame.dispose();
 			}
 		});
 		
 		setupLayout(menuTitle);
 		
-		pack();
-		setLocationRelativeTo(viewFrame);
+		menuFrame.getContentPane().add(basisPanel);
+		
+		menuFrame.pack();
+		menuFrame.setLocationRelativeTo(applicationFrame);
+	}
+	
+	/**
+	 * Returns the menu frame holding all the JPanels to display to the user.
+	 * @return
+	 */
+	public JFrame getPreferencesFrame() {
+		
+		return menuFrame;
 	}
 	
 	/**
@@ -95,7 +116,7 @@ public class PreferencesMenu extends JFrame {
 	 */
 	public void setupLayout(String startMenu) {
 		
-		getContentPane().removeAll();
+		menuFrame.getContentPane().removeAll();
 		
 		ok_button = GUIParams.setButtonLayout("OK", null);
 		ok_button.addActionListener(new ActionListener() {
@@ -103,7 +124,7 @@ public class PreferencesMenu extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				
-				PreferencesMenu.this.dispose();
+				menuFrame.dispose();
 			}
 			
 		});
@@ -117,32 +138,34 @@ public class PreferencesMenu extends JFrame {
 		
 		setupMenuHeaders();
 		
-		getContentPane().add(leftPanel, "pushy, aligny 0%, w 20%, h 75%");
+		basisPanel.add(leftPanel, "pushy, aligny 0%, w 20%, " +
+				"h 75%");
 		
 		if(startMenu.equalsIgnoreCase("Theme") && themeSettings != null) {
-			getContentPane().add(themeSettings, "w 79%, h 95%, wrap");
+			basisPanel.add(themeSettings, "w 79%, h 95%, wrap");
 		
 		} else if(startMenu.equalsIgnoreCase("Fonts") 
 				&& fontSettings != null) {
-			getContentPane().add(fontSettings, "w 79%, h 95%, wrap");
+			basisPanel.add(fontSettings, "w 79%, h 95%, wrap");
 			
 		} else if(startMenu.equalsIgnoreCase("URL") 
 				&& urlSettings != null) {
-			getContentPane().add(urlSettings, "w 79%, h 95%, wrap");
+			basisPanel.add(urlSettings, "w 79%, h 95%, wrap");
 		
 		} else if(startMenu.equalsIgnoreCase("Row and Column Labels") 
 				&& annotationSettings != null) {
-			getContentPane().add(annotationSettings, "w 79%, h 95%, wrap");
+			basisPanel.add(annotationSettings, "w 79%, " +
+					"h 95%, wrap");
 			
 		} else if(startMenu.equalsIgnoreCase("Color Settings") 
 				&& pixelSettings != null) {
-			getContentPane().add(pixelSettings, "w 79%, h 95%, wrap");
+			basisPanel.add(pixelSettings, "w 79%, h 95%, wrap");
 		}
 		
-		getContentPane().add(ok_button, "pushx, alignx 100%, span");
+		basisPanel.add(ok_button, "pushx, alignx 100%, span");
 		
-		validate();
-		repaint();
+		menuFrame.validate();
+		menuFrame.repaint();
 	}
 	
 	public void setupMenuHeaders() {
@@ -252,12 +275,12 @@ public class PreferencesMenu extends JFrame {
 			panel.setBackground(GUIParams.BG_COLOR);
 			
 			final UrlSettingsPanel genePanel = new UrlSettingsPanel(
-					viewFrame.getUrlExtractor(), 
-					viewFrame.getGeneUrlPresets());
+					tvFrame.getUrlExtractor(), 
+					tvFrame.getGeneUrlPresets());
 
 			final UrlSettingsPanel arrayPanel = new UrlSettingsPanel(
-					viewFrame.getArrayUrlExtractor(), 
-					viewFrame.getArrayUrlPresets());
+					tvFrame.getArrayUrlExtractor(), 
+					tvFrame.getArrayUrlPresets());
 			
 			panel.add(genePanel, "pushx, alignx 50%, w 95%, wrap");
 			panel.add(arrayPanel, "pushx, alignx 50%, w 95%");
@@ -335,23 +358,23 @@ public class PreferencesMenu extends JFrame {
 			
 			PreferencesMenu.this.setupLayout("Theme");
 			
-			if (viewFrame.getDataModel() != null 
-					&& viewFrame.getRunning() != null) {
-				if(viewFrame.getConfirmPanel() != null) {
-					viewFrame.setView("LoadCheckView");
+			if (tvFrame.getDataModel() != null 
+					&& tvFrame.getRunning() != null) {
+				if(tvFrame.getConfirmPanel() != null) {
+					tvFrame.setView("LoadCheckView");
 				}
-				viewFrame.setLoaded(false);
-				viewFrame.setView("DendroView");
+				tvFrame.setLoaded(false);
+				tvFrame.setView("DendroView");
 
-			} else if (viewFrame.getDataModel() != null 
-					&& viewFrame.getRunning() == null) {
-				viewFrame.setView("LoadCheckView");
+			} else if (tvFrame.getDataModel() != null 
+					&& tvFrame.getRunning() == null) {
+				tvFrame.setView("LoadCheckView");
 
 			} else {
-				viewFrame.setView("WelcomeView");
+				tvFrame.setView("WelcomeView");
 			}
 			
-			PreferencesMenu.this.dispose();
+			menuFrame.dispose();
 		}
 	}
 	
@@ -373,20 +396,20 @@ public class PreferencesMenu extends JFrame {
 			panel.setBackground(GUIParams.BG_COLOR);
 			
 			final HeaderSummaryPanel genePanel = new HeaderSummaryPanel(
-					viewFrame.getDataModel().getGeneHeaderInfo(), 
-					dendroView.getTextview().getHeaderSummary(), viewFrame);
+					tvFrame.getDataModel().getGeneHeaderInfo(), 
+					dendroView.getTextview().getHeaderSummary(), tvFrame);
 
 			final HeaderSummaryPanel arrayPanel = new HeaderSummaryPanel(
 					dendroView.getArraynameview().getHeaderInfo(), 
-					dendroView.getArraynameview().getHeaderSummary(), viewFrame);
+					dendroView.getArraynameview().getHeaderSummary(), tvFrame);
 
 			final HeaderSummaryPanel atrPanel = new HeaderSummaryPanel(
-					viewFrame.getDataModel().getAtrHeaderInfo(), 
-					dendroView.getAtrview().getHeaderSummary(), viewFrame);
+					tvFrame.getDataModel().getAtrHeaderInfo(), 
+					dendroView.getAtrview().getHeaderSummary(), tvFrame);
 
 			final HeaderSummaryPanel gtrPanel = new HeaderSummaryPanel(
-					viewFrame.getDataModel().getGtrHeaderInfo(), 
-					dendroView.getGtrview().getHeaderSummary(), viewFrame);
+					tvFrame.getDataModel().getGtrHeaderInfo(), 
+					dendroView.getGtrview().getHeaderSummary(), tvFrame);
 			
 			final JButton custom_button = GUIParams.setButtonLayout(
 					"Use Custom Labels", null);
@@ -396,12 +419,12 @@ public class PreferencesMenu extends JFrame {
 				public void actionPerformed(ActionEvent arg0) {
 					
 					File customFile;
-					FileSet loadedSet = viewFrame.getDataModel().getFileSet();
+					FileSet loadedSet = tvFrame.getDataModel().getFileSet();
 					File file = new File(loadedSet.getDir() 
 							+ loadedSet.getRoot() + loadedSet.getExt());
 					
 					try {
-						customFile = viewFrame.selectFile();
+						customFile = tvFrame.selectFile();
 						
 						final String fileName = file.getAbsolutePath();
 						final int dotIndex = fileName.indexOf(".");
@@ -415,7 +438,7 @@ public class PreferencesMenu extends JFrame {
 						// Next: read file, return string arrays with new names
 						// Then: update currently loaded model.
 						
-						PreferencesMenu.this.dispose();
+						menuFrame.dispose();
 						
 					} catch (LoadException e) {
 						e.printStackTrace();
@@ -453,26 +476,26 @@ public class PreferencesMenu extends JFrame {
 	 */
 	public void addMenu(String title) {
 		
-		getContentPane().removeAll();
+		basisPanel.removeAll();
 		
-		getContentPane().add(leftPanel, "pushy, aligny 0%, w 20%, h 75%");
+		basisPanel.add(leftPanel, "pushy, aligny 0%, w 20%, h 75%");
 		
 		if(title.equalsIgnoreCase("Theme") && themeSettings != null) {
-			getContentPane().add(themeSettings, "w 79%, h 95%, wrap");
+			basisPanel.add(themeSettings, "w 79%, h 95%, wrap");
 			
 		} else if(title.equalsIgnoreCase("Annotations") 
 				&& annotationSettings != null) {
-			getContentPane().add(annotationSettings, "w 79%, h 95%, wrap");
+			basisPanel.add(annotationSettings, "w 79%, h 95%, wrap");
 			
 		} else if(title.equalsIgnoreCase("Font") && fontSettings != null) {
-			getContentPane().add(fontSettings, "w 79%, h 95%, wrap");
+			basisPanel.add(fontSettings, "w 79%, h 95%, wrap");
 		
 		} else if(title.equalsIgnoreCase("Color Settings") 
 				&& pixelSettings != null) {
-			getContentPane().add(pixelSettings, "w 79%, h 95%, wrap");
+			basisPanel.add(pixelSettings, "w 79%, h 95%, wrap");
 		
 		} else if(title.equalsIgnoreCase("URL") && urlSettings != null) {
-			getContentPane().add(pixelSettings, "w 79%, h 95%, wrap");
+			basisPanel.add(pixelSettings, "w 79%, h 95%, wrap");
 		
 		} else {
 			//In case menu cannot be loaded, display excuse.
@@ -486,12 +509,12 @@ public class PreferencesMenu extends JFrame {
 			hint.setForeground(GUIParams.TEXT);
 			panel.add(hint, "push, alignx 50%");
 			
-			getContentPane().add(panel, "w 79%, h 95%, wrap");
+			basisPanel.add(panel, "w 79%, h 95%, wrap");
 		}
 		
-		getContentPane().add(ok_button, "pushx, alignx 100%, span");
+		basisPanel.add(ok_button, "pushx, alignx 100%, span");
 		
-		validate();
-		repaint();
+		menuFrame.validate();
+		menuFrame.repaint();
 	}
 }

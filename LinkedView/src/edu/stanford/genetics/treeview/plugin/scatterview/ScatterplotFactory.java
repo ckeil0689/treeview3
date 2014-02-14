@@ -20,11 +20,11 @@ import javax.swing.JPanel;
 import edu.stanford.genetics.treeview.ConfigNode;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.HeaderInfo;
-import edu.stanford.genetics.treeview.LinkedViewFrame;
 import edu.stanford.genetics.treeview.MainPanel;
 import edu.stanford.genetics.treeview.PluginFactory;
 import edu.stanford.genetics.treeview.SettingsPanelHolder;
 import edu.stanford.genetics.treeview.TabbedSettingsPanel;
+import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.TreeviewMenuBarI;
 import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.core.PluginManager;
@@ -34,6 +34,7 @@ import edu.stanford.genetics.treeview.core.PluginManager;
  * 
  */
 public class ScatterplotFactory extends PluginFactory {
+	
 	private static ScatterColorPresets colorPresets = new ScatterColorPresets();
 	private ScatterColorPresetEditor cpresetEditor = null;
 	private JFrame cpresetFrame = null;
@@ -61,9 +62,8 @@ public class ScatterplotFactory extends PluginFactory {
 	 */
 	@Override
 	public MainPanel restorePlugin(final ConfigNode node,
-			final ViewFrame viewFrame) {
-		final ScatterPanel gsp = new ScatterPanel((LinkedViewFrame) viewFrame,
-				node);
+			final TreeViewFrame viewFrame) {
+		final ScatterPanel gsp = new ScatterPanel(viewFrame, node);
 		gsp.setSelection(viewFrame.getGeneSelection());
 		gsp.setName(getPluginName());
 		return gsp;
@@ -105,23 +105,24 @@ public class ScatterplotFactory extends PluginFactory {
 	public void addPluginConfig(final TreeviewMenuBarI globalMenu,
 			final ViewFrame frame) {
 		super.addPluginConfig(globalMenu, frame);
-		globalMenu.addMenuItem("Scatterplot Color...", new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent actionEvent) {
-				if (cpresetFrame == null) {
-					setupPresetsFrame(frame.getApp().getGlobalConfig()
-							.getRoot());
-				}
-				tabbedPanel.setSelectedComponent(cpresetEditor);
-				cpresetFrame.setVisible(true);
-			}
-		});
+		globalMenu.addMenuItem("Scatterplot Color...");
+//		, new ActionListener() {
+//			@Override
+//			public void actionPerformed(final ActionEvent actionEvent) {
+//				if (cpresetFrame == null) {
+//					setupPresetsFrame(frame.getApp().getGlobalConfig()
+//							.getRoot());
+//				}
+//				tabbedPanel.setSelectedComponent(cpresetEditor);
+//				cpresetFrame.setVisible(true);
+//			}
+//		});
 		globalMenu.setMnemonic(KeyEvent.VK_S);
 	}
 
 	/**
 	 * 
-	 * @param frame
+	 * @param tvFrame
 	 *            ViewFrame that contains relevant global config node
 	 */
 	private void setupPresetsFrame(final ConfigNode node) {

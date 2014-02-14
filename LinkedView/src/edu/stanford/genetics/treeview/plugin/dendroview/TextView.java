@@ -151,7 +151,7 @@ public class TextView extends ModelView implements FontSelectable, KeyListener,
 
 				final FontSelector fontSelector = new FontSelector(
 						TextView.this, "Select Fonts for Gene Info");
-				fontSelector.showDialog(viewFrame);
+				fontSelector.showDialog(applicationFrame);
 			}
 		});
 

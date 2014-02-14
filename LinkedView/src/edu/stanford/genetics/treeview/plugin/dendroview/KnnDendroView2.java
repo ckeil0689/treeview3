@@ -32,6 +32,7 @@ import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.MainPanel;
 import edu.stanford.genetics.treeview.MessagePanel;
+import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.model.KnnModel;
 
@@ -49,8 +50,6 @@ import edu.stanford.genetics.treeview.model.KnnModel;
 public class KnnDendroView2 extends DendroView implements
 		ConfigNodePersistent, MainPanel, Observer {
 
-	private static final long serialVersionUID = 1L;
-
 	/**
 	 * Constructor for the KnnDendroView object
 	 * 
@@ -59,15 +58,14 @@ public class KnnDendroView2 extends DendroView implements
 	 * @param vFrame
 	 *            parent ViewFrame of KnnDendroView
 	 */
-	public KnnDendroView2(final KnnModel tVModel, final ViewFrame vFrame) {
+	public KnnDendroView2(final TreeViewFrame vFrame) {
 
-		super(tVModel, vFrame);
+		super(null, vFrame);
 	}
 
-	public KnnDendroView2(final DataModel tVModel, final ConfigNode root,
-			final ViewFrame vFrame) {
+	public KnnDendroView2(final ConfigNode root, final TreeViewFrame vFrame) {
 
-		super(tVModel, root, vFrame, "KnnDendrogram");
+		super(root, vFrame, "KnnDendrogram");
 	}
 
 	/**
@@ -144,7 +142,7 @@ public class KnnDendroView2 extends DendroView implements
 //		arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
 
 		textview = new TextViewManager(getDataModel().getGeneHeaderInfo(),
-				viewFrame.getUrlExtractor(), getDataModel());
+				tvFrame.getUrlExtractor(), getDataModel());
 		// textview.setMap(getZoomYmap());
 
 		doDoubleLayout();

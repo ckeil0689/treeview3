@@ -5,17 +5,13 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-
-import javax.swing.JFrame;
 
 import edu.stanford.genetics.treeview.ConfigNode;
 import edu.stanford.genetics.treeview.MainPanel;
 import edu.stanford.genetics.treeview.PluginFactory;
 import edu.stanford.genetics.treeview.SettingsPanel;
-import edu.stanford.genetics.treeview.SettingsPanelHolder;
+import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.TreeviewMenuBarI;
 import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.core.PluginManager;
@@ -30,7 +26,7 @@ public class DendrogramFactory extends PluginFactory {
 	// presets must be set before static initializer.
 	private static ColorPresets colorPresets = new ColorPresets();
 	private final ColorPresetEditor cpresetEditor;
-	private JFrame cpresetFrame = null;
+//	private JFrame cpresetFrame = null;
 
 	static {
 		PluginManager.registerPlugin(new DendrogramFactory());
@@ -61,10 +57,9 @@ public class DendrogramFactory extends PluginFactory {
 	 */
 	@Override
 	public MainPanel restorePlugin(final ConfigNode node,
-			final ViewFrame viewFrame) {
+			final TreeViewFrame viewFrame) {
 
-		final DendroView dendroView = new DendroView(
-				viewFrame.getDataModel(), node, viewFrame);
+		final DendroView dendroView = new DendroView(node, viewFrame);
 		dendroView.setName("Dendrogram");
 		return dendroView;
 	}

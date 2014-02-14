@@ -30,14 +30,13 @@ package edu.stanford.genetics.treeview.model;
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
 
-import java.awt.Frame;
 import java.awt.MenuItem;
-import java.util.ArrayList;
 
 import edu.stanford.genetics.treeview.ConfigNode;
 import edu.stanford.genetics.treeview.DummyConfigNode;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LoadException;
+import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.XmlConfig;
 
 public class AtrTVModel extends TVModel {
@@ -79,11 +78,11 @@ public class AtrTVModel extends TVModel {
 	}
 
 	@Override
-	public void setFrame(final Frame f) {
+	public void setFrame(final TreeViewFrame f) {
 	}
 
 	@Override
-	public Frame getFrame() {
+	public TreeViewFrame getFrame() {
 		return null;
 	}
 

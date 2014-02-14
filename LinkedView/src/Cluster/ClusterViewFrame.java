@@ -16,42 +16,50 @@ import edu.stanford.genetics.treeview.TreeViewFrame;
  * @author CKeil
  *
  */
-public class ClusterViewFrame extends JFrame {
+public class ClusterViewFrame {
 	
-	private static final long serialVersionUID = 1L;
-	
+	private JFrame clusterFrame;
 	private ClusterView clusterView;
 
 	public ClusterViewFrame(TreeViewFrame tvFrame) {
 		
-		super("Hierarchical Clustering");
+		clusterFrame = new JFrame("Hierarchical Clustering");
 		
 		clusterView = new ClusterView(tvFrame);
 		
 		// Setting preferred size for the ContentPane of this frame
 		final Dimension mainDim = GUIParams.getScreenSize();
-		getContentPane().setPreferredSize(new Dimension(mainDim.width * 1/2, 
-				mainDim.height * 3/4));
+		clusterFrame.getContentPane().setPreferredSize(
+				new Dimension(mainDim.width * 1/2, mainDim.height * 3/4));
 		
-		setMinimumSize(new Dimension(800, 600));
+		clusterFrame.setMinimumSize(new Dimension(800, 600));
 
 		// setup frame options
-		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		clusterFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
 		// Makes the frame invisible when the window is closed
-		this.addWindowListener(new WindowAdapter() {
+		clusterFrame.addWindowListener(new WindowAdapter() {
 			
 			@Override
 			public void windowClosing(final WindowEvent we) {
 				
-				ClusterViewFrame.this.dispose();
+				clusterFrame.dispose();
 			}
 		});
 		
-		getContentPane().add(clusterView);
+		clusterFrame.getContentPane().add(clusterView);
 		
-		pack();	
-		setLocationRelativeTo(tvFrame);
+		clusterFrame.pack();	
+		clusterFrame.setLocationRelativeTo(tvFrame.getAppFrame());
+	}
+	
+	/**
+	 * Sets the visibility of clusterFrame.
+	 * @param visible
+	 */
+	public void setVisible(boolean visible) {
+		
+		clusterFrame.setVisible(visible);
 	}
 	
 	/**

@@ -10,11 +10,10 @@ import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
 
-public class StatsPanel extends JFrame {
-
-	private static final long serialVersionUID = 1L;
+public class StatsPanel {
 
 	private TreeViewFrame viewFrame;
+	private JFrame statsFrame;
 	
 	/**
 	 * Constructor
@@ -22,31 +21,32 @@ public class StatsPanel extends JFrame {
 	 */
 	public StatsPanel(TreeViewFrame viewFrame) {
 		
-		super("Stats");
+		statsFrame = new JFrame("Stats");
 		
 		this.viewFrame = viewFrame;
 		
-		setResizable(false);
+		statsFrame.setResizable(false);
 		
 		final Dimension mainDim = GUIParams.getScreenSize();
 		
-		getContentPane().setSize(mainDim.width * 1/2, mainDim.height * 1/2);
+		statsFrame.getContentPane().setSize(mainDim.width * 1/2, 
+				mainDim.height * 1/2);
 		
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		statsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
-		this.addWindowListener(new WindowAdapter() {
+		statsFrame.addWindowListener(new WindowAdapter() {
 			
 			@Override
 			public void windowClosing(final WindowEvent we) {
 				
-				StatsPanel.this.dispose();
+				statsFrame.dispose();
 			}
 		});
 		
 		setupLayout();
 		
-		pack();
-		setLocationRelativeTo(viewFrame);
+		statsFrame.pack();
+		statsFrame.setLocationRelativeTo(viewFrame.getAppFrame());
 	}
 	
 	/**
@@ -100,7 +100,15 @@ public class StatsPanel extends JFrame {
 			mainPanel.add(nLoad, "push, alignx 50%");
 		}
 		
-		getContentPane().add(mainPanel);
+		statsFrame.getContentPane().add(mainPanel);
+	}
+	
+	/**
+	 * Sets the visibility of statsFrame.
+	 * @param visible
+	 */
+	public void setVisible(boolean visible) {
 		
+		statsFrame.setVisible(true);
 	}
 }

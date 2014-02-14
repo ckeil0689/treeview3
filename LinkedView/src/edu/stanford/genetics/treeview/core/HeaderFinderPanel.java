@@ -23,13 +23,13 @@
 package edu.stanford.genetics.treeview.core;
 
 // for summary view...
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
@@ -71,11 +71,11 @@ public abstract class HeaderFinderPanel extends JPanel {
 	public HeaderFinderPanel(final ViewFrame f, final HeaderInfo hI,
 			final TreeSelectionI geneSelection, final String type) {
 
-		this((Frame) f, hI, geneSelection, type);
+		this(f.getAppFrame(), hI, geneSelection, type);
 		this.viewFrame = f;
 	}
 
-	private HeaderFinderPanel(final Frame f, final HeaderInfo hI,
+	private HeaderFinderPanel(final JFrame f, final HeaderInfo hI,
 			final TreeSelectionI geneSelection, final String type) {
 
 		super();

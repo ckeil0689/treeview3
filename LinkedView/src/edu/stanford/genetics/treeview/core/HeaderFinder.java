@@ -24,7 +24,6 @@ package edu.stanford.genetics.treeview.core;
 
 // for summary view...
 import java.awt.BorderLayout;
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -36,6 +35,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -80,11 +80,11 @@ public abstract class HeaderFinder extends JDialog {
 	protected HeaderFinder(final ViewFrame f, final HeaderInfo hI,
 			final TreeSelectionI geneSelection, final String title) {
 
-		this((Frame) f, hI, geneSelection, title);
+		this(f.getAppFrame(), hI, geneSelection, title);
 		this.viewFrame = f;
 	}
 
-	private HeaderFinder(final Frame f, final HeaderInfo hI,
+	private HeaderFinder(final JFrame f, final HeaderInfo hI,
 			final TreeSelectionI geneSelection, final String title) {
 
 		super(f, title);

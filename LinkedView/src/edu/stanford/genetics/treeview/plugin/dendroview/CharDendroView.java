@@ -37,6 +37,7 @@ import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.MessagePanel;
 import edu.stanford.genetics.treeview.TreeSelection;
+import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.ViewFrame;
 
 /**
@@ -54,8 +55,6 @@ import edu.stanford.genetics.treeview.ViewFrame;
  */
 public class CharDendroView extends DendroView {
 
-	private static final long serialVersionUID = 1L;
-
 	private HeaderInfo charHeaderInfo;
 
 	/**
@@ -67,9 +66,10 @@ public class CharDendroView extends DendroView {
 	 *            node in which to store persistent configuration info (if
 	 *            desired)
 	 */
-	public CharDendroView(final ViewFrame vFrame, final ConfigNode configNode) {
+	public CharDendroView(final TreeViewFrame vFrame, 
+			final ConfigNode configNode) {
 
-		super(vFrame.getDataModel(), configNode, vFrame, "CharDendroView");
+		super(configNode, vFrame, "CharDendroView");
 		// this is where it gets interesting...
 		setArraySelection(new TreeSelection(arrayDrawer.getNumCol()));
 	}
@@ -135,7 +135,8 @@ public class CharDendroView extends DendroView {
 				bitmapPanel.setIncludedGeneHeaders(textview.getHeaderSummary()
 						.getIncluded());
 
-				final JDialog popup = new CancelableSettingsDialog(viewFrame,
+				final JDialog popup = 
+						new CancelableSettingsDialog(tvFrame.getAppFrame(),
 						"Export to Image", bitmapPanel);
 				popup.pack();
 				popup.setVisible(true);
@@ -224,7 +225,7 @@ public class CharDendroView extends DendroView {
 		// arraynameview.setMapping(getZoomXmap());
 
 		textview = new TextViewManager(getDataModel().getGeneHeaderInfo(),
-				viewFrame.getUrlExtractor(), getDataModel());
+				tvFrame.getUrlExtractor(), getDataModel());
 		// textview.setMap(getZoomYmap());
 
 		doDoubleLayout();

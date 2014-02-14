@@ -48,7 +48,8 @@ public abstract class PluginFactory {
 	 *            ConfigNode holding configuration of plugin
 	 * @return new plugin object
 	 */
-	public abstract MainPanel restorePlugin(ConfigNode node, ViewFrame viewFrame);
+	public abstract MainPanel restorePlugin(ConfigNode node, 
+			TreeViewFrame viewFrame);
 
 	/**
 	 * This method is used by the application to configure new instances of the

@@ -12,6 +12,7 @@ import edu.stanford.genetics.treeview.ConfigNode;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.MainPanel;
 import edu.stanford.genetics.treeview.PluginFactory;
+import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.core.PluginManager;
 
@@ -49,7 +50,7 @@ public class GeneAnnoFactory extends PluginFactory {
 	 */
 	@Override
 	public MainPanel restorePlugin(final ConfigNode node,
-			final ViewFrame viewFrame) {
+			final TreeViewFrame viewFrame) {
 		if (viewFrame.getDataModel().gidFound() == false) {
 			JOptionPane.showMessageDialog(viewFrame, new JTextArea(
 					"DataModel does not have a gene tree"));

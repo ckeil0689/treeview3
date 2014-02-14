@@ -39,7 +39,6 @@ import edu.stanford.genetics.treeview.DataMatrix;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.ExportException;
 import edu.stanford.genetics.treeview.HeaderInfo;
-import edu.stanford.genetics.treeview.LinkedViewFrame;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.MainPanel;
 import edu.stanford.genetics.treeview.MainProgramArgs;
@@ -47,6 +46,7 @@ import edu.stanford.genetics.treeview.ModelessSettingsDialog;
 import edu.stanford.genetics.treeview.NoValueException;
 import edu.stanford.genetics.treeview.SettingsPanel;
 import edu.stanford.genetics.treeview.TreeSelectionI;
+import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.TreeviewMenuBarI;
 import edu.stanford.genetics.treeview.XmlConfig;
 
@@ -89,15 +89,15 @@ public class ScatterPanel extends JPanel implements MainPanel,
 	}
 
 	ScatterParameterPanel scatterParameterPanel;
-	private LinkedViewFrame viewFrame;
+	private TreeViewFrame viewFrame;
 
 	/** Setter for viewFrame */
-	public void setViewFrame(final LinkedViewFrame viewFrame) {
+	public void setViewFrame(final TreeViewFrame viewFrame) {
 		this.viewFrame = viewFrame;
 	}
 
 	/** Getter for viewFrame */
-	public LinkedViewFrame getViewFrame() {
+	public TreeViewFrame getViewFrame() {
 		return viewFrame;
 	}
 
@@ -105,7 +105,7 @@ public class ScatterPanel extends JPanel implements MainPanel,
 		System.out.println("scatterPane resized");
 	}
 
-	public ScatterPanel(final LinkedViewFrame viewFrame,
+	public ScatterPanel(final TreeViewFrame viewFrame,
 			final ConfigNode configNode) {
 		setViewFrame(viewFrame);
 		setLayout(new BorderLayout());
@@ -187,12 +187,13 @@ public class ScatterPanel extends JPanel implements MainPanel,
 	 */
 	@Override
 	public void populateSettingsMenu(final TreeviewMenuBarI menu) {
-		menu.addMenuItem("Display...", new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				showDisplayPopup();
-			}
-		}, 0);
+		menu.addMenuItem("Display...");
+//		, new ActionListener() {
+//			@Override
+//			public void actionPerformed(final ActionEvent e) {
+//				showDisplayPopup();
+//			}
+//		}, 0);
 		menu.setMnemonic(KeyEvent.VK_D);
 	}
 
@@ -214,20 +215,21 @@ public class ScatterPanel extends JPanel implements MainPanel,
 	 */
 	@Override
 	public void populateExportMenu(final TreeviewMenuBarI menu) {
-		menu.addMenuItem("Export to Image...", new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent actionEvent) {
-
-				final BitmapScatterViewExportPanel bitmapPanel = new BitmapScatterViewExportPanel(
-						scatterPane);
-				bitmapPanel.setSourceSet(viewFrame.getDataModel().getFileSet());
-
-				final JDialog popup = new CancelableSettingsDialog(viewFrame,
-						"Export to Image...", bitmapPanel);
-				popup.setSize(500, 300);
-				popup.setVisible(true);
-			}
-		});
+		menu.addMenuItem("Export to Image...");
+//		, new ActionListener() {
+//			@Override
+//			public void actionPerformed(final ActionEvent actionEvent) {
+//
+//				final BitmapScatterViewExportPanel bitmapPanel = new BitmapScatterViewExportPanel(
+//						scatterPane);
+//				bitmapPanel.setSourceSet(viewFrame.getDataModel().getFileSet());
+//
+//				final JDialog popup = new CancelableSettingsDialog(viewFrame,
+//						"Export to Image...", bitmapPanel);
+//				popup.setSize(500, 300);
+//				popup.setVisible(true);
+//			}
+//		});
 		menu.setMnemonic(KeyEvent.VK_I);
 	}
 

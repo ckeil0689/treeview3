@@ -22,7 +22,6 @@
  */
 package edu.stanford.genetics.treeview.model;
 
-import java.awt.Frame;
 import java.util.Hashtable;
 import java.util.Observable;
 import java.util.concurrent.ExecutionException;
@@ -34,11 +33,12 @@ import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.FileSetListener;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LoadException;
+import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.XmlConfig;
 
 public class TVModel extends Observable implements DataModel {
 
-	protected Frame frame;
+	protected TreeViewFrame tvFrame;
 	protected FileSet source = null;
 	protected String dir = null;
 	protected String root;
@@ -150,11 +150,6 @@ public class TVModel extends Observable implements DataModel {
 
 		return arrayHeaderInfo.getNumHeaders() + extraCompareExpr;
 	}
-
-//	public void setExprData(final double[] newData) {
-//
-//		dataMatrix.setExprData(newData);
-//	}
 	
 	public void setExprData(final double[][] newData) {
 
@@ -261,14 +256,14 @@ public class TVModel extends Observable implements DataModel {
 		documentConfig = newVal;
 	}
 
-	public void setFrame(final Frame f) {
+	public void setFrame(final TreeViewFrame f) {
 
-		frame = f;
+		tvFrame = f;
 	}
 
-	public Frame getFrame() {
+	public TreeViewFrame getFrame() {
 
-		return frame;
+		return tvFrame;
 	}
 
 	protected void hashAIDs() {
@@ -586,26 +581,12 @@ public class TVModel extends Observable implements DataModel {
 	public class TVDataMatrix implements DataMatrix {
 
 		private boolean modified = false;
-//		private double[] exprData = null;
 		private double[][] exprData = null;
 
 		public void clear() {
 
 			exprData = null;
 		}
-
-//		@Override
-//		public double getValue(final int x, final int y) {
-//
-//			final int nexpr = nExpr();
-//			final int ngene = nGene();
-//			if ((x < nexpr) && (y < ngene) && (x >= 0) && (y >= 0)) {
-//				return exprData[x + y * nexpr];
-//
-//			} else {
-//				return DataModel.NODATA;
-//			}
-//		}
 		
 		@Override
 		public double getValue(final int x, final int y) {
@@ -619,34 +600,16 @@ public class TVModel extends Observable implements DataModel {
 				return DataModel.NODATA;
 			}
 		}
-
-//		public void setExprData(final double[] newData) {
-//
-//			exprData = newData;
-//		}
 		
 		public void setExprData(final double[][] newData) {
 
 			exprData = newData;
 		}
-
-//		public double[] getExprData() {
-//
-//			return exprData;
-//		}
 		
 		public double[][] getExprData() {
 
 			return exprData;
 		}
-
-//		@Override
-//		public void setValue(final double value, final int x, final int y) {
-//
-//			exprData[x + y * getNumCol()] = value;
-//			setModified(true);
-//			setChanged();
-//		}
 		
 		@Override
 		public void setValue(final double value, final int x, final int y) {
@@ -823,22 +786,6 @@ public class TVModel extends Observable implements DataModel {
 		if (!isLoaded()) {
 			throw new LoadException("Loading Cancelled", LoadException.INTPARSE);
 		}
-	}
-
-	/**
-	 * Don't open a loading window...
-	 */
-	public void loadNewNW(final FileSet fileSet) throws LoadException {
-
-		System.out.println("Not yet implemented for NewModelLoader.");
-//		resetState();
-//		setSource(fileSet);
-//		final TVModelLoader2 loader = new TVModelLoader2(this);
-//		loader.loadIntoNW();
-//
-//		if (!isLoaded()) {
-//			throw new LoadException("Loading Cancelled", LoadException.INTPARSE);
-//		}
 	}
 
 	/**

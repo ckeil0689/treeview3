@@ -3,15 +3,12 @@ package Cluster;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.concurrent.ExecutionException;
 
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import edu.stanford.genetics.treeview.FileSet;
-import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.TVFrameController;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.model.TVModel;
@@ -28,6 +25,7 @@ public class ClusterViewController {
 
 	private TVModel tvModel;
 	private TreeViewFrame tvFrame;
+	private TVFrameController controller;
 	private ClusterView clusterView;
 	
 	private SwingWorker<Void, Void> clusterWorker;
@@ -36,10 +34,12 @@ public class ClusterViewController {
 	private String finalFilePath;
 	private FileSet fileSet;
 	
-	public ClusterViewController(ClusterView view, TreeViewFrame tvFrame) {
+	public ClusterViewController(ClusterView view, TreeViewFrame tvFrame, 
+			TVFrameController controller) {
 		
 		this.tvFrame = tvFrame;
-		this.tvModel = (TVModel)tvFrame.getDataModel();
+		this.controller = controller;
+		this.tvModel = controller.getTVControllerModel();
 		this.clusterView = view;
 		
 		setupWorkerThread();
@@ -90,37 +90,25 @@ public class ClusterViewController {
 			@Override
 			protected Void doInBackground() throws Exception {
 				
-				loadFileSet(fileSet);
+				controller.loadFileSet(fileSet);
 				return null;
 			}
 			
 			@Override
 			protected void done() {
 				
-				tvFrame.setView("DendroView");
-				tvFrame.setLoaded(true);
+				if(controller.getTVControllerModel().getDataMatrix().getNumRow() > 0) {
+					controller.setDataModel(controller.getTVControllerModel());
+					tvFrame.setView("LoadCheckView");
+					controller.addViewListeners();
+					
+				} else {
+					System.out.println("No datamatrix set by worker thread.");
+					tvFrame.setView("WelcomeView");
+					controller.addViewListeners();
+				}
 			}
 		};
-	}
-	
-	public void loadFileSet(final FileSet fileSet) throws LoadException {
-
-		tvModel.setFrame(tvFrame);
-
-		try {
-			tvModel.loadNew(fileSet);
-
-		} catch (final LoadException e) {
-			if (e.getType() != LoadException.INTPARSE) {
-				JOptionPane.showMessageDialog(tvFrame, e);
-				throw e;
-			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			
-		} catch (ExecutionException e) {
-			e.printStackTrace();
-		}
 	}
 	
 	// Define Listeners as inner classes
@@ -235,9 +223,8 @@ public class ClusterViewController {
 			fileSet = new FileSet(file.getName(), file.getParent() 
 					+ File.separator);
 
-			
+			tvFrame.setView("LoadProgressView");
 			setupLoadWorkerThread();
-			tvFrame.setLoaded(false);
 			loadWorker.execute();
 			
 			topFrame.dispose();

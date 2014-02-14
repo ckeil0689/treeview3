@@ -69,11 +69,10 @@ import edu.stanford.genetics.treeview.core.ScrollablePanel;
  * @author CKeil
  * 
  */
-public class MethodInfoFrame extends JFrame {
-
-	private static final long serialVersionUID = 1L;
+public class MethodInfoFrame {
 
 	// Frame and Model instance variables declared
+	private JFrame methodInfoFrame;
 	protected TreeViewFrame viewFrame;
 
 	// Various GUI Panels
@@ -103,7 +102,7 @@ public class MethodInfoFrame extends JFrame {
 	protected MethodInfoFrame(final TreeViewFrame f, final String title) {
 
 		// Inherit constructor from JFrame, title passed from ClusterFrameWindow
-		super(title);
+		methodInfoFrame = new JFrame(title);
 
 		// Initialize instance variables
 		this.viewFrame = f;
@@ -114,16 +113,17 @@ public class MethodInfoFrame extends JFrame {
 		mainDim.setSize(rectangle.height, rectangle.height * 3 / 4);
 
 		// setup frame options
-		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		setResizable(false);
+		methodInfoFrame.setDefaultCloseOperation(
+				WindowConstants.DISPOSE_ON_CLOSE);
+		methodInfoFrame.setResizable(false);
 
 		// Makes the frame invisible when the window is closed
-		this.addWindowListener(new WindowAdapter() {
+		methodInfoFrame.addWindowListener(new WindowAdapter() {
 
 			@Override
 			public void windowClosing(final WindowEvent we) {
 
-				MethodInfoFrame.this.dispose();
+				methodInfoFrame.dispose();
 			}
 		});
 
@@ -163,7 +163,7 @@ public class MethodInfoFrame extends JFrame {
 			@Override
 			public void actionPerformed(final ActionEvent arg0) {
 
-				MethodInfoFrame.this.dispose();
+				methodInfoFrame.dispose();
 			}
 		});
 
@@ -194,13 +194,22 @@ public class MethodInfoFrame extends JFrame {
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
 		// Add the mainPanel to the ContentPane
-		getContentPane().add(scrollPane);
+		methodInfoFrame.getContentPane().add(scrollPane);
 
 		// packs items so that the frame fits them
-		pack();
+		methodInfoFrame.pack();
 
 		// Center JFrame on screen, needs to be used after pack();
-		setLocationRelativeTo(viewFrame);
+		methodInfoFrame.setLocationRelativeTo(viewFrame.getAppFrame());
+	}
+	
+	/**
+	 * Sets visibility of methodInfoFrame.
+	 * @param visible
+	 */
+	public void setVisible(boolean visible) {
+		
+		methodInfoFrame.setVisible(visible);
 	}
 
 	// Information panels to be shown when labels are clicked

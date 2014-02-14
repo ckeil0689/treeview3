@@ -22,10 +22,7 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.Window;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.net.URL;
-import java.util.Enumeration;
 
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
@@ -59,7 +56,7 @@ import edu.stanford.genetics.treeview.model.TVModel;
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.16 $ $Date: 2010-05-11 13:31:51 $
  */
-public abstract class TreeViewApp implements WindowListener {
+public abstract class TreeViewApp {//implements WindowListener {
 
 	/** Version of application */
 	public final static String versionTag = "0.1";
@@ -73,12 +70,12 @@ public abstract class TreeViewApp implements WindowListener {
 			"~abarysh/treeview/";
 
 	/** holds all open windows */
-	protected java.util.Vector<Window> windows;
+//	protected java.util.Vector<Window> windows;
 
 	private final Preferences prefs;
 	private final UrlPresets geneUrlPresets;
 	private final UrlPresets arrayUrlPresets;
-	private boolean exitOnWindowsClosed = true;
+//	private boolean exitOnWindowsClosed = true;
 
 	/** holds global config */
 	private final XmlConfig globalConfig;
@@ -107,7 +104,7 @@ public abstract class TreeViewApp implements WindowListener {
 	 */
 	public TreeViewApp(final XmlConfig xmlConfig, final boolean isApplet) {
 
-		windows = new java.util.Vector<Window>();
+//		windows = new java.util.Vector<Window>();
 		globalConfig = xmlConfig;
 
 		geneUrlPresets = new UrlPresets(getGlobalConfig().getNode(
@@ -219,7 +216,7 @@ public abstract class TreeViewApp implements WindowListener {
 	 * 
 	 * @throws LoadException
 	 */
-	public ViewFrame openNew() {
+	public TreeViewFrame openNew() {
 
 		try {
 			return openNew(null);
@@ -241,7 +238,7 @@ public abstract class TreeViewApp implements WindowListener {
 	 *                the exception rethrown.
 	 * @throws LoadException
 	 */
-	public ViewFrame openNew(final FileSet fileSet) throws LoadException {
+	public TreeViewFrame openNew(final FileSet fileSet) throws LoadException {
 
 		// setup toplevel
 		final TreeViewFrame tvFrame = new TreeViewFrame(this);
@@ -254,37 +251,11 @@ public abstract class TreeViewApp implements WindowListener {
 				tvFrame.setLoaded(true);
 
 			} catch (final LoadException e) {
-				tvFrame.dispose();
+				tvFrame.getAppFrame().dispose();
 				throw e;
 			}
 		}
-		tvFrame.addWindowListener(this);
-		return tvFrame;
-	}
-
-	/**
-	 * same as above, but doesn't open a loading window (damn deadlocks!)
-	 * 
-	 * @throws LoadException
-	 */
-	public ViewFrame openNewNW(final FileSet fileSet) throws LoadException {
-
-		// setup toplevel
-		final TreeViewFrame tvFrame = new TreeViewFrame(this);
-		final TVModel model = new TVModel();
-		final TVFrameController tvController = new TVFrameController(tvFrame, 
-				model);
-		if (fileSet != null) {
-			try {
-				tvController.loadFileSetNW(fileSet);
-				tvFrame.setLoaded(true);
-
-			} catch (final LoadException e) {
-				tvFrame.dispose();
-				throw e;
-			}
-		}
-		tvFrame.addWindowListener(this);
+//		tvFrame.addWindowListener(this);
 		return tvFrame;
 	}
 
@@ -298,111 +269,111 @@ public abstract class TreeViewApp implements WindowListener {
 		return globalConfig;
 	}
 
-	/**
-	 * A WindowListener, which allows other windows to react to another window
-	 * being opened.
-	 * 
-	 * @param e
-	 *            A window opening event. Used to add the window to the windows
-	 *            list.
-	 */
-	@Override
-	public void windowOpened(final WindowEvent e) {
+//	/**
+//	 * A WindowListener, which allows other windows to react to another window
+//	 * being opened.
+//	 * 
+//	 * @param e
+//	 *            A window opening event. Used to add the window to the windows
+//	 *            list.
+//	 */
+//	@Override
+//	public void windowOpened(final WindowEvent e) {
+//
+//		windows.addElement(e.getWindow());
+//		rebuildWindowMenus();
+//	}
 
-		windows.addElement(e.getWindow());
-		rebuildWindowMenus();
-	}
+//	/**
+//	 * rebuilds all the window menus. Should be called whenever a
+//	 * <code>ViewFrame</code> is created, destroyed, or changes its name. The
+//	 * first two cases are handled by <code>TreeViewApp</code>, the
+//	 * <code>ViewFrame</code> itself should call this method when it changes its
+//	 * name.
+//	 */
+//	public void rebuildWindowMenus() {
+//
+//		final int max = windows.size();
+//		for (int i = 0; i < max; i++) {
+//			final ViewFrame source = (ViewFrame) windows.elementAt(i);
+//			// rebuildWindowMenu( source.getWindowMenu());
+//			source.rebuildWindowMenu(windows);
+//		}
+//	}
 
-	/**
-	 * rebuilds all the window menus. Should be called whenever a
-	 * <code>ViewFrame</code> is created, destroyed, or changes its name. The
-	 * first two cases are handled by <code>TreeViewApp</code>, the
-	 * <code>ViewFrame</code> itself should call this method when it changes its
-	 * name.
-	 */
-	public void rebuildWindowMenus() {
+//	/**
+//	 * A WindowListener, which allows other windows to react to another window
+//	 * being closed.
+//	 * 
+//	 * @param e
+//	 *            A window closing event. Used to remove the window from the
+//	 *            windows list.
+//	 */
+//	@Override
+//	public void windowClosed(final WindowEvent e) {
+//
+//		windows.removeElement(e.getWindow());
+//
+//		if (windows.isEmpty() && exitOnWindowsClosed) {
+//			endProgram();
+//		}
+//		rebuildWindowMenus();
+//	}
 
-		final int max = windows.size();
-		for (int i = 0; i < max; i++) {
-			final ViewFrame source = (ViewFrame) windows.elementAt(i);
-			// rebuildWindowMenu( source.getWindowMenu());
-			source.rebuildWindowMenu(windows);
-		}
-	}
-
-	/**
-	 * A WindowListener, which allows other windows to react to another window
-	 * being closed.
-	 * 
-	 * @param e
-	 *            A window closing event. Used to remove the window from the
-	 *            windows list.
-	 */
-	@Override
-	public void windowClosed(final WindowEvent e) {
-
-		windows.removeElement(e.getWindow());
-
-		if (windows.isEmpty() && exitOnWindowsClosed) {
-			endProgram();
-		}
-		rebuildWindowMenus();
-	}
-
-	/**
-	 * loops over the list of windows the <code>TreeViewApp</code> has collected
-	 * through the WindowListener interface. just closes the window; other
-	 * bookkeeping stuff is done by the <code>windowClosed</code> method.
-	 */
-	public void closeAllWindows() {
-
-		final Enumeration<Window> e = windows.elements();
-		while (e.hasMoreElements()) {
-			final ViewFrame f = (ViewFrame) e.nextElement();
-			f.closeWindow();
-		}
-	}
-
-	public ViewFrame[] getWindows() {
-
-		final ViewFrame[] frames = new ViewFrame[windows.size()];
-		int i = 0;
-
-		final Enumeration<Window> e = windows.elements();
-		while (e.hasMoreElements()) {
-			frames[i++] = (ViewFrame) e.nextElement();
-		}
-
-		return frames;
-	}
+//	/**
+//	 * loops over the list of windows the <code>TreeViewApp</code> has collected
+//	 * through the WindowListener interface. just closes the window; other
+//	 * bookkeeping stuff is done by the <code>windowClosed</code> method.
+//	 */
+//	public void closeAllWindows() {
+//
+//		final Enumeration<Window> e = windows.elements();
+//		while (e.hasMoreElements()) {
+//			final ViewFrame f = (ViewFrame) e.nextElement();
+//			f.closeWindow();
+//		}
+//	}
+//
+//	public ViewFrame[] getWindows() {
+//
+//		final ViewFrame[] frames = new ViewFrame[windows.size()];
+//		int i = 0;
+//
+//		final Enumeration<Window> e = windows.elements();
+//		while (e.hasMoreElements()) {
+//			frames[i++] = (ViewFrame) e.nextElement();
+//		}
+//
+//		return frames;
+//	}
 
 	/** Stores the globalconfig, closes all windows, and then exits. */
 	protected abstract void endProgram();
 
-	@Override
-	public void windowActivated(final WindowEvent e) {
-		// nothing
-	}
-
-	@Override
-	public void windowClosing(final WindowEvent e) {
-		// nothing
-	}
-
-	@Override
-	public void windowDeactivated(final WindowEvent e) {
-		// nothing
-	}
-
-	@Override
-	public void windowDeiconified(final WindowEvent e) {
-		// nothing
-	}
-
-	@Override
-	public void windowIconified(final WindowEvent e) {
-		// nothing
-	}
+//	@Override
+//	public void windowActivated(final WindowEvent e) {
+//		// nothing
+//	}
+//
+//	@Override
+//	public void windowClosing(final WindowEvent e) {
+//		// nothing
+//	}
+//
+//	@Override
+//	public void windowDeactivated(final WindowEvent e) {
+//		// nothing
+//	}
+//
+//	@Override
+//	public void windowDeiconified(final WindowEvent e) {
+//		// nothing
+//	}
+//
+//	@Override
+//	public void windowIconified(final WindowEvent e) {
+//		// nothing
+//	}
 
 	/**
 	 * Get a per-user file in which to store global config info. Read the code
@@ -438,14 +409,14 @@ public abstract class TreeViewApp implements WindowListener {
 		return dir + fsep + file;
 	}
 
-	/**
-	 * @param exitOnWindowsClosed
-	 *            the exitOnWindowsClosed to set
-	 */
-	public void setExitOnWindowsClosed(final boolean exitOnWindowsClosed) {
-
-		this.exitOnWindowsClosed = exitOnWindowsClosed;
-	}
+//	/**
+//	 * @param exitOnWindowsClosed
+//	 *            the exitOnWindowsClosed to set
+//	 */
+//	public void setExitOnWindowsClosed(final boolean exitOnWindowsClosed) {
+//
+//		this.exitOnWindowsClosed = exitOnWindowsClosed;
+//	}
 
 	public Preferences getPrefs() {
 

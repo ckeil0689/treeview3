@@ -25,7 +25,7 @@ public class NewModelLoader {
 
 	protected TVModel targetModel;
 	private FileSet fileSet;
-	protected TreeViewFrame frame;
+	protected TreeViewFrame tvFrame;
 	protected LoadProgressView loadProgView;
 	
 	protected String[][] stringLabels;
@@ -43,9 +43,9 @@ public class NewModelLoader {
 	public NewModelLoader(TVModel model) {
 		
 		this.targetModel = model;
-		this.frame = (TreeViewFrame)model.getFrame();
+		this.tvFrame = (TreeViewFrame)model.getFrame();
 		this.fileSet = model.getFileSet();
-		this.loadProgView = frame.getLoadProgView();
+		this.loadProgView = tvFrame.getLoadProgView();
 	}
 	
 	public TVModel load() {

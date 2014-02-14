@@ -35,7 +35,6 @@ import javax.swing.JPanel;
 
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LoadException;
-import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.XmlConfig;
 
 /**
@@ -136,7 +135,7 @@ public class NewKnnModelLoader extends NewModelLoader {
 			temp.add(new JLabel("Out of memory, allocate more RAM"));
 			temp.add(new JLabel("see Chapter 3 of Help->Documentation... " +
 					"for Out of Memory"));
-			JOptionPane.showMessageDialog(frame, temp);
+			JOptionPane.showMessageDialog(tvFrame.getAppFrame(), temp);
 			
 		} catch (IOException e) {
 			System.out.println("Loading resulted in an error. Cause: " 

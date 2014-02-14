@@ -18,6 +18,7 @@ import edu.stanford.genetics.treeview.MainPanel;
 import edu.stanford.genetics.treeview.PluginFactory;
 import edu.stanford.genetics.treeview.SettingsPanelHolder;
 import edu.stanford.genetics.treeview.TabbedSettingsPanel;
+import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.TreeviewMenuBarI;
 import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.core.PluginManager;
@@ -56,7 +57,7 @@ public class KaryoscopeFactory extends PluginFactory {
 	 */
 	@Override
 	public MainPanel restorePlugin(final ConfigNode node,
-			final ViewFrame viewFrame) {
+			final TreeViewFrame viewFrame) {
 		final KaryoPanel karyoPanel = new KaryoPanel(viewFrame.getDataModel(),
 				viewFrame.getGeneSelection(), viewFrame, node);
 		karyoPanel.setName(getPluginName());
@@ -105,17 +106,18 @@ public class KaryoscopeFactory extends PluginFactory {
 	public void addPluginConfig(final TreeviewMenuBarI globalMenu,
 			final ViewFrame frame) {
 		super.addPluginConfig(globalMenu, frame);
-		globalMenu.addMenuItem("Karyoscope Color...", new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent actionEvent) {
-				if (cpresetFrame == null) {
-					setupPresetsFrame(frame.getApp().getGlobalConfig()
-							.getRoot());
-				}
-				tabbedPanel.setSelectedComponent(cpresetEditor);
-				cpresetFrame.setVisible(true);
-			}
-		});
+		globalMenu.addMenuItem("Karyoscope Color...");
+//		, new ActionListener() {
+//			@Override
+//			public void actionPerformed(final ActionEvent actionEvent) {
+//				if (cpresetFrame == null) {
+//					setupPresetsFrame(frame.getApp().getGlobalConfig()
+//							.getRoot());
+//				}
+//				tabbedPanel.setSelectedComponent(cpresetEditor);
+//				cpresetFrame.setVisible(true);
+//			}
+//		});
 		globalMenu.setMnemonic(KeyEvent.VK_K);
 
 		if (coordPresets.getNumPresets() == 0) {
@@ -129,24 +131,25 @@ public class KaryoscopeFactory extends PluginFactory {
 			coordEditor.synchronizeFrom();
 		}
 
-		globalMenu.addMenuItem("Karyoscope Coordinates...",
-				new ActionListener() {
-					@Override
-					public void actionPerformed(final ActionEvent actionEvent) {
-						if (cpresetFrame == null) {
-							setupPresetsFrame(frame.getApp().getGlobalConfig()
-									.getRoot());
-						}
-						tabbedPanel.setSelectedComponent(coordEditor);
-						cpresetFrame.setVisible(true);
-					}
-				});
+		globalMenu.addMenuItem("Karyoscope Coordinates...");
+//		,
+//				new ActionListener() {
+//					@Override
+//					public void actionPerformed(final ActionEvent actionEvent) {
+//						if (cpresetFrame == null) {
+//							setupPresetsFrame(frame.getApp().getGlobalConfig()
+//									.getRoot());
+//						}
+//						tabbedPanel.setSelectedComponent(coordEditor);
+//						cpresetFrame.setVisible(true);
+//					}
+//				});
 		globalMenu.setMnemonic(KeyEvent.VK_O);
 	}
 
 	/**
 	 * 
-	 * @param frame
+	 * @param tvFrame
 	 *            ViewFrame that contains relevant global config node
 	 */
 	private void setupPresetsFrame(final ConfigNode node) {

@@ -43,7 +43,8 @@ public class MenubarActions {
 			
 		} else if(name.equalsIgnoreCase("Quit Program")) {
 			try {
-				tvFrame.getApp().closeAllWindows();
+//				tvFrame.getApp().closeAllWindows();
+				tvFrame.closeWindow();
 				
 			} catch (final Exception e) {
 				System.out.println("While trying to exit, got error " + e);
@@ -58,7 +59,7 @@ public class MenubarActions {
 			tvFrame.openPrefMenu(name);
 			
 		} else if(name.equalsIgnoreCase("Cluster")) {
-			tvFrame.setupClusterView();
+			controller.setupClusterView();
 			
 		} else if(name.equalsIgnoreCase("Functional Enrichment")) {
 			tvFrame.displayWIP();
@@ -71,6 +72,12 @@ public class MenubarActions {
 			
 		} else if(name.equalsIgnoreCase("Save Data")) {
 			controller.saveData();
+			
+		} else if(name.equalsIgnoreCase("New Window")) {
+			tvFrame.createNewFrame().getAppFrame().setVisible(true);
+			
+//		} else if(name.equalsIgnoreCase("Close Window")) {
+//			tvFrame.closeWindow();
 			
 		} else if(name.equalsIgnoreCase("About...")) {
 			tvFrame.showAboutWindow();
