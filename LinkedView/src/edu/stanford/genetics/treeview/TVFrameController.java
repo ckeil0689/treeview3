@@ -20,10 +20,12 @@ import javax.swing.SwingWorker;
 import Cluster.ClusterViewController;
 import Cluster.ClusterViewFrame;
 import Controllers.MenubarActions;
+import Controllers.PreferencesController;
 
 import edu.stanford.genetics.treeview.model.CDTCreator3;
 import edu.stanford.genetics.treeview.model.DataModelWriter;
 import edu.stanford.genetics.treeview.model.TVModel;
+import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 
 /**
  * This class controls user interaction with TVFrame and its views.
@@ -190,7 +192,8 @@ public class TVFrameController {
 							
 							
 								final CDTCreator3 fileTransformer = 
-										new CDTCreator3(file, fileType, tvFrame);
+										new CDTCreator3(file, fileType, 
+												tvFrame);
 								
 								fileTransformer.createFile();
 				
@@ -671,6 +674,32 @@ public class TVFrameController {
 //				}
 //			};
 //			SwingUtilities.invokeLater(update);
+		}
+	}
+	
+	/**
+	 * Opens the preferences menu and sets the displayed menu to
+	 * the specified option using a string as identification.
+	 * @param menu
+	 */
+	public void openPrefMenu(String menu) {
+		
+		if(tvFrame.getDendroView() == null) {
+			PreferencesMenu preferences = new PreferencesMenu(tvFrame, menu);
+			
+			PreferencesController pController = 
+					new PreferencesController(tvFrame, preferences, this);
+			
+			preferences.getPreferencesFrame().setVisible(true);
+		
+		} else {
+			PreferencesMenu preferences = new PreferencesMenu(
+					tvFrame, tvFrame.getDendroView(), menu);
+			
+			PreferencesController pController = 
+					new PreferencesController(tvFrame, preferences, this);
+			
+			preferences.getPreferencesFrame().setVisible(true);
 		}
 	}
 	

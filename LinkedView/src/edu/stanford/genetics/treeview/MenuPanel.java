@@ -9,28 +9,31 @@ import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
 
-public class MenuPanel extends JPanel implements MouseListener {
-
-	private static final long serialVersionUID = 1L;
+public class MenuPanel implements MouseListener {
 	
 	private JLabel label;
+	private JPanel menuPanel;
 	private PreferencesMenu frame;
 	
 	public MenuPanel(String title, PreferencesMenu frame) {
-		
-		super();
 
 		this.frame = frame;
 		
-		setLayout(new MigLayout());
-		setBackground(GUIParams.BG_COLOR);
-		addMouseListener(this);
+		menuPanel = new JPanel();
+		menuPanel.setLayout(new MigLayout());
+		menuPanel.setBackground(GUIParams.BG_COLOR);
+		menuPanel.addMouseListener(this);
 		
 		label = new JLabel(title);
 		label.setFont(GUIParams.FONTS);
 		label.setForeground(GUIParams.TEXT);
 		
-		add(label, "push");
+		menuPanel.add(label, "push");
+	}
+	
+	public JPanel makeMenuPanel() {
+		
+		return menuPanel;
 	}
 
 	@Override
@@ -42,14 +45,14 @@ public class MenuPanel extends JPanel implements MouseListener {
 	@Override
 	public void mouseEntered(MouseEvent arg0) {
 		
-		this.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		menuPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		label.setForeground(GUIParams.MAIN);
 	}
 
 	@Override
 	public void mouseExited(MouseEvent arg0) {
 		
-		this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		menuPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 		label.setForeground(GUIParams.TEXT);
 	}
 

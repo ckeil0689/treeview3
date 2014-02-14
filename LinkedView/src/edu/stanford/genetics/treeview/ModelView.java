@@ -31,6 +31,7 @@ import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Observer;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -43,13 +44,14 @@ import javax.swing.JPanel;
  * This currently consists of buffer management, status and hints panels.
  * Interestingly, but necessarily, it has no dependency on any models.
  */
-public abstract class ModelView extends JPanel implements java.util.Observer,
+public abstract class ModelView extends JPanel implements Observer,
 		MouseListener {
 
 	private static final long serialVersionUID = 1L;
 
 	protected ViewFrame viewFrame = null;
 	protected JFrame applicationFrame = null;
+	
 	protected MessagePanel status = null;
 	protected boolean hasMouse = false;
 

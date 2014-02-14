@@ -73,6 +73,11 @@ public class GUIParams {
 		TABLEHEADERS = new Color(255, 205, 120, 255);
 	}
 	
+	public static boolean isDarkTheme() {
+		
+		return dark;
+	}
+	
 	/**
 	 * Creates a button with a title and icon if desired. The method 
 	 * centralizes the layout setting for buttons so that all buttons will

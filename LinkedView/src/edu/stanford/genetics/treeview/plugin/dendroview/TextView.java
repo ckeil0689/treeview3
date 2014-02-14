@@ -112,9 +112,6 @@ public class TextView extends ModelView implements FontSelectable, KeyListener,
 			headerSummary.setIncluded(new int[] { 2 });
 		}
 
-		// int yorfIndex = headerInfo.getIndex("YORF");
-		// int nameIndex = headerInfo.getIndex("NAME");
-
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addKeyListener(this);

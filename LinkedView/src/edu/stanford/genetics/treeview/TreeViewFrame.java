@@ -59,8 +59,6 @@ import Views.LoadProgressView;
 import Views.WelcomeView;
 
 import net.miginfocom.swing.MigLayout;
-import Cluster.ClusterViewController;
-import Cluster.ClusterViewFrame;
 import edu.stanford.genetics.treeview.core.ArrayFinder;
 import edu.stanford.genetics.treeview.core.FileMru;
 import edu.stanford.genetics.treeview.core.FileMruEditor;
@@ -266,24 +264,24 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 //		clusterViewFrame.setVisible(true);
 //	}
 	
-	/**
-	 * Opens the preferences menu and sets the displayed menu to
-	 * the specified option using a string as identification.
-	 * @param menu
-	 */
-	public void openPrefMenu(String menu) {
-		
-		if(getLoaded()) {
-			PreferencesMenu preferences = new PreferencesMenu(
-					TreeViewFrame.this, menu);
-			preferences.getPreferencesFrame().setVisible(true);
-		
-		} else {
-			PreferencesMenu preferences = new PreferencesMenu(
-					TreeViewFrame.this, (DendroView)running, menu);
-			preferences.getPreferencesFrame().setVisible(true);
-		}
-	}
+//	/**
+//	 * Opens the preferences menu and sets the displayed menu to
+//	 * the specified option using a string as identification.
+//	 * @param menu
+//	 */
+//	public void openPrefMenu(String menu) {
+//		
+//		if(getLoaded()) {
+//			PreferencesMenu preferences = new PreferencesMenu(
+//					TreeViewFrame.this, menu);
+//			preferences.getPreferencesFrame().setVisible(true);
+//		
+//		} else {
+//			PreferencesMenu preferences = new PreferencesMenu(
+//					TreeViewFrame.this, (DendroView)running, menu);
+//			preferences.getPreferencesFrame().setVisible(true);
+//		}
+//	}
 	
 	/**
 	 * Displays an editor for recently used files.

@@ -1,11 +1,8 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.File;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -82,17 +79,7 @@ public class PreferencesMenu {
 		basisPanel.setPreferredSize(
 				new Dimension(width, height));
 		
-		
 		menuFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		
-		menuFrame.addWindowListener(new WindowAdapter() {
-			
-			@Override
-			public void windowClosing(final WindowEvent we) {
-				
-				menuFrame.dispose();
-			}
-		});
 		
 		setupLayout(menuTitle);
 		
@@ -111,23 +98,46 @@ public class PreferencesMenu {
 		return menuFrame;
 	}
 	
+	// Listeners
+	/**
+	 * Adds an ActionListener to the ok_button.
+	 * @param listener
+	 */
+	public void addOKButtonListener(ActionListener listener) {
+		
+		ok_button.addActionListener(listener);
+	}
+	
+	/**
+	 * Equips the preferences JFrame with a window listener.
+	 * @param listener
+	 */
+	public void addWindowListener(WindowAdapter listener) {
+		
+		menuFrame.addWindowListener(listener);
+	}
+	
+	/**
+	 * Adds an ActionListener to the theme_button in ThemeSettings
+	 * @param listener
+	 */
+	public void addThemeListener(ActionListener listener) {
+		
+		themeSettings.getThemeButton().addActionListener(listener);
+	}
+	
+	public void addCustomLabelListener(ActionListener listener) {
+		
+		System.out.println("Custom label Listener added.");
+		annotationSettings.getCustomLabelButton().addActionListener(listener);
+	}
+	
 	/**
 	 * Sets up the layout for the menu.
 	 */
 	public void setupLayout(String startMenu) {
 		
-		menuFrame.getContentPane().removeAll();
-		
 		ok_button = GUIParams.setButtonLayout("OK", null);
-		ok_button.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				
-				menuFrame.dispose();
-			}
-			
-		});
 		
 		setupMenus();
 		
@@ -141,26 +151,7 @@ public class PreferencesMenu {
 		basisPanel.add(leftPanel, "pushy, aligny 0%, w 20%, " +
 				"h 75%");
 		
-		if(startMenu.equalsIgnoreCase("Theme") && themeSettings != null) {
-			basisPanel.add(themeSettings, "w 79%, h 95%, wrap");
-		
-		} else if(startMenu.equalsIgnoreCase("Fonts") 
-				&& fontSettings != null) {
-			basisPanel.add(fontSettings, "w 79%, h 95%, wrap");
-			
-		} else if(startMenu.equalsIgnoreCase("URL") 
-				&& urlSettings != null) {
-			basisPanel.add(urlSettings, "w 79%, h 95%, wrap");
-		
-		} else if(startMenu.equalsIgnoreCase("Row and Column Labels") 
-				&& annotationSettings != null) {
-			basisPanel.add(annotationSettings, "w 79%, " +
-					"h 95%, wrap");
-			
-		} else if(startMenu.equalsIgnoreCase("Color Settings") 
-				&& pixelSettings != null) {
-			basisPanel.add(pixelSettings, "w 79%, h 95%, wrap");
-		}
+		addMenu(startMenu);
 		
 		basisPanel.add(ok_button, "pushx, alignx 100%, span");
 		
@@ -170,20 +161,21 @@ public class PreferencesMenu {
 	
 	public void setupMenuHeaders() {
 		
-		MenuPanel theme = new MenuPanel("Theme", this);
+		JPanel theme = new MenuPanel("Theme", this).makeMenuPanel();
 		leftPanel.add(theme, "pushx, w 90%, h 10%, alignx 50%, span, wrap");
 		
-		MenuPanel annotations = new MenuPanel("Annotations", this);
+		JPanel annotations = new MenuPanel("Row and Column Labels", 
+				this).makeMenuPanel();
 		leftPanel.add(annotations, "pushx, w 90%, h 10%, alignx 50%, " +
 				"span, wrap");
 			
-		MenuPanel font = new MenuPanel("Font", this);
+		JPanel font = new MenuPanel("Font", this).makeMenuPanel();
 		leftPanel.add(font, "pushx, w 90%, h 10%, alignx 50%, span, wrap");
 			
-		MenuPanel url = new MenuPanel("URL", this);
+		JPanel url = new MenuPanel("URL", this).makeMenuPanel();
 		leftPanel.add(url, "pushx, w 90%, h 10%, alignx 50%, span, wrap");
 		
-		MenuPanel heatMap = new MenuPanel("Color Settings", this);
+		JPanel heatMap = new MenuPanel("Color Settings", this).makeMenuPanel();
 		leftPanel.add(heatMap, "pushx, w 90%, h 10%, alignx 50%, span");
 	}
 	
@@ -206,13 +198,14 @@ public class PreferencesMenu {
 	/**
 	 * Create the panel for pixel settings.
 	 */
-	class PixelSettingsPanel extends JScrollPane {
-
-		private static final long serialVersionUID = 1L;
+	class PixelSettingsPanel {
 		
 		private ColorExtractor ce = null;
+		private JScrollPane scrollPane;
 
 		public PixelSettingsPanel() {
+			
+			scrollPane = new JScrollPane();
 			
 			JPanel panel = new JPanel();
 			panel.setLayout(new MigLayout());
@@ -232,18 +225,25 @@ public class PreferencesMenu {
 			
 			panel.add(pss, "push, grow");
 			
-			setViewportView(panel);
+			scrollPane.setViewportView(panel);
+		}
+		
+		public JScrollPane makePSPanel() {
+			
+			return scrollPane;
 		}
 	}
 	
 	/**
 	 * Create the panel for font settings.
 	 */
-	class FontPanel extends JScrollPane {
+	class FontPanel {
 
-		private static final long serialVersionUID = 1L;
-
+		private JScrollPane scrollPane;
+		
 		public FontPanel() {
+			
+			scrollPane = new JScrollPane();
 			
 			JPanel panel = new JPanel();
 			panel.setLayout(new MigLayout());
@@ -257,18 +257,25 @@ public class PreferencesMenu {
 			panel.add(labelFont, "span, wrap");
 			panel.add(fontChangePanel, "pushx, alignx 50%, w 95%");
 			
-			setViewportView(panel);
+			scrollPane.setViewportView(panel);
+		}
+		
+		public JScrollPane makeFontPanel() {
+			
+			return scrollPane;
 		}
 	}
 	
 	/**
 	 * Create the panel for font settings.
 	 */
-	class URLSettings extends JScrollPane {
+	class URLSettings {
 
-		private static final long serialVersionUID = 1L;
+		private JScrollPane scrollPane;
 
 		public URLSettings() {
+			
+			scrollPane = new JScrollPane();
 			
 			JPanel panel = new JPanel();
 			panel.setLayout(new MigLayout());
@@ -285,7 +292,12 @@ public class PreferencesMenu {
 			panel.add(genePanel, "pushx, alignx 50%, w 95%, wrap");
 			panel.add(arrayPanel, "pushx, alignx 50%, w 95%");
 			
-			setViewportView(panel);
+			scrollPane.setViewportView(panel);
+		}
+		
+		public JScrollPane makeURLPanel() {
+			
+			return scrollPane;
 		}
 	}
 	
@@ -294,87 +306,38 @@ public class PreferencesMenu {
 	 * @author CKeil
 	 *
 	 */
-	class ThemeSettingsPanel extends JScrollPane {
+	class ThemeSettingsPanel {
 
-		private static final long serialVersionUID = 1L;
-
-		private JButton day;
-		private JButton night;
+		private JButton theme_button;
+		private JScrollPane scrollPane;
 		
 		public ThemeSettingsPanel() {
+			
+			scrollPane = new JScrollPane();
 			
 			JPanel panel = new JPanel();
 			panel.setLayout(new MigLayout());
 			panel.setBackground(GUIParams.BG_COLOR);
 			
-			panel.add(GUIParams.setupHeader("Select a theme:"), "span, wrap");
+			panel.add(GUIParams.setupHeader("Click to switch theme:"), 
+					"span, wrap");
 			
 			// Choice #1
-			day = GUIParams.setButtonLayout("Daylight", null);
+			theme_button = GUIParams.setButtonLayout("Switch Theme", null);
 			
-			// Choice #2
-			night = GUIParams.setButtonLayout("Night", null);
+			panel.add(theme_button);
 			
-			day.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					
-					ThemeSettingsPanel.this.updateCheck(true);
-				}
-			});
-	
-			night.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					
-					ThemeSettingsPanel.this.updateCheck(false);
-				}
-			});
-			
-			panel.add(day);
-			panel.add(night);
-			
-			setViewportView(panel);
+			scrollPane.setViewportView(panel);
 		}
 		
-		/**
-		 * Sets the theme according to which radio button is selected.
-		 */
-		public void updateCheck(boolean day) {
-
-			if (day) {
-				GUIParams.setDayLight();
-				resetTheme();
-
-			} else {
-				GUIParams.setNight();
-				resetTheme();
-			}
+		public JScrollPane makeThemePanel() {
+			
+			return scrollPane;
 		}
 		
-		public void resetTheme() {
+		public JButton getThemeButton() {
 			
-			PreferencesMenu.this.setupLayout("Theme");
-			
-			if (tvFrame.getDataModel() != null 
-					&& tvFrame.getRunning() != null) {
-				if(tvFrame.getConfirmPanel() != null) {
-					tvFrame.setView("LoadCheckView");
-				}
-				tvFrame.setLoaded(false);
-				tvFrame.setView("DendroView");
-
-			} else if (tvFrame.getDataModel() != null 
-					&& tvFrame.getRunning() == null) {
-				tvFrame.setView("LoadCheckView");
-
-			} else {
-				tvFrame.setView("WelcomeView");
-			}
-			
-			menuFrame.dispose();
+			return theme_button;
 		}
 	}
 	
@@ -383,13 +346,14 @@ public class PreferencesMenu {
 	 * @author CKeil
 	 *
 	 */
-	class AnnotationPanel extends JScrollPane {
+	class AnnotationPanel {
 		
-		private static final long serialVersionUID = 1L;
+		private JScrollPane scrollPane;
+		private final JButton custom_button;
 		
 		public AnnotationPanel() {
 			
-			super();
+			scrollPane = new JScrollPane();
 			
 			JPanel panel = new JPanel();
 			panel.setLayout(new MigLayout());
@@ -411,41 +375,8 @@ public class PreferencesMenu {
 					tvFrame.getDataModel().getGtrHeaderInfo(), 
 					dendroView.getGtrview().getHeaderSummary(), tvFrame);
 			
-			final JButton custom_button = GUIParams.setButtonLayout(
+			custom_button = GUIParams.setButtonLayout(
 					"Use Custom Labels", null);
-			custom_button.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					
-					File customFile;
-					FileSet loadedSet = tvFrame.getDataModel().getFileSet();
-					File file = new File(loadedSet.getDir() 
-							+ loadedSet.getRoot() + loadedSet.getExt());
-					
-					try {
-						customFile = tvFrame.selectFile();
-						
-						final String fileName = file.getAbsolutePath();
-						final int dotIndex = fileName.indexOf(".");
-
-						final int suffixLength = fileName.length() - dotIndex;
-
-						final String fileType = file.getAbsolutePath()
-								.substring(fileName.length() - suffixLength, 
-										fileName.length());
-						
-						// Next: read file, return string arrays with new names
-						// Then: update currently loaded model.
-						
-						menuFrame.dispose();
-						
-					} catch (LoadException e) {
-						e.printStackTrace();
-					}
-				}
-				
-			});
 			
 			JLabel rows = GUIParams.setupHeader("Rows");
 			JLabel cols = GUIParams.setupHeader("Columns");
@@ -465,7 +396,17 @@ public class PreferencesMenu {
 			panel.add(cTrees, "span, wrap");
 			panel.add(atrPanel, "pushx, alignx 50%, w 95%, span");
 			
-			setViewportView(panel);
+			scrollPane.setViewportView(panel);
+		}
+		
+		public JScrollPane makeLabelPane() {
+			
+			return scrollPane;
+		}
+		
+		public JButton getCustomLabelButton() {
+			
+			return custom_button;
 		}
 	}
 	
@@ -481,21 +422,23 @@ public class PreferencesMenu {
 		basisPanel.add(leftPanel, "pushy, aligny 0%, w 20%, h 75%");
 		
 		if(title.equalsIgnoreCase("Theme") && themeSettings != null) {
-			basisPanel.add(themeSettings, "w 79%, h 95%, wrap");
+			basisPanel.add(themeSettings.makeThemePanel(), 
+					"w 79%, h 95%, wrap");
 			
-		} else if(title.equalsIgnoreCase("Annotations") 
+		} else if(title.equalsIgnoreCase("Row and Column Labels") 
 				&& annotationSettings != null) {
-			basisPanel.add(annotationSettings, "w 79%, h 95%, wrap");
+			basisPanel.add(annotationSettings.makeLabelPane(), 
+					"w 79%, h 95%, wrap");
 			
 		} else if(title.equalsIgnoreCase("Font") && fontSettings != null) {
-			basisPanel.add(fontSettings, "w 79%, h 95%, wrap");
+			basisPanel.add(fontSettings.makeFontPanel(), "w 79%, h 95%, wrap");
 		
 		} else if(title.equalsIgnoreCase("Color Settings") 
 				&& pixelSettings != null) {
-			basisPanel.add(pixelSettings, "w 79%, h 95%, wrap");
+			basisPanel.add(pixelSettings.makePSPanel(), "w 79%, h 95%, wrap");
 		
 		} else if(title.equalsIgnoreCase("URL") && urlSettings != null) {
-			basisPanel.add(pixelSettings, "w 79%, h 95%, wrap");
+//			basisPanel.add(pixelSettings.makePSPanel(), "w 79%, h 95%, wrap");
 		
 		} else {
 			//In case menu cannot be loaded, display excuse.
@@ -514,7 +457,7 @@ public class PreferencesMenu {
 		
 		basisPanel.add(ok_button, "pushx, alignx 100%, span");
 		
-		menuFrame.validate();
-		menuFrame.repaint();
+		basisPanel.revalidate();
+		basisPanel.repaint();
 	}
 }

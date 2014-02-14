@@ -241,7 +241,7 @@ public class CDTCreator3 {
 		final int eweightRow = eweightInd.get(0);
 		final int eweightCol = eweightInd.get(1);
 		final int gweightCol = gweightInd.get(1);
-		final int dataCol = dataStart.get(1);
+		int dataCol = dataStart.get(1);
 		final int dataRow = dataStart.get(0);
 		int gidCol = 0;
 		int line = 0;
@@ -252,8 +252,19 @@ public class CDTCreator3 {
 			rowElement.add("GID");
 		} 
 		
+		if(hasORF == false) {
+			dataCol++;
+		}
 		rowElement.add("ORF");
+		
+		if(hasName == false) {
+			dataCol++;
+		}
 		rowElement.add("NAME");
+		
+		if(hasGWeight == false) {
+			dataCol++;
+		}
 		rowElement.add("GWEIGHT");
 		
 		// add array name row
@@ -291,7 +302,7 @@ public class CDTCreator3 {
 		rowElement.add("EWEIGHT");
 
 		// start at 1 because EWEIGHT takes position 0
-		for (int i = eweightCol + 1; i < dataCol; i++) {
+		for (int i = eweightCol; i < dataCol; i++) {
 
 			rowElement.add("");
 		}
@@ -318,7 +329,7 @@ public class CDTCreator3 {
 				rowElement.add(fullRow.get(orfCol));
 				
 			} else {
-				rowElement.add("ORF label missing");
+				rowElement.add("ORF N/A");
 			}
 
 			if (nameInd.get(0) != null) {
@@ -328,7 +339,7 @@ public class CDTCreator3 {
 				rowElement.add(fullRow.get(orfCol));
 				
 			} else {
-				rowElement.add("ORF and NAME labels missing");
+				rowElement.add("ORF & NAME N/A");
 			}
 
 			rowElement.add(fullRow.get(gweightCol));
