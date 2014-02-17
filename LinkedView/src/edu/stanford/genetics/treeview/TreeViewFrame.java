@@ -1004,7 +1004,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			panel.add(l1, "pushx, wrap");
 			panel.add(button, "pushx, alignx 50%");
 
-			dialog.add(panel, "push, grow");
+			dialog.add(panel);
 
 			dialog.pack();
 			dialog.setVisible(true);

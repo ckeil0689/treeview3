@@ -22,13 +22,9 @@
  */
 package edu.stanford.genetics.treeview;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.Observable;
 import java.util.Observer;
 
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -48,7 +44,6 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 
 	private HeaderInfo headerInfo;
 	private HeaderSummary headerSummary;
-	private TreeViewFrame viewFrame;
 	private final JList headerList = new JList(new String[0]);
 
 	public HeaderSummaryPanel(final HeaderInfo headerInfo,
@@ -56,7 +51,6 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 
 		this.headerInfo = headerInfo;
 		this.headerSummary = headerSummary; 
-		this.viewFrame = frame;
 
 		setLayout(new MigLayout());
 		setOpaque(false);
@@ -80,50 +74,6 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 			}
 		};
 		
-//		JButton custom_button = GUIParams.setButtonLayout("Use Custom Labels", 
-//				null);
-//		custom_button.addActionListener(new ActionListener() {
-//
-//			@Override
-//			public void actionPerformed(ActionEvent arg0) {
-//				
-//				File customFile;
-//				FileSet loadedSet = viewFrame.getDataModel().getFileSet();
-//				File file = new File(loadedSet.getDir() + loadedSet.getRoot() 
-//						+ loadedSet.getExt());
-//				
-//				try {
-//					customFile = viewFrame.selectFile();
-//					
-//					final String fileName = file.getAbsolutePath();
-//					final int dotIndex = fileName.indexOf(".");
-//
-//					final int suffixLength = fileName.length() - dotIndex;
-//
-//					final String fileType = file.getAbsolutePath().substring(
-//							fileName.length() - suffixLength, fileName.length());
-//					
-//					final CDTCreator2 fileChanger = new CDTCreator2(file, 
-//							customFile, fileType);
-//					fileChanger.createFile();
-//
-//					file = new File(fileChanger.getFilePath());
-//					
-//					FileSet fileSet = viewFrame.getFileSet(file);
-//					viewFrame.loadFileSet(fileSet);
-//
-//					fileSet = viewFrame.getFileMRU().addUnique(fileSet);
-//					viewFrame.getFileMRU().setLast(fileSet);
-//
-//					viewFrame.confirmLoaded();
-//					
-//				} catch (LoadException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//			
-//		});
-//		add(custom_button);
 		getHeaderList().addListSelectionListener(tmp);
 		synchronizeFrom();
 	}

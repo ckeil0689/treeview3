@@ -262,8 +262,25 @@ public class NewModelLoader {
 						}
 					}
 					
-					// handle line in which data has been found
-					stringLabels[rowN] = labels;
+					// avoid first datarow to be added with null values
+					if(dataFound) {
+						String[] firstDataRow = new String[dataStartCol];
+						
+						for(int i = 0; i < labels.length; i++) {
+							
+							if(labels[i] != null) {
+								firstDataRow[i] = labels[i];
+								
+							} else {
+								break;
+							}
+						}
+						stringLabels[rowN] = firstDataRow;
+						
+					} else {
+						// handle line in which data has been found
+						stringLabels[rowN] = labels;
+					}
 					
 					if(dataFound) {
 						doubleData = new double[lineNum - dataStartRow][];

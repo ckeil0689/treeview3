@@ -11,8 +11,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import javax.swing.SwingWorker;
+
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.GUIParams;
+import edu.stanford.genetics.treeview.LabelLoadDialog;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.PreferencesMenu;
 import edu.stanford.genetics.treeview.TVFrameController;
@@ -26,6 +29,7 @@ public class PreferencesController {
 	private TVFrameController controller;
 	private TreeViewFrame tvFrame;
 	private PreferencesMenu preferences;
+	private SwingWorker<Void, Void> labelWorker;
 	
 	public PreferencesController(TreeViewFrame tvFrame, 
 			PreferencesMenu preferences, TVFrameController controller) {
@@ -50,10 +54,18 @@ public class PreferencesController {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
-			CustomLabelLoader clLoader = new CustomLabelLoader(tvFrame);
-			String[][] loadedLabels = clLoader.load();
-			clLoader.replaceLabels((TVModel)tvFrame.getDataModel(), 
-					loadedLabels);
+			setupLabelWorker();
+			
+			if(tvFrame.getLoaded()){
+				labelWorker.execute();
+//				CustomLabelLoader clLoader = new CustomLabelLoader(tvFrame);
+//				String[][] loadedLabels = clLoader.load();
+//				clLoader.replaceLabels((TVModel)tvFrame.getDataModel(), 
+//						loadedLabels);
+//				
+//				// Needs to refresh textview and update the label selector
+//				preferences.synchronizeAnnotation();
+			}
 			
 		}
 	}
@@ -142,5 +154,39 @@ public class PreferencesController {
 				controller.addViewListeners();
 			}
 		}
+	}
+	
+	public void setupLabelWorker() {
+		
+		final LabelLoadDialog dialog = new LabelLoadDialog(tvFrame);
+		
+		labelWorker = new SwingWorker<Void, Void>() {
+
+			@Override
+			protected Void doInBackground() throws Exception {
+				
+				// Load new labels
+				CustomLabelLoader clLoader = new CustomLabelLoader(tvFrame);
+				String[][] loadedLabels = clLoader.load();
+				
+				// Open small dialog
+				dialog.setVisible(true);
+				
+				clLoader.addNewLabels((TVModel)tvFrame.getDataModel(), 
+						loadedLabels);
+				return null;
+			}
+			
+			@Override
+			protected void done() {
+				
+				// Refresh labels
+				preferences.synchronizeAnnotation();
+				
+				// Close dialog
+				dialog.dispose();
+			}
+			
+		};
 	}
 }

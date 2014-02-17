@@ -188,18 +188,18 @@ public class TVFrameController {
 								fileName.length() - suffixLength, 
 								fileName.length());
 					
-						if (!fileType.equalsIgnoreCase(".cdt")) {
-							
-							
-								final CDTCreator3 fileTransformer = 
-										new CDTCreator3(file, fileType, 
-												tvFrame);
-								
-								fileTransformer.createFile();
-				
-								file = new File(fileTransformer.getFilePath());
-								
-						}
+//						if (!fileType.equalsIgnoreCase(".cdt")) {
+//							
+//							
+//								final CDTCreator3 fileTransformer = 
+//										new CDTCreator3(file, fileType, 
+//												tvFrame);
+//								
+//								fileTransformer.createFile();
+//				
+//								file = new File(fileTransformer.getFilePath());
+//								
+//						}
 						fileSet = tvFrame.getFileSet(file);
 						
 					} else {
@@ -217,10 +217,10 @@ public class TVFrameController {
 						System.out.println("FileSet is null.");
 					}
 					
-				} catch (IOException e) {
-					System.out.println("Could not generate CDT file. Cause: " +
-							e.getCause());
-					e.printStackTrace();
+//				} catch (IOException e) {
+//					System.out.println("Could not generate CDT file. Cause: " +
+//							e.getCause());
+//					e.printStackTrace();
 					
 				} catch (LoadException e) {
 					System.out.println("Loading the FileSet was interrupted. " +

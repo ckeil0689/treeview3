@@ -44,12 +44,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.SwingWorker;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 
 import edu.stanford.genetics.treeview.BrowserControl;
 import edu.stanford.genetics.treeview.ConfigNode;
-import edu.stanford.genetics.treeview.SwingWorker;
 import edu.stanford.genetics.treeview.TreeViewApp;
 import edu.stanford.genetics.treeview.model.LoadProgress;
 
@@ -70,6 +70,7 @@ import edu.stanford.genetics.treeview.model.LoadProgress;
  * 
  */
 public class RegEngine {
+	
 	LoadProgress loadProgress;
 	private final Entry regEntry;
 	javax.swing.Timer loadTimer;
@@ -111,6 +112,7 @@ public class RegEngine {
 	 * 
 	 */
 	public static void verify(final ConfigNode node) throws Exception {
+		
 		final Registration reg = new Registration(node);
 		final String versionTag = TreeViewApp.getVersionTag();
 		Entry entry = reg.getCurrentEntry();
@@ -148,6 +150,7 @@ public class RegEngine {
 	 * @throws Exception
 	 */
 	public static void reverify(final ConfigNode node) throws Exception {
+		
 		final Registration reg = new Registration(node);
 		final String versionTag = TreeViewApp.getVersionTag();
 		Entry entry = reg.getEntry(versionTag);
@@ -176,15 +179,16 @@ public class RegEngine {
 	 */
 	private void attemptRegistration() throws Exception {
 		loadProgress = new LoadProgress("Registering Java Treeview...", null);
-		final SwingWorker worker = new SwingWorker() {
+		final SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+
 			@Override
-			public Object construct() {
+			protected Void doInBackground() throws Exception {
 				run();
 				return null;
 			}
 		};
 		// start up the worker thread
-		worker.start();
+		worker.execute();
 		loadTimer.start();
 
 		// show a modal dialog, should block until loading done...

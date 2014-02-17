@@ -242,6 +242,7 @@ public class CDTCreator3 {
 		final int eweightCol = eweightInd.get(1);
 		final int gweightCol = gweightInd.get(1);
 		int dataCol = dataStart.get(1);
+		int eweightGap = dataStart.get(1);
 		final int dataRow = dataStart.get(0);
 		int gidCol = 0;
 		int line = 0;
@@ -253,17 +254,17 @@ public class CDTCreator3 {
 		} 
 		
 		if(hasORF == false) {
-			dataCol++;
+			eweightGap++;
 		}
 		rowElement.add("ORF");
 		
 		if(hasName == false) {
-			dataCol++;
+			eweightGap++;
 		}
 		rowElement.add("NAME");
 		
 		if(hasGWeight == false) {
-			dataCol++;
+			eweightGap++;
 		}
 		rowElement.add("GWEIGHT");
 		
@@ -302,7 +303,7 @@ public class CDTCreator3 {
 		rowElement.add("EWEIGHT");
 
 		// start at 1 because EWEIGHT takes position 0
-		for (int i = eweightCol; i < dataCol; i++) {
+		for (int i = eweightCol + 1; i < eweightGap; i++) {
 
 			rowElement.add("");
 		}

@@ -36,6 +36,7 @@ public class ExitConfirmDialog {
 			@Override
 			public void actionPerformed(final ActionEvent arg0) {
 
+				exitFrame.dispose();
 				view.getAppFrame().dispose();
 			}
 		});

@@ -155,6 +155,7 @@ public class TextViewManager extends ModelView implements FontSelectable,
 
 	@Override
 	public void update(final Observable ob, final Object obj) {
+		
 		if (ob == headerSummary) {
 			saveSelection();
 			saveDividerLocations();

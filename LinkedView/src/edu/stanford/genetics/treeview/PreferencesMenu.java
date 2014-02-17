@@ -98,6 +98,12 @@ public class PreferencesMenu {
 		return menuFrame;
 	}
 	
+	public void synchronizeAnnotation() {
+		
+		annotationSettings.synchronize();
+		setupLayout("Row and Column Labels");
+	}
+	
 	// Listeners
 	/**
 	 * Adds an ActionListener to the ok_button.
@@ -129,7 +135,11 @@ public class PreferencesMenu {
 	public void addCustomLabelListener(ActionListener listener) {
 		
 		System.out.println("Custom label Listener added.");
-		annotationSettings.getCustomLabelButton().addActionListener(listener);
+		
+		if(annotationSettings != null) {
+			annotationSettings.getCustomLabelButton()
+			.addActionListener(listener);
+		}
 	}
 	
 	/**
@@ -350,6 +360,7 @@ public class PreferencesMenu {
 		
 		private JScrollPane scrollPane;
 		private final JButton custom_button;
+		private final HeaderSummaryPanel genePanel;
 		
 		public AnnotationPanel() {
 			
@@ -359,7 +370,7 @@ public class PreferencesMenu {
 			panel.setLayout(new MigLayout());
 			panel.setBackground(GUIParams.BG_COLOR);
 			
-			final HeaderSummaryPanel genePanel = new HeaderSummaryPanel(
+			genePanel = new HeaderSummaryPanel(
 					tvFrame.getDataModel().getGeneHeaderInfo(), 
 					dendroView.getTextview().getHeaderSummary(), tvFrame);
 
@@ -407,6 +418,11 @@ public class PreferencesMenu {
 		public JButton getCustomLabelButton() {
 			
 			return custom_button;
+		}
+		
+		public void synchronize() {
+			
+			genePanel.synchronizeTo();
 		}
 	}
 	

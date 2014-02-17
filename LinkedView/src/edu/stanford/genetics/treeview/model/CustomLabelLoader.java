@@ -9,6 +9,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.TreeViewFrame;
@@ -17,11 +19,10 @@ public class CustomLabelLoader {
 
 	private TreeViewFrame tvFrame;
 	private String[][] labels;
+	private String[] newNames;
 	private int lineNum;
 	
-    private boolean hasORF = false;
-    private boolean hasNAME = false;
-    private boolean hasGWeight = false;
+    boolean namesFound = false;
 	
 	public CustomLabelLoader(TreeViewFrame tvFrame) {
 		
@@ -46,11 +47,6 @@ public class CustomLabelLoader {
 	        BufferedReader br = new BufferedReader(
 	        		new InputStreamReader(in));
 	        
-	        // booleans to determine whether certain labels were found
-	        // in the custom file
-	        boolean labelsFound = false;
-	        boolean headersFound = false;
-	        
 	        // int to count the current row in while loop
 	        int rowN = 0;
 	        int headerStart = 0;
@@ -62,85 +58,16 @@ public class CustomLabelLoader {
 	        	cdtColN--;
 	        }
 	        
-	        // int variables for label locations in custom file
-	        int orfCol = -1;
-	        int nameCol = -1;
-	        int gweightCol = -1;
-	        
-	        //Yeast ORF number of characters.
-	        int orfLength = 7;
+	        setLabelArray(lineNum, cdtColN);
 	        
 	        String line;
-			
 	        // iterate reader through each line
 	        while((line = br.readLine()) != null) {
 	        	
 	        	final String[] lineAsStrings = line.split("\t");
-	        	
-	        	if(!headersFound) {
-		        	for(int i = 0; i < lineAsStrings.length; i++) {
-						
-						String element = lineAsStrings[i];
-						
-						if(element.equalsIgnoreCase("ORF")) {
-							hasORF = true;
-							orfCol = i;
-							labelsFound = true;
-							
-						} else if(element.equalsIgnoreCase("NAME")) {
-							hasNAME = true;
-							nameCol = i;
-							labelsFound = true;
-							
-						} else if(element.equalsIgnoreCase("GWEIGHT")) {
-							hasGWeight = true;
-							gweightCol = i;
-							labelsFound = true;
-							
-						} else if(element.contains("y") && element.length() 
-								== orfLength){
-							headersFound = true;
-							headerStart = rowN;
-							setLabelArray(rowN, cdtColN);
-							
-							if(!labelsFound) {
-								orfCol = 0;
-								nameCol = 1;
-								gweightCol = 2;
-							}
-						}
-					}
-	        	
+		
+				labels[rowN - headerStart] = lineAsStrings;
 				
-				// after the labels were found add the headers to a Strig[][]
-				// which can later update GeneHeaderInfo for the TVModel.
-	        	} else {
-					
-					String[] rowLabels = new String[cdtColN];
-					
-					if(orfCol != -1) {
-						rowLabels[0] = lineAsStrings[orfCol];
-						
-					} else {
-						rowLabels[0] = "N/A";
-					}
-					
-					if(nameCol != -1) {
-						rowLabels[1] = lineAsStrings[nameCol];
-						
-					} else {
-						rowLabels[1] = "N/A";
-					}
-					
-					if(gweightCol != -1) {
-						rowLabels[2] = lineAsStrings[gweightCol];
-						
-					} else {
-						rowLabels[2] = "N/A";
-					}
-					
-					labels[rowN - headerStart] = rowLabels;
-	        	}
 	        	rowN++;
 	        }
 	        
@@ -159,46 +86,144 @@ public class CustomLabelLoader {
 		return labels;
 	}
 	
-	public void replaceLabels(TVModel model, String[][] loadedLabels) {
+	/**
+	 * Searches the loaded file for labels.
+	 */
+	public void checkForLabels(TVModel model) {
 		
-		String[][] oldLabels = model.getGeneHeaderInfo().getHeaderArray();
-		String[][] newLabels = oldLabels;
+		int checkRowLimit = (model.geneHeaderInfo.getNumHeaders()/100); 
 		
-		for(int i = 0; i < oldLabels.length; i++) {
-			
-			newLabels[i] = findNewHeader(oldLabels[i], loadedLabels);
+		newNames = new String[labels[0].length];
+		
+		if(checkRowLimit > 5) {
+			checkRowLimit = 5;
 		}
 		
-		model.setGeneHeaders(newLabels);
-		model.notifyObservers();	
+		// YORF regex pattern
+		Pattern pattern = Pattern.compile("(\\D{3}\\d{3}\\D{1})");
+		
+		for(int i = 0; i < checkRowLimit; i++) {
+			
+			for(int j = 0; j < labels[i].length; j++) {
+				
+				String yorf = labels[i][j];
+				Matcher matcher = pattern.matcher(yorf);
+				
+				if (!(matcher.find() || yorf.equalsIgnoreCase(""))) {
+					System.out.println("Label: " + yorf);
+					newNames[j] = yorf;
+					namesFound = true;
+				    
+				} else {
+					System.out.println(matcher.group(0));
+				}
+			}
+		}
 	}
 	
-	public String[] findNewHeader(String[] oldLabels, String[][] loadedLabels) {
+	public String[] concatArrays(String [] a, String[] b) {
 		
-		String[] newHeaders = new String[oldLabels.length];
+		String [] c = new String[a.length + b.length];
+		
+		System.arraycopy(a, 0, c, 0, a.length);
+		System.arraycopy(b, 0, c, a.length, b.length);
+		
+		return c;
+	}
+	
+	/**
+	 * Replacing matching values in the old headerArray with loaded labels.
+	 * @param model
+	 * @param loadedLabels
+	 */
+	public void replaceLabels(TVModel model) {
+		
+		String[][] oldHeaders = model.getGeneHeaderInfo().getHeaderArray();
+		String[][] headersToAdd = 
+				new String[oldHeaders.length + labels[0].length][];
+		
+		String[] newHeaders;
+		// Iterate over loadedLabels
+		for(int i = 0; i < oldHeaders.length; i++) {
+			
+			newHeaders = findNewHeader(oldHeaders[i], labels);
+			headersToAdd[i] = concatArrays(oldHeaders[i], newHeaders);
+		}
+		
+		model.setGeneHeaders(headersToAdd);
+		model.notifyObservers();
+	}
+	
+	/**
+	 * Checks the loadedLabels array whether it contains a label from the old
+	 * headerArray and then replaces it accordingly with the 
+	 * newly loaded version.
+	 * @param oldLabels
+	 * @param loadedLabels
+	 * @return
+	 */
+	public String[] findNewHeader(String[] oldGene, String[][] loadedLabels) {
+		
+		String[] newGene = new String[oldGene.length];
+		boolean match = false;
 		
 		for(int i = 0; i < loadedLabels.length; i++) {
 			
-			if(loadedLabels[i][0].equalsIgnoreCase(oldLabels[0])) {
-				
-				newHeaders = loadedLabels[i];
-				
-//				if(!hasORF) {
-//					newHeaders[0] = oldLabels[0];
-//				}
-//				
-//				if(!hasNAME) {
-//					newHeaders[1] = oldLabels[1];
-//				}
-//				
-//				if(!hasGWeight) {
-//					newHeaders[2] = oldLabels[2];
-//				}
-				break;
+			for(int j = 0; j < loadedLabels[i].length; j++) {
+			
+				for(int k = 0; k < oldGene.length; k++) {
+					
+					if(loadedLabels[i][j].equalsIgnoreCase(oldGene[k])) {
+						match = true;	
+						newGene = loadedLabels[i];
+						break;
+					} 
+				}
 			}
 		}
 		
-		return newHeaders;
+		if(!match) {
+			newGene = oldGene;	
+		}
+		
+		return newGene;
+	}
+	
+	// Experimental
+	public void addNewLabels(TVModel model, String[][] loadedLabels) {
+		
+		checkForLabels(model);
+		
+		String[] oldNames = model.getGeneHeaderInfo().getNames();
+		
+		String[] namesToAdd;
+		// Change model prefix array
+		if(namesFound) {
+			namesToAdd = concatArrays(oldNames, newNames);
+			
+			// Check for empty or null value
+			for(int i = 0; i < namesToAdd.length; i++) {
+				
+				if(namesToAdd[i] == null 
+						|| namesToAdd[i].equalsIgnoreCase("")) {
+					namesToAdd[i] = "CUSTOM " + (i + 1);
+				}
+			}
+			
+		} else {
+			// Make headers for custom labels
+			for(int i = 0; i < newNames.length; i++) {
+				
+				newNames[i] = "CUSTOM " + (i + 1);
+			}
+			
+			namesToAdd = concatArrays(oldNames, newNames);
+		}
+		
+		model.getGeneHeaderInfo().setPrefixArray(namesToAdd);
+		
+		// Change headerArrays (without matching actual names first)
+		replaceLabels(model);
 	}
 	
 	/**
@@ -209,7 +234,7 @@ public class CustomLabelLoader {
 	 */
 	public void setLabelArray(int rowN, int cdtColN) {
 		
-		labels = new String[lineNum - rowN][cdtColN];
+		labels = new String[rowN][cdtColN];
 	}
 	
 	/**
