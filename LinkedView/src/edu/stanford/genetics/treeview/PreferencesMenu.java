@@ -65,6 +65,8 @@ public class PreferencesMenu {
 		basisPanel = new JPanel();
 		basisPanel.setLayout(new MigLayout());
 		
+		ok_button = GUIParams.setButtonLayout("OK", null);
+		
 		// Setting preferred size for the ContentPane of this frame
 		final Dimension mainDim = GUIParams.getScreenSize();
 		
@@ -146,8 +148,6 @@ public class PreferencesMenu {
 	 * Sets up the layout for the menu.
 	 */
 	public void setupLayout(String startMenu) {
-		
-		ok_button = GUIParams.setButtonLayout("OK", null);
 		
 		setupMenus();
 		

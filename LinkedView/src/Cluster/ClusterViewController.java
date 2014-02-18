@@ -97,7 +97,8 @@ public class ClusterViewController {
 			@Override
 			protected void done() {
 				
-				if(controller.getTVControllerModel().getDataMatrix().getNumRow() > 0) {
+				if(controller.getTVControllerModel().
+						getDataMatrix().getNumRow() > 0) {
 					controller.setDataModel(controller.getTVControllerModel());
 					tvFrame.setView("LoadCheckView");
 					controller.addViewListeners();
@@ -218,16 +219,24 @@ public class ClusterViewController {
 			JFrame topFrame = (JFrame) SwingUtilities
 					.getWindowAncestor(clusterView);
 			
-			File file = new File(finalFilePath);
+			File file = null;
 			
-			fileSet = new FileSet(file.getName(), file.getParent() 
-					+ File.separator);
-
-			tvFrame.setView("LoadProgressView");
-			setupLoadWorkerThread();
-			loadWorker.execute();
+			if(finalFilePath != null) {
+				file = new File(finalFilePath);
 			
-			topFrame.dispose();
+				fileSet = new FileSet(file.getName(), file.getParent() 
+						+ File.separator);
+	
+				tvFrame.setView("LoadProgressView");
+				setupLoadWorkerThread();
+				loadWorker.execute();
+				
+				topFrame.dispose();
+			
+			} else {
+				// Make Warning Dialog
+				
+			}
 		}
 	}
 	

@@ -159,7 +159,6 @@ public class HierCluster2 {
 
 					// add the column of each gene's minimum to a list
 					colMinIndexList.add(gene.indexOf(geneMin));
-
 				}
 				// for the first empty list in the half-distance matrix,
 				// add the largest value of the last row so it
@@ -169,7 +168,7 @@ public class HierCluster2 {
 					// there's no actual value for the empty top row.
 					// Therefore a substitute is added. It is 2x the max size
 					// of the greatest value of the last distance matrix
-					// entry so it an never be a minimum and
+					// entry so it can never be a minimum and
 					// is effectively ignored
 					final int last = halfDMatrix.size() - 1;
 					final double substitute = Collections.max(halfDMatrix
@@ -567,7 +566,7 @@ public class HierCluster2 {
 					// access if a list is too short for the requested
 					// index since the distance matrix is symmetrical
 					
-					// halfDMatrix is getting mutated. Needs deepCopy? ---Investigate
+					// halfDMatrix is getting mutated. Needs deepCopy? 			---Investigate
 					
 					final List<Double> currentRow = halfDMatrixCopy
 							.get(selectedGene);
@@ -657,8 +656,8 @@ public class HierCluster2 {
 					// take a row (gene) from the matrix which also appears
 					// in the fusedGroup (current cluster).
 					
-					// halfDMatrix is getting mutated. Needs deepCopy? ---Investigate
-					final List<Double> currentRow = halfDMatrix
+					// halfDMatrix is getting mutated. Needs deepCopy? 			---Investigate
+					final List<Double> currentRow = halfDMatrixCopy
 							.get(selectedGene);
 
 					// go through all clusters and their contained genes
@@ -671,7 +670,7 @@ public class HierCluster2 {
 							distanceVal = currentRow.get(gene);
 						
 						} else {
-							distanceVal = halfDMatrix.get(gene)
+							distanceVal = halfDMatrixCopy.get(gene)
 									.get(selectedGene);
 						}
 						distanceSum += distanceVal;

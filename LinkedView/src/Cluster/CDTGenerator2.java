@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 import edu.stanford.genetics.treeview.DataModel;
+import edu.stanford.genetics.treeview.model.TVModel;
 
 /**
  * This class is used to generate the .CDT tab delimited file which Java
@@ -20,7 +21,7 @@ import edu.stanford.genetics.treeview.DataModel;
 public class CDTGenerator2 {
 
 	// Instance variables
-	private final DataModel model;
+	private final TVModel model;
 	private final ClusterView clusterView;
 
 	private String filePath;
@@ -47,7 +48,7 @@ public class CDTGenerator2 {
 	private ClusterFileWriter2 bufferedWriter;
 
 	// Constructor (building the object)
-	public CDTGenerator2(final DataModel model, final ClusterView clusterView,
+	public CDTGenerator2(final TVModel model, final ClusterView clusterView,
 			final List<List<Double>> sepList, final List<String> orderedRows,
 			final List<String> orderedCols, final boolean hierarchical) {
 
@@ -332,9 +333,16 @@ public class CDTGenerator2 {
 			cdtRow1.add("GID");
 		}
 
-		cdtRow1.add("ORF");
-		cdtRow1.add("NAME");
-		cdtRow1.add("GWEIGHT");
+		String[] rowHeaders = model.getGeneHeaderInfo().getNames();
+		
+		for(String element : rowHeaders) {
+			
+			cdtRow1.add(element);
+		}
+		
+//		cdtRow1.add("ORF");
+//		cdtRow1.add("NAME");
+//		cdtRow1.add("GWEIGHT");
 
 		// Adding column names to first row
 		for (int i = 0; i < colNameListOrdered.size(); i++) {
@@ -346,17 +354,21 @@ public class CDTGenerator2 {
 		bufferedWriter.writeContent(cdtRow1);
 
 		if (!choice2.contentEquals("Do Not Cluster")) {
-			aidBuffer = 3;
+			aidBuffer = rowHeaders.length;
 
 			final List<String> cdtRow2 = new ArrayList<String>();
 
 			cdtRow2.add("AID");
-			cdtRow2.add("");
-			cdtRow2.add("");
-
-			if (!choice.contentEquals("Do Not Cluster")) {
+			
+			for(int i = 0; i < rowHeaders.length; i++) {
 				cdtRow2.add("");
 			}
+//			cdtRow2.add("");
+//			cdtRow2.add("");
+//
+//			if (!choice.contentEquals("Do Not Cluster")) {
+//				cdtRow2.add("");
+//			}
 
 			// Fill second row with array element strings ("ARRY3X")
 			for (int i = 0; i < orderedCols.size(); i++) {
@@ -370,12 +382,17 @@ public class CDTGenerator2 {
 		final List<String> cdtRow3 = new ArrayList<String>();
 
 		cdtRow3.add("EWEIGHT");
-		cdtRow3.add("");
-		cdtRow3.add("");
-
-		if (!choice.contentEquals("Do Not Cluster")) {
+		
+		for(int i = 0; i < rowHeaders.length; i++) {
 			cdtRow3.add("");
 		}
+		
+//		cdtRow3.add("");
+//		cdtRow3.add("");
+//
+//		if (!choice.contentEquals("Do Not Cluster")) {
+//			cdtRow3.add("");
+//		}
 
 		for (int i = 0; i < colNameListOrdered.size(); i++) {
 
@@ -390,9 +407,16 @@ public class CDTGenerator2 {
 			
 			List<String> row = cdtDataStrings.get(i);
 			
-			row.add(0, rowNameListOrdered.get(i).get(0));
-			row.add(1, rowNameListOrdered.get(i).get(1));
-			row.add(2, rowNameListOrdered.get(i).get(2));
+			for(int j = 0; j < rowHeaders.length; j++) {
+				
+				row.add(j, rowNameListOrdered.get(i).get(j));
+				row.add(j, rowNameListOrdered.get(i).get(j));
+				row.add(j, rowNameListOrdered.get(i).get(j));
+			}
+			
+//			row.add(0, rowNameListOrdered.get(i).get(0));
+//			row.add(1, rowNameListOrdered.get(i).get(1));
+//			row.add(2, rowNameListOrdered.get(i).get(2));
 
 			// Adding GID names if rows were clustered
 			if (!choice.contentEquals("Do Not Cluster")) {

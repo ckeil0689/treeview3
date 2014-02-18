@@ -25,7 +25,7 @@ public class ClusterProcessor {
 	private final ClusterView clusterView;
 	
 	// Model
-	private final DataModel tvModel;
+	private final TVModel tvModel;
 	
 	// Lists
 	private List<List<Double>> rowDistances = new ArrayList<List<Double>>();
@@ -239,12 +239,11 @@ public class ClusterProcessor {
 
 		colDistances = dCalc.getDistanceMatrix();
 		
-		Integer[] spinnerInput = clusterView.getSpinnerValues();
-		
 		if (hierarchical) {
 			orderedCols = hCluster(colDistances, colString);
 
 		} else {
+			Integer[] spinnerInput = clusterView.getSpinnerValues();
 			orderedCols = kmCluster(colDistances, colString, spinnerInput[2], 
 					spinnerInput[3]);
 		}

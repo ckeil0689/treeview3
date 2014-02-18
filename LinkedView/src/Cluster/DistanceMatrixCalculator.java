@@ -49,6 +49,9 @@ public class DistanceMatrixCalculator {
 	 */
 	public void pearson(final boolean absolute, final boolean centered) {
 
+		// Reset in case Spearman Rank was used
+		clusterView.setLoadText("Calculating Distance Matrix...");
+		
 		clusterView.setPBarMax(fullList.size());
 
 		// making sure distanceList is clear
@@ -161,25 +164,24 @@ public class DistanceMatrixCalculator {
 
 		// making sure distanceList is clear
 		distanceList.clear();
+		
+		clusterView.setLoadText("Getting Spearman Ranks...");
 
-		System.out.println("FullList E 1000 Sample: "
-				+ fullList.get(1000).subList(0, 20));
+		for (int i = 0; i < fullList.size(); i++) {
+			
+			clusterView.updatePBar(i);
 
-		for (final List<Double> row : fullList) {
-
-			final List<Double> copyRow = new ArrayList<Double>(row);
+			final List<Double> copyRow = new ArrayList<Double>(fullList.get(i));
 
 			Collections.sort(copyRow);
 
-			for (int i = 0; i < copyRow.size(); i++) {
+			for (int j = 0; j < copyRow.size(); j++) {
 
-				final Double rank = (double) i;
-				row.set(row.indexOf(copyRow.get(i)), rank);
+				final Double rank = (double) j;
+				fullList.get(i).set(fullList.get(i).indexOf(copyRow.get(j)), 
+						rank);
 			}
 		}
-
-		System.out.println("FullList E 1000 Sample POST: "
-				+ fullList.get(1000).subList(0, 20));
 
 		pearson(false, true);
 	}

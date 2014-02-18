@@ -52,7 +52,7 @@ public class MenubarActions {
 			}
 			
 		} else if(name.equalsIgnoreCase("Theme")
-				|| name.equalsIgnoreCase("Font")
+				|| name.equalsIgnoreCase("Fonts")
 				|| name.equalsIgnoreCase("URL")
 				|| name.equalsIgnoreCase("Row and Column Labels")
 				|| name.equalsIgnoreCase("Color Settings")) {

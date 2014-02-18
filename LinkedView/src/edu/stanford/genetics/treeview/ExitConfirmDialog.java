@@ -18,7 +18,7 @@ public class ExitConfirmDialog {
 	public ExitConfirmDialog(final ViewFrame view) {
 
 		exitFrame = new JFrame("Confirm Exit");
-		exitFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		exitFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		exitFrame.setResizable(false);
 
 		final JPanel mainPanel = new JPanel();

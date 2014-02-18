@@ -102,8 +102,8 @@ public class ClusterView extends JPanel implements MainPanel {
 	
 	private ClickableIcon infoIcon;
 
-	private final String[] clusterMethods = { "Single Linkage",
-			"Centroid Linkage", "Average Linkage", "Complete Linkage" };
+	private final String[] clusterMethods = { "Single Linkage", 
+			"Average Linkage", "Complete Linkage" };
 
 	/**
 	 * Chained constructor for the ClusterView object note this will reuse any

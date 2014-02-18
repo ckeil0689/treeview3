@@ -950,9 +950,17 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 
 		if (arrayIndexes > 0 && geneIndexes > 0) {
 			newScale = xmap.getAvailablePixels() / arrayIndexes;
+			
+			if (newScale < xmap.getMinScale()) {
+				newScale = xmap.getMinScale();
+			}
 			xmap.setScale(newScale);
 
 			newScale2 = ymap.getAvailablePixels() / geneIndexes;
+			
+			if (newScale2 < ymap.getMinScale()) {
+				newScale2 = ymap.getMinScale();
+			}
 			ymap.setScale(newScale2);
 		}
 	}
