@@ -63,8 +63,11 @@ public class ClusterViewController {
 			public Void doInBackground() {
 				
 				// Setup a ClusterProcessor
-				final ClusterProcessor clusterTarget = 
-						new ClusterProcessor(clusterView, tvModel);
+//				final ClusterProcessor clusterTarget = 
+//						new ClusterProcessor(clusterView, tvModel);
+				
+				final ClusterProcessorArrays clusterTarget = 
+						new ClusterProcessorArrays(clusterView, tvModel);
 
 				// Begin the actual clustering, hierarchical or kmeans
 				finalFilePath = clusterTarget.cluster(

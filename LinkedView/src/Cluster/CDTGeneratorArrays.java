@@ -17,7 +17,7 @@ import edu.stanford.genetics.treeview.model.TVModel;
  * @author CKeil
  * 
  */
-public class CDTGenerator2 {
+public class CDTGeneratorArrays {
 
 	// Instance variables
 	private final TVModel model;
@@ -46,9 +46,9 @@ public class CDTGenerator2 {
 	private ClusterFileWriter2 bufferedWriter;
 
 	// Constructor (building the object)
-	public CDTGenerator2(final TVModel model, final ClusterView clusterView,
-			final List<List<Double>> sepList, final List<String> orderedRows,
-			final List<String> orderedCols, final boolean hierarchical) {
+	public CDTGeneratorArrays(final TVModel model, final ClusterView clusterView,
+			final double[][] sepList, final String[] orderedRows,
+			final String[] orderedCols, final boolean hierarchical) {
 
 		this.model = model;
 		this.clusterView = clusterView;

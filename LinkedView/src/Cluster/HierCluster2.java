@@ -118,6 +118,7 @@ public class HierCluster2 {
 		int finalClusterN = 1;
 		while (halfDMatrix.size() > finalClusterN) {
 
+			double time = System.currentTimeMillis();
 			// update ProgressBar
 			clusterView.updatePBar(wholeMSize - halfDMatrix.size());
 
@@ -310,6 +311,9 @@ public class HierCluster2 {
 
 				for (final List<Double> element : halfDMatrix) {
 
+					// value at column index of element replaced with 
+					// value from newRow at index of the current element's
+					// index in halfDMatrix
 					if (element.size() > column) {
 						element.set(column,
 								newRow.get(halfDMatrix.indexOf(element)));
@@ -320,6 +324,9 @@ public class HierCluster2 {
 				System.out.println("Weird error. Neither "
 						+ "rowGroup nor colGroup have a minimum.");
 			}
+			
+			time = System.currentTimeMillis() - time;
+			System.out.println("Loop time Lists:" + time);
 		}
 		
 		bufferedWriter.closeWriter();
@@ -547,6 +554,11 @@ public class HierCluster2 {
 		List<Double> newRow = new ArrayList<Double>();
 		
 		for (int i = 0; i < geneGroups.size(); i++) {
+			
+			if(i == 26)
+			{
+				System.out.println("Bug");
+			}
 
 			double newRowVal = 0;
 			double distanceVal = 0;
@@ -589,6 +601,11 @@ public class HierCluster2 {
 							// matrix symmetry
 							distanceVal = halfDMatrixCopy.get(gene)
 									.get(selectedGene);
+						}
+						
+						if(distanceVal != 1.0 )
+						{
+							System.out.println("Bug");
 						}
 						
 						distances.add(distanceVal);

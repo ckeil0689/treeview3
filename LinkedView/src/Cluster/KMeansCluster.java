@@ -1,5 +1,7 @@
 package Cluster;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -13,6 +15,7 @@ public class KMeansCluster {
 	private final TVModel model;
 	private final ClusterView clusterView;
 	
+	private ClusterFileWriter2 bufferedWriter;
 	private String filePath;
 	private String type = "";
 	private final int clusterN;
@@ -91,23 +94,26 @@ public class KMeansCluster {
 
 		geneGroups = indexToString(clusters);
 
-		final List<List<String>> clusterData = new ArrayList<List<String>>();
-
 		final List<String> initial = new ArrayList<String>();
-
-		String fileEnd;
+		
+		// File Writer
+		try {
+			setupFileWriter();
+			
+		} catch (IOException e) {
+			System.out.println("FileWriter failed in KMeansCluster");
+			e.printStackTrace();
+		}
 
 		if (type.equalsIgnoreCase("Gene")) {
-			fileEnd = "_K_G" + clusterN + ".kgg";
 			initial.add("ORF");
 
 		} else {
-			fileEnd = "_K_A" + clusterN + ".kag";
 			initial.add("ARRAY");
 		}
 
 		initial.add("GROUP");
-		clusterData.add(initial);
+		bufferedWriter.writeContent(initial);
 
 		// Prepare data for writing
 		for (final List<String> group : geneGroups) {
@@ -123,13 +129,31 @@ public class KMeansCluster {
 				dataPair.add(element);
 				dataPair.add(index);
 
-				clusterData.add(dataPair);
+				bufferedWriter.writeContent(dataPair);
 			}
 		}
+	}
+	
+	public void setupFileWriter() throws IOException {
+		
+		String fileEnd; 
+		
+		if (type.equalsIgnoreCase("Gene")) {
+			fileEnd = "_K_G" + clusterN + ".kgg";
 
-		final ClusterFileWriter fw = new ClusterFileWriter(model);
+		} else {
+			fileEnd = "_K_A" + clusterN + ".kag";
+		}
+		
+		File file = new File(model.getSource().substring(0,
+				model.getSource().length() - 4)
+				+ fileEnd);
 
-		fw.writeFile(clusterData, fileEnd);
+		file.createNewFile();
+
+		bufferedWriter = new ClusterFileWriter2(file);
+
+		filePath = bufferedWriter.getFilePath();
 	}
 
 	// Cluster support methods

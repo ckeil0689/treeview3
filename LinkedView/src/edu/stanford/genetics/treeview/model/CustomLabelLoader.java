@@ -121,6 +121,12 @@ public class CustomLabelLoader {
 		}
 	}
 	
+	/**
+	 * Fuses two arrays together.
+	 * @param a
+	 * @param b
+	 * @return
+	 */
 	public String[] concatArrays(String [] a, String[] b) {
 		
 		String [] c = new String[a.length + b.length];

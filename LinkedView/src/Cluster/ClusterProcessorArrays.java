@@ -18,7 +18,7 @@ import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
  * @author CKeil
  * 
  */
-public class ClusterProcessor {
+public class ClusterProcessorArrays {
 
 	// View
 	private final ClusterView clusterView;
@@ -27,18 +27,18 @@ public class ClusterProcessor {
 	private final TVModel tvModel;
 	
 	// Lists
-	private List<List<Double>> rowDistances = new ArrayList<List<Double>>();
-	private List<List<Double>> colDistances = new ArrayList<List<Double>>();
+	private double[][] rowDistances;
+	private double[][] colDistances;
 
-	private List<String> orderedRows = new ArrayList<String>();
-	private List<String> orderedCols = new ArrayList<String>();
+	private String[] orderedRows;
+	private String[] orderedCols;
 	
 	/**
 	 * Main constructor
 	 * @param cView
 	 * @param model
 	 */
-	public ClusterProcessor(final ClusterView cView, final TVModel model) {
+	public ClusterProcessorArrays(final ClusterView cView, final TVModel model) {
 		
 		this.clusterView = cView;
 		this.tvModel = model;
@@ -56,11 +56,9 @@ public class ClusterProcessor {
 	 */
 	public String cluster(final boolean hierarchical) {
 		
-		// List variables needed for process
-		final List<Double> unformattedDataList = matrixToList();
-		
-		// Getting formatted row data
-		List<List<Double>> sepRows = formatRowData(unformattedDataList);
+		// Get the data for clustering
+		TVDataMatrix matrix = (TVDataMatrix) tvModel.getDataMatrix();
+		final double[][] dataArrays = matrix.getExprData();
 		
 		// Getting user choices from the View
 		final String choice = clusterView.getRowSimilarity();
@@ -69,25 +67,29 @@ public class ClusterProcessor {
 		// if user checked clustering for elements
 		if (!choice.contentEquals("Do Not Cluster")) {
 			
-			clusterRows(sepRows, hierarchical);
+			clusterRows(dataArrays, hierarchical);
 		}
 
 		// if user checked clustering for arrays
-		if (!choice2.contentEquals("Do Not Cluster")) {
-			
-			List<List<Double>> sepCols = formatColData(unformattedDataList);
-			
-			clusterCols(sepCols, hierarchical);
-		}
+//		if (!choice2.contentEquals("Do Not Cluster")) {
+//			
+//			double[][] sepCols = formatColData(dataArrays);
+//			
+//			clusterCols(sepCols, hierarchical);
+//		}
 
 		// also takes list of row elements because only one list can easily
 		// be consistently transformed and fed into file writer
 		// to make a tab-delimited file
 		
 		//works until here (but check for correctness!)
-		final CDTGenerator2 cdtGen = new CDTGenerator2(tvModel, clusterView, 
-				sepRows, orderedRows, orderedCols, hierarchical);
+//		final CDTGenerator2 cdtGen = new CDTGenerator2(tvModel, clusterView, 
+//				dataArrays, orderedRows, orderedCols, hierarchical);
 
+		final CDTGeneratorArrays cdtGen = new CDTGeneratorArrays(tvModel, 
+				clusterView, dataArrays, orderedRows, orderedCols, 
+				hierarchical);
+				
 		cdtGen.generateCDT();
 		
 		return cdtGen.getFilePath();
@@ -101,11 +103,14 @@ public class ClusterProcessor {
 	 * @param pBar
 	 * @return
 	 */
-	public List<String> hCluster(final List<List<Double>> distances,
+	public String[] hCluster(final double[][] distanceMatrix,
 			final String type) {
 
-		final HierCluster2 cGen = new HierCluster2(tvModel, clusterView, 
-				distances, type);
+//		final HierCluster2 cGen = new HierCluster2(tvModel, clusterView, 
+//				distanceMatrix, type);
+		
+		final HierClusterArrays cGen = new HierClusterArrays(tvModel, 
+				clusterView, distanceMatrix, type);
 
 		cGen.cluster();
 
@@ -133,46 +138,46 @@ public class ClusterProcessor {
 		return cGen.getReorderedList();
 	}
 	
-	/**
-	 * This method takes the matrix data that is provided as double[] and
-	 * transforms it to a List<Double> object for further procedures.
-	 * @return List<Double>
-	 */
-	public List<Double> matrixToList() {
-		
-		final List<Double> dataList = new ArrayList<Double>();
-		
-		TVDataMatrix matrix = (TVDataMatrix) tvModel.getDataMatrix();
-		final double[][] dataArrays = matrix.getExprData();
-		
-		for(double[] array : dataArrays) {
-			for (final double d : array) {
+//	/**
+//	 * This method takes the matrix data that is provided as double[] and
+//	 * transforms it to a List<Double> object for further procedures.
+//	 * @return List<Double>
+//	 */
+//	public List<Double> matrixToList() {
+//		
+//		final List<Double> dataList = new ArrayList<Double>();
+//		
+//		TVDataMatrix matrix = (TVDataMatrix) tvModel.getDataMatrix();
+//		final double[][] dataArrays = matrix.getExprData();
+//		
+//		for(double[] array : dataArrays) {
+//			for (final double d : array) {
+//	
+//				dataList.add(d);
+//			}
+//		}
+//		
+//		return dataList;
+//	}
 	
-				dataList.add(d);
-			}
-		}
-		
-		return dataList;
-	}
-	
-	/**
-	 * This method uses the unformatted matrix data list and splits it up into
-	 * the rows.
-	 * @param unformattedData
-	 * @return
-	 */
-	public List<List<Double>> formatRowData(List<Double> unformattedData) {
-		
-		final DataFormatter formattedData = 
-				new DataFormatter(tvModel, clusterView, unformattedData);
-
-		List<List<Double>> sepRows = new ArrayList<List<Double>>();
-		
-		formattedData.splitRows();
-		sepRows = formattedData.getRowList();
-		
-		return sepRows;
-	}
+//	/**
+//	 * This method uses the unformatted matrix data list and splits it up into
+//	 * the rows.
+//	 * @param unformattedData
+//	 * @return
+//	 */
+//	public List<List<Double>> formatRowData(List<Double> unformattedData) {
+//		
+//		final DataFormatter formattedData = 
+//				new DataFormatter(tvModel, clusterView, unformattedData);
+//
+//		List<List<Double>> sepRows = new ArrayList<List<Double>>();
+//		
+//		formattedData.splitRows();
+//		sepRows = formattedData.getRowList();
+//		
+//		return sepRows;
+//	}
 	
 	/**
 	 * This method uses the unformatted matrix data list and splits it up into
@@ -197,13 +202,13 @@ public class ClusterProcessor {
 	 * Clusters the row data based on user input.
 	 * @param sepRows
 	 */
-	public void clusterRows(List<List<Double>> sepRows, boolean hierarchical) {
+	public void clusterRows(double[][] dataArrays, boolean hierarchical) {
 		
 		final String choice = clusterView.getRowSimilarity();
 		final String rowString = "GENE";
 		
-		final DistanceMatrixCalculator dCalc = 
-				new DistanceMatrixCalculator(sepRows, choice, clusterView);
+		final DMCalculatorArrays dCalc = 
+				new DMCalculatorArrays(dataArrays, choice, clusterView);
 
 		dCalc.measureDistance();
 
@@ -215,8 +220,8 @@ public class ClusterProcessor {
 		} else {
 			Integer[] spinnerInput = clusterView.getSpinnerValues();
 			
-			orderedRows = kmCluster(rowDistances, rowString, spinnerInput[0], 
-					spinnerInput[1]);
+//			orderedRows = kmCluster(rowDistances, rowString, spinnerInput[0], 
+//					spinnerInput[1]);
 		}
 
 		clusterView.refresh();
@@ -236,15 +241,15 @@ public class ClusterProcessor {
 
 		dCalc.measureDistance();
 
-		colDistances = dCalc.getDistanceMatrix();
+//		colDistances = dCalc.getDistanceMatrix();
 		
 		if (hierarchical) {
 			orderedCols = hCluster(colDistances, colString);
 
 		} else {
 			Integer[] spinnerInput = clusterView.getSpinnerValues();
-			orderedCols = kmCluster(colDistances, colString, spinnerInput[2], 
-					spinnerInput[3]);
+//			orderedCols = kmCluster(colDistances, colString, spinnerInput[2], 
+//					spinnerInput[3]);
 		}
 
 		clusterView.refresh();

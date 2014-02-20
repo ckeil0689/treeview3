@@ -1139,7 +1139,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 				menuList.add(themeMenuItem);
 				
 				JMenuItem fontMenuItem = 
-						(JMenuItem)menubar.addMenuItem("Fonts");
+						(JMenuItem)menubar.addMenuItem("Font");
 				menuList.add(fontMenuItem);
 				
 				JMenuItem urlMenuItem = (JMenuItem)menubar.addMenuItem("URL");

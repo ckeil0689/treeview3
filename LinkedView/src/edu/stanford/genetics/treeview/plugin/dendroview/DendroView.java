@@ -254,17 +254,16 @@ MainPanel, Observer {
 		} else {
 			geneIndex = null;
 		}
-		
-		setDataModel(dataModel);
-		setupViews();
-		doDoubleLayout();
-		dendroPane.addComponentListener(this);
-
 
 		if ((arrayIndex != null) || (geneIndex != null)) {
 			dataModel = new ReorderedDataModel(dataModel, geneIndex, 
 					arrayIndex);
 		}
+		
+		setDataModel(dataModel);
+		setupViews();
+		doDoubleLayout();
+		dendroPane.addComponentListener(this);
 
 		if (geneIndex != null) {
 			setGeneSelection(new ReorderedTreeSelection(

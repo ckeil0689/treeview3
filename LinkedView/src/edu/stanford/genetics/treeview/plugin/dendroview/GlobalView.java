@@ -546,7 +546,6 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 				}
 			}
 			recalculateOverlay();
-			// drawGeneIndicator();
 			drawIndicatorCircle();
 
 		} else if (o == arraySelection) {
@@ -560,13 +559,11 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 				}
 			}
 			recalculateOverlay();
-			// drawGeneIndicator();
 			drawIndicatorCircle();
 
 		} else if ((o == xmap) || o == ymap) {
 			recalculateZoom(); // it moves around, you see...
 			recalculateOverlay();
-			// drawGeneIndicator();
 			drawIndicatorCircle();
 			offscreenValid = false;
 
@@ -673,8 +670,8 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 			// do something else?
 		}
 
-		this.revalidate();
-		this.repaint();
+		revalidate();
+		repaint();
 	}
 
 	// MouseMotionListener
