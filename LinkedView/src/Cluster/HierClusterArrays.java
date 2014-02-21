@@ -122,6 +122,10 @@ public class HierClusterArrays {
 			loopN = wholeMSize - halfDMatrix.length;
 			System.out.println("Loop: " + loopN);
 			
+			if(loopN == 495) {
+				System.out.println("Bug");
+			}
+			
 			// update ProgressBar
 			clusterView.updatePBar(loopN);
 
@@ -189,10 +193,6 @@ public class HierClusterArrays {
 			Arrays.sort(geneMinListCopy);
 			row = findValue(geneMinList, geneMinListCopy[0]);
 			
-			if(loopN == 51) {
-				System.out.println("Bug");
-			}
-			
 			// find the corresponding column using gene
 			// with the minimum value (row)
 			column = colMinIndexList[row];
@@ -235,7 +235,7 @@ public class HierClusterArrays {
 			pair[2] = genePair[1];
 			pair[3] = String.valueOf(1 - min);
 			
-//			bufferedWriter.writeContent(pair);
+			bufferedWriter.writeContent(pair);
 
 			// add note of new cluster to dataTable
 			dataTable[loopN] = pair;
@@ -267,15 +267,20 @@ public class HierClusterArrays {
 				newVals.add(fusedGroup[i]);
 			}
 					
-			if (rowGHasMin) {
+			int targetGGSize = geneGroups.size() + 1;
+			if (rowGHasMin && row < targetGGSize) {
 				geneGroups.add(row, newVals);
 
-			} else if (colGHasMin) {
+			} else if (colGHasMin && column < targetGGSize) {
 				geneGroups.add(column, newVals);
 
+			} else if((rowGHasMin && row == targetGGSize)
+					|| (colGHasMin && column == targetGGSize)){
+				geneGroups.add(newVals);
+			
 			} else {
-				System.out.println("Adding fusedGroup to geneGroups failed.");
-			}
+				System.out.println("Problem adding fusedGroup to geneGroups.");
+			} 
 			
 			// Update the distance matrix 
 
@@ -338,7 +343,7 @@ public class HierClusterArrays {
 			}
 			
 			time = System.currentTimeMillis() - time;
-			System.out.println("Loop time arrays:" + time);
+//			System.out.println("Loop time arrays:" + time);
 		}
 		
 		bufferedWriter.closeWriter();
@@ -382,18 +387,14 @@ public class HierClusterArrays {
 		// this should shift the elements of halfDMatrix up by one 
 		// once it reaches the index which should be removed.
 		// A double of the last array in the element should remain at the end.
-		int k = 0;
-		for(int i = 0; i < oldMatrix.length; i++) {
-			
-			if(i == removeIndex) {
-				k++;
-			}
-			
-			if(k < oldMatrix.length && i < newMatrix.length) {
-				newMatrix[i] = halfDMatrix[k];
-			}
+		for(int i = 0; i < newMatrix.length; i++) {
 				
-			k++;
+			if(i < removeIndex) {
+				newMatrix[i] = halfDMatrix[i];
+				
+			} else if(i >= removeIndex) {
+				newMatrix[i] = halfDMatrix[i + 1];
+			}
 		}
 		
 		// this shrinks the current element after to a max size of '***Index'
@@ -405,26 +406,44 @@ public class HierClusterArrays {
 		// which are larger than the largest of the two.
 		// Make a function!
 		if (removeIndex > keepIndex) {
-			for (double[] element : newMatrix) {
+			for (int i = removeIndex; i < newMatrix.length; i++) {
 
-				if (element.length > removeIndex) {
-					double[] replacement = new double[removeIndex];
-					System.arraycopy(element, 0, replacement, 0, removeIndex);
-					element = replacement;
-				}
+				double[] element = newMatrix[i];
+				newMatrix[i] = removeCol(element, removeIndex);
 			}
 		} else {
-			for (double[] element : newMatrix) {
+			for (int i = keepIndex; i < newMatrix.length; i++) {
 
-				if (element.length > keepIndex) {
-					double[] replacement = new double[keepIndex];
-					System.arraycopy(element, 0, replacement, 0, keepIndex);
-					element = replacement;
-				}
+				double[] element = newMatrix[i];
+				newMatrix[i] = removeCol(element, keepIndex);
 			}
 		}
 		
 		return newMatrix;
+	}
+	
+	/**
+	 * Removes one value from a double[] array by making a new 
+	 * array without this value and with a length of array.length - 1.
+	 * @param array
+	 * @param toDelete
+	 * @return
+	 */
+	public double[] removeCol(double[] array, int toDelete) {
+		
+		double[] newArray = new double[array.length - 1];
+		
+		for(int i = 0; i < newArray.length; i++) {
+			
+			if(i < toDelete) {
+				newArray[i] = array[i];
+				
+			} else if(i >= toDelete) {
+				newArray[i] = array[i+1];
+			}
+		}
+		
+		return newArray;
 	}
 	
 	/**
@@ -812,12 +831,16 @@ public class HierClusterArrays {
 	public void reorderGen(final List<Integer> finalCluster) {
 
 		String element = "";
+		
+		reorderedList = new String[finalCluster.size()];
 
 		for (int i = 0; i < finalCluster.size(); i++) {
 
 			element = type + finalCluster.get(i) + "X";
 			reorderedList[i] = element;
 		}
+		
+		System.out.println("Done HierCluster");
 	}
 
 	/**

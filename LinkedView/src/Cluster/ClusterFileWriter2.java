@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.List;
 
 /**
  * This class is used to save data from clustering to the local storage by
@@ -36,7 +35,7 @@ public class ClusterFileWriter2 extends BufferedWriter {
 	 * @param input
 	 * @param fileEnd
 	 */
-	public void writeContent(final List<String> input) {
+	public void writeContent(final String[] input) {
 
 		final String content = doParse(input);
 
@@ -70,16 +69,16 @@ public class ClusterFileWriter2 extends BufferedWriter {
 	 * @param lastLine
 	 * @return
 	 */
-	public String doParse(final List<String> input) {
+	public String doParse(final String[] input) {
 
 		final StringBuilder sb = new StringBuilder();
 
-		int lastIndex = input.size() - 1;
-		for (final String element : input) {
+		int lastIndex = input.length - 1;
+		for (int i = 0; i < input.length; i++) {
 	
-			sb.append(element);
+			sb.append(input[i]);
 			
-			if(input.indexOf(element) != lastIndex) {
+			if(i != lastIndex) {
 				sb.append(SEPARATOR);
 			}
 		}

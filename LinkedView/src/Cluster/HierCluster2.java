@@ -121,6 +121,10 @@ public class HierCluster2 {
 			double time = System.currentTimeMillis();
 			// update ProgressBar
 			clusterView.updatePBar(wholeMSize - halfDMatrix.size());
+			
+			if(wholeMSize - halfDMatrix.size() == 51) {
+				System.out.println("Bug");
+			}
 
 			// local variables
 			double min = 0;
@@ -554,11 +558,6 @@ public class HierCluster2 {
 		List<Double> newRow = new ArrayList<Double>();
 		
 		for (int i = 0; i < geneGroups.size(); i++) {
-			
-			if(i == 26)
-			{
-				System.out.println("Bug");
-			}
 
 			double newRowVal = 0;
 			double distanceVal = 0;
