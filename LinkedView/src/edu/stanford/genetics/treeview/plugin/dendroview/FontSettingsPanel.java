@@ -227,18 +227,18 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 		setBackground(GUIParams.BG_COLOR);
 
 		setupFontChoice();
-		add(font_choice, "pushx");
+		add(font_choice, "span, wrap");
 
 		setupStyleChoice();
-		add(style_choice, "pushx");
+		add(style_choice, "span, wrap");
 
 		size_field = new NatField(client.getPoints(), 3);
 		size_field.addActionListener(new SelectionListener());
-		add(size_field, "pushx, wrap");
+		add(size_field, "span, wrap");
 		
 		exampleField = new JLabel("Font Example Text");
 		exampleField.setForeground(GUIParams.TEXT);
-		add(exampleField, "span");
+		add(exampleField, "pushx, alignx 50%, span");
 	}
 
 	private void updateExample() {

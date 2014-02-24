@@ -109,27 +109,27 @@ public class PixelSettingsSelector extends JPanel implements SettingsPanel {
 
 		removeAll();
 		
-		JPanel pixels = setPanelLayout();
+//		JPanel pixels = setPanelLayout();
 		JPanel contrast = setPanelLayout();
 		JPanel log = setPanelLayout();
 		JPanel colors = setPanelLayout();
 		
-		pixels.add(GUIParams.setupHeader("Pixel Scale"), "span, wrap");
-
-		m_xscale = new ScalePanel(m_xmap, "X-Scale:");
-		pixels.add(m_xscale, "w 50%");
-		m_yscale = new ScalePanel(m_ymap, "Y-Scale:");
-		pixels.add(m_yscale, "w 50%");
-
-		if (m_xZmap != null && m_yZmap != null) {
-
-			pixels.add(makeLabel("Zoom:"), "wrap");
-			m_xZscale = new ScalePanel(m_xZmap, "X:");
-			pixels.add(m_xZscale, "pushx, growx");
-			m_yZscale = new ScalePanel(m_yZmap, "Y:");
-			pixels.add(m_yZscale, "pushx, growx");
-		}
-		add(pixels, "push, w 90%, wrap");
+//		pixels.add(GUIParams.setupHeader("Pixel Scale"), "span, wrap");
+//
+//		m_xscale = new ScalePanel(m_xmap, "X-Scale:");
+//		pixels.add(m_xscale, "w 50%");
+//		m_yscale = new ScalePanel(m_ymap, "Y-Scale:");
+//		pixels.add(m_yscale, "w 50%");
+//
+//		if (m_xZmap != null && m_yZmap != null) {
+//
+//			pixels.add(makeLabel("Zoom:"), "wrap");
+//			m_xZscale = new ScalePanel(m_xZmap, "X:");
+//			pixels.add(m_xZscale, "pushx, growx");
+//			m_yZscale = new ScalePanel(m_yZmap, "Y:");
+//			pixels.add(m_yZscale, "pushx, growx");
+//		}
+//		add(pixels, "push, w 90%, wrap");
 
 		if (m_drawer != null) {
 			contrast.add(GUIParams.setupHeader("Contrast"), "wrap");

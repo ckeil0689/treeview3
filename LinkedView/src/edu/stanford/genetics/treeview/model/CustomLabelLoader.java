@@ -52,13 +52,14 @@ public class CustomLabelLoader {
 	        int headerStart = 0;
 	        
 	        // Number of row labels without GID
-	        int cdtColN = tvFrame.getDataModel().getGeneHeaderInfo().getNumNames();
+	        int cdtColN = tvFrame.getDataModel().getGeneHeaderInfo()
+	        		.getNumNames();
 	        
 	        if(tvFrame.getDataModel().gidFound() == true) {
 	        	cdtColN--;
 	        }
 	        
-	        setLabelArray(lineNum, cdtColN);
+	        setLabelArrays(lineNum, cdtColN);
 	        
 	        String line;
 	        // iterate reader through each line
@@ -144,19 +145,33 @@ public class CustomLabelLoader {
 	 */
 	public void replaceLabels(TVModel model) {
 		
-		String[][] oldHeaders = model.getGeneHeaderInfo().getHeaderArray();
-		String[][] headersToAdd = 
-				new String[oldHeaders.length + labels[0].length][];
+		String[][] oldRowHeaders = model.getGeneHeaderInfo().getHeaderArray();
+		String[][] oldColHeaders = model.getArrayHeaderInfo().getHeaderArray();
 		
-		String[] newHeaders;
+		String[][] rowHeadersToAdd = 
+				new String[oldRowHeaders.length + labels[0].length][];
+		String[][] colHeadersToAdd = 
+				new String[oldColHeaders.length + labels[0].length][];
+		
+		String[] newRowHeaders;
 		// Iterate over loadedLabels
-		for(int i = 0; i < oldHeaders.length; i++) {
+		for(int i = 0; i < oldRowHeaders.length; i++) {
 			
-			newHeaders = findNewHeader(oldHeaders[i], labels);
-			headersToAdd[i] = concatArrays(oldHeaders[i], newHeaders);
+			newRowHeaders = findNewHeader(oldRowHeaders[i], labels);
+			rowHeadersToAdd[i] = concatArrays(oldRowHeaders[i], newRowHeaders);
 		}
 		
-		model.setGeneHeaders(headersToAdd);
+		String[] newColHeaders;
+		// Iterate over loadedLabels
+		for(int i = 0; i < oldColHeaders.length; i++) {
+			
+			newColHeaders = findNewHeader(oldColHeaders[i], labels);
+			colHeadersToAdd[i] = concatArrays(oldColHeaders[i], newColHeaders);
+		}
+		
+		model.setGeneHeaders(rowHeadersToAdd);
+		model.setArrayHeaders(colHeadersToAdd);
+		
 		model.notifyObservers();
 	}
 	
@@ -200,19 +215,30 @@ public class CustomLabelLoader {
 		
 		checkForLabels(model);
 		
-		String[] oldNames = model.getGeneHeaderInfo().getNames();
+		String[] oldRowNames = model.getGeneHeaderInfo().getNames();
+		String[] oldColNames = model.getArrayHeaderInfo().getNames();
 		
-		String[] namesToAdd;
+		String[] rowNamesToAdd;
+		String[] colNamesToAdd;
 		// Change model prefix array
 		if(namesFound) {
-			namesToAdd = concatArrays(oldNames, newNames);
+			rowNamesToAdd = concatArrays(oldRowNames, newNames);
+			colNamesToAdd = concatArrays(oldColNames, newNames);
 			
 			// Check for empty or null value
-			for(int i = 0; i < namesToAdd.length; i++) {
+			for(int i = 0; i < rowNamesToAdd.length; i++) {
 				
-				if(namesToAdd[i] == null 
-						|| namesToAdd[i].equalsIgnoreCase("")) {
-					namesToAdd[i] = "CUSTOM " + (i + 1);
+				if(rowNamesToAdd[i] == null 
+						|| rowNamesToAdd[i].equalsIgnoreCase("")) {
+					rowNamesToAdd[i] = "CUSTOM " + (i + 1);
+				}
+			}
+			
+			for(int i = 0; i < colNamesToAdd.length; i++) {
+				
+				if(colNamesToAdd[i] == null 
+						|| colNamesToAdd[i].equalsIgnoreCase("")) {
+					colNamesToAdd[i] = "CUSTOM " + (i + 1);
 				}
 			}
 			
@@ -223,10 +249,12 @@ public class CustomLabelLoader {
 				newNames[i] = "CUSTOM " + (i + 1);
 			}
 			
-			namesToAdd = concatArrays(oldNames, newNames);
+			rowNamesToAdd = concatArrays(oldRowNames, newNames);
+			colNamesToAdd = concatArrays(oldColNames, newNames);
 		}
 		
-		model.getGeneHeaderInfo().setPrefixArray(namesToAdd);
+		model.getGeneHeaderInfo().setPrefixArray(rowNamesToAdd);
+		model.getArrayHeaderInfo().setPrefixArray(colNamesToAdd);
 		
 		// Change headerArrays (without matching actual names first)
 		replaceLabels(model);
@@ -238,7 +266,7 @@ public class CustomLabelLoader {
 	 * @param rowN
 	 * @param cdtColN
 	 */
-	public void setLabelArray(int rowN, int cdtColN) {
+	public void setLabelArrays(int rowN, int cdtColN) {
 		
 		labels = new String[rowN][cdtColN];
 	}

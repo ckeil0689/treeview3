@@ -361,6 +361,7 @@ public class PreferencesMenu {
 		private JScrollPane scrollPane;
 		private final JButton custom_button;
 		private final HeaderSummaryPanel genePanel;
+		private final HeaderSummaryPanel arrayPanel;
 		
 		public AnnotationPanel() {
 			
@@ -374,38 +375,38 @@ public class PreferencesMenu {
 					tvFrame.getDataModel().getGeneHeaderInfo(), 
 					dendroView.getTextview().getHeaderSummary(), tvFrame);
 
-			final HeaderSummaryPanel arrayPanel = new HeaderSummaryPanel(
+			arrayPanel = new HeaderSummaryPanel(
 					dendroView.getArraynameview().getHeaderInfo(), 
 					dendroView.getArraynameview().getHeaderSummary(), tvFrame);
 
-			final HeaderSummaryPanel atrPanel = new HeaderSummaryPanel(
-					tvFrame.getDataModel().getAtrHeaderInfo(), 
-					dendroView.getAtrview().getHeaderSummary(), tvFrame);
-
-			final HeaderSummaryPanel gtrPanel = new HeaderSummaryPanel(
-					tvFrame.getDataModel().getGtrHeaderInfo(), 
-					dendroView.getGtrview().getHeaderSummary(), tvFrame);
+//			final HeaderSummaryPanel atrPanel = new HeaderSummaryPanel(
+//					tvFrame.getDataModel().getAtrHeaderInfo(), 
+//					dendroView.getAtrview().getHeaderSummary(), tvFrame);
+//
+//			final HeaderSummaryPanel gtrPanel = new HeaderSummaryPanel(
+//					tvFrame.getDataModel().getGtrHeaderInfo(), 
+//					dendroView.getGtrview().getHeaderSummary(), tvFrame);
 			
 			custom_button = GUIParams.setButtonLayout(
 					"Use Custom Labels", null);
 			
 			JLabel rows = GUIParams.setupHeader("Rows");
 			JLabel cols = GUIParams.setupHeader("Columns");
-			JLabel rTrees = GUIParams.setupHeader("Row Trees");
-			JLabel cTrees = GUIParams.setupHeader("Column Trees");
+//			JLabel rTrees = GUIParams.setupHeader("Row Trees");
+//			JLabel cTrees = GUIParams.setupHeader("Column Trees");
 			
-			panel.add(rows, "span, wrap");
-			panel.add(genePanel, "pushx, alignx 50%, w 95%, span, wrap");
-			panel.add(custom_button, "pushx, alignx 50%, span, wrap");
+			panel.add(rows, "pushx, alignx 50%");
+			panel.add(cols, "pushx, alignx 50%, wrap");
+			panel.add(genePanel, "pushx, alignx 50%, w 45%");
+			panel.add(arrayPanel, "pushx, alignx 50%, w 45%, wrap");
 			
-			panel.add(cols, "span, wrap");
-			panel.add(arrayPanel, "pushx, alignx 50%, w 95%, span, wrap");
+			panel.add(custom_button, "pushx, alignx 50%, span");
 			
-			panel.add(rTrees, "span, wrap");
-			panel.add(gtrPanel, "pushx, alignx 50%, w 95%, span, wrap");
-			
-			panel.add(cTrees, "span, wrap");
-			panel.add(atrPanel, "pushx, alignx 50%, w 95%, span");
+//			panel.add(rTrees, "span, wrap");
+//			panel.add(gtrPanel, "pushx, alignx 50%, w 95%, span, wrap");
+//			
+//			panel.add(cTrees, "span, wrap");
+//			panel.add(atrPanel, "pushx, alignx 50%, w 95%, span");
 			
 			scrollPane.setViewportView(panel);
 		}
@@ -423,6 +424,7 @@ public class PreferencesMenu {
 		public void synchronize() {
 			
 			genePanel.synchronizeTo();
+			arrayPanel.synchronizeTo();
 		}
 	}
 	

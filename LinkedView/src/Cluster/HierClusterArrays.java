@@ -122,10 +122,6 @@ public class HierClusterArrays {
 			loopN = wholeMSize - halfDMatrix.length;
 			System.out.println("Loop: " + loopN);
 			
-			if(loopN == 495) {
-				System.out.println("Bug");
-			}
-			
 			// update ProgressBar
 			clusterView.updatePBar(loopN);
 
@@ -149,6 +145,9 @@ public class HierClusterArrays {
 			// the corresponding column value in columnValues
 			final int[] colMinIndexList = new int[halfDMatrix.length];
 
+			if(loopN == 494) {
+				System.out.println("Bug");
+			}
 			// going through every gene (row) in newDList
 			// takes ~150ms
 			for (int j = 0; j < halfDMatrix.length; j++) {
@@ -643,9 +642,9 @@ public class HierClusterArrays {
 		
 		boolean contains = false;
 		
-		for(double used : usedMins) {
+		for(int i = 0; i < usedMins.length; i++) {
 			
-			if(min == used) {
+			if(min == usedMins[i]) {
 				contains = true;
 				break;
 			}

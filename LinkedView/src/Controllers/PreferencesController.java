@@ -3,20 +3,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
 
 import javax.swing.SwingWorker;
 
-import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.LabelLoadDialog;
-import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.PreferencesMenu;
 import edu.stanford.genetics.treeview.TVFrameController;
 import edu.stanford.genetics.treeview.TreeViewFrame;
@@ -58,13 +49,6 @@ public class PreferencesController {
 			
 			if(tvFrame.getLoaded()){
 				labelWorker.execute();
-//				CustomLabelLoader clLoader = new CustomLabelLoader(tvFrame);
-//				String[][] loadedLabels = clLoader.load();
-//				clLoader.replaceLabels((TVModel)tvFrame.getDataModel(), 
-//						loadedLabels);
-//				
-//				// Needs to refresh textview and update the label selector
-//				preferences.synchronizeAnnotation();
 			}
 			
 		}

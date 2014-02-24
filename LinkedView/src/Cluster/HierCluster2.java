@@ -121,10 +121,6 @@ public class HierCluster2 {
 			double time = System.currentTimeMillis();
 			// update ProgressBar
 			clusterView.updatePBar(wholeMSize - halfDMatrix.size());
-			
-			if(wholeMSize - halfDMatrix.size() == 51) {
-				System.out.println("Bug");
-			}
 
 			// local variables
 			double min = 0;
@@ -144,6 +140,10 @@ public class HierCluster2 {
 			// the row value is just the position of
 			// the corresponding column value in columnValues
 			final List<Integer> colMinIndexList = new ArrayList<Integer>();
+			
+			if(wholeMSize - halfDMatrix.size() == 494) {
+				System.out.println("Bug");
+			}
 
 			// going through every gene (row) in newDList
 			// takes ~150ms
@@ -223,7 +223,8 @@ public class HierCluster2 {
 			pair.add(genePair.get(1));
 			pair.add(String.valueOf(1 - min));
 			
-			bufferedWriter.writeContent(pair);
+			String[] pairArr = new String[pair.size()];
+			bufferedWriter.writeContent(pair.toArray(pairArr));
 
 			// add note of new cluster to dataTable
 			dataTable.add(pair);
@@ -330,7 +331,7 @@ public class HierCluster2 {
 			}
 			
 			time = System.currentTimeMillis() - time;
-			System.out.println("Loop time Lists:" + time);
+//			System.out.println("Loop time Lists:" + time);
 		}
 		
 		bufferedWriter.closeWriter();
@@ -600,11 +601,6 @@ public class HierCluster2 {
 							// matrix symmetry
 							distanceVal = halfDMatrixCopy.get(gene)
 									.get(selectedGene);
-						}
-						
-						if(distanceVal != 1.0 )
-						{
-							System.out.println("Bug");
 						}
 						
 						distances.add(distanceVal);

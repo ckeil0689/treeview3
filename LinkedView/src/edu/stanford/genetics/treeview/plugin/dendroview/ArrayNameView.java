@@ -104,8 +104,11 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		this.setLayout(new MigLayout());
 
 		headerInfo = hInfo;
+		
 		headerSummary = new HeaderSummary();
 		headerSummary.setIncluded(new int[] { 0 });
+		headerSummary.addObserver(this);
+		
 		scrollPane = new JScrollPane(this);
 		scrollPane.setBorder(null);
 		panel = scrollPane;
@@ -500,6 +503,9 @@ public class ArrayNameView extends ModelView implements MouseListener,
 
 		} else if (o == arraySelection || o == geneSelection) {
 			selectionChanged(); // which genes are selected changed
+
+		} else if (o == headerSummary) { // annotation selection changed
+			selectionChanged();
 
 		} else {
 			System.out.println("ArrayNameView got funny update!");
