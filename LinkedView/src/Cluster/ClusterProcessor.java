@@ -84,7 +84,7 @@ public class ClusterProcessor {
 		// be consistently transformed and fed into file writer
 		// to make a tab-delimited file
 		
-		//works until here (but check for correctness!)
+		// works until here (but check for correctness!)
 		final CDTGenerator2 cdtGen = new CDTGenerator2(tvModel, clusterView, 
 				sepRows, orderedRows, orderedCols, hierarchical);
 

@@ -24,6 +24,12 @@ public class HierCluster2 {
 	private String filePath;
 	private final String type;
 	private int wholeMSize;
+	
+	private List<Double> replacedDoubles;
+	private List<Double> avgRepList;
+	private List<Double> avgNRList;
+	private double averageReplaced;
+	private double averageNR;
 
 	// Distance Matrix
 	//private List<List<Double>> dMatrix = new ArrayList<List<Double>>();
@@ -77,6 +83,9 @@ public class HierCluster2 {
 		}
 
 		wholeMSize = halfDMatrix.size();
+		
+		avgRepList = new ArrayList<Double>();
+		avgNRList = new ArrayList<Double>();
 		
 		// ProgressBar maximum
 		clusterView.setLoadText("Clustering data...");
@@ -141,7 +150,7 @@ public class HierCluster2 {
 			// the corresponding column value in columnValues
 			final List<Integer> colMinIndexList = new ArrayList<Integer>();
 			
-			if(wholeMSize - halfDMatrix.size() == 494) {
+			if(wholeMSize - halfDMatrix.size() == 16) {
 				System.out.println("Bug");
 			}
 
@@ -195,6 +204,8 @@ public class HierCluster2 {
 			// row and column value of the minimum
 			// distance value in matrix are now known
 			min = halfDMatrix.get(row).get(column);
+			
+			List<Double> sortedGMList = sortGMList(geneMinList);
 
 			// add used min value to record so the
 			// next iterations finds the next higher min
@@ -218,7 +229,7 @@ public class HierCluster2 {
 					colGroup, row, column);
 
 			// Construct String list to add to dataTable (current cluster)
-			pair.add("NODE" + (wholeMSize - halfDMatrix.size()) + "X");
+			pair.add("NODE" + (wholeMSize - halfDMatrix.size() + 1) + "X");
 			pair.add(genePair.get(0));
 			pair.add(genePair.get(1));
 			pair.add(String.valueOf(1 - min));
@@ -272,7 +283,8 @@ public class HierCluster2 {
 				halfDMatrix.remove(row);
 				halfDMatrix.remove(column);
 
-				// something more efficient possible??				--- Investigate
+				// something more efficient possible??		
+				// removes the column at row for every element that is larger than row--- Investigate
 				for (final List<Double> element : halfDMatrix) {
 
 					if (element.size() > row) {
@@ -292,36 +304,50 @@ public class HierCluster2 {
 			} else if(linkMethod.contentEquals("Average Linkage")) {
 				newRow = newRowGenAverage(fusedGroup);
 			}
+			
+			//---newROw check
+			double sumRep = 0.0;
+			for(double num : newRow) {
+				sumRep += num;
+			}
+			
+			averageNR = sumRep/newRow.size();
+			
+			avgNRList.add(averageNR);
 
 			// first: check whether the row or column contains the
 			// smallest gene by index of both (fusedGroup)
 			// then add a newClade value to each element where
 			// newClade intersects (basically adding the column)
+			int repInd = 0;
 			if (rowGroup.contains(Collections.min(fusedGroup))) {
-				halfDMatrix.add(row, newRow.subList(0, row));
+				repInd = row;
+				List<Double> replacement = newRow.subList(0, row);
+				halfDMatrix.add(row, replacement);
 
-				for (final List<Double> element : halfDMatrix) {
+				for (int j = row; j < halfDMatrix.size(); j++) {
 
 					// add to element at index 'row' if the element
 					// is bigger than the row value otherwise the element
 					// is too small to add a column value
-					if (element.size() > row) {
-						element.set(row,
-								newRow.get(halfDMatrix.indexOf(element)));
+					if (halfDMatrix.get(j).size() > row) {
+						halfDMatrix.get(j).set(row, newRow.get(j));
 					}
 
 				}
 			} else if (colGroup.contains(Collections.min(fusedGroup))) {
-				halfDMatrix.add(column, newRow.subList(0, column));
+				repInd = column;
+				List<Double> replacement = newRow.subList(0, column);
+				halfDMatrix.add(column, replacement);
 
-				for (final List<Double> element : halfDMatrix) {
+				// Loop starts at column because matrix is symmetrical
+				for (int j = column; j < halfDMatrix.size(); j++) {
 
 					// value at column index of element replaced with 
 					// value from newRow at index of the current element's
 					// index in halfDMatrix
-					if (element.size() > column) {
-						element.set(column,
-								newRow.get(halfDMatrix.indexOf(element)));
+					if (halfDMatrix.get(j).size() > column) {
+						halfDMatrix.get(j).set(column, newRow.get(j));
 					}
 
 				}
@@ -330,12 +356,40 @@ public class HierCluster2 {
 						+ "rowGroup nor colGroup have a minimum.");
 			}
 			
+			// Check for the replaced doubles
+			replacedDoubles = new ArrayList<Double>();
+			
+			for(int i = repInd; i < halfDMatrix.size(); i++) {
+				
+				if(halfDMatrix.get(i).size() > repInd) {
+					replacedDoubles.add(halfDMatrix.get(i).get(repInd));
+				}
+			}
+			
+			sumRep = 0.0;
+			for(double num : replacedDoubles) {
+				sumRep += num;
+			}
+			
+			averageReplaced = sumRep/replacedDoubles.size();
+			
+			avgRepList.add(averageReplaced);
+			
 			time = System.currentTimeMillis() - time;
 //			System.out.println("Loop time Lists:" + time);
 		}
 		
 		bufferedWriter.closeWriter();
 		reorderGen(geneGroups.get(0));
+	}
+	
+	public List<Double> sortGMList(List<Double> gmList) {
+		
+		List<Double> gmSorted = new ArrayList<Double>(gmList);
+		
+		Collections.sort(gmSorted);
+		
+		return gmSorted;
 	}
 	
 	public void setupFileWriter() throws IOException {
@@ -567,7 +621,6 @@ public class HierCluster2 {
 			// check if fusedGroup contains the current checked gene
 			// (then no mean should be calculated) no elements in common
 			if (Collections.disjoint(geneGroups.get(i), fusedGroup)) {
-			
 				final List<Double> distances = new ArrayList<Double>();
 
 				for (int j = 0; j < fusedGroup.size(); j++) {
@@ -622,12 +675,12 @@ public class HierCluster2 {
 			}
 			// all elements in common
 			else if (geneGroups.get(i).containsAll(fusedGroup)) {
+				
 				newRowVal = 0.0;
 				newRow.add(newRowVal);
 			
 			// is there a third case?
 			} else {
-	
 			}
 		}
 

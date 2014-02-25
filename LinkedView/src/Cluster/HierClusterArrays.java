@@ -25,6 +25,12 @@ public class HierClusterArrays {
 	private final String type;
 	private int wholeMSize;
 	private int loopN;
+	
+	private List<Double> replacedDoubles;
+	private List<Double> avgRepList;
+	private List<Double> avgNRList;
+	private double averageReplaced;
+	private double averageNR;
 
 	// Distance Matrix
 	//private List<List<Double>> dMatrix = new ArrayList<List<Double>>();
@@ -77,6 +83,9 @@ public class HierClusterArrays {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		avgRepList = new ArrayList<Double>();
+		avgNRList = new ArrayList<Double>();
 		
 		// ProgressBar maximum
 		clusterView.setLoadText("Clustering data...");
@@ -144,10 +153,7 @@ public class HierClusterArrays {
 			// the row value is just the position of
 			// the corresponding column value in columnValues
 			final int[] colMinIndexList = new int[halfDMatrix.length];
-
-			if(loopN == 494) {
-				System.out.println("Bug");
-			}
+			
 			// going through every gene (row) in newDList
 			// takes ~150ms
 			for (int j = 0; j < halfDMatrix.length; j++) {
@@ -195,6 +201,10 @@ public class HierClusterArrays {
 			// find the corresponding column using gene
 			// with the minimum value (row)
 			column = colMinIndexList[row];
+			
+			if(row == 193 && column == 73) {
+				System.out.println("Bug");
+			}
 
 			// row and column value of the minimum
 			// distance value in matrix are now known
@@ -229,7 +239,7 @@ public class HierClusterArrays {
 					colGroup, row, column);
 
 			// Construct String list to add to dataTable (current cluster)
-			pair[0] = "NODE" + (loopN) + "X";
+			pair[0] = "NODE" + (loopN + 1) + "X";
 			pair[1] = genePair[0];
 			pair[2] = genePair[1];
 			pair[3] = String.valueOf(1 - min);
@@ -294,21 +304,31 @@ public class HierClusterArrays {
 			} else if(linkMethod.contentEquals("Average Linkage")) {
 				newRow = newRowGenAverage(fusedGroup);
 			}
+			
+			//---newROw check
+			double sumRep = 0.0;
+			for(double num : newRow) {
+				sumRep += num;
+			}
+			
+			averageNR = sumRep/newRow.length;
+			
+			avgNRList.add(averageNR);
 
 			// first: check whether the row or column contains the
 			// smallest gene by index of both (fusedGroup)
 			// then add a newClade value to each element where
 			// newClade intersects (basically adding the column)
+			int repInd = 0;
 			if (rowGHasMin) {
+				repInd = row;
 				// replace element at row with newRow
-				double[] replacementRow = new double[row];
-				System.arraycopy(newRow, 0, replacementRow, 0, row);
-				halfDMatrix[row] = replacementRow;
+				replaceRow(row, newRow);
 				
 				// remove the other row from halfDMatrix
-				halfDMatrix = updateDM(column, row, halfDMatrix);
+				updateDM(column, row);
 
-				for (int j = 0; j < halfDMatrix.length; j++) {
+				for (int j = row; j < halfDMatrix.length; j++) {
 
 					double[] element = halfDMatrix[j];
 					// add to element at index 'row' if the element
@@ -320,26 +340,47 @@ public class HierClusterArrays {
 
 				}
 			} else if (colGHasMin) {
+				repInd = column;
 				// replace element at row with newRow
-				double[] replacementRow = new double[column];
-				System.arraycopy(newRow, 0, replacementRow, 0, column);
-				halfDMatrix[column] = replacementRow;
+				replaceRow(column, newRow);
 				
 				// remove the other row from halfDMatrix
-				halfDMatrix = updateDM(row, column, halfDMatrix);
+				updateDM(row, column);
 
-				for (int j = 0; j < halfDMatrix.length; j++) {
+				for (int j = column; j < halfDMatrix.length; j++) {
 
 					double[] element = halfDMatrix[j];
+					
 					if (element.length > column) {
 						element[column] = newRow[j];
 					}
 
 				}
+				
+				System.out.println("Stop.");
 			} else {
 				System.out.println("Weird error. Neither "
 						+ "rowGroup nor colGroup have a minimum.");
 			}
+			
+			// Check for the replaced doubles
+			replacedDoubles = new ArrayList<Double>();
+						
+			for(int i = repInd; i < halfDMatrix.length; i++) {
+				
+				if(halfDMatrix[i].length > repInd) {
+					replacedDoubles.add(halfDMatrix[i][repInd]);
+				}
+			}
+			
+			sumRep = 0.0;
+			for(double num : replacedDoubles) {
+				sumRep += num;
+			}
+			
+			averageReplaced = sumRep/replacedDoubles.size();
+			
+			avgRepList.add(averageReplaced);
 			
 			time = System.currentTimeMillis() - time;
 //			System.out.println("Loop time arrays:" + time);
@@ -347,6 +388,27 @@ public class HierClusterArrays {
 		
 		bufferedWriter.closeWriter();
 		reorderGen(geneGroups.get(0));
+	}
+	
+	public void replaceRow(int repInd, double[] newRow) {
+		
+		double[][] newMatrix = new double[halfDMatrix.length][];
+		
+		double[] replacementRow = new double[repInd];
+		System.arraycopy(newRow, 0, replacementRow, 0, repInd);
+		
+		for(int i = 0; i < newMatrix.length; i++) {
+			
+			if(i < repInd || i > repInd) {
+				newMatrix[i] = halfDMatrix[i];
+				
+			} else if(i == repInd) {
+				newMatrix[i] = replacementRow;
+			}
+		}
+		
+		halfDMatrix = null;
+		halfDMatrix = newMatrix;
 	}
 	
 	public void setupFileWriter() throws IOException {
@@ -378,10 +440,9 @@ public class HierClusterArrays {
 	 * @param row
 	 * @param column
 	 */
-	public double[][] updateDM(int removeIndex, int keepIndex, 
-			double[][] oldMatrix) {
+	public void updateDM(int removeIndex, int keepIndex) {
 		
-		double[][] newMatrix = new double[oldMatrix.length - 1][];
+		double[][] newMatrix = new double[halfDMatrix.length - 1][];
 		
 		// this should shift the elements of halfDMatrix up by one 
 		// once it reaches the index which should be removed.
@@ -392,14 +453,15 @@ public class HierClusterArrays {
 				newMatrix[i] = halfDMatrix[i];
 				
 			} else if(i >= removeIndex) {
-				newMatrix[i] = halfDMatrix[i + 1];
+				double[] newElement = halfDMatrix[i + 1];
+				newMatrix[i] = newElement;
 			}
 		}
 		
 		// this shrinks the current element after to a max size of '***Index'
 		// after this the longest element in halfDMatrix has size '***Index'
 		
-		// ISSUE: this currently shrinks all larger elements to keep or removeInd,
+		// ISSUE: this currently shrinks all larger elements to keepInd or removeInd,
 		// whichever is the larger.
 		// BUT: It should only remove the double AT keep/removeInd in elements
 		// which are larger than the largest of the two.
@@ -418,7 +480,8 @@ public class HierClusterArrays {
 			}
 		}
 		
-		return newMatrix;
+		halfDMatrix = null;
+		halfDMatrix = newMatrix;
 	}
 	
 	/**
@@ -929,8 +992,10 @@ public class HierClusterArrays {
 			// is there a third case?
 			} 
 		}
+		
 		return newRow;
 	}
+	
 	
 	/**
 	 * Method used to generate a new row/col for the distance matrix which is
