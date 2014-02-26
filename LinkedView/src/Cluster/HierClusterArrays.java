@@ -25,12 +25,6 @@ public class HierClusterArrays {
 	private final String type;
 	private int wholeMSize;
 	private int loopN;
-	
-	private List<Double> replacedDoubles;
-	private List<Double> avgRepList;
-	private List<Double> avgNRList;
-	private double averageReplaced;
-	private double averageNR;
 
 	// Distance Matrix
 	//private List<List<Double>> dMatrix = new ArrayList<List<Double>>();
@@ -84,9 +78,6 @@ public class HierClusterArrays {
 			e.printStackTrace();
 		}
 		
-		avgRepList = new ArrayList<Double>();
-		avgNRList = new ArrayList<Double>();
-		
 		// ProgressBar maximum
 		clusterView.setLoadText("Clustering data...");
 		clusterView.setPBarMax(wholeMSize);
@@ -98,7 +89,14 @@ public class HierClusterArrays {
 		// in calculations (list of fusedGroups)
 		geneIntegerTable = new int[wholeMSize][];
 
+		// Create array to check whether a min val was already used.
+		// Fill with -1 values so 0 won't be mistaken as having been used.
 		usedMins = new double[wholeMSize];
+		
+		for(int i = 0; i < usedMins.length; i++) {
+			
+			usedMins[i] = -1;
+		}
 
 		// halving of the distance matrix
 		halfDMatrix = splitMatrix(halfDMatrix);
@@ -129,7 +127,6 @@ public class HierClusterArrays {
 
 			double time = System.currentTimeMillis();
 			loopN = wholeMSize - halfDMatrix.length;
-			System.out.println("Loop: " + loopN);
 			
 			// update ProgressBar
 			clusterView.updatePBar(loopN);
@@ -153,7 +150,7 @@ public class HierClusterArrays {
 			// the row value is just the position of
 			// the corresponding column value in columnValues
 			final int[] colMinIndexList = new int[halfDMatrix.length];
-			
+
 			// going through every gene (row) in newDList
 			// takes ~150ms
 			for (int j = 0; j < halfDMatrix.length; j++) {
@@ -201,10 +198,6 @@ public class HierClusterArrays {
 			// find the corresponding column using gene
 			// with the minimum value (row)
 			column = colMinIndexList[row];
-			
-			if(row == 193 && column == 73) {
-				System.out.println("Bug");
-			}
 
 			// row and column value of the minimum
 			// distance value in matrix are now known
@@ -244,6 +237,13 @@ public class HierClusterArrays {
 			pair[2] = genePair[1];
 			pair[3] = String.valueOf(1 - min);
 			
+			System.out.println("-----------");
+			System.out.println(pair[0]);
+			System.out.println(pair[1]);
+			System.out.println(pair[2]);
+			System.out.println(pair[3]);
+			System.out.println("-----------");
+			
 			bufferedWriter.writeContent(pair);
 
 			// add note of new cluster to dataTable
@@ -265,6 +265,11 @@ public class HierClusterArrays {
 				geneGroups.remove(row);
 			}
 			
+			if(loopN == 250) {	
+				System.out.println("UpdateDM bug.");
+			}
+			
+			// These function are wrong for row/ col = 0
 			int groupMin = findGroupMin(fusedGroup);
 			boolean rowGHasMin = checkGroupForMin(groupMin, rowGroup);
 			boolean colGHasMin = checkGroupForMin(groupMin, colGroup);
@@ -304,24 +309,12 @@ public class HierClusterArrays {
 			} else if(linkMethod.contentEquals("Average Linkage")) {
 				newRow = newRowGenAverage(fusedGroup);
 			}
-			
-			//---newROw check
-			double sumRep = 0.0;
-			for(double num : newRow) {
-				sumRep += num;
-			}
-			
-			averageNR = sumRep/newRow.length;
-			
-			avgNRList.add(averageNR);
 
 			// first: check whether the row or column contains the
 			// smallest gene by index of both (fusedGroup)
 			// then add a newClade value to each element where
 			// newClade intersects (basically adding the column)
-			int repInd = 0;
 			if (rowGHasMin) {
-				repInd = row;
 				// replace element at row with newRow
 				replaceRow(row, newRow);
 				
@@ -340,7 +333,6 @@ public class HierClusterArrays {
 
 				}
 			} else if (colGHasMin) {
-				repInd = column;
 				// replace element at row with newRow
 				replaceRow(column, newRow);
 				
@@ -354,33 +346,12 @@ public class HierClusterArrays {
 					if (element.length > column) {
 						element[column] = newRow[j];
 					}
-
 				}
 				
-				System.out.println("Stop.");
 			} else {
 				System.out.println("Weird error. Neither "
 						+ "rowGroup nor colGroup have a minimum.");
 			}
-			
-			// Check for the replaced doubles
-			replacedDoubles = new ArrayList<Double>();
-						
-			for(int i = repInd; i < halfDMatrix.length; i++) {
-				
-				if(halfDMatrix[i].length > repInd) {
-					replacedDoubles.add(halfDMatrix[i][repInd]);
-				}
-			}
-			
-			sumRep = 0.0;
-			for(double num : replacedDoubles) {
-				sumRep += num;
-			}
-			
-			averageReplaced = sumRep/replacedDoubles.size();
-			
-			avgRepList.add(averageReplaced);
 			
 			time = System.currentTimeMillis() - time;
 //			System.out.println("Loop time arrays:" + time);
@@ -938,8 +909,10 @@ public class HierClusterArrays {
 			// check if fusedGroup contains the current checked gene
 			// (then no mean should be calculated) no elements in common
 			if (checkDisjoint(currentGroup, fusedGroup)) {
-				final double[] distances = new double[fusedGroup.length];
+				final double[] distances = new double[fusedGroup.length 
+				                                      * currentGroup.length];
 
+				int dInd = 0;
 				for (int j = 0; j < fusedGroup.length; j++) {
 
 					selectedGene = fusedGroup[j];
@@ -967,8 +940,10 @@ public class HierClusterArrays {
 							distanceVal = halfDMatrixCopy[currentGroup[k]]
 									[selectedGene];
 						}
+						
+						distances[dInd] = distanceVal;
+						dInd++;
 					}
-					distances[j] = distanceVal;
 				}
 				
 				// result is a list of all distances between genes in 

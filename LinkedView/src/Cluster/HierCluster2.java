@@ -149,10 +149,6 @@ public class HierCluster2 {
 			// the row value is just the position of
 			// the corresponding column value in columnValues
 			final List<Integer> colMinIndexList = new ArrayList<Integer>();
-			
-			if(wholeMSize - halfDMatrix.size() == 16) {
-				System.out.println("Bug");
-			}
 
 			// going through every gene (row) in newDList
 			// takes ~150ms
@@ -195,11 +191,17 @@ public class HierCluster2 {
 			}
 
 			// finds the row (gene) which has the smallest value
-			row = geneMinList.indexOf(Collections.min(geneMinList));
+			double minListmin = Collections.min(geneMinList);
+			row = geneMinList.indexOf(minListmin);
 
 			// find the corresponding column using gene
 			// with the minimum value (row)
 			column = colMinIndexList.get(row);
+			
+			if(wholeMSize - halfDMatrix.size() == 250) {
+				
+				System.out.println("Find geneMin bug.");
+			}
 
 			// row and column value of the minimum
 			// distance value in matrix are now known
@@ -342,6 +344,10 @@ public class HierCluster2 {
 
 				// Loop starts at column because matrix is symmetrical
 				for (int j = column; j < halfDMatrix.size(); j++) {
+					
+					if(j == 258) {
+						System.out.println("Bug");
+					}
 
 					// value at column index of element replaced with 
 					// value from newRow at index of the current element's
@@ -625,6 +631,10 @@ public class HierCluster2 {
 
 				for (int j = 0; j < fusedGroup.size(); j++) {
 
+					if(i == 258) {
+						System.out.println("Bug.");
+					}
+					
 					selectedGene = fusedGroup.get(j);
 
 					// use halfDMatrix instead and just reverse the index
