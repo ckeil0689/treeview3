@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import edu.stanford.genetics.treeview.DataModel;
@@ -160,7 +161,6 @@ public class HierClusterArrays {
 
 				// just avoid the first empty list in the half-distance matrix
 				if (gene.length > 0) {
-					
 					// make trial the minimum value of that gene
 					geneMin = findRowMin(gene);
 
@@ -175,7 +175,6 @@ public class HierClusterArrays {
 				// add the largest value of the last row so it
 				// won't be mistaken as a minimum value
 				else {
-
 					// there's no actual value for the empty top row.
 					// Therefore a substitute is added. It is 2x the max size
 					// of the greatest value of the last distance matrix
@@ -344,7 +343,7 @@ public class HierClusterArrays {
 		}
 		
 		time = System.currentTimeMillis() - time;
-		System.out.println("Cluster Time Arrays:" + time);
+		System.out.println("Total Cluster Arrays:" + time);
 		
 		bufferedWriter.closeWriter();
 		reorderGen(geneGroups.get(0));
@@ -367,7 +366,7 @@ public class HierClusterArrays {
 			}
 		}
 		
-		halfDMatrix = null;
+//		halfDMatrix = null;
 		halfDMatrix = newMatrix;
 	}
 	
@@ -420,12 +419,6 @@ public class HierClusterArrays {
 		
 		// this shrinks the current element after to a max size of '***Index'
 		// after this the longest element in halfDMatrix has size '***Index'
-		
-		// ISSUE: this currently shrinks all larger elements to keepInd or removeInd,
-		// whichever is the larger.
-		// BUT: It should only remove the double AT keep/removeInd in elements
-		// which are larger than the largest of the two.
-		// Make a function!
 		if (removeIndex > keepIndex) {
 			for (int i = removeIndex; i < newMatrix.length; i++) {
 
@@ -440,7 +433,7 @@ public class HierClusterArrays {
 			}
 		}
 		
-		halfDMatrix = null;
+//		halfDMatrix = null;
 		halfDMatrix = newMatrix;
 	}
 	
@@ -612,24 +605,46 @@ public class HierClusterArrays {
 
 		double geneMin = -1.0;
 
+//		// standard collection copy constructor to make deep copy to protect
+//		// gene
+//		final double[] deepGene = gene.clone();
+//		
+//		Arrays.sort(deepGene);
+//		
+//		int minIndex = 0;
+//
+//		for (int i = 0; i < deepGene.length; i++) {
+//			
+//			final double min = deepGene[minIndex];
+//
+//			if (!checkForUsedMin(min)) {
+//				geneMin = min;
+//				break;
+//
+//			} else {
+//				minIndex++;
+//			}
+//		}
+
 		// standard collection copy constructor to make deep copy to protect
 		// gene
-		final double[] deepGene = gene.clone();
+		final List<Double> deepGene = new ArrayList<Double>();
 		
-		Arrays.sort(deepGene);
-		
-		int minIndex = 0;
-
-		for (int i = 0; i < deepGene.length; i++) {
+		for(double element : gene) {
 			
-			final double min = deepGene[minIndex];
+			deepGene.add(element);
+		}
+
+		for (int i = 0; i < deepGene.size(); i++) {
+
+			final double min = Collections.min(deepGene);
 
 			if (!checkForUsedMin(min)) {
 				geneMin = min;
 				break;
 
 			} else {
-				minIndex++;
+				deepGene.remove(deepGene.indexOf(min));
 			}
 		}
 
@@ -722,9 +737,6 @@ public class HierClusterArrays {
 				// if the 2 groups have elements in common...
 				if(geneIntegerTable[j] != null) {
 					if (!checkDisjoint(geneIntegerTable[j], colGroup)) {
-						
-	//					final int[] intersect = geneIntegerTable[j].clone();
-	//					intersect.retainAll(colGroup);
 	
 						// assigns NODE # of last fusedGroup containing
 						// a colGroup element
@@ -749,10 +761,6 @@ public class HierClusterArrays {
 				// if the 2 groups have elements in common...
 				if(geneIntegerTable[j] != null) {
 					if (!checkDisjoint(geneIntegerTable[j], rowGroup)) {
-						
-	//					final int[] intersect = geneIntegerTable[j].clone();
-	//					Arrays.asList(intersect).retainAll(rowGroup);
-	//					intersect.retainAll(rowGroup);
 	
 						// assigns NODE # of last fusedGroup containing
 						// a rowGroup element
@@ -862,7 +870,7 @@ public class HierClusterArrays {
 			reorderedList[i] = element;
 		}
 		
-		System.out.println("Done HierCluster");
+		System.out.println("Done HierCluster.");
 	}
 
 	/**
@@ -1032,7 +1040,6 @@ public class HierClusterArrays {
 			else  {
 				newRowVal = 0.0;
 				newRow[i] = newRowVal;
-				
 			} 
 		}
 

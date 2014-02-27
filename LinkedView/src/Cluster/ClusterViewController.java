@@ -3,7 +3,6 @@ package Cluster;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
@@ -64,11 +63,11 @@ public class ClusterViewController {
 			public Void doInBackground() {
 				
 				// Setup a ClusterProcessor
-//				final ClusterProcessor clusterTarget = 
-//						new ClusterProcessor(clusterView, tvModel);
+				final ClusterProcessor clusterTarget = 
+						new ClusterProcessor(clusterView, tvModel);
 				
-				final ClusterProcessorArrays clusterTarget = 
-						new ClusterProcessorArrays(clusterView, tvModel);
+//				final ClusterProcessorArrays clusterTarget = 
+//						new ClusterProcessorArrays(clusterView, tvModel);
 
 				// Begin the actual clustering, hierarchical or kmeans
 				finalFilePath = clusterTarget.cluster(

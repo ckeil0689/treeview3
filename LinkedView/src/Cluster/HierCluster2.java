@@ -150,10 +150,6 @@ public class HierCluster2 {
 
 				// just avoid the first empty list in the half-distance matrix
 				if (gene.size() > 0) {
-
-					if(wholeMSize - halfDMatrix.size() == 574 && j == 880) {
-						System.out.println("HDM Replacement bug.");
-					}
 					
 					// make trial the minimum value of that gene
 					geneMin = findRowMin(gene);
@@ -169,7 +165,6 @@ public class HierCluster2 {
 				// add the largest value of the last row so it
 				// won't be mistaken as a minimum value
 				else {
-
 					// there's no actual value for the empty top row.
 					// Therefore a substitute is added. It is 2x the max size
 					// of the greatest value of the last distance matrix
@@ -334,7 +329,7 @@ public class HierCluster2 {
 		}
 		
 		time = System.currentTimeMillis() - time;
-		System.out.println("Cluster Time Lists:" + time);
+		System.out.println("Total Cluster Time Lists:" + time);
 		
 		bufferedWriter.closeWriter();
 		reorderGen(geneGroups.get(0));
