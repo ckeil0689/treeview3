@@ -123,9 +123,9 @@ public class HierClusterArrays {
 		// which means that there is only 1 cluster
 		// initially every gene is its own cluster
 		int finalClusterN = 1;
+		double time = System.currentTimeMillis();
 		while (halfDMatrix.length > finalClusterN) {
-
-			double time = System.currentTimeMillis();
+			
 			loopN = wholeMSize - halfDMatrix.length;
 			
 			// update ProgressBar
@@ -160,7 +160,7 @@ public class HierClusterArrays {
 
 				// just avoid the first empty list in the half-distance matrix
 				if (gene.length > 0) {
-
+					
 					// make trial the minimum value of that gene
 					geneMin = findRowMin(gene);
 
@@ -181,7 +181,7 @@ public class HierClusterArrays {
 					// of the greatest value of the last distance matrix
 					// entry so it can never be a minimum and
 					// is effectively ignored
-					final double[] last = halfDMatrix[halfDMatrix.length - 1];
+					double[] last = halfDMatrix[halfDMatrix.length - 1].clone();
 					Arrays.sort(last);
 					final double substitute = last[last.length - 1] * 2;
 
@@ -237,13 +237,6 @@ public class HierClusterArrays {
 			pair[2] = genePair[1];
 			pair[3] = String.valueOf(1 - min);
 			
-			System.out.println("-----------");
-			System.out.println(pair[0]);
-			System.out.println(pair[1]);
-			System.out.println(pair[2]);
-			System.out.println(pair[3]);
-			System.out.println("-----------");
-			
 			bufferedWriter.writeContent(pair);
 
 			// add note of new cluster to dataTable
@@ -263,10 +256,6 @@ public class HierClusterArrays {
 			} else {
 				geneGroups.remove(column);
 				geneGroups.remove(row);
-			}
-			
-			if(loopN == 250) {	
-				System.out.println("UpdateDM bug.");
 			}
 			
 			// These function are wrong for row/ col = 0
@@ -352,10 +341,10 @@ public class HierClusterArrays {
 				System.out.println("Weird error. Neither "
 						+ "rowGroup nor colGroup have a minimum.");
 			}
-			
-			time = System.currentTimeMillis() - time;
-//			System.out.println("Loop time arrays:" + time);
 		}
+		
+		time = System.currentTimeMillis() - time;
+		System.out.println("Cluster Time Arrays:" + time);
 		
 		bufferedWriter.closeWriter();
 		reorderGen(geneGroups.get(0));

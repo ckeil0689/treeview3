@@ -24,12 +24,6 @@ public class HierCluster2 {
 	private String filePath;
 	private final String type;
 	private int wholeMSize;
-	
-	private List<Double> replacedDoubles;
-	private List<Double> avgRepList;
-	private List<Double> avgNRList;
-	private double averageReplaced;
-	private double averageNR;
 
 	// Distance Matrix
 	//private List<List<Double>> dMatrix = new ArrayList<List<Double>>();
@@ -84,9 +78,6 @@ public class HierCluster2 {
 
 		wholeMSize = halfDMatrix.size();
 		
-		avgRepList = new ArrayList<Double>();
-		avgNRList = new ArrayList<Double>();
-		
 		// ProgressBar maximum
 		clusterView.setLoadText("Clustering data...");
 		clusterView.setPBarMax(wholeMSize);
@@ -125,9 +116,9 @@ public class HierCluster2 {
 		// which means that there is only 1 cluster
 		// initially every gene is its own cluster
 		int finalClusterN = 1;
+		double time = System.currentTimeMillis();
 		while (halfDMatrix.size() > finalClusterN) {
-
-			double time = System.currentTimeMillis();
+			
 			// update ProgressBar
 			clusterView.updatePBar(wholeMSize - halfDMatrix.size());
 
@@ -160,6 +151,10 @@ public class HierCluster2 {
 				// just avoid the first empty list in the half-distance matrix
 				if (gene.size() > 0) {
 
+					if(wholeMSize - halfDMatrix.size() == 574 && j == 880) {
+						System.out.println("HDM Replacement bug.");
+					}
+					
 					// make trial the minimum value of that gene
 					geneMin = findRowMin(gene);
 
@@ -197,17 +192,10 @@ public class HierCluster2 {
 			// find the corresponding column using gene
 			// with the minimum value (row)
 			column = colMinIndexList.get(row);
-			
-			if(wholeMSize - halfDMatrix.size() == 250) {
-				
-				System.out.println("Find geneMin bug.");
-			}
 
 			// row and column value of the minimum
 			// distance value in matrix are now known
 			min = halfDMatrix.get(row).get(column);
-			
-			List<Double> sortedGMList = sortGMList(geneMinList);
 
 			// add used min value to record so the
 			// next iterations finds the next higher min
@@ -306,24 +294,12 @@ public class HierCluster2 {
 			} else if(linkMethod.contentEquals("Average Linkage")) {
 				newRow = newRowGenAverage(fusedGroup);
 			}
-			
-			//---newROw check
-			double sumRep = 0.0;
-			for(double num : newRow) {
-				sumRep += num;
-			}
-			
-			averageNR = sumRep/newRow.size();
-			
-			avgNRList.add(averageNR);
 
 			// first: check whether the row or column contains the
 			// smallest gene by index of both (fusedGroup)
 			// then add a newClade value to each element where
 			// newClade intersects (basically adding the column)
-			int repInd = 0;
 			if (rowGroup.contains(Collections.min(fusedGroup))) {
-				repInd = row;
 				List<Double> replacement = newRow.subList(0, row);
 				halfDMatrix.add(row, replacement);
 
@@ -338,16 +314,11 @@ public class HierCluster2 {
 
 				}
 			} else if (colGroup.contains(Collections.min(fusedGroup))) {
-				repInd = column;
 				List<Double> replacement = newRow.subList(0, column);
 				halfDMatrix.add(column, replacement);
 
 				// Loop starts at column because matrix is symmetrical
 				for (int j = column; j < halfDMatrix.size(); j++) {
-					
-					if(j == 258) {
-						System.out.println("Bug");
-					}
 
 					// value at column index of element replaced with 
 					// value from newRow at index of the current element's
@@ -355,35 +326,15 @@ public class HierCluster2 {
 					if (halfDMatrix.get(j).size() > column) {
 						halfDMatrix.get(j).set(column, newRow.get(j));
 					}
-
 				}
 			} else {
 				System.out.println("Weird error. Neither "
 						+ "rowGroup nor colGroup have a minimum.");
 			}
-			
-			// Check for the replaced doubles
-			replacedDoubles = new ArrayList<Double>();
-			
-			for(int i = repInd; i < halfDMatrix.size(); i++) {
-				
-				if(halfDMatrix.get(i).size() > repInd) {
-					replacedDoubles.add(halfDMatrix.get(i).get(repInd));
-				}
-			}
-			
-			sumRep = 0.0;
-			for(double num : replacedDoubles) {
-				sumRep += num;
-			}
-			
-			averageReplaced = sumRep/replacedDoubles.size();
-			
-			avgRepList.add(averageReplaced);
-			
-			time = System.currentTimeMillis() - time;
-//			System.out.println("Loop time Lists:" + time);
 		}
+		
+		time = System.currentTimeMillis() - time;
+		System.out.println("Cluster Time Lists:" + time);
 		
 		bufferedWriter.closeWriter();
 		reorderGen(geneGroups.get(0));
@@ -630,10 +581,6 @@ public class HierCluster2 {
 				final List<Double> distances = new ArrayList<Double>();
 
 				for (int j = 0; j < fusedGroup.size(); j++) {
-
-					if(i == 258) {
-						System.out.println("Bug.");
-					}
 					
 					selectedGene = fusedGroup.get(j);
 
