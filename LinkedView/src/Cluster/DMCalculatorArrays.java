@@ -158,9 +158,6 @@ public class DMCalculatorArrays {
 	 * correlation distance measure on the data.
 	 */
 	public void spearman() {
-
-		// making sure distanceList is clear
-		distanceMatrix = new double[dataArrays.length][];
 		
 		clusterView.setLoadText("Getting Spearman Ranks...");
 
@@ -178,8 +175,6 @@ public class DMCalculatorArrays {
 			for (int j = 0; j < copyRow.length; j++) {
 
 				final Double rank = (double) j;
-//				dataArrays.get(i).set(dataArrays.get(i).indexOf(copyRow.get(j)), 
-//						rank);
 				int index = find(dataArrays[i], copyRow[j]);
 				
 				if(index != -1) {
@@ -222,7 +217,7 @@ public class DMCalculatorArrays {
 			final double[] gene = dataArrays[i];
 
 			// distances of one gene to all others
-			final double[] geneDistance = new double[gene.length];
+			final double[] geneDistance = new double[dataArrays.length];
 
 			// choose a gene for distance comparison
 			for (int j = 0; j < dataArrays.length; j++) {
@@ -277,7 +272,7 @@ public class DMCalculatorArrays {
 
 		// take a gene
 		for (int i = 0; i < dataArrays.length; i++) {
-
+			
 			// update progressbar
 			clusterView.updatePBar(i);
 

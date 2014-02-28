@@ -88,7 +88,6 @@ public class CDTGeneratorArrays {
 		// transform cdtDataFile from double lists to string lists
 		cdtDataStrings = new String[cdtDataDoubles.length][];
 
-		// takes 3k ms...
 		for (int i = 0; i < cdtDataDoubles.length; i++) {
 
 			final double[] element = cdtDataDoubles[i];
@@ -193,7 +192,17 @@ public class CDTGeneratorArrays {
 		// order column data and names
 		if (!choice2.contentEquals("Do Not Cluster")) {
 
-			if (cdtDataDoubles.length == 0) {
+			boolean empty = false;
+			
+			for(double[] element : cdtDataDoubles) {
+				
+				if(element == null) {
+					empty = true;
+					break;
+				}
+			}
+			
+			if (empty) {
 				cdtDataDoubles = sepList;
 			}
 
@@ -221,7 +230,6 @@ public class CDTGeneratorArrays {
 
 				// reordering column names
 				colNameListOrdered[i] = colNames[index];
-				;
 			}
 		} else {
 			colNameListOrdered = colNames;
@@ -329,8 +337,9 @@ public class CDTGeneratorArrays {
 
 		// The first row
 		int rowLength = model.getGeneHeaderInfo().getNumNames() 
-				+ rowNames.length;
+				+ colNames.length;
 		int addIndex = 0;
+		
 		if (!choice.contentEquals("Do Not Cluster")) {
 			rowLength++;
 		}
@@ -351,7 +360,7 @@ public class CDTGeneratorArrays {
 		}
 
 		// Adding column names to first row
-		for (int i = addIndex; i < colNameListOrdered.length; i++) {
+		for (int i = 0; i < colNameListOrdered.length; i++) {
 
 			cdtRow1[addIndex] = colNameListOrdered[i][0];
 			addIndex++;
@@ -414,17 +423,20 @@ public class CDTGeneratorArrays {
 			// Adding GID names if rows were clustered
 			if (!choice.contentEquals("Do Not Cluster")) {
 				row[addIndex] = orderedRows[i];
-			}
-			
-			for(int j = 0; j < rowHeaders.length; j++) {
-				
-				row[j + addIndex] = rowNameListOrdered[i][j];
 				addIndex++;
 			}
 			
+			// Adding row headers
+			for(int j = 0; j < rowNames[i].length; j++) {
+				
+				row[addIndex] = rowNames[i][j];
+				addIndex++;
+			}
+			
+			// Adding data
 			for(int j = 0; j < cdtDataStrings[i].length; j++) {
 				
-				row[j + addIndex] = cdtDataStrings[i][j];
+				row[addIndex] = cdtDataStrings[i][j];
 				addIndex++;
 			}
 			
