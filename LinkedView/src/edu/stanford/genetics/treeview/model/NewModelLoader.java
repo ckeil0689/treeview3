@@ -28,6 +28,7 @@ public class NewModelLoader {
 	protected TreeViewFrame tvFrame;
 	protected LoadProgressView loadProgView;
 	
+	// Instance variables for the actual data to be loaded.
 	protected String[][] stringLabels;
 	private double[][] doubleData;
 	
@@ -170,21 +171,22 @@ public class NewModelLoader {
 	public  void extractData(BufferedReader reader) {
 		
 		final String Digits     = "(\\p{Digit}+)";
+		final String emptyDigits = "(\\p{Digit}*)";
 		final String HexDigits  = "(\\p{XDigit}+)";
 
 		// an exponent is 'e' or 'E' followed by an optionally 
 		// signed decimal integer.
-		final String Exp        = "[eE][+-]?"+Digits;
+		final String exp        = "[eE][+-]?" + emptyDigits;
 		final String fpRegex    =
-		    ("[\\x00-\\x20]*"+  // Optional leading "whitespace"
+		    ("[\\x00-\\x20]*" +  // Optional leading "whitespace"
 		     "[+-]?(" + // Optional sign character
 		     "NaN|" +           // "NaN" string
 		     "Infinity|" +      // "Infinity" string
 		     // Digits ._opt Digits_opt ExponentPart_opt 
 		     //FloatTypeSuffix_opt
-		     "((("+Digits+"(\\.)?("+Digits+"?)("+Exp+")?)|"+
+		     "(((" + Digits + "(\\.)?(" + Digits + "?)(" + exp + ")?)|" +
 		     // . Digits ExponentPart_opt FloatTypeSuffix_opt
-		     "(\\.("+Digits+")("+Exp+")?)|"+
+		     "(\\.(" + Digits + ")(" + exp + ")?)|" +
 		     // Hexadecimal strings
 		     "((" +
 		     // 0[xX] HexDigits ._opt BinaryExponent FloatTypeSuffix_opt
@@ -290,12 +292,19 @@ public class NewModelLoader {
 						for(int i = 0; i < lineAsStrings.length 
 		                        - dataStartCol; i++) {
 							
-							String element = lineAsStrings[i];
+							String element = lineAsStrings[i + dataStartCol];
 						
 							// Check whether string can be double and is not 
 							// gweight
 							if (Pattern.matches(fpRegex, element)
 									&& i != gWeightCol) {
+								
+								// For empty exponents apparently 
+								// caused by Windows .txt
+								if(element.endsWith("e") 
+										|| element.endsWith("E")) {
+									element = element + "+00";
+								}
 								
 								double val = Double.parseDouble(element);
 								dataValues[i] = val;
@@ -328,6 +337,11 @@ public class NewModelLoader {
 						// handle parseDouble error somehow? 
 						// using the Pattern.matches method screws up 
 						// loading time by a factor of 1000....
+						if(element.endsWith("e") 
+								|| element.endsWith("E")) {
+							element = element + "+00";
+						}
+						
 						double val = Double.parseDouble(element);
 						dataValues[i] = val;
 					}

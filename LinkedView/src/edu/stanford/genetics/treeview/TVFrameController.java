@@ -22,7 +22,6 @@ import Cluster.ClusterViewFrame;
 import Controllers.MenubarActions;
 import Controllers.PreferencesController;
 
-import edu.stanford.genetics.treeview.model.CDTCreator3;
 import edu.stanford.genetics.treeview.model.DataModelWriter;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;

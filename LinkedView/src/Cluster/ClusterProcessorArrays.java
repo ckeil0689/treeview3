@@ -1,12 +1,9 @@
 package Cluster;
 
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
-
-//import Cluster.ClusterView.FinalOptionsPanel;
 
 /**
  * This class takes the original uploaded dataArray passed in the constructor
@@ -118,7 +115,7 @@ public class ClusterProcessorArrays {
 	 * @param iterations
 	 * @return
 	 */
-	public List<String> kmCluster(final List<List<Double>> distances,
+	public String[] kmCluster(final double[][] distances,
 			final String type, final int clusterN, final int iterations) {
 
 		final KMeansCluster cGen = new KMeansCluster(tvModel, clusterView, 
@@ -169,8 +166,8 @@ public class ClusterProcessorArrays {
 		} else {
 			Integer[] spinnerInput = clusterView.getSpinnerValues();
 			
-//			orderedRows = kmCluster(rowDistances, rowString, spinnerInput[0], 
-//					spinnerInput[1]);
+			orderedRows = kmCluster(rowDistances, rowString, spinnerInput[0], 
+					spinnerInput[1]);
 		}
 
 		clusterView.refresh();
@@ -197,8 +194,8 @@ public class ClusterProcessorArrays {
 
 		} else {
 			Integer[] spinnerInput = clusterView.getSpinnerValues();
-//			orderedCols = kmCluster(colDistances, colString, spinnerInput[2], 
-//					spinnerInput[3]);
+			orderedCols = kmCluster(colDistances, colString, spinnerInput[2], 
+					spinnerInput[3]);
 		}
 
 		clusterView.refresh();

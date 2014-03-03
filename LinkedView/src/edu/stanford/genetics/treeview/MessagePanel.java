@@ -22,13 +22,14 @@
  */
 package edu.stanford.genetics.treeview;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Vector;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -55,7 +56,7 @@ public class MessagePanel extends JPanel {
 		messages = new Vector<String>(5, 5);
 		messagecanvas = new MessageCanvas();
 
-		this.add(messagecanvas, "pushx, growx");
+		add(messagecanvas, "pushx, growx");
 	}
 
 	/**
@@ -65,42 +66,48 @@ public class MessagePanel extends JPanel {
 
 		private static final long serialVersionUID = 1L;
 
-		private final JLabel row;
-		private final JLabel col;
-		private final JLabel val;
-		private final JLabel last;
+		private final JTextArea row;
+		private final JTextArea col;
+		private final JTextArea val;
+		private final JTextArea last;
 
-		private final ArrayList<JLabel> labelList;
+		private final ArrayList<JTextArea> textList;
 
 		public MessageCanvas() {
 
 			super();
-			this.setLayout(new MigLayout("ins 0"));
+			setLayout(new MigLayout("ins 0"));
 
 			row = setupLabel();
-			this.add(row, "pushx, wrap");
+			add(row, "pushx, growx, wrap");
 
 			col = setupLabel();
-			this.add(col, "pushx, wrap");
+			add(col, "pushx, growx, wrap");
 
 			val = setupLabel();
-			this.add(val, "pushx, wrap");
+			add(val, "pushx, growx, wrap");
 
 			last = setupLabel();
-			this.add(last, "pushx");
+			add(last, "pushx, growx");
 
-			labelList = new ArrayList<JLabel>();
-			labelList.add(row);
-			labelList.add(col);
-			labelList.add(val);
-			labelList.add(last);
+			textList = new ArrayList<JTextArea>();
+			textList.add(row);
+			textList.add(col);
+			textList.add(val);
+			textList.add(last);
 		}
 
-		public JLabel setupLabel() {
+		public JTextArea setupLabel() {
 
-			final JLabel label = new JLabel();
+			final JTextArea label = new JTextArea();
 			label.setFont(GUIParams.FONTS);
 			label.setForeground(GUIParams.TEXT);
+			label.setBorder(null);
+			label.setOpaque(false);
+			label.setEditable(false);
+			label.setFocusable(false);
+			label.setLineWrap(true);
+			label.setWrapStyleWord(true);
 
 			return label;
 		}
@@ -129,7 +136,7 @@ public class MessagePanel extends JPanel {
 			// }
 
 			// resetting labels
-			for (final JLabel label : labelList) {
+			for (final JTextArea label : textList) {
 
 				label.setText("");
 			}
@@ -137,7 +144,7 @@ public class MessagePanel extends JPanel {
 			// Setting text for all labels
 			for (final String message : messages) {
 
-				labelList.get(messages.indexOf(message)).setText(message);
+				textList.get(messages.indexOf(message)).setText(message);
 			}
 
 			this.revalidate();
