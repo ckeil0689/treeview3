@@ -40,6 +40,7 @@ import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.ViewFrame;
+import edu.stanford.genetics.treeview.WideComboBox;
 
 /**
  * This class allows users to look for row or column elements by choosing them
@@ -64,7 +65,7 @@ public abstract class HeaderFinderPanel extends JPanel {
 	private final ArrayList<String> geneList;
 	private String[] genefHeaders = { "" };
 	private final String type;
-	private final AutoComboBox genefBox;
+	private final WideComboBox genefBox;
 	private final JButton genefButton;
 
 	// "Search Gene Text for Substring"
@@ -129,8 +130,8 @@ public abstract class HeaderFinderPanel extends JPanel {
 			}
 		});
 
-		add(genefBox, "width 85%");
-		add(genefButton, "width 15%, wrap");
+		add(genefBox, "w 85%");
+		add(genefButton, "w 15%, wrap");
 	}
 
 	/**

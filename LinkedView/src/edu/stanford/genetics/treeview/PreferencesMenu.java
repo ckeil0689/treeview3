@@ -156,7 +156,14 @@ public class PreferencesMenu {
 		leftPanel.setBackground(GUIParams.BG_COLOR);
 		leftPanel.setBorder(BorderFactory.createEtchedBorder());
 		
-		setupMenuHeaders();
+		if(startMenu.equalsIgnoreCase("Theme")
+				|| startMenu.equalsIgnoreCase("Font")
+				|| startMenu.equalsIgnoreCase("URL")) {
+			setupMenuHeaders(false);
+			
+		} else {
+			setupMenuHeaders(true);
+		}
 		
 		basisPanel.add(leftPanel, "pushy, aligny 0%, w 20%, " +
 				"h 75%");
@@ -169,24 +176,28 @@ public class PreferencesMenu {
 		menuFrame.repaint();
 	}
 	
-	public void setupMenuHeaders() {
+	public void setupMenuHeaders(boolean analysis) {
 		
-		JPanel theme = new MenuPanel("Theme", this).makeMenuPanel();
-		leftPanel.add(theme, "pushx, w 90%, h 10%, alignx 50%, span, wrap");
-		
-		JPanel annotations = new MenuPanel("Row and Column Labels", 
-				this).makeMenuPanel();
-		leftPanel.add(annotations, "pushx, w 90%, h 10%, alignx 50%, " +
-				"span, wrap");
+		if(!analysis) {
+			JPanel theme = new MenuPanel("Theme", this).makeMenuPanel();
+			leftPanel.add(theme, "pushx, w 90%, h 10%, alignx 50%, span, wrap");
+				
+			JPanel font = new MenuPanel("Font", this).makeMenuPanel();
+			leftPanel.add(font, "pushx, w 90%, h 10%, alignx 50%, span, wrap");
+				
+			JPanel url = new MenuPanel("URL", this).makeMenuPanel();
+			leftPanel.add(url, "pushx, w 90%, h 10%, alignx 50%, span");
 			
-		JPanel font = new MenuPanel("Font", this).makeMenuPanel();
-		leftPanel.add(font, "pushx, w 90%, h 10%, alignx 50%, span, wrap");
+		} else {
+			JPanel annotations = new MenuPanel("Row and Column Labels", 
+					this).makeMenuPanel();
+			leftPanel.add(annotations, "pushx, w 90%, h 10%, alignx 50%, " +
+					"span, wrap");
 			
-		JPanel url = new MenuPanel("URL", this).makeMenuPanel();
-		leftPanel.add(url, "pushx, w 90%, h 10%, alignx 50%, span, wrap");
-		
-		JPanel heatMap = new MenuPanel("Color Settings", this).makeMenuPanel();
-		leftPanel.add(heatMap, "pushx, w 90%, h 10%, alignx 50%, span");
+			JPanel heatMap = new MenuPanel("Color Settings", 
+					this).makeMenuPanel();
+			leftPanel.add(heatMap, "pushx, w 90%, h 10%, alignx 50%, span");
+		}
 	}
 	
 	/**

@@ -125,7 +125,6 @@ public class CDTGeneratorArrays {
 			fileEnd = ".cdt";
 
 		} else {
-
 			String rowC = "";
 			String colC = "";
 			
@@ -134,14 +133,11 @@ public class CDTGeneratorArrays {
 			int row_clusterN = spinnerInput[0];
 			int col_clusterN = spinnerInput[2];
 
-			if (orderedRows.length > 0 && orderedCols.length > 0) {
+			if (orderedRows != null && orderedRows.length > 0) {
 				rowC = "_G" + row_clusterN;
-				colC = "_A" + col_clusterN;
-
-			} else if (orderedRows.length > 0) {
-				rowC = "_G" + row_clusterN;
-
-			} else if (orderedCols.length > 0) {
+			} 
+			
+			if (orderedCols != null && orderedCols.length > 0) {
 				colC = "_A" + col_clusterN;
 			}
 
@@ -278,7 +274,7 @@ public class CDTGeneratorArrays {
 				geneNames[i] = colNames[i][0];
 			}
 
-			if (cdtDataDoubles.length == 0) {
+			if (cdtDataDoubles[0] == null) {
 				cdtDataDoubles = sepList;
 			}
 
@@ -303,7 +299,6 @@ public class CDTGeneratorArrays {
 
 				// reordering names
 				colNameListOrdered[i] = colNames[index];
-				;
 			}
 		} else {
 			colNameListOrdered = colNames;
@@ -451,7 +446,7 @@ public class CDTGeneratorArrays {
 	public void fillKMeans() {
 
 		int rowLength = model.getGeneHeaderInfo().getNumNames() 
-				+ rowNames.length;
+				+ colNames.length;
 		
 		final String[] cdtRow1 = new String[rowLength];
 		String[] rowHeaders = model.getGeneHeaderInfo().getNames();
@@ -477,6 +472,8 @@ public class CDTGeneratorArrays {
 		final String[] cdtRow2 = new String[rowLength];
 
 		cdtRow2[addIndex] = "EWEIGHT";
+		addIndex++; 
+		
 		for(int i = 0; i < rowHeaders.length - 1; i++) {
 			
 			cdtRow2[addIndex] = "";
@@ -494,7 +491,7 @@ public class CDTGeneratorArrays {
 
 		// Add gene names in ORF and NAME columns (0 & 1) and GWeights (2)
 		// buffer is just the amount of rows before the data starts
-		int dataLineN = orderedRows.length;
+		int dataLineN = colNames.length;
 		for (int i = 0; i < dataLineN; i++) {
 
 			addIndex = 0;
@@ -502,13 +499,13 @@ public class CDTGeneratorArrays {
 			
 			for(int j = 0; j < rowHeaders.length; j++) {
 				
-				row[j + addIndex] = rowNameListOrdered[i][j];
+				row[addIndex] = rowNameListOrdered[i][j];
 				addIndex++;
 			}
 			
-			for(int j = 0; j < cdtDataStrings.length; j++) {
+			for(int j = 0; j < cdtDataStrings[i].length; j++) {
 				
-				row[j + addIndex] = cdtDataStrings[i][j];
+				row[addIndex] = cdtDataStrings[i][j];
 				addIndex++;
 			}
 			

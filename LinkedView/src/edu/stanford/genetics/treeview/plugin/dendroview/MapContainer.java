@@ -95,12 +95,20 @@ public class MapContainer extends Observable implements Observer,
 		setMap(root.getAttribute("current", default_map));
 	}
 
+	/**
+	 * Sets the MapContainer's scale back to the default value.
+	 * @param d
+	 */
 	public void setDefaultScale(final double d) {
 
 		default_scale = d;
 		fixedMap.setDefaultScale(d);
 	}
 
+	/**
+	 * Resets the MapContainer so that it completely fills out the available 
+	 * screen space.
+	 */
 	public void setHome() {
 
 		final double pixels = getAvailablePixels();
@@ -109,6 +117,10 @@ public class MapContainer extends Observable implements Observer,
 		setScale(minScale);
 	}
 
+	/**
+	 * Sets the minimum scale for the available screen space so that no
+	 * white space occurs in GlobalView.
+	 */
 	public void setMinScale() {
 
 		final double pixels = getAvailablePixels();

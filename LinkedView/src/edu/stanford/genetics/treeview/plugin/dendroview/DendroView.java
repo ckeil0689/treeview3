@@ -561,25 +561,25 @@ MainPanel, Observer {
 		buttonPanel.add(crossPanel, "pushx, alignx 50%, wrap");
 		buttonPanel.add(zoomButton, "pushx, alignx 50%");
 		
-		finderPanel.add(getGeneFinderPanel(), "pushx, w 100%, h 30%, " +
+		finderPanel.add(getGeneFinderPanel(), "w 90%, h 30%, " +
 				"alignx 50%, wrap");
-		finderPanel.add(getArrayFinderPanel(), "pushx, w 100%, h 30%, " +
+		finderPanel.add(getArrayFinderPanel(), "w 90%, h 30%, " +
 				"alignx 50%");
 
 		navPanel.add(buttonPanel, "h 20%, w 90%, alignx 50%, wrap");
-		navPanel.add(finderPanel, "pushy, h 20%, w 90%, alignx 50%, " +
+		navPanel.add(finderPanel, "pushy, h 20%, w 70%, alignx 50%, " +
 				"aligny 10%");
 		
-		dendroPane.add(statuspanel, "w 20%, h 20%");
+		dendroPane.add(statuspanel, "w 18.5%, h 20%");
 		dendroPane.add(atrPane, "w 62%, h 20%");
-		dendroPane.add(fillPanel1, "span 2, w 18%, h 20%, wrap");
-		dendroPane.add(gtrPane, "w 20%, h 75%");
+		dendroPane.add(fillPanel1, "span 2, w 19.5%, h 20%, wrap");
+		dendroPane.add(gtrPane, "w 18.5%, h 75%");
 		dendroPane.add(globalview, "w 62%, h 75%");
 		dendroPane.add(globalYscrollbar, "w 1%, h 75%");
-		dendroPane.add(navPanel, "w 17%, h 75%, wrap");
-		dendroPane.add(fillPanel2, "w 20%, h 5%");
+		dendroPane.add(navPanel, "w 18.5%, h 75%, wrap");
+		dendroPane.add(fillPanel2, "w 18.5%, h 5%");
 		dendroPane.add(globalXscrollbar, "pushy, aligny 0%, w 62%, h 1%");
-		dendroPane.add(fillPanel3, "span 2, w 18%, h 5%");
+		dendroPane.add(fillPanel3, "span 2, w 19.5%, h 5%");
 		
 		// Ensuring window resizing works with GlobalView
 		globalXmap.setHome();
@@ -587,7 +587,6 @@ MainPanel, Observer {
 	}
 
 	// Methods
-	
 	/**
 	 * Redoing all the layout if parameters changed.
 	 */

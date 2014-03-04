@@ -66,6 +66,9 @@ public class KMeansCluster {
 
 		// deep copy of distance matrix to avoid mutation
 		copyDMatrix = deepCopy(dMatrix);
+		
+		// The list containing the reordered gene names. 
+		reorderedList = new String[dMatrix.length];
 
 		// Make a list of all means of distances for every gene
 		elementMeanList = generateMeans(copyDMatrix);
@@ -146,6 +149,8 @@ public class KMeansCluster {
 				bufferedWriter.writeContent(dataPair);
 			}
 		}
+		
+		bufferedWriter.closeWriter();
 	}
 	
 	public void setupFileWriter() throws IOException {
@@ -303,6 +308,7 @@ public class KMeansCluster {
 					addIndexInner++;
 				} else {
 					meanIndexes[addIndexInner] = bestInd;
+					addIndexInner++;
 				}
 			}
 
@@ -362,7 +368,7 @@ public class KMeansCluster {
 	public double[][] indexesToMeans(final double[] meanList,
 			final int[][] clusters) {
 
-		final double[][] clusterMeans = new double[meanList.length][];
+		final double[][] clusterMeans = new double[clusters.length][];
 
 		int addIndex = 0;
 		for (final int[] group : clusters) {

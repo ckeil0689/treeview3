@@ -24,7 +24,6 @@ import Controllers.PreferencesController;
 
 import edu.stanford.genetics.treeview.model.DataModelWriter;
 import edu.stanford.genetics.treeview.model.TVModel;
-import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 
 /**
  * This class controls user interaction with TVFrame and its views.
@@ -40,7 +39,6 @@ public class TVFrameController {
 	private SwingWorker<Void, Void> worker;
 	private File file;
 	private FileSet fileMenuSet;
-	private String fileType;
 	
 	public TVFrameController(TreeViewFrame tvFrame, TVModel model) {
 		
@@ -178,15 +176,15 @@ public class TVFrameController {
 				FileSet fileSet = null;
 				try {
 					if(fileMenuSet == null) {
-						final String fileName = file.getAbsolutePath();
-						final int dotIndex = fileName.indexOf(".");
-	
-						final int suffixLength = fileName.length() - dotIndex;
-	
-						fileType = file.getAbsolutePath().substring(
-								fileName.length() - suffixLength, 
-								fileName.length());
-					
+//						final String fileName = file.getAbsolutePath();
+//						final int dotIndex = fileName.indexOf(".");
+//	
+//						final int suffixLength = fileName.length() - dotIndex;
+//	
+//						fileType = file.getAbsolutePath().substring(
+//								fileName.length() - suffixLength, 
+//								fileName.length());
+//					
 //						if (!fileType.equalsIgnoreCase(".cdt")) {
 //							
 //							
@@ -297,6 +295,7 @@ public class TVFrameController {
 	public void loadFileSet(final FileSet fileSet) throws LoadException {
 
 		// Make TVModel object
+		model = new TVModel();
 		model.setFrame(tvFrame);
 
 		try {

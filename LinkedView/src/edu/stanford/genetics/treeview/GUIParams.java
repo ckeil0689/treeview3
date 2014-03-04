@@ -193,11 +193,12 @@ public class GUIParams {
 	 * @param combo
 	 * @return
 	 */
-	public static AutoComboBox setComboLayout(final String[] combos) {
+	public static WideComboBox setComboLayout(final String[] combos) {
 
-		final AutoComboBox comboBox = new AutoComboBox(combos);
+		final WideComboBox comboBox = new WideComboBox(combos);
 		comboBox.setFont(FONTS);
 		comboBox.setBackground(Color.white);
+//		comboBox.setMaximumSize(new Dimension(200, 30));
 
 		return comboBox;
 	}

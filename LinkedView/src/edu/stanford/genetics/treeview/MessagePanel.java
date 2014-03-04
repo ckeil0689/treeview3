@@ -22,7 +22,6 @@
  */
 package edu.stanford.genetics.treeview;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.util.ArrayList;
