@@ -78,12 +78,7 @@ public class CDTGeneratorArrays {
 		colNameListOrdered = new String[colNames.length][];
 
 		// Order Rows and/ or Columns
-		if (hierarchical) {
-			orderHierarchical();
-
-		} else {
-			orderKMeans();
-		}
+		orderData();
 
 		// transform cdtDataFile from double lists to string lists
 		cdtDataStrings = new String[cdtDataDoubles.length][];
@@ -159,7 +154,7 @@ public class CDTGeneratorArrays {
 	 * This method orders the data if the user decided to use hierarchical
 	 * clustering.
 	 */
-	public void orderHierarchical() {
+	public void orderData() {
 		
 		int[] reorderedRowIndexes = new int[sepList.length];
 		int[] reorderedColIndexes = new int[colNames.length];
@@ -168,41 +163,70 @@ public class CDTGeneratorArrays {
 				[reorderedColIndexes.length];
 		
 		if (!choice.contentEquals("Do Not Cluster")) {
+			
+			final String[] geneNames = new String[rowNames.length];
+			if(!hierarchical) {
+				for (int i = 0; i < geneNames.length; i++) {
+	
+					geneNames[i] = rowNames[i][0];
+				}
+			}
+			
+			int rowIndex = -1;
 			for (int i = 0; i < orderedRows.length; i++) {
 
 				final String rowElement = orderedRows[i];
-
-				// Regex: Non-digits ('\D') are replaced with "" (no space!)
-				// This means: GENE456X -> 456
-				final String adjusted = rowElement.replaceAll("[\\D]", "");
-
-				// Adjusted spring is made into integer which can be used
-				// as index
-				final int index = Integer.parseInt(adjusted);
 				
-				reorderedRowIndexes[i] = index;
+				if(hierarchical) {
+					// Regex: Non-digits ('\D') are replaced with "" (no space!)
+					// This means: GENE456X -> 456
+					final String adjusted = rowElement.replaceAll("[\\D]", "");
+	
+					// Adjusted spring is made into integer which can be used
+					// as index
+					rowIndex = Integer.parseInt(adjusted);
+					
+				} else {
+					rowIndex = findIndex(geneNames, rowElement);
+				}
+				
+				reorderedRowIndexes[i] = rowIndex;
 
 				// Order the row names
-				rowNameListOrdered[i] = rowNames[index];
+				rowNameListOrdered[i] = rowNames[rowIndex];
 			}
 		} else {
 			for(int i = 0; i < reorderedRowIndexes.length; i++) {
 				reorderedRowIndexes[i] = i;
 			}
-			
 			rowNameListOrdered = rowNames;
 		}
 		
 		if (!choice2.contentEquals("Do Not Cluster")) {
+			// Make list of gene names to quickly access indexes
+			final String[] geneNames = new String[colNames.length];
+
+			if(!hierarchical) {
+				for (int i = 0; i < geneNames.length; i++) {
+	
+					geneNames[i] = colNames[i][0];
+				}
+			}
+			
 			int colIndex = -1;
 			// Make an array of indexes from the ordered column list.
 			for(int i = 0; i < reorderedColIndexes.length; i++) {
 				
-				final String colElement = orderedCols[i];
-				final String adjusted = colElement.replaceAll("[\\D]", "");
-
-				// gets index from ordered list, e.g. ARRY45X --> 45;
-				colIndex = Integer.parseInt(adjusted);
+				String colElement = orderedCols[i];
+				if(hierarchical) {
+					final String adjusted = colElement.replaceAll("[\\D]", "");
+	
+					// gets index from ordered list, e.g. ARRY45X --> 45;
+					colIndex = Integer.parseInt(adjusted);
+					
+				} else {
+					colIndex = findIndex(geneNames, colElement);
+				}
 				
 				reorderedColIndexes[i] = colIndex;
 				
@@ -230,80 +254,6 @@ public class CDTGeneratorArrays {
 				col = reorderedColIndexes[j];
 				cdtDataDoubles[i][j] = sepList[row][col];
 			}
-		}
-		System.out.println("Check.");
-	}
-
-	/**
-	 * This method orders the data table if the user decided to use K-Means
-	 * clustering.
-	 */
-	public void orderKMeans() {
-		
-		if (!choice.contentEquals("Do Not Cluster")) {
-			// Make list of gene names to quickly access indexes
-			final String[] geneNames = new String[rowNames.length];
-
-			for (int i = 0; i < geneNames.length; i++) {
-
-				geneNames[i] = rowNames[i][0];
-			}
-
-			for (int i = 0; i < orderedRows.length; i++) {
-
-				final String rowElement = orderedRows[i];
-
-				// Index of the gene in original data table
-				final int index = findIndex(geneNames, rowElement);;
-
-				final double[] rowData = sepList[index];
-
-				cdtDataDoubles[i] = rowData;
-
-				rowNameListOrdered[i] = rowNames[index];
-			}
-		} else {
-			rowNameListOrdered = rowNames;
-		}
-		
-		// order column data and names
-		if (!choice2.contentEquals("Do Not Cluster")) {
-			// Make list of gene names to quickly access indexes
-			final String[] geneNames = new String[colNames.length];
-
-			for (int i = 0; i < geneNames.length; i++) {
-
-				geneNames[i] = colNames[i][0];
-			}
-
-			if (cdtDataDoubles[0] == null) {
-				cdtDataDoubles = sepList;
-			}
-
-			//
-			for (int i = 0; i < orderedCols.length; i++) {
-
-				final String colElement = orderedCols[i];
-
-				final int index = findIndex(geneNames, colElement);
-
-				// going through every row
-				for (int j = 0; j < cdtDataDoubles.length; j++) {
-
-					// swapping position in original column arrangement
-					// according to new ordered list
-					double first = cdtDataDoubles[j][i];
-					double second = cdtDataDoubles[j][index];
-				
-					cdtDataDoubles[j][i] = second;
-					cdtDataDoubles[j][index] = first;
-				}
-
-				// reordering names
-				colNameListOrdered[i] = colNames[index];
-			}
-		} else {
-			colNameListOrdered = colNames;
 		}
 	}
 	
