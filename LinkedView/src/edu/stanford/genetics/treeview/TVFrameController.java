@@ -214,11 +214,6 @@ public class TVFrameController {
 						System.out.println("FileSet is null.");
 					}
 					
-//				} catch (IOException e) {
-//					System.out.println("Could not generate CDT file. Cause: " +
-//							e.getCause());
-//					e.printStackTrace();
-					
 				} catch (LoadException e) {
 					System.out.println("Loading the FileSet was interrupted. " +
 							"Cause: " + e.getCause());
@@ -233,7 +228,7 @@ public class TVFrameController {
 				fileMenuSet = null;
 				
 				if(model.getDataMatrix().getNumRow() > 0) {
-					setDataModel(model);
+					setDataModel();
 					tvFrame.setView("LoadCheckView");
 					addViewListeners();
 					
@@ -408,22 +403,18 @@ public class TVFrameController {
 	 * 
 	 * @param DataModel newModel
 	 */
-	public void setDataModel(DataModel newModel) {
+	public void setDataModel() {
 
-		if(newModel != null) {
+		if(model != null) {
 			if (tvFrame.getDataModel() != null) {
 				tvFrame.getDataModel().clearFileSetListeners();
 			}
 	
-			tvFrame.setDataModel(newModel);
-			newModel = null;
+			tvFrame.setDataModel(model);
 	
 			if (tvFrame.getDataModel() != null) {
 				tvFrame.getDataModel().addFileSetListener(tvFrame);
 			}
-	
-//			tvFrame.setView("LoadCheckView");
-//			addViewListeners();
 					
 			setupExtractors();
 			

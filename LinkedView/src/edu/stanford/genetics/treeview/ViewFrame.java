@@ -45,7 +45,7 @@ import javax.swing.WindowConstants;
 
 import Cluster.ClusterFileFilter;
 import edu.stanford.genetics.treeview.core.FileMru;
-import edu.stanford.genetics.treeview.core.HeaderFinder;
+//import edu.stanford.genetics.treeview.core.HeaderFinder;
 import edu.stanford.genetics.treeview.model.DataModelWriter;
 import edu.stanford.genetics.treeview.model.ReorderedDataModel;
 
@@ -602,7 +602,7 @@ public abstract class ViewFrame implements Observer {
 		urlExtractor = ue;
 	}
 
-	abstract public HeaderFinder getGeneFinder();
+//	abstract public HeaderFinder getGeneFinder();
 	
 	abstract public void setView(String name);
 

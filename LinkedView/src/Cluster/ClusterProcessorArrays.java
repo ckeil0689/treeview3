@@ -96,7 +96,7 @@ public class ClusterProcessorArrays {
 	 */
 	public String[] hCluster(final double[][] distanceMatrix,
 			final String type) {
-		
+
 		final HierClusterArrays cGen = new HierClusterArrays(tvModel, 
 				clusterView, distanceMatrix, type);
 

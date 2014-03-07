@@ -48,7 +48,6 @@ import javax.swing.SwingUtilities;
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.HeaderInfo;
-import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelViewProduced;
 import edu.stanford.genetics.treeview.TreeSelectionI;
@@ -63,8 +62,6 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 	protected TreeSelectionI arraySelection;
 	protected MapContainer xmap;
 	protected MapContainer ymap;
-	protected MapContainer zoomXmap;
-	protected MapContainer zoomYmap;
 	private final String[] statustext = new String[] { "Mouseover Selection",
 			"", "" };
 	private HeaderInfo arrayHI;
@@ -73,8 +70,6 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 	private ArrayDrawer drawer;
 	private int overx;
 	private int overy;
-	private int rowLabelCol;
-	private int colLabelCol;
 	private final JScrollPane scrollPane;
 
 	/**
@@ -115,10 +110,6 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 		// panel = this;
 
 		setLayout(new MigLayout());
-		
-		// Column indexes for statuspanel display
-		rowLabelCol = 1;
-		colLabelCol = 0;
 
 		scrollPane = new JScrollPane(panel,
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -187,8 +178,7 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 				if (geneHI != null) {
 					final int realGene = overy;
 					try {
-						statustext[0] += geneHI.getHeader(realGene, 
-								rowLabelCol);
+						statustext[0] += geneHI.getHeader(realGene, 1);
 
 					} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 						statustext[0] += " (N/A)";
@@ -197,40 +187,30 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 				statustext[1] = "Column: ";// + (overx + 1);
 				if (arrayHI != null) {
 					try {
-						statustext[1] += arrayHI.getHeader(overx, colLabelCol);
+						statustext[1] += arrayHI.getHeader(overx, 0);
 
 					} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 						statustext[1] += " (N/A)";
 					}
 				}
 
-				if (drawer.isMissing(overx, overy)) {
-					statustext[2] = "Value:  No Data";
-
-				} else if (drawer.isEmpty(overx, overy)) {
-					statustext[2] = "";
-
-				} else {
-					statustext[2] = "Value:  "
-							+ drawer.getSummary(overx, overy);
+				if(drawer != null) {
+					if (drawer.isMissing(overx, overy)) {
+						statustext[2] = "Value:  No Data";
+	
+					} else if (drawer.isEmpty(overx, overy)) {
+						statustext[2] = "";
+	
+					} else {
+						statustext[2] = "Value:  "
+								+ drawer.getSummary(overx, overy);
+					}
 				}
 			}
 		} catch (final ArrayIndexOutOfBoundsException ex) {
 			// ignore silently?
 		}
 		return statustext;
-	}
-	
-	/**
-	 * Sets the two integers which define the labels that are being
-	 * shown by the status panel.
-	 * @param row
-	 * @param col
-	 */
-	public void setStatusLabelInds(int row, int col) {
-		
-		rowLabelCol = row;
-		colLabelCol = col;
 	}
 
 	/**
@@ -389,7 +369,7 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 	 */
 	@Override
 	protected void updateBuffer(final Graphics g) {
-
+		
 		if (offscreenChanged) {
 			xmap.setAvailablePixels(offscreenSize.width);
 			ymap.setAvailablePixels(offscreenSize.height);
@@ -419,7 +399,7 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 							- xmap.getIndex(0), ymap.getIndex(destRect.height)
 							- ymap.getIndex(0));
 
-			if ((sourceRect.x >= 0) && (sourceRect.y >= 0)) {
+			if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
 				drawer.paint(g, sourceRect, destRect, null);
 			}
 		}
@@ -431,7 +411,7 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 	 */
 	@Override
 	protected void updatePixels() {
-
+		
 		if (offscreenChanged) {
 			offscreenValid = false;
 			xmap.setAvailablePixels(offscreenSize.width);
@@ -457,7 +437,7 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 							- xmap.getIndex(0), ymap.getIndex(destRect.height)
 							- ymap.getIndex(0));
 
-			if ((sourceRect.x >= 0) && (sourceRect.y >= 0)) {
+			if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
 				drawer.paint(offscreenPixels, sourceRect, destRect,
 						offscreenScanSize);
 			}
@@ -588,22 +568,22 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 			drawIndicatorCircle();
 			offscreenValid = false;
 
-		} else if ((o == zoomYmap) || (o == zoomXmap)) {
-			recalculateZoom();
-			/*
-			 * if (o == zoomXmap) { if ((zoomYmap.getUsedPixels() == 0) &&
-			 * (zoomXmap.getUsedPixels() != 0)) {
-			 * zoomYmap.setIndexRange(ymap.getMinIndex(), ymap.getMaxIndex());
-			 * zoomYmap.notifyObservers(); } } else if (o == zoomYmap) { if
-			 * ((zoomXmap.getUsedPixels() == 0) && (zoomYmap.getUsedPixels() !=
-			 * 0)) { zoomXmap.setIndexRange(xmap.getMinIndex(),
-			 * xmap.getMaxIndex()); zoomXmap.notifyObservers(); } }
-			 */
-			if ((status != null) && hasMouse) {
-				status.setMessages(getStatus());
-			}
+//		} else if ((o == zoomYmap) || (o == zoomXmap)) {
+//			recalculateZoom();
+//			/*
+//			 * if (o == zoomXmap) { if ((zoomYmap.getUsedPixels() == 0) &&
+//			 * (zoomXmap.getUsedPixels() != 0)) {
+//			 * zoomYmap.setIndexRange(ymap.getMinIndex(), ymap.getMaxIndex());
+//			 * zoomYmap.notifyObservers(); } } else if (o == zoomYmap) { if
+//			 * ((zoomXmap.getUsedPixels() == 0) && (zoomYmap.getUsedPixels() !=
+//			 * 0)) { zoomXmap.setIndexRange(xmap.getMinIndex(),
+//			 * xmap.getMaxIndex()); zoomXmap.notifyObservers(); } }
+//			 */
+//			if ((status != null) && hasMouse) {
+//				status.setMessages(getStatus());
+//			}
 
-		} else if (o == drawer) {
+		} else if (o == drawer && drawer != null) {
 			/*
 			 * signal from drawer means that it need to draw something
 			 * different.
@@ -651,14 +631,19 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 	@Override
 	public void mouseExited(final MouseEvent e) {
 		
-		hasMouse = false;
+//		hasMouse = false;
+//		
+//		// Display empty field
+//		statustext[0] = "";
+//		statustext[1] = "";
+//		statustext[2] = "";
+//		
+//		status.setMessages(statustext);
+	}
+	
+	@Override
+	public void mouseEntered(final MouseEvent e) {
 		
-		// Display empty field
-		statustext[0] = "";
-		statustext[1] = "";
-		statustext[2] = "";
-		
-		status.setMessages(statustext);
 	}
 
 	@Override

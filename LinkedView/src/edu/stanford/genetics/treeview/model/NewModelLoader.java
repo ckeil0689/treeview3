@@ -1,13 +1,14 @@
 package edu.stanford.genetics.treeview.model;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
@@ -54,10 +55,9 @@ public class NewModelLoader {
 		try {
 			// Read data from specified file location
 			loadProgView.resetLoadBar();
-			lineNum = count(fileSet.getCdt());
+			loadProgView.setLoadLabel("Getting file ready to load...");
+			lineNum = count(new File(fileSet.getCdt()));
 			loadProgView.setLoadBarMax(lineNum);
-			
-			loadProgView.setLoadLabel("Loading Data into TreeView.");
 			
 			FileInputStream fis = new FileInputStream(fileSet.getCdt());
 	        DataInputStream in = new DataInputStream(fis);
@@ -65,7 +65,7 @@ public class NewModelLoader {
 	        
 	        // Get data from file into String and double arrays 
 	        // Put the arrays in ArrayLists for later access.
-	        System.out.println("Starting extract.");
+	        loadProgView.setLoadLabel("Extracting data.");
 	        extractData(br);
 	        
         } catch(FileNotFoundException e) {
@@ -80,7 +80,7 @@ public class NewModelLoader {
 		
 		
 		// Parse the CDT File
-		loadProgView.setLoadLabel("Making sense of CDT file.");
+		loadProgView.setLoadLabel("Parsing main file.");
 		parseCDT();
 		
 		// If present, parse ATR File
@@ -105,7 +105,7 @@ public class NewModelLoader {
 		
 		// Load Config File
 		try {
-			loadProgView.setLoadLabel("Loading configuration file.");
+			loadProgView.setLoadLabel("Getting configurations...");
 			final String xmlFile = targetModel.getFileSet().getJtv();
 
 			XmlConfig documentConfig;
@@ -123,42 +123,37 @@ public class NewModelLoader {
 			e.printStackTrace();
 		}
 		
+		loadProgView.setLoadLabel("Done.");
 		targetModel.setLoaded(true);
+		
+		// Free the large objects for garbage collection
+		stringLabels = null;
+		doubleData = null;
+		
 		return targetModel;
 	}
 	
 	/**
 	 * Count amount of lines in the file to be loaded so that the progressBar
 	 * can get correct values for extractData().
-	 * Code from StackOverflow (https://stackoverflow.com/questions/453018).
-	 * @param filename
-	 * @return
-	 * @throws IOException
+	 * Code from StackOverflow (https://stackoverflow.com/questions/1277880).
 	 */
-	public int count(String filename) throws IOException {
-	    
-		InputStream is = new BufferedInputStream(new FileInputStream(filename));
-	    
+	public static int count(File aFile) throws IOException {
+		
+		LineNumberReader reader = null;
+		
 		try {
-	        byte[] c = new byte[1024];
-	        int count = 0;
-	        int readChars = 0;
-	        boolean empty = true;
-	        
-	        while ((readChars = is.read(c)) != -1) {
-	            empty = false;
-	            
-	            for (int i = 0; i < readChars; ++i) {
-	                if (c[i] == '\n') {
-	                    ++count;
-	                }
-	            }
-	        }
-	        return (count == 0 && !empty) ? 1 : count;
-	        
-	    } finally {
-	        is.close();
-	    }
+			reader = new LineNumberReader(new FileReader(aFile));
+			while ((reader.readLine()) != null);
+			return reader.getLineNumber();
+			
+		} catch (Exception ex) {
+			return -1;
+			
+		} finally { 
+			if(reader != null) 
+				reader.close();
+		}
 	}
 	
 	/**
@@ -212,6 +207,10 @@ public class NewModelLoader {
 			while ((line = reader.readLine()) != null) {
 				
 				loadProgView.updateLoadBar(rowN);
+				
+				if(rowN == 1713) {
+					System.out.println("Bug");
+				}
 	
 				// load line as String array
 				final String[] lineAsStrings = line.split("\t");
@@ -342,10 +341,19 @@ public class NewModelLoader {
 							element = element + "+00";
 						}
 						
-						double val = Double.parseDouble(element);
-						dataValues[i] = val;
+						// Trying to parse the String, if not possible,
+						// add 0.
+						try {
+							double val = Double.parseDouble(element);
+							dataValues[i] = val;
+							
+						} catch(Exception e) {
+							double val = Double.parseDouble("0.00E+00");
+							dataValues[i] = val;
+						}
 					}
 					
+					// Issue with length of stringLabels
 					stringLabels[rowN] = labels;
 					doubleData[rowN - dataStartRow] = dataValues;
 				} 

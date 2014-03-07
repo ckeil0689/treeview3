@@ -63,19 +63,19 @@ public class ClusterViewController {
 			public Void doInBackground() {
 				
 				// Setup a ClusterProcessor
-//				final ClusterProcessor clusterTarget = 
-//						new ClusterProcessor(clusterView, tvModel);
-				
+				// final ClusterProcessor clusterTarget = 
+				// new ClusterProcessor(clusterView, tvModel);
+					
 				final ClusterProcessorArrays clusterTarget = 
 						new ClusterProcessorArrays(clusterView, tvModel);
-
+				
 				// Begin the actual clustering, hierarchical or kmeans
 				finalFilePath = clusterTarget.cluster(
 						isHierarchical());
-
+				
 				clusterView.refresh();
-
-				return null;
+				
+				return null;	
 			}
 
 			@Override
@@ -102,7 +102,7 @@ public class ClusterViewController {
 				
 				if(controller.getTVControllerModel().
 						getDataMatrix().getNumRow() > 0) {
-					controller.setDataModel(controller.getTVControllerModel());
+					controller.setDataModel();
 					tvFrame.setView("LoadCheckView");
 					controller.addViewListeners();
 					

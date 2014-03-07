@@ -347,6 +347,11 @@ public class HierClusterArrays {
 		
 		bufferedWriter.closeWriter();
 		reorderGen(geneGroups.get(0));
+		
+		// Ensure garbage collection for large objects
+		halfDMatrixCopy = null;
+		dataTable = null;
+		geneGroups = null;
 	}
 	
 	public void replaceRow(int repInd, double[] newRow) {
@@ -366,7 +371,6 @@ public class HierClusterArrays {
 			}
 		}
 		
-//		halfDMatrix = null;
 		halfDMatrix = newMatrix;
 	}
 	
@@ -432,8 +436,7 @@ public class HierClusterArrays {
 				newMatrix[i] = removeCol(element, keepIndex);
 			}
 		}
-		
-//		halfDMatrix = null;
+
 		halfDMatrix = newMatrix;
 	}
 	
@@ -775,9 +778,18 @@ public class HierClusterArrays {
 			}
 		}
 
-		dataList[0] = geneCol;
-		dataList[1] = geneRow;
-
+		
+		// Check if only one of the two String has a "NODE" component.
+		// If yes, position it at [1].	
+		if(!geneCol.contains("NODE") && geneRow.contains("NODE")) {
+			dataList[0] = geneCol;
+			dataList[1] = geneRow;
+			
+		} else {
+			dataList[0] = geneRow;
+			dataList[1] = geneCol;
+		}
+		
 		return dataList;
 	}
 	
@@ -869,8 +881,6 @@ public class HierClusterArrays {
 			element = type + finalCluster.get(i) + "X";
 			reorderedList[i] = element;
 		}
-		
-		System.out.println("Done HierCluster.");
 	}
 
 	/**

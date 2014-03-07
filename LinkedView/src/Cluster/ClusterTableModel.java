@@ -1,7 +1,5 @@
 package Cluster;
 
-import java.util.List;
-
 import javax.swing.table.AbstractTableModel;
 
 import edu.stanford.genetics.treeview.DataModel;
@@ -12,10 +10,10 @@ public class ClusterTableModel extends AbstractTableModel {
 	private static final long serialVersionUID = 1L;
 
 	// Instance variables
-	private final List<double[]> tableList;
+	private final double[][] tableList;
 	private final TVModel currentModel;
 
-	public ClusterTableModel(final List<double[]> tableList,
+	public ClusterTableModel(final double[][] tableList,
 			final DataModel currentModel) {
 
 		this.tableList = tableList;
@@ -26,13 +24,13 @@ public class ClusterTableModel extends AbstractTableModel {
 	@Override
 	public int getColumnCount() {
 
-		return tableList.get(0).length;
+		return tableList[0].length;
 	}
 
 	@Override
 	public int getRowCount() {
 
-		return tableList.size();
+		return tableList.length;
 	}
 
 	@Override

@@ -25,6 +25,7 @@ package edu.stanford.genetics.treeview.model;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -74,7 +75,7 @@ public class NewKnnModelLoader extends NewModelLoader {
 			
 			// Read data from specified file location
 			loadProgView.resetLoadBar();
-			int loadBarMax = count(fileSet.getCdt());
+			int loadBarMax = count(new File(fileSet.getCdt()));
 			loadProgView.setLoadBarMax(loadBarMax);
 			
 			loadProgView.setLoadLabel("Loading Data into TreeView.");

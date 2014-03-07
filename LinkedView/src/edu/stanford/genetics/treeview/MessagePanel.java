@@ -153,29 +153,29 @@ public class MessagePanel extends JPanel {
 			// }
 		}
 
-//		@Override
-//		public Dimension getPreferredSize() {
-//
-//			final FontMetrics metrics = getFontMetrics(getFont());
-//			final int ascent = metrics.getAscent();
-//
-//			// for title...
-//			int height = ascent;
-//			int width = metrics.stringWidth(title);
-//			final Enumeration<String> e = messages.elements();
-//			while (e.hasMoreElements()) {
-//				final String message = e.nextElement();
-//				if (message == null) {
-//					continue;
-//				}
-//				height += ascent;
-//				final int length = metrics.stringWidth(message);
-//				if (width < length) {
-//					width = length;
-//				}
-//			}
-//			return new Dimension(width, height);
-//		}
+		// @Override
+		// public Dimension getPreferredSize() {
+		//
+		// final FontMetrics metrics = getFontMetrics(getFont());
+		// final int ascent = metrics.getAscent();
+		//
+		// // for title...
+		// int height = ascent;
+		// int width = metrics.stringWidth(title);
+		// final Enumeration<String> e = messages.elements();
+		// while (e.hasMoreElements()) {
+		// final String message = e.nextElement();
+		// if (message == null) {
+		// continue;
+		// }
+		// height += ascent;
+		// final int length = metrics.stringWidth(message);
+		// if (width < length) {
+		// width = length;
+		// }
+		// }
+		// return new Dimension(width, height);
+		// }
 	}
 
 	public void setMessages(final String[] m) {

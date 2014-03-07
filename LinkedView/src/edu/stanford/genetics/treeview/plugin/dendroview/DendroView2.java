@@ -101,8 +101,7 @@ import edu.stanford.genetics.treeview.model.TVModel;
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.7 $ $Date: 2009-03-23 02:46:51 $
  */
-public class DendroView implements ConfigNodePersistent, ComponentListener, 
-MainPanel, Observer {
+public class DendroView2 implements ConfigNodePersistent, MainPanel, Observer {
 
 	private static ImageIcon treeviewIcon = null;
 
@@ -173,6 +172,14 @@ MainPanel, Observer {
 	// JMenuItems
 	private JMenuItem colorMenuItem;
 	private JMenuItem annotationsMenuItem;
+	
+	// JButtons
+	private JButton zoomButton;
+	private JButton scaleIncX;
+	private JButton scaleIncY;
+	private JButton scaleDecX;
+	private JButton scaleDecY;
+	private JButton scaleDefaultAll;
 
 	/**
 	 * Chained constructor for the DendroView object note this will reuse any
@@ -183,12 +190,12 @@ MainPanel, Observer {
 	 * @param vFrame
 	 *            parent ViewFrame of DendroView
 	 */
-	public DendroView(TreeViewFrame tvFrame) {
+	public DendroView2(TreeViewFrame tvFrame) {
 
 		this(null, tvFrame, "Dendrogram");
 	}
 
-	public DendroView(final ConfigNode root, final TreeViewFrame tvFrame) {
+	public DendroView2(final ConfigNode root, final TreeViewFrame tvFrame) {
 
 		this(root, tvFrame, "Dendrogram");
 	}
@@ -206,7 +213,7 @@ MainPanel, Observer {
 	 * @param name
 	 *            name of this view.
 	 */
-	public DendroView(final ConfigNode root, final TreeViewFrame tvFrame, 
+	public DendroView2(final ConfigNode root, final TreeViewFrame tvFrame, 
 			final String name) {
 
 		this.tvFrame = tvFrame;
@@ -259,7 +266,6 @@ MainPanel, Observer {
 		setDataModel(dataModel);
 		setupViews();
 		doDoubleLayout();
-		dendroPane.addComponentListener(this);
 
 		if (geneIndex != null) {
 			setGeneSelection(new ReorderedTreeSelection(
@@ -412,13 +418,6 @@ MainPanel, Observer {
 		JPanel fillPanel2;
 		JPanel fillPanel3;
 		JPanel fillPanel4;
-		
-		final JButton zoomButton;
-		JButton scaleIncX;
-		JButton scaleIncY;
-		JButton scaleDecX;
-		JButton scaleDecY;
-		JButton scaleDefaultAll;
 
 		// Clear panel
 		dendroPane.removeAll();
@@ -426,72 +425,22 @@ MainPanel, Observer {
 		//Buttons
 		scaleDefaultAll = GUIParams.setButtonLayout(null, "homeIcon");
 		scaleDefaultAll.setToolTipText("Resets the zoomed view.");
-		scaleDefaultAll.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-
-				getGlobalXmap().setHome();
-				getGlobalYmap().setHome();
-			}
-		});
 
 		scaleIncX = GUIParams.setButtonLayout(null, "zoomInIcon");
 		scaleIncX.setToolTipText("Zooms in on X-axis.");
-		scaleIncX.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-
-				getGlobalXmap().zoomIn();
-			}
-		});
 
 		scaleDecX = GUIParams.setButtonLayout(null, "zoomOutIcon");
 		scaleDecX .setToolTipText("Zooms out of X-axis.");
-		scaleDecX.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-
-				getGlobalXmap().zoomOut();
-			}
-		});
 
 		scaleIncY = GUIParams.setButtonLayout(null, "zoomInIcon");
 		scaleIncY.setToolTipText("Zooms in on Y-axis.");
-		scaleIncY.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-
-				getGlobalYmap().zoomIn();
-			}
-		});
 
 		scaleDecY = GUIParams.setButtonLayout(null, "zoomOutIcon");
 		scaleDecY.setToolTipText("Zooms out of Y-axis.");
-		scaleDecY.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-
-				getGlobalYmap().zoomOut();
-			}
-		});
 		
 		zoomButton = GUIParams.setButtonLayout("Zoom On Selection", 
 				"fullscreenIcon");
 		zoomButton.setToolTipText("Zooms into the selected area.");
-		zoomButton.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-
-				globalview.zoomSelection();
-				globalview.centerSelection();
-			}
-		});
 
 		// Panels
 		buttonPanel = new JPanel();
@@ -584,6 +533,38 @@ MainPanel, Observer {
 		// Ensuring window resizing works with GlobalView
 		globalXmap.setHome();
 		globalYmap.setHome();
+	}
+	
+	// Add Button Listeners
+	/**
+	 * Adds an ActionListener to the scale buttons in DendroView.
+	 * @param l
+	 */
+	public void addScaleListener(ActionListener l) {
+		
+		scaleIncX.addActionListener(l);
+		scaleDecX.addActionListener(l);
+		scaleIncY.addActionListener(l);
+		scaleDecY.addActionListener(l);
+		scaleDefaultAll.addActionListener(l);
+	}
+	
+	/**
+	 * Adds an ActionListener to the Zoom button in DendroView.
+	 * @param l
+	 */
+	public void addZoomListener(ActionListener l) {
+		
+		zoomButton.addActionListener(l);
+	}
+	
+	/**
+	 * Adds a component listener to the main panel of DendroView.
+	 * @param l
+	 */
+	public void addCompListener(ComponentListener l) {
+		
+		getDendroPane().addComponentListener(l);
 	}
 
 	// Methods
@@ -1945,40 +1926,6 @@ MainPanel, Observer {
 		return arrayFinderPanel;
 	}
 
-	/**
-	 * Setter for root - may not work properly public void
-	 * setConfigNode(ConfigNode root) { this.root = root; }
-	 */
-	// Component Listeners
-	@Override
-	public void componentHidden(final ComponentEvent arg0) {
-	}
-
-	@Override
-	public void componentMoved(final ComponentEvent arg0) {
-	}
-
-	@Override
-	public void componentResized(final ComponentEvent arg0) {
-		
-		if (globalXmap.getAvailablePixels() > globalXmap.getUsedPixels()
-				&& globalXmap.getScale() == globalXmap.getMinScale()) {
-			globalXmap.setHome();
-		}
-
-		if (globalYmap.getAvailablePixels() > globalYmap.getUsedPixels()
-				&& globalYmap.getScale() == globalYmap.getMinScale()) {
-			globalYmap.setHome();
-		}
-
-		dendroPane.revalidate();
-		dendroPane.repaint();
-	}
-
-	@Override
-	public void componentShown(final ComponentEvent arg0) {
-	}
-
 	@Override
 	public String getName() {
 
@@ -1988,6 +1935,43 @@ MainPanel, Observer {
 	public void setName(String name) {
 
 		this.name = name;
+	}
+	
+	// JButton Getters
+	public JButton getXPlusButton() {
+		
+		return scaleIncX;
+	}
+	
+	public JButton getXMinusButton() {
+		
+		return scaleDecX;
+	}
+	
+	public JButton getYPlusButton() {
+		
+		return scaleIncY;
+	}
+	
+	public JButton getYMinusButton() {
+		
+		return scaleDecY;
+	}
+	
+	public JButton getHomeButton() {
+		
+		return scaleDefaultAll;
+	}
+	
+	// Getters for the Views
+	public GlobalView getGlobalView() {
+		
+		return globalview;
+	}
+	
+	public JPanel getDendroPane() {
+		
+		return dendroPane;
 	}
 
 	@Override

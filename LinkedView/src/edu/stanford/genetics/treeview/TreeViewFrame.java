@@ -59,11 +59,11 @@ import Views.LoadProgressView;
 import Views.WelcomeView;
 
 import net.miginfocom.swing.MigLayout;
-import edu.stanford.genetics.treeview.core.ArrayFinder;
+//import edu.stanford.genetics.treeview.core.ArrayFinder;
 import edu.stanford.genetics.treeview.core.FileMru;
 import edu.stanford.genetics.treeview.core.FileMruEditor;
-import edu.stanford.genetics.treeview.core.GeneFinder;
-import edu.stanford.genetics.treeview.core.HeaderFinder;
+//import edu.stanford.genetics.treeview.core.GeneFinder;
+//import edu.stanford.genetics.treeview.core.HeaderFinder;
 import edu.stanford.genetics.treeview.core.LogMessagesPanel;
 import edu.stanford.genetics.treeview.core.LogSettingsPanel;
 import edu.stanford.genetics.treeview.core.MenuHelpPluginsFrame;
@@ -91,8 +91,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 	private final TreeViewApp treeView;
 	private ProgramMenu programMenu;
-	private HeaderFinder geneFinder = null;
-	private HeaderFinder arrayFinder = null;
+//	private HeaderFinder geneFinder = null;
+//	private HeaderFinder arrayFinder = null;
 	
 	// Different Views
 	private WelcomeView welcomeView;
@@ -512,6 +512,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	@Override
 	public void update(final Observable observable, final Object object) {
 		
+		System.out.println("Updating fileMRU in TVFrame.");
+		
 		if (observable == fileMru) {
 			// System.out.println("Rebuilding file menu");
 			programMenu.rebuild();
@@ -531,7 +533,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	public void setLoaded(final boolean flag) {
 
 		// reset persistent popups
-		setGeneFinder(null);
+//		setGeneFinder(null);
 		loaded = flag;
 //		getContentPane().removeAll();
 //		waiting.removeAll();
@@ -556,9 +558,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		// menubar.rebuild...
 		rebuildMainPanelMenu();
 //		treeView.rebuildWindowMenus();
-
-		applicationFrame.validate();
-		applicationFrame.repaint();
 	}
 
 	// Methods to setup Menubar
@@ -1298,22 +1297,22 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		return fileMenuSet;
 	}
 	
-	/**
-	 * Setter for geneFinder
-	 * 
-	 * @param HeaderFinder
-	 *            geneFinder
-	 */
-	public void setGeneFinder(final HeaderFinder geneFinder) {
-
-		this.geneFinder = geneFinder;
-	}
-
-	/** Setter for geneFinder */
-	public void setArrayFinder(final HeaderFinder geneFinder) {
-
-		this.geneFinder = geneFinder;
-	}
+//	/**
+//	 * Setter for geneFinder
+//	 * 
+//	 * @param HeaderFinder
+//	 *            geneFinder
+//	 */
+//	public void setGeneFinder(final HeaderFinder geneFinder) {
+//
+//		this.geneFinder = geneFinder;
+//	}
+//
+//	/** Setter for geneFinder */
+//	public void setArrayFinder(final HeaderFinder geneFinder) {
+//
+//		this.geneFinder = geneFinder;
+//	}
 	
 	public void setArraySelection(TreeSelection aSelect) {
 		
@@ -1360,31 +1359,31 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		return loaded;
 	}
 
-	@Override
-	public HeaderFinder getGeneFinder() {
-
-		if (geneFinder == null) {
-			geneFinder = new GeneFinder(TreeViewFrame.this, getDataModel()
-					.getGeneHeaderInfo(), getGeneSelection());
-		}
-
-		return geneFinder;
-	}
-
-	/**
-	 * Getter for geneFinder
-	 * 
-	 * @return HeaderFinder arrayFinder
-	 */
-	public HeaderFinder getArrayFinder() {
-
-		if (arrayFinder == null) {
-
-			arrayFinder = new ArrayFinder(TreeViewFrame.this, getDataModel()
-					.getArrayHeaderInfo(), getArraySelection());
-		}
-		return arrayFinder;
-	}
+//	@Override
+//	public HeaderFinder getGeneFinder() {
+//
+//		if (geneFinder == null) {
+//			geneFinder = new GeneFinder(TreeViewFrame.this, getDataModel()
+//					.getGeneHeaderInfo(), getGeneSelection());
+//		}
+//
+//		return geneFinder;
+//	}
+//
+//	/**
+//	 * Getter for geneFinder
+//	 * 
+//	 * @return HeaderFinder arrayFinder
+//	 */
+//	public HeaderFinder getArrayFinder() {
+//
+//		if (arrayFinder == null) {
+//
+//			arrayFinder = new ArrayFinder(TreeViewFrame.this, getDataModel()
+//					.getArrayHeaderInfo(), getArraySelection());
+//		}
+//		return arrayFinder;
+//	}
 	
 	public ArrayList<JMenuItem> getMenus() {
 		

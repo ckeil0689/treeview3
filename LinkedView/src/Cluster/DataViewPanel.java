@@ -2,8 +2,7 @@ package Cluster;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -35,7 +34,6 @@ public class DataViewPanel extends JPanel {
 	 * Instance Variables
 	 */
 	private TVModel model;
-	private TVDataMatrix matrix;
 
 	private String[] geneNames;
 	private String[][] headerArray;
@@ -43,7 +41,7 @@ public class DataViewPanel extends JPanel {
 	/**
 	 * Limit of rows/ columns for preview to display
 	 */
-	private final int max = 20;
+	private final int MAX = 20;
 
 	/**
 	 * Swing Components
@@ -63,23 +61,30 @@ public class DataViewPanel extends JPanel {
 		this.model = (TVModel) cModel;
 		this.setLayout(new MigLayout("ins 0"));
 
-		matrix = (TVDataMatrix) model.getDataMatrix();
-		double[][] dataArrays = matrix.getExprData();
+		double[][] dataArrays = Arrays.copyOfRange(((TVDataMatrix) 
+				model.getDataMatrix()).getExprData(), 0, MAX);
 
 		headerArray = model.getGeneHeaderInfo().getHeaderArray();
 
-		List<double[]> arraysList = new ArrayList<double[]>();
+		double[][] arraysList = new double[MAX][MAX];
 
-		if (dataArrays.length > max) {
-
-			for(int i = 0; i < max; i++) {
-				arraysList.add(dataArrays[i]);
+		// Fill 2-dimensional 20x20 (max size) array to be sued for data
+		// in the JTable
+		if (dataArrays.length > MAX) {
+			for(int i = 0; i < MAX; i++) {
+				
+				for(int j = 0; j < MAX; j++) {
+					
+					arraysList[i][j] = dataArrays[i][j];
+				}
 			}
 		}
+		
+		dataArrays = null;
 
-		geneNames = new String[max];
+		geneNames = new String[MAX];
 
-		for (int i = 0; i < max; i++) {
+		for (int i = 0; i < MAX; i++) {
 
 			geneNames[i] = headerArray[i][1];
 		}
@@ -99,7 +104,7 @@ public class DataViewPanel extends JPanel {
 		table.setFillsViewportHeight(true);
 		tableScroll.setBackground(GUIParams.BG_COLOR);
 
-		for (int i = 0; i < max; i++) {
+		for (int i = 0; i < MAX; i++) {
 
 			table.getColumnModel()
 					.getColumn(i)
@@ -129,7 +134,7 @@ public class DataViewPanel extends JPanel {
 			@Override
 			public int getRowCount() {
 
-				return max;
+				return MAX;
 			}
 
 			@Override
@@ -148,7 +153,7 @@ public class DataViewPanel extends JPanel {
 
 		headerTable = new JTable(model);
 
-		for (int i = 0; i < max; i++) {
+		for (int i = 0; i < MAX; i++) {
 
 			headerTable.setValueAt(geneNames[i], i, 0);
 			headerTable.setRowHeight(i, headerTable.getRowHeight(i) * 2);
@@ -180,8 +185,8 @@ public class DataViewPanel extends JPanel {
 
 		tableScroll.setRowHeaderView(headerTable);
 
-		this.add(tableScroll, "grow, push");
-		this.setVisible(true);
+		add(tableScroll, "grow, push");
+		setVisible(true);
 	}
 
 	/**
@@ -192,19 +197,7 @@ public class DataViewPanel extends JPanel {
 		header.setBackground(GUIParams.TABLEHEADERS);
 		tableScroll.setBackground(GUIParams.BG_COLOR);
 
-		this.revalidate();
-		this.repaint();
-	}
-
-	public List<Double> fillDList(final double[] array) {
-
-		final List<Double> doubleList = new ArrayList<Double>();
-
-		for (final double d : array) {
-
-			doubleList.add(d);
-		}
-
-		return doubleList;
+		revalidate();
+		repaint();
 	}
 }
