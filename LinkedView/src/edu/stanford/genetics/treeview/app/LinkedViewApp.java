@@ -154,15 +154,9 @@ public class LinkedViewApp extends TreeViewApp {
 		final TVModel model = new TVModel();
 		final TVFrameController tvController = new TVFrameController(tvFrame, 
 				model);
-		
-		try {
-			tvController.loadFileSet(fileSet);
-			tvFrame.setLoaded(true);
-
-		} catch (final LoadException e) {
-			tvFrame.getAppFrame().dispose();
-			throw e;
-		}
+	
+		tvController.loadFileSet(fileSet);
+		tvFrame.setLoaded(true);
 
 //		tvFrame.addWindowListener(this);
 		return tvFrame;
@@ -231,10 +225,10 @@ public class LinkedViewApp extends TreeViewApp {
 //				mainPanel.export(args);
 //				return true;
 //			}
-			if (exportType.equalsIgnoreCase(tvFrame.getRunning().getName())) {
-				tvFrame.getRunning().export(args);
-				return true;
-			}
+//			if (exportType.equalsIgnoreCase(tvFrame.getRunning().getName())) {
+//				tvFrame.getRunning().export(args);
+//				return true;
+//			}
 //		}
 		System.err.println("Error exporting, could not find plugin of type "
 				+ exportType);
@@ -253,10 +247,6 @@ public class LinkedViewApp extends TreeViewApp {
 	 *            Standard argument string.
 	 */
 	public static void main(final String astring[]) {
-
-		System.setProperty("apple.laf.useScreenMenuBar", "true");
-        System.setProperty("com.apple.mrj.application.apple.menu.about.name", 
-        		"TreeView 3");
         
 		final LinkedViewApp statView = new LinkedViewApp();
 		// statView.dealWithRegistration();

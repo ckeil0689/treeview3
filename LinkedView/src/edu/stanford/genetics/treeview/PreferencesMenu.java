@@ -1,18 +1,24 @@
 package edu.stanford.genetics.treeview;
 
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import Controllers.DendroController;
+import GradientColorChoice.ColorGradientChooser;
+import GradientColorChoice.ColorGradientController;
+
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
-import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
+import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
 import edu.stanford.genetics.treeview.plugin.dendroview.DoubleArrayDrawer;
 import edu.stanford.genetics.treeview.plugin.dendroview.FontSettingsPanel;
@@ -24,11 +30,12 @@ public class PreferencesMenu {
 	
 	private TreeViewFrame tvFrame;
 	private JFrame applicationFrame;
-	private JFrame menuFrame;
+	private JDialog menuDialog;
 	
 	private JPanel basisPanel;
 	private JPanel leftPanel;
-	private DendroView dendroView;
+	private DendroView2 dendroView;
+	private DendroController dendroController;
 	private JButton ok_button;
 	
 	// Menus
@@ -38,13 +45,15 @@ public class PreferencesMenu {
 	private ThemeSettingsPanel themeSettings = null;
 	private URLSettings urlSettings = null;
 	
+	private ColorGradientChooser gradientPick = null;
+	
 	/**
 	 * Chained constructor in case DendroView isn't available
 	 * @param viewFrame
 	 */
 	public PreferencesMenu(TreeViewFrame tvFrame, String menuTitle) {
 		
-		this(tvFrame, null, menuTitle);
+		this(tvFrame, null, null, menuTitle);
 	}
 	
 	/**
@@ -53,14 +62,18 @@ public class PreferencesMenu {
 	 * @param dendroView
 	 * @param menuTitle
 	 */
-	public PreferencesMenu(TreeViewFrame tvFrame, DendroView dendroView, 
-			String menuTitle) {
+	public PreferencesMenu(TreeViewFrame tvFrame, DendroView2 dendroView, 
+			DendroController controller, String menuTitle) {
 		
 		this.tvFrame = tvFrame;
 		this.applicationFrame = tvFrame.getAppFrame();
 		this.dendroView = dendroView;
+		this.dendroController = controller;
 		
-		menuFrame = new JFrame("Preferences");
+		menuDialog = new JDialog();
+		menuDialog.setTitle("Preferences");
+		menuDialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
+		menuDialog.setResizable(false);
 		
 		basisPanel = new JPanel();
 		basisPanel.setLayout(new MigLayout());
@@ -76,28 +89,37 @@ public class PreferencesMenu {
 			width = 640;
 		}
 		
-		int height = mainDim.height * 3/4;
+		int height = mainDim.height * 1/2;
 		
 		basisPanel.setPreferredSize(
 				new Dimension(width, height));
 		
-		menuFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		menuDialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 		setupLayout(menuTitle);
 		
-		menuFrame.getContentPane().add(basisPanel);
+		menuDialog.getContentPane().add(basisPanel);
 		
-		menuFrame.pack();
-		menuFrame.setLocationRelativeTo(applicationFrame);
+		menuDialog.pack();
+		menuDialog.setLocationRelativeTo(applicationFrame);
+	}
+	
+	/**
+	 * Sets the visibility of clusterFrame.
+	 * @param visible
+	 */
+	public void setVisible(boolean visible) {
+		
+		menuDialog.setVisible(visible);
 	}
 	
 	/**
 	 * Returns the menu frame holding all the JPanels to display to the user.
 	 * @return
 	 */
-	public JFrame getPreferencesFrame() {
+	public JDialog getPreferencesFrame() {
 		
-		return menuFrame;
+		return menuDialog;
 	}
 	
 	public void synchronizeAnnotation() {
@@ -122,7 +144,7 @@ public class PreferencesMenu {
 	 */
 	public void addWindowListener(WindowAdapter listener) {
 		
-		menuFrame.addWindowListener(listener);
+		menuDialog.addWindowListener(listener);
 	}
 	
 	/**
@@ -172,8 +194,8 @@ public class PreferencesMenu {
 		
 		basisPanel.add(ok_button, "pushx, alignx 100%, span");
 		
-		menuFrame.validate();
-		menuFrame.repaint();
+		menuDialog.validate();
+		menuDialog.repaint();
 	}
 	
 	public void setupMenuHeaders(boolean analysis) {
@@ -211,6 +233,10 @@ public class PreferencesMenu {
 			pixelSettings = new PixelSettingsPanel();
 			annotationSettings = new AnnotationPanel();
 			fontSettings = new FontPanel();
+			
+			gradientPick = new ColorGradientChooser();
+			ColorGradientController gradientControl = 
+					new ColorGradientController(gradientPick);
 		}
 		
 		themeSettings = new ThemeSettingsPanel();
@@ -233,7 +259,7 @@ public class PreferencesMenu {
 			panel.setBackground(GUIParams.BG_COLOR);
 			
 			try {
-				ce = ((DoubleArrayDrawer) dendroView.getArrayDrawer())
+				ce = ((DoubleArrayDrawer) dendroController.getArrayDrawer())
 						.getColorExtractor();
 	
 			} catch (final Exception e) {
@@ -241,7 +267,8 @@ public class PreferencesMenu {
 			}
 	
 			PixelSettingsSelector pss = new PixelSettingsSelector(
-					dendroView.getGlobalXmap(), dendroView.getGlobalYmap(), ce, 
+					dendroController.getGlobalXMap(), 
+					dendroController.getGlobalYMap(), ce, 
 					DendrogramFactory.getColorPresets()); 
 			
 			panel.add(pss, "push, grow");
@@ -464,7 +491,8 @@ public class PreferencesMenu {
 		
 		} else if(title.equalsIgnoreCase("Color Settings") 
 				&& pixelSettings != null) {
-			basisPanel.add(pixelSettings.makePSPanel(), "w 79%, h 95%, wrap");
+//			basisPanel.add(pixelSettings.makePSPanel(), "w 79%, h 95%, wrap");
+			basisPanel.add(gradientPick.makeGradientPanel(), "w 79%, h 95%, wrap");
 		
 		} else if(title.equalsIgnoreCase("URL") && urlSettings != null) {
 //			basisPanel.add(pixelSettings.makePSPanel(), "w 79%, h 95%, wrap");

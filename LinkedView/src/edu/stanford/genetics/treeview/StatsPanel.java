@@ -4,7 +4,7 @@ import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -13,7 +13,7 @@ import net.miginfocom.swing.MigLayout;
 public class StatsPanel {
 
 	private TreeViewFrame viewFrame;
-	private JFrame statsFrame;
+	private JDialog statsDialog;
 	
 	/**
 	 * Constructor
@@ -21,32 +21,33 @@ public class StatsPanel {
 	 */
 	public StatsPanel(TreeViewFrame viewFrame) {
 		
-		statsFrame = new JFrame("Stats");
-		
 		this.viewFrame = viewFrame;
 		
-		statsFrame.setResizable(false);
+		statsDialog = new JDialog();
+		statsDialog.setTitle("Stats");
+		statsDialog.setModalityType(JDialog.DEFAULT_MODALITY_TYPE);
+		statsDialog.setResizable(false);
 		
 		final Dimension mainDim = GUIParams.getScreenSize();
 		
-		statsFrame.getContentPane().setSize(mainDim.width * 1/2, 
+		statsDialog.getContentPane().setSize(mainDim.width * 1/2, 
 				mainDim.height * 1/2);
 		
-		statsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		statsDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		
-		statsFrame.addWindowListener(new WindowAdapter() {
+		statsDialog.addWindowListener(new WindowAdapter() {
 			
 			@Override
 			public void windowClosing(final WindowEvent we) {
 				
-				statsFrame.dispose();
+				statsDialog.dispose();
 			}
 		});
 		
 		setupLayout();
 		
-		statsFrame.pack();
-		statsFrame.setLocationRelativeTo(viewFrame.getAppFrame());
+		statsDialog.pack();
+		statsDialog.setLocationRelativeTo(viewFrame.getAppFrame());
 	}
 	
 	/**
@@ -58,7 +59,7 @@ public class StatsPanel {
 		mainPanel.setLayout(new MigLayout());
 		mainPanel.setBackground(GUIParams.BG_COLOR);
 		
-		JLabel header = GUIParams.setupHeader("Stats for the loaded Model");
+		JLabel header = GUIParams.setupHeader("Data Stats");
 		
 		if(viewFrame.getDataModel() != null) {
 			JLabel source = new JLabel("Source: " + viewFrame.getDataModel()
@@ -100,7 +101,7 @@ public class StatsPanel {
 			mainPanel.add(nLoad, "push, alignx 50%");
 		}
 		
-		statsFrame.getContentPane().add(mainPanel);
+		statsDialog.getContentPane().add(mainPanel);
 	}
 	
 	/**
@@ -109,6 +110,6 @@ public class StatsPanel {
 	 */
 	public void setVisible(boolean visible) {
 		
-		statsFrame.setVisible(true);
+		statsDialog.setVisible(true);
 	}
 }

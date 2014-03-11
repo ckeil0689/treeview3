@@ -335,24 +335,24 @@ public class KMeansCluster {
 
 		// Check if sum of group sizes match the amount of overall means
 		// for testing only
-		int sum = 0;
-		for (int i = 0; i < clustersArray.length; i++) {
-
-			int[] group = clustersArray[i];
-			
-			sum += group.length;
-			System.out.println("Group Size " + i + ": " + group.length);
-		}
-
-		if (sum == meanList.length) {
-			System.out.println("Success! sum and meanList size match up.");
-			System.out.println("Seed Means: " + Arrays.toString(getSeedMeans()));
-
-		} else {
-			System.out.println("Something's weird.");
-			System.out.println("Sum: " + sum);
-			System.out.println("MeanList Size: " + meanList.length);
-		}
+//		int sum = 0;
+//		for (int i = 0; i < clustersArray.length; i++) {
+//
+//			int[] group = clustersArray[i];
+//			
+//			sum += group.length;
+//			System.out.println("Group Size " + i + ": " + group.length);
+//		}
+//
+//		if (sum == meanList.length) {
+//			System.out.println("Success! sum and meanList size match up.");
+//			System.out.println("Seed Means: " + Arrays.toString(getSeedMeans()));
+//
+//		} else {
+//			System.out.println("Something's weird.");
+//			System.out.println("Sum: " + sum);
+//			System.out.println("MeanList Size: " + meanList.length);
+//		}
 
 		return clustersArray;
 	}

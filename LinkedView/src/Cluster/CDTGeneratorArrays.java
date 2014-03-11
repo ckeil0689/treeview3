@@ -460,8 +460,7 @@ public class CDTGeneratorArrays {
 
 		// Add gene names in ORF and NAME columns (0 & 1) and GWeights (2)
 		// buffer is just the amount of rows before the data starts
-		int dataLineN = colNames.length;
-		for (int i = 0; i < dataLineN; i++) {
+		for (int i = 0; i < cdtDataStrings.length; i++) {
 
 			addIndex = 0;
 			String[] row = new String[rowLength];

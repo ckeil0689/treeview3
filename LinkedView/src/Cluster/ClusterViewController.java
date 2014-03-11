@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
@@ -46,7 +46,6 @@ public class ClusterViewController {
 		
 		// Add listeners after creating them
 		clusterView.addClusterListener(new ClusterListener());
-		clusterView.addVisualizeListener(new VisualizeListener());
 		clusterView.addClusterMenuListener(new ClusterMenuSetupListener());
 		clusterView.addCancelListener(new CancelListener());
 	}
@@ -81,7 +80,8 @@ public class ClusterViewController {
 			@Override
 			protected void done() {
 
-				clusterView.displayCompleted(finalFilePath);
+//				clusterView.displayCompleted(finalFilePath);
+				visualizeData();
 			}
 		};
 	}
@@ -103,8 +103,8 @@ public class ClusterViewController {
 				if(controller.getTVControllerModel().
 						getDataMatrix().getNumRow() > 0) {
 					controller.setDataModel();
-					tvFrame.setView("LoadCheckView");
 					controller.addViewListeners();
+					controller.setLoaded();
 					
 				} else {
 					System.out.println("No datamatrix set by worker thread.");
@@ -199,47 +199,31 @@ public class ClusterViewController {
 	}
 	
 	/**
-	 * A listener for dendro_button in ClusterView that sets up the new 
-	 * DendroView2 with the recently clustered file by calling setLoaded() in 
-	 * TreeViewFrame.
-	 * @author CKeil
-	 *
+	 * Sets a new DendroView with the new data loaded into TVModel, displaying
+	 * an updated HeatMap. It should also close the ClusterViewFrame.
 	 */
-	class VisualizeListener implements ActionListener {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			
-			visualizeData();
-		}
+	public void visualizeData() {
 		
-		/**
-		 * Sets a new DendroView with the new data loaded into TVModel, displaying
-		 * an updated HeatMap. It should also close the ClusterViewFrame.
-		 */
-		public void visualizeData() {
+		JDialog topFrame = (JDialog) SwingUtilities
+				.getWindowAncestor(clusterView);
+		
+		File file = null;
+		
+		if(finalFilePath != null) {
+			file = new File(finalFilePath);
+		
+			fileSet = new FileSet(file.getName(), file.getParent() 
+					+ File.separator);
+
+			tvFrame.setView("LoadProgressView");
+			setupLoadWorkerThread();
+			loadWorker.execute();
 			
-			JFrame topFrame = (JFrame) SwingUtilities
-					.getWindowAncestor(clusterView);
+			topFrame.dispose();
+		
+		} else {
+			// Make Warning Dialog
 			
-			File file = null;
-			
-			if(finalFilePath != null) {
-				file = new File(finalFilePath);
-			
-				fileSet = new FileSet(file.getName(), file.getParent() 
-						+ File.separator);
-	
-				tvFrame.setView("LoadProgressView");
-				setupLoadWorkerThread();
-				loadWorker.execute();
-				
-				topFrame.dispose();
-			
-			} else {
-				// Make Warning Dialog
-				
-			}
 		}
 	}
 	

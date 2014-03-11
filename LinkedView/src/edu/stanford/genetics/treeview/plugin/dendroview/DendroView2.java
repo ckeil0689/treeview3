@@ -23,65 +23,32 @@
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.ScrollPane;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.concurrent.ExecutionException;
 
-import javax.imageio.ImageIO;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JSplitPane;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import net.miginfocom.swing.MigLayout;
-import edu.stanford.genetics.treeview.BrowserControl;
-import edu.stanford.genetics.treeview.CdtFilter;
 import edu.stanford.genetics.treeview.ConfigNode;
-import edu.stanford.genetics.treeview.ConfigNodePersistent;
-import edu.stanford.genetics.treeview.DataModel;
-import edu.stanford.genetics.treeview.DummyConfigNode;
-import edu.stanford.genetics.treeview.ExportException;
-import edu.stanford.genetics.treeview.FileSet;
+import edu.stanford.genetics.treeview.DendroPanel;
 import edu.stanford.genetics.treeview.GUIParams;
-import edu.stanford.genetics.treeview.HeaderInfo;
-import edu.stanford.genetics.treeview.HeaderSummary;
-import edu.stanford.genetics.treeview.LoadException;
-import edu.stanford.genetics.treeview.MainPanel;
-import edu.stanford.genetics.treeview.MainProgramArgs;
-import edu.stanford.genetics.treeview.MessagePanel;
 import edu.stanford.genetics.treeview.ModelView;
-import edu.stanford.genetics.treeview.ReorderedTreeSelection;
 import edu.stanford.genetics.treeview.TabbedSettingsPanel;
-import edu.stanford.genetics.treeview.TreeDrawerNode;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.TreeviewMenuBarI;
 import edu.stanford.genetics.treeview.ViewFrame;
-import edu.stanford.genetics.treeview.core.ArrayFinderPanel;
-import edu.stanford.genetics.treeview.core.GeneFinderPanel;
-import edu.stanford.genetics.treeview.core.HeaderFinderPanel;
-import edu.stanford.genetics.treeview.model.AtrTVModel;
-import edu.stanford.genetics.treeview.model.ReorderedDataModel;
-import edu.stanford.genetics.treeview.model.TVModel;
-//Explicitly imported because error (unclear TVModel reference) was thrown
+import edu.stanford.genetics.treeview.core.ArrayFinderBox;
+import edu.stanford.genetics.treeview.core.GeneFinderBox;
+import edu.stanford.genetics.treeview.core.HeaderFinderBox;
 
 /**
  * This class encapsulates a dendrogram view, which is the classic Eisen
@@ -101,16 +68,13 @@ import edu.stanford.genetics.treeview.model.TVModel;
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.7 $ $Date: 2009-03-23 02:46:51 $
  */
-public class DendroView2 implements ConfigNodePersistent, MainPanel, Observer {
-
-	private static ImageIcon treeviewIcon = null;
+public class DendroView2 implements Observer, DendroPanel {
 
 	// Instance Variables
 	protected int gtr_div_size = 0;
 	protected int atr_div_size = 0;
 
 	// Container JFrame
-	private JFrame applicationFrame;
 	protected TreeViewFrame tvFrame;
 	
 	// Name
@@ -123,7 +87,7 @@ public class DendroView2 implements ConfigNodePersistent, MainPanel, Observer {
 	protected boolean loaded;
 
 	// Map Views
-	protected GlobalView globalview;
+	private GlobalView globalview;
 
 	// Trees
 	protected GTRView gtrview;
@@ -136,38 +100,9 @@ public class DendroView2 implements ConfigNodePersistent, MainPanel, Observer {
 	protected JScrollBar globalXscrollbar;
 	protected JScrollBar globalYscrollbar;
 
-	// Drawers
-	protected ArrayDrawer arrayDrawer;
-	protected InvertedTreeDrawer invertedTreeDrawer;
-	protected LeftTreeDrawer leftTreeDrawer;
-
-	// MapContainers
-	protected MapContainer globalXmap;
-	protected MapContainer globalYmap;
-
-//	protected MessagePanel statuspanel;
-	protected BrowserControl browserControl;
-	protected ConfigNode root;
-
 	// persistent popups
 	protected JDialog settingsFrame;
 	protected TabbedSettingsPanel settingsPanel;
-
-	/*
-	 * The following arrays allow translation to and from screen and DataMatrix
-	 * I had to add these in order to have gaps in the Dendroview of k-means
-	 */
-	private int[] arrayIndex = null;
-	private int[] geneIndex = null;
-
-	// The model
-	private DataModel dataModel = null;
-
-	// Selections
-	private TreeSelectionI geneSelection = null;
-	private TreeSelectionI arraySelection = null;
-
-	private ColorExtractor colorExtractor;
 	
 	// JMenuItems
 	private JMenuItem colorMenuItem;
@@ -180,6 +115,10 @@ public class DendroView2 implements ConfigNodePersistent, MainPanel, Observer {
 	private JButton scaleDecX;
 	private JButton scaleDecY;
 	private JButton scaleDefaultAll;
+	
+	// Selections
+	private TreeSelectionI geneSelection = null;
+	private TreeSelectionI arraySelection = null;
 
 	/**
 	 * Chained constructor for the DendroView object note this will reuse any
@@ -192,12 +131,12 @@ public class DendroView2 implements ConfigNodePersistent, MainPanel, Observer {
 	 */
 	public DendroView2(TreeViewFrame tvFrame) {
 
-		this(null, tvFrame, "Dendrogram");
+		this(tvFrame, "Dendrogram");
 	}
 
 	public DendroView2(final ConfigNode root, final TreeViewFrame tvFrame) {
 
-		this(root, tvFrame, "Dendrogram");
+		this(tvFrame, "Dendrogram");
 	}
 
 	/**
@@ -213,75 +152,16 @@ public class DendroView2 implements ConfigNodePersistent, MainPanel, Observer {
 	 * @param name
 	 *            name of this view.
 	 */
-	public DendroView2(final ConfigNode root, final TreeViewFrame tvFrame, 
-			final String name) {
+	public DendroView2(final TreeViewFrame tvFrame, final String name) {
 
 		this.tvFrame = tvFrame;
-		this.applicationFrame = tvFrame.getAppFrame();
-		this.dataModel = (TVModel) tvFrame.getDataModel();
 		this.name = "DendroView";
 
 		dendroPane = new JPanel();
 		dendroPane.setLayout(new MigLayout("ins 0"));
 		dendroPane.setBackground(GUIParams.BG_COLOR);
 		
-		if (root == null) {
-			if (dataModel.getDocumentConfigRoot() != null) {
-				bindConfig(dataModel.getDocumentConfigRoot().fetchOrCreate(
-						"MainView"));
-
-			} else {
-				bindConfig(new DummyConfigNode("MainView"));
-			}
-		} else {
-			bindConfig(root);
-		}
-
-		// For K-Means
-		if (dataModel.getArrayHeaderInfo().getIndex("GROUP") != -1) {
-			final HeaderInfo headerInfo = dataModel.getArrayHeaderInfo();
-			final int groupIndex = headerInfo.getIndex("GROUP");
-
-			arrayIndex = getGroupVector(headerInfo, groupIndex);
-
-		} else {
-			arrayIndex = null;
-		}
-
-		if (dataModel.getGeneHeaderInfo().getIndex("GROUP") != -1) {
-			System.err.println("got gene group header");
-			final HeaderInfo headerInfo = dataModel.getGeneHeaderInfo();
-			final int groupIndex = headerInfo.getIndex("GROUP");
-			geneIndex = getGroupVector(headerInfo, groupIndex);
-
-		} else {
-			geneIndex = null;
-		}
-
-		if ((arrayIndex != null) || (geneIndex != null)) {
-			dataModel = new ReorderedDataModel(dataModel, geneIndex, 
-					arrayIndex);
-		}
-		
-		setDataModel(dataModel);
 		setupViews();
-		doDoubleLayout();
-
-		if (geneIndex != null) {
-			setGeneSelection(new ReorderedTreeSelection(
-					tvFrame.getGeneSelection(), geneIndex));
-
-		} else {
-			setGeneSelection(tvFrame.getGeneSelection());
-		}
-
-		if (arrayIndex != null) {
-			setArraySelection(new ReorderedTreeSelection(
-					tvFrame.getArraySelection(), arrayIndex));
-
-		} else {
-			setArraySelection(tvFrame.getArraySelection());
-		}
 	}
 	
 	/**
@@ -300,73 +180,28 @@ public class DendroView2 implements ConfigNodePersistent, MainPanel, Observer {
 	 * 
 	 */
 	protected void setupViews() {
-
-		final ColorPresets colorPresets = DendrogramFactory.getColorPresets();
-		colorExtractor = new ColorExtractor();
-		colorExtractor.setDefaultColorSet(colorPresets.getDefaultColorSet());
-		colorExtractor.setMissing(DataModel.NODATA, DataModel.EMPTY);
-
-		final DoubleArrayDrawer dArrayDrawer = new DoubleArrayDrawer();
-		dArrayDrawer.setColorExtractor(colorExtractor);
-		arrayDrawer = dArrayDrawer;
-		((Observable) getDataModel()).addObserver(arrayDrawer);
 		
-		// set data first to avoid adding auto-generated
-		// contrast to documentConfig.
-		dArrayDrawer.setDataMatrix(getDataModel().getDataMatrix());
-		dArrayDrawer.recalculateContrast();
-		dArrayDrawer.bindConfig(getFirst("ArrayDrawer"));
-
-		// Set up status panel
-//		statuspanel = new MessagePanel();
-
-		// globalmaps tell globalview, atrview, and gtrview
-		// where to draw each data point.
-		// the scrollbars "scroll" by communicating with the maps.
-		globalXmap = new MapContainer("Fixed");
-		globalYmap = new MapContainer("Fixed");
-
 		// Create the Global view (JPanel to display)
 		globalview = new GlobalView();
-		globalview.setXMap(globalXmap);
-		globalview.setYMap(globalYmap);
-		globalview.setHeaders(getDataModel().getGeneHeaderInfo(),
-				getDataModel().getArrayHeaderInfo());
-		globalview.setArrayDrawer(arrayDrawer);
 
 		// scrollbars, mostly used by maps
 		globalXscrollbar = globalview.getXScroll();
-		globalXmap.setScrollbar(globalXscrollbar);
-
 		globalYscrollbar = globalview.getYScroll();
-		globalYmap.setScrollbar(globalYscrollbar);
 
 		// Set up the column name display
-		arraynameview = new ArrayNameView(getDataModel().getArrayHeaderInfo());
+		arraynameview = new ArrayNameView(tvFrame.getDataModel().getArrayHeaderInfo());
 //		arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
-		arraynameview.setDataModel(getDataModel());
-		arraynameview.setMap(getGlobalXmap());
 
-		textview = new TextViewManager(getDataModel().getGeneHeaderInfo(),
-				tvFrame.getUrlExtractor(), getDataModel());
-		textview.setMap(getGlobalYmap());
+		textview = new TextViewManager(tvFrame.getDataModel().getGeneHeaderInfo(),
+				tvFrame.getUrlExtractor(), tvFrame.getDataModel());
 
 		// Set up row dendrogram
-		leftTreeDrawer = new LeftTreeDrawer();
 		gtrview = new GTRView();
-		gtrview.setOpaque(true);
-		gtrview.setMap(globalYmap);
-		gtrview.setLeftTreeDrawer(leftTreeDrawer);
 		gtrview.getHeaderSummary().setIncluded(new int[] { 0, 3 });
 
 		// Set up column dendrogram
-		invertedTreeDrawer = new InvertedTreeDrawer();
 		atrview = new ATRView();
-		atrview.setMap(globalXmap);
-		atrview.setInvertedTreeDrawer(invertedTreeDrawer);
 		atrview.getHeaderSummary().setIncluded(new int[] { 0, 3 });
-		
-		final HeaderSummary atrSummary = atrview.getHeaderSummary();
 		
 		// Register Views
 		registerView(globalview);
@@ -378,33 +213,16 @@ public class DendroView2 implements ConfigNodePersistent, MainPanel, Observer {
 		// reset persistent popups
 		settingsFrame = null;
 		settingsPanel = null;
-		
-		// urls
-		colorExtractor.bindConfig(getFirst("ColorExtractor"));
-
-		// this is here because my only subclass shares this code.
-		bindTrees();
-
-		globalXmap.bindConfig(getFirst("GlobalXMap"));
-		globalYmap.bindConfig(getFirst("GlobalYMap"));
-		textview.bindConfig(getFirst("TextView"));
-		arraynameview.bindConfig(getFirst("ArrayNameView"));
-		atrSummary.bindConfig(getFirst("AtrSummary"));
-		gtrview.getHeaderSummary().bindConfig(getFirst("GtrSummary"));
-
-		// perhaps I could remember this stuff in the MapContainer...
-		globalXmap.setIndexRange(0, dataModel.getDataMatrix().getNumCol() - 1);
-		globalYmap.setIndexRange(0, dataModel.getDataMatrix().getNumRow() - 1);
-		
-		globalXmap.notifyObservers();
-		globalYmap.notifyObservers();
 	}
 
 	/**
 	 * Manages the component layout in TreeViewFrame
 	 */
-	protected void doDoubleLayout() {
+	public void setupLayout() {
 
+		// Clear panel
+		dendroPane.removeAll();
+		
 		// Components for layout setup
 		JPanel buttonPanel;
 		JPanel crossPanel;
@@ -418,9 +236,6 @@ public class DendroView2 implements ConfigNodePersistent, MainPanel, Observer {
 		JPanel fillPanel2;
 		JPanel fillPanel3;
 		JPanel fillPanel4;
-
-		// Clear panel
-		dendroPane.removeAll();
 		
 		//Buttons
 		scaleDefaultAll = GUIParams.setButtonLayout(null, "homeIcon");
@@ -519,20 +334,16 @@ public class DendroView2 implements ConfigNodePersistent, MainPanel, Observer {
 		navPanel.add(finderPanel, "pushy, h 20%, w 70%, alignx 50%, " +
 				"aligny 10%");
 		
-		dendroPane.add(fillPanel4, "w 18.5%, h 20%");
-		dendroPane.add(atrPane, "w 62%, h 20%");
-		dendroPane.add(fillPanel1, "span 2, w 19.5%, h 20%, wrap");
-		dendroPane.add(gtrPane, "w 18.5%, h 75%");
-		dendroPane.add(globalview, "w 62%, h 75%");
+		dendroPane.add(fillPanel4, "w 18.5%::, h 20%");
+		dendroPane.add(atrPane, "w 72%, h 20%");
+		dendroPane.add(fillPanel1, "span 2, w ::19.5%, h 20%, wrap");
+		dendroPane.add(gtrPane, "w 18.5%::, h 75%");
+		dendroPane.add(globalview, "w 72%, h 75%");
 		dendroPane.add(globalYscrollbar, "w 1%, h 75%");
-		dendroPane.add(navPanel, "w 18.5%, h 75%, wrap");
-		dendroPane.add(fillPanel2, "w 18.5%, h 5%");
-		dendroPane.add(globalXscrollbar, "pushy, aligny 0%, w 62%, h 1%");
-		dendroPane.add(fillPanel3, "span 2, w 19.5%, h 5%");
-		
-		// Ensuring window resizing works with GlobalView
-		globalXmap.setHome();
-		globalYmap.setHome();
+		dendroPane.add(navPanel, "w ::18.5%, h 75%, wrap");
+		dendroPane.add(fillPanel2, "w 18.5%::, h 5%");
+		dendroPane.add(globalXscrollbar, "pushy, aligny 0%, w 72%, h 1%");
+		dendroPane.add(fillPanel3, "span 2, w ::19.5%, h 5%");
 	}
 	
 	// Add Button Listeners
@@ -571,603 +382,49 @@ public class DendroView2 implements ConfigNodePersistent, MainPanel, Observer {
 	/**
 	 * Redoing all the layout if parameters changed.
 	 */
-	@Override
 	public void refresh() {
 		
 		dendroPane.removeAll();
-		setupViews();
-		doDoubleLayout();
+		setupLayout();
 		
 		dendroPane.revalidate();
 		dendroPane.repaint();
 	}
 	
-	private int[] getGroupVector(final HeaderInfo headerInfo,
-			final int groupIndex) {
-
-		int ngroup = 0;
-		String cur = headerInfo.getHeader(0, groupIndex);
-
-		for (int i = 0; i < headerInfo.getNumHeaders(); i++) {
-
-			final String test = headerInfo.getHeader(i, groupIndex);
-			if (cur.equals(test) == false) {
-				cur = test;
-				ngroup++;
-			}
-		}
-
-		final int[] groupVector = new int[ngroup + headerInfo.getNumHeaders()];
-		ngroup = 0;
-		cur = headerInfo.getHeader(0, groupIndex);
-
-		for (int i = 0; i < headerInfo.getNumHeaders(); i++) {
-
-			final String test = headerInfo.getHeader(i, groupIndex);
-			if (cur.equals(test) == false) {
-				groupVector[i + ngroup] = -1;
-				cur = test;
-				ngroup++;
-			}
-			groupVector[i + ngroup] = i;
-		}
-
-		return groupVector;
-	}
-
-//	/**
-//	 * Finds the currently selected genes, mirror image flips them, and then
-//	 * rebuilds all necessary trees and saved data to the .jtv file.
-//	 * 
-//	 */
-//	private void flipSelectedGTRNode() {
-//
-//		int leftIndex, rightIndex;
-//		String selectedID;
-//		final TreeDrawerNode geneNode = leftTreeDrawer
-//				.getNodeById(getGeneSelection().getSelectedNode());
-//
-//		if (geneNode == null || geneNode.isLeaf()) {
-//
-//			return;
-//		}
-//
-//		selectedID = geneNode.getId();
-//
-//		// find the starting index of the left array tree, the ending
-//		// index of the right array tree
-//		leftIndex = getDataModel().getGeneHeaderInfo().getHeaderIndex(
-//				geneNode.getLeft().getLeftLeaf().getId());
-//		rightIndex = getDataModel().getGeneHeaderInfo().getHeaderIndex(
-//				geneNode.getRight().getRightLeaf().getId());
-//
-//		final int num = getDataModel().getDataMatrix().getNumRow();
-//
-//		final int[] newOrder = SetupInvertedArray(num, leftIndex, rightIndex);
-//
-//		/*
-//		 * System.out.print("Fliping to: "); for(int i = 0; i < newOrder.length;
-//		 * i++) { System.out.print(newOrder[i] + " "); } System.out.println("");
-//		 */
-//
-//		((TVModel) getDataModel()).reorderGenes(newOrder);
-//		// ((TVModel)getDataModel()).saveGeneOrder(newOrder);
-//		((Observable) getDataModel()).notifyObservers();
-//
-//		updateGTRDrawer(selectedID);
-//	}
-
-//	private int[] SetupInvertedArray(final int num, final int leftIndex,
-//			final int rightIndex) {
-//
-//		final int[] newOrder = new int[num];
-//
-//		for (int i = 0; i < num; i++) {
-//
-//			newOrder[i] = i;
-//		}
-//
-//		for (int i = 0; i <= (rightIndex - leftIndex); i++) {
-//
-//			newOrder[leftIndex + i] = rightIndex - i;
-//		}
-//
-//		return newOrder;
-//	}
-
-//	/**
-//	 * Finds the currently selected arrays, mirror image flips them, and then
-//	 * rebuilds all necessary trees and saved data to the .jtv file.
-//	 */
-//	private void flipSelectedATRNode() {
-//
-//		int leftIndex, rightIndex;
-//		String selectedID;
-//		final TreeDrawerNode arrayNode = invertedTreeDrawer
-//				.getNodeById(getArraySelection().getSelectedNode());
-//
-//		if (arrayNode == null || arrayNode.isLeaf()) {
-//
-//			return;
-//		}
-//
-//		selectedID = arrayNode.getId();
-//
-//		// find the starting index of the left array tree,
-//		// the ending index of the right array tree
-//		leftIndex = getDataModel().getArrayHeaderInfo().getHeaderIndex(
-//				arrayNode.getLeft().getLeftLeaf().getId());
-//		rightIndex = getDataModel().getArrayHeaderInfo().getHeaderIndex(
-//				arrayNode.getRight().getRightLeaf().getId());
-//
-//		final int num = getDataModel().getDataMatrix().getNumUnappendedCol();
-//
-//		final int[] newOrder = new int[num];
-//
-//		for (int i = 0; i < num; i++) {
-//
-//			newOrder[i] = i;
-//		}
-//
-//		for (int i = 0; i <= (rightIndex - leftIndex); i++) {
-//
-//			newOrder[leftIndex + i] = rightIndex - i;
-//		}
-//
-//		/*
-//		 * System.out.print("Fliping to: "); for(int i = 0; i < newOrder.length;
-//		 * i++) { System.out.print(newOrder[i] + " "); } System.out.println("");
-//		 */
-//
-//		((TVModel) getDataModel()).reorderArrays(newOrder);
-//		((Observable) getDataModel()).notifyObservers();
-//
-//		updateATRDrawer(selectedID);
-//	}
-
 	/**
-	 * Displays a data set alongside the primary one for comparison.
-	 * 
-	 * @param model
-	 *            - the model containing cdt data being added to the display.
+	 * Zooms in on the globalview.
+	 * Make a separate globalview controller later.
 	 */
-	public void compareToModel(final TVModel model) {
-
-		getDataModel().removeAppended();
-		getDataModel().append(model);
-
-		arraySelection.resize(getDataModel().getDataMatrix().getNumCol());
-		arraySelection.notifyObservers();
-
-		globalXmap.setIndexRange(0,
-				getDataModel().getDataMatrix().getNumCol() - 1);
-		globalXmap.notifyObservers();
-
-//		zoomXmap.setIndexRange(0,
-//		getDataModel().getDataMatrix().getNumCol() - 1);
-//		zoomXmap.notifyObservers();
-
-		((Observable) getDataModel()).notifyObservers();
-	}
-
-	/**
-	 * Aligns the current ATR to the passed model as best as possible, saves the
-	 * new ordering to the .jtv file.
-	 * 
-	 * @param model
-	 *            - AtrTVModel with which to align.
-	 */
-	public void alignAtrToModel(final AtrTVModel model) {
-
-		try {
-			String selectedID = null;
-
-			try {
-				selectedID = getArraySelection().getSelectedNode();
-
-			} catch (final NullPointerException npe) {
-				npe.printStackTrace();
-			}
-
-			int[] ordering;
-			ordering = AtrAligner.align(getDataModel().getAtrHeaderInfo(),
-					getDataModel().getArrayHeaderInfo(),
-					model.getAtrHeaderInfo(), model.getArrayHeaderInfo());
-
-			/*
-			 * System.out.print("New ordering: "); for(int i = 0; i <
-			 * ordering.length; i++) { System.out.print(ordering[i] + " "); }
-			 * System.out.println();
-			 */
-
-			((TVModel) getDataModel()).reorderArrays(ordering);
-			((Observable) getDataModel()).notifyObservers();
-
-			if (selectedID != null) {
-
-				updateATRDrawer(selectedID);
-			}
-		} catch (final Exception e) {
-			e.printStackTrace();
-			System.out.println(e.toString());
-		}
-	}
-
-//	/**
-//	 * Updates the GTRDrawer to reflect changes in the DataModel gene order;
-//	 * rebuilds the TreeDrawerNode tree.
-//	 * 
-//	 * @param selectedID
-//	 *            ID of the node selected before a change in tree structure was
-//	 *            made. This node is then found and reselected after the ATR
-//	 *            tree is rebuilt.
-//	 */
-//	private void updateGTRDrawer(final String selectedID) {
-//
-//		try {
-//			final TVModel tvmodel = (TVModel) getDataModel();
-//			leftTreeDrawer.setData(tvmodel.getGtrHeaderInfo(),
-//					tvmodel.getGeneHeaderInfo());
-//
-//			final HeaderInfo trHeaderInfo = tvmodel.getGtrHeaderInfo();
-//
-//			if (trHeaderInfo.getIndex("NODECOLOR") >= 0) {
-//				TreeColorer.colorUsingHeader(leftTreeDrawer.getRootNode(),
-//						trHeaderInfo, trHeaderInfo.getIndex("NODECOLOR"));
-//			}
-//		} catch (final DendroException e) {
-//
-//			// LogPanel.println("Had problem setting up the array tree : "
-//			// + e.getMessage());
-//			// e.printStackTrace();
-//			final Box mismatch = new Box(BoxLayout.Y_AXIS);
-//			mismatch.add(new JLabel(e.getMessage()));
-//			mismatch.add(new JLabel("Perhaps there is a mismatch "
-//					+ "between your ATR and CDT files?"));
-//			mismatch.add(new JLabel("Ditching Gene Tree, since it's lame."));
-//
-//			JOptionPane.showMessageDialog(tvFrame, mismatch,
-//					"Tree Construction Error", JOptionPane.ERROR_MESSAGE);
-//
-//			gtrview.setEnabled(false);
-//			// gtrzview.setEnabled(false);
-//
-//			try {
-//				leftTreeDrawer.setData(null, null);
-//
-//			} catch (final DendroException ex) {
-//
-//			}
-//		}
-//
-//		final TreeDrawerNode arrayNode = leftTreeDrawer.getRootNode().findNode(
-//				selectedID);
-//
-//		geneSelection.setSelectedNode(arrayNode.getId());
-//		gtrview.setSelectedNode(arrayNode);
-//		// gtrzview.setSelectedNode(arrayNode);
-//
-//		geneSelection.notifyObservers();
-//		leftTreeDrawer.notifyObservers();
-//	}
-
-	/**
-	 * Updates the ATRDrawer to reflect changes in the DataMode array order;
-	 * rebuilds the TreeDrawerNode tree.
-	 * 
-	 * @param selectedID
-	 *            ID of the node selected before a change in tree structure was
-	 *            made. This node is then found and reselected after the ATR
-	 *            tree is rebuilt.
-	 */
-	private void updateATRDrawer(final String selectedID) {
+	public void zoomSelection() {
 		
-		try {
-			final TVModel tvmodel = (TVModel) getDataModel();
-			invertedTreeDrawer.setData(tvmodel.getAtrHeaderInfo(),
-					tvmodel.getArrayHeaderInfo());
-			final HeaderInfo trHeaderInfo = tvmodel.getAtrHeaderInfo();
-
-			if (trHeaderInfo.getIndex("NODECOLOR") >= 0) {
-
-				TreeColorer.colorUsingHeader(invertedTreeDrawer.getRootNode(),
-						trHeaderInfo, trHeaderInfo.getIndex("NODECOLOR"));
-			}
-		} catch (final DendroException e) {
-
-			// LogPanel.println("Had problem setting up the array tree : "
-			// + e.getMessage());
-			// e.printStackTrace();
-			final Box mismatch = new Box(BoxLayout.Y_AXIS);
-			mismatch.add(new JLabel(e.getMessage()));
-			mismatch.add(new JLabel("Perhaps there is a mismatch "
-					+ "between your ATR and CDT files?"));
-			mismatch.add(new JLabel("Ditching Array Tree, since it's lame."));
-
-			JOptionPane.showMessageDialog(applicationFrame, mismatch,
-					"Tree Construction Error", JOptionPane.ERROR_MESSAGE);
-
-			atrview.setEnabled(false);
-
-			try {
-				invertedTreeDrawer.setData(null, null);
-
-			} catch (final DendroException ex) {
-
-			}
-		}
-
-		final TreeDrawerNode arrayNode = invertedTreeDrawer.getRootNode()
-				.findNode(selectedID);
-
-		arraySelection.setSelectedNode(arrayNode.getId());
-		atrview.setSelectedNode(arrayNode);
-
-		arraySelection.notifyObservers();
-		invertedTreeDrawer.notifyObservers();
+		globalview.zoomSelection();
+		globalview.centerSelection();
 	}
-
+	
 	/**
-	 * Creates an AtrTVModel for use in tree alignment.
 	 * 
-	 * @param fileSet
-	 * @return a new AtrTVModel with the file set loaded into it.
-	 * @throws LoadException
+	 * @param o
+	 * @param arg
 	 */
-	protected AtrTVModel makeAtrModel(final FileSet fileSet)
-			throws LoadException {
-
-		final AtrTVModel atrTVModel = new AtrTVModel();
-
-		try {
-			atrTVModel.loadNew(fileSet);
-
-		} catch (final LoadException e) {
-			JOptionPane.showMessageDialog(dendroPane, e);
-			throw e;
-		}
-
-		return atrTVModel;
-	}
-
-	protected TVModel makeCdtModel(final FileSet fileSet) throws LoadException {
-
-		final TVModel tvModel = new TVModel();
-
-		try {
-			tvModel.loadNew(fileSet);
-
-		} catch (final LoadException e) {
-			JOptionPane.showMessageDialog(dendroPane, e);
-			throw e;
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			
-		} catch (ExecutionException e) {
-			e.printStackTrace();
-		}
-
-		return tvModel;
-	}
-
-	/**
-	 * Open a dialog which allows the user to select a new CDT data file for
-	 * tree alignment.
-	 * 
-	 * @return The fileset corresponding to the dataset.
-	 */
-	/*
-	 * Unknow what actually happens if the file CDT does not have an associated
-	 * ATR.
-	 */
-	protected FileSet offerATRFileSelection() throws LoadException {
-
-		FileSet fileSet1; // will be chosen...
-
-		final JFileChooser fileDialog = new JFileChooser();
-		setupATRFileDialog(fileDialog);
-
-		final int retVal = fileDialog.showOpenDialog(dendroPane);
-
-		if (retVal == JFileChooser.APPROVE_OPTION) {
-			final File chosen = fileDialog.getSelectedFile();
-			fileSet1 = new FileSet(chosen.getName(), chosen.getParent()
-					+ File.separator);
-
-		} else {
-			throw new LoadException("File Dialog closed without selection...",
-					LoadException.NOFILE);
-		}
-
-		return fileSet1;
-	}
-
-	/**
-	 * Sets up a dialog for loading ATR files for tree alignment.
-	 * 
-	 * @param fileDialog
-	 *            the dialog to setup
-	 */
-	protected void setupATRFileDialog(final JFileChooser fileDialog) {
-
-		final CdtFilter ff = new CdtFilter();
-		try {
-			fileDialog.addChoosableFileFilter(ff);
-			// will fail on pre-1.3 swings
-			fileDialog.setAcceptAllFileFilterUsed(true);
-
-		} catch (final Exception e) {
-			// hmm... I'll just assume that there's no accept all.
-			fileDialog
-					.addChoosableFileFilter(new javax.swing.filechooser.FileFilter() {
-
-						@Override
-						public boolean accept(final File f) {
-
-							return true;
-						}
-
-						@Override
-						public String getDescription() {
-
-							return "All Files";
-						}
-					});
-		}
-
-		fileDialog.setFileFilter(ff);
-		fileDialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
-	}
-
-	@Override
-	public void scrollToGene(final int i) {
-
-		getGlobalYmap().scrollToIndex(i);
-		getGlobalYmap().notifyObservers();
-	}
-
-	@Override
-	public void scrollToArray(final int i) {
-
-		getGlobalXmap().scrollToIndex(i);
-		getGlobalXmap().notifyObservers();
-	}
-
 	@Override
 	public void update(final Observable o, final Object arg) {
 		
 		if (o == geneSelection) {
 			gtrview.scrollToNode(geneSelection.getSelectedNode());
+			
+		} else if (o == arraySelection) {
+			atrview.scrollToNode(arraySelection.getSelectedNode());
 		}
 	}
 
 	/**
-	 * this is meant to be called from setupViews. It make sure that the trees
-	 * are generated from the current model, and enables/disables them as
-	 * required.
-	 * 
-	 * I factored it out because it is common betwen DendroView and
-	 * KnnDendroView.
-	 */
-	protected void bindTrees() {
-
-		final DataModel tvmodel = getDataModel();
-
-		if ((tvmodel != null) && tvmodel.aidFound()) {
-			try {
-				atrview.setEnabled(true);
-
-				invertedTreeDrawer.setData(tvmodel.getAtrHeaderInfo(),
-						tvmodel.getArrayHeaderInfo());
-				final HeaderInfo trHeaderInfo = tvmodel.getAtrHeaderInfo();
-
-				if (trHeaderInfo.getIndex("NODECOLOR") >= 0) {
-					TreeColorer.colorUsingHeader(
-							invertedTreeDrawer.getRootNode(), trHeaderInfo,
-							trHeaderInfo.getIndex("NODECOLOR"));
-				}
-
-			} catch (final DendroException e) {
-				// LogPanel.println("Had problem setting up the array tree : "
-				// + e.getMessage());
-				// e.printStackTrace();
-				final Box mismatch = new Box(BoxLayout.Y_AXIS);
-				mismatch.add(new JLabel(e.getMessage()));
-				mismatch.add(new JLabel("Perhaps there is a mismatch "
-						+ "between your ATR and CDT files?"));
-				mismatch.add(new JLabel("Ditching Array Tree, "
-						+ "since it's lame."));
-
-				JOptionPane.showMessageDialog(applicationFrame, mismatch,
-						"Tree Construction Error", JOptionPane.ERROR_MESSAGE);
-
-				atrview.setEnabled(false);
-
-				try {
-					invertedTreeDrawer.setData(null, null);
-
-				} catch (final DendroException ex) {
-
-				}
-			}
-		} else {
-			atrview.setEnabled(false);
-
-			try {
-				invertedTreeDrawer.setData(null, null);
-
-			} catch (final DendroException ex) {
-
-			}
-		}
-
-		invertedTreeDrawer.notifyObservers();
-
-		if ((tvmodel != null) && tvmodel.gidFound()) {
-			try {
-				gtrview.setEnabled(true);
-
-				leftTreeDrawer.setData(tvmodel.getGtrHeaderInfo(),
-						tvmodel.getGeneHeaderInfo());
-				final HeaderInfo gtrHeaderInfo = tvmodel.getGtrHeaderInfo();
-
-				if (gtrHeaderInfo.getIndex("NODECOLOR") >= 0) {
-					TreeColorer.colorUsingHeader(leftTreeDrawer.getRootNode(),
-							tvmodel.getGtrHeaderInfo(),
-							gtrHeaderInfo.getIndex("NODECOLOR"));
-
-				} else {
-					TreeColorer.colorUsingLeaf(leftTreeDrawer.getRootNode(),
-							tvmodel.getGeneHeaderInfo(), tvmodel
-									.getGeneHeaderInfo().getIndex("FGCOLOR"));
-				}
-
-			} catch (final DendroException e) {
-				// LogPanel.println("Had problem setting up the gene tree :
-				// " + e.getMessage());
-				// e.printStackTrace();
-				final Box mismatch = new Box(BoxLayout.Y_AXIS);
-				mismatch.add(new JLabel(e.getMessage()));
-				mismatch.add(new JLabel("Perhaps there is a mismatch "
-						+ "between your GTR and CDT files?"));
-				mismatch.add(new JLabel("Ditching Gene Tree, "
-						+ "since it's lame."));
-
-				JOptionPane.showMessageDialog(applicationFrame, mismatch,
-						"Tree Construction Error", JOptionPane.ERROR_MESSAGE);
-
-				gtrview.setEnabled(false);
-
-				try {
-					leftTreeDrawer.setData(null, null);
-
-				} catch (final DendroException ex) {
-
-				}
-			}
-		} else {
-			gtrview.setEnabled(false);
-
-			try {
-				leftTreeDrawer.setData(null, null);
-
-			} catch (final DendroException ex) {
-
-			}
-		}
-
-		leftTreeDrawer.notifyObservers();
-	}
-
-	/**
-	 * registers a modelview with the hint and status panels, and the viewFrame.
+	 * registers a modelview with the viewFrame.
 	 * 
 	 * @param modelView
 	 *            The ModelView to be added
 	 */
 	private void registerView(final ModelView modelView) {
-
-//		modelView.setStatusPanel(statuspanel);
+		
 		modelView.setViewFrame(tvFrame);
 	}
 
@@ -1379,14 +636,6 @@ public class DendroView2 implements ConfigNodePersistent, MainPanel, Observer {
 		// menu.setMnemonic(KeyEvent.VK_Z);
 	}
 
-	/**
-	 * show summary of the specified indexes
-	 */
-	public void showSubDataModel(final int[] indexes) {
-
-		getViewFrame().showSubDataModel(indexes, null, null);
-	}
-
 	// Populate Menus
 	/**
 	 * adds DendroView stuff to Analysis menu
@@ -1522,87 +771,6 @@ public class DendroView2 implements ConfigNodePersistent, MainPanel, Observer {
 		tvFrame.addToMenuList(colorMenuItem);
 	}
 
-	/**
-	 * Alok: this function changes the info in the ConfigNode to match the
-	 * current panel sizes. this is a hack, since I don't know how to intercept
-	 * panel resizing. Actually, in the current layout this isn't even used.
-	 */
-	@Override
-	public void syncConfig() {
-		/*
-		 * DragGridPanel running = this; floa t[] heights =
-		 * running.getHeights(); ConfigNode heightNodes[] =
-		 * root.fetch("Height"); for (int i = 0; i < heights.length; i++) { if
-		 * (i < heightNodes.length) { heightNodes[i].setAttribute("value",
-		 * (double) heights[i], 1.0 / heights.length); } else { ConfigNode n =
-		 * root.create("Height"); n.setAttribute("value", (double) heights[i],
-		 * 1.0 / heights.length); } }
-		 * 
-		 * float[] widths = running.getWidths(); ConfigNode widthNodes[] =
-		 * root.fetch("Width"); for (int i = 0; i < widths.length; i++) { if (i
-		 * < widthNodes.length) { widthNodes[i].setAttribute("value", (double)
-		 * widths[i], 1.0 / widths.length); } else { ConfigNode n =
-		 * root.create("Width"); n.setAttribute("value", (double) widths[i], 1.0
-		 * / widths.length); } }
-		 */
-	}
-
-	/**
-	 * binds this dendroView to a particular confignode, resizing the panel
-	 * sizes appropriately.
-	 * 
-	 * @param configNode
-	 *            ConfigNode to bind to
-	 */
-
-	@Override
-	public void bindConfig(final ConfigNode configNode) {
-		
-		root = configNode;
-		/*
-		 * ConfigNode heightNodes[] = root.fetch("Height"); ConfigNode
-		 * widthNodes[] = root.fetch("Width");
-		 * 
-		 * float heights[]; float widths[]; if (heightNodes.length != 0) {
-		 * heights = new float[heightNodes.length]; widths = new
-		 * float[widthNodes.length]; for (int i = 0; i < heights.length; i++) {
-		 * heights[i] = (float) heightNodes[i].getAttribute( "value", 1.0 /
-		 * heights.length); } for (int j = 0; j < widths.length; j++) {
-		 * widths[j] = (float) widthNodes[j].getAttribute( "value", 1.0 /
-		 * widths.length); } } else { widths = new float[]{2 / 11f, 3 / 11f, 3 /
-		 * 11f, 3 / 11f}; heights = new float[]{3 / 16f, 1 / 16f, 3 / 4f}; }
-		 * setHeights(heights); setWidths(widths);
-		 */
-	}
-
-	public void saveImage(final JPanel panel) throws IOException {
-
-		File saveFile = new File("savedImage.png");
-
-		final JFileChooser fc = new JFileChooser();
-
-		fc.setFileFilter(new FileNameExtensionFilter("PNG", "png"));
-		fc.setSelectedFile(saveFile);
-		final int returnVal = fc.showSaveDialog(dendroPane);
-
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			saveFile = fc.getSelectedFile();
-
-			String fileName = saveFile.toString();
-
-			if (!fileName.endsWith(".png")) {
-				fileName += ".png";
-				saveFile = new File(fileName);
-			}
-
-			final BufferedImage im = new BufferedImage(panel.getWidth(),
-					panel.getHeight(), BufferedImage.TYPE_INT_ARGB);
-
-			panel.paint(im.getGraphics());
-			ImageIO.write(im, "PNG", saveFile);
-		}
-	}
-
 //	/**
 //	 * @param initXmap
 //	 * @param initYmap
@@ -1713,135 +881,6 @@ public class DendroView2 implements ConfigNodePersistent, MainPanel, Observer {
 //		}
 //	}
 
-	// Getters
-	/**
-	 * Always returns an instance of the node, even if it has to create it.
-	 */
-	protected ConfigNode getFirst(final String name) {
-
-		return getConfigNode().fetchOrCreate(name);
-	}
-
-	public TreeSelectionI getGeneSelection() {
-
-		return geneSelection;
-	}
-
-	public TreeSelectionI getArraySelection() {
-
-		return arraySelection;
-	}
-
-	/**
-	 * Getter for root
-	 */
-	@Override
-	public ConfigNode getConfigNode() {
-
-		return root;
-	}
-
-	/**
-	 * Icon for display in tabbed panel
-	 */
-	@Override
-	public ImageIcon getIcon() {
-
-		if (treeviewIcon == null)
-			try {
-				treeviewIcon = new ImageIcon("images/treeview.gif",
-						"TreeView Icon");
-
-			} catch (final java.security.AccessControlException e) {
-				// need form relative URL somehow...
-			}
-
-		return treeviewIcon;
-	}
-
-	public ArrayNameView getArraynameview() {
-
-		return arraynameview;
-	}
-
-	public ATRView getAtrview() {
-
-		return atrview;
-	}
-
-	public GTRView getGtrview() {
-
-		return gtrview;
-	}
-
-	public TextViewManager getTextview() {
-
-		return textview;
-	}
-
-	/**
-	 * Gets the globalXmap attribute of the DendroView object
-	 * 
-	 * @return globalXmap
-	 */
-	public MapContainer getGlobalXmap() {
-
-		return globalXmap;
-	}
-
-	/**
-	 * Gets the globalYmap attribute of the DendroView object
-	 * 
-	 * @return The globalYmap
-	 */
-	public MapContainer getGlobalYmap() {
-
-		return globalYmap;
-	}
-
-	// /**
-	// * Gets the zoomXmap attribute of the DendroView object
-	// * @return zoomXmap
-	// */
-	// public MapContainer getZoomXmap() {
-	//
-	// return zoomXmap;
-	// }
-	//
-	// /**
-	// * Gets the zoomYmap attribute of the DendroView object
-	// * @return zoomYmap
-	// */
-	// public MapContainer getZoomYmap() {
-	//
-	// return zoomYmap;
-	// }
-
-	/**
-	 * Getter for viewFrame
-	 */
-	public ViewFrame getViewFrame() {
-
-		return tvFrame;
-	}
-
-	/**
-	 * Gets the model this DendroView is based on
-	 */
-	protected DataModel getDataModel() {
-
-		return this.dataModel;
-	}
-	
-	/**
-	 * Getter for ArrayDrawer object.
-	 * @return
-	 */
-	public ArrayDrawer getArrayDrawer() {
-		
-		return arrayDrawer;
-	}
-
 	// Setters
 	/**
 	 * This should be called after setDataModel has been set to the appropriate
@@ -1895,21 +934,15 @@ public class DendroView2 implements ConfigNodePersistent, MainPanel, Observer {
 		this.tvFrame = viewFrame;
 	}
 
-	/**
-	 * Setter for dataModel
-	 */
-	protected void setDataModel(final DataModel dataModel) {
+	public JPanel getGeneFinderPanel() {
 
-		this.dataModel = dataModel;
-	}
-
-	public HeaderFinderPanel getGeneFinderPanel() {
-
-		HeaderFinderPanel geneFinderPanel = new GeneFinderPanel(tvFrame, this,
-					getDataModel().getGeneHeaderInfo(),
+		HeaderFinderBox geneFinderBox = new GeneFinderBox(tvFrame, this,
+					tvFrame.getDataModel().getGeneHeaderInfo(),
 					tvFrame.getGeneSelection());
 
-		return geneFinderPanel;
+		JPanel contentPanel = geneFinderBox.getContentPanel();
+		
+		return contentPanel;
 	}
 
 	/**
@@ -1917,13 +950,15 @@ public class DendroView2 implements ConfigNodePersistent, MainPanel, Observer {
 	 * 
 	 * @return HeaderFinderPanel arrayFinderPanel
 	 */
-	public HeaderFinderPanel getArrayFinderPanel() {
+	public JPanel getArrayFinderPanel() {
 
-		HeaderFinderPanel arrayFinderPanel = new ArrayFinderPanel(tvFrame, this,
-				getDataModel().getArrayHeaderInfo(),
+		HeaderFinderBox arrayFinderBox = new ArrayFinderBox(tvFrame, this,
+				tvFrame.getDataModel().getArrayHeaderInfo(),
 				tvFrame.getArraySelection());
 		
-		return arrayFinderPanel;
+		JPanel contentPanel = arrayFinderBox.getContentPanel();
+		
+		return contentPanel;
 	}
 
 	@Override
@@ -1937,7 +972,7 @@ public class DendroView2 implements ConfigNodePersistent, MainPanel, Observer {
 		this.name = name;
 	}
 	
-	// JButton Getters
+	// Getters
 	public JButton getXPlusButton() {
 		
 		return scaleIncX;
@@ -1963,7 +998,16 @@ public class DendroView2 implements ConfigNodePersistent, MainPanel, Observer {
 		return scaleDefaultAll;
 	}
 	
-	// Getters for the Views
+	public JScrollBar getXScroll() {
+		
+		return globalXscrollbar;
+	}
+	
+	public JScrollBar getYScroll() {
+		
+		return globalYscrollbar;
+	}
+	
 	public GlobalView getGlobalView() {
 		
 		return globalview;
@@ -1973,10 +1017,42 @@ public class DendroView2 implements ConfigNodePersistent, MainPanel, Observer {
 		
 		return dendroPane;
 	}
+	
+	public TreeSelectionI getGeneSelection() {
 
-	@Override
-	public void export(MainProgramArgs args) throws ExportException {
-		// TODO Auto-generated method stub
-		
+		return geneSelection;
+	}
+
+	public TreeSelectionI getArraySelection() {
+
+		return arraySelection;
+	}
+
+	public ArrayNameView getArraynameview() {
+
+		return arraynameview;
+	}
+
+	public ATRView getAtrview() {
+
+		return atrview;
+	}
+
+	public GTRView getGtrview() {
+
+		return gtrview;
+	}
+
+	public TextViewManager getTextview() {
+
+		return textview;
+	}
+
+	/**
+	 * Getter for viewFrame
+	 */
+	public ViewFrame getViewFrame() {
+
+		return tvFrame;
 	}
 }

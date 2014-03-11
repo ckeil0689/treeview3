@@ -507,6 +507,21 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 		synchMap();
 		repaint();
 	}
+	
+	/**
+	 * @param nodeName
+	 */
+	public void scrollToNode(final String nodeName) {
+
+		final TreeDrawerNode node = drawer.getNodeById(nodeName);
+		if (node != null) {
+			final int index = (int) node.getIndex();
+			if (map.isVisible(index) == false) {
+				map.scrollToIndex(index);
+				map.notifyObservers();
+			}
+		}
+	}
 
 	/**
 	 * Key releases are ignored.

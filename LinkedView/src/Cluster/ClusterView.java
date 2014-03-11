@@ -90,7 +90,6 @@ public class ClusterView extends JPanel implements MainPanel {
 
 	private JButton cluster_button;
 	private JButton cancel_button;
-	private JButton dendro_button;
 	
 	private JSpinner enterRC;
 	private JSpinner enterCC;
@@ -217,11 +216,6 @@ public class ClusterView extends JPanel implements MainPanel {
 		// Button to begin Clustering
 		cluster_button = GUIParams.setButtonLayout("Cluster", null);
 		
-		// Button to show Heat Map
-		dendro_button = GUIParams.setButtonLayout("Clustergram", 
-				"forwardIcon");
-		dendro_button.setEnabled(false);
-		
 		// Button to cancel worker thread in the controller
 		cancel_button = GUIParams.setButtonLayout("Cancel", null);
 		
@@ -275,21 +269,15 @@ public class ClusterView extends JPanel implements MainPanel {
 		mainPanel.setLayout(new MigLayout("ins 0"));
 		mainPanel.setBackground(GUIParams.BG_COLOR);
 		
-		// header
-		JLabel head1 = new JLabel("Options");
-		head1.setFont(GUIParams.FONTL);
-		head1.setForeground(GUIParams.MAIN);
-		
 		// Panel for the Buttons
 		buttonPanel = new JPanel();
 		buttonPanel.setLayout(new MigLayout());
 		buttonPanel.setOpaque(false);
 		buttonPanel.add(cluster_button, "alignx 50%, pushx");
 		
-		mainPanel.add(head1, "pushx, alignx 50%, h 15%, span, wrap");
 		mainPanel.add(clusterType, "alignx 50%, push, h 5%, span, wrap");
 		mainPanel.add(optionsPanel, "pushx, alignx 50%, "
-				+ "w 70%, h 60%, wrap");
+				+ "w 70%, h 70%, wrap");
 		mainPanel.add(buttonPanel, "pushx, alignx 50%, h 15%");
 	}
 
@@ -309,16 +297,14 @@ public class ClusterView extends JPanel implements MainPanel {
 		loadPanel = new JPanel();
 		loadPanel.setLayout(new MigLayout());
 		loadPanel.setOpaque(false);
-		loadPanel.setBorder(BorderFactory.createLineBorder(GUIParams.BORDERS,
-				EtchedBorder.LOWERED));
 		
-		optionsPanel.add(similarityPanel, "pushy, h 20%, span, wrap");
+		optionsPanel.add(similarityPanel, "pushx, alignx 50%, h 20%");
 
 		if (clusterType.getSelectedIndex() == 0) {
-			optionsPanel.add(linkagePanel, "pushy, h 20%, span, wrap");
+			optionsPanel.add(linkagePanel, "pushx, alignx 50%, h 20%, wrap");
 
 		} else {
-			optionsPanel.add(kMeansPanel, "pushy, h 20%, span");
+			optionsPanel.add(kMeansPanel, "pushx, alignx 50%, h 20%, wrap");
 		}
 	}
 	
@@ -345,7 +331,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		head3.setFont(GUIParams.FONTS);
 		head3.setForeground(GUIParams.TEXT);
 		
-		similarityPanel.add(similarity, "w 100%, span, wrap");
+		similarityPanel.add(similarity, "pushx, alignx 50%, span, wrap");
 		similarityPanel.add(head2, "h 10%, w 10%");
 		similarityPanel.add(geneCombo, "w 40%, wrap");
 		similarityPanel.add(head3, "h 10%, w 10%");
@@ -364,7 +350,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		// Clickable Panel to call InfoFrame
 		infoIcon = new ClickableIcon(tvFrame, GUIParams.QUESTIONICON);
 		
-		linkagePanel.add(method, "span, wrap");
+		linkagePanel.add(method, "pushx, alignx 50%, span, wrap");
 		linkagePanel.add(clusterChoice, "w 40%");
 		linkagePanel.add(infoIcon, "w 10%");
 		
@@ -534,16 +520,6 @@ public class ClusterView extends JPanel implements MainPanel {
 		mainPanel.repaint();
 	}
 	
-	/**
-	 * Adds a listener to dendro_button to register user interaction and
-	 * notify ClusterController to call the visualizeData() method.
-	 * @param visual
-	 */
-	public void addVisualizeListener(ActionListener visual) {
-		
-		dendro_button.addActionListener(visual);
-	}
-	
 //	/**
 //	 * Sets a new DendroView with the new data loaded into TVModel, displaying
 //	 * an updated HeatMap. It should also close the ClusterViewFrame.
@@ -584,7 +560,6 @@ public class ClusterView extends JPanel implements MainPanel {
 		
 
 		loadPanel.removeAll();
-		dendro_button.setEnabled(false);
 		buttonPanel.remove(cluster_button);
 			
 		setLoadPanel(choice, choice2);
@@ -593,7 +568,6 @@ public class ClusterView extends JPanel implements MainPanel {
 				"span, wrap");
 		
 		buttonPanel.add(cancel_button, "pushx, alignx 50%");
-		buttonPanel.add(dendro_button, "pushx, alignx 50%");
 		mainPanel.add(buttonPanel, "pushx, alignx 50%, "
 				+ "h 15%");
 		
@@ -620,7 +594,6 @@ public class ClusterView extends JPanel implements MainPanel {
 		loadPanel.removeAll();
 		optionsPanel.remove(loadPanel);
 		buttonPanel.remove(cancel_button);
-		buttonPanel.remove(dendro_button);
 		cluster_button.setEnabled(true);
 		
 		tvFrame.setLoaded(false);
@@ -675,11 +648,11 @@ public class ClusterView extends JPanel implements MainPanel {
 		TextDisplay error2 = new TextDisplay(hint2);
 		TextDisplay error3 = new TextDisplay(hint3);
 
-		loadPanel.add(error1, "pushx, w 90%, alignx 50%, span, wrap");
-		loadPanel.add(error2, "w 90%, span, wrap");
-		loadPanel.add(error3, "w 90%, span");
+		loadPanel.add(error1, "pushx, alignx 50%, span, wrap");
+		loadPanel.add(error2, "span, wrap");
+		loadPanel.add(error3, "span");
 		
-		optionsPanel.add(loadPanel, "alignx 50%, push, w 90%, " +
+		optionsPanel.add(loadPanel, "alignx 50%, pushx, w 90%, " +
 				"span");
 
 		mainPanel.revalidate();
@@ -699,12 +672,10 @@ public class ClusterView extends JPanel implements MainPanel {
 
 		TextDisplay status2 = new TextDisplay("File Path: " + finalFilePath);
 
-		dendro_button.setEnabled(true);
 		buttonPanel.add(cluster_button, "pushx, alignx 50%");
-		buttonPanel.add(dendro_button, "pushx, alignx 50%");
 
-		loadPanel.add(status1, "growx, pushx, wrap");
-		loadPanel.add(status2, "growx, pushx, wrap");
+		loadPanel.add(status1, "pushx, alignx 50%, span, wrap");
+		loadPanel.add(status2, "pushx, alignx 50%, span, wrap");
 
 		mainPanel.revalidate();
 		mainPanel.repaint();

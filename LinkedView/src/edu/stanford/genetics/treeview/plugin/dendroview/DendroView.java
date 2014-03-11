@@ -66,7 +66,6 @@ import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.MainPanel;
 import edu.stanford.genetics.treeview.MainProgramArgs;
-import edu.stanford.genetics.treeview.MessagePanel;
 import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.ReorderedTreeSelection;
 import edu.stanford.genetics.treeview.TabbedSettingsPanel;
@@ -75,9 +74,9 @@ import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.TreeviewMenuBarI;
 import edu.stanford.genetics.treeview.ViewFrame;
-import edu.stanford.genetics.treeview.core.ArrayFinderPanel;
-import edu.stanford.genetics.treeview.core.GeneFinderPanel;
-import edu.stanford.genetics.treeview.core.HeaderFinderPanel;
+import edu.stanford.genetics.treeview.core.ArrayFinderBox;
+import edu.stanford.genetics.treeview.core.GeneFinderBox;
+import edu.stanford.genetics.treeview.core.HeaderFinderBox;
 import edu.stanford.genetics.treeview.model.AtrTVModel;
 import edu.stanford.genetics.treeview.model.ReorderedDataModel;
 import edu.stanford.genetics.treeview.model.TVModel;
@@ -570,16 +569,16 @@ MainPanel, Observer {
 		navPanel.add(finderPanel, "pushy, h 20%, w 70%, alignx 50%, " +
 				"aligny 10%");
 		
-		dendroPane.add(fillPanel4, "w 18.5%, h 20%");
-		dendroPane.add(atrPane, "w 62%, h 20%");
-		dendroPane.add(fillPanel1, "span 2, w 19.5%, h 20%, wrap");
-		dendroPane.add(gtrPane, "w 18.5%, h 75%");
-		dendroPane.add(globalview, "w 62%, h 75%");
+		dendroPane.add(fillPanel4, "w 18.5%::, h 20%");
+		dendroPane.add(atrPane, "w 72%, h 20%");
+		dendroPane.add(fillPanel1, "span 2, w ::19.5%, h 20%, wrap");
+		dendroPane.add(gtrPane, "w 18.5%::, h 75%");
+		dendroPane.add(globalview, "w 72%, h 75%");
 		dendroPane.add(globalYscrollbar, "w 1%, h 75%");
-		dendroPane.add(navPanel, "w 18.5%, h 75%, wrap");
-		dendroPane.add(fillPanel2, "w 18.5%, h 5%");
-		dendroPane.add(globalXscrollbar, "pushy, aligny 0%, w 62%, h 1%");
-		dendroPane.add(fillPanel3, "span 2, w 19.5%, h 5%");
+		dendroPane.add(navPanel, "w ::18.5%, h 75%, wrap");
+		dendroPane.add(fillPanel2, "w 18.5%::, h 5%");
+		dendroPane.add(globalXscrollbar, "pushy, aligny 0%, w 72%, h 1%");
+		dendroPane.add(fillPanel3, "span 2, w ::19.5%, h 5%");
 		
 		// Ensuring window resizing works with GlobalView
 		globalXmap.setHome();
@@ -1922,13 +1921,15 @@ MainPanel, Observer {
 		this.dataModel = dataModel;
 	}
 
-	public HeaderFinderPanel getGeneFinderPanel() {
+	public JPanel getGeneFinderPanel() {
 
-		HeaderFinderPanel geneFinderPanel = new GeneFinderPanel(tvFrame, this,
+		HeaderFinderBox geneFinderBox = new GeneFinderBox(tvFrame, this,
 					getDataModel().getGeneHeaderInfo(),
 					tvFrame.getGeneSelection());
 
-		return geneFinderPanel;
+		JPanel contentPanel = geneFinderBox.getContentPanel();
+		
+		return contentPanel;
 	}
 
 	/**
@@ -1936,13 +1937,15 @@ MainPanel, Observer {
 	 * 
 	 * @return HeaderFinderPanel arrayFinderPanel
 	 */
-	public HeaderFinderPanel getArrayFinderPanel() {
+	public JPanel getArrayFinderPanel() {
 
-		HeaderFinderPanel arrayFinderPanel = new ArrayFinderPanel(tvFrame, this,
+		HeaderFinderBox arrayFinderBox = new ArrayFinderBox(tvFrame, this,
 				getDataModel().getArrayHeaderInfo(),
 				tvFrame.getArraySelection());
 		
-		return arrayFinderPanel;
+		JPanel contentPanel = arrayFinderBox.getContentPanel();
+		
+		return contentPanel;
 	}
 
 	/**

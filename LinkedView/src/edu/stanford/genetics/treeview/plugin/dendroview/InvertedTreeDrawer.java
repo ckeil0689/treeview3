@@ -38,7 +38,7 @@ import edu.stanford.genetics.treeview.TreeDrawerNode;
  * @version Alpha
  */
 
-class InvertedTreeDrawer extends TreeDrawer {
+public class InvertedTreeDrawer extends TreeDrawer {
 
 	@Override
 	public void paint(final Graphics graphics,

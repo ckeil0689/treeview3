@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.util.Arrays;
 
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ScrollPaneConstants;
@@ -14,7 +13,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 
-import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.model.TVModel;
@@ -26,9 +24,7 @@ import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
  * @author CKeil
  * 
  */
-public class DataViewPanel extends JPanel {
-
-	private static final long serialVersionUID = 1L;
+public class DataViewPanel {
 
 	/**
 	 * Instance Variables
@@ -59,7 +55,6 @@ public class DataViewPanel extends JPanel {
 	public DataViewPanel(final DataModel cModel) {
 
 		this.model = (TVModel) cModel;
-		this.setLayout(new MigLayout("ins 0"));
 
 		double[][] dataArrays = Arrays.copyOfRange(((TVDataMatrix) 
 				model.getDataMatrix()).getExprData(), 0, MAX);
@@ -184,9 +179,16 @@ public class DataViewPanel extends JPanel {
 				});
 
 		tableScroll.setRowHeaderView(headerTable);
-
-		add(tableScroll, "grow, push");
-		setVisible(true);
+	}
+	
+	/**
+	 * Provides the scrollPane which contains the data table for the
+	 * preview.
+	 * @return JScrollPane
+	 */
+	public JScrollPane getDataView() {
+		
+		return tableScroll;
 	}
 
 	/**
@@ -197,7 +199,7 @@ public class DataViewPanel extends JPanel {
 		header.setBackground(GUIParams.TABLEHEADERS);
 		tableScroll.setBackground(GUIParams.BG_COLOR);
 
-		revalidate();
-		repaint();
+		tableScroll.revalidate();
+		tableScroll.repaint();
 	}
 }

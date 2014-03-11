@@ -52,7 +52,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelViewProduced;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 
-class GlobalView extends ModelViewProduced implements MouseMotionListener,
+public class GlobalView extends ModelViewProduced implements MouseMotionListener,
 		MouseListener, MouseWheelListener, KeyListener {
 
 	private static final long serialVersionUID = 1L;
@@ -640,11 +640,6 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 //		
 //		status.setMessages(statustext);
 	}
-	
-	@Override
-	public void mouseEntered(final MouseEvent e) {
-		
-	}
 
 	@Override
 	public void mouseReleased(final MouseEvent e) {
@@ -759,8 +754,9 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 					ret = null;
 
 				} else {
-					ret = "Row: " + row + " Column: " + col + " Value: "
-							+ drawer.getSummary(overx, geneRow);
+					ret = "<html>Row: " + row + " <br>Column: " + col + 
+							" <br>Value: " 
+							+ drawer.getSummary(overx, geneRow) + "</html>";
 				}
 			}
 		}
@@ -917,6 +913,7 @@ class GlobalView extends ModelViewProduced implements MouseMotionListener,
 
 		// nodes
 		geneSelection.setSelectedNode(null);
+		
 		// genes...
 		geneSelection.deselectAllIndexes();
 

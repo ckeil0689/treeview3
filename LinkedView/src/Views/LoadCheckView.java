@@ -153,8 +153,8 @@ public class LoadCheckView {
 			loadCheckPanel.add(numPanel, "span, pushx, growx, alignx 50%, " +
 					"width ::60%, wrap");
 			loadCheckPanel.add(previewLabel, "span, alignx 50%, pushx, wrap");
-			loadCheckPanel.add(dataView, "span, push, grow, alignx 50%, " +
-					"width ::60%, height ::60%, wrap");
+			loadCheckPanel.add(dataView.getDataView(), "span, push, grow, " +
+					"alignx 50%, width ::60%, height ::60%, wrap");
 			loadCheckPanel.add(buttonPanel, "span, alignx 50%, push");
 
 			loadCheckPanel.revalidate();

@@ -23,7 +23,7 @@ public class DMCalculatorArrays {
 	private final String choice;
 
 	// Constructor
-	public DMCalculatorArrays(final double[][] fullList, 
+	public DMCalculatorArrays(final double[][] fullList,
 			final String choice, final ClusterView clusterView) {
 
 		this.dataArrays = fullList;

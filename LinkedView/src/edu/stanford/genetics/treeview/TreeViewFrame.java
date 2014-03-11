@@ -54,22 +54,20 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
+import Controllers.DendroController;
 import Views.LoadCheckView;
 import Views.LoadProgressView;
 import Views.WelcomeView;
 
 import net.miginfocom.swing.MigLayout;
-//import edu.stanford.genetics.treeview.core.ArrayFinder;
 import edu.stanford.genetics.treeview.core.FileMru;
 import edu.stanford.genetics.treeview.core.FileMruEditor;
-//import edu.stanford.genetics.treeview.core.GeneFinder;
-//import edu.stanford.genetics.treeview.core.HeaderFinder;
 import edu.stanford.genetics.treeview.core.LogMessagesPanel;
 import edu.stanford.genetics.treeview.core.LogSettingsPanel;
 import edu.stanford.genetics.treeview.core.MenuHelpPluginsFrame;
 import edu.stanford.genetics.treeview.core.TreeViewJMenuBar;
 import edu.stanford.genetics.treeview.model.TVModel;
-import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
+import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
 
 /**
  * This class is the main window of TreeView 3. It holds all views 
@@ -84,21 +82,21 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	private static String appName = "TreeView 3";
 
 	protected JPanel waiting;
-	protected MainPanel running;
+	protected DendroPanel running;
 	protected DataModel dataModel;
 	protected JDialog presetsFrame = null;
 	protected TabbedSettingsPanel presetsPanel = null;
 
 	private final TreeViewApp treeView;
 	private ProgramMenu programMenu;
-//	private HeaderFinder geneFinder = null;
-//	private HeaderFinder arrayFinder = null;
 	
 	// Different Views
 	private WelcomeView welcomeView;
 	private LoadProgressView loadProgView;
 	private LoadCheckView confirmPanel;
-	private DendroView dendroView;
+	private DendroView2 dendroView;
+	
+	private DendroController dendroController;
 	
 	private FileSet fileMenuSet;
 	
@@ -161,17 +159,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		setupFrameSize();
 		setLoaded(false);
 	}
-
-	// Window and Frame methods
-	@Override
-	public void closeWindow() {
-
-		if (running != null) {
-			running.syncConfig();
-		}
-
-		super.closeWindow();
-	}
 	
 	// Setting different views
 	/** 
@@ -210,7 +197,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			}
 			
 		} else {
-			dendroView = new DendroView(this);
+			dendroView = new DendroView2(this);
+			dendroController = new DendroController(dendroView, this, 
+					(TVModel)dataModel, null);
 			setRunning(dendroView);
 			view = dendroView.makeDendroPanel();
 			setLoaded(true);
@@ -243,45 +232,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		waiting.revalidate();
 		waiting.repaint();
 	}
-	
-//	/**
-//	 * Opens the ClusterViewFrame with either the options for hierarchical
-//	 * clustering or K-Means, depending on the boolean parameter.
-//	 * @param hierarchical
-//	 */
-//	public void setupClusterView() {
-//		
-//		// Making a new Window to display clustering components
-//		ClusterViewFrame clusterViewFrame = 
-//				new ClusterViewFrame(TreeViewFrame.this);
-//		
-//		// Creating the Controller for this view.
-//		ClusterViewController clusControl = 
-//				new ClusterViewController(clusterViewFrame.getClusterView(), 
-//						TreeViewFrame.this);
-//		
-//		// Make the clustering window visible.
-//		clusterViewFrame.setVisible(true);
-//	}
-	
-//	/**
-//	 * Opens the preferences menu and sets the displayed menu to
-//	 * the specified option using a string as identification.
-//	 * @param menu
-//	 */
-//	public void openPrefMenu(String menu) {
-//		
-//		if(getLoaded()) {
-//			PreferencesMenu preferences = new PreferencesMenu(
-//					TreeViewFrame.this, menu);
-//			preferences.getPreferencesFrame().setVisible(true);
-//		
-//		} else {
-//			PreferencesMenu preferences = new PreferencesMenu(
-//					TreeViewFrame.this, (DendroView)running, menu);
-//			preferences.getPreferencesFrame().setVisible(true);
-//		}
-//	}
 	
 	/**
 	 * Displays an editor for recently used files.
@@ -331,46 +281,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 */
 	public void showAboutWindow() {
 		
-		final JPanel message = new JPanel();
-		message.setLayout(new GridLayout(0, 1));
-		message.add(new JLabel(getAppName() + " was created by Chris Keil "
-				+ "based on Alok Saldhana's Java TreeView."));
-		message.add(new JLabel("Version: "
-				+ TreeViewApp.getVersionTag()));
-
-		JPanel home = new JPanel();
-		home.add(new JLabel("Homepage"));
-		home.add(new JTextField(TreeViewApp.getUpdateUrl()));
-
-		JButton yesB = new JButton("Open");
-		yesB.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-				displayURL(TreeViewApp.getUpdateUrl());
-			}
-
-		});
-		home.add(yesB);
-		message.add(home);
-
-		home = new JPanel();
-		home.add(new JLabel("Announcements"));
-		home.add(new JTextField(TreeViewApp.getAnnouncementUrl()));
-
-		yesB = new JButton("Sign Up");
-		yesB.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-				displayURL(TreeViewApp.getAnnouncementUrl());
-			}
-
-		});
-		home.add(yesB);
-		message.add(home);
-
-		JOptionPane.showMessageDialog(applicationFrame, message,
-				"About...", JOptionPane.INFORMATION_MESSAGE);
+		new AboutDialog(this).openAboutDialog();
 	}
 	
 	/**
@@ -493,7 +404,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 * Return TVFrame's current DendroView instance
 	 * @return dendroView
 	 */
-	public DendroView getDendroView() {
+	public DendroView2 getDendroView() {
 		
 		return dendroView;
 	}
@@ -503,7 +414,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 * setLoaded(true).
 	 * @param panel
 	 */
-	public void setRunning(MainPanel panel) {
+	public void setRunning(DendroPanel panel) {
 		
 		running = panel;
 	}
@@ -1225,13 +1136,13 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	@Override
 	public void scrollToGene(final int i) {
 
-		running.scrollToGene(i);
+		dendroController.scrollToGene(i);
 	}
 
 	@Override
 	public void scrollToArray(final int i) {
 
-		running.scrollToArray(i);
+		dendroController.scrollToArray(i);
 	}
 
 	// Why do these methods exist? They appear to do nothing but
@@ -1389,6 +1300,11 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		return menuList;
 	}
+	
+	public DendroController getDendroController() {
+		
+		return dendroController;
+	}
 
 	/**
 	 * Returns TVFrame's instance of dataModel
@@ -1421,7 +1337,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 * Returns the parent JPanel of TVFrame which holds the different views.
 	 * @return
 	 */
-	public MainPanel getRunning() {
+	public DendroPanel getRunning() {
 		
 		return running;
 	}

@@ -606,6 +606,7 @@ public class TVModel extends Observable implements DataModel {
 			exprData = newData;
 		}
 		
+		
 		public double[][] getExprData() {
 
 			return exprData;
@@ -775,10 +776,6 @@ public class TVModel extends Observable implements DataModel {
 
 		resetState();
 		setSource(fileSet);
-		
-		// Loader object, gets this TVModel passed to set instance variables
-//		final TVModelLoader2 loader = new TVModelLoader2(this);
-//		loader.loadInto();
 		
 		NewModelLoader loader = new NewModelLoader(this);
 		loader.load();

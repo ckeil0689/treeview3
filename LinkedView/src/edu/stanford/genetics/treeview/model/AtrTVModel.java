@@ -58,13 +58,13 @@ public class AtrTVModel extends TVModel {
 		return -1;
 	}
 
-//	@Override
-//	public void setExprData(final double[] newData) {
-//	}
-	
 	@Override
 	public void setExprData(final double[][] newData) {
 	}
+	
+//	@Override
+//	public void setExprData(final double[][] newData) {
+//	}
 
 	ConfigNode documentConfig = new DummyConfigNode("AtrTVModel");
 

@@ -21,7 +21,6 @@
  * END_HEADER */
 package edu.stanford.genetics.treeview;
 
-import java.awt.Window;
 import java.net.URL;
 
 import javax.swing.ToolTipManager;
@@ -134,7 +133,7 @@ public abstract class TreeViewApp {//implements WindowListener {
 
 		if (!isApplet) {
 			if (System.getProperty("os.name").startsWith("Mac OS")) {
-				if (prefs.getMacStyleMenubar()) {
+//				if (prefs.getMacStyleMenubar()) {
 					// Mac Java 1.3
 					System.setProperty("com.apple.macos.useScreenMenuBar",
 							"true");
@@ -148,7 +147,7 @@ public abstract class TreeViewApp {//implements WindowListener {
 																		// X
 																		// 10.2
 					System.setProperty("com.apple.mrj.application"
-							+ ".apple.menu.about.name", "TreeView");
+							+ ".apple.menu.about.name", "TreeView 3");
 
 					try {
 						UIManager.setLookAndFeel(UIManager
@@ -167,7 +166,7 @@ public abstract class TreeViewApp {//implements WindowListener {
 					// Mac Java 1.4
 					System.setProperty("apple.laf.useScreenMenuBar", "true");
 					System.setProperty("apple.awt.showGrowBox", "true");
-				}
+//				}
 			}
 		}
 	}
@@ -246,14 +245,8 @@ public abstract class TreeViewApp {//implements WindowListener {
 		final TVFrameController tvController = new TVFrameController(tvFrame, 
 				model);
 		if (fileSet != null) {
-			try {
-				tvController.loadFileSet(fileSet);
-				tvFrame.setLoaded(true);
-
-			} catch (final LoadException e) {
-				tvFrame.getAppFrame().dispose();
-				throw e;
-			}
+			tvController.loadFileSet(fileSet);
+			tvFrame.setLoaded(true);
 		}
 //		tvFrame.addWindowListener(this);
 		return tvFrame;

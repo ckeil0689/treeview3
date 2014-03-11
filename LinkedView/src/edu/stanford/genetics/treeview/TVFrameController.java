@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 
 import Cluster.ClusterViewController;
-import Cluster.ClusterViewFrame;
+import Cluster.ClusterViewDialog;
 import Controllers.MenubarActions;
 import Controllers.PreferencesController;
 
@@ -61,7 +61,7 @@ public class TVFrameController {
 			System.out.println("Welcome Listener added.");
 			tvFrame.getWelcomeView().addLoadListener(new LoadPanelListener(
 					tvFrame.getWelcomeView().getLoadIcon(), 
-					tvFrame.getWelcomeView().getLoadIcon().getLabel()));
+					tvFrame.getWelcomeView().getLoadLabel()));
 		}
 		
 		if(tvFrame.getLoadCheckView() != null) {
@@ -126,14 +126,7 @@ public class TVFrameController {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 
-			if(tvFrame.getDataModel() != null) {
-				tvFrame.setView("DendroView");
-				tvFrame.setLoaded(true);
-				tvFrame.addMenuActionListeners(new TVMenuListener());
-				
-			} else {
-				System.out.println("Couldn't continue, dataModel is null.");
-			}
+			setLoaded();
 		}	
 	}
 	
@@ -152,12 +145,24 @@ public class TVFrameController {
 			
 			ArrayList<JMenuItem> menuList = tvFrame.getMenus();
 			
-			for(JMenuItem menuItem : menuList) {
-				if(e.getSource() ==  menuItem) {
+			for(int i = 0; i < menuList.size(); i++) {
+				if(e.getSource() ==  menuList.get(i)) {
 					
-					menuActions.execute(menuItem.getText());
+					menuActions.execute(menuList.get(i).getText());
 				}
 			}
+		}
+	}
+	
+	public void setLoaded() {
+		
+		if(tvFrame.getDataModel() != null) {
+			tvFrame.setView("DendroView");
+			tvFrame.setLoaded(true);
+			tvFrame.addMenuActionListeners(new TVMenuListener());
+			
+		} else {
+			System.out.println("Couldn't continue, dataModel is null.");
 		}
 	}
 	
@@ -174,8 +179,8 @@ public class TVFrameController {
 			public Void doInBackground() {
 				
 				FileSet fileSet = null;
-				try {
-					if(fileMenuSet == null) {
+				
+				if(fileMenuSet == null) {
 //						final String fileName = file.getAbsolutePath();
 //						final int dotIndex = fileName.indexOf(".");
 //	
@@ -197,28 +202,23 @@ public class TVFrameController {
 //								file = new File(fileTransformer.getFilePath());
 //								
 //						}
-						fileSet = tvFrame.getFileSet(file);
-						
-					} else {
-						fileSet = fileMenuSet;
-					}
-				
-					// Loading TVModel
-					loadFileSet(fileSet);
+					fileSet = tvFrame.getFileSet(file);
 					
-					if(fileSet != null) {
-						fileSet = tvFrame.getFileMRU().addUnique(fileSet);
-						tvFrame.getFileMRU().setLast(fileSet);
-						
-					} else {
-						System.out.println("FileSet is null.");
-					}
-					
-				} catch (LoadException e) {
-					System.out.println("Loading the FileSet was interrupted. " +
-							"Cause: " + e.getCause());
-					e.printStackTrace();
+				} else {
+					fileSet = fileMenuSet;
 				}
+			
+				// Loading TVModel
+				loadFileSet(fileSet);
+				
+				if(fileSet != null) {
+					fileSet = tvFrame.getFileMRU().addUnique(fileSet);
+					tvFrame.getFileMRU().setLast(fileSet);
+					
+				} else {
+					System.out.println("FileSet is null.");
+				}
+					
 				return null;
 			}
 
@@ -234,8 +234,8 @@ public class TVFrameController {
 					
 				} else {
 					System.out.println("No datamatrix set by worker thread.");
-					tvFrame.setView("WelcomeView");
-					addViewListeners();
+//					tvFrame.setView("WelcomeView");
+//					addViewListeners();
 				}
 			}
 		};
@@ -254,7 +254,7 @@ public class TVFrameController {
 		
 		try {
 			file = tvFrame.selectFile();
-			tvFrame.setView("LoadProgressView");
+//			tvFrame.setView("LoadProgressView");
 			tvFrame.setLoaded(false);
 			worker.execute();
 			
@@ -287,11 +287,13 @@ public class TVFrameController {
 	 * then sets the Datamodel. A side effect of setting the datamodel is to
 	 * update the running window.
 	 */
-	public void loadFileSet(final FileSet fileSet) throws LoadException {
+	public void loadFileSet(final FileSet fileSet) {
 
 		// Make TVModel object
 		model = new TVModel();
 		model.setFrame(tvFrame);
+		
+		tvFrame.setView("LoadProgressView");
 
 		try {
 			// load instance variables of TVModel with data
@@ -300,7 +302,6 @@ public class TVFrameController {
 		} catch (final LoadException e) {
 			if (e.getType() != LoadException.INTPARSE) {
 				JOptionPane.showMessageDialog(applicationFrame, e);
-				throw e;
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -387,7 +388,7 @@ public class TVFrameController {
 	public void setupClusterView() {
 		
 		// Making a new Window to display clustering components
-		ClusterViewFrame clusterViewFrame = new ClusterViewFrame(tvFrame);
+		ClusterViewDialog clusterViewFrame = new ClusterViewDialog(tvFrame);
 		
 		// Creating the Controller for this view.
 		ClusterViewController clusControl = 
@@ -626,9 +627,6 @@ public class TVFrameController {
 			tvFrame.getFileMRU().setLast(tvFrame.getFileMenuSet());
 			tvFrame.getFileMRU().notifyObservers();
 
-			if (tvFrame.getRunning() != null) {
-				tvFrame.getRunning().syncConfig();
-			}
 			fileMenuSet = tvFrame.getFileMenuSet();
 			
 			setupWorkerThread();
@@ -679,16 +677,17 @@ public class TVFrameController {
 			PreferencesController pController = 
 					new PreferencesController(tvFrame, preferences, this);
 			
-			preferences.getPreferencesFrame().setVisible(true);
+			preferences.setVisible(true);
 		
 		} else {
 			PreferencesMenu preferences = new PreferencesMenu(
-					tvFrame, tvFrame.getDendroView(), menu);
+					tvFrame, tvFrame.getDendroView(), 
+					tvFrame.getDendroController(), menu);
 			
 			PreferencesController pController = 
 					new PreferencesController(tvFrame, preferences, this);
 			
-			preferences.getPreferencesFrame().setVisible(true);
+			preferences.setVisible(true);
 		}
 	}
 	

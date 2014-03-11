@@ -16,8 +16,6 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
 import javax.swing.plaf.basic.BasicProgressBarUI;
 
-import edu.stanford.genetics.treeview.core.AutoComboBox;
-
 public class GUIParams {
 
 	// Default
@@ -198,7 +196,7 @@ public class GUIParams {
 		final WideComboBox comboBox = new WideComboBox(combos);
 		comboBox.setFont(FONTS);
 		comboBox.setBackground(Color.white);
-//		comboBox.setMaximumSize(new Dimension(200, 30));
+		comboBox.setMaximumSize(new Dimension(200, 30));
 
 		return comboBox;
 	}

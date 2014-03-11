@@ -629,7 +629,7 @@ public abstract class ViewFrame implements Observer {
 //			throw new LoadException("File Dialog closed without selection...",
 //					LoadException.NOFILE);
 			System.out.println("File Dialog closed without selection...");
-			setView("WelcomeView");
+//			setView("WelcomeView");
 		}
 
 		return chosen;

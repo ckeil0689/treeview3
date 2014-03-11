@@ -34,7 +34,8 @@ public class ClusterProcessorArrays {
 	 * @param cView
 	 * @param model
 	 */
-	public ClusterProcessorArrays(final ClusterView cView, final TVModel model) {
+	public ClusterProcessorArrays(final ClusterView cView, 
+			final TVModel model) {
 		
 		this.clusterView = cView;
 		this.tvModel = model;
