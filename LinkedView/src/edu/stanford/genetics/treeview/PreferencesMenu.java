@@ -96,9 +96,9 @@ public class PreferencesMenu {
 		
 		menuDialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
-		setupLayout(menuTitle);
-		
 		menuDialog.getContentPane().add(basisPanel);
+		
+		setupLayout(menuTitle);
 		
 		menuDialog.pack();
 		menuDialog.setLocationRelativeTo(applicationFrame);
@@ -234,7 +234,10 @@ public class PreferencesMenu {
 			annotationSettings = new AnnotationPanel();
 			fontSettings = new FontPanel();
 			
-			gradientPick = new ColorGradientChooser();
+			gradientPick = new ColorGradientChooser(((DoubleArrayDrawer) 
+					dendroController.getArrayDrawer()).getColorExtractor(), 
+					DendrogramFactory.getColorPresets(), basisPanel);
+			
 			ColorGradientController gradientControl = 
 					new ColorGradientController(gradientPick);
 		}
@@ -492,7 +495,8 @@ public class PreferencesMenu {
 		} else if(title.equalsIgnoreCase("Color Settings") 
 				&& pixelSettings != null) {
 //			basisPanel.add(pixelSettings.makePSPanel(), "w 79%, h 95%, wrap");
-			basisPanel.add(gradientPick.makeGradientPanel(), "w 79%, h 95%, wrap");
+			basisPanel.add(gradientPick.makeGradientPanel(), 
+					"w 79%, h 95%, wrap");
 		
 		} else if(title.equalsIgnoreCase("URL") && urlSettings != null) {
 //			basisPanel.add(pixelSettings.makePSPanel(), "w 79%, h 95%, wrap");

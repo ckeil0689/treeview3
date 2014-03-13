@@ -9,6 +9,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
 import edu.stanford.genetics.treeview.ConfigNode;
+import edu.stanford.genetics.treeview.DendroPanel;
 import edu.stanford.genetics.treeview.MainPanel;
 import edu.stanford.genetics.treeview.PluginFactory;
 import edu.stanford.genetics.treeview.TreeViewFrame;
@@ -38,15 +39,17 @@ public class AlignmentFactory extends PluginFactory {
 	 * .genetics.treeview.ConfigNode)
 	 */
 	@Override
-	public MainPanel restorePlugin(final ConfigNode node,
+	public DendroPanel restorePlugin(final ConfigNode node,
 			final TreeViewFrame viewFrame) {
-		if (node.getAttribute("headerName", null) == null) {
-			return null;
-		} else {
-			final CharDendroView charPanel = new CharDendroView(viewFrame, node);
-			charPanel.setName(getPluginName());
-			return charPanel;
-		}
+//		if (node.getAttribute("headerName", null) == null) {
+//			return null;
+//		} else {
+//			final CharDendroView charPanel = new CharDendroView(node, viewFrame);
+//			charPanel.setName(getPluginName());
+//			return charPanel;
+//		}
+		
+		return null;
 	}
 
 	public AlignmentFactory() {

@@ -142,32 +142,6 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 		return p;
 	}
 
-	// @Override
-	// public String[] getStatus() {
-	//
-	// String [] status = new String[4];
-	// if ((geneSelection == null) || (arraySelection == null)) {
-	// status[0] = "ERROR: GlobalView improperly configured";
-	// status[1] = " geneSelection is null";
-	// status[2] = " thus, gene selection will not work.";
-	// status[3] = "";
-	//
-	// } else {
-	// int sx = arraySelection.getMinIndex();
-	// int ex = arraySelection.getMaxIndex();
-	//
-	// int sy = geneSelection.getMinIndex();
-	// int ey = geneSelection.getMaxIndex();
-	//
-	// status[0] = (ey - sy + 1) + " genes selected";
-	// status[1] = (ex - sx + 1) + " arrays selected";
-	// status[2] = "Genes from " + sy + " to " + ey;
-	// status[3] = "Arrays from " + sx + " to " + ex;
-	// }
-	//
-	// return status;
-	// }
-
 	@Override
 	public String[] getStatus() {
 
@@ -304,56 +278,6 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 		ymap = m;
 		ymap.addObserver(this);
 	}
-
-	// /**
-	// * get the xmapping for this view
-	// *
-	// * @return the current mapping
-	// */
-	// public MapContainer getXMap() {
-	//
-	// return xmap;
-	// }
-	//
-	// /**
-	// * get the ymapping for this view
-	// *
-	// * @return the current mapping
-	// */
-	// public MapContainer getYMap() {
-	//
-	// return ymap;
-	// }
-
-	// /** DEPRECATE
-	// * set the xmapping for this view
-	// *
-	// * @param m the new mapping
-	// */
-	// public void setZoomXMap(MapContainer m) {
-	//
-	// if (zoomXmap != null) {
-	// zoomXmap.deleteObserver(this);
-	// }
-	//
-	// zoomXmap = m;
-	// zoomXmap.addObserver(this);
-	// }
-	//
-	// /** DEPRECATE
-	// * set the ymapping for this view
-	// *
-	// * @param m the new mapping
-	// */
-	// public void setZoomYMap(MapContainer m) {
-	//
-	// if (zoomYmap != null) {
-	// zoomYmap.deleteObserver(this);
-	// }
-	//
-	// zoomYmap = m;
-	// zoomYmap.addObserver(this);
-	// }
 
 	@Override
 	public String viewName() {
@@ -567,21 +491,6 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 			recalculateOverlay();
 			drawIndicatorCircle();
 			offscreenValid = false;
-
-//		} else if ((o == zoomYmap) || (o == zoomXmap)) {
-//			recalculateZoom();
-//			/*
-//			 * if (o == zoomXmap) { if ((zoomYmap.getUsedPixels() == 0) &&
-//			 * (zoomXmap.getUsedPixels() != 0)) {
-//			 * zoomYmap.setIndexRange(ymap.getMinIndex(), ymap.getMaxIndex());
-//			 * zoomYmap.notifyObservers(); } } else if (o == zoomYmap) { if
-//			 * ((zoomXmap.getUsedPixels() == 0) && (zoomYmap.getUsedPixels() !=
-//			 * 0)) { zoomXmap.setIndexRange(xmap.getMinIndex(),
-//			 * xmap.getMaxIndex()); zoomXmap.notifyObservers(); } }
-//			 */
-//			if ((status != null) && hasMouse) {
-//				status.setMessages(getStatus());
-//			}
 
 		} else if (o == drawer && drawer != null) {
 			/*

@@ -48,7 +48,7 @@ public abstract class PluginFactory {
 	 *            ConfigNode holding configuration of plugin
 	 * @return new plugin object
 	 */
-	public abstract MainPanel restorePlugin(ConfigNode node, 
+	public abstract DendroPanel restorePlugin(ConfigNode node, 
 			TreeViewFrame viewFrame);
 
 	/**

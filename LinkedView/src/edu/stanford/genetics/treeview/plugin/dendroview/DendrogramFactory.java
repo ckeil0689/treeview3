@@ -8,6 +8,7 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 import java.awt.event.KeyEvent;
 
 import edu.stanford.genetics.treeview.ConfigNode;
+import edu.stanford.genetics.treeview.DendroPanel;
 import edu.stanford.genetics.treeview.MainPanel;
 import edu.stanford.genetics.treeview.PluginFactory;
 import edu.stanford.genetics.treeview.SettingsPanel;
@@ -56,10 +57,10 @@ public class DendrogramFactory extends PluginFactory {
 	 * #createPlugin(edu.stanford.genetics.treeview.ConfigNode)
 	 */
 	@Override
-	public MainPanel restorePlugin(final ConfigNode node,
+	public DendroPanel restorePlugin(final ConfigNode node,
 			final TreeViewFrame viewFrame) {
 
-		final DendroView dendroView = new DendroView(node, viewFrame);
+		final DendroView2 dendroView = new DendroView2(node, viewFrame);
 		dendroView.setName("Dendrogram");
 		return dendroView;
 	}
