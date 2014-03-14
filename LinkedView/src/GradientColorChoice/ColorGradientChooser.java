@@ -102,6 +102,7 @@ public class ColorGradientChooser {
 		
 		private Rectangle2D gradientRect = new Rectangle2D.Float();
 		private Rectangle2D thumbRect = new Rectangle2D.Float();
+		private Rectangle2D numRect = new Rectangle2D.Float();
 		
 		public GradientBox() {
 			
@@ -126,14 +127,16 @@ public class ColorGradientChooser {
 			
 			drawThumbBox(g2);
 			drawGradientBox(g2);
+			drawNumBox(g2);
 			
 			g2.dispose();
 		}
 		
 		public void setupRects(int width, int height) {
 			
-			gradientRect.setRect(0, 0, width, height * 3/4);
-			thumbRect.setRect(0, 0, width, height * 1/4);
+			gradientRect.setRect(0, 0, width, height * 2/4);
+			thumbRect.setRect(0,  height * 1/4, width, height * 1/4);
+			numRect.setRect(0, height * 3/4, width, height * 1/4);
 		}
 		
 		public void drawGradientBox(Graphics2D g2) {
@@ -166,13 +169,35 @@ public class ColorGradientChooser {
 		public void drawThumbBox(Graphics2D g2) {
 			
 			// Fill thumbRect with background color
-			g2.setColor(GUIParams.LIGHTGRAY);
+			g2.setColor(GUIParams.DARKGRAY);
 			g2.fill(thumbRect);
 			
 			// Paint the thumbs
 			for(Thumb t : thumbList) {
 				
 				t.paint(g2);
+			}
+		}
+		
+		public void drawNumBox(Graphics2D g2) {
+			
+			g2.setColor(GUIParams.LIGHTGRAY);
+			g2.fill(numRect);
+			
+			g2.setColor(Color.black);
+			g2.setFont(GUIParams.FONTS);
+			
+			// Paint the thumbs
+			int i = 0;
+			for(Thumb t : thumbList) {
+				
+				// Rounding to 3 decimals
+				float fraction = fractions[i];
+				Double value = (double)Math.round(fraction * 1000) / 1000;
+				
+				g2.drawString(Double.toString(value), t.getX(), 
+						(int)((numRect.getHeight()/2) + numRect.getMinY()));
+				i++;
 			}
 		}
 		
@@ -296,8 +321,6 @@ public class ColorGradientChooser {
 					insertThumbAt(pos, colorList.get(i));  
 				}
 	        }
-			
-			System.out.println("thumblist size: " + thumbList.size());
 		}
 		
 		/**
@@ -350,7 +373,9 @@ public class ColorGradientChooser {
 		public void removeThumbAt(int x, int y) {
 			
 			int index = 0;
-			for(Thumb t : thumbList) {
+			for(int i = 0; i < thumbList.size(); i++) {
+				
+				Thumb t = thumbList.get(i);
 				
 				if(t.contains(x, y)) {
 					thumbList.remove(t);
@@ -391,15 +416,27 @@ public class ColorGradientChooser {
 		
 		public void updateThumbPos(int mouseX) {
 			
-			// adjust fractions for colors
-			
-			
 			if(selectedThumb != null) {
+				// get position of previous thumb
+				int selectedIndex = thumbList.indexOf(selectedThumb);
+				int previousPos = 0;
+				int nextPos = gradientBox.getWidth();
+				
+				if(selectedIndex != 0) {
+					previousPos = thumbList.get(selectedIndex - 1).getX();
+				}
+				
+				if(selectedIndex != thumbList.size() - 1) {
+					nextPos = thumbList.get(selectedIndex + 1).getX();
+				}
+
 				int deltaX = mouseX - selectedThumb.getX();
 				int newX = selectedThumb.getX() + deltaX;
 				
-				selectedThumb.setCoords(newX, selectedThumb.getY());
-				fractions = updateFractions();
+				if(previousPos < newX && newX < nextPos) {
+					selectedThumb.setCoords(newX, selectedThumb.getY());
+					fractions = updateFractions();
+				}
 				repaint();
 			}
 		}
@@ -419,8 +456,6 @@ public class ColorGradientChooser {
 				fractions[i] = (float)(t.getX()/ gradientRect.getWidth());
 				i++;
 			}
-			
-			System.out.println("Fractions: " + Arrays.toString(fractions));
 			
 			return fractions;
 		}

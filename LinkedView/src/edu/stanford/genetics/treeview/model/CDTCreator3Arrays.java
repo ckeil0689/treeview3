@@ -9,7 +9,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 
-import Views.LoadProgressView;
+import Views.WelcomeView;
 
 import edu.stanford.genetics.treeview.TreeViewFrame;
 
@@ -28,7 +28,7 @@ import Cluster.ClusterFileWriter2;
  */
 public class CDTCreator3Arrays {
 
-	private LoadProgressView loadProgView;
+	private WelcomeView loadProgView;
 	private BufferedReader reader = null;
 	private File file;
 	private File customFile;
@@ -82,7 +82,7 @@ public class CDTCreator3Arrays {
 		this.file = file;
 		this.customFile = file2;
 		this.fileType = fileType;
-		this.loadProgView = tvFrame.getLoadProgView();
+		this.loadProgView = tvFrame.getWelcomeView();
 	}
 
 	public void createFile() throws IOException {

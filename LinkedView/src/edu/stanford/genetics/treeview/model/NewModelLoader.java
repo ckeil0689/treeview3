@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.SwingWorker;
 
-import Views.LoadProgressView;
+import Views.WelcomeView;
 
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.TreeViewFrame;
@@ -27,7 +27,7 @@ public class NewModelLoader {
 	protected TVModel targetModel;
 	private FileSet fileSet;
 	protected TreeViewFrame tvFrame;
-	protected LoadProgressView loadProgView;
+	protected WelcomeView loadProgView;
 	
 	// Instance variables for the actual data to be loaded.
 	protected String[][] stringLabels;
@@ -47,7 +47,7 @@ public class NewModelLoader {
 		this.targetModel = model;
 		this.tvFrame = (TreeViewFrame)model.getFrame();
 		this.fileSet = model.getFileSet();
-		this.loadProgView = tvFrame.getLoadProgView();
+		this.loadProgView = tvFrame.getWelcomeView();
 	}
 	
 	public TVModel load() {

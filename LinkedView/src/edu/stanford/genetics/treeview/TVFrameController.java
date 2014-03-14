@@ -58,19 +58,18 @@ public class TVFrameController {
 		tvFrame.addFileMenuListeners(new FileMenuListener());
 		
 		if(tvFrame.getWelcomeView() != null) {
-			System.out.println("Welcome Listener added.");
 			tvFrame.getWelcomeView().addLoadListener(new LoadPanelListener(
 					tvFrame.getWelcomeView().getLoadIcon(), 
 					tvFrame.getWelcomeView().getLoadLabel()));
 		}
 		
-		if(tvFrame.getLoadCheckView() != null) {
-			System.out.println("LoadCheck Listener added.");
-			tvFrame.getLoadCheckView().addLoadListener(
-					new LoadButtonListener());
-			tvFrame.getLoadCheckView().addContinueListener(
-					new ContinueListener());
-		}
+//		if(tvFrame.getLoadCheckView() != null) {
+//			System.out.println("LoadCheck Listener added.");
+//			tvFrame.getLoadCheckView().addLoadListener(
+//					new LoadButtonListener());
+//			tvFrame.getLoadCheckView().addContinueListener(
+//					new ContinueListener());
+//		}
 	}
 	
 	/**
@@ -159,7 +158,8 @@ public class TVFrameController {
 		if(tvFrame.getDataModel() != null) {
 			tvFrame.setView("DendroView");
 			tvFrame.setLoaded(true);
-			tvFrame.addMenuActionListeners(new TVMenuListener());
+			addViewListeners();
+//			tvFrame.addMenuActionListeners(new TVMenuListener());
 			
 		} else {
 			System.out.println("Couldn't continue, dataModel is null.");
@@ -229,8 +229,11 @@ public class TVFrameController {
 				
 				if(model.getDataMatrix().getNumRow() > 0) {
 					setDataModel();
-					tvFrame.setView("LoadCheckView");
-					addViewListeners();
+					setLoaded();
+//					tvFrame.setLoaded(true);
+//					tvFrame.setView("LoadCheckView");
+//					tvFrame.setView("DendroView");
+//					addViewListeners();
 					
 				} else {
 					System.out.println("No datamatrix set by worker thread.");
@@ -254,7 +257,6 @@ public class TVFrameController {
 		
 		try {
 			file = tvFrame.selectFile();
-//			tvFrame.setView("LoadProgressView");
 			tvFrame.setLoaded(false);
 			worker.execute();
 			

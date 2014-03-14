@@ -1,10 +1,11 @@
 package edu.stanford.genetics.treeview;
 
+import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
@@ -13,11 +14,13 @@ import net.miginfocom.swing.MigLayout;
 
 public class ExitConfirmDialog {
 	
-	private JFrame exitFrame;
+	private JDialog exitFrame;
 
 	public ExitConfirmDialog(final ViewFrame view) {
 
-		exitFrame = new JFrame("Confirm Exit");
+		exitFrame = new JDialog();
+		exitFrame.setTitle("Confirm Exit");
+		exitFrame.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
 		exitFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		exitFrame.setResizable(false);
 

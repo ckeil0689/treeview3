@@ -112,7 +112,6 @@ public class ColorGradientController {
 		public void mouseDragged(MouseEvent e) {
 			
 			gradientPick.getGradientBox().updateThumbPos(e.getX());
-//			gradientPick.getGradientBox().repaint();
 		}
 
 		@Override

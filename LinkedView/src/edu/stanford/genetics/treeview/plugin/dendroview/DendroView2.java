@@ -240,6 +240,7 @@ public class DendroView2 implements Observer, DendroPanel {
 		//Buttons
 		scaleDefaultAll = GUIParams.setButtonLayout(null, "homeIcon");
 		scaleDefaultAll.setToolTipText("Resets the zoomed view.");
+		scaleDefaultAll.setForeground(GUIParams.LIGHTGRAY);
 
 		scaleIncX = GUIParams.setButtonLayout(null, "zoomInIcon");
 		scaleIncX.setToolTipText("Zooms in on X-axis.");
@@ -253,8 +254,7 @@ public class DendroView2 implements Observer, DendroPanel {
 		scaleDecY = GUIParams.setButtonLayout(null, "zoomOutIcon");
 		scaleDecY.setToolTipText("Zooms out of Y-axis.");
 		
-		zoomButton = GUIParams.setButtonLayout("Zoom On Selection", 
-				"fullscreenIcon");
+		zoomButton = GUIParams.setButtonLayout(null, "fullscreenIcon");
 		zoomButton.setToolTipText("Zooms into the selected area.");
 
 		// Panels
@@ -318,12 +318,12 @@ public class DendroView2 implements Observer, DendroPanel {
 
 		crossPanel.add(scaleIncY, "span, alignx 50%, wrap");
 		crossPanel.add(scaleDecX);
-		crossPanel.add(scaleDefaultAll);
+		crossPanel.add(zoomButton);
 		crossPanel.add(scaleIncX, "wrap");
 		crossPanel.add(scaleDecY, "span, alignx 50%");
 
 		buttonPanel.add(crossPanel, "pushx, alignx 50%, wrap");
-		buttonPanel.add(zoomButton, "pushx, alignx 50%");
+		buttonPanel.add(scaleDefaultAll, "pushx, alignx 50%");
 		
 		finderPanel.add(getGeneFinderPanel(), "w 90%, h 30%, " +
 				"alignx 50%, wrap");

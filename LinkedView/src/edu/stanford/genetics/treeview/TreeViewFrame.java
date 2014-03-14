@@ -30,7 +30,6 @@ package edu.stanford.genetics.treeview;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -56,7 +55,6 @@ import javax.swing.WindowConstants;
 
 import Controllers.DendroController;
 import Views.LoadCheckView;
-import Views.LoadProgressView;
 import Views.WelcomeView;
 
 import net.miginfocom.swing.MigLayout;
@@ -92,7 +90,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	
 	// Different Views
 	private WelcomeView welcomeView;
-	private LoadProgressView loadProgView;
 	private LoadCheckView confirmPanel;
 	private DendroView2 dendroView;
 	
@@ -175,11 +172,11 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		if(!viewName.equalsIgnoreCase("DendroView")) {
 			if(viewName.equalsIgnoreCase("WelcomeView")) {
 				welcomeView = new WelcomeView(this);
-				view = welcomeView.makeWelcomePanel();
+				view = welcomeView.makeInitial();
 				
 			} else if(viewName.equalsIgnoreCase("LoadProgressView")) {
-				loadProgView = new LoadProgressView();
-				view = loadProgView.makeLoadProgView();
+				welcomeView = new WelcomeView(this);
+				view = welcomeView.makeLoading();
 			
 			} else if(viewName.equalsIgnoreCase("LoadCheckView")) {
 				confirmPanel = new LoadCheckView((TVModel)dataModel);
@@ -214,7 +211,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	public void resetViews() {
 		
 		welcomeView = null;
-		loadProgView = null;
 		confirmPanel = null;
 		dendroView = null;
 	}
@@ -380,15 +376,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	public WelcomeView getWelcomeView() {
 		
 		return welcomeView;
-	}
-	
-	/**
-	 * Return TVFrame's current LoadProgressView instance
-	 * @return loadProgView
-	 */
-	public LoadProgressView getLoadProgView() {
-		
-		return loadProgView;
 	}
 	
 	/**
