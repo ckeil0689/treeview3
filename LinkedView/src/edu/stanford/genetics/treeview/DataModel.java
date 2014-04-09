@@ -22,6 +22,8 @@
  */
 package edu.stanford.genetics.treeview;
 
+import java.util.prefs.Preferences;
+
 import edu.stanford.genetics.treeview.model.IntHeaderInfo;
 
 /**
@@ -50,7 +52,7 @@ public interface DataModel {
 	 * 
 	 * @return The documentConfig value
 	 */
-	public ConfigNode getDocumentConfigRoot();
+	public Preferences getDocumentConfigRoot();
 
 	/**
 	 * Gets the file path or url which this <code>DataModel</code> was built

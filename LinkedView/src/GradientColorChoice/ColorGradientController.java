@@ -12,6 +12,9 @@ import java.awt.event.MouseMotionListener;
 import javax.swing.JColorChooser;
 import javax.swing.Timer;
 
+import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet2;
+
 public class ColorGradientController {
 
 	private ColorGradientChooser gradientPick;
@@ -21,13 +24,32 @@ public class ColorGradientController {
 		this.gradientPick = gradientPick;
 		
 		// Add listeners
-		gradientPick.addColorListener(new ColorListener());
-		gradientPick.addThumbMotionListener(new ThumbMotionListener());
-		gradientPick.addAddListener(new AddButtonListener());
-		gradientPick.addDefaultListener(new DefaultListener());
+		addAllListeners();
 	}
 	
-	protected class ColorListener implements MouseListener, ActionListener {
+	/**
+	 * Adds all listeners to the ColorGradientChooser object.
+	 */
+	public void addAllListeners() {
+		
+		if(gradientPick != null) {
+			gradientPick.addThumbSelectionListener(
+					new ThumbSelectionListener());
+			gradientPick.addThumbMotionListener(new ThumbMotionListener());
+			gradientPick.addAddListener(new AddButtonListener());
+			gradientPick.addRemoveListener(new RemoveButtonListener());
+			gradientPick.addDefaultListener(new DefaultListener());
+		}
+	}
+	
+	/**
+	 * This listener specifically defines what happens when a user clicks
+	 * on a thumb.
+	 * @author CKeil
+	 *
+	 */
+	protected class ThumbSelectionListener implements MouseListener, 
+	ActionListener {
 		
 		private final Integer clickInterval = 
 				(Integer) Toolkit.getDefaultToolkit().getDesktopProperty(
@@ -36,7 +58,7 @@ public class ColorGradientController {
 		private Timer timer;
 		private MouseEvent lastEvent;
 		
-		protected ColorListener() {
+		protected ThumbSelectionListener() {
 			
 			timer = new Timer(clickInterval, this);
 		}
@@ -44,10 +66,17 @@ public class ColorGradientController {
 		/**
 		 * Specifies what happens when a single click is performed by the user.
 		 */
-		private void singleClick() {
+		private void clickOrPress() {
 	
-			gradientPick.getGradientBox().setGradientColor(
-					lastEvent.getPoint());
+			if(gradientPick.getGradientBox().isGradientArea(
+					lastEvent.getPoint())) {
+				gradientPick.getGradientBox().setGradientColor(
+						lastEvent.getPoint());
+				
+			} else {
+				gradientPick.getGradientBox().deselectAllThumbs();
+				gradientPick.getGradientBox().selectThumb(lastEvent.getPoint());
+			}
 		}
 		
 		/**
@@ -55,11 +84,7 @@ public class ColorGradientController {
 		 */
 		private void doubleClick() {
 			
-			if(gradientPick.getColorListSize() > 2) {
-				gradientPick.getGradientBox().removeThumbAt(lastEvent.getX(), 
-						lastEvent.getY());
-				gradientPick.getGradientBox().removeColor();
-			}
+			gradientPick.getGradientBox().specifyThumbPos(lastEvent.getPoint());
 		}
 		
 		@Override
@@ -87,25 +112,28 @@ public class ColorGradientController {
 		@Override
 		public void mousePressed(MouseEvent e) {
 			
-			gradientPick.getGradientBox().selectThumb(e.getX(), e.getY());
-			gradientPick.getGradientBox().repaint();
+			lastEvent = e;
+			clickOrPress();
 		}
 
 		@Override
-		public void mouseReleased(MouseEvent e) {
-			
-			gradientPick.getGradientBox().deselectAllThumbs();
-			gradientPick.getGradientBox().repaint();
-		}
+		public void mouseReleased(MouseEvent e) {}
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			
 			timer.stop();
-			singleClick();
+			clickOrPress();
 		}
 	}
 	
+	/**
+	 * This listener defines the behavior of ColorGradientChooser when
+	 * the user moves the mouse on top a thumb or 
+	 * drags it in a certain direction.
+	 * @author CKeil
+	 *
+	 */
 	class ThumbMotionListener implements MouseMotionListener {
 		
 		@Override
@@ -117,11 +145,8 @@ public class ColorGradientController {
 		@Override
 		public void mouseMoved(MouseEvent e) {
 			
-			if((e.getX() > 0 && e.getX() 
-					< gradientPick.getGradientBox().getWidth())
-					&& (e.getY() > 0 && e.getY() 
-							< gradientPick.getGradientBox().getHeight() 
-							* 1/4)) {
+			if(gradientPick.getGradientBox().containsThumb(e.getX(), 
+					e.getY())) {
 				gradientPick.getGradientBox().setCursor(
 						new Cursor(Cursor.HAND_CURSOR));
 				
@@ -133,8 +158,6 @@ public class ColorGradientController {
 	}
 	
 	class AddButtonListener implements ActionListener {
-
-		private int addIndex = -1;
 		
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
@@ -143,40 +166,7 @@ public class ColorGradientController {
 					gradientPick.getGradientBox(), "Pick a Color", 
 					Color.black);
 			
-			int x = findBestX();
-			
-			gradientPick.getGradientBox().insertThumbAt(x, newCol);
-			
-			if(addIndex > -1) {
-				gradientPick.getGradientBox().addColor(newCol, addIndex);
-				
-			} else {
-				System.out.println("No useful index set to add a color" +
-						"to color list. Location: ColorGradientController" +
-						" AddButtonListener.");
-			}
-		}
-		
-		public int findBestX() {
-			
-			float[] fractions = gradientPick.getGradientBox().updateFractions();
-			
-			int x = -1;
-			float bigDiff = 0.0f;
-
-			for(int i = 0; i < fractions.length - 1; i++) {
-				
-				float diff = fractions[i + 1] - fractions[i];
-				if(diff > bigDiff) {
-					bigDiff = diff;
-					x = (int)((bigDiff/2 + fractions[i]) 
-							* gradientPick.getGradientBox().getSize()
-							.getWidth());
-					addIndex = i + 1;
-				}
-			}
-			
-			return x;
+			gradientPick.getGradientBox().addColor(newCol);
 		}
 	}
 	
@@ -185,7 +175,9 @@ public class ColorGradientController {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			
-			gradientPick.getGradientBox().removeColor();
+			if(gradientPick.getColorListSize() > 2) {
+				gradientPick.getGradientBox().removeColor();
+			}
 		}
 	}
 	
@@ -194,12 +186,33 @@ public class ColorGradientController {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			
-			if(arg0.getSource() == gradientPick.getRGButtton()) {
+			if(arg0.getSource() == gradientPick.getRGButton()) {
 				gradientPick.getGradientBox().setDefaults(true);
 				
-			} else {
+			} else if(arg0.getSource() == gradientPick.getYBButton()){
 				gradientPick.getGradientBox().setDefaults(false);
+				
+			} else if(arg0.getSource() == gradientPick.getCustomColorButton()){
+//				gradientPick.getGradientBox().setDefaults(false);
+				// should set to last custom preset here
+				
+			} else {
+				LogBuffer.println("No source found for ActionEvent in " +
+						"DefaultListener in ColorGradientController");
 			}
+		}
+		
+	}
+	
+	class SaveColorPresetListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			
+			final ColorSet2 temp = new ColorSet2();
+//			colorExtractorEditor.copyStateTo(temp);
+			temp.setName("UserDefined");
+			gradientPick.addColorSet(temp);	
 		}
 		
 	}

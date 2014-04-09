@@ -36,6 +36,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Arrays;
+import java.util.prefs.Preferences;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -48,7 +49,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import edu.stanford.genetics.treeview.DummyConfigNode;
 import edu.stanford.genetics.treeview.DummyHeaderInfo;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.NatField;
@@ -95,7 +95,8 @@ public class FUOptionsPanel extends JPanel implements SettingsPanel {
 
 	public static void main(final String[] argv) {
 
-		final UrlPresets p = new UrlPresets(new DummyConfigNode("UrlPresets"));
+		final UrlPresets p = new UrlPresets();
+		p.setConfigNode("FUOptions");
 		final HeaderInfo hi = new DummyHeaderInfo();
 		final UrlExtractor ue = new UrlExtractor(hi);
 		final FontSelectable fs = new TextView(hi, ue);

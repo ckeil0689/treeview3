@@ -35,17 +35,19 @@ import java.awt.event.MouseListener;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 import java.util.Observable;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
 import net.miginfocom.swing.MigLayout;
-import edu.stanford.genetics.treeview.ConfigNode;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.RotateImageFilter;
 import edu.stanford.genetics.treeview.TreeSelectionI;
@@ -80,7 +82,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 
 	private int maxlength = 0;
 	private boolean backBufferValid = false;
-	private ConfigNode root = null;
+	private Preferences configNode = null;
 //	private UrlExtractor urlExtractor = null;
 	private TreeSelectionI arraySelection;
 	private TreeSelectionI geneSelection;
@@ -105,20 +107,23 @@ public class ArrayNameView extends ModelView implements MouseListener,
 
 		headerInfo = hInfo;
 		
-		headerSummary = new HeaderSummary();
+		headerSummary = new HeaderSummary("ArraySummary");
 		headerSummary.setIncluded(new int[] { 0 });
 		headerSummary.addObserver(this);
-		
-		scrollPane = new JScrollPane(this);
-		scrollPane.setBorder(null);
-		panel = scrollPane;
 
+		addMouseListener(this);
+		
 		l1 = new JLabel();
 		l1.setFont(GUIParams.FONTS);
 		l1.setForeground(GUIParams.TEXT);
-		this.add(l1, "alignx 50%, aligny 50%, push");
-
-		addMouseListener(this);
+		
+		add(l1, "alignx 50%, aligny 50%, push");
+		
+		scrollPane = new JScrollPane(this, 
+				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.setBorder(null);
+		panel = scrollPane;
 	}
 
 	public HeaderInfo getHeaderInfo() {
@@ -581,8 +586,8 @@ public class ArrayNameView extends ModelView implements MouseListener,
 
 		if ((face == null) || (!face.equals(string))) {
 			face = string;
-			if (root != null)
-				root.setAttribute("face", face, d_face);
+			if (configNode != null)
+				configNode.put("face", face);
 			setFont(new Font(face, style, size));
 			backBufferValid = false;
 			revalidate();
@@ -596,8 +601,8 @@ public class ArrayNameView extends ModelView implements MouseListener,
 
 		if (size != i) {
 			size = i;
-			if (root != null)
-				root.setAttribute("size", size, d_size);
+			if (configNode != null)
+				configNode.putInt("size", size);
 			setFont(new Font(face, style, size));
 			backBufferValid = false;
 			revalidate();
@@ -612,8 +617,8 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		if (style != i) {
 			style = i;
 			backBufferValid = false;
-			if (root != null)
-				root.setAttribute("style", style, d_style);
+			if (configNode != null)
+				configNode.putInt("style", style);
 			setFont(new Font(face, style, size));
 			revalidate();
 			repaint();
@@ -634,23 +639,82 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		return headerSummary;
 	}
 
+//	/* inherit description */
+//	@Override
+//	public void bindConfig(final Preferences configNode) {
+//
+//		root = configNode;
+//		
+//		try {
+//			String[] childrenNodes = root.childrenNames();
+//			boolean nodePresent = false;
+//			for(int i = 0; i < childrenNodes.length; i++) {
+//				
+//				// Actually looking for children nodes...
+//				if(childrenNodes[i].equalsIgnoreCase("ArraySummary")) {
+//					nodePresent = true;
+//				}
+//			}
+//			
+////			if (configNode.fetchFirst("ArraySummary") == null) {
+//			if (!nodePresent) {
+//				getHeaderSummary().bindConfig(configNode.node("ArraySummary"));
+//				getHeaderSummary().setIncluded(new int[] { 0 });
+//
+//			} else {
+//				// Actually get first subNode here...
+//				getHeaderSummary()
+//					.bindConfig(configNode.node("ArraySummary"));
+////						.bindConfig(configNode.fetchFirst("ArraySummary"));
+//			}
+//
+//			setFace(root.get("face", d_face));
+//			setStyle(root.getInt("style", d_style));
+//			setPoints(root.getInt("size", d_size));
+//			
+//		} catch (BackingStoreException e) {
+//			e.printStackTrace();
+//			LogBuffer.println("Error in ArrayNameView/bindConfig()" 
+//					+ e.getMessage());
+//		}
+//	}
+	
 	/* inherit description */
 	@Override
-	public void bindConfig(final ConfigNode configNode) {
+	public void setConfigNode(Preferences parentNode) {
 
-		root = configNode;
-		if (configNode.fetchFirst("ArraySummary") == null) {
-			getHeaderSummary().bindConfig(configNode.create("ArraySummary"));
+		if(parentNode != null) {
+			this.configNode = parentNode.node("ArrayNameView");
+			
+		} else {
+			LogBuffer.println("Could not find or create ArrayameView" +
+					"node because parentNode was null.");
+		}
+		
+		String[] childrenNodes = getRootChildrenNodes();
+		boolean nodePresent = false;
+		for(int i = 0; i < childrenNodes.length; i++) {
+			
+			// Actually looking for children nodes...
+			if(childrenNodes[i].equalsIgnoreCase("ArraySummary")) {
+				nodePresent = true;
+			}
+		}
+		
+//			if (configNode.fetchFirst("ArraySummary") == null) {
+		if (!nodePresent) {
+			getHeaderSummary().setConfigNode(configNode);
 			getHeaderSummary().setIncluded(new int[] { 0 });
 
 		} else {
-			getHeaderSummary()
-					.bindConfig(configNode.fetchFirst("ArraySummary"));
+			// Actually get first subNode here...
+			getHeaderSummary().setConfigNode(configNode);
+//						.bindConfig(configNode.fetchFirst("ArraySummary"));
 		}
 
-		setFace(root.getAttribute("face", d_face));
-		setStyle(root.getAttribute("style", d_style));
-		setPoints(root.getAttribute("size", d_size));
+		setFace(configNode.get("face", d_face));
+		setStyle(configNode.getInt("style", d_style));
+		setPoints(configNode.getInt("size", d_size));
 	}
 
 	/**
@@ -683,5 +747,26 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		}
 		this.geneSelection = arraySelection;
 		this.geneSelection.addObserver(this);
+	}
+	
+	/**
+	 * Returns the names of the current children of this class' root node.
+	 * @return
+	 */
+	public String[] getRootChildrenNodes() {
+		
+		if(configNode != null) {
+			String[] childrenNodes;
+			try {
+				childrenNodes = configNode.childrenNames();
+				return childrenNodes;
+				
+			} catch (BackingStoreException e) {
+				e.printStackTrace();
+				return null;
+			}
+		} else {
+			return null;
+		}
 	}
 }

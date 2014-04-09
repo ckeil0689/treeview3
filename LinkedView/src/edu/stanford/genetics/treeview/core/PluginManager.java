@@ -19,40 +19,47 @@ import java.util.Enumeration;
 import java.util.Vector;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 import java.util.zip.ZipEntry;
 
 import javax.swing.JOptionPane;
 
-import edu.stanford.genetics.treeview.ConfigNode;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.PluginFactory;
 
 public class PluginManager {
+	
 	private static String s_pluginclassfile = "tv_plugins.cd";
+	
 	/**
 	 * holds global plugin manager I hate static variables, but this one looks
 	 * necessary.
 	 * */
 	private static PluginManager pluginManager = new PluginManager();
+	
+	/**
+	 * holds list of all plugin factories
+	 */
+	private final java.util.Vector pluginFactories = new Vector();
 
 	public static PluginManager getPluginManager() {
 
 		return pluginManager;
 	}
 
-	/**
-	 * holds list of all plugin factories
-	 */
-	private final java.util.Vector pluginFactories = new Vector();
-
 	public File[] readdir(final String s_dir) {
+		
 		final File f_dir = new File(s_dir);
 		final FileFilter fileFilter = new FileFilter() {
+			
 			@Override
 			public boolean accept(final File file) {
+				
 				return file.getName().endsWith("jar");
 			}
 		};
+		
 		return f_dir.listFiles(fileFilter);
 	}
 
@@ -72,16 +79,20 @@ public class PluginManager {
 			final Enumeration e = jf.entries();
 			JarEntry je = null;
 			String classfile = null;
+			
 			for (; e.hasMoreElements();) {
+				
 				je = (JarEntry) e.nextElement();
 				if (je.toString().indexOf(s_pluginclassfile) >= 0) {
 					classfile = je.toString();
 				}
 			}
 			ze = jf.getEntry(classfile);
+			
 		} catch (final NullPointerException e) {
 			LogBuffer.println("JarFile has no tv_plugins.cd" + jf.getName());
 			throw e;
+			
 		} catch (final RuntimeException e) {
 			e.printStackTrace();
 		}
@@ -92,8 +103,10 @@ public class PluginManager {
 		 */
 		final BufferedReader br = new BufferedReader(new InputStreamReader(
 				jf.getInputStream(ze)));
+		
 		final ArrayList al = new ArrayList();
 		String s = null;
+		
 		while ((s = br.readLine()) != null) {
 			al.add(s);
 		}
@@ -156,6 +169,7 @@ public class PluginManager {
 					@SuppressWarnings("unused")
 					final PluginFactory pp = (PluginFactory) c.newInstance();
 					b_loadedPlugin |= true;
+					
 				} else {
 					b_loadedPlugin |= false;
 				}
@@ -192,25 +206,41 @@ public class PluginManager {
 	 * changes.
 	 * 
 	 */
-	public void pluginAssignConfigNodes(final ConfigNode node) {
+	public void pluginAssignConfigNodes(final Preferences node) {
+		
 		final PluginFactory[] plugins = getPluginFactories();
+		
 		for (int i = 0; i < plugins.length; i++) {
-			ConfigNode pluginNode = null;
-			final ConfigNode[] pluginPresets = node.fetch("PluginGlobal");
-			for (int j = 0; j < pluginPresets.length; j++) {
-				// scan existing pluginPresets for correct name
-				if (pluginPresets[j].getAttribute("name", "").equals(
-						plugins[i].getPluginName())) {
-					pluginNode = pluginPresets[j];
-					break;
+			
+			Preferences pluginNode = null;
+			final Preferences pluginPresetsNode = node.node("PluginGlobal");
+			String[] pluginPresetsChildrenNodes;
+			try {
+				pluginPresetsChildrenNodes = pluginPresetsNode.childrenNames();
+			
+				for (int j = 0; j < pluginPresetsChildrenNodes.length; j++) {
+					
+					// scan existing pluginPresets for correct name
+					if (pluginPresetsNode.node(pluginPresetsChildrenNodes[j])
+							.get("name", "").equals(plugins[i].getPluginName())) {
+						
+						pluginNode = pluginPresetsNode.node(
+								pluginPresetsChildrenNodes[j]);
+						break;
+					}
 				}
+				
+				if (pluginNode == null) {
+					// no existing presets node for plugin, must create
+					pluginNode = node.node("PluginGlobal");
+					pluginNode.put("name", plugins[i].getPluginName());
+				}
+				
+				plugins[i].setGlobalNode(pluginNode);
+				
+			} catch (BackingStoreException e) {
+				e.printStackTrace();
 			}
-			if (pluginNode == null) {
-				// no existing presets node for plugin, must create
-				pluginNode = node.create("PluginGlobal");
-				pluginNode.setAttribute("name", plugins[i].getPluginName(), "");
-			}
-			plugins[i].setGlobalNode(pluginNode);
 		}
 	}
 

@@ -139,6 +139,10 @@ public abstract class ModelView extends JPanel implements Observer,
 	@Override
 	public synchronized void paintComponent(final Graphics g) {
 
+		// Call JComponent's paintComponent method to clear panel 
+		// before every redraw.
+		super.paintComponent(g);
+		
 		final Rectangle clip = g.getClipBounds();
 		g.setColor(Color.white);
 		g.fillRect(clip.x, clip.y, clip.width, clip.height);

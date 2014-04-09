@@ -95,7 +95,9 @@ public class UrlPresetsEditor extends JPanel implements SettingsPanel {
 
 	public static void main(final String[] argv) {
 
-		final UrlPresets p = new UrlPresets(new DummyConfigNode("UrlPresets"));
+		final UrlPresets p = new UrlPresets("UrlPresetsEditor");
+		p.setConfigNode(null);
+		
 		final UrlPresetsEditor e = new UrlPresetsEditor(p);
 		final Frame f = new Frame(e.getTitle());
 		e.addToFrame(f);
@@ -262,9 +264,9 @@ public class UrlPresetsEditor extends JPanel implements SettingsPanel {
 				presets.setPresetHeader(i, presetHeaders[i].getText());
 			}
 
-			for (int i = 0; i < n; i++) {
-				presets.setPresetName(i, presetNames[i].getText());
-			}
+//			for (int i = 0; i < n; i++) {
+//				presets.setPresetName(i, presetNames[i].getText());
+//			}
 
 			for (int i = 0; i < n; i++) {
 				presets.setPresetTemplate(i, presetTemplates[i].getText());

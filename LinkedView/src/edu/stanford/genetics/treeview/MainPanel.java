@@ -22,6 +22,8 @@
  */
 package edu.stanford.genetics.treeview;
 
+import java.util.prefs.Preferences;
+
 import javax.swing.ImageIcon;
 
 /**
@@ -46,7 +48,7 @@ public interface MainPanel {
 	 * this method gets the config node on which this component is based, or
 	 * null.
 	 */
-	public ConfigNode getConfigNode();
+	public Preferences getConfigNode();
 
 	/**
 	 * Add items related to settings

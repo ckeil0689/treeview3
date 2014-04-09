@@ -23,6 +23,8 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.Color;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 /**
  * a color set which can be stored in an ConfigNode.
@@ -32,7 +34,7 @@ import java.awt.Color;
  */
 public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 
-	private ConfigNode configNode;
+	private Preferences configNode;
 
 	private final Color[] colors;
 
@@ -77,8 +79,9 @@ public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 	 *            The new name value
 	 */
 	public void setName(final String name) {
+		
 		if (configNode != null) {
-			configNode.setAttribute("name", name, defaultName);
+			configNode.put("name", name);
 		}
 		this.name = name;
 	}
@@ -86,6 +89,7 @@ public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 	/* inherit description */
 	@Override
 	public String getName() {
+		
 		return name;
 	}
 
@@ -96,6 +100,7 @@ public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 	 * be monkeyed with, except in the constructor of a subclass.
 	 */
 	protected void setDefaultName(final String defaultName) {
+		
 		this.defaultName = defaultName;
 	}
 
@@ -105,6 +110,7 @@ public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 	 * @return The defaultName value
 	 */
 	public String getDefaultName() {
+		
 		return defaultName;
 	}
 
@@ -149,11 +155,61 @@ public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 		setName(other.getName());
 	}
 
+//	/* inherit description */
+//	@Override
+//	public void bindConfig(final Preferences configNode) {
+//
+//		this.configNode = configNode;
+//		// first, init existing...
+//		final Color[] oldColors = new Color[types.length];
+//		for (int i = 0; i < types.length; i++) {
+//			oldColors[i] = colors[i];
+//			colors[i] = null;
+//		}
+//
+//		// copy over the new...
+//		final ConfigNode[] colorNodes = configNode.fetch("Color");
+//		for (int i = 0; i < colorNodes.length; i++) {
+//			final int type = getIndex(colorNodes[i]
+//					.getAttribute("type", "none"));
+//			if (type == -1) {
+//				continue;
+//			}
+//			colors[type] = decodeColor(colorNodes[i].getAttribute("hex",
+//					defaultColors[type]));
+//		}
+//		setName(configNode.get("name", defaultName));
+//
+//		// finally, make any new nodes which are required...
+//		for (int i = 0; i < types.length; i++) {
+//			
+//			if (colors[i] == null) {
+//				final Preferences colorNode = configNode.node("Color");
+//				colorNode.put("type", getType(i));
+//				if (oldColors[i] == null) {
+//					System.out
+//							.println("In ConfigColorSet.bindConfig(), Oldcolors "
+//									+ i + "was null, should never happen!");
+//					colorNode.put("hex", defaultColors[i]);
+//				} else {
+//					colorNode.put("hex", encodeColor(oldColors[i]));
+//				}
+//			}
+//		}
+//	}
+	
 	/* inherit description */
 	@Override
-	public void bindConfig(final ConfigNode configNode) {
+	public void setConfigNode(Preferences parentNode) {
 
-		this.configNode = configNode;
+		if(parentNode != null) {
+			this.configNode = parentNode.node("ConfigColorSet");
+			
+		} else {
+			LogBuffer.println("Could not find or create ConfigColorSet node" +
+					"because parentNode is null.");
+		}
+		
 		// first, init existing...
 		final Color[] oldColors = new Color[types.length];
 		for (int i = 0; i < types.length; i++) {
@@ -162,32 +218,33 @@ public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 		}
 
 		// copy over the new...
-		final ConfigNode[] colorNodes = configNode.fetch("Color");
-		for (int i = 0; i < colorNodes.length; i++) {
-			final int type = getIndex(colorNodes[i]
-					.getAttribute("type", "none"));
+//		final ConfigNode[] colorNodes = configNode.fetch("Color");
+		String[] childrenNodes = getRootChildrenNodes();
+		
+		for (int i = 0; i < childrenNodes.length; i++) {
+			final int type = getIndex(configNode.node(childrenNodes[i])
+					.get("type", "none"));
 			if (type == -1) {
 				continue;
 			}
-			colors[type] = decodeColor(colorNodes[i].getAttribute("hex",
-					defaultColors[type]));
+			colors[type] = decodeColor(configNode.node(childrenNodes[i])
+					.get("hex", defaultColors[type]));
 		}
-		setName(configNode.getAttribute("name", defaultName));
+		setName(configNode.get("name", defaultName));
 
 		// finally, make any new nodes which are required...
 		for (int i = 0; i < types.length; i++) {
+			
 			if (colors[i] == null) {
-				final ConfigNode colorNode = configNode.create("Color");
-				colorNode.setAttribute("type", getType(i), "none");
+				final Preferences colorNode = configNode.node("Color" + i);
+				colorNode.put("type", getType(i));
 				if (oldColors[i] == null) {
-					System.out
-							.println("In ConfigColorSet.bindConfig(), Oldcolors "
-									+ i + "was null, should never happen!");
-					colorNode.setAttribute("hex", defaultColors[i],
-							defaultColors[i]);
+					System.out.println("In ConfigColorSet.bindConfig(), " +
+							"Oldcolors " + i + "was null, " +
+									"should never happen!");
+					colorNode.put("hex", defaultColors[i]);
 				} else {
-					colorNode.setAttribute("hex", encodeColor(oldColors[i]),
-							defaultColors[i]);
+					colorNode.put("hex", encodeColor(oldColors[i]));
 				}
 			}
 		}
@@ -235,12 +292,14 @@ public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 	/* inherit description */
 	@Override
 	public void setColor(final int i, final Color newColor) {
+		
 		colors[i] = newColor;
 		if (configNode != null) {
-			final ConfigNode[] colors = configNode.fetch("Color");
-			colors[i].setAttribute("type", getType(i), "none");
-			colors[i].setAttribute("hex", encodeColor(newColor),
-					defaultColors[i]);
+//			final ConfigNode[] colors = configNode.fetch("Color");
+			String[] childrenNodes = getRootChildrenNodes();
+			
+			configNode.node(childrenNodes[i]).put("type", getType(i));
+			configNode.node(childrenNodes[i]).put("hex", encodeColor(newColor));
 		}
 	}
 
@@ -339,5 +398,26 @@ public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 			return "F";
 		}
 		return "F";
+	}
+	
+	/**
+	 * Returns the names of the current children of this class' root node.
+	 * @return
+	 */
+	public String[] getRootChildrenNodes() {
+		
+		if(configNode != null) {
+			String[] childrenNodes;
+			try {
+				childrenNodes = configNode.childrenNames();
+				return childrenNodes;
+				
+			} catch (BackingStoreException e) {
+				e.printStackTrace();
+				return null;
+			}
+		} else {
+			return null;
+		}
 	}
 }

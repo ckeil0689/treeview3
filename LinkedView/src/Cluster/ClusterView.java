@@ -28,6 +28,7 @@
 package Cluster;
 
 import java.awt.event.ActionListener;
+import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -43,7 +44,6 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EtchedBorder;
 
 import net.miginfocom.swing.MigLayout;
-import edu.stanford.genetics.treeview.ConfigNode;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.ExportException;
 import edu.stanford.genetics.treeview.GUIParams;
@@ -71,7 +71,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	// Instance
 	private TreeViewFrame tvFrame;
 	protected TVModel dataModel;
-	protected ConfigNode root;
+	protected Preferences root;
 
 	// Various GUI elements
 	private JScrollPane scrollPane;
@@ -125,7 +125,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	 * @param root
 	 * @param vFrame
 	 */
-	public ClusterView(final ConfigNode root, final TreeViewFrame tvFrame) {
+	public ClusterView(final Preferences root, final TreeViewFrame tvFrame) {
 
 		this(root, tvFrame, "Cluster View");
 	}
@@ -143,7 +143,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	 * @param name
 	 *            name of this view.
 	 */
-	public ClusterView (final ConfigNode root, final TreeViewFrame tvFrame, 
+	public ClusterView (final Preferences root, final TreeViewFrame tvFrame, 
 			final String name) {
 
 		super.setName(name);
@@ -298,7 +298,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		loadPanel.setLayout(new MigLayout());
 		loadPanel.setOpaque(false);
 		
-		optionsPanel.add(similarityPanel, "pushx, alignx 50%, h 20%");
+		optionsPanel.add(similarityPanel, "pushx, alignx 50%, h 20%, wrap");
 
 		if (clusterType.getSelectedIndex() == 0) {
 			optionsPanel.add(linkagePanel, "pushx, alignx 50%, h 20%, wrap");
@@ -321,20 +321,19 @@ public class ClusterView extends JPanel implements MainPanel {
 		JLabel similarity = new JLabel("Similarity Metric");
 		similarity.setFont(GUIParams.FONTL);
 		similarity.setForeground(GUIParams.MAIN);
-
-		// Labels
-		JLabel head2 = new JLabel("Rows:");
-		head2.setFont(GUIParams.FONTS);
-		head2.setForeground(GUIParams.TEXT);
-
-		JLabel head3 = new JLabel("Columns:");
-		head3.setFont(GUIParams.FONTS);
-		head3.setForeground(GUIParams.TEXT);
+		
+		JLabel rowLabel = new JLabel("Rows: ");
+		rowLabel.setFont(GUIParams.FONTS);
+		rowLabel.setForeground(GUIParams.TEXT);
+		
+		JLabel colLabel = new JLabel("Columns: ");
+		colLabel.setFont(GUIParams.FONTS);
+		colLabel.setForeground(GUIParams.TEXT);
 		
 		similarityPanel.add(similarity, "pushx, alignx 50%, span, wrap");
-		similarityPanel.add(head2, "h 10%, w 10%");
+		similarityPanel.add(rowLabel);
 		similarityPanel.add(geneCombo, "w 40%, wrap");
-		similarityPanel.add(head3, "h 10%, w 10%");
+		similarityPanel.add(colLabel);
 		similarityPanel.add(arrayCombo, "w 40%");
 		
 		// Component for linkage choices
@@ -350,9 +349,9 @@ public class ClusterView extends JPanel implements MainPanel {
 		// Clickable Panel to call InfoFrame
 		infoIcon = new ClickableIcon(tvFrame, GUIParams.QUESTIONICON);
 		
-		linkagePanel.add(method, "pushx, alignx 50%, span, wrap");
-		linkagePanel.add(clusterChoice, "w 40%");
-		linkagePanel.add(infoIcon, "w 10%");
+		linkagePanel.add(method, "pushx, alignx 95%");
+		linkagePanel.add(infoIcon, "pushx, alignx 0%, w 10%, wrap");
+		linkagePanel.add(clusterChoice, "pushx, alignx 50%, span");
 		
 		// Component for K-Means options
 		kMeansPanel = new JPanel();
@@ -460,7 +459,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	 * Getter for root
 	 */
 	@Override
-	public ConfigNode getConfigNode() {
+	public Preferences getConfigNode() {
 
 		return root;
 	}
@@ -486,7 +485,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	 * 
 	 * @param root
 	 */
-	public void setConfigNode(final ConfigNode root) {
+	public void setConfigNode(final Preferences root) {
 
 		this.root = root;
 	}

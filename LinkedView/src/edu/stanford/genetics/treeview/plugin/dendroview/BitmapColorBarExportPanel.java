@@ -29,6 +29,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.prefs.Preferences;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -48,10 +49,11 @@ import edu.stanford.genetics.treeview.SettingsPanel;
  */
 public class BitmapColorBarExportPanel extends ColorBarExportPanel implements
 		SettingsPanel {
+	
 	JComboBox formatPulldown = new JComboBox(BitmapWriter.formats);
 
 	// I wish I could just inherit this...
-	public BitmapColorBarExportPanel(final ColorExtractor colorExtractor) {
+	public BitmapColorBarExportPanel(final ColorExtractor2 colorExtractor) {
 		super(colorExtractor);
 		final JPanel holder = new JPanel();
 		final JCheckBox appendExt = new JCheckBox("Append Extension?", true);
@@ -123,5 +125,11 @@ public class BitmapColorBarExportPanel extends ColorBarExportPanel implements
 	@Override
 	protected String getInitialExtension() {
 		return ("_colorbar.png");
+	}
+
+	@Override
+	public void setConfigNode(Preferences parentNode) {
+		// TODO Auto-generated method stub
+		
 	}
 }

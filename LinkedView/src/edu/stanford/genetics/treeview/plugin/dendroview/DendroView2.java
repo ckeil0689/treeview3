@@ -23,21 +23,26 @@
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.ScrollPane;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseListener;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.prefs.Preferences;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JSplitPane;
+import javax.swing.JWindow;
 
 import net.miginfocom.swing.MigLayout;
-import edu.stanford.genetics.treeview.ConfigNode;
 import edu.stanford.genetics.treeview.DendroPanel;
 import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.ModelView;
@@ -116,6 +121,9 @@ public class DendroView2 implements Observer, DendroPanel {
 	private JButton scaleDecY;
 	private JButton scaleDefaultAll;
 	
+	// Booleans
+	private boolean showTrees = false;
+	
 	// Selections
 	private TreeSelectionI geneSelection = null;
 	private TreeSelectionI arraySelection = null;
@@ -134,7 +142,7 @@ public class DendroView2 implements Observer, DendroPanel {
 		this(tvFrame, "Dendrogram");
 	}
 
-	public DendroView2(final ConfigNode root, final TreeViewFrame tvFrame) {
+	public DendroView2(final Preferences root, final TreeViewFrame tvFrame) {
 
 		this(tvFrame, "Dendrogram");
 	}
@@ -189,10 +197,12 @@ public class DendroView2 implements Observer, DendroPanel {
 		globalYscrollbar = globalview.getYScroll();
 
 		// Set up the column name display
-		arraynameview = new ArrayNameView(tvFrame.getDataModel().getArrayHeaderInfo());
+		arraynameview = new ArrayNameView(
+				tvFrame.getDataModel().getArrayHeaderInfo());
 //		arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
 
-		textview = new TextViewManager(tvFrame.getDataModel().getGeneHeaderInfo(),
+		textview = new TextViewManager(
+				tvFrame.getDataModel().getGeneHeaderInfo(),
 				tvFrame.getUrlExtractor(), tvFrame.getDataModel());
 
 		// Set up row dendrogram
@@ -226,11 +236,11 @@ public class DendroView2 implements Observer, DendroPanel {
 		// Components for layout setup
 		JPanel buttonPanel;
 		JPanel crossPanel;
-		JPanel finderPanel;
 		JPanel textpanel;
 		JPanel navPanel;
-		JSplitPane gtrPane;
-		JSplitPane atrPane;
+		JSplitPane gtrPane = null;
+		JSplitPane atrPane = null;
+		JPanel firstPanel;
 		
 		JPanel fillPanel1;
 		JPanel fillPanel2;
@@ -238,9 +248,8 @@ public class DendroView2 implements Observer, DendroPanel {
 		JPanel fillPanel4;
 		
 		//Buttons
-		scaleDefaultAll = GUIParams.setButtonLayout(null, "homeIcon");
+		scaleDefaultAll = GUIParams.setButtonLayout("HOME", "homeIcon");
 		scaleDefaultAll.setToolTipText("Resets the zoomed view.");
-		scaleDefaultAll.setForeground(GUIParams.LIGHTGRAY);
 
 		scaleIncX = GUIParams.setButtonLayout(null, "zoomInIcon");
 		scaleIncX.setToolTipText("Zooms in on X-axis.");
@@ -267,6 +276,7 @@ public class DendroView2 implements Observer, DendroPanel {
 		crossPanel.setOpaque(false);
 
 		fillPanel1 = new JPanel();
+		fillPanel1.setLayout(new MigLayout());
 		fillPanel1.setOpaque(false);
 
 		fillPanel2 = new JPanel();
@@ -278,6 +288,11 @@ public class DendroView2 implements Observer, DendroPanel {
 		fillPanel4 = new JPanel();
 		fillPanel4.setOpaque(false);
 		
+		firstPanel = new JPanel();
+		firstPanel.setLayout(new MigLayout());
+		firstPanel.setOpaque(false);
+		firstPanel.setBorder(null);
+		
 		navPanel = new JPanel();
 		navPanel.setLayout(new MigLayout());
 		navPanel.setOpaque(false);
@@ -285,33 +300,33 @@ public class DendroView2 implements Observer, DendroPanel {
 
 		textpanel = new JPanel();
 		textpanel.setLayout(new MigLayout("ins 0"));
-		textpanel.setOpaque(false);
+		textpanel.setOpaque(true);
 		
-		finderPanel = new JPanel();
-		finderPanel.setLayout(new MigLayout());
-		finderPanel.setOpaque(false);
+		if(gtrview.isEnabled() || atrview.isEnabled()) {
+			tvFrame.getTreeButton().setEnabled(true);
+			
+		} else {
+			tvFrame.getTreeButton().setEnabled(false);
+			tvFrame.getTreeButton().setText("");
+		}
 		
-		gtrPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, gtrview,
-				textpanel);
-		gtrPane.setResizeWeight(0.5);
-		gtrPane.setOpaque(false);
-		gtrPane.setBorder(null);
-		
-		if(gtrview.isEnabled()) {
+		if(showTrees) {
+			gtrPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, gtrview,
+					textpanel);
+			gtrPane.setResizeWeight(0.5);
+			gtrPane.setOpaque(false);
+			gtrPane.setBorder(null);
 			gtr_div_size = 3;
-		}
-		gtrPane.setDividerSize(gtr_div_size);
-
-		atrPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, atrview,
-				arraynameview);
-		atrPane.setResizeWeight(0.5);
-		atrPane.setOpaque(false);
-		atrPane.setBorder(null);
-		
-		if(atrview.isEnabled()) {
+			gtrPane.setDividerSize(gtr_div_size);
+	
+			atrPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, atrview,
+					arraynameview);
+			atrPane.setResizeWeight(0.5);
+			atrPane.setOpaque(false);
+			atrPane.setBorder(null);
 			atr_div_size = 3;
-		}
-		atrPane.setDividerSize(atr_div_size);
+			atrPane.setDividerSize(atr_div_size);
+		} 
 		
 		// Adding Components onto each other
 		textpanel.add(textview.getComponent(), "push, grow");
@@ -323,27 +338,76 @@ public class DendroView2 implements Observer, DendroPanel {
 		crossPanel.add(scaleDecY, "span, alignx 50%");
 
 		buttonPanel.add(crossPanel, "pushx, alignx 50%, wrap");
-		buttonPanel.add(scaleDefaultAll, "pushx, alignx 50%");
 		
-		finderPanel.add(getGeneFinderPanel(), "w 90%, h 30%, " +
-				"alignx 50%, wrap");
-		finderPanel.add(getArrayFinderPanel(), "w 90%, h 30%, " +
-				"alignx 50%");
+		navPanel.add(buttonPanel, "pushx, h 20%, w 90%, alignx 50%, wrap");
+		navPanel.add(scaleDefaultAll, "pushx, alignx 50%");
 
-		navPanel.add(buttonPanel, "h 20%, w 90%, alignx 50%, wrap");
-		navPanel.add(finderPanel, "pushy, h 20%, w 70%, alignx 50%, " +
-				"aligny 10%");
+//		navPanel.add(buttonPanel, "pushx, h 20%, w 90%, alignx 50%, wrap");
+//		navPanel.add(scaleDefaultAll, "pushx, alignx 50%");
+//		dendroPane.add(firstPanel, "w 18.5%::, h 20%");
+//		dendroPane.add(atrPane, "w 72%, h 20%");
+//		dendroPane.add(fillPanel1, "span 2, w ::19.5%, h 20%, wrap");
+//		dendroPane.add(gtrPane, "w 18.5%::, h 75%");
+//		dendroPane.add(globalview, "w 72%, h 75%");
+//		dendroPane.add(globalYscrollbar, "w 1%, h 75%");
+//		dendroPane.add(navPanel, "w ::18.5%, h 75%, wrap");
+//		dendroPane.add(fillPanel2, "w 18.5%::, h 5%");
+//		dendroPane.add(globalXscrollbar, "pushy, aligny 0%, w 72%, h 1%");
+//		dendroPane.add(fillPanel3, "span 2, w ::19.5%, h 5%");
 		
-		dendroPane.add(fillPanel4, "w 18.5%::, h 20%");
-		dendroPane.add(atrPane, "w 72%, h 20%");
-		dendroPane.add(fillPanel1, "span 2, w ::19.5%, h 20%, wrap");
-		dendroPane.add(gtrPane, "w 18.5%::, h 75%");
-		dendroPane.add(globalview, "w 72%, h 75%");
-		dendroPane.add(globalYscrollbar, "w 1%, h 75%");
-		dendroPane.add(navPanel, "w ::18.5%, h 75%, wrap");
-		dendroPane.add(fillPanel2, "w 18.5%::, h 5%");
-		dendroPane.add(globalXscrollbar, "pushy, aligny 0%, w 72%, h 1%");
-		dendroPane.add(fillPanel3, "span 2, w ::19.5%, h 5%");
+		// Layout depends on which dendrogram is shown or not!
+		if(showTrees && (atrview.isEnabled() && gtrview.isEnabled())) {
+			dendroPane.add(firstPanel, "w 18.5%, h 20%");
+			dendroPane.add(atrPane, "w 72%, h 20%");
+			dendroPane.add(fillPanel1, "span 2, w 11.5%, h 20%, wrap");
+			dendroPane.add(gtrPane, "span 1 2, w 18.5%, h 75%");
+			dendroPane.add(globalview, "w 72%, h 75%");
+			dendroPane.add(globalYscrollbar, "w 1%, h 75%");
+			dendroPane.add(navPanel, "w 10.5%, h 75%, wrap");
+			dendroPane.add(globalXscrollbar, "pushy, aligny 0%, w 72%, h 1%");
+			dendroPane.add(fillPanel3, "span 2 2, w 11.5%, h 5%, wrap");
+			dendroPane.add(fillPanel2, "w 18.5%, h 5%");
+			dendroPane.add(fillPanel4, "w 72%, h 1%");
+			
+		} else if(showTrees && (atrview.isEnabled() && !gtrview.isEnabled())) {
+			dendroPane.add(firstPanel, "w 18.5%, h 20%");
+			dendroPane.add(atrPane, "w 80%, h 20%");
+			dendroPane.add(fillPanel1, "span 2, w 11.5%, h 20%, wrap");
+			dendroPane.add(textpanel, "span 1 2, w 10.5%, h 75%");
+			dendroPane.add(globalview, "w 80%, h 75%");
+			dendroPane.add(globalYscrollbar, "w 1%, h 75%");
+			dendroPane.add(navPanel, "w 10.5%, h 75%, wrap");
+			dendroPane.add(globalXscrollbar, "pushy, aligny 0%, w 80%, h 1%");
+			dendroPane.add(fillPanel3, "span 2 2, w 11.5%, h 5%, wrap");
+			dendroPane.add(fillPanel2, "w 10.5%, h 5%");
+			dendroPane.add(fillPanel4, "w 80%, h 1%");
+			
+		} else if(showTrees && (!atrview.isEnabled() && gtrview.isEnabled())) {
+			dendroPane.add(firstPanel, "w 18.5%, h 10%");
+			dendroPane.add(arraynameview, "w 72%, h 10%");
+			dendroPane.add(fillPanel1, "span 2, w 11.5%, h 10%, wrap");
+			dendroPane.add(gtrPane, "span 1 2, w 18.5%, h 85%");
+			dendroPane.add(globalview, "w 72%, h 85%");
+			dendroPane.add(globalYscrollbar, "w 1%, h 85%");
+			dendroPane.add(navPanel, "w 10.5%, h 85%, wrap");
+			dendroPane.add(globalXscrollbar, "pushy, aligny 0%, w 72%, h 1%");
+			dendroPane.add(fillPanel3, "span 2 2, w 11.5%, h 5%, wrap");
+			dendroPane.add(fillPanel2, "w 18.5%, h 5%");
+			dendroPane.add(fillPanel4, "w 72%, h 1%");
+			
+		} else {
+			dendroPane.add(firstPanel, "w 10.5%, h 10%");
+			dendroPane.add(arraynameview, "w 80%, h 10%");
+			dendroPane.add(fillPanel1, "span 2, w 11.5%, h 10%, wrap");
+			dendroPane.add(textpanel, "span 1 2, w 10.5%, h 85%");
+			dendroPane.add(globalview, "w 80%, h 85%");
+			dendroPane.add(globalYscrollbar, "w 1%, h 85%");
+			dendroPane.add(navPanel, "w 10.5%, h 85%, wrap");
+			dendroPane.add(globalXscrollbar, "pushy, aligny 0%, w 80%, h 1%");
+			dendroPane.add(fillPanel3, "span 2 2, w 11.5%, h 5%, wrap");
+			dendroPane.add(fillPanel2, "span 1 2, w 10.5%, h 5%");
+			dendroPane.add(fillPanel4, "w 80%, h 1%");
+		}
 	}
 	
 	// Add Button Listeners
@@ -377,15 +441,32 @@ public class DendroView2 implements Observer, DendroPanel {
 		
 		getDendroPane().addComponentListener(l);
 	}
+	
+	public void addSearchButtonListener(MouseListener l) {
+		
+		tvFrame.getSearchButton().addMouseListener(l);
+	}
+	
+	public void addTreeButtonListener(MouseListener l) {
+		
+		tvFrame.getTreeButton().addMouseListener(l);
+	}
+	
+	public void addSearchButtonClickListener(ActionListener l) {
+		
+		tvFrame.getSearchButton().addActionListener(l);
+	}
+	
+	public void addTreeButtonClickListener(ActionListener l) {
+		
+		tvFrame.getTreeButton().addActionListener(l);
+	}
 
 	// Methods
 	/**
 	 * Redoing all the layout if parameters changed.
 	 */
 	public void refresh() {
-		
-		dendroPane.removeAll();
-		setupLayout();
 		
 		dendroPane.revalidate();
 		dendroPane.repaint();
@@ -427,12 +508,57 @@ public class DendroView2 implements Observer, DendroPanel {
 		
 		modelView.setViewFrame(tvFrame);
 	}
-
-	// Menus
+	
+	/**
+	 * Changes the visibility of dendrograms and resets the layout.
+	 * @param visible
+	 */
 	@Override
-	public void populateExportMenu(final TreeviewMenuBarI menu) {
+	public void setTreesVisible(boolean visible) {
+		
+		this.showTrees = visible;
+	}
+	
+	/**
+	 * Opens a JWindow containing Swing components used to search data
+	 * by name in the loaded TVModel.
+	 */
+	@Override
+	public JWindow openSearchPanel(){
+		
+		final JWindow window = new JWindow();
+		
+		JPanel container = new JPanel();
+		container.setLayout(new MigLayout());
+		container.setBackground(GUIParams.BG_COLOR);
+		container.setBorder(BorderFactory.createEtchedBorder(GUIParams.BORDERS, 
+				GUIParams.BG_COLOR));
+		
+		JButton closeButton = GUIParams.setButtonLayout("Close", null);
+		closeButton.addActionListener(new ActionListener() {
 
-		menu.addMenuItem("Export to Postscript...");
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				
+				window.dispose();
+			}
+		});
+		
+		container.add(getGeneFinderPanel(), "w 90%, h 40%, " +
+				"alignx 50%, wrap");
+		container.add(getArrayFinderPanel(), "w 90%, h 40%, " +
+				"alignx 50, wrap");
+		container.add(closeButton, "pushx, alignx 50%");
+		
+		window.getContentPane().add(container);
+		
+		return window;
+	}
+	
+//	@Override
+//	public void populateExportMenu(final TreeviewMenuBarI menu) {
+//
+//		menu.addMenuItem("Export to Postscript...");
 //		, new ActionListener() {
 //
 //			@Override
@@ -459,10 +585,10 @@ public class DendroView2 implements Observer, DendroPanel {
 //				popup.setVisible(true);
 //			}
 //		});
-		menu.setAccelerator(KeyEvent.VK_X);
-		menu.setMnemonic(KeyEvent.VK_X);
-
-		menu.addMenuItem("Export to Image...");
+//		menu.setAccelerator(KeyEvent.VK_X);
+//		menu.setMnemonic(KeyEvent.VK_X);
+//
+//		menu.addMenuItem("Export to Image...");
 //		, new ActionListener() {
 //
 //			@Override
@@ -488,9 +614,9 @@ public class DendroView2 implements Observer, DendroPanel {
 //				popup.setVisible(true);
 //			}
 //		});
-		menu.setMnemonic(KeyEvent.VK_I);
-
-		menu.addMenuItem("Export ColorBar to Postscript...");
+//		menu.setMnemonic(KeyEvent.VK_I);
+//
+//		menu.addMenuItem("Export ColorBar to Postscript...");
 //		, new ActionListener() {
 //
 //					@Override
@@ -510,9 +636,9 @@ public class DendroView2 implements Observer, DendroPanel {
 //						popup.setVisible(true);
 //					}
 //				});
-		menu.setMnemonic(KeyEvent.VK_B);
-
-		menu.addMenuItem("Export ColorBar to Image...");
+//		menu.setMnemonic(KeyEvent.VK_B);
+//
+//		menu.addMenuItem("Export ColorBar to Image...");
 //		, new ActionListener() {
 //
 //			@Override
@@ -530,11 +656,11 @@ public class DendroView2 implements Observer, DendroPanel {
 //				popup.setVisible(true);
 //			}
 //		});
-		menu.setMnemonic(KeyEvent.VK_M);
-
-		menu.addSeparator();
-		addSimpleExportOptions(menu);
-	}
+//		menu.setMnemonic(KeyEvent.VK_M);
+//
+//		menu.addSeparator();
+//		addSimpleExportOptions(menu);
+//	}
 
 	private void addSimpleExportOptions(final TreeviewMenuBarI menu) {
 
@@ -643,9 +769,9 @@ public class DendroView2 implements Observer, DendroPanel {
 	 * @param menu
 	 *            menu to add to
 	 */
-	@Override
-	public void populateAnalysisMenu(final TreeviewMenuBarI menu) {
-
+//	@Override
+//	public void populateAnalysisMenu(final TreeviewMenuBarI menu) {
+//
 //		menu.addMenuItem("Flip Array Tree Node", new ActionListener() {
 //
 //			@Override
@@ -750,25 +876,37 @@ public class DendroView2 implements Observer, DendroPanel {
 		// }
 		// });
 		// menu.setMnemonic(KeyEvent.VK_S);
-	}
+//	}
 
-	/**
-	 * adds DendroView stuff to Document menu
-	 * 
-	 * @param menu
-	 *            menu to add to
-	 */
+//	/**
+//	 * adds DendroView stuff to Document menu
+//	 * 
+//	 * @param menu
+//	 *            menu to add to
+//	 */
+//	@Override
+//	public void populateSettingsMenu(final TreeviewMenuBarI menu) {
+//		
+//		annotationsMenuItem = (JMenuItem) menu.addMenuItem(
+//				"Row and Column Labels", 0);
+//		menu.setMnemonic(KeyEvent.VK_R);
+//		tvFrame.addToMenuList(annotationsMenuItem);
+//		
+//		colorMenuItem = (JMenuItem) menu.addMenuItem("Color Settings", 1); 
+//		menu.setMnemonic(KeyEvent.VK_C);
+//		tvFrame.addToMenuList(colorMenuItem);
+//	}
+	
 	@Override
-	public void populateSettingsMenu(final TreeviewMenuBarI menu) {
+	public void addDendroMenus(JMenu menu) {
+	
+		annotationsMenuItem = new JMenuItem("Row and Column Labels");
+		menu.add(annotationsMenuItem);
+		tvFrame.addToStackMenuList(annotationsMenuItem);
 		
-		annotationsMenuItem = (JMenuItem) menu.addMenuItem(
-				"Row and Column Labels", 0);
-		menu.setMnemonic(KeyEvent.VK_R);
-		tvFrame.addToMenuList(annotationsMenuItem);
-		
-		colorMenuItem = (JMenuItem) menu.addMenuItem("Color Settings", 1); 
-		menu.setMnemonic(KeyEvent.VK_C);
-		tvFrame.addToMenuList(colorMenuItem);
+		colorMenuItem = new JMenuItem("Color Settings");
+		menu.add(colorMenuItem);
+		tvFrame.addToStackMenuList(colorMenuItem);
 	}
 
 //	/**
@@ -998,6 +1136,7 @@ public class DendroView2 implements Observer, DendroPanel {
 		return scaleDefaultAll;
 	}
 	
+	
 	public JScrollBar getXScroll() {
 		
 		return globalXscrollbar;
@@ -1054,5 +1193,22 @@ public class DendroView2 implements Observer, DendroPanel {
 	public ViewFrame getViewFrame() {
 
 		return tvFrame;
+	}
+	
+	/**
+	 * Returns a boolean which indicates whether the dendrogram ModelViews are
+	 * enabled.
+	 * @return
+	 */
+	public boolean treesEnabled() {
+		
+		boolean enabled = false;
+		
+		if(gtrview.isEnabled() || atrview.isEnabled()) {
+			enabled = true;
+			
+		}
+		
+		return enabled;
 	}
 }

@@ -22,9 +22,9 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import edu.stanford.genetics.treeview.ConfigNode;
+import java.util.prefs.Preferences;
+
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
-import edu.stanford.genetics.treeview.DummyConfigNode;
 
 /**
  * This class is a contract for maps between indexes and pixels. It would be an
@@ -36,21 +36,34 @@ public abstract class IntegerMap implements ConfigNodePersistent {
 	protected int availablepixels;
 	protected int maxindex;
 	protected int minindex;
-	protected ConfigNode root;
+	protected Preferences root;
 
 	public IntegerMap() {
 
 		availablepixels = 0;
 		maxindex = -1;
 		minindex = -1;
-		root = new DummyConfigNode(type());
+		root = Preferences.userRoot().node(type());
 	}
 
+//	@Override
+//	public void bindConfig(final Preferences configNode) {
+//
+//		root = configNode;
+//		root.put("type", type());
+//	}
+	
 	@Override
-	public void bindConfig(final ConfigNode configNode) {
+	public void setConfigNode(String key) {
 
-		root = configNode;
-		root.setAttribute("type", type(), null);
+		if(key == null) {
+			this.root = Preferences.userRoot().node(this.getClass().getName());
+			
+		} else {
+			this.root = Preferences.userRoot().node(key);
+		}
+		
+		root.put("type", type());
 	}
 
 	public IntegerMap createMap(final String string) {

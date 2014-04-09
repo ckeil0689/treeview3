@@ -1,28 +1,23 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.Cursor;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
 
-public class MenuPanel implements MouseListener {
+public class MenuPanel {
 	
 	private JLabel label;
 	private JPanel menuPanel;
-	private PreferencesMenu frame;
+	private boolean selected = false;
 	
-	public MenuPanel(String title, PreferencesMenu frame) {
-
-		this.frame = frame;
+	public MenuPanel(String title) {
 		
 		menuPanel = new JPanel();
 		menuPanel.setLayout(new MigLayout());
 		menuPanel.setBackground(GUIParams.BG_COLOR);
-		menuPanel.addMouseListener(this);
 		
 		label = new JLabel(title);
 		label.setFont(GUIParams.FONTS);
@@ -31,41 +26,41 @@ public class MenuPanel implements MouseListener {
 		menuPanel.add(label, "push");
 	}
 	
-	public JPanel makeMenuPanel() {
+	public JPanel getMenuPanel() {
 		
 		return menuPanel;
 	}
-
-	@Override
-	public void mouseClicked(MouseEvent arg0) {
+	
+	public void setSelected(boolean selected) {
 		
-		frame.addMenu(label.getText());
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent arg0) {
+		this.selected = selected;
 		
-		menuPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-		label.setForeground(GUIParams.MAIN);
-	}
-
-	@Override
-	public void mouseExited(MouseEvent arg0) {
+		if(selected) {
+			label.setForeground(GUIParams.MAIN);
+			
+		} else {
+			label.setForeground(GUIParams.TEXT);
+		}
 		
-		menuPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-		label.setForeground(GUIParams.TEXT);
+		menuPanel.repaint();
 	}
-
-	@Override
-	public void mousePressed(MouseEvent arg0) {
-		// TODO Auto-generated method stub
+	
+	public String getLabelText() {
 		
+		return label.getText();
 	}
-
-	@Override
-	public void mouseReleased(MouseEvent arg0) {
-		// TODO Auto-generated method stub
+	
+	public void setHover(boolean hover) {
 		
+		if(hover) {
+			label.setForeground(GUIParams.MAIN);
+			menuPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+			
+		} else {
+			if(!selected) {
+				label.setForeground(GUIParams.TEXT);
+			}
+			menuPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		}
 	}
-
 }

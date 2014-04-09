@@ -25,23 +25,23 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 import javax.swing.JOptionPane;
+
+import Controllers.TVFrameController;
 
 import edu.stanford.genetics.treeview.ExportException;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.MainProgramArgs;
-import edu.stanford.genetics.treeview.TVFrameController;
 import edu.stanford.genetics.treeview.TreeViewApp;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.Util;
-import edu.stanford.genetics.treeview.XmlConfig;
 import edu.stanford.genetics.treeview.core.PluginManager;
 import edu.stanford.genetics.treeview.model.TVModel;
-
-//import edu.stanford.genetics.treeview.ConfigNode;
 
 /**
  * Main class of LinkedView application. Mostly manages windows, and
@@ -76,9 +76,9 @@ public class LinkedViewApp extends TreeViewApp {
 	 * Constructor for the TreeViewApp object takes configuration from the
 	 * passed in XmlConfig.
 	 */
-	public LinkedViewApp(final XmlConfig xmlConfig) {
+	public LinkedViewApp(final Preferences configurations) {
 
-		super(xmlConfig, false);
+		super(configurations, false);
 		scanForPlugins();
 	}
 
@@ -110,7 +110,7 @@ public class LinkedViewApp extends TreeViewApp {
 			PluginManager.getPluginManager().loadPlugins(files, false);
 		}
 		PluginManager.getPluginManager().pluginAssignConfigNodes(
-				getGlobalConfig().getNode("Plugins"));
+				getGlobalConfig().node("Plugins"));
 	}
 
 	// private void dealWithRegistration() {
@@ -325,7 +325,12 @@ public class LinkedViewApp extends TreeViewApp {
 	protected void endProgram() {
 
 		if (getGlobalConfig() != null) {
-			getGlobalConfig().store();
+			try {
+				getGlobalConfig().flush();
+				
+			} catch (BackingStoreException e) {
+				e.printStackTrace();
+			}
 		}
 //		closeAllWindows();
 		System.exit(0);

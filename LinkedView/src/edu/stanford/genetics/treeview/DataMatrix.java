@@ -44,6 +44,25 @@ public interface DataMatrix {
 	 *         value, as defined by the constants in DataModel.
 	 */
 	double getValue(int col, int row);
+	
+	/**
+	 * Find the minimum and maximum value in the loaded dataset.
+	 */
+	void calculateMinMax();
+	
+	/**
+	 * Return the minimum value of the dataset. Used to calculate colors to
+	 * draw the pixels with DoubleArrayDrawer in DendroView.
+	 * @return
+	 */
+	double getMinVal();
+	
+	/**
+	 * Return the maximum value of the dataset. Used to calculate colors to
+	 * draw the pixels with DoubleArrayDrawer in DendroView.
+	 * @return
+	 */
+	double getMaxVal();
 
 	/**
 	 * Sets the value attribute of an element in the DataMatrix object

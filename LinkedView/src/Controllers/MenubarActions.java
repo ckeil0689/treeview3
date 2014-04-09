@@ -1,6 +1,5 @@
 package Controllers;
 
-import edu.stanford.genetics.treeview.TVFrameController;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 
 /**
@@ -53,10 +52,12 @@ public class MenubarActions {
 			
 		} else if(name.equalsIgnoreCase("Theme")
 				|| name.equalsIgnoreCase("Font")
-				|| name.equalsIgnoreCase("URL")
-				|| name.equalsIgnoreCase("Row and Column Labels")
+				|| name.equalsIgnoreCase("URL")){
+			controller.openPrefMenu(name, "Aesthetics");
+			
+		} else if(name.equalsIgnoreCase("Row and Column Labels")
 				|| name.equalsIgnoreCase("Color Settings")) {
-			controller.openPrefMenu(name);
+			controller.openPrefMenu(name, "Options");
 			
 		} else if(name.equalsIgnoreCase("Cluster")) {
 			controller.setupClusterView();

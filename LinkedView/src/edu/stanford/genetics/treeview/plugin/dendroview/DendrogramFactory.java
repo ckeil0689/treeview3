@@ -6,8 +6,8 @@
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.event.KeyEvent;
+import java.util.prefs.Preferences;
 
-import edu.stanford.genetics.treeview.ConfigNode;
 import edu.stanford.genetics.treeview.DendroPanel;
 import edu.stanford.genetics.treeview.MainPanel;
 import edu.stanford.genetics.treeview.PluginFactory;
@@ -25,7 +25,7 @@ import edu.stanford.genetics.treeview.core.PluginManager;
 public class DendrogramFactory extends PluginFactory {
 
 	// presets must be set before static initializer.
-	private static ColorPresets colorPresets = new ColorPresets();
+	private static ColorPresets2 colorPresets = new ColorPresets2();
 	private final ColorPresetEditor cpresetEditor;
 //	private JFrame cpresetFrame = null;
 
@@ -57,7 +57,7 @@ public class DendrogramFactory extends PluginFactory {
 	 * #createPlugin(edu.stanford.genetics.treeview.ConfigNode)
 	 */
 	@Override
-	public DendroPanel restorePlugin(final ConfigNode node,
+	public DendroPanel restorePlugin(final Preferences node,
 			final TreeViewFrame viewFrame) {
 
 		final DendroView2 dendroView = new DendroView2(node, viewFrame);
@@ -72,10 +72,11 @@ public class DendrogramFactory extends PluginFactory {
 	 * #setGlobalNode(edu.stanford.genetics.treeview.ConfigNode)
 	 */
 	@Override
-	public void setGlobalNode(final ConfigNode node) {
+	public void setGlobalNode(final Preferences node) {
 
 		super.setGlobalNode(node);
-		colorPresets.bindConfig(node.fetchOrCreate("ColorPresets"));
+		
+		colorPresets.setConfigNode("ColorPresets");
 
 		if (colorPresets.getNumPresets() == 0) {
 			colorPresets.addDefaultPresets();
@@ -133,13 +134,13 @@ public class DendrogramFactory extends PluginFactory {
 	 * 
 	 * @return color presets for dendrogram view
 	 */
-	public static ColorPresets getColorPresets() {
+	public static ColorPresets2 getColorPresets() {
 
 		return colorPresets;
 	}
 
 	@Override
-	public boolean configurePlugin(final ConfigNode node,
+	public boolean configurePlugin(final Preferences node,
 			final ViewFrame viewFrame) {
 
 		return true;

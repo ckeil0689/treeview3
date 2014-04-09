@@ -25,12 +25,14 @@ package edu.stanford.genetics.treeview;
 import java.util.Enumeration;
 import java.util.Observable;
 import java.util.Vector;
+import java.util.prefs.Preferences;
 
 public class LogBuffer extends Observable {
 
 	private static LogBuffer singleton = new LogBuffer();
 
-	private final ConfigNode root = new DummyConfigNode("LogBuffer");
+	private final Preferences root = 
+			Preferences.userRoot().node(this.getClass().getName());
 	private final int defaultLog = 0; // false
 	private final Vector<String> buffer = new Vector<String>(100, 100);
 
@@ -50,7 +52,7 @@ public class LogBuffer extends Observable {
 			return true;
 
 		} else {
-			return (root.getAttribute("print", 1) == 1);
+			return (root.getInt("print", 1) == 1);
 		}
 	}
 
@@ -60,7 +62,7 @@ public class LogBuffer extends Observable {
 	 */
 	public boolean getLog() {
 
-		return (root.getAttribute("log", defaultLog) == 1);
+		return (root.getInt("log", defaultLog) == 1);
 	}
 
 	public void setLog(final boolean bool) {
@@ -71,10 +73,10 @@ public class LogBuffer extends Observable {
 		}
 
 		if (bool) {
-			root.setAttribute("log", 1, defaultLog);
+			root.putInt("log", 1);
 
 		} else {
-			root.setAttribute("log", 0, defaultLog);
+			root.putInt("log", 0);
 		}
 
 		setChanged();

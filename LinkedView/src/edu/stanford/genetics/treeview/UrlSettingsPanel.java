@@ -33,6 +33,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -86,7 +87,8 @@ public class UrlSettingsPanel extends JPanel implements SettingsPanel {
 
 	public static void main(final String[] argv) {
 
-		final UrlPresets p = new UrlPresets(new DummyConfigNode("UrlPresets"));
+		final UrlPresets p = new UrlPresets("UrlSettingsPanel");
+		p.setConfigNode(null);
 		final HeaderInfo hi = new DummyHeaderInfo();
 		final UrlExtractor ue = new UrlExtractor(hi);
 

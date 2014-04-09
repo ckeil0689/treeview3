@@ -39,12 +39,12 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.Observable;
+import java.util.prefs.Preferences;
 
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
 import net.miginfocom.swing.MigLayout;
-import edu.stanford.genetics.treeview.ConfigNode;
 import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
@@ -65,7 +65,7 @@ public class TextView extends ModelView implements FontSelectable, KeyListener,
 	private final int d_style = 0;
 	private final int d_size = 12;
 
-	private ConfigNode root = null;
+	private Preferences root = null;
 
 	private String face;
 	private int style;
@@ -126,7 +126,9 @@ public class TextView extends ModelView implements FontSelectable, KeyListener,
 		l2.setForeground(GUIParams.TEXT);
 		add(l2, "alignx 50%, aligny 0%, push");
 
-		scrollPane = new JScrollPane(this);
+		scrollPane = new JScrollPane(this,
+				JScrollPane.VERTICAL_SCROLLBAR_NEVER,
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setBorder(null);
 		panel = scrollPane;
 	}
@@ -523,7 +525,7 @@ public class TextView extends ModelView implements FontSelectable, KeyListener,
 			face = string;
 
 			if (root != null) {
-				root.setAttribute("face", face, d_face);
+				root.put("face", face);
 			}
 
 			setFont(new Font(face, style, size));
@@ -539,7 +541,7 @@ public class TextView extends ModelView implements FontSelectable, KeyListener,
 			size = i;
 
 			if (root != null) {
-				root.setAttribute("size", size, d_size);
+				root.putInt("size", size);
 			}
 
 			setFont(new Font(face, style, size));
@@ -550,11 +552,12 @@ public class TextView extends ModelView implements FontSelectable, KeyListener,
 
 	@Override
 	public void setStyle(final int i) {
+		
 		if (style != i) {
 			style = i;
 
 			if (root != null) {
-				root.setAttribute("style", style, d_style);
+				root.putInt("style", style);
 			}
 
 			setFont(new Font(face, style, size));
@@ -563,15 +566,34 @@ public class TextView extends ModelView implements FontSelectable, KeyListener,
 		}
 	}
 
-	public void bindConfig(final ConfigNode configNode) {
+//	public void bindConfig(final Preferences configNode) {
+//
+//		root = configNode;
+//
+//		setFace(root.get("face", d_face));
+//		setStyle(root.getInt("style", d_style));
+//		setPoints(root.getInt("size", d_size));
+//
+////		getHeaderSummary().bindConfig(root.fetchOrCreate("GeneSummary"));
+//		getHeaderSummary().setConfigNode("GeneSummary");
+//	}
+	public void setConfigNode(String key) {
 
-		root = configNode;
+		if(key == null) {
+			this.root = 
+					Preferences.userRoot().node(this.getClass().getName());
+			
+		} else {
+			this.root = 
+					Preferences.userRoot().node(key);
+		}
 
-		setFace(root.getAttribute("face", d_face));
-		setStyle(root.getAttribute("style", d_style));
-		setPoints(root.getAttribute("size", d_size));
+		setFace(root.get("face", d_face));
+		setStyle(root.getInt("style", d_style));
+		setPoints(root.getInt("size", d_size));
 
-		getHeaderSummary().bindConfig(root.fetchOrCreate("GeneSummary"));
+//		getHeaderSummary().bindConfig(root.fetchOrCreate("GeneSummary"));
+		getHeaderSummary().setConfigNode("GeneSummary");
 	}
 
 	/** Setter for headerSummary */

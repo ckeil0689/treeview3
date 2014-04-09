@@ -23,6 +23,7 @@
 package edu.stanford.genetics.treeview;
 
 import java.io.File;
+import java.util.prefs.Preferences;
 
 /**
  * Encapsulates a set of files corresponding to a typical hierarchical cluster
@@ -45,7 +46,8 @@ import java.io.File;
  */
 
 public class CDTFileSet extends FileSet {
-	private ConfigNode node = null;
+	
+	private Preferences node = null;
 
 	@Override
 	public boolean hasMoved() {
@@ -65,7 +67,7 @@ public class CDTFileSet extends FileSet {
 	 * @param configNode
 	 *            ConfigNode to base this fileset on.
 	 */
-	public CDTFileSet(final ConfigNode configNode) {
+	public CDTFileSet(final Preferences configNode) {
 
 		super(configNode);
 		node = configNode;
@@ -83,7 +85,8 @@ public class CDTFileSet extends FileSet {
 	public CDTFileSet(final String cdt, final String dir) {
 
 		super(dir);
-		node = new DummyConfigNode("FileSet");
+//		node = new DummyConfigNode("FileSet");
+		node = Preferences.userRoot().node(this.getClass().getName());
 		setCdt(cdt);
 	}
 
@@ -134,7 +137,8 @@ public class CDTFileSet extends FileSet {
 	 */
 	@Override
 	public String getExt() {
-		return node.getAttribute("cdt", ".cdt");
+		
+		return node.get("cdt", ".cdt");
 	}
 
 	/**
@@ -159,7 +163,8 @@ public class CDTFileSet extends FileSet {
 	 */
 	@Override
 	public void setExt(final String string) {
-		node.setAttribute("cdt", string, ".cdt");
+		
+		node.put("cdt", string);
 	}
 
 	// the following concerns types which you can open as...

@@ -23,18 +23,22 @@
 package edu.stanford.genetics.treeview;
 
 import java.util.Observable;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 /**
  * this class generates a single string summary of a HeaderInfo.
  */
 public class HeaderSummary extends Observable implements ConfigNodePersistent {
 
-	private ConfigNode root;
+	private Preferences configNode;
 	private int[] included = new int[] { 1 };
+	private String type;
 
-	public HeaderSummary() {
+	public HeaderSummary(String type) {
 
 		super();
+		this.type = type;
 	}
 
 	public void setIncluded(final int[] newIncluded) {
@@ -135,20 +139,34 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		return out;
 	}
 
+//	@Override
+//	public void bindConfig(final Preferences configNode) {
+//		
+//		root = configNode;
+//		synchronizeFrom();
+//	}
+	
 	@Override
-	public void bindConfig(final ConfigNode configNode) {
-		root = configNode;
+	public void setConfigNode(Preferences parentNode) {
+		
+		if(parentNode != null) {
+			this.configNode = parentNode.node(type);
+			
+		} else {
+			LogBuffer.println("Could not find or create HeaderSummary" +
+					"node because parentNode was null.");
+		}
 		synchronizeFrom();
 	}
 
 	private void synchronizeFrom() {
 
-		if (root == null) {
+		if (configNode == null) {
 			return;
 		}
 
-		if (root.hasAttribute("included")) {
-			final String incString = root.getAttribute("included", "1");
+		if (nodeHasAttribute("included")) {
+			final String incString = configNode.get("included", "1");
 			if (incString.equals("")) {
 				setIncluded(new int[0]);
 
@@ -185,7 +203,7 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 
 	private void synchronizeTo() {
 
-		if (root == null) {
+		if (configNode == null) {
 			return;
 		}
 
@@ -200,6 +218,28 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 			temp.append(",");
 			temp.append(vec[i]);
 		}
-		root.setAttribute("included", temp.toString(), "1");
+		configNode.put("included", temp.toString());
+	}
+	
+	public boolean nodeHasAttribute(String name) {
+		
+		boolean contains = false;
+		
+		try {
+			String[] keys = configNode.keys();
+			
+			for(int i = 0; i < keys.length; i++) {
+				
+				if(keys[i].equalsIgnoreCase(name)) {
+					contains = true;
+					break;
+				}
+			}
+			return contains;
+			
+		} catch (BackingStoreException e) {
+			e.printStackTrace();
+			return contains;
+		}
 	}
 }

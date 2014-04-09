@@ -98,20 +98,22 @@ public abstract class HeaderFinderBox {
 		geneList = new ArrayList<String>();
 		genefHeaders = getGenes(hA);
 		
+		for (final String gene : genefHeaders) {
+
+			geneList.add(gene);
+		}
+		
 		String [] labeledHeaders = new String[genefHeaders.length + 1];
 		
 		labeledHeaders[0] = genef;
 		
 		Arrays.sort(genefHeaders);
 		
+//		String[] geneHeaderClones = genefHeaders.clone();
+		
 		for(int i = 0; i < genefHeaders.length; i++) {
 			
 			labeledHeaders[i + 1] = genefHeaders[i];
-		}
-		
-		for (final String gene : genefHeaders) {
-
-			geneList.add(gene);
 		}
 
 		genefBox = GUIParams.setComboLayout(labeledHeaders);

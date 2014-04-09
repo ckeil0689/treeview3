@@ -5,10 +5,11 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
+import java.util.prefs.Preferences;
+
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
-import edu.stanford.genetics.treeview.ConfigNode;
 import edu.stanford.genetics.treeview.DendroPanel;
 import edu.stanford.genetics.treeview.MainPanel;
 import edu.stanford.genetics.treeview.PluginFactory;
@@ -17,6 +18,7 @@ import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.core.PluginManager;
 
 public class AlignmentFactory extends PluginFactory {
+	
 	static {
 		PluginManager.registerPlugin(new AlignmentFactory());
 	}
@@ -28,6 +30,7 @@ public class AlignmentFactory extends PluginFactory {
 	 */
 	@Override
 	public String getPluginName() {
+		
 		return "Alignment";
 	}
 
@@ -39,8 +42,9 @@ public class AlignmentFactory extends PluginFactory {
 	 * .genetics.treeview.ConfigNode)
 	 */
 	@Override
-	public DendroPanel restorePlugin(final ConfigNode node,
+	public DendroPanel restorePlugin(final Preferences node,
 			final TreeViewFrame viewFrame) {
+		
 //		if (node.getAttribute("headerName", null) == null) {
 //			return null;
 //		} else {
@@ -64,11 +68,11 @@ public class AlignmentFactory extends PluginFactory {
 	 * .genetics.treeview.ConfigNode, edu.stanford.genetics.treeview.ViewFrame)
 	 */
 	@Override
-	public boolean configurePlugin(final ConfigNode node,
+	public boolean configurePlugin(final Preferences node,
 			final ViewFrame viewFrame) {
 		
 		if (viewFrame.getDataModel().getGeneHeaderInfo().getIndex("ALN") >= 0) {
-			node.setAttribute("headerName", "ALN", null);
+			node.put("headerName", "ALN");
 			return true;
 			
 		} else {

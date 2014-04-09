@@ -21,16 +21,17 @@ public class DMCalculatorArrays {
 	
 	private final ClusterView clusterView;
 	private final String choice;
+	private final String type;
 
 	// Constructor
 	public DMCalculatorArrays(final double[][] fullList,
-			final String choice, final ClusterView clusterView) {
+			final String choice, final String type,
+			final ClusterView clusterView) {
 
 		this.dataArrays = fullList;
 		this.choice = choice;
 		this.clusterView = clusterView;
-		
-		clusterView.setLoadText("Calculating distance matrix...");
+		this.type = type;
 	}
 
 	// Methods to calculate distance matrix
@@ -47,7 +48,8 @@ public class DMCalculatorArrays {
 	public void pearson(final boolean absolute, final boolean centered) {
 
 		// Reset in case Spearman Rank was used
-		clusterView.setLoadText("Calculating Distance Matrix...");
+		clusterView.setLoadText("Calculating " + type 
+				+ " Distance Matrix...");
 		
 		clusterView.setPBarMax(dataArrays.length);
 
@@ -159,7 +161,7 @@ public class DMCalculatorArrays {
 	 */
 	public void spearman() {
 		
-		clusterView.setLoadText("Getting Spearman Ranks...");
+		clusterView.setLoadText("Getting " + type + " Spearman Ranks...");
 
 		for (int i = 0; i < dataArrays.length; i++) {
 			
@@ -202,6 +204,9 @@ public class DMCalculatorArrays {
 		double g2 = 0;
 		double gDiff = 0;
 
+		clusterView.setLoadText("Calculating " + type 
+				+ " Distance Matrix...");
+		
 		clusterView.setPBarMax(dataArrays.length);
 
 		// making sure distanceList is empty
@@ -265,6 +270,8 @@ public class DMCalculatorArrays {
 		double g2 = 0;
 		double gDiff = 0;
 
+		clusterView.setLoadText("Calculating " + type 
+				+ " Distance Matrix...");
 		clusterView.setPBarMax(dataArrays.length);
 
 		// making sure distanceList is clear

@@ -7,11 +7,10 @@ package edu.stanford.genetics.treeview.model;
 
 import java.util.Observable;
 import java.util.Observer;
+import java.util.prefs.Preferences;
 
-import edu.stanford.genetics.treeview.ConfigNode;
 import edu.stanford.genetics.treeview.DataMatrix;
 import edu.stanford.genetics.treeview.DataModel;
-import edu.stanford.genetics.treeview.DummyConfigNode;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.FileSetListener;
 import edu.stanford.genetics.treeview.HeaderInfo;
@@ -37,7 +36,8 @@ public class ReorderedDataModel extends Observable implements DataModel {
 	private final DataModel parent;
 	private final int[] geneIndex;
 	private final int[] arrayIndex;
-	private ConfigNode documentConfig = new DummyConfigNode("SubDataModel");
+	private Preferences documentConfig = Preferences.userRoot()
+			.node("SubDataModel");
 
 	/**
 	 * Builds data model which corresponds to a reordered version of the source
@@ -171,6 +171,24 @@ public class ReorderedDataModel extends Observable implements DataModel {
 		public int getNumUnappendedRow() {
 
 			return 0;
+		}
+
+		@Override
+		public void calculateMinMax() {
+			
+			parent.getDataMatrix().calculateMinMax();
+		}
+
+		@Override
+		public double getMinVal() {
+			
+			return parent.getDataMatrix().getMinVal();
+		}
+
+		@Override
+		public double getMaxVal() {
+			
+			return parent.getDataMatrix().getMaxVal();
 		}
 	}
 
@@ -314,7 +332,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 	 * @see edu.stanford.genetics.treeview.DataModel#getDocumentConfig()
 	 */
 	@Override
-	public ConfigNode getDocumentConfigRoot() {
+	public Preferences getDocumentConfigRoot() {
 
 		return documentConfig;
 	}

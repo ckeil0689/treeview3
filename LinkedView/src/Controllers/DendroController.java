@@ -1,32 +1,39 @@
 package Controllers;
 
+import java.awt.Cursor;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Observable;
 import java.util.concurrent.ExecutionException;
+import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JWindow;
+import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import edu.stanford.genetics.treeview.CdtFilter;
-import edu.stanford.genetics.treeview.ConfigNode;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.DataModel;
-import edu.stanford.genetics.treeview.DummyConfigNode;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LoadException;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ReorderedTreeSelection;
 import edu.stanford.genetics.treeview.TreeDrawerNode;
 import edu.stanford.genetics.treeview.TreeSelectionI;
@@ -35,11 +42,9 @@ import edu.stanford.genetics.treeview.model.AtrTVModel;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.plugin.dendroview.ArrayDrawer;
 import edu.stanford.genetics.treeview.plugin.dendroview.AtrAligner;
-import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
-import edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets;
+import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor2;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroException;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
-import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
 import edu.stanford.genetics.treeview.plugin.dendroview.DoubleArrayDrawer;
 import edu.stanford.genetics.treeview.plugin.dendroview.InvertedTreeDrawer;
 import edu.stanford.genetics.treeview.plugin.dendroview.LeftTreeDrawer;
@@ -52,7 +57,7 @@ public class DendroController implements ConfigNodePersistent {
 	private TreeViewFrame tvFrame;
 	private TVModel tvModel;
 	
-	protected ConfigNode root;
+	protected Preferences configNode;
 	
 	private int[] arrayIndex = null;
 	private int[] geneIndex = null;
@@ -71,24 +76,202 @@ public class DendroController implements ConfigNodePersistent {
 	private TreeSelectionI arraySelection = null;
 	
 	// Color Extractor
-	private ColorExtractor colorExtractor;
+	private ColorExtractor2 colorExtractor;
 	
 	public DendroController(DendroView2 dendroView, TreeViewFrame tvFrame, 
-			TVModel tvModel, ConfigNode root) {
+			TVModel tvModel, Preferences root) {
 		
 		this.dendroView = dendroView;
 		this.tvFrame = tvFrame;
 		this.tvModel = tvModel;
-		this.root = root;
+		this.configNode = root;
 		
-		checkConfig();
+		setConfigNode(tvFrame.getConfigNode());
 		bindComponentFunctions();
 		dendroView.setupLayout();
+		dendroView.refresh();
+		resetMapContainers();
 		
 		// add listeners
+		addViewListeners();
+		addMenuButtonListeners();
+	}
+	
+	/**
+	 * Recalculates proportions for the MapContainers, when the layout was
+	 * changed by removing or adding components, or resizing the TVFrame.
+	 * Only works if GlobalView is already resized (has availablePixels set
+	 * to new value!).
+	 */
+	public void resetMapContainers() {
+		
+		dendroView.getGlobalView().resetHome(true);
+	}
+	
+	public void addViewListeners() {
+		
 		dendroView.addScaleListener(new ScaleListener());
 		dendroView.addZoomListener(new ZoomListener());
 		dendroView.addCompListener(new ResizeListener());
+	}
+	
+	public void addMenuButtonListeners() {
+		
+		dendroView.addSearchButtonListener(new SearchButtonListener());
+		dendroView.addSearchButtonClickListener(
+				new SearchButtonClickListener());
+		dendroView.addTreeButtonListener(new TreeButtonListener());
+		dendroView.addTreeButtonClickListener(new TreeButtonClickListener());
+	}
+	
+	class SearchButtonListener implements MouseListener {
+
+		@Override
+		public void mouseClicked(MouseEvent e) {}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			
+			e.getComponent().setCursor(new Cursor(Cursor.HAND_CURSOR));
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+			
+			e.getComponent().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {}
+
+		@Override
+		public void mouseReleased(MouseEvent arg0) {}
+	}
+	
+	
+	class SearchButtonClickListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			
+			new SearchWindowOpener(e).run();
+		}
+	}
+	
+	/**
+	 * SwingWorker which opens the label search panel.
+	 * @author CKeil
+	 *
+	 */
+	class SearchWindowOpener extends SwingWorker<Void, Void> {
+
+		private JWindow window;
+		private ActionEvent event;
+		
+		SearchWindowOpener (ActionEvent e) {
+			
+			this. event = e;
+		}
+		@Override
+		protected Void doInBackground() throws Exception {
+			
+			window = dendroView.openSearchPanel(); 
+			Point location = ((JButton)event.getSource()).getLocation();
+			int height = ((JButton)event.getSource()).getHeight();
+			
+			window.setLocation(location.x, location.y + (2 * height));
+			window.pack();
+			return null;
+		}
+		
+		@Override
+		protected void done() {
+			
+			if(window != null) {
+				window.setVisible(true);
+			}
+		}
+	}
+	
+	/**
+	 * Listener for the button that handles cursor change when the mouse
+	 * enters its area.
+	 * @author CKeil
+	 *
+	 */
+	class TreeButtonListener implements MouseListener {
+
+		@Override
+		public void mouseClicked(MouseEvent e) {}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			
+			e.getComponent().setCursor(new Cursor(Cursor.HAND_CURSOR));
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+			
+			e.getComponent().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {}
+
+		@Override
+		public void mouseReleased(MouseEvent arg0) {}
+	}
+	
+	/**
+	 * Listener for the button that is responsible to show/ hide 
+	 * Dendrograms. It switches between JSplitPanes and JPanels in DendroView
+	 * and causes DendroView to reset its layout, re-add the listeners,
+	 * and reset the MapContainers to adjust to 
+	 * the different size of GlobalView.
+	 * @author CKeil
+	 *
+	 */
+	class TreeButtonClickListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			
+			new TreeButtonClicker().run();
+		}
+	}
+	
+	/**
+	 * SwingWorker which changes the visibility of Dendrograms.
+	 * @author CKeil
+	 *
+	 */
+	class TreeButtonClicker extends SwingWorker<Void, Void> {
+
+		@Override
+		protected Void doInBackground() throws Exception {
+			
+			if(tvFrame.getTreeButton().getText()
+					.equalsIgnoreCase("SHOW TREES")) {
+				tvFrame.getTreeButton().setText("HIDE TREES");
+				dendroView.setTreesVisible(true);
+				
+			} else {
+				tvFrame.getTreeButton().setText("SHOW TREES");
+				dendroView.setTreesVisible(false);
+			}
+			
+			dendroView.setupLayout();
+			addViewListeners();
+			return null;
+		}
+		
+		@Override
+		protected void done() {
+			
+			dendroView.refresh();
+			resetMapContainers();
+		}
 	}
 	
 	/**
@@ -103,22 +286,81 @@ public class DendroController implements ConfigNodePersistent {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
-			if(e.getSource() == dendroView.getXPlusButton()) {
-				globalXmap.zoomIn();
+			new ScaleChanger(e).run();
+//			if(e.getSource() == dendroView.getXPlusButton()) {
+//				getGlobalXMap().zoomIn();
+//				
+//			} else if(e.getSource() == dendroView.getXMinusButton()) {
+//				getGlobalXMap().zoomOut();
+//				
+//			} else if(e.getSource() == dendroView.getYPlusButton()) {
+//				getGlobalYMap().zoomIn();
+//				
+//			} else if(e.getSource() == dendroView.getYMinusButton()) {
+//				getGlobalYMap().zoomOut();
+//				
+//			} else if(e.getSource() == dendroView.getHomeButton()) {
+//				// GlobalView size known, this is why it works
+////				resetMapContainers();
+//				dendroView.getGlobalView().resetHome(true);
+//				
+//			} else {
+//				LogBuffer.println("Got weird source for actionPerformed() " +
+//						"in DendroController ScaleListener.");
+//			}
+//			
+//			getGlobalXMap().notifyObservers();
+//			getGlobalYMap().notifyObservers();
+		}
+	}
+	
+	/**
+	 * SwingWorker which changes the scale of either x or y MapContainer or
+	 * both. Notifies MapContainer's observers when done.
+	 * @author CKeil
+	 *
+	 */
+	class ScaleChanger extends SwingWorker<Void, Void> {
+		
+		private ActionEvent event;
+		
+		ScaleChanger(ActionEvent e) {
+			
+			this.event = e;
+		}
+		
+		@Override
+		protected Void doInBackground() throws Exception {
+			
+			if(event.getSource() == dendroView.getXPlusButton()) {
+				getGlobalXMap().zoomIn();
 				
-			} else if(e.getSource() == dendroView.getXMinusButton()) {
-				globalXmap.zoomOut();
+			} else if(event.getSource() == dendroView.getXMinusButton()) {
+				getGlobalXMap().zoomOut();
 				
-			} else if(e.getSource() == dendroView.getYPlusButton()) {
-				globalYmap.zoomIn();
+			} else if(event.getSource() == dendroView.getYPlusButton()) {
+				getGlobalYMap().zoomIn();
 				
-			} else if(e.getSource() == dendroView.getYMinusButton()) {
-				globalYmap.zoomOut();
+			} else if(event.getSource() == dendroView.getYMinusButton()) {
+				getGlobalYMap().zoomOut();
 				
-			} else if(e.getSource() == dendroView.getHomeButton()) {
-				globalXmap.setHome();
-				globalYmap.setHome();
+			} else if(event.getSource() == dendroView.getHomeButton()) {
+				// GlobalView size known, this is why it works
+//				resetMapContainers();
+				dendroView.getGlobalView().resetHome(true);
+				
+			} else {
+				LogBuffer.println("Got weird source for actionPerformed() " +
+						"in DendroController ScaleListener.");
 			}
+			return null;
+		}
+		
+		@Override
+		protected void done() {
+			
+			getGlobalXMap().notifyObservers();
+			getGlobalYMap().notifyObservers();
 		}
 	}
 	
@@ -134,7 +376,6 @@ public class DendroController implements ConfigNodePersistent {
 			
 			dendroView.zoomSelection();
 		}
-		
 	}
 	
 	/**
@@ -147,34 +388,33 @@ public class DendroController implements ConfigNodePersistent {
 				
 		// Component Listeners
 		@Override
-		public void componentHidden(final ComponentEvent arg0) {
-		}
+		public void componentHidden(final ComponentEvent arg0) {}
 
 		@Override
-		public void componentMoved(final ComponentEvent arg0) {
-		}
+		public void componentMoved(final ComponentEvent arg0) {}
 
 		@Override
 		public void componentResized(final ComponentEvent arg0) {
 			
-			if (globalXmap.getAvailablePixels() > globalXmap.getUsedPixels()
-					&& globalXmap.getScale() == globalXmap.getMinScale()) {
-				globalXmap.setHome();
-			}
-
-			if (globalYmap.getAvailablePixels() > globalYmap.getUsedPixels()
-					&& globalYmap.getScale() == globalYmap.getMinScale()) {
-				globalYmap.setHome();
-			}
-
-			dendroView.getDendroPane().revalidate();
-			dendroView.getDendroPane().repaint();
+//			if (globalXmap.getAvailablePixels() > globalXmap.getUsedPixels()
+//					&& globalXmap.getScale() == globalXmap.getMinScale()) {
+//				globalXmap.setHome();
+//				globalXmap.notifyObservers();
+//			}
+//
+//			if (globalYmap.getAvailablePixels() > globalYmap.getUsedPixels()
+//					&& globalYmap.getScale() == globalYmap.getMinScale()) {
+//				globalYmap.setHome();
+//				globalYmap.notifyObservers();
+//			}
+			resetMapContainers();
 		}
 
 		@Override
-		public void componentShown(final ComponentEvent arg0) {
-		}
+		public void componentShown(final ComponentEvent arg0) {}
 	}
+	
+	
 	
 	public void saveImage(final JPanel panel) throws IOException {
 
@@ -204,59 +444,58 @@ public class DendroController implements ConfigNodePersistent {
 		}
 	}
 	
-	/**
-	 * binds this dendroView to a particular confignode, resizing the panel
-	 * sizes appropriately.
-	 * 
-	 * @param configNode
-	 *            ConfigNode to bind to
-	 */
-
-	@Override
-	public void bindConfig(final ConfigNode configNode) {
-		
-		root = configNode;
-		/*
-		 * ConfigNode heightNodes[] = root.fetch("Height"); ConfigNode
-		 * widthNodes[] = root.fetch("Width");
-		 * 
-		 * float heights[]; float widths[]; if (heightNodes.length != 0) {
-		 * heights = new float[heightNodes.length]; widths = new
-		 * float[widthNodes.length]; for (int i = 0; i < heights.length; i++) {
-		 * heights[i] = (float) heightNodes[i].getAttribute( "value", 1.0 /
-		 * heights.length); } for (int j = 0; j < widths.length; j++) {
-		 * widths[j] = (float) widthNodes[j].getAttribute( "value", 1.0 /
-		 * widths.length); } } else { widths = new float[]{2 / 11f, 3 / 11f, 3 /
-		 * 11f, 3 / 11f}; heights = new float[]{3 / 16f, 1 / 16f, 3 / 4f}; }
-		 * setHeights(heights); setWidths(widths);
-		 */
-	}
+//	/**
+//	 * binds this dendroView to a particular confignode, resizing the panel
+//	 * sizes appropriately.
+//	 * 
+//	 * @param configNode
+//	 *            ConfigNode to bind to
+//	 */
+//
+//	@Override
+//	public void bindConfig(final Preferences configNode) {
+//		
+//		root = configNode;
+//		/*
+//		 * ConfigNode heightNodes[] = root.fetch("Height"); ConfigNode
+//		 * widthNodes[] = root.fetch("Width");
+//		 * 
+//		 * float heights[]; float widths[]; if (heightNodes.length != 0) {
+//		 * heights = new float[heightNodes.length]; widths = new
+//		 * float[widthNodes.length]; for (int i = 0; i < heights.length; i++) {
+//		 * heights[i] = (float) heightNodes[i].getAttribute( "value", 1.0 /
+//		 * heights.length); } for (int j = 0; j < widths.length; j++) {
+//		 * widths[j] = (float) widthNodes[j].getAttribute( "value", 1.0 /
+//		 * widths.length); } } else { widths = new float[]{2 / 11f, 3 / 11f, 3 /
+//		 * 11f, 3 / 11f}; heights = new float[]{3 / 16f, 1 / 16f, 3 / 4f}; }
+//		 * setHeights(heights); setWidths(widths);
+//		 */
+//	}
 	
 	/**
 	 * Checks whether there is a configuration node for the current model
 	 * and DendroView. If not it creates one.
 	 */
-	public void checkConfig() {
+	@Override
+	public void setConfigNode(Preferences parentNode) {
 		
-		if (root == null) {
-			if (tvModel.getDocumentConfigRoot() != null) {
-				bindConfig(tvModel.getDocumentConfigRoot().fetchOrCreate(
-						"MainView"));
-
-			} else {
-				bindConfig(new DummyConfigNode("MainView"));
-			}
-		} else {
-			bindConfig(root);
+		if (parentNode != null) {
+//			if (tvModel.getDocumentConfigRoot() != null) {
+//				configNode = tvModel.getDocumentConfigRoot().node(name);
+//
+//			} else {
+//				configNode = Preferences.userRoot().node("DendroView");
+//			}
+			configNode = parentNode.node("DendroView");
 		}
 	}
 	
 	/**
 	 * Getter for root
 	 */
-	public ConfigNode getConfigNode() {
+	public Preferences getConfigNode() {
 
-		return root;
+		return configNode;
 	}
 	
 	/**
@@ -360,9 +599,9 @@ public class DendroController implements ConfigNodePersistent {
 		// Give components access to TVModel
 		dendroView.getArraynameview().setDataModel(tvModel);
 		
-		final ColorPresets colorPresets = DendrogramFactory.getColorPresets();
-		colorExtractor = new ColorExtractor();
-		colorExtractor.setDefaultColorSet(colorPresets.getDefaultColorSet());
+//		final ColorPresets colorPresets = DendrogramFactory.getColorPresets();
+		colorExtractor = new ColorExtractor2();
+//		colorExtractor.setDefaultColorSet(colorPresets.getDefaultColorSet());
 		colorExtractor.setMissing(DataModel.NODATA, DataModel.EMPTY);
 
 		final DoubleArrayDrawer dArrayDrawer = new DoubleArrayDrawer();
@@ -374,7 +613,7 @@ public class DendroController implements ConfigNodePersistent {
 		// contrast to documentConfig.
 		dArrayDrawer.setDataMatrix(tvModel.getDataMatrix());
 		dArrayDrawer.recalculateContrast();
-		dArrayDrawer.bindConfig(getFirst("ArrayDrawer"));
+		dArrayDrawer.setConfigNode("ArrayDrawer1");//getFirst("ArrayDrawer"));
 		
 		// Headers for GlobalView
 		dendroView.getGlobalView().setHeaders(tvModel.getGeneHeaderInfo(),
@@ -391,16 +630,6 @@ public class DendroController implements ConfigNodePersistent {
 		globalXmap.setScrollbar(dendroView.getXScroll());
 		globalYmap.setScrollbar(dendroView.getYScroll());
 		
-		globalXmap.bindConfig(getFirst("GlobalXMap"));
-		globalYmap.bindConfig(getFirst("GlobalYMap"));
-		
-		dendroView.getTextview().bindConfig(getFirst("TextView"));
-		dendroView.getArraynameview().bindConfig(getFirst("ArrayNameView"));
-		dendroView.getAtrview().getHeaderSummary().bindConfig(
-				getFirst("AtrSummary"));
-		dendroView.getAtrview().getHeaderSummary().bindConfig(
-				getFirst("GtrSummary"));
-		
 		// Drawers
 		dendroView.getGlobalView().setArrayDrawer(arrayDrawer);
 		
@@ -411,7 +640,7 @@ public class DendroController implements ConfigNodePersistent {
 		dendroView.getAtrview().setInvertedTreeDrawer(invertedTreeDrawer);
 		
 		// URLs
-		colorExtractor.bindConfig(getFirst("ColorExtractor"));
+		colorExtractor.setConfigNode("ColorExtractor1");//getFirst("ColorExtractor"));
 		
 		// this is here because my only subclass shares this code.
 		bindTrees();
@@ -421,11 +650,23 @@ public class DendroController implements ConfigNodePersistent {
 		globalYmap.setIndexRange(0, tvModel.getDataMatrix().getNumRow() - 1);
 		
 		// Ensuring window resizing works with GlobalView
-		globalXmap.setHome();
-		globalYmap.setHome();
+//		resetMapContainers();
+	}
+	
+	/**
+	 * Connects all sub components with DendroView's configuration node,
+	 * so that the hierarchical structure of Java's Preferences API can be
+	 * followed.
+	 */
+	public void setPresets() {
 		
-		globalXmap.notifyObservers();
-		globalYmap.notifyObservers();
+		globalXmap.setConfigNode(configNode);//getFirst("GlobalXMap"));
+		globalYmap.setConfigNode(configNode);//getFirst("GlobalYMap"));
+		
+		dendroView.getTextview().setConfigNode(configNode);//getFirst("TextView"));
+		dendroView.getArraynameview().setConfigNode(configNode);//getFirst("ArrayNameView"));
+		dendroView.getAtrview().getHeaderSummary().setConfigNode(configNode);
+		dendroView.getGtrview().getHeaderSummary().setConfigNode(configNode);
 	}
 	
 	/**
@@ -915,15 +1156,18 @@ public class DendroController implements ConfigNodePersistent {
 
 				leftTreeDrawer.setData(tvModel.getGtrHeaderInfo(),
 						tvModel.getGeneHeaderInfo());
-				final HeaderInfo gtrHeaderInfo = tvModel.getGtrHeaderInfo();
+				final HeaderInfo gtrHeaderInfo = 
+						tvModel.getGtrHeaderInfo();
 
 				if (gtrHeaderInfo.getIndex("NODECOLOR") >= 0) {
-					TreeColorer.colorUsingHeader(leftTreeDrawer.getRootNode(),
+					TreeColorer.colorUsingHeader(
+							leftTreeDrawer.getRootNode(),
 							tvModel.getGtrHeaderInfo(),
 							gtrHeaderInfo.getIndex("NODECOLOR"));
 
 				} else {
-					TreeColorer.colorUsingLeaf(leftTreeDrawer.getRootNode(),
+					TreeColorer.colorUsingLeaf(
+							leftTreeDrawer.getRootNode(),
 							tvModel.getGeneHeaderInfo(), tvModel
 									.getGeneHeaderInfo().getIndex("FGCOLOR"));
 				}
@@ -971,8 +1215,8 @@ public class DendroController implements ConfigNodePersistent {
 	 */
 	public void scrollToGene(final int i) {
 
-		globalYmap.scrollToIndex(i);
-		globalYmap.notifyObservers();
+		getGlobalYMap().scrollToIndex(i);
+		getGlobalYMap().notifyObservers();
 	}
 
 	/**
@@ -981,8 +1225,8 @@ public class DendroController implements ConfigNodePersistent {
 	 */
 	public void scrollToArray(final int i) {
 
-		globalXmap.scrollToIndex(i);
-		globalXmap.notifyObservers();
+		getGlobalXMap().scrollToIndex(i);
+		getGlobalXMap().notifyObservers();
 	}
 	
 	/**
@@ -993,14 +1237,14 @@ public class DendroController implements ConfigNodePersistent {
 		tvFrame.showSubDataModel(indexes, null, null);
 	}
 	
-	// Getters
-	/**
-	 * Always returns an instance of the node, even if it has to create it.
-	 */
-	protected ConfigNode getFirst(final String name) {
-
-		return getConfigNode().fetchOrCreate(name);
-	}
+//	// Getters
+//	/**
+//	 * Always returns an instance of the node, even if it has to create it.
+//	 */
+//	protected Preferences getFirst(final String name) {
+//
+//		return getConfigNode().node(name);
+//	}
 	
 	// Setters
 	/**
@@ -1012,7 +1256,6 @@ public class DendroController implements ConfigNodePersistent {
 	public void setArraySelection(final TreeSelectionI arraySelection) {
 
 		if (this.arraySelection != null) {
-
 			this.arraySelection.deleteObserver(dendroView);
 		}
 
@@ -1034,7 +1277,6 @@ public class DendroController implements ConfigNodePersistent {
 	public void setGeneSelection(final TreeSelectionI geneSelection) {
 
 		if (this.geneSelection != null) {
-
 			this.geneSelection.deleteObserver(dendroView);
 		}
 
@@ -1047,7 +1289,7 @@ public class DendroController implements ConfigNodePersistent {
 		dendroView.getArraynameview().setGeneSelection(geneSelection);
 	}
 	
-	// Getters
+	// Getters for fields
 	public ArrayDrawer getArrayDrawer() {
 		
 		return arrayDrawer;

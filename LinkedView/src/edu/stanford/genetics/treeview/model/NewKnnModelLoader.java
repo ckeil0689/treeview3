@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.prefs.Preferences;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -36,7 +37,6 @@ import javax.swing.JPanel;
 
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LoadException;
-import edu.stanford.genetics.treeview.XmlConfig;
 
 /**
  * @author aloksaldanha
@@ -122,8 +122,11 @@ public class NewKnnModelLoader extends NewModelLoader {
 			}
 			
 			try {
-				final XmlConfig documentConfig = new XmlConfig(targetModel
-						.getFileSet().getJtv(), "DocumentConfig");
+//				final Preferences documentConfig = new XmlConfig(targetModel
+//						.getFileSet().getJtv(), "DocumentConfig");
+				final Preferences documentConfig = 
+						Preferences.userRoot().node("DocumentConfig");
+				documentConfig.put("jtv", targetModel.getFileSet().getJtv());
 				targetModel.setDocumentConfig(documentConfig);
 				
 			} catch (final Exception e) {

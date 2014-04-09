@@ -58,6 +58,7 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 	private static final long serialVersionUID = 1L;
 
 	protected boolean hasDrawn = false;
+	private boolean resetHome = false;
 	protected TreeSelectionI geneSelection;
 	protected TreeSelectionI arraySelection;
 	protected MapContainer xmap;
@@ -341,7 +342,7 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 			xmap.setAvailablePixels(offscreenSize.width);
 			ymap.setAvailablePixels(offscreenSize.height);
 
-			if (hasDrawn == false) {
+			if (hasDrawn == false ) {
 				// total kludge, but addnotify isn't working correctly...
 				xmap.recalculateScale();
 				ymap.recalculateScale();
@@ -350,6 +351,16 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 
 			xmap.notifyObservers();
 			ymap.notifyObservers();
+		}
+		
+		if(resetHome) {
+			xmap.setHome();
+			ymap.setHome();
+			
+			xmap.notifyObservers();
+			ymap.notifyObservers();
+			
+			resetHome = false;
 		}
 
 		if (offscreenValid == false) {
@@ -422,8 +433,8 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 			selectionRect.setBounds(spx, spy, epx - spx, epy - spy);
 		}
 
-		this.revalidate();
-		this.repaint();
+		revalidate();
+		repaint();
 	}
 
 	protected void recalculateZoom() {
@@ -795,8 +806,8 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 			}
 		}
 
-		this.revalidate();
-		this.repaint();
+		revalidate();
+		repaint();
 	}
 
 	/**
@@ -853,6 +864,8 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 
 		double newScale = 0.0;
 		double newScale2 = 0.0;
+		
+		double rest = 0.0;
 
 		final int arrayIndexes = arraySelection.getNSelectedIndexes();
 		final int geneIndexes = geneSelection.getNSelectedIndexes();
@@ -860,17 +873,22 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 		if (arrayIndexes > 0 && geneIndexes > 0) {
 			newScale = xmap.getAvailablePixels() / arrayIndexes;
 			
+			rest = xmap.getAvailablePixels() % arrayIndexes;
+			
 			if (newScale < xmap.getMinScale()) {
 				newScale = xmap.getMinScale();
 			}
-			xmap.setScale(newScale);
+			
+			xmap.setScale(newScale + rest/ arrayIndexes);
 
 			newScale2 = ymap.getAvailablePixels() / geneIndexes;
+			rest = ymap.getAvailablePixels() % geneIndexes;
 			
 			if (newScale2 < ymap.getMinScale()) {
 				newScale2 = ymap.getMinScale();
 			}
-			ymap.setScale(newScale2);
+			
+			ymap.setScale(newScale2 + rest/ geneIndexes);
 		}
 	}
 
@@ -882,9 +900,19 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 		int scrollX;
 		int scrollY;
 
-		if (startPoint != null && endPoint != null) {
-			scrollX = (endPoint.x + startPoint.x) / 2;
-			scrollY = (endPoint.y + startPoint.y) / 2;
+		int[] selectedGenes = geneSelection.getSelectedIndexes();
+		int[] selectedArrays = arraySelection.getSelectedIndexes();
+		
+		if (selectedGenes.length > 0 && selectedArrays.length > 0) {
+			
+			double endX = selectedArrays[selectedArrays.length - 1];
+			double endY = selectedGenes[selectedGenes.length -  1];
+			
+			double startX = selectedArrays[0];
+			double startY = selectedGenes[0];
+			
+			scrollX = (int)(endX + startX)/ 2;
+			scrollY = (int)(endY + startY)/ 2;
 
 			xmap.scrollToIndex(scrollX);
 			ymap.scrollToIndex(scrollY);
@@ -913,5 +941,11 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 
 		geneHI = ghi;
 		arrayHI = ahi;
+	}
+	
+	public void resetHome(boolean resized) {
+		
+		this.resetHome = resized;
+		repaint();
 	}
 }

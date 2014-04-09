@@ -13,6 +13,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
+import javax.swing.JRadioButton;
 import javax.swing.SwingConstants;
 import javax.swing.plaf.basic.BasicProgressBarUI;
 
@@ -22,10 +23,13 @@ public class GUIParams {
 	public static String QUESTIONICON = "questionIcon_dark.png";
 	
 	public static Font FONTS = new Font("Sans Serif", Font.PLAIN, 14);
+	public static Font FONT_MENU = new Font("Sans Serif", Font.PLAIN, 18);
 	public static Font FONTL = new Font("Sans Serif", Font.PLAIN, 20);
 
-	public static Color LIGHTGRAY = new Color(180, 180, 180, 255);
-	public static Color DARKGRAY = new Color(200, 200, 200, 255);
+	public static Color LIGHTGRAY = new Color(200, 200, 200, 255);
+	public static Color DARKGRAY = new Color(150, 150, 150, 255);
+	public static Color RADIOTEXT = new Color(50, 50, 50, 255);
+	public static Color MENU = new Color(254, 254, 254, 255);
 	public static Color TEXT = new Color(200, 200, 200, 255);
 	public static Color BORDERS = new Color(200, 200, 200, 255);
 	public static Color MAIN = new Color(255, 200, 65, 255);
@@ -43,14 +47,11 @@ public class GUIParams {
 		
 		QUESTIONICON = "questionIcon_light.png";
 
-		LIGHTGRAY = new Color(140, 140, 140, 255);
-		DARKGRAY = new Color(180, 180, 180, 255);
 		TEXT = new Color(20, 20, 20, 255);
 		MAIN = new Color(30, 144, 255, 255);
 		BORDERS = new Color(100, 100, 100, 255);
 		ELEMENT_HOV = new Color(122, 214, 255, 255);
 		BG_COLOR = new Color(254, 254, 254, 255);
-		RED1 = new Color(240, 80, 50, 255);
 		TABLEHEADERS = new Color(191, 235, 255, 255);
 	}
 
@@ -59,15 +60,12 @@ public class GUIParams {
 		dark = true;
 		
 		QUESTIONICON = "questionIcon_dark.png";
-		
-		LIGHTGRAY = new Color(180, 180, 180, 255);
-		DARKGRAY = new Color(200, 200, 200, 255);
+
 		TEXT = new Color(200, 200, 200, 255);
 		MAIN = new Color(255, 200, 65, 255);
 		BORDERS = new Color(200, 200, 200, 255);
 		ELEMENT_HOV = new Color(255, 174, 77, 255);
 		BG_COLOR = new Color(39, 40, 34, 255);
-		RED1 = new Color(240, 80, 50, 255);
 		TABLEHEADERS = new Color(255, 205, 120, 255);
 	}
 	
@@ -91,6 +89,7 @@ public class GUIParams {
 		// Basic layout
 		button.setFont(FONTS);
 		button.setBorder(null);
+		button.setFocusPainted(false);
 		
 		// Set button color first
 		button.setBackground(MAIN);
@@ -151,6 +150,45 @@ public class GUIParams {
 		button.setPreferredSize(d);
 
 		return button;
+	}
+	
+	/**
+	 * Sets a layout for a button which is supposed to appear in the top
+	 * menubar which belongs to the TVFrame.
+	 * @param title
+	 * @param iconFileName
+	 * @return
+	 */
+	public static JButton setMenuButtonLayout(String title, 
+			String iconFileName) {
+		
+		JButton menuButton = setButtonLayout(title, iconFileName);
+		
+		menuButton.setBackground(BG_COLOR);
+		menuButton.setForeground(MAIN);
+		menuButton.setFont(FONTS);
+		menuButton.setBorder(null);
+		menuButton.setFocusPainted(false);
+		
+		return menuButton;
+	}
+	
+	/**
+	 * Sets the layout of JRadioButton.
+	 * @param title
+	 * @param iconFileName
+	 * @return
+	 */
+	public static JRadioButton setRadioButtonLayout(String title) {
+		
+		JRadioButton menuButton = new JRadioButton(title);
+		menuButton.setOpaque(false);
+		menuButton.setForeground(RADIOTEXT);
+		menuButton.setFont(FONTS);
+		menuButton.setBorder(null);
+		menuButton.setFocusPainted(false);
+		
+		return menuButton;
 	}
 	
 	/**

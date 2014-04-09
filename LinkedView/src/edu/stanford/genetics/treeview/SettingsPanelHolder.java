@@ -26,6 +26,8 @@ import java.awt.Component;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -41,7 +43,7 @@ public class SettingsPanelHolder extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	private Window window = null;
-	private ConfigNode configNode = null;
+	private Preferences configNode = null;
 
 	/**
 	 * Please use this constructor.
@@ -51,8 +53,10 @@ public class SettingsPanelHolder extends JPanel {
 	 * @param c
 	 *            ConfigNode to store on a save.
 	 */
-	public SettingsPanelHolder(final Window w, final ConfigNode c) {
+	public SettingsPanelHolder(final Window w, final Preferences c) {
+		
 		super();
+		
 		window = w;
 		configNode = c;
 		setLayout(new BorderLayout());
@@ -60,6 +64,7 @@ public class SettingsPanelHolder extends JPanel {
 	}
 
 	public void synchronizeTo() {
+		
 		final int n = this.getComponentCount();
 		for (int i = 0; i < n; i++) {
 			synchronizeTo(i);
@@ -67,8 +72,10 @@ public class SettingsPanelHolder extends JPanel {
 	}
 
 	public void synchronizeTo(final int i) {
+		
 		try {
 			((SettingsPanel) getComponent(i)).synchronizeTo();
+			
 		} catch (final ClassCastException e) {
 			// ignore
 		}
@@ -124,7 +131,12 @@ public class SettingsPanelHolder extends JPanel {
 								+ "configNode is null");
 
 					} else {
-						configNode.store();
+						try {
+							configNode.flush();
+							
+						} catch (BackingStoreException e1) {
+							e1.printStackTrace();
+						}
 					}
 					hideWindow();
 				}

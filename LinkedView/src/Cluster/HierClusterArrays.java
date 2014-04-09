@@ -80,7 +80,17 @@ public class HierClusterArrays {
 		}
 		
 		// ProgressBar maximum
-		clusterView.setLoadText("Clustering data...");
+		String side = "";
+		if(type.equalsIgnoreCase("GENE")) {
+			side = "Row";
+			
+		} else if(type.equalsIgnoreCase("ARRY")){
+			side = "Column";
+			
+		} else {
+			side = "???";
+		}
+		clusterView.setLoadText("Clustering " + side + " Data...");
 		clusterView.setPBarMax(wholeMSize);
 
 		// data to be written to file

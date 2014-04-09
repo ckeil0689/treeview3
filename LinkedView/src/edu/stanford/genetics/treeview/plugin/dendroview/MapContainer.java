@@ -26,10 +26,11 @@ import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 import javax.swing.JScrollBar;
 
-import edu.stanford.genetics.treeview.ConfigNode;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeDrawerNode;
@@ -54,7 +55,7 @@ public class MapContainer extends Observable implements Observer,
 
 	private JScrollBar scrollbar = null;
 	private TreeDrawerNode selected = null;
-	private ConfigNode root = null;
+	private Preferences root = null;
 
 	public MapContainer() {
 
@@ -70,29 +71,50 @@ public class MapContainer extends Observable implements Observer,
 		setMap(type);
 	}
 
-	private ConfigNode fetchOrCreateNode(final String name) {
+	private Preferences fetchOrCreateNode(final String name) {
 
-		ConfigNode ret = root.fetchFirst(name);
-		if (ret == null) {
-			ret = root.create(name);
-		}
+		// Get first child?
+		Preferences ret = root.node(name);
+//		if (ret == null) {
+//			ret = root.create(name);
+//		}
 
 		return ret;
 	}
 
+//	// confignode persistent
+//	@Override
+//	public void bindConfig(final Preferences configNode) {
+//
+//		root = configNode;
+//
+//		// first bind subordinate maps...
+//		fixedMap.bindConfig(fetchOrCreateNode("FixedMap"));
+//		fillMap.bindConfig(fetchOrCreateNode("FillMap"));
+//		nullMap.bindConfig(fetchOrCreateNode("NullMap"));
+//
+//		// then, fix self up...
+//		setMap(root.get("current", default_map));
+//	}
+	
 	// confignode persistent
 	@Override
-	public void bindConfig(final ConfigNode configNode) {
+	public void setConfigNode(String key) {
 
-		root = configNode;
+		if(key == null) {
+			this.root = Preferences.userRoot().node(this.getClass().getName());
+			
+		} else {
+			this.root = Preferences.userRoot().node(key);
+		}
 
 		// first bind subordinate maps...
-		fixedMap.bindConfig(fetchOrCreateNode("FixedMap"));
-		fillMap.bindConfig(fetchOrCreateNode("FillMap"));
-		nullMap.bindConfig(fetchOrCreateNode("NullMap"));
+		fixedMap.setConfigNode("FixedMap");
+		fillMap.setConfigNode("FillMap");
+		nullMap.setConfigNode("NullMap");
 
 		// then, fix self up...
-		setMap(root.getAttribute("current", default_map));
+		setMap(root.get("current", default_map));
 	}
 
 	/**
@@ -110,10 +132,8 @@ public class MapContainer extends Observable implements Observer,
 	 * screen space.
 	 */
 	public void setHome() {
-
-		final double pixels = getAvailablePixels();
-		final double divider = getMaxIndex() - getMinIndex();
-		minScale = pixels / divider;
+		
+		setMinScale();
 		setScale(minScale);
 	}
 
@@ -125,7 +145,7 @@ public class MapContainer extends Observable implements Observer,
 
 		final double pixels = getAvailablePixels();
 		final double divider = getMaxIndex() - getMinIndex();
-		minScale = roundScale(pixels/ divider);
+		minScale = pixels/ divider;
 	}
 
 	/**
@@ -141,6 +161,7 @@ public class MapContainer extends Observable implements Observer,
 
 		double newScale = 0.0;
 		double zoomVal = 1;
+		double rest = 0.0;
 
 		if (scrollbar.getVisibleAmount() <= 20) {
 			zoomVal = 1;
@@ -160,6 +181,8 @@ public class MapContainer extends Observable implements Observer,
 
 		newScale = getAvailablePixels()
 				/ (scrollbar.getVisibleAmount() + zoomVal);
+		rest = getAvailablePixels()
+				% (scrollbar.getVisibleAmount() + zoomVal);
 
 		if (newScale < minScale) {
 			newScale = minScale;
@@ -183,6 +206,7 @@ public class MapContainer extends Observable implements Observer,
 		final double maxScale = getAvailablePixels() / minAllowedTiles;
 		double newScale = 0.0;
 		double zoomVal = 1;
+		double rest = 0.0;
 
 		if (scrollbar.getVisibleAmount() <= 20) {
 			zoomVal = 1;
@@ -203,6 +227,8 @@ public class MapContainer extends Observable implements Observer,
 		// Recalculating scale
 		newScale = getAvailablePixels()
 				/ (scrollbar.getVisibleAmount() - zoomVal);
+		rest = getAvailablePixels()
+				% (scrollbar.getVisibleAmount() - zoomVal);
 
 		if (newScale > maxScale) {
 			newScale = maxScale;
@@ -220,14 +246,15 @@ public class MapContainer extends Observable implements Observer,
 
 		double fittedScale = 1.0;
 
-		fittedScale = Math.round(scale * 2) / 2;
+		fittedScale = Math.round(scale * 2)/ 2;
 
 		return fittedScale;
 	}
 
 	public void recalculateScale() {
 
-		if (root.fetchFirst("FixedMap").hasAttribute("scale")) {
+//		if (root.fetchFirst("FixedMap").hasAttribute("scale")) {
+		if (nodeHasAttribute("FixedMap","scale")) {
 			if (getScale() < getAvailablePixels()) {
 				return;
 			}
@@ -538,7 +565,7 @@ public class MapContainer extends Observable implements Observer,
 
 		if (current != integerMap) {
 			if (root != null) {
-				root.setAttribute("current", integerMap.type(), default_map);
+				root.put("current", integerMap.type());
 			}
 			integerMap.setAvailablePixels(current.getAvailablePixels());
 			integerMap.setIndexRange(current.getMinIndex(),
@@ -547,5 +574,33 @@ public class MapContainer extends Observable implements Observer,
 			setupScrollbar();
 			setChanged();
 		}
+	}
+	
+	/**
+	 * Checks if a certain node has a certain attribute (key).
+	 * @param nodeName
+	 * @param key
+	 * @return
+	 */
+	public boolean nodeHasAttribute(String nodeName, String key) {
+		
+		boolean hasAttribute = false;
+		
+		try {
+			String[] keys = root.node(nodeName).keys();
+			for(int i = 0; i < keys.length; i++) {
+				
+				if(keys[i].equalsIgnoreCase(key)) {
+					hasAttribute = true;
+				}
+			}
+			
+		} catch (BackingStoreException e) {
+			LogBuffer.println("Error in MapContainer/nodeHasAttribute: " 
+					+ e.getMessage());
+			e.printStackTrace();
+		}
+		
+		return hasAttribute;
 	}
 }

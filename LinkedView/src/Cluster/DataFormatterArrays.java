@@ -20,8 +20,8 @@ public class DataFormatterArrays {
 	private double[][] colList;
 
 	// Constructor (building the object)
-	public DataFormatterArrays(final DataModel model, final ClusterView clusterView, 
-			final double[][] rawData) {
+	public DataFormatterArrays(final DataModel model, 
+			final ClusterView clusterView, final double[][] rawData) {
 
 		this.model = (TVModel) model;
 		this.clusterView = clusterView;

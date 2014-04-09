@@ -38,7 +38,8 @@ public class ClusterViewDialog {
 		clusterDialog.setMinimumSize(new Dimension(800, 600));
 
 		// setup frame options
-		clusterDialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		clusterDialog.setDefaultCloseOperation(
+				WindowConstants.DISPOSE_ON_CLOSE);
 
 		// Makes the frame invisible when the window is closed
 		clusterDialog.addWindowListener(new WindowAdapter() {

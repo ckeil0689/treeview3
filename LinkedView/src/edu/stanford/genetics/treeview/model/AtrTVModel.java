@@ -31,13 +31,11 @@ package edu.stanford.genetics.treeview.model;
  */
 
 import java.awt.MenuItem;
+import java.util.prefs.Preferences;
 
-import edu.stanford.genetics.treeview.ConfigNode;
-import edu.stanford.genetics.treeview.DummyConfigNode;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.TreeViewFrame;
-import edu.stanford.genetics.treeview.XmlConfig;
 
 public class AtrTVModel extends TVModel {
 
@@ -66,15 +64,17 @@ public class AtrTVModel extends TVModel {
 //	public void setExprData(final double[][] newData) {
 //	}
 
-	ConfigNode documentConfig = new DummyConfigNode("AtrTVModel");
+	Preferences documentConfig = 
+			Preferences.userRoot().node(this.getClass().getName());
 
 	@Override
-	public ConfigNode getDocumentConfigRoot() {
+	public Preferences getDocumentConfigRoot() {
+		
 		return documentConfig;
 	}
 
 	@Override
-	public void setDocumentConfig(final XmlConfig newVal) {
+	public void setDocumentConfig(final Preferences newVal) {
 	}
 
 	@Override

@@ -22,21 +22,25 @@
  */
 package edu.stanford.genetics.treeview;
 
+import java.util.prefs.Preferences;
+
 /**
  * This is the second url extraction class I'm writing. It's designed to do
  * less... I'm going to make UrlPresets and UrlEditor as well.
  */
 
 public class UrlExtractor2 implements ConfigNodePersistent {
-	private ConfigNode root;
+	
+	private Preferences configNode;
 	private final UrlPresets presets;
 
 	/**
 	 * This class must have a config node to stash data in, even if it's a
 	 * dummy. It also needs UrlPresets to infer templates from styles
 	 */
-	public UrlExtractor2(final ConfigNode n, final UrlPresets p) {
-		root = n;
+	public UrlExtractor2(final Preferences n, final UrlPresets p) {
+		
+		configNode = n;
 		presets = p;
 	}
 
@@ -45,18 +49,21 @@ public class UrlExtractor2 implements ConfigNodePersistent {
 	 * url template.
 	 */
 	public String getColHeader() {
-		final String ret = root.getAttribute("header", null);
+		
+		final String ret = configNode.get("header", null);
 		return ret;
 	}
 
 	public void setColHeader(final String head) {
-		root.setAttribute("header", head, null);
+		
+		configNode.put("header", head);
 	}
 
 	/**
 	 * most common use, fills in current template with val
 	 */
 	public String substitute(final String val) {
+		
 		final String temp = getTemplate();
 		if (temp == null)
 			return null;
@@ -69,32 +76,46 @@ public class UrlExtractor2 implements ConfigNodePersistent {
 	}
 
 	public String getTemplate() {
-		String ret = root.getAttribute("template", null);
+		
+		String ret = configNode.get("template", null);
 		if (ret != null)
 			return ret;
 
 		// try style preset
 		if (ret == null)
-			ret = presets.getTemplate(root.getAttribute("style", "None"));
+			ret = presets.getTemplate(configNode.get("style", "None"));
 
 		// try custom
 		if (ret == null)
-			ret = root.getAttribute("custom", null);
+			ret = configNode.get("custom", null);
 
 		// okay, first preset...
 		if (ret == null)
 			ret = presets.getTemplate(0);
 
-		root.setAttribute("template", ret, null);
+		configNode.put("template", ret);
 		return ret;
 	}
 
 	public void setTemplate(final String ret) {
-		root.setAttribute("template", ret, null);
+		
+		configNode.put("template", ret);
 	}
 
+//	@Override
+//	public void bindConfig(final Preferences configNode) {
+//		root = configNode;
+//	}
+	
 	@Override
-	public void bindConfig(final ConfigNode configNode) {
-		root = configNode;
+	public void setConfigNode(Preferences parentNode) {
+		
+		if(parentNode != null) {
+			this.configNode = parentNode.node("UrlExtractor");
+			
+		} else {
+			LogBuffer.println("Could not find or create UrlExtractor" +
+					"node because parentNode was null.");
+		}
 	}
 }

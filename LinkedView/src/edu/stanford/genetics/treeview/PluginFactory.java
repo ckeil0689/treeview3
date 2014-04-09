@@ -5,6 +5,8 @@
  */
 package edu.stanford.genetics.treeview;
 
+import java.util.prefs.Preferences;
+
 /**
  * 
  * This interface allows the application to get information about the plugin and
@@ -48,7 +50,7 @@ public abstract class PluginFactory {
 	 *            ConfigNode holding configuration of plugin
 	 * @return new plugin object
 	 */
-	public abstract DendroPanel restorePlugin(ConfigNode node, 
+	public abstract DendroPanel restorePlugin(Preferences node, 
 			TreeViewFrame viewFrame);
 
 	/**
@@ -65,7 +67,8 @@ public abstract class PluginFactory {
 	 *            ViewFrame to which to add new plugin
 	 * @return true if it was successfully configured.
 	 */
-	public abstract boolean configurePlugin(ConfigNode node, ViewFrame viewFrame);
+	public abstract boolean configurePlugin(Preferences node, 
+			ViewFrame viewFrame);
 
 	/**
 	 * This is called during the generation of the Settings->Global menu. It
@@ -78,7 +81,7 @@ public abstract class PluginFactory {
 		// no presets by default.
 	}
 
-	private ConfigNode globalNode;
+	private Preferences globalNode;
 
 	/**
 	 * The ConfigNode passed into configurePlugin() and restorePlugin() is a
@@ -95,7 +98,8 @@ public abstract class PluginFactory {
 	 * 
 	 * @param node
 	 */
-	public void setGlobalNode(final ConfigNode node) {
+	public void setGlobalNode(final Preferences node) {
+		
 		globalNode = node;
 	}
 
@@ -109,7 +113,8 @@ public abstract class PluginFactory {
 	 * 
 	 * @return global configuration node for plugin type
 	 */
-	public ConfigNode getGlobalNode() {
+	public Preferences getGlobalNode() {
+		
 		return globalNode;
 	}
 

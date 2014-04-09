@@ -3,32 +3,38 @@ package edu.stanford.genetics.treeview;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentListener;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
+import java.util.ArrayList;
+import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 
 import Controllers.DendroController;
 import GradientColorChoice.ColorGradientChooser;
 import GradientColorChoice.ColorGradientController;
 
-import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
+import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor2;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
 import edu.stanford.genetics.treeview.plugin.dendroview.DoubleArrayDrawer;
 import edu.stanford.genetics.treeview.plugin.dendroview.FontSettingsPanel;
-import edu.stanford.genetics.treeview.plugin.dendroview.PixelSettingsSelector;
 
 import net.miginfocom.swing.MigLayout;
 
 public class PreferencesMenu {
 	
 	private TreeViewFrame tvFrame;
+	private Preferences configNode;
 	private JFrame applicationFrame;
 	private JDialog menuDialog;
 	
@@ -47,13 +53,16 @@ public class PreferencesMenu {
 	
 	private ColorGradientChooser gradientPick = null;
 	
+	private ArrayList<MenuPanel> menuPanelList;
+	
 	/**
 	 * Chained constructor in case DendroView isn't available
 	 * @param viewFrame
 	 */
-	public PreferencesMenu(TreeViewFrame tvFrame, String menuTitle) {
+	public PreferencesMenu(TreeViewFrame tvFrame, String menuTitle, 
+			String dialogTitle) {
 		
-		this(tvFrame, null, null, menuTitle);
+		this(tvFrame, null, null, menuTitle, dialogTitle);
 	}
 	
 	/**
@@ -63,31 +72,32 @@ public class PreferencesMenu {
 	 * @param menuTitle
 	 */
 	public PreferencesMenu(TreeViewFrame tvFrame, DendroView2 dendroView, 
-			DendroController controller, String menuTitle) {
+			DendroController controller, String menuTitle, String dialogTitle) {
 		
 		this.tvFrame = tvFrame;
 		this.applicationFrame = tvFrame.getAppFrame();
 		this.dendroView = dendroView;
 		this.dendroController = controller;
+		this.configNode = tvFrame.getConfigNode().node("Preferences");
+		
+		menuPanelList = new ArrayList<MenuPanel>();
 		
 		menuDialog = new JDialog();
-		menuDialog.setTitle("Preferences");
+		menuDialog.setTitle(dialogTitle);
 		menuDialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
-		menuDialog.setResizable(false);
+		menuDialog.setResizable(true);
 		
 		basisPanel = new JPanel();
 		basisPanel.setLayout(new MigLayout());
-		
-		ok_button = GUIParams.setButtonLayout("OK", null);
 		
 		// Setting preferred size for the ContentPane of this frame
 		final Dimension mainDim = GUIParams.getScreenSize();
 		
 		int width = mainDim.width * 1/2;
 		
-		if(width > 640) {
-			width = 640;
-		}
+//		if(width > 640) {
+//			width = 640;
+//		}
 		
 		int height = mainDim.height * 1/2;
 		
@@ -148,17 +158,16 @@ public class PreferencesMenu {
 	}
 	
 	/**
-	 * Adds an ActionListener to the theme_button in ThemeSettings
+	 * Adds an ActionListener to the darkThemeButton in ThemeSettings
 	 * @param listener
 	 */
 	public void addThemeListener(ActionListener listener) {
 		
-		themeSettings.getThemeButton().addActionListener(listener);
+		themeSettings.getDarkThemeButton().addActionListener(listener);
+		themeSettings.getLightThemeButton().addActionListener(listener);
 	}
 	
 	public void addCustomLabelListener(ActionListener listener) {
-		
-		System.out.println("Custom label Listener added.");
 		
 		if(annotationSettings != null) {
 			annotationSettings.getCustomLabelButton()
@@ -166,12 +175,32 @@ public class PreferencesMenu {
 		}
 	}
 	
+	public void addMenuListeners(MouseListener l) {
+		
+		for(MenuPanel panel : menuPanelList) {
+			
+			panel.getMenuPanel().addMouseListener(l);
+		}
+	}
+	
+	/**
+	 * Adds a component listener to the JDialog in which the content of
+	 * this class is held. This ensures repainting of all child components
+	 * when the JDialog is being resized.
+	 * @param l
+	 */
+	public void addComponentListener(ComponentListener l) {
+		
+		menuDialog.addComponentListener(l);
+	}
+	
 	/**
 	 * Sets up the layout for the menu.
 	 */
 	public void setupLayout(String startMenu) {
 		
-		setupMenus();
+		menuPanelList.clear();
+		setupPanels();
 		
 		leftPanel = new JPanel();
 		leftPanel.setLayout(new MigLayout());
@@ -192,6 +221,7 @@ public class PreferencesMenu {
 		
 		addMenu(startMenu);
 		
+		ok_button = GUIParams.setButtonLayout("OK", null);
 		basisPanel.add(ok_button, "pushx, alignx 100%, span");
 		
 		menuDialog.validate();
@@ -201,24 +231,35 @@ public class PreferencesMenu {
 	public void setupMenuHeaders(boolean analysis) {
 		
 		if(!analysis) {
-			JPanel theme = new MenuPanel("Theme", this).makeMenuPanel();
-			leftPanel.add(theme, "pushx, w 90%, h 10%, alignx 50%, span, wrap");
+			MenuPanel theme = new MenuPanel("Theme");
+			JPanel themePanel = theme.getMenuPanel();
+			leftPanel.add(themePanel, "pushx, w 90%, h 10%, alignx 50%, " +
+					"span, wrap");
+			menuPanelList.add(theme);
 				
-			JPanel font = new MenuPanel("Font", this).makeMenuPanel();
-			leftPanel.add(font, "pushx, w 90%, h 10%, alignx 50%, span, wrap");
+			MenuPanel font = new MenuPanel("Font");
+			JPanel fontPanel = font.getMenuPanel();
+			leftPanel.add(fontPanel, "pushx, w 90%, h 10%, alignx 50%, " +
+					"span, wrap");
+			menuPanelList.add(font);
 				
-			JPanel url = new MenuPanel("URL", this).makeMenuPanel();
-			leftPanel.add(url, "pushx, w 90%, h 10%, alignx 50%, span");
+			MenuPanel url = new MenuPanel("URL");
+			JPanel urlPanel = url.getMenuPanel();
+			leftPanel.add(urlPanel, "pushx, w 90%, h 10%, alignx 50%, span");
+			menuPanelList.add(url);
 			
 		} else {
-			JPanel annotations = new MenuPanel("Row and Column Labels", 
-					this).makeMenuPanel();
-			leftPanel.add(annotations, "pushx, w 90%, h 10%, alignx 50%, " +
-					"span, wrap");
+			MenuPanel annotations = new MenuPanel("Row and Column Labels");
+			JPanel annotationsPanel = annotations.getMenuPanel();
+			leftPanel.add(annotationsPanel, "pushx, w 90%, h 10%, " +
+					"alignx 50%, span, wrap");
+			menuPanelList.add(annotations);
 			
-			JPanel heatMap = new MenuPanel("Color Settings", 
-					this).makeMenuPanel();
-			leftPanel.add(heatMap, "pushx, w 90%, h 10%, alignx 50%, span");
+			MenuPanel heatMap = new MenuPanel("Color Settings");
+			JPanel heatMapPanel = heatMap.getMenuPanel();
+			leftPanel.add(heatMapPanel, "pushx, w 90%, h 10%, alignx 50%, " +
+					"span");
+			menuPanelList.add(heatMap);
 		}
 	}
 	
@@ -226,7 +267,7 @@ public class PreferencesMenu {
 	 * Setting up the menus depending on whether DendroView 
 	 * has been instantiated.
 	 */
-	public void setupMenus() {
+	public void setupPanels() {
 		
 		if(dendroView != null) {
 			
@@ -236,7 +277,10 @@ public class PreferencesMenu {
 			
 			gradientPick = new ColorGradientChooser(((DoubleArrayDrawer) 
 					dendroController.getArrayDrawer()).getColorExtractor(), 
-					DendrogramFactory.getColorPresets(), basisPanel);
+					DendrogramFactory.getColorPresets(), 
+					tvFrame.getDataModel().getDataMatrix().getMinVal(),
+					tvFrame.getDataModel().getDataMatrix().getMaxVal(),
+					applicationFrame);
 			
 			ColorGradientController gradientControl = 
 					new ColorGradientController(gradientPick);
@@ -250,7 +294,7 @@ public class PreferencesMenu {
 	 */
 	class PixelSettingsPanel {
 		
-		private ColorExtractor ce = null;
+		private ColorExtractor2 ce = null;
 		private JScrollPane scrollPane;
 
 		public PixelSettingsPanel() {
@@ -261,22 +305,22 @@ public class PreferencesMenu {
 			panel.setLayout(new MigLayout());
 			panel.setBackground(GUIParams.BG_COLOR);
 			
-			try {
-				ce = ((DoubleArrayDrawer) dendroController.getArrayDrawer())
-						.getColorExtractor();
-	
-			} catch (final Exception e) {
-	
-			}
-	
-			PixelSettingsSelector pss = new PixelSettingsSelector(
-					dendroController.getGlobalXMap(), 
-					dendroController.getGlobalYMap(), ce, 
-					DendrogramFactory.getColorPresets()); 
-			
-			panel.add(pss, "push, grow");
-			
-			scrollPane.setViewportView(panel);
+//			try {
+//				ce = ((DoubleArrayDrawer) dendroController.getArrayDrawer())
+//						.getColorExtractor();
+//	
+//			} catch (final Exception e) {
+//	
+//			}
+//	
+//			PixelSettingsSelector pss = new PixelSettingsSelector(
+//					dendroController.getGlobalXMap(), 
+//					dendroController.getGlobalYMap(), ce, 
+//					DendrogramFactory.getColorPresets()); 
+//			
+//			panel.add(pss, "push, grow");
+//			
+//			scrollPane.setViewportView(panel);
 		}
 		
 		public JScrollPane makePSPanel() {
@@ -359,7 +403,11 @@ public class PreferencesMenu {
 	 */
 	class ThemeSettingsPanel {
 
-		private JButton theme_button;
+		private JRadioButton darkThemeButton;
+		private JRadioButton lightThemeButton;
+		
+		private ButtonGroup themeButtonGroup;
+		
 		private JScrollPane scrollPane;
 		
 		public ThemeSettingsPanel() {
@@ -368,15 +416,36 @@ public class PreferencesMenu {
 			
 			JPanel panel = new JPanel();
 			panel.setLayout(new MigLayout());
-			panel.setBackground(GUIParams.BG_COLOR);
+			panel.setBackground(GUIParams.MENU);
 			
-			panel.add(GUIParams.setupHeader("Click to switch theme:"), 
-					"span, wrap");
+			JLabel label = new JLabel("Choose a Theme:");
+			label.setForeground(GUIParams.RADIOTEXT);
+			label.setFont(GUIParams.FONTL);
 			
-			// Choice #1
-			theme_button = GUIParams.setButtonLayout("Switch Theme", null);
+			panel.add(label, "span, wrap");
 			
-			panel.add(theme_button);
+			darkThemeButton = GUIParams.setRadioButtonLayout("Dark");
+			lightThemeButton = GUIParams.setRadioButtonLayout("Light");
+			
+			themeButtonGroup = new ButtonGroup();
+			themeButtonGroup.add(darkThemeButton);
+			themeButtonGroup.add(lightThemeButton);
+			
+			// Check for saved presets...
+			String default_theme = "dark";
+			String savedTheme = tvFrame.getConfigNode().get("theme", 
+					default_theme);
+			
+			// Since changing the theme resets the layout
+			if(savedTheme.equalsIgnoreCase("dark")) {
+				darkThemeButton.setSelected(true);
+				
+			} else {
+				lightThemeButton.setSelected(true);
+			}
+			
+			panel.add(lightThemeButton, "span, wrap");
+			panel.add(darkThemeButton, "span");
 			
 			scrollPane.setViewportView(panel);
 		}
@@ -386,9 +455,14 @@ public class PreferencesMenu {
 			return scrollPane;
 		}
 		
-		public JButton getThemeButton() {
+		public JRadioButton getDarkThemeButton() {
 			
-			return theme_button;
+			return darkThemeButton;
+		}
+		
+		public JRadioButton getLightThemeButton() {
+			
+			return lightThemeButton;
 		}
 	}
 	
@@ -429,7 +503,7 @@ public class PreferencesMenu {
 //					dendroView.getGtrview().getHeaderSummary(), tvFrame);
 			
 			custom_button = GUIParams.setButtonLayout(
-					"Use Custom Labels", null);
+					"Load Custom Labels", null);
 			
 			JLabel rows = GUIParams.setupHeader("Rows");
 			JLabel cols = GUIParams.setupHeader("Columns");
@@ -493,7 +567,7 @@ public class PreferencesMenu {
 			basisPanel.add(fontSettings.makeFontPanel(), "w 79%, h 95%, wrap");
 		
 		} else if(title.equalsIgnoreCase("Color Settings") 
-				&& pixelSettings != null) {
+				&& gradientPick != null) {
 //			basisPanel.add(pixelSettings.makePSPanel(), "w 79%, h 95%, wrap");
 			basisPanel.add(gradientPick.makeGradientPanel(), 
 					"w 79%, h 95%, wrap");
@@ -516,9 +590,52 @@ public class PreferencesMenu {
 			basisPanel.add(panel, "w 79%, h 95%, wrap");
 		}
 		
-		basisPanel.add(ok_button, "pushx, alignx 100%, span");
+		for(MenuPanel panel : menuPanelList) {
+			
+			if(panel.getLabelText().equals(title)) {
+				
+				panel.setSelected(true);
+			}
+		}
 		
 		basisPanel.revalidate();
 		basisPanel.repaint();
+	}
+	
+	/**
+	 * Returns the darkThemeButton from ThemeSettings for the controller.
+	 * @return
+	 */
+	public JRadioButton getLightButton() {
+		
+		return themeSettings.getLightThemeButton();
+	}
+	
+	/**
+	 * Returns the darkThemeButton from ThemeSettings for the controller.
+	 * @return
+	 */
+	public JRadioButton getDarkButton() {
+		
+		return themeSettings.getDarkThemeButton();
+	}
+	
+	/**
+	 * Gets the list which contains the JPanels used to select the menu
+	 * type in the PreferencesMenu window.
+	 * @return
+	 */
+	public ArrayList<MenuPanel> getMenuPanelList() {
+		
+		return menuPanelList;
+	}
+	
+	/**
+	 * Returns PreferencesMenu's configNode.
+	 * @return
+	 */
+	public Preferences getConfigNode() {
+		
+		return configNode;
 	}
 }

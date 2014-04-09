@@ -96,7 +96,7 @@ public class ClusterProcessorArrays {
 	 * @return
 	 */
 	public String[] hCluster(final double[][] distanceMatrix,
-			final String type) {
+			 final String type) {
 
 		final HierClusterArrays cGen = new HierClusterArrays(tvModel, 
 				clusterView, distanceMatrix, type);
@@ -155,7 +155,7 @@ public class ClusterProcessorArrays {
 		final String rowString = "GENE";
 		
 		final DMCalculatorArrays dCalc = 
-				new DMCalculatorArrays(dataArrays, choice, clusterView);
+				new DMCalculatorArrays(dataArrays, choice, "Row", clusterView);
 
 		dCalc.measureDistance();
 
@@ -184,7 +184,7 @@ public class ClusterProcessorArrays {
 		final String colString = "ARRY";
 		
 		final DMCalculatorArrays dCalc = 
-				new DMCalculatorArrays(sepCols, choice2, clusterView);
+				new DMCalculatorArrays(sepCols, choice2, "Column", clusterView);
 
 		dCalc.measureDistance();
 

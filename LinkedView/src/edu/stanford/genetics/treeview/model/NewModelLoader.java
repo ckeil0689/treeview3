@@ -12,6 +12,7 @@ import java.io.LineNumberReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
+import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 
 import javax.swing.SwingWorker;
@@ -19,8 +20,8 @@ import javax.swing.SwingWorker;
 import Views.WelcomeView;
 
 import edu.stanford.genetics.treeview.FileSet;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeViewFrame;
-import edu.stanford.genetics.treeview.XmlConfig;
 
 public class NewModelLoader {
 
@@ -37,6 +38,7 @@ public class NewModelLoader {
 	private int dataStartRow;
 	private int dataStartCol;
 	
+	boolean dataFound = false;
 	private boolean gidFound = false;
 	private boolean aidFound = false;
 	private boolean eWeightFound = false;
@@ -50,7 +52,7 @@ public class NewModelLoader {
 		this.loadProgView = tvFrame.getWelcomeView();
 	}
 	
-	public TVModel load() {
+	public TVModel load() throws OutOfMemoryError {
 		
 		try {
 			// Read data from specified file location
@@ -68,16 +70,28 @@ public class NewModelLoader {
 	        loadProgView.setLoadLabel("Extracting data.");
 	        extractData(br);
 	        
+	        if(dataFound == false) {
+	        	String noData = "No data could be identified " +
+	        			"in the chosen file.";
+	        	tvFrame.setLoadErrorMessage(noData);
+	        	return null;
+	        }
+	        
+	        br.close();
+	        
         } catch(FileNotFoundException e) {
-        	System.out.println("CDT file could not be found.");
+        	String fnfError = "Chosen file could not be found: " 
+        			+ e.getMessage();
+        	LogBuffer.println(fnfError);
+        	tvFrame.setLoadErrorMessage(fnfError);
         	e.printStackTrace();
         	
         } catch (IOException e) {
-        	System.out.println("CDT file could not be loaded into " +
-        			"BufferedReader.");
+        	String fnfError = "File could not be loaded: " + e.getMessage();
+        	LogBuffer.println(fnfError);
+        	tvFrame.setLoadErrorMessage(fnfError);
         	e.printStackTrace();
 		}
-		
 		
 		// Parse the CDT File
 		loadProgView.setLoadLabel("Parsing main file.");
@@ -89,7 +103,7 @@ public class NewModelLoader {
 			parseATR();
 		
 		} else {
-			System.out.println("No ATR file found for this CDT file.");
+			LogBuffer.println("No ATR file found for this CDT file.");
 			targetModel.aidFound(false);
 		}
 		
@@ -99,7 +113,7 @@ public class NewModelLoader {
 			parseGTR();
 			
 		} else {
-			System.out.println("No GTR file found for this CDT file.");
+			LogBuffer.println("No GTR file found for this CDT file.");
 			targetModel.gidFound(false);
 		}
 		
@@ -108,13 +122,19 @@ public class NewModelLoader {
 			loadProgView.setLoadLabel("Getting configurations...");
 			final String xmlFile = targetModel.getFileSet().getJtv();
 
-			XmlConfig documentConfig;
+			Preferences documentConfig;
 			if (xmlFile.startsWith("http:")) {
-				documentConfig = new XmlConfig(new URL(xmlFile),
-						"DocumentConfig");
+//				documentConfig = new XmlConfig(new URL(xmlFile),
+//						"DocumentConfig");
+				
+				documentConfig = Preferences.userRoot().node("DocumentConfig");
+				LogBuffer.println("Cannot support configuration " +
+						"file from URL at the moment.");
 
 			} else {
-				documentConfig = new XmlConfig(xmlFile, "DocumentConfig");
+//				documentConfig = new XmlConfig(xmlFile, "DocumentConfig");
+				documentConfig = Preferences.userRoot().node("DocumentConfig");
+				documentConfig.put("jtv", xmlFile);
 			}
 			targetModel.setDocumentConfig(documentConfig);
 
@@ -163,7 +183,7 @@ public class NewModelLoader {
 	 * @param reader
 	 * @param dataExtract
 	 */
-	public  void extractData(BufferedReader reader) {
+	public  void extractData (BufferedReader reader) throws IOException {
 		
 		final String Digits     = "(\\p{Digit}+)";
 		final String emptyDigits = "(\\p{Digit}*)";
@@ -201,167 +221,157 @@ public class NewModelLoader {
 		dataStartCol = 0;
 		int gWeightCol = 0;
 		int rowN = 0;
-		boolean dataFound = false;
 		
-		try {
-			while ((line = reader.readLine()) != null) {
+		while ((line = reader.readLine()) != null) {
+			
+			loadProgView.updateLoadBar(rowN);
+
+			// load line as String array
+			final String[] lineAsStrings = line.split("\t");
+			String[] labels;
+			double[] dataValues;
+			
+			// loop over String array to convert applicable String to double
+			// first find data start
+			if(dataFound == false) {
+				labels = new String[lineAsStrings.length];
+				boolean containsEWeight = false;
 				
-				loadProgView.updateLoadBar(rowN);
-				
-				if(rowN == 1713) {
-					System.out.println("Bug");
-				}
-	
-				// load line as String array
-				final String[] lineAsStrings = line.split("\t");
-				String[] labels;
-				double[] dataValues;
-				
-				// loop over String array to convert applicable String to double
-				// first find data start
-				if(dataFound == false) {
-					labels = new String[lineAsStrings.length];
-					boolean containsEWeight = false;
+				for(int i = 0; i < lineAsStrings.length; i++) {
 					
-					for(int i = 0; i < lineAsStrings.length; i++) {
-						
-						String element = lineAsStrings[i];
-						
-						if(element.equalsIgnoreCase("GID")) {
-							gidFound = true;
-						} 
-						
-						// Check for GWEIGHT to avoid the weight being
-						// recognized as row start of actual data
-						if(element.equalsIgnoreCase("GWEIGHT")) {
-							gWeightCol = i;
-							gWeightFound = true;
-						} 
-						
-						if(element.equalsIgnoreCase("AID")) {
-							aidFound = true;
-						}
-						
-						// Check for EWEIGHT to avoid the weight being
-						// recognized as column start of actual data
-						if(element.equalsIgnoreCase("EWEIGHT")) {
-							containsEWeight = true;
-							eWeightFound = true;
-						}
+					String element = lineAsStrings[i];
 					
-						if (Pattern.matches(fpRegex, element) 
-								&& (!containsEWeight && i != gWeightCol)) {
-							
-							dataStartRow = rowN;
-							dataStartCol = i;
-							
-							dataFound = true;
-							break;
-							
-						} else {
-							labels[i] = element;
-						}
+					if(element.equalsIgnoreCase("GID")) {
+						gidFound = true;
+					} 
+					
+					// Check for GWEIGHT to avoid the weight being
+					// recognized as row start of actual data
+					if(element.equalsIgnoreCase("GWEIGHT")) {
+						gWeightCol = i;
+						gWeightFound = true;
+					} 
+					
+					if(element.equalsIgnoreCase("AID")) {
+						aidFound = true;
 					}
 					
-					// avoid first datarow to be added with null values
-					if(dataFound) {
-						String[] firstDataRow = new String[dataStartCol];
+					// Check for EWEIGHT to avoid the weight being
+					// recognized as column start of actual data
+					if(element.equalsIgnoreCase("EWEIGHT")) {
+						containsEWeight = true;
+						eWeightFound = true;
+					}
+				
+					if (Pattern.matches(fpRegex, element) 
+							&& (!containsEWeight && i != gWeightCol)) {
 						
-						for(int i = 0; i < labels.length; i++) {
-							
-							if(labels[i] != null) {
-								firstDataRow[i] = labels[i];
-								
-							} else {
-								break;
-							}
-						}
-						stringLabels[rowN] = firstDataRow;
+						dataStartRow = rowN;
+						dataStartCol = i;
+						
+						dataFound = true;
+						break;
 						
 					} else {
-						// handle line in which data has been found
-						stringLabels[rowN] = labels;
+						labels[i] = element;
 					}
+				}
+				
+				// avoid first datarow to be added with null values
+				if(dataFound) {
+					String[] firstDataRow = new String[dataStartCol];
 					
-					if(dataFound) {
-						doubleData = new double[lineNum - dataStartRow][];
-						dataValues = new double[lineAsStrings.length 
-						                        - dataStartCol];
+					for(int i = 0; i < labels.length; i++) {
 						
-						for(int i = 0; i < lineAsStrings.length 
-		                        - dataStartCol; i++) {
+						if(labels[i] != null) {
+							firstDataRow[i] = labels[i];
 							
-							String element = lineAsStrings[i + dataStartCol];
-						
-							// Check whether string can be double and is not 
-							// gweight
-							if (Pattern.matches(fpRegex, element)
-									&& i != gWeightCol) {
-								
-								// For empty exponents apparently 
-								// caused by Windows .txt
-								if(element.endsWith("e") 
-										|| element.endsWith("E")) {
-									element = element + "+00";
-								}
-								
-								double val = Double.parseDouble(element);
-								dataValues[i] = val;
-								
-							} else {
-								dataValues[i] = 0;
-							}
+						} else {
+							break;
 						}
-						
-						doubleData[rowN - dataStartRow] = dataValues;
 					}
+					stringLabels[rowN] = firstDataRow;
 					
 				} else {
-					labels = new String[dataStartCol];
+					// handle line in which data has been found
+					stringLabels[rowN] = labels;
+				}
+				
+				if(dataFound) {
+					doubleData = new double[lineNum - dataStartRow][];
 					dataValues = new double[lineAsStrings.length 
 					                        - dataStartCol];
 					
-					for(int i = 0; i < dataStartCol; i++) {
-						
-						String element = lineAsStrings[i];
-					
-						labels[i] = element;
-					}
-					
-					for(int i = 0; i < lineAsStrings.length - dataStartCol;
-							i++) {
+					for(int i = 0; i < lineAsStrings.length 
+	                        - dataStartCol; i++) {
 						
 						String element = lineAsStrings[i + dataStartCol];
-						
-						// handle parseDouble error somehow? 
-						// using the Pattern.matches method screws up 
-						// loading time by a factor of 1000....
-						if(element.endsWith("e") 
-								|| element.endsWith("E")) {
-							element = element + "+00";
-						}
-						
-						// Trying to parse the String, if not possible,
-						// add 0.
-						try {
+					
+						// Check whether string can be double and is not 
+						// gweight
+						if (Pattern.matches(fpRegex, element)
+								&& i != gWeightCol) {
+							
+							// For empty exponents apparently 
+							// caused by Windows .txt
+							if(element.endsWith("e") 
+									|| element.endsWith("E")) {
+								element = element + "+00";
+							}
+							
 							double val = Double.parseDouble(element);
 							dataValues[i] = val;
 							
-						} catch(Exception e) {
-							double val = Double.parseDouble("0.00E+00");
-							dataValues[i] = val;
+						} else {
+							dataValues[i] = 0;
 						}
 					}
 					
-					// Issue with length of stringLabels
-					stringLabels[rowN] = labels;
 					doubleData[rowN - dataStartRow] = dataValues;
-				} 
-				rowN++;
-			}
-			
-		} catch (final IOException e) {
-			e.printStackTrace();
+				}
+				
+			} else {
+				labels = new String[dataStartCol];
+				dataValues = new double[lineAsStrings.length 
+				                        - dataStartCol];
+				
+				for(int i = 0; i < dataStartCol; i++) {
+					
+					String element = lineAsStrings[i];
+				
+					labels[i] = element;
+				}
+				
+				for(int i = 0; i < lineAsStrings.length - dataStartCol;
+						i++) {
+					
+					String element = lineAsStrings[i + dataStartCol];
+					
+					// handle parseDouble error somehow? 
+					// using the Pattern.matches method screws up 
+					// loading time by a factor of 1000....
+					if(element.endsWith("e") 
+							|| element.endsWith("E")) {
+						element = element + "+00";
+					}
+					
+					// Trying to parse the String, if not possible,
+					// add 0.
+					try {
+						double val = Double.parseDouble(element);
+						dataValues[i] = val;
+						
+					} catch(Exception e) {
+						double val = Double.parseDouble("0.00E+00");
+						dataValues[i] = val;
+					}
+				}
+				
+				// Issue with length of stringLabels
+				stringLabels[rowN] = labels;
+				doubleData[rowN - dataStartRow] = dataValues;
+			} 
+			rowN++;
 		}
 	}
 	
@@ -435,6 +445,7 @@ public class NewModelLoader {
 		targetModel.setGenePrefix(genePrefix);
 		targetModel.setGeneHeaders(gHeaders);
 		targetModel.setExprData(doubleData);
+		targetModel.getDataMatrix().calculateMinMax();
 	}
 	
 	public void parseGTR() {
@@ -510,7 +521,7 @@ public class NewModelLoader {
 		ArrayList<String[]> gtrData = new ArrayList<String[]>();
 		
 		try {
-			System.out.println("Starting GTR load.");
+			LogBuffer.println("Starting GTR load.");
 			// Read data from specified file location
 			
 			FileInputStream fis = new FileInputStream(loadingSet);
@@ -519,7 +530,7 @@ public class NewModelLoader {
 	        
 	        // Get data from file into String and double arrays 
 	        // Put the arrays in ArrayLists for later access.
-	        System.out.println("Starting GTR extract.");
+	        LogBuffer.println("Starting GTR extract.");
 	        gtrData = extractGTR(br);
 	        
         } catch(FileNotFoundException e) {

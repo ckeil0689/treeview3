@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.prefs.Preferences;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -60,6 +61,8 @@ public abstract class ViewFrame implements Observer {
 	
 	// The Main application frame
 	protected JFrame applicationFrame;
+	
+	protected Preferences configNode;
 	
 	// The global most recently used object.
 	protected FileMru fileMru;
@@ -157,10 +160,10 @@ public abstract class ViewFrame implements Observer {
 	 * @param fileMruNode
 	 *            Node which will be bound to the FileMru
 	 */
-	protected void setupFileMru(final ConfigNode fileMruNode) {
+	protected void setupFileMru() {
 
 		fileMru = new FileMru();
-		fileMru.bindConfig(fileMruNode);
+		fileMru.setConfigNode(configNode);
 
 		try {
 			fileMru.removeMoved();
@@ -312,10 +315,10 @@ public abstract class ViewFrame implements Observer {
 					}
 				}
 
-				final ConfigNode documentConfig = dataModel
+				final Preferences documentConfig = dataModel
 						.getDocumentConfigRoot();
 				if (documentConfig != null) {
-					documentConfig.store();
+//					documentConfig.store();
 				}
 			}
 		} catch (final Exception e) {
@@ -640,7 +643,7 @@ public abstract class ViewFrame implements Observer {
 	 * 
 	 * @return The fileset corresponding to the dataset.
 	 */
-	protected FileSet getFileSet(final File file) {
+	public FileSet getFileSet(final File file) {
 
 		FileSet fileSet1;
 

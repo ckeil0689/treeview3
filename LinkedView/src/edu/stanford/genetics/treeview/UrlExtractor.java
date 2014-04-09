@@ -24,6 +24,7 @@ package edu.stanford.genetics.treeview;
 
 import java.awt.Frame;
 import java.io.UnsupportedEncodingException;
+import java.util.prefs.Preferences;
 
 /**
  * This class extracts Urls from HeaderInfo. Also included is a class to pop up
@@ -34,6 +35,7 @@ public class UrlExtractor {
 	 * This class must be constructed around gene header info
 	 */
 	public UrlExtractor(final HeaderInfo hI) {
+		
 		headerInfo = hI;
 		urlTemplate = dUrlTemplate;
 		index = dindex;
@@ -42,6 +44,7 @@ public class UrlExtractor {
 	}
 
 	public UrlExtractor(final HeaderInfo hI, final UrlPresets uPresets) {
+		
 		headerInfo = hI;
 		urlTemplate = dUrlTemplate;
 		index = dindex;
@@ -54,16 +57,17 @@ public class UrlExtractor {
 	/**
 	 * can be bound to config node to provide persistence
 	 */
-	public void bindConfig(final ConfigNode n) {
+	public void bindConfig(final Preferences n) {
+		
 		root = n;
 		// extract state...
-		urlTemplate = root.getAttribute("urlTemplate", dUrlTemplate);
-		index = root.getAttribute("index", dindex);
+		urlTemplate = root.get("urlTemplate", dUrlTemplate);
+		index = root.getInt("index", dindex);
 		// some shennanigans since I can't store booleans in a confignode...
 		int ide = 0;
 		if (isDefaultEnabled == true)
 			ide = 1;
-		isEnabled = (root.getAttribute("isEnabled", ide) == 1);
+		isEnabled = (root.getInt("isEnabled", ide) == 1);
 	}
 
 	/**
@@ -127,7 +131,7 @@ public class UrlExtractor {
 	public void setIndex(final int i) {
 		index = i;
 		if (root != null)
-			root.setAttribute("index", index, dindex);
+			root.putInt("index", index);
 	}
 
 	public int getIndex() {
@@ -137,7 +141,7 @@ public class UrlExtractor {
 	public void setUrlTemplate(final String c) {
 		urlTemplate = c;
 		if (root != null)
-			root.setAttribute("urlTemplate", urlTemplate, dUrlTemplate);
+			root.put("urlTemplate", urlTemplate);
 	}
 
 	public String getUrlTemplate() {
@@ -168,7 +172,7 @@ public class UrlExtractor {
 			ie = 1;
 
 		if (root != null)
-			root.setAttribute("isEnabled", ie, ide);
+			root.putInt("isEnabled", ie);
 
 	}
 
@@ -201,6 +205,6 @@ public class UrlExtractor {
 		return headerInfo;
 	}
 
-	private ConfigNode root;
+	private Preferences root;
 	UrlPresets uPresets;
 }

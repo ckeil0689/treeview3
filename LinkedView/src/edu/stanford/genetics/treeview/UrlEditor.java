@@ -94,7 +94,8 @@ public class UrlEditor {
 
 	public static void main(final String[] argv) {
 
-		final UrlPresets p = new UrlPresets(new DummyConfigNode("UrlPresets"));
+		final UrlPresets p = new UrlPresets("UrlEditor");
+		p.setConfigNode(null);
 		final UrlEditor e = new UrlEditor(new UrlExtractor(null), p, null);
 		final Frame f = new Frame(getTitle());
 		e.addToFrame(f);

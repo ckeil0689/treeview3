@@ -25,8 +25,8 @@ package edu.stanford.genetics.treeview.model;
 import java.util.Hashtable;
 import java.util.Observable;
 import java.util.concurrent.ExecutionException;
+import java.util.prefs.Preferences;
 
-import edu.stanford.genetics.treeview.ConfigNode;
 import edu.stanford.genetics.treeview.DataMatrix;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
@@ -34,7 +34,6 @@ import edu.stanford.genetics.treeview.FileSetListener;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.TreeViewFrame;
-import edu.stanford.genetics.treeview.XmlConfig;
 
 public class TVModel extends Observable implements DataModel {
 
@@ -55,7 +54,7 @@ public class TVModel extends Observable implements DataModel {
 
 	protected boolean eweightFound = false;
 	protected boolean gweightFound = false;
-	protected XmlConfig documentConfig; // holds document config
+	protected Preferences documentConfig; // holds document config
 
 	/** has model been successfully loaded? */
 	private boolean loaded = false;
@@ -240,18 +239,18 @@ public class TVModel extends Observable implements DataModel {
 		source.addFileSetListener(listener);
 	}
 
-	public XmlConfig getDocumentConfig() {
+	public Preferences getDocumentConfig() {
 
 		return documentConfig;
 	}
 
 	@Override
-	public ConfigNode getDocumentConfigRoot() {
+	public Preferences getDocumentConfigRoot() {
 
-		return documentConfig.getRoot();
+		return documentConfig.userRoot();
 	}
 
-	public void setDocumentConfig(final XmlConfig newVal) {
+	public void setDocumentConfig(final Preferences newVal) {
 
 		documentConfig = newVal;
 	}
@@ -582,10 +581,48 @@ public class TVModel extends Observable implements DataModel {
 
 		private boolean modified = false;
 		private double[][] exprData = null;
+		private double minVal = Double.MAX_VALUE;
+		private double maxVal = Double.MIN_VALUE;
 
 		public void clear() {
 
 			exprData = null;
+		}
+		
+		@Override
+		public void calculateMinMax() {
+			
+			if(exprData != null) {
+				for(int i = 0; i < nGene(); i++) {
+					
+					for(int j = 0; j < nExpr(); j++) {
+						
+						if(exprData[i][j] > maxVal) {
+							
+							maxVal = exprData[i][j];
+						}
+						
+						if(exprData[i][j] < minVal) {
+							
+							minVal = exprData[i][j];
+						}
+					}
+				}				
+			} else {
+				//Log that exprdata is null
+			}
+		}
+		
+		@Override
+		public double getMinVal() {
+			
+			return minVal;
+		}
+		
+		@Override
+		public double getMaxVal() {
+			
+			return maxVal;
 		}
 		
 		@Override
@@ -772,7 +809,7 @@ public class TVModel extends Observable implements DataModel {
 	 * 
 	 */
 	public void loadNew(final FileSet fileSet) throws LoadException, 
-	InterruptedException, ExecutionException {
+	InterruptedException, ExecutionException, OutOfMemoryError {
 
 		resetState();
 		setSource(fileSet);
@@ -781,7 +818,8 @@ public class TVModel extends Observable implements DataModel {
 		loader.load();
 
 		if (!isLoaded()) {
-			throw new LoadException("Loading Cancelled", LoadException.INTPARSE);
+			throw new LoadException("Loading Cancelled", 
+					LoadException.INTPARSE);
 		}
 	}
 

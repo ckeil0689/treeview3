@@ -33,10 +33,12 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Observable;
+import java.util.prefs.Preferences;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -44,10 +46,11 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenuBar;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
@@ -55,6 +58,7 @@ import javax.swing.WindowConstants;
 
 import Controllers.DendroController;
 import Views.LoadCheckView;
+import Views.LoadErrorView;
 import Views.WelcomeView;
 
 import net.miginfocom.swing.MigLayout;
@@ -79,6 +83,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	// Instance Variables
 	private static String appName = "TreeView 3";
 
+	protected JPanel backgroundPanel;
+	protected JPanel menuPanel;
 	protected JPanel waiting;
 	protected DendroPanel running;
 	protected DataModel dataModel;
@@ -90,8 +96,11 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	
 	// Different Views
 	private WelcomeView welcomeView;
+	private LoadErrorView loadErrorView;
 	private LoadCheckView confirmPanel;
 	private DendroView2 dendroView;
+	
+	private String loadErrorMessage;
 	
 	private DendroController dendroController;
 	
@@ -99,7 +108,14 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	
 	// Menu Items
 	private ArrayList<JMenuItem> menuList;
+	private ArrayList<JMenuItem> stackMenuList;
 	private ArrayList<JMenuItem> fileMenuList;
+	
+	private JButton stackButton;
+	private JButton searchButton;
+	private JButton treeButton;
+	
+	private JPopupMenu stackMenu;
 	
 	private boolean loaded;
 
@@ -127,34 +143,58 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 		super(appName);
 		treeView = treeview;
-		loaded = false;
+		configNode = treeView.getGlobalConfig().node("TreeViewFrame");
 		setWindowActive(true);
 
+		// General UIManager setup
 		try {
 			UIManager.setLookAndFeel(UIManager
 					.getCrossPlatformLookAndFeelClassName());
-
+			
+			UIManager.put("MenuItem.selectionBackground", 
+					GUIParams.ELEMENT_HOV);
+			UIManager.put("MenuItem.font", GUIParams.FONT_MENU);
+			UIManager.put("MenuItem.background", GUIParams.MENU);
+			
+			UIManager.put("Menu.selectionBackground", 
+					GUIParams.ELEMENT_HOV);
+			UIManager.put("Menu.font", GUIParams.FONT_MENU);
+			UIManager.put("Menu.background", GUIParams.MENU);
+			
 		} catch (final Exception e) {
 
 		}
 
-		waiting = new JPanel();
-		waiting.setLayout(new MigLayout("ins 0"));
-		waiting.setBackground(GUIParams.BG_COLOR);
-		
-		// Add the main background panel to the contentPane
-		applicationFrame.getContentPane().add(waiting);
-
-		// Set the first view to WelcomeView
-		setView("WelcomeView");
-		
 		// Set up other stuff
-		setupPresets();
-		setupMenuBar();
-		setupFileMru(treeView.getGlobalConfig().getNode("FileMru"));
+		setupMainPanels();
+		setupPresets();	
+		
+//		setupMenuBar();
+		buildMenu();
 
 		setupFrameSize();
 		setLoaded(false);
+	}
+	
+	/**
+	 * Initializes all the main panels that make up TreeView.
+	 */
+	public void setupMainPanels() {
+		
+		backgroundPanel = new JPanel();
+		backgroundPanel.setLayout(new MigLayout("ins 0"));
+		
+		menuPanel = new JPanel();
+		menuPanel.setLayout(new MigLayout("ins 0"));
+		
+		waiting = new JPanel();
+		waiting.setLayout(new MigLayout("ins 0"));
+		
+		backgroundPanel.add(menuPanel, "pushx, grow, wrap");
+		backgroundPanel.add(waiting, "pushx, grow, h 98%");
+		
+		// Add the main background panel to the contentPane
+		applicationFrame.getContentPane().add(backgroundPanel);
 	}
 	
 	// Setting different views
@@ -177,10 +217,14 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			} else if(viewName.equalsIgnoreCase("LoadProgressView")) {
 				welcomeView = new WelcomeView(this);
 				view = welcomeView.makeLoading();
+				
+			} else if(viewName.equalsIgnoreCase("LoadErrorView")) {
+				loadErrorView = new LoadErrorView(this, loadErrorMessage);
+				view = loadErrorView.makeErrorPanel();
 			
-			} else if(viewName.equalsIgnoreCase("LoadCheckView")) {
-				confirmPanel = new LoadCheckView((TVModel)dataModel);
-				view = confirmPanel.makeLoadCheckView();
+//			} else if(viewName.equalsIgnoreCase("LoadCheckView")) {
+//				confirmPanel = new LoadCheckView((TVModel)dataModel);
+//				view = confirmPanel.makeLoadCheckView();
 				
 			} else {
 				view.setLayout(new MigLayout());
@@ -193,13 +237,20 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 				view.add(error, "push, alignx 50%");
 			}
 			
+			// Rebuild Menus
+			buildMenu();
+			
 		} else {
 			dendroView = new DendroView2(this);
+			setRunning(dendroView);
+			
+			// Rebuild Menus
+			buildMenu();
+			
 			dendroController = new DendroController(dendroView, this, 
 					(TVModel)dataModel, null);
-			setRunning(dendroView);
+			
 			view = dendroView.makeDendroPanel();
-			setLoaded(true);
 		}
 		
 		displayView(view);
@@ -216,17 +267,28 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	}
 	
 	/**
+	 * Displays a screen to notify the user of a loading issue. Offers
+	 * the user to load a different file by providing the appropriate button.
+	 * @param errorMessage
+	 */
+	public void setLoadErrorMessage(String errorMessage) {
+		
+		this.loadErrorMessage = errorMessage;
+	}
+	
+	/**
 	 * Setting the JPanel to be displayed within TVFrame
 	 * @param view
 	 */
 	public void displayView(JPanel view) {
 		
 		waiting.removeAll();
-		
+		waiting.setBackground(GUIParams.BG_COLOR);
 		waiting.add(view, "push, grow");
 		
-		waiting.revalidate();
-		waiting.repaint();
+		backgroundPanel.setBackground(GUIParams.BG_COLOR);
+		backgroundPanel.revalidate();
+		backgroundPanel.repaint();
 	}
 	
 	/**
@@ -370,7 +432,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	
 	// Getters for Views
 	/**
-	 * Return TVFrame's current WelcomeView instance
+	 * Returns TVFrame's current WelcomeView instance
 	 * @return welcomeView
 	 */
 	public WelcomeView getWelcomeView() {
@@ -379,7 +441,16 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	}
 	
 	/**
-	 * Return TVFrame's current LoadCheckView instance
+	 * Returns TVFrame's current LoadErrorView instance
+	 * @return welcomeView
+	 */
+	public LoadErrorView getLoadErrorView() {
+		
+		return loadErrorView;
+	}
+	
+	/**
+	 * Returns TVFrame's current LoadCheckView instance
 	 * @return confirmPanel
 	 */
 	public LoadCheckView getLoadCheckView() {
@@ -388,7 +459,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	}
 	
 	/**
-	 * Return TVFrame's current DendroView instance
+	 * Returns TVFrame's current DendroView instance
 	 * @return dendroView
 	 */
 	public DendroView2 getDendroView() {
@@ -414,7 +485,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		if (observable == fileMru) {
 			// System.out.println("Rebuilding file menu");
-			programMenu.rebuild();
+//			programMenu.rebuild();
 
 		} else {
 			System.out.println("Got weird update");
@@ -433,116 +504,334 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		// reset persistent popups
 //		setGeneFinder(null);
 		loaded = flag;
-//		getContentPane().removeAll();
+//		backgroundPanel.removeAll();
 //		waiting.removeAll();
 
 		if (loaded) {
 			if (running == null) {
-				JOptionPane.showMessageDialog(applicationFrame, "TreeViewFrame 253: "
-						+ "No plugins to display");
+				JOptionPane.showMessageDialog(applicationFrame, 
+						"TreeViewFrame 253: No plugins to display");
 			} else {
-				confirmPanel = null;
-//				getContentPane().add((JComponent) running);
-//				setView(running.getName());
 				setLoadedTitle();
-				treeView.getGlobalConfig().store();
+//				treeView.getGlobalConfig().store();
 			}
 
 		} else {
-//			getContentPane().add(waiting);
+//			backgroundPanel.add(waiting);
 			applicationFrame.setTitle(getAppName());
 		}
 
 		// menubar.rebuild...
-		rebuildMainPanelMenu();
+//		rebuildMainPanelMenu();
 //		treeView.rebuildWindowMenus();
 	}
 
-	// Methods to setup Menubar
 	/**
-	 * This method sets up the main MenuBar with all the subMenus. It also calls
-	 * methods to populate the subMenus.
+	 * Builds the two menu buttons for TVFrame.
 	 */
-	protected void setupMenuBar() {
-
-		menuList = new ArrayList<JMenuItem>();
+	public void buildMenu() {
 		
-		menubar = new TreeViewJMenuBar();
-		applicationFrame.setJMenuBar(new JMenuBar());
-
-		((TreeViewJMenuBar) menubar).setUnderlyingMenuBar(
-				applicationFrame.getJMenuBar());
-
-		synchronized (menubar) {
-			menubar.addMenu(TreeviewMenuBarI.programMenu);
-			menubar.setMenuMnemonic(KeyEvent.VK_F);
-			programMenu = new ProgramMenu(); // rebuilt when fileMru notifies
-			menubar.addMenu(TreeviewMenuBarI.documentMenu);
-			menubar.setMenuMnemonic(KeyEvent.VK_S);
-			menubar.addMenu(TreeviewMenuBarI.analysisMenu);
-			menubar.setMenuMnemonic(KeyEvent.VK_A);
-			menubar.addMenu(TreeviewMenuBarI.exportMenu);
-			menubar.setMenuMnemonic(KeyEvent.VK_E);
-			menubar.addMenu(TreeviewMenuBarI.windowMenu);
-			menubar.setMenuMnemonic(KeyEvent.VK_W);
-			populateWindowMenu(menubar);
-			menubar.addMenu(TreeviewMenuBarI.helpMenu);
-			menubar.setMenuMnemonic(KeyEvent.VK_H);
-			populateHelpMenu(menubar);
+		menuPanel.removeAll();
+		menuPanel.setBackground(GUIParams.BG_COLOR);
+		
+		generateStackMenu();
+		
+		if(running != null) {
+			generateSearchMenu();
+			generateTreeMenu();
 		}
 	}
+	
+	public void generateStackMenu() {
+		
+		stackButton = GUIParams.setMenuButtonLayout("MENU", "stackIcon");
+		stackButton.setToolTipText("Tools & Analysis Options");
+		
+		menuPanel.add(stackButton);
+		
+		stackMenu = new JPopupMenu();
+		
+		stackMenuList = new ArrayList<JMenuItem>();
+		
+		// File
+		JMenu fileSubMenu = new JMenu("File");
+		// Open new file Menu
+		JMenuItem openMenuItem = new JMenuItem("Open");
+		fileSubMenu.add(openMenuItem);
+		stackMenuList.add(openMenuItem);
+	
+		// menubar.addMenuItem("Open Url...", new ActionListener() {
+		// public void actionPerformed(ActionEvent actionEvent) {
+		// try {
+		// FileSet fileSet = offerUrlSelection();
+		// loadFileSet(fileSet);
+		// fileSet = fileMru.addUnique(fileSet);
+		// fileMru.setLast(fileSet);
+		// fileMru.notifyObservers();
+		// setLoaded(true);
+		// } catch (LoadException e) {
+		// LogBuffer.println("could not load url: "
+		// + e.getMessage());
+		// // setLoaded(false);
+		// }
+		// }
+		// });
+		// menubar.setMnemonic(KeyEvent.VK_U);
+		
+		//-------
+		fileMenuList = new ArrayList<JMenuItem>();
+		
+		JMenu recentSubMenu = new JMenu("Open Recent");
+		
+		final Preferences[] aconfigNode = fileMru.getConfigs();
+		final String astring[] = fileMru.getFileNames();
 
-	/**
-	 * When this method is called some components of the main MenuBar are
-	 * rearranged and restructured. Depending whether the boolean loaded is true
-	 * some subMenus are populated or not.
-	 */
-	public void rebuildMainPanelMenu() {
+		for (int j = aconfigNode.length; j > 0; j--) {
+			
+			fileMenuSet = new FileSet(aconfigNode[j - 1]);
+			
+			JMenuItem fileSetMenuItem = new JMenuItem(astring[j - 1]);
+			recentSubMenu.add(fileSetMenuItem);
+			fileMenuList.add(fileSetMenuItem);
+		}
+		
+		fileSubMenu.add(recentSubMenu);
+		
+		JMenuItem editRecentMenuItem = new JMenuItem("Edit Recent Files");
+		fileSubMenu.add(editRecentMenuItem);
+		stackMenuList.add(editRecentMenuItem);
+		//--------
 
-		synchronized (menubar) {
-			menubar.setMenu(TreeviewMenuBarI.documentMenu);
-			menubar.removeMenuItems();
-			menubar.setMenu(TreeviewMenuBarI.analysisMenu);
-			menubar.removeAll();
-			menubar.setEnabled(true);
-			menubar.setMenu(TreeviewMenuBarI.exportMenu);
-			menubar.removeAll();
+		fileSubMenu.addSeparator();
+		
+		JMenuItem saveMenuItem = new JMenuItem("Save");
+		fileSubMenu.add(saveMenuItem);
+		stackMenuList.add(saveMenuItem);
+
+		JMenuItem saveAsMenuItem = new JMenuItem("Save as");
+		fileSubMenu.add(saveAsMenuItem);
+		stackMenuList.add(saveAsMenuItem);
+		
+		stackMenu.add(fileSubMenu);
+
+//		menubar.addSubMenu(TreeviewMenuBarI.mruSubMenu);
+		if(running != null) {
+			stackMenu.addSeparator();
+			JMenu viewMenu = new JMenu("View");
+			running.addDendroMenus(viewMenu);
+			stackMenu.add(viewMenu);
+			
+			// Cluster Menu
+			JMenuItem clusterMenuItem = new JMenuItem("Cluster");
+			stackMenu.add(clusterMenuItem);
+			stackMenuList.add(clusterMenuItem);
+			
+			// Functional Enrichment Menu
+//			JMenuItem funcEnrMenuItem = new JMenuItem("Functional Enrichment");
+//			stackMenu.add(funcEnrMenuItem);
+//			stackMenuList.add(funcEnrMenuItem);
+		}
+		
+		stackMenu.addSeparator();
+		
+		// Preferences
+		JMenu prefSubMenu = new JMenu("Preferences");
+		
+		if(running == null) {
+			JMenuItem themeMenuItem = new JMenuItem("Theme");
+			stackMenuList.add(themeMenuItem);
+			prefSubMenu.add(themeMenuItem);
+			
+		} else {
+			JMenuItem themeMenuItem = new JMenuItem("Theme");
+			stackMenuList.add(themeMenuItem);
+			prefSubMenu.add(themeMenuItem);
+			
+			JMenuItem fontMenuItem = new JMenuItem("Font");
+			stackMenuList.add(fontMenuItem);
+			prefSubMenu.add(fontMenuItem);
+			
+			JMenuItem urlMenuItem = new JMenuItem("URL");
+			stackMenuList.add(urlMenuItem);
+			prefSubMenu.add(urlMenuItem);
 		}
 
-		if (getLoaded()) {
-			menubar.setMenu(TreeviewMenuBarI.analysisMenu);
-			populateAnalysisMenu(menubar);
-			menubar.setMenu(TreeviewMenuBarI.exportMenu);
-			populateExportMenu(menubar);
-			menubar.setMenu(TreeviewMenuBarI.programMenu);
-
-			if (running != null) {
-				programMenu.populatePreferencesMenu(menubar);
-				menubar.setMenu(TreeviewMenuBarI.documentMenu);
-				menubar.removeAll();
-				populateSettingsMenu(menubar);
-				running.populateSettingsMenu(menubar);
-				menubar.setMenu(TreeviewMenuBarI.programMenu);
-				menubar.setMenu(TreeviewMenuBarI.analysisMenu);
-				running.populateAnalysisMenu(menubar);
-				menubar.setMenu(TreeviewMenuBarI.exportMenu);
-
-				if (menubar.getItemCount() > 0) {
-					menubar.addSeparator();
-				}
-				running.populateExportMenu(menubar);
-			}
-
-			menubar.setMenu(TreeviewMenuBarI.analysisMenu);
-
-			if (menubar.getItemCount() > 0) {
-				menubar.addSeparator();
-			}
+		stackMenu.add(prefSubMenu);
+		
+		// Help
+		JMenu helpSubMenu = new JMenu("Help");
+		
+		if(running != null) {
+			JMenuItem statsMenuItem = new JMenuItem("Stats");
+			helpSubMenu.add(statsMenuItem);
+			stackMenuList.add(statsMenuItem);
 		}
+					
+		JMenuItem aboutMenuItem = new JMenuItem("About...");
+		helpSubMenu.add(aboutMenuItem);
+		stackMenuList.add(aboutMenuItem);
 
-		menubar.setMenu(TreeviewMenuBarI.documentMenu);
-		menubar.setEnabled(true);
+		JMenuItem logMenuItem = new JMenuItem("Show Log");
+		helpSubMenu.add(logMenuItem);
+		stackMenuList.add(logMenuItem);
+
+		JMenuItem documentMenuItem = new JMenuItem("Documentation...");
+		helpSubMenu.add(documentMenuItem);
+		stackMenuList.add(documentMenuItem);
+
+//				menubar.addMenuItem("Plugins...");
+//				, new ActionListener() {
+//
+//					@Override
+//					public void actionPerformed(final ActionEvent actionEvent) {
+//
+//						displayPluginInfo();
+//					}
+//				});
+
+//				menubar.addMenuItem("Registration...");
+//				, new ActionListener() {
+//
+//					@Override
+//					public void actionPerformed(final ActionEvent actionEvent) {
+//
+//						final ConfigNode node = treeView.getGlobalConfig().getNode(
+//								"Registration");
+//						if (node != null) {
+//							try {
+//								edu.stanford.genetics.treeview.reg.RegEngine
+//										.reverify(node);
+//							} catch (final Exception e) {
+//								LogBuffer.println("registration error " + e);
+//								e.printStackTrace();
+//							}
+//						}
+//					}
+//				});
+
+		JMenuItem feedbackMenuItem = new JMenuItem("Feedback");
+		helpSubMenu.add(feedbackMenuItem);
+		stackMenuList.add(feedbackMenuItem);
+		
+		stackMenu.add(helpSubMenu);
+		stackMenu.addSeparator();
+		
+		// New Window
+		JMenuItem newWindowMenuItem = new JMenuItem("New Window");
+		stackMenuList.add(newWindowMenuItem);
+		stackMenu.add(newWindowMenuItem);
+		
+		// Quit Program Menu
+		JMenuItem quitMenuItem = new JMenuItem("Quit Program");
+		stackMenu.add(quitMenuItem);
+		stackMenuList.add(quitMenuItem);
 	}
+	
+	public void generateSearchMenu() {
+		
+		searchButton = GUIParams.setMenuButtonLayout("SEARCH LABELS", null);
+		searchButton.setToolTipText("Find Row or Column Elements");
+		
+		menuPanel.add(searchButton);
+	}
+	
+	public void generateTreeMenu() {
+		
+		treeButton = GUIParams.setMenuButtonLayout("SHOW TREES", null);
+		treeButton.setToolTipText("Determine Dendrogram Visibility");
+		
+		// Initially disabled, will be enabled if gtrview or atrview in
+		// DendroView are enabled.
+		treeButton.setEnabled(false);
+		
+		menuPanel.add(treeButton);
+	}
+	
+	// Methods to setup Menubar
+//	/**
+//	 * This method sets up the main MenuBar with all the subMenus. It also calls
+//	 * methods to populate the subMenus.
+//	 */
+//	protected void setupMenuBar() {
+//
+//		menuList = new ArrayList<JMenuItem>();
+//		
+//		menubar = new TreeViewJMenuBar();
+//		applicationFrame.setJMenuBar(new JMenuBar());
+//
+//		((TreeViewJMenuBar) menubar).setUnderlyingMenuBar(
+//				applicationFrame.getJMenuBar());
+//
+//		synchronized (menubar) {
+//			menubar.addMenu(TreeviewMenuBarI.programMenu);
+//			menubar.setMenuMnemonic(KeyEvent.VK_F);
+//			programMenu = new ProgramMenu(); // rebuilt when fileMru notifies
+//			menubar.addMenu(TreeviewMenuBarI.documentMenu);
+//			menubar.setMenuMnemonic(KeyEvent.VK_S);
+//			menubar.addMenu(TreeviewMenuBarI.analysisMenu);
+//			menubar.setMenuMnemonic(KeyEvent.VK_A);
+//			menubar.addMenu(TreeviewMenuBarI.exportMenu);
+//			menubar.setMenuMnemonic(KeyEvent.VK_E);
+//			menubar.addMenu(TreeviewMenuBarI.windowMenu);
+//			menubar.setMenuMnemonic(KeyEvent.VK_W);
+//			populateWindowMenu(menubar);
+//			menubar.addMenu(TreeviewMenuBarI.helpMenu);
+//			menubar.setMenuMnemonic(KeyEvent.VK_H);
+//			populateHelpMenu(menubar);
+//		}
+//	}
+
+//	/**
+//	 * When this method is called some components of the main MenuBar are
+//	 * rearranged and restructured. Depending whether the boolean loaded is true
+//	 * some subMenus are populated or not.
+//	 */
+//	public void rebuildMainPanelMenu() {
+//
+//		synchronized (menubar) {
+//			menubar.setMenu(TreeviewMenuBarI.documentMenu);
+//			menubar.removeMenuItems();
+//			menubar.setMenu(TreeviewMenuBarI.analysisMenu);
+//			menubar.removeAll();
+//			menubar.setEnabled(true);
+//			menubar.setMenu(TreeviewMenuBarI.exportMenu);
+//			menubar.removeAll();
+//		}
+//
+//		if (getLoaded()) {
+//			menubar.setMenu(TreeviewMenuBarI.analysisMenu);
+//			populateAnalysisMenu(menubar);
+//			menubar.setMenu(TreeviewMenuBarI.exportMenu);
+//			populateExportMenu(menubar);
+//			menubar.setMenu(TreeviewMenuBarI.programMenu);
+//
+//			if (running != null) {
+//				programMenu.populatePreferencesMenu(menubar);
+//				menubar.setMenu(TreeviewMenuBarI.documentMenu);
+//				menubar.removeAll();
+//				populateSettingsMenu(menubar);
+//				running.populateSettingsMenu(menubar);
+//				menubar.setMenu(TreeviewMenuBarI.programMenu);
+//				menubar.setMenu(TreeviewMenuBarI.analysisMenu);
+//				running.populateAnalysisMenu(menubar);
+//				menubar.setMenu(TreeviewMenuBarI.exportMenu);
+//
+//				if (menubar.getItemCount() > 0) {
+//					menubar.addSeparator();
+//				}
+//				running.populateExportMenu(menubar);
+//			}
+//
+//			menubar.setMenu(TreeviewMenuBarI.analysisMenu);
+//
+//			if (menubar.getItemCount() > 0) {
+//				menubar.addSeparator();
+//			}
+//		}
+//
+//		menubar.setMenu(TreeviewMenuBarI.documentMenu);
+//		menubar.setEnabled(true);
+//	}
 
 //	/**
 //	 * This method sets up a JDialog to call an option for the user to change
@@ -577,15 +866,15 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 */
 	protected void populateWindowMenu(final TreeviewMenuBarI menubar) {
 	
-		menubar.removeAll();
-
-		menubar.addSeparator();
-
-		JMenuItem newWindowMenuItem = 
-				(JMenuItem) menubar.addMenuItem("New Window");
-		menuList.add(newWindowMenuItem);
-		menubar.setAccelerator(KeyEvent.VK_N);
-		menubar.setMnemonic(KeyEvent.VK_N);
+//		menubar.removeAll();
+//
+//		menubar.addSeparator();
+//
+//		JMenuItem newWindowMenuItem = 
+//				(JMenuItem) menubar.addMenuItem("New Window");
+//		settingsMenuList.add(newWindowMenuItem);
+//		menubar.setAccelerator(KeyEvent.VK_N);
+//		menubar.setMnemonic(KeyEvent.VK_N);
 
 //		JMenuItem closeWindowMenuItem = 
 //				(JMenuItem) menubar.addMenuItem("Close Window");
@@ -996,7 +1285,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 				menubar.setSubMenu(TreeviewMenuBarI.mruSubMenu);
 				menubar.removeAll();
 
-				final ConfigNode aconfigNode[] = fileMru.getConfigs();
+				final Preferences[] aconfigNode = fileMru.getConfigs();
 				final String astring[] = fileMru.getFileNames();
 
 				for (int j = aconfigNode.length; j > 0; j--) {
@@ -1157,12 +1446,12 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	}
 	
 	// Adding MenuActionListeners
-	public void addMenuActionListeners(ActionListener listener) {
+	public void addMenuActionListeners(ActionListener l) {
 		
-		for(JMenuItem item : menuList){
+		for(JMenuItem item : stackMenuList){
 			
 			if(item.getActionListeners().length == 0) {
-				item.addActionListener(listener);
+				item.addActionListener(l);
 			}
 		}
 	}
@@ -1171,9 +1460,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 * used for the views to add some exclusive JMenuItems
 	 * @param menu
 	 */
-	public void addToMenuList(JMenuItem menu) {
+	public void addToStackMenuList(JMenuItem menu) {
 		
-		menuList.add(menu);
+		stackMenuList.add(menu);
 	}
 	
 	/**
@@ -1190,9 +1479,34 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		}
 	}
 	
+	public void addStackButtonListener(MouseListener l) {
+		
+		stackButton.addMouseListener(l);
+	}
+	
+	public void addSearchButtonListener(MouseListener l) {
+		
+		searchButton.addMouseListener(l);
+	}
+	
+	public void addTreeButtonListener(MouseListener l) {
+		
+		treeButton.addMouseListener(l);
+	}
+	
+	public JPopupMenu getStackMenu() {
+		
+		return stackMenu;
+	}
+	
 	public FileSet getFileMenuSet() {
 		
 		return fileMenuSet;
+	}
+	
+	public ArrayList<JMenuItem> getStackMenus() {
+		
+		return stackMenuList;
 	}
 	
 //	/**
@@ -1283,14 +1597,18 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 //		return arrayFinder;
 //	}
 	
-	public ArrayList<JMenuItem> getMenus() {
-		
-		return menuList;
-	}
-	
 	public DendroController getDendroController() {
 		
 		return dendroController;
+	}
+	
+	/**
+	 * Returns TreeViewFrame's configNode.
+	 * @return
+	 */
+	public Preferences getConfigNode() {
+		
+		return configNode;
 	}
 
 	/**
@@ -1329,6 +1647,16 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		return running;
 	}
 	
+	public JButton getTreeButton() {
+		
+		return treeButton;
+	}
+	
+	public JButton getSearchButton() {
+		
+		return searchButton;
+	}
+	
 	/**
 	 * Returns TVFrame's instance of the LoadCheckView panel.
 	 * @return
@@ -1338,7 +1666,26 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		return confirmPanel;
 	}
 
-	// Empty Methods
+	/** 
+	 * 
+	 * Setting up all saved configurations related to TVFrame.
+	 */
 	protected void setupPresets() {
+		
+		// Load Theme
+		String default_theme = "dark";
+		String savedTheme = getConfigNode().get("theme", 
+				default_theme);
+		
+		// Since changing the theme resets the layout
+		if(savedTheme.equalsIgnoreCase("dark")) {
+			GUIParams.setNight();
+			
+		} else {
+			GUIParams.setDayLight();
+		}
+		
+		// Load FileMRU
+		setupFileMru();
 	}
 }

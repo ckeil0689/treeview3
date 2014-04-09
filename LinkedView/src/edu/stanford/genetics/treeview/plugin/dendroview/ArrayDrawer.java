@@ -27,8 +27,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.util.Observable;
 import java.util.Observer;
-
-import edu.stanford.genetics.treeview.ConfigNode;
+import java.util.prefs.Preferences;
 
 /**
  * Class for Drawing A Colored Grid Representation of a Matrix.
@@ -55,7 +54,7 @@ import edu.stanford.genetics.treeview.ConfigNode;
  */
 public abstract class ArrayDrawer extends Observable implements Observer {
 
-	private ConfigNode root;
+	private Preferences root;
 
 	/**
 	 * Get Color for a given array element
@@ -114,15 +113,32 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 		setDefaults();
 	}
 
+//	/**
+//	 * binds this arraydrawer to a particular ConfigNode.
+//	 * 
+//	 * @param configNode
+//	 *            confignode to bind to
+//	 */
+//	public void bindConfig(final Preferences configNode) {
+//
+//		root = configNode;
+//	}
+	
 	/**
 	 * binds this arraydrawer to a particular ConfigNode.
 	 * 
 	 * @param configNode
 	 *            confignode to bind to
 	 */
-	public void bindConfig(final ConfigNode configNode) {
+	public void setConfigNode(String key) {
 
-		root = configNode;
+		if(key == null) {
+			this.root = 
+					Preferences.userRoot().node(this.getClass().getName());
+			
+		} else {
+			this.root = Preferences.userRoot().node(key);
+		}
 	}
 
 	/**
@@ -242,12 +258,12 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 		notifyObservers();
 	}
 
-	public ConfigNode getRoot() {
+	public Preferences getRoot() {
 
 		return root;
 	}
 
-	public void setRoot(final ConfigNode root) {
+	public void setRoot(final Preferences root) {
 
 		this.root = root;
 	}

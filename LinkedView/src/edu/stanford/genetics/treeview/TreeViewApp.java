@@ -22,10 +22,13 @@
 package edu.stanford.genetics.treeview;
 
 import java.net.URL;
+import java.util.prefs.Preferences;
 
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+
+import Controllers.TVFrameController;
 
 import edu.stanford.genetics.treeview.model.TVModel;
 
@@ -71,13 +74,13 @@ public abstract class TreeViewApp {//implements WindowListener {
 	/** holds all open windows */
 //	protected java.util.Vector<Window> windows;
 
-	private final Preferences prefs;
+	private final CustomConfigs prefs;
 	private final UrlPresets geneUrlPresets;
 	private final UrlPresets arrayUrlPresets;
 //	private boolean exitOnWindowsClosed = true;
 
 	/** holds global config */
-	private final XmlConfig globalConfig;
+	private final Preferences globalConfig;
 
 	/**
 	 * Constructor for the TreeViewApp object. Opens up a globalConfig from the
@@ -85,32 +88,38 @@ public abstract class TreeViewApp {//implements WindowListener {
 	 */
 	public TreeViewApp() {
 
-		this(new XmlConfig(globalConfigName(), "ProgramConfig"), false);
+//		this(new XmlConfig(globalConfigName(), "ProgramConfig"), false);
+		this(null, false);
 	}
 
-	/**
-	 * Constructor for the TreeViewApp object. Opens up a globalConfig from the
-	 * default location.
-	 */
-	public TreeViewApp(final boolean isApplet) {
-
-		this(new XmlConfig(globalConfigName(), "ProgramConfig"), isApplet);
-	}
+//	/**
+//	 * Constructor for the TreeViewApp object. Opens up a globalConfig from the
+//	 * default location.
+//	 */
+//	public TreeViewApp(final boolean isApplet) {
+//
+//		this(isApplet);
+//	}
 
 	/**
 	 * Constructor for the TreeViewApp object takes configuration from the
 	 * passed in XmlConfig.
 	 */
-	public TreeViewApp(final XmlConfig xmlConfig, final boolean isApplet) {
+	public TreeViewApp(Preferences preferences, final boolean isApplet) {
 
 //		windows = new java.util.Vector<Window>();
-		globalConfig = xmlConfig;
+		if(preferences != null) {
+			globalConfig = preferences;
+			
+		} else {
+			globalConfig = setPreferences();
+		}
 
-		geneUrlPresets = new UrlPresets(getGlobalConfig().getNode(
-				"GeneUrlPresets"));
-		arrayUrlPresets = new UrlPresets();
-		arrayUrlPresets
-				.bindConfig(getGlobalConfig().getNode("ArrayUrlPresets"));
+		geneUrlPresets = new UrlPresets("GeneUrlPresets");
+		geneUrlPresets.setConfigNode(getGlobalConfig());
+		
+		arrayUrlPresets = new UrlPresets("ArrayUrlPresets");
+		arrayUrlPresets.setConfigNode(getGlobalConfig());
 
 		if (arrayUrlPresets.getPresetNames().length == 0) {
 			arrayUrlPresets.addPreset("Google",
@@ -126,8 +135,8 @@ public abstract class TreeViewApp {//implements WindowListener {
 		} catch (final Exception e) {
 		}
 
-		prefs = new Preferences();
-		prefs.bindConfig(getGlobalConfig().getNode("Preferences"));
+		prefs = new CustomConfigs();
+		prefs.setConfigNode(getGlobalConfig());
 
 		// JOptionPane.showMessageDialog(null, System.getProperty( "os.name" ));
 
@@ -209,6 +218,28 @@ public abstract class TreeViewApp {//implements WindowListener {
 
 		return arrayUrlPresets;
 	}
+	
+	/**
+	 * Sets up user-specified preferences.
+	 * @return
+	 */
+	public Preferences setPreferences() {
+		
+		Preferences configurations = Preferences.userRoot().node(
+				this.getClass().getName());
+		
+		return configurations;
+	}
+	
+	/**
+	 * returns an XmlConfig representing global configuration variables
+	 * 
+	 * @return The globalConfig value
+	 */
+	public Preferences getGlobalConfig() {
+
+		return globalConfig;
+	}
 
 	/**
 	 * creates a ViewFrame window
@@ -250,16 +281,6 @@ public abstract class TreeViewApp {//implements WindowListener {
 		}
 //		tvFrame.addWindowListener(this);
 		return tvFrame;
-	}
-
-	/**
-	 * returns an XmlConfig representing global configuration variables
-	 * 
-	 * @return The globalConfig value
-	 */
-	public XmlConfig getGlobalConfig() {
-
-		return globalConfig;
 	}
 
 //	/**
@@ -368,39 +389,39 @@ public abstract class TreeViewApp {//implements WindowListener {
 //		// nothing
 //	}
 
-	/**
-	 * Get a per-user file in which to store global config info. Read the code
-	 * to find out exactly how it guesses.
-	 * 
-	 * @return A system-specific guess at a global config file name.
-	 */
-	public static String globalConfigName() {
-
-		// must find and construct the properties object...
-		final String dir = System.getProperty("user.home");
-
-		final String fsep = System.getProperty("file.separator");
-
-		final String os = System.getProperty("os.name");
-
-		String file;
-		if (os.indexOf("Mac") >= 0) {
-			file = "JavaTreeView Config";
-
-		} else if (fsep.equals("/")) {
-			file = ".javaTreeViewXmlrc";
-
-		} else if (fsep.equals("\\")) {
-			file = "jtview.xml";
-
-		} else {
-			System.out.println("Could not determine sys type! "
-					+ "using name jtview.cfg");
-			file = "jtview.xml";
-		}
-
-		return dir + fsep + file;
-	}
+//	/**
+//	 * Get a per-user file in which to store global config info. Read the code
+//	 * to find out exactly how it guesses.
+//	 * 
+//	 * @return A system-specific guess at a global config file name.
+//	 */
+//	public static String globalConfigName() {
+//
+//		// must find and construct the properties object...
+//		final String dir = System.getProperty("user.home");
+//
+//		final String fsep = System.getProperty("file.separator");
+//
+//		final String os = System.getProperty("os.name");
+//
+//		String file;
+//		if (os.indexOf("Mac") >= 0) {
+//			file = "JavaTreeView Config";
+//
+//		} else if (fsep.equals("/")) {
+//			file = ".javaTreeViewXmlrc";
+//
+//		} else if (fsep.equals("\\")) {
+//			file = "jtview.xml";
+//
+//		} else {
+//			System.out.println("Could not determine sys type! "
+//					+ "using name jtview.cfg");
+//			file = "jtview.xml";
+//		}
+//
+//		return dir + fsep + file;
+//	}
 
 //	/**
 //	 * @param exitOnWindowsClosed
@@ -411,7 +432,7 @@ public abstract class TreeViewApp {//implements WindowListener {
 //		this.exitOnWindowsClosed = exitOnWindowsClosed;
 //	}
 
-	public Preferences getPrefs() {
+	public CustomConfigs getPrefs() {
 
 		return prefs;
 	}

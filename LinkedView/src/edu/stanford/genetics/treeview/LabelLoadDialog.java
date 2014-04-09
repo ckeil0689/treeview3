@@ -1,6 +1,6 @@
 package edu.stanford.genetics.treeview;
 
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
@@ -9,16 +9,18 @@ import net.miginfocom.swing.MigLayout;
 
 public class LabelLoadDialog {
 
-	private JFrame labelLoadFrame;
+	private JDialog labelLoadFrame;
 	private final JLabel prompt;
 	private final JPanel mainPanel;
 
 	public LabelLoadDialog(final ViewFrame view) {
 
-		labelLoadFrame = new JFrame("Loading Labels");
+		labelLoadFrame = new JDialog();
+		labelLoadFrame.setTitle("Loading Labels");
 		labelLoadFrame.setDefaultCloseOperation(
 				WindowConstants.DISPOSE_ON_CLOSE);
 		labelLoadFrame.setResizable(false);
+		labelLoadFrame.setModalityType(JDialog.DEFAULT_MODALITY_TYPE);
 
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new MigLayout());

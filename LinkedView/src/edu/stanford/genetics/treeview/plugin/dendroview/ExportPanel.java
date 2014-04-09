@@ -35,6 +35,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.MemoryImageSource;
 import java.io.File;
+import java.util.prefs.Preferences;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -53,7 +54,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import edu.stanford.genetics.treeview.ConfigNode;
 import edu.stanford.genetics.treeview.DummyHeaderInfo;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.HeaderInfo;
@@ -74,7 +74,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private ConfigNode root;
+	private Preferences root;
 
 	// external links
 	private final HeaderInfo arrayHeaderInfo; // allows access to array headers.
@@ -378,7 +378,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		if (root == null) {
 			return defaultPath;
 		} else {
-			return root.getAttribute("file", defaultPath);
+			return root.get("file", defaultPath);
 		}
 	}
 
@@ -447,12 +447,17 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		test.setVisible(true);
 	}
 
-	public void bindConfig(final ConfigNode configNode) {
+	public void bindConfig(final Preferences configNode) {
 		root = configNode;
 	}
 
-	public ConfigNode createSubNode() {
-		return root.create("File");
+	/**
+	 * Creates a new "File" configuration node
+	 * @return
+	 */
+	public Preferences createSubNode() {
+		
+		return root.node("File");
 	}
 
 	private void setupWidgets() {

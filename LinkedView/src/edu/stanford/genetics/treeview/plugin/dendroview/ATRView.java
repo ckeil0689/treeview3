@@ -65,7 +65,7 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 
 	private static final long serialVersionUID = 1L;
 
-	protected HeaderSummary headerSummary = new HeaderSummary();
+	protected HeaderSummary headerSummary = new HeaderSummary("AtrSummary");
 
 	private TreeSelectionI arraySelection;
 	private LinearTransformation xScaleEq, yScaleEq;

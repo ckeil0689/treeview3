@@ -35,6 +35,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.text.NumberFormat;
+import java.util.prefs.Preferences;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -48,7 +49,6 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import edu.stanford.genetics.treeview.ConfigNode;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.DataMatrix;
 import edu.stanford.genetics.treeview.FileSet;
@@ -68,17 +68,18 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 
 	private static final long serialVersionUID = 1L;
 
-	private ConfigNode root;
+	private Preferences configNode;
 
 	// external links
 	private FileSet sourceSet;// FileSet from which current data was
 								// constructed.
-	private ColorExtractor colorExtractor;
+	private ColorExtractor2 colorExtractor;
 
 	/**
 	 * The ColorExtractor is used to determine colors for the color bar.
 	 */
-	public void setColorExtractor(final ColorExtractor colorExtractor) {
+	public void setColorExtractor(final ColorExtractor2 colorExtractor) {
+		
 		this.colorExtractor = colorExtractor;
 	}
 
@@ -86,7 +87,8 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 	 * The ColorExtractor is used to determine colors for the global and zoom
 	 * views.
 	 */
-	public ColorExtractor getColorExtractor() {
+	public ColorExtractor2 getColorExtractor() {
+		
 		return colorExtractor;
 	}
 
@@ -99,6 +101,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 	 * The sourceSet is used to suggest a file name for the exported image.
 	 */
 	public FileSet getSourceSet() {
+		
 		return sourceSet;
 	}
 
@@ -106,6 +109,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 	 * The sourceSet is used to suggest a file name for the exported image.
 	 */
 	public void setSourceSet(final FileSet fs) {
+		
 		sourceSet = fs;
 		if (filePanel != null) {
 			filePanel.setFilePath(getInitialFilePath());
@@ -119,6 +123,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 	 * @return true if need Bbox options, false otherwise.
 	 */
 	protected boolean hasBbox() {
+		
 		return true;
 	}
 
@@ -134,6 +139,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 	 * bounding box. Only meaningful for postscript.
 	 */
 	protected boolean includeBbox() {
+		
 		return settingsPanel.useBbox();
 	}
 
@@ -143,14 +149,17 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 	 * @return A file path to print image to.
 	 */
 	protected File getFile() {
+		
 		return filePanel.getFile();
 	}
 
 	public String getFilePath() {
+		
 		return filePanel.getFilePath();
 	}
 
 	public void setFilePath(final String newFile) {
+		
 		filePanel.setFilePath(newFile);
 	}
 
@@ -161,6 +170,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 	 * @return The initialExtension value
 	 */
 	protected String getInitialExtension() {
+		
 		return ".ps";
 	}
 
@@ -171,6 +181,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 	 * @return The initialFilePath value
 	 */
 	protected String getInitialFilePath() {
+		
 		String defaultPath = null;
 		if (sourceSet == null) {
 			defaultPath = System.getProperty("user.home");
@@ -178,10 +189,10 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 			defaultPath = sourceSet.getDir() + sourceSet.getRoot()
 					+ getInitialExtension();
 		}
-		if (root == null) {
+		if (configNode == null) {
 			return defaultPath;
 		} else {
-			return root.getAttribute("file", defaultPath);
+			return configNode.get("file", defaultPath);
 		}
 	}
 
@@ -191,7 +202,8 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 	 * @param colorExtractor
 	 *            Description of the Parameter
 	 */
-	public ColorBarExportPanel(final ColorExtractor colorExtractor) {
+	public ColorBarExportPanel(final ColorExtractor2 colorExtractor) {
+		
 		this.colorExtractor = colorExtractor;
 		setupWidgets();
 	}
@@ -203,7 +215,8 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 	 *            none required
 	 */
 	public final static void main(final String[] argv) {
-		final ColorExtractor colorE = new ColorExtractor();
+		
+		final ColorExtractor2 colorE = new ColorExtractor2();
 		colorE.setDefaults();
 		final double contrast = colorE.getContrast();
 		colorE.setMissing(contrast * 2, contrast * 2);
@@ -215,13 +228,28 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 		test.setVisible(true);
 	}
 
+//	/* inherit description */
+//	@Override
+//	public void bindConfig(final Preferences configNode) {
+//		
+//		root = configNode;
+//	}
+	
 	/* inherit description */
 	@Override
-	public void bindConfig(final ConfigNode configNode) {
-		root = configNode;
+	public void setConfigNode(Preferences parentNode) {
+		
+		if(parentNode != null) {
+			this.configNode = parentNode.node("ColorBarExportPanel");
+			
+		} else {
+			LogBuffer.println("Could not find or create ColorBarExportPanel " +
+					"node because parentNode was null.");
+		}
 	}
 
 	private void setupWidgets() {
+		
 		Box upperPanel;// holds major widget panels
 		upperPanel = new Box(BoxLayout.X_AXIS);
 		settingsPanel = new SettingsPanel();
@@ -534,6 +562,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 	 */
 	protected void drawBoxes(final Graphics g, final int x, final int y,
 			final double scale) {
+		
 		final DoubleArrayDrawer drawer = new DoubleArrayDrawer();
 		drawer.setColorExtractor(getColorExtractor());
 		final int boxes = getNumBoxes();
@@ -1026,7 +1055,8 @@ class TestColorBarExportPanel extends ColorBarExportPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	TestColorBarExportPanel(final ColorExtractor colorExtractor) {
+	TestColorBarExportPanel(final ColorExtractor2 colorExtractor) {
+		
 		super(colorExtractor);
 	}
 }
@@ -1120,4 +1150,21 @@ class SimpleDataMatrix implements DataMatrix {
 		return 0;
 	}
 
+	@Override
+	public void calculateMinMax() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public double getMinVal() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getMaxVal() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

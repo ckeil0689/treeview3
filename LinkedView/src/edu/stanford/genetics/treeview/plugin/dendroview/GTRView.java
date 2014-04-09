@@ -303,9 +303,6 @@ public class GTRView extends ModelViewBuffered implements MouseListener,
 		}
 	}
 
-	public void setZoomMap(final MapContainer m) {
-	}
-
 	// method from ModelView
 	@Override
 	public String viewName() {

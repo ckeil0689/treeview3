@@ -30,6 +30,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -44,10 +45,8 @@ import javax.swing.event.ListSelectionListener;
 
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.CdtFilter;
-import edu.stanford.genetics.treeview.ConfigNode;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.GUIParams;
-import edu.stanford.genetics.treeview.XmlConfig;
 
 /**
  * This class allows you to edit the file mru, and also get some info about them
@@ -262,7 +261,7 @@ public class FileMruEditor extends JPanel {
 		 */
 		private void regenList() {
 
-			final ConfigNode[] nodes = client.getConfigs();
+			final Preferences[] nodes = client.getConfigs();
 			FileSet[] files;
 			files = new FileSet[nodes.length];
 			for (int i = 0; i < nodes.length; i++) {
@@ -447,12 +446,12 @@ public class FileMruEditor extends JPanel {
 	 */
 	public final static void main(final String[] args) {
 
-		final XmlConfig c = new XmlConfig(args[0], "TestConfig");
-		final FileMru fm = new FileMru();
-
-		fm.bindConfig(c.getNode("FileMru"));
-		final FileMruEditor fme = new FileMruEditor(fm);
-		fme.makeTop();
+//		final XmlConfig c = new XmlConfig(args[0], "TestConfig");
+//		final FileMru fm = new FileMru();
+//
+//		fm.bindConfig(c.getNode("FileMru"));
+//		final FileMruEditor fme = new FileMruEditor(fm);
+//		fme.makeTop();
 	}
 
 }
