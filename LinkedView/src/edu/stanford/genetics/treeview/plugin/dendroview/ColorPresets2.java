@@ -217,8 +217,7 @@ public class ColorPresets2 implements ConfigNodePersistent {
 		for (int i = 0; i < childrenNodes.length; i++) {
 
 			ret.setConfigNode(configNode.node(childrenNodes[i]));
-			
-			String newName = ret.getName();
+
 			if (name.equals(ret.getName())) {
 				return ret;
 			}
@@ -233,17 +232,37 @@ public class ColorPresets2 implements ConfigNodePersistent {
 	public void addColorSet(final String name, ArrayList<Color> colors, 
 			ArrayList<Double> fractions, final String missing) {
 
-		
 		// Make the children of ColorSet here by adding an int to the name?
 		final ColorSet2 preset = new ColorSet2();
+		String[] childrenNodes = getRootChildrenNodes();
+		boolean customFound = false;
+		String customNode = "";
 		
-		int setNodeIndex = 0;
-		setNodeIndex = getRootChildrenNodes().length + 1;
-		preset.setConfigNode(configNode.node("ColorSet" + setNodeIndex));
-		preset.setColorList(colors);
-		preset.setFractionList(fractions);
-		preset.setName(name);
-		preset.setMissing(missing);
+		for(String node : childrenNodes) {
+			
+			String default_name = "NoName";
+			if(configNode.node(node).get("name", default_name)
+					.equalsIgnoreCase("Custom")) {
+				customFound = true;
+				customNode = node;
+			}
+		}
+		
+		if(customFound) {
+			preset.setConfigNode(configNode.node(customNode));
+			preset.setColorList(colors);
+			preset.setFractionList(fractions);
+			preset.setMissing(missing);
+			
+		} else {
+			int setNodeIndex = 0;
+			setNodeIndex = getRootChildrenNodes().length + 1;
+			preset.setConfigNode(configNode.node("ColorSet" + setNodeIndex));
+			preset.setColorList(colors);
+			preset.setFractionList(fractions);
+			preset.setName(name);
+			preset.setMissing(missing);
+		}
 	}
 
 	/**

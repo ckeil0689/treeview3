@@ -169,9 +169,7 @@
         </node>
       </node>
       <node name="TreeViewFrame">
-        <map>
-          <entry key="theme" value="light"/>
-        </map>
+        <map/>
         <node name="DendroView">
           <map/>
           <node name="ArrayNameView">
@@ -235,53 +233,11 @@
             <node name="ColorSet3">
               <map>
                 <entry key="Color1" value="#FF0000"/>
-                <entry key="Color2" value="#000000"/>
-                <entry key="Color3" value="#00FF00"/>
+                <entry key="Color2" value="#FFFF00"/>
+                <entry key="Color3" value="#FF00FF"/>
                 <entry key="colorNum" value="3"/>
                 <entry key="Fraction1" value="0.0"/>
-                <entry key="Fraction2" value="0.898097813129425"/>
-                <entry key="Fraction3" value="1.0"/>
-                <entry key="fracNum" value="3"/>
-                <entry key="name" value="Custom"/>
-                <entry key="missing" value="#ffffff"/>
-              </map>
-            </node>
-            <node name="ColorSet4">
-              <map>
-                <entry key="Color1" value="#FF0000"/>
-                <entry key="Color2" value="#000000"/>
-                <entry key="Color3" value="#00FF00"/>
-                <entry key="colorNum" value="3"/>
-                <entry key="Fraction1" value="0.0"/>
-                <entry key="Fraction2" value="0.898097813129425"/>
-                <entry key="Fraction3" value="1.0"/>
-                <entry key="fracNum" value="3"/>
-                <entry key="name" value="Custom"/>
-                <entry key="missing" value="#ffffff"/>
-              </map>
-            </node>
-            <node name="ColorSet5">
-              <map>
-                <entry key="Color1" value="#99FF33"/>
-                <entry key="Color2" value="#000000"/>
-                <entry key="Color3" value="#1BB7E5"/>
-                <entry key="colorNum" value="3"/>
-                <entry key="Fraction1" value="0.0"/>
-                <entry key="Fraction2" value="0.91847825050354"/>
-                <entry key="Fraction3" value="1.0"/>
-                <entry key="fracNum" value="3"/>
-                <entry key="name" value="Custom"/>
-                <entry key="missing" value="#ffffff"/>
-              </map>
-            </node>
-            <node name="ColorSet6">
-              <map>
-                <entry key="Color1" value="#FF0000"/>
-                <entry key="Color2" value="#000000"/>
-                <entry key="Color3" value="#00FF00"/>
-                <entry key="colorNum" value="3"/>
-                <entry key="Fraction1" value="0.0"/>
-                <entry key="Fraction2" value="0.898097813129425"/>
+                <entry key="Fraction2" value="0.16304348409175873"/>
                 <entry key="Fraction3" value="1.0"/>
                 <entry key="fracNum" value="3"/>
                 <entry key="name" value="Custom"/>
@@ -294,7 +250,7 @@
             <node name="FixedMap">
               <map>
                 <entry key="type" value="Fixed"/>
-                <entry key="scale" value="6.303030303030303"/>
+                <entry key="scale" value="5.553030303030303"/>
               </map>
             </node>
             <node name="NullMap">
@@ -305,7 +261,7 @@
           </node>
           <node name="GradientChooser">
             <map>
-              <entry key="activeColors" value="Custom"/>
+              <entry key="activeColors" value="RedGreen"/>
             </map>
           </node>
           <node name="GtrSummary">
@@ -315,11 +271,15 @@
             <map/>
             <node name="Dividers">
               <map/>
-            </node>
-            <node name="Selection0">
-              <map>
-                <entry key="index" value="1"/>
-              </map>
+              <node name="TextView">
+                <map>
+                  <entry key="face" value="Dialog"/>
+                  <entry key="size" value="12"/>
+                </map>
+                <node name="TextViewManagerSummary">
+                  <map/>
+                </node>
+              </node>
             </node>
             <node name="TextView0">
               <map/>
@@ -341,9 +301,7 @@
                   <entry key="size" value="12"/>
                 </map>
                 <node name="TextViewManagerSummary">
-                  <map>
-                    <entry key="included" value="1"/>
-                  </map>
+                  <map/>
                 </node>
               </node>
             </node>

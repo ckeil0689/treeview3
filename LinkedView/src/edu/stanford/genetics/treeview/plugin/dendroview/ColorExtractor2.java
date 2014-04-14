@@ -198,25 +198,58 @@ public class ColorExtractor2 extends Observable implements ConfigNodePersistent,
 			
 //			Preferences cand = root.node("ColorSet1");
 		
-		String[] childrenNodes = this.getRootChildrenNodes();
+//		String[] childrenNodes = this.getRootChildrenNodes();
+//		
+//		// Get first colorSet
+//		String firstColorSet = null;
+//		for(String node : childrenNodes) {
+//			
+//			if(node.contains("ColorSet")) {
+//				firstColorSet = node;
+//			}
+//		}
+//
+//		if(firstColorSet != null) {
+//			colorSet.setConfigNode(configNode.node(firstColorSet));
+//			
+//		} else {
+//			LogBuffer.println("Could not find or create ColorSet " +
+//					"node in ColorExtractor2 because parentNode was null.");
+//		}
 		
-		// Get first colorSet
-		String firstColorSet = null;
-		for(String node : childrenNodes) {
-			
-			if(node.contains("ColorSet")) {
-				firstColorSet = node;
+		String lastActive = "RedGreen";
+		try {
+			if(parentNode.nodeExists("GradientChooser")) {
+				lastActive = parentNode.node("GradientChooser").get(
+						"activeColors", lastActive);
 			}
-		}
-
-		if(firstColorSet != null) {
-			colorSet.setConfigNode(configNode.node(firstColorSet));
+		
+			// Set colorList and fractionList here, based on what the last active
+			// node was in GradientColorChooser. Otherwise keep defaults?
+			Preferences colorPresetNode = parentNode.node("ColorPresets");
+			String[] childrenNodes = colorPresetNode.childrenNames();
 			
-		} else {
-			LogBuffer.println("Could not find or create ColorSet " +
-					"node in ColorExtractor2 because parentNode was null.");
+			for(int i = 0; i < childrenNodes.length; i++) {
+				
+				if(colorPresetNode.node(childrenNodes[i]).get("name", 
+						lastActive).equalsIgnoreCase(lastActive)) {
+					colorSet.setConfigNode(colorPresetNode.node(
+							childrenNodes[i]));
+					break;
+				}
+			}
+		} catch (BackingStoreException e) {
+			e.printStackTrace();
 		}
-		synchFloats();
+		
+		String[] colors = colorSet.getColors();
+		ArrayList<Color> cList = new ArrayList<Color>(colors.length);
+		for(String color : colors) {
+			cList.add(Color.decode(color));
+		}
+			
+		setNewParams(colorSet.getFractions(), cList);
+//		synchFloats();
 		contrast = configNode.getDouble("contrast", getContrast());
 		setLogCenter(configNode.getDouble("logcenter", 1.0));
 		setLogBase(configNode.getDouble("logbase", 2.0));
