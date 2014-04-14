@@ -114,6 +114,7 @@ public class PluginManager {
 	}
 
 	public void loadPlugins(final File[] f_jars, final boolean showPopup) {
+		
 		String s_loadedPlugins = "";
 		String s_notloadedPlugins = "";
 
@@ -147,6 +148,7 @@ public class PluginManager {
 	}
 
 	public boolean loadPlugin(final URL jarURL) {
+		
 		boolean b_loadedPlugin = false;
 		try {
 			LogBuffer.println("Plugin Jar " + jarURL);

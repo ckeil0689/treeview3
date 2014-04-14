@@ -126,8 +126,7 @@ public class KnnDendroView2 extends DendroView2 implements
 	}
 
 	@Override
-	public void bindConfig(Preferences configNode) {
-		// TODO Auto-generated method stub
+	public void setConfigNode(Preferences configNode) {
 		
 	}
 }

@@ -131,6 +131,10 @@ public class PreferencesController {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
+			if(preferences.getGradientPick() != null) {
+				preferences.getGradientPick().saveStatus();
+			}
+			
 			preferences.getPreferencesFrame().dispose();
 		}
 		
@@ -145,6 +149,10 @@ public class PreferencesController {
 		
 		@Override
 		public void windowClosing(final WindowEvent we) {
+			
+			if(preferences.getGradientPick() != null) {
+				preferences.getGradientPick().saveStatus();
+			}
 			
 			preferences.getPreferencesFrame().dispose();
 		}

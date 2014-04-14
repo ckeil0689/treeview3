@@ -9,7 +9,6 @@ import java.awt.event.KeyEvent;
 import java.util.prefs.Preferences;
 
 import edu.stanford.genetics.treeview.DendroPanel;
-import edu.stanford.genetics.treeview.MainPanel;
 import edu.stanford.genetics.treeview.PluginFactory;
 import edu.stanford.genetics.treeview.SettingsPanel;
 import edu.stanford.genetics.treeview.TreeViewFrame;
@@ -76,7 +75,7 @@ public class DendrogramFactory extends PluginFactory {
 
 		super.setGlobalNode(node);
 		
-		colorPresets.setConfigNode("ColorPresets");
+		colorPresets.setConfigNode(node);
 
 		if (colorPresets.getNumPresets() == 0) {
 			colorPresets.addDefaultPresets();

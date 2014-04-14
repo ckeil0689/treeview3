@@ -69,7 +69,7 @@ public class ColorPresets2 implements ConfigNodePersistent {
 	public ColorPresets2(final Preferences parent) {
 
 		super();
-		setConfigNode(null);
+		setConfigNode(parent);
 		final int nNames = getPresetNames().length;
 		if (nNames == 0) {
 			addDefaultPresets();
@@ -80,7 +80,9 @@ public class ColorPresets2 implements ConfigNodePersistent {
 	public ColorPresets2() {
 
 		super();
-		configNode = Preferences.userRoot().node("ColorPresets");
+		
+		// Get the global configNode
+		configNode = Preferences.userRoot().node("TreeViewApp");
 	}
 
 	/**
@@ -129,6 +131,7 @@ public class ColorPresets2 implements ConfigNodePersistent {
 
 		for (int i = 0; i < defaultColorSets.length; i++) {
 
+			defaultColorSets[i].setConfigNode(configNode);
 			addColorSet(defaultColorSets[i]);
 		}
 	}
@@ -214,6 +217,8 @@ public class ColorPresets2 implements ConfigNodePersistent {
 		for (int i = 0; i < childrenNodes.length; i++) {
 
 			ret.setConfigNode(configNode.node(childrenNodes[i]));
+			
+			String newName = ret.getName();
 			if (name.equals(ret.getName())) {
 				return ret;
 			}
@@ -276,7 +281,7 @@ public class ColorPresets2 implements ConfigNodePersistent {
 			this.configNode = parentNode.node("ColorPresets");
 			
 		} else {
-			LogBuffer.println("Could not find or create ColorPresets" +
+			LogBuffer.println("Could not find or create ColorPresets " +
 					"node because parentNode was null.");
 		}
 		
@@ -334,5 +339,14 @@ public class ColorPresets2 implements ConfigNodePersistent {
 		} else {
 			return null;
 		}
+	}
+	
+	/**
+	 * Returns the configNode of ColorPresets
+	 * @return
+	 */
+	public Preferences getConfigNode() {
+		
+		return configNode;
 	}
 }

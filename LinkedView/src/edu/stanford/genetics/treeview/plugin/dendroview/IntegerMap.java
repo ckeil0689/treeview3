@@ -25,6 +25,7 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 import java.util.prefs.Preferences;
 
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
+import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
  * This class is a contract for maps between indexes and pixels. It would be an
@@ -36,14 +37,15 @@ public abstract class IntegerMap implements ConfigNodePersistent {
 	protected int availablepixels;
 	protected int maxindex;
 	protected int minindex;
-	protected Preferences root;
+	protected Preferences configNode;
+	protected String type;
 
 	public IntegerMap() {
 
 		availablepixels = 0;
 		maxindex = -1;
 		minindex = -1;
-		root = Preferences.userRoot().node(type());
+		configNode = Preferences.userRoot().node(type());
 	}
 
 //	@Override
@@ -54,16 +56,27 @@ public abstract class IntegerMap implements ConfigNodePersistent {
 //	}
 	
 	@Override
-	public void setConfigNode(String key) {
+	public void setConfigNode(Preferences parentNode) {
 
-		if(key == null) {
-			this.root = Preferences.userRoot().node(this.getClass().getName());
+		if(parentNode != null) {
+			this.configNode = parentNode.node(type);
 			
 		} else {
-			this.root = Preferences.userRoot().node(key);
+			LogBuffer.println("Could not find or create IntegerMap " +
+					"node because parentNode was null.");
 		}
 		
-		root.put("type", type());
+		configNode.put("type", type());
+	}
+	
+	/**
+	 * Sets the String type to either Fixed or Full, so that 
+	 * different configNode can be created.
+	 * @param type
+	 */
+	public void setTypeString(String type) {
+		
+		this.type = type;
 	}
 
 	public IntegerMap createMap(final String string) {

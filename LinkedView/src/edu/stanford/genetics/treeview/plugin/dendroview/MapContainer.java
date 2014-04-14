@@ -48,6 +48,7 @@ public class MapContainer extends Observable implements Observer,
 	private double default_scale = 1.0;
 	private double minScale;
 	private IntegerMap current = null;
+	private String mapName;
 
 	private FixedMap fixedMap = null;
 	private FillMap fillMap = null;
@@ -55,26 +56,28 @@ public class MapContainer extends Observable implements Observer,
 
 	private JScrollBar scrollbar = null;
 	private TreeDrawerNode selected = null;
-	private Preferences root = null;
+	private Preferences configNode = null;
 
-	public MapContainer() {
+	public MapContainer(String mapName) {
 
-		fixedMap = new FixedMap();
-		fillMap = new FillMap();
-		nullMap = new NullMap();
-		current = nullMap;
+		this.fixedMap = new FixedMap();
+		this.fillMap = new FillMap();
+		this.nullMap = new NullMap();
+		this.current = nullMap;
+		this.mapName = mapName;
+		
 	}
 
-	public MapContainer(final String type) {
+	public MapContainer(final String type, String mapName) {
 
-		this();
+		this(mapName);
 		setMap(type);
 	}
 
 	private Preferences fetchOrCreateNode(final String name) {
 
 		// Get first child?
-		Preferences ret = root.node(name);
+		Preferences ret = configNode.node(name);
 //		if (ret == null) {
 //			ret = root.create(name);
 //		}
@@ -99,22 +102,28 @@ public class MapContainer extends Observable implements Observer,
 	
 	// confignode persistent
 	@Override
-	public void setConfigNode(String key) {
+	public void setConfigNode(Preferences parentNode) {
 
-		if(key == null) {
-			this.root = Preferences.userRoot().node(this.getClass().getName());
+		if(parentNode != null) {
+			this.configNode = parentNode.node(mapName);
 			
 		} else {
-			this.root = Preferences.userRoot().node(key);
+			LogBuffer.println("Could not find or create MapContainer " +
+					"node because parentNode was null.");
 		}
 
 		// first bind subordinate maps...
-		fixedMap.setConfigNode("FixedMap");
-		fillMap.setConfigNode("FillMap");
-		nullMap.setConfigNode("NullMap");
+		fixedMap.setTypeString("FixedMap");
+		fixedMap.setConfigNode(configNode);
+		
+		fillMap.setTypeString("FillMap");
+		fillMap.setConfigNode(configNode);
+		
+		nullMap.setTypeString("NullMap");
+		nullMap.setConfigNode(configNode);
 
 		// then, fix self up...
-		setMap(root.get("current", default_map));
+		setMap(configNode.get("current", default_map));
 	}
 
 	/**
@@ -564,8 +573,8 @@ public class MapContainer extends Observable implements Observer,
 	private void switchMap(final IntegerMap integerMap) {
 
 		if (current != integerMap) {
-			if (root != null) {
-				root.put("current", integerMap.type());
+			if (configNode != null) {
+				configNode.put("current", integerMap.type());
 			}
 			integerMap.setAvailablePixels(current.getAvailablePixels());
 			integerMap.setIndexRange(current.getMinIndex(),
@@ -587,7 +596,7 @@ public class MapContainer extends Observable implements Observer,
 		boolean hasAttribute = false;
 		
 		try {
-			String[] keys = root.node(nodeName).keys();
+			String[] keys = configNode.node(nodeName).keys();
 			for(int i = 0; i < keys.length; i++) {
 				
 				if(keys[i].equalsIgnoreCase(key)) {

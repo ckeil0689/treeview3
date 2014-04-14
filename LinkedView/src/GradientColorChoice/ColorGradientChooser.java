@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -34,7 +35,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 
+import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.GUIParams;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor2;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractorEditor2;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets2;
@@ -42,10 +45,11 @@ import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet2;
 
 import net.miginfocom.swing.MigLayout;
 
-public class ColorGradientChooser {
+public class ColorGradientChooser implements ConfigNodePersistent {
 
 	private JFrame applicationFrame;
 	private JPanel mainPanel;
+	private Preferences configNode;
 	
 	private GradientBox gradientBox;
 	
@@ -57,14 +61,6 @@ public class ColorGradientChooser {
 	
 	private ArrayList<Color> colorList;
 	private ArrayList<Thumb> thumbList;
-	
-	private final Color RG_DEFAULT_PRIMARY = Color.red;
-	private final Color YB_DEFAULT_PRIMARY = Color.yellow;
-	
-	private final Color DEFAULT_SECONDARY = Color.black;
-	
-	private final Color RG_DEFAULT_TERTIARY = Color.green;
-	private final Color YB_DEFAULT_TERTIARY = Color.blue;
 	
 	private JButton addButton;
 	private JButton removeButton;
@@ -121,7 +117,6 @@ public class ColorGradientChooser {
 		colorButtonGroup.add(redGreenButton);
 		colorButtonGroup.add(yellowBlueButton);
 		colorButtonGroup.add(customColorButton);
-		redGreenButton.setSelected(true);
 		
 		JPanel radioButtonPanel = new JPanel();
 		radioButtonPanel.setLayout(new MigLayout());
@@ -158,9 +153,28 @@ public class ColorGradientChooser {
 //		mainPanel.add(saveButton, "pushx, alignx 50%, span, wrap");
 		mainPanel.add(radioButtonPanel, "pushx");
 		mainPanel.add(presetPanel);
+	}
 	
+	@Override
+	public void setConfigNode(Preferences parentNode) {
 		
-		gradientBox.setDefaults(true);
+		if (parentNode != null) {
+			this.configNode = parentNode.node("GradientChooser");
+			
+		} else {
+			LogBuffer.println("Could not find or create GradientChooser " +
+					"node because parentNode was null.");
+		}
+	}
+	
+	/**
+	 * Saves the current colors and fractions as a ColorSet to the configNode.
+	 */
+	public void saveStatus() {
+		
+		if(gradientBox != null) {
+			gradientBox.savePresets();
+		}
 	}
 	
 	/**
@@ -410,23 +424,78 @@ public class ColorGradientChooser {
 		 * Resets the color values to default.
 		 * @param redGreen
 		 */
-		public void setDefaults(boolean redGreen) {
+		public void setPresets() {
 			
 			colorList.clear();
 			thumbList.clear();
 			fractions = resetFractions();
 			
-			if(redGreen) {
-				colorList.add(RG_DEFAULT_PRIMARY);
-				colorList.add(DEFAULT_SECONDARY);
-				colorList.add(RG_DEFAULT_TERTIARY);
+			ColorSet2 defaultSet = colorPresets.getDefaultColorSet();
+			
+			String defaultColors = "RedGreen";
+			String colorScheme = configNode.get("activeColors", defaultColors);
+			
+			if(colorScheme.equalsIgnoreCase("Custom")) {
+				customColorButton.setSelected(true);
+				ColorSet2 savedColorSet = colorPresets.getColorSet(colorScheme);
+				loadPresets(savedColorSet);
+				
+			} else if(colorScheme.equalsIgnoreCase(defaultColors)){
+				// Colors should be defined as default ColorSet in ColorPresets2
+				redGreenButton.setSelected(true);
+				ColorSet2 rgColorSet = colorPresets.getColorSet(colorScheme);
+				loadPresets(rgColorSet);
+				
+			} else if(colorScheme.equalsIgnoreCase("YellowBlue")){
+				yellowBlueButton.setSelected(true);
+				ColorSet2 ybColorSet = colorPresets.getColorSet("YellowBlue");
+				loadPresets(ybColorSet);
 				
 			} else {
-				colorList.add(YB_DEFAULT_PRIMARY);
-				colorList.add(DEFAULT_SECONDARY);
-				colorList.add(YB_DEFAULT_TERTIARY);
+				LogBuffer.println("No matching ColorSet found in " +
+						"ColorGradientChooser.setPresets()");
 			}
+			
 			setColors();
+		}
+		
+		/**
+		 * Loads the values from a given ColorSet into colorList 
+		 * and fractionList.
+		 * @param colorSet
+		 */
+		public void loadPresets(ColorSet2 colorSet) {
+			
+			String[] colors = colorSet.getColors();
+			
+			for(String color : colors) {
+				
+				colorList.add(Color.decode(color));
+			}
+			
+			float[] fracs = colorSet.getFractions();
+			
+			if(fractions.length == fracs.length) {
+				fractions = fracs;
+				
+			} else {
+				LogBuffer.println("Fractions and fracs are not the same " +
+						"length in ColorGradientChooser.setPresets()!");
+			}
+		}
+		
+		public void savePresets() {
+			
+			ArrayList<Double> fractionList = new ArrayList<Double>();
+			
+			for(float f : fractions) {
+				
+				fractionList.add((double)f);
+			}
+			
+			String colorSetName = "Custom";
+			colorPresets.addColorSet(colorSetName, colorList, fractionList, 
+					"#ffffff");
 		}
 		
 		/**
@@ -770,6 +839,7 @@ public class ColorGradientChooser {
 	 */
 	public JPanel makeGradientPanel() {
 		
+		gradientBox.setPresets();
 		return mainPanel;
 	}
 	
@@ -949,6 +1019,11 @@ public class ColorGradientChooser {
 	}
 	
 	// Accessors
+	protected Preferences getConfigNode() {
+		
+		return configNode;
+	}
+	
 	protected ButtonGroup getButtonGroup() {
 		
 		return colorButtonGroup;
@@ -975,12 +1050,43 @@ public class ColorGradientChooser {
 	 * selected if it isn't already.
 	 * Should set the preset here.
 	 */
+	public void selectRedGreen() {
+		
+		// Save current color status as preset. When user switches back to
+		// custom, the preset should be called here.
+		if(!getCustomColorButton().isSelected()) {
+			redGreenButton.setSelected(true);
+			configNode.put("activeColors", "RedGreen");
+		}
+	}
+	
+	/**
+	 * Sets the 'custom' button of the radiobutton group for colors to
+	 * selected if it isn't already.
+	 * Should set the preset here.
+	 */
+	public void selectYellowBlue() {
+		
+		// Save current color status as preset. When user switches back to
+		// custom, the preset should be called here.
+		if(!getCustomColorButton().isSelected()) {
+			yellowBlueButton.setSelected(true);
+			configNode.put("activeColors", "YellowBlue");
+		}
+	}
+	
+	/**
+	 * Sets the 'custom' button of the radiobutton group for colors to
+	 * selected if it isn't already.
+	 * Should set the preset here.
+	 */
 	public void selectCustom() {
 		
 		// Save current color status as preset. When user switches back to
 		// custom, the preset should be called here.
 		if(!getCustomColorButton().isSelected()) {
-			getCustomColorButton().setSelected(true);
+			customColorButton.setSelected(true);
+			configNode.put("activeColors", "Custom");
 		}
 	}
 	

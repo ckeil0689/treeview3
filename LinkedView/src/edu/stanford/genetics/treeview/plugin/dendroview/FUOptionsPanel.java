@@ -95,8 +95,8 @@ public class FUOptionsPanel extends JPanel implements SettingsPanel {
 
 	public static void main(final String[] argv) {
 
-		final UrlPresets p = new UrlPresets();
-		p.setConfigNode("FUOptions");
+		final UrlPresets p = new UrlPresets("FUOptions");
+		p.setConfigNode(null);
 		final HeaderInfo hi = new DummyHeaderInfo();
 		final UrlExtractor ue = new UrlExtractor(hi);
 		final FontSelectable fs = new TextView(hi, ue);

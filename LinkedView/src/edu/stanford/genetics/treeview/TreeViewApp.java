@@ -21,7 +21,10 @@
  * END_HEADER */
 package edu.stanford.genetics.treeview;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URL;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.swing.ToolTipManager;
@@ -114,6 +117,25 @@ public abstract class TreeViewApp {//implements WindowListener {
 		} else {
 			globalConfig = setPreferences();
 		}
+		
+		
+		// Generate an XML file of the Preferences at this point, so it
+		// can be viewed and analyzed.
+		FileOutputStream fos;
+		try {
+			fos = new FileOutputStream("prefs.xml");
+			globalConfig.exportSubtree(fos);
+			fos.close();
+			
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			
+		} catch (BackingStoreException e1) {
+			e1.printStackTrace();
+		}
+		
+		prefs = new CustomConfigs();
+		prefs.setConfigNode(getGlobalConfig());
 
 		geneUrlPresets = new UrlPresets("GeneUrlPresets");
 		geneUrlPresets.setConfigNode(getGlobalConfig());
@@ -132,11 +154,7 @@ public abstract class TreeViewApp {//implements WindowListener {
 			final ToolTipManager ttm = ToolTipManager.sharedInstance();
 			ttm.setEnabled(true);
 
-		} catch (final Exception e) {
-		}
-
-		prefs = new CustomConfigs();
-		prefs.setConfigNode(getGlobalConfig());
+		} catch (final Exception e) {}
 
 		// JOptionPane.showMessageDialog(null, System.getProperty( "os.name" ));
 
@@ -225,8 +243,7 @@ public abstract class TreeViewApp {//implements WindowListener {
 	 */
 	public Preferences setPreferences() {
 		
-		Preferences configurations = Preferences.userRoot().node(
-				this.getClass().getName());
+		Preferences configurations = Preferences.userRoot().node("TreeViewApp");
 		
 		return configurations;
 	}

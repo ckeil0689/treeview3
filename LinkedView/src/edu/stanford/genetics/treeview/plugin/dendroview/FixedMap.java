@@ -64,10 +64,10 @@ public class FixedMap extends IntegerMap {
 	 *            ConfigNode to bind to
 	 */
 	@Override
-	public void setConfigNode(String key) {
+	public void setConfigNode(Preferences parentNode) {
 
-		super.setConfigNode(key);
-		scale = root.getDouble("scale", default_scale);
+		super.setConfigNode(parentNode);
+		scale = configNode.getDouble("scale", default_scale);
 	}
 
 	/**
@@ -155,7 +155,7 @@ public class FixedMap extends IntegerMap {
 	public void setScale(final double d) {
 
 		scale = d;
-		root.putDouble("scale", scale);
+		configNode.putDouble("scale", scale);
 	}
 
 	/**

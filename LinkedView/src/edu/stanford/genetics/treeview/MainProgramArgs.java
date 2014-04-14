@@ -5,6 +5,7 @@ import jargs.gnu.CmdLineParser.IllegalOptionValueException;
 import jargs.gnu.CmdLineParser.UnknownOptionException;
 
 public class MainProgramArgs {
+
 	private String sframeType;
 	private String sResource;
 	private String sExportType;
@@ -16,6 +17,7 @@ public class MainProgramArgs {
 	final private CmdLineParser.Option exportType;
 
 	public MainProgramArgs(final String[] args) {
+		
 		parser = new CmdLineParser();
 		resource = parser.addStringOption('r', "resource");
 		filePath = parser.addStringOption('f', "file");

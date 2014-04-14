@@ -38,6 +38,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Observable;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.swing.BoxLayout;
@@ -248,7 +249,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			buildMenu();
 			
 			dendroController = new DendroController(dendroView, this, 
-					(TVModel)dataModel, null);
+					(TVModel)dataModel);
 			
 			view = dendroView.makeDendroPanel();
 		}
@@ -540,6 +541,24 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			generateSearchMenu();
 			generateTreeMenu();
 		}
+		
+		// Only for debugging Preferences API
+		JButton clearButton = GUIParams.setButtonLayout("Clear Configs", null);
+		clearButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				
+				try {
+					treeView.getGlobalConfig().removeNode();
+					
+				} catch (BackingStoreException e) {
+					e.printStackTrace();
+				}
+			}
+			
+		});
+		menuPanel.add(clearButton);
 	}
 	
 	public void generateStackMenu() {

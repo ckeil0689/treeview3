@@ -51,7 +51,7 @@ public class GTRView extends ModelViewBuffered implements MouseListener,
 
 	private static final long serialVersionUID = 1L;;
 
-	protected HeaderSummary headerSummary = new HeaderSummary();
+	protected HeaderSummary headerSummary = new HeaderSummary("GtrSummary");
 
 	private MapContainer map;
 	private LeftTreeDrawer drawer = null;

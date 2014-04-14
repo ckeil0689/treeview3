@@ -83,6 +83,7 @@ public class ColorPresetEditor extends JPanel implements SettingsPanel {
 	 *            Description of the Parameter
 	 */
 	public void showConfig(final Frame f) {
+		
 		if (window == null) {
 			final Dialog d = new Dialog(f, getTitle(), true);
 			d.setLayout(new BorderLayout());

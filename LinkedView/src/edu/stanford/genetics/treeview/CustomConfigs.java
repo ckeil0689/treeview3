@@ -74,7 +74,7 @@ public class CustomConfigs implements ConfigNodePersistent{
 	public void setConfigNode(Preferences parentNode) {
 		
 		if(parentNode != null) {
-			this.configNode = configNode.node("CustomConfigs");
+			this.configNode = parentNode.node("CustomConfigs");
 			
 		} else {
 			LogBuffer.println("Could not find or create CustomConfigs" +

@@ -45,27 +45,30 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
 import net.miginfocom.swing.MigLayout;
+import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.UrlExtractor;
 
-public class TextView extends ModelView implements FontSelectable, KeyListener,
-		AdjustmentListener, MouseListener, MouseMotionListener {
+public class TextView extends ModelView implements ConfigNodePersistent, 
+		FontSelectable, KeyListener, AdjustmentListener, MouseListener, 
+		MouseMotionListener {
 
 	private static final long serialVersionUID = 1L;
 
 	protected HeaderInfo headerInfo = null;
-	protected HeaderSummary headerSummary = new HeaderSummary();
+	protected HeaderSummary headerSummary = new HeaderSummary("GeneSummary");
 
 	private final int scrollstep = 5;
 	private final String d_face = "Dialog";
 	private final int d_style = 0;
 	private final int d_size = 12;
 
-	private Preferences root = null;
+	private Preferences configNode = null;
 
 	private String face;
 	private int style;
@@ -524,8 +527,8 @@ public class TextView extends ModelView implements FontSelectable, KeyListener,
 		if ((face == null) || (!face.equals(string))) {
 			face = string;
 
-			if (root != null) {
-				root.put("face", face);
+			if (configNode != null) {
+				configNode.put("face", face);
 			}
 
 			setFont(new Font(face, style, size));
@@ -540,8 +543,8 @@ public class TextView extends ModelView implements FontSelectable, KeyListener,
 		if (size != i) {
 			size = i;
 
-			if (root != null) {
-				root.putInt("size", size);
+			if (configNode != null) {
+				configNode.putInt("size", size);
 			}
 
 			setFont(new Font(face, style, size));
@@ -556,8 +559,8 @@ public class TextView extends ModelView implements FontSelectable, KeyListener,
 		if (style != i) {
 			style = i;
 
-			if (root != null) {
-				root.putInt("style", style);
+			if (configNode != null) {
+				configNode.putInt("style", style);
 			}
 
 			setFont(new Font(face, style, size));
@@ -577,23 +580,23 @@ public class TextView extends ModelView implements FontSelectable, KeyListener,
 ////		getHeaderSummary().bindConfig(root.fetchOrCreate("GeneSummary"));
 //		getHeaderSummary().setConfigNode("GeneSummary");
 //	}
-	public void setConfigNode(String key) {
+	@Override
+	public void setConfigNode(Preferences parentNode) {
 
-		if(key == null) {
-			this.root = 
-					Preferences.userRoot().node(this.getClass().getName());
+		if(parentNode != null) {
+			this.configNode = parentNode.node("TextView");
 			
 		} else {
-			this.root = 
-					Preferences.userRoot().node(key);
+			LogBuffer.println("Could not find or create TextView " +
+					"node because parentNode was null.");
 		}
 
-		setFace(root.get("face", d_face));
-		setStyle(root.getInt("style", d_style));
-		setPoints(root.getInt("size", d_size));
+		setFace(configNode.get("face", d_face));
+		setStyle(configNode.getInt("style", d_style));
+		setPoints(configNode.getInt("size", d_size));
 
 //		getHeaderSummary().bindConfig(root.fetchOrCreate("GeneSummary"));
-		getHeaderSummary().setConfigNode("GeneSummary");
+		getHeaderSummary().setConfigNode(configNode);
 	}
 
 	/** Setter for headerSummary */

@@ -43,8 +43,10 @@ import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.plugin.dendroview.ArrayDrawer;
 import edu.stanford.genetics.treeview.plugin.dendroview.AtrAligner;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor2;
+import edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets2;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroException;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
+import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
 import edu.stanford.genetics.treeview.plugin.dendroview.DoubleArrayDrawer;
 import edu.stanford.genetics.treeview.plugin.dendroview.InvertedTreeDrawer;
 import edu.stanford.genetics.treeview.plugin.dendroview.LeftTreeDrawer;
@@ -79,12 +81,11 @@ public class DendroController implements ConfigNodePersistent {
 	private ColorExtractor2 colorExtractor;
 	
 	public DendroController(DendroView2 dendroView, TreeViewFrame tvFrame, 
-			TVModel tvModel, Preferences root) {
+			TVModel tvModel) {
 		
 		this.dendroView = dendroView;
 		this.tvFrame = tvFrame;
 		this.tvModel = tvModel;
-		this.configNode = root;
 		
 		setConfigNode(tvFrame.getConfigNode());
 		bindComponentFunctions();
@@ -599,9 +600,10 @@ public class DendroController implements ConfigNodePersistent {
 		// Give components access to TVModel
 		dendroView.getArraynameview().setDataModel(tvModel);
 		
-//		final ColorPresets colorPresets = DendrogramFactory.getColorPresets();
+		final ColorPresets2 colorPresets = DendrogramFactory.getColorPresets();
+		colorPresets.setConfigNode(configNode);
 		colorExtractor = new ColorExtractor2();
-//		colorExtractor.setDefaultColorSet(colorPresets.getDefaultColorSet());
+		colorExtractor.setDefaultColorSet(colorPresets.getDefaultColorSet());
 		colorExtractor.setMissing(DataModel.NODATA, DataModel.EMPTY);
 
 		final DoubleArrayDrawer dArrayDrawer = new DoubleArrayDrawer();
@@ -622,8 +624,8 @@ public class DendroController implements ConfigNodePersistent {
 		// globalmaps tell globalview, atrview, and gtrview
 		// where to draw each data point.
 		// the scrollbars "scroll" by communicating with the maps.
-		globalXmap = new MapContainer("Fixed");
-		globalYmap = new MapContainer("Fixed");
+		globalXmap = new MapContainer("Fixed", "FixedMap");
+		globalYmap = new MapContainer("Fixed", "FixedMap");
 		
 		setMapContainers();
 		
@@ -638,9 +640,8 @@ public class DendroController implements ConfigNodePersistent {
 		
 		invertedTreeDrawer = new InvertedTreeDrawer();
 		dendroView.getAtrview().setInvertedTreeDrawer(invertedTreeDrawer);
-		
-		// URLs
-		colorExtractor.setConfigNode("ColorExtractor1");//getFirst("ColorExtractor"));
+	
+		setPresets();
 		
 		// this is here because my only subclass shares this code.
 		bindTrees();
@@ -662,6 +663,8 @@ public class DendroController implements ConfigNodePersistent {
 		
 		globalXmap.setConfigNode(configNode);//getFirst("GlobalXMap"));
 		globalYmap.setConfigNode(configNode);//getFirst("GlobalYMap"));
+		// URLs
+		colorExtractor.setConfigNode(configNode);//getFirst("ColorExtractor"));
 		
 		dendroView.getTextview().setConfigNode(configNode);//getFirst("TextView"));
 		dendroView.getArraynameview().setConfigNode(configNode);//getFirst("ArrayNameView"));

@@ -87,6 +87,7 @@ public class PreferencesMenu {
 		menuDialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
 		menuDialog.setResizable(true);
 		
+		
 		basisPanel = new JPanel();
 		basisPanel.setLayout(new MigLayout());
 		
@@ -281,6 +282,10 @@ public class PreferencesMenu {
 					tvFrame.getDataModel().getDataMatrix().getMinVal(),
 					tvFrame.getDataModel().getDataMatrix().getMaxVal(),
 					applicationFrame);
+			
+			// Adding GradientColorChooser configurations to DendroView node.
+			gradientPick.setConfigNode(tvFrame.getConfigNode()
+					.node("DendroView"));
 			
 			ColorGradientController gradientControl = 
 					new ColorGradientController(gradientPick);
@@ -637,5 +642,10 @@ public class PreferencesMenu {
 	public Preferences getConfigNode() {
 		
 		return configNode;
+	}
+	
+	public ColorGradientChooser getGradientPick() {
+		
+		return gradientPick;
 	}
 }

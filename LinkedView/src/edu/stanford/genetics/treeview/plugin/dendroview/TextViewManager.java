@@ -38,9 +38,11 @@ import javax.swing.JSplitPane;
 
 import net.miginfocom.swing.MigLayout;
 
+import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.MessagePanel;
 import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.TreeSelectionI;
@@ -51,8 +53,8 @@ import edu.stanford.genetics.treeview.ViewFrame;
  * @author avsegal
  * 
  */
-public class TextViewManager extends ModelView implements FontSelectable,
-		PropertyChangeListener {
+public class TextViewManager extends ModelView implements ConfigNodePersistent, 
+		FontSelectable, PropertyChangeListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -63,8 +65,9 @@ public class TextViewManager extends ModelView implements FontSelectable,
 	private int numShown;
 	private final HeaderInfo hI;
 	private final Vector<ModelView> textViews;
-	private Preferences configRoot;
-	private HeaderSummary headerSummary = new HeaderSummary();
+	private Preferences configNode;
+	private HeaderSummary headerSummary = 
+			new HeaderSummary("TextViewManagerSummary");
 	private final int dividerLocations[];
 
 	/**
@@ -123,7 +126,7 @@ public class TextViewManager extends ModelView implements FontSelectable,
 	 */
 	private void loadSelection() {
 
-		if (configRoot == null) {
+		if (configNode == null) {
 			return;
 		}
 
@@ -147,7 +150,7 @@ public class TextViewManager extends ModelView implements FontSelectable,
 				
 				if(childrenNodes[i].contains("Selection")) {
 					included[addIndex] = 
-						configRoot.node(childrenNodes[i]).getInt("index", -1);
+						configNode.node(childrenNodes[i]).getInt("index", -1);
 					addIndex++;
 				}
 			}
@@ -160,7 +163,7 @@ public class TextViewManager extends ModelView implements FontSelectable,
 	 */
 	private void saveSelection() {
 
-		if (configRoot == null) {
+		if (configNode == null) {
 			return;
 		}
 
@@ -169,7 +172,7 @@ public class TextViewManager extends ModelView implements FontSelectable,
 		for(int i = 0; i < childrenNodes.length; i++) {
 			
 			if(childrenNodes[i].contains("Selection")) {
-				configRoot.remove(childrenNodes[i]);
+				configNode.remove(childrenNodes[i]);
 			}
 		}
 
@@ -177,7 +180,7 @@ public class TextViewManager extends ModelView implements FontSelectable,
 		for (int i = 0; i < headerSummary.getIncluded().length; i++) {
 
 			// Create children here.
-			configRoot.node("Selection" + i).putInt("index",
+			configNode.node("Selection" + i).putInt("index",
 					headerSummary.getIncluded()[i]);
 		}
 	}
@@ -323,14 +326,15 @@ public class TextViewManager extends ModelView implements FontSelectable,
 		}
 	}
 
-	public void setConfigNode(String key) {
+	@Override
+	public void setConfigNode(Preferences parentNode) {
 
-		if(key == null) {
-			this.configRoot = 
-					Preferences.userRoot().node(this.getClass().getName());
+		if(parentNode != null) {
+			this.configNode = parentNode.node("TextViewManager");
 			
 		} else {
-			this.configRoot = Preferences.userRoot().node(key);
+			LogBuffer.println("Could not find or create TextViewManager" +
+					"node because parentNode was null.");
 		}
 		
 		loadSelection(); // doesn't quite work yet,
@@ -344,13 +348,14 @@ public class TextViewManager extends ModelView implements FontSelectable,
 		// amount of TextViews.
 		for (int i = childrenNodes.length; i < textViews.size(); i++) {
 //			configRoot.create("TextView");
-			configRoot.node("TextView" + i);
+			configNode.node("TextView" + i);
 		}
 
 		
 		childrenNodes = getRootChildrenNodes();
 		for (int i = 0; i < textViews.size(); i++) {
-			((TextView) textViews.get(i)).setConfigNode(childrenNodes[i]);
+			((TextView) textViews.get(i)).setConfigNode(
+					configNode.node(childrenNodes[i]));
 		}
 
 		// binding config can change fonts.
@@ -443,9 +448,9 @@ public class TextViewManager extends ModelView implements FontSelectable,
 	public void saveDividerLocationsToConfig() {
 
 		Preferences node = null;
-		if (configRoot != null) {
+		if (configNode != null) {
 //			node = configRoot.fetchFirst("Dividers");
-			node = configRoot.node("Dividers");
+			node = configNode.node("Dividers");
 
 //			if (node == null) {
 //				node = configRoot.create("Dividers");
@@ -476,9 +481,9 @@ public class TextViewManager extends ModelView implements FontSelectable,
 	public void loadDividerLocationsFromConfig() {
 
 		Preferences node = null;
-		if (configRoot != null) {
+		if (configNode != null) {
 //			node = configRoot.fetchFirst("Dividers");
-			node = configRoot.node("Dividers");
+			node = configNode.node("Dividers");
 
 		} else {
 			return;
@@ -510,7 +515,8 @@ public class TextViewManager extends ModelView implements FontSelectable,
 	public void propertyChange(final PropertyChangeEvent pce) {
 
 		if (!ignoreDividerChange
-				&& pce.getPropertyName() == JSplitPane.DIVIDER_LOCATION_PROPERTY) {
+				&& pce.getPropertyName() 
+				== JSplitPane.DIVIDER_LOCATION_PROPERTY) {
 			saveDividerLocations();
 			saveDividerLocationsToConfig();
 		}
@@ -522,10 +528,10 @@ public class TextViewManager extends ModelView implements FontSelectable,
 	 */
 	public String[] getRootChildrenNodes() {
 		
-		if(configRoot != null) {
+		if(configNode != null) {
 			String[] childrenNodes;
 			try {
-				childrenNodes = configRoot.childrenNames();
+				childrenNodes = configNode.childrenNames();
 				return childrenNodes;
 				
 			} catch (BackingStoreException e) {

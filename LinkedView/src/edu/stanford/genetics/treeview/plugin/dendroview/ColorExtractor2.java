@@ -25,6 +25,7 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Observable;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
@@ -175,7 +176,7 @@ public class ColorExtractor2 extends Observable implements ConfigNodePersistent,
 			this.configNode = parentNode.node("ColorExtractor");
 			
 		} else {
-			LogBuffer.println("Could not find or create ColorExtractor" +
+			LogBuffer.println("Could not find or create ColorExtractor2 " +
 					"node because parentNode was null.");
 		}
 		
@@ -196,8 +197,25 @@ public class ColorExtractor2 extends Observable implements ConfigNodePersistent,
 //				}
 			
 //			Preferences cand = root.node("ColorSet1");
+		
+		String[] childrenNodes = this.getRootChildrenNodes();
+		
+		// Get first colorSet
+		String firstColorSet = null;
+		for(String node : childrenNodes) {
+			
+			if(node.contains("ColorSet")) {
+				firstColorSet = node;
+			}
+		}
 
-		colorSet.setConfigNode("ColorSet1");
+		if(firstColorSet != null) {
+			colorSet.setConfigNode(configNode.node(firstColorSet));
+			
+		} else {
+			LogBuffer.println("Could not find or create ColorSet " +
+					"node in ColorExtractor2 because parentNode was null.");
+		}
 		synchFloats();
 		contrast = configNode.getDouble("contrast", getContrast());
 		setLogCenter(configNode.getDouble("logcenter", 1.0));
@@ -616,10 +634,32 @@ public class ColorExtractor2 extends Observable implements ConfigNodePersistent,
 
 	/** resets the ColorExtractor to a default state. */
 	public void setDefaults() {
+		
 		setMissingColor(ColorSet2.encodeColor(defaultColorSet.getMissing()));
 		setEmptyColor(ColorSet2.encodeColor(defaultColorSet.getEmpty()));
 		setContrast(default_contrast);
 		synchFloats();
 		setChanged();
+	}
+	
+	/**
+	 * Returns the names of the current children of this class' root node.
+	 * @return
+	 */
+	public String[] getRootChildrenNodes() {
+		
+		if(configNode != null) {
+			String[] childrenNodes;
+			try {
+				childrenNodes = configNode.childrenNames();
+				return childrenNodes;
+				
+			} catch (BackingStoreException e) {
+				e.printStackTrace();
+				return null;
+			}
+		} else {
+			return null;
+		}
 	}
 }

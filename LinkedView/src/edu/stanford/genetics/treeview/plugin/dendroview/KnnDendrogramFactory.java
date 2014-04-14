@@ -68,7 +68,7 @@ public class KnnDendrogramFactory extends PluginFactory {
 	public void setGlobalNode(final Preferences node) {
 
 		super.setGlobalNode(node);
-		colorPresets.setConfigNode("KnnColorPresets");
+		colorPresets.setConfigNode(node);
 		if (colorPresets.getNumPresets() == 0) {
 			colorPresets.addDefaultPresets();
 		}

@@ -187,13 +187,13 @@ public class ColorGradientController {
 		public void actionPerformed(ActionEvent arg0) {
 			
 			if(arg0.getSource() == gradientPick.getRGButton()) {
-				gradientPick.getGradientBox().setDefaults(true);
+				gradientPick.selectRedGreen();
 				
 			} else if(arg0.getSource() == gradientPick.getYBButton()){
-				gradientPick.getGradientBox().setDefaults(false);
+				gradientPick.selectYellowBlue();
 				
 			} else if(arg0.getSource() == gradientPick.getCustomColorButton()){
-//				gradientPick.getGradientBox().setDefaults(false);
+				gradientPick.selectCustom();
 				// should set to last custom preset here
 				
 			} else {
@@ -201,7 +201,6 @@ public class ColorGradientController {
 						"DefaultListener in ColorGradientController");
 			}
 		}
-		
 	}
 	
 	class SaveColorPresetListener implements ActionListener {

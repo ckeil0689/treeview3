@@ -104,7 +104,7 @@ public class FillMap extends IntegerMap {
 	}
 
 	@Override
-	public void setConfigNode(String key) {
+	public void setConfigNode(Preferences parentNode) {
 		
 	}
 }
