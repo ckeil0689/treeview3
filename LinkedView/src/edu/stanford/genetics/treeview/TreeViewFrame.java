@@ -68,7 +68,6 @@ import edu.stanford.genetics.treeview.core.FileMruEditor;
 import edu.stanford.genetics.treeview.core.LogMessagesPanel;
 import edu.stanford.genetics.treeview.core.LogSettingsPanel;
 import edu.stanford.genetics.treeview.core.MenuHelpPluginsFrame;
-import edu.stanford.genetics.treeview.core.TreeViewJMenuBar;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
 
@@ -82,8 +81,6 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
 public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 	// Instance Variables
-	private static String appName = "TreeView 3";
-
 	protected JPanel backgroundPanel;
 	protected JPanel menuPanel;
 	protected JPanel waiting;
@@ -129,7 +126,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 */
 	public TreeViewFrame(final TreeViewApp treeview) {
 
-		this(treeview, appName);
+		this(treeview, StringRes.appName);
 	}
 
 	/**
@@ -350,7 +347,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		final JPanel message = new JPanel();
 		message.setLayout(new BoxLayout(message, BoxLayout.Y_AXIS));
-		message.add(new JLabel(getAppName()
+		message.add(new JLabel(StringRes.appName
 				+ " documentation is available from the website."));
 
 		final String docUrl = TreeViewApp.getUpdateUrl()
@@ -519,7 +516,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 
 		} else {
 //			backgroundPanel.add(waiting);
-			applicationFrame.setTitle(getAppName());
+			applicationFrame.setTitle(StringRes.appName);
 		}
 
 		// menubar.rebuild...
@@ -1455,7 +1452,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	 */
 	private void setLoadedTitle() {
 
-		applicationFrame.setTitle(getAppName() + " : " + dataModel.getSource());
+		applicationFrame.setTitle(StringRes.appName + " : " 
+				+ dataModel.getSource());
 	}
 	
 	@Override
@@ -1556,16 +1554,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 	}
 
 	// Getters
-	/**
-	 * Returns the name of the app
-	 * 
-	 * @return String name
-	 */
-	public String getAppName() {
-
-		return appName;
-	}
-
 	@Override
 	public TreeViewApp getApp() {
 

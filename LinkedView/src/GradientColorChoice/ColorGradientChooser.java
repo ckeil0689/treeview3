@@ -70,6 +70,8 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 	private JRadioButton yellowBlueButton;
 	private JRadioButton customColorButton;
 	
+	private boolean customSelected;
+	
 	private ButtonGroup colorButtonGroup;
 	
 	private ColorExtractor2 colorExtractor;
@@ -177,6 +179,20 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 		}
 	}
 	
+	public void setCustomSelected(boolean selected) {
+		
+		this.customSelected = selected;
+		
+		if(selected) {
+			addButton.setEnabled(true);
+			removeButton.setEnabled(true);
+			
+		} else {
+			addButton.setEnabled(false);
+			removeButton.setEnabled(false);
+		}
+	}
+	
 	/**
 	 * A special JPanel that represents a gradient colored box.
 	 * It has a MouseListener attached (via the controller class) which
@@ -218,9 +234,12 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 			
 			try {
 				drawGradientBox(g2);
+				
 			} catch (IllegalArgumentException e) {
-				System.out.println("Fraction Keyframe not increasing.");
-				System.out.println("Fractions: " + Arrays.toString(fractions));
+				LogBuffer.println("Fraction Keyframe not increasing " +
+						"for LinearGradientPaint.");
+				LogBuffer.println("Fractions: " + Arrays.toString(fractions));
+				LogBuffer.println("Colors: " + colorList.toString());
 			}
 			
 			drawNumBox(g2);
@@ -298,7 +317,7 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 					i++;
 				}
 			} else {
-				System.out.println("ThumbList size (" + thumbList.size() 
+				LogBuffer.println("ThumbList size (" + thumbList.size() 
 						+ ") and fractions size (" + fractions.length 
 						+ ") are different in drawNumbBox!");
 			}
@@ -314,9 +333,7 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 			if(selectedThumb != null) {
 				selectedIndex = thumbList.indexOf(selectedThumb);
 			}
-			
-//			if((selectedIndex == thumbList.size() - 1) 
-//					&& thumbList.size() > 0) {
+	
 			if(thumbList.get(selectedIndex).getX() 
 					== thumbList.get(thumbList.size() - 1).getX()) {
 				selectedIndex--;
@@ -341,7 +358,6 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 			}
 			
 			setColors();
-			selectCustom();
 			repaint();
 		}
 		
@@ -354,7 +370,6 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 			for(Thumb t : thumbList) {
 				
 				if(t.isSelected()){
-//						&& !(index == 0 || index == thumbList.size() - 1)) {
 					thumbList.remove(index);
 					colorList.remove(index);
 					selectedThumb = null;
@@ -372,7 +387,6 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 			}
 			
 			setColors();
-			selectCustom();
 			repaint();
 		}
 		
@@ -404,7 +418,6 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 				colorList.set(index, newCol);
 				thumbList.get(index).setColor(newCol);
 				setColors();
-				selectCustom();
 			}
 		}
 		
@@ -430,24 +443,25 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 			thumbList.clear();
 			fractions = resetFractions();
 			
-			ColorSet2 defaultSet = colorPresets.getDefaultColorSet();
-			
 			String defaultColors = "RedGreen";
 			String colorScheme = configNode.get("activeColors", defaultColors);
 			
 			if(colorScheme.equalsIgnoreCase("Custom")) {
 				customColorButton.setSelected(true);
+				setCustomSelected(true);
 				ColorSet2 savedColorSet = colorPresets.getColorSet(colorScheme);
 				loadPresets(savedColorSet);
 				
 			} else if(colorScheme.equalsIgnoreCase(defaultColors)){
 				// Colors should be defined as default ColorSet in ColorPresets2
 				redGreenButton.setSelected(true);
+				setCustomSelected(false);
 				ColorSet2 rgColorSet = colorPresets.getColorSet(colorScheme);
 				loadPresets(rgColorSet);
 				
 			} else if(colorScheme.equalsIgnoreCase("YellowBlue")){
 				yellowBlueButton.setSelected(true);
+				setCustomSelected(false);
 				ColorSet2 ybColorSet = colorPresets.getColorSet("YellowBlue");
 				loadPresets(ybColorSet);
 				
@@ -455,8 +469,6 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 				LogBuffer.println("No matching ColorSet found in " +
 						"ColorGradientChooser.setPresets()");
 			}
-			
-			setColors();
 		}
 		
 		/**
@@ -475,13 +487,14 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 			
 			float[] fracs = colorSet.getFractions();
 			
-			if(fractions.length == fracs.length) {
-				fractions = fracs;
-				
-			} else {
-				LogBuffer.println("Fractions and fracs are not the same " +
-						"length in ColorGradientChooser.setPresets()!");
-			}
+			fractions = fracs;
+//			if(fractions.length == fracs.length) {
+//				fractions = fracs;
+//				
+//			} else {
+//				LogBuffer.println("Fractions and fracs are not the same " +
+//						"length in ColorGradientChooser.setPresets()!");
+//			}
 		}
 		
 		public void savePresets() {
@@ -547,8 +560,6 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 			for(Thumb t : thumbList) {
 				
 				if(t.contains((int)point.getX(), (int)point.getY())) {
-//						&& !(addIndex == 0 
-//						|| addIndex == thumbList.size() - 1)) {
 						t.setSelected(!t.isSelected());
 						break;
 				} else {
@@ -592,9 +603,6 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 		public boolean checkThumbPresence(int thumbIndex) {
 			
 			boolean isPresent = false;
-			
-//			int checkIndex = 0;
-//			for(Thumb t : thumbList) {
 				
 			if(thumbList.size() > thumbIndex) {
 				double fraction = thumbList.get(thumbIndex).getX()
@@ -604,17 +612,12 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 				double fraction2 = (double)Math.round(fractions[thumbIndex] 
 						* 10000)/ 10000;
 				
-//				if(t.getX() == pos || t.isSelected()) {
 				if(fraction == fraction2 
 						|| thumbList.get(thumbIndex).isSelected()) {
 					isPresent = true;
-//					break;
-					
-				} else {
-//					checkIndex++;
 				}
 			}
-//			}
+			
 			return isPresent;
 		}
 		
@@ -653,7 +656,7 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 		public void updateThumbPos(int inputX) {
 			
 			if(thumbList.size() != fractions.length) {
-				System.out.println("ThumbList size (" + thumbList.size() 
+				LogBuffer.println("ThumbList size (" + thumbList.size() 
 						+ ") and fractions size (" + fractions.length 
 						+ ") are different in updateThumbPos!");
 			}
@@ -701,13 +704,12 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 				}
 				
 				if(thumbList.size() != fractions.length) {
-					System.out.println("ThumbList size (" + thumbList.size() 
+					LogBuffer.println("ThumbList size (" + thumbList.size() 
 							+ ") and fractions size (" + fractions.length 
 							+ ") are different in updateThumbPos!");
 				}
 				
 				setColors();
-				selectCustom();
 				repaint();
 			}
 		}
@@ -796,10 +798,9 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 					positionInputDialog.setVisible(true);
 				}
 			}
-			setColors();
-			selectCustom();
-			repaint();
 			
+			setColors();
+			repaint();
 		}
 		
 		// Fraction list Methods
@@ -1044,50 +1045,26 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 		return customColorButton;
 	}
 	
+	public boolean isCustomSelected() {
+		
+		return customSelected;
+	}
+	
 	// Mutators
 	/**
-	 * Sets the 'custom' button of the radiobutton group for colors to
-	 * selected if it isn't already.
-	 * Should set the preset here.
+	 * Switched the currently used ColorSet to the one that matches 
+	 * the specified entered name key in its 'ColorSet' configNode.
 	 */
-	public void selectRedGreen() {
+	public void switchColorSet(String name) {
 		
-		// Save current color status as preset. When user switches back to
-		// custom, the preset should be called here.
-		if(!getCustomColorButton().isSelected()) {
-			redGreenButton.setSelected(true);
-			configNode.put("activeColors", "RedGreen");
-		}
+		configNode.put("activeColors", name);
+		gradientBox.setPresets();
+		gradientBox.setColors();
 	}
 	
-	/**
-	 * Sets the 'custom' button of the radiobutton group for colors to
-	 * selected if it isn't already.
-	 * Should set the preset here.
-	 */
-	public void selectYellowBlue() {
+	public void setActiveColorSet(String name) {
 		
-		// Save current color status as preset. When user switches back to
-		// custom, the preset should be called here.
-		if(!getCustomColorButton().isSelected()) {
-			yellowBlueButton.setSelected(true);
-			configNode.put("activeColors", "YellowBlue");
-		}
-	}
-	
-	/**
-	 * Sets the 'custom' button of the radiobutton group for colors to
-	 * selected if it isn't already.
-	 * Should set the preset here.
-	 */
-	public void selectCustom() {
-		
-		// Save current color status as preset. When user switches back to
-		// custom, the preset should be called here.
-		if(!getCustomColorButton().isSelected()) {
-			customColorButton.setSelected(true);
-			configNode.put("activeColors", "Custom");
-		}
+		configNode.put("activeColors", name);
 	}
 	
 	protected void addColorSet(ColorSet2 temp) {
@@ -1120,6 +1097,7 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 		
 		redGreenButton.addActionListener(l);
 		yellowBlueButton.addActionListener(l);
+		customColorButton.addActionListener(l);
 	}
 	
 	protected void addSavePresetListener(ActionListener l) {

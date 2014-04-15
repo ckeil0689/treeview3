@@ -12,8 +12,6 @@
  */
 package edu.stanford.genetics.treeview;
 
-import java.awt.event.ActionListener;
-
 import javax.swing.event.MenuListener;
 
 public abstract class TreeviewMenuBarI {

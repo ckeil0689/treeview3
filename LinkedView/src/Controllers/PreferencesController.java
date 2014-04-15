@@ -8,7 +8,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.prefs.Preferences;
 
 import javax.swing.SwingWorker;
 
@@ -16,6 +15,7 @@ import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.LabelLoadDialog;
 import edu.stanford.genetics.treeview.MenuPanel;
 import edu.stanford.genetics.treeview.PreferencesMenu;
+import edu.stanford.genetics.treeview.StringRes;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.model.CustomLabelLoader;
 import edu.stanford.genetics.treeview.model.TVModel;
@@ -62,6 +62,13 @@ public class PreferencesController {
 		
 		@Override
 		public void mouseClicked(MouseEvent arg0) {
+			
+//			if(preferences.getActiveMenu().equalsIgnoreCase(
+//					StringRes.menu_title_Color) 
+//					&& preferences.getGradientPick().isCustomSelected()) {
+//				preferences.getGradientPick().saveStatus();
+//			}
+			checkForColorSave();
 			
 			for(MenuPanel panel : preferences.getMenuPanelList()) {
 				
@@ -131,9 +138,12 @@ public class PreferencesController {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
-			if(preferences.getGradientPick() != null) {
-				preferences.getGradientPick().saveStatus();
-			}
+//			if(preferences.getActiveMenu().equalsIgnoreCase(
+//					StringRes.menu_title_Color) 
+//					&& preferences.getGradientPick().isCustomSelected()) {
+//				preferences.getGradientPick().saveStatus();
+//			}
+			checkForColorSave();
 			
 			preferences.getPreferencesFrame().dispose();
 		}
@@ -150,9 +160,12 @@ public class PreferencesController {
 		@Override
 		public void windowClosing(final WindowEvent we) {
 			
-			if(preferences.getGradientPick() != null) {
-				preferences.getGradientPick().saveStatus();
-			}
+//			if(preferences.getActiveMenu().equalsIgnoreCase(
+//					StringRes.menu_title_Color) 
+//					&& preferences.getGradientPick().isCustomSelected()) {
+//				preferences.getGradientPick().saveStatus();
+//			}
+			checkForColorSave();
 			
 			preferences.getPreferencesFrame().dispose();
 		}
@@ -169,55 +182,7 @@ public class PreferencesController {
 		public void actionPerformed(ActionEvent e) {
 			
 			new ThemeResetter(e).run();
-//			boolean light = false;
-//			
-//			if(e.getSource().equals(preferences.getLightButton())) {
-//				preferences.getLightButton().setEnabled(false);
-//				preferences.getDarkButton().setEnabled(true);
-//				light = true;
-//				
-//			} else {
-//				preferences.getLightButton().setEnabled(true);
-//				preferences.getDarkButton().setEnabled(false);
-//			}
-//			
-//			updateCheck(light);
 		}
-		
-//		/**
-//		 * Switches the theme between day and night.
-//		 */
-//		public void updateCheck(boolean light) {
-//
-//			if (light) {
-//				GUIParams.setDayLight();
-//				resetTheme();
-//
-//			} else {
-//				GUIParams.setNight();
-//				resetTheme();
-//			}
-//		}
-//		
-//		/**
-//		 * Clears the TVFrame from the current view and loads the 
-//		 * new appropriate view with new color parameters.
-//		 */
-//		public void resetTheme() {
-//			
-//			preferences.setupLayout("Theme");
-//			addListeners();
-//			
-//			if (tvFrame.getDataModel() != null 
-//					&& tvFrame.getRunning() != null) {
-//				tvFrame.setView("DendroView");
-//				controller.addViewListeners();
-//
-//			} else {
-//				tvFrame.setView("WelcomeView");
-//				controller.addViewListeners();
-//			}
-//		}
 	}
 	
 	class ThemeResetter extends SwingWorker<Void, Void> {
@@ -250,12 +215,12 @@ public class PreferencesController {
 			if (light) {
 				GUIParams.setDayLight();
 				resetTheme();
-				tvFrame.getConfigNode().put("theme", "light");
+				tvFrame.getConfigNode().put("theme", StringRes.rButton_light);
 
 			} else {
 				GUIParams.setNight();
 				resetTheme();
-				tvFrame.getConfigNode().put("theme", "dark");
+				tvFrame.getConfigNode().put("theme", StringRes.rButton_dark);
 			}
 		}
 		
@@ -265,16 +230,16 @@ public class PreferencesController {
 		 */
 		public void resetTheme() {
 			
-			preferences.setupLayout("Theme");
+			preferences.setupLayout(StringRes.menu_title_Theme);
 			addListeners();
 			
 			if (tvFrame.getDataModel() != null 
 					&& tvFrame.getRunning() != null) {
-				tvFrame.setView("DendroView");
+				tvFrame.setView(StringRes.view_Dendro);
 				controller.addViewListeners();
 
 			} else {
-				tvFrame.setView("WelcomeView");
+				tvFrame.setView(StringRes.view_Welcome);
 				controller.addViewListeners();
 			}
 		}
@@ -298,6 +263,15 @@ public class PreferencesController {
 		public void componentShown(ComponentEvent arg0) {}
 		
 		
+	}
+	
+	public void checkForColorSave() {
+		
+		if(preferences.getActiveMenu().equalsIgnoreCase(
+				StringRes.menu_title_Color) 
+				&& preferences.getGradientPick().isCustomSelected()) {
+			preferences.getGradientPick().saveStatus();
+		}
 	}
 	
 	/**

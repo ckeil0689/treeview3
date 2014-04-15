@@ -68,14 +68,17 @@ public class ColorGradientController {
 		 */
 		private void clickOrPress() {
 	
-			if(gradientPick.getGradientBox().isGradientArea(
-					lastEvent.getPoint())) {
-				gradientPick.getGradientBox().setGradientColor(
-						lastEvent.getPoint());
-				
-			} else {
-				gradientPick.getGradientBox().deselectAllThumbs();
-				gradientPick.getGradientBox().selectThumb(lastEvent.getPoint());
+			if(gradientPick.isCustomSelected()) {
+				if(gradientPick.getGradientBox().isGradientArea(
+						lastEvent.getPoint())) {
+					gradientPick.getGradientBox().setGradientColor(
+							lastEvent.getPoint());
+					gradientPick.setActiveColorSet("Custom");
+					
+				} else {
+					gradientPick.getGradientBox().deselectAllThumbs();
+					gradientPick.getGradientBox().selectThumb(lastEvent.getPoint());
+				}
 			}
 		}
 		
@@ -84,7 +87,10 @@ public class ColorGradientController {
 		 */
 		private void doubleClick() {
 			
-			gradientPick.getGradientBox().specifyThumbPos(lastEvent.getPoint());
+			if(gradientPick.isCustomSelected()) {
+				gradientPick.getGradientBox().specifyThumbPos(
+						lastEvent.getPoint());
+			}
 		}
 		
 		@Override
@@ -139,20 +145,24 @@ public class ColorGradientController {
 		@Override
 		public void mouseDragged(MouseEvent e) {
 			
-			gradientPick.getGradientBox().updateThumbPos(e.getX());
+			if(gradientPick.isCustomSelected()) {
+				gradientPick.getGradientBox().updateThumbPos(e.getX());
+			}
 		}
 
 		@Override
 		public void mouseMoved(MouseEvent e) {
 			
-			if(gradientPick.getGradientBox().containsThumb(e.getX(), 
-					e.getY())) {
-				gradientPick.getGradientBox().setCursor(
-						new Cursor(Cursor.HAND_CURSOR));
-				
-			} else {
-				gradientPick.getGradientBox().setCursor(
-						new Cursor(Cursor.DEFAULT_CURSOR));
+			if(gradientPick.isCustomSelected()) {
+				if(gradientPick.getGradientBox().containsThumb(e.getX(), 
+						e.getY())) {
+					gradientPick.getGradientBox().setCursor(
+							new Cursor(Cursor.HAND_CURSOR));
+					
+				} else {
+					gradientPick.getGradientBox().setCursor(
+							new Cursor(Cursor.DEFAULT_CURSOR));
+				}
 			}
 		}
 	}
@@ -187,14 +197,16 @@ public class ColorGradientController {
 		public void actionPerformed(ActionEvent arg0) {
 			
 			if(arg0.getSource() == gradientPick.getRGButton()) {
-				gradientPick.selectRedGreen();
+				gradientPick.switchColorSet("RedGreen");
+				gradientPick.setCustomSelected(false);
 				
 			} else if(arg0.getSource() == gradientPick.getYBButton()){
-				gradientPick.selectYellowBlue();
+				gradientPick.switchColorSet("YellowBlue");
+				gradientPick.setCustomSelected(false);
 				
 			} else if(arg0.getSource() == gradientPick.getCustomColorButton()){
-				gradientPick.selectCustom();
-				// should set to last custom preset here
+				gradientPick.switchColorSet("Custom");
+				gradientPick.setCustomSelected(true);
 				
 			} else {
 				LogBuffer.println("No source found for ActionEvent in " +

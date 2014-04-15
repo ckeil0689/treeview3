@@ -210,10 +210,10 @@ public class ColorPresets2 implements ConfigNodePersistent {
 	 */
 	public ColorSet2 getColorSet(final String name) {
 
-//		final ConfigNode aconfigNode[] = root.fetch("ColorSet");
 		String[] childrenNodes = getRootChildrenNodes();
 		final ColorSet2 ret = new ColorSet2();
 		
+		// First check for the node with the supplied name.
 		for (int i = 0; i < childrenNodes.length; i++) {
 
 			ret.setConfigNode(configNode.node(childrenNodes[i]));
@@ -222,7 +222,10 @@ public class ColorPresets2 implements ConfigNodePersistent {
 				return ret;
 			}
 		}
-		return null;
+		
+		// Should always have a RedGreen and YellowBlue node.
+		ret.setConfigNode(configNode.node(childrenNodes[0]));
+		return ret;
 	}
 
 	/**

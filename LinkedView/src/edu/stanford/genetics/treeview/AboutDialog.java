@@ -62,7 +62,7 @@ public class AboutDialog {
 		message.setLayout(new MigLayout());
 		message.setBackground(GUIParams.BG_COLOR);
 		
-		JLabel text = new JLabel(tvFrame.getAppName() + 
+		JLabel text = new JLabel(StringRes.appName + 
 				" was created by Chris Keil based on Alok Saldhana's " +
 				"Java TreeView.");
 		text.setFont(GUIParams.FONTS);

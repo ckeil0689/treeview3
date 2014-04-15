@@ -43,6 +43,7 @@ public class PreferencesMenu {
 	private DendroView2 dendroView;
 	private DendroController dendroController;
 	private JButton ok_button;
+	private String activeMenu;
 	
 	// Menus
 	private PixelSettingsPanel pixelSettings = null;
@@ -78,13 +79,16 @@ public class PreferencesMenu {
 		this.applicationFrame = tvFrame.getAppFrame();
 		this.dendroView = dendroView;
 		this.dendroController = controller;
-		this.configNode = tvFrame.getConfigNode().node("Preferences");
+		this.configNode = tvFrame.getConfigNode().node(
+				StringRes.pref_node_Preferences);
+		this.activeMenu = menuTitle;
 		
 		menuPanelList = new ArrayList<MenuPanel>();
 		
 		menuDialog = new JDialog();
 		menuDialog.setTitle(dialogTitle);
 		menuDialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
+		menuDialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		menuDialog.setResizable(true);
 		
 		
@@ -95,17 +99,9 @@ public class PreferencesMenu {
 		final Dimension mainDim = GUIParams.getScreenSize();
 		
 		int width = mainDim.width * 1/2;
-		
-//		if(width > 640) {
-//			width = 640;
-//		}
-		
 		int height = mainDim.height * 1/2;
 		
-		basisPanel.setPreferredSize(
-				new Dimension(width, height));
-		
-		menuDialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		basisPanel.setPreferredSize(new Dimension(width, height));
 		
 		menuDialog.getContentPane().add(basisPanel);
 		
@@ -136,7 +132,7 @@ public class PreferencesMenu {
 	public void synchronizeAnnotation() {
 		
 		annotationSettings.synchronize();
-		setupLayout("Row and Column Labels");
+		setupLayout(StringRes.menu_title_RowAndCol);
 	}
 	
 	// Listeners
@@ -208,9 +204,9 @@ public class PreferencesMenu {
 		leftPanel.setBackground(GUIParams.BG_COLOR);
 		leftPanel.setBorder(BorderFactory.createEtchedBorder());
 		
-		if(startMenu.equalsIgnoreCase("Theme")
-				|| startMenu.equalsIgnoreCase("Font")
-				|| startMenu.equalsIgnoreCase("URL")) {
+		if(startMenu.equalsIgnoreCase(StringRes.menu_title_Theme)
+				|| startMenu.equalsIgnoreCase(StringRes.menu_title_Font)
+				|| startMenu.equalsIgnoreCase(StringRes.menu_title_URL)) {
 			setupMenuHeaders(false);
 			
 		} else {
@@ -222,7 +218,7 @@ public class PreferencesMenu {
 		
 		addMenu(startMenu);
 		
-		ok_button = GUIParams.setButtonLayout("OK", null);
+		ok_button = GUIParams.setButtonLayout(StringRes.button_OK, null);
 		basisPanel.add(ok_button, "pushx, alignx 100%, span");
 		
 		menuDialog.validate();
@@ -232,31 +228,32 @@ public class PreferencesMenu {
 	public void setupMenuHeaders(boolean analysis) {
 		
 		if(!analysis) {
-			MenuPanel theme = new MenuPanel("Theme");
+			MenuPanel theme = new MenuPanel(StringRes.menu_title_Theme);
 			JPanel themePanel = theme.getMenuPanel();
 			leftPanel.add(themePanel, "pushx, w 90%, h 10%, alignx 50%, " +
 					"span, wrap");
 			menuPanelList.add(theme);
 				
-			MenuPanel font = new MenuPanel("Font");
+			MenuPanel font = new MenuPanel(StringRes.menu_title_Font);
 			JPanel fontPanel = font.getMenuPanel();
 			leftPanel.add(fontPanel, "pushx, w 90%, h 10%, alignx 50%, " +
 					"span, wrap");
 			menuPanelList.add(font);
 				
-			MenuPanel url = new MenuPanel("URL");
+			MenuPanel url = new MenuPanel(StringRes.menu_title_URL);
 			JPanel urlPanel = url.getMenuPanel();
 			leftPanel.add(urlPanel, "pushx, w 90%, h 10%, alignx 50%, span");
 			menuPanelList.add(url);
 			
 		} else {
-			MenuPanel annotations = new MenuPanel("Row and Column Labels");
+			MenuPanel annotations = new MenuPanel(
+					StringRes.menu_title_RowAndCol);
 			JPanel annotationsPanel = annotations.getMenuPanel();
 			leftPanel.add(annotationsPanel, "pushx, w 90%, h 10%, " +
 					"alignx 50%, span, wrap");
 			menuPanelList.add(annotations);
 			
-			MenuPanel heatMap = new MenuPanel("Color Settings");
+			MenuPanel heatMap = new MenuPanel(StringRes.menu_title_Color);
 			JPanel heatMapPanel = heatMap.getMenuPanel();
 			leftPanel.add(heatMapPanel, "pushx, w 90%, h 10%, alignx 50%, " +
 					"span");
@@ -271,7 +268,6 @@ public class PreferencesMenu {
 	public void setupPanels() {
 		
 		if(dendroView != null) {
-			
 			pixelSettings = new PixelSettingsPanel();
 			annotationSettings = new AnnotationPanel();
 			fontSettings = new FontPanel();
@@ -285,7 +281,7 @@ public class PreferencesMenu {
 			
 			// Adding GradientColorChooser configurations to DendroView node.
 			gradientPick.setConfigNode(tvFrame.getConfigNode()
-					.node("DendroView"));
+					.node(StringRes.pref_node_DendroView));
 			
 			ColorGradientController gradientControl = 
 					new ColorGradientController(gradientPick);
@@ -429,20 +425,22 @@ public class PreferencesMenu {
 			
 			panel.add(label, "span, wrap");
 			
-			darkThemeButton = GUIParams.setRadioButtonLayout("Dark");
-			lightThemeButton = GUIParams.setRadioButtonLayout("Light");
+			darkThemeButton = GUIParams.setRadioButtonLayout(
+					StringRes.rButton_dark);
+			lightThemeButton = GUIParams.setRadioButtonLayout(
+					StringRes.rButton_light);
 			
 			themeButtonGroup = new ButtonGroup();
 			themeButtonGroup.add(darkThemeButton);
 			themeButtonGroup.add(lightThemeButton);
 			
 			// Check for saved presets...
-			String default_theme = "dark";
+			String default_theme = StringRes.rButton_dark;
 			String savedTheme = tvFrame.getConfigNode().get("theme", 
 					default_theme);
 			
 			// Since changing the theme resets the layout
-			if(savedTheme.equalsIgnoreCase("dark")) {
+			if(savedTheme.equalsIgnoreCase(StringRes.rButton_dark)) {
 				darkThemeButton.setSelected(true);
 				
 			} else {
@@ -508,7 +506,7 @@ public class PreferencesMenu {
 //					dendroView.getGtrview().getHeaderSummary(), tvFrame);
 			
 			custom_button = GUIParams.setButtonLayout(
-					"Load Custom Labels", null);
+					StringRes.button_customLabels, null);
 			
 			JLabel rows = GUIParams.setupHeader("Rows");
 			JLabel cols = GUIParams.setupHeader("Columns");
@@ -556,28 +554,32 @@ public class PreferencesMenu {
 	public void addMenu(String title) {
 		
 		basisPanel.removeAll();
-		
 		basisPanel.add(leftPanel, "pushy, aligny 0%, w 20%, h 75%");
 		
-		if(title.equalsIgnoreCase("Theme") && themeSettings != null) {
+		activeMenu = title;
+		
+		if(title.equalsIgnoreCase(StringRes.menu_title_Theme) 
+				&& themeSettings != null) {
 			basisPanel.add(themeSettings.makeThemePanel(), 
 					"w 79%, h 95%, wrap");
 			
-		} else if(title.equalsIgnoreCase("Row and Column Labels") 
+		} else if(title.equalsIgnoreCase(StringRes.menu_title_RowAndCol) 
 				&& annotationSettings != null) {
 			basisPanel.add(annotationSettings.makeLabelPane(), 
 					"w 79%, h 95%, wrap");
 			
-		} else if(title.equalsIgnoreCase("Font") && fontSettings != null) {
+		} else if(title.equalsIgnoreCase(StringRes.menu_title_Font) 
+				&& fontSettings != null) {
 			basisPanel.add(fontSettings.makeFontPanel(), "w 79%, h 95%, wrap");
 		
-		} else if(title.equalsIgnoreCase("Color Settings") 
+		} else if(title.equalsIgnoreCase(StringRes.menu_title_Color) 
 				&& gradientPick != null) {
 //			basisPanel.add(pixelSettings.makePSPanel(), "w 79%, h 95%, wrap");
 			basisPanel.add(gradientPick.makeGradientPanel(), 
 					"w 79%, h 95%, wrap");
 		
-		} else if(title.equalsIgnoreCase("URL") && urlSettings != null) {
+		} else if(title.equalsIgnoreCase(StringRes.menu_title_URL) 
+				&& urlSettings != null) {
 //			basisPanel.add(pixelSettings.makePSPanel(), "w 79%, h 95%, wrap");
 		
 		} else {
@@ -647,5 +649,14 @@ public class PreferencesMenu {
 	public ColorGradientChooser getGradientPick() {
 		
 		return gradientPick;
+	}
+	
+	/**
+	 * Returns the name of the last chosen menu.
+	 * @return String
+	 */
+	public String getActiveMenu() {
+		
+		return activeMenu;
 	}
 }

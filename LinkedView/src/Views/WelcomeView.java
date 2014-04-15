@@ -9,6 +9,7 @@ import javax.swing.JProgressBar;
 
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.GUIParams;
+import edu.stanford.genetics.treeview.StringRes;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 
 public class WelcomeView {
@@ -88,7 +89,7 @@ public class WelcomeView {
 		jl.setFont(new Font("Sans Serif", Font.PLAIN, 30));
 		jl.setForeground(GUIParams.BG_COLOR);
 
-		jl2 = new JLabel("Welcome to " + tvFrame.getAppName());
+		jl2 = new JLabel("Welcome to " + StringRes.appName);
 		jl2.setFont(new Font("Sans Serif", Font.BOLD, 50));
 		jl2.setForeground(GUIParams.BG_COLOR);
 
