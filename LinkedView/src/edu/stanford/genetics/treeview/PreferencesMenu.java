@@ -23,6 +23,7 @@ import Controllers.DendroController;
 import GradientColorChoice.ColorGradientChooser;
 import GradientColorChoice.ColorGradientController;
 
+import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor2;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
@@ -280,8 +281,9 @@ public class PreferencesMenu {
 					applicationFrame);
 			
 			// Adding GradientColorChooser configurations to DendroView node.
-			gradientPick.setConfigNode(tvFrame.getConfigNode()
-					.node(StringRes.pref_node_DendroView));
+			gradientPick.setConfigNode(((TVModel)tvFrame.getDataModel()).getDocumentConfig());
+//			tvFrame.getConfigNode()
+//					.node(StringRes.pref_node_File));
 			
 			ColorGradientController gradientControl = 
 					new ColorGradientController(gradientPick);

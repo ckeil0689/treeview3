@@ -77,7 +77,8 @@ public class ColorGradientController {
 					
 				} else {
 					gradientPick.getGradientBox().deselectAllThumbs();
-					gradientPick.getGradientBox().selectThumb(lastEvent.getPoint());
+					gradientPick.getGradientBox().selectThumb(
+							lastEvent.getPoint());
 				}
 			}
 		}
@@ -197,10 +198,18 @@ public class ColorGradientController {
 		public void actionPerformed(ActionEvent arg0) {
 			
 			if(arg0.getSource() == gradientPick.getRGButton()) {
+				if(gradientPick.getConfigNode().get("activeColors", 
+						"RedGreen").equalsIgnoreCase("Custom")) {
+					gradientPick.saveStatus();
+				}
 				gradientPick.switchColorSet("RedGreen");
 				gradientPick.setCustomSelected(false);
 				
 			} else if(arg0.getSource() == gradientPick.getYBButton()){
+				if(gradientPick.getConfigNode().get("activeColors", 
+						"YellowBlue").equalsIgnoreCase("Custom")) {
+					gradientPick.saveStatus();
+				}
 				gradientPick.switchColorSet("YellowBlue");
 				gradientPick.setCustomSelected(false);
 				

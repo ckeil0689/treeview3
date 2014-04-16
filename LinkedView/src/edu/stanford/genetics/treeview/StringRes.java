@@ -11,7 +11,19 @@ package edu.stanford.genetics.treeview;
  */
 public class StringRes {
 
-	// Main fields
+	
+	// Global Application Fields
+	/** Version of application */
+	public final static String versionTag = "0.1";
+
+	/** Homepage for updates */
+	public final static String updateUrl = "https://www.princeton.edu/~abarysh/" +
+			"treeview/";
+	
+	/** url of announcements mailing list */
+	public final static String announcementUrl = "https://www.princeton.edu/" +
+			"~abarysh/treeview/";
+	
 	public static final String appName = "TreeView 3";
 	
 	// View Names
@@ -29,6 +41,7 @@ public class StringRes {
 	// Nodes
 	public static final String pref_node_Preferences = "Preferences";
 	public static final String pref_node_DendroView = "DendroView";
+	public static final String pref_node_File = "File";
 	
 	// Button Texts
 	public static final String button_OK = "OK";

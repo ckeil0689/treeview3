@@ -32,7 +32,6 @@ public class PreferencesController {
 	private TreeViewFrame tvFrame;
 	private PreferencesMenu preferences;
 	private SwingWorker<Void, Void> labelWorker;
-//	private Preferences configNode;
 	
 	public PreferencesController(TreeViewFrame tvFrame, 
 			PreferencesMenu preferences, TVFrameController controller) {
@@ -40,7 +39,6 @@ public class PreferencesController {
 		this.controller = controller;
 		this.tvFrame = tvFrame;
 		this.preferences = preferences;
-//		this.configNode = preferences.getConfigNode();
 		
 		addListeners();
 	}
@@ -63,11 +61,6 @@ public class PreferencesController {
 		@Override
 		public void mouseClicked(MouseEvent arg0) {
 			
-//			if(preferences.getActiveMenu().equalsIgnoreCase(
-//					StringRes.menu_title_Color) 
-//					&& preferences.getGradientPick().isCustomSelected()) {
-//				preferences.getGradientPick().saveStatus();
-//			}
 			checkForColorSave();
 			
 			for(MenuPanel panel : preferences.getMenuPanelList()) {
@@ -137,14 +130,8 @@ public class PreferencesController {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			
-//			if(preferences.getActiveMenu().equalsIgnoreCase(
-//					StringRes.menu_title_Color) 
-//					&& preferences.getGradientPick().isCustomSelected()) {
-//				preferences.getGradientPick().saveStatus();
-//			}
+		
 			checkForColorSave();
-			
 			preferences.getPreferencesFrame().dispose();
 		}
 		
@@ -160,13 +147,7 @@ public class PreferencesController {
 		@Override
 		public void windowClosing(final WindowEvent we) {
 			
-//			if(preferences.getActiveMenu().equalsIgnoreCase(
-//					StringRes.menu_title_Color) 
-//					&& preferences.getGradientPick().isCustomSelected()) {
-//				preferences.getGradientPick().saveStatus();
-//			}
 			checkForColorSave();
-			
 			preferences.getPreferencesFrame().dispose();
 		}
 	}
@@ -265,6 +246,10 @@ public class PreferencesController {
 		
 	}
 	
+	/**
+	 * Saves color presets if the currently shown menu is Color Settings
+	 * and the 'Custom' JRadioButton is selected.
+	 */
 	public void checkForColorSave() {
 		
 		if(preferences.getActiveMenu().equalsIgnoreCase(

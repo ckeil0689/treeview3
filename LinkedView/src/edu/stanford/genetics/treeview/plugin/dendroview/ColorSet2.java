@@ -51,9 +51,6 @@ public class ColorSet2 implements ConfigNodePersistent {
 
 	private final String default_missingColor = "#909090";
 	private final String default_emptyColor = "#FFFFFF";
-	private final String default_color1 = "#FF0000";
-	private final String default_color2 = "#000000";
-	private final String default_color3 = "#00FF00";
 	private final float[] default_fractions = {0.0f, 0.5f, 1.0f};
 	private final String default_name = "NoName";
 
@@ -124,6 +121,9 @@ public class ColorSet2 implements ConfigNodePersistent {
 		setEmpty(empty);
 	}
 
+	/**
+	 * Sets defaults for missing and empty colors.
+	 */
 	private void setDefaults() {
 
 		missing = decodeColor(default_missingColor);
@@ -157,19 +157,6 @@ public class ColorSet2 implements ConfigNodePersistent {
 		setEmpty(other.getEmpty());
 		setName(other.getName());
 	}
-
-//	/**
-//	 * sets colors and name to reflect <code>ConfigNode</code>
-//	 */
-//	@Override
-//	public void bindConfig(final Preferences root) {
-//
-//		this.root = root;
-//		missing = decodeColor(root
-//				.get("missing", default_missingColor));
-//		empty = decodeColor(root.get("empty", default_emptyColor));
-//		name = root.get("name", default_name);
-//	}
 	
 	/**
 	 * sets colors and name to reflect <code>ConfigNode</code>
@@ -178,16 +165,12 @@ public class ColorSet2 implements ConfigNodePersistent {
 	public void setConfigNode(Preferences parentNode) {
 
 		if(parentNode != null) {
-			this.configNode = parentNode;//.node("ColorSet");
+			this.configNode = parentNode;
 			
 		} else {
 			LogBuffer.println("Could not find or create ColorSet " +
 					"node because parentNode was null.");
 		}
-		
-//		missing = decodeColor(configNode
-//				.get("missing", default_missingColor));
-//		empty = decodeColor(configNode.get("empty", default_emptyColor));
 		
 		// Check if colors/ fractions have been defined and if nodes exist.
 		// If no nodes exist, create them (mainly used for initial default
@@ -229,13 +212,22 @@ public class ColorSet2 implements ConfigNodePersistent {
 	/* inherit description */
 	@Override
 	public String toString() {
-//		return "ColorSet " + getName() + "\n" + "up: " + getUp().toString()
-//				+ "\t" + "zero: " + getZero().toString() + "\t" + "down: "
-//				+ getDown().toString() + "\t" + "missing: "
-//				+ getMissing().toString() + "\t" + "empty: "
-//				+ getEmpty().toString() + "\t";
 		
-		return "toString() in ColorSet2 not set";
+		String[] colors = getColors();
+		
+		String colorString = "";
+		if(colors.length > 0) {
+			for(String color : colors) {
+				
+				colorString += color + "; ";
+			}
+		} else {
+			colorString = "No colors in node.";
+		}
+		
+		return "ColorSet " + getName() + "\n" + "Colors: " + colorString 
+				+ " missing: " + getMissing().toString() + "\t" + "empty: "
+				+ getEmpty().toString() + "\t";
 	}
 
 	/**
@@ -507,11 +499,7 @@ public class ColorSet2 implements ConfigNodePersistent {
 	public void loadEisen(final File file) throws IOException {
 		
 		final FileInputStream stream = new FileInputStream(file);
-//		up = unpackEisen(stream);
-//		zero = unpackEisen(stream);
-//		down = unpackEisen(stream);
 		missing = unpackEisen(stream);
-		
 		stream.close();
 	}
 
@@ -539,11 +527,7 @@ public class ColorSet2 implements ConfigNodePersistent {
 	public void saveEisen(final File file) throws IOException {
 		
 		final FileOutputStream stream = new FileOutputStream(file);
-//		packEisen(up, stream);
-//		packEisen(zero, stream);
-//		packEisen(down, stream);
 		packEisen(missing, stream);
-		
 		stream.close();
 	}
 

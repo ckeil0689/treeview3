@@ -63,21 +63,9 @@ import edu.stanford.genetics.treeview.model.TVModel;
  */
 public abstract class TreeViewApp {//implements WindowListener {
 
-	/** Version of application */
-	public final static String versionTag = "0.1";
-
-	// url of homepage to go for updates
-	protected static String updateUrl = "https://www.princeton.edu/~abarysh/" +
-			"treeview/";
-
-	// url of announcements mailing list
-	protected static String announcementUrl = "https://www.princeton.edu/" +
-			"~abarysh/treeview/";
-
 	/** holds all open windows */
 //	protected java.util.Vector<Window> windows;
 
-	private final CustomConfigs prefs;
 	private final UrlPresets geneUrlPresets;
 	private final UrlPresets arrayUrlPresets;
 //	private boolean exitOnWindowsClosed = true;
@@ -91,7 +79,6 @@ public abstract class TreeViewApp {//implements WindowListener {
 	 */
 	public TreeViewApp() {
 
-//		this(new XmlConfig(globalConfigName(), "ProgramConfig"), false);
 		this(null, false);
 	}
 
@@ -117,7 +104,19 @@ public abstract class TreeViewApp {//implements WindowListener {
 		} else {
 			globalConfig = setPreferences();
 		}
+
+		geneUrlPresets = new UrlPresets("GeneUrlPresets");
+		geneUrlPresets.setConfigNode(getGlobalConfig());
 		
+		arrayUrlPresets = new UrlPresets("ArrayUrlPresets");
+		arrayUrlPresets.setConfigNode(getGlobalConfig());
+
+		if (arrayUrlPresets.getPresetNames().length == 0) {
+			arrayUrlPresets.addPreset("Google",
+					"http://www.google.com/search?hl=en&ie=ISO-8859-1"
+							+ "&q=HEADER");
+			arrayUrlPresets.setDefaultPreset(-1);
+		}
 		
 		// Generate an XML file of the Preferences at this point, so it
 		// can be viewed and analyzed.
@@ -132,22 +131,6 @@ public abstract class TreeViewApp {//implements WindowListener {
 			
 		} catch (BackingStoreException e1) {
 			e1.printStackTrace();
-		}
-		
-		prefs = new CustomConfigs();
-		prefs.setConfigNode(getGlobalConfig());
-
-		geneUrlPresets = new UrlPresets("GeneUrlPresets");
-		geneUrlPresets.setConfigNode(getGlobalConfig());
-		
-		arrayUrlPresets = new UrlPresets("ArrayUrlPresets");
-		arrayUrlPresets.setConfigNode(getGlobalConfig());
-
-		if (arrayUrlPresets.getPresetNames().length == 0) {
-			arrayUrlPresets.addPreset("Google",
-					"http://www.google.com/search?hl=en&ie=ISO-8859-1"
-							+ "&q=HEADER");
-			arrayUrlPresets.setDefaultPreset(-1);
 		}
 
 		try {
@@ -202,30 +185,6 @@ public abstract class TreeViewApp {//implements WindowListener {
 	 * URL of codebase
 	 */
 	public abstract URL getCodeBase();
-
-	/**
-	 * The release-level version tag for the whole application.
-	 * 
-	 * @return a string representing the versionTag
-	 */
-	public static String getVersionTag() {
-
-		return versionTag;
-	}
-
-	/**
-	 * Getter for updateUrl, a string representing a website where you can
-	 * download newer versions.
-	 */
-	public static String getUpdateUrl() {
-
-		return updateUrl;
-	}
-
-	public static String getAnnouncementUrl() {
-
-		return announcementUrl;
-	}
 
 	public UrlPresets getGeneUrlPresets() {
 
@@ -406,39 +365,6 @@ public abstract class TreeViewApp {//implements WindowListener {
 //		// nothing
 //	}
 
-//	/**
-//	 * Get a per-user file in which to store global config info. Read the code
-//	 * to find out exactly how it guesses.
-//	 * 
-//	 * @return A system-specific guess at a global config file name.
-//	 */
-//	public static String globalConfigName() {
-//
-//		// must find and construct the properties object...
-//		final String dir = System.getProperty("user.home");
-//
-//		final String fsep = System.getProperty("file.separator");
-//
-//		final String os = System.getProperty("os.name");
-//
-//		String file;
-//		if (os.indexOf("Mac") >= 0) {
-//			file = "JavaTreeView Config";
-//
-//		} else if (fsep.equals("/")) {
-//			file = ".javaTreeViewXmlrc";
-//
-//		} else if (fsep.equals("\\")) {
-//			file = "jtview.xml";
-//
-//		} else {
-//			System.out.println("Could not determine sys type! "
-//					+ "using name jtview.cfg");
-//			file = "jtview.xml";
-//		}
-//
-//		return dir + fsep + file;
-//	}
 
 //	/**
 //	 * @param exitOnWindowsClosed
@@ -448,9 +374,4 @@ public abstract class TreeViewApp {//implements WindowListener {
 //
 //		this.exitOnWindowsClosed = exitOnWindowsClosed;
 //	}
-
-	public CustomConfigs getPrefs() {
-
-		return prefs;
-	}
 }

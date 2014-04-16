@@ -78,7 +78,7 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 	private ColorPresets2 colorPresets;
 	
 	private ColorExtractorEditor2 colorExtractorEditor;
-	private ColorPresetsPanel colorPresetsPanel;
+//	private ColorPresetsPanel colorPresetsPanel;
 	
 	private Thumb selectedThumb = null;
 	
@@ -138,14 +138,14 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 		presetPanel.setLayout(new MigLayout());
 		colorExtractorEditor = new ColorExtractorEditor2(colorExtractor);
 		presetPanel.add(colorExtractorEditor, "alignx 50%, pushx, wrap");
-		presetPanel.add(new CEEButtons(), "alignx 50%, pushx, wrap");
+//		presetPanel.add(new CEEButtons(), "alignx 50%, pushx, wrap");
 
-		colorPresetsPanel = new ColorPresetsPanel();
-		final JScrollPane sp = new JScrollPane(colorPresetsPanel,
-				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		sp.setOpaque(false);
-		presetPanel.add(sp, "alignx 50%, pushx, growx");
+//		colorPresetsPanel = new ColorPresetsPanel();
+//		final JScrollPane sp = new JScrollPane(colorPresetsPanel,
+//				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+//				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+//		sp.setOpaque(false);
+//		presetPanel.add(sp, "alignx 50%, pushx, growx");
 		
 		mainPanel.add(hint, "span, wrap");
 		mainPanel.add(gradientBox, "h 20%, growx, pushx, alignx 50%, " +
@@ -486,15 +486,7 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 			}
 			
 			float[] fracs = colorSet.getFractions();
-			
 			fractions = fracs;
-//			if(fractions.length == fracs.length) {
-//				fractions = fracs;
-//				
-//			} else {
-//				LogBuffer.println("Fractions and fracs are not the same " +
-//						"length in ColorGradientChooser.setPresets()!");
-//			}
 		}
 		
 		public void savePresets() {
@@ -542,7 +534,6 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 			for(Thumb t : thumbList) {
 				
 				if(t.contains(x, y)) {
-					
 					containsThumb = true;
 					break;
 				}
@@ -566,14 +557,20 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 					t.setSelected(false);
 				}
 			}
+			
 			repaint();
 		}
 		
 		/**
-		 * Sets thumbs evenly depending on the amounts of colors currently
-		 * added to the gradient.
+		 * First checks if fraction array is in ascending order, then
+		 * verifies thumb positions to match fractions. Returns a boolean so
+		 * that the boxes won't be drawn in the paintComponent method, if the
+		 * fractions aren't ascending. This would cause an exception with 
+		 * LinearGradientPaint.
 		 */
 		public void verifyThumbs() {
+			
+			boolean ascending = verifyFractions();
 			
 			int x = (int)thumbRect.getX();
 			int w = (int)thumbRect.getWidth(); 
@@ -593,6 +590,35 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 					adjustThumbPos(i);
 				}
 	        }
+		}
+		
+		public boolean verifyFractions() {
+			
+			boolean ascending = true;
+			for(int i = 0; i < fractions.length - 1; i++) {
+				
+				// Ascending
+				if(fractions[i] > fractions[i + 1]) {
+					ascending = false;
+					break;
+				} 
+				
+				// Out of range
+				if(fractions[i] > 1.0 || fractions[i + 1] > 1.0) {
+					ascending = false;
+					break;
+					
+				} else if(fractions[i] < 0.0 || fractions[i + 1] < 0.0) {
+					ascending = false;
+					break; 
+					
+				} else if(fractions[i] == fractions[i + 1]) {
+					ascending = false;
+					break;
+				}
+			}
+			
+			return ascending;
 		}
 		
 		/**
@@ -655,11 +681,7 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 		
 		public void updateThumbPos(int inputX) {
 			
-			if(thumbList.size() != fractions.length) {
-				LogBuffer.println("ThumbList size (" + thumbList.size() 
-						+ ") and fractions size (" + fractions.length 
-						+ ") are different in updateThumbPos!");
-			}
+			float[] checkFracs = fractions.clone();
 			
 			if(selectedThumb != null) {
 				// get position of previous thumb
@@ -703,10 +725,12 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 					fractions = updateFractions();
 				}
 				
-				if(thumbList.size() != fractions.length) {
-					LogBuffer.println("ThumbList size (" + thumbList.size() 
-							+ ") and fractions size (" + fractions.length 
-							+ ") are different in updateThumbPos!");
+				boolean fracsOK = verifyFractions();
+				
+				if(!fracsOK) {
+					LogBuffer.println("Fractions not ok. Original: " 
+				+ Arrays.toString(checkFracs) + "\n" + "New: " 
+							+ Arrays.toString(fractions));
 				}
 				
 				setColors();
@@ -1105,134 +1129,134 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 		saveButton.addActionListener(l);
 	}
 	
-	// Inner Classes
-	/**
-	 * this class allows the presets to be selected...
-	 */
-	class ColorPresetsPanel extends JPanel {
-
-		private static final long serialVersionUID = 1L;
-
-		ColorPresetsPanel() {
-
-			redoLayout();
-		}
-
-		public void redoLayout() {
-
-			removeAll();
-			this.setBackground(GUIParams.BG_COLOR);
-			final int nPresets = colorPresets.getNumPresets();
-			final JButton[] buttons = new JButton[nPresets];
-			for (int i = 0; i < nPresets; i++) {
-				final JButton presetButton = GUIParams.setButtonLayout((
-						colorPresets.getPresetNames())[i], null);
-				final int index = i;
-				presetButton.addActionListener(new ActionListener() {
-
-					@Override
-					public void actionPerformed(final ActionEvent e) {
-
-						colorExtractorEditor.copyStateFrom(colorPresets
-								.getColorSet(index));
-					}
-				});
-				this.add(presetButton);
-
-				buttons[index] = presetButton;
-			}
-		}
-	}
-	
-	class CEEButtons extends JPanel {
-
-		private static final long serialVersionUID = 1L;
-
-		CEEButtons() {
-
-			this.setOpaque(false);
-			final JButton loadButton = GUIParams.setButtonLayout("Load", null);
-			loadButton.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-
-					final JFileChooser chooser = new JFileChooser();
-					final int returnVal = chooser
-							.showOpenDialog(CEEButtons.this);
-					if (returnVal == JFileChooser.APPROVE_OPTION) {
-						final File f = chooser.getSelectedFile();
-						try {
-							final ColorSet2 temp = new ColorSet2();
-							temp.loadEisen(f);
-							colorExtractorEditor.copyStateFrom(temp);
-
-						} catch (final IOException ex) {
-							JOptionPane.showMessageDialog(CEEButtons.this,
-									"Could not load from " + f.toString()
-											+ "\n" + ex);
-						}
-					}
-				}
-			});
-			this.add(loadButton);
-
-			final JButton saveButton = GUIParams.setButtonLayout("Save", null);
-			saveButton.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-
-					final JFileChooser chooser = new JFileChooser();
-					final int returnVal = chooser
-							.showSaveDialog(CEEButtons.this);
-					if (returnVal == JFileChooser.APPROVE_OPTION) {
-						final File f = chooser.getSelectedFile();
-						try {
-							final ColorSet2 temp = new ColorSet2();
-							colorExtractorEditor.copyStateTo(temp);
-							temp.saveEisen(f);
-
-						} catch (final IOException ex) {
-							JOptionPane.showMessageDialog(CEEButtons.this,
-									"Could not save to " + f.toString() + "\n"
-											+ ex);
-						}
-					}
-				}
-			});
-			this.add(saveButton);
-
-			final JButton makeButton = GUIParams.setButtonLayout("Make Preset", 
-					null);
-			makeButton.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-
-					final ColorSet2 temp = new ColorSet2();
-					colorExtractorEditor.copyStateTo(temp);
-					temp.setName("UserDefined");
-					colorPresets.addColorSet(temp);
-					colorPresetsPanel.redoLayout();
-					colorPresetsPanel.invalidate();
-					colorPresetsPanel.revalidate();
-					colorPresetsPanel.repaint();
-				}
-			});
-			this.add(makeButton);
-
-			final JButton resetButton = GUIParams.setButtonLayout(
-					"Reset Presets", null);
-			resetButton.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-
-					colorPresets.reset();
-				}
-			});
-			this.add(resetButton);
-		}
-	}
+//	// Inner Classes
+//	/**
+//	 * this class allows the presets to be selected...
+//	 */
+//	class ColorPresetsPanel extends JPanel {
+//
+//		private static final long serialVersionUID = 1L;
+//
+//		ColorPresetsPanel() {
+//
+//			redoLayout();
+//		}
+//
+//		public void redoLayout() {
+//
+//			removeAll();
+//			this.setBackground(GUIParams.BG_COLOR);
+//			final int nPresets = colorPresets.getNumPresets();
+//			final JButton[] buttons = new JButton[nPresets];
+//			for (int i = 0; i < nPresets; i++) {
+//				final JButton presetButton = GUIParams.setButtonLayout((
+//						colorPresets.getPresetNames())[i], null);
+//				final int index = i;
+//				presetButton.addActionListener(new ActionListener() {
+//
+//					@Override
+//					public void actionPerformed(final ActionEvent e) {
+//
+//						colorExtractorEditor.copyStateFrom(colorPresets
+//								.getColorSet(index));
+//					}
+//				});
+//				this.add(presetButton);
+//
+//				buttons[index] = presetButton;
+//			}
+//		}
+//	}
+//	
+//	class CEEButtons extends JPanel {
+//
+//		private static final long serialVersionUID = 1L;
+//
+//		CEEButtons() {
+//
+//			this.setOpaque(false);
+//			final JButton loadButton = GUIParams.setButtonLayout("Load", null);
+//			loadButton.addActionListener(new ActionListener() {
+//
+//				@Override
+//				public void actionPerformed(final ActionEvent e) {
+//
+//					final JFileChooser chooser = new JFileChooser();
+//					final int returnVal = chooser
+//							.showOpenDialog(CEEButtons.this);
+//					if (returnVal == JFileChooser.APPROVE_OPTION) {
+//						final File f = chooser.getSelectedFile();
+//						try {
+//							final ColorSet2 temp = new ColorSet2();
+//							temp.loadEisen(f);
+//							colorExtractorEditor.copyStateFrom(temp);
+//
+//						} catch (final IOException ex) {
+//							JOptionPane.showMessageDialog(CEEButtons.this,
+//									"Could not load from " + f.toString()
+//											+ "\n" + ex);
+//						}
+//					}
+//				}
+//			});
+//			this.add(loadButton);
+//
+//			final JButton saveButton = GUIParams.setButtonLayout("Save", null);
+//			saveButton.addActionListener(new ActionListener() {
+//
+//				@Override
+//				public void actionPerformed(final ActionEvent e) {
+//
+//					final JFileChooser chooser = new JFileChooser();
+//					final int returnVal = chooser
+//							.showSaveDialog(CEEButtons.this);
+//					if (returnVal == JFileChooser.APPROVE_OPTION) {
+//						final File f = chooser.getSelectedFile();
+//						try {
+//							final ColorSet2 temp = new ColorSet2();
+//							colorExtractorEditor.copyStateTo(temp);
+//							temp.saveEisen(f);
+//
+//						} catch (final IOException ex) {
+//							JOptionPane.showMessageDialog(CEEButtons.this,
+//									"Could not save to " + f.toString() + "\n"
+//											+ ex);
+//						}
+//					}
+//				}
+//			});
+//			this.add(saveButton);
+//
+//			final JButton makeButton = GUIParams.setButtonLayout("Make Preset", 
+//					null);
+//			makeButton.addActionListener(new ActionListener() {
+//
+//				@Override
+//				public void actionPerformed(final ActionEvent e) {
+//
+//					final ColorSet2 temp = new ColorSet2();
+//					colorExtractorEditor.copyStateTo(temp);
+//					temp.setName("UserDefined");
+//					colorPresets.addColorSet(temp);
+//					colorPresetsPanel.redoLayout();
+//					colorPresetsPanel.invalidate();
+//					colorPresetsPanel.revalidate();
+//					colorPresetsPanel.repaint();
+//				}
+//			});
+//			this.add(makeButton);
+//
+//			final JButton resetButton = GUIParams.setButtonLayout(
+//					"Reset Presets", null);
+//			resetButton.addActionListener(new ActionListener() {
+//
+//				@Override
+//				public void actionPerformed(final ActionEvent e) {
+//
+//					colorPresets.reset();
+//				}
+//			});
+//			this.add(resetButton);
+//		}
+//	}
 }

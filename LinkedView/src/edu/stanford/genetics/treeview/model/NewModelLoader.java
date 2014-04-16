@@ -120,22 +120,44 @@ public class NewModelLoader {
 		// Load Config File
 		try {
 			loadProgView.setLoadLabel("Getting configurations...");
-			final String xmlFile = targetModel.getFileSet().getJtv();
-
-			Preferences documentConfig;
-			if (xmlFile.startsWith("http:")) {
+			final String fileName = targetModel.getFileSet().getRoot();
+			Preferences fileNode = tvFrame.getConfigNode().node("File");
+			
+			Preferences documentConfig = null;
+			String[] childrenNodes = fileNode.childrenNames();
+			String default_name = "No file.";
+			
+			boolean fileFound = false;
+			if(childrenNodes.length > 0) {
+				
+				for(int i = 0; i < childrenNodes.length; i++) {
+					
+					if(fileNode.node(childrenNodes[i]).get("name", 
+							default_name).equalsIgnoreCase(fileName)) {
+						documentConfig = fileNode.node(childrenNodes[i]);
+						fileFound = true;
+						break;
+					}
+				}
+			}
+			
+			if(!fileFound) {
+				documentConfig = fileNode.node("Model " 
+						+ (childrenNodes.length + 1));
+				documentConfig.put("name", fileName);
+			}
+			
+//			if (fileName.startsWith("http:")) {
 //				documentConfig = new XmlConfig(new URL(xmlFile),
 //						"DocumentConfig");
-				
-				documentConfig = Preferences.userRoot().node("DocumentConfig");
-				LogBuffer.println("Cannot support configuration " +
-						"file from URL at the moment.");
-
-			} else {
+//				
+//				documentConfig = tvFrame.getConfigNode().node("File");
+//				LogBuffer.println("Cannot support configuration " +
+//						"file from URL at the moment.");
+//
+//			} else {
 //				documentConfig = new XmlConfig(xmlFile, "DocumentConfig");
-				documentConfig = Preferences.userRoot().node("DocumentConfig");
-				documentConfig.put("jtv", xmlFile);
-			}
+//			}
 			targetModel.setDocumentConfig(documentConfig);
 
 		} catch (final Exception e) {

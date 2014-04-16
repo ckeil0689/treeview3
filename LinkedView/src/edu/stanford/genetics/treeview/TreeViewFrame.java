@@ -219,10 +219,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			} else if(viewName.equalsIgnoreCase("LoadErrorView")) {
 				loadErrorView = new LoadErrorView(this, loadErrorMessage);
 				view = loadErrorView.makeErrorPanel();
-			
-//			} else if(viewName.equalsIgnoreCase("LoadCheckView")) {
-//				confirmPanel = new LoadCheckView((TVModel)dataModel);
-//				view = confirmPanel.makeLoadCheckView();
 				
 			} else {
 				view.setLayout(new MigLayout());
@@ -350,8 +346,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		message.add(new JLabel(StringRes.appName
 				+ " documentation is available from the website."));
 
-		final String docUrl = TreeViewApp.getUpdateUrl()
-				+ "/manual.html";
+		final String docUrl = StringRes.updateUrl + "/manual.html";
 		message.add(new JTextField(docUrl));
 
 		final JButton lButton = new JButton("Launch Browser");

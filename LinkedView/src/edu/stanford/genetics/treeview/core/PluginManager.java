@@ -215,18 +215,19 @@ public class PluginManager {
 		for (int i = 0; i < plugins.length; i++) {
 			
 			Preferences pluginNode = null;
-			final Preferences pluginPresetsNode = node.node("PluginGlobal");
+//			final Preferences pluginPresetsNode = node.node("PluginGlobal");
 			String[] pluginPresetsChildrenNodes;
 			try {
-				pluginPresetsChildrenNodes = pluginPresetsNode.childrenNames();
+				pluginPresetsChildrenNodes = node.childrenNames();
 			
 				for (int j = 0; j < pluginPresetsChildrenNodes.length; j++) {
 					
 					// scan existing pluginPresets for correct name
-					if (pluginPresetsNode.node(pluginPresetsChildrenNodes[j])
-							.get("name", "").equals(plugins[i].getPluginName())) {
+					if (node.node(pluginPresetsChildrenNodes[j])
+							.get("name", "").equals(
+									plugins[i].getPluginName())) {
 						
-						pluginNode = pluginPresetsNode.node(
+						pluginNode = node.node(
 								pluginPresetsChildrenNodes[j]);
 						break;
 					}
@@ -234,7 +235,7 @@ public class PluginManager {
 				
 				if (pluginNode == null) {
 					// no existing presets node for plugin, must create
-					pluginNode = node.node("PluginGlobal");
+					pluginNode = node.node(plugins[i].getPluginName());
 					pluginNode.put("name", plugins[i].getPluginName());
 				}
 				

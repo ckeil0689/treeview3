@@ -68,7 +68,7 @@ public class AboutDialog {
 		text.setFont(GUIParams.FONTS);
 		text.setForeground(GUIParams.TEXT);
 		
-		JLabel version = new JLabel("Version: " + TreeViewApp.getVersionTag());
+		JLabel version = new JLabel("Version: " + StringRes.versionTag);
 		version.setFont(GUIParams.FONTS);
 		version.setForeground(GUIParams.TEXT);
 		
@@ -80,7 +80,7 @@ public class AboutDialog {
 		hp.setForeground(GUIParams.TEXT);
 		
 		message.add(hp);
-		message.add(new JTextField(TreeViewApp.getUpdateUrl()));
+		message.add(new JTextField(StringRes.updateUrl));
 
 		JButton yesB = GUIParams.setButtonLayout("Open", null);
 		yesB.addActionListener(new ActionListener() {
@@ -88,7 +88,7 @@ public class AboutDialog {
 			@Override
 			public void actionPerformed(final ActionEvent arg0) {
 				
-				tvFrame.displayURL(TreeViewApp.getUpdateUrl());
+				tvFrame.displayURL(StringRes.updateUrl);
 			}
 
 		});
@@ -99,14 +99,14 @@ public class AboutDialog {
 		announce.setForeground(GUIParams.TEXT);
 		
 		message.add(announce);
-		message.add(new JTextField(TreeViewApp.getAnnouncementUrl()));
+		message.add(new JTextField(StringRes.announcementUrl));
 
 		yesB = GUIParams.setButtonLayout("Sign Up", null);
 		yesB.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent arg0) {
 				
-				tvFrame.displayURL(TreeViewApp.getAnnouncementUrl());
+				tvFrame.displayURL(StringRes.announcementUrl);
 			}
 
 		});

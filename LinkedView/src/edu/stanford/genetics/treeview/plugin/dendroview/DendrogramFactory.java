@@ -75,11 +75,11 @@ public class DendrogramFactory extends PluginFactory {
 
 		super.setGlobalNode(node);
 		
-		colorPresets.setConfigNode(node);
-
-		if (colorPresets.getNumPresets() == 0) {
-			colorPresets.addDefaultPresets();
-		}
+//		colorPresets.setConfigNode(node);
+//
+//		if (colorPresets.getNumPresets() == 0) {
+//			colorPresets.addDefaultPresets();
+//		}
 
 		cpresetEditor.synchronizeFrom();
 	}

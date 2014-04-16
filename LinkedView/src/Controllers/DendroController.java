@@ -481,13 +481,13 @@ public class DendroController implements ConfigNodePersistent {
 	public void setConfigNode(Preferences parentNode) {
 		
 		if (parentNode != null) {
-//			if (tvModel.getDocumentConfigRoot() != null) {
-//				configNode = tvModel.getDocumentConfigRoot().node(name);
-//
-//			} else {
-//				configNode = Preferences.userRoot().node("DendroView");
-//			}
-			configNode = parentNode.node("DendroView");
+			if (tvModel.getDocumentConfigRoot() != null) {
+				configNode = tvModel.getDocumentConfig();
+
+			} else {
+				configNode = Preferences.userRoot().node("DendroView");
+			}
+//			configNode = parentNode.node("DendroView");
 		}
 	}
 	
@@ -663,6 +663,7 @@ public class DendroController implements ConfigNodePersistent {
 		
 		globalXmap.setConfigNode(configNode);//getFirst("GlobalXMap"));
 		globalYmap.setConfigNode(configNode);//getFirst("GlobalYMap"));
+		
 		// URLs
 		colorExtractor.setConfigNode(configNode);//getFirst("ColorExtractor"));
 		
