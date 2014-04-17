@@ -1,5 +1,11 @@
 package Controllers;
 
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
+
+import edu.stanford.genetics.treeview.ConfirmDialog;
+import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.StringRes;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 
 /**
@@ -13,6 +19,11 @@ public class MenubarActions {
 
 	private TreeViewFrame tvFrame;
 	private TVFrameController controller;
+	
+	private enum CLEARNODES {
+		
+		
+	}
 	
 	public MenubarActions(TreeViewFrame tvFrame, 
 			TVFrameController controller) {
@@ -59,6 +70,15 @@ public class MenubarActions {
 				|| name.equalsIgnoreCase("Color Settings")) {
 			controller.openPrefMenu(name, "Options");
 			
+		} else if(name.equalsIgnoreCase(StringRes.menubar_clearPrefs)) {
+			ConfirmDialog confirmClear = new ConfirmDialog(tvFrame, 
+					"clear preferences");
+			confirmClear.setVisible(true);
+			
+			if(confirmClear.getConfirmed()) {
+				removeAllKeys(tvFrame.getConfigNode());
+			}
+				
 		} else if(name.equalsIgnoreCase("Cluster")) {
 			controller.setupClusterView();
 			
@@ -89,5 +109,44 @@ public class MenubarActions {
 		} else if(name.equalsIgnoreCase("Show Log")) {
 			tvFrame.showLogMessages();
 		}
+	}
+	
+	/**
+	 * Recursive method to remove all keys from all nodes, starting from the
+	 * original parent node on which this method is called.
+	 * @param parentNode
+	 */
+	public void removeAllKeys(Preferences parentNode) {
+		
+		try {
+			if(!tvFrame.getLoaded()) {
+				parentNode.clear();
+				Preferences fileNode = parentNode.node(
+						StringRes.pref_node_File);
+				String[] models = fileNode.childrenNames();
+				
+				for(int i = 0; i < models.length; i++) {
+					
+					fileNode.node(models[i]).removeNode();
+				}
+				
+			} else {
+//				parentNode.clear();
+//				
+//				String[] childrenNodes = parentNode.childrenNames();
+//				
+//				if(childrenNodes.length > 0)
+//				for(int i = 0; i < childrenNodes.length; i++) {
+//					
+//					removeAllKeys(parentNode.node(childrenNodes[i]));
+//				}
+			}
+			
+		} catch (BackingStoreException e) {
+			LogBuffer.println("Error when removing Preferences " +
+					"keys: " + e.getMessage());
+			e.printStackTrace();
+		}
+		
 	}
 }

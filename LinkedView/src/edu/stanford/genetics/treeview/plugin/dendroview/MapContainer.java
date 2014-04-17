@@ -65,7 +65,6 @@ public class MapContainer extends Observable implements Observer,
 		this.nullMap = new NullMap();
 		this.current = nullMap;
 		this.mapName = mapName;
-		
 	}
 
 	public MapContainer(final String type, String mapName) {
@@ -124,6 +123,7 @@ public class MapContainer extends Observable implements Observer,
 
 		// then, fix self up...
 		setMap(configNode.get("current", default_map));
+		setScale(configNode.getDouble("scale", default_scale));
 	}
 
 	/**
@@ -505,6 +505,8 @@ public class MapContainer extends Observable implements Observer,
 			fixedMap.setScale(d);
 			setupScrollbar();
 			setChanged();
+	
+			configNode.putDouble("scale", d);
 		}
 	}
 

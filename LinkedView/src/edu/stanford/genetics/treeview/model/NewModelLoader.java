@@ -120,11 +120,14 @@ public class NewModelLoader {
 		// Load Config File
 		try {
 			loadProgView.setLoadLabel("Getting configurations...");
-			final String fileName = targetModel.getFileSet().getRoot();
+			final String fileName = targetModel.getFileSet().getRoot(); 
+			final String fileExt = targetModel.getFileSet().getExt();
+			
 			Preferences fileNode = tvFrame.getConfigNode().node("File");
 			
 			Preferences documentConfig = null;
 			String[] childrenNodes = fileNode.childrenNames();
+			
 			String default_name = "No file.";
 			
 			boolean fileFound = false;
@@ -145,6 +148,7 @@ public class NewModelLoader {
 				documentConfig = fileNode.node("Model " 
 						+ (childrenNodes.length + 1));
 				documentConfig.put("name", fileName);
+				documentConfig.put("extension", fileExt);
 			}
 			
 //			if (fileName.startsWith("http:")) {

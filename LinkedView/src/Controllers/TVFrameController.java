@@ -125,21 +125,6 @@ public class TVFrameController {
 		}	
 	}
 	
-//	/**
-//	 * Sets TVFrame "loaded" to true which triggers the setup of DendroView.
-//	 * @author CKeil
-//	 *
-//	 */
-//	class ContinueListener implements ActionListener {
-//
-//		@Override
-//		public void actionPerformed(ActionEvent arg0) {
-//
-//			setLoaded();
-//		}	
-//	}
-	
-	
 	class StackButtonListener implements MouseListener {
 
 		@Override
@@ -313,27 +298,6 @@ public class TVFrameController {
 				FileSet fileSet = null;
 				
 				if(fileMenuSet == null) {
-//						final String fileName = file.getAbsolutePath();
-//						final int dotIndex = fileName.indexOf(".");
-//	
-//						final int suffixLength = fileName.length() - dotIndex;
-//	
-//						fileType = file.getAbsolutePath().substring(
-//								fileName.length() - suffixLength, 
-//								fileName.length());
-//					
-//						if (!fileType.equalsIgnoreCase(".cdt")) {
-//							
-//							
-//								final CDTCreator3 fileTransformer = 
-//										new CDTCreator3(file, fileType, 
-//												tvFrame);
-//								
-//								fileTransformer.createFile();
-//				
-//								file = new File(fileTransformer.getFilePath());
-//								
-//						}
 					fileSet = tvFrame.getFileSet(file);
 					
 				} else {
@@ -384,7 +348,11 @@ public class TVFrameController {
 		
 		try {
 			file = tvFrame.selectFile();
-			worker.execute();
+			
+			// Only run loader, if JFileChooser wasn't canceled.
+			if(file != null) {
+				worker.execute();
+			}
 			
 		} catch (LoadException e) {
 			System.out.println("Loading the FileSet was interrupted. " +

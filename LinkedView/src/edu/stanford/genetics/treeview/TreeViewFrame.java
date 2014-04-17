@@ -78,7 +78,8 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
  * @author ckeil
  * 
  */
-public class TreeViewFrame extends ViewFrame implements FileSetListener {
+public class TreeViewFrame extends ViewFrame implements FileSetListener, 
+ConfigNodePersistent {
 
 	// Instance Variables
 	protected JPanel backgroundPanel;
@@ -193,6 +194,14 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		
 		// Add the main background panel to the contentPane
 		applicationFrame.getContentPane().add(backgroundPanel);
+	}
+	
+	@Override
+	public void setConfigNode(Preferences parentNode) {
+		
+		if (parentNode != null) {
+			configNode = parentNode.node("TreeViewFrame");
+		}
 	}
 	
 	// Setting different views
@@ -535,22 +544,22 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 		}
 		
 		// Only for debugging Preferences API
-		JButton clearButton = GUIParams.setButtonLayout("Clear Configs", null);
-		clearButton.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				
-				try {
-					treeView.getGlobalConfig().removeNode();
-					
-				} catch (BackingStoreException e) {
-					e.printStackTrace();
-				}
-			}
-			
-		});
-		menuPanel.add(clearButton);
+//		JButton clearButton = GUIParams.setButtonLayout("Clear Configs", null);
+//		clearButton.addActionListener(new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(ActionEvent arg0) {
+//				
+//				try {
+//					treeView.getGlobalConfig().removeNode();
+//					
+//				} catch (BackingStoreException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//			
+//		});
+//		menuPanel.add(clearButton);
 	}
 	
 	public void generateStackMenu() {
@@ -653,6 +662,13 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			stackMenuList.add(themeMenuItem);
 			prefSubMenu.add(themeMenuItem);
 			
+			prefSubMenu.addSeparator();
+			
+			JMenuItem clearPrefsMenuItem = new JMenuItem(
+					StringRes.menubar_clearPrefs);
+			stackMenuList.add(clearPrefsMenuItem);
+			prefSubMenu.add(clearPrefsMenuItem);
+			
 		} else {
 			JMenuItem themeMenuItem = new JMenuItem("Theme");
 			stackMenuList.add(themeMenuItem);
@@ -665,6 +681,13 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener {
 			JMenuItem urlMenuItem = new JMenuItem("URL");
 			stackMenuList.add(urlMenuItem);
 			prefSubMenu.add(urlMenuItem);
+			
+			prefSubMenu.addSeparator();
+			
+			JMenuItem clearPrefsMenuItem = new JMenuItem(
+					StringRes.menubar_clearPrefs);
+			stackMenuList.add(clearPrefsMenuItem);
+			prefSubMenu.add(clearPrefsMenuItem);
 		}
 
 		stackMenu.add(prefSubMenu);

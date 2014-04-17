@@ -586,8 +586,9 @@ public class ArrayNameView extends ModelView implements MouseListener,
 
 		if ((face == null) || (!face.equals(string))) {
 			face = string;
-			if (configNode != null)
+			if (configNode != null) {
 				configNode.put("face", face);
+			}
 			setFont(new Font(face, style, size));
 			backBufferValid = false;
 			revalidate();
@@ -601,8 +602,9 @@ public class ArrayNameView extends ModelView implements MouseListener,
 
 		if (size != i) {
 			size = i;
-			if (configNode != null)
+			if (configNode != null) {
 				configNode.putInt("size", size);
+			}
 			setFont(new Font(face, style, size));
 			backBufferValid = false;
 			revalidate();
@@ -617,8 +619,9 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		if (style != i) {
 			style = i;
 			backBufferValid = false;
-			if (configNode != null)
+			if (configNode != null) {
 				configNode.putInt("style", style);
+			}
 			setFont(new Font(face, style, size));
 			revalidate();
 			repaint();

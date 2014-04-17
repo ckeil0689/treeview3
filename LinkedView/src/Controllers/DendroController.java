@@ -80,6 +80,9 @@ public class DendroController implements ConfigNodePersistent {
 	// Color Extractor
 	private ColorExtractor2 colorExtractor;
 	
+	// Search Window (Global so it can be checked if open).
+	private JWindow window;
+	
 	public DendroController(DendroView2 dendroView, TreeViewFrame tvFrame, 
 			TVModel tvModel) {
 		
@@ -89,9 +92,11 @@ public class DendroController implements ConfigNodePersistent {
 		
 		setConfigNode(tvFrame.getConfigNode());
 		bindComponentFunctions();
+		setTreesVis(configNode.getBoolean("treesVisible", false));
+		
 		dendroView.setupLayout();
 		dendroView.refresh();
-		resetMapContainers();
+//		resetMapContainers();
 		
 		// add listeners
 		addViewListeners();
@@ -165,8 +170,7 @@ public class DendroController implements ConfigNodePersistent {
 	 *
 	 */
 	class SearchWindowOpener extends SwingWorker<Void, Void> {
-
-		private JWindow window;
+		
 		private ActionEvent event;
 		
 		SearchWindowOpener (ActionEvent e) {
@@ -176,20 +180,26 @@ public class DendroController implements ConfigNodePersistent {
 		@Override
 		protected Void doInBackground() throws Exception {
 			
-			window = dendroView.openSearchPanel(); 
-			Point location = ((JButton)event.getSource()).getLocation();
-			int height = ((JButton)event.getSource()).getHeight();
-			
-			window.setLocation(location.x, location.y + (2 * height));
-			window.pack();
+			if(window == null) {
+				window = dendroView.openSearchPanel(); 
+				Point location = ((JButton)event.getSource()).getLocation();
+				int height = ((JButton)event.getSource()).getHeight();
+				
+				window.setLocation(location.x, location.y + (2 * height));
+				window.pack();
+				
+			}
 			return null;
 		}
 		
 		@Override
 		protected void done() {
 			
-			if(window != null) {
+			if(!window.isShowing()) {
 				window.setVisible(true);
+				
+			} else {
+				window.dispose();
 			}
 		}
 	}
@@ -254,12 +264,10 @@ public class DendroController implements ConfigNodePersistent {
 			
 			if(tvFrame.getTreeButton().getText()
 					.equalsIgnoreCase("SHOW TREES")) {
-				tvFrame.getTreeButton().setText("HIDE TREES");
-				dendroView.setTreesVisible(true);
+				setTreesVis(true);
 				
 			} else {
-				tvFrame.getTreeButton().setText("SHOW TREES");
-				dendroView.setTreesVisible(false);
+				setTreesVis(false);
 			}
 			
 			dendroView.setupLayout();
@@ -288,30 +296,6 @@ public class DendroController implements ConfigNodePersistent {
 		public void actionPerformed(ActionEvent e) {
 			
 			new ScaleChanger(e).run();
-//			if(e.getSource() == dendroView.getXPlusButton()) {
-//				getGlobalXMap().zoomIn();
-//				
-//			} else if(e.getSource() == dendroView.getXMinusButton()) {
-//				getGlobalXMap().zoomOut();
-//				
-//			} else if(e.getSource() == dendroView.getYPlusButton()) {
-//				getGlobalYMap().zoomIn();
-//				
-//			} else if(e.getSource() == dendroView.getYMinusButton()) {
-//				getGlobalYMap().zoomOut();
-//				
-//			} else if(e.getSource() == dendroView.getHomeButton()) {
-//				// GlobalView size known, this is why it works
-////				resetMapContainers();
-//				dendroView.getGlobalView().resetHome(true);
-//				
-//			} else {
-//				LogBuffer.println("Got weird source for actionPerformed() " +
-//						"in DendroController ScaleListener.");
-//			}
-//			
-//			getGlobalXMap().notifyObservers();
-//			getGlobalYMap().notifyObservers();
 		}
 	}
 	
@@ -415,7 +399,18 @@ public class DendroController implements ConfigNodePersistent {
 		public void componentShown(final ComponentEvent arg0) {}
 	}
 	
-	
+	public void setTreesVis(boolean vis) {
+		
+		dendroView.setTreesVisible(vis);
+		configNode.putBoolean("treesVisible", vis);
+		
+		if(vis) {
+			tvFrame.getTreeButton().setText("HIDE TREES");
+			
+		} else {
+			tvFrame.getTreeButton().setText("SHOW TREES");
+		}
+	}
 	
 	public void saveImage(final JPanel panel) throws IOException {
 
@@ -624,8 +619,8 @@ public class DendroController implements ConfigNodePersistent {
 		// globalmaps tell globalview, atrview, and gtrview
 		// where to draw each data point.
 		// the scrollbars "scroll" by communicating with the maps.
-		globalXmap = new MapContainer("Fixed", "FixedMap");
-		globalYmap = new MapContainer("Fixed", "FixedMap");
+		globalXmap = new MapContainer("Fixed", "GlobalXMap");
+		globalYmap = new MapContainer("Fixed", "GlobalYMap");
 		
 		setMapContainers();
 		

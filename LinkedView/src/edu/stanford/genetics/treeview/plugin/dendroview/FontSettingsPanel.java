@@ -44,6 +44,8 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
@@ -233,7 +235,8 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 		add(style_choice, "span, wrap");
 
 		size_field = new NatField(client.getPoints(), 3);
-		size_field.addActionListener(new SelectionListener());
+		size_field.getDocument().addDocumentListener(
+				new DocumentChangeListener());
 		add(size_field, "span, wrap");
 		
 		exampleField = new JLabel("Font Example Text");
@@ -284,6 +287,28 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
+			
+			updateExample();
+			synchronizeClient();
+		}
+	}
+	
+	class DocumentChangeListener implements DocumentListener {
+
+		@Override
+		public void changedUpdate(DocumentEvent arg0) {
+			
+		}
+
+		@Override
+		public void insertUpdate(DocumentEvent arg0) {
+			
+			updateExample();
+			synchronizeClient();
+		}
+
+		@Override
+		public void removeUpdate(DocumentEvent arg0) {
 			
 			updateExample();
 			synchronizeClient();

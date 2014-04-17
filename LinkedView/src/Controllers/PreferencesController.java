@@ -195,13 +195,13 @@ public class PreferencesController {
 
 			if (light) {
 				GUIParams.setDayLight();
-				resetTheme();
 				tvFrame.getConfigNode().put("theme", StringRes.rButton_light);
+				resetTheme();
 
 			} else {
 				GUIParams.setNight();
-				resetTheme();
 				tvFrame.getConfigNode().put("theme", StringRes.rButton_dark);
+				resetTheme();
 			}
 		}
 		

@@ -281,9 +281,8 @@ public class PreferencesMenu {
 					applicationFrame);
 			
 			// Adding GradientColorChooser configurations to DendroView node.
-			gradientPick.setConfigNode(((TVModel)tvFrame.getDataModel()).getDocumentConfig());
-//			tvFrame.getConfigNode()
-//					.node(StringRes.pref_node_File));
+			gradientPick.setConfigNode(((TVModel)tvFrame.getDataModel())
+					.getDocumentConfig());
 			
 			ColorGradientController gradientControl = 
 					new ColorGradientController(gradientPick);

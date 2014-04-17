@@ -325,8 +325,12 @@ public abstract class ViewFrame implements Observer {
 			System.out.println("ViewFrame.closeWindow() Got exception: " + e);
 		}
 		
-		final ExitConfirmDialog confirm = new ExitConfirmDialog(this);
+		final ConfirmDialog confirm = new ConfirmDialog(this, "exit TreeView");
 		confirm.setVisible(true);
+		
+		if(confirm.getConfirmed()) {
+			applicationFrame.dispose();
+		}
 	}
 
 	/**
@@ -626,13 +630,10 @@ public abstract class ViewFrame implements Observer {
 		final int retVal = fileDialog.showOpenDialog(applicationFrame);
 
 		if (retVal == JFileChooser.APPROVE_OPTION) {
-
 			chosen = fileDialog.getSelectedFile();
+			
 		} else {
-//			throw new LoadException("File Dialog closed without selection...",
-//					LoadException.NOFILE);
 			System.out.println("File Dialog closed without selection...");
-//			setView("WelcomeView");
 		}
 
 		return chosen;
