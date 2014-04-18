@@ -344,9 +344,45 @@ public class DendroController implements ConfigNodePersistent {
 		@Override
 		protected void done() {
 			
+			setButtonEnabledStatus();
+			
 			getGlobalXMap().notifyObservers();
 			getGlobalYMap().notifyObservers();
 		}
+	}
+	
+	public void setButtonEnabledStatus() {
+		
+		// X-Axis Buttons
+		if(getGlobalXMap().getScale() == getGlobalXMap().getMinScale()) {
+			dendroView.getXMinusButton().setEnabled(false);
+			
+		} else if(getGlobalXMap().getScale() != getGlobalXMap().getMinScale()
+				&& getGlobalXMap().getScale() 
+				!= getGlobalXMap().getAvailablePixels()) {
+			dendroView.getXMinusButton().setEnabled(true);
+			dendroView.getXPlusButton().setEnabled(true);
+			
+		} else if(getGlobalXMap().getScale() 
+				== getGlobalXMap().getAvailablePixels()) {
+			dendroView.getXPlusButton().setEnabled(false);
+		}
+		
+		// Y-Axis Buttons
+		if(getGlobalYMap().getScale() == getGlobalYMap().getMinScale()) {
+			dendroView.getYMinusButton().setEnabled(false);
+			
+		} else if(getGlobalYMap().getScale() != getGlobalYMap().getMinScale()
+				&& getGlobalYMap().getScale() 
+				!= getGlobalYMap().getAvailablePixels()) {
+			dendroView.getYMinusButton().setEnabled(true);
+			dendroView.getYPlusButton().setEnabled(true);
+			
+		} else if(getGlobalYMap().getScale() 
+				== getGlobalYMap().getAvailablePixels()) {
+			dendroView.getYPlusButton().setEnabled(false);
+		}
+		
 	}
 	
 	/**
@@ -359,7 +395,72 @@ public class DendroController implements ConfigNodePersistent {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			
-			dendroView.zoomSelection();
+			zoomSelection();
+			centerSelection();
+		}
+	}
+	
+	/**
+	 * Uses the array- and geneSelection and currently available pixels on
+	 * screen retrieved from the MapContainer objects to calculate a new scale
+	 * and zoom in on it by working in conjunction with centerSelection().
+	 */
+	public void zoomSelection() {
+
+		double newScale = 0.0;
+		double newScale2 = 0.0;
+		
+		double rest = 0.0;
+
+		final int arrayIndexes = arraySelection.getNSelectedIndexes();
+		final int geneIndexes = geneSelection.getNSelectedIndexes();
+
+		if (arrayIndexes > 0 && geneIndexes > 0) {
+			newScale = globalXmap.getAvailablePixels() / arrayIndexes;
+			
+			rest = globalXmap.getAvailablePixels() % arrayIndexes;
+			
+			if (newScale < globalXmap.getMinScale()) {
+				newScale = globalXmap.getMinScale();
+			}
+			globalXmap.setScale(newScale + (rest/ arrayIndexes));
+
+			
+			newScale2 = globalYmap.getAvailablePixels() / geneIndexes;
+			rest = globalYmap.getAvailablePixels() % geneIndexes;
+			
+			if (newScale2 < globalYmap.getMinScale()) {
+				newScale2 = globalYmap.getMinScale();
+			}
+			
+			globalYmap.setScale(newScale2 + (rest/ geneIndexes));
+		}
+	}
+
+	/**
+	 * Scrolls to the center of the selected rectangle
+	 */
+	public void centerSelection() {
+
+		int scrollX;
+		int scrollY;
+
+		int[] selectedGenes = geneSelection.getSelectedIndexes();
+		int[] selectedArrays = arraySelection.getSelectedIndexes();
+		
+		if (selectedGenes.length > 0 && selectedArrays.length > 0) {
+			
+			double endX = selectedArrays[selectedArrays.length - 1];
+			double endY = selectedGenes[selectedGenes.length -  1];
+			
+			double startX = selectedArrays[0];
+			double startY = selectedGenes[0];
+			
+			scrollX = (int) Math.round((endX + startX)/ 2);
+			scrollY = (int) Math.round((endY + startY)/ 2);
+
+			globalXmap.scrollToIndex(scrollX);
+			globalYmap.scrollToIndex(scrollY);
 		}
 	}
 	

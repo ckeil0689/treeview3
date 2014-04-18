@@ -116,7 +116,7 @@ public class FixedMap extends IntegerMap {
 		}
 
 		final int i = (int) ((maxindex - minindex + 1) * scale);
-		final int j = (int) (scale * (int) (availablepixels / scale));
+		final int j = (int) Math.round((scale * (int)(availablepixels/ scale)));
 		if (i > j) {
 			return j;
 

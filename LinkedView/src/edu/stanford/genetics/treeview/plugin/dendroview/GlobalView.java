@@ -407,6 +407,10 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 		}
 	}
 
+	/**
+	 * Checks the selection of genes and arrays and calculates the 
+	 * appropriate selection rectangle.
+	 */
 	protected void recalculateOverlay() {
 
 		if ((geneSelection == null) || (arraySelection == null)) {
@@ -853,70 +857,6 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 
 		geneSelection.notifyObservers();
 		arraySelection.notifyObservers();
-	}
-
-	/**
-	 * Uses the array- and geneSelection and currently available pixels on
-	 * screen retrieved from the MapContainer objects to calculate a new scale
-	 * and zoom in on it by working in conjunction with centerSelection().
-	 */
-	public void zoomSelection() {
-
-		double newScale = 0.0;
-		double newScale2 = 0.0;
-		
-		double rest = 0.0;
-
-		final int arrayIndexes = arraySelection.getNSelectedIndexes();
-		final int geneIndexes = geneSelection.getNSelectedIndexes();
-
-		if (arrayIndexes > 0 && geneIndexes > 0) {
-			newScale = xmap.getAvailablePixels() / arrayIndexes;
-			
-			rest = xmap.getAvailablePixels() % arrayIndexes;
-			
-			if (newScale < xmap.getMinScale()) {
-				newScale = xmap.getMinScale();
-			}
-			
-			xmap.setScale(newScale + rest/ arrayIndexes);
-
-			newScale2 = ymap.getAvailablePixels() / geneIndexes;
-			rest = ymap.getAvailablePixels() % geneIndexes;
-			
-			if (newScale2 < ymap.getMinScale()) {
-				newScale2 = ymap.getMinScale();
-			}
-			
-			ymap.setScale(newScale2 + rest/ geneIndexes);
-		}
-	}
-
-	/**
-	 * Scrolls to the center of the selected rectangle
-	 */
-	public void centerSelection() {
-
-		int scrollX;
-		int scrollY;
-
-		int[] selectedGenes = geneSelection.getSelectedIndexes();
-		int[] selectedArrays = arraySelection.getSelectedIndexes();
-		
-		if (selectedGenes.length > 0 && selectedArrays.length > 0) {
-			
-			double endX = selectedArrays[selectedArrays.length - 1];
-			double endY = selectedGenes[selectedGenes.length -  1];
-			
-			double startX = selectedArrays[0];
-			double startY = selectedGenes[0];
-			
-			scrollX = (int)(endX + startX)/ 2;
-			scrollY = (int)(endY + startY)/ 2;
-
-			xmap.scrollToIndex(scrollX);
-			ymap.scrollToIndex(scrollY);
-		}
 	}
 
 	/**

@@ -473,16 +473,6 @@ public class DendroView2 implements Observer, DendroPanel {
 	}
 	
 	/**
-	 * Zooms in on the globalview.
-	 * Make a separate globalview controller later.
-	 */
-	public void zoomSelection() {
-		
-		globalview.zoomSelection();
-		globalview.centerSelection();
-	}
-	
-	/**
 	 * 
 	 * @param o
 	 * @param arg

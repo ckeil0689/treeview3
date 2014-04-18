@@ -72,34 +72,7 @@ public class MapContainer extends Observable implements Observer,
 		this(mapName);
 		setMap(type);
 	}
-
-	private Preferences fetchOrCreateNode(final String name) {
-
-		// Get first child?
-		Preferences ret = configNode.node(name);
-//		if (ret == null) {
-//			ret = root.create(name);
-//		}
-
-		return ret;
-	}
-
-//	// confignode persistent
-//	@Override
-//	public void bindConfig(final Preferences configNode) {
-//
-//		root = configNode;
-//
-//		// first bind subordinate maps...
-//		fixedMap.bindConfig(fetchOrCreateNode("FixedMap"));
-//		fillMap.bindConfig(fetchOrCreateNode("FillMap"));
-//		nullMap.bindConfig(fetchOrCreateNode("NullMap"));
-//
-//		// then, fix self up...
-//		setMap(root.get("current", default_map));
-//	}
 	
-	// confignode persistent
 	@Override
 	public void setConfigNode(Preferences parentNode) {
 
@@ -123,7 +96,6 @@ public class MapContainer extends Observable implements Observer,
 
 		// then, fix self up...
 		setMap(configNode.get("current", default_map));
-		setScale(configNode.getDouble("scale", default_scale));
 	}
 
 	/**
@@ -168,35 +140,39 @@ public class MapContainer extends Observable implements Observer,
 	 */
 	public void zoomOut() {
 
-		double newScale = 0.0;
 		double zoomVal = 1;
-		double rest = 0.0;
+		double newScale = getScale();
+		int tileNum = scrollbar.getVisibleAmount();
 
-		if (scrollbar.getVisibleAmount() <= 20) {
+		if (tileNum <= 20) {
 			zoomVal = 1;
 			
-		} else if (scrollbar.getVisibleAmount() <= 100) {
+		} else if (tileNum <= 100) {
 			zoomVal = 5;
 			
-		} else if (scrollbar.getVisibleAmount() <= 500) {
+		} else if (tileNum <= 500) {
 			zoomVal = 20;
 			
-		} else if (scrollbar.getVisibleAmount() <= 1000) {
+		} else if (tileNum <= 1000) {
 			zoomVal = 50;
 			
-		} else if (scrollbar.getVisibleAmount() <= 6000) {
+		} else if (tileNum <= 6000) {
 			zoomVal = 100;
 		}
 
-		newScale = getAvailablePixels()
-				/ (scrollbar.getVisibleAmount() + zoomVal);
-		rest = getAvailablePixels()
-				% (scrollbar.getVisibleAmount() + zoomVal);
+		zoomVal = Math.round(tileNum/20.0);
+		
+		LogBuffer.println("Non-round ZoomVal: " + (tileNum/20.0));
+		
+		double newTiles = tileNum + zoomVal;
+		
+		newScale = getAvailablePixels()/ newTiles;
 
 		if (newScale < minScale) {
 			newScale = minScale;
 		}
-
+		
+//		newScale = verifyScale(newScale);
 		setScale(newScale);
 	}
 
@@ -211,38 +187,38 @@ public class MapContainer extends Observable implements Observer,
 	 */
 	public void zoomIn() {
 
-		final double minAllowedTiles = 1;
-		final double maxScale = getAvailablePixels() / minAllowedTiles;
-		double newScale = 0.0;
+		final double maxScale = getAvailablePixels();
+		double newScale = getScale();
 		double zoomVal = 1;
-		double rest = 0.0;
 
-		if (scrollbar.getVisibleAmount() <= 20) {
+		int tileNum = scrollbar.getVisibleAmount();
+		
+		if (tileNum <= 20) {
 			zoomVal = 1;
 			
-		} else if (scrollbar.getVisibleAmount() <= 100) {
+		} else if (tileNum <= 100) {
 			zoomVal = 5;
 			
-		} else if (scrollbar.getVisibleAmount() <= 500) {
+		} else if (tileNum <= 500) {
 			zoomVal = 20;
 			
-		} else if (scrollbar.getVisibleAmount() <= 1000) {
+		} else if (tileNum <= 1000) {
 			zoomVal = 50;
 			
-		} else if (scrollbar.getVisibleAmount() <= 6000) {
+		} else if (tileNum <= 6000) {
 			zoomVal = 100;
 		}
 
+		zoomVal = Math.round(tileNum/20.0);
+		
 		// Recalculating scale
-		newScale = getAvailablePixels()
-				/ (scrollbar.getVisibleAmount() - zoomVal);
-		rest = getAvailablePixels()
-				% (scrollbar.getVisibleAmount() - zoomVal);
+		newScale = getAvailablePixels()/ (tileNum - zoomVal);
 
 		if (newScale > maxScale) {
 			newScale = maxScale;
 		}
 
+//		newScale = verifyScale(newScale);
 		setScale(newScale);
 	}
 
@@ -251,18 +227,31 @@ public class MapContainer extends Observable implements Observer,
 	 * @param scale
 	 * @return
 	 */
-	public double roundScale(final double scale) {
+	public double verifyScale(final double scale) {
 
-		double fittedScale = 1.0;
+		double rest;
+		boolean hasRest = false;
+		
+		double pixels = (double)getAvailablePixels();
 
-		fittedScale = Math.round(scale * 2)/ 2;
-
-		return fittedScale;
+		rest = pixels % scale;
+		
+		if(rest > 0.0) {
+			hasRest = true;
+		}
+		
+		if(!hasRest) {
+			return scale;
+			
+		} else {
+			LogBuffer.println("Has rest: " + rest);
+			double updatedScale = scale;
+			return updatedScale;
+		}
 	}
 
 	public void recalculateScale() {
 
-//		if (root.fetchFirst("FixedMap").hasAttribute("scale")) {
 		if (nodeHasAttribute("FixedMap","scale")) {
 			if (getScale() < getAvailablePixels()) {
 				return;
@@ -300,15 +289,12 @@ public class MapContainer extends Observable implements Observer,
 
 		IntegerMap newMap = null;
 		if (nullMap.type().equals(string)) {
-			// System.out.println("type " + string + " is nullMap");
 			newMap = nullMap;
 
 		} else if (fillMap.type().equals(string)) {
-			// System.out.println("type " + string + " is fillMap");
 			newMap = fillMap;
 
 		} else if (fixedMap.type().equals(string)) {
-			// System.out.println("type " + string + " is fixedMap");
 			newMap = fixedMap;
 		}
 
@@ -505,6 +491,15 @@ public class MapContainer extends Observable implements Observer,
 			fixedMap.setScale(d);
 			setupScrollbar();
 			setChanged();
+			
+			if(getAvailablePixels() != getUsedPixels()) {
+				LogBuffer.println("Used pixels are not the same as " +
+						"available pixels. Product value: " 
+						+ ((d * (int)(getAvailablePixels()/ d))) 
+						+ " UsedPix: " + getUsedPixels() + " AvailPix: " 
+						+ getAvailablePixels()+ " Scale: " + getScale() 
+						+ " ScrollBar#: " + scrollbar.getVisibleAmount());
+			}
 	
 			configNode.putDouble("scale", d);
 		}

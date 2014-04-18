@@ -47,13 +47,6 @@ public abstract class IntegerMap implements ConfigNodePersistent {
 		minindex = -1;
 		configNode = Preferences.userRoot().node(type());
 	}
-
-//	@Override
-//	public void bindConfig(final Preferences configNode) {
-//
-//		root = configNode;
-//		root.put("type", type());
-//	}
 	
 	@Override
 	public void setConfigNode(Preferences parentNode) {
