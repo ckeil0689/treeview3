@@ -890,6 +890,14 @@ public class DendroView2 implements Observer, DendroPanel {
 	@Override
 	public void addDendroMenus(JMenu menu) {
 	
+		// Cluster Menu
+		JMenuItem clusterMenuItem = new JMenuItem("Cluster");
+//		stackMenu.add(clusterMenuItem);
+		menu.add(clusterMenuItem);
+		tvFrame.addToStackMenuList(clusterMenuItem);
+		
+		menu.addSeparator();
+		
 		annotationsMenuItem = new JMenuItem("Row and Column Labels");
 		menu.add(annotationsMenuItem);
 		tvFrame.addToStackMenuList(annotationsMenuItem);

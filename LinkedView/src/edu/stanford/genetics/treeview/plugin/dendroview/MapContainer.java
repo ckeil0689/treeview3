@@ -57,6 +57,8 @@ public class MapContainer extends Observable implements Observer,
 	private JScrollBar scrollbar = null;
 	private TreeDrawerNode selected = null;
 	private Preferences configNode = null;
+	
+	private double tileNumVisible;
 
 	public MapContainer(String mapName) {
 
@@ -114,6 +116,7 @@ public class MapContainer extends Observable implements Observer,
 	 */
 	public void setHome() {
 		
+		this.tileNumVisible = getMaxIndex();
 		setMinScale();
 		setScale(minScale);
 	}
@@ -140,33 +143,23 @@ public class MapContainer extends Observable implements Observer,
 	 */
 	public void zoomOut() {
 
-		double zoomVal = 1;
+		int zoomVal;
 		double newScale = getScale();
-		int tileNum = scrollbar.getVisibleAmount();
+//		int tileNum = scrollbar.getVisibleAmount();
 
-		if (tileNum <= 20) {
+		zoomVal = (int)Math.round(tileNumVisible/20.0);
+		
+		LogBuffer.println("Non-round ZoomVal: " + (tileNumVisible/20.0));
+		LogBuffer.println("Round ZoomVal: " + Math.round(tileNumVisible/20.0));
+		
+		// Ensure that at least one tile will be zoomed out.
+		if(zoomVal < 1) {
 			zoomVal = 1;
-			
-		} else if (tileNum <= 100) {
-			zoomVal = 5;
-			
-		} else if (tileNum <= 500) {
-			zoomVal = 20;
-			
-		} else if (tileNum <= 1000) {
-			zoomVal = 50;
-			
-		} else if (tileNum <= 6000) {
-			zoomVal = 100;
 		}
-
-		zoomVal = Math.round(tileNum/20.0);
 		
-		LogBuffer.println("Non-round ZoomVal: " + (tileNum/20.0));
+		tileNumVisible = tileNumVisible + zoomVal;
 		
-		double newTiles = tileNum + zoomVal;
-		
-		newScale = getAvailablePixels()/ newTiles;
+		newScale = getAvailablePixels()/ tileNumVisible;
 
 		if (newScale < minScale) {
 			newScale = minScale;
@@ -189,30 +182,37 @@ public class MapContainer extends Observable implements Observer,
 
 		final double maxScale = getAvailablePixels();
 		double newScale = getScale();
-		double zoomVal = 1;
+		int zoomVal;
 
-		int tileNum = scrollbar.getVisibleAmount();
+//		int tileNum = scrollbar.getVisibleAmount();
 		
-		if (tileNum <= 20) {
-			zoomVal = 1;
-			
-		} else if (tileNum <= 100) {
-			zoomVal = 5;
-			
-		} else if (tileNum <= 500) {
-			zoomVal = 20;
-			
-		} else if (tileNum <= 1000) {
-			zoomVal = 50;
-			
-		} else if (tileNum <= 6000) {
-			zoomVal = 100;
-		}
+//		if (tileNum <= 20) {
+//			zoomVal = 1;
+//			
+//		} else if (tileNum <= 100) {
+//			zoomVal = 5;
+//			
+//		} else if (tileNum <= 500) {
+//			zoomVal = 20;
+//			
+//		} else if (tileNum <= 1000) {
+//			zoomVal = 50;
+//			
+//		} else if (tileNum <= 6000) {
+//			zoomVal = 100;
+//		}
 
-		zoomVal = Math.round(tileNum/20.0);
+		zoomVal = (int)Math.round(tileNumVisible/20.0);
+		
+		// Ensure that at least one tile will be zoomed in.
+		if(zoomVal < 1) {
+			zoomVal = 1;
+		}
+		
+		tileNumVisible = tileNumVisible - zoomVal;
 		
 		// Recalculating scale
-		newScale = getAvailablePixels()/ (tileNum - zoomVal);
+		newScale = getAvailablePixels()/ tileNumVisible;
 
 		if (newScale > maxScale) {
 			newScale = maxScale;

@@ -48,6 +48,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -110,11 +111,12 @@ ConfigNodePersistent {
 	private ArrayList<JMenuItem> stackMenuList;
 	private ArrayList<JMenuItem> fileMenuList;
 	
-	private JButton stackButton;
+//	private JButton stackButton;
 	private JButton searchButton;
 	private JButton treeButton;
 	
-	private JPopupMenu stackMenu;
+//	private JPopupMenu stackMenu;
+	private JMenuBar menuBar;
 	
 	private boolean loaded;
 
@@ -535,8 +537,10 @@ ConfigNodePersistent {
 		
 		menuPanel.removeAll();
 		menuPanel.setBackground(GUIParams.BG_COLOR);
+		menuBar = new JMenuBar();
+		applicationFrame.setJMenuBar(menuBar);
 		
-		generateStackMenu();
+		generateMenuBar();
 		
 		if(running != null) {
 			generateSearchMenu();
@@ -562,14 +566,14 @@ ConfigNodePersistent {
 //		menuPanel.add(clearButton);
 	}
 	
-	public void generateStackMenu() {
+	public void generateMenuBar() {
 		
-		stackButton = GUIParams.setMenuButtonLayout("MENU", "stackIcon");
-		stackButton.setToolTipText("Tools & Analysis Options");
+//		stackButton = GUIParams.setMenuButtonLayout("MENU", "stackIcon");
+//		stackButton.setToolTipText("Tools & Analysis Options");
 		
-		menuPanel.add(stackButton);
+//		menuPanel.add(stackButton);
 		
-		stackMenu = new JPopupMenu();
+//		stackMenu = new JPopupMenu();
 		
 		stackMenuList = new ArrayList<JMenuItem>();
 		
@@ -632,19 +636,22 @@ ConfigNodePersistent {
 		fileSubMenu.add(saveAsMenuItem);
 		stackMenuList.add(saveAsMenuItem);
 		
-		stackMenu.add(fileSubMenu);
+//		stackMenu.add(fileSubMenu);
+		menuBar.add(fileSubMenu);
 
 //		menubar.addSubMenu(TreeviewMenuBarI.mruSubMenu);
 		if(running != null) {
-			stackMenu.addSeparator();
+//			stackMenu.addSeparator();
 			JMenu viewMenu = new JMenu("View");
 			running.addDendroMenus(viewMenu);
-			stackMenu.add(viewMenu);
+//			stackMenu.add(viewMenu);
+			menuBar.add(viewMenu);
 			
-			// Cluster Menu
-			JMenuItem clusterMenuItem = new JMenuItem("Cluster");
-			stackMenu.add(clusterMenuItem);
-			stackMenuList.add(clusterMenuItem);
+//			// Cluster Menu
+//			JMenuItem clusterMenuItem = new JMenuItem("Cluster");
+////			stackMenu.add(clusterMenuItem);
+//			fileSubMenu.add(clusterMenuItem);
+//			stackMenuList.add(clusterMenuItem);
 			
 			// Functional Enrichment Menu
 //			JMenuItem funcEnrMenuItem = new JMenuItem("Functional Enrichment");
@@ -652,7 +659,7 @@ ConfigNodePersistent {
 //			stackMenuList.add(funcEnrMenuItem);
 		}
 		
-		stackMenu.addSeparator();
+//		stackMenu.addSeparator();
 		
 		// Preferences
 		JMenu prefSubMenu = new JMenu("Preferences");
@@ -684,13 +691,14 @@ ConfigNodePersistent {
 			
 			prefSubMenu.addSeparator();
 			
-			JMenuItem clearPrefsMenuItem = new JMenuItem(
-					StringRes.menubar_clearPrefs);
-			stackMenuList.add(clearPrefsMenuItem);
-			prefSubMenu.add(clearPrefsMenuItem);
+//			JMenuItem clearPrefsMenuItem = new JMenuItem(
+//					StringRes.menubar_clearPrefs);
+//			stackMenuList.add(clearPrefsMenuItem);
+//			prefSubMenu.add(clearPrefsMenuItem);
 		}
 
-		stackMenu.add(prefSubMenu);
+//		stackMenu.add(prefSubMenu);
+		menuBar.add(prefSubMenu);
 		
 		// Help
 		JMenu helpSubMenu = new JMenu("Help");
@@ -747,17 +755,21 @@ ConfigNodePersistent {
 		helpSubMenu.add(feedbackMenuItem);
 		stackMenuList.add(feedbackMenuItem);
 		
-		stackMenu.add(helpSubMenu);
-		stackMenu.addSeparator();
+//		stackMenu.add(helpSubMenu);
+		menuBar.add(helpSubMenu);
+		
+		fileSubMenu.addSeparator();
 		
 		// New Window
 		JMenuItem newWindowMenuItem = new JMenuItem("New Window");
 		stackMenuList.add(newWindowMenuItem);
-		stackMenu.add(newWindowMenuItem);
+		fileSubMenu.add(newWindowMenuItem);
+//		stackMenu.add(newWindowMenuItem);
 		
 		// Quit Program Menu
 		JMenuItem quitMenuItem = new JMenuItem("Quit Program");
-		stackMenu.add(quitMenuItem);
+//		stackMenu.add(quitMenuItem);
+		fileSubMenu.add(quitMenuItem);
 		stackMenuList.add(quitMenuItem);
 	}
 	
@@ -780,92 +792,6 @@ ConfigNodePersistent {
 		
 		menuPanel.add(treeButton);
 	}
-	
-	// Methods to setup Menubar
-//	/**
-//	 * This method sets up the main MenuBar with all the subMenus. It also calls
-//	 * methods to populate the subMenus.
-//	 */
-//	protected void setupMenuBar() {
-//
-//		menuList = new ArrayList<JMenuItem>();
-//		
-//		menubar = new TreeViewJMenuBar();
-//		applicationFrame.setJMenuBar(new JMenuBar());
-//
-//		((TreeViewJMenuBar) menubar).setUnderlyingMenuBar(
-//				applicationFrame.getJMenuBar());
-//
-//		synchronized (menubar) {
-//			menubar.addMenu(TreeviewMenuBarI.programMenu);
-//			menubar.setMenuMnemonic(KeyEvent.VK_F);
-//			programMenu = new ProgramMenu(); // rebuilt when fileMru notifies
-//			menubar.addMenu(TreeviewMenuBarI.documentMenu);
-//			menubar.setMenuMnemonic(KeyEvent.VK_S);
-//			menubar.addMenu(TreeviewMenuBarI.analysisMenu);
-//			menubar.setMenuMnemonic(KeyEvent.VK_A);
-//			menubar.addMenu(TreeviewMenuBarI.exportMenu);
-//			menubar.setMenuMnemonic(KeyEvent.VK_E);
-//			menubar.addMenu(TreeviewMenuBarI.windowMenu);
-//			menubar.setMenuMnemonic(KeyEvent.VK_W);
-//			populateWindowMenu(menubar);
-//			menubar.addMenu(TreeviewMenuBarI.helpMenu);
-//			menubar.setMenuMnemonic(KeyEvent.VK_H);
-//			populateHelpMenu(menubar);
-//		}
-//	}
-
-//	/**
-//	 * When this method is called some components of the main MenuBar are
-//	 * rearranged and restructured. Depending whether the boolean loaded is true
-//	 * some subMenus are populated or not.
-//	 */
-//	public void rebuildMainPanelMenu() {
-//
-//		synchronized (menubar) {
-//			menubar.setMenu(TreeviewMenuBarI.documentMenu);
-//			menubar.removeMenuItems();
-//			menubar.setMenu(TreeviewMenuBarI.analysisMenu);
-//			menubar.removeAll();
-//			menubar.setEnabled(true);
-//			menubar.setMenu(TreeviewMenuBarI.exportMenu);
-//			menubar.removeAll();
-//		}
-//
-//		if (getLoaded()) {
-//			menubar.setMenu(TreeviewMenuBarI.analysisMenu);
-//			populateAnalysisMenu(menubar);
-//			menubar.setMenu(TreeviewMenuBarI.exportMenu);
-//			populateExportMenu(menubar);
-//			menubar.setMenu(TreeviewMenuBarI.programMenu);
-//
-//			if (running != null) {
-//				programMenu.populatePreferencesMenu(menubar);
-//				menubar.setMenu(TreeviewMenuBarI.documentMenu);
-//				menubar.removeAll();
-//				populateSettingsMenu(menubar);
-//				running.populateSettingsMenu(menubar);
-//				menubar.setMenu(TreeviewMenuBarI.programMenu);
-//				menubar.setMenu(TreeviewMenuBarI.analysisMenu);
-//				running.populateAnalysisMenu(menubar);
-//				menubar.setMenu(TreeviewMenuBarI.exportMenu);
-//
-//				if (menubar.getItemCount() > 0) {
-//					menubar.addSeparator();
-//				}
-//				running.populateExportMenu(menubar);
-//			}
-//
-//			menubar.setMenu(TreeviewMenuBarI.analysisMenu);
-//
-//			if (menubar.getItemCount() > 0) {
-//				menubar.addSeparator();
-//			}
-//		}
-//
-//		menubar.setMenu(TreeviewMenuBarI.documentMenu);
-//		menubar.setEnabled(true);
-//	}
 
 //	/**
 //	 * This method sets up a JDialog to call an option for the user to change
@@ -894,28 +820,6 @@ ConfigNodePersistent {
 //	}
 
 	// Populating various menus
-	/**
-	 * Sets up the window menu.
-	 * @param menubar
-	 */
-	protected void populateWindowMenu(final TreeviewMenuBarI menubar) {
-	
-//		menubar.removeAll();
-//
-//		menubar.addSeparator();
-//
-//		JMenuItem newWindowMenuItem = 
-//				(JMenuItem) menubar.addMenuItem("New Window");
-//		settingsMenuList.add(newWindowMenuItem);
-//		menubar.setAccelerator(KeyEvent.VK_N);
-//		menubar.setMnemonic(KeyEvent.VK_N);
-
-//		JMenuItem closeWindowMenuItem = 
-//				(JMenuItem) menubar.addMenuItem("Close Window");
-//		menuList.add(closeWindowMenuItem);
-//		menubar.setAccelerator(KeyEvent.VK_W);
-//		menubar.setMnemonic(KeyEvent.VK_W);
-	}
 	/**
 	 * This methods populates the Settings menu with several MenuItems and
 	 * subMenus.
@@ -1514,10 +1418,10 @@ ConfigNodePersistent {
 		}
 	}
 	
-	public void addStackButtonListener(MouseListener l) {
-		
-		stackButton.addMouseListener(l);
-	}
+//	public void addStackButtonListener(MouseListener l) {
+//		
+//		stackButton.addMouseListener(l);
+//	}
 	
 	public void addSearchButtonListener(MouseListener l) {
 		
@@ -1529,10 +1433,10 @@ ConfigNodePersistent {
 		treeButton.addMouseListener(l);
 	}
 	
-	public JPopupMenu getStackMenu() {
-		
-		return stackMenu;
-	}
+//	public JPopupMenu getStackMenu() {
+//		
+//		return stackMenu;
+//	}
 	
 	public FileSet getFileMenuSet() {
 		

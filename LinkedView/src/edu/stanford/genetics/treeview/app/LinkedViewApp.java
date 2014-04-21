@@ -70,6 +70,9 @@ public class LinkedViewApp extends TreeViewApp {
 
 		super();// does not call XmlConfig constructor
 		scanForPlugins();
+		
+		//added to circumvent standardStartup for now
+		openNew().getAppFrame().setVisible(true);
 	}
 
 	/**

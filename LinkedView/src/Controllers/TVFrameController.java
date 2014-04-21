@@ -74,7 +74,7 @@ public class TVFrameController {
 		menuActions =  new MenubarActions(tvFrame, 
 				TVFrameController.this);
 		
-		tvFrame.addStackButtonListener(new StackButtonListener());
+//		tvFrame.addStackButtonListener(new StackButtonListener());
 		tvFrame.addMenuActionListeners(new StackMenuListener());
 		tvFrame.addFileMenuListeners(new FileMenuListener());
 		
@@ -130,8 +130,8 @@ public class TVFrameController {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			
-			tvFrame.getStackMenu().show(e.getComponent(), 0, 
-					e.getComponent().getHeight());
+//			tvFrame.getStackMenu().show(e.getComponent(), 0, 
+//					e.getComponent().getHeight());
 		}
 
 		@Override
