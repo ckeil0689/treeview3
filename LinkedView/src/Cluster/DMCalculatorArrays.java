@@ -16,6 +16,7 @@ public class DMCalculatorArrays {
 
 	// Instance variables
 	// list with all genes and their distances to all other genes
+	private final double PRECISION_LEVEL = 0.0001;
 	private double[][] distanceMatrix;
 	private final double[][] dataArrays;
 	
@@ -333,7 +334,7 @@ public class DMCalculatorArrays {
 	    
 		for(int i = 0; i < array.length; i++) {
 			
-			if(array[i] == value) {
+			if(Math.abs(array[i] - value) < PRECISION_LEVEL) {
 				return i;
 			}
 		} 

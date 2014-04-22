@@ -111,10 +111,13 @@ public abstract class HeaderFinderBox {
 		
 //		String[] geneHeaderClones = genefHeaders.clone();
 		
-		for(int i = 0; i < genefHeaders.length; i++) {
-			
-			labeledHeaders[i + 1] = genefHeaders[i];
-		}
+//		for(int i = 0; i < genefHeaders.length; i++) {
+//			
+//			labeledHeaders[i + 1] = genefHeaders[i];
+//		}
+		
+		System.arraycopy(genefHeaders, 0, labeledHeaders, 1, 
+				genefHeaders.length);
 
 		genefBox = GUIParams.setComboLayout(labeledHeaders);
 		genefBox.setEditable(true);

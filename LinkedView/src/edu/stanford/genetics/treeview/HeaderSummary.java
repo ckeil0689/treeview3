@@ -65,9 +65,11 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		try {
 			strings = headerInfo.getHeader(index);
 
-		} catch (final java.lang.ArrayIndexOutOfBoundsException aie) {
+		} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 			LogBuffer.println("index " + index
 					+ " out of bounds on headers, continuing");
+			LogBuffer.println("ArrayIndexOutOfBoundsException in " +
+					"getSummary() in HeaderSummary: " + e.getMessage());
 			return null;
 		}
 
@@ -91,8 +93,10 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 					out.append(test);
 					count++;
 				}
-			} catch (final java.lang.ArrayIndexOutOfBoundsException aie) {
+			} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 				// out.append(strings[1]);
+				LogBuffer.println("ArrayIndexOutOfBoundsException in " +
+						"getSummary() in HeaderSummary: " + e.getMessage());
 			}
 		}
 
@@ -110,9 +114,11 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		try {
 			strings = headerInfo.getHeader(index);
 
-		} catch (final java.lang.ArrayIndexOutOfBoundsException aie) {
+		} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 			LogBuffer.println("index " + index + " out of bounds on headers, "
 					+ "continuing");
+			LogBuffer.println("ArrayIndexOutOfBoundsException in " +
+					"getSummaryArray() in HeaderSummary: " + e.getMessage());
 			return null;
 		}
 
@@ -132,19 +138,15 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 				final String test = strings[included[i]];
 				out[count] = test;
 				count++;
-			} catch (final java.lang.ArrayIndexOutOfBoundsException aie) {
+			} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 				// out.append(strings[1]);
+				LogBuffer.println("ArrayIndexOutOfBoundsException in " +
+						"getSummaryArray() in HeaderSummary: " 
+						+ e.getMessage());
 			}
 		}
 		return out;
 	}
-
-//	@Override
-//	public void bindConfig(final Preferences configNode) {
-//		
-//		root = configNode;
-//		synchronizeFrom();
-//	}
 	
 	@Override
 	public void setConfigNode(Preferences parentNode) {
@@ -189,12 +191,15 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 					}
 				}
 				try {
-					array[numComma] = (new Integer(incString.substring(last)))
-							.intValue();
+					array[numComma] = Integer.parseInt(
+							incString.substring(last));
 
 				} catch (final NumberFormatException e) {
 					LogBuffer.println("HeaderSummary has trouble "
 							+ "restoring included list from " + incString);
+					LogBuffer.println("NumberFormatException in " +
+							"synchronizeFrom() in " +
+							"HeaderSummary: " + e.getMessage());
 				}
 				setIncluded(array);
 			}
@@ -215,7 +220,7 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 
 		for (int i = 1; i < vec.length; i++) {
 
-			temp.append(",");
+			temp.append(',');
 			temp.append(vec[i]);
 		}
 		configNode.put("included", temp.toString());

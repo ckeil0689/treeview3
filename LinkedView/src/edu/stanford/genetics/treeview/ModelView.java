@@ -183,7 +183,6 @@ public abstract class ModelView extends JPanel implements Observer,
 		return;
 	}
 
-	@Override
 	public void addNotify() {
 
 		super.addNotify();

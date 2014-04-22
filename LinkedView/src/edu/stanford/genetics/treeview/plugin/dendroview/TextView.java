@@ -41,6 +41,7 @@ import java.awt.event.MouseMotionListener;
 import java.util.Observable;
 import java.util.prefs.Preferences;
 
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
@@ -132,7 +133,7 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 		scrollPane = new JScrollPane(this,
 				JScrollPane.VERTICAL_SCROLLBAR_NEVER,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		scrollPane.setBorder(null);
+		scrollPane.setBorder(BorderFactory.createLineBorder(GUIParams.ELEMENT_HOV));
 		panel = scrollPane;
 	}
 

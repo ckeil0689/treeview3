@@ -55,6 +55,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.TreeColorer;
 
 public class DendroController implements ConfigNodePersistent {
 
+	private final double PRECISION_LEVEL = 0.001;
 	private DendroView2 dendroView;
 	private TreeViewFrame tvFrame;
 	private TVModel tvModel;
@@ -354,32 +355,37 @@ public class DendroController implements ConfigNodePersistent {
 	public void setButtonEnabledStatus() {
 		
 		// X-Axis Buttons
-		if(getGlobalXMap().getScale() == getGlobalXMap().getMinScale()) {
+		if(Math.abs(getGlobalXMap().getScale() 
+				- getGlobalXMap().getMinScale()) < PRECISION_LEVEL) {
 			dendroView.getXMinusButton().setEnabled(false);
 			
-		} else if(getGlobalXMap().getScale() != getGlobalXMap().getMinScale()
-				&& getGlobalXMap().getScale() 
-				!= getGlobalXMap().getAvailablePixels()) {
+		} else if(Math.abs(getGlobalXMap().getScale() 
+				- getGlobalXMap().getMinScale()) > PRECISION_LEVEL
+				&& Math.abs(getGlobalXMap().getScale() 
+				- getGlobalXMap().getAvailablePixels()) > PRECISION_LEVEL) {
 			dendroView.getXMinusButton().setEnabled(true);
 			dendroView.getXPlusButton().setEnabled(true);
 			
-		} else if(getGlobalXMap().getScale() 
-				== getGlobalXMap().getAvailablePixels()) {
+		} else if(Math.abs(getGlobalXMap().getScale() 
+				- getGlobalXMap().getAvailablePixels()) < PRECISION_LEVEL) {
 			dendroView.getXPlusButton().setEnabled(false);
 		}
 		
 		// Y-Axis Buttons
-		if(getGlobalYMap().getScale() == getGlobalYMap().getMinScale()) {
+		if(Math.abs(getGlobalYMap().getScale() 
+				- getGlobalYMap().getMinScale()) < PRECISION_LEVEL) {
 			dendroView.getYMinusButton().setEnabled(false);
 			
-		} else if(getGlobalYMap().getScale() != getGlobalYMap().getMinScale()
-				&& getGlobalYMap().getScale() 
-				!= getGlobalYMap().getAvailablePixels()) {
+		} else if(Math.abs(getGlobalYMap().getScale() 
+				- getGlobalYMap().getMinScale()) > PRECISION_LEVEL
+				&& Math.abs(getGlobalYMap().getScale() 
+						- getGlobalYMap().getAvailablePixels()) 
+						> PRECISION_LEVEL) {
 			dendroView.getYMinusButton().setEnabled(true);
 			dendroView.getYPlusButton().setEnabled(true);
 			
-		} else if(getGlobalYMap().getScale() 
-				== getGlobalYMap().getAvailablePixels()) {
+		} else if(Math.abs(getGlobalYMap().getScale() 
+				- getGlobalYMap().getAvailablePixels()) < PRECISION_LEVEL) {
 			dendroView.getYPlusButton().setEnabled(false);
 		}
 		
@@ -409,31 +415,25 @@ public class DendroController implements ConfigNodePersistent {
 
 		double newScale = 0.0;
 		double newScale2 = 0.0;
-		
-		double rest = 0.0;
 
-		final int arrayIndexes = arraySelection.getNSelectedIndexes();
-		final int geneIndexes = geneSelection.getNSelectedIndexes();
+		final double arrayIndexes = arraySelection.getNSelectedIndexes();
+		final double geneIndexes = geneSelection.getNSelectedIndexes();
 
 		if (arrayIndexes > 0 && geneIndexes > 0) {
-			newScale = globalXmap.getAvailablePixels() / arrayIndexes;
-			
-			rest = globalXmap.getAvailablePixels() % arrayIndexes;
+			newScale = ((double)globalXmap.getAvailablePixels())/ arrayIndexes;
 			
 			if (newScale < globalXmap.getMinScale()) {
 				newScale = globalXmap.getMinScale();
 			}
-			globalXmap.setScale(newScale + (rest/ arrayIndexes));
+			globalXmap.setScale(newScale);
 
 			
-			newScale2 = globalYmap.getAvailablePixels() / geneIndexes;
-			rest = globalYmap.getAvailablePixels() % geneIndexes;
+			newScale2 = ((double)globalYmap.getAvailablePixels())/ geneIndexes;
 			
 			if (newScale2 < globalYmap.getMinScale()) {
 				newScale2 = globalYmap.getMinScale();
 			}
-			
-			globalYmap.setScale(newScale2 + (rest/ geneIndexes));
+			globalYmap.setScale(newScale2);
 		}
 	}
 
@@ -647,7 +647,7 @@ public class DendroController implements ConfigNodePersistent {
 		for (int i = 0; i < headerInfo.getNumHeaders(); i++) {
 
 			final String test = headerInfo.getHeader(i, groupIndex);
-			if (cur.equals(test) == false) {
+			if (!cur.equals(test)) {
 				cur = test;
 				ngroup++;
 			}
@@ -660,7 +660,7 @@ public class DendroController implements ConfigNodePersistent {
 		for (int i = 0; i < headerInfo.getNumHeaders(); i++) {
 
 			final String test = headerInfo.getHeader(i, groupIndex);
-			if (cur.equals(test) == false) {
+			if (!cur.equals(test)) {
 				groupVector[i + ngroup] = -1;
 				cur = test;
 				ngroup++;
@@ -705,7 +705,7 @@ public class DendroController implements ConfigNodePersistent {
 		final DoubleArrayDrawer dArrayDrawer = new DoubleArrayDrawer();
 		dArrayDrawer.setColorExtractor(colorExtractor);
 		arrayDrawer = dArrayDrawer;
-		((Observable) tvModel).addObserver(arrayDrawer);
+		tvModel.addObserver(arrayDrawer);
 		
 		// set data first to avoid adding auto-generated
 		// contrast to documentConfig.
@@ -801,7 +801,7 @@ public class DendroController implements ConfigNodePersistent {
 				tvModel.getDataMatrix().getNumCol() - 1);
 		globalXmap.notifyObservers();
 
-		((Observable) tvModel).notifyObservers();
+		tvModel.notifyObservers();
 	}
 	
 	/**
@@ -845,7 +845,8 @@ public class DendroController implements ConfigNodePersistent {
 				invertedTreeDrawer.setData(null, null);
 
 			} catch (final DendroException ex) {
-
+				LogBuffer.println("Got DendroException when trying to " +
+						"setData() on invertedTreeDrawer: " + e.getMessage());
 			}
 		}
 
@@ -935,6 +936,8 @@ public class DendroController implements ConfigNodePersistent {
 			fileDialog.setAcceptAllFileFilterUsed(true);
 
 		} catch (final Exception e) {
+			LogBuffer.println("Exception when adding a ChoosableFileFilter " +
+					"and setAcceptAllFileFilterUsed(): " + e.getMessage());
 			// hmm... I'll just assume that there's no accept all.
 			fileDialog.addChoosableFileFilter(
 					new javax.swing.filechooser.FileFilter() {
@@ -1065,7 +1068,9 @@ public class DendroController implements ConfigNodePersistent {
 				leftTreeDrawer.setData(null, null);
 
 			} catch (final DendroException ex) {
-
+				LogBuffer.println("Got exception in setData() " +
+						"for leftTreeDrawer in updateGTRDrawer(): " 
+						+ e.getMessage());
 			}
 		}
 
@@ -1234,7 +1239,9 @@ public class DendroController implements ConfigNodePersistent {
 					invertedTreeDrawer.setData(null, null);
 
 				} catch (final DendroException ex) {
-
+					LogBuffer.println("Got DendroException in setData() " +
+							"for invertedTreeDrawer in bindTrees(): " 
+							+ e.getMessage());
 				}
 			}
 		} else {
@@ -1243,8 +1250,10 @@ public class DendroController implements ConfigNodePersistent {
 			try {
 				invertedTreeDrawer.setData(null, null);
 
-			} catch (final DendroException ex) {
-
+			} catch (final DendroException e) {
+				LogBuffer.println("Got DendroException in setData() " +
+						"for invertedTreeDrawer in bindTrees(): " 
+						+ e.getMessage());
 			}
 		}
 
@@ -1292,7 +1301,9 @@ public class DendroController implements ConfigNodePersistent {
 					leftTreeDrawer.setData(null, null);
 
 				} catch (final DendroException ex) {
-
+					LogBuffer.println("Got DendroException in setData() " +
+							"for leftTreeDrawer in bindTrees(): " 
+							+ ex.getMessage());
 				}
 			}
 		} else {
@@ -1301,8 +1312,10 @@ public class DendroController implements ConfigNodePersistent {
 			try {
 				leftTreeDrawer.setData(null, null);
 
-			} catch (final DendroException ex) {
-
+			} catch (final DendroException e) {
+				LogBuffer.println("Got DendroException in setData() " +
+						"for leftTreeDrawer in bindTrees(): " 
+						+ e.getMessage());
 			}
 		}
 

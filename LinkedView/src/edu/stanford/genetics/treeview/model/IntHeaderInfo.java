@@ -143,30 +143,38 @@ public class IntHeaderInfo extends Observable implements HeaderInfo {
 
 			final String[] from = getHeaderArray()[row];
 			final String[] to = new String[newNumNames];
-			for (int col = 0; col < index; col++) {
+			
+//			for (int col = 0; col < index; col++) {
+//
+//				to[col] = from[col];
+//			}
+			
+			System.arraycopy(from, 0, to, 0, index);
 
-				to[col] = from[col];
-			}
-
-			for (int col = index + 1; col < newNumNames; col++) {
-
-				to[col] = from[col - 1];
-			}
+//			for (int col = index + 1; col < newNumNames; col++) {
+//
+//				to[col] = from[col - 1];
+//			}
+			
+			System.arraycopy(from, index, to, index + 1, newNumNames);
 
 			getHeaderArray()[row] = to;
 		}
 
 		final String[] newPrefix = new String[newNumNames];
-		for (int col = 0; col < index; col++) {
-
-			newPrefix[col] = prefixArray[col];
-		}
+//		for (int col = 0; col < index; col++) {
+//
+//			newPrefix[col] = prefixArray[col];
+//		}
+		
+		System.arraycopy(prefixArray, 0, newPrefix, 0, index);
 
 		newPrefix[index] = name;
-		for (int col = index + 1; col < newNumNames; col++) {
-
-			newPrefix[col] = prefixArray[col - 1];
-		}
+//		for (int col = index + 1; col < newNumNames; col++) {
+//
+//			newPrefix[col] = prefixArray[col - 1];
+//		}
+		System.arraycopy(prefixArray, index, newPrefix, index + 1, newNumNames);
 
 		prefixArray = newPrefix;
 		setModified(true);
@@ -208,7 +216,7 @@ public class IntHeaderInfo extends Observable implements HeaderInfo {
 			return false;
 		}
 
-		if (getHeaderArray()[i][nameIndex] == value) {
+		if (getHeaderArray()[i][nameIndex].equalsIgnoreCase(value)) {
 			return false;
 		}
 

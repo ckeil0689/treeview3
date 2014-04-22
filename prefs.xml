@@ -135,7 +135,7 @@
       </node>
       <node name="TreeViewFrame">
         <map>
-          <entry key="theme" value="Dark"/>
+          <entry key="theme" value="Light"/>
         </map>
         <node name="File">
           <map/>
@@ -143,7 +143,7 @@
             <map>
               <entry key="name" value="MP_4pairsT_0p75slf_0p01enrich"/>
               <entry key="extension" value=".txt"/>
-              <entry key="treesVisible" value="false"/>
+              <entry key="treesVisible" value="true"/>
             </map>
             <node name="ArrayNameView">
               <map>
@@ -160,7 +160,9 @@
               <map/>
             </node>
             <node name="ColorExtractor">
-              <map/>
+              <map>
+                <entry key="logcenter" value="1.0"/>
+              </map>
             </node>
             <node name="ColorPresets">
               <map>
@@ -206,12 +208,12 @@
             </node>
             <node name="GlobalXMap">
               <map>
-                <entry key="scale" value="11.416666666666666"/>
+                <entry key="scale" value="10.25"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="11.416666666666666"/>
+                  <entry key="scale" value="10.25"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -222,12 +224,12 @@
             </node>
             <node name="GlobalYMap">
               <map>
-                <entry key="scale" value="6.098484848484849"/>
+                <entry key="scale" value="5.371212121212121"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="6.098484848484849"/>
+                  <entry key="scale" value="5.371212121212121"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -383,12 +385,12 @@
             </node>
             <node name="GlobalXMap">
               <map>
-                <entry key="scale" value="0.46001221001221"/>
+                <entry key="scale" value="20.364864864864863"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="0.46001221001221"/>
+                  <entry key="scale" value="20.364864864864863"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -399,12 +401,12 @@
             </node>
             <node name="GlobalYMap">
               <map>
-                <entry key="scale" value="0.5536451169188445"/>
+                <entry key="scale" value="18.72093023255814"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="0.5536451169188445"/>
+                  <entry key="scale" value="18.72093023255814"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -437,7 +439,7 @@
               </node>
               <node name="Selection0">
                 <map>
-                  <entry key="index" value="1"/>
+                  <entry key="index" value="0"/>
                 </map>
                 <node name="TextView">
                   <map>
@@ -445,7 +447,9 @@
                     <entry key="size" value="12"/>
                   </map>
                   <node name="TextViewManagerSummary">
-                    <map/>
+                    <map>
+                      <entry key="included" value="0"/>
+                    </map>
                   </node>
                 </node>
               </node>
@@ -489,6 +493,36 @@
               <entry key="style" value="0"/>
             </map>
             <node name="File1">
+              <map/>
+            </node>
+            <node name="File2">
+              <map/>
+            </node>
+          </node>
+          <node name="File2">
+            <map>
+              <entry key="root" value="MP_4pairsT_0p75slf_0p01enrich"/>
+              <entry key="dir" value="C:\Users\CKeil\Work\TreeView Related Files\Test Files\"/>
+              <entry key="cdt" value=".txt"/>
+              <entry key="name" value="No name"/>
+              <entry key="style" value="0"/>
+            </map>
+            <node name="File2">
+              <map/>
+            </node>
+            <node name="File3">
+              <map/>
+            </node>
+          </node>
+          <node name="File3">
+            <map>
+              <entry key="root" value="MP_4pairsT_0p75slf_0p01enrich"/>
+              <entry key="dir" value="C:\Users\CKeil\Work\TreeView Related Files\Test Files\"/>
+              <entry key="cdt" value=".cdt"/>
+              <entry key="name" value="No name"/>
+              <entry key="style" value="0"/>
+            </map>
+            <node name="File3">
               <map/>
             </node>
           </node>

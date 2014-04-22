@@ -42,6 +42,8 @@ import edu.stanford.genetics.treeview.LogBuffer;
 public class ColorExtractor2 extends Observable implements ConfigNodePersistent,
 		ContrastSelectable {
 	
+	private final double PRECISION_LEVEL = 0.0001;
+	
 	private ColorSet2 defaultColorSet;
 	private final double default_contrast = 3.0;
 	private final ColorSet2 colorSet = new ColorSet2();// Will be backed by
@@ -266,7 +268,7 @@ public class ColorExtractor2 extends Observable implements ConfigNodePersistent,
 	@Override
 	public void setContrast(final double contrastValue) {
 		
-		if (contrast != contrastValue) {
+		if (Math.abs(contrast - contrastValue) < PRECISION_LEVEL) {
 			contrast = contrastValue;
 			
 			if (configNode != null) {
@@ -290,7 +292,7 @@ public class ColorExtractor2 extends Observable implements ConfigNodePersistent,
 
 	public void setLogCenter(final double center) {
 		
-		if (m_logCenter != center) {
+		if (Math.abs(m_logCenter - center) < PRECISION_LEVEL) {
 			m_logCenter = center;
 			
 			if (configNode != null) {
@@ -307,7 +309,7 @@ public class ColorExtractor2 extends Observable implements ConfigNodePersistent,
 
 	public void setLogBase(final double base) {
 		
-		if (m_logBase != base) {
+		if (Math.abs(m_logBase - base) < PRECISION_LEVEL) {
 			m_logBase = base;
 			
 			m_logBaseDivisor = Math.log(base);
@@ -482,12 +484,12 @@ public class ColorExtractor2 extends Observable implements ConfigNodePersistent,
 	public float[] getFloatColor(double dval, float[] fractionVals, 
 			ArrayList<Color> colorVals) {
 		
-		if (dval == nodata) {
+		if (Math.abs(dval - nodata) < PRECISION_LEVEL) {
 			// System.out.println("value " + dval + " was nodata");
 			return missingColor;
 			// return new Color(missingColor[0], missingColor[1],
 			// missingColor[2]);
-		} else if (dval == empty) {
+		} else if (Math.abs(dval - empty) < PRECISION_LEVEL) {
 			// System.out.println("value " + dval + " was empty");
 			return emptyColor;
 			// return new Color(emptyColor[0], emptyColor[1], emptyColor[2]);

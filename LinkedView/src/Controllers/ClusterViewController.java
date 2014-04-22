@@ -157,13 +157,9 @@ public class ClusterViewController {
 				final String choice2) {
 
 			if (isHierarchical()) {
-				if (!choice.contentEquals("Do Not Cluster")
-						|| !choice2.contentEquals("Do Not Cluster")) {
-					return true;
-
-				} else {
-					return false;
-				}
+				return (!choice.contentEquals("Do Not Cluster")
+						|| !choice2.contentEquals("Do Not Cluster"));
+				
 			} else {
 				final Integer[] spinnerValues = clusterView.getSpinnerValues();
 				
@@ -172,15 +168,10 @@ public class ClusterViewController {
 				final int clustersC = spinnerValues[2];
 				final int itsC = spinnerValues[3];
 				
-				if ((!choice.contentEquals("Do Not Cluster") 
+				return (!choice.contentEquals("Do Not Cluster") 
 						&& (clustersR > 0 && itsR > 0))
 						|| (!choice2.contentEquals("Do Not Cluster") 
-								&& (clustersC > 0 && itsC > 0))) {
-					return true;
-
-				} else {
-					return false;
-				}
+								&& (clustersC > 0 && itsC > 0));
 			}
 		}
 	}

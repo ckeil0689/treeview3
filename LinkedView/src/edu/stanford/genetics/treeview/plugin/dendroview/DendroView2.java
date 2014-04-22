@@ -341,26 +341,13 @@ public class DendroView2 implements Observer, DendroPanel {
 		
 		navPanel.add(buttonPanel, "pushx, h 20%, w 90%, alignx 50%, wrap");
 		navPanel.add(scaleDefaultAll, "pushx, alignx 50%");
-
-//		navPanel.add(buttonPanel, "pushx, h 20%, w 90%, alignx 50%, wrap");
-//		navPanel.add(scaleDefaultAll, "pushx, alignx 50%");
-//		dendroPane.add(firstPanel, "w 18.5%::, h 20%");
-//		dendroPane.add(atrPane, "w 72%, h 20%");
-//		dendroPane.add(fillPanel1, "span 2, w ::19.5%, h 20%, wrap");
-//		dendroPane.add(gtrPane, "w 18.5%::, h 75%");
-//		dendroPane.add(globalview, "w 72%, h 75%");
-//		dendroPane.add(globalYscrollbar, "w 1%, h 75%");
-//		dendroPane.add(navPanel, "w ::18.5%, h 75%, wrap");
-//		dendroPane.add(fillPanel2, "w 18.5%::, h 5%");
-//		dendroPane.add(globalXscrollbar, "pushy, aligny 0%, w 72%, h 1%");
-//		dendroPane.add(fillPanel3, "span 2, w ::19.5%, h 5%");
 		
 		// Layout depends on which dendrogram is shown or not!
 		if(showTrees && (atrview.isEnabled() && gtrview.isEnabled())) {
 			dendroPane.add(firstPanel, "w 18.5%, h 20%");
 			dendroPane.add(atrPane, "w 72%, h 20%");
 			dendroPane.add(fillPanel1, "span 2, w 11.5%, h 20%, wrap");
-			dendroPane.add(gtrPane, "span 1 2, w 18.5%, h 75%");
+			dendroPane.add(gtrPane, "span 1 2, w 18.5%, h 76%");
 			dendroPane.add(globalview, "w 72%, h 75%");
 			dendroPane.add(globalYscrollbar, "w 1%, h 75%");
 			dendroPane.add(navPanel, "w 10.5%, h 75%, wrap");
@@ -373,7 +360,7 @@ public class DendroView2 implements Observer, DendroPanel {
 			dendroPane.add(firstPanel, "w 18.5%, h 20%");
 			dendroPane.add(atrPane, "w 80%, h 20%");
 			dendroPane.add(fillPanel1, "span 2, w 11.5%, h 20%, wrap");
-			dendroPane.add(textpanel, "span 1 2, w 10.5%, h 75%");
+			dendroPane.add(textpanel, "span 1 2, w 10.5%, h 76%");
 			dendroPane.add(globalview, "w 80%, h 75%");
 			dendroPane.add(globalYscrollbar, "w 1%, h 75%");
 			dendroPane.add(navPanel, "w 10.5%, h 75%, wrap");
@@ -386,7 +373,7 @@ public class DendroView2 implements Observer, DendroPanel {
 			dendroPane.add(firstPanel, "w 18.5%, h 10%");
 			dendroPane.add(arraynameview, "w 72%, h 10%");
 			dendroPane.add(fillPanel1, "span 2, w 11.5%, h 10%, wrap");
-			dendroPane.add(gtrPane, "span 1 2, w 18.5%, h 85%");
+			dendroPane.add(gtrPane, "span 1 2, w 18.5%, h 86%");
 			dendroPane.add(globalview, "w 72%, h 85%");
 			dendroPane.add(globalYscrollbar, "w 1%, h 85%");
 			dendroPane.add(navPanel, "w 10.5%, h 85%, wrap");
@@ -399,7 +386,7 @@ public class DendroView2 implements Observer, DendroPanel {
 			dendroPane.add(firstPanel, "w 10.5%, h 10%");
 			dendroPane.add(arraynameview, "w 80%, h 10%");
 			dendroPane.add(fillPanel1, "span 2, w 11.5%, h 10%, wrap");
-			dendroPane.add(textpanel, "span 1 2, w 10.5%, h 85%");
+			dendroPane.add(textpanel, "span 1 2, w 10.5%, h 86%");
 			dendroPane.add(globalview, "w 80%, h 85%");
 			dendroPane.add(globalYscrollbar, "w 1%, h 85%");
 			dendroPane.add(navPanel, "w 10.5%, h 85%, wrap");

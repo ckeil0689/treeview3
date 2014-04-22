@@ -289,7 +289,8 @@ public class GTRView extends ModelViewBuffered implements MouseListener,
 			}
 
 			if ((cand != null)
-					&& (cand.getId() != geneSelection.getSelectedNode())) {
+					&& !(cand.getId().equalsIgnoreCase(
+							geneSelection.getSelectedNode()))) {
 				final String id = cand.getId();
 				geneSelection.setSelectedNode(id);
 				geneSelection.notifyObservers();

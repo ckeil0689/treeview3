@@ -62,6 +62,8 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 	private final GeneListTableModel tableModel;
 	private final Notifier notifier = new Notifier();
 	
+	private final double PRECISION_LEVEL = 0.001;
+	
 	private final TreeSelectionI geneSelection;
 	private final HeaderInfo headerInfo;
 	private HeaderInfo aHeaderInfo;
@@ -166,10 +168,10 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 			} else {
 				final double val = dataMatrix.getValue(columnIndex
 						- selectedPrefix.length, rowIndex + top);
-				if (val == DataModel.NODATA) {
+				if (Math.abs(val - DataModel.NODATA) < PRECISION_LEVEL) {
 					return null;
 				}
-				if (val == DataModel.EMPTY) {
+				if (Math.abs(val - DataModel.EMPTY) < PRECISION_LEVEL) {
 					return null;
 				}
 				return new Double(val);
@@ -332,7 +334,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 				final String[] pNames = headerInfo.getNames();
 				output.print(pNames[selectedPrefix[0]]);
 				for (int j = 1; j < selectedPrefix.length; j++) {
-					output.print("\t");
+					output.print('\t');
 					output.print(pNames[selectedPrefix[j]]);
 				}
 				if (fieldRow.includeExpr()) {
@@ -340,59 +342,71 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 					if (gidRow == -1)
 						gidRow = 0;
 					for (int j = 0; j < nArray; j++) {
-						output.print("\t");
+						output.print('\t');
 						try {
 							final String[] headers = aHeaderInfo.getHeader(j);
 							final String out = headers[gidRow];
 							output.print(out);
-						} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
+							
+						} catch (final java.lang.
+								ArrayIndexOutOfBoundsException e) {
+							LogBuffer.println("Exception when trying to " +
+									"save gene list: " + e.getMessage());
 						}
 					}
-					output.print("\n");
+					output.print('\n');
+					
 					// EWEIGHT row
 					output.print("EWEIGHT");
 					for (int j = 1; j < selectedPrefix.length; j++) {
-						output.print("\t");
+						output.print('\t');
 					}
 					final int eRow = aHeaderInfo.getIndex("EWEIGHT");
 					for (int j = 0; j < nArray; j++) {
-						output.print("\t");
+						output.print('\t');
 						try {
 							final String[] headers = aHeaderInfo.getHeader(j);
 							final String out = headers[eRow];
 							output.print(out);
-						} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
-							output.print("1");
+							
+						} catch (final java.lang.
+								ArrayIndexOutOfBoundsException e) {
+							LogBuffer.println("Exception when trying to " +
+									"save gene list: " + e.getMessage());
+							output.print('1');
 						}
 					}
 				}
-				output.print("\n");
+				output.print('\n');
 			}
 			for (int i = top; i <= bot; i++) {
-				if (geneSelection.isIndexSelected(i) == false)
+				if (geneSelection.isIndexSelected(i) == false) {
 					continue;
+				}
+				
 				final String[] headers = headerInfo.getHeader(i);
 				output.print(headers[selectedPrefix[0]]);
 				for (int j = 1; j < selectedPrefix.length; j++) {
-					output.print("\t");
+					output.print('\t');
 					output.print(headers[selectedPrefix[j]]);
 				}
 				if (fieldRow.includeExpr()) {
 					for (int j = 0; j < nArray; j++) {
-						output.print("\t");
+						output.print('\t');
 						final double val = dataMatrix.getValue(j, i);
-						if (val != noData)
+						if (Math.abs(val - noData) < PRECISION_LEVEL) {
 							output.print(val);
+						}
 					}
 				}
-				output.print("\n");
+				output.print('\n');
 			}
 			output.close();
 			dispose();
 		} catch (final Exception e) {
 			e.printStackTrace();
-			LogBuffer
-					.println("In GeneListMaker.saveList(), got exception " + e);
+			LogBuffer.println("In GeneListMaker.saveList(), " +
+					"got exception " + e.getMessage());
 		}
 
 	}

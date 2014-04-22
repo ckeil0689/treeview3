@@ -37,6 +37,7 @@ import javax.swing.JPanel;
 
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LoadException;
+import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
  * @author aloksaldanha
@@ -92,7 +93,7 @@ public class NewKnnModelLoader extends NewModelLoader {
 			parseCDT();
 
 			final String kggfilename = fileSet.getKgg();
-			if (kggfilename != "") {
+			if (!kggfilename.equalsIgnoreCase("")) {
 				try {
 					fis = new FileInputStream(kggfilename);
 			        in = new DataInputStream(fis);
@@ -107,7 +108,7 @@ public class NewKnnModelLoader extends NewModelLoader {
 			}
 
 			final String kagfilename = fileSet.getKag();
-			if (kagfilename != "") {
+			if (!kagfilename.equalsIgnoreCase("")) {
 				try {
 					fis = new FileInputStream(kagfilename);
 			        in = new DataInputStream(fis);
@@ -131,10 +132,14 @@ public class NewKnnModelLoader extends NewModelLoader {
 				
 			} catch (final Exception e) {
 				targetModel.setDocumentConfig(null);
+				LogBuffer.println("Exception in load() in " +
+						"NewKnnModelLoader: " + e.getMessage());
 			}
 			
 			// ActionEvent(this, 0, "none",0);
 		} catch (final java.lang.OutOfMemoryError ex) {
+			LogBuffer.println("OutOfMemoryError in load() in " +
+					"NewKnnModelLoader: " + ex.getMessage());
 			final JPanel temp = new JPanel();
 			temp.add(new JLabel("Out of memory, allocate more RAM"));
 			temp.add(new JLabel("see Chapter 3 of Help->Documentation... " +

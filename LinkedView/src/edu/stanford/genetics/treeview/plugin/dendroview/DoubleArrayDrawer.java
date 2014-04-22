@@ -27,6 +27,7 @@ import java.awt.Rectangle;
 
 import edu.stanford.genetics.treeview.DataMatrix;
 import edu.stanford.genetics.treeview.DataModel;
+import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
  * Class for Drawing A Colored Grid Representation of a Data Matrix.
@@ -61,6 +62,14 @@ import edu.stanford.genetics.treeview.DataModel;
  */
 public class DoubleArrayDrawer extends ArrayDrawer {
 
+	protected final double PRECISION_LEVEL = 0.0001;
+	
+	/** Used to convert data values into colors */
+	protected ColorExtractor2 colorExtractor;
+	
+	/** The array of data values to be rendered. */
+	protected DataMatrix dataMatrix;
+	
 	/** Constructor does nothing but set defaults */
 	public DoubleArrayDrawer() {
 
@@ -130,11 +139,11 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 
 				final double val = dataMatrix.getValue(row, col);
 
-				if (val == DataModel.NODATA) {
+				if (Math.abs(val - DataModel.NODATA) < PRECISION_LEVEL) {
 					continue;
 				}
 
-				if (val == DataModel.EMPTY) {
+				if (Math.abs(val - DataModel.EMPTY) < PRECISION_LEVEL) {
 					continue;
 				}
 
@@ -173,7 +182,8 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 			final Rectangle dest, final int scanSize, final int[] geneOrder) {
 
 		if (dataMatrix == null) {
-			System.out.println("data matrix wasn't set");
+			LogBuffer.println("Data matrix wasn't set, " +
+					"can't be used in paint() in DoubleArrayDrawer.");
 		}
 
 		// ynext will hold the first pixel of the next block.
@@ -225,19 +235,21 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 							final double thisVal = dataMatrix.getValue(j
 									+ source.x, actualGene);
 
-							if (thisVal == DataModel.EMPTY) {
+							if (Math.abs(thisVal - DataModel.EMPTY) 
+									< PRECISION_LEVEL) {
 								val = DataModel.EMPTY;
 								count = 1;
 								break;
 							}
 
-							if (thisVal != DataModel.NODATA) {
+							if (Math.abs(thisVal - DataModel.NODATA) 
+									> PRECISION_LEVEL) {
 								count++;
 								val += thisVal;
 							}
 						}
 
-						if (val == DataModel.EMPTY) {
+						if (Math.abs(val - DataModel.EMPTY) < PRECISION_LEVEL) {
 							break;
 						}
 					}
@@ -259,8 +271,8 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 						}
 					}
 				} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
-					// System.out.println("out of bounds, " + (i + source.x) +
-					// ", " + (array + source.y));
+					LogBuffer.println("ArrayIndexOutOfBoundsException in " +
+							"paint() in DoubleArrayDrawer: " + e.getMessage());
 				}
 				arrayFirst = array + 1;
 			}
@@ -278,30 +290,36 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 	 * @return value of array element, or DataModel.NODATA if not found
 	 */
 	public double getValue(final int x, final int y) {
+		
 		if (dataMatrix == null) {
-			System.out.println("dataMatrix was not set in DoubleArrayDrawer");
+			LogBuffer.println("DataMatrix was not set in DoubleArrayDrawer," +
+					"can't be used in getValue().");
 		}
 		return dataMatrix.getValue(x, y);
 	}
 
 	@Override
 	public String getSummary(final int x, final int y) {
+		
 		return "" + getValue(x, y);
 	}
 
 	@Override
 	public boolean isMissing(final int x, final int y) {
-		return (getValue(x, y) == DataModel.NODATA);
+		
+		return (Math.abs(getValue(x, y) - DataModel.NODATA) < PRECISION_LEVEL);
 	}
 
 	@Override
 	public boolean isEmpty(final int x, final int y) {
-		return (getValue(x, y) == DataModel.EMPTY);
+		
+		return (Math.abs(getValue(x, y) - DataModel.EMPTY) < PRECISION_LEVEL);
 	}
 
 	/** how many rows are there to draw? */
 	@Override
 	public int getNumRow() {
+		
 		if (dataMatrix != null) {
 			return dataMatrix.getNumRow();
 		}
@@ -311,6 +329,7 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 	/** how many cols are there to draw? */
 	@Override
 	public int getNumCol() {
+		
 		if (dataMatrix != null) {
 			return dataMatrix.getNumCol();
 		}
@@ -328,17 +347,14 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 	 */
 	@Override
 	public Color getColor(final int x, final int y) {
+		
 		return colorExtractor.getColor(getValue(x, y));
 	}
 
 	/** resets the ArrayDrawer to a default state. */
 	@Override
 	protected void setDefaults() {
+		
 		dataMatrix = null;
 	}
-
-	/** Used to convert data values into colors */
-	protected ColorExtractor2 colorExtractor;
-	/** The array of data values to be rendered. */
-	protected DataMatrix dataMatrix;
 }

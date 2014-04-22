@@ -20,6 +20,7 @@ import edu.stanford.genetics.treeview.model.TVModel;
 public class HierClusterArrays {
 
 	// Instance variables
+	private final double PRECISION_LEVEL = 0.001;
 	private final TVModel model;
 	private final ClusterView clusterView;
 	private String filePath;
@@ -484,7 +485,7 @@ public class HierClusterArrays {
 	    
 		for(int i = 0; i < array.length; i++) {
 			
-			if(array[i] == value) {
+			if(Math.abs(array[i] - value) < PRECISION_LEVEL) {
 				return i;
 			}
 		} 
@@ -563,10 +564,12 @@ public class HierClusterArrays {
 			final double[] oldList = distanceMatrix[i];
 			final double[] newList = new double[oldList.length];
 
-			for (int j = 0; j < oldList.length; j++) {
-				
-				newList[j] = oldList[j];
-			}
+//			for (int j = 0; j < oldList.length; j++) {
+//				
+//				newList[j] = oldList[j];
+//			}
+			
+			System.arraycopy(oldList, 0, newList, 0, oldList.length);
 			
 			deepCopy[i] = newList;
 		}
@@ -695,7 +698,7 @@ public class HierClusterArrays {
 		
 		for(int i = 0; i < usedMins.length; i++) {
 			
-			if(min == usedMins[i]) {
+			if(Math.abs(min - usedMins[i]) < PRECISION_LEVEL) {
 				contains = true;
 				break;
 			}
@@ -864,7 +867,7 @@ public class HierClusterArrays {
 		   
 		    for (int j = 0; j < toSearch.length; j++) {
 		       
-		    	if(toIterate[i] == toSearch[j]){
+		    	if(Math.abs(toIterate[i] - toSearch[j]) < PRECISION_LEVEL){
 		            disjoint = false;
 		        } else {
 		        	disjoint = true;

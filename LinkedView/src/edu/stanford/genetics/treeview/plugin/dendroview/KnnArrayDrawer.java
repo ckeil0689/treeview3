@@ -25,6 +25,7 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 import java.awt.Rectangle;
 
 import edu.stanford.genetics.treeview.DataModel;
+import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
  * Class for Drawing PixelViews.
@@ -66,17 +67,22 @@ public class KnnArrayDrawer extends DoubleArrayDrawer {
 
 	@Override
 	public void recalculateContrast() {
+		
 		double mean = 0.0;
 		int count = 0;
 		final int nRow = dataMatrix.getNumRow();
 		final int nCol = dataMatrix.getNumCol();
 		for (int row = 0; row < nRow; row++) {
 			for (int col = 0; col < nCol; col++) {
+				
 				final double val = dataMatrix.getValue(row, col);
-				if (val == DataModel.NODATA)
+				if (Math.abs(val - DataModel.NODATA) < PRECISION_LEVEL) {
 					continue;
-				if (val == DataModel.EMPTY)
+				}
+				
+				if (Math.abs(val - DataModel.EMPTY) < PRECISION_LEVEL) {
 					continue;
+				}
 				mean += Math.abs(val);
 				count++;
 			}
@@ -110,15 +116,19 @@ public class KnnArrayDrawer extends DoubleArrayDrawer {
 	@Override
 	public void paint(final int[] pixels, final Rectangle source,
 			final Rectangle dest, final int scanSize, final int[] geneOrder) {
+		
 		if (dataMatrix == null) {
-			System.out.println("data matrix wasn't set");
+			LogBuffer.println("Data matrix wasn't set, " +
+					"can't be used in paint() in KnnArrayDrawer.");
 		}
+		
 		// ynext will hold the first pixel of the next block.
 		int ynext = dest.y;
 		// geneFirst holds first gene which contributes to this pixel.
 		int geneFirst = 0;
 		// gene will hold the last gene to contribute to this pixel.
 		for (int gene = 0; gene < source.height; gene++) {
+			
 			final int ystart = ynext;
 			ynext = dest.y + (dest.height + gene * dest.height) / source.height;
 			// keep incrementing until block is at least one pixel high
@@ -141,39 +151,48 @@ public class KnnArrayDrawer extends DoubleArrayDrawer {
 					double val = 0;
 					int count = 0;
 					for (int i = geneFirst; i <= gene; i++) {
+						
 						for (int j = arrayFirst; j <= array; j++) {
+							
 							int actualGene = source.y + i;
 							if (geneOrder != null)
 								actualGene = geneOrder[actualGene];
 							final double thisVal = dataMatrix.getValue(j
 									+ source.x, actualGene);
-							if (thisVal == DataModel.EMPTY) {
+							if (Math.abs(thisVal - DataModel.EMPTY) 
+									< PRECISION_LEVEL) {
 								val = DataModel.EMPTY;
 								count = 1;
 								break;
 							}
-							if (thisVal != DataModel.NODATA) {
+							
+							if (Math.abs(thisVal - DataModel.NODATA) 
+									> PRECISION_LEVEL) {
 								count++;
 								val += thisVal;
 							}
 						}
-						if (val == DataModel.EMPTY)
+						if (Math.abs(val - DataModel.EMPTY) < PRECISION_LEVEL) {
 							break;
+						}
 					}
 					if (count == 0) {
 						val = DataModel.NODATA;
+						
 					} else {
 						val /= count;
 					}
 					final int t_color = colorExtractor.getARGBColor(val);
 					for (int x = xstart; x < xnext; x++) {
+						
 						for (int y = ystart; y < ynext; y++) {
+							
 							pixels[x + y * scanSize] = t_color;
 						}
 					}
 				} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
-					// System.out.println("out of bounds, " + (i + source.x) +
-					// ", " + (array + source.y));
+					LogBuffer.println("ArrayIndexOutOfBoundsException " +
+							"in paint() in KnnArrayDrawer: " + e.getMessage());
 				}
 				arrayFirst = array + 1;
 			}

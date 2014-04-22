@@ -153,10 +153,10 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 	 */
 	public final static int encode_style(final String style) {
 
-		return style == styles[0] ? Font.PLAIN
-				: style == styles[1] ? Font.ITALIC
-						: style == styles[2] ? Font.BOLD : Font.BOLD
-								+ Font.ITALIC;
+		return style.equalsIgnoreCase(styles[0]) ? Font.PLAIN
+				: style.equalsIgnoreCase(styles[1]) ? Font.ITALIC
+						: style.equalsIgnoreCase(styles[2]) ? Font.BOLD : 
+							Font.BOLD + Font.ITALIC;
 	}
 
 	/**

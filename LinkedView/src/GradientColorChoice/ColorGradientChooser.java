@@ -236,6 +236,9 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 				drawGradientBox(g2);
 				
 			} catch (IllegalArgumentException e) {
+				LogBuffer.println("IllegalArgumentException in " +
+						"drawGradientBox in ColorGradientChooser: " 
+						+ e.getMessage());
 				LogBuffer.println("Fraction Keyframe not increasing " +
 						"for LinearGradientPaint.");
 				LogBuffer.println("Fractions: " + Arrays.toString(fractions));
@@ -401,7 +404,7 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 			
 			int clickPos = (int)point.getX();
 			int index = 0;
-			int distance = (int) gradientBox.getWidth();
+			int distance = gradientBox.getWidth();
 			
 			for(Thumb t : thumbList) {
 				
@@ -570,8 +573,6 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 		 */
 		public void verifyThumbs() {
 			
-			boolean ascending = verifyFractions();
-			
 			int x = (int)thumbRect.getX();
 			int w = (int)thumbRect.getWidth(); 
 			
@@ -594,6 +595,7 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 		
 		public boolean verifyFractions() {
 			
+			final double PRECISION_LEVEL = 0.0001;
 			boolean ascending = true;
 			for(int i = 0; i < fractions.length - 1; i++) {
 				
@@ -612,7 +614,8 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 					ascending = false;
 					break; 
 					
-				} else if(fractions[i] == fractions[i + 1]) {
+				} else if(Math.abs(fractions[i] - fractions[i + 1]) 
+						< PRECISION_LEVEL) {
 					ascending = false;
 					break;
 				}
@@ -628,6 +631,8 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 		 */
 		public boolean checkThumbPresence(int thumbIndex) {
 			
+			final double PRECISION_LEVEL = 0.0001;
+			
 			boolean isPresent = false;
 				
 			if(thumbList.size() > thumbIndex) {
@@ -638,7 +643,7 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 				double fraction2 = (double)Math.round(fractions[thumbIndex] 
 						* 10000)/ 10000;
 				
-				if(fraction == fraction2 
+				if(Math.abs(fraction - fraction2) < PRECISION_LEVEL 
 						|| thumbList.get(thumbIndex).isSelected()) {
 					isPresent = true;
 				}

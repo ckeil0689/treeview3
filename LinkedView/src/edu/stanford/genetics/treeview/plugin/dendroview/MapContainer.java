@@ -44,6 +44,8 @@ import edu.stanford.genetics.treeview.TreeDrawerNode;
 public class MapContainer extends Observable implements Observer,
 		AdjustmentListener, ConfigNodePersistent {
 
+	private final double PRECISION_LEVEL = 0.0001;
+	
 	private final String default_map = "Fixed";
 	private double default_scale = 1.0;
 	private double minScale;
@@ -145,7 +147,6 @@ public class MapContainer extends Observable implements Observer,
 
 		int zoomVal;
 		double newScale = getScale();
-//		int tileNum = scrollbar.getVisibleAmount();
 
 		zoomVal = (int)Math.round(tileNumVisible/20.0);
 		
@@ -164,8 +165,6 @@ public class MapContainer extends Observable implements Observer,
 		if (newScale < minScale) {
 			newScale = minScale;
 		}
-		
-//		newScale = verifyScale(newScale);
 		setScale(newScale);
 	}
 
@@ -184,24 +183,6 @@ public class MapContainer extends Observable implements Observer,
 		double newScale = getScale();
 		int zoomVal;
 
-//		int tileNum = scrollbar.getVisibleAmount();
-		
-//		if (tileNum <= 20) {
-//			zoomVal = 1;
-//			
-//		} else if (tileNum <= 100) {
-//			zoomVal = 5;
-//			
-//		} else if (tileNum <= 500) {
-//			zoomVal = 20;
-//			
-//		} else if (tileNum <= 1000) {
-//			zoomVal = 50;
-//			
-//		} else if (tileNum <= 6000) {
-//			zoomVal = 100;
-//		}
-
 		zoomVal = (int)Math.round(tileNumVisible/20.0);
 		
 		// Ensure that at least one tile will be zoomed in.
@@ -217,8 +198,6 @@ public class MapContainer extends Observable implements Observer,
 		if (newScale > maxScale) {
 			newScale = maxScale;
 		}
-
-//		newScale = verifyScale(newScale);
 		setScale(newScale);
 	}
 
@@ -487,7 +466,7 @@ public class MapContainer extends Observable implements Observer,
 
 	public void setScale(final double d) {
 
-		if (fixedMap.getScale() != d) {
+		if (Math.abs(fixedMap.getScale() - d) > PRECISION_LEVEL) {
 			fixedMap.setScale(d);
 			setupScrollbar();
 			setChanged();

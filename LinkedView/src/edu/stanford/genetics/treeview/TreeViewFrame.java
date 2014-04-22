@@ -38,7 +38,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Observable;
-import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.swing.BoxLayout;
@@ -52,14 +51,11 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
 import Controllers.DendroController;
-import Views.LoadCheckView;
 import Views.LoadErrorView;
 import Views.WelcomeView;
 
@@ -97,7 +93,6 @@ ConfigNodePersistent {
 	// Different Views
 	private WelcomeView welcomeView;
 	private LoadErrorView loadErrorView;
-	private LoadCheckView confirmPanel;
 	private DendroView2 dendroView;
 	
 	private String loadErrorMessage;
@@ -146,25 +141,6 @@ ConfigNodePersistent {
 		treeView = treeview;
 		configNode = treeView.getGlobalConfig().node("TreeViewFrame");
 		setWindowActive(true);
-
-		// General UIManager setup
-		try {
-			UIManager.setLookAndFeel(UIManager
-					.getCrossPlatformLookAndFeelClassName());
-			
-			UIManager.put("MenuItem.selectionBackground", 
-					GUIParams.ELEMENT_HOV);
-			UIManager.put("MenuItem.font", GUIParams.FONT_MENU);
-			UIManager.put("MenuItem.background", GUIParams.MENU);
-			
-			UIManager.put("Menu.selectionBackground", 
-					GUIParams.ELEMENT_HOV);
-			UIManager.put("Menu.font", GUIParams.FONT_MENU);
-			UIManager.put("Menu.background", GUIParams.MENU);
-			
-		} catch (final Exception e) {
-
-		}
 
 		// Set up other stuff
 		setupMainPanels();
@@ -267,7 +243,7 @@ ConfigNodePersistent {
 	public void resetViews() {
 		
 		welcomeView = null;
-		confirmPanel = null;
+//		confirmPanel = null;
 		dendroView = null;
 	}
 	
@@ -451,15 +427,6 @@ ConfigNodePersistent {
 	public LoadErrorView getLoadErrorView() {
 		
 		return loadErrorView;
-	}
-	
-	/**
-	 * Returns TVFrame's current LoadCheckView instance
-	 * @return confirmPanel
-	 */
-	public LoadCheckView getLoadCheckView() {
-		
-		return confirmPanel;
 	}
 	
 	/**
@@ -1291,8 +1258,11 @@ ConfigNodePersistent {
 		try {
 			frame.setSourceText(f_currdir.getCanonicalPath() + File.separator
 					+ "plugins" + File.separator);
+			
 		} catch (final IOException e) {
 			frame.setSourceText("Unable to read default plugins directory.");
+			LogBuffer.println("IOException while trying to display " +
+					"Plugin info: " + e.getMessage());
 		}
 
 		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -1584,15 +1554,6 @@ ConfigNodePersistent {
 	public JButton getSearchButton() {
 		
 		return searchButton;
-	}
-	
-	/**
-	 * Returns TVFrame's instance of the LoadCheckView panel.
-	 * @return
-	 */
-	public LoadCheckView getConfirmPanel() {
-		
-		return confirmPanel;
 	}
 
 	/** 

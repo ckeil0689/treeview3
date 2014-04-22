@@ -203,7 +203,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	@Override
 	public void setSelectedNode(final String n) {
 
-		if (selectedNode != n) {
+		if (selectedNode == null || !selectedNode.equalsIgnoreCase(n)) {
 			selectedNode = n;
 			setChanged();
 		}

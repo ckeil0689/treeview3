@@ -38,16 +38,16 @@ public class NewModelLoader {
 	private int dataStartRow;
 	private int dataStartCol;
 	
-	boolean dataFound = false;
-	private boolean gidFound = false;
-	private boolean aidFound = false;
-	private boolean eWeightFound = false;
-	private boolean gWeightFound = false;
+	boolean hasData = false;
+	private boolean hasGID = false;
+	private boolean hasAID = false;
+	private boolean hasEWeight = false;
+	private boolean hasGWeight = false;
 	
 	public NewModelLoader(TVModel model) {
 		
 		this.targetModel = model;
-		this.tvFrame = (TreeViewFrame)model.getFrame();
+		this.tvFrame = model.getFrame();
 		this.fileSet = model.getFileSet();
 		this.loadProgView = tvFrame.getWelcomeView();
 	}
@@ -70,7 +70,7 @@ public class NewModelLoader {
 	        loadProgView.setLoadLabel("Extracting data.");
 	        extractData(br);
 	        
-	        if(dataFound == false) {
+	        if(!hasData) {
 	        	String noData = "No data could be identified " +
 	        			"in the chosen file.";
 	        	tvFrame.setLoadErrorMessage(noData);
@@ -98,7 +98,7 @@ public class NewModelLoader {
 		parseCDT();
 		
 		// If present, parse ATR File
-		if(aidFound) {
+		if(hasAID) {
 			loadProgView.setLoadLabel("Reading ATR file.");
 			parseATR();
 		
@@ -108,7 +108,7 @@ public class NewModelLoader {
 		}
 		
 		// If present, parse GTR File
-		if(gidFound) {
+		if(hasGID) {
 			loadProgView.setLoadLabel("Reading GTR file.");
 			parseGTR();
 			
@@ -194,6 +194,8 @@ public class NewModelLoader {
 			return reader.getLineNumber();
 			
 		} catch (Exception ex) {
+			LogBuffer.println("Exception when trying to count lines: " 
+					+ ex.getMessage());
 			return -1;
 			
 		} finally { 
@@ -259,7 +261,7 @@ public class NewModelLoader {
 			
 			// loop over String array to convert applicable String to double
 			// first find data start
-			if(dataFound == false) {
+			if(!hasData) {
 				labels = new String[lineAsStrings.length];
 				boolean containsEWeight = false;
 				
@@ -268,25 +270,25 @@ public class NewModelLoader {
 					String element = lineAsStrings[i];
 					
 					if(element.equalsIgnoreCase("GID")) {
-						gidFound = true;
+						hasGID = true;
 					} 
 					
 					// Check for GWEIGHT to avoid the weight being
 					// recognized as row start of actual data
 					if(element.equalsIgnoreCase("GWEIGHT")) {
 						gWeightCol = i;
-						gWeightFound = true;
+						hasGWeight = true;
 					} 
 					
 					if(element.equalsIgnoreCase("AID")) {
-						aidFound = true;
+						hasAID = true;
 					}
 					
 					// Check for EWEIGHT to avoid the weight being
 					// recognized as column start of actual data
 					if(element.equalsIgnoreCase("EWEIGHT")) {
 						containsEWeight = true;
-						eWeightFound = true;
+						hasEWeight = true;
 					}
 				
 					if (Pattern.matches(fpRegex, element) 
@@ -295,7 +297,7 @@ public class NewModelLoader {
 						dataStartRow = rowN;
 						dataStartCol = i;
 						
-						dataFound = true;
+						hasData = true;
 						break;
 						
 					} else {
@@ -304,7 +306,7 @@ public class NewModelLoader {
 				}
 				
 				// avoid first datarow to be added with null values
-				if(dataFound) {
+				if(hasData) {
 					String[] firstDataRow = new String[dataStartCol];
 					
 					for(int i = 0; i < labels.length; i++) {
@@ -323,7 +325,7 @@ public class NewModelLoader {
 					stringLabels[rowN] = labels;
 				}
 				
-				if(dataFound) {
+				if(hasData) {
 					doubleData = new double[lineNum - dataStartRow][];
 					dataValues = new double[lineAsStrings.length 
 					                        - dataStartCol];
@@ -388,6 +390,9 @@ public class NewModelLoader {
 						dataValues[i] = val;
 						
 					} catch(Exception e) {
+						LogBuffer.println("Exception when trying to parse " +
+								"a double in extractData() in " +
+								"NewModelLoader: " + e.getMessage());
 						double val = Double.parseDouble("0.00E+00");
 						dataValues[i] = val;
 					}
@@ -414,7 +419,8 @@ public class NewModelLoader {
 				gtrData.add(lineAsStrings);
 			}
 		} catch (IOException e) {
-				
+			LogBuffer.println("IOException during the " +
+					"extraction of GTR file: " + e.getMessage());
 		}
 		
 		return gtrData;
@@ -423,8 +429,8 @@ public class NewModelLoader {
 	public void parseCDT() {
 		
 		// Tell model whether EWEIGHT and GWEIGHT where found
-		targetModel.setEweightFound(eWeightFound);
-		targetModel.setGweightFound(gWeightFound);
+		targetModel.setEweightFound(hasEWeight);
+		targetModel.setGweightFound(hasGWeight);
 		
 		int nExpr = doubleData[0].length;
 		int nExprPrefix = dataStartRow;
@@ -457,10 +463,12 @@ public class NewModelLoader {
 		final String[][] gHeaders = new String[nGene][nGenePrefix];
 		
 		// Fill row prefix array
-		for(int i = 0; i < nGenePrefix; i++) {
-			
-			genePrefix[i] = stringLabels[0][i];
-		}
+//		for(int i = 0; i < nGenePrefix; i++) {
+//			
+//			genePrefix[i] = stringLabels[0][i];
+//		}
+		
+		System.arraycopy(stringLabels[0], 0, genePrefix, 0, nGenePrefix);
 		
 		// Fill Header array
 		for (int i = 0; i < nGene; i++) {
@@ -482,8 +490,7 @@ public class NewModelLoader {
 		final String[] firstRow = gtrData.get(0);
 		if ( // decide if this is not an extended file..
 		(firstRow.length == 4)// is the length classic?
-				&& (firstRow[0].equalsIgnoreCase("NODEID") == false)) { 
-			
+				&& !(firstRow[0].equalsIgnoreCase("NODEID"))) { 
 			// okay, need to assign headers...
 			targetModel.setGtrPrefix(new String[] { "NODEID", "LEFT", 
 					"RIGHT", "CORRELATION" });
@@ -493,6 +500,7 @@ public class NewModelLoader {
 				gtrHeaders[i] = gtrData.get(i);
 			}
 			targetModel.setGtrHeaders(gtrHeaders);
+			
 		} else {// first row of tempVector is actual header names...
 			targetModel.setGtrPrefix(firstRow);
 
@@ -505,7 +513,7 @@ public class NewModelLoader {
 		
 		targetModel.hashGIDs();
 		targetModel.hashGTRs();
-		targetModel.gidFound(gidFound);
+		targetModel.gidFound(hasGID);
 	}
 	
 	public void parseATR() {
@@ -516,7 +524,7 @@ public class NewModelLoader {
 		final String[] firstRow = atrData.get(0);
 		if ( // decide if this is not an extended file..
 		(firstRow.length == 4)// is the length classic?
-				&& (firstRow[0].equalsIgnoreCase("NODEID") == false)) { 
+				&& !(firstRow[0].equalsIgnoreCase("NODEID"))) { 
 			
 			// okay, need to assign headers...
 			targetModel.setAtrPrefix(new String[] { "NODEID", "LEFT", 
@@ -539,7 +547,7 @@ public class NewModelLoader {
 		
 		targetModel.hashAIDs();
 		targetModel.hashATRs();
-		targetModel.aidFound(aidFound);
+		targetModel.aidFound(hasAID);
 	}
 	
 	public ArrayList<String[]> loadSet(String loadingSet) {

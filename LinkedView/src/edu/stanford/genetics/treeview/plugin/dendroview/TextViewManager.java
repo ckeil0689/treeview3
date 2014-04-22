@@ -515,8 +515,8 @@ public class TextViewManager extends ModelView implements ConfigNodePersistent,
 	public void propertyChange(final PropertyChangeEvent pce) {
 
 		if (!ignoreDividerChange
-				&& pce.getPropertyName() 
-				== JSplitPane.DIVIDER_LOCATION_PROPERTY) {
+				&& pce.getPropertyName().equalsIgnoreCase(
+						JSplitPane.DIVIDER_LOCATION_PROPERTY)) {
 			saveDividerLocations();
 			saveDividerLocationsToConfig();
 		}

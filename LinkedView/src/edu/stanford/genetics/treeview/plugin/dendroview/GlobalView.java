@@ -156,6 +156,9 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 						statustext[0] += geneHI.getHeader(realGene, 1);
 
 					} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
+						LogBuffer.println("ArrayIndexOutOfBoundsException " +
+								"in getStatus() in GlobalView: " 
+								+ e.getMessage());
 						statustext[0] += " (N/A)";
 					}
 				}
@@ -165,6 +168,9 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 						statustext[1] += arrayHI.getHeader(overx, 0);
 
 					} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
+						LogBuffer.println("ArrayIndexOutOfBoundsException " +
+								"in getStatus() in GlobalView: " 
+								+ e.getMessage());
 						statustext[1] += " (N/A)";
 					}
 				}
@@ -182,8 +188,10 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 					}
 				}
 			}
-		} catch (final ArrayIndexOutOfBoundsException ex) {
-			// ignore silently?
+		} catch (final ArrayIndexOutOfBoundsException e) {
+			LogBuffer.println("ArrayIndexOutOfBoundsException " +
+					"in getStatus() in GlobalView: " 
+					+ e.getMessage());
 		}
 		return statustext;
 	}
@@ -299,7 +307,7 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 			xmap.setAvailablePixels(offscreenSize.width);
 			ymap.setAvailablePixels(offscreenSize.height);
 
-			if (hasDrawn == false) {
+			if (!hasDrawn) {
 				// total kludge, but addnotify isn't working correctly...
 				xmap.recalculateScale();
 				ymap.recalculateScale();
@@ -310,7 +318,7 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 			ymap.notifyObservers();
 		}
 
-		if (offscreenValid == false) {
+		if (!offscreenValid) {
 			// clear the pallette...
 			g.setColor(Color.white);
 			g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
@@ -342,7 +350,7 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 			xmap.setAvailablePixels(offscreenSize.width);
 			ymap.setAvailablePixels(offscreenSize.height);
 
-			if (hasDrawn == false ) {
+			if (!hasDrawn) {
 				// total kludge, but addnotify isn't working correctly...
 				xmap.recalculateScale();
 				ymap.recalculateScale();
@@ -363,7 +371,7 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 			resetHome = false;
 		}
 
-		if (offscreenValid == false) {
+		if (!offscreenValid) {
 			final Rectangle destRect = new Rectangle(0, 0,
 					xmap.getUsedPixels(), ymap.getUsedPixels());
 
@@ -526,7 +534,7 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 	@Override
 	public void mousePressed(final MouseEvent e) {
 
-		if (enclosingWindow().isActive() == false) {
+		if (!enclosingWindow().isActive()) {
 			return;
 		}
 
@@ -568,7 +576,7 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 	@Override
 	public void mouseReleased(final MouseEvent e) {
 
-		if (enclosingWindow().isActive() == false) {
+		if (!enclosingWindow().isActive()) {
 			return;
 		}
 

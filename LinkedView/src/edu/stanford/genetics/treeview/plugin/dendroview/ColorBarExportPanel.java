@@ -1101,9 +1101,10 @@ class SimpleDataMatrix implements DataMatrix {
 
 		final double[] temp = new double[nRow * appendIndex];
 
-		for (int i = 0; i < nRow * appendIndex; i++) {
-			temp[i] = dataMatrix[i];
-		}
+//		for (int i = 0; i < nRow * appendIndex; i++) {
+//			temp[i] = dataMatrix[i];
+//		}	
+		System.arraycopy(dataMatrix, 0, temp, 0, nRow * appendIndex);
 		appendIndex = -1;
 	}
 

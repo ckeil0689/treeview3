@@ -208,7 +208,7 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 	@Override
 	public void update(final Observable o, final Object arg) {
 
-		if (isEnabled() == false) {
+		if (!isEnabled()) {
 			return;
 		}
 
@@ -241,7 +241,8 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 			}
 			// Only notify observers if we're changing the selected node.
 			if ((cand != null)
-					&& (cand.getId() != arraySelection.getSelectedNode())) {
+					&& !(cand.getId().equalsIgnoreCase(
+							arraySelection.getSelectedNode()))) {
 				arraySelection.setSelectedNode(cand.getId());
 				arraySelection.notifyObservers();
 
@@ -337,11 +338,11 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 	@Override
 	public void updateBuffer(final Graphics g) {
 
-		if (offscreenChanged == true) {
+		if (offscreenChanged) {
 			offscreenValid = false;
 		}
 
-		if ((offscreenValid == false) && (drawer != null)) {
+		if ((!offscreenValid) && (drawer != null)) {
 			map.setAvailablePixels(offscreenSize.width);
 
 			// clear the pallette...
@@ -374,7 +375,7 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 	@Override
 	public void mouseClicked(final MouseEvent e) {
 
-		if (isEnabled() == false) {
+		if (!isEnabled()) {
 			return;
 		}
 
@@ -382,7 +383,7 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 			return;
 		}
 
-		if (enclosingWindow().isActive() == false) {
+		if (!enclosingWindow().isActive()) {
 			return;
 		}
 
@@ -419,19 +420,19 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 			break;
 
 		case KeyEvent.VK_LEFT:
-			if (selectedNode.isLeaf() == false) {
+			if (!selectedNode.isLeaf()) {
 				selectLeft();
 			}
 			break;
 
 		case KeyEvent.VK_RIGHT:
-			if (selectedNode.isLeaf() == false) {
+			if (!selectedNode.isLeaf()) {
 				selectRight();
 			}
 			break;
 
 		case KeyEvent.VK_DOWN:
-			if (selectedNode.isLeaf() == false) {
+			if (!selectedNode.isLeaf()) {
 				final TreeDrawerNode right = selectedNode.getRight();
 				final TreeDrawerNode left = selectedNode.getLeft();
 
@@ -516,7 +517,7 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 		final TreeDrawerNode node = drawer.getNodeById(nodeName);
 		if (node != null) {
 			final int index = (int) node.getIndex();
-			if (map.isVisible(index) == false) {
+			if (!map.isVisible(index)) {
 				map.scrollToIndex(index);
 				map.notifyObservers();
 			}
