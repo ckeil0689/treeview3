@@ -9,6 +9,7 @@ import javax.swing.JDialog;
 import javax.swing.WindowConstants;
 
 import edu.stanford.genetics.treeview.GUIParams;
+import edu.stanford.genetics.treeview.StringRes;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 
 /**
@@ -21,14 +22,14 @@ public class ClusterViewDialog {
 	private JDialog clusterDialog;
 	private ClusterView clusterView;
 
-	public ClusterViewDialog(TreeViewFrame tvFrame) {
+	public ClusterViewDialog(TreeViewFrame tvFrame, String clusterType) {
 		
 		clusterDialog = new JDialog();
 		clusterDialog.setTitle("Clustering");
 		clusterDialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
 		clusterDialog.setResizable(false);
 		
-		clusterView = new ClusterView(tvFrame);
+		clusterView = new ClusterView(tvFrame, clusterType);
 		
 		// Setting preferred size for the ContentPane of this frame
 		final Dimension mainDim = GUIParams.getScreenSize();

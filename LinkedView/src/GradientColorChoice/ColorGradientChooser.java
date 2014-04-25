@@ -138,21 +138,12 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 		presetPanel.setLayout(new MigLayout());
 		colorExtractorEditor = new ColorExtractorEditor2(colorExtractor);
 		presetPanel.add(colorExtractorEditor, "alignx 50%, pushx, wrap");
-//		presetPanel.add(new CEEButtons(), "alignx 50%, pushx, wrap");
-
-//		colorPresetsPanel = new ColorPresetsPanel();
-//		final JScrollPane sp = new JScrollPane(colorPresetsPanel,
-//				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-//				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-//		sp.setOpaque(false);
-//		presetPanel.add(sp, "alignx 50%, pushx, growx");
 		
 		mainPanel.add(hint, "span, wrap");
 		mainPanel.add(gradientBox, "h 20%, growx, pushx, alignx 50%, " +
 				"span, wrap");
 		mainPanel.add(addButton, "pushx, alignx 100%");
 		mainPanel.add(removeButton, "pushx, alignx 0%, wrap");
-//		mainPanel.add(saveButton, "pushx, alignx 50%, span, wrap");
 		mainPanel.add(radioButtonPanel, "pushx");
 		mainPanel.add(presetPanel);
 	}
@@ -796,8 +787,9 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 									double fraction = Math.abs(inputDataValue 
 											- minVal)/ (maxVal - minVal);
 									
-									int inputXValue = (int) (fraction 
-											* gradientBox.getWidth());
+									int width = gradientBox.getWidth();
+									int inputXValue = (int)Math.round((fraction 
+											* width));
 									
 									gradientBox.updateThumbPos(inputXValue);
 									positionInputDialog.dispose();

@@ -91,6 +91,17 @@ abstract class TreeDrawer extends Observable implements Observer {
 
 		setDefaults();
 	}
+	
+	private void setDefaults() {
+
+		id2node = null;
+		rootNode = null;
+		leafList = null;
+		if (nodeInfo != null)
+			nodeInfo.deleteObserver(this);
+		nodeInfo = null;
+		setChanged();
+	}
 
 	@Override
 	public void update(final Observable o, final Object arg) {
@@ -148,11 +159,85 @@ abstract class TreeDrawer extends Observable implements Observer {
 				return leafList[i];
 
 			} catch (final Exception e) {
-				System.out.println("Got exception " + e);
+				LogBuffer.println("Got exception: " + e.getMessage());
 				e.printStackTrace();
 			}
 		}
 		return null;
+	}
+	
+	public TreeDrawerNode getNearestNode(int minSelectionIndex, 
+			int maxSelectionIndex) {
+		
+		if(rootNode == null) {
+			return null;
+		}
+		
+		TreeDrawerNode minLeaf = getLeaf(minSelectionIndex);
+		TreeDrawerNode maxLeaf = getLeaf(maxSelectionIndex);
+		
+		TreeDrawerNode[] minParentArray = new TreeDrawerNode[leafList.length];
+		TreeDrawerNode[] maxParentArray = new TreeDrawerNode[leafList.length];
+		
+		boolean isRoot = false;
+		int addIndex = 0;
+		while(!isRoot) {
+			
+			TreeDrawerNode parent = minLeaf.getParent();
+			if(parent.getId().equalsIgnoreCase(rootNode.getId())) {
+				isRoot = true;
+				
+			} else {
+				minParentArray[addIndex] = parent;
+				minLeaf = parent;
+				addIndex++;
+			}
+		}
+		
+		isRoot = false;
+		addIndex = 0;
+		while(!isRoot) {
+			
+			TreeDrawerNode parent = maxLeaf.getParent();
+			if(parent.getId().equalsIgnoreCase(rootNode.getId())) {
+				isRoot = true;
+				
+			} else {
+				maxParentArray[addIndex] = parent;
+				maxLeaf = parent;
+				addIndex++;
+			}
+		}
+		
+		TreeDrawerNode nearestNode = null;
+		for(int i = 0; i < minParentArray.length; i++) {
+			
+			if(minParentArray[i] == null) {
+				break;
+			}
+			
+			for(int j = 0; j < maxParentArray.length; j++) {
+				
+				if(maxParentArray[j] == null) {
+					break;
+				}
+				
+				if(minParentArray[i].getId().equalsIgnoreCase(
+						maxParentArray[j].getId())) {
+					nearestNode = minParentArray[i];
+					break;
+				} 
+			}
+			
+			if(nearestNode != null) {
+				break;
+			}
+		}
+		
+		if(nearestNode == null) {
+			LogBuffer.println("Error finding nearest node!");
+		}
+		return nearestNode;
 	}
 
 	/**
@@ -205,7 +290,7 @@ abstract class TreeDrawer extends Observable implements Observer {
 			TreeDrawerNode rightn = id2node.get(rightId);
 
 			if (newn != null) {
-				System.out.println("Symbol '" + newn
+				LogBuffer.println("Symbol '" + newn
 						+ "' appeared twice, building weird tree");
 			}
 
@@ -374,7 +459,7 @@ abstract class TreeDrawer extends Observable implements Observer {
 	 */
 	abstract public void paint(Graphics graphics,
 			LinearTransformation xScaleEq, LinearTransformation yScaleEq,
-			Rectangle dest, TreeDrawerNode selected);
+			Rectangle dest, TreeDrawerNode selected, boolean isLeft);
 
 	/**
 	 * Get the closest node to the given (index, correlation) pair.
@@ -389,6 +474,7 @@ abstract class TreeDrawer extends Observable implements Observer {
 
 		final IterativeClosestFinder rcf = new IterativeClosestFinder(index,
 				corr, weight);
+		
 		return rcf.find(rootNode);
 	}
 
@@ -451,7 +537,7 @@ abstract class TreeDrawer extends Observable implements Observer {
 			final Stack<TreeDrawerNode> remaining = new Stack<TreeDrawerNode>();
 			remaining.push(startNode);
 
-			while (remaining.empty() == false) {
+			while (!remaining.empty()) {
 
 				final TreeDrawerNode testN = remaining.pop();
 
@@ -463,28 +549,17 @@ abstract class TreeDrawer extends Observable implements Observer {
 				// lots of stack allocation...
 				final TreeDrawerNode left = testN.getLeft();
 				final TreeDrawerNode right = testN.getRight();
-				if (left.isLeaf() == false) {
+				if (!left.isLeaf()) {
 					remaining.push(left);
 				}
 
-				if (right.isLeaf() == false) {
+				if (!right.isLeaf()) {
 					remaining.push(right);
 				}
 			}
 
 			return closest;
 		}
-	}
-
-	private void setDefaults() {
-
-		id2node = null;
-		rootNode = null;
-		leafList = null;
-		if (nodeInfo != null)
-			nodeInfo.deleteObserver(this);
-		nodeInfo = null;
-		setChanged();
 	}
 
 	public static double parseDouble(final String string) {

@@ -61,13 +61,13 @@ public class MenubarActions {
 				System.exit(1);
 			}
 			
-		} else if(name.equalsIgnoreCase("Theme")
-				|| name.equalsIgnoreCase("Font")
-				|| name.equalsIgnoreCase("URL")){
+		} else if(name.equalsIgnoreCase(StringRes.menu_title_Theme)
+				|| name.equalsIgnoreCase(StringRes.menu_title_Font)
+				|| name.equalsIgnoreCase(StringRes.menu_title_URL)){
 			controller.openPrefMenu(name, "Aesthetics");
 			
-		} else if(name.equalsIgnoreCase("Row and Column Labels")
-				|| name.equalsIgnoreCase("Color Settings")) {
+		} else if(name.equalsIgnoreCase(StringRes.menu_title_RowAndCol)
+				|| name.equalsIgnoreCase(StringRes.menu_title_Color)) {
 			controller.openPrefMenu(name, "Options");
 			
 		} else if(name.equalsIgnoreCase(StringRes.menubar_clearPrefs)) {
@@ -79,8 +79,11 @@ public class MenubarActions {
 				removeAllKeys(tvFrame.getConfigNode());
 			}
 				
-		} else if(name.equalsIgnoreCase("Cluster")) {
-			controller.setupClusterView();
+		} else if(name.equalsIgnoreCase(StringRes.menu_title_Hier)) {
+			controller.setupClusterView(StringRes.menu_title_Hier);
+			
+		} else if(name.equalsIgnoreCase(StringRes.menu_title_KMeans)) {
+			controller.setupClusterView(StringRes.menu_title_KMeans);
 			
 		} else if(name.equalsIgnoreCase("Functional Enrichment")) {
 			tvFrame.displayWIP();

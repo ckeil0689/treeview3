@@ -72,9 +72,11 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 	private MapContainer map;
 	private final JScrollBar scrollbar;
 
-	private InvertedTreeDrawer drawer = null;
+	private TreePainter drawer = null;
 	private TreeDrawerNode selectedNode = null;
 	private Rectangle destRect = null;
+	
+	private final boolean ISLEFT = false;
 
 	/** Constructor, sets up AWT components */
 	public ATRView() {
@@ -108,13 +110,15 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 		}
 		if (selectedNode != null) {
 			drawer.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
-					destRect, selectedNode, false);
+					destRect, selectedNode, false, ISLEFT);
 		}
+		
 		selectedNode = n;
+		
 		if (selectedNode != null) {
 			if (xScaleEq != null) {
 				drawer.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
-						destRect, selectedNode, true);
+						destRect, selectedNode, true, ISLEFT);
 			}
 		}
 
@@ -169,7 +173,7 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 	 * @param d
 	 *            The new drawer
 	 */
-	public void setInvertedTreeDrawer(final InvertedTreeDrawer d) {
+	public void setInvertedTreeDrawer(final TreePainter d) {
 
 		if (drawer != null) {
 			drawer.deleteObserver(this);
@@ -233,11 +237,17 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 					cand = drawer.getLeaf(arraySelection.getMinIndex());
 				}
 				// this clause selects the root node if all arrays are selected.
-				if (arraySelection.getMinIndex() == map.getMinIndex()) {
-					if (arraySelection.getMaxIndex() == map.getMaxIndex()) {
-						cand = drawer.getRootNode();
-					}
+				else if (arraySelection.getMinIndex() == map.getMinIndex() 
+						&& arraySelection.getMaxIndex() == map.getMaxIndex()) {
+					cand = drawer.getRootNode();
+				
 				}
+//				// find node when multiple arrays are selected.
+//				} else if(arraySelection.getMinIndex() >= map.getMinIndex() 
+//						&& arraySelection.getMaxIndex() <= map.getMaxIndex()) {
+//					cand = drawer.getNearestNode(arraySelection.getMinIndex(), 
+//							arraySelection.getMaxIndex());
+//				}
 			}
 			// Only notify observers if we're changing the selected node.
 			if ((cand != null)
@@ -254,8 +264,8 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 			System.out.println(viewName() + "Got an update from unknown " + o);
 		}
 
-		this.revalidate();
-		this.repaint();
+		revalidate();
+		repaint();
 	}
 
 	/**
@@ -360,7 +370,7 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 							+ destRect.height);
 
 			// draw
-			drawer.paint(g, xScaleEq, yScaleEq, destRect, selectedNode);
+			drawer.paint(g, xScaleEq, yScaleEq, destRect, selectedNode, ISLEFT);
 
 		} else {
 			// System.out.println("didn't update buffer: valid =
@@ -465,9 +475,9 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 		}
 
 		drawer.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq, destRect,
-				current, true);
+				current, true, ISLEFT);
 		drawer.paintSingle(offscreenGraphics, xScaleEq, yScaleEq, destRect,
-				selectedNode, true);
+				selectedNode, true, ISLEFT);
 
 		synchMap();
 		repaint();
@@ -483,9 +493,9 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 		selectedNode = current.getRight();
 
 		drawer.paintSingle(offscreenGraphics, xScaleEq, yScaleEq, destRect,
-				current, false);
+				current, false, ISLEFT);
 		drawer.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq, destRect,
-				current.getLeft(), false);
+				current.getLeft(), false, ISLEFT);
 
 		synchMap();
 		repaint();
@@ -501,9 +511,9 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 		selectedNode = current.getLeft();
 
 		drawer.paintSingle(offscreenGraphics, xScaleEq, yScaleEq, destRect,
-				current, false);
+				current, false, ISLEFT);
 		drawer.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq, destRect,
-				current.getRight(), false);
+				current.getRight(), false, ISLEFT);
 
 		synchMap();
 		repaint();

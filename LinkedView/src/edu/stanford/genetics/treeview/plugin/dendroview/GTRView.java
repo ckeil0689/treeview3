@@ -54,13 +54,15 @@ public class GTRView extends ModelViewBuffered implements MouseListener,
 	protected HeaderSummary headerSummary = new HeaderSummary("GtrSummary");
 
 	private MapContainer map;
-	private LeftTreeDrawer drawer = null;
+	private TreePainter drawer = null;
 	private TreeDrawerNode selectedNode = null;
 	private Rectangle destRect = null;
 
 	private TreeSelectionI geneSelection;
 	private LinearTransformation xScaleEq;
 	private LinearTransformation yScaleEq;
+	
+	private final boolean ISLEFT = true;
 
 	/**
 	 * Constructor. You still need to specify a map to have this thing draw.
@@ -74,14 +76,14 @@ public class GTRView extends ModelViewBuffered implements MouseListener,
 		addMouseListener(this);
 		addKeyListener(this);
 	}
-
+	
 	/**
 	 * Set the drawer
 	 * 
 	 * @param d
 	 *            The new drawer
 	 */
-	public void setLeftTreeDrawer(final LeftTreeDrawer d) {
+	public void setLeftTreeDrawer(final TreePainter d) {
 
 		if (drawer != null) {
 			drawer.deleteObserver(this);
@@ -176,14 +178,14 @@ public class GTRView extends ModelViewBuffered implements MouseListener,
 
 			if (selectedNode != null) {
 				drawer.paintSubtree(offscreenGraphics, getXScaleEq(),
-						getYScaleEq(), destRect, selectedNode, false);
+						getYScaleEq(), destRect, selectedNode, false, ISLEFT);
 			}
 
 			selectedNode = n;
 
 			if (selectedNode != null) {
 				drawer.paintSubtree(offscreenGraphics, getXScaleEq(),
-						getYScaleEq(), destRect, selectedNode, true);
+						getYScaleEq(), destRect, selectedNode, true, ISLEFT);
 			}
 		} else {
 			selectedNode = n;
@@ -212,9 +214,9 @@ public class GTRView extends ModelViewBuffered implements MouseListener,
 		}
 
 		drawer.paintSubtree(offscreenGraphics, getXScaleEq(), getYScaleEq(),
-				destRect, current, true);
+				destRect, current, true, ISLEFT);
 		drawer.paintSingle(offscreenGraphics, getXScaleEq(), getYScaleEq(),
-				destRect, selectedNode, true);
+				destRect, selectedNode, true, ISLEFT);
 
 		synchMap();
 		repaint();
@@ -230,9 +232,9 @@ public class GTRView extends ModelViewBuffered implements MouseListener,
 		selectedNode = current.getRight();
 
 		drawer.paintSingle(offscreenGraphics, getXScaleEq(), getYScaleEq(),
-				destRect, current, false);
+				destRect, current, false, ISLEFT);
 		drawer.paintSubtree(offscreenGraphics, getXScaleEq(), getYScaleEq(),
-				destRect, current.getLeft(), false);
+				destRect, current.getLeft(), false, ISLEFT);
 		synchMap();
 		repaint();
 	}
@@ -247,9 +249,9 @@ public class GTRView extends ModelViewBuffered implements MouseListener,
 		selectedNode = current.getLeft();
 
 		drawer.paintSingle(offscreenGraphics, getXScaleEq(), getYScaleEq(),
-				destRect, current, false);
+				destRect, current, false, ISLEFT);
 		drawer.paintSubtree(offscreenGraphics, getXScaleEq(), getYScaleEq(),
-				destRect, current.getRight(), false);
+				destRect, current.getRight(), false, ISLEFT);
 
 		synchMap();
 		repaint();
@@ -274,25 +276,29 @@ public class GTRView extends ModelViewBuffered implements MouseListener,
 		} else if (o == geneSelection) {
 			TreeDrawerNode cand = null;
 			if (geneSelection.getNSelectedIndexes() > 0) {
-
-				// This clause selects the array node if only a
-				// single array is selected.
-				if (geneSelection.getMinIndex() == geneSelection.getMaxIndex()) {
+				// Select the array node if only a single array is selected.
+				if (geneSelection.getMinIndex() 
+						== geneSelection.getMaxIndex()) {
 					cand = drawer.getLeaf(geneSelection.getMinIndex());
-
-					// this clause selects the root node if
-					// all genes are selected.
-				} else if ((geneSelection.getMinIndex() == map.getMinIndex())
+				} 
+				// select the root node if all genes are selected.
+				else if ((geneSelection.getMinIndex() == map.getMinIndex())
 						&& (geneSelection.getMaxIndex() == map.getMaxIndex())) {
 					cand = drawer.getRootNode();
+			
+					// find node when multiple arrays are selected.
 				}
+//				} else if(geneSelection.getMinIndex() >= map.getMinIndex() 
+//						&& geneSelection.getMaxIndex() <= map.getMaxIndex()) {
+//					cand = drawer.getNearestNode(geneSelection.getMinIndex(), 
+//							geneSelection.getMaxIndex());
+//				}
 			}
 
 			if ((cand != null)
 					&& !(cand.getId().equalsIgnoreCase(
 							geneSelection.getSelectedNode()))) {
-				final String id = cand.getId();
-				geneSelection.setSelectedNode(id);
+				geneSelection.setSelectedNode(cand.getId());
 				geneSelection.notifyObservers();
 
 			} else {
@@ -302,6 +308,9 @@ public class GTRView extends ModelViewBuffered implements MouseListener,
 		} else {
 			LogBuffer.println(viewName() + "Got an update from unknown " + o);
 		}
+		
+		revalidate();
+		repaint();
 	}
 
 	// method from ModelView
@@ -376,7 +385,7 @@ public class GTRView extends ModelViewBuffered implements MouseListener,
 			// System.out.println("yScaleEq " + getYScaleEq());
 			// draw
 			drawer.paint(g, getXScaleEq(), getYScaleEq(), destRect,
-					selectedNode);
+					selectedNode, ISLEFT);
 
 		} else {
 			// System.out.println("didn't update buffer: valid = "
@@ -388,7 +397,7 @@ public class GTRView extends ModelViewBuffered implements MouseListener,
 	@Override
 	public void mouseClicked(final MouseEvent e) {
 
-		if (enclosingWindow().isActive() == false) {
+		if (!enclosingWindow().isActive()) {
 			return;
 		}
 
@@ -426,19 +435,19 @@ public class GTRView extends ModelViewBuffered implements MouseListener,
 			break;
 
 		case KeyEvent.VK_LEFT:
-			if (selectedNode.isLeaf() == false) {
+			if (!selectedNode.isLeaf()) {
 				selectLeft();
 			}
 			break;
 
 		case KeyEvent.VK_RIGHT:
-			if (selectedNode.isLeaf() == false) {
+			if (!selectedNode.isLeaf()) {
 				selectRight();
 			}
 			break;
 
 		case KeyEvent.VK_DOWN:
-			if (selectedNode.isLeaf() == false) {
+			if (!selectedNode.isLeaf()) {
 				final TreeDrawerNode right = selectedNode.getRight();
 				final TreeDrawerNode left = selectedNode.getLeft();
 

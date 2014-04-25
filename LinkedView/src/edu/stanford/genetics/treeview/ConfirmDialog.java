@@ -33,7 +33,7 @@ public class ConfirmDialog {
 		final JLabel prompt = new JLabel(
 				"Are you sure you want to " + function + "?");
 		prompt.setForeground(GUIParams.TEXT);
-		prompt.setFont(GUIParams.FONTL);
+		prompt.setFont(GUIParams.FONT_MENU);
 
 		final JButton ok = GUIParams.setButtonLayout("OK", null);
 		ok.addActionListener(new ConfirmListener());

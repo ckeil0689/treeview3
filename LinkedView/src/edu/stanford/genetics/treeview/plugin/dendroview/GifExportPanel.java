@@ -50,8 +50,8 @@ public class GifExportPanel extends ExportPanel implements SettingsPanel {
 			final HeaderInfo geneHeaderInfo,
 			final TreeSelectionI geneSelection,
 			final TreeSelectionI arraySelection,
-			final InvertedTreeDrawer arrayTreeDrawer,
-			final LeftTreeDrawer geneTreeDrawer, final ArrayDrawer arrayDrawer,
+			final TreePainter arrayTreeDrawer,
+			final TreePainter geneTreeDrawer, final ArrayDrawer arrayDrawer,
 			final MapContainer arrayMap, final MapContainer geneMap) {
 		super(arrayHeaderInfo, geneHeaderInfo, geneSelection, arraySelection,
 				arrayTreeDrawer, geneTreeDrawer, arrayDrawer, arrayMap,

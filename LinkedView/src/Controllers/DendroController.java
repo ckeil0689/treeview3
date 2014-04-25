@@ -48,14 +48,14 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendroException;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
 import edu.stanford.genetics.treeview.plugin.dendroview.DoubleArrayDrawer;
-import edu.stanford.genetics.treeview.plugin.dendroview.InvertedTreeDrawer;
-import edu.stanford.genetics.treeview.plugin.dendroview.LeftTreeDrawer;
+import edu.stanford.genetics.treeview.plugin.dendroview.TreePainter;
+//import edu.stanford.genetics.treeview.plugin.dendroview.LeftTreeDrawer;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreeColorer;
 
 public class DendroController implements ConfigNodePersistent {
 
-	private final double PRECISION_LEVEL = 0.001;
+	private final double PRECISION_LEVEL = 0.0001;
 	private DendroView2 dendroView;
 	private TreeViewFrame tvFrame;
 	private TVModel tvModel;
@@ -67,8 +67,8 @@ public class DendroController implements ConfigNodePersistent {
 	
 	// Drawers
 	protected ArrayDrawer arrayDrawer;
-	protected InvertedTreeDrawer invertedTreeDrawer;
-	protected LeftTreeDrawer leftTreeDrawer;
+	protected TreePainter invertedTreeDrawer;
+	protected TreePainter leftTreeDrawer;
 	
 	// MapContainers
 	protected MapContainer globalXmap;
@@ -96,8 +96,6 @@ public class DendroController implements ConfigNodePersistent {
 		setTreesVis(configNode.getBoolean("treesVisible", false));
 		
 		dendroView.setupLayout();
-		dendroView.refresh();
-//		resetMapContainers();
 		
 		// add listeners
 		addViewListeners();
@@ -482,17 +480,6 @@ public class DendroController implements ConfigNodePersistent {
 		@Override
 		public void componentResized(final ComponentEvent arg0) {
 			
-//			if (globalXmap.getAvailablePixels() > globalXmap.getUsedPixels()
-//					&& globalXmap.getScale() == globalXmap.getMinScale()) {
-//				globalXmap.setHome();
-//				globalXmap.notifyObservers();
-//			}
-//
-//			if (globalYmap.getAvailablePixels() > globalYmap.getUsedPixels()
-//					&& globalYmap.getScale() == globalYmap.getMinScale()) {
-//				globalYmap.setHome();
-//				globalYmap.notifyObservers();
-//			}
 			resetMapContainers();
 		}
 
@@ -694,7 +681,7 @@ public class DendroController implements ConfigNodePersistent {
 		}
 		
 		// Give components access to TVModel
-		dendroView.getArraynameview().setDataModel(tvModel);
+//		dendroView.getArraynameview().setDataModel(tvModel);
 		
 		final ColorPresets2 colorPresets = DendrogramFactory.getColorPresets();
 		colorPresets.setConfigNode(configNode);
@@ -731,10 +718,11 @@ public class DendroController implements ConfigNodePersistent {
 		// Drawers
 		dendroView.getGlobalView().setArrayDrawer(arrayDrawer);
 		
-		leftTreeDrawer = new LeftTreeDrawer();
+//		leftTreeDrawer = new LeftTreeDrawer();
+		leftTreeDrawer = new TreePainter();
 		dendroView.getGtrview().setLeftTreeDrawer(leftTreeDrawer);
 		
-		invertedTreeDrawer = new InvertedTreeDrawer();
+		invertedTreeDrawer = new TreePainter();
 		dendroView.getAtrview().setInvertedTreeDrawer(invertedTreeDrawer);
 	
 		setPresets();
@@ -1349,15 +1337,6 @@ public class DendroController implements ConfigNodePersistent {
 
 		tvFrame.showSubDataModel(indexes, null, null);
 	}
-	
-//	// Getters
-//	/**
-//	 * Always returns an instance of the node, even if it has to create it.
-//	 */
-//	protected Preferences getFirst(final String name) {
-//
-//		return getConfigNode().node(name);
-//	}
 	
 	// Setters
 	/**

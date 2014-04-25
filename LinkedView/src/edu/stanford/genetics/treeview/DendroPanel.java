@@ -37,32 +37,10 @@ import javax.swing.JWindow;
 public interface DendroPanel {
 
 	public void refresh();
-
-//	/**
-//	 * Add items related to settings
-//	 * 
-//	 * @param menubar
-//	 *            A menu to add items to.
-//	 */
-//	public void populateSettingsMenu(TreeviewMenuBarI menubar);
-//
-//	/**
-//	 * Add items which do some kind of analysis
-//	 * 
-//	 * @param menubar
-//	 *            A menu to add items to.
-//	 */
-//	public void populateAnalysisMenu(TreeviewMenuBarI menubar);
-//
-//	/**
-//	 * Add items which allow for export, if any.
-//	 * 
-//	 * @param menubar
-//	 *            A menu to add items to.
-//	 */
-//	public void populateExportMenu(TreeviewMenuBarI menubar);
 	
 	public void addDendroMenus(JMenu menu);
+	
+	public void addClusterMenus(JMenu menu);
 	
 	public JWindow openSearchPanel();
 	

@@ -83,8 +83,8 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 								// constructed.
 	private final TreeSelectionI geneSelection;
 	private final TreeSelectionI arraySelection;
-	private final InvertedTreeDrawer arrayTreeDrawer;
-	private final LeftTreeDrawer geneTreeDrawer;
+	private final TreePainter arrayTreeDrawer;
+	private final TreePainter geneTreeDrawer;
 	private final ArrayDrawer arrayDrawer;
 	private final MapContainer geneMap;
 	private final MapContainer arrayMap;
@@ -397,8 +397,8 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			final HeaderInfo geneHeaderInfo,
 			final TreeSelectionI geneSelection,
 			final TreeSelectionI arraySelection,
-			final InvertedTreeDrawer arrayTreeDrawer,
-			final LeftTreeDrawer geneTreeDrawer, final ArrayDrawer arrayDrawer,
+			final TreePainter arrayTreeDrawer,
+			final TreePainter geneTreeDrawer, final ArrayDrawer arrayDrawer,
 			final MapContainer arrayMap, final MapContainer geneMap,
 			final boolean hasChar) {
 		this.arrayHeaderInfo = arrayHeaderInfo;
@@ -881,8 +881,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 
 		// draw
 		geneTreeDrawer.paintSubtree(g, xScaleEq, yScaleEq, destRect,
-				getGeneNode(), false);
-
+				getGeneNode(), false, true);
 	}
 
 	/**
@@ -916,7 +915,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 
 		// draw
 		arrayTreeDrawer.paintSubtree(g, xScaleEq, yScaleEq, destRect,
-				getArrayNode(), false);
+				getArrayNode(), false, false);
 	}
 
 	/**

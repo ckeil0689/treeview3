@@ -17,8 +17,8 @@ public class StringRes {
 	public final static String versionTag = "0.1";
 
 	/** Homepage for updates */
-	public final static String updateUrl = "https://www.princeton.edu/~abarysh/" +
-			"treeview/";
+	public final static String updateUrl = "https://www.princeton.edu/" +
+			"~abarysh/treeview/";
 	
 	/** url of announcements mailing list */
 	public final static String announcementUrl = "https://www.princeton.edu/" +
@@ -30,12 +30,17 @@ public class StringRes {
 	public static final String view_Welcome = "WelcomeView";
 	public static final String view_Dendro = "DendroView";
 	
+	// View Titles
+	public static final String view_title_Cluster = "Cluster View";
+	
 	// Preferences Menu Titles
 	public static final String menu_title_Theme = "Theme";
 	public static final String menu_title_Font = "Font";
 	public static final String menu_title_URL = "URL";
 	public static final String menu_title_RowAndCol = "Row and Column Labels";
 	public static final String menu_title_Color = "Color Settings";
+	public static final String menu_title_Hier = "Hierarchical";
+	public static final String menu_title_KMeans = "K-Means";
 	
 	// MenuBar
 	public static final String menubar_clearPrefs = "Clear Preferences";
@@ -48,9 +53,17 @@ public class StringRes {
 	
 	// Button Texts
 	public static final String button_OK = "OK";
+	public static final String button_Cancel = "Cancel";
+	public static final String button_Cluster = "Cluster";
 	public static final String button_customLabels = "Load Custom Labels";
 	
 	// RadioButton Texts
 	public static final String rButton_dark = "Dark";
 	public static final String rButton_light = "Light";
+	
+	// Labels
+	public static final String label_ZoomColLabels = "Zoom to See Column " +
+			"Labels";
+	public static final String label_ZoomRowLabels1 = "Zoom to See";
+	public static final String label_ZoomRowLabels2 = "Row Labels";
 }

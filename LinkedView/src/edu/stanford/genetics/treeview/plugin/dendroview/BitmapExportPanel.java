@@ -60,8 +60,8 @@ public class BitmapExportPanel extends ExportPanel implements SettingsPanel {
 			final HeaderInfo geneHeaderInfo,
 			final TreeSelectionI geneSelection,
 			final TreeSelectionI arraySelection,
-			final InvertedTreeDrawer arrayTreeDrawer,
-			final LeftTreeDrawer geneTreeDrawer, final ArrayDrawer arrayDrawer,
+			final TreePainter arrayTreeDrawer,
+			final TreePainter geneTreeDrawer, final ArrayDrawer arrayDrawer,
 			final MapContainer arrayMap, final MapContainer geneMap) {
 		this(arrayHeaderInfo, geneHeaderInfo, geneSelection, arraySelection,
 				arrayTreeDrawer, geneTreeDrawer, arrayDrawer, arrayMap,
@@ -72,8 +72,8 @@ public class BitmapExportPanel extends ExportPanel implements SettingsPanel {
 			final HeaderInfo geneHeaderInfo,
 			final TreeSelectionI geneSelection,
 			final TreeSelectionI arraySelection,
-			final InvertedTreeDrawer arrayTreeDrawer,
-			final LeftTreeDrawer geneTreeDrawer, final ArrayDrawer arrayDrawer,
+			final TreePainter arrayTreeDrawer,
+			final TreePainter geneTreeDrawer, final ArrayDrawer arrayDrawer,
 			final MapContainer arrayMap, final MapContainer geneMap,
 			final boolean hasChar) {
 		super(arrayHeaderInfo, geneHeaderInfo, geneSelection, arraySelection,

@@ -726,7 +726,7 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 
 		} else if ((geneSelection.getNSelectedIndexes() == 1 && arraySelection
 				.getNSelectedIndexes() == 1)
-				&& (xmap.getScale() < 10.0 && ymap.getScale() < 10.0)) {
+				&& (xmap.getScale() < 20.0 && ymap.getScale() < 20.0)) {
 
 			// Width and height of rectangle which spans the Ellipse2D object
 			w = xmap.getUsedPixels() * 0.05;

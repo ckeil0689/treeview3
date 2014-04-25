@@ -100,7 +100,7 @@ public class DendroView2 implements Observer, DendroPanel {
 
 	// Row and Column names
 	protected TextViewManager textview;
-	protected ArrayNameView arraynameview;
+	protected ArrayNameViewManager arraynameview;
 
 	protected JScrollBar globalXscrollbar;
 	protected JScrollBar globalYscrollbar;
@@ -197,8 +197,11 @@ public class DendroView2 implements Observer, DendroPanel {
 		globalYscrollbar = globalview.getYScroll();
 
 		// Set up the column name display
-		arraynameview = new ArrayNameView(
-				tvFrame.getDataModel().getArrayHeaderInfo());
+		arraynameview = new ArrayNameViewManager(
+				tvFrame.getDataModel().getArrayHeaderInfo(),
+				tvFrame.getUrlExtractor(), tvFrame.getDataModel());
+//				new ArrayNameView(
+//				tvFrame.getDataModel().getArrayHeaderInfo());
 //		arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
 
 		textview = new TextViewManager(
@@ -237,6 +240,7 @@ public class DendroView2 implements Observer, DendroPanel {
 		JPanel buttonPanel;
 		JPanel crossPanel;
 		JPanel textpanel;
+		JPanel arrayNamePanel;
 		JPanel navPanel;
 		JSplitPane gtrPane = null;
 		JSplitPane atrPane = null;
@@ -302,6 +306,10 @@ public class DendroView2 implements Observer, DendroPanel {
 		textpanel.setLayout(new MigLayout("ins 0"));
 		textpanel.setOpaque(true);
 		
+		arrayNamePanel = new JPanel();
+		arrayNamePanel.setLayout(new MigLayout("ins 0"));
+		arrayNamePanel.setOpaque(true);
+		
 		if(gtrview.isEnabled() || atrview.isEnabled()) {
 			tvFrame.getTreeButton().setEnabled(true);
 			
@@ -320,7 +328,7 @@ public class DendroView2 implements Observer, DendroPanel {
 			gtrPane.setDividerSize(gtr_div_size);
 	
 			atrPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, atrview,
-					arraynameview);
+					arrayNamePanel);
 			atrPane.setResizeWeight(0.5);
 			atrPane.setOpaque(false);
 			atrPane.setBorder(null);
@@ -330,6 +338,7 @@ public class DendroView2 implements Observer, DendroPanel {
 		
 		// Adding Components onto each other
 		textpanel.add(textview.getComponent(), "push, grow");
+		arrayNamePanel.add(arraynameview.getComponent(), "push, grow");
 
 		crossPanel.add(scaleIncY, "span, alignx 50%, wrap");
 		crossPanel.add(scaleDecX);
@@ -345,8 +354,8 @@ public class DendroView2 implements Observer, DendroPanel {
 		// Layout depends on which dendrogram is shown or not!
 		if(showTrees && (atrview.isEnabled() && gtrview.isEnabled())) {
 			dendroPane.add(firstPanel, "w 18.5%, h 20%");
-			dendroPane.add(atrPane, "w 72%, h 20%");
-			dendroPane.add(fillPanel1, "span 2, w 11.5%, h 20%, wrap");
+			dendroPane.add(atrPane, "span 2, w 73%, h 20%");
+			dendroPane.add(fillPanel1, "w 10.5%, h 20%, wrap");
 			dendroPane.add(gtrPane, "span 1 2, w 18.5%, h 76%");
 			dendroPane.add(globalview, "w 72%, h 75%");
 			dendroPane.add(globalYscrollbar, "w 1%, h 75%");
@@ -358,8 +367,8 @@ public class DendroView2 implements Observer, DendroPanel {
 			
 		} else if(showTrees && (atrview.isEnabled() && !gtrview.isEnabled())) {
 			dendroPane.add(firstPanel, "w 18.5%, h 20%");
-			dendroPane.add(atrPane, "w 80%, h 20%");
-			dendroPane.add(fillPanel1, "span 2, w 11.5%, h 20%, wrap");
+			dendroPane.add(atrPane, "span 2, w 80%, h 20%");
+			dendroPane.add(fillPanel1, "w 10.5%, h 20%, wrap");
 			dendroPane.add(textpanel, "span 1 2, w 10.5%, h 76%");
 			dendroPane.add(globalview, "w 80%, h 75%");
 			dendroPane.add(globalYscrollbar, "w 1%, h 75%");
@@ -371,8 +380,8 @@ public class DendroView2 implements Observer, DendroPanel {
 			
 		} else if(showTrees && (!atrview.isEnabled() && gtrview.isEnabled())) {
 			dendroPane.add(firstPanel, "w 18.5%, h 10%");
-			dendroPane.add(arraynameview, "w 72%, h 10%");
-			dendroPane.add(fillPanel1, "span 2, w 11.5%, h 10%, wrap");
+			dendroPane.add(arrayNamePanel, "span 2, w 73%, h 10%");
+			dendroPane.add(fillPanel1, "w 10.5%, h 10%, wrap");
 			dendroPane.add(gtrPane, "span 1 2, w 18.5%, h 86%");
 			dendroPane.add(globalview, "w 72%, h 85%");
 			dendroPane.add(globalYscrollbar, "w 1%, h 85%");
@@ -384,8 +393,8 @@ public class DendroView2 implements Observer, DendroPanel {
 			
 		} else {
 			dendroPane.add(firstPanel, "w 10.5%, h 10%");
-			dendroPane.add(arraynameview, "w 80%, h 10%");
-			dendroPane.add(fillPanel1, "span 2, w 11.5%, h 10%, wrap");
+			dendroPane.add(arrayNamePanel, "span 2, w 81%, h 10%");
+			dendroPane.add(fillPanel1, "span 2, w 10.5%, h 10%, wrap");
 			dendroPane.add(textpanel, "span 1 2, w 10.5%, h 86%");
 			dendroPane.add(globalview, "w 80%, h 85%");
 			dendroPane.add(globalYscrollbar, "w 1%, h 85%");
@@ -426,6 +435,7 @@ public class DendroView2 implements Observer, DendroPanel {
 	 */
 	public void addCompListener(ComponentListener l) {
 		
+		// tvFrame.getAppFrame().getContentPane().addComponentListener(l);
 		getDendroPane().addComponentListener(l);
 	}
 	
@@ -876,14 +886,6 @@ public class DendroView2 implements Observer, DendroPanel {
 	
 	@Override
 	public void addDendroMenus(JMenu menu) {
-	
-		// Cluster Menu
-		JMenuItem clusterMenuItem = new JMenuItem("Cluster");
-//		stackMenu.add(clusterMenuItem);
-		menu.add(clusterMenuItem);
-		tvFrame.addToStackMenuList(clusterMenuItem);
-		
-		menu.addSeparator();
 		
 		annotationsMenuItem = new JMenuItem("Row and Column Labels");
 		menu.add(annotationsMenuItem);
@@ -892,6 +894,19 @@ public class DendroView2 implements Observer, DendroPanel {
 		colorMenuItem = new JMenuItem("Color Settings");
 		menu.add(colorMenuItem);
 		tvFrame.addToStackMenuList(colorMenuItem);
+	}
+	
+	@Override
+	public void addClusterMenus(JMenu menu) {
+	
+		// Cluster Menu
+		JMenuItem hierMenuItem = new JMenuItem("Hierarchical");
+		menu.add(hierMenuItem);
+		tvFrame.addToStackMenuList(hierMenuItem);
+		
+		JMenuItem kMeansMenuItem = new JMenuItem("K-Means");
+		menu.add(kMeansMenuItem);
+		tvFrame.addToStackMenuList(kMeansMenuItem);
 	}
 
 //	/**
@@ -1152,7 +1167,7 @@ public class DendroView2 implements Observer, DendroPanel {
 		return arraySelection;
 	}
 
-	public ArrayNameView getArraynameview() {
+	public ArrayNameViewManager getArraynameview() {
 
 		return arraynameview;
 	}

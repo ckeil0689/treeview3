@@ -82,7 +82,7 @@ public class MapContainer extends Observable implements Observer,
 
 		if(parentNode != null) {
 			this.configNode = parentNode.node(mapName);
-			
+				
 		} else {
 			LogBuffer.println("Could not find or create MapContainer " +
 					"node because parentNode was null.");
@@ -119,7 +119,7 @@ public class MapContainer extends Observable implements Observer,
 	public void setHome() {
 		
 		this.tileNumVisible = getMaxIndex();
-		setMinScale();
+		minScale = getCalculatedMinScale();
 		setScale(minScale);
 	}
 
@@ -127,11 +127,11 @@ public class MapContainer extends Observable implements Observer,
 	 * Sets the minimum scale for the available screen space so that no
 	 * white space occurs in GlobalView.
 	 */
-	public void setMinScale() {
+	public double getCalculatedMinScale() {
 
 		final double pixels = getAvailablePixels();
-		final double divider = getMaxIndex() - getMinIndex();
-		minScale = pixels/ divider;
+		final double divider = getMaxIndex() - getMinIndex() + 1;
+		return pixels/ divider;
 	}
 
 	/**
@@ -148,10 +148,9 @@ public class MapContainer extends Observable implements Observer,
 		int zoomVal;
 		double newScale = getScale();
 
-		zoomVal = (int)Math.round(tileNumVisible/20.0);
+		tileNumVisible = Math.round(getAvailablePixels()/ getScale());
 		
-		LogBuffer.println("Non-round ZoomVal: " + (tileNumVisible/20.0));
-		LogBuffer.println("Round ZoomVal: " + Math.round(tileNumVisible/20.0));
+		zoomVal = (int)Math.round(tileNumVisible/20.0);
 		
 		// Ensure that at least one tile will be zoomed out.
 		if(zoomVal < 1) {
@@ -183,6 +182,8 @@ public class MapContainer extends Observable implements Observer,
 		double newScale = getScale();
 		int zoomVal;
 
+		tileNumVisible = Math.round(getAvailablePixels()/ getScale());
+		
 		zoomVal = (int)Math.round(tileNumVisible/20.0);
 		
 		// Ensure that at least one tile will be zoomed in.
@@ -352,7 +353,7 @@ public class MapContainer extends Observable implements Observer,
 	@Override
 	public void update(final Observable observable, final Object object) {
 
-		System.out.println(new StringBuffer("MapContainer Got an "
+		LogBuffer.println(new StringBuffer("MapContainer Got an "
 				+ "update from unknown ").append(observable).toString());
 		notifyObservers(object);
 	}
@@ -376,6 +377,12 @@ public class MapContainer extends Observable implements Observer,
 	public double getScale() {
 
 		return current.getScale();
+	}
+	
+	public double getMinScale() {
+
+		return minScale;
+//		return current.getMinScale();
 	}
 
 	public int getPixel(final double d) {
@@ -481,6 +488,7 @@ public class MapContainer extends Observable implements Observer,
 			}
 	
 			configNode.putDouble("scale", d);
+			configNode.putDouble("minScale", d);
 		}
 	}
 
@@ -507,16 +515,6 @@ public class MapContainer extends Observable implements Observer,
 	public int getMinIndex() {
 
 		return current.getMinIndex();
-	}
-
-	/**
-	 * Get smallest scale
-	 * 
-	 * @return
-	 */
-	public double getMinScale() {
-
-		return minScale;
 	}
 
 	public TreeDrawerNode getSelectedNode() {

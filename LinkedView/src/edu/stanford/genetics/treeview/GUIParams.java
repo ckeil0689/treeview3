@@ -23,7 +23,7 @@ public class GUIParams {
 	public static String QUESTIONICON = "questionIcon_dark.png";
 	
 	public static Font FONTS = new Font("Sans Serif", Font.PLAIN, 14);
-	public static Font FONT_MENU = new Font("Sans Serif", Font.PLAIN, 18);
+	public static Font FONT_MENU = new Font("Sans Serif", Font.PLAIN, 16);
 	public static Font FONTL = new Font("Sans Serif", Font.PLAIN, 20);
 
 	public static Color LIGHTGRAY = new Color(200, 200, 200, 255);

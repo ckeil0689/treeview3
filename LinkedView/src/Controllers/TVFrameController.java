@@ -74,7 +74,6 @@ public class TVFrameController {
 		menuActions =  new MenubarActions(tvFrame, 
 				TVFrameController.this);
 		
-//		tvFrame.addStackButtonListener(new StackButtonListener());
 		tvFrame.addMenuActionListeners(new StackMenuListener());
 		tvFrame.addFileMenuListeners(new FileMenuListener());
 		
@@ -158,91 +157,6 @@ public class TVFrameController {
 			
 		}
 	}
-	
-//	class SearchButtonListener implements MouseListener {
-//
-//		@Override
-//		public void mouseClicked(MouseEvent e) {
-//			
-//			if(tvFrame.getRunning() != null) {
-//				JWindow window = tvFrame.getRunning().openSearchPanel(); 
-//				window.setLocationRelativeTo(e.getComponent());
-//			    window.pack();
-//			    window.setVisible(true);
-//			}
-//		}
-//
-//		@Override
-//		public void mouseEntered(MouseEvent e) {
-//			
-//			e.getComponent().setCursor(new Cursor(Cursor.HAND_CURSOR));
-//		}
-//
-//		@Override
-//		public void mouseExited(MouseEvent e) {
-//			
-//			e.getComponent().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-//		}
-//
-//		@Override
-//		public void mousePressed(MouseEvent e) {
-//			// TODO Auto-generated method stub
-//			
-//		}
-//
-//		@Override
-//		public void mouseReleased(MouseEvent arg0) {
-//			// TODO Auto-generated method stub
-//			
-//		}
-//	}
-//	
-//	class TreeButtonListener implements MouseListener {
-//
-//		@Override
-//		public void mouseClicked(MouseEvent e) {
-//			
-//			if(tvFrame.getRunning() != null) {
-//				if(tvFrame.getTreeButton().getText()
-//						.equalsIgnoreCase("SHOW TREES")) {
-//					tvFrame.getTreeButton().setText("HIDE TREES");
-//					tvFrame.getRunning().setTreesVisible(true);
-//					tvFrame.getRunning().refresh();
-//					addViewListeners();
-//					
-//				} else {
-//					tvFrame.getTreeButton().setText("SHOW TREES");
-//					tvFrame.getRunning().setTreesVisible(false);
-//					tvFrame.getRunning().refresh();
-//					addViewListeners();
-//				}
-//			}
-//		}
-//
-//		@Override
-//		public void mouseEntered(MouseEvent e) {
-//			
-//			e.getComponent().setCursor(new Cursor(Cursor.HAND_CURSOR));
-//		}
-//
-//		@Override
-//		public void mouseExited(MouseEvent e) {
-//			
-//			e.getComponent().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-//		}
-//
-//		@Override
-//		public void mousePressed(MouseEvent e) {
-//			// TODO Auto-generated method stub
-//			
-//		}
-//
-//		@Override
-//		public void mouseReleased(MouseEvent arg0) {
-//			// TODO Auto-generated method stub
-//			
-//		}
-//	}
 	
 	class StackMenuListener implements ActionListener {
 
@@ -485,18 +399,19 @@ public class TVFrameController {
 	 * clustering or K-Means, depending on the boolean parameter.
 	 * @param hierarchical
 	 */
-	public void setupClusterView() {
+	public void setupClusterView(String clusterType) {
 		
 		// Making a new Window to display clustering components
-		ClusterViewDialog clusterViewFrame = new ClusterViewDialog(tvFrame);
+		ClusterViewDialog clusterViewDialog = new ClusterViewDialog(tvFrame, 
+				clusterType);
 		
 		// Creating the Controller for this view.
 		ClusterViewController clusControl = 
-				new ClusterViewController(clusterViewFrame.getClusterView()
-						, tvFrame, this);
+				new ClusterViewController(clusterViewDialog.getClusterView(), 
+						tvFrame, this);
 		
 		// Make the clustering window visible.
-		clusterViewFrame.setVisible(true);
+		clusterViewDialog.setVisible(true);
 	}
 	
 	/**

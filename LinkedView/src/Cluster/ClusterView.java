@@ -28,6 +28,7 @@
 package Cluster;
 
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
@@ -49,6 +50,7 @@ import edu.stanford.genetics.treeview.ExportException;
 import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.MainPanel;
 import edu.stanford.genetics.treeview.MainProgramArgs;
+import edu.stanford.genetics.treeview.StringRes;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.TreeviewMenuBarI;
 import edu.stanford.genetics.treeview.model.TVModel;
@@ -103,6 +105,8 @@ public class ClusterView extends JPanel implements MainPanel {
 
 	private final String[] clusterMethods = { "Single Linkage", 
 			"Average Linkage", "Complete Linkage" };
+	
+	private final String clusterTypeID;
 
 	/**
 	 * Chained constructor for the ClusterView object note this will reuse any
@@ -113,9 +117,9 @@ public class ClusterView extends JPanel implements MainPanel {
 	 * @param vFrame
 	 *            parent ViewFrame of DendroView
 	 */
-	public ClusterView(final TreeViewFrame tvFrame) {
+	public ClusterView(final TreeViewFrame tvFrame, final String clusterTypeID) {
 
-		this(null, tvFrame, "Cluster View");
+		this(null, tvFrame, StringRes.view_title_Cluster, clusterTypeID);
 	}
 
 	/**
@@ -125,9 +129,10 @@ public class ClusterView extends JPanel implements MainPanel {
 	 * @param root
 	 * @param vFrame
 	 */
-	public ClusterView(final Preferences root, final TreeViewFrame tvFrame) {
+	public ClusterView(final Preferences root, final TreeViewFrame tvFrame, 
+			final String clusterTypeID) {
 
-		this(root, tvFrame, "Cluster View");
+		this(root, tvFrame, StringRes.view_title_Cluster, clusterTypeID);
 	}
 
 	/**
@@ -144,12 +149,13 @@ public class ClusterView extends JPanel implements MainPanel {
 	 *            name of this view.
 	 */
 	public ClusterView (final Preferences root, final TreeViewFrame tvFrame, 
-			final String name) {
+			final String name, final String clusterTypeID) {
 
 		super.setName(name);
 
 		this.tvFrame = tvFrame;
 		this.dataModel = (TVModel)tvFrame.getDataModel();
+		this.clusterTypeID = clusterTypeID;
 
 		// Set layout for initial window
 		setupLayout();
@@ -214,10 +220,12 @@ public class ClusterView extends JPanel implements MainPanel {
 	public void setupInteractiveComponents() {
 		
 		// Button to begin Clustering
-		cluster_button = GUIParams.setButtonLayout("Cluster", null);
+		cluster_button = GUIParams.setButtonLayout(StringRes.button_Cluster, 
+				null);
 		
 		// Button to cancel worker thread in the controller
-		cancel_button = GUIParams.setButtonLayout("Cancel", null);
+		cancel_button = GUIParams.setButtonLayout(StringRes.button_Cancel, 
+				null);
 		
 		// Label for cluster process
 		loadLabel = new JLabel();
@@ -227,12 +235,13 @@ public class ClusterView extends JPanel implements MainPanel {
 		pBar = GUIParams.setPBarLayout();
 		
 		// ComboBox to choose cluster method
-		String[] clusterNames = { "Hierarchical Clustering",
-		"K-Means" };
+		String[] clusterNames = { StringRes.menu_title_Hier, 
+				StringRes.menu_title_KMeans };
 		
 		clusterType = GUIParams.setComboLayout(clusterNames);
 		
-		clusterType.setSelectedIndex(0);
+		clusterType.setSelectedIndex(Arrays.asList(clusterNames)
+				.indexOf(clusterTypeID));
 		
 		String[] measurements = { "Do Not Cluster",
 				"Pearson Correlation (uncentered)",

@@ -495,7 +495,8 @@ public class PreferencesMenu {
 					dendroView.getTextview().getHeaderSummary(), tvFrame);
 
 			arrayPanel = new HeaderSummaryPanel(
-					dendroView.getArraynameview().getHeaderInfo(), 
+//					dendroView.getArraynameview().getHeaderInfo(), 
+					tvFrame.getDataModel().getArrayHeaderInfo(),
 					dendroView.getArraynameview().getHeaderSummary(), tvFrame);
 
 //			final HeaderSummaryPanel atrPanel = new HeaderSummaryPanel(

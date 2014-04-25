@@ -13,6 +13,25 @@ public class TreeViewLauncher {
 		try {
 			boolean isApplet = false;
 			
+			if (!isApplet 
+					&& System.getProperty("os.name").contains("Mac")) {
+				// Mac Java 1.3
+//				System.setProperty("com.apple.macos.useScreenMenuBar", 
+//						"true");
+//				System.setProperty("com.apple.mrj.application"
+//						+ ".growbox.intrudes", "true");
+				
+				//only needed for 1.3.1 on OSX 10.2
+//				System.setProperty("com.apple.hwaccel", "true"); 
+				
+				System.setProperty("com.apple.mrj.application"
+						+ ".apple.menu.about.name", "TreeView 3");
+
+				// Mac Java 1.4
+				System.setProperty("apple.laf.useScreenMenuBar", "true");
+				System.setProperty("apple.awt.showGrowBox", "true");
+			}
+			
 			UIManager.setLookAndFeel(UIManager
 					.getCrossPlatformLookAndFeelClassName());
 			
@@ -25,25 +44,6 @@ public class TreeViewLauncher {
 					GUIParams.ELEMENT_HOV);
 			UIManager.put("Menu.font", GUIParams.FONT_MENU);
 			UIManager.put("Menu.background", GUIParams.MENU);
-			
-			if (!isApplet 
-					&& System.getProperty("os.name").startsWith("Mac OS")) {
-				// Mac Java 1.3
-				System.setProperty("com.apple.macos.useScreenMenuBar", 
-						"true");
-				System.setProperty("com.apple.mrj.application"
-						+ ".growbox.intrudes", "true");
-				
-				//only needed for 1.3.1 on OSX 10.2
-				System.setProperty("com.apple.hwaccel", "true"); 
-				
-				System.setProperty("com.apple.mrj.application"
-						+ ".apple.menu.about.name", "TreeView 3");
-
-				// Mac Java 1.4
-				System.setProperty("apple.laf.useScreenMenuBar", "true");
-				System.setProperty("apple.awt.showGrowBox", "true");
-			}
 			
 			javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			

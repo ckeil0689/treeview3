@@ -52,6 +52,7 @@ import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelView;
+import edu.stanford.genetics.treeview.StringRes;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.UrlExtractor;
 
@@ -133,7 +134,7 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 		scrollPane = new JScrollPane(this,
 				JScrollPane.VERTICAL_SCROLLBAR_NEVER,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		scrollPane.setBorder(BorderFactory.createLineBorder(GUIParams.ELEMENT_HOV));
+		scrollPane.setBorder(null);
 		panel = scrollPane;
 	}
 
@@ -277,8 +278,8 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 				// offscreenSize.height / 2 );
 			}
 		} else {
-			l1.setText("Zoom to show");
-			l2.setText("Row Labels");
+			l1.setText(StringRes.label_ZoomRowLabels1);
+			l2.setText(StringRes.label_ZoomRowLabels2);
 		}
 	}
 

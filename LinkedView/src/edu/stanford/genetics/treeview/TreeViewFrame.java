@@ -38,6 +38,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Observable;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.swing.BoxLayout;
@@ -140,6 +141,7 @@ ConfigNodePersistent {
 		super(appName);
 		treeView = treeview;
 		configNode = treeView.getGlobalConfig().node("TreeViewFrame");
+		
 		setWindowActive(true);
 
 		// Set up other stuff
@@ -243,7 +245,6 @@ ConfigNodePersistent {
 	public void resetViews() {
 		
 		welcomeView = null;
-//		confirmPanel = null;
 		dendroView = null;
 	}
 	
@@ -269,7 +270,6 @@ ConfigNodePersistent {
 		
 		backgroundPanel.setBackground(GUIParams.BG_COLOR);
 		backgroundPanel.revalidate();
-		backgroundPanel.repaint();
 	}
 	
 	/**
@@ -515,32 +515,27 @@ ConfigNodePersistent {
 		}
 		
 		// Only for debugging Preferences API
-//		JButton clearButton = GUIParams.setButtonLayout("Clear Configs", null);
+//		JButton clearButton = GUIParams.setButtonLayout("Mac MenuBar Property", 
+//				null);
 //		clearButton.addActionListener(new ActionListener() {
 //
 //			@Override
 //			public void actionPerformed(ActionEvent arg0) {
-//				
+//	
 //				try {
 //					treeView.getGlobalConfig().removeNode();
-//					
 //				} catch (BackingStoreException e) {
+//					// TODO Auto-generated catch block
 //					e.printStackTrace();
 //				}
+//				LogBuffer.println(System.getProperty(
+//						"apple.laf.useScreenMenuBar"));
 //			}
-//			
 //		});
 //		menuPanel.add(clearButton);
 	}
 	
 	public void generateMenuBar() {
-		
-//		stackButton = GUIParams.setMenuButtonLayout("MENU", "stackIcon");
-//		stackButton.setToolTipText("Tools & Analysis Options");
-		
-//		menuPanel.add(stackButton);
-		
-//		stackMenu = new JPopupMenu();
 		
 		stackMenuList = new ArrayList<JMenuItem>();
 		
@@ -603,22 +598,16 @@ ConfigNodePersistent {
 		fileSubMenu.add(saveAsMenuItem);
 		stackMenuList.add(saveAsMenuItem);
 		
-//		stackMenu.add(fileSubMenu);
 		menuBar.add(fileSubMenu);
 
-//		menubar.addSubMenu(TreeviewMenuBarI.mruSubMenu);
 		if(running != null) {
-//			stackMenu.addSeparator();
 			JMenu viewMenu = new JMenu("View");
 			running.addDendroMenus(viewMenu);
-//			stackMenu.add(viewMenu);
 			menuBar.add(viewMenu);
 			
-//			// Cluster Menu
-//			JMenuItem clusterMenuItem = new JMenuItem("Cluster");
-////			stackMenu.add(clusterMenuItem);
-//			fileSubMenu.add(clusterMenuItem);
-//			stackMenuList.add(clusterMenuItem);
+			JMenu clusterMenu = new JMenu("Cluster");
+			running.addClusterMenus(clusterMenu);
+			menuBar.add(clusterMenu);
 			
 			// Functional Enrichment Menu
 //			JMenuItem funcEnrMenuItem = new JMenuItem("Functional Enrichment");
@@ -626,13 +615,11 @@ ConfigNodePersistent {
 //			stackMenuList.add(funcEnrMenuItem);
 		}
 		
-//		stackMenu.addSeparator();
-		
 		// Preferences
 		JMenu prefSubMenu = new JMenu("Preferences");
 		
 		if(running == null) {
-			JMenuItem themeMenuItem = new JMenuItem("Theme");
+			JMenuItem themeMenuItem = new JMenuItem(StringRes.menu_title_Theme);
 			stackMenuList.add(themeMenuItem);
 			prefSubMenu.add(themeMenuItem);
 			
@@ -644,15 +631,15 @@ ConfigNodePersistent {
 			prefSubMenu.add(clearPrefsMenuItem);
 			
 		} else {
-			JMenuItem themeMenuItem = new JMenuItem("Theme");
+			JMenuItem themeMenuItem = new JMenuItem(StringRes.menu_title_Theme);
 			stackMenuList.add(themeMenuItem);
 			prefSubMenu.add(themeMenuItem);
 			
-			JMenuItem fontMenuItem = new JMenuItem("Font");
+			JMenuItem fontMenuItem = new JMenuItem(StringRes.menu_title_Font);
 			stackMenuList.add(fontMenuItem);
 			prefSubMenu.add(fontMenuItem);
 			
-			JMenuItem urlMenuItem = new JMenuItem("URL");
+			JMenuItem urlMenuItem = new JMenuItem(StringRes.menu_title_URL);
 			stackMenuList.add(urlMenuItem);
 			prefSubMenu.add(urlMenuItem);
 			
@@ -664,8 +651,8 @@ ConfigNodePersistent {
 //			prefSubMenu.add(clearPrefsMenuItem);
 		}
 
-//		stackMenu.add(prefSubMenu);
-		menuBar.add(prefSubMenu);
+		fileSubMenu.addSeparator();
+		fileSubMenu.add(prefSubMenu);
 		
 		// Help
 		JMenu helpSubMenu = new JMenu("Help");
@@ -722,7 +709,6 @@ ConfigNodePersistent {
 		helpSubMenu.add(feedbackMenuItem);
 		stackMenuList.add(feedbackMenuItem);
 		
-//		stackMenu.add(helpSubMenu);
 		menuBar.add(helpSubMenu);
 		
 		fileSubMenu.addSeparator();
@@ -731,11 +717,9 @@ ConfigNodePersistent {
 		JMenuItem newWindowMenuItem = new JMenuItem("New Window");
 		stackMenuList.add(newWindowMenuItem);
 		fileSubMenu.add(newWindowMenuItem);
-//		stackMenu.add(newWindowMenuItem);
 		
 		// Quit Program Menu
 		JMenuItem quitMenuItem = new JMenuItem("Quit Program");
-//		stackMenu.add(quitMenuItem);
 		fileSubMenu.add(quitMenuItem);
 		stackMenuList.add(quitMenuItem);
 	}

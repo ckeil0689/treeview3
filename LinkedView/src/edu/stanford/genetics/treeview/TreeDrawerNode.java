@@ -45,6 +45,49 @@ public class TreeDrawerNode {
 	private TreeDrawerNode right = null;
 	private String id = null;
 	private Color color = GUIParams.TEXT;
+	
+	/**
+	 * Constructor for leaves.
+	 * 
+	 * @param i
+	 * @param correlation
+	 * @param index
+	 */
+	public TreeDrawerNode(final String i, final double correlation,
+			final double index) {
+
+		id = i;
+		corr = correlation;
+		ind = index;
+		minInd = index;
+		maxInd = index;
+	}
+
+	/**
+	 * Constructor for internal nodes.
+	 * 
+	 * @param i
+	 * @param correlation
+	 * @param l
+	 * @param r
+	 */
+	public TreeDrawerNode(final String i, final double correlation,
+			final TreeDrawerNode l, final TreeDrawerNode r) {
+
+		id = i;
+		corr = correlation;
+		right = r;
+		left = l;
+
+		ind = (right.getIndex() + left.getIndex()) / 2;
+		minInd = Math.min(right.getMinIndex(), left.getMinIndex());
+		maxInd = Math.max(right.getMaxIndex(), left.getMaxIndex());
+
+		if (minInd > maxInd) {
+			throw new RuntimeException(
+					"min was less than max! this should not happen.");
+		}
+	}
 
 	/**
 	 * returns maximum correlation value (really branch height) for this subtree
@@ -155,49 +198,6 @@ public class TreeDrawerNode {
 		return dx * dx + dy * dy;
 	}
 
-	/**
-	 * Constructor for leaves.
-	 * 
-	 * @param i
-	 * @param correlation
-	 * @param index
-	 */
-	public TreeDrawerNode(final String i, final double correlation,
-			final double index) {
-
-		id = i;
-		corr = correlation;
-		ind = index;
-		minInd = index;
-		maxInd = index;
-	}
-
-	/**
-	 * Constructor for internal nodes.
-	 * 
-	 * @param i
-	 * @param correlation
-	 * @param l
-	 * @param r
-	 */
-	public TreeDrawerNode(final String i, final double correlation,
-			final TreeDrawerNode l, final TreeDrawerNode r) {
-
-		id = i;
-		corr = correlation;
-		right = r;
-		left = l;
-
-		ind = (right.getIndex() + left.getIndex()) / 2;
-		minInd = Math.min(right.getMinIndex(), left.getMinIndex());
-		maxInd = Math.max(right.getMaxIndex(), left.getMaxIndex());
-
-		if (minInd > maxInd) {
-			throw new RuntimeException(
-					"min was less than max! this should not happen.");
-		}
-	}
-
 	// Accessors
 	/**
 	 * @return index of node, i.e. where to draw node across width of tree
@@ -254,7 +254,7 @@ public class TreeDrawerNode {
 	public TreeDrawerNode getLeftLeaf() {
 
 		TreeDrawerNode cand = this;
-		while (cand.isLeaf() == false) {
+		while (!cand.isLeaf()) {
 			cand = cand.getLeft();
 		}
 
@@ -264,7 +264,7 @@ public class TreeDrawerNode {
 	public TreeDrawerNode getRightLeaf() {
 
 		TreeDrawerNode cand = this;
-		while (cand.isLeaf() == false) {
+		while (!cand.isLeaf()) {
 			cand = cand.getRight();
 		}
 

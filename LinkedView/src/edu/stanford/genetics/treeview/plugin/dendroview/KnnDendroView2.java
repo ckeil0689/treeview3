@@ -104,7 +104,7 @@ public class KnnDendroView2 extends DendroView2 implements
 		gtrview.setMap(globalYmap);
 		gtrview.setLeftTreeDrawer(leftTreeDrawer);
 
-		invertedTreeDrawer = new InvertedTreeDrawer();
+		invertedTreeDrawer = new TreePainter();
 		atrview = new ATRView();
 
 

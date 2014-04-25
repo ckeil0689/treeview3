@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 import edu.stanford.genetics.treeview.DataModel;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.model.TVModel;
 
 /**
@@ -20,7 +21,7 @@ import edu.stanford.genetics.treeview.model.TVModel;
 public class HierClusterArrays {
 
 	// Instance variables
-	private final double PRECISION_LEVEL = 0.001;
+	private final double PRECISION_LEVEL = 0.00001;
 	private final TVModel model;
 	private final ClusterView clusterView;
 	private String filePath;
@@ -199,7 +200,7 @@ public class HierClusterArrays {
 					colMinIndexList[j] = findValue(last, last[last.length - 1]);
 				}
 			}
-
+			
 			// finds the row (gene) which has the smallest value
 			double[] geneMinListCopy = geneMinList.clone();
 			Arrays.sort(geneMinListCopy);
@@ -483,6 +484,10 @@ public class HierClusterArrays {
 	 */
 	public int findValue(double[] array, double value) {
 	    
+		if(loopN == 82) {
+			LogBuffer.println("LoopN: " + loopN);
+		}
+		
 		for(int i = 0; i < array.length; i++) {
 			
 			if(Math.abs(array[i] - value) < PRECISION_LEVEL) {

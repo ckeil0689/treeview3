@@ -38,6 +38,7 @@ import java.util.Observable;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
@@ -50,7 +51,9 @@ import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.RotateImageFilter;
+import edu.stanford.genetics.treeview.StringRes;
 import edu.stanford.genetics.treeview.TreeSelectionI;
+import edu.stanford.genetics.treeview.UrlExtractor;
 
 /**
  * Renders the names of the arrays.
@@ -83,7 +86,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 	private int maxlength = 0;
 	private boolean backBufferValid = false;
 	private Preferences configNode = null;
-//	private UrlExtractor urlExtractor = null;
+	private UrlExtractor urlExtractor = null;
 	private TreeSelectionI arraySelection;
 	private TreeSelectionI geneSelection;
 
@@ -100,14 +103,16 @@ public class ArrayNameView extends ModelView implements MouseListener,
 	 * @param hInfo
 	 *            Header containing array names as first row.
 	 */
-	public ArrayNameView(final HeaderInfo hInfo) {
+	public ArrayNameView(final HeaderInfo hInfo, 
+			final UrlExtractor uExtractor) {
 
 		super();
 		this.setLayout(new MigLayout());
 
-		headerInfo = hInfo;
+		this.headerInfo = hInfo;
+		this.urlExtractor = uExtractor;
 		
-		headerSummary = new HeaderSummary("ArraySummary");
+		this.headerSummary = new HeaderSummary("ArraySummary");
 		headerSummary.setIncluded(new int[] { 0 });
 		headerSummary.addObserver(this);
 
@@ -395,7 +400,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 				}
 			}
 		} else {
-			l1.setText("Zoom to show Column Labels");
+			l1.setText(StringRes.label_ZoomColLabels);
 		}
 		// end of if
 	}
@@ -641,46 +646,6 @@ public class ArrayNameView extends ModelView implements MouseListener,
 
 		return headerSummary;
 	}
-
-//	/* inherit description */
-//	@Override
-//	public void bindConfig(final Preferences configNode) {
-//
-//		root = configNode;
-//		
-//		try {
-//			String[] childrenNodes = root.childrenNames();
-//			boolean nodePresent = false;
-//			for(int i = 0; i < childrenNodes.length; i++) {
-//				
-//				// Actually looking for children nodes...
-//				if(childrenNodes[i].equalsIgnoreCase("ArraySummary")) {
-//					nodePresent = true;
-//				}
-//			}
-//			
-////			if (configNode.fetchFirst("ArraySummary") == null) {
-//			if (!nodePresent) {
-//				getHeaderSummary().bindConfig(configNode.node("ArraySummary"));
-//				getHeaderSummary().setIncluded(new int[] { 0 });
-//
-//			} else {
-//				// Actually get first subNode here...
-//				getHeaderSummary()
-//					.bindConfig(configNode.node("ArraySummary"));
-////						.bindConfig(configNode.fetchFirst("ArraySummary"));
-//			}
-//
-//			setFace(root.get("face", d_face));
-//			setStyle(root.getInt("style", d_style));
-//			setPoints(root.getInt("size", d_size));
-//			
-//		} catch (BackingStoreException e) {
-//			e.printStackTrace();
-//			LogBuffer.println("Error in ArrayNameView/bindConfig()" 
-//					+ e.getMessage());
-//		}
-//	}
 	
 	/* inherit description */
 	@Override
