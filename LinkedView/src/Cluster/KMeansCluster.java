@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+
+import javax.swing.SwingWorker;
+
 import edu.stanford.genetics.treeview.model.TVModel;
 
 public class KMeansCluster {
@@ -31,6 +34,8 @@ public class KMeansCluster {
 
 	// list to return ordered GENE numbers for .cdt creation
 	private String[] reorderedList;
+	
+	private SwingWorker<Void, Void> worker;
 
 	/**
 	 * Main constructor
@@ -43,7 +48,7 @@ public class KMeansCluster {
 	 */
 	public KMeansCluster(final TVModel model, final ClusterView clusterView,
 		 double[][] dMatrix, final String type, int clusterN, 
-			int iterations) {
+			int iterations, final SwingWorker<Void, Void> worker) {
 
 		this.model = model;
 		this.clusterView = clusterView;
@@ -51,6 +56,7 @@ public class KMeansCluster {
 		this.type = type;
 		this.clusterN = clusterN;
 		this.iterations = iterations;
+		this.worker = worker;
 	}
 
 	// method for clustering the distance matrix
@@ -86,6 +92,10 @@ public class KMeansCluster {
 		// distance means to clusters
 		for (int i = 0; i < iterations; i++) {
 
+			if(worker.isCancelled()) {
+				break;
+			}
+			
 			findNewMeans(clusterMeans);
 
 			clusters = assignMeansVals(elementMeanList);

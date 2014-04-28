@@ -146,16 +146,10 @@ public class TVFrameController {
 		}
 
 		@Override
-		public void mousePressed(MouseEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
+		public void mousePressed(MouseEvent e) {}
 
 		@Override
-		public void mouseReleased(MouseEvent arg0) {
-			// TODO Auto-generated method stub
-			
-		}
+		public void mouseReleased(MouseEvent arg0) {}
 	}
 	
 	class StackMenuListener implements ActionListener {
@@ -202,31 +196,29 @@ public class TVFrameController {
 	 * selected by the user. This prevents the GUI from locking up and allows
 	 * the ProgressBar to display progress.
 	 */
-	public void setupWorkerThread() {
-		
-		worker = new SwingWorker<Void, Void>() {
+	private class LoadWorker extends SwingWorker<Void, Void> {
 
-			@Override
-			public Void doInBackground() {
-				
-				FileSet fileSet = null;
-				
-				if(fileMenuSet == null) {
-					fileSet = tvFrame.getFileSet(file);
-					
-				} else {
-					fileSet = fileMenuSet;
-				}
+		@Override
+		public Void doInBackground() {
 			
-				// Loading TVModel
-				loadFileSet(fileSet);
+			FileSet fileSet = null;
+			
+			if(fileMenuSet == null) {
+				fileSet = tvFrame.getFileSet(file);
 				
-				if(fileSet != null) {
-					fileSet = tvFrame.getFileMRU().addUnique(fileSet);
-					tvFrame.getFileMRU().setLast(fileSet);
-					
-				} else {
-					System.out.println("FileSet is null.");
+			} else {
+				fileSet = fileMenuSet;
+			}
+		
+			// Loading TVModel
+			loadFileSet(fileSet);
+			
+			if(fileSet != null) {
+				fileSet = tvFrame.getFileMRU().addUnique(fileSet);
+				tvFrame.getFileMRU().setLast(fileSet);
+				
+			} else {
+				System.out.println("FileSet is null.");
 				}
 					
 				return null;
@@ -246,7 +238,6 @@ public class TVFrameController {
 				
 				setViewChoice();
 			}
-		};
 	}
 	
 	/**
@@ -258,7 +249,7 @@ public class TVFrameController {
 	 */
 	public void openFile() {
 	
-		setupWorkerThread();
+		worker = new LoadWorker();
 		
 		try {
 			file = tvFrame.selectFile();
@@ -269,7 +260,7 @@ public class TVFrameController {
 			}
 			
 		} catch (LoadException e) {
-			System.out.println("Loading the FileSet was interrupted. " +
+			LogBuffer.println("Loading the FileSet was interrupted. " +
 					"Cause: " + e.getCause());
 			e.printStackTrace();
 		}
@@ -641,7 +632,7 @@ public class TVFrameController {
 
 			fileMenuSet = tvFrame.getFileMenuSet();
 			
-			setupWorkerThread();
+			worker = new LoadWorker();
 			tvFrame.setView("LoadProgressView");
 			worker.execute();
 

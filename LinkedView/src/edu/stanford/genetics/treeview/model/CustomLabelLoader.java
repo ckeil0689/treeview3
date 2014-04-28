@@ -13,6 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.stanford.genetics.treeview.LoadException;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 
 public class CustomLabelLoader {
@@ -111,12 +112,12 @@ public class CustomLabelLoader {
 				Matcher matcher = pattern.matcher(yorf);
 				
 				if (!(matcher.find() || yorf.equalsIgnoreCase(""))) {
-					System.out.println("Label: " + yorf);
+					LogBuffer.println("Label: " + yorf);
 					newNames[j] = yorf;
 					namesFound = true;
 				    
 				} else {
-					System.out.println(matcher.group(0));
+					LogBuffer.println(matcher.group(0));
 				}
 			}
 		}

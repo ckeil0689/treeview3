@@ -3,6 +3,8 @@ package Cluster;
 import java.math.BigDecimal;
 import java.util.Arrays;
 
+import javax.swing.SwingWorker;
+
 /**
  * This class is used to calculate a distance matrix based on input data. It
  * contains several different methods and will return a matrix of distances
@@ -23,16 +25,19 @@ public class DMCalculatorArrays {
 	private final ClusterView clusterView;
 	private final String choice;
 	private final String type;
+	
+	private SwingWorker<Void, Void> worker;
 
 	// Constructor
 	public DMCalculatorArrays(final double[][] fullList,
 			final String choice, final String type,
-			final ClusterView clusterView) {
+			final ClusterView clusterView, SwingWorker<Void, Void> worker) {
 
 		this.dataArrays = fullList;
 		this.choice = choice;
 		this.clusterView = clusterView;
 		this.type = type;
+		this.worker = worker;
 	}
 
 	// Methods to calculate distance matrix
@@ -59,6 +64,10 @@ public class DMCalculatorArrays {
 
 		// take a gene
 		for (int i = 0; i < dataArrays.length; i++) {
+			
+			if(worker.isCancelled()) {
+				break;
+			}
 
 			// update progressbar
 			clusterView.updatePBar(i);
@@ -166,6 +175,10 @@ public class DMCalculatorArrays {
 
 		for (int i = 0; i < dataArrays.length; i++) {
 			
+			if(worker.isCancelled()) {
+				break;
+			}
+			
 			clusterView.updatePBar(i);
 
 			// Make a copy row to avoid mutation
@@ -215,6 +228,10 @@ public class DMCalculatorArrays {
 
 		// take a gene
 		for (int i = 0; i < dataArrays.length; i++) {
+			
+			if(worker.isCancelled()) {
+				break;
+			}
 
 			// update progressbar
 			clusterView.updatePBar(i);
@@ -280,6 +297,10 @@ public class DMCalculatorArrays {
 
 		// take a gene
 		for (int i = 0; i < dataArrays.length; i++) {
+			
+			if(worker.isCancelled()) {
+				break;
+			}
 			
 			// update progressbar
 			clusterView.updatePBar(i);

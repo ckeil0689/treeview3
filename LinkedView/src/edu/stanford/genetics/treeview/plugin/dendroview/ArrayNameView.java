@@ -40,6 +40,7 @@ import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 
 import net.miginfocom.swing.MigLayout;
@@ -122,12 +123,13 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		l1.setFont(GUIParams.FONTS);
 		l1.setForeground(GUIParams.TEXT);
 		
-		add(l1, "alignx 50%, aligny 50%, push");
+		add(l1, "alignx 50%, aligny 100%, push");
 		
 		scrollPane = new JScrollPane(this, 
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBorder(null);
+		
 		panel = scrollPane;
 	}
 

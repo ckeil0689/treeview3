@@ -64,6 +64,8 @@ public class StringRes {
 	// Labels
 	public static final String label_ZoomColLabels = "Zoom to See Column " +
 			"Labels";
-	public static final String label_ZoomRowLabels1 = "Zoom to See";
-	public static final String label_ZoomRowLabels2 = "Row Labels";
+	public static final String label_ZoomRowLabels = "Zoom to See Row Labels";
+	
+	// Cluster Options
+	public static final String cluster_DoNot = "Do Not Cluster";
 }

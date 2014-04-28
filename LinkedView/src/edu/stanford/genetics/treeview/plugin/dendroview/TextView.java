@@ -86,7 +86,6 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 
 	private final JScrollPane scrollPane;
 	private final JLabel l1;
-	private final JLabel l2;
 
 	/**
 	 * should really take a HeaderSummary instead of HeaderInfo, since the
@@ -124,12 +123,7 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 		l1 = new JLabel();
 		l1.setFont(GUIParams.FONTS);
 		l1.setForeground(GUIParams.TEXT);
-		add(l1, "alignx 50%, aligny 100%, push, wrap");
-		
-		l2 = new JLabel();
-		l2.setFont(GUIParams.FONTS);
-		l2.setForeground(GUIParams.TEXT);
-		add(l2, "alignx 50%, aligny 0%, push");
+		add(l1, "alignx 0%, aligny 50%, push, wrap");
 
 		scrollPane = new JScrollPane(this,
 				JScrollPane.VERTICAL_SCROLLBAR_NEVER,
@@ -186,7 +180,6 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 		if (map.getScale() > 12.0) {
 
 			l1.setText("");
-			l2.setText("");
 
 			if ((map.getMinIndex() >= 0) && (offscreenSize.height > 0)) {
 
@@ -278,8 +271,7 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 				// offscreenSize.height / 2 );
 			}
 		} else {
-			l1.setText(StringRes.label_ZoomRowLabels1);
-			l2.setText(StringRes.label_ZoomRowLabels2);
+			l1.setText(StringRes.label_ZoomRowLabels);
 		}
 	}
 

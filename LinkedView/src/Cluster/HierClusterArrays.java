@@ -4,8 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+
+import javax.swing.SwingWorker;
 
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -21,16 +22,15 @@ import edu.stanford.genetics.treeview.model.TVModel;
 public class HierClusterArrays {
 
 	// Instance variables
-	private final double PRECISION_LEVEL = 0.00001;
+	private final double PRECISION_LEVEL = 0.0000000001;
 	private final TVModel model;
 	private final ClusterView clusterView;
 	private String filePath;
 	private final String type;
 	private int wholeMSize;
 	private int loopN;
-
-	// Distance Matrix
-	//private List<List<Double>> dMatrix = new ArrayList<List<Double>>();
+	
+	private SwingWorker<Void, Void> worker;
 
 	// Half of the Distance Matrix (symmetry)
 	private double[][] halfDMatrix;
@@ -61,14 +61,16 @@ public class HierClusterArrays {
 	 * @param type
 	 * @param method
 	 */
-	public HierClusterArrays(final DataModel model, final ClusterView clusterView, 
-			final double[][] dMatrix, final String type) {
+	public HierClusterArrays(final DataModel model, 
+			final ClusterView clusterView, final double[][] dMatrix, 
+			final String type, final SwingWorker<Void, Void> worker) {
 
 		this.model = (TVModel) model;
 		this.clusterView = clusterView;
 		this.halfDMatrix = dMatrix;
 		this.type = type;
 		this.wholeMSize = dMatrix.length;
+		this.worker = worker;
 	}
 
 	// method for clustering the distance matrix
@@ -136,8 +138,7 @@ public class HierClusterArrays {
 		// which means that there is only 1 cluster
 		// initially every gene is its own cluster
 		int finalClusterN = 1;
-		double time = System.currentTimeMillis();
-		while (halfDMatrix.length > finalClusterN) {
+		while (halfDMatrix.length > finalClusterN && !worker.isCancelled()) {
 			
 			loopN = wholeMSize - halfDMatrix.length;
 			
@@ -293,7 +294,7 @@ public class HierClusterArrays {
 				geneGroups.add(newVals);
 			
 			} else {
-				System.out.println("Problem adding fusedGroup to geneGroups.");
+				LogBuffer.println("Problem adding fusedGroup to geneGroups.");
 			} 
 			
 			// Update the distance matrix 
@@ -349,13 +350,17 @@ public class HierClusterArrays {
 				}
 				
 			} else {
-				System.out.println("Weird error. Neither "
+				LogBuffer.println("Weird error. Neither "
 						+ "rowGroup nor colGroup have a minimum.");
 			}
 		}
 		
-		time = System.currentTimeMillis() - time;
-		System.out.println("Total Cluster Arrays:" + time);
+		if(worker.isCancelled()) {
+			LogBuffer.println("Thread has been cancelled.");
+			
+		} else {
+			LogBuffer.println("Thread finished without cancelling.");
+		}
 		
 		bufferedWriter.closeWriter();
 		reorderGen(geneGroups.get(0));
@@ -483,10 +488,6 @@ public class HierClusterArrays {
 	 * @return
 	 */
 	public int findValue(double[] array, double value) {
-	    
-		if(loopN == 82) {
-			LogBuffer.println("LoopN: " + loopN);
-		}
 		
 		for(int i = 0; i < array.length; i++) {
 			
@@ -568,11 +569,6 @@ public class HierClusterArrays {
 
 			final double[] oldList = distanceMatrix[i];
 			final double[] newList = new double[oldList.length];
-
-//			for (int j = 0; j < oldList.length; j++) {
-//				
-//				newList[j] = oldList[j];
-//			}
 			
 			System.arraycopy(oldList, 0, newList, 0, oldList.length);
 			
@@ -625,47 +621,17 @@ public class HierClusterArrays {
 	public double findRowMin(final double[] gene) {
 
 		double geneMin = -1.0;
-
-//		// standard collection copy constructor to make deep copy to protect
-//		// gene
-//		final double[] deepGene = gene.clone();
-//		
-//		Arrays.sort(deepGene);
-//		
-//		int minIndex = 0;
-//
-//		for (int i = 0; i < deepGene.length; i++) {
-//			
-//			final double min = deepGene[minIndex];
-//
-//			if (!checkForUsedMin(min)) {
-//				geneMin = min;
-//				break;
-//
-//			} else {
-//				minIndex++;
-//			}
-//		}
-
-		// standard collection copy constructor to make deep copy to protect
-		// gene
-		final List<Double> deepGene = new ArrayList<Double>();
 		
-		for(double element : gene) {
-			
-			deepGene.add(element);
-		}
+		final double[] deepGene = gene.clone();
+		Arrays.sort(deepGene);
+		
+		for (int i = 0; i < deepGene.length; i++) {
 
-		for (int i = 0; i < deepGene.size(); i++) {
-
-			final double min = Collections.min(deepGene);
+			final double min = deepGene[i];
 
 			if (!checkForUsedMin(min)) {
 				geneMin = min;
 				break;
-
-			} else {
-				deepGene.remove(deepGene.indexOf(min));
 			}
 		}
 

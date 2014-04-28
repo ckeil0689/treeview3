@@ -2,6 +2,9 @@ package Cluster;
 
 import java.util.concurrent.ExecutionException;
 
+import javax.swing.SwingWorker;
+
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 
@@ -16,18 +19,9 @@ import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
  */
 public class ClusterProcessorArrays {
 
-	// View
 	private final ClusterView clusterView;
-	
-	// Model
 	private final TVModel tvModel;
-	
-	// Lists
-	private double[][] rowDistances;
-	private double[][] colDistances;
-
-	private String[] orderedRows;
-	private String[] orderedCols;
+	private SwingWorker<Void, Void> worker;
 	
 	/**
 	 * Main constructor
@@ -35,49 +29,30 @@ public class ClusterProcessorArrays {
 	 * @param model
 	 */
 	public ClusterProcessorArrays(final ClusterView cView, 
-			final TVModel model) {
+			final TVModel model, SwingWorker<Void, Void> worker) {
 		
 		this.clusterView = cView;
 		this.tvModel = model;
+		this.worker = worker;
 	}
-
+	
 	/**
-	 * Main method to iterate through the various processes of clustering which
-	 * are done by other classes.
-	 * 
-	 * Returns the filePath of the newly clustered file.
-	 * 
-	 * @param similarityM
-	 * @throws InterruptedException
-	 * @throws ExecutionException
+	 * Function to generate a cdt-file that represents a clustered data set.
+	 * The file is generated from the clustering results and subsequently
+	 * stored into the same directory as the original file, together with
+	 * ATR and GTR files for the dendrograms. 
+	 * @param hierarchical
+	 * @return
 	 */
-	public String cluster(final boolean hierarchical) {
+	public String saveCDT(boolean hierarchical, String[] orderedRows, 
+			String[] orderedCols) {
 		
-		// Get the data for clustering
-		final double[][] dataArrays = ((TVDataMatrix) tvModel.getDataMatrix())
-				.getExprData();
-		
-		// Getting user choices from the View
-		final String choice = clusterView.getRowSimilarity();
-		final String choice2 = clusterView.getColSimilarity();
-		
-		// if user checked clustering for elements
-		if (!choice.contentEquals("Do Not Cluster")) {
-			
-			clusterRows(dataArrays, hierarchical);
-		}
-
-		// if user checked clustering for arrays
-		if (!choice2.contentEquals("Do Not Cluster")) {
-			
-			double[][] sepCols = formatColData(dataArrays);
-			
-			clusterCols(sepCols, hierarchical);
-		}
-
 		// also takes list of row elements because only one list can easily
 		// be consistently transformed and fed into file writer
 		// to make a tab-delimited file
+		final double[][] dataArrays = ((TVDataMatrix) tvModel.getDataMatrix())
+				.getExprData();
+		
 		final CDTGeneratorArrays cdtGen = new CDTGeneratorArrays(tvModel, 
 				clusterView, dataArrays, orderedRows, orderedCols, 
 				hierarchical);
@@ -99,7 +74,7 @@ public class ClusterProcessorArrays {
 			 final String type) {
 
 		final HierClusterArrays cGen = new HierClusterArrays(tvModel, 
-				clusterView, distanceMatrix, type);
+				clusterView, distanceMatrix, type, worker);
 
 		cGen.cluster();
 
@@ -120,7 +95,7 @@ public class ClusterProcessorArrays {
 			final String type, final int clusterN, final int iterations) {
 
 		final KMeansCluster cGen = new KMeansCluster(tvModel, clusterView, 
-				distances, type, clusterN, iterations);
+				distances, type, clusterN, iterations, worker);
 
 		cGen.cluster();
 
@@ -146,59 +121,32 @@ public class ClusterProcessorArrays {
 	}
 	
 	/**
-	 * Clusters the row data based on user input.
-	 * @param sepRows
+	 * Calculates the distance matrix according to the chosen method.
+	 * @param choice
+	 * @return
 	 */
-	public void clusterRows(double[][] dataArrays, boolean hierarchical) {
+	public double[][] calculateDistance(String choice, String type) {
 		
-		final String choice = clusterView.getRowSimilarity();
-		final String rowString = "GENE";
-		
-		final DMCalculatorArrays dCalc = 
-				new DMCalculatorArrays(dataArrays, choice, "Row", clusterView);
-
-		dCalc.measureDistance();
-
-		rowDistances = dCalc.getDistanceMatrix();
-				
-		if (hierarchical) {
-			orderedRows = hCluster(rowDistances, rowString);
-
-		} else {
-			Integer[] spinnerInput = clusterView.getSpinnerValues();
+		double[][] data = null;
+		if(type.equalsIgnoreCase("Row")) {
+			data = ((TVDataMatrix) tvModel.getDataMatrix())
+					.getExprData();
 			
-			orderedRows = kmCluster(rowDistances, rowString, spinnerInput[0], 
-					spinnerInput[1]);
-		}
-
-		clusterView.refresh();
-	}
-	
-	/**
-	 * Clusters the column data based on user input.
-	 * @param sepRows
-	 */
-	public void clusterCols(double[][] sepCols, boolean hierarchical) {
-		
-		final String choice2 = clusterView.getColSimilarity();
-		final String colString = "ARRY";
-		
-		final DMCalculatorArrays dCalc = 
-				new DMCalculatorArrays(sepCols, choice2, "Column", clusterView);
-
-		dCalc.measureDistance();
-
-		colDistances = dCalc.getDistanceMatrix();
-		
-		if (hierarchical) {
-			orderedCols = hCluster(colDistances, colString);
-
 		} else {
-			Integer[] spinnerInput = clusterView.getSpinnerValues();
-			orderedCols = kmCluster(colDistances, colString, spinnerInput[2], 
-					spinnerInput[3]);
+			data = formatColData(((TVDataMatrix)tvModel.getDataMatrix())
+					.getExprData());
 		}
-
-		clusterView.refresh();
+		
+		if(data != null) {
+			final DMCalculatorArrays dCalc = new DMCalculatorArrays(data, 
+					choice, type, clusterView, worker);
+	
+			dCalc.measureDistance();
+			return dCalc.getDistanceMatrix();
+			
+		} else {
+			LogBuffer.println(type + " Data was not extracted.");
+			return null;
+		}
 	}
 }

@@ -12,6 +12,8 @@ import Cluster.ClusterProcessorArrays;
 import Cluster.ClusterView;
 
 import edu.stanford.genetics.treeview.FileSet;
+import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.StringRes;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.model.TVModel;
 
@@ -29,9 +31,9 @@ public class ClusterViewController {
 	private TreeViewFrame tvFrame;
 	private TVFrameController controller;
 	private ClusterView clusterView;
-	
-	private SwingWorker<Void, Void> clusterWorker;
+
 	private SwingWorker<Void, Void> loadWorker;
+	private SwingWorker<Void, Void> clusterWorker;
 	
 	private String finalFilePath;
 	private FileSet fileSet;
@@ -44,8 +46,6 @@ public class ClusterViewController {
 		this.tvModel = controller.getTVControllerModel();
 		this.clusterView = view;
 		
-		setupWorkerThread();
-		
 		// Add listeners after creating them
 		clusterView.addClusterListener(new ClusterListener());
 		clusterView.addClusterMenuListener(new ClusterMenuSetupListener());
@@ -56,64 +56,107 @@ public class ClusterViewController {
 	 * Sets up the worker thread to start calculations without 
 	 * affecting the GUI.
 	 */
-	public void setupWorkerThread() {
-		
-		clusterWorker = new SwingWorker<Void, Void>() {
+	private class MyClusterWorker extends SwingWorker<Void, Void> {
 
-			@Override
-			public Void doInBackground() {
+		@Override
+		public Void doInBackground() {
 				
-				// Setup a ClusterProcessor
-				// final ClusterProcessor clusterTarget = 
-				// new ClusterProcessor(clusterView, tvModel);
-					
-				final ClusterProcessorArrays clusterTarget = 
-						new ClusterProcessorArrays(clusterView, tvModel);
-				
-				// Begin the actual clustering, hierarchical or kmeans
-				finalFilePath = clusterTarget.cluster(
-						isHierarchical());
-				
-				clusterView.refresh();
-				
-				return null;	
-			}
-
-			@Override
-			protected void done() {
-
-//				clusterView.displayCompleted(finalFilePath);
-				visualizeData();
-			}
-		};
-	}
-	
-	public void setupLoadWorkerThread() {
-		
-		loadWorker = new SwingWorker<Void, Void>() {
-
-			@Override
-			protected Void doInBackground() throws Exception {
-				
-				controller.loadFileSet(fileSet);
-				return null;
-			}
+			final ClusterProcessorArrays clusterTarget = 
+					new ClusterProcessorArrays(clusterView, tvModel, this);
 			
-			@Override
-			protected void done() {
+			String choice = clusterView.getRowSimilarity();
+			String choice2 = clusterView.getColSimilarity();
+			
+			String[] orderedRows = null;
+			String[] orderedCols = null;
+			
+			if(!choice.equalsIgnoreCase(StringRes.cluster_DoNot)) {
+				final String rowString = "GENE";
+				double[][] rowDistances = clusterTarget
+						.calculateDistance(choice, "Row");
 				
-				if(controller.getTVControllerModel().
-						getDataMatrix().getNumRow() > 0) {
-					controller.setDataModel();
-					controller.setViewChoice();
-					
-				} else {
-					System.out.println("No datamatrix set by worker thread.");
-					tvFrame.setView("WelcomeView");
-					controller.addViewListeners();
+				if(!isCancelled()) {
+					if (isHierarchical()) {
+						orderedRows = clusterTarget.hCluster(rowDistances, 
+								rowString);
+	
+					} else {
+						Integer[] spinnerInput = clusterView.getSpinnerValues();
+						
+						orderedRows = clusterTarget.kmCluster(rowDistances, 
+								rowString, spinnerInput[0], spinnerInput[1]);
+					}
 				}
 			}
-		};
+			
+			if(!choice2.equalsIgnoreCase(StringRes.cluster_DoNot)) {
+				final String colString = "ARRY";
+				double[][] rowDistances = clusterTarget
+						.calculateDistance(choice2, "Column");
+				
+				if(!isCancelled()) {
+					if (isHierarchical()) {
+						orderedCols = clusterTarget.hCluster(rowDistances, 
+								colString);
+	
+					} else {
+						Integer[] spinnerInput = clusterView.getSpinnerValues();
+						
+						orderedCols = clusterTarget.kmCluster(rowDistances, 
+								colString, spinnerInput[0], spinnerInput[1]);
+					}
+				}
+			}
+			
+			if(!isCancelled()) {
+				finalFilePath = clusterTarget.saveCDT(isHierarchical(), 
+						orderedRows, orderedCols);
+			}
+			
+			return null;	
+		}
+
+		@Override
+		protected void done() {
+
+			if(!isCancelled()) {
+				visualizeData();
+				
+			} else {
+				clusterView.cancel();
+				LogBuffer.println("Clustering has been cancelled.");
+			}
+		}
+	}
+	
+	/**
+	 * Worker thread to load data chosen by the user. If the loading is 
+	 * successful, it sets the dataModel in the TVFrameController and loads
+	 * the DendroView.
+	 */
+	private class LoadWorker extends SwingWorker<Void,Void> {
+
+		@Override
+		protected Void doInBackground() throws Exception {
+			
+			controller.loadFileSet(fileSet);
+			return null;
+		}
+		
+		@Override
+		protected void done() {
+			
+			if(controller.getTVControllerModel().
+					getDataMatrix().getNumRow() > 0) {
+				controller.setDataModel();
+				controller.setViewChoice();
+				
+			} else {
+				LogBuffer.println("No datamatrix set by worker thread.");
+				tvFrame.setView("WelcomeView");
+				controller.addViewListeners();
+			}
+		}
 	}
 	
 	// Define Listeners as inner classes
@@ -139,6 +182,7 @@ public class ClusterViewController {
 						linkageMethod);
 				
 				// Start the worker
+				clusterWorker = new MyClusterWorker();
 				clusterWorker.execute();
 				
 			} else {
@@ -208,7 +252,7 @@ public class ClusterViewController {
 					+ File.separator);
 
 			tvFrame.setView("LoadProgressView");
-			setupLoadWorkerThread();
+			loadWorker = new LoadWorker();
 			loadWorker.execute();
 			
 			topFrame.dispose();
@@ -230,7 +274,7 @@ public class ClusterViewController {
 		public void actionPerformed(ActionEvent e) {
 			
 			clusterWorker.cancel(true);
-			clusterView.cancel();
+			clusterWorker = null;
 		}
 	}
 	
@@ -243,7 +287,7 @@ public class ClusterViewController {
 
 		boolean hierarchical = false;
 		final String choice = clusterView.getClusterMethod();
-		hierarchical = choice.equalsIgnoreCase("Hierarchical Clustering");
+		hierarchical = choice.equalsIgnoreCase(StringRes.menu_title_Hier);
 		return hierarchical;
 	}
 }
