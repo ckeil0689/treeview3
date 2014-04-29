@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Observable;
 import java.util.concurrent.ExecutionException;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
@@ -55,7 +56,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.TreeColorer;
 
 public class DendroController implements ConfigNodePersistent {
 
-	private final double PRECISION_LEVEL = 0.0001;
+	private final double PRECISION_LEVEL = 0.000001;
 	private DendroView2 dendroView;
 	private TreeViewFrame tvFrame;
 	private TVModel tvModel;
@@ -96,6 +97,7 @@ public class DendroController implements ConfigNodePersistent {
 		setTreesVis(configNode.getBoolean("treesVisible", false));
 		
 		dendroView.setupLayout();
+		setSavedScale();
 		
 		// add listeners
 		addViewListeners();
@@ -176,6 +178,7 @@ public class DendroController implements ConfigNodePersistent {
 			
 			this. event = e;
 		}
+		
 		@Override
 		protected Void doInBackground() throws Exception {
 			
@@ -185,9 +188,9 @@ public class DendroController implements ConfigNodePersistent {
 				int height = ((JButton)event.getSource()).getHeight();
 				
 				window.setLocation(location.x, location.y + (2 * height));
-				window.pack();
-				
+				window.pack();	
 			}
+			
 			return null;
 		}
 		
@@ -271,14 +274,16 @@ public class DendroController implements ConfigNodePersistent {
 			
 			dendroView.setupLayout();
 			addViewListeners();
+//			resetMapContainers();
 			return null;
 		}
 		
 		@Override
 		protected void done() {
 			
-			dendroView.refresh();
-			resetMapContainers();
+			globalXmap.calculateNewMinScale();
+			globalYmap.calculateNewMinScale();
+			setSavedScale();
 		}
 	}
 	
@@ -386,7 +391,47 @@ public class DendroController implements ConfigNodePersistent {
 				- getGlobalYMap().getAvailablePixels()) < PRECISION_LEVEL) {
 			dendroView.getYPlusButton().setEnabled(false);
 		}
+	}
+	
+	public void saveSettings() {
 		
+		try {
+			if(configNode.nodeExists("GlobalXMap") && globalXmap != null) {
+				configNode.node("GlobalXMap").putDouble("scale", 
+						globalXmap.getScale());
+				configNode.node("GlobalXMap").putInt("XScrollValue", 
+						dendroView.getXScroll().getValue());
+			}
+		
+			if(configNode.nodeExists("GlobalYMap") && globalYmap != null) {
+				configNode.node("GlobalYMap").putDouble("scale", 
+						globalYmap.getScale());
+				configNode.node("GlobalYMap").putInt("YScrollValue", 
+						dendroView.getYScroll().getValue());
+			}
+		} catch (BackingStoreException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void setSavedScale() {
+		
+		try {
+			if(configNode.nodeExists("GlobalXMap") && globalXmap != null) {
+				globalXmap.setLastScale();
+				dendroView.setXScroll(configNode.node("GlobalXMap")
+						.getInt("XScrollValue", 0));
+			}
+			
+			if(configNode.nodeExists("GlobalYMap") && globalYmap != null) {
+				globalYmap.setLastScale();
+				dendroView.setYScroll(configNode.node("GlobalYMap")
+						.getInt("YScrollValue", 0));
+			}
+			
+		} catch (BackingStoreException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -433,6 +478,8 @@ public class DendroController implements ConfigNodePersistent {
 			}
 			globalYmap.setScale(newScale2);
 		}
+		
+		saveSettings();
 	}
 
 	/**
@@ -615,7 +662,7 @@ public class DendroController implements ConfigNodePersistent {
 		if ((arrayIndex != null) || (geneIndex != null)) {
 //			tvModel = new ReorderedDataModel(tvModel, geneIndex, 
 //					arrayIndex);
-			System.out.println("DataModel issue in DendroController.");
+			LogBuffer.println("DataModel issue in DendroController.");
 		}
 	}
 	

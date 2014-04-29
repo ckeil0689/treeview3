@@ -89,13 +89,13 @@ public abstract class ViewFrame implements Observer {
 
 		this.applicationFrame = new JFrame(title);
 
-		try {
-			UIManager.setLookAndFeel(UIManager
-					.getCrossPlatformLookAndFeelClassName());
-
-		} catch (final Exception e) {
-
-		}
+//		try {
+//			UIManager.setLookAndFeel(UIManager
+//					.getCrossPlatformLookAndFeelClassName());
+//
+//		} catch (final Exception e) {
+//
+//		}
 
 		setupWindowListener();
 	}
@@ -107,13 +107,13 @@ public abstract class ViewFrame implements Observer {
 
 		this.applicationFrame = new JFrame();
 
-		try {
-			UIManager.setLookAndFeel(UIManager
-					.getCrossPlatformLookAndFeelClassName());
-
-		} catch (final Exception e) {
-
-		}
+//		try {
+//			UIManager.setLookAndFeel(UIManager
+//					.getCrossPlatformLookAndFeelClassName());
+//
+//		} catch (final Exception e) {
+//
+//		}
 
 		setupWindowListener();
 	}
@@ -322,16 +322,19 @@ public abstract class ViewFrame implements Observer {
 				}
 			}
 		} catch (final Exception e) {
-			System.out.println("ViewFrame.closeWindow() Got exception: " + e);
+			LogBuffer.println("ViewFrame.closeWindow() Got exception: " + e);
 		}
 		
 		final ConfirmDialog confirm = new ConfirmDialog(this, "exit TreeView");
 		confirm.setVisible(true);
 		
 		if(confirm.getConfirmed()) {
+			saveSettings();
 			applicationFrame.dispose();
 		}
 	}
+	
+	public abstract void saveSettings();
 
 	/**
 	 * required by all <code>ModelPanel</code>s

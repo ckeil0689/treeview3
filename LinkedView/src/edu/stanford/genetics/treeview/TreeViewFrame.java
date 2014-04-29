@@ -184,6 +184,14 @@ ConfigNodePersistent {
 		}
 	}
 	
+	@Override
+	public void saveSettings() {
+		
+		if(dendroController != null) {
+			dendroController.saveSettings();
+		}
+	}
+	
 	// Setting different views
 	/** 
 	 * Choosing JPanel to be displayed.

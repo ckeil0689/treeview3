@@ -1032,7 +1032,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		tempMap.setScale(spacing);
 		tempMap.setIndexRange(min, max);
 		tempMap.setAvailablePixels(width + getBorderPixels());
-		final ArrayNameView anv = new ArrayNameView(arrayHeaderInfo);
+		final ArrayNameView anv = new ArrayNameView(arrayHeaderInfo, null);
 		anv.setFace(getArrayFont().getName());
 		anv.setStyle(getArrayFont().getStyle());
 		anv.setPoints(getArrayFont().getSize());

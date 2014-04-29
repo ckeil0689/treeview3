@@ -68,4 +68,7 @@ public class StringRes {
 	
 	// Cluster Options
 	public static final String cluster_DoNot = "Do Not Cluster";
+	
+	// Frame Title - Testingo
+	public static final String test_title_FontSelector = "Font Settings Test";
 }

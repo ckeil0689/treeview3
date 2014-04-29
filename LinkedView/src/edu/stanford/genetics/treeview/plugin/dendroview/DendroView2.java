@@ -45,6 +45,7 @@ import javax.swing.JWindow;
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.DendroPanel;
 import edu.stanford.genetics.treeview.GUIParams;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.TabbedSettingsPanel;
 import edu.stanford.genetics.treeview.TreeSelectionI;
@@ -1142,9 +1143,19 @@ public class DendroView2 implements Observer, DendroPanel {
 		return globalXscrollbar;
 	}
 	
+	public void setXScroll(int i) {
+		
+		globalXscrollbar.setValue(i);
+	}
+	
 	public JScrollBar getYScroll() {
 		
 		return globalYscrollbar;
+	}
+	
+	public void setYScroll(int i) {
+		
+		globalYscrollbar.setValue(i);
 	}
 	
 	public GlobalView getGlobalView() {

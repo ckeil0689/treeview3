@@ -28,7 +28,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor2;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
 import edu.stanford.genetics.treeview.plugin.dendroview.DoubleArrayDrawer;
-import edu.stanford.genetics.treeview.plugin.dendroview.FontSettingsPanel;
+import edu.stanford.genetics.treeview.plugin.dendroview.FontSettings;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -217,10 +217,9 @@ public class PreferencesMenu {
 		basisPanel.add(leftPanel, "pushy, aligny 0%, w 20%, " +
 				"h 75%");
 		
-		addMenu(startMenu);
-		
 		ok_button = GUIParams.setButtonLayout(StringRes.button_OK, null);
-		basisPanel.add(ok_button, "pushx, alignx 100%, span");
+		
+		addMenu(startMenu);
 		
 		menuDialog.validate();
 		menuDialog.repaint();
@@ -346,13 +345,13 @@ public class PreferencesMenu {
 			panel.setLayout(new MigLayout());
 			panel.setBackground(GUIParams.BG_COLOR);
 			
-			final FontSettingsPanel fontChangePanel = new FontSettingsPanel(
+			final FontSettings fontSettings = new FontSettings(
 					dendroView.getTextview(), dendroView.getArraynameview());
 			
 			JLabel labelFont = GUIParams.setupHeader("Set Label Font:");
 			
 			panel.add(labelFont, "span, wrap");
-			panel.add(fontChangePanel, "pushx, alignx 50%, w 95%");
+			panel.add(fontSettings.makeFontPanel(), "pushx, alignx 50%, w 95%");
 			
 			scrollPane.setViewportView(panel);
 		}
@@ -498,22 +497,12 @@ public class PreferencesMenu {
 //					dendroView.getArraynameview().getHeaderInfo(), 
 					tvFrame.getDataModel().getArrayHeaderInfo(),
 					dendroView.getArraynameview().getHeaderSummary(), tvFrame);
-
-//			final HeaderSummaryPanel atrPanel = new HeaderSummaryPanel(
-//					tvFrame.getDataModel().getAtrHeaderInfo(), 
-//					dendroView.getAtrview().getHeaderSummary(), tvFrame);
-//
-//			final HeaderSummaryPanel gtrPanel = new HeaderSummaryPanel(
-//					tvFrame.getDataModel().getGtrHeaderInfo(), 
-//					dendroView.getGtrview().getHeaderSummary(), tvFrame);
 			
 			custom_button = GUIParams.setButtonLayout(
 					StringRes.button_customLabels, null);
 			
 			JLabel rows = GUIParams.setupHeader("Rows");
 			JLabel cols = GUIParams.setupHeader("Columns");
-//			JLabel rTrees = GUIParams.setupHeader("Row Trees");
-//			JLabel cTrees = GUIParams.setupHeader("Column Trees");
 			
 			panel.add(rows, "pushx, alignx 50%");
 			panel.add(cols, "pushx, alignx 50%, wrap");
@@ -521,12 +510,6 @@ public class PreferencesMenu {
 			panel.add(arrayPanel, "pushx, alignx 50%, w 45%, wrap");
 			
 			panel.add(custom_button, "pushx, alignx 50%, span");
-			
-//			panel.add(rTrees, "span, wrap");
-//			panel.add(gtrPanel, "pushx, alignx 50%, w 95%, span, wrap");
-//			
-//			panel.add(cTrees, "span, wrap");
-//			panel.add(atrPanel, "pushx, alignx 50%, w 95%, span");
 			
 			scrollPane.setViewportView(panel);
 		}
@@ -598,6 +581,8 @@ public class PreferencesMenu {
 			
 			basisPanel.add(panel, "w 79%, h 95%, wrap");
 		}
+		
+		basisPanel.add(ok_button, "pushx, alignx 100%, span");
 		
 		for(MenuPanel panel : menuPanelList) {
 			

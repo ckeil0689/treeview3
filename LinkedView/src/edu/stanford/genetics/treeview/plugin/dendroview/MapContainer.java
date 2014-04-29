@@ -117,10 +117,25 @@ public class MapContainer extends Observable implements Observer,
 	 * screen space.
 	 */
 	public void setHome() {
+
+		calculateNewMinScale();
+		setScale(minScale);
+	}
+	
+	public void calculateNewMinScale() {
 		
 		this.tileNumVisible = getMaxIndex();
 		minScale = getCalculatedMinScale();
-		setScale(minScale);
+	}
+	
+	/**
+	 * Sets the scale of this MapContainer to the last saved value.
+	 */
+	public void setLastScale() {
+		
+		if(configNode != null) {
+			setScale(configNode.getDouble("scale", getCalculatedMinScale()));
+		}
 	}
 
 	/**
@@ -488,7 +503,7 @@ public class MapContainer extends Observable implements Observer,
 			}
 	
 			configNode.putDouble("scale", d);
-			configNode.putDouble("minScale", d);
+			configNode.putDouble("minScale", minScale);
 		}
 	}
 

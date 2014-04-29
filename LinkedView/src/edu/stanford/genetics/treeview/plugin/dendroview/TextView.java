@@ -138,23 +138,23 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 		return "TextView";
 	}
 
-	// I bet this isn't used anymore.
-	public MenuItem getFontMenuItem() {
-
-		final MenuItem itema = new MenuItem("Gene Font...");
-		itema.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent actionEvent) {
-
-				final FontSelector fontSelector = new FontSelector(
-						TextView.this, "Select Fonts for Gene Info");
-				fontSelector.showDialog(applicationFrame);
-			}
-		});
-
-		return itema;
-	}
+//	// I bet this isn't used anymore.
+//	public MenuItem getFontMenuItem() {
+//
+//		final MenuItem itema = new MenuItem("Gene Font...");
+//		itema.addActionListener(new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent actionEvent) {
+//
+//				final FontSelector fontSelector = new FontSelector(
+//						TextView.this, "Select Fonts for Gene Info");
+//				fontSelector.showDialog(applicationFrame);
+//			}
+//		});
+//
+//		return itema;
+//	}
 
 	// Canvas methods
 	@Override

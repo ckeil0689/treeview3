@@ -30,12 +30,9 @@ public class CustomLabelLoader {
 		this.tvFrame = tvFrame;
 	}
 	
-	public String[][] load() {
-		
-		File customFile;
+	public String[][] load(File customFile) {
 		
 		try {
-			customFile = tvFrame.selectFile();
 			
 			final String fileName = customFile.getAbsolutePath();
 			
@@ -75,9 +72,6 @@ public class CustomLabelLoader {
 	        
 	        br.close();
 			
-		} catch (LoadException exc) {
-			exc.printStackTrace();
-			
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 			
@@ -112,12 +106,12 @@ public class CustomLabelLoader {
 				Matcher matcher = pattern.matcher(yorf);
 				
 				if (!(matcher.find() || yorf.equalsIgnoreCase(""))) {
-					LogBuffer.println("Label: " + yorf);
+//					LogBuffer.println("Label: " + yorf);
 					newNames[j] = yorf;
 					namesFound = true;
 				    
 				} else {
-					LogBuffer.println(matcher.group(0));
+//					LogBuffer.println(matcher.group(0));
 				}
 			}
 		}
@@ -154,6 +148,7 @@ public class CustomLabelLoader {
 		String[][] colHeadersToAdd = 
 				new String[oldColHeaders.length + labels[0].length][];
 		
+		double time = System.currentTimeMillis();
 		String[] newRowHeaders;
 		// Iterate over loadedLabels
 		for(int i = 0; i < oldRowHeaders.length; i++) {
@@ -162,6 +157,11 @@ public class CustomLabelLoader {
 			rowHeadersToAdd[i] = concatArrays(oldRowHeaders[i], newRowHeaders);
 		}
 		
+		LogBuffer.println("Time for replacing row labels: " + 
+		        (System.currentTimeMillis() - time));
+		
+		time = System.currentTimeMillis();
+		
 		String[] newColHeaders;
 		// Iterate over loadedLabels
 		for(int i = 0; i < oldColHeaders.length; i++) {
@@ -169,6 +169,9 @@ public class CustomLabelLoader {
 			newColHeaders = findNewHeader(oldColHeaders[i], labels);
 			colHeadersToAdd[i] = concatArrays(oldColHeaders[i], newColHeaders);
 		}
+		
+		LogBuffer.println("Time for replacing col labels: " + 
+		        (System.currentTimeMillis() - time));
 		
 		model.setGeneHeaders(rowHeadersToAdd);
 		model.setArrayHeaders(colHeadersToAdd);
@@ -202,6 +205,10 @@ public class CustomLabelLoader {
 					} 
 				}
 			}
+			
+			if(match) {
+				break;
+			}
 		}
 		
 		if(!match) {
@@ -221,6 +228,7 @@ public class CustomLabelLoader {
 		
 		String[] rowNamesToAdd;
 		String[] colNamesToAdd;
+		
 		// Change model prefix array
 		if(namesFound) {
 			rowNamesToAdd = concatArrays(oldRowNames, newNames);

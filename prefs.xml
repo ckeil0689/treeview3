@@ -162,8 +162,9 @@
                 <map/>
                 <node name="ArrayNameView">
                   <map>
-                    <entry key="face" value="Dialog"/>
+                    <entry key="face" value="Verdana"/>
                     <entry key="size" value="12"/>
+                    <entry key="style" value="0"/>
                   </map>
                   <node name="ArrayNameViewManagerSummary">
                     <map>
@@ -176,8 +177,9 @@
                 <map/>
                 <node name="ArrayNameView">
                   <map>
-                    <entry key="face" value="Dialog"/>
+                    <entry key="face" value="Verdana"/>
                     <entry key="size" value="12"/>
+                    <entry key="style" value="0"/>
                   </map>
                   <node name="ArrayNameViewManagerSummary">
                     <map>
@@ -255,16 +257,35 @@
                   <entry key="name" value="YellowBlue"/>
                 </map>
               </node>
+              <node name="ColorSet3">
+                <map>
+                  <entry key="Color1" value="#CC00CC"/>
+                  <entry key="Color2" value="#CC3300"/>
+                  <entry key="Color3" value="#FFFF33"/>
+                  <entry key="colorNum" value="5"/>
+                  <entry key="Fraction1" value="0.19157609343528748"/>
+                  <entry key="Fraction2" value="0.43885868787765503"/>
+                  <entry key="Fraction3" value="0.55027174949646"/>
+                  <entry key="fracNum" value="5"/>
+                  <entry key="name" value="Custom"/>
+                  <entry key="missing" value="#ffffff"/>
+                  <entry key="Color4" value="#000000"/>
+                  <entry key="Color5" value="#00FF00"/>
+                  <entry key="Fraction4" value="0.63451087474823"/>
+                  <entry key="Fraction5" value="1.0"/>
+                </map>
+              </node>
             </node>
             <node name="GlobalXMap">
               <map>
-                <entry key="scale" value="11.330827067669173"/>
-                <entry key="minScale" value="11.330827067669173"/>
+                <entry key="scale" value="115.92307692307692"/>
+                <entry key="minScale" value="115.92307692307692"/>
+                <entry key="XScrollValue" value="0"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="11.330827067669173"/>
+                  <entry key="scale" value="115.92307692307692"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -275,13 +296,14 @@
             </node>
             <node name="GlobalYMap">
               <map>
-                <entry key="scale" value="6.082706766917293"/>
-                <entry key="minScale" value="6.082706766917293"/>
+                <entry key="scale" value="42.578947368421055"/>
+                <entry key="minScale" value="42.578947368421055"/>
+                <entry key="YScrollValue" value="0"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="6.082706766917293"/>
+                  <entry key="scale" value="42.578947368421055"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -291,7 +313,9 @@
               </node>
             </node>
             <node name="GradientChooser">
-              <map/>
+              <map>
+                <entry key="activeColors" value="Custom"/>
+              </map>
             </node>
             <node name="GtrSummary">
               <map/>
@@ -302,8 +326,9 @@
                 <map/>
                 <node name="TextView">
                   <map>
-                    <entry key="face" value="Dialog"/>
+                    <entry key="face" value="Verdana"/>
                     <entry key="size" value="12"/>
+                    <entry key="style" value="0"/>
                   </map>
                   <node name="TextViewManagerSummary">
                     <map/>
@@ -316,11 +341,14 @@
                 </map>
                 <node name="TextView">
                   <map>
-                    <entry key="face" value="Dialog"/>
+                    <entry key="face" value="Verdana"/>
                     <entry key="size" value="12"/>
+                    <entry key="style" value="0"/>
                   </map>
                   <node name="TextViewManagerSummary">
-                    <map/>
+                    <map>
+                      <entry key="included" value="0"/>
+                    </map>
                   </node>
                 </node>
               </node>
@@ -383,7 +411,7 @@
                   </map>
                   <node name="ArrayNameViewManagerSummary">
                     <map>
-                      <entry key="included" value="0"/>
+                      <entry key="included" value="4"/>
                     </map>
                   </node>
                 </node>
@@ -393,7 +421,7 @@
               </node>
               <node name="Selection0">
                 <map>
-                  <entry key="index" value="0"/>
+                  <entry key="index" value="4"/>
                 </map>
               </node>
             </node>
@@ -519,7 +547,7 @@
               </node>
               <node name="Selection0">
                 <map>
-                  <entry key="index" value="0"/>
+                  <entry key="index" value="4"/>
                 </map>
                 <node name="TextView">
                   <map>
@@ -527,7 +555,9 @@
                     <entry key="size" value="12"/>
                   </map>
                   <node name="TextViewManagerSummary">
-                    <map/>
+                    <map>
+                      <entry key="included" value="4"/>
+                    </map>
                   </node>
                 </node>
               </node>
@@ -913,6 +943,629 @@
               </node>
             </node>
           </node>
+          <node name="Model 5">
+            <map>
+              <entry key="name" value="testData_large2"/>
+              <entry key="extension" value=".txt"/>
+              <entry key="treesVisible" value="false"/>
+            </map>
+            <node name="ArrayNameViewManager">
+              <map/>
+              <node name="ArrayNameView0">
+                <map/>
+                <node name="ArrayNameView">
+                  <map>
+                    <entry key="face" value="Dialog"/>
+                    <entry key="size" value="12"/>
+                  </map>
+                  <node name="ArrayNameViewManagerSummary">
+                    <map>
+                      <entry key="included" value="0"/>
+                    </map>
+                  </node>
+                </node>
+              </node>
+              <node name="ArrayNameView1">
+                <map/>
+                <node name="ArrayNameView">
+                  <map>
+                    <entry key="face" value="Dialog"/>
+                    <entry key="size" value="12"/>
+                  </map>
+                  <node name="ArrayNameViewManagerSummary">
+                    <map>
+                      <entry key="included" value="0"/>
+                    </map>
+                  </node>
+                </node>
+              </node>
+              <node name="Dividers">
+                <map/>
+              </node>
+              <node name="Selection0">
+                <map>
+                  <entry key="index" value="0"/>
+                </map>
+              </node>
+            </node>
+            <node name="AtrSummary">
+              <map/>
+            </node>
+            <node name="ColorExtractor">
+              <map>
+                <entry key="logcenter" value="1.0"/>
+              </map>
+            </node>
+            <node name="ColorPresets">
+              <map>
+                <entry key="Color1" value="#FEFF00"/>
+                <entry key="Color2" value="#000000"/>
+                <entry key="Color3" value="#1BB7E5"/>
+                <entry key="colorNum" value="3"/>
+                <entry key="Fraction1" value="0.0"/>
+                <entry key="Fraction2" value="0.5"/>
+                <entry key="Fraction3" value="1.0"/>
+                <entry key="fracNum" value="3"/>
+              </map>
+              <node name="ColorSet1">
+                <map>
+                  <entry key="Color1" value="#FF0000"/>
+                  <entry key="Color2" value="#000000"/>
+                  <entry key="Color3" value="#00FF00"/>
+                  <entry key="colorNum" value="3"/>
+                  <entry key="Fraction1" value="0.0"/>
+                  <entry key="Fraction2" value="0.5"/>
+                  <entry key="Fraction3" value="1.0"/>
+                  <entry key="fracNum" value="3"/>
+                  <entry key="missing" value="#909090"/>
+                  <entry key="empty" value="#FFFFFF"/>
+                  <entry key="name" value="RedGreen"/>
+                </map>
+              </node>
+              <node name="ColorSet2">
+                <map>
+                  <entry key="Color1" value="#FEFF00"/>
+                  <entry key="Color2" value="#000000"/>
+                  <entry key="Color3" value="#1BB7E5"/>
+                  <entry key="colorNum" value="3"/>
+                  <entry key="Fraction1" value="0.0"/>
+                  <entry key="Fraction2" value="0.5"/>
+                  <entry key="Fraction3" value="1.0"/>
+                  <entry key="fracNum" value="3"/>
+                  <entry key="missing" value="#909090"/>
+                  <entry key="empty" value="#FFFFFF"/>
+                  <entry key="name" value="YellowBlue"/>
+                </map>
+              </node>
+            </node>
+            <node name="GlobalXMap">
+              <map>
+                <entry key="scale" value="6.2592592592592595"/>
+                <entry key="minScale" value="6.2592592592592595"/>
+              </map>
+              <node name="FixedMap">
+                <map>
+                  <entry key="type" value="Fixed"/>
+                  <entry key="scale" value="6.2592592592592595"/>
+                </map>
+              </node>
+              <node name="NullMap">
+                <map>
+                  <entry key="type" value="Null"/>
+                </map>
+              </node>
+            </node>
+            <node name="GlobalYMap">
+              <map>
+                <entry key="scale" value="0.1376545272302038"/>
+                <entry key="minScale" value="0.1376545272302038"/>
+              </map>
+              <node name="FixedMap">
+                <map>
+                  <entry key="type" value="Fixed"/>
+                  <entry key="scale" value="0.1376545272302038"/>
+                </map>
+              </node>
+              <node name="NullMap">
+                <map>
+                  <entry key="type" value="Null"/>
+                </map>
+              </node>
+            </node>
+            <node name="GtrSummary">
+              <map/>
+            </node>
+            <node name="TextViewManager">
+              <map/>
+              <node name="Dividers">
+                <map/>
+              </node>
+              <node name="TextView0">
+                <map/>
+                <node name="TextView">
+                  <map>
+                    <entry key="face" value="Dialog"/>
+                    <entry key="size" value="12"/>
+                  </map>
+                  <node name="TextViewManagerSummary">
+                    <map/>
+                  </node>
+                </node>
+              </node>
+              <node name="TextView1">
+                <map/>
+                <node name="TextView">
+                  <map>
+                    <entry key="face" value="Dialog"/>
+                    <entry key="size" value="12"/>
+                  </map>
+                  <node name="TextViewManagerSummary">
+                    <map/>
+                  </node>
+                </node>
+              </node>
+              <node name="TextView2">
+                <map/>
+                <node name="TextView">
+                  <map>
+                    <entry key="face" value="Dialog"/>
+                    <entry key="size" value="12"/>
+                  </map>
+                  <node name="TextViewManagerSummary">
+                    <map/>
+                  </node>
+                </node>
+              </node>
+            </node>
+          </node>
+          <node name="Model 6">
+            <map>
+              <entry key="name" value="testData_large"/>
+              <entry key="extension" value=".txt"/>
+              <entry key="treesVisible" value="false"/>
+            </map>
+            <node name="ArrayNameViewManager">
+              <map/>
+              <node name="ArrayNameView0">
+                <map/>
+                <node name="ArrayNameView">
+                  <map>
+                    <entry key="face" value="Dialog"/>
+                    <entry key="size" value="12"/>
+                  </map>
+                  <node name="ArrayNameViewManagerSummary">
+                    <map>
+                      <entry key="included" value="0"/>
+                    </map>
+                  </node>
+                </node>
+              </node>
+              <node name="ArrayNameView1">
+                <map/>
+                <node name="ArrayNameView">
+                  <map>
+                    <entry key="face" value="Dialog"/>
+                    <entry key="size" value="12"/>
+                  </map>
+                  <node name="ArrayNameViewManagerSummary">
+                    <map>
+                      <entry key="included" value="4"/>
+                    </map>
+                  </node>
+                </node>
+              </node>
+              <node name="Dividers">
+                <map/>
+              </node>
+              <node name="Selection0">
+                <map>
+                  <entry key="index" value="4"/>
+                </map>
+              </node>
+            </node>
+            <node name="AtrSummary">
+              <map/>
+            </node>
+            <node name="ColorExtractor">
+              <map>
+                <entry key="logcenter" value="1.0"/>
+              </map>
+            </node>
+            <node name="ColorPresets">
+              <map>
+                <entry key="Color1" value="#FEFF00"/>
+                <entry key="Color2" value="#000000"/>
+                <entry key="Color3" value="#1BB7E5"/>
+                <entry key="colorNum" value="3"/>
+                <entry key="Fraction1" value="0.0"/>
+                <entry key="Fraction2" value="0.5"/>
+                <entry key="Fraction3" value="1.0"/>
+                <entry key="fracNum" value="3"/>
+              </map>
+              <node name="ColorSet1">
+                <map>
+                  <entry key="Color1" value="#FF0000"/>
+                  <entry key="Color2" value="#000000"/>
+                  <entry key="Color3" value="#00FF00"/>
+                  <entry key="colorNum" value="3"/>
+                  <entry key="Fraction1" value="0.0"/>
+                  <entry key="Fraction2" value="0.5"/>
+                  <entry key="Fraction3" value="1.0"/>
+                  <entry key="fracNum" value="3"/>
+                  <entry key="missing" value="#909090"/>
+                  <entry key="empty" value="#FFFFFF"/>
+                  <entry key="name" value="RedGreen"/>
+                </map>
+              </node>
+              <node name="ColorSet2">
+                <map>
+                  <entry key="Color1" value="#FEFF00"/>
+                  <entry key="Color2" value="#000000"/>
+                  <entry key="Color3" value="#1BB7E5"/>
+                  <entry key="colorNum" value="3"/>
+                  <entry key="Fraction1" value="0.0"/>
+                  <entry key="Fraction2" value="0.5"/>
+                  <entry key="Fraction3" value="1.0"/>
+                  <entry key="fracNum" value="3"/>
+                  <entry key="missing" value="#909090"/>
+                  <entry key="empty" value="#FFFFFF"/>
+                  <entry key="name" value="YellowBlue"/>
+                </map>
+              </node>
+              <node name="ColorSet3">
+                <map>
+                  <entry key="Color1" value="#0099FF"/>
+                  <entry key="Color2" value="#000000"/>
+                  <entry key="Color3" value="#FFFF33"/>
+                  <entry key="colorNum" value="3"/>
+                  <entry key="Fraction1" value="0.551630437374115"/>
+                  <entry key="Fraction2" value="0.58152174949646"/>
+                  <entry key="Fraction3" value="0.60597825050354"/>
+                  <entry key="fracNum" value="3"/>
+                  <entry key="name" value="Custom"/>
+                  <entry key="missing" value="#ffffff"/>
+                </map>
+              </node>
+            </node>
+            <node name="GlobalXMap">
+              <map>
+                <entry key="scale" value="0.45987183399450715"/>
+                <entry key="minScale" value="0.45987183399450715"/>
+              </map>
+              <node name="FixedMap">
+                <map>
+                  <entry key="type" value="Fixed"/>
+                  <entry key="scale" value="0.45987183399450715"/>
+                </map>
+              </node>
+              <node name="NullMap">
+                <map>
+                  <entry key="type" value="Null"/>
+                </map>
+              </node>
+            </node>
+            <node name="GlobalYMap">
+              <map>
+                <entry key="scale" value="0.13900343642611684"/>
+                <entry key="minScale" value="0.13900343642611684"/>
+              </map>
+              <node name="FixedMap">
+                <map>
+                  <entry key="type" value="Fixed"/>
+                  <entry key="scale" value="0.13900343642611684"/>
+                </map>
+              </node>
+              <node name="NullMap">
+                <map>
+                  <entry key="type" value="Null"/>
+                </map>
+              </node>
+            </node>
+            <node name="GradientChooser">
+              <map>
+                <entry key="activeColors" value="Custom"/>
+              </map>
+            </node>
+            <node name="GtrSummary">
+              <map/>
+            </node>
+            <node name="TextViewManager">
+              <map/>
+              <node name="Dividers">
+                <map/>
+                <node name="TextView">
+                  <map>
+                    <entry key="face" value="Dialog"/>
+                    <entry key="size" value="12"/>
+                  </map>
+                  <node name="TextViewManagerSummary">
+                    <map/>
+                  </node>
+                </node>
+              </node>
+              <node name="Selection0">
+                <map>
+                  <entry key="index" value="5"/>
+                </map>
+                <node name="TextView">
+                  <map>
+                    <entry key="face" value="Dialog"/>
+                    <entry key="size" value="12"/>
+                  </map>
+                  <node name="TextViewManagerSummary">
+                    <map/>
+                  </node>
+                </node>
+              </node>
+              <node name="TextView0">
+                <map/>
+                <node name="TextView">
+                  <map>
+                    <entry key="face" value="Dialog"/>
+                    <entry key="size" value="12"/>
+                  </map>
+                  <node name="TextViewManagerSummary">
+                    <map>
+                      <entry key="included" value="5"/>
+                    </map>
+                  </node>
+                </node>
+              </node>
+              <node name="TextView1">
+                <map/>
+                <node name="TextView">
+                  <map>
+                    <entry key="face" value="Dialog"/>
+                    <entry key="size" value="12"/>
+                  </map>
+                  <node name="TextViewManagerSummary">
+                    <map/>
+                  </node>
+                </node>
+              </node>
+              <node name="TextView2">
+                <map/>
+                <node name="TextView">
+                  <map>
+                    <entry key="face" value="Dialog"/>
+                    <entry key="size" value="12"/>
+                  </map>
+                  <node name="TextViewManagerSummary">
+                    <map>
+                      <entry key="included" value="5"/>
+                    </map>
+                  </node>
+                </node>
+              </node>
+            </node>
+          </node>
+          <node name="Model 7">
+            <map>
+              <entry key="name" value="testData_small_C3"/>
+              <entry key="extension" value=".cdt"/>
+              <entry key="treesVisible" value="false"/>
+            </map>
+            <node name="ArrayNameViewManager">
+              <map/>
+              <node name="ArrayNameView0">
+                <map/>
+                <node name="ArrayNameView">
+                  <map>
+                    <entry key="face" value="Dialog"/>
+                    <entry key="size" value="12"/>
+                  </map>
+                  <node name="ArrayNameViewManagerSummary">
+                    <map>
+                      <entry key="included" value="0"/>
+                    </map>
+                  </node>
+                </node>
+              </node>
+              <node name="ArrayNameView1">
+                <map/>
+                <node name="ArrayNameView">
+                  <map>
+                    <entry key="face" value="Dialog"/>
+                    <entry key="size" value="12"/>
+                  </map>
+                  <node name="ArrayNameViewManagerSummary">
+                    <map>
+                      <entry key="included" value="0"/>
+                    </map>
+                  </node>
+                </node>
+              </node>
+              <node name="ArrayNameView2">
+                <map/>
+                <node name="ArrayNameView">
+                  <map>
+                    <entry key="face" value="Dialog"/>
+                    <entry key="size" value="12"/>
+                  </map>
+                  <node name="ArrayNameViewManagerSummary">
+                    <map>
+                      <entry key="included" value="0"/>
+                    </map>
+                  </node>
+                </node>
+              </node>
+              <node name="Dividers">
+                <map/>
+              </node>
+              <node name="Selection0">
+                <map>
+                  <entry key="index" value="0"/>
+                </map>
+              </node>
+            </node>
+            <node name="AtrSummary">
+              <map/>
+            </node>
+            <node name="ColorExtractor">
+              <map>
+                <entry key="logcenter" value="1.0"/>
+              </map>
+            </node>
+            <node name="ColorPresets">
+              <map>
+                <entry key="Color1" value="#FEFF00"/>
+                <entry key="Color2" value="#000000"/>
+                <entry key="Color3" value="#1BB7E5"/>
+                <entry key="colorNum" value="3"/>
+                <entry key="Fraction1" value="0.0"/>
+                <entry key="Fraction2" value="0.5"/>
+                <entry key="Fraction3" value="1.0"/>
+                <entry key="fracNum" value="3"/>
+              </map>
+              <node name="ColorSet1">
+                <map>
+                  <entry key="Color1" value="#FF0000"/>
+                  <entry key="Color2" value="#000000"/>
+                  <entry key="Color3" value="#00FF00"/>
+                  <entry key="colorNum" value="3"/>
+                  <entry key="Fraction1" value="0.0"/>
+                  <entry key="Fraction2" value="0.5"/>
+                  <entry key="Fraction3" value="1.0"/>
+                  <entry key="fracNum" value="3"/>
+                  <entry key="missing" value="#909090"/>
+                  <entry key="empty" value="#FFFFFF"/>
+                  <entry key="name" value="RedGreen"/>
+                </map>
+              </node>
+              <node name="ColorSet2">
+                <map>
+                  <entry key="Color1" value="#FEFF00"/>
+                  <entry key="Color2" value="#000000"/>
+                  <entry key="Color3" value="#1BB7E5"/>
+                  <entry key="colorNum" value="3"/>
+                  <entry key="Fraction1" value="0.0"/>
+                  <entry key="Fraction2" value="0.5"/>
+                  <entry key="Fraction3" value="1.0"/>
+                  <entry key="fracNum" value="3"/>
+                  <entry key="missing" value="#909090"/>
+                  <entry key="empty" value="#FFFFFF"/>
+                  <entry key="name" value="YellowBlue"/>
+                </map>
+              </node>
+              <node name="ColorSet3">
+                <map>
+                  <entry key="Color1" value="#FF0000"/>
+                  <entry key="Color2" value="#000000"/>
+                  <entry key="Color3" value="#00FF00"/>
+                  <entry key="colorNum" value="3"/>
+                  <entry key="Fraction1" value="0.63451087474823"/>
+                  <entry key="Fraction2" value="0.676630437374115"/>
+                  <entry key="Fraction3" value="0.7160326242446899"/>
+                  <entry key="fracNum" value="3"/>
+                  <entry key="name" value="Custom"/>
+                  <entry key="missing" value="#ffffff"/>
+                </map>
+              </node>
+            </node>
+            <node name="GlobalXMap">
+              <map>
+                <entry key="scale" value="6.20164609053498"/>
+                <entry key="minScale" value="6.20164609053498"/>
+              </map>
+              <node name="FixedMap">
+                <map>
+                  <entry key="type" value="Fixed"/>
+                  <entry key="scale" value="6.20164609053498"/>
+                </map>
+              </node>
+              <node name="NullMap">
+                <map>
+                  <entry key="type" value="Null"/>
+                </map>
+              </node>
+            </node>
+            <node name="GlobalYMap">
+              <map>
+                <entry key="scale" value="1.6244979919678715"/>
+                <entry key="minScale" value="1.6244979919678715"/>
+              </map>
+              <node name="FixedMap">
+                <map>
+                  <entry key="type" value="Fixed"/>
+                  <entry key="scale" value="1.6244979919678715"/>
+                </map>
+              </node>
+              <node name="NullMap">
+                <map>
+                  <entry key="type" value="Null"/>
+                </map>
+              </node>
+            </node>
+            <node name="GradientChooser">
+              <map>
+                <entry key="activeColors" value="Custom"/>
+              </map>
+            </node>
+            <node name="GtrSummary">
+              <map/>
+            </node>
+            <node name="TextViewManager">
+              <map/>
+              <node name="Dividers">
+                <map/>
+              </node>
+              <node name="Selection0">
+                <map>
+                  <entry key="index" value="2"/>
+                </map>
+              </node>
+              <node name="TextView0">
+                <map/>
+                <node name="TextView">
+                  <map>
+                    <entry key="face" value="Dialog"/>
+                    <entry key="size" value="12"/>
+                  </map>
+                  <node name="TextViewManagerSummary">
+                    <map/>
+                  </node>
+                </node>
+              </node>
+              <node name="TextView1">
+                <map/>
+                <node name="TextView">
+                  <map>
+                    <entry key="face" value="Dialog"/>
+                    <entry key="size" value="12"/>
+                  </map>
+                  <node name="TextViewManagerSummary">
+                    <map/>
+                  </node>
+                </node>
+              </node>
+              <node name="TextView2">
+                <map/>
+                <node name="TextView">
+                  <map>
+                    <entry key="face" value="Dialog"/>
+                    <entry key="size" value="12"/>
+                  </map>
+                  <node name="TextViewManagerSummary">
+                    <map/>
+                  </node>
+                </node>
+              </node>
+              <node name="TextView3">
+                <map/>
+                <node name="TextView">
+                  <map>
+                    <entry key="face" value="Dialog"/>
+                    <entry key="size" value="12"/>
+                  </map>
+                  <node name="TextViewManagerSummary">
+                    <map>
+                      <entry key="included" value="2"/>
+                    </map>
+                  </node>
+                </node>
+              </node>
+            </node>
+          </node>
         </node>
         <node name="FileMRU">
           <map/>
@@ -936,6 +1589,12 @@
             <node name="File4">
               <map/>
             </node>
+            <node name="File6">
+              <map/>
+            </node>
+            <node name="File7">
+              <map/>
+            </node>
           </node>
           <node name="File2">
             <map>
@@ -946,6 +1605,9 @@
               <entry key="style" value="0"/>
             </map>
             <node name="File2">
+              <map/>
+            </node>
+            <node name="File7">
               <map/>
             </node>
           </node>
@@ -960,6 +1622,12 @@
             <node name="File3">
               <map/>
             </node>
+            <node name="File4">
+              <map/>
+            </node>
+            <node name="File6">
+              <map/>
+            </node>
           </node>
           <node name="File4">
             <map>
@@ -970,6 +1638,42 @@
               <entry key="style" value="0"/>
             </map>
             <node name="File4">
+              <map/>
+            </node>
+          </node>
+          <node name="File5">
+            <map>
+              <entry key="root" value="testData_large2"/>
+              <entry key="dir" value="C:\Users\CKeil\Work\TreeView Related Files\Test Files\"/>
+              <entry key="cdt" value=".txt"/>
+              <entry key="name" value="No name"/>
+              <entry key="style" value="0"/>
+            </map>
+            <node name="File5">
+              <map/>
+            </node>
+          </node>
+          <node name="File6">
+            <map>
+              <entry key="root" value="testData_large"/>
+              <entry key="dir" value="C:\Users\CKeil\Work\TreeView Related Files\Test Files\"/>
+              <entry key="cdt" value=".txt"/>
+              <entry key="name" value="No name"/>
+              <entry key="style" value="0"/>
+            </map>
+            <node name="File6">
+              <map/>
+            </node>
+          </node>
+          <node name="File7">
+            <map>
+              <entry key="root" value="testData_small_C3"/>
+              <entry key="dir" value="C:\Users\CKeil\Work\TreeView Related Files\Test Files\"/>
+              <entry key="cdt" value=".cdt"/>
+              <entry key="name" value="No name"/>
+              <entry key="style" value="0"/>
+            </map>
+            <node name="File7">
               <map/>
             </node>
           </node>

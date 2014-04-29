@@ -8,11 +8,13 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 
 import javax.swing.SwingWorker;
 
 import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.LabelLoadDialog;
+import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.MenuPanel;
 import edu.stanford.genetics.treeview.PreferencesMenu;
 import edu.stanford.genetics.treeview.StringRes;
@@ -32,6 +34,8 @@ public class PreferencesController {
 	private TreeViewFrame tvFrame;
 	private PreferencesMenu preferences;
 	private SwingWorker<Void, Void> labelWorker;
+	private LabelLoadDialog dialog;
+	private File customFile;
 	
 	public PreferencesController(TreeViewFrame tvFrame, 
 			PreferencesMenu preferences, TVFrameController controller) {
@@ -113,10 +117,25 @@ public class PreferencesController {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
-			setupLabelWorker();
-			
 			if(tvFrame.getLoaded()){
-				labelWorker.execute();
+				
+				try {
+					customFile = tvFrame.selectFile();
+					
+				} catch (LoadException e1) {
+					e1.printStackTrace();
+				}
+				
+				if(customFile != null) {
+					
+					labelWorker = new LabelWorker();
+					labelWorker.execute();
+					
+					// After executing SwingWorker to prevent the dialog
+					// from blocking the background task.
+					dialog = new LabelLoadDialog(tvFrame);
+					dialog.setVisible(true);
+				}
 			}
 		}
 	}
@@ -263,36 +282,29 @@ public class PreferencesController {
 	 * Sets up a SwingWorker to run a background thread while loading the 
 	 * custom labels.
 	 */
-	public void setupLabelWorker() {
-		
-		final LabelLoadDialog dialog = new LabelLoadDialog(tvFrame);
-		
-		labelWorker = new SwingWorker<Void, Void>() {
+	class LabelWorker extends SwingWorker<Void, Void> {
 
-			@Override
-			protected Void doInBackground() throws Exception {
-				
-				// Load new labels
-				CustomLabelLoader clLoader = new CustomLabelLoader(tvFrame);
-				String[][] loadedLabels = clLoader.load();
-				
-				// Open small dialog
-				dialog.setVisible(true);
-				
-				clLoader.addNewLabels((TVModel)tvFrame.getDataModel(), 
-						loadedLabels);
-				return null;
-			}
+		@Override
+		protected Void doInBackground() throws Exception {
 			
-			@Override
-			protected void done() {
-				
-				// Refresh labels
-				preferences.synchronizeAnnotation();
-				
-				// Close dialog
-				dialog.dispose();
-			}
-		};
+			// Load new labels
+			CustomLabelLoader clLoader = new CustomLabelLoader(tvFrame);
+			String[][] loadedLabels = clLoader.load(customFile);
+			
+			clLoader.addNewLabels((TVModel)tvFrame.getDataModel(), 
+					loadedLabels);
+			
+			return null;
+		}
+		
+		@Override
+		protected void done() {
+			
+			// Refresh labels
+			preferences.synchronizeAnnotation();
+			
+			// Close dialog
+			dialog.dispose();
+		}
 	}
 }
