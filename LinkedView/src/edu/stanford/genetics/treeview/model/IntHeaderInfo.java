@@ -32,6 +32,7 @@ public class IntHeaderInfo extends Observable implements HeaderInfo {
 		id2row.clear();
 	}
 
+	@Override
 	public void setPrefixArray(final String[] newVal) {
 
 		prefixArray = newVal;

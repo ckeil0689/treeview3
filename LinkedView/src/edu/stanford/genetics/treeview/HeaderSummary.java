@@ -22,6 +22,7 @@
  */
 package edu.stanford.genetics.treeview;
 
+import java.util.Arrays;
 import java.util.Observable;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -88,15 +89,18 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 			try {
 				final String test = strings[included[i]];
 				if (test != null) {
-					if (count != 0)
+					if (count != 0) {
 						out.append(", ");
+					}
 					out.append(test);
 					count++;
 				}
 			} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 				// out.append(strings[1]);
-				LogBuffer.println("ArrayIndexOutOfBoundsException in " +
-						"getSummary() in HeaderSummary: " + e.getMessage());
+//				LogBuffer.println("ArrayIndexOutOfBoundsException in " +
+//						"getSummary() in HeaderSummary: " + e.getMessage());
+//				LogBuffer.println("strings[]: " + Arrays.toString(strings));
+//				LogBuffer.println("included[i]: " + included[i]);
 			}
 		}
 
@@ -108,17 +112,18 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		}
 	}
 
-	public String[] getSummaryArray(final HeaderInfo headerInfo, final int index) {
+	public String[] getSummaryArray(final HeaderInfo headerInfo, 
+			final int index) {
 
 		String[] strings = null;
 		try {
 			strings = headerInfo.getHeader(index);
 
 		} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
-			LogBuffer.println("index " + index + " out of bounds on headers, "
-					+ "continuing");
-			LogBuffer.println("ArrayIndexOutOfBoundsException in " +
-					"getSummaryArray() in HeaderSummary: " + e.getMessage());
+//			LogBuffer.println("index " + index + " out of bounds on headers, "
+//					+ "continuing");
+//			LogBuffer.println("ArrayIndexOutOfBoundsException in " +
+//					"getSummaryArray() in HeaderSummary: " + e.getMessage());
 			return null;
 		}
 
@@ -127,7 +132,6 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		}
 
 		if (included.length == 0) {
-
 			return null;
 		}
 
@@ -140,9 +144,9 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 				count++;
 			} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 				// out.append(strings[1]);
-				LogBuffer.println("ArrayIndexOutOfBoundsException in " +
-						"getSummaryArray() in HeaderSummary: " 
-						+ e.getMessage());
+//				LogBuffer.println("ArrayIndexOutOfBoundsException in " +
+//						"getSummaryArray() in HeaderSummary: " 
+//						+ e.getMessage());
 			}
 		}
 		return out;

@@ -8,13 +8,18 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.util.List;
 
 import javax.swing.SwingWorker;
 
 import edu.stanford.genetics.treeview.GUIParams;
+import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LabelLoadDialog;
 import edu.stanford.genetics.treeview.LoadException;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.MenuPanel;
 import edu.stanford.genetics.treeview.PreferencesMenu;
 import edu.stanford.genetics.treeview.StringRes;
@@ -33,7 +38,7 @@ public class PreferencesController {
 	private TVFrameController controller;
 	private TreeViewFrame tvFrame;
 	private PreferencesMenu preferences;
-	private SwingWorker<Void, Void> labelWorker;
+	private SwingWorker<Void, Integer> labelWorker;
 	private LabelLoadDialog dialog;
 	private File customFile;
 	
@@ -128,12 +133,27 @@ public class PreferencesController {
 				
 				if(customFile != null) {
 					
-					labelWorker = new LabelWorker();
+					labelWorker = new LabelWorker("Row");
+					dialog = new LabelLoadDialog(tvFrame);
+					
+					// A property listener used to update the progress bar
+				    PropertyChangeListener listener = 
+				    		new PropertyChangeListener(){
+				    	
+				      public void propertyChange(PropertyChangeEvent event) {
+				        
+				    	  if ("progress".equals(event.getPropertyName())) {
+				    		  dialog.updateProgress(
+				    				  ((Integer)event.getNewValue()));
+				    	  }
+				      }
+				    };
+				    labelWorker.addPropertyChangeListener(listener);
+				    
 					labelWorker.execute();
 					
 					// After executing SwingWorker to prevent the dialog
 					// from blocking the background task.
-					dialog = new LabelLoadDialog(tvFrame);
 					dialog.setVisible(true);
 				}
 			}
@@ -282,29 +302,74 @@ public class PreferencesController {
 	 * Sets up a SwingWorker to run a background thread while loading the 
 	 * custom labels.
 	 */
-	class LabelWorker extends SwingWorker<Void, Void> {
+	class LabelWorker extends SwingWorker<Void, Integer> {
 
+		private String type;
+		
+		public LabelWorker(String type) {
+			
+			this.type = type;
+		}
+		
 		@Override
 		protected Void doInBackground() throws Exception {
 			
-			// Load new labels
-			CustomLabelLoader clLoader = new CustomLabelLoader(tvFrame);
-			String[][] loadedLabels = clLoader.load(customFile);
+			TVModel model = (TVModel)tvFrame.getDataModel();
 			
-			clLoader.addNewLabels((TVModel)tvFrame.getDataModel(), 
-					loadedLabels);
+			HeaderInfo headerInfo = null;
+			if(type.equalsIgnoreCase("Row")) {
+				headerInfo = model.getGeneHeaderInfo(); 
+				
+			} else if(type.equalsIgnoreCase("Column")){
+				headerInfo = model.getArrayHeaderInfo();
+			}
+			
+			// Load new labels
+			CustomLabelLoader clLoader = new CustomLabelLoader(tvFrame, 
+					headerInfo, preferences.getSelectedLabelIndexes());
+			
+			clLoader.load(customFile);
+			
+			int headerNum = clLoader.checkForHeaders(model);
+			
+			// Change headerArrays (without matching actual names first)
+			String[][] oldHeaders = headerInfo.getHeaderArray();
+			String[] oldNames = headerInfo.getNames();
+			
+			String[][] headersToAdd = 
+					new String[oldHeaders.length + headerNum][];
+			
+			// Iterate over loadedLabels
+			for(int i = 0; i < oldHeaders.length; i++) {
+				
+				headersToAdd[i] = clLoader.replaceLabel(oldHeaders[i], 
+						oldNames);
+				
+				setProgress((i + 1) * 100 /oldHeaders.length);
+			}
+			
+			clLoader.setHeaders(model, type, headersToAdd);
 			
 			return null;
 		}
 		
 		@Override
+		protected void process(List<Integer> chunks) {
+			
+			dialog.setPBarMax(chunks.get(0));
+		}
+		
+		@Override
 		protected void done() {
+			
+			// Close dialog
+			dialog.dispose();
 			
 			// Refresh labels
 			preferences.synchronizeAnnotation();
 			
-			// Close dialog
-			dialog.dispose();
+			preferences.setupLayout(StringRes.menu_title_RowAndCol);
+			addListeners();
 		}
 	}
 }

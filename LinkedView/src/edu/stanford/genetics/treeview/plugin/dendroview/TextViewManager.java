@@ -149,8 +149,15 @@ public class TextViewManager extends ModelView implements ConfigNodePersistent,
 			for (int i = 0; i < childrenNodes.length; i++) {
 				
 				if(childrenNodes[i].contains("Selection")) {
-					included[addIndex] = 
-						configNode.node(childrenNodes[i]).getInt("index", -1);
+					
+					int headerNum = configNode.node(childrenNodes[i]).getInt(
+							"index", -1);
+					if(hI.getNumNames() >= headerNum) {
+						included[addIndex] = headerNum;
+	
+					} else {
+						included[addIndex] = hI.getNumNames();
+					}
 					addIndex++;
 				}
 			}
@@ -180,8 +187,8 @@ public class TextViewManager extends ModelView implements ConfigNodePersistent,
 		for (int i = 0; i < headerSummary.getIncluded().length; i++) {
 
 			// Create children here.
-			configNode.node("Selection" + i).putInt("index",
-					headerSummary.getIncluded()[i]);
+			int indexT = headerSummary.getIncluded()[i];
+			configNode.node("Selection" + i).putInt("index", indexT);
 		}
 	}
 

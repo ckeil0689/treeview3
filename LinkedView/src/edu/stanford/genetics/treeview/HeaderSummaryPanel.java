@@ -123,6 +123,15 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 
 		return headerList;
 	}
+	
+	/**
+	 * Returns the smalles index from a selected range in the header list.
+	 * @return
+	 */
+	public int getSmallestSelectedIndex() {
+		
+		return getHeaderList().getSelectedIndex();
+	}
 
 	@Override
 	public void synchronizeFrom() {

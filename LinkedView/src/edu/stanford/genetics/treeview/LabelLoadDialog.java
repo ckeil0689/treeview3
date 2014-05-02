@@ -3,6 +3,7 @@ package edu.stanford.genetics.treeview;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.WindowConstants;
 
 import net.miginfocom.swing.MigLayout;
@@ -12,6 +13,7 @@ public class LabelLoadDialog {
 	private JDialog labelLoadFrame;
 	private final JLabel prompt;
 	private final JPanel mainPanel;
+	private final JProgressBar pBar;
 
 	public LabelLoadDialog(final ViewFrame view) {
 
@@ -29,8 +31,11 @@ public class LabelLoadDialog {
 		prompt = new JLabel("Loading new labels...");
 		prompt.setForeground(GUIParams.TEXT);
 		prompt.setFont(GUIParams.FONTL);
+		
+		pBar = GUIParams.setPBarLayout();
 
-		mainPanel.add(prompt, "push, alignx 50%, span");
+		mainPanel.add(prompt, "pushx, alignx 50%, span, wrap");
+		mainPanel.add(pBar, "pushx, alignx 50%, span");
 
 		labelLoadFrame.getContentPane().add(mainPanel);
 		labelLoadFrame.pack();
@@ -56,6 +61,16 @@ public class LabelLoadDialog {
 		
 		mainPanel.revalidate();
 		mainPanel.repaint();
+	}
+	
+	public void setPBarMax(int max) {
+		
+		pBar.setMaximum(max);
+	}
+	
+	public void updateProgress(int value) {
+		
+		pBar.setValue(value);
 	}
 	
 	/**

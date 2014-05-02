@@ -132,8 +132,29 @@ public class PreferencesMenu {
 	
 	public void synchronizeAnnotation() {
 		
-		annotationSettings.synchronize();
-		setupLayout(StringRes.menu_title_RowAndCol);
+		if(annotationSettings != null) {
+			annotationSettings.synchronize();
+			
+		} else {
+			LogBuffer.println("AnnotationSettings object was null. " +
+					"Could not synchronize.");
+		}
+	}
+	
+	/**
+	 * Returns the two indeces which represent the currently selected la
+	 * @return
+	 */
+	public int[] getSelectedLabelIndexes() {
+		
+		if(annotationSettings != null) {
+			return new int[] {annotationSettings.getSelectedGeneIndex(), 
+					annotationSettings.getSelectedArrayIndex()};
+		} else {
+			LogBuffer.println("AnnotationSettings object was null. " +
+					"Could not get selected indeces.");
+			return null;
+		}
 	}
 	
 	// Listeners
@@ -494,7 +515,6 @@ public class PreferencesMenu {
 					dendroView.getTextview().getHeaderSummary(), tvFrame);
 
 			arrayPanel = new HeaderSummaryPanel(
-//					dendroView.getArraynameview().getHeaderInfo(), 
 					tvFrame.getDataModel().getArrayHeaderInfo(),
 					dendroView.getArraynameview().getHeaderSummary(), tvFrame);
 			
@@ -528,6 +548,16 @@ public class PreferencesMenu {
 			
 			genePanel.synchronizeTo();
 			arrayPanel.synchronizeTo();
+		}
+		
+		public int getSelectedGeneIndex() {
+			
+			return genePanel.getSmallestSelectedIndex();
+		}
+		
+		public int getSelectedArrayIndex() {
+			
+			return arrayPanel.getSmallestSelectedIndex();
 		}
 	}
 	

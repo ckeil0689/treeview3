@@ -149,8 +149,17 @@ public class ArrayNameViewManager extends ModelView implements ConfigNodePersist
 			for (int i = 0; i < childrenNodes.length; i++) {
 				
 				if(childrenNodes[i].contains("Selection")) {
-					included[addIndex] = 
-						configNode.node(childrenNodes[i]).getInt("index", -1);
+//					included[addIndex] = 
+//						configNode.node(childrenNodes[i]).getInt("index", -1);
+//					addIndex++;
+					int headerNum = configNode.node(childrenNodes[i]).getInt(
+							"index", -1);
+					if(hI.getNumNames() >= headerNum) {
+						included[addIndex] = headerNum;
+	
+					} else {
+						included[addIndex] = hI.getNumNames();
+					}
 					addIndex++;
 				}
 			}
@@ -180,8 +189,8 @@ public class ArrayNameViewManager extends ModelView implements ConfigNodePersist
 		for (int i = 0; i < headerSummary.getIncluded().length; i++) {
 
 			// Create children here.
-			configNode.node("Selection" + i).putInt("index",
-					headerSummary.getIncluded()[i]);
+			int indexA = headerSummary.getIncluded()[i];
+			configNode.node("Selection" + i).putInt("index", indexA);
 		}
 	}
 

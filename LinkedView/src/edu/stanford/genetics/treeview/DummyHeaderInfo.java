@@ -112,6 +112,11 @@ public class DummyHeaderInfo implements HeaderInfo {
 	public boolean setHeader(final int i, final String name, final String value) {
 		return false;
 	}
+	
+	@Override 
+	public void setPrefixArray(final String[] newPrefixArray) {
+		
+	}
 
 	@Override
 	public boolean getModified() {

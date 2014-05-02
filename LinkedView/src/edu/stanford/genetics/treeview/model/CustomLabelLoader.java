@@ -9,31 +9,47 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import edu.stanford.genetics.treeview.LoadException;
+import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 
 public class CustomLabelLoader {
 
 	private TreeViewFrame tvFrame;
+	private HeaderInfo headerInfo;
 	private String[][] labels;
 	private String[] newNames;
+	private boolean[] labelMatches;
+	private int[] selectedIndeces;
+	private int misses;
 	private int lineNum;
 	
     boolean namesFound = false;
 	
-	public CustomLabelLoader(TreeViewFrame tvFrame) {
+	public CustomLabelLoader(TreeViewFrame tvFrame, HeaderInfo headerInfo, 
+			int[] selectedIndeces) {
 		
 		this.tvFrame = tvFrame;
+		this.headerInfo = headerInfo;
+		this.selectedIndeces = selectedIndeces;
 	}
 	
-	public String[][] load(File customFile) {
+	/**
+	 * Loads the file with an InputStream and a BufferedReader and then
+	 * assigns the file content to a String[][] which contains the new labels.
+	 * The method then calls addNewLabels() to add the newly loaded labels to
+	 * the currently loaded TVModel object.
+	 * @param customFile
+	 */
+	public void load(File customFile) {
 		
 		try {
-			
 			final String fileName = customFile.getAbsolutePath();
 			
 			lineNum = count(fileName);
@@ -47,17 +63,16 @@ public class CustomLabelLoader {
 	        
 	        // int to count the current row in while loop
 	        int rowN = 0;
-	        int headerStart = 0;
 	        
 	        // Number of row labels without GID
-	        int cdtColN = tvFrame.getDataModel().getGeneHeaderInfo()
+	        int geneLabelNum = tvFrame.getDataModel().getGeneHeaderInfo()
 	        		.getNumNames();
 	        
-	        if(tvFrame.getDataModel().gidFound() == true) {
-	        	cdtColN--;
+	        if(tvFrame.getDataModel().gidFound()) {
+	        	geneLabelNum--;
 	        }
-	        
-	        setLabelArrays(lineNum, cdtColN);
+
+	        labels = new String[lineNum][geneLabelNum];
 	        
 	        String line;
 	        // iterate reader through each line
@@ -65,7 +80,7 @@ public class CustomLabelLoader {
 	        	
 	        	final String[] lineAsStrings = line.split("\t");
 		
-				labels[rowN - headerStart] = lineAsStrings;
+				labels[rowN] = lineAsStrings;
 				
 	        	rowN++;
 	        }
@@ -78,43 +93,98 @@ public class CustomLabelLoader {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		
-		return labels;
 	}
 	
 	/**
-	 * Searches the loaded file for labels.
+	 * Searches the loaded labels for header names such as ORF.
+	 * If they are present, the newly loaded labels will later replace the old
+	 * labels.
 	 */
-	public void checkForLabels(TVModel model) {
+	public int checkForHeaders(TVModel model) {
 		
-		int checkRowLimit = (model.geneHeaderInfo.getNumHeaders()/100); 
+		int checkLimit = headerInfo.getNumHeaders()/100; 
 		
 		newNames = new String[labels[0].length];
 		
-		if(checkRowLimit > 5) {
-			checkRowLimit = 5;
+		if(checkLimit > 5) {
+			checkLimit = 5;
 		}
 		
 		// YORF regex pattern
-		Pattern pattern = Pattern.compile("(\\D{3}\\d{3}\\D{1})");
+//		Pattern pattern = Pattern.compile("(\\D{3}\\d{3}\\D{1})");
+//		
+//		for(int i = 0; i < checkRowLimit; i++) {
+//			
+//			for(int j = 0; j < labels[i].length; j++) {
+//				
+//				String yorf = labels[i][j];
+//				Matcher matcher = pattern.matcher(yorf);
+//				
+//				if (!(matcher.find() || yorf.equalsIgnoreCase(""))) {
+////					LogBuffer.println("Label: " + yorf);
+//					newNames[j] = yorf;
+//					namesFound = true;
+//				    
+//				} else {
+////					LogBuffer.println(matcher.group(0));
+//				}
+//			}
+//		}
 		
-		for(int i = 0; i < checkRowLimit; i++) {
+		for(int i = 0; i < checkLimit; i++) {
 			
 			for(int j = 0; j < labels[i].length; j++) {
 				
 				String yorf = labels[i][j];
-				Matcher matcher = pattern.matcher(yorf);
 				
-				if (!(matcher.find() || yorf.equalsIgnoreCase(""))) {
-//					LogBuffer.println("Label: " + yorf);
+				if (!yorf.equalsIgnoreCase("")) {
 					newNames[j] = yorf;
 					namesFound = true;
-				    
-				} else {
-//					LogBuffer.println(matcher.group(0));
 				}
 			}
 		}
+		
+		// Check if old model already contains labels from the new list.
+		List<String> existingLabels = Arrays.asList(headerInfo.getNames());
+		
+		labelMatches = new boolean[newNames.length];
+		
+		misses = 0;
+		if(existingLabels != null) {
+			for(int i = 0; i < newNames.length; i++) {
+				
+				if(existingLabels.contains(newNames[i])) {
+					labelMatches[i] = true;
+					
+				} else {
+					labelMatches[i] = false;
+					misses++;
+				}
+			}
+		} else {
+			LogBuffer.println("No Label names could be loaded.");
+			return 0;
+		}
+		
+		int addIndex = 0;
+		String[] finalNames = new String[misses];
+		for(int i = 0; i < labelMatches.length; i ++) {
+			
+			if(!labelMatches[i]) {
+				finalNames[addIndex] = newNames[i];
+				addIndex++;
+			}
+		}
+		
+		newNames = finalNames;
+		
+		LogBuffer.println("Old Labels: " + existingLabels.toString());
+		LogBuffer.println("New Labels: " + Arrays.toString(newNames));
+		LogBuffer.println("Selected Indeces: " + Arrays.toString(
+				selectedIndeces));
+		LogBuffer.println("Match List: " + Arrays.toString(labelMatches));
+		
+		return labels[0].length;
 	}
 	
 	/**
@@ -138,69 +208,44 @@ public class CustomLabelLoader {
 	 * @param model
 	 * @param loadedLabels
 	 */
-	public void replaceLabels(TVModel model) {
+	public String[] replaceLabel(String[] oldHeaders, String oldNames[]) {
 		
-		String[][] oldRowHeaders = model.getGeneHeaderInfo().getHeaderArray();
-		String[][] oldColHeaders = model.getArrayHeaderInfo().getHeaderArray();
-		
-		String[][] rowHeadersToAdd = 
-				new String[oldRowHeaders.length + labels[0].length][];
-		String[][] colHeadersToAdd = 
-				new String[oldColHeaders.length + labels[0].length][];
-		
-		double time = System.currentTimeMillis();
-		String[] newRowHeaders;
-		// Iterate over loadedLabels
-		for(int i = 0; i < oldRowHeaders.length; i++) {
+		String[] newHeaders = null;
+		String[] headerToAdd;
 			
-			newRowHeaders = findNewHeader(oldRowHeaders[i], labels);
-			rowHeadersToAdd[i] = concatArrays(oldRowHeaders[i], newRowHeaders);
-		}
+		newHeaders = findNewLabel(oldHeaders, oldNames, labels);
+		headerToAdd = concatArrays(oldHeaders, newHeaders);
 		
-		LogBuffer.println("Time for replacing row labels: " + 
-		        (System.currentTimeMillis() - time));
-		
-		time = System.currentTimeMillis();
-		
-		String[] newColHeaders;
-		// Iterate over loadedLabels
-		for(int i = 0; i < oldColHeaders.length; i++) {
-			
-			newColHeaders = findNewHeader(oldColHeaders[i], labels);
-			colHeadersToAdd[i] = concatArrays(oldColHeaders[i], newColHeaders);
-		}
-		
-		LogBuffer.println("Time for replacing col labels: " + 
-		        (System.currentTimeMillis() - time));
-		
-		model.setGeneHeaders(rowHeadersToAdd);
-		model.setArrayHeaders(colHeadersToAdd);
-		
-		model.notifyObservers();
+		return headerToAdd;
 	}
 	
 	/**
 	 * Checks the loadedLabels array whether it contains a label from the old
 	 * headerArray and then replaces it accordingly with the 
-	 * newly loaded version.
+	 * newly loaded version. Returns the new 
 	 * @param oldLabels
 	 * @param loadedLabels
 	 * @return
 	 */
-	public String[] findNewHeader(String[] oldGene, String[][] loadedLabels) {
+	public String[] findNewLabel(String[] oldGene, String[] oldNames, 
+			String[][] loadedLabels) {
 		
-		String[] newGene = new String[oldGene.length];
+		List<String> newLabels = new ArrayList<String>();
 		boolean match = false;
 		
+		// Find a match
+		int matchIndex = -1;
 		for(int i = 0; i < loadedLabels.length; i++) {
 			
-			for(int j = 0; j < loadedLabels[i].length; j++) {
+			String[] loadedLabelElement = loadedLabels[i];
+			
+			for(int j = 0; j < loadedLabelElement.length; j++) {
 			
 				for(int k = 0; k < oldGene.length; k++) {
 					
-					if(loadedLabels[i][j].equalsIgnoreCase(oldGene[k])) {
-						match = true;	
-						newGene = loadedLabels[i];
+					if(loadedLabelElement[j].equalsIgnoreCase(oldGene[k])) {
+						match = true;
+						matchIndex = i;
 						break;
 					} 
 				}
@@ -211,43 +256,58 @@ public class CustomLabelLoader {
 			}
 		}
 		
-		if(!match) {
-			newGene = oldGene;	
-		}
-		
-		return newGene;
-	}
-	
-	// Experimental
-	public void addNewLabels(TVModel model, String[][] loadedLabels) {
-		
-		checkForLabels(model);
-		
-		String[] oldRowNames = model.getGeneHeaderInfo().getNames();
-		String[] oldColNames = model.getArrayHeaderInfo().getNames();
-		
-		String[] rowNamesToAdd;
-		String[] colNamesToAdd;
-		
-		// Change model prefix array
-		if(namesFound) {
-			rowNamesToAdd = concatArrays(oldRowNames, newNames);
-			colNamesToAdd = concatArrays(oldColNames, newNames);
+		// Replace matched element.
+		if(match) {
+			String[] matchedGene = loadedLabels[matchIndex];
 			
-			// Check for empty or null value
-			for(int i = 0; i < rowNamesToAdd.length; i++) {
+			for(int i = 0; i < matchedGene.length; i++) {
 				
-				if(rowNamesToAdd[i] == null 
-						|| rowNamesToAdd[i].equalsIgnoreCase("")) {
-					rowNamesToAdd[i] = "CUSTOM " + (i + 1);
+				if(!labelMatches[i]) {
+					newLabels.add(matchedGene[i]);
 				}
 			}
-			
-			for(int i = 0; i < colNamesToAdd.length; i++) {
+					
+		} else {
+			for(int i = 0; i < misses; i++) {
 				
-				if(colNamesToAdd[i] == null 
-						|| colNamesToAdd[i].equalsIgnoreCase("")) {
-					colNamesToAdd[i] = "CUSTOM " + (i + 1);
+				newLabels.add("No match");
+			}
+		}
+		
+		// Change list to array for return
+		return newLabels.toArray(new String[newLabels.size()]);
+	}
+	
+	/**
+	 * Sets the new names for the labels in the TVModel object.
+	 * @param model
+	 */
+	public void setHeaders(TVModel model, String type, 
+			String[][] headersToAdd) {
+		
+		// Set the new headers for the TVModel
+		if(type.equalsIgnoreCase("Row")) {
+			model.setGeneHeaders(headersToAdd);
+			
+		} else if(type.equalsIgnoreCase("Column")) {
+			model.setArrayHeaders(headersToAdd);
+		}
+		
+		model.notifyObservers();
+		
+		// Set the new Labels for the headers
+		String[] oldNames = headerInfo.getNames();
+		String[] namesToAdd = null;
+		// Change model prefix array
+		if(namesFound) {
+			namesToAdd = concatArrays(oldNames, newNames);
+			
+			// Check for empty or null value
+			for(int i = 0; i < namesToAdd.length; i++) {
+				
+				if(namesToAdd[i] == null 
+						|| namesToAdd[i].equalsIgnoreCase("")) {
+					namesToAdd[i] = "CUSTOM " + (i + 1);
 				}
 			}
 			
@@ -258,26 +318,10 @@ public class CustomLabelLoader {
 				newNames[i] = "CUSTOM " + (i + 1);
 			}
 			
-			rowNamesToAdd = concatArrays(oldRowNames, newNames);
-			colNamesToAdd = concatArrays(oldColNames, newNames);
+			namesToAdd = concatArrays(oldNames, newNames);
 		}
 		
-		model.getGeneHeaderInfo().setPrefixArray(rowNamesToAdd);
-		model.getArrayHeaderInfo().setPrefixArray(colNamesToAdd);
-		
-		// Change headerArrays (without matching actual names first)
-		replaceLabels(model);
-	}
-	
-	/**
-	 * Sets the instance variable that represent a 2-dimensional String array
-	 * for all the headers.
-	 * @param rowN
-	 * @param cdtColN
-	 */
-	public void setLabelArrays(int rowN, int cdtColN) {
-		
-		labels = new String[rowN][cdtColN];
+		headerInfo.setPrefixArray(namesToAdd);
 	}
 	
 	/**
