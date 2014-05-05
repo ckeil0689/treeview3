@@ -122,7 +122,8 @@ public class PreferencesController {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
-			if(tvFrame.getLoaded()){
+			if(tvFrame.getLoaded() && (preferences.getAnnotationChoices()[0] 
+					|| preferences.getAnnotationChoices()[1])){
 				
 				try {
 					customFile = tvFrame.selectFile();
@@ -133,7 +134,10 @@ public class PreferencesController {
 				
 				if(customFile != null) {
 					
-					labelWorker = new LabelWorker("Row");
+					if(preferences.getAnnotationChoices()[0]) {
+						labelWorker = new LabelWorker("Row");
+					} 
+					
 					dialog = new LabelLoadDialog(tvFrame);
 					
 					// A property listener used to update the progress bar
@@ -156,6 +160,8 @@ public class PreferencesController {
 					// from blocking the background task.
 					dialog.setVisible(true);
 				}
+			} else {
+				LogBuffer.println("Nothing selected.");
 			}
 		}
 	}

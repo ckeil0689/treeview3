@@ -235,20 +235,20 @@ public class CustomLabelLoader {
 		
 		// Find a match
 		int matchIndex = -1;
+		String oldLabel = oldGene[selectedIndeces[0]];
 		for(int i = 0; i < loadedLabels.length; i++) {
 			
 			String[] loadedLabelElement = loadedLabels[i];
 			
 			for(int j = 0; j < loadedLabelElement.length; j++) {
 			
-				for(int k = 0; k < oldGene.length; k++) {
+				String newLabel = loadedLabelElement[j];
 					
-					if(loadedLabelElement[j].equalsIgnoreCase(oldGene[k])) {
-						match = true;
-						matchIndex = i;
-						break;
-					} 
-				}
+				if(newLabel.toLowerCase().contains(oldLabel.toLowerCase())) {
+					match = true;
+					matchIndex = i;
+					break;
+				} 
 			}
 			
 			if(match) {

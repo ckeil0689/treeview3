@@ -12,6 +12,7 @@ import java.util.prefs.Preferences;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -154,6 +155,22 @@ public class PreferencesMenu {
 			LogBuffer.println("AnnotationSettings object was null. " +
 					"Could not get selected indeces.");
 			return null;
+		}
+	}
+	
+	/**
+	 * Returns a boolean array which indicated if the user selected
+	 * row- or column labels to be replaced.
+	 * @return
+	 */
+	public boolean[] getAnnotationChoices() {
+		
+		if(annotationSettings != null) {
+			return new boolean[] {annotationSettings.isRowsChecked(), 
+					annotationSettings.isColsChecked()};
+			
+		} else {
+			return new boolean[]{false, false};
 		}
 	}
 	
@@ -501,6 +518,8 @@ public class PreferencesMenu {
 		private final JButton custom_button;
 		private final HeaderSummaryPanel genePanel;
 		private final HeaderSummaryPanel arrayPanel;
+		private final JCheckBox rowBox;
+		private final JCheckBox colBox;
 		
 		public AnnotationPanel() {
 			
@@ -518,18 +537,32 @@ public class PreferencesMenu {
 					tvFrame.getDataModel().getArrayHeaderInfo(),
 					dendroView.getArraynameview().getHeaderSummary(), tvFrame);
 			
+			JPanel loadLabelPanel = new JPanel();
+			loadLabelPanel.setLayout(new MigLayout());
+			loadLabelPanel.setOpaque(false);
+			loadLabelPanel.setBorder(BorderFactory.createEtchedBorder());
+			
 			custom_button = GUIParams.setButtonLayout(
 					StringRes.button_customLabels, null);
 			
 			JLabel rows = GUIParams.setupHeader("Rows");
 			JLabel cols = GUIParams.setupHeader("Columns");
+			JLabel newLabels = GUIParams.setupHeader("Load New Labels");
 			
 			panel.add(rows, "pushx, alignx 50%");
 			panel.add(cols, "pushx, alignx 50%, wrap");
 			panel.add(genePanel, "pushx, alignx 50%, w 45%");
 			panel.add(arrayPanel, "pushx, alignx 50%, w 45%, wrap");
 			
-			panel.add(custom_button, "pushx, alignx 50%, span");
+			rowBox = new JCheckBox("Rows");
+			colBox = new JCheckBox("Cols");
+			
+			loadLabelPanel.add(rowBox, "pushx, alignx 50%");
+			loadLabelPanel.add(colBox, "pushx, alignx 50%, wrap");
+			loadLabelPanel.add(custom_button, "pushx, alignx 50%, span");
+			
+			panel.add(newLabels, "pushx, alignx 50%, span, wrap");
+			panel.add(loadLabelPanel, "pushx, alignx 50%, span");
 			
 			scrollPane.setViewportView(panel);
 		}
@@ -558,6 +591,16 @@ public class PreferencesMenu {
 		public int getSelectedArrayIndex() {
 			
 			return arrayPanel.getSmallestSelectedIndex();
+		}
+		
+		public boolean isRowsChecked() {
+			
+			return rowBox.isSelected();
+		}
+		
+		public boolean isColsChecked() {
+			
+			return colBox.isSelected();
 		}
 	}
 	

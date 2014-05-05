@@ -278,14 +278,14 @@
             </node>
             <node name="GlobalXMap">
               <map>
-                <entry key="scale" value="301.4"/>
+                <entry key="scale" value="215.28571428571428"/>
                 <entry key="minScale" value="11.330827067669173"/>
-                <entry key="XScrollValue" value="6"/>
+                <entry key="XScrollValue" value="0"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="301.4"/>
+                  <entry key="scale" value="215.28571428571428"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -296,14 +296,14 @@
             </node>
             <node name="GlobalYMap">
               <map>
-                <entry key="scale" value="115.57142857142857"/>
+                <entry key="scale" value="89.88888888888889"/>
                 <entry key="minScale" value="6.082706766917293"/>
-                <entry key="YScrollValue" value="7"/>
+                <entry key="YScrollValue" value="0"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="115.57142857142857"/>
+                  <entry key="scale" value="89.88888888888889"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -491,14 +491,14 @@
             </node>
             <node name="GlobalXMap">
               <map>
-                <entry key="scale" value="0.45987183399450715"/>
+                <entry key="scale" value="19.075949367088608"/>
                 <entry key="minScale" value="0.45987183399450715"/>
                 <entry key="XScrollValue" value="0"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="0.45987183399450715"/>
+                  <entry key="scale" value="19.075949367088608"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -509,14 +509,14 @@
             </node>
             <node name="GlobalYMap">
               <map>
-                <entry key="scale" value="0.5560137457044674"/>
+                <entry key="scale" value="23.794117647058822"/>
                 <entry key="minScale" value="0.5560137457044674"/>
                 <entry key="YScrollValue" value="0"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="0.5560137457044674"/>
+                  <entry key="scale" value="23.794117647058822"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -549,7 +549,7 @@
               </node>
               <node name="Selection0">
                 <map>
-                  <entry key="index" value="2"/>
+                  <entry key="index" value="0"/>
                 </map>
                 <node name="TextView">
                   <map>
@@ -558,7 +558,7 @@
                   </map>
                   <node name="TextViewManagerSummary">
                     <map>
-                      <entry key="included" value="2"/>
+                      <entry key="included" value="0"/>
                     </map>
                   </node>
                 </node>
@@ -1648,6 +1648,9 @@
               <entry key="style" value="0"/>
             </map>
             <node name="File4">
+              <map/>
+            </node>
+            <node name="File8">
               <map/>
             </node>
           </node>
