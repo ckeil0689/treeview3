@@ -106,7 +106,7 @@ public class CancelableSettingsDialog extends JDialog {
 			});
 			add(save_button);
 
-			final JButton cancel_button = GUIParams.setButtonLayout("Cancel", 
+			final JButton cancel_button = GUIParams.setButtonLayout("Cancel",
 					null);
 			cancel_button.addActionListener(new ActionListener() {
 

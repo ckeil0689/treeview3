@@ -54,7 +54,7 @@ class ContrastSelector extends JPanel implements AdjustmentListener {
 		font_label.setForeground(GUIParams.TEXT);
 		font_label.setFont(GUIParams.FONTS);
 		inner.add(font_label, "alignx 50%");
-		
+
 		inner.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
 
 		contrastTextField = new JTextField(Double.toString(contrast), 5);

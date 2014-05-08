@@ -50,7 +50,7 @@ import javax.swing.JOptionPane;
  *          (1/16/2003)
  */
 public class FileSet {
-	
+
 	// the following concerns types which you can open as...
 	public static final int AUTO_STYLE = 0;
 	public static final int CLASSIC_STYLE = 1;
@@ -59,32 +59,33 @@ public class FileSet {
 	private static final String validStyles = "auto|classic|kmeans|linked";
 	private static final String[] validStylesArray = { "Auto", "Classic",
 			"Kmeans", "Linked" };
-	
+
 	// the following concerns whether quoted strings are parsed
 	public static final int PARSE_QUOTED = 1;
-	
+
 	private Preferences node = null;
 	List<FileSetListener> fileSetListeners = new ArrayList<FileSetListener>();
-	
+
 	/**
 	 * Checks if a file's location has changed.
+	 * 
 	 * @return
 	 */
 	public boolean hasMoved() {
-		
+
 		if (isUrl()) {
 			return false;
-			
+
 		} else {
 			try {
 				final File f = new File(getCdt());
 				return !(f.exists());
-				
+
 			} catch (final Exception e) {
-				LogBuffer.println("Exception occurred when checking " +
-						"whether a FileSet has moved: " + e.getMessage());
+				LogBuffer.println("Exception occurred when checking "
+						+ "whether a FileSet has moved: " + e.getMessage());
 			}
-			
+
 			return true;
 		}
 	}
@@ -96,7 +97,7 @@ public class FileSet {
 	 *            ConfigNode to base this fileset on.
 	 */
 	public FileSet(final Preferences configNode) {
-		
+
 		node = configNode;
 	}
 
@@ -110,14 +111,14 @@ public class FileSet {
 	 *            directory to find file in.
 	 */
 	public FileSet(final String cdt, final String dir) {
-		
+
 		node = Preferences.userRoot().node(this.getClass().getName());
 		setCdt(cdt);
 		setDir(dir);
 	}
 
 	public FileSet(final String dir) {
-		
+
 		node = Preferences.userRoot().node(this.getClass().getName());
 		setDir(dir);
 	}
@@ -128,7 +129,7 @@ public class FileSet {
 	 * @return The configNode value
 	 */
 	public Preferences getConfigNode() {
-		
+
 		return node;
 	}
 
@@ -139,7 +140,7 @@ public class FileSet {
 	 *            FileSet to copy state from
 	 */
 	public void copyState(final FileSet fileSet) {
-		
+
 		setRoot(fileSet.getRoot());
 		setDir(fileSet.getDir());
 		setExt(fileSet.getExt());
@@ -152,7 +153,7 @@ public class FileSet {
 	 */
 	@Override
 	public String toString() {
-		
+
 		return getCdt();
 	}
 
@@ -164,7 +165,7 @@ public class FileSet {
 	 * @return true if equal
 	 */
 	public boolean equals(final FileSet fileSet) {
-		
+
 		return getCdt().equals(fileSet.getCdt());
 	}
 
@@ -172,7 +173,7 @@ public class FileSet {
 	 * @return The complete path of the atr file
 	 */
 	public String getAtr() {
-		
+
 		return getDir() + getRoot() + node.get("atr", ".atr");
 	}
 
@@ -180,7 +181,7 @@ public class FileSet {
 	 * @return The complete path of the cdt file
 	 */
 	public String getCdt() {
-		
+
 		return getDir() + getRoot() + getExt();
 	}
 
@@ -188,7 +189,7 @@ public class FileSet {
 	 * @return The directory in which the files of the fileset are found
 	 */
 	public String getDir() {
-		
+
 		return node.get("dir", "");
 	}
 
@@ -196,7 +197,7 @@ public class FileSet {
 	 * @return The complete path of the gtr file
 	 */
 	public String getGtr() {
-		
+
 		return getDir() + getRoot() + node.get("gtr", ".gtr");
 	}
 
@@ -204,7 +205,7 @@ public class FileSet {
 	 * @return The complete path of the jtv file
 	 */
 	public String getJtv() {
-		
+
 		return getDir() + getRoot() + node.get("jtv", ".jtv");
 	}
 
@@ -213,7 +214,7 @@ public class FileSet {
 	 *         "test.cdt".
 	 */
 	public String getRoot() {
-		
+
 		return node.get("root", "");
 	}
 
@@ -222,7 +223,7 @@ public class FileSet {
 	 *         for one based on "test.cdt", "pcl" for one based on "test.pcl"
 	 */
 	public String getExt() {
-		
+
 		return node.get("cdt", ".cdt");
 	}
 
@@ -230,7 +231,7 @@ public class FileSet {
 	 * @return The logical name of the fileset
 	 */
 	public String getName() {
-		
+
 		return node.get("name", "No name");
 	}
 
@@ -241,7 +242,7 @@ public class FileSet {
 	 *            Name of base of the FileSet
 	 */
 	public void setCdt(final String string1) {
-		
+
 		if (string1 != null) {
 			setRoot(string1.substring(0, string1.length() - 4));
 			setExt(string1.substring(string1.length() - 4, string1.length()));
@@ -256,7 +257,7 @@ public class FileSet {
 	 *            The new root value
 	 */
 	public void setRoot(final String string) {
-		
+
 		node.put("root", string);
 	}
 
@@ -267,7 +268,7 @@ public class FileSet {
 	 *            The new dir value
 	 */
 	public void setDir(final String string) {
-		
+
 		node.put("dir", string);
 	}
 
@@ -278,7 +279,7 @@ public class FileSet {
 	 *            The new ext value
 	 */
 	public void setExt(final String string) {
-		
+
 		node.put("cdt", string);
 	}
 
@@ -286,7 +287,7 @@ public class FileSet {
 	 * @return The logical name of the fileset
 	 */
 	public void setName(final String string) {
-		
+
 		node.put("name", string);
 	}
 
@@ -294,19 +295,19 @@ public class FileSet {
 	 * Used to display gene clusters for knn clustering
 	 */
 	public String getKgg() {
-		
+
 		String filename = getRoot();
 		final int postfix = filename.lastIndexOf("_K");
-		
+
 		if (filename.indexOf("_G", postfix) == -1) {
 			return "";
 		}
-		
+
 		final int arrayid = filename.indexOf("_A", postfix);
 		if (arrayid != -1) {
 			filename = filename.substring(0, arrayid);
 		}
-		
+
 		return getDir() + filename + node.get("kgg", ".kgg");
 	}
 
@@ -314,20 +315,20 @@ public class FileSet {
 	 * Used to display array clusters for knn clustering
 	 */
 	public String getKag() {
-		
+
 		String filename = getRoot();
 		final int postfix = filename.lastIndexOf("_K");
 		final int arrayid = filename.indexOf("_A");
 		if (arrayid == -1) {
 			return "";
 		}
-		
+
 		final int geneid = filename.indexOf("_G", postfix);
 		if (geneid != -1) {
 			filename = filename.substring(0, geneid)
 					+ filename.substring(arrayid);
 		}
-		
+
 		return getDir() + filename + node.get("kag", ".kag");
 	}
 
@@ -335,7 +336,7 @@ public class FileSet {
 	 * returns string array of valid style names
 	 */
 	public static String[] getStyles() {
-		
+
 		return validStylesArray;
 	}
 
@@ -346,21 +347,21 @@ public class FileSet {
 	 * @return string representing style, or null if code not found.
 	 */
 	public static String getStyleByIndex(final int i) {
-		
+
 		switch (i) {
-		
+
 		case AUTO_STYLE:
 			return "auto";
-			
+
 		case CLASSIC_STYLE:
 			return "classic";
-			
+
 		case KMEANS_STYLE:
 			return "kmeans";
-			
+
 		case LINKED_STYLE:
 			return "linked";
-			
+
 		default:
 			return null;
 		}
@@ -373,19 +374,19 @@ public class FileSet {
 	 * @return int representing style, or -1 if style not found.
 	 */
 	public static int getStyleByName(final String name) {
-		
+
 		if (name.equalsIgnoreCase("auto")) {
 			return AUTO_STYLE;
-			
+
 		} else if (name.equalsIgnoreCase("classic")) {
 			return CLASSIC_STYLE;
-			
+
 		} else if (name.equalsIgnoreCase("kmeans")) {
 			return KMEANS_STYLE;
-			
+
 		} else if (name.equalsIgnoreCase("linked")) {
 			return LINKED_STYLE;
-			
+
 		} else {
 			JOptionPane.showMessageDialog(null, "Error: Invalid Style " + name
 					+ ". Valid styles " + validStyles);
@@ -398,25 +399,25 @@ public class FileSet {
 	 * @return does this fileset have a specified style?
 	 */
 	public boolean hasStyle() {
-		
+
 		boolean contains = false;
-		
+
 		String[] keys;
 		try {
 			keys = node.keys();
-		
-			for(int i = 0; i < keys.length; i++) {
-				
-				if(keys[i].equalsIgnoreCase("style")) {
-					
+
+			for (int i = 0; i < keys.length; i++) {
+
+				if (keys[i].equalsIgnoreCase("style")) {
+
 					contains = true;
 					break;
 				}
 			}
-			
+
 			return contains;
 
-		} catch (BackingStoreException e) {
+		} catch (final BackingStoreException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return contains;
@@ -424,21 +425,21 @@ public class FileSet {
 	}
 
 	public int getStyle() {
-		
+
 		return node.getInt("style", AUTO_STYLE);
 	}
 
 	public void setStyle(final int newStyle) {
-		
+
 		node.putInt("style", newStyle);
 	}
 
 	public void setStyle(final String newStyle) {
-		
+
 		if (newStyle == null) {
 			JOptionPane.showMessageDialog(null, "Error: Invalid Style null. "
 					+ "Valid styles " + validStyles);
-			
+
 		} else {
 			final int style = getStyleByName(newStyle);
 			if (style != -1) {
@@ -448,39 +449,39 @@ public class FileSet {
 	}
 
 	public void setParseQuotedStrings(final boolean parseQuote) {
-		
+
 		if (parseQuote) {
 			node.putInt("quotes", 1);
-			
+
 		} else {
 			node.putInt("quotes", 0);
 		}
 	}
 
 	public boolean getParseQuotedStrings() {
-		
+
 		return (node.getInt("quotes", PARSE_QUOTED) == 1);
 	}
 
 	public void addFileSetListener(final FileSetListener listener) {
-		
+
 		fileSetListeners.add(listener);
 	}
 
 	public void clearFileSetListeners() {
-		
+
 		fileSetListeners.clear();
 	}
 
 	public void notifyMoved() {
-		
+
 		for (final FileSetListener listener : fileSetListeners) {
 			listener.onFileSetMoved(this);
 		}
 	}
-	
+
 	public boolean isUrl() {
-		
+
 		return getDir().startsWith("http");
 	}
 

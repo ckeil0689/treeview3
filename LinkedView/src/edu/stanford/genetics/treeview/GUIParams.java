@@ -21,7 +21,7 @@ public class GUIParams {
 
 	// Default
 	public static String QUESTIONICON = "questionIcon_dark.png";
-	
+
 	public static Font FONTS = new Font("Sans Serif", Font.PLAIN, 14);
 	public static Font FONT_MENU = new Font("Sans Serif", Font.PLAIN, 16);
 	public static Font FONTL = new Font("Sans Serif", Font.PLAIN, 20);
@@ -38,13 +38,13 @@ public class GUIParams {
 	public static Color RED1 = new Color(240, 80, 50, 255);
 	public static Color PROGRESS = new Color(39, 40, 34, 255);
 	public static Color TABLEHEADERS = new Color(255, 200, 120, 255);
-	
+
 	private static boolean dark = true;
 
 	public static void setDayLight() {
-		
+
 		dark = false;
-		
+
 		QUESTIONICON = "questionIcon_light.png";
 
 		TEXT = new Color(20, 20, 20, 255);
@@ -58,7 +58,7 @@ public class GUIParams {
 	public static void setNight() {
 
 		dark = true;
-		
+
 		QUESTIONICON = "questionIcon_dark.png";
 
 		TEXT = new Color(200, 200, 200, 255);
@@ -68,129 +68,132 @@ public class GUIParams {
 		BG_COLOR = new Color(39, 40, 34, 255);
 		TABLEHEADERS = new Color(255, 205, 120, 255);
 	}
-	
+
 	public static boolean isDarkTheme() {
-		
+
 		return dark;
 	}
-	
+
 	/**
-	 * Creates a button with a title and icon if desired. The method 
-	 * centralizes the layout setting for buttons so that all buttons will
-	 * look similar.
+	 * Creates a button with a title and icon if desired. The method centralizes
+	 * the layout setting for buttons so that all buttons will look similar.
+	 * 
 	 * @param title
 	 * @param iconFileName
 	 * @return
 	 */
-	public static JButton setButtonLayout(String title, String iconFileName) {
+	public static JButton setButtonLayout(final String title,
+			final String iconFileName) {
 
 		final JButton button = new JButton();
-		
+
 		// Basic layout
 		button.setFont(FONTS);
 		button.setBorder(null);
 		button.setFocusPainted(false);
-		
+
 		// Set button color first
 		button.setBackground(MAIN);
 		button.setForeground(BG_COLOR);
-		
-		// Check if button has a title and change color if it's "Close" 
-		if(title != null) {
+
+		// Check if button has a title and change color if it's "Close"
+		if (title != null) {
 			button.setText(title);
-			
-			if(title.equalsIgnoreCase("Close")) {
+
+			if (title.equalsIgnoreCase("Close")) {
 				button.setBackground(RED1);
-				button.setForeground(Color.white);	
-			} 
+				button.setForeground(Color.white);
+			}
 		}
-		
+
 		// If provided, add icon to button
-		if(iconFileName != null) {	
-			
+		if (iconFileName != null) {
+
 			String iconType;
-			
-			if(!iconFileName.substring(iconFileName.length() - 4, 
+
+			if (!iconFileName.substring(iconFileName.length() - 4,
 					iconFileName.length() - 1).equalsIgnoreCase("png")) {
-				if(dark) {
+				if (dark) {
 					iconType = "_dark.png";
-					
+
 				} else {
 					iconType = "_light.png";
 				}
 			} else {
 				iconType = "";
 			}
-			
+
 			try {
-				ClassLoader classLoader = Thread.currentThread()
+				final ClassLoader classLoader = Thread.currentThread()
 						.getContextClassLoader();
-				InputStream input = classLoader
+				final InputStream input = classLoader
 						.getResourceAsStream(iconFileName + iconType);
-				
-			    Image img = ImageIO.read(input);
-			    button.setIcon(new ImageIcon(img));
-			    
-			    button.setHorizontalTextPosition(SwingConstants.LEFT);
-		
-			  } catch (IOException ex) {
-			  }
-		} 
-		
+
+				final Image img = ImageIO.read(input);
+				button.setIcon(new ImageIcon(img));
+
+				button.setHorizontalTextPosition(SwingConstants.LEFT);
+
+			} catch (final IOException ex) {
+			}
+		}
+
 		final Dimension d = button.getPreferredSize();
-		d.setSize(d.getWidth()* 1.5, d.getHeight() * 1.5);
-		
-		if(iconFileName != null) {
+		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
+
+		if (iconFileName != null) {
 			button.setMinimumSize(new Dimension(40, 40));
-		
+
 		} else {
 			button.setMinimumSize(new Dimension(80, 40));
 		}
-		
+
 		button.setPreferredSize(d);
 
 		return button;
 	}
-	
+
 	/**
-	 * Sets a layout for a button which is supposed to appear in the top
-	 * menubar which belongs to the TVFrame.
+	 * Sets a layout for a button which is supposed to appear in the top menubar
+	 * which belongs to the TVFrame.
+	 * 
 	 * @param title
 	 * @param iconFileName
 	 * @return
 	 */
-	public static JButton setMenuButtonLayout(String title, 
-			String iconFileName) {
-		
-		JButton menuButton = setButtonLayout(title, iconFileName);
-		
+	public static JButton setMenuButtonLayout(final String title,
+			final String iconFileName) {
+
+		final JButton menuButton = setButtonLayout(title, iconFileName);
+
 		menuButton.setBackground(BG_COLOR);
 		menuButton.setForeground(MAIN);
 		menuButton.setFont(FONTS);
 		menuButton.setBorder(null);
 		menuButton.setFocusPainted(false);
-		
+
 		return menuButton;
 	}
-	
+
 	/**
 	 * Sets the layout of JRadioButton.
+	 * 
 	 * @param title
 	 * @param iconFileName
 	 * @return
 	 */
-	public static JRadioButton setRadioButtonLayout(String title) {
-		
-		JRadioButton menuButton = new JRadioButton(title);
+	public static JRadioButton setRadioButtonLayout(final String title) {
+
+		final JRadioButton menuButton = new JRadioButton(title);
 		menuButton.setOpaque(false);
 		menuButton.setForeground(RADIOTEXT);
 		menuButton.setFont(FONTS);
 		menuButton.setBorder(null);
 		menuButton.setFocusPainted(false);
-		
+
 		return menuButton;
 	}
-	
+
 	/**
 	 * Method to setup a JProgressBar
 	 * 
@@ -200,7 +203,7 @@ public class GUIParams {
 	 */
 	public static JProgressBar setPBarLayout() {
 
-		JProgressBar pBar = new JProgressBar();
+		final JProgressBar pBar = new JProgressBar();
 		pBar.setMinimum(0);
 		pBar.setStringPainted(true);
 		pBar.setMaximumSize(new Dimension(2000, 20));
@@ -221,7 +224,7 @@ public class GUIParams {
 
 		return pBar;
 	}
-	
+
 	/**
 	 * Setting up a general layout for a ComboBox object The method is used to
 	 * make all ComboBoxes appear consistent in aesthetics
@@ -238,30 +241,32 @@ public class GUIParams {
 
 		return comboBox;
 	}
-	
+
 	/**
 	 * Returns the size of the current screen.
+	 * 
 	 * @return Dimension size
 	 */
 	public static Dimension getScreenSize() {
-		
+
 		final Toolkit toolkit = Toolkit.getDefaultToolkit();
 		final Dimension dimension = toolkit.getScreenSize();
-		
+
 		return dimension;
 	}
-	
+
 	/**
 	 * Creates a header label.
+	 * 
 	 * @param title
 	 * @return
 	 */
-	public static JLabel setupHeader(String title) {
-		
-		JLabel header = new JLabel(title);
+	public static JLabel setupHeader(final String title) {
+
+		final JLabel header = new JLabel(title);
 		header.setFont(FONTL);
 		header.setForeground(MAIN);
-		
+
 		return header;
 	}
 }

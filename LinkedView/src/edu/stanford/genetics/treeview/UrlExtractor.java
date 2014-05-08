@@ -35,7 +35,7 @@ public class UrlExtractor {
 	 * This class must be constructed around gene header info
 	 */
 	public UrlExtractor(final HeaderInfo hI) {
-		
+
 		headerInfo = hI;
 		urlTemplate = dUrlTemplate;
 		index = dindex;
@@ -44,7 +44,7 @@ public class UrlExtractor {
 	}
 
 	public UrlExtractor(final HeaderInfo hI, final UrlPresets uPresets) {
-		
+
 		headerInfo = hI;
 		urlTemplate = dUrlTemplate;
 		index = dindex;
@@ -58,7 +58,7 @@ public class UrlExtractor {
 	 * can be bound to config node to provide persistence
 	 */
 	public void bindConfig(final Preferences n) {
-		
+
 		root = n;
 		// extract state...
 		urlTemplate = root.get("urlTemplate", dUrlTemplate);

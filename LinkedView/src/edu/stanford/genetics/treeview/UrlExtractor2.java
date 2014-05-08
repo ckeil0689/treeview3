@@ -30,7 +30,7 @@ import java.util.prefs.Preferences;
  */
 
 public class UrlExtractor2 implements ConfigNodePersistent {
-	
+
 	private Preferences configNode;
 	private final UrlPresets presets;
 
@@ -39,7 +39,7 @@ public class UrlExtractor2 implements ConfigNodePersistent {
 	 * dummy. It also needs UrlPresets to infer templates from styles
 	 */
 	public UrlExtractor2(final Preferences n, final UrlPresets p) {
-		
+
 		configNode = n;
 		presets = p;
 	}
@@ -49,13 +49,13 @@ public class UrlExtractor2 implements ConfigNodePersistent {
 	 * url template.
 	 */
 	public String getColHeader() {
-		
+
 		final String ret = configNode.get("header", null);
 		return ret;
 	}
 
 	public void setColHeader(final String head) {
-		
+
 		configNode.put("header", head);
 	}
 
@@ -63,7 +63,7 @@ public class UrlExtractor2 implements ConfigNodePersistent {
 	 * most common use, fills in current template with val
 	 */
 	public String substitute(final String val) {
-		
+
 		final String temp = getTemplate();
 		if (temp == null)
 			return null;
@@ -76,7 +76,7 @@ public class UrlExtractor2 implements ConfigNodePersistent {
 	}
 
 	public String getTemplate() {
-		
+
 		String ret = configNode.get("template", null);
 		if (ret != null)
 			return ret;
@@ -98,24 +98,24 @@ public class UrlExtractor2 implements ConfigNodePersistent {
 	}
 
 	public void setTemplate(final String ret) {
-		
+
 		configNode.put("template", ret);
 	}
 
-//	@Override
-//	public void bindConfig(final Preferences configNode) {
-//		root = configNode;
-//	}
-	
+	// @Override
+	// public void bindConfig(final Preferences configNode) {
+	// root = configNode;
+	// }
+
 	@Override
-	public void setConfigNode(Preferences parentNode) {
-		
-		if(parentNode != null) {
+	public void setConfigNode(final Preferences parentNode) {
+
+		if (parentNode != null) {
 			this.configNode = parentNode.node("UrlExtractor");
-			
+
 		} else {
-			LogBuffer.println("Could not find or create UrlExtractor" +
-					"node because parentNode was null.");
+			LogBuffer.println("Could not find or create UrlExtractor"
+					+ "node because parentNode was null.");
 		}
 	}
 }

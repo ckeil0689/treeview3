@@ -512,4 +512,4 @@
 //	private final float[] missingColor = new float[3];
 //	private final float[] emptyColor = new float[3];
 //
-//}
+// }

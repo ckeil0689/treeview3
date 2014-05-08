@@ -75,7 +75,7 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 	private TreePainter drawer = null;
 	private TreeDrawerNode selectedNode = null;
 	private Rectangle destRect = null;
-	
+
 	private final boolean ISLEFT = false;
 
 	/** Constructor, sets up AWT components */
@@ -112,9 +112,9 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 			drawer.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
 					destRect, selectedNode, false, ISLEFT);
 		}
-		
+
 		selectedNode = n;
-		
+
 		if (selectedNode != null) {
 			if (xScaleEq != null) {
 				drawer.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
@@ -237,22 +237,22 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 					cand = drawer.getLeaf(arraySelection.getMinIndex());
 				}
 				// this clause selects the root node if all arrays are selected.
-				else if (arraySelection.getMinIndex() == map.getMinIndex() 
+				else if (arraySelection.getMinIndex() == map.getMinIndex()
 						&& arraySelection.getMaxIndex() == map.getMaxIndex()) {
 					cand = drawer.getRootNode();
-				
+
 				}
-//				// find node when multiple arrays are selected.
-//				} else if(arraySelection.getMinIndex() >= map.getMinIndex() 
-//						&& arraySelection.getMaxIndex() <= map.getMaxIndex()) {
-//					cand = drawer.getNearestNode(arraySelection.getMinIndex(), 
-//							arraySelection.getMaxIndex());
-//				}
+				// // find node when multiple arrays are selected.
+				// } else if(arraySelection.getMinIndex() >= map.getMinIndex()
+				// && arraySelection.getMaxIndex() <= map.getMaxIndex()) {
+				// cand = drawer.getNearestNode(arraySelection.getMinIndex(),
+				// arraySelection.getMaxIndex());
+				// }
 			}
 			// Only notify observers if we're changing the selected node.
 			if ((cand != null)
-					&& !(cand.getId().equalsIgnoreCase(
-							arraySelection.getSelectedNode()))) {
+					&& !(cand.getId().equalsIgnoreCase(arraySelection
+							.getSelectedNode()))) {
 				arraySelection.setSelectedNode(cand.getId());
 				arraySelection.notifyObservers();
 
@@ -518,7 +518,7 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 		synchMap();
 		repaint();
 	}
-	
+
 	/**
 	 * @param nodeName
 	 */

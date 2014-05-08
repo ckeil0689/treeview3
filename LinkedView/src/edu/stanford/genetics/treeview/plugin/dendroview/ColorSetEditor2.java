@@ -45,9 +45,9 @@ import edu.stanford.genetics.treeview.ColorIcon;
  */
 
 public class ColorSetEditor2 extends JPanel {
-	
+
 	private static final long serialVersionUID = 1L;
-	
+
 	private final static int UP = 0;
 	private final static int ZERO = 1;
 	private final static int DOWN = 2;
@@ -61,7 +61,7 @@ public class ColorSetEditor2 extends JPanel {
 	 *            <code>ColorSet</code> to be edited
 	 */
 	public ColorSetEditor2(final ColorSet2 colorSet) {
-		
+
 		this.colorSet = colorSet;
 		add(new ColorPanel(UP));
 		add(new ColorPanel(ZERO));
@@ -76,7 +76,7 @@ public class ColorSetEditor2 extends JPanel {
 	 *            ignored
 	 */
 	public final static void main(final String[] argv) {
-		
+
 		final ColorSet2 temp = new ColorSet2();
 		final ColorSetEditor2 cse = new ColorSetEditor2(temp);
 		final JFrame frame = new JFrame("ColorSetEditor Test");
@@ -106,8 +106,8 @@ public class ColorSetEditor2 extends JPanel {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final Color trial = JColorChooser.showDialog(
-							ColorSetEditor2.this,
-							"Pick Color for " + getLabel(), getColor());
+							ColorSetEditor2.this, "Pick Color for "
+									+ getLabel(), getColor());
 					if (trial != null) {
 						setColor(trial);
 					}
@@ -119,15 +119,15 @@ public class ColorSetEditor2 extends JPanel {
 
 		private void setColor(final Color c) {
 			switch (type) {
-//			case UP:
-//				colorSet.setUp(c);
-//				break;
-//			case ZERO:
-//				colorSet.setZero(c);
-//				break;
-//			case DOWN:
-//				colorSet.setDown(c);
-//				break;
+			// case UP:
+			// colorSet.setUp(c);
+			// break;
+			// case ZERO:
+			// colorSet.setZero(c);
+			// break;
+			// case DOWN:
+			// colorSet.setDown(c);
+			// break;
 			case MISSING:
 				colorSet.setMissing(c);
 				break;
@@ -153,12 +153,12 @@ public class ColorSetEditor2 extends JPanel {
 
 		private Color getColor() {
 			switch (type) {
-//			case UP:
-//				return colorSet.getUp();
-//			case ZERO:
-//				return colorSet.getZero();
-//			case DOWN:
-//				return colorSet.getDown();
+			// case UP:
+			// return colorSet.getUp();
+			// case ZERO:
+			// return colorSet.getZero();
+			// case DOWN:
+			// return colorSet.getDown();
 			case MISSING:
 				return colorSet.getMissing();
 			}

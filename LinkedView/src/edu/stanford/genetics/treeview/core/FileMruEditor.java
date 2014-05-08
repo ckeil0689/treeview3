@@ -63,7 +63,7 @@ public class FileMruEditor extends JPanel {
 	private FileSetPanel fileSetPanel;
 	private ButtonPanel buttonPanel;
 
-	private static String[] options = new String[] {"Find...", "Remove",
+	private static String[] options = new String[] { "Find...", "Remove",
 			"Cancel" };
 	/**
 	 * Constant signifying what type of action to take. Used to keep track of
@@ -88,7 +88,7 @@ public class FileMruEditor extends JPanel {
 	 *            the FileMru to be edited
 	 */
 	public FileMruEditor(final FileMru fm) {
-		
+
 		super();
 		client = fm;
 		setupWidgets();
@@ -446,12 +446,12 @@ public class FileMruEditor extends JPanel {
 	 */
 	public final static void main(final String[] args) {
 
-//		final XmlConfig c = new XmlConfig(args[0], "TestConfig");
-//		final FileMru fm = new FileMru();
-//
-//		fm.bindConfig(c.getNode("FileMru"));
-//		final FileMruEditor fme = new FileMruEditor(fm);
-//		fme.makeTop();
+		// final XmlConfig c = new XmlConfig(args[0], "TestConfig");
+		// final FileMru fm = new FileMru();
+		//
+		// fm.bindConfig(c.getNode("FileMru"));
+		// final FileMruEditor fme = new FileMruEditor(fm);
+		// fme.makeTop();
 	}
 
 }

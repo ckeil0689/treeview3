@@ -9,7 +9,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
@@ -18,7 +17,6 @@ import java.util.regex.Pattern;
 import javax.swing.SwingWorker;
 
 import Views.WelcomeView;
-
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeViewFrame;
@@ -26,481 +24,474 @@ import edu.stanford.genetics.treeview.TreeViewFrame;
 public class NewModelLoader {
 
 	protected TVModel targetModel;
-	private FileSet fileSet;
+	private final FileSet fileSet;
 	protected TreeViewFrame tvFrame;
 	protected WelcomeView loadProgView;
-	
+
 	// Instance variables for the actual data to be loaded.
-	protected String[][] stringLabels;
+//	protected String[][] stringLabels;
 	private double[][] doubleData;
-	
+
 	private int lineNum;
 	private int dataStartRow;
 	private int dataStartCol;
-	
+
 	boolean hasData = false;
 	private boolean hasGID = false;
 	private boolean hasAID = false;
 	private boolean hasEWeight = false;
 	private boolean hasGWeight = false;
-	
-	public NewModelLoader(TVModel model) {
-		
+
+	public NewModelLoader(final TVModel model) {
+
 		this.targetModel = model;
 		this.tvFrame = model.getFrame();
 		this.fileSet = model.getFileSet();
 		this.loadProgView = tvFrame.getWelcomeView();
 	}
-	
+
 	public TVModel load() throws OutOfMemoryError {
 		
-		try {
+		String[][] stringLabels = null;
+		try { 
 			// Read data from specified file location
 			loadProgView.resetLoadBar();
 			loadProgView.setLoadLabel("Getting file ready to load...");
 			lineNum = count(new File(fileSet.getCdt()));
 			loadProgView.setLoadBarMax(lineNum);
 			
-			FileInputStream fis = new FileInputStream(fileSet.getCdt());
-	        DataInputStream in = new DataInputStream(fis);
-	        BufferedReader br = new BufferedReader(new InputStreamReader(in));
-	        
-	        // Get data from file into String and double arrays 
-	        // Put the arrays in ArrayLists for later access.
-	        loadProgView.setLoadLabel("Extracting data.");
-	        extractData(br);
-	        
-	        if(!hasData) {
-	        	String noData = "No data could be identified " +
-	        			"in the chosen file.";
-	        	tvFrame.setLoadErrorMessage(noData);
-	        	return null;
-	        }
-	        
-	        br.close();
-	        
-        } catch(FileNotFoundException e) {
-        	String fnfError = "Chosen file could not be found: " 
-        			+ e.getMessage();
-        	LogBuffer.println(fnfError);
-        	tvFrame.setLoadErrorMessage(fnfError);
-        	e.printStackTrace();
-        	
-        } catch (IOException e) {
-        	String fnfError = "File could not be loaded: " + e.getMessage();
-        	LogBuffer.println(fnfError);
-        	tvFrame.setLoadErrorMessage(fnfError);
-        	e.printStackTrace();
-		}
+			BufferedReader br = new BufferedReader(new FileReader(
+				new File(fileSet.getCdt())));
 		
+			try {
+				// Get data from file into String and double arrays
+				// Put the arrays in ArrayLists for later access.
+				loadProgView.setLoadLabel("Extracting data.");
+				stringLabels = extractData(br);
+	
+				if (!hasData) {
+					final String noData = "No data could be identified "
+							+ "in the chosen file.";
+					tvFrame.setLoadErrorMessage(noData);
+					return null;
+				}
+			} catch (final FileNotFoundException e) {
+				final String fnfError = "Chosen file could not be found: "
+						+ e.getMessage();
+				LogBuffer.println(fnfError);
+				tvFrame.setLoadErrorMessage(fnfError);
+				e.printStackTrace();
+				
+			}  finally {
+				if(br != null) {
+					br.close();
+					br = null;
+				}
+			}
+		} catch (final IOException e) {
+			final String fnfError = "File could not be loaded: "
+					+ e.getMessage();
+			LogBuffer.println(fnfError);
+			tvFrame.setLoadErrorMessage(fnfError);
+			e.printStackTrace();
+		}
+
 		// Parse the CDT File
 		loadProgView.setLoadLabel("Parsing main file.");
-		parseCDT();
-		
+		parseCDT(stringLabels);
+
 		// If present, parse ATR File
-		if(hasAID) {
+		if (hasAID) {
 			loadProgView.setLoadLabel("Reading ATR file.");
 			parseATR();
-		
+
 		} else {
 			LogBuffer.println("No ATR file found for this CDT file.");
 			targetModel.aidFound(false);
 		}
-		
+
 		// If present, parse GTR File
-		if(hasGID) {
+		if (hasGID) {
 			loadProgView.setLoadLabel("Reading GTR file.");
 			parseGTR();
-			
+
 		} else {
 			LogBuffer.println("No GTR file found for this CDT file.");
 			targetModel.gidFound(false);
 		}
-		
+
 		// Load Config File
 		try {
 			loadProgView.setLoadLabel("Getting configurations...");
-			final String fileName = targetModel.getFileSet().getRoot(); 
+			final String fileName = targetModel.getFileSet().getRoot();
 			final String fileExt = targetModel.getFileSet().getExt();
-			
-			Preferences fileNode = tvFrame.getConfigNode().node("File");
-			
+
+			final Preferences fileNode = tvFrame.getConfigNode().node("File");
+
 			Preferences documentConfig = null;
-			String[] childrenNodes = fileNode.childrenNames();
-			
-			String default_name = "No file.";
-			
+			final String[] childrenNodes = fileNode.childrenNames();
+
+			final String default_name = "No file.";
+
 			boolean fileFound = false;
-			if(childrenNodes.length > 0) {
-				
-				for(int i = 0; i < childrenNodes.length; i++) {
-					
-					if(fileNode.node(childrenNodes[i]).get("name", 
-							default_name).equalsIgnoreCase(fileName)) {
+			if (childrenNodes.length > 0) {
+
+				for (int i = 0; i < childrenNodes.length; i++) {
+
+					if (fileNode.node(childrenNodes[i])
+							.get("name", default_name)
+							.equalsIgnoreCase(fileName)) {
 						documentConfig = fileNode.node(childrenNodes[i]);
 						fileFound = true;
 						break;
 					}
 				}
 			}
-			
-			if(!fileFound) {
-				documentConfig = fileNode.node("Model " 
+
+			if (!fileFound) {
+				documentConfig = fileNode.node("Model "
 						+ (childrenNodes.length + 1));
 				documentConfig.put("name", fileName);
 				documentConfig.put("extension", fileExt);
 			}
 			
-//			if (fileName.startsWith("http:")) {
-//				documentConfig = new XmlConfig(new URL(xmlFile),
-//						"DocumentConfig");
-//				
-//				documentConfig = tvFrame.getConfigNode().node("File");
-//				LogBuffer.println("Cannot support configuration " +
-//						"file from URL at the moment.");
-//
-//			} else {
-//				documentConfig = new XmlConfig(xmlFile, "DocumentConfig");
-//			}
 			targetModel.setDocumentConfig(documentConfig);
 
 		} catch (final Exception e) {
 			targetModel.setDocumentConfig(null);
 			e.printStackTrace();
 		}
-		
-		loadProgView.setLoadLabel("Done.");
-		targetModel.setLoaded(true);
-		
+
 		// Free the large objects for garbage collection
 		stringLabels = null;
 		doubleData = null;
-		
+				
+		loadProgView.setLoadLabel("Done.");
+		targetModel.setLoaded(true);
+
 		return targetModel;
 	}
-	
+
 	/**
 	 * Count amount of lines in the file to be loaded so that the progressBar
-	 * can get correct values for extractData().
-	 * Code from StackOverflow (https://stackoverflow.com/questions/1277880).
+	 * can get correct values for extractData(). Code from StackOverflow
+	 * (https://stackoverflow.com/questions/1277880).
 	 */
-	public static int count(File aFile) throws IOException {
-		
-		LineNumberReader reader = null;
-		
+	public int count(final File aFile) throws IOException {
+
+//		LineNumberReader reader = null;
+		BufferedReader reader = null;
+
 		try {
+			int num = 0;
 			reader = new LineNumberReader(new FileReader(aFile));
-			while ((reader.readLine()) != null);
-			return reader.getLineNumber();
-			
-		} catch (Exception ex) {
-			LogBuffer.println("Exception when trying to count lines: " 
+			while ((reader.readLine()) != null) num++;
+			return num; //reader.getLineNumber();
+
+		} catch (final Exception ex) {
+			LogBuffer.println("Exception when trying to count lines: "
 					+ ex.getMessage());
 			return -1;
-			
-		} finally { 
-			if(reader != null) 
+
+		} finally {
+			if (reader != null) {
 				reader.close();
+				reader = null;
+			}
 		}
 	}
-	
+
 	/**
-	 * Reading the data separated by tab delimited \t
-	 * The regex check if a String can be parsed to double is taken from
-	 * StackOverflow (https://stackoverflow.com/questions/8564896).
+	 * Reading the data separated by tab delimited \t The regex check if a
+	 * String can be parsed to double is taken from StackOverflow
+	 * (https://stackoverflow.com/questions/8564896).
+	 * 
 	 * @param reader
 	 * @param dataExtract
 	 */
-	public  void extractData (BufferedReader reader) throws IOException {
-		
-		final String Digits     = "(\\p{Digit}+)";
+	public String[][] extractData(final BufferedReader reader) 
+			throws IOException {
+
+		final String Digits = "(\\p{Digit}+)";
 		final String emptyDigits = "(\\p{Digit}*)";
-		final String HexDigits  = "(\\p{XDigit}+)";
+		final String HexDigits = "(\\p{XDigit}+)";
 
-		// an exponent is 'e' or 'E' followed by an optionally 
+		// an exponent is 'e' or 'E' followed by an optionally
 		// signed decimal integer.
-		final String exp        = "[eE][+-]?" + emptyDigits;
-		final String fpRegex    =
-		    ("[\\x00-\\x20]*" +  // Optional leading "whitespace"
-		     "[+-]?(" + // Optional sign character
-		     "NaN|" +           // "NaN" string
-		     "Infinity|" +      // "Infinity" string
-		     // Digits ._opt Digits_opt ExponentPart_opt 
-		     //FloatTypeSuffix_opt
-		     "(((" + Digits + "(\\.)?(" + Digits + "?)(" + exp + ")?)|" +
-		     // . Digits ExponentPart_opt FloatTypeSuffix_opt
-		     "(\\.(" + Digits + ")(" + exp + ")?)|" +
-		     // Hexadecimal strings
-		     "((" +
-		     // 0[xX] HexDigits ._opt BinaryExponent FloatTypeSuffix_opt
-		     "(0[xX]" + HexDigits + "(\\.)?)|" +    
-			// 0[xX] HexDigits_opt . HexDigits BinaryExponent 
-		     //FloatTypeSuffix_opt
-		     "(0[xX]" + HexDigits + "?(\\.)" + HexDigits + ")" +
-		     ")[pP][+-]?" + Digits + "))" +
-		     "[fFdD]?))" +
-		     "[\\x00-\\x20]*");// Optional trailing "whitespace"
+		final String exp = "[eE][+-]?" + emptyDigits;
+		final String fpRegex = ("[\\x00-\\x20]*" + // Optional leading
+													// "whitespace"
+				"[+-]?(" + // Optional sign character
+				"NaN|" + // "NaN" string
+				"Infinity|" + // "Infinity" string
+				// Digits ._opt Digits_opt ExponentPart_opt
+				// FloatTypeSuffix_opt
+				"(((" + Digits + "(\\.)?(" + Digits + "?)(" + exp + ")?)|"
+				+
+				// . Digits ExponentPart_opt FloatTypeSuffix_opt
+				"(\\.(" + Digits + ")(" + exp + ")?)|"
+				+
+				// Hexadecimal strings
+				"(("
+				+
+				// 0[xX] HexDigits ._opt BinaryExponent FloatTypeSuffix_opt
+				"(0[xX]" + HexDigits
+				+ "(\\.)?)|"
+				+
+				// 0[xX] HexDigits_opt . HexDigits BinaryExponent
+				// FloatTypeSuffix_opt
+				"(0[xX]" + HexDigits + "?(\\.)" + HexDigits + ")"
+				+ ")[pP][+-]?" + Digits + "))" + "[fFdD]?))" + "[\\x00-\\x20]*");// Optional
+																					// trailing
+																					// "whitespace"
 
-		  
-		stringLabels = new String[lineNum][];
-		
+		String[][] stringLabels = new String[lineNum][];
+
 		String line;
 		dataStartRow = 0;
 		dataStartCol = 0;
 		int gWeightCol = 0;
 		int rowN = 0;
-		
+
 		while ((line = reader.readLine()) != null) {
-			
+
+			if(rowN == 2500) {
+				LogBuffer.println("CheckPoint rowN in while loop.");
+			}
 			loadProgView.updateLoadBar(rowN);
 
 			// load line as String array
 			final String[] lineAsStrings = line.split("\t");
 			String[] labels;
 			double[] dataValues;
-			
+
 			// loop over String array to convert applicable String to double
 			// first find data start
-			if(!hasData) {
+			if (!hasData) {
 				labels = new String[lineAsStrings.length];
 				boolean containsEWeight = false;
-				
-				for(int i = 0; i < lineAsStrings.length; i++) {
-					
-					String element = lineAsStrings[i];
-					
-					if(element.equalsIgnoreCase("GID")) {
+
+				for (int i = 0; i < lineAsStrings.length; i++) {
+
+					final String element = lineAsStrings[i];
+
+					if (element.equalsIgnoreCase("GID")) {
 						hasGID = true;
-					} 
-					
+					}
+
 					// Check for GWEIGHT to avoid the weight being
 					// recognized as row start of actual data
-					if(element.equalsIgnoreCase("GWEIGHT")) {
+					if (element.equalsIgnoreCase("GWEIGHT")) {
 						gWeightCol = i;
 						hasGWeight = true;
-					} 
-					
-					if(element.equalsIgnoreCase("AID")) {
+					}
+
+					if (element.equalsIgnoreCase("AID")) {
 						hasAID = true;
 					}
-					
+
 					// Check for EWEIGHT to avoid the weight being
 					// recognized as column start of actual data
-					if(element.equalsIgnoreCase("EWEIGHT")) {
+					if (element.equalsIgnoreCase("EWEIGHT")) {
 						containsEWeight = true;
 						hasEWeight = true;
 					}
-				
-					if (Pattern.matches(fpRegex, element) 
+
+					if (Pattern.matches(fpRegex, element)
 							&& (!containsEWeight && i != gWeightCol)) {
-						
+
 						dataStartRow = rowN;
 						dataStartCol = i;
-						
+
 						hasData = true;
 						break;
-						
+
 					} else {
 						labels[i] = element;
 					}
 				}
-				
+
 				// avoid first datarow to be added with null values
-				if(hasData) {
-					String[] firstDataRow = new String[dataStartCol];
-					
-					for(int i = 0; i < labels.length; i++) {
-						
-						if(labels[i] != null) {
+				if (hasData) {
+					final String[] firstDataRow = new String[dataStartCol];
+
+					for (int i = 0; i < labels.length; i++) {
+
+						if (labels[i] != null) {
 							firstDataRow[i] = labels[i];
-							
+
 						} else {
 							break;
 						}
 					}
 					stringLabels[rowN] = firstDataRow;
-					
+
 				} else {
 					// handle line in which data has been found
 					stringLabels[rowN] = labels;
 				}
-				
-				if(hasData) {
+
+				if (hasData) {
 					doubleData = new double[lineNum - dataStartRow][];
-					dataValues = new double[lineAsStrings.length 
-					                        - dataStartCol];
-					
-					for(int i = 0; i < lineAsStrings.length 
-	                        - dataStartCol; i++) {
-						
+					dataValues = new double[lineAsStrings.length - dataStartCol];
+
+					for (int i = 0; i < lineAsStrings.length - dataStartCol; i++) {
+
 						String element = lineAsStrings[i + dataStartCol];
-					
-						// Check whether string can be double and is not 
+
+						// Check whether string can be double and is not
 						// gweight
 						if (Pattern.matches(fpRegex, element)
 								&& i != gWeightCol) {
-							
-							// For empty exponents apparently 
+
+							// For empty exponents apparently
 							// caused by Windows .txt
-							if(element.endsWith("e") 
-									|| element.endsWith("E")) {
+							if (element.endsWith("e") || element.endsWith("E")) {
 								element = element + "+00";
 							}
-							
-							double val = Double.parseDouble(element);
+
+							final double val = Double.parseDouble(element);
 							dataValues[i] = val;
-							
+
 						} else {
 							dataValues[i] = 0;
 						}
 					}
-					
+
 					doubleData[rowN - dataStartRow] = dataValues;
 				}
-				
+
 			} else {
 				labels = new String[dataStartCol];
-				dataValues = new double[lineAsStrings.length 
-				                        - dataStartCol];
+				dataValues = new double[lineAsStrings.length - dataStartCol];
 				
-				for(int i = 0; i < dataStartCol; i++) {
-					
-					String element = lineAsStrings[i];
-				
-					labels[i] = element;
-				}
-				
-				for(int i = 0; i < lineAsStrings.length - dataStartCol;
-						i++) {
-					
+				System.arraycopy(lineAsStrings, 0, labels, 0, dataStartCol);
+
+				for (int i = 0; i < lineAsStrings.length - dataStartCol; i++) {
+
 					String element = lineAsStrings[i + dataStartCol];
-					
-					// handle parseDouble error somehow? 
-					// using the Pattern.matches method screws up 
+
+					// handle parseDouble error somehow?
+					// using the Pattern.matches method screws up
 					// loading time by a factor of 1000....
-					if(element.endsWith("e") 
-							|| element.endsWith("E")) {
+					if (element.endsWith("e") || element.endsWith("E")) {
 						element = element + "+00";
 					}
-					
+
 					// Trying to parse the String, if not possible,
 					// add 0.
 					try {
-						double val = Double.parseDouble(element);
+						final double val = Double.parseDouble(element);
 						dataValues[i] = val;
-						
-					} catch(Exception e) {
-						LogBuffer.println("Exception when trying to parse " +
-								"a double in extractData() in " +
-								"NewModelLoader: " + e.getMessage());
-						double val = Double.parseDouble("0.00E+00");
+
+					} catch (final Exception e) {
+						LogBuffer.println("Exception when trying to parse "
+								+ "a double in extractData() in "
+								+ "NewModelLoader: " + e.getMessage());
+						final double val = Double.parseDouble("0.00E+00");
 						dataValues[i] = val;
 					}
 				}
-				
+
 				// Issue with length of stringLabels
 				stringLabels[rowN] = labels;
 				doubleData[rowN - dataStartRow] = dataValues;
-			} 
+			}
 			rowN++;
 		}
+		
+		return stringLabels;
 	}
-	
-	public ArrayList<String[]> extractGTR(BufferedReader reader) {
-		
-		ArrayList<String[]> gtrData = new ArrayList<String[]>();
+
+	public ArrayList<String[]> extractGTR(final BufferedReader reader) {
+
+		final ArrayList<String[]> gtrData = new ArrayList<String[]>();
 		String line;
-		
+
 		try {
 			while ((line = reader.readLine()) != null) {
-	
+
 				// load line as String array
 				final String[] lineAsStrings = line.split("\t");
 				gtrData.add(lineAsStrings);
 			}
-		} catch (IOException e) {
-			LogBuffer.println("IOException during the " +
-					"extraction of GTR file: " + e.getMessage());
+		} catch (final IOException e) {
+			LogBuffer.println("IOException during the "
+					+ "extraction of GTR file: " + e.getMessage());
 		}
-		
+
 		return gtrData;
 	}
-	
-	public void parseCDT() {
-		
+
+	public void parseCDT(String[][] stringLabels) {
+
 		// Tell model whether EWEIGHT and GWEIGHT where found
 		targetModel.setEweightFound(hasEWeight);
 		targetModel.setGweightFound(hasGWeight);
-		
-		int nExpr = doubleData[0].length;
-		int nExprPrefix = dataStartRow;
-		
-		int nGenePrefix = dataStartCol;
-		int nGene = doubleData.length;
-		
+
+		final int nExpr = doubleData[0].length;
+		final int nExprPrefix = dataStartRow;
+
+		final int nGenePrefix = dataStartCol;
+		final int nGene = doubleData.length;
+
 		// Set Array Prefix and Headers
 		final String[] arrayPrefix = new String[nExprPrefix];
 		final String[][] aHeaders = new String[nExpr][nExprPrefix];
-		
+
 		// fill prefix array
-		for(int i = 0; i < nExprPrefix; i++) {
-			
+		for (int i = 0; i < nExprPrefix; i++) {
+
 			arrayPrefix[i] = stringLabels[i][0];
-			
-			String[] labelRow = stringLabels[i];
-			
+
+			final String[] labelRow = stringLabels[i];
+
 			// fill column header array
-			for(int j = 0; j < nExpr; j++) {
-				
+			for (int j = 0; j < nExpr; j++) {
+
 				aHeaders[j][i] = labelRow[j + nGenePrefix];
 			}
 		}
-		
+
 		targetModel.setArrayPrefix(arrayPrefix);
 		targetModel.setArrayHeaders(aHeaders);
-		
+
 		final String[] genePrefix = new String[nGenePrefix];
 		final String[][] gHeaders = new String[nGene][nGenePrefix];
-		
-		// Fill row prefix array
-//		for(int i = 0; i < nGenePrefix; i++) {
-//			
-//			genePrefix[i] = stringLabels[0][i];
-//		}
-		
+
 		System.arraycopy(stringLabels[0], 0, genePrefix, 0, nGenePrefix);
-		
+
 		// Fill Header array
 		for (int i = 0; i < nGene; i++) {
-			
+
 			gHeaders[i] = stringLabels[i + nExprPrefix];
 		}
-		
+
 		targetModel.setGenePrefix(genePrefix);
 		targetModel.setGeneHeaders(gHeaders);
 		targetModel.setExprData(doubleData);
 		targetModel.getDataMatrix().calculateMinMax();
 	}
-	
+
 	public void parseGTR() {
-		
+
 		// First, load the GTR File
-		ArrayList<String[]> gtrData = loadSet(fileSet.getGtr());
-			
+		final ArrayList<String[]> gtrData = loadSet(fileSet.getGtr());
+
 		final String[] firstRow = gtrData.get(0);
 		if ( // decide if this is not an extended file..
 		(firstRow.length == 4)// is the length classic?
-				&& !(firstRow[0].equalsIgnoreCase("NODEID"))) { 
+				&& !(firstRow[0].equalsIgnoreCase("NODEID"))) {
 			// okay, need to assign headers...
-			targetModel.setGtrPrefix(new String[] { "NODEID", "LEFT", 
-					"RIGHT", "CORRELATION" });
-			
+			targetModel.setGtrPrefix(new String[] { "NODEID", "LEFT", "RIGHT",
+					"CORRELATION" });
+
 			final String[][] gtrHeaders = new String[gtrData.size()][];
 			for (int i = 0; i < gtrHeaders.length; i++) {
 				gtrHeaders[i] = gtrData.get(i);
 			}
 			targetModel.setGtrHeaders(gtrHeaders);
-			
+
 		} else {// first row of tempVector is actual header names...
 			targetModel.setGtrPrefix(firstRow);
 
@@ -510,26 +501,26 @@ public class NewModelLoader {
 			}
 			targetModel.setGtrHeaders(gtrHeaders);
 		}
-		
+
 		targetModel.hashGIDs();
 		targetModel.hashGTRs();
 		targetModel.gidFound(hasGID);
 	}
-	
+
 	public void parseATR() {
-		
-		// First, load the GTR File
-		ArrayList<String[]> atrData = loadSet(fileSet.getAtr());
-		
+
+		// First, load the ATR File
+		final ArrayList<String[]> atrData = loadSet(fileSet.getAtr());
+
 		final String[] firstRow = atrData.get(0);
 		if ( // decide if this is not an extended file..
 		(firstRow.length == 4)// is the length classic?
-				&& !(firstRow[0].equalsIgnoreCase("NODEID"))) { 
-			
+				&& !(firstRow[0].equalsIgnoreCase("NODEID"))) {
+
 			// okay, need to assign headers...
-			targetModel.setAtrPrefix(new String[] { "NODEID", "LEFT", 
-					"RIGHT", "CORRELATION" });
-			
+			targetModel.setAtrPrefix(new String[] { "NODEID", "LEFT", "RIGHT",
+					"CORRELATION" });
+
 			final String[][] atrHeaders = new String[atrData.size()][];
 			for (int i = 0; i < atrHeaders.length; i++) {
 				atrHeaders[i] = atrData.get(i);
@@ -544,59 +535,64 @@ public class NewModelLoader {
 			}
 			targetModel.setAtrHeaders(atrHeaders);
 		}
-		
+
 		targetModel.hashAIDs();
 		targetModel.hashATRs();
 		targetModel.aidFound(hasAID);
 	}
-	
-	public ArrayList<String[]> loadSet(String loadingSet) {
-		
+
+	public ArrayList<String[]> loadSet(final String loadingSet) {
+
 		ArrayList<String[]> gtrData = new ArrayList<String[]>();
-		
+
 		try {
 			LogBuffer.println("Starting GTR load.");
 			// Read data from specified file location
+
+//			final FileInputStream fis = new FileInputStream(loadingSet);
+//			final DataInputStream in = new DataInputStream(fis);
+			final BufferedReader br = new BufferedReader(
+					new FileReader(loadingSet));
+
+			// Get data from file into String and double arrays
+			// Put the arrays in ArrayLists for later access.
+			LogBuffer.println("Starting GTR extract.");
+			gtrData = extractGTR(br);
 			
-			FileInputStream fis = new FileInputStream(loadingSet);
-	        DataInputStream in = new DataInputStream(fis);
-	        BufferedReader br = new BufferedReader(new InputStreamReader(in));
-	        
-	        // Get data from file into String and double arrays 
-	        // Put the arrays in ArrayLists for later access.
-	        LogBuffer.println("Starting GTR extract.");
-	        gtrData = extractGTR(br);
-	        
-        } catch(FileNotFoundException e) {
-        	e.printStackTrace();
-        }
-		
+			br.close();
+
+		} catch (final FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 		return gtrData;
 	}
-	
+
 	class LoadWorker extends SwingWorker<Void, Void> {
 
 		@Override
 		protected Void doInBackground() throws Exception {
-			
+
 			load();
 			return null;
 		}
-		
+
 		@Override
 		protected void done() {
 
 			try {
 				// Wait for worker to finish.
 				get();
-				
-			} catch (InterruptedException e) {
+
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
-				
-			} catch (ExecutionException e) {
+
+			} catch (final ExecutionException e) {
 				e.printStackTrace();
 			}
 		}
-		
+
 	}
 }

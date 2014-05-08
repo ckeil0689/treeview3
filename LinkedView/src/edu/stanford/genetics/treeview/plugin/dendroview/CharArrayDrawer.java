@@ -130,7 +130,7 @@ public class CharArrayDrawer extends ArrayDrawer {
 	@Override
 	public void paint(final int[] pixels, final Rectangle source,
 			final Rectangle dest, final int scanSize, final int[] geneOrder) {
-		
+
 		if (headerInfo == null) {
 			System.out.println("header info wasn't set");
 		}
@@ -190,8 +190,9 @@ public class CharArrayDrawer extends ArrayDrawer {
 						}
 					}
 				} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
-					LogBuffer.println("ArrayIndexOutOfBoundsException " +
-							"in paint() in CharArrayDrawer: " + e.getMessage());
+					LogBuffer.println("ArrayIndexOutOfBoundsException "
+							+ "in paint() in CharArrayDrawer: "
+							+ e.getMessage());
 				}
 				arrayFirst = array + 1;
 			}
@@ -259,21 +260,21 @@ public class CharArrayDrawer extends ArrayDrawer {
 				return aln.charAt(x);
 			}
 		} catch (final IndexOutOfBoundsException e) {
-			LogBuffer.println("IndexOutOfBoundsException in " +
-					"getChar() in CharArrayDrawer: " + e.getMessage());
+			LogBuffer.println("IndexOutOfBoundsException in "
+					+ "getChar() in CharArrayDrawer: " + e.getMessage());
 		}
 		return '\0';
 	}
 
 	@Override
 	public String getSummary(final int x, final int y) {
-		
+
 		return "" + getChar(x, y);
 	}
 
 	@Override
 	public boolean isMissing(final int x, final int y) {
-		
+
 		final String aln = headerInfo.getHeader(y, headerName);
 		@SuppressWarnings("unused")
 		// used to test whether char in bounds
@@ -283,8 +284,8 @@ public class CharArrayDrawer extends ArrayDrawer {
 				test = aln.charAt(x);
 			return false;
 		} catch (final IndexOutOfBoundsException e) {
-			LogBuffer.println("IndexOutOfBoundsException in " +
-					"isMissing() in CharArrayDrawer: " + e.getMessage());
+			LogBuffer.println("IndexOutOfBoundsException in "
+					+ "isMissing() in CharArrayDrawer: " + e.getMessage());
 		}
 		return true;
 	}

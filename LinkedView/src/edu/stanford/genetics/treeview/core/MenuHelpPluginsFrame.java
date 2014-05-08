@@ -114,7 +114,7 @@ public class MenuHelpPluginsFrame extends JDialog {
 						frame.getApp().getGlobalConfig().node("Plugins"));
 				setLabelText();
 				MenuHelpPluginsFrame.this.validate();
-//				frame.rebuildMainPanelMenu();
+				// frame.rebuildMainPanelMenu();
 			}
 		});
 		this.getContentPane().add(b_scan, c);

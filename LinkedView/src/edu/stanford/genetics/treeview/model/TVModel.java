@@ -58,7 +58,7 @@ public class TVModel extends Observable implements DataModel {
 
 	/** has model been successfully loaded? */
 	private boolean loaded = false;
-	private int appendIndex = -1;
+	private final int appendIndex = -1;
 
 	/*
 	 * For cases where we are comparing two models (this needs to be changed).
@@ -89,7 +89,7 @@ public class TVModel extends Observable implements DataModel {
 
 	@Override
 	public void setModelForCompare(final DataModel m) {
-		
+
 		if (m == null) {
 			compareModel = null;
 			extraCompareExpr = 0;
@@ -149,7 +149,7 @@ public class TVModel extends Observable implements DataModel {
 
 		return arrayHeaderInfo.getNumHeaders() + extraCompareExpr;
 	}
-	
+
 	public void setExprData(final double[][] newData) {
 
 		dataMatrix.setExprData(newData);
@@ -199,14 +199,14 @@ public class TVModel extends Observable implements DataModel {
 	}
 
 	public void setSource(final FileSet source) {
-		
+
 		this.source = source;
 		setChanged();
 	}
 
 	@Override
 	public String getSource() {
-		
+
 		if (source == null) {
 			return "No Data Loaded";
 
@@ -247,7 +247,7 @@ public class TVModel extends Observable implements DataModel {
 	@Override
 	public Preferences getDocumentConfigRoot() {
 
-		return documentConfig.userRoot();
+		return Preferences.userRoot();
 	}
 
 	public void setDocumentConfig(final Preferences newVal) {
@@ -474,36 +474,36 @@ public class TVModel extends Observable implements DataModel {
 	@Override
 	public void removeAppended() {
 
-//		if (appendIndex == -1) {
-//
-//			return;
-//		}
-//
-//		final int ngene = nGene();
-//		int nexpr = nExpr();
-//		final double[] temp = new double[ngene * appendIndex];
-//
-//		int i = 0;
-//
-//		for (int g = 0; g < this.dataMatrix.getNumRow(); g++) {
-//			for (int e = 0; e < nexpr; e++) {
-//				if (e < appendIndex) {
-//					temp[i++] = getValue(e, g);
-//				}
-//			}
-//		}
-//		dataMatrix.setExprData(temp);
-//
-//		final String[][] tempS = new String[appendIndex][];
-//
-//		for (int j = 0; j < appendIndex; j++) {
-//			tempS[j] = arrayHeaderInfo.getHeader(j);
-//		}
-//
-//		arrayHeaderInfo.setHeaderArray(tempS);
-//		nexpr = appendIndex;
-//		appendIndex = -1;
-//		setChanged();
+		// if (appendIndex == -1) {
+		//
+		// return;
+		// }
+		//
+		// final int ngene = nGene();
+		// int nexpr = nExpr();
+		// final double[] temp = new double[ngene * appendIndex];
+		//
+		// int i = 0;
+		//
+		// for (int g = 0; g < this.dataMatrix.getNumRow(); g++) {
+		// for (int e = 0; e < nexpr; e++) {
+		// if (e < appendIndex) {
+		// temp[i++] = getValue(e, g);
+		// }
+		// }
+		// }
+		// dataMatrix.setExprData(temp);
+		//
+		// final String[][] tempS = new String[appendIndex][];
+		//
+		// for (int j = 0; j < appendIndex; j++) {
+		// tempS[j] = arrayHeaderInfo.getHeader(j);
+		// }
+		//
+		// arrayHeaderInfo.setHeaderArray(tempS);
+		// nexpr = appendIndex;
+		// appendIndex = -1;
+		// setChanged();
 	}
 
 	/**
@@ -515,60 +515,60 @@ public class TVModel extends Observable implements DataModel {
 	@Override
 	public void append(final DataModel m) {
 
-//		final int ngene = nGene();
-//		int nexpr = nExpr();
-//		if (m == null || m.getDataMatrix().getNumRow() != ngene
-//				|| appendIndex != -1) {
-//			System.out.println("Could not compare.");
-//			return;
-//		}
-//
-//		final double[] temp = new double[getDataMatrix().getNumRow()
-//				* getDataMatrix().getNumCol() + m.getDataMatrix().getNumRow()
-//				* (m.getDataMatrix().getNumCol() + 1)];
-//
-//		int i = 0;
-//
-//		for (int g = 0; g < m.getDataMatrix().getNumRow(); g++) {
-//			for (int e = 0; e < nexpr + m.getDataMatrix().getNumCol() + 1; e++) {
-//
-//				if (e < nexpr) {
-//					temp[i++] = getValue(e, g);
-//
-//				} else if (e < nexpr + 1) {
-//					temp[i++] = DataModel.NODATA;
-//
-//				} else {
-//					temp[i++] = m.getDataMatrix().getValue(e - nexpr - 1, g);
-//				}
-//			}
-//		}
-//
-//		final String[][] tempS = new String[getArrayHeaderInfo()
-//				.getNumHeaders() + m.getArrayHeaderInfo().getNumHeaders() + 1][];
-//
-//		i = 0;
-//		for (int j = 0; j < getArrayHeaderInfo().getNumHeaders(); j++) {
-//			tempS[i++] = getArrayHeaderInfo().getHeader(j);
-//		}
-//
-//		tempS[i] = new String[getArrayHeaderInfo().getNumNames()];
-//
-//		for (int j = 0; j < tempS[i].length; j++) {
-//			tempS[i][j] = "-----------------------";
-//		}
-//
-//		i++;
-//
-//		for (int j = 0; j < getArrayHeaderInfo().getNumHeaders(); j++) {
-//			tempS[i++] = getArrayHeaderInfo().getHeader(j);
-//		}
-//
-//		arrayHeaderInfo.setHeaderArray(tempS);
-//		appendIndex = nexpr;
-//		nexpr += m.getDataMatrix().getNumCol() + 1;
-//		dataMatrix.setExprData(temp);
-//		setChanged();
+		// final int ngene = nGene();
+		// int nexpr = nExpr();
+		// if (m == null || m.getDataMatrix().getNumRow() != ngene
+		// || appendIndex != -1) {
+		// System.out.println("Could not compare.");
+		// return;
+		// }
+		//
+		// final double[] temp = new double[getDataMatrix().getNumRow()
+		// * getDataMatrix().getNumCol() + m.getDataMatrix().getNumRow()
+		// * (m.getDataMatrix().getNumCol() + 1)];
+		//
+		// int i = 0;
+		//
+		// for (int g = 0; g < m.getDataMatrix().getNumRow(); g++) {
+		// for (int e = 0; e < nexpr + m.getDataMatrix().getNumCol() + 1; e++) {
+		//
+		// if (e < nexpr) {
+		// temp[i++] = getValue(e, g);
+		//
+		// } else if (e < nexpr + 1) {
+		// temp[i++] = DataModel.NODATA;
+		//
+		// } else {
+		// temp[i++] = m.getDataMatrix().getValue(e - nexpr - 1, g);
+		// }
+		// }
+		// }
+		//
+		// final String[][] tempS = new String[getArrayHeaderInfo()
+		// .getNumHeaders() + m.getArrayHeaderInfo().getNumHeaders() + 1][];
+		//
+		// i = 0;
+		// for (int j = 0; j < getArrayHeaderInfo().getNumHeaders(); j++) {
+		// tempS[i++] = getArrayHeaderInfo().getHeader(j);
+		// }
+		//
+		// tempS[i] = new String[getArrayHeaderInfo().getNumNames()];
+		//
+		// for (int j = 0; j < tempS[i].length; j++) {
+		// tempS[i][j] = "-----------------------";
+		// }
+		//
+		// i++;
+		//
+		// for (int j = 0; j < getArrayHeaderInfo().getNumHeaders(); j++) {
+		// tempS[i++] = getArrayHeaderInfo().getHeader(j);
+		// }
+		//
+		// arrayHeaderInfo.setHeaderArray(tempS);
+		// appendIndex = nexpr;
+		// nexpr += m.getDataMatrix().getNumCol() + 1;
+		// dataMatrix.setExprData(temp);
+		// setChanged();
 	}
 
 	/**
@@ -588,43 +588,43 @@ public class TVModel extends Observable implements DataModel {
 
 			exprData = null;
 		}
-		
+
 		@Override
 		public void calculateMinMax() {
-			
-			if(exprData != null) {
-				for(int i = 0; i < nGene(); i++) {
-					
-					for(int j = 0; j < nExpr(); j++) {
-						
-						if(exprData[i][j] > maxVal) {
-							
+
+			if (exprData != null) {
+				for (int i = 0; i < nGene(); i++) {
+
+					for (int j = 0; j < nExpr(); j++) {
+
+						if (exprData[i][j] > maxVal) {
+
 							maxVal = exprData[i][j];
 						}
-						
-						if(exprData[i][j] < minVal) {
-							
+
+						if (exprData[i][j] < minVal) {
+
 							minVal = exprData[i][j];
 						}
 					}
-				}				
+				}
 			} else {
-				//Log that exprdata is null
+				// Log that exprdata is null
 			}
 		}
-		
+
 		@Override
 		public double getMinVal() {
-			
+
 			return minVal;
 		}
-		
+
 		@Override
 		public double getMaxVal() {
-			
+
 			return maxVal;
 		}
-		
+
 		@Override
 		public double getValue(final int x, final int y) {
 
@@ -637,18 +637,17 @@ public class TVModel extends Observable implements DataModel {
 				return DataModel.NODATA;
 			}
 		}
-		
+
 		public void setExprData(final double[][] newData) {
 
 			exprData = newData;
 		}
-		
-		
+
 		public double[][] getExprData() {
 
 			return exprData;
 		}
-		
+
 		@Override
 		public void setValue(final double value, final int x, final int y) {
 
@@ -785,7 +784,6 @@ public class TVModel extends Observable implements DataModel {
 
 			return -1;
 		}
-
 	}
 
 	public void setGenePrefix(final String[] newVal) {
@@ -804,22 +802,22 @@ public class TVModel extends Observable implements DataModel {
 	 * 
 	 * @param fileSet
 	 *            fileset to load
-	 * @throws ExecutionException 
-	 * @throws InterruptedException 
+	 * @throws ExecutionException
+	 * @throws InterruptedException
 	 * 
 	 */
-	public void loadNew(final FileSet fileSet) throws LoadException, 
-	InterruptedException, ExecutionException, OutOfMemoryError {
+	public void loadNew(final FileSet fileSet) throws LoadException,
+			InterruptedException, ExecutionException, OutOfMemoryError {
 
 		resetState();
 		setSource(fileSet);
-		
+
 		NewModelLoader loader = new NewModelLoader(this);
 		loader.load();
+		loader = null;
 
 		if (!isLoaded()) {
-			throw new LoadException("Loading Cancelled", 
-					LoadException.INTPARSE);
+			throw new LoadException("Loading Cancelled", LoadException.INTPARSE);
 		}
 	}
 

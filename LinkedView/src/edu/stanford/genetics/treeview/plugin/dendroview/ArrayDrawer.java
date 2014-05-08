@@ -113,29 +113,28 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 		setDefaults();
 	}
 
-//	/**
-//	 * binds this arraydrawer to a particular ConfigNode.
-//	 * 
-//	 * @param configNode
-//	 *            confignode to bind to
-//	 */
-//	public void bindConfig(final Preferences configNode) {
-//
-//		root = configNode;
-//	}
-	
+	// /**
+	// * binds this arraydrawer to a particular ConfigNode.
+	// *
+	// * @param configNode
+	// * confignode to bind to
+	// */
+	// public void bindConfig(final Preferences configNode) {
+	//
+	// root = configNode;
+	// }
+
 	/**
 	 * binds this arraydrawer to a particular ConfigNode.
 	 * 
 	 * @param configNode
 	 *            confignode to bind to
 	 */
-	public void setConfigNode(String key) {
+	public void setConfigNode(final String key) {
 
-		if(key == null) {
-			this.root = 
-					Preferences.userRoot().node(this.getClass().getName());
-			
+		if (key == null) {
+			this.root = Preferences.userRoot().node(this.getClass().getName());
+
 		} else {
 			this.root = Preferences.userRoot().node(key);
 		}

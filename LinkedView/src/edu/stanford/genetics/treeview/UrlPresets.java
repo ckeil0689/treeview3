@@ -31,31 +31,32 @@ import java.util.prefs.Preferences;
  */
 
 public class UrlPresets implements ConfigNodePersistent {
-	
-	private final static int dIndex = 0;
-	
-	private Preferences configNode; // which preset to use if not by
-											// confignode?
-	private String type;
-//	/**
-//	 * creates a new UrlPresets object and binds it to the node
-//	 * 
-//	 * adds default Gene Presets if none are currently set.
-//	 */
-//	public UrlPresets(final Preferences parent) {
-//		
-//		super();
-//		
-//		setConfigNode(null);
-//		
-//		if (getPresetNames().length == 0) {
-//			addDefaultGenePresets();
-//		}
-//
-//	}
 
-	public UrlPresets(String type) {
-		
+	private final static int dIndex = 0;
+
+	private Preferences configNode; // which preset to use if not by
+									// confignode?
+	private final String type;
+
+	// /**
+	// * creates a new UrlPresets object and binds it to the node
+	// *
+	// * adds default Gene Presets if none are currently set.
+	// */
+	// public UrlPresets(final Preferences parent) {
+	//
+	// super();
+	//
+	// setConfigNode(null);
+	//
+	// if (getPresetNames().length == 0) {
+	// addDefaultGenePresets();
+	// }
+	//
+	// }
+
+	public UrlPresets(final String type) {
+
 		super();
 		this.type = type;
 	}
@@ -65,61 +66,57 @@ public class UrlPresets implements ConfigNodePersistent {
 	 * settings
 	 */
 	public int getDefaultPreset() {
-		
+
 		return configNode.getInt("default", dIndex);
 	}
 
 	public boolean isDefaultEnabled() {
-		
+
 		return (getDefaultPreset() != -1);
 	}
 
 	public String getDefaultTemplate() {
-		
+
 		final int defaultPreset = getDefaultPreset();
-		
+
 		if (defaultPreset == -1) {
 			return null;
 		}
-		
+
 		try {
 			return getTemplate(defaultPreset);
-			
+
 		} catch (final Exception e) {
 			return getTemplate(0);
 		}
 	}
 
 	public void setDefaultPreset(final int i) {
-		
+
 		configNode.putInt("default", i);
 	}
 
 	public void addDefaultGenePresets() {
-		
-		addPreset("SGD","http://genome-www4.stanford.edu/cgi-bin/SGD/locus." +
-				"pl?locus=HEADER");
-		
+
+		addPreset("SGD", "http://genome-www4.stanford.edu/cgi-bin/SGD/locus."
+				+ "pl?locus=HEADER");
+
 		addPreset("YPD",
 				"http://www.proteome.com/databases/YPD/reports/HEADER.html");
-		
-		addPreset(
-				"WormBase","http://www.wormbase.org/db/searches/" +
-				"basic?class=AnyGene&query=HEADER&Search=Search");
-		
-		addPreset(
-				"Source_CloneID", "http://genome-www4.stanford.edu/cgi-bin/" +
-						"SMD/source/sourceResult?option=CloneID&choice=" +
-						"Gene&criteria=HEADER");
-		
+
+		addPreset("WormBase", "http://www.wormbase.org/db/searches/"
+				+ "basic?class=AnyGene&query=HEADER&Search=Search");
+
+		addPreset("Source_CloneID", "http://genome-www4.stanford.edu/cgi-bin/"
+				+ "SMD/source/sourceResult?option=CloneID&choice="
+				+ "Gene&criteria=HEADER");
+
 		addPreset("FlyBase",
 				"http://flybase.bio.indiana.edu/.bin/fbgenq.html?HEADER");
-		
-		addPreset(
-				"MouseGD",
-				"http://www.informatics.jax.org/javawi/servlet/" +
-				"SearchTool?query=HEADER&selectedQuery=Genes+and+Markers");
-		
+
+		addPreset("MouseGD", "http://www.informatics.jax.org/javawi/servlet/"
+				+ "SearchTool?query=HEADER&selectedQuery=Genes+and+Markers");
+
 		addPreset("GenomeNetEcoli",
 				"http://www.genome.ad.jp/dbget-bin/www_bget?eco:HEADER");
 	}
@@ -128,14 +125,14 @@ public class UrlPresets implements ConfigNodePersistent {
 	 * returns String [] of preset names for display
 	 */
 	public String[] getPresetNames() {
-		
+
 		try {
-//			Preferences presetNode = root.node("Preset");
+			// Preferences presetNode = root.node("Preset");
 			final String[] astring = configNode.childrenNames();
-			
+
 			return astring;
-			
-		} catch (BackingStoreException e) {
+
+		} catch (final BackingStoreException e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -144,32 +141,33 @@ public class UrlPresets implements ConfigNodePersistent {
 	/**
 	 * Returns a boolean array which contains information about whether each
 	 * preset is enabled or not.
+	 * 
 	 * @return
 	 */
 	public boolean[] getPresetEnablings() {
-		
-		Preferences presetNode = configNode.node("Preset");
+
+		final Preferences presetNode = configNode.node("Preset");
 		try {
-			String[] childrenNodes = presetNode.childrenNames();
+			final String[] childrenNodes = presetNode.childrenNames();
 			final boolean aboolean[] = new boolean[childrenNodes.length];
-			
+
 			String temp;
-			for(int i = 0; i < childrenNodes.length; i++) {
-				
-				temp = presetNode.node(childrenNodes[i]).get(
-						"enabled", "false");
-				
+			for (int i = 0; i < childrenNodes.length; i++) {
+
+				temp = presetNode.node(childrenNodes[i])
+						.get("enabled", "false");
+
 				if (temp.toLowerCase().equals("true")) {
-						aboolean[i] = true;
-							
+					aboolean[i] = true;
+
 				} else {
-						aboolean[i] = false;
+					aboolean[i] = false;
 				}
 			}
-			
+
 			return aboolean;
-			
-		} catch (BackingStoreException e) {
+
+		} catch (final BackingStoreException e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -177,22 +175,23 @@ public class UrlPresets implements ConfigNodePersistent {
 
 	/**
 	 * Returns a String array of preset headers.
+	 * 
 	 * @return
 	 */
 	public String[] getPresetHeaders() {
-		
+
 		final Preferences presetNode = configNode.node("Preset");
-		
+
 		try {
-			String[] childrenNodes = presetNode.childrenNames();
+			final String[] childrenNodes = presetNode.childrenNames();
 			final String astring[] = new String[childrenNodes.length];
-			
+
 			for (int i = 0; i < childrenNodes.length; i++)
-				astring[i] = presetNode.node(childrenNodes[i]).get("header", 
-						"");
+				astring[i] = presetNode.node(childrenNodes[i])
+						.get("header", "");
 			return astring;
-			
-		} catch (BackingStoreException e) {
+
+		} catch (final BackingStoreException e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -202,20 +201,20 @@ public class UrlPresets implements ConfigNodePersistent {
 	 * returns the template for the ith preset or null, if i too large.
 	 */
 	public String getTemplate(final int index) {
-		
+
 		final Preferences presetNode = configNode.node("Preset");
-		
+
 		try {
-			String[] childrenNodes = presetNode.childrenNames();
+			final String[] childrenNodes = presetNode.childrenNames();
 			if (index < childrenNodes.length) {
-				return presetNode.node(childrenNodes[index]).get("template", 
+				return presetNode.node(childrenNodes[index]).get("template",
 						null);
-				
+
 			} else {
 				return null;
 			}
-			
-		} catch (BackingStoreException e) {
+
+		} catch (final BackingStoreException e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -225,23 +224,23 @@ public class UrlPresets implements ConfigNodePersistent {
 	 * returns the template for this name or null, if name not found in kids
 	 */
 	public String getTemplate(final String name) {
-		
+
 		final Preferences presetNode = configNode.node("Preset");
 		String template = null;
 		try {
-			String[] childrenNodes = presetNode.childrenNames();
-			
-			for(int i = 0; i < childrenNodes.length; i++) {
-				
+			final String[] childrenNodes = presetNode.childrenNames();
+
+			for (int i = 0; i < childrenNodes.length; i++) {
+
 				if (name.equalsIgnoreCase(childrenNodes[i])) {
 					template = presetNode.node(childrenNodes[i]).get(
 							"template", null);
 				}
 			}
-			
+
 			return template;
-			
-		} catch (BackingStoreException e) {
+
+		} catch (final BackingStoreException e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -254,33 +253,35 @@ public class UrlPresets implements ConfigNodePersistent {
 	 * @return null if header is not specified in presets
 	 */
 	public String getTemplateByHeader(final String header) {
-		
+
 		final Preferences presetNode = configNode.node("Preset");
 		try {
-			String[] childrenNodes = presetNode.childrenNames();
+			final String[] childrenNodes = presetNode.childrenNames();
 			final boolean[] enablings = getPresetEnablings();
-			
+
 			String template = null;
 			for (int i = 0; i < childrenNodes.length; i++) {
 				if (enablings[i]
-						&& matchPattern(header, presetNode.node(
-								childrenNodes[i]).get("header", null))) {
+						&& matchPattern(
+								header,
+								presetNode.node(childrenNodes[i]).get("header",
+										null))) {
 					// may cause compatibility issues with old .jtv files
 					template = presetNode.node(childrenNodes[i]).get(
 							"template", null);
 				}
 			}
-			
+
 			return template;
-			
-		} catch (BackingStoreException e) {
+
+		} catch (final BackingStoreException e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
 
 	private boolean matchPattern(final String string, final String pattern) {
-		
+
 		for (int i = 0, j = 0; i < pattern.length(); i++, j++) {
 			if (pattern.charAt(i) == '*') {
 				if (i == pattern.length() - 1) {
@@ -303,90 +304,91 @@ public class UrlPresets implements ConfigNodePersistent {
 		return true;
 	}
 
-//	public void setPresetName(final int index, final String name) {
-//		
-//		final Preferences presetNode = root.node("Preset");
-//		String[] childrenNodes = presetNode.childrenNames();
-//		
-//		try {
-//			childrenNodes[index].put("name", name, null);
-//		} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
-//			System.out.println("UrlPresets.setPresetName() got error: " + e);
-//		}
-//	}
+	// public void setPresetName(final int index, final String name) {
+	//
+	// final Preferences presetNode = root.node("Preset");
+	// String[] childrenNodes = presetNode.childrenNames();
+	//
+	// try {
+	// childrenNodes[index].put("name", name, null);
+	// } catch (final java.lang.ArrayIndexOutOfBoundsException e) {
+	// System.out.println("UrlPresets.setPresetName() got error: " + e);
+	// }
+	// }
 
 	public void setPresetHeader(final int index, final String header) {
-		
+
 		final Preferences presetNode = configNode.node("Preset");
-		
+
 		try {
-			String[] childrenNodes = presetNode.childrenNames();
-			
+			final String[] childrenNodes = presetNode.childrenNames();
+
 			presetNode.node(childrenNodes[index]).put("header", header);
-			
-		} catch (BackingStoreException e1) {
+
+		} catch (final BackingStoreException e1) {
 			e1.printStackTrace();
-			LogBuffer.println("Error in URLPresets/setHeader(): " + 
-					e1.getMessage());
-			
+			LogBuffer.println("Error in URLPresets/setHeader(): "
+					+ e1.getMessage());
+
 		} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
-			LogBuffer.println("UrlPresets.setPresetHeader() got error: " 
+			LogBuffer.println("UrlPresets.setPresetHeader() got error: "
 					+ e.getMessage());
 		}
 	}
 
 	public void setPresetEnabled(final int index, final boolean enabled) {
-		
+
 		final Preferences presetNode = configNode.node("Preset");
-		
+
 		try {
-			String[] childrenNodes = presetNode.childrenNames();
-			
+			final String[] childrenNodes = presetNode.childrenNames();
+
 			if (enabled) {
 				presetNode.node(childrenNodes[index]).put("enabled", "true");
-				
+
 			} else {
 				presetNode.node(childrenNodes[index]).put("enabled", "false");
 			}
-			
-		} catch (BackingStoreException e1) {
+
+		} catch (final BackingStoreException e1) {
 			e1.printStackTrace();
-			LogBuffer.println("Error in URLPresets/setPresetEnabled(): " + 
-					e1.getMessage());
-			
+			LogBuffer.println("Error in URLPresets/setPresetEnabled(): "
+					+ e1.getMessage());
+
 		} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
-			System.out.println("UrlPresets.setPresetEnabled() got error: " 
+			System.out.println("UrlPresets.setPresetEnabled() got error: "
 					+ e.getMessage());
 		}
 	}
 
 	public void setPresetTemplate(final int index, final String template) {
-		
+
 		final Preferences presetNode = configNode.node("Preset");
-		
+
 		try {
-			String[] childrenNodes = presetNode.childrenNames();
-			
+			final String[] childrenNodes = presetNode.childrenNames();
+
 			presetNode.node(childrenNodes[index]).put("template", template);
-			
-		} catch (BackingStoreException e1) {
+
+		} catch (final BackingStoreException e1) {
 			e1.printStackTrace();
-			LogBuffer.println("Error in URLPresets/setPresetEnabled(): " + 
-					e1.getMessage());
+			LogBuffer.println("Error in URLPresets/setPresetEnabled(): "
+					+ e1.getMessage());
 		}
 	}
 
 	public void addPreset(final String name, final String template) {
-		
+
 		final Preferences preset = configNode.node(name);
-		
-		preset.put("template", template);//, null);
-		preset.put("header", "*");//, null);
-		preset.put("enabled", "false");//, null);
+
+		preset.put("template", template);// , null);
+		preset.put("header", "*");// , null);
+		preset.put("enabled", "false");// , null);
 	}
 
 	/**
 	 * Creates a new subNode for the Preset node.
+	 * 
 	 * @param name
 	 * @param template
 	 * @param header
@@ -394,48 +396,48 @@ public class UrlPresets implements ConfigNodePersistent {
 	 */
 	public void addPreset(final String name, final String template,
 			final String header, final boolean enabled) {
-		
+
 		final Preferences preset = configNode.node(name);
-		
-		preset.put("template", template);//, null);
-		preset.put("header", header);//, null);
-		
+
+		preset.put("template", template);// , null);
+		preset.put("header", header);// , null);
+
 		if (enabled) {
-			preset.put("enabled", "true");//, null);
-			
+			preset.put("enabled", "true");// , null);
+
 		} else {
-			preset.put("enabled", "false");//, null);
+			preset.put("enabled", "false");// , null);
 		}
 	}
 
-//	@Override
-//	public void bindConfig(Preferences configNode) {
-//		
-//		this.root = configNode;
-//	}
-	
+	// @Override
+	// public void bindConfig(Preferences configNode) {
+	//
+	// this.root = configNode;
+	// }
+
 	@Override
-	public void setConfigNode(Preferences parentNode) {
-		
-		if(parentNode != null) {
+	public void setConfigNode(final Preferences parentNode) {
+
+		if (parentNode != null) {
 			this.configNode = parentNode.node(type);
-			
-		} else if(parentNode == null && configNode == null){
-			//Unrelated dummy node for testing
+
+		} else if (parentNode == null && configNode == null) {
+			// Unrelated dummy node for testing
 			configNode = Preferences.userRoot().node(type);
-			
+
 		} else {
-			LogBuffer.println("There was a problem with UrlPresets node " +
-					"setting.");
+			LogBuffer.println("There was a problem with UrlPresets node "
+					+ "setting.");
 		}
-		
+
 		if (getPresetNames().length == 0) {
 			addDefaultGenePresets();
 		}
 	}
-	
+
 	public Preferences getConfigNode() {
-		
+
 		return configNode;
 	}
 }

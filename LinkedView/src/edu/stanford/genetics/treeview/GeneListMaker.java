@@ -57,13 +57,13 @@ import javax.swing.table.AbstractTableModel;
 public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private Preferences configNode = null;
 	private final GeneListTableModel tableModel;
 	private final Notifier notifier = new Notifier();
-	
+
 	private final double PRECISION_LEVEL = 0.001;
-	
+
 	private final TreeSelectionI geneSelection;
 	private final HeaderInfo headerInfo;
 	private HeaderInfo aHeaderInfo;
@@ -87,7 +87,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 		 * @return call to indicate table structure changed.
 		 */
 		public void dataChanged() {
-			
+
 			fireTableStructureChanged();
 		}
 
@@ -98,10 +98,10 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 		 */
 		@Override
 		public int getRowCount() {
-			
+
 			if (fieldRow.includeHeader()) {
 				return geneSelection.getNSelectedIndexes() + 1;
-				
+
 			} else {
 				return geneSelection.getNSelectedIndexes();
 			}
@@ -114,11 +114,11 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 		 */
 		@Override
 		public int getColumnCount() {
-			
+
 			final int[] selectedPrefix = fieldRow.getSelectedPrefix();
 			if (fieldRow.includeExpr()) {
 				return nArray + selectedPrefix.length;
-				
+
 			} else {
 				return selectedPrefix.length;
 			}
@@ -205,34 +205,34 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 		}
 	};
 
-//	@Override
-//	public void bindConfig(final Preferences configNode) {
-//		
-//		root = configNode;
-//	}
-	
+	// @Override
+	// public void bindConfig(final Preferences configNode) {
+	//
+	// root = configNode;
+	// }
+
 	@Override
-	public void setConfigNode(Preferences parentNode) {
-		
-		if(parentNode != null) {
+	public void setConfigNode(final Preferences parentNode) {
+
+		if (parentNode != null) {
 			this.configNode = parentNode.node("GeneListMaker");
-			
+
 		} else {
-			LogBuffer.println("Could not find or create GeneListMaker" +
-					"node because parentNode was null.");
+			LogBuffer.println("Could not find or create GeneListMaker"
+					+ "node because parentNode was null.");
 		}
 	}
 
 	public Preferences createSubNode() {
-		
+
 		return configNode.node("File");
 	}
 
 	public String getFile() {
-		
+
 		if (configNode == null) {
 			return defaultFile;
-			
+
 		} else {
 			return configNode.get("file", defaultFile);
 		}
@@ -241,9 +241,9 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 	FileRow fileRow = null;
 
 	public void setFile(final String newdir) {
-		
+
 		configNode.put("file", newdir);
-		
+
 		if (fileRow != null) {
 			fileRow.setFile(newdir);
 		}
@@ -251,9 +251,9 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 
 	public GeneListMaker(final JFrame f, final TreeSelectionI n,
 			final HeaderInfo hI, final String dd) {
-		
+
 		super(f, "Gene Text Export", true);
-		
+
 		geneSelection = n;
 		headerInfo = hI;
 		defaultFile = dd;
@@ -347,15 +347,14 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 							final String[] headers = aHeaderInfo.getHeader(j);
 							final String out = headers[gidRow];
 							output.print(out);
-							
-						} catch (final java.lang.
-								ArrayIndexOutOfBoundsException e) {
-							LogBuffer.println("Exception when trying to " +
-									"save gene list: " + e.getMessage());
+
+						} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
+							LogBuffer.println("Exception when trying to "
+									+ "save gene list: " + e.getMessage());
 						}
 					}
 					output.print('\n');
-					
+
 					// EWEIGHT row
 					output.print("EWEIGHT");
 					for (int j = 1; j < selectedPrefix.length; j++) {
@@ -368,11 +367,10 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 							final String[] headers = aHeaderInfo.getHeader(j);
 							final String out = headers[eRow];
 							output.print(out);
-							
-						} catch (final java.lang.
-								ArrayIndexOutOfBoundsException e) {
-							LogBuffer.println("Exception when trying to " +
-									"save gene list: " + e.getMessage());
+
+						} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
+							LogBuffer.println("Exception when trying to "
+									+ "save gene list: " + e.getMessage());
 							output.print('1');
 						}
 					}
@@ -383,7 +381,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 				if (geneSelection.isIndexSelected(i) == false) {
 					continue;
 				}
-				
+
 				final String[] headers = headerInfo.getHeader(i);
 				output.print(headers[selectedPrefix[0]]);
 				for (int j = 1; j < selectedPrefix.length; j++) {
@@ -405,8 +403,8 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 			dispose();
 		} catch (final Exception e) {
 			e.printStackTrace();
-			LogBuffer.println("In GeneListMaker.saveList(), " +
-					"got exception " + e.getMessage());
+			LogBuffer.println("In GeneListMaker.saveList(), "
+					+ "got exception " + e.getMessage());
 		}
 
 	}

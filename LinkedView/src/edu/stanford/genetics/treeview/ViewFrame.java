@@ -41,14 +41,13 @@ import java.util.prefs.Preferences;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
 import Cluster.ClusterFileFilter;
 import edu.stanford.genetics.treeview.core.FileMru;
-//import edu.stanford.genetics.treeview.core.HeaderFinder;
 import edu.stanford.genetics.treeview.model.DataModelWriter;
 import edu.stanford.genetics.treeview.model.ReorderedDataModel;
+//import edu.stanford.genetics.treeview.core.HeaderFinder;
 
 /**
  * Any frame that wants to contain MainPanels must extend this.
@@ -57,28 +56,28 @@ import edu.stanford.genetics.treeview.model.ReorderedDataModel;
  * @version @version $Revision: 1.37 $ $Date: 2009-08-26 11:48:27 $
  */
 public abstract class ViewFrame implements Observer {
-	//extends JFrame implements Observer {
-	
+	// extends JFrame implements Observer {
+
 	// The Main application frame
 	protected JFrame applicationFrame;
-	
+
 	protected Preferences configNode;
-	
+
 	// The global most recently used object.
 	protected FileMru fileMru;
-	
-	// allows opening of urls in external browser 
+
+	// allows opening of urls in external browser
 	protected BrowserControl browserControl = null;
-	
+
 	// url extractor for genes
 	private UrlExtractor urlExtractor;
-	
+
 	// url extractor for arrays
 	private UrlExtractor arrayUrlExtractor;
-	
+
 	// menubar for the application
 	protected TreeviewMenuBarI menubar;
-	
+
 	/**
 	 * Constructor for the ViewFrame object Sets title and window listeners
 	 * 
@@ -89,13 +88,13 @@ public abstract class ViewFrame implements Observer {
 
 		this.applicationFrame = new JFrame(title);
 
-//		try {
-//			UIManager.setLookAndFeel(UIManager
-//					.getCrossPlatformLookAndFeelClassName());
-//
-//		} catch (final Exception e) {
-//
-//		}
+		// try {
+		// UIManager.setLookAndFeel(UIManager
+		// .getCrossPlatformLookAndFeelClassName());
+		//
+		// } catch (final Exception e) {
+		//
+		// }
 
 		setupWindowListener();
 	}
@@ -107,23 +106,24 @@ public abstract class ViewFrame implements Observer {
 
 		this.applicationFrame = new JFrame();
 
-//		try {
-//			UIManager.setLookAndFeel(UIManager
-//					.getCrossPlatformLookAndFeelClassName());
-//
-//		} catch (final Exception e) {
-//
-//		}
+		// try {
+		// UIManager.setLookAndFeel(UIManager
+		// .getCrossPlatformLookAndFeelClassName());
+		//
+		// } catch (final Exception e) {
+		//
+		// }
 
 		setupWindowListener();
 	}
-	
+
 	/**
 	 * Returns the applications main JFrame.
+	 * 
 	 * @return
 	 */
 	public JFrame getAppFrame() {
-		
+
 		return applicationFrame;
 	}
 
@@ -139,19 +139,19 @@ public abstract class ViewFrame implements Observer {
 	@Override
 	public abstract void update(Observable observable, Object object);
 
-//	/**
-//	 * This routine should return any instances of the plugin of the indicated
-//	 * name (i.e. it will loop over all instantiated MainPanel calling their
-//	 * getName() properties, find all that are equal to the indicated string,
-//	 * and return all matching ones
-//	 */
-//	public abstract MainPanel[] getMainPanelsByName(String name);
+	// /**
+	// * This routine should return any instances of the plugin of the indicated
+	// * name (i.e. it will loop over all instantiated MainPanel calling their
+	// * getName() properties, find all that are equal to the indicated string,
+	// * and return all matching ones
+	// */
+	// public abstract MainPanel[] getMainPanelsByName(String name);
 
-//	/**
-//	 * 
-//	 * @return all mainPanels managed by this viewFrame
-//	 */
-//	public abstract MainPanel[] getMainPanels();
+	// /**
+	// *
+	// * @return all mainPanels managed by this viewFrame
+	// */
+	// public abstract MainPanel[] getMainPanels();
 
 	/**
 	 * Sets up a <code>FileMru</code> using a particular config node. This
@@ -187,16 +187,16 @@ public abstract class ViewFrame implements Observer {
 	private void center(final Rectangle rectangle) {
 
 		final Dimension dimension = applicationFrame.getSize();
-		applicationFrame.setLocation((rectangle.width - dimension.width) 
-				/ 3 + rectangle.x,(rectangle.height - dimension.height) 
-				/ 3 + rectangle.y);
+		applicationFrame.setLocation((rectangle.width - dimension.width) / 3
+				+ rectangle.x, (rectangle.height - dimension.height) / 3
+				+ rectangle.y);
 	}
 
 	/**
 	 * Determines dimension of screen and centers frame on screen.
 	 */
 	public void centerOnscreen() {
-		
+
 		// trying this for mac...
 		final Toolkit toolkit = Toolkit.getDefaultToolkit();
 		final Dimension dimension = toolkit.getScreenSize();
@@ -205,23 +205,23 @@ public abstract class ViewFrame implements Observer {
 		// should drag out of global config
 		center(rectangle);
 	}
-	
+
 	/**
-	 * To maximize the application on startup, considering taskbar. 
+	 * To maximize the application on startup, considering taskbar.
 	 */
 	public void setupFrameSize() {
-		
+
 		final Toolkit toolkit = Toolkit.getDefaultToolkit();
 		final Dimension screenSize = toolkit.getScreenSize();
-		final Insets screenInsets = toolkit.getScreenInsets(
-				GraphicsEnvironment.getLocalGraphicsEnvironment()
-				.getScreenDevices()[0].getDefaultConfiguration());
+		final Insets screenInsets = toolkit.getScreenInsets(GraphicsEnvironment
+				.getLocalGraphicsEnvironment().getScreenDevices()[0]
+				.getDefaultConfiguration());
 		final int taskbarHeight = screenInsets.bottom;
-		
-		applicationFrame.setSize(new Dimension(screenSize.width, 
+
+		applicationFrame.setSize(new Dimension(screenSize.width,
 				screenSize.height - taskbarHeight));
-		applicationFrame.setMinimumSize(new Dimension(screenSize.width * 2/ 3, 
-				screenSize.height * 2/ 3));
+		applicationFrame.setMinimumSize(new Dimension(screenSize.width * 2 / 3,
+				screenSize.height * 2 / 3));
 	}
 
 	// MOVE to TVFrame controller
@@ -231,13 +231,13 @@ public abstract class ViewFrame implements Observer {
 	 */
 	private void setupWindowListener() {
 
-		applicationFrame.setDefaultCloseOperation(
-				WindowConstants.DO_NOTHING_ON_CLOSE);
+		applicationFrame
+				.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		applicationFrame.addWindowListener(new WindowAdapter() {
 
 			@Override
 			public void windowActivated(final WindowEvent windowEvent) {
-				
+
 				setWindowActive(true);
 			}
 
@@ -249,7 +249,7 @@ public abstract class ViewFrame implements Observer {
 
 			@Override
 			public void windowDeactivated(final WindowEvent windowEvent) {
-				
+
 				setWindowActive(false);
 			}
 		});
@@ -285,31 +285,31 @@ public abstract class ViewFrame implements Observer {
 	private boolean windowActive;
 
 	/**
-	 * checks if DataModel has been modified. Stores a configFile when
-	 * closing the window.
+	 * checks if DataModel has been modified. Stores a configFile when closing
+	 * the window.
 	 */
 	public void closeWindow() {
-		
+
 		try {
 			final DataModel dataModel = getDataModel();
-			
+
 			if (dataModel != null) {
 				if (dataModel.getModified()) {
-					final int option = 
-							JOptionPane.showConfirmDialog(applicationFrame,
+					final int option = JOptionPane.showConfirmDialog(
+							applicationFrame,
 							"DataModel is modified. Do you wish to save?");
-					
+
 					switch (option) {
-					
+
 					case JOptionPane.YES_OPTION:
 						final DataModelWriter writer = new DataModelWriter(
 								getDataModel());
 						writer.writeIncremental(getDataModel().getFileSet());
 						break;
-						
+
 					case JOptionPane.CANCEL_OPTION:
 						return;
-						
+
 					case JOptionPane.NO_OPTION:
 						break;
 					}
@@ -318,22 +318,22 @@ public abstract class ViewFrame implements Observer {
 				final Preferences documentConfig = dataModel
 						.getDocumentConfigRoot();
 				if (documentConfig != null) {
-//					documentConfig.store();
+					// documentConfig.store();
 				}
 			}
 		} catch (final Exception e) {
 			LogBuffer.println("ViewFrame.closeWindow() Got exception: " + e);
 		}
-		
+
 		final ConfirmDialog confirm = new ConfirmDialog(this, "exit TreeView");
 		confirm.setVisible(true);
-		
-		if(confirm.getConfirmed()) {
+
+		if (confirm.getConfirmed()) {
 			saveSettings();
 			applicationFrame.dispose();
 		}
 	}
-	
+
 	public abstract void saveSettings();
 
 	/**
@@ -420,8 +420,8 @@ public abstract class ViewFrame implements Observer {
 	 * @return Sets the shared <code>DataModel</code>
 	 * @throws LoadException
 	 */
-	public abstract void setDataModel(DataModel model);//, boolean cluster,
-			//boolean hierarchical);
+	public abstract void setDataModel(DataModel model);// , boolean cluster,
+	// boolean hierarchical);
 
 	/**
 	 * Should scroll all MainPanels in this view frame to the specified gene.
@@ -612,8 +612,8 @@ public abstract class ViewFrame implements Observer {
 		urlExtractor = ue;
 	}
 
-//	abstract public HeaderFinder getGeneFinder();
-	
+	// abstract public HeaderFinder getGeneFinder();
+
 	abstract public void setView(String name);
 
 	/**
@@ -634,7 +634,7 @@ public abstract class ViewFrame implements Observer {
 
 		if (retVal == JFileChooser.APPROVE_OPTION) {
 			chosen = fileDialog.getSelectedFile();
-			
+
 		} else {
 			System.out.println("File Dialog closed without selection...");
 		}
@@ -730,18 +730,18 @@ public abstract class ViewFrame implements Observer {
 		} catch (final Exception e) {
 
 			// hmm... I'll just assume that there's no accept all.
-			fileDialog.addChoosableFileFilter(
-					new javax.swing.filechooser.FileFilter() {
-						
+			fileDialog
+					.addChoosableFileFilter(new javax.swing.filechooser.FileFilter() {
+
 						@Override
 						public boolean accept(final File f) {
-							
+
 							return true;
 						}
 
 						@Override
 						public String getDescription() {
-							
+
 							return "All Files";
 						}
 					});
@@ -757,58 +757,58 @@ public abstract class ViewFrame implements Observer {
 		}
 	}
 
-//	/**
-//	 * Rebuild a particular window menu.
-//	 * 
-//	 * @param windows
-//	 *            the list of windows to add elements to.
-//	 * 
-//	 *            Add a menu item for each window which grants that window the
-//	 *            foreground when selected.
-//	 */
-//	public void rebuildWindowMenu(final Vector<Window> windows) {
-//
-//		synchronized (menubar) {
-//
-//			menubar.setMenu(TreeviewMenuBarI.windowMenu);
-//			menubar.removeAll();
-//
-//			final int max = windows.size();
-//			for (int i = 0; i < max; i++) {
-//
-//				if (i > 8) {
-//
-//					break;
-//				}// just want first 9 windows...
-//				addFocusItem(windows, i);
-//			}
-//			menubar.addSeparator();
-//
-//			menubar.addMenuItem("New Window");
-////			, new ActionListener() {
-////
-////				@Override
-////				public void actionPerformed(final ActionEvent actionEvent) {
-////
-////					createNewFrame().setVisible(true);
-////				}
-////			});
-//			menubar.setAccelerator(KeyEvent.VK_N);
-//			menubar.setMnemonic(KeyEvent.VK_N);
-//
-//			menubar.addMenuItem("Close Window");
-////			, new ActionListener() {
-////
-////				@Override
-////				public void actionPerformed(final ActionEvent actionEvent) {
-////
-////					closeWindow();
-////				}
-////			});
-//			menubar.setAccelerator(KeyEvent.VK_W);
-//			menubar.setMnemonic(KeyEvent.VK_W);
-//		}
-//	}
+	// /**
+	// * Rebuild a particular window menu.
+	// *
+	// * @param windows
+	// * the list of windows to add elements to.
+	// *
+	// * Add a menu item for each window which grants that window the
+	// * foreground when selected.
+	// */
+	// public void rebuildWindowMenu(final Vector<Window> windows) {
+	//
+	// synchronized (menubar) {
+	//
+	// menubar.setMenu(TreeviewMenuBarI.windowMenu);
+	// menubar.removeAll();
+	//
+	// final int max = windows.size();
+	// for (int i = 0; i < max; i++) {
+	//
+	// if (i > 8) {
+	//
+	// break;
+	// }// just want first 9 windows...
+	// addFocusItem(windows, i);
+	// }
+	// menubar.addSeparator();
+	//
+	// menubar.addMenuItem("New Window");
+	// // , new ActionListener() {
+	// //
+	// // @Override
+	// // public void actionPerformed(final ActionEvent actionEvent) {
+	// //
+	// // createNewFrame().setVisible(true);
+	// // }
+	// // });
+	// menubar.setAccelerator(KeyEvent.VK_N);
+	// menubar.setMnemonic(KeyEvent.VK_N);
+	//
+	// menubar.addMenuItem("Close Window");
+	// // , new ActionListener() {
+	// //
+	// // @Override
+	// // public void actionPerformed(final ActionEvent actionEvent) {
+	// //
+	// // closeWindow();
+	// // }
+	// // });
+	// menubar.setAccelerator(KeyEvent.VK_W);
+	// menubar.setMnemonic(KeyEvent.VK_W);
+	// }
+	// }
 
 	/**
 	 * currenlty, only the concrete subclass has a reference to the application,
@@ -822,47 +822,48 @@ public abstract class ViewFrame implements Observer {
 
 	public abstract TreeViewApp getApp();
 
-//	/**
-//	 * Constructs a MenuItem which causes the i'th window to be moved to the
-//	 * front.
-//	 * 
-//	 * @param windows
-//	 *            a list of windows
-//	 * @param i
-//	 *            which window to move to the front.
-//	 * @return a menuItem which focuses the i'th window, or null if more than 9
-//	 *         windows.
-//	 */
-//	private void addFocusItem(final Vector<Window> windows, final int i) {
-//
-//		final int p1 = i + 1;
-//
-//		if (p1 > 9) {
-//
-//			return;
-//		}
-//
-//		final ViewFrame source = (ViewFrame) windows.elementAt(i);
-//		String name;
-//
-//		if (source.getLoaded()) {
-//
-//			name = source.getDataModel().getName();
-//		} else {
-//
-//			name = "Not Loaded";
-//		}
-//		menubar.addMenuItem(name);
-////		, new ActionListener() {
-////
-////			@Override
-////			public void actionPerformed(final ActionEvent e) {
-////
-////				source.toFront();
-////			}
-////		});
-//		menubar.setAccelerator(getKey(p1));
-//	}
+	// /**
+	// * Constructs a MenuItem which causes the i'th window to be moved to the
+	// * front.
+	// *
+	// * @param windows
+	// * a list of windows
+	// * @param i
+	// * which window to move to the front.
+	// * @return a menuItem which focuses the i'th window, or null if more than
+	// 9
+	// * windows.
+	// */
+	// private void addFocusItem(final Vector<Window> windows, final int i) {
+	//
+	// final int p1 = i + 1;
+	//
+	// if (p1 > 9) {
+	//
+	// return;
+	// }
+	//
+	// final ViewFrame source = (ViewFrame) windows.elementAt(i);
+	// String name;
+	//
+	// if (source.getLoaded()) {
+	//
+	// name = source.getDataModel().getName();
+	// } else {
+	//
+	// name = "Not Loaded";
+	// }
+	// menubar.addMenuItem(name);
+	// // , new ActionListener() {
+	// //
+	// // @Override
+	// // public void actionPerformed(final ActionEvent e) {
+	// //
+	// // source.toFront();
+	// // }
+	// // });
+	// menubar.setAccelerator(getKey(p1));
+	// }
 
 	/**
 	 * Gets the key corresponding to a particular number.
@@ -901,7 +902,7 @@ public abstract class ViewFrame implements Observer {
 			final String name) {
 
 		if (indexes.length == 0) {
-			JOptionPane.showMessageDialog(applicationFrame, 
+			JOptionPane.showMessageDialog(applicationFrame,
 					"No Genes to show summary of!");
 			return;
 		}

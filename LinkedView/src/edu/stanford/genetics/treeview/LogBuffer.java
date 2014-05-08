@@ -31,8 +31,8 @@ public class LogBuffer extends Observable {
 
 	private static LogBuffer singleton = new LogBuffer();
 
-	private final Preferences root = 
-			Preferences.userRoot().node(this.getClass().getName());
+	private final Preferences root = Preferences.userRoot().node(
+			this.getClass().getName());
 	private final int defaultLog = 0; // false
 	private final Vector<String> buffer = new Vector<String>(100, 100);
 

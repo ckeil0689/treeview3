@@ -26,7 +26,7 @@ public class DendrogramFactory extends PluginFactory {
 	// presets must be set before static initializer.
 	private static ColorPresets2 colorPresets = new ColorPresets2();
 	private final ColorPresetEditor cpresetEditor;
-//	private JFrame cpresetFrame = null;
+	// private JFrame cpresetFrame = null;
 
 	static {
 		PluginManager.registerPlugin(new DendrogramFactory());
@@ -74,12 +74,12 @@ public class DendrogramFactory extends PluginFactory {
 	public void setGlobalNode(final Preferences node) {
 
 		super.setGlobalNode(node);
-		
-//		colorPresets.setConfigNode(node);
-//
-//		if (colorPresets.getNumPresets() == 0) {
-//			colorPresets.addDefaultPresets();
-//		}
+
+		// colorPresets.setConfigNode(node);
+		//
+		// if (colorPresets.getNumPresets() == 0) {
+		// colorPresets.addDefaultPresets();
+		// }
 
 		cpresetEditor.synchronizeFrom();
 	}
@@ -96,24 +96,24 @@ public class DendrogramFactory extends PluginFactory {
 
 		super.addPluginConfig(globalMenu, frame);
 		globalMenu.addMenuItem("Dendrogram Color Presets...");
-//		, new ActionListener() {
-//
-//					@Override
-//					public void actionPerformed(final ActionEvent actionEvent) {
-//
-//						if (cpresetFrame == null) {
-//							cpresetFrame = new JFrame(
-//									"Dendrogram Color Presets");
-//							final SettingsPanelHolder holder = new SettingsPanelHolder(
-//									cpresetFrame, frame.getApp()
-//											.getGlobalConfig().getRoot());
-//							holder.addSettingsPanel(cpresetEditor);
-//							cpresetFrame.getContentPane().add(holder);
-//						}
-//						cpresetFrame.pack();
-//						cpresetFrame.setVisible(true);
-//					}
-//				});
+		// , new ActionListener() {
+		//
+		// @Override
+		// public void actionPerformed(final ActionEvent actionEvent) {
+		//
+		// if (cpresetFrame == null) {
+		// cpresetFrame = new JFrame(
+		// "Dendrogram Color Presets");
+		// final SettingsPanelHolder holder = new SettingsPanelHolder(
+		// cpresetFrame, frame.getApp()
+		// .getGlobalConfig().getRoot());
+		// holder.addSettingsPanel(cpresetEditor);
+		// cpresetFrame.getContentPane().add(holder);
+		// }
+		// cpresetFrame.pack();
+		// cpresetFrame.setVisible(true);
+		// }
+		// });
 		globalMenu.setMnemonic(KeyEvent.VK_D);
 	}
 

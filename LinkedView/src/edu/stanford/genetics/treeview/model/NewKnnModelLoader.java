@@ -49,7 +49,7 @@ public class NewKnnModelLoader extends NewModelLoader {
 	 * @param model
 	 */
 	public NewKnnModelLoader(final KnnModel model) {
-		
+
 		super(model);
 	}
 
@@ -60,35 +60,36 @@ public class NewKnnModelLoader extends NewModelLoader {
 
 	/**
 	 * This run() completely overrides the run() of TVModelLoader2.
-	 * @return 
+	 * 
+	 * @return
 	 * 
 	 * @see edu.stanford.genetics.treeview.model.TVModelLoader2#run()
 	 */
 	@Override
 	public TVModel load() {
-		
+
 		try {
 			final KnnModel model = getKnnModel();
 			final FileSet fileSet = targetModel.getFileSet();
-			
+
 			model.gidFound(false);
 			model.aidFound(false);
-			
+
 			// Read data from specified file location
 			loadProgView.resetLoadBar();
-			int loadBarMax = count(new File(fileSet.getCdt()));
+			final int loadBarMax = count(new File(fileSet.getCdt()));
 			loadProgView.setLoadBarMax(loadBarMax);
-			
+
 			loadProgView.setLoadLabel("Loading Data into TreeView.");
-			
+
 			FileInputStream fis = new FileInputStream(fileSet.getCdt());
-	        DataInputStream in = new DataInputStream(fis);
-	        BufferedReader br = new BufferedReader(new InputStreamReader(in));
-	        
-	        // Get data from file into String and double arrays 
-	        // Put the arrays in ArrayLists for later access.
-	        System.out.println("Starting extract.");
-	        extractData(br);
+			DataInputStream in = new DataInputStream(fis);
+			BufferedReader br = new BufferedReader(new InputStreamReader(in));
+
+			// Get data from file into String and double arrays
+			// Put the arrays in ArrayLists for later access.
+			System.out.println("Starting extract.");
+			extractData(br);
 
 			parseCDT();
 
@@ -96,11 +97,11 @@ public class NewKnnModelLoader extends NewModelLoader {
 			if (!kggfilename.equalsIgnoreCase("")) {
 				try {
 					fis = new FileInputStream(kggfilename);
-			        in = new DataInputStream(fis);
-			        br = new BufferedReader(new InputStreamReader(in));
+					in = new DataInputStream(fis);
+					br = new BufferedReader(new InputStreamReader(in));
 					extractData(br);
 					model.setGClusters(stringLabels, LoadException.KGGPARSE);
-					
+
 				} catch (final Exception e) {
 					System.out.println("error parsing KGG: " + e.getCause());
 					e.printStackTrace();
@@ -111,47 +112,47 @@ public class NewKnnModelLoader extends NewModelLoader {
 			if (!kagfilename.equalsIgnoreCase("")) {
 				try {
 					fis = new FileInputStream(kagfilename);
-			        in = new DataInputStream(fis);
-			        br = new BufferedReader(new InputStreamReader(in));
+					in = new DataInputStream(fis);
+					br = new BufferedReader(new InputStreamReader(in));
 					extractData(br);
 					model.setAClusters(stringLabels, LoadException.KAGPARSE);
-					
+
 				} catch (final Exception e) {
 					System.out.println("error parsing KAG: " + e.getCause());
 					e.printStackTrace();
 				}
 			}
-			
+
 			try {
-//				final Preferences documentConfig = new XmlConfig(targetModel
-//						.getFileSet().getJtv(), "DocumentConfig");
-				final Preferences documentConfig = 
-						Preferences.userRoot().node("DocumentConfig");
+				// final Preferences documentConfig = new XmlConfig(targetModel
+				// .getFileSet().getJtv(), "DocumentConfig");
+				final Preferences documentConfig = Preferences.userRoot().node(
+						"DocumentConfig");
 				documentConfig.put("jtv", targetModel.getFileSet().getJtv());
 				targetModel.setDocumentConfig(documentConfig);
-				
+
 			} catch (final Exception e) {
 				targetModel.setDocumentConfig(null);
-				LogBuffer.println("Exception in load() in " +
-						"NewKnnModelLoader: " + e.getMessage());
+				LogBuffer.println("Exception in load() in "
+						+ "NewKnnModelLoader: " + e.getMessage());
 			}
-			
+
 			// ActionEvent(this, 0, "none",0);
 		} catch (final java.lang.OutOfMemoryError ex) {
-			LogBuffer.println("OutOfMemoryError in load() in " +
-					"NewKnnModelLoader: " + ex.getMessage());
+			LogBuffer.println("OutOfMemoryError in load() in "
+					+ "NewKnnModelLoader: " + ex.getMessage());
 			final JPanel temp = new JPanel();
 			temp.add(new JLabel("Out of memory, allocate more RAM"));
-			temp.add(new JLabel("see Chapter 3 of Help->Documentation... " +
-					"for Out of Memory"));
+			temp.add(new JLabel("see Chapter 3 of Help->Documentation... "
+					+ "for Out of Memory"));
 			JOptionPane.showMessageDialog(tvFrame.getAppFrame(), temp);
-			
-		} catch (IOException e) {
-			System.out.println("Loading resulted in an error. Cause: " 
+
+		} catch (final IOException e) {
+			System.out.println("Loading resulted in an error. Cause: "
 					+ e.getCause());
 			e.printStackTrace();
 		}
-		
+
 		targetModel.setLoaded(true);
 		return targetModel;
 	}

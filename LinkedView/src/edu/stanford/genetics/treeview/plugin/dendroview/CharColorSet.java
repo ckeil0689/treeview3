@@ -120,33 +120,33 @@ public class CharColorSet implements ConfigNodePersistent {
 		setName(other.getName());
 	}
 
-//	/**
-//	 * sets colors and name to reflect <code>ConfigNode</code>
-//	 */
-//	@Override
-//	public void bindConfig(final Preferences root) {
-//		
-//		this.root = root;
-//		missing = decodeColor(root
-//				.get("missing", default_missingColor));
-//		empty = decodeColor(root.get("empty", default_emptyColor));
-//		name = root.get("name", default_name);
-//	}
-	
+	// /**
+	// * sets colors and name to reflect <code>ConfigNode</code>
+	// */
+	// @Override
+	// public void bindConfig(final Preferences root) {
+	//
+	// this.root = root;
+	// missing = decodeColor(root
+	// .get("missing", default_missingColor));
+	// empty = decodeColor(root.get("empty", default_emptyColor));
+	// name = root.get("name", default_name);
+	// }
+
 	/**
 	 * sets colors and name to reflect <code>ConfigNode</code>
 	 */
 	@Override
-	public void setConfigNode(Preferences parentNode) {
-		
-		if(parentNode != null) {
+	public void setConfigNode(final Preferences parentNode) {
+
+		if (parentNode != null) {
 			this.root = parentNode.node("CharColorSet");
-			
+
 		} else {
-			LogBuffer.println("Could not find or create CharColorSet" +
-					"node because parentNode was null.");
+			LogBuffer.println("Could not find or create CharColorSet"
+					+ "node because parentNode was null.");
 		}
-		
+
 		missing = decodeColor(root.get("missing", default_missingColor));
 		empty = decodeColor(root.get("empty", default_emptyColor));
 		name = root.get("name", default_name);
@@ -157,7 +157,7 @@ public class CharColorSet implements ConfigNodePersistent {
 	 */
 	@Override
 	public String toString() {
-		
+
 		return "CharColorSet " + getName() + "\n" + "missing: "
 				+ getMissing().toString() + "\t" + "empty: "
 				+ getEmpty().toString() + "\t";
@@ -167,7 +167,7 @@ public class CharColorSet implements ConfigNodePersistent {
 	 * Color for missing values.
 	 */
 	public Color getMissing() {
-		
+
 		return missing;
 	}
 
@@ -175,7 +175,7 @@ public class CharColorSet implements ConfigNodePersistent {
 	 * Color for empty values.
 	 */
 	public Color getEmpty() {
-		
+
 		return empty;
 	}
 
@@ -183,16 +183,16 @@ public class CharColorSet implements ConfigNodePersistent {
 	 * The name of this color set
 	 */
 	public String getName() {
-		
+
 		return name;
 	}
 
 	public Color getColor(final char c) {
-		
+
 		Color cand = null;
 		if (c < maxChar) {
 			cand = charColors[c];
-			
+
 		} else {
 			LogBuffer.println("passed in char " + c + " greater than maxChar "
 					+ maxChar + " to CharColorSet.java");
@@ -208,7 +208,7 @@ public class CharColorSet implements ConfigNodePersistent {
 	 * Color for missing values.
 	 */
 	public void setMissing(final String newString) {
-		
+
 		missing = decodeColor(newString);
 		if (root != null) {
 			root.put("missing", newString);
@@ -219,7 +219,7 @@ public class CharColorSet implements ConfigNodePersistent {
 	 * Color for empty values.
 	 */
 	public void setEmpty(final String newString) {
-		
+
 		empty = decodeColor(newString);
 		if (root != null) {
 			root.put("empty", newString);
@@ -233,7 +233,7 @@ public class CharColorSet implements ConfigNodePersistent {
 	 * Color for missing values.
 	 */
 	public void setMissing(final Color newColor) {
-		
+
 		missing = newColor;
 		if (root != null) {
 			root.put("missing", encodeColor(missing));
@@ -244,7 +244,7 @@ public class CharColorSet implements ConfigNodePersistent {
 	 * Color for empty values.
 	 */
 	public void setEmpty(final Color newColor) {
-		
+
 		empty = newColor;
 		if (root != null) {
 			root.put("empty", encodeColor(empty));
@@ -258,7 +258,7 @@ public class CharColorSet implements ConfigNodePersistent {
 	 * The name of this color set
 	 */
 	public void setName(final String name) {
-		
+
 		this.name = name;
 		if (root != null) {
 			root.put("name", name);
@@ -273,7 +273,7 @@ public class CharColorSet implements ConfigNodePersistent {
 	 * @return The corresponding java color object.
 	 */
 	public final static Color decodeColor(final String colorString) {
-		
+
 		return ColorSet2.decodeColor(colorString);
 	}
 
@@ -285,7 +285,7 @@ public class CharColorSet implements ConfigNodePersistent {
 	 * @return The corresponding hex string
 	 */
 	public final static String encodeColor(final Color color) {
-		
+
 		return ColorSet2.encodeColor(color);
 	}
 }

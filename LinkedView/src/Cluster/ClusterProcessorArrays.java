@@ -1,7 +1,5 @@
 package Cluster;
 
-import java.util.concurrent.ExecutionException;
-
 import javax.swing.SwingWorker;
 
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -21,45 +19,20 @@ public class ClusterProcessorArrays {
 
 	private final ClusterView clusterView;
 	private final TVModel tvModel;
-	private SwingWorker<Void, Void> worker;
-	
+	private final SwingWorker<String[], Void> worker;
+
 	/**
 	 * Main constructor
+	 * 
 	 * @param cView
 	 * @param model
 	 */
-	public ClusterProcessorArrays(final ClusterView cView, 
-			final TVModel model, SwingWorker<Void, Void> worker) {
-		
+	public ClusterProcessorArrays(final ClusterView cView, final TVModel model,
+			final SwingWorker<String[], Void> worker) {
+
 		this.clusterView = cView;
 		this.tvModel = model;
 		this.worker = worker;
-	}
-	
-	/**
-	 * Function to generate a cdt-file that represents a clustered data set.
-	 * The file is generated from the clustering results and subsequently
-	 * stored into the same directory as the original file, together with
-	 * ATR and GTR files for the dendrograms. 
-	 * @param hierarchical
-	 * @return
-	 */
-	public String saveCDT(boolean hierarchical, String[] orderedRows, 
-			String[] orderedCols) {
-		
-		// also takes list of row elements because only one list can easily
-		// be consistently transformed and fed into file writer
-		// to make a tab-delimited file
-		final double[][] dataArrays = ((TVDataMatrix) tvModel.getDataMatrix())
-				.getExprData();
-		
-		final CDTGeneratorArrays cdtGen = new CDTGeneratorArrays(tvModel, 
-				clusterView, dataArrays, orderedRows, orderedCols, 
-				hierarchical);
-				
-		cdtGen.generateCDT();
-		
-		return cdtGen.getFilePath();
 	}
 
 	/**
@@ -70,10 +43,9 @@ public class ClusterProcessorArrays {
 	 * @param pBar
 	 * @return
 	 */
-	public String[] hCluster(final double[][] distanceMatrix,
-			 final String type) {
+	public String[] hCluster(final double[][] distanceMatrix, final String type) {
 
-		final HierClusterArrays cGen = new HierClusterArrays(tvModel, 
+		final HierClusterArrays cGen = new HierClusterArrays(tvModel,
 				clusterView, distanceMatrix, type, worker);
 
 		cGen.cluster();
@@ -91,59 +63,60 @@ public class ClusterProcessorArrays {
 	 * @param iterations
 	 * @return
 	 */
-	public String[] kmCluster(final double[][] distances,
-			final String type, final int clusterN, final int iterations) {
+	public String[] kmCluster(final double[][] distances, final String type,
+			final int clusterN, final int iterations) {
 
-		final KMeansCluster cGen = new KMeansCluster(tvModel, clusterView, 
+		final KMeansCluster cGen = new KMeansCluster(tvModel, clusterView,
 				distances, type, clusterN, iterations, worker);
 
 		cGen.cluster();
 
 		return cGen.getReorderedList();
 	}
-	
+
 	/**
 	 * This method uses the unformatted matrix data list and splits it up into
 	 * the columns.
+	 * 
 	 * @param unformattedData
 	 * @return
 	 */
-	public double[][] formatColData(double[][] unformattedData) {
-		
-		final DataFormatterArrays formattedData = 
-				new DataFormatterArrays(tvModel, clusterView, unformattedData);
-		
+	public double[][] formatColData(final double[][] unformattedData) {
+
+		final DataFormatterArrays formattedData = new DataFormatterArrays(
+				tvModel, clusterView, unformattedData);
+
 		formattedData.splitColumns();
 
-		double[][] sepCols = formattedData.getColList();
-		
+		final double[][] sepCols = formattedData.getColList();
+
 		return sepCols;
 	}
-	
+
 	/**
 	 * Calculates the distance matrix according to the chosen method.
+	 * 
 	 * @param choice
 	 * @return
 	 */
-	public double[][] calculateDistance(String choice, String type) {
-		
+	public double[][] calculateDistance(final String choice, final String type) {
+
 		double[][] data = null;
-		if(type.equalsIgnoreCase("Row")) {
-			data = ((TVDataMatrix) tvModel.getDataMatrix())
-					.getExprData();
-			
+		if (type.equalsIgnoreCase("Row")) {
+			data = ((TVDataMatrix) tvModel.getDataMatrix()).getExprData();
+
 		} else {
-			data = formatColData(((TVDataMatrix)tvModel.getDataMatrix())
+			data = formatColData(((TVDataMatrix) tvModel.getDataMatrix())
 					.getExprData());
 		}
-		
-		if(data != null) {
-			final DMCalculatorArrays dCalc = new DMCalculatorArrays(data, 
+
+		if (data != null) {
+			final DMCalculatorArrays dCalc = new DMCalculatorArrays(data,
 					choice, type, clusterView, worker);
-	
+
 			dCalc.measureDistance();
 			return dCalc.getDistanceMatrix();
-			
+
 		} else {
 			LogBuffer.println(type + " Data was not extracted.");
 			return null;

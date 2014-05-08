@@ -29,15 +29,15 @@ import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.PluginFactory;
 
 public class PluginManager {
-	
+
 	private static String s_pluginclassfile = "tv_plugins.cd";
-	
+
 	/**
 	 * holds global plugin manager I hate static variables, but this one looks
 	 * necessary.
 	 * */
 	private static PluginManager pluginManager = new PluginManager();
-	
+
 	/**
 	 * holds list of all plugin factories
 	 */
@@ -49,17 +49,17 @@ public class PluginManager {
 	}
 
 	public File[] readdir(final String s_dir) {
-		
+
 		final File f_dir = new File(s_dir);
 		final FileFilter fileFilter = new FileFilter() {
-			
+
 			@Override
 			public boolean accept(final File file) {
-				
+
 				return file.getName().endsWith("jar");
 			}
 		};
-		
+
 		return f_dir.listFiles(fileFilter);
 	}
 
@@ -79,20 +79,20 @@ public class PluginManager {
 			final Enumeration e = jf.entries();
 			JarEntry je = null;
 			String classfile = null;
-			
+
 			for (; e.hasMoreElements();) {
-				
+
 				je = (JarEntry) e.nextElement();
 				if (je.toString().indexOf(s_pluginclassfile) >= 0) {
 					classfile = je.toString();
 				}
 			}
 			ze = jf.getEntry(classfile);
-			
+
 		} catch (final NullPointerException e) {
 			LogBuffer.println("JarFile has no tv_plugins.cd" + jf.getName());
 			throw e;
-			
+
 		} catch (final RuntimeException e) {
 			e.printStackTrace();
 		}
@@ -103,10 +103,10 @@ public class PluginManager {
 		 */
 		final BufferedReader br = new BufferedReader(new InputStreamReader(
 				jf.getInputStream(ze)));
-		
+
 		final ArrayList al = new ArrayList();
 		String s = null;
-		
+
 		while ((s = br.readLine()) != null) {
 			al.add(s);
 		}
@@ -114,7 +114,7 @@ public class PluginManager {
 	}
 
 	public void loadPlugins(final File[] f_jars, final boolean showPopup) {
-		
+
 		String s_loadedPlugins = "";
 		String s_notloadedPlugins = "";
 
@@ -148,7 +148,7 @@ public class PluginManager {
 	}
 
 	public boolean loadPlugin(final URL jarURL) {
-		
+
 		boolean b_loadedPlugin = false;
 		try {
 			LogBuffer.println("Plugin Jar " + jarURL);
@@ -171,7 +171,7 @@ public class PluginManager {
 					@SuppressWarnings("unused")
 					final PluginFactory pp = (PluginFactory) c.newInstance();
 					b_loadedPlugin |= true;
-					
+
 				} else {
 					b_loadedPlugin |= false;
 				}
@@ -179,10 +179,13 @@ public class PluginManager {
 		} catch (final ClassNotFoundException e) {
 			e.printStackTrace();
 			LogBuffer.println("ClassNotFound " + e);
+			
 		} catch (final InstantiationException e) {
 			Debug.print(e);
+			
 		} catch (final IllegalAccessException e) {
 			Debug.print(e);
+			
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
@@ -209,39 +212,37 @@ public class PluginManager {
 	 * 
 	 */
 	public void pluginAssignConfigNodes(final Preferences node) {
-		
+
 		final PluginFactory[] plugins = getPluginFactories();
-		
+
 		for (int i = 0; i < plugins.length; i++) {
-			
+
 			Preferences pluginNode = null;
-//			final Preferences pluginPresetsNode = node.node("PluginGlobal");
+			// final Preferences pluginPresetsNode = node.node("PluginGlobal");
 			String[] pluginPresetsChildrenNodes;
 			try {
 				pluginPresetsChildrenNodes = node.childrenNames();
-			
+
 				for (int j = 0; j < pluginPresetsChildrenNodes.length; j++) {
-					
+
 					// scan existing pluginPresets for correct name
 					if (node.node(pluginPresetsChildrenNodes[j])
-							.get("name", "").equals(
-									plugins[i].getPluginName())) {
-						
-						pluginNode = node.node(
-								pluginPresetsChildrenNodes[j]);
+							.get("name", "").equals(plugins[i].getPluginName())) {
+
+						pluginNode = node.node(pluginPresetsChildrenNodes[j]);
 						break;
 					}
 				}
-				
+
 				if (pluginNode == null) {
 					// no existing presets node for plugin, must create
 					pluginNode = node.node(plugins[i].getPluginName());
 					pluginNode.put("name", plugins[i].getPluginName());
 				}
-				
+
 				plugins[i].setGlobalNode(pluginNode);
-				
-			} catch (BackingStoreException e) {
+
+			} catch (final BackingStoreException e) {
 				e.printStackTrace();
 			}
 		}

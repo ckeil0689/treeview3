@@ -149,7 +149,7 @@ public interface HeaderInfo {
 	 * @return true if successfully modified, false if not.
 	 */
 	public boolean setHeader(int i, String name, String value);
-	
+
 	public void setPrefixArray(String[] newPrefixArray);
 
 	/**

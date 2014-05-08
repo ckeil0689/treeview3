@@ -41,148 +41,153 @@ import edu.stanford.genetics.treeview.model.TVModel;
 
 /**
  * This class controls user interaction with TVFrame and its views.
+ * 
  * @author CKeil
- *
+ * 
  */
 public class TVFrameController {
 
 	private TVModel model;
-	private TreeViewFrame tvFrame;
-	private JFrame applicationFrame;
+	private final TreeViewFrame tvFrame;
+	private final JFrame applicationFrame;
 	private MenubarActions menuActions;
-	
+
 	private SwingWorker<Void, Void> worker;
 	private File file;
 	private FileSet fileMenuSet;
-	
+
 	private boolean error = false;
-	
-	public TVFrameController(TreeViewFrame tvFrame, TVModel model) {
-		
+
+	public TVFrameController(final TreeViewFrame tvFrame, final TVModel model) {
+
 		this.model = model;
 		this.tvFrame = tvFrame;
 		this.applicationFrame = tvFrame.getAppFrame();
-		
+
 		setViewChoice();
 	}
-	
+
 	/**
 	 * Adds listeners to views that are instantiated in TVFrame.
 	 */
 	public void addViewListeners() {
-		
-		menuActions =  new MenubarActions(tvFrame, 
-				TVFrameController.this);
-		
+
+		menuActions = new MenubarActions(tvFrame, TVFrameController.this);
+
 		tvFrame.addMenuActionListeners(new StackMenuListener());
 		tvFrame.addFileMenuListeners(new FileMenuListener());
-		
-		if(tvFrame.getWelcomeView() != null) {
-			tvFrame.getWelcomeView().addLoadListener(new LoadPanelListener(
-					tvFrame.getWelcomeView().getLoadIcon(), 
-					tvFrame.getWelcomeView().getLoadLabel()));
+
+		if (tvFrame.getWelcomeView() != null) {
+			tvFrame.getWelcomeView().addLoadListener(
+					new LoadPanelListener(tvFrame.getWelcomeView()
+							.getLoadIcon(), tvFrame.getWelcomeView()
+							.getLoadLabel()));
 		}
-		
-		if(tvFrame.getLoadErrorView() != null) {
+
+		if (tvFrame.getLoadErrorView() != null) {
 			tvFrame.getLoadErrorView().addLoadNewListener(
 					new LoadButtonListener());
 		}
 	}
-	
+
 	/**
 	 * Handles the loading of data.
+	 * 
 	 * @author CKeil
-	 *
+	 * 
 	 */
 	class LoadPanelListener extends SSMouseListener {
-		
-		public LoadPanelListener(JPanel panel, JLabel label) {
-			
+
+		public LoadPanelListener(final JPanel panel, final JLabel label) {
+
 			super(panel, label);
 		}
 
 		@Override
-		public void mouseClicked(MouseEvent arg0) {
+		public void mouseClicked(final MouseEvent arg0) {
 
 			// Setting screen for loading bar.
 			openFile();
-		}	
+		}
 	}
-	
+
 	/**
 	 * Handles the new loading of data.
+	 * 
 	 * @author CKeil
-	 *
+	 * 
 	 */
 	class LoadButtonListener implements ActionListener {
 
 		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			
+		public void actionPerformed(final ActionEvent arg0) {
+
 			// Setting screen for loading bar.
 			openFile();
-		}	
+		}
 	}
-	
+
 	class StackButtonListener implements MouseListener {
 
 		@Override
-		public void mouseClicked(MouseEvent e) {
-			
-//			tvFrame.getStackMenu().show(e.getComponent(), 0, 
-//					e.getComponent().getHeight());
+		public void mouseClicked(final MouseEvent e) {
+
+			// tvFrame.getStackMenu().show(e.getComponent(), 0,
+			// e.getComponent().getHeight());
 		}
 
 		@Override
-		public void mouseEntered(MouseEvent e) {
-			
+		public void mouseEntered(final MouseEvent e) {
+
 			e.getComponent().setCursor(new Cursor(Cursor.HAND_CURSOR));
 		}
 
 		@Override
-		public void mouseExited(MouseEvent e) {
-			
+		public void mouseExited(final MouseEvent e) {
+
 			e.getComponent().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 		}
 
 		@Override
-		public void mousePressed(MouseEvent e) {}
+		public void mousePressed(final MouseEvent e) {
+		}
 
 		@Override
-		public void mouseReleased(MouseEvent arg0) {}
+		public void mouseReleased(final MouseEvent arg0) {
+		}
 	}
-	
+
 	class StackMenuListener implements ActionListener {
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			
-			ArrayList<JMenuItem> menuList = tvFrame.getStackMenus();
-			
-			for(int i = 0; i < menuList.size(); i++) {
-				if(e.getSource() ==  menuList.get(i)) {
-					
+		public void actionPerformed(final ActionEvent e) {
+
+			final ArrayList<JMenuItem> menuList = tvFrame.getStackMenus();
+
+			for (int i = 0; i < menuList.size(); i++) {
+				if (e.getSource() == menuList.get(i)) {
+
 					menuActions.execute(menuList.get(i).getText());
 				}
 			}
 		}
 	}
-	
+
 	public void setViewChoice() {
-		
-		if(error) {
+
+		if (error) {
 			tvFrame.setView("LoadErrorView");
 			tvFrame.setLoaded(false);
 			addViewListeners();
-			
+
 			LogBuffer.println("DataModel not properly loaded.");
-			
+
 		} else {
-			if(tvFrame.getDataModel() != null) {
+			if (tvFrame.getDataModel() != null) {
 				tvFrame.setView("DendroView");
 				tvFrame.setLoaded(true);
 				addViewListeners();
-				
+
 			} else {
 				tvFrame.setView("WelcomeView");
 				tvFrame.setLoaded(false);
@@ -190,7 +195,7 @@ public class TVFrameController {
 			}
 		}
 	}
-	
+
 	/**
 	 * Setting up a worker thread to do the CDT generation if a non-cdt file was
 	 * selected by the user. This prevents the GUI from locking up and allows
@@ -200,72 +205,73 @@ public class TVFrameController {
 
 		@Override
 		public Void doInBackground() {
-			
+
 			FileSet fileSet = null;
-			
-			if(fileMenuSet == null) {
+
+			if (fileMenuSet == null) {
 				fileSet = tvFrame.getFileSet(file);
-				
+
 			} else {
 				fileSet = fileMenuSet;
 			}
-		
+
 			// Loading TVModel
 			loadFileSet(fileSet);
-			
-			if(fileSet != null) {
+
+			if (fileSet != null) {
 				fileSet = tvFrame.getFileMRU().addUnique(fileSet);
 				tvFrame.getFileMRU().setLast(fileSet);
-				
+
 			} else {
 				System.out.println("FileSet is null.");
-				}
-					
-				return null;
 			}
 
-			@Override
-			protected void done() {
- 
-				if(model.isLoaded()) {
-					fileMenuSet = null;
-					setDataModel();
-					error = false;
-					
-				} else {
-					error = true;
-				}
-				
-				setViewChoice();
+			return null;
+		}
+
+		@Override
+		protected void done() {
+
+			if (model.isLoaded()) {
+				fileMenuSet = null;
+				setDataModel();
+				error = false;
+
+			} else {
+				error = true;
 			}
+
+			setViewChoice();
+		}
 	}
-	
+
 	/**
 	 * This method opens a file dialog to open either the visualization view or
 	 * the cluster view depending on which file type is chosen.
-	 * @throws IOException 
+	 * 
+	 * @throws IOException
 	 * 
 	 * @throws LoadException
 	 */
 	public void openFile() {
-	
+
 		worker = new LoadWorker();
-		
+
 		try {
 			file = tvFrame.selectFile();
-			
+
 			// Only run loader, if JFileChooser wasn't canceled.
-			if(file != null) {
+			if (file != null) {
 				worker.execute();
 			}
-			
-		} catch (LoadException e) {
-			LogBuffer.println("Loading the FileSet was interrupted. " +
-					"Cause: " + e.getCause());
+
+		} catch (final LoadException e) {
+			LogBuffer.println("Loading the FileSet was interrupted. "
+					+ "Cause: " + e.getCause());
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Loads a FileSet and calls setLoaded(true) to reset the MainPanel.
 	 * 
@@ -280,7 +286,7 @@ public class TVFrameController {
 		tvFrame.getFileMRU().setLast(fileSet);
 		tvFrame.getFileMRU().notifyObservers();
 	}
-	
+
 	/**
 	 * r * This is the workhorse. It creates a new DataModel of the file, and
 	 * then sets the Datamodel. A side effect of setting the datamodel is to
@@ -291,16 +297,16 @@ public class TVFrameController {
 		// Make TVModel object
 		model = new TVModel();
 		model.setFrame(tvFrame);
-		
+
 		tvFrame.setView("LoadProgressView");
 
 		try {
 			// load instance variables of TVModel with data
 			model.loadNew(fileSet);
-			
-		} catch (OutOfMemoryError e) {
-			String oomError = "The data file is too large. " +
-					"Increase the JVM's heap size. Error: " + e.getMessage();
+
+		} catch (final OutOfMemoryError e) {
+			final String oomError = "The data file is too large. "
+					+ "Increase the JVM's heap size. Error: " + e.getMessage();
 			tvFrame.setLoadErrorMessage(oomError);
 			e.printStackTrace();
 
@@ -308,14 +314,14 @@ public class TVFrameController {
 			if (e.getType() != LoadException.INTPARSE) {
 				JOptionPane.showMessageDialog(applicationFrame, e);
 			}
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			e.printStackTrace();
-			
-		} catch (ExecutionException e) {
+
+		} catch (final ExecutionException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	// Loading Methods
 	/**
 	 * Allows user to load a file from a URL
@@ -350,7 +356,7 @@ public class TVFrameController {
 
 		return fileSet1;
 	}
-	
+
 	/**
 	 * Sets up the following: 1) urlExtractor, an object that generates urls
 	 * from gene indexes 2) arrayUrlExtractor, similarly 3) geneSelection and 4)
@@ -366,104 +372,103 @@ public class TVFrameController {
 
 		final Preferences documentConfig = tvFrame.getDataModel()
 				.getDocumentConfigRoot();
-		
+
 		// extractors...
 		final UrlPresets genePresets = tvFrame.getGeneUrlPresets();
-		final UrlExtractor urlExtractor = new UrlExtractor(
-				tvFrame.getDataModel().getGeneHeaderInfo(), genePresets);
+		final UrlExtractor urlExtractor = new UrlExtractor(tvFrame
+				.getDataModel().getGeneHeaderInfo(), genePresets);
 		urlExtractor.bindConfig(documentConfig.node("UrlExtractor"));
 		tvFrame.setUrlExtractor(urlExtractor);
 
 		final UrlPresets arrayPresets = tvFrame.getArrayUrlPresets();
-		final UrlExtractor arrayUrlExtractor = new UrlExtractor(
-				tvFrame.getDataModel().getArrayHeaderInfo(), arrayPresets);
-		arrayUrlExtractor.bindConfig(documentConfig
-				.node("ArrayUrlExtractor"));
+		final UrlExtractor arrayUrlExtractor = new UrlExtractor(tvFrame
+				.getDataModel().getArrayHeaderInfo(), arrayPresets);
+		arrayUrlExtractor.bindConfig(documentConfig.node("ArrayUrlExtractor"));
 		tvFrame.setArrayUrlExtractor(arrayUrlExtractor);
 
 		tvFrame.setGeneSelection(new TreeSelection(ngene));
 		tvFrame.setArraySelection(new TreeSelection(nexpr));
 	}
-	
+
 	/**
 	 * Opens the ClusterViewFrame with either the options for hierarchical
 	 * clustering or K-Means, depending on the boolean parameter.
+	 * 
 	 * @param hierarchical
 	 */
-	public void setupClusterView(String clusterType) {
-		
+	public void setupClusterView(final String clusterType) {
+
 		// Making a new Window to display clustering components
-		ClusterViewDialog clusterViewDialog = new ClusterViewDialog(tvFrame, 
-				clusterType);
-		
+		final ClusterViewDialog clusterViewDialog = new ClusterViewDialog(
+				tvFrame, clusterType);
+
 		// Creating the Controller for this view.
-		ClusterViewController clusControl = 
-				new ClusterViewController(clusterViewDialog.getClusterView(), 
-						tvFrame, this);
-		
+		final ClusterViewController2 clusControl = new ClusterViewController2(
+				clusterViewDialog.getClusterView(), tvFrame, this);
+
 		// Make the clustering window visible.
 		clusterViewDialog.setVisible(true);
 	}
-	
+
 	/**
 	 * Setter for dataModel for TVFrame, also sets extractors, running.
 	 * 
-	 * @param DataModel newModel
+	 * @param DataModel
+	 *            newModel
 	 */
 	public void setDataModel() {
 
-		if(model != null) {
+		if (model != null) {
 			if (tvFrame.getDataModel() != null) {
 				tvFrame.getDataModel().clearFileSetListeners();
 			}
-	
+
 			tvFrame.setDataModel(model);
-	
+
 			if (tvFrame.getDataModel() != null) {
 				tvFrame.getDataModel().addFileSetListener(tvFrame);
 			}
-					
+
 			setupExtractors();
-			
+
 		} else {
 			tvFrame.setDataModel(null);
 		}
 	}
-	
+
 	/**
 	 * Opens an instance of GeneListMaker used to save a list of genes.
 	 */
 	public void saveList() {
-		
+
 		if (warnSelectionEmpty()) {
 			final FileSet source = tvFrame.getDataModel().getFileSet();
 			String def = tvFrame.getDataModel().getName() + "_list.txt";
-		
+
 			if (source != null) {
-		
+
 				def = source.getDir() + source.getRoot() + "_list.txt";
 			}
-		
+
 			final GeneListMaker t = new GeneListMaker(applicationFrame,
 					tvFrame.getGeneSelection(), tvFrame.getDataModel()
 							.getGeneHeaderInfo(), def);
-		
-			t.setDataMatrix(tvFrame.getDataModel().getDataMatrix(),
-					tvFrame.getDataModel().getArrayHeaderInfo(),
-					DataModel.NODATA);
-		
+
+			t.setDataMatrix(tvFrame.getDataModel().getDataMatrix(), tvFrame
+					.getDataModel().getArrayHeaderInfo(), DataModel.NODATA);
+
 			t.setConfigNode(tvFrame.getConfigNode());
-		
+
 			t.pack();
 			t.setVisible(true);
 		}
 	}
-	
+
 	/**
 	 * Opens instance of GeneListMaker to save data.
 	 */
 	public void saveData() {
-		
+
 		if (warnSelectionEmpty()) {
 			final FileSet source = tvFrame.getDataModel().getFileSet();
 
@@ -472,9 +477,8 @@ public class TVFrameController {
 							.getGeneHeaderInfo(), source.getDir()
 							+ source.getRoot() + "_data.cdt");
 
-			t.setDataMatrix(tvFrame.getDataModel().getDataMatrix(),
-					tvFrame.getDataModel().getArrayHeaderInfo(),
-					DataModel.NODATA);
+			t.setDataMatrix(tvFrame.getDataModel().getDataMatrix(), tvFrame
+					.getDataModel().getArrayHeaderInfo(), DataModel.NODATA);
 
 			t.setConfigNode(tvFrame.getConfigNode());
 
@@ -483,7 +487,7 @@ public class TVFrameController {
 			t.setVisible(true);
 		}
 	}
-	
+
 	/**
 	 * Generates a warning message if TreeSelectionI object is null and returns
 	 * false in that case.
@@ -503,26 +507,26 @@ public class TVFrameController {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Saves the current model, GUI handled by TVFrame.
+	 * 
 	 * @param incremental
 	 * @return
 	 */
 	public boolean doModelSave(final boolean incremental) {
 
-		final DataModelWriter writer = 
-				new DataModelWriter(tvFrame.getDataModel());
+		final DataModelWriter writer = new DataModelWriter(
+				tvFrame.getDataModel());
 		final Set<DataModelFileType> written;
 
 		if (incremental) {
-			written = writer.writeIncremental(
-					tvFrame.getDataModel().getFileSet());
+			written = writer.writeIncremental(tvFrame.getDataModel()
+					.getFileSet());
 
 		} else {
 			written = writer.writeAll(tvFrame.getDataModel().getFileSet());
 		}
-
 
 		if (written.isEmpty()) {
 			tvFrame.openSaveDialog(written.isEmpty(), null);
@@ -546,79 +550,75 @@ public class TVFrameController {
 					msg += ",";
 				}
 			}
- 
+
 			tvFrame.openSaveDialog(written.isEmpty(), msg);
 			return true;
 		}
 	}
-	
+
 	/**
 	 * Saves the model as a user specified file.
 	 */
 	public void saveModelAs() {
-		
+
 		if (tvFrame.getDataModel().getFileSet() == null) {
 			JOptionPane.showMessageDialog(applicationFrame,
 					"Saving of datamodels not backed by "
 							+ "files is not yet supported.");
-	
+
 		} else {
 			final JFileChooser fileDialog = new JFileChooser();
 			final CdtFilter ff = new CdtFilter();
 			fileDialog.setFileFilter(ff);
-	
-			final String string = tvFrame.getDataModel().getFileSet()
-					.getDir();
-	
+
+			final String string = tvFrame.getDataModel().getFileSet().getDir();
+
 			if (string != null) {
-	
-				fileDialog
-						.setCurrentDirectory(new File(string));
+
+				fileDialog.setCurrentDirectory(new File(string));
 			}
-	
-			final int retVal = fileDialog
-					.showSaveDialog(applicationFrame);
-	
+
+			final int retVal = fileDialog.showSaveDialog(applicationFrame);
+
 			if (retVal == JFileChooser.APPROVE_OPTION) {
-				final File chosen = fileDialog
-						.getSelectedFile();
+				final File chosen = fileDialog.getSelectedFile();
 				String name = chosen.getName();
-	
+
 				if (!name.toLowerCase().endsWith(".cdt")
 						&& !name.toLowerCase().endsWith(".pcl")) {
 					name += ".cdt";
 				}
-	
-				FileSet fileSet2 = new FileSet(name, chosen
-						.getParent() + File.separator);
+
+				FileSet fileSet2 = new FileSet(name, chosen.getParent()
+						+ File.separator);
 				fileSet2.copyState(tvFrame.getDataModel().getFileSet());
-	
-				final FileSet fileSet1 = new FileSet(name,
-						chosen.getParent() + File.separator);
-				fileSet1.setName(tvFrame.getDataModel().getFileSet()
-						.getName());
-	
+
+				final FileSet fileSet1 = new FileSet(name, chosen.getParent()
+						+ File.separator);
+				fileSet1.setName(tvFrame.getDataModel().getFileSet().getName());
+
 				tvFrame.getDataModel().getFileSet().copyState(fileSet1);
 				doModelSave(false);
-	
+
 				tvFrame.getDataModel().getFileSet().notifyMoved();
-				tvFrame.getFileMRU().removeDuplicates(tvFrame.getDataModel()
-						.getFileSet());
+				tvFrame.getFileMRU().removeDuplicates(
+						tvFrame.getDataModel().getFileSet());
 				fileSet2 = tvFrame.getFileMRU().addUnique(fileSet2);
 				tvFrame.getFileMRU().setLast(
 						tvFrame.getDataModel().getFileSet());
 				tvFrame.rebuildProgramMenu();
 				tvFrame.addFileMenuListeners(new FileMenuListener());
-	
+
 				if (tvFrame.getDataModel() instanceof TVModel) {
-					((TVModel) tvFrame.getDataModel())
-					.getDocumentConfig().put("jtv", tvFrame.getDataModel()
-							.getFileSet().getJtv());
+					((TVModel) tvFrame.getDataModel()).getDocumentConfig()
+							.put("jtv",
+									tvFrame.getDataModel().getFileSet()
+											.getJtv());
 				}
 			}
 		}
 	}
-	
+
 	/**
 	 * This class is an ActionListener which overrides the run() function.
 	 */
@@ -631,76 +631,78 @@ public class TVFrameController {
 			tvFrame.getFileMRU().notifyObservers();
 
 			fileMenuSet = tvFrame.getFileMenuSet();
-			
+
 			worker = new LoadWorker();
 			tvFrame.setView("LoadProgressView");
 			worker.execute();
 
-//					} catch (final LoadException e) {
-//						if (e.getType() == LoadException.INTPARSE) {
-//							
-//						} else {
-//							final int result = FileMruEditor.offerSearch(
-//									tvFrame.getFileMenuSet(), 
-//									tvFrame, "Could not Load " 
-//											+ tvFrame.getFileMenuSet().getCdt());
-//
-//							if (result == FileMruEditor.FIND) {
-//								tvFrame.getFileMRU().notifyFileSetModified();
-//								tvFrame.getFileMRU().notifyObservers();
-//
-//								actionPerformed(actionEvent); // REPROCESS...
-//								return; // EARLY RETURN
-//
-//							} else if (result == FileMruEditor.REMOVE) {
-//								tvFrame.getFileMRU().removeFileSet(
-//										tvFrame.getFileMenuSet());
-//								tvFrame.getFileMRU().notifyObservers();
-//							}
-//						}
-//						tvFrame.setLoaded(false);
-//					}
-					// dataModel.notifyObservers();
-//				}
-//			};
-//			SwingUtilities.invokeLater(update);
+			// } catch (final LoadException e) {
+			// if (e.getType() == LoadException.INTPARSE) {
+			//
+			// } else {
+			// final int result = FileMruEditor.offerSearch(
+			// tvFrame.getFileMenuSet(),
+			// tvFrame, "Could not Load "
+			// + tvFrame.getFileMenuSet().getCdt());
+			//
+			// if (result == FileMruEditor.FIND) {
+			// tvFrame.getFileMRU().notifyFileSetModified();
+			// tvFrame.getFileMRU().notifyObservers();
+			//
+			// actionPerformed(actionEvent); // REPROCESS...
+			// return; // EARLY RETURN
+			//
+			// } else if (result == FileMruEditor.REMOVE) {
+			// tvFrame.getFileMRU().removeFileSet(
+			// tvFrame.getFileMenuSet());
+			// tvFrame.getFileMRU().notifyObservers();
+			// }
+			// }
+			// tvFrame.setLoaded(false);
+			// }
+			// dataModel.notifyObservers();
+			// }
+			// };
+			// SwingUtilities.invokeLater(update);
 		}
 	}
-	
+
 	/**
-	 * Opens the preferences menu and sets the displayed menu to
-	 * the specified option using a string as identification.
+	 * Opens the preferences menu and sets the displayed menu to the specified
+	 * option using a string as identification.
+	 * 
 	 * @param menu
 	 */
-	public void openPrefMenu(String menu, String dialogTitle) {
-		
-		if(tvFrame.getDendroView() == null) {
-			PreferencesMenu preferences = new PreferencesMenu(tvFrame, menu, 
-					dialogTitle);
-			
-			PreferencesController pController = 
-					new PreferencesController(tvFrame, preferences, this);
-			
+	public void openPrefMenu(final String menu, final String dialogTitle) {
+
+		if (tvFrame.getDendroView() == null) {
+			final PreferencesMenu preferences = new PreferencesMenu(tvFrame,
+					menu, dialogTitle);
+
+			final PreferencesController pController = new PreferencesController(
+					tvFrame, preferences, this);
+
 			preferences.setVisible(true);
-		
+
 		} else {
-			PreferencesMenu preferences = new PreferencesMenu(
-					tvFrame, tvFrame.getDendroView(), 
-					tvFrame.getDendroController(), menu, dialogTitle);
-			
-			PreferencesController pController = 
-					new PreferencesController(tvFrame, preferences, this);
-			
+			final PreferencesMenu preferences = new PreferencesMenu(tvFrame,
+					tvFrame.getDendroView(), tvFrame.getDendroController(),
+					menu, dialogTitle);
+
+			final PreferencesController pController = new PreferencesController(
+					tvFrame, preferences, this);
+
 			preferences.setVisible(true);
 		}
 	}
-	
+
 	/**
 	 * Returns TVFrameController's model.
+	 * 
 	 * @return
 	 */
 	public TVModel getTVControllerModel() {
-		
+
 		return model;
 	}
 }

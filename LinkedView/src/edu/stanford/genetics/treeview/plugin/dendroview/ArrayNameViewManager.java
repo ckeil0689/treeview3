@@ -24,7 +24,6 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.Component;
 import java.awt.Graphics;
-import java.awt.GridLayout;
 import java.awt.Image;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -37,7 +36,6 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
 import net.miginfocom.swing.MigLayout;
-
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.HeaderInfo;
@@ -53,8 +51,8 @@ import edu.stanford.genetics.treeview.ViewFrame;
  * @author avsegal
  * 
  */
-public class ArrayNameViewManager extends ModelView implements ConfigNodePersistent, 
-		FontSelectable, PropertyChangeListener {
+public class ArrayNameViewManager extends ModelView implements
+		ConfigNodePersistent, FontSelectable, PropertyChangeListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -66,8 +64,8 @@ public class ArrayNameViewManager extends ModelView implements ConfigNodePersist
 	private final HeaderInfo hI;
 	private final Vector<ModelView> arrayNameViews;
 	private Preferences configNode;
-	private HeaderSummary headerSummary = 
-			new HeaderSummary("ArrayNameViewManagerSummary");
+	private HeaderSummary headerSummary = new HeaderSummary(
+			"ArrayNameViewManagerSummary");
 	private final int dividerLocations[];
 
 	/**
@@ -76,7 +74,7 @@ public class ArrayNameViewManager extends ModelView implements ConfigNodePersist
 	 * @param hI
 	 * @param uExtractor
 	 */
-	public ArrayNameViewManager(final HeaderInfo hI, 
+	public ArrayNameViewManager(final HeaderInfo hI,
 			final UrlExtractor uExtractor, final DataModel model) {
 
 		super();
@@ -131,32 +129,32 @@ public class ArrayNameViewManager extends ModelView implements ConfigNodePersist
 		}
 
 		// Need to get the children of Selection node
-//		final ConfigNode[] nodes = configRoot.fetch("Selection");
-		String[] childrenNodes = getRootChildrenNodes();
+		// final ConfigNode[] nodes = configRoot.fetch("Selection");
+		final String[] childrenNodes = getRootChildrenNodes();
 		// Check how many selection nodes there are in the childrenNodes
 		int numNodes = 0;
-		for(String node : childrenNodes) {
-			
-			if(node.contains("Selection")) {
+		for (final String node : childrenNodes) {
+
+			if (node.contains("Selection")) {
 				numNodes++;
 			}
 		}
-		
+
 		int[] included;
 		int addIndex = 0;
 		if (childrenNodes.length > 0) {
 			included = new int[numNodes];
 			for (int i = 0; i < childrenNodes.length; i++) {
-				
-				if(childrenNodes[i].contains("Selection")) {
-//					included[addIndex] = 
-//						configNode.node(childrenNodes[i]).getInt("index", -1);
-//					addIndex++;
-					int headerNum = configNode.node(childrenNodes[i]).getInt(
-							"index", -1);
-					if(hI.getNumNames() >= headerNum) {
+
+				if (childrenNodes[i].contains("Selection")) {
+					// included[addIndex] =
+					// configNode.node(childrenNodes[i]).getInt("index", -1);
+					// addIndex++;
+					final int headerNum = configNode.node(childrenNodes[i])
+							.getInt("index", -1);
+					if (hI.getNumNames() >= headerNum) {
 						included[addIndex] = headerNum;
-	
+
 					} else {
 						included[addIndex] = hI.getNumNames();
 					}
@@ -177,10 +175,10 @@ public class ArrayNameViewManager extends ModelView implements ConfigNodePersist
 		}
 
 		// First remove all selection nodes.
-		String[] childrenNodes = getRootChildrenNodes();
-		for(int i = 0; i < childrenNodes.length; i++) {
-			
-			if(childrenNodes[i].contains("Selection")) {
+		final String[] childrenNodes = getRootChildrenNodes();
+		for (int i = 0; i < childrenNodes.length; i++) {
+
+			if (childrenNodes[i].contains("Selection")) {
 				configNode.remove(childrenNodes[i]);
 			}
 		}
@@ -189,14 +187,14 @@ public class ArrayNameViewManager extends ModelView implements ConfigNodePersist
 		for (int i = 0; i < headerSummary.getIncluded().length; i++) {
 
 			// Create children here.
-			int indexA = headerSummary.getIncluded()[i];
+			final int indexA = headerSummary.getIncluded()[i];
 			configNode.node("Selection" + i).putInt("index", indexA);
 		}
 	}
 
 	@Override
 	public void update(final Observable ob, final Object obj) {
-		
+
 		if (ob == headerSummary) {
 			saveSelection();
 			saveDividerLocations();
@@ -278,10 +276,12 @@ public class ArrayNameViewManager extends ModelView implements ConfigNodePersist
 			root = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 			((JSplitPane) root).setDividerSize(2);
 			((JSplitPane) root).setBorder(null);
-			((JSplitPane) root).setRightComponent(
-					((ArrayNameView) arrayNameViews.get(n - 1)).getComponent());
-			((JSplitPane) root).setLeftComponent(
-					((ArrayNameView) arrayNameViews.get(n - 2)).getComponent());
+			((JSplitPane) root)
+					.setRightComponent(((ArrayNameView) arrayNameViews
+							.get(n - 1)).getComponent());
+			((JSplitPane) root)
+					.setLeftComponent(((ArrayNameView) arrayNameViews
+							.get(n - 2)).getComponent());
 			root.addPropertyChangeListener(
 					JSplitPane.DIVIDER_LOCATION_PROPERTY, this);
 
@@ -315,7 +315,7 @@ public class ArrayNameViewManager extends ModelView implements ConfigNodePersist
 			((ArrayNameView) arrayNameViews.get(i)).setGeneSelection(selection);
 		}
 	}
-	
+
 	/**
 	 * Need to override TextView.setGeneSelection() to account for the textviews
 	 * that are contained.
@@ -325,7 +325,7 @@ public class ArrayNameViewManager extends ModelView implements ConfigNodePersist
 
 		for (int i = 0; i < arrayNameViews.size(); i++) {
 			((ArrayNameView) arrayNameViews.get(i))
-			.setArraySelection(selection);
+					.setArraySelection(selection);
 		}
 	}
 
@@ -337,35 +337,34 @@ public class ArrayNameViewManager extends ModelView implements ConfigNodePersist
 	}
 
 	@Override
-	public void setConfigNode(Preferences parentNode) {
+	public void setConfigNode(final Preferences parentNode) {
 
-		if(parentNode != null) {
+		if (parentNode != null) {
 			this.configNode = parentNode.node("ArrayNameViewManager");
-			
+
 		} else {
-			LogBuffer.println("Could not find or create ArrayNameViewManager" +
-					"node because parentNode was null.");
+			LogBuffer.println("Could not find or create ArrayNameViewManager"
+					+ "node because parentNode was null.");
 		}
-		
+
 		loadSelection(); // doesn't quite work yet,
 		// something more global then this headerSummary needs to be updated.
-		
+
 		// Get all children nodes.
-//		ConfigNode[] viewNodes = configRoot.fetch("TextView");
+		// ConfigNode[] viewNodes = configRoot.fetch("TextView");
 		String[] childrenNodes = getRootChildrenNodes();
 
 		// Creates new children nodes if TextView nodes differ from
 		// amount of TextViews.
 		for (int i = childrenNodes.length; i < arrayNameViews.size(); i++) {
-//			configRoot.create("TextView");
+			// configRoot.create("TextView");
 			configNode.node("ArrayNameView" + i);
 		}
 
-		
 		childrenNodes = getRootChildrenNodes();
 		for (int i = 0; i < arrayNameViews.size(); i++) {
-			((ArrayNameView) arrayNameViews.get(i)).setConfigNode(
-					configNode.node(childrenNodes[i]));
+			((ArrayNameView) arrayNameViews.get(i)).setConfigNode(configNode
+					.node(childrenNodes[i]));
 		}
 
 		// binding config can change fonts.
@@ -446,7 +445,7 @@ public class ArrayNameViewManager extends ModelView implements ConfigNodePersist
 
 		for (int i = 0; i < arrayNameViews.size(); i++) {
 			((ArrayNameView) arrayNameViews.get(i))
-			.setHeaderSummary(headerSummary);
+					.setHeaderSummary(headerSummary);
 		}
 	}
 
@@ -460,12 +459,12 @@ public class ArrayNameViewManager extends ModelView implements ConfigNodePersist
 
 		Preferences node = null;
 		if (configNode != null) {
-//			node = configRoot.fetchFirst("Dividers");
+			// node = configRoot.fetchFirst("Dividers");
 			node = configNode.node("Dividers");
 
-//			if (node == null) {
-//				node = configRoot.create("Dividers");
-//			}
+			// if (node == null) {
+			// node = configRoot.create("Dividers");
+			// }
 		} else {
 			return;
 		}
@@ -493,7 +492,7 @@ public class ArrayNameViewManager extends ModelView implements ConfigNodePersist
 
 		Preferences node = null;
 		if (configNode != null) {
-//			node = configRoot.fetchFirst("Dividers");
+			// node = configRoot.fetchFirst("Dividers");
 			node = configNode.node("Dividers");
 
 		} else {
@@ -532,20 +531,21 @@ public class ArrayNameViewManager extends ModelView implements ConfigNodePersist
 			saveDividerLocationsToConfig();
 		}
 	}
-	
+
 	/**
 	 * Returns the names of the current children of this class' root node.
+	 * 
 	 * @return
 	 */
 	public String[] getRootChildrenNodes() {
-		
-		if(configNode != null) {
+
+		if (configNode != null) {
 			String[] childrenNodes;
 			try {
 				childrenNodes = configNode.childrenNames();
 				return childrenNodes;
-				
-			} catch (BackingStoreException e) {
+
+			} catch (final BackingStoreException e) {
 				e.printStackTrace();
 				return null;
 			}

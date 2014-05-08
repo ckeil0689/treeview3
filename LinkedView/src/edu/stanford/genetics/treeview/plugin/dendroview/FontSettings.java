@@ -49,9 +49,9 @@ import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
-
 import net.miginfocom.swing.MigLayout;
+
+import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 import edu.stanford.genetics.treeview.DummyHeaderInfo;
 import edu.stanford.genetics.treeview.GUIParams;
@@ -67,20 +67,12 @@ import edu.stanford.genetics.treeview.UrlExtractor;
 public class FontSettings implements SettingsPanel {
 
 	private final String[] preferredFonts = {
-		
-		"Arial",
-		"Tahoma",
-		"Verdana",
-		"Times New Roman",
-		"Helvetica",
-		"Calibri",
-		"Courier",
-		"Dialog",
-		"Myriad"
-	};
-	
+
+	"Arial", "Tahoma", "Verdana", "Times New Roman", "Helvetica", "Calibri",
+			"Courier", "Dialog", "Myriad" };
+
 	private Font[] fonts;
-	
+
 	private final FontSelectable client;
 	private final FontSelectable client2;
 	private JPanel fontPanel;
@@ -89,25 +81,25 @@ public class FontSettings implements SettingsPanel {
 	private NatField size_field;
 	private JLabel exampleField;
 
-	public FontSettings(final FontSelectable fs, 
-			final FontSelectable fs2) {
+	public FontSettings(final FontSelectable fs, final FontSelectable fs2) {
 
 		client = fs;
 		client2 = fs2;
 	}
-	
+
 	/**
-	 * Makes a JPanel that includes the font selection options.
-	 * Then returns this JPanel.
+	 * Makes a JPanel that includes the font selection options. Then returns
+	 * this JPanel.
+	 * 
 	 * @return JPanel
 	 */
 	public JPanel makeFontPanel() {
-		
+
 		fontPanel = new JPanel();
 		setupFonts();
 		setupWidgets();
 		updateExample();
-		
+
 		return fontPanel;
 	}
 
@@ -149,11 +141,7 @@ public class FontSettings implements SettingsPanel {
 	 */
 	public final static String[] styles = {
 
-		"Plain", 
-		"Italic", 
-		"Bold", 
-		"Bold Italic" 
-	};
+	"Plain", "Italic", "Bold", "Bold Italic" };
 
 	/**
 	 * turn a style number from class java.awt.Font into a string
@@ -165,16 +153,16 @@ public class FontSettings implements SettingsPanel {
 	public final static String decode_style(final int style) {
 
 		switch (style) {
-		
+
 		case Font.PLAIN:
 			return styles[0];
-			
+
 		case Font.ITALIC:
 			return styles[1];
-			
+
 		case Font.BOLD:
 			return styles[2];
-			
+
 		default:
 			return styles[3];
 		}
@@ -189,36 +177,36 @@ public class FontSettings implements SettingsPanel {
 	 */
 	public final static int encode_style(final String style) {
 
-		return style.equalsIgnoreCase(styles[0]) ? Font.PLAIN
-				: style.equalsIgnoreCase(styles[1]) ? Font.ITALIC
-						: style.equalsIgnoreCase(styles[2]) ? Font.BOLD : 
-							Font.BOLD + Font.ITALIC;
+		return style.equalsIgnoreCase(styles[0]) ? Font.PLAIN : style
+				.equalsIgnoreCase(styles[1]) ? Font.ITALIC : style
+				.equalsIgnoreCase(styles[2]) ? Font.BOLD : Font.BOLD
+				+ Font.ITALIC;
 	}
-	
+
 	/**
 	 * Gets all the preferred fonts from the system.
 	 */
 	public void setupFonts() {
-		
+
 		// Getting only preferred fonts from the system.
-		Font[] allFonts = GraphicsEnvironment.getLocalGraphicsEnvironment()
-				.getAllFonts();
-		
-		ArrayList<Font> fontList = new ArrayList<Font>();
-		
-		for(String fontName : preferredFonts) {
-			
-			for(Font font : allFonts) {
-				
-				if(font.getName().contains(fontName)) {
+		final Font[] allFonts = GraphicsEnvironment
+				.getLocalGraphicsEnvironment().getAllFonts();
+
+		final ArrayList<Font> fontList = new ArrayList<Font>();
+
+		for (final String fontName : preferredFonts) {
+
+			for (final Font font : allFonts) {
+
+				if (font.getName().contains(fontName)) {
 					fontList.add(font);
 				}
 			}
 		}
-		
+
 		fonts = new Font[fontList.size()];
-		for(int i = 0; i < fontList.size(); i++) {
-			
+		for (int i = 0; i < fontList.size(); i++) {
+
 			fonts[i] = fontList.get(i);
 		}
 	}
@@ -276,7 +264,7 @@ public class FontSettings implements SettingsPanel {
 		client.setFace(string);
 		client.setStyle(i);
 		client.setPoints(size);
-		
+
 		client2.setFace(string);
 		client2.setStyle(i);
 		client2.setPoints(size);
@@ -301,7 +289,7 @@ public class FontSettings implements SettingsPanel {
 		size_field.getDocument().addDocumentListener(
 				new DocumentChangeListener());
 		fontPanel.add(size_field, "span, wrap");
-		
+
 		exampleField = new JLabel("Font Example Text");
 		exampleField.setForeground(GUIParams.TEXT);
 		fontPanel.add(exampleField, "pushx, alignx 50%, span");
@@ -325,7 +313,7 @@ public class FontSettings implements SettingsPanel {
 		ButtonPanel(final Window w) {
 
 			final Window window = w;
-			final JButton close_button = GUIParams.setButtonLayout("Close", 
+			final JButton close_button = GUIParams.setButtonLayout("Close",
 					null);
 			close_button.addActionListener(new ActionListener() {
 
@@ -338,44 +326,44 @@ public class FontSettings implements SettingsPanel {
 			add(close_button);
 		}
 	}
-	
+
 	/**
-	 * Listener to remove need for a button. When the user chooses a value
-	 * for a Swing component with this listener, the font is automatically
-	 * updated.
+	 * Listener to remove need for a button. When the user chooses a value for a
+	 * Swing component with this listener, the font is automatically updated.
+	 * 
 	 * @author CKeil
-	 *
+	 * 
 	 */
 	class SelectionListener implements ActionListener {
 
 		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			
+		public void actionPerformed(final ActionEvent arg0) {
+
 			updateExample();
 			synchronizeClient();
 		}
 	}
-	
+
 	class DocumentChangeListener implements DocumentListener {
 
 		@Override
-		public void changedUpdate(DocumentEvent arg0) {
-			
+		public void changedUpdate(final DocumentEvent arg0) {
+
 		}
 
 		@Override
-		public void insertUpdate(DocumentEvent arg0) {
-			
+		public void insertUpdate(final DocumentEvent arg0) {
+
 			updateExample();
 			synchronizeClient();
 		}
 
 		@Override
-		public void removeUpdate(DocumentEvent arg0) {
-			
+		public void removeUpdate(final DocumentEvent arg0) {
+
 			updateExample();
 			synchronizeClient();
 		}
-		
+
 	}
 }

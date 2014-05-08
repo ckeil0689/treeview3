@@ -13,31 +13,31 @@ import javax.swing.WindowConstants;
 import net.miginfocom.swing.MigLayout;
 
 public class ConfirmDialog {
-	
-	private JDialog confirmDialog;
+
+	private final JDialog confirmDialog;
 	private boolean confirmed;
 
-	public ConfirmDialog(ViewFrame viewFrame, String function) {
-		
+	public ConfirmDialog(final ViewFrame viewFrame, final String function) {
+
 		confirmDialog = new JDialog();
 		confirmDialog.setTitle("Confirm");
 		confirmDialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
-		confirmDialog.setDefaultCloseOperation(
-				WindowConstants.DISPOSE_ON_CLOSE);
+		confirmDialog
+				.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		confirmDialog.setResizable(false);
 
 		final JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new MigLayout());
 		mainPanel.setBackground(GUIParams.BG_COLOR);
 
-		final JLabel prompt = new JLabel(
-				"Are you sure you want to " + function + "?");
+		final JLabel prompt = new JLabel("Are you sure you want to " + function
+				+ "?");
 		prompt.setForeground(GUIParams.TEXT);
 		prompt.setFont(GUIParams.FONT_MENU);
 
 		final JButton ok = GUIParams.setButtonLayout("OK", null);
 		ok.addActionListener(new ConfirmListener());
-		
+
 		final JButton cancel = GUIParams.setButtonLayout("Cancel", null);
 		cancel.addActionListener(new DenyListener());
 
@@ -49,38 +49,39 @@ public class ConfirmDialog {
 		confirmDialog.pack();
 		confirmDialog.setLocationRelativeTo(viewFrame.getAppFrame());
 	}
-	
+
 	class ConfirmListener implements ActionListener {
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			
+		public void actionPerformed(final ActionEvent e) {
+
 			confirmed = true;
 			confirmDialog.dispose();
 		}
 	}
-	
+
 	class DenyListener implements ActionListener {
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			
+		public void actionPerformed(final ActionEvent e) {
+
 			confirmed = false;
 			confirmDialog.dispose();
 		}
 	}
-	
+
 	public boolean getConfirmed() {
-		
+
 		return confirmed;
 	}
-	
+
 	/**
 	 * Sets the visibility of exitFrame;
+	 * 
 	 * @param visible
 	 */
-	public void setVisible(boolean visible) {
-		
+	public void setVisible(final boolean visible) {
+
 		confirmDialog.setVisible(visible);
 	}
 }

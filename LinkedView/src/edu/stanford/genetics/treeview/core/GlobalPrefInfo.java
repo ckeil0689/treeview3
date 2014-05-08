@@ -28,26 +28,24 @@ public class GlobalPrefInfo extends JPanel implements Observer {
 	private TreeViewApp app = null;
 
 	public GlobalPrefInfo(final TreeViewApp appArg) {
-		
+
 		app = appArg;
 		setLayout(new BorderLayout());
 		txtField.setText(app.getGlobalConfig().name());
 		txtField.setEditable(false);
 		final JButton testButton = new JButton("Test!");
 		testButton.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				
+
 				final LogBuffer lb = LogBuffer.getSingleton();
 				final boolean origStatus = lb.getLog();
 				lb.setLog(true);
 				lb.addObserver(GlobalPrefInfo.this);
-				app.getGlobalConfig().node("Test")
-						.put("Hello", "Hello");
-				app.getGlobalConfig().node("Test")
-						.put("Hello", "World");
-//				app.getGlobalConfig().store();
+				app.getGlobalConfig().node("Test").put("Hello", "Hello");
+				app.getGlobalConfig().node("Test").put("Hello", "World");
+				// app.getGlobalConfig().store();
 
 				lb.deleteObserver(GlobalPrefInfo.this);
 				lb.setLog(origStatus);

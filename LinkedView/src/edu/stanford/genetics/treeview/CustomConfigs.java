@@ -57,51 +57,51 @@ class PreferencesPanel extends JPanel {
 	}
 }
 
-public class CustomConfigs implements ConfigNodePersistent{
+public class CustomConfigs implements ConfigNodePersistent {
 
 	public static int DEFAULT_MacStyleMenubar = 1;
-	
+
 	// Root Preferences node of this class.
 	private Preferences configNode;
 
-//	@Override
-//	public void bindConfig(final Preferences configNode) {
-//		
-//		this.root = configNode;
-//	}
-	
+	// @Override
+	// public void bindConfig(final Preferences configNode) {
+	//
+	// this.root = configNode;
+	// }
+
 	@Override
-	public void setConfigNode(Preferences parentNode) {
-		
-		if(parentNode != null) {
+	public void setConfigNode(final Preferences parentNode) {
+
+		if (parentNode != null) {
 			this.configNode = parentNode.node("CustomConfigs");
-			
+
 		} else {
-			LogBuffer.println("Could not find or create CustomConfigs" +
-					"node because parentNode was null.");
+			LogBuffer.println("Could not find or create CustomConfigs"
+					+ "node because parentNode was null.");
 		}
-		
+
 	}
 
 	public boolean getMacStyleMenubar() {
-		
+
 		// Default will be true
 		return (configNode.getInt("macStyleMenubar",
 				CustomConfigs.DEFAULT_MacStyleMenubar) == 1);
 	}
 
 	public void setMacStyleMenubar(final boolean parse) {
-		
+
 		if (parse) {
 			configNode.putInt("macStyleMenubar", 1);
-			
+
 		} else {
 			configNode.putInt("macStyleMenubar", 0);
 		}
 	}
 
 	public void showEditor() {
-		
+
 		final PreferencesPanel p = new PreferencesPanel(this);
 		JOptionPane.showMessageDialog(null, p, "Please configure preferences",
 				JOptionPane.QUESTION_MESSAGE);

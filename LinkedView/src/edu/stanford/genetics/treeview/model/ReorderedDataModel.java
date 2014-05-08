@@ -36,8 +36,8 @@ public class ReorderedDataModel extends Observable implements DataModel {
 	private final DataModel parent;
 	private final int[] geneIndex;
 	private final int[] arrayIndex;
-	private Preferences documentConfig = Preferences.userRoot()
-			.node("SubDataModel");
+	private Preferences documentConfig = Preferences.userRoot().node(
+			"SubDataModel");
 
 	/**
 	 * Builds data model which corresponds to a reordered version of the source
@@ -175,19 +175,19 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 		@Override
 		public void calculateMinMax() {
-			
+
 			parent.getDataMatrix().calculateMinMax();
 		}
 
 		@Override
 		public double getMinVal() {
-			
+
 			return parent.getDataMatrix().getMinVal();
 		}
 
 		@Override
 		public double getMaxVal() {
-			
+
 			return parent.getDataMatrix().getMaxVal();
 		}
 	}

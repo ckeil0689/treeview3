@@ -9,11 +9,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 
-import Views.WelcomeView;
-
-import edu.stanford.genetics.treeview.TreeViewFrame;
-
 import Cluster.ClusterFileWriter2;
+import Views.WelcomeView;
+import edu.stanford.genetics.treeview.TreeViewFrame;
 
 /**
  * This class transforms any loaded file of non-cdt format to a cdt file in
@@ -28,10 +26,10 @@ import Cluster.ClusterFileWriter2;
  */
 public class CDTCreator3Arrays {
 
-	private WelcomeView loadProgView;
+	private final WelcomeView loadProgView;
 	private BufferedReader reader = null;
-	private File file;
-	private File customFile;
+	private final File file;
+	private final File customFile;
 	private String[][] dataSet;
 
 	// booleans
@@ -39,24 +37,24 @@ public class CDTCreator3Arrays {
 	boolean hasAID = false;
 	boolean hasORF = false;
 	boolean hasName = false;
-	boolean hasGWeight = false; 
+	boolean hasGWeight = false;
 	boolean hasEWeight = false;
-	
+
 	// label positions
 	private final int[] gidInd = new int[2];
 	private final int[] aidInd = new int[2];
-	private final int[] orfInd =  new int[2];
-	private final int[] gweightInd =  new int[2];
-	private final int[] eweightInd =  new int[2];
-	private final int[] dataStart =  new int[2];
-	private final int[] nameInd =  new int[2];
+	private final int[] orfInd = new int[2];
+	private final int[] gweightInd = new int[2];
+	private final int[] eweightInd = new int[2];
+	private final int[] dataStart = new int[2];
+	private final int[] nameInd = new int[2];
 
-	private boolean gid = false;
+	private final boolean gid = false;
 	private int rowSize;
 
 	private String fileType = "";
 	private String filePath = "";
-	
+
 	// Buffered writer
 	private ClusterFileWriter2 bw;
 
@@ -65,18 +63,18 @@ public class CDTCreator3Arrays {
 	 * 
 	 * @param file
 	 */
-	public CDTCreator3Arrays(final File file, final String fileType, 
+	public CDTCreator3Arrays(final File file, final String fileType,
 			final TreeViewFrame tvFrame) {
 
 		this(file, null, fileType, tvFrame);
 	}
-	
+
 	/**
 	 * Constructor for custom ORF/ NAME lists
 	 * 
 	 * @param file
 	 */
-	public CDTCreator3Arrays(final File file, final File file2, 
+	public CDTCreator3Arrays(final File file, final File file2,
 			final String fileType, final TreeViewFrame tvFrame) {
 
 		this.file = file;
@@ -91,22 +89,22 @@ public class CDTCreator3Arrays {
 			// Loading screen
 			loadProgView.setLoadLabel("Transforming file to CDT format...");
 			loadProgView.resetLoadBar();
-			
+
 			// Count file lines for loadBar
-			int pBarMax = count(file.getAbsolutePath());
+			final int pBarMax = count(file.getAbsolutePath());
 			loadProgView.setLoadBarMax(pBarMax);
-			
+
 			reader = new BufferedReader(new FileReader(file));
 
-//			final String[][] dataExtract = extractData(reader, pBarMax);
+			// final String[][] dataExtract = extractData(reader, pBarMax);
 
-			//Arrays to ArrayLists
+			// Arrays to ArrayLists
 			loadProgView.setLoadLabel("Preparing dataset.");
-//			dataSet = transformArray(dataExtract);
+			// dataSet = transformArray(dataExtract);
 			dataSet = extractData(reader, pBarMax);
 			rowSize = dataSet[0].length;
 
-			//Find positions of labels in the data set
+			// Find positions of labels in the data set
 			loadProgView.setLoadLabel("Checking for labels.");
 			findLabel(gidInd, "GID");
 			findLabel(aidInd, "AID");
@@ -122,10 +120,10 @@ public class CDTCreator3Arrays {
 
 			loadProgView.setLoadLabel("Setting up file details.");
 			setupFile();
-			
+
 			loadProgView.setLoadLabel("Writing CDT file...");
 			generateCDT();
-			
+
 			bw.close();
 
 		} catch (final FileNotFoundException e) {
@@ -144,6 +142,7 @@ public class CDTCreator3Arrays {
 	/**
 	 * Finds the positions of given labels in the data set and assigns the
 	 * values to instance variables for further use.
+	 * 
 	 * @param labelPos
 	 * @param dataSet
 	 * @param label
@@ -155,37 +154,37 @@ public class CDTCreator3Arrays {
 
 		// find GWEIGHT and EWEIGHT
 		for (int i = 0; i < dataSet.length; i++) {
-			
-			String[] row = dataSet[i];
-			
+
+			final String[] row = dataSet[i];
+
 			int addIndex = 0;
 			for (int j = 0; j < row.length; j++) {
 
-				String element = row[j];
-				
+				final String element = row[j];
+
 				if (element.equalsIgnoreCase(label)) {
 					labelPos[addIndex] = i;
 					addIndex++;
-					
+
 					labelPos[addIndex] = j;
 					addIndex++;
-					
-					if(label.equalsIgnoreCase("GID")) {
+
+					if (label.equalsIgnoreCase("GID")) {
 						hasGID = true;
-					
-					} else if(label.equalsIgnoreCase("AID")) {
+
+					} else if (label.equalsIgnoreCase("AID")) {
 						hasAID = true;
-						
-					} else if(label.equalsIgnoreCase("ORF")) {
+
+					} else if (label.equalsIgnoreCase("ORF")) {
 						hasORF = true;
-						
-					} else if(label.equalsIgnoreCase("NAME")) {
+
+					} else if (label.equalsIgnoreCase("NAME")) {
 						hasName = true;
-						
-					} else if(label.equalsIgnoreCase("GWEIGHT")) {
+
+					} else if (label.equalsIgnoreCase("GWEIGHT")) {
 						hasGWeight = true;
-						
-					} else if(label.equalsIgnoreCase("EWEIGHT")) {
+
+					} else if (label.equalsIgnoreCase("EWEIGHT")) {
 						hasEWeight = true;
 					}
 					break;
@@ -196,7 +195,7 @@ public class CDTCreator3Arrays {
 				if (labelPos.length == 0) {
 					labelPos[addIndex] = -1;
 					addIndex++;
-					
+
 					labelPos[addIndex] = -1;
 					addIndex++;
 				}
@@ -206,13 +205,13 @@ public class CDTCreator3Arrays {
 	}
 
 	/**
-	 * Composes a .cdt file to further be used by TreeView 
-	 * (currently tab-delim only). 
-	 * TreeView uses the specific .cdt-format with very defined row and column
-	 * elements to display certain data in its various views. This function
-	 * assembles such a .cdt file from the scavenged data of the loaded input
-	 * file.
-	 * @throws IOException 
+	 * Composes a .cdt file to further be used by TreeView (currently tab-delim
+	 * only). TreeView uses the specific .cdt-format with very defined row and
+	 * column elements to display certain data in its various views. This
+	 * function assembles such a .cdt file from the scavenged data of the loaded
+	 * input file.
+	 * 
+	 * @throws IOException
 	 */
 	private void generateCDT() throws IOException {
 
@@ -221,48 +220,48 @@ public class CDTCreator3Arrays {
 		final int eweightRow = eweightInd[0];
 		final int eweightCol = eweightInd[1];
 		final int gweightCol = gweightInd[1];
-		int dataCol = dataStart[1];
+		final int dataCol = dataStart[1];
 		int eweightGap = dataStart[1];
 		final int dataRow = dataStart[0];
-		int gidCol = 0;
+		final int gidCol = 0;
 		int line = 0;
-		
+
 		String[] rowElement = new String[rowSize];
 
 		int addIndex = 0;
 		if (hasGID) {
 			rowElement[addIndex] = "GID";
-		} 
-		
-		if(hasORF == false) {
+		}
+
+		if (hasORF == false) {
 			eweightGap++;
 		}
 		rowElement[addIndex] = "ORF";
 		addIndex++;
-		
-		if(hasName == false) {
+
+		if (hasName == false) {
 			eweightGap++;
 		}
 		rowElement[addIndex] = "NAME";
 		addIndex++;
-		
-		if(hasGWeight == false) {
+
+		if (hasGWeight == false) {
 			eweightGap++;
 		}
 		rowElement[addIndex] = "GWEIGHT";
 		addIndex++;
-		
+
 		// add array name row
-		String[] element = dataSet[orfRow];
-		for(int i = dataCol; i < element.length; i++) {
-			
+		final String[] element = dataSet[orfRow];
+		for (int i = dataCol; i < element.length; i++) {
+
 			rowElement[addIndex] = element[i];
 			addIndex++;
 		}
-		
+
 		bw.writeContent(rowElement);
 		line++;
-		
+
 		rowElement = new String[rowSize];
 		addIndex = 0;
 
@@ -270,7 +269,7 @@ public class CDTCreator3Arrays {
 		if (hasAID) {
 			rowElement[addIndex] = "AID";
 			addIndex++;
-			
+
 			for (int i = 0; i < dataCol; i++) {
 
 				rowElement[addIndex] = "";
@@ -279,13 +278,13 @@ public class CDTCreator3Arrays {
 
 			final int aidRow = aidInd[0];
 
-			String[] aidList = dataSet[aidRow];
-			for(int i = dataCol; i < aidList.length; i++) {
-				
+			final String[] aidList = dataSet[aidRow];
+			for (int i = dataCol; i < aidList.length; i++) {
+
 				rowElement[addIndex] = aidList[i];
 				addIndex++;
 			}
-			
+
 			bw.writeContent(rowElement);
 			line++;
 		}
@@ -293,7 +292,7 @@ public class CDTCreator3Arrays {
 		// add EWEIGHT row
 		rowElement = new String[rowSize];
 		addIndex = 0;
-		
+
 		rowElement[addIndex] = "EWEIGHT";
 		addIndex++;
 
@@ -303,23 +302,23 @@ public class CDTCreator3Arrays {
 			rowElement[addIndex] = "";
 			addIndex++;
 		}
-		
-		String[] eweightList = dataSet[eweightRow];
-		for(int i = dataCol; i < eweightList.length; i++) {
-			
+
+		final String[] eweightList = dataSet[eweightRow];
+		for (int i = dataCol; i < eweightList.length; i++) {
+
 			rowElement[addIndex] = eweightList[i];
 			addIndex++;
 		}
-		
+
 		bw.writeContent(rowElement);
 		line++;
-		
+
 		// continue with each data row, just each element + data sublist values
 		// for the size of the dataSet - dataCol(amount of rows already filled)
-		int dataLineN = dataSet.length;
+		final int dataLineN = dataSet.length;
 		for (int i = dataRow; i < dataLineN; i++) {
 
-			String[] fullRow = dataSet[i];
+			final String[] fullRow = dataSet[i];
 			rowElement = new String[rowSize];
 			addIndex = 0;
 
@@ -327,11 +326,11 @@ public class CDTCreator3Arrays {
 				rowElement[addIndex] = fullRow[gidCol];
 				addIndex++;
 			}
-			
-			if(orfInd != null) {
+
+			if (orfInd != null) {
 				rowElement[addIndex] = fullRow[orfCol];
 				addIndex++;
-				
+
 			} else {
 				rowElement[addIndex] = "ORF N/A";
 				addIndex++;
@@ -341,10 +340,10 @@ public class CDTCreator3Arrays {
 				rowElement[addIndex] = fullRow[nameInd[1]];
 				addIndex++;
 
-			} else if (orfInd != null){
+			} else if (orfInd != null) {
 				rowElement[addIndex] = fullRow[orfCol];
 				addIndex++;
-				
+
 			} else {
 				rowElement[addIndex] = "ORF & NAME N/A";
 				addIndex++;
@@ -352,18 +351,18 @@ public class CDTCreator3Arrays {
 
 			rowElement[addIndex] = fullRow[gweightCol];
 			addIndex++;
-			
-			for(int j  = dataCol; j < rowSize; j++) {
+
+			for (int j = dataCol; j < rowSize; j++) {
 				rowElement[addIndex] = fullRow[i];
 				addIndex++;
 			}
-			
+
 			// Check whether it's the last line
 			bw.writeContent(rowElement);
 			line++;
 			loadProgView.updateLoadBar(line);
 		}
-		
+
 		bw.closeWriter();
 	}
 
@@ -374,21 +373,21 @@ public class CDTCreator3Arrays {
 	public void setupFile() {
 
 		final String fileEnd;
-		
-		if(customFile == null) {
+
+		if (customFile == null) {
 			fileEnd = "_adjusted.cdt";
-			
+
 		} else {
 			fileEnd = "_custom.cdt";
 		}
-		
+
 		final String fileName = file.getAbsolutePath().substring(0,
 				file.getAbsolutePath().length() - fileType.length());
 
 		try {
 			final File file2 = new File(fileName + fileEnd);
 			file2.createNewFile();
-			
+
 			filePath = file2.getAbsolutePath();
 
 			bw = new ClusterFileWriter2(file2);
@@ -397,22 +396,24 @@ public class CDTCreator3Arrays {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Reading the data separated by tab delimited \t
+	 * 
 	 * @param reader
 	 * @param dataExtract
 	 * @return
 	 */
-	public String[][] extractData(BufferedReader reader, int numLines) {
-		
-		String[][] dataExtract = new String[numLines][];
+	public String[][] extractData(final BufferedReader reader,
+			final int numLines) {
+
+		final String[][] dataExtract = new String[numLines][];
 		String line;
-		
+
 		try {
 			int addIndex = 0;
 			while ((line = reader.readLine()) != null) {
-	
+
 				final String[] row = line.split("\t");
 				dataExtract[addIndex] = row;
 				addIndex++;
@@ -423,119 +424,123 @@ public class CDTCreator3Arrays {
 
 		return dataExtract;
 	}
-	
-//	/**
-//	 * Transforms Array matrix to ArrayList matrix
-//	 * @param dataExtract
-//	 * @return
-//	 */
-//	public String[][] transformArray(String[][] dataExtract) {
-//		
-//		String[][] dataSet = new String[][];
-//		int addIndexOuter = 0;
-//		for (final String[] row : dataExtract) {
-//
-//			final String[] newRow = new String[row.length];
-//			int addIndexInner = 0;
-//			
-//			for (final String element : row) {
-//
-//				newRow[addIndexInner] = element;
-//				addIndexInner++;
-//			}
-//
-//			dataSet[addIndexOuter] = newRow;
-//		}
-//		
-//		return dataSet;
-//	}
-	
-//	/**
-//	 * Replaces original ORF/ NAME labels with custom labels
-//	 */
-//	public void replaceLabels() {
-//		
-//		final int dataRow = dataStart.get(0);
-//		final int orfCol = orfInd.get(1);
-//		final int nameCol = nameInd.get(1);
-//		final int customOrfCol = customOrfInd.get(1);
-//		final int customNameCol = customNameInd.get(1);
-//		
-//		for (int i = dataRow; i < dataSet.size(); i++) {
-//
-//			final List<String> row = dataSet.get(i);
-//			
-//			for(List<String> labels : customDataSet) {
-//				
-//				if(checkSubString(row.get(orfCol), 
-//						labels.get(customOrfCol))) {
-//					row.set(orfCol, labels.get(customOrfCol));
-//				}
-//				
-//				if(checkSubString(row.get(nameCol), 
-//						labels.get(customNameCol))) {
-//					row.set(nameCol, labels.get(customNameCol));
-//				}
-//			}
-//		}
-//	}
-	
+
+	// /**
+	// * Transforms Array matrix to ArrayList matrix
+	// * @param dataExtract
+	// * @return
+	// */
+	// public String[][] transformArray(String[][] dataExtract) {
+	//
+	// String[][] dataSet = new String[][];
+	// int addIndexOuter = 0;
+	// for (final String[] row : dataExtract) {
+	//
+	// final String[] newRow = new String[row.length];
+	// int addIndexInner = 0;
+	//
+	// for (final String element : row) {
+	//
+	// newRow[addIndexInner] = element;
+	// addIndexInner++;
+	// }
+	//
+	// dataSet[addIndexOuter] = newRow;
+	// }
+	//
+	// return dataSet;
+	// }
+
+	// /**
+	// * Replaces original ORF/ NAME labels with custom labels
+	// */
+	// public void replaceLabels() {
+	//
+	// final int dataRow = dataStart.get(0);
+	// final int orfCol = orfInd.get(1);
+	// final int nameCol = nameInd.get(1);
+	// final int customOrfCol = customOrfInd.get(1);
+	// final int customNameCol = customNameInd.get(1);
+	//
+	// for (int i = dataRow; i < dataSet.size(); i++) {
+	//
+	// final List<String> row = dataSet.get(i);
+	//
+	// for(List<String> labels : customDataSet) {
+	//
+	// if(checkSubString(row.get(orfCol),
+	// labels.get(customOrfCol))) {
+	// row.set(orfCol, labels.get(customOrfCol));
+	// }
+	//
+	// if(checkSubString(row.get(nameCol),
+	// labels.get(customNameCol))) {
+	// row.set(nameCol, labels.get(customNameCol));
+	// }
+	// }
+	// }
+	// }
+
 	/**
-	 * Checking a custom string whether it contains 
+	 * Checking a custom string whether it contains
+	 * 
 	 * @param original
 	 * @param custom
 	 * @return
 	 */
-	public boolean checkSubString(String original, String custom) {
-		
+	public boolean checkSubString(final String original, final String custom) {
+
 		boolean match = false;
-		int nameLength = 7;
-		
-		if(custom != null || original != null) {
-			if(custom.contains(original.substring(0, nameLength))){
+		final int nameLength = 7;
+
+		if (custom != null || original != null) {
+			if (custom.contains(original.substring(0, nameLength))) {
 				match = true;
 			}
 		}
-		
+
 		return match;
 	}
-	
+
 	/**
 	 * Count amount of lines in the file to be loaded so that the progressBar
-	 * can get correct values for extractData().
-	 * Code from StackOverflow (https://stackoverflow.com/questions/453018).
+	 * can get correct values for extractData(). Code from StackOverflow
+	 * (https://stackoverflow.com/questions/453018).
+	 * 
 	 * @param filename
 	 * @return
 	 * @throws IOException
 	 */
-	public int count(String filename) throws IOException {
-	    
-		InputStream is = new BufferedInputStream(new FileInputStream(filename));
-	    
+	public int count(final String filename) throws IOException {
+
+		final InputStream is = new BufferedInputStream(new FileInputStream(
+				filename));
+
 		try {
-	        byte[] c = new byte[1024];
-	        int count = 0;
-	        int readChars = 0;
-	        boolean empty = true;
-	        
-	        while ((readChars = is.read(c)) != -1) {
-	            empty = false;
-	            
-	            for (int i = 0; i < readChars; ++i) {
-	                if (c[i] == '\n') {
-	                    ++count;
-	                }
-	            }
-	        }
-	        return (count == 0 && !empty) ? 1 : count;
-	        
-	    } finally {
-	        is.close();
-	    }
+			final byte[] c = new byte[1024];
+			int count = 0;
+			int readChars = 0;
+			boolean empty = true;
+
+			while ((readChars = is.read(c)) != -1) {
+				empty = false;
+
+				for (int i = 0; i < readChars; ++i) {
+					if (c[i] == '\n') {
+						++count;
+					}
+				}
+			}
+			return (count == 0 && !empty) ? 1 : count;
+
+		} finally {
+			is.close();
+		}
 	}
 
 	/**
 	 * Getter for file path
+	 * 
 	 * @return
 	 */
 	public String getFilePath() {

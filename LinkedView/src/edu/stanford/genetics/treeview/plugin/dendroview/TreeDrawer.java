@@ -91,7 +91,7 @@ abstract class TreeDrawer extends Observable implements Observer {
 
 		setDefaults();
 	}
-	
+
 	private void setDefaults() {
 
 		id2node = null;
@@ -165,76 +165,76 @@ abstract class TreeDrawer extends Observable implements Observer {
 		}
 		return null;
 	}
-	
-	public TreeDrawerNode getNearestNode(int minSelectionIndex, 
-			int maxSelectionIndex) {
-		
-		if(rootNode == null) {
+
+	public TreeDrawerNode getNearestNode(final int minSelectionIndex,
+			final int maxSelectionIndex) {
+
+		if (rootNode == null) {
 			return null;
 		}
-		
+
 		TreeDrawerNode minLeaf = getLeaf(minSelectionIndex);
 		TreeDrawerNode maxLeaf = getLeaf(maxSelectionIndex);
-		
-		TreeDrawerNode[] minParentArray = new TreeDrawerNode[leafList.length];
-		TreeDrawerNode[] maxParentArray = new TreeDrawerNode[leafList.length];
-		
+
+		final TreeDrawerNode[] minParentArray = new TreeDrawerNode[leafList.length];
+		final TreeDrawerNode[] maxParentArray = new TreeDrawerNode[leafList.length];
+
 		boolean isRoot = false;
 		int addIndex = 0;
-		while(!isRoot) {
-			
-			TreeDrawerNode parent = minLeaf.getParent();
-			if(parent.getId().equalsIgnoreCase(rootNode.getId())) {
+		while (!isRoot) {
+
+			final TreeDrawerNode parent = minLeaf.getParent();
+			if (parent.getId().equalsIgnoreCase(rootNode.getId())) {
 				isRoot = true;
-				
+
 			} else {
 				minParentArray[addIndex] = parent;
 				minLeaf = parent;
 				addIndex++;
 			}
 		}
-		
+
 		isRoot = false;
 		addIndex = 0;
-		while(!isRoot) {
-			
-			TreeDrawerNode parent = maxLeaf.getParent();
-			if(parent.getId().equalsIgnoreCase(rootNode.getId())) {
+		while (!isRoot) {
+
+			final TreeDrawerNode parent = maxLeaf.getParent();
+			if (parent.getId().equalsIgnoreCase(rootNode.getId())) {
 				isRoot = true;
-				
+
 			} else {
 				maxParentArray[addIndex] = parent;
 				maxLeaf = parent;
 				addIndex++;
 			}
 		}
-		
+
 		TreeDrawerNode nearestNode = null;
-		for(int i = 0; i < minParentArray.length; i++) {
-			
-			if(minParentArray[i] == null) {
+		for (int i = 0; i < minParentArray.length; i++) {
+
+			if (minParentArray[i] == null) {
 				break;
 			}
-			
-			for(int j = 0; j < maxParentArray.length; j++) {
-				
-				if(maxParentArray[j] == null) {
+
+			for (int j = 0; j < maxParentArray.length; j++) {
+
+				if (maxParentArray[j] == null) {
 					break;
 				}
-				
-				if(minParentArray[i].getId().equalsIgnoreCase(
+
+				if (minParentArray[i].getId().equalsIgnoreCase(
 						maxParentArray[j].getId())) {
 					nearestNode = minParentArray[i];
 					break;
-				} 
+				}
 			}
-			
-			if(nearestNode != null) {
+
+			if (nearestNode != null) {
 				break;
 			}
 		}
-		
-		if(nearestNode == null) {
+
+		if (nearestNode == null) {
 			LogBuffer.println("Error finding nearest node!");
 		}
 		return nearestNode;
@@ -474,7 +474,7 @@ abstract class TreeDrawer extends Observable implements Observer {
 
 		final IterativeClosestFinder rcf = new IterativeClosestFinder(index,
 				corr, weight);
-		
+
 		return rcf.find(rootNode);
 	}
 

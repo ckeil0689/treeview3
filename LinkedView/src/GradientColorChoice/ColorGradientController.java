@@ -17,64 +17,65 @@ import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet2;
 
 public class ColorGradientController {
 
-	private ColorGradientChooser gradientPick;
-	
-	public ColorGradientController(ColorGradientChooser gradientPick) {
-		
+	private final ColorGradientChooser gradientPick;
+
+	public ColorGradientController(final ColorGradientChooser gradientPick) {
+
 		this.gradientPick = gradientPick;
-		
+
 		// Add listeners
 		addAllListeners();
 	}
-	
+
 	/**
 	 * Adds all listeners to the ColorGradientChooser object.
 	 */
 	public void addAllListeners() {
-		
-		if(gradientPick != null) {
-			gradientPick.addThumbSelectionListener(
-					new ThumbSelectionListener());
+
+		if (gradientPick != null) {
+			gradientPick
+					.addThumbSelectionListener(new ThumbSelectionListener());
 			gradientPick.addThumbMotionListener(new ThumbMotionListener());
 			gradientPick.addAddListener(new AddButtonListener());
 			gradientPick.addRemoveListener(new RemoveButtonListener());
 			gradientPick.addDefaultListener(new DefaultListener());
 		}
 	}
-	
+
 	/**
-	 * This listener specifically defines what happens when a user clicks
-	 * on a thumb.
+	 * This listener specifically defines what happens when a user clicks on a
+	 * thumb.
+	 * 
 	 * @author CKeil
-	 *
+	 * 
 	 */
-	protected class ThumbSelectionListener implements MouseListener, 
-	ActionListener {
-		
-		private final Integer clickInterval = 
-				(Integer) Toolkit.getDefaultToolkit().getDesktopProperty(
+	protected class ThumbSelectionListener implements MouseListener,
+			ActionListener {
+
+		private final Integer clickInterval = (Integer) Toolkit
+				.getDefaultToolkit().getDesktopProperty(
 						"awt.multiClickInterval");
-		
-		private Timer timer;
+
+		private final Timer timer;
 		private MouseEvent lastEvent;
-		
+
 		protected ThumbSelectionListener() {
-			
+
 			timer = new Timer(clickInterval, this);
 		}
-		
+
 		/**
 		 * Specifies what happens when a single click is performed by the user.
 		 */
 		private void clickOrPress() {
-	
-			if(gradientPick.isCustomSelected()) {
-				if(gradientPick.getGradientBox().isGradientArea(
+
+			if (gradientPick.isCustomSelected()) {
+				if (gradientPick.getGradientBox().isGradientArea(
 						lastEvent.getPoint())) {
 					gradientPick.getGradientBox().setGradientColor(
 							lastEvent.getPoint());
 					gradientPick.setActiveColorSet("Custom");
-					
+
 				} else {
 					gradientPick.getGradientBox().deselectAllThumbs();
 					gradientPick.getGradientBox().selectThumb(
@@ -82,84 +83,87 @@ public class ColorGradientController {
 				}
 			}
 		}
-		
+
 		/**
 		 * Specifies what happens when a double click is performed by the user.
 		 */
 		private void doubleClick() {
-			
-			if(gradientPick.isCustomSelected()) {
+
+			if (gradientPick.isCustomSelected()) {
 				gradientPick.getGradientBox().specifyThumbPos(
 						lastEvent.getPoint());
 			}
 		}
-		
+
 		@Override
-		public void mouseClicked(MouseEvent e) {
-			
+		public void mouseClicked(final MouseEvent e) {
+
 			lastEvent = e;
-			
-			if(timer.isRunning()) {
+
+			if (timer.isRunning()) {
 				timer.stop();
-				
-				if(e.getClickCount() >= 2) {
+
+				if (e.getClickCount() >= 2) {
 					doubleClick();
 				}
 			} else {
-				timer.restart();	
-			} 
+				timer.restart();
+			}
 		}
 
 		@Override
-		public void mouseEntered(MouseEvent e) {}
+		public void mouseEntered(final MouseEvent e) {
+		}
 
 		@Override
-		public void mouseExited(MouseEvent e) {}
+		public void mouseExited(final MouseEvent e) {
+		}
 
 		@Override
-		public void mousePressed(MouseEvent e) {
-			
+		public void mousePressed(final MouseEvent e) {
+
 			lastEvent = e;
 			clickOrPress();
 		}
 
 		@Override
-		public void mouseReleased(MouseEvent e) {}
+		public void mouseReleased(final MouseEvent e) {
+		}
 
 		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			
+		public void actionPerformed(final ActionEvent arg0) {
+
 			timer.stop();
 			clickOrPress();
 		}
 	}
-	
+
 	/**
-	 * This listener defines the behavior of ColorGradientChooser when
-	 * the user moves the mouse on top a thumb or 
-	 * drags it in a certain direction.
+	 * This listener defines the behavior of ColorGradientChooser when the user
+	 * moves the mouse on top a thumb or drags it in a certain direction.
+	 * 
 	 * @author CKeil
-	 *
+	 * 
 	 */
 	class ThumbMotionListener implements MouseMotionListener {
-		
+
 		@Override
-		public void mouseDragged(MouseEvent e) {
-			
-			if(gradientPick.isCustomSelected()) {
+		public void mouseDragged(final MouseEvent e) {
+
+			if (gradientPick.isCustomSelected()) {
 				gradientPick.getGradientBox().updateThumbPos(e.getX());
 			}
 		}
 
 		@Override
-		public void mouseMoved(MouseEvent e) {
-			
-			if(gradientPick.isCustomSelected()) {
-				if(gradientPick.getGradientBox().containsThumb(e.getX(), 
+		public void mouseMoved(final MouseEvent e) {
+
+			if (gradientPick.isCustomSelected()) {
+				if (gradientPick.getGradientBox().containsThumb(e.getX(),
 						e.getY())) {
 					gradientPick.getGradientBox().setCursor(
 							new Cursor(Cursor.HAND_CURSOR));
-					
+
 				} else {
 					gradientPick.getGradientBox().setCursor(
 							new Cursor(Cursor.DEFAULT_CURSOR));
@@ -167,73 +171,74 @@ public class ColorGradientController {
 			}
 		}
 	}
-	
+
 	class AddButtonListener implements ActionListener {
-		
+
 		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			
-			Color newCol = JColorChooser.showDialog(
-					gradientPick.getGradientBox(), "Pick a Color", 
-					Color.black);
-			
+		public void actionPerformed(final ActionEvent arg0) {
+
+			final Color newCol = JColorChooser.showDialog(
+					gradientPick.getGradientBox(), "Pick a Color", Color.black);
+
 			gradientPick.getGradientBox().addColor(newCol);
 		}
 	}
-	
+
 	class RemoveButtonListener implements ActionListener {
 
 		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			
-			if(gradientPick.getColorListSize() > 2) {
+		public void actionPerformed(final ActionEvent arg0) {
+
+			if (gradientPick.getColorListSize() > 2) {
 				gradientPick.getGradientBox().removeColor();
 			}
 		}
 	}
-	
+
 	class DefaultListener implements ActionListener {
 
 		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			
-			if(arg0.getSource() == gradientPick.getRGButton()) {
-				if(gradientPick.getConfigNode().get("activeColors", 
-						"RedGreen").equalsIgnoreCase("Custom")) {
+		public void actionPerformed(final ActionEvent arg0) {
+
+			if (arg0.getSource() == gradientPick.getRGButton()) {
+				if (gradientPick.getConfigNode()
+						.get("activeColors", "RedGreen")
+						.equalsIgnoreCase("Custom")) {
 					gradientPick.saveStatus();
 				}
 				gradientPick.switchColorSet("RedGreen");
 				gradientPick.setCustomSelected(false);
-				
-			} else if(arg0.getSource() == gradientPick.getYBButton()){
-				if(gradientPick.getConfigNode().get("activeColors", 
-						"YellowBlue").equalsIgnoreCase("Custom")) {
+
+			} else if (arg0.getSource() == gradientPick.getYBButton()) {
+				if (gradientPick.getConfigNode()
+						.get("activeColors", "YellowBlue")
+						.equalsIgnoreCase("Custom")) {
 					gradientPick.saveStatus();
 				}
 				gradientPick.switchColorSet("YellowBlue");
 				gradientPick.setCustomSelected(false);
-				
-			} else if(arg0.getSource() == gradientPick.getCustomColorButton()){
+
+			} else if (arg0.getSource() == gradientPick.getCustomColorButton()) {
 				gradientPick.switchColorSet("Custom");
 				gradientPick.setCustomSelected(true);
-				
+
 			} else {
-				LogBuffer.println("No source found for ActionEvent in " +
-						"DefaultListener in ColorGradientController");
+				LogBuffer.println("No source found for ActionEvent in "
+						+ "DefaultListener in ColorGradientController");
 			}
 		}
 	}
-	
+
 	class SaveColorPresetListener implements ActionListener {
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			
+		public void actionPerformed(final ActionEvent e) {
+
 			final ColorSet2 temp = new ColorSet2();
-//			colorExtractorEditor.copyStateTo(temp);
+			// colorExtractorEditor.copyStateTo(temp);
 			temp.setName("UserDefined");
-			gradientPick.addColorSet(temp);	
+			gradientPick.addColorSet(temp);
 		}
-		
+
 	}
 }

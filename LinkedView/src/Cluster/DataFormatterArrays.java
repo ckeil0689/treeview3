@@ -15,12 +15,12 @@ public class DataFormatterArrays {
 	// Instance variables
 	private final TVModel model;
 	private final ClusterView clusterView;
-	private double[][] rawData;
+	private final double[][] rawData;
 
 	private double[][] colList;
 
 	// Constructor (building the object)
-	public DataFormatterArrays(final DataModel model, 
+	public DataFormatterArrays(final DataModel model,
 			final ClusterView clusterView, final double[][] rawData) {
 
 		this.model = (TVModel) model;
@@ -34,7 +34,7 @@ public class DataFormatterArrays {
 		// Number of arrays/ columns
 		final int nCols = model.nExpr();
 		final int nRows = model.nGene();
-		
+
 		colList = new double[nCols][nRows];
 
 		// Setting up ProgressBar
@@ -50,7 +50,7 @@ public class DataFormatterArrays {
 
 			for (int i = 0; i < nRows; i++) {
 
-//				final int element = (i * nCols) + j;
+				// final int element = (i * nCols) + j;
 
 				sArray[i] = rawData[i][j];
 			}

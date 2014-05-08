@@ -59,17 +59,17 @@ public class AtrTVModel extends TVModel {
 	@Override
 	public void setExprData(final double[][] newData) {
 	}
-	
-//	@Override
-//	public void setExprData(final double[][] newData) {
-//	}
 
-	Preferences documentConfig = 
-			Preferences.userRoot().node(this.getClass().getName());
+	// @Override
+	// public void setExprData(final double[][] newData) {
+	// }
+
+	Preferences documentConfig = Preferences.userRoot().node(
+			this.getClass().getName());
 
 	@Override
 	public Preferences getDocumentConfigRoot() {
-		
+
 		return documentConfig;
 	}
 
@@ -95,7 +95,7 @@ public class AtrTVModel extends TVModel {
 		resetState();
 		setSource(fileSet);
 		final AtrTVModelLoader loader = new AtrTVModelLoader(this);
-//		loader.loadInto();
+		// loader.loadInto();
 		loader.load();
 	}
 

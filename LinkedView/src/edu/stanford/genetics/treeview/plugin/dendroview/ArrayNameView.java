@@ -38,10 +38,9 @@ import java.util.Observable;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import javax.swing.BorderFactory;
 import javax.swing.JLabel;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
@@ -104,32 +103,31 @@ public class ArrayNameView extends ModelView implements MouseListener,
 	 * @param hInfo
 	 *            Header containing array names as first row.
 	 */
-	public ArrayNameView(final HeaderInfo hInfo, 
-			final UrlExtractor uExtractor) {
+	public ArrayNameView(final HeaderInfo hInfo, final UrlExtractor uExtractor) {
 
 		super();
 		this.setLayout(new MigLayout());
 
 		this.headerInfo = hInfo;
 		this.urlExtractor = uExtractor;
-		
+
 		this.headerSummary = new HeaderSummary("ArraySummary");
 		headerSummary.setIncluded(new int[] { 0 });
 		headerSummary.addObserver(this);
 
 		addMouseListener(this);
-		
+
 		l1 = new JLabel();
 		l1.setFont(GUIParams.FONTS);
 		l1.setForeground(GUIParams.TEXT);
-		
+
 		add(l1, "alignx 50%, aligny 100%, push");
-		
-		scrollPane = new JScrollPane(this, 
-				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+		scrollPane = new JScrollPane(this,
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBorder(null);
-		
+
 		panel = scrollPane;
 	}
 
@@ -266,12 +264,13 @@ public class ArrayNameView extends ModelView implements MouseListener,
 			try {
 				final Graphics2D g2d = (Graphics2D) g;
 				final AffineTransform orig = g2d.getTransform();
-				
-				FontRenderContext frc = new FontRenderContext(orig, true, true);
-				
-				g2d.rotate(Math.PI * 3/2);
+
+				final FontRenderContext frc = new FontRenderContext(orig, true,
+						true);
+
+				g2d.rotate(Math.PI * 3 / 2);
 				g2d.translate(-offscreenSize.height, 0);
-				
+
 				final int start = map.getIndex(0);
 				final int end = map.getIndex(map.getUsedPixels()) - 1;
 				int gidRow = headerInfo.getIndex("GID");
@@ -322,38 +321,36 @@ public class ArrayNameView extends ModelView implements MouseListener,
 								}
 
 								g2d.setColor(fore);
-//								g2d.drawString(out, 0, map.getMiddlePixel(j) 
-//										+ ascent / 2);
-								
-								// Unknown Mac OS X issue with drawString, 
+								// g2d.drawString(out, 0, map.getMiddlePixel(j)
+								// + ascent / 2);
+
+								// Unknown Mac OS X issue with drawString,
 								// mysteriously fixed by this.
 								g2d.drawGlyphVector(g2d.getFont()
-										.createGlyphVector(frc, out), 0, 
-										map.getMiddlePixel(j) 
-										+ ascent / 2);
+										.createGlyphVector(frc, out), 0,
+										map.getMiddlePixel(j) + ascent / 2);
 
 								if (colorIndex > 0) {
 									g.setColor(fore);
 								}
 							} else {
 								g2d.setColor(GUIParams.TEXT);
-//								g2d.drawString(out, 0, map.getMiddlePixel(j) 
-//										+ ascent / 2);
+								// g2d.drawString(out, 0, map.getMiddlePixel(j)
+								// + ascent / 2);
 								// g.setColor(fore);
-								
-								// Unknown Mac OS X issue with drawString, 
-								// mysteriously fixed by this. 
+
+								// Unknown Mac OS X issue with drawString,
+								// mysteriously fixed by this.
 								g2d.drawGlyphVector(g2d.getFont()
-										.createGlyphVector(frc, out), 0, 
-										map.getMiddlePixel(j) 
-										+ ascent / 2);
+										.createGlyphVector(frc, out), 0,
+										map.getMiddlePixel(j) + ascent / 2);
 							}
 
 						}
 					} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 					}
 				}
-				
+
 				g2d.setTransform(orig);
 
 			} catch (final java.lang.NoClassDefFoundError e) {
@@ -384,7 +381,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 						 */
 
 						backBuffer = createImage(maxlength, offscreenSize.width);
-//						updateBackBuffer();// this flips the backbuffer...
+						// updateBackBuffer();// this flips the backbuffer...
 
 					} else {
 						// some kind of blank default image?
@@ -406,18 +403,17 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		}
 		// end of if
 	}
-	
 
-//	/**
-//	 * Sets the urlExtractor to be used when an array name is clicked on.
-//	 * 
-//	 * @param ue
-//	 *            Will be fed array indexes.
-//	 */
-//	public void setUrlExtractor(final UrlExtractor ue) {
-//
-//		urlExtractor = ue;
-//	}
+	// /**
+	// * Sets the urlExtractor to be used when an array name is clicked on.
+	// *
+	// * @param ue
+	// * Will be fed array indexes.
+	// */
+	// public void setUrlExtractor(final UrlExtractor ue) {
+	//
+	// urlExtractor = ue;
+	// }
 
 	/**
 	 * Used to space the array names.
@@ -530,37 +526,36 @@ public class ArrayNameView extends ModelView implements MouseListener,
 	 */
 	@Override
 	public void mouseClicked(final MouseEvent e) {
-//		if (urlExtractor == null) {
-//			return;
-//		}
-//
-//		if (urlExtractor.isEnabled() == false) {
-//			return;
-//		}
-//
-//		// now, want mouse click to signal browser...
-//		final int index = map.getIndex(e.getX());
-//		if (map.contains(index)) {
-//			viewFrame.displayURL(urlExtractor.getUrl(index));
-//		}
+		// if (urlExtractor == null) {
+		// return;
+		// }
+		//
+		// if (urlExtractor.isEnabled() == false) {
+		// return;
+		// }
+		//
+		// // now, want mouse click to signal browser...
+		// final int index = map.getIndex(e.getX());
+		// if (map.contains(index)) {
+		// viewFrame.displayURL(urlExtractor.getUrl(index));
+		// }
 		final int index = map.getIndex(e.getX());
-		if(geneSelection.getNSelectedIndexes() 
-				== geneSelection.getNumIndexes() 
-				&& arraySelection.isIndexSelected(index)) {
+		if (geneSelection.getNSelectedIndexes() == geneSelection
+				.getNumIndexes() && arraySelection.isIndexSelected(index)) {
 			geneSelection.deselectAllIndexes();
 			arraySelection.deselectAllIndexes();
-			
-		} else if(geneSelection.getNSelectedIndexes() > 0) {
+
+		} else if (geneSelection.getNSelectedIndexes() > 0) {
 			geneSelection.deselectAllIndexes();
 			arraySelection.deselectAllIndexes();
 			arraySelection.setIndex(index, true);
 			geneSelection.selectAllIndexes();
-			
+
 		} else {
 			arraySelection.setIndex(index, true);
 			geneSelection.selectAllIndexes();
 		}
-		
+
 		geneSelection.notifyObservers();
 		arraySelection.notifyObservers();
 	}
@@ -648,30 +643,30 @@ public class ArrayNameView extends ModelView implements MouseListener,
 
 		return headerSummary;
 	}
-	
+
 	/* inherit description */
 	@Override
-	public void setConfigNode(Preferences parentNode) {
+	public void setConfigNode(final Preferences parentNode) {
 
-		if(parentNode != null) {
+		if (parentNode != null) {
 			this.configNode = parentNode.node("ArrayNameView");
-			
+
 		} else {
-			LogBuffer.println("Could not find or create ArrayameView" +
-					"node because parentNode was null.");
+			LogBuffer.println("Could not find or create ArrayameView"
+					+ "node because parentNode was null.");
 		}
-		
-		String[] childrenNodes = getRootChildrenNodes();
+
+		final String[] childrenNodes = getRootChildrenNodes();
 		boolean nodePresent = false;
-		for(int i = 0; i < childrenNodes.length; i++) {
-			
+		for (int i = 0; i < childrenNodes.length; i++) {
+
 			// Actually looking for children nodes...
-			if(childrenNodes[i].equalsIgnoreCase("ArraySummary")) {
+			if (childrenNodes[i].equalsIgnoreCase("ArraySummary")) {
 				nodePresent = true;
 			}
 		}
-		
-//			if (configNode.fetchFirst("ArraySummary") == null) {
+
+		// if (configNode.fetchFirst("ArraySummary") == null) {
 		if (!nodePresent) {
 			getHeaderSummary().setConfigNode(configNode);
 			getHeaderSummary().setIncluded(new int[] { 0 });
@@ -679,7 +674,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		} else {
 			// Actually get first subNode here...
 			getHeaderSummary().setConfigNode(configNode);
-//						.bindConfig(configNode.fetchFirst("ArraySummary"));
+			// .bindConfig(configNode.fetchFirst("ArraySummary"));
 		}
 
 		setFace(configNode.get("face", d_face));
@@ -702,7 +697,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		this.arraySelection = arraySelection;
 		this.arraySelection.addObserver(this);
 	}
-	
+
 	/**
 	 * Set geneSelection
 	 * 
@@ -718,20 +713,21 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		this.geneSelection = arraySelection;
 		this.geneSelection.addObserver(this);
 	}
-	
+
 	/**
 	 * Returns the names of the current children of this class' root node.
+	 * 
 	 * @return
 	 */
 	public String[] getRootChildrenNodes() {
-		
-		if(configNode != null) {
+
+		if (configNode != null) {
 			String[] childrenNodes;
 			try {
 				childrenNodes = configNode.childrenNames();
 				return childrenNodes;
-				
-			} catch (BackingStoreException e) {
+
+			} catch (final BackingStoreException e) {
 				e.printStackTrace();
 				return null;
 			}

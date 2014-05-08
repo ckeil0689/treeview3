@@ -22,7 +22,6 @@
  */
 package edu.stanford.genetics.treeview;
 
-import java.util.Arrays;
 import java.util.Observable;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -34,9 +33,9 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 
 	private Preferences configNode;
 	private int[] included = new int[] { 1 };
-	private String type;
+	private final String type;
 
-	public HeaderSummary(String type) {
+	public HeaderSummary(final String type) {
 
 		super();
 		this.type = type;
@@ -69,8 +68,8 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 			LogBuffer.println("index " + index
 					+ " out of bounds on headers, continuing");
-			LogBuffer.println("ArrayIndexOutOfBoundsException in " +
-					"getSummary() in HeaderSummary: " + e.getMessage());
+			LogBuffer.println("ArrayIndexOutOfBoundsException in "
+					+ "getSummary() in HeaderSummary: " + e.getMessage());
 			return null;
 		}
 
@@ -97,10 +96,10 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 				}
 			} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 				// out.append(strings[1]);
-//				LogBuffer.println("ArrayIndexOutOfBoundsException in " +
-//						"getSummary() in HeaderSummary: " + e.getMessage());
-//				LogBuffer.println("strings[]: " + Arrays.toString(strings));
-//				LogBuffer.println("included[i]: " + included[i]);
+				// LogBuffer.println("ArrayIndexOutOfBoundsException in " +
+				// "getSummary() in HeaderSummary: " + e.getMessage());
+				// LogBuffer.println("strings[]: " + Arrays.toString(strings));
+				// LogBuffer.println("included[i]: " + included[i]);
 			}
 		}
 
@@ -112,18 +111,18 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		}
 	}
 
-	public String[] getSummaryArray(final HeaderInfo headerInfo, 
-			final int index) {
+	public String[] getSummaryArray(final HeaderInfo headerInfo, final int index) {
 
 		String[] strings = null;
 		try {
 			strings = headerInfo.getHeader(index);
 
 		} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
-//			LogBuffer.println("index " + index + " out of bounds on headers, "
-//					+ "continuing");
-//			LogBuffer.println("ArrayIndexOutOfBoundsException in " +
-//					"getSummaryArray() in HeaderSummary: " + e.getMessage());
+			// LogBuffer.println("index " + index +
+			// " out of bounds on headers, "
+			// + "continuing");
+			// LogBuffer.println("ArrayIndexOutOfBoundsException in " +
+			// "getSummaryArray() in HeaderSummary: " + e.getMessage());
 			return null;
 		}
 
@@ -144,23 +143,23 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 				count++;
 			} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 				// out.append(strings[1]);
-//				LogBuffer.println("ArrayIndexOutOfBoundsException in " +
-//						"getSummaryArray() in HeaderSummary: " 
-//						+ e.getMessage());
+				// LogBuffer.println("ArrayIndexOutOfBoundsException in " +
+				// "getSummaryArray() in HeaderSummary: "
+				// + e.getMessage());
 			}
 		}
 		return out;
 	}
-	
+
 	@Override
-	public void setConfigNode(Preferences parentNode) {
-		
-		if(parentNode != null) {
+	public void setConfigNode(final Preferences parentNode) {
+
+		if (parentNode != null) {
 			this.configNode = parentNode.node(type);
-			
+
 		} else {
-			LogBuffer.println("Could not find or create HeaderSummary" +
-					"node because parentNode was null.");
+			LogBuffer.println("Could not find or create HeaderSummary"
+					+ "node because parentNode was null.");
 		}
 		synchronizeFrom();
 	}
@@ -195,15 +194,15 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 					}
 				}
 				try {
-					array[numComma] = Integer.parseInt(
-							incString.substring(last));
+					array[numComma] = Integer.parseInt(incString
+							.substring(last));
 
 				} catch (final NumberFormatException e) {
 					LogBuffer.println("HeaderSummary has trouble "
 							+ "restoring included list from " + incString);
-					LogBuffer.println("NumberFormatException in " +
-							"synchronizeFrom() in " +
-							"HeaderSummary: " + e.getMessage());
+					LogBuffer.println("NumberFormatException in "
+							+ "synchronizeFrom() in " + "HeaderSummary: "
+							+ e.getMessage());
 				}
 				setIncluded(array);
 			}
@@ -229,24 +228,24 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		}
 		configNode.put("included", temp.toString());
 	}
-	
-	public boolean nodeHasAttribute(String name) {
-		
+
+	public boolean nodeHasAttribute(final String name) {
+
 		boolean contains = false;
-		
+
 		try {
-			String[] keys = configNode.keys();
-			
-			for(int i = 0; i < keys.length; i++) {
-				
-				if(keys[i].equalsIgnoreCase(name)) {
+			final String[] keys = configNode.keys();
+
+			for (int i = 0; i < keys.length; i++) {
+
+				if (keys[i].equalsIgnoreCase(name)) {
 					contains = true;
 					break;
 				}
 			}
 			return contains;
-			
-		} catch (BackingStoreException e) {
+
+		} catch (final BackingStoreException e) {
 			e.printStackTrace();
 			return contains;
 		}

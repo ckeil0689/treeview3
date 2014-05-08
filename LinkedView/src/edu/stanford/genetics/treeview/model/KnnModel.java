@@ -36,23 +36,23 @@ public class KnnModel extends TVModel implements DataModel {
 	 */
 	@Override
 	public String getType() {
-		
+
 		return "KnnModel";
 	}
 
 	// accessor methods
 	public int getNumArrayClusters() {
-		
+
 		return aClusterMembers.length;
 	}
 
 	public int getNumGeneClusters() {
-		
+
 		return gClusterMembers.length;
 	}
 
 	public int[] getArrayClusters() {
-		
+
 		if (aClusterMembers == null)
 			return null;
 		final int n = aClusterMembers.length;
@@ -63,7 +63,7 @@ public class KnnModel extends TVModel implements DataModel {
 	};
 
 	public int[] getGeneClusters() {
-		
+
 		if (gClusterMembers == null)
 			return null;
 		final int n = gClusterMembers.length;
@@ -74,7 +74,7 @@ public class KnnModel extends TVModel implements DataModel {
 	};
 
 	public KnnModel() {
-		
+
 		super();
 		/* build KnnModel, initially empty... */
 	}
@@ -88,32 +88,32 @@ public class KnnModel extends TVModel implements DataModel {
 	 */
 	@Override
 	public void loadNew(final FileSet fileSet) throws LoadException {
-		
+
 		resetState();
 		setSource(fileSet);
-//		final KnnModelLoader loader = new KnnModelLoader(this);
-//		loader.loadInto();
+		// final KnnModelLoader loader = new KnnModelLoader(this);
+		// loader.loadInto();
 		final NewKnnModelLoader loader = new NewKnnModelLoader(this);
 		loader.load();
 	}
 
-//	/**
-//	 * Don't open a loading window...
-//	 */
-//	@Override
-//	public void loadNewNW(final FileSet fileSet) throws LoadException {
-//		
-//		resetState();
-//		setSource(fileSet);
-////		final KnnModelLoader loader = new KnnModelLoader(this);
-////		loader.loadIntoNW();
-//		final NewKnnModelLoader loader = new NewKnnModelLoader(this);
-//		loader.loadIntoNW();
-//	}
+	// /**
+	// * Don't open a loading window...
+	// */
+	// @Override
+	// public void loadNewNW(final FileSet fileSet) throws LoadException {
+	//
+	// resetState();
+	// setSource(fileSet);
+	// // final KnnModelLoader loader = new KnnModelLoader(this);
+	// // loader.loadIntoNW();
+	// final NewKnnModelLoader loader = new NewKnnModelLoader(this);
+	// loader.loadIntoNW();
+	// }
 
 	@Override
 	public String[] toStrings() {
-		
+
 		final String[] msg = { "Selected KnnModel Stats",
 				"Source = " + source.getCdt(), "Nexpr   = " + nExpr(),
 				"NGeneHeader = " + getGeneHeaderInfo().getNumNames(),
@@ -144,84 +144,86 @@ public class KnnModel extends TVModel implements DataModel {
 	 * @param ptype
 	 *            the parse type for error reporting.
 	 */
-//	public void setGClusters(final RectData tempTable, final int ptype) {
-//		
-//		final HeaderInfo geneHeader = getGeneHeaderInfo();
-//		final boolean result = checkCorrespondence(tempTable, geneHeader, ptype);
-//		
-//		if (result) {
-//			geneHeader.addName("GROUP", geneHeader.getNumNames() - 1);
-//			
-//			for (int row = 0; row < geneHeader.getNumHeaders(); row++) {
-//				
-//				geneHeader.setHeader(row, "GROUP", tempTable.getString(row, 1));
-//			}
-//		}
-//	}
-//
-//	public void setAClusters(final RectData tempTable, final int kagparse) {
-//		
-//		final HeaderInfo arrayHeader = getArrayHeaderInfo();
-//		final boolean result = checkCorrespondence(tempTable, arrayHeader,
-//				kagparse);
-//		
-//		if (result) {
-//			arrayHeader.addName("GROUP", arrayHeader.getNumNames() - 1);
-//			
-//			for (int row = 0; row < arrayHeader.getNumHeaders(); row++) {
-//				
-//				arrayHeader.setHeader(row, "GROUP", 
-//						tempTable.getString(row, 1));
-//			}
-//		}
-//	}
-	
+	// public void setGClusters(final RectData tempTable, final int ptype) {
+	//
+	// final HeaderInfo geneHeader = getGeneHeaderInfo();
+	// final boolean result = checkCorrespondence(tempTable, geneHeader, ptype);
+	//
+	// if (result) {
+	// geneHeader.addName("GROUP", geneHeader.getNumNames() - 1);
+	//
+	// for (int row = 0; row < geneHeader.getNumHeaders(); row++) {
+	//
+	// geneHeader.setHeader(row, "GROUP", tempTable.getString(row, 1));
+	// }
+	// }
+	// }
+	//
+	// public void setAClusters(final RectData tempTable, final int kagparse) {
+	//
+	// final HeaderInfo arrayHeader = getArrayHeaderInfo();
+	// final boolean result = checkCorrespondence(tempTable, arrayHeader,
+	// kagparse);
+	//
+	// if (result) {
+	// arrayHeader.addName("GROUP", arrayHeader.getNumNames() - 1);
+	//
+	// for (int row = 0; row < arrayHeader.getNumHeaders(); row++) {
+	//
+	// arrayHeader.setHeader(row, "GROUP",
+	// tempTable.getString(row, 1));
+	// }
+	// }
+	// }
+
 	public void setGClusters(final String[][] labels, final int ptype) {
-		
+
 		final HeaderInfo geneHeader = getGeneHeaderInfo();
-//		final boolean result = checkCorrespondence(tempTable, geneHeader, ptype);
+		// final boolean result = checkCorrespondence(tempTable, geneHeader,
+		// ptype);
 		final boolean result = checkCorrespondence(labels, geneHeader, ptype);
-		
+
 		if (result) {
 			geneHeader.addName("GROUP", geneHeader.getNumNames() - 1);
-			
+
 			for (int row = 0; row < geneHeader.getNumHeaders(); row++) {
-				
-//				geneHeader.setHeader(row, "GROUP", tempTable.getString(row, 1));
+
+				// geneHeader.setHeader(row, "GROUP", tempTable.getString(row,
+				// 1));
 				geneHeader.setHeader(row, "GROUP", labels[row][1]);
 			}
 		}
 	}
 
 	public void setAClusters(final String[][] labels, final int kagparse) {
-		
+
 		final HeaderInfo arrayHeader = getArrayHeaderInfo();
-//		final boolean result = checkCorrespondence(tempTable, arrayHeader,
-//				kagparse);
+		// final boolean result = checkCorrespondence(tempTable, arrayHeader,
+		// kagparse);
 		final boolean result = checkCorrespondence(labels, arrayHeader,
 				kagparse);
-		
+
 		if (result) {
 			arrayHeader.addName("GROUP", arrayHeader.getNumNames() - 1);
-			
+
 			for (int row = 0; row < arrayHeader.getNumHeaders(); row++) {
-				
-//				arrayHeader.setHeader(row, "GROUP", 
-//						tempTable.getString(row, 1));
+
+				// arrayHeader.setHeader(row, "GROUP",
+				// tempTable.getString(row, 1));
 				arrayHeader.setHeader(row, "GROUP", labels[row][1]);
 			}
 		}
 	}
 
 	public void parseClusters() throws LoadException {
-		
+
 		gClusterMembers = calculateMembership(getGeneHeaderInfo(), "GROUP");
 		aClusterMembers = calculateMembership(getArrayHeaderInfo(), "GROUP");
 	}
 
 	public int[][] calculateMembership(final HeaderInfo headerInfo,
 			final String column) {
-		
+
 		final int groupIndex = headerInfo.getIndex(column);
 		if (groupIndex < 0)
 			return null;
@@ -236,7 +238,7 @@ public class KnnModel extends TVModel implements DataModel {
 
 	private void populateMembers(final int[][] members,
 			final HeaderInfo headerInfo, final int index) {
-	
+
 		final int[] counts = new int[members.length];
 		for (int i = 0; i < counts.length; i++)
 			counts[i] = 0;
@@ -258,7 +260,7 @@ public class KnnModel extends TVModel implements DataModel {
 	 */
 	private int[] getCountVector(final HeaderInfo headerInfo,
 			final int columnIndex) {
-		
+
 		final Vector<Integer> counts = new Vector<Integer>();
 		for (int i = 0; i < headerInfo.getNumHeaders(); i++) {
 			final Integer group = new Integer(headerInfo.getHeader(i,
@@ -285,15 +287,15 @@ public class KnnModel extends TVModel implements DataModel {
 	 * @param ptype
 	 * @return true if it matches
 	 */
-//	private boolean checkCorrespondence(final RectData tempTable,
-//			final HeaderInfo headerInfo, final int ptype) {
-//		
-//		return true;
-//	}
-	
+	// private boolean checkCorrespondence(final RectData tempTable,
+	// final HeaderInfo headerInfo, final int ptype) {
+	//
+	// return true;
+	// }
+
 	private boolean checkCorrespondence(final String[][] labels,
 			final HeaderInfo headerInfo, final int ptype) {
-		
+
 		return true;
 	}
 

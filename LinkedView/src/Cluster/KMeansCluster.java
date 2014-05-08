@@ -3,7 +3,6 @@ package Cluster;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -16,7 +15,7 @@ public class KMeansCluster {
 	// Instance variables
 	private final TVModel model;
 	private final ClusterView clusterView;
-	
+
 	private ClusterFileWriter2 bufferedWriter;
 	private String filePath;
 	private String type = "";
@@ -24,7 +23,7 @@ public class KMeansCluster {
 	private final int iterations;
 
 	// Distance Matrix
-	private double[][] dMatrix;
+	private final double[][] dMatrix;
 
 	// Half of the Distance Matrix (symmetry)
 	private double[][] copyDMatrix;
@@ -34,8 +33,8 @@ public class KMeansCluster {
 
 	// list to return ordered GENE numbers for .cdt creation
 	private String[] reorderedList;
-	
-	private SwingWorker<Void, Void> worker;
+
+	private final SwingWorker<String[], Void> worker;
 
 	/**
 	 * Main constructor
@@ -47,8 +46,8 @@ public class KMeansCluster {
 	 * @param method
 	 */
 	public KMeansCluster(final TVModel model, final ClusterView clusterView,
-		 double[][] dMatrix, final String type, int clusterN, 
-			int iterations, final SwingWorker<Void, Void> worker) {
+			final double[][] dMatrix, final String type, final int clusterN,
+			final int iterations, final SwingWorker<String[], Void> worker) {
 
 		this.model = model;
 		this.clusterView = clusterView;
@@ -72,8 +71,8 @@ public class KMeansCluster {
 
 		// deep copy of distance matrix to avoid mutation
 		copyDMatrix = deepCopy(dMatrix);
-		
-		// The list containing the reordered gene names. 
+
+		// The list containing the reordered gene names.
 		reorderedList = new String[dMatrix.length];
 
 		// Make a list of all means of distances for every gene
@@ -92,10 +91,10 @@ public class KMeansCluster {
 		// distance means to clusters
 		for (int i = 0; i < iterations; i++) {
 
-			if(worker.isCancelled()) {
+			if (worker.isCancelled()) {
 				break;
 			}
-			
+
 			findNewMeans(clusterMeans);
 
 			clusters = assignMeansVals(elementMeanList);
@@ -107,15 +106,15 @@ public class KMeansCluster {
 
 		geneGroups = indexToString(clusters);
 
-		int pairSize = 2;
+		final int pairSize = 2;
 		final String[] initial = new String[pairSize];
 		int addIndex = 0;
-		
+
 		// File Writer
 		try {
 			setupFileWriter();
-			
-		} catch (IOException e) {
+
+		} catch (final IOException e) {
 			System.out.println("FileWriter failed in KMeansCluster");
 			e.printStackTrace();
 		}
@@ -131,20 +130,20 @@ public class KMeansCluster {
 
 		initial[addIndex] = "GROUP";
 		addIndex++;
-		
+
 		bufferedWriter.writeContent(initial);
 
 		addIndex = 0;
 		// Prepare data for writing
 		for (int i = 0; i < geneGroups.length; i++) {
 
-			String[] group = geneGroups[i];
-			
+			final String[] group = geneGroups[i];
+
 			int addIndexInner = 0;
-			for(int j = 0; j < group.length; j++) {
-				
+			for (int j = 0; j < group.length; j++) {
+
 				addIndexInner = 0;
-				
+
 				reorderedList[addIndex] = group[j];
 				addIndex++;
 
@@ -153,28 +152,28 @@ public class KMeansCluster {
 
 				dataPair[addIndexInner] = group[j];
 				addIndexInner++;
-				
+
 				dataPair[addIndexInner] = index;
 
 				bufferedWriter.writeContent(dataPair);
 			}
 		}
-		
+
 		bufferedWriter.closeWriter();
 	}
-	
+
 	public void setupFileWriter() throws IOException {
-		
-		String fileEnd; 
-		
+
+		String fileEnd;
+
 		if (type.equalsIgnoreCase("Gene")) {
 			fileEnd = "_K_G" + clusterN + ".kgg";
 
 		} else {
 			fileEnd = "_K_A" + clusterN + ".kag";
 		}
-		
-		File file = new File(model.getSource().substring(0,
+
+		final File file = new File(model.getSource().substring(0,
 				model.getSource().length() - 4)
 				+ fileEnd);
 
@@ -273,8 +272,7 @@ public class KMeansCluster {
 
 		clusterView.updatePBar(0);
 
-		final ArrayList<List<Integer>> clusters = 
-				new ArrayList<List<Integer>>();
+		final ArrayList<List<Integer>> clusters = new ArrayList<List<Integer>>();
 
 		// fill clusters List with clusterN-amount of empty lists to
 		// avoid duplicates of the initial means later
@@ -287,13 +285,13 @@ public class KMeansCluster {
 		// seedCluster has clusterN-amount of Integers designating the
 		// initial means
 		final double[] initialMeans = getSeedMeans();
-		
+
 		// Compare each mean from meanList to all seed means from seedClusters
 		// and assign the means to the according group.
 		for (int i = 0; i < meanList.length; i++) {
 
 			final int geneID = i;
-			double mean = meanList[i];
+			final double mean = meanList[i];
 
 			clusterView.updatePBar(geneID);
 
@@ -306,8 +304,8 @@ public class KMeansCluster {
 			int addIndexInner = 0;
 			for (int j = 0; j < initialMeans.length; j++) {
 
-				double seed = initialMeans[j];
-				
+				final double seed = initialMeans[j];
+
 				distance = Math.abs(seed - mean);
 
 				if (distance < bestD) {
@@ -327,42 +325,42 @@ public class KMeansCluster {
 			// Add the current gene to appropriate cluster group
 			clusters.get(bestCluster).add(geneID);
 		}
-		
+
 		// Transform the list into arrays
-		int[][] clustersArray = new int[clusters.size()][];
-		
-		for(int i = 0; i < clusters.size(); i++) {
-			
-			int[] cluster = new int[clusters.get(i).size()];
-			
-			for(int j = 0; j < cluster.length; j++) {
-				
+		final int[][] clustersArray = new int[clusters.size()][];
+
+		for (int i = 0; i < clusters.size(); i++) {
+
+			final int[] cluster = new int[clusters.get(i).size()];
+
+			for (int j = 0; j < cluster.length; j++) {
+
 				cluster[j] = clusters.get(i).get(j);
 			}
-			
+
 			clustersArray[i] = cluster;
 		}
 
 		// Check if sum of group sizes match the amount of overall means
 		// for testing only
-//		int sum = 0;
-//		for (int i = 0; i < clustersArray.length; i++) {
-//
-//			int[] group = clustersArray[i];
-//			
-//			sum += group.length;
-//			System.out.println("Group Size " + i + ": " + group.length);
-//		}
-//
-//		if (sum == meanList.length) {
-//			System.out.println("Success! sum and meanList size match up.");
-//			System.out.println("Seed Means: " + Arrays.toString(getSeedMeans()));
-//
-//		} else {
-//			System.out.println("Something's weird.");
-//			System.out.println("Sum: " + sum);
-//			System.out.println("MeanList Size: " + meanList.length);
-//		}
+		// int sum = 0;
+		// for (int i = 0; i < clustersArray.length; i++) {
+		//
+		// int[] group = clustersArray[i];
+		//
+		// sum += group.length;
+		// System.out.println("Group Size " + i + ": " + group.length);
+		// }
+		//
+		// if (sum == meanList.length) {
+		// System.out.println("Success! sum and meanList size match up.");
+		// System.out.println("Seed Means: " + Arrays.toString(getSeedMeans()));
+		//
+		// } else {
+		// System.out.println("Something's weird.");
+		// System.out.println("Sum: " + sum);
+		// System.out.println("MeanList Size: " + meanList.length);
+		// }
 
 		return clustersArray;
 	}
@@ -451,8 +449,8 @@ public class KMeansCluster {
 		} else {
 			headerArray = model.getGeneHeaderInfo().getHeaderArray();
 		}
-		
-		String[] geneNameArray = new String[headerArray.length];
+
+		final String[] geneNameArray = new String[headerArray.length];
 
 		int addIndex = 0;
 		for (final String[] element : headerArray) {
@@ -527,12 +525,12 @@ public class KMeansCluster {
 	 * @param clusters
 	 * @param elementMeanList
 	 */
-	public void setSeedMeans(final int[] clusters, 
+	public void setSeedMeans(final int[] clusters,
 			final double[] elementMeanList) {
 
 		// Clear seedMeans
-		for(int i = 0; i < seedMeans.length; i ++) {
-			
+		for (int i = 0; i < seedMeans.length; i++) {
+
 			seedMeans[i] = -1;
 		}
 

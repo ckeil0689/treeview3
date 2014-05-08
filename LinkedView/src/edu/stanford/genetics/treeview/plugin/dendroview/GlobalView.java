@@ -52,8 +52,8 @@ import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelViewProduced;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 
-public class GlobalView extends ModelViewProduced implements MouseMotionListener,
-		MouseListener, MouseWheelListener, KeyListener {
+public class GlobalView extends ModelViewProduced implements
+		MouseMotionListener, MouseListener, MouseWheelListener, KeyListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -67,7 +67,7 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 			"", "" };
 	private HeaderInfo arrayHI;
 	private HeaderInfo geneHI;
-	
+
 	private ArrayDrawer drawer;
 	private int overx;
 	private int overy;
@@ -118,7 +118,7 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 
 		setToolTipText("This Turns Tooltips On");
 
-		//addComponentListener(this);
+		// addComponentListener(this);
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addMouseWheelListener(this);
@@ -156,8 +156,8 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 						statustext[0] += geneHI.getHeader(realGene, 1);
 
 					} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
-						LogBuffer.println("ArrayIndexOutOfBoundsException " +
-								"in getStatus() in GlobalView: " 
+						LogBuffer.println("ArrayIndexOutOfBoundsException "
+								+ "in getStatus() in GlobalView: "
 								+ e.getMessage());
 						statustext[0] += " (N/A)";
 					}
@@ -168,20 +168,20 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 						statustext[1] += arrayHI.getHeader(overx, 0);
 
 					} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
-						LogBuffer.println("ArrayIndexOutOfBoundsException " +
-								"in getStatus() in GlobalView: " 
+						LogBuffer.println("ArrayIndexOutOfBoundsException "
+								+ "in getStatus() in GlobalView: "
 								+ e.getMessage());
 						statustext[1] += " (N/A)";
 					}
 				}
 
-				if(drawer != null) {
+				if (drawer != null) {
 					if (drawer.isMissing(overx, overy)) {
 						statustext[2] = "Value:  No Data";
-	
+
 					} else if (drawer.isEmpty(overx, overy)) {
 						statustext[2] = "";
-	
+
 					} else {
 						statustext[2] = "Value:  "
 								+ drawer.getSummary(overx, overy);
@@ -189,9 +189,8 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 				}
 			}
 		} catch (final ArrayIndexOutOfBoundsException e) {
-			LogBuffer.println("ArrayIndexOutOfBoundsException " +
-					"in getStatus() in GlobalView: " 
-					+ e.getMessage());
+			LogBuffer.println("ArrayIndexOutOfBoundsException "
+					+ "in getStatus() in GlobalView: " + e.getMessage());
 		}
 		return statustext;
 	}
@@ -302,7 +301,7 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 	 */
 	@Override
 	protected void updateBuffer(final Graphics g) {
-		
+
 		if (offscreenChanged) {
 			xmap.setAvailablePixels(offscreenSize.width);
 			ymap.setAvailablePixels(offscreenSize.height);
@@ -344,7 +343,7 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 	 */
 	@Override
 	protected void updatePixels() {
-		
+
 		if (offscreenChanged) {
 			offscreenValid = false;
 			xmap.setAvailablePixels(offscreenSize.width);
@@ -360,14 +359,14 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 			xmap.notifyObservers();
 			ymap.notifyObservers();
 		}
-		
-		if(resetHome) {
+
+		if (resetHome) {
 			xmap.setHome();
 			ymap.setHome();
-			
+
 			xmap.notifyObservers();
 			ymap.notifyObservers();
-			
+
 			resetHome = false;
 		}
 
@@ -416,8 +415,8 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 	}
 
 	/**
-	 * Checks the selection of genes and arrays and calculates the 
-	 * appropriate selection rectangle.
+	 * Checks the selection of genes and arrays and calculates the appropriate
+	 * selection rectangle.
 	 */
 	protected void recalculateOverlay() {
 
@@ -547,7 +546,7 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 			dragRect.setSize(endPoint.x - dragRect.x, endPoint.y - dragRect.y);
 
 			drawBand(dragRect);
-			
+
 		} else if (SwingUtilities.isRightMouseButton(e)) {
 			geneSelection.setSelectedNode(null);
 			geneSelection.deselectAllIndexes();
@@ -559,18 +558,18 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 			arraySelection.notifyObservers();
 		}
 	}
-	
+
 	@Override
 	public void mouseExited(final MouseEvent e) {
-		
-//		hasMouse = false;
-//		
-//		// Display empty field
-//		statustext[0] = "";
-//		statustext[1] = "";
-//		statustext[2] = "";
-//		
-//		status.setMessages(statustext);
+
+		// hasMouse = false;
+		//
+		// // Display empty field
+		// statustext[0] = "";
+		// statustext[1] = "";
+		// statustext[2] = "";
+		//
+		// status.setMessages(statustext);
 	}
 
 	@Override
@@ -594,11 +593,11 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 				final Point start = new Point(startPoint.x, ymap.getMinIndex());
 				final Point end = new Point(endPoint.x, ymap.getMaxIndex());
 				selectRectangle(start, end);
-				
+
 			} else {
 				selectRectangle(startPoint, endPoint);
 			}
-			
+
 		} else {
 			// do something else?
 		}
@@ -686,8 +685,8 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 					ret = null;
 
 				} else {
-					ret = "<html>Row: " + row + " <br>Column: " + col + 
-							" <br>Value: " 
+					ret = "<html>Row: " + row + " <br>Column: " + col
+							+ " <br>Value: "
 							+ drawer.getSummary(overx, geneRow) + "</html>";
 				}
 			}
@@ -845,7 +844,7 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 
 		// nodes
 		geneSelection.setSelectedNode(null);
-		
+
 		// genes...
 		geneSelection.deselectAllIndexes();
 
@@ -890,9 +889,9 @@ public class GlobalView extends ModelViewProduced implements MouseMotionListener
 		geneHI = ghi;
 		arrayHI = ahi;
 	}
-	
-	public void resetHome(boolean resized) {
-		
+
+	public void resetHome(final boolean resized) {
+
 		this.resetHome = resized;
 		repaint();
 	}

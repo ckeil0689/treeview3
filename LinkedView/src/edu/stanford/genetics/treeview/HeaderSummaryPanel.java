@@ -47,24 +47,24 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 	private final JList headerList = new JList(new String[0]);
 
 	public HeaderSummaryPanel(final HeaderInfo headerInfo,
-			final HeaderSummary headerSummary, TreeViewFrame frame) {
+			final HeaderSummary headerSummary, final TreeViewFrame frame) {
 
 		this.headerInfo = headerInfo;
-		this.headerSummary = headerSummary; 
+		this.headerSummary = headerSummary;
 
 		setLayout(new MigLayout());
 		setOpaque(false);
-		
-		JLabel label = new JLabel("Select headers to display:");
+
+		final JLabel label = new JLabel("Select headers to display:");
 		label.setFont(GUIParams.FONTS);
 		label.setForeground(GUIParams.TEXT);
 		add(label, "span, wrap");
-		
+
 		setHeaderList(headerInfo.getNames());
 		headerList.setVisibleRowCount(5);
 		headerList.setFont(GUIParams.FONTS);
 		add(new JScrollPane(getHeaderList()), "push, grow, wrap");
-		
+
 		final ListSelectionListener tmp = new ListSelectionListener() {
 
 			@Override
@@ -73,7 +73,7 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 				synchronizeTo();
 			}
 		};
-		
+
 		getHeaderList().addListSelectionListener(tmp);
 		synchronizeFrom();
 	}
@@ -123,13 +123,14 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 
 		return headerList;
 	}
-	
+
 	/**
 	 * Returns the smalles index from a selected range in the header list.
+	 * 
 	 * @return
 	 */
 	public int getSmallestSelectedIndex() {
-		
+
 		return getHeaderList().getSelectedIndex();
 	}
 
@@ -163,7 +164,7 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 	 */
 	@Override
 	public void update(final Observable o, final Object arg) {
-		
+
 		if (o == headerInfo) {
 			setHeaderList(headerInfo.getNames());
 			synchronizeFrom();

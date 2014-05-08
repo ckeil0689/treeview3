@@ -47,28 +47,29 @@ public abstract class IntegerMap implements ConfigNodePersistent {
 		minindex = -1;
 		configNode = Preferences.userRoot().node(type());
 	}
-	
-	@Override
-	public void setConfigNode(Preferences parentNode) {
 
-		if(parentNode != null) {
+	@Override
+	public void setConfigNode(final Preferences parentNode) {
+
+		if (parentNode != null) {
 			this.configNode = parentNode.node(type);
-			
+
 		} else {
-			LogBuffer.println("Could not find or create IntegerMap " +
-					"node because parentNode was null.");
+			LogBuffer.println("Could not find or create IntegerMap "
+					+ "node because parentNode was null.");
 		}
-		
+
 		configNode.put("type", type());
 	}
-	
+
 	/**
-	 * Sets the String type to either Fixed or Full, so that 
-	 * different configNode can be created.
+	 * Sets the String type to either Fixed or Full, so that different
+	 * configNode can be created.
+	 * 
 	 * @param type
 	 */
-	public void setTypeString(String type) {
-		
+	public void setTypeString(final String type) {
+
 		this.type = type;
 	}
 

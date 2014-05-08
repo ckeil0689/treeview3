@@ -31,7 +31,6 @@ import java.util.prefs.Preferences;
 import javax.swing.JOptionPane;
 
 import Controllers.TVFrameController;
-
 import edu.stanford.genetics.treeview.ExportException;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LoadException;
@@ -70,8 +69,8 @@ public class LinkedViewApp extends TreeViewApp {
 
 		super();// does not call XmlConfig constructor
 		scanForPlugins();
-		
-		//added to circumvent standardStartup for now
+
+		// added to circumvent standardStartup for now
 		openNew().getAppFrame().setVisible(true);
 	}
 
@@ -137,13 +136,13 @@ public class LinkedViewApp extends TreeViewApp {
 	public TreeViewFrame openNew() {
 
 		// setup toplevel
-//		final LinkedViewFrame tvFrame = new LinkedViewFrame(this);
+		// final LinkedViewFrame tvFrame = new LinkedViewFrame(this);
 		final TVModel model = new TVModel();
 		final TreeViewFrame tvFrame = new TreeViewFrame(this);
-//		tvFrame.addWindowListener(this);
-		final TVFrameController tvController = new TVFrameController(tvFrame, 
+		// tvFrame.addWindowListener(this);
+		final TVFrameController tvController = new TVFrameController(tvFrame,
 				model);
-		
+
 		return tvFrame;
 	}
 
@@ -152,21 +151,22 @@ public class LinkedViewApp extends TreeViewApp {
 	public TreeViewFrame openNew(final FileSet fileSet) throws LoadException {
 
 		// setup toplevel
-//		final LinkedViewFrame tvFrame = new LinkedViewFrame(this);
+		// final LinkedViewFrame tvFrame = new LinkedViewFrame(this);
 		final TreeViewFrame tvFrame = new TreeViewFrame(this);
 		final TVModel model = new TVModel();
-		final TVFrameController tvController = new TVFrameController(tvFrame, 
+		final TVFrameController tvController = new TVFrameController(tvFrame,
 				model);
-	
+
 		tvController.loadFileSet(fileSet);
 		tvFrame.setLoaded(true);
 
-//		tvFrame.addWindowListener(this);
+		// tvFrame.addWindowListener(this);
 		return tvFrame;
 	}
 
 	/**
 	 * Method that sets up the initial View
+	 * 
 	 * @param astring
 	 */
 	protected void standardStartup(final String astring[]) {
@@ -193,8 +193,8 @@ public class LinkedViewApp extends TreeViewApp {
 			try {
 				System.out.println("StandardStartup LOAD attempted.");
 				final TreeViewFrame tvFrame = openNew(fileSet);
-//				tvFrame.setVisible(true);
-//				tvFrame.load(fileSet);
+				// tvFrame.setVisible(true);
+				// tvFrame.load(fileSet);
 				if (exportType != null) {
 					try {
 						attemptExport(exportType, tvFrame);
@@ -223,16 +223,16 @@ public class LinkedViewApp extends TreeViewApp {
 	private boolean attemptExport(final String exportType,
 			final TreeViewFrame tvFrame) throws ExportException {
 
-//		for (final MainPanel mainPanel : tvFrame.getMainPanels()) {
-//			if (exportType.equalsIgnoreCase(mainPanel.getName())) {
-//				mainPanel.export(args);
-//				return true;
-//			}
-//			if (exportType.equalsIgnoreCase(tvFrame.getRunning().getName())) {
-//				tvFrame.getRunning().export(args);
-//				return true;
-//			}
-//		}
+		// for (final MainPanel mainPanel : tvFrame.getMainPanels()) {
+		// if (exportType.equalsIgnoreCase(mainPanel.getName())) {
+		// mainPanel.export(args);
+		// return true;
+		// }
+		// if (exportType.equalsIgnoreCase(tvFrame.getRunning().getName())) {
+		// tvFrame.getRunning().export(args);
+		// return true;
+		// }
+		// }
 		System.err.println("Error exporting, could not find plugin of type "
 				+ exportType);
 		return false;
@@ -250,7 +250,7 @@ public class LinkedViewApp extends TreeViewApp {
 	 *            Standard argument string.
 	 */
 	public static void main(final String astring[]) {
-        
+
 		final LinkedViewApp statView = new LinkedViewApp();
 		// statView.dealWithRegistration();
 
@@ -330,12 +330,12 @@ public class LinkedViewApp extends TreeViewApp {
 		if (getGlobalConfig() != null) {
 			try {
 				getGlobalConfig().flush();
-				
-			} catch (BackingStoreException e) {
+
+			} catch (final BackingStoreException e) {
 				e.printStackTrace();
 			}
 		}
-//		closeAllWindows();
+		// closeAllWindows();
 		System.exit(0);
 	}
 }

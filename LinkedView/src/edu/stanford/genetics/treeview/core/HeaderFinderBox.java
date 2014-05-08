@@ -59,14 +59,14 @@ public abstract class HeaderFinderBox {
 	private final HeaderInfo headerInfo;
 	private final int choices[];
 	private int nchoices = 0;
-	
+
 	private final ArrayList<String> geneList;
 	private String[] genefHeaders = { "" };
 	private final String type;
 	private final WideComboBox genefBox;
 	private final JButton genefButton;
-	
-	private JPanel contentPanel;
+
+	private final JPanel contentPanel;
 
 	// "Search Gene Text for Substring"
 	public HeaderFinderBox(final ViewFrame f, final HeaderInfo hI,
@@ -93,36 +93,36 @@ public abstract class HeaderFinderBox {
 
 		final String[][] hA = headerInfo.getHeaderArray();
 
-		String genef = "Search " + type + " Labels... ";
+		final String genef = "Search " + type + " Labels... ";
 
 		geneList = new ArrayList<String>();
 		genefHeaders = getGenes(hA);
-		
+
 		for (final String gene : genefHeaders) {
 
 			geneList.add(gene);
 		}
-		
-		String [] labeledHeaders = new String[genefHeaders.length + 1];
-		
+
+		final String[] labeledHeaders = new String[genefHeaders.length + 1];
+
 		labeledHeaders[0] = genef;
-		
+
 		Arrays.sort(genefHeaders);
-		
-//		String[] geneHeaderClones = genefHeaders.clone();
-		
-//		for(int i = 0; i < genefHeaders.length; i++) {
-//			
-//			labeledHeaders[i + 1] = genefHeaders[i];
-//		}
-		
-		System.arraycopy(genefHeaders, 0, labeledHeaders, 1, 
+
+		// String[] geneHeaderClones = genefHeaders.clone();
+
+		// for(int i = 0; i < genefHeaders.length; i++) {
+		//
+		// labeledHeaders[i + 1] = genefHeaders[i];
+		// }
+
+		System.arraycopy(genefHeaders, 0, labeledHeaders, 1,
 				genefHeaders.length);
 
 		genefBox = GUIParams.setComboLayout(labeledHeaders);
 		genefBox.setEditable(true);
 		AutoCompleteDecorator.decorate(genefBox);
-		
+
 		genefButton = GUIParams.setButtonLayout(null, "searchIcon");
 		genefButton.setToolTipText("Highlights the selected label.");
 		genefButton.addActionListener(new ActionListener() {
@@ -139,13 +139,14 @@ public abstract class HeaderFinderBox {
 		contentPanel.add(genefBox);
 		contentPanel.add(genefButton);
 	}
-	
+
 	/**
 	 * Returns the content panel which keeps the GUI components.
+	 * 
 	 * @return JPanel
 	 */
 	public JPanel getContentPanel() {
-		
+
 		return contentPanel;
 	}
 

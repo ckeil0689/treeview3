@@ -17,7 +17,7 @@ public class MainProgramArgs {
 	final private CmdLineParser.Option exportType;
 
 	public MainProgramArgs(final String[] args) {
-		
+
 		parser = new CmdLineParser();
 		resource = parser.addStringOption('r', "resource");
 		filePath = parser.addStringOption('f', "file");

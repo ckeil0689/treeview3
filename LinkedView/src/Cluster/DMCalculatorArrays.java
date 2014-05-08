@@ -21,17 +21,17 @@ public class DMCalculatorArrays {
 	private final double PRECISION_LEVEL = 0.0001;
 	private double[][] distanceMatrix;
 	private final double[][] dataArrays;
-	
+
 	private final ClusterView clusterView;
 	private final String choice;
 	private final String type;
-	
-	private SwingWorker<Void, Void> worker;
+
+	private final SwingWorker<String[], Void> worker;
 
 	// Constructor
-	public DMCalculatorArrays(final double[][] fullList,
-			final String choice, final String type,
-			final ClusterView clusterView, SwingWorker<Void, Void> worker) {
+	public DMCalculatorArrays(final double[][] fullList, final String choice,
+			final String type, final ClusterView clusterView,
+			final SwingWorker<String[], Void> worker) {
 
 		this.dataArrays = fullList;
 		this.choice = choice;
@@ -54,9 +54,8 @@ public class DMCalculatorArrays {
 	public void pearson(final boolean absolute, final boolean centered) {
 
 		// Reset in case Spearman Rank was used
-		clusterView.setLoadText("Calculating " + type 
-				+ " Distance Matrix...");
-		
+		clusterView.setLoadText("Calculating " + type + " Distance Matrix...");
+
 		clusterView.setPBarMax(dataArrays.length);
 
 		// making sure distanceList is clear
@@ -64,8 +63,8 @@ public class DMCalculatorArrays {
 
 		// take a gene
 		for (int i = 0; i < dataArrays.length; i++) {
-			
-			if(worker.isCancelled()) {
+
+			if (worker.isCancelled()) {
 				break;
 			}
 
@@ -170,15 +169,15 @@ public class DMCalculatorArrays {
 	 * correlation distance measure on the data.
 	 */
 	public void spearman() {
-		
+
 		clusterView.setLoadText("Getting " + type + " Spearman Ranks...");
 
 		for (int i = 0; i < dataArrays.length; i++) {
-			
-			if(worker.isCancelled()) {
+
+			if (worker.isCancelled()) {
 				break;
 			}
-			
+
 			clusterView.updatePBar(i);
 
 			// Make a copy row to avoid mutation
@@ -187,18 +186,18 @@ public class DMCalculatorArrays {
 			// Sort the copy row
 			Arrays.sort(copyRow);
 
-			// Iterate over sorted copy row to 
+			// Iterate over sorted copy row to
 			for (int j = 0; j < copyRow.length; j++) {
 
 				final Double rank = (double) j;
-				int index = find(dataArrays[i], copyRow[j]);
-				
-				if(index != -1) {
+				final int index = find(dataArrays[i], copyRow[j]);
+
+				if (index != -1) {
 					dataArrays[i][index] = rank;
-				
+
 				} else {
-					System.out.println("Spearman rank distance calc " +
-							"went wrong.");
+					System.out.println("Spearman rank distance calc "
+							+ "went wrong.");
 				}
 			}
 		}
@@ -218,9 +217,8 @@ public class DMCalculatorArrays {
 		double g2 = 0;
 		double gDiff = 0;
 
-		clusterView.setLoadText("Calculating " + type 
-				+ " Distance Matrix...");
-		
+		clusterView.setLoadText("Calculating " + type + " Distance Matrix...");
+
 		clusterView.setPBarMax(dataArrays.length);
 
 		// making sure distanceList is empty
@@ -228,8 +226,8 @@ public class DMCalculatorArrays {
 
 		// take a gene
 		for (int i = 0; i < dataArrays.length; i++) {
-			
-			if(worker.isCancelled()) {
+
+			if (worker.isCancelled()) {
 				break;
 			}
 
@@ -288,8 +286,7 @@ public class DMCalculatorArrays {
 		double g2 = 0;
 		double gDiff = 0;
 
-		clusterView.setLoadText("Calculating " + type 
-				+ " Distance Matrix...");
+		clusterView.setLoadText("Calculating " + type + " Distance Matrix...");
 		clusterView.setPBarMax(dataArrays.length);
 
 		// making sure distanceList is clear
@@ -297,11 +294,11 @@ public class DMCalculatorArrays {
 
 		// take a gene
 		for (int i = 0; i < dataArrays.length; i++) {
-			
-			if(worker.isCancelled()) {
+
+			if (worker.isCancelled()) {
 				break;
 			}
-			
+
 			// update progressbar
 			clusterView.updatePBar(i);
 
@@ -344,22 +341,23 @@ public class DMCalculatorArrays {
 			distanceMatrix[i] = dataDistance;
 		}
 	}
-	
+
 	/**
 	 * Finds the index of a value in a double array.
+	 * 
 	 * @param array
 	 * @param value
 	 * @return
 	 */
-	public int find(double[] array, double value) {
-	    
-		for(int i = 0; i < array.length; i++) {
-			
-			if(Math.abs(array[i] - value) < PRECISION_LEVEL) {
+	public int find(final double[] array, final double value) {
+
+		for (int i = 0; i < array.length; i++) {
+
+			if (Math.abs(array[i] - value) < PRECISION_LEVEL) {
 				return i;
 			}
-		} 
-		
+		}
+
 		return -1;
 	}
 
@@ -367,7 +365,7 @@ public class DMCalculatorArrays {
 	 * Chooses appropriate distance measure according to user GUI selection.
 	 */
 	public void measureDistance() {
-		
+
 		if (choice.equalsIgnoreCase("Pearson Correlation (uncentered)")) {
 			pearson(false, false);
 

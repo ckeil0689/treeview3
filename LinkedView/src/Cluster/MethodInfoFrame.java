@@ -72,7 +72,7 @@ import edu.stanford.genetics.treeview.core.ScrollablePanel;
 public class MethodInfoFrame {
 
 	// Frame and Model instance variables declared
-	private JFrame methodInfoFrame;
+	private final JFrame methodInfoFrame;
 	protected TreeViewFrame viewFrame;
 
 	// Various GUI Panels
@@ -113,8 +113,8 @@ public class MethodInfoFrame {
 		mainDim.setSize(rectangle.height, rectangle.height * 3 / 4);
 
 		// setup frame options
-		methodInfoFrame.setDefaultCloseOperation(
-				WindowConstants.DISPOSE_ON_CLOSE);
+		methodInfoFrame
+				.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		methodInfoFrame.setResizable(false);
 
 		// Makes the frame invisible when the window is closed
@@ -202,13 +202,14 @@ public class MethodInfoFrame {
 		// Center JFrame on screen, needs to be used after pack();
 		methodInfoFrame.setLocationRelativeTo(viewFrame.getAppFrame());
 	}
-	
+
 	/**
 	 * Sets visibility of methodInfoFrame.
+	 * 
 	 * @param visible
 	 */
-	public void setVisible(boolean visible) {
-		
+	public void setVisible(final boolean visible) {
+
 		methodInfoFrame.setVisible(visible);
 	}
 

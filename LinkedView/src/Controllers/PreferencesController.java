@@ -28,35 +28,37 @@ import edu.stanford.genetics.treeview.model.CustomLabelLoader;
 import edu.stanford.genetics.treeview.model.TVModel;
 
 /**
- * Controller for the PreferencesMenu class. Handles user interaction with
- * Swing components such as buttons.
+ * Controller for the PreferencesMenu class. Handles user interaction with Swing
+ * components such as buttons.
+ * 
  * @author CKeil
- *
+ * 
  */
 public class PreferencesController {
 
-	private TVFrameController controller;
-	private TreeViewFrame tvFrame;
-	private PreferencesMenu preferences;
+	private final TVFrameController controller;
+	private final TreeViewFrame tvFrame;
+	private final PreferencesMenu preferences;
 	private SwingWorker<Void, Integer> labelWorker;
 	private LabelLoadDialog dialog;
 	private File customFile;
-	
-	public PreferencesController(TreeViewFrame tvFrame, 
-			PreferencesMenu preferences, TVFrameController controller) {
-		
+
+	public PreferencesController(final TreeViewFrame tvFrame,
+			final PreferencesMenu preferences,
+			final TVFrameController controller) {
+
 		this.controller = controller;
 		this.tvFrame = tvFrame;
 		this.preferences = preferences;
-		
+
 		addListeners();
 	}
-	
+
 	/**
 	 * Adds all necessary listeners to the preferences instance.
 	 */
 	public void addListeners() {
-		
+
 		preferences.addWindowListener(new WindowListener());
 		preferences.addOKButtonListener(new ConfirmationListener());
 		preferences.addThemeListener(new ThemeListener());
@@ -64,20 +66,20 @@ public class PreferencesController {
 		preferences.addMenuListeners(new MenuPanelListener());
 		preferences.addComponentListener(new PreferencesComponentListener());
 	}
-	
+
 	class MenuPanelListener implements MouseListener {
-		
+
 		@Override
-		public void mouseClicked(MouseEvent arg0) {
-			
+		public void mouseClicked(final MouseEvent arg0) {
+
 			checkForColorSave();
-			
-			for(MenuPanel panel : preferences.getMenuPanelList()) {
-				
-				if(arg0.getSource().equals(panel.getMenuPanel())) {
+
+			for (final MenuPanel panel : preferences.getMenuPanelList()) {
+
+				if (arg0.getSource().equals(panel.getMenuPanel())) {
 					preferences.addMenu(panel.getLabelText());
 					panel.setSelected(true);
-					
+
 				} else {
 					panel.setSelected(false);
 				}
@@ -85,158 +87,172 @@ public class PreferencesController {
 		}
 
 		@Override
-		public void mouseEntered(MouseEvent arg0) {
-			
-			for(MenuPanel panel : preferences.getMenuPanelList()) {
-				
-				if(arg0.getSource().equals(panel.getMenuPanel())) {
+		public void mouseEntered(final MouseEvent arg0) {
+
+			for (final MenuPanel panel : preferences.getMenuPanelList()) {
+
+				if (arg0.getSource().equals(panel.getMenuPanel())) {
 					panel.setHover(true);
 				}
 			}
 		}
 
 		@Override
-		public void mouseExited(MouseEvent arg0) {
-			
-			for(MenuPanel panel : preferences.getMenuPanelList()) {
-				
-				if(arg0.getSource().equals(panel.getMenuPanel())) {
+		public void mouseExited(final MouseEvent arg0) {
+
+			for (final MenuPanel panel : preferences.getMenuPanelList()) {
+
+				if (arg0.getSource().equals(panel.getMenuPanel())) {
 					panel.setHover(false);
-				} 
+				}
 			}
 		}
 
 		@Override
-		public void mousePressed(MouseEvent arg0) {}
+		public void mousePressed(final MouseEvent arg0) {
+		}
 
 		@Override
-		public void mouseReleased(MouseEvent arg0) {}
+		public void mouseReleased(final MouseEvent arg0) {
+		}
 	}
+
 	/**
 	 * Listener for 'use custom labels' button.
+	 * 
 	 * @author CKeil
-	 *
+	 * 
 	 */
 	class CustomLabelListener implements ActionListener {
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			
-			if(tvFrame.getLoaded() && (preferences.getAnnotationChoices()[0] 
-					|| preferences.getAnnotationChoices()[1])){
-				
+		public void actionPerformed(final ActionEvent e) {
+
+			final boolean[] choices = preferences.getAnnotationChoices();
+
+			if (tvFrame.getLoaded() && (choices[0] || choices[1])) {
+
 				try {
 					customFile = tvFrame.selectFile();
-					
-				} catch (LoadException e1) {
+
+				} catch (final LoadException e1) {
 					e1.printStackTrace();
 				}
-				
-				if(customFile != null) {
-					
-					if(preferences.getAnnotationChoices()[0]) {
-						labelWorker = new LabelWorker("Row");
-					} 
-					
-					dialog = new LabelLoadDialog(tvFrame);
-					
-					// A property listener used to update the progress bar
-				    PropertyChangeListener listener = 
-				    		new PropertyChangeListener(){
-				    	
-				      public void propertyChange(PropertyChangeEvent event) {
-				        
-				    	  if ("progress".equals(event.getPropertyName())) {
-				    		  dialog.updateProgress(
-				    				  ((Integer)event.getNewValue()));
-				    	  }
-				      }
-				    };
-				    labelWorker.addPropertyChangeListener(listener);
-				    
-					labelWorker.execute();
-					
-					// After executing SwingWorker to prevent the dialog
-					// from blocking the background task.
-					dialog.setVisible(true);
+
+				if (customFile != null) {
+					if (choices[0]) {
+						loadNewLabels("Row");
+					}
+
+					if (choices[1]) {
+						loadNewLabels("Column");
+					}
 				}
 			} else {
 				LogBuffer.println("Nothing selected.");
 			}
 		}
 	}
-	
+
+	public void loadNewLabels(final String type) {
+
+		labelWorker = new LabelWorker(type);
+
+		dialog = new LabelLoadDialog(tvFrame);
+
+		// A property listener used to update the progress bar
+		final PropertyChangeListener listener = new PropertyChangeListener() {
+
+			@Override
+			public void propertyChange(final PropertyChangeEvent event) {
+
+				if ("progress".equals(event.getPropertyName())) {
+					dialog.updateProgress(((Integer) event.getNewValue()));
+				}
+			}
+		};
+		labelWorker.addPropertyChangeListener(listener);
+
+		labelWorker.execute();
+
+		// After executing SwingWorker to prevent the dialog
+		// from blocking the background task.
+		dialog.setVisible(true);
+	}
+
 	/**
 	 * Listener for the "Ok" button in the preferences frame.
+	 * 
 	 * @author CKeil
-	 *
+	 * 
 	 */
 	class ConfirmationListener implements ActionListener {
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
-		
+		public void actionPerformed(final ActionEvent e) {
+
 			checkForColorSave();
 			preferences.getPreferencesFrame().dispose();
 		}
-		
 	}
-	
+
 	/**
 	 * WindowAdapter for the Preferences menu.
+	 * 
 	 * @author CKeil
-	 *
+	 * 
 	 */
 	class WindowListener extends WindowAdapter {
-		
+
 		@Override
 		public void windowClosing(final WindowEvent we) {
-			
+
 			checkForColorSave();
 			preferences.getPreferencesFrame().dispose();
 		}
 	}
-	
+
 	/**
 	 * Listener for the theme switch button.
+	 * 
 	 * @author CKeil
-	 *
+	 * 
 	 */
 	class ThemeListener implements ActionListener {
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			
+		public void actionPerformed(final ActionEvent e) {
+
 			new ThemeResetter(e).run();
 		}
 	}
-	
+
 	class ThemeResetter extends SwingWorker<Void, Void> {
 
-		private ActionEvent event;
-		
-		ThemeResetter(ActionEvent e) {
-			
+		private final ActionEvent event;
+
+		ThemeResetter(final ActionEvent e) {
+
 			this.event = e;
 		}
-		
+
 		@Override
 		protected Void doInBackground() throws Exception {
-			
+
 			boolean light = false;
-			
-			if(event.getSource().equals(preferences.getLightButton())) {
-				light = true;	
+
+			if (event.getSource().equals(preferences.getLightButton())) {
+				light = true;
 			}
-			
+
 			updateCheck(light);
 			return null;
 		}
-		
+
 		/**
 		 * Switches the theme between day and night.
 		 */
-		public void updateCheck(boolean light) {
+		public void updateCheck(final boolean light) {
 
 			if (light) {
 				GUIParams.setDayLight();
@@ -249,18 +265,17 @@ public class PreferencesController {
 				resetTheme();
 			}
 		}
-		
+
 		/**
-		 * Clears the TVFrame from the current view and loads the 
-		 * new appropriate view with new color parameters.
+		 * Clears the TVFrame from the current view and loads the new
+		 * appropriate view with new color parameters.
 		 */
 		public void resetTheme() {
-			
+
 			preferences.setupLayout(StringRes.menu_title_Theme);
 			addListeners();
-			
-			if (tvFrame.getDataModel() != null 
-					&& tvFrame.getRunning() != null) {
+
+			if (tvFrame.getDataModel() != null && tvFrame.getRunning() != null) {
 				tvFrame.setView(StringRes.view_Dendro);
 				controller.addViewListeners();
 
@@ -270,110 +285,112 @@ public class PreferencesController {
 			}
 		}
 	}
-	
+
 	class PreferencesComponentListener implements ComponentListener {
 
 		@Override
-		public void componentHidden(ComponentEvent arg0) {}
+		public void componentHidden(final ComponentEvent arg0) {
+		}
 
 		@Override
-		public void componentMoved(ComponentEvent arg0) {}
+		public void componentMoved(final ComponentEvent arg0) {
+		}
 
 		@Override
-		public void componentResized(ComponentEvent arg0) {
-			
+		public void componentResized(final ComponentEvent arg0) {
+
 			preferences.getPreferencesFrame().getContentPane().repaint();
 		}
 
 		@Override
-		public void componentShown(ComponentEvent arg0) {}
-		
-		
+		public void componentShown(final ComponentEvent arg0) {
+		}
+
 	}
-	
+
 	/**
-	 * Saves color presets if the currently shown menu is Color Settings
-	 * and the 'Custom' JRadioButton is selected.
+	 * Saves color presets if the currently shown menu is Color Settings and the
+	 * 'Custom' JRadioButton is selected.
 	 */
 	public void checkForColorSave() {
-		
-		if(preferences.getActiveMenu().equalsIgnoreCase(
-				StringRes.menu_title_Color) 
+
+		if (preferences.getActiveMenu().equalsIgnoreCase(
+				StringRes.menu_title_Color)
 				&& preferences.getGradientPick().isCustomSelected()) {
 			preferences.getGradientPick().saveStatus();
 		}
 	}
-	
+
 	/**
-	 * Sets up a SwingWorker to run a background thread while loading the 
-	 * custom labels.
+	 * Sets up a SwingWorker to run a background thread while loading the custom
+	 * labels.
 	 */
 	class LabelWorker extends SwingWorker<Void, Integer> {
 
-		private String type;
-		
-		public LabelWorker(String type) {
-			
+		private final String type;
+
+		public LabelWorker(final String type) {
+
 			this.type = type;
 		}
-		
+
 		@Override
 		protected Void doInBackground() throws Exception {
-			
-			TVModel model = (TVModel)tvFrame.getDataModel();
-			
+
+			final TVModel model = (TVModel) tvFrame.getDataModel();
+
 			HeaderInfo headerInfo = null;
-			if(type.equalsIgnoreCase("Row")) {
-				headerInfo = model.getGeneHeaderInfo(); 
-				
-			} else if(type.equalsIgnoreCase("Column")){
+			if (type.equalsIgnoreCase("Row")) {
+				headerInfo = model.getGeneHeaderInfo();
+
+			} else if (type.equalsIgnoreCase("Column")) {
 				headerInfo = model.getArrayHeaderInfo();
 			}
-			
+
 			// Load new labels
-			CustomLabelLoader clLoader = new CustomLabelLoader(tvFrame, 
+			final CustomLabelLoader clLoader = new CustomLabelLoader(tvFrame,
 					headerInfo, preferences.getSelectedLabelIndexes());
-			
+
 			clLoader.load(customFile);
-			
-			int headerNum = clLoader.checkForHeaders(model);
-			
+
+			final int headerNum = clLoader.checkForHeaders(model);
+
 			// Change headerArrays (without matching actual names first)
-			String[][] oldHeaders = headerInfo.getHeaderArray();
-			String[] oldNames = headerInfo.getNames();
-			
-			String[][] headersToAdd = 
-					new String[oldHeaders.length + headerNum][];
-			
+			final String[][] oldHeaders = headerInfo.getHeaderArray();
+			final String[] oldNames = headerInfo.getNames();
+
+			final String[][] headersToAdd = new String[oldHeaders.length
+					+ headerNum][];
+
 			// Iterate over loadedLabels
-			for(int i = 0; i < oldHeaders.length; i++) {
-				
-				headersToAdd[i] = clLoader.replaceLabel(oldHeaders[i], 
-						oldNames);
-				
-				setProgress((i + 1) * 100 /oldHeaders.length);
+			for (int i = 0; i < oldHeaders.length; i++) {
+
+				headersToAdd[i] = clLoader
+						.replaceLabel(oldHeaders[i], oldNames);
+
+				setProgress((i + 1) * 100 / oldHeaders.length);
 			}
-			
+
 			clLoader.setHeaders(model, type, headersToAdd);
-			
+
 			return null;
 		}
-		
+
 		@Override
-		protected void process(List<Integer> chunks) {
-			
+		protected void process(final List<Integer> chunks) {
+
 			dialog.setPBarMax(chunks.get(0));
 		}
-		
+
 		@Override
 		protected void done() {
-			
+
 			// Close dialog
 			dialog.dispose();
-			
+
 			// Refresh labels
 			preferences.synchronizeAnnotation();
-			
+
 			preferences.setupLayout(StringRes.menu_title_RowAndCol);
 			addListeners();
 		}

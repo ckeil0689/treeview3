@@ -46,7 +46,7 @@ import java.util.prefs.Preferences;
  */
 
 public class CDTFileSet extends FileSet {
-	
+
 	private Preferences node = null;
 
 	@Override
@@ -85,7 +85,7 @@ public class CDTFileSet extends FileSet {
 	public CDTFileSet(final String cdt, final String dir) {
 
 		super(dir);
-//		node = new DummyConfigNode("FileSet");
+		// node = new DummyConfigNode("FileSet");
 		node = Preferences.userRoot().node(this.getClass().getName());
 		setCdt(cdt);
 	}
@@ -137,7 +137,7 @@ public class CDTFileSet extends FileSet {
 	 */
 	@Override
 	public String getExt() {
-		
+
 		return node.get("cdt", ".cdt");
 	}
 
@@ -163,7 +163,7 @@ public class CDTFileSet extends FileSet {
 	 */
 	@Override
 	public void setExt(final String string) {
-		
+
 		node.put("cdt", string);
 	}
 

@@ -54,9 +54,9 @@ public class SettingsPanelHolder extends JPanel {
 	 *            ConfigNode to store on a save.
 	 */
 	public SettingsPanelHolder(final Window w, final Preferences c) {
-		
+
 		super();
-		
+
 		window = w;
 		configNode = c;
 		setLayout(new BorderLayout());
@@ -64,7 +64,7 @@ public class SettingsPanelHolder extends JPanel {
 	}
 
 	public void synchronizeTo() {
-		
+
 		final int n = this.getComponentCount();
 		for (int i = 0; i < n; i++) {
 			synchronizeTo(i);
@@ -72,10 +72,10 @@ public class SettingsPanelHolder extends JPanel {
 	}
 
 	public void synchronizeTo(final int i) {
-		
+
 		try {
 			((SettingsPanel) getComponent(i)).synchronizeTo();
-			
+
 		} catch (final ClassCastException e) {
 			// ignore
 		}
@@ -133,8 +133,8 @@ public class SettingsPanelHolder extends JPanel {
 					} else {
 						try {
 							configNode.flush();
-							
-						} catch (BackingStoreException e1) {
+
+						} catch (final BackingStoreException e1) {
 							e1.printStackTrace();
 						}
 					}

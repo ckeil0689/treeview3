@@ -427,15 +427,15 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 	}
 
 	public static final void main(final String[] argv) {
-		
+
 		final HeaderInfo aH = new DummyHeaderInfo();
 		final HeaderInfo gH = new DummyHeaderInfo();
 		final MapContainer aMap = new MapContainer("Fixed", "FixedMap");
-//		aMap.setMap("Fixed");
+		// aMap.setMap("Fixed");
 		aMap.setScale(10);
 		aMap.setIndexRange(0, aH.getNumHeaders());
 		final MapContainer gMap = new MapContainer("Fixed", "FixedMap");
-//		gMap.setMap("Fixed");
+		// gMap.setMap("Fixed");
 		gMap.setScale(12);
 		gMap.setIndexRange(0, gH.getNumHeaders());
 		final TreeSelectionI gsel = new TreeSelection(gH.getNumHeaders());
@@ -454,10 +454,11 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 
 	/**
 	 * Creates a new "File" configuration node
+	 * 
 	 * @return
 	 */
 	public Preferences createSubNode() {
-		
+
 		return root.node("File");
 	}
 
@@ -1515,17 +1516,17 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 	class HeaderSelectionPanel extends JPanel {
 
 		private static final long serialVersionUID = 1L;
-		
+
 		private final JCheckBox geneAnnoInside, arrayAnnoInside;
-		private final HeaderSummary geneSummary = 
-				new HeaderSummary("GeneSummary");
+		private final HeaderSummary geneSummary = new HeaderSummary(
+				"GeneSummary");
 
 		public HeaderSummary getGeneSummary() {
 			return geneSummary;
 		}
 
-		private final HeaderSummary arraySummary = 
-				new HeaderSummary("ArraySummary");
+		private final HeaderSummary arraySummary = new HeaderSummary(
+				"ArraySummary");
 
 		public HeaderSummary getArraySummary() {
 			return arraySummary;

@@ -100,8 +100,8 @@ public abstract class ModelViewProduced extends ModelView {
 
 		// Rectangle clip = g.getClipBounds();
 		// System.out.println("Entering " + viewName() + " to clip " + clip );
-//		super.paintComponent(g);
-		
+		// super.paintComponent(g);
+
 		final Dimension newsize = getSize();
 		if (newsize == null) {
 			return;

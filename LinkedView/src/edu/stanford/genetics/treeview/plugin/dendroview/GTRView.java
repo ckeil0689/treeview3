@@ -61,7 +61,7 @@ public class GTRView extends ModelViewBuffered implements MouseListener,
 	private TreeSelectionI geneSelection;
 	private LinearTransformation xScaleEq;
 	private LinearTransformation yScaleEq;
-	
+
 	private final boolean ISLEFT = true;
 
 	/**
@@ -76,7 +76,7 @@ public class GTRView extends ModelViewBuffered implements MouseListener,
 		addMouseListener(this);
 		addKeyListener(this);
 	}
-	
+
 	/**
 	 * Set the drawer
 	 * 
@@ -277,27 +277,26 @@ public class GTRView extends ModelViewBuffered implements MouseListener,
 			TreeDrawerNode cand = null;
 			if (geneSelection.getNSelectedIndexes() > 0) {
 				// Select the array node if only a single array is selected.
-				if (geneSelection.getMinIndex() 
-						== geneSelection.getMaxIndex()) {
+				if (geneSelection.getMinIndex() == geneSelection.getMaxIndex()) {
 					cand = drawer.getLeaf(geneSelection.getMinIndex());
-				} 
+				}
 				// select the root node if all genes are selected.
 				else if ((geneSelection.getMinIndex() == map.getMinIndex())
 						&& (geneSelection.getMaxIndex() == map.getMaxIndex())) {
 					cand = drawer.getRootNode();
-			
+
 					// find node when multiple arrays are selected.
 				}
-//				} else if(geneSelection.getMinIndex() >= map.getMinIndex() 
-//						&& geneSelection.getMaxIndex() <= map.getMaxIndex()) {
-//					cand = drawer.getNearestNode(geneSelection.getMinIndex(), 
-//							geneSelection.getMaxIndex());
-//				}
+				// } else if(geneSelection.getMinIndex() >= map.getMinIndex()
+				// && geneSelection.getMaxIndex() <= map.getMaxIndex()) {
+				// cand = drawer.getNearestNode(geneSelection.getMinIndex(),
+				// geneSelection.getMaxIndex());
+				// }
 			}
 
 			if ((cand != null)
-					&& !(cand.getId().equalsIgnoreCase(
-							geneSelection.getSelectedNode()))) {
+					&& !(cand.getId().equalsIgnoreCase(geneSelection
+							.getSelectedNode()))) {
 				geneSelection.setSelectedNode(cand.getId());
 				geneSelection.notifyObservers();
 
@@ -308,7 +307,7 @@ public class GTRView extends ModelViewBuffered implements MouseListener,
 		} else {
 			LogBuffer.println(viewName() + "Got an update from unknown " + o);
 		}
-		
+
 		revalidate();
 		repaint();
 	}

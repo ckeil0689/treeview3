@@ -1,12 +1,9 @@
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JPanel;
@@ -54,7 +51,7 @@ public class ColorExtractorEditor2 extends JPanel {
 
 			removeAll();
 			this.setOpaque(false);
-			final JButton pushButton = GUIParams.setButtonLayout("Missing", 
+			final JButton pushButton = GUIParams.setButtonLayout("Missing",
 					null);
 			pushButton.addActionListener(new ActionListener() {
 
@@ -66,7 +63,7 @@ public class ColorExtractorEditor2 extends JPanel {
 									+ "Missing", colorExtractor.getMissing());
 					if (trial != null) {
 						colorExtractor.setMissingColor(trial);
-						
+
 						colorExtractor.notifyObservers();
 						repaint();
 					}

@@ -12,144 +12,146 @@ import edu.stanford.genetics.treeview.TreeViewFrame;
  * This class contains all the different actions which are being mapped to
  * JMenuItems using ActionListener. GUI related actions will be called from
  * TVFrame, other stuff in the Controller.
+ * 
  * @author CKeil
- *
+ * 
  */
 public class MenubarActions {
 
-	private TreeViewFrame tvFrame;
-	private TVFrameController controller;
-	
+	private final TreeViewFrame tvFrame;
+	private final TVFrameController controller;
+
 	private enum CLEARNODES {
-		
-		
+
 	}
-	
-	public MenubarActions(TreeViewFrame tvFrame, 
-			TVFrameController controller) {
-		
+
+	public MenubarActions(final TreeViewFrame tvFrame,
+			final TVFrameController controller) {
+
 		this.tvFrame = tvFrame;
 		this.controller = controller;
 	}
-	
+
 	/**
-	 * Executes a certain function based on which menuItem was clicked
-	 * by the user.
+	 * Executes a certain function based on which menuItem was clicked by the
+	 * user.
+	 * 
 	 * @param name
 	 */
-	public void execute(String name) {
-		
-		if(name.equalsIgnoreCase("Open")) {
+	public void execute(final String name) {
+
+		if (name.equalsIgnoreCase("Open")) {
 			controller.openFile();
-			
-		} else if(name.equalsIgnoreCase("Save")) {
+
+		} else if (name.equalsIgnoreCase("Save")) {
 			controller.doModelSave(true);
-			
-		} else if(name.equalsIgnoreCase("Save As")) {
+
+		} else if (name.equalsIgnoreCase("Save As")) {
 			controller.saveModelAs();
-			
-		} else if(name.equalsIgnoreCase("Edit Recent Files")) {
+
+		} else if (name.equalsIgnoreCase("Edit Recent Files")) {
 			tvFrame.showRecentFileEditor();
-			
-		} else if(name.equalsIgnoreCase("Quit Program")) {
+
+		} else if (name.equalsIgnoreCase("Quit Program")) {
 			try {
-//				tvFrame.getApp().closeAllWindows();
+				// tvFrame.getApp().closeAllWindows();
 				tvFrame.closeWindow();
-				
+
 			} catch (final Exception e) {
 				System.out.println("While trying to exit, got error " + e);
 				System.exit(1);
 			}
-			
-		} else if(name.equalsIgnoreCase(StringRes.menu_title_Theme)
+
+		} else if (name.equalsIgnoreCase(StringRes.menu_title_Theme)
 				|| name.equalsIgnoreCase(StringRes.menu_title_Font)
-				|| name.equalsIgnoreCase(StringRes.menu_title_URL)){
+				|| name.equalsIgnoreCase(StringRes.menu_title_URL)) {
 			controller.openPrefMenu(name, "Aesthetics");
-			
-		} else if(name.equalsIgnoreCase(StringRes.menu_title_RowAndCol)
+
+		} else if (name.equalsIgnoreCase(StringRes.menu_title_RowAndCol)
 				|| name.equalsIgnoreCase(StringRes.menu_title_Color)) {
 			controller.openPrefMenu(name, "Options");
-			
-		} else if(name.equalsIgnoreCase(StringRes.menubar_clearPrefs)) {
-			ConfirmDialog confirmClear = new ConfirmDialog(tvFrame, 
+
+		} else if (name.equalsIgnoreCase(StringRes.menubar_clearPrefs)) {
+			final ConfirmDialog confirmClear = new ConfirmDialog(tvFrame,
 					"clear preferences");
 			confirmClear.setVisible(true);
-			
-			if(confirmClear.getConfirmed()) {
+
+			if (confirmClear.getConfirmed()) {
 				removeAllKeys(tvFrame.getConfigNode());
 			}
-				
-		} else if(name.equalsIgnoreCase(StringRes.menu_title_Hier)) {
+
+		} else if (name.equalsIgnoreCase(StringRes.menu_title_Hier)) {
 			controller.setupClusterView(StringRes.menu_title_Hier);
-			
-		} else if(name.equalsIgnoreCase(StringRes.menu_title_KMeans)) {
+
+		} else if (name.equalsIgnoreCase(StringRes.menu_title_KMeans)) {
 			controller.setupClusterView(StringRes.menu_title_KMeans);
-			
-		} else if(name.equalsIgnoreCase("Functional Enrichment")) {
+
+		} else if (name.equalsIgnoreCase("Functional Enrichment")) {
 			tvFrame.displayWIP();
-			
-		} else if(name.equalsIgnoreCase("Stats")) {
-			tvFrame.openStatsView();	
-			
-		} else if(name.equalsIgnoreCase("Save List")) {
+
+		} else if (name.equalsIgnoreCase("Stats")) {
+			tvFrame.openStatsView();
+
+		} else if (name.equalsIgnoreCase("Save List")) {
 			controller.saveList();
-			
-		} else if(name.equalsIgnoreCase("Save Data")) {
+
+		} else if (name.equalsIgnoreCase("Save Data")) {
 			controller.saveData();
-			
-		} else if(name.equalsIgnoreCase("New Window")) {
+
+		} else if (name.equalsIgnoreCase("New Window")) {
 			tvFrame.createNewFrame().getAppFrame().setVisible(true);
-			
-//		} else if(name.equalsIgnoreCase("Close Window")) {
-//			tvFrame.closeWindow();
-			
-		} else if(name.equalsIgnoreCase("About...")) {
+
+			// } else if(name.equalsIgnoreCase("Close Window")) {
+			// tvFrame.closeWindow();
+
+		} else if (name.equalsIgnoreCase("About...")) {
 			tvFrame.showAboutWindow();
-			
-		} else if(name.equalsIgnoreCase("Documentation...")) {
+
+		} else if (name.equalsIgnoreCase("Documentation...")) {
 			tvFrame.showDocumentation();
-			
-		} else if(name.equalsIgnoreCase("Show Log")) {
+
+		} else if (name.equalsIgnoreCase("Show Log")) {
 			tvFrame.showLogMessages();
 		}
 	}
-	
+
 	/**
 	 * Recursive method to remove all keys from all nodes, starting from the
 	 * original parent node on which this method is called.
+	 * 
 	 * @param parentNode
 	 */
-	public void removeAllKeys(Preferences parentNode) {
-		
+	public void removeAllKeys(final Preferences parentNode) {
+
 		try {
-			if(!tvFrame.getLoaded()) {
+			if (!tvFrame.getLoaded()) {
 				parentNode.clear();
-				Preferences fileNode = parentNode.node(
-						StringRes.pref_node_File);
-				String[] models = fileNode.childrenNames();
-				
-				for(int i = 0; i < models.length; i++) {
-					
+				final Preferences fileNode = parentNode
+						.node(StringRes.pref_node_File);
+				final String[] models = fileNode.childrenNames();
+
+				for (int i = 0; i < models.length; i++) {
+
 					fileNode.node(models[i]).removeNode();
 				}
-				
+
 			} else {
-//				parentNode.clear();
-//				
-//				String[] childrenNodes = parentNode.childrenNames();
-//				
-//				if(childrenNodes.length > 0)
-//				for(int i = 0; i < childrenNodes.length; i++) {
-//					
-//					removeAllKeys(parentNode.node(childrenNodes[i]));
-//				}
+				// parentNode.clear();
+				//
+				// String[] childrenNodes = parentNode.childrenNames();
+				//
+				// if(childrenNodes.length > 0)
+				// for(int i = 0; i < childrenNodes.length; i++) {
+				//
+				// removeAllKeys(parentNode.node(childrenNodes[i]));
+				// }
 			}
-			
-		} catch (BackingStoreException e) {
-			LogBuffer.println("Error when removing Preferences " +
-					"keys: " + e.getMessage());
+
+		} catch (final BackingStoreException e) {
+			LogBuffer.println("Error when removing Preferences " + "keys: "
+					+ e.getMessage());
 			e.printStackTrace();
 		}
-		
+
 	}
 }

@@ -382,7 +382,18 @@
 	
 </target>
 
+<taskdef name="bundleapp"
+             classname="com.oracle.appbundler.AppBundlerTask"   
+             classpath="lib/appbundler-1.0.jar" />
 
-
+    <target name="bundle-treeView3">
+        <bundleapp outputdirectory="dist"
+            name="TreeView3"
+            displayname="TreeView 3"
+            identifier="components.TreeView3"
+            mainclassname="components.TreeView3">
+            <classpath file="dist/TreeView3.jar" />
+        </bundleapp>
+    </target>
 
 </project>

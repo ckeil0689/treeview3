@@ -37,13 +37,13 @@ import javax.swing.JWindow;
 public interface DendroPanel {
 
 	public void refresh();
-	
+
 	public void addDendroMenus(JMenu menu);
-	
+
 	public void addClusterMenus(JMenu menu);
-	
+
 	public JWindow openSearchPanel();
-	
+
 	public void setTreesVisible(boolean visible);
 
 	/**

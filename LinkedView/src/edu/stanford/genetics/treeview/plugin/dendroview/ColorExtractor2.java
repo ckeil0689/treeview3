@@ -39,11 +39,11 @@ import edu.stanford.genetics.treeview.LogBuffer;
  * @version @version $Revision: 1.2 $ $Date: 2007-07-13 02:33:47 $
  */
 
-public class ColorExtractor2 extends Observable implements ConfigNodePersistent,
-		ContrastSelectable {
-	
+public class ColorExtractor2 extends Observable implements
+		ConfigNodePersistent, ContrastSelectable {
+
 	private final double PRECISION_LEVEL = 0.0001;
-	
+
 	private ColorSet2 defaultColorSet;
 	private final double default_contrast = 3.0;
 	private final ColorSet2 colorSet = new ColorSet2();// Will be backed by
@@ -53,16 +53,16 @@ public class ColorExtractor2 extends Observable implements ConfigNodePersistent,
 	private double m_logCenter = 1.0;
 	private double m_logBaseDivisor;
 	private double m_logBase;
-	
+
 	private double dataMin;
 	private double dataMax;
-	
+
 	private ArrayList<Color> colorList;
 	private float[] fractions;
-	
-	private ArrayList<Color> colorList_default;
-	private float[] fractions_default;
-	
+
+	private final ArrayList<Color> colorList_default;
+	private final float[] fractions_default;
+
 	private Preferences configNode;
 	private double contrast = default_contrast;
 
@@ -75,34 +75,34 @@ public class ColorExtractor2 extends Observable implements ConfigNodePersistent,
 
 	/** Constructor for the ColorExtractor object */
 	public ColorExtractor2() {
-		
+
 		// set a default defaultColorSet... should be superceded by a user
 		// setting...
-//		defaultColorSet = new ColorSet2();
-//		defaultColorSet.setMissing(ColorSet.decodeColor("#909090"));
-//		defaultColorSet.setEmpty(ColorSet.decodeColor("#FFFFFF"));
+		// defaultColorSet = new ColorSet2();
+		// defaultColorSet.setMissing(ColorSet.decodeColor("#909090"));
+		// defaultColorSet.setEmpty(ColorSet.decodeColor("#FFFFFF"));
 		colorList_default = new ArrayList<Color>();
 		colorList_default.add(Color.red);
 		colorList_default.add(Color.black);
 		colorList_default.add(Color.green);
-		
+
 		fractions_default = new float[3];
 		fractions_default[0] = 0.0f;
 		fractions_default[1] = 0.5f;
 		fractions_default[2] = 1.0f;
-		
+
 		setDefaultColorSet(defaultColorSet);
 		setLogBase(2.0);
 	}
-	
-	public void setMinMax(double min, double max) {
-		
+
+	public void setMinMax(final double min, final double max) {
+
 		this.dataMin = min;
 		this.dataMax = max;
 	}
-	
-	public void setNewParams(float[] frac, ArrayList<Color> cl) {
-		
+
+	public void setNewParams(final float[] frac, final ArrayList<Color> cl) {
+
 		fractions = frac;
 		colorList = cl;
 		setChanged();
@@ -114,56 +114,56 @@ public class ColorExtractor2 extends Observable implements ConfigNodePersistent,
 	 * default colors are.
 	 */
 	public void setDefaultColorSet(final ColorSet2 set) {
-		
+
 		defaultColorSet = set;
 	}
 
-//	/**
-//	 * binds this ColorExtractor to a particular ConfigNode. This makes colors
-//	 * persistent
-//	 * 
-//	 * @param configNode
-//	 *            confignode to bind to
-//	 */
-//	@Override
-//	public void bindConfig(final Preferences configNode) {
-//		
-//		if (root != configNode) {
-//			
-//			root = configNode;
-//			try {
-//				String[] childrenNodes = root.childrenNames();
-//				boolean nodePresent = false;
-//				
-//				for(int i = 0; i < childrenNodes.length; i++) {
-//					
-//					// This should later be about the children of ColorSet
-//					if(childrenNodes[i].equalsIgnoreCase("ColorSet")) {
-//						nodePresent = true;
-//					}
-//				}
-//				
-////				Preferences cand = root.fetchFirst("ColorSet");
-////				if (cand == null) {
-////					cand = root.create("ColorSet");
-////				}
-//				
-//				Preferences cand = root.node("ColorSet");
-//
-//				colorSet.bindConfig(cand);
-//				synchFloats();
-//				contrast = root.getDouble("contrast", getContrast());
-//				setLogCenter(root.getDouble("logcenter", 1.0));
-//				setLogBase(root.getDouble("logbase", 2.0));
-//				m_logTranform = (root.getInt("logtransform", 0) == 1);
-//				setChanged();
-//				
-//			} catch (BackingStoreException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//	}
-	
+	// /**
+	// * binds this ColorExtractor to a particular ConfigNode. This makes colors
+	// * persistent
+	// *
+	// * @param configNode
+	// * confignode to bind to
+	// */
+	// @Override
+	// public void bindConfig(final Preferences configNode) {
+	//
+	// if (root != configNode) {
+	//
+	// root = configNode;
+	// try {
+	// String[] childrenNodes = root.childrenNames();
+	// boolean nodePresent = false;
+	//
+	// for(int i = 0; i < childrenNodes.length; i++) {
+	//
+	// // This should later be about the children of ColorSet
+	// if(childrenNodes[i].equalsIgnoreCase("ColorSet")) {
+	// nodePresent = true;
+	// }
+	// }
+	//
+	// // Preferences cand = root.fetchFirst("ColorSet");
+	// // if (cand == null) {
+	// // cand = root.create("ColorSet");
+	// // }
+	//
+	// Preferences cand = root.node("ColorSet");
+	//
+	// colorSet.bindConfig(cand);
+	// synchFloats();
+	// contrast = root.getDouble("contrast", getContrast());
+	// setLogCenter(root.getDouble("logcenter", 1.0));
+	// setLogBase(root.getDouble("logbase", 2.0));
+	// m_logTranform = (root.getInt("logtransform", 0) == 1);
+	// setChanged();
+	//
+	// } catch (BackingStoreException e) {
+	// e.printStackTrace();
+	// }
+	// }
+	// }
+
 	/**
 	 * binds this ColorExtractor to a particular ConfigNode. This makes colors
 	 * persistent
@@ -172,86 +172,87 @@ public class ColorExtractor2 extends Observable implements ConfigNodePersistent,
 	 *            confignode to bind to
 	 */
 	@Override
-	public void setConfigNode(Preferences parentNode) {
-		
+	public void setConfigNode(final Preferences parentNode) {
+
 		if (parentNode != null) {
 			this.configNode = parentNode.node("ColorExtractor");
-			
+
 		} else {
-			LogBuffer.println("Could not find or create ColorExtractor2 " +
-					"node because parentNode was null.");
+			LogBuffer.println("Could not find or create ColorExtractor2 "
+					+ "node because parentNode was null.");
 		}
-		
-//			String[] childrenNodes = root.childrenNames();
-//			boolean nodePresent = false;
-//			
-//			for(int i = 0; i < childrenNodes.length; i++) {
-//				
-//				// This should later be about the children of ColorSet
-//				if(childrenNodes[i].equalsIgnoreCase("ColorSet" + i)) {
-//					nodePresent = true;
-//				}
-//			}
-			
-//				Preferences cand = root.fetchFirst("ColorSet");
-//				if (cand == null) {
-//					cand = root.create("ColorSet");
-//				}
-			
-//			Preferences cand = root.node("ColorSet1");
-		
-//		String[] childrenNodes = this.getRootChildrenNodes();
-//		
-//		// Get first colorSet
-//		String firstColorSet = null;
-//		for(String node : childrenNodes) {
-//			
-//			if(node.contains("ColorSet")) {
-//				firstColorSet = node;
-//			}
-//		}
-//
-//		if(firstColorSet != null) {
-//			colorSet.setConfigNode(configNode.node(firstColorSet));
-//			
-//		} else {
-//			LogBuffer.println("Could not find or create ColorSet " +
-//					"node in ColorExtractor2 because parentNode was null.");
-//		}
-		
+
+		// String[] childrenNodes = root.childrenNames();
+		// boolean nodePresent = false;
+		//
+		// for(int i = 0; i < childrenNodes.length; i++) {
+		//
+		// // This should later be about the children of ColorSet
+		// if(childrenNodes[i].equalsIgnoreCase("ColorSet" + i)) {
+		// nodePresent = true;
+		// }
+		// }
+
+		// Preferences cand = root.fetchFirst("ColorSet");
+		// if (cand == null) {
+		// cand = root.create("ColorSet");
+		// }
+
+		// Preferences cand = root.node("ColorSet1");
+
+		// String[] childrenNodes = this.getRootChildrenNodes();
+		//
+		// // Get first colorSet
+		// String firstColorSet = null;
+		// for(String node : childrenNodes) {
+		//
+		// if(node.contains("ColorSet")) {
+		// firstColorSet = node;
+		// }
+		// }
+		//
+		// if(firstColorSet != null) {
+		// colorSet.setConfigNode(configNode.node(firstColorSet));
+		//
+		// } else {
+		// LogBuffer.println("Could not find or create ColorSet " +
+		// "node in ColorExtractor2 because parentNode was null.");
+		// }
+
 		String lastActive = "RedGreen";
 		try {
-			if(parentNode.nodeExists("GradientChooser")) {
+			if (parentNode.nodeExists("GradientChooser")) {
 				lastActive = parentNode.node("GradientChooser").get(
 						"activeColors", lastActive);
 			}
-		
-			// Set colorList and fractionList here, based on what the last active
+
+			// Set colorList and fractionList here, based on what the last
+			// active
 			// node was in GradientColorChooser. Otherwise keep defaults?
-			Preferences colorPresetNode = parentNode.node("ColorPresets");
-			String[] childrenNodes = colorPresetNode.childrenNames();
-			
-			for(int i = 0; i < childrenNodes.length; i++) {
-				
-				if(colorPresetNode.node(childrenNodes[i]).get("name", 
-						lastActive).equalsIgnoreCase(lastActive)) {
-					colorSet.setConfigNode(colorPresetNode.node(
-							childrenNodes[i]));
+			final Preferences colorPresetNode = parentNode.node("ColorPresets");
+			final String[] childrenNodes = colorPresetNode.childrenNames();
+
+			for (int i = 0; i < childrenNodes.length; i++) {
+
+				if (colorPresetNode.node(childrenNodes[i])
+						.get("name", lastActive).equalsIgnoreCase(lastActive)) {
+					colorSet.setConfigNode(colorPresetNode
+							.node(childrenNodes[i]));
 					break;
 				}
 			}
-		} catch (BackingStoreException e) {
+		} catch (final BackingStoreException e) {
 			e.printStackTrace();
 		}
-		
-		String[] colors = colorSet.getColors();
-		ArrayList<Color> cList = new ArrayList<Color>(colors.length);
-		for(String color : colors) {
+
+		final String[] colors = colorSet.getColors();
+		final ArrayList<Color> cList = new ArrayList<Color>(colors.length);
+		for (final String color : colors) {
 			cList.add(Color.decode(color));
 		}
-			
+
 		setNewParams(colorSet.getFractions(), cList);
-//		synchFloats();
+		// synchFloats();
 		contrast = configNode.getDouble("contrast", getContrast());
 		setLogCenter(configNode.getDouble("logcenter", 1.0));
 		setLogBase(configNode.getDouble("logbase", 2.0));
@@ -267,10 +268,10 @@ public class ColorExtractor2 extends Observable implements ConfigNodePersistent,
 	 */
 	@Override
 	public void setContrast(final double contrastValue) {
-		
+
 		if (Math.abs(contrast - contrastValue) < PRECISION_LEVEL) {
 			contrast = contrastValue;
-			
+
 			if (configNode != null) {
 				configNode.putDouble("contrast", contrast);
 			}
@@ -279,10 +280,10 @@ public class ColorExtractor2 extends Observable implements ConfigNodePersistent,
 	}
 
 	public void setLogTransform(final boolean transform) {
-		
+
 		if (transform != m_logTranform) {
 			m_logTranform = transform;
-			
+
 			if (configNode != null) {
 				configNode.putInt("logtransform", transform ? 1 : 0);
 			}
@@ -291,10 +292,10 @@ public class ColorExtractor2 extends Observable implements ConfigNodePersistent,
 	}
 
 	public void setLogCenter(final double center) {
-		
+
 		if (Math.abs(m_logCenter - center) < PRECISION_LEVEL) {
 			m_logCenter = center;
-			
+
 			if (configNode != null) {
 				configNode.putDouble("logcenter", center);
 			}
@@ -303,15 +304,15 @@ public class ColorExtractor2 extends Observable implements ConfigNodePersistent,
 	}
 
 	public double getLogCenter() {
-		
+
 		return m_logCenter;
 	}
 
 	public void setLogBase(final double base) {
-		
+
 		if (Math.abs(m_logBase - base) < PRECISION_LEVEL) {
 			m_logBase = base;
-			
+
 			m_logBaseDivisor = Math.log(base);
 			if (configNode != null) {
 				configNode.putDouble("logbase", base);
@@ -321,12 +322,12 @@ public class ColorExtractor2 extends Observable implements ConfigNodePersistent,
 	}
 
 	public double getLogBase() {
-		
+
 		return m_logBase;
 	}
 
 	public boolean getLogTransform() {
-		
+
 		return m_logTranform;
 	}
 
@@ -337,7 +338,7 @@ public class ColorExtractor2 extends Observable implements ConfigNodePersistent,
 	 */
 	@Override
 	public double getContrast() {
-		
+
 		return contrast;
 	}
 
@@ -463,9 +464,9 @@ public class ColorExtractor2 extends Observable implements ConfigNodePersistent,
 		 * zeroColor[i] * ff1; } }
 		 */
 		final float[] comp;
-		if(fractions == null || colorList == null) {
+		if (fractions == null || colorList == null) {
 			comp = getFloatColor(dval, fractions_default, colorList_default);
-			
+
 		} else {
 			comp = getFloatColor(dval, fractions, colorList);
 		}
@@ -481,9 +482,9 @@ public class ColorExtractor2 extends Observable implements ConfigNodePersistent,
 	 *            Description of the Parameter
 	 * @return The floatColor value
 	 */
-	public float[] getFloatColor(double dval, float[] fractionVals, 
-			ArrayList<Color> colorVals) {
-		
+	public float[] getFloatColor(double dval, final float[] fractionVals,
+			final ArrayList<Color> colorVals) {
+
 		if (Math.abs(dval - nodata) < PRECISION_LEVEL) {
 			// System.out.println("value " + dval + " was nodata");
 			return missingColor;
@@ -499,152 +500,151 @@ public class ColorExtractor2 extends Observable implements ConfigNodePersistent,
 				dval = Math.log(dval / m_logCenter) / m_logBaseDivisor;
 			}
 			// calculate factor...
-//			double factor;
-//			if (dval < 0) {
-//				factor = -dval / contrast;
-//			} else {
-//				factor = dval / contrast;
-//			}
-//			if (factor > 1.0) {
-//				factor = 1.0;
-//			}
-//			if (factor < 0.0) {
-//				factor = 0.0;
-//			}
-//			final float ffactor = (float) factor;
-//			final float ff1 = (float) (1.0 - factor);
+			// double factor;
+			// if (dval < 0) {
+			// factor = -dval / contrast;
+			// } else {
+			// factor = dval / contrast;
+			// }
+			// if (factor > 1.0) {
+			// factor = 1.0;
+			// }
+			// if (factor < 0.0) {
+			// factor = 0.0;
+			// }
+			// final float ffactor = (float) factor;
+			// final float ff1 = (float) (1.0 - factor);
 
 			// calculate colors...
 			final float[] comp = new float[3];
-			
-//			if(dval > 0.15) {
-//				System.out.println("b");
-//			}
+
+			// if(dval > 0.15) {
+			// System.out.println("b");
+			// }
 			// How many percent away from dataMin dval is on the range.
 			// This corresponds with the fractions list and the 2 colors
 			// needed to calculate the gradient RGB-value can be deduced.
 			// Example: dval is 0.23 (=23%) of the range between dataMin and
-			// dataMax. fractions has 3 colors at [0.0, 0.5, 1.0] which is 
+			// dataMax. fractions has 3 colors at [0.0, 0.5, 1.0] which is
 			// default. That means the colors at 0.0 and 0.5 ought to be used
 			// to calculate the gradient.
-			double valueFraction = (dval - dataMin)/ (dataMax - dataMin);
-			
-			int colorIndex = 0; 
-			for(int i = 0; i < fractionVals.length; i++) {
-				
-				if(valueFraction > fractionVals[i]) {
+			final double valueFraction = (dval - dataMin) / (dataMax - dataMin);
+
+			int colorIndex = 0;
+			for (int i = 0; i < fractionVals.length; i++) {
+
+				if (valueFraction > fractionVals[i]) {
 					colorIndex = i;
 				}
 			}
-			
-			double minFraction = fractionVals[colorIndex];
+
+			final double minFraction = fractionVals[colorIndex];
 			double maxFraction = fractionVals[colorIndex];
 			double x = 0.0;
-			
+
 			int nextIndex = colorIndex;
-			if(colorIndex < fractionVals.length - 1) {
+			if (colorIndex < fractionVals.length - 1) {
 				nextIndex = colorIndex + 1;
 				maxFraction = fractionVals[nextIndex];
-				
-				// Fraction position between the two colors 
-				x = (valueFraction - minFraction)/ (maxFraction 
-						- minFraction);
-					
-				if(x < 0) {
+
+				// Fraction position between the two colors
+				x = (valueFraction - minFraction) / (maxFraction - minFraction);
+
+				if (x < 0) {
 					x = 0.0;
-					
-				} else if(x > 1.0) {
+
+				} else if (x > 1.0) {
 					x = 1.0;
 				}
 			} else {
 				x = 1.0;
 			}
-			
-			// The 2 colors		
-			Color color1 = colorVals.get(colorIndex);
-			Color color2 = colorVals.get(nextIndex);
-			
+
+			// The 2 colors
+			final Color color1 = colorVals.get(colorIndex);
+			final Color color2 = colorVals.get(nextIndex);
+
 			for (int i = 0; i < comp.length; i++) {
-				
-				if(i == 0) {
-					comp[i] = (float)((color1.getRed() * (1 - x) 
-							+ color2.getRed() * x)/ 256);
-					
-				} else if(i == 1) {
-					comp[i] = (float)((color1.getGreen() * (1 - x) 
-							+ color2.getGreen() * x) /256);
-					
-				} else if(i == 2) {
-					comp[i] = (float)((color1.getBlue() * (1 - x) 
-							+ color2.getBlue() * x) /256);
+
+				if (i == 0) {
+					comp[i] = (float) ((color1.getRed() * (1 - x) + color2
+							.getRed() * x) / 256);
+
+				} else if (i == 1) {
+					comp[i] = (float) ((color1.getGreen() * (1 - x) + color2
+							.getGreen() * x) / 256);
+
+				} else if (i == 2) {
+					comp[i] = (float) ((color1.getBlue() * (1 - x) + color2
+							.getBlue() * x) / 256);
 				}
 			}
-//			if(fractionVals.length > colorIndex) {
-//				maxFraction = fractionVals[colorIndex + 1];
-//				
-//				// Fraction position between the two colors 
-//				double x = (valueFraction - minFraction)/ (maxFraction 
-//						- minFraction);
-//					
-//				if(x < 0) {
-//					x = 0.0;
-//					
-//				} else if(x > 1.0) {
-//					x = 1.0;
-//				}
-//						
-//				// The 2 colors		
-//				Color color1 = colorVals.get(colorIndex);
-//				Color color2 = colorVals.get(colorIndex + 1);
-//				
-//				for (int i = 0; i < comp.length; i++) {
-//					
-//					if(i == 0) {
-//						comp[i] = (float)((color1.getRed() * (1 - x) 
-//								+ color2.getRed() * x)/ 256);
-//						
-//					} else if(i == 1) {
-//						comp[i] = (float)((color1.getGreen() * (1 - x) 
-//								+ color2.getGreen() * x) /256);
-//						
-//					} else if(i == 2) {
-//						comp[i] = (float)((color1.getBlue() * (1 - x) 
-//								+ color2.getBlue() * x) /256);
-//					}
-//				}
-//				
-//			} else {
-//				Color color = colorVals.get(colorIndex);
-//				for (int i = 0; i < 3; i++) {
-//					
-//					if(i == 0) {
-//						comp[i] = (float)color.getRed();
-//						
-//					} else if(i == 1) {
-//						comp[i] = (float)color.getGreen();
-//						
-//					} else if(i == 2) {
-//						comp[i] = (float)color.getBlue();
-//					}
-//				}
-//			}
+			// if(fractionVals.length > colorIndex) {
+			// maxFraction = fractionVals[colorIndex + 1];
+			//
+			// // Fraction position between the two colors
+			// double x = (valueFraction - minFraction)/ (maxFraction
+			// - minFraction);
+			//
+			// if(x < 0) {
+			// x = 0.0;
+			//
+			// } else if(x > 1.0) {
+			// x = 1.0;
+			// }
+			//
+			// // The 2 colors
+			// Color color1 = colorVals.get(colorIndex);
+			// Color color2 = colorVals.get(colorIndex + 1);
+			//
+			// for (int i = 0; i < comp.length; i++) {
+			//
+			// if(i == 0) {
+			// comp[i] = (float)((color1.getRed() * (1 - x)
+			// + color2.getRed() * x)/ 256);
+			//
+			// } else if(i == 1) {
+			// comp[i] = (float)((color1.getGreen() * (1 - x)
+			// + color2.getGreen() * x) /256);
+			//
+			// } else if(i == 2) {
+			// comp[i] = (float)((color1.getBlue() * (1 - x)
+			// + color2.getBlue() * x) /256);
+			// }
+			// }
+			//
+			// } else {
+			// Color color = colorVals.get(colorIndex);
+			// for (int i = 0; i < 3; i++) {
+			//
+			// if(i == 0) {
+			// comp[i] = (float)color.getRed();
+			//
+			// } else if(i == 1) {
+			// comp[i] = (float)color.getGreen();
+			//
+			// } else if(i == 2) {
+			// comp[i] = (float)color.getBlue();
+			// }
+			// }
+			// }
 			return comp;
 		}
 	}
 
-//	/** prints out a description of the state to standard out */
-//	public void printSelf() {
-//		System.out.println("upColor " + upColor[0] + ", " + upColor[1] + ", "
-//				+ upColor[2]);
-//		System.out.println("downColor " + downColor[0] + ", " + downColor[1]
-//				+ ", " + downColor[2]);
-//		System.out.println("zeroColor " + zeroColor[0] + ", " + zeroColor[1]
-//				+ ", " + zeroColor[2]);
-//		System.out.println("missingColor " + missingColor[0] + ", "
-//				+ missingColor[1] + ", " + missingColor[2]);
-//		System.out.println("emptyColor " + emptyColor[0] + ", " + emptyColor[1]
-//				+ ", " + emptyColor[2]);
-//	}
+	// /** prints out a description of the state to standard out */
+	// public void printSelf() {
+	// System.out.println("upColor " + upColor[0] + ", " + upColor[1] + ", "
+	// + upColor[2]);
+	// System.out.println("downColor " + downColor[0] + ", " + downColor[1]
+	// + ", " + downColor[2]);
+	// System.out.println("zeroColor " + zeroColor[0] + ", " + zeroColor[1]
+	// + ", " + zeroColor[2]);
+	// System.out.println("missingColor " + missingColor[0] + ", "
+	// + missingColor[1] + ", " + missingColor[2]);
+	// System.out.println("emptyColor " + emptyColor[0] + ", " + emptyColor[1]
+	// + ", " + emptyColor[2]);
+	// }
 
 	/**
 	 * Gets the aRGBColor attribute of the ColorExtractor object
@@ -654,11 +654,11 @@ public class ColorExtractor2 extends Observable implements ConfigNodePersistent,
 	 * @return The aRGBColor value
 	 */
 	public int getARGBColor(final double dval) {
-		
+
 		final float[] comp;
-		if(fractions == null || colorList == null) {
+		if (fractions == null || colorList == null) {
 			comp = getFloatColor(dval, fractions_default, colorList_default);
-			
+
 		} else {
 			comp = getFloatColor(dval, fractions, colorList);
 		}
@@ -669,27 +669,28 @@ public class ColorExtractor2 extends Observable implements ConfigNodePersistent,
 
 	/** resets the ColorExtractor to a default state. */
 	public void setDefaults() {
-		
+
 		setMissingColor(ColorSet2.encodeColor(defaultColorSet.getMissing()));
 		setEmptyColor(ColorSet2.encodeColor(defaultColorSet.getEmpty()));
 		setContrast(default_contrast);
 		synchFloats();
 		setChanged();
 	}
-	
+
 	/**
 	 * Returns the names of the current children of this class' root node.
+	 * 
 	 * @return
 	 */
 	public String[] getRootChildrenNodes() {
-		
-		if(configNode != null) {
+
+		if (configNode != null) {
 			String[] childrenNodes;
 			try {
 				childrenNodes = configNode.childrenNames();
 				return childrenNodes;
-				
-			} catch (BackingStoreException e) {
+
+			} catch (final BackingStoreException e) {
 				e.printStackTrace();
 				return null;
 			}

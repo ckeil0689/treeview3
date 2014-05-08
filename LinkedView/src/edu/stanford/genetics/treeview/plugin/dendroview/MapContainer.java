@@ -45,12 +45,12 @@ public class MapContainer extends Observable implements Observer,
 		AdjustmentListener, ConfigNodePersistent {
 
 	private final double PRECISION_LEVEL = 0.0001;
-	
+
 	private final String default_map = "Fixed";
 	private double default_scale = 1.0;
 	private double minScale;
 	private IntegerMap current = null;
-	private String mapName;
+	private final String mapName;
 
 	private FixedMap fixedMap = null;
 	private FillMap fillMap = null;
@@ -59,10 +59,10 @@ public class MapContainer extends Observable implements Observer,
 	private JScrollBar scrollbar = null;
 	private TreeDrawerNode selected = null;
 	private Preferences configNode = null;
-	
+
 	private double tileNumVisible;
 
-	public MapContainer(String mapName) {
+	public MapContainer(final String mapName) {
 
 		this.fixedMap = new FixedMap();
 		this.fillMap = new FillMap();
@@ -71,30 +71,30 @@ public class MapContainer extends Observable implements Observer,
 		this.mapName = mapName;
 	}
 
-	public MapContainer(final String type, String mapName) {
+	public MapContainer(final String type, final String mapName) {
 
 		this(mapName);
 		setMap(type);
 	}
-	
-	@Override
-	public void setConfigNode(Preferences parentNode) {
 
-		if(parentNode != null) {
+	@Override
+	public void setConfigNode(final Preferences parentNode) {
+
+		if (parentNode != null) {
 			this.configNode = parentNode.node(mapName);
-				
+
 		} else {
-			LogBuffer.println("Could not find or create MapContainer " +
-					"node because parentNode was null.");
+			LogBuffer.println("Could not find or create MapContainer "
+					+ "node because parentNode was null.");
 		}
 
 		// first bind subordinate maps...
 		fixedMap.setTypeString("FixedMap");
 		fixedMap.setConfigNode(configNode);
-		
+
 		fillMap.setTypeString("FillMap");
 		fillMap.setConfigNode(configNode);
-		
+
 		nullMap.setTypeString("NullMap");
 		nullMap.setConfigNode(configNode);
 
@@ -104,6 +104,7 @@ public class MapContainer extends Observable implements Observer,
 
 	/**
 	 * Sets the MapContainer's scale back to the default value.
+	 * 
 	 * @param d
 	 */
 	public void setDefaultScale(final double d) {
@@ -113,7 +114,7 @@ public class MapContainer extends Observable implements Observer,
 	}
 
 	/**
-	 * Resets the MapContainer so that it completely fills out the available 
+	 * Resets the MapContainer so that it completely fills out the available
 	 * screen space.
 	 */
 	public void setHome() {
@@ -121,32 +122,32 @@ public class MapContainer extends Observable implements Observer,
 		calculateNewMinScale();
 		setScale(minScale);
 	}
-	
+
 	public void calculateNewMinScale() {
-		
+
 		this.tileNumVisible = getMaxIndex();
 		minScale = getCalculatedMinScale();
 	}
-	
+
 	/**
 	 * Sets the scale of this MapContainer to the last saved value.
 	 */
 	public void setLastScale() {
-		
-		if(configNode != null) {
+
+		if (configNode != null) {
 			setScale(configNode.getDouble("scale", getCalculatedMinScale()));
 		}
 	}
 
 	/**
-	 * Sets the minimum scale for the available screen space so that no
-	 * white space occurs in GlobalView.
+	 * Sets the minimum scale for the available screen space so that no white
+	 * space occurs in GlobalView.
 	 */
 	public double getCalculatedMinScale() {
 
 		final double pixels = getAvailablePixels();
 		final double divider = getMaxIndex() - getMinIndex() + 1;
-		return pixels/ divider;
+		return pixels / divider;
 	}
 
 	/**
@@ -163,18 +164,18 @@ public class MapContainer extends Observable implements Observer,
 		int zoomVal;
 		double newScale = getScale();
 
-		tileNumVisible = Math.round(getAvailablePixels()/ getScale());
-		
-		zoomVal = (int)Math.round(tileNumVisible/20.0);
-		
+		tileNumVisible = Math.round(getAvailablePixels() / getScale());
+
+		zoomVal = (int) Math.round(tileNumVisible / 20.0);
+
 		// Ensure that at least one tile will be zoomed out.
-		if(zoomVal < 1) {
+		if (zoomVal < 1) {
 			zoomVal = 1;
 		}
-		
+
 		tileNumVisible = tileNumVisible + zoomVal;
-		
-		newScale = getAvailablePixels()/ tileNumVisible;
+
+		newScale = getAvailablePixels() / tileNumVisible;
 
 		if (newScale < minScale) {
 			newScale = minScale;
@@ -197,19 +198,19 @@ public class MapContainer extends Observable implements Observer,
 		double newScale = getScale();
 		int zoomVal;
 
-		tileNumVisible = Math.round(getAvailablePixels()/ getScale());
-		
-		zoomVal = (int)Math.round(tileNumVisible/20.0);
-		
+		tileNumVisible = Math.round(getAvailablePixels() / getScale());
+
+		zoomVal = (int) Math.round(tileNumVisible / 20.0);
+
 		// Ensure that at least one tile will be zoomed in.
-		if(zoomVal < 1) {
+		if (zoomVal < 1) {
 			zoomVal = 1;
 		}
-		
+
 		tileNumVisible = tileNumVisible - zoomVal;
-		
+
 		// Recalculating scale
-		newScale = getAvailablePixels()/ tileNumVisible;
+		newScale = getAvailablePixels() / tileNumVisible;
 
 		if (newScale > maxScale) {
 			newScale = maxScale;
@@ -226,28 +227,28 @@ public class MapContainer extends Observable implements Observer,
 
 		double rest;
 		boolean hasRest = false;
-		
-		double pixels = (double)getAvailablePixels();
+
+		final double pixels = getAvailablePixels();
 
 		rest = pixels % scale;
-		
-		if(rest > 0.0) {
+
+		if (rest > 0.0) {
 			hasRest = true;
 		}
-		
-		if(!hasRest) {
+
+		if (!hasRest) {
 			return scale;
-			
+
 		} else {
 			LogBuffer.println("Has rest: " + rest);
-			double updatedScale = scale;
+			final double updatedScale = scale;
 			return updatedScale;
 		}
 	}
 
 	public void recalculateScale() {
 
-		if (nodeHasAttribute("FixedMap","scale")) {
+		if (nodeHasAttribute("FixedMap", "scale")) {
 			if (getScale() < getAvailablePixels()) {
 				return;
 			}
@@ -393,11 +394,11 @@ public class MapContainer extends Observable implements Observer,
 
 		return current.getScale();
 	}
-	
+
 	public double getMinScale() {
 
 		return minScale;
-//		return current.getMinScale();
+		// return current.getMinScale();
 	}
 
 	public int getPixel(final double d) {
@@ -492,16 +493,16 @@ public class MapContainer extends Observable implements Observer,
 			fixedMap.setScale(d);
 			setupScrollbar();
 			setChanged();
-			
-			if(getAvailablePixels() != getUsedPixels()) {
-				LogBuffer.println("Used pixels are not the same as " +
-						"available pixels. Product value: " 
-						+ ((d * (int)(getAvailablePixels()/ d))) 
-						+ " UsedPix: " + getUsedPixels() + " AvailPix: " 
-						+ getAvailablePixels()+ " Scale: " + getScale() 
+
+			if (getAvailablePixels() != getUsedPixels()) {
+				LogBuffer.println("Used pixels are not the same as "
+						+ "available pixels. Product value: "
+						+ ((d * (int) (getAvailablePixels() / d)))
+						+ " UsedPix: " + getUsedPixels() + " AvailPix: "
+						+ getAvailablePixels() + " Scale: " + getScale()
 						+ " ScrollBar#: " + scrollbar.getVisibleAmount());
 			}
-	
+
 			configNode.putDouble("scale", d);
 			configNode.putDouble("minScale", minScale);
 		}
@@ -573,32 +574,33 @@ public class MapContainer extends Observable implements Observer,
 			setChanged();
 		}
 	}
-	
+
 	/**
 	 * Checks if a certain node has a certain attribute (key).
+	 * 
 	 * @param nodeName
 	 * @param key
 	 * @return
 	 */
-	public boolean nodeHasAttribute(String nodeName, String key) {
-		
+	public boolean nodeHasAttribute(final String nodeName, final String key) {
+
 		boolean hasAttribute = false;
-		
+
 		try {
-			String[] keys = configNode.node(nodeName).keys();
-			for(int i = 0; i < keys.length; i++) {
-				
-				if(keys[i].equalsIgnoreCase(key)) {
+			final String[] keys = configNode.node(nodeName).keys();
+			for (int i = 0; i < keys.length; i++) {
+
+				if (keys[i].equalsIgnoreCase(key)) {
 					hasAttribute = true;
 				}
 			}
-			
-		} catch (BackingStoreException e) {
-			LogBuffer.println("Error in MapContainer/nodeHasAttribute: " 
+
+		} catch (final BackingStoreException e) {
+			LogBuffer.println("Error in MapContainer/nodeHasAttribute: "
 					+ e.getMessage());
 			e.printStackTrace();
 		}
-		
+
 		return hasAttribute;
 	}
 }

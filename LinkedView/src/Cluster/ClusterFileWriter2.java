@@ -16,15 +16,15 @@ import java.io.OutputStreamWriter;
  */
 public class ClusterFileWriter2 extends BufferedWriter {
 
-	private File file;
+	private final File file;
 	private final String SEPARATOR = "\t";
 	private final String END_OF_ROW = "\n";
 
-	public ClusterFileWriter2(final File file) 
-			throws IOException, FileNotFoundException {
-		
-		super(new OutputStreamWriter(
-				new FileOutputStream(file.getAbsoluteFile()), "UTF-8"));
+	public ClusterFileWriter2(final File file) throws IOException,
+			FileNotFoundException {
+
+		super(new OutputStreamWriter(new FileOutputStream(
+				file.getAbsoluteFile()), "UTF-8"));
 		this.file = file;
 	}
 
@@ -46,7 +46,7 @@ public class ClusterFileWriter2 extends BufferedWriter {
 
 		}
 	}
-	
+
 	/**
 	 * Closes this BufferedWriter and prints a notification to console.
 	 */
@@ -58,7 +58,7 @@ public class ClusterFileWriter2 extends BufferedWriter {
 		} catch (final IOException e) {
 
 		}
-		
+
 		System.out.println("Done." + file.getAbsolutePath());
 	}
 
@@ -73,16 +73,16 @@ public class ClusterFileWriter2 extends BufferedWriter {
 
 		final StringBuilder sb = new StringBuilder();
 
-		int lastIndex = input.length - 1;
+		final int lastIndex = input.length - 1;
 		for (int i = 0; i < input.length; i++) {
-	
+
 			sb.append(input[i]);
-			
-			if(i != lastIndex) {
+
+			if (i != lastIndex) {
 				sb.append(SEPARATOR);
 			}
 		}
-		
+
 		sb.append(END_OF_ROW);
 
 		return sb.toString();

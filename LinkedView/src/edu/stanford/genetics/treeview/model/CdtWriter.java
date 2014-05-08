@@ -6,18 +6,18 @@ import java.io.IOException;
 import edu.stanford.genetics.treeview.DataModel;
 
 public class CdtWriter {
-	
+
 	private final double PRECISION_LEVEL = 0.001;
-	
+
 	DataModel dataModel;
 
 	public CdtWriter(final DataModel dataModel) {
-		
+
 		this.dataModel = dataModel;
 	}
 
 	public void write(final String spool) throws IOException {
-		
+
 		FileWriter out = null;
 		try {
 			out = new FileWriter(spool);
@@ -90,7 +90,7 @@ public class CdtWriter {
 
 	private void printNotNull2(final FileWriter out, final double value)
 			throws IOException {
-		
+
 		if (Math.abs(value - DataModel.EMPTY) < PRECISION_LEVEL) {
 			out.write("" + value);
 		}
@@ -98,7 +98,7 @@ public class CdtWriter {
 
 	private void printNotNull(final FileWriter out, final String value)
 			throws IOException {
-		
+
 		if (value != null) {
 			out.write(value);
 		}

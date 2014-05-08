@@ -12,7 +12,6 @@ import java.awt.Menu;
 import java.awt.MenuBar;
 import java.awt.MenuItem;
 import java.awt.MenuShortcut;
-import java.awt.event.ActionListener;
 
 import javax.swing.event.MenuListener;
 
@@ -64,26 +63,26 @@ public class TreeViewMenuBar extends TreeviewMenuBarI {
 	 * edu.stanford.genetics.treeview.TreeviewMenuBarI#addMenuItem(java.lang
 	 * .String, java.awt.event.ActionListener)
 	 */
-//	@Override
-//	public Object addMenuItem(final String name, final ActionListener l) {
-//		currentMenuItem = new MenuItem(name);
-//		currentMenuItem.addActionListener(l);
-//		currentMenu.add(currentMenuItem);
-//		return currentMenuItem;
-//	}
-//
-//	@Override
-//	public Object addMenuItem(final String name, final ActionListener l,
-//			final int pos) {
-//		currentMenuItem = new MenuItem(name);
-//		currentMenuItem.addActionListener(l);
-//		currentMenu.insert(currentMenuItem, pos);
-//		return currentMenuItem;
-//	}
-//	
+	// @Override
+	// public Object addMenuItem(final String name, final ActionListener l) {
+	// currentMenuItem = new MenuItem(name);
+	// currentMenuItem.addActionListener(l);
+	// currentMenu.add(currentMenuItem);
+	// return currentMenuItem;
+	// }
+	//
+	// @Override
+	// public Object addMenuItem(final String name, final ActionListener l,
+	// final int pos) {
+	// currentMenuItem = new MenuItem(name);
+	// currentMenuItem.addActionListener(l);
+	// currentMenu.insert(currentMenuItem, pos);
+	// return currentMenuItem;
+	// }
+	//
 	@Override
 	public Object addMenuItem(final String name) {
-		
+
 		currentMenuItem = new MenuItem(name);
 		currentMenu.add(currentMenuItem);
 		return currentMenuItem;
@@ -91,7 +90,7 @@ public class TreeViewMenuBar extends TreeviewMenuBarI {
 
 	@Override
 	public Object addMenuItem(final String name, final int pos) {
-		
+
 		currentMenuItem = new MenuItem(name);
 		currentMenu.insert(currentMenuItem, pos);
 		return currentMenuItem;
@@ -214,8 +213,8 @@ public class TreeViewMenuBar extends TreeviewMenuBarI {
 	}
 
 	@Override
-	public void addMenuListener(MenuListener listener) {
+	public void addMenuListener(final MenuListener listener) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

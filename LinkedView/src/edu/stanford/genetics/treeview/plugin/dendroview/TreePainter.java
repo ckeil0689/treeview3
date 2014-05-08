@@ -40,7 +40,7 @@ import edu.stanford.genetics.treeview.TreeDrawerNode;
  */
 
 public class TreePainter extends TreeDrawer {
-	
+
 	private boolean isLeft;
 
 	@Override
@@ -50,8 +50,8 @@ public class TreePainter extends TreeDrawer {
 			final TreeDrawerNode selected, final boolean isLeft) {
 
 		if ((getRootNode() == null) || (getRootNode().isLeaf()))
-			LogBuffer.println("Root node is null or leaf in paint() " +
-					"in InvertedTreeDrawer!");
+			LogBuffer.println("Root node is null or leaf in paint() "
+					+ "in InvertedTreeDrawer!");
 
 		else {
 			this.isLeft = isLeft;
@@ -66,7 +66,7 @@ public class TreePainter extends TreeDrawer {
 	public void paintSubtree(final Graphics graphics,
 			final LinearTransformation xScaleEq,
 			final LinearTransformation yScaleEq, final Rectangle dest,
-			final TreeDrawerNode root, final boolean isSelected, 
+			final TreeDrawerNode root, final boolean isSelected,
 			final boolean isLeft) {
 
 		if ((root == null) || (root.isLeaf()) || (xScaleEq == null)
@@ -86,7 +86,7 @@ public class TreePainter extends TreeDrawer {
 	public void paintSubtree(final Graphics graphics,
 			final LinearTransformation xScaleEq,
 			final LinearTransformation yScaleEq, final Rectangle dest,
-			final TreeDrawerNode root, final TreeDrawerNode selected, 
+			final TreeDrawerNode root, final TreeDrawerNode selected,
 			final boolean isLeft) {
 
 		if ((root == null) || (root.isLeaf())) {
@@ -104,7 +104,7 @@ public class TreePainter extends TreeDrawer {
 	public void paintSingle(final Graphics graphics,
 			final LinearTransformation xScaleEq,
 			final LinearTransformation yScaleEq, final Rectangle dest,
-			final TreeDrawerNode root, final boolean isSelected, 
+			final TreeDrawerNode root, final boolean isSelected,
 			final boolean isLeft) {
 
 		if ((root == null) || (root.isLeaf())) {
@@ -170,17 +170,15 @@ public class TreePainter extends TreeDrawer {
 			xT = xScaleEq;
 			yT = yScaleEq;
 			dest = d;
-			
+
 			// GTRView
-			if(isLeft && dest != null) {
+			if (isLeft && dest != null) {
 				minInd = (int) yScaleEq.inverseTransform(dest.y);
-				maxInd = (int) yScaleEq.inverseTransform(dest.y + dest.height) 
-						+ 1;
-			// ATRView
+				maxInd = (int) yScaleEq.inverseTransform(dest.y + dest.height) + 1;
+				// ATRView
 			} else {
 				minInd = (int) xScaleEq.inverseTransform(dest.x);
-				maxInd = (int) xScaleEq.inverseTransform(dest.x + dest.width) 
-						+ 1;
+				maxInd = (int) xScaleEq.inverseTransform(dest.x + dest.width) + 1;
 			}
 		}
 
@@ -271,38 +269,38 @@ public class TreePainter extends TreeDrawer {
 			final TreeDrawerNode right = node.getRight();
 
 			if (xT == null) {
-				LogBuffer.println("xt in drawSingle in InvertedTreeDrawer " +
-						"was null.");
+				LogBuffer.println("xt in drawSingle in InvertedTreeDrawer "
+						+ "was null.");
 			}
 
 			if (right == null) {
-				LogBuffer.println("right in drawSingle in InvertedTreeDrawer " +
-						"was null.");
+				LogBuffer.println("right in drawSingle in InvertedTreeDrawer "
+						+ "was null.");
 			}
 
 			int rx = 0;
 			int lx = 0;
 			int tx = 0;
-			
+
 			int ry = 0;
 			int ly = 0;
 			int ty = 0;
-			
+
 			// GTRView
-			if(isLeft) {
+			if (isLeft) {
 				rx = (int) xT.transform(right.getCorr());
 				lx = (int) xT.transform(left.getCorr());
 				tx = (int) xT.transform(node.getCorr());
 
 				ry = (int) yT.transform(right.getIndex() + .5);
 				ly = (int) yT.transform(left.getIndex() + .5);
-				
-			// ATRView
+
+				// ATRView
 			} else {
 				ry = (int) yT.transform(right.getCorr());
 				ly = (int) yT.transform(left.getCorr());
 				ty = (int) yT.transform(node.getCorr());
-	
+
 				rx = (int) xT.transform(right.getIndex() + .5);
 				lx = (int) xT.transform(left.getIndex() + .5);
 				// int tx = (int) xT.transform(node.getIndex() + .5);
@@ -315,16 +313,15 @@ public class TreePainter extends TreeDrawer {
 			} else {
 				graphics.setColor(node.getColor());
 			}
-			
-			if(isLeft) {
-				graphics.drawPolyline(new int[] { rx, tx, tx, lx }, new int[] { 
+
+			if (isLeft) {
+				graphics.drawPolyline(new int[] { rx, tx, tx, lx }, new int[] {
 						ry, ry, ly, ly }, 4);
-				
+
 			} else {
 				graphics.drawPolyline(new int[] { rx, rx, lx, lx }, new int[] {
 						ry, ty, ty, ly }, 4);
 			}
-			
 
 			// graphics.setColor(t);
 		}

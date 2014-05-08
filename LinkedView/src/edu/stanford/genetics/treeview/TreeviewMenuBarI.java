@@ -71,13 +71,14 @@ public abstract class TreeviewMenuBarI {
 	/**
 	 * add item to current menu, and make current
 	 */
-//	public abstract Object addMenuItem(String name, ActionListener l);
-//
-//	public abstract Object addMenuItem(String name, ActionListener l, int pos);
+	// public abstract Object addMenuItem(String name, ActionListener l);
+	//
+	// public abstract Object addMenuItem(String name, ActionListener l, int
+	// pos);
 	public abstract Object addMenuItem(String name);
 
 	public abstract Object addMenuItem(String name, int pos);
-	
+
 	public abstract void addMenuListener(MenuListener listener);
 
 	/**

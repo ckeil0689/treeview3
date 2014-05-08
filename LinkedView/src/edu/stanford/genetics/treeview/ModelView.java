@@ -51,7 +51,7 @@ public abstract class ModelView extends JPanel implements Observer,
 
 	protected ViewFrame viewFrame = null;
 	protected JFrame applicationFrame = null;
-	
+
 	protected MessagePanel status = null;
 	protected boolean hasMouse = false;
 
@@ -105,8 +105,8 @@ public abstract class ModelView extends JPanel implements Observer,
 	public String[] getStatus() {
 
 		if (default_status == null) {
-			default_status = new String[] {""};
-			//"No status info for " + viewName() };
+			default_status = new String[] { "" };
+			// "No status info for " + viewName() };
 		}
 
 		return default_status;
@@ -139,10 +139,10 @@ public abstract class ModelView extends JPanel implements Observer,
 	@Override
 	public synchronized void paintComponent(final Graphics g) {
 
-		// Call JComponent's paintComponent method to clear panel 
+		// Call JComponent's paintComponent method to clear panel
 		// before every redraw.
 		super.paintComponent(g);
-		
+
 		final Rectangle clip = g.getClipBounds();
 		g.setColor(Color.white);
 		g.fillRect(clip.x, clip.y, clip.width, clip.height);
@@ -183,6 +183,7 @@ public abstract class ModelView extends JPanel implements Observer,
 		return;
 	}
 
+	@Override
 	public void addNotify() {
 
 		super.addNotify();
@@ -219,7 +220,7 @@ public abstract class ModelView extends JPanel implements Observer,
 			try {
 				if (status != null) {
 					status.setMessages(getStatus());
-				} 
+				}
 			} catch (final Exception ex) {
 				JOptionPane.showMessageDialog(this, ex.toString());
 			}

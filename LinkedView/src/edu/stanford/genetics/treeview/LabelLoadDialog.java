@@ -1,5 +1,7 @@
 package edu.stanford.genetics.treeview;
 
+import java.awt.Dialog;
+
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -10,7 +12,7 @@ import net.miginfocom.swing.MigLayout;
 
 public class LabelLoadDialog {
 
-	private JDialog labelLoadFrame;
+	private final JDialog labelLoadFrame;
 	private final JLabel prompt;
 	private final JPanel mainPanel;
 	private final JProgressBar pBar;
@@ -19,10 +21,10 @@ public class LabelLoadDialog {
 
 		labelLoadFrame = new JDialog();
 		labelLoadFrame.setTitle("Loading Labels");
-		labelLoadFrame.setDefaultCloseOperation(
-				WindowConstants.DISPOSE_ON_CLOSE);
+		labelLoadFrame
+				.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		labelLoadFrame.setResizable(false);
-		labelLoadFrame.setModalityType(JDialog.DEFAULT_MODALITY_TYPE);
+		labelLoadFrame.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
 
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new MigLayout());
@@ -31,7 +33,7 @@ public class LabelLoadDialog {
 		prompt = new JLabel("Loading new labels...");
 		prompt.setForeground(GUIParams.TEXT);
 		prompt.setFont(GUIParams.FONTL);
-		
+
 		pBar = GUIParams.setPBarLayout();
 
 		mainPanel.add(prompt, "pushx, alignx 50%, span, wrap");
@@ -41,43 +43,44 @@ public class LabelLoadDialog {
 		labelLoadFrame.pack();
 		labelLoadFrame.setLocationRelativeTo(view.getAppFrame());
 	}
-	
+
 	/**
 	 * Sets the visibility of exitFrame;
+	 * 
 	 * @param visible
 	 */
-	public void setVisible(boolean visible) {
-		
+	public void setVisible(final boolean visible) {
+
 		labelLoadFrame.setVisible(visible);
 	}
-	
+
 	/**
 	 * Shows a warning if loading labels failed.
 	 */
 	public void setWarning() {
-		
+
 		prompt.setText("Loading failed.");
 		prompt.setForeground(GUIParams.RED1);
-		
+
 		mainPanel.revalidate();
 		mainPanel.repaint();
 	}
-	
-	public void setPBarMax(int max) {
-		
+
+	public void setPBarMax(final int max) {
+
 		pBar.setMaximum(max);
 	}
-	
-	public void updateProgress(int value) {
-		
+
+	public void updateProgress(final int value) {
+
 		pBar.setValue(value);
 	}
-	
+
 	/**
 	 * Used to close the dialog's frame.
 	 */
 	public void dispose() {
-		
+
 		labelLoadFrame.dispose();
 	}
 }

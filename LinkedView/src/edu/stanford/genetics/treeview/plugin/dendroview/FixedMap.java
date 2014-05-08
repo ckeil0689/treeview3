@@ -24,7 +24,6 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.util.prefs.Preferences;
 
-
 /**
  * Maps integers (gene index) to pixels using a fixed scale
  * 
@@ -44,19 +43,19 @@ public class FixedMap extends IntegerMap {
 		default_scale = 10.0;
 	}
 
-//	/**
-//	 * For persistance of scale, bind to a ConfigNode
-//	 * 
-//	 * @param configNode
-//	 *            ConfigNode to bind to
-//	 */
-//	@Override
-//	public void bindConfig(final Preferences configNode) {
-//
-//		super.bindConfig(configNode);
-//		scale = root.getDouble("scale", default_scale);
-//	}
-	
+	// /**
+	// * For persistance of scale, bind to a ConfigNode
+	// *
+	// * @param configNode
+	// * ConfigNode to bind to
+	// */
+	// @Override
+	// public void bindConfig(final Preferences configNode) {
+	//
+	// super.bindConfig(configNode);
+	// scale = root.getDouble("scale", default_scale);
+	// }
+
 	/**
 	 * For persistance of scale, bind to a ConfigNode
 	 * 
@@ -64,7 +63,7 @@ public class FixedMap extends IntegerMap {
 	 *            ConfigNode to bind to
 	 */
 	@Override
-	public void setConfigNode(Preferences parentNode) {
+	public void setConfigNode(final Preferences parentNode) {
 
 		super.setConfigNode(parentNode);
 		scale = configNode.getDouble("scale", default_scale);
@@ -116,7 +115,8 @@ public class FixedMap extends IntegerMap {
 		}
 
 		final int i = (int) ((maxindex - minindex + 1) * scale);
-		final int j = (int) Math.round((scale * (int)(availablepixels/ scale)));
+		final int j = (int) Math
+				.round((scale * (int) (availablepixels / scale)));
 		if (i > j) {
 			return j;
 

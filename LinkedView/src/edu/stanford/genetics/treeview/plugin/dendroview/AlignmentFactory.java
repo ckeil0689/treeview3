@@ -11,14 +11,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
 import edu.stanford.genetics.treeview.DendroPanel;
-import edu.stanford.genetics.treeview.MainPanel;
 import edu.stanford.genetics.treeview.PluginFactory;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.core.PluginManager;
 
 public class AlignmentFactory extends PluginFactory {
-	
+
 	static {
 		PluginManager.registerPlugin(new AlignmentFactory());
 	}
@@ -30,7 +29,7 @@ public class AlignmentFactory extends PluginFactory {
 	 */
 	@Override
 	public String getPluginName() {
-		
+
 		return "Alignment";
 	}
 
@@ -44,15 +43,15 @@ public class AlignmentFactory extends PluginFactory {
 	@Override
 	public DendroPanel restorePlugin(final Preferences node,
 			final TreeViewFrame viewFrame) {
-		
-//		if (node.getAttribute("headerName", null) == null) {
-//			return null;
-//		} else {
-//			final CharDendroView charPanel = new CharDendroView(node, viewFrame);
-//			charPanel.setName(getPluginName());
-//			return charPanel;
-//		}
-		
+
+		// if (node.getAttribute("headerName", null) == null) {
+		// return null;
+		// } else {
+		// final CharDendroView charPanel = new CharDendroView(node, viewFrame);
+		// charPanel.setName(getPluginName());
+		// return charPanel;
+		// }
+
 		return null;
 	}
 
@@ -70,16 +69,16 @@ public class AlignmentFactory extends PluginFactory {
 	@Override
 	public boolean configurePlugin(final Preferences node,
 			final ViewFrame viewFrame) {
-		
+
 		if (viewFrame.getDataModel().getGeneHeaderInfo().getIndex("ALN") >= 0) {
 			node.put("headerName", "ALN");
 			return true;
-			
+
 		} else {
 			JOptionPane.showMessageDialog(viewFrame.getAppFrame(),
-							new JTextArea("Cannot find aligned sequence.\n" +
-									"Please put aligned sequence in column " +
-									"titled \"ALN\"."));
+					new JTextArea("Cannot find aligned sequence.\n"
+							+ "Please put aligned sequence in column "
+							+ "titled \"ALN\"."));
 			return false;
 		}
 	}

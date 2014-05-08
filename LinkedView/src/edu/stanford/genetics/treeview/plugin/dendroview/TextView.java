@@ -28,9 +28,6 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.MenuItem;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.KeyEvent;
@@ -41,9 +38,9 @@ import java.awt.event.MouseMotionListener;
 import java.util.Observable;
 import java.util.prefs.Preferences;
 
-import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
@@ -56,8 +53,8 @@ import edu.stanford.genetics.treeview.StringRes;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.UrlExtractor;
 
-public class TextView extends ModelView implements ConfigNodePersistent, 
-		FontSelectable, KeyListener, AdjustmentListener, MouseListener, 
+public class TextView extends ModelView implements ConfigNodePersistent,
+		FontSelectable, KeyListener, AdjustmentListener, MouseListener,
 		MouseMotionListener {
 
 	private static final long serialVersionUID = 1L;
@@ -126,8 +123,8 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 		add(l1, "alignx 0%, aligny 50%, push, wrap");
 
 		scrollPane = new JScrollPane(this,
-				JScrollPane.VERTICAL_SCROLLBAR_NEVER,
-				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setBorder(null);
 		panel = scrollPane;
 	}
@@ -138,23 +135,23 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 		return "TextView";
 	}
 
-//	// I bet this isn't used anymore.
-//	public MenuItem getFontMenuItem() {
-//
-//		final MenuItem itema = new MenuItem("Gene Font...");
-//		itema.addActionListener(new ActionListener() {
-//
-//			@Override
-//			public void actionPerformed(final ActionEvent actionEvent) {
-//
-//				final FontSelector fontSelector = new FontSelector(
-//						TextView.this, "Select Fonts for Gene Info");
-//				fontSelector.showDialog(applicationFrame);
-//			}
-//		});
-//
-//		return itema;
-//	}
+	// // I bet this isn't used anymore.
+	// public MenuItem getFontMenuItem() {
+	//
+	// final MenuItem itema = new MenuItem("Gene Font...");
+	// itema.addActionListener(new ActionListener() {
+	//
+	// @Override
+	// public void actionPerformed(final ActionEvent actionEvent) {
+	//
+	// final FontSelector fontSelector = new FontSelector(
+	// TextView.this, "Select Fonts for Gene Info");
+	// fontSelector.showDialog(applicationFrame);
+	// }
+	// });
+	//
+	// return itema;
+	// }
 
 	// Canvas methods
 	@Override
@@ -243,10 +240,12 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 							}
 
 							g.setColor(fore);
-							
+
 							// right-aligned text
-							g.drawString(out, offscreenSize.width 
-									- metrics.stringWidth(out),
+							g.drawString(
+									out,
+									offscreenSize.width
+											- metrics.stringWidth(out),
 									map.getMiddlePixel(j) + ascent / 2);
 
 							if (fgColorIndex > 0) {
@@ -255,14 +254,16 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 						} else {
 							g.setColor(GUIParams.TEXT);
 							// right-aligned text
-							g.drawString(out, offscreenSize.width
+							g.drawString(
+									out,
+									offscreenSize.width
 											- metrics.stringWidth(out),// 0,
 									map.getMiddlePixel(j) + ascent / 2);
 							// g.setColor(fore);
 						}
-						
-//						g2d.translate(offscreenSize.height, 0);
-//						g2d.rotate(Math.PI / 2);
+
+						// g2d.translate(offscreenSize.height, 0);
+						// g2d.rotate(Math.PI / 2);
 					}
 				}
 			} else {
@@ -291,7 +292,7 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 		this.geneSelection = geneSelection;
 		this.geneSelection.addObserver(this);
 	}
-	
+
 	/**
 	 * Set geneSelection
 	 * 
@@ -382,46 +383,45 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 	@Override
 	public void mouseClicked(final MouseEvent e) {
 
-//		if (urlExtractor == null) {
-//			return;
-//		}
-//
-//		urlExtractor.setEnabled(true);
-//
-//		if (urlExtractor.isEnabled() == false) {
-//			return;
-//		}
-//
-//		// now, want mouse click to signal browser...
-//		final int index = map.getIndex(e.getY());
-//		if (map.contains(index)) {
-//			if (col != -1) {
-//				viewFrame.displayURL(urlExtractor.getUrl(index,
-//						headerInfo.getNames()[col]));
-//
-//			} else {
-//				viewFrame.displayURL(urlExtractor.getUrl(index));
-//			}
-//		}
+		// if (urlExtractor == null) {
+		// return;
+		// }
+		//
+		// urlExtractor.setEnabled(true);
+		//
+		// if (urlExtractor.isEnabled() == false) {
+		// return;
+		// }
+		//
+		// // now, want mouse click to signal browser...
+		// final int index = map.getIndex(e.getY());
+		// if (map.contains(index)) {
+		// if (col != -1) {
+		// viewFrame.displayURL(urlExtractor.getUrl(index,
+		// headerInfo.getNames()[col]));
+		//
+		// } else {
+		// viewFrame.displayURL(urlExtractor.getUrl(index));
+		// }
+		// }
 		final int index = map.getIndex(e.getY());
-		
-		if(arraySelection.getNSelectedIndexes() 
-				== arraySelection.getNumIndexes() 
-				&& geneSelection.isIndexSelected(index)) {
+
+		if (arraySelection.getNSelectedIndexes() == arraySelection
+				.getNumIndexes() && geneSelection.isIndexSelected(index)) {
 			arraySelection.deselectAllIndexes();
 			geneSelection.deselectAllIndexes();
-		
-		} else if(arraySelection.getNSelectedIndexes() > 0) {
+
+		} else if (arraySelection.getNSelectedIndexes() > 0) {
 			arraySelection.deselectAllIndexes();
 			geneSelection.deselectAllIndexes();
 			geneSelection.setIndex(index, true);
 			arraySelection.selectAllIndexes();
-			
+
 		} else {
 			geneSelection.setIndex(index, true);
 			arraySelection.selectAllIndexes();
 		}
-		
+
 		arraySelection.notifyObservers();
 		geneSelection.notifyObservers();
 	}
@@ -549,7 +549,7 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 
 	@Override
 	public void setStyle(final int i) {
-		
+
 		if (style != i) {
 			style = i;
 
@@ -563,33 +563,33 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 		}
 	}
 
-//	public void bindConfig(final Preferences configNode) {
-//
-//		root = configNode;
-//
-//		setFace(root.get("face", d_face));
-//		setStyle(root.getInt("style", d_style));
-//		setPoints(root.getInt("size", d_size));
-//
-////		getHeaderSummary().bindConfig(root.fetchOrCreate("GeneSummary"));
-//		getHeaderSummary().setConfigNode("GeneSummary");
-//	}
+	// public void bindConfig(final Preferences configNode) {
+	//
+	// root = configNode;
+	//
+	// setFace(root.get("face", d_face));
+	// setStyle(root.getInt("style", d_style));
+	// setPoints(root.getInt("size", d_size));
+	//
+	// // getHeaderSummary().bindConfig(root.fetchOrCreate("GeneSummary"));
+	// getHeaderSummary().setConfigNode("GeneSummary");
+	// }
 	@Override
-	public void setConfigNode(Preferences parentNode) {
+	public void setConfigNode(final Preferences parentNode) {
 
-		if(parentNode != null) {
+		if (parentNode != null) {
 			this.configNode = parentNode.node("TextView");
-			
+
 		} else {
-			LogBuffer.println("Could not find or create TextView " +
-					"node because parentNode was null.");
+			LogBuffer.println("Could not find or create TextView "
+					+ "node because parentNode was null.");
 		}
 
 		setFace(configNode.get("face", d_face));
 		setStyle(configNode.getInt("style", d_style));
 		setPoints(configNode.getInt("size", d_size));
 
-//		getHeaderSummary().bindConfig(root.fetchOrCreate("GeneSummary"));
+		// getHeaderSummary().bindConfig(root.fetchOrCreate("GeneSummary"));
 		getHeaderSummary().setConfigNode(configNode);
 	}
 

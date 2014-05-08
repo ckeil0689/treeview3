@@ -44,7 +44,7 @@ public class GifColorBarExportPanel extends ColorBarExportPanel implements
 
 	// I wish I could just inherit this...
 	public GifColorBarExportPanel(final ColorExtractor2 colorExtractor) {
-		
+
 		super(colorExtractor);
 	}
 
@@ -59,7 +59,7 @@ public class GifColorBarExportPanel extends ColorBarExportPanel implements
 	}
 
 	public void save() {
-		
+
 		try {
 			final OutputStream output = new BufferedOutputStream(
 					new FileOutputStream(getFile()));

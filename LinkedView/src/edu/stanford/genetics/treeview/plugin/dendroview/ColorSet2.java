@@ -51,16 +51,16 @@ public class ColorSet2 implements ConfigNodePersistent {
 
 	private final String default_missingColor = "#909090";
 	private final String default_emptyColor = "#FFFFFF";
-	private final float[] default_fractions = {0.0f, 0.5f, 1.0f};
+	private final float[] default_fractions = { 0.0f, 0.5f, 1.0f };
 	private final String default_name = "NoName";
 
 	private String name;
 	private Color missing;
 	private Color empty;
-	
+
 	private ArrayList<Color> colorList;
 	private ArrayList<Double> fractionList;
-	
+
 	private Preferences configNode = null;
 
 	/**
@@ -69,10 +69,10 @@ public class ColorSet2 implements ConfigNodePersistent {
 	public ColorSet2() {
 
 		super();
-		
+
 		colorList = new ArrayList<Color>();
 		fractionList = new ArrayList<Double>();
-		
+
 		setDefaults();
 	}
 
@@ -92,28 +92,28 @@ public class ColorSet2 implements ConfigNodePersistent {
 	 * @param empty
 	 *            string representing inital empty color
 	 */
-	public ColorSet2(final String name, final String color1, 
-			final String color2, final String color3, final String missing, 
+	public ColorSet2(final String name, final String color1,
+			final String color2, final String color3, final String missing,
 			final String empty) {
 
 		super();
-		
+
 		colorList = new ArrayList<Color>();
 		fractionList = new ArrayList<Double>();
-		
-		ArrayList<Color> colors = new ArrayList<Color>();
+
+		final ArrayList<Color> colors = new ArrayList<Color>();
 		colors.add(decodeColor(color1));
 		colors.add(decodeColor(color2));
 		colors.add(decodeColor(color3));
-		
-		float[] floatVals = default_fractions;
-		ArrayList<Double> fracs = new ArrayList<Double>(floatVals.length);
-		
-		for(int i = 0; i < floatVals.length; i++) {
-			
-			fracs.add((double)floatVals[i]);
+
+		final float[] floatVals = default_fractions;
+		final ArrayList<Double> fracs = new ArrayList<Double>(floatVals.length);
+
+		for (int i = 0; i < floatVals.length; i++) {
+
+			fracs.add((double) floatVals[i]);
 		}
-		
+
 		setColorList(colors);
 		setFractionList(fracs);
 		setName(name);
@@ -135,192 +135,196 @@ public class ColorSet2 implements ConfigNodePersistent {
 	 */
 	public void copyStateFrom(final ColorSet2 other) {
 
-		String[] colorHexVals = other.getColors();
-		ArrayList<Color> colors = new ArrayList<Color>(colorHexVals.length);
-		
-		for(int i = 0; i < colorHexVals.length; i++) {
-			
+		final String[] colorHexVals = other.getColors();
+		final ArrayList<Color> colors = new ArrayList<Color>(
+				colorHexVals.length);
+
+		for (int i = 0; i < colorHexVals.length; i++) {
+
 			colors.add(decodeColor(colorHexVals[i]));
 		}
-		
-		float[] floatVals = other.getFractions();
-		ArrayList<Double> fracs = new ArrayList<Double>(floatVals.length);
-		
-		for(int i = 0; i < floatVals.length; i++) {
-			
-			fracs.add((double)floatVals[i]);
+
+		final float[] floatVals = other.getFractions();
+		final ArrayList<Double> fracs = new ArrayList<Double>(floatVals.length);
+
+		for (int i = 0; i < floatVals.length; i++) {
+
+			fracs.add((double) floatVals[i]);
 		}
-		
+
 		setColorList(colors);
 		setFractionList(fracs);
 		setMissing(other.getMissing());
 		setEmpty(other.getEmpty());
 		setName(other.getName());
 	}
-	
+
 	/**
 	 * sets colors and name to reflect <code>ConfigNode</code>
 	 */
 	@Override
-	public void setConfigNode(Preferences parentNode) {
+	public void setConfigNode(final Preferences parentNode) {
 
-		if(parentNode != null) {
+		if (parentNode != null) {
 			this.configNode = parentNode;
-			
+
 		} else {
-			LogBuffer.println("Could not find or create ColorSet " +
-					"node because parentNode was null.");
+			LogBuffer.println("Could not find or create ColorSet "
+					+ "node because parentNode was null.");
 		}
-		
+
 		// Check if colors/ fractions have been defined and if nodes exist.
 		// If no nodes exist, create them (mainly used for initial default
-		// nodes because they are statically initialized in ColorPresets2 
+		// nodes because they are statically initialized in ColorPresets2
 		// and can't be assigned to a configNode at that point.
 		try {
-			if(!configNode.nodeExists("Color1") && colorList.size() > 0) {
-				for(int i = 0; i < colorList.size(); i++) {
-					
-					configNode.put("Color" + (i + 1), 
+			if (!configNode.nodeExists("Color1") && colorList.size() > 0) {
+				for (int i = 0; i < colorList.size(); i++) {
+
+					configNode.put("Color" + (i + 1),
 							encodeColor(colorList.get(i)));
 				}
-				
+
 				configNode.putInt("colorNum", colorList.size());
-				
+
 			} else {
-				missing = decodeColor(configNode
-						.get("missing", default_missingColor));
-				empty = decodeColor(configNode.get(
-						"empty", default_emptyColor));
+				missing = decodeColor(configNode.get("missing",
+						default_missingColor));
+				empty = decodeColor(configNode.get("empty", default_emptyColor));
 				name = configNode.get("name", default_name);
 			}
-			
-			if(!configNode.nodeExists("Fraction1") && fractionList.size() > 0) {
-				for(int i = 0; i < fractionList.size(); i++) {
-					
-					configNode.put("Fraction" + (i + 1), 
+
+			if (!configNode.nodeExists("Fraction1") && fractionList.size() > 0) {
+				for (int i = 0; i < fractionList.size(); i++) {
+
+					configNode.put("Fraction" + (i + 1),
 							Double.toString(fractionList.get(i)));
 				}
-				
+
 				configNode.putInt("fracNum", fractionList.size());
 			}
-		} catch (BackingStoreException e) {
+		} catch (final BackingStoreException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	/* inherit description */
 	@Override
 	public String toString() {
-		
-		String[] colors = getColors();
-		
+
+		final String[] colors = getColors();
+
 		String colorString = "";
-		if(colors.length > 0) {
-			for(String color : colors) {
-				
+		if (colors.length > 0) {
+			for (final String color : colors) {
+
 				colorString += color + "; ";
 			}
 		} else {
 			colorString = "No colors in node.";
 		}
-		
-		return "ColorSet " + getName() + "\n" + "Colors: " + colorString 
+
+		return "ColorSet " + getName() + "\n" + "Colors: " + colorString
 				+ " missing: " + getMissing().toString() + "\t" + "empty: "
 				+ getEmpty().toString() + "\t";
 	}
 
 	/**
-	 * Sets the colorList for this Preset instance. 
+	 * Sets the colorList for this Preset instance.
+	 * 
 	 * @param colors
 	 */
-	public void setColorList(ArrayList<Color> colors) {
-		
-		if(colorList != null) {
+	public void setColorList(final ArrayList<Color> colors) {
+
+		if (colorList != null) {
 			this.colorList = colors;
-			
+
 		} else {
 			LogBuffer.println("ColorList in ColorSet2.setColorList() is null!");
 		}
-		
-		if(configNode != null) {
-			for(int i = 0; i < colorList.size(); i++) {
-				
-				configNode.put("Color" + (i + 1), 
-						encodeColor(colorList.get(i)));
+
+		if (configNode != null) {
+			for (int i = 0; i < colorList.size(); i++) {
+
+				configNode
+						.put("Color" + (i + 1), encodeColor(colorList.get(i)));
 			}
-			
+
 			configNode.putInt("colorNum", colorList.size());
 		}
 	}
-	
+
 	/**
 	 * Retrieves hex representations of colors currently stored in the
 	 * configNode of ColorSet2.
+	 * 
 	 * @return
 	 */
 	public String[] getColors() {
-		
-		int colorNum = configNode.getInt("colorNum", 0);
-		String[] colors = new String[colorNum];
-		
-		for(int i = 0; i < colorNum; i++) {
-			
+
+		final int colorNum = configNode.getInt("colorNum", 0);
+		final String[] colors = new String[colorNum];
+
+		for (int i = 0; i < colorNum; i++) {
+
 			colors[i] = configNode.get("Color" + (i + 1), "NoColor");
 		}
-		
+
 		return colors;
 	}
-	
+
 	/**
-	 * Sets the fractionList for this preset instance. Combined with the 
+	 * Sets the fractionList for this preset instance. Combined with the
 	 * colorList, a LinearGradient can be recreated in ColorGradientChooser.
+	 * 
 	 * @param fractions
 	 */
-	public void setFractionList(ArrayList<Double> fractions) {
-		
-		if(fractionList != null) {
+	public void setFractionList(final ArrayList<Double> fractions) {
+
+		if (fractionList != null) {
 			this.fractionList = fractions;
-			
+
 		} else {
-			LogBuffer.println("FractionList in ColorSet2.setFractionList() " +
-					"is null!");
+			LogBuffer.println("FractionList in ColorSet2.setFractionList() "
+					+ "is null!");
 		}
-		
-		if(configNode != null) {
-			for(int i = 0; i < fractionList.size(); i++) {
-				
-				configNode.put("Fraction" + (i + 1), 
+
+		if (configNode != null) {
+			for (int i = 0; i < fractionList.size(); i++) {
+
+				configNode.put("Fraction" + (i + 1),
 						Double.toString(fractionList.get(i)));
 			}
-			
+
 			configNode.putInt("fracNum", fractionList.size());
 		}
 	}
-	
+
 	/**
 	 * Retrieves the fraction values stored in the current configNode.
+	 * 
 	 * @return
 	 */
 	public float[] getFractions() {
-		
-		int fractNum = configNode.getInt("fracNum", 0);
-		float[] fractions = new float[fractNum];
-		
-		for(int i = 0; i < fractNum; i++) {
-			
-			fractions[i] = (float)Double.parseDouble(
-					configNode.get("Fraction" + (i + 1), "0.0"));
+
+		final int fractNum = configNode.getInt("fracNum", 0);
+		final float[] fractions = new float[fractNum];
+
+		for (int i = 0; i < fractNum; i++) {
+
+			fractions[i] = (float) Double.parseDouble(configNode.get("Fraction"
+					+ (i + 1), "0.0"));
 		}
-		
+
 		return fractions;
 	}
-	
+
 	/**
 	 * Color for missing values.
 	 */
 	public Color getMissing() {
-		
+
 		return missing;
 	}
 
@@ -328,7 +332,7 @@ public class ColorSet2 implements ConfigNodePersistent {
 	 * Color for empty values.
 	 */
 	public Color getEmpty() {
-		
+
 		return empty;
 	}
 
@@ -336,7 +340,7 @@ public class ColorSet2 implements ConfigNodePersistent {
 	 * The name of this color set
 	 */
 	public String getName() {
-		
+
 		return name;
 	}
 
@@ -344,7 +348,7 @@ public class ColorSet2 implements ConfigNodePersistent {
 	 * Color for missing values.
 	 */
 	public void setMissing(final String newString) {
-		
+
 		missing = decodeColor(newString);
 		if (configNode != null) {
 			configNode.put("missing", newString);
@@ -355,7 +359,7 @@ public class ColorSet2 implements ConfigNodePersistent {
 	 * Color for empty values.
 	 */
 	public void setEmpty(final String newString) {
-		
+
 		empty = decodeColor(newString);
 		if (configNode != null) {
 			configNode.put("empty", newString);
@@ -366,7 +370,7 @@ public class ColorSet2 implements ConfigNodePersistent {
 	 * Color for missing values.
 	 */
 	public void setMissing(final Color newColor) {
-		
+
 		missing = newColor;
 		if (configNode != null) {
 			configNode.put("missing", encodeColor(missing));
@@ -377,7 +381,7 @@ public class ColorSet2 implements ConfigNodePersistent {
 	 * Color for empty values.
 	 */
 	public void setEmpty(final Color newColor) {
-		
+
 		empty = newColor;
 		if (configNode != null) {
 			configNode.put("empty", encodeColor(empty));
@@ -388,7 +392,7 @@ public class ColorSet2 implements ConfigNodePersistent {
 	 * The name of this color set
 	 */
 	public void setName(final String name) {
-		
+
 		this.name = name;
 		if (configNode != null) {
 			configNode.put("name", name);
@@ -403,7 +407,7 @@ public class ColorSet2 implements ConfigNodePersistent {
 	 * @return The corresponding java color object.
 	 */
 	public final static Color decodeColor(final String colorString) {
-		
+
 		return Color.decode(colorString);// will this work?
 	}
 
@@ -415,7 +419,7 @@ public class ColorSet2 implements ConfigNodePersistent {
 	 * @return The corresponding hex string
 	 */
 	public final static String encodeColor(final Color color) {
-		
+
 		final int red = color.getRed();
 		final int green = color.getGreen();
 		final int blue = color.getBlue();
@@ -424,15 +428,15 @@ public class ColorSet2 implements ConfigNodePersistent {
 	}
 
 	private final static String hex(final int buf) {
-		
+
 		final int hi = buf / 16;
 		final int low = buf % 16;
-		
+
 		return hexChar(hi) + hexChar(low);
 	}
 
 	private final static String hexChar(final int i) {
-		
+
 		switch (i) {
 		case 0:
 			return "0";
@@ -469,7 +473,7 @@ public class ColorSet2 implements ConfigNodePersistent {
 		}
 		return "F";
 	}
-	
+
 	// Save/ load methods
 	/**
 	 * extract values from Eisen-formatted file specified by the string argument
@@ -484,7 +488,7 @@ public class ColorSet2 implements ConfigNodePersistent {
 	 *                throw if problems with file
 	 */
 	public void loadEisen(final String file) throws IOException {
-		
+
 		loadEisen(new File(file));
 	}
 
@@ -497,7 +501,7 @@ public class ColorSet2 implements ConfigNodePersistent {
 	 *                throw if problems with file
 	 */
 	public void loadEisen(final File file) throws IOException {
-		
+
 		final FileInputStream stream = new FileInputStream(file);
 		missing = unpackEisen(stream);
 		stream.close();
@@ -512,7 +516,7 @@ public class ColorSet2 implements ConfigNodePersistent {
 	 *                throw if problems with file
 	 */
 	public void saveEisen(final String file) throws IOException {
-		
+
 		saveEisen(new File(file));
 	}
 
@@ -525,25 +529,25 @@ public class ColorSet2 implements ConfigNodePersistent {
 	 *                throw if problems with file
 	 */
 	public void saveEisen(final File file) throws IOException {
-		
+
 		final FileOutputStream stream = new FileOutputStream(file);
 		packEisen(missing, stream);
 		stream.close();
 	}
 
 	private Color unpackEisen(final InputStream stream) throws IOException {
-		
+
 		final int red = stream.read();
 		final int green = stream.read();
 		final int blue = stream.read();
 		final int alpha = stream.read();
-		
+
 		return new Color(red, green, blue, alpha);
 	}
 
 	private void packEisen(final Color out, final OutputStream stream)
 			throws IOException {
-		
+
 		stream.write(out.getRed());
 		stream.write(out.getGreen());
 		stream.write(out.getBlue());
