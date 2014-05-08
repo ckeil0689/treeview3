@@ -358,7 +358,7 @@ public class DendroController implements ConfigNodePersistent {
 		@Override
 		protected void done() {
 
-			setButtonEnabledStatus();
+//			setButtonEnabledStatus();
 
 			getGlobalXMap().notifyObservers();
 			getGlobalYMap().notifyObservers();

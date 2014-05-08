@@ -56,6 +56,7 @@ public class ClusterViewController2 {
 		clusterView.addClusterListener(new ClusterListener());
 		clusterView.addClusterMenuListener(new ClusterMenuSetupListener());
 		clusterView.addCancelListener(new CancelListener());
+		clusterView.addClusterChoiceListener(new ClusterChoiceListener());
 	}
 
 	class ClusterProcessWorker extends SwingWorker<Void, Void> {
@@ -137,8 +138,10 @@ public class ClusterViewController2 {
 				final int clustersC = spinnerValues[2];
 				final int itsC = spinnerValues[3];
 
-				return (!choice.contentEquals("Do Not Cluster") && (clustersR > 0 && itsR > 0))
-						|| (!choice2.contentEquals("Do Not Cluster") && (clustersC > 0 && itsC > 0));
+				return (!choice.contentEquals("Do Not Cluster") 
+						&& (clustersR > 0 && itsR > 0))
+						|| (!choice2.contentEquals("Do Not Cluster") 
+								&& (clustersC > 0 && itsC > 0));
 			}
 		}
 	}
@@ -195,6 +198,14 @@ public class ClusterViewController2 {
 			}
 
 			return reorderedElements;
+		}
+		
+		@Override
+		public void done() {
+			
+			if(isCancelled()) {
+				clusterView.cancel();
+			}
 		}
 	}
 
@@ -273,7 +284,8 @@ public class ClusterViewController2 {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			final ClusterProcessWorker clusterProcess = new ClusterProcessWorker();
+			final ClusterProcessWorker clusterProcess = 
+					new ClusterProcessWorker();
 			clusterProcess.execute();
 		}
 	}
@@ -290,6 +302,21 @@ public class ClusterViewController2 {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
+			clusterView.setupClusterMenu(isHierarchical());
+		}
+	}
+	
+	/**
+	 * Listener listens to a change in selection for the clusterChoice
+	 * JComboBox in clusterView. Calls a new layout setup as a response.
+	 * @author CKeil
+	 *
+	 */
+	class ClusterChoiceListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			
 			clusterView.setupClusterMenu(isHierarchical());
 		}
 	}

@@ -1,13 +1,10 @@
 package edu.stanford.genetics.treeview.model;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
@@ -182,9 +179,8 @@ public class NewModelLoader {
 		LineNumberReader reader = null;
 
 		try {
-			int num = 0;
 			reader = new LineNumberReader(new FileReader(aFile));
-			while ((reader.readLine()) != null) num++;
+			while ((reader.readLine()) != null);
 			return reader.getLineNumber();
 
 		} catch (final Exception ex) {
@@ -257,7 +253,7 @@ public class NewModelLoader {
 			loadProgView.updateLoadBar(rowN);
 
 			// load line as String array
-			String[] lineAsStrings = line.split("\t");
+			String[] lineAsStrings = line.split("\\t");
 			String[] labels;
 			double[] dataValues;
 
@@ -304,6 +300,12 @@ public class NewModelLoader {
 
 					} else {
 						labels[i] = element;
+						
+						// Concat empty String, otherwise this will store a 
+						// reference to the entire line from reader even when 
+						// loading method and SwingWorker are closed.
+						// Strings are immutable.
+						labels[i] += "";
 					}
 				}
 

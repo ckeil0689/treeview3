@@ -74,6 +74,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	private TreeViewFrame tvFrame;
 	protected TVModel dataModel;
 	protected Preferences root;
+	protected ClusterInfoFactory clusterInfo;
 
 	// Various GUI elements
 	private JScrollPane scrollPane;
@@ -84,6 +85,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	private JPanel linkagePanel;
 	private JPanel kMeansPanel;
 	private JPanel loadPanel;
+	private JPanel infoPanel;
 
 	private JComboBox geneCombo;
 	private JComboBox arrayCombo;
@@ -100,8 +102,6 @@ public class ClusterView extends JPanel implements MainPanel {
 
 	private JLabel loadLabel;
 	private JProgressBar pBar;
-
-	private ClickableIcon infoIcon;
 
 	private final String[] clusterMethods = { "Single Linkage",
 			"Average Linkage", "Complete Linkage" };
@@ -156,7 +156,8 @@ public class ClusterView extends JPanel implements MainPanel {
 		this.tvFrame = tvFrame;
 		this.dataModel = (TVModel) tvFrame.getDataModel();
 		this.clusterTypeID = clusterTypeID;
-
+		this.clusterInfo = new ClusterInfoFactory();
+		
 		// Set layout for initial window
 		setupLayout();
 	}
@@ -307,6 +308,10 @@ public class ClusterView extends JPanel implements MainPanel {
 		loadPanel = new JPanel();
 		loadPanel.setLayout(new MigLayout());
 		loadPanel.setOpaque(false);
+		
+		// Cluster Info Panel
+		infoPanel = clusterInfo.makeMethodInfoPanel(
+				clusterChoice.getSelectedIndex());
 
 		optionsPanel.add(similarityPanel, "pushx, alignx 50%, h 20%, wrap");
 
@@ -316,6 +321,8 @@ public class ClusterView extends JPanel implements MainPanel {
 		} else {
 			optionsPanel.add(kMeansPanel, "pushx, alignx 50%, h 20%, wrap");
 		}
+		
+		optionsPanel.add(infoPanel, "pushx, w 90%, alignx 50%, span, wrap");
 	}
 
 	/**
@@ -356,11 +363,8 @@ public class ClusterView extends JPanel implements MainPanel {
 		method.setFont(GUIParams.FONTL);
 		method.setForeground(GUIParams.MAIN);
 
-		// Clickable Panel to call InfoFrame
-		infoIcon = new ClickableIcon(tvFrame, GUIParams.QUESTIONICON);
-
-		linkagePanel.add(method, "pushx, alignx 95%");
-		linkagePanel.add(infoIcon, "pushx, alignx 0%, w 10%, wrap");
+		// Cluster Options
+		linkagePanel.add(method, "pushx, alignx 50%, wrap");
 		linkagePanel.add(clusterChoice, "pushx, alignx 50%, span");
 
 		// Component for K-Means options
@@ -530,27 +534,6 @@ public class ClusterView extends JPanel implements MainPanel {
 		mainPanel.repaint();
 	}
 
-	// /**
-	// * Sets a new DendroView with the new data loaded into TVModel, displaying
-	// * an updated HeatMap. It should also close the ClusterViewFrame.
-	// */
-	// public void visualizeData() {
-	//
-	// JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-	//
-	// final FileSet fileSet = new FileSet(file.getName(), file
-	// .getParent() + File.separator);
-	//
-	// try {
-	// viewFrame.loadFileSet(fileSet);
-	//
-	// } catch (final LoadException e) {
-	//
-	// }
-	// viewFrame.setLoaded(true);
-	// topFrame.dispose();
-	// }
-
 	/**
 	 * Adds a listener to cluster_button to register user interaction and notify
 	 * ClusterController to call the performCluster() method.
@@ -575,7 +558,8 @@ public class ClusterView extends JPanel implements MainPanel {
 		setLoadPanel(choice, choice2);
 
 		optionsPanel.add(loadPanel, "pushx, w 90%, alignx 50%, span, wrap");
-
+		optionsPanel.add(infoPanel, "pushx, w 90%, alignx 50%, span, wrap");
+		
 		buttonPanel.add(cancel_button, "pushx, alignx 50%");
 		mainPanel.add(buttonPanel, "pushx, alignx 50%, " + "h 15%");
 
@@ -592,6 +576,16 @@ public class ClusterView extends JPanel implements MainPanel {
 	public void addCancelListener(final ActionListener cancel) {
 
 		cancel_button.addActionListener(cancel);
+	}
+	
+	/**
+	 * Listener for the clusterChoice JComboBox in order to change the display
+	 * of information about cluster methods when the selection is changed.
+	 * @param l
+	 */
+	public void addClusterChoiceListener(final ActionListener l) {
+		
+		clusterChoice.addActionListener(l);
 	}
 
 	/**
