@@ -179,14 +179,13 @@ public class NewModelLoader {
 	 */
 	public int count(final File aFile) throws IOException {
 
-//		LineNumberReader reader = null;
-		BufferedReader reader = null;
+		LineNumberReader reader = null;
 
 		try {
 			int num = 0;
 			reader = new LineNumberReader(new FileReader(aFile));
 			while ((reader.readLine()) != null) num++;
-			return num; //reader.getLineNumber();
+			return reader.getLineNumber();
 
 		} catch (final Exception ex) {
 			LogBuffer.println("Exception when trying to count lines: "
@@ -241,9 +240,9 @@ public class NewModelLoader {
 				// 0[xX] HexDigits_opt . HexDigits BinaryExponent
 				// FloatTypeSuffix_opt
 				"(0[xX]" + HexDigits + "?(\\.)" + HexDigits + ")"
-				+ ")[pP][+-]?" + Digits + "))" + "[fFdD]?))" + "[\\x00-\\x20]*");// Optional
-																					// trailing
-																					// "whitespace"
+				+ ")[pP][+-]?" + Digits + "))" + "[fFdD]?))" 
+				+ "[\\x00-\\x20]*");
+				// Optional trailing "whitespace"
 
 		String[][] stringLabels = new String[lineNum][];
 
@@ -255,13 +254,10 @@ public class NewModelLoader {
 
 		while ((line = reader.readLine()) != null) {
 
-			if(rowN == 2500) {
-				LogBuffer.println("CheckPoint rowN in while loop.");
-			}
 			loadProgView.updateLoadBar(rowN);
 
 			// load line as String array
-			final String[] lineAsStrings = line.split("\t");
+			String[] lineAsStrings = line.split("\t");
 			String[] labels;
 			double[] dataValues;
 
@@ -366,6 +362,14 @@ public class NewModelLoader {
 				dataValues = new double[lineAsStrings.length - dataStartCol];
 				
 				System.arraycopy(lineAsStrings, 0, labels, 0, dataStartCol);
+				
+				// This ensures that references to immutable string 
+				// (whole line from readline()!) do not stay in memory.
+				for (int i = 0; i < labels.length; i++){
+					labels[i] += "";
+				}
+				
+				stringLabels[rowN] = labels;
 
 				for (int i = 0; i < lineAsStrings.length - dataStartCol; i++) {
 

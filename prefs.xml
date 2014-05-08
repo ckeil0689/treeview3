@@ -260,13 +260,13 @@
               <node name="ColorSet3">
                 <map>
                   <entry key="Color1" value="#CC00CC"/>
-                  <entry key="Color2" value="#CC3300"/>
-                  <entry key="Color3" value="#FFFF33"/>
-                  <entry key="colorNum" value="5"/>
+                  <entry key="Color2" value="#000000"/>
+                  <entry key="Color3" value="#00FF00"/>
+                  <entry key="colorNum" value="3"/>
                   <entry key="Fraction1" value="0.19157609343528748"/>
-                  <entry key="Fraction2" value="0.43885868787765503"/>
-                  <entry key="Fraction3" value="0.55027174949646"/>
-                  <entry key="fracNum" value="5"/>
+                  <entry key="Fraction2" value="0.60326087474823"/>
+                  <entry key="Fraction3" value="1.0"/>
+                  <entry key="fracNum" value="3"/>
                   <entry key="name" value="Custom"/>
                   <entry key="missing" value="#ffffff"/>
                   <entry key="Color4" value="#000000"/>
@@ -314,7 +314,7 @@
             </node>
             <node name="GradientChooser">
               <map>
-                <entry key="activeColors" value="YellowBlue"/>
+                <entry key="activeColors" value="Custom"/>
               </map>
             </node>
             <node name="GtrSummary">
@@ -347,7 +347,7 @@
                   </map>
                   <node name="TextViewManagerSummary">
                     <map>
-                      <entry key="included" value="4"/>
+                      <entry key="included" value="0"/>
                     </map>
                   </node>
                 </node>
@@ -425,7 +425,7 @@
                   </map>
                   <node name="ArrayNameViewManagerSummary">
                     <map>
-                      <entry key="included" value="1"/>
+                      <entry key="included" value="0"/>
                     </map>
                   </node>
                 </node>
@@ -560,7 +560,7 @@
               </node>
               <node name="Selection0">
                 <map>
-                  <entry key="index" value="0"/>
+                  <entry key="index" value="1"/>
                 </map>
                 <node name="TextView">
                   <map>
@@ -1626,14 +1626,14 @@
                   </map>
                   <node name="ArrayNameViewManagerSummary">
                     <map>
-                      <entry key="included" value="0"/>
+                      <entry key="included" value="2"/>
                     </map>
                   </node>
                 </node>
               </node>
               <node name="Selection0">
                 <map>
-                  <entry key="index" value="0"/>
+                  <entry key="index" value="2"/>
                 </map>
               </node>
             </node>
@@ -1703,14 +1703,14 @@
             </node>
             <node name="GlobalXMap">
               <map>
-                <entry key="scale" value="0.4020811099252935"/>
-                <entry key="minScale" value="0.4020811099252935"/>
-                <entry key="XScrollValue" value="0"/>
+                <entry key="scale" value="115.92307692307692"/>
+                <entry key="minScale" value="0.38847385272145146"/>
+                <entry key="XScrollValue" value="1221"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="0.4020811099252935"/>
+                  <entry key="scale" value="115.92307692307692"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -1721,14 +1721,14 @@
             </node>
             <node name="GlobalYMap">
               <map>
-                <entry key="scale" value="0.2464209564422784"/>
-                <entry key="minScale" value="0.2464209564422784"/>
-                <entry key="YScrollValue" value="0"/>
+                <entry key="scale" value="27.896551724137932"/>
+                <entry key="minScale" value="0.21717940907706365"/>
+                <entry key="YScrollValue" value="81"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="0.2464209564422784"/>
+                  <entry key="scale" value="27.896551724137932"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -1761,7 +1761,7 @@
               </node>
               <node name="Selection0">
                 <map>
-                  <entry key="index" value="2"/>
+                  <entry key="index" value="0"/>
                 </map>
                 <node name="TextView">
                   <map>
@@ -1782,7 +1782,7 @@
                   </map>
                   <node name="TextViewManagerSummary">
                     <map>
-                      <entry key="included" value="3"/>
+                      <entry key="included" value="0"/>
                     </map>
                   </node>
                 </node>

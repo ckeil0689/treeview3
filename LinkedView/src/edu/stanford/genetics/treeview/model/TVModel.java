@@ -817,7 +817,8 @@ public class TVModel extends Observable implements DataModel {
 		loader = null;
 
 		if (!isLoaded()) {
-			throw new LoadException("Loading Cancelled", LoadException.INTPARSE);
+			throw new LoadException("Loading Cancelled", 
+					LoadException.INTPARSE);
 		}
 	}
 
