@@ -33,7 +33,7 @@ public class ClusterInfoFactory {
 		label.setFont(GUIParams.FONTL);
 		label.setForeground(GUIParams.MAIN);
 		
-		mainPanel.add(label, "pushx, span, wrap");
+		mainPanel.add(label, "push, alignx 0%, aligny 0%, span, wrap");
 		
 		JLabel similarity = new JLabel("Similarity: ");
 		similarity.setFont(GUIParams.FONTS);
@@ -70,19 +70,19 @@ public class ClusterInfoFactory {
 		TextDisplay disadvantageText = new TextDisplay(
 				getDisadvantage(methodIndex));
 		
-		mainPanel.add(similarity, "pushx");
+		mainPanel.add(similarity, "pushx, alignx 0%");
 		mainPanel.add(similarityText, "pushx, growx, wrap");
 		
-		mainPanel.add(type, "pushx");
+		mainPanel.add(type, "pushx, alignx 0%");
 		mainPanel.add(typeText, "pushx, growx, wrap");
 		
-		mainPanel.add(time, "pushx");
+		mainPanel.add(time, "pushx, alignx 0%");
 		mainPanel.add(timeText, "pushx, growx, wrap");
 		
-		mainPanel.add(advantage, "pushx");
+		mainPanel.add(advantage, "pushx, alignx 0%");
 		mainPanel.add(advantageText, "pushx, growx, wrap");
 		
-		mainPanel.add(disadvantage, "pushx");
+		mainPanel.add(disadvantage, "pushx, alignx 0%");
 		mainPanel.add(disadvantageText, "pushx, growx, wrap");
 		
 		mainPanel.revalidate();

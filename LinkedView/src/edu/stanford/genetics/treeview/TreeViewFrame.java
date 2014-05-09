@@ -742,7 +742,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 	public void generateSearchMenu() {
 
-		searchButton = GUIParams.setMenuButtonLayout("SEARCH LABELS", null);
+		searchButton = GUIParams.setMenuButtonLayout(StringRes.button_searchLabels, null);
 		searchButton.setToolTipText("Find Row or Column Elements");
 
 		menuPanel.add(searchButton);
@@ -750,7 +750,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 	public void generateTreeMenu() {
 
-		treeButton = GUIParams.setMenuButtonLayout("SHOW TREES", null);
+		treeButton = GUIParams.setMenuButtonLayout(StringRes.button_showTrees, null);
 		treeButton.setToolTipText("Determine Dendrogram Visibility");
 
 		// Initially disabled, will be enabled if gtrview or atrview in

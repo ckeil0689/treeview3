@@ -119,7 +119,6 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 		final JPanel radioButtonPanel = new JPanel();
 		radioButtonPanel.setLayout(new MigLayout());
 		radioButtonPanel.setOpaque(false);
-		radioButtonPanel.setBorder(BorderFactory.createEtchedBorder());
 
 		final JLabel colorHint = new JLabel("Choose a Color Scheme:");
 		colorHint.setFont(GUIParams.FONTS);

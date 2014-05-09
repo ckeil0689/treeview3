@@ -54,19 +54,23 @@ public class StringRes {
 	public static final String button_OK = "OK";
 	public static final String button_Cancel = "Cancel";
 	public static final String button_Cluster = "Cluster";
-	public static final String button_customLabels = "Load Custom Labels";
+	public static final String button_customLabels = "Load custom labels";
+	public static final String button_home = "Home";
+	public static final String button_searchLabels = "Search labels";
+	public static final String button_showTrees = "Show trees";
+	public static final String button_hideTrees = "Hide trees";
 
 	// RadioButton Texts
 	public static final String rButton_dark = "Dark";
 	public static final String rButton_light = "Light";
 
 	// Labels
-	public static final String label_ZoomColLabels = "Zoom to See Column "
-			+ "Labels";
-	public static final String label_ZoomRowLabels = "Zoom to See Row Labels";
+	public static final String label_ZoomColLabels = "Zoom to see column "
+			+ "labels";
+	public static final String label_ZoomRowLabels = "Zoom to see row labels";
 
 	// Cluster Options
-	public static final String cluster_DoNot = "Do Not Cluster";
+	public static final String cluster_DoNot = "Do not cluster";
 	
 	// Cluster Info
 	public static final String clusterInfo_Single_Similarity = "Joins the " +

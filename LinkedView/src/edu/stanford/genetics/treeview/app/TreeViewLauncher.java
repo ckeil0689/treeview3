@@ -12,16 +12,13 @@ public class TreeViewLauncher {
 
 		try {
 			final boolean isApplet = false;
-
+			
+			// This String will store the menuBarUI key from 
+			// Apple's Aqua LookAndFeel so it can be implemented
+			// in CrossPlatform LAF afterwards which cannot use 
+			// OSX native menuBar otherwise...
+			String menuBarUI = "";
 			if (!isApplet && System.getProperty("os.name").contains("Mac")) {
-				// Mac Java 1.3
-				// System.setProperty("com.apple.macos.useScreenMenuBar",
-				// "true");
-				// System.setProperty("com.apple.mrj.application"
-				// + ".growbox.intrudes", "true");
-
-				// only needed for 1.3.1 on OSX 10.2
-				// System.setProperty("com.apple.hwaccel", "true");
 
 				System.setProperty("com.apple.mrj.application"
 						+ ".apple.menu.about.name", "TreeView 3");
@@ -29,19 +26,30 @@ public class TreeViewLauncher {
 				// Mac Java 1.4
 				System.setProperty("apple.laf.useScreenMenuBar", "true");
 				System.setProperty("apple.awt.showGrowBox", "true");
+				
+				UIManager.setLookAndFeel(UIManager
+						.getSystemLookAndFeelClassName());
+				
+				menuBarUI = UIManager.getString("MenuBarUI");
+				
 			}
-
+			
 			UIManager.setLookAndFeel(UIManager
 					.getCrossPlatformLookAndFeelClassName());
 
-			UIManager
-					.put("MenuItem.selectionBackground", GUIParams.ELEMENT_HOV);
-			UIManager.put("MenuItem.font", GUIParams.FONT_MENU);
-			UIManager.put("MenuItem.background", GUIParams.MENU);
-
-			UIManager.put("Menu.selectionBackground", GUIParams.ELEMENT_HOV);
-			UIManager.put("Menu.font", GUIParams.FONT_MENU);
-			UIManager.put("Menu.background", GUIParams.MENU);
+			if (!isApplet && System.getProperty("os.name").contains("Mac")) {
+				UIManager.put("MenuBarUI", menuBarUI);
+				
+			} else {
+				UIManager
+						.put("MenuItem.selectionBackground", GUIParams.ELEMENT_HOV);
+				UIManager.put("MenuItem.font", GUIParams.FONT_MENU);
+				UIManager.put("MenuItem.background", GUIParams.MENU);
+	
+				UIManager.put("Menu.selectionBackground", GUIParams.ELEMENT_HOV);
+				UIManager.put("Menu.font", GUIParams.FONT_MENU);
+				UIManager.put("Menu.background", GUIParams.MENU);
+			}
 
 			javax.swing.SwingUtilities.invokeLater(new Runnable() {
 

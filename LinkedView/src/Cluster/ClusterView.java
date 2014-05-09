@@ -103,8 +103,8 @@ public class ClusterView extends JPanel implements MainPanel {
 	private JLabel loadLabel;
 	private JProgressBar pBar;
 
-	private final String[] clusterMethods = { "Single Linkage",
-			"Average Linkage", "Complete Linkage" };
+	private final String[] clusterMethods = { "Average Linkage", 
+			"Single Linkage", "Complete Linkage" };
 
 	private final String clusterTypeID;
 
@@ -255,9 +255,11 @@ public class ClusterView extends JPanel implements MainPanel {
 
 		// Drop-down menu for row selection
 		geneCombo = GUIParams.setComboLayout(measurements);
+		geneCombo.setSelectedIndex(1);
 
 		// Drop-down menu for column selection
 		arrayCombo = GUIParams.setComboLayout(measurements);
+		arrayCombo.setSelectedIndex(1);
 
 		// Linkage choice drop-down menu
 		clusterChoice = GUIParams.setComboLayout(clusterMethods);
@@ -284,12 +286,10 @@ public class ClusterView extends JPanel implements MainPanel {
 		buttonPanel = new JPanel();
 		buttonPanel.setLayout(new MigLayout());
 		buttonPanel.setOpaque(false);
-		buttonPanel.add(cluster_button, "alignx 50%, pushx");
+		buttonPanel.add(cluster_button, "pushx, alignx 50%");
 
-		mainPanel.add(clusterType, "alignx 50%, push, h 5%, span, wrap");
-		mainPanel.add(optionsPanel, "pushx, alignx 50%, "
-				+ "w 70%, h 70%, wrap");
-		mainPanel.add(buttonPanel, "pushx, alignx 50%, h 15%");
+		mainPanel.add(optionsPanel, "pushx, alignx 50%, w 90%, h 70%, wrap");
+		mainPanel.add(buttonPanel, "pushx, alignx 50%, w 90%, h 15%");
 	}
 
 	/**
@@ -300,9 +300,11 @@ public class ClusterView extends JPanel implements MainPanel {
 		// Background Panel for the Cluster Options
 		optionsPanel = new JPanel();
 		optionsPanel.setLayout(new MigLayout());
-		optionsPanel.setBorder(BorderFactory.createLineBorder(
-				GUIParams.BORDERS, EtchedBorder.LOWERED));
 		optionsPanel.setOpaque(false);
+		
+		JPanel choicePanel = new JPanel();
+		choicePanel.setLayout(new MigLayout());
+		choicePanel.setOpaque(false);
 
 		// ProgressBar Component
 		loadPanel = new JPanel();
@@ -312,17 +314,40 @@ public class ClusterView extends JPanel implements MainPanel {
 		// Cluster Info Panel
 		infoPanel = clusterInfo.makeMethodInfoPanel(
 				clusterChoice.getSelectedIndex());
+		
+		final JLabel type = new JLabel("Cluster Type");
+		type.setFont(GUIParams.FONTL);
+		type.setForeground(GUIParams.MAIN);
+		
+		choicePanel.add(type, "push, alignx 0%, aligny 0%, w 40%");
+		choicePanel.add(clusterType, "push, alignx 0%, aligny 0%, w 60%, h 20%, wrap");
+		
+		final JLabel similarity = new JLabel("Similarity Metric");
+		similarity.setFont(GUIParams.FONTL);
+		similarity.setForeground(GUIParams.MAIN);
 
-		optionsPanel.add(similarityPanel, "pushx, alignx 50%, h 20%, wrap");
+		choicePanel.add(similarity, "push, alignx 0%, aligny 0%");
+		choicePanel.add(similarityPanel, "push, alignx 0%, aligny 0%, h 20%, wrap");
 
 		if (clusterType.getSelectedIndex() == 0) {
-			optionsPanel.add(linkagePanel, "pushx, alignx 50%, h 20%, wrap");
+			final JLabel method = new JLabel("Linkage Method");
+			method.setFont(GUIParams.FONTL);
+			method.setForeground(GUIParams.MAIN);
+			
+			choicePanel.add(method, "push, alignx 0%, aligny 0%");
+			choicePanel.add(linkagePanel, "push, alignx 0%, aligny 0%, h 20%, wrap");
 
 		} else {
-			optionsPanel.add(kMeansPanel, "pushx, alignx 50%, h 20%, wrap");
+			final JLabel kMeans = new JLabel("K-Means Options");
+			kMeans.setFont(GUIParams.FONTL);
+			kMeans.setForeground(GUIParams.MAIN);
+			
+			choicePanel.add(kMeans, "pushx, alignx 0%");
+			choicePanel.add(kMeansPanel, "pushx, alignx 50%, h 20%, wrap");
 		}
 		
-		optionsPanel.add(infoPanel, "pushx, w 90%, alignx 50%, span, wrap");
+		optionsPanel.add(choicePanel, "pushx, w 50%");
+		optionsPanel.add(infoPanel, "pushx, w 50%, wrap");
 	}
 
 	/**
@@ -335,10 +360,6 @@ public class ClusterView extends JPanel implements MainPanel {
 		similarityPanel.setLayout(new MigLayout());
 		similarityPanel.setOpaque(false);
 
-		final JLabel similarity = new JLabel("Similarity Metric");
-		similarity.setFont(GUIParams.FONTL);
-		similarity.setForeground(GUIParams.MAIN);
-
 		final JLabel rowLabel = new JLabel("Rows: ");
 		rowLabel.setFont(GUIParams.FONTS);
 		rowLabel.setForeground(GUIParams.TEXT);
@@ -347,10 +368,9 @@ public class ClusterView extends JPanel implements MainPanel {
 		colLabel.setFont(GUIParams.FONTS);
 		colLabel.setForeground(GUIParams.TEXT);
 
-		similarityPanel.add(similarity, "pushx, alignx 50%, span, wrap");
-		similarityPanel.add(rowLabel);
+		similarityPanel.add(rowLabel, "pushx, alignx 0%");
 		similarityPanel.add(geneCombo, "w 40%, wrap");
-		similarityPanel.add(colLabel);
+		similarityPanel.add(colLabel, "pushx, alignx 0%");
 		similarityPanel.add(arrayCombo, "w 40%");
 
 		// Component for linkage choices
@@ -358,23 +378,13 @@ public class ClusterView extends JPanel implements MainPanel {
 		linkagePanel.setLayout(new MigLayout());
 		linkagePanel.setOpaque(false);
 
-		// Label
-		final JLabel method = new JLabel("Linkage Method");
-		method.setFont(GUIParams.FONTL);
-		method.setForeground(GUIParams.MAIN);
-
 		// Cluster Options
-		linkagePanel.add(method, "pushx, alignx 50%, wrap");
-		linkagePanel.add(clusterChoice, "pushx, alignx 50%, span");
+		linkagePanel.add(clusterChoice, "pushx, alignx 0%, span");
 
 		// Component for K-Means options
 		kMeansPanel = new JPanel();
 		kMeansPanel.setLayout(new MigLayout());
 		kMeansPanel.setOpaque(false);
-
-		final JLabel kMeans = new JLabel("K-Means Options");
-		kMeans.setFont(GUIParams.FONTL);
-		kMeans.setForeground(GUIParams.MAIN);
 
 		final JLabel clusters = new JLabel("Clusters: ");
 		clusters.setFont(GUIParams.FONTS);
@@ -383,8 +393,6 @@ public class ClusterView extends JPanel implements MainPanel {
 		final JLabel its = new JLabel("Iterations: ");
 		its.setFont(GUIParams.FONTS);
 		its.setForeground(GUIParams.TEXT);
-
-		kMeansPanel.add(kMeans, "span, wrap");
 
 		kMeansPanel.add(clusters, "w 10%, h 15%");
 		kMeansPanel.add(enterRC, "w 5%");
@@ -558,10 +566,9 @@ public class ClusterView extends JPanel implements MainPanel {
 		setLoadPanel(choice, choice2);
 
 		optionsPanel.add(loadPanel, "pushx, w 90%, alignx 50%, span, wrap");
-		optionsPanel.add(infoPanel, "pushx, w 90%, alignx 50%, span, wrap");
 		
 		buttonPanel.add(cancel_button, "pushx, alignx 50%");
-		mainPanel.add(buttonPanel, "pushx, alignx 50%, " + "h 15%");
+		mainPanel.add(buttonPanel, "pushx, alignx 50%, h 15%");
 
 		mainPanel.revalidate();
 		mainPanel.repaint();

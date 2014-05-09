@@ -217,7 +217,6 @@
 
 </target>
 
-<!--
 <target name="appletJar" depends="compile"
 	description="Create applet jar file">
   <echo    message="Creating applet jar file for ${app.name}"/>
@@ -252,7 +251,6 @@
 <target name="pluginDir">
 	<mkdir dir="${plugin.dir}"/>
 </target>
--->
 	
 <target name="dendrogramPlugin" depends="pluginDir,compile">
 	  <echo    message="Creating jar file for dendrogram plugin"/>
@@ -344,7 +342,6 @@
 
 <!-- some stuff for Mac OSX application bundles... -->
 <!-- unfortunately, this only work on max os X right now. -->
-<!--
 <taskdef name="jarbundler"
                    classname="net.sourceforge.jarbundler.JarBundler">
  <classpath>
@@ -384,7 +381,6 @@
 	<delete file="TreeViewCitrus.jar"/>
 	
 </target>
--->
 
 <taskdef name="bundleapp"
              classname="com.oracle.appbundler.AppBundlerTask"   

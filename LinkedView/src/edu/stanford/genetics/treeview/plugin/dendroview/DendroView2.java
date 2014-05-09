@@ -46,6 +46,7 @@ import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.DendroPanel;
 import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.ModelView;
+import edu.stanford.genetics.treeview.StringRes;
 import edu.stanford.genetics.treeview.TabbedSettingsPanel;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.TreeViewFrame;
@@ -253,7 +254,7 @@ public class DendroView2 implements Observer, DendroPanel {
 		JPanel fillPanel4;
 
 		// Buttons
-		scaleDefaultAll = GUIParams.setButtonLayout("HOME", "homeIcon");
+		scaleDefaultAll = GUIParams.setButtonLayout(StringRes.button_home, "homeIcon");
 		scaleDefaultAll.setToolTipText("Resets the zoomed view.");
 
 		scaleIncX = GUIParams.setButtonLayout(null, "zoomInIcon");
@@ -893,7 +894,7 @@ public class DendroView2 implements Observer, DendroPanel {
 	@Override
 	public void addDendroMenus(final JMenu menu) {
 
-		annotationsMenuItem = new JMenuItem("Row and Column Labels");
+		annotationsMenuItem = new JMenuItem(StringRes.menu_title_RowAndCol);
 		menu.add(annotationsMenuItem);
 		tvFrame.addToStackMenuList(annotationsMenuItem);
 
@@ -906,11 +907,11 @@ public class DendroView2 implements Observer, DendroPanel {
 	public void addClusterMenus(final JMenu menu) {
 
 		// Cluster Menu
-		final JMenuItem hierMenuItem = new JMenuItem("Hierarchical");
+		final JMenuItem hierMenuItem = new JMenuItem(StringRes.menu_title_Hier);
 		menu.add(hierMenuItem);
 		tvFrame.addToStackMenuList(hierMenuItem);
 
-		final JMenuItem kMeansMenuItem = new JMenuItem("K-Means");
+		final JMenuItem kMeansMenuItem = new JMenuItem(StringRes.menu_title_KMeans);
 		menu.add(kMeansMenuItem);
 		tvFrame.addToStackMenuList(kMeansMenuItem);
 	}
