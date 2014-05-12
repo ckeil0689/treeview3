@@ -169,8 +169,6 @@ public class DendroView2 implements Observer, DendroPanel {
 		dendroPane = new JPanel();
 		dendroPane.setLayout(new MigLayout("ins 0"));
 		dendroPane.setBackground(GUIParams.BG_COLOR);
-
-		setupViews();
 	}
 
 	/**
@@ -180,6 +178,8 @@ public class DendroView2 implements Observer, DendroPanel {
 	 */
 	public JPanel makeDendroPanel() {
 
+		setupViews();
+		
 		return dendroPane;
 	}
 
@@ -254,23 +254,24 @@ public class DendroView2 implements Observer, DendroPanel {
 		JPanel fillPanel4;
 
 		// Buttons
-		scaleDefaultAll = GUIParams.setButtonLayout(StringRes.button_home, "homeIcon");
+		scaleDefaultAll = GUIParams.setButtonLayout(StringRes.button_home, 
+				"homeIcon");
 		scaleDefaultAll.setToolTipText("Resets the zoomed view.");
 
 		scaleIncX = GUIParams.setButtonLayout(null, "zoomInIcon");
-		scaleIncX.setToolTipText("Zooms in on X-axis.");
+		scaleIncX.setToolTipText(StringRes.tooltip_xZoomIn);
 
 		scaleDecX = GUIParams.setButtonLayout(null, "zoomOutIcon");
-		scaleDecX.setToolTipText("Zooms out of X-axis.");
+		scaleDecX.setToolTipText(StringRes.tooltip_xZoomOut);
 
 		scaleIncY = GUIParams.setButtonLayout(null, "zoomInIcon");
-		scaleIncY.setToolTipText("Zooms in on Y-axis.");
+		scaleIncY.setToolTipText(StringRes.tooltip_yZoomIn);
 
 		scaleDecY = GUIParams.setButtonLayout(null, "zoomOutIcon");
-		scaleDecY.setToolTipText("Zooms out of Y-axis.");
+		scaleDecY.setToolTipText(StringRes.tooltip_yZoomOut);
 
 		zoomButton = GUIParams.setButtonLayout(null, "fullscreenIcon");
-		zoomButton.setToolTipText("Zooms into the selected area.");
+		zoomButton.setToolTipText(StringRes.tooltip_home);
 
 		// Panels
 		buttonPanel = new JPanel();

@@ -47,12 +47,11 @@ import edu.stanford.genetics.treeview.model.TVModel;
  */
 public class TVFrameController {
 
-	private TVModel model;
+	private final TVModel model;
 	private final TreeViewFrame tvFrame;
 	private final JFrame applicationFrame;
 	private MenubarActions menuActions;
 
-	private SwingWorker<Void, Void> worker;
 	private File file;
 	private FileSet fileMenuSet;
 
@@ -65,6 +64,7 @@ public class TVFrameController {
 		this.applicationFrame = tvFrame.getAppFrame();
 
 		setViewChoice();
+		addViewListeners();
 	}
 
 	/**
@@ -178,7 +178,7 @@ public class TVFrameController {
 		if (error) {
 			tvFrame.setView("LoadErrorView");
 			tvFrame.setLoaded(false);
-			addViewListeners();
+//			addViewListeners();
 
 			LogBuffer.println("DataModel not properly loaded.");
 
@@ -186,12 +186,12 @@ public class TVFrameController {
 			if (tvFrame.getDataModel() != null) {
 				tvFrame.setView("DendroView");
 				tvFrame.setLoaded(true);
-				addViewListeners();
+//				addViewListeners();
 
 			} else {
 				tvFrame.setView("WelcomeView");
 				tvFrame.setLoaded(false);
-				addViewListeners();
+//				addViewListeners();
 			}
 		}
 	}
@@ -255,7 +255,7 @@ public class TVFrameController {
 	 */
 	public void openFile() {
 
-		worker = new LoadWorker();
+		SwingWorker<Void, Void> worker = new LoadWorker();
 
 		try {
 			file = tvFrame.selectFile();
@@ -295,7 +295,6 @@ public class TVFrameController {
 	public void loadFileSet(final FileSet fileSet) {
 
 		// Make TVModel object
-		model = new TVModel();
 		model.setFrame(tvFrame);
 
 		tvFrame.setView("LoadProgressView");
@@ -606,7 +605,6 @@ public class TVFrameController {
 				fileSet2 = tvFrame.getFileMRU().addUnique(fileSet2);
 				tvFrame.getFileMRU().setLast(
 						tvFrame.getDataModel().getFileSet());
-				tvFrame.rebuildProgramMenu();
 				tvFrame.addFileMenuListeners(new FileMenuListener());
 
 				if (tvFrame.getDataModel() instanceof TVModel) {
@@ -632,7 +630,7 @@ public class TVFrameController {
 
 			fileMenuSet = tvFrame.getFileMenuSet();
 
-			worker = new LoadWorker();
+			SwingWorker<Void, Void> worker = new LoadWorker();
 			tvFrame.setView("LoadProgressView");
 			worker.execute();
 

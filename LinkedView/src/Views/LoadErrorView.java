@@ -20,20 +20,12 @@ import edu.stanford.genetics.treeview.TreeViewFrame;
  */
 public class LoadErrorView {
 
-	// Initial
-	private final TreeViewFrame tvFrame;
-
 	private JPanel homePanel;
 	private JPanel errorPanel;
-
-	private JLabel errorLabel;
-	private JLabel message;
 
 	private JButton loadNew;
 
 	private String errorMessage = "Weird. No issue has been determined.";
-
-	private JLabel jl;
 
 	/**
 	 * Constructor with required parameters to show a load-error screen.
@@ -43,11 +35,8 @@ public class LoadErrorView {
 	 * @param message
 	 *            The error message
 	 */
-	public LoadErrorView(final TreeViewFrame tvFrame, final String message) {
-
-		this.tvFrame = tvFrame;
-		this.errorMessage = message;
-
+	public LoadErrorView() {
+		
 		setupMainPanel();
 	}
 
@@ -68,7 +57,7 @@ public class LoadErrorView {
 		title_bg.setLayout(new MigLayout());
 		title_bg.setBackground(GUIParams.MAIN);
 
-		jl = new JLabel("Oh oh!");
+		JLabel jl = new JLabel("Oh oh!");
 		jl.setFont(new Font("Sans Serif", Font.BOLD, 50));
 		jl.setForeground(GUIParams.BG_COLOR);
 
@@ -76,29 +65,32 @@ public class LoadErrorView {
 
 		homePanel.add(title_bg, "pushx, growx, alignx 50%, span, "
 				+ "height 20%::, wrap");
+		
+		errorPanel = new JPanel();
+		errorPanel.setLayout(new MigLayout());
+		errorPanel.setOpaque(false);
+		
+		homePanel.add(errorPanel, "push, alignx 50%");
+		
+		loadNew = GUIParams.setButtonLayout("Load New File", null);
 	}
 
 	public JPanel makeErrorPanel() {
 
-		errorPanel = new JPanel();
-		errorPanel.setLayout(new MigLayout());
-		errorPanel.setOpaque(false);
-
-		errorLabel = new JLabel("Looks like we ran into the following issue: ");
+		errorPanel.removeAll();
+		
+		JLabel errorLabel = new JLabel("Looks like we ran into the " +
+				"following issue: ");
 		errorLabel.setFont(GUIParams.FONTL);
 		errorLabel.setForeground(GUIParams.MAIN);
 
-		message = new JLabel(errorMessage);
+		JLabel message = new JLabel(errorMessage);
 		message.setFont(GUIParams.FONTS);
 		message.setForeground(GUIParams.TEXT);
-
-		loadNew = GUIParams.setButtonLayout("Load New File", null);
 
 		errorPanel.add(errorLabel, "pushx, alignx 50%, span, wrap");
 		errorPanel.add(message, "pushx, alignx 50%, span, wrap");
 		errorPanel.add(loadNew, "pushx, alignx 50%, span, wrap");
-
-		homePanel.add(errorPanel, "push, alignx 50%");
 
 		homePanel.revalidate();
 		homePanel.repaint();
@@ -115,5 +107,10 @@ public class LoadErrorView {
 	public void addLoadNewListener(final ActionListener l) {
 
 		loadNew.addActionListener(l);
+	}
+	
+	public void setErrorMessage(String error) {
+		
+		this.errorMessage = error;
 	}
 }

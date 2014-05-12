@@ -32,7 +32,13 @@ public class StringRes {
 	// View Titles
 	public static final String view_title_Cluster = "Cluster View";
 
-	// Preferences Menu Titles
+	// Menu Titles
+	public static final String menu_title_Open = "Open...";
+	public static final String menu_title_OpenRecent = "Open Recent";
+	public static final String menu_title_EditRecent = "Edit Recent Files";
+	public static final String menu_title_Save = "Save";
+	public static final String menu_title_SaveAs = "Save As...";
+	public static final String menu_title_Prefs = "Preferences...";
 	public static final String menu_title_Theme = "Theme";
 	public static final String menu_title_Font = "Font";
 	public static final String menu_title_URL = "URL";
@@ -40,8 +46,19 @@ public class StringRes {
 	public static final String menu_title_Color = "Color Settings";
 	public static final String menu_title_Hier = "Hierarchical";
 	public static final String menu_title_KMeans = "K-Means";
+	public static final String menu_title_Help = "Help";
+	public static final String menu_title_Stats = "Stats...";
+	public static final String menu_title_About = "About...";
+	public static final String menu_title_ShowLog = "Show Log...";
+	public static final String menu_title_Docs = "Documentation...";
+	public static final String menu_title_Feedback = "Send Feedback...";
+	public static final String menu_title_NewWindow = "New Window...";
+	public static final String menu_title_QuitWindow = "Quit Window...";
 
 	// MenuBar
+	public static final String menubar_file = "File";
+	public static final String menubar_view = "View";
+	public static final String menubar_cluster = "Cluster";
 	public static final String menubar_clearPrefs = "Clear Preferences";
 
 	// Preferences API
@@ -59,6 +76,17 @@ public class StringRes {
 	public static final String button_searchLabels = "Search labels";
 	public static final String button_showTrees = "Show trees";
 	public static final String button_hideTrees = "Hide trees";
+	
+	// Tooltips
+	public static final String tooltip_searchRowCol = "Find row " +
+			"or column elements";
+	public static final String tooltip_showTrees = "Determine dendrogram" +
+			"visibility";
+	public static final String tooltip_xZoomIn = "Zoom in on rows.";
+	public static final String tooltip_xZoomOut = "Zoom out of rows.";
+	public static final String tooltip_yZoomIn = "Zoom in on columns.";
+	public static final String tooltip_yZoomOut = "Zoom out of columns.";
+	public static final String tooltip_home = "Zoom into the selected area.";
 
 	// RadioButton Texts
 	public static final String rButton_dark = "Dark";

@@ -40,19 +40,19 @@ public class MenubarActions {
 	 */
 	public void execute(final String name) {
 
-		if (name.equalsIgnoreCase("Open")) {
+		if (name.equalsIgnoreCase(StringRes.menu_title_Open)) {
 			controller.openFile();
 
-		} else if (name.equalsIgnoreCase("Save")) {
+		} else if (name.equalsIgnoreCase(StringRes.menu_title_Save)) {
 			controller.doModelSave(true);
 
-		} else if (name.equalsIgnoreCase("Save As")) {
+		} else if (name.equalsIgnoreCase(StringRes.menu_title_SaveAs)) {
 			controller.saveModelAs();
 
-		} else if (name.equalsIgnoreCase("Edit Recent Files")) {
+		} else if (name.equalsIgnoreCase(StringRes.menu_title_EditRecent)) {
 			tvFrame.showRecentFileEditor();
 
-		} else if (name.equalsIgnoreCase("Quit Program")) {
+		} else if (name.equalsIgnoreCase(StringRes.menu_title_QuitWindow)) {
 			try {
 				// tvFrame.getApp().closeAllWindows();
 				tvFrame.closeWindow();
@@ -89,7 +89,7 @@ public class MenubarActions {
 		} else if (name.equalsIgnoreCase("Functional Enrichment")) {
 			tvFrame.displayWIP();
 
-		} else if (name.equalsIgnoreCase("Stats")) {
+		} else if (name.equalsIgnoreCase(StringRes.menu_title_Stats)) {
 			tvFrame.openStatsView();
 
 		} else if (name.equalsIgnoreCase("Save List")) {
@@ -98,19 +98,19 @@ public class MenubarActions {
 		} else if (name.equalsIgnoreCase("Save Data")) {
 			controller.saveData();
 
-		} else if (name.equalsIgnoreCase("New Window")) {
+		} else if (name.equalsIgnoreCase(StringRes.menu_title_NewWindow)) {
 			tvFrame.createNewFrame().getAppFrame().setVisible(true);
 
 			// } else if(name.equalsIgnoreCase("Close Window")) {
 			// tvFrame.closeWindow();
 
-		} else if (name.equalsIgnoreCase("About...")) {
+		} else if (name.equalsIgnoreCase(StringRes.menu_title_About)) {
 			tvFrame.showAboutWindow();
 
-		} else if (name.equalsIgnoreCase("Documentation...")) {
+		} else if (name.equalsIgnoreCase(StringRes.menu_title_Docs)) {
 			tvFrame.showDocumentation();
 
-		} else if (name.equalsIgnoreCase("Show Log")) {
+		} else if (name.equalsIgnoreCase(StringRes.menu_title_ShowLog)) {
 			tvFrame.showLogMessages();
 		}
 	}

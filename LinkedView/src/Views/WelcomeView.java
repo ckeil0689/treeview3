@@ -10,31 +10,59 @@ import javax.swing.JProgressBar;
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.StringRes;
-import edu.stanford.genetics.treeview.TreeViewFrame;
 
 public class WelcomeView {
 
 	// Initial
-	private final TreeViewFrame tvFrame;
-	private JPanel loadPanel;
-	private JPanel loadProgPanel;
-	private JPanel homePanel;
-	private JLabel label;
+	private final JPanel loadPanel;
+	private final JPanel homePanel;
 
-	private JLabel jl;
-	private JLabel jl2;
+	private final JLabel jl;
+	private final JLabel jl2;
+	private final JLabel label;
 
 	private boolean isLoading = false;
 
 	// Loading stuff
-	private JProgressBar loadBar;
+	private final JProgressBar loadBar;
 	private JLabel loadLabel;
 
-	public WelcomeView(final TreeViewFrame tvFrame) {
+	public WelcomeView() {
 
-		this.tvFrame = tvFrame;
+		homePanel = new JPanel();
+		homePanel.setLayout(new MigLayout("ins 0"));
+		homePanel.setBackground(GUIParams.BG_COLOR);
 
-		setupMainPanel();
+		JPanel title_bg;
+
+		title_bg = new JPanel();
+		title_bg.setLayout(new MigLayout());
+		title_bg.setBackground(GUIParams.MAIN);
+
+		jl = new JLabel("Hello! How are you Gentlepeople?");
+		jl.setFont(new Font("Sans Serif", Font.PLAIN, 30));
+		jl.setForeground(GUIParams.BG_COLOR);
+
+		jl2 = new JLabel("Welcome to " + StringRes.appName);
+		jl2.setFont(new Font("Sans Serif", Font.BOLD, 50));
+		jl2.setForeground(GUIParams.BG_COLOR);
+		
+		label = new JLabel("Load Data >");
+		label.setFont(new Font("Sans Serif", Font.PLAIN, 50));
+		label.setForeground(GUIParams.MAIN);
+
+		title_bg.add(jl, "push, alignx 50%, span, wrap");
+		title_bg.add(jl2, "push, alignx 50%, span");
+		
+		loadPanel = new JPanel();
+		loadPanel.setLayout(new MigLayout());
+		loadPanel.setOpaque(false);
+		
+		loadBar = GUIParams.setPBarLayout();
+		
+		homePanel.add(title_bg, "pushx, growx, alignx 50%, span, "
+				+ "height 20%::, wrap");
+		homePanel.add(loadPanel, "push, grow, alignx 50%");
 	}
 
 	/**
@@ -69,60 +97,17 @@ public class WelcomeView {
 	 */
 	public void addLoadListener(final MouseListener loadData) {
 
-		loadPanel.addMouseListener(loadData);
+		label.addMouseListener(loadData);
 	}
 
-	/**
-	 * Returns the panel of this view instance, which contains all the content.
-	 * 
-	 * @return
-	 */
-	public void setupMainPanel() {
-
-		homePanel = new JPanel();
-		homePanel.setLayout(new MigLayout("ins 0"));
-		homePanel.setBackground(GUIParams.BG_COLOR);
-
-		JPanel title_bg;
-
-		title_bg = new JPanel();
-		title_bg.setLayout(new MigLayout());
-		title_bg.setBackground(GUIParams.MAIN);
-
-		jl = new JLabel("Hello! How are you Gentlepeople?");
-		jl.setFont(new Font("Sans Serif", Font.PLAIN, 30));
-		jl.setForeground(GUIParams.BG_COLOR);
-
-		jl2 = new JLabel("Welcome to " + StringRes.appName);
-		jl2.setFont(new Font("Sans Serif", Font.BOLD, 50));
-		jl2.setForeground(GUIParams.BG_COLOR);
-
-		title_bg.add(jl, "push, alignx 50%, span, wrap");
-		title_bg.add(jl2, "push, alignx 50%, span");
-
-		homePanel.add(title_bg, "pushx, growx, alignx 50%, span, "
-				+ "height 20%::, wrap");
-	}
 
 	public JPanel makeInitial() {
 
 		isLoading = false;
 
-		if (loadProgPanel != null && homePanel.isAncestorOf(loadProgPanel)) {
-			homePanel.remove(loadProgPanel);
-		}
+		loadPanel.removeAll();
 
-		loadPanel = new JPanel();
-		loadPanel.setLayout(new MigLayout());
-		loadPanel.setOpaque(false);
-
-		label = new JLabel("Load Data >");
-		label.setFont(new Font("Sans Serif", Font.PLAIN, 50));
-		label.setForeground(GUIParams.MAIN);
-
-		loadPanel.add(label, "pushx, alignx 50%");
-
-		homePanel.add(loadPanel, "push, alignx 50%");
+		loadPanel.add(label, "push, alignx 50%");
 
 		homePanel.revalidate();
 		homePanel.repaint();
@@ -134,37 +119,22 @@ public class WelcomeView {
 
 		isLoading = true;
 
-		if (loadPanel != null && homePanel.isAncestorOf(loadPanel)) {
-			homePanel.remove(loadPanel);
-		}
+		loadPanel.removeAll();
 
 		jl.setText("One moment, please.");
 		jl2.setText("Loading you data!");
+		
+		loadLabel = new JLabel();
+		loadLabel.setFont(GUIParams.FONTL);
+		loadLabel.setForeground(GUIParams.TEXT);
 
-		homePanel.add(getLoadPanel(), "push, grow");
+		loadPanel.add(loadLabel, "push, alignx 50%, aligny 100%, wrap");
+		loadPanel.add(loadBar, "push, w 70%, alignx 50%, aligny 0%");
 
 		homePanel.revalidate();
 		homePanel.repaint();
 
 		return homePanel;
-	}
-
-	public JPanel getLoadPanel() {
-
-		loadProgPanel = new JPanel();
-		loadProgPanel.setLayout(new MigLayout("ins 0"));
-		loadProgPanel.setOpaque(false);
-
-		loadLabel = new JLabel();
-		loadLabel.setFont(GUIParams.FONTL);
-		loadLabel.setForeground(GUIParams.TEXT);
-
-		loadBar = GUIParams.setPBarLayout();
-
-		loadProgPanel.add(loadLabel, "push, alignx 50%, aligny 100%, wrap");
-		loadProgPanel.add(loadBar, "push, w 70%, alignx 50%, aligny 0%");
-
-		return loadProgPanel;
 	}
 
 	// LoadBar functions
