@@ -39,6 +39,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.swing.JLabel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
@@ -103,32 +104,55 @@ public class ArrayNameView extends ModelView implements MouseListener,
 	 * @param hInfo
 	 *            Header containing array names as first row.
 	 */
-	public ArrayNameView(final HeaderInfo hInfo, final UrlExtractor uExtractor) {
+	public ArrayNameView() {
 
 		super();
 		this.setLayout(new MigLayout());
 
+//		this.headerInfo = hInfo;
+//		this.urlExtractor = uExtractor;
+//
+//		this.headerSummary = new HeaderSummary("ArraySummary");
+//		headerSummary.setIncluded(new int[] { 0 });
+//		headerSummary.addObserver(this);
+
+		addMouseListener(this);
+
+		l1 = new JLabel();
+		l1.setFont(GUIParams.FONTS);
+
+		add(l1, "alignx 50%, aligny 100%, push");
+
+		scrollPane = new JScrollPane(this,
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.setBorder(null);
+
+		panel = scrollPane;
+	}
+	
+	public JScrollBar getYScroll() {
+		
+		return scrollPane.getVerticalScrollBar();
+	}
+	
+	public void generateView(final HeaderInfo hInfo, 
+			final UrlExtractor uExtractor) {
+		
 		this.headerInfo = hInfo;
 		this.urlExtractor = uExtractor;
 
 		this.headerSummary = new HeaderSummary("ArraySummary");
 		headerSummary.setIncluded(new int[] { 0 });
 		headerSummary.addObserver(this);
-
-		addMouseListener(this);
-
-		l1 = new JLabel();
-		l1.setFont(GUIParams.FONTS);
+	}
+	
+	/**
+	 * Set the colors of all the components to the currently active scheme.
+	 */
+	public void setColors() {
+		
 		l1.setForeground(GUIParams.TEXT);
-
-		add(l1, "alignx 50%, aligny 100%, push");
-
-		scrollPane = new JScrollPane(this,
-				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		scrollPane.setBorder(null);
-
-		panel = scrollPane;
 	}
 
 	public HeaderInfo getHeaderInfo() {

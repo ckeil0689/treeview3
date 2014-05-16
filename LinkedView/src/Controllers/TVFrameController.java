@@ -64,7 +64,6 @@ public class TVFrameController {
 		this.applicationFrame = tvFrame.getAppFrame();
 
 		setViewChoice();
-		addViewListeners();
 	}
 
 	/**
@@ -77,12 +76,12 @@ public class TVFrameController {
 		tvFrame.addMenuActionListeners(new StackMenuListener());
 		tvFrame.addFileMenuListeners(new FileMenuListener());
 
-		if (tvFrame.getWelcomeView() != null) {
-			tvFrame.getWelcomeView().addLoadListener(
-					new LoadPanelListener(tvFrame.getWelcomeView()
-							.getLoadIcon(), tvFrame.getWelcomeView()
-							.getLoadLabel()));
-		}
+//		if (tvFrame.getWelcomeView() != null) {
+//			tvFrame.getWelcomeView().addLoadListener(
+//					new LoadPanelListener(tvFrame.getWelcomeView()
+//							.getLoadIcon(), tvFrame.getWelcomeView()
+//							.getLoadLabel()));
+//		}
 
 		if (tvFrame.getLoadErrorView() != null) {
 			tvFrame.getLoadErrorView().addLoadNewListener(
@@ -178,7 +177,6 @@ public class TVFrameController {
 		if (error) {
 			tvFrame.setView("LoadErrorView");
 			tvFrame.setLoaded(false);
-//			addViewListeners();
 
 			LogBuffer.println("DataModel not properly loaded.");
 
@@ -186,14 +184,14 @@ public class TVFrameController {
 			if (tvFrame.getDataModel() != null) {
 				tvFrame.setView("DendroView");
 				tvFrame.setLoaded(true);
-//				addViewListeners();
 
 			} else {
 				tvFrame.setView("WelcomeView");
 				tvFrame.setLoaded(false);
-//				addViewListeners();
 			}
 		}
+		
+		addViewListeners();
 	}
 
 	/**
@@ -671,27 +669,27 @@ public class TVFrameController {
 	 * 
 	 * @param menu
 	 */
-	public void openPrefMenu(final String menu, final String dialogTitle) {
+	public void openPrefMenu(final String menu) {
 
-		if (tvFrame.getDendroView() == null) {
-			final PreferencesMenu preferences = new PreferencesMenu(tvFrame,
-					menu, dialogTitle);
-
-			final PreferencesController pController = new PreferencesController(
-					tvFrame, preferences, this);
-
-			preferences.setVisible(true);
-
-		} else {
+//		if (!tvFrame.getDendroView().isLoaded()) {
+//			final PreferencesMenu preferences = new PreferencesMenu(tvFrame,
+//					menu, dialogTitle);
+//
+//			final PreferencesController pController = new PreferencesController(
+//					tvFrame, preferences, this);
+//
+//			preferences.setVisible(true);
+//
+//		} else {
 			final PreferencesMenu preferences = new PreferencesMenu(tvFrame,
 					tvFrame.getDendroView(), tvFrame.getDendroController(),
-					menu, dialogTitle);
+					menu);
 
 			final PreferencesController pController = new PreferencesController(
 					tvFrame, preferences, this);
 
 			preferences.setVisible(true);
-		}
+//		}
 	}
 
 	/**

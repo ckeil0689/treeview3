@@ -405,7 +405,7 @@ public abstract class ViewFrame implements Observer {
 	 * 
 	 * @return True if there is currently a model loaded.
 	 */
-	public abstract boolean getLoaded();
+	public abstract boolean isLoaded();
 
 	/**
 	 * Gets the shared <code>DataModel</code>

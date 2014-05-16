@@ -139,10 +139,15 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		treeView = treeview;
 		configNode = treeView.getGlobalConfig().node("TreeViewFrame");
 		
+		// Presets first
+		setupPresets();
+		
 		// Initialize the views
 		welcomeView = new WelcomeView();
 		loadErrorView = new LoadErrorView();
+		
 		dendroView = new DendroView2(this);
+		dendroController = new DendroController(this);
 
 		setWindowActive(true);
 
@@ -156,14 +161,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		waiting = new JPanel();
 		waiting.setLayout(new MigLayout("ins 0"));
 
-		backgroundPanel.add(menuPanel, "pushx, grow, wrap");
-		backgroundPanel.add(waiting, "pushx, grow, h 98%");
-
 		// Add the main background panel to the contentPane
 		applicationFrame.getContentPane().add(backgroundPanel);
-		
-		// Presets
-		setupPresets();
 
 		// setupMenuBar();
 		buildMenu();
@@ -183,7 +182,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	@Override
 	public void saveSettings() {
 
-		if (dendroController != null) {
+		if (dendroView.isLoaded()) {
 			dendroController.saveSettings();
 		}
 	}
@@ -202,15 +201,12 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		// Set view dependent of 'loaded'
 		if (!viewName.equalsIgnoreCase("DendroView")) {
 			if (viewName.equalsIgnoreCase("WelcomeView")) {
-//				welcomeView = new WelcomeView(this);
 				view = welcomeView.makeInitial();
 
 			} else if (viewName.equalsIgnoreCase("LoadProgressView")) {
-//				welcomeView = new WelcomeView(this);
 				view = welcomeView.makeLoading();
 
 			} else if (viewName.equalsIgnoreCase("LoadErrorView")) {
-//				loadErrorView = new LoadErrorView(this, loadErrorMessage);
 				loadErrorView.setErrorMessage(loadErrorMessage);
 				view = loadErrorView.makeErrorPanel();
 
@@ -229,29 +225,19 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 			buildMenu();
 
 		} else {
-//			dendroView = new DendroView2(this);
+			view = dendroView.makeDendroPanel();
 			setRunning(dendroView);
+			dendroView.setLoaded(true);
 
 			// Rebuild Menus
 			buildMenu();
 
-			dendroController = new DendroController(dendroView, this,
-					(TVModel) dataModel);
+			dendroController.setNew(dendroView,(TVModel) dataModel);
 
-			view = dendroView.makeDendroPanel();
 		}
 
 		displayView(view);
 	}
-
-//	/**
-//	 * Sets all views to null to free up memory.
-//	 */
-//	public void resetViews() {
-//
-//		welcomeView = null;
-//		dendroView = null;
-//	}
 
 	/**
 	 * Displays a screen to notify the user of a loading issue. Offers the user
@@ -271,10 +257,17 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	public void displayView(final JPanel view) {
 
+		backgroundPanel.removeAll();
 		waiting.removeAll();
+		
 		waiting.setBackground(GUIParams.BG_COLOR);
 		waiting.add(view, "push, grow");
 
+		if(dendroView.isLoaded()) {
+			backgroundPanel.add(menuPanel, "pushx, grow, wrap");
+		}
+		
+		backgroundPanel.add(waiting, "push, grow");
 		backgroundPanel.setBackground(GUIParams.BG_COLOR);
 		backgroundPanel.revalidate();
 		backgroundPanel.repaint();
@@ -314,7 +307,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		buffer.setLog(true);
 		inner.add(new LogSettingsPanel(buffer), BorderLayout.SOUTH);
 
-		final JDialog top = new JDialog(applicationFrame, "JTV Messages", false);
+		final JDialog top = new JDialog(applicationFrame, "JTV Messages", 
+				false);
 		top.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		top.setContentPane(inner);
 		top.pack();
@@ -617,47 +611,49 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		}
 
 		// Preferences
-		final JMenu prefSubMenu = new JMenu(StringRes.menu_title_Prefs);
+		final JMenuItem prefMenuItem = new JMenuItem(
+				StringRes.menu_title_Prefs);
+		stackMenuList.add(prefMenuItem);
 
-		if (running == null) {
-			final JMenuItem themeMenuItem = new JMenuItem(
-					StringRes.menu_title_Theme);
-			stackMenuList.add(themeMenuItem);
-			prefSubMenu.add(themeMenuItem);
-
-			prefSubMenu.addSeparator();
-
-			final JMenuItem clearPrefsMenuItem = new JMenuItem(
-					StringRes.menubar_clearPrefs);
-			stackMenuList.add(clearPrefsMenuItem);
-			prefSubMenu.add(clearPrefsMenuItem);
-
-		} else {
-			final JMenuItem themeMenuItem = new JMenuItem(
-					StringRes.menu_title_Theme);
-			stackMenuList.add(themeMenuItem);
-			prefSubMenu.add(themeMenuItem);
-
-			final JMenuItem fontMenuItem = new JMenuItem(
-					StringRes.menu_title_Font);
-			stackMenuList.add(fontMenuItem);
-			prefSubMenu.add(fontMenuItem);
-
-			final JMenuItem urlMenuItem = new JMenuItem(
-					StringRes.menu_title_URL);
-			stackMenuList.add(urlMenuItem);
-			prefSubMenu.add(urlMenuItem);
-
-			prefSubMenu.addSeparator();
-
-			// JMenuItem clearPrefsMenuItem = new JMenuItem(
-			// StringRes.menubar_clearPrefs);
-			// stackMenuList.add(clearPrefsMenuItem);
-			// prefSubMenu.add(clearPrefsMenuItem);
-		}
+//		if (running == null) {
+//			final JMenuItem themeMenuItem = new JMenuItem(
+//					StringRes.menu_title_Theme);
+//			stackMenuList.add(themeMenuItem);
+//			prefSubMenu.add(themeMenuItem);
+//
+//			prefSubMenu.addSeparator();
+//
+//			final JMenuItem clearPrefsMenuItem = new JMenuItem(
+//					StringRes.menubar_clearPrefs);
+//			stackMenuList.add(clearPrefsMenuItem);
+//			prefSubMenu.add(clearPrefsMenuItem);
+//
+//		} else {
+//			final JMenuItem themeMenuItem = new JMenuItem(
+//					StringRes.menu_title_Theme);
+//			stackMenuList.add(themeMenuItem);
+//			prefSubMenu.add(themeMenuItem);
+//
+//			final JMenuItem fontMenuItem = new JMenuItem(
+//					StringRes.menu_title_Font);
+//			stackMenuList.add(fontMenuItem);
+//			prefSubMenu.add(fontMenuItem);
+//
+//			final JMenuItem urlMenuItem = new JMenuItem(
+//					StringRes.menu_title_URL);
+//			stackMenuList.add(urlMenuItem);
+//			prefSubMenu.add(urlMenuItem);
+//
+//			prefSubMenu.addSeparator();
+//
+//			// JMenuItem clearPrefsMenuItem = new JMenuItem(
+//			// StringRes.menubar_clearPrefs);
+//			// stackMenuList.add(clearPrefsMenuItem);
+//			// prefSubMenu.add(clearPrefsMenuItem);
+//		}
 
 		fileSubMenu.addSeparator();
-		fileSubMenu.add(prefSubMenu);
+		fileSubMenu.add(prefMenuItem);
 
 		// Help
 		final JMenu helpSubMenu = new JMenu(StringRes.menu_title_Help);
@@ -1197,7 +1193,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	}
 
 	@Override
-	public boolean getLoaded() {
+	public boolean isLoaded() {
 
 		return loaded;
 	}

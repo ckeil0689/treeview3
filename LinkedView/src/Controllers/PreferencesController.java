@@ -63,7 +63,7 @@ public class PreferencesController {
 		preferences.addOKButtonListener(new ConfirmationListener());
 		preferences.addThemeListener(new ThemeListener());
 		preferences.addCustomLabelListener(new CustomLabelListener());
-		preferences.addMenuListeners(new MenuPanelListener());
+//		preferences.addMenuListeners(new MenuPanelListener());
 		preferences.addComponentListener(new PreferencesComponentListener());
 	}
 
@@ -74,38 +74,38 @@ public class PreferencesController {
 
 			checkForColorSave();
 
-			for (final MenuPanel panel : preferences.getMenuPanelList()) {
-
-				if (arg0.getSource().equals(panel.getMenuPanel())) {
-					preferences.addMenu(panel.getLabelText());
-					panel.setSelected(true);
-
-				} else {
-					panel.setSelected(false);
-				}
-			}
+//			for (final MenuPanel panel : preferences.getMenuPanelList()) {
+//
+//				if (arg0.getSource().equals(panel.getMenuPanel())) {
+//					preferences.addMenu(panel.getLabelText());
+//					panel.setSelected(true);
+//
+//				} else {
+//					panel.setSelected(false);
+//				}
+//			}
 		}
 
 		@Override
 		public void mouseEntered(final MouseEvent arg0) {
 
-			for (final MenuPanel panel : preferences.getMenuPanelList()) {
-
-				if (arg0.getSource().equals(panel.getMenuPanel())) {
-					panel.setHover(true);
-				}
-			}
+//			for (final MenuPanel panel : preferences.getMenuPanelList()) {
+//
+//				if (arg0.getSource().equals(panel.getMenuPanel())) {
+//					panel.setHover(true);
+//				}
+//			}
 		}
 
 		@Override
 		public void mouseExited(final MouseEvent arg0) {
 
-			for (final MenuPanel panel : preferences.getMenuPanelList()) {
-
-				if (arg0.getSource().equals(panel.getMenuPanel())) {
-					panel.setHover(false);
-				}
-			}
+//			for (final MenuPanel panel : preferences.getMenuPanelList()) {
+//
+//				if (arg0.getSource().equals(panel.getMenuPanel())) {
+//					panel.setHover(false);
+//				}
+//			}
 		}
 
 		@Override
@@ -128,10 +128,7 @@ public class PreferencesController {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			final boolean[] choices = preferences.getAnnotationChoices();
-
-			if (tvFrame.getLoaded() && (choices[0] || choices[1])) {
-
+			if (tvFrame.isLoaded()) {
 				try {
 					customFile = tvFrame.selectFile();
 
@@ -140,16 +137,11 @@ public class PreferencesController {
 				}
 
 				if (customFile != null) {
-					if (choices[0]) {
-						loadNewLabels("Row");
-					}
-
-					if (choices[1]) {
-						loadNewLabels("Column");
-					}
+					loadNewLabels("Row");
+					loadNewLabels("Column");
 				}
 			} else {
-				LogBuffer.println("Nothing selected.");
+				LogBuffer.println("Model not loaded in tvFrame.");
 			}
 		}
 	}
@@ -158,7 +150,7 @@ public class PreferencesController {
 
 		labelWorker = new LabelWorker(type);
 
-		dialog = new LabelLoadDialog(tvFrame);
+		dialog = new LabelLoadDialog(tvFrame, type);
 
 		// A property listener used to update the progress bar
 		final PropertyChangeListener listener = new PropertyChangeListener() {
@@ -272,10 +264,11 @@ public class PreferencesController {
 		 */
 		public void resetTheme() {
 
-			preferences.setupLayout(StringRes.menu_title_Theme);
+			preferences.setupLayout(StringRes.menu_title_Prefs);
 			addListeners();
 
-			if (tvFrame.getDataModel() != null && tvFrame.getRunning() != null) {
+			if (tvFrame.getDataModel() != null 
+					&& tvFrame.getRunning() != null) {
 				tvFrame.setView(StringRes.view_Dendro);
 				controller.addViewListeners();
 

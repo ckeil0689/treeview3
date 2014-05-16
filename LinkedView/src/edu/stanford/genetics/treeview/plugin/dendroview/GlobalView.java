@@ -40,6 +40,7 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.Ellipse2D;
 import java.util.Observable;
 
+import javax.swing.BorderFactory;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
@@ -48,6 +49,7 @@ import javax.swing.SwingUtilities;
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelViewProduced;
 import edu.stanford.genetics.treeview.TreeSelectionI;
@@ -67,6 +69,9 @@ public class GlobalView extends ModelViewProduced implements
 			"", "" };
 	private HeaderInfo arrayHI;
 	private HeaderInfo geneHI;
+	
+	private HeaderSummary geneSummary;
+	private HeaderSummary arraySummary;
 
 	private ArrayDrawer drawer;
 	private int overx;
@@ -108,13 +113,15 @@ public class GlobalView extends ModelViewProduced implements
 	public GlobalView() {
 
 		super();
-		// panel = this;
 
 		setLayout(new MigLayout());
 
-		scrollPane = new JScrollPane(panel,
-				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrollPane = new JScrollPane(this,
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		
+		panel = scrollPane;
+		panel.setBorder(BorderFactory.createEtchedBorder());
 
 		setToolTipText("This Turns Tooltips On");
 
@@ -153,7 +160,8 @@ public class GlobalView extends ModelViewProduced implements
 				if (geneHI != null) {
 					final int realGene = overy;
 					try {
-						statustext[0] += geneHI.getHeader(realGene, 1);
+						statustext[0] += geneSummary.getSummary(geneHI, 
+								realGene);//geneHI.getHeader(realGene, 1);
 
 					} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 						LogBuffer.println("ArrayIndexOutOfBoundsException "
@@ -165,7 +173,8 @@ public class GlobalView extends ModelViewProduced implements
 				statustext[1] = "Column: ";// + (overx + 1);
 				if (arrayHI != null) {
 					try {
-						statustext[1] += arrayHI.getHeader(overx, 0);
+						statustext[1] += arraySummary.getSummary(geneHI, 
+								overx);
 
 					} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 						LogBuffer.println("ArrayIndexOutOfBoundsException "
@@ -243,6 +252,12 @@ public class GlobalView extends ModelViewProduced implements
 
 		drawer = arrayDrawer;
 		drawer.addObserver(this);
+	}
+	
+	public void setHeaderSummary(HeaderSummary gene, HeaderSummary array) {
+		
+		this.geneSummary = gene;
+		this.arraySummary = array;
 	}
 
 	/**
@@ -665,14 +680,14 @@ public class GlobalView extends ModelViewProduced implements
 			if (xmap.contains(overx) && ymap.contains(overy)) {
 
 				if (geneHI != null) {
-					row = geneHI.getHeader(geneRow, 1);
+					row = geneSummary.getSummary(geneHI, overy);
 
 				} else {
 					row = "N/A";
 				}
 
 				if (arrayHI != null) {
-					col = arrayHI.getHeader(geneCol, 0);
+					col = arraySummary.getSummary(arrayHI, overx);
 
 				} else {
 					col = "N/A";

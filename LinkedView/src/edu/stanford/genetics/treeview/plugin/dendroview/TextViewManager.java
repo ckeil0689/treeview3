@@ -57,16 +57,15 @@ public class TextViewManager extends ModelView implements ConfigNodePersistent,
 	private static final long serialVersionUID = 1L;
 
 	private boolean ignoreDividerChange = false;
-	private final UrlExtractor uExtractor;
+	private UrlExtractor uExtractor;
 	private Component root;
 	private int numViews;
 	private int numShown;
-	private final HeaderInfo hI;
-	private final Vector<ModelView> textViews;
+	private HeaderInfo hI;
+	private Vector<ModelView> textViews;
 	private Preferences configNode;
-	private HeaderSummary headerSummary = new HeaderSummary(
-			"TextViewManagerSummary");
-	private final int dividerLocations[];
+	private HeaderSummary headerSummary;
+	private int dividerLocations[];
 
 	/**
 	 * Constructor
@@ -74,12 +73,56 @@ public class TextViewManager extends ModelView implements ConfigNodePersistent,
 	 * @param hI
 	 * @param uExtractor
 	 */
-	public TextViewManager(final HeaderInfo hI, final UrlExtractor uExtractor,
-			final DataModel model) {
+	public TextViewManager() {
 
 		super();
+//		this.hI = hI;
+//		this.uExtractor = uExtractor;
+//
+//		// Find out what kind of file was loaded
+//		final String srcFileType = model.getSource().toLowerCase();
+//
+//		root = null;
+//		textViews = new Vector<ModelView>();
+//
+//		panel = new JPanel();
+//		panel.setLayout(new MigLayout("ins 0"));
+//
+//		dividerLocations = new int[hI.getNumNames() - 1];
+//		// firstNotShown = null;
+//		numShown = 0;
+//
+//		// could set up headerSummary...
+//		final int GIDIndex = hI.getIndex("GID");
+//		if (GIDIndex == -1 && !srcFileType.endsWith(".cdt")) {
+//			headerSummary.setIncluded(new int[] { 1 }); // changed from {1}???
+//
+//		} else if (GIDIndex == -1 && srcFileType.endsWith(".cdt")) {
+//			headerSummary.setIncluded(new int[] { 1 });
+//
+//		} else {
+//			headerSummary.setIncluded(new int[] { 2 });
+//		}
+//		headerSummary.addObserver(this);
+//
+//		makeTextViews(hI.getNumNames());
+//
+//		for (int i = 0; i < numViews - 1; i++) {
+//
+//			dividerLocations[i] = 50;
+//		}
+//
+//		addTextViews(1);
+//		loadDividerLocations();
+//		setVisible(true);
+	}
+	
+	public void generateView(final HeaderInfo hI, final UrlExtractor uExtractor,
+			final DataModel model) {
+		
 		this.hI = hI;
 		this.uExtractor = uExtractor;
+		this.headerSummary = new HeaderSummary("TextViewManagerSummary");
 
 		// Find out what kind of file was loaded
 		final String srcFileType = model.getSource().toLowerCase();

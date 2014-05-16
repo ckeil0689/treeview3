@@ -31,6 +31,10 @@ public class StringRes {
 
 	// View Titles
 	public static final String view_title_Cluster = "Cluster View";
+	
+	// Main Words
+	public static final String main_rows = "Rows";
+	public static final String main_cols = "Columns";
 
 	// Menu Titles
 	public static final String menu_title_Open = "Open...";
@@ -38,7 +42,7 @@ public class StringRes {
 	public static final String menu_title_EditRecent = "Edit Recent Files";
 	public static final String menu_title_Save = "Save";
 	public static final String menu_title_SaveAs = "Save As...";
-	public static final String menu_title_Prefs = "Preferences...";
+	public static final String menu_title_Prefs = "Preferences";
 	public static final String menu_title_Theme = "Theme";
 	public static final String menu_title_Font = "Font";
 	public static final String menu_title_URL = "URL";
@@ -71,7 +75,7 @@ public class StringRes {
 	public static final String button_OK = "OK";
 	public static final String button_Cancel = "Cancel";
 	public static final String button_Cluster = "Cluster";
-	public static final String button_customLabels = "Load custom labels";
+	public static final String button_customLabels = "Load more labels...";
 	public static final String button_home = "Home";
 	public static final String button_searchLabels = "Search labels";
 	public static final String button_showTrees = "Show trees";
@@ -82,11 +86,11 @@ public class StringRes {
 			"or column elements";
 	public static final String tooltip_showTrees = "Determine dendrogram" +
 			"visibility";
-	public static final String tooltip_xZoomIn = "Zoom in on rows.";
-	public static final String tooltip_xZoomOut = "Zoom out of rows.";
-	public static final String tooltip_yZoomIn = "Zoom in on columns.";
-	public static final String tooltip_yZoomOut = "Zoom out of columns.";
-	public static final String tooltip_home = "Zoom into the selected area.";
+	public static final String tooltip_xZoomIn = "Zoom in on rows";
+	public static final String tooltip_xZoomOut = "Zoom out of rows";
+	public static final String tooltip_yZoomIn = "Zoom in on columns";
+	public static final String tooltip_yZoomOut = "Zoom out of columns";
+	public static final String tooltip_home = "Zoom into the selected area";
 
 	// RadioButton Texts
 	public static final String rButton_dark = "Dark";

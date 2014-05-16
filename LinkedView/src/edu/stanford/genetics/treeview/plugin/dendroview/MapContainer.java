@@ -559,6 +559,15 @@ public class MapContainer extends Observable implements Observer,
 
 		return current.getAvailablePixels();
 	}
+	
+	/**
+	 * Returns amount of tiles currently visible on this map.
+	 * @return
+	 */
+	public int getTileNumVisible() {
+		
+		return (int)tileNumVisible;
+	}
 
 	private void switchMap(final IntegerMap integerMap) {
 

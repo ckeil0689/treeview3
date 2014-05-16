@@ -57,16 +57,15 @@ public class ArrayNameViewManager extends ModelView implements
 	private static final long serialVersionUID = 1L;
 
 	private boolean ignoreDividerChange = false;
-	private final UrlExtractor uExtractor;
+	private UrlExtractor uExtractor;
 	private Component root;
 	private int numViews;
 	private int numShown;
-	private final HeaderInfo hI;
-	private final Vector<ModelView> arrayNameViews;
+	private HeaderInfo hI;
+	private Vector<ModelView> arrayNameViews;
 	private Preferences configNode;
-	private HeaderSummary headerSummary = new HeaderSummary(
-			"ArrayNameViewManagerSummary");
-	private final int dividerLocations[];
+	private HeaderSummary headerSummary;
+	private int dividerLocations[];
 
 	/**
 	 * Constructor
@@ -74,13 +73,57 @@ public class ArrayNameViewManager extends ModelView implements
 	 * @param hI
 	 * @param uExtractor
 	 */
-	public ArrayNameViewManager(final HeaderInfo hI,
-			final UrlExtractor uExtractor, final DataModel model) {
+	public ArrayNameViewManager() {
 
 		super();
+//		this.hI = hI;
+//		this.uExtractor = uExtractor;
+
+//		// Find out what kind of file was loaded
+//		final String srcFileType = model.getSource().toLowerCase();
+//
+//		root = null;
+//		arrayNameViews = new Vector<ModelView>();
+//
+//		panel = new JPanel();
+//		panel.setLayout(new MigLayout("ins 0"));
+//
+//		dividerLocations = new int[hI.getNumNames() - 1];
+//		// firstNotShown = null;
+//		numShown = 0;
+//
+//		// could set up headerSummary...
+//		final int GIDIndex = hI.getIndex("GID");
+//		if (GIDIndex == -1 && !srcFileType.endsWith(".cdt")) {
+//			headerSummary.setIncluded(new int[] { 1 }); // changed from {1}???
+//
+//		} else if (GIDIndex == -1 && srcFileType.endsWith(".cdt")) {
+//			headerSummary.setIncluded(new int[] { 1 });
+//
+//		} else {
+//			headerSummary.setIncluded(new int[] { 2 });
+//		}
+//		headerSummary.addObserver(this);
+//
+//		makeArrayNameViews(hI.getNumNames());
+//
+//		for (int i = 0; i < numViews - 1; i++) {
+//
+//			dividerLocations[i] = 50;
+//		}
+//
+//		addArrayNameViews(1);
+//		loadDividerLocations();
+//		setVisible(true);
+	}
+	
+	public void generateView(final HeaderInfo hI,
+			final UrlExtractor uExtractor, final DataModel model) {
+		
 		this.hI = hI;
 		this.uExtractor = uExtractor;
-
+		this.headerSummary = new HeaderSummary("ArrayNameViewManagerSummary");
+		
 		// Find out what kind of file was loaded
 		final String srcFileType = model.getSource().toLowerCase();
 

@@ -71,6 +71,7 @@ public class IntHeaderInfo extends Observable implements HeaderInfo {
 		try {
 			if (getHeaderArray()[gene] == null) {
 				return new String[0];
+				
 			} else {
 				return getHeaderArray()[gene];
 			}

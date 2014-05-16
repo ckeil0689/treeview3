@@ -199,7 +199,7 @@ public abstract class HeaderFinderBox {
 		geneSelection.notifyObservers();
 
 		if ((viewFrame != null) && (selected.length > 0)) {
-			scrollToIndex(choices[selected[0]]);
+			scrollToIndex(geneList.indexOf(genefBox.getSelectedItem()));
 		}
 	}
 

@@ -57,9 +57,9 @@ import edu.stanford.genetics.treeview.plugin.dendroview.TreePainter;
 public class DendroController implements ConfigNodePersistent {
 
 	private final double PRECISION_LEVEL = 0.000001;
-	private final DendroView2 dendroView;
+	private DendroView2 dendroView;
 	private final TreeViewFrame tvFrame;
-	private final TVModel tvModel;
+	private TVModel tvModel;
 
 	protected Preferences configNode;
 
@@ -72,8 +72,8 @@ public class DendroController implements ConfigNodePersistent {
 	protected TreePainter leftTreeDrawer;
 
 	// MapContainers
-	protected MapContainer globalXmap;
-	protected MapContainer globalYmap;
+	protected final MapContainer globalXmap;
+	protected final MapContainer globalYmap;
 
 	// Selections
 	private TreeSelectionI geneSelection = null;
@@ -83,13 +83,19 @@ public class DendroController implements ConfigNodePersistent {
 	private ColorExtractor2 colorExtractor;
 
 	// Search Window (Global so it can be checked if open).
-	private JWindow window;
+//	private JWindow window;
 
-	public DendroController(final DendroView2 dendroView,
-			final TreeViewFrame tvFrame, final TVModel tvModel) {
+	public DendroController(final TreeViewFrame tvFrame) {
 
-		this.dendroView = dendroView;
 		this.tvFrame = tvFrame;
+		
+		globalXmap = new MapContainer("Fixed", "GlobalXMap");
+		globalYmap = new MapContainer("Fixed", "GlobalYMap");
+	}
+	
+	public void setNew(final DendroView2 dendroView, final TVModel tvModel) {
+		
+		this.dendroView = dendroView;
 		this.tvModel = tvModel;
 
 		setConfigNode(tvFrame.getConfigNode());
@@ -176,6 +182,7 @@ public class DendroController implements ConfigNodePersistent {
 	class SearchWindowOpener extends SwingWorker<Void, Void> {
 
 		private final ActionEvent event;
+		private JWindow window;
 
 		SearchWindowOpener(final ActionEvent e) {
 
@@ -369,29 +376,34 @@ public class DendroController implements ConfigNodePersistent {
 	public void setButtonEnabledStatus() {
 
 		// X-Axis Buttons
-		if (Math.abs(getGlobalXMap().getScale() - getGlobalXMap().getMinScale()) < PRECISION_LEVEL) {
+		if (Math.abs(getGlobalXMap().getScale() - getGlobalXMap().getMinScale()) 
+				< PRECISION_LEVEL) {
 			dendroView.getXMinusButton().setEnabled(false);
 
 		} else if (Math.abs(getGlobalXMap().getScale()
 				- getGlobalXMap().getMinScale()) > PRECISION_LEVEL
 				&& Math.abs(getGlobalXMap().getScale()
-						- getGlobalXMap().getAvailablePixels()) > PRECISION_LEVEL) {
+						- getGlobalXMap().getAvailablePixels()) 
+						> PRECISION_LEVEL) {
 			dendroView.getXMinusButton().setEnabled(true);
 			dendroView.getXPlusButton().setEnabled(true);
 
 		} else if (Math.abs(getGlobalXMap().getScale()
-				- getGlobalXMap().getAvailablePixels()) < PRECISION_LEVEL) {
+				- getGlobalXMap().getAvailablePixels()) 
+				< PRECISION_LEVEL) {
 			dendroView.getXPlusButton().setEnabled(false);
 		}
 
 		// Y-Axis Buttons
-		if (Math.abs(getGlobalYMap().getScale() - getGlobalYMap().getMinScale()) < PRECISION_LEVEL) {
+		if (Math.abs(getGlobalYMap().getScale() - getGlobalYMap().getMinScale())
+				< PRECISION_LEVEL) {
 			dendroView.getYMinusButton().setEnabled(false);
 
 		} else if (Math.abs(getGlobalYMap().getScale()
 				- getGlobalYMap().getMinScale()) > PRECISION_LEVEL
 				&& Math.abs(getGlobalYMap().getScale()
-						- getGlobalYMap().getAvailablePixels()) > PRECISION_LEVEL) {
+						- getGlobalYMap().getAvailablePixels()) 
+						> PRECISION_LEVEL) {
 			dendroView.getYMinusButton().setEnabled(true);
 			dendroView.getYPlusButton().setEnabled(true);
 
@@ -766,9 +778,6 @@ public class DendroController implements ConfigNodePersistent {
 		// globalmaps tell globalview, atrview, and gtrview
 		// where to draw each data point.
 		// the scrollbars "scroll" by communicating with the maps.
-		globalXmap = new MapContainer("Fixed", "GlobalXMap");
-		globalYmap = new MapContainer("Fixed", "GlobalYMap");
-
 		setMapContainers();
 
 		globalXmap.setScrollbar(dendroView.getXScroll());
@@ -821,9 +830,9 @@ public class DendroController implements ConfigNodePersistent {
 	public void setMapContainers() {
 
 		dendroView.getAtrview().setMap(globalXmap);
+		dendroView.getArraynameview().setMap(globalXmap);
 		dendroView.getGtrview().setMap(globalYmap);
 		dendroView.getTextview().setMap(globalYmap);
-		dendroView.getArraynameview().setMap(globalXmap);
 
 		dendroView.getGlobalView().setXMap(globalXmap);
 		dendroView.getGlobalView().setYMap(globalYmap);

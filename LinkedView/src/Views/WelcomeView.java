@@ -3,6 +3,7 @@ package Views;
 import java.awt.Font;
 import java.awt.event.MouseListener;
 
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -19,7 +20,7 @@ public class WelcomeView {
 
 	private final JLabel jl;
 	private final JLabel jl2;
-	private final JLabel label;
+	private final JButton label;
 
 	private boolean isLoading = false;
 
@@ -47,9 +48,7 @@ public class WelcomeView {
 		jl2.setFont(new Font("Sans Serif", Font.BOLD, 50));
 		jl2.setForeground(GUIParams.BG_COLOR);
 		
-		label = new JLabel("Load Data >");
-		label.setFont(new Font("Sans Serif", Font.PLAIN, 50));
-		label.setForeground(GUIParams.MAIN);
+		label = GUIParams.setButtonLayout("Open...", null);
 
 		title_bg.add(jl, "push, alignx 50%, span, wrap");
 		title_bg.add(jl2, "push, alignx 50%, span");
@@ -80,7 +79,7 @@ public class WelcomeView {
 	 * 
 	 * @return
 	 */
-	public JLabel getLoadLabel() {
+	public JButton getLoadLabel() {
 
 		return label;
 	}

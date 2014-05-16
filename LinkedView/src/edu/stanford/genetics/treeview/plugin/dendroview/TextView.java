@@ -39,6 +39,7 @@ import java.util.Observable;
 import java.util.prefs.Preferences;
 
 import javax.swing.JLabel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
@@ -76,9 +77,9 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 	private TreeSelectionI geneSelection;
 	private TreeSelectionI arraySelection;
 	private MapContainer map;
-	private final UrlExtractor urlExtractor;
+	private UrlExtractor urlExtractor;
 	private int maxlength = 0;
-	private final int col;
+	private int col;
 	private boolean dragging = false;
 
 	private final JScrollPane scrollPane;
@@ -89,29 +90,16 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 	 * mapping should be managed by Dendroview so that the SummaryView can use
 	 * the same HeaderSummary.
 	 */
-	public TextView(final HeaderInfo hI, final UrlExtractor uExtractor) {
+//	public TextView(final HeaderInfo hI, final UrlExtractor uExtractor) {
+//
+//		this(hI, uExtractor, -1);
+//	}
 
-		this(hI, uExtractor, -1);
-	}
-
-	public TextView(final HeaderInfo hI, final UrlExtractor uExtractor,
-			final int col) {
+	public TextView() {
 
 		super();
 		this.setLayout(new MigLayout());
 		this.setOpaque(false);
-		urlExtractor = uExtractor;
-		headerInfo = hI;
-		this.col = col;
-
-		// could set up headerSummary...
-		final int GIDIndex = headerInfo.getIndex("GID");
-		if (GIDIndex == -1) {
-			headerSummary.setIncluded(new int[] { 1 });
-
-		} else {
-			headerSummary.setIncluded(new int[] { 2 });
-		}
 
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -124,9 +112,41 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 
 		scrollPane = new JScrollPane(this,
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
-				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBorder(null);
 		panel = scrollPane;
+	}
+	
+	public JScrollBar getXScroll() {
+		
+		return scrollPane.getHorizontalScrollBar();
+	}
+	
+	public void generateView(final HeaderInfo hI, final UrlExtractor uExtractor,
+			final int col) {
+		
+		this.urlExtractor = uExtractor;
+		headerInfo = hI;
+		this.col = col;
+
+		// could set up headerSummary...
+		final int GIDIndex = headerInfo.getIndex("GID");
+//		if (GIDIndex == -1) {
+//			headerSummary.setIncluded(new int[] { 1 });
+//
+//		} else {
+//			headerSummary.setIncluded(new int[] { 2 });
+//		}
+		headerSummary.setIncluded(new int[] { 0 });
+		headerSummary.addObserver(this);
+	}
+	
+	/**
+	 * Sets component color according to the currently active color scheme.
+	 */
+	public void setColors() {
+		
+		l1.setForeground(GUIParams.TEXT);
 	}
 
 	@Override

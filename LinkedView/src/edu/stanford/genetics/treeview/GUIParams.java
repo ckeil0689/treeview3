@@ -186,7 +186,7 @@ public class GUIParams {
 
 		final JRadioButton menuButton = new JRadioButton(title);
 		menuButton.setOpaque(false);
-		menuButton.setForeground(RADIOTEXT);
+		menuButton.setForeground(TEXT);
 		menuButton.setFont(FONTS);
 		menuButton.setBorder(null);
 		menuButton.setFocusPainted(false);

@@ -90,23 +90,23 @@ public class DendroView2 implements Observer, DendroPanel {
 	private final JPanel dendroPane;
 
 	protected ScrollPane panes[];
-	protected boolean loaded;
+	private boolean loaded;
 
 	// Map Views
-	private GlobalView globalview;
+	private final GlobalView globalview;
 
 	// Trees
-	protected GTRView gtrview;
-	protected ATRView atrview;
+	protected final GTRView gtrview;
+	protected final ATRView atrview;
 
-	// Row and Column names
-	protected TextViewManager textview;
-	protected ArrayNameViewManager arraynameview;
+	// Row and column names
+	protected final TextView textview;
+	protected final ArrayNameView arraynameview;
 
 	protected JScrollBar globalXscrollbar;
 	protected JScrollBar globalYscrollbar;
 
-	// persistent popups
+	// Persistent popups
 	protected JDialog settingsFrame;
 	protected TabbedSettingsPanel settingsPanel;
 
@@ -165,10 +165,34 @@ public class DendroView2 implements Observer, DendroPanel {
 
 		this.tvFrame = tvFrame;
 		this.name = "DendroView";
+		this.loaded = false;
 
 		dendroPane = new JPanel();
 		dendroPane.setLayout(new MigLayout("ins 0"));
-		dendroPane.setBackground(GUIParams.BG_COLOR);
+		
+		// Create the Global view (JPanel to display)
+		globalview = new GlobalView();
+
+		// scrollbars, mostly used by maps
+		globalXscrollbar = globalview.getXScroll();
+		globalYscrollbar = globalview.getYScroll();
+
+		// Set up the column name display
+//		arraynameview = new ArrayNameViewManager();
+		arraynameview = new ArrayNameView();
+		// new ArrayNameView(
+		// tvFrame.getDataModel().getArrayHeaderInfo());
+		// arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
+
+		textview = new TextView();
+
+		// Set up row dendrogram
+		gtrview = new GTRView();
+		gtrview.getHeaderSummary().setIncluded(new int[] { 0, 3 });
+
+		// Set up column dendrogram
+		atrview = new ATRView();
+		atrview.getHeaderSummary().setIncluded(new int[] { 0, 3 });
 	}
 
 	/**
@@ -178,46 +202,18 @@ public class DendroView2 implements Observer, DendroPanel {
 	 */
 	public JPanel makeDendroPanel() {
 
-		setupViews();
+//		arraynameview.generateView(tvFrame.getDataModel()
+//				.getArrayHeaderInfo(), tvFrame.getUrlExtractor(),
+//				tvFrame.getDataModel());
+		arraynameview.generateView(tvFrame.getDataModel()
+				.getArrayHeaderInfo(), tvFrame.getUrlExtractor());
 		
-		return dendroPane;
-	}
-
-	// Layout
-	/**
-	 * This method should be called only during initial setup of the ModelView.
-	 * It sets up the views and binds them all to Config nodes.
-	 * 
-	 */
-	protected void setupViews() {
-
-		// Create the Global view (JPanel to display)
-		globalview = new GlobalView();
-
-		// scrollbars, mostly used by maps
-		globalXscrollbar = globalview.getXScroll();
-		globalYscrollbar = globalview.getYScroll();
-
-		// Set up the column name display
-		arraynameview = new ArrayNameViewManager(tvFrame.getDataModel()
-				.getArrayHeaderInfo(), tvFrame.getUrlExtractor(),
-				tvFrame.getDataModel());
-		// new ArrayNameView(
-		// tvFrame.getDataModel().getArrayHeaderInfo());
-		// arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
-
-		textview = new TextViewManager(tvFrame.getDataModel()
-				.getGeneHeaderInfo(), tvFrame.getUrlExtractor(),
-				tvFrame.getDataModel());
-
-		// Set up row dendrogram
-		gtrview = new GTRView();
-		gtrview.getHeaderSummary().setIncluded(new int[] { 0, 3 });
-
-		// Set up column dendrogram
-		atrview = new ATRView();
-		atrview.getHeaderSummary().setIncluded(new int[] { 0, 3 });
-
+		textview.generateView(tvFrame.getDataModel()
+				.getGeneHeaderInfo(), tvFrame.getUrlExtractor(), -1);
+		
+		globalview.setHeaderSummary(textview.getHeaderSummary(), 
+				arraynameview.getHeaderSummary());
+		
 		// Register Views
 		registerView(globalview);
 		registerView(atrview);
@@ -228,6 +224,8 @@ public class DendroView2 implements Observer, DendroPanel {
 		// reset persistent popups
 		settingsFrame = null;
 		settingsPanel = null;
+		
+		return dendroPane;
 	}
 
 	/**
@@ -237,6 +235,9 @@ public class DendroView2 implements Observer, DendroPanel {
 
 		// Clear panel
 		dendroPane.removeAll();
+		
+		// Set color scheme
+		setComponentColors();
 
 		// Components for layout setup
 		JPanel buttonPanel;
@@ -254,9 +255,8 @@ public class DendroView2 implements Observer, DendroPanel {
 		JPanel fillPanel4;
 
 		// Buttons
-		scaleDefaultAll = GUIParams.setButtonLayout(StringRes.button_home, 
-				"homeIcon");
-		scaleDefaultAll.setToolTipText("Resets the zoomed view.");
+		scaleDefaultAll = GUIParams.setButtonLayout(null, "homeIcon");
+		scaleDefaultAll.setToolTipText("Reset the zoomed view");
 
 		scaleIncX = GUIParams.setButtonLayout(null, "zoomInIcon");
 		scaleIncX.setToolTipText(StringRes.tooltip_xZoomIn);
@@ -277,6 +277,7 @@ public class DendroView2 implements Observer, DendroPanel {
 		buttonPanel = new JPanel();
 		buttonPanel.setLayout(new MigLayout());
 		buttonPanel.setOpaque(false);
+		
 
 		crossPanel = new JPanel();
 		crossPanel.setLayout(new MigLayout());
@@ -307,11 +308,11 @@ public class DendroView2 implements Observer, DendroPanel {
 
 		textpanel = new JPanel();
 		textpanel.setLayout(new MigLayout("ins 0"));
-		textpanel.setOpaque(true);
+		textpanel.setOpaque(false);
 
 		arrayNamePanel = new JPanel();
 		arrayNamePanel.setLayout(new MigLayout("ins 0"));
-		arrayNamePanel.setOpaque(true);
+		arrayNamePanel.setOpaque(false);
 
 		if (gtrview.isEnabled() || atrview.isEnabled()) {
 			tvFrame.getTreeButton().setEnabled(true);
@@ -352,17 +353,22 @@ public class DendroView2 implements Observer, DendroPanel {
 		buttonPanel.add(crossPanel, "pushx, alignx 50%, wrap");
 
 		navPanel.add(buttonPanel, "pushx, h 20%, w 90%, alignx 50%, wrap");
-		navPanel.add(scaleDefaultAll, "pushx, alignx 50%");
+		navPanel.add(scaleDefaultAll, "push, alignx 50%, aligny 5%");
+		
+		JScrollBar arrayScroll = arraynameview.getYScroll();
+		JScrollBar geneScroll = textview.getXScroll();
 
 		// Layout depends on which dendrogram is shown or not!
 		if (showTrees && (atrview.isEnabled() && gtrview.isEnabled())) {
 			dendroPane.add(firstPanel, "w 18.5%, h 20%");
-			dendroPane.add(atrPane, "span 2, w 73%, h 20%");
+			dendroPane.add(atrPane, "w 72%, h 20%");
+			dendroPane.add(arrayScroll, "w 1%, h 20%");
 			dendroPane.add(fillPanel1, "w 10.5%, h 20%, wrap");
-			dendroPane.add(gtrPane, "span 1 2, w 18.5%, h 76%");
+			dendroPane.add(gtrPane, "w 18.5%, h 76%");
 			dendroPane.add(globalview, "w 72%, h 75%");
-			dendroPane.add(globalYscrollbar, "w 1%, h 75%");
+			dendroPane.add(globalYscrollbar, "h 75%");
 			dendroPane.add(navPanel, "w 10.5%, h 75%, wrap");
+			dendroPane.add(geneScroll, "w 18.5%, h 1%");
 			dendroPane.add(globalXscrollbar, "pushy, aligny 0%, w 72%, h 1%");
 			dendroPane.add(fillPanel3, "span 2 2, w 11.5%, h 5%, wrap");
 			dendroPane.add(fillPanel2, "w 18.5%, h 5%");
@@ -370,12 +376,14 @@ public class DendroView2 implements Observer, DendroPanel {
 
 		} else if (showTrees && (atrview.isEnabled() && !gtrview.isEnabled())) {
 			dendroPane.add(firstPanel, "w 18.5%, h 20%");
-			dendroPane.add(atrPane, "span 2, w 80%, h 20%");
+			dendroPane.add(atrPane, "w 79%, h 20%");
+			dendroPane.add(arrayScroll, "w 1%, h 20%");
 			dendroPane.add(fillPanel1, "w 10.5%, h 20%, wrap");
-			dendroPane.add(textpanel, "span 1 2, w 10.5%, h 76%");
+			dendroPane.add(textpanel, "w 10.5%, h 76%");
 			dendroPane.add(globalview, "w 80%, h 75%");
-			dendroPane.add(globalYscrollbar, "w 1%, h 75%");
+			dendroPane.add(globalYscrollbar, "h 75%");
 			dendroPane.add(navPanel, "w 10.5%, h 75%, wrap");
+			dendroPane.add(geneScroll, "w 10.5%, h 1%");
 			dendroPane.add(globalXscrollbar, "pushy, aligny 0%, w 80%, h 1%");
 			dendroPane.add(fillPanel3, "span 2 2, w 11.5%, h 5%, wrap");
 			dendroPane.add(fillPanel2, "w 10.5%, h 5%");
@@ -383,12 +391,14 @@ public class DendroView2 implements Observer, DendroPanel {
 
 		} else if (showTrees && (!atrview.isEnabled() && gtrview.isEnabled())) {
 			dendroPane.add(firstPanel, "w 18.5%, h 10%");
-			dendroPane.add(arrayNamePanel, "span 2, w 73%, h 10%");
+			dendroPane.add(arrayNamePanel, "w 72%, h 10%");
+			dendroPane.add(arrayScroll, "w 1%, h 10%");
 			dendroPane.add(fillPanel1, "w 10.5%, h 10%, wrap");
-			dendroPane.add(gtrPane, "span 1 2, w 18.5%, h 86%");
+			dendroPane.add(gtrPane, "w 18.5%, h 86%");
 			dendroPane.add(globalview, "w 72%, h 85%");
-			dendroPane.add(globalYscrollbar, "w 1%, h 85%");
+			dendroPane.add(globalYscrollbar, "h 85%");
 			dendroPane.add(navPanel, "w 10.5%, h 85%, wrap");
+			dendroPane.add(geneScroll, "w 18.5%, h 1%");
 			dendroPane.add(globalXscrollbar, "pushy, aligny 0%, w 72%, h 1%");
 			dendroPane.add(fillPanel3, "span 2 2, w 11.5%, h 5%, wrap");
 			dendroPane.add(fillPanel2, "w 18.5%, h 5%");
@@ -396,17 +406,26 @@ public class DendroView2 implements Observer, DendroPanel {
 
 		} else {
 			dendroPane.add(firstPanel, "w 10.5%, h 10%");
-			dendroPane.add(arrayNamePanel, "span 2, w 81%, h 10%");
+			dendroPane.add(arrayNamePanel, "w 81%, h 10%");
+			dendroPane.add(arrayScroll, "w 1%, h 10%");
 			dendroPane.add(fillPanel1, "span 2, w 10.5%, h 10%, wrap");
-			dendroPane.add(textpanel, "span 1 2, w 10.5%, h 86%");
+			dendroPane.add(textpanel, "w 10.5%, h 86%");
 			dendroPane.add(globalview, "w 80%, h 85%");
-			dendroPane.add(globalYscrollbar, "w 1%, h 85%");
+			dendroPane.add(globalYscrollbar, "h 85%");
 			dendroPane.add(navPanel, "w 10.5%, h 85%, wrap");
+			dendroPane.add(geneScroll, "w 10.5%, h 1%");
 			dendroPane.add(globalXscrollbar, "pushy, aligny 0%, w 80%, h 1%");
 			dendroPane.add(fillPanel3, "span 2 2, w 11.5%, h 5%, wrap");
 			dendroPane.add(fillPanel2, "span 1 2, w 10.5%, h 5%");
 			dendroPane.add(fillPanel4, "w 80%, h 1%");
 		}
+	}
+	
+	public void setComponentColors() {
+		
+		dendroPane.setBackground(GUIParams.BG_COLOR);
+		arraynameview.setColors();
+		textview.setColors();
 	}
 
 	// Add Button Listeners
@@ -1030,6 +1049,25 @@ public class DendroView2 implements Observer, DendroPanel {
 
 	// Setters
 	/**
+	 * Sets the boolean which identifies the loaded status of DendroView.
+	 * Will be true if a file has been loaded into DendroView.
+	 * @param loaded
+	 */
+	public void setLoaded(boolean loaded) {
+		
+		this.loaded = loaded;
+	}
+	
+	/**
+	 * Shows whether the status of this DendroView is loaded or not.
+	 * @return
+	 */
+	public boolean isLoaded() {
+		
+		return loaded;
+	}
+	
+	/**
 	 * This should be called after setDataModel has been set to the appropriate
 	 * model
 	 * 
@@ -1185,7 +1223,7 @@ public class DendroView2 implements Observer, DendroPanel {
 		return arraySelection;
 	}
 
-	public ArrayNameViewManager getArraynameview() {
+	public ArrayNameView getArraynameview() {
 
 		return arraynameview;
 	}
@@ -1200,7 +1238,7 @@ public class DendroView2 implements Observer, DendroPanel {
 		return gtrview;
 	}
 
-	public TextViewManager getTextview() {
+	public TextView getTextview() {
 
 		return textview;
 	}

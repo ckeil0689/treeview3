@@ -17,7 +17,7 @@ public class LabelLoadDialog {
 	private final JPanel mainPanel;
 	private final JProgressBar pBar;
 
-	public LabelLoadDialog(final ViewFrame view) {
+	public LabelLoadDialog(final ViewFrame view, String type) {
 
 		labelLoadFrame = new JDialog();
 		labelLoadFrame.setTitle("Loading Labels");
@@ -30,7 +30,7 @@ public class LabelLoadDialog {
 		mainPanel.setLayout(new MigLayout());
 		mainPanel.setBackground(GUIParams.BG_COLOR);
 
-		prompt = new JLabel("Loading new labels...");
+		prompt = new JLabel("Loading new " + type + " labels...");
 		prompt.setForeground(GUIParams.TEXT);
 		prompt.setFont(GUIParams.FONTL);
 

@@ -1,10 +1,5 @@
 package Controllers;
 
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
-
-import edu.stanford.genetics.treeview.ConfirmDialog;
-import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.StringRes;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 
@@ -20,10 +15,6 @@ public class MenubarActions {
 
 	private final TreeViewFrame tvFrame;
 	private final TVFrameController controller;
-
-	private enum CLEARNODES {
-
-	}
 
 	public MenubarActions(final TreeViewFrame tvFrame,
 			final TVFrameController controller) {
@@ -62,23 +53,12 @@ public class MenubarActions {
 				System.exit(1);
 			}
 
-		} else if (name.equalsIgnoreCase(StringRes.menu_title_Theme)
-				|| name.equalsIgnoreCase(StringRes.menu_title_Font)
-				|| name.equalsIgnoreCase(StringRes.menu_title_URL)) {
-			controller.openPrefMenu(name, "Aesthetics");
+		} else if (name.equalsIgnoreCase(StringRes.menu_title_Prefs)) {
+			controller.openPrefMenu(name);
 
 		} else if (name.equalsIgnoreCase(StringRes.menu_title_RowAndCol)
 				|| name.equalsIgnoreCase(StringRes.menu_title_Color)) {
-			controller.openPrefMenu(name, "Options");
-
-		} else if (name.equalsIgnoreCase(StringRes.menubar_clearPrefs)) {
-			final ConfirmDialog confirmClear = new ConfirmDialog(tvFrame,
-					"clear preferences");
-			confirmClear.setVisible(true);
-
-			if (confirmClear.getConfirmed()) {
-				removeAllKeys(tvFrame.getConfigNode());
-			}
+			controller.openPrefMenu(name);
 
 		} else if (name.equalsIgnoreCase(StringRes.menu_title_Hier)) {
 			controller.setupClusterView(StringRes.menu_title_Hier);
@@ -113,45 +93,5 @@ public class MenubarActions {
 		} else if (name.equalsIgnoreCase(StringRes.menu_title_ShowLog)) {
 			tvFrame.showLogMessages();
 		}
-	}
-
-	/**
-	 * Recursive method to remove all keys from all nodes, starting from the
-	 * original parent node on which this method is called.
-	 * 
-	 * @param parentNode
-	 */
-	public void removeAllKeys(final Preferences parentNode) {
-
-		try {
-			if (!tvFrame.getLoaded()) {
-				parentNode.clear();
-				final Preferences fileNode = parentNode
-						.node(StringRes.pref_node_File);
-				final String[] models = fileNode.childrenNames();
-
-				for (int i = 0; i < models.length; i++) {
-
-					fileNode.node(models[i]).removeNode();
-				}
-
-			} else {
-				// parentNode.clear();
-				//
-				// String[] childrenNodes = parentNode.childrenNames();
-				//
-				// if(childrenNodes.length > 0)
-				// for(int i = 0; i < childrenNodes.length; i++) {
-				//
-				// removeAllKeys(parentNode.node(childrenNodes[i]));
-				// }
-			}
-
-		} catch (final BackingStoreException e) {
-			LogBuffer.println("Error when removing Preferences " + "keys: "
-					+ e.getMessage());
-			e.printStackTrace();
-		}
-
 	}
 }
