@@ -31,7 +31,6 @@ import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.prefs.Preferences;
 
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -42,7 +41,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.border.EtchedBorder;
 
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.DataModel;
@@ -117,7 +115,8 @@ public class ClusterView extends JPanel implements MainPanel {
 	 * @param vFrame
 	 *            parent ViewFrame of DendroView
 	 */
-	public ClusterView(final TreeViewFrame tvFrame, final String clusterTypeID) {
+	public ClusterView(final TreeViewFrame tvFrame, 
+			final String clusterTypeID) {
 
 		this(null, tvFrame, StringRes.view_title_Cluster, clusterTypeID);
 	}
@@ -320,14 +319,16 @@ public class ClusterView extends JPanel implements MainPanel {
 		type.setForeground(GUIParams.MAIN);
 		
 		choicePanel.add(type, "push, alignx 0%, aligny 0%, w 40%");
-		choicePanel.add(clusterType, "push, alignx 0%, aligny 0%, w 60%, h 20%, wrap");
+		choicePanel.add(clusterType, "push, alignx 0%, aligny 0%, w 60%, " +
+				"h 20%, wrap");
 		
 		final JLabel similarity = new JLabel("Similarity Metric");
 		similarity.setFont(GUIParams.FONTL);
 		similarity.setForeground(GUIParams.MAIN);
 
 		choicePanel.add(similarity, "push, alignx 0%, aligny 0%");
-		choicePanel.add(similarityPanel, "push, alignx 0%, aligny 0%, h 20%, wrap");
+		choicePanel.add(similarityPanel, "push, alignx 0%, aligny 0%, " +
+				"h 20%, wrap");
 
 		if (clusterType.getSelectedIndex() == 0) {
 			final JLabel method = new JLabel("Linkage Method");
@@ -335,7 +336,8 @@ public class ClusterView extends JPanel implements MainPanel {
 			method.setForeground(GUIParams.MAIN);
 			
 			choicePanel.add(method, "push, alignx 0%, aligny 0%");
-			choicePanel.add(linkagePanel, "push, alignx 0%, aligny 0%, h 20%, wrap");
+			choicePanel.add(linkagePanel, "push, alignx 0%, aligny 0%, " +
+					"h 20%, wrap");
 
 		} else {
 			final JLabel kMeans = new JLabel("K-Means Options");
@@ -346,8 +348,8 @@ public class ClusterView extends JPanel implements MainPanel {
 			choicePanel.add(kMeansPanel, "pushx, alignx 50%, h 20%, wrap");
 		}
 		
-		optionsPanel.add(choicePanel, "pushx, w 50%");
-		optionsPanel.add(infoPanel, "pushx, w 50%, wrap");
+		optionsPanel.add(choicePanel, "push, aligny 10%, w 50%");
+		optionsPanel.add(infoPanel, "push, aligny 10%, w 50%, wrap");
 	}
 
 	/**
@@ -369,9 +371,9 @@ public class ClusterView extends JPanel implements MainPanel {
 		colLabel.setForeground(GUIParams.TEXT);
 
 		similarityPanel.add(rowLabel, "pushx, alignx 0%");
-		similarityPanel.add(geneCombo, "w 40%, wrap");
+		similarityPanel.add(geneCombo, "wrap");
 		similarityPanel.add(colLabel, "pushx, alignx 0%");
-		similarityPanel.add(arrayCombo, "w 40%");
+		similarityPanel.add(arrayCombo);
 
 		// Component for linkage choices
 		linkagePanel = new JPanel();

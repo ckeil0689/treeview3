@@ -453,7 +453,7 @@ public abstract class ViewFrame implements Observer {
 	public void seekGene(final int i) {
 
 		geneSelection.deselectAllIndexes();
-		geneSelection.setIndex(i, true);
+		geneSelection.setIndexSelection(i, true);
 		geneSelection.notifyObservers();
 		scrollToGene(i);
 	}
@@ -465,7 +465,7 @@ public abstract class ViewFrame implements Observer {
 	public void seekArray(final int i) {
 
 		arraySelection.deselectAllIndexes();
-		arraySelection.setIndex(i, true);
+		arraySelection.setIndexSelection(i, true);
 		arraySelection.notifyObservers();
 		scrollToGene(i);
 	}
@@ -479,7 +479,7 @@ public abstract class ViewFrame implements Observer {
 			seekGene(i);
 		}
 
-		geneSelection.setIndex(i, true);
+		geneSelection.setIndexSelection(i, true);
 		geneSelection.notifyObservers();
 
 		scrollToGene(i);

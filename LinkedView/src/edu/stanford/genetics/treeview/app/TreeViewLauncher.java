@@ -5,6 +5,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.TVScrollBarUI;
 
 public class TreeViewLauncher {
 
@@ -36,17 +37,20 @@ public class TreeViewLauncher {
 			
 			UIManager.setLookAndFeel(UIManager
 					.getCrossPlatformLookAndFeelClassName());
+			
+			UIManager.put("ScrollBarUI", TVScrollBarUI.class.getName());
 
 			if (!isApplet && System.getProperty("os.name").contains("Mac")) {
 				UIManager.put("MenuBarUI", menuBarUI);
 				
 			} else {
-				UIManager
-						.put("MenuItem.selectionBackground", GUIParams.ELEMENT_HOV);
+				UIManager.put("MenuItem.selectionBackground", 
+								GUIParams.ELEMENT_HOV);
 				UIManager.put("MenuItem.font", GUIParams.FONT_MENU);
 				UIManager.put("MenuItem.background", GUIParams.MENU);
 	
-				UIManager.put("Menu.selectionBackground", GUIParams.ELEMENT_HOV);
+				UIManager.put("Menu.selectionBackground", 
+						GUIParams.ELEMENT_HOV);
 				UIManager.put("Menu.font", GUIParams.FONT_MENU);
 				UIManager.put("Menu.background", GUIParams.MENU);
 			}

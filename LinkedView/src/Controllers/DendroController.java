@@ -1,7 +1,6 @@
 package Controllers;
 
 import java.awt.Cursor;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -18,12 +17,11 @@ import java.util.prefs.Preferences;
 import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JWindow;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -81,9 +79,6 @@ public class DendroController implements ConfigNodePersistent {
 
 	// Color Extractor
 	private ColorExtractor2 colorExtractor;
-
-	// Search Window (Global so it can be checked if open).
-//	private JWindow window;
 
 	public DendroController(final TreeViewFrame tvFrame) {
 
@@ -169,53 +164,15 @@ public class DendroController implements ConfigNodePersistent {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			new SearchWindowOpener(e).run();
+			dendroView.openSearchDialog();
+//			final Point location = ((JButton) e.getSource())
+//					.getLocation();
+//			final int height = ((JButton) e.getSource()).getHeight();
+
+//			dialog.setLocation(location.x, location.y + (2 * height));
 		}
 	}
 
-	/**
-	 * SwingWorker which opens the label search panel.
-	 * 
-	 * @author CKeil
-	 * 
-	 */
-	class SearchWindowOpener extends SwingWorker<Void, Void> {
-
-		private final ActionEvent event;
-		private JWindow window;
-
-		SearchWindowOpener(final ActionEvent e) {
-
-			this.event = e;
-		}
-
-		@Override
-		protected Void doInBackground() throws Exception {
-
-			if (window == null) {
-				window = dendroView.openSearchPanel();
-				final Point location = ((JButton) event.getSource())
-						.getLocation();
-				final int height = ((JButton) event.getSource()).getHeight();
-
-				window.setLocation(location.x, location.y + (2 * height));
-				window.pack();
-			}
-
-			return null;
-		}
-
-		@Override
-		protected void done() {
-
-			if (!window.isShowing()) {
-				window.setVisible(true);
-
-			} else {
-				window.dispose();
-			}
-		}
-	}
 
 	/**
 	 * Listener for the button that handles cursor change when the mouse enters

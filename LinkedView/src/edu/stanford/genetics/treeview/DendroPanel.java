@@ -23,7 +23,6 @@
 package edu.stanford.genetics.treeview;
 
 import javax.swing.JMenu;
-import javax.swing.JWindow;
 
 /**
  * implementing objects are expected to be subclasses of component. The purpose
@@ -42,7 +41,7 @@ public interface DendroPanel {
 
 	public void addClusterMenus(JMenu menu);
 
-	public JWindow openSearchPanel();
+	public void openSearchDialog();
 
 	public void setTreesVisible(boolean visible);
 

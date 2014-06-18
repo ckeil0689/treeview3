@@ -33,7 +33,7 @@ public interface TreeSelectionI {
 	 * @param b
 	 *            The new selection status
 	 */
-	public abstract void setIndex(int i, boolean b);
+	public abstract void setIndexSelection(int i, boolean b);
 
 	/**
 	 * gets the selection status for a particular index.

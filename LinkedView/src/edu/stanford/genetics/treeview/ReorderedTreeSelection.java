@@ -44,7 +44,7 @@ public class ReorderedTreeSelection extends Observable implements
 	}
 
 	@Override
-	public void setIndex(int i, final boolean b) {
+	public void setIndexSelection(int i, final boolean b) {
 		if (i >= reorderedIndex.length) {
 			i = reorderedIndex.length - 1;
 		}
@@ -55,7 +55,7 @@ public class ReorderedTreeSelection extends Observable implements
 
 		final int index = reorderedIndex[i];
 		if (index != -1) {
-			parent.setIndex(index, b);
+			parent.setIndexSelection(index, b);
 		}
 	}
 

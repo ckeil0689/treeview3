@@ -20,7 +20,6 @@ import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LabelLoadDialog;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.MenuPanel;
 import edu.stanford.genetics.treeview.PreferencesMenu;
 import edu.stanford.genetics.treeview.StringRes;
 import edu.stanford.genetics.treeview.TreeViewFrame;
@@ -231,13 +230,7 @@ public class PreferencesController {
 		@Override
 		protected Void doInBackground() throws Exception {
 
-			boolean light = false;
-
-			if (event.getSource().equals(preferences.getLightButton())) {
-				light = true;
-			}
-
-			updateCheck(light);
+			updateCheck(event.getSource().equals(preferences.getLightButton()));
 			return null;
 		}
 

@@ -64,6 +64,7 @@ public class TVFrameController {
 		this.applicationFrame = tvFrame.getAppFrame();
 
 		setViewChoice();
+		addViewListeners();
 	}
 
 	/**
@@ -71,22 +72,26 @@ public class TVFrameController {
 	 */
 	public void addViewListeners() {
 
-		menuActions = new MenubarActions(tvFrame, TVFrameController.this);
-
-		tvFrame.addMenuActionListeners(new StackMenuListener());
-		tvFrame.addFileMenuListeners(new FileMenuListener());
-
-//		if (tvFrame.getWelcomeView() != null) {
-//			tvFrame.getWelcomeView().addLoadListener(
-//					new LoadPanelListener(tvFrame.getWelcomeView()
-//							.getLoadIcon(), tvFrame.getWelcomeView()
-//							.getLoadLabel()));
-//		}
+		if (tvFrame.getWelcomeView() != null) {
+			tvFrame.getWelcomeView().addLoadListener(
+					new LoadPanelListener());
+		}
 
 		if (tvFrame.getLoadErrorView() != null) {
 			tvFrame.getLoadErrorView().addLoadNewListener(
 					new LoadButtonListener());
 		}
+	}
+	
+	/**
+	 * Adds listeners to the menubar.
+	 */
+	public void addMenuListeners() {
+		
+		menuActions = new MenubarActions(tvFrame, TVFrameController.this);
+
+		tvFrame.addMenuActionListeners(new StackMenuListener());
+		tvFrame.addFileMenuListeners(new FileMenuListener());
 	}
 
 	/**
@@ -95,17 +100,11 @@ public class TVFrameController {
 	 * @author CKeil
 	 * 
 	 */
-	class LoadPanelListener extends SSMouseListener {
-
-		public LoadPanelListener(final JPanel panel, final JLabel label) {
-
-			super(panel, label);
-		}
+	class LoadPanelListener implements ActionListener {
 
 		@Override
-		public void mouseClicked(final MouseEvent arg0) {
-
-			// Setting screen for loading bar.
+		public void actionPerformed(ActionEvent arg0) {
+			
 			openFile();
 		}
 	}
@@ -191,7 +190,7 @@ public class TVFrameController {
 			}
 		}
 		
-		addViewListeners();
+		addMenuListeners();
 	}
 
 	/**

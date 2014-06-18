@@ -35,7 +35,7 @@ public class ClusterViewDialog {
 		// Setting preferred size for the ContentPane of this frame
 		final Dimension mainDim = GUIParams.getScreenSize();
 		clusterDialog.getContentPane().setPreferredSize(
-				new Dimension(mainDim.width * 3 / 4, mainDim.height * 1/ 2));
+				new Dimension(mainDim.width * 1/ 2, mainDim.height * 1/ 2));
 
 		clusterDialog.setMinimumSize(new Dimension(800, 600));
 

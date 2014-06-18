@@ -35,18 +35,19 @@ import java.util.prefs.Preferences;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JSplitPane;
-import javax.swing.JWindow;
 
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.DendroPanel;
 import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.StringRes;
+import edu.stanford.genetics.treeview.TVScrollBarUI;
 import edu.stanford.genetics.treeview.TabbedSettingsPanel;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.TreeViewFrame;
@@ -93,7 +94,7 @@ public class DendroView2 implements Observer, DendroPanel {
 	private boolean loaded;
 
 	// Map Views
-	private final GlobalView globalview;
+	private final GlobalView2 globalview;
 
 	// Trees
 	protected final GTRView gtrview;
@@ -171,11 +172,13 @@ public class DendroView2 implements Observer, DendroPanel {
 		dendroPane.setLayout(new MigLayout("ins 0"));
 		
 		// Create the Global view (JPanel to display)
-		globalview = new GlobalView();
+		globalview = new GlobalView2();
 
 		// scrollbars, mostly used by maps
 		globalXscrollbar = globalview.getXScroll();
+		globalXscrollbar.setUI(new TVScrollBarUI());
 		globalYscrollbar = globalview.getYScroll();
+		globalYscrollbar.setUI(new TVScrollBarUI());
 
 		// Set up the column name display
 //		arraynameview = new ArrayNameViewManager();
@@ -538,35 +541,50 @@ public class DendroView2 implements Observer, DendroPanel {
 	 * in the loaded TVModel.
 	 */
 	@Override
-	public JWindow openSearchPanel() {
+	public void openSearchDialog() {
 
-		final JWindow window = new JWindow();
+		final JDialog dialog = new JDialog();
+		dialog.setModalityType(JDialog.DEFAULT_MODALITY_TYPE);
+		dialog.setTitle(StringRes.dialog_title_search);
+		dialog.setResizable(false);
 
 		final JPanel container = new JPanel();
 		container.setLayout(new MigLayout());
 		container.setBackground(GUIParams.BG_COLOR);
 		container.setBorder(BorderFactory.createEtchedBorder(GUIParams.BORDERS,
 				GUIParams.BG_COLOR));
-
+		
+		JLabel wildTip = new JLabel("Tip: Edit the search fields to search " +
+				"for terms.");
+		wildTip.setFont(GUIParams.FONTS);
+		wildTip.setForeground(GUIParams.TEXT);
+		
+		JLabel wildTip2 = new JLabel("Wildcards ('*', '?') are supported.");
+		wildTip2.setFont(GUIParams.FONTS);
+		wildTip2.setForeground(GUIParams.TEXT);
+		
 		final JButton closeButton = GUIParams.setButtonLayout("Close", null);
 		closeButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(final ActionEvent arg0) {
 
-				window.dispose();
+				dialog.dispose();
 			}
 		});
 
 		container.add(getGeneFinderPanel(), "w 90%, h 40%, "
 				+ "alignx 50%, wrap");
 		container.add(getArrayFinderPanel(), "w 90%, h 40%, "
-				+ "alignx 50, wrap");
-		container.add(closeButton, "pushx, alignx 50%");
+				+ "alignx 50%, wrap");
+		container.add(wildTip, "span, wrap");
+		container.add(wildTip2, "span, wrap");
+		container.add(closeButton, "push, alignx 50%");
 
-		window.getContentPane().add(container);
-
-		return window;
+		dialog.getContentPane().add(container);
+		dialog.pack();
+		dialog.setLocationRelativeTo(tvFrame.getAppFrame());
+		dialog.setVisible(true);
 	}
 
 	// @Override
@@ -1203,7 +1221,7 @@ public class DendroView2 implements Observer, DendroPanel {
 		globalYscrollbar.setValue(i);
 	}
 
-	public GlobalView getGlobalView() {
+	public GlobalView2 getGlobalView() {
 
 		return globalview;
 	}

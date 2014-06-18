@@ -29,8 +29,9 @@ public class StringRes {
 	public static final String view_Welcome = "WelcomeView";
 	public static final String view_Dendro = "DendroView";
 
-	// View Titles
+	// Frame Titles
 	public static final String view_title_Cluster = "Cluster View";
+	public static final String dialog_title_search = "Search Labels";
 	
 	// Main Words
 	public static final String main_rows = "Rows";
@@ -57,7 +58,7 @@ public class StringRes {
 	public static final String menu_title_Docs = "Documentation...";
 	public static final String menu_title_Feedback = "Send Feedback...";
 	public static final String menu_title_NewWindow = "New Window...";
-	public static final String menu_title_QuitWindow = "Quit Window...";
+	public static final String menu_title_QuitWindow = "Close Window...";
 
 	// MenuBar
 	public static final String menubar_file = "File";

@@ -38,6 +38,8 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Ellipse2D;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 
 import javax.swing.BorderFactory;
@@ -54,7 +56,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelViewProduced;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 
-public class GlobalView extends ModelViewProduced implements
+public class GlobalView2 extends ModelViewProduced implements
 		MouseMotionListener, MouseListener, MouseWheelListener, KeyListener {
 
 	private static final long serialVersionUID = 1L;
@@ -93,7 +95,7 @@ public class GlobalView extends ModelViewProduced implements
 	/**
 	 * Rectangle to track yellow selected rectangle (pixels)
 	 */
-	private Rectangle selectionRect = null;
+	private ArrayList<Rectangle> selectionRectList = null;
 
 	/**
 	 * Circle to be used as indicator for selection
@@ -110,7 +112,7 @@ public class GlobalView extends ModelViewProduced implements
 	 * MapContainer) to help it figure out where to draw things. It also tries
 	 * to
 	 */
-	public GlobalView() {
+	public GlobalView2() {
 
 		super();
 
@@ -407,7 +409,7 @@ public class GlobalView extends ModelViewProduced implements
 	public synchronized void paintComposite(final Graphics g) {
 
 		// composite the rectangles...
-		if (selectionRect != null) {
+		if (selectionRectList != null) {
 			// if (zoomRect != null) {
 			// g.setColor(Color.cyan);
 			// g.drawRect(zoomRect.x, zoomRect.y,
@@ -415,8 +417,10 @@ public class GlobalView extends ModelViewProduced implements
 			// }
 
 			g.setColor(Color.yellow);
-			g.drawRect(selectionRect.x, selectionRect.y, selectionRect.width,
-					selectionRect.height);
+			
+			for(Rectangle rect : selectionRectList) {
+				g.drawRect(rect.x, rect.y, rect.width, rect.height);
+			}
 
 			if (indicatorCircle != null) {
 				final Graphics2D g2 = (Graphics2D) g;
@@ -436,28 +440,112 @@ public class GlobalView extends ModelViewProduced implements
 	protected void recalculateOverlay() {
 
 		if ((geneSelection == null) || (arraySelection == null)) {
+			selectionRectList = null;
 			return;
 		}
+		
+		selectionRectList = new ArrayList<Rectangle>();
 
-		int spx, spy, epx, epy;
-		spx = xmap.getPixel(arraySelection.getMinIndex());
-		// last pixel of last block
-		epx = xmap.getPixel(arraySelection.getMaxIndex() + 1) - 1;
+		int[] selectedArrayIndexes = arraySelection.getSelectedIndexes();
+		int[] selectedGeneIndexes = geneSelection.getSelectedIndexes();
+		
+		int spx = 0; 
+		int spy = 0; 
+		int epx = 0;
+		int epy = 0;
+		
+		ArrayList<ArrayList<Integer>> xValList = 
+				new ArrayList<ArrayList<Integer>>();
+		ArrayList<ArrayList<Integer>> yValList = 
+				new ArrayList<ArrayList<Integer>>();
+		
+		List<Integer> consecIndexList = new ArrayList<Integer>();
+		
+		// Iterate over arrays to generate rectangles
+		for(int i = 0; i < selectedArrayIndexes.length; i++) {
+			
+			int now = selectedArrayIndexes[i];
+			int next = selectedArrayIndexes[i];
+			if(i < selectedArrayIndexes.length - 1) {
+				next = selectedArrayIndexes[i + 1];
+				
+			} else {
+				consecIndexList.add(now);
+			}
+			
+			if(next == now + 1 || consecIndexList.size() == 0) {
+				consecIndexList.add(now);
+				
+			} else {
+				ArrayList<Integer> xVals = new ArrayList<Integer>(2);
+				
+				spx = xmap.getPixel(consecIndexList.get(0));
+				// last pixel of last block
+				epx = xmap.getPixel(consecIndexList.get(
+						consecIndexList.size() - 1) + 1) - 1;
+				
+				xVals.add(spx);
+				xVals.add(epx);
+				
+				xValList.add(xVals);
+				
+				consecIndexList.clear();
+			}
+		}
+		
+		consecIndexList.clear();
+		
+		for(int i = 0; i < selectedGeneIndexes.length; i++) {
+			
+			int now = selectedGeneIndexes[i];
+			int next = selectedGeneIndexes[i];
+			if(i < selectedGeneIndexes.length - 1) {
+				next = selectedGeneIndexes[i + 1];
+				
+			} else {
+				consecIndexList.add(now);
+			}
+			
+			if(next == now + 1 || consecIndexList.size() == 0) {
+				consecIndexList.add(now);
+				
+			} else {
+				ArrayList<Integer> yVals = new ArrayList<Integer>(2);
+				
+				spy = ymap.getPixel(consecIndexList.get(0));
+				// last pixel of last block
+				epy = ymap.getPixel(consecIndexList.get(
+						consecIndexList.size() - 1) + 1) - 1;
+				
+				if (epy < spy) {
+					epy = spy;
+					// correct for roundoff error above
+				}
+				
+				yVals.add(spy);
+				yVals.add(epy);
+				
+				yValList.add(yVals);
+				
+				consecIndexList.clear();
+			}
+		}	
 
-		spy = ymap.getPixel(geneSelection.getMinIndex());
-		epy = ymap.getPixel(geneSelection.getMaxIndex() + 1) - 1;
-
-		if (epy < spy) {
-			epy = spy;
-			// correct for roundoff error above
+		if (selectionRectList != null) {
+			for(ArrayList<Integer> xVals : xValList) {
+				
+				for(ArrayList<Integer> yVals : yValList) {
+					
+					selectionRectList.add(new Rectangle(xVals.get(0), 
+							yVals.get(0), xVals.get(1) - xVals.get(0), 
+							yVals.get(1) - yVals.get(0)));
+				}
+			}
 		}
 
-		if (selectionRect == null) {
-			selectionRect = new Rectangle(spx, spy, epx - spx, epy - spy);
-
-		} else {
-			selectionRect.setBounds(spx, spy, epx - spx, epy - spy);
-		}
+//		} else {
+//			selectionRect.setBounds(spx, spy, epx - spx, epy - spy);
+//		}
 
 		revalidate();
 		repaint();
@@ -465,9 +553,9 @@ public class GlobalView extends ModelViewProduced implements
 
 	protected void recalculateZoom() {
 
-		if (selectionRect == null) {
-			return;
-		}
+//		if (selectionRect == null) {
+//			return;
+//		}
 
 		// int spx, epx, spy, epy;
 		// try {

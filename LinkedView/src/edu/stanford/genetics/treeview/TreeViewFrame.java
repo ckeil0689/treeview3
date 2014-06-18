@@ -30,6 +30,7 @@ package edu.stanford.genetics.treeview;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -194,8 +195,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	@Override
 	public void setView(final String viewName) {
 
-//		resetViews();
-
 		JPanel view = new JPanel();
 
 		// Set view dependent of 'loaded'
@@ -269,6 +268,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		
 		backgroundPanel.add(waiting, "push, grow");
 		backgroundPanel.setBackground(GUIParams.BG_COLOR);
+		
 		backgroundPanel.revalidate();
 		backgroundPanel.repaint();
 	}
@@ -531,7 +531,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		final JMenuItem openMenuItem = new JMenuItem(StringRes.menu_title_Open, 
 				KeyEvent.VK_O);
 		openMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, 
-				ActionEvent.CTRL_MASK));
+				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		fileSubMenu.add(openMenuItem);
 		stackMenuList.add(openMenuItem);
 
@@ -579,11 +579,19 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		// --------
 
 		fileSubMenu.addSeparator();
+		
+		// Quit Program Menu
+		final JMenuItem quitMenuItem = new JMenuItem(
+				StringRes.menu_title_QuitWindow, KeyEvent.VK_W);
+		quitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, 
+				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		fileSubMenu.add(quitMenuItem);
+		stackMenuList.add(quitMenuItem);
 
 		final JMenuItem saveMenuItem = new JMenuItem(StringRes.menu_title_Save, 
 				KeyEvent.VK_S);
 		saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, 
-				ActionEvent.CTRL_MASK));
+				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		fileSubMenu.add(saveMenuItem);
 		stackMenuList.add(saveMenuItem);
 
@@ -614,43 +622,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		final JMenuItem prefMenuItem = new JMenuItem(
 				StringRes.menu_title_Prefs);
 		stackMenuList.add(prefMenuItem);
-
-//		if (running == null) {
-//			final JMenuItem themeMenuItem = new JMenuItem(
-//					StringRes.menu_title_Theme);
-//			stackMenuList.add(themeMenuItem);
-//			prefSubMenu.add(themeMenuItem);
-//
-//			prefSubMenu.addSeparator();
-//
-//			final JMenuItem clearPrefsMenuItem = new JMenuItem(
-//					StringRes.menubar_clearPrefs);
-//			stackMenuList.add(clearPrefsMenuItem);
-//			prefSubMenu.add(clearPrefsMenuItem);
-//
-//		} else {
-//			final JMenuItem themeMenuItem = new JMenuItem(
-//					StringRes.menu_title_Theme);
-//			stackMenuList.add(themeMenuItem);
-//			prefSubMenu.add(themeMenuItem);
-//
-//			final JMenuItem fontMenuItem = new JMenuItem(
-//					StringRes.menu_title_Font);
-//			stackMenuList.add(fontMenuItem);
-//			prefSubMenu.add(fontMenuItem);
-//
-//			final JMenuItem urlMenuItem = new JMenuItem(
-//					StringRes.menu_title_URL);
-//			stackMenuList.add(urlMenuItem);
-//			prefSubMenu.add(urlMenuItem);
-//
-//			prefSubMenu.addSeparator();
-//
-//			// JMenuItem clearPrefsMenuItem = new JMenuItem(
-//			// StringRes.menubar_clearPrefs);
-//			// stackMenuList.add(clearPrefsMenuItem);
-//			// prefSubMenu.add(clearPrefsMenuItem);
-//		}
 
 		fileSubMenu.addSeparator();
 		fileSubMenu.add(prefMenuItem);
@@ -690,26 +661,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		// }
 		// });
 
-		// menubar.addMenuItem("Registration...");
-		// , new ActionListener() {
-		//
-		// @Override
-		// public void actionPerformed(final ActionEvent actionEvent) {
-		//
-		// final ConfigNode node = treeView.getGlobalConfig().getNode(
-		// "Registration");
-		// if (node != null) {
-		// try {
-		// edu.stanford.genetics.treeview.reg.RegEngine
-		// .reverify(node);
-		// } catch (final Exception e) {
-		// LogBuffer.println("registration error " + e);
-		// e.printStackTrace();
-		// }
-		// }
-		// }
-		// });
-
 		final JMenuItem feedbackMenuItem = new JMenuItem(
 				StringRes.menu_title_Feedback);
 		helpSubMenu.add(feedbackMenuItem);
@@ -719,21 +670,13 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		fileSubMenu.addSeparator();
 
-		// New Window
-		final JMenuItem newWindowMenuItem = new JMenuItem(
-				StringRes.menu_title_NewWindow, KeyEvent.VK_N);
-		newWindowMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, 
-				ActionEvent.CTRL_MASK));
-		stackMenuList.add(newWindowMenuItem);
-		fileSubMenu.add(newWindowMenuItem);
-
-		// Quit Program Menu
-		final JMenuItem quitMenuItem = new JMenuItem(
-				StringRes.menu_title_QuitWindow, KeyEvent.VK_W);
-		quitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, 
-				ActionEvent.CTRL_MASK));
-		fileSubMenu.add(quitMenuItem);
-		stackMenuList.add(quitMenuItem);
+//		// New Window
+//		final JMenuItem newWindowMenuItem = new JMenuItem(
+//				StringRes.menu_title_NewWindow, KeyEvent.VK_N);
+//		newWindowMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, 
+//				ActionEvent.CTRL_MASK));
+//		stackMenuList.add(newWindowMenuItem);
+//		fileSubMenu.add(newWindowMenuItem);
 	}
 
 	public void generateSearchMenu() {

@@ -434,11 +434,11 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 		} else if (arraySelection.getNSelectedIndexes() > 0) {
 			arraySelection.deselectAllIndexes();
 			geneSelection.deselectAllIndexes();
-			geneSelection.setIndex(index, true);
+			geneSelection.setIndexSelection(index, true);
 			arraySelection.selectAllIndexes();
 
 		} else {
-			geneSelection.setIndex(index, true);
+			geneSelection.setIndexSelection(index, true);
 			arraySelection.selectAllIndexes();
 		}
 

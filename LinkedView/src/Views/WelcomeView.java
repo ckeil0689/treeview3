@@ -1,7 +1,7 @@
 package Views;
 
 import java.awt.Font;
-import java.awt.event.MouseListener;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -17,38 +17,31 @@ public class WelcomeView {
 	// Initial
 	private final JPanel loadPanel;
 	private final JPanel homePanel;
+	private final JPanel title_bg;
 
 	private final JLabel jl;
 	private final JLabel jl2;
-	private final JButton label;
+	private JButton loadButton;
 
 	private boolean isLoading = false;
 
 	// Loading stuff
-	private final JProgressBar loadBar;
+	private JProgressBar loadBar;
 	private JLabel loadLabel;
 
 	public WelcomeView() {
 
 		homePanel = new JPanel();
 		homePanel.setLayout(new MigLayout("ins 0"));
-		homePanel.setBackground(GUIParams.BG_COLOR);
-
-		JPanel title_bg;
 
 		title_bg = new JPanel();
 		title_bg.setLayout(new MigLayout());
-		title_bg.setBackground(GUIParams.MAIN);
 
 		jl = new JLabel("Hello! How are you Gentlepeople?");
 		jl.setFont(new Font("Sans Serif", Font.PLAIN, 30));
-		jl.setForeground(GUIParams.BG_COLOR);
 
 		jl2 = new JLabel("Welcome to " + StringRes.appName);
 		jl2.setFont(new Font("Sans Serif", Font.BOLD, 50));
-		jl2.setForeground(GUIParams.BG_COLOR);
-		
-		label = GUIParams.setButtonLayout("Open...", null);
 
 		title_bg.add(jl, "push, alignx 50%, span, wrap");
 		title_bg.add(jl2, "push, alignx 50%, span");
@@ -56,8 +49,6 @@ public class WelcomeView {
 		loadPanel = new JPanel();
 		loadPanel.setLayout(new MigLayout());
 		loadPanel.setOpaque(false);
-		
-		loadBar = GUIParams.setPBarLayout();
 		
 		homePanel.add(title_bg, "pushx, growx, alignx 50%, span, "
 				+ "height 20%::, wrap");
@@ -79,9 +70,9 @@ public class WelcomeView {
 	 * 
 	 * @return
 	 */
-	public JButton getLoadLabel() {
+	public JButton getLoadButton() {
 
-		return label;
+		return loadButton;
 	}
 
 	public boolean isLoading() {
@@ -90,13 +81,13 @@ public class WelcomeView {
 	}
 
 	/**
-	 * Equipping the load_Icon with a MouseListener
+	 * Equipping the loadButton with an ActionListener
 	 * 
 	 * @param loadData
 	 */
-	public void addLoadListener(final MouseListener loadData) {
+	public void addLoadListener(final ActionListener loadData) {
 
-		label.addMouseListener(loadData);
+		loadButton.addActionListener(loadData);
 	}
 
 
@@ -106,8 +97,15 @@ public class WelcomeView {
 
 		loadPanel.removeAll();
 
-		loadPanel.add(label, "push, alignx 50%");
+		loadButton = GUIParams.setLargeButtonLayout("Open...");
+		loadPanel.add(loadButton, "push, alignx 50%");
 
+		// Set the colors
+		homePanel.setBackground(GUIParams.BG_COLOR);
+		title_bg.setBackground(GUIParams.MAIN);
+		jl.setForeground(GUIParams.BG_COLOR);
+		jl2.setForeground(GUIParams.BG_COLOR);
+		
 		homePanel.revalidate();
 		homePanel.repaint();
 
@@ -126,6 +124,8 @@ public class WelcomeView {
 		loadLabel = new JLabel();
 		loadLabel.setFont(GUIParams.FONTL);
 		loadLabel.setForeground(GUIParams.TEXT);
+		
+		loadBar = GUIParams.setPBarLayout();
 
 		loadPanel.add(loadLabel, "push, alignx 50%, aligny 100%, wrap");
 		loadPanel.add(loadBar, "push, w 70%, alignx 50%, aligny 0%");

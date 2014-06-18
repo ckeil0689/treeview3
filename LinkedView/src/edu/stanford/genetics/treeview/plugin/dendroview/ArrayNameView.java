@@ -572,11 +572,11 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		} else if (geneSelection.getNSelectedIndexes() > 0) {
 			geneSelection.deselectAllIndexes();
 			arraySelection.deselectAllIndexes();
-			arraySelection.setIndex(index, true);
+			arraySelection.setIndexSelection(index, true);
 			geneSelection.selectAllIndexes();
 
 		} else {
-			arraySelection.setIndex(index, true);
+			arraySelection.setIndexSelection(index, true);
 			geneSelection.selectAllIndexes();
 		}
 

@@ -23,18 +23,20 @@
 package edu.stanford.genetics.treeview.core;
 
 // for summary view...
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import net.miginfocom.swing.MigLayout;
-
-import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 import edu.stanford.genetics.treeview.GUIParams;
 import edu.stanford.genetics.treeview.HeaderInfo;
@@ -57,8 +59,8 @@ public abstract class HeaderFinderBox {
 	protected ViewFrame viewFrame;
 
 	private final HeaderInfo headerInfo;
-	private final int choices[];
-	private int nchoices = 0;
+//	private final int choices[];
+//	private int nchoices = 0;
 
 	private final ArrayList<String> geneList;
 	private String[] genefHeaders = { "" };
@@ -84,7 +86,7 @@ public abstract class HeaderFinderBox {
 		this.headerInfo = hI;
 		this.geneSelection = geneSelection;
 		this.type = type;
-		this.choices = new int[hI.getNumHeaders()]; // could be wasteful of
+//		this.choices = new int[hI.getNumHeaders()]; // could be wasteful of
 													// ram...
 
 		contentPanel = new JPanel();
@@ -109,19 +111,12 @@ public abstract class HeaderFinderBox {
 
 		Arrays.sort(genefHeaders);
 
-		// String[] geneHeaderClones = genefHeaders.clone();
-
-		// for(int i = 0; i < genefHeaders.length; i++) {
-		//
-		// labeledHeaders[i + 1] = genefHeaders[i];
-		// }
-
 		System.arraycopy(genefHeaders, 0, labeledHeaders, 1,
 				genefHeaders.length);
 
-		genefBox = GUIParams.setComboLayout(labeledHeaders);
+		genefBox = GUIParams.setWideComboLayout(labeledHeaders);
 		genefBox.setEditable(true);
-		AutoCompleteDecorator.decorate(genefBox);
+//		AutoCompleteDecorator.decorate(genefBox);
 
 		genefButton = GUIParams.setButtonLayout(null, "searchIcon");
 		genefButton.setToolTipText("Highlights the selected label.");
@@ -129,9 +124,7 @@ public abstract class HeaderFinderBox {
 
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-
-				final String gene = genefBox.getSelectedItem().toString();
-				findGenes(gene);
+				
 				seekAll();
 			}
 		});
@@ -187,14 +180,17 @@ public abstract class HeaderFinderBox {
 	}
 
 	public void seekAll() {
-
+		
 		final int[] selected = { 0 };
 		geneSelection.setSelectedNode(null);
 		geneSelection.deselectAllIndexes();
 
-		int geneIndex = 0;
-		geneIndex = geneList.indexOf(genefBox.getSelectedItem());
-		geneSelection.setIndex(geneIndex, true);
+		ArrayList<Integer> indexList = findSelected();
+		
+		for(int i = 0; i < indexList.size(); i++) {
+			
+			geneSelection.setIndexSelection(indexList.get(i), true);
+		}
 
 		geneSelection.notifyObservers();
 
@@ -202,57 +198,101 @@ public abstract class HeaderFinderBox {
 			scrollToIndex(geneList.indexOf(genefBox.getSelectedItem()));
 		}
 	}
-
-	private void findGenes(final String sub) {
-
-		nchoices = 0;
-
-		final int jmax = headerInfo.getNumHeaders();
-		for (int j = 0; j < jmax; j++) {
-
-			final String[] strings = headerInfo.getHeader(j);
-			if (strings == null) {
-				continue;
-			}
-
-			boolean match = false;
-			for (int i = 0; i < strings.length; i++) {
-				if (strings[i] == null) {
-					continue;
-				}
-
-				String cand;
-				cand = strings[i].toUpperCase();
-
-				if (cand.indexOf(sub) >= 0) {
-					match = true;
-					break;
-				}
-			}
-
-			if (match) {
-				selectGene(j);
+	
+	private ArrayList<Integer> findSelected() {
+		
+		ArrayList<Integer> indexList = new ArrayList<Integer>();
+		
+		String sub = genefBox.getSelectedItem().toString();
+		
+		for(String gene : geneList) {
+			
+			if(wildCardMatch(gene, sub)) {
+				indexList.add(geneList.indexOf(gene));
 			}
 		}
+		
+		return indexList;
 	}
-
-	private void selectGene(final int j) {
-
-		// String [] strings = headerInfo.getHeader(j);
-		// String id = "";
-		// for (int i = 1; i < strings.length; i++) {
-		// if (strings[i] != null) {
-		// id += strings[i] + "; ";
-		// }
-		// }
-		//
-		// if (strings[0] != null) {
-		// id += strings[0] + "; ";
-		// }
-
-		choices[nchoices++] = j;
-	}
+	
+	/**
+     * Performs a wildcard matching for the text and pattern 
+     * provided. Matching is done based on regex patterns.
+     * 
+     * @param text the text to be tested for matches.
+     * 
+     * @param pattern the pattern to be matched for.
+     * This can contain the wildcard character '*' (asterisk).
+     * 
+     * @return <tt>true</tt> if a match is found, <tt>false</tt> 
+     * otherwise.
+     */
+    public static boolean wildCardMatch(String text, String pattern) {
+        
+    	if(text == null || pattern == null) {
+    		return false;
+    	}
+    	
+    	// Define CharSequences to replaced in given String.
+    	CharSequence singleChar = "?";
+    	CharSequence regexSingleChar = ".";
+    	
+    	CharSequence multiChar = "*";
+    	CharSequence regexMultiChar = "(.)*";
+    	
+    	// Transform String to Regex
+    	pattern = pattern.replace(singleChar, regexSingleChar);
+    	pattern = pattern.replace(multiChar, regexMultiChar);
+        
+    	// Check if generated regex matches, store result in boolean.
+        boolean isMatch = false;
+        if(text.matches(pattern)) {
+        	isMatch = true;
+        }
+        
+        return isMatch;
+    }
 
 	abstract public void scrollToIndex(int i);
+	
+	// Testing WildCard search
+	public static void main(String[] args) {
+		
+		JDialog dialog = new JDialog();
+		dialog.setTitle("WildCard Search Test");
+		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		dialog.setSize(new Dimension(400, 150));
+		
+		JPanel container = new JPanel();
+		container.setLayout(new MigLayout());
+		
+		dialog.getContentPane().add(container);
+		
+		final JTextField tf1 = new JTextField();
+		tf1.setEditable(true);
+		
+		final JTextField tf2 = new JTextField();
+		tf2.setEditable(true);
+		
+		final JLabel matchStatus = new JLabel("WildCard Match:");
+		
+		JButton matchStrings = new JButton("Check match");
+		matchStrings.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				
+				boolean match = wildCardMatch(tf1.getText(), tf2.getText());
+				matchStatus.setText("WildCard Match: " + match);
+			}
+		});
+		
+		container.add(tf1, "growx, span, wrap");
+		container.add(tf2, "growx, span, wrap");
+		container.add(matchStrings, "span, pushx, alignx 50%, wrap");
+		container.add(matchStatus, "span, pushx, alignx 50%");
+		
+		dialog.setVisible(true);
+	}
 
 }

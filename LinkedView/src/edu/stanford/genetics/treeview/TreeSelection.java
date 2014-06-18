@@ -100,7 +100,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#setIndex(int, boolean)
 	 */
 	@Override
-	public void setIndex(final int i, final boolean b) {
+	public void setIndexSelection(final int i, final boolean b) {
 
 		integerSelection.set(i, b);
 	}

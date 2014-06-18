@@ -1,6 +1,7 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
@@ -11,6 +12,7 @@ import java.io.InputStream;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
@@ -25,6 +27,7 @@ public class GUIParams {
 	public static Font FONTS = new Font("Sans Serif", Font.PLAIN, 14);
 	public static Font FONT_MENU = new Font("Sans Serif", Font.PLAIN, 16);
 	public static Font FONTL = new Font("Sans Serif", Font.PLAIN, 20);
+	public static Font FONTXXL = new Font("Sans Serif", Font.PLAIN, 30);
 
 	public static Color LIGHTGRAY = new Color(200, 200, 200, 255);
 	public static Color DARKGRAY = new Color(150, 150, 150, 255);
@@ -33,8 +36,12 @@ public class GUIParams {
 	public static Color TEXT = new Color(200, 200, 200, 255);
 	public static Color BORDERS = new Color(200, 200, 200, 255);
 	public static Color MAIN = new Color(255, 200, 65, 255);
+	public static Color BUTTON_DARK = new Color(255, 180, 45, 255);
+	public static Color BUTTON_BORDER_PRESS = new Color(185, 145, 45, 255);
+	public static Color BUTTON_BORDER_ROLL = new Color(255, 205, 65, 255);
 	public static Color ELEMENT_HOV = new Color(255, 174, 77, 255);
 	public static Color BG_COLOR = new Color(39, 40, 34, 255);
+	public static Color SCROLL_BG = new Color(80, 80, 80, 255);
 	public static Color RED1 = new Color(240, 80, 50, 255);
 	public static Color PROGRESS = new Color(39, 40, 34, 255);
 	public static Color TABLEHEADERS = new Color(255, 200, 120, 255);
@@ -49,9 +56,13 @@ public class GUIParams {
 
 		TEXT = new Color(20, 20, 20, 255);
 		MAIN = new Color(30, 144, 255, 255);
+		BUTTON_DARK = new Color(30, 110, 255, 255);
+		BUTTON_BORDER_PRESS = new Color(30, 115, 255, 255);
+		BUTTON_BORDER_ROLL = new Color(30, 175, 255, 255);
 		BORDERS = new Color(100, 100, 100, 255);
 		ELEMENT_HOV = new Color(122, 214, 255, 255);
 		BG_COLOR = new Color(254, 254, 254, 255);
+		SCROLL_BG = new Color(230, 230, 230, 255);
 		TABLEHEADERS = new Color(191, 235, 255, 255);
 	}
 
@@ -63,9 +74,13 @@ public class GUIParams {
 
 		TEXT = new Color(200, 200, 200, 255);
 		MAIN = new Color(255, 200, 65, 255);
+		BUTTON_DARK = new Color(255, 180, 45, 255);
+		BUTTON_BORDER_PRESS = new Color(185, 145, 45, 255);
+		BUTTON_BORDER_ROLL = new Color(255, 205, 65, 255);
 		BORDERS = new Color(200, 200, 200, 255);
 		ELEMENT_HOV = new Color(255, 174, 77, 255);
 		BG_COLOR = new Color(39, 40, 34, 255);
+		SCROLL_BG = new Color(80, 80, 80, 255);
 		TABLEHEADERS = new Color(255, 205, 120, 255);
 	}
 
@@ -85,56 +100,26 @@ public class GUIParams {
 	public static JButton setButtonLayout(final String title,
 			final String iconFileName) {
 
-		final JButton button = new JButton();
-
+		final JButton button;
+		if(title != null) {
+			button = new TVButton(title);
+			
+		} else {
+			button = new TVButton("");
+		}
+		
 		// Basic layout
 		button.setFont(FONTS);
-		button.setBorder(null);
-		button.setFocusPainted(false);
-
-		// Set button color first
-		button.setBackground(MAIN);
 		button.setForeground(BG_COLOR);
-
-		// Check if button has a title and change color if it's "Close"
-		if (title != null) {
-			button.setText(title);
-
-			if (title.equalsIgnoreCase("Close")) {
-				button.setBackground(RED1);
-				button.setForeground(Color.white);
-			}
-		}
+		button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
 		// If provided, add icon to button
 		if (iconFileName != null) {
-
-			String iconType;
-
-			if (!iconFileName.substring(iconFileName.length() - 4,
-					iconFileName.length() - 1).equalsIgnoreCase("png")) {
-				if (dark) {
-					iconType = "_dark.png";
-
-				} else {
-					iconType = "_light.png";
-				}
-			} else {
-				iconType = "";
-			}
-
-			try {
-				final ClassLoader classLoader = Thread.currentThread()
-						.getContextClassLoader();
-				final InputStream input = classLoader
-						.getResourceAsStream(iconFileName + iconType);
-
-				final Image img = ImageIO.read(input);
+			Image img = getIconImage(iconFileName);
+			
+			if(img != null) {
 				button.setIcon(new ImageIcon(img));
-
 				button.setHorizontalTextPosition(SwingConstants.LEFT);
-
-			} catch (final IOException ex) {
 			}
 		}
 
@@ -164,15 +149,96 @@ public class GUIParams {
 	public static JButton setMenuButtonLayout(final String title,
 			final String iconFileName) {
 
-		final JButton menuButton = setButtonLayout(title, iconFileName);
+		final JButton button = new JButton();
 
-		menuButton.setBackground(BG_COLOR);
-		menuButton.setForeground(MAIN);
-		menuButton.setFont(FONTS);
-		menuButton.setBorder(null);
-		menuButton.setFocusPainted(false);
+		button.setBackground(BG_COLOR);
+		button.setForeground(MAIN);
+		button.setFont(FONTS);
+		button.setText(title);
+		button.setBorder(null);
+		button.setFocusPainted(false);
+		button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		
+		if (iconFileName != null) {
+			Image img = getIconImage(iconFileName);
+			
+			if(img != null) {
+				button.setIcon(new ImageIcon(img));
+				button.setHorizontalTextPosition(SwingConstants.LEFT);
+			}
+		}
+		
+		final Dimension d = button.getPreferredSize();
+		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
 
-		return menuButton;
+		button.setPreferredSize(d);
+
+		return button;
+	}
+	
+	/**
+	 * Sets a layout for a very large button.
+	 * 
+	 * @param title
+	 * @param iconFileName
+	 * @return
+	 */
+	public static JButton setLargeButtonLayout(final String title) {
+
+		final JButton button;
+		if(title != null) {
+			button = new TVButton(title);
+			
+		} else {
+			button = new TVButton("No title.");
+		}
+
+		// Basic layout
+		button.setFont(FONTXXL);
+		button.setForeground(GUIParams.BG_COLOR);
+		button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		
+		final Dimension d = button.getPreferredSize();
+		d.setSize(d.getWidth() * 2.5, d.getHeight() * 2.5);
+
+		button.setPreferredSize(d);
+		
+		return button;
+	}
+	
+	/**
+	 * Generates an image that can be used as an icon on a JButton.
+	 * @param iconFileName
+	 * @return
+	 */
+	public static Image getIconImage(String iconFileName) {
+		
+		String iconType;
+		Image img = null;
+
+		if (!iconFileName.substring(iconFileName.length() - 4,
+				iconFileName.length() - 1).equalsIgnoreCase("png")) {
+			if (dark) {
+				iconType = "_dark.png";
+
+			} else {
+				iconType = "_light.png";
+			}
+		} else {
+			iconType = "";
+		}
+
+		try {
+			final ClassLoader classLoader = Thread.currentThread()
+					.getContextClassLoader();
+			final InputStream input = classLoader
+					.getResourceAsStream(iconFileName + iconType);
+
+			img = ImageIO.read(input);
+		} catch (final IOException ex) {
+		}
+		
+		return img;
 	}
 
 	/**
@@ -226,18 +292,32 @@ public class GUIParams {
 	}
 
 	/**
+	 * Setting up a layout for a wide ComboBox object. 
+	 * @param combo
+	 * @return
+	 */
+	public static WideComboBox setWideComboLayout(final String[] combos) {
+
+		final WideComboBox comboBox = new WideComboBox(combos);
+		comboBox.setFont(FONTS);
+		comboBox.setBackground(Color.white);
+		comboBox.setMaximumSize(new Dimension(200, 30));
+
+		return comboBox;
+	}
+	
+	/**
 	 * Setting up a general layout for a ComboBox object The method is used to
 	 * make all ComboBoxes appear consistent in aesthetics
 	 * 
 	 * @param combo
 	 * @return
 	 */
-	public static WideComboBox setComboLayout(final String[] combos) {
+	public static JComboBox setComboLayout(final String[] combos) {
 
-		final WideComboBox comboBox = new WideComboBox(combos);
+		final JComboBox comboBox = new JComboBox(combos);
 		comboBox.setFont(FONTS);
 		comboBox.setBackground(Color.white);
-		comboBox.setMaximumSize(new Dimension(200, 30));
 
 		return comboBox;
 	}

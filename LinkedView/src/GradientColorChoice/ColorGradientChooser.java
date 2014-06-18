@@ -770,7 +770,8 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 					positionInputDialog
 							.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
 					positionInputDialog
-							.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+							.setDefaultCloseOperation(
+									WindowConstants.DISPOSE_ON_CLOSE);
 					positionInputDialog.setTitle("New Position");
 
 					final JLabel enterPrompt = new JLabel("Enter data value: ");
