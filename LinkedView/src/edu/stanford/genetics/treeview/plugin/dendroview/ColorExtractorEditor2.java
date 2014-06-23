@@ -8,7 +8,7 @@ import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JPanel;
 
-import edu.stanford.genetics.treeview.GUIParams;
+import edu.stanford.genetics.treeview.GUIUtils;
 
 /**
  * This class allows editing of a color set...
@@ -51,7 +51,7 @@ public class ColorExtractorEditor2 extends JPanel {
 
 			removeAll();
 			this.setOpaque(false);
-			final JButton pushButton = GUIParams.setButtonLayout("Missing",
+			final JButton pushButton = GUIUtils.setButtonLayout("Missing",
 					null);
 			pushButton.addActionListener(new ActionListener() {
 

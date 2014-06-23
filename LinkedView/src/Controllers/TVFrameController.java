@@ -36,7 +36,9 @@ import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.UrlExtractor;
 import edu.stanford.genetics.treeview.UrlPresets;
+import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.model.DataModelWriter;
+import edu.stanford.genetics.treeview.model.ReorderedDataModel;
 import edu.stanford.genetics.treeview.model.TVModel;
 
 /**
@@ -430,6 +432,27 @@ public class TVFrameController {
 		} else {
 			tvFrame.setDataModel(null);
 		}
+	}
+	
+	public void showSubDataModel(final int[] geneIndexes,
+			final int[] arrayIndexes, final String source, final String name) {
+
+		final ReorderedDataModel dataModel = new ReorderedDataModel(
+				model, geneIndexes, arrayIndexes);
+		if (source != null) {
+			dataModel.setSource(source);
+		}
+
+		if (name != null) {
+			dataModel.setName(name);
+		}
+
+//		final ViewFrame window = getApp().openNew();
+//		window.setDataModel(dataModel);
+//		window.setLoaded(true);
+//		window.getAppFrame().setVisible(true);
+		tvFrame.setDataModel(dataModel);
+		setViewChoice();
 	}
 
 	/**

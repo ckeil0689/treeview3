@@ -28,6 +28,8 @@ public class StringRes {
 	// View Names
 	public static final String view_Welcome = "WelcomeView";
 	public static final String view_Dendro = "DendroView";
+	public static final String view_LoadProg = "LoadProgressView";
+	public static final String view_LoadError = "LoadErrorView";
 
 	// Frame Titles
 	public static final String view_title_Cluster = "Cluster View";

@@ -35,11 +35,12 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 import net.miginfocom.swing.MigLayout;
-
-import edu.stanford.genetics.treeview.GUIParams;
+import edu.stanford.genetics.treeview.GUIUtils;
 import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.WideComboBox;
@@ -59,35 +60,33 @@ public abstract class HeaderFinderBox {
 	protected ViewFrame viewFrame;
 
 	private final HeaderInfo headerInfo;
-//	private final int choices[];
-//	private int nchoices = 0;
+	private final HeaderSummary headerSummary;
 
 	private final ArrayList<String> geneList;
 	private String[] genefHeaders = { "" };
-	private final String type;
 	private final WideComboBox genefBox;
 	private final JButton genefButton;
 
 	private final JPanel contentPanel;
 
 	// "Search Gene Text for Substring"
-	public HeaderFinderBox(final ViewFrame f, final HeaderInfo hI,
-			final TreeSelectionI geneSelection, final String type) {
+	public HeaderFinderBox(final ViewFrame f, final HeaderInfo hI, 
+			final HeaderSummary headerSummary, final TreeSelectionI 
+			geneSelection, final String type) {
 
-		this(f.getAppFrame(), hI, geneSelection, type);
+		this(f.getAppFrame(), hI, headerSummary, geneSelection, type);
 		this.viewFrame = f;
 	}
 
-	private HeaderFinderBox(final JFrame f, final HeaderInfo hI,
+	private HeaderFinderBox(final JFrame f, final HeaderInfo hI, 
+			final HeaderSummary headerSummary,
 			final TreeSelectionI geneSelection, final String type) {
 
 		super();
 		this.viewFrame = null;
 		this.headerInfo = hI;
+		this.headerSummary = headerSummary;
 		this.geneSelection = geneSelection;
-		this.type = type;
-//		this.choices = new int[hI.getNumHeaders()]; // could be wasteful of
-													// ram...
 
 		contentPanel = new JPanel();
 		contentPanel.setLayout(new MigLayout());
@@ -114,11 +113,11 @@ public abstract class HeaderFinderBox {
 		System.arraycopy(genefHeaders, 0, labeledHeaders, 1,
 				genefHeaders.length);
 
-		genefBox = GUIParams.setWideComboLayout(labeledHeaders);
+		genefBox = GUIUtils.setWideComboLayout(labeledHeaders);
 		genefBox.setEditable(true);
 //		AutoCompleteDecorator.decorate(genefBox);
 
-		genefButton = GUIParams.setButtonLayout(null, "searchIcon");
+		genefButton = GUIUtils.setButtonLayout(null, "searchIcon");
 		genefButton.setToolTipText("Highlights the selected label.");
 		genefButton.addActionListener(new ActionListener() {
 
@@ -153,22 +152,7 @@ public abstract class HeaderFinderBox {
 	public String[] getGenes(final String[][] hA) {
 
 		final String[] geneArray = new String[hA.length];
-		int idIndex = 0;
-
-		if (type.equalsIgnoreCase("Row")) {
-			if (headerInfo.getIndex("ORF") != -1) {
-				idIndex = headerInfo.getIndex("ORF");
-			}
-		} else {
-			if (headerInfo.getIndex("GID") != -1) {
-				idIndex = headerInfo.getIndex("GID");
-
-			} else {
-				if (headerInfo.getIndex("ORF") != -1) {
-					idIndex = headerInfo.getIndex("ORF");
-				}
-			}
-		}
+		int idIndex = headerSummary.getIncluded()[0];
 
 		for (int i = 0; i < hA.length; i++) {
 
@@ -255,44 +239,56 @@ public abstract class HeaderFinderBox {
 
 	abstract public void scrollToIndex(int i);
 	
-	// Testing WildCard search
+	/**
+	 * Test method for wild card search.
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		
-		JDialog dialog = new JDialog();
-		dialog.setTitle("WildCard Search Test");
-		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		dialog.setSize(new Dimension(400, 150));
-		
-		JPanel container = new JPanel();
-		container.setLayout(new MigLayout());
-		
-		dialog.getContentPane().add(container);
-		
-		final JTextField tf1 = new JTextField();
-		tf1.setEditable(true);
-		
-		final JTextField tf2 = new JTextField();
-		tf2.setEditable(true);
-		
-		final JLabel matchStatus = new JLabel("WildCard Match:");
-		
-		JButton matchStrings = new JButton("Check match");
-		matchStrings.addActionListener(new ActionListener() {
+		// Swing thread
+		SwingUtilities.invokeLater(new Runnable() {
 
 			@Override
-			public void actionPerformed(ActionEvent arg0) {
+			public void run() {
 				
-				boolean match = wildCardMatch(tf1.getText(), tf2.getText());
-				matchStatus.setText("WildCard Match: " + match);
+				JDialog dialog = new JDialog();
+				dialog.setTitle("WildCard Search Test");
+				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+				dialog.setSize(new Dimension(400, 150));
+				
+				JPanel container = new JPanel();
+				container.setLayout(new MigLayout());
+				
+				dialog.getContentPane().add(container);
+				
+				final JTextField tf1 = new JTextField();
+				tf1.setEditable(true);
+				
+				final JTextField tf2 = new JTextField();
+				tf2.setEditable(true);
+				
+				final JLabel matchStatus = new JLabel("WildCard Match:");
+				
+				JButton matchStrings = new JButton("Check match");
+				matchStrings.addActionListener(new ActionListener() {
+
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+						
+						boolean match = wildCardMatch(tf1.getText(), 
+								tf2.getText());
+						matchStatus.setText("WildCard Match: " + match);
+					}
+				});
+				
+				container.add(tf1, "growx, span, wrap");
+				container.add(tf2, "growx, span, wrap");
+				container.add(matchStrings, "span, pushx, alignx 50%, wrap");
+				container.add(matchStatus, "span, pushx, alignx 50%");
+				
+				dialog.setVisible(true);
 			}
 		});
-		
-		container.add(tf1, "growx, span, wrap");
-		container.add(tf2, "growx, span, wrap");
-		container.add(matchStrings, "span, pushx, alignx 50%, wrap");
-		container.add(matchStatus, "span, pushx, alignx 50%");
-		
-		dialog.setVisible(true);
 	}
 
 }

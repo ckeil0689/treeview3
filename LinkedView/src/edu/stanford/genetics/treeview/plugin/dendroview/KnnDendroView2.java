@@ -33,7 +33,7 @@ import edu.stanford.genetics.treeview.DataMatrix;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.DendroPanel;
 import edu.stanford.genetics.treeview.ExportException;
-import edu.stanford.genetics.treeview.GUIParams;
+import edu.stanford.genetics.treeview.GUIUtils;
 import edu.stanford.genetics.treeview.MainPanel;
 import edu.stanford.genetics.treeview.MainProgramArgs;
 import edu.stanford.genetics.treeview.MessagePanel;

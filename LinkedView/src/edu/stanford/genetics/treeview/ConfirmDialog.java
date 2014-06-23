@@ -28,17 +28,17 @@ public class ConfirmDialog {
 
 		final JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new MigLayout());
-		mainPanel.setBackground(GUIParams.BG_COLOR);
+		mainPanel.setBackground(GUIUtils.BG_COLOR);
 
 		final JLabel prompt = new JLabel("Are you sure you want to " + function
 				+ "?");
-		prompt.setForeground(GUIParams.TEXT);
-		prompt.setFont(GUIParams.FONT_MENU);
+		prompt.setForeground(GUIUtils.TEXT);
+		prompt.setFont(GUIUtils.FONT_MENU);
 
-		final JButton ok = GUIParams.setButtonLayout("OK", null);
+		final JButton ok = GUIUtils.setButtonLayout("OK", null);
 		ok.addActionListener(new ConfirmListener());
 
-		final JButton cancel = GUIParams.setButtonLayout("Cancel", null);
+		final JButton cancel = GUIUtils.setButtonLayout("Cancel", null);
 		cancel.addActionListener(new DenyListener());
 
 		mainPanel.add(prompt, "push, alignx 50%, span, wrap");

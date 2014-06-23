@@ -34,6 +34,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
+import edu.stanford.genetics.treeview.GUIUtils;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
@@ -127,7 +128,7 @@ public class ColorSet2 implements ConfigNodePersistent {
 	private void setDefaults() {
 
 		missing = decodeColor(default_missingColor);
-		empty = decodeColor(default_emptyColor);
+		empty = GUIUtils.BG_COLOR; //decodeColor(default_emptyColor);
 	}
 
 	/**

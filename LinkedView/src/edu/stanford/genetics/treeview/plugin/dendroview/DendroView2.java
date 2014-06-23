@@ -34,6 +34,7 @@ import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -42,9 +43,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JSplitPane;
 
-import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.DendroPanel;
-import edu.stanford.genetics.treeview.GUIParams;
+import edu.stanford.genetics.treeview.GUIUtils;
 import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.StringRes;
 import edu.stanford.genetics.treeview.TVScrollBarUI;
@@ -114,6 +114,7 @@ public class DendroView2 implements Observer, DendroPanel {
 	// JMenuItems
 	private JMenuItem colorMenuItem;
 	private JMenuItem annotationsMenuItem;
+	private JMenuItem isolateMenu;
 
 	// JButtons
 	private JButton zoomButton;
@@ -122,6 +123,16 @@ public class DendroView2 implements Observer, DendroPanel {
 	private JButton scaleDecX;
 	private JButton scaleDecY;
 	private JButton scaleDefaultAll;
+	
+	private JCheckBox lockGlobalView;
+	
+	// GlobalView default sizes as ints to keep track.
+	private int gvWidth = 100;
+	private int gvHeight = 100;
+	
+	private int arrayWidth = 100;
+	private int geneHeight = 100;
+
 
 	// Booleans
 	private boolean showTrees = false;
@@ -168,8 +179,7 @@ public class DendroView2 implements Observer, DendroPanel {
 		this.name = "DendroView";
 		this.loaded = false;
 
-		dendroPane = new JPanel();
-		dendroPane.setLayout(new MigLayout("ins 0"));
+		dendroPane = GUIUtils.createJPanel(false, false, null);
 		
 		// Create the Global view (JPanel to display)
 		globalview = new GlobalView2();
@@ -179,6 +189,9 @@ public class DendroView2 implements Observer, DendroPanel {
 		globalXscrollbar.setUI(new TVScrollBarUI());
 		globalYscrollbar = globalview.getYScroll();
 		globalYscrollbar.setUI(new TVScrollBarUI());
+		
+		lockGlobalView = new JCheckBox("Lock matrix size");
+		lockGlobalView.setFont(GUIUtils.FONTS);
 
 		// Set up the column name display
 //		arraynameview = new ArrayNameViewManager();
@@ -239,6 +252,9 @@ public class DendroView2 implements Observer, DendroPanel {
 		// Clear panel
 		dendroPane.removeAll();
 		
+		lockGlobalView.setBackground(GUIUtils.BG_COLOR);
+		lockGlobalView.setForeground(GUIUtils.TEXT);
+		
 		// Set color scheme
 		setComponentColors();
 
@@ -247,7 +263,10 @@ public class DendroView2 implements Observer, DendroPanel {
 		JPanel crossPanel;
 		JPanel textpanel;
 		JPanel arrayNamePanel;
+		JPanel arrayContainer;
+		JPanel geneContainer;
 		JPanel navPanel;
+		JPanel globalViewContainer;
 		JSplitPane gtrPane = null;
 		JSplitPane atrPane = null;
 		JPanel firstPanel;
@@ -258,64 +277,52 @@ public class DendroView2 implements Observer, DendroPanel {
 		JPanel fillPanel4;
 
 		// Buttons
-		scaleDefaultAll = GUIParams.setButtonLayout(null, "homeIcon");
+		scaleDefaultAll = GUIUtils.setButtonLayout(null, "homeIcon");
 		scaleDefaultAll.setToolTipText("Reset the zoomed view");
 
-		scaleIncX = GUIParams.setButtonLayout(null, "zoomInIcon");
+		scaleIncX = GUIUtils.setButtonLayout(null, "zoomInIcon");
 		scaleIncX.setToolTipText(StringRes.tooltip_xZoomIn);
 
-		scaleDecX = GUIParams.setButtonLayout(null, "zoomOutIcon");
+		scaleDecX = GUIUtils.setButtonLayout(null, "zoomOutIcon");
 		scaleDecX.setToolTipText(StringRes.tooltip_xZoomOut);
 
-		scaleIncY = GUIParams.setButtonLayout(null, "zoomInIcon");
+		scaleIncY = GUIUtils.setButtonLayout(null, "zoomInIcon");
 		scaleIncY.setToolTipText(StringRes.tooltip_yZoomIn);
 
-		scaleDecY = GUIParams.setButtonLayout(null, "zoomOutIcon");
+		scaleDecY = GUIUtils.setButtonLayout(null, "zoomOutIcon");
 		scaleDecY.setToolTipText(StringRes.tooltip_yZoomOut);
 
-		zoomButton = GUIParams.setButtonLayout(null, "fullscreenIcon");
+		zoomButton = GUIUtils.setButtonLayout(null, "fullscreenIcon");
 		zoomButton.setToolTipText(StringRes.tooltip_home);
 
 		// Panels
-		buttonPanel = new JPanel();
-		buttonPanel.setLayout(new MigLayout());
-		buttonPanel.setOpaque(false);
+		buttonPanel = GUIUtils.createJPanel(false, true, null);
 		
+		crossPanel = GUIUtils.createJPanel(false, true, null);
+		
+		globalViewContainer = GUIUtils.createJPanel(false, false, null); 
 
-		crossPanel = new JPanel();
-		crossPanel.setLayout(new MigLayout());
-		crossPanel.setOpaque(false);
+		fillPanel1 = GUIUtils.createJPanel(false, true, null); 
 
-		fillPanel1 = new JPanel();
-		fillPanel1.setLayout(new MigLayout());
-		fillPanel1.setOpaque(false);
+		fillPanel2 = GUIUtils.createJPanel(false, true, null);
 
-		fillPanel2 = new JPanel();
-		fillPanel2.setOpaque(false);
+		fillPanel3 = GUIUtils.createJPanel(false, true, null); 
 
-		fillPanel3 = new JPanel();
-		fillPanel3.setOpaque(false);
+		fillPanel4 = GUIUtils.createJPanel(false, true, null); 
+		
+		arrayContainer = GUIUtils.createJPanel(false, false, null);
+		
+		geneContainer = GUIUtils.createJPanel(false, false, null);
 
-		fillPanel4 = new JPanel();
-		fillPanel4.setOpaque(false);
-
-		firstPanel = new JPanel();
-		firstPanel.setLayout(new MigLayout());
-		firstPanel.setOpaque(false);
+		firstPanel = GUIUtils.createJPanel(false, true, null);
 		firstPanel.setBorder(null);
 
-		navPanel = new JPanel();
-		navPanel.setLayout(new MigLayout());
-		navPanel.setOpaque(false);
+		navPanel = GUIUtils.createJPanel(false, true, null);
 		navPanel.setBorder(null);
 
-		textpanel = new JPanel();
-		textpanel.setLayout(new MigLayout("ins 0"));
-		textpanel.setOpaque(false);
+		textpanel = GUIUtils.createJPanel(false, false, null); 
 
-		arrayNamePanel = new JPanel();
-		arrayNamePanel.setLayout(new MigLayout("ins 0"));
-		arrayNamePanel.setOpaque(false);
+		arrayNamePanel = GUIUtils.createJPanel(false, false, null);
 
 		if (gtrview.isEnabled() || atrview.isEnabled()) {
 			tvFrame.getTreeButton().setEnabled(true);
@@ -346,6 +353,9 @@ public class DendroView2 implements Observer, DendroPanel {
 		// Adding Components onto each other
 		textpanel.add(textview.getComponent(), "push, grow");
 		arrayNamePanel.add(arraynameview.getComponent(), "push, grow");
+		
+		globalViewContainer.add(globalview, "w " + gvWidth + "%, h "
+				+ "" + gvHeight + "%, push, alignx 50%, aligny 50%");
 
 		crossPanel.add(scaleIncY, "span, alignx 50%, wrap");
 		crossPanel.add(scaleDecX);
@@ -356,77 +366,126 @@ public class DendroView2 implements Observer, DendroPanel {
 		buttonPanel.add(crossPanel, "pushx, alignx 50%, wrap");
 
 		navPanel.add(buttonPanel, "pushx, h 20%, w 90%, alignx 50%, wrap");
-		navPanel.add(scaleDefaultAll, "push, alignx 50%, aligny 5%");
+		navPanel.add(scaleDefaultAll, "push, alignx 50%, aligny 5%, wrap");
+		navPanel.add(lockGlobalView, "push, alignx 50%, aligny 5%");
 		
 		JScrollBar arrayScroll = arraynameview.getYScroll();
 		JScrollBar geneScroll = textview.getXScroll();
+		
+		// Widths
+		double textViewCol = 0;
+		double firstPanelCol = 0;
+		double globalViewCol = 0;
+		double navCol = 10.5;
+		double yScrollWidth = 1.0;
+		
+		// Heights
+		double arrayRow = 0;
+		double globalViewRow = 0;
+		double bottomRow = 5;
+		double xScrollHeight = 1.0;
 
-		// Layout depends on which dendrogram is shown or not!
+		// Layout parameters depend on tree visibility and atr/gtr availability
 		if (showTrees && (atrview.isEnabled() && gtrview.isEnabled())) {
-			dendroPane.add(firstPanel, "w 18.5%, h 20%");
-			dendroPane.add(atrPane, "w 72%, h 20%");
-			dendroPane.add(arrayScroll, "w 1%, h 20%");
-			dendroPane.add(fillPanel1, "w 10.5%, h 20%, wrap");
-			dendroPane.add(gtrPane, "w 18.5%, h 76%");
-			dendroPane.add(globalview, "w 72%, h 75%");
-			dendroPane.add(globalYscrollbar, "h 75%");
-			dendroPane.add(navPanel, "w 10.5%, h 75%, wrap");
-			dendroPane.add(geneScroll, "w 18.5%, h 1%");
-			dendroPane.add(globalXscrollbar, "pushy, aligny 0%, w 72%, h 1%");
-			dendroPane.add(fillPanel3, "span 2 2, w 11.5%, h 5%, wrap");
-			dendroPane.add(fillPanel2, "w 18.5%, h 5%");
-			dendroPane.add(fillPanel4, "w 72%, h 1%");
+			firstPanelCol = 18.5;
+			textViewCol = 18.5;
+			globalViewCol = 72;
+			
+			arrayRow = 20;
+			globalViewRow = 75;
+			
+			arrayContainer.add(atrPane, "push, growy, alignx 50%, w " 
+					+ arrayWidth + "%");
+			geneContainer.add(gtrPane, "push, growx, aligny 50%, h " 
+					+ geneHeight + "%");
 
 		} else if (showTrees && (atrview.isEnabled() && !gtrview.isEnabled())) {
-			dendroPane.add(firstPanel, "w 18.5%, h 20%");
-			dendroPane.add(atrPane, "w 79%, h 20%");
-			dendroPane.add(arrayScroll, "w 1%, h 20%");
-			dendroPane.add(fillPanel1, "w 10.5%, h 20%, wrap");
-			dendroPane.add(textpanel, "w 10.5%, h 76%");
-			dendroPane.add(globalview, "w 80%, h 75%");
-			dendroPane.add(globalYscrollbar, "h 75%");
-			dendroPane.add(navPanel, "w 10.5%, h 75%, wrap");
-			dendroPane.add(geneScroll, "w 10.5%, h 1%");
-			dendroPane.add(globalXscrollbar, "pushy, aligny 0%, w 80%, h 1%");
-			dendroPane.add(fillPanel3, "span 2 2, w 11.5%, h 5%, wrap");
-			dendroPane.add(fillPanel2, "w 10.5%, h 5%");
-			dendroPane.add(fillPanel4, "w 80%, h 1%");
+			firstPanelCol = 18.5;
+			textViewCol = 10.5;
+			globalViewCol = 80;
+			
+			arrayRow = 20;
+			globalViewRow = 75;
+			
+			arrayContainer.add(atrPane, "push, growy, alignx 50%, w " 
+					+ arrayWidth + "%");
+			geneContainer.add(textpanel, "push, growx, aligny 50%, h " 
+					+ geneHeight + "%");
 
 		} else if (showTrees && (!atrview.isEnabled() && gtrview.isEnabled())) {
-			dendroPane.add(firstPanel, "w 18.5%, h 10%");
-			dendroPane.add(arrayNamePanel, "w 72%, h 10%");
-			dendroPane.add(arrayScroll, "w 1%, h 10%");
-			dendroPane.add(fillPanel1, "w 10.5%, h 10%, wrap");
-			dendroPane.add(gtrPane, "w 18.5%, h 86%");
-			dendroPane.add(globalview, "w 72%, h 85%");
-			dendroPane.add(globalYscrollbar, "h 85%");
-			dendroPane.add(navPanel, "w 10.5%, h 85%, wrap");
-			dendroPane.add(geneScroll, "w 18.5%, h 1%");
-			dendroPane.add(globalXscrollbar, "pushy, aligny 0%, w 72%, h 1%");
-			dendroPane.add(fillPanel3, "span 2 2, w 11.5%, h 5%, wrap");
-			dendroPane.add(fillPanel2, "w 18.5%, h 5%");
-			dendroPane.add(fillPanel4, "w 72%, h 1%");
+			firstPanelCol = 18.5;
+			textViewCol = 18.5;
+			globalViewCol = 72;
+			
+			arrayRow = 10;
+			globalViewRow = 85;
+			
+			arrayContainer.add(arrayNamePanel, "push, growy, alignx 50%, w " 
+					+ arrayWidth + "%");
+			geneContainer.add(gtrPane, "push, growx, aligny 50%, h " 
+					+ geneHeight + "%");
 
 		} else {
-			dendroPane.add(firstPanel, "w 10.5%, h 10%");
-			dendroPane.add(arrayNamePanel, "w 81%, h 10%");
-			dendroPane.add(arrayScroll, "w 1%, h 10%");
-			dendroPane.add(fillPanel1, "span 2, w 10.5%, h 10%, wrap");
-			dendroPane.add(textpanel, "w 10.5%, h 86%");
-			dendroPane.add(globalview, "w 80%, h 85%");
-			dendroPane.add(globalYscrollbar, "h 85%");
-			dendroPane.add(navPanel, "w 10.5%, h 85%, wrap");
-			dendroPane.add(geneScroll, "w 10.5%, h 1%");
-			dendroPane.add(globalXscrollbar, "pushy, aligny 0%, w 80%, h 1%");
-			dendroPane.add(fillPanel3, "span 2 2, w 11.5%, h 5%, wrap");
-			dendroPane.add(fillPanel2, "span 1 2, w 10.5%, h 5%");
-			dendroPane.add(fillPanel4, "w 80%, h 1%");
+			firstPanelCol = 10.5;
+			textViewCol = 10.5;
+			globalViewCol = 80;
+			
+			arrayRow = 10;
+			globalViewRow = 85;
+			
+			arrayContainer.add(arrayNamePanel, "push, growy, alignx 50%, w " 
+					+ arrayWidth + "%");
+			geneContainer.add(textpanel, "push, growx, aligny 50%, h " 
+					+ geneHeight + "%");
 		}
+		
+		// Adding all components to the dendroPane
+		dendroPane.add(firstPanel, "w " + firstPanelCol + "%, h "
+				+ "" + arrayRow + "%");
+		
+		dendroPane.add(arrayContainer, "w " + (globalViewCol - yScrollWidth) 
+				+ "%, h " + arrayRow + "%");
+		
+		dendroPane.add(arrayScroll, "w " + yScrollWidth + "%, h "
+				+ "" + arrayRow + "%");
+		
+		dendroPane.add(fillPanel1, "w " + navCol + "%, h " + arrayRow + "%, "
+				+ "wrap");
+		
+		dendroPane.add(geneContainer, "w " + textViewCol + "%, h "
+				+ "" + (globalViewRow + xScrollHeight) + "%");
+		
+		dendroPane.add(globalViewContainer, "w " + globalViewCol + "%, "
+				+ "h " + globalViewRow + "%");
+		
+		dendroPane.add(globalYscrollbar, "h " + globalViewRow + "%");
+		
+		dendroPane.add(navPanel, "w " + navCol + "%, h "
+				+ "" + globalViewRow + "%, wrap");
+		
+		dendroPane.add(geneScroll, "w " + textViewCol + "%, h "
+				+ "" + yScrollWidth + "%");
+		
+		dendroPane.add(globalXscrollbar, "pushy, aligny 0%, w "
+				+ "" + globalViewCol + "%, h " + xScrollHeight + "%");
+		
+		dendroPane.add(fillPanel3, "span 2 2, w "
+				+ "" + (navCol + yScrollWidth) + "%, h "
+						+ "" + bottomRow + "%, wrap");
+		
+		dendroPane.add(fillPanel2, "w " + textViewCol  + "%, h "
+				+ "" + bottomRow + "%");
+		
+		dendroPane.add(fillPanel4, "w " + globalViewCol + "%, h "
+				+ "" + xScrollHeight + "%");
+		
+		dendroPane.revalidate();
+		dendroPane.repaint();
 	}
 	
 	public void setComponentColors() {
 		
-		dendroPane.setBackground(GUIParams.BG_COLOR);
+		dendroPane.setBackground(GUIUtils.BG_COLOR);
 		arraynameview.setColors();
 		textview.setColors();
 	}
@@ -535,6 +594,27 @@ public class DendroView2 implements Observer, DendroPanel {
 
 		this.showTrees = visible;
 	}
+	
+	/**
+	 * Sets the status of the JCheckBox that controls whether GlobalView
+	 * will be resized or not.
+	 * 
+	 * @param visible
+	 */
+	public void setGVLocked(final boolean locked) {
+
+		lockGlobalView.setSelected(locked);
+	}
+	
+	/**
+	 * Returns the status of the JCheckBox that controls whether GlobalView
+	 * will be resized or not.
+	 * @return
+	 */
+	public boolean getGVLocked() {
+		
+		return lockGlobalView.isSelected();
+	}
 
 	/**
 	 * Opens a JWindow containing Swing components used to search data by name
@@ -548,22 +628,23 @@ public class DendroView2 implements Observer, DendroPanel {
 		dialog.setTitle(StringRes.dialog_title_search);
 		dialog.setResizable(false);
 
-		final JPanel container = new JPanel();
-		container.setLayout(new MigLayout());
-		container.setBackground(GUIParams.BG_COLOR);
-		container.setBorder(BorderFactory.createEtchedBorder(GUIParams.BORDERS,
-				GUIParams.BG_COLOR));
+		final JPanel container = GUIUtils.createJPanel(true, true, null); //new JPanel();
+//		container.setLayout(new MigLayout());
+//		container.setBackground(GUIUtils.BG_COLOR);
+		container.setBorder(BorderFactory.createEtchedBorder(GUIUtils.BORDERS,
+				GUIUtils.BG_COLOR));
 		
-		JLabel wildTip = new JLabel("Tip: Edit the search fields to search " +
-				"for terms.");
-		wildTip.setFont(GUIParams.FONTS);
-		wildTip.setForeground(GUIParams.TEXT);
+		JLabel wildTip = GUIUtils.createSmallLabel("Tip: Edit the search "
+				+ "fields to search for terms.");
+//		wildTip.setFont(GUIUtils.FONTS);
+//		wildTip.setForeground(GUIUtils.TEXT);
 		
-		JLabel wildTip2 = new JLabel("Wildcards ('*', '?') are supported.");
-		wildTip2.setFont(GUIParams.FONTS);
-		wildTip2.setForeground(GUIParams.TEXT);
+		JLabel wildTip2 = GUIUtils.createSmallLabel("Wildcards ('*', '?') "
+				+ "are supported.");
+//		wildTip2.setFont(GUIUtils.FONTS);
+//		wildTip2.setForeground(GUIUtils.TEXT);
 		
-		final JButton closeButton = GUIParams.setButtonLayout("Close", null);
+		final JButton closeButton = GUIUtils.setButtonLayout("Close", null);
 		closeButton.addActionListener(new ActionListener() {
 
 			@Override
@@ -579,7 +660,7 @@ public class DendroView2 implements Observer, DendroPanel {
 				+ "alignx 50%, wrap");
 		container.add(wildTip, "span, wrap");
 		container.add(wildTip2, "span, wrap");
-		container.add(closeButton, "push, alignx 50%");
+		container.add(closeButton, "push, alignx 100%");
 
 		dialog.getContentPane().add(container);
 		dialog.pack();
@@ -939,17 +1020,25 @@ public class DendroView2 implements Observer, DendroPanel {
 		colorMenuItem = new JMenuItem("Color Settings");
 		menu.add(colorMenuItem);
 		tvFrame.addToStackMenuList(colorMenuItem);
+		
+//		menu.addSeparator();
+//		
+//		isolateMenu = new JMenuItem("Isolate Selected");
+//		menu.add(isolateMenu);
+//		tvFrame.addToStackMenuList(isolateMenu);
 	}
 
 	@Override
 	public void addClusterMenus(final JMenu menu) {
 
 		// Cluster Menu
-		final JMenuItem hierMenuItem = new JMenuItem(StringRes.menu_title_Hier);
+		final JMenuItem hierMenuItem = new JMenuItem(
+				StringRes.menu_title_Hier);
 		menu.add(hierMenuItem);
 		tvFrame.addToStackMenuList(hierMenuItem);
 
-		final JMenuItem kMeansMenuItem = new JMenuItem(StringRes.menu_title_KMeans);
+		final JMenuItem kMeansMenuItem = new JMenuItem(
+				StringRes.menu_title_KMeans);
 		menu.add(kMeansMenuItem);
 		tvFrame.addToStackMenuList(kMeansMenuItem);
 	}
@@ -1076,6 +1165,7 @@ public class DendroView2 implements Observer, DendroPanel {
 		this.loaded = loaded;
 	}
 	
+	
 	/**
 	 * Shows whether the status of this DendroView is loaded or not.
 	 * @return
@@ -1083,6 +1173,48 @@ public class DendroView2 implements Observer, DendroPanel {
 	public boolean isLoaded() {
 		
 		return loaded;
+	}
+	
+	// Set GlobalView sizes
+	public void setGVWidth(int newWidth) {
+		
+		this.gvWidth = newWidth;
+	}
+	
+	public void setGVHeight(int newHeight) {
+		
+		this.gvHeight = newHeight;
+	}
+	
+	public void setArrayWidth(int newWidth) {
+		
+		this.arrayWidth = newWidth;
+	}
+	
+	public void setGeneHeight(int newHeight) {
+		
+		this.geneHeight = newHeight;
+	}
+	
+	// Get GlobalView sizes
+	public int getGVWidth() {
+		
+		return gvWidth;
+	}
+	
+	public int getGVHeight() {
+		
+		return gvHeight;
+	}
+	
+	public int getArrayWidth() {
+		
+		return arrayWidth;
+	}
+	
+	public int getGeneHeight() {
+		
+		return geneHeight;
 	}
 	
 	/**
@@ -1140,7 +1272,8 @@ public class DendroView2 implements Observer, DendroPanel {
 	public JPanel getGeneFinderPanel() {
 
 		final HeaderFinderBox geneFinderBox = new GeneFinderBox(tvFrame, this,
-				tvFrame.getDataModel().getGeneHeaderInfo(),
+				tvFrame.getDataModel().getGeneHeaderInfo(), 
+				getTextview().getHeaderSummary(),
 				tvFrame.getGeneSelection());
 
 		final JPanel contentPanel = geneFinderBox.getContentPanel();
@@ -1156,7 +1289,8 @@ public class DendroView2 implements Observer, DendroPanel {
 	public JPanel getArrayFinderPanel() {
 
 		final HeaderFinderBox arrayFinderBox = new ArrayFinderBox(tvFrame,
-				this, tvFrame.getDataModel().getArrayHeaderInfo(),
+				this, tvFrame.getDataModel().getArrayHeaderInfo(), 
+				getArraynameview().getHeaderSummary(),
 				tvFrame.getArraySelection());
 
 		final JPanel contentPanel = arrayFinderBox.getContentPanel();

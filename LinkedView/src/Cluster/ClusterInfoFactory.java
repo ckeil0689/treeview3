@@ -3,7 +3,7 @@ package Cluster;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import edu.stanford.genetics.treeview.GUIParams;
+import edu.stanford.genetics.treeview.GUIUtils;
 import edu.stanford.genetics.treeview.StringRes;
 
 import net.miginfocom.swing.MigLayout;
@@ -30,42 +30,42 @@ public class ClusterInfoFactory {
 		mainPanel.removeAll();
 		
 		JLabel label = new JLabel("Linkage Method Details");
-		label.setFont(GUIParams.FONTL);
-		label.setForeground(GUIParams.MAIN);
+		label.setFont(GUIUtils.FONTL);
+		label.setForeground(GUIUtils.MAIN);
 		
 		mainPanel.add(label, "push, alignx 0%, aligny 0%, span, wrap");
 		
 		JLabel similarity = new JLabel("Similarity: ");
-		similarity.setFont(GUIParams.FONTS);
-		similarity.setForeground(GUIParams.TEXT);
+		similarity.setFont(GUIUtils.FONTS);
+		similarity.setForeground(GUIUtils.TEXT);
 		
 		TextDisplay similarityText = new TextDisplay(
 				getSimilarity(methodIndex));
 		
 		JLabel type = new JLabel("Type: ");
-		type.setFont(GUIParams.FONTS);
-		type.setForeground(GUIParams.TEXT);
+		type.setFont(GUIUtils.FONTS);
+		type.setForeground(GUIUtils.TEXT);
 		
 		TextDisplay typeText = new TextDisplay(
 				getType(methodIndex));
 		
 		JLabel time = new JLabel("Time: ");
-		time.setFont(GUIParams.FONTS);
-		time.setForeground(GUIParams.TEXT);
+		time.setFont(GUIUtils.FONTS);
+		time.setForeground(GUIUtils.TEXT);
 		
 		TextDisplay timeText = new TextDisplay(
 				getTime(methodIndex));
 		
 		JLabel advantage = new JLabel("Advantages: ");
-		advantage.setFont(GUIParams.FONTS);
-		advantage.setForeground(GUIParams.TEXT);
+		advantage.setFont(GUIUtils.FONTS);
+		advantage.setForeground(GUIUtils.TEXT);
 		
 		TextDisplay advantageText = new TextDisplay(
 				getAdvantage(methodIndex));
 		
 		JLabel disadvantage = new JLabel("Disadvantages: ");
-		disadvantage.setFont(GUIParams.FONTS);
-		disadvantage.setForeground(GUIParams.TEXT);
+		disadvantage.setFont(GUIUtils.FONTS);
+		disadvantage.setForeground(GUIUtils.TEXT);
 		
 		TextDisplay disadvantageText = new TextDisplay(
 				getDisadvantage(methodIndex));
@@ -96,8 +96,8 @@ public class ClusterInfoFactory {
 		mainPanel.removeAll();
 		
 		JLabel label = new JLabel("Tip");
-		label.setFont(GUIParams.FONTL);
-		label.setForeground(GUIParams.MAIN);
+		label.setFont(GUIUtils.FONTL);
+		label.setForeground(GUIUtils.MAIN);
 		
 		mainPanel.add(label, "pushx, span, wrap");
 		

@@ -31,7 +31,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Observable;
 
-import edu.stanford.genetics.treeview.GUIParams;
+import edu.stanford.genetics.treeview.GUIUtils;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LinearTransformation;
@@ -367,7 +367,7 @@ public class GTRView extends ModelViewBuffered implements MouseListener,
 			map.setAvailablePixels(offscreenSize.height);
 
 			// clear the pallette...
-			g.setColor(GUIParams.BG_COLOR);
+			g.setColor(GUIUtils.BG_COLOR);
 			g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
 			g.setColor(Color.black);
 

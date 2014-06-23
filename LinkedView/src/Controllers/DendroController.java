@@ -17,7 +17,6 @@ import java.util.prefs.Preferences;
 import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -96,6 +95,7 @@ public class DendroController implements ConfigNodePersistent {
 		setConfigNode(tvFrame.getConfigNode());
 		bindComponentFunctions();
 		setTreesVis(configNode.getBoolean("treesVisible", false));
+		setGVLocked(configNode.getBoolean("globalViewLocked", false));
 
 		dendroView.setupLayout();
 		setSavedScale();
@@ -165,14 +165,8 @@ public class DendroController implements ConfigNodePersistent {
 		public void actionPerformed(final ActionEvent e) {
 
 			dendroView.openSearchDialog();
-//			final Point location = ((JButton) e.getSource())
-//					.getLocation();
-//			final int height = ((JButton) e.getSource()).getHeight();
-
-//			dialog.setLocation(location.x, location.y + (2 * height));
 		}
 	}
-
 
 	/**
 	 * Listener for the button that handles cursor change when the mouse enters
@@ -233,10 +227,10 @@ public class DendroController implements ConfigNodePersistent {
 	 * 
 	 */
 	class TreeButtonClicker extends SwingWorker<Void, Void> {
-
+		
 		@Override
 		protected Void doInBackground() throws Exception {
-
+			
 			if (tvFrame.getTreeButton().getText()
 					.equalsIgnoreCase(StringRes.button_showTrees)) {
 				setTreesVis(true);
@@ -247,16 +241,18 @@ public class DendroController implements ConfigNodePersistent {
 
 			dendroView.setupLayout();
 			addViewListeners();
-			// resetMapContainers();
 			return null;
 		}
 
 		@Override
 		protected void done() {
 
-			globalXmap.calculateNewMinScale();
-			globalYmap.calculateNewMinScale();
-			setSavedScale();
+//			resetMapContainers();
+			globalXmap.recalculateScale();
+			globalYmap.recalculateScale();
+			
+			dendroView.getGlobalView().revalidate();
+			dendroView.getGlobalView().repaint();
 		}
 	}
 
@@ -279,7 +275,9 @@ public class DendroController implements ConfigNodePersistent {
 
 	/**
 	 * SwingWorker which changes the scale of either x or y MapContainer or
-	 * both. Notifies MapContainer's observers when done.
+	 * both. Notifies MapContainer's observers when done. Also resizes 
+	 * GlobalView if the resulting scale is too small to fill out 
+	 * the dedicated space in DendroView.
 	 * 
 	 * @author CKeil
 	 * 
@@ -296,22 +294,44 @@ public class DendroController implements ConfigNodePersistent {
 		@Override
 		protected Void doInBackground() throws Exception {
 
+			boolean locked = dendroView.getGVLocked();
+			int width = dendroView.getGVWidth();
+			int height = dendroView.getGVHeight();
+			
 			if (event.getSource() == dendroView.getXPlusButton()) {
+				if(width < 100 && !locked) {
+					changeGVSize(5, 0);
+				}
+				
 				getGlobalXMap().zoomIn();
 
 			} else if (event.getSource() == dendroView.getXMinusButton()) {
+				if((width > 50 && getGlobalXMap().getScale() <= getGlobalXMap()
+						.getMinScale()) 
+						&& !locked) {
+					changeGVSize(-5, 0);
+				}
+				
 				getGlobalXMap().zoomOut();
 
 			} else if (event.getSource() == dendroView.getYPlusButton()) {
+				if(height < 100 && !locked) {
+					changeGVSize(0, 5);
+				}
+				
 				getGlobalYMap().zoomIn();
 
 			} else if (event.getSource() == dendroView.getYMinusButton()) {
+				if((height > 50 && getGlobalYMap().getScale() <= getGlobalYMap()
+						.getMinScale())
+						&& !locked) {
+					changeGVSize(0, -5);
+				}
+				
 				getGlobalYMap().zoomOut();
 
 			} else if (event.getSource() == dendroView.getHomeButton()) {
-				// GlobalView size known, this is why it works
-				// resetMapContainers();
-				dendroView.getGlobalView().resetHome(true);
+				resetMapContainers();
 
 			} else {
 				LogBuffer.println("Got weird source for actionPerformed() "
@@ -330,45 +350,64 @@ public class DendroController implements ConfigNodePersistent {
 		}
 	}
 
-	public void setButtonEnabledStatus() {
-
-		// X-Axis Buttons
-		if (Math.abs(getGlobalXMap().getScale() - getGlobalXMap().getMinScale()) 
-				< PRECISION_LEVEL) {
-			dendroView.getXMinusButton().setEnabled(false);
-
-		} else if (Math.abs(getGlobalXMap().getScale()
-				- getGlobalXMap().getMinScale()) > PRECISION_LEVEL
-				&& Math.abs(getGlobalXMap().getScale()
-						- getGlobalXMap().getAvailablePixels()) 
-						> PRECISION_LEVEL) {
-			dendroView.getXMinusButton().setEnabled(true);
-			dendroView.getXPlusButton().setEnabled(true);
-
-		} else if (Math.abs(getGlobalXMap().getScale()
-				- getGlobalXMap().getAvailablePixels()) 
-				< PRECISION_LEVEL) {
-			dendroView.getXPlusButton().setEnabled(false);
-		}
-
-		// Y-Axis Buttons
-		if (Math.abs(getGlobalYMap().getScale() - getGlobalYMap().getMinScale())
-				< PRECISION_LEVEL) {
-			dendroView.getYMinusButton().setEnabled(false);
-
-		} else if (Math.abs(getGlobalYMap().getScale()
-				- getGlobalYMap().getMinScale()) > PRECISION_LEVEL
-				&& Math.abs(getGlobalYMap().getScale()
-						- getGlobalYMap().getAvailablePixels()) 
-						> PRECISION_LEVEL) {
-			dendroView.getYMinusButton().setEnabled(true);
-			dendroView.getYPlusButton().setEnabled(true);
-
-		} else if (Math.abs(getGlobalYMap().getScale()
-				- getGlobalYMap().getAvailablePixels()) < PRECISION_LEVEL) {
-			dendroView.getYPlusButton().setEnabled(false);
-		}
+	/**
+	 * Changes the size of GlobalView if the user tries to scale one axis and
+	 * GlobalView doesn't fill up 100% of its dedicated space. If it wouldn't
+	 * resize, there would be a minimum scale for each screen size.
+	 * @param widthChange
+	 * @param heightChange
+	 */
+	public void changeGVSize(int widthChange, int heightChange) {
+		
+		dendroView.setGVWidth(dendroView.getGVWidth() + widthChange);
+		dendroView.setGVHeight(dendroView.getGVHeight() + heightChange);
+		dendroView.setArrayWidth(dendroView.getArrayWidth() + widthChange);
+		dendroView.setGeneHeight(dendroView.getGeneHeight() + heightChange);
+		
+		dendroView.setupLayout();
+		addViewListeners();
+		resetMapContainers();
 	}
+	
+//	public void setButtonEnabledStatus() {
+//
+//		// X-Axis Buttons
+//		if (Math.abs(getGlobalXMap().getScale() - getGlobalXMap().getMinScale()) 
+//				< PRECISION_LEVEL) {
+//			dendroView.getXMinusButton().setEnabled(false);
+//
+//		} else if (Math.abs(getGlobalXMap().getScale()
+//				- getGlobalXMap().getMinScale()) > PRECISION_LEVEL
+//				&& Math.abs(getGlobalXMap().getScale()
+//						- getGlobalXMap().getAvailablePixels()) 
+//						> PRECISION_LEVEL) {
+//			dendroView.getXMinusButton().setEnabled(true);
+//			dendroView.getXPlusButton().setEnabled(true);
+//
+//		} else if (Math.abs(getGlobalXMap().getScale()
+//				- getGlobalXMap().getAvailablePixels()) 
+//				< PRECISION_LEVEL) {
+//			dendroView.getXPlusButton().setEnabled(false);
+//		}
+//
+//		// Y-Axis Buttons
+//		if (Math.abs(getGlobalYMap().getScale() - getGlobalYMap().getMinScale())
+//				< PRECISION_LEVEL) {
+//			dendroView.getYMinusButton().setEnabled(false);
+//
+//		} else if (Math.abs(getGlobalYMap().getScale()
+//				- getGlobalYMap().getMinScale()) > PRECISION_LEVEL
+//				&& Math.abs(getGlobalYMap().getScale()
+//						- getGlobalYMap().getAvailablePixels()) 
+//						> PRECISION_LEVEL) {
+//			dendroView.getYMinusButton().setEnabled(true);
+//			dendroView.getYPlusButton().setEnabled(true);
+//
+//		} else if (Math.abs(getGlobalYMap().getScale()
+//				- getGlobalYMap().getAvailablePixels()) < PRECISION_LEVEL) {
+//			dendroView.getYPlusButton().setEnabled(false);
+//		}
+//	}
 
 	public void saveSettings() {
 
@@ -527,6 +566,18 @@ public class DendroController implements ConfigNodePersistent {
 			tvFrame.getTreeButton().setText(StringRes.button_showTrees);
 		}
 	}
+	
+	/**
+	 * Sets the status of the JCheckBox that controls GlobalView size 
+	 * adjustment. Stores value in configNode in order to retrieve it when
+	 * a new DendroView for the same data set is generated.
+	 * @param locked
+	 */
+	public void setGVLocked(final boolean locked) {
+
+		dendroView.setGVLocked(locked);
+		configNode.putBoolean("globalViewLocked", locked);
+	}
 
 	public void saveImage(final JPanel panel) throws IOException {
 
@@ -556,34 +607,6 @@ public class DendroController implements ConfigNodePersistent {
 		}
 	}
 
-	// /**
-	// * binds this dendroView to a particular confignode, resizing the panel
-	// * sizes appropriately.
-	// *
-	// * @param configNode
-	// * ConfigNode to bind to
-	// */
-	//
-	// @Override
-	// public void bindConfig(final Preferences configNode) {
-	//
-	// root = configNode;
-	// /*
-	// * ConfigNode heightNodes[] = root.fetch("Height"); ConfigNode
-	// * widthNodes[] = root.fetch("Width");
-	// *
-	// * float heights[]; float widths[]; if (heightNodes.length != 0) {
-	// * heights = new float[heightNodes.length]; widths = new
-	// * float[widthNodes.length]; for (int i = 0; i < heights.length; i++) {
-	// * heights[i] = (float) heightNodes[i].getAttribute( "value", 1.0 /
-	// * heights.length); } for (int j = 0; j < widths.length; j++) {
-	// * widths[j] = (float) widthNodes[j].getAttribute( "value", 1.0 /
-	// * widths.length); } } else { widths = new float[]{2 / 11f, 3 / 11f, 3 /
-	// * 11f, 3 / 11f}; heights = new float[]{3 / 16f, 1 / 16f, 3 / 4f}; }
-	// * setHeights(heights); setWidths(widths);
-	// */
-	// }
-
 	/**
 	 * Checks whether there is a configuration node for the current model and
 	 * DendroView. If not it creates one.
@@ -598,7 +621,6 @@ public class DendroController implements ConfigNodePersistent {
 			} else {
 				configNode = Preferences.userRoot().node("DendroView");
 			}
-			// configNode = parentNode.node("DendroView");
 		}
 	}
 

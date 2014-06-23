@@ -56,7 +56,6 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
-import net.miginfocom.swing.MigLayout;
 import Controllers.DendroController;
 import Views.LoadErrorView;
 import Views.WelcomeView;
@@ -118,8 +117,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	/**
 	 * Chained constructor
 	 * 
-	 * @param TreeViewApp
-	 *            treeview
+	 * @param TreeViewApp treeview
 	 */
 	public TreeViewFrame(final TreeViewApp treeview) {
 
@@ -153,14 +151,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		setWindowActive(true);
 
 		// Set up other stuff
-		backgroundPanel = new JPanel();
-		backgroundPanel.setLayout(new MigLayout("ins 0"));
-
-		menuPanel = new JPanel();
-		menuPanel.setLayout(new MigLayout("ins 0"));
-
-		waiting = new JPanel();
-		waiting.setLayout(new MigLayout("ins 0"));
+		backgroundPanel = GUIUtils.createJPanel(true, false, null);
+		menuPanel = GUIUtils.createJPanel(true, false, null);
+		waiting = GUIUtils.createJPanel(true, false, null);
 
 		// Add the main background panel to the contentPane
 		applicationFrame.getContentPane().add(backgroundPanel);
@@ -170,6 +163,28 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		setupFrameSize();
 		setLoaded(false);
+	}
+	
+	/**
+	 * 
+	 * Setting up all saved configurations related to TVFrame.
+	 */
+	protected void setupPresets() {
+
+		// Load Theme
+		final String default_theme = "dark";
+		final String savedTheme = getConfigNode().get("theme", default_theme);
+
+		// Since changing the theme resets the layout
+		if (savedTheme.equalsIgnoreCase("dark")) {
+			GUIUtils.setNight();
+
+		} else {
+			GUIUtils.setDayLight();
+		}
+
+		// Load FileMRU
+		setupFileMru();
 	}
 
 	@Override
@@ -195,27 +210,25 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	@Override
 	public void setView(final String viewName) {
 
-		JPanel view = new JPanel();
+		JPanel view;
 
 		// Set view dependent of 'loaded'
-		if (!viewName.equalsIgnoreCase("DendroView")) {
-			if (viewName.equalsIgnoreCase("WelcomeView")) {
+		if (!viewName.equalsIgnoreCase(StringRes.view_Dendro)) {
+			if (viewName.equalsIgnoreCase(StringRes.view_Welcome)) {
 				view = welcomeView.makeInitial();
 
-			} else if (viewName.equalsIgnoreCase("LoadProgressView")) {
+			} else if (viewName.equalsIgnoreCase(StringRes.view_LoadProg)) {
 				view = welcomeView.makeLoading();
 
-			} else if (viewName.equalsIgnoreCase("LoadErrorView")) {
+			} else if (viewName.equalsIgnoreCase(StringRes.view_LoadError)) {
 				loadErrorView.setErrorMessage(loadErrorMessage);
 				view = loadErrorView.makeErrorPanel();
 
 			} else {
-				view.setLayout(new MigLayout());
-				view.setOpaque(false);
+				view = GUIUtils.createJPanel(false, false, null);
 
-				final JLabel error = new JLabel("No view could be loaded.");
-				error.setFont(GUIParams.FONTL);
-				error.setForeground(GUIParams.TEXT);
+				final JLabel error = GUIUtils.createBigLabel(
+						"No view could be loaded.");
 
 				view.add(error, "push, alignx 50%");
 			}
@@ -232,7 +245,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 			buildMenu();
 
 			dendroController.setNew(dendroView,(TVModel) dataModel);
-
 		}
 
 		displayView(view);
@@ -259,7 +271,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		backgroundPanel.removeAll();
 		waiting.removeAll();
 		
-		waiting.setBackground(GUIParams.BG_COLOR);
+		waiting.setBackground(GUIUtils.BG_COLOR);
 		waiting.add(view, "push, grow");
 
 		if(dendroView.isLoaded()) {
@@ -267,7 +279,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		}
 		
 		backgroundPanel.add(waiting, "push, grow");
-		backgroundPanel.setBackground(GUIParams.BG_COLOR);
+		backgroundPanel.setBackground(GUIUtils.BG_COLOR);
 		
 		backgroundPanel.revalidate();
 		backgroundPanel.repaint();
@@ -390,20 +402,16 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		final JDialog dialog = new JDialog(applicationFrame);
 
-		final Dimension screenSize = GUIParams.getScreenSize();
+		final Dimension screenSize = GUIUtils.getScreenSize();
 		dialog.setSize(new Dimension(screenSize.width * 1 / 2,
 				screenSize.height * 1 / 2));
 
 		dialog.setLocationRelativeTo(applicationFrame);
 		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
-		final JPanel panel = new JPanel();
-		panel.setLayout(new MigLayout());
-		panel.setBackground(GUIParams.BG_COLOR);
+		final JPanel panel = GUIUtils.createJPanel(true, true, null);
 
-		final JLabel l1 = new JLabel("Work in progress.");
-		l1.setFont(GUIParams.FONTS);
-		l1.setForeground(GUIParams.TEXT);
+		final JLabel l1 = GUIUtils.createSmallLabel("Work in progress.");
 
 		panel.add(l1, "push, alignx 50%");
 		dialog.add(panel);
@@ -508,7 +516,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	public void buildMenu() {
 
 		menuPanel.removeAll();
-		menuPanel.setBackground(GUIParams.BG_COLOR);
+		menuPanel.setBackground(GUIUtils.BG_COLOR);
 		menuBar = new JMenuBar();
 		applicationFrame.setJMenuBar(menuBar);
 
@@ -681,7 +689,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 	public void generateSearchMenu() {
 
-		searchButton = GUIParams.setMenuButtonLayout(
+		searchButton = GUIUtils.setMenuButtonLayout(
 				StringRes.button_searchLabels, null);
 		searchButton.setToolTipText(StringRes.tooltip_searchRowCol);
 
@@ -690,7 +698,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 	public void generateTreeMenu() {
 
-		treeButton = GUIParams.setMenuButtonLayout(StringRes.button_showTrees, 
+		treeButton = GUIUtils.setMenuButtonLayout(StringRes.button_showTrees, 
 				null);
 		treeButton.setToolTipText(StringRes.tooltip_showTrees);
 
@@ -845,13 +853,11 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		final JDialog dialog = new JDialog(applicationFrame);
 		dialog.setTitle("Information");
 		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		dialog.setLocationRelativeTo(null);
+		dialog.setModalityType(JDialog.DEFAULT_MODALITY_TYPE);
 
-		final JPanel panel = new JPanel();
-		panel.setLayout(new MigLayout());
-		panel.setBackground(GUIParams.BG_COLOR);
+		final JPanel panel = GUIUtils.createJPanel(true, true, null);
 
-		final JButton button = GUIParams.setButtonLayout("OK", null);
+		final JButton button = GUIUtils.setButtonLayout("OK", null);
 		button.addActionListener(new ActionListener() {
 
 			@Override
@@ -861,24 +867,17 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		});
 
 		if (writerEmpty) {
-			final JLabel l1 = new JLabel("No Model changes were written.");
-			l1.setFont(GUIParams.FONTS);
-			l1.setForeground(GUIParams.TEXT);
+			final JLabel l1 = GUIUtils.createSmallLabel(
+					"No Model changes were written.");
 
-			final JLabel l2 = new JLabel("Only the following changes require "
-					+ "explicit saving:");
-			l2.setFont(GUIParams.FONTS);
-			l2.setForeground(GUIParams.TEXT);
+			final JLabel l2 = GUIUtils.createSmallLabel("Only the "
+					+ "following changes require explicit saving: ");
 
-			final JLabel l3 = new JLabel("- Tree Node flips (Analysis->Flip "
-					+ "Array/Gene Tree Node)");
-			l3.setFont(GUIParams.FONTS);
-			l3.setForeground(GUIParams.TEXT);
+			final JLabel l3 = GUIUtils.createSmallLabel("- Tree Node flips "
+					+ "(Analysis->Flip Array/Gene Tree Node)");
 
-			final JLabel l4 = new JLabel("- Tree Node Annotations "
-					+ "(Analysis->Array/Gene TreeAnno)");
-			l4.setFont(GUIParams.FONTS);
-			l4.setForeground(GUIParams.TEXT);
+			final JLabel l4 = GUIUtils.createSmallLabel("- Tree Node "
+					+ "Annotations (Analysis->Array/Gene TreeAnno)");
 
 			panel.add(l1, "pushx, wrap");
 			panel.add(l2, "pushx, wrap");
@@ -888,23 +887,18 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 			dialog.add(panel);
 
-			dialog.pack();
-			dialog.setVisible(true);
-
 		} else {
-
-			final JLabel l1 = new JLabel(msg);
-			l1.setFont(GUIParams.FONTS);
-			l1.setForeground(GUIParams.TEXT);
+			final JLabel l1 = GUIUtils.createSmallLabel(msg);
 
 			panel.add(l1, "pushx, wrap");
 			panel.add(button, "pushx, alignx 50%");
 
 			dialog.add(panel);
-
-			dialog.pack();
-			dialog.setVisible(true);
 		}
+		
+		dialog.pack();
+		dialog.setLocationRelativeTo(null);
+		dialog.setVisible(true);
 	}
 
 
@@ -1059,11 +1053,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		}
 	}
 
-	// public void addStackButtonListener(MouseListener l) {
-	//
-	// stackButton.addMouseListener(l);
-	// }
-
 	public void addSearchButtonListener(final MouseListener l) {
 
 		searchButton.addMouseListener(l);
@@ -1073,11 +1062,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		treeButton.addMouseListener(l);
 	}
-
-	// public JPopupMenu getStackMenu() {
-	//
-	// return stackMenu;
-	// }
 
 	public FileSet getFileMenuSet() {
 
@@ -1219,27 +1203,5 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	public JButton getSearchButton() {
 
 		return searchButton;
-	}
-
-	/**
-	 * 
-	 * Setting up all saved configurations related to TVFrame.
-	 */
-	protected void setupPresets() {
-
-		// Load Theme
-		final String default_theme = "dark";
-		final String savedTheme = getConfigNode().get("theme", default_theme);
-
-		// Since changing the theme resets the layout
-		if (savedTheme.equalsIgnoreCase("dark")) {
-			GUIParams.setNight();
-
-		} else {
-			GUIParams.setDayLight();
-		}
-
-		// Load FileMRU
-		setupFileMru();
 	}
 }

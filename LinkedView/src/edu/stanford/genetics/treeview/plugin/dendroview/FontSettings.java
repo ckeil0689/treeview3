@@ -54,7 +54,7 @@ import net.miginfocom.swing.MigLayout;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 import edu.stanford.genetics.treeview.DummyHeaderInfo;
-import edu.stanford.genetics.treeview.GUIParams;
+import edu.stanford.genetics.treeview.GUIUtils;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.NatField;
 import edu.stanford.genetics.treeview.SettingsPanel;
@@ -241,7 +241,7 @@ public class FontSettings implements SettingsPanel {
 			fontNames[Arrays.asList(fonts).indexOf(f)] = f.getName();
 		}
 
-		font_choice = GUIParams.setComboLayout(fontNames);
+		font_choice = GUIUtils.setComboLayout(fontNames);
 		font_choice.setEditable(true);
 		AutoCompleteDecorator.decorate(font_choice);
 		font_choice.setSelectedItem(client.getFace());
@@ -250,7 +250,7 @@ public class FontSettings implements SettingsPanel {
 
 	private void setupStyleChoice() {
 
-		style_choice = GUIParams.setComboLayout(styles);
+		style_choice = GUIUtils.setComboLayout(styles);
 		style_choice.setSelectedItem(decode_style(client.getStyle()));
 		style_choice.addActionListener(new SelectionListener());
 	}
@@ -277,7 +277,7 @@ public class FontSettings implements SettingsPanel {
 
 		fontPanel.removeAll();
 		fontPanel.setLayout(new MigLayout());
-		fontPanel.setBackground(GUIParams.BG_COLOR);
+		fontPanel.setBackground(GUIUtils.BG_COLOR);
 
 		setupFontChoice();
 		fontPanel.add(font_choice, "span, wrap");
@@ -291,7 +291,7 @@ public class FontSettings implements SettingsPanel {
 		fontPanel.add(size_field, "span, wrap");
 
 		exampleField = new JLabel("Font Example Text");
-		exampleField.setForeground(GUIParams.TEXT);
+		exampleField.setForeground(GUIUtils.TEXT);
 		fontPanel.add(exampleField, "pushx, alignx 50%, span");
 	}
 
@@ -313,7 +313,7 @@ public class FontSettings implements SettingsPanel {
 		ButtonPanel(final Window w) {
 
 			final Window window = w;
-			final JButton close_button = GUIParams.setButtonLayout("Close",
+			final JButton close_button = GUIUtils.setButtonLayout("Close",
 					null);
 			close_button.addActionListener(new ActionListener() {
 

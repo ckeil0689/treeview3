@@ -45,7 +45,7 @@ import javax.swing.ScrollPaneConstants;
 
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
-import edu.stanford.genetics.treeview.GUIParams;
+import edu.stanford.genetics.treeview.GUIUtils;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -106,8 +106,8 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 		addKeyListener(this);
 
 		l1 = new JLabel();
-		l1.setFont(GUIParams.FONTS);
-		l1.setForeground(GUIParams.TEXT);
+		l1.setFont(GUIUtils.FONTS);
+		l1.setForeground(GUIUtils.TEXT);
 		add(l1, "alignx 0%, aligny 50%, push, wrap");
 
 		scrollPane = new JScrollPane(this,
@@ -146,7 +146,7 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 	 */
 	public void setColors() {
 		
-		l1.setForeground(GUIParams.TEXT);
+		l1.setForeground(GUIUtils.TEXT);
 	}
 
 	@Override
@@ -154,24 +154,6 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 
 		return "TextView";
 	}
-
-	// // I bet this isn't used anymore.
-	// public MenuItem getFontMenuItem() {
-	//
-	// final MenuItem itema = new MenuItem("Gene Font...");
-	// itema.addActionListener(new ActionListener() {
-	//
-	// @Override
-	// public void actionPerformed(final ActionEvent actionEvent) {
-	//
-	// final FontSelector fontSelector = new FontSelector(
-	// TextView.this, "Select Fonts for Gene Info");
-	// fontSelector.showDialog(applicationFrame);
-	// }
-	// });
-	//
-	// return itema;
-	// }
 
 	// Canvas methods
 	@Override
@@ -189,9 +171,9 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 
 	public void updateBuffer(final Graphics g, final Dimension offscreenSize) {
 
-		g.setColor(GUIParams.BG_COLOR);
+		g.setColor(GUIUtils.BG_COLOR);
 		g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
-		g.setColor(GUIParams.TEXT);
+		g.setColor(GUIUtils.TEXT);
 
 		// clear the pallette...
 		if (map.getScale() > 12.0) {
@@ -249,7 +231,7 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 					}
 
 					if (out != null) {
-						final Color fore = GUIParams.MAIN; // g.getColor();
+						final Color fore = GUIUtils.MAIN; // g.getColor();
 						if ((geneSelection == null)
 								|| geneSelection.isIndexSelected(j)) {
 							final String[] strings = headerInfo.getHeader(j);
@@ -272,7 +254,7 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 								g.setColor(fore);
 							}
 						} else {
-							g.setColor(GUIParams.TEXT);
+							g.setColor(GUIUtils.TEXT);
 							// right-aligned text
 							g.drawString(
 									out,
@@ -432,8 +414,10 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 			geneSelection.deselectAllIndexes();
 
 		} else if (arraySelection.getNSelectedIndexes() > 0) {
-			arraySelection.deselectAllIndexes();
-			geneSelection.deselectAllIndexes();
+			if(!e.isShiftDown()) {
+				arraySelection.deselectAllIndexes();
+				geneSelection.deselectAllIndexes();
+			}
 			geneSelection.setIndexSelection(index, true);
 			arraySelection.selectAllIndexes();
 
@@ -457,9 +441,7 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 	public void mouseDragged(final MouseEvent e) {
 
 		if (dragging) {
-			// int xoff = (e.getX() * (maxlength - offscreenSize.width))
-			// / offscreenSize.width;
-			// adjustScrollbar(xoff);
+			
 		}
 	}
 

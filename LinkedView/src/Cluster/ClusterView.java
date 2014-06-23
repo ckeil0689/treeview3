@@ -45,7 +45,7 @@ import javax.swing.SpinnerNumberModel;
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.ExportException;
-import edu.stanford.genetics.treeview.GUIParams;
+import edu.stanford.genetics.treeview.GUIUtils;
 import edu.stanford.genetics.treeview.MainPanel;
 import edu.stanford.genetics.treeview.MainProgramArgs;
 import edu.stanford.genetics.treeview.StringRes;
@@ -221,25 +221,25 @@ public class ClusterView extends JPanel implements MainPanel {
 	public void setupInteractiveComponents() {
 
 		// Button to begin Clustering
-		cluster_button = GUIParams.setButtonLayout(StringRes.button_Cluster,
+		cluster_button = GUIUtils.setButtonLayout(StringRes.button_Cluster,
 				null);
 
 		// Button to cancel worker thread in the controller
-		cancel_button = GUIParams
+		cancel_button = GUIUtils
 				.setButtonLayout(StringRes.button_Cancel, null);
 
 		// Label for cluster process
 		loadLabel = new JLabel();
-		loadLabel.setFont(GUIParams.FONTS);
-		loadLabel.setForeground(GUIParams.TEXT);
+		loadLabel.setFont(GUIUtils.FONTS);
+		loadLabel.setForeground(GUIUtils.TEXT);
 		// ProgressBar for clustering process
-		pBar = GUIParams.setPBarLayout();
+		pBar = GUIUtils.setPBarLayout();
 
 		// ComboBox to choose cluster method
 		final String[] clusterNames = { StringRes.menu_title_Hier,
 				StringRes.menu_title_KMeans };
 
-		clusterType = GUIParams.setComboLayout(clusterNames);
+		clusterType = GUIUtils.setComboLayout(clusterNames);
 
 		clusterType.setSelectedIndex(Arrays.asList(clusterNames).indexOf(
 				clusterTypeID));
@@ -253,15 +253,15 @@ public class ClusterView extends JPanel implements MainPanel {
 				"City Block Distance" };
 
 		// Drop-down menu for row selection
-		geneCombo = GUIParams.setComboLayout(measurements);
+		geneCombo = GUIUtils.setComboLayout(measurements);
 		geneCombo.setSelectedIndex(1);
 
 		// Drop-down menu for column selection
-		arrayCombo = GUIParams.setComboLayout(measurements);
+		arrayCombo = GUIUtils.setComboLayout(measurements);
 		arrayCombo.setSelectedIndex(1);
 
 		// Linkage choice drop-down menu
-		clusterChoice = GUIParams.setComboLayout(clusterMethods);
+		clusterChoice = GUIUtils.setComboLayout(clusterMethods);
 
 		// Spinners for K-Means
 		enterRC = setupSpinner();
@@ -279,7 +279,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		// Create background panel
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new MigLayout("ins 0"));
-		mainPanel.setBackground(GUIParams.BG_COLOR);
+		mainPanel.setBackground(GUIUtils.BG_COLOR);
 
 		// Panel for the Buttons
 		buttonPanel = new JPanel();
@@ -315,16 +315,16 @@ public class ClusterView extends JPanel implements MainPanel {
 				clusterChoice.getSelectedIndex());
 		
 		final JLabel type = new JLabel("Cluster Type");
-		type.setFont(GUIParams.FONTL);
-		type.setForeground(GUIParams.MAIN);
+		type.setFont(GUIUtils.FONTL);
+		type.setForeground(GUIUtils.MAIN);
 		
 		choicePanel.add(type, "push, alignx 0%, aligny 0%, w 40%");
 		choicePanel.add(clusterType, "push, alignx 0%, aligny 0%, w 60%, " +
 				"h 20%, wrap");
 		
 		final JLabel similarity = new JLabel("Similarity Metric");
-		similarity.setFont(GUIParams.FONTL);
-		similarity.setForeground(GUIParams.MAIN);
+		similarity.setFont(GUIUtils.FONTL);
+		similarity.setForeground(GUIUtils.MAIN);
 
 		choicePanel.add(similarity, "push, alignx 0%, aligny 0%");
 		choicePanel.add(similarityPanel, "push, alignx 0%, aligny 0%, " +
@@ -332,8 +332,8 @@ public class ClusterView extends JPanel implements MainPanel {
 
 		if (clusterType.getSelectedIndex() == 0) {
 			final JLabel method = new JLabel("Linkage Method");
-			method.setFont(GUIParams.FONTL);
-			method.setForeground(GUIParams.MAIN);
+			method.setFont(GUIUtils.FONTL);
+			method.setForeground(GUIUtils.MAIN);
 			
 			choicePanel.add(method, "push, alignx 0%, aligny 0%");
 			choicePanel.add(linkagePanel, "push, alignx 0%, aligny 0%, " +
@@ -341,8 +341,8 @@ public class ClusterView extends JPanel implements MainPanel {
 
 		} else {
 			final JLabel kMeans = new JLabel("K-Means Options");
-			kMeans.setFont(GUIParams.FONTL);
-			kMeans.setForeground(GUIParams.MAIN);
+			kMeans.setFont(GUIUtils.FONTL);
+			kMeans.setForeground(GUIUtils.MAIN);
 			
 			choicePanel.add(kMeans, "pushx, alignx 0%");
 			choicePanel.add(kMeansPanel, "pushx, alignx 50%, h 20%, wrap");
@@ -363,12 +363,12 @@ public class ClusterView extends JPanel implements MainPanel {
 		similarityPanel.setOpaque(false);
 
 		final JLabel rowLabel = new JLabel("Rows: ");
-		rowLabel.setFont(GUIParams.FONTS);
-		rowLabel.setForeground(GUIParams.TEXT);
+		rowLabel.setFont(GUIUtils.FONTS);
+		rowLabel.setForeground(GUIUtils.TEXT);
 
 		final JLabel colLabel = new JLabel("Columns: ");
-		colLabel.setFont(GUIParams.FONTS);
-		colLabel.setForeground(GUIParams.TEXT);
+		colLabel.setFont(GUIUtils.FONTS);
+		colLabel.setForeground(GUIUtils.TEXT);
 
 		similarityPanel.add(rowLabel, "pushx, alignx 0%");
 		similarityPanel.add(geneCombo, "wrap");
@@ -389,12 +389,12 @@ public class ClusterView extends JPanel implements MainPanel {
 		kMeansPanel.setOpaque(false);
 
 		final JLabel clusters = new JLabel("Clusters: ");
-		clusters.setFont(GUIParams.FONTS);
-		clusters.setForeground(GUIParams.TEXT);
+		clusters.setFont(GUIUtils.FONTS);
+		clusters.setForeground(GUIUtils.TEXT);
 
 		final JLabel its = new JLabel("Iterations: ");
-		its.setFont(GUIParams.FONTS);
-		its.setForeground(GUIParams.TEXT);
+		its.setFont(GUIUtils.FONTS);
+		its.setForeground(GUIUtils.TEXT);
 
 		kMeansPanel.add(clusters, "w 10%, h 15%");
 		kMeansPanel.add(enterRC, "w 5%");
@@ -416,7 +416,7 @@ public class ClusterView extends JPanel implements MainPanel {
 				5000, 1);
 		final JSpinner jft = new JSpinner(amountChoice);
 
-		jft.setFont(GUIParams.FONTS);
+		jft.setFont(GUIUtils.FONTS);
 
 		return jft;
 	}
@@ -655,7 +655,7 @@ public class ClusterView extends JPanel implements MainPanel {
 		}
 
 		final TextDisplay error1 = new TextDisplay(hint);
-		error1.setForeground(GUIParams.RED1);
+		error1.setForeground(GUIUtils.RED1);
 
 		final TextDisplay error2 = new TextDisplay(hint2);
 		final TextDisplay error3 = new TextDisplay(hint3);

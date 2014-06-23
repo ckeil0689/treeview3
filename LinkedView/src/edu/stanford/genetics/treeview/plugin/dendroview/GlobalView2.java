@@ -39,7 +39,6 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Observable;
 
 import javax.swing.BorderFactory;
@@ -49,7 +48,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
 import net.miginfocom.swing.MigLayout;
-import edu.stanford.genetics.treeview.GUIParams;
+import edu.stanford.genetics.treeview.GUIUtils;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -95,17 +94,12 @@ public class GlobalView2 extends ModelViewProduced implements
 	/**
 	 * Rectangle to track yellow selected rectangle (pixels)
 	 */
-	private ArrayList<Rectangle> selectionRectList = null;
+	private ArrayList<Rectangle> selectionRectList = new ArrayList<Rectangle>();
 
 	/**
 	 * Circle to be used as indicator for selection
 	 */
 	private Ellipse2D.Double indicatorCircle = null;
-
-	/**
-	 * Rectangle to track blue zoom rectangle (pixels)
-	 */
-	// private Rectangle zoomRect = null;
 
 	/**
 	 * GlobalView also likes to have an globalxmap and globalymap (both of type
@@ -124,10 +118,10 @@ public class GlobalView2 extends ModelViewProduced implements
 		
 		panel = scrollPane;
 		panel.setBorder(BorderFactory.createEtchedBorder());
+		panel.setBackground(GUIUtils.ELEMENT_HOV);
 
 		setToolTipText("This Turns Tooltips On");
-
-		// addComponentListener(this);
+		
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addMouseWheelListener(this);
@@ -336,7 +330,7 @@ public class GlobalView2 extends ModelViewProduced implements
 
 		if (!offscreenValid) {
 			// clear the pallette...
-			g.setColor(Color.white);
+			g.setColor(GUIUtils.BG_COLOR);
 			g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
 			g.setColor(Color.black);
 
@@ -449,106 +443,110 @@ public class GlobalView2 extends ModelViewProduced implements
 		int[] selectedArrayIndexes = arraySelection.getSelectedIndexes();
 		int[] selectedGeneIndexes = geneSelection.getSelectedIndexes();
 		
-		int spx = 0; 
-		int spy = 0; 
-		int epx = 0;
-		int epy = 0;
-		
-		ArrayList<ArrayList<Integer>> xValList = 
-				new ArrayList<ArrayList<Integer>>();
-		ArrayList<ArrayList<Integer>> yValList = 
-				new ArrayList<ArrayList<Integer>>();
-		
-		List<Integer> consecIndexList = new ArrayList<Integer>();
-		
-		// Iterate over arrays to generate rectangles
-		for(int i = 0; i < selectedArrayIndexes.length; i++) {
-			
-			int now = selectedArrayIndexes[i];
-			int next = selectedArrayIndexes[i];
-			if(i < selectedArrayIndexes.length - 1) {
-				next = selectedArrayIndexes[i + 1];
-				
-			} else {
-				consecIndexList.add(now);
-			}
-			
-			if(next == now + 1 || consecIndexList.size() == 0) {
-				consecIndexList.add(now);
-				
-			} else {
-				ArrayList<Integer> xVals = new ArrayList<Integer>(2);
-				
-				spx = xmap.getPixel(consecIndexList.get(0));
-				// last pixel of last block
-				epx = xmap.getPixel(consecIndexList.get(
-						consecIndexList.size() - 1) + 1) - 1;
-				
-				xVals.add(spx);
-				xVals.add(epx);
-				
-				xValList.add(xVals);
-				
-				consecIndexList.clear();
-			}
-		}
-		
-		consecIndexList.clear();
-		
-		for(int i = 0; i < selectedGeneIndexes.length; i++) {
-			
-			int now = selectedGeneIndexes[i];
-			int next = selectedGeneIndexes[i];
-			if(i < selectedGeneIndexes.length - 1) {
-				next = selectedGeneIndexes[i + 1];
-				
-			} else {
-				consecIndexList.add(now);
-			}
-			
-			if(next == now + 1 || consecIndexList.size() == 0) {
-				consecIndexList.add(now);
-				
-			} else {
-				ArrayList<Integer> yVals = new ArrayList<Integer>(2);
-				
-				spy = ymap.getPixel(consecIndexList.get(0));
-				// last pixel of last block
-				epy = ymap.getPixel(consecIndexList.get(
-						consecIndexList.size() - 1) + 1) - 1;
-				
-				if (epy < spy) {
-					epy = spy;
-					// correct for roundoff error above
-				}
-				
-				yVals.add(spy);
-				yVals.add(epy);
-				
-				yValList.add(yVals);
-				
-				consecIndexList.clear();
-			}
-		}	
+		if(selectedArrayIndexes.length > 0 || selectedGeneIndexes.length > 0) {
 
-		if (selectionRectList != null) {
-			for(ArrayList<Integer> xVals : xValList) {
-				
-				for(ArrayList<Integer> yVals : yValList) {
+			ArrayList<ArrayList<Integer>> arrayBoundaryList = 
+					new ArrayList<ArrayList<Integer>>();
+			ArrayList<ArrayList<Integer>> geneBoundaryList = 
+					new ArrayList<ArrayList<Integer>>();
+
+			
+			arrayBoundaryList = findRectangleBoundaries(selectedArrayIndexes, 
+					xmap);
+			geneBoundaryList = findRectangleBoundaries(selectedGeneIndexes, 
+					ymap);
+	
+			// Make the rectangles
+			if (selectionRectList != null) {
+				for(ArrayList<Integer> xBoundaries : arrayBoundaryList) {
 					
-					selectionRectList.add(new Rectangle(xVals.get(0), 
-							yVals.get(0), xVals.get(1) - xVals.get(0), 
-							yVals.get(1) - yVals.get(0)));
+					for(ArrayList<Integer> yBoundaries : geneBoundaryList) {
+						
+						selectionRectList.add(new Rectangle(
+								xBoundaries.get(0), 
+								yBoundaries.get(0), 
+								xBoundaries.get(1) - xBoundaries.get(0), 
+								yBoundaries.get(1) - yBoundaries.get(0)));
+					}
 				}
 			}
+	
+			revalidate();
+			repaint();
 		}
-
-//		} else {
-//			selectionRect.setBounds(spx, spy, epx - spx, epy - spy);
-//		}
-
-		revalidate();
-		repaint();
+	}
+	
+	/**
+	 * Finds the boundaries needed to draw all selection rectangles
+	 * @param selectedIndexes
+	 * @param map
+	 * @return
+	 */
+	protected ArrayList<ArrayList<Integer>> findRectangleBoundaries(
+			int[] selectedIndexes, MapContainer map) {
+		
+		int sp = 0; 
+		int ep = 0;
+		
+		ArrayList<ArrayList<Integer>> rangeList = 
+				new ArrayList<ArrayList<Integer>>();
+		ArrayList<ArrayList<Integer>> boundaryList = 
+				new ArrayList<ArrayList<Integer>>();
+		ArrayList<Integer> rectangleRange = new ArrayList<Integer>();
+		
+		/*
+		 * If array is bigger than 1, check how many consecutive labels are
+		 * selected by finding out which elements are only 1 apart.
+		 * Store consecutive indexes separately to make separate rectangles
+		 * later.
+		 */
+		int loopStart = 0;
+		while(loopStart < selectedIndexes.length) {
+			
+			for(int i = loopStart; i < selectedIndexes.length; i++) {
+				
+				int current = selectedIndexes[i];
+				
+				if(rectangleRange.size() == 0 
+						|| rectangleRange.get(
+								rectangleRange.size() - 1) == current - 1) {
+					rectangleRange.add(current);
+					loopStart = i + 1;
+					
+				} else {
+					break;
+				}
+			}
+			
+			rangeList.add(rectangleRange);
+			rectangleRange = new ArrayList<Integer>();
+		}
+		
+		/*
+		 * For every selection range produce map values 
+		 * (rectangle boundaries) for each rectangle to be drawn.
+		 */
+		for(ArrayList<Integer> selectionRange : rangeList) {
+			
+			ArrayList<Integer> boundaries = new ArrayList<Integer>(2);
+			
+			sp = map.getPixel(selectionRange.get(0));
+			// last pixel of last block
+			ep = map.getPixel(selectionRange.get(
+					selectionRange.size() - 1) + 1) - 1;
+			
+			if (ep < sp) {
+				ep = sp;
+				// correct for roundoff error above
+			}
+			
+			boundaries.add(sp);
+			boundaries.add(ep);
+			
+			boundaryList.add(boundaries);
+		}
+		
+		return boundaryList;
 	}
 
 	protected void recalculateZoom() {
@@ -801,7 +799,7 @@ public class GlobalView2 extends ModelViewProduced implements
 
 		final Graphics g = getGraphics();
 		g.setXORMode(getBackground());
-		g.setColor(GUIParams.MAIN);
+		g.setColor(GUIUtils.MAIN);
 
 		final int x = xmap.getPixel(l.x);
 		final int y = ymap.getPixel(l.y);

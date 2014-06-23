@@ -9,7 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
 import net.miginfocom.swing.MigLayout;
-import edu.stanford.genetics.treeview.GUIParams;
+import edu.stanford.genetics.treeview.GUIUtils;
 import edu.stanford.genetics.treeview.StringRes;
 
 public class WelcomeView {
@@ -97,14 +97,14 @@ public class WelcomeView {
 
 		loadPanel.removeAll();
 
-		loadButton = GUIParams.setLargeButtonLayout("Open...");
+		loadButton = GUIUtils.setLargeButtonLayout("Open...");
 		loadPanel.add(loadButton, "push, alignx 50%");
 
 		// Set the colors
-		homePanel.setBackground(GUIParams.BG_COLOR);
-		title_bg.setBackground(GUIParams.MAIN);
-		jl.setForeground(GUIParams.BG_COLOR);
-		jl2.setForeground(GUIParams.BG_COLOR);
+		homePanel.setBackground(GUIUtils.BG_COLOR);
+		title_bg.setBackground(GUIUtils.MAIN);
+		jl.setForeground(GUIUtils.BG_COLOR);
+		jl2.setForeground(GUIUtils.BG_COLOR);
 		
 		homePanel.revalidate();
 		homePanel.repaint();
@@ -122,10 +122,10 @@ public class WelcomeView {
 		jl2.setText("Loading you data!");
 		
 		loadLabel = new JLabel();
-		loadLabel.setFont(GUIParams.FONTL);
-		loadLabel.setForeground(GUIParams.TEXT);
+		loadLabel.setFont(GUIUtils.FONTL);
+		loadLabel.setForeground(GUIUtils.TEXT);
 		
-		loadBar = GUIParams.setPBarLayout();
+		loadBar = GUIUtils.setPBarLayout();
 
 		loadPanel.add(loadLabel, "push, alignx 50%, aligny 100%, wrap");
 		loadPanel.add(loadBar, "push, w 70%, alignx 50%, aligny 0%");

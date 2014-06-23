@@ -420,9 +420,7 @@ public abstract class ViewFrame implements Observer {
 	 * @return Sets the shared <code>DataModel</code>
 	 * @throws LoadException
 	 */
-	public abstract void setDataModel(DataModel model);// , boolean cluster,
-	// boolean hierarchical);
-
+	public abstract void setDataModel(DataModel model);
 	/**
 	 * Should scroll all MainPanels in this view frame to the specified gene.
 	 * The index provided is respect to the TreeSelection object.

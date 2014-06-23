@@ -42,6 +42,12 @@ public class MenubarActions {
 
 		} else if (name.equalsIgnoreCase(StringRes.menu_title_EditRecent)) {
 			tvFrame.showRecentFileEditor();
+			
+		} else if (name.equalsIgnoreCase("Isolate Selected")) {
+			controller.showSubDataModel(
+					tvFrame.getGeneSelection().getSelectedIndexes(), 
+					tvFrame.getArraySelection().getSelectedIndexes(), 
+					null, null);
 
 		} else if (name.equalsIgnoreCase(StringRes.menu_title_QuitWindow)) {
 			try {

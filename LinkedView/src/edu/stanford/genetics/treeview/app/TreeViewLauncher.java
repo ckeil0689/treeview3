@@ -3,10 +3,17 @@ package edu.stanford.genetics.treeview.app;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import edu.stanford.genetics.treeview.GUIParams;
+import edu.stanford.genetics.treeview.GUIUtils;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TVScrollBarUI;
 
+/**
+ * Launcher class which wraps the creation of the GUI as well as the main
+ * method in LinkedViewApp in a Swing thread and allows to modify some UIManager
+ * configurations beforehand (OSX menubar etc.).
+ * @author CKeil
+ *
+ */
 public class TreeViewLauncher {
 
 	public static void main(final String[] args) {
@@ -14,23 +21,30 @@ public class TreeViewLauncher {
 		try {
 			final boolean isApplet = false;
 			
-			// This String will store the menuBarUI key from 
-			// Apple's Aqua LookAndFeel so it can be implemented
-			// in CrossPlatform LAF afterwards which cannot use 
-			// OSX native menuBar otherwise...
+			/*
+			 * This String will store the menuBarUI key from 
+			 * Apple's Aqua LookAndFeel so it can be implemented
+			 * in CrossPlatform LAF afterwards which cannot use 
+			 * OSX native menuBar otherwise...
+			 */
 			String menuBarUI = "";
 			if (!isApplet && System.getProperty("os.name").contains("Mac")) {
 
 				System.setProperty("com.apple.mrj.application"
 						+ ".apple.menu.about.name", "TreeView 3");
 
-				// Mac Java 1.4
+				// Activate OSX native menubar
 				System.setProperty("apple.laf.useScreenMenuBar", "true");
 				System.setProperty("apple.awt.showGrowBox", "true");
 				
 				UIManager.setLookAndFeel(UIManager
 						.getSystemLookAndFeelClassName());
 				
+				/* 
+				 * To keep custom look and feel AND OSX menubar, store variable
+				 * and then switch back to CrossPlatformLookAndFeel. Otherwise
+				 * the menubar can't be displayed.
+				 */
 				menuBarUI = UIManager.getString("MenuBarUI");
 				
 			}
@@ -44,15 +58,16 @@ public class TreeViewLauncher {
 				UIManager.put("MenuBarUI", menuBarUI);
 				
 			} else {
+				// Custom menu components for non-OSX systems.
 				UIManager.put("MenuItem.selectionBackground", 
-								GUIParams.ELEMENT_HOV);
-				UIManager.put("MenuItem.font", GUIParams.FONT_MENU);
-				UIManager.put("MenuItem.background", GUIParams.MENU);
+								GUIUtils.ELEMENT_HOV);
+				UIManager.put("MenuItem.font", GUIUtils.FONT_MENU);
+				UIManager.put("MenuItem.background", GUIUtils.MENU);
 	
 				UIManager.put("Menu.selectionBackground", 
-						GUIParams.ELEMENT_HOV);
-				UIManager.put("Menu.font", GUIParams.FONT_MENU);
-				UIManager.put("Menu.background", GUIParams.MENU);
+						GUIUtils.ELEMENT_HOV);
+				UIManager.put("Menu.font", GUIUtils.FONT_MENU);
+				UIManager.put("Menu.background", GUIUtils.MENU);
 			}
 
 			javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -75,7 +90,5 @@ public class TreeViewLauncher {
 		} catch (final UnsupportedLookAndFeelException e) {
 			LogBuffer.logException(e);
 		}
-
-		// JOptionPane.showMessageDialog(null, System.getProperty( "os.name" ));
 	}
 }

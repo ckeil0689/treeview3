@@ -37,7 +37,7 @@ public class AboutDialog {
 		aboutDialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
 		aboutDialog.setResizable(false);
 
-		final Dimension mainDim = GUIParams.getScreenSize();
+		final Dimension mainDim = GUIUtils.getScreenSize();
 
 		aboutDialog.setSize(mainDim.width * 1 / 2, mainDim.height * 1 / 2);
 
@@ -62,29 +62,29 @@ public class AboutDialog {
 
 		final JPanel message = new JPanel();
 		message.setLayout(new MigLayout());
-		message.setBackground(GUIParams.BG_COLOR);
+		message.setBackground(GUIUtils.BG_COLOR);
 
 		final JLabel text = new JLabel(StringRes.appName
 				+ " was created by Chris Keil based on Alok Saldhana's "
 				+ "Java TreeView.");
-		text.setFont(GUIParams.FONTS);
-		text.setForeground(GUIParams.TEXT);
+		text.setFont(GUIUtils.FONTS);
+		text.setForeground(GUIUtils.TEXT);
 
 		final JLabel version = new JLabel("Version: " + StringRes.versionTag);
-		version.setFont(GUIParams.FONTS);
-		version.setForeground(GUIParams.TEXT);
+		version.setFont(GUIUtils.FONTS);
+		version.setForeground(GUIUtils.TEXT);
 
 		message.add(text, "span, wrap");
 		message.add(version, "span, wrap");
 
 		final JLabel hp = new JLabel("Homepage");
-		hp.setFont(GUIParams.FONTS);
-		hp.setForeground(GUIParams.TEXT);
+		hp.setFont(GUIUtils.FONTS);
+		hp.setForeground(GUIUtils.TEXT);
 
 		message.add(hp);
 		message.add(new JTextField(StringRes.updateUrl));
 
-		JButton yesB = GUIParams.setButtonLayout("Open", null);
+		JButton yesB = GUIUtils.setButtonLayout("Open", null);
 		yesB.addActionListener(new ActionListener() {
 
 			@Override
@@ -97,13 +97,13 @@ public class AboutDialog {
 		message.add(yesB, "wrap");
 
 		final JLabel announce = new JLabel("Announcements");
-		announce.setFont(GUIParams.FONTS);
-		announce.setForeground(GUIParams.TEXT);
+		announce.setFont(GUIUtils.FONTS);
+		announce.setForeground(GUIUtils.TEXT);
 
 		message.add(announce);
 		message.add(new JTextField(StringRes.announcementUrl));
 
-		yesB = GUIParams.setButtonLayout("Sign Up", null);
+		yesB = GUIUtils.setButtonLayout("Sign Up", null);
 		yesB.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent arg0) {

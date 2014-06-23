@@ -47,7 +47,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
 import net.miginfocom.swing.MigLayout;
-import edu.stanford.genetics.treeview.GUIParams;
+import edu.stanford.genetics.treeview.GUIUtils;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -713,7 +713,7 @@ public class GlobalView extends ModelViewProduced implements
 
 		final Graphics g = getGraphics();
 		g.setXORMode(getBackground());
-		g.setColor(GUIParams.MAIN);
+		g.setColor(GUIUtils.MAIN);
 
 		final int x = xmap.getPixel(l.x);
 		final int y = ymap.getPixel(l.y);

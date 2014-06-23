@@ -15,7 +15,7 @@ import java.util.List;
 
 import javax.swing.SwingWorker;
 
-import edu.stanford.genetics.treeview.GUIParams;
+import edu.stanford.genetics.treeview.GUIUtils;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LabelLoadDialog;
 import edu.stanford.genetics.treeview.LoadException;
@@ -240,12 +240,12 @@ public class PreferencesController {
 		public void updateCheck(final boolean light) {
 
 			if (light) {
-				GUIParams.setDayLight();
+				GUIUtils.setDayLight();
 				tvFrame.getConfigNode().put("theme", StringRes.rButton_light);
 				resetTheme();
 
 			} else {
-				GUIParams.setNight();
+				GUIUtils.setNight();
 				tvFrame.getConfigNode().put("theme", StringRes.rButton_dark);
 				resetTheme();
 			}

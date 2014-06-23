@@ -218,34 +218,6 @@ public class MapContainer extends Observable implements Observer,
 		setScale(newScale);
 	}
 
-	/**
-	 * 
-	 * @param scale
-	 * @return
-	 */
-	public double verifyScale(final double scale) {
-
-		double rest;
-		boolean hasRest = false;
-
-		final double pixels = getAvailablePixels();
-
-		rest = pixels % scale;
-
-		if (rest > 0.0) {
-			hasRest = true;
-		}
-
-		if (!hasRest) {
-			return scale;
-
-		} else {
-			LogBuffer.println("Has rest: " + rest);
-			final double updatedScale = scale;
-			return updatedScale;
-		}
-	}
-
 	public void recalculateScale() {
 
 		if (nodeHasAttribute("FixedMap", "scale")) {

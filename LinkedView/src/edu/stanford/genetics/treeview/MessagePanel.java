@@ -99,8 +99,8 @@ public class MessagePanel extends JPanel {
 		public JTextArea setupLabel() {
 
 			final JTextArea label = new JTextArea();
-			label.setFont(GUIParams.FONTS);
-			label.setForeground(GUIParams.TEXT);
+			label.setFont(GUIUtils.FONTS);
+			label.setForeground(GUIUtils.TEXT);
 			label.setBorder(null);
 			label.setOpaque(false);
 			label.setEditable(false);
@@ -123,10 +123,10 @@ public class MessagePanel extends JPanel {
 			final Dimension size = getSize();
 			g.clearRect(0, 0, size.width, size.height);
 
-			g.setColor(GUIParams.BG_COLOR);
+			g.setColor(GUIUtils.BG_COLOR);
 			g.fillRect(0, 0, size.width, size.height);
 
-			g.setColor(GUIParams.TEXT);
+			g.setColor(GUIUtils.TEXT);
 
 			// while (e.hasMoreElements()) {
 			// String message = (String) e.nextElement();

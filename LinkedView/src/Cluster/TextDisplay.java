@@ -2,7 +2,7 @@ package Cluster;
 
 import javax.swing.JTextArea;
 
-import edu.stanford.genetics.treeview.GUIParams;
+import edu.stanford.genetics.treeview.GUIUtils;
 
 /**
  * Small helper class to set up TextAreas for the display of long texts.
@@ -18,8 +18,8 @@ public class TextDisplay extends JTextArea {
 
 		super(text);
 		setOpaque(false);
-		setFont(GUIParams.FONTS);
-		setForeground(GUIParams.TEXT);
+		setFont(GUIUtils.FONTS);
+		setForeground(GUIUtils.TEXT);
 		setEditable(false);
 		setBorder(null);
 		setLineWrap(true);

@@ -28,13 +28,13 @@ public class LabelLoadDialog {
 
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new MigLayout());
-		mainPanel.setBackground(GUIParams.BG_COLOR);
+		mainPanel.setBackground(GUIUtils.BG_COLOR);
 
 		prompt = new JLabel("Loading new " + type + " labels...");
-		prompt.setForeground(GUIParams.TEXT);
-		prompt.setFont(GUIParams.FONTL);
+		prompt.setForeground(GUIUtils.TEXT);
+		prompt.setFont(GUIUtils.FONTL);
 
-		pBar = GUIParams.setPBarLayout();
+		pBar = GUIUtils.setPBarLayout();
 
 		mainPanel.add(prompt, "pushx, alignx 50%, span, wrap");
 		mainPanel.add(pBar, "pushx, alignx 50%, span");
@@ -60,7 +60,7 @@ public class LabelLoadDialog {
 	public void setWarning() {
 
 		prompt.setText("Loading failed.");
-		prompt.setForeground(GUIParams.RED1);
+		prompt.setForeground(GUIUtils.RED1);
 
 		mainPanel.revalidate();
 		mainPanel.repaint();

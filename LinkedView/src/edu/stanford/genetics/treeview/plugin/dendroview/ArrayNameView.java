@@ -46,7 +46,7 @@ import javax.swing.ScrollPaneConstants;
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.DataModel;
-import edu.stanford.genetics.treeview.GUIParams;
+import edu.stanford.genetics.treeview.GUIUtils;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -119,7 +119,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		addMouseListener(this);
 
 		l1 = new JLabel();
-		l1.setFont(GUIParams.FONTS);
+		l1.setFont(GUIUtils.FONTS);
 
 		add(l1, "alignx 50%, aligny 100%, push");
 
@@ -152,7 +152,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 	 */
 	public void setColors() {
 		
-		l1.setForeground(GUIParams.TEXT);
+		l1.setForeground(GUIUtils.TEXT);
 	}
 
 	public HeaderInfo getHeaderInfo() {
@@ -201,9 +201,9 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		final int bgColorIndex = headerInfo.getIndex("BGCOLOR");
 		int gidRow = headerInfo.getIndex("GID");
 
-		g.setColor(GUIParams.BG_COLOR);// Color.white);
+		g.setColor(GUIUtils.BG_COLOR);// Color.white);
 		g.fillRect(0, 0, maxlength, offscreenSize.width);
-		g.setColor(GUIParams.TEXT);// Color.black);
+		g.setColor(GUIUtils.TEXT);// Color.black);
 
 		if (gidRow == -1) {
 			gidRow = 0;
@@ -252,7 +252,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 						g.setColor(back);
 					}
 				} else {
-					g.setColor(GUIParams.DARKGRAY);// Color.gray);
+					g.setColor(GUIUtils.DARKGRAY);// Color.gray);
 					g.drawString(out, 0, map.getMiddlePixel(j) + ascent / 2);
 					g.setColor(back);
 				}
@@ -277,9 +277,9 @@ public class ArrayNameView extends ModelView implements MouseListener,
 
 	public void updateBuffer(final Graphics g, final Dimension offscreenSize) {
 
-		g.setColor(GUIParams.BG_COLOR);// Color.white);
+		g.setColor(GUIUtils.BG_COLOR);// Color.white);
 		g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
-		g.setColor(GUIParams.TEXT);// Color.black);
+		g.setColor(GUIUtils.TEXT);// Color.black);
 
 		if (map.getScale() > 12.0) {
 			l1.setText("");
@@ -326,7 +326,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 				}
 
 				// Foreground Text
-				final Color fore = GUIParams.MAIN;// g.getColor();
+				final Color fore = GUIUtils.MAIN;// g.getColor();
 				for (int j = start; j <= end; j++) {
 
 					try {
@@ -358,7 +358,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 									g.setColor(fore);
 								}
 							} else {
-								g2d.setColor(GUIParams.TEXT);
+								g2d.setColor(GUIUtils.TEXT);
 								// g2d.drawString(out, 0, map.getMiddlePixel(j)
 								// + ascent / 2);
 								// g.setColor(fore);
@@ -563,15 +563,18 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		// if (map.contains(index)) {
 		// viewFrame.displayURL(urlExtractor.getUrl(index));
 		// }
-		final int index = map.getIndex(e.getX());
+		final int index = map.getIndex(e.getX()); 
+		
 		if (geneSelection.getNSelectedIndexes() == geneSelection
 				.getNumIndexes() && arraySelection.isIndexSelected(index)) {
 			geneSelection.deselectAllIndexes();
 			arraySelection.deselectAllIndexes();
 
 		} else if (geneSelection.getNSelectedIndexes() > 0) {
-			geneSelection.deselectAllIndexes();
-			arraySelection.deselectAllIndexes();
+			if(!e.isShiftDown()) {
+				geneSelection.deselectAllIndexes();
+				arraySelection.deselectAllIndexes();
+			}
 			arraySelection.setIndexSelection(index, true);
 			geneSelection.selectAllIndexes();
 

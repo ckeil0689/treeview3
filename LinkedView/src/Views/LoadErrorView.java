@@ -8,7 +8,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
-import edu.stanford.genetics.treeview.GUIParams;
+import edu.stanford.genetics.treeview.GUIUtils;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 
 /**
@@ -49,17 +49,17 @@ public class LoadErrorView {
 
 		homePanel = new JPanel();
 		homePanel.setLayout(new MigLayout("ins 0"));
-		homePanel.setBackground(GUIParams.BG_COLOR);
+		homePanel.setBackground(GUIUtils.BG_COLOR);
 
 		JPanel title_bg;
 
 		title_bg = new JPanel();
 		title_bg.setLayout(new MigLayout());
-		title_bg.setBackground(GUIParams.MAIN);
+		title_bg.setBackground(GUIUtils.MAIN);
 
 		JLabel jl = new JLabel("Oh oh!");
 		jl.setFont(new Font("Sans Serif", Font.BOLD, 50));
-		jl.setForeground(GUIParams.BG_COLOR);
+		jl.setForeground(GUIUtils.BG_COLOR);
 
 		title_bg.add(jl, "push, alignx 50%, span");
 
@@ -72,7 +72,7 @@ public class LoadErrorView {
 		
 		homePanel.add(errorPanel, "push, alignx 50%");
 		
-		loadNew = GUIParams.setButtonLayout("Load New File", null);
+		loadNew = GUIUtils.setButtonLayout("Load New File", null);
 	}
 
 	public JPanel makeErrorPanel() {
@@ -81,12 +81,12 @@ public class LoadErrorView {
 		
 		JLabel errorLabel = new JLabel("Looks like we ran into the " +
 				"following issue: ");
-		errorLabel.setFont(GUIParams.FONTL);
-		errorLabel.setForeground(GUIParams.MAIN);
+		errorLabel.setFont(GUIUtils.FONTL);
+		errorLabel.setForeground(GUIUtils.MAIN);
 
 		JLabel message = new JLabel(errorMessage);
-		message.setFont(GUIParams.FONTS);
-		message.setForeground(GUIParams.TEXT);
+		message.setFont(GUIUtils.FONTS);
+		message.setForeground(GUIUtils.TEXT);
 
 		errorPanel.add(errorLabel, "pushx, alignx 50%, span, wrap");
 		errorPanel.add(message, "pushx, alignx 50%, span, wrap");

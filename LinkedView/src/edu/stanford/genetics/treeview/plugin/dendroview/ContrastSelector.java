@@ -20,7 +20,7 @@ import javax.swing.event.DocumentListener;
 
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.ContrastSelectable;
-import edu.stanford.genetics.treeview.GUIParams;
+import edu.stanford.genetics.treeview.GUIUtils;
 
 class ContrastSelector extends JPanel implements AdjustmentListener {
 
@@ -51,8 +51,8 @@ class ContrastSelector extends JPanel implements AdjustmentListener {
 		inner.setLayout(new MigLayout());
 
 		final JLabel font_label = new JLabel("Value:", SwingConstants.LEFT);
-		font_label.setForeground(GUIParams.TEXT);
-		font_label.setFont(GUIParams.FONTS);
+		font_label.setForeground(GUIUtils.TEXT);
+		font_label.setFont(GUIUtils.FONTS);
 		inner.add(font_label, "alignx 50%");
 
 		inner.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
@@ -83,7 +83,7 @@ class ContrastSelector extends JPanel implements AdjustmentListener {
 
 		this.add(inner, "pushx, alignx 50%, wrap");
 		scrollbar = new JScrollBar(Adjustable.HORIZONTAL);
-		scrollbar.setBackground(GUIParams.BG_COLOR);
+		scrollbar.setBackground(GUIUtils.BG_COLOR);
 		scrollbar.setValues((int) (contrast * 100.0), 0, 1, 500);
 		scrollbar.addAdjustmentListener(this);
 		this.add(scrollbar, "pushx, growx");
@@ -93,7 +93,7 @@ class ContrastSelector extends JPanel implements AdjustmentListener {
 
 		final JPanel panel = new JPanel();
 		panel.setLayout(new MigLayout());
-		panel.setBackground(GUIParams.BG_COLOR);
+		panel.setBackground(GUIUtils.BG_COLOR);
 
 		return panel;
 	}

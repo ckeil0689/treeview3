@@ -56,13 +56,13 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 		setOpaque(false);
 
 		final JLabel label = new JLabel("Select headers to display:");
-		label.setFont(GUIParams.FONTS);
-		label.setForeground(GUIParams.TEXT);
+		label.setFont(GUIUtils.FONTS);
+		label.setForeground(GUIUtils.TEXT);
 		add(label, "span, wrap");
 
 		setHeaderList(headerInfo.getNames());
 		headerList.setVisibleRowCount(5);
-		headerList.setFont(GUIParams.FONTS);
+		headerList.setFont(GUIUtils.FONTS);
 		add(new JScrollPane(getHeaderList()), "push, grow, wrap");
 
 		final ListSelectionListener tmp = new ListSelectionListener() {
@@ -125,7 +125,7 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 	}
 
 	/**
-	 * Returns the smalles index from a selected range in the header list.
+	 * Returns the smallest index from a selected range in the header list.
 	 * 
 	 * @return
 	 */
