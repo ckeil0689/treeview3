@@ -6,20 +6,19 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
-
-import javax.swing.JButton;
+import javax.swing.JToggleButton;
 
 /**
  * Custom JButton with overridden paintComponent method. 
  * @author CKeil
  *
  */
-public class TVButton extends JButton {
+public class TVToggleButton extends JToggleButton {
 
 	private static final long serialVersionUID = 1L;
 	private final int BORDERSIZE = 3;
 	
-	public TVButton(String title) {
+	public TVToggleButton(String title) {
 		
 		super(title);
         super.setContentAreaFilled(false);
@@ -38,7 +37,12 @@ public class TVButton extends JButton {
 					GUIUtils.BUTTON_DARK, new Point(0, getHeight()), 
 					GUIUtils.MAIN));
 			
-		} else {
+		} else if (getModel().isSelected()) {
+			g2.setPaint(new GradientPaint(new Point(0, 0), 
+					GUIUtils.BUTTON_DARKEST, new Point(0, getHeight()), 
+					GUIUtils.BUTTON_DARKEST));
+			
+		} else { 
 			g2.setPaint(new GradientPaint(new Point(0, 0), GUIUtils.MAIN, 
 					new Point(0, getHeight()), GUIUtils.BUTTON_DARK));
 		}

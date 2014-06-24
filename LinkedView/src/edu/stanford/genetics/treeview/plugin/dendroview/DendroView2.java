@@ -22,6 +22,7 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
+import java.awt.Color;
 import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -42,6 +43,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JSplitPane;
+import javax.swing.JToggleButton;
 
 import edu.stanford.genetics.treeview.DendroPanel;
 import edu.stanford.genetics.treeview.GUIUtils;
@@ -124,14 +126,17 @@ public class DendroView2 implements Observer, DendroPanel {
 	private JButton scaleDecY;
 	private JButton scaleDefaultAll;
 	
-	private JCheckBox lockGlobalView;
+	private JToggleButton toggleScale;
 	
 	// GlobalView default sizes as ints to keep track.
-	private int gvWidth = 100;
-	private int gvHeight = 100;
+	private double gvWidth;
+	private double gvHeight;
 	
-	private int arrayWidth = 100;
-	private int geneHeight = 100;
+	private double maxGVWidth;
+	private double maxGVHeight;
+	
+	private double widthChange = 0;
+	private double heightChange = 0;
 
 
 	// Booleans
@@ -190,8 +195,7 @@ public class DendroView2 implements Observer, DendroPanel {
 		globalYscrollbar = globalview.getYScroll();
 		globalYscrollbar.setUI(new TVScrollBarUI());
 		
-		lockGlobalView = new JCheckBox("Lock matrix size");
-		lockGlobalView.setFont(GUIUtils.FONTS);
+		toggleScale = GUIUtils.setToggleButtonLayout("Change Matrix Size");
 
 		// Set up the column name display
 //		arraynameview = new ArrayNameViewManager();
@@ -252,9 +256,6 @@ public class DendroView2 implements Observer, DendroPanel {
 		// Clear panel
 		dendroPane.removeAll();
 		
-		lockGlobalView.setBackground(GUIUtils.BG_COLOR);
-		lockGlobalView.setForeground(GUIUtils.TEXT);
-		
 		// Set color scheme
 		setComponentColors();
 
@@ -267,14 +268,12 @@ public class DendroView2 implements Observer, DendroPanel {
 		JPanel geneContainer;
 		JPanel navPanel;
 		JPanel globalViewContainer;
+		JPanel navContainer;
 		JSplitPane gtrPane = null;
 		JSplitPane atrPane = null;
+		
 		JPanel firstPanel;
-
-		JPanel fillPanel1;
-		JPanel fillPanel2;
-		JPanel fillPanel3;
-		JPanel fillPanel4;
+		JPanel bottomPanel;
 
 		// Buttons
 		scaleDefaultAll = GUIUtils.setButtonLayout(null, "homeIcon");
@@ -301,20 +300,16 @@ public class DendroView2 implements Observer, DendroPanel {
 		crossPanel = GUIUtils.createJPanel(false, true, null);
 		
 		globalViewContainer = GUIUtils.createJPanel(false, false, null); 
+		
+		navContainer = GUIUtils.createJPanel(true, false, null);
 
-		fillPanel1 = GUIUtils.createJPanel(false, true, null); 
-
-		fillPanel2 = GUIUtils.createJPanel(false, true, null);
-
-		fillPanel3 = GUIUtils.createJPanel(false, true, null); 
-
-		fillPanel4 = GUIUtils.createJPanel(false, true, null); 
+		bottomPanel = GUIUtils.createJPanel(false, true, null); 
 		
 		arrayContainer = GUIUtils.createJPanel(false, false, null);
 		
 		geneContainer = GUIUtils.createJPanel(false, false, null);
 
-		firstPanel = GUIUtils.createJPanel(false, true, null);
+		firstPanel = GUIUtils.createJPanel(true, true, null);
 		firstPanel.setBorder(null);
 
 		navPanel = GUIUtils.createJPanel(false, true, null);
@@ -354,8 +349,11 @@ public class DendroView2 implements Observer, DendroPanel {
 		textpanel.add(textview.getComponent(), "push, grow");
 		arrayNamePanel.add(arraynameview.getComponent(), "push, grow");
 		
-		globalViewContainer.add(globalview, "w " + gvWidth + "%, h "
-				+ "" + gvHeight + "%, push, alignx 50%, aligny 50%");
+		globalViewContainer.add(globalview, "w 99%, h 99%, push, alignx 50%, "
+				+ "aligny 50%");
+		globalViewContainer.add(globalYscrollbar, "w 1%, h 100%, wrap");
+		globalViewContainer.add(globalXscrollbar, "span, pushx, alignx 50%, "
+				+ "w 100%, h 1%");
 
 		crossPanel.add(scaleIncY, "span, alignx 50%, wrap");
 		crossPanel.add(scaleDecX);
@@ -367,7 +365,9 @@ public class DendroView2 implements Observer, DendroPanel {
 
 		navPanel.add(buttonPanel, "pushx, h 20%, w 90%, alignx 50%, wrap");
 		navPanel.add(scaleDefaultAll, "push, alignx 50%, aligny 5%, wrap");
-		navPanel.add(lockGlobalView, "push, alignx 50%, aligny 5%");
+		navPanel.add(toggleScale, "push, alignx 50%, aligny 5%");
+		
+		navContainer.add(navPanel, "push, h 50%, alignx 100%, aligny 50%");
 		
 		JScrollBar arrayScroll = arraynameview.getYScroll();
 		JScrollBar geneScroll = textview.getXScroll();
@@ -375,109 +375,98 @@ public class DendroView2 implements Observer, DendroPanel {
 		// Widths
 		double textViewCol = 0;
 		double firstPanelCol = 0;
-		double globalViewCol = 0;
 		double navCol = 10.5;
-		double yScrollWidth = 1.0;
+		double halfWidthChange = 0.0;
 		
 		// Heights
 		double arrayRow = 0;
-		double globalViewRow = 0;
 		double bottomRow = 5;
-		double xScrollHeight = 1.0;
+		double halfHeightChange = 0.0;
 
 		// Layout parameters depend on tree visibility and atr/gtr availability
 		if (showTrees && (atrview.isEnabled() && gtrview.isEnabled())) {
+			maxGVWidth = 72;
+			maxGVHeight = 75;
+			
 			firstPanelCol = 18.5;
 			textViewCol = 18.5;
-			globalViewCol = 72;
 			
 			arrayRow = 20;
-			globalViewRow = 75;
 			
-			arrayContainer.add(atrPane, "push, growy, alignx 50%, w " 
-					+ arrayWidth + "%");
-			geneContainer.add(gtrPane, "push, growx, aligny 50%, h " 
-					+ geneHeight + "%");
+			arrayContainer.add(atrPane, "w 99%, h 100%");
+			geneContainer.add(gtrPane, "w 100%, h 99%, wrap");
 
 		} else if (showTrees && (atrview.isEnabled() && !gtrview.isEnabled())) {
+			maxGVWidth = 80;
+			maxGVHeight = 75;
+			
 			firstPanelCol = 18.5;
 			textViewCol = 10.5;
-			globalViewCol = 80;
 			
 			arrayRow = 20;
-			globalViewRow = 75;
 			
-			arrayContainer.add(atrPane, "push, growy, alignx 50%, w " 
-					+ arrayWidth + "%");
-			geneContainer.add(textpanel, "push, growx, aligny 50%, h " 
-					+ geneHeight + "%");
+			arrayContainer.add(atrPane, "w 99%, h 100%");
+			geneContainer.add(textpanel, "w 100%, h 99%, wrap");
 
 		} else if (showTrees && (!atrview.isEnabled() && gtrview.isEnabled())) {
+			maxGVWidth = 72;
+			maxGVHeight = 85;
+			
 			firstPanelCol = 18.5;
 			textViewCol = 18.5;
-			globalViewCol = 72;
 			
 			arrayRow = 10;
-			globalViewRow = 85;
 			
-			arrayContainer.add(arrayNamePanel, "push, growy, alignx 50%, w " 
-					+ arrayWidth + "%");
-			geneContainer.add(gtrPane, "push, growx, aligny 50%, h " 
-					+ geneHeight + "%");
+			arrayContainer.add(arrayNamePanel, "w 99%, h 100%");
+			geneContainer.add(gtrPane, "w 100%, h 99%, wrap");
 
 		} else {
+			maxGVWidth = 80;
+			maxGVHeight = 85;
+			
 			firstPanelCol = 10.5;
 			textViewCol = 10.5;
-			globalViewCol = 80;
 			
 			arrayRow = 10;
-			globalViewRow = 85;
 			
-			arrayContainer.add(arrayNamePanel, "push, growy, alignx 50%, w " 
-					+ arrayWidth + "%");
-			geneContainer.add(textpanel, "push, growx, aligny 50%, h " 
-					+ geneHeight + "%");
+			arrayContainer.add(arrayNamePanel, "w 99%, h 100%");
+			geneContainer.add(textpanel, "w 100%, h 99%, wrap");
 		}
+				
+		arrayContainer.add(arrayScroll, "w 1%, h 100%");
+		geneContainer.add(geneScroll, "w 100%, h 1%");
+		
+		gvWidth = maxGVWidth + widthChange;
+		gvHeight = maxGVHeight + heightChange;
+		
+		halfWidthChange = widthChange/ 2.0;
+		halfHeightChange = heightChange/ 2.0;
+		
+		// Adjusting widths and heights
+		textViewCol = textViewCol - halfWidthChange;
+		firstPanelCol = firstPanelCol - halfWidthChange;
+		navCol = navCol - halfWidthChange;
+		
+		arrayRow = arrayRow - halfHeightChange;
+		bottomRow = bottomRow - halfHeightChange;
 		
 		// Adding all components to the dendroPane
-		dendroPane.add(firstPanel, "w " + firstPanelCol + "%, h "
-				+ "" + arrayRow + "%");
+		dendroPane.add(firstPanel, "w " + firstPanelCol + "%, "
+				+ "h " + arrayRow + "%");
 		
-		dendroPane.add(arrayContainer, "w " + (globalViewCol - yScrollWidth) 
-				+ "%, h " + arrayRow + "%");
+		dendroPane.add(arrayContainer, "w " + gvWidth + "%, "
+				+ "h " + arrayRow + "%");
 		
-		dendroPane.add(arrayScroll, "w " + yScrollWidth + "%, h "
-				+ "" + arrayRow + "%");
-		
-		dendroPane.add(fillPanel1, "w " + navCol + "%, h " + arrayRow + "%, "
+		dendroPane.add(navContainer, "span 1 3, w " + navCol + "%, h 100%, "
 				+ "wrap");
 		
-		dendroPane.add(geneContainer, "w " + textViewCol + "%, h "
-				+ "" + (globalViewRow + xScrollHeight) + "%");
+		dendroPane.add(geneContainer, "w " + textViewCol + "%, "
+				+ "h " + gvHeight + "%");
 		
-		dendroPane.add(globalViewContainer, "w " + globalViewCol + "%, "
-				+ "h " + globalViewRow + "%");
+		dendroPane.add(globalViewContainer, "w " + gvWidth + "%, "
+				+ "h " + gvHeight + "%, wrap");
 		
-		dendroPane.add(globalYscrollbar, "h " + globalViewRow + "%");
-		
-		dendroPane.add(navPanel, "w " + navCol + "%, h "
-				+ "" + globalViewRow + "%, wrap");
-		
-		dendroPane.add(geneScroll, "w " + textViewCol + "%, h "
-				+ "" + yScrollWidth + "%");
-		
-		dendroPane.add(globalXscrollbar, "pushy, aligny 0%, w "
-				+ "" + globalViewCol + "%, h " + xScrollHeight + "%");
-		
-		dendroPane.add(fillPanel3, "span 2 2, w "
-				+ "" + (navCol + yScrollWidth) + "%, h "
-						+ "" + bottomRow + "%, wrap");
-		
-		dendroPane.add(fillPanel2, "w " + textViewCol  + "%, h "
-				+ "" + bottomRow + "%");
-		
-		dendroPane.add(fillPanel4, "w " + globalViewCol + "%, h "
-				+ "" + xScrollHeight + "%");
+		dendroPane.add(bottomPanel, "span, h " + bottomRow + "%");
 		
 		dendroPane.revalidate();
 		dendroPane.repaint();
@@ -603,7 +592,7 @@ public class DendroView2 implements Observer, DendroPanel {
 	 */
 	public void setGVLocked(final boolean locked) {
 
-		lockGlobalView.setSelected(locked);
+		toggleScale.setSelected(locked);
 	}
 	
 	/**
@@ -613,7 +602,7 @@ public class DendroView2 implements Observer, DendroPanel {
 	 */
 	public boolean getGVLocked() {
 		
-		return lockGlobalView.isSelected();
+		return toggleScale.isSelected();
 	}
 
 	/**
@@ -1176,47 +1165,58 @@ public class DendroView2 implements Observer, DendroPanel {
 	}
 	
 	// Set GlobalView sizes
-	public void setGVWidth(int newWidth) {
+	public void setGVWidth(double newWidth) {
 		
 		this.gvWidth = newWidth;
 	}
 	
-	public void setGVHeight(int newHeight) {
+	public void setGVHeight(double newHeight) {
 		
 		this.gvHeight = newHeight;
 	}
 	
-	public void setArrayWidth(int newWidth) {
-		
-		this.arrayWidth = newWidth;
-	}
-	
-	public void setGeneHeight(int newHeight) {
-		
-		this.geneHeight = newHeight;
-	}
-	
 	// Get GlobalView sizes
-	public int getGVWidth() {
+	public double getGVWidth() {
 		
 		return gvWidth;
 	}
 	
-	public int getGVHeight() {
+	public double getGVHeight() {
 		
 		return gvHeight;
 	}
 	
-	public int getArrayWidth() {
+	public double getWidthChange() {
 		
-		return arrayWidth;
+		return widthChange;
 	}
 	
-	public int getGeneHeight() {
+	public void setWidthChange(double change) {
 		
-		return geneHeight;
+		this.widthChange = widthChange + change;
 	}
 	
+	public double getHeightChange() {
+		
+		return heightChange;
+	}
+	
+	public void setHeightChange(double change) {
+		
+		this.heightChange = heightChange + change;
+	}
+	
+	public double getMaxGVWidth() {
+		
+		return maxGVWidth;
+	}
+	
+	public double getMaxGVHeight() {
+		
+		return maxGVHeight;
+	}
+	
+	// Selection methods
 	/**
 	 * This should be called after setDataModel has been set to the appropriate
 	 * model

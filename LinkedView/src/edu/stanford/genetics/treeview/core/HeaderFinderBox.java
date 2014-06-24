@@ -165,7 +165,6 @@ public abstract class HeaderFinderBox {
 
 	public void seekAll() {
 		
-		final int[] selected = { 0 };
 		geneSelection.setSelectedNode(null);
 		geneSelection.deselectAllIndexes();
 
@@ -178,8 +177,8 @@ public abstract class HeaderFinderBox {
 
 		geneSelection.notifyObservers();
 
-		if ((viewFrame != null) && (selected.length > 0)) {
-			scrollToIndex(geneList.indexOf(genefBox.getSelectedItem()));
+		if ((viewFrame != null) && (indexList.size() > 0)) {
+			scrollToIndex(indexList.get(0));
 		}
 	}
 	

@@ -17,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
+import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.plaf.basic.BasicProgressBarUI;
 
@@ -40,6 +41,7 @@ public class GUIUtils {
 	public static Color BORDERS = new Color(200, 200, 200, 255);
 	public static Color MAIN = new Color(255, 200, 65, 255);
 	public static Color BUTTON_DARK = new Color(255, 180, 45, 255);
+	public static Color BUTTON_DARKEST = new Color(200, 145, 35, 255);
 	public static Color BUTTON_BORDER_PRESS = new Color(185, 145, 45, 255);
 	public static Color BUTTON_BORDER_ROLL = new Color(255, 205, 65, 255);
 	public static Color ELEMENT_HOV = new Color(255, 174, 77, 255);
@@ -215,6 +217,37 @@ public class GUIUtils {
 		} else {
 			button.setMinimumSize(new Dimension(80, 40));
 		}
+
+		button.setPreferredSize(d);
+
+		return button;
+	}
+	
+	/**
+	 * Creates a button with a title and icon if desired. The method centralizes
+	 * the layout setting for buttons so that all buttons will look similar.
+	 * 
+	 * @param title
+	 * @param iconFileName
+	 * @return
+	 */
+	public static JToggleButton setToggleButtonLayout(final String title) {
+
+		final JToggleButton button;
+		if(title != null) {
+			button = new TVToggleButton(title);
+			
+		} else {
+			button = new TVToggleButton("");
+		}
+		
+		// Basic layout
+		button.setFont(FONTS);
+		button.setForeground(BG_COLOR);
+		button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+		final Dimension d = button.getPreferredSize();
+		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
 
 		button.setPreferredSize(d);
 

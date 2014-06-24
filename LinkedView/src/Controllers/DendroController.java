@@ -295,43 +295,51 @@ public class DendroController implements ConfigNodePersistent {
 		protected Void doInBackground() throws Exception {
 
 			boolean locked = dendroView.getGVLocked();
-			int width = dendroView.getGVWidth();
-			int height = dendroView.getGVHeight();
+			double width = dendroView.getGVWidth();
+			double height = dendroView.getGVHeight();
+			double maxGVWidth = dendroView.getMaxGVWidth();
+			double maxGVHeight = dendroView.getMaxGVHeight();
 			
 			if (event.getSource() == dendroView.getXPlusButton()) {
-				if(width < 100 && !locked) {
+				if(width < maxGVWidth && locked) {
 					changeGVSize(5, 0);
+					
+				} else if(!locked ){
+					getGlobalXMap().zoomIn();
 				}
-				
-				getGlobalXMap().zoomIn();
 
 			} else if (event.getSource() == dendroView.getXMinusButton()) {
-				if((width > 50 && getGlobalXMap().getScale() <= getGlobalXMap()
-						.getMinScale()) 
-						&& !locked) {
+				if(width > 10 && locked) {
 					changeGVSize(-5, 0);
+					
+				} else if(!locked) {
+					getGlobalXMap().zoomOut();
 				}
-				
-				getGlobalXMap().zoomOut();
 
 			} else if (event.getSource() == dendroView.getYPlusButton()) {
-				if(height < 100 && !locked) {
+				if(height < maxGVHeight && locked) {
 					changeGVSize(0, 5);
+					
+				} else if(!locked) {
+					getGlobalYMap().zoomIn();
 				}
-				
-				getGlobalYMap().zoomIn();
 
 			} else if (event.getSource() == dendroView.getYMinusButton()) {
-				if((height > 50 && getGlobalYMap().getScale() <= getGlobalYMap()
-						.getMinScale())
-						&& !locked) {
+				if(height > 10 && locked) {
 					changeGVSize(0, -5);
+					
+				} else if(!locked) {
+					getGlobalYMap().zoomOut();
 				}
-				
-				getGlobalYMap().zoomOut();
 
 			} else if (event.getSource() == dendroView.getHomeButton()) {
-				resetMapContainers();
+				if(locked) {
+					changeGVSize(-dendroView.getWidthChange(), 
+							-dendroView.getHeightChange());
+					
+				} else {
+					resetMapContainers();
+				}
 
 			} else {
 				LogBuffer.println("Got weird source for actionPerformed() "
@@ -357,12 +365,10 @@ public class DendroController implements ConfigNodePersistent {
 	 * @param widthChange
 	 * @param heightChange
 	 */
-	public void changeGVSize(int widthChange, int heightChange) {
+	public void changeGVSize(double widthChange, double heightChange) {
 		
-		dendroView.setGVWidth(dendroView.getGVWidth() + widthChange);
-		dendroView.setGVHeight(dendroView.getGVHeight() + heightChange);
-		dendroView.setArrayWidth(dendroView.getArrayWidth() + widthChange);
-		dendroView.setGeneHeight(dendroView.getGeneHeight() + heightChange);
+		dendroView.setWidthChange(widthChange);
+		dendroView.setHeightChange(heightChange);
 		
 		dendroView.setupLayout();
 		addViewListeners();
