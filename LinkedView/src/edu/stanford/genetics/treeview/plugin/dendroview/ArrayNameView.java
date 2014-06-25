@@ -46,7 +46,7 @@ import javax.swing.ScrollPaneConstants;
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.DataModel;
-import edu.stanford.genetics.treeview.GUIUtils;
+import edu.stanford.genetics.treeview.GUIFactory;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -118,8 +118,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 
 		addMouseListener(this);
 
-		l1 = new JLabel();
-		l1.setFont(GUIUtils.FONTS);
+		l1 = GUIFactory.createSmallLabel("");
 
 		add(l1, "alignx 50%, aligny 100%, push");
 
@@ -152,7 +151,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 	 */
 	public void setColors() {
 		
-		l1.setForeground(GUIUtils.TEXT);
+		l1.setForeground(GUIFactory.TEXT);
 	}
 
 	public HeaderInfo getHeaderInfo() {
@@ -201,9 +200,9 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		final int bgColorIndex = headerInfo.getIndex("BGCOLOR");
 		int gidRow = headerInfo.getIndex("GID");
 
-		g.setColor(GUIUtils.BG_COLOR);// Color.white);
+		g.setColor(this.getBackground());// Color.white);
 		g.fillRect(0, 0, maxlength, offscreenSize.width);
-		g.setColor(GUIUtils.TEXT);// Color.black);
+		g.setColor(GUIFactory.TEXT);// Color.black);
 
 		if (gidRow == -1) {
 			gidRow = 0;
@@ -252,7 +251,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 						g.setColor(back);
 					}
 				} else {
-					g.setColor(GUIUtils.DARKGRAY);// Color.gray);
+					g.setColor(GUIFactory.DARKGRAY);// Color.gray);
 					g.drawString(out, 0, map.getMiddlePixel(j) + ascent / 2);
 					g.setColor(back);
 				}
@@ -277,9 +276,9 @@ public class ArrayNameView extends ModelView implements MouseListener,
 
 	public void updateBuffer(final Graphics g, final Dimension offscreenSize) {
 
-		g.setColor(GUIUtils.BG_COLOR);// Color.white);
+		g.setColor(this.getBackground());// Color.white);
 		g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
-		g.setColor(GUIUtils.TEXT);// Color.black);
+		g.setColor(GUIFactory.TEXT);// Color.black);
 
 		if (map.getScale() > 12.0) {
 			l1.setText("");
@@ -326,7 +325,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 				}
 
 				// Foreground Text
-				final Color fore = GUIUtils.MAIN;// g.getColor();
+				final Color fore = GUIFactory.MAIN;// g.getColor();
 				for (int j = start; j <= end; j++) {
 
 					try {
@@ -358,7 +357,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 									g.setColor(fore);
 								}
 							} else {
-								g2d.setColor(GUIUtils.TEXT);
+								g2d.setColor(GUIFactory.TEXT);
 								// g2d.drawString(out, 0, map.getMiddlePixel(j)
 								// + ascent / 2);
 								// g.setColor(fore);

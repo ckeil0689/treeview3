@@ -44,7 +44,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 
 import edu.stanford.genetics.treeview.DendroPanel;
-import edu.stanford.genetics.treeview.GUIUtils;
+import edu.stanford.genetics.treeview.GUIFactory;
 import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.StringRes;
 import edu.stanford.genetics.treeview.TVScrollBarUI;
@@ -183,18 +183,18 @@ public class DendroView2 implements Observer, DendroPanel {
 		this.name = "DendroView";
 		this.loaded = false;
 
-		dendroPane = GUIUtils.createJPanel(false, false, null);
+		dendroPane = GUIFactory.createJPanel(false, false, null);
 		
 		// Create the Global view (JPanel to display)
 		globalview = new GlobalView2();
 
 		// scrollbars, mostly used by maps
 		globalXscrollbar = globalview.getXScroll();
-		globalXscrollbar.setUI(new TVScrollBarUI());
+//		globalXscrollbar.setUI(new TVScrollBarUI());
 		globalYscrollbar = globalview.getYScroll();
-		globalYscrollbar.setUI(new TVScrollBarUI());
+//		globalYscrollbar.setUI(new TVScrollBarUI());
 		
-		toggleScale = GUIUtils.setToggleButtonLayout(
+		toggleScale = GUIFactory.setToggleButtonLayout(
 				StringRes.button_toggleMatrixSize);
 
 		// Set up the column name display
@@ -276,48 +276,48 @@ public class DendroView2 implements Observer, DendroPanel {
 		JPanel bottomPanel;
 
 		// Buttons
-		scaleDefaultAll = GUIUtils.setButtonLayout(null, StringRes.icon_home);
+		scaleDefaultAll = GUIFactory.setButtonLayout(null, StringRes.icon_home);
 		scaleDefaultAll.setToolTipText("Reset the zoomed view");
 
-		scaleIncX = GUIUtils.setButtonLayout(null, StringRes.icon_zoomIn);
+		scaleIncX = GUIFactory.setButtonLayout(null, StringRes.icon_zoomIn);
 		scaleIncX.setToolTipText(StringRes.tooltip_xZoomIn);
 
-		scaleDecX = GUIUtils.setButtonLayout(null, StringRes.icon_zoomOut);
+		scaleDecX = GUIFactory.setButtonLayout(null, StringRes.icon_zoomOut);
 		scaleDecX.setToolTipText(StringRes.tooltip_xZoomOut);
 
-		scaleIncY = GUIUtils.setButtonLayout(null, StringRes.icon_zoomIn);
+		scaleIncY = GUIFactory.setButtonLayout(null, StringRes.icon_zoomIn);
 		scaleIncY.setToolTipText(StringRes.tooltip_yZoomIn);
 
-		scaleDecY = GUIUtils.setButtonLayout(null, StringRes.icon_zoomOut);
+		scaleDecY = GUIFactory.setButtonLayout(null, StringRes.icon_zoomOut);
 		scaleDecY.setToolTipText(StringRes.tooltip_yZoomOut);
 
-		zoomButton = GUIUtils.setButtonLayout(null, StringRes.icon_zoomAll);
+		zoomButton = GUIFactory.setButtonLayout(null, StringRes.icon_zoomAll);
 		zoomButton.setToolTipText(StringRes.tooltip_home);
 
 		// Panels
-		buttonPanel = GUIUtils.createJPanel(false, true, null);
+		buttonPanel = GUIFactory.createJPanel(false, true, null);
 		
-		crossPanel = GUIUtils.createJPanel(false, true, null);
+		crossPanel = GUIFactory.createJPanel(false, true, null);
 		
-		globalViewContainer = GUIUtils.createJPanel(false, false, null); 
+		globalViewContainer = GUIFactory.createJPanel(false, false, null); 
 		
-		navContainer = GUIUtils.createJPanel(true, false, null);
+		navContainer = GUIFactory.createJPanel(true, false, null);
 
-		bottomPanel = GUIUtils.createJPanel(false, true, null); 
+		bottomPanel = GUIFactory.createJPanel(false, true, null); 
 		
-		arrayContainer = GUIUtils.createJPanel(false, false, null);
+		arrayContainer = GUIFactory.createJPanel(false, false, null);
 		
-		geneContainer = GUIUtils.createJPanel(false, false, null);
+		geneContainer = GUIFactory.createJPanel(false, false, null);
 
-		firstPanel = GUIUtils.createJPanel(true, true, null);
+		firstPanel = GUIFactory.createJPanel(true, true, null);
 		firstPanel.setBorder(null);
 
-		navPanel = GUIUtils.createJPanel(false, true, null);
+		navPanel = GUIFactory.createJPanel(false, true, null);
 		navPanel.setBorder(null);
 
-		textpanel = GUIUtils.createJPanel(false, false, null); 
+		textpanel = GUIFactory.createJPanel(false, false, null); 
 
-		arrayNamePanel = GUIUtils.createJPanel(false, false, null);
+		arrayNamePanel = GUIFactory.createJPanel(false, false, null);
 
 		if (gtrview.isEnabled() || atrview.isEnabled()) {
 			tvFrame.getTreeButton().setEnabled(true);
@@ -474,7 +474,7 @@ public class DendroView2 implements Observer, DendroPanel {
 	
 	public void setComponentColors() {
 		
-		dendroPane.setBackground(GUIUtils.BG_COLOR);
+		dendroPane.setBackground(GUIFactory.BG_COLOR);
 		arraynameview.setColors();
 		textview.setColors();
 	}
@@ -618,23 +618,23 @@ public class DendroView2 implements Observer, DendroPanel {
 		dialog.setTitle(StringRes.dialog_title_search);
 		dialog.setResizable(false);
 
-		final JPanel container = GUIUtils.createJPanel(true, true, null); //new JPanel();
+		final JPanel container = GUIFactory.createJPanel(true, true, null); //new JPanel();
 //		container.setLayout(new MigLayout());
 //		container.setBackground(GUIUtils.BG_COLOR);
-		container.setBorder(BorderFactory.createEtchedBorder(GUIUtils.BORDERS,
-				GUIUtils.BG_COLOR));
+		container.setBorder(BorderFactory.createEtchedBorder(GUIFactory.BORDERS,
+				GUIFactory.BG_COLOR));
 		
-		JLabel wildTip = GUIUtils.createSmallLabel("Tip: Edit the search "
+		JLabel wildTip = GUIFactory.createSmallLabel("Tip: Edit the search "
 				+ "fields to search for terms.");
 //		wildTip.setFont(GUIUtils.FONTS);
 //		wildTip.setForeground(GUIUtils.TEXT);
 		
-		JLabel wildTip2 = GUIUtils.createSmallLabel("Wildcards ('*', '?') "
+		JLabel wildTip2 = GUIFactory.createSmallLabel("Wildcards ('*', '?') "
 				+ "are supported.");
 //		wildTip2.setFont(GUIUtils.FONTS);
 //		wildTip2.setForeground(GUIUtils.TEXT);
 		
-		final JButton closeButton = GUIUtils.setButtonLayout("Close", null);
+		final JButton closeButton = GUIFactory.setButtonLayout("Close", null);
 		closeButton.addActionListener(new ActionListener() {
 
 			@Override

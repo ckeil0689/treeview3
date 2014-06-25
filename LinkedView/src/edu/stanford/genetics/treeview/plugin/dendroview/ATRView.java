@@ -41,8 +41,6 @@ import java.util.Observable;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
-
-import edu.stanford.genetics.treeview.GUIUtils;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LinearTransformation;
@@ -356,7 +354,7 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 			map.setAvailablePixels(offscreenSize.width);
 
 			// clear the pallette...
-			g.setColor(GUIUtils.BG_COLOR);
+			g.setColor(this.getBackground());
 			g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
 			g.setColor(Color.black);
 

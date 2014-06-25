@@ -46,7 +46,7 @@ import javax.swing.event.ListSelectionListener;
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.CdtFilter;
 import edu.stanford.genetics.treeview.FileSet;
-import edu.stanford.genetics.treeview.GUIUtils;
+import edu.stanford.genetics.treeview.GUIFactory;
 
 /**
  * This class allows you to edit the file mru, and also get some info about them
@@ -211,10 +211,10 @@ public class FileMruEditor extends JPanel {
 		final JPanel upper = fileSetPanel;
 		upper.setSize(300, 200);
 		this.setLayout(new MigLayout());
-		this.setBackground(GUIUtils.BG_COLOR);
+		this.setBackground(GUIFactory.BG_COLOR);
 
 		final JLabel l1 = new JLabel(getTitle());
-		l1.setForeground(GUIUtils.TEXT);
+		l1.setForeground(GUIFactory.TEXT);
 
 		this.add(l1, "pushx, alignx 50%, wrap");
 		this.add(upper, "push, grow, alignx 50%, wrap");
@@ -373,7 +373,7 @@ public class FileMruEditor extends JPanel {
 			this.setLayout(new MigLayout());
 			this.setOpaque(false);
 
-			openButton = GUIUtils.setButtonLayout("Open", null);
+			openButton = GUIFactory.setButtonLayout("Open", null);
 			openButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -383,7 +383,7 @@ public class FileMruEditor extends JPanel {
 			});
 			// this.add(openButton); not sure about this...
 
-			searchButton = GUIUtils.setButtonLayout("Find", null);
+			searchButton = GUIFactory.setButtonLayout("Find", null);
 			searchButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -394,7 +394,7 @@ public class FileMruEditor extends JPanel {
 			});
 			this.add(searchButton, "pushx");
 
-			deleteButton = GUIUtils.setButtonLayout("Remove", null);
+			deleteButton = GUIFactory.setButtonLayout("Remove", null);
 			deleteButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -403,7 +403,7 @@ public class FileMruEditor extends JPanel {
 			});
 			this.add(deleteButton, "pushx");
 
-			deleteAllButton = GUIUtils.setButtonLayout("Remove All", null);
+			deleteAllButton = GUIFactory.setButtonLayout("Remove All", null);
 			deleteAllButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -413,7 +413,7 @@ public class FileMruEditor extends JPanel {
 			});
 			this.add(deleteAllButton, "pushx");
 
-			closeButton = GUIUtils.setButtonLayout("Close", null);
+			closeButton = GUIFactory.setButtonLayout("Close", null);
 			closeButton.addActionListener(new ActionListener() {
 
 				@Override

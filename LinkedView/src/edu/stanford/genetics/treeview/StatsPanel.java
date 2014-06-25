@@ -31,7 +31,7 @@ public class StatsPanel {
 		statsDialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
 		statsDialog.setResizable(false);
 
-		final Dimension mainDim = GUIUtils.getScreenSize();
+		final Dimension mainDim = GUIFactory.getScreenSize();
 
 		statsDialog.getContentPane().setSize(mainDim.width * 1 / 2,
 				mainDim.height * 1 / 2);
@@ -60,21 +60,21 @@ public class StatsPanel {
 
 		final JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new MigLayout());
-		mainPanel.setBackground(GUIUtils.BG_COLOR);
+		mainPanel.setBackground(GUIFactory.BG_COLOR);
 
-		final JLabel header = GUIUtils.setupHeader("Data Stats");
+		final JLabel header = GUIFactory.setupHeader("Data Stats");
 
 		if (viewFrame.getDataModel() != null) {
 			final JLabel source = new JLabel("Source: "
 					+ viewFrame.getDataModel().getSource());
-			source.setForeground(GUIUtils.TEXT);
-			source.setFont(GUIUtils.FONTS);
+			source.setForeground(GUIFactory.TEXT);
+			source.setFont(GUIFactory.FONTS);
 
 			final JLabel cols = new JLabel("Columns: "
 					+ viewFrame.getDataModel().getArrayHeaderInfo()
 							.getNumHeaders());
-			cols.setForeground(GUIUtils.TEXT);
-			cols.setFont(GUIUtils.FONTS);
+			cols.setForeground(GUIFactory.TEXT);
+			cols.setFont(GUIFactory.FONTS);
 
 			final int rowN = viewFrame.getDataModel().getGeneHeaderInfo()
 					.getNumHeaders();
@@ -84,13 +84,13 @@ public class StatsPanel {
 			final JLabel rows = new JLabel("Rows: "
 					+ viewFrame.getDataModel().getGeneHeaderInfo()
 							.getNumHeaders());
-			rows.setForeground(GUIUtils.TEXT);
-			rows.setFont(GUIUtils.FONTS);
+			rows.setForeground(GUIFactory.TEXT);
+			rows.setFont(GUIFactory.FONTS);
 
 			final JLabel size = new JLabel(
 					"Matrix Size (includes N/A-values): " + (rowN * colN));
-			size.setForeground(GUIUtils.TEXT);
-			size.setFont(GUIUtils.FONTS);
+			size.setForeground(GUIFactory.TEXT);
+			size.setFont(GUIFactory.FONTS);
 
 			mainPanel.add(header, "pushx, alignx 50%, wrap");
 			mainPanel.add(source, "wrap");
@@ -101,8 +101,8 @@ public class StatsPanel {
 		} else {
 			final JLabel nLoad = new JLabel(
 					"It appears, the Model was not loaded.");
-			nLoad.setForeground(GUIUtils.TEXT);
-			nLoad.setFont(GUIUtils.FONTS);
+			nLoad.setForeground(GUIFactory.TEXT);
+			nLoad.setFont(GUIFactory.FONTS);
 
 			mainPanel.add(nLoad, "push, alignx 50%");
 		}

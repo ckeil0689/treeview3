@@ -143,7 +143,7 @@
             <map>
               <entry key="name" value="MP_4pairsT_0p75slf_0p01enrich"/>
               <entry key="extension" value=".txt"/>
-              <entry key="treesVisible" value="false"/>
+              <entry key="treesVisible" value="true"/>
               <entry key="globalViewLocked" value="false"/>
             </map>
             <node name="ArrayNameView">
@@ -279,14 +279,14 @@
             </node>
             <node name="GlobalXMap">
               <map>
-                <entry key="scale" value="11.210526315789474"/>
-                <entry key="minScale" value="11.210526315789474"/>
-                <entry key="XScrollValue" value="0"/>
+                <entry key="scale" value="333.75"/>
+                <entry key="minScale" value="10.037593984962406"/>
+                <entry key="XScrollValue" value="16"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="11.210526315789474"/>
+                  <entry key="scale" value="333.75"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -297,14 +297,14 @@
             </node>
             <node name="GlobalYMap">
               <map>
-                <entry key="scale" value="6.090225563909774"/>
-                <entry key="minScale" value="6.090225563909774"/>
-                <entry key="YScrollValue" value="0"/>
+                <entry key="scale" value="118.16666666666667"/>
+                <entry key="minScale" value="5.330827067669173"/>
+                <entry key="YScrollValue" value="16"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="6.090225563909774"/>
+                  <entry key="scale" value="118.16666666666667"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -2144,11 +2144,12 @@
               <entry key="name" value="fg_140130_NN_matrix"/>
               <entry key="extension" value=".txt"/>
               <entry key="treesVisible" value="false"/>
+              <entry key="globalViewLocked" value="false"/>
             </map>
             <node name="ArrayNameView">
               <map>
-                <entry key="face" value="Dialog"/>
-                <entry key="size" value="12"/>
+                <entry key="face" value="Dialog.plain"/>
+                <entry key="size" value="14"/>
               </map>
               <node name="ArraySummary">
                 <map>
@@ -2272,14 +2273,14 @@
             </node>
             <node name="GlobalXMap">
               <map>
-                <entry key="scale" value="0.4052828175026681"/>
-                <entry key="minScale" value="0.4052828175026681"/>
+                <entry key="scale" value="0.39674493062966915"/>
+                <entry key="minScale" value="0.39674493062966915"/>
                 <entry key="XScrollValue" value="0"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="0.4052828175026681"/>
+                  <entry key="scale" value="0.39674493062966915"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -2290,14 +2291,14 @@
             </node>
             <node name="GlobalYMap">
               <map>
-                <entry key="scale" value="0.2537313432835821"/>
-                <entry key="minScale" value="0.2537313432835821"/>
+                <entry key="scale" value="0.24581175753883644"/>
+                <entry key="minScale" value="0.24581175753883644"/>
                 <entry key="YScrollValue" value="0"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="0.2537313432835821"/>
+                  <entry key="scale" value="0.24581175753883644"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -2316,8 +2317,8 @@
             </node>
             <node name="TextView">
               <map>
-                <entry key="face" value="Dialog"/>
-                <entry key="size" value="12"/>
+                <entry key="face" value="Dialog.plain"/>
+                <entry key="size" value="14"/>
               </map>
               <node name="GeneSummary">
                 <map>

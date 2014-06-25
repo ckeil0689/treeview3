@@ -22,7 +22,6 @@
  */
 package edu.stanford.genetics.treeview;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -70,7 +69,7 @@ public abstract class ModelView extends JPanel implements Observer,
 	protected ModelView() {
 
 		super(false);
-		setBackground(GUIUtils.BG_COLOR);
+//		setBackground(GUIFactory.BG_COLOR);
 	}
 
 	/**
@@ -144,7 +143,7 @@ public abstract class ModelView extends JPanel implements Observer,
 		super.paintComponent(g);
 
 		final Rectangle clip = g.getClipBounds();
-		g.setColor(Color.white);
+		g.setColor(this.getBackground());
 		g.fillRect(clip.x, clip.y, clip.width, clip.height);
 
 		final Dimension reqSize = getSize();

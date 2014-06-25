@@ -52,7 +52,7 @@ import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 import net.miginfocom.swing.MigLayout;
 
 import edu.stanford.genetics.treeview.DummyHeaderInfo;
-import edu.stanford.genetics.treeview.GUIUtils;
+import edu.stanford.genetics.treeview.GUIFactory;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.NatField;
 import edu.stanford.genetics.treeview.SettingsPanel;
@@ -190,7 +190,7 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 			fontNames[Arrays.asList(fonts).indexOf(f)] = f.getName();
 		}
 
-		font_choice = GUIUtils.setComboLayout(fontNames);
+		font_choice = GUIFactory.setComboLayout(fontNames);
 		font_choice.setEditable(true);
 		AutoCompleteDecorator.decorate(font_choice);
 		font_choice.setSelectedItem(client.getFace());
@@ -199,7 +199,7 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 
 	private void setupStyleChoice() {
 
-		style_choice = GUIUtils.setComboLayout(styles);
+		style_choice = GUIFactory.setComboLayout(styles);
 		style_choice.setSelectedItem(decode_style(client.getStyle()));
 		style_choice.addActionListener(new SelectionListener());
 	}
@@ -226,7 +226,7 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 
 		removeAll();
 		setLayout(new MigLayout());
-		setBackground(GUIUtils.BG_COLOR);
+		setBackground(GUIFactory.BG_COLOR);
 
 		setupFontChoice();
 		add(font_choice, "span, wrap");
@@ -240,7 +240,7 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 		add(size_field, "span, wrap");
 		
 		exampleField = new JLabel("Font Example Text");
-		exampleField.setForeground(GUIUtils.TEXT);
+		exampleField.setForeground(GUIFactory.TEXT);
 		add(exampleField, "pushx, alignx 50%, span");
 	}
 
@@ -262,7 +262,7 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 		ButtonPanel(final Window w) {
 
 			final Window window = w;
-			final JButton close_button = GUIUtils.setButtonLayout("Close", 
+			final JButton close_button = GUIFactory.setButtonLayout("Close", 
 					null);
 			close_button.addActionListener(new ActionListener() {
 

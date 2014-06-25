@@ -1,15 +1,13 @@
 package Views;
 
-import java.awt.Font;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import net.miginfocom.swing.MigLayout;
-import edu.stanford.genetics.treeview.GUIUtils;
-import edu.stanford.genetics.treeview.TreeViewFrame;
+import edu.stanford.genetics.treeview.GUIFactory;
+import edu.stanford.genetics.treeview.StringRes;
 
 /**
  * A class which prepares JPanels to display in case of errors during the data
@@ -47,46 +45,31 @@ public class LoadErrorView {
 	 */
 	public void setupMainPanel() {
 
-		homePanel = new JPanel();
-		homePanel.setLayout(new MigLayout("ins 0"));
-		homePanel.setBackground(GUIUtils.BG_COLOR);
+		homePanel = GUIFactory.createJPanel(false, false, null);
 
-		JPanel title_bg;
+		JPanel title_bg = GUIFactory.createJPanel(false, false, null);
 
-		title_bg = new JPanel();
-		title_bg.setLayout(new MigLayout());
-		title_bg.setBackground(GUIUtils.MAIN);
-
-		JLabel jl = new JLabel("Oh oh!");
-		jl.setFont(new Font("Sans Serif", Font.BOLD, 50));
-		jl.setForeground(GUIUtils.BG_COLOR);
+		JLabel jl = GUIFactory.createXXLLabel(StringRes.loading_Ohoh);
 
 		title_bg.add(jl, "push, alignx 50%, span");
 
 		homePanel.add(title_bg, "pushx, growx, alignx 50%, span, "
 				+ "height 20%::, wrap");
 		
-		errorPanel = new JPanel();
-		errorPanel.setLayout(new MigLayout());
-		errorPanel.setOpaque(false);
+		errorPanel = GUIFactory.createJPanel(false, true, null);
 		
 		homePanel.add(errorPanel, "push, alignx 50%");
 		
-		loadNew = GUIUtils.setButtonLayout("Load New File", null);
+		loadNew = GUIFactory.setButtonLayout(StringRes.button_loadNewFile, 
+				null);
 	}
 
 	public JPanel makeErrorPanel() {
 
 		errorPanel.removeAll();
 		
-		JLabel errorLabel = new JLabel("Looks like we ran into the " +
-				"following issue: ");
-		errorLabel.setFont(GUIUtils.FONTL);
-		errorLabel.setForeground(GUIUtils.MAIN);
-
-		JLabel message = new JLabel(errorMessage);
-		message.setFont(GUIUtils.FONTS);
-		message.setForeground(GUIUtils.TEXT);
+		JLabel errorLabel = GUIFactory.createBigLabel(StringRes.loading_Error);
+		JLabel message = GUIFactory.createSmallLabel(errorMessage);
 
 		errorPanel.add(errorLabel, "pushx, alignx 50%, span, wrap");
 		errorPanel.add(message, "pushx, alignx 50%, span, wrap");

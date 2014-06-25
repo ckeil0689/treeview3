@@ -44,7 +44,7 @@ public class TreeDrawerNode {
 	private TreeDrawerNode left = null;
 	private TreeDrawerNode right = null;
 	private String id = null;
-	private Color color = GUIUtils.TEXT;
+	private Color color = GUIFactory.TEXT;
 
 	/**
 	 * Constructor for leaves.

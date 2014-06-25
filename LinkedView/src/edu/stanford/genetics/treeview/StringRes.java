@@ -41,6 +41,17 @@ public class StringRes {
 	// Main Words
 	public static final String main_rows = "Rows";
 	public static final String main_cols = "Columns";
+	
+	// Title Screen
+	public static final String title_Hello = "Hello! How are you Gentlepeople?";
+	public static final String title_Welcome = "Welcome to ";
+	
+	// Loading
+	public static final String loading_OneSec = "One moment, please.";
+	public static final String loading_active = "Loading you data!";
+	public static final String loading_Ohoh = "Oh oh!";
+	public static final String loading_Error = "Looks like we ran into the " +
+	"following issue: ";
 
 	// Menu Titles
 	public static final String menu_title_Open = "Open...";
@@ -87,6 +98,7 @@ public class StringRes {
 	public static final String button_showTrees = "Show trees";
 	public static final String button_hideTrees = "Hide trees";
 	public static final String button_toggleMatrixSize = "Change Matrix Size";
+	public static final String button_loadNewFile = "Load New File";
 	
 	// Icon Names
 	public static final String icon_home = "homeIcon";

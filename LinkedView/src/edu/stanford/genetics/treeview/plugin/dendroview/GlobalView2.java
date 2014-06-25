@@ -48,7 +48,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
 import net.miginfocom.swing.MigLayout;
-import edu.stanford.genetics.treeview.GUIUtils;
+import edu.stanford.genetics.treeview.GUIFactory;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -118,7 +118,7 @@ public class GlobalView2 extends ModelViewProduced implements
 		
 		panel = scrollPane;
 		panel.setBorder(BorderFactory.createEtchedBorder());
-		panel.setBackground(GUIUtils.ELEMENT_HOV);
+		panel.setBackground(GUIFactory.ELEMENT_HOV);
 
 		setToolTipText("This Turns Tooltips On");
 		
@@ -330,7 +330,7 @@ public class GlobalView2 extends ModelViewProduced implements
 
 		if (!offscreenValid) {
 			// clear the pallette...
-			g.setColor(GUIUtils.BG_COLOR);
+			g.setColor(GUIFactory.BG_COLOR);
 			g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
 			g.setColor(Color.black);
 
@@ -799,7 +799,7 @@ public class GlobalView2 extends ModelViewProduced implements
 
 		final Graphics g = getGraphics();
 		g.setXORMode(getBackground());
-		g.setColor(GUIUtils.MAIN);
+		g.setColor(GUIFactory.MAIN);
 
 		final int x = xmap.getPixel(l.x);
 		final int y = ymap.getPixel(l.y);

@@ -100,7 +100,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	private FileSet fileMenuSet;
 
 	// Menu Items
-	private ArrayList<JMenuItem> menuList;
 	private ArrayList<JMenuItem> stackMenuList;
 	private ArrayList<JMenuItem> fileMenuList;
 
@@ -151,9 +150,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		setWindowActive(true);
 
 		// Set up other stuff
-		backgroundPanel = GUIUtils.createJPanel(true, false, null);
-		menuPanel = GUIUtils.createJPanel(true, false, null);
-		waiting = GUIUtils.createJPanel(true, false, null);
+		backgroundPanel = GUIFactory.createJPanel(true, false, null);
+		menuPanel = GUIFactory.createJPanel(true, false, null);
+		waiting = GUIFactory.createJPanel(true, false, null);
 
 		// Add the main background panel to the contentPane
 		applicationFrame.getContentPane().add(backgroundPanel);
@@ -177,10 +176,10 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		// Since changing the theme resets the layout
 		if (savedTheme.equalsIgnoreCase("dark")) {
-			GUIUtils.setNight();
+			GUIFactory.setNight();
 
 		} else {
-			GUIUtils.setDayLight();
+			GUIFactory.setDayLight();
 		}
 
 		// Load FileMRU
@@ -225,9 +224,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 				view = loadErrorView.makeErrorPanel();
 
 			} else {
-				view = GUIUtils.createJPanel(false, false, null);
+				view = GUIFactory.createJPanel(false, false, null);
 
-				final JLabel error = GUIUtils.createBigLabel(
+				final JLabel error = GUIFactory.createBigLabel(
 						"No view could be loaded.");
 
 				view.add(error, "push, alignx 50%");
@@ -271,7 +270,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		backgroundPanel.removeAll();
 		waiting.removeAll();
 		
-		waiting.setBackground(GUIUtils.BG_COLOR);
+//		waiting.setBackground(GUIFactory.BG_COLOR);
 		waiting.add(view, "push, grow");
 
 		if(dendroView.isLoaded()) {
@@ -279,7 +278,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		}
 		
 		backgroundPanel.add(waiting, "push, grow");
-		backgroundPanel.setBackground(GUIUtils.BG_COLOR);
+//		backgroundPanel.setBackground(GUIFactory.BG_COLOR);
 		
 		backgroundPanel.revalidate();
 		backgroundPanel.repaint();
@@ -402,16 +401,16 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		final JDialog dialog = new JDialog(applicationFrame);
 
-		final Dimension screenSize = GUIUtils.getScreenSize();
+		final Dimension screenSize = GUIFactory.getScreenSize();
 		dialog.setSize(new Dimension(screenSize.width * 1 / 2,
 				screenSize.height * 1 / 2));
 
 		dialog.setLocationRelativeTo(applicationFrame);
 		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
-		final JPanel panel = GUIUtils.createJPanel(true, true, null);
+		final JPanel panel = GUIFactory.createJPanel(true, true, null);
 
-		final JLabel l1 = GUIUtils.createSmallLabel("Work in progress.");
+		final JLabel l1 = GUIFactory.createSmallLabel("Work in progress.");
 
 		panel.add(l1, "push, alignx 50%");
 		dialog.add(panel);
@@ -516,7 +515,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	public void buildMenu() {
 
 		menuPanel.removeAll();
-		menuPanel.setBackground(GUIUtils.BG_COLOR);
+//		menuPanel.setBackground(GUIFactory.BG_COLOR);
 		menuBar = new JMenuBar();
 		applicationFrame.setJMenuBar(menuBar);
 
@@ -689,7 +688,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 	public void generateSearchMenu() {
 
-		searchButton = GUIUtils.setMenuButtonLayout(
+		searchButton = GUIFactory.setMenuButtonLayout(
 				StringRes.button_searchLabels, null);
 		searchButton.setToolTipText(StringRes.tooltip_searchRowCol);
 
@@ -698,7 +697,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 	public void generateTreeMenu() {
 
-		treeButton = GUIUtils.setMenuButtonLayout(StringRes.button_showTrees, 
+		treeButton = GUIFactory.setMenuButtonLayout(StringRes.button_showTrees, 
 				null);
 		treeButton.setToolTipText(StringRes.tooltip_showTrees);
 
@@ -709,137 +708,137 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		menuPanel.add(treeButton);
 	}
 
-	/**
-	 * This method populates the Export Menu with MenuItems.
-	 * 
-	 * @param menubar2
-	 */
-	protected void populateExportMenu(final TreeviewMenuBarI menubar) {
+//	/**
+//	 * This method populates the Export Menu with MenuItems.
+//	 * 
+//	 * @param menubar2
+//	 */
+//	protected void populateExportMenu(final TreeviewMenuBarI menubar) {
+//
+//		/*
+//		 * MenuItem menuItem2 = new MenuItem("Export to Text File... ");
+//		 * menuItem2.addActionListener(new ActionListener() { public void
+//		 * actionPerformed(ActionEvent actiosnEvent) { ViewFrame viewFrame =
+//		 * TreeViewFrame.this; FileSet source = getDataModel().getFileSet();
+//		 * GeneListMaker t = new GeneListMaker(viewFrame, getGeneSelection(),
+//		 * getDataModel().getGeneHeaderInfo(), source.getDir()+source.getRoot()
+//		 * + ".txt"); t.setDataMatrix(getDataModel().getDataMatrix(),
+//		 * getDataModel().getArrayHeaderInfo(), DataModel.NODATA);
+//		 * t.bindConfig(getDataModel().getDocumentConfig()
+//		 * .getNode("GeneListMaker")); t.makeList(); } });
+//		 * exportMenu.add(menuItem2);
+//		 */
+//
+//		// Save List Menu
+//		final JMenuItem saveListMenuItem = (JMenuItem) menubar
+//				.addMenuItem("Save List");
+//		menubar.setMnemonic(KeyEvent.VK_L);
+//		menuList.add(saveListMenuItem);
+//
+//		// Save Data Menu
+//		final JMenuItem saveDataMenuItem = (JMenuItem) menubar
+//				.addMenuItem("Save Data");
+//		menubar.setMnemonic(KeyEvent.VK_D);
+//		menuList.add(saveDataMenuItem);
+//	}
 
-		/*
-		 * MenuItem menuItem2 = new MenuItem("Export to Text File... ");
-		 * menuItem2.addActionListener(new ActionListener() { public void
-		 * actionPerformed(ActionEvent actiosnEvent) { ViewFrame viewFrame =
-		 * TreeViewFrame.this; FileSet source = getDataModel().getFileSet();
-		 * GeneListMaker t = new GeneListMaker(viewFrame, getGeneSelection(),
-		 * getDataModel().getGeneHeaderInfo(), source.getDir()+source.getRoot()
-		 * + ".txt"); t.setDataMatrix(getDataModel().getDataMatrix(),
-		 * getDataModel().getArrayHeaderInfo(), DataModel.NODATA);
-		 * t.bindConfig(getDataModel().getDocumentConfig()
-		 * .getNode("GeneListMaker")); t.makeList(); } });
-		 * exportMenu.add(menuItem2);
-		 */
-
-		// Save List Menu
-		final JMenuItem saveListMenuItem = (JMenuItem) menubar
-				.addMenuItem("Save List");
-		menubar.setMnemonic(KeyEvent.VK_L);
-		menuList.add(saveListMenuItem);
-
-		// Save Data Menu
-		final JMenuItem saveDataMenuItem = (JMenuItem) menubar
-				.addMenuItem("Save Data");
-		menubar.setMnemonic(KeyEvent.VK_D);
-		menuList.add(saveDataMenuItem);
-	}
-
-	/**
-	 * Populates the HelpMenu with MenuItems and subMenus.
-	 * 
-	 * @param menubar
-	 */
-	private void populateHelpMenu(final TreeviewMenuBarI menubar) {
-
-		final JMenuItem aboutMenuItem = (JMenuItem) menubar
-				.addMenuItem("About...");
-		menuList.add(aboutMenuItem);
-		menubar.setMnemonic(KeyEvent.VK_A);
-
-		final JMenuItem logMenuItem = (JMenuItem) menubar
-				.addMenuItem("Show Log");
-		menuList.add(logMenuItem);
-		menubar.setMnemonic(KeyEvent.VK_M);
-
-		final JMenuItem documentMenuItem = (JMenuItem) menubar
-				.addMenuItem("Documentation...");
-		menuList.add(documentMenuItem);
-		menubar.setMnemonic(KeyEvent.VK_D);
-
-		menubar.addMenuItem("Plugins...");
-		// , new ActionListener() {
-		//
-		// @Override
-		// public void actionPerformed(final ActionEvent actionEvent) {
-		//
-		// displayPluginInfo();
-		// }
-		// });
-		menubar.setMnemonic(KeyEvent.VK_P);
-
-		menubar.addMenuItem("Registration...");
-		// , new ActionListener() {
-		//
-		// @Override
-		// public void actionPerformed(final ActionEvent actionEvent) {
-		//
-		// final ConfigNode node = treeView.getGlobalConfig().getNode(
-		// "Registration");
-		// if (node != null) {
-		// try {
-		// edu.stanford.genetics.treeview.reg.RegEngine
-		// .reverify(node);
-		// } catch (final Exception e) {
-		// LogBuffer.println("registration error " + e);
-		// e.printStackTrace();
-		// }
-		// }
-		// }
-		// });
-		menubar.setMnemonic(KeyEvent.VK_R);
-
-		final JMenuItem feedbackMenuItem = (JMenuItem) menubar
-				.addMenuItem("Feedback");
-		menuList.add(feedbackMenuItem);
-		menubar.setMnemonic(KeyEvent.VK_F);
-
-		// menubar.addSeparator();
-		//
-		// menubar.addMenuItem("Memory...");
-		// , new ActionListener() {
-		//
-		// @Override
-		// public void actionPerformed(final ActionEvent e) {
-		//
-		// final MemMonitor m = new MemMonitor();
-		// m.start();
-		// }
-		// });
-		// menubar.setMnemonic(KeyEvent.VK_M);
-		//
-		// menubar.addMenuItem("Threads...");
-		// , new ActionListener() {
-		//
-		// @Override
-		// public void actionPerformed(final ActionEvent e) {
-		//
-		// final ThreadListener t = new ThreadListener();
-		// t.start();
-		// }
-		// });
-		// menubar.setMnemonic(KeyEvent.VK_T);
-		//
-		// menubar.addMenuItem("Global Pref Info...");
-		// , new ActionListener() {
-		//
-		// @Override
-		// public void actionPerformed(final ActionEvent e) {
-		//
-		// final GlobalPrefInfo gpi = new GlobalPrefInfo(getApp());
-		// JOptionPane.showMessageDialog(null, gpi, "Global Pref Info...",
-		// JOptionPane.INFORMATION_MESSAGE);
-		// }
-		// });
-	}
+//	/**
+//	 * Populates the HelpMenu with MenuItems and subMenus.
+//	 * 
+//	 * @param menubar
+//	 */
+//	private void populateHelpMenu(final TreeviewMenuBarI menubar) {
+//
+//		final JMenuItem aboutMenuItem = (JMenuItem) menubar
+//				.addMenuItem("About...");
+//		menuList.add(aboutMenuItem);
+//		menubar.setMnemonic(KeyEvent.VK_A);
+//
+//		final JMenuItem logMenuItem = (JMenuItem) menubar
+//				.addMenuItem("Show Log");
+//		menuList.add(logMenuItem);
+//		menubar.setMnemonic(KeyEvent.VK_M);
+//
+//		final JMenuItem documentMenuItem = (JMenuItem) menubar
+//				.addMenuItem("Documentation...");
+//		menuList.add(documentMenuItem);
+//		menubar.setMnemonic(KeyEvent.VK_D);
+//
+//		menubar.addMenuItem("Plugins...");
+//		// , new ActionListener() {
+//		//
+//		// @Override
+//		// public void actionPerformed(final ActionEvent actionEvent) {
+//		//
+//		// displayPluginInfo();
+//		// }
+//		// });
+//		menubar.setMnemonic(KeyEvent.VK_P);
+//
+//		menubar.addMenuItem("Registration...");
+//		// , new ActionListener() {
+//		//
+//		// @Override
+//		// public void actionPerformed(final ActionEvent actionEvent) {
+//		//
+//		// final ConfigNode node = treeView.getGlobalConfig().getNode(
+//		// "Registration");
+//		// if (node != null) {
+//		// try {
+//		// edu.stanford.genetics.treeview.reg.RegEngine
+//		// .reverify(node);
+//		// } catch (final Exception e) {
+//		// LogBuffer.println("registration error " + e);
+//		// e.printStackTrace();
+//		// }
+//		// }
+//		// }
+//		// });
+//		menubar.setMnemonic(KeyEvent.VK_R);
+//
+//		final JMenuItem feedbackMenuItem = (JMenuItem) menubar
+//				.addMenuItem("Feedback");
+//		menuList.add(feedbackMenuItem);
+//		menubar.setMnemonic(KeyEvent.VK_F);
+//
+//		// menubar.addSeparator();
+//		//
+//		// menubar.addMenuItem("Memory...");
+//		// , new ActionListener() {
+//		//
+//		// @Override
+//		// public void actionPerformed(final ActionEvent e) {
+//		//
+//		// final MemMonitor m = new MemMonitor();
+//		// m.start();
+//		// }
+//		// });
+//		// menubar.setMnemonic(KeyEvent.VK_M);
+//		//
+//		// menubar.addMenuItem("Threads...");
+//		// , new ActionListener() {
+//		//
+//		// @Override
+//		// public void actionPerformed(final ActionEvent e) {
+//		//
+//		// final ThreadListener t = new ThreadListener();
+//		// t.start();
+//		// }
+//		// });
+//		// menubar.setMnemonic(KeyEvent.VK_T);
+//		//
+//		// menubar.addMenuItem("Global Pref Info...");
+//		// , new ActionListener() {
+//		//
+//		// @Override
+//		// public void actionPerformed(final ActionEvent e) {
+//		//
+//		// final GlobalPrefInfo gpi = new GlobalPrefInfo(getApp());
+//		// JOptionPane.showMessageDialog(null, gpi, "Global Pref Info...",
+//		// JOptionPane.INFORMATION_MESSAGE);
+//		// }
+//		// });
+//	}
 
 	// Various Methods
 	/**
@@ -855,9 +854,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		dialog.setModalityType(JDialog.DEFAULT_MODALITY_TYPE);
 
-		final JPanel panel = GUIUtils.createJPanel(true, true, null);
+		final JPanel panel = GUIFactory.createJPanel(true, true, null);
 
-		final JButton button = GUIUtils.setButtonLayout("OK", null);
+		final JButton button = GUIFactory.setButtonLayout("OK", null);
 		button.addActionListener(new ActionListener() {
 
 			@Override
@@ -867,16 +866,16 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		});
 
 		if (writerEmpty) {
-			final JLabel l1 = GUIUtils.createSmallLabel(
+			final JLabel l1 = GUIFactory.createSmallLabel(
 					"No Model changes were written.");
 
-			final JLabel l2 = GUIUtils.createSmallLabel("Only the "
+			final JLabel l2 = GUIFactory.createSmallLabel("Only the "
 					+ "following changes require explicit saving: ");
 
-			final JLabel l3 = GUIUtils.createSmallLabel("- Tree Node flips "
+			final JLabel l3 = GUIFactory.createSmallLabel("- Tree Node flips "
 					+ "(Analysis->Flip Array/Gene Tree Node)");
 
-			final JLabel l4 = GUIUtils.createSmallLabel("- Tree Node "
+			final JLabel l4 = GUIFactory.createSmallLabel("- Tree Node "
 					+ "Annotations (Analysis->Array/Gene TreeAnno)");
 
 			panel.add(l1, "pushx, wrap");
@@ -888,7 +887,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 			dialog.add(panel);
 
 		} else {
-			final JLabel l1 = GUIUtils.createSmallLabel(msg);
+			final JLabel l1 = GUIFactory.createSmallLabel(msg);
 
 			panel.add(l1, "pushx, wrap");
 			panel.add(button, "pushx, alignx 50%");

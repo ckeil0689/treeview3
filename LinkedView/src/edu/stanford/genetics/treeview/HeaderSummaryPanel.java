@@ -56,13 +56,13 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 		setOpaque(false);
 
 		final JLabel label = new JLabel("Select headers to display:");
-		label.setFont(GUIUtils.FONTS);
-		label.setForeground(GUIUtils.TEXT);
+		label.setFont(GUIFactory.FONTS);
+		label.setForeground(GUIFactory.TEXT);
 		add(label, "span, wrap");
 
 		setHeaderList(headerInfo.getNames());
 		headerList.setVisibleRowCount(5);
-		headerList.setFont(GUIUtils.FONTS);
+		headerList.setFont(GUIFactory.FONTS);
 		add(new JScrollPane(getHeaderList()), "push, grow, wrap");
 
 		final ListSelectionListener tmp = new ListSelectionListener() {

@@ -37,7 +37,7 @@ public class AboutDialog {
 		aboutDialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
 		aboutDialog.setResizable(false);
 
-		final Dimension mainDim = GUIUtils.getScreenSize();
+		final Dimension mainDim = GUIFactory.getScreenSize();
 
 		aboutDialog.setSize(mainDim.width * 1 / 2, mainDim.height * 1 / 2);
 
@@ -62,29 +62,29 @@ public class AboutDialog {
 
 		final JPanel message = new JPanel();
 		message.setLayout(new MigLayout());
-		message.setBackground(GUIUtils.BG_COLOR);
+		message.setBackground(GUIFactory.BG_COLOR);
 
 		final JLabel text = new JLabel(StringRes.appName
 				+ " was created by Chris Keil based on Alok Saldhana's "
 				+ "Java TreeView.");
-		text.setFont(GUIUtils.FONTS);
-		text.setForeground(GUIUtils.TEXT);
+		text.setFont(GUIFactory.FONTS);
+		text.setForeground(GUIFactory.TEXT);
 
 		final JLabel version = new JLabel("Version: " + StringRes.versionTag);
-		version.setFont(GUIUtils.FONTS);
-		version.setForeground(GUIUtils.TEXT);
+		version.setFont(GUIFactory.FONTS);
+		version.setForeground(GUIFactory.TEXT);
 
 		message.add(text, "span, wrap");
 		message.add(version, "span, wrap");
 
 		final JLabel hp = new JLabel("Homepage");
-		hp.setFont(GUIUtils.FONTS);
-		hp.setForeground(GUIUtils.TEXT);
+		hp.setFont(GUIFactory.FONTS);
+		hp.setForeground(GUIFactory.TEXT);
 
 		message.add(hp);
 		message.add(new JTextField(StringRes.updateUrl));
 
-		JButton yesB = GUIUtils.setButtonLayout("Open", null);
+		JButton yesB = GUIFactory.setButtonLayout("Open", null);
 		yesB.addActionListener(new ActionListener() {
 
 			@Override
@@ -97,13 +97,13 @@ public class AboutDialog {
 		message.add(yesB, "wrap");
 
 		final JLabel announce = new JLabel("Announcements");
-		announce.setFont(GUIUtils.FONTS);
-		announce.setForeground(GUIUtils.TEXT);
+		announce.setFont(GUIFactory.FONTS);
+		announce.setForeground(GUIFactory.TEXT);
 
 		message.add(announce);
 		message.add(new JTextField(StringRes.announcementUrl));
 
-		yesB = GUIUtils.setButtonLayout("Sign Up", null);
+		yesB = GUIFactory.setButtonLayout("Sign Up", null);
 		yesB.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent arg0) {

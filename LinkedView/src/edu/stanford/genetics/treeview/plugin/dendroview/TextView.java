@@ -45,7 +45,7 @@ import javax.swing.ScrollPaneConstants;
 
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
-import edu.stanford.genetics.treeview.GUIUtils;
+import edu.stanford.genetics.treeview.GUIFactory;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -105,9 +105,7 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 		addMouseMotionListener(this);
 		addKeyListener(this);
 
-		l1 = new JLabel();
-		l1.setFont(GUIUtils.FONTS);
-		l1.setForeground(GUIUtils.TEXT);
+		l1 = GUIFactory.createSmallLabel("");
 		add(l1, "alignx 0%, aligny 50%, push, wrap");
 
 		scrollPane = new JScrollPane(this,
@@ -146,7 +144,7 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 	 */
 	public void setColors() {
 		
-		l1.setForeground(GUIUtils.TEXT);
+		l1.setForeground(GUIFactory.TEXT);
 	}
 
 	@Override
@@ -171,9 +169,9 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 
 	public void updateBuffer(final Graphics g, final Dimension offscreenSize) {
 
-		g.setColor(GUIUtils.BG_COLOR);
+		g.setColor(this.getBackground());
 		g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
-		g.setColor(GUIUtils.TEXT);
+		g.setColor(GUIFactory.TEXT);
 
 		// clear the pallette...
 		if (map.getScale() > 12.0) {
@@ -231,7 +229,7 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 					}
 
 					if (out != null) {
-						final Color fore = GUIUtils.MAIN; // g.getColor();
+						final Color fore = GUIFactory.MAIN; // g.getColor();
 						if ((geneSelection == null)
 								|| geneSelection.isIndexSelected(j)) {
 							final String[] strings = headerInfo.getHeader(j);
@@ -254,7 +252,7 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 								g.setColor(fore);
 							}
 						} else {
-							g.setColor(GUIUtils.TEXT);
+							g.setColor(GUIFactory.TEXT);
 							// right-aligned text
 							g.drawString(
 									out,

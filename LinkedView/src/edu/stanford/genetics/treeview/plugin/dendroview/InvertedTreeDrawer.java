@@ -27,7 +27,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.util.Stack;
 
-import edu.stanford.genetics.treeview.GUIUtils;
+import edu.stanford.genetics.treeview.GUIFactory;
 import edu.stanford.genetics.treeview.LinearTransformation;
 import edu.stanford.genetics.treeview.TreeDrawerNode;
 
@@ -121,7 +121,7 @@ public class InvertedTreeDrawer extends TreeDrawer {
 	 */
 	class NodeDrawer {
 
-		private final Color sel_color = GUIUtils.MAIN;
+		private final Color sel_color = GUIFactory.MAIN;
 		private final Graphics graphics;
 		private final TreeDrawerNode selected;
 		private final LinearTransformation xT, yT;

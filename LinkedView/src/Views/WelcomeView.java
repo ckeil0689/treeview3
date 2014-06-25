@@ -1,6 +1,5 @@
 package Views;
 
-import java.awt.Font;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
@@ -8,8 +7,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
-import net.miginfocom.swing.MigLayout;
-import edu.stanford.genetics.treeview.GUIUtils;
+import edu.stanford.genetics.treeview.GUIFactory;
 import edu.stanford.genetics.treeview.StringRes;
 
 public class WelcomeView {
@@ -31,24 +29,19 @@ public class WelcomeView {
 
 	public WelcomeView() {
 
-		homePanel = new JPanel();
-		homePanel.setLayout(new MigLayout("ins 0"));
+		homePanel = GUIFactory.createJPanel(false, false, null);
 
-		title_bg = new JPanel();
-		title_bg.setLayout(new MigLayout());
+		title_bg = GUIFactory.createJPanel(true, true, null);
 
-		jl = new JLabel("Hello! How are you Gentlepeople?");
-		jl.setFont(new Font("Sans Serif", Font.PLAIN, 30));
+		jl = GUIFactory.createXXLLabel(StringRes.title_Hello);
 
-		jl2 = new JLabel("Welcome to " + StringRes.appName);
-		jl2.setFont(new Font("Sans Serif", Font.BOLD, 50));
+		jl2 = GUIFactory.createXXLLabel(StringRes.title_Welcome 
+				+ StringRes.appName);
 
 		title_bg.add(jl, "push, alignx 50%, span, wrap");
 		title_bg.add(jl2, "push, alignx 50%, span");
 		
-		loadPanel = new JPanel();
-		loadPanel.setLayout(new MigLayout());
-		loadPanel.setOpaque(false);
+		loadPanel = GUIFactory.createJPanel(false, true, null);
 		
 		homePanel.add(title_bg, "pushx, growx, alignx 50%, span, "
 				+ "height 20%::, wrap");
@@ -97,14 +90,14 @@ public class WelcomeView {
 
 		loadPanel.removeAll();
 
-		loadButton = GUIUtils.setLargeButtonLayout("Open...");
+		loadButton = GUIFactory.setLargeButtonLayout("Open...");
 		loadPanel.add(loadButton, "push, alignx 50%");
 
 		// Set the colors
-		homePanel.setBackground(GUIUtils.BG_COLOR);
-		title_bg.setBackground(GUIUtils.MAIN);
-		jl.setForeground(GUIUtils.BG_COLOR);
-		jl2.setForeground(GUIUtils.BG_COLOR);
+//		homePanel.setBackground(GUIFactory.BG_COLOR);
+//		title_bg.setBackground(GUIFactory.MAIN);
+//		jl.setForeground(GUIFactory.BG_COLOR);
+//		jl2.setForeground(GUIFactory.BG_COLOR);
 		
 		homePanel.revalidate();
 		homePanel.repaint();
@@ -118,14 +111,12 @@ public class WelcomeView {
 
 		loadPanel.removeAll();
 
-		jl.setText("One moment, please.");
-		jl2.setText("Loading you data!");
+		jl.setText(StringRes.loading_OneSec);
+		jl2.setText(StringRes.loading_active);
 		
-		loadLabel = new JLabel();
-		loadLabel.setFont(GUIUtils.FONTL);
-		loadLabel.setForeground(GUIUtils.TEXT);
+		loadLabel = GUIFactory.createBigLabel("");
 		
-		loadBar = GUIUtils.setPBarLayout();
+		loadBar = GUIFactory.setPBarLayout();
 
 		loadPanel.add(loadLabel, "push, alignx 50%, aligny 100%, wrap");
 		loadPanel.add(loadBar, "push, w 70%, alignx 50%, aligny 0%");

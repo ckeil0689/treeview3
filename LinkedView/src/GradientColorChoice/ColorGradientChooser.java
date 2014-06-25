@@ -33,7 +33,7 @@ import javax.swing.WindowConstants;
 
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
-import edu.stanford.genetics.treeview.GUIUtils;
+import edu.stanford.genetics.treeview.GUIFactory;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor2;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractorEditor2;
@@ -89,28 +89,28 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new MigLayout());
-		mainPanel.setBackground(GUIUtils.MENU);
+		mainPanel.setBackground(GUIFactory.MENU);
 		mainPanel.setBorder(BorderFactory.createEtchedBorder());
 
 		final JLabel hint = new JLabel(
 				"Move or add sliders to adjust color scheme.");
-		hint.setForeground(GUIUtils.DARKGRAY);
-		hint.setFont(GUIUtils.FONTS);
+		hint.setForeground(GUIFactory.DARKGRAY);
+		hint.setFont(GUIFactory.FONTS);
 
 		colorList = new ArrayList<Color>();
 		thumbList = new ArrayList<Thumb>();
 
 		gradientBox = new GradientBox();
 
-		addButton = GUIUtils.setButtonLayout("Add Color", null);
-		removeButton = GUIUtils.setButtonLayout("Remove Selected", null);
+		addButton = GUIFactory.setButtonLayout("Add Color", null);
+		removeButton = GUIFactory.setButtonLayout("Remove Selected", null);
 		// saveButton = GUIParams.setButtonLayout("Save Colors", null);
 
 		colorButtonGroup = new ButtonGroup();
 
-		redGreenButton = GUIUtils.setRadioButtonLayout("Red-Green");
-		yellowBlueButton = GUIUtils.setRadioButtonLayout("Yellow-Blue");
-		customColorButton = GUIUtils.setRadioButtonLayout("Custom Colors");
+		redGreenButton = GUIFactory.setRadioButtonLayout("Red-Green");
+		yellowBlueButton = GUIFactory.setRadioButtonLayout("Yellow-Blue");
+		customColorButton = GUIFactory.setRadioButtonLayout("Custom Colors");
 
 		colorButtonGroup.add(redGreenButton);
 		colorButtonGroup.add(yellowBlueButton);
@@ -121,8 +121,8 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 		radioButtonPanel.setOpaque(false);
 
 		final JLabel colorHint = new JLabel("Choose a Color Scheme:");
-		colorHint.setFont(GUIUtils.FONTS);
-		colorHint.setForeground(GUIUtils.DARKGRAY);
+		colorHint.setFont(GUIFactory.FONTS);
+		colorHint.setForeground(GUIFactory.DARKGRAY);
 
 		radioButtonPanel.add(colorHint, "span, wrap");
 		radioButtonPanel.add(redGreenButton, "span, wrap");
@@ -272,7 +272,7 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 		public void drawThumbBox(final Graphics2D g2) {
 
 			// Fill thumbRect with background color
-			g2.setColor(GUIUtils.MENU);
+			g2.setColor(GUIFactory.MENU);
 			g2.fill(thumbRect);
 
 			// Paint the thumbs
@@ -284,11 +284,11 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 
 		public void drawNumBox(final Graphics2D g2) {
 
-			g2.setColor(GUIUtils.MENU);
+			g2.setColor(GUIFactory.MENU);
 			g2.fill(numRect);
 
 			g2.setColor(Color.black);
-			g2.setFont(GUIUtils.FONTS);
+			g2.setFont(GUIFactory.FONTS);
 
 			// Paint the thumbs
 			if (thumbList.size() == fractions.length) {
@@ -775,13 +775,13 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 					positionInputDialog.setTitle("New Position");
 
 					final JLabel enterPrompt = new JLabel("Enter data value: ");
-					enterPrompt.setForeground(GUIUtils.TEXT);
-					enterPrompt.setFont(GUIUtils.FONTS);
+					enterPrompt.setForeground(GUIFactory.TEXT);
+					enterPrompt.setFont(GUIFactory.FONTS);
 
 					final JTextField inputField = new JTextField();
 					inputField.setEditable(true);
 
-					final JButton okButton = GUIUtils.setButtonLayout("OK",
+					final JButton okButton = GUIFactory.setButtonLayout("OK",
 							null);
 					okButton.addActionListener(new ActionListener() {
 
@@ -818,7 +818,7 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 
 					final JPanel panel = new JPanel();
 					panel.setLayout(new MigLayout());
-					panel.setBackground(GUIUtils.BG_COLOR);
+					panel.setBackground(GUIFactory.BG_COLOR);
 
 					panel.add(enterPrompt, "push, span, wrap");
 					panel.add(inputField, "push, growx, span, wrap");

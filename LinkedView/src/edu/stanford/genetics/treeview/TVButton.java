@@ -35,12 +35,12 @@ public class TVButton extends JButton {
 		
 		if(getModel().isRollover()) {
 			g2.setPaint(new GradientPaint(new Point(0, 0), 
-					GUIUtils.BUTTON_DARK, new Point(0, getHeight()), 
-					GUIUtils.MAIN));
+					GUIFactory.BUTTON_DARK, new Point(0, getHeight()), 
+					GUIFactory.MAIN));
 			
 		} else {
-			g2.setPaint(new GradientPaint(new Point(0, 0), GUIUtils.MAIN, 
-					new Point(0, getHeight()), GUIUtils.BUTTON_DARK));
+			g2.setPaint(new GradientPaint(new Point(0, 0), GUIFactory.MAIN, 
+					new Point(0, getHeight()), GUIFactory.BUTTON_DARK));
 		}
 		g2.fillRect(0, 0, getWidth(), getHeight());
 		g2.fillRect(0, 0, getWidth(), getHeight());
@@ -59,13 +59,13 @@ public class TVButton extends JButton {
         		RenderingHints.VALUE_ANTIALIAS_ON);
 		
 		if(getModel().isPressed()) {
-	        g2.setColor(GUIUtils.BUTTON_BORDER_PRESS);
+	        g2.setColor(GUIFactory.BUTTON_BORDER_PRESS);
 	       
 		} else if(getModel().isRollover()) {
-			g2.setColor(GUIUtils.BUTTON_BORDER_ROLL);
+			g2.setColor(GUIFactory.BUTTON_BORDER_ROLL);
 			
 		} else {
-			g2.setColor(GUIUtils.MAIN);
+			g2.setColor(GUIFactory.MAIN);
 		}
 		
 	    g2.setStroke(new BasicStroke(BORDERSIZE, BasicStroke.CAP_ROUND, 

@@ -55,7 +55,7 @@ public class ModelessSettingsDialog extends JDialog {
 		inner.setLayout(new MigLayout());
 		inner.add((JPanel) panel, "push, grow, wrap");
 		inner.add(new ButtonPanel(), "pushx, growx, alignx 50%");
-		inner.setBackground(GUIUtils.BG_COLOR);
+		inner.setBackground(GUIFactory.BG_COLOR);
 
 		getContentPane().add(inner);
 	}
@@ -73,9 +73,9 @@ public class ModelessSettingsDialog extends JDialog {
 
 		public ButtonPanel() {
 
-			this.setBackground(GUIUtils.BG_COLOR);
+			this.setBackground(GUIFactory.BG_COLOR);
 
-			final JButton close_button = GUIUtils.setButtonLayout("Close",
+			final JButton close_button = GUIFactory.setButtonLayout("Close",
 					null);
 			close_button.addActionListener(new ActionListener() {
 
@@ -88,7 +88,7 @@ public class ModelessSettingsDialog extends JDialog {
 			});
 			add(close_button);
 
-			final JButton cancel_button = GUIUtils.setButtonLayout("Cancel",
+			final JButton cancel_button = GUIFactory.setButtonLayout("Cancel",
 					null);
 			cancel_button.addActionListener(new ActionListener() {
 

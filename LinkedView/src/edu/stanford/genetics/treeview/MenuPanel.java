@@ -17,11 +17,11 @@ public class MenuPanel {
 
 		menuPanel = new JPanel();
 		menuPanel.setLayout(new MigLayout());
-		menuPanel.setBackground(GUIUtils.BG_COLOR);
+		menuPanel.setBackground(GUIFactory.BG_COLOR);
 
 		label = new JLabel(title);
-		label.setFont(GUIUtils.FONTS);
-		label.setForeground(GUIUtils.TEXT);
+		label.setFont(GUIFactory.FONTS);
+		label.setForeground(GUIFactory.TEXT);
 
 		menuPanel.add(label, "push");
 	}
@@ -36,10 +36,10 @@ public class MenuPanel {
 		this.selected = selected;
 
 		if (selected) {
-			label.setForeground(GUIUtils.MAIN);
+			label.setForeground(GUIFactory.MAIN);
 
 		} else {
-			label.setForeground(GUIUtils.TEXT);
+			label.setForeground(GUIFactory.TEXT);
 		}
 
 		menuPanel.repaint();
@@ -53,12 +53,12 @@ public class MenuPanel {
 	public void setHover(final boolean hover) {
 
 		if (hover) {
-			label.setForeground(GUIUtils.MAIN);
+			label.setForeground(GUIFactory.MAIN);
 			menuPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
 		} else {
 			if (!selected) {
-				label.setForeground(GUIUtils.TEXT);
+				label.setForeground(GUIFactory.TEXT);
 			}
 			menuPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 		}

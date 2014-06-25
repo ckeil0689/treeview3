@@ -26,14 +26,14 @@ public class ExitConfirmDialog {
 
 		final JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new MigLayout());
-		mainPanel.setBackground(GUIUtils.BG_COLOR);
+		mainPanel.setBackground(GUIFactory.BG_COLOR);
 
 		final JLabel prompt = new JLabel(
 				"Are you sure you want to close TreeView?");
-		prompt.setForeground(GUIUtils.TEXT);
-		prompt.setFont(GUIUtils.FONTS);
+		prompt.setForeground(GUIFactory.TEXT);
+		prompt.setFont(GUIFactory.FONTS);
 
-		final JButton ok = GUIUtils.setButtonLayout("Yes", null);
+		final JButton ok = GUIFactory.setButtonLayout("Yes", null);
 		ok.addActionListener(new ActionListener() {
 
 			@Override

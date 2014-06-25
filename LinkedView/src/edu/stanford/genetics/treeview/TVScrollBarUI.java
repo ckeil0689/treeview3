@@ -26,7 +26,7 @@ public class TVScrollBarUI extends BasicScrollBarUI {
     @Override
     protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {
         
-    	g.setColor(GUIUtils.SCROLL_BG);
+    	g.setColor(GUIFactory.SCROLL_BG);
     	g.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, 
     			trackBounds.height);
     }
@@ -37,7 +37,7 @@ public class TVScrollBarUI extends BasicScrollBarUI {
     	Graphics2D g2d = (Graphics2D)g;
     	g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
                 RenderingHints.VALUE_ANTIALIAS_ON);
-    	g2d.setColor(GUIUtils.MAIN);
+    	g2d.setColor(GUIFactory.MAIN);
     	g2d.fillRect(thumbBounds.x, thumbBounds.y, thumbBounds.width, 
     			thumbBounds.height);
     }

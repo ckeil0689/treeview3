@@ -99,7 +99,7 @@ public class PreferencesMenu {
 		basisPanel.setLayout(new MigLayout());
 
 		// Setting preferred size for the ContentPane of this frame
-		final Dimension mainDim = GUIUtils.getScreenSize();
+		final Dimension mainDim = GUIFactory.getScreenSize();
 
 		final int width = mainDim.width * 1 / 2;
 		final int height = mainDim.height * 1 / 2;
@@ -246,7 +246,7 @@ public class PreferencesMenu {
 //
 //		basisPanel.add(leftPanel, "pushy, aligny 0%, w 20%, " + "h 75%");
 
-		ok_button = GUIUtils.setButtonLayout(StringRes.button_OK, null);
+		ok_button = GUIFactory.setButtonLayout(StringRes.button_OK, null);
 
 		addMenu(startMenu);
 
@@ -334,7 +334,7 @@ public class PreferencesMenu {
 
 			final JPanel panel = new JPanel();
 			panel.setLayout(new MigLayout());
-			panel.setBackground(GUIUtils.BG_COLOR);
+			panel.setBackground(GUIFactory.BG_COLOR);
 
 			// try {
 			// ce = ((DoubleArrayDrawer) dendroController.getArrayDrawer())
@@ -373,12 +373,12 @@ public class PreferencesMenu {
 
 			final JPanel panel = new JPanel();
 			panel.setLayout(new MigLayout());
-			panel.setBackground(GUIUtils.BG_COLOR);
+			panel.setBackground(GUIFactory.BG_COLOR);
 
 			final FontSettings fontSettings = new FontSettings(
 					dendroView.getTextview(), dendroView.getArraynameview());
 
-			final JLabel labelFont = GUIUtils.setupHeader("Set Label Font:");
+			final JLabel labelFont = GUIFactory.setupHeader("Set Label Font:");
 
 			panel.add(labelFont, "span, wrap");
 			panel.add(fontSettings.makeFontPanel(), "pushx, alignx 50%, w 95%");
@@ -405,7 +405,7 @@ public class PreferencesMenu {
 
 			final JPanel panel = new JPanel();
 			panel.setLayout(new MigLayout());
-			panel.setBackground(GUIUtils.BG_COLOR);
+			panel.setBackground(GUIFactory.BG_COLOR);
 
 			final UrlSettingsPanel genePanel = new UrlSettingsPanel(
 					tvFrame.getUrlExtractor(), tvFrame.getGeneUrlPresets());
@@ -447,17 +447,17 @@ public class PreferencesMenu {
 
 			final JPanel panel = new JPanel();
 			panel.setLayout(new MigLayout());
-			panel.setBackground(GUIUtils.BG_COLOR);
+			panel.setBackground(GUIFactory.BG_COLOR);
 
 			final JLabel label = new JLabel("Choose a Theme:");
-			label.setForeground(GUIUtils.MAIN);
-			label.setFont(GUIUtils.FONTL);
+			label.setForeground(GUIFactory.MAIN);
+			label.setFont(GUIFactory.FONTL);
 
 			panel.add(label, "span, wrap");
 
-			darkThemeButton = GUIUtils
+			darkThemeButton = GUIFactory
 					.setRadioButtonLayout(StringRes.rButton_dark);
-			lightThemeButton = GUIUtils
+			lightThemeButton = GUIFactory
 					.setRadioButtonLayout(StringRes.rButton_light);
 
 			themeButtonGroup = new ButtonGroup();
@@ -518,7 +518,7 @@ public class PreferencesMenu {
 
 			final JPanel panel = new JPanel();
 			panel.setLayout(new MigLayout());
-			panel.setBackground(GUIUtils.BG_COLOR);
+			panel.setBackground(GUIFactory.BG_COLOR);
 
 			genePanel = new HeaderSummaryPanel(tvFrame.getDataModel()
 					.getGeneHeaderInfo(), dendroView.getTextview()
@@ -533,11 +533,11 @@ public class PreferencesMenu {
 			loadLabelPanel.setOpaque(false);
 			loadLabelPanel.setBorder(BorderFactory.createEtchedBorder());
 
-			custom_button = GUIUtils.setButtonLayout(
+			custom_button = GUIFactory.setButtonLayout(
 					StringRes.button_customLabels, null);
 
-			final JLabel rows = GUIUtils.setupHeader(StringRes.main_rows);
-			final JLabel cols = GUIUtils.setupHeader(StringRes.main_cols);
+			final JLabel rows = GUIFactory.setupHeader(StringRes.main_rows);
+			final JLabel cols = GUIFactory.setupHeader(StringRes.main_cols);
 
 			panel.add(rows, "pushx, alignx 50%");
 			panel.add(cols, "pushx, alignx 50%, wrap");
@@ -615,12 +615,12 @@ public class PreferencesMenu {
 			// In case menu cannot be loaded, display excuse.
 			final JPanel panel = new JPanel();
 			panel.setLayout(new MigLayout());
-			panel.setBackground(GUIUtils.BG_COLOR);
+			panel.setBackground(GUIFactory.BG_COLOR);
 
 			final JLabel hint = new JLabel("Menu cannot be shown because it "
 					+ "wasn't loaded.");
-			hint.setFont(GUIUtils.FONTS);
-			hint.setForeground(GUIUtils.TEXT);
+			hint.setFont(GUIFactory.FONTS);
+			hint.setForeground(GUIFactory.TEXT);
 			panel.add(hint, "push, alignx 50%");
 
 			basisPanel.add(panel, "w 79%, h 95%, wrap");
