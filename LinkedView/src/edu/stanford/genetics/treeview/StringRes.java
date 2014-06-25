@@ -24,6 +24,9 @@ public class StringRes {
 			+ "~abarysh/treeview/";
 
 	public static final String appName = "TreeView 3";
+	
+	// General
+	public static final String empty = "";
 
 	// View Names
 	public static final String view_Welcome = "WelcomeView";
@@ -83,6 +86,13 @@ public class StringRes {
 	public static final String button_searchLabels = "Search labels";
 	public static final String button_showTrees = "Show trees";
 	public static final String button_hideTrees = "Hide trees";
+	public static final String button_toggleMatrixSize = "Change Matrix Size";
+	
+	// Icon Names
+	public static final String icon_home = "homeIcon";
+	public static final String icon_zoomIn = "zoomInIcon";
+	public static final String icon_zoomOut = "zoomOutIcon";
+	public static final String icon_zoomAll = "fullscreenIcon";
 	
 	// Tooltips
 	public static final String tooltip_searchRowCol = "Find row " +
@@ -106,6 +116,17 @@ public class StringRes {
 
 	// Cluster Options
 	public static final String cluster_DoNot = "Do not cluster";
+	public static final String cluster_pearsonUn = "Pearson "
+			+ "Correlation (uncentered)";
+	public static final String cluster_pearsonCentered = "Pearson "
+			+ "Correlation (centered)";
+	public static final String cluster_absoluteUn = "Absolute "
+			+ "Correlation (uncentered)";
+	public static final String cluster_absoluteCentered = "Absolute "
+			+ "Correlation (centered)";
+	public static final String cluster_spearman = "Spearman Ranked Correlation";
+	public static final String cluster_euclidean = "Euclidean Distance";
+	public static final String cluster_cityBlock = "City Block Distance";
 	
 	// Cluster Info
 	public static final String clusterInfo_Single_Similarity = "Joins the " +
@@ -147,6 +168,18 @@ public class StringRes {
 	
 	// Cluster Info - Tip
 	public static final String clusterTip_Memory = "Memory tip.";
+	public static final String clusterTip_completed = "The file has been saved "
+			+ "in the original directory.";
+	public static final String clusterTip_filePath = "File Path: ";
+	
+	// Cluster Error - Hints
+	public static final String clusterError_tooQuick = "Woah, "
+			+ "that's too quick!";
+	public static final String clusterError_selectSimilarity = "Select at "
+			+ "least one similarity metric for either rows or columns "
+			+ "to begin clustering!";
+	public static final String clusterError_amount = "The amount of clusters "
+			+ "and iterations must be greater than 0.";
 
 	// Frame Title - Testing
 	public static final String test_title_FontSelector = "Font Settings Test";

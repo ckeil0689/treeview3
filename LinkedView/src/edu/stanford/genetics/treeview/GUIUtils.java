@@ -62,6 +62,7 @@ public class GUIUtils {
 		TEXT = new Color(20, 20, 20, 255);
 		MAIN = new Color(30, 144, 255, 255);
 		BUTTON_DARK = new Color(30, 110, 255, 255);
+		BUTTON_DARKEST = new Color(30, 90, 255, 255);
 		BUTTON_BORDER_PRESS = new Color(30, 115, 255, 255);
 		BUTTON_BORDER_ROLL = new Color(30, 175, 255, 255);
 		BORDERS = new Color(100, 100, 100, 255);
@@ -80,6 +81,7 @@ public class GUIUtils {
 		TEXT = new Color(200, 200, 200, 255);
 		MAIN = new Color(255, 200, 65, 255);
 		BUTTON_DARK = new Color(255, 180, 45, 255);
+		BUTTON_DARKEST = new Color(200, 145, 35, 255);
 		BUTTON_BORDER_PRESS = new Color(185, 145, 45, 255);
 		BUTTON_BORDER_ROLL = new Color(255, 205, 65, 255);
 		BORDERS = new Color(200, 200, 200, 255);
@@ -154,7 +156,7 @@ public class GUIUtils {
 		
 		JLabel label = new JLabel(text);
 		label.setFont(FONTL);
-		label.setForeground(TEXT);
+		label.setForeground(MAIN);
 		
 		return label;
 	}
@@ -430,9 +432,9 @@ public class GUIUtils {
 	 * @param combo
 	 * @return
 	 */
-	public static JComboBox setComboLayout(final String[] combos) {
+	public static JComboBox<String> setComboLayout(final String[] combos) {
 
-		final JComboBox comboBox = new JComboBox(combos);
+		final JComboBox<String> comboBox = new JComboBox<String>(combos);
 		comboBox.setFont(FONTS);
 		comboBox.setBackground(Color.white);
 

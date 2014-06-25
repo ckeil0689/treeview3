@@ -22,7 +22,6 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import java.awt.Color;
 import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -35,7 +34,6 @@ import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -93,7 +91,6 @@ public class DendroView2 implements Observer, DendroPanel {
 	private final JPanel dendroPane;
 
 	protected ScrollPane panes[];
-	private boolean loaded;
 
 	// Map Views
 	private final GlobalView2 globalview;
@@ -141,6 +138,8 @@ public class DendroView2 implements Observer, DendroPanel {
 
 	// Booleans
 	private boolean showTrees = false;
+	private boolean toggled = false;
+	private boolean loaded;
 
 	// Selections
 	private TreeSelectionI geneSelection = null;
@@ -195,7 +194,8 @@ public class DendroView2 implements Observer, DendroPanel {
 		globalYscrollbar = globalview.getYScroll();
 		globalYscrollbar.setUI(new TVScrollBarUI());
 		
-		toggleScale = GUIUtils.setToggleButtonLayout("Change Matrix Size");
+		toggleScale = GUIUtils.setToggleButtonLayout(
+				StringRes.button_toggleMatrixSize);
 
 		// Set up the column name display
 //		arraynameview = new ArrayNameViewManager();
@@ -276,22 +276,22 @@ public class DendroView2 implements Observer, DendroPanel {
 		JPanel bottomPanel;
 
 		// Buttons
-		scaleDefaultAll = GUIUtils.setButtonLayout(null, "homeIcon");
+		scaleDefaultAll = GUIUtils.setButtonLayout(null, StringRes.icon_home);
 		scaleDefaultAll.setToolTipText("Reset the zoomed view");
 
-		scaleIncX = GUIUtils.setButtonLayout(null, "zoomInIcon");
+		scaleIncX = GUIUtils.setButtonLayout(null, StringRes.icon_zoomIn);
 		scaleIncX.setToolTipText(StringRes.tooltip_xZoomIn);
 
-		scaleDecX = GUIUtils.setButtonLayout(null, "zoomOutIcon");
+		scaleDecX = GUIUtils.setButtonLayout(null, StringRes.icon_zoomOut);
 		scaleDecX.setToolTipText(StringRes.tooltip_xZoomOut);
 
-		scaleIncY = GUIUtils.setButtonLayout(null, "zoomInIcon");
+		scaleIncY = GUIUtils.setButtonLayout(null, StringRes.icon_zoomIn);
 		scaleIncY.setToolTipText(StringRes.tooltip_yZoomIn);
 
-		scaleDecY = GUIUtils.setButtonLayout(null, "zoomOutIcon");
+		scaleDecY = GUIUtils.setButtonLayout(null, StringRes.icon_zoomOut);
 		scaleDecY.setToolTipText(StringRes.tooltip_yZoomOut);
 
-		zoomButton = GUIUtils.setButtonLayout(null, "fullscreenIcon");
+		zoomButton = GUIUtils.setButtonLayout(null, StringRes.icon_zoomAll);
 		zoomButton.setToolTipText(StringRes.tooltip_home);
 
 		// Panels
@@ -592,6 +592,7 @@ public class DendroView2 implements Observer, DendroPanel {
 	 */
 	public void setGVLocked(final boolean locked) {
 
+		this.toggled = locked;
 		toggleScale.setSelected(locked);
 	}
 	

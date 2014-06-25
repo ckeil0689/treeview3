@@ -552,7 +552,6 @@ public class NewModelLoader {
 		ArrayList<String[]> gtrData = new ArrayList<String[]>();
 
 		try {
-			LogBuffer.println("Starting GTR load.");
 			// Read data from specified file location
 
 //			final FileInputStream fis = new FileInputStream(loadingSet);
@@ -562,7 +561,6 @@ public class NewModelLoader {
 
 			// Get data from file into String and double arrays
 			// Put the arrays in ArrayLists for later access.
-			LogBuffer.println("Starting GTR extract.");
 			gtrData = extractGTR(br);
 			
 			br.close();

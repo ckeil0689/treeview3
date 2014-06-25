@@ -85,10 +85,10 @@ public class ClusterView extends JPanel implements MainPanel {
 	private JPanel loadPanel;
 	private JPanel infoPanel;
 
-	private JComboBox geneCombo;
-	private JComboBox arrayCombo;
-	private JComboBox clusterType;
-	private JComboBox clusterChoice;
+	private JComboBox<String> geneCombo;
+	private JComboBox<String> arrayCombo;
+	private JComboBox<String> clusterType;
+	private JComboBox<String> clusterChoice;
 
 	private JButton cluster_button;
 	private JButton cancel_button;
@@ -229,9 +229,7 @@ public class ClusterView extends JPanel implements MainPanel {
 				.setButtonLayout(StringRes.button_Cancel, null);
 
 		// Label for cluster process
-		loadLabel = new JLabel();
-		loadLabel.setFont(GUIUtils.FONTS);
-		loadLabel.setForeground(GUIUtils.TEXT);
+		loadLabel = GUIUtils.createSmallLabel("");
 		// ProgressBar for clustering process
 		pBar = GUIUtils.setPBarLayout();
 
@@ -244,13 +242,13 @@ public class ClusterView extends JPanel implements MainPanel {
 		clusterType.setSelectedIndex(Arrays.asList(clusterNames).indexOf(
 				clusterTypeID));
 
-		final String[] measurements = { "Do Not Cluster",
-				"Pearson Correlation (uncentered)",
-				"Pearson Correlation (centered)",
-				"Absolute Correlation (uncentered)",
-				"Absolute Correlation (centered)",
-				"Spearman Ranked Correlation", "Euclidean Distance",
-				"City Block Distance" };
+		final String[] measurements = { StringRes.cluster_DoNot,
+				StringRes.cluster_pearsonUn,
+				StringRes.cluster_pearsonCentered,
+				StringRes.cluster_absoluteUn,
+				StringRes.cluster_absoluteCentered,
+				StringRes.cluster_spearman, StringRes.cluster_euclidean,
+				StringRes.cluster_cityBlock };
 
 		// Drop-down menu for row selection
 		geneCombo = GUIUtils.setComboLayout(measurements);
@@ -277,14 +275,10 @@ public class ClusterView extends JPanel implements MainPanel {
 	public void setMainPanel() {
 
 		// Create background panel
-		mainPanel = new JPanel();
-		mainPanel.setLayout(new MigLayout("ins 0"));
-		mainPanel.setBackground(GUIUtils.BG_COLOR);
+		mainPanel = GUIUtils.createJPanel(true, false, null);
 
 		// Panel for the Buttons
-		buttonPanel = new JPanel();
-		buttonPanel.setLayout(new MigLayout());
-		buttonPanel.setOpaque(false);
+		buttonPanel = GUIUtils.createJPanel(false, true, null);
 		buttonPanel.add(cluster_button, "pushx, alignx 50%");
 
 		mainPanel.add(optionsPanel, "pushx, alignx 50%, w 90%, h 70%, wrap");
@@ -297,52 +291,38 @@ public class ClusterView extends JPanel implements MainPanel {
 	public void setOptionsPanel() {
 
 		// Background Panel for the Cluster Options
-		optionsPanel = new JPanel();
-		optionsPanel.setLayout(new MigLayout());
-		optionsPanel.setOpaque(false);
+		optionsPanel = GUIUtils.createJPanel(false, true, null);
 		
-		JPanel choicePanel = new JPanel();
-		choicePanel.setLayout(new MigLayout());
-		choicePanel.setOpaque(false);
+		JPanel choicePanel = GUIUtils.createJPanel(false, true, null);
 
 		// ProgressBar Component
-		loadPanel = new JPanel();
-		loadPanel.setLayout(new MigLayout());
-		loadPanel.setOpaque(false);
+		loadPanel = GUIUtils.createJPanel(false, true, null);
 		
 		// Cluster Info Panel
 		infoPanel = clusterInfo.makeMethodInfoPanel(
 				clusterChoice.getSelectedIndex());
 		
-		final JLabel type = new JLabel("Cluster Type");
-		type.setFont(GUIUtils.FONTL);
-		type.setForeground(GUIUtils.MAIN);
+		final JLabel type = GUIUtils.createBigLabel("Cluster Type");
 		
 		choicePanel.add(type, "push, alignx 0%, aligny 0%, w 40%");
 		choicePanel.add(clusterType, "push, alignx 0%, aligny 0%, w 60%, " +
 				"h 20%, wrap");
 		
-		final JLabel similarity = new JLabel("Similarity Metric");
-		similarity.setFont(GUIUtils.FONTL);
-		similarity.setForeground(GUIUtils.MAIN);
+		final JLabel similarity = GUIUtils.createBigLabel("Similarity Metric");
 
 		choicePanel.add(similarity, "push, alignx 0%, aligny 0%");
 		choicePanel.add(similarityPanel, "push, alignx 0%, aligny 0%, " +
 				"h 20%, wrap");
 
 		if (clusterType.getSelectedIndex() == 0) {
-			final JLabel method = new JLabel("Linkage Method");
-			method.setFont(GUIUtils.FONTL);
-			method.setForeground(GUIUtils.MAIN);
+			final JLabel method = GUIUtils.createBigLabel("Linkage Method");
 			
 			choicePanel.add(method, "push, alignx 0%, aligny 0%");
 			choicePanel.add(linkagePanel, "push, alignx 0%, aligny 0%, " +
 					"h 20%, wrap");
 
 		} else {
-			final JLabel kMeans = new JLabel("K-Means Options");
-			kMeans.setFont(GUIUtils.FONTL);
-			kMeans.setForeground(GUIUtils.MAIN);
+			final JLabel kMeans = GUIUtils.createBigLabel("K-Means Options");
 			
 			choicePanel.add(kMeans, "pushx, alignx 0%");
 			choicePanel.add(kMeansPanel, "pushx, alignx 50%, h 20%, wrap");
@@ -358,17 +338,10 @@ public class ClusterView extends JPanel implements MainPanel {
 	public void setupInnerPanels() {
 
 		// Component for similarity measure options
-		similarityPanel = new JPanel();
-		similarityPanel.setLayout(new MigLayout());
-		similarityPanel.setOpaque(false);
+		similarityPanel = GUIUtils.createJPanel(false, true, null);
 
-		final JLabel rowLabel = new JLabel("Rows: ");
-		rowLabel.setFont(GUIUtils.FONTS);
-		rowLabel.setForeground(GUIUtils.TEXT);
-
-		final JLabel colLabel = new JLabel("Columns: ");
-		colLabel.setFont(GUIUtils.FONTS);
-		colLabel.setForeground(GUIUtils.TEXT);
+		final JLabel rowLabel = GUIUtils.createSmallLabel("Rows: ");
+		final JLabel colLabel = GUIUtils.createSmallLabel("Columns: ");
 
 		similarityPanel.add(rowLabel, "pushx, alignx 0%");
 		similarityPanel.add(geneCombo, "wrap");
@@ -376,25 +349,16 @@ public class ClusterView extends JPanel implements MainPanel {
 		similarityPanel.add(arrayCombo);
 
 		// Component for linkage choices
-		linkagePanel = new JPanel();
-		linkagePanel.setLayout(new MigLayout());
-		linkagePanel.setOpaque(false);
+		linkagePanel = GUIUtils.createJPanel(false, true, null);
 
 		// Cluster Options
 		linkagePanel.add(clusterChoice, "pushx, alignx 0%, span");
 
 		// Component for K-Means options
-		kMeansPanel = new JPanel();
-		kMeansPanel.setLayout(new MigLayout());
-		kMeansPanel.setOpaque(false);
+		kMeansPanel = GUIUtils.createJPanel(false, true, null);
 
-		final JLabel clusters = new JLabel("Clusters: ");
-		clusters.setFont(GUIUtils.FONTS);
-		clusters.setForeground(GUIUtils.TEXT);
-
-		final JLabel its = new JLabel("Iterations: ");
-		its.setFont(GUIUtils.FONTS);
-		its.setForeground(GUIUtils.TEXT);
+		final JLabel clusters = GUIUtils.createSmallLabel("Clusters: ");
+		final JLabel its = GUIUtils.createSmallLabel("Iterations: ");
 
 		kMeansPanel.add(clusters, "w 10%, h 15%");
 		kMeansPanel.add(enterRC, "w 5%");
@@ -450,7 +414,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	 * 
 	 * @return
 	 */
-	public JComboBox getGeneCombo() {
+	public JComboBox<String> getGeneCombo() {
 
 		return geneCombo;
 	}
@@ -460,7 +424,7 @@ public class ClusterView extends JPanel implements MainPanel {
 	 * 
 	 * @return
 	 */
-	public JComboBox getArrayCombo() {
+	public JComboBox<String> getArrayCombo() {
 
 		return arrayCombo;
 	}
@@ -623,8 +587,8 @@ public class ClusterView extends JPanel implements MainPanel {
 	 */
 	public void setLoadPanel(final String choice, final String choice2) {
 
-		if (!choice.contentEquals("Do Not Cluster")
-				|| !choice2.contentEquals("Do Not Cluster")) {
+		if (!choice.contentEquals(StringRes.cluster_DoNot)
+				|| !choice2.contentEquals(StringRes.cluster_DoNot)) {
 			loadPanel.add(loadLabel, "pushx, alignx 50%, wrap");
 			loadPanel.add(pBar, "pushx, w 90%, alignx 50%, wrap");
 		}
@@ -638,20 +602,12 @@ public class ClusterView extends JPanel implements MainPanel {
 
 		loadPanel.removeAll();
 
-		final String hint = "Woah, that's too quick!";
-		String hint2 = "";
-		String hint3 = "";
+		final String hint = StringRes.clusterError_tooQuick;
+		String hint2 = StringRes.clusterError_selectSimilarity;
+		String hint3 = StringRes.empty;
 
-		if (hierarchical) {
-			hint2 = "Select at least one similarity metric for "
-					+ "either rows or columns to begin clustering!";
-
-		} else {
-			hint2 = "Select at least one similarity metric for "
-					+ "either rows or columns to begin clustering!";
-
-			hint3 = "The amount of clusters and iterations must "
-					+ "be greater than 0.";
+		if (!hierarchical) {
+			hint3 = StringRes.clusterError_amount;
 		}
 
 		final TextDisplay error1 = new TextDisplay(hint);
@@ -678,11 +634,11 @@ public class ClusterView extends JPanel implements MainPanel {
 
 		buttonPanel.remove(cancel_button);
 
-		final TextDisplay status1 = new TextDisplay("The file has been saved "
-				+ "in the original directory.");
+		final TextDisplay status1 = new TextDisplay(
+				StringRes.clusterTip_completed);
 
-		final TextDisplay status2 = new TextDisplay("File Path: "
-				+ finalFilePath);
+		final TextDisplay status2 = new TextDisplay(
+				StringRes.clusterTip_filePath + finalFilePath);
 
 		buttonPanel.add(cluster_button, "pushx, alignx 50%");
 

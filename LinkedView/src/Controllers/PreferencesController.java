@@ -263,12 +263,13 @@ public class PreferencesController {
 			if (tvFrame.getDataModel() != null 
 					&& tvFrame.getRunning() != null) {
 				tvFrame.setView(StringRes.view_Dendro);
-				controller.addViewListeners();
 
 			} else {
 				tvFrame.setView(StringRes.view_Welcome);
-				controller.addViewListeners();
 			}
+			
+			controller.addViewListeners();
+			controller.addMenuListeners();
 		}
 	}
 
