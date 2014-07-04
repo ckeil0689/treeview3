@@ -24,6 +24,7 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -57,10 +58,10 @@ public class ColorExtractor2 extends Observable implements
 	private double dataMin;
 	private double dataMax;
 
-	private ArrayList<Color> colorList;
+	private List<Color> colorList;
 	private float[] fractions;
 
-	private final ArrayList<Color> colorList_default;
+	private final List<Color> colorList_default;
 	private final float[] fractions_default;
 
 	private Preferences configNode;
@@ -101,7 +102,7 @@ public class ColorExtractor2 extends Observable implements
 		this.dataMax = max;
 	}
 
-	public void setNewParams(final float[] frac, final ArrayList<Color> cl) {
+	public void setNewParams(final float[] frac, final List<Color> cl) {
 
 		fractions = frac;
 		colorList = cl;
@@ -246,7 +247,7 @@ public class ColorExtractor2 extends Observable implements
 		}
 
 		final String[] colors = colorSet.getColors();
-		final ArrayList<Color> cList = new ArrayList<Color>(colors.length);
+		final List<Color> cList = new ArrayList<Color>(colors.length);
 		for (final String color : colors) {
 			cList.add(Color.decode(color));
 		}
@@ -483,7 +484,7 @@ public class ColorExtractor2 extends Observable implements
 	 * @return The floatColor value
 	 */
 	public float[] getFloatColor(double dval, final float[] fractionVals,
-			final ArrayList<Color> colorVals) {
+			final List<Color> colorVals) {
 
 		if (Math.abs(dval - nodata) < PRECISION_LEVEL) {
 			// System.out.println("value " + dval + " was nodata");

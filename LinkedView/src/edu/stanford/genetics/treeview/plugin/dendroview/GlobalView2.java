@@ -39,6 +39,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 
 import javax.swing.BorderFactory;
@@ -94,7 +95,7 @@ public class GlobalView2 extends ModelViewProduced implements
 	/**
 	 * Rectangle to track yellow selected rectangle (pixels)
 	 */
-	private ArrayList<Rectangle> selectionRectList = new ArrayList<Rectangle>();
+	private List<Rectangle> selectionRectList = new ArrayList<Rectangle>();
 
 	/**
 	 * Circle to be used as indicator for selection
@@ -445,10 +446,10 @@ public class GlobalView2 extends ModelViewProduced implements
 		
 		if(selectedArrayIndexes.length > 0 || selectedGeneIndexes.length > 0) {
 
-			ArrayList<ArrayList<Integer>> arrayBoundaryList = 
-					new ArrayList<ArrayList<Integer>>();
-			ArrayList<ArrayList<Integer>> geneBoundaryList = 
-					new ArrayList<ArrayList<Integer>>();
+			List<List<Integer>> arrayBoundaryList = 
+					new ArrayList<List<Integer>>();
+			List<List<Integer>> geneBoundaryList = 
+					new ArrayList<List<Integer>>();
 
 			
 			arrayBoundaryList = findRectangleBoundaries(selectedArrayIndexes, 
@@ -458,9 +459,9 @@ public class GlobalView2 extends ModelViewProduced implements
 	
 			// Make the rectangles
 			if (selectionRectList != null) {
-				for(ArrayList<Integer> xBoundaries : arrayBoundaryList) {
+				for(List<Integer> xBoundaries : arrayBoundaryList) {
 					
-					for(ArrayList<Integer> yBoundaries : geneBoundaryList) {
+					for(List<Integer> yBoundaries : geneBoundaryList) {
 						
 						selectionRectList.add(new Rectangle(
 								xBoundaries.get(0), 
@@ -482,17 +483,17 @@ public class GlobalView2 extends ModelViewProduced implements
 	 * @param map
 	 * @return
 	 */
-	protected ArrayList<ArrayList<Integer>> findRectangleBoundaries(
+	protected List<List<Integer>> findRectangleBoundaries(
 			int[] selectedIndexes, MapContainer map) {
 		
 		int sp = 0; 
 		int ep = 0;
 		
-		ArrayList<ArrayList<Integer>> rangeList = 
-				new ArrayList<ArrayList<Integer>>();
-		ArrayList<ArrayList<Integer>> boundaryList = 
-				new ArrayList<ArrayList<Integer>>();
-		ArrayList<Integer> rectangleRange = new ArrayList<Integer>();
+		List<List<Integer>> rangeList = 
+				new ArrayList<List<Integer>>();
+		List<List<Integer>> boundaryList = 
+				new ArrayList<List<Integer>>();
+		List<Integer> rectangleRange = new ArrayList<Integer>();
 		
 		/*
 		 * If array is bigger than 1, check how many consecutive labels are
@@ -526,9 +527,9 @@ public class GlobalView2 extends ModelViewProduced implements
 		 * For every selection range produce map values 
 		 * (rectangle boundaries) for each rectangle to be drawn.
 		 */
-		for(ArrayList<Integer> selectionRange : rangeList) {
+		for(List<Integer> selectionRange : rangeList) {
 			
-			ArrayList<Integer> boundaries = new ArrayList<Integer>(2);
+			List<Integer> boundaries = new ArrayList<Integer>(2);
 			
 			sp = map.getPixel(selectionRange.get(0));
 			// last pixel of last block
@@ -761,7 +762,6 @@ public class GlobalView2 extends ModelViewProduced implements
 		if (drawer != null) {
 
 			final int geneRow = overy;
-			final int geneCol = overx;
 
 			if (xmap.contains(overx) && ymap.contains(overy)) {
 

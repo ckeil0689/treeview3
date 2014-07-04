@@ -37,6 +37,7 @@ import edu.stanford.genetics.treeview.TreeDrawerNode;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.model.AtrTVModel;
+import edu.stanford.genetics.treeview.model.ReorderedDataModel;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.plugin.dendroview.ArrayDrawer;
 import edu.stanford.genetics.treeview.plugin.dendroview.AtrAligner;
@@ -56,7 +57,7 @@ public class DendroController implements ConfigNodePersistent {
 	private final double PRECISION_LEVEL = 0.000001;
 	private DendroView2 dendroView;
 	private final TreeViewFrame tvFrame;
-	private TVModel tvModel;
+	private DataModel tvModel;
 
 	protected Preferences configNode;
 
@@ -87,7 +88,7 @@ public class DendroController implements ConfigNodePersistent {
 		globalYmap = new MapContainer("Fixed", "GlobalYMap");
 	}
 	
-	public void setNew(final DendroView2 dendroView, final TVModel tvModel) {
+	public void setNew(final DendroView2 dendroView, final DataModel tvModel) {
 		
 		this.dendroView = dendroView;
 		this.tvModel = tvModel;
@@ -95,7 +96,6 @@ public class DendroController implements ConfigNodePersistent {
 		setConfigNode(tvFrame.getConfigNode());
 		bindComponentFunctions();
 		setTreesVis(configNode.getBoolean("treesVisible", false));
-		setGVLocked(configNode.getBoolean("globalViewLocked", false));
 
 		dendroView.setupLayout();
 		setSavedScale();
@@ -293,58 +293,29 @@ public class DendroController implements ConfigNodePersistent {
 
 		@Override
 		protected Void doInBackground() throws Exception {
-
-			boolean locked = dendroView.getGVLocked();
-			double width = dendroView.getGVWidth();
-			double height = dendroView.getGVHeight();
-			double maxGVWidth = dendroView.getMaxGVWidth();
-			double maxGVHeight = dendroView.getMaxGVHeight();
 			
 			if (event.getSource() == dendroView.getXPlusButton()) {
-				if(width < maxGVWidth && locked) {
-					changeGVSize(5, 0);
-					
-				} else if(!locked ){
-					getGlobalXMap().zoomIn();
-				}
+				getGlobalXMap().zoomIn();
 
 			} else if (event.getSource() == dendroView.getXMinusButton()) {
-				if(width > 10 && locked) {
-					changeGVSize(-5, 0);
-					
-				} else if(!locked) {
-					getGlobalXMap().zoomOut();
-				}
+				getGlobalXMap().zoomOut();
 
 			} else if (event.getSource() == dendroView.getYPlusButton()) {
-				if(height < maxGVHeight && locked) {
-					changeGVSize(0, 5);
-					
-				} else if(!locked) {
-					getGlobalYMap().zoomIn();
-				}
+				getGlobalYMap().zoomIn();
+				
 
 			} else if (event.getSource() == dendroView.getYMinusButton()) {
-				if(height > 10 && locked) {
-					changeGVSize(0, -5);
-					
-				} else if(!locked) {
-					getGlobalYMap().zoomOut();
-				}
+				getGlobalYMap().zoomOut();
+				
 
 			} else if (event.getSource() == dendroView.getHomeButton()) {
-				if(locked) {
-					changeGVSize(-dendroView.getWidthChange(), 
-							-dendroView.getHeightChange());
-					
-				} else {
-					resetMapContainers();
-				}
+				resetMapContainers();
 
 			} else {
 				LogBuffer.println("Got weird source for actionPerformed() "
 						+ "in DendroController ScaleListener.");
 			}
+			
 			return null;
 		}
 
@@ -357,22 +328,136 @@ public class DendroController implements ConfigNodePersistent {
 			getGlobalYMap().notifyObservers();
 		}
 	}
-
+	
 	/**
-	 * Changes the size of GlobalView if the user tries to scale one axis and
-	 * GlobalView doesn't fill up 100% of its dedicated space. If it wouldn't
-	 * resize, there would be a minimum scale for each screen size.
-	 * @param widthChange
-	 * @param heightChange
+	 * Sets the dimensions of the GlobalView axes. There are three options, 
+	 * passed from the MenuBar when the user selects it.
+	 * Fill: This fills all of the available space on the screen 
+	 * with the matrix.
+	 * Equal: Both axes are equally sized, forming a square matrix.
+	 * Proportional: Axes are sized in proportion to how many elements they
+	 * show. 
+	 * @param mode
 	 */
-	public void changeGVSize(double widthChange, double heightChange) {
+	public void setMatrixSize(String mode) {
 		
-		dendroView.setWidthChange(widthChange);
-		dendroView.setHeightChange(heightChange);
+		if(mode.equalsIgnoreCase("fill")) {
+			// Change so that height-/widthChange can be set directly
+			dendroView.setGVWidth(0);
+			dendroView.setGVHeight(0);
+			
+		} else if(mode.equalsIgnoreCase("equal")) {
+			setMatrixAxesEqual();
+			
+		} else if(mode.equalsIgnoreCase("proportional")) {
+			setPixelScalesEqual();
+			
+		} else {
+			LogBuffer.println("Got weird resize option in "
+					+ "setMatrixSize(): " + mode);
+		}
 		
 		dendroView.setupLayout();
 		addViewListeners();
 		resetMapContainers();
+		
+		// only for debug - erase after
+		LogBuffer.println("--------------------------");
+		LogBuffer.println("GVWidth: " + dendroView.getGlobalView().getWidth());
+		LogBuffer.println("GVHeight: " + dendroView.getGlobalView().getHeight());
+		LogBuffer.println("XScale: " + getGlobalXMap().getScale());
+		LogBuffer.println("YScale: " + getGlobalYMap().getScale());
+	}
+	
+	/**
+	 * Sets the size of each GlobalView axes to the smallest of both to
+	 * form a square.
+	 */
+	public void setMatrixAxesEqual() {
+		
+		double percentDiff = 0.0;
+		
+		// Find absolute GlobalView dimensions
+		double absGVWidth = dendroView.getGlobalView().getWidth() 
+				+ dendroView.getYScroll().getWidth();
+		double absGVHeight = dendroView.getGlobalView().getHeight() 
+				+ dendroView.getXScroll().getHeight();
+		
+		if(Math.abs(absGVWidth - absGVHeight) <= PRECISION_LEVEL) {
+			// TO-DO: get rid of this statement, as it does nothing!
+		
+		} else if(absGVWidth < absGVHeight) {
+			percentDiff = (absGVWidth/ absGVHeight);
+			
+			double newHeight = dendroView.getMaxGVHeight() * percentDiff;
+			// rounding
+			newHeight =newHeight * 1000;
+			newHeight = (double)Math.round(newHeight);
+			newHeight = newHeight/ 1000;
+			
+			dendroView.setGVHeight(newHeight);
+		
+		} else if(absGVHeight < absGVWidth) {
+			percentDiff = (absGVHeight/ absGVWidth);
+			
+			double newWidth = dendroView.getMaxGVWidth() * percentDiff;
+			// rounding
+			newWidth = newWidth * 1000;
+			newWidth = (double)Math.round(newWidth);
+			newWidth = newWidth/ 1000;
+			
+			dendroView.setGVWidth(newWidth);
+		
+		} else {
+			LogBuffer.println("Uncovered case when trying to set matrix "
+					+ "to squared matrix.");
+		}
+	}
+	
+	/**
+	 * Resizes the matrix such that it fits all pixels as squares.
+	 * If gvWidth or gvHeight would go below a certain size, the matrix is
+	 * adjusted such that the content remains viewable in a meaningful manner.
+	 */
+	public void setPixelScalesEqual() {
+		
+		// Condition: All pixels must be shown, but must have same scale.
+				
+		double xScale = globalXmap.getScale();
+		double yScale = globalYmap.getScale();
+		
+		if(xScale >= yScale) {
+			globalXmap.setScale(yScale);
+			
+			double used = globalXmap.getUsedPixels();
+			double avail = globalXmap.getAvailablePixels();
+			
+			double percentDiff = used/ avail;
+			
+			double newWidth = dendroView.getMaxGVWidth() * percentDiff;
+			// rounding
+			newWidth = newWidth * 1000;
+			newWidth = (double)Math.round(newWidth);
+			newWidth = newWidth/ 1000;
+			
+			dendroView.setGVWidth(newWidth);
+			
+		} else {
+			globalYmap.setScale(xScale);
+			
+			double used = globalYmap.getUsedPixels();
+			double avail = globalYmap.getAvailablePixels();
+			
+			double percentDiff = used/ avail;
+			
+			double newHeight = dendroView.getMaxGVHeight() * percentDiff;
+			// rounding
+			newHeight = newHeight * 1000;
+			newHeight = (double)Math.round(newHeight);
+			newHeight = newHeight/ 1000;
+			
+			dendroView.setGVHeight(newHeight);
+		}
 	}
 	
 //	public void setButtonEnabledStatus() {
@@ -572,18 +657,6 @@ public class DendroController implements ConfigNodePersistent {
 			tvFrame.getTreeButton().setText(StringRes.button_showTrees);
 		}
 	}
-	
-	/**
-	 * Sets the status of the JCheckBox that controls GlobalView size 
-	 * adjustment. Stores value in configNode in order to retrieve it when
-	 * a new DendroView for the same data set is generated.
-	 * @param locked
-	 */
-	public void setGVLocked(final boolean locked) {
-
-		dendroView.setGVLocked(locked);
-		configNode.putBoolean("globalViewLocked", locked);
-	}
 
 	public void saveImage(final JPanel panel) throws IOException {
 
@@ -622,7 +695,7 @@ public class DendroController implements ConfigNodePersistent {
 
 		if (parentNode != null) {
 			if (tvModel.getDocumentConfigRoot() != null) {
-				configNode = tvModel.getDocumentConfig();
+				configNode = ((TVModel)tvModel).getDocumentConfig();
 
 			} else {
 				configNode = Preferences.userRoot().node("DendroView");
@@ -668,8 +741,8 @@ public class DendroController implements ConfigNodePersistent {
 		// ISSUE: Needs DataModel, not TVModel. Should dataModel be used
 		// in this class rather than TVModel?
 		if ((arrayIndex != null) || (geneIndex != null)) {
-			// tvModel = new ReorderedDataModel(tvModel, geneIndex,
-			// arrayIndex);
+			 tvModel = new ReorderedDataModel(tvModel, geneIndex,
+			 arrayIndex);
 			LogBuffer.println("DataModel issue in DendroController.");
 		}
 	}
@@ -748,7 +821,7 @@ public class DendroController implements ConfigNodePersistent {
 		final DoubleArrayDrawer dArrayDrawer = new DoubleArrayDrawer();
 		dArrayDrawer.setColorExtractor(colorExtractor);
 		arrayDrawer = dArrayDrawer;
-		tvModel.addObserver(arrayDrawer);
+		((TVModel)tvModel).addObserver(arrayDrawer);
 
 		// set data first to avoid adding auto-generated
 		// contrast to documentConfig.
@@ -840,7 +913,7 @@ public class DendroController implements ConfigNodePersistent {
 		globalXmap.setIndexRange(0, tvModel.getDataMatrix().getNumCol() - 1);
 		globalXmap.notifyObservers();
 
-		tvModel.notifyObservers();
+		((TVModel)tvModel).notifyObservers();
 	}
 
 	/**
@@ -906,12 +979,13 @@ public class DendroController implements ConfigNodePersistent {
 	 * @return
 	 * @throws LoadException
 	 */
-	protected TVModel makeCdtModel(final FileSet fileSet) throws LoadException {
+	protected DataModel makeCdtModel(final FileSet fileSet) 
+			throws LoadException {
 
-		final TVModel tvModel = new TVModel();
+		final DataModel tvModel = new TVModel();
 
 		try {
-			tvModel.loadNew(fileSet);
+			((TVModel)tvModel).loadNew(fileSet);
 
 		} catch (final LoadException e) {
 			JOptionPane.showMessageDialog(dendroView.getDendroPane(), e);
@@ -1029,8 +1103,8 @@ public class DendroController implements ConfigNodePersistent {
 			 * System.out.println();
 			 */
 
-			tvModel.reorderArrays(ordering);
-			tvModel.notifyObservers();
+			((TVModel)tvModel).reorderArrays(ordering);
+			((TVModel)tvModel).notifyObservers();
 
 			if (selectedID != null) {
 

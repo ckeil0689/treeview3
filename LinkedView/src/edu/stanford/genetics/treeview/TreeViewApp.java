@@ -260,7 +260,7 @@ public abstract class TreeViewApp {// implements WindowListener {
 
 		// setup toplevel
 		final TreeViewFrame tvFrame = new TreeViewFrame(this);
-		final TVModel model = new TVModel();
+		final DataModel model = new TVModel();
 		final TVFrameController tvController = new TVFrameController(tvFrame,
 				model);
 		if (fileSet != null) {

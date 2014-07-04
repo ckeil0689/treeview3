@@ -65,7 +65,16 @@ public class MenubarActions {
 		} else if (name.equalsIgnoreCase(StringRes.menu_title_RowAndCol)
 				|| name.equalsIgnoreCase(StringRes.menu_title_Color)) {
 			controller.openPrefMenu(name);
-
+			
+		} else if(name.equalsIgnoreCase("Fill screen")) {
+			tvFrame.setMatrixSize("fill");
+			
+		} else if(name.equalsIgnoreCase("Equal axes")) {
+			tvFrame.setMatrixSize("equal");
+			
+		} else if(name.equalsIgnoreCase("Proportional axes")) {
+			tvFrame.setMatrixSize("proportional");
+			
 		} else if (name.equalsIgnoreCase(StringRes.menu_title_Hier)) {
 			controller.setupClusterView(StringRes.menu_title_Hier);
 

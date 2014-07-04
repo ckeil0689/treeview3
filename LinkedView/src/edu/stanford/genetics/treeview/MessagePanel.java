@@ -25,6 +25,7 @@ package edu.stanford.genetics.treeview;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JPanel;
@@ -70,7 +71,7 @@ public class MessagePanel extends JPanel {
 		private final JTextArea val;
 		private final JTextArea last;
 
-		private final ArrayList<JTextArea> textList;
+		private final List<JTextArea> textList;
 
 		public MessageCanvas() {
 

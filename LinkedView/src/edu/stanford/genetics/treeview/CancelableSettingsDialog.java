@@ -33,8 +33,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import net.miginfocom.swing.MigLayout;
-
 /**
  * this is a dialog which displays a single cancelable settings panel
  * 
@@ -63,11 +61,11 @@ public class CancelableSettingsDialog extends JDialog {
 		super(frame, title, true);
 		settingsPanel = panel;
 		settingsFrame = this;
-		final JPanel inner = new JPanel();
-		inner.setLayout(new MigLayout());
+		final JPanel inner = GUIFactory.createJPanel(false, false, null);
+		
 		inner.add((Component) panel, "push, grow, wrap");
 		inner.add(new ButtonPanel(), "pushx, growx, alignx 50%");
-		inner.setBackground(GUIFactory.BG_COLOR);
+		
 		getContentPane().add(inner);
 		pack();
 	}
@@ -80,7 +78,7 @@ public class CancelableSettingsDialog extends JDialog {
 
 			this.setBackground(GUIFactory.BG_COLOR);
 
-			final JButton save_button = GUIFactory.setButtonLayout("Save", null);
+			final JButton save_button = GUIFactory.setButtonLayout("Save");
 			save_button.addActionListener(new ActionListener() {
 
 				@Override
@@ -106,8 +104,7 @@ public class CancelableSettingsDialog extends JDialog {
 			});
 			add(save_button);
 
-			final JButton cancel_button = GUIFactory.setButtonLayout("Cancel",
-					null);
+			final JButton cancel_button = GUIFactory.setButtonLayout("Cancel");
 			cancel_button.addActionListener(new ActionListener() {
 
 				@Override

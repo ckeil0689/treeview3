@@ -27,6 +27,8 @@ public class StringRes {
 	
 	// General
 	public static final String empty = "";
+	public static final String dot = ".";
+	
 
 	// View Names
 	public static final String view_Welcome = "WelcomeView";
@@ -37,13 +39,15 @@ public class StringRes {
 	// Frame Titles
 	public static final String view_title_Cluster = "Cluster View";
 	public static final String dialog_title_search = "Search Labels";
+	public static final String dialog_title_exitConfirm = "Confirm Exit";
+	public static final String dialog_title_about = "About...";
 	
 	// Main Words
 	public static final String main_rows = "Rows";
 	public static final String main_cols = "Columns";
 	
 	// Title Screen
-	public static final String title_Hello = "Hello! How are you Gentlepeople?";
+	public static final String title_Hello = "Hello, how are you Gentlepeople?";
 	public static final String title_Welcome = "Welcome to ";
 	
 	// Loading
@@ -154,6 +158,7 @@ public class StringRes {
 			"no need to recalculate similarity matrix.";
 	public static final String clusterInfo_Single_DisAdv = "Unsuitable for " +
 			"isolating spherical or poorly separated clusters.";
+	public static final String clusterInfo_Ready = "Ready to cluster!";
 	
 	public static final String clusterInfo_Compl_Similarity = "Joins the " +
 			"most distant two clusters by finding the least similar pair " +
@@ -185,13 +190,8 @@ public class StringRes {
 	public static final String clusterTip_filePath = "File Path: ";
 	
 	// Cluster Error - Hints
-	public static final String clusterError_tooQuick = "Woah, "
-			+ "that's too quick!";
-	public static final String clusterError_selectSimilarity = "Select at "
-			+ "least one similarity metric for either rows or columns "
-			+ "to begin clustering!";
-	public static final String clusterError_amount = "The amount of clusters "
-			+ "and iterations must be greater than 0.";
+	public static final String clusterError_invalid = "Please pick valid "
+			+ "cluster options to begin clustering!";
 
 	// Frame Title - Testing
 	public static final String test_title_FontSelector = "Font Settings Test";

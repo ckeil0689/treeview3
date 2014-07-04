@@ -31,6 +31,7 @@ import java.util.prefs.Preferences;
 import javax.swing.JOptionPane;
 
 import Controllers.TVFrameController;
+import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.ExportException;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LoadException;
@@ -137,7 +138,7 @@ public class LinkedViewApp extends TreeViewApp {
 
 		// setup toplevel
 		// final LinkedViewFrame tvFrame = new LinkedViewFrame(this);
-		final TVModel model = new TVModel();
+		final DataModel model = new TVModel();
 		final TreeViewFrame tvFrame = new TreeViewFrame(this);
 		// tvFrame.addWindowListener(this);
 		final TVFrameController tvController = new TVFrameController(tvFrame,
@@ -153,7 +154,7 @@ public class LinkedViewApp extends TreeViewApp {
 		// setup toplevel
 		// final LinkedViewFrame tvFrame = new LinkedViewFrame(this);
 		final TreeViewFrame tvFrame = new TreeViewFrame(this);
-		final TVModel model = new TVModel();
+		final DataModel model = new TVModel();
 		final TVFrameController tvController = new TVFrameController(tvFrame,
 				model);
 

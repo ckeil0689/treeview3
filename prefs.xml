@@ -279,14 +279,14 @@
             </node>
             <node name="GlobalXMap">
               <map>
-                <entry key="scale" value="333.75"/>
-                <entry key="minScale" value="10.037593984962406"/>
-                <entry key="XScrollValue" value="16"/>
+                <entry key="scale" value="11.180451127819548"/>
+                <entry key="minScale" value="11.180451127819548"/>
+                <entry key="XScrollValue" value="0"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="333.75"/>
+                  <entry key="scale" value="11.180451127819548"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -297,14 +297,14 @@
             </node>
             <node name="GlobalYMap">
               <map>
-                <entry key="scale" value="118.16666666666667"/>
-                <entry key="minScale" value="5.330827067669173"/>
-                <entry key="YScrollValue" value="16"/>
+                <entry key="scale" value="5.894736842105263"/>
+                <entry key="minScale" value="5.894736842105263"/>
+                <entry key="YScrollValue" value="0"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="118.16666666666667"/>
+                  <entry key="scale" value="5.894736842105263"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -890,6 +890,398 @@
               </node>
             </node>
           </node>
+          <node name="Model 13">
+            <map>
+              <entry key="name" value="testData_small"/>
+              <entry key="extension" value=".txt"/>
+              <entry key="treesVisible" value="true"/>
+              <entry key="globalViewLocked" value="false"/>
+            </map>
+            <node name="ArrayNameView">
+              <map>
+                <entry key="face" value="Dialog"/>
+                <entry key="size" value="12"/>
+              </map>
+              <node name="ArraySummary">
+                <map>
+                  <entry key="included" value="0"/>
+                </map>
+              </node>
+            </node>
+            <node name="AtrSummary">
+              <map/>
+            </node>
+            <node name="ColorExtractor">
+              <map>
+                <entry key="logcenter" value="1.0"/>
+              </map>
+            </node>
+            <node name="ColorPresets">
+              <map>
+                <entry key="Color1" value="#FEFF00"/>
+                <entry key="Color2" value="#000000"/>
+                <entry key="Color3" value="#1BB7E5"/>
+                <entry key="colorNum" value="3"/>
+                <entry key="Fraction1" value="0.0"/>
+                <entry key="Fraction2" value="0.5"/>
+                <entry key="Fraction3" value="1.0"/>
+                <entry key="fracNum" value="3"/>
+              </map>
+              <node name="ColorSet1">
+                <map>
+                  <entry key="Color1" value="#FF0000"/>
+                  <entry key="Color2" value="#000000"/>
+                  <entry key="Color3" value="#00FF00"/>
+                  <entry key="colorNum" value="3"/>
+                  <entry key="Fraction1" value="0.0"/>
+                  <entry key="Fraction2" value="0.5"/>
+                  <entry key="Fraction3" value="1.0"/>
+                  <entry key="fracNum" value="3"/>
+                  <entry key="missing" value="#909090"/>
+                  <entry key="empty" value="#FFFFFF"/>
+                  <entry key="name" value="RedGreen"/>
+                </map>
+              </node>
+              <node name="ColorSet2">
+                <map>
+                  <entry key="Color1" value="#FEFF00"/>
+                  <entry key="Color2" value="#000000"/>
+                  <entry key="Color3" value="#1BB7E5"/>
+                  <entry key="colorNum" value="3"/>
+                  <entry key="Fraction1" value="0.0"/>
+                  <entry key="Fraction2" value="0.5"/>
+                  <entry key="Fraction3" value="1.0"/>
+                  <entry key="fracNum" value="3"/>
+                  <entry key="missing" value="#909090"/>
+                  <entry key="empty" value="#FFFFFF"/>
+                  <entry key="name" value="YellowBlue"/>
+                </map>
+              </node>
+              <node name="ColorSet3">
+                <map>
+                  <entry key="Color1" value="#FF0000"/>
+                  <entry key="Color2" value="#000000"/>
+                  <entry key="Color3" value="#00FF00"/>
+                  <entry key="colorNum" value="3"/>
+                  <entry key="Fraction1" value="0.5355603694915771"/>
+                  <entry key="Fraction2" value="0.670258641242981"/>
+                  <entry key="Fraction3" value="0.8663793206214905"/>
+                  <entry key="fracNum" value="3"/>
+                  <entry key="name" value="Custom"/>
+                  <entry key="missing" value="#ffffff"/>
+                </map>
+              </node>
+            </node>
+            <node name="GlobalXMap">
+              <map>
+                <entry key="scale" value="6.1193415637860085"/>
+                <entry key="minScale" value="6.1193415637860085"/>
+                <entry key="XScrollValue" value="0"/>
+              </map>
+              <node name="FixedMap">
+                <map>
+                  <entry key="type" value="Fixed"/>
+                  <entry key="scale" value="6.1193415637860085"/>
+                </map>
+              </node>
+              <node name="NullMap">
+                <map>
+                  <entry key="type" value="Null"/>
+                </map>
+              </node>
+            </node>
+            <node name="GlobalYMap">
+              <map>
+                <entry key="scale" value="1.5742971887550201"/>
+                <entry key="minScale" value="1.5742971887550201"/>
+                <entry key="YScrollValue" value="0"/>
+              </map>
+              <node name="FixedMap">
+                <map>
+                  <entry key="type" value="Fixed"/>
+                  <entry key="scale" value="1.5742971887550201"/>
+                </map>
+              </node>
+              <node name="NullMap">
+                <map>
+                  <entry key="type" value="Null"/>
+                </map>
+              </node>
+            </node>
+            <node name="GradientChooser">
+              <map>
+                <entry key="activeColors" value="Custom"/>
+              </map>
+            </node>
+            <node name="GtrSummary">
+              <map/>
+            </node>
+            <node name="TextView">
+              <map>
+                <entry key="face" value="Dialog"/>
+                <entry key="size" value="12"/>
+              </map>
+              <node name="GeneSummary">
+                <map>
+                  <entry key="included" value="0"/>
+                </map>
+              </node>
+            </node>
+          </node>
+          <node name="Model 14">
+            <map>
+              <entry key="name" value="fg_090813_v2_alpha"/>
+              <entry key="extension" value=".txt"/>
+              <entry key="treesVisible" value="false"/>
+              <entry key="globalViewLocked" value="false"/>
+            </map>
+            <node name="ArrayNameView">
+              <map>
+                <entry key="face" value="Dialog"/>
+                <entry key="size" value="12"/>
+              </map>
+              <node name="ArraySummary">
+                <map>
+                  <entry key="included" value="0"/>
+                </map>
+              </node>
+            </node>
+            <node name="AtrSummary">
+              <map/>
+            </node>
+            <node name="ColorExtractor">
+              <map>
+                <entry key="logcenter" value="1.0"/>
+              </map>
+            </node>
+            <node name="ColorPresets">
+              <map>
+                <entry key="Color1" value="#FEFF00"/>
+                <entry key="Color2" value="#000000"/>
+                <entry key="Color3" value="#1BB7E5"/>
+                <entry key="colorNum" value="3"/>
+                <entry key="Fraction1" value="0.0"/>
+                <entry key="Fraction2" value="0.5"/>
+                <entry key="Fraction3" value="1.0"/>
+                <entry key="fracNum" value="3"/>
+              </map>
+              <node name="ColorSet1">
+                <map>
+                  <entry key="Color1" value="#FF0000"/>
+                  <entry key="Color2" value="#000000"/>
+                  <entry key="Color3" value="#00FF00"/>
+                  <entry key="colorNum" value="3"/>
+                  <entry key="Fraction1" value="0.0"/>
+                  <entry key="Fraction2" value="0.5"/>
+                  <entry key="Fraction3" value="1.0"/>
+                  <entry key="fracNum" value="3"/>
+                  <entry key="missing" value="#909090"/>
+                  <entry key="empty" value="#FFFFFF"/>
+                  <entry key="name" value="RedGreen"/>
+                </map>
+              </node>
+              <node name="ColorSet2">
+                <map>
+                  <entry key="Color1" value="#FEFF00"/>
+                  <entry key="Color2" value="#000000"/>
+                  <entry key="Color3" value="#1BB7E5"/>
+                  <entry key="colorNum" value="3"/>
+                  <entry key="Fraction1" value="0.0"/>
+                  <entry key="Fraction2" value="0.5"/>
+                  <entry key="Fraction3" value="1.0"/>
+                  <entry key="fracNum" value="3"/>
+                  <entry key="missing" value="#909090"/>
+                  <entry key="empty" value="#FFFFFF"/>
+                  <entry key="name" value="YellowBlue"/>
+                </map>
+              </node>
+              <node name="ColorSet3">
+                <map>
+                  <entry key="Color1" value="#3399FF"/>
+                  <entry key="Color2" value="#000000"/>
+                  <entry key="Color3" value="#00FF00"/>
+                  <entry key="colorNum" value="3"/>
+                  <entry key="Fraction1" value="0.46875"/>
+                  <entry key="Fraction2" value="0.5295138955116272"/>
+                  <entry key="Fraction3" value="0.5763888955116272"/>
+                  <entry key="fracNum" value="3"/>
+                  <entry key="name" value="Custom"/>
+                  <entry key="missing" value="#ffffff"/>
+                </map>
+              </node>
+            </node>
+            <node name="GlobalXMap">
+              <map>
+                <entry key="scale" value="0.38275418275418277"/>
+                <entry key="minScale" value="0.38275418275418277"/>
+                <entry key="XScrollValue" value="0"/>
+              </map>
+              <node name="FixedMap">
+                <map>
+                  <entry key="type" value="Fixed"/>
+                  <entry key="scale" value="0.38275418275418277"/>
+                </map>
+              </node>
+              <node name="NullMap">
+                <map>
+                  <entry key="type" value="Null"/>
+                </map>
+              </node>
+            </node>
+            <node name="GlobalYMap">
+              <map>
+                <entry key="scale" value="784.0"/>
+                <entry key="minScale" value="0.45794392523364486"/>
+                <entry key="YScrollValue" value="687"/>
+              </map>
+              <node name="FixedMap">
+                <map>
+                  <entry key="type" value="Fixed"/>
+                  <entry key="scale" value="784.0"/>
+                </map>
+              </node>
+              <node name="NullMap">
+                <map>
+                  <entry key="type" value="Null"/>
+                </map>
+              </node>
+            </node>
+            <node name="GradientChooser">
+              <map>
+                <entry key="activeColors" value="Custom"/>
+              </map>
+            </node>
+            <node name="GtrSummary">
+              <map/>
+            </node>
+            <node name="TextView">
+              <map>
+                <entry key="face" value="Dialog"/>
+                <entry key="size" value="12"/>
+              </map>
+              <node name="GeneSummary">
+                <map>
+                  <entry key="included" value="0"/>
+                </map>
+              </node>
+            </node>
+          </node>
+          <node name="Model 15">
+            <map>
+              <entry key="name" value="testData_gamma"/>
+              <entry key="extension" value=".txt"/>
+              <entry key="treesVisible" value="false"/>
+            </map>
+            <node name="ArrayNameView">
+              <map>
+                <entry key="face" value="Dialog"/>
+                <entry key="size" value="12"/>
+              </map>
+              <node name="ArraySummary">
+                <map>
+                  <entry key="included" value="0"/>
+                </map>
+              </node>
+            </node>
+            <node name="AtrSummary">
+              <map/>
+            </node>
+            <node name="ColorExtractor">
+              <map>
+                <entry key="logcenter" value="1.0"/>
+              </map>
+            </node>
+            <node name="ColorPresets">
+              <map>
+                <entry key="Color1" value="#FEFF00"/>
+                <entry key="Color2" value="#000000"/>
+                <entry key="Color3" value="#1BB7E5"/>
+                <entry key="colorNum" value="3"/>
+                <entry key="Fraction1" value="0.0"/>
+                <entry key="Fraction2" value="0.5"/>
+                <entry key="Fraction3" value="1.0"/>
+                <entry key="fracNum" value="3"/>
+              </map>
+              <node name="ColorSet1">
+                <map>
+                  <entry key="Color1" value="#FF0000"/>
+                  <entry key="Color2" value="#000000"/>
+                  <entry key="Color3" value="#00FF00"/>
+                  <entry key="colorNum" value="3"/>
+                  <entry key="Fraction1" value="0.0"/>
+                  <entry key="Fraction2" value="0.5"/>
+                  <entry key="Fraction3" value="1.0"/>
+                  <entry key="fracNum" value="3"/>
+                  <entry key="missing" value="#909090"/>
+                  <entry key="empty" value="#FFFFFF"/>
+                  <entry key="name" value="RedGreen"/>
+                </map>
+              </node>
+              <node name="ColorSet2">
+                <map>
+                  <entry key="Color1" value="#FEFF00"/>
+                  <entry key="Color2" value="#000000"/>
+                  <entry key="Color3" value="#1BB7E5"/>
+                  <entry key="colorNum" value="3"/>
+                  <entry key="Fraction1" value="0.0"/>
+                  <entry key="Fraction2" value="0.5"/>
+                  <entry key="Fraction3" value="1.0"/>
+                  <entry key="fracNum" value="3"/>
+                  <entry key="missing" value="#909090"/>
+                  <entry key="empty" value="#FFFFFF"/>
+                  <entry key="name" value="YellowBlue"/>
+                </map>
+              </node>
+            </node>
+            <node name="GlobalXMap">
+              <map>
+                <entry key="scale" value="0.453768690875801"/>
+                <entry key="minScale" value="0.453768690875801"/>
+                <entry key="XScrollValue" value="0"/>
+              </map>
+              <node name="FixedMap">
+                <map>
+                  <entry key="type" value="Fixed"/>
+                  <entry key="scale" value="0.453768690875801"/>
+                </map>
+              </node>
+              <node name="NullMap">
+                <map>
+                  <entry key="type" value="Null"/>
+                </map>
+              </node>
+            </node>
+            <node name="GlobalYMap">
+              <map>
+                <entry key="scale" value="0.5388316151202749"/>
+                <entry key="minScale" value="0.5388316151202749"/>
+                <entry key="YScrollValue" value="0"/>
+              </map>
+              <node name="FixedMap">
+                <map>
+                  <entry key="type" value="Fixed"/>
+                  <entry key="scale" value="0.5388316151202749"/>
+                </map>
+              </node>
+              <node name="NullMap">
+                <map>
+                  <entry key="type" value="Null"/>
+                </map>
+              </node>
+            </node>
+            <node name="GtrSummary">
+              <map/>
+            </node>
+            <node name="TextView">
+              <map>
+                <entry key="face" value="Dialog"/>
+                <entry key="size" value="12"/>
+              </map>
+              <node name="GeneSummary">
+                <map/>
+              </node>
+            </node>
+          </node>
           <node name="Model 2">
             <map>
               <entry key="name" value="testData_alpha"/>
@@ -904,7 +1296,7 @@
               </map>
               <node name="ArraySummary">
                 <map>
-                  <entry key="included" value="0"/>
+                  <entry key="included" value="1"/>
                 </map>
               </node>
             </node>
@@ -1013,9 +1405,9 @@
                   <entry key="Color2" value="#000000"/>
                   <entry key="Color3" value="#FFFF33"/>
                   <entry key="colorNum" value="3"/>
-                  <entry key="Fraction1" value="0.5215517282485962"/>
-                  <entry key="Fraction2" value="0.5818965435028076"/>
-                  <entry key="Fraction3" value="0.6778017282485962"/>
+                  <entry key="Fraction1" value="0.5043103694915771"/>
+                  <entry key="Fraction2" value="0.5193965435028076"/>
+                  <entry key="Fraction3" value="0.5549569129943848"/>
                   <entry key="fracNum" value="3"/>
                   <entry key="name" value="Custom"/>
                   <entry key="missing" value="#ffffff"/>
@@ -1024,14 +1416,14 @@
             </node>
             <node name="GlobalXMap">
               <map>
-                <entry key="scale" value="0.28104974061641746"/>
-                <entry key="minScale" value="0.28104974061641746"/>
-                <entry key="XScrollValue" value="1751"/>
+                <entry key="scale" value="0.453768690875801"/>
+                <entry key="minScale" value="0.453768690875801"/>
+                <entry key="XScrollValue" value="0"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="0.28104974061641746"/>
+                  <entry key="scale" value="0.453768690875801"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -1042,14 +1434,14 @@
             </node>
             <node name="GlobalYMap">
               <map>
-                <entry key="scale" value="0.422680412371134"/>
-                <entry key="minScale" value="0.422680412371134"/>
-                <entry key="YScrollValue" value="720"/>
+                <entry key="scale" value="0.5388316151202749"/>
+                <entry key="minScale" value="0.5388316151202749"/>
+                <entry key="YScrollValue" value="0"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="0.422680412371134"/>
+                  <entry key="scale" value="0.5388316151202749"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -1695,6 +2087,17 @@
               <entry key="extension" value=".txt"/>
               <entry key="treesVisible" value="false"/>
             </map>
+            <node name="ArrayNameView">
+              <map>
+                <entry key="face" value="Dialog"/>
+                <entry key="size" value="12"/>
+              </map>
+              <node name="ArraySummary">
+                <map>
+                  <entry key="included" value="0"/>
+                </map>
+              </node>
+            </node>
             <node name="ArrayNameViewManager">
               <map/>
               <node name="ArrayNameView0">
@@ -1800,14 +2203,14 @@
             </node>
             <node name="GlobalXMap">
               <map>
-                <entry key="scale" value="0.45987183399450715"/>
-                <entry key="minScale" value="0.45987183399450715"/>
+                <entry key="scale" value="0.453768690875801"/>
+                <entry key="minScale" value="0.453768690875801"/>
                 <entry key="XScrollValue" value="0"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="0.45987183399450715"/>
+                  <entry key="scale" value="0.453768690875801"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -1818,14 +2221,14 @@
             </node>
             <node name="GlobalYMap">
               <map>
-                <entry key="scale" value="0.13900343642611684"/>
-                <entry key="minScale" value="0.13900343642611684"/>
+                <entry key="scale" value="0.13470790378006872"/>
+                <entry key="minScale" value="0.13470790378006872"/>
                 <entry key="YScrollValue" value="0"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="0.13900343642611684"/>
+                  <entry key="scale" value="0.13470790378006872"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -1841,6 +2244,15 @@
             </node>
             <node name="GtrSummary">
               <map/>
+            </node>
+            <node name="TextView">
+              <map>
+                <entry key="face" value="Dialog"/>
+                <entry key="size" value="12"/>
+              </map>
+              <node name="GeneSummary">
+                <map/>
+              </node>
             </node>
             <node name="TextViewManager">
               <map/>
@@ -2389,7 +2801,19 @@
               <entry key="name" value="test_tiny"/>
               <entry key="extension" value=".txt"/>
               <entry key="treesVisible" value="false"/>
+              <entry key="globalViewLocked" value="false"/>
             </map>
+            <node name="ArrayNameView">
+              <map>
+                <entry key="face" value="Dialog"/>
+                <entry key="size" value="12"/>
+              </map>
+              <node name="ArraySummary">
+                <map>
+                  <entry key="included" value="0"/>
+                </map>
+              </node>
+            </node>
             <node name="ArrayNameViewManager">
               <map/>
               <node name="ArrayNameView0">
@@ -2478,16 +2902,31 @@
                   <entry key="name" value="YellowBlue"/>
                 </map>
               </node>
+              <node name="ColorSet3">
+                <map>
+                  <entry key="Color1" value="#FF0000"/>
+                  <entry key="Color2" value="#000000"/>
+                  <entry key="Color3" value="#00FF00"/>
+                  <entry key="colorNum" value="3"/>
+                  <entry key="Fraction1" value="0.4795258641242981"/>
+                  <entry key="Fraction2" value="0.5"/>
+                  <entry key="Fraction3" value="0.5183189511299133"/>
+                  <entry key="fracNum" value="3"/>
+                  <entry key="name" value="Custom"/>
+                  <entry key="missing" value="#ffffff"/>
+                </map>
+              </node>
             </node>
             <node name="GlobalXMap">
               <map>
-                <entry key="scale" value="76.05"/>
-                <entry key="minScale" value="76.05"/>
+                <entry key="scale" value="38.45"/>
+                <entry key="minScale" value="38.45"/>
+                <entry key="XScrollValue" value="0"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="76.05"/>
+                  <entry key="scale" value="38.45"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -2498,13 +2937,14 @@
             </node>
             <node name="GlobalYMap">
               <map>
-                <entry key="scale" value="26.580645161290324"/>
-                <entry key="minScale" value="26.580645161290324"/>
+                <entry key="scale" value="25.29032258064516"/>
+                <entry key="minScale" value="25.29032258064516"/>
+                <entry key="YScrollValue" value="0"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="26.580645161290324"/>
+                  <entry key="scale" value="25.29032258064516"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -2513,8 +2953,24 @@
                 </map>
               </node>
             </node>
+            <node name="GradientChooser">
+              <map>
+                <entry key="activeColors" value="Custom"/>
+              </map>
+            </node>
             <node name="GtrSummary">
               <map/>
+            </node>
+            <node name="TextView">
+              <map>
+                <entry key="face" value="Dialog"/>
+                <entry key="size" value="12"/>
+              </map>
+              <node name="GeneSummary">
+                <map>
+                  <entry key="included" value="0"/>
+                </map>
+              </node>
             </node>
             <node name="TextViewManager">
               <map/>
@@ -2634,6 +3090,42 @@
           <node name="File13">
             <map>
               <entry key="root" value="testData_max"/>
+              <entry key="dir" value="C:\Users\CKeil\Work\TreeView Related Files\Test Files\"/>
+              <entry key="cdt" value=".txt"/>
+              <entry key="name" value="No name"/>
+              <entry key="style" value="0"/>
+            </map>
+            <node name="File9">
+              <map/>
+            </node>
+          </node>
+          <node name="File14">
+            <map>
+              <entry key="root" value="testData_small"/>
+              <entry key="dir" value="C:\Users\CKeil\Work\TreeView Related Files\Test Files\"/>
+              <entry key="cdt" value=".txt"/>
+              <entry key="name" value="No name"/>
+              <entry key="style" value="0"/>
+            </map>
+            <node name="File9">
+              <map/>
+            </node>
+          </node>
+          <node name="File15">
+            <map>
+              <entry key="root" value="fg_090813_v2_alpha"/>
+              <entry key="dir" value="C:\Users\CKeil\Work\TreeView Related Files\Test Files\"/>
+              <entry key="cdt" value=".txt"/>
+              <entry key="name" value="No name"/>
+              <entry key="style" value="0"/>
+            </map>
+            <node name="File9">
+              <map/>
+            </node>
+          </node>
+          <node name="File16">
+            <map>
+              <entry key="root" value="testData_gamma"/>
               <entry key="dir" value="C:\Users\CKeil\Work\TreeView Related Files\Test Files\"/>
               <entry key="cdt" value=".txt"/>
               <entry key="name" value="No name"/>

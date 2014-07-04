@@ -8,12 +8,12 @@ import java.util.Random;
 
 import javax.swing.SwingWorker;
 
-import edu.stanford.genetics.treeview.model.TVModel;
+import edu.stanford.genetics.treeview.DataModel;
 
 public class KMeansCluster {
 
 	// Instance variables
-	private final TVModel model;
+	private final DataModel model;
 	private final ClusterView clusterView;
 
 	private ClusterFileWriter2 bufferedWriter;
@@ -45,7 +45,7 @@ public class KMeansCluster {
 	 * @param type
 	 * @param method
 	 */
-	public KMeansCluster(final TVModel model, final ClusterView clusterView,
+	public KMeansCluster(final DataModel model, final ClusterView clusterView,
 			final double[][] dMatrix, final String type, final int clusterN,
 			final int iterations, final SwingWorker<String[], Void> worker) {
 
@@ -272,7 +272,7 @@ public class KMeansCluster {
 
 		clusterView.updatePBar(0);
 
-		final ArrayList<List<Integer>> clusters = new ArrayList<List<Integer>>();
+		final List<List<Integer>> clusters = new ArrayList<List<Integer>>();
 
 		// fill clusters List with clusterN-amount of empty lists to
 		// avoid duplicates of the initial means later

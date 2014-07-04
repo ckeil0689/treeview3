@@ -6,6 +6,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JSeparator;
 
 import edu.stanford.genetics.treeview.GUIFactory;
 import edu.stanford.genetics.treeview.StringRes;
@@ -31,20 +32,26 @@ public class WelcomeView {
 
 		homePanel = GUIFactory.createJPanel(false, false, null);
 
-		title_bg = GUIFactory.createJPanel(true, true, null);
-
-		jl = GUIFactory.createXXLLabel(StringRes.title_Hello);
-
-		jl2 = GUIFactory.createXXLLabel(StringRes.title_Welcome 
-				+ StringRes.appName);
-
-		title_bg.add(jl, "push, alignx 50%, span, wrap");
-		title_bg.add(jl2, "push, alignx 50%, span");
+		title_bg = GUIFactory.createJPanel(false, true, null);
+		
+		JPanel titleContainer = GUIFactory.createJPanel(false, false, null);
 		
 		loadPanel = GUIFactory.createJPanel(false, true, null);
+
+		jl = GUIFactory.createBigLabel(StringRes.title_Hello);
+
+		jl2 = GUIFactory.createXXLLabel(StringRes.title_Welcome 
+				+ StringRes.appName + StringRes.dot);
+
+		titleContainer.add(jl, "pushx, alignx 50%, aligny 50%, span, wrap");
+		titleContainer.add(jl2, "pushx, alignx 50%, span");
+		titleContainer.add(new JSeparator(JSeparator.HORIZONTAL), "w 30%, "
+				+ "pushx, alignx 50%");
 		
-		homePanel.add(title_bg, "pushx, growx, alignx 50%, span, "
-				+ "height 20%::, wrap");
+		title_bg.add(titleContainer, "push, growx, align 50%");
+		
+		homePanel.add(title_bg, "push, grow, alignx 50%, "
+				+ "span, wrap");
 		homePanel.add(loadPanel, "push, grow, alignx 50%");
 	}
 
@@ -91,7 +98,7 @@ public class WelcomeView {
 		loadPanel.removeAll();
 
 		loadButton = GUIFactory.setLargeButtonLayout("Open...");
-		loadPanel.add(loadButton, "push, alignx 50%");
+		loadPanel.add(loadButton, "push, alignx 50%, aligny 0%");
 
 		// Set the colors
 //		homePanel.setBackground(GUIFactory.BG_COLOR);
@@ -111,6 +118,8 @@ public class WelcomeView {
 
 		loadPanel.removeAll();
 
+		JPanel loadContainer = GUIFactory.createJPanel(false, false, null);
+		
 		jl.setText(StringRes.loading_OneSec);
 		jl2.setText(StringRes.loading_active);
 		
@@ -118,8 +127,10 @@ public class WelcomeView {
 		
 		loadBar = GUIFactory.setPBarLayout();
 
-		loadPanel.add(loadLabel, "push, alignx 50%, aligny 100%, wrap");
-		loadPanel.add(loadBar, "push, w 70%, alignx 50%, aligny 0%");
+		loadContainer.add(loadLabel, "pushx, alignx 50%, wrap");
+		loadContainer.add(loadBar, "pushx, growx");
+		
+		loadPanel.add(loadContainer, "pushx, growx, align 50%, w 60%!");
 
 		homePanel.revalidate();
 		homePanel.repaint();

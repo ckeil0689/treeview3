@@ -23,7 +23,6 @@
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.ScrollPane;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
@@ -41,13 +40,11 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JSplitPane;
-import javax.swing.JToggleButton;
 
 import edu.stanford.genetics.treeview.DendroPanel;
 import edu.stanford.genetics.treeview.GUIFactory;
 import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.StringRes;
-import edu.stanford.genetics.treeview.TVScrollBarUI;
 import edu.stanford.genetics.treeview.TabbedSettingsPanel;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.TreeViewFrame;
@@ -113,7 +110,7 @@ public class DendroView2 implements Observer, DendroPanel {
 	// JMenuItems
 	private JMenuItem colorMenuItem;
 	private JMenuItem annotationsMenuItem;
-	private JMenuItem isolateMenu;
+	private JMenu matrixMenu;
 
 	// JButtons
 	private JButton zoomButton;
@@ -123,22 +120,15 @@ public class DendroView2 implements Observer, DendroPanel {
 	private JButton scaleDecY;
 	private JButton scaleDefaultAll;
 	
-	private JToggleButton toggleScale;
-	
 	// GlobalView default sizes as ints to keep track.
 	private double gvWidth;
 	private double gvHeight;
 	
 	private double maxGVWidth;
 	private double maxGVHeight;
-	
-	private double widthChange = 0;
-	private double heightChange = 0;
-
 
 	// Booleans
 	private boolean showTrees = false;
-	private boolean toggled = false;
 	private boolean loaded;
 
 	// Selections
@@ -193,9 +183,6 @@ public class DendroView2 implements Observer, DendroPanel {
 //		globalXscrollbar.setUI(new TVScrollBarUI());
 		globalYscrollbar = globalview.getYScroll();
 //		globalYscrollbar.setUI(new TVScrollBarUI());
-		
-		toggleScale = GUIFactory.setToggleButtonLayout(
-				StringRes.button_toggleMatrixSize);
 
 		// Set up the column name display
 //		arraynameview = new ArrayNameViewManager();
@@ -276,22 +263,22 @@ public class DendroView2 implements Observer, DendroPanel {
 		JPanel bottomPanel;
 
 		// Buttons
-		scaleDefaultAll = GUIFactory.setButtonLayout(null, StringRes.icon_home);
+		scaleDefaultAll = GUIFactory.setNavButtonLayout(StringRes.icon_home);
 		scaleDefaultAll.setToolTipText("Reset the zoomed view");
 
-		scaleIncX = GUIFactory.setButtonLayout(null, StringRes.icon_zoomIn);
+		scaleIncX = GUIFactory.setNavButtonLayout(StringRes.icon_zoomIn);
 		scaleIncX.setToolTipText(StringRes.tooltip_xZoomIn);
 
-		scaleDecX = GUIFactory.setButtonLayout(null, StringRes.icon_zoomOut);
+		scaleDecX = GUIFactory.setNavButtonLayout(StringRes.icon_zoomOut);
 		scaleDecX.setToolTipText(StringRes.tooltip_xZoomOut);
 
-		scaleIncY = GUIFactory.setButtonLayout(null, StringRes.icon_zoomIn);
+		scaleIncY = GUIFactory.setNavButtonLayout(StringRes.icon_zoomIn);
 		scaleIncY.setToolTipText(StringRes.tooltip_yZoomIn);
 
-		scaleDecY = GUIFactory.setButtonLayout(null, StringRes.icon_zoomOut);
+		scaleDecY = GUIFactory.setNavButtonLayout(StringRes.icon_zoomOut);
 		scaleDecY.setToolTipText(StringRes.tooltip_yZoomOut);
 
-		zoomButton = GUIFactory.setButtonLayout(null, StringRes.icon_zoomAll);
+		zoomButton = GUIFactory.setNavButtonLayout(StringRes.icon_zoomAll);
 		zoomButton.setToolTipText(StringRes.tooltip_home);
 
 		// Panels
@@ -355,17 +342,16 @@ public class DendroView2 implements Observer, DendroPanel {
 		globalViewContainer.add(globalXscrollbar, "span, pushx, alignx 50%, "
 				+ "w 100%, h 1%");
 
-		crossPanel.add(scaleIncY, "span, alignx 50%, wrap");
-		crossPanel.add(scaleDecX);
-		crossPanel.add(zoomButton);
-		crossPanel.add(scaleIncX, "wrap");
-		crossPanel.add(scaleDecY, "span, alignx 50%");
+		crossPanel.add(scaleIncY, "span, alignx 50%, h 33%, wrap");
+		crossPanel.add(scaleDecX, "h 33%");
+		crossPanel.add(zoomButton, "h 33%");
+		crossPanel.add(scaleIncX, "h 33%, wrap");
+		crossPanel.add(scaleDecY, "span, h 33%, alignx 50%");
 
 		buttonPanel.add(crossPanel, "pushx, alignx 50%, wrap");
 
 		navPanel.add(buttonPanel, "pushx, h 20%, w 90%, alignx 50%, wrap");
-		navPanel.add(scaleDefaultAll, "push, alignx 50%, aligny 5%, wrap");
-		navPanel.add(toggleScale, "push, alignx 50%, aligny 5%");
+		navPanel.add(scaleDefaultAll, "push, alignx 50%, aligny 5%");
 		
 		navContainer.add(navPanel, "push, h 50%, alignx 100%, aligny 50%");
 		
@@ -436,8 +422,13 @@ public class DendroView2 implements Observer, DendroPanel {
 		arrayContainer.add(arrayScroll, "w 1%, h 100%");
 		geneContainer.add(geneScroll, "w 100%, h 1%");
 		
-		gvWidth = maxGVWidth + widthChange;
-		gvHeight = maxGVHeight + heightChange;
+		if(gvWidth == 0 && gvHeight == 0) {
+			gvWidth = maxGVWidth;
+			gvHeight = maxGVHeight;
+		}
+		
+		double widthChange = gvWidth - maxGVWidth;
+		double heightChange = gvHeight - maxGVHeight;
 		
 		halfWidthChange = widthChange/ 2.0;
 		halfHeightChange = heightChange/ 2.0;
@@ -583,28 +574,6 @@ public class DendroView2 implements Observer, DendroPanel {
 
 		this.showTrees = visible;
 	}
-	
-	/**
-	 * Sets the status of the JCheckBox that controls whether GlobalView
-	 * will be resized or not.
-	 * 
-	 * @param visible
-	 */
-	public void setGVLocked(final boolean locked) {
-
-		this.toggled = locked;
-		toggleScale.setSelected(locked);
-	}
-	
-	/**
-	 * Returns the status of the JCheckBox that controls whether GlobalView
-	 * will be resized or not.
-	 * @return
-	 */
-	public boolean getGVLocked() {
-		
-		return toggleScale.isSelected();
-	}
 
 	/**
 	 * Opens a JWindow containing Swing components used to search data by name
@@ -618,39 +587,22 @@ public class DendroView2 implements Observer, DendroPanel {
 		dialog.setTitle(StringRes.dialog_title_search);
 		dialog.setResizable(false);
 
-		final JPanel container = GUIFactory.createJPanel(true, true, null); //new JPanel();
-//		container.setLayout(new MigLayout());
-//		container.setBackground(GUIUtils.BG_COLOR);
+		final JPanel container = GUIFactory.createJPanel(true, true, null); 
 		container.setBorder(BorderFactory.createEtchedBorder(GUIFactory.BORDERS,
 				GUIFactory.BG_COLOR));
 		
 		JLabel wildTip = GUIFactory.createSmallLabel("Tip: Edit the search "
 				+ "fields to search for terms.");
-//		wildTip.setFont(GUIUtils.FONTS);
-//		wildTip.setForeground(GUIUtils.TEXT);
 		
 		JLabel wildTip2 = GUIFactory.createSmallLabel("Wildcards ('*', '?') "
 				+ "are supported.");
-//		wildTip2.setFont(GUIUtils.FONTS);
-//		wildTip2.setForeground(GUIUtils.TEXT);
-		
-		final JButton closeButton = GUIFactory.setButtonLayout("Close", null);
-		closeButton.addActionListener(new ActionListener() {
 
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-
-				dialog.dispose();
-			}
-		});
-
+		container.add(wildTip, "span, wrap");
+		container.add(wildTip2, "span, wrap");
 		container.add(getGeneFinderPanel(), "w 90%, h 40%, "
 				+ "alignx 50%, wrap");
 		container.add(getArrayFinderPanel(), "w 90%, h 40%, "
-				+ "alignx 50%, wrap");
-		container.add(wildTip, "span, wrap");
-		container.add(wildTip2, "span, wrap");
-		container.add(closeButton, "push, alignx 100%");
+				+ "alignx 50%");
 
 		dialog.getContentPane().add(container);
 		dialog.pack();
@@ -1011,7 +963,22 @@ public class DendroView2 implements Observer, DendroPanel {
 		menu.add(colorMenuItem);
 		tvFrame.addToStackMenuList(colorMenuItem);
 		
-//		menu.addSeparator();
+		menu.addSeparator();
+		
+		matrixMenu = new JMenu("Matrix Size");
+		menu.add(matrixMenu);
+		
+		JMenuItem fillScreenMenuItem = new JMenuItem("Fill screen");
+		matrixMenu.add(fillScreenMenuItem);
+		tvFrame.addToStackMenuList(fillScreenMenuItem);
+		
+		JMenuItem equalAxesMenuItem = new JMenuItem("Equal axes");
+		matrixMenu.add(equalAxesMenuItem);
+		tvFrame.addToStackMenuList(equalAxesMenuItem);
+		
+		JMenuItem proportMatrixMenuItem = new JMenuItem("Proportional axes");
+		matrixMenu.add(proportMatrixMenuItem);
+		tvFrame.addToStackMenuList(proportMatrixMenuItem);
 //		
 //		isolateMenu = new JMenuItem("Isolate Selected");
 //		menu.add(isolateMenu);
@@ -1187,25 +1154,27 @@ public class DendroView2 implements Observer, DendroPanel {
 		return gvHeight;
 	}
 	
-	public double getWidthChange() {
-		
-		return widthChange;
-	}
-	
-	public void setWidthChange(double change) {
-		
-		this.widthChange = widthChange + change;
-	}
-	
-	public double getHeightChange() {
-		
-		return heightChange;
-	}
-	
-	public void setHeightChange(double change) {
-		
-		this.heightChange = heightChange + change;
-	}
+//	public double getWidthChange() {
+//		
+//		return widthChange;
+//	}
+//	
+//	public void setWidthChange(double change) {
+//		
+////		this.widthChange = widthChange + change;
+//		this.widthChange = change;
+//	}
+//	
+//	public double getHeightChange() {
+//		
+//		return heightChange;
+//	}
+//	
+//	public void setHeightChange(double change) {
+//		
+////		this.heightChange = heightChange + change;
+//		this.heightChange = change;
+//	}
 	
 	public double getMaxGVWidth() {
 		

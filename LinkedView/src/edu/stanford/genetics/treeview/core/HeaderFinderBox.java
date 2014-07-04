@@ -26,8 +26,11 @@ package edu.stanford.genetics.treeview.core;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -36,6 +39,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+
+import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.GUIFactory;
@@ -62,7 +67,7 @@ public abstract class HeaderFinderBox {
 	private final HeaderInfo headerInfo;
 	private final HeaderSummary headerSummary;
 
-	private final ArrayList<String> geneList;
+	private final List<String> geneList;
 	private String[] genefHeaders = { "" };
 	private final WideComboBox genefBox;
 	private final JButton genefButton;
@@ -88,9 +93,7 @@ public abstract class HeaderFinderBox {
 		this.headerSummary = headerSummary;
 		this.geneSelection = geneSelection;
 
-		contentPanel = new JPanel();
-		contentPanel.setLayout(new MigLayout());
-		contentPanel.setOpaque(false);
+		contentPanel = GUIFactory.createJPanel(false, true, null);
 
 		final String[][] hA = headerInfo.getHeaderArray();
 
@@ -115,9 +118,12 @@ public abstract class HeaderFinderBox {
 
 		genefBox = GUIFactory.setWideComboLayout(labeledHeaders);
 		genefBox.setEditable(true);
-//		AutoCompleteDecorator.decorate(genefBox);
+		AutoCompleteDecorator.decorate(genefBox);
+		
+		genefBox.getEditor().getEditorComponent().addKeyListener(
+				new BoxKeyListener());
 
-		genefButton = GUIFactory.setButtonLayout(null, "searchIcon");
+		genefButton = GUIFactory.setNavButtonLayout("searchIcon");
 		genefButton.setToolTipText("Highlights the selected label.");
 		genefButton.addActionListener(new ActionListener() {
 
@@ -168,7 +174,7 @@ public abstract class HeaderFinderBox {
 		geneSelection.setSelectedNode(null);
 		geneSelection.deselectAllIndexes();
 
-		ArrayList<Integer> indexList = findSelected();
+		List<Integer> indexList = findSelected();
 		
 		for(int i = 0; i < indexList.size(); i++) {
 			
@@ -182,9 +188,9 @@ public abstract class HeaderFinderBox {
 		}
 	}
 	
-	private ArrayList<Integer> findSelected() {
+	private List<Integer> findSelected() {
 		
-		ArrayList<Integer> indexList = new ArrayList<Integer>();
+		List<Integer> indexList = new ArrayList<Integer>();
 		
 		String sub = genefBox.getSelectedItem().toString();
 		
@@ -237,6 +243,29 @@ public abstract class HeaderFinderBox {
     }
 
 	abstract public void scrollToIndex(int i);
+	
+	/**
+	 * KeyListener to implement search by pressing enter when the 
+	 * combobox has focus.
+	 * @author CKeil
+	 *
+	 */
+	class BoxKeyListener extends KeyAdapter {
+
+		@Override
+		public void keyPressed(KeyEvent e) {}
+
+		@Override
+		public void keyReleased(KeyEvent e) {}
+
+		@Override
+		public void keyTyped(KeyEvent e) {
+			
+			if(e.getKeyChar() == KeyEvent.VK_ENTER) {
+				seekAll();
+			}
+		}
+	}
 	
 	/**
 	 * Test method for wild card search.

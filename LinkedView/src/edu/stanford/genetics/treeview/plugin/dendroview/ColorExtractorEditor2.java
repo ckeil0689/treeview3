@@ -51,8 +51,7 @@ public class ColorExtractorEditor2 extends JPanel {
 
 			removeAll();
 			this.setOpaque(false);
-			final JButton pushButton = GUIFactory.setButtonLayout("Missing",
-					null);
+			final JButton pushButton = GUIFactory.setButtonLayout("Missing");
 			pushButton.addActionListener(new ActionListener() {
 
 				@Override

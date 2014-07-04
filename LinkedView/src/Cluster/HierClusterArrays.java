@@ -23,7 +23,7 @@ public class HierClusterArrays {
 
 	// Instance variables
 	private final double PRECISION_LEVEL = 0.0000000001;
-	private final TVModel model;
+	private final DataModel model;
 	private final ClusterView clusterView;
 	private String filePath;
 	private final String type;
@@ -46,7 +46,7 @@ public class HierClusterArrays {
 
 	private ClusterFileWriter2 bufferedWriter;
 
-	private ArrayList<List<Integer>> geneGroups;
+	private List<List<Integer>> geneGroups;
 	private int[][] geneIntegerTable;
 
 	// needed for connectNodes??? better way?

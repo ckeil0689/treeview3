@@ -30,8 +30,6 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import net.miginfocom.swing.MigLayout;
-
 /**
  * this is a dialog which displays a modeless settings dialog. it includes a
  * close button, which will dispose of the dialog when it is pressed. It could
@@ -51,11 +49,10 @@ public class ModelessSettingsDialog extends JDialog {
 		settingsPanel = panel;
 		settingsFrame = this;
 
-		final JPanel inner = new JPanel();
-		inner.setLayout(new MigLayout());
+		final JPanel inner = GUIFactory.createJPanel(false, false, null);
+		
 		inner.add((JPanel) panel, "push, grow, wrap");
 		inner.add(new ButtonPanel(), "pushx, growx, alignx 50%");
-		inner.setBackground(GUIFactory.BG_COLOR);
 
 		getContentPane().add(inner);
 	}
@@ -75,8 +72,7 @@ public class ModelessSettingsDialog extends JDialog {
 
 			this.setBackground(GUIFactory.BG_COLOR);
 
-			final JButton close_button = GUIFactory.setButtonLayout("Close",
-					null);
+			final JButton close_button = GUIFactory.setButtonLayout("Close");
 			close_button.addActionListener(new ActionListener() {
 
 				@Override
@@ -88,8 +84,7 @@ public class ModelessSettingsDialog extends JDialog {
 			});
 			add(close_button);
 
-			final JButton cancel_button = GUIFactory.setButtonLayout("Cancel",
-					null);
+			final JButton cancel_button = GUIFactory.setButtonLayout("Cancel");
 			cancel_button.addActionListener(new ActionListener() {
 
 				@Override

@@ -3,7 +3,8 @@ package Cluster;
 import java.io.File;
 import java.io.IOException;
 
-import edu.stanford.genetics.treeview.model.TVModel;
+import edu.stanford.genetics.treeview.DataModel;
+import edu.stanford.genetics.treeview.StringRes;
 
 /**
  * This class is used to generate the .CDT tab delimited file which Java
@@ -16,13 +17,13 @@ import edu.stanford.genetics.treeview.model.TVModel;
 public class CDTGeneratorArrays {
 
 	// Instance variables
-	private final TVModel model;
+	private final DataModel model;
 	private final ClusterView clusterView;
 
 	private String filePath;
 	private final boolean hierarchical;
-	private final String choice;
-	private final String choice2;
+	private final boolean isRowMethodChosen;
+	private final boolean isColMethodChosen;
 
 	private final double[][] sepList;
 	private double[][] cdtDataDoubles;
@@ -39,7 +40,7 @@ public class CDTGeneratorArrays {
 	private ClusterFileWriter2 bufferedWriter;
 
 	// Constructor (building the object)
-	public CDTGeneratorArrays(final TVModel model,
+	public CDTGeneratorArrays(final DataModel model,
 			final ClusterView clusterView, final double[][] sepList,
 			final String[] orderedRows, final String[] orderedCols,
 			final boolean hierarchical) {
@@ -50,8 +51,10 @@ public class CDTGeneratorArrays {
 		this.orderedRows = orderedRows;
 		this.orderedCols = orderedCols;
 		this.hierarchical = hierarchical;
-		this.choice = clusterView.getRowSimilarity();
-		this.choice2 = clusterView.getColSimilarity();
+		this.isRowMethodChosen = clusterView.getRowSimilarity()
+				.contentEquals(StringRes.cluster_DoNot);
+		this.isColMethodChosen = clusterView.getColSimilarity()
+				.contentEquals(StringRes.cluster_DoNot);
 	}
 
 	public void generateCDT() {
@@ -162,10 +165,10 @@ public class CDTGeneratorArrays {
 		final int[] reorderedRowIndexes = new int[sepList.length];
 		final int[] reorderedColIndexes = new int[colNames.length];
 
-		cdtDataDoubles = new double[reorderedRowIndexes.length][reorderedColIndexes.length];
+		cdtDataDoubles = new double[reorderedRowIndexes.length]
+				[reorderedColIndexes.length];
 
-		if (!choice.contentEquals("Do Not Cluster")) {
-
+		if (!isRowMethodChosen) {
 			final String[] geneNames = new String[rowNames.length];
 			if (!hierarchical) {
 				for (int i = 0; i < geneNames.length; i++) {
@@ -204,7 +207,7 @@ public class CDTGeneratorArrays {
 			rowNameListOrdered = rowNames;
 		}
 
-		if (!choice2.contentEquals("Do Not Cluster")) {
+		if (!isColMethodChosen) {
 			// Make list of gene names to quickly access indexes
 			final String[] geneNames = new String[colNames.length];
 
@@ -290,13 +293,13 @@ public class CDTGeneratorArrays {
 				+ colNames.length;
 		int addIndex = 0;
 
-		if (!choice.contentEquals("Do Not Cluster")) {
+		if (!isRowMethodChosen) {
 			rowLength++;
 		}
 
 		String[] cdtRow1 = new String[rowLength];
 
-		if (!choice.contentEquals("Do Not Cluster")) {
+		if (!isRowMethodChosen) {
 			cdtRow1[addIndex] = "GID";
 			addIndex++;
 		}
@@ -320,8 +323,7 @@ public class CDTGeneratorArrays {
 		bufferedWriter.writeContent(cdtRow1);
 		cdtRow1 = null;
 
-		if (!choice2.contentEquals("Do Not Cluster")) {
-
+		if (!isColMethodChosen) {
 			addIndex = 0;
 			String[] cdtRow2 = new String[rowLength];
 
@@ -329,11 +331,12 @@ public class CDTGeneratorArrays {
 			addIndex++;
 
 			// Check if rows have been clustered
-			if (!choice.contentEquals("Do Not Cluster")) {
+			if (!isRowMethodChosen) {
 				for (int i = 0; i < rowHeaders.length; i++) {
 					cdtRow2[addIndex] = "";
 					addIndex++;
 				}
+				
 			} else {
 				for (int i = 0; i < rowHeaders.length - 1; i++) {
 					cdtRow2[addIndex] = "";
@@ -358,7 +361,7 @@ public class CDTGeneratorArrays {
 		cdtRow3[addIndex] = "EWEIGHT";
 		addIndex++;
 
-		if (!choice.contentEquals("Do Not Cluster")) {
+		if (!isRowMethodChosen) {
 			for (int i = 0; i < rowHeaders.length; i++) {
 
 				cdtRow3[addIndex] = "";
@@ -388,7 +391,7 @@ public class CDTGeneratorArrays {
 			final String[] row = new String[rowLength];
 
 			// Adding GID names if rows were clustered
-			if (!choice.contentEquals("Do Not Cluster")) {
+			if (!isRowMethodChosen) {
 				row[addIndex] = orderedRows[i];
 				addIndex++;
 			}

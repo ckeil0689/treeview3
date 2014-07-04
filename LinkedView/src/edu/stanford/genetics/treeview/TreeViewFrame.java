@@ -38,6 +38,7 @@ import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.prefs.Preferences;
 
@@ -100,8 +101,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	private FileSet fileMenuSet;
 
 	// Menu Items
-	private ArrayList<JMenuItem> stackMenuList;
-	private ArrayList<JMenuItem> fileMenuList;
+	private List<JMenuItem> stackMenuList;
+	private List<JMenuItem> fileMenuList;
 
 	// private JButton stackButton;
 	private JButton searchButton;
@@ -274,10 +275,10 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		waiting.add(view, "push, grow");
 
 		if(dendroView.isLoaded()) {
-			backgroundPanel.add(menuPanel, "pushx, grow, wrap");
+			backgroundPanel.add(menuPanel, "push, grow, h 5%, wrap");
 		}
 		
-		backgroundPanel.add(waiting, "push, grow");
+		backgroundPanel.add(waiting, "push, grow, h 95%");
 //		backgroundPanel.setBackground(GUIFactory.BG_COLOR);
 		
 		backgroundPanel.revalidate();
@@ -473,6 +474,15 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		} else {
 			System.out.println("Got weird update");
 		}
+	}
+	
+	/**
+	 * Passes the resize call for the matrix to the DendroController.
+	 * @param mode
+	 */
+	public void setMatrixSize(String mode) {
+		
+		dendroController.setMatrixSize(mode);
 	}
 
 	/**
@@ -688,8 +698,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 	public void generateSearchMenu() {
 
-		searchButton = GUIFactory.setMenuButtonLayout(
-				StringRes.button_searchLabels, null);
+		searchButton = GUIFactory.setButtonLayout(
+				StringRes.button_searchLabels);
 		searchButton.setToolTipText(StringRes.tooltip_searchRowCol);
 
 		menuPanel.add(searchButton);
@@ -697,8 +707,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 	public void generateTreeMenu() {
 
-		treeButton = GUIFactory.setMenuButtonLayout(StringRes.button_showTrees, 
-				null);
+		treeButton = GUIFactory.setButtonLayout(StringRes.button_showTrees);
 		treeButton.setToolTipText(StringRes.tooltip_showTrees);
 
 		// Initially disabled, will be enabled if gtrview or atrview in
@@ -856,7 +865,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		final JPanel panel = GUIFactory.createJPanel(true, true, null);
 
-		final JButton button = GUIFactory.setButtonLayout("OK", null);
+		final JButton button = GUIFactory.setButtonLayout("OK");
 		button.addActionListener(new ActionListener() {
 
 			@Override
@@ -1067,7 +1076,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		return fileMenuSet;
 	}
 
-	public ArrayList<JMenuItem> getStackMenus() {
+	public List<JMenuItem> getStackMenus() {
 
 		return stackMenuList;
 	}

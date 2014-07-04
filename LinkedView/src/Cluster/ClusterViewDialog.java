@@ -1,15 +1,15 @@
 package Cluster;
 
 import java.awt.Dialog;
-import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
-import edu.stanford.genetics.treeview.GUIFactory;
-import edu.stanford.genetics.treeview.TreeViewFrame;
+import edu.stanford.genetics.treeview.StringRes;
 
 /**
  * Frame set up for ClusterView.
@@ -22,22 +22,22 @@ public class ClusterViewDialog {
 	private final JDialog clusterDialog;
 	private final ClusterView clusterView;
 
-	public ClusterViewDialog(final TreeViewFrame tvFrame,
+	public ClusterViewDialog(final JFrame parentFrame,
 			final String clusterType) {
 
 		clusterDialog = new JDialog();
 		clusterDialog.setTitle("Clustering");
 		clusterDialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
-		clusterDialog.setResizable(false);
+		clusterDialog.setResizable(true);
 
-		clusterView = new ClusterView(tvFrame, clusterType);
+		clusterView = new ClusterView(clusterType);
 
 		// Setting preferred size for the ContentPane of this frame
-		final Dimension mainDim = GUIFactory.getScreenSize();
-		clusterDialog.getContentPane().setPreferredSize(
-				new Dimension(mainDim.width * 1/ 2, mainDim.height * 1/ 2));
+//		final Dimension mainDim = GUIFactory.getScreenSize();
+//		clusterDialog.getContentPane().setPreferredSize(
+//				new Dimension(mainDim.width * 1/ 2, mainDim.height * 1/ 2));
 
-		clusterDialog.setMinimumSize(new Dimension(800, 600));
+//		clusterDialog.setMinimumSize(new Dimension(800, 600));
 
 		// setup frame options
 		clusterDialog
@@ -53,10 +53,10 @@ public class ClusterViewDialog {
 			}
 		});
 
-		clusterDialog.getContentPane().add(clusterView);
+		clusterDialog.getContentPane().add(clusterView.makeClusterPanel());
 
 		clusterDialog.pack();
-		clusterDialog.setLocationRelativeTo(tvFrame.getAppFrame());
+		clusterDialog.setLocationRelativeTo(parentFrame);
 	}
 
 	/**
@@ -77,6 +77,24 @@ public class ClusterViewDialog {
 	public ClusterView getClusterView() {
 
 		return clusterView;
+	}
+	
+	/**
+	 * Test method to check UI and UX.
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				
+				ClusterViewDialog cd = new ClusterViewDialog(new JFrame(), 
+						StringRes.menu_title_Hier);
+				cd.setVisible(true);
+			}
+		});
 	}
 
 }

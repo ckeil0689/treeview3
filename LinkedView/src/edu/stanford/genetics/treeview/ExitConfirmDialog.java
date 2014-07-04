@@ -10,8 +10,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
-import net.miginfocom.swing.MigLayout;
-
+/**
+ * Small dialog used to confirm the decision to exit the program.
+ * @author CKeil
+ *
+ */
 public class ExitConfirmDialog {
 	
 	private JDialog exitFrame;
@@ -19,21 +22,17 @@ public class ExitConfirmDialog {
 	public ExitConfirmDialog(final ViewFrame view) {
 
 		exitFrame = new JDialog();
-		exitFrame.setTitle("Confirm Exit");
+		exitFrame.setTitle(StringRes.dialog_title_exitConfirm);
 		exitFrame.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
 		exitFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		exitFrame.setResizable(false);
 
-		final JPanel mainPanel = new JPanel();
-		mainPanel.setLayout(new MigLayout());
-		mainPanel.setBackground(GUIFactory.BG_COLOR);
+		final JPanel mainPanel = GUIFactory.createJPanel(false, true, null);
 
-		final JLabel prompt = new JLabel(
-				"Are you sure you want to close TreeView?");
-		prompt.setForeground(GUIFactory.TEXT);
-		prompt.setFont(GUIFactory.FONTS);
+		final JLabel prompt = GUIFactory.createSmallLabel("Are you sure "
+				+ "you want to close TreeView?");
 
-		final JButton ok = GUIFactory.setButtonLayout("Yes", null);
+		final JButton ok = GUIFactory.setButtonLayout("Yes");
 		ok.addActionListener(new ActionListener() {
 
 			@Override

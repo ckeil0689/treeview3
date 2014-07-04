@@ -1,7 +1,6 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.Dialog;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -13,8 +12,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
-
-import net.miginfocom.swing.MigLayout;
 
 /**
  * A class that generates a JDialog to display some small amounts of
@@ -33,13 +30,13 @@ public class AboutDialog {
 		this.tvFrame = tvFrame;
 
 		aboutDialog = new JDialog();
-		aboutDialog.setTitle("About...");
+		aboutDialog.setTitle(StringRes.dialog_title_about);
 		aboutDialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
 		aboutDialog.setResizable(false);
 
-		final Dimension mainDim = GUIFactory.getScreenSize();
-
-		aboutDialog.setSize(mainDim.width * 1 / 2, mainDim.height * 1 / 2);
+//		final Dimension mainDim = GUIFactory.getScreenSize();
+//
+//		aboutDialog.setSize(mainDim.width * 1 / 2, mainDim.height * 1 / 2);
 
 		aboutDialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -60,31 +57,24 @@ public class AboutDialog {
 
 	public void setupLayout() {
 
-		final JPanel message = new JPanel();
-		message.setLayout(new MigLayout());
-		message.setBackground(GUIFactory.BG_COLOR);
+		final JPanel message = GUIFactory.createJPanel(false, true, null);
 
-		final JLabel text = new JLabel(StringRes.appName
+		final JLabel text = GUIFactory.createSmallLabel(StringRes.appName
 				+ " was created by Chris Keil based on Alok Saldhana's "
 				+ "Java TreeView.");
-		text.setFont(GUIFactory.FONTS);
-		text.setForeground(GUIFactory.TEXT);
 
-		final JLabel version = new JLabel("Version: " + StringRes.versionTag);
-		version.setFont(GUIFactory.FONTS);
-		version.setForeground(GUIFactory.TEXT);
+		final JLabel version = GUIFactory.createSmallLabel("Version: " 
+				+ StringRes.versionTag);
 
 		message.add(text, "span, wrap");
 		message.add(version, "span, wrap");
 
-		final JLabel hp = new JLabel("Homepage");
-		hp.setFont(GUIFactory.FONTS);
-		hp.setForeground(GUIFactory.TEXT);
+		final JLabel hp = GUIFactory.createSmallLabel("Homepage");
 
 		message.add(hp);
 		message.add(new JTextField(StringRes.updateUrl));
 
-		JButton yesB = GUIFactory.setButtonLayout("Open", null);
+		JButton yesB = GUIFactory.setButtonLayout("Open");
 		yesB.addActionListener(new ActionListener() {
 
 			@Override
@@ -96,21 +86,18 @@ public class AboutDialog {
 		});
 		message.add(yesB, "wrap");
 
-		final JLabel announce = new JLabel("Announcements");
-		announce.setFont(GUIFactory.FONTS);
-		announce.setForeground(GUIFactory.TEXT);
+		final JLabel announce = GUIFactory.createSmallLabel("Announcements");
 
 		message.add(announce);
 		message.add(new JTextField(StringRes.announcementUrl));
 
-		yesB = GUIFactory.setButtonLayout("Sign Up", null);
+		yesB = GUIFactory.setButtonLayout("Sign Up");
 		yesB.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent arg0) {
 
 				tvFrame.displayURL(StringRes.announcementUrl);
 			}
-
 		});
 		message.add(yesB);
 

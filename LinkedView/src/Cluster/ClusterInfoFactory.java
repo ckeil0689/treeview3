@@ -6,8 +6,6 @@ import javax.swing.JPanel;
 import edu.stanford.genetics.treeview.GUIFactory;
 import edu.stanford.genetics.treeview.StringRes;
 
-import net.miginfocom.swing.MigLayout;
-
 /**
  * Provides a JPanel that displays information about a selected cluster
  * method.
@@ -16,74 +14,66 @@ import net.miginfocom.swing.MigLayout;
  */
 public class ClusterInfoFactory {
 
-	private JPanel mainPanel;
+	private static JPanel mainPanel;
 	
-	public ClusterInfoFactory() {
+	static {
 		
-		mainPanel = new JPanel();
-		mainPanel.setLayout(new MigLayout());
-		mainPanel.setOpaque(false);
+		mainPanel = GUIFactory.createJPanel(false, true, null);
 	}
 	
-	public JPanel makeMethodInfoPanel(int methodIndex) {
+	/**
+	 * Generates an infoPanel depending on the supplied method index that
+	 * stands for the type of clustering algorithm.
+	 * @param methodIndex
+	 * @return
+	 */
+	public static JPanel makeMethodInfoPanel(int methodIndex) {
 		
 		mainPanel.removeAll();
 		
-		JLabel label = new JLabel("Linkage Method Details");
-		label.setFont(GUIFactory.FONTL);
-		label.setForeground(GUIFactory.MAIN);
+		JLabel label = GUIFactory.createBigLabel("Linkage Method Details");
 		
-		mainPanel.add(label, "push, alignx 0%, aligny 0%, span, wrap");
+		mainPanel.add(label, "pushx, alignx 0%, aligny 0%, span, wrap");
 		
-		JLabel similarity = new JLabel("Similarity: ");
-		similarity.setFont(GUIFactory.FONTS);
-		similarity.setForeground(GUIFactory.TEXT);
+		JLabel similarity = GUIFactory.createSmallLabel("Similarity: ");
 		
 		TextDisplay similarityText = new TextDisplay(
 				getSimilarity(methodIndex));
 		
-		JLabel type = new JLabel("Type: ");
-		type.setFont(GUIFactory.FONTS);
-		type.setForeground(GUIFactory.TEXT);
+		JLabel type = GUIFactory.createSmallLabel("Type: ");
 		
 		TextDisplay typeText = new TextDisplay(
 				getType(methodIndex));
 		
-		JLabel time = new JLabel("Time: ");
-		time.setFont(GUIFactory.FONTS);
-		time.setForeground(GUIFactory.TEXT);
+		JLabel time = GUIFactory.createSmallLabel("Time: ");
 		
 		TextDisplay timeText = new TextDisplay(
 				getTime(methodIndex));
 		
-		JLabel advantage = new JLabel("Advantages: ");
-		advantage.setFont(GUIFactory.FONTS);
-		advantage.setForeground(GUIFactory.TEXT);
+		JLabel advantage = GUIFactory.createSmallLabel("Advantages: ");
 		
 		TextDisplay advantageText = new TextDisplay(
 				getAdvantage(methodIndex));
 		
-		JLabel disadvantage = new JLabel("Disadvantages: ");
-		disadvantage.setFont(GUIFactory.FONTS);
-		disadvantage.setForeground(GUIFactory.TEXT);
+		JLabel disadvantage = GUIFactory.createSmallLabel("Disadvantages: ");
 		
 		TextDisplay disadvantageText = new TextDisplay(
 				getDisadvantage(methodIndex));
 		
-		mainPanel.add(similarity, "pushx, alignx 0%");
-		mainPanel.add(similarityText, "pushx, growx, wrap");
+		mainPanel.add(similarity, "alignx 0%");
+		mainPanel.add(similarityText, "w 400:500:, wrap");
 		
-		mainPanel.add(type, "pushx, alignx 0%");
-		mainPanel.add(typeText, "pushx, growx, wrap");
+		mainPanel.add(type, "alignx 0%");
+		mainPanel.add(typeText, "w 400:500:, wrap");
 		
-		mainPanel.add(time, "pushx, alignx 0%");
-		mainPanel.add(timeText, "pushx, growx, wrap");
+		mainPanel.add(time, "alignx 0%");
+		mainPanel.add(timeText, "w 400:500:, wrap");
 		
-		mainPanel.add(advantage, "pushx, alignx 0%");
-		mainPanel.add(advantageText, "pushx, growx, wrap");
+		mainPanel.add(advantage, "alignx 0%");
+		mainPanel.add(advantageText, "w 400:500:, wrap");
 		
-		mainPanel.add(disadvantage, "pushx, alignx 0%");
-		mainPanel.add(disadvantageText, "pushx, growx, wrap");
+		mainPanel.add(disadvantage, "alignx 0%");
+		mainPanel.add(disadvantageText, "w 400:500:, wrap");
 		
 		mainPanel.revalidate();
 		mainPanel.repaint();
@@ -91,26 +81,24 @@ public class ClusterInfoFactory {
 		return mainPanel;
 	}
 	
-	public JPanel makeTipPanel() {
-		
-		mainPanel.removeAll();
-		
-		JLabel label = new JLabel("Tip");
-		label.setFont(GUIFactory.FONTL);
-		label.setForeground(GUIFactory.MAIN);
-		
-		mainPanel.add(label, "pushx, span, wrap");
-		
-		int index = 0;
-		TextDisplay tip = new TextDisplay(getTip(index));
-		
-		mainPanel.add(tip, "pushx, growx, wrap");
-		
-		mainPanel.revalidate();
-		mainPanel.repaint();
-		
-		return mainPanel;
-	}
+//	public JPanel makeTipPanel() {
+//		
+//		mainPanel.removeAll();
+//		
+//		JLabel label = GUIFactory.createBigLabel("Tip");
+//		
+//		mainPanel.add(label, "pushx, span, wrap");
+//		
+//		int index = 0;
+//		TextDisplay tip = new TextDisplay(getTip(index));
+//		
+//		mainPanel.add(tip, "pushx, growx, wrap");
+//		
+//		mainPanel.revalidate();
+//		mainPanel.repaint();
+//		
+//		return mainPanel;
+//	}
 	
 	/**
 	 * Gets the appropriate similarity String resource depending on which 
@@ -118,7 +106,7 @@ public class ClusterInfoFactory {
 	 * @param index
 	 * @return
 	 */
-	public String getSimilarity(int index) {
+	private static String getSimilarity(int index) {
 		
 		String similarity;
 		
@@ -141,7 +129,7 @@ public class ClusterInfoFactory {
 	 * @param index
 	 * @return
 	 */
-	public String getTip(int index) {
+	private static String getTip(int index) {
 		
 		String tip;
 		
@@ -162,7 +150,7 @@ public class ClusterInfoFactory {
 	 * @param index
 	 * @return
 	 */
-	public String getType(int index) {
+	private static String getType(int index) {
 		
 		String type;
 		
@@ -185,7 +173,7 @@ public class ClusterInfoFactory {
 	 * @param index
 	 * @return
 	 */
-	public String getTime(int index) {
+	private static String getTime(int index) {
 		
 		String time;
 		
@@ -208,7 +196,7 @@ public class ClusterInfoFactory {
 	 * @param index
 	 * @return
 	 */
-	public String getAdvantage(int index) {
+	private static String getAdvantage(int index) {
 		
 		String advantage;
 		
@@ -231,7 +219,7 @@ public class ClusterInfoFactory {
 	 * @param index
 	 * @return
 	 */
-	public String getDisadvantage(int index) {
+	private static String getDisadvantage(int index) {
 		
 		String disadvantage;
 		

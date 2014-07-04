@@ -749,7 +749,7 @@ MainPanel, Observer {
 	 * @param model
 	 *            - the model containing cdt data being added to the display.
 	 */
-	public void compareToModel(final TVModel model) {
+	public void compareToModel(final DataModel model) {
 
 		getDataModel().removeAppended();
 		getDataModel().append(model);
@@ -881,7 +881,7 @@ MainPanel, Observer {
 	private void updateATRDrawer(final String selectedID) {
 		
 		try {
-			final TVModel tvmodel = (TVModel) getDataModel();
+			final DataModel tvmodel = (TVModel) getDataModel();
 			invertedTreeDrawer.setData(tvmodel.getAtrHeaderInfo(),
 					tvmodel.getArrayHeaderInfo());
 			final HeaderInfo trHeaderInfo = tvmodel.getAtrHeaderInfo();

@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -59,8 +60,8 @@ public class ColorSet2 implements ConfigNodePersistent {
 	private Color missing;
 	private Color empty;
 
-	private ArrayList<Color> colorList;
-	private ArrayList<Double> fractionList;
+	private List<Color> colorList;
+	private List<Double> fractionList;
 
 	private Preferences configNode = null;
 
@@ -102,13 +103,13 @@ public class ColorSet2 implements ConfigNodePersistent {
 		colorList = new ArrayList<Color>();
 		fractionList = new ArrayList<Double>();
 
-		final ArrayList<Color> colors = new ArrayList<Color>();
+		final List<Color> colors = new ArrayList<Color>();
 		colors.add(decodeColor(color1));
 		colors.add(decodeColor(color2));
 		colors.add(decodeColor(color3));
 
 		final float[] floatVals = default_fractions;
-		final ArrayList<Double> fracs = new ArrayList<Double>(floatVals.length);
+		final List<Double> fracs = new ArrayList<Double>(floatVals.length);
 
 		for (int i = 0; i < floatVals.length; i++) {
 
@@ -137,7 +138,7 @@ public class ColorSet2 implements ConfigNodePersistent {
 	public void copyStateFrom(final ColorSet2 other) {
 
 		final String[] colorHexVals = other.getColors();
-		final ArrayList<Color> colors = new ArrayList<Color>(
+		final List<Color> colors = new ArrayList<Color>(
 				colorHexVals.length);
 
 		for (int i = 0; i < colorHexVals.length; i++) {
@@ -146,7 +147,7 @@ public class ColorSet2 implements ConfigNodePersistent {
 		}
 
 		final float[] floatVals = other.getFractions();
-		final ArrayList<Double> fracs = new ArrayList<Double>(floatVals.length);
+		final List<Double> fracs = new ArrayList<Double>(floatVals.length);
 
 		for (int i = 0; i < floatVals.length; i++) {
 
@@ -236,7 +237,7 @@ public class ColorSet2 implements ConfigNodePersistent {
 	 * 
 	 * @param colors
 	 */
-	public void setColorList(final ArrayList<Color> colors) {
+	public void setColorList(final List<Color> colors) {
 
 		if (colorList != null) {
 			this.colorList = colors;
@@ -281,7 +282,7 @@ public class ColorSet2 implements ConfigNodePersistent {
 	 * 
 	 * @param fractions
 	 */
-	public void setFractionList(final ArrayList<Double> fractions) {
+	public void setFractionList(final List<Double> fractions) {
 
 		if (fractionList != null) {
 			this.fractionList = fractions;

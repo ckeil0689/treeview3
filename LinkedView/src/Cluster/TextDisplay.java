@@ -19,9 +19,9 @@ public class TextDisplay extends JTextArea {
 		super(text);
 		setOpaque(false);
 		setFont(GUIFactory.FONTS);
-		setForeground(GUIFactory.TEXT);
+//		setForeground(GUIFactory.TEXT);
 		setEditable(false);
-		setBorder(null);
+//		setBorder(null);
 		setLineWrap(true);
 		setWrapStyleWord(true);
 		setFocusable(false);

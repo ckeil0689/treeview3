@@ -16,7 +16,7 @@ import edu.stanford.genetics.treeview.model.TVModel;
 public class DataFormatter {
 
 	// Instance variables
-	private final TVModel model;
+	private final DataModel model;
 	private final ClusterView clusterView;
 	private final List<Double> list;
 

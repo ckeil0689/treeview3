@@ -11,7 +11,7 @@ public class ClusterTableModel extends AbstractTableModel {
 
 	// Instance variables
 	private final double[][] tableList;
-	private final TVModel currentModel;
+	private final DataModel currentModel;
 
 	public ClusterTableModel(final double[][] tableList,
 			final DataModel currentModel) {
@@ -36,7 +36,7 @@ public class ClusterTableModel extends AbstractTableModel {
 	@Override
 	public Object getValueAt(final int arg0, final int arg1) {
 
-		return currentModel.getValue(arg1, arg0);
+		return ((TVModel)currentModel).getValue(arg1, arg0);
 	}
 
 	@Override

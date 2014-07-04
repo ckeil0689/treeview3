@@ -1,18 +1,14 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.Dialog;
-import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentListener;
-import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
-import java.util.ArrayList;
 import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -21,7 +17,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.WindowConstants;
 
-import net.miginfocom.swing.MigLayout;
 import Controllers.DendroController;
 import GradientColorChoice.ColorGradientChooser;
 import GradientColorChoice.ColorGradientController;
@@ -87,24 +82,21 @@ public class PreferencesMenu {
 				StringRes.pref_node_Preferences);
 		this.activeMenu = menuTitle;
 
-//		menuPanelList = new ArrayList<MenuPanel>();
-
 		menuDialog = new JDialog();
 		menuDialog.setTitle(menuTitle);
 		menuDialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
 		menuDialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		menuDialog.setResizable(true);
 
-		basisPanel = new JPanel();
-		basisPanel.setLayout(new MigLayout());
+		basisPanel = GUIFactory.createJPanel(false, false, null);
 
 		// Setting preferred size for the ContentPane of this frame
-		final Dimension mainDim = GUIFactory.getScreenSize();
-
-		final int width = mainDim.width * 1 / 2;
-		final int height = mainDim.height * 1 / 2;
-
-		basisPanel.setPreferredSize(new Dimension(width, height));
+//		final Dimension mainDim = GUIFactory.getScreenSize();
+//
+//		final int width = mainDim.width * 1 / 2;
+//		final int height = mainDim.height * 1 / 2;
+//
+//		basisPanel.setPreferredSize(new Dimension(width, height));
 
 		menuDialog.getContentPane().add(basisPanel);
 
@@ -246,7 +238,7 @@ public class PreferencesMenu {
 //
 //		basisPanel.add(leftPanel, "pushy, aligny 0%, w 20%, " + "h 75%");
 
-		ok_button = GUIFactory.setButtonLayout(StringRes.button_OK, null);
+		ok_button = GUIFactory.setButtonLayout(StringRes.button_OK);
 
 		addMenu(startMenu);
 
@@ -332,9 +324,7 @@ public class PreferencesMenu {
 
 			scrollPane = new JScrollPane();
 
-			final JPanel panel = new JPanel();
-			panel.setLayout(new MigLayout());
-			panel.setBackground(GUIFactory.BG_COLOR);
+			final JPanel panel = GUIFactory.createJPanel(false, true, null);
 
 			// try {
 			// ce = ((DoubleArrayDrawer) dendroController.getArrayDrawer())
@@ -371,9 +361,7 @@ public class PreferencesMenu {
 
 			scrollPane = new JScrollPane();
 
-			final JPanel panel = new JPanel();
-			panel.setLayout(new MigLayout());
-			panel.setBackground(GUIFactory.BG_COLOR);
+			final JPanel panel = GUIFactory.createJPanel(false, true, null);
 
 			final FontSettings fontSettings = new FontSettings(
 					dendroView.getTextview(), dendroView.getArraynameview());
@@ -403,9 +391,7 @@ public class PreferencesMenu {
 
 			scrollPane = new JScrollPane();
 
-			final JPanel panel = new JPanel();
-			panel.setLayout(new MigLayout());
-			panel.setBackground(GUIFactory.BG_COLOR);
+			final JPanel panel = GUIFactory.createJPanel(false, true, null);
 
 			final UrlSettingsPanel genePanel = new UrlSettingsPanel(
 					tvFrame.getUrlExtractor(), tvFrame.getGeneUrlPresets());
@@ -445,13 +431,9 @@ public class PreferencesMenu {
 
 			scrollPane = new JScrollPane();
 
-			final JPanel panel = new JPanel();
-			panel.setLayout(new MigLayout());
-			panel.setBackground(GUIFactory.BG_COLOR);
+			final JPanel panel = GUIFactory.createJPanel(false, true, null);
 
-			final JLabel label = new JLabel("Choose a Theme:");
-			label.setForeground(GUIFactory.MAIN);
-			label.setFont(GUIFactory.FONTL);
+			final JLabel label = GUIFactory.createBigLabel("Choose a Theme:");
 
 			panel.add(label, "span, wrap");
 
@@ -516,9 +498,7 @@ public class PreferencesMenu {
 
 			scrollPane = new JScrollPane();
 
-			final JPanel panel = new JPanel();
-			panel.setLayout(new MigLayout());
-			panel.setBackground(GUIFactory.BG_COLOR);
+			final JPanel panel = GUIFactory.createJPanel(false, true, null);
 
 			genePanel = new HeaderSummaryPanel(tvFrame.getDataModel()
 					.getGeneHeaderInfo(), dendroView.getTextview()
@@ -528,13 +508,12 @@ public class PreferencesMenu {
 					.getArrayHeaderInfo(), dendroView.getArraynameview()
 					.getHeaderSummary(), tvFrame);
 
-			final JPanel loadLabelPanel = new JPanel();
-			loadLabelPanel.setLayout(new MigLayout());
-			loadLabelPanel.setOpaque(false);
+			final JPanel loadLabelPanel = GUIFactory.createJPanel(false, 
+					true, null);
 			loadLabelPanel.setBorder(BorderFactory.createEtchedBorder());
 
 			custom_button = GUIFactory.setButtonLayout(
-					StringRes.button_customLabels, null);
+					StringRes.button_customLabels);
 
 			final JLabel rows = GUIFactory.setupHeader(StringRes.main_rows);
 			final JLabel cols = GUIFactory.setupHeader(StringRes.main_cols);
@@ -584,7 +563,6 @@ public class PreferencesMenu {
 	public void addMenu(final String title) {
 
 		basisPanel.removeAll();
-//		basisPanel.add(leftPanel, "pushy, aligny 0%, w 20%, h 75%");
 
 		activeMenu = title;
 
@@ -613,28 +591,16 @@ public class PreferencesMenu {
 
 		} else {
 			// In case menu cannot be loaded, display excuse.
-			final JPanel panel = new JPanel();
-			panel.setLayout(new MigLayout());
-			panel.setBackground(GUIFactory.BG_COLOR);
+			final JPanel panel = GUIFactory.createJPanel(false, true, null);
 
-			final JLabel hint = new JLabel("Menu cannot be shown because it "
-					+ "wasn't loaded.");
-			hint.setFont(GUIFactory.FONTS);
-			hint.setForeground(GUIFactory.TEXT);
+			final JLabel hint = GUIFactory.createSmallLabel("Menu cannot be "
+					+ "shown because it wasn't loaded.");
 			panel.add(hint, "push, alignx 50%");
 
 			basisPanel.add(panel, "w 79%, h 95%, wrap");
 		}
 
 		basisPanel.add(ok_button, "pushx, alignx 100%, span");
-
-//		for (final MenuPanel panel : menuPanelList) {
-//
-//			if (panel.getLabelText().equals(title)) {
-//
-//				panel.setSelected(true);
-//			}
-//		}
 
 		basisPanel.revalidate();
 		basisPanel.repaint();
@@ -659,17 +625,6 @@ public class PreferencesMenu {
 
 		return themeSettings.getDarkThemeButton();
 	}
-
-//	/**
-//	 * Gets the list which contains the JPanels used to select the menu type in
-//	 * the PreferencesMenu window.
-//	 * 
-//	 * @return
-//	 */
-//	public ArrayList<MenuPanel> getMenuPanelList() {
-//
-//		return menuPanelList;
-//	}
 
 	/**
 	 * Returns PreferencesMenu's configNode.

@@ -39,6 +39,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -192,7 +193,7 @@ public class FontSettings implements SettingsPanel {
 		final Font[] allFonts = GraphicsEnvironment
 				.getLocalGraphicsEnvironment().getAllFonts();
 
-		final ArrayList<Font> fontList = new ArrayList<Font>();
+		final List<Font> fontList = new ArrayList<Font>();
 
 		for (final String fontName : preferredFonts) {
 

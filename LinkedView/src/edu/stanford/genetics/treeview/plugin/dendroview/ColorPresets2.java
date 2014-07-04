@@ -24,6 +24,7 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -232,8 +233,8 @@ public class ColorPresets2 implements ConfigNodePersistent {
 	 * constructs and adds a <code>ColorSet2</code> with the specified
 	 * attributes.
 	 */
-	public void addColorSet(final String name, final ArrayList<Color> colors,
-			final ArrayList<Double> fractions, final String missing) {
+	public void addColorSet(final String name, final List<Color> colors,
+			final List<Double> fractions, final String missing) {
 
 		// Make the children of ColorSet here by adding an int to the name?
 		final ColorSet2 preset = new ColorSet2();

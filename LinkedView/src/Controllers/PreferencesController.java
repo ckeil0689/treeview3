@@ -15,6 +15,7 @@ import java.util.List;
 
 import javax.swing.SwingWorker;
 
+import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.GUIFactory;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LabelLoadDialog;
@@ -324,7 +325,7 @@ public class PreferencesController {
 		@Override
 		protected Void doInBackground() throws Exception {
 
-			final TVModel model = (TVModel) tvFrame.getDataModel();
+			final DataModel model = tvFrame.getDataModel();
 
 			HeaderInfo headerInfo = null;
 			if (type.equalsIgnoreCase("Row")) {

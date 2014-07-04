@@ -17,9 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
-import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
-import javax.swing.plaf.basic.BasicProgressBarUI;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -156,7 +154,6 @@ public class GUIFactory {
 		
 		JLabel label = new JLabel(text);
 		label.setFont(FONTL);
-//		label.setForeground(MAIN);
 		
 		return label;
 	}
@@ -171,7 +168,6 @@ public class GUIFactory {
 		
 		JLabel label = new JLabel(text);
 		label.setFont(FONTXXL);
-//		label.setForeground(TEXT);
 		
 		return label;
 	}
@@ -184,10 +180,13 @@ public class GUIFactory {
 	 * @param iconFileName
 	 * @return
 	 */
-	public static JButton setButtonLayout(final String title,
-			final String iconFileName) {
+	public static JButton setButtonLayout(final String title) { //,
+			//final String iconFileName) {
 
-		final JButton button = new JButton(title);
+		final JButton btn = new JButton(title);
+//		btn.setFont(FONT_MENU);
+		btn.setFocusPainted(false);
+//		btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 //		if(title != null) {
 //			button = new TVButton(title);
 //			
@@ -196,8 +195,47 @@ public class GUIFactory {
 //		}
 		
 		// Basic layout
-		button.setFont(FONTS);
+//		button.setFont(FONTS);
 //		button.setForeground(BG_COLOR);
+
+		// If provided, add icon to button
+//		if (iconFileName != null) {
+//			Image img = getIconImage(iconFileName);
+//			
+//			if(img != null) {
+//				button.setIcon(new ImageIcon(img));
+//				button.setHorizontalTextPosition(SwingConstants.LEFT);
+//			}
+//		}
+//		
+//		button.setPreferredSize(new Dimension(button.getWidth(), 
+//				button.getWidth()));
+//
+//		final Dimension d = button.getPreferredSize();
+//		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
+//		
+//		if (iconFileName != null) {
+//			button.setMinimumSize(new Dimension(40, 40));
+//		}
+//
+//		button.setPreferredSize(d);
+
+		return btn;
+	}
+	
+	/**
+	 * Creates a button with a title and icon if desired. The method centralizes
+	 * the layout setting for buttons so that all navigation buttons 
+	 * will look similar.
+	 * 
+	 * @param title
+	 * @param iconFileName
+	 * @return
+	 */
+	public static JButton setNavButtonLayout(final String iconFileName) {
+
+		final JButton button = new JButton();
+		button.setFocusPainted(false);
 		button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
 		// If provided, add icon to button
@@ -208,86 +246,19 @@ public class GUIFactory {
 				button.setIcon(new ImageIcon(img));
 				button.setHorizontalTextPosition(SwingConstants.LEFT);
 			}
+		} else {
+			button.setText("Missing Icon");
 		}
+		
+		button.setPreferredSize(new Dimension(button.getWidth(), 
+				button.getWidth()));
 
 		final Dimension d = button.getPreferredSize();
 		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
-
+		
 		if (iconFileName != null) {
 			button.setMinimumSize(new Dimension(40, 40));
-
-		} else {
-			button.setMinimumSize(new Dimension(80, 40));
 		}
-
-		button.setPreferredSize(d);
-
-		return button;
-	}
-	
-	/**
-	 * Creates a button with a title and icon if desired. The method centralizes
-	 * the layout setting for buttons so that all buttons will look similar.
-	 * 
-	 * @param title
-	 * @param iconFileName
-	 * @return
-	 */
-	public static JToggleButton setToggleButtonLayout(final String title) {
-
-		final JToggleButton button = new JToggleButton(title);
-//		if(title != null) {
-//			button = new TVToggleButton(title);
-//			
-//		} else {
-//			button = new TVToggleButton("");
-//		}
-		
-		// Basic layout
-		button.setFont(FONTS);
-//		button.setForeground(BG_COLOR);
-		button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-		final Dimension d = button.getPreferredSize();
-		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
-
-		button.setPreferredSize(d);
-
-		return button;
-	}
-
-	/**
-	 * Sets a layout for a button which is supposed to appear in the top menubar
-	 * which belongs to the TVFrame.
-	 * 
-	 * @param title
-	 * @param iconFileName
-	 * @return
-	 */
-	public static JButton setMenuButtonLayout(final String title,
-			final String iconFileName) {
-
-		final JButton button = new JButton();
-
-//		button.setBackground(BG_COLOR);
-//		button.setForeground(MAIN);
-		button.setFont(FONTS);
-		button.setText(title);
-		button.setBorder(null);
-		button.setFocusPainted(false);
-		button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-		
-		if (iconFileName != null) {
-			Image img = getIconImage(iconFileName);
-			
-			if(img != null) {
-				button.setIcon(new ImageIcon(img));
-				button.setHorizontalTextPosition(SwingConstants.LEFT);
-			}
-		}
-		
-		final Dimension d = button.getPreferredSize();
-		d.setSize(d.getWidth() * 1.5, d.getHeight() * 1.5);
 
 		button.setPreferredSize(d);
 
@@ -304,6 +275,7 @@ public class GUIFactory {
 	public static JButton setLargeButtonLayout(final String title) {
 
 		final JButton button = new JButton(title);
+		button.setFocusPainted(false);
 //		if(title != null) {
 //			button = new TVButton(title);
 //			
@@ -336,12 +308,13 @@ public class GUIFactory {
 
 		if (!iconFileName.substring(iconFileName.length() - 4,
 				iconFileName.length() - 1).equalsIgnoreCase("png")) {
-			if (dark) {
-				iconType = "_dark.png";
-
-			} else {
-				iconType = "_light.png";
-			}
+			iconType = "_dark.png";
+//			if (dark) {
+//				iconType = "_dark.png";
+//
+//			} else {
+//				iconType = "_light.png";
+//			}
 		} else {
 			iconType = "";
 		}
@@ -392,18 +365,18 @@ public class GUIFactory {
 		pBar.setStringPainted(true);
 		pBar.setMaximumSize(new Dimension(2000, 20));
 //		pBar.setForeground(MAIN);
-		pBar.setUI(new BasicProgressBarUI() {
-
-			@Override
-			protected Color getSelectionBackground() {
-				return PROGRESS;
-			};
-
-			@Override
-			protected Color getSelectionForeground() {
-				return PROGRESS;
-			};
-		});
+//		pBar.setUI(new BasicProgressBarUI() {
+//
+//			@Override
+//			protected Color getSelectionBackground() {
+//				return PROGRESS;
+//			};
+//
+//			@Override
+//			protected Color getSelectionForeground() {
+//				return PROGRESS;
+//			};
+//		});
 		pBar.setVisible(true);
 
 		return pBar;
@@ -417,8 +390,6 @@ public class GUIFactory {
 	public static WideComboBox setWideComboLayout(final String[] combos) {
 
 		final WideComboBox comboBox = new WideComboBox(combos);
-		comboBox.setFont(FONTS);
-//		comboBox.setBackground(Color.white);
 		comboBox.setPreferredSize(new Dimension(300, 30));
 		comboBox.setMinimumSize(comboBox.getPreferredSize());
 
@@ -435,8 +406,6 @@ public class GUIFactory {
 	public static JComboBox<String> setComboLayout(final String[] combos) {
 
 		final JComboBox<String> comboBox = new JComboBox<String>(combos);
-		comboBox.setFont(FONTS);
-//		comboBox.setBackground(Color.white);
 
 		return comboBox;
 	}

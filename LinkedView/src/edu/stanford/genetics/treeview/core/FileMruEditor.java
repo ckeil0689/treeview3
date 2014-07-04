@@ -35,6 +35,7 @@ import java.util.prefs.Preferences;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -141,7 +142,7 @@ public class FileMruEditor extends JPanel {
 	 */
 	public void makeTop() {
 
-		final Frame top = new Frame(getTitle());
+		final JFrame top = new JFrame(getTitle());
 		top.add(this);
 		top.addWindowListener(new WindowAdapter() {
 
@@ -152,10 +153,10 @@ public class FileMruEditor extends JPanel {
 		});
 		top.pack();
 
-		final Dimension d = top.getSize();
-		if (d.width < 600) {
-			top.setSize(600, d.height);
-		}
+//		final Dimension d = top.getSize();
+//		if (d.width < 600) {
+//			top.setSize(600, d.height);
+//		}
 		window = top;
 		top.setVisible(true);
 	}
@@ -180,12 +181,12 @@ public class FileMruEditor extends JPanel {
 		d.pack();
 
 		window = d;
-		final Dimension ts = d.getSize();
-		final Dimension dim = f.getSize();
-		if (dim.height / 2 < ts.height) {
-			d.setSize(ts.width, dim.height / 2);
-		}
-		System.out.println("Size of parent " + dim + " my size " + ts);
+//		final Dimension ts = d.getSize();
+//		final Dimension dim = f.getSize();
+//		if (dim.height / 2 < ts.height) {
+//			d.setSize(ts.width, dim.height / 2);
+//		}
+//		System.out.println("Size of parent " + dim + " my size " + ts);
 		d.setVisible(true);
 	}
 
@@ -211,7 +212,6 @@ public class FileMruEditor extends JPanel {
 		final JPanel upper = fileSetPanel;
 		upper.setSize(300, 200);
 		this.setLayout(new MigLayout());
-		this.setBackground(GUIFactory.BG_COLOR);
 
 		final JLabel l1 = new JLabel(getTitle());
 		l1.setForeground(GUIFactory.TEXT);
@@ -373,7 +373,7 @@ public class FileMruEditor extends JPanel {
 			this.setLayout(new MigLayout());
 			this.setOpaque(false);
 
-			openButton = GUIFactory.setButtonLayout("Open", null);
+			openButton = GUIFactory.setButtonLayout("Open");
 			openButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -383,7 +383,7 @@ public class FileMruEditor extends JPanel {
 			});
 			// this.add(openButton); not sure about this...
 
-			searchButton = GUIFactory.setButtonLayout("Find", null);
+			searchButton = GUIFactory.setButtonLayout("Find");
 			searchButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -394,7 +394,7 @@ public class FileMruEditor extends JPanel {
 			});
 			this.add(searchButton, "pushx");
 
-			deleteButton = GUIFactory.setButtonLayout("Remove", null);
+			deleteButton = GUIFactory.setButtonLayout("Remove");
 			deleteButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -403,7 +403,7 @@ public class FileMruEditor extends JPanel {
 			});
 			this.add(deleteButton, "pushx");
 
-			deleteAllButton = GUIFactory.setButtonLayout("Remove All", null);
+			deleteAllButton = GUIFactory.setButtonLayout("Remove All");
 			deleteAllButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -413,7 +413,7 @@ public class FileMruEditor extends JPanel {
 			});
 			this.add(deleteAllButton, "pushx");
 
-			closeButton = GUIFactory.setButtonLayout("Close", null);
+			closeButton = GUIFactory.setButtonLayout("Close");
 			closeButton.addActionListener(new ActionListener() {
 
 				@Override

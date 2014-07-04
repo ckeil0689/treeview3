@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
@@ -14,6 +15,7 @@ import java.util.regex.Pattern;
 import javax.swing.SwingWorker;
 
 import Views.WelcomeView;
+import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeViewFrame;
@@ -39,10 +41,10 @@ public class NewModelLoader {
 	private boolean hasEWeight = false;
 	private boolean hasGWeight = false;
 
-	public NewModelLoader(final TVModel model) {
+	public NewModelLoader(final DataModel model) {
 
-		this.targetModel = model;
-		this.tvFrame = model.getFrame();
+		this.targetModel = (TVModel)model;
+		this.tvFrame = ((TVModel)model).getFrame();
 		this.fileSet = model.getFileSet();
 		this.loadProgView = tvFrame.getWelcomeView();
 	}
@@ -409,9 +411,9 @@ public class NewModelLoader {
 		return stringLabels;
 	}
 
-	public ArrayList<String[]> extractGTR(final BufferedReader reader) {
+	public List<String[]> extractGTR(final BufferedReader reader) {
 
-		final ArrayList<String[]> gtrData = new ArrayList<String[]>();
+		final List<String[]> gtrData = new ArrayList<String[]>();
 		String line;
 
 		try {
@@ -482,7 +484,7 @@ public class NewModelLoader {
 	public void parseGTR() {
 
 		// First, load the GTR File
-		final ArrayList<String[]> gtrData = loadSet(fileSet.getGtr());
+		final List<String[]> gtrData = loadSet(fileSet.getGtr());
 
 		final String[] firstRow = gtrData.get(0);
 		if ( // decide if this is not an extended file..
@@ -516,7 +518,7 @@ public class NewModelLoader {
 	public void parseATR() {
 
 		// First, load the ATR File
-		final ArrayList<String[]> atrData = loadSet(fileSet.getAtr());
+		final List<String[]> atrData = loadSet(fileSet.getAtr());
 
 		final String[] firstRow = atrData.get(0);
 		if ( // decide if this is not an extended file..
@@ -547,9 +549,9 @@ public class NewModelLoader {
 		targetModel.aidFound(hasAID);
 	}
 
-	public ArrayList<String[]> loadSet(final String loadingSet) {
+	public List<String[]> loadSet(final String loadingSet) {
 
-		ArrayList<String[]> gtrData = new ArrayList<String[]>();
+		List<String[]> gtrData = new ArrayList<String[]>();
 
 		try {
 			// Read data from specified file location

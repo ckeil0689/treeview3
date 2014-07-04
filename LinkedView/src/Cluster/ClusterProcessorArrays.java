@@ -2,8 +2,8 @@ package Cluster;
 
 import javax.swing.SwingWorker;
 
+import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 
 /**
@@ -18,7 +18,7 @@ import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 public class ClusterProcessorArrays {
 
 	private final ClusterView clusterView;
-	private final TVModel tvModel;
+	private final DataModel tvModel;
 	private final SwingWorker<String[], Void> worker;
 
 	/**
@@ -27,8 +27,8 @@ public class ClusterProcessorArrays {
 	 * @param cView
 	 * @param model
 	 */
-	public ClusterProcessorArrays(final ClusterView cView, final TVModel model,
-			final SwingWorker<String[], Void> worker) {
+	public ClusterProcessorArrays(final ClusterView cView, 
+			final DataModel model, final SwingWorker<String[], Void> worker) {
 
 		this.clusterView = cView;
 		this.tvModel = model;

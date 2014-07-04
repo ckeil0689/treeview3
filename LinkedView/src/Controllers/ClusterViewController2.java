@@ -12,11 +12,11 @@ import javax.swing.SwingWorker;
 import Cluster.CDTGeneratorArrays;
 import Cluster.ClusterProcessorArrays;
 import Cluster.ClusterView;
+import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.StringRes;
 import edu.stanford.genetics.treeview.TreeViewFrame;
-import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 
 /**
@@ -29,7 +29,7 @@ import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
  */
 public class ClusterViewController2 {
 
-	private final TVModel tvModel;
+	private final DataModel tvModel;
 	private final TreeViewFrame tvFrame;
 	private final TVFrameController controller;
 	private final ClusterView clusterView;
@@ -68,12 +68,13 @@ public class ClusterViewController2 {
 			// the cluster_button is being clicked.
 			final String rowSimilarity = clusterView.getRowSimilarity();
 			final String colSimilarity = clusterView.getColSimilarity();
-			final String linkageMethod = clusterView.getLinkageMethod();
+//			final String linkageMethod = clusterView.getLinkageMethod();
 
 			// GUI changes when clustering is running
 			if (checkSelections(rowSimilarity, colSimilarity)) {
-				clusterView.displayClusterProcess(rowSimilarity, colSimilarity,
-						linkageMethod);
+//				clusterView.displayClusterProcess(rowSimilarity, colSimilarity,
+//						linkageMethod);
+				clusterView.setClustering(true);
 
 				// Start the workers
 				if (!rowSimilarity.equalsIgnoreCase(StringRes.cluster_DoNot)) {
@@ -84,9 +85,17 @@ public class ClusterViewController2 {
 					orderedCols = cluster(colSimilarity, "Column");
 				}
 
-				save();
+//				save();
+			} else {
+				clusterView.displayErrorLabel();
 			}
 			return null;
+		}
+		
+		@Override
+		public void done() {
+			
+			save();
 		}
 
 		public String[] cluster(final String choice, final String type) {
@@ -120,15 +129,16 @@ public class ClusterViewController2 {
 		/**
 		 * Checks whether all needed options are selected to perform clustering.
 		 * 
-		 * @param choice
-		 * @param choice2
+		 * @param choiceRow
+		 * @param choiceCol
 		 * @return
 		 */
-		public boolean checkSelections(final String choice, final String choice2) {
+		public boolean checkSelections(final String choiceRow, 
+				final String choiceCol) {
 
 			if (isHierarchical()) {
-				return (!choice.contentEquals("Do Not Cluster") || !choice2
-						.contentEquals("Do Not Cluster"));
+				return (!choiceRow.contentEquals(StringRes.cluster_DoNot) 
+						|| !choiceCol.contentEquals(StringRes.cluster_DoNot));
 
 			} else {
 				final Integer[] spinnerValues = clusterView.getSpinnerValues();
@@ -138,9 +148,9 @@ public class ClusterViewController2 {
 				final int clustersC = spinnerValues[2];
 				final int itsC = spinnerValues[3];
 
-				return (!choice.contentEquals("Do Not Cluster") 
+				return (!choiceRow.contentEquals(StringRes.cluster_DoNot) 
 						&& (clustersR > 0 && itsR > 0))
-						|| (!choice2.contentEquals("Do Not Cluster") 
+						|| (!choiceCol.contentEquals(StringRes.cluster_DoNot) 
 								&& (clustersC > 0 && itsC > 0));
 			}
 		}
@@ -302,7 +312,8 @@ public class ClusterViewController2 {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			clusterView.setupClusterMenu(isHierarchical());
+//			clusterView.setupClusterMenu(isHierarchical());
+			clusterView.setupLayout();
 		}
 	}
 	
@@ -317,7 +328,8 @@ public class ClusterViewController2 {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			
-			clusterView.setupClusterMenu(isHierarchical());
+//			clusterView.setupClusterMenu(isHierarchical());
+			clusterView.setupLayout();
 		}
 	}
 
@@ -328,7 +340,7 @@ public class ClusterViewController2 {
 	public void visualizeData() {
 
 		final JDialog topFrame = (JDialog) SwingUtilities
-				.getWindowAncestor(clusterView);
+				.getWindowAncestor(clusterView.getMainPanel());
 
 		File file = null;
 
@@ -362,8 +374,10 @@ public class ClusterViewController2 {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			clusterWorker.cancel(true);
-			clusterWorker = null;
+			if(clusterWorker != null) {
+				clusterWorker.cancel(true);
+				clusterWorker = null;
+			}
 		}
 	}
 

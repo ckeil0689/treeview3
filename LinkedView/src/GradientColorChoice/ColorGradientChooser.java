@@ -17,6 +17,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
@@ -54,8 +55,8 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 	private final double minVal;
 	private final double maxVal;
 
-	private final ArrayList<Color> colorList;
-	private final ArrayList<Thumb> thumbList;
+	private final List<Color> colorList;
+	private final List<Thumb> thumbList;
 
 	private final JButton addButton;
 	private final JButton removeButton;
@@ -102,8 +103,8 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 
 		gradientBox = new GradientBox();
 
-		addButton = GUIFactory.setButtonLayout("Add Color", null);
-		removeButton = GUIFactory.setButtonLayout("Remove Selected", null);
+		addButton = GUIFactory.setButtonLayout("Add Color");
+		removeButton = GUIFactory.setButtonLayout("Remove Selected");
 		// saveButton = GUIParams.setButtonLayout("Save Colors", null);
 
 		colorButtonGroup = new ButtonGroup();
@@ -490,7 +491,7 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 
 		public void savePresets() {
 
-			final ArrayList<Double> fractionList = new ArrayList<Double>();
+			final List<Double> fractionList = new ArrayList<Double>();
 
 			for (final float f : fractions) {
 
@@ -555,6 +556,7 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 				if (t.contains((int) point.getX(), (int) point.getY())) {
 					t.setSelected(!t.isSelected());
 					break;
+					
 				} else {
 					t.setSelected(false);
 				}
@@ -774,15 +776,13 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 									WindowConstants.DISPOSE_ON_CLOSE);
 					positionInputDialog.setTitle("New Position");
 
-					final JLabel enterPrompt = new JLabel("Enter data value: ");
-					enterPrompt.setForeground(GUIFactory.TEXT);
-					enterPrompt.setFont(GUIFactory.FONTS);
+					final JLabel enterPrompt = GUIFactory.createSmallLabel(
+							"Enter data value: ");
 
 					final JTextField inputField = new JTextField();
 					inputField.setEditable(true);
 
-					final JButton okButton = GUIFactory.setButtonLayout("OK",
-							null);
+					final JButton okButton = GUIFactory.setButtonLayout("OK");
 					okButton.addActionListener(new ActionListener() {
 
 						@Override
@@ -816,9 +816,8 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 						}
 					});
 
-					final JPanel panel = new JPanel();
-					panel.setLayout(new MigLayout());
-					panel.setBackground(GUIFactory.BG_COLOR);
+					final JPanel panel = GUIFactory.createJPanel(false, 
+							false, null);
 
 					panel.add(enterPrompt, "push, span, wrap");
 					panel.add(inputField, "push, growx, span, wrap");

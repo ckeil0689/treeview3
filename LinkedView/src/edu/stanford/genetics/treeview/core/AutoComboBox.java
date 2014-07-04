@@ -4,7 +4,7 @@ import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.ComboBoxModel;
@@ -19,22 +19,22 @@ public class AutoComboBox extends JComboBox implements FocusListener {
 	private boolean isAutoPopupWidth = true;
 	private int popupWidth;
 	private String label;
-	private MutableComboBoxModel model;
+	private MutableComboBoxModel<String> model;
 
 	public AutoComboBox(final Vector<String> items) {
 
 		super(items);
 		this.label = items.get(0);
 
-		model = (MutableComboBoxModel) getModel();
+		model = (MutableComboBoxModel<String>) getModel();
 	}
 
-	public AutoComboBox(final ArrayList<String> items) {
+	public AutoComboBox(final List<String> items) {
 
 		this(items.toArray());
 		this.label = items.get(0);
 
-		model = (MutableComboBoxModel) getModel();
+		model = (MutableComboBoxModel<String>) getModel();
 	}
 
 	public AutoComboBox(final Object[] items) {
@@ -42,14 +42,14 @@ public class AutoComboBox extends JComboBox implements FocusListener {
 		super(items);
 		this.label = (String) items[0];
 
-		model = (MutableComboBoxModel) getModel();
+		model = (MutableComboBoxModel<String>) getModel();
 	}
 
-	public AutoComboBox(final ComboBoxModel comboBoxModel) {
+	public AutoComboBox(final ComboBoxModel<String> comboBoxModel) {
 
 		super(comboBoxModel);
 
-		model = (MutableComboBoxModel) getModel();
+		model = (MutableComboBoxModel<String>) getModel();
 	}
 
 	/**

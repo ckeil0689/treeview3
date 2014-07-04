@@ -10,8 +10,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
-import net.miginfocom.swing.MigLayout;
-
 public class ConfirmDialog {
 
 	private final JDialog confirmDialog;
@@ -26,19 +24,15 @@ public class ConfirmDialog {
 				.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		confirmDialog.setResizable(false);
 
-		final JPanel mainPanel = new JPanel();
-		mainPanel.setLayout(new MigLayout());
-		mainPanel.setBackground(GUIFactory.BG_COLOR);
+		final JPanel mainPanel = GUIFactory.createJPanel(false, true, null);
 
-		final JLabel prompt = new JLabel("Are you sure you want to " + function
-				+ "?");
-		prompt.setForeground(GUIFactory.TEXT);
-		prompt.setFont(GUIFactory.FONT_MENU);
-
-		final JButton ok = GUIFactory.setButtonLayout("OK", null);
+		final JLabel prompt = GUIFactory.createSmallLabel("Are you sure "
+				+ "you want to " + function + "?");
+		
+		final JButton ok = GUIFactory.setButtonLayout("OK");
 		ok.addActionListener(new ConfirmListener());
 
-		final JButton cancel = GUIFactory.setButtonLayout("Cancel", null);
+		final JButton cancel = GUIFactory.setButtonLayout("Cancel");
 		cancel.addActionListener(new DenyListener());
 
 		mainPanel.add(prompt, "push, alignx 50%, span, wrap");

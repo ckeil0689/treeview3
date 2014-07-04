@@ -7,17 +7,16 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import Cluster.ClusterViewDialog;
@@ -30,13 +29,11 @@ import edu.stanford.genetics.treeview.GeneListMaker;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.PreferencesMenu;
-import edu.stanford.genetics.treeview.SSMouseListener;
 import edu.stanford.genetics.treeview.TreeSelection;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.UrlExtractor;
 import edu.stanford.genetics.treeview.UrlPresets;
-import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.model.DataModelWriter;
 import edu.stanford.genetics.treeview.model.ReorderedDataModel;
 import edu.stanford.genetics.treeview.model.TVModel;
@@ -49,7 +46,7 @@ import edu.stanford.genetics.treeview.model.TVModel;
  */
 public class TVFrameController {
 
-	private final TVModel model;
+	private final DataModel model;
 	private final TreeViewFrame tvFrame;
 	private final JFrame applicationFrame;
 	private MenubarActions menuActions;
@@ -59,7 +56,8 @@ public class TVFrameController {
 
 	private boolean error = false;
 
-	public TVFrameController(final TreeViewFrame tvFrame, final TVModel model) {
+	public TVFrameController(final TreeViewFrame tvFrame, 
+			final DataModel model) {
 
 		this.model = model;
 		this.tvFrame = tvFrame;
@@ -162,7 +160,7 @@ public class TVFrameController {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			final ArrayList<JMenuItem> menuList = tvFrame.getStackMenus();
+			final List<JMenuItem> menuList = tvFrame.getStackMenus();
 
 			for (int i = 0; i < menuList.size(); i++) {
 				if (e.getSource() == menuList.get(i)) {
@@ -294,13 +292,14 @@ public class TVFrameController {
 	public void loadFileSet(final FileSet fileSet) {
 
 		// Make TVModel object
-		model.setFrame(tvFrame);
+		TVModel tvModel = (TVModel) model;
+		tvModel.setFrame(tvFrame);
 
 		tvFrame.setView("LoadProgressView");
 
 		try {
 			// load instance variables of TVModel with data
-			model.loadNew(fileSet);
+			tvModel.loadNew(fileSet);
 
 		} catch (final OutOfMemoryError e) {
 			final String oomError = "The data file is too large. "
@@ -313,9 +312,13 @@ public class TVFrameController {
 				JOptionPane.showMessageDialog(applicationFrame, e);
 			}
 		} catch (final InterruptedException e) {
+			LogBuffer.println("InterruptedException in "
+					+ "loadFileSet(): " + e.getMessage());
 			e.printStackTrace();
 
 		} catch (final ExecutionException e) {
+			LogBuffer.println("ExecutionException in "
+					+ "loadFileSet(): " + e.getMessage());
 			e.printStackTrace();
 		}
 	}
@@ -396,16 +399,26 @@ public class TVFrameController {
 	 */
 	public void setupClusterView(final String clusterType) {
 
-		// Making a new Window to display clustering components
-		final ClusterViewDialog clusterViewDialog = new ClusterViewDialog(
-				tvFrame, clusterType);
+		SwingUtilities.invokeLater(new Runnable() {
 
-		// Creating the Controller for this view.
-		final ClusterViewController2 clusControl = new ClusterViewController2(
-				clusterViewDialog.getClusterView(), tvFrame, this);
+			@Override
+			public void run() {
+				
+				// Making a new Window to display clustering components
+				final ClusterViewDialog clusterViewDialog = 
+						new ClusterViewDialog(tvFrame.getAppFrame(), 
+								clusterType);
 
-		// Make the clustering window visible.
-		clusterViewDialog.setVisible(true);
+				// Creating the Controller for this view.
+				final ClusterViewController2 clusControl = 
+						new ClusterViewController2(clusterViewDialog
+								.getClusterView(), tvFrame, 
+								TVFrameController.this);
+
+				// Make the clustering window visible.
+				clusterViewDialog.setVisible(true);
+			}
+		});
 	}
 
 	/**
@@ -719,7 +732,7 @@ public class TVFrameController {
 	 * 
 	 * @return
 	 */
-	public TVModel getTVControllerModel() {
+	public DataModel getTVControllerModel() {
 
 		return model;
 	}

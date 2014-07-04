@@ -3,9 +3,7 @@ package edu.stanford.genetics.treeview.app;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import edu.stanford.genetics.treeview.GUIFactory;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.TVScrollBarUI;
 
 /**
  * Launcher class which wraps the creation of the GUI as well as the main
@@ -30,7 +28,7 @@ public class TreeViewLauncher {
 			 * in CrossPlatform LAF afterwards which cannot use 
 			 * OSX native menuBar otherwise...
 			 */
-			String menuBarUI = "";
+//			String menuBarUI = "";
 			if (!isApplet && System.getProperty("os.name").contains("Mac")) {
 
 				System.setProperty("com.apple.mrj.application"
@@ -48,7 +46,7 @@ public class TreeViewLauncher {
 				 * and then switch back to CrossPlatformLookAndFeel. Otherwise
 				 * the menubar can't be displayed.
 				 */
-				menuBarUI = UIManager.getString("MenuBarUI");
+//				menuBarUI = UIManager.getString("MenuBarUI");
 				
 			}
 			

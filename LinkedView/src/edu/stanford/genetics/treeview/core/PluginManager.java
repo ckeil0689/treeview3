@@ -16,6 +16,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Vector;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -68,7 +69,7 @@ public class PluginManager {
 	 * array of all classes to be declared NOTE: This method should probably be
 	 * moved into a PluginManager class
 	 */
-	private ArrayList getClassDeclarations(final JarFile jf)
+	private List getClassDeclarations(final JarFile jf)
 			throws NullPointerException, IOException {
 
 		ZipEntry ze = null;
@@ -94,6 +95,8 @@ public class PluginManager {
 			throw e;
 
 		} catch (final RuntimeException e) {
+			LogBuffer.println("RunTimeException in PluginManager: " 
+					+ e.getMessage());
 			e.printStackTrace();
 		}
 
@@ -104,7 +107,7 @@ public class PluginManager {
 		final BufferedReader br = new BufferedReader(new InputStreamReader(
 				jf.getInputStream(ze)));
 
-		final ArrayList al = new ArrayList();
+		final List al = new ArrayList();
 		String s = null;
 
 		while ((s = br.readLine()) != null) {
@@ -155,7 +158,7 @@ public class PluginManager {
 			final JarURLConnection conn = (JarURLConnection) jarURL
 					.openConnection();
 			final JarFile jarFile = conn.getJarFile();
-			final ArrayList al_classnames = getClassDeclarations(jarFile);
+			final List al_classnames = getClassDeclarations(jarFile);
 			for (int j = 0; j < al_classnames.size(); j++) {
 				final Class thisClass = getClass();
 				final URLClassLoader urlcl = new URLClassLoader(

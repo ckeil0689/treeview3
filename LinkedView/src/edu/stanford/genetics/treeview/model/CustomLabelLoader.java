@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeViewFrame;
@@ -98,7 +99,7 @@ public class CustomLabelLoader {
 	 * Searches the loaded labels for header names such as ORF. If they are
 	 * present, the newly loaded labels will later replace the old labels.
 	 */
-	public int checkForHeaders(final TVModel model) {
+	public int checkForHeaders(final DataModel model) {
 
 		int checkLimit = headerInfo.getNumHeaders() / 100;
 
@@ -286,18 +287,19 @@ public class CustomLabelLoader {
 	 * 
 	 * @param model
 	 */
-	public void setHeaders(final TVModel model, final String type,
+	public void setHeaders(final DataModel model, final String type,
 			final String[][] headersToAdd) {
 
+		TVModel tvModel = (TVModel) model;
 		// Set the new headers for the TVModel
 		if (type.equalsIgnoreCase("Row")) {
-			model.setGeneHeaders(headersToAdd);
+			tvModel.setGeneHeaders(headersToAdd);
 
 		} else if (type.equalsIgnoreCase("Column")) {
-			model.setArrayHeaders(headersToAdd);
+			tvModel.setArrayHeaders(headersToAdd);
 		}
 
-		model.notifyObservers();
+		tvModel.notifyObservers();
 
 		// Set the new Labels for the headers
 		final String[] oldNames = headerInfo.getNames();
