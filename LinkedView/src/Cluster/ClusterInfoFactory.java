@@ -15,6 +15,7 @@ import edu.stanford.genetics.treeview.StringRes;
 public class ClusterInfoFactory {
 
 	private static JPanel mainPanel;
+	private final static int KMEANS_INDEX = 3;
 	
 	static {
 		
@@ -27,7 +28,7 @@ public class ClusterInfoFactory {
 	 * @param methodIndex
 	 * @return
 	 */
-	public static JPanel makeMethodInfoPanel(int methodIndex) {
+	public static JPanel makeHierInfoPanel(int methodIndex) {
 		
 		mainPanel.removeAll();
 		
@@ -81,6 +82,34 @@ public class ClusterInfoFactory {
 		return mainPanel;
 	}
 	
+	/**
+	 * Generates an infoPanel depending on the supplied method index that
+	 * stands for the type of clustering algorithm.
+	 * @param methodIndex
+	 * @return
+	 */
+	public static JPanel makeKmeansInfoPanel() {
+		
+		mainPanel.removeAll();
+		
+		JLabel label = GUIFactory.createBigLabel("K-Means Details");
+		
+		mainPanel.add(label, "pushx, alignx 0%, aligny 0%, span, wrap");
+		
+		JLabel similarity = GUIFactory.createSmallLabel("Similarity: ");
+		
+		TextDisplay similarityText = new TextDisplay(
+				getSimilarity(KMEANS_INDEX));
+		
+		mainPanel.add(similarity, "alignx 0%");
+		mainPanel.add(similarityText, "w 400:500:, wrap");
+		
+		mainPanel.revalidate();
+		mainPanel.repaint();
+		
+		return mainPanel;
+	}
+	
 //	public JPanel makeTipPanel() {
 //		
 //		mainPanel.removeAll();
@@ -116,6 +145,8 @@ public class ClusterInfoFactory {
 			case 1: 	similarity = StringRes.clusterInfo_Avg_Similarity;
 						break;
 			case 2: 	similarity = StringRes.clusterInfo_Compl_Similarity;
+						break;
+			case 3: 	similarity = StringRes.clusterInfo_KMeans;
 						break;
 			default: 	similarity = "N/ A";
 		}

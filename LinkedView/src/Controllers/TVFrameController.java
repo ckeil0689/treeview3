@@ -29,6 +29,7 @@ import edu.stanford.genetics.treeview.GeneListMaker;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.PreferencesMenu;
+import edu.stanford.genetics.treeview.StringRes;
 import edu.stanford.genetics.treeview.TreeSelection;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.TreeViewFrame;
@@ -174,18 +175,18 @@ public class TVFrameController {
 	public void setViewChoice() {
 
 		if (error) {
-			tvFrame.setView("LoadErrorView");
+			tvFrame.setView(StringRes.view_LoadError);
 			tvFrame.setLoaded(false);
 
-			LogBuffer.println("DataModel not properly loaded.");
+			LogBuffer.println(StringRes.clusterError_notLoaded);
 
 		} else {
 			if (tvFrame.getDataModel() != null) {
-				tvFrame.setView("DendroView");
+				tvFrame.setView(StringRes.view_Dendro);
 				tvFrame.setLoaded(true);
 
 			} else {
-				tvFrame.setView("WelcomeView");
+				tvFrame.setView(StringRes.view_Welcome);
 				tvFrame.setLoaded(false);
 			}
 		}
@@ -411,8 +412,7 @@ public class TVFrameController {
 
 				// Creating the Controller for this view.
 				final ClusterViewController2 clusControl = 
-						new ClusterViewController2(clusterViewDialog
-								.getClusterView(), tvFrame, 
+						new ClusterViewController2(clusterViewDialog, 
 								TVFrameController.this);
 
 				// Make the clustering window visible.
@@ -706,25 +706,14 @@ public class TVFrameController {
 	 */
 	public void openPrefMenu(final String menu) {
 
-//		if (!tvFrame.getDendroView().isLoaded()) {
-//			final PreferencesMenu preferences = new PreferencesMenu(tvFrame,
-//					menu, dialogTitle);
-//
-//			final PreferencesController pController = new PreferencesController(
-//					tvFrame, preferences, this);
-//
-//			preferences.setVisible(true);
-//
-//		} else {
-			final PreferencesMenu preferences = new PreferencesMenu(tvFrame,
-					tvFrame.getDendroView(), tvFrame.getDendroController(),
-					menu);
+		final PreferencesMenu preferences = new PreferencesMenu(tvFrame,
+				tvFrame.getDendroView(), tvFrame.getDendroController(),
+				menu);
 
-			final PreferencesController pController = new PreferencesController(
-					tvFrame, preferences, this);
+		final PreferencesController pController = new PreferencesController(
+				tvFrame, preferences);
 
-			preferences.setVisible(true);
-//		}
+		preferences.setVisible(true);
 	}
 
 	/**

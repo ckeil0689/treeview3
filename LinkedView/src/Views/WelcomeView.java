@@ -97,7 +97,7 @@ public class WelcomeView {
 
 		loadPanel.removeAll();
 
-		loadButton = GUIFactory.setLargeButtonLayout("Open...");
+		loadButton = GUIFactory.createLargeButton("Open...");
 		loadPanel.add(loadButton, "push, alignx 50%, aligny 0%");
 
 		// Set the colors

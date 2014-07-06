@@ -17,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
+import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 
 import net.miginfocom.swing.MigLayout;
@@ -121,9 +122,6 @@ public class GUIFactory {
 		// specify background, otherwise default to theme's backgroundColor.
 		if(backgroundColor != null) {
 			panel.setBackground(backgroundColor);
-			
-		} else {
-//			panel.setBackground(BG_COLOR);
 		}
 		
 		return panel;
@@ -180,7 +178,7 @@ public class GUIFactory {
 	 * @param iconFileName
 	 * @return
 	 */
-	public static JButton setButtonLayout(final String title) { //,
+	public static JButton createButton(final String title) { //,
 			//final String iconFileName) {
 
 		final JButton btn = new JButton(title);
@@ -225,6 +223,22 @@ public class GUIFactory {
 	
 	/**
 	 * Creates a button with a title and icon if desired. The method centralizes
+	 * the layout setting for buttons so that all buttons will look similar.
+	 * 
+	 * @param title
+	 * @param iconFileName
+	 * @return
+	 */
+	public static JToggleButton createToggleButton(final String title) {
+
+		final JToggleButton btn = new JToggleButton(title);
+		btn.setFocusPainted(false);
+
+		return btn;
+	}
+	
+	/**
+	 * Creates a button with a title and icon if desired. The method centralizes
 	 * the layout setting for buttons so that all navigation buttons 
 	 * will look similar.
 	 * 
@@ -232,7 +246,7 @@ public class GUIFactory {
 	 * @param iconFileName
 	 * @return
 	 */
-	public static JButton setNavButtonLayout(final String iconFileName) {
+	public static JButton createNavButton(final String iconFileName) {
 
 		final JButton button = new JButton();
 		button.setFocusPainted(false);
@@ -272,7 +286,7 @@ public class GUIFactory {
 	 * @param iconFileName
 	 * @return
 	 */
-	public static JButton setLargeButtonLayout(final String title) {
+	public static JButton createLargeButton(final String title) {
 
 		final JButton button = new JButton(title);
 		button.setFocusPainted(false);
@@ -364,19 +378,6 @@ public class GUIFactory {
 		pBar.setMinimum(0);
 		pBar.setStringPainted(true);
 		pBar.setMaximumSize(new Dimension(2000, 20));
-//		pBar.setForeground(MAIN);
-//		pBar.setUI(new BasicProgressBarUI() {
-//
-//			@Override
-//			protected Color getSelectionBackground() {
-//				return PROGRESS;
-//			};
-//
-//			@Override
-//			protected Color getSelectionForeground() {
-//				return PROGRESS;
-//			};
-//		});
 		pBar.setVisible(true);
 
 		return pBar;

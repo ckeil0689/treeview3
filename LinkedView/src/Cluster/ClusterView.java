@@ -154,10 +154,10 @@ public class ClusterView {
 	public void setupInteractiveComponents() {
 
 		// Button to begin Clustering
-		cluster_btn = GUIFactory.setButtonLayout(StringRes.button_Cluster);
+		cluster_btn = GUIFactory.createButton(StringRes.button_Cluster);
 
 		// Button to cancel worker thread in the controller
-		cancel_button = GUIFactory.setButtonLayout(StringRes.button_Cancel);
+		cancel_button = GUIFactory.createButton(StringRes.button_Cancel);
 
 		// Label for cluster process
 		loadLabel = GUIFactory.createSmallLabel(StringRes.clusterInfo_Ready);
@@ -226,8 +226,16 @@ public class ClusterView {
 		JPanel choicePanel = setupChoicePanel();
 		
 		// Cluster Info Panel
-		JPanel infoPanel = ClusterInfoFactory.makeMethodInfoPanel(
-				clusterChoice.getSelectedIndex());
+		JPanel infoPanel;
+		
+		if(clusterType.getSelectedIndex() == 0) {
+			infoPanel = ClusterInfoFactory.makeHierInfoPanel(
+					clusterChoice.getSelectedIndex());
+			
+		} else {
+			infoPanel = ClusterInfoFactory.makeKmeansInfoPanel();
+		}
+	
 
 		optionsPanel.add(choicePanel, "aligny 10%, w 40%, h 100%");
 		optionsPanel.add(new JSeparator(JSeparator.VERTICAL), "pushx, w 1%, "
@@ -272,20 +280,31 @@ public class ClusterView {
 			
 			choicePanel.add(method, "pushx, alignx 0%, span, wrap");
 			choicePanel.add(choose, "pushx, alignx 0%, w 20%");
-			choicePanel.add(clusterChoice, "pushx, alignx 0%, w 80%");
+			choicePanel.add(clusterChoice, "pushx, alignx 0%, w 80%, wrap");
 
 		// K-means
 		} else {
 			final JLabel kMeans = GUIFactory.createBigLabel("K-Means Options");
 			final JLabel clusters = GUIFactory.createSmallLabel("Clusters: ");
-			final JLabel its = GUIFactory.createSmallLabel("Iterations: ");
+			final JLabel its = GUIFactory.createSmallLabel("Cycles: ");
+			final JLabel filler = GUIFactory.createSmallLabel(
+					StringRes.empty);
+			final JLabel rows = GUIFactory.createSmallLabel(
+					StringRes.main_rows);
+			final JLabel cols = GUIFactory.createSmallLabel(
+					StringRes.main_cols);
 			
 			choicePanel.add(kMeans, "pushx, alignx 0%, span, wrap");
-			choicePanel.add(clusters, "w 20%");
+			
+			choicePanel.add(filler, "w 20%!");
+			choicePanel.add(rows, "split 2");
+			choicePanel.add(cols, "wrap");
+			
+			choicePanel.add(clusters, "w 20%!");
 			choicePanel.add(enterRC, "split 2");
 			choicePanel.add(enterCC, "wrap");
 
-			choicePanel.add(its, "w 20%");
+			choicePanel.add(its, "w 20%!");
 			choicePanel.add(enterRIt, "split 2");
 			choicePanel.add(enterCIt);
 		}
@@ -294,17 +313,16 @@ public class ClusterView {
 	}
 
 	/**
-	 * Method to setup the look of an editable TextField
+	 * This method sets up and returns a JSpinner for entering numerical
+	 * input.
 	 * 
-	 * @return
+	 * @return JSpinner
 	 */
 	public JSpinner setupSpinner() {
 
 		final SpinnerNumberModel amountChoice = new SpinnerNumberModel(0, 0,
 				5000, 1);
 		final JSpinner jft = new JSpinner(amountChoice);
-
-		jft.setFont(GUIFactory.FONTS);
 
 		return jft;
 	}
@@ -348,17 +366,6 @@ public class ClusterView {
 	}
 
 	// Implementing methods to connect with Controller
-	/**
-	 * Adds a listener to the combobox for choosing the clustering type.
-	 * (K-Means vs. Hierarchical).
-	 * 
-	 * @param switcher
-	 */
-	public void addClusterMenuListener(final ActionListener clusterMenu) {
-
-		clusterType.addActionListener(clusterMenu);
-	}
-
 	/**
 	 * Adds a listener to cluster_button to register user interaction and notify
 	 * ClusterController to call the performCluster() method.
@@ -427,6 +434,11 @@ public class ClusterView {
 	public void addClusterChoiceListener(final ActionListener l) {
 		
 		clusterChoice.addActionListener(l);
+	}
+	
+	public void addClusterTypeListener(final ActionListener l) {
+		
+		clusterType.addActionListener(l);
 	}
 
 	/**

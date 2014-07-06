@@ -29,10 +29,10 @@ public class ConfirmDialog {
 		final JLabel prompt = GUIFactory.createSmallLabel("Are you sure "
 				+ "you want to " + function + "?");
 		
-		final JButton ok = GUIFactory.setButtonLayout("OK");
+		final JButton ok = GUIFactory.createButton("OK");
 		ok.addActionListener(new ConfirmListener());
 
-		final JButton cancel = GUIFactory.setButtonLayout("Cancel");
+		final JButton cancel = GUIFactory.createButton("Cancel");
 		cancel.addActionListener(new DenyListener());
 
 		mainPanel.add(prompt, "push, alignx 50%, span, wrap");

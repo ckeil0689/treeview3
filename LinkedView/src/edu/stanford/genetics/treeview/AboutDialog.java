@@ -74,7 +74,7 @@ public class AboutDialog {
 		message.add(hp);
 		message.add(new JTextField(StringRes.updateUrl));
 
-		JButton yesB = GUIFactory.setButtonLayout("Open");
+		JButton yesB = GUIFactory.createButton("Open");
 		yesB.addActionListener(new ActionListener() {
 
 			@Override
@@ -91,7 +91,7 @@ public class AboutDialog {
 		message.add(announce);
 		message.add(new JTextField(StringRes.announcementUrl));
 
-		yesB = GUIFactory.setButtonLayout("Sign Up");
+		yesB = GUIFactory.createButton("Sign Up");
 		yesB.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent arg0) {

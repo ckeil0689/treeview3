@@ -123,7 +123,7 @@ public abstract class HeaderFinderBox {
 		genefBox.getEditor().getEditorComponent().addKeyListener(
 				new BoxKeyListener());
 
-		genefButton = GUIFactory.setNavButtonLayout("searchIcon");
+		genefButton = GUIFactory.createNavButton("searchIcon");
 		genefButton.setToolTipText("Highlights the selected label.");
 		genefButton.addActionListener(new ActionListener() {
 

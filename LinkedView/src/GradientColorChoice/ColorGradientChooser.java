@@ -25,7 +25,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -36,14 +35,16 @@ import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.GUIFactory;
 import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor2;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractorEditor2;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets2;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet2;
+import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
 
 public class ColorGradientChooser implements ConfigNodePersistent {
 
-	private final JFrame applicationFrame;
+	private final TreeViewFrame tvFrame;
 	private final JPanel mainPanel;
 	private Preferences configNode;
 
@@ -78,15 +79,14 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 
 	private Thumb selectedThumb = null;
 
-	public ColorGradientChooser(final ColorExtractor2 drawer,
-			final ColorPresets2 colorPresets, final double minVal,
-			final double maxVal, final JFrame applicationFrame) {
+	public ColorGradientChooser(TreeViewFrame tvFrame, 
+			final ColorExtractor2 drawer) {
 
+		this.tvFrame = tvFrame;
 		this.colorExtractor = drawer;
-		this.colorPresets = colorPresets;
-		this.applicationFrame = applicationFrame;
-		this.minVal = minVal;
-		this.maxVal = maxVal;
+		this.colorPresets = DendrogramFactory.getColorPresets();
+		this.minVal = tvFrame.getDataModel().getDataMatrix().getMinVal();
+		this.maxVal = tvFrame.getDataModel().getDataMatrix().getMaxVal();
 
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new MigLayout());
@@ -103,8 +103,8 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 
 		gradientBox = new GradientBox();
 
-		addButton = GUIFactory.setButtonLayout("Add Color");
-		removeButton = GUIFactory.setButtonLayout("Remove Selected");
+		addButton = GUIFactory.createButton("Add Color");
+		removeButton = GUIFactory.createButton("Remove Selected");
 		// saveButton = GUIParams.setButtonLayout("Save Colors", null);
 
 		colorButtonGroup = new ButtonGroup();
@@ -117,21 +117,18 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 		colorButtonGroup.add(yellowBlueButton);
 		colorButtonGroup.add(customColorButton);
 
-		final JPanel radioButtonPanel = new JPanel();
-		radioButtonPanel.setLayout(new MigLayout());
-		radioButtonPanel.setOpaque(false);
+		final JPanel radioButtonPanel = 
+				GUIFactory.createJPanel(false, true, null);
 
-		final JLabel colorHint = new JLabel("Choose a Color Scheme:");
-		colorHint.setFont(GUIFactory.FONTS);
-		colorHint.setForeground(GUIFactory.DARKGRAY);
+		final JLabel colorHint = GUIFactory
+				.createSmallLabel("Choose a Color Scheme: ");
 
 		radioButtonPanel.add(colorHint, "span, wrap");
 		radioButtonPanel.add(redGreenButton, "span, wrap");
 		radioButtonPanel.add(yellowBlueButton, "span, wrap");
 		radioButtonPanel.add(customColorButton, "span");
 
-		final JPanel presetPanel = new JPanel();
-		presetPanel.setLayout(new MigLayout());
+		final JPanel presetPanel = GUIFactory.createJPanel(false, true, null);
 		colorExtractorEditor = new ColorExtractorEditor2(colorExtractor);
 		presetPanel.add(colorExtractorEditor, "alignx 50%, pushx, wrap");
 
@@ -782,7 +779,7 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 					final JTextField inputField = new JTextField();
 					inputField.setEditable(true);
 
-					final JButton okButton = GUIFactory.setButtonLayout("OK");
+					final JButton okButton = GUIFactory.createButton("OK");
 					okButton.addActionListener(new ActionListener() {
 
 						@Override
@@ -826,7 +823,8 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 					positionInputDialog.getContentPane().add(panel);
 
 					positionInputDialog.pack();
-					positionInputDialog.setLocationRelativeTo(applicationFrame);
+					positionInputDialog.setLocationRelativeTo(tvFrame
+							.getAppFrame());
 					positionInputDialog.setVisible(true);
 				}
 			}

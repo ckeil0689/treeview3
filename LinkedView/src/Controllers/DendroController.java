@@ -32,7 +32,6 @@ import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ReorderedTreeSelection;
-import edu.stanford.genetics.treeview.StringRes;
 import edu.stanford.genetics.treeview.TreeDrawerNode;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.TreeViewFrame;
@@ -231,13 +230,7 @@ public class DendroController implements ConfigNodePersistent {
 		@Override
 		protected Void doInBackground() throws Exception {
 			
-			if (tvFrame.getTreeButton().getText()
-					.equalsIgnoreCase(StringRes.button_showTrees)) {
-				setTreesVis(true);
-
-			} else {
-				setTreesVis(false);
-			}
+			setTreesVis(tvFrame.getTreeButton().isSelected());
 
 			dendroView.setupLayout();
 			addViewListeners();
@@ -649,13 +642,6 @@ public class DendroController implements ConfigNodePersistent {
 
 		dendroView.setTreesVisible(vis);
 		configNode.putBoolean("treesVisible", vis);
-
-		if (vis) {
-			tvFrame.getTreeButton().setText(StringRes.button_hideTrees);
-
-		} else {
-			tvFrame.getTreeButton().setText(StringRes.button_showTrees);
-		}
 	}
 
 	public void saveImage(final JPanel panel) throws IOException {

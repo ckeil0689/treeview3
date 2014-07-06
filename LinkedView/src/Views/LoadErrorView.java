@@ -60,7 +60,7 @@ public class LoadErrorView {
 		
 		homePanel.add(errorPanel, "push, alignx 50%");
 		
-		loadNew = GUIFactory.setButtonLayout(StringRes.button_loadNewFile);
+		loadNew = GUIFactory.createButton(StringRes.button_LoadNewFile);
 	}
 
 	public JPanel makeErrorPanel() {

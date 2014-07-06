@@ -143,7 +143,7 @@
             <map>
               <entry key="name" value="MP_4pairsT_0p75slf_0p01enrich"/>
               <entry key="extension" value=".txt"/>
-              <entry key="treesVisible" value="true"/>
+              <entry key="treesVisible" value="false"/>
               <entry key="globalViewLocked" value="false"/>
             </map>
             <node name="ArrayNameView">
@@ -315,7 +315,7 @@
             </node>
             <node name="GradientChooser">
               <map>
-                <entry key="activeColors" value="YellowBlue"/>
+                <entry key="activeColors" value="Custom"/>
               </map>
             </node>
             <node name="GtrSummary">
@@ -974,14 +974,14 @@
             </node>
             <node name="GlobalXMap">
               <map>
-                <entry key="scale" value="6.1193415637860085"/>
-                <entry key="minScale" value="6.1193415637860085"/>
+                <entry key="scale" value="1.4691358024691359"/>
+                <entry key="minScale" value="1.4691358024691359"/>
                 <entry key="XScrollValue" value="0"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="6.1193415637860085"/>
+                  <entry key="scale" value="1.4691358024691359"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -1010,7 +1010,7 @@
             </node>
             <node name="GradientChooser">
               <map>
-                <entry key="activeColors" value="Custom"/>
+                <entry key="activeColors" value="YellowBlue"/>
               </map>
             </node>
             <node name="GtrSummary">
@@ -1101,9 +1101,9 @@
                   <entry key="Color2" value="#000000"/>
                   <entry key="Color3" value="#00FF00"/>
                   <entry key="colorNum" value="3"/>
-                  <entry key="Fraction1" value="0.46875"/>
-                  <entry key="Fraction2" value="0.5295138955116272"/>
-                  <entry key="Fraction3" value="0.5763888955116272"/>
+                  <entry key="Fraction1" value="0.5336658358573914"/>
+                  <entry key="Fraction2" value="0.5835411548614502"/>
+                  <entry key="Fraction3" value="0.6446384191513062"/>
                   <entry key="fracNum" value="3"/>
                   <entry key="name" value="Custom"/>
                   <entry key="missing" value="#ffffff"/>
@@ -1130,14 +1130,14 @@
             </node>
             <node name="GlobalYMap">
               <map>
-                <entry key="scale" value="784.0"/>
+                <entry key="scale" value="0.45794392523364486"/>
                 <entry key="minScale" value="0.45794392523364486"/>
-                <entry key="YScrollValue" value="687"/>
+                <entry key="YScrollValue" value="0"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="784.0"/>
+                  <entry key="scale" value="0.45794392523364486"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -1452,7 +1452,7 @@
             </node>
             <node name="GradientChooser">
               <map>
-                <entry key="activeColors" value="Custom"/>
+                <entry key="activeColors" value="RedGreen"/>
               </map>
             </node>
             <node name="GtrSummary">
@@ -3128,6 +3128,18 @@
               <entry key="root" value="testData_gamma"/>
               <entry key="dir" value="C:\Users\CKeil\Work\TreeView Related Files\Test Files\"/>
               <entry key="cdt" value=".txt"/>
+              <entry key="name" value="No name"/>
+              <entry key="style" value="0"/>
+            </map>
+            <node name="File9">
+              <map/>
+            </node>
+          </node>
+          <node name="File17">
+            <map>
+              <entry key="root" value="fg_090813_v2_alpha"/>
+              <entry key="dir" value="C:\Users\CKeil\Work\TreeView Related Files\Test Files\"/>
+              <entry key="cdt" value=".cdt"/>
               <entry key="name" value="No name"/>
               <entry key="style" value="0"/>
             </map>

@@ -37,10 +37,11 @@ public class StringRes {
 	public static final String view_LoadError = "LoadErrorView";
 
 	// Frame Titles
-	public static final String view_title_Cluster = "Cluster View";
+	public static final String dialog_title_Cluster = "Cluster View";
 	public static final String dialog_title_search = "Search Labels";
+	public static final String dialog_title_prefs = "Preferences";
 	public static final String dialog_title_exitConfirm = "Confirm Exit";
-	public static final String dialog_title_about = "About...";
+	public static final String dialog_title_about = "About";
 	
 	// Main Words
 	public static final String main_rows = "Rows";
@@ -59,32 +60,30 @@ public class StringRes {
 
 	// Menu Titles
 	public static final String menu_title_Open = "Open...";
-	public static final String menu_title_OpenRecent = "Open Recent";
+	public static final String menu_title_OpenRecent = "Open Recent...";
 	public static final String menu_title_EditRecent = "Edit Recent Files";
-	public static final String menu_title_Save = "Save";
+	public static final String menu_title_Save = "Save...";
 	public static final String menu_title_SaveAs = "Save As...";
+	public static final String menu_title_Font = "Font...";
+	public static final String menu_title_URL = "URL...";
 	public static final String menu_title_Prefs = "Preferences";
-	public static final String menu_title_Theme = "Theme";
-	public static final String menu_title_Font = "Font";
-	public static final String menu_title_URL = "URL";
-	public static final String menu_title_RowAndCol = "Row and Column Labels";
-	public static final String menu_title_Color = "Color Settings";
+	public static final String menu_title_RowAndCol = "Row and Column Labels...";
+	public static final String menu_title_Color = "Color Settings...";
 	public static final String menu_title_Hier = "Hierarchical";
 	public static final String menu_title_KMeans = "K-Means";
-	public static final String menu_title_Help = "Help";
 	public static final String menu_title_Stats = "Stats...";
 	public static final String menu_title_About = "About...";
 	public static final String menu_title_ShowLog = "Show Log...";
 	public static final String menu_title_Docs = "Documentation...";
 	public static final String menu_title_Feedback = "Send Feedback...";
-	public static final String menu_title_NewWindow = "New Window...";
-	public static final String menu_title_QuitWindow = "Close Window...";
+	public static final String menu_title_NewWindow = "New Window";
+	public static final String menu_title_QuitWindow = "Close Window";
 
 	// MenuBar
-	public static final String menubar_file = "File";
-	public static final String menubar_view = "View";
-	public static final String menubar_cluster = "Cluster";
-	public static final String menubar_clearPrefs = "Clear Preferences";
+	public static final String menubar_File = "File";
+	public static final String menubar_View = "View";
+	public static final String menubar_Cluster = "Cluster";
+	public static final String menubar_Help = "Help";
 
 	// Preferences API
 	// Nodes
@@ -96,13 +95,10 @@ public class StringRes {
 	public static final String button_OK = "OK";
 	public static final String button_Cancel = "Cancel";
 	public static final String button_Cluster = "Cluster";
-	public static final String button_customLabels = "Load more labels...";
-	public static final String button_home = "Home";
-	public static final String button_searchLabels = "Search labels";
-	public static final String button_showTrees = "Show trees";
-	public static final String button_hideTrees = "Hide trees";
-	public static final String button_toggleMatrixSize = "Change Matrix Size";
-	public static final String button_loadNewFile = "Load New File";
+	public static final String button_CustomLabels = "Load more labels...";
+	public static final String button_SearchLabels = "Search labels...";
+	public static final String button_ShowTrees = "Show trees";
+	public static final String button_LoadNewFile = "Load New File...";
 	
 	// Icon Names
 	public static final String icon_home = "homeIcon";
@@ -122,8 +118,8 @@ public class StringRes {
 	public static final String tooltip_home = "Zoom into the selected area";
 
 	// RadioButton Texts
-	public static final String rButton_dark = "Dark";
-	public static final String rButton_light = "Light";
+//	public static final String rButton_dark = "Dark";
+//	public static final String rButton_light = "Light";
 
 	// Labels
 	public static final String label_ZoomColLabels = "Zoom to see column "
@@ -182,6 +178,8 @@ public class StringRes {
 			"evaluation studies.";
 	public static final String clusterInfo_Avg_DisAdv = "Expensive for " +
 			"large collections.";
+	public static final String clusterInfo_KMeans = "Splits the data into"
+			+ "groups.";
 	
 	// Cluster Info - Tip
 	public static final String clusterTip_Memory = "Memory tip.";
@@ -192,6 +190,8 @@ public class StringRes {
 	// Cluster Error - Hints
 	public static final String clusterError_invalid = "Please pick valid "
 			+ "cluster options to begin clustering!";
+	public static final String clusterError_notLoaded = "DataModel not "
+			+ "properly loaded.";
 
 	// Frame Title - Testing
 	public static final String test_title_FontSelector = "Font Settings Test";

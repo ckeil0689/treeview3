@@ -16,7 +16,6 @@ import java.util.List;
 import javax.swing.SwingWorker;
 
 import edu.stanford.genetics.treeview.DataModel;
-import edu.stanford.genetics.treeview.GUIFactory;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LabelLoadDialog;
 import edu.stanford.genetics.treeview.LoadException;
@@ -25,7 +24,6 @@ import edu.stanford.genetics.treeview.PreferencesMenu;
 import edu.stanford.genetics.treeview.StringRes;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.model.CustomLabelLoader;
-import edu.stanford.genetics.treeview.model.TVModel;
 
 /**
  * Controller for the PreferencesMenu class. Handles user interaction with Swing
@@ -36,7 +34,6 @@ import edu.stanford.genetics.treeview.model.TVModel;
  */
 public class PreferencesController {
 
-	private final TVFrameController controller;
 	private final TreeViewFrame tvFrame;
 	private final PreferencesMenu preferences;
 	private SwingWorker<Void, Integer> labelWorker;
@@ -44,10 +41,8 @@ public class PreferencesController {
 	private File customFile;
 
 	public PreferencesController(final TreeViewFrame tvFrame,
-			final PreferencesMenu preferences,
-			final TVFrameController controller) {
+			final PreferencesMenu preferences) {
 
-		this.controller = controller;
 		this.tvFrame = tvFrame;
 		this.preferences = preferences;
 
@@ -61,7 +56,7 @@ public class PreferencesController {
 
 		preferences.addWindowListener(new WindowListener());
 		preferences.addOKButtonListener(new ConfirmationListener());
-		preferences.addThemeListener(new ThemeListener());
+//		preferences.addThemeListener(new ThemeListener());
 		preferences.addCustomLabelListener(new CustomLabelListener());
 //		preferences.addMenuListeners(new MenuPanelListener());
 		preferences.addComponentListener(new PreferencesComponentListener());
@@ -204,75 +199,75 @@ public class PreferencesController {
 		}
 	}
 
-	/**
-	 * Listener for the theme switch button.
-	 * 
-	 * @author CKeil
-	 * 
-	 */
-	class ThemeListener implements ActionListener {
+//	/**
+//	 * Listener for the theme switch button.
+//	 * 
+//	 * @author CKeil
+//	 * 
+//	 */
+//	class ThemeListener implements ActionListener {
+//
+//		@Override
+//		public void actionPerformed(final ActionEvent e) {
+//
+//			new ThemeResetter(e).run();
+//		}
+//	}
 
-		@Override
-		public void actionPerformed(final ActionEvent e) {
-
-			new ThemeResetter(e).run();
-		}
-	}
-
-	class ThemeResetter extends SwingWorker<Void, Void> {
-
-		private final ActionEvent event;
-
-		ThemeResetter(final ActionEvent e) {
-
-			this.event = e;
-		}
-
-		@Override
-		protected Void doInBackground() throws Exception {
-
-			updateCheck(event.getSource().equals(preferences.getLightButton()));
-			return null;
-		}
-
-		/**
-		 * Switches the theme between day and night.
-		 */
-		public void updateCheck(final boolean light) {
-
-			if (light) {
-				GUIFactory.setDayLight();
-				tvFrame.getConfigNode().put("theme", StringRes.rButton_light);
-				resetTheme();
-
-			} else {
-				GUIFactory.setNight();
-				tvFrame.getConfigNode().put("theme", StringRes.rButton_dark);
-				resetTheme();
-			}
-		}
-
-		/**
-		 * Clears the TVFrame from the current view and loads the new
-		 * appropriate view with new color parameters.
-		 */
-		public void resetTheme() {
-
-			preferences.setupLayout(StringRes.menu_title_Prefs);
-			addListeners();
-
-			if (tvFrame.getDataModel() != null 
-					&& tvFrame.getRunning() != null) {
-				tvFrame.setView(StringRes.view_Dendro);
-
-			} else {
-				tvFrame.setView(StringRes.view_Welcome);
-			}
-			
-			controller.addViewListeners();
-			controller.addMenuListeners();
-		}
-	}
+//	class ThemeResetter extends SwingWorker<Void, Void> {
+//
+//		private final ActionEvent event;
+//
+//		ThemeResetter(final ActionEvent e) {
+//
+//			this.event = e;
+//		}
+//
+//		@Override
+//		protected Void doInBackground() throws Exception {
+//
+//			updateCheck(event.getSource().equals(preferences.getLightButton()));
+//			return null;
+//		}
+//
+//		/**
+//		 * Switches the theme between day and night.
+//		 */
+//		public void updateCheck(final boolean light) {
+//
+//			if (light) {
+//				GUIFactory.setDayLight();
+//				tvFrame.getConfigNode().put("theme", StringRes.rButton_light);
+//				resetTheme();
+//
+//			} else {
+//				GUIFactory.setNight();
+//				tvFrame.getConfigNode().put("theme", StringRes.rButton_dark);
+//				resetTheme();
+//			}
+//		}
+//
+//		/**
+//		 * Clears the TVFrame from the current view and loads the new
+//		 * appropriate view with new color parameters.
+//		 */
+//		public void resetTheme() {
+//
+//			preferences.setupLayout(StringRes.menu_title_Prefs);
+//			addListeners();
+//
+//			if (tvFrame.getDataModel() != null 
+//					&& tvFrame.getRunning() != null) {
+//				tvFrame.setView(StringRes.view_Dendro);
+//
+//			} else {
+//				tvFrame.setView(StringRes.view_Welcome);
+//			}
+//			
+//			controller.addViewListeners();
+//			controller.addMenuListeners();
+//		}
+//	}
 
 	class PreferencesComponentListener implements ComponentListener {
 
@@ -302,11 +297,11 @@ public class PreferencesController {
 	 */
 	public void checkForColorSave() {
 
-		if (preferences.getActiveMenu().equalsIgnoreCase(
-				StringRes.menu_title_Color)
-				&& preferences.getGradientPick().isCustomSelected()) {
-			preferences.getGradientPick().saveStatus();
-		}
+//		if (preferences.getActiveMenu().equalsIgnoreCase(
+//				StringRes.menu_title_Color)
+//				&& preferences.getGradientPick().isCustomSelected()) {
+//			preferences.getGradientPick().saveStatus();
+//		}
 	}
 
 	/**

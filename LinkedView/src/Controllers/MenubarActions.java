@@ -59,11 +59,10 @@ public class MenubarActions {
 				System.exit(1);
 			}
 
-		} else if (name.equalsIgnoreCase(StringRes.menu_title_Prefs)) {
-			controller.openPrefMenu(name);
-
 		} else if (name.equalsIgnoreCase(StringRes.menu_title_RowAndCol)
-				|| name.equalsIgnoreCase(StringRes.menu_title_Color)) {
+				|| name.equalsIgnoreCase(StringRes.menu_title_Color)
+				|| name.equalsIgnoreCase(StringRes.menu_title_Font)
+				|| name.equalsIgnoreCase(StringRes.menu_title_URL)) {
 			controller.openPrefMenu(name);
 			
 		} else if(name.equalsIgnoreCase("Fill screen")) {

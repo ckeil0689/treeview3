@@ -263,22 +263,22 @@ public class DendroView2 implements Observer, DendroPanel {
 		JPanel bottomPanel;
 
 		// Buttons
-		scaleDefaultAll = GUIFactory.setNavButtonLayout(StringRes.icon_home);
+		scaleDefaultAll = GUIFactory.createNavButton(StringRes.icon_home);
 		scaleDefaultAll.setToolTipText("Reset the zoomed view");
 
-		scaleIncX = GUIFactory.setNavButtonLayout(StringRes.icon_zoomIn);
+		scaleIncX = GUIFactory.createNavButton(StringRes.icon_zoomIn);
 		scaleIncX.setToolTipText(StringRes.tooltip_xZoomIn);
 
-		scaleDecX = GUIFactory.setNavButtonLayout(StringRes.icon_zoomOut);
+		scaleDecX = GUIFactory.createNavButton(StringRes.icon_zoomOut);
 		scaleDecX.setToolTipText(StringRes.tooltip_xZoomOut);
 
-		scaleIncY = GUIFactory.setNavButtonLayout(StringRes.icon_zoomIn);
+		scaleIncY = GUIFactory.createNavButton(StringRes.icon_zoomIn);
 		scaleIncY.setToolTipText(StringRes.tooltip_yZoomIn);
 
-		scaleDecY = GUIFactory.setNavButtonLayout(StringRes.icon_zoomOut);
+		scaleDecY = GUIFactory.createNavButton(StringRes.icon_zoomOut);
 		scaleDecY.setToolTipText(StringRes.tooltip_yZoomOut);
 
-		zoomButton = GUIFactory.setNavButtonLayout(StringRes.icon_zoomAll);
+		zoomButton = GUIFactory.createNavButton(StringRes.icon_zoomAll);
 		zoomButton.setToolTipText(StringRes.tooltip_home);
 
 		// Panels
@@ -443,7 +443,7 @@ public class DendroView2 implements Observer, DendroPanel {
 		
 		// Adding all components to the dendroPane
 		dendroPane.add(firstPanel, "w " + firstPanelCol + "%, "
-				+ "h " + arrayRow + "%");
+				+ "h " + arrayRow + "%, pushx");
 		
 		dendroPane.add(arrayContainer, "w " + gvWidth + "%, "
 				+ "h " + arrayRow + "%");
@@ -452,7 +452,7 @@ public class DendroView2 implements Observer, DendroPanel {
 				+ "wrap");
 		
 		dendroPane.add(geneContainer, "w " + textViewCol + "%, "
-				+ "h " + gvHeight + "%");
+				+ "h " + gvHeight + "%, pushx");
 		
 		dendroPane.add(globalViewContainer, "w " + gvWidth + "%, "
 				+ "h " + gvHeight + "%, wrap");
@@ -959,7 +959,7 @@ public class DendroView2 implements Observer, DendroPanel {
 		menu.add(annotationsMenuItem);
 		tvFrame.addToStackMenuList(annotationsMenuItem);
 
-		colorMenuItem = new JMenuItem("Color Settings");
+		colorMenuItem = new JMenuItem(StringRes.menu_title_Color);
 		menu.add(colorMenuItem);
 		tvFrame.addToStackMenuList(colorMenuItem);
 		

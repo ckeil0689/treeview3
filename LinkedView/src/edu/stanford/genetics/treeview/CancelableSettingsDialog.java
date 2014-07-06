@@ -78,7 +78,7 @@ public class CancelableSettingsDialog extends JDialog {
 
 			this.setBackground(GUIFactory.BG_COLOR);
 
-			final JButton save_button = GUIFactory.setButtonLayout("Save");
+			final JButton save_button = GUIFactory.createButton("Save");
 			save_button.addActionListener(new ActionListener() {
 
 				@Override
@@ -104,7 +104,7 @@ public class CancelableSettingsDialog extends JDialog {
 			});
 			add(save_button);
 
-			final JButton cancel_button = GUIFactory.setButtonLayout("Cancel");
+			final JButton cancel_button = GUIFactory.createButton("Cancel");
 			cancel_button.addActionListener(new ActionListener() {
 
 				@Override

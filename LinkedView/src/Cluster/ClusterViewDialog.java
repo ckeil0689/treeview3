@@ -21,23 +21,19 @@ public class ClusterViewDialog {
 
 	private final JDialog clusterDialog;
 	private final ClusterView clusterView;
+	private final JFrame parentFrame;
 
 	public ClusterViewDialog(final JFrame parentFrame,
 			final String clusterType) {
-
+		
+		this.parentFrame = parentFrame;
+		
 		clusterDialog = new JDialog();
-		clusterDialog.setTitle("Clustering");
+		clusterDialog.setTitle(StringRes.dialog_title_Cluster);
 		clusterDialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
-		clusterDialog.setResizable(true);
+		clusterDialog.setResizable(false);
 
 		clusterView = new ClusterView(clusterType);
-
-		// Setting preferred size for the ContentPane of this frame
-//		final Dimension mainDim = GUIFactory.getScreenSize();
-//		clusterDialog.getContentPane().setPreferredSize(
-//				new Dimension(mainDim.width * 1/ 2, mainDim.height * 1/ 2));
-
-//		clusterDialog.setMinimumSize(new Dimension(800, 600));
 
 		// setup frame options
 		clusterDialog
@@ -55,6 +51,26 @@ public class ClusterViewDialog {
 
 		clusterDialog.getContentPane().add(clusterView.makeClusterPanel());
 
+		packDialog();
+	}
+	
+	/**
+	 * Resets the entire JDialog contentPane when the user chooses to change
+	 * the clustering type. This avoids a continuously growing dialog when
+	 * switches are performed and pack() is called.
+	 */
+	public void reset() {
+		
+		clusterDialog.getContentPane().removeAll();
+		clusterDialog.getContentPane().add(clusterView.makeClusterPanel());
+		packDialog();
+	}
+	
+	/**
+	 * Packs the JDialog layout and centers it in the application JFrame.
+	 */
+	public void packDialog() {
+		
 		clusterDialog.pack();
 		clusterDialog.setLocationRelativeTo(parentFrame);
 	}

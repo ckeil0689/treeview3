@@ -54,6 +54,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
@@ -106,7 +107,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 	// private JButton stackButton;
 	private JButton searchButton;
-	private JButton treeButton;
+	private JToggleButton treeToggleButton;
 
 	// private JPopupMenu stackMenu;
 	private JMenuBar menuBar;
@@ -542,10 +543,10 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		stackMenuList = new ArrayList<JMenuItem>();
 
 		// File
-		final JMenu fileSubMenu = new JMenu(StringRes.menubar_file);
+		final JMenu fileSubMenu = new JMenu(StringRes.menubar_File);
 		
 		// Open new file Menu
-		final JMenuItem openMenuItem = new JMenuItem(StringRes.menu_title_Open, 
+		final JMenuItem openMenuItem = new JMenuItem(StringRes.menu_title_Open,
 				KeyEvent.VK_O);
 		openMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, 
 				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -619,14 +620,27 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		menuBar.add(fileSubMenu);
 
+		// Preferences
+		final JMenu prefSubMenu = new JMenu(StringRes.menu_title_Prefs);
+		
 		if (running != null) {
-			final JMenu viewMenu = new JMenu(StringRes.menubar_view);
+			final JMenu viewMenu = new JMenu(StringRes.menubar_View);
 			running.addDendroMenus(viewMenu);
 			menuBar.add(viewMenu);
 
-			final JMenu clusterMenu = new JMenu(StringRes.menubar_cluster);
+			final JMenu clusterMenu = new JMenu(StringRes.menubar_Cluster);
 			running.addClusterMenus(clusterMenu);
 			menuBar.add(clusterMenu);
+			
+			final JMenuItem fontMenuItem = new JMenuItem(
+					StringRes.menu_title_Font);
+			prefSubMenu.add(fontMenuItem);
+			stackMenuList.add(fontMenuItem);
+			
+			final JMenuItem urlMenuItem = new JMenuItem(
+					StringRes.menu_title_URL);
+			prefSubMenu.add(urlMenuItem);
+			stackMenuList.add(urlMenuItem);
 
 			// Functional Enrichment Menu
 			// JMenuItem funcEnrMenuItem = new
@@ -635,16 +649,11 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 			// stackMenuList.add(funcEnrMenuItem);
 		}
 
-		// Preferences
-		final JMenuItem prefMenuItem = new JMenuItem(
-				StringRes.menu_title_Prefs);
-		stackMenuList.add(prefMenuItem);
-
 		fileSubMenu.addSeparator();
-		fileSubMenu.add(prefMenuItem);
+		fileSubMenu.add(prefSubMenu);
 
 		// Help
-		final JMenu helpSubMenu = new JMenu(StringRes.menu_title_Help);
+		final JMenu helpSubMenu = new JMenu(StringRes.menubar_Help);
 
 		if (running != null) {
 			final JMenuItem statsMenuItem = new JMenuItem(
@@ -698,8 +707,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 	public void generateSearchMenu() {
 
-		searchButton = GUIFactory.setButtonLayout(
-				StringRes.button_searchLabels);
+		searchButton = GUIFactory.createButton(StringRes.button_SearchLabels);
 		searchButton.setToolTipText(StringRes.tooltip_searchRowCol);
 
 		menuPanel.add(searchButton);
@@ -707,14 +715,15 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 	public void generateTreeMenu() {
 
-		treeButton = GUIFactory.setButtonLayout(StringRes.button_showTrees);
-		treeButton.setToolTipText(StringRes.tooltip_showTrees);
+		treeToggleButton = GUIFactory.createToggleButton(StringRes
+				.button_ShowTrees);
+		treeToggleButton.setToolTipText(StringRes.tooltip_showTrees);
 
 		// Initially disabled, will be enabled if gtrview or atrview in
 		// DendroView are enabled.
-		treeButton.setEnabled(false);
+		treeToggleButton.setEnabled(false);
 
-		menuPanel.add(treeButton);
+		menuPanel.add(treeToggleButton);
 	}
 
 //	/**
@@ -865,7 +874,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		final JPanel panel = GUIFactory.createJPanel(true, true, null);
 
-		final JButton button = GUIFactory.setButtonLayout("OK");
+		final JButton button = GUIFactory.createButton("OK");
 		button.addActionListener(new ActionListener() {
 
 			@Override
@@ -1068,7 +1077,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 	public void addTreeButtonListener(final MouseListener l) {
 
-		treeButton.addMouseListener(l);
+		treeToggleButton.addMouseListener(l);
 	}
 
 	public FileSet getFileMenuSet() {
@@ -1203,9 +1212,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		return running;
 	}
 
-	public JButton getTreeButton() {
+	public JToggleButton getTreeButton() {
 
-		return treeButton;
+		return treeToggleButton;
 	}
 
 	public JButton getSearchButton() {

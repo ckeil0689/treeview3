@@ -32,7 +32,6 @@ import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -41,26 +40,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import net.miginfocom.swing.MigLayout;
-
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
-import edu.stanford.genetics.treeview.DummyHeaderInfo;
 import edu.stanford.genetics.treeview.GUIFactory;
-import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.NatField;
 import edu.stanford.genetics.treeview.SettingsPanel;
-import edu.stanford.genetics.treeview.StringRes;
-import edu.stanford.genetics.treeview.UrlExtractor;
 
 /**
  * This class allows selection of Fonts for a FontSelectable.
@@ -77,8 +68,8 @@ public class FontSettings implements SettingsPanel {
 	private final FontSelectable client;
 	private final FontSelectable client2;
 	private JPanel fontPanel;
-	private JComboBox font_choice;
-	private JComboBox style_choice;
+	private JComboBox<String> font_choice;
+	private JComboBox<String> style_choice;
 	private NatField size_field;
 	private JLabel exampleField;
 
@@ -96,7 +87,7 @@ public class FontSettings implements SettingsPanel {
 	 */
 	public JPanel makeFontPanel() {
 
-		fontPanel = new JPanel();
+		fontPanel = GUIFactory.createJPanel(false, true, null);
 		setupFonts();
 		setupWidgets();
 		updateExample();
@@ -106,23 +97,23 @@ public class FontSettings implements SettingsPanel {
 
 	public static void main(final String[] argv) {
 
-		final HeaderInfo hi = new DummyHeaderInfo();
-		final UrlExtractor ue = new UrlExtractor(hi);
-
-		final FontSelectable fs = new TextView(hi, ue);
-		final FontSelectable fs2 = new ArrayNameView(hi, ue);
-		fs.setPoints(10);
-		final FontSettings e = new FontSettings(fs, fs2);
-		final JFrame f = new JFrame(StringRes.test_title_FontSelector);
-		f.add(e.makeFontPanel());
-		f.addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(final WindowEvent we) {
-				System.exit(0);
-			}
-		});
-		f.pack();
-		f.setVisible(true);
+//		final HeaderInfo hi = new DummyHeaderInfo();
+//		final UrlExtractor ue = new UrlExtractor(hi);
+//
+//		final FontSelectable fs = new TextView(hi, ue);
+//		final FontSelectable fs2 = new ArrayNameView(hi, ue);
+//		fs.setPoints(10);
+//		final FontSettings e = new FontSettings(fs, fs2);
+//		final JFrame f = new JFrame(StringRes.test_title_FontSelector);
+//		f.add(e.makeFontPanel());
+//		f.addWindowListener(new WindowAdapter() {
+//			@Override
+//			public void windowClosing(final WindowEvent we) {
+//				System.exit(0);
+//			}
+//		});
+//		f.pack();
+//		f.setVisible(true);
 	}
 
 	@Override
@@ -223,7 +214,6 @@ public class FontSettings implements SettingsPanel {
 		final JDialog d = new JDialog(f, title);
 		d.setLayout(new BorderLayout());
 		d.add(fontPanel, BorderLayout.CENTER);
-		d.add(new ButtonPanel(d), BorderLayout.SOUTH);
 		d.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(final WindowEvent we) {
@@ -277,8 +267,6 @@ public class FontSettings implements SettingsPanel {
 	private void setupWidgets() {
 
 		fontPanel.removeAll();
-		fontPanel.setLayout(new MigLayout());
-		fontPanel.setBackground(GUIFactory.BG_COLOR);
 
 		setupFontChoice();
 		fontPanel.add(font_choice, "span, wrap");
@@ -305,27 +293,6 @@ public class FontSettings implements SettingsPanel {
 		exampleField.setFont(new Font(string, i, size));
 		exampleField.revalidate();
 		exampleField.repaint();
-	}
-
-	private class ButtonPanel extends JPanel {
-
-		private static final long serialVersionUID = 1L;
-
-		ButtonPanel(final Window w) {
-
-			final Window window = w;
-			final JButton close_button = GUIFactory.setButtonLayout("Close",
-					null);
-			close_button.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-
-					window.setVisible(false);
-				}
-			});
-			add(close_button);
-		}
 	}
 
 	/**

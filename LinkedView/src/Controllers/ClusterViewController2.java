@@ -12,11 +12,11 @@ import javax.swing.SwingWorker;
 import Cluster.CDTGeneratorArrays;
 import Cluster.ClusterProcessorArrays;
 import Cluster.ClusterView;
+import Cluster.ClusterViewDialog;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.StringRes;
-import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 
 /**
@@ -30,9 +30,9 @@ import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 public class ClusterViewController2 {
 
 	private final DataModel tvModel;
-	private final TreeViewFrame tvFrame;
 	private final TVFrameController controller;
 	private final ClusterView clusterView;
+	private final ClusterViewDialog clusterDialog;
 
 	private SwingWorker<Void, Void> loadWorker;
 	private SwingWorker<String[], Void> clusterWorker;
@@ -44,17 +44,17 @@ public class ClusterViewController2 {
 	private String finalFilePath;
 	private FileSet fileSet;
 
-	public ClusterViewController2(final ClusterView view,
-			final TreeViewFrame tvFrame, final TVFrameController controller) {
+	public ClusterViewController2(final ClusterViewDialog dialog, 
+			final TVFrameController controller) {
 
-		this.tvFrame = tvFrame;
+		this.clusterDialog = dialog;
 		this.controller = controller;
 		this.tvModel = controller.getTVControllerModel();
-		this.clusterView = view;
+		this.clusterView = dialog.getClusterView();
 
 		// Add listeners after creating them
 		clusterView.addClusterListener(new ClusterListener());
-		clusterView.addClusterMenuListener(new ClusterMenuSetupListener());
+		clusterView.addClusterTypeListener(new ClusterTypeListener());
 		clusterView.addCancelListener(new CancelListener());
 		clusterView.addClusterChoiceListener(new ClusterChoiceListener());
 	}
@@ -269,13 +269,14 @@ public class ClusterViewController2 {
 		@Override
 		protected void done() {
 
-			if (controller.getTVControllerModel().getDataMatrix().getNumRow() > 0) {
+			if (controller.getTVControllerModel().getDataMatrix()
+					.getNumRow() > 0) {
 				controller.setDataModel();
 				controller.setViewChoice();
 
 			} else {
 				LogBuffer.println("No datamatrix set by worker thread.");
-				tvFrame.setView("WelcomeView");
+				controller.setViewChoice();
 				controller.addViewListeners();
 			}
 		}
@@ -299,21 +300,20 @@ public class ClusterViewController2 {
 			clusterProcess.execute();
 		}
 	}
-
+	
 	/**
-	 * Listener to interact with the viewer and switch the cluster panel view
-	 * when a different type is selected by the user.
-	 * 
+	 * Listener listens to a change in selection for the clusterChoice
+	 * JComboBox in clusterView. Calls a new layout setup as a response.
 	 * @author CKeil
-	 * 
+	 *
 	 */
-	class ClusterMenuSetupListener implements ActionListener {
+	class ClusterTypeListener implements ActionListener {
 
 		@Override
-		public void actionPerformed(final ActionEvent e) {
-
-//			clusterView.setupClusterMenu(isHierarchical());
-			clusterView.setupLayout();
+		public void actionPerformed(ActionEvent arg0) {
+			
+			clusterDialog.reset();
+//			clusterDialog.packDialog();
 		}
 	}
 	
@@ -328,7 +328,6 @@ public class ClusterViewController2 {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			
-//			clusterView.setupClusterMenu(isHierarchical());
 			clusterView.setupLayout();
 		}
 	}
@@ -350,7 +349,7 @@ public class ClusterViewController2 {
 			fileSet = new FileSet(file.getName(), file.getParent()
 					+ File.separator);
 
-			tvFrame.setView("LoadProgressView");
+			controller.setViewChoice();
 			loadWorker = new LoadWorker();
 			loadWorker.execute();
 

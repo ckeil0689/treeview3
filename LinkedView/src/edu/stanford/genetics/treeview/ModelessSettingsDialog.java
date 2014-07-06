@@ -72,7 +72,7 @@ public class ModelessSettingsDialog extends JDialog {
 
 			this.setBackground(GUIFactory.BG_COLOR);
 
-			final JButton close_button = GUIFactory.setButtonLayout("Close");
+			final JButton close_button = GUIFactory.createButton("Close");
 			close_button.addActionListener(new ActionListener() {
 
 				@Override
@@ -84,7 +84,7 @@ public class ModelessSettingsDialog extends JDialog {
 			});
 			add(close_button);
 
-			final JButton cancel_button = GUIFactory.setButtonLayout("Cancel");
+			final JButton cancel_button = GUIFactory.createButton("Cancel");
 			cancel_button.addActionListener(new ActionListener() {
 
 				@Override

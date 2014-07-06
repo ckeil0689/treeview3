@@ -32,7 +32,7 @@ public class ExitConfirmDialog {
 		final JLabel prompt = GUIFactory.createSmallLabel("Are you sure "
 				+ "you want to close TreeView?");
 
-		final JButton ok = GUIFactory.setButtonLayout("Yes");
+		final JButton ok = GUIFactory.createButton("Yes");
 		ok.addActionListener(new ActionListener() {
 
 			@Override
