@@ -28,6 +28,7 @@ import java.util.prefs.Preferences;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.StringRes;
 
 /*
  *  Decompiled by Mocha from FileMru.class
@@ -70,7 +71,7 @@ public class FileMru extends java.util.Observable implements
 	public synchronized void setConfigNode(final Preferences parentNode) {
 
 		if (parentNode != null) {
-			this.configNode = parentNode.node("FileMRU");
+			this.configNode = parentNode.node(StringRes.pref_node_FileMRU);
 
 		} else {
 			LogBuffer.println("Could not find or create FileMRU Preferences"
@@ -88,7 +89,7 @@ public class FileMru extends java.util.Observable implements
 
 		setChanged();
 		final int subNodeIndex = getRootChildrenNodes().length + 1;
-		return configNode.node("File" + subNodeIndex);
+		return configNode.node("File" + subNodeIndex); //ok
 	}
 
 	/**
@@ -141,7 +142,7 @@ public class FileMru extends java.util.Observable implements
 		final String astring[] = new String[childrenNodes.length];
 
 		for (int i = 0; i < childrenNodes.length; i++) {
-			astring[i] = configNode.node(childrenNodes[i]).get("root", "");
+			astring[i] = configNode.node(childrenNodes[i]).get("root", ""); 
 		}
 		return astring;
 	}
@@ -196,8 +197,15 @@ public class FileMru extends java.util.Observable implements
 	public synchronized void removeFile(final int i) {
 
 		// final ConfigNode aconfigNode[] = root.fetch("File");
-		final String[] childrenNodes = getRootChildrenNodes();
-		configNode.remove(childrenNodes[i]);
+		String[] childrenNodes = getRootChildrenNodes();
+		try {
+			configNode.node(childrenNodes[i]).removeNode();
+			
+		} catch (BackingStoreException e) {
+			e.printStackTrace();
+			LogBuffer.println("BackingStoreException when trying to remove"
+					+ " a file in FileMRU: " + e.getMessage());
+		}
 		setChanged();
 	}
 
@@ -224,12 +232,12 @@ public class FileMru extends java.util.Observable implements
 		// final ConfigNode[] all = root.fetch("File");
 		final String[] childrenNodes = getRootChildrenNodes();
 
-		Preferences last = configNode
-				.node(childrenNodes[childrenNodes.length - 1]);
-		if (!configNode.equals(last)) {
-			last = configNode;
-			setChanged();
-		}
+//		Preferences last = configNode
+//				.node(childrenNodes[childrenNodes.length - 1]);
+//		if (!configNode.equals(last)) {
+//			last = configNode;
+//			setChanged();
+//		}
 	}
 
 	/**
@@ -306,7 +314,9 @@ public class FileMru extends java.util.Observable implements
 	public synchronized void removeMoved() {
 
 		final Preferences[] nodes = getConfigs();
+		
 		for (int i = nodes.length; i > 0; i--) {
+			
 			final FileSet fileSet = new FileSet(nodes[i - 1]);
 			if (fileSet.hasMoved()) {
 				LogBuffer.println("Could not find " + fileSet.getCdt() + ", "

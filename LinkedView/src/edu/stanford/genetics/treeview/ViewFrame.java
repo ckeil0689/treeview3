@@ -154,8 +154,10 @@ public abstract class ViewFrame implements Observer {
 	// public abstract MainPanel[] getMainPanels();
 
 	/**
-	 * Sets up a <code>FileMru</code> using a particular config node. This
-	 * <code>FileMru</code> can later be edited or used to show a mru menu.
+	 * This method sets up an object of the FileMRU class, which is used to
+	 * build a node ('FileMRU') with Java's Preferences API. This node contains
+	 * information about the Most Recently Used files and can be used to
+	 * conveniently load or edit them.
 	 * 
 	 * @param fileMruNode
 	 *            Node which will be bound to the FileMru

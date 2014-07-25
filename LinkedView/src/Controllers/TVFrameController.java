@@ -240,6 +240,12 @@ public class TVFrameController {
 			}
 
 			setViewChoice();
+			
+			/* 
+			 * necessary because menuBar is rebuilt by TVFrame update()
+			 * and loses its listeners.
+			 */
+			addMenuListeners();
 		}
 	}
 
@@ -661,10 +667,11 @@ public class TVFrameController {
 			tvFrame.getFileMRU().setLast(tvFrame.getFileMenuSet());
 			tvFrame.getFileMRU().notifyObservers();
 
-			fileMenuSet = tvFrame.getFileMenuSet();
+			fileMenuSet = tvFrame.findFileSet(
+					(JMenuItem)actionEvent.getSource());//tvFrame.getFileMenuSet();
 
 			SwingWorker<Void, Void> worker = new LoadWorker();
-			tvFrame.setView("LoadProgressView");
+			tvFrame.setView("LoadProgressView"); //change
 			worker.execute();
 
 			// } catch (final LoadException e) {

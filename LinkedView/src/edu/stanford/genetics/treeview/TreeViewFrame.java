@@ -104,6 +104,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	// Menu Items
 	private List<JMenuItem> stackMenuList;
 	private List<JMenuItem> fileMenuList;
+	private List<FileSet> fileSetList;
 
 	// private JButton stackButton;
 	private JButton searchButton;
@@ -137,10 +138,15 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		super(appName);
 		treeView = treeview;
-		configNode = treeView.getGlobalConfig().node("TreeViewFrame");
+		configNode = treeView.getGlobalConfig().node(
+				StringRes.pref_node_TVFrame);
 		
-		// Presets first
-		setupPresets();
+//		try {
+//			configNode.node("FileMRU").removeNode();
+//		} catch (BackingStoreException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		
 		// Initialize the views
 		welcomeView = new WelcomeView();
@@ -159,6 +165,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		// Add the main background panel to the contentPane
 		applicationFrame.getContentPane().add(backgroundPanel);
 
+		// Presets first
+		setupPresets();
+				
 		// setupMenuBar();
 		buildMenu();
 
@@ -172,17 +181,17 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	protected void setupPresets() {
 
-		// Load Theme
-		final String default_theme = "dark";
-		final String savedTheme = getConfigNode().get("theme", default_theme);
-
-		// Since changing the theme resets the layout
-		if (savedTheme.equalsIgnoreCase("dark")) {
-			GUIFactory.setNight();
-
-		} else {
-			GUIFactory.setDayLight();
-		}
+//		// Load Theme
+//		final String default_theme = "dark";
+//		final String savedTheme = getConfigNode().get("theme", default_theme);
+//
+//		// Since changing the theme resets the layout
+//		if (savedTheme.equalsIgnoreCase("dark")) {
+//			GUIFactory.setNight();
+//
+//		} else {
+//			GUIFactory.setDayLight();
+//		}
 
 		// Load FileMRU
 		setupFileMru();
@@ -192,7 +201,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	public void setConfigNode(final Preferences parentNode) {
 
 		if (parentNode != null) {
-			configNode = parentNode.node("TreeViewFrame");
+			configNode = parentNode.node(StringRes.pref_node_TVFrame);
 		}
 	}
 
@@ -291,8 +300,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	public void showRecentFileEditor() {
 
-		final FileMruEditor fme = new FileMruEditor(fileMru);
-		fme.showDialog(applicationFrame);
+		new FileMruEditor(fileMru).showDialog(applicationFrame);
 	}
 
 	/**
@@ -468,9 +476,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		System.out.println("Updating fileMRU in TVFrame.");
 
-		if (observable == fileMru) {
+		if (observable == fileMru && menubar != null) {
 			// System.out.println("Rebuilding file menu");
-			// programMenu.rebuild();
+			buildMenu();
 
 		} else {
 			System.out.println("Got weird update");
@@ -521,7 +529,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	}
 
 	/**
-	 * Builds the two menu buttons for TVFrame.
+	 * Builds the two menu buttons for TVFrame and generates the menubar for
+	 * the application.
 	 */
 	public void buildMenu() {
 
@@ -536,6 +545,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 			generateSearchMenu();
 			generateTreeMenu();
 		}
+		
+		menuPanel.revalidate();
+		menuPanel.repaint();
 	}
 
 	public void generateMenuBar() {
@@ -573,6 +585,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		// -------
 		fileMenuList = new ArrayList<JMenuItem>();
+		fileSetList = new ArrayList<FileSet>();
 
 		final JMenu recentSubMenu = new JMenu(StringRes.menu_title_OpenRecent);
 
@@ -582,6 +595,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		for (int j = aconfigNode.length; j > 0; j--) {
 
 			fileMenuSet = new FileSet(aconfigNode[j - 1]);
+			fileSetList.add(fileMenuSet);
 
 			final JMenuItem fileSetMenuItem = new JMenuItem(astring[j - 1]);
 			recentSubMenu.add(fileSetMenuItem);
@@ -1032,6 +1046,28 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	public void setDataModel(final DataModel model) {
 
 		this.dataModel = model;
+	}
+	
+	/**
+	 * Returns the FileSet which has been chosen in the 'Open Recent' menu.
+	 * FileSet is found by matching the index of the MenuItem to the index of
+	 * the FileSet list which is created by checking the 'FileMRU' 
+	 * Preferences node for previously stored fileSets.
+	 * @param menuItem
+	 * @return FileSet
+	 */
+	public FileSet findFileSet(JMenuItem menuItem) {
+		
+		int index = fileMenuList.indexOf(menuItem);
+		
+		if(fileSetList.size() == fileMenuList.size()) {
+			return fileSetList.get(index);
+			
+		} else {
+			LogBuffer.println("Sizes of FileSetList and FileMenuList in TVFrame"
+					+ "don't match.");
+			return null;
+		}
 	}
 
 	// Adding MenuActionListeners

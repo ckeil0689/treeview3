@@ -90,6 +90,8 @@ public class StringRes {
 	public static final String pref_node_Preferences = "Preferences";
 	public static final String pref_node_DendroView = "DendroView";
 	public static final String pref_node_File = "File";
+	public static final String pref_node_TVFrame = "TreeViewFrame";
+	public static final String pref_node_FileMRU = "FileMRU";
 
 	// Button Texts
 	public static final String button_OK = "OK";

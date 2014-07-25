@@ -160,27 +160,6 @@ public class ClusterInfoFactory {
 	 * @param index
 	 * @return
 	 */
-	private static String getTip(int index) {
-		
-		String tip;
-		
-		switch(index) {
-			case 0: 	tip = StringRes.clusterTip_Memory;
-						break;
-						
-			default: 	tip = "Clustering is a computationally expensive " +
-					"process. Larger matrices need exponentially more time.";
-		}
-		
-		return tip;
-	}
-	
-	/**
-	 * Gets the appropriate type String resource depending on which method is
-	 * selected by the user (designated by index).
-	 * @param index
-	 * @return
-	 */
 	private static String getType(int index) {
 		
 		String type;

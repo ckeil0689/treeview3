@@ -974,14 +974,14 @@
             </node>
             <node name="GlobalXMap">
               <map>
-                <entry key="scale" value="1.4691358024691359"/>
-                <entry key="minScale" value="1.4691358024691359"/>
+                <entry key="scale" value="6.1193415637860085"/>
+                <entry key="minScale" value="6.1193415637860085"/>
                 <entry key="XScrollValue" value="0"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="1.4691358024691359"/>
+                  <entry key="scale" value="6.1193415637860085"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -1278,7 +1278,9 @@
                 <entry key="size" value="12"/>
               </map>
               <node name="GeneSummary">
-                <map/>
+                <map>
+                  <entry key="included" value="0"/>
+                </map>
               </node>
             </node>
           </node>
@@ -1815,14 +1817,14 @@
             </node>
             <node name="GlobalXMap">
               <map>
-                <entry key="scale" value="11.210526315789474"/>
-                <entry key="minScale" value="11.210526315789474"/>
+                <entry key="scale" value="11.180451127819548"/>
+                <entry key="minScale" value="11.180451127819548"/>
                 <entry key="XScrollValue" value="0"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="11.210526315789474"/>
+                  <entry key="scale" value="11.180451127819548"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -1833,14 +1835,14 @@
             </node>
             <node name="GlobalYMap">
               <map>
-                <entry key="scale" value="6.097744360902255"/>
-                <entry key="minScale" value="6.097744360902255"/>
+                <entry key="scale" value="5.894736842105263"/>
+                <entry key="minScale" value="5.894736842105263"/>
                 <entry key="YScrollValue" value="0"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="6.097744360902255"/>
+                  <entry key="scale" value="5.894736842105263"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -2330,6 +2332,16 @@
               <entry key="extension" value=".cdt"/>
               <entry key="treesVisible" value="false"/>
             </map>
+            <node name="ArrayNameView">
+              <map>
+                <entry key="face" value="Dialog"/>
+              </map>
+              <node name="ArraySummary">
+                <map>
+                  <entry key="included" value="0"/>
+                </map>
+              </node>
+            </node>
             <node name="ArrayNameViewManager">
               <map/>
               <node name="ArrayNameView0">
@@ -2451,6 +2463,7 @@
               <map>
                 <entry key="scale" value="6.20164609053498"/>
                 <entry key="minScale" value="6.20164609053498"/>
+                <entry key="XScrollValue" value="0"/>
               </map>
               <node name="FixedMap">
                 <map>
@@ -2468,6 +2481,7 @@
               <map>
                 <entry key="scale" value="1.6244979919678715"/>
                 <entry key="minScale" value="1.6244979919678715"/>
+                <entry key="YScrollValue" value="0"/>
               </map>
               <node name="FixedMap">
                 <map>
@@ -2488,6 +2502,16 @@
             </node>
             <node name="GtrSummary">
               <map/>
+            </node>
+            <node name="TextView">
+              <map>
+                <entry key="face" value="Dialog"/>
+              </map>
+              <node name="GeneSummary">
+                <map>
+                  <entry key="included" value="0"/>
+                </map>
+              </node>
             </node>
             <node name="TextViewManager">
               <map/>
@@ -2703,14 +2727,14 @@
             </node>
             <node name="GlobalYMap">
               <map>
-                <entry key="scale" value="0.24581175753883644"/>
-                <entry key="minScale" value="0.24581175753883644"/>
+                <entry key="scale" value="0.23880597014925373"/>
+                <entry key="minScale" value="0.23880597014925373"/>
                 <entry key="YScrollValue" value="0"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="0.24581175753883644"/>
+                  <entry key="scale" value="0.23880597014925373"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -2919,14 +2943,14 @@
             </node>
             <node name="GlobalXMap">
               <map>
-                <entry key="scale" value="38.45"/>
-                <entry key="minScale" value="38.45"/>
+                <entry key="scale" value="74.35"/>
+                <entry key="minScale" value="74.35"/>
                 <entry key="XScrollValue" value="0"/>
               </map>
               <node name="FixedMap">
                 <map>
                   <entry key="type" value="Fixed"/>
-                  <entry key="scale" value="38.45"/>
+                  <entry key="scale" value="74.35"/>
                 </map>
               </node>
               <node name="NullMap">
@@ -3020,38 +3044,14 @@
           <map/>
           <node name="File1">
             <map>
-              <entry key="root" value="MP_4pairsT_0p75slf_0p01enrich"/>
+              <entry key="root" value="testData_alpha"/>
               <entry key="dir" value="C:\Users\CKeil\Work\TreeView Related Files\Test Files\"/>
               <entry key="cdt" value=".txt"/>
               <entry key="name" value="No name"/>
               <entry key="style" value="0"/>
             </map>
-            <node name="File1">
-              <map/>
-            </node>
-            <node name="File2">
-              <map/>
-            </node>
-            <node name="File3">
-              <map/>
-            </node>
-            <node name="File4">
-              <map/>
-            </node>
-            <node name="File6">
-              <map/>
-            </node>
-            <node name="File7">
-              <map/>
-            </node>
-            <node name="File8">
-              <map/>
-            </node>
-            <node name="File9">
-              <map/>
-            </node>
           </node>
-          <node name="File10">
+          <node name="File2">
             <map>
               <entry key="root" value="fg_140130_NN_matrix"/>
               <entry key="dir" value="C:\Users\CKeil\Work\TreeView Related Files\Test Files\"/>
@@ -3059,71 +3059,8 @@
               <entry key="name" value="No name"/>
               <entry key="style" value="0"/>
             </map>
-            <node name="File9">
-              <map/>
-            </node>
           </node>
-          <node name="File11">
-            <map>
-              <entry key="root" value="fg_140130_NN_matrix"/>
-              <entry key="dir" value="C:\Users\CKeil\Work\TreeView Related Files\Test Files\"/>
-              <entry key="cdt" value=".cdt"/>
-              <entry key="name" value="No name"/>
-              <entry key="style" value="0"/>
-            </map>
-            <node name="File9">
-              <map/>
-            </node>
-          </node>
-          <node name="File12">
-            <map>
-              <entry key="root" value="test_tiny"/>
-              <entry key="dir" value="C:\Users\CKeil\Work\TreeView Related Files\Test Files\"/>
-              <entry key="cdt" value=".txt"/>
-              <entry key="name" value="No name"/>
-              <entry key="style" value="0"/>
-            </map>
-            <node name="File9">
-              <map/>
-            </node>
-          </node>
-          <node name="File13">
-            <map>
-              <entry key="root" value="testData_max"/>
-              <entry key="dir" value="C:\Users\CKeil\Work\TreeView Related Files\Test Files\"/>
-              <entry key="cdt" value=".txt"/>
-              <entry key="name" value="No name"/>
-              <entry key="style" value="0"/>
-            </map>
-            <node name="File9">
-              <map/>
-            </node>
-          </node>
-          <node name="File14">
-            <map>
-              <entry key="root" value="testData_small"/>
-              <entry key="dir" value="C:\Users\CKeil\Work\TreeView Related Files\Test Files\"/>
-              <entry key="cdt" value=".txt"/>
-              <entry key="name" value="No name"/>
-              <entry key="style" value="0"/>
-            </map>
-            <node name="File9">
-              <map/>
-            </node>
-          </node>
-          <node name="File15">
-            <map>
-              <entry key="root" value="fg_090813_v2_alpha"/>
-              <entry key="dir" value="C:\Users\CKeil\Work\TreeView Related Files\Test Files\"/>
-              <entry key="cdt" value=".txt"/>
-              <entry key="name" value="No name"/>
-              <entry key="style" value="0"/>
-            </map>
-            <node name="File9">
-              <map/>
-            </node>
-          </node>
-          <node name="File16">
+          <node name="File3">
             <map>
               <entry key="root" value="testData_gamma"/>
               <entry key="dir" value="C:\Users\CKeil\Work\TreeView Related Files\Test Files\"/>
@@ -3131,150 +3068,6 @@
               <entry key="name" value="No name"/>
               <entry key="style" value="0"/>
             </map>
-            <node name="File9">
-              <map/>
-            </node>
-          </node>
-          <node name="File17">
-            <map>
-              <entry key="root" value="fg_090813_v2_alpha"/>
-              <entry key="dir" value="C:\Users\CKeil\Work\TreeView Related Files\Test Files\"/>
-              <entry key="cdt" value=".cdt"/>
-              <entry key="name" value="No name"/>
-              <entry key="style" value="0"/>
-            </map>
-            <node name="File9">
-              <map/>
-            </node>
-          </node>
-          <node name="File2">
-            <map>
-              <entry key="root" value="MP_4pairsT_0p75slf_0p01enrich"/>
-              <entry key="dir" value="C:\Users\CKeil\Work\TreeView Related Files\Test Files\"/>
-              <entry key="cdt" value=".cdt"/>
-              <entry key="name" value="No name"/>
-              <entry key="style" value="0"/>
-            </map>
-            <node name="File2">
-              <map/>
-            </node>
-            <node name="File7">
-              <map/>
-            </node>
-            <node name="File9">
-              <map/>
-            </node>
-          </node>
-          <node name="File3">
-            <map>
-              <entry key="root" value="testData_alpha"/>
-              <entry key="dir" value="C:\Users\CKeil\Work\TreeView Related Files\Test Files\"/>
-              <entry key="cdt" value=".txt"/>
-              <entry key="name" value="No name"/>
-              <entry key="style" value="0"/>
-            </map>
-            <node name="File3">
-              <map/>
-            </node>
-            <node name="File4">
-              <map/>
-            </node>
-            <node name="File6">
-              <map/>
-            </node>
-            <node name="File8">
-              <map/>
-            </node>
-            <node name="File9">
-              <map/>
-            </node>
-          </node>
-          <node name="File4">
-            <map>
-              <entry key="root" value="strain_orf_allele_131014"/>
-              <entry key="dir" value="C:\Users\CKeil\Work\TreeView Related Files\Test Files\"/>
-              <entry key="cdt" value=".txt"/>
-              <entry key="name" value="No name"/>
-              <entry key="style" value="0"/>
-            </map>
-            <node name="File4">
-              <map/>
-            </node>
-            <node name="File8">
-              <map/>
-            </node>
-            <node name="File9">
-              <map/>
-            </node>
-          </node>
-          <node name="File5">
-            <map>
-              <entry key="root" value="testData_large2"/>
-              <entry key="dir" value="C:\Users\CKeil\Work\TreeView Related Files\Test Files\"/>
-              <entry key="cdt" value=".txt"/>
-              <entry key="name" value="No name"/>
-              <entry key="style" value="0"/>
-            </map>
-            <node name="File5">
-              <map/>
-            </node>
-          </node>
-          <node name="File6">
-            <map>
-              <entry key="root" value="testData_large"/>
-              <entry key="dir" value="C:\Users\CKeil\Work\TreeView Related Files\Test Files\"/>
-              <entry key="cdt" value=".txt"/>
-              <entry key="name" value="No name"/>
-              <entry key="style" value="0"/>
-            </map>
-            <node name="File6">
-              <map/>
-            </node>
-            <node name="File7">
-              <map/>
-            </node>
-            <node name="File8">
-              <map/>
-            </node>
-            <node name="File9">
-              <map/>
-            </node>
-          </node>
-          <node name="File7">
-            <map>
-              <entry key="root" value="testData_small_C3"/>
-              <entry key="dir" value="C:\Users\CKeil\Work\TreeView Related Files\Test Files\"/>
-              <entry key="cdt" value=".cdt"/>
-              <entry key="name" value="No name"/>
-              <entry key="style" value="0"/>
-            </map>
-            <node name="File7">
-              <map/>
-            </node>
-          </node>
-          <node name="File8">
-            <map>
-              <entry key="root" value="strain_orf_allele_131014_labels"/>
-              <entry key="dir" value="C:\Users\CKeil\Work\TreeView Related Files\Test Files\"/>
-              <entry key="cdt" value=".txt"/>
-              <entry key="name" value="No name"/>
-              <entry key="style" value="0"/>
-            </map>
-            <node name="File8">
-              <map/>
-            </node>
-          </node>
-          <node name="File9">
-            <map>
-              <entry key="root" value="testData_alpha"/>
-              <entry key="dir" value="C:\Users\CKeil\Work\TreeView Related Files\Test Files\"/>
-              <entry key="cdt" value=".cdt"/>
-              <entry key="name" value="No name"/>
-              <entry key="style" value="0"/>
-            </map>
-            <node name="File9">
-              <map/>
-            </node>
           </node>
         </node>
         <node name="Preferences">

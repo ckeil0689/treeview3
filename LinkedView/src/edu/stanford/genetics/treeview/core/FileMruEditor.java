@@ -22,13 +22,9 @@
  */
 package edu.stanford.genetics.treeview.core;
 
-import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.prefs.Preferences;
 
@@ -44,7 +40,6 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.CdtFilter;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.GUIFactory;
@@ -55,14 +50,13 @@ import edu.stanford.genetics.treeview.GUIFactory;
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.2 $ $Date: 2010-05-02 13:39:00 $
  */
-public class FileMruEditor extends JPanel {
-
-	private static final long serialVersionUID = 1L;
+public class FileMruEditor {
 
 	private final FileMru client;
 	private Window window;
-	private FileSetPanel fileSetPanel;
-	private ButtonPanel buttonPanel;
+	private JPanel mainPanel;
+	private FileSetDisplay fileSetDisplay;
+	private ButtonArrangement buttonArrangement;
 
 	private static String[] options = new String[] { "Find...", "Remove",
 			"Cancel" };
@@ -90,7 +84,6 @@ public class FileMruEditor extends JPanel {
 	 */
 	public FileMruEditor(final FileMru fm) {
 
-		super();
 		client = fm;
 		setupWidgets();
 	}
@@ -140,55 +133,50 @@ public class FileMruEditor extends JPanel {
 	/**
 	 * put editor in a top level frame and show
 	 */
-	public void makeTop() {
+	public void showDialog(JFrame appFrame) {
 
-		final JFrame top = new JFrame(getTitle());
-		top.add(this);
-		top.addWindowListener(new WindowAdapter() {
+		final JDialog dialog = new JDialog();
+		dialog.setTitle(getTitle());
+		dialog.setModalityType(JDialog.DEFAULT_MODALITY_TYPE);
+		dialog.getContentPane().add(mainPanel);
+		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		
+		dialog.pack();
+		dialog.setLocationRelativeTo(appFrame);
+		
 
-			@Override
-			public void windowClosing(final WindowEvent we) {
-				we.getWindow().dispose();
-			}
-		});
-		top.pack();
-
-//		final Dimension d = top.getSize();
-//		if (d.width < 600) {
-//			top.setSize(600, d.height);
-//		}
-		window = top;
-		top.setVisible(true);
+		window = dialog;
+		dialog.setVisible(true);
 	}
 
-	/**
-	 * put editor in a dialog
-	 * 
-	 * @param f
-	 *            Window to block
-	 */
-	public void showDialog(final Frame f) {
-
-		final JDialog d = new JDialog(f, getTitle(), true);
-		d.setContentPane(this);
-		d.addWindowListener(new WindowAdapter() {
-
-			@Override
-			public void windowClosing(final WindowEvent we) {
-				we.getWindow().dispose();
-			}
-		});
-		d.pack();
-
-		window = d;
-//		final Dimension ts = d.getSize();
-//		final Dimension dim = f.getSize();
-//		if (dim.height / 2 < ts.height) {
-//			d.setSize(ts.width, dim.height / 2);
-//		}
-//		System.out.println("Size of parent " + dim + " my size " + ts);
-		d.setVisible(true);
-	}
+//	/**
+//	 * put editor in a dialog
+//	 * 
+//	 * @param f
+//	 *            Window to block
+//	 */
+//	public void showDialog(final Frame f) {
+//
+//		final JDialog d = new JDialog(f, getTitle(), true);
+//		d.setContentPane(this);
+//		d.addWindowListener(new WindowAdapter() {
+//
+//			@Override
+//			public void windowClosing(final WindowEvent we) {
+//				we.getWindow().dispose();
+//			}
+//		});
+//		d.pack();
+//
+//		window = d;
+////		final Dimension ts = d.getSize();
+////		final Dimension dim = f.getSize();
+////		if (dim.height / 2 < ts.height) {
+////			d.setSize(ts.width, dim.height / 2);
+////		}
+////		System.out.println("Size of parent " + dim + " my size " + ts);
+//		d.setVisible(true);
+//	}
 
 	/**
 	 * Gets the title attribute of the FileMruEditor object
@@ -205,22 +193,21 @@ public class FileMruEditor extends JPanel {
 	 */
 	private void setupWidgets() {
 
-		fileSetPanel = new FileSetPanel();
-		buttonPanel = new ButtonPanel();
-		buttonPanel.setThingsSelected(false);
+		mainPanel = GUIFactory.createJPanel(false, true, null);
+		fileSetDisplay = new FileSetDisplay();
+		buttonArrangement = new ButtonArrangement();
+		buttonArrangement.setThingsSelected(false);
 
-		final JPanel upper = fileSetPanel;
-		upper.setSize(300, 200);
-		this.setLayout(new MigLayout());
+		final JLabel l1 = GUIFactory.createSmallLabel(getTitle());
+		final JPanel upper = fileSetDisplay.getFileSetPanel();
+		final JPanel buttonPanel = buttonArrangement.getButtonPanel();
 
-		final JLabel l1 = new JLabel(getTitle());
-		l1.setForeground(GUIFactory.TEXT);
-
-		this.add(l1, "pushx, alignx 50%, wrap");
-		this.add(upper, "push, grow, alignx 50%, wrap");
-		this.add(buttonPanel, "pushx, alignx 50%");
-		this.revalidate();
-		this.repaint();
+		mainPanel.add(l1, "pushx, alignx 50%, wrap");
+		mainPanel.add(upper, "push, grow, alignx 50%, wrap");
+		mainPanel.add(buttonPanel, "pushx, alignx 50%");
+		
+		mainPanel.revalidate();
+		mainPanel.repaint();
 	}
 
 	/**
@@ -228,32 +215,35 @@ public class FileMruEditor extends JPanel {
 	 * 
 	 * @author Alok Saldanha <alok@genome.stanford.edu>
 	 */
-	private class FileSetPanel extends JPanel {
+	private class FileSetDisplay {
 
-		private static final long serialVersionUID = 1L;
-
-		private final JList list;
+		private final JList<FileSet> list;
+		private final JPanel fileSetDisplay;
 
 		/**
 		 * Constructor for the FileSetPanel object
 		 */
-		FileSetPanel() {
+		FileSetDisplay() {
 
-			list = new JList();
+			list = new JList<FileSet>();
 			list.addListSelectionListener(new ListSelectionListener() {
 				@Override
 				public void valueChanged(final ListSelectionEvent e) {
 					final int i = list.getSelectedIndex();
 					// System.out.println("got selection event, selected is "
 					// + i);
-					buttonPanel.setThingsSelected(i >= 0);
+					buttonArrangement.setThingsSelected(i >= 0);
 				}
 			});
 			regenList();
-			this.setLayout(new MigLayout("ins 0"));
-			list.setMinimumSize(new Dimension(10, 10));
+			fileSetDisplay = GUIFactory.createJPanel(false, true, null);
 			final JScrollPane scrollPane = new JScrollPane(list);
-			this.add(scrollPane, "push, grow");
+			fileSetDisplay.add(scrollPane, "push, grow");
+		}
+		
+		public JPanel getFileSetPanel() {
+			
+			return fileSetDisplay;
 		}
 
 		/**
@@ -296,9 +286,8 @@ public class FileMruEditor extends JPanel {
 		}
 
 		/**
-		 * removes all filsets.
+		 * removes all fileSets.
 		 */
-		@Override
 		public void removeAll() {
 
 			final int max = list.getModel().getSize();
@@ -311,7 +300,7 @@ public class FileMruEditor extends JPanel {
 		}
 
 		/**
-		 * Offers a search for the seleced file. Useful if you moved the file.
+		 * Offers a search for the selected file. Useful if you moved the file.
 		 */
 		public void searchSelected() {
 
@@ -358,20 +347,18 @@ public class FileMruEditor extends JPanel {
 	 * 
 	 * @author Alok Saldanha <alok@genome.stanford.edu>
 	 */
-	private class ButtonPanel extends JPanel {
-
-		private static final long serialVersionUID = 1L;
+	private class ButtonArrangement {
 
 		private final JButton openButton, searchButton, deleteButton,
 				deleteAllButton, closeButton;
+		private final JPanel buttonPanel;
 
 		/**
 		 * Constructor for the ButtonPanel object
 		 */
-		private ButtonPanel() {
+		private ButtonArrangement() {
 
-			this.setLayout(new MigLayout());
-			this.setOpaque(false);
+			buttonPanel = GUIFactory.createJPanel(false, true, null);
 
 			openButton = GUIFactory.createButton("Open");
 			openButton.addActionListener(new ActionListener() {
@@ -389,29 +376,32 @@ public class FileMruEditor extends JPanel {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 
-					fileSetPanel.searchSelected();
+					fileSetDisplay.searchSelected();
 				}
 			});
-			this.add(searchButton, "pushx");
+			buttonPanel.add(searchButton, "pushx");
 
 			deleteButton = GUIFactory.createButton("Remove");
 			deleteButton.addActionListener(new ActionListener() {
+				
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					fileSetPanel.removeSelected();
+					
+					fileSetDisplay.removeSelected();
 				}
 			});
-			this.add(deleteButton, "pushx");
+			buttonPanel.add(deleteButton, "pushx");
 
 			deleteAllButton = GUIFactory.createButton("Remove All");
 			deleteAllButton.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					fileSetPanel.removeAll();
+					
+					fileSetDisplay.removeAll();
 				}
 			});
-			this.add(deleteAllButton, "pushx");
+			buttonPanel.add(deleteAllButton, "pushx");
 
 			closeButton = GUIFactory.createButton("Close");
 			closeButton.addActionListener(new ActionListener() {
@@ -421,7 +411,12 @@ public class FileMruEditor extends JPanel {
 					window.dispose();
 				}
 			});
-			this.add(closeButton, "pushx");
+			buttonPanel.add(closeButton, "pushx");
+		}
+		
+		public JPanel getButtonPanel() {
+			
+			return buttonPanel;
 		}
 
 		/**
