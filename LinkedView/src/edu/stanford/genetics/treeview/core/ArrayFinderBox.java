@@ -9,7 +9,6 @@ import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.ViewFrame;
-import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
 
 /**
  * @author aloksaldanha
@@ -22,8 +21,8 @@ public class ArrayFinderBox extends HeaderFinderBox {
 	 * @param hI
 	 * @param geneSelection
 	 */
-	public ArrayFinderBox(final ViewFrame f, final DendroView2 dv,
-			final HeaderInfo hI, final HeaderSummary headerSummary, 
+	public ArrayFinderBox(final ViewFrame f, final HeaderInfo hI, 
+			final HeaderSummary headerSummary, 
 			final TreeSelectionI geneSelection) {
 
 		super(f, hI, headerSummary, geneSelection, "Column");
@@ -38,7 +37,7 @@ public class ArrayFinderBox extends HeaderFinderBox {
 	public void scrollToIndex(final int i) {
 
 		if (viewFrame != null) {
-			viewFrame.scrollToArray(i);
+//			viewFrame.scrollToArray(i);
 		}
 	}
 }

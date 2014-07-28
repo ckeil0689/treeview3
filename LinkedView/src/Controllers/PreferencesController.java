@@ -219,18 +219,28 @@ public class PreferencesController {
 		protected Void doInBackground() throws Exception {
 
 			HeaderInfo headerInfo = null;
-			if (type.equalsIgnoreCase("Row")) {
+			if (type.equalsIgnoreCase(StringRes.main_rows)) {
 				headerInfo = model.getGeneHeaderInfo();
 
-			} else if (type.equalsIgnoreCase("Column")) {
+			} else if (type.equalsIgnoreCase(StringRes.main_cols)) {
 				headerInfo = model.getArrayHeaderInfo();
+			}
+			
+			/*
+			 * Get number of rows without GID row. Done here to avoid passing 
+			 * model.
+			 */
+			int geneNum = model.getGeneHeaderInfo().getNumNames();
+
+			if (model.gidFound()) {
+				geneNum--;
 			}
 
 			// Load new labels
-			final CustomLabelLoader clLoader = new CustomLabelLoader(tvFrame,
-					headerInfo, preferences.getSelectedLabelIndexes());
+			final CustomLabelLoader clLoader = new CustomLabelLoader(headerInfo, 
+					preferences.getSelectedLabelIndexes());
 
-			clLoader.load(customFile);
+			clLoader.load(customFile, geneNum);
 
 			final int headerNum = clLoader.checkForHeaders(model);
 

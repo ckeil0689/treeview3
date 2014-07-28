@@ -16,11 +16,9 @@ import java.util.List;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.TreeViewFrame;
 
 public class CustomLabelLoader {
-
-	private final TreeViewFrame tvFrame;
+	
 	private final HeaderInfo headerInfo;
 	private String[][] labels;
 	private String[] newNames;
@@ -31,10 +29,9 @@ public class CustomLabelLoader {
 
 	boolean namesFound = false;
 
-	public CustomLabelLoader(final TreeViewFrame tvFrame,
-			final HeaderInfo headerInfo, final int[] selectedIndeces) {
+	public CustomLabelLoader(final HeaderInfo headerInfo, 
+			final int[] selectedIndeces) {
 
-		this.tvFrame = tvFrame;
 		this.headerInfo = headerInfo;
 		this.selectedIndeces = selectedIndeces;
 	}
@@ -46,8 +43,9 @@ public class CustomLabelLoader {
 	 * currently loaded TVModel object.
 	 * 
 	 * @param customFile
+	 * @param int geneNum
 	 */
-	public void load(final File customFile) {
+	public void load(final File customFile, int geneNum) {
 
 		try {
 			final String fileName = customFile.getAbsolutePath();
@@ -65,14 +63,14 @@ public class CustomLabelLoader {
 			int rowN = 0;
 
 			// Number of row labels without GID
-			int geneLabelNum = tvFrame.getDataModel().getGeneHeaderInfo()
-					.getNumNames();
+//			int geneLabelNum = tvFrame.getDataModel().getGeneHeaderInfo()
+//					.getNumNames();
+//
+//			if (tvFrame.getDataModel().gidFound()) {
+//				geneLabelNum--;
+//			}
 
-			if (tvFrame.getDataModel().gidFound()) {
-				geneLabelNum--;
-			}
-
-			labels = new String[lineNum][geneLabelNum];
+			labels = new String[lineNum][geneNum];
 
 			String line;
 			// iterate reader through each line

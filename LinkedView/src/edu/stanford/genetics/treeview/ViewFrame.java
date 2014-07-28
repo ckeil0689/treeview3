@@ -85,14 +85,6 @@ public abstract class ViewFrame implements Observer {
 
 		this.applicationFrame = new JFrame(title);
 
-		// try {
-		// UIManager.setLookAndFeel(UIManager
-		// .getCrossPlatformLookAndFeelClassName());
-		//
-		// } catch (final Exception e) {
-		//
-		// }
-
 		setupWindowListener();
 	}
 
@@ -102,14 +94,6 @@ public abstract class ViewFrame implements Observer {
 	public ViewFrame() {
 
 		this.applicationFrame = new JFrame();
-
-		// try {
-		// UIManager.setLookAndFeel(UIManager
-		// .getCrossPlatformLookAndFeelClassName());
-		//
-		// } catch (final Exception e) {
-		//
-		// }
 
 		setupWindowListener();
 	}

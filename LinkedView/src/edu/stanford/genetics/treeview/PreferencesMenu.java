@@ -17,8 +17,8 @@ import javax.swing.WindowConstants;
 
 import Utilities.GUIFactory;
 import Utilities.StringRes;
+import ColorChooser.ColorChooser;
 import Controllers.PreferencesController;
-import GradientColorChoice.ColorGradientChooser;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
 import edu.stanford.genetics.treeview.plugin.dendroview.FontSettings;
 
@@ -32,7 +32,7 @@ public class PreferencesMenu implements ConfigNodePersistent {
 
 	private JPanel basisPanel;
 	private final DendroView2 dendroView;
-	private ColorGradientChooser gradientPick;
+	private ColorChooser gradientPick;
 	private JButton ok_btn;
 
 	// Menus
@@ -81,7 +81,7 @@ public class PreferencesMenu implements ConfigNodePersistent {
 		});
 	}
 	
-	public void setGradientChooser(ColorGradientChooser gradientPick) {
+	public void setGradientChooser(ColorChooser gradientPick) {
 		
 		this.gradientPick = gradientPick;
 	}

@@ -21,8 +21,8 @@ import javax.swing.SwingWorker;
 
 import Utilities.StringRes;
 import Cluster.ClusterViewDialog;
-import GradientColorChoice.ColorGradientChooser;
-import GradientColorChoice.ColorGradientController;
+import ColorChooser.ColorChooser;
+import ColorChooser.ColorChooserController;
 import edu.stanford.genetics.treeview.CdtFilter;
 import edu.stanford.genetics.treeview.DataMatrix;
 import edu.stanford.genetics.treeview.DataModel;
@@ -734,13 +734,16 @@ public class TVFrameController {
 			@Override
 			public void run() {
 				
-				ColorGradientChooser gradientPick = null;
+				final PreferencesMenu preferences = 
+						new PreferencesMenu(tvFrame);
+				
+				ColorChooser gradientPick = null;
 				if(menu.equalsIgnoreCase(StringRes.menu_title_Color)) {
 					
 					int min = (int)model.getDataMatrix().getMinVal();
 					int max = (int)model.getDataMatrix().getMaxVal();
 					
-					gradientPick = new ColorGradientChooser(tvFrame, 
+					gradientPick = new ColorChooser(tvFrame, 
 									((DoubleArrayDrawer) dendroController
 											.getArrayDrawer())
 											.getColorExtractor(), min, max);
@@ -752,15 +755,15 @@ public class TVFrameController {
 					gradientPick.setConfigNode(((TVModel) model)
 							.getDocumentConfig());
 					
-					final ColorGradientController gradientControl = 
-							new ColorGradientController(gradientPick);
-				}
-				
-				final PreferencesMenu preferences = 
-						new PreferencesMenu(tvFrame);
-				
-				if(gradientPick != null) {
+					final ColorChooserController gradientControl = 
+							new ColorChooserController(gradientPick);
+					
 					preferences.setGradientChooser(gradientPick);
+					
+				} else if(menu.equalsIgnoreCase(
+						StringRes.menu_title_RowAndCol)) {
+					preferences.setHeaderInfo(model.getGeneHeaderInfo(), 
+							model.getArrayHeaderInfo());
 				}
 				
 				preferences.setupLayout(menu);

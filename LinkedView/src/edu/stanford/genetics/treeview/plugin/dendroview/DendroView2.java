@@ -1175,7 +1175,7 @@ public class DendroView2 implements Observer, DendroPanel {
 
 	public JPanel getGeneFinderPanel(HeaderInfo geneHI) {
 
-		final HeaderFinderBox geneFinderBox = new GeneFinderBox(tvFrame, this,
+		final HeaderFinderBox geneFinderBox = new GeneFinderBox(tvFrame,
 				geneHI, getTextview().getHeaderSummary(), 
 				tvFrame.getGeneSelection());
 
@@ -1192,7 +1192,7 @@ public class DendroView2 implements Observer, DendroPanel {
 	public JPanel getArrayFinderPanel(HeaderInfo arrayHI) {
 
 		final HeaderFinderBox arrayFinderBox = new ArrayFinderBox(tvFrame,
-				this, arrayHI, getArraynameview().getHeaderSummary(),
+				arrayHI, getArraynameview().getHeaderSummary(),
 				tvFrame.getArraySelection());
 
 		final JPanel contentPanel = arrayFinderBox.getContentPanel();
