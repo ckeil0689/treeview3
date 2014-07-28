@@ -30,6 +30,8 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import Utilities.GUIFactory;
+
 /**
  * this is a dialog which displays a modeless settings dialog. it includes a
  * close button, which will dispose of the dialog when it is pressed. It could
@@ -70,9 +72,7 @@ public class ModelessSettingsDialog extends JDialog {
 
 		public ButtonPanel() {
 
-			this.setBackground(GUIFactory.BG_COLOR);
-
-			final JButton close_button = GUIFactory.createButton("Close");
+			final JButton close_button = GUIFactory.createBtn("Close");
 			close_button.addActionListener(new ActionListener() {
 
 				@Override
@@ -84,7 +84,7 @@ public class ModelessSettingsDialog extends JDialog {
 			});
 			add(close_button);
 
-			final JButton cancel_button = GUIFactory.createButton("Cancel");
+			final JButton cancel_button = GUIFactory.createBtn("Cancel");
 			cancel_button.addActionListener(new ActionListener() {
 
 				@Override

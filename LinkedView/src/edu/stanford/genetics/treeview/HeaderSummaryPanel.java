@@ -32,6 +32,7 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import Utilities.GUIFactory;
 import net.miginfocom.swing.MigLayout;
 
 /**
@@ -55,9 +56,8 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 		setLayout(new MigLayout());
 		setOpaque(false);
 
-		final JLabel label = new JLabel("Select headers to display:");
-		label.setFont(GUIFactory.FONTS);
-		label.setForeground(GUIFactory.TEXT);
+		final JLabel label = GUIFactory.createLabel("Select headers to "
+				+ "display:", GUIFactory.FONTS);
 		add(label, "span, wrap");
 
 		setHeaderList(headerInfo.getNames());

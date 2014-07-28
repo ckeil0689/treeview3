@@ -6,9 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import edu.stanford.genetics.treeview.DataModel;
+import edu.stanford.genetics.treeview.LogBuffer;
 
 public class KMeansCluster {
 
@@ -16,7 +18,7 @@ public class KMeansCluster {
 	private final DataModel model;
 	private final ClusterView clusterView;
 
-	private ClusterFileWriter2 bufferedWriter;
+	private ClusterFileWriter bufferedWriter;
 	private String filePath;
 	private String type = "";
 	private final int clusterN;
@@ -61,6 +63,10 @@ public class KMeansCluster {
 	// method for clustering the distance matrix
 	public void cluster() {
 
+		// Just checking for debugging
+		LogBuffer.println("Is KMeansCluster.cluster() on EDT? " 
+				+ SwingUtilities.isEventDispatchThread());
+				
 		double[] elementMeanList = new double[dMatrix.length];
 		int[][] clusters = new int[clusterN][];
 		double[][] clusterMeans = new double[dMatrix.length][];
@@ -179,7 +185,7 @@ public class KMeansCluster {
 
 		file.createNewFile();
 
-		bufferedWriter = new ClusterFileWriter2(file);
+		bufferedWriter = new ClusterFileWriter(file);
 
 		filePath = bufferedWriter.getFilePath();
 	}

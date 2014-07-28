@@ -45,9 +45,6 @@ import javax.swing.WindowConstants;
 
 import Cluster.ClusterFileFilter;
 import edu.stanford.genetics.treeview.core.FileMru;
-import edu.stanford.genetics.treeview.model.DataModelWriter;
-import edu.stanford.genetics.treeview.model.ReorderedDataModel;
-//import edu.stanford.genetics.treeview.core.HeaderFinder;
 
 /**
  * Any frame that wants to contain MainPanels must extend this.
@@ -58,7 +55,7 @@ import edu.stanford.genetics.treeview.model.ReorderedDataModel;
 public abstract class ViewFrame implements Observer {
 	// extends JFrame implements Observer {
 
-	// The Main application frame
+	// Main application frame
 	protected JFrame applicationFrame;
 
 	protected Preferences configNode;
@@ -292,40 +289,40 @@ public abstract class ViewFrame implements Observer {
 	 */
 	public void closeWindow() {
 
-		try {
-			final DataModel dataModel = getDataModel();
-
-			if (dataModel != null) {
-				if (dataModel.getModified()) {
-					final int option = JOptionPane.showConfirmDialog(
-							applicationFrame,
-							"DataModel is modified. Do you wish to save?");
-
-					switch (option) {
-
-					case JOptionPane.YES_OPTION:
-						final DataModelWriter writer = new DataModelWriter(
-								getDataModel());
-						writer.writeIncremental(getDataModel().getFileSet());
-						break;
-
-					case JOptionPane.CANCEL_OPTION:
-						return;
-
-					case JOptionPane.NO_OPTION:
-						break;
-					}
-				}
-
-				final Preferences documentConfig = dataModel
-						.getDocumentConfigRoot();
-				if (documentConfig != null) {
-					// documentConfig.store();
-				}
-			}
-		} catch (final Exception e) {
-			LogBuffer.println("ViewFrame.closeWindow() Got exception: " + e);
-		}
+//		try {
+////			final DataModel dataModel = getDataModel();
+//
+//			if (dataModel != null) {
+//				if (dataModel.getModified()) {
+//					final int option = JOptionPane.showConfirmDialog(
+//							applicationFrame,
+//							"DataModel is modified. Do you wish to save?");
+//
+//					switch (option) {
+//
+//					case JOptionPane.YES_OPTION:
+//						final DataModelWriter writer = new DataModelWriter(
+//								getDataModel());
+//						writer.writeIncremental(getDataModel().getFileSet());
+//						break;
+//
+//					case JOptionPane.CANCEL_OPTION:
+//						return;
+//
+//					case JOptionPane.NO_OPTION:
+//						break;
+//					}
+//				}
+//
+//				final Preferences documentConfig = dataModel
+//						.getDocumentConfigRoot();
+//				if (documentConfig != null) {
+//					// documentConfig.store();
+//				}
+//			}
+//		} catch (final Exception e) {
+//			LogBuffer.println("ViewFrame.closeWindow() Got exception: " + e);
+//		}
 
 		final ConfirmDialog confirm = new ConfirmDialog(this, "exit TreeView");
 		confirm.setVisible(true);
@@ -409,30 +406,30 @@ public abstract class ViewFrame implements Observer {
 	 */
 	public abstract boolean isLoaded();
 
-	/**
-	 * Gets the shared <code>DataModel</code>
-	 * 
-	 * @return Gets the shared <code>DataModel</code>
-	 */
-	public abstract DataModel getDataModel();
+//	/**
+//	 * Gets the shared <code>DataModel</code>
+//	 * 
+//	 * @return Gets the shared <code>DataModel</code>
+//	 */
+//	public abstract DataModel getDataModel();
 
-	/**
-	 * Sets the shared <code>DataModel</code>
-	 * 
-	 * @return Sets the shared <code>DataModel</code>
-	 * @throws LoadException
-	 */
-	public abstract void setDataModel(DataModel model);
-	/**
-	 * Should scroll all MainPanels in this view frame to the specified gene.
-	 * The index provided is respect to the TreeSelection object.
-	 * 
-	 * @param i
-	 *            gene index in model to scroll the MainPanel to.
-	 */
-	public abstract void scrollToGene(int i);
-
-	public abstract void scrollToArray(int i);
+//	/**
+//	 * Sets the shared <code>DataModel</code>
+//	 * 
+//	 * @return Sets the shared <code>DataModel</code>
+//	 * @throws LoadException
+//	 */
+//	public abstract void setDataModel(DataModel model);
+//	/**
+//	 * Should scroll all MainPanels in this view frame to the specified gene.
+//	 * The index provided is respect to the TreeSelection object.
+//	 * 
+//	 * @param i
+//	 *            gene index in model to scroll the MainPanel to.
+//	 */
+//	public abstract void scrollToGene(int i);
+//
+//	public abstract void scrollToArray(int i);
 
 	/**
 	 * The shared selection objects
@@ -455,7 +452,7 @@ public abstract class ViewFrame implements Observer {
 		geneSelection.deselectAllIndexes();
 		geneSelection.setIndexSelection(i, true);
 		geneSelection.notifyObservers();
-		scrollToGene(i);
+//		scrollToGene(i);
 	}
 
 	/**
@@ -467,7 +464,7 @@ public abstract class ViewFrame implements Observer {
 		arraySelection.deselectAllIndexes();
 		arraySelection.setIndexSelection(i, true);
 		arraySelection.notifyObservers();
-		scrollToGene(i);
+//		scrollToGene(i);
 	}
 
 	/**
@@ -482,7 +479,7 @@ public abstract class ViewFrame implements Observer {
 		geneSelection.setIndexSelection(i, true);
 		geneSelection.notifyObservers();
 
-		scrollToGene(i);
+//		scrollToGene(i);
 	}
 
 	public boolean geneIsSelected(final int i) {
@@ -898,34 +895,34 @@ public abstract class ViewFrame implements Observer {
 		return 0;
 	}
 
-	public void showSubDataModel(final int[] indexes, final String source,
-			final String name) {
-
-		if (indexes.length == 0) {
-			JOptionPane.showMessageDialog(applicationFrame,
-					"No Genes to show summary of!");
-			return;
-		}
-
-		showSubDataModel(indexes, null, source, name);
-	}
-
-	public void showSubDataModel(final int[] geneIndexes,
-			final int[] arrayIndexes, final String source, final String name) {
-
-		final ReorderedDataModel dataModel = new ReorderedDataModel(
-				getDataModel(), geneIndexes, arrayIndexes);
-		if (source != null) {
-			dataModel.setSource(source);
-		}
-
-		if (name != null) {
-			dataModel.setName(name);
-		}
-
-		final ViewFrame window = getApp().openNew();
-		window.setDataModel(dataModel);
-		window.setLoaded(true);
-		window.getAppFrame().setVisible(true);
-	}
+//	public void showSubDataModel(final int[] indexes, final String source,
+//			final String name) {
+//
+//		if (indexes.length == 0) {
+//			JOptionPane.showMessageDialog(applicationFrame,
+//					"No Genes to show summary of!");
+//			return;
+//		}
+//
+//		showSubDataModel(indexes, null, source, name);
+//	}
+//
+//	public void showSubDataModel(final int[] geneIndexes,
+//			final int[] arrayIndexes, final String source, final String name) {
+//
+//		final ReorderedDataModel dataModel = new ReorderedDataModel(
+//				getDataModel(), geneIndexes, arrayIndexes);
+//		if (source != null) {
+//			dataModel.setSource(source);
+//		}
+//
+//		if (name != null) {
+//			dataModel.setName(name);
+//		}
+//
+//		final ViewFrame window = getApp().openNew();
+//		window.setDataModel(dataModel);
+//		window.setLoaded(true);
+//		window.getAppFrame().setVisible(true);
+//	}
 }

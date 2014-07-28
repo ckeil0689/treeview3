@@ -49,7 +49,7 @@ import javax.swing.event.DocumentListener;
 
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
-import edu.stanford.genetics.treeview.GUIFactory;
+import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.NatField;
 import edu.stanford.genetics.treeview.SettingsPanel;
 
@@ -232,7 +232,7 @@ public class FontSettings implements SettingsPanel {
 			fontNames[Arrays.asList(fonts).indexOf(f)] = f.getName();
 		}
 
-		font_choice = GUIFactory.setComboLayout(fontNames);
+		font_choice = GUIFactory.createComboBox(fontNames);
 		font_choice.setEditable(true);
 		AutoCompleteDecorator.decorate(font_choice);
 		font_choice.setSelectedItem(client.getFace());
@@ -241,7 +241,7 @@ public class FontSettings implements SettingsPanel {
 
 	private void setupStyleChoice() {
 
-		style_choice = GUIFactory.setComboLayout(styles);
+		style_choice = GUIFactory.createComboBox(styles);
 		style_choice.setSelectedItem(decode_style(client.getStyle()));
 		style_choice.addActionListener(new SelectionListener());
 	}
@@ -279,8 +279,8 @@ public class FontSettings implements SettingsPanel {
 				new DocumentChangeListener());
 		fontPanel.add(size_field, "span, wrap");
 
-		exampleField = new JLabel("Font Example Text");
-		exampleField.setForeground(GUIFactory.TEXT);
+		exampleField = GUIFactory.createLabel("Font Example Text: ", 
+				GUIFactory.FONTS);
 		fontPanel.add(exampleField, "pushx, alignx 50%, span");
 	}
 

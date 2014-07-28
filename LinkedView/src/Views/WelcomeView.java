@@ -8,8 +8,8 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JSeparator;
 
-import edu.stanford.genetics.treeview.GUIFactory;
-import edu.stanford.genetics.treeview.StringRes;
+import Utilities.GUIFactory;
+import Utilities.StringRes;
 
 public class WelcomeView {
 
@@ -38,10 +38,10 @@ public class WelcomeView {
 		
 		loadPanel = GUIFactory.createJPanel(false, true, null);
 
-		jl = GUIFactory.createBigLabel(StringRes.title_Hello);
+		jl = GUIFactory.createLabel(StringRes.title_Hello, GUIFactory.FONTL);
 
-		jl2 = GUIFactory.createXXLLabel(StringRes.title_Welcome 
-				+ StringRes.appName + StringRes.dot);
+		jl2 = GUIFactory.createLabel(StringRes.title_Welcome 
+				+ StringRes.appName + StringRes.dot, GUIFactory.FONTXXL);
 
 		titleContainer.add(jl, "pushx, alignx 50%, aligny 50%, span, wrap");
 		titleContainer.add(jl2, "pushx, alignx 50%, span");
@@ -97,7 +97,7 @@ public class WelcomeView {
 
 		loadPanel.removeAll();
 
-		loadButton = GUIFactory.createLargeButton("Open...");
+		loadButton = GUIFactory.createLargeBtn("Open...");
 		loadPanel.add(loadButton, "push, alignx 50%, aligny 0%");
 
 		// Set the colors
@@ -123,9 +123,9 @@ public class WelcomeView {
 		jl.setText(StringRes.loading_OneSec);
 		jl2.setText(StringRes.loading_active);
 		
-		loadLabel = GUIFactory.createBigLabel("");
+		loadLabel = GUIFactory.createLabel("", GUIFactory.FONTL);
 		
-		loadBar = GUIFactory.setPBarLayout();
+		loadBar = GUIFactory.createPBar();
 
 		loadContainer.add(loadLabel, "pushx, alignx 50%, wrap");
 		loadContainer.add(loadBar, "pushx, growx");

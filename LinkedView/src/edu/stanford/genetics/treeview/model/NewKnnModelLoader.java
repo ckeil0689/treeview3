@@ -35,7 +35,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import edu.stanford.genetics.treeview.DataModel;
+import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -67,11 +67,13 @@ public class NewKnnModelLoader extends NewModelLoader {
 	 * @see edu.stanford.genetics.treeview.model.TVModelLoader2#run()
 	 */
 	@Override
-	public TVModel load() {
+	public KnnModel load() {
 
 		try {
 			final KnnModel model = getKnnModel();
 			final FileSet fileSet = targetModel.getFileSet();
+			
+			String[][] stringLabels = null;
 
 			model.gidFound(false);
 			model.aidFound(false);
@@ -89,10 +91,10 @@ public class NewKnnModelLoader extends NewModelLoader {
 
 			// Get data from file into String and double arrays
 			// Put the arrays in ArrayLists for later access.
-			System.out.println("Starting extract.");
-			extractData(br);
+			LogBuffer.println("Starting extract.");
+			stringLabels = extractData(br);
 
-			parseCDT();
+			parseCDT(stringLabels);
 
 			final String kggfilename = fileSet.getKgg();
 			if (!kggfilename.equalsIgnoreCase("")) {
@@ -104,7 +106,7 @@ public class NewKnnModelLoader extends NewModelLoader {
 					model.setGClusters(stringLabels, LoadException.KGGPARSE);
 
 				} catch (final Exception e) {
-					System.out.println("error parsing KGG: " + e.getCause());
+					LogBuffer.println("error parsing KGG: " + e.getCause());
 					e.printStackTrace();
 				}
 			}
@@ -119,7 +121,7 @@ public class NewKnnModelLoader extends NewModelLoader {
 					model.setAClusters(stringLabels, LoadException.KAGPARSE);
 
 				} catch (final Exception e) {
-					System.out.println("error parsing KAG: " + e.getCause());
+					LogBuffer.println("error parsing KAG: " + e.getCause());
 					e.printStackTrace();
 				}
 			}
@@ -130,32 +132,40 @@ public class NewKnnModelLoader extends NewModelLoader {
 				final Preferences documentConfig = Preferences.userRoot().node(
 						"DocumentConfig");
 				documentConfig.put("jtv", targetModel.getFileSet().getJtv());
-				targetModel.setDocumentConfig(documentConfig);
+				model.setDocumentConfig(documentConfig);
 
 			} catch (final Exception e) {
-				targetModel.setDocumentConfig(null);
+				model.setDocumentConfig(null);
 				LogBuffer.println("Exception in load() in "
 						+ "NewKnnModelLoader: " + e.getMessage());
 			}
+			
+			model.setLoaded(true);
+			return model;
 
 			// ActionEvent(this, 0, "none",0);
 		} catch (final java.lang.OutOfMemoryError ex) {
 			LogBuffer.println("OutOfMemoryError in load() in "
 					+ "NewKnnModelLoader: " + ex.getMessage());
-			final JPanel temp = new JPanel();
-			temp.add(new JLabel("Out of memory, allocate more RAM"));
-			temp.add(new JLabel("see Chapter 3 of Help->Documentation... "
-					+ "for Out of Memory"));
+			final JPanel temp = GUIFactory.createJPanel(false, true, null);
+			temp.add(new JLabel("Loading used too much memory. You can "
+					+ "manually allocate more RAM."), "span, wrap");
+			temp.add(new JLabel("Open the terminal (Mac/ Linux) or command line"
+					+ "(Windows), navigate to directory of the TreeView 3 "
+					+ "JAR file."));
+			temp.add(new JLabel("Then type this line to launch the JAR file"
+					+ "with 2GB of RAM: java -Xmx2048m -jar TreeView3.jar"));
 			JOptionPane.showMessageDialog(tvFrame.getAppFrame(), temp);
+			
+			return null;
 
 		} catch (final IOException e) {
-			System.out.println("Loading resulted in an error. Cause: "
+			LogBuffer.println("Loading resulted in an error. Cause: "
 					+ e.getCause());
 			e.printStackTrace();
+			
+			return null;
 		}
-
-		targetModel.setLoaded(true);
-		return targetModel;
 	}
 
 }

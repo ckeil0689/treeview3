@@ -48,8 +48,8 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
+import Utilities.GUIFactory;
 import net.miginfocom.swing.MigLayout;
-import edu.stanford.genetics.treeview.GUIFactory;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -331,7 +331,7 @@ public class GlobalView2 extends ModelViewProduced implements
 
 		if (!offscreenValid) {
 			// clear the pallette...
-			g.setColor(GUIFactory.BG_COLOR);
+			g.setColor(GUIFactory.DEFAULT_BG);
 			g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
 			g.setColor(Color.black);
 

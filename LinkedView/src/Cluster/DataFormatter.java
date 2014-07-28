@@ -1,9 +1,9 @@
 package Cluster;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.swing.SwingUtilities;
 
 import edu.stanford.genetics.treeview.DataModel;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.model.TVModel;
 
 /**
@@ -16,62 +16,33 @@ import edu.stanford.genetics.treeview.model.TVModel;
 public class DataFormatter {
 
 	// Instance variables
-	private final DataModel model;
+	private final TVModel model;
 	private final ClusterView clusterView;
-	private final List<Double> list;
+	private final double[][] rawData;
 
-	private final List<List<Double>> rowList = new ArrayList<List<Double>>();
-	private final List<List<Double>> colList = new ArrayList<List<Double>>();
+	private double[][] colList;
 
 	// Constructor (building the object)
-	public DataFormatter(final DataModel model, final ClusterView clusterView, 
-			final List<Double> list) {
+	public DataFormatter(final DataModel model,
+			final ClusterView clusterView, final double[][] rawData) {
 
 		this.model = (TVModel) model;
 		this.clusterView = clusterView;
-		this.list = list;
-	}
-
-	// extracting rows from raw data array
-	public void splitRows() {
-
-		int lower = 0;
-		int upper = 0;
-
-		// number of arrays
-		final int nCols = list.size() / model.nGene();
-		
-		// number of rows
-		final int nRows = list.size() / nCols;
-		
-		clusterView.setLoadText("Finding data rows...");
-		clusterView.setPBarMax(nRows);
-
-		for (int i = 0; i < nRows; i++) {
-
-			clusterView.updatePBar(i);
-
-			upper += nCols;
-
-			rowList.add(list.subList(lower, upper));
-
-			lower = upper;
-		}
-
-		if (upper < list.size() - 1) {
-			lower = upper;
-			upper = list.size();
-
-			rowList.add(list.subList(lower, upper));
-		}
+		this.rawData = rawData;
 	}
 
 	// getting the columns from raw data array
 	public void splitColumns() {
 
+		// Just checking for debugging
+		LogBuffer.println("Is DataFormatterArrays.splitColumns() on EDT? " 
+				+ SwingUtilities.isEventDispatchThread());
+				
 		// Number of arrays/ columns
-		final int nCols = list.size() / model.nGene();
+		final int nCols = model.nExpr();
 		final int nRows = model.nGene();
+
+		colList = new double[nCols][nRows];
 
 		// Setting up ProgressBar
 		clusterView.setLoadText("Finding data columns...");
@@ -82,26 +53,20 @@ public class DataFormatter {
 
 			clusterView.updatePBar(j);
 
-			final List<Double> sArray = new ArrayList<Double>();
+			final double[] sArray = new double[nRows];
 
 			for (int i = 0; i < nRows; i++) {
 
-				final int element = (i * nCols) + j;
+				// final int element = (i * nCols) + j;
 
-				sArray.add(list.get(element));
+				sArray[i] = rawData[i][j];
 			}
 
-			colList.add(sArray);
+			colList[j] = sArray;
 		}
 	}
 
-	// Accessor methods to return each data list
-	public List<List<Double>> getRowList() {
-
-		return rowList;
-	}
-
-	public List<List<Double>> getColList() {
+	public double[][] getColList() {
 
 		return colList;
 	}

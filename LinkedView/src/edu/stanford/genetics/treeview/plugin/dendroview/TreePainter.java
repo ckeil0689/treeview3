@@ -27,7 +27,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.util.Stack;
 
-import edu.stanford.genetics.treeview.GUIFactory;
+import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.LinearTransformation;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeDrawerNode;

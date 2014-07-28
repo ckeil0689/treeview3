@@ -54,6 +54,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.DummyHeaderInfo;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.HeaderInfo;
@@ -63,7 +64,6 @@ import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeDrawerNode;
 import edu.stanford.genetics.treeview.TreeSelection;
 import edu.stanford.genetics.treeview.TreeSelectionI;
-import edu.stanford.genetics.treeview.WaitScreen;
 
 /**
  * This class is a superclass which implements a GUI for selection of options
@@ -677,7 +677,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		private static final long serialVersionUID = 1L;
 		JCheckBox drawPreview;
 		DrawingPanel drawingPanel;
-		WaitScreen waitingPanel;
+		JPanel waitingPanel;
 
 		public void updatePreview() {
 			if ((drawPreview == null) || drawPreview.isSelected()) {
@@ -694,8 +694,10 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			setLayout(new BorderLayout());
 			add(new JLabel("Preview"), BorderLayout.NORTH);
 			drawingPanel = new DrawingPanel();
-			waitingPanel = new WaitScreen(new String[] { "Check Box to",
-					"Display Preview" });
+			waitingPanel = GUIFactory.createJPanel(false, true, null);
+			waitingPanel.add(new JLabel("Check Box to display preview."));
+					//new WaitScreen(new String[] { "Check Box to",
+					//"Display Preview" });
 			add(waitingPanel, BorderLayout.CENTER);
 			drawPreview = new JCheckBox("Draw Preview");
 			drawPreview.addActionListener(new ActionListener() {
@@ -952,6 +954,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 	 */
 	public void drawArrayAnnoBox(final Graphics g, final int x, final int y,
 			final double scale) {
+		
 		// HACK doesn't deal with discontinuous selection right.
 		final int height = (int) (getArrayAnnoLength() * scale);
 		final int width = (int) (getXmapWidth() * scale);
@@ -981,6 +984,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 	 */
 	protected void drawGeneAnno(final Graphics g, final int x, final int y,
 			final double scale) {
+		
 		// HACK doesn't deal with discontinuous selection right.
 		final int width = (int) (getGeneAnnoLength() * scale);
 		final int height = (int) (getYmapHeight() * scale);
@@ -994,12 +998,14 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		tempMap.setScale(spacing);
 		tempMap.setIndexRange(min, max);
 		tempMap.setAvailablePixels(height + getBorderPixels());
-		final TextView anv = new TextView(geneHeaderInfo, null);
+		final TextView anv = new TextView();
+		anv.generateView(null, 0);
+		anv.setHeaderInfo(geneHeaderInfo);
 		anv.setMap(tempMap);
 		anv.setHeaderSummary(headerSelectionPanel.getGeneSummary());
 		final Image buf = new BufferedImage(width + getBorderPixels(), height
 				+ getBorderPixels(), BufferedImage.TYPE_INT_ARGB);
-		System.out.println("setting font for genes to " + getGeneFont());
+		LogBuffer.println("setting font for genes to " + getGeneFont());
 		anv.setFace(getGeneFont().getName());
 		anv.setStyle(getGeneFont().getStyle());
 		anv.setPoints(getGeneFont().getSize());
@@ -1033,7 +1039,9 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		tempMap.setScale(spacing);
 		tempMap.setIndexRange(min, max);
 		tempMap.setAvailablePixels(width + getBorderPixels());
-		final ArrayNameView anv = new ArrayNameView(arrayHeaderInfo, null);
+		final ArrayNameView anv = new ArrayNameView();
+		anv.generateView(null);
+		anv.setHeaderInfo(arrayHeaderInfo);
 		anv.setFace(getArrayFont().getName());
 		anv.setStyle(getArrayFont().getStyle());
 		anv.setPoints(getArrayFont().getSize());

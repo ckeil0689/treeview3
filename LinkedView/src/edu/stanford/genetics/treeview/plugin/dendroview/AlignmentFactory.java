@@ -11,6 +11,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
 import edu.stanford.genetics.treeview.DendroPanel;
+import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.PluginFactory;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.ViewFrame;
@@ -18,6 +19,8 @@ import edu.stanford.genetics.treeview.core.PluginManager;
 
 public class AlignmentFactory extends PluginFactory {
 
+	private HeaderInfo geneHI;
+	
 	static {
 		PluginManager.registerPlugin(new AlignmentFactory());
 	}
@@ -70,7 +73,7 @@ public class AlignmentFactory extends PluginFactory {
 	public boolean configurePlugin(final Preferences node,
 			final ViewFrame viewFrame) {
 
-		if (viewFrame.getDataModel().getGeneHeaderInfo().getIndex("ALN") >= 0) {
+		if (geneHI.getIndex("ALN") >= 0) {
 			node.put("headerName", "ALN");
 			return true;
 
@@ -81,6 +84,11 @@ public class AlignmentFactory extends PluginFactory {
 							+ "titled \"ALN\"."));
 			return false;
 		}
+	}
+	
+	public void setGeneHeaderInfo(HeaderInfo geneHI) {
+		
+		this.geneHI = geneHI;
 	}
 
 }

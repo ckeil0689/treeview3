@@ -30,6 +30,8 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.MemoryImageSource;
 
+import Utilities.GUIFactory;
+
 /**
  * superclass, to hold info and code common to all model views
  * 
@@ -166,7 +168,7 @@ public abstract class ModelViewBuffered extends ModelView {
 		}
 
 		// update offscreenBuffer if necessary
-		g.setColor(GUIFactory.BG_COLOR);// Color.white); //NO
+		g.setColor(GUIFactory.DEFAULT_BG);
 		g.fillRect(clip.x, clip.y, clip.width, clip.height);
 
 		if (isEnabled()) {
@@ -177,7 +179,7 @@ public abstract class ModelViewBuffered extends ModelView {
 		} else {
 			// System.out.println(viewName() + " not enabled");
 			final Graphics tg = offscreenBuffer.getGraphics();
-			tg.setColor(GUIFactory.BG_COLOR);// Color.white); //NO
+			tg.setColor(GUIFactory.DEFAULT_BG);
 			tg.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
 		}
 

@@ -2,7 +2,7 @@ package Cluster;
 
 import javax.swing.JTextArea;
 
-import edu.stanford.genetics.treeview.GUIFactory;
+import Utilities.GUIFactory;
 
 /**
  * Small helper class to set up TextAreas for the display of long texts.

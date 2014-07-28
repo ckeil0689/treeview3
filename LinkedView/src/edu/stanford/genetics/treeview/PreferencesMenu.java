@@ -4,6 +4,7 @@ import java.awt.Dialog;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentListener;
 import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
@@ -11,59 +12,52 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
-import Controllers.DendroController;
+import Utilities.GUIFactory;
+import Utilities.StringRes;
+import Controllers.PreferencesController;
 import GradientColorChoice.ColorGradientChooser;
-import GradientColorChoice.ColorGradientController;
-import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
-import edu.stanford.genetics.treeview.plugin.dendroview.DoubleArrayDrawer;
 import edu.stanford.genetics.treeview.plugin.dendroview.FontSettings;
 
-public class PreferencesMenu {
+public class PreferencesMenu implements ConfigNodePersistent {
 
 	private final TreeViewFrame tvFrame;
-	private final Preferences configNode;
-	private final JDialog menuDialog;
+	private HeaderInfo geneHI;
+	private HeaderInfo arrayHI;
+	private Preferences configNode;
+	private JDialog menuDialog;
 
-	private final JPanel basisPanel;
+	private JPanel basisPanel;
 	private final DendroView2 dendroView;
-	private final DendroController dendroController;
-	private JButton ok_button;
+	private ColorGradientChooser gradientPick;
+	private JButton ok_btn;
 
 	// Menus
 	private AnnotationPanel annotationSettings;
 
 	/**
-	 * Chained constructor in case DendroView isn't available
+	 * Chained constructor
 	 * 
 	 * @param viewFrame
 	 */
-	public PreferencesMenu(final TreeViewFrame tvFrame, 
-			final String menuTitle) {
+	public PreferencesMenu() {
 
-		this(tvFrame, null, null, menuTitle);
+		this(null);
 	}
 
 	/**
 	 * Main constructor for Preferences Menu
 	 * 
 	 * @param tvFrame
-	 * @param dendroView
-	 * @param menuTitle
 	 */
-	public PreferencesMenu(final TreeViewFrame tvFrame,
-			final DendroView2 dendroView, final DendroController controller,
-			final String menuTitle) {
+	public PreferencesMenu(final TreeViewFrame tvFrame) {
 
 		this.tvFrame = tvFrame;
-		this.dendroView = dendroView;
-		this.dendroController = controller;
-		this.configNode = tvFrame.getConfigNode().node(
-				StringRes.pref_node_Preferences);
+		this.dendroView = tvFrame.getDendroView();
 
-		
 		// Setup JDialog
 		menuDialog = new JDialog();
 		menuDialog.setTitle(StringRes.dialog_title_prefs);
@@ -75,11 +69,27 @@ public class PreferencesMenu {
 		basisPanel = GUIFactory.createJPanel(false, true, null);
 
 		menuDialog.getContentPane().add(basisPanel);
-
-		setupLayout(menuTitle);
-
-		menuDialog.pack();
-		menuDialog.setLocationRelativeTo(tvFrame.getAppFrame());
+		menuDialog.addWindowListener(new WindowAdapter() {
+			
+			@Override
+			public void windowClosed(WindowEvent e) {
+				
+				if(gradientPick != null && gradientPick.isCustomSelected()) {
+					gradientPick.saveStatus();
+				}
+			}
+		});
+	}
+	
+	public void setGradientChooser(ColorGradientChooser gradientPick) {
+		
+		this.gradientPick = gradientPick;
+	}
+	
+	public void setHeaderInfo(HeaderInfo geneHI, HeaderInfo arrayHI) {
+		
+		this.geneHI = geneHI;
+		this.arrayHI = arrayHI;
 	}
 
 	/**
@@ -89,7 +99,25 @@ public class PreferencesMenu {
 	 */
 	public void setVisible(final boolean visible) {
 
+		menuDialog.pack();
+		menuDialog.setLocationRelativeTo(tvFrame.getAppFrame());
 		menuDialog.setVisible(visible);
+	}
+	
+	/**
+	 * Setting the configNode for the PreferencesMenu
+	 * @param configNode
+	 */
+	@Override
+	public void setConfigNode(Preferences parentNode) {
+		
+		if (parentNode != null) {
+			this.configNode = parentNode.node(StringRes.pref_node_Preferences);
+
+		} else {
+			LogBuffer.println("Could not find or create PreferencesMenu "
+					+ "node because parentNode was null.");
+		}
 	}
 
 	/**
@@ -138,7 +166,7 @@ public class PreferencesMenu {
 	 */
 	public void addOKButtonListener(final ActionListener listener) {
 
-		ok_button.addActionListener(listener);
+		ok_btn.addActionListener(listener);
 	}
 
 	/**
@@ -235,7 +263,8 @@ public class PreferencesMenu {
 			final FontSettings fontSettings = new FontSettings(
 					dendroView.getTextview(), dendroView.getArraynameview());
 
-			final JLabel labelFont = GUIFactory.setupHeader("Set Label Font:");
+			final JLabel labelFont = GUIFactory.createLabel("Set Label Font:", 
+					GUIFactory.FONTL);
 
 			mainPanel.add(labelFont, "span, wrap");
 			mainPanel.add(fontSettings.makeFontPanel(), 
@@ -365,20 +394,18 @@ public class PreferencesMenu {
 
 			mainPanel = GUIFactory.createJPanel(false, true, null);
 
-			genePanel = new HeaderSummaryPanel(tvFrame.getDataModel()
-					.getGeneHeaderInfo(), dendroView.getTextview()
-					.getHeaderSummary(), tvFrame);
+			genePanel = new HeaderSummaryPanel(geneHI, 
+					dendroView.getTextview().getHeaderSummary(), tvFrame);
 
-			arrayPanel = new HeaderSummaryPanel(tvFrame.getDataModel()
-					.getArrayHeaderInfo(), dendroView.getArraynameview()
-					.getHeaderSummary(), tvFrame);
+			arrayPanel = new HeaderSummaryPanel(arrayHI, 
+					dendroView.getArraynameview().getHeaderSummary(), tvFrame);
 
 			final JPanel loadLabelPanel = GUIFactory.createJPanel(false, 
 					true, null);
 			loadLabelPanel.setBorder(BorderFactory.createEtchedBorder());
 
-			custom_button = GUIFactory.createButton(
-					StringRes.button_CustomLabels);
+			custom_button = GUIFactory.createBtn(
+					StringRes.btn_CustomLabels);
 
 			final JLabel rows = GUIFactory.setupHeader(StringRes.main_rows);
 			final JLabel cols = GUIFactory.setupHeader(StringRes.main_cols);
@@ -429,26 +456,28 @@ public class PreferencesMenu {
 		
 		JPanel menuPanel;
 		if (menu.equalsIgnoreCase(StringRes.menu_title_Font)
-				&& dendroView.isLoaded()) {
+				&& tvFrame.isLoaded()) {
 			menuPanel = new FontPanel().makeFontPanel();
 
 		} else if (menu.equalsIgnoreCase(StringRes.menu_title_RowAndCol)) {
 			annotationSettings = new AnnotationPanel();
 			menuPanel = annotationSettings.makeLabelPane();
 
-		} else if (menu.equalsIgnoreCase(StringRes.menu_title_Color)) {
-			ColorGradientChooser gradientPick = new ColorGradientChooser(
-					tvFrame, ((DoubleArrayDrawer) dendroController
-							.getArrayDrawer()).getColorExtractor());
-
-			// Adding GradientColorChooser configurations to DendroView node.
-			gradientPick.setConfigNode(((TVModel) tvFrame.getDataModel())
-					.getDocumentConfig());
-			
-			final ColorGradientController gradientControl = 
-					new ColorGradientController(gradientPick);
+		} else if (menu.equalsIgnoreCase(StringRes.menu_title_Color) 
+				&& gradientPick != null) {
+//			ColorGradientChooser gradientPick = new ColorGradientChooser(
+//					tvFrame, ((DoubleArrayDrawer) dendroController
+//							.getArrayDrawer()).getColorExtractor());
+//
+//			// Adding GradientColorChooser configurations to DendroView node.
+//			gradientPick.setConfigNode(((TVModel) tvFrame.getDataModel())
+//					.getDocumentConfig());
+//			
+//			final ColorGradientController gradientControl = 
+//					new ColorGradientController(gradientPick);
 			
 			menuPanel = gradientPick.makeGradientPanel();
+		
 
 		} else if (menu.equalsIgnoreCase(StringRes.menu_title_URL)) {
 			menuPanel = new URLSettings().makeURLPanel();
@@ -457,15 +486,15 @@ public class PreferencesMenu {
 			// In case menu cannot be loaded, display excuse.
 			menuPanel = GUIFactory.createJPanel(false, true, null);
 
-			final JLabel hint = GUIFactory.createSmallLabel("Menu cannot be "
-					+ "shown because it wasn't loaded.");
+			final JLabel hint = GUIFactory.createLabel("Menu cannot be "
+					+ "shown because it wasn't loaded.", GUIFactory.FONTS);
 			menuPanel.add(hint, "push, alignx 50%");
 		}
 
-		ok_button = GUIFactory.createButton(StringRes.button_OK);
+		ok_btn = GUIFactory.createBtn(StringRes.btn_OK);
 		
 		basisPanel.add(menuPanel, "push, grow, wrap");
-		basisPanel.add(ok_button, "pushx, alignx 100%, span");
+		basisPanel.add(ok_btn, "pushx, alignx 100%, span");
 
 		basisPanel.revalidate();
 		basisPanel.repaint();
@@ -500,6 +529,26 @@ public class PreferencesMenu {
 
 		return configNode;
 	}
+	
+	// Layout Test
+	public static void main(String[] args) {
+		
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				
+				String menuTitle = ""; // change this to see different menus
+				
+				PreferencesMenu prefMenu = new PreferencesMenu(null);
+				
+				final PreferencesController pController = 
+						new PreferencesController(null, null, prefMenu);
+
+				prefMenu.setVisible(true);
+			}
+		});
+    }
 
 //	public ColorGradientChooser getGradientPick() {
 //

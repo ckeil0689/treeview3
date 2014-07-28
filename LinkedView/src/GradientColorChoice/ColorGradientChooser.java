@@ -31,13 +31,11 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 
-import net.miginfocom.swing.MigLayout;
+import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
-import edu.stanford.genetics.treeview.GUIFactory;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor2;
-import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractorEditor2;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets2;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet2;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
@@ -74,44 +72,36 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 	private final ColorExtractor2 colorExtractor;
 	private final ColorPresets2 colorPresets;
 
-	private final ColorExtractorEditor2 colorExtractorEditor;
-	// private ColorPresetsPanel colorPresetsPanel;
-
 	private Thumb selectedThumb = null;
 
 	public ColorGradientChooser(TreeViewFrame tvFrame, 
-			final ColorExtractor2 drawer) {
+			final ColorExtractor2 drawer, int minVal, int maxVal) {
 
 		this.tvFrame = tvFrame;
 		this.colorExtractor = drawer;
 		this.colorPresets = DendrogramFactory.getColorPresets();
-		this.minVal = tvFrame.getDataModel().getDataMatrix().getMinVal();
-		this.maxVal = tvFrame.getDataModel().getDataMatrix().getMaxVal();
+		this.minVal = minVal;
+		this.maxVal = maxVal;
 
-		mainPanel = new JPanel();
-		mainPanel.setLayout(new MigLayout());
-		mainPanel.setBackground(GUIFactory.MENU);
+		mainPanel = GUIFactory.createJPanel(false, true, null);
 		mainPanel.setBorder(BorderFactory.createEtchedBorder());
 
-		final JLabel hint = new JLabel(
-				"Move or add sliders to adjust color scheme.");
-		hint.setForeground(GUIFactory.DARKGRAY);
-		hint.setFont(GUIFactory.FONTS);
+		final JLabel hint = GUIFactory.createLabel("Move or add sliders "
+				+ "to adjust color scheme.", GUIFactory.FONTS);
 
 		colorList = new ArrayList<Color>();
 		thumbList = new ArrayList<Thumb>();
 
 		gradientBox = new GradientBox();
 
-		addButton = GUIFactory.createButton("Add Color");
-		removeButton = GUIFactory.createButton("Remove Selected");
-		// saveButton = GUIParams.setButtonLayout("Save Colors", null);
+		addButton = GUIFactory.createBtn("Add Color");
+		removeButton = GUIFactory.createBtn("Remove Selected");
 
 		colorButtonGroup = new ButtonGroup();
 
-		redGreenButton = GUIFactory.setRadioButtonLayout("Red-Green");
-		yellowBlueButton = GUIFactory.setRadioButtonLayout("Yellow-Blue");
-		customColorButton = GUIFactory.setRadioButtonLayout("Custom Colors");
+		redGreenButton = GUIFactory.createRadioBtn("Red-Green");
+		yellowBlueButton = GUIFactory.createRadioBtn("Yellow-Blue");
+		customColorButton = GUIFactory.createRadioBtn("Custom Colors");
 
 		colorButtonGroup.add(redGreenButton);
 		colorButtonGroup.add(yellowBlueButton);
@@ -120,25 +110,20 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 		final JPanel radioButtonPanel = 
 				GUIFactory.createJPanel(false, true, null);
 
-		final JLabel colorHint = GUIFactory
-				.createSmallLabel("Choose a Color Scheme: ");
+		final JLabel colorHint = GUIFactory.createLabel("Choose a Color "
+				+ "Scheme: ", GUIFactory.FONTS);
 
 		radioButtonPanel.add(colorHint, "span, wrap");
 		radioButtonPanel.add(redGreenButton, "span, wrap");
 		radioButtonPanel.add(yellowBlueButton, "span, wrap");
 		radioButtonPanel.add(customColorButton, "span");
 
-		final JPanel presetPanel = GUIFactory.createJPanel(false, true, null);
-		colorExtractorEditor = new ColorExtractorEditor2(colorExtractor);
-		presetPanel.add(colorExtractorEditor, "alignx 50%, pushx, wrap");
-
 		mainPanel.add(hint, "span, wrap");
-		mainPanel.add(gradientBox, "h 20%, growx, pushx, alignx 50%, "
+		mainPanel.add(gradientBox, "h 100:100:, w 400:400:, pushx, alignx 50%, "
 				+ "span, wrap");
-		mainPanel.add(addButton, "pushx, alignx 100%");
-		mainPanel.add(removeButton, "pushx, alignx 0%, wrap");
+		mainPanel.add(addButton, "pushx, split 2, alignx 50%");
+		mainPanel.add(removeButton, "pushx, wrap");
 		mainPanel.add(radioButtonPanel, "pushx");
-		mainPanel.add(presetPanel);
 	}
 
 	@Override
@@ -159,7 +144,7 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 	public void saveStatus() {
 
 		if (gradientBox != null) {
-			gradientBox.savePresets();
+			gradientBox.saveCustomPresets();
 		}
 	}
 
@@ -270,7 +255,7 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 		public void drawThumbBox(final Graphics2D g2) {
 
 			// Fill thumbRect with background color
-			g2.setColor(GUIFactory.MENU);
+			g2.setColor(GUIFactory.DEFAULT_BG);
 			g2.fill(thumbRect);
 
 			// Paint the thumbs
@@ -282,7 +267,7 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 
 		public void drawNumBox(final Graphics2D g2) {
 
-			g2.setColor(GUIFactory.MENU);
+			g2.setColor(GUIFactory.DEFAULT_BG);
 			g2.fill(numRect);
 
 			g2.setColor(Color.black);
@@ -486,7 +471,11 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 			fractions = fracs;
 		}
 
-		public void savePresets() {
+		/**
+		 * Serves to store the currently chosen custom color setup in a
+		 * configNode.
+		 */
+		public void saveCustomPresets() {
 
 			final List<Double> fractionList = new ArrayList<Double>();
 
@@ -498,6 +487,8 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 			final String colorSetName = "Custom";
 			colorPresets.addColorSet(colorSetName, colorList, fractionList,
 					"#ffffff");
+			
+			LogBuffer.println("Custom colors saved.");
 		}
 
 		/**
@@ -773,13 +764,13 @@ public class ColorGradientChooser implements ConfigNodePersistent {
 									WindowConstants.DISPOSE_ON_CLOSE);
 					positionInputDialog.setTitle("New Position");
 
-					final JLabel enterPrompt = GUIFactory.createSmallLabel(
-							"Enter data value: ");
+					final JLabel enterPrompt = GUIFactory.createLabel(
+							"Enter data value: ", GUIFactory.FONTS);
 
 					final JTextField inputField = new JTextField();
 					inputField.setEditable(true);
 
-					final JButton okButton = GUIFactory.createButton("OK");
+					final JButton okButton = GUIFactory.createBtn("OK");
 					okButton.addActionListener(new ActionListener() {
 
 						@Override

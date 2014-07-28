@@ -6,8 +6,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import edu.stanford.genetics.treeview.GUIFactory;
-import edu.stanford.genetics.treeview.StringRes;
+import Utilities.GUIFactory;
+import Utilities.StringRes;
 
 /**
  * A class which prepares JPanels to display in case of errors during the data
@@ -49,7 +49,8 @@ public class LoadErrorView {
 
 		JPanel title_bg = GUIFactory.createJPanel(false, false, null);
 
-		JLabel jl = GUIFactory.createXXLLabel(StringRes.loading_Ohoh);
+		JLabel jl = GUIFactory.createLabel(StringRes.loading_Ohoh, 
+				GUIFactory.FONTXXL);
 
 		title_bg.add(jl, "push, alignx 50%, span");
 
@@ -60,15 +61,16 @@ public class LoadErrorView {
 		
 		homePanel.add(errorPanel, "push, alignx 50%");
 		
-		loadNew = GUIFactory.createButton(StringRes.button_LoadNewFile);
+		loadNew = GUIFactory.createBtn(StringRes.btn_LoadNewFile);
 	}
 
 	public JPanel makeErrorPanel() {
 
 		errorPanel.removeAll();
 		
-		JLabel errorLabel = GUIFactory.createBigLabel(StringRes.loading_Error);
-		JLabel message = GUIFactory.createSmallLabel(errorMessage);
+		JLabel errorLabel = GUIFactory.createLabel(StringRes.loading_Error, 
+				GUIFactory.FONTL);
+		JLabel message = GUIFactory.createLabel(errorMessage, GUIFactory.FONTS);
 
 		errorPanel.add(errorLabel, "pushx, alignx 50%, span, wrap");
 		errorPanel.add(message, "pushx, alignx 50%, span, wrap");

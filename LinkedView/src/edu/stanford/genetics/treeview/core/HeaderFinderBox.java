@@ -42,8 +42,8 @@ import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
+import Utilities.GUIFactory;
 import net.miginfocom.swing.MigLayout;
-import edu.stanford.genetics.treeview.GUIFactory;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.TreeSelectionI;
@@ -116,14 +116,14 @@ public abstract class HeaderFinderBox {
 		System.arraycopy(genefHeaders, 0, labeledHeaders, 1,
 				genefHeaders.length);
 
-		genefBox = GUIFactory.setWideComboLayout(labeledHeaders);
+		genefBox = GUIFactory.createWideComboBox(labeledHeaders);
 		genefBox.setEditable(true);
 		AutoCompleteDecorator.decorate(genefBox);
 		
 		genefBox.getEditor().getEditorComponent().addKeyListener(
 				new BoxKeyListener());
 
-		genefButton = GUIFactory.createNavButton("searchIcon");
+		genefButton = GUIFactory.createNavBtn("searchIcon");
 		genefButton.setToolTipText("Highlights the selected label.");
 		genefButton.addActionListener(new ActionListener() {
 

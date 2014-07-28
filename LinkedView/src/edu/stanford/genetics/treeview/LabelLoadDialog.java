@@ -8,7 +8,8 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.WindowConstants;
 
-import net.miginfocom.swing.MigLayout;
+import Utilities.GUIFactory;
+import Utilities.StringRes;
 
 public class LabelLoadDialog {
 
@@ -20,21 +21,18 @@ public class LabelLoadDialog {
 	public LabelLoadDialog(final ViewFrame view, String type) {
 
 		labelLoadFrame = new JDialog();
-		labelLoadFrame.setTitle("Loading Labels");
+		labelLoadFrame.setTitle(StringRes.dialog_title_loadLabels);
 		labelLoadFrame
 				.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		labelLoadFrame.setResizable(false);
 		labelLoadFrame.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
 
-		mainPanel = new JPanel();
-		mainPanel.setLayout(new MigLayout());
-		mainPanel.setBackground(GUIFactory.BG_COLOR);
+		mainPanel = GUIFactory.createJPanel(false, true, null);
 
-		prompt = new JLabel("Loading new " + type + " labels...");
-		prompt.setForeground(GUIFactory.TEXT);
-		prompt.setFont(GUIFactory.FONTL);
+		prompt = GUIFactory.createLabel("Loading new " + type + " labels...", 
+				GUIFactory.FONTM);
 
-		pBar = GUIFactory.setPBarLayout();
+		pBar = GUIFactory.createPBar();
 
 		mainPanel.add(prompt, "pushx, alignx 50%, span, wrap");
 		mainPanel.add(pBar, "pushx, alignx 50%, span");

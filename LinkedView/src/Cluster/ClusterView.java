@@ -40,8 +40,8 @@ import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
-import edu.stanford.genetics.treeview.GUIFactory;
-import edu.stanford.genetics.treeview.StringRes;
+import Utilities.GUIFactory;
+import Utilities.StringRes;
 
 /**
  * This class exists to internalize the clustering process directly into
@@ -154,22 +154,24 @@ public class ClusterView {
 	public void setupInteractiveComponents() {
 
 		// Button to begin Clustering
-		cluster_btn = GUIFactory.createButton(StringRes.button_Cluster);
+		cluster_btn = GUIFactory.createBtn(StringRes.btn_Cluster);
 
 		// Button to cancel worker thread in the controller
-		cancel_button = GUIFactory.createButton(StringRes.button_Cancel);
+		cancel_button = GUIFactory.createBtn(StringRes.btn_Cancel);
 
 		// Label for cluster process
-		loadLabel = GUIFactory.createSmallLabel(StringRes.clusterInfo_Ready);
+		loadLabel = GUIFactory.createLabel(StringRes.clusterInfo_Ready, 
+				GUIFactory.FONTS);
+		
 		// ProgressBar for clustering process
-		pBar = GUIFactory.setPBarLayout();
+		pBar = GUIFactory.createPBar();
 		pBar.setEnabled(false); //initially disabled
 
 		// ComboBox to choose cluster method
 		final String[] clusterNames = { StringRes.menu_title_Hier,
 				StringRes.menu_title_KMeans };
 
-		clusterType = GUIFactory.setComboLayout(clusterNames);
+		clusterType = GUIFactory.createComboBox(clusterNames);
 
 		clusterType.setSelectedIndex(Arrays.asList(clusterNames).indexOf(
 				clusterTypeID));
@@ -183,15 +185,15 @@ public class ClusterView {
 				StringRes.cluster_cityBlock };
 
 		// Drop-down menu for row selection
-		geneCombo = GUIFactory.setComboLayout(measurements);
+		geneCombo = GUIFactory.createComboBox(measurements);
 		geneCombo.setSelectedIndex(1);
 
 		// Drop-down menu for column selection
-		arrayCombo = GUIFactory.setComboLayout(measurements);
+		arrayCombo = GUIFactory.createComboBox(measurements);
 		arrayCombo.setSelectedIndex(1);
 
 		// Linkage choice drop-down menu
-		clusterChoice = GUIFactory.setComboLayout(clusterMethods);
+		clusterChoice = GUIFactory.createComboBox(clusterMethods);
 
 		// Spinners for K-Means
 		enterRC = setupSpinner();
@@ -253,18 +255,22 @@ public class ClusterView {
 		JPanel choicePanel = GUIFactory.createJPanel(false, true, null);
 		
 		// Components for choosing Cluster type
-		final JLabel type = GUIFactory.createBigLabel("Cluster Type");
-		final JLabel switchLabel = GUIFactory.createSmallLabel("Switch: ");
+		final JLabel type = GUIFactory.createLabel("Cluster Type", 
+				GUIFactory.FONTL);
+		final JLabel switchLabel = GUIFactory.createLabel("Switch: ", 
+				GUIFactory.FONTS);
 		
 		choicePanel.add(type, "pushx, alignx 0%, span, wrap");
 		choicePanel.add(switchLabel, "pushx, alignx 0%, w 20%");
 		choicePanel.add(clusterType, "pushx, alignx 0%, w 80%, wrap 20px");
 		
 		// Components for similarity measure options
-		final JLabel similarity = GUIFactory.createBigLabel("Similarity "
-				+ "Metric");
-		final JLabel rowLabel = GUIFactory.createSmallLabel("Rows: ");
-		final JLabel colLabel = GUIFactory.createSmallLabel("Columns: ");
+		final JLabel similarity = GUIFactory.createLabel("Similarity "
+				+ "Metric", GUIFactory.FONTL);
+		final JLabel rowLabel = GUIFactory.createLabel("Rows: ", 
+				GUIFactory.FONTS);
+		final JLabel colLabel = GUIFactory.createLabel("Columns: ", 
+				GUIFactory.FONTS);
 
 		choicePanel.add(similarity, "pushx, alignx 0%, span, wrap");
 		choicePanel.add(rowLabel, "pushx, alignx 0%, w 20%");
@@ -275,8 +281,10 @@ public class ClusterView {
 		// Components for linkage choice
 		// Hierarchical
 		if (clusterType.getSelectedIndex() == 0) {
-			final JLabel method = GUIFactory.createBigLabel("Linkage Method");
-			final JLabel choose = GUIFactory.createSmallLabel("Choose: ");
+			final JLabel method = GUIFactory.createLabel("Linkage Method", 
+					GUIFactory.FONTL);
+			final JLabel choose = GUIFactory.createLabel("Choose: ", 
+					GUIFactory.FONTS);
 			
 			choicePanel.add(method, "pushx, alignx 0%, span, wrap");
 			choicePanel.add(choose, "pushx, alignx 0%, w 20%");
@@ -284,15 +292,18 @@ public class ClusterView {
 
 		// K-means
 		} else {
-			final JLabel kMeans = GUIFactory.createBigLabel("K-Means Options");
-			final JLabel clusters = GUIFactory.createSmallLabel("Clusters: ");
-			final JLabel its = GUIFactory.createSmallLabel("Cycles: ");
-			final JLabel filler = GUIFactory.createSmallLabel(
-					StringRes.empty);
-			final JLabel rows = GUIFactory.createSmallLabel(
-					StringRes.main_rows);
-			final JLabel cols = GUIFactory.createSmallLabel(
-					StringRes.main_cols);
+			final JLabel kMeans = GUIFactory.createLabel("K-Means Options", 
+					GUIFactory.FONTL);
+			final JLabel clusters = GUIFactory.createLabel("Clusters: ", 
+					GUIFactory.FONTS);
+			final JLabel its = GUIFactory.createLabel("Cycles: ", 
+					GUIFactory.FONTS);
+			final JLabel filler = GUIFactory.createLabel(StringRes.empty, 
+					GUIFactory.FONTS);
+			final JLabel rows = GUIFactory.createLabel(StringRes.main_rows, 
+					GUIFactory.FONTS);
+			final JLabel cols = GUIFactory.createLabel(StringRes.main_cols, 
+					GUIFactory.FONTS);
 			
 			choicePanel.add(kMeans, "pushx, alignx 0%, span, wrap");
 			
@@ -459,13 +470,10 @@ public class ClusterView {
 	 * @param choice
 	 * @param choice2
 	 */
-	public void setLoadPanel() {//final String choice, final String choice2) {
-
-//		if (!choice.contentEquals(StringRes.cluster_DoNot)
-//				|| !choice2.contentEquals(StringRes.cluster_DoNot)) {
-			loadPanel.add(loadLabel, "pushx, alignx 50%, wrap");
-			loadPanel.add(pBar, "pushx, w 90%, alignx 50%, wrap");
-//		}
+	public void setLoadPanel() {
+		
+		loadPanel.add(loadLabel, "pushx, alignx 50%, wrap");
+		loadPanel.add(pBar, "pushx, w 90%, alignx 50%, wrap");
 	}
 
 	/**
@@ -578,7 +586,7 @@ public class ClusterView {
 	 */
 	public void setPBarMax(final int max) {
 
-		pBar.setMaximum(max);
+		pBar.setMaximum(max); 
 	}
 
 	/**

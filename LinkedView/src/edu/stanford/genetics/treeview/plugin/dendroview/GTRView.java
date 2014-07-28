@@ -52,6 +52,7 @@ public class GTRView extends ModelViewBuffered implements MouseListener,
 
 	protected HeaderSummary headerSummary = new HeaderSummary("GtrSummary");
 
+	private HeaderInfo gtrHI;
 	private MapContainer map;
 	private TreePainter drawer = null;
 	private TreeDrawerNode selectedNode = null;
@@ -165,6 +166,11 @@ public class GTRView extends ModelViewBuffered implements MouseListener,
 	public HeaderSummary getHeaderSummary() {
 
 		return headerSummary;
+	}
+	
+	public void setGTRHeaderInfo(HeaderInfo gtrHI) {
+		
+		this.gtrHI = gtrHI;
 	}
 
 	public void setSelectedNode(final TreeDrawerNode n) {
@@ -332,15 +338,13 @@ public class GTRView extends ModelViewBuffered implements MouseListener,
 			} else {
 				final int[] nameIndex = getHeaderSummary().getIncluded();
 				status = new String[nameIndex.length * 2];
-				final HeaderInfo gtrInfo = getViewFrame().getDataModel()
-						.getGtrHeaderInfo();
-				final String[] names = gtrInfo.getNames();
+				final String[] names = gtrHI.getNames();
 
 				for (int i = 0; i < nameIndex.length; i++) {
 					status[2 * i] = names[nameIndex[i]] + ":";
 					status[2 * i + 1] = " "
-							+ gtrInfo.getHeader(gtrInfo
-									.getHeaderIndex(selectedNode.getId()))[nameIndex[i]];
+							+ gtrHI.getHeader(gtrHI.getHeaderIndex(
+									selectedNode.getId()))[nameIndex[i]];
 				}
 			}
 		} else {

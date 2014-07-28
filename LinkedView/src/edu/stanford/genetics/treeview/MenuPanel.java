@@ -5,6 +5,7 @@ import java.awt.Cursor;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import Utilities.GUIFactory;
 import net.miginfocom.swing.MigLayout;
 
 public class MenuPanel {
@@ -15,13 +16,9 @@ public class MenuPanel {
 
 	public MenuPanel(final String title) {
 
-		menuPanel = new JPanel();
-		menuPanel.setLayout(new MigLayout());
-		menuPanel.setBackground(GUIFactory.BG_COLOR);
+		menuPanel = GUIFactory.createJPanel(false, true, null);
 
-		label = new JLabel(title);
-		label.setFont(GUIFactory.FONTS);
-		label.setForeground(GUIFactory.TEXT);
+		label = GUIFactory.createLabel(title, GUIFactory.FONTS);
 
 		menuPanel.add(label, "push");
 	}

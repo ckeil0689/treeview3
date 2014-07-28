@@ -3,8 +3,8 @@ package Cluster;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import edu.stanford.genetics.treeview.GUIFactory;
-import edu.stanford.genetics.treeview.StringRes;
+import Utilities.GUIFactory;
+import Utilities.StringRes;
 
 /**
  * Provides a JPanel that displays information about a selected cluster
@@ -32,31 +32,35 @@ public class ClusterInfoFactory {
 		
 		mainPanel.removeAll();
 		
-		JLabel label = GUIFactory.createBigLabel("Linkage Method Details");
+		JLabel label = GUIFactory.createLabel("Linkage Method Details", 
+				GUIFactory.FONTL);
 		
 		mainPanel.add(label, "pushx, alignx 0%, aligny 0%, span, wrap");
 		
-		JLabel similarity = GUIFactory.createSmallLabel("Similarity: ");
+		JLabel similarity = GUIFactory.createLabel("Similarity: ", 
+				GUIFactory.FONTS);
 		
 		TextDisplay similarityText = new TextDisplay(
 				getSimilarity(methodIndex));
 		
-		JLabel type = GUIFactory.createSmallLabel("Type: ");
+		JLabel type = GUIFactory.createLabel("Type: ", GUIFactory.FONTS);
 		
 		TextDisplay typeText = new TextDisplay(
 				getType(methodIndex));
 		
-		JLabel time = GUIFactory.createSmallLabel("Time: ");
+		JLabel time = GUIFactory.createLabel("Time: ", GUIFactory.FONTS);
 		
 		TextDisplay timeText = new TextDisplay(
 				getTime(methodIndex));
 		
-		JLabel advantage = GUIFactory.createSmallLabel("Advantages: ");
+		JLabel advantage = GUIFactory.createLabel("Advantages: ", 
+				GUIFactory.FONTS);
 		
 		TextDisplay advantageText = new TextDisplay(
 				getAdvantage(methodIndex));
 		
-		JLabel disadvantage = GUIFactory.createSmallLabel("Disadvantages: ");
+		JLabel disadvantage = GUIFactory.createLabel("Disadvantages: ", 
+				GUIFactory.FONTS);
 		
 		TextDisplay disadvantageText = new TextDisplay(
 				getDisadvantage(methodIndex));
@@ -92,11 +96,13 @@ public class ClusterInfoFactory {
 		
 		mainPanel.removeAll();
 		
-		JLabel label = GUIFactory.createBigLabel("K-Means Details");
+		JLabel label = GUIFactory.createLabel("K-Means Details", 
+				GUIFactory.FONTL);
 		
 		mainPanel.add(label, "pushx, alignx 0%, aligny 0%, span, wrap");
 		
-		JLabel similarity = GUIFactory.createSmallLabel("Similarity: ");
+		JLabel similarity = GUIFactory.createLabel("Similarity: ", 
+				GUIFactory.FONTS);
 		
 		TextDisplay similarityText = new TextDisplay(
 				getSimilarity(KMEANS_INDEX));

@@ -69,7 +69,6 @@ public abstract class ModelView extends JPanel implements Observer,
 	protected ModelView() {
 
 		super(false);
-//		setBackground(GUIFactory.BG_COLOR);
 	}
 
 	/**
@@ -117,7 +116,7 @@ public abstract class ModelView extends JPanel implements Observer,
 	}
 
 	/**
-	 * Update the double buffer, if buffered Otherwise, just called by
+	 * Update the double buffer, if buffered. Otherwise, just called by
 	 * paintComponent to paint the main component.
 	 * 
 	 * called only when offscreen buffer is marked as invalid, or if the

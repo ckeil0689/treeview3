@@ -9,6 +9,8 @@ import java.awt.RenderingHints;
 
 import javax.swing.JButton;
 
+import Utilities.GUIFactory;
+
 /**
  * Custom JButton with overridden paintComponent method. 
  * @author CKeil

@@ -1,9 +1,12 @@
 package Cluster;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Arrays;
+
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
+
+import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
  * This class is used to calculate a distance matrix based on input data. It
@@ -18,22 +21,26 @@ public class DistanceMatrixCalculator {
 
 	// Instance variables
 	// list with all genes and their distances to all other genes
-	private final List<List<Double>> distanceList = 
-			new ArrayList<List<Double>>();
-	private final List<List<Double>> fullList;
-	
+	private final double PRECISION_LEVEL = 0.0001;
+	private double[][] distanceMatrix;
+	private final double[][] dataArrays;
+
 	private final ClusterView clusterView;
 	private final String choice;
+	private final String type;
+
+	private final SwingWorker<String[], Void> worker;
 
 	// Constructor
-	public DistanceMatrixCalculator(final List<List<Double>> fullList, 
-			final String choice, final ClusterView clusterView) {
+	public DistanceMatrixCalculator(final double[][] fullList, final String choice,
+			final String type, final ClusterView clusterView,
+			final SwingWorker<String[], Void> worker) {
 
-		this.fullList = fullList;
+		this.dataArrays = fullList;
 		this.choice = choice;
 		this.clusterView = clusterView;
-		
-		clusterView.setLoadText("Calculating distance matrix...");
+		this.type = type;
+		this.worker = worker;
 	}
 
 	// Methods to calculate distance matrix
@@ -42,35 +49,43 @@ public class DistanceMatrixCalculator {
 	 * The parameters allow for selection of different versions of the Pearson
 	 * correlation (absolute Pearson correlation, centered vs. uncentered).
 	 * 
-	 * @param fullList
+	 * @param dataArrays
 	 * @param absolute
 	 * @param centered
 	 * @return List<List<Double> distance matrix
 	 */
 	public void pearson(final boolean absolute, final boolean centered) {
 
+		// Just checking for debugging
+		LogBuffer.println("Is DMCalculatorArrays.pearson() on EDT? " 
+				+ SwingUtilities.isEventDispatchThread());
+				
 		// Reset in case Spearman Rank was used
-		clusterView.setLoadText("Calculating Distance Matrix...");
-		
-		clusterView.setPBarMax(fullList.size());
+		clusterView.setLoadText("Calculating " + type + " Distance Matrix...");
+
+		clusterView.setPBarMax(dataArrays.length);
 
 		// making sure distanceList is clear
-		distanceList.clear();
+		distanceMatrix = new double[dataArrays.length][];
 
 		// take a gene
-		for (int i = 0; i < fullList.size(); i++) {
+		for (int i = 0; i < dataArrays.length; i++) {
+
+			if (worker.isCancelled()) {
+				break;
+			}
 
 			// update progressbar
 			clusterView.updatePBar(i);
 
 			// refers to one gene with all it's data
-			final List<Double> data = fullList.get(i);
+			final double[] data = dataArrays[i];
 
 			// pearson values of one gene compared to all others
-			final List<Double> pearsonList = new ArrayList<Double>();
+			final double[] pearsonList = new double[dataArrays.length];
 
 			// second gene for comparison
-			for (int j = 0; j < fullList.size(); j++) {
+			for (int j = 0; j < dataArrays.length; j++) {
 
 				// local variables
 				double xi = 0;
@@ -89,7 +104,7 @@ public class DistanceMatrixCalculator {
 				double finalVal = 0;
 				BigDecimal pearson2;
 
-				final List<Double> data2 = fullList.get(j);
+				final double[] data2 = dataArrays[j];
 
 				if (centered) {// causes issues in cluster(????)
 					for (final double x : data) {
@@ -97,14 +112,14 @@ public class DistanceMatrixCalculator {
 						mean_sumX += x;
 					}
 
-					mean_x = mean_sumX / data.size(); // casted int to double
+					mean_x = mean_sumX / data.length; // casted int to double
 
 					for (final double y : data2) {
 
 						mean_sumY += y;
 					}
 
-					mean_y = mean_sumY / data2.size();
+					mean_y = mean_sumY / data2.length;
 
 				} else {// works great in cluster
 
@@ -113,14 +128,14 @@ public class DistanceMatrixCalculator {
 				}
 
 				// compare each value of both genes
-				for (int k = 0; k < data.size(); k++) {
+				for (int k = 0; k < data.length; k++) {
 
 					// part x
-					xi = data.get(k);
+					xi = data[k];
 					sumX += (xi - mean_x) * (xi - mean_x);
 
 					// part y
-					yi = data2.get(k);
+					yi = data2[k];
 					sumY += (yi - mean_y) * (yi - mean_y);
 
 					// part xy
@@ -132,12 +147,17 @@ public class DistanceMatrixCalculator {
 
 				// calculate pearson value for current gene pair
 				rootProduct = (sumX_root * sumY_root);
-
-				if (absolute) {
-					finalVal = Math.abs(sumXY / rootProduct);
-
+				
+				if(rootProduct == 0) {
+					finalVal = 1.0;
+					
 				} else {
-					finalVal = sumXY / rootProduct;
+					if (absolute) {
+						finalVal = Math.abs(sumXY / rootProduct);
+	
+					} else {
+						finalVal = sumXY / rootProduct;
+					}
 				}
 
 				pearson1 = 1.0 - finalVal;
@@ -148,10 +168,10 @@ public class DistanceMatrixCalculator {
 				pearson2 = new BigDecimal(String.valueOf(pearson1));
 				pearson2 = pearson2.setScale(10, BigDecimal.ROUND_DOWN);
 
-				pearsonList.add(pearson2.doubleValue());
+				pearsonList[j] = pearson2.doubleValue();
 			}
 
-			distanceList.add(pearsonList);
+			distanceMatrix[i] = pearsonList;
 		}
 	}
 
@@ -162,24 +182,39 @@ public class DistanceMatrixCalculator {
 	 */
 	public void spearman() {
 
-		// making sure distanceList is clear
-		distanceList.clear();
-		
-		clusterView.setLoadText("Getting Spearman Ranks...");
+		// Just checking for debugging
+		LogBuffer.println("Is DMCalculatorArrays.spearman() on EDT? " 
+				+ SwingUtilities.isEventDispatchThread());
+				
+		clusterView.setLoadText("Getting " + type + " Spearman Ranks...");
 
-		for (int i = 0; i < fullList.size(); i++) {
-			
+		for (int i = 0; i < dataArrays.length; i++) {
+
+			if (worker.isCancelled()) {
+				break;
+			}
+
 			clusterView.updatePBar(i);
 
-			final List<Double> copyRow = new ArrayList<Double>(fullList.get(i));
+			// Make a copy row to avoid mutation
+			final double[] copyRow = dataArrays[i].clone();
 
-			Collections.sort(copyRow);
+			// Sort the copy row
+			Arrays.sort(copyRow);
 
-			for (int j = 0; j < copyRow.size(); j++) {
+			// Iterate over sorted copy row to
+			for (int j = 0; j < copyRow.length; j++) {
 
 				final Double rank = (double) j;
-				fullList.get(i).set(fullList.get(i).indexOf(copyRow.get(j)), 
-						rank);
+				final int index = find(dataArrays[i], copyRow[j]);
+
+				if (index != -1) {
+					dataArrays[i][index] = rank;
+
+				} else {
+					LogBuffer.println("Spearman rank distance calc "
+							+ "went wrong.");
+				}
 			}
 		}
 
@@ -192,45 +227,55 @@ public class DistanceMatrixCalculator {
 	 */
 	public void euclid() {
 
+		// Just checking for debugging
+		LogBuffer.println("Is DMCalculatorArrays.euclid() on EDT? " 
+				+ SwingUtilities.isEventDispatchThread());
+		
 		// local variables
 		double sDist = 0;
 		double g1 = 0;
 		double g2 = 0;
 		double gDiff = 0;
 
-		clusterView.setPBarMax(fullList.size());
+		clusterView.setLoadText("Calculating " + type + " Distance Matrix...");
+
+		clusterView.setPBarMax(dataArrays.length);
 
 		// making sure distanceList is empty
-		distanceList.clear();
+		distanceMatrix = new double[dataArrays.length][];
 
 		// take a gene
-		for (int i = 0; i < fullList.size(); i++) {
+		for (int i = 0; i < dataArrays.length; i++) {
+
+			if (worker.isCancelled()) {
+				break;
+			}
 
 			// update progressbar
 			clusterView.updatePBar(i);
 
 			// refers to one gene with all it's data
-			final List<Double> gene = fullList.get(i);
+			final double[] gene = dataArrays[i];
 
 			// distances of one gene to all others
-			final List<Double> geneDistance = new ArrayList<Double>();
+			final double[] geneDistance = new double[dataArrays.length];
 
 			// choose a gene for distance comparison
-			for (int j = 0; j < fullList.size(); j++) {
+			for (int j = 0; j < dataArrays.length; j++) {
 
-				final List<Double> gene2 = fullList.get(j);
+				final double[] gene2 = dataArrays[j];
 
 				// squared differences between elements of 2 genes
-				final List<Double> sDiff = new ArrayList<Double>();
+				final double[] sDiff = new double[gene.length];
 
 				// compare each value of both genes
-				for (int k = 0; k < gene.size(); k++) {
+				for (int k = 0; k < gene.length; k++) {
 
-					g1 = gene.get(k);
-					g2 = gene2.get(k);
+					g1 = gene[k];
+					g2 = gene2[k];
 					gDiff = g1 - g2;
 					sDist = gDiff * gDiff;
-					sDiff.add(sDist);
+					sDiff[k] = sDist;
 				}
 
 				// sum all the squared value distances up
@@ -241,13 +286,13 @@ public class DistanceMatrixCalculator {
 				}
 
 				double divSum = 0;
-				divSum = sum / fullList.size();
+				divSum = sum / dataArrays.length;
 
-				geneDistance.add(divSum);
+				geneDistance[j] = divSum;
 			}
 
 			// list with all genes and their distances to the other genes
-			distanceList.add(geneDistance);
+			distanceMatrix[i] = geneDistance;
 		}
 	}
 
@@ -256,44 +301,53 @@ public class DistanceMatrixCalculator {
 	 */
 	public void cityBlock() {
 
+		// Just checking for debugging
+		LogBuffer.println("Is DMCalculatorArrays.cityBlock() on EDT? " 
+				+ SwingUtilities.isEventDispatchThread());
+				
 		// local variables
 		double g1 = 0;
 		double g2 = 0;
 		double gDiff = 0;
 
-		clusterView.setPBarMax(fullList.size());
+		clusterView.setLoadText("Calculating " + type + " Distance Matrix...");
+		clusterView.setPBarMax(dataArrays.length);
 
 		// making sure distanceList is clear
-		distanceList.clear();
+		distanceMatrix = new double[dataArrays.length][];
 
 		// take a gene
-		for (int i = 0; i < fullList.size(); i++) {
+		for (int i = 0; i < dataArrays.length; i++) {
+
+			if (worker.isCancelled()) {
+				break;
+			}
 
 			// update progressbar
 			clusterView.updatePBar(i);
 
 			// refers to one gene with all it's data
-			final List<Double> data = fullList.get(i);
+			final double[] data = dataArrays[i];
 
 			// distances of one gene to all others
-			final List<Double> dataDistance = new ArrayList<Double>();
+			final double[] dataDistance = new double[dataArrays.length];
 
 			// choose a gene for distance comparison
-			for (int j = 0; j < fullList.size(); j++) {
+			for (int j = 0; j < dataArrays.length; j++) {
 
-				final List<Double> data2 = fullList.get(j);
+				final double[] data2 = dataArrays[j];
 
 				// differences between elements of 2 genes
-				final List<Double> sDiff = new ArrayList<Double>();
+				final double[] sDiff = new double[data.length];
 
 				// compare each value of both genes
-				for (int k = 0; k < data.size(); k++) {
+				for (int k = 0; k < data.length; k++) {
 
-					g1 = data.get(k);
-					g2 = data2.get(k);
+					g1 = data[k];
+					g2 = data2[k];
 					gDiff = g1 - g2;
 					gDiff = Math.abs(gDiff);
-					sDiff.add(gDiff);
+					sDiff[k] = gDiff;
 				}
 
 				// sum all the squared value distances up
@@ -304,19 +358,38 @@ public class DistanceMatrixCalculator {
 					sum += element;
 				}
 
-				dataDistance.add(sum);
+				dataDistance[j] = sum;
 			}
 
 			// list with all genes and their distances to the other genes
-			distanceList.add(dataDistance);
+			distanceMatrix[i] = dataDistance;
 		}
+	}
+
+	/**
+	 * Finds the index of a value in a double array.
+	 * 
+	 * @param array
+	 * @param value
+	 * @return
+	 */
+	public int find(final double[] array, final double value) {
+
+		for (int i = 0; i < array.length; i++) {
+
+			if (Math.abs(array[i] - value) < PRECISION_LEVEL) {
+				return i;
+			}
+		}
+
+		return -1;
 	}
 
 	/**
 	 * Chooses appropriate distance measure according to user GUI selection.
 	 */
 	public void measureDistance() {
-		
+
 		if (choice.equalsIgnoreCase("Pearson Correlation (uncentered)")) {
 			pearson(false, false);
 
@@ -347,8 +420,8 @@ public class DistanceMatrixCalculator {
 	}
 
 	// Accessor method to retrieve the distance matrix
-	public List<List<Double>> getDistanceMatrix() {
+	public double[][] getDistanceMatrix() {
 
-		return distanceList;
+		return distanceMatrix;
 	}
 }

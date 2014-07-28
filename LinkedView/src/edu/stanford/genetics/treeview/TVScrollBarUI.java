@@ -9,6 +9,8 @@ import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicScrollBarUI;
 
+import Utilities.GUIFactory;
+
 /**
  * Custom ScrollBar UI to be used with any JScrollBars. GLobal implementation
  * is achieved by setting the JScrollBar UI to this class in the UI manager in

@@ -65,6 +65,7 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 
 	protected HeaderSummary headerSummary = new HeaderSummary("AtrSummary");
 
+	private HeaderInfo atrHI;
 	private TreeSelectionI arraySelection;
 	private LinearTransformation xScaleEq, yScaleEq;
 	private MapContainer map;
@@ -311,14 +312,12 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 			} else {
 				final int[] nameIndex = getHeaderSummary().getIncluded();
 				status = new String[nameIndex.length * 2];
-				final HeaderInfo atrInfo = getViewFrame().getDataModel()
-						.getAtrHeaderInfo();
-				final String[] names = atrInfo.getNames();
+				final String[] names = atrHI.getNames();
 				for (int i = 0; i < nameIndex.length; i++) {
 					status[2 * i] = names[nameIndex[i]] + ":";
 					status[2 * i + 1] = " "
-							+ atrInfo.getHeader(atrInfo
-									.getHeaderIndex(selectedNode.getId()))[nameIndex[i]];
+							+ atrHI.getHeader(atrHI.getHeaderIndex(
+									selectedNode.getId()))[nameIndex[i]];
 				}
 			}
 		} else {
@@ -340,6 +339,11 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 	public HeaderSummary getHeaderSummary() {
 
 		return headerSummary;
+	}
+	
+	public void setATRHeaderInfo(final HeaderInfo atrHI) {
+		
+		this.atrHI = atrHI;
 	}
 
 	/* inherit description */
@@ -384,10 +388,6 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 	public void mouseClicked(final MouseEvent e) {
 
 		if (!isEnabled()) {
-			return;
-		}
-
-		if (this == null) {
 			return;
 		}
 

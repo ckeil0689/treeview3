@@ -43,16 +43,16 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
+import Utilities.GUIFactory;
+import Utilities.StringRes;
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.DataModel;
-import edu.stanford.genetics.treeview.GUIFactory;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.RotateImageFilter;
-import edu.stanford.genetics.treeview.StringRes;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.UrlExtractor;
 
@@ -74,6 +74,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 	 * HeaderInfo containing the names of the arrays.
 	 */
 	protected HeaderInfo headerInfo = null;
+	protected HeaderSummary headerSummary = new HeaderSummary("ArraySummary");
 	protected DataModel dataModel = null;
 
 	private String face;
@@ -115,10 +116,10 @@ public class ArrayNameView extends ModelView implements MouseListener,
 //		this.headerSummary = new HeaderSummary("ArraySummary");
 //		headerSummary.setIncluded(new int[] { 0 });
 //		headerSummary.addObserver(this);
-
+		
 		addMouseListener(this);
 
-		l1 = GUIFactory.createSmallLabel("");
+		l1 = GUIFactory.createLabel("", GUIFactory.FONTS);
 
 		add(l1, "alignx 50%, aligny 100%, push");
 
@@ -135,23 +136,13 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		return scrollPane.getVerticalScrollBar();
 	}
 	
-	public void generateView(final HeaderInfo hInfo, 
-			final UrlExtractor uExtractor) {
-		
-		this.headerInfo = hInfo;
+	public void generateView(final UrlExtractor uExtractor) {
+
 		this.urlExtractor = uExtractor;
 
-		this.headerSummary = new HeaderSummary("ArraySummary");
+//		this.headerSummary = new HeaderSummary("ArraySummary");
 		headerSummary.setIncluded(new int[] { 0 });
 		headerSummary.addObserver(this);
-	}
-	
-	/**
-	 * Set the colors of all the components to the currently active scheme.
-	 */
-	public void setColors() {
-		
-		l1.setForeground(GUIFactory.TEXT);
 	}
 
 	public HeaderInfo getHeaderInfo() {
@@ -200,9 +191,9 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		final int bgColorIndex = headerInfo.getIndex("BGCOLOR");
 		int gidRow = headerInfo.getIndex("GID");
 
-		g.setColor(this.getBackground());// Color.white);
+		g.setColor(this.getBackground());
 		g.fillRect(0, 0, maxlength, offscreenSize.width);
-		g.setColor(GUIFactory.TEXT);// Color.black);
+		g.setColor(Color.black);
 
 		if (gidRow == -1) {
 			gidRow = 0;
@@ -251,7 +242,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 						g.setColor(back);
 					}
 				} else {
-					g.setColor(GUIFactory.DARKGRAY);// Color.gray);
+					g.setColor(Color.gray);
 					g.drawString(out, 0, map.getMiddlePixel(j) + ascent / 2);
 					g.setColor(back);
 				}
@@ -276,9 +267,9 @@ public class ArrayNameView extends ModelView implements MouseListener,
 
 	public void updateBuffer(final Graphics g, final Dimension offscreenSize) {
 
-		g.setColor(this.getBackground());// Color.white);
+		g.setColor(this.getBackground());
 		g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
-		g.setColor(GUIFactory.TEXT);// Color.black);
+		g.setColor(Color.black);
 
 		if (map.getScale() > 12.0) {
 			l1.setText("");
@@ -357,7 +348,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 									g.setColor(fore);
 								}
 							} else {
-								g2d.setColor(GUIFactory.TEXT);
+								g2d.setColor(Color.black);
 								// g2d.drawString(out, 0, map.getMiddlePixel(j)
 								// + ascent / 2);
 								// g.setColor(fore);
@@ -539,7 +530,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 			selectionChanged();
 
 		} else {
-			System.out.println("ArrayNameView got funny update!");
+			LogBuffer.println("ArrayNameView got funny update!");
 		}
 	}
 
@@ -656,7 +647,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		}
 	}
 
-	private HeaderSummary headerSummary;
+//	private HeaderSummary headerSummary;
 
 	/** Setter for headerSummary */
 	public void setHeaderSummary(final HeaderSummary headerSummary) {
@@ -692,7 +683,6 @@ public class ArrayNameView extends ModelView implements MouseListener,
 			}
 		}
 
-		// if (configNode.fetchFirst("ArraySummary") == null) {
 		if (!nodePresent) {
 			getHeaderSummary().setConfigNode(configNode);
 			getHeaderSummary().setIncluded(new int[] { 0 });
@@ -700,7 +690,6 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		} else {
 			// Actually get first subNode here...
 			getHeaderSummary().setConfigNode(configNode);
-			// .bindConfig(configNode.fetchFirst("ArraySummary"));
 		}
 
 		setFace(configNode.get("face", d_face));

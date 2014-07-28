@@ -40,9 +40,9 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.CdtFilter;
 import edu.stanford.genetics.treeview.FileSet;
-import edu.stanford.genetics.treeview.GUIFactory;
 
 /**
  * This class allows you to edit the file mru, and also get some info about them
@@ -198,7 +198,7 @@ public class FileMruEditor {
 		buttonArrangement = new ButtonArrangement();
 		buttonArrangement.setThingsSelected(false);
 
-		final JLabel l1 = GUIFactory.createSmallLabel(getTitle());
+		final JLabel l1 = GUIFactory.createLabel(getTitle(), GUIFactory.FONTS);
 		final JPanel upper = fileSetDisplay.getFileSetPanel();
 		final JPanel buttonPanel = buttonArrangement.getButtonPanel();
 
@@ -360,7 +360,7 @@ public class FileMruEditor {
 
 			buttonPanel = GUIFactory.createJPanel(false, true, null);
 
-			openButton = GUIFactory.createButton("Open");
+			openButton = GUIFactory.createBtn("Open");
 			openButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -370,7 +370,7 @@ public class FileMruEditor {
 			});
 			// this.add(openButton); not sure about this...
 
-			searchButton = GUIFactory.createButton("Find");
+			searchButton = GUIFactory.createBtn("Find");
 			searchButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -381,7 +381,7 @@ public class FileMruEditor {
 			});
 			buttonPanel.add(searchButton, "pushx");
 
-			deleteButton = GUIFactory.createButton("Remove");
+			deleteButton = GUIFactory.createBtn("Remove");
 			deleteButton.addActionListener(new ActionListener() {
 				
 				@Override
@@ -392,7 +392,7 @@ public class FileMruEditor {
 			});
 			buttonPanel.add(deleteButton, "pushx");
 
-			deleteAllButton = GUIFactory.createButton("Remove All");
+			deleteAllButton = GUIFactory.createBtn("Remove All");
 			deleteAllButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -403,7 +403,7 @@ public class FileMruEditor {
 			});
 			buttonPanel.add(deleteAllButton, "pushx");
 
-			closeButton = GUIFactory.createButton("Close");
+			closeButton = GUIFactory.createBtn("Close");
 			closeButton.addActionListener(new ActionListener() {
 
 				@Override

@@ -10,6 +10,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
+import Utilities.GUIFactory;
+
 public class ConfirmDialog {
 
 	private final JDialog confirmDialog;
@@ -26,13 +28,13 @@ public class ConfirmDialog {
 
 		final JPanel mainPanel = GUIFactory.createJPanel(false, true, null);
 
-		final JLabel prompt = GUIFactory.createSmallLabel("Are you sure "
-				+ "you want to " + function + "?");
+		final JLabel prompt = GUIFactory.createLabel("Are you sure "
+				+ "you want to " + function + "?", GUIFactory.FONTS);
 		
-		final JButton ok = GUIFactory.createButton("OK");
+		final JButton ok = GUIFactory.createBtn("OK");
 		ok.addActionListener(new ConfirmListener());
 
-		final JButton cancel = GUIFactory.createButton("Cancel");
+		final JButton cancel = GUIFactory.createBtn("Cancel");
 		cancel.addActionListener(new DenyListener());
 
 		mainPanel.add(prompt, "push, alignx 50%, span, wrap");

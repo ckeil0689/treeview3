@@ -6,7 +6,10 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
+
 import javax.swing.JToggleButton;
+
+import Utilities.GUIFactory;
 
 /**
  * Custom JButton with overridden paintComponent method. 

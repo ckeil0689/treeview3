@@ -1,12 +1,9 @@
 package Controllers;
 
-import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -49,7 +46,6 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DoubleArrayDrawer;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreeColorer;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreePainter;
-//import edu.stanford.genetics.treeview.plugin.dendroview.LeftTreeDrawer;
 
 public class DendroController implements ConfigNodePersistent {
 
@@ -93,6 +89,7 @@ public class DendroController implements ConfigNodePersistent {
 		this.tvModel = tvModel;
 
 		setConfigNode(tvFrame.getConfigNode());
+		updateHeaderInfo();
 		bindComponentFunctions();
 		setTreesVis(configNode.getBoolean("treesVisible", false));
 
@@ -125,79 +122,16 @@ public class DendroController implements ConfigNodePersistent {
 	public void addMenuButtonListeners() {
 
 		dendroView.addSearchButtonListener(new SearchButtonListener());
-		dendroView
-				.addSearchButtonClickListener(new SearchButtonClickListener());
 		dendroView.addTreeButtonListener(new TreeButtonListener());
-		dendroView.addTreeButtonClickListener(new TreeButtonClickListener());
 	}
 
-	class SearchButtonListener implements MouseListener {
-
-		@Override
-		public void mouseClicked(final MouseEvent e) {
-		}
-
-		@Override
-		public void mouseEntered(final MouseEvent e) {
-
-			e.getComponent().setCursor(new Cursor(Cursor.HAND_CURSOR));
-		}
-
-		@Override
-		public void mouseExited(final MouseEvent e) {
-
-			e.getComponent().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-		}
-
-		@Override
-		public void mousePressed(final MouseEvent e) {
-		}
-
-		@Override
-		public void mouseReleased(final MouseEvent arg0) {
-		}
-	}
-
-	class SearchButtonClickListener implements ActionListener {
+	class SearchButtonListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			dendroView.openSearchDialog();
-		}
-	}
-
-	/**
-	 * Listener for the button that handles cursor change when the mouse enters
-	 * its area.
-	 * 
-	 * @author CKeil
-	 * 
-	 */
-	class TreeButtonListener implements MouseListener {
-
-		@Override
-		public void mouseClicked(final MouseEvent e) {
-		}
-
-		@Override
-		public void mouseEntered(final MouseEvent e) {
-
-			e.getComponent().setCursor(new Cursor(Cursor.HAND_CURSOR));
-		}
-
-		@Override
-		public void mouseExited(final MouseEvent e) {
-
-			e.getComponent().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-		}
-
-		@Override
-		public void mousePressed(final MouseEvent e) {
-		}
-
-		@Override
-		public void mouseReleased(final MouseEvent arg0) {
+			dendroView.openSearchDialog(tvModel.getGeneHeaderInfo(), 
+					tvModel.getArrayHeaderInfo());
 		}
 	}
 
@@ -210,7 +144,7 @@ public class DendroController implements ConfigNodePersistent {
 	 * @author CKeil
 	 * 
 	 */
-	class TreeButtonClickListener implements ActionListener {
+	class TreeButtonListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
@@ -333,6 +267,8 @@ public class DendroController implements ConfigNodePersistent {
 	 * @param mode
 	 */
 	public void setMatrixSize(String mode) {
+		
+		// Checked, runs on EDT
 		
 		if(mode.equalsIgnoreCase("fill")) {
 			// Change so that height-/widthChange can be set directly
@@ -813,11 +749,7 @@ public class DendroController implements ConfigNodePersistent {
 		// contrast to documentConfig.
 		dArrayDrawer.setDataMatrix(tvModel.getDataMatrix());
 		dArrayDrawer.recalculateContrast();
-		dArrayDrawer.setConfigNode("ArrayDrawer1");// getFirst("ArrayDrawer"));
-
-		// Headers for GlobalView
-		dendroView.getGlobalView().setHeaders(tvModel.getGeneHeaderInfo(),
-				tvModel.getArrayHeaderInfo());
+		dArrayDrawer.setConfigNode("ArrayDrawer1");
 
 		// globalmaps tell globalview, atrview, and gtrview
 		// where to draw each data point.
@@ -845,9 +777,6 @@ public class DendroController implements ConfigNodePersistent {
 		// perhaps I could remember this stuff in the MapContainer...
 		globalXmap.setIndexRange(0, tvModel.getDataMatrix().getNumCol() - 1);
 		globalYmap.setIndexRange(0, tvModel.getDataMatrix().getNumRow() - 1);
-
-		// Ensuring window resizing works with GlobalView
-		// resetMapContainers();
 	}
 
 	/**
@@ -880,6 +809,20 @@ public class DendroController implements ConfigNodePersistent {
 
 		dendroView.getGlobalView().setXMap(globalXmap);
 		dendroView.getGlobalView().setYMap(globalYmap);
+	}
+	
+	/**
+	 * Updates all headerInfo instances for all the view components.
+	 */
+	public void updateHeaderInfo() {
+		
+		dendroView.getAtrview().setATRHeaderInfo(tvModel.getAtrHeaderInfo());
+		dendroView.getGtrview().setGTRHeaderInfo(tvModel.getGtrHeaderInfo());
+		dendroView.getArraynameview().setHeaderInfo(
+				tvModel.getArrayHeaderInfo());
+		dendroView.getTextview().setHeaderInfo(tvModel.getGeneHeaderInfo());
+		dendroView.getGlobalView().setHeaders(tvModel.getGeneHeaderInfo(),
+				tvModel.getArrayHeaderInfo());
 	}
 
 	/**
@@ -1440,13 +1383,13 @@ public class DendroController implements ConfigNodePersistent {
 		getGlobalXMap().notifyObservers();
 	}
 
-	/**
-	 * show summary of the specified indexes
-	 */
-	public void showSubDataModel(final int[] indexes) {
-
-		tvFrame.showSubDataModel(indexes, null, null);
-	}
+//	/**
+//	 * show summary of the specified indexes
+//	 */
+//	public void showSubDataModel(final int[] indexes) {
+//
+//		tvFrame.showSubDataModel(indexes, null, null);
+//	}
 
 	// Setters
 	/**

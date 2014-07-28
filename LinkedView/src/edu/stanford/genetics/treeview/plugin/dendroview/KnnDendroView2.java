@@ -92,10 +92,10 @@ public class KnnDendroView2 extends DendroView2 implements
 		final KnnArrayDrawer kArrayDrawer = new KnnArrayDrawer();
 		kArrayDrawer.setColorExtractor(colorExtractor);
 		arrayDrawer = kArrayDrawer;
-		// XXX shouldn't need to observer, should be immuable?
+		// XXX shouldn't need to observer, should be immutable?
 		((Observable) getDataModel()).addObserver(arrayDrawer);
 
-		globalview = new GlobalView();
+		globalview = new GlobalView2();
 
 		arraynameview = new ArrayNameView(getDataModel().getArrayHeaderInfo());
 

@@ -18,9 +18,9 @@ import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import Utilities.GUIFactory;
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.ContrastSelectable;
-import edu.stanford.genetics.treeview.GUIFactory;
 
 class ContrastSelector extends JPanel implements AdjustmentListener {
 
@@ -51,7 +51,6 @@ class ContrastSelector extends JPanel implements AdjustmentListener {
 		inner.setLayout(new MigLayout());
 
 		final JLabel font_label = new JLabel("Value:", SwingConstants.LEFT);
-		font_label.setForeground(GUIFactory.TEXT);
 		font_label.setFont(GUIFactory.FONTS);
 		inner.add(font_label, "alignx 50%");
 
@@ -83,7 +82,6 @@ class ContrastSelector extends JPanel implements AdjustmentListener {
 
 		this.add(inner, "pushx, alignx 50%, wrap");
 		scrollbar = new JScrollBar(Adjustable.HORIZONTAL);
-		scrollbar.setBackground(GUIFactory.BG_COLOR);
 		scrollbar.setValues((int) (contrast * 100.0), 0, 1, 500);
 		scrollbar.addAdjustmentListener(this);
 		this.add(scrollbar, "pushx, growx");
@@ -91,9 +89,7 @@ class ContrastSelector extends JPanel implements AdjustmentListener {
 
 	public JPanel setPanelLayout() {
 
-		final JPanel panel = new JPanel();
-		panel.setLayout(new MigLayout());
-		panel.setBackground(GUIFactory.BG_COLOR);
+		final JPanel panel = GUIFactory.createJPanel(false, true, null);
 
 		return panel;
 	}

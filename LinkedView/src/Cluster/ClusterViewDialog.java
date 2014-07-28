@@ -9,7 +9,7 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
-import edu.stanford.genetics.treeview.StringRes;
+import Utilities.StringRes;
 
 /**
  * Frame set up for ClusterView.

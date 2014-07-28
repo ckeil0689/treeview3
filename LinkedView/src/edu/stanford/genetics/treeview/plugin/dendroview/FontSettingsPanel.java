@@ -44,13 +44,13 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 import net.miginfocom.swing.MigLayout;
-
 import edu.stanford.genetics.treeview.DummyHeaderInfo;
 import edu.stanford.genetics.treeview.GUIFactory;
 import edu.stanford.genetics.treeview.HeaderInfo;
@@ -61,24 +61,32 @@ import edu.stanford.genetics.treeview.UrlExtractor;
 /**
  * This class allows selection of Fonts for a FontSelectable.
  */
-public class FontSettingsPanel extends JPanel implements SettingsPanel {
-
-	private static final long serialVersionUID = 1L;
+public class FontSettingsPanel implements SettingsPanel {
 
 	private final FontSelectable client;
 	private final FontSelectable client2;
-	private JComboBox font_choice;
-	private JComboBox style_choice;
+	private JComboBox<String> font_choice;
+	private JComboBox<String> style_choice;
 	private NatField size_field;
 	private JLabel exampleField;
+	private final JPanel mainPanel;
 
-	String size_prop, face_prop, style_prop;
+	private String size_prop, face_prop, style_prop;
+	
+	// the allowed font styles
+	/**
+	 * Description of the Field
+	 */
+	public final static String[] styles = {"Plain", "Italic", 
+		"Bold", "Bold Italic" };
 
 	public FontSettingsPanel(final FontSelectable fs, 
 			final FontSelectable fs2) {
 
-		client = fs;
-		client2 = fs2;
+		this.client = fs;
+		this.client2 = fs2;
+		
+		mainPanel = GUIFactory.createJPanel(false, true, null);
 		setupWidgets();
 		updateExample();
 	}
@@ -93,7 +101,7 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 		fs.setPoints(10);
 		final FontSettingsPanel e = new FontSettingsPanel(fs, fs2);
 		final JFrame f = new JFrame("Font Settings Test");
-		f.add(e);
+		e.showDialog(f, "Font Settings Test");
 		f.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(final WindowEvent we) {
@@ -115,14 +123,6 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 		// nothing to do...
 	}
 
-	// the allowed font styles
-	/**
-	 * Description of the Field
-	 */
-	public final static String[] styles = {
-
-	"Plain", "Italic", "Bold", "Bold Italic" };
-
 	/**
 	 * turn a style number from class java.awt.Font into a string
 	 * 
@@ -133,12 +133,16 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 	public final static String decode_style(final int style) {
 
 		switch (style) {
+		
 		case Font.PLAIN:
 			return styles[0];
+			
 		case Font.ITALIC:
 			return styles[1];
+			
 		case Font.BOLD:
 			return styles[2];
+			
 		default:
 			return styles[3];
 		}
@@ -165,20 +169,24 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 	 * @param f
 	 *            frame to block
 	 */
-	public void showDialog(final Frame f, final String title) {
+	public void showDialog(final JFrame parent, final String title) {
 
-		final JDialog d = new JDialog(f, title);
-		d.setLayout(new BorderLayout());
-		d.add(this, BorderLayout.CENTER);
-		d.add(new ButtonPanel(d), BorderLayout.SOUTH);
-		d.addWindowListener(new WindowAdapter() {
+		SwingUtilities.invokeLater(new Runnable() {
+
 			@Override
-			public void windowClosing(final WindowEvent we) {
-				we.getWindow().dispose();
+			public void run() {
+				
+				final JDialog d = new JDialog(parent, title);
+				d.setModalityType(JDialog.DEFAULT_MODALITY_TYPE);
+				d.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+				
+				d.add(mainPanel, "push, grow");
+				
+				d.pack();
+				d.setLocationRelativeTo(parent);
+				d.setVisible(true);
 			}
 		});
-		d.pack();
-		d.setVisible(true);
 	}
 
 	private void setupFontChoice() {
@@ -224,24 +232,22 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 	 */
 	private void setupWidgets() {
 
-		removeAll();
-		setLayout(new MigLayout());
-		setBackground(GUIFactory.BG_COLOR);
+		mainPanel.removeAll();
 
 		setupFontChoice();
-		add(font_choice, "span, wrap");
+		mainPanel.add(font_choice, "span, wrap");
 
 		setupStyleChoice();
-		add(style_choice, "span, wrap");
+		mainPanel.add(style_choice, "span, wrap");
 
 		size_field = new NatField(client.getPoints(), 3);
 		size_field.getDocument().addDocumentListener(
 				new DocumentChangeListener());
-		add(size_field, "span, wrap");
+		mainPanel.add(size_field, "span, wrap");
 		
 		exampleField = new JLabel("Font Example Text");
 		exampleField.setForeground(GUIFactory.TEXT);
-		add(exampleField, "pushx, alignx 50%, span");
+		mainPanel.add(exampleField, "pushx, alignx 50%, span");
 	}
 
 	private void updateExample() {
@@ -253,27 +259,6 @@ public class FontSettingsPanel extends JPanel implements SettingsPanel {
 		exampleField.setFont(new Font(string, i, size));
 		exampleField.revalidate();
 		exampleField.repaint();
-	}
-
-	private class ButtonPanel extends JPanel {
-
-		private static final long serialVersionUID = 1L;
-
-		ButtonPanel(final Window w) {
-
-			final Window window = w;
-			final JButton close_button = GUIFactory.setButtonLayout("Close", 
-					null);
-			close_button.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-
-					window.setVisible(false);
-				}
-			});
-			add(close_button);
-		}
 	}
 	
 	/**

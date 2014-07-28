@@ -41,7 +41,7 @@ public interface DendroPanel {
 
 	public void addClusterMenus(JMenu menu);
 
-	public void openSearchDialog();
+	public void openSearchDialog(HeaderInfo geneHI, HeaderInfo arrayHI);
 
 	public void setTreesVisible(boolean visible);
 

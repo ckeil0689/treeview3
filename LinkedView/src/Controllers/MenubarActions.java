@@ -1,6 +1,6 @@
 package Controllers;
 
-import edu.stanford.genetics.treeview.StringRes;
+import Utilities.StringRes;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 
 /**
@@ -66,13 +66,13 @@ public class MenubarActions {
 			controller.openPrefMenu(name);
 			
 		} else if(name.equalsIgnoreCase("Fill screen")) {
-			tvFrame.setMatrixSize("fill");
+			controller.setMatrixSize("fill");
 			
 		} else if(name.equalsIgnoreCase("Equal axes")) {
-			tvFrame.setMatrixSize("equal");
+			controller.setMatrixSize("equal");
 			
 		} else if(name.equalsIgnoreCase("Proportional axes")) {
-			tvFrame.setMatrixSize("proportional");
+			controller.setMatrixSize("proportional");
 			
 		} else if (name.equalsIgnoreCase(StringRes.menu_title_Hier)) {
 			controller.setupClusterView(StringRes.menu_title_Hier);
@@ -84,7 +84,13 @@ public class MenubarActions {
 			tvFrame.displayWIP();
 
 		} else if (name.equalsIgnoreCase(StringRes.menu_title_Stats)) {
-			tvFrame.openStatsView();
+			String source = controller.getDataModel().getSource();
+			int rowNum = controller.getDataModel().getGeneHeaderInfo()
+					.getNumHeaders();
+			int colNum = controller.getDataModel().getArrayHeaderInfo()
+					.getNumHeaders();
+			
+			tvFrame.openStatsView(source, rowNum, colNum);
 
 		} else if (name.equalsIgnoreCase("Save List")) {
 			controller.saveList();

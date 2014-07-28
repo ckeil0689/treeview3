@@ -10,6 +10,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
+import Utilities.GUIFactory;
+import Utilities.StringRes;
+
 /**
  * Small dialog used to confirm the decision to exit the program.
  * @author CKeil
@@ -29,10 +32,10 @@ public class ExitConfirmDialog {
 
 		final JPanel mainPanel = GUIFactory.createJPanel(false, true, null);
 
-		final JLabel prompt = GUIFactory.createSmallLabel("Are you sure "
-				+ "you want to close TreeView?");
+		final JLabel prompt = GUIFactory.createLabel("Are you sure "
+				+ "you want to close TreeView?", GUIFactory.FONTS);
 
-		final JButton ok = GUIFactory.createButton("Yes");
+		final JButton ok = GUIFactory.createBtn("Yes");
 		ok.addActionListener(new ActionListener() {
 
 			@Override

@@ -22,6 +22,7 @@
  */
 package edu.stanford.genetics.treeview;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ import java.util.Vector;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
+import Utilities.GUIFactory;
 import net.miginfocom.swing.MigLayout;
 
 public class MessagePanel extends JPanel {
@@ -101,7 +103,6 @@ public class MessagePanel extends JPanel {
 
 			final JTextArea label = new JTextArea();
 			label.setFont(GUIFactory.FONTS);
-			label.setForeground(GUIFactory.TEXT);
 			label.setBorder(null);
 			label.setOpaque(false);
 			label.setEditable(false);
@@ -124,10 +125,10 @@ public class MessagePanel extends JPanel {
 			final Dimension size = getSize();
 			g.clearRect(0, 0, size.width, size.height);
 
-			g.setColor(GUIFactory.BG_COLOR);
+			g.setColor(GUIFactory.DEFAULT_BG);
 			g.fillRect(0, 0, size.width, size.height);
 
-			g.setColor(GUIFactory.TEXT);
+			g.setColor(Color.black);
 
 			// while (e.hasMoreElements()) {
 			// String message = (String) e.nextElement();

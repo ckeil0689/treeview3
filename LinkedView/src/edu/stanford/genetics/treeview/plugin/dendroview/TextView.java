@@ -43,14 +43,14 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
+import Utilities.GUIFactory;
+import Utilities.StringRes;
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
-import edu.stanford.genetics.treeview.GUIFactory;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelView;
-import edu.stanford.genetics.treeview.StringRes;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.UrlExtractor;
 
@@ -105,7 +105,7 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 		addMouseMotionListener(this);
 		addKeyListener(this);
 
-		l1 = GUIFactory.createSmallLabel("");
+		l1 = GUIFactory.createLabel("", GUIFactory.FONTS);
 		add(l1, "alignx 0%, aligny 50%, push, wrap");
 
 		scrollPane = new JScrollPane(this,
@@ -120,15 +120,13 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 		return scrollPane.getHorizontalScrollBar();
 	}
 	
-	public void generateView(final HeaderInfo hI, final UrlExtractor uExtractor,
-			final int col) {
+	public void generateView(final UrlExtractor uExtractor, final int col) {
 		
 		this.urlExtractor = uExtractor;
-		headerInfo = hI;
 		this.col = col;
 
 		// could set up headerSummary...
-		final int GIDIndex = headerInfo.getIndex("GID");
+//		final int GIDIndex = headerInfo.getIndex("GID");
 //		if (GIDIndex == -1) {
 //			headerSummary.setIncluded(new int[] { 1 });
 //
@@ -137,14 +135,6 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 //		}
 		headerSummary.setIncluded(new int[] { 0 });
 		headerSummary.addObserver(this);
-	}
-	
-	/**
-	 * Sets component color according to the currently active color scheme.
-	 */
-	public void setColors() {
-		
-		l1.setForeground(GUIFactory.TEXT);
 	}
 
 	@Override
@@ -171,7 +161,7 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 
 		g.setColor(this.getBackground());
 		g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
-		g.setColor(GUIFactory.TEXT);
+		g.setColor(Color.black);
 
 		// clear the pallette...
 		if (map.getScale() > 12.0) {
@@ -252,7 +242,7 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 								g.setColor(fore);
 							}
 						} else {
-							g.setColor(GUIFactory.TEXT);
+							g.setColor(Color.black);
 							// right-aligned text
 							g.drawString(
 									out,
@@ -603,5 +593,10 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 	public HeaderSummary getHeaderSummary() {
 
 		return headerSummary;
+	}
+	
+	public void setHeaderInfo(HeaderInfo geneHI) {
+		
+		this.headerInfo = geneHI;
 	}
 }

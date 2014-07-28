@@ -25,10 +25,10 @@ package edu.stanford.genetics.treeview.core;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import Utilities.StringRes;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.StringRes;
 
 /*
  *  Decompiled by Mocha from FileMru.class
@@ -89,7 +89,7 @@ public class FileMru extends java.util.Observable implements
 
 		setChanged();
 		final int subNodeIndex = getRootChildrenNodes().length + 1;
-		return configNode.node("File" + subNodeIndex); //ok
+		return configNode.node("File" + subNodeIndex);
 	}
 
 	/**
@@ -142,7 +142,8 @@ public class FileMru extends java.util.Observable implements
 		final String astring[] = new String[childrenNodes.length];
 
 		for (int i = 0; i < childrenNodes.length; i++) {
-			astring[i] = configNode.node(childrenNodes[i]).get("root", ""); 
+			astring[i] = configNode.node(childrenNodes[i]).get("root", "") 
+					+ configNode.node(childrenNodes[i]).get("cdt", ""); 
 		}
 		return astring;
 	}

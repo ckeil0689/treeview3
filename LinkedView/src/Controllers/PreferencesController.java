@@ -15,13 +15,13 @@ import java.util.List;
 
 import javax.swing.SwingWorker;
 
+import Utilities.StringRes;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LabelLoadDialog;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.PreferencesMenu;
-import edu.stanford.genetics.treeview.StringRes;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.model.CustomLabelLoader;
 
@@ -36,14 +36,16 @@ public class PreferencesController {
 
 	private final TreeViewFrame tvFrame;
 	private final PreferencesMenu preferences;
+	private final DataModel model;
 	private SwingWorker<Void, Integer> labelWorker;
 	private LabelLoadDialog dialog;
 	private File customFile;
 
-	public PreferencesController(final TreeViewFrame tvFrame,
+	public PreferencesController(final TreeViewFrame tvFrame, DataModel model,
 			final PreferencesMenu preferences) {
 
 		this.tvFrame = tvFrame;
+		this.model = model;
 		this.preferences = preferences;
 
 		addListeners();
@@ -56,9 +58,7 @@ public class PreferencesController {
 
 		preferences.addWindowListener(new WindowListener());
 		preferences.addOKButtonListener(new ConfirmationListener());
-//		preferences.addThemeListener(new ThemeListener());
 		preferences.addCustomLabelListener(new CustomLabelListener());
-//		preferences.addMenuListeners(new MenuPanelListener());
 		preferences.addComponentListener(new PreferencesComponentListener());
 	}
 
@@ -68,48 +68,19 @@ public class PreferencesController {
 		public void mouseClicked(final MouseEvent arg0) {
 
 			checkForColorSave();
-
-//			for (final MenuPanel panel : preferences.getMenuPanelList()) {
-//
-//				if (arg0.getSource().equals(panel.getMenuPanel())) {
-//					preferences.addMenu(panel.getLabelText());
-//					panel.setSelected(true);
-//
-//				} else {
-//					panel.setSelected(false);
-//				}
-//			}
 		}
 
 		@Override
-		public void mouseEntered(final MouseEvent arg0) {
-
-//			for (final MenuPanel panel : preferences.getMenuPanelList()) {
-//
-//				if (arg0.getSource().equals(panel.getMenuPanel())) {
-//					panel.setHover(true);
-//				}
-//			}
-		}
+		public void mouseEntered(final MouseEvent arg0) {}
 
 		@Override
-		public void mouseExited(final MouseEvent arg0) {
-
-//			for (final MenuPanel panel : preferences.getMenuPanelList()) {
-//
-//				if (arg0.getSource().equals(panel.getMenuPanel())) {
-//					panel.setHover(false);
-//				}
-//			}
-		}
+		public void mouseExited(final MouseEvent arg0) {}
 
 		@Override
-		public void mousePressed(final MouseEvent arg0) {
-		}
+		public void mousePressed(final MouseEvent arg0) {}
 
 		@Override
-		public void mouseReleased(final MouseEvent arg0) {
-		}
+		public void mouseReleased(final MouseEvent arg0) {}
 	}
 
 	/**
@@ -132,8 +103,8 @@ public class PreferencesController {
 				}
 
 				if (customFile != null) {
-					loadNewLabels("Row");
-					loadNewLabels("Column");
+					loadNewLabels(StringRes.main_rows);
+					loadNewLabels(StringRes.main_cols);
 				}
 			} else {
 				LogBuffer.println("Model not loaded in tvFrame.");
@@ -199,85 +170,13 @@ public class PreferencesController {
 		}
 	}
 
-//	/**
-//	 * Listener for the theme switch button.
-//	 * 
-//	 * @author CKeil
-//	 * 
-//	 */
-//	class ThemeListener implements ActionListener {
-//
-//		@Override
-//		public void actionPerformed(final ActionEvent e) {
-//
-//			new ThemeResetter(e).run();
-//		}
-//	}
-
-//	class ThemeResetter extends SwingWorker<Void, Void> {
-//
-//		private final ActionEvent event;
-//
-//		ThemeResetter(final ActionEvent e) {
-//
-//			this.event = e;
-//		}
-//
-//		@Override
-//		protected Void doInBackground() throws Exception {
-//
-//			updateCheck(event.getSource().equals(preferences.getLightButton()));
-//			return null;
-//		}
-//
-//		/**
-//		 * Switches the theme between day and night.
-//		 */
-//		public void updateCheck(final boolean light) {
-//
-//			if (light) {
-//				GUIFactory.setDayLight();
-//				tvFrame.getConfigNode().put("theme", StringRes.rButton_light);
-//				resetTheme();
-//
-//			} else {
-//				GUIFactory.setNight();
-//				tvFrame.getConfigNode().put("theme", StringRes.rButton_dark);
-//				resetTheme();
-//			}
-//		}
-//
-//		/**
-//		 * Clears the TVFrame from the current view and loads the new
-//		 * appropriate view with new color parameters.
-//		 */
-//		public void resetTheme() {
-//
-//			preferences.setupLayout(StringRes.menu_title_Prefs);
-//			addListeners();
-//
-//			if (tvFrame.getDataModel() != null 
-//					&& tvFrame.getRunning() != null) {
-//				tvFrame.setView(StringRes.view_Dendro);
-//
-//			} else {
-//				tvFrame.setView(StringRes.view_Welcome);
-//			}
-//			
-//			controller.addViewListeners();
-//			controller.addMenuListeners();
-//		}
-//	}
-
 	class PreferencesComponentListener implements ComponentListener {
 
 		@Override
-		public void componentHidden(final ComponentEvent arg0) {
-		}
+		public void componentHidden(final ComponentEvent arg0) {}
 
 		@Override
-		public void componentMoved(final ComponentEvent arg0) {
-		}
+		public void componentMoved(final ComponentEvent arg0) {}
 
 		@Override
 		public void componentResized(final ComponentEvent arg0) {
@@ -286,8 +185,7 @@ public class PreferencesController {
 		}
 
 		@Override
-		public void componentShown(final ComponentEvent arg0) {
-		}
+		public void componentShown(final ComponentEvent arg0) {}
 
 	}
 
@@ -319,8 +217,6 @@ public class PreferencesController {
 
 		@Override
 		protected Void doInBackground() throws Exception {
-
-			final DataModel model = tvFrame.getDataModel();
 
 			HeaderInfo headerInfo = null;
 			if (type.equalsIgnoreCase("Row")) {

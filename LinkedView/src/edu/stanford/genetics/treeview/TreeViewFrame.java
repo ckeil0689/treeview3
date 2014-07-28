@@ -28,8 +28,6 @@
  */
 package edu.stanford.genetics.treeview;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -40,6 +38,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.swing.BoxLayout;
@@ -56,9 +55,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
-import Controllers.DendroController;
+import Utilities.GUIFactory;
+import Utilities.StringRes;
 import Views.LoadErrorView;
 import Views.WelcomeView;
 import edu.stanford.genetics.treeview.core.FileMru;
@@ -66,7 +67,6 @@ import edu.stanford.genetics.treeview.core.FileMruEditor;
 import edu.stanford.genetics.treeview.core.LogMessagesPanel;
 import edu.stanford.genetics.treeview.core.LogSettingsPanel;
 import edu.stanford.genetics.treeview.core.MenuHelpPluginsFrame;
-import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
 
 /**
@@ -80,15 +80,15 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		ConfigNodePersistent {
 
 	// Instance Variables
-	protected final JPanel backgroundPanel;
-	protected final JPanel menuPanel;
+	protected final JPanel bgPanel;
+	protected final JPanel btnPanel;
 	protected final JPanel waiting;
 	protected DendroPanel running;
-	protected DataModel dataModel;
 	protected JDialog presetsFrame = null;
 	protected TabbedSettingsPanel presetsPanel = null;
 
 	private final TreeViewApp treeView;
+	private String title;
 
 	// Different Views
 	private final WelcomeView welcomeView;
@@ -97,8 +97,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 	private String loadErrorMessage;
 
-	private DendroController dendroController;
-
 	private FileSet fileMenuSet;
 
 	// Menu Items
@@ -106,11 +104,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	private List<JMenuItem> fileMenuList;
 	private List<FileSet> fileSetList;
 
-	// private JButton stackButton;
-	private JButton searchButton;
-	private JToggleButton treeToggleButton;
+	private final JButton searchBtn;
+	private final JToggleButton treeToggleBtn;
 
-	// private JPopupMenu stackMenu;
 	private JMenuBar menuBar;
 
 	private boolean loaded;
@@ -142,59 +138,42 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 				StringRes.pref_node_TVFrame);
 		
 //		try {
-//			configNode.node("FileMRU").removeNode();
+//			configNode.node("File").removeNode();
 //		} catch (BackingStoreException e) {
-//			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
 		
 		// Initialize the views
 		welcomeView = new WelcomeView();
 		loadErrorView = new LoadErrorView();
-		
 		dendroView = new DendroView2(this);
-		dendroController = new DendroController(this);
 
 		setWindowActive(true);
 
 		// Set up other stuff
-		backgroundPanel = GUIFactory.createJPanel(true, false, null);
-		menuPanel = GUIFactory.createJPanel(true, false, null);
-		waiting = GUIFactory.createJPanel(true, false, null);
+		bgPanel = GUIFactory.createJPanel(true, true, null);
+		btnPanel = GUIFactory.createJPanel(true, false, null);
+		waiting = GUIFactory.createJPanel(true, true, null);
 
 		// Add the main background panel to the contentPane
-		applicationFrame.getContentPane().add(backgroundPanel);
-
-		// Presets first
-		setupPresets();
-				
-		// setupMenuBar();
-		buildMenu();
-
-		setupFrameSize();
-		setLoaded(false);
-	}
-	
-	/**
-	 * 
-	 * Setting up all saved configurations related to TVFrame.
-	 */
-	protected void setupPresets() {
-
-//		// Load Theme
-//		final String default_theme = "dark";
-//		final String savedTheme = getConfigNode().get("theme", default_theme);
-//
-//		// Since changing the theme resets the layout
-//		if (savedTheme.equalsIgnoreCase("dark")) {
-//			GUIFactory.setNight();
-//
-//		} else {
-//			GUIFactory.setDayLight();
-//		}
+		applicationFrame.getContentPane().add(bgPanel);
+		
+		// Buttons
+		searchBtn = GUIFactory.createBtn(StringRes.btn_SearchLabels);
+		searchBtn.setToolTipText(StringRes.tooltip_searchRowCol);
+		
+		treeToggleBtn = GUIFactory.createToggleBtn(StringRes
+				.btn_ShowTrees);
+		treeToggleBtn.setToolTipText(StringRes.tooltip_showTrees);
 
 		// Load FileMRU
 		setupFileMru();
+				
+		// setupMenuBar();
+//		buildMenu();
+
+		setupFrameSize();
+		setLoaded(false);
 	}
 
 	@Override
@@ -208,8 +187,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	@Override
 	public void saveSettings() {
 
-		if (dendroView.isLoaded()) {
-			dendroController.saveSettings();
+		if (isLoaded()) {
+//			dendroController.saveSettings();
 		}
 	}
 
@@ -237,26 +216,25 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 			} else {
 				view = GUIFactory.createJPanel(false, false, null);
 
-				final JLabel error = GUIFactory.createBigLabel(
-						"No view could be loaded.");
+				final JLabel error = GUIFactory.createLabel("No view "
+						+ "could be loaded.", GUIFactory.FONTS);
 
 				view.add(error, "push, alignx 50%");
 			}
 
 			// Rebuild Menus
-			buildMenu();
+//			buildMenuBar();
 
 		} else {
 			view = dendroView.makeDendroPanel();
-			setRunning(dendroView);
-			dendroView.setLoaded(true);
 
 			// Rebuild Menus
-			buildMenu();
+//			buildMenuBar();
 
-			dendroController.setNew(dendroView,(TVModel) dataModel);
+//			dendroController.setNew(dendroView);//,(TVModel) dataModel);
 		}
 
+		buildMenuBar();
 		displayView(view);
 	}
 
@@ -278,21 +256,19 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	public void displayView(final JPanel view) {
 
-		backgroundPanel.removeAll();
+		bgPanel.removeAll();
 		waiting.removeAll();
 		
-//		waiting.setBackground(GUIFactory.BG_COLOR);
 		waiting.add(view, "push, grow");
 
-		if(dendroView.isLoaded()) {
-			backgroundPanel.add(menuPanel, "push, grow, h 5%, wrap");
+		if(isLoaded()) {
+			bgPanel.add(btnPanel, "pushx, h 3%, wrap");
 		}
 		
-		backgroundPanel.add(waiting, "push, grow, h 95%");
-//		backgroundPanel.setBackground(GUIFactory.BG_COLOR);
+		bgPanel.add(waiting, "push, grow, h 97%");
 		
-		backgroundPanel.revalidate();
-		backgroundPanel.repaint();
+		bgPanel.revalidate();
+		bgPanel.repaint();
 	}
 
 	/**
@@ -300,16 +276,32 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	public void showRecentFileEditor() {
 
-		new FileMruEditor(fileMru).showDialog(applicationFrame);
+		SwingUtilities.invokeLater(new Runnable(){
+
+			@Override
+			public void run() {
+				
+				new FileMruEditor(fileMru).showDialog(applicationFrame);
+			}
+		});
 	}
 
 	/**
 	 * Shows a panel which displays the current stats of the loaded model.
 	 */
-	public void openStatsView() {
+	public void openStatsView(final String source, final int rowNum, 
+			final int colNum) {
 
-		final StatsPanel stats = new StatsPanel(TreeViewFrame.this);
-		stats.setVisible(true);
+		SwingUtilities.invokeLater(new Runnable(){
+
+			@Override
+			public void run() {
+				
+				final StatsPanel stats = new StatsPanel(TreeViewFrame.this);
+				stats.setupLayout(source, rowNum, colNum);
+				stats.setVisible(true);
+			}
+		});
 	}
 
 	/**
@@ -317,24 +309,30 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	public void showLogMessages() {
 
-		final JPanel inner = new JPanel();
-		inner.setLayout(new BorderLayout());
-		inner.add(new JLabel("JTV Messages"), BorderLayout.NORTH);
-		inner.add(new JScrollPane(
-				new LogMessagesPanel(LogBuffer.getSingleton())),
-				BorderLayout.CENTER);
+		SwingUtilities.invokeLater(new Runnable(){
 
-		final LogBuffer buffer = LogBuffer.getSingleton();
-		buffer.setLog(true);
-		inner.add(new LogSettingsPanel(buffer), BorderLayout.SOUTH);
+			@Override
+			public void run() {
+				
+				final JPanel inner = GUIFactory.createJPanel(false, true, null);
+				inner.add(new JLabel("JTV Messages"), "span, wrap");
+				inner.add(new JScrollPane(
+						new LogMessagesPanel(LogBuffer.getSingleton())),
+						"push, grow, wrap");
 
-		final JDialog top = new JDialog(applicationFrame, "JTV Messages", 
-				false);
-		top.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		top.setContentPane(inner);
-		top.pack();
-		top.setLocationRelativeTo(applicationFrame);
-		top.setVisible(true);
+				final LogBuffer buffer = LogBuffer.getSingleton();
+				buffer.setLog(true);
+				inner.add(new LogSettingsPanel(buffer), "span, push");
+
+				final JDialog top = new JDialog(applicationFrame, "JTV Messages", 
+						false);
+				top.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+				top.setContentPane(inner);
+				top.pack();
+				top.setLocationRelativeTo(applicationFrame);
+				top.setVisible(true);
+			}
+		});
 	}
 
 	/**
@@ -342,7 +340,14 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	public void showAboutWindow() {
 
-		new AboutDialog(this).openAboutDialog();
+		SwingUtilities.invokeLater(new Runnable(){
+
+			@Override
+			public void run() {
+				
+				new AboutDialog(TreeViewFrame.this).openAboutDialog();
+			}
+		});
 	}
 
 	/**
@@ -350,25 +355,32 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	public void showDocumentation() {
 
-		final JPanel message = new JPanel();
-		message.setLayout(new BoxLayout(message, BoxLayout.Y_AXIS));
-		message.add(new JLabel(StringRes.appName
-				+ " documentation is available from the website."));
-
-		final String docUrl = StringRes.updateUrl + "/manual.html";
-		message.add(new JTextField(docUrl));
-
-		final JButton lButton = new JButton("Launch Browser");
-		lButton.addActionListener(new ActionListener() {
+		SwingUtilities.invokeLater(new Runnable(){
 
 			@Override
-			public void actionPerformed(final ActionEvent e) {
-
-				displayURL(docUrl);
+			public void run() {
+				
+				final JPanel message = new JPanel();
+				message.setLayout(new BoxLayout(message, BoxLayout.Y_AXIS));
+				message.add(new JLabel(StringRes.appName
+						+ " documentation is available from the website."));
+		
+				final String docUrl = StringRes.updateUrl + "/manual.html";
+				message.add(new JTextField(docUrl));
+		
+				final JButton lButton = new JButton("Launch Browser");
+				lButton.addActionListener(new ActionListener() {
+		
+					@Override
+					public void actionPerformed(final ActionEvent e) {
+		
+						displayURL(docUrl);
+					}
+				});
+				message.add(lButton);
+				JOptionPane.showMessageDialog(applicationFrame, message);
 			}
 		});
-		message.add(lButton);
-		JOptionPane.showMessageDialog(applicationFrame, message);
 	}
 
 	/**
@@ -376,32 +388,39 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	public void showFeedbackDialog() {
 
-		final JPanel feedback = new JPanel();
-		feedback.setLayout(new BoxLayout(feedback, BoxLayout.Y_AXIS));
+		SwingUtilities.invokeLater(new Runnable(){
 
-		JComponent tmp = new JLabel("Please report bugs to ");
-		tmp.setAlignmentX((float) 0.0);
-		feedback.add(tmp);
-
-		tmp = new JLabel("For support, bugs reports, and requests "
-				+ "send email to ");
-		tmp.setAlignmentX((float) 0.0);
-		feedback.add(tmp);
-		final String supportURL = "ckeil@princeton.edu";
-		tmp = new JTextField(supportURL);
-		// tmp.setAlignmentX((float) 1.0);
-		feedback.add(tmp);
-		final JButton yesB = new JButton("Email Support");
-		yesB.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-				displayURL("mailto:" + supportURL);
+			public void run() {
+			
+				final JPanel feedback = new JPanel();
+				feedback.setLayout(new BoxLayout(feedback, BoxLayout.Y_AXIS));
+		
+				JComponent tmp = new JLabel("Please report bugs to ");
+				tmp.setAlignmentX((float) 0.0);
+				feedback.add(tmp);
+		
+				tmp = new JLabel("For support, bugs reports, and requests "
+						+ "send email to ");
+				tmp.setAlignmentX((float) 0.0);
+				feedback.add(tmp);
+				final String supportURL = "ckeil@princeton.edu";
+				tmp = new JTextField(supportURL);
+				// tmp.setAlignmentX((float) 1.0);
+				feedback.add(tmp);
+				final JButton yesB = new JButton("Email Support");
+				yesB.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(final ActionEvent arg0) {
+						displayURL("mailto:" + supportURL);
+					}
+				});
+				feedback.add(yesB);
+		
+				JOptionPane.showMessageDialog(applicationFrame, feedback,
+						"Feedback...", JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
-		feedback.add(yesB);
-
-		JOptionPane.showMessageDialog(applicationFrame, feedback,
-				"Feedback...", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	/**
@@ -409,23 +428,28 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	public void displayWIP() {
 
-		final JDialog dialog = new JDialog(applicationFrame);
+		SwingUtilities.invokeLater(new Runnable(){
 
-		final Dimension screenSize = GUIFactory.getScreenSize();
-		dialog.setSize(new Dimension(screenSize.width * 1 / 2,
-				screenSize.height * 1 / 2));
-
-		dialog.setLocationRelativeTo(applicationFrame);
-		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-
-		final JPanel panel = GUIFactory.createJPanel(true, true, null);
-
-		final JLabel l1 = GUIFactory.createSmallLabel("Work in progress.");
-
-		panel.add(l1, "push, alignx 50%");
-		dialog.add(panel);
-
-		dialog.setVisible(true);
+			@Override
+			public void run() {
+				
+				final JDialog dialog = new JDialog(applicationFrame);
+				dialog.setDefaultCloseOperation(
+						WindowConstants.DISPOSE_ON_CLOSE);
+		
+				final JPanel panel = GUIFactory.createJPanel(true, true, null);
+				final JLabel l1 = GUIFactory.createLabel("Work in progress.", 
+						GUIFactory.FONTS);
+		
+				panel.add(l1, "push, alignx 50%");
+				dialog.add(panel);
+				
+				dialog.pack();
+				dialog.setLocationRelativeTo(applicationFrame);
+		
+				dialog.setVisible(true);
+			}
+		});
 	}
 
 	// Getters for Views
@@ -463,36 +487,33 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 * Sets the currently running panel for TVFrame. TVFrame is updated by
 	 * setLoaded(true).
 	 * 
-	 * @param panel
+	 * @param boolean isDendroLoaded
 	 */
-	public void setRunning(final DendroPanel panel) {
+	public void setRunning(final boolean isDendroLoaded) {
 
-		running = panel;
+		if(isDendroLoaded) { 
+			running = dendroView;
+			
+		} else {
+			running = null;
+		}
 	}
 
 	// Observer
 	@Override
 	public void update(final Observable observable, final Object object) {
 
-		System.out.println("Updating fileMRU in TVFrame.");
+		LogBuffer.println("Updating fileMRU in TVFrame.");
 
 		if (observable == fileMru && menubar != null) {
 			// System.out.println("Rebuilding file menu");
-			buildMenu();
+			buildMenuBar();
 
 		} else {
-			System.out.println("Got weird update");
+			LogBuffer.println("Got weird update");
 		}
 	}
-	
-	/**
-	 * Passes the resize call for the matrix to the DendroController.
-	 * @param mode
-	 */
-	public void setMatrixSize(String mode) {
-		
-		dendroController.setMatrixSize(mode);
-	}
+
 
 	/**
 	 * This should be called whenever the loaded status changes It's
@@ -502,12 +523,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	@Override
 	public void setLoaded(final boolean flag) {
-
-		// reset persistent popups
+		
 		// setGeneFinder(null);
-		loaded = flag;
-		// backgroundPanel.removeAll();
-		// waiting.removeAll();
+		this.loaded = flag;
 
 		if (loaded) {
 			if (running == null) {
@@ -515,43 +533,69 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 						"TreeViewFrame 253: No plugins to display");
 			} else {
 				setLoadedTitle();
-				// treeView.getGlobalConfig().store();
 			}
 
 		} else {
-			// backgroundPanel.add(waiting);
 			applicationFrame.setTitle(StringRes.appName);
 		}
 
+		buildMenuBar();
+//		setOptionButtons();
 		// menubar.rebuild...
 		// rebuildMainPanelMenu();
 		// treeView.rebuildWindowMenus();
 	}
 
+//	/**
+//	 * Builds the two menu buttons for TVFrame and generates the menubar for
+//	 * the application.
+//	 */
+//	public void buildMenu() {
+//
+////		btnPanel.removeAll();
+//		menuBar = new JMenuBar();
+//		applicationFrame.setJMenuBar(menuBar);
+//
+//		buildMenuBar();
+//
+////		if (running != null) {
+////			generateSearchMenu();
+////			generateTreeMenu();
+////		}
+//		
+////		btnPanel.revalidate();
+////		btnPanel.repaint();
+//	}
+	
 	/**
-	 * Builds the two menu buttons for TVFrame and generates the menubar for
-	 * the application.
+	 * Controls the display of the search and tree toggle buttons.
+	 * @param hasTrees
 	 */
-	public void buildMenu() {
-
-		menuPanel.removeAll();
-//		menuPanel.setBackground(GUIFactory.BG_COLOR);
-		menuBar = new JMenuBar();
-		applicationFrame.setJMenuBar(menuBar);
-
-		generateMenuBar();
-
-		if (running != null) {
-			generateSearchMenu();
-			generateTreeMenu();
+	public void setOptionButtons(boolean hasTrees) {
+		
+		btnPanel.removeAll();
+		
+		if(loaded && hasTrees) {
+			btnPanel.add(searchBtn);
+			btnPanel.add(treeToggleBtn);
+			
+		} else if(loaded && !hasTrees) {
+			btnPanel.add(searchBtn);
 		}
 		
-		menuPanel.revalidate();
-		menuPanel.repaint();
+		btnPanel.revalidate();
+		btnPanel.repaint();
 	}
 
-	public void generateMenuBar() {
+	/**
+	 * Builds the JMenubar, fills it with JMenuItems and adds listeners
+	 * to them.
+	 */
+	public void buildMenuBar() {
 
+		menuBar = new JMenuBar();
+		applicationFrame.setJMenuBar(menuBar);
+		
 		stackMenuList = new ArrayList<JMenuItem>();
 
 		// File
@@ -708,8 +752,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		menuBar.add(helpSubMenu);
 
-		fileSubMenu.addSeparator();
-
 //		// New Window
 //		final JMenuItem newWindowMenuItem = new JMenuItem(
 //				StringRes.menu_title_NewWindow, KeyEvent.VK_N);
@@ -719,26 +761,26 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 //		fileSubMenu.add(newWindowMenuItem);
 	}
 
-	public void generateSearchMenu() {
-
-		searchButton = GUIFactory.createButton(StringRes.button_SearchLabels);
-		searchButton.setToolTipText(StringRes.tooltip_searchRowCol);
-
-		menuPanel.add(searchButton);
-	}
-
-	public void generateTreeMenu() {
-
-		treeToggleButton = GUIFactory.createToggleButton(StringRes
-				.button_ShowTrees);
-		treeToggleButton.setToolTipText(StringRes.tooltip_showTrees);
-
-		// Initially disabled, will be enabled if gtrview or atrview in
-		// DendroView are enabled.
-		treeToggleButton.setEnabled(false);
-
-		menuPanel.add(treeToggleButton);
-	}
+//	public void generateSearchMenu() {
+//
+//		searchButton = GUIFactory.createButton(StringRes.button_SearchLabels);
+//		searchButton.setToolTipText(StringRes.tooltip_searchRowCol);
+//
+//		buttonPanel.add(searchButton);
+//	}
+//
+//	public void generateTreeMenu() {
+//
+//		treeToggleButton = GUIFactory.createToggleButton(StringRes
+//				.button_ShowTrees);
+//		treeToggleButton.setToolTipText(StringRes.tooltip_showTrees);
+//
+//		// Initially disabled, will be enabled if gtrview or atrview in
+//		// DendroView are enabled.
+//		treeToggleButton.setEnabled(false);
+//
+//		buttonPanel.add(treeToggleButton);
+//	}
 
 //	/**
 //	 * This method populates the Export Menu with MenuItems.
@@ -888,7 +930,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		final JPanel panel = GUIFactory.createJPanel(true, true, null);
 
-		final JButton button = GUIFactory.createButton("OK");
+		final JButton button = GUIFactory.createBtn("OK");
 		button.addActionListener(new ActionListener() {
 
 			@Override
@@ -898,17 +940,18 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		});
 
 		if (writerEmpty) {
-			final JLabel l1 = GUIFactory.createSmallLabel(
-					"No Model changes were written.");
+			final JLabel l1 = GUIFactory.createLabel("No Model changes "
+					+ "were written.", GUIFactory.FONTS);
 
-			final JLabel l2 = GUIFactory.createSmallLabel("Only the "
-					+ "following changes require explicit saving: ");
+			final JLabel l2 = GUIFactory.createLabel("Only the following "
+					+ "changes require explicit saving: ", GUIFactory.FONTS);
 
-			final JLabel l3 = GUIFactory.createSmallLabel("- Tree Node flips "
-					+ "(Analysis->Flip Array/Gene Tree Node)");
+			final JLabel l3 = GUIFactory.createLabel("- Tree Node flips "
+					+ "(Analysis->Flip Array/Gene Tree Node)", 
+					GUIFactory.FONTS);
 
-			final JLabel l4 = GUIFactory.createSmallLabel("- Tree Node "
-					+ "Annotations (Analysis->Array/Gene TreeAnno)");
+			final JLabel l4 = GUIFactory.createLabel("- Tree Node Annotations "
+					+ "(Analysis->Array/Gene TreeAnno)", GUIFactory.FONTS);
 
 			panel.add(l1, "pushx, wrap");
 			panel.add(l2, "pushx, wrap");
@@ -919,7 +962,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 			dialog.add(panel);
 
 		} else {
-			final JLabel l1 = GUIFactory.createSmallLabel(msg);
+			final JLabel l1 = GUIFactory.createLabel(msg, GUIFactory.FONTS);
 
 			panel.add(l1, "pushx, wrap");
 			panel.add(button, "pushx, alignx 50%");
@@ -1011,17 +1054,17 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	// return list;
 	// }
 
-	@Override
-	public void scrollToGene(final int i) {
-
-		dendroController.scrollToGene(i);
-	}
-
-	@Override
-	public void scrollToArray(final int i) {
-
-		dendroController.scrollToArray(i);
-	}
+//	@Override
+//	public void scrollToGene(final int i) {
+//
+//		dendroController.scrollToGene(i);
+//	}
+//
+//	@Override
+//	public void scrollToArray(final int i) {
+//
+//		dendroController.scrollToArray(i);
+//	}
 
 	// Why do these methods exist? They appear to do nothing but
 	// calling the setLoadedTitle() method...
@@ -1039,13 +1082,18 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	private void setLoadedTitle() {
 
 		applicationFrame.setTitle(StringRes.appName + " : "
-				+ dataModel.getSource());
+				+ title); //dataModel.getSource());
 	}
 
-	@Override
-	public void setDataModel(final DataModel model) {
+//	@Override
+//	public void setDataModel(final DataModel model) {
+//
+//		this.dataModel = model;
+//	}
+	
+	public void setTitleString(final String title) {
 
-		this.dataModel = model;
+		this.title = title;
 	}
 	
 	/**
@@ -1108,12 +1156,12 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 	public void addSearchButtonListener(final MouseListener l) {
 
-		searchButton.addMouseListener(l);
+		searchBtn.addMouseListener(l);
 	}
 
 	public void addTreeButtonListener(final MouseListener l) {
 
-		treeToggleButton.addMouseListener(l);
+		treeToggleBtn.addMouseListener(l);
 	}
 
 	public FileSet getFileMenuSet() {
@@ -1204,10 +1252,10 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	// return arrayFinder;
 	// }
 
-	public DendroController getDendroController() {
-
-		return dendroController;
-	}
+//	public DendroController getDendroController() {
+//
+//		return dendroController;
+//	}
 
 	/**
 	 * Returns TreeViewFrame's configNode.
@@ -1219,14 +1267,14 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		return configNode;
 	}
 
-	/**
-	 * Returns TVFrame's instance of dataModel
-	 */
-	@Override
-	public DataModel getDataModel() {
-
-		return dataModel;
-	}
+//	/**
+//	 * Returns TVFrame's instance of dataModel
+//	 */
+//	@Override
+//	public DataModel getDataModel() {
+//
+//		return dataModel;
+//	}
 
 	/**
 	 * Returns TVFrame's instance of FileMRU
@@ -1250,11 +1298,11 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 	public JToggleButton getTreeButton() {
 
-		return treeToggleButton;
+		return treeToggleBtn;
 	}
 
 	public JButton getSearchButton() {
 
-		return searchButton;
+		return searchBtn;
 	}
 }

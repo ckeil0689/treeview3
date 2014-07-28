@@ -25,7 +25,8 @@ package edu.stanford.genetics.treeview;
 /**
  * Represents nodes in ATRView and GTRView.
  *
- * HACK Should really retrofit this so that it's a subclass of DefaultMutableTreeNode. 
+ * HACK Should really retrofit this so that it's a subclass of 
+ * DefaultMutableTreeNode. 
  *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version Alpha
@@ -44,7 +45,7 @@ public class TreeDrawerNode {
 	private TreeDrawerNode left = null;
 	private TreeDrawerNode right = null;
 	private String id = null;
-	private Color color = GUIFactory.TEXT;
+	private Color color = Color.black;
 
 	/**
 	 * Constructor for leaves.
