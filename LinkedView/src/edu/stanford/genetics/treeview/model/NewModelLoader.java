@@ -255,7 +255,7 @@ public class NewModelLoader {
 			loadProgView.updateLoadBar(rowN);
 
 			// load line as String array
-			String[] lineAsStrings = line.split("\\t");
+			String[] lineAsStrings = line.split("\\t", -1);
 			String[] labels;
 			double[] dataValues;
 
