@@ -17,6 +17,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet2;
 
 public class ColorChooserController {
 
+	public static final Integer DEFAULT_MULTI_CLICK_INTERVAL = 300;
 	private final ColorChooser gradientPick;
 
 	public ColorChooserController(final ColorChooser gradientPick) {
@@ -27,6 +28,19 @@ public class ColorChooserController {
 		addAllListeners();
 	}
 
+    /**
+     * Returns the system multi-click interval.
+     */
+    public static int getMultiClickInterval() {
+        Integer multiClickInterval = (Integer) Toolkit.getDefaultToolkit().getDesktopProperty("awt.multiClickInterval");
+
+        if (multiClickInterval == null) {
+            multiClickInterval = DEFAULT_MULTI_CLICK_INTERVAL;
+        }
+
+        return multiClickInterval;
+    }
+    
 	/**
 	 * Adds all listeners to the ColorGradientChooser object.
 	 */
@@ -52,16 +66,11 @@ public class ColorChooserController {
 	protected class ThumbSelectionListener implements MouseListener,
 			ActionListener {
 
-		private final Integer clickInterval = (Integer) Toolkit
-				.getDefaultToolkit().getDesktopProperty(
-						"awt.multiClickInterval");
-
 		private final Timer timer;
 		private MouseEvent lastEvent;
 
 		protected ThumbSelectionListener() {
-
-			timer = new Timer(clickInterval, this);
+			timer = new Timer(ColorChooserController.getMultiClickInterval(), this);
 		}
 
 		/**
