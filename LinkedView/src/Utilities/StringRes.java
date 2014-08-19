@@ -54,7 +54,7 @@ public class StringRes {
 	
 	// Loading
 	public static final String loading_OneSec = "One moment, please.";
-	public static final String loading_active = "Loading you data!";
+	public static final String loading_active = "Loading your data!";
 	public static final String loading_Ohoh = "Oh oh!";
 	public static final String loading_Error = "Looks like we ran into the " +
 	"following issue: ";
