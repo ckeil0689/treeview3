@@ -11,3 +11,13 @@ LinkedView/doc/JTVProgrammerGuide/JTVProgrammerGuide.fo
 LinkedView/doc/JTVUserManual/JTVUserManual.fo
 LinkedView/docbook
 *.pdf
+/bin/
+/dist/
+prefs.xml
+
+# OS Stuff
+.DS_Store
+
+# Eclipse stuff
+.settings
+.metadata
