@@ -11,8 +11,6 @@ LinkedView/doc/JTVProgrammerGuide/JTVProgrammerGuide.fo
 LinkedView/doc/JTVUserManual/JTVUserManual.fo
 LinkedView/docbook
 *.pdf
-/bin/
-/dist/
 prefs.xml
 
 # OS Stuff
@@ -21,3 +19,4 @@ prefs.xml
 # Eclipse stuff
 .settings
 .metadata
+/bin/
