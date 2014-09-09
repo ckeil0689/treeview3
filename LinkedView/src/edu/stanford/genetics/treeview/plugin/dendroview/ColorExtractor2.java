@@ -232,15 +232,22 @@ public class ColorExtractor2 extends Observable implements
 			// node was in GradientColorChooser. Otherwise keep defaults?
 			final Preferences colorPresetNode = parentNode.node("ColorPresets");
 			final String[] childrenNodes = colorPresetNode.childrenNames();
-
+			Boolean foundColorSet = false;
 			for (int i = 0; i < childrenNodes.length; i++) {
 
 				if (colorPresetNode.node(childrenNodes[i])
 						.get("name", lastActive).equalsIgnoreCase(lastActive)) {
 					colorSet.setConfigNode(colorPresetNode
 							.node(childrenNodes[i]));
+					foundColorSet = true;
 					break;
 				}
+			}
+			// TODO This should be a more robust way of choosing a default colorset
+			if (! foundColorSet) {
+				colorSet.setConfigNode(colorPresetNode.node(childrenNodes[0]));
+				LogBuffer.println("Unable to find last used colorset: " + lastActive + 
+						"; using " + colorPresetNode.node(childrenNodes[0]).get("name", "RedGreen"));
 			}
 		} catch (final BackingStoreException e) {
 			e.printStackTrace();
