@@ -1,56 +1,36 @@
 package Cluster;
 
-import java.awt.Dialog;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
 
+import Utilities.CustomDialog;
 import Utilities.StringRes;
 
 /**
- * Frame set up for ClusterView.
+ * Dialog set up for ClusterView. Produces a modal JDialog that
+ * contains the elements from ClusterView and overlays over the main
+ * application. Used to focus the user on this specific task.
  * 
  * @author CKeil
  * 
  */
-public class ClusterViewDialog {
+public class ClusterViewDialog extends CustomDialog {
 
-	private final JDialog clusterDialog;
 	private final ClusterView clusterView;
 	private final JFrame parentFrame;
 
 	public ClusterViewDialog(final JFrame parentFrame,
 			final String clusterType) {
 		
-		this.parentFrame = parentFrame;
+		super(StringRes.dlg_Cluster);
 		
-		clusterDialog = new JDialog();
-		clusterDialog.setTitle(StringRes.dialog_title_Cluster);
-		clusterDialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
-		clusterDialog.setResizable(false);
+		this.parentFrame = parentFrame;
 
 		clusterView = new ClusterView(clusterType);
-
-		// setup frame options
-		clusterDialog
-				.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-
-		// Makes the frame invisible when the window is closed
-		clusterDialog.addWindowListener(new WindowAdapter() {
-
-			@Override
-			public void windowClosing(final WindowEvent we) {
-
-				clusterDialog.dispose();
-			}
-		});
-
-		clusterDialog.getContentPane().add(clusterView.makeClusterPanel());
-
+		
+		mainPanel.add(clusterView.makeClusterPanel());
+		dialog.getContentPane().add(mainPanel);
+		
 		packDialog();
 	}
 	
@@ -61,8 +41,8 @@ public class ClusterViewDialog {
 	 */
 	public void reset() {
 		
-		clusterDialog.getContentPane().removeAll();
-		clusterDialog.getContentPane().add(clusterView.makeClusterPanel());
+		dialog.getContentPane().removeAll();
+		dialog.getContentPane().add(clusterView.makeClusterPanel());
 		packDialog();
 	}
 	
@@ -71,18 +51,8 @@ public class ClusterViewDialog {
 	 */
 	public void packDialog() {
 		
-		clusterDialog.pack();
-		clusterDialog.setLocationRelativeTo(parentFrame);
-	}
-
-	/**
-	 * Sets the visibility of clusterFrame.
-	 * 
-	 * @param visible
-	 */
-	public void setVisible(final boolean visible) {
-
-		clusterDialog.setVisible(visible);
+		dialog.pack();
+		dialog.setLocationRelativeTo(parentFrame);
 	}
 
 	/**
@@ -93,6 +63,17 @@ public class ClusterViewDialog {
 	public ClusterView getClusterView() {
 
 		return clusterView;
+	}
+	
+	/**
+	 * Allows access to the dialog's parentFrame so that error dialogs or 
+	 * alerts can be properly displayed, since they need a JFrame 
+	 * to be centered.
+	 * @return JFrame parentFrame
+	 */
+	public JFrame getParentFrame() {
+		
+		return parentFrame;
 	}
 	
 	/**
@@ -107,10 +88,9 @@ public class ClusterViewDialog {
 			public void run() {
 				
 				ClusterViewDialog cd = new ClusterViewDialog(new JFrame(), 
-						StringRes.menu_title_Hier);
+						StringRes.menu_Hier);
 				cd.setVisible(true);
 			}
 		});
 	}
-
 }

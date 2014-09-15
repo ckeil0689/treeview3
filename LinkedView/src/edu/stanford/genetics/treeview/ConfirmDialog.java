@@ -1,36 +1,39 @@
 package edu.stanford.genetics.treeview;
 
-import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.WindowConstants;
 
+import Utilities.CustomDialog;
 import Utilities.GUIFactory;
 
-public class ConfirmDialog {
-
-	private final JDialog confirmDialog;
+/**
+ * Small dialog used to confirm the decision to exit the program.
+ * @author CKeil
+ *
+ */
+public class ConfirmDialog extends CustomDialog {
+	
 	private boolean confirmed;
 
-	public ConfirmDialog(final ViewFrame viewFrame, final String function) {
+	/**
+	 * Constructs a dialog that provides the user with a second chance
+	 * in case the closing operation for the application was accidentally 
+	 * invoked.
+	 * @param view The main view instance.
+	 * @param title Title for this ConfirmDialog.
+	 * @param intent The action to be confirmed by the user.
+	 */
+	public ConfirmDialog(final ViewFrame view, String intent) {
 
-		confirmDialog = new JDialog();
-		confirmDialog.setTitle("Confirm");
-		confirmDialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
-		confirmDialog
-				.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		confirmDialog.setResizable(false);
-
-		final JPanel mainPanel = GUIFactory.createJPanel(false, true, null);
+		super("Confirm");
 
 		final JLabel prompt = GUIFactory.createLabel("Are you sure "
-				+ "you want to " + function + "?", GUIFactory.FONTS);
-		
+				+ "you want to continue the following task:", GUIFactory.FONTS);
+		final JLabel task = GUIFactory.createLabel(intent, GUIFactory.FONTS);
+
 		final JButton ok = GUIFactory.createBtn("OK");
 		ok.addActionListener(new ConfirmListener());
 
@@ -38,21 +41,31 @@ public class ConfirmDialog {
 		cancel.addActionListener(new DenyListener());
 
 		mainPanel.add(prompt, "push, alignx 50%, span, wrap");
+		mainPanel.add(task, "push, alignx 50%, span, wrap");
 		mainPanel.add(ok, "pushx, alignx 50%");
 		mainPanel.add(cancel, "pushx, alignx 50%");
 
-		confirmDialog.getContentPane().add(mainPanel);
-		confirmDialog.pack();
-		confirmDialog.setLocationRelativeTo(viewFrame.getAppFrame());
+		dialog.getContentPane().add(mainPanel);
+		dialog.pack();
+		dialog.setLocationRelativeTo(view.getAppFrame());
 	}
+	
+	/**
+	 * Gets the result of the user choice about closing the application.
+	 * @return boolean 
+	 */
+	public boolean getConfirmed() {
 
+		return confirmed;
+	}
+	
 	class ConfirmListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
 			confirmed = true;
-			confirmDialog.dispose();
+			dialog.dispose();
 		}
 	}
 
@@ -62,22 +75,7 @@ public class ConfirmDialog {
 		public void actionPerformed(final ActionEvent e) {
 
 			confirmed = false;
-			confirmDialog.dispose();
+			dialog.dispose();
 		}
-	}
-
-	public boolean getConfirmed() {
-
-		return confirmed;
-	}
-
-	/**
-	 * Sets the visibility of exitFrame;
-	 * 
-	 * @param visible
-	 */
-	public void setVisible(final boolean visible) {
-
-		confirmDialog.setVisible(visible);
 	}
 }

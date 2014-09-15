@@ -8,9 +8,8 @@ import edu.stanford.genetics.treeview.LogBuffer;
 /**
  * Launcher class which wraps the creation of the GUI as well as the main
  * method in LinkedViewApp in a Swing thread and allows to modify some UIManager
- * configurations beforehand (OSX menubar etc.).
+ * configurations beforehand. This is useful for the activation of the native Mac OSX menubar, for example.
  * @author CKeil
- *
  */
 public class TreeViewLauncher {
 
@@ -23,12 +22,8 @@ public class TreeViewLauncher {
 					.getSystemLookAndFeelClassName());
 			
 			/*
-			 * This String will store the menuBarUI key from 
-			 * Apple's Aqua LookAndFeel so it can be implemented
-			 * in CrossPlatform LAF afterwards which cannot use 
-			 * OSX native menuBar otherwise...
+			 * Check for OS and use menubar for Mac if applicable, for a more native feel.
 			 */
-//			String menuBarUI = "";
 			if (!isApplet && System.getProperty("os.name").contains("Mac")) {
 
 				System.setProperty("com.apple.mrj.application"
@@ -37,39 +32,7 @@ public class TreeViewLauncher {
 				// Activate OSX native menubar
 				System.setProperty("apple.laf.useScreenMenuBar", "true");
 				System.setProperty("apple.awt.showGrowBox", "true");
-				
-//				UIManager.setLookAndFeel(UIManager
-//						.getSystemLookAndFeelClassName());
-				
-				/* 
-				 * To keep custom look and feel AND OSX menubar, store variable
-				 * and then switch back to CrossPlatformLookAndFeel. Otherwise
-				 * the menubar can't be displayed.
-				 */
-//				menuBarUI = UIManager.getString("MenuBarUI");
-				
 			}
-			
-//			UIManager.setLookAndFeel(UIManager
-//					.getCrossPlatformLookAndFeelClassName());
-			
-//			UIManager.put("ScrollBarUI", TVScrollBarUI.class.getName());
-
-//			if (!isApplet && System.getProperty("os.name").contains("Mac")) {
-//				UIManager.put("MenuBarUI", menuBarUI);
-//				
-//			} else {
-//				// Custom menu components for non-OSX systems.
-//				UIManager.put("MenuItem.selectionBackground", 
-//								GUIFactory.ELEMENT_HOV);
-//				UIManager.put("MenuItem.font", GUIFactory.FONT_MENU);
-//				UIManager.put("MenuItem.background", GUIFactory.MENU);
-//	
-//				UIManager.put("Menu.selectionBackground", 
-//						GUIFactory.ELEMENT_HOV);
-//				UIManager.put("Menu.font", GUIFactory.FONT_MENU);
-//				UIManager.put("Menu.background", GUIFactory.MENU);
-//			}
 
 			javax.swing.SwingUtilities.invokeLater(new Runnable() {
 

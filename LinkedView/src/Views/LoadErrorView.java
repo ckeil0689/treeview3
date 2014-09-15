@@ -49,7 +49,7 @@ public class LoadErrorView {
 
 		JPanel title_bg = GUIFactory.createJPanel(false, false, null);
 
-		JLabel jl = GUIFactory.createLabel(StringRes.loading_Ohoh, 
+		JLabel jl = GUIFactory.createLabel(StringRes.load_Ohoh, 
 				GUIFactory.FONTXXL);
 
 		title_bg.add(jl, "push, alignx 50%, span");
@@ -68,7 +68,7 @@ public class LoadErrorView {
 
 		errorPanel.removeAll();
 		
-		JLabel errorLabel = GUIFactory.createLabel(StringRes.loading_Error, 
+		JLabel errorLabel = GUIFactory.createLabel(StringRes.load_Error, 
 				GUIFactory.FONTL);
 		JLabel message = GUIFactory.createLabel(errorMessage, GUIFactory.FONTS);
 

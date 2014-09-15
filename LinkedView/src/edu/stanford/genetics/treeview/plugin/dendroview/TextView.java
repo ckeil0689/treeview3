@@ -262,7 +262,7 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 				// offscreenSize.height / 2 );
 			}
 		} else {
-			l1.setText(StringRes.label_ZoomRowLabels);
+			l1.setText(StringRes.lbl_ZoomRowLabels);
 		}
 	}
 

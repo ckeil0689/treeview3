@@ -413,7 +413,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 				}
 			}
 		} else {
-			l1.setText(StringRes.label_ZoomColLabels);
+			l1.setText(StringRes.lbl_ZoomColLabels);
 		}
 		// end of if
 	}

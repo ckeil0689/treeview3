@@ -68,7 +68,7 @@ public class LinkedViewApp extends TreeViewApp {
 	// "edu.stanford.genetics.treeview.plugin.karyoview.KaryoscopeFactory"
 	public LinkedViewApp() {
 
-		super();// does not call XmlConfig constructor
+		super();// creates or loads global config file (Preferences) here.
 		scanForPlugins();
 
 		// added to circumvent standardStartup for now
@@ -78,6 +78,7 @@ public class LinkedViewApp extends TreeViewApp {
 	/**
 	 * Constructor for the TreeViewApp object takes configuration from the
 	 * passed in XmlConfig.
+	 * @param Preferences The preferences data for this instance of TreeView.
 	 */
 	public LinkedViewApp(final Preferences configurations) {
 

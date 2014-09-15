@@ -246,19 +246,19 @@ public class DendroView2 implements Observer, DendroPanel {
 		scaleDefaultAll.setToolTipText("Reset the zoomed view");
 
 		scaleIncX = GUIFactory.createNavBtn(StringRes.icon_zoomIn);
-		scaleIncX.setToolTipText(StringRes.tooltip_xZoomIn);
+		scaleIncX.setToolTipText(StringRes.tt_xZoomIn);
 
 		scaleDecX = GUIFactory.createNavBtn(StringRes.icon_zoomOut);
-		scaleDecX.setToolTipText(StringRes.tooltip_xZoomOut);
+		scaleDecX.setToolTipText(StringRes.tt_xZoomOut);
 
 		scaleIncY = GUIFactory.createNavBtn(StringRes.icon_zoomIn);
-		scaleIncY.setToolTipText(StringRes.tooltip_yZoomIn);
+		scaleIncY.setToolTipText(StringRes.tt_yZoomIn);
 
 		scaleDecY = GUIFactory.createNavBtn(StringRes.icon_zoomOut);
-		scaleDecY.setToolTipText(StringRes.tooltip_yZoomOut);
+		scaleDecY.setToolTipText(StringRes.tt_yZoomOut);
 
 		zoomBtn = GUIFactory.createNavBtn(StringRes.icon_zoomAll);
-		zoomBtn.setToolTipText(StringRes.tooltip_home);
+		zoomBtn.setToolTipText(StringRes.tt_home);
 
 		// Panels
 		btnPanel = GUIFactory.createJPanel(false, true, null);
@@ -540,7 +540,7 @@ public class DendroView2 implements Observer, DendroPanel {
 
 		final JDialog dialog = new JDialog();
 		dialog.setModalityType(JDialog.DEFAULT_MODALITY_TYPE);
-		dialog.setTitle(StringRes.dialog_title_search);
+		dialog.setTitle(StringRes.dlg_search);
 		dialog.setResizable(false);
 
 		final JPanel container = GUIFactory.createJPanel(true, true, null);
@@ -910,11 +910,11 @@ public class DendroView2 implements Observer, DendroPanel {
 	@Override
 	public void addDendroMenus(final JMenu menu) {
 
-		annotationsMenuItem = new JMenuItem(StringRes.menu_title_RowAndCol);
+		annotationsMenuItem = new JMenuItem(StringRes.menu_RowAndCol);
 		menu.add(annotationsMenuItem);
 		tvFrame.addToStackMenuList(annotationsMenuItem);
 
-		colorMenuItem = new JMenuItem(StringRes.menu_title_Color);
+		colorMenuItem = new JMenuItem(StringRes.menu_Color);
 		menu.add(colorMenuItem);
 		tvFrame.addToStackMenuList(colorMenuItem);
 		
@@ -945,12 +945,12 @@ public class DendroView2 implements Observer, DendroPanel {
 
 		// Cluster Menu
 		final JMenuItem hierMenuItem = new JMenuItem(
-				StringRes.menu_title_Hier);
+				StringRes.menu_Hier);
 		menu.add(hierMenuItem);
 		tvFrame.addToStackMenuList(hierMenuItem);
 
 		final JMenuItem kMeansMenuItem = new JMenuItem(
-				StringRes.menu_title_KMeans);
+				StringRes.menu_KMeans);
 		menu.add(kMeansMenuItem);
 		tvFrame.addToStackMenuList(kMeansMenuItem);
 	}

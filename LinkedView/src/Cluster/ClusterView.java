@@ -29,7 +29,6 @@ package Cluster;
 
 import java.awt.event.ActionListener;
 import java.util.Arrays;
-import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -53,9 +52,6 @@ import Utilities.StringRes;
  * @version 0.1
  */
 public class ClusterView {
-
-	// Instance
-	protected Preferences root;
 
 	// Various GUI elements
 	private JPanel mainPanel;
@@ -85,27 +81,13 @@ public class ClusterView {
 	private final String clusterTypeID;
 
 	/**
-	 * Chained constructor for the ClusterView object note this will reuse any
-	 * existing MainView subnode of the documentconfig.
+	 * Constructor for the ClusterView object which binds to an explicit
+	 * Preferences parent node.
 	 * 
-	 * @param cVModel
-	 *            model this ClusterView is to represent
+	 * @param root Parent node to which to bind this DendroView
+	 * @param name name of this view.
 	 */
 	public ClusterView(final String clusterTypeID) {
-
-		this(null, clusterTypeID);
-	}
-
-	/**
-	 * Constructor for the ClusterView object which binds to an explicit
-	 * confignode
-	 * 
-	 * @param root
-	 *            Confignode to which to bind this DendroView
-	 * @param name
-	 *            name of this view.
-	 */
-	public ClusterView(final Preferences root, final String clusterTypeID) {
 
 		this.clusterTypeID = clusterTypeID;
 		
@@ -168,21 +150,24 @@ public class ClusterView {
 		pBar.setEnabled(false); //initially disabled
 
 		// ComboBox to choose cluster method
-		final String[] clusterNames = { StringRes.menu_title_Hier,
-				StringRes.menu_title_KMeans };
+		final String[] clusterNames = { StringRes.menu_Hier,
+				StringRes.menu_KMeans };
 
 		clusterType = GUIFactory.createComboBox(clusterNames);
 
 		clusterType.setSelectedIndex(Arrays.asList(clusterNames).indexOf(
 				clusterTypeID));
 
-		final String[] measurements = { StringRes.cluster_DoNot,
+		final String[] measurements = { 
+				StringRes.cluster_DoNot,
 				StringRes.cluster_pearsonUn,
 				StringRes.cluster_pearsonCentered,
 				StringRes.cluster_absoluteUn,
 				StringRes.cluster_absoluteCentered,
-				StringRes.cluster_spearman, StringRes.cluster_euclidean,
-				StringRes.cluster_cityBlock };
+				StringRes.cluster_spearman, 
+				StringRes.cluster_euclidean,
+				StringRes.cluster_cityBlock 
+		};
 
 		// Drop-down menu for row selection
 		geneCombo = GUIFactory.createComboBox(measurements);
@@ -238,7 +223,6 @@ public class ClusterView {
 			infoPanel = ClusterInfoFactory.makeKmeansInfoPanel();
 		}
 	
-
 		optionsPanel.add(choicePanel, "aligny 10%, w 40%, h 100%");
 		optionsPanel.add(new JSeparator(JSeparator.VERTICAL), "pushx, w 1%, "
 				+ "h 100%");
@@ -366,16 +350,6 @@ public class ClusterView {
 		return arrayCombo;
 	}
 
-	/**
-	 * Setter for root - may not work properly
-	 * 
-	 * @param root
-	 */
-	public void setConfigNode(final Preferences root) {
-
-		this.root = root;
-	}
-
 	// Implementing methods to connect with Controller
 	/**
 	 * Adds a listener to cluster_button to register user interaction and notify
@@ -387,27 +361,6 @@ public class ClusterView {
 
 		cluster_btn.addActionListener(cluster);
 	}
-
-//	/**
-//	 * Performs the clustering action when the cluster_button is clicked, based
-//	 * on the user choices.
-//	 */
-//	public void displayClusterProcess(final String choice,
-//			final String choice2, final String linkageMethod) {
-//
-//		loadPanel.removeAll();
-//		buttonPanel.remove(cluster_button);
-//
-//		setLoadPanel(choice, choice2);
-//
-//		optionsPanel.add(loadPanel, "pushx, w 90%, alignx 50%, span, wrap");
-//		
-//		buttonPanel.add(cancel_button, "pushx, alignx 50%");
-//		mainPanel.add(buttonPanel, "pushx, alignx 50%, h 15%");
-//
-//		mainPanel.revalidate();
-//		mainPanel.repaint();
-//	}
 	
 	public void setClustering(boolean clustering) {
 		

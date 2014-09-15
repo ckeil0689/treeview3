@@ -60,14 +60,14 @@ public class ColorSet2 implements ConfigNodePersistent {
 	private List<Color> colorList;
 	private List<Double> fractionList;
 
-	private Preferences configNode = null;
+	private Preferences configNode;
 
 	/**
 	 * Constructor for the ColorSet object, uses default values
 	 */
 	public ColorSet2() {
 
-		super();
+		super(); //? what super class constructor is invoked here?
 
 		colorList = new ArrayList<Color>();
 		fractionList = new ArrayList<Double>();

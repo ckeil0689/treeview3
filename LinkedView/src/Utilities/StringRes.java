@@ -37,12 +37,12 @@ public class StringRes {
 	public static final String view_LoadError = "LoadErrorView";
 
 	// JDialog Titles
-	public static final String dialog_title_Cluster = "Cluster View";
-	public static final String dialog_title_search = "Search Labels";
-	public static final String dialog_title_loadLabels = "Loading Labels";
-	public static final String dialog_title_prefs = "Preferences";
-	public static final String dialog_title_exitConfirm = "Confirm Exit";
-	public static final String dialog_title_about = "About";
+	public static final String dlg_Cluster = "Cluster View";
+	public static final String dlg_search = "Search Labels";
+	public static final String dlg_loadLabels = "Loading Labels";
+	public static final String dlg_prefs = "Preferences";
+	public static final String dlg_exitConfirm = "Confirm Exit";
+	public static final String dlg_about = "About";
 	
 	// Main Words
 	public static final String main_rows = "Rows";
@@ -53,46 +53,47 @@ public class StringRes {
 	public static final String title_Welcome = "Welcome to ";
 	
 	// Loading
-	public static final String loading_OneSec = "One moment, please.";
-	public static final String loading_active = "Loading your data!";
-	public static final String loading_Ohoh = "Oh oh!";
-	public static final String loading_Error = "Looks like we ran into the " +
-	"following issue: ";
+	public static final String load_OneSec = "One moment, please.";
+	public static final String load_active = "Loading your data!";
+	public static final String load_Ohoh = "Oh oh!";
+	public static final String load_Error = "Looks like we ran into the " +
+			"following issue: ";
 
 	// Menu Titles
-	public static final String menu_title_Open = "Open...";
-	public static final String menu_title_OpenRecent = "Open Recent...";
-	public static final String menu_title_EditRecent = "Edit Recent Files";
-	public static final String menu_title_Save = "Save...";
-	public static final String menu_title_SaveAs = "Save As...";
-	public static final String menu_title_Font = "Font...";
-	public static final String menu_title_URL = "URL...";
-	public static final String menu_title_Prefs = "Preferences";
-	public static final String menu_title_RowAndCol = "Row and Column Labels...";
-	public static final String menu_title_Color = "Color Settings...";
-	public static final String menu_title_Hier = "Hierarchical";
-	public static final String menu_title_KMeans = "K-Means";
-	public static final String menu_title_Stats = "Stats...";
-	public static final String menu_title_About = "About...";
-	public static final String menu_title_ShowLog = "Show Log...";
-	public static final String menu_title_Docs = "Documentation...";
-	public static final String menu_title_Feedback = "Send Feedback...";
-	public static final String menu_title_NewWindow = "New Window";
-	public static final String menu_title_QuitWindow = "Close Window";
+	public static final String menu_Open = "Open...";
+	public static final String menu_OpenRecent = "Open Recent...";
+	public static final String menu_EditRecent = "Edit Recent Files";
+	public static final String menu_Save = "Save...";
+	public static final String menu_SaveAs = "Save As...";
+	public static final String menu_Font = "Font...";
+	public static final String menu_URL = "URL...";
+	public static final String menu_Prefs = "Preferences";
+	public static final String menu_ResetPrefs = "Reset Preferences";
+	public static final String menu_RowAndCol = "Row and Column Labels...";
+	public static final String menu_Color = "Color Settings...";
+	public static final String menu_Hier = "Hierarchical";
+	public static final String menu_KMeans = "K-Means";
+	public static final String menu_Stats = "Stats...";
+	public static final String menu_About = "About...";
+	public static final String menu_ShowLog = "Show Log...";
+	public static final String menu_Docs = "Documentation...";
+	public static final String menu_Feedback = "Send Feedback...";
+	public static final String menu_NewWindow = "New Window";
+	public static final String menu_QuitWindow = "Close Window";
 
 	// MenuBar
-	public static final String menubar_File = "File";
-	public static final String menubar_View = "View";
-	public static final String menubar_Cluster = "Cluster";
-	public static final String menubar_Help = "Help";
+	public static final String mbar_File = "File";
+	public static final String mbar_View = "View";
+	public static final String mbar_Cluster = "Cluster";
+	public static final String mbar_Help = "Help";
 
 	// Preferences API
 	// Nodes
-	public static final String pref_node_Preferences = "Preferences";
-	public static final String pref_node_DendroView = "DendroView";
-	public static final String pref_node_File = "File";
-	public static final String pref_node_TVFrame = "TreeViewFrame";
-	public static final String pref_node_FileMRU = "FileMRU";
+	public static final String pnode_Preferences = "Preferences";
+	public static final String pnode_DendroView = "DendroView";
+	public static final String pnode_File = "File";
+	public static final String pnode_TVFrame = "TreeViewFrame";
+	public static final String pnode_FileMRU = "FileMRU";
 
 	// Button Texts
 	public static final String btn_OK = "OK";
@@ -110,24 +111,17 @@ public class StringRes {
 	public static final String icon_zoomAll = "fullscreenIcon";
 	
 	// Tooltips
-	public static final String tooltip_searchRowCol = "Find row " +
-			"or column elements";
-	public static final String tooltip_showTrees = "Determine dendrogram" +
-			"visibility";
-	public static final String tooltip_xZoomIn = "Zoom in on rows";
-	public static final String tooltip_xZoomOut = "Zoom out of rows";
-	public static final String tooltip_yZoomIn = "Zoom in on columns";
-	public static final String tooltip_yZoomOut = "Zoom out of columns";
-	public static final String tooltip_home = "Zoom into the selected area";
-
-	// RadioButton Texts
-//	public static final String rButton_dark = "Dark";
-//	public static final String rButton_light = "Light";
+	public static final String tt_searchRowCol = "Find row or column elements";
+	public static final String tt_showTrees = "Determine dendrogram visibility";
+	public static final String tt_xZoomIn = "Zoom in on rows";
+	public static final String tt_xZoomOut = "Zoom out of rows";
+	public static final String tt_yZoomIn = "Zoom in on columns";
+	public static final String tt_yZoomOut = "Zoom out of columns";
+	public static final String tt_home = "Zoom into the selected area";
 
 	// Labels
-	public static final String label_ZoomColLabels = "Zoom to see column "
-			+ "labels";
-	public static final String label_ZoomRowLabels = "Zoom to see row labels";
+	public static final String lbl_ZoomColLabels = "Zoom to see column labels";
+	public static final String lbl_ZoomRowLabels = "Zoom to see row labels";
 
 	// Cluster Options
 	public static final String cluster_DoNot = "Do not cluster";

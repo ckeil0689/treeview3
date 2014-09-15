@@ -280,7 +280,7 @@ public class PreferencesController {
 			// Refresh labels
 			preferences.synchronizeAnnotation();
 
-			preferences.setupLayout(StringRes.menu_title_RowAndCol);
+			preferences.setupLayout(StringRes.menu_RowAndCol);
 			addListeners();
 		}
 	}

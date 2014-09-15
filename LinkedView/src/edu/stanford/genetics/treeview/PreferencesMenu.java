@@ -1,6 +1,5 @@
 package edu.stanford.genetics.treeview;
 
-import java.awt.Dialog;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentListener;
 import java.awt.event.WindowAdapter;
@@ -13,8 +12,8 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
 
+import Utilities.CustomDialog;
 import Utilities.GUIFactory;
 import Utilities.StringRes;
 import ColorChooser.ColorChooser;
@@ -22,15 +21,20 @@ import Controllers.PreferencesController;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
 import edu.stanford.genetics.treeview.plugin.dendroview.FontSettings;
 
-public class PreferencesMenu implements ConfigNodePersistent {
+/**
+ * A dialog that can contain various menus, depending on which the user
+ * chooses to open. This is done by setting the contents of the dialog's
+ * contentPane based on the clicked JMenuItem in the menubar.
+ * @author CKeil
+ *
+ */
+public class PreferencesMenu extends CustomDialog implements ConfigNodePersistent {
 
 	private final TreeViewFrame tvFrame;
 	private HeaderInfo geneHI;
 	private HeaderInfo arrayHI;
 	private Preferences configNode;
-	private JDialog menuDialog;
-
-	private JPanel basisPanel;
+	
 	private final DendroView2 dendroView;
 	private ColorChooser gradientPick;
 	private JButton ok_btn;
@@ -55,21 +59,12 @@ public class PreferencesMenu implements ConfigNodePersistent {
 	 */
 	public PreferencesMenu(final TreeViewFrame tvFrame) {
 
+		super(StringRes.dlg_prefs);
 		this.tvFrame = tvFrame;
 		this.dendroView = tvFrame.getDendroView();
 
-		// Setup JDialog
-		menuDialog = new JDialog();
-		menuDialog.setTitle(StringRes.dialog_title_prefs);
-		menuDialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
-		menuDialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		menuDialog.setResizable(false);
-
-		// Setup the basic content panel
-		basisPanel = GUIFactory.createJPanel(false, true, null);
-
-		menuDialog.getContentPane().add(basisPanel);
-		menuDialog.addWindowListener(new WindowAdapter() {
+		dialog.getContentPane().add(mainPanel);
+		dialog.addWindowListener(new WindowAdapter() {
 			
 			@Override
 			public void windowClosed(WindowEvent e) {
@@ -91,18 +86,6 @@ public class PreferencesMenu implements ConfigNodePersistent {
 		this.geneHI = geneHI;
 		this.arrayHI = arrayHI;
 	}
-
-	/**
-	 * Sets the visibility of clusterFrame.
-	 * 
-	 * @param visible
-	 */
-	public void setVisible(final boolean visible) {
-
-		menuDialog.pack();
-		menuDialog.setLocationRelativeTo(tvFrame.getAppFrame());
-		menuDialog.setVisible(visible);
-	}
 	
 	/**
 	 * Setting the configNode for the PreferencesMenu
@@ -112,7 +95,7 @@ public class PreferencesMenu implements ConfigNodePersistent {
 	public void setConfigNode(Preferences parentNode) {
 		
 		if (parentNode != null) {
-			this.configNode = parentNode.node(StringRes.pref_node_Preferences);
+			this.configNode = parentNode.node(StringRes.pnode_Preferences);
 
 		} else {
 			LogBuffer.println("Could not find or create PreferencesMenu "
@@ -123,11 +106,11 @@ public class PreferencesMenu implements ConfigNodePersistent {
 	/**
 	 * Returns the menu frame holding all the JPanels to display to the user.
 	 * 
-	 * @return
+	 * @return JDialog
 	 */
 	public JDialog getPreferencesFrame() {
 
-		return menuDialog;
+		return dialog;
 	}
 
 	public void synchronizeAnnotation() {
@@ -176,19 +159,8 @@ public class PreferencesMenu implements ConfigNodePersistent {
 	 */
 	public void addWindowListener(final WindowAdapter listener) {
 
-		menuDialog.addWindowListener(listener);
+		dialog.addWindowListener(listener);
 	}
-
-//	/**
-//	 * Adds an ActionListener to the darkThemeButton in ThemeSettings
-//	 * 
-//	 * @param listener
-//	 */
-//	public void addThemeListener(final ActionListener listener) {
-//
-//		themeSettings.getDarkThemeButton().addActionListener(listener);
-//		themeSettings.getLightThemeButton().addActionListener(listener);
-//	}
 
 	public void addCustomLabelListener(final ActionListener listener) {
 
@@ -207,7 +179,7 @@ public class PreferencesMenu implements ConfigNodePersistent {
 	 */
 	public void addComponentListener(final ComponentListener l) {
 
-		menuDialog.addComponentListener(l);
+		dialog.addComponentListener(l);
 	}
 
 //	/**
@@ -308,75 +280,6 @@ public class PreferencesMenu implements ConfigNodePersistent {
 		}
 	}
 
-//	/**
-//	 * Subclass to create a panel that handles theme settings.
-//	 * 
-//	 * @author CKeil
-//	 * 
-//	 */
-//	class ThemeSettingsPanel {
-//
-//		private final JRadioButton darkThemeButton;
-//		private final JRadioButton lightThemeButton;
-//
-//		private final ButtonGroup themeButtonGroup;
-//
-//		private final JScrollPane scrollPane;
-//
-//		public ThemeSettingsPanel() {
-//
-//			scrollPane = new JScrollPane();
-//
-//			final JPanel panel = GUIFactory.createJPanel(false, true, null);
-//
-//			final JLabel label = GUIFactory.createBigLabel("Choose a Theme:");
-//
-//			panel.add(label, "span, wrap");
-//
-//			darkThemeButton = GUIFactory
-//					.setRadioButtonLayout(StringRes.rButton_dark);
-//			lightThemeButton = GUIFactory
-//					.setRadioButtonLayout(StringRes.rButton_light);
-//
-//			themeButtonGroup = new ButtonGroup();
-//			themeButtonGroup.add(darkThemeButton);
-//			themeButtonGroup.add(lightThemeButton);
-//
-//			// Check for saved presets...
-//			final String default_theme = StringRes.rButton_dark;
-//			final String savedTheme = tvFrame.getConfigNode().get("theme",
-//					default_theme);
-//
-//			// Since changing the theme resets the layout
-//			if (savedTheme.equalsIgnoreCase(StringRes.rButton_dark)) {
-//				darkThemeButton.setSelected(true);
-//
-//			} else {
-//				lightThemeButton.setSelected(true);
-//			}
-//
-//			panel.add(lightThemeButton, "span, wrap");
-//			panel.add(darkThemeButton, "span");
-//
-//			scrollPane.setViewportView(panel);
-//		}
-//
-//		public JScrollPane makeThemePanel() {
-//
-//			return scrollPane;
-//		}
-//
-//		public JRadioButton getDarkThemeButton() {
-//
-//			return darkThemeButton;
-//		}
-//
-//		public JRadioButton getLightThemeButton() {
-//
-//			return lightThemeButton;
-//		}
-//	}
-
 	/**
 	 * Subclass for the Annotation settings panel.
 	 * 
@@ -452,34 +355,23 @@ public class PreferencesMenu implements ConfigNodePersistent {
 	 */
 	public void setupLayout(final String menu) {
 
-		basisPanel.removeAll();
+		mainPanel.removeAll();
 		
 		JPanel menuPanel;
-		if (menu.equalsIgnoreCase(StringRes.menu_title_Font)
+		if (menu.equalsIgnoreCase(StringRes.menu_Font)
 				&& tvFrame.isLoaded()) {
 			menuPanel = new FontPanel().makeFontPanel();
 
-		} else if (menu.equalsIgnoreCase(StringRes.menu_title_RowAndCol)) {
+		} else if (menu.equalsIgnoreCase(StringRes.menu_RowAndCol)) {
 			annotationSettings = new AnnotationPanel();
 			menuPanel = annotationSettings.makeLabelPane();
 
-		} else if (menu.equalsIgnoreCase(StringRes.menu_title_Color) 
+		} else if (menu.equalsIgnoreCase(StringRes.menu_Color) 
 				&& gradientPick != null) {
-//			ColorGradientChooser gradientPick = new ColorGradientChooser(
-//					tvFrame, ((DoubleArrayDrawer) dendroController
-//							.getArrayDrawer()).getColorExtractor());
-//
-//			// Adding GradientColorChooser configurations to DendroView node.
-//			gradientPick.setConfigNode(((TVModel) tvFrame.getDataModel())
-//					.getDocumentConfig());
-//			
-//			final ColorGradientController gradientControl = 
-//					new ColorGradientController(gradientPick);
-			
 			menuPanel = gradientPick.makeGradientPanel();
 		
 
-		} else if (menu.equalsIgnoreCase(StringRes.menu_title_URL)) {
+		} else if (menu.equalsIgnoreCase(StringRes.menu_URL)) {
 			menuPanel = new URLSettings().makeURLPanel();
 			
 		} else {
@@ -493,32 +385,15 @@ public class PreferencesMenu implements ConfigNodePersistent {
 
 		ok_btn = GUIFactory.createBtn(StringRes.btn_OK);
 		
-		basisPanel.add(menuPanel, "push, grow, wrap");
-		basisPanel.add(ok_btn, "pushx, alignx 100%, span");
+		mainPanel.add(menuPanel, "push, grow, wrap");
+		mainPanel.add(ok_btn, "pushx, alignx 100%, span");
 
-		basisPanel.revalidate();
-		basisPanel.repaint();
+		mainPanel.revalidate();
+		mainPanel.repaint();
+		
+		dialog.pack();
+		dialog.setLocationRelativeTo(tvFrame.getAppFrame());
 	}
-
-//	/**
-//	 * Returns the darkThemeButton from ThemeSettings for the controller.
-//	 * 
-//	 * @return
-//	 */
-//	public JRadioButton getLightButton() {
-//
-//		return themeSettings.getLightThemeButton();
-//	}
-//
-//	/**
-//	 * Returns the darkThemeButton from ThemeSettings for the controller.
-//	 * 
-//	 * @return
-//	 */
-//	public JRadioButton getDarkButton() {
-//
-//		return themeSettings.getDarkThemeButton();
-//	}
 
 	/**
 	 * Returns PreferencesMenu's configNode.
@@ -549,19 +424,4 @@ public class PreferencesMenu implements ConfigNodePersistent {
 			}
 		});
     }
-
-//	public ColorGradientChooser getGradientPick() {
-//
-//		return gradientPick;
-//	}
-
-//	/**
-//	 * Returns the name of the last chosen menu.
-//	 * 
-//	 * @return String
-//	 */
-//	public String getActiveMenu() {
-//
-//		return activeMenu;
-//	}
 }

@@ -9,6 +9,7 @@ import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import Utilities.ErrorDialog;
 import Utilities.StringRes;
 import Cluster.CDTGenerator;
 import Cluster.ClusterProcessor;
@@ -20,9 +21,9 @@ import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 
 /**
- * Class to be used as controller in the MVC design pattern for clustergrams. It
- * handles user interactions by implementing listeners which call methods from
- * the model or view to respond.
+ * Controls clustering according to user choices in ClusterView. It
+ * handles user interactions by implementing listeners which in turn call 
+ * methods from the model or view to respond.
  * 
  * @author CKeil
  * 
@@ -84,8 +85,6 @@ public class ClusterController {
 				if (!colSimilarity.equalsIgnoreCase(StringRes.cluster_DoNot)) {
 					orderedCols = cluster(colSimilarity, "Column");
 				}
-
-//				save();
 			} else {
 				clusterView.displayErrorLabel();
 			}
@@ -98,6 +97,14 @@ public class ClusterController {
 			save();
 		}
 
+		/**
+		 * General cluster method that starts a dedicated SwingWorker method
+		 * which runs the calculations in the background. This allows for 
+		 * updates of the ClusterView GUI, e.g. the JProgressBar.
+		 * @param choice The selected clustering method.
+		 * @param type The currently active clustering type.
+		 * @return
+		 */
 		public String[] cluster(final String choice, final String type) {
 
 			clusterWorker = new MyClusterWorker(choice, type);
@@ -108,11 +115,20 @@ public class ClusterController {
 				return clusterWorker.get();
 
 			} catch (final InterruptedException e) {
-				e.printStackTrace();
+				ErrorDialog error = new ErrorDialog(
+						clusterDialog.getParentFrame(), 
+						"Clustering was interrupted.");
+				error.setVisible(true);
+				LogBuffer.println(e.getMessage());
 				return null;
 
 			} catch (final ExecutionException e) {
-				e.printStackTrace();
+				ErrorDialog error = new ErrorDialog(
+						clusterDialog.getParentFrame(), 
+						"Clustering experienced an issue with code"
+						+ "execution.");
+				error.setVisible(true);
+				LogBuffer.println(e.getMessage());
 				return null;
 			}
 		}
@@ -127,10 +143,11 @@ public class ClusterController {
 		}
 
 		/**
-		 * Checks whether all needed options are selected to perform clustering.
+		 * Verifies whether all needed options are selected 
+		 * to perform clustering.
 		 * 
-		 * @param choiceRow
-		 * @param choiceCol
+		 * @param choiceRow Selected method for row clustering.
+		 * @param choiceCol Selected method for column clustering.
 		 * @return
 		 */
 		public boolean checkSelections(final String choiceRow, 
@@ -218,10 +235,19 @@ public class ClusterController {
 					clusterView.cancel();
 				}
 			} catch (InterruptedException e) {
+				ErrorDialog error = new ErrorDialog(
+						clusterDialog.getParentFrame(), 
+						"Cancelling cluster was interrupted.");
+				error.setVisible(true);		
 				LogBuffer.println(e.getMessage());
 				clusterView.cancel();
 				
 			} catch (ExecutionException e) {
+				ErrorDialog error = new ErrorDialog(
+						clusterDialog.getParentFrame(), 
+						"Cancelling cluster experienced an issue with"
+						+ "code execution.");
+				error.setVisible(true);
 				LogBuffer.println(e.getMessage());
 				clusterView.cancel();
 			}
@@ -398,7 +424,7 @@ public class ClusterController {
 
 		boolean hierarchical = false;
 		final String choice = clusterView.getClusterMethod();
-		hierarchical = choice.equalsIgnoreCase(StringRes.menu_title_Hier);
+		hierarchical = choice.equalsIgnoreCase(StringRes.menu_Hier);
 		return hierarchical;
 	}
 }

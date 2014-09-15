@@ -92,6 +92,9 @@ public abstract class TreeViewApp {// implements WindowListener {
 	/**
 	 * Constructor for the TreeViewApp object takes configuration from the
 	 * passed in XmlConfig.
+	 * @param Preferences The saved preferences file.
+	 * @param boolean checks if the current running instance is a browser 
+	 * applet or desktop application.
 	 */
 	public TreeViewApp(final Preferences preferences, final boolean isApplet) {
 
@@ -155,9 +158,10 @@ public abstract class TreeViewApp {// implements WindowListener {
 	}
 
 	/**
-	 * Sets up user-specified preferences.
-	 * 
-	 * @return
+	 * Loads the Preferences file stored on the users machine.
+	 * If none is present with the root node 'TreeViewApp', it creates
+	 * a new one.
+	 * @return Preferences
 	 */
 	public Preferences setPreferences() {
 

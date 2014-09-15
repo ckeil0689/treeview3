@@ -308,7 +308,7 @@ public abstract class ViewFrame implements Observer {
 //			LogBuffer.println("ViewFrame.closeWindow() Got exception: " + e);
 //		}
 
-		final ConfirmDialog confirm = new ConfirmDialog(this, "exit TreeView");
+		final ConfirmDialog confirm = new ConfirmDialog(this, "Exit TreeView");
 		confirm.setVisible(true);
 
 		if (confirm.getConfirmed()) {

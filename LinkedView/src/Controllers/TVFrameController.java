@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.swing.JFileChooser;
@@ -19,11 +20,13 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import Utilities.ErrorDialog;
 import Utilities.StringRes;
 import Cluster.ClusterViewDialog;
 import ColorChooser.ColorChooser;
 import ColorChooser.ColorChooserController;
 import edu.stanford.genetics.treeview.CdtFilter;
+import edu.stanford.genetics.treeview.ConfirmDialog;
 import edu.stanford.genetics.treeview.DataMatrix;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.DataModelFileType;
@@ -54,7 +57,7 @@ public class TVFrameController {
 	private final TreeViewFrame tvFrame;
 	private final JFrame applicationFrame;
 	private final DendroController dendroController;
-	private MenubarActions menuActions;
+	private MenubarController menuActions;
 
 	private File file;
 	private FileSet fileMenuSet;
@@ -75,6 +78,28 @@ public class TVFrameController {
 		
 		setViewChoice();
 		addViewListeners();
+	}
+	
+	/**
+	 * Removes all children nodes of the 'File'node. This has the effect that
+	 * all preferences stored specific to different loaded data sets are reset.
+	 */
+	public void resetPreferences() {
+		
+		try {
+			String intent = "Reset Preferences";
+			ConfirmDialog confirm = new ConfirmDialog(tvFrame, intent);
+			confirm.setVisible(true);
+			if (confirm.getConfirmed()) {
+				tvFrame.getConfigNode().node("File").removeNode();
+			}
+			
+		} catch (BackingStoreException e) {
+			String message = "Issue while resetting preferences.";
+			ErrorDialog error = new ErrorDialog(tvFrame.getAppFrame(), message);
+			error.setVisible(true);
+			LogBuffer.println(e.getMessage());
+		}
 	}
 
 	/**
@@ -98,7 +123,7 @@ public class TVFrameController {
 	 */
 	public void addMenuListeners() {
 		
-		menuActions = new MenubarActions(tvFrame, TVFrameController.this);
+		menuActions = new MenubarController(tvFrame, TVFrameController.this);
 
 		tvFrame.addMenuActionListeners(new StackMenuListener());
 		tvFrame.addFileMenuListeners(new FileMenuListener());
@@ -738,7 +763,7 @@ public class TVFrameController {
 						new PreferencesMenu(tvFrame);
 				
 				ColorChooser gradientPick = null;
-				if(menu.equalsIgnoreCase(StringRes.menu_title_Color)) {
+				if(menu.equalsIgnoreCase(StringRes.menu_Color)) {
 					
 					int min = (int)model.getDataMatrix().getMinVal();
 					int max = (int)model.getDataMatrix().getMaxVal();
@@ -761,7 +786,7 @@ public class TVFrameController {
 					preferences.setGradientChooser(gradientPick);
 					
 				} else if(menu.equalsIgnoreCase(
-						StringRes.menu_title_RowAndCol)) {
+						StringRes.menu_RowAndCol)) {
 					preferences.setHeaderInfo(model.getGeneHeaderInfo(), 
 							model.getArrayHeaderInfo());
 				}
@@ -769,7 +794,7 @@ public class TVFrameController {
 				preferences.setupLayout(menu);
 				
 				preferences.setConfigNode(tvFrame.getConfigNode().node(
-						StringRes.pref_node_Preferences));
+						StringRes.pnode_Preferences));
 
 				final PreferencesController pController = 
 						new PreferencesController(tvFrame, model, preferences);

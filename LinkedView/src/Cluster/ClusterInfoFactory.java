@@ -116,25 +116,6 @@ public class ClusterInfoFactory {
 		return mainPanel;
 	}
 	
-//	public JPanel makeTipPanel() {
-//		
-//		mainPanel.removeAll();
-//		
-//		JLabel label = GUIFactory.createBigLabel("Tip");
-//		
-//		mainPanel.add(label, "pushx, span, wrap");
-//		
-//		int index = 0;
-//		TextDisplay tip = new TextDisplay(getTip(index));
-//		
-//		mainPanel.add(tip, "pushx, growx, wrap");
-//		
-//		mainPanel.revalidate();
-//		mainPanel.repaint();
-//		
-//		return mainPanel;
-//	}
-	
 	/**
 	 * Gets the appropriate similarity String resource depending on which 
 	 * method is selected by the user (designated by index).

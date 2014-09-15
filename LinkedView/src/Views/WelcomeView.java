@@ -120,8 +120,8 @@ public class WelcomeView {
 
 		JPanel loadContainer = GUIFactory.createJPanel(false, false, null);
 		
-		jl.setText(StringRes.loading_OneSec);
-		jl2.setText(StringRes.loading_active);
+		jl.setText(StringRes.load_OneSec);
+		jl2.setText(StringRes.load_active);
 		
 		loadLabel = GUIFactory.createLabel("", GUIFactory.FONTL);
 		

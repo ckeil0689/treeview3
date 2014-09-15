@@ -1,18 +1,13 @@
 package edu.stanford.genetics.treeview;
 
-import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.WindowConstants;
 
+import Utilities.CustomDialog;
 import Utilities.GUIFactory;
 import Utilities.StringRes;
 
@@ -23,44 +18,26 @@ import Utilities.StringRes;
  * @author CKeil
  * 
  */
-public class AboutDialog {
+public class AboutDialog extends CustomDialog{
 
-	private final JDialog aboutDialog;
 	private final TreeViewFrame tvFrame;
 
 	public AboutDialog(final TreeViewFrame tvFrame) {
 
+		super(StringRes.dlg_about);
 		this.tvFrame = tvFrame;
-
-		aboutDialog = new JDialog();
-		aboutDialog.setTitle(StringRes.dialog_title_about);
-		aboutDialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
-		aboutDialog.setResizable(false);
-
-//		final Dimension mainDim = GUIFactory.getScreenSize();
-//
-//		aboutDialog.setSize(mainDim.width * 1 / 2, mainDim.height * 1 / 2);
-
-		aboutDialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-
-		aboutDialog.addWindowListener(new WindowAdapter() {
-
-			@Override
-			public void windowClosing(final WindowEvent we) {
-
-				aboutDialog.dispose();
-			}
-		});
 
 		setupLayout();
 
-		aboutDialog.pack();
-		aboutDialog.setLocationRelativeTo(tvFrame.getAppFrame());
+		dialog.pack();
+		dialog.setLocationRelativeTo(tvFrame.getAppFrame());
 	}
 
+	/**
+	 * Setup the layout and content of the mainPanel and add it to the
+	 * dialog.
+	 */
 	public void setupLayout() {
-
-		final JPanel message = GUIFactory.createJPanel(false, true, null);
 
 		final JLabel text = GUIFactory.createLabel(StringRes.appName
 				+ " was created by Chris Keil based on Alok Saldhana's "
@@ -69,13 +46,13 @@ public class AboutDialog {
 		final JLabel version = GUIFactory.createLabel("Version: " 
 				+ StringRes.versionTag, GUIFactory.FONTS);
 
-		message.add(text, "span, wrap");
-		message.add(version, "span, wrap");
+		mainPanel.add(text, "span, wrap");
+		mainPanel.add(version, "span, wrap");
 
 		final JLabel hp = GUIFactory.createLabel("Homepage", GUIFactory.FONTS);
 
-		message.add(hp);
-		message.add(new JTextField(StringRes.updateUrl));
+		mainPanel.add(hp);
+		mainPanel.add(new JTextField(StringRes.updateUrl));
 
 		JButton yesB = GUIFactory.createBtn("Open");
 		yesB.addActionListener(new ActionListener() {
@@ -87,13 +64,13 @@ public class AboutDialog {
 			}
 
 		});
-		message.add(yesB, "wrap");
+		mainPanel.add(yesB, "wrap");
 
 		final JLabel announce = GUIFactory.createLabel("Announcements", 
 				GUIFactory.FONTS);
 
-		message.add(announce);
-		message.add(new JTextField(StringRes.announcementUrl));
+		mainPanel.add(announce);
+		mainPanel.add(new JTextField(StringRes.announcementUrl));
 
 		yesB = GUIFactory.createBtn("Sign Up");
 		yesB.addActionListener(new ActionListener() {
@@ -103,16 +80,8 @@ public class AboutDialog {
 				tvFrame.displayURL(StringRes.announcementUrl);
 			}
 		});
-		message.add(yesB);
+		mainPanel.add(yesB);
 
-		aboutDialog.add(message);
-	}
-
-	/**
-	 * Opens the "About" JDialog.
-	 */
-	public void openAboutDialog() {
-
-		aboutDialog.setVisible(true);
+		dialog.add(mainPanel);
 	}
 }

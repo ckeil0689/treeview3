@@ -71,7 +71,7 @@ public class FileMru extends java.util.Observable implements
 	public synchronized void setConfigNode(final Preferences parentNode) {
 
 		if (parentNode != null) {
-			this.configNode = parentNode.node(StringRes.pref_node_FileMRU);
+			this.configNode = parentNode.node(StringRes.pnode_FileMRU);
 
 		} else {
 			LogBuffer.println("Could not find or create FileMRU Preferences"
