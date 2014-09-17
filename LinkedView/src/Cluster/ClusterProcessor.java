@@ -2,8 +2,10 @@ package Cluster;
 
 import javax.swing.SwingWorker;
 
+import Utilities.AlertDialog;
+import Utilities.ErrorDialog;
+import Controllers.ClusterController;
 import edu.stanford.genetics.treeview.DataModel;
-import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 
 /**
@@ -44,7 +46,7 @@ public class ClusterProcessor {
 	 * @return
 	 */
 	public String[] hCluster(final double[][] distanceMatrix, 
-			final String type) {
+			final int type) {
 
 		final HierarchicalCluster cGen = new HierarchicalCluster(tvModel,
 				clusterView, distanceMatrix, type, worker);
@@ -57,18 +59,18 @@ public class ClusterProcessor {
 	/**
 	 * Method to execute the K-Means clustering algorithm.
 	 * 
-	 * @param distances
-	 * @param type
-	 * @param pBar
-	 * @param clusterN
-	 * @param iterations
+	 * @param distMatrix The calculated distance matrix. 
+	 * @param axis The matrix axis on which operations will be performed.
+	 * @param pBar The progressBar.
+	 * @param groupNum Number of groups to be formed (k).
+	 * @param iterations Number of iterations to be done.
 	 * @return
 	 */
-	public String[] kmCluster(final double[][] distances, final String type,
-			final int clusterN, final int iterations) {
+	public String[] kmCluster(final double[][] distMatrix, final int axis,
+			final int groupNum, final int iterations) {
 
 		final KMeansCluster cGen = new KMeansCluster(tvModel, clusterView,
-				distances, type, clusterN, iterations, worker);
+				distMatrix, axis, groupNum, iterations, worker);
 
 		cGen.cluster();
 
@@ -97,13 +99,14 @@ public class ClusterProcessor {
 	/**
 	 * Calculates the distance matrix according to the chosen method.
 	 * 
-	 * @param choice
+	 * @param distMeasure
 	 * @return
 	 */
-	public double[][] calculateDistance(final String choice, final String type) {
+	public double[][] calculateDistance(final String distMeasure, 
+			final int axis) {
 
 		double[][] data = null;
-		if (type.equalsIgnoreCase("Row")) {
+		if (axis == ClusterController.ROW) {
 			data = ((TVDataMatrix) tvModel.getDataMatrix()).getExprData();
 
 		} else {
@@ -112,20 +115,24 @@ public class ClusterProcessor {
 		}
 
 		if (data != null) {
-			final DistanceMatrixCalculator dCalc = 
-					new DistanceMatrixCalculator(data, choice, type, 
-							clusterView, worker);
+			final DistMatrixCalculator dCalc = new DistMatrixCalculator(data, 
+					distMeasure, axis, clusterView, worker);
 
 			try {
 				dCalc.measureDistance();
 				
 			} catch(NumberFormatException e) {
-				LogBuffer.println(e.getMessage());
+				String message = "Measuring the distances experienced "
+						+ "an issue. Check log messages to see the cause.";
+				ErrorDialog.showError(message, e);;
 			}
+			
 			return dCalc.getDistanceMatrix();
 
 		} else {
-			LogBuffer.println(type + " Data was not extracted.");
+			String message = "Data could not be retrieved "
+					+ "for distance calculation.";
+			AlertDialog.showAlert(message);
 			return null;
 		}
 	}

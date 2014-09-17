@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import Utilities.StringRes;
 import edu.stanford.genetics.treeview.DataModel;
+import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 
 /**
  * This class is used to generate the .CDT tab delimited file which Java
@@ -41,13 +42,12 @@ public class CDTGenerator {
 
 	// Constructor (building the object)
 	public CDTGenerator(final DataModel model,
-			final ClusterView clusterView, final double[][] sepList,
-			final String[] orderedRows, final String[] orderedCols,
-			final boolean hierarchical) {
+			final ClusterView clusterView, final String[] orderedRows, 
+			final String[] orderedCols, final boolean hierarchical) {
 
 		this.model = model;
 		this.clusterView = clusterView;
-		this.sepList = sepList;
+		this.sepList = ((TVDataMatrix) model.getDataMatrix()).getExprData();//sepList;
 		this.orderedRows = orderedRows;
 		this.orderedCols = orderedCols;
 		this.hierarchical = hierarchical;

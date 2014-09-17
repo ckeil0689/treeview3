@@ -96,7 +96,7 @@ public class TVFrameController {
 			
 		} catch (BackingStoreException e) {
 			String message = "Issue while resetting preferences.";
-			ErrorDialog error = new ErrorDialog(tvFrame.getAppFrame(), message);
+			ErrorDialog error = new ErrorDialog(message);
 			error.setVisible(true);
 			LogBuffer.println(e.getMessage());
 		}

@@ -53,32 +53,32 @@ import Utilities.StringRes;
  */
 public class ClusterView {
 
-	// Various GUI elements
+	// GUI components
 	private JPanel mainPanel;
 	private JPanel optionsPanel;
-	private JPanel buttonPanel;
+	private JPanel btnPanel;
 	private JPanel loadPanel;
 
-	private JComboBox<String> geneCombo;
-	private JComboBox<String> arrayCombo;
-	private JComboBox<String> clusterType;
-	private JComboBox<String> clusterChoice;
+	private JComboBox<String> rowDistChooser;
+	private JComboBox<String> colDistChooser;
+	private JComboBox<String> clusterChooser;
+	private JComboBox<String> linkageChooser;
 
 	private JButton cluster_btn;
-	private JButton cancel_button;
+	private JButton cancel_btn;
 
-	private JSpinner enterRC;
-	private JSpinner enterCC;
-	private JSpinner enterRIt;
-	private JSpinner enterCIt;
+	private JSpinner rowGroupsSetr;
+	private JSpinner colGroupsSetr;
+	private JSpinner rowIterationsSetr;
+	private JSpinner colIterationsSetr;
 
 	private JLabel loadLabel;
 	private JProgressBar pBar;
 
-	private final String[] clusterMethods = { "Average Linkage", 
+	private final String[] linkageMethods = { "Average Linkage", 
 			"Single Linkage", "Complete Linkage" };
 
-	private final String clusterTypeID;
+	private final String clusterType;
 
 	/**
 	 * Constructor for the ClusterView object which binds to an explicit
@@ -87,9 +87,9 @@ public class ClusterView {
 	 * @param root Parent node to which to bind this DendroView
 	 * @param name name of this view.
 	 */
-	public ClusterView(final String clusterTypeID) {
+	public ClusterView(final String clusterType) {
 
-		this.clusterTypeID = clusterTypeID;
+		this.clusterType = clusterType;
 		
 		// Setting up the interactive components with listeners
 		setupInteractiveComponents();
@@ -104,9 +104,9 @@ public class ClusterView {
 		optionsPanel = GUIFactory.createJPanel(false, true, null);
 		
 		// Panel for the Cluster/ Cancel buttons
-		buttonPanel = GUIFactory.createJPanel(false, true, null);
+		btnPanel = GUIFactory.createJPanel(false, true, null);
 		
-		// ProgressBar Component
+		// ProgressBar Panel
 		loadPanel = GUIFactory.createJPanel(false, true, null);
 		
 		setupLayout();
@@ -131,7 +131,7 @@ public class ClusterView {
 	}
 
 	/**
-	 * Prepares the buttons to be used in the layout.
+	 * Sets up all the interactive components to be used in the layout.
 	 */
 	public void setupInteractiveComponents() {
 
@@ -139,7 +139,7 @@ public class ClusterView {
 		cluster_btn = GUIFactory.createBtn(StringRes.btn_Cluster);
 
 		// Button to cancel worker thread in the controller
-		cancel_button = GUIFactory.createBtn(StringRes.btn_Cancel);
+		cancel_btn = GUIFactory.createBtn(StringRes.btn_Cancel);
 
 		// Label for cluster process
 		loadLabel = GUIFactory.createLabel(StringRes.clusterInfo_Ready, 
@@ -153,53 +153,53 @@ public class ClusterView {
 		final String[] clusterNames = { StringRes.menu_Hier,
 				StringRes.menu_KMeans };
 
-		clusterType = GUIFactory.createComboBox(clusterNames);
+		clusterChooser = GUIFactory.createComboBox(clusterNames);
 
-		clusterType.setSelectedIndex(Arrays.asList(clusterNames).indexOf(
-				clusterTypeID));
+		clusterChooser.setSelectedIndex(Arrays.asList(clusterNames).indexOf(
+				clusterType));
 
 		final String[] measurements = { 
 				StringRes.cluster_DoNot,
 				StringRes.cluster_pearsonUn,
-				StringRes.cluster_pearsonCentered,
-				StringRes.cluster_absoluteUn,
-				StringRes.cluster_absoluteCentered,
+				StringRes.cluster_pearsonCtrd,
+				StringRes.cluster_absCorrUn,
+				StringRes.cluster_absCorrCtrd,
 				StringRes.cluster_spearman, 
 				StringRes.cluster_euclidean,
 				StringRes.cluster_cityBlock 
 		};
 
 		// Drop-down menu for row selection
-		geneCombo = GUIFactory.createComboBox(measurements);
-		geneCombo.setSelectedIndex(1);
+		rowDistChooser = GUIFactory.createComboBox(measurements);
+		rowDistChooser.setSelectedIndex(1);
 
 		// Drop-down menu for column selection
-		arrayCombo = GUIFactory.createComboBox(measurements);
-		arrayCombo.setSelectedIndex(1);
+		colDistChooser = GUIFactory.createComboBox(measurements);
+		colDistChooser.setSelectedIndex(1);
 
 		// Linkage choice drop-down menu
-		clusterChoice = GUIFactory.createComboBox(clusterMethods);
+		linkageChooser = GUIFactory.createComboBox(linkageMethods);
 
 		// Spinners for K-Means
-		enterRC = setupSpinner();
-		enterCC = setupSpinner();
-		enterRIt = setupSpinner();
-		enterCIt = setupSpinner();
+		rowGroupsSetr = setupSpinner();
+		colGroupsSetr = setupSpinner();
+		rowIterationsSetr = setupSpinner();
+		colIterationsSetr = setupSpinner();
 	}
 
-	// Layout setups for some Swing elements
+	// Layout setups for main UI elements
 	/**
 	 * Sets up general elements of the mainPanel
 	 */
 	public void setMainPanel() {
 
 		// Panel for the Buttons
-		buttonPanel.removeAll();
-		buttonPanel.add(cluster_btn, "pushx, alignx 50%");
+		btnPanel.removeAll();
+		btnPanel.add(cluster_btn, "pushx, alignx 50%");
 
 		mainPanel.add(optionsPanel, "pushx, growx, w 90%, wrap");
 		mainPanel.add(loadPanel, "pushx, w 90%, growx, span, wrap");
-		mainPanel.add(buttonPanel, "pushx, growx, w 90%");
+		mainPanel.add(btnPanel, "pushx, growx, w 90%");
 	}
 
 	/**
@@ -215,9 +215,9 @@ public class ClusterView {
 		// Cluster Info Panel
 		JPanel infoPanel;
 		
-		if(clusterType.getSelectedIndex() == 0) {
+		if(clusterChooser.getSelectedIndex() == 0) {
 			infoPanel = ClusterInfoFactory.makeHierInfoPanel(
-					clusterChoice.getSelectedIndex());
+					linkageChooser.getSelectedIndex());
 			
 		} else {
 			infoPanel = ClusterInfoFactory.makeKmeansInfoPanel();
@@ -246,7 +246,7 @@ public class ClusterView {
 		
 		choicePanel.add(type, "pushx, alignx 0%, span, wrap");
 		choicePanel.add(switchLabel, "pushx, alignx 0%, w 20%");
-		choicePanel.add(clusterType, "pushx, alignx 0%, w 80%, wrap 20px");
+		choicePanel.add(clusterChooser, "pushx, alignx 0%, w 80%, wrap 20px");
 		
 		// Components for similarity measure options
 		final JLabel similarity = GUIFactory.createLabel("Similarity "
@@ -258,13 +258,13 @@ public class ClusterView {
 
 		choicePanel.add(similarity, "pushx, alignx 0%, span, wrap");
 		choicePanel.add(rowLabel, "pushx, alignx 0%, w 20%");
-		choicePanel.add(geneCombo, "w 80%, wrap");
+		choicePanel.add(rowDistChooser, "w 80%, wrap");
 		choicePanel.add(colLabel, "pushx, alignx 0%, w 20%");
-		choicePanel.add(arrayCombo, "w 80%, wrap 20px");
+		choicePanel.add(colDistChooser, "w 80%, wrap 20px");
 
 		// Components for linkage choice
 		// Hierarchical
-		if (clusterType.getSelectedIndex() == 0) {
+		if (clusterChooser.getSelectedIndex() == 0) {
 			final JLabel method = GUIFactory.createLabel("Linkage Method", 
 					GUIFactory.FONTL);
 			final JLabel choose = GUIFactory.createLabel("Choose: ", 
@@ -272,7 +272,7 @@ public class ClusterView {
 			
 			choicePanel.add(method, "pushx, alignx 0%, span, wrap");
 			choicePanel.add(choose, "pushx, alignx 0%, w 20%");
-			choicePanel.add(clusterChoice, "pushx, alignx 0%, w 80%, wrap");
+			choicePanel.add(linkageChooser, "pushx, alignx 0%, w 80%, wrap");
 
 		// K-means
 		} else {
@@ -296,12 +296,12 @@ public class ClusterView {
 			choicePanel.add(cols, "wrap");
 			
 			choicePanel.add(clusters, "w 20%!");
-			choicePanel.add(enterRC, "split 2");
-			choicePanel.add(enterCC, "wrap");
+			choicePanel.add(rowGroupsSetr, "split 2");
+			choicePanel.add(colGroupsSetr, "wrap");
 
 			choicePanel.add(its, "w 20%!");
-			choicePanel.add(enterRIt, "split 2");
-			choicePanel.add(enterCIt);
+			choicePanel.add(rowIterationsSetr, "split 2");
+			choicePanel.add(colIterationsSetr);
 		}
 		
 		return choicePanel;
@@ -322,34 +322,6 @@ public class ClusterView {
 		return jft;
 	}
 
-	/**
-	 * Get the mainPanel for reference
-	 */
-	public JPanel getMainPanel() {
-
-		return mainPanel;
-	}
-
-	/**
-	 * Get the similarity measure choice for row clustering
-	 * 
-	 * @return
-	 */
-	public JComboBox<String> getGeneCombo() {
-
-		return geneCombo;
-	}
-
-	/**
-	 * Get the similarity measure choice for column clustering
-	 * 
-	 * @return
-	 */
-	public JComboBox<String> getArrayCombo() {
-
-		return arrayCombo;
-	}
-
 	// Implementing methods to connect with Controller
 	/**
 	 * Adds a listener to cluster_button to register user interaction and notify
@@ -362,32 +334,40 @@ public class ClusterView {
 		cluster_btn.addActionListener(cluster);
 	}
 	
-	public void setClustering(boolean clustering) {
+	/**
+	 * Sets the state of clustering. If true, clustering is considered in
+	 * progress and the UI has to change accordingly. The cluster button will
+	 * be replaced by a cancel button, and vice versa.
+	 * @param isInProgress
+	 */
+	public void setClustering(boolean isInProgress) {
 		
-		if(clustering) {
-			buttonPanel.remove(cluster_btn);
-			buttonPanel.add(cancel_button, "pushx, alignx 50%");
+		pBar.setValue(0); // reset ProgressBar
+		
+		if(isInProgress) {
+			btnPanel.remove(cluster_btn);
+			btnPanel.add(cancel_btn, "pushx, alignx 50%");
 			pBar.setEnabled(true);
 			
 		} else {
-			buttonPanel.remove(cancel_button);
-			buttonPanel.add(cluster_btn, "pushx, alignx 50%");
+			btnPanel.remove(cancel_btn);
+			btnPanel.add(cluster_btn, "pushx, alignx 50%");
 			pBar.setEnabled(false);
 		}
 		
-		buttonPanel.revalidate();
-		buttonPanel.repaint();
+		btnPanel.revalidate();
+		btnPanel.repaint();
 	}
 
 	/**
-	 * Adds a listener to cancel_button to register user interaction and notify
+	 * Adds a listener to cancel_btn to register user interaction and notifies
 	 * ClusterController to call the cancel() method.
 	 * 
 	 * @param cancel
 	 */
 	public void addCancelListener(final ActionListener cancel) {
 
-		cancel_button.addActionListener(cancel);
+		cancel_btn.addActionListener(cancel);
 	}
 	
 	/**
@@ -397,21 +377,20 @@ public class ClusterView {
 	 */
 	public void addClusterChoiceListener(final ActionListener l) {
 		
-		clusterChoice.addActionListener(l);
+		linkageChooser.addActionListener(l);
 	}
 	
 	public void addClusterTypeListener(final ActionListener l) {
 		
-		clusterType.addActionListener(l);
+		clusterChooser.addActionListener(l);
 	}
 
 	/**
-	 * Attempts to cancel the worker thread when the cancel button is clicked.
-	 * Also resets the view accordingly.
+	 * Attempts to cancel the SwingWorker thread for clustering when the 
+	 * cancel button is clicked. Also resets the UI accordingly.
 	 */
 	public void cancel() {
 
-		pBar.setValue(0);
 		loadLabel.setText(StringRes.clusterInfo_Ready);
 		setClustering(false);
 	}
@@ -447,7 +426,7 @@ public class ClusterView {
 	 */
 	public void displayCompleted(final String finalFilePath) {
 
-		buttonPanel.remove(cancel_button);
+		btnPanel.remove(cancel_btn);
 
 		final TextDisplay status1 = new TextDisplay(
 				StringRes.clusterTip_completed);
@@ -455,7 +434,7 @@ public class ClusterView {
 		final TextDisplay status2 = new TextDisplay(
 				StringRes.clusterTip_filePath + finalFilePath);
 
-		buttonPanel.add(cluster_btn, "pushx, alignx 50%");
+		btnPanel.add(cluster_btn, "pushx, alignx 50%");
 
 		loadPanel.add(status1, "pushx, alignx 50%, span, wrap");
 		loadPanel.add(status2, "pushx, alignx 50%, span, wrap");
@@ -471,7 +450,7 @@ public class ClusterView {
 	 */
 	public String getClusterMethod() {
 
-		return (String) clusterType.getSelectedItem();
+		return (String) clusterChooser.getSelectedItem();
 	}
 
 	/**
@@ -481,7 +460,7 @@ public class ClusterView {
 	 */
 	public String getRowSimilarity() {
 
-		return (String) geneCombo.getSelectedItem();
+		return (String) rowDistChooser.getSelectedItem();
 	}
 
 	/**
@@ -491,7 +470,7 @@ public class ClusterView {
 	 */
 	public String getColSimilarity() {
 
-		return (String) arrayCombo.getSelectedItem();
+		return (String) colDistChooser.getSelectedItem();
 	}
 
 	/**
@@ -501,7 +480,7 @@ public class ClusterView {
 	 */
 	public String getLinkageMethod() {
 
-		return (String) clusterChoice.getSelectedItem();
+		return (String) linkageChooser.getSelectedItem();
 	}
 
 	/**
@@ -514,10 +493,10 @@ public class ClusterView {
 		final int spinners = 4;
 		final Integer[] spinnerValues = new Integer[spinners];
 
-		spinnerValues[0] = (Integer) enterRC.getValue();
-		spinnerValues[1] = (Integer) enterRIt.getValue();
-		spinnerValues[2] = (Integer) enterCC.getValue();
-		spinnerValues[3] = (Integer) enterCIt.getValue();
+		spinnerValues[0] = (Integer) rowGroupsSetr.getValue();
+		spinnerValues[1] = (Integer) rowIterationsSetr.getValue();
+		spinnerValues[2] = (Integer) colGroupsSetr.getValue();
+		spinnerValues[3] = (Integer) colIterationsSetr.getValue();
 
 		return spinnerValues;
 	}

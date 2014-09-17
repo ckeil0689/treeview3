@@ -5,10 +5,9 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.concurrent.ExecutionException;
 
-import javax.swing.JDialog;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import Utilities.AlertDialog;
 import Utilities.ErrorDialog;
 import Utilities.StringRes;
 import Cluster.CDTGenerator;
@@ -18,20 +17,22 @@ import Cluster.ClusterViewDialog;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 
 /**
- * Controls clustering according to user choices in ClusterView. It
- * handles user interactions by implementing listeners which in turn call 
- * methods from the model or view to respond.
+ * Controls user input from ClusterView. It handles user interactions 
+ * by implementing listeners which in turn call appropriate methods to respond.
  * 
  * @author CKeil
  * 
  */
 public class ClusterController {
+	
+	// Axes identifiers.
+	public final static int ROW = 1;
+	public final static int COL = 2;
 
 	private final DataModel tvModel;
-	private final TVFrameController controller;
+	private final TVFrameController tvController;
 	private final ClusterView clusterView;
 	private final ClusterViewDialog clusterDialog;
 
@@ -39,8 +40,8 @@ public class ClusterController {
 	private SwingWorker<String[], Void> clusterWorker;
 	private SwingWorker<Void, Void> saveWorker;
 
-	private String[] orderedRows;
-	private String[] orderedCols;
+	private String[] reorderedRows;
+	private String[] reorderedCols;
 
 	private String finalFilePath;
 	private FileSet fileSet;
@@ -49,7 +50,7 @@ public class ClusterController {
 			final TVFrameController controller) {
 
 		this.clusterDialog = dialog;
-		this.controller = controller;
+		this.tvController = controller;
 		this.tvModel = controller.getDataModel();
 		this.clusterView = dialog.getClusterView();
 
@@ -60,167 +61,159 @@ public class ClusterController {
 		clusterView.addClusterChoiceListener(new ClusterChoiceListener());
 	}
 
+	/**
+	 * Processes clustering in the background according to user input. Allows
+	 * for the UI to remain responsive during these tasks. This is
+	 * useful for updating the progress bar and progress label.
+	 * @author CKeil
+	 *
+	 */
 	class ClusterProcessWorker extends SwingWorker<Void, Void> {
 
 		@Override
 		protected Void doInBackground() throws Exception {
 
-			// Declared inside because the choice is different every time
-			// the cluster_button is being clicked.
+			// Get chosen similarity options.
 			final String rowSimilarity = clusterView.getRowSimilarity();
 			final String colSimilarity = clusterView.getColSimilarity();
-//			final String linkageMethod = clusterView.getLinkageMethod();
 
-			// GUI changes when clustering is running
-			if (checkSelections(rowSimilarity, colSimilarity)) {
-//				clusterView.displayClusterProcess(rowSimilarity, colSimilarity,
-//						linkageMethod);
-				clusterView.setClustering(true);
-
-				// Start the workers
-				if (!rowSimilarity.equalsIgnoreCase(StringRes.cluster_DoNot)) {
-					orderedRows = cluster(rowSimilarity, "Row");
-				}
-
-				if (!colSimilarity.equalsIgnoreCase(StringRes.cluster_DoNot)) {
-					orderedCols = cluster(colSimilarity, "Column");
-				}
-			} else {
+			if (!checkSelections(rowSimilarity, ROW) 
+					&& !checkSelections(colSimilarity, COL)) {
 				clusterView.displayErrorLabel();
+				return null;
 			}
+			
+			if (checkSelections(rowSimilarity, ROW)) {
+				reorderedRows = cluster(rowSimilarity, ROW);
+			}
+
+			if (checkSelections(colSimilarity, COL)) {
+				reorderedCols = cluster(colSimilarity, COL);
+			}
+			
 			return null;
 		}
 		
 		@Override
 		public void done() {
 			
-			save();
+			saveClusterFile();
 		}
 
 		/**
-		 * General cluster method that starts a dedicated SwingWorker method
-		 * which runs the calculations in the background. This allows for 
-		 * updates of the ClusterView GUI, e.g. the JProgressBar.
-		 * @param choice The selected clustering method.
-		 * @param type The currently active clustering type.
+		 * Tells the ClusterWorker to begin executing. Waits for the return
+		 * of reordered matrix elements for the chosen axis. 
+		 * @param distMeasure The selected clustering method.
+		 * @param axis The currently active clustering type.
 		 * @return
 		 */
-		public String[] cluster(final String choice, final String type) {
-
-			clusterWorker = new MyClusterWorker(choice, type);
+		public String[] cluster(final String distMeasure, final int axis) {
+			
+			clusterWorker = new MyClusterWorker(distMeasure, axis);
 			clusterWorker.execute();
-			LogBuffer.println(type + " Clustering started.");
+			LogBuffer.println("Clustering started.");
 
 			try {
 				return clusterWorker.get();
 
-			} catch (final InterruptedException e) {
-				ErrorDialog error = new ErrorDialog(
-						clusterDialog.getParentFrame(), 
-						"Clustering was interrupted.");
-				error.setVisible(true);
-				LogBuffer.println(e.getMessage());
+			} catch (InterruptedException | ExecutionException e) {
+				ErrorDialog.showError("Clustering was interrupted.", e);
 				return null;
-
-			} catch (final ExecutionException e) {
-				ErrorDialog error = new ErrorDialog(
-						clusterDialog.getParentFrame(), 
-						"Clustering experienced an issue with code"
-						+ "execution.");
-				error.setVisible(true);
-				LogBuffer.println(e.getMessage());
-				return null;
-			}
-		}
-
-		public void save() {
-
-			if (orderedRows != null || orderedCols != null) {
-				saveWorker = new SaveCDTWorker();
-				saveWorker.execute();
-				LogBuffer.println("Saving started.");
 			}
 		}
 
 		/**
-		 * Verifies whether all needed options are selected 
-		 * to perform clustering.
-		 * 
-		 * @param choiceRow Selected method for row clustering.
-		 * @param choiceCol Selected method for column clustering.
-		 * @return
+		 * Saves the clustered matrix axes to a new CDT file, so it can be
+		 * loaded and displayed.
 		 */
-		public boolean checkSelections(final String choiceRow, 
-				final String choiceCol) {
+		public void saveClusterFile() {
+
+			if (reorderedRows != null || reorderedCols != null) {
+				saveWorker = new SaveCDTWorker();
+				saveWorker.execute();
+				LogBuffer.println("Saving started.");
+				
+			} else {
+				AlertDialog.showAlert("Cannot save the file, because neither"
+						+ "rows nor columns were properly clustered.");
+			}
+		}
+
+		/**
+		 * Verifies whether all needed options are selected to 
+		 * perform clustering.
+		 * 
+		 * @param dMeasure Selected distance measure.
+		 * @return boolean 
+		 */
+		public boolean checkSelections(final String dMeasure, int type) {
 
 			if (isHierarchical()) {
-				return (!choiceRow.contentEquals(StringRes.cluster_DoNot) 
-						|| !choiceCol.contentEquals(StringRes.cluster_DoNot));
+				return !dMeasure.contentEquals(StringRes.cluster_DoNot);
 
 			} else {
 				final Integer[] spinnerValues = clusterView.getSpinnerValues();
 
-				final int clustersR = spinnerValues[0];
-				final int itsR = spinnerValues[1];
-				final int clustersC = spinnerValues[2];
-				final int itsC = spinnerValues[3];
+				int groups;
+				int iterations;
+				
+				switch(type) {
+				
+				case ROW: 	groups = spinnerValues[0]; 
+							iterations = spinnerValues[1];
+							break;
+				case COL: 	groups = spinnerValues[2]; 
+							iterations = spinnerValues[3];
+							break;
+				default:	groups = 0;
+							iterations = 0;
+							break;
+				}
 
-				return (!choiceRow.contentEquals(StringRes.cluster_DoNot) 
-						&& (clustersR > 0 && itsR > 0))
-						|| (!choiceCol.contentEquals(StringRes.cluster_DoNot) 
-								&& (clustersC > 0 && itsC > 0));
+				return (!dMeasure.contentEquals(StringRes.cluster_DoNot) 
+						&& (groups > 0 && iterations > 0));
 			}
 		}
 	}
 
 	/**
-	 * Sets up the worker thread to start calculations without affecting the
-	 * GUI.
+	 * General cluster method that starts a dedicated SwingWorker method
+	 * which runs the calculations in the background. This allows for 
+	 * updates of the ClusterView GUI, e.g. the JProgressBar.
 	 */
 	private class MyClusterWorker extends SwingWorker<String[], Void> {
 
-		private final String choice;
-		private final String type;
+		private final String distMeasure;
+		private final int axis;
 
-		public MyClusterWorker(final String choice, final String type) {
+		public MyClusterWorker(final String distMeasure, final int axis) {
 
-			this.choice = choice;
-			this.type = type;
+			this.distMeasure = distMeasure;
+			this.axis = axis;
 		}
 
 		@Override
 		public String[] doInBackground() {
 
-			final ClusterProcessor clusterTarget = 
+			final ClusterProcessor processor = 
 					new ClusterProcessor(clusterView, tvModel, this);
 
 			String[] reorderedElements = null;
 
-			String typeHeader = "";
-			if (type.equalsIgnoreCase("Row")) {
-				typeHeader = "GENE";
-
-			} else if (type.equalsIgnoreCase("Column")) {
-				typeHeader = "ARRY";
-
-			} else {
-				LogBuffer.println("Invalid type name for clustering.");
-			}
-
-			final double[][] distances = clusterTarget.calculateDistance(
-					choice, type);
+			final double[][] distances = processor.calculateDistance(
+					distMeasure, axis);
 
 			if (!isCancelled() || distances != null) {
 				if (isHierarchical()) {
-					reorderedElements = clusterTarget.hCluster(distances,
-							typeHeader);
+					reorderedElements = processor.hCluster(distances,
+							axis);
 
 				} else {
 					final Integer[] spinnerInput = clusterView
 							.getSpinnerValues();
 
-					reorderedElements = clusterTarget.kmCluster(distances,
-							typeHeader, spinnerInput[0], spinnerInput[1]);
+					reorderedElements = processor.kmCluster(distances,
+							axis, spinnerInput[0], spinnerInput[1]);
 				}
 			}
 
@@ -234,38 +227,28 @@ public class ClusterController {
 				if(isCancelled() || get() == null) {
 					clusterView.cancel();
 				}
-			} catch (InterruptedException e) {
-				ErrorDialog error = new ErrorDialog(
-						clusterDialog.getParentFrame(), 
-						"Cancelling cluster was interrupted.");
-				error.setVisible(true);		
-				LogBuffer.println(e.getMessage());
-				clusterView.cancel();
-				
-			} catch (ExecutionException e) {
-				ErrorDialog error = new ErrorDialog(
-						clusterDialog.getParentFrame(), 
-						"Cancelling cluster experienced an issue with"
-						+ "code execution.");
-				error.setVisible(true);
-				LogBuffer.println(e.getMessage());
+			} catch (InterruptedException | ExecutionException e) {
+				ErrorDialog.showError("Cancelling cluster was interrupted.", e);
 				clusterView.cancel();
 			}
 		}
 	}
 
+	/**
+	 * Worker with the task to generate and write a new CDT file which contains
+	 * the newly clustered matrix.  
+	 * @author CKeil
+	 *
+	 */
 	class SaveCDTWorker extends SwingWorker<Void, Void> {
 
 		@Override
 		protected Void doInBackground() throws Exception {
 
 			if (!isCancelled()) {
-				final double[][] dataArrays = ((TVDataMatrix) tvModel
-						.getDataMatrix()).getExprData();
-
 				final CDTGenerator cdtGen = new CDTGenerator(
-						tvModel, clusterView, dataArrays, orderedRows,
-						orderedCols, isHierarchical());
+						tvModel, clusterView, reorderedRows, reorderedCols, 
+						isHierarchical());
 
 				cdtGen.generateCDT();
 
@@ -297,22 +280,23 @@ public class ClusterController {
 		@Override
 		protected Void doInBackground() throws Exception {
 
-			controller.loadFileSet(fileSet);
+			tvController.loadFileSet(fileSet);
 			return null;
 		}
 
 		@Override
 		protected void done() {
 
-			if (controller.getDataModel().getDataMatrix()
+			if (tvController.getDataModel().getDataMatrix()
 					.getNumRow() > 0) {
-				controller.setDataModel();
-				controller.setViewChoice();
+				tvController.setDataModel();
+				tvController.setViewChoice();
+				clusterDialog.dispose();
 
 			} else {
-				LogBuffer.println("No datamatrix set by worker thread.");
-				controller.setViewChoice();
-				controller.addViewListeners();
+				AlertDialog.showAlert("No clustered data matrix could be set.");
+				tvController.setViewChoice();
+				tvController.addViewListeners();
 			}
 		}
 	}
@@ -348,7 +332,6 @@ public class ClusterController {
 		public void actionPerformed(ActionEvent arg0) {
 			
 			clusterDialog.reset();
-//			clusterDialog.packDialog();
 		}
 	}
 	
@@ -373,9 +356,6 @@ public class ClusterController {
 	 */
 	public void visualizeData() {
 
-		final JDialog topFrame = (JDialog) SwingUtilities
-				.getWindowAncestor(clusterView.getMainPanel());
-
 		File file = null;
 
 		if (finalFilePath != null) {
@@ -384,15 +364,14 @@ public class ClusterController {
 			fileSet = new FileSet(file.getName(), file.getParent()
 					+ File.separator);
 
-			controller.setViewChoice();
+			tvController.setViewChoice();
 			loadWorker = new LoadWorker();
 			loadWorker.execute();
 
-			topFrame.dispose();
-
 		} else {
-			// Make Warning Dialog
-
+			String alert = "When trying to load the clustered file, no"
+					+ "no file path could be found.";
+			AlertDialog.showAlert(alert);
 		}
 	}
 
@@ -416,15 +395,13 @@ public class ClusterController {
 	}
 
 	/**
-	 * Returns the choice of the cluster drop down menu as a string
+	 * Returns whether hierarchical clustering is currently selected or not.
 	 * 
-	 * @return
+	 * @return boolean
 	 */
 	public boolean isHierarchical() {
 
-		boolean hierarchical = false;
-		final String choice = clusterView.getClusterMethod();
-		hierarchical = choice.equalsIgnoreCase(StringRes.menu_Hier);
-		return hierarchical;
+		return clusterView.getClusterMethod()
+				.equalsIgnoreCase(StringRes.menu_Hier);
 	}
 }

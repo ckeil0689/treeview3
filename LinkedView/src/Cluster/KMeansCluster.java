@@ -9,6 +9,7 @@ import java.util.Random;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import Controllers.ClusterController;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.LogBuffer;
 
@@ -20,15 +21,15 @@ public class KMeansCluster {
 
 	private ClusterFileWriter bufferedWriter;
 	private String filePath;
-	private String type = "";
-	private final int clusterN;
+	private int axis;
+	private final int groupNum;
 	private final int iterations;
 
 	// Distance Matrix
-	private final double[][] dMatrix;
+	private final double[][] distMatrix;
 
 	// Half of the Distance Matrix (symmetry)
-	private double[][] copyDMatrix;
+	private double[][] copyDistMatrix;
 
 	// list to return ordered GENE numbers for .cdt creation
 	private double[] seedMeans;
@@ -42,20 +43,20 @@ public class KMeansCluster {
 	 * Main constructor
 	 * 
 	 * @param model
-	 * @param dMatrix
+	 * @param distMatrix
 	 * @param pBar
-	 * @param type
+	 * @param axis
 	 * @param method
 	 */
 	public KMeansCluster(final DataModel model, final ClusterView clusterView,
-			final double[][] dMatrix, final String type, final int clusterN,
+			final double[][] distMatrix, final int axis, final int groupNum,
 			final int iterations, final SwingWorker<String[], Void> worker) {
 
 		this.model = model;
 		this.clusterView = clusterView;
-		this.dMatrix = dMatrix;
-		this.type = type;
-		this.clusterN = clusterN;
+		this.distMatrix = distMatrix;
+		this.axis = axis;
+		this.groupNum = groupNum;
 		this.iterations = iterations;
 		this.worker = worker;
 	}
@@ -67,26 +68,26 @@ public class KMeansCluster {
 		LogBuffer.println("Is KMeansCluster.cluster() on EDT? " 
 				+ SwingUtilities.isEventDispatchThread());
 				
-		double[] elementMeanList = new double[dMatrix.length];
-		int[][] clusters = new int[clusterN][];
-		double[][] clusterMeans = new double[dMatrix.length][];
+		double[] elementMeanList = new double[distMatrix.length];
+		int[][] clusters = new int[groupNum][];
+		double[][] clusterMeans = new double[distMatrix.length][];
 
 		// ProgressBar maximum
 		clusterView.setLoadText("Clustering data...");
-		clusterView.setPBarMax(dMatrix.length);
+		clusterView.setPBarMax(distMatrix.length);
 
 		// deep copy of distance matrix to avoid mutation
-		copyDMatrix = deepCopy(dMatrix);
+		copyDistMatrix = deepCopy(distMatrix);
 
 		// The list containing the reordered gene names.
-		reorderedList = new String[dMatrix.length];
+		reorderedList = new String[distMatrix.length];
 
 		// Make a list of all means of distances for every gene
-		elementMeanList = generateMeans(copyDMatrix);
+		elementMeanList = generateMeans(copyDistMatrix);
 
 		// List of seeds should be of clusterN-size
-		seedMeans = new double[clusterN];
-		setSeeds(clusterN, elementMeanList);
+		seedMeans = new double[groupNum];
+		setSeeds(groupNum, elementMeanList);
 
 		// Use the seedClusters to define Voronoi spaces. This means, assign
 		// the distance mean of each gene to the closest seed cluster.
@@ -125,14 +126,8 @@ public class KMeansCluster {
 			e.printStackTrace();
 		}
 
-		if (type.equalsIgnoreCase("Gene")) {
-			initial[addIndex] = "ORF";
-			addIndex++;
-
-		} else {
-			initial[addIndex] = "ARRAY";
-			addIndex++;
-		}
+		initial[addIndex] = (axis == ClusterController.ROW) ? "ORF" : "ARRAY";
+		addIndex++;
 
 		initial[addIndex] = "GROUP";
 		addIndex++;
@@ -170,14 +165,8 @@ public class KMeansCluster {
 
 	public void setupFileWriter() throws IOException {
 
-		String fileEnd;
-
-		if (type.equalsIgnoreCase("Gene")) {
-			fileEnd = "_K_G" + clusterN + ".kgg";
-
-		} else {
-			fileEnd = "_K_A" + clusterN + ".kag";
-		}
+		String fileEnd = (axis == ClusterController.ROW) ? 
+				"_K_G" + groupNum + ".kgg" : "_K_A" + groupNum + ".kag";
 
 		final File file = new File(model.getSource().substring(0,
 				model.getSource().length() - 4)
@@ -282,7 +271,7 @@ public class KMeansCluster {
 
 		// fill clusters List with clusterN-amount of empty lists to
 		// avoid duplicates of the initial means later
-		for (int i = 0; i < clusterN; i++) {
+		for (int i = 0; i < groupNum; i++) {
 
 			final List<Integer> group = new ArrayList<Integer>();
 			clusters.add(group);
@@ -449,7 +438,7 @@ public class KMeansCluster {
 		String[][] headerArray;
 
 		// Get the right header array
-		if (getType().equalsIgnoreCase("Arry")) {
+		if (axis == ClusterController.ROW) {
 			headerArray = model.getArrayHeaderInfo().getHeaderArray();
 
 		} else {
@@ -579,15 +568,5 @@ public class KMeansCluster {
 	public String getFilePath() {
 
 		return filePath;
-	}
-
-	/**
-	 * Accessor for the type of the current object instance
-	 * 
-	 * @return
-	 */
-	public String getType() {
-
-		return type;
 	}
 }

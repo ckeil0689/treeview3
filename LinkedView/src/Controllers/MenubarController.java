@@ -209,8 +209,9 @@ public class MenubarController {
 	 * name.
 	 */
 	private void displayError() {
+		
 		String message = "A menu button could not be matched with a function.";
-		ErrorDialog error = new ErrorDialog(tvFrame.getAppFrame(), message);
+		ErrorDialog error = new ErrorDialog(message);
 		error.setVisible(true);
 	}
 }

@@ -3,6 +3,7 @@ package Utilities;
 import java.awt.Dialog;
 
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
@@ -40,6 +41,8 @@ public class CustomDialog {
 	 */
 	public void setVisible(boolean visible) {
 		
+		dialog.pack();
+		dialog.setLocationRelativeTo(JFrame.getFrames()[0]);
 		dialog.setVisible(visible);
 	}
 }

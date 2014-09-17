@@ -4,12 +4,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
+
+import edu.stanford.genetics.treeview.LogBuffer;
 
 public class ErrorDialog extends CustomDialog {
 	
-	public ErrorDialog(final JFrame parentFrame, final String message) {
+	public ErrorDialog(final String message) {
 		
 		super("Oh oh!");
 		
@@ -33,7 +34,19 @@ public class ErrorDialog extends CustomDialog {
 		mainPanel.add(ok, "alignx 50%");
 
 		dialog.getContentPane().add(mainPanel);
-		dialog.pack();
-		dialog.setLocationRelativeTo(parentFrame);
+	}
+	
+	/**
+	 * Opens a JDialog that displays a supplied error message. Furthermore,
+	 * it prints the message from the exception to the log. 
+	 * @param parentFrame The parent frame for the appearing JDialog.
+	 * @param message The error message to be shown.
+	 * @param e The exception that necessitates the popup dialog..
+	 */
+	public static void showError(final String message, final Exception e) {
+		
+		ErrorDialog error = new ErrorDialog(message);
+		LogBuffer.println(e.getMessage());
+		error.setVisible(true);		
 	}
 }

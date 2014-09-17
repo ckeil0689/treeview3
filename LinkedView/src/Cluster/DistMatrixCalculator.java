@@ -6,6 +6,9 @@ import java.util.Arrays;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import Utilities.AlertDialog;
+import Utilities.StringRes;
+import Controllers.ClusterController;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
@@ -17,7 +20,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
  * @author CKeil
  * 
  */
-public class DistanceMatrixCalculator {
+public class DistMatrixCalculator {
 
 	// Instance variables
 	// list with all genes and their distances to all other genes
@@ -26,21 +29,22 @@ public class DistanceMatrixCalculator {
 	private final double[][] dataArrays;
 
 	private final ClusterView clusterView;
-	private final String choice;
-	private final String type;
+	private final String distMeasure;
+	private final String axisPrefix;
 
 	private final SwingWorker<String[], Void> worker;
 
 	// Constructor
-	public DistanceMatrixCalculator(final double[][] fullList, final String choice,
-			final String type, final ClusterView clusterView,
+	public DistMatrixCalculator(final double[][] fullList, 
+			final String distMeasure, final int axis, 
+			final ClusterView clusterView, 
 			final SwingWorker<String[], Void> worker) {
 
 		this.dataArrays = fullList;
-		this.choice = choice;
+		this.distMeasure = distMeasure;
 		this.clusterView = clusterView;
-		this.type = type;
 		this.worker = worker;
+		this.axisPrefix = (axis == ClusterController.ROW) ? "Row" : "Column";
 	}
 
 	// Methods to calculate distance matrix
@@ -61,7 +65,8 @@ public class DistanceMatrixCalculator {
 				+ SwingUtilities.isEventDispatchThread());
 				
 		// Reset in case Spearman Rank was used
-		clusterView.setLoadText("Calculating " + type + " Distance Matrix...");
+		clusterView.setLoadText("Calculating " + axisPrefix 
+				+ " Distance Matrix...");
 
 		clusterView.setPBarMax(dataArrays.length);
 
@@ -186,7 +191,7 @@ public class DistanceMatrixCalculator {
 		LogBuffer.println("Is DMCalculatorArrays.spearman() on EDT? " 
 				+ SwingUtilities.isEventDispatchThread());
 				
-		clusterView.setLoadText("Getting " + type + " Spearman Ranks...");
+		clusterView.setLoadText("Getting " + axisPrefix + " Spearman Ranks...");
 
 		for (int i = 0; i < dataArrays.length; i++) {
 
@@ -237,7 +242,7 @@ public class DistanceMatrixCalculator {
 		double g2 = 0;
 		double gDiff = 0;
 
-		clusterView.setLoadText("Calculating " + type + " Distance Matrix...");
+		clusterView.setLoadText("Calculating " + axisPrefix + " Distance Matrix...");
 
 		clusterView.setPBarMax(dataArrays.length);
 
@@ -309,9 +314,6 @@ public class DistanceMatrixCalculator {
 		double g1 = 0;
 		double g2 = 0;
 		double gDiff = 0;
-
-		clusterView.setLoadText("Calculating " + type + " Distance Matrix...");
-		clusterView.setPBarMax(dataArrays.length);
 
 		// making sure distanceList is clear
 		distanceMatrix = new double[dataArrays.length][];
@@ -386,37 +388,44 @@ public class DistanceMatrixCalculator {
 	}
 
 	/**
-	 * Chooses appropriate distance measure according to user GUI selection.
+	 * Chooses appropriate distance measure according to user selection.
 	 */
 	public void measureDistance() {
-
-		if (choice.equalsIgnoreCase("Pearson Correlation (uncentered)")) {
-			pearson(false, false);
-
-		} else if (choice.equalsIgnoreCase("Pearson Correlation "
-				+ "(centered)")) {
-			pearson(false, true);
-
-		} else if (choice.equalsIgnoreCase("Absolute Correlation "
-				+ "(uncentered)")) {
-			pearson(true, false);
-
-		} else if (choice.equalsIgnoreCase("Absolute Correlation "
-				+ "(centered)")) {
-			pearson(true, true);
-
-		} else if (choice.equalsIgnoreCase("Spearman Ranked Correlation")) {
-			spearman();
-
-		} else if (choice.equalsIgnoreCase("Euclidean Distance")) {
-			euclid();
-
-		} else if (choice.equalsIgnoreCase("City Block Distance")) {
-			cityBlock();
-
-		} else {
-
+		
+		clusterView.setLoadText("Calculating " + axisPrefix 
+				+ " Distance Matrix...");
+		clusterView.setPBarMax(dataArrays.length);
+		
+		switch(distMeasure) {
+		
+			case StringRes.cluster_pearsonUn: 	pearson(false, false);
+												break;
+			case StringRes.cluster_pearsonCtrd: pearson(false, true);
+												break;
+			case StringRes.cluster_absCorrUn: 	pearson(true, false);
+												break;
+			case StringRes.cluster_absCorrCtrd:	pearson(true, true);
+												break;
+			case StringRes.cluster_spearman:	spearman();
+												break;
+			case StringRes.cluster_euclidean: 	euclid();
+												break;
+			case StringRes.cluster_cityBlock:	cityBlock();
+												break;
+			default:							showDistAlert();
+												break;
 		}
+	}
+	
+	/**
+	 * Shows a pop-up alert if the selected distance measure could not
+	 * be matched to an defined method to execute the calculations.
+	 */
+	public void showDistAlert() {
+		
+		AlertDialog.showAlert("Could not start measuring distance, "
+				+ "because no match for the selected distance measure "
+				+ "was found.");
 	}
 
 	// Accessor method to retrieve the distance matrix

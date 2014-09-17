@@ -125,14 +125,14 @@ public class StringRes {
 
 	// Cluster Options
 	public static final String cluster_DoNot = "Do not cluster";
-	public static final String cluster_pearsonUn = "Pearson "
-			+ "Correlation (uncentered)";
-	public static final String cluster_pearsonCentered = "Pearson "
-			+ "Correlation (centered)";
-	public static final String cluster_absoluteUn = "Absolute "
-			+ "Correlation (uncentered)";
-	public static final String cluster_absoluteCentered = "Absolute "
-			+ "Correlation (centered)";
+	public static final String cluster_pearsonUn = "Pearson Correlation "
+			+ "(uncentered)";
+	public static final String cluster_pearsonCtrd = "Pearson Correlation "
+			+ "(centered)";
+	public static final String cluster_absCorrUn = "Absolute Correlation "
+			+ "(uncentered)";
+	public static final String cluster_absCorrCtrd = "Absolute Correlation "
+			+ "(centered)";
 	public static final String cluster_spearman = "Spearman Ranked Correlation";
 	public static final String cluster_euclidean = "Euclidean Distance";
 	public static final String cluster_cityBlock = "City Block Distance";

@@ -77,6 +77,14 @@ public class ClusterViewDialog extends CustomDialog {
 	}
 	
 	/**
+	 * Closes the JDialog.
+	 */
+	public void dispose() {
+		
+		dialog.dispose();
+	}
+	
+	/**
 	 * Test method to check UI and UX.
 	 * @param args
 	 */

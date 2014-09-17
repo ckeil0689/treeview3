@@ -21,6 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import Utilities.ErrorDialog;
 import edu.stanford.genetics.treeview.CdtFilter;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.DataModel;
@@ -388,46 +389,6 @@ public class DendroController implements ConfigNodePersistent {
 			dendroView.setGVHeight(newHeight);
 		}
 	}
-	
-//	public void setButtonEnabledStatus() {
-//
-//		// X-Axis Buttons
-//		if (Math.abs(getGlobalXMap().getScale() - getGlobalXMap().getMinScale()) 
-//				< PRECISION_LEVEL) {
-//			dendroView.getXMinusButton().setEnabled(false);
-//
-//		} else if (Math.abs(getGlobalXMap().getScale()
-//				- getGlobalXMap().getMinScale()) > PRECISION_LEVEL
-//				&& Math.abs(getGlobalXMap().getScale()
-//						- getGlobalXMap().getAvailablePixels()) 
-//						> PRECISION_LEVEL) {
-//			dendroView.getXMinusButton().setEnabled(true);
-//			dendroView.getXPlusButton().setEnabled(true);
-//
-//		} else if (Math.abs(getGlobalXMap().getScale()
-//				- getGlobalXMap().getAvailablePixels()) 
-//				< PRECISION_LEVEL) {
-//			dendroView.getXPlusButton().setEnabled(false);
-//		}
-//
-//		// Y-Axis Buttons
-//		if (Math.abs(getGlobalYMap().getScale() - getGlobalYMap().getMinScale())
-//				< PRECISION_LEVEL) {
-//			dendroView.getYMinusButton().setEnabled(false);
-//
-//		} else if (Math.abs(getGlobalYMap().getScale()
-//				- getGlobalYMap().getMinScale()) > PRECISION_LEVEL
-//				&& Math.abs(getGlobalYMap().getScale()
-//						- getGlobalYMap().getAvailablePixels()) 
-//						> PRECISION_LEVEL) {
-//			dendroView.getYMinusButton().setEnabled(true);
-//			dendroView.getYPlusButton().setEnabled(true);
-//
-//		} else if (Math.abs(getGlobalYMap().getScale()
-//				- getGlobalYMap().getAvailablePixels()) < PRECISION_LEVEL) {
-//			dendroView.getYPlusButton().setEnabled(false);
-//		}
-//	}
 
 	public void saveSettings() {
 
@@ -905,7 +866,7 @@ public class DendroController implements ConfigNodePersistent {
 	 * Loads a TVModel from a provided FileSet and then returns the new TVModel.
 	 * 
 	 * @param fileSet
-	 * @return
+	 * @return DataModel
 	 * @throws LoadException
 	 */
 	protected DataModel makeCdtModel(final FileSet fileSet) 
@@ -916,14 +877,11 @@ public class DendroController implements ConfigNodePersistent {
 		try {
 			((TVModel)tvModel).loadNew(fileSet);
 
-		} catch (final LoadException e) {
-			JOptionPane.showMessageDialog(dendroView.getDendroPane(), e);
-			throw e;
-		} catch (final InterruptedException e) {
-			e.printStackTrace();
-
-		} catch (final ExecutionException e) {
-			e.printStackTrace();
+		} catch (LoadException | InterruptedException | ExecutionException e) {
+			ErrorDialog error = new ErrorDialog("Loading model "
+					+ "was interrupted.");
+			error.setVisible(true);		
+			LogBuffer.println(e.getMessage());
 		}
 
 		return tvModel;
@@ -1061,8 +1019,10 @@ public class DendroController implements ConfigNodePersistent {
 			atrTVModel.loadNew(fileSet);
 
 		} catch (final LoadException e) {
-			JOptionPane.showMessageDialog(dendroView.getDendroPane(), e);
-			throw e;
+			ErrorDialog error = new ErrorDialog("Loading Atr model "
+					+ "was interrupted.");
+			error.setVisible(true);		
+			LogBuffer.println(e.getMessage());
 		}
 
 		return atrTVModel;
@@ -1262,18 +1222,10 @@ public class DendroController implements ConfigNodePersistent {
 				}
 
 			} catch (final DendroException e) {
-				// LogPanel.println("Had problem setting up the array tree : "
-				// + e.getMessage());
-				// e.printStackTrace();
-				final Box mismatch = new Box(BoxLayout.Y_AXIS);
-				mismatch.add(new JLabel(e.getMessage()));
-				mismatch.add(new JLabel("Perhaps there is a mismatch "
-						+ "between your ATR and CDT files?"));
-				mismatch.add(new JLabel("Ditching Array Tree, "
-						+ "since it's lame."));
-
-				JOptionPane.showMessageDialog(tvFrame.getAppFrame(), mismatch,
-						"Tree Construction Error", JOptionPane.ERROR_MESSAGE);
+				String message = "Seems like there is a mismatch between your "
+						+ "ATR and CDT files. Ditching Array Tree.";
+				
+				ErrorDialog.showError(message, e);
 
 				dendroView.getAtrview().setEnabled(false);
 
@@ -1281,9 +1233,11 @@ public class DendroController implements ConfigNodePersistent {
 					invertedTreeDrawer.setData(null, null);
 
 				} catch (final DendroException ex) {
-					LogBuffer.println("Got DendroException in setData() "
-							+ "for invertedTreeDrawer in bindTrees(): "
-							+ e.getMessage());
+					message = "Got DendroException in setData() for "
+							+ "invertedTreeDrawer in bindTrees(): " 
+							+ e.getMessage();
+					
+					ErrorDialog.showError(message, e);
 				}
 			}
 		} else {
@@ -1293,9 +1247,11 @@ public class DendroController implements ConfigNodePersistent {
 				invertedTreeDrawer.setData(null, null);
 
 			} catch (final DendroException e) {
-				LogBuffer.println("Got DendroException in setData() "
+				String message = "Got DendroException in setData() "
 						+ "for invertedTreeDrawer in bindTrees(): "
-						+ e.getMessage());
+						+ e.getMessage();
+				
+				ErrorDialog.showError(message, e);
 			}
 		}
 
@@ -1321,18 +1277,11 @@ public class DendroController implements ConfigNodePersistent {
 				}
 
 			} catch (final DendroException e) {
-				// LogPanel.println("Had problem setting up the gene tree :
-				// " + e.getMessage());
-				// e.printStackTrace();
-				final Box mismatch = new Box(BoxLayout.Y_AXIS);
-				mismatch.add(new JLabel(e.getMessage()));
-				mismatch.add(new JLabel("Perhaps there is a mismatch "
-						+ "between your GTR and CDT files?"));
-				mismatch.add(new JLabel("Ditching Gene Tree, "
-						+ "since it's lame."));
-
-				JOptionPane.showMessageDialog(tvFrame.getAppFrame(), mismatch,
-						"Tree Construction Error", JOptionPane.ERROR_MESSAGE);
+				String message = "There seems to be a mismatch between your "
+						+ "GTR and CDT files. Ditching Gene Tree, "
+						+ "since it's lame.";
+				
+				ErrorDialog.showError(message, e);
 
 				dendroView.getGtrview().setEnabled(false);
 
@@ -1340,9 +1289,11 @@ public class DendroController implements ConfigNodePersistent {
 					leftTreeDrawer.setData(null, null);
 
 				} catch (final DendroException ex) {
-					LogBuffer.println("Got DendroException in setData() "
+					message = "Got DendroException in setData() "
 							+ "for leftTreeDrawer in bindTrees(): "
-							+ ex.getMessage());
+							+ ex.getMessage();
+					
+					ErrorDialog.showError(message, e);
 				}
 			}
 		} else {
@@ -1352,9 +1303,11 @@ public class DendroController implements ConfigNodePersistent {
 				leftTreeDrawer.setData(null, null);
 
 			} catch (final DendroException e) {
-				LogBuffer.println("Got DendroException in setData() "
+				String message = "Got DendroException in setData() "
 						+ "for leftTreeDrawer in bindTrees(): "
-						+ e.getMessage());
+						+ e.getMessage();
+				
+				ErrorDialog.showError(message, e);
 			}
 		}
 

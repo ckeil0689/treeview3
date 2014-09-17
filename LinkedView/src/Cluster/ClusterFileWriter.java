@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
+import edu.stanford.genetics.treeview.LogBuffer;
+
 /**
  * This class is used to save data from clustering to the local storage by
  * converting it to a tab-delimited string and using a BufferedWriter.
@@ -59,7 +61,7 @@ public class ClusterFileWriter extends BufferedWriter {
 
 		}
 
-		System.out.println("Done." + file.getAbsolutePath());
+		LogBuffer.println("Done." + file.getAbsolutePath());
 	}
 
 	/**

@@ -9,6 +9,7 @@ import java.util.List;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import Controllers.ClusterController;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.model.TVModel;
@@ -27,7 +28,8 @@ public class HierarchicalCluster {
 	private final DataModel model;
 	private final ClusterView clusterView;
 	private String filePath;
-	private final String type;
+	private final int axis;
+	private final String axisPrefix;
 	private final int wholeMSize;
 	private int loopN;
 
@@ -59,19 +61,21 @@ public class HierarchicalCluster {
 	 * @param model
 	 * @param dMatrix
 	 * @param pBar
-	 * @param type
+	 * @param axis
 	 * @param method
 	 */
 	public HierarchicalCluster(final DataModel model,
 			final ClusterView clusterView, final double[][] dMatrix,
-			final String type, final SwingWorker<String[], Void> worker) {
+			final int axis, final SwingWorker<String[], Void> worker) {
 
 		this.model = (TVModel) model;
 		this.clusterView = clusterView;
 		this.halfDMatrix = dMatrix;
-		this.type = type;
+		this.axis = axis;
 		this.wholeMSize = dMatrix.length;
 		this.worker = worker;
+		
+		this.axisPrefix = (axis == ClusterController.ROW) ? "GENE" : "ARRY";
 	}
 
 	// method for clustering the distance matrix
@@ -90,10 +94,10 @@ public class HierarchicalCluster {
 
 		// ProgressBar maximum
 		String side = "";
-		if (type.equalsIgnoreCase("GENE")) {
+		if (axis == ClusterController.ROW) {
 			side = "Row";
 
-		} else if (type.equalsIgnoreCase("ARRY")) {
+		} else if (axis == ClusterController.COL) {
 			side = "Column";
 
 		} else {
@@ -401,27 +405,33 @@ public class HierarchicalCluster {
 		halfDMatrix = newMatrix;
 	}
 
+	/**
+	 * Sets up a buffered writer to write & save the tree files (GTR & ATR).
+	 * Also sets the filePath to the directory in which the resulting file was
+	 * saved.
+	 * @throws IOException
+	 */
 	public void setupFileWriter() throws IOException {
 
 		String fileEnd;
 
-		if (type.equalsIgnoreCase("GENE")) {
+		if (axis == ClusterController.ROW) {
 			fileEnd = ".gtr";
 
 		} else {
 			fileEnd = ".atr";
 		}
 
-		final File file = new File(model.getSource().substring(0,
-				model.getSource().length() - 4)
-				+ fileEnd);
+		String fileName = model.getSource().substring(0, 
+				model.getSource().length() - 4) + fileEnd;
+		
+		final File file = new File(fileName);
 
 		file.createNewFile();
 
 		bufferedWriter = new ClusterFileWriter(file);
 
 		filePath = bufferedWriter.getFilePath();
-
 	}
 
 	/**
@@ -725,8 +735,8 @@ public class HierarchicalCluster {
 		// to add now is already in a list from before, if yes connect
 		// to LATEST node by replacing the gene name with the node name
 		if (fusedGroup.length == 2) {
-			geneRow = type + geneGroups.get(row).get(0) + "X";
-			geneCol = type + geneGroups.get(column).get(0) + "X";
+			geneRow = axisPrefix + geneGroups.get(row).get(0) + "X";
+			geneCol = axisPrefix + geneGroups.get(column).get(0) + "X";
 
 		}
 		// if size of fusedGroup exceeds 2...
@@ -750,7 +760,8 @@ public class HierarchicalCluster {
 					// does not have any elements in common
 					// with geneGroups.get(column)
 					else {
-						geneCol = type + geneGroups.get(column).get(0) + "X";
+						geneCol = axisPrefix + geneGroups.get(column).get(0) 
+								+ "X";
 					}
 				}
 			}
@@ -772,7 +783,7 @@ public class HierarchicalCluster {
 
 					} else {
 						// random fix to see what happens
-						geneRow = type + geneGroups.get(row).get(0) + "X";
+						geneRow = axisPrefix + geneGroups.get(row).get(0) + "X";
 					}
 				}
 			}
@@ -880,7 +891,7 @@ public class HierarchicalCluster {
 
 		for (int i = 0; i < finalCluster.size(); i++) {
 
-			element = type + finalCluster.get(i) + "X";
+			element = axisPrefix + finalCluster.get(i) + "X";
 			reorderedList[i] = element;
 		}
 	}
@@ -985,7 +996,7 @@ public class HierarchicalCluster {
 	 * chosen as the one with the minimum distance in each iteration. The values
 	 * of the new row/col are calculated as average of the sum of all distances.
 	 * 
-	 * @param fusedGroup
+	 * @param fusedGroup 
 	 * @param geneGroups
 	 * @param newRow
 	 * @return newClade
@@ -1059,7 +1070,7 @@ public class HierarchicalCluster {
 	/**
 	 * Accessor for the reordered list
 	 * 
-	 * @return
+	 * @return The reordered list of matrix elements after clustering. 
 	 */
 	public String[] getReorderedList() {
 
@@ -1069,7 +1080,7 @@ public class HierarchicalCluster {
 	/**
 	 * Accessor for the file path
 	 * 
-	 * @return
+	 * @return The filePath of the generated tree file.
 	 */
 	public String getFilePath() {
 
