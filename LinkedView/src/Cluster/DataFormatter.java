@@ -2,9 +2,7 @@ package Cluster;
 
 import javax.swing.SwingUtilities;
 
-import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.model.TVModel;
 
 /**
  * This class is used to make an object which can take in the loaded data in its
@@ -15,48 +13,38 @@ import edu.stanford.genetics.treeview.model.TVModel;
  */
 public class DataFormatter {
 
-	// Instance variables
-	private final TVModel model;
-	private final ClusterView clusterView;
-	private final double[][] rawData;
+	public DataFormatter() {
 
-	private double[][] colList;
-
-	// Constructor (building the object)
-	public DataFormatter(final DataModel model,
-			final ClusterView clusterView, final double[][] rawData) {
-
-		this.model = (TVModel) model;
-		this.clusterView = clusterView;
-		this.rawData = rawData;
 	}
 
 	// getting the columns from raw data array
-	public void splitColumns() {
+	public double[][] splitColumns(final double[][] rawData) {
 
 		// Just checking for debugging
 		LogBuffer.println("Is DataFormatterArrays.splitColumns() on EDT? " 
 				+ SwingUtilities.isEventDispatchThread());
 				
 		// Number of arrays/ columns
-		final int nCols = model.nExpr();
-		final int nRows = model.nGene();
+		// Assumes all arrays are same length
+		final int nCols = rawData[0].length;
+		final int nRows = rawData.length;
 
-		colList = new double[nCols][nRows];
+		final double[][] colList = new double[nCols][nRows];
 
 		// Setting up ProgressBar
-		clusterView.setLoadText("Finding data columns...");
-		clusterView.setPBarMax(nCols);
+		ClusterView.setLoadText("Finding data columns...");
+		ClusterView.setPBarMax(nCols);
 
 		// Iterate through all columns
 		for (int j = 0; j < nCols; j++) {
 
-			clusterView.updatePBar(j);
+			ClusterView.updatePBar(j);
 
 			final double[] sArray = new double[nRows];
 
 			for (int i = 0; i < nRows; i++) {
 
+				// use if data is 1D array
 				// final int element = (i * nCols) + j;
 
 				sArray[i] = rawData[i][j];
@@ -64,10 +52,7 @@ public class DataFormatter {
 
 			colList[j] = sArray;
 		}
-	}
-
-	public double[][] getColList() {
-
+		
 		return colList;
 	}
 }

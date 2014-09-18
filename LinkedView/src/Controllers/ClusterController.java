@@ -5,10 +5,9 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.concurrent.ExecutionException;
 
+import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
-import Utilities.AlertDialog;
-import Utilities.ErrorDialog;
 import Utilities.StringRes;
 import Cluster.CDTGenerator;
 import Cluster.ClusterProcessor;
@@ -58,7 +57,7 @@ public class ClusterController {
 		clusterView.addClusterListener(new ClusterListener());
 		clusterView.addClusterTypeListener(new ClusterTypeListener());
 		clusterView.addCancelListener(new CancelListener());
-		clusterView.addClusterChoiceListener(new ClusterChoiceListener());
+		clusterView.addLinkageListener(new ClusterChoiceListener());
 	}
 
 	/**
@@ -77,16 +76,19 @@ public class ClusterController {
 			final String rowSimilarity = clusterView.getRowSimilarity();
 			final String colSimilarity = clusterView.getColSimilarity();
 
+			// If no options are selected, display error.
 			if (!checkSelections(rowSimilarity, ROW) 
 					&& !checkSelections(colSimilarity, COL)) {
 				clusterView.displayErrorLabel();
 				return null;
 			}
 			
+			// Row cluster
 			if (checkSelections(rowSimilarity, ROW)) {
 				reorderedRows = cluster(rowSimilarity, ROW);
 			}
 
+			// Column cluster
 			if (checkSelections(colSimilarity, COL)) {
 				reorderedCols = cluster(colSimilarity, COL);
 			}
@@ -109,6 +111,7 @@ public class ClusterController {
 		 */
 		public String[] cluster(final String distMeasure, final int axis) {
 			
+			clusterView.setClustering(true);
 			clusterWorker = new MyClusterWorker(distMeasure, axis);
 			clusterWorker.execute();
 			LogBuffer.println("Clustering started.");
@@ -117,7 +120,10 @@ public class ClusterController {
 				return clusterWorker.get();
 
 			} catch (InterruptedException | ExecutionException e) {
-				ErrorDialog.showError("Clustering was interrupted.", e);
+				String message = "Clustering was interrupted.";
+				JOptionPane.showMessageDialog(clusterDialog.getParentFrame(), 
+						message, "Error", JOptionPane.ERROR_MESSAGE);
+				LogBuffer.logException(e);
 				return null;
 			}
 		}
@@ -134,8 +140,12 @@ public class ClusterController {
 				LogBuffer.println("Saving started.");
 				
 			} else {
-				AlertDialog.showAlert("Cannot save the file, because neither"
-						+ "rows nor columns were properly clustered.");
+				String message = "Cannot save the file, because neither"
+						+ " rows nor columns were properly clustered.";
+				JOptionPane.showMessageDialog(
+						clusterDialog.getParentFrame(), message, "Alert", 
+						JOptionPane.WARNING_MESSAGE);
+				LogBuffer.println("Alert: " + message);
 			}
 		}
 
@@ -196,23 +206,23 @@ public class ClusterController {
 		public String[] doInBackground() {
 
 			final ClusterProcessor processor = 
-					new ClusterProcessor(clusterView, tvModel, this);
+					new ClusterProcessor(tvModel, this);
 
 			String[] reorderedElements = null;
 
-			final double[][] distances = processor.calculateDistance(
+			final double[][] distMatrix = processor.calculateDistance(
 					distMeasure, axis);
 
-			if (!isCancelled() || distances != null) {
+			if (!isCancelled() || distMatrix != null) {
 				if (isHierarchical()) {
-					reorderedElements = processor.hCluster(distances,
-							axis);
+					reorderedElements = processor.hCluster(distMatrix, axis, 
+							clusterView.getLinkageMethod());
 
 				} else {
 					final Integer[] spinnerInput = clusterView
 							.getSpinnerValues();
 
-					reorderedElements = processor.kmCluster(distances,
+					reorderedElements = processor.kmCluster(distMatrix,
 							axis, spinnerInput[0], spinnerInput[1]);
 				}
 			}
@@ -225,11 +235,14 @@ public class ClusterController {
 			
 			try {
 				if(isCancelled() || get() == null) {
-					clusterView.cancel();
+					clusterView.setClustering(false);
 				}
 			} catch (InterruptedException | ExecutionException e) {
-				ErrorDialog.showError("Cancelling cluster was interrupted.", e);
-				clusterView.cancel();
+				String message = "Cancelling cluster was interrupted.";
+				JOptionPane.showMessageDialog(clusterDialog.getParentFrame(), 
+						message, "Error", JOptionPane.ERROR_MESSAGE);
+				LogBuffer.logException(e);;
+				clusterView.setClustering(false);
 			}
 		}
 	}
@@ -264,7 +277,7 @@ public class ClusterController {
 				visualizeData();
 
 			} else {
-				clusterView.cancel();
+				clusterView.setClustering(false);
 				LogBuffer.println("Clustering has been cancelled.");
 			}
 		}
@@ -294,7 +307,11 @@ public class ClusterController {
 				clusterDialog.dispose();
 
 			} else {
-				AlertDialog.showAlert("No clustered data matrix could be set.");
+				String message = "No clustered data matrix could be set.";
+				JOptionPane.showMessageDialog(clusterDialog.getParentFrame(), 
+						message, "Alert", JOptionPane.WARNING_MESSAGE);
+				LogBuffer.println("Alert: " + message);
+				clusterView.setClustering(false);
 				tvController.setViewChoice();
 				tvController.addViewListeners();
 			}
@@ -371,7 +388,9 @@ public class ClusterController {
 		} else {
 			String alert = "When trying to load the clustered file, no"
 					+ "no file path could be found.";
-			AlertDialog.showAlert(alert);
+			JOptionPane.showMessageDialog(clusterDialog.getParentFrame(), 
+					alert, "Alert", JOptionPane.WARNING_MESSAGE);
+			LogBuffer.println("Alert: " + alert);
 		}
 	}
 

@@ -21,7 +21,6 @@ import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import Utilities.ErrorDialog;
 import edu.stanford.genetics.treeview.CdtFilter;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.DataModel;
@@ -878,10 +877,10 @@ public class DendroController implements ConfigNodePersistent {
 			((TVModel)tvModel).loadNew(fileSet);
 
 		} catch (LoadException | InterruptedException | ExecutionException e) {
-			ErrorDialog error = new ErrorDialog("Loading model "
-					+ "was interrupted.");
-			error.setVisible(true);		
-			LogBuffer.println(e.getMessage());
+			String message = "Clustering was interrupted.";
+			JOptionPane.showMessageDialog(tvFrame.getAppFrame(), message, 
+					"Error", JOptionPane.ERROR_MESSAGE);
+			LogBuffer.logException(e);
 		}
 
 		return tvModel;
@@ -1019,10 +1018,10 @@ public class DendroController implements ConfigNodePersistent {
 			atrTVModel.loadNew(fileSet);
 
 		} catch (final LoadException e) {
-			ErrorDialog error = new ErrorDialog("Loading Atr model "
-					+ "was interrupted.");
-			error.setVisible(true);		
-			LogBuffer.println(e.getMessage());
+			String message = "Loading Atr model was interrupted.";
+			JOptionPane.showMessageDialog(tvFrame.getAppFrame(), message, 
+					"Error", JOptionPane.ERROR_MESSAGE);
+			LogBuffer.logException(e);
 		}
 
 		return atrTVModel;
@@ -1225,7 +1224,9 @@ public class DendroController implements ConfigNodePersistent {
 				String message = "Seems like there is a mismatch between your "
 						+ "ATR and CDT files. Ditching Array Tree.";
 				
-				ErrorDialog.showError(message, e);
+				JOptionPane.showMessageDialog(tvFrame.getAppFrame(), message, 
+						"Error", JOptionPane.ERROR_MESSAGE);
+				LogBuffer.logException(e);
 
 				dendroView.getAtrview().setEnabled(false);
 
@@ -1237,7 +1238,9 @@ public class DendroController implements ConfigNodePersistent {
 							+ "invertedTreeDrawer in bindTrees(): " 
 							+ e.getMessage();
 					
-					ErrorDialog.showError(message, e);
+					JOptionPane.showMessageDialog(tvFrame.getAppFrame(), 
+							message, "Error", JOptionPane.ERROR_MESSAGE);
+					LogBuffer.logException(ex);
 				}
 			}
 		} else {
@@ -1251,7 +1254,9 @@ public class DendroController implements ConfigNodePersistent {
 						+ "for invertedTreeDrawer in bindTrees(): "
 						+ e.getMessage();
 				
-				ErrorDialog.showError(message, e);
+				JOptionPane.showMessageDialog(tvFrame.getAppFrame(), message, 
+						"Error", JOptionPane.ERROR_MESSAGE);
+				LogBuffer.logException(e);
 			}
 		}
 
@@ -1281,8 +1286,10 @@ public class DendroController implements ConfigNodePersistent {
 						+ "GTR and CDT files. Ditching Gene Tree, "
 						+ "since it's lame.";
 				
-				ErrorDialog.showError(message, e);
-
+				JOptionPane.showMessageDialog(tvFrame.getAppFrame(), message, 
+						"Error", JOptionPane.ERROR_MESSAGE);
+				LogBuffer.logException(e);
+				
 				dendroView.getGtrview().setEnabled(false);
 
 				try {
@@ -1293,7 +1300,9 @@ public class DendroController implements ConfigNodePersistent {
 							+ "for leftTreeDrawer in bindTrees(): "
 							+ ex.getMessage();
 					
-					ErrorDialog.showError(message, e);
+					JOptionPane.showMessageDialog(tvFrame.getAppFrame(), 
+							message, "Error", JOptionPane.ERROR_MESSAGE);
+					LogBuffer.logException(ex);
 				}
 			}
 		} else {
@@ -1307,7 +1316,9 @@ public class DendroController implements ConfigNodePersistent {
 						+ "for leftTreeDrawer in bindTrees(): "
 						+ e.getMessage();
 				
-				ErrorDialog.showError(message, e);
+				JOptionPane.showMessageDialog(tvFrame.getAppFrame(), message, 
+						"Error", JOptionPane.ERROR_MESSAGE);
+				LogBuffer.logException(e);
 			}
 		}
 

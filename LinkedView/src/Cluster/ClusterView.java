@@ -38,6 +38,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.UIManager;
 
 import Utilities.GUIFactory;
 import Utilities.StringRes;
@@ -53,6 +54,10 @@ import Utilities.StringRes;
  */
 public class ClusterView {
 
+	// Static variables for updates from clustering classes
+	public static JLabel loadLabel;
+	public static JProgressBar pBar;
+	
 	// GUI components
 	private JPanel mainPanel;
 	private JPanel optionsPanel;
@@ -71,9 +76,6 @@ public class ClusterView {
 	private JSpinner colGroupsSetr;
 	private JSpinner rowIterationsSetr;
 	private JSpinner colIterationsSetr;
-
-	private JLabel loadLabel;
-	private JProgressBar pBar;
 
 	private final String[] linkageMethods = { "Average Linkage", 
 			"Single Linkage", "Complete Linkage" };
@@ -345,11 +347,13 @@ public class ClusterView {
 		pBar.setValue(0); // reset ProgressBar
 		
 		if(isInProgress) {
+			loadLabel.setForeground(UIManager.getColor("Label.foreground"));
 			btnPanel.remove(cluster_btn);
 			btnPanel.add(cancel_btn, "pushx, alignx 50%");
 			pBar.setEnabled(true);
 			
 		} else {
+			loadLabel.setText(StringRes.clusterInfo_Ready);
 			btnPanel.remove(cancel_btn);
 			btnPanel.add(cluster_btn, "pushx, alignx 50%");
 			pBar.setEnabled(false);
@@ -371,11 +375,11 @@ public class ClusterView {
 	}
 	
 	/**
-	 * Listener for the clusterChoice JComboBox in order to change the display
-	 * of information about cluster methods when the selection is changed.
+	 * Listener for the linkage JComboBox in order to change the display
+	 * of information about linkage methods when the selection is changed.
 	 * @param l
 	 */
-	public void addClusterChoiceListener(final ActionListener l) {
+	public void addLinkageListener(final ActionListener l) {
 		
 		linkageChooser.addActionListener(l);
 	}
@@ -383,16 +387,6 @@ public class ClusterView {
 	public void addClusterTypeListener(final ActionListener l) {
 		
 		clusterChooser.addActionListener(l);
-	}
-
-	/**
-	 * Attempts to cancel the SwingWorker thread for clustering when the 
-	 * cancel button is clicked. Also resets the UI accordingly.
-	 */
-	public void cancel() {
-
-		loadLabel.setText(StringRes.clusterInfo_Ready);
-		setClustering(false);
 	}
 
 	/**
@@ -415,6 +409,7 @@ public class ClusterView {
 	public void displayErrorLabel() {
 
 		loadLabel.setText(StringRes.clusterError_invalid);
+		loadLabel.setForeground(GUIFactory.RED1);
 
 		loadPanel.revalidate();
 		loadPanel.repaint();
@@ -506,7 +501,7 @@ public class ClusterView {
 	 * 
 	 * @param text
 	 */
-	public void setLoadText(final String text) {
+	public static void setLoadText(final String text) {
 
 		loadLabel.setText(text);
 	}
@@ -516,7 +511,7 @@ public class ClusterView {
 	 * 
 	 * @param max
 	 */
-	public void setPBarMax(final int max) {
+	public static void setPBarMax(final int max) {
 
 		pBar.setMaximum(max); 
 	}
@@ -526,7 +521,7 @@ public class ClusterView {
 	 * 
 	 * @param i
 	 */
-	public void updatePBar(final int i) {
+	public static void updatePBar(final int i) {
 
 		pBar.setValue(i);
 	}

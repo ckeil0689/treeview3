@@ -13,11 +13,15 @@ import Controllers.ClusterController;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.LogBuffer;
 
+/**
+ * Class to perform the calculations of the K-Means algorithm.
+ * @author CKeil
+ *
+ */
 public class KMeansCluster {
 
 	// Instance variables
 	private final DataModel model;
-	private final ClusterView clusterView;
 
 	private ClusterFileWriter bufferedWriter;
 	private String filePath;
@@ -40,20 +44,24 @@ public class KMeansCluster {
 	private final SwingWorker<String[], Void> worker;
 
 	/**
-	 * Main constructor
-	 * 
-	 * @param model
-	 * @param distMatrix
-	 * @param pBar
-	 * @param axis
-	 * @param method
+	 * The KMeansCluster object needs several parameters to be able to
+	 * start its calculations. It will eventually return a String array of 
+	 * reordered matrix elements. 
+	 * @param model The model which holds the loaded data as well as info
+	 * about this it.
+	 * @param distMatrix The calculated distance matrix to be clustered.
+	 * @param axis The matrix axis to be clustered.
+	 * @param groupNum The number of groups (k) to be formed.
+	 * @param iterations The number iterations the k-means algorithm is
+	 * run. This impacts the clustering result.
+	 * @param worker The clustering worker object. Used to check if the user
+	 * cancelled the operation, so that calculations can be interrupted.
 	 */
-	public KMeansCluster(final DataModel model, final ClusterView clusterView,
-			final double[][] distMatrix, final int axis, final int groupNum,
-			final int iterations, final SwingWorker<String[], Void> worker) {
+	public KMeansCluster(final DataModel model, final double[][] distMatrix, 
+			final int axis, final int groupNum, final int iterations, 
+			final SwingWorker<String[], Void> worker) {
 
 		this.model = model;
-		this.clusterView = clusterView;
 		this.distMatrix = distMatrix;
 		this.axis = axis;
 		this.groupNum = groupNum;
@@ -73,8 +81,8 @@ public class KMeansCluster {
 		double[][] clusterMeans = new double[distMatrix.length][];
 
 		// ProgressBar maximum
-		clusterView.setLoadText("Clustering data...");
-		clusterView.setPBarMax(distMatrix.length);
+		ClusterView.setLoadText("Clustering data...");
+		ClusterView.setPBarMax(distMatrix.length);
 
 		// deep copy of distance matrix to avoid mutation
 		copyDistMatrix = deepCopy(distMatrix);
@@ -265,7 +273,7 @@ public class KMeansCluster {
 	 */
 	public int[][] assignMeansVals(final double[] meanList) {
 
-		clusterView.updatePBar(0);
+		ClusterView.updatePBar(0);
 
 		final List<List<Integer>> clusters = new ArrayList<List<Integer>>();
 
@@ -288,7 +296,7 @@ public class KMeansCluster {
 			final int geneID = i;
 			final double mean = meanList[i];
 
-			clusterView.updatePBar(geneID);
+			ClusterView.updatePBar(geneID);
 
 			final int[] meanIndexes = new int[initialMeans.length];
 

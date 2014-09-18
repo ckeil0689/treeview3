@@ -20,13 +20,11 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
-import Utilities.ErrorDialog;
 import Utilities.StringRes;
 import Cluster.ClusterViewDialog;
 import ColorChooser.ColorChooser;
 import ColorChooser.ColorChooserController;
 import edu.stanford.genetics.treeview.CdtFilter;
-import edu.stanford.genetics.treeview.ConfirmDialog;
 import edu.stanford.genetics.treeview.DataMatrix;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.DataModelFileType;
@@ -87,17 +85,25 @@ public class TVFrameController {
 	public void resetPreferences() {
 		
 		try {
-			String intent = "Reset Preferences";
-			ConfirmDialog confirm = new ConfirmDialog(tvFrame, intent);
-			confirm.setVisible(true);
-			if (confirm.getConfirmed()) {
-				tvFrame.getConfigNode().node("File").removeNode();
+			final int option = JOptionPane.showConfirmDialog(applicationFrame,
+					"Are you sure you want to reset preferences?", 
+					"Reset Preferences?", JOptionPane.YES_NO_OPTION);
+
+			switch (option) {
+
+				case JOptionPane.YES_OPTION:	tvFrame.getConfigNode()
+												.node("File").removeNode();
+												break;
+												
+				case JOptionPane.NO_OPTION:		break;
+				
+				default:						return;
 			}
 			
 		} catch (BackingStoreException e) {
 			String message = "Issue while resetting preferences.";
-			ErrorDialog error = new ErrorDialog(message);
-			error.setVisible(true);
+			JOptionPane.showMessageDialog(applicationFrame, message, 
+					"Error", JOptionPane.ERROR_MESSAGE);
 			LogBuffer.println(e.getMessage());
 		}
 	}
@@ -478,7 +484,7 @@ public class TVFrameController {
 								clusterType);
 
 				// Creating the Controller for this view.
-				final ClusterController clusControl = 
+//				final ClusterController clusControl = 
 						new ClusterController(clusterViewDialog, 
 								TVFrameController.this);
 
@@ -759,16 +765,17 @@ public class TVFrameController {
 			@Override
 			public void run() {
 				
+				// View
 				final PreferencesMenu preferences = 
 						new PreferencesMenu(tvFrame);
 				
-				ColorChooser gradientPick = null;
 				if(menu.equalsIgnoreCase(StringRes.menu_Color)) {
 					
 					int min = (int)model.getDataMatrix().getMinVal();
 					int max = (int)model.getDataMatrix().getMaxVal();
 					
-					gradientPick = new ColorChooser(tvFrame, 
+					// View
+					ColorChooser gradientPick = new ColorChooser(tvFrame, 
 									((DoubleArrayDrawer) dendroController
 											.getArrayDrawer())
 											.getColorExtractor(), min, max);
@@ -780,8 +787,8 @@ public class TVFrameController {
 					gradientPick.setConfigNode(((TVModel) model)
 							.getDocumentConfig());
 					
-					final ColorChooserController gradientControl = 
-							new ColorChooserController(gradientPick);
+					// Controller
+					new ColorChooserController(gradientPick);
 					
 					preferences.setGradientChooser(gradientPick);
 					
@@ -796,8 +803,8 @@ public class TVFrameController {
 				preferences.setConfigNode(tvFrame.getConfigNode().node(
 						StringRes.pnode_Preferences));
 
-				final PreferencesController pController = 
-						new PreferencesController(tvFrame, model, preferences);
+				// Controller
+				new PreferencesController(tvFrame, model, preferences);
 
 				preferences.setVisible(true);
 			}

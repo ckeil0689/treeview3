@@ -1,7 +1,9 @@
 package Controllers;
 
-import Utilities.ErrorDialog;
+import javax.swing.JOptionPane;
+
 import Utilities.StringRes;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 
 /**
@@ -23,103 +25,15 @@ public class MenubarController {
 		this.controller = controller;
 	}
 
-	// TODO implement switch statement instead of elseifs.
 	/**
 	 * Executes a certain function based on which menuItem was clicked by the
 	 * user. This is determined by using the name string of the MenuItem, 
 	 * stored in StringRes.
 	 * 
-	 * @param name
+	 * @param name The clicked menu's name.
 	 */
 	public void execute(final String name) {
-
-//		if (name.equalsIgnoreCase(StringRes.menu_title_Open)) {
-//			controller.openFile();
-//
-//		} else if (name.equalsIgnoreCase(StringRes.menu_title_Save)) {
-//			controller.doModelSave(true);
-//
-//		} else if (name.equalsIgnoreCase(StringRes.menu_title_SaveAs)) {
-//			controller.saveModelAs();
-//
-//		} else if (name.equalsIgnoreCase(StringRes.menu_title_EditRecent)) {
-//			tvFrame.showRecentFileEditor();
-//			
-//		} else if (name.equalsIgnoreCase(StringRes.menu_title_ResetPrefs)) {
-//			controller.resetPreferences();
-//			
-//		} else if (name.equalsIgnoreCase("Isolate Selected")) {
-//			controller.showSubDataModel(
-//					tvFrame.getGeneSelection().getSelectedIndexes(), 
-//					tvFrame.getArraySelection().getSelectedIndexes(), 
-//					null, null);
-//
-//		} else if (name.equalsIgnoreCase(StringRes.menu_title_QuitWindow)) {
-//			try {
-//				// tvFrame.getApp().closeAllWindows();
-//				tvFrame.closeWindow();
-//
-//			} catch (final Exception e) {
-//				System.out.println("While trying to exit, got error " + e);
-//				System.exit(1);
-//			}
-//
-//		} else if (name.equalsIgnoreCase(StringRes.menu_title_RowAndCol)
-//				|| name.equalsIgnoreCase(StringRes.menu_title_Color)
-//				|| name.equalsIgnoreCase(StringRes.menu_title_Font)
-//				|| name.equalsIgnoreCase(StringRes.menu_title_URL)) {
-//			controller.openPrefMenu(name);
-//			
-//		} else if(name.equalsIgnoreCase("Fill screen")) {
-//			controller.setMatrixSize("fill");
-//			
-//		} else if(name.equalsIgnoreCase("Equal axes")) {
-//			controller.setMatrixSize("equal");
-//			
-//		} else if(name.equalsIgnoreCase("Proportional axes")) {
-//			controller.setMatrixSize("proportional");
-//			
-//		} else if (name.equalsIgnoreCase(StringRes.menu_title_Hier)) {
-//			controller.setupClusterView(StringRes.menu_title_Hier);
-//
-//		} else if (name.equalsIgnoreCase(StringRes.menu_title_KMeans)) {
-//			controller.setupClusterView(StringRes.menu_title_KMeans);
-//
-//		} else if (name.equalsIgnoreCase("Functional Enrichment")) {
-//			tvFrame.displayWIP();
-//
-//		} else if (name.equalsIgnoreCase(StringRes.menu_title_Stats)) {
-//			String source = controller.getDataModel().getSource();
-//			int rowNum = controller.getDataModel().getGeneHeaderInfo()
-//					.getNumHeaders();
-//			int colNum = controller.getDataModel().getArrayHeaderInfo()
-//					.getNumHeaders();
-//			
-//			tvFrame.openStatsView(source, rowNum, colNum);
-//
-//		} else if (name.equalsIgnoreCase("Save List")) {
-//			controller.saveList();
-//
-//		} else if (name.equalsIgnoreCase("Save Data")) {
-//			controller.saveData();
-//
-//		} else if (name.equalsIgnoreCase(StringRes.menu_title_NewWindow)) {
-//			tvFrame.createNewFrame().getAppFrame().setVisible(true);
-//
-//			// } else if(name.equalsIgnoreCase("Close Window")) {
-//			// tvFrame.closeWindow();
-//
-//		} else if (name.equalsIgnoreCase(StringRes.menu_title_About)) {
-//			tvFrame.showAboutWindow();
-//
-//		} else if (name.equalsIgnoreCase(StringRes.menu_title_Docs)) {
-//			tvFrame.showDocumentation();
-//
-//		} else if (name.equalsIgnoreCase(StringRes.menu_title_ShowLog)) {
-//			tvFrame.showLogMessages();
-//		}
 		
-		// Switch implementation
 		switch (name) {
 			case StringRes.menu_Open: 		controller.openFile();
 											break;
@@ -211,7 +125,8 @@ public class MenubarController {
 	private void displayError() {
 		
 		String message = "A menu button could not be matched with a function.";
-		ErrorDialog error = new ErrorDialog(message);
-		error.setVisible(true);
+		JOptionPane.showMessageDialog(tvFrame.getAppFrame(), message, 
+				"Alert", JOptionPane.WARNING_MESSAGE);
+		LogBuffer.println("Alert: " + message);
 	}
 }

@@ -307,13 +307,21 @@ public abstract class ViewFrame implements Observer {
 //		} catch (final Exception e) {
 //			LogBuffer.println("ViewFrame.closeWindow() Got exception: " + e);
 //		}
+		
+		// Confirm user's intent to exit the application.
+		final int option = JOptionPane.showConfirmDialog(applicationFrame,
+				"Are you sure you want to close TreeView?", "Exit TreeView?",
+			    JOptionPane.YES_NO_OPTION);
 
-		final ConfirmDialog confirm = new ConfirmDialog(this, "Exit TreeView");
-		confirm.setVisible(true);
+		switch (option) {
 
-		if (confirm.getConfirmed()) {
-			saveSettings();
-			applicationFrame.dispose();
+			case JOptionPane.YES_OPTION:	saveSettings();
+											applicationFrame.dispose();
+											break;
+											
+			case JOptionPane.NO_OPTION:		break;
+			
+			default:						return;
 		}
 	}
 

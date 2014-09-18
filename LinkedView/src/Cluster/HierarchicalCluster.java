@@ -10,9 +10,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import Controllers.ClusterController;
-import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.model.TVModel;
 
 /**
  * Test class to assess whether the operation can work on half a matrix (due to
@@ -24,9 +22,9 @@ import edu.stanford.genetics.treeview.model.TVModel;
 public class HierarchicalCluster {
 
 	// Instance variables
-	private final double PRECISION_LEVEL = 0.0000000001;
-	private final DataModel model;
-	private final ClusterView clusterView;
+	private final double PRECISION_LEVEL = 0.0000000001; //float comparison
+	private String fileName;
+	private final String linkMethod;
 	private String filePath;
 	private final int axis;
 	private final String axisPrefix;
@@ -64,12 +62,12 @@ public class HierarchicalCluster {
 	 * @param axis
 	 * @param method
 	 */
-	public HierarchicalCluster(final DataModel model,
-			final ClusterView clusterView, final double[][] dMatrix,
+	public HierarchicalCluster(final String fileName,
+			final String linkageMethod, final double[][] dMatrix,
 			final int axis, final SwingWorker<String[], Void> worker) {
 
-		this.model = (TVModel) model;
-		this.clusterView = clusterView;
+		this.fileName = fileName;
+		this.linkMethod = linkageMethod;
 		this.halfDMatrix = dMatrix;
 		this.axis = axis;
 		this.wholeMSize = dMatrix.length;
@@ -103,8 +101,9 @@ public class HierarchicalCluster {
 		} else {
 			side = "???";
 		}
-		clusterView.setLoadText("Clustering " + side + " Data...");
-		clusterView.setPBarMax(wholeMSize);
+		
+		ClusterView.setLoadText("Clustering " + side + " Data...");
+		ClusterView.setPBarMax(wholeMSize);
 
 		// data to be written to file
 		dataTable = new String[wholeMSize][];
@@ -123,7 +122,7 @@ public class HierarchicalCluster {
 		}
 
 		// halving of the distance matrix
-		halfDMatrix = splitMatrix(halfDMatrix);
+		//halfDMatrix = splitMatrix(halfDMatrix);
 
 		// deep copy of distance matrix to avoid mutation
 		// needed to access values during generation of new row after joining
@@ -152,7 +151,7 @@ public class HierarchicalCluster {
 			loopN = wholeMSize - halfDMatrix.length;
 
 			// update ProgressBar
-			clusterView.updatePBar(loopN);
+			ClusterView.updatePBar(loopN);
 
 			// local variables
 			double min = 0;
@@ -315,8 +314,6 @@ public class HierarchicalCluster {
 
 			// newRow contains corresponding values depending on the
 			// cluster method
-			final String linkMethod = clusterView.getLinkageMethod();
-
 			if (linkMethod.contentEquals("Single Linkage")
 					|| linkMethod.contentEquals("Complete Linkage")) {
 				newRow = newRowGenSC(fusedGroup);
@@ -422,8 +419,7 @@ public class HierarchicalCluster {
 			fileEnd = ".atr";
 		}
 
-		String fileName = model.getSource().substring(0, 
-				model.getSource().length() - 4) + fileEnd;
+		fileName += fileEnd;
 		
 		final File file = new File(fileName);
 
@@ -558,28 +554,28 @@ public class HierarchicalCluster {
 		return c;
 	}
 
-	/**
-	 * Method to half the distance matrix. This should be done because a
-	 * distance matrix is symmetrical and it saves computational time to do
-	 * operations on only half of the values.
-	 * 
-	 * @param distanceMatrix
-	 * @return half distanceMatrix
-	 */
-	public double[][] splitMatrix(final double[][] distanceMatrix) {
-
-		final double[][] halfMatrix = new double[wholeMSize][];
-
-		// distance matrices are symmetrical!
-		for (int i = 0; i < distanceMatrix.length; i++) {
-
-			final double[] newRow = Arrays.copyOfRange(distanceMatrix[i], 0, i);
-
-			halfMatrix[i] = newRow;
-		}
-
-		return halfMatrix;
-	}
+//	/**
+//	 * Method to half the distance matrix. This should be done because a
+//	 * distance matrix is symmetrical and it saves computational time to do
+//	 * operations on only half of the values.
+//	 * 
+//	 * @param distanceMatrix
+//	 * @return half distanceMatrix
+//	 */
+//	public double[][] splitMatrix(final double[][] distanceMatrix) {
+//
+//		final double[][] halfMatrix = new double[wholeMSize][];
+//
+//		// distance matrices are symmetrical!
+//		for (int i = 0; i < distanceMatrix.length; i++) {
+//
+//			final double[] newRow = Arrays.copyOfRange(distanceMatrix[i], 0, i);
+//
+//			halfMatrix[i] = newRow;
+//		}
+//
+//		return halfMatrix;
+//	}
 
 	/**
 	 * Method to make deep copy of distance matrix
@@ -910,7 +906,6 @@ public class HierarchicalCluster {
 	 */
 	public double[] newRowGenSC(final int[] fusedGroup) {
 
-		final String linkMethod = clusterView.getLinkageMethod();
 		final double[] newRow = new double[geneGroups.size()];
 
 		for (int i = 0; i < geneGroups.size(); i++) {
