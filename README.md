@@ -13,6 +13,7 @@ This README would normally document whatever steps are necessary to get your app
 * Summary of set up
 * Configuration
 * Dependencies
+    1. Java 1.7+
 * Database configuration
 * How to run tests
 * Deployment instructions
@@ -22,6 +23,7 @@ This README would normally document whatever steps are necessary to get your app
 * Writing tests
 * Code review
 * Other guidelines
+    1. Oracle Code Conventions: http://www.oracle.com/technetwork/java/javase/documentation/codeconvtoc-136057.html
 
 ### Who do I talk to? ###
 
