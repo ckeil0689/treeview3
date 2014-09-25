@@ -41,7 +41,7 @@ public class KMeansCluster {
 	// list to return ordered GENE numbers for .cdt creation
 	private String[] reorderedList;
 
-	private final SwingWorker<String[], Void> worker;
+	private final SwingWorker<String[], Integer> worker;
 
 	/**
 	 * The KMeansCluster object needs several parameters to be able to
@@ -59,7 +59,7 @@ public class KMeansCluster {
 	 */
 	public KMeansCluster(final DataModel model, final double[][] distMatrix, 
 			final int axis, final int groupNum, final int iterations, 
-			final SwingWorker<String[], Void> worker) {
+			final SwingWorker<String[], Integer> worker) {
 
 		this.model = model;
 		this.distMatrix = distMatrix;

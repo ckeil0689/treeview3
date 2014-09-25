@@ -40,14 +40,23 @@ public class CDTGenerator {
 
 	private ClusterFileWriter bufferedWriter;
 
-	// Constructor (building the object)
+	/**
+	 * The task for this class is to take supplied data that is the result
+	 * of clustering and format it into a new CDT file that can be read and 
+	 * interpreted by TreeView. 
+	 * @param model
+	 * @param clusterView
+	 * @param orderedRows
+	 * @param orderedCols
+	 * @param hierarchical
+	 */
 	public CDTGenerator(final DataModel model,
 			final ClusterView clusterView, final String[] orderedRows, 
 			final String[] orderedCols, final boolean hierarchical) {
 
 		this.model = model;
 		this.clusterView = clusterView;
-		this.sepList = ((TVDataMatrix) model.getDataMatrix()).getExprData();//sepList;
+		this.sepList = ((TVDataMatrix) model.getDataMatrix()).getExprData();
 		this.orderedRows = orderedRows;
 		this.orderedCols = orderedCols;
 		this.hierarchical = hierarchical;

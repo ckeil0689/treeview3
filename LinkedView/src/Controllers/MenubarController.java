@@ -8,7 +8,7 @@ import edu.stanford.genetics.treeview.TreeViewFrame;
 
 /**
  * This class contains all the different actions which are being mapped to
- * JMenuItems using ActionListener.
+ * JMenuItems using ActionListeners.
  * 
  * @author CKeil
  * 
@@ -18,6 +18,12 @@ public class MenubarController {
 	private final TreeViewFrame tvFrame;
 	private final TVFrameController controller;
 
+	/**
+	 * A controller to handle user interaction with JMenuItems. It defines
+	 * what methods are executed when the JMenuItems are clicked.
+	 * @param tvFrame The main JFrame of the application.
+	 * @param controller The controller for TVFrame.
+	 */
 	public MenubarController(final TreeViewFrame tvFrame,
 			final TVFrameController controller) {
 
@@ -35,62 +41,86 @@ public class MenubarController {
 	public void execute(final String name) {
 		
 		switch (name) {
-			case StringRes.menu_Open: 		controller.openFile();
-											break;
-			case StringRes.menu_Save: 		controller.doModelSave(true);
-											break;
-			case StringRes.menu_SaveAs: 	controller.saveModelAs();
-											break;
-			case StringRes.menu_EditRecent: tvFrame.showRecentFileEditor();
-											break;
-			case StringRes.menu_ResetPrefs:	controller.resetPreferences();
-											break;
-			case "Isolate Selected":		showSubData();
-											break;
-			case StringRes.menu_QuitWindow: tvFrame.closeWindow();
-											break;
-			case StringRes.menu_RowAndCol:	controller.openPrefMenu(name);
-											break;
-			case StringRes.menu_Color:		controller.openPrefMenu(name);
-											break;
-			case StringRes.menu_Font:		controller.openPrefMenu(name);
-											break;
-			case StringRes.menu_URL:		controller.openPrefMenu(name);
-											break;	
-			case "Fill screen":				controller.setMatrixSize("fill");
-											break;
-			case "Equal axes":				controller.setMatrixSize("equal");
-											break;
-			case "Proportional axes":	    controller.setMatrixSize(
-											"proportional");
-											break;
-			case StringRes.menu_Hier:		controller.setupClusterView(name);
-											break;
-			case StringRes.menu_KMeans:    	controller.setupClusterView(name);
-											break;
-			case "Functional Enrichment":	tvFrame.displayWIP();
-											break;
-			case StringRes.menu_Stats:		openStats();
-											break;
-			case "Save List":				controller.saveList();
-											break;
-			case "Save Data":				controller.saveData();
-											break;
-			case StringRes.menu_NewWindow:	tvFrame.createNewFrame()
-											.getAppFrame().setVisible(true);
-											break;
-			case StringRes.menu_About:		tvFrame.showAboutWindow();
-											break;
-			case StringRes.menu_Docs:		tvFrame.showDocumentation();
-											break;
-			case StringRes.menu_ShowLog:	tvFrame.showLogMessages();
-											break;
-			default: 						displayError();
-											break;
+		
+		case StringRes.menu_Open: 		
+			controller.openFile();
+			break;
+		case StringRes.menu_Save: 		
+			controller.doModelSave(true);
+			break;
+		case StringRes.menu_SaveAs: 	
+			controller.saveModelAs();
+			break;
+		case StringRes.menu_EditRecent: 
+			tvFrame.showRecentFileEditor();
+			break;
+		case StringRes.menu_ResetPrefs:	
+			controller.resetPreferences();
+			break;
+		case "Isolate Selected":		
+			showSubData();
+			break;
+		case StringRes.menu_QuitWindow: 
+			tvFrame.closeWindow();
+			break;
+		case StringRes.menu_RowAndCol:	
+			controller.openPrefMenu(name);
+			break;
+		case StringRes.menu_Color:		
+			controller.openPrefMenu(name);
+			break;
+		case StringRes.menu_Font:		
+			controller.openPrefMenu(name);
+			break;
+		case StringRes.menu_URL:		
+			controller.openPrefMenu(name);
+			break;	
+		case "Fill screen":				
+			controller.setMatrixSize("fill");
+			break;
+		case "Equal axes":				
+			controller.setMatrixSize("equal");
+			break;
+		case "Proportional axes":	    
+			controller.setMatrixSize("proportional");
+			break;
+		case StringRes.menu_Hier:		
+			controller.setupClusterView(name);
+			break;
+		case StringRes.menu_KMeans:    	
+			controller.setupClusterView(name);
+			break;
+		case "Functional Enrichment":	
+			tvFrame.displayWIP();
+			break;
+		case StringRes.menu_Stats:		
+			openStats();
+			break;
+		case "Save List":				
+			controller.saveList();
+			break;
+		case "Save Data":				
+			controller.saveData();
+			break;
+		case StringRes.menu_NewWindow:	
+			tvFrame.createNewFrame().getAppFrame().setVisible(true);
+			break;
+		case StringRes.menu_About:		
+			tvFrame.showAboutWindow();
+			break;
+		case StringRes.menu_Docs:		
+			tvFrame.showDocumentation();
+			break;
+		case StringRes.menu_ShowLog:	
+			tvFrame.showLogMessages();
+			break;
+		default: 						
+			displayError();
+			break;
 		}
 	}
 	
-	// Some helpers to keep the switch statement readable.
+	/* Some helpers to keep the switch statement readable. */
 	/**
 	 * Takes the currently selected row and column indexes and uses them
 	 * to open a new view that only displays the selected data. 

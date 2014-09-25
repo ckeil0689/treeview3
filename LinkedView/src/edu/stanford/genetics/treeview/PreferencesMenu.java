@@ -18,7 +18,7 @@ import Utilities.GUIFactory;
 import Utilities.StringRes;
 import ColorChooser.ColorChooser;
 import Controllers.PreferencesController;
-import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
+import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 import edu.stanford.genetics.treeview.plugin.dendroview.FontSettings;
 
 /**
@@ -35,7 +35,7 @@ public class PreferencesMenu extends CustomDialog implements ConfigNodePersisten
 	private HeaderInfo arrayHI;
 	private Preferences configNode;
 	
-	private final DendroView2 dendroView;
+	private final DendroView dendroView;
 	private ColorChooser gradientPick;
 	private JButton ok_btn;
 

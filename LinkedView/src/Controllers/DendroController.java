@@ -40,7 +40,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.AtrAligner;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor2;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets2;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroException;
-import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
+import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
 import edu.stanford.genetics.treeview.plugin.dendroview.DoubleArrayDrawer;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
@@ -50,7 +50,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.TreePainter;
 public class DendroController implements ConfigNodePersistent {
 
 	private final double PRECISION_LEVEL = 0.000001;
-	private DendroView2 dendroView;
+	private DendroView dendroView;
 	private final TreeViewFrame tvFrame;
 	private DataModel tvModel;
 
@@ -83,7 +83,7 @@ public class DendroController implements ConfigNodePersistent {
 		globalYmap = new MapContainer("Fixed", "GlobalYMap");
 	}
 	
-	public void setNew(final DendroView2 dendroView, final DataModel tvModel) {
+	public void setNew(final DendroView dendroView, final DataModel tvModel) {
 		
 		this.dendroView = dendroView;
 		this.tvModel = tvModel;

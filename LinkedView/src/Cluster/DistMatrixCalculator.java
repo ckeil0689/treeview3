@@ -1,5 +1,7 @@
 package Cluster;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
 
@@ -8,13 +10,12 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
 import Utilities.StringRes;
-import Controllers.ClusterController;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
  * This class is used to calculate a distance matrix based on input data. It
  * contains several different methods and will return a matrix of distances
- * between row or column elements, using the parameters which the user has
+ * between rows or columns, using the parameters which the user has
  * chosen.
  * 
  * @author CKeil
@@ -26,86 +27,96 @@ public class DistMatrixCalculator {
 	private final double[][] data;
 
 	private final String distMeasure;
-	private final String axisPrefix;
 
-	private final SwingWorker<String[], Void> worker;
+	private final SwingWorker<double[][], Integer> worker;
 	
 	private double[][] distMatrix;
+	
+	private ClusterFileWriter bufferedWriter;
 
-	// Constructor
-	public DistMatrixCalculator(final double[][] fullList, 
+	/**
+	 * Constructs a DistMatrixCalculator which can be used to obtain
+	 * distance matrices for supplied datasets.
+	 * @param data The original data from which to construct a distance matrix.
+	 * @param distMeasure The user choice for the measure of distance 
+	 * to be used.
+	 * @param axis The axis of the original matrix which should be compared.
+	 * @param worker The SwingWorker thread which calculates this operation.
+	 * Used to allow cancellation of the process.
+	 */
+	public DistMatrixCalculator(final double[][] data, 
 			final String distMeasure, final int axis, 
-			final SwingWorker<String[], Void> worker) {
+			final SwingWorker<double[][], Integer> worker) {
 
-		this.data = fullList;
+		this.data = data;
 		this.distMeasure = distMeasure;
 		this.worker = worker;
-		this.axisPrefix = (axis == ClusterController.ROW) ? "Row" : "Column";
+		
+		setupWriter();
 	}
 
-	// Methods to calculate distance matrix
+	/* Distance measure functions */
 	/**
 	 * This method generates a symmetric distance list based on 
-	 * the Pearson correlation. Distances of elements on the selected axis
+	 * the Pearson correlation. Distances of rows on the selected axis
 	 * will be compared to each other.
 	 * The parameters allow for selection of different versions of the Pearson
 	 * correlation (absolute Pearson correlation, centered vs. uncentered).
 	 * 
-	 * @param data
-	 * @param absolute
-	 * @param centered
-	 * @return List<List<Double> distance matrix
+	 * @param data The original dataset. 
+	 * @param absolute Whether pearson should be absolute or not.
+	 * @param centered Whether pearson should be centered or not.
 	 */
 	public void pearson(final boolean absolute, final boolean centered) {
 				
-		// Reset in case Spearman Rank was used
-		ClusterView.setLoadText("Calculating " + axisPrefix 
-				+ " Distance Matrix...");
+		/* Reset in case Spearman Rank was used */
+//		ClusterView.setLoadText("Calculating " + axisPrefix 
+//				+ " Distance Matrix...");
+//
+//		ClusterView.setPBarMax(data.length);
 
-		ClusterView.setPBarMax(data.length);
-
-		// making sure distanceList is clear
+		/* making sure distanceList is clear */
 		distMatrix = new double[data.length][];
 
-		// take an element
+		/* take a row */
 		for (int i = 0; i < data.length; i++) {
 
 			if (worker.isCancelled()) {
 				break;
 			}
  
-			// for half matrix! full distMatrix is symmetric...
+			/* for half matrix! full distMatrix is symmetric... */
 			int limit = i;
 			
-			// update progressbar
+			/* update progressbar */
 			ClusterView.updatePBar(i);
 
-			// pearson values of one element compared to all others
-			final double[] elementDist = new double[limit];
+			/* pearson values of one row compared to all others */
+			final double[] rowDist = new double[limit];
 
-			// second element for comparison
+			/* second row for comparison */
 			for (int j = 0; j < limit; j++) {
 
-				elementDist[j] = calcPearson(data[i], data[j], 
-						centered, absolute);
+				rowDist[j] = calcPearson(data[i], data[j], centered, absolute);
 			}
 
-			distMatrix[i] = elementDist;
+			distMatrix[i] = rowDist;
 		}
+		
+		writeMatrix();
 	}
 	
 	/**
-	 * Calculates the pearson correlation coefficient of two elements.
-	 * @param element First matrix element.
-	 * @param otherElement Matrix element to be compared.
+	 * Calculates the pearson correlation coefficient of two rows.
+	 * @param row A matrix row.
+	 * @param otherRow Another matrix row to be compared to the first one.
 	 * @param centered Whether the correlation should be centered.
 	 * @param absolute Whether the coefficient will be in absolute terms.
-	 * @return double The Pearson correlation coefficient.
+	 * @return The Pearson correlation coefficient.
 	 */
-	public double calcPearson(double[] element, double[] otherElement, 
+	public double calcPearson(double[] row, double[] otherRow, 
 			boolean centered, boolean absolute) {
 		
-		// local variables
 		double xi = 0;
 		double yi = 0;
 		double mean_x = 0;
@@ -115,67 +126,66 @@ public class DistMatrixCalculator {
 		double sumX = 0;
 		double sumY = 0;
 		double sumXY = 0;
-		double pearson = 0;
 		double rootProduct = 0;
 
 		if (centered) {
-			for(int k = 0; k < element.length; k++) {
+			for(int k = 0; k < row.length; k++) {
 				
-				mean_sumX += element[k];
-				mean_sumY += otherElement[k];
+				mean_sumX += row[k];
+				mean_sumY += otherRow[k];
 			}
 
-			mean_x = mean_sumX/ element.length;
-			mean_y = mean_sumY/ otherElement.length;
+			mean_x = mean_sumX/ row.length;
+			mean_y = mean_sumY/ otherRow.length;
 
 		} else {// works great in cluster
 			mean_x = 0;
 			mean_y = 0;
 		}
 
-		// compare each value of both genes
-		for (int k = 0; k < element.length; k++) {
+		/* compare each value of both genes */
+		for (int k = 0; k < row.length; k++) {
 
 			// part x
-			xi = element[k];
+			xi = row[k];
 			sumX += (xi - mean_x) * (xi - mean_x);
 
 			// part y
-			yi = otherElement[k];
+			yi = otherRow[k];
 			sumY += (yi - mean_y) * (yi - mean_y);
 
 			// part xy
 			sumXY += (xi - mean_x) * (yi - mean_y);
 		}
 
-		// calculate pearson value for current element pair
+		/* Calculate pearson value for current row pair. Stays 0.0 if
+		 * the rootProduct is 0 */
 		rootProduct = (Math.sqrt(sumX) * Math.sqrt(sumY));
 		
+		double pearson = 0.0;
 		if(rootProduct != 0) {
 			double sumOverRoot = sumXY/ rootProduct;
-			pearson = (absolute) ? Math.abs(sumOverRoot) :  sumOverRoot;
-			pearson = 1.0 - pearson;
-			
-		} else {
-			pearson = 0.0;
+			pearson = (absolute) ? Math.abs(sumOverRoot) : sumOverRoot;
+			pearson = 1.0 - pearson;	
 		}
 		
-		// using BigDecimal to correct for rounding errors caused by
-		// floating point arithmetic (0.0 would be
-		// -1.113274672357E-16 for example)
+		 /* using BigDecimal to correct for rounding errors caused by 
+		  * floating point arithmetic (e.g. 0.0 would be -1.113274672357E-16)
+		  */
 		return new BigDecimal(String.valueOf(pearson)).setScale(10, 
 				BigDecimal.ROUND_DOWN).doubleValue();
 	}
 	
 
 	/**
+	 * TODO Some massive errors in here, correct them!
 	 * This method runs the Spearman Ranked distance measure. It ranks the data
 	 * values by their magnitude and then calls an uncentered Pearson
 	 * correlation distance measure on the data.
 	 */
 	public void spearman() {
 				
-		ClusterView.setLoadText("Getting " + axisPrefix + " Spearman Ranks...");
+//		ClusterView.setLoadText("Getting " + axisPrefix + " Spearman Ranks...");
 
 		for (int i = 0; i < data.length; i++) {
 
@@ -185,13 +195,13 @@ public class DistMatrixCalculator {
 
 			ClusterView.updatePBar(i);
 
-			// Make a copy row to avoid mutation
+			/* Make a copy row to avoid mutation */
 			final double[] copyRow = data[i].clone();
 
-			// Sort the copy row
+			/* Sort the copy row */
 			Arrays.sort(copyRow);
 
-			// Iterate over sorted copy row to
+			/* Iterate over sorted copy row to */
 			for (int j = 0; j < copyRow.length; j++) {
 
 				final Double rank = (double) j;
@@ -213,64 +223,64 @@ public class DistMatrixCalculator {
 	/**
 	 * Uses one of the two 'taxicab' distance measures: 
 	 * Euclidean or Manhattan.
-	 * @param euclid Whether Euclidean distance is used or not.
+	 * @param isEuclid Whether Euclidean distance is used or not.
 	 */
-	public void taxicab(boolean euclid) {
+	public void taxicab(boolean isEuclid) {
 
-		ClusterView.setLoadText("Calculating " + axisPrefix 
-				+ " Distance Matrix...");
+//		ClusterView.setLoadText("Calculating " + axisPrefix 
+//				+ " Distance Matrix...");
+//
+//		ClusterView.setPBarMax(data.length);
 
-		ClusterView.setPBarMax(data.length);
-
-		// making sure distanceList is empty
+		/* making sure distanceList is empty */
 		distMatrix = new double[data.length][];
 
-		// iterate through all elements
+		/* iterate through all elements */
 		for (int i = 0; i < data.length; i++) {
 
 			if (worker.isCancelled()) {
 				break;
 			}
 
-			// update progressbar
+			/* update progressbar */
 			ClusterView.updatePBar(i);
 			
-			// limit size of distMatrix element due to symmetry 
+			/* limit size of distMatrix element due to symmetry */
 			int limit = i;
 
-			// euclidean distances of one element to all others
-			final double[] elementDist = new double[limit];
+			/* Euclidean distances of one element to all others */
+			final double[] rowDist = new double[limit];
 			
-			if(euclid) {
+			if(isEuclid) {
 				for (int j = 0; j < limit; j++) {
 	
-					elementDist[j] = calcEuclid(data[i], data[j]);
+					rowDist[j] = calcEuclid(data[i], data[j]);
 				}
 			} else {
 				for (int j = 0; j < limit; j++) {
 
-					elementDist[j] = calcManhattan(data[i], data[j]);
+					rowDist[j] = calcManhattan(data[i], data[j]);
 				}
 			}
 
-			// list with all genes and their distances to the other genes
-			distMatrix[i] = elementDist;
+			/* list with all rows and their distances to the other rows */
+			distMatrix[i] = rowDist;
 		}
 	}
 	
 	/**
-	 * Calculates the Euclidean distance between two elements.
-	 * @param element One matrix element.
-	 * @param otherElement Another matrix element.
-	 * @return double The Euclidean distance between the two elements.
+	 * Calculates the Euclidean distance between two rows.
+	 * @param row One matrix row.
+	 * @param otherRow Another matrix row.
+	 * @return double The Euclidean distance between the two rows.
 	 */
-	public double calcEuclid(double[] element, double[] otherElement) {
+	public double calcEuclid(double[] row, double[] otherRow) {
 		
 		double sum = 0;
-		// compare each value of both elements
-		for (int k = 0; k < element.length; k++) {
+		/* compare each value of both elements */
+		for (int k = 0; k < row.length; k++) {
 			
-			double diff = element[k] - otherElement[k];
+			double diff = row[k] - otherRow[k];
 			sum += diff * diff; // using Math.pow is massive slow down...
 		}
 		
@@ -286,7 +296,7 @@ public class DistMatrixCalculator {
 	public double calcManhattan(double[] element, double[] otherElement) {
 		
 		double sum = 0;
-		// compare each value of both elements
+		/* compare each value of both elements */
 		for (int k = 0; k < element.length; k++) {
 			
 			sum += Math.abs(element[k] - otherElement[k]);
@@ -298,9 +308,9 @@ public class DistMatrixCalculator {
 	/**
 	 * Finds the index of a value in a double array. Used for Spearman Rank.
 	 * 
-	 * @param array
-	 * @param value
-	 * @return
+	 * @param array The array to query.
+	 * @param value The value to be found in the array.
+	 * @return The index of the target value.
 	 */
 	public int find(final double[] array, final double value) {
 
@@ -319,29 +329,82 @@ public class DistMatrixCalculator {
 	 */
 	public void measureDistance() {
 		
-		ClusterView.setLoadText("Calculating " + axisPrefix 
-				+ " Distance Matrix...");
-		ClusterView.setPBarMax(data.length);
+//		ClusterView.setLoadText("Calculating " + axisPrefix 
+//				+ " Distance Matrix...");
+//		ClusterView.setPBarMax(data.length);
 		
 		switch(distMeasure) {
 		
-			case StringRes.cluster_pearsonUn: 	pearson(false, false);
-												break;
-			case StringRes.cluster_pearsonCtrd: pearson(false, true);
-												break;
-			case StringRes.cluster_absCorrUn: 	pearson(true, false);
-												break;
-			case StringRes.cluster_absCorrCtrd:	pearson(true, true);
-												break;
-			case StringRes.cluster_spearman:	spearman();
-												break;
-			case StringRes.cluster_euclidean: 	taxicab(true);
-												break;
-			case StringRes.cluster_cityBlock:	taxicab(false);
-												break;
-			default:							showDistAlert();
-												break;
+		case StringRes.cluster_pearsonUn: 	
+			pearson(false, false);
+			break;
+		case StringRes.cluster_pearsonCtrd: 
+			pearson(false, true);
+			break;
+		case StringRes.cluster_absCorrUn: 	
+			pearson(true, false);
+			break;
+		case StringRes.cluster_absCorrCtrd:	
+			pearson(true, true);
+			break;
+		case StringRes.cluster_spearman:	
+			spearman();
+			break;
+		case StringRes.cluster_euclidean: 	
+			taxicab(true);
+			break;
+		case StringRes.cluster_cityBlock:	
+			taxicab(false);
+			break;
+		default:							
+			showDistAlert();
+			break;
 		}
+	}
+	
+	public void setupWriter() {
+		
+		final File file = new File("C:/Users/CKeil/Programming/Princeton/"
+				+ "TreeView Related Files/test_dist_matrix.txt");
+
+		try {
+			file.createNewFile();
+			bufferedWriter = new ClusterFileWriter(file);
+			
+		} catch (IOException e) {
+			LogBuffer.logException(e);
+			String message = "There was trouble when trying to setup the"
+					+ "buffered writer to save ATR or GTR files.";
+			JOptionPane.showMessageDialog(JFrame.getFrames()[0], message, 
+					"Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
+	public void writeMatrix() {
+
+		/* Transform distMatrix to Strings for writing */ 
+		String[][] dataStrings = new String[distMatrix.length][];
+		
+		for (int i = 0; i < distMatrix.length; i++) {
+			
+			final double[] element = distMatrix[i];
+			final String[] newStringData = new String[element.length];
+
+			for (int j = 0; j < element.length; j++) {
+
+				newStringData[j] = String.valueOf(element[j]);
+			}
+
+			dataStrings[i] = newStringData;
+		}
+		
+		for(String[] row : dataStrings) {
+			bufferedWriter.writeContent(row);
+		}
+		
+		bufferedWriter.closeWriter();
+		
+		LogBuffer.println("Finished writing distMatrix.");
 	}
 	
 	/**
@@ -358,7 +421,10 @@ public class DistMatrixCalculator {
 		LogBuffer.println("Alert: " + message);
 	}
 
-	// Accessor method to retrieve the distance matrix
+	/** 
+	 * Accessor method to retrieve the distance matrix
+	 * @return The calculated distance matrix.
+	 */
 	public double[][] getDistanceMatrix() {
 
 		return distMatrix;
