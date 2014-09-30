@@ -455,9 +455,69 @@ public class DendroController implements ConfigNodePersistent {
 
 		double newScale = 0.0;
 		double newScale2 = 0.0;
+		
+		//Declare the min number of spots to zoom in on for each dimension.
+		//We should set this as a preference in the future. -Rob
+		double minZoomIndex      = 20;
+		double minArrayZoomIndex = minZoomIndex;
+		double minGeneZoomIndex  = minZoomIndex;
+		
+		//Determine the boundaries of the data (so that we do not exceed them)
+		final double maxArrayIndex = globalXmap.getMaxIndex();
+		final double maxGeneIndex  = globalYmap.getMaxIndex();
+		
+		//Make sure our zoom limits have not exceeded the boundaries of the data
+		if(maxArrayIndex < minArrayZoomIndex) {
+			minArrayZoomIndex = maxArrayIndex;
+		}
+		if(maxGeneIndex < minGeneZoomIndex) {
+			minGeneZoomIndex = maxGeneIndex;
+		}
 
-		final double arrayIndexes = arraySelection.getNSelectedIndexes();
-		final double geneIndexes = geneSelection.getNSelectedIndexes();
+		//Obtain the selection size of each dimension
+		double arrayIndexes = arraySelection.getNSelectedIndexes();
+		double geneIndexes = geneSelection.getNSelectedIndexes();
+		
+		//We'll allow the user to surpass the min zoom index when they are near the edge, so that
+		//their selection is centered on the screen, so let's get the edges of the selection
+		double minSelectedArrayIndex = arraySelection.getMinIndex();
+		double minSelectedGeneIndex  = geneSelection.getMinIndex();
+		
+		//If the array selection is smaller than the minimum zoom level
+		if(arrayIndexes < minArrayZoomIndex) {
+			
+			//If the center of the selection is less than half the distance to the near edge
+			if((minSelectedArrayIndex + arrayIndexes / 2) < (minArrayZoomIndex / 2)) {
+				arrayIndexes = (minSelectedArrayIndex + arrayIndexes / 2) * 2;
+			}
+			//Else if the center of the selection is less than half the distance to the far edge
+			else if((minSelectedArrayIndex + arrayIndexes / 2) >
+					(maxArrayIndex - (minArrayZoomIndex / 2))) {
+				arrayIndexes = (maxArrayIndex - (minSelectedArrayIndex + arrayIndexes / 2)) * 2;
+			}
+			//Otherwise, set the standard minimum zoom
+			else {
+				arrayIndexes = minArrayZoomIndex;
+			}
+		}
+		
+		//If the gene selection is smaller than the minimum zoom level
+		if(geneIndexes < minGeneZoomIndex) {
+			
+			//If the center of the selection is less than half the distance to the near edge
+			if((minSelectedGeneIndex + geneIndexes / 2) < (minGeneZoomIndex / 2)) {
+				geneIndexes = (minSelectedGeneIndex + geneIndexes / 2) * 2;
+			}
+			//Else if the center of the selection is less than half the distance to the far edge
+			else if((minSelectedGeneIndex + geneIndexes / 2) >
+					(maxGeneIndex - (minGeneZoomIndex / 2))) {
+				geneIndexes = (maxGeneIndex - (minSelectedGeneIndex + geneIndexes / 2)) * 2;
+			}
+			//Otherwise, set the standard minimum zoom
+			else {
+				geneIndexes = minGeneZoomIndex;
+			}
+		}
 
 		if (arrayIndexes > 0 && geneIndexes > 0) {
 			newScale = (globalXmap.getAvailablePixels()) / arrayIndexes;
