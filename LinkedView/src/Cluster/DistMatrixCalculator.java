@@ -48,6 +48,8 @@ public class DistMatrixCalculator {
 			final String distMeasure, final int axis, 
 			final SwingWorker<double[][], Integer> worker) {
 
+		LogBuffer.println("Initializing DistMatrixCalculator.");
+		
 		this.data = data;
 		this.distMeasure = distMeasure;
 		this.worker = worker;
@@ -68,12 +70,6 @@ public class DistMatrixCalculator {
 	 * @param centered Whether pearson should be centered or not.
 	 */
 	public void pearson(final boolean absolute, final boolean centered) {
-				
-		/* Reset in case Spearman Rank was used */
-//		ClusterView.setLoadText("Calculating " + axisPrefix 
-//				+ " Distance Matrix...");
-//
-//		ClusterView.setPBarMax(data.length);
 
 		/* making sure distanceList is clear */
 		distMatrix = new double[data.length][];
@@ -184,8 +180,6 @@ public class DistMatrixCalculator {
 	 * correlation distance measure on the data.
 	 */
 	public void spearman() {
-				
-//		ClusterView.setLoadText("Getting " + axisPrefix + " Spearman Ranks...");
 
 		for (int i = 0; i < data.length; i++) {
 
@@ -226,11 +220,6 @@ public class DistMatrixCalculator {
 	 * @param isEuclid Whether Euclidean distance is used or not.
 	 */
 	public void taxicab(boolean isEuclid) {
-
-//		ClusterView.setLoadText("Calculating " + axisPrefix 
-//				+ " Distance Matrix...");
-//
-//		ClusterView.setPBarMax(data.length);
 
 		/* making sure distanceList is empty */
 		distMatrix = new double[data.length][];
@@ -329,10 +318,6 @@ public class DistMatrixCalculator {
 	 */
 	public void measureDistance() {
 		
-//		ClusterView.setLoadText("Calculating " + axisPrefix 
-//				+ " Distance Matrix...");
-//		ClusterView.setPBarMax(data.length);
-		
 		switch(distMeasure) {
 		
 		case StringRes.cluster_pearsonUn: 	
@@ -364,6 +349,8 @@ public class DistMatrixCalculator {
 	
 	public void setupWriter() {
 		
+		LogBuffer.println("Setting up DistMatrix writer.");
+		
 		final File file = new File("C:/Users/CKeil/Programming/Princeton/"
 				+ "TreeView Related Files/test_dist_matrix.txt");
 
@@ -382,6 +369,7 @@ public class DistMatrixCalculator {
 	
 	public void writeMatrix() {
 
+		LogBuffer.println("Writing distance matrix...");
 		/* Transform distMatrix to Strings for writing */ 
 		String[][] dataStrings = new String[distMatrix.length][];
 		
@@ -422,7 +410,7 @@ public class DistMatrixCalculator {
 	}
 
 	/** 
-	 * Accessor method to retrieve the distance matrix
+	 * Getter to retrieve the distance matrix.
 	 * @return The calculated distance matrix.
 	 */
 	public double[][] getDistanceMatrix() {

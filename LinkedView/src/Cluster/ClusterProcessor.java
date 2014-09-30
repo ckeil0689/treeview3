@@ -48,6 +48,7 @@ public class ClusterProcessor {
 			final int axis) {
 		
 		try {
+			LogBuffer.println("Starting clusterAxis()");
 			ClusterWorker clusterWorker = new ClusterWorker(distMatrix, 
 					linkMethod, spinnerInput, hierarchical, axis);
 			clusterWorker.execute();
@@ -104,13 +105,18 @@ public class ClusterProcessor {
 			this.distMeasure = distMeasure;
 			this.axis = axis;
 			
+			String axisPrefix = "N/A";
 			if(axis == 0) {
 				this.max = ((TVDataMatrix) tvModel.getDataMatrix()).getNumRow();
+				axisPrefix = "row";
 				
 			} else {
 				this.max = ((TVDataMatrix) tvModel.getDataMatrix()).getNumCol();
+				axisPrefix = "column";
 			}
 			
+			ClusterView.setLoadText("Calculating " + axisPrefix 
+					+ " Distance Matrix...");
 			ClusterView.setPBarMax(max);
 		}
 		
@@ -144,7 +150,6 @@ public class ClusterProcessor {
 							(axis == ClusterController.ROW) ? "Row" : "Column";
 					ClusterView.setLoadText("Calculating " + axisPrefix 
 							+ " Distance Matrix...");
-					ClusterView.setPBarMax(data.length);
 					
 					dCalc.measureDistance();
 					
@@ -172,7 +177,7 @@ public class ClusterProcessor {
 		
 		@Override
 		public void done() {
-			
+			// Do something when done?
 		}
 		
 		/**
@@ -204,25 +209,25 @@ public class ClusterProcessor {
 		private final String linkMethod;
 		private final Integer[] spinnerInput;
 		private final int axis;
-		private final int max;
 		private boolean hierarchical;
 
 		public ClusterWorker(final double[][] distMatrix, String linkMethod, 
 				final Integer[] spinnerInput, boolean hierarchical, 
 				final int axis) {
 
+			LogBuffer.println("Initializing ClusterWorker");
 			this.distMatrix = distMatrix;
 			this.linkMethod = linkMethod;
 			this.spinnerInput = spinnerInput;
 			this.hierarchical = hierarchical;
 			this.axis = axis;
 			
-			if(axis == 0) {
-				this.max = ((TVDataMatrix) tvModel.getDataMatrix())
-						.getNumRow();
+			int max = 0;
+			if(axis == ClusterController.ROW) {
+				max = ((TVDataMatrix) tvModel.getDataMatrix()).getNumRow();
+				
 			} else {
-				this.max = ((TVDataMatrix) tvModel.getDataMatrix())
-						.getNumCol();
+				max = ((TVDataMatrix) tvModel.getDataMatrix()).getNumCol();
 			}
 			
 			ClusterView.setPBarMax(max);
@@ -240,13 +245,16 @@ public class ClusterProcessor {
 			
 			/* Hierarchical */
 			if (hierarchical) {
+				LogBuffer.println("Getting source file name.");
+				
 				String fileName = tvModel.getSource().substring(0, 
 						tvModel.getSource().length() - 4);
 				
-				HierarchicalCluster cGen = 
-						new HierarchicalCluster(fileName, linkMethod, 
+				HierCluster cGen = 
+						new HierCluster(fileName, linkMethod, 
 								distMatrix, axis, this);
 				
+				LogBuffer.println("Starting cluster.");
 				/* 
 				 * Continue process until distMatrix has a size of 1, 
 				 * This array is the final cluster. Initially every row is 
@@ -257,11 +265,12 @@ public class ClusterProcessor {
 				
 				while (distMatrixLength > 1 && !isCancelled()) {
 					distMatrixLength = cGen.cluster();
-					publish(loopNum - distMatrixLength);
+					publish(loopNum);
 					loopNum++;
 				}
 				
 				/* Write the tree file */
+				LogBuffer.println("Writing clustered data.");
 				cGen.writeData();
 
 				return cGen.getReorderedList();

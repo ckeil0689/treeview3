@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.List;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
@@ -38,12 +39,6 @@ public class ClusterController {
 	private SwingWorker<Void, Void> loadWorker;
 	private SwingWorker<String[], Integer> clusterWorker;
 	private SwingWorker<Void, Void> saveWorker;
-
-	private String[] reorderedRows;
-	private String[] reorderedCols;
-
-	private String finalFilePath;
-	private FileSet fileSet;
 
 	/**
 	 * Links the clustering functionality to the user interface. The object
@@ -103,6 +98,10 @@ public class ClusterController {
 	 */
 	class ClusterProcessWorker extends SwingWorker<Void, String> {
 		
+		/* The finished reordered axes */
+		private String[] reorderedRows;
+		private String[] reorderedCols;
+		
 		@Override
         protected void process(List<String> chunks) {
             
@@ -113,21 +112,22 @@ public class ClusterController {
 		@Override
 		protected Void doInBackground() throws Exception {
 			
+			/* Tell ClusterView that clustering begins */
+			clusterView.setClustering(true);
+			
+			/* ProgressBar maximum */
+//			ClusterView.setPBarMax();
+			
 			/* Get chosen similarity options. */
 			String rowSimilarity = clusterView.getRowSimilarity();
 			String colSimilarity = clusterView.getColSimilarity();
 
-			/* If no options are selected, display error. */
+			/* If no options are selected, display error and return null. */
 			if (!checkSelections(rowSimilarity, ROW) 
 					&& !checkSelections(colSimilarity, COL)) {
 				clusterView.displayErrorLabel();
 				return null;
 			}
-			
-			clusterView.setClustering(true);
-			
-			/* ProgressBar maximum */
-//			ClusterView.setPBarMax();
 			
 			/* When done, start distance measure */
 			ClusterProcessor processor = new ClusterProcessor(tvModel);
@@ -169,7 +169,7 @@ public class ClusterController {
 		@Override
 		public void done() {
 			
-			saveClusterFile();
+			saveClusterFile(reorderedRows, reorderedCols);
 		}
 	}
 
@@ -177,19 +177,19 @@ public class ClusterController {
 	 * Saves the clustering output (reordered axes) to a new CDT file, 
 	 * so it can later be loaded and displayed.
 	 */
-	public void saveClusterFile() {
+	public void saveClusterFile(String[] reorderedRows, 
+			String[] reorderedCols) {
 
 		if (reorderedRows != null || reorderedCols != null) {
 			ClusterView.setLoadText("Saving...");
-			saveWorker = new SaveCDTWorker();
+			saveWorker = new SaveWorker(reorderedRows, reorderedCols);
 			saveWorker.execute();
 			LogBuffer.println("Saving started.");
 			
 		} else {
 			String message = "Cannot save. No clustered data was created.";
-			JOptionPane.showMessageDialog(
-					clusterDialog.getParentFrame(), message, "Error", 
-					JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(JFrame.getFrames()[0], message, 
+					"Error", JOptionPane.ERROR_MESSAGE);
 			LogBuffer.println("Alert: " + message);
 		}
 	}
@@ -199,10 +199,22 @@ public class ClusterController {
 	 * contains the newly clustered matrix. 
 	 * Makes sure that the newly created file is visualized right after 
 	 * clustering, given that the process was not cancelled.
+	 * @param reorderedRows Reordered row axis.
 	 * @author CKeil
 	 */
-	class SaveCDTWorker extends SwingWorker<Void, Void> {
+	class SaveWorker extends SwingWorker<Void, Void> {
 
+		/* The finished reordered axes */
+		private String[] reorderedRows;
+		private String[] reorderedCols;
+		private String filePath;
+		
+		public SaveWorker(String[] reorderedRows, String[] reorderedCols) {
+			
+			this.reorderedRows = reorderedRows;
+			this.reorderedCols = reorderedCols;
+		}
+		
 		@Override
 		protected Void doInBackground() throws Exception {
 			
@@ -213,7 +225,7 @@ public class ClusterController {
 
 				cdtGen.generateCDT();
 
-				finalFilePath = cdtGen.getFilePath();
+				filePath = cdtGen.getFilePath();
 			}
 			return null;
 		}
@@ -223,7 +235,8 @@ public class ClusterController {
 
 			if (!isCancelled()) {
 				ClusterView.setLoadText("Done!");
-				visualizeData();
+				LogBuffer.println("Done saving. Opening file now.");
+				visualizeData(filePath);
 
 			} else {
 				clusterView.setClustering(false);
@@ -280,9 +293,19 @@ public class ClusterController {
 	 */
 	private class LoadWorker extends SwingWorker<Void, Void> {
 
+		private FileSet fileSet;
+		
+		public LoadWorker(FileSet fileSet) {
+			
+			this.fileSet = fileSet;
+		}
+		
 		@Override
 		protected Void doInBackground() throws Exception {
 
+			LogBuffer.println("Loading data...");
+			clusterDialog.dispose();
+			
 			tvController.loadFileSet(fileSet);
 			return null;
 		}
@@ -294,11 +317,12 @@ public class ClusterController {
 					.getNumRow() > 0) {
 				tvController.setDataModel();
 				tvController.setViewChoice();
-				clusterDialog.dispose();
+//				clusterDialog.dispose();
+				LogBuffer.println("Successfully loaded.");
 
 			} else {
 				String message = "No clustered data matrix could be set.";
-				JOptionPane.showMessageDialog(clusterDialog.getParentFrame(), 
+				JOptionPane.showMessageDialog(JFrame.getFrames()[0], 
 						message, "Alert", JOptionPane.WARNING_MESSAGE);
 				LogBuffer.println("Alert: " + message);
 				clusterView.setClustering(false);
@@ -319,6 +343,7 @@ public class ClusterController {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			
+			LogBuffer.println("Reset cluster type.");
 			clusterDialog.reset();
 		}
 	}
@@ -334,6 +359,7 @@ public class ClusterController {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			
+			LogBuffer.println("Reset ClusterView layout.");
 			clusterView.setupLayout();
 		}
 	}
@@ -342,18 +368,20 @@ public class ClusterController {
 	 * Sets a new DendroView with the new data loaded into TVModel, displaying
 	 * an updated HeatMap. It should also close the ClusterViewFrame.
 	 */
-	public void visualizeData() {
+	public void visualizeData(String filePath) {
 
+		LogBuffer.println("Getting files for loading clustered data.");
+		
 		File file = null;
 
-		if (finalFilePath != null) {
-			file = new File(finalFilePath);
+		if (filePath != null) {
+			file = new File(filePath);
 
-			fileSet = new FileSet(file.getName(), file.getParent()
+			FileSet fileSet = new FileSet(file.getName(), file.getParent()
 					+ File.separator);
 
 			tvController.setViewChoice();
-			loadWorker = new LoadWorker();
+			loadWorker = new LoadWorker(fileSet);
 			loadWorker.execute();
 
 		} else {
@@ -377,6 +405,8 @@ public class ClusterController {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
+			LogBuffer.println("Trying to cancel.");
+			
 			if(clusterWorker != null) {
 				clusterWorker.cancel(true);
 				clusterWorker = null;

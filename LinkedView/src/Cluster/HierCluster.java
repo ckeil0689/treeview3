@@ -20,7 +20,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
  * @author CKeil
  * 
  */
-public class HierarchicalCluster {
+public class HierCluster {
 
 	/*
 	 * IMPORTANT NOTE: The variable prefixes row- and col- refer to the 
@@ -33,11 +33,8 @@ public class HierarchicalCluster {
 	 * might be additional overhead during already intensive/ complex 
 	 * clustering algorithms.
 	 */
-	private final double PRECISION_LEVEL = 0.0000000001; //float comparison
-	private String fileName;
+	private final double PRECISION_LEVEL = 0.0000000001; // float comparison!
 	private final String linkMethod;
-	private String filePath;
-	private final int axis;
 	private final String axisPrefix;
 	private final int distMatrixSize;
 	private int loopNum;
@@ -58,11 +55,10 @@ public class HierarchicalCluster {
 	private double min;
 	int rowMinIndex = 0;
 	int colMinIndex = 0;
-	
-	private double[] usedMins;
 
-	/* list to return ordered element numbers for .cdt creation 
-	 * (e.g. GENE64X) 
+	/* 
+	 * Reordered list of distance matrix rows. This directly represents
+	 * the reordered axis that was selected to be clustered. 
 	 */
 	private String[] reorderedRows;
 
@@ -87,21 +83,32 @@ public class HierarchicalCluster {
 	 * @param worker The worker thread which performs the clustering. Needs to
 	 * be interrupted in this class if the user cancels the operation.
 	 */
-	public HierarchicalCluster(final String fileName,
-			final String linkMethod, final double[][] distMatrix,
-			final int axis, final SwingWorker<String[], Integer> worker) {
+	public HierCluster(String fileName, final String linkMethod, 
+			final double[][] distMatrix, final int axis, 
+			final SwingWorker<String[], Integer> worker) {
 
-		this.fileName = fileName;
+		LogBuffer.println("Initializing HierCluster.");
 		this.linkMethod = linkMethod;
 		this.distMatrix = distMatrix;
-		this.axis = axis;
 		this.distMatrixSize = distMatrix.length;
 		this.worker = worker;
 		
-		/* Get labels for ATR and GTR tree files */
-		this.axisPrefix = (axis == ClusterController.ROW) ? "GENE" : "ARRY";
+		/* 
+		 * Setting up labels for ATR and GTR tree files and 
+		 * file name for writing. 
+		 */
+		String fileSuffix = ".notchanged";
+		if(axis == ClusterController.ROW) {
+			this.axisPrefix = "GENE";
+			fileSuffix = ".gtr";
+			
+		} else {
+			this.axisPrefix = "ARRY";
+			fileSuffix = ".atr";
+		}
 		
-		setupFileWriter();
+		fileName += fileSuffix;
+		setupFileWriter(fileName);
 		prepareCluster();
 	}
 	
@@ -113,6 +120,7 @@ public class HierarchicalCluster {
 	 */
 	public void prepareCluster() {
 
+		LogBuffer.println("Preparing for cluster.");
 		/* Data to be written to file */
 		rowPairs = new String[distMatrixSize][];
 
@@ -121,20 +129,9 @@ public class HierarchicalCluster {
 		 * in calculations (list of fusedGroups).
 		 */
 		rowIndexTable = new int[distMatrixSize][];
-
-		/* Create array to check whether a min value was already used. 
-		 * Fill with -1.0 values so 0.0 won't be mistaken as having been used, 
-		 * since double arrays are initialized with 0.0.
-		 * (distance values are between 0 and 1).
-		 */ 
-		min = distMatrix[1][0]; // first row is empty!
 		
-		usedMins = new double[distMatrixSize];
-
-		for (int i = 0; i < usedMins.length; i++) {
-
-			usedMins[i] = -1.0;
-		}
+		/* Initialize min with smallest double value */
+		min = Double.MIN_VALUE;
 
 		/* 
 		 * Deep copy of distance matrix to avoid later mutation. 
@@ -163,15 +160,17 @@ public class HierarchicalCluster {
 		}
 		
 		/* Ensure all needed variables are set up and initialized */
-		if(rowPairs == null || usedMins == null || rowIndexTable == null 
-				|| distMatrixCopy == null || formedClusters == null) {
-			String message = "Looks like clustering was not properly"
-					+ "set up by the software. Can't proceed with"
+		if(rowPairs == null || rowIndexTable == null || distMatrixCopy == null 
+				|| formedClusters == null) {
+			String message = "Looks like clustering was not properly "
+					+ "set up by the software. Can't proceed with "
 					+ "clustering.";
 			JOptionPane.showMessageDialog(JFrame.getFrames()[0], message, 
 					"Error", JOptionPane.ERROR_MESSAGE);
 			worker.cancel(true);
 		}
+		
+		LogBuffer.println("Done preparing.");
 	}
 
 	/** 
@@ -197,10 +196,9 @@ public class HierarchicalCluster {
 * minimum that was found in the previous step! The matrix shrinks as rows are
 * clustered together (hence the need for a deep copy!).
 */			
-//			min = findMatrixMin_new();
-		min = findMatrixMin_old();
+		min = findMatrixMin();
 /* 
- * STEP 2:
+ * STEP 2: 
  */
 		/* 
 		 * The replacement row for the two removed row elements 
@@ -347,7 +345,6 @@ public class HierarchicalCluster {
 	
 	public void writeData() {
 
-		LogBuffer.println("Used Minimums: " + Arrays.toString(usedMins));
 		bufferedWriter.closeWriter();
 		reorderGen(formedClusters.get(0));
 
@@ -355,100 +352,6 @@ public class HierarchicalCluster {
 		distMatrixCopy = null;
 		rowPairs = null;
 		formedClusters = null;
-	}
-	
-	public double findMatrixMin_old() {
-		
-		/* local variables */
-		double min = 0;
-		double rowMin = 0;
-
-		/*
-		 * List to store the minimum value of all rows at each 
-		 * while-loop iteration. Smallest value in this array will be 
-		 * the minimum value of the entire array.
-		 */
-		final double[] allRowMins = new double[distMatrix.length];
-
-		/* 
-		 * The row value is just the position of the corresponding 
-		 * column value in columnValues.
-		 */
-		final int[] colMinIndices = new int[distMatrix.length];
-
-		/* Going through every row in distMatrix */
-		for (int j = 0; j < distMatrix.length; j++) {
-
-			/* Select current row */
-			final double[] row = distMatrix[j];
-
-			/* Just avoid the first empty list in the distance matrix. */
-			if (row.length > 0) {
-				
-				/* make trial the minimum value of that row */
-				rowMin = findRowMin(row);
-
-				/* 
-				 * Minimums of each row in current distance matrix. 
-				 * Does not contain previously used minimums.
-				 */
-				allRowMins[j] = rowMin;
-
-				/* add the column of each row's minimum to a list */
-				colMinIndices[j] = findValue(row, rowMin);
-			}
-			
-			/* for the first empty list in the half-distance matrix, 
-			 * add the largest value of the last row so it won't be 
-			 * mistaken as a minimum value.
-			 */
-			else {
-				/* there's no actual value for the empty top row. 
-				 * Therefore a substitute is added. It is 2x the max size
-				 * the greatest value of the last distance matrix entry 
-				 * so it can never be a minimum and is effectively ignored
-				 */ 
-				final double[] last = 
-						distMatrix[distMatrix.length - 1].clone();
-				Arrays.sort(last);
-				final double substitute = last[last.length - 1] * 2;
-
-				allRowMins[j] = substitute;
-				colMinIndices[j] = findValue(last, last[last.length - 1]);
-			}
-		}
-
-		/* 
-		 * Find the row which has the minimum value. Clone the array of
-		 * row minimums to avoid mutation, sort it, then find first value
-		 * of sorted array in the original to get the row index of the
-		 * min value.
-		 */
-		final double[] allRowMinsCopy = allRowMins.clone();
-		Arrays.sort(allRowMinsCopy);
-		
-		rowMinIndex = findValue(allRowMins, allRowMinsCopy[0]);
-
-		/* 
-		 * Find the corresponding column index using the row 
-		 * with the minimum value.
-		 */
-		colMinIndex = colMinIndices[rowMinIndex];
-
-		/* 
-		 * Row and column indices now provide minimum value.
-		 * TODO This process is WAY too complicated. Simplify.
-		 */
-		min = distMatrix[rowMinIndex][colMinIndex];
-
-		/* 
-		 * Add min value to array so the next iteration finds 
-		 * the next higher min value and ignores the ones that have already
-		 * been used.
-		 */
-		usedMins[loopNum] = min;
-		
-		return min;
 	}
 	
 	/**
@@ -459,7 +362,7 @@ public class HierarchicalCluster {
 	 * new row pair to be clustered.
 	 * @return The minimum value in the current distance matrix.
 	 */
-	public double findMatrixMin_new() {
+	public double findMatrixMin() {
 		
 		/* New min must be bigger than previous matrix min */
 		double newMin = Double.MAX_VALUE;
@@ -477,7 +380,6 @@ public class HierarchicalCluster {
 			}
 		}
 		
-		usedMins[loopNum] = newMin;
 		return newMin;
 	}
 
@@ -516,25 +418,15 @@ public class HierarchicalCluster {
 	 * with setting up the buffered writer since there wouldn't be a filePath
 	 * where the cluster data could be saved anyways.
 	 */
-	public void setupFileWriter() {
+	public void setupFileWriter(String fileName) {
 
-		String fileEnd;
-
-		if (axis == ClusterController.ROW) {
-			fileEnd = ".gtr";
-
-		} else {
-			fileEnd = ".atr";
-		}
-
-		fileName += fileEnd;
+		LogBuffer.println("Setting up file writer in HierCluster.");
 		
 		final File file = new File(fileName);
 
 		try {
 			file.createNewFile();
 			bufferedWriter = new ClusterFileWriter(file);
-			filePath = bufferedWriter.getFilePath();
 			
 		} catch (IOException e) {
 			LogBuffer.logException(e);
@@ -696,63 +588,19 @@ public class HierarchicalCluster {
 	}
 
 	/**
-	 * make trial the minimum value of that gene check whether min was used
-	 * before (in whole calculation process)
+	 * Make trial the minimum value of that gene check whether min was used
+	 * before (in whole calculation process)<--- Why? TODO
 	 * 
 	 * @return double trial
 	 */
-	public int findGroupMin(final int[] element) {
-
-		int elementMin = -1;
+	public int findGroupMin(final int[] row) {
 
 		// standard collection copy constructor to make deep copy to protect
-		// gene
-		final int[] elementCopy = element.clone();
+		// 'row' from mutation.
+		final int[] rowCopy = row.clone();
+		Arrays.sort(rowCopy);
 
-		Arrays.sort(elementCopy);
-
-		int minIndex = 0;
-
-		for (int i = 0; i < elementCopy.length; i++) {
-
-			final int min = elementCopy[minIndex];
-
-			if (!checkForUsedMin(min)) {
-				elementMin = min;
-				break;
-
-			} else {
-				minIndex++;
-			}
-		}
-
-		return elementMin;
-	}
-
-	/**
-	 * make trial the minimum value of that gene check whether min was used
-	 * before (in whole calculation process)
-	 * 
-	 * @return double trial
-	 */
-	public double findRowMin(final double[] gene) {
-
-		double geneMin = -1.0;
-
-		final double[] deepGene = gene.clone();
-		Arrays.sort(deepGene);
-
-		for (int i = 0; i < deepGene.length; i++) {
-
-			final double min = deepGene[i];
-
-			if (!checkForUsedMin(min)) {
-				geneMin = min;
-				break;
-			}
-		}
-
-		return geneMin;
+		return rowCopy[0];
 	}
 
 	/**
@@ -768,27 +616,6 @@ public class HierarchicalCluster {
 		for (final int gene : group) {
 
 			if (min == gene) {
-				contains = true;
-				break;
-			}
-		}
-
-		return contains;
-	}
-
-	/**
-	 * Checks usedMins array if it already contains a given double value.
-	 * 
-	 * @param min
-	 * @return
-	 */
-	public boolean checkForUsedMin(final double min) {
-
-		boolean contains = false;
-
-		for (int i = 0; i < usedMins.length; i++) {
-
-			if (Math.abs(min - usedMins[i]) < PRECISION_LEVEL) {
 				contains = true;
 				break;
 			}
@@ -1166,15 +993,5 @@ public class HierarchicalCluster {
 	public String[] getReorderedList() {
 
 		return reorderedRows;
-	}
-
-	/**
-	 * Getter for the file path
-	 * 
-	 * @return The filePath of the generated tree file.
-	 */
-	public String getFilePath() {
-
-		return filePath;
 	}
 }

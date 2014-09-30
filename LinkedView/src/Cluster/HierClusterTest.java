@@ -80,7 +80,7 @@ public class HierClusterTest {
 		protected String[] doInBackground() {
 			
 			/* Cluster test matrix */
-			HierarchicalCluster hc = new HierarchicalCluster(file.getName(),
+			HierCluster hc = new HierCluster(file.getName(),
 					StringRes.cluster_link_Avg, distM, 0, this);
 			
 			hc.cluster();
