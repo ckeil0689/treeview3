@@ -31,6 +31,7 @@ import java.util.prefs.Preferences;
 
 import javax.swing.JScrollBar;
 
+import Utilities.Helper;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeDrawerNode;
@@ -44,7 +45,7 @@ import edu.stanford.genetics.treeview.TreeDrawerNode;
 public class MapContainer extends Observable implements Observer,
 		AdjustmentListener, ConfigNodePersistent {
 
-	private final double PRECISION_LEVEL = 0.0001;
+	private final double EPSILON = 0.0001;
 
 	private final String default_map = "Fixed";
 	private double default_scale = 1.0;
@@ -461,7 +462,8 @@ public class MapContainer extends Observable implements Observer,
 
 	public void setScale(final double d) {
 
-		if (Math.abs(fixedMap.getScale() - d) > PRECISION_LEVEL) {
+		if (!Helper.nearlyEqual(fixedMap.getScale(), d, EPSILON)) { 
+			//Math.abs(fixedMap.getScale() - d) > EPSILON) {
 			fixedMap.setScale(d);
 			setupScrollbar();
 			setChanged();

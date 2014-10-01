@@ -21,6 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import Utilities.Helper;
 import edu.stanford.genetics.treeview.CdtFilter;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.DataModel;
@@ -49,7 +50,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.TreePainter;
 
 public class DendroController implements ConfigNodePersistent {
 
-	private final double PRECISION_LEVEL = 0.000001;
+	private final double EPSILON = 0.000001;
 	private DendroView dendroView;
 	private final TreeViewFrame tvFrame;
 	private DataModel tvModel;
@@ -312,8 +313,9 @@ public class DendroController implements ConfigNodePersistent {
 		double absGVHeight = dendroView.getGlobalView().getHeight() 
 				+ dendroView.getXScroll().getHeight();
 		
-		if(Math.abs(absGVWidth - absGVHeight) <= PRECISION_LEVEL) {
-			// TO-DO: get rid of this statement, as it does nothing!
+		if(Helper.nearlyEqual(absGVWidth, absGVHeight, EPSILON)) {
+			//Math.abs(absGVWidth - absGVHeight) <= EPSILON) {
+			/* TODO get rid of this statement, as it does nothing! */
 		
 		} else if(absGVWidth < absGVHeight) {
 			percentDiff = (absGVWidth/ absGVHeight);

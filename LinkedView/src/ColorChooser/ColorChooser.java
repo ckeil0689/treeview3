@@ -32,6 +32,7 @@ import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 
 import Utilities.GUIFactory;
+import Utilities.Helper;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeViewFrame;
@@ -42,6 +43,8 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
 
 public class ColorChooser implements ConfigNodePersistent {
 
+	final double EPSILON = 0.0001;
+	
 	private final TreeViewFrame tvFrame;
 	private final JPanel mainPanel;
 	private Preferences configNode;
@@ -584,7 +587,6 @@ public class ColorChooser implements ConfigNodePersistent {
 
 		public boolean verifyFractions() {
 
-			final double PRECISION_LEVEL = 0.0001;
 			boolean ascending = true;
 			for (int i = 0; i < fractions.length - 1; i++) {
 
@@ -603,7 +605,9 @@ public class ColorChooser implements ConfigNodePersistent {
 					ascending = false;
 					break;
 
-				} else if (Math.abs(fractions[i] - fractions[i + 1]) < PRECISION_LEVEL) {
+				} else if (Helper.nearlyEqual(fractions[i], fractions[i + 1], 
+						EPSILON)) {
+					//Math.abs(fractions[i] - fractions[i + 1]) < EPSILON) {
 					ascending = false;
 					break;
 				}
@@ -620,8 +624,6 @@ public class ColorChooser implements ConfigNodePersistent {
 		 */
 		public boolean checkThumbPresence(final int thumbIndex) {
 
-			final double PRECISION_LEVEL = 0.0001;
-
 			boolean isPresent = false;
 
 			if (thumbList.size() > thumbIndex) {
@@ -632,7 +634,8 @@ public class ColorChooser implements ConfigNodePersistent {
 				final double fraction2 = (double) Math
 						.round(fractions[thumbIndex] * 10000) / 10000;
 
-				if (Math.abs(fraction - fraction2) < PRECISION_LEVEL
+				if (Helper.nearlyEqual(fraction, fraction2, EPSILON)
+					//Math.abs(fraction - fraction2) < PRECISION_LEVEL
 						|| thumbList.get(thumbIndex).isSelected()) {
 					isPresent = true;
 				}

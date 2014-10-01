@@ -3,11 +3,12 @@ package edu.stanford.genetics.treeview.model;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import Utilities.Helper;
 import edu.stanford.genetics.treeview.DataModel;
 
 public class CdtWriter {
 
-	private final double PRECISION_LEVEL = 0.001;
+	private final double EPSILON = 0.001;
 
 	DataModel dataModel;
 
@@ -91,7 +92,8 @@ public class CdtWriter {
 	private void printNotNull2(final FileWriter out, final double value)
 			throws IOException {
 
-		if (Math.abs(value - DataModel.EMPTY) < PRECISION_LEVEL) {
+		if (Helper.nearlyEqual(value, DataModel.EMPTY, EPSILON)) {
+			//Math.abs(value - DataModel.EMPTY) < EPSILON) {
 			out.write("" + value);
 		}
 	}

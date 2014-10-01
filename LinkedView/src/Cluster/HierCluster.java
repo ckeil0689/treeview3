@@ -10,6 +10,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
+import Utilities.Helper;
 import Controllers.ClusterController;
 import edu.stanford.genetics.treeview.LogBuffer;
 
@@ -33,7 +34,7 @@ public class HierCluster {
 	 * might be additional overhead during already intensive/ complex 
 	 * clustering algorithms.
 	 */
-	private final double PRECISION_LEVEL = 0.0000000001; // float comparison!
+	private final double EPSILON = 0.0000000001; // float comparison!
 	private final String linkMethod;
 	private final String axisPrefix;
 	private final int distMatrixSize;
@@ -183,7 +184,7 @@ public class HierCluster {
 
 		loopNum = distMatrixSize - distMatrix.length;
 		
-//			LogBuffer.println("Loop: " + loopNum); // Debug
+//		LogBuffer.println("Loop: " + loopNum); // Debug
 		
 		/*
 		 *  list to store the Strings which represent calculated data 
@@ -372,7 +373,9 @@ public class HierCluster {
 			for(int j = 0; j < distMatrix[i].length; j++) {
 				
 				double element = distMatrix[i][j];
-				if(element > min && element < newMin) {
+				
+				if((element > min || Helper.nearlyEqual(element, min, EPSILON)) 
+						&& element < newMin) {
 					newMin = element;
 					rowMinIndex = i;
 					colMinIndex = j;
@@ -521,7 +524,7 @@ public class HierCluster {
 
 		for (int i = 0; i < array.length; i++) {
 
-			if (Math.abs(array[i] - value) < PRECISION_LEVEL) {
+			if (Helper.nearlyEqual(array[i], value, EPSILON)) {
 				return i;
 			}
 		}
@@ -785,7 +788,7 @@ public class HierCluster {
 
 			for (int j = 0; j < toSearch.length; j++) {
 
-				if (Math.abs(toIterate[i] - toSearch[j]) < PRECISION_LEVEL) {
+				if (Helper.nearlyEqual(toIterate[i], toSearch[j], EPSILON)) {
 					disjoint = false;
 				} else {
 					disjoint = true;

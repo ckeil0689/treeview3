@@ -9,6 +9,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
+import Utilities.Helper;
 import Utilities.StringRes;
 import edu.stanford.genetics.treeview.LogBuffer;
 
@@ -23,7 +24,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
  */
 public class DistMatrixCalculator {
 
-	private final double PRECISION_LEVEL = 0.0001;
+	private final double EPSILON = 0.0001;
 	private final double[][] data;
 
 	private final String distMeasure;
@@ -32,7 +33,7 @@ public class DistMatrixCalculator {
 	
 	private double[][] distMatrix;
 	
-	private ClusterFileWriter bufferedWriter;
+//	private ClusterFileWriter bufferedWriter;
 
 	/**
 	 * Constructs a DistMatrixCalculator which can be used to obtain
@@ -54,7 +55,7 @@ public class DistMatrixCalculator {
 		this.distMeasure = distMeasure;
 		this.worker = worker;
 		
-		setupWriter();
+//		setupWriter();
 	}
 
 	/* Distance measure functions */
@@ -99,7 +100,7 @@ public class DistMatrixCalculator {
 			distMatrix[i] = rowDist;
 		}
 		
-		writeMatrix();
+//		writeMatrix();
 	}
 	
 	/**
@@ -305,7 +306,8 @@ public class DistMatrixCalculator {
 
 		for (int i = 0; i < array.length; i++) {
 
-			if (Math.abs(array[i] - value) < PRECISION_LEVEL) {
+			if (Helper.nearlyEqual(array[i], value, EPSILON)) {
+				//Math.abs(array[i] - value) < EPSILON) {
 				return i;
 			}
 		}
@@ -347,53 +349,53 @@ public class DistMatrixCalculator {
 		}
 	}
 	
-	public void setupWriter() {
-		
-		LogBuffer.println("Setting up DistMatrix writer.");
-		
-		final File file = new File("C:/Users/CKeil/Programming/Princeton/"
-				+ "TreeView Related Files/test_dist_matrix.txt");
-
-		try {
-			file.createNewFile();
-			bufferedWriter = new ClusterFileWriter(file);
-			
-		} catch (IOException e) {
-			LogBuffer.logException(e);
-			String message = "There was trouble when trying to setup the"
-					+ "buffered writer to save ATR or GTR files.";
-			JOptionPane.showMessageDialog(JFrame.getFrames()[0], message, 
-					"Error", JOptionPane.ERROR_MESSAGE);
-		}
-	}
+//	public void setupWriter() {
+//		
+//		LogBuffer.println("Setting up DistMatrix writer.");
+//		
+//		final File file = new File("C:/Users/CKeil/Programming/Princeton/"
+//				+ "TreeView Related Files/test_dist_matrix.txt");
+//
+//		try {
+//			file.createNewFile();
+//			bufferedWriter = new ClusterFileWriter(file);
+//			
+//		} catch (IOException e) {
+//			LogBuffer.logException(e);
+//			String message = "There was trouble when trying to setup the"
+//					+ "buffered writer to save ATR or GTR files.";
+//			JOptionPane.showMessageDialog(JFrame.getFrames()[0], message, 
+//					"Error", JOptionPane.ERROR_MESSAGE);
+//		}
+//	}
 	
-	public void writeMatrix() {
-
-		LogBuffer.println("Writing distance matrix...");
-		/* Transform distMatrix to Strings for writing */ 
-		String[][] dataStrings = new String[distMatrix.length][];
-		
-		for (int i = 0; i < distMatrix.length; i++) {
-			
-			final double[] element = distMatrix[i];
-			final String[] newStringData = new String[element.length];
-
-			for (int j = 0; j < element.length; j++) {
-
-				newStringData[j] = String.valueOf(element[j]);
-			}
-
-			dataStrings[i] = newStringData;
-		}
-		
-		for(String[] row : dataStrings) {
-			bufferedWriter.writeContent(row);
-		}
-		
-		bufferedWriter.closeWriter();
-		
-		LogBuffer.println("Finished writing distMatrix.");
-	}
+//	public void writeMatrix() {
+//
+//		LogBuffer.println("Writing distance matrix...");
+//		/* Transform distMatrix to Strings for writing */ 
+//		String[][] dataStrings = new String[distMatrix.length][];
+//		
+//		for (int i = 0; i < distMatrix.length; i++) {
+//			
+//			final double[] element = distMatrix[i];
+//			final String[] newStringData = new String[element.length];
+//
+//			for (int j = 0; j < element.length; j++) {
+//
+//				newStringData[j] = String.valueOf(element[j]);
+//			}
+//
+//			dataStrings[i] = newStringData;
+//		}
+//		
+//		for(String[] row : dataStrings) {
+//			bufferedWriter.writeContent(row);
+//		}
+//		
+//		bufferedWriter.closeWriter();
+//		
+//		LogBuffer.println("Finished writing distMatrix.");
+//	}
 	
 	/**
 	 * Shows a pop-up alert if the selected distance measure could not
