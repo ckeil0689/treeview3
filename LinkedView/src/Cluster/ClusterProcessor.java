@@ -48,7 +48,7 @@ public class ClusterProcessor {
 			final int axis) {
 		
 		try {
-			LogBuffer.println("Starting clusterAxis()");
+			LogBuffer.println("Starting clusterAxis(): " + axis);
 			ClusterWorker clusterWorker = new ClusterWorker(distMatrix, 
 					linkMethod, spinnerInput, hierarchical, axis);
 			clusterWorker.execute();
@@ -93,6 +93,7 @@ public class ClusterProcessor {
 	 * finishes after the calculations were cancelled by the user, 
 	 * it let's the cluster dialog know so it can respond appropriately.
 	 * Input data is translated into output data here.
+	 * TODO Take the loop outside, probably the method choice as well!
 	 */
 	class DistanceWorker extends SwingWorker<double[][], Integer> {
 
@@ -151,7 +152,10 @@ public class ClusterProcessor {
 					ClusterView.setLoadText("Calculating " + axisPrefix 
 							+ " Distance Matrix...");
 					
-					dCalc.measureDistance();
+					// Choice of method here
+					
+					// loop of distance measure method here.
+					dCalc.measureDistance(); // replace
 					
 					return dCalc.getDistanceMatrix();
 					
@@ -269,9 +273,12 @@ public class ClusterProcessor {
 					loopNum++;
 				}
 				
+				/* Return empty String[] if user cancels op */
+				if(isCancelled()) return new String[]{""};
+				
 				/* Write the tree file */
 				LogBuffer.println("Writing clustered data.");
-				cGen.writeData();
+				cGen.finish();
 
 				return cGen.getReorderedList();
 			} 

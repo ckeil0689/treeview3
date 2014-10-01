@@ -29,7 +29,7 @@ public class DistMatrixCalculator {
 
 	private final String distMeasure;
 
-	private final SwingWorker<double[][], Integer> worker;
+//	private final SwingWorker<double[][], Integer> worker;
 	
 	private double[][] distMatrix;
 	
@@ -53,7 +53,7 @@ public class DistMatrixCalculator {
 		
 		this.data = data;
 		this.distMeasure = distMeasure;
-		this.worker = worker;
+//		this.worker = worker;
 		
 //		setupWriter();
 	}
@@ -77,16 +77,12 @@ public class DistMatrixCalculator {
 
 		/* take a row */
 		for (int i = 0; i < data.length; i++) {
-
-			if (worker.isCancelled()) {
-				break;
-			}
  
 			/* for half matrix! full distMatrix is symmetric... */
 			int limit = i;
 			
 			/* update progressbar */
-			ClusterView.updatePBar(i);
+			ClusterView.updatePBar(i); // take out of this class to swingworker
 
 			/* pearson values of one row compared to all others */
 			final double[] rowDist = new double[limit];
@@ -184,10 +180,6 @@ public class DistMatrixCalculator {
 
 		for (int i = 0; i < data.length; i++) {
 
-			if (worker.isCancelled()) {
-				break;
-			}
-
 			ClusterView.updatePBar(i);
 
 			/* Make a copy row to avoid mutation */
@@ -228,9 +220,9 @@ public class DistMatrixCalculator {
 		/* iterate through all elements */
 		for (int i = 0; i < data.length; i++) {
 
-			if (worker.isCancelled()) {
-				break;
-			}
+//			if (worker.isCancelled()) {
+//				break;
+//			}
 
 			/* update progressbar */
 			ClusterView.updatePBar(i);
@@ -307,7 +299,6 @@ public class DistMatrixCalculator {
 		for (int i = 0; i < array.length; i++) {
 
 			if (Helper.nearlyEqual(array[i], value, EPSILON)) {
-				//Math.abs(array[i] - value) < EPSILON) {
 				return i;
 			}
 		}

@@ -37,7 +37,7 @@ public class ClusterController {
 	private final ClusterViewDialog clusterDialog;
 
 	private SwingWorker<Void, Void> loadWorker;
-	private SwingWorker<String[], Integer> clusterWorker;
+	private SwingWorker<Void, String> clusterProcess;
 	private SwingWorker<Void, Void> saveWorker;
 
 	/**
@@ -81,8 +81,8 @@ public class ClusterController {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			final ClusterProcessWorker clusterProcess = 
-					new ClusterProcessWorker();
+			//final ClusterProcessWorker 
+			clusterProcess = new ClusterProcessWorker();
 			
 			clusterProcess.execute();
 		}
@@ -115,9 +115,6 @@ public class ClusterController {
 			/* Tell ClusterView that clustering begins */
 			clusterView.setClustering(true);
 			
-			/* ProgressBar maximum */
-//			ClusterView.setPBarMax();
-			
 			/* Get chosen similarity options. */
 			String rowSimilarity = clusterView.getRowSimilarity();
 			String colSimilarity = clusterView.getColSimilarity();
@@ -133,34 +130,48 @@ public class ClusterController {
 			ClusterProcessor processor = new ClusterProcessor(tvModel);
 			
 			/* Row axis cluster */
-			double[][] distMatrix;
+			double[][] distMatrix = null;
 			if (checkSelections(rowSimilarity, ROW)) {
 				/* ProgressBar label */
 				publish("Calculating row distances...");
-				distMatrix = processor.calcDistance(rowSimilarity, ROW);
+				
+				if(!isCancelled()) {
+					distMatrix = processor.calcDistance(rowSimilarity, ROW);
+				}
 				
 				if(distMatrix == null) return null;
 				
 				publish("Clustering row data...");
 				
-				reorderedRows = processor.clusterAxis(distMatrix, 
+				if(!isCancelled()) {
+					reorderedRows = processor.clusterAxis(distMatrix, 
 						clusterView.getLinkageMethod(), 
 						clusterView.getSpinnerValues(), isHierarchical(), ROW);
+					LogBuffer.println("ReorderedRows length: " 
+						+ reorderedRows.length);
+				}
 			}
 			
 			/* Column axis cluster */
 			if (checkSelections(colSimilarity, COL)) {
 				/* ProgressBar label */
 				publish("Calculating column distances...");
-				distMatrix = processor.calcDistance(colSimilarity, COL);
+				
+				if(!isCancelled()) {
+					distMatrix = processor.calcDistance(colSimilarity, COL);
+				}
 				
 				if(distMatrix == null) return null;
 				
 				publish("Clustering column data...");
 				
-				reorderedCols = processor.clusterAxis(distMatrix, 
+				if(!isCancelled()) {
+					reorderedCols = processor.clusterAxis(distMatrix, 
 						clusterView.getLinkageMethod(), 
 						clusterView.getSpinnerValues(), isHierarchical(), COL);
+					LogBuffer.println("ReorderedCols length: " 
+						+ reorderedCols.length);
+				}
 			}
 			
 			return null;
@@ -219,13 +230,17 @@ public class ClusterController {
 		protected Void doInBackground() throws Exception {
 			
 			if (!isCancelled()) {
+				LogBuffer.println("Initializing CDT writer.");
 				final CDTGenerator cdtGen = new CDTGenerator(
 						tvModel, clusterView, reorderedRows, reorderedCols, 
 						isHierarchical());
 
+				LogBuffer.println("Generating CDT.");
 				cdtGen.generateCDT();
-
+				
+				LogBuffer.println("Setting file path.");
 				filePath = cdtGen.getFilePath();
+				LogBuffer.println("Path: " + filePath);
 			}
 			return null;
 		}
@@ -317,7 +332,6 @@ public class ClusterController {
 					.getNumRow() > 0) {
 				tvController.setDataModel();
 				tvController.setViewChoice();
-//				clusterDialog.dispose();
 				LogBuffer.println("Successfully loaded.");
 
 			} else {
@@ -407,9 +421,9 @@ public class ClusterController {
 
 			LogBuffer.println("Trying to cancel.");
 			
-			if(clusterWorker != null) {
-				clusterWorker.cancel(true);
-				clusterWorker = null;
+			if(clusterProcess != null) {
+				clusterProcess.cancel(true);
+				clusterProcess = null;
 			}
 		}
 	}
