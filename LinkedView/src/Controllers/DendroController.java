@@ -453,7 +453,7 @@ public class DendroController implements ConfigNodePersistent {
 	 */
 	public void zoomSelection() {
 
-		double newScale = 0.0;
+		double newScale  = 0.0;
 		double newScale2 = 0.0;
 		
 		//Declare the min number of spots to zoom in on for each dimension.
@@ -466,7 +466,7 @@ public class DendroController implements ConfigNodePersistent {
 		final double maxArrayIndex = globalXmap.getMaxIndex();
 		final double maxGeneIndex  = globalYmap.getMaxIndex();
 		
-		//Make sure our zoom limits have not exceeded the boundaries of the data
+		//Make sure our zoom limits have not exceeded the boundaries of the data (if the data matrix is really small)
 		if(maxArrayIndex < minArrayZoomIndex) {
 			minArrayZoomIndex = maxArrayIndex;
 		}
@@ -476,7 +476,7 @@ public class DendroController implements ConfigNodePersistent {
 
 		//Obtain the selection size of each dimension
 		double arrayIndexes = arraySelection.getNSelectedIndexes();
-		double geneIndexes = geneSelection.getNSelectedIndexes();
+		double geneIndexes  = geneSelection.getNSelectedIndexes();
 		
 		//We'll allow the user to surpass the min zoom index when they are near the edge, so that
 		//their selection is centered on the screen, so let's get the edges of the selection
@@ -493,7 +493,7 @@ public class DendroController implements ConfigNodePersistent {
 			//Else if the center of the selection is less than half the distance to the far edge
 			else if((minSelectedArrayIndex + arrayIndexes / 2) >
 					(maxArrayIndex - (minArrayZoomIndex / 2))) {
-				arrayIndexes = (maxArrayIndex - (minSelectedArrayIndex + arrayIndexes / 2)) * 2;
+				arrayIndexes = (maxArrayIndex - (minSelectedArrayIndex + arrayIndexes / 2 - 1)) * 2;
 			}
 			//Otherwise, set the standard minimum zoom
 			else {
@@ -511,7 +511,7 @@ public class DendroController implements ConfigNodePersistent {
 			//Else if the center of the selection is less than half the distance to the far edge
 			else if((minSelectedGeneIndex + geneIndexes / 2) >
 					(maxGeneIndex - (minGeneZoomIndex / 2))) {
-				geneIndexes = (maxGeneIndex - (minSelectedGeneIndex + geneIndexes / 2)) * 2;
+				geneIndexes = (maxGeneIndex - (minSelectedGeneIndex + geneIndexes / 2 - 1)) * 2;
 			}
 			//Otherwise, set the standard minimum zoom
 			else {
