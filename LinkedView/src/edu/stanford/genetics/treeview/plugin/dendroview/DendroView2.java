@@ -52,6 +52,7 @@ import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.core.ArrayFinderBox;
 import edu.stanford.genetics.treeview.core.GeneFinderBox;
 import edu.stanford.genetics.treeview.core.HeaderFinderBox;
+import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
  * This class encapsulates a dendrogram view, which is the classic Eisen
@@ -473,6 +474,10 @@ public class DendroView2 implements Observer, DendroPanel {
 
 	public void addSearchButtonListener(final ActionListener l) {
 
+		for( ActionListener al : tvFrame.getSearchButton().getActionListeners() ) {
+			tvFrame.getSearchButton().removeActionListener( al );
+	    }
+		LogBuffer.println("Adding Search Button Listener");
 		tvFrame.getSearchButton().addActionListener(l);
 	}
 
