@@ -46,6 +46,7 @@ import Utilities.GUIFactory;
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.WideComboBox;
@@ -221,19 +222,15 @@ public abstract class HeaderFinderBox {
     	if(text == null || pattern == null) {
     		return false;
     	}
-    	
-    	// Define CharSequences to replaced in given String.
-    	CharSequence singleChar = "?";
-    	CharSequence regexSingleChar = ".";
-    	
-    	CharSequence multiChar = "*";
-    	CharSequence regexMultiChar = "(.)*";
-    	
-    	// Transform String to Regex
-    	pattern = pattern.replace(singleChar, regexSingleChar);
-    	pattern = pattern.replace(multiChar, regexMultiChar);
-        
-    	// Check if generated regex matches, store result in boolean.
+
+    	//Escape all metacharacters except our supported wildcards
+    	pattern = pattern.replaceAll("([^A-Za-z0-9 \\?\\*])", "\\\\$1");
+    	//Convert our wildcards to regular expression syntax
+    	pattern = pattern.replaceAll("\\?", ".");
+    	pattern = pattern.replaceAll("\\*", ".*");
+		//LogBuffer.println("Searching for [" + pattern + "]");
+
+		// Check if generated regex matches, store result in boolean.
         boolean isMatch = false;
         if(text.matches(pattern)) {
         	isMatch = true;
