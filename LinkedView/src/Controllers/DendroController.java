@@ -99,7 +99,7 @@ public class DendroController implements ConfigNodePersistent {
 
 		// add listeners
 		addViewListeners();
-		addMenuButtonListeners();
+		addMenuBtnListeners();
 	}
 
 	/**
@@ -120,10 +120,15 @@ public class DendroController implements ConfigNodePersistent {
 		dendroView.addCompListener(new ResizeListener());
 	}
 
-	public void addMenuButtonListeners() {
+	/**
+	 * TODO Make sure only one listener is on each button, not multiple 
+	 * instances.
+	 */
+	public void addMenuBtnListeners() {
 
+		LogBuffer.println("Adding MenuBtnListeners.");
 		dendroView.addSearchButtonListener(new SearchButtonListener());
-		dendroView.addTreeButtonListener(new TreeButtonListener());
+		dendroView.addTreeBtnListener(new TreeBtnListener());
 	}
 
 	class SearchButtonListener implements ActionListener {
@@ -145,12 +150,12 @@ public class DendroController implements ConfigNodePersistent {
 	 * @author CKeil
 	 * 
 	 */
-	class TreeButtonListener implements ActionListener {
+	class TreeBtnListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			new TreeButtonClicker().run();
+			new TreeBtnClicker().run();
 		}
 	}
 
@@ -160,13 +165,14 @@ public class DendroController implements ConfigNodePersistent {
 	 * @author CKeil
 	 * 
 	 */
-	class TreeButtonClicker extends SwingWorker<Void, Void> {
+	class TreeBtnClicker extends SwingWorker<Void, Void> {
 		
 		@Override
 		protected Void doInBackground() throws Exception {
 			
 			setTreesVis(tvFrame.getTreeButton().isSelected());
-
+			
+			LogBuffer.println("Setting dendroView layout in TreeBtnClicker.");
 			dendroView.setupLayout();
 			addViewListeners();
 			return null;

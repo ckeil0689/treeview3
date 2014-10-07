@@ -8,7 +8,6 @@ import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.SwingWorker;
 
 import Utilities.Helper;
 import Controllers.ClusterController;
@@ -39,8 +38,6 @@ public class HierCluster {
 	private final String axisPrefix;
 	private final int distMatrixSize;
 	private int loopNum;
-
-	private final SwingWorker<String[], Integer> worker;
 
 	/* Half of the Distance Matrix (symmetry) */
 	private double[][] distMatrix;
@@ -91,14 +88,12 @@ public class HierCluster {
 	 * be interrupted in this class if the user cancels the operation.
 	 */
 	public HierCluster(String fileName, final String linkMethod, 
-			final double[][] distMatrix, final int axis, 
-			final SwingWorker<String[], Integer> worker) {
+			final double[][] distMatrix, final int axis) {
 
 		LogBuffer.println("Initializing HierCluster.");
 		this.linkMethod = linkMethod;
 		this.distMatrix = distMatrix;
 		this.distMatrixSize = distMatrix.length;
-		this.worker = worker;
 		
 		/* 
 		 * Setting up labels for ATR and GTR tree files and 
@@ -174,10 +169,11 @@ public class HierCluster {
 					+ "clustering.";
 			JOptionPane.showMessageDialog(JFrame.getFrames()[0], message, 
 					"Error", JOptionPane.ERROR_MESSAGE);
-			worker.cancel(true);
+			LogBuffer.println("Cluster preparation failed.");
+			return;
 		}
 		
-		LogBuffer.println("Done preparing.");
+		LogBuffer.println("Cluster preparation successful.");
 	}
 
 	/** 
@@ -196,7 +192,7 @@ public class HierCluster {
 * STEP 1: Find current(!) matrix minimum. Should be larger than the last
 * minimum that was found in the previous step! The matrix shrinks as rows are
 * clustered together (hence the need for a deep copy!).
-*/			
+*/
 		min = findMatrixMin();
 /* 
  * STEP 2: Link the two clusters, that are closest, in the cluster index list, 
@@ -228,7 +224,7 @@ public class HierCluster {
 
 		/* Fuse the two clusters into a new one. */
 		final int[] newCluster = concatArrays(targetRow, targetRow2);
-
+		
 /*
  * Step 3: Match the newly created node with the others.
  */
@@ -266,7 +262,7 @@ public class HierCluster {
 			currentClusters.remove(colMinIndex);
 			currentClusters.remove(rowMinIndex);
 		}
-
+		
 		/* 
 		 * Adding the newly formed cluster to the list of current cluster at
 		 * the position of the old cluster that contains the minimum row index.
@@ -313,10 +309,13 @@ public class HierCluster {
 		 */
 		if (linkMethod.contentEquals("Single Linkage")
 				|| linkMethod.contentEquals("Complete Linkage")) {
-			newRow = newRowGenSC(newCluster);
+			newRow = scLink(newCluster);
 
 		} else if (linkMethod.contentEquals("Average Linkage")) {
-			newRow = newRowGenAverage(newCluster);
+			newRow = avgLink(newCluster);
+			
+		} else {
+			LogBuffer.println("No matching link method found.");
 		}
 
 		/* 
@@ -366,6 +365,11 @@ public class HierCluster {
 		return distMatrix.length;
 	}
 	
+	/**
+	 * Takes information about a newly formed cluster and writes it to a file.
+	 * @param rowPair The pair of clustered rows.
+	 * @return
+	 */
 	public String[] writeData(String[] rowPair) {
 		
 		/*
@@ -391,6 +395,12 @@ public class HierCluster {
 		return nodeInfo;
 	}
 	
+	/**
+	 * Finishes up clustering. Closes the bufferedWriter and causes the list
+	 * of reordered distance matrix rows to be generated.
+	 * Also sets the variables that store the most data to null, to ensure 
+	 * garbage collection.
+	 */
 	public void finish() {
 
 		bufferedWriter.closeWriter();
@@ -484,8 +494,11 @@ public class HierCluster {
 					+ "buffered writer to save ATR or GTR files.";
 			JOptionPane.showMessageDialog(JFrame.getFrames()[0], message, 
 					"Error", JOptionPane.ERROR_MESSAGE);
-			worker.cancel(true);
+			LogBuffer.println("Setting up buffered writer failed.");
+			return;
 		}
+		
+		LogBuffer.println("Tree file writer setup successful.");
 	}
 
 	/**
@@ -506,13 +519,7 @@ public class HierCluster {
 		 */
 		for (int i = 0; i < newMatrix.length; i++) {
 
-			if (i < removeIndex) {
-				newMatrix[i] = distMatrix[i];
-
-			} else if (i >= removeIndex) {
-				final double[] newElement = distMatrix[i + 1];
-				newMatrix[i] = newElement;
-			}
+			newMatrix[i] = (i < removeIndex) ? distMatrix[i] : distMatrix[i + 1];
 		}
 
 		/* This shrinks the current element after to a max size of '***Index' 
@@ -549,12 +556,7 @@ public class HierCluster {
 
 		for (int i = 0; i < newArray.length; i++) {
 
-			if (i < toDelete) {
-				newArray[i] = array[i];
-
-			} else {
-				newArray[i] = array[i + 1];
-			}
+			newArray[i] = (i < toDelete) ? array[i] : array[i + 1];
 		}
 
 		return newArray;
@@ -580,30 +582,11 @@ public class HierCluster {
 	}
 
 	/**
-	 * Finds the index of a value in a double array.
+	 * Fuses two arrays into a new third array and returns it.
 	 * 
-	 * @param array
-	 * @param value
-	 * @return
-	 */
-	public int findArrayInDM(final double[] array) {
-
-		for (int i = 0; i < array.length; i++) {
-
-			if (!checkDisjoint(distMatrix[i], array)) {
-				return i;
-			}
-		}
-
-		return -1;
-	}
-
-	/**
-	 * Fuses two arrays together.
-	 * 
-	 * @param a
-	 * @param b
-	 * @return
+	 * @param a First array.
+	 * @param b Second array.
+	 * @return The merged array.
 	 */
 	public int[] concatArrays(final int[] a, final int[] b) {
 
@@ -618,7 +601,8 @@ public class HierCluster {
 	/**
 	 * Method to make deep copy of distance matrix
 	 * 
-	 * @return
+	 * @return A two-dimensional double array that is a copy of the distance
+	 * matrix.
 	 */
 	public double[][] deepCopy(final double[][] distanceMatrix) {
 
@@ -680,16 +664,14 @@ public class HierCluster {
 	 * formed cluster. In this case the remaining gene will be connected 
 	 * to that NODE.
 	 * 
-	 * @param fusedGroup
+	 * @param newCluster
 	 * @param rowGroup
 	 * @param colGroup
-	 * @param currentClusters
 	 * @param row
 	 * @param column
-	 * @param rowIndexTable
-	 * @return
+	 * @return The pair of matrix rows that have been clustered.
 	 */
-	public String[] connectNodes(final int[] fusedGroup, final int[] rowGroup,
+	public String[] connectNodes(final int[] newCluster, final int[] rowGroup,
 			final int[] colGroup, final int row, final int column) {
 
 		// make Strings for String list to be written to data file
@@ -703,7 +685,7 @@ public class HierCluster {
 		// check the lists in dataMatrix whether the genePair you want
 		// to add now is already in a list from before, if yes connect
 		// to LATEST node by replacing the gene name with the node name
-		if (fusedGroup.length == 2) {
+		if (newCluster.length == 2) {
 			geneRow = axisPrefix + currentClusters.get(row).get(0) + "X";
 			geneCol = axisPrefix + currentClusters.get(column).get(0) + "X";
 
@@ -752,7 +734,8 @@ public class HierCluster {
 
 					} else {
 						// random fix to see what happens
-						geneRow = axisPrefix + currentClusters.get(row).get(0) + "X";
+						geneRow = axisPrefix + currentClusters.get(row).get(0) 
+								+ "X";
 					}
 				}
 			}
@@ -809,45 +792,6 @@ public class HierCluster {
 	}
 
 	/**
-	 * Checks if two double[] have ALL elements in common.
-	 * 
-	 * @param a
-	 * @param b
-	 * @return
-	 */
-	public boolean checkDisjoint(final double[] a, final double[] b) {
-
-		double[] toIterate;
-		double[] toSearch;
-
-		boolean disjoint = true;
-
-		if (a.length > b.length) {
-			toIterate = b;
-			toSearch = a;
-
-		} else {
-			toIterate = a;
-			toSearch = b;
-		}
-
-		for (int i = 0; i < toIterate.length; i++) {
-
-			for (int j = 0; j < toSearch.length; j++) {
-
-				if (Helper.nearlyEqual(toIterate[i], toSearch[j], EPSILON)) {
-					disjoint = false;
-				} else {
-					disjoint = true;
-					break;
-				}
-			}
-		}
-
-		return disjoint;
-	}
-
-	/**
 	 * Reorders the finalCluster and returns it as a String[]
 	 * 
 	 * @param finalCluster
@@ -877,7 +821,7 @@ public class HierCluster {
 	 * @param newRow
 	 * @return newClade
 	 */
-	public double[] newRowGenSC(final int[] fusedGroup) {
+	public double[] scLink(final int[] fusedGroup) {
 
 		final double[] newRow = new double[currentClusters.size()];
 
@@ -969,7 +913,7 @@ public class HierCluster {
 	 * @param newRow
 	 * @return newClade
 	 */
-	public double[] newRowGenAverage(final int[] fusedGroup) {
+	public double[] avgLink(final int[] fusedGroup) {
 
 		final double[] newRow = new double[currentClusters.size()];
 
@@ -1036,7 +980,7 @@ public class HierCluster {
 	}
 
 	/**
-	 * Accessor for the reordered list
+	 * Getter for the reordered list
 	 * 
 	 * @return The reordered list of matrix elements after clustering. 
 	 */

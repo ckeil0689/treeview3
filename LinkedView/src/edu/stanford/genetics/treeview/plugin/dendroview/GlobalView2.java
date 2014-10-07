@@ -152,13 +152,13 @@ public class GlobalView2 extends ModelViewProduced implements
 
 		try {
 			if (xmap.contains(overx) && ymap.contains(overy)) {
-				statustext[0] = "Row: ";// + (overy + 1);
+				statustext[0] = "Row: ";
 
 				if (geneHI != null) {
 					final int realGene = overy;
 					try {
 						statustext[0] += geneSummary.getSummary(geneHI, 
-								realGene);//geneHI.getHeader(realGene, 1);
+								realGene);
 
 					} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 						LogBuffer.println("ArrayIndexOutOfBoundsException "
@@ -167,7 +167,7 @@ public class GlobalView2 extends ModelViewProduced implements
 						statustext[0] += " (N/A)";
 					}
 				}
-				statustext[1] = "Column: ";// + (overx + 1);
+				statustext[1] = "Column: ";
 				if (arrayHI != null) {
 					try {
 						statustext[1] += arraySummary.getSummary(geneHI, 

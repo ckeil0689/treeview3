@@ -102,6 +102,8 @@ public class ClusterController {
 		private String[] reorderedRows;
 		private String[] reorderedCols;
 		
+		private int pBarMax = 0;
+		
 		@Override
         protected void process(List<String> chunks) {
             
@@ -116,8 +118,19 @@ public class ClusterController {
 			clusterView.setClustering(true);
 			
 			/* Get chosen similarity options. */
-			String rowSimilarity = clusterView.getRowSimilarity();
-			String colSimilarity = clusterView.getColSimilarity();
+			int rowSimilarity = clusterView.getRowSimilarity();
+			int colSimilarity = clusterView.getColSimilarity();
+			
+			/* Set maximum for progressbar */
+			if(rowSimilarity != 0) {
+				pBarMax += (2 * tvModel.getGeneHeaderInfo().getNumHeaders());
+			}
+			
+			if(colSimilarity != 0) {
+				pBarMax += (2 * tvModel.getArrayHeaderInfo().getNumHeaders());
+			}
+			
+			ClusterView.setPBarMax(pBarMax);
 
 			/* If no options are selected, display error and return null. */
 			if (!checkSelections(rowSimilarity, ROW) 
@@ -268,10 +281,10 @@ public class ClusterController {
 	 * @return boolean Whether all needed selections have 
 	 * appropriate values.
 	 */
-	public boolean checkSelections(final String distMeasure, int type) {
+	public boolean checkSelections(final int distMeasure, int type) {
 
 		if (isHierarchical()) {
-			return !distMeasure.contentEquals(StringRes.cluster_DoNot);
+			return distMeasure != 0;
 
 		} else {
 			final Integer[] spinnerValues = clusterView.getSpinnerValues();
@@ -295,8 +308,7 @@ public class ClusterController {
 				break;
 			}
 
-			return (!distMeasure.contentEquals(StringRes.cluster_DoNot) 
-					&& (groups > 0 && iterations > 0));
+			return (distMeasure!= 0 && (groups > 0 && iterations > 0));
 		}
 	}
 
@@ -312,6 +324,7 @@ public class ClusterController {
 		
 		public LoadWorker(FileSet fileSet) {
 			
+			LogBuffer.println("Initializing LoadWorker.");
 			this.fileSet = fileSet;
 		}
 		
@@ -394,6 +407,7 @@ public class ClusterController {
 			FileSet fileSet = new FileSet(file.getName(), file.getParent()
 					+ File.separator);
 
+			LogBuffer.println("Setting view choice to begin loading.");
 			tvController.setViewChoice();
 			loadWorker = new LoadWorker(fileSet);
 			loadWorker.execute();
@@ -410,7 +424,7 @@ public class ClusterController {
 	/**
 	 * Defines what happens if the user clicks the 'Cancel' button in
 	 * DendroView. Calls the cancel() method in the view.
-	 * 
+	 * TODO add cancel functionality to distance worker and cluster worker.
 	 * @author CKeil
 	 * 
 	 */

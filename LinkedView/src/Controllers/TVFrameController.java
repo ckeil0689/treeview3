@@ -223,6 +223,7 @@ public class TVFrameController {
 
 		} else {
 			if (model.isLoaded()) {
+				LogBuffer.println("Setting DendroView.");
 				tvFrame.setRunning(true);
 				tvFrame.setLoaded(true);
 				dendroController.setNew(tvFrame.getDendroView(), 
@@ -230,26 +231,12 @@ public class TVFrameController {
 				tvFrame.setView(StringRes.view_Dendro);
 
 			} else {
+				LogBuffer.println("Setting WelcomeView.");
 				tvFrame.setRunning(false);
 				tvFrame.setLoaded(false);
 				tvFrame.setView(StringRes.view_Welcome);
 			}
 		}
-		
-//		if(model.isLoaded() && tvFrame.getDataModel() != null) {
-//			tvFrame.setView(StringRes.view_Dendro);
-//			tvFrame.setLoaded(true);
-//			
-//		} else if(!model.isLoaded() && error) {
-//			tvFrame.setView(StringRes.view_LoadError);
-//			tvFrame.setLoaded(false);
-//
-//			LogBuffer.println(StringRes.clusterError_notLoaded);
-//			
-//		} else {
-//			tvFrame.setView(StringRes.view_Welcome);
-//			tvFrame.setLoaded(false);
-//		}
 		
 		addMenuListeners();
 	}

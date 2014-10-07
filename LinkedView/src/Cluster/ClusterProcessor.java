@@ -23,6 +23,7 @@ import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 public class ClusterProcessor {
 
 	private final DataModel tvModel;
+	private int pBarCount;
 
 	/**
 	 * 
@@ -31,6 +32,7 @@ public class ClusterProcessor {
 	public ClusterProcessor(final DataModel model) {
 
 		this.tvModel = model;
+		this.pBarCount = 0;
 	}
 	
 	/**
@@ -59,7 +61,7 @@ public class ClusterProcessor {
 			e.printStackTrace();
 			LogBuffer.logException(e);
 			LogBuffer.println(e.getLocalizedMessage());
-			return null;
+			return new String[]{"No clustered data."};
 		}
 	}
 	
@@ -70,7 +72,7 @@ public class ClusterProcessor {
 	 * @param axis
 	 * @return
 	 */
-	public double[][] calcDistance(String distMeasure, int axis) {
+	public double[][] calcDistance(int distMeasure, int axis) {
 		
 		try {
 			DistanceWorker distWorker = new DistanceWorker(distMeasure,axis);
@@ -82,7 +84,7 @@ public class ClusterProcessor {
 			e.printStackTrace();
 			LogBuffer.logException(e);
 			LogBuffer.println(e.getLocalizedMessage());
-			return null;
+			return new double[][] {{0}, {0}};
 		}
 	}
 
@@ -93,21 +95,21 @@ public class ClusterProcessor {
 	 * finishes after the calculations were cancelled by the user, 
 	 * it let's the cluster dialog know so it can respond appropriately.
 	 * Input data is translated into output data here.
-	 * TODO Take the loop outside, probably the method choice as well!
+	 * TODO Take switch statement outside the loop.
 	 */
 	class DistanceWorker extends SwingWorker<double[][], Integer> {
 
-		private final String distMeasure;
+		private final int distMeasure;
 		private final int axis;
 		private final int max;
 
-		public DistanceWorker(final String distMeasure, final int axis) {
+		public DistanceWorker(final int distMeasure, final int axis) {
 
 			this.distMeasure = distMeasure;
 			this.axis = axis;
 			
 			String axisPrefix = "N/A";
-			if(axis == 0) {
+			if(axis == ClusterController.ROW) {
 				this.max = ((TVDataMatrix) tvModel.getDataMatrix()).getNumRow();
 				axisPrefix = "row";
 				
@@ -116,17 +118,17 @@ public class ClusterProcessor {
 				axisPrefix = "column";
 			}
 			
+			LogBuffer.println("Max of " + axisPrefix + ": " + max);
+			
 			ClusterView.setLoadText("Calculating " + axisPrefix 
 					+ " Distance Matrix...");
-			ClusterView.setPBarMax(max);
 		}
 		
 		@Override
         protected void process(List<Integer> chunks) {
             
 			int i = chunks.get(chunks.size()-1);
-            ClusterView.updatePBar(i); 
-            ClusterView.setLoadText("Loading " + i + " of " + max);
+            ClusterView.updatePBar(pBarCount + i);
         }
 
 		@Override
@@ -144,7 +146,7 @@ public class ClusterProcessor {
 
 			if (data != null) {
 				final DistMatrixCalculator dCalc = 
-						new DistMatrixCalculator(data, distMeasure, axis, this);
+						new DistMatrixCalculator(data, distMeasure, axis);
 
 				try {
 					String axisPrefix = 
@@ -152,14 +154,20 @@ public class ClusterProcessor {
 					ClusterView.setLoadText("Calculating " + axisPrefix 
 							+ " Distance Matrix...");
 					
-					// Choice of method here
+					// Choice of method here instead of in loop?
 					
-					// loop of distance measure method here.
-					dCalc.measureDistance(); // replace
+					/* Loop generates rows for distance matrix */
+					/* take a row */
+					for (int i = 0; i < data.length; i++) {
+			 
+						if(isCancelled()) break;
+						publish(i);
+						dCalc.calcRow(i);
+					}
 					
 					return dCalc.getDistanceMatrix();
 					
-				} catch(NumberFormatException e) {
+				} catch (NumberFormatException e) {
 					String message = "Measuring the distances experienced "
 							+ "an issue. Check log messages to see "
 							+ "the cause.";
@@ -176,17 +184,22 @@ public class ClusterProcessor {
 				LogBuffer.println("Alert: " + message);
 			}
 			
-			return null;
+			LogBuffer.println("Distance matrix could not be calculated and"
+					+ " was set to values of 0.");
+			return new double[][] {{0}, {0}};
 		}
 		
 		@Override
 		public void done() {
-			// Do something when done?
+			
+			/* keep track of overall progress */
+			pBarCount += max;
+			LogBuffer.println("pBarCount: " + pBarCount);
 		}
 		
 		/**
-		 * This method uses the unformatted matrix data list and splits it up into
-		 * the columns.
+		 * This method uses the unformatted matrix data list and splits 
+		 * it up into the columns.
 		 * 
 		 * @param unformattedData The non-formatted, loaded data.
 		 * @return
@@ -213,6 +226,7 @@ public class ClusterProcessor {
 		private final String linkMethod;
 		private final Integer[] spinnerInput;
 		private final int axis;
+		private final int max;
 		private boolean hierarchical;
 
 		public ClusterWorker(final double[][] distMatrix, String linkMethod, 
@@ -225,23 +239,14 @@ public class ClusterProcessor {
 			this.spinnerInput = spinnerInput;
 			this.hierarchical = hierarchical;
 			this.axis = axis;
-			
-			int max = 0;
-			if(axis == ClusterController.ROW) {
-				max = ((TVDataMatrix) tvModel.getDataMatrix()).getNumRow();
-				
-			} else {
-				max = ((TVDataMatrix) tvModel.getDataMatrix()).getNumCol();
-			}
-			
-			ClusterView.setPBarMax(max);
+			this.max = distMatrix.length - 1; // 1 cluster remains
 		}
 		
 		@Override
         protected void process(List<Integer> chunks) {
             
 			int i = chunks.get(chunks.size()-1);
-            ClusterView.updatePBar(i);
+            ClusterView.updatePBar(pBarCount + i);
         }
 
 		@Override
@@ -254,9 +259,8 @@ public class ClusterProcessor {
 				String fileName = tvModel.getSource().substring(0, 
 						tvModel.getSource().length() - 4);
 				
-				HierCluster cGen = 
-						new HierCluster(fileName, linkMethod, 
-								distMatrix, axis, this);
+				HierCluster cGen = new HierCluster(fileName, linkMethod, 
+								distMatrix, axis);
 				
 				LogBuffer.println("Starting cluster.");
 				/* 
@@ -268,12 +272,13 @@ public class ClusterProcessor {
 				int distMatrixLength = distMatrix.length;
 				
 				while (distMatrixLength > 1 && !isCancelled()) {
+					
 					distMatrixLength = cGen.cluster();
 					publish(loopNum);
 					loopNum++;
 				}
 				
-				/* Return empty String[] if user cancels op */
+				/* Return empty String[] if user cancels operation */
 				if(isCancelled()) return new String[]{""};
 				
 				/* Write the tree file */
@@ -296,6 +301,8 @@ public class ClusterProcessor {
 		@Override
 		public void done() {
 			
+			pBarCount += max;
+			LogBuffer.println("pBarCount: " + pBarCount);
 			if (isCancelled()) {
 				LogBuffer.println("Clustering has been cancelled.");
 

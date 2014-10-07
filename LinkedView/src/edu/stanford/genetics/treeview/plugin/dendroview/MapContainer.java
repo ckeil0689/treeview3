@@ -462,8 +462,7 @@ public class MapContainer extends Observable implements Observer,
 
 	public void setScale(final double d) {
 
-		if (!Helper.nearlyEqual(fixedMap.getScale(), d, EPSILON)) { 
-			//Math.abs(fixedMap.getScale() - d) > EPSILON) {
+		if (!Helper.nearlyEqual(fixedMap.getScale(), d, EPSILON)) {
 			fixedMap.setScale(d);
 			setupScrollbar();
 			setChanged();

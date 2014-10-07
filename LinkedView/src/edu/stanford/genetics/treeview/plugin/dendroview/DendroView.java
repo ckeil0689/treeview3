@@ -43,6 +43,7 @@ import Utilities.GUIFactory;
 import Utilities.StringRes;
 import edu.stanford.genetics.treeview.DendroPanel;
 import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.TabbedSettingsPanel;
 import edu.stanford.genetics.treeview.TreeSelectionI;
@@ -225,6 +226,8 @@ public class DendroView implements Observer, DendroPanel {
 	 */
 	public void setupLayout() {
 
+		LogBuffer.println("Setting up DendroPane layout.");
+		
 		// Clear panel
 		dendroPane.removeAll();
 
@@ -479,7 +482,7 @@ public class DendroView implements Observer, DendroPanel {
 		tvFrame.getSearchButton().addActionListener(l);
 	}
 
-	public void addTreeButtonListener(final ActionListener l) {
+	public void addTreeBtnListener(final ActionListener l) {
 
 		tvFrame.getTreeButton().addActionListener(l);
 	}

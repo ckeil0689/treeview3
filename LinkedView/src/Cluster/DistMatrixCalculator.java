@@ -1,16 +1,12 @@
 package Cluster;
 
-import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.SwingWorker;
 
 import Utilities.Helper;
-import Utilities.StringRes;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
@@ -27,16 +23,14 @@ public class DistMatrixCalculator {
 	private final double EPSILON = 0.0001;
 	private final double[][] data;
 
-	private final String distMeasure;
-
-//	private final SwingWorker<double[][], Integer> worker;
+	/* The user selected distance measure */
+	private final int distMeasure;
 	
+	/* The distance matrix object to be filled and returned */
 	private double[][] distMatrix;
-	
-//	private ClusterFileWriter bufferedWriter;
 
 	/**
-	 * Constructs a DistMatrixCalculator which can be used to obtain
+	 * Constructs a DistMatrixCalculator which is used to obtain
 	 * distance matrices for supplied datasets.
 	 * @param data The original data from which to construct a distance matrix.
 	 * @param distMeasure The user choice for the measure of distance 
@@ -46,16 +40,13 @@ public class DistMatrixCalculator {
 	 * Used to allow cancellation of the process.
 	 */
 	public DistMatrixCalculator(final double[][] data, 
-			final String distMeasure, final int axis, 
-			final SwingWorker<double[][], Integer> worker) {
+			final int distMeasure, final int axis) {
 
 		LogBuffer.println("Initializing DistMatrixCalculator.");
 		
 		this.data = data;
+		this.distMatrix = new double[data.length][];
 		this.distMeasure = distMeasure;
-//		this.worker = worker;
-		
-//		setupWriter();
 	}
 
 	/* Distance measure functions */
@@ -70,33 +61,20 @@ public class DistMatrixCalculator {
 	 * @param absolute Whether pearson should be absolute or not.
 	 * @param centered Whether pearson should be centered or not.
 	 */
-	public void pearson(final boolean absolute, final boolean centered) {
+	public void pearson(final boolean absolute, final boolean centered, 
+			final int limit) {
 
-		/* making sure distanceList is clear */
-		distMatrix = new double[data.length][];
+		/* pearson values of one row compared to all others */
+		final double[] rowDist = new double[limit];
 
-		/* take a row */
-		for (int i = 0; i < data.length; i++) {
- 
-			/* for half matrix! full distMatrix is symmetric... */
-			int limit = i;
-			
-			/* update progressbar */
-			ClusterView.updatePBar(i); // take out of this class to swingworker
+		/* second row for comparison */
+		for (int j = 0; j < limit; j++) {
 
-			/* pearson values of one row compared to all others */
-			final double[] rowDist = new double[limit];
-
-			/* second row for comparison */
-			for (int j = 0; j < limit; j++) {
-
-				rowDist[j] = calcPearson(data[i], data[j], centered, absolute);
-			}
-
-			distMatrix[i] = rowDist;
+			rowDist[j] = calcPearson(data[limit], data[j], centered, 
+					absolute);
 		}
-		
-//		writeMatrix();
+
+		distMatrix[limit] = rowDist;
 	}
 	
 	/**
@@ -180,8 +158,6 @@ public class DistMatrixCalculator {
 
 		for (int i = 0; i < data.length; i++) {
 
-			ClusterView.updatePBar(i);
-
 			/* Make a copy row to avoid mutation */
 			final double[] copyRow = data[i].clone();
 
@@ -194,6 +170,7 @@ public class DistMatrixCalculator {
 				final Double rank = (double) j;
 				final int index = find(data[i], copyRow[j]);
 
+				/* Rewrite the data object. This will be used by pearson(). */
 				if (index != -1) {
 					data[i][index] = rank;
 
@@ -204,7 +181,7 @@ public class DistMatrixCalculator {
 			}
 		}
 
-		pearson(false, true);
+//		pearson(false, true);
 	}
 
 	/**
@@ -212,42 +189,25 @@ public class DistMatrixCalculator {
 	 * Euclidean or Manhattan.
 	 * @param isEuclid Whether Euclidean distance is used or not.
 	 */
-	public void taxicab(boolean isEuclid) {
+	public void taxicab(boolean isEuclid, int limit) {
 
-		/* making sure distanceList is empty */
-		distMatrix = new double[data.length][];
+		/* Euclidean distances of one element to all others */
+		final double[] rowDist = new double[limit];
+		
+		if(isEuclid) {
+			for (int j = 0; j < limit; j++) {
 
-		/* iterate through all elements */
-		for (int i = 0; i < data.length; i++) {
-
-//			if (worker.isCancelled()) {
-//				break;
-//			}
-
-			/* update progressbar */
-			ClusterView.updatePBar(i);
-			
-			/* limit size of distMatrix element due to symmetry */
-			int limit = i;
-
-			/* Euclidean distances of one element to all others */
-			final double[] rowDist = new double[limit];
-			
-			if(isEuclid) {
-				for (int j = 0; j < limit; j++) {
-	
-					rowDist[j] = calcEuclid(data[i], data[j]);
-				}
-			} else {
-				for (int j = 0; j < limit; j++) {
-
-					rowDist[j] = calcManhattan(data[i], data[j]);
-				}
+				rowDist[j] = calcEuclid(data[limit], data[j]);
 			}
+		} else {
+			for (int j = 0; j < limit; j++) {
 
-			/* list with all rows and their distances to the other rows */
-			distMatrix[i] = rowDist;
+				rowDist[j] = calcManhattan(data[limit], data[j]);
+			}
 		}
+
+		/* list with all rows and their distances to the other rows */
+		distMatrix[limit] = rowDist;
 	}
 	
 	/**
@@ -309,84 +269,53 @@ public class DistMatrixCalculator {
 	/**
 	 * Chooses appropriate distance measure according to user selection.
 	 */
-	public void measureDistance() {
+	public void calcRow(int index) {
 		
+		/*
+		 * The switch condition is an int instead of the actual method String
+		 * name because until I figured out how to pass methods as variables
+		 * (or a better way to switch the methods) this function will be called
+		 * from a loop. Switching ints is much less expensive.
+		 * The ints follow the index position of the methods in the JComboBox
+		 * in ClusterView.
+		 * For reference here is a table that describes what each int 
+		 * stands for:
+		 * - Pearson Uncentered: 1
+		 * - Pearson Centered: 2
+		 * - Absolute Uncentered: 3
+		 * - Absolute Centered: 4
+		 * - Spearman: 5
+		 * - Euclidean: 6
+		 * - City Block: 7
+		 */
 		switch(distMeasure) {
 		
-		case StringRes.cluster_pearsonUn: 	
-			pearson(false, false);
+		case 1: 	
+			pearson(false, false, index);
 			break;
-		case StringRes.cluster_pearsonCtrd: 
-			pearson(false, true);
+		case 2: 
+			pearson(false, true, index);
 			break;
-		case StringRes.cluster_absCorrUn: 	
-			pearson(true, false);
+		case 3: 	
+			pearson(true, false, index);
 			break;
-		case StringRes.cluster_absCorrCtrd:	
-			pearson(true, true);
+		case 4:	
+			pearson(true, true, index);
 			break;
-		case StringRes.cluster_spearman:	
+		case 5:	
 			spearman();
 			break;
-		case StringRes.cluster_euclidean: 	
-			taxicab(true);
+		case 6: 	
+			taxicab(true, index);
 			break;
-		case StringRes.cluster_cityBlock:	
-			taxicab(false);
+		case 7:	
+			taxicab(false, index);
 			break;
 		default:							
 			showDistAlert();
 			break;
 		}
 	}
-	
-//	public void setupWriter() {
-//		
-//		LogBuffer.println("Setting up DistMatrix writer.");
-//		
-//		final File file = new File("C:/Users/CKeil/Programming/Princeton/"
-//				+ "TreeView Related Files/test_dist_matrix.txt");
-//
-//		try {
-//			file.createNewFile();
-//			bufferedWriter = new ClusterFileWriter(file);
-//			
-//		} catch (IOException e) {
-//			LogBuffer.logException(e);
-//			String message = "There was trouble when trying to setup the"
-//					+ "buffered writer to save ATR or GTR files.";
-//			JOptionPane.showMessageDialog(JFrame.getFrames()[0], message, 
-//					"Error", JOptionPane.ERROR_MESSAGE);
-//		}
-//	}
-	
-//	public void writeMatrix() {
-//
-//		LogBuffer.println("Writing distance matrix...");
-//		/* Transform distMatrix to Strings for writing */ 
-//		String[][] dataStrings = new String[distMatrix.length][];
-//		
-//		for (int i = 0; i < distMatrix.length; i++) {
-//			
-//			final double[] element = distMatrix[i];
-//			final String[] newStringData = new String[element.length];
-//
-//			for (int j = 0; j < element.length; j++) {
-//
-//				newStringData[j] = String.valueOf(element[j]);
-//			}
-//
-//			dataStrings[i] = newStringData;
-//		}
-//		
-//		for(String[] row : dataStrings) {
-//			bufferedWriter.writeContent(row);
-//		}
-//		
-//		bufferedWriter.closeWriter();
-//		
-//		LogBuffer.println("Finished writing distMatrix.");
-//	}
 	
 	/**
 	 * Shows a pop-up alert if the selected distance measure could not

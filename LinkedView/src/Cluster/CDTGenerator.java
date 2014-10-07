@@ -3,7 +3,6 @@ package Cluster;
 import java.io.File;
 import java.io.IOException;
 
-import Utilities.StringRes;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 
@@ -60,10 +59,8 @@ public class CDTGenerator {
 		this.orderedRows = orderedRows;
 		this.orderedCols = orderedCols;
 		this.hierarchical = hierarchical;
-		this.isRowMethodChosen = clusterView.getRowSimilarity()
-				.contentEquals(StringRes.cluster_DoNot);
-		this.isColMethodChosen = clusterView.getColSimilarity()
-				.contentEquals(StringRes.cluster_DoNot);
+		this.isRowMethodChosen = clusterView.getRowSimilarity() != 0;
+		this.isColMethodChosen = clusterView.getColSimilarity() != 0;
 	}
 
 	public void generateCDT() {
@@ -177,7 +174,7 @@ public class CDTGenerator {
 		cdtDataDoubles = new double[reorderedRowIndexes.length]
 				[reorderedColIndexes.length];
 
-		if (!isRowMethodChosen) {
+		if (isRowMethodChosen) {
 			final String[] geneNames = new String[rowNames.length];
 			if (!hierarchical) {
 				for (int i = 0; i < geneNames.length; i++) {
@@ -216,7 +213,7 @@ public class CDTGenerator {
 			rowNameListOrdered = rowNames;
 		}
 
-		if (!isColMethodChosen) {
+		if (isColMethodChosen) {
 			// Make list of gene names to quickly access indexes
 			final String[] geneNames = new String[colNames.length];
 
@@ -302,13 +299,13 @@ public class CDTGenerator {
 				+ colNames.length;
 		int addIndex = 0;
 
-		if (!isRowMethodChosen) {
+		if (isRowMethodChosen) {
 			rowLength++;
 		}
 
 		String[] cdtRow1 = new String[rowLength];
 
-		if (!isRowMethodChosen) {
+		if (isRowMethodChosen) {
 			cdtRow1[addIndex] = "GID";
 			addIndex++;
 		}
@@ -332,7 +329,7 @@ public class CDTGenerator {
 		bufferedWriter.writeContent(cdtRow1);
 		cdtRow1 = null;
 
-		if (!isColMethodChosen) {
+		if (isColMethodChosen) {
 			addIndex = 0;
 			String[] cdtRow2 = new String[rowLength];
 
@@ -340,7 +337,7 @@ public class CDTGenerator {
 			addIndex++;
 
 			// Check if rows have been clustered
-			if (!isRowMethodChosen) {
+			if (isRowMethodChosen) {
 				for (int i = 0; i < rowHeaders.length; i++) {
 					cdtRow2[addIndex] = "";
 					addIndex++;
@@ -370,7 +367,7 @@ public class CDTGenerator {
 		cdtRow3[addIndex] = "EWEIGHT";
 		addIndex++;
 
-		if (!isRowMethodChosen) {
+		if (isRowMethodChosen) {
 			for (int i = 0; i < rowHeaders.length; i++) {
 
 				cdtRow3[addIndex] = "";
@@ -400,7 +397,7 @@ public class CDTGenerator {
 			final String[] row = new String[rowLength];
 
 			// Adding GID names if rows were clustered
-			if (!isRowMethodChosen) {
+			if (isRowMethodChosen) {
 				row[addIndex] = orderedRows[i];
 				addIndex++;
 			}
