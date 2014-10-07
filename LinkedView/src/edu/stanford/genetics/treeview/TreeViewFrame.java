@@ -1160,10 +1160,10 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		}
 	}
 
-	public void addSearchButtonListener(final MouseListener l) {
-
-		searchBtn.addMouseListener(l);
-	}
+//	public void addSearchButtonListener(final MouseListener l) {
+//
+//		searchBtn.addMouseListener(l);
+//	}
 
 	public void addTreeButtonListener(final MouseListener l) {
 
