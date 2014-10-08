@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import edu.stanford.genetics.treeview.DataModel;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 
 /**
@@ -66,6 +67,7 @@ public class CDTGenerator {
 	public void generateCDT() {
 
 		try {
+			LogBuffer.println("Setting up writer in CDTGenerator.");
 			setupWriter();
 
 		} catch (final IOException e) {
@@ -88,32 +90,39 @@ public class CDTGenerator {
 		colNameListOrdered = new String[colNames.length][];
 
 		// Order Rows and/ or Columns
+		LogBuffer.println("Ordering data...");
 		orderData();
 
 		// transform cdtDataFile from double lists to string lists
+		LogBuffer.println("Making cdtDataStrings.");
 		cdtDataStrings = new String[cdtDataDoubles.length][];
-
+		LogBuffer.println("cdtDD Length: " + cdtDataDoubles.length);
+		LogBuffer.println("cdtDS Length: " + cdtDataStrings.length);
 		for (int i = 0; i < cdtDataDoubles.length; i++) {
 
 			final double[] element = cdtDataDoubles[i];
+			
 			final String[] newStringData = new String[element.length];
 
 			for (int j = 0; j < element.length; j++) {
 
 				newStringData[j] = String.valueOf(element[j]);
 			}
-
+			
 			cdtDataStrings[i] = newStringData;
 		}
 
 		// Add some string elements, as well as row/ column names
 		if (hierarchical) {
+			LogBuffer.println("Filling hierarchical...");
 			fillHierarchical();
 
 		} else {
+			LogBuffer.println("K-Means...");
 			fillKMeans();
 		}
 
+		LogBuffer.println("Closing writer.");
 		bufferedWriter.closeWriter();
 	}
 
@@ -360,7 +369,7 @@ public class CDTGenerator {
 			bufferedWriter.writeContent(cdtRow2);
 			cdtRow2 = null;
 		}
-
+		
 		final String[] cdtRow3 = new String[rowLength];
 
 		addIndex = 0;
