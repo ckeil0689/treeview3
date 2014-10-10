@@ -101,11 +101,6 @@ public class GlobalView extends ModelViewProduced implements
 	private Ellipse2D.Double indicatorCircle = null;
 
 	/**
-	 * Rectangle to track blue zoom rectangle (pixels)
-	 */
-	// private Rectangle zoomRect = null;
-
-	/**
 	 * GlobalView also likes to have an globalxmap and globalymap (both of type
 	 * MapContainer) to help it figure out where to draw things. It also tries
 	 * to

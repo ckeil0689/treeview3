@@ -127,15 +127,21 @@ public class ClusterInfoFactory {
 		String similarity;
 		
 		switch(index) {
-			case 0: 	similarity = StringRes.clusterInfo_Single_Similarity;
-						break;
-			case 1: 	similarity = StringRes.clusterInfo_Avg_Similarity;
-						break;
-			case 2: 	similarity = StringRes.clusterInfo_Compl_Similarity;
-						break;
-			case 3: 	similarity = StringRes.clusterInfo_KMeans;
-						break;
-			default: 	similarity = "N/ A";
+			case 0: 	
+				similarity = StringRes.clusterInfo_Avg_Similarity;
+				break;
+			case 1: 	
+				similarity = StringRes.clusterInfo_Single_Similarity;
+				break;
+			case 2: 	
+				similarity = StringRes.clusterInfo_Compl_Similarity;
+				break;
+			case 3: 	
+				similarity = StringRes.clusterInfo_KMeans;
+				break;
+			default: 	
+				similarity = "N/ A";
+				break;
 		}
 		
 		return similarity;
@@ -152,9 +158,9 @@ public class ClusterInfoFactory {
 		String type;
 		
 		switch(index) {
-			case 0: 	type = StringRes.clusterInfo_Single_Type;
+			case 0: 	type = StringRes.clusterInfo_Avg_Type;
 						break;
-			case 1: 	type = StringRes.clusterInfo_Avg_Type;
+			case 1: 	type = StringRes.clusterInfo_Single_Type;
 						break;
 			case 2: 	type = StringRes.clusterInfo_Compl_Type;
 						break;
@@ -175,9 +181,9 @@ public class ClusterInfoFactory {
 		String time;
 		
 		switch(index) {
-			case 0: 	time = StringRes.clusterInfo_Single_Time;
+			case 0: 	time = StringRes.clusterInfo_Avg_Time;
 						break;
-			case 1: 	time = StringRes.clusterInfo_Avg_Time;
+			case 1: 	time = StringRes.clusterInfo_Single_Time;
 						break;
 			case 2: 	time = StringRes.clusterInfo_Compl_Time;
 						break;
@@ -198,9 +204,9 @@ public class ClusterInfoFactory {
 		String advantage;
 		
 		switch(index) {
-			case 0: 	advantage = StringRes.clusterInfo_Single_Adv;
+			case 0: 	advantage = StringRes.clusterInfo_Avg_Adv;
 						break;
-			case 1: 	advantage = StringRes.clusterInfo_Avg_Adv;
+			case 1: 	advantage = StringRes.clusterInfo_Single_Adv;
 						break;
 			case 2: 	advantage = StringRes.clusterInfo_Compl_Adv;
 						break;
@@ -221,9 +227,9 @@ public class ClusterInfoFactory {
 		String disadvantage;
 		
 		switch(index) {
-			case 0: 	disadvantage = StringRes.clusterInfo_Single_DisAdv;
+			case 0: 	disadvantage = StringRes.clusterInfo_Avg_DisAdv;
 						break;
-			case 1: 	disadvantage = StringRes.clusterInfo_Avg_DisAdv;
+			case 1: 	disadvantage = StringRes.clusterInfo_Single_DisAdv;
 						break;
 			case 2: 	disadvantage = StringRes.clusterInfo_Compl_DisAdv;
 						break;

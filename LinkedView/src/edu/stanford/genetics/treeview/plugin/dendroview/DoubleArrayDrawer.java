@@ -25,6 +25,7 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 import java.awt.Color;
 import java.awt.Rectangle;
 
+import Utilities.Helper;
 import edu.stanford.genetics.treeview.DataMatrix;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -62,7 +63,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
  */
 public class DoubleArrayDrawer extends ArrayDrawer {
 
-	protected final double PRECISION_LEVEL = 0.0001;
+	protected final double EPSILON = 0.0001;
 
 	/** Used to convert data values into colors */
 	protected ColorExtractor2 colorExtractor;
@@ -139,11 +140,13 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 
 				final double val = dataMatrix.getValue(row, col);
 
-				if (Math.abs(val - DataModel.NODATA) < PRECISION_LEVEL) {
+				if (Helper.nearlyEqual(val, DataModel.NODATA, EPSILON)) { 
+					//Math.abs(val - DataModel.NODATA) < EPSILON) {
 					continue;
 				}
 
-				if (Math.abs(val - DataModel.EMPTY) < PRECISION_LEVEL) {
+				if (Helper.nearlyEqual(val, DataModel.EMPTY, EPSILON)) { 
+					//Math.abs(val - DataModel.EMPTY) < EPSILON) {
 					continue;
 				}
 
@@ -235,19 +238,22 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 							final double thisVal = dataMatrix.getValue(j
 									+ source.x, actualGene);
 
-							if (Math.abs(thisVal - DataModel.EMPTY) < PRECISION_LEVEL) {
+							if (Helper.nearlyEqual(thisVal, DataModel.EMPTY, EPSILON)) {
+								//Math.abs(thisVal - DataModel.EMPTY) < EPSILON) {
 								val = DataModel.EMPTY;
 								count = 1;
 								break;
 							}
 
-							if (Math.abs(thisVal - DataModel.NODATA) > PRECISION_LEVEL) {
+							if (!Helper.nearlyEqual(thisVal, DataModel.EMPTY, EPSILON)) { 
+								//Math.abs(thisVal - DataModel.NODATA) > EPSILON) {
 								count++;
 								val += thisVal;
 							}
 						}
 
-						if (Math.abs(val - DataModel.EMPTY) < PRECISION_LEVEL) {
+						if (Helper.nearlyEqual(val, DataModel.EMPTY, EPSILON)) { 
+							//Math.abs(val - DataModel.EMPTY) < EPSILON) {
 							break;
 						}
 					}
@@ -307,13 +313,15 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 	@Override
 	public boolean isMissing(final int x, final int y) {
 
-		return (Math.abs(getValue(x, y) - DataModel.NODATA) < PRECISION_LEVEL);
+		return Helper.nearlyEqual(getValue(x, y), DataModel.NODATA, EPSILON); 
+				//(Math.abs(getValue(x, y) - DataModel.NODATA) < EPSILON);
 	}
 
 	@Override
 	public boolean isEmpty(final int x, final int y) {
 
-		return (Math.abs(getValue(x, y) - DataModel.EMPTY) < PRECISION_LEVEL);
+		return Helper.nearlyEqual(getValue(x, y), DataModel.EMPTY, EPSILON);
+				//(Math.abs(getValue(x, y) - DataModel.EMPTY) < EPSILON);
 	}
 
 	/** how many rows are there to draw? */

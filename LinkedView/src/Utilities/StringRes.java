@@ -123,7 +123,7 @@ public class StringRes {
 	public static final String lbl_ZoomColLabels = "Zoom to see column labels";
 	public static final String lbl_ZoomRowLabels = "Zoom to see row labels";
 
-	// Cluster Options
+	/* Distance Measures */
 	public static final String cluster_DoNot = "Do not cluster";
 	public static final String cluster_pearsonUn = "Pearson Correlation "
 			+ "(uncentered)";
@@ -136,6 +136,9 @@ public class StringRes {
 	public static final String cluster_spearman = "Spearman Ranked Correlation";
 	public static final String cluster_euclidean = "Euclidean Distance";
 	public static final String cluster_cityBlock = "City Block Distance";
+	
+	/* Linkage Methods */
+	public static final String cluster_link_Avg = "Average Linkage";
 	
 	// Cluster Info
 	public static final String clusterInfo_Single_Similarity = "Joins the " +

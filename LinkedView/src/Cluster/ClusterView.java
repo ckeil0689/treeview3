@@ -40,6 +40,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
 
+import edu.stanford.genetics.treeview.LogBuffer;
 import Utilities.GUIFactory;
 import Utilities.StringRes;
 
@@ -451,21 +452,21 @@ public class ClusterView {
 	/**
 	 * Returns the selected similarity measure for the rows as a String.
 	 * 
-	 * @return String choice
+	 * @return int choice
 	 */
-	public String getRowSimilarity() {
+	public int getRowSimilarity() {
 
-		return (String) rowDistChooser.getSelectedItem();
+		return rowDistChooser.getSelectedIndex();
 	}
 
 	/**
 	 * Returns the selected similarity measure for the columns as a String.
 	 * 
-	 * @return String choice
+	 * @return int choice
 	 */
-	public String getColSimilarity() {
+	public int getColSimilarity() {
 
-		return (String) colDistChooser.getSelectedItem();
+		return colDistChooser.getSelectedIndex();
 	}
 
 	/**
@@ -513,6 +514,7 @@ public class ClusterView {
 	 */
 	public static void setPBarMax(final int max) {
 
+		LogBuffer.println("Setting pBar max: " + max);
 		pBar.setMaximum(max); 
 	}
 

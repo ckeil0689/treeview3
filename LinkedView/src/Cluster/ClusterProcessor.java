@@ -1,5 +1,8 @@
 package Cluster;
 
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
@@ -10,132 +13,302 @@ import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 
 /**
- * This class takes the original uploaded dataArray passed in the constructor
- * and manipulates it according to mathematical principles of hierarchical
- * clustering. It generates files to display dendrograms (.gtr and .atr) as well
- * as a reordered original data file (.cdt)
- * 
+ * This class takes the original uploaded dataset and manipulates it 
+ * according to mathematical principles of hierarchical clustering. 
+ * It generates files to display dendrograms (.gtr and .atr) as well
+ * as a reordered original data file (.cdt).
  * @author CKeil
  * 
  */
 public class ClusterProcessor {
 
 	private final DataModel tvModel;
-	private final SwingWorker<String[], Void> worker;
+	private int pBarCount;
 
 	/**
-	 * Main constructor
 	 * 
-	 * @param cView
 	 * @param model
 	 */
-	public ClusterProcessor(final DataModel model, 
-			final SwingWorker<String[], Void> worker) {
+	public ClusterProcessor(final DataModel model) {
 
 		this.tvModel = model;
-		this.worker = worker;
+		this.pBarCount = 0;
 	}
-
+	
 	/**
-	 * Method to execute one of the Hierarchical Clustering algorithms.
-	 * 
-	 * @param distMatrix The calculated distance matrix to be clustered.
-	 * @param axis The matrix axis to be clustered.
-	 * @param linkageMethod The linkage method to be used.
-	 * @return String[] List of reordered matrix elements.
-	 */
-	public String[] hCluster(final double[][] distMatrix, 
-			final int axis, final String linkageMethod) {
-
-		String fileName = tvModel.getSource().substring(0, 
-				tvModel.getSource().length() - 4);
-		
-		final HierarchicalCluster cGen = new HierarchicalCluster(fileName,
-				linkageMethod, distMatrix, axis, worker);
-
-		cGen.cluster();
-
-		return cGen.getReorderedList();
-	}
-
-	/**
-	 * Method to execute the K-Means clustering algorithm.
-	 * 
-	 * @param tvModel The data model. Needed for headerInfo arrays.
-	 * @param distMatrix The calculated distance matrix. 
-	 * @param axis The matrix axis on which operations will be performed.
-	 * @param groupNum Number of groups to be formed (k).
-	 * @param iterations Number of iterations to be done.
+	 * Starts a SwingWorker thread to do the clustering and waits for it
+	 * to return a String array containing the reordered axis elements.
+	 * @param distMatrix
+	 * @param linkMethod
+	 * @param spinnerInput
+	 * @param hierarchical
+	 * @param axis
 	 * @return
 	 */
-	public String[] kmCluster(final double[][] distMatrix, final int axis,
-			final int groupNum, final int iterations) {
-
-		final KMeansCluster cGen = new KMeansCluster(tvModel, distMatrix, 
-				axis, groupNum, iterations, worker);
-
-		cGen.cluster();
-
-		return cGen.getReorderedList();
-	}
-
-	/**
-	 * This method uses the unformatted matrix data list and splits it up into
-	 * the columns.
-	 * 
-	 * @param unformattedData The non-formatted, loaded data.
-	 * @return
-	 */
-	public double[][] formatColData(final double[][] unformattedData) {
-
-		final DataFormatter formattedData = new DataFormatter();
-
-		return formattedData.splitColumns(unformattedData);
-	}
-
-	/**
-	 * Calculates the distance matrix according to the chosen method.
-	 * 
-	 * @param distMeasure
-	 * @return
-	 */
-	public double[][] calculateDistance(final String distMeasure, 
+	public String[] clusterAxis(double[][] distMatrix, String linkMethod, 
+			final Integer[] spinnerInput, boolean hierarchical, 
 			final int axis) {
-
-		double[][] data = null;
-		if (axis == ClusterController.ROW) {
-			data = ((TVDataMatrix) tvModel.getDataMatrix()).getExprData();
-
-		} else {
-			data = formatColData(((TVDataMatrix) tvModel.getDataMatrix())
-					.getExprData());
+		
+		try {
+			LogBuffer.println("Starting clusterAxis(): " + axis);
+			ClusterWorker clusterWorker = new ClusterWorker(distMatrix, 
+					linkMethod, spinnerInput, hierarchical, axis);
+			clusterWorker.execute();
+			
+			return clusterWorker.get();
+			
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+			LogBuffer.logException(e);
+			LogBuffer.println(e.getLocalizedMessage());
+			return new String[]{"No clustered data."};
 		}
+	}
+	
+	/**
+	 * Creates a SwingWorker to calculate the distance matrix for the loaded
+	 * data.
+	 * @param distMeasure
+	 * @param axis
+	 * @return
+	 */
+	public double[][] calcDistance(int distMeasure, int axis) {
+		
+		try {
+			DistanceWorker distWorker = new DistanceWorker(distMeasure,axis);
+			distWorker.execute();
+			
+			return distWorker.get();
+			
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+			LogBuffer.logException(e);
+			LogBuffer.println(e.getLocalizedMessage());
+			return new double[][] {{0}, {0}};
+		}
+	}
 
-		if (data != null) {
-			final DistMatrixCalculator dCalc = new DistMatrixCalculator(data, 
-					distMeasure, axis, worker);
+	/**
+	 * General cluster method that starts a dedicated SwingWorker method
+	 * which runs the calculations in the background. This allows for 
+	 * updates of the ClusterView GUI, e.g. the JProgressBar. If it 
+	 * finishes after the calculations were cancelled by the user, 
+	 * it let's the cluster dialog know so it can respond appropriately.
+	 * Input data is translated into output data here.
+	 * TODO Take switch statement outside the loop.
+	 */
+	class DistanceWorker extends SwingWorker<double[][], Integer> {
 
-			try {
-				dCalc.measureDistance();
+		private final int distMeasure;
+		private final int axis;
+		private final int max;
+
+		public DistanceWorker(final int distMeasure, final int axis) {
+
+			this.distMeasure = distMeasure;
+			this.axis = axis;
+			
+			String axisPrefix = "N/A";
+			if(axis == ClusterController.ROW) {
+				this.max = ((TVDataMatrix) tvModel.getDataMatrix()).getNumRow();
+				axisPrefix = "row";
 				
-			} catch(NumberFormatException e) {
-				String message = "Measuring the distances experienced "
-						+ "an issue. Check log messages to see the cause.";
-				
-				JOptionPane.showMessageDialog(JFrame.getFrames()[0], message, 
-						"Error", JOptionPane.ERROR_MESSAGE);
-				LogBuffer.logException(e);
+			} else {
+				this.max = ((TVDataMatrix) tvModel.getDataMatrix()).getNumCol();
+				axisPrefix = "column";
 			}
 			
-			return dCalc.getDistanceMatrix();
+			LogBuffer.println("Max of " + axisPrefix + ": " + max);
+			
+			ClusterView.setLoadText("Calculating " + axisPrefix 
+					+ " Distance Matrix...");
+		}
+		
+		@Override
+        protected void process(List<Integer> chunks) {
+            
+			int i = chunks.get(chunks.size()-1);
+            ClusterView.updatePBar(pBarCount + i);
+        }
 
-		} else {
-			String message = "Data could not be retrieved "
-					+ "for distance calculation.";
-			JOptionPane.showMessageDialog(JFrame.getFrames()[0], message, 
-					"Alert", JOptionPane.WARNING_MESSAGE);
-			LogBuffer.println("Alert: " + message);
-			return null;
+		@Override
+		public double[][] doInBackground() {
+			
+			/* Calculate distance matrix */
+			double[][] data = null;
+			if (axis == ClusterController.ROW) {
+				data = ((TVDataMatrix)tvModel.getDataMatrix()).getExprData();
+
+			} else {
+				data = formatColData(((TVDataMatrix) tvModel.getDataMatrix())
+						.getExprData());
+			}
+
+			if (data != null) {
+				final DistMatrixCalculator dCalc = 
+						new DistMatrixCalculator(data, distMeasure, axis);
+
+				try {
+					String axisPrefix = 
+							(axis == ClusterController.ROW) ? "Row" : "Column";
+					ClusterView.setLoadText("Calculating " + axisPrefix 
+							+ " Distance Matrix...");
+					
+					// Choice of method here instead of in loop?
+					
+					/* Loop generates rows for distance matrix */
+					/* take a row */
+					for (int i = 0; i < data.length; i++) {
+			 
+						if(isCancelled()) break;
+						publish(i);
+						dCalc.calcRow(i);
+					}
+					
+					return dCalc.getDistanceMatrix();
+					
+				} catch (NumberFormatException e) {
+					String message = "Measuring the distances experienced "
+							+ "an issue. Check log messages to see "
+							+ "the cause.";
+					
+					JOptionPane.showMessageDialog(JFrame.getFrames()[0], 
+							message, "Error", JOptionPane.ERROR_MESSAGE);
+					LogBuffer.logException(e);
+				}
+			} else {
+				String message = "Data could not be retrieved for "
+						+ "distance calculation.";
+				JOptionPane.showMessageDialog(JFrame.getFrames()[0], 
+						message, "Alert", JOptionPane.WARNING_MESSAGE);
+				LogBuffer.println("Alert: " + message);
+			}
+			
+			LogBuffer.println("Distance matrix could not be calculated and"
+					+ " was set to values of 0.");
+			return new double[][] {{0}, {0}};
+		}
+		
+		@Override
+		public void done() {
+			
+			/* keep track of overall progress */
+			pBarCount += max;
+			LogBuffer.println("pBarCount: " + pBarCount);
+		}
+		
+		/**
+		 * This method uses the unformatted matrix data list and splits 
+		 * it up into the columns.
+		 * 
+		 * @param unformattedData The non-formatted, loaded data.
+		 * @return
+		 */
+		public double[][] formatColData(final double[][] unformattedData) {
+
+			final DataFormatter formattedData = new DataFormatter();
+
+			return formattedData.splitColumns(unformattedData);
+		}
+	}
+	
+	/**
+	 * General cluster method that starts a dedicated SwingWorker method
+	 * which runs the calculations in the background. This allows for 
+	 * updates of the ClusterView GUI, e.g. the JProgressBar. If it 
+	 * finishes after the calculations were cancelled by the user, 
+	 * it let's the cluster dialog know so it can respond appropriately.
+	 * Input data is translated into output data here.
+	 */
+	class ClusterWorker extends SwingWorker<String[], Integer> {
+
+		private final double[][] distMatrix;
+		private final String linkMethod;
+		private final Integer[] spinnerInput;
+		private final int axis;
+		private final int max;
+		private boolean hierarchical;
+
+		public ClusterWorker(final double[][] distMatrix, String linkMethod, 
+				final Integer[] spinnerInput, boolean hierarchical, 
+				final int axis) {
+
+			LogBuffer.println("Initializing ClusterWorker");
+			this.distMatrix = distMatrix;
+			this.linkMethod = linkMethod;
+			this.spinnerInput = spinnerInput;
+			this.hierarchical = hierarchical;
+			this.axis = axis;
+			this.max = distMatrix.length - 1; // 1 cluster remains
+		}
+		
+		@Override
+        protected void process(List<Integer> chunks) {
+            
+			int i = chunks.get(chunks.size()-1);
+            ClusterView.updatePBar(pBarCount + i);
+        }
+
+		@Override
+		public String[] doInBackground() {
+			
+			/* Hierarchical */
+			if (hierarchical) {
+				LogBuffer.println("Getting source file name.");
+				
+				String fileName = tvModel.getSource().substring(0, 
+						tvModel.getSource().length() - 4);
+				
+				HierCluster cGen = new HierCluster(fileName, linkMethod, 
+								distMatrix, axis);
+				
+				LogBuffer.println("Starting cluster.");
+				/* 
+				 * Continue process until distMatrix has a size of 1, 
+				 * This array is the final cluster. Initially every row is 
+				 * its own cluster (bottom-up clustering).
+				 */
+				int loopNum = 0;
+				int distMatrixLength = distMatrix.length;
+				
+				while (distMatrixLength > 1 && !isCancelled()) {
+					
+					distMatrixLength = cGen.cluster();
+					publish(loopNum);
+					loopNum++;
+				}
+				
+				/* Return empty String[] if user cancels operation */
+				if(isCancelled()) return new String[]{""};
+				
+				/* Write the tree file */
+				LogBuffer.println("Writing clustered data.");
+				cGen.finish();
+
+				return cGen.getReorderedList();
+			} 
+			/* K-Means */
+			else {
+				KMeansCluster cGen = new KMeansCluster(tvModel, distMatrix, 
+						axis, spinnerInput[0], spinnerInput[1], this);
+
+				cGen.cluster();
+
+				return cGen.getReorderedList();
+			}
+		}
+		
+		@Override
+		public void done() {
+			
+			pBarCount += max;
+			LogBuffer.println("pBarCount: " + pBarCount);
+			if (isCancelled()) {
+				LogBuffer.println("Clustering has been cancelled.");
+
+			} else {
+				LogBuffer.println("Cluster successfully completed.");
+			}
 		}
 	}
 }

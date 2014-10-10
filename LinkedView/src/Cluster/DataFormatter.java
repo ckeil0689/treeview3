@@ -13,10 +13,6 @@ import edu.stanford.genetics.treeview.LogBuffer;
  */
 public class DataFormatter {
 
-	public DataFormatter() {
-
-	}
-
 	// getting the columns from raw data array
 	public double[][] splitColumns(final double[][] rawData) {
 
@@ -33,12 +29,9 @@ public class DataFormatter {
 
 		// Setting up ProgressBar
 		ClusterView.setLoadText("Finding data columns...");
-		ClusterView.setPBarMax(nCols);
 
 		// Iterate through all columns
 		for (int j = 0; j < nCols; j++) {
-
-			ClusterView.updatePBar(j);
 
 			final double[] sArray = new double[nRows];
 

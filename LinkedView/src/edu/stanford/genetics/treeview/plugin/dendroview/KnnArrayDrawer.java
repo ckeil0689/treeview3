@@ -76,11 +76,11 @@ public class KnnArrayDrawer extends DoubleArrayDrawer {
 			for (int col = 0; col < nCol; col++) {
 
 				final double val = dataMatrix.getValue(row, col);
-				if (Math.abs(val - DataModel.NODATA) < PRECISION_LEVEL) {
+				if (Math.abs(val - DataModel.NODATA) < EPSILON) {
 					continue;
 				}
 
-				if (Math.abs(val - DataModel.EMPTY) < PRECISION_LEVEL) {
+				if (Math.abs(val - DataModel.EMPTY) < EPSILON) {
 					continue;
 				}
 				mean += Math.abs(val);
@@ -159,18 +159,18 @@ public class KnnArrayDrawer extends DoubleArrayDrawer {
 								actualGene = geneOrder[actualGene];
 							final double thisVal = dataMatrix.getValue(j
 									+ source.x, actualGene);
-							if (Math.abs(thisVal - DataModel.EMPTY) < PRECISION_LEVEL) {
+							if (Math.abs(thisVal - DataModel.EMPTY) < EPSILON) {
 								val = DataModel.EMPTY;
 								count = 1;
 								break;
 							}
 
-							if (Math.abs(thisVal - DataModel.NODATA) > PRECISION_LEVEL) {
+							if (Math.abs(thisVal - DataModel.NODATA) > EPSILON) {
 								count++;
 								val += thisVal;
 							}
 						}
-						if (Math.abs(val - DataModel.EMPTY) < PRECISION_LEVEL) {
+						if (Math.abs(val - DataModel.EMPTY) < EPSILON) {
 							break;
 						}
 					}
