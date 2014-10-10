@@ -821,31 +821,6 @@ public class TVModel extends Observable implements DataModel {
 					LoadException.INTPARSE);
 		}
 	}
-	
-	/**
-	 * 
-	 * 
-	 * @param fileSet
-	 *            fileset to load
-	 * @throws ExecutionException
-	 * @throws InterruptedException
-	 * 
-	 */
-	public void loadNoGUI(final FileSet fileSet) throws LoadException,
-			InterruptedException, ExecutionException, OutOfMemoryError {
-
-		resetState();
-		setSource(fileSet);
-
-		NoGUILoader loader = new NoGUILoader(this);
-		loader.load();
-		loader = null;
-
-		if (!isLoaded()) {
-			throw new LoadException("Loading Cancelled", 
-					LoadException.INTPARSE);
-		}
-	}
 
 	/**
 	 * @param b
