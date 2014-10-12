@@ -474,11 +474,11 @@ public class DendroView2 implements Observer, DendroPanel {
 
 	public void addSearchButtonListener(final ActionListener l) {
 
-		for( ActionListener al : tvFrame.getSearchButton().getActionListeners() ) {
-			tvFrame.getSearchButton().removeActionListener( al );
+		for( ActionListener al : tvFrame.getSearchBtn().getActionListeners() ) {
+			tvFrame.getSearchBtn().removeActionListener( al );
 	    }
 		LogBuffer.println("Adding Search Button Listener");
-		tvFrame.getSearchButton().addActionListener(l);
+		tvFrame.getSearchBtn().addActionListener(l);
 	}
 
 	public void addTreeButtonListener(final ActionListener l) {

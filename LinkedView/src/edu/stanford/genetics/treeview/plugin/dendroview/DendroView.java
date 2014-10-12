@@ -477,9 +477,17 @@ public class DendroView implements Observer, DendroPanel {
 		getDendroPane().addComponentListener(l);
 	}
 
-	public void addSearchButtonListener(final ActionListener l) {
+	/**
+	 * First removes all listeners from searchBtn, then adds one new listener.
+	 * @param l
+	 */
+	public void addSearchBtnListener(final ActionListener l) {
 
-		tvFrame.getSearchButton().addActionListener(l);
+		for( ActionListener al : tvFrame.getSearchBtn().getActionListeners() ) {
+			tvFrame.getSearchBtn().removeActionListener( al );
+	    }
+		LogBuffer.println("Adding Search Button Listener");
+		tvFrame.getSearchBtn().addActionListener(l);
 	}
 
 	public void addTreeBtnListener(final ActionListener l) {

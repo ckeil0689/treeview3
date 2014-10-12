@@ -127,7 +127,7 @@ public class DendroController implements ConfigNodePersistent {
 	public void addMenuBtnListeners() {
 
 		LogBuffer.println("Adding MenuBtnListeners.");
-		dendroView.addSearchButtonListener(new SearchButtonListener());
+		dendroView.addSearchBtnListener(new SearchButtonListener());
 		dendroView.addTreeBtnListener(new TreeBtnListener());
 	}
 

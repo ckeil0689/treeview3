@@ -147,6 +147,11 @@ public class ClusterProcessor {
 			if (data != null) {
 				final DistMatrixCalculator dCalc = 
 						new DistMatrixCalculator(data, distMeasure, axis);
+				
+				if(distMeasure == 5) {// Spearman --> change to final variables
+					
+					dCalc.spearman();
+				}
 
 				try {
 					String axisPrefix = 
