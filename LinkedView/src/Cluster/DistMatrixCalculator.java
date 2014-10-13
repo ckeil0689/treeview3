@@ -21,13 +21,19 @@ import edu.stanford.genetics.treeview.LogBuffer;
 public class DistMatrixCalculator {
 
 	private final double EPSILON = 0.0001;
-	private final double[][] data;
+	
+	/* 
+	 * reference for the matrix to be clustered. Spearman Rank generates
+	 * the rank matrix, which needs to be clustered. Without reference variable,
+	 * the data matrix would be mutated.
+	 */
+	private double[][] taskData;
 
 	/* The user selected distance measure */
 	private final int distMeasure;
 	
 	/* The distance matrix object to be filled and returned */
-	private double[][] distMatrix;
+	private final double[][] distMatrix;
 
 	/**
 	 * Constructs a DistMatrixCalculator which is used to obtain
@@ -44,7 +50,7 @@ public class DistMatrixCalculator {
 
 		LogBuffer.println("Initializing DistMatrixCalculator.");
 		
-		this.data = data;
+		this.taskData = data;
 		this.distMatrix = new double[data.length][];
 		this.distMeasure = distMeasure;
 	}
@@ -70,7 +76,7 @@ public class DistMatrixCalculator {
 		/* second row for comparison */
 		for (int j = 0; j < limit; j++) {
 
-			rowDist[j] = calcPearson(data[limit], data[j], centered, 
+			rowDist[j] = calcPearson(taskData[limit], taskData[j], centered, 
 					absolute);
 		}
 
@@ -149,97 +155,91 @@ public class DistMatrixCalculator {
 	
 
 	/**
-	 * TODO Some massive errors in here, correct them!
 	 * This method runs the Spearman Ranked distance measure. It rewrites the
 	 * data object with ranks for the values in the matrix rows.
 	 * Later on, pearson correlation will be called on the rewritten data
 	 * object. 
 	 */
-	public void spearman() {
+	public double[] spearman(double[] row) {
 		
-		/*
-		 * Step 1: Go through each row.
-		 * Step 2: Rank the values in the data array by increasing 
-		 * numerical value.
-		 * Step 3: For all identical values, make rank the average rank.
-		 * 
-		 * If the value is the same as the 'next' one in the sorted array 
-		 * (e.g. 0.0 following 0.0), it doesn't matter to what index in the 
-		 * array it corresponds to. All of the same values will be assigned
-		 * the same rank, which only depends on the number of equal values.
-		 * The assigned rank will be the average rank of all these values.
-		 * If two 1.3s are in the data, and the first is rank 5, 
-		 * the second rank 6, then their actual recorded rank will be 5.5.
-		 */
-
+	/*
+	 * Step 1: Go through each row.
+	 * Step 2: Rank the values in the data array by increasing 
+	 * numerical value.
+	 * Step 3: For all identical values, make rank the average rank.
+	 * 
+	 * If the value is the same as the 'next' one in the sorted array 
+	 * (e.g. 0.0 following 0.0), it doesn't matter to what index in the 
+	 * array it corresponds to. All of the same values will be assigned
+	 * the same rank, which only depends on the number of equal values.
+	 * The assigned rank will be the average rank of all these values.
+	 * If two 1.3s are in the data, and the first is rank 5, 
+	 * the second rank 6, then their actual recorded rank will be 5.5.
+	 */
+		double[] rankRow = new double[row.length];
 		
-		/* Iterate over every row of the matrix. */
-		for (int i = 0; i < data.length; i++) {
+		/* Make a copy row to avoid mutation */
+		final double[] copyRow = row.clone();
 
-			double[] row = data[i]; 
-			/* Make a copy row to avoid mutation */
-			final double[] copyRow = data[i].clone();
-
-			/* Sort the copy row */
-			Arrays.sort(copyRow);
+		/* Sort the copy row */
+		Arrays.sort(copyRow);
+		
+		double temp;
+		int countDuplicates = 1;
+		int duplicateRankSum = 0;
+		/* Iterate over sorted copy row to assign ranks */
+		for (int j = 0; j < copyRow.length; j++) {
 			
-			double temp;
-			int countDuplicates = 1;
-			int duplicateRankSum = 0;
-			/* Iterate over sorted copy row to assign ranks */
-			for (int j = 0; j < copyRow.length; j++) {
-				
+			temp = copyRow[j];
+			
+			/*
+			 * Check if following values in array are identical.
+			 */	
+			while (j + 1 < copyRow.length 
+					&& Helper.nearlyEqual(copyRow[j + 1], temp, EPSILON)) {
+				countDuplicates++;
+				duplicateRankSum += j;
 				temp = copyRow[j];
-				
-				/*
-				 * Check if following values in array are identical.
-				 */	
-				while (j + 1 < copyRow.length 
-						&& Helper.nearlyEqual(copyRow[j + 1], temp, EPSILON)) {
-					countDuplicates++;
-					duplicateRankSum += j;
-					temp = copyRow[j];
-					j++;
-				}
-				
-				/* Fill duplicate values with average rank */
-				if (countDuplicates > 1) {
-					double avgRank = duplicateRankSum / (countDuplicates * 1.0);
-					
-					for(int k = 0; k < row.length; k++) {
-						
-						if(Helper.nearlyEqual(row[k], temp, EPSILON)) {
-							row[k] = avgRank;  
-						}
-					}
-					
-					/* Don't forget to set new temp */
-					temp = copyRow[j];
-				} 
-				
-				/* Assign rank if value is unique */
-				else {
-					/* Find index of current copy row element in original */
-					final int index = find(row, copyRow[j]);
-
-					/* Write rank over original value at found index. */
-					if (index != -1) {
-						row[index] = j + 1;  // j + 1 is the rank! 
-						temp = copyRow[j];
-					} else {
-						LogBuffer.println("Spearman rank failed due to a "
-								+ "ranking issue.");
-						break;
-					}
-				}
-				
-				/* reset duplicate params */
-				countDuplicates = 1;
-				duplicateRankSum = 0;
+				j++;
 			}
+			
+			/* Fill duplicate values with average rank */
+			if (countDuplicates > 1) {
+				double avgRank = duplicateRankSum / (countDuplicates * 1.0);
+				
+				for(int k = 0; k < row.length; k++) {
+					
+					if(Helper.nearlyEqual(row[k], temp, EPSILON)) {
+						rankRow[k] = avgRank; 	
+					} 
+				}
+				
+				/* Don't forget to set new temp */
+				temp = copyRow[j];
+			} 
+			
+			/* Assign rank if value is unique */
+			else {
+				/* Find index of current copy row element in original */
+				final int index = find(row, copyRow[j]);
+
+				/* Write rank over original value at found index. */
+				if (index != -1) {
+					rankRow[index] = j + 1;  // j + 1 is the rank! 
+					temp = copyRow[j];
+				} else {
+					LogBuffer.println("Spearman rank failed due to a "
+							+ "ranking issue.");
+					break;
+				}
+			}
+			
+			/* reset duplicate params */
+			countDuplicates = 1;
+			duplicateRankSum = 0;
 		}
 		
-		LogBuffer.println("Ranking has completed.");
+		return rankRow;
 	}
 
 	/**
@@ -255,12 +255,12 @@ public class DistMatrixCalculator {
 		if(isEuclid) {
 			for (int j = 0; j < limit; j++) {
 
-				rowDist[j] = calcEuclid(data[limit], data[j]);
+				rowDist[j] = calcEuclid(taskData[limit], taskData[j]);
 			}
 		} else {
 			for (int j = 0; j < limit; j++) {
 
-				rowDist[j] = calcManhattan(data[limit], data[j]);
+				rowDist[j] = calcManhattan(taskData[limit], taskData[j]);
 			}
 		}
 
@@ -284,7 +284,7 @@ public class DistMatrixCalculator {
 			sum += diff * diff; // using Math.pow is massive slow down...
 		}
 		
-		return sum/ data.length;
+		return sum/ taskData.length;
 	}
 	
 	/**
@@ -316,9 +316,6 @@ public class DistMatrixCalculator {
 
 		for (int i = 0; i < array.length; i++) {
 
-			/*
-			 * TODO What if the same values appear multiple times?
-			 */
 			if (Helper.nearlyEqual(array[i], value, EPSILON)) {
 				return i;
 			}
@@ -391,6 +388,11 @@ public class DistMatrixCalculator {
 		JOptionPane.showMessageDialog(JFrame.getFrames()[0], 
 				message, "Alert", JOptionPane.WARNING_MESSAGE);
 		LogBuffer.println("Alert: " + message);
+	}
+	
+	public void setTaskData(double[][] data) {
+		
+		this.taskData = data;
 	}
 
 	/** 

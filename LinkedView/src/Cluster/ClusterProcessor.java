@@ -101,27 +101,21 @@ public class ClusterProcessor {
 
 		private final int distMeasure;
 		private final int axis;
-		private final int max;
+		private final int axisSize;
 
 		public DistanceWorker(final int distMeasure, final int axis) {
 
 			this.distMeasure = distMeasure;
 			this.axis = axis;
 			
-			String axisPrefix = "N/A";
 			if(axis == ClusterController.ROW) {
-				this.max = ((TVDataMatrix) tvModel.getDataMatrix()).getNumRow();
-				axisPrefix = "row";
+				this.axisSize = 
+						((TVDataMatrix) tvModel.getDataMatrix()).getNumRow();
 				
 			} else {
-				this.max = ((TVDataMatrix) tvModel.getDataMatrix()).getNumCol();
-				axisPrefix = "column";
+				this.axisSize = 
+						((TVDataMatrix) tvModel.getDataMatrix()).getNumCol();
 			}
-			
-			LogBuffer.println("Max of " + axisPrefix + ": " + max);
-			
-			ClusterView.setLoadText("Calculating " + axisPrefix 
-					+ " Distance Matrix...");
 		}
 		
 		@Override
@@ -148,19 +142,29 @@ public class ClusterProcessor {
 				final DistMatrixCalculator dCalc = 
 						new DistMatrixCalculator(data, distMeasure, axis);
 				
+				/* Ranking data if Spearman was chosen */
 				if(distMeasure == 5) {// Spearman --> change to final variables
 					
-					dCalc.spearman();
+					double[][] rankMatrix = 
+							new double[data.length][data[0].length];
+					
+					/* Iterate over every row of the matrix. */
+					for (int i = 0; i < rankMatrix.length; i++) {
+						
+						if(isCancelled()) break;
+						publish(i);
+						rankMatrix[i] = dCalc.spearman(data[i]);
+					}
+					
+					dCalc.setTaskData(rankMatrix);
+					
+					/* Keep track of progress */
+					pBarCount += axisSize;
+					
+					LogBuffer.println("Ranking has completed.");
 				}
 
 				try {
-					String axisPrefix = 
-							(axis == ClusterController.ROW) ? "Row" : "Column";
-					ClusterView.setLoadText("Calculating " + axisPrefix 
-							+ " Distance Matrix...");
-					
-					// Choice of method here instead of in loop?
-					
 					/* Loop generates rows for distance matrix */
 					/* take a row */
 					for (int i = 0; i < data.length; i++) {
@@ -198,7 +202,7 @@ public class ClusterProcessor {
 		public void done() {
 			
 			/* keep track of overall progress */
-			pBarCount += max;
+			pBarCount += axisSize;
 			LogBuffer.println("pBarCount: " + pBarCount);
 		}
 		

@@ -121,13 +121,24 @@ public class ClusterController {
 			int rowSimilarity = clusterView.getRowSimilarity();
 			int colSimilarity = clusterView.getColSimilarity();
 			
+			int rows = tvModel.getGeneHeaderInfo().getNumHeaders();
+			int cols = tvModel.getArrayHeaderInfo().getNumHeaders();
+			
 			/* Set maximum for progressbar */
 			if(rowSimilarity != 0) {
-				pBarMax += (2 * tvModel.getGeneHeaderInfo().getNumHeaders());
+				pBarMax += (2 * rows);
+				
+				/* In case of ranking */
+				if(rowSimilarity == 5) pBarMax += rows;
+				
 			}
 			
 			if(colSimilarity != 0) {
 				pBarMax += (2 * tvModel.getArrayHeaderInfo().getNumHeaders());
+				
+				/* In case of ranking */
+				if(colSimilarity == 5) pBarMax += cols;
+				
 			}
 			
 			ClusterView.setPBarMax(pBarMax);
@@ -145,6 +156,7 @@ public class ClusterController {
 			/* Row axis cluster */
 			double[][] distMatrix = null;
 			if (checkSelections(rowSimilarity, ROW)) {
+				
 				/* ProgressBar label */
 				publish("Calculating row distances...");
 				
