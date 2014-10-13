@@ -23,53 +23,29 @@
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.ScrollPane;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.concurrent.ExecutionException;
+import java.util.prefs.Preferences;
 
-import javax.imageio.ImageIO;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JSplitPane;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
-import net.miginfocom.swing.MigLayout;
-import edu.stanford.genetics.treeview.BrowserControl;
-import edu.stanford.genetics.treeview.CdtFilter;
-import edu.stanford.genetics.treeview.ConfigNode;
-import edu.stanford.genetics.treeview.ConfigNodePersistent;
-import edu.stanford.genetics.treeview.DataModel;
-import edu.stanford.genetics.treeview.DummyConfigNode;
-import edu.stanford.genetics.treeview.ExportException;
-import edu.stanford.genetics.treeview.FileSet;
-import edu.stanford.genetics.treeview.GUIParams;
+import Utilities.GUIFactory;
+import Utilities.StringRes;
+import edu.stanford.genetics.treeview.DendroPanel;
 import edu.stanford.genetics.treeview.HeaderInfo;
-import edu.stanford.genetics.treeview.HeaderSummary;
-import edu.stanford.genetics.treeview.LoadException;
-import edu.stanford.genetics.treeview.MainPanel;
-import edu.stanford.genetics.treeview.MainProgramArgs;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelView;
-import edu.stanford.genetics.treeview.ReorderedTreeSelection;
 import edu.stanford.genetics.treeview.TabbedSettingsPanel;
-import edu.stanford.genetics.treeview.TreeDrawerNode;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.TreeviewMenuBarI;
@@ -77,12 +53,11 @@ import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.core.ArrayFinderBox;
 import edu.stanford.genetics.treeview.core.GeneFinderBox;
 import edu.stanford.genetics.treeview.core.HeaderFinderBox;
-import edu.stanford.genetics.treeview.model.AtrTVModel;
-import edu.stanford.genetics.treeview.model.ReorderedDataModel;
-import edu.stanford.genetics.treeview.model.TVModel;
-//Explicitly imported because error (unclear TVModel reference) was thrown
 
 /**
+ * TODO Refactor this JavaDoc. 
+ * It's not applicable to the current program anymore.
+ * 
  * This class encapsulates a dendrogram view, which is the classic Eisen
  * treeview. It uses a drag grid panel to lay out a bunch of linked
  * visualizations of the data, a la Eisen. In addition to laying out components,
@@ -100,104 +75,89 @@ import edu.stanford.genetics.treeview.model.TVModel;
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.7 $ $Date: 2009-03-23 02:46:51 $
  */
-public class DendroView implements ConfigNodePersistent, ComponentListener, 
-MainPanel, Observer {
-
-	private static ImageIcon treeviewIcon = null;
+public class DendroView implements Observer, DendroPanel {
 
 	// Instance Variables
 	protected int gtr_div_size = 0;
 	protected int atr_div_size = 0;
 
 	// Container JFrame
-	private JFrame applicationFrame;
 	protected TreeViewFrame tvFrame;
-	
+
 	// Name
 	private String name;
-	
+
 	// Main container JPanel
-	private JPanel dendroPane;
+	private final JPanel dendroPane;
 
 	protected ScrollPane panes[];
-	protected boolean loaded;
 
 	// Map Views
-	protected GlobalView globalview;
+	private final GlobalView2 globalview;
 
 	// Trees
-	protected GTRView gtrview;
-	protected ATRView atrview;
+	protected final GTRView gtrview;
+	protected final ATRView atrview;
 
-	// Row and Column names
-	protected TextViewManager textview;
-	protected ArrayNameView arraynameview;
+	// Row and column names
+	protected final TextView textview;
+	protected final ArrayNameView arraynameview;
 
 	protected JScrollBar globalXscrollbar;
 	protected JScrollBar globalYscrollbar;
 
-	// Drawers
-	protected ArrayDrawer arrayDrawer;
-	protected InvertedTreeDrawer invertedTreeDrawer;
-	protected LeftTreeDrawer leftTreeDrawer;
-
-	// MapContainers
-	protected MapContainer globalXmap;
-	protected MapContainer globalYmap;
-
-//	protected MessagePanel statuspanel;
-	protected BrowserControl browserControl;
-	protected ConfigNode root;
-
-	// persistent popups
+	// Persistent popups
 	protected JDialog settingsFrame;
 	protected TabbedSettingsPanel settingsPanel;
 
-	/*
-	 * The following arrays allow translation to and from screen and DataMatrix
-	 * I had to add these in order to have gaps in the Dendroview of k-means
-	 */
-	private int[] arrayIndex = null;
-	private int[] geneIndex = null;
+	// JMenuItems
+	private JMenuItem colorMenuItem;
+	private JMenuItem annotationsMenuItem;
+	private JMenu matrixMenu;
 
-	// The model
-	private DataModel dataModel = null;
+	// JButtons
+	private JButton zoomBtn;
+	private JButton scaleIncX;
+	private JButton scaleIncY;
+	private JButton scaleDecX;
+	private JButton scaleDecY;
+	private JButton scaleDefaultAll;
+	
+	// GlobalView default sizes as ints to keep track.
+	private double gvWidth;
+	private double gvHeight;
+	
+	private double maxGVWidth;
+	private double maxGVHeight;
+
+	// Booleans
+	private boolean hasTrees = false;
 
 	// Selections
 	private TreeSelectionI geneSelection = null;
 	private TreeSelectionI arraySelection = null;
 
-	private ColorExtractor colorExtractor;
-	
-	// JMenuItems
-	private JMenuItem colorMenuItem;
-	private JMenuItem annotationsMenuItem;
-
 	/**
 	 * Chained constructor for the DendroView object note this will reuse any
 	 * existing MainView subnode of the documentconfig.
 	 * 
-	 * @param tVModel
-	 *            model this DendroView is to represent
 	 * @param vFrame
 	 *            parent ViewFrame of DendroView
 	 */
-	public DendroView(TreeViewFrame tvFrame) {
+	public DendroView(final TreeViewFrame tvFrame) {
 
-		this(null, tvFrame, "Dendrogram");
+		this(tvFrame, "Dendrogram");
 	}
 
-	public DendroView(final ConfigNode root, final TreeViewFrame tvFrame) {
+	public DendroView(final Preferences root, final TreeViewFrame tvFrame) {
 
-		this(root, tvFrame, "Dendrogram");
+		this(tvFrame, "Dendrogram");
 	}
 
 	/**
 	 * Constructor for the DendroView object which binds to an explicit
 	 * confignode.
 	 * 
-	 * @param dataModel
-	 *            model this DendroView is to represent
 	 * @param root
 	 *            Confignode to which to bind this DendroView
 	 * @param vFrame
@@ -205,161 +165,47 @@ MainPanel, Observer {
 	 * @param name
 	 *            name of this view.
 	 */
-	public DendroView(final ConfigNode root, final TreeViewFrame tvFrame, 
-			final String name) {
+	public DendroView(final TreeViewFrame tvFrame, final String name) {
 
 		this.tvFrame = tvFrame;
-		this.applicationFrame = tvFrame.getAppFrame();
-		this.dataModel = (TVModel) tvFrame.getDataModel();
 		this.name = "DendroView";
 
-		dendroPane = new JPanel();
-		dendroPane.setLayout(new MigLayout("ins 0"));
-		dendroPane.setBackground(GUIParams.BG_COLOR);
+		dendroPane = GUIFactory.createJPanel(false, false, null);
 		
-		if (root == null) {
-			if (dataModel.getDocumentConfigRoot() != null) {
-				bindConfig(dataModel.getDocumentConfigRoot().fetchOrCreate(
-						"MainView"));
-
-			} else {
-				bindConfig(new DummyConfigNode("MainView"));
-			}
-		} else {
-			bindConfig(root);
-		}
-
-		// For K-Means
-		if (dataModel.getArrayHeaderInfo().getIndex("GROUP") != -1) {
-			final HeaderInfo headerInfo = dataModel.getArrayHeaderInfo();
-			final int groupIndex = headerInfo.getIndex("GROUP");
-
-			arrayIndex = getGroupVector(headerInfo, groupIndex);
-
-		} else {
-			arrayIndex = null;
-		}
-
-		if (dataModel.getGeneHeaderInfo().getIndex("GROUP") != -1) {
-			System.err.println("got gene group header");
-			final HeaderInfo headerInfo = dataModel.getGeneHeaderInfo();
-			final int groupIndex = headerInfo.getIndex("GROUP");
-			geneIndex = getGroupVector(headerInfo, groupIndex);
-
-		} else {
-			geneIndex = null;
-		}
-
-		if ((arrayIndex != null) || (geneIndex != null)) {
-			dataModel = new ReorderedDataModel(dataModel, geneIndex, 
-					arrayIndex);
-		}
-		
-		setDataModel(dataModel);
-		setupViews();
-		doDoubleLayout();
-		dendroPane.addComponentListener(this);
-
-		if (geneIndex != null) {
-			setGeneSelection(new ReorderedTreeSelection(
-					tvFrame.getGeneSelection(), geneIndex));
-
-		} else {
-			setGeneSelection(tvFrame.getGeneSelection());
-		}
-
-		if (arrayIndex != null) {
-			setArraySelection(new ReorderedTreeSelection(
-					tvFrame.getArraySelection(), arrayIndex));
-
-		} else {
-			setArraySelection(tvFrame.getArraySelection());
-		}
-	}
-	
-	/**
-	 *  Returns the dendroPane so it can be displayed in TVFrame.
-	 * @return JPanel dendroPane
-	 */
-	public JPanel makeDendroPanel() {
-		
-		return dendroPane;
-	}
-
-	// Layout
-	/**
-	 * This method should be called only during initial setup of the ModelView.
-	 * It sets up the views and binds them all to Config nodes.
-	 * 
-	 */
-	protected void setupViews() {
-
-		final ColorPresets colorPresets = DendrogramFactory.getColorPresets();
-		colorExtractor = new ColorExtractor();
-		colorExtractor.setDefaultColorSet(colorPresets.getDefaultColorSet());
-		colorExtractor.setMissing(DataModel.NODATA, DataModel.EMPTY);
-
-		final DoubleArrayDrawer dArrayDrawer = new DoubleArrayDrawer();
-		dArrayDrawer.setColorExtractor(colorExtractor);
-		arrayDrawer = dArrayDrawer;
-		((Observable) getDataModel()).addObserver(arrayDrawer);
-		
-		// set data first to avoid adding auto-generated
-		// contrast to documentConfig.
-		dArrayDrawer.setDataMatrix(getDataModel().getDataMatrix());
-		dArrayDrawer.recalculateContrast();
-		dArrayDrawer.bindConfig(getFirst("ArrayDrawer"));
-
-		// Set up status panel
-//		statuspanel = new MessagePanel();
-
-		// globalmaps tell globalview, atrview, and gtrview
-		// where to draw each data point.
-		// the scrollbars "scroll" by communicating with the maps.
-		globalXmap = new MapContainer("Fixed");
-		globalYmap = new MapContainer("Fixed");
-
 		// Create the Global view (JPanel to display)
-		globalview = new GlobalView();
-		globalview.setXMap(globalXmap);
-		globalview.setYMap(globalYmap);
-		globalview.setHeaders(getDataModel().getGeneHeaderInfo(),
-				getDataModel().getArrayHeaderInfo());
-		globalview.setArrayDrawer(arrayDrawer);
+		globalview = new GlobalView2();
 
 		// scrollbars, mostly used by maps
 		globalXscrollbar = globalview.getXScroll();
-		globalXmap.setScrollbar(globalXscrollbar);
-
 		globalYscrollbar = globalview.getYScroll();
-		globalYmap.setScrollbar(globalYscrollbar);
 
 		// Set up the column name display
-		arraynameview = new ArrayNameView(getDataModel().getArrayHeaderInfo());
-//		arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
-		arraynameview.setDataModel(getDataModel());
-		arraynameview.setMap(getGlobalXmap());
+		arraynameview = new ArrayNameView();
+		// arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
 
-		textview = new TextViewManager(getDataModel().getGeneHeaderInfo(),
-				tvFrame.getUrlExtractor(), getDataModel());
-		textview.setMap(getGlobalYmap());
+		textview = new TextView();
 
 		// Set up row dendrogram
-		leftTreeDrawer = new LeftTreeDrawer();
 		gtrview = new GTRView();
-		gtrview.setOpaque(true);
-		gtrview.setMap(globalYmap);
-		gtrview.setLeftTreeDrawer(leftTreeDrawer);
 		gtrview.getHeaderSummary().setIncluded(new int[] { 0, 3 });
 
 		// Set up column dendrogram
-		invertedTreeDrawer = new InvertedTreeDrawer();
 		atrview = new ATRView();
-		atrview.setMap(globalXmap);
-		atrview.setInvertedTreeDrawer(invertedTreeDrawer);
 		atrview.getHeaderSummary().setIncluded(new int[] { 0, 3 });
+	}
+
+	/**
+	 * Returns the dendroPane so it can be displayed in TVFrame.
+	 * 
+	 * @return JPanel dendroPane
+	 */
+	public JPanel makeDendroPanel() {
+
+		arraynameview.generateView(tvFrame.getUrlExtractor());
+		textview.generateView(tvFrame.getUrlExtractor(), -1);
 		
-		final HeaderSummary atrSummary = atrview.getHeaderSummary();
+		globalview.setHeaderSummary(textview.getHeaderSummary(), 
+				arraynameview.getHeaderSummary());
 		
 		// Register Views
 		registerView(globalview);
@@ -372,217 +218,281 @@ MainPanel, Observer {
 		settingsFrame = null;
 		settingsPanel = null;
 		
-		// urls
-		colorExtractor.bindConfig(getFirst("ColorExtractor"));
-
-		// this is here because my only subclass shares this code.
-		bindTrees();
-
-		globalXmap.bindConfig(getFirst("GlobalXMap"));
-		globalYmap.bindConfig(getFirst("GlobalYMap"));
-		textview.bindConfig(getFirst("TextView"));
-		arraynameview.bindConfig(getFirst("ArrayNameView"));
-		atrSummary.bindConfig(getFirst("AtrSummary"));
-		gtrview.getHeaderSummary().bindConfig(getFirst("GtrSummary"));
-
-		// perhaps I could remember this stuff in the MapContainer...
-		globalXmap.setIndexRange(0, dataModel.getDataMatrix().getNumCol() - 1);
-		globalYmap.setIndexRange(0, dataModel.getDataMatrix().getNumRow() - 1);
-		
-		globalXmap.notifyObservers();
-		globalYmap.notifyObservers();
+		return dendroPane;
 	}
 
 	/**
 	 * Manages the component layout in TreeViewFrame
 	 */
-	protected void doDoubleLayout() {
+	public void setupLayout() {
 
-		// Components for layout setup
-		JPanel buttonPanel;
-		JPanel crossPanel;
-		JPanel finderPanel;
-		JPanel textpanel;
-		JPanel navPanel;
-		JSplitPane gtrPane;
-		JSplitPane atrPane;
+		LogBuffer.println("Setting up DendroPane layout.");
 		
-		JPanel fillPanel1;
-		JPanel fillPanel2;
-		JPanel fillPanel3;
-		JPanel fillPanel4;
-		
-		final JButton zoomButton;
-		JButton scaleIncX;
-		JButton scaleIncY;
-		JButton scaleDecX;
-		JButton scaleDecY;
-		JButton scaleDefaultAll;
-
 		// Clear panel
 		dendroPane.removeAll();
+
+		// Components for layout setup
+		JPanel btnPanel;
+		JPanel crossPanel;
+		JPanel textpanel;
+		JPanel arrayNamePanel;
+		JPanel arrayContainer;
+		JPanel geneContainer;
+		JPanel navPanel;
+		JPanel globalViewContainer;
+		JPanel navContainer;
+		JSplitPane gtrPane = null;
+		JSplitPane atrPane = null;
 		
-		//Buttons
-		scaleDefaultAll = GUIParams.setButtonLayout(null, "homeIcon");
-		scaleDefaultAll.setToolTipText("Resets the zoomed view.");
-		scaleDefaultAll.addActionListener(new ActionListener() {
+		JPanel firstPanel;
+		JPanel bottomPanel;
 
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
+		// Buttons
+		scaleDefaultAll = GUIFactory.createNavBtn(StringRes.icon_home);
+		scaleDefaultAll.setToolTipText("Reset the zoomed view");
 
-				getGlobalXmap().setHome();
-				getGlobalYmap().setHome();
-			}
-		});
+		scaleIncX = GUIFactory.createNavBtn(StringRes.icon_zoomIn);
+		scaleIncX.setToolTipText(StringRes.tt_xZoomIn);
 
-		scaleIncX = GUIParams.setButtonLayout(null, "zoomInIcon");
-		scaleIncX.setToolTipText("Zooms in on X-axis.");
-		scaleIncX.addActionListener(new ActionListener() {
+		scaleDecX = GUIFactory.createNavBtn(StringRes.icon_zoomOut);
+		scaleDecX.setToolTipText(StringRes.tt_xZoomOut);
 
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
+		scaleIncY = GUIFactory.createNavBtn(StringRes.icon_zoomIn);
+		scaleIncY.setToolTipText(StringRes.tt_yZoomIn);
 
-				getGlobalXmap().zoomIn();
-			}
-		});
+		scaleDecY = GUIFactory.createNavBtn(StringRes.icon_zoomOut);
+		scaleDecY.setToolTipText(StringRes.tt_yZoomOut);
 
-		scaleDecX = GUIParams.setButtonLayout(null, "zoomOutIcon");
-		scaleDecX .setToolTipText("Zooms out of X-axis.");
-		scaleDecX.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-
-				getGlobalXmap().zoomOut();
-			}
-		});
-
-		scaleIncY = GUIParams.setButtonLayout(null, "zoomInIcon");
-		scaleIncY.setToolTipText("Zooms in on Y-axis.");
-		scaleIncY.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-
-				getGlobalYmap().zoomIn();
-			}
-		});
-
-		scaleDecY = GUIParams.setButtonLayout(null, "zoomOutIcon");
-		scaleDecY.setToolTipText("Zooms out of Y-axis.");
-		scaleDecY.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-
-				getGlobalYmap().zoomOut();
-			}
-		});
-		
-		zoomButton = GUIParams.setButtonLayout("Zoom On Selection", 
-				"fullscreenIcon");
-		zoomButton.setToolTipText("Zooms into the selected area.");
-		zoomButton.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-
-				globalview.zoomSelection();
-				globalview.centerSelection();
-			}
-		});
+		zoomBtn = GUIFactory.createNavBtn(StringRes.icon_zoomAll);
+		zoomBtn.setToolTipText(StringRes.tt_home);
 
 		// Panels
-		buttonPanel = new JPanel();
-		buttonPanel.setLayout(new MigLayout());
-		buttonPanel.setOpaque(false);
-
-		crossPanel = new JPanel();
-		crossPanel.setLayout(new MigLayout());
-		crossPanel.setOpaque(false);
-
-		fillPanel1 = new JPanel();
-		fillPanel1.setOpaque(false);
-
-		fillPanel2 = new JPanel();
-		fillPanel2.setOpaque(false);
+		btnPanel = GUIFactory.createJPanel(false, true, null);
 		
-		fillPanel3 = new JPanel();
-		fillPanel3.setOpaque(false);
+		crossPanel = GUIFactory.createJPanel(false, true, null);
 		
-		fillPanel4 = new JPanel();
-		fillPanel4.setOpaque(false);
+		globalViewContainer = GUIFactory.createJPanel(false, false, null); 
 		
-		navPanel = new JPanel();
-		navPanel.setLayout(new MigLayout());
-		navPanel.setOpaque(false);
+		navContainer = GUIFactory.createJPanel(true, false, null);
+
+		bottomPanel = GUIFactory.createJPanel(false, true, null); 
+		
+		arrayContainer = GUIFactory.createJPanel(false, false, null);
+		
+		geneContainer = GUIFactory.createJPanel(false, false, null);
+
+		firstPanel = GUIFactory.createJPanel(true, true, null);
+		firstPanel.setBorder(null);
+
+		navPanel = GUIFactory.createJPanel(false, true, null);
 		navPanel.setBorder(null);
 
-		textpanel = new JPanel();
-		textpanel.setLayout(new MigLayout("ins 0"));
-		textpanel.setOpaque(false);
-		
-		finderPanel = new JPanel();
-		finderPanel.setLayout(new MigLayout());
-		finderPanel.setOpaque(false);
-		
-		gtrPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, gtrview,
-				textpanel);
-		gtrPane.setResizeWeight(0.5);
-		gtrPane.setOpaque(false);
-		gtrPane.setBorder(null);
-		
-		if(gtrview.isEnabled()) {
-			gtr_div_size = 3;
-		}
-		gtrPane.setDividerSize(gtr_div_size);
+		textpanel = GUIFactory.createJPanel(false, false, null); 
 
-		atrPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, atrview,
-				arraynameview);
-		atrPane.setResizeWeight(0.5);
-		atrPane.setOpaque(false);
-		atrPane.setBorder(null);
-		
-		if(atrview.isEnabled()) {
+		arrayNamePanel = GUIFactory.createJPanel(false, false, null);
+
+		tvFrame.setOptionButtons(gtrview.isEnabled() || atrview.isEnabled());
+
+		if (hasTrees) {
+			gtrPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, gtrview,
+					textpanel);
+			gtrPane.setResizeWeight(0.5);
+			gtrPane.setOpaque(false);
+			gtrPane.setBorder(null);
+			gtr_div_size = 3;
+			gtrPane.setDividerSize(gtr_div_size);
+
+			atrPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, atrview,
+					arrayNamePanel);
+			atrPane.setResizeWeight(0.5);
+			atrPane.setOpaque(false);
+			atrPane.setBorder(null);
 			atr_div_size = 3;
+			atrPane.setDividerSize(atr_div_size);
 		}
-		atrPane.setDividerSize(atr_div_size);
-		
+
 		// Adding Components onto each other
 		textpanel.add(textview.getComponent(), "push, grow");
-
-		crossPanel.add(scaleIncY, "span, alignx 50%, wrap");
-		crossPanel.add(scaleDecX);
-		crossPanel.add(scaleDefaultAll);
-		crossPanel.add(scaleIncX, "wrap");
-		crossPanel.add(scaleDecY, "span, alignx 50%");
-
-		buttonPanel.add(crossPanel, "pushx, alignx 50%, wrap");
-		buttonPanel.add(zoomButton, "pushx, alignx 50%");
+		arrayNamePanel.add(arraynameview.getComponent(), "push, grow");
 		
-		finderPanel.add(getGeneFinderPanel(), "w 90%, h 30%, " +
-				"alignx 50%, wrap");
-		finderPanel.add(getArrayFinderPanel(), "w 90%, h 30%, " +
-				"alignx 50%");
+		globalViewContainer.add(globalview, "w 99%, h 99%, push, alignx 50%, "
+				+ "aligny 50%");
+		globalViewContainer.add(globalYscrollbar, "w 1%, h 100%, wrap");
+		globalViewContainer.add(globalXscrollbar, "span, pushx, alignx 50%, "
+				+ "w 100%, h 1%");
 
-		navPanel.add(buttonPanel, "h 20%, w 90%, alignx 50%, wrap");
-		navPanel.add(finderPanel, "pushy, h 20%, w 70%, alignx 50%, " +
-				"aligny 10%");
+		crossPanel.add(scaleIncY, "span, alignx 50%, h 33%, wrap");
+		crossPanel.add(scaleDecX, "h 33%");
+		crossPanel.add(zoomBtn, "h 33%");
+		crossPanel.add(scaleIncX, "h 33%, wrap");
+		crossPanel.add(scaleDecY, "span, h 33%, alignx 50%");
+
+		btnPanel.add(crossPanel, "pushx, alignx 50%, wrap");
+
+		navPanel.add(btnPanel, "pushx, h 20%, w 90%, alignx 50%, wrap");
+		navPanel.add(scaleDefaultAll, "push, alignx 50%, aligny 5%");
 		
-		dendroPane.add(fillPanel4, "w 18.5%::, h 20%");
-		dendroPane.add(atrPane, "w 72%, h 20%");
-		dendroPane.add(fillPanel1, "span 2, w ::19.5%, h 20%, wrap");
-		dendroPane.add(gtrPane, "w 18.5%::, h 75%");
-		dendroPane.add(globalview, "w 72%, h 75%");
-		dendroPane.add(globalYscrollbar, "w 1%, h 75%");
-		dendroPane.add(navPanel, "w ::18.5%, h 75%, wrap");
-		dendroPane.add(fillPanel2, "w 18.5%::, h 5%");
-		dendroPane.add(globalXscrollbar, "pushy, aligny 0%, w 72%, h 1%");
-		dendroPane.add(fillPanel3, "span 2, w ::19.5%, h 5%");
+		navContainer.add(navPanel, "push, h 50%, alignx 100%, aligny 50%");
 		
-		// Ensuring window resizing works with GlobalView
-		globalXmap.setHome();
-		globalYmap.setHome();
+		JScrollBar arrayScroll = arraynameview.getYScroll();
+		JScrollBar geneScroll = textview.getXScroll();
+		
+		// Widths
+		double textViewCol = 0;
+		double firstPanelCol = 0;
+		double navCol = 10.5;
+		double halfWidthChange = 0.0;
+		
+		// Heights
+		double arrayRow = 0;
+		double bottomRow = 5;
+		double halfHeightChange = 0.0;
+
+		// Layout parameters depend on tree visibility and atr/gtr availability
+		if (hasTrees && (atrview.isEnabled() && gtrview.isEnabled())) {
+			maxGVWidth = 72;
+			maxGVHeight = 75;
+			
+			firstPanelCol = 18.5;
+			textViewCol = 18.5;
+			
+			arrayRow = 20;
+			
+			arrayContainer.add(atrPane, "w 99%, h 100%");
+			geneContainer.add(gtrPane, "w 100%, h 99%, wrap");
+
+		} else if (hasTrees && (atrview.isEnabled() && !gtrview.isEnabled())) {
+			maxGVWidth = 80;
+			maxGVHeight = 75;
+			
+			firstPanelCol = 18.5;
+			textViewCol = 10.5;
+			
+			arrayRow = 20;
+			
+			arrayContainer.add(atrPane, "w 99%, h 100%");
+			geneContainer.add(textpanel, "w 100%, h 99%, wrap");
+
+		} else if (hasTrees && (!atrview.isEnabled() && gtrview.isEnabled())) {
+			maxGVWidth = 72;
+			maxGVHeight = 85;
+			
+			firstPanelCol = 18.5;
+			textViewCol = 18.5;
+			
+			arrayRow = 10;
+			
+			arrayContainer.add(arrayNamePanel, "w 99%, h 100%");
+			geneContainer.add(gtrPane, "w 100%, h 99%, wrap");
+
+		} else {
+			maxGVWidth = 80;
+			maxGVHeight = 85;
+			
+			firstPanelCol = 10.5;
+			textViewCol = 10.5;
+			
+			arrayRow = 10;
+			
+			arrayContainer.add(arrayNamePanel, "w 99%, h 100%");
+			geneContainer.add(textpanel, "w 100%, h 99%, wrap");
+		}
+				
+		arrayContainer.add(arrayScroll, "w 1%, h 100%");
+		geneContainer.add(geneScroll, "w 100%, h 1%");
+		
+		if(gvWidth == 0 && gvHeight == 0) {
+			gvWidth = maxGVWidth;
+			gvHeight = maxGVHeight;
+		}
+		
+		double widthChange = gvWidth - maxGVWidth;
+		double heightChange = gvHeight - maxGVHeight;
+		
+		halfWidthChange = widthChange/ 2.0;
+		halfHeightChange = heightChange/ 2.0;
+		
+		// Adjusting widths and heights
+		textViewCol = textViewCol - halfWidthChange;
+		firstPanelCol = firstPanelCol - halfWidthChange;
+		navCol = navCol - halfWidthChange;
+		
+		arrayRow = arrayRow - halfHeightChange;
+		bottomRow = bottomRow - halfHeightChange;
+		
+		// Adding all components to the dendroPane
+		dendroPane.add(firstPanel, "w " + firstPanelCol + "%, "
+				+ "h " + arrayRow + "%, pushx");
+		
+		dendroPane.add(arrayContainer, "w " + gvWidth + "%, "
+				+ "h " + arrayRow + "%");
+		
+		dendroPane.add(navContainer, "span 1 3, w " + navCol + "%, h 100%, "
+				+ "wrap");
+		
+		dendroPane.add(geneContainer, "w " + textViewCol + "%, "
+				+ "h " + gvHeight + "%, pushx");
+		
+		dendroPane.add(globalViewContainer, "w " + gvWidth + "%, "
+				+ "h " + gvHeight + "%, wrap");
+		
+		dendroPane.add(bottomPanel, "span, h " + bottomRow + "%");
+		
+		dendroPane.revalidate();
+		dendroPane.repaint();
+	}
+
+	// Add Button Listeners
+	/**
+	 * Adds an ActionListener to the scale buttons in DendroView.
+	 * 
+	 * @param l
+	 */
+	public void addScaleListener(final ActionListener l) {
+
+		scaleIncX.addActionListener(l);
+		scaleDecX.addActionListener(l);
+		scaleIncY.addActionListener(l);
+		scaleDecY.addActionListener(l);
+		scaleDefaultAll.addActionListener(l);
+	}
+
+	/**
+	 * Adds an ActionListener to the Zoom button in DendroView.
+	 * 
+	 * @param l
+	 */
+	public void addZoomListener(final ActionListener l) {
+
+		zoomBtn.addActionListener(l);
+	}
+
+	/**
+	 * Adds a component listener to the main panel of DendroView.
+	 * 
+	 * @param l
+	 */
+	public void addCompListener(final ComponentListener l) {
+
+		getDendroPane().addComponentListener(l);
+	}
+
+	/**
+	 * First removes all listeners from searchBtn, then adds one new listener.
+	 * @param l
+	 */
+	public void addSearchBtnListener(final ActionListener l) {
+
+		for( ActionListener al : tvFrame.getSearchBtn().getActionListeners() ) {
+			tvFrame.getSearchBtn().removeActionListener( al );
+	    }
+		LogBuffer.println("Adding Search Button Listener");
+		tvFrame.getSearchBtn().addActionListener(l);
+	}
+
+	public void addTreeBtnListener(final ActionListener l) {
+
+		tvFrame.getTreeButton().addActionListener(l);
 	}
 
 	// Methods
@@ -591,776 +501,255 @@ MainPanel, Observer {
 	 */
 	@Override
 	public void refresh() {
-		
-		dendroPane.removeAll();
-		setupViews();
-		doDoubleLayout();
-		
+
 		dendroPane.revalidate();
 		dendroPane.repaint();
 	}
-	
-	private int[] getGroupVector(final HeaderInfo headerInfo,
-			final int groupIndex) {
-
-		int ngroup = 0;
-		String cur = headerInfo.getHeader(0, groupIndex);
-
-		for (int i = 0; i < headerInfo.getNumHeaders(); i++) {
-
-			final String test = headerInfo.getHeader(i, groupIndex);
-			if (cur.equals(test) == false) {
-				cur = test;
-				ngroup++;
-			}
-		}
-
-		final int[] groupVector = new int[ngroup + headerInfo.getNumHeaders()];
-		ngroup = 0;
-		cur = headerInfo.getHeader(0, groupIndex);
-
-		for (int i = 0; i < headerInfo.getNumHeaders(); i++) {
-
-			final String test = headerInfo.getHeader(i, groupIndex);
-			if (cur.equals(test) == false) {
-				groupVector[i + ngroup] = -1;
-				cur = test;
-				ngroup++;
-			}
-			groupVector[i + ngroup] = i;
-		}
-
-		return groupVector;
-	}
-
-//	/**
-//	 * Finds the currently selected genes, mirror image flips them, and then
-//	 * rebuilds all necessary trees and saved data to the .jtv file.
-//	 * 
-//	 */
-//	private void flipSelectedGTRNode() {
-//
-//		int leftIndex, rightIndex;
-//		String selectedID;
-//		final TreeDrawerNode geneNode = leftTreeDrawer
-//				.getNodeById(getGeneSelection().getSelectedNode());
-//
-//		if (geneNode == null || geneNode.isLeaf()) {
-//
-//			return;
-//		}
-//
-//		selectedID = geneNode.getId();
-//
-//		// find the starting index of the left array tree, the ending
-//		// index of the right array tree
-//		leftIndex = getDataModel().getGeneHeaderInfo().getHeaderIndex(
-//				geneNode.getLeft().getLeftLeaf().getId());
-//		rightIndex = getDataModel().getGeneHeaderInfo().getHeaderIndex(
-//				geneNode.getRight().getRightLeaf().getId());
-//
-//		final int num = getDataModel().getDataMatrix().getNumRow();
-//
-//		final int[] newOrder = SetupInvertedArray(num, leftIndex, rightIndex);
-//
-//		/*
-//		 * System.out.print("Fliping to: "); for(int i = 0; i < newOrder.length;
-//		 * i++) { System.out.print(newOrder[i] + " "); } System.out.println("");
-//		 */
-//
-//		((TVModel) getDataModel()).reorderGenes(newOrder);
-//		// ((TVModel)getDataModel()).saveGeneOrder(newOrder);
-//		((Observable) getDataModel()).notifyObservers();
-//
-//		updateGTRDrawer(selectedID);
-//	}
-
-//	private int[] SetupInvertedArray(final int num, final int leftIndex,
-//			final int rightIndex) {
-//
-//		final int[] newOrder = new int[num];
-//
-//		for (int i = 0; i < num; i++) {
-//
-//			newOrder[i] = i;
-//		}
-//
-//		for (int i = 0; i <= (rightIndex - leftIndex); i++) {
-//
-//			newOrder[leftIndex + i] = rightIndex - i;
-//		}
-//
-//		return newOrder;
-//	}
-
-//	/**
-//	 * Finds the currently selected arrays, mirror image flips them, and then
-//	 * rebuilds all necessary trees and saved data to the .jtv file.
-//	 */
-//	private void flipSelectedATRNode() {
-//
-//		int leftIndex, rightIndex;
-//		String selectedID;
-//		final TreeDrawerNode arrayNode = invertedTreeDrawer
-//				.getNodeById(getArraySelection().getSelectedNode());
-//
-//		if (arrayNode == null || arrayNode.isLeaf()) {
-//
-//			return;
-//		}
-//
-//		selectedID = arrayNode.getId();
-//
-//		// find the starting index of the left array tree,
-//		// the ending index of the right array tree
-//		leftIndex = getDataModel().getArrayHeaderInfo().getHeaderIndex(
-//				arrayNode.getLeft().getLeftLeaf().getId());
-//		rightIndex = getDataModel().getArrayHeaderInfo().getHeaderIndex(
-//				arrayNode.getRight().getRightLeaf().getId());
-//
-//		final int num = getDataModel().getDataMatrix().getNumUnappendedCol();
-//
-//		final int[] newOrder = new int[num];
-//
-//		for (int i = 0; i < num; i++) {
-//
-//			newOrder[i] = i;
-//		}
-//
-//		for (int i = 0; i <= (rightIndex - leftIndex); i++) {
-//
-//			newOrder[leftIndex + i] = rightIndex - i;
-//		}
-//
-//		/*
-//		 * System.out.print("Fliping to: "); for(int i = 0; i < newOrder.length;
-//		 * i++) { System.out.print(newOrder[i] + " "); } System.out.println("");
-//		 */
-//
-//		((TVModel) getDataModel()).reorderArrays(newOrder);
-//		((Observable) getDataModel()).notifyObservers();
-//
-//		updateATRDrawer(selectedID);
-//	}
 
 	/**
-	 * Displays a data set alongside the primary one for comparison.
 	 * 
-	 * @param model
-	 *            - the model containing cdt data being added to the display.
+	 * @param o
+	 * @param arg
 	 */
-	public void compareToModel(final DataModel model) {
-
-		getDataModel().removeAppended();
-		getDataModel().append(model);
-
-		arraySelection.resize(getDataModel().getDataMatrix().getNumCol());
-		arraySelection.notifyObservers();
-
-		globalXmap.setIndexRange(0,
-				getDataModel().getDataMatrix().getNumCol() - 1);
-		globalXmap.notifyObservers();
-
-//		zoomXmap.setIndexRange(0,
-//		getDataModel().getDataMatrix().getNumCol() - 1);
-//		zoomXmap.notifyObservers();
-
-		((Observable) getDataModel()).notifyObservers();
-	}
-
-	/**
-	 * Aligns the current ATR to the passed model as best as possible, saves the
-	 * new ordering to the .jtv file.
-	 * 
-	 * @param model
-	 *            - AtrTVModel with which to align.
-	 */
-	public void alignAtrToModel(final AtrTVModel model) {
-
-		try {
-			String selectedID = null;
-
-			try {
-				selectedID = getArraySelection().getSelectedNode();
-
-			} catch (final NullPointerException npe) {
-				npe.printStackTrace();
-			}
-
-			int[] ordering;
-			ordering = AtrAligner.align(getDataModel().getAtrHeaderInfo(),
-					getDataModel().getArrayHeaderInfo(),
-					model.getAtrHeaderInfo(), model.getArrayHeaderInfo());
-
-			/*
-			 * System.out.print("New ordering: "); for(int i = 0; i <
-			 * ordering.length; i++) { System.out.print(ordering[i] + " "); }
-			 * System.out.println();
-			 */
-
-			((TVModel) getDataModel()).reorderArrays(ordering);
-			((Observable) getDataModel()).notifyObservers();
-
-			if (selectedID != null) {
-
-				updateATRDrawer(selectedID);
-			}
-		} catch (final Exception e) {
-			e.printStackTrace();
-			System.out.println(e.toString());
-		}
-	}
-
-//	/**
-//	 * Updates the GTRDrawer to reflect changes in the DataModel gene order;
-//	 * rebuilds the TreeDrawerNode tree.
-//	 * 
-//	 * @param selectedID
-//	 *            ID of the node selected before a change in tree structure was
-//	 *            made. This node is then found and reselected after the ATR
-//	 *            tree is rebuilt.
-//	 */
-//	private void updateGTRDrawer(final String selectedID) {
-//
-//		try {
-//			final TVModel tvmodel = (TVModel) getDataModel();
-//			leftTreeDrawer.setData(tvmodel.getGtrHeaderInfo(),
-//					tvmodel.getGeneHeaderInfo());
-//
-//			final HeaderInfo trHeaderInfo = tvmodel.getGtrHeaderInfo();
-//
-//			if (trHeaderInfo.getIndex("NODECOLOR") >= 0) {
-//				TreeColorer.colorUsingHeader(leftTreeDrawer.getRootNode(),
-//						trHeaderInfo, trHeaderInfo.getIndex("NODECOLOR"));
-//			}
-//		} catch (final DendroException e) {
-//
-//			// LogPanel.println("Had problem setting up the array tree : "
-//			// + e.getMessage());
-//			// e.printStackTrace();
-//			final Box mismatch = new Box(BoxLayout.Y_AXIS);
-//			mismatch.add(new JLabel(e.getMessage()));
-//			mismatch.add(new JLabel("Perhaps there is a mismatch "
-//					+ "between your ATR and CDT files?"));
-//			mismatch.add(new JLabel("Ditching Gene Tree, since it's lame."));
-//
-//			JOptionPane.showMessageDialog(tvFrame, mismatch,
-//					"Tree Construction Error", JOptionPane.ERROR_MESSAGE);
-//
-//			gtrview.setEnabled(false);
-//			// gtrzview.setEnabled(false);
-//
-//			try {
-//				leftTreeDrawer.setData(null, null);
-//
-//			} catch (final DendroException ex) {
-//
-//			}
-//		}
-//
-//		final TreeDrawerNode arrayNode = leftTreeDrawer.getRootNode().findNode(
-//				selectedID);
-//
-//		geneSelection.setSelectedNode(arrayNode.getId());
-//		gtrview.setSelectedNode(arrayNode);
-//		// gtrzview.setSelectedNode(arrayNode);
-//
-//		geneSelection.notifyObservers();
-//		leftTreeDrawer.notifyObservers();
-//	}
-
-	/**
-	 * Updates the ATRDrawer to reflect changes in the DataMode array order;
-	 * rebuilds the TreeDrawerNode tree.
-	 * 
-	 * @param selectedID
-	 *            ID of the node selected before a change in tree structure was
-	 *            made. This node is then found and reselected after the ATR
-	 *            tree is rebuilt.
-	 */
-	private void updateATRDrawer(final String selectedID) {
-		
-		try {
-			final DataModel tvmodel = (TVModel) getDataModel();
-			invertedTreeDrawer.setData(tvmodel.getAtrHeaderInfo(),
-					tvmodel.getArrayHeaderInfo());
-			final HeaderInfo trHeaderInfo = tvmodel.getAtrHeaderInfo();
-
-			if (trHeaderInfo.getIndex("NODECOLOR") >= 0) {
-
-				TreeColorer.colorUsingHeader(invertedTreeDrawer.getRootNode(),
-						trHeaderInfo, trHeaderInfo.getIndex("NODECOLOR"));
-			}
-		} catch (final DendroException e) {
-
-			// LogPanel.println("Had problem setting up the array tree : "
-			// + e.getMessage());
-			// e.printStackTrace();
-			final Box mismatch = new Box(BoxLayout.Y_AXIS);
-			mismatch.add(new JLabel(e.getMessage()));
-			mismatch.add(new JLabel("Perhaps there is a mismatch "
-					+ "between your ATR and CDT files?"));
-			mismatch.add(new JLabel("Ditching Array Tree, since it's lame."));
-
-			JOptionPane.showMessageDialog(applicationFrame, mismatch,
-					"Tree Construction Error", JOptionPane.ERROR_MESSAGE);
-
-			atrview.setEnabled(false);
-
-			try {
-				invertedTreeDrawer.setData(null, null);
-
-			} catch (final DendroException ex) {
-
-			}
-		}
-
-		final TreeDrawerNode arrayNode = invertedTreeDrawer.getRootNode()
-				.findNode(selectedID);
-
-		arraySelection.setSelectedNode(arrayNode.getId());
-		atrview.setSelectedNode(arrayNode);
-
-		arraySelection.notifyObservers();
-		invertedTreeDrawer.notifyObservers();
-	}
-
-	/**
-	 * Creates an AtrTVModel for use in tree alignment.
-	 * 
-	 * @param fileSet
-	 * @return a new AtrTVModel with the file set loaded into it.
-	 * @throws LoadException
-	 */
-	protected AtrTVModel makeAtrModel(final FileSet fileSet)
-			throws LoadException {
-
-		final AtrTVModel atrTVModel = new AtrTVModel();
-
-		try {
-			atrTVModel.loadNew(fileSet);
-
-		} catch (final LoadException e) {
-			JOptionPane.showMessageDialog(dendroPane, e);
-			throw e;
-		}
-
-		return atrTVModel;
-	}
-
-	protected TVModel makeCdtModel(final FileSet fileSet) throws LoadException {
-
-		final TVModel tvModel = new TVModel();
-
-		try {
-			tvModel.loadNew(fileSet);
-
-		} catch (final LoadException e) {
-			JOptionPane.showMessageDialog(dendroPane, e);
-			throw e;
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			
-		} catch (ExecutionException e) {
-			e.printStackTrace();
-		}
-
-		return tvModel;
-	}
-
-	/**
-	 * Open a dialog which allows the user to select a new CDT data file for
-	 * tree alignment.
-	 * 
-	 * @return The fileset corresponding to the dataset.
-	 */
-	/*
-	 * Unknow what actually happens if the file CDT does not have an associated
-	 * ATR.
-	 */
-	protected FileSet offerATRFileSelection() throws LoadException {
-
-		FileSet fileSet1; // will be chosen...
-
-		final JFileChooser fileDialog = new JFileChooser();
-		setupATRFileDialog(fileDialog);
-
-		final int retVal = fileDialog.showOpenDialog(dendroPane);
-
-		if (retVal == JFileChooser.APPROVE_OPTION) {
-			final File chosen = fileDialog.getSelectedFile();
-			fileSet1 = new FileSet(chosen.getName(), chosen.getParent()
-					+ File.separator);
-
-		} else {
-			throw new LoadException("File Dialog closed without selection...",
-					LoadException.NOFILE);
-		}
-
-		return fileSet1;
-	}
-
-	/**
-	 * Sets up a dialog for loading ATR files for tree alignment.
-	 * 
-	 * @param fileDialog
-	 *            the dialog to setup
-	 */
-	protected void setupATRFileDialog(final JFileChooser fileDialog) {
-
-		final CdtFilter ff = new CdtFilter();
-		try {
-			fileDialog.addChoosableFileFilter(ff);
-			// will fail on pre-1.3 swings
-			fileDialog.setAcceptAllFileFilterUsed(true);
-
-		} catch (final Exception e) {
-			// hmm... I'll just assume that there's no accept all.
-			fileDialog
-					.addChoosableFileFilter(new javax.swing.filechooser.FileFilter() {
-
-						@Override
-						public boolean accept(final File f) {
-
-							return true;
-						}
-
-						@Override
-						public String getDescription() {
-
-							return "All Files";
-						}
-					});
-		}
-
-		fileDialog.setFileFilter(ff);
-		fileDialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
-	}
-
-	@Override
-	public void scrollToGene(final int i) {
-
-		getGlobalYmap().scrollToIndex(i);
-		getGlobalYmap().notifyObservers();
-	}
-
-	@Override
-	public void scrollToArray(final int i) {
-
-		getGlobalXmap().scrollToIndex(i);
-		getGlobalXmap().notifyObservers();
-	}
-
 	@Override
 	public void update(final Observable o, final Object arg) {
-		
+
 		if (o == geneSelection) {
 			gtrview.scrollToNode(geneSelection.getSelectedNode());
+
+		} else if (o == arraySelection) {
+			atrview.scrollToNode(arraySelection.getSelectedNode());
 		}
 	}
 
 	/**
-	 * this is meant to be called from setupViews. It make sure that the trees
-	 * are generated from the current model, and enables/disables them as
-	 * required.
-	 * 
-	 * I factored it out because it is common betwen DendroView and
-	 * KnnDendroView.
-	 */
-	protected void bindTrees() {
-
-		final DataModel tvmodel = getDataModel();
-
-		if ((tvmodel != null) && tvmodel.aidFound()) {
-			try {
-				atrview.setEnabled(true);
-
-				invertedTreeDrawer.setData(tvmodel.getAtrHeaderInfo(),
-						tvmodel.getArrayHeaderInfo());
-				final HeaderInfo trHeaderInfo = tvmodel.getAtrHeaderInfo();
-
-				if (trHeaderInfo.getIndex("NODECOLOR") >= 0) {
-					TreeColorer.colorUsingHeader(
-							invertedTreeDrawer.getRootNode(), trHeaderInfo,
-							trHeaderInfo.getIndex("NODECOLOR"));
-				}
-
-			} catch (final DendroException e) {
-				// LogPanel.println("Had problem setting up the array tree : "
-				// + e.getMessage());
-				// e.printStackTrace();
-				final Box mismatch = new Box(BoxLayout.Y_AXIS);
-				mismatch.add(new JLabel(e.getMessage()));
-				mismatch.add(new JLabel("Perhaps there is a mismatch "
-						+ "between your ATR and CDT files?"));
-				mismatch.add(new JLabel("Ditching Array Tree, "
-						+ "since it's lame."));
-
-				JOptionPane.showMessageDialog(applicationFrame, mismatch,
-						"Tree Construction Error", JOptionPane.ERROR_MESSAGE);
-
-				atrview.setEnabled(false);
-
-				try {
-					invertedTreeDrawer.setData(null, null);
-
-				} catch (final DendroException ex) {
-
-				}
-			}
-		} else {
-			atrview.setEnabled(false);
-
-			try {
-				invertedTreeDrawer.setData(null, null);
-
-			} catch (final DendroException ex) {
-
-			}
-		}
-
-		invertedTreeDrawer.notifyObservers();
-
-		if ((tvmodel != null) && tvmodel.gidFound()) {
-			try {
-				gtrview.setEnabled(true);
-
-				leftTreeDrawer.setData(tvmodel.getGtrHeaderInfo(),
-						tvmodel.getGeneHeaderInfo());
-				final HeaderInfo gtrHeaderInfo = tvmodel.getGtrHeaderInfo();
-
-				if (gtrHeaderInfo.getIndex("NODECOLOR") >= 0) {
-					TreeColorer.colorUsingHeader(leftTreeDrawer.getRootNode(),
-							tvmodel.getGtrHeaderInfo(),
-							gtrHeaderInfo.getIndex("NODECOLOR"));
-
-				} else {
-					TreeColorer.colorUsingLeaf(leftTreeDrawer.getRootNode(),
-							tvmodel.getGeneHeaderInfo(), tvmodel
-									.getGeneHeaderInfo().getIndex("FGCOLOR"));
-				}
-
-			} catch (final DendroException e) {
-				// LogPanel.println("Had problem setting up the gene tree :
-				// " + e.getMessage());
-				// e.printStackTrace();
-				final Box mismatch = new Box(BoxLayout.Y_AXIS);
-				mismatch.add(new JLabel(e.getMessage()));
-				mismatch.add(new JLabel("Perhaps there is a mismatch "
-						+ "between your GTR and CDT files?"));
-				mismatch.add(new JLabel("Ditching Gene Tree, "
-						+ "since it's lame."));
-
-				JOptionPane.showMessageDialog(applicationFrame, mismatch,
-						"Tree Construction Error", JOptionPane.ERROR_MESSAGE);
-
-				gtrview.setEnabled(false);
-
-				try {
-					leftTreeDrawer.setData(null, null);
-
-				} catch (final DendroException ex) {
-
-				}
-			}
-		} else {
-			gtrview.setEnabled(false);
-
-			try {
-				leftTreeDrawer.setData(null, null);
-
-			} catch (final DendroException ex) {
-
-			}
-		}
-
-		leftTreeDrawer.notifyObservers();
-	}
-
-	/**
-	 * registers a modelview with the hint and status panels, and the viewFrame.
+	 * registers a modelview with the viewFrame.
 	 * 
 	 * @param modelView
 	 *            The ModelView to be added
 	 */
 	private void registerView(final ModelView modelView) {
 
-//		modelView.setStatusPanel(statuspanel);
 		modelView.setViewFrame(tvFrame);
 	}
 
-	// Menus
+	/**
+	 * Changes the visibility of dendrograms and resets the layout.
+	 * 
+	 * @param visible
+	 */
 	@Override
-	public void populateExportMenu(final TreeviewMenuBarI menu) {
+	public void setTreesVisible(final boolean visible) {
 
-		menu.addMenuItem("Export to Postscript...");
-//		, new ActionListener() {
-//
-//			@Override
-//			public void actionPerformed(final ActionEvent actionEvent) {
-//
-//				MapContainer initXmap, initYmap;
-//
-//				// if ((getArraySelection().getNSelectedIndexes() != 0) ||
-//				// (getGeneSelection().getNSelectedIndexes() != 0)) {
-//				// initXmap = getZoomXmap();
-//				// initYmap = getZoomYmap();
-//				//
-//				// } else {
-//				initXmap = getGlobalXmap();
-//				initYmap = getGlobalYmap();
-//				// }
-//
-//				final PostscriptExportPanel psePanel = setupPostscriptExport(
-//						initXmap, initYmap);
-//
-//				final JDialog popup = new CancelableSettingsDialog(viewFrame,
-//						"Export to Postscript", psePanel);
-//				popup.pack();
-//				popup.setVisible(true);
-//			}
-//		});
-		menu.setAccelerator(KeyEvent.VK_X);
-		menu.setMnemonic(KeyEvent.VK_X);
-
-		menu.addMenuItem("Export to Image...");
-//		, new ActionListener() {
-//
-//			@Override
-//			public void actionPerformed(final ActionEvent actionEvent) {
-//
-//				MapContainer initXmap, initYmap;
-//				// if ((getArraySelection().getNSelectedIndexes() != 0) ||
-//				// (getGeneSelection().getNSelectedIndexes() != 0)) {
-//				// initXmap = getZoomXmap();
-//				// initYmap = getZoomYmap();
-//				//
-//				// } else {
-//				initXmap = getGlobalXmap();
-//				initYmap = getGlobalYmap();
-//				// }
-//
-//				final BitmapExportPanel bitmapPanel = setupBitmapExport(
-//						initXmap, initYmap);
-//
-//				final JDialog popup = new CancelableSettingsDialog(viewFrame,
-//						"Export to Image", bitmapPanel);
-//				popup.pack();
-//				popup.setVisible(true);
-//			}
-//		});
-		menu.setMnemonic(KeyEvent.VK_I);
-
-		menu.addMenuItem("Export ColorBar to Postscript...");
-//		, new ActionListener() {
-//
-//					@Override
-//					public void actionPerformed(final ActionEvent actionEvent) {
-//
-//						final PostscriptColorBarExportPanel gcbPanel = 
-//								new PostscriptColorBarExportPanel(
-//								((DoubleArrayDrawer) arrayDrawer)
-//										.getColorExtractor());
-//
-//						gcbPanel.setSourceSet(getDataModel().getFileSet());
-//
-//						final JDialog popup = new CancelableSettingsDialog(
-//								viewFrame, "Export ColorBar to Postscript",
-//								gcbPanel);
-//						popup.pack();
-//						popup.setVisible(true);
-//					}
-//				});
-		menu.setMnemonic(KeyEvent.VK_B);
-
-		menu.addMenuItem("Export ColorBar to Image...");
-//		, new ActionListener() {
-//
-//			@Override
-//			public void actionPerformed(final ActionEvent actionEvent) {
-//
-//				final BitmapColorBarExportPanel gcbPanel = 
-//						new BitmapColorBarExportPanel(
-//						((DoubleArrayDrawer) arrayDrawer).getColorExtractor());
-//
-//				gcbPanel.setSourceSet(getDataModel().getFileSet());
-//
-//				final JDialog popup = new CancelableSettingsDialog(viewFrame,
-//						"Export ColorBar to Image", gcbPanel);
-//				popup.pack();
-//				popup.setVisible(true);
-//			}
-//		});
-		menu.setMnemonic(KeyEvent.VK_M);
-
-		menu.addSeparator();
-		addSimpleExportOptions(menu);
+		this.hasTrees = visible;
 	}
+
+	/**
+	 * Opens a JWindow containing Swing components used to search data by name
+	 * in the loaded TVModel.
+	 */
+	@Override
+	public void openSearchDialog(final HeaderInfo geneHI, 
+			final HeaderInfo arrayHI) {
+
+		final JDialog dialog = new JDialog();
+		dialog.setModalityType(JDialog.DEFAULT_MODALITY_TYPE);
+		dialog.setTitle(StringRes.dlg_search);
+		dialog.setResizable(false);
+
+		final JPanel container = GUIFactory.createJPanel(true, true, null);
+		
+		JLabel wildTip = GUIFactory.createLabel("You can use wildcards "
+				+ "to search (*, ?).", GUIFactory.FONTS);
+		
+		JLabel wildTip2 = GUIFactory.createLabel("E.g.: *complex* --> "
+				+ "Rpd3s complex, ATP Synthase (complex V), etc...", 
+				GUIFactory.FONTS);
+
+		container.add(wildTip, "span, wrap");
+		container.add(wildTip2, "span, wrap");
+		container.add(getGeneFinderPanel(geneHI), "w 90%, h 40%, "
+				+ "alignx 50%, wrap");
+		container.add(getArrayFinderPanel(arrayHI), "w 90%, h 40%, "
+				+ "alignx 50%");
+
+		dialog.getContentPane().add(container);
+		dialog.pack();
+		dialog.setLocationRelativeTo(tvFrame.getAppFrame());
+		dialog.setVisible(true);
+	}
+
+	// @Override
+	// public void populateExportMenu(final TreeviewMenuBarI menu) {
+	//
+	// menu.addMenuItem("Export to Postscript...");
+	// , new ActionListener() {
+	//
+	// @Override
+	// public void actionPerformed(final ActionEvent actionEvent) {
+	//
+	// MapContainer initXmap, initYmap;
+	//
+	// // if ((getArraySelection().getNSelectedIndexes() != 0) ||
+	// // (getGeneSelection().getNSelectedIndexes() != 0)) {
+	// // initXmap = getZoomXmap();
+	// // initYmap = getZoomYmap();
+	// //
+	// // } else {
+	// initXmap = getGlobalXmap();
+	// initYmap = getGlobalYmap();
+	// // }
+	//
+	// final PostscriptExportPanel psePanel = setupPostscriptExport(
+	// initXmap, initYmap);
+	//
+	// final JDialog popup = new CancelableSettingsDialog(viewFrame,
+	// "Export to Postscript", psePanel);
+	// popup.pack();
+	// popup.setVisible(true);
+	// }
+	// });
+	// menu.setAccelerator(KeyEvent.VK_X);
+	// menu.setMnemonic(KeyEvent.VK_X);
+	//
+	// menu.addMenuItem("Export to Image...");
+	// , new ActionListener() {
+	//
+	// @Override
+	// public void actionPerformed(final ActionEvent actionEvent) {
+	//
+	// MapContainer initXmap, initYmap;
+	// // if ((getArraySelection().getNSelectedIndexes() != 0) ||
+	// // (getGeneSelection().getNSelectedIndexes() != 0)) {
+	// // initXmap = getZoomXmap();
+	// // initYmap = getZoomYmap();
+	// //
+	// // } else {
+	// initXmap = getGlobalXmap();
+	// initYmap = getGlobalYmap();
+	// // }
+	//
+	// final BitmapExportPanel bitmapPanel = setupBitmapExport(
+	// initXmap, initYmap);
+	//
+	// final JDialog popup = new CancelableSettingsDialog(viewFrame,
+	// "Export to Image", bitmapPanel);
+	// popup.pack();
+	// popup.setVisible(true);
+	// }
+	// });
+	// menu.setMnemonic(KeyEvent.VK_I);
+	//
+	// menu.addMenuItem("Export ColorBar to Postscript...");
+	// , new ActionListener() {
+	//
+	// @Override
+	// public void actionPerformed(final ActionEvent actionEvent) {
+	//
+	// final PostscriptColorBarExportPanel gcbPanel =
+	// new PostscriptColorBarExportPanel(
+	// ((DoubleArrayDrawer) arrayDrawer)
+	// .getColorExtractor());
+	//
+	// gcbPanel.setSourceSet(getDataModel().getFileSet());
+	//
+	// final JDialog popup = new CancelableSettingsDialog(
+	// viewFrame, "Export ColorBar to Postscript",
+	// gcbPanel);
+	// popup.pack();
+	// popup.setVisible(true);
+	// }
+	// });
+	// menu.setMnemonic(KeyEvent.VK_B);
+	//
+	// menu.addMenuItem("Export ColorBar to Image...");
+	// , new ActionListener() {
+	//
+	// @Override
+	// public void actionPerformed(final ActionEvent actionEvent) {
+	//
+	// final BitmapColorBarExportPanel gcbPanel =
+	// new BitmapColorBarExportPanel(
+	// ((DoubleArrayDrawer) arrayDrawer).getColorExtractor());
+	//
+	// gcbPanel.setSourceSet(getDataModel().getFileSet());
+	//
+	// final JDialog popup = new CancelableSettingsDialog(viewFrame,
+	// "Export ColorBar to Image", gcbPanel);
+	// popup.pack();
+	// popup.setVisible(true);
+	// }
+	// });
+	// menu.setMnemonic(KeyEvent.VK_M);
+	//
+	// menu.addSeparator();
+	// addSimpleExportOptions(menu);
+	// }
 
 	private void addSimpleExportOptions(final TreeviewMenuBarI menu) {
 
 		menu.addMenuItem("Save Tree Image");
-//		, new ActionListener() {
-//
-//			@Override
-//			public void actionPerformed(final ActionEvent actionEvent) {
-//
-//				MapContainer initXmap, initYmap;
-//				initXmap = getGlobalXmap();
-//				initYmap = getGlobalYmap();
-//
-//				final BitmapExportPanel bitmapPanel = new BitmapExportPanel(
-//						arraynameview.getHeaderInfo(), getDataModel()
-//								.getGeneHeaderInfo(), getGeneSelection(),
-//						getArraySelection(), invertedTreeDrawer,
-//						leftTreeDrawer, arrayDrawer, initXmap, initYmap);
-//
-//				bitmapPanel.setGeneFont(textview.getFont());
-//				bitmapPanel.setArrayFont(arraynameview.getFont());
-//				bitmapPanel.setSourceSet(getDataModel().getFileSet());
-//				bitmapPanel.setDrawSelected(false);
-//				bitmapPanel.includeData(false);
-//				bitmapPanel.includeAtr(false);
-//				bitmapPanel.deselectHeaders();
-//
-//				final JDialog popup = new CancelableSettingsDialog(viewFrame,
-//						"Export to Image", bitmapPanel);
-//				popup.pack();
-//				popup.setVisible(true);
-//			}
-//		});
+		// , new ActionListener() {
+		//
+		// @Override
+		// public void actionPerformed(final ActionEvent actionEvent) {
+		//
+		// MapContainer initXmap, initYmap;
+		// initXmap = getGlobalXmap();
+		// initYmap = getGlobalYmap();
+		//
+		// final BitmapExportPanel bitmapPanel = new BitmapExportPanel(
+		// arraynameview.getHeaderInfo(), getDataModel()
+		// .getGeneHeaderInfo(), getGeneSelection(),
+		// getArraySelection(), invertedTreeDrawer,
+		// leftTreeDrawer, arrayDrawer, initXmap, initYmap);
+		//
+		// bitmapPanel.setGeneFont(textview.getFont());
+		// bitmapPanel.setArrayFont(arraynameview.getFont());
+		// bitmapPanel.setSourceSet(getDataModel().getFileSet());
+		// bitmapPanel.setDrawSelected(false);
+		// bitmapPanel.includeData(false);
+		// bitmapPanel.includeAtr(false);
+		// bitmapPanel.deselectHeaders();
+		//
+		// final JDialog popup = new CancelableSettingsDialog(viewFrame,
+		// "Export to Image", bitmapPanel);
+		// popup.pack();
+		// popup.setVisible(true);
+		// }
+		// });
 		menu.setMnemonic(KeyEvent.VK_T);
 
 		menu.addMenuItem("Save Thumbnail Image");
-//		, new ActionListener() {
-//
-//			@Override
-//			public void actionPerformed(final ActionEvent actionEvent) {
-//
-//				MapContainer initXmap, initYmap;
-//				initXmap = getGlobalXmap();
-//				initYmap = getGlobalYmap();
-//
-//				final BitmapExportPanel bitmapPanel = new BitmapExportPanel(
-//						arraynameview.getHeaderInfo(), getDataModel()
-//								.getGeneHeaderInfo(), getGeneSelection(),
-//						getArraySelection(), invertedTreeDrawer,
-//						leftTreeDrawer, arrayDrawer, initXmap, initYmap);
-//
-//				bitmapPanel.setSourceSet(getDataModel().getFileSet());
-//				bitmapPanel.setGeneFont(textview.getFont());
-//				bitmapPanel.setArrayFont(arraynameview.getFont());
-//				bitmapPanel.setDrawSelected(false);
-//				bitmapPanel.includeGtr(false);
-//				bitmapPanel.includeAtr(false);
-//				bitmapPanel.deselectHeaders();
-//
-//				final JDialog popup = new CancelableSettingsDialog(viewFrame,
-//						"Export To Image", bitmapPanel);
-//				popup.pack();
-//				popup.setVisible(true);
-//			}
-//		});
+		// , new ActionListener() {
+		//
+		// @Override
+		// public void actionPerformed(final ActionEvent actionEvent) {
+		//
+		// MapContainer initXmap, initYmap;
+		// initXmap = getGlobalXmap();
+		// initYmap = getGlobalYmap();
+		//
+		// final BitmapExportPanel bitmapPanel = new BitmapExportPanel(
+		// arraynameview.getHeaderInfo(), getDataModel()
+		// .getGeneHeaderInfo(), getGeneSelection(),
+		// getArraySelection(), invertedTreeDrawer,
+		// leftTreeDrawer, arrayDrawer, initXmap, initYmap);
+		//
+		// bitmapPanel.setSourceSet(getDataModel().getFileSet());
+		// bitmapPanel.setGeneFont(textview.getFont());
+		// bitmapPanel.setArrayFont(arraynameview.getFont());
+		// bitmapPanel.setDrawSelected(false);
+		// bitmapPanel.includeGtr(false);
+		// bitmapPanel.includeAtr(false);
+		// bitmapPanel.deselectHeaders();
+		//
+		// final JDialog popup = new CancelableSettingsDialog(viewFrame,
+		// "Export To Image", bitmapPanel);
+		// popup.pack();
+		// popup.setVisible(true);
+		// }
+		// });
 		menu.setMnemonic(KeyEvent.VK_H);
 
 		// menu.addMenuItem("Save Zoomed Image", new ActionListener() {
@@ -1397,14 +786,6 @@ MainPanel, Observer {
 		// menu.setMnemonic(KeyEvent.VK_Z);
 	}
 
-	/**
-	 * show summary of the specified indexes
-	 */
-	public void showSubDataModel(final int[] indexes) {
-
-		getViewFrame().showSubDataModel(indexes, null, null);
-	}
-
 	// Populate Menus
 	/**
 	 * adds DendroView stuff to Analysis menu
@@ -1412,455 +793,348 @@ MainPanel, Observer {
 	 * @param menu
 	 *            menu to add to
 	 */
+	// @Override
+	// public void populateAnalysisMenu(final TreeviewMenuBarI menu) {
+	//
+	// menu.addMenuItem("Flip Array Tree Node", new ActionListener() {
+	//
+	// @Override
+	// public void actionPerformed(final ActionEvent ae) {
+	//
+	// if (getGtrview().hasFocus()) {
+	//
+	// flipSelectedGTRNode();
+	// } else {
+	//
+	// flipSelectedATRNode();
+	// }
+	// }
+	// });
+	// menu.setAccelerator(KeyEvent.VK_L);
+	// menu.setMnemonic(KeyEvent.VK_A);
+	//
+	// menu.addMenuItem("Flip Gene Tree Node", new ActionListener() {
+	//
+	// @Override
+	// public void actionPerformed(final ActionEvent ae) {
+	//
+	// flipSelectedGTRNode();
+	// }
+	// });
+	// menu.setMnemonic(KeyEvent.VK_G);
+	//
+	// menu.addMenuItem("Align to Tree...", new ActionListener() {
+	//
+	// @Override
+	// public void actionPerformed(final ActionEvent ae) {
+	//
+	// try {
+	//
+	// final FileSet fileSet = offerATRFileSelection();
+	// final AtrTVModel atrModel = makeAtrModel(fileSet);
+	//
+	// alignAtrToModel(atrModel);
+	// } catch (final LoadException e) {
+	//
+	// if ((e.getType() != LoadException.INTPARSE)
+	// && (e.getType() != LoadException.NOFILE)) {
+	// LogBuffer.println("Could not open file: "
+	// + e.getMessage());
+	// e.printStackTrace();
+	// }
+	// }
+	// }
+	// });
+	// menu.setAccelerator(KeyEvent.VK_A);
+	// menu.setMnemonic(KeyEvent.VK_G);
+	//
+	// menu.addMenuItem("Compare to...", new ActionListener() {
+	//
+	// @Override
+	// public void actionPerformed(final ActionEvent ae) {
+	//
+	// try {
+	//
+	// final FileSet fileSet = offerATRFileSelection();
+	// final TVModel tvModel = makeCdtModel(fileSet);
+	// compareToModel(tvModel);
+	// } catch (final LoadException e) {
+	//
+	// if ((e.getType() != LoadException.INTPARSE)
+	// && (e.getType() != LoadException.NOFILE)) {
+	// LogBuffer.println("Could not open file: "
+	// + e.getMessage());
+	// e.printStackTrace();
+	// }
+	// }
+	// }
+	// });
+	// menu.setAccelerator(KeyEvent.VK_C);
+	// menu.setMnemonic(KeyEvent.VK_C);
+	//
+	// menu.addMenuItem("Remove comparison", new ActionListener() {
+	//
+	// @Override
+	// public void actionPerformed(final ActionEvent ae) {
+	//
+	// getDataModel().removeAppended();
+	// globalXmap.setIndexRange(0, getDataModel().getDataMatrix()
+	// .getNumCol() - 1);
+	// globalXmap.notifyObservers();
+	//
+	// ((Observable) getDataModel()).notifyObservers();
+	// }
+	// });
+	// menu.setAccelerator(KeyEvent.VK_R);
+	// menu.setMnemonic(KeyEvent.VK_R);
+
+	// menu.addMenuItem("Summary Window...",new ActionListener() {
+	// public void actionPerformed(ActionEvent e) {
+	// SummaryViewWizard wizard =
+	// new SummaryViewWizard(DendroView2.this);
+	// int retval = JOptionPane.showConfirmDialog(DendroView2.this,
+	// wizard, "Configure Summary", JOptionPane.OK_CANCEL_OPTION);
+	// if (retval == JOptionPane.OK_OPTION) {
+	// showSubDataModel(wizard.getIndexes());
+	// }
+	// }
+	// });
+	// menu.setMnemonic(KeyEvent.VK_S);
+	// }
+
+	// /**
+	// * adds DendroView stuff to Document menu
+	// *
+	// * @param menu
+	// * menu to add to
+	// */
+	// @Override
+	// public void populateSettingsMenu(final TreeviewMenuBarI menu) {
+	//
+	// annotationsMenuItem = (JMenuItem) menu.addMenuItem(
+	// "Row and Column Labels", 0);
+	// menu.setMnemonic(KeyEvent.VK_R);
+	// tvFrame.addToMenuList(annotationsMenuItem);
+	//
+	// colorMenuItem = (JMenuItem) menu.addMenuItem("Color Settings", 1);
+	// menu.setMnemonic(KeyEvent.VK_C);
+	// tvFrame.addToMenuList(colorMenuItem);
+	// }
+
 	@Override
-	public void populateAnalysisMenu(final TreeviewMenuBarI menu) {
+	public void addDendroMenus(final JMenu menu) {
 
-//		menu.addMenuItem("Flip Array Tree Node", new ActionListener() {
-//
-//			@Override
-//			public void actionPerformed(final ActionEvent ae) {
-//
-//				if (getGtrview().hasFocus()) {
-//
-//					flipSelectedGTRNode();
-//				} else {
-//
-//					flipSelectedATRNode();
-//				}
-//			}
-//		});
-//		menu.setAccelerator(KeyEvent.VK_L);
-//		menu.setMnemonic(KeyEvent.VK_A);
-//
-//		menu.addMenuItem("Flip Gene Tree Node", new ActionListener() {
-//
-//			@Override
-//			public void actionPerformed(final ActionEvent ae) {
-//
-//				flipSelectedGTRNode();
-//			}
-//		});
-//		menu.setMnemonic(KeyEvent.VK_G);
-//
-//		menu.addMenuItem("Align to Tree...", new ActionListener() {
-//
-//			@Override
-//			public void actionPerformed(final ActionEvent ae) {
-//
-//				try {
-//
-//					final FileSet fileSet = offerATRFileSelection();
-//					final AtrTVModel atrModel = makeAtrModel(fileSet);
-//
-//					alignAtrToModel(atrModel);
-//				} catch (final LoadException e) {
-//
-//					if ((e.getType() != LoadException.INTPARSE)
-//							&& (e.getType() != LoadException.NOFILE)) {
-//						LogBuffer.println("Could not open file: "
-//								+ e.getMessage());
-//						e.printStackTrace();
-//					}
-//				}
-//			}
-//		});
-//		menu.setAccelerator(KeyEvent.VK_A);
-//		menu.setMnemonic(KeyEvent.VK_G);
-//
-//		menu.addMenuItem("Compare to...", new ActionListener() {
-//
-//			@Override
-//			public void actionPerformed(final ActionEvent ae) {
-//
-//				try {
-//
-//					final FileSet fileSet = offerATRFileSelection();
-//					final TVModel tvModel = makeCdtModel(fileSet);
-//					compareToModel(tvModel);
-//				} catch (final LoadException e) {
-//
-//					if ((e.getType() != LoadException.INTPARSE)
-//							&& (e.getType() != LoadException.NOFILE)) {
-//						LogBuffer.println("Could not open file: "
-//								+ e.getMessage());
-//						e.printStackTrace();
-//					}
-//				}
-//			}
-//		});
-//		menu.setAccelerator(KeyEvent.VK_C);
-//		menu.setMnemonic(KeyEvent.VK_C);
-//
-//		menu.addMenuItem("Remove comparison", new ActionListener() {
-//
-//			@Override
-//			public void actionPerformed(final ActionEvent ae) {
-//
-//				getDataModel().removeAppended();
-//				globalXmap.setIndexRange(0, getDataModel().getDataMatrix()
-//						.getNumCol() - 1);
-//				globalXmap.notifyObservers();
-//
-//				((Observable) getDataModel()).notifyObservers();
-//			}
-//		});
-//		menu.setAccelerator(KeyEvent.VK_R);
-//		menu.setMnemonic(KeyEvent.VK_R);
+		annotationsMenuItem = new JMenuItem(StringRes.menu_RowAndCol);
+		menu.add(annotationsMenuItem);
+		tvFrame.addToStackMenuList(annotationsMenuItem);
 
-		// menu.addMenuItem("Summary Window...",new ActionListener() {
-		// public void actionPerformed(ActionEvent e) {
-		// SummaryViewWizard wizard =
-		// new SummaryViewWizard(DendroView2.this);
-		// int retval = JOptionPane.showConfirmDialog(DendroView2.this,
-		// wizard, "Configure Summary", JOptionPane.OK_CANCEL_OPTION);
-		// if (retval == JOptionPane.OK_OPTION) {
-		// showSubDataModel(wizard.getIndexes());
-		// }
-		// }
-		// });
-		// menu.setMnemonic(KeyEvent.VK_S);
-	}
-
-	/**
-	 * adds DendroView stuff to Document menu
-	 * 
-	 * @param menu
-	 *            menu to add to
-	 */
-	@Override
-	public void populateSettingsMenu(final TreeviewMenuBarI menu) {
+		colorMenuItem = new JMenuItem(StringRes.menu_Color);
+		menu.add(colorMenuItem);
+		tvFrame.addToStackMenuList(colorMenuItem);
 		
-		annotationsMenuItem = (JMenuItem) menu.addMenuItem(
-				"Row and Column Labels", 0);
-		menu.setMnemonic(KeyEvent.VK_R);
-		tvFrame.addToMenuList(annotationsMenuItem);
+		menu.addSeparator();
 		
-		colorMenuItem = (JMenuItem) menu.addMenuItem("Color Settings", 1); 
-		menu.setMnemonic(KeyEvent.VK_C);
-		tvFrame.addToMenuList(colorMenuItem);
-	}
-
-	/**
-	 * Alok: this function changes the info in the ConfigNode to match the
-	 * current panel sizes. this is a hack, since I don't know how to intercept
-	 * panel resizing. Actually, in the current layout this isn't even used.
-	 */
-	@Override
-	public void syncConfig() {
-		/*
-		 * DragGridPanel running = this; floa t[] heights =
-		 * running.getHeights(); ConfigNode heightNodes[] =
-		 * root.fetch("Height"); for (int i = 0; i < heights.length; i++) { if
-		 * (i < heightNodes.length) { heightNodes[i].setAttribute("value",
-		 * (double) heights[i], 1.0 / heights.length); } else { ConfigNode n =
-		 * root.create("Height"); n.setAttribute("value", (double) heights[i],
-		 * 1.0 / heights.length); } }
-		 * 
-		 * float[] widths = running.getWidths(); ConfigNode widthNodes[] =
-		 * root.fetch("Width"); for (int i = 0; i < widths.length; i++) { if (i
-		 * < widthNodes.length) { widthNodes[i].setAttribute("value", (double)
-		 * widths[i], 1.0 / widths.length); } else { ConfigNode n =
-		 * root.create("Width"); n.setAttribute("value", (double) widths[i], 1.0
-		 * / widths.length); } }
-		 */
-	}
-
-	/**
-	 * binds this dendroView to a particular confignode, resizing the panel
-	 * sizes appropriately.
-	 * 
-	 * @param configNode
-	 *            ConfigNode to bind to
-	 */
-
-	@Override
-	public void bindConfig(final ConfigNode configNode) {
+		matrixMenu = new JMenu("Matrix Size");
+		menu.add(matrixMenu);
 		
-		root = configNode;
-		/*
-		 * ConfigNode heightNodes[] = root.fetch("Height"); ConfigNode
-		 * widthNodes[] = root.fetch("Width");
-		 * 
-		 * float heights[]; float widths[]; if (heightNodes.length != 0) {
-		 * heights = new float[heightNodes.length]; widths = new
-		 * float[widthNodes.length]; for (int i = 0; i < heights.length; i++) {
-		 * heights[i] = (float) heightNodes[i].getAttribute( "value", 1.0 /
-		 * heights.length); } for (int j = 0; j < widths.length; j++) {
-		 * widths[j] = (float) widthNodes[j].getAttribute( "value", 1.0 /
-		 * widths.length); } } else { widths = new float[]{2 / 11f, 3 / 11f, 3 /
-		 * 11f, 3 / 11f}; heights = new float[]{3 / 16f, 1 / 16f, 3 / 4f}; }
-		 * setHeights(heights); setWidths(widths);
-		 */
+		JMenuItem fillScreenMenuItem = new JMenuItem("Fill screen");
+		matrixMenu.add(fillScreenMenuItem);
+		tvFrame.addToStackMenuList(fillScreenMenuItem);
+		
+		JMenuItem equalAxesMenuItem = new JMenuItem("Equal axes");
+		matrixMenu.add(equalAxesMenuItem);
+		tvFrame.addToStackMenuList(equalAxesMenuItem);
+		
+		JMenuItem proportMatrixMenuItem = new JMenuItem("Proportional axes");
+		matrixMenu.add(proportMatrixMenuItem);
+		tvFrame.addToStackMenuList(proportMatrixMenuItem);
+//		
+//		isolateMenu = new JMenuItem("Isolate Selected");
+//		menu.add(isolateMenu);
+//		tvFrame.addToStackMenuList(isolateMenu);
 	}
 
-	public void saveImage(final JPanel panel) throws IOException {
-
-		File saveFile = new File("savedImage.png");
-
-		final JFileChooser fc = new JFileChooser();
-
-		fc.setFileFilter(new FileNameExtensionFilter("PNG", "png"));
-		fc.setSelectedFile(saveFile);
-		final int returnVal = fc.showSaveDialog(dendroPane);
-
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			saveFile = fc.getSelectedFile();
-
-			String fileName = saveFile.toString();
-
-			if (!fileName.endsWith(".png")) {
-				fileName += ".png";
-				saveFile = new File(fileName);
-			}
-
-			final BufferedImage im = new BufferedImage(panel.getWidth(),
-					panel.getHeight(), BufferedImage.TYPE_INT_ARGB);
-
-			panel.paint(im.getGraphics());
-			ImageIO.write(im, "PNG", saveFile);
-		}
-	}
-
-//	/**
-//	 * @param initXmap
-//	 * @param initYmap
-//	 * @return
-//	 */
-//	private PostscriptExportPanel setupPostscriptExport(
-//			final MapContainer initXmap, final MapContainer initYmap) {
-//
-//		final PostscriptExportPanel psePanel = new PostscriptExportPanel(
-//				arraynameview.getHeaderInfo(), getDataModel()
-//						.getGeneHeaderInfo(), getGeneSelection(),
-//				getArraySelection(), invertedTreeDrawer, leftTreeDrawer,
-//				arrayDrawer, initXmap, initYmap);
-//
-//		psePanel.setSourceSet(getDataModel().getFileSet());
-//		psePanel.setGeneFont(textview.getFont());
-//		psePanel.setArrayFont(arraynameview.getFont());
-//		psePanel.setIncludedArrayHeaders(arraynameview.getHeaderSummary()
-//				.getIncluded());
-//		psePanel.setIncludedGeneHeaders(textview.getHeaderSummary()
-//				.getIncluded());
-//
-//		return psePanel;
-//	}
-//
-//	private BitmapExportPanel setupBitmapExport(final MapContainer initXmap,
-//			final MapContainer initYmap) {
-//
-//		final BitmapExportPanel bitmapPanel = new BitmapExportPanel(
-//				arraynameview.getHeaderInfo(), getDataModel()
-//						.getGeneHeaderInfo(), getGeneSelection(),
-//				getArraySelection(), invertedTreeDrawer, leftTreeDrawer,
-//				arrayDrawer, initXmap, initYmap);
-//
-//		bitmapPanel.setSourceSet(getDataModel().getFileSet());
-//		bitmapPanel.setGeneFont(textview.getFont());
-//		bitmapPanel.setArrayFont(arraynameview.getFont());
-//		bitmapPanel.setIncludedArrayHeaders(arraynameview.getHeaderSummary()
-//				.getIncluded());
-//		bitmapPanel.setIncludedGeneHeaders(textview.getHeaderSummary()
-//				.getIncluded());
-//
-//		return bitmapPanel;
-//	}
-
-//	@Override
-//	public void export(final MainProgramArgs mainArgs) throws ExportException {
-//
-//		final DendroviewArgs args = new DendroviewArgs(mainArgs.remainingArgs());
-//
-//		if (args.getFilePath() == null) {
-//			System.err.println("Error, must specify an output file\n");
-//			args.printUsage();
-//
-//			return;
-//		}
-//
-//		final ExportPanel exporter;
-//
-//		if ("ps".equalsIgnoreCase(args.getExportType())) {
-//			exporter = setupPostscriptExport(getGlobalXmap(), getGlobalYmap());
-//
-//		} else if ("png".equalsIgnoreCase(args.getExportType())
-//				|| "gif".equalsIgnoreCase(args.getExportType())) {
-//			exporter = setupBitmapExport(getGlobalXmap(), getGlobalYmap());
-//
-//		} else {
-//			System.err.println("Error, unrecognized output format "
-//					+ args.getExportType() + " \n");
-//
-//			args.printUsage();
-//			exporter = null;
-//		}
-//
-//		if (exporter != null) {
-//			exporter.setFilePath(args.getFilePath());
-//			exporter.setIncludedArrayHeaders(args.getArrayHeaders());
-//			exporter.setIncludedGeneHeaders(args.getGeneHeaders());
-//
-//			if (args.getXScale() != null) {
-//				exporter.setXscale(args.getXScale());
-//			}
-//
-//			if (args.getYScale() != null) {
-//				exporter.setYscale(args.getYScale());
-//			}
-//
-//			if (args.getContrast() != null) {
-//				colorExtractor.setContrast(args.getContrast());
-//			}
-//
-//			if (args.getGtrWidth() != null) {
-//				exporter.setExplicitGtrWidth(args.getGtrWidth());
-//			}
-//
-//			if (args.getAtrHeight() != null) {
-//				exporter.setExplicitAtrHeight(args.getAtrHeight());
-//			}
-//
-//			if (args.getLogcenter() != null) {
-//				colorExtractor.setLogCenter(args.getLogcenter());
-//				colorExtractor.setLogBase(2.0);
-//				colorExtractor.setLogTransform(true);
-//			}
-//
-//			exporter.setArrayAnnoInside(args.getArrayAnnoInside());
-//			exporter.save();
-//		}
-//	}
-
-	// Getters
-	/**
-	 * Always returns an instance of the node, even if it has to create it.
-	 */
-	protected ConfigNode getFirst(final String name) {
-
-		return getConfigNode().fetchOrCreate(name);
-	}
-
-	public TreeSelectionI getGeneSelection() {
-
-		return geneSelection;
-	}
-
-	public TreeSelectionI getArraySelection() {
-
-		return arraySelection;
-	}
-
-	/**
-	 * Getter for root
-	 */
 	@Override
-	public ConfigNode getConfigNode() {
+	public void addClusterMenus(final JMenu menu) {
 
-		return root;
-	}
+		// Cluster Menu
+		final JMenuItem hierMenuItem = new JMenuItem(
+				StringRes.menu_Hier);
+		menu.add(hierMenuItem);
+		tvFrame.addToStackMenuList(hierMenuItem);
 
-	/**
-	 * Icon for display in tabbed panel
-	 */
-	@Override
-	public ImageIcon getIcon() {
-
-		if (treeviewIcon == null)
-			try {
-				treeviewIcon = new ImageIcon("images/treeview.gif",
-						"TreeView Icon");
-
-			} catch (final java.security.AccessControlException e) {
-				// need form relative URL somehow...
-			}
-
-		return treeviewIcon;
-	}
-
-	public ArrayNameView getArraynameview() {
-
-		return arraynameview;
-	}
-
-	public ATRView getAtrview() {
-
-		return atrview;
-	}
-
-	public GTRView getGtrview() {
-
-		return gtrview;
-	}
-
-	public TextViewManager getTextview() {
-
-		return textview;
-	}
-
-	/**
-	 * Gets the globalXmap attribute of the DendroView object
-	 * 
-	 * @return globalXmap
-	 */
-	public MapContainer getGlobalXmap() {
-
-		return globalXmap;
-	}
-
-	/**
-	 * Gets the globalYmap attribute of the DendroView object
-	 * 
-	 * @return The globalYmap
-	 */
-	public MapContainer getGlobalYmap() {
-
-		return globalYmap;
+		final JMenuItem kMeansMenuItem = new JMenuItem(
+				StringRes.menu_KMeans);
+		menu.add(kMeansMenuItem);
+		tvFrame.addToStackMenuList(kMeansMenuItem);
 	}
 
 	// /**
-	// * Gets the zoomXmap attribute of the DendroView object
-	// * @return zoomXmap
+	// * @param initXmap
+	// * @param initYmap
+	// * @return
 	// */
-	// public MapContainer getZoomXmap() {
+	// private PostscriptExportPanel setupPostscriptExport(
+	// final MapContainer initXmap, final MapContainer initYmap) {
 	//
-	// return zoomXmap;
+	// final PostscriptExportPanel psePanel = new PostscriptExportPanel(
+	// arraynameview.getHeaderInfo(), getDataModel()
+	// .getGeneHeaderInfo(), getGeneSelection(),
+	// getArraySelection(), invertedTreeDrawer, leftTreeDrawer,
+	// arrayDrawer, initXmap, initYmap);
+	//
+	// psePanel.setSourceSet(getDataModel().getFileSet());
+	// psePanel.setGeneFont(textview.getFont());
+	// psePanel.setArrayFont(arraynameview.getFont());
+	// psePanel.setIncludedArrayHeaders(arraynameview.getHeaderSummary()
+	// .getIncluded());
+	// psePanel.setIncludedGeneHeaders(textview.getHeaderSummary()
+	// .getIncluded());
+	//
+	// return psePanel;
 	// }
 	//
-	// /**
-	// * Gets the zoomYmap attribute of the DendroView object
-	// * @return zoomYmap
-	// */
-	// public MapContainer getZoomYmap() {
+	// private BitmapExportPanel setupBitmapExport(final MapContainer initXmap,
+	// final MapContainer initYmap) {
 	//
-	// return zoomYmap;
+	// final BitmapExportPanel bitmapPanel = new BitmapExportPanel(
+	// arraynameview.getHeaderInfo(), getDataModel()
+	// .getGeneHeaderInfo(), getGeneSelection(),
+	// getArraySelection(), invertedTreeDrawer, leftTreeDrawer,
+	// arrayDrawer, initXmap, initYmap);
+	//
+	// bitmapPanel.setSourceSet(getDataModel().getFileSet());
+	// bitmapPanel.setGeneFont(textview.getFont());
+	// bitmapPanel.setArrayFont(arraynameview.getFont());
+	// bitmapPanel.setIncludedArrayHeaders(arraynameview.getHeaderSummary()
+	// .getIncluded());
+	// bitmapPanel.setIncludedGeneHeaders(textview.getHeaderSummary()
+	// .getIncluded());
+	//
+	// return bitmapPanel;
 	// }
 
-	/**
-	 * Getter for viewFrame
-	 */
-	public ViewFrame getViewFrame() {
-
-		return tvFrame;
-	}
-
-	/**
-	 * Gets the model this DendroView is based on
-	 */
-	protected DataModel getDataModel() {
-
-		return this.dataModel;
+	// @Override
+	// public void export(final MainProgramArgs mainArgs) throws ExportException
+	// {
+	//
+	// final DendroviewArgs args = new DendroviewArgs(mainArgs.remainingArgs());
+	//
+	// if (args.getFilePath() == null) {
+	// System.err.println("Error, must specify an output file\n");
+	// args.printUsage();
+	//
+	// return;
+	// }
+	//
+	// final ExportPanel exporter;
+	//
+	// if ("ps".equalsIgnoreCase(args.getExportType())) {
+	// exporter = setupPostscriptExport(getGlobalXmap(), getGlobalYmap());
+	//
+	// } else if ("png".equalsIgnoreCase(args.getExportType())
+	// || "gif".equalsIgnoreCase(args.getExportType())) {
+	// exporter = setupBitmapExport(getGlobalXmap(), getGlobalYmap());
+	//
+	// } else {
+	// System.err.println("Error, unrecognized output format "
+	// + args.getExportType() + " \n");
+	//
+	// args.printUsage();
+	// exporter = null;
+	// }
+	//
+	// if (exporter != null) {
+	// exporter.setFilePath(args.getFilePath());
+	// exporter.setIncludedArrayHeaders(args.getArrayHeaders());
+	// exporter.setIncludedGeneHeaders(args.getGeneHeaders());
+	//
+	// if (args.getXScale() != null) {
+	// exporter.setXscale(args.getXScale());
+	// }
+	//
+	// if (args.getYScale() != null) {
+	// exporter.setYscale(args.getYScale());
+	// }
+	//
+	// if (args.getContrast() != null) {
+	// colorExtractor.setContrast(args.getContrast());
+	// }
+	//
+	// if (args.getGtrWidth() != null) {
+	// exporter.setExplicitGtrWidth(args.getGtrWidth());
+	// }
+	//
+	// if (args.getAtrHeight() != null) {
+	// exporter.setExplicitAtrHeight(args.getAtrHeight());
+	// }
+	//
+	// if (args.getLogcenter() != null) {
+	// colorExtractor.setLogCenter(args.getLogcenter());
+	// colorExtractor.setLogBase(2.0);
+	// colorExtractor.setLogTransform(true);
+	// }
+	//
+	// exporter.setArrayAnnoInside(args.getArrayAnnoInside());
+	// exporter.save();
+	// }
+	// }
+	
+	// Set GlobalView sizes
+	public void setGVWidth(double newWidth) {
+		
+		this.gvWidth = newWidth;
 	}
 	
-	/**
-	 * Getter for ArrayDrawer object.
-	 * @return
-	 */
-	public ArrayDrawer getArrayDrawer() {
+	public void setGVHeight(double newHeight) {
 		
-		return arrayDrawer;
+		this.gvHeight = newHeight;
 	}
-
-	// Setters
+	
+	// Get GlobalView sizes
+	public double getGVWidth() {
+		
+		return gvWidth;
+	}
+	
+	public double getGVHeight() {
+		
+		return gvHeight;
+	}
+	
+//	public double getWidthChange() {
+//		
+//		return widthChange;
+//	}
+//	
+//	public void setWidthChange(double change) {
+//		
+////		this.widthChange = widthChange + change;
+//		this.widthChange = change;
+//	}
+//	
+//	public double getHeightChange() {
+//		
+//		return heightChange;
+//	}
+//	
+//	public void setHeightChange(double change) {
+//		
+////		this.heightChange = heightChange + change;
+//		this.heightChange = change;
+//	}
+	
+	public double getMaxGVWidth() {
+		
+		return maxGVWidth;
+	}
+	
+	public double getMaxGVHeight() {
+		
+		return maxGVHeight;
+	}
+	
+	// Selection methods
 	/**
 	 * This should be called after setDataModel has been set to the appropriate
 	 * model
@@ -1913,22 +1187,14 @@ MainPanel, Observer {
 		this.tvFrame = viewFrame;
 	}
 
-	/**
-	 * Setter for dataModel
-	 */
-	protected void setDataModel(final DataModel dataModel) {
+	public JPanel getGeneFinderPanel(HeaderInfo geneHI) {
 
-		this.dataModel = dataModel;
-	}
+		final HeaderFinderBox geneFinderBox = new GeneFinderBox(tvFrame,
+				geneHI, getTextview().getHeaderSummary(), 
+				tvFrame.getGeneSelection());
 
-	public JPanel getGeneFinderPanel() {
+		final JPanel contentPanel = geneFinderBox.getContentPanel();
 
-		HeaderFinderBox geneFinderBox = new GeneFinderBox(tvFrame, this,
-					getDataModel().getGeneHeaderInfo(),
-					tvFrame.getGeneSelection());
-
-		JPanel contentPanel = geneFinderBox.getContentPanel();
-		
 		return contentPanel;
 	}
 
@@ -1937,49 +1203,15 @@ MainPanel, Observer {
 	 * 
 	 * @return HeaderFinderPanel arrayFinderPanel
 	 */
-	public JPanel getArrayFinderPanel() {
+	public JPanel getArrayFinderPanel(HeaderInfo arrayHI) {
 
-		HeaderFinderBox arrayFinderBox = new ArrayFinderBox(tvFrame, this,
-				getDataModel().getArrayHeaderInfo(),
+		final HeaderFinderBox arrayFinderBox = new ArrayFinderBox(tvFrame,
+				arrayHI, getArraynameview().getHeaderSummary(),
 				tvFrame.getArraySelection());
-		
-		JPanel contentPanel = arrayFinderBox.getContentPanel();
-		
+
+		final JPanel contentPanel = arrayFinderBox.getContentPanel();
+
 		return contentPanel;
-	}
-
-	/**
-	 * Setter for root - may not work properly public void
-	 * setConfigNode(ConfigNode root) { this.root = root; }
-	 */
-	// Component Listeners
-	@Override
-	public void componentHidden(final ComponentEvent arg0) {
-	}
-
-	@Override
-	public void componentMoved(final ComponentEvent arg0) {
-	}
-
-	@Override
-	public void componentResized(final ComponentEvent arg0) {
-		
-		if (globalXmap.getAvailablePixels() > globalXmap.getUsedPixels()
-				&& globalXmap.getScale() == globalXmap.getMinScale()) {
-			globalXmap.setHome();
-		}
-
-		if (globalYmap.getAvailablePixels() > globalYmap.getUsedPixels()
-				&& globalYmap.getScale() == globalYmap.getMinScale()) {
-			globalYmap.setHome();
-		}
-
-		dendroPane.revalidate();
-		dendroPane.repaint();
-	}
-
-	@Override
-	public void componentShown(final ComponentEvent arg0) {
 	}
 
 	@Override
@@ -1987,15 +1219,121 @@ MainPanel, Observer {
 
 		return name;
 	}
-	
-	public void setName(String name) {
+
+	public void setName(final String name) {
 
 		this.name = name;
 	}
 
-	@Override
-	public void export(MainProgramArgs args) throws ExportException {
-		// TODO Auto-generated method stub
-		
+	// Getters
+	public JButton getXPlusButton() {
+
+		return scaleIncX;
+	}
+
+	public JButton getXMinusButton() {
+
+		return scaleDecX;
+	}
+
+	public JButton getYPlusButton() {
+
+		return scaleIncY;
+	}
+
+	public JButton getYMinusButton() {
+
+		return scaleDecY;
+	}
+
+	public JButton getHomeButton() {
+
+		return scaleDefaultAll;
+	}
+
+	public JScrollBar getXScroll() {
+
+		return globalXscrollbar;
+	}
+
+	public void setXScroll(final int i) {
+
+		globalXscrollbar.setValue(i);
+	}
+
+	public JScrollBar getYScroll() {
+
+		return globalYscrollbar;
+	}
+
+	public void setYScroll(final int i) {
+
+		globalYscrollbar.setValue(i);
+	}
+
+	public GlobalView2 getGlobalView() {
+
+		return globalview;
+	}
+
+	public JPanel getDendroPane() {
+
+		return dendroPane;
+	}
+
+	public TreeSelectionI getGeneSelection() {
+
+		return geneSelection;
+	}
+
+	public TreeSelectionI getArraySelection() {
+
+		return arraySelection;
+	}
+
+	public ArrayNameView getArraynameview() {
+
+		return arraynameview;
+	}
+
+	public ATRView getAtrview() {
+
+		return atrview;
+	}
+
+	public GTRView getGtrview() {
+
+		return gtrview;
+	}
+
+	public TextView getTextview() {
+
+		return textview;
+	}
+
+	/**
+	 * Getter for viewFrame
+	 */
+	public ViewFrame getViewFrame() {
+
+		return tvFrame;
+	}
+
+	/**
+	 * Returns a boolean which indicates whether the dendrogram ModelViews are
+	 * enabled.
+	 * 
+	 * @return
+	 */
+	public boolean treesEnabled() {
+
+		boolean enabled = false;
+
+		if (gtrview.isEnabled() || atrview.isEnabled()) {
+			enabled = true;
+
+		}
+
+		return enabled;
 	}
 }

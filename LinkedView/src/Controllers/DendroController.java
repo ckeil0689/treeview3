@@ -21,6 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import Utilities.Helper;
 import edu.stanford.genetics.treeview.CdtFilter;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.DataModel;
@@ -40,7 +41,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.AtrAligner;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor2;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets2;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroException;
-import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
+import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
 import edu.stanford.genetics.treeview.plugin.dendroview.DoubleArrayDrawer;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
@@ -49,8 +50,8 @@ import edu.stanford.genetics.treeview.plugin.dendroview.TreePainter;
 
 public class DendroController implements ConfigNodePersistent {
 
-	private final double PRECISION_LEVEL = 0.000001;
-	private DendroView2 dendroView;
+	private final double EPSILON = 0.000001;
+	private DendroView dendroView;
 	private final TreeViewFrame tvFrame;
 	private DataModel tvModel;
 
@@ -83,7 +84,7 @@ public class DendroController implements ConfigNodePersistent {
 		globalYmap = new MapContainer("Fixed", "GlobalYMap");
 	}
 	
-	public void setNew(final DendroView2 dendroView, final DataModel tvModel) {
+	public void setNew(final DendroView dendroView, final DataModel tvModel) {
 		
 		this.dendroView = dendroView;
 		this.tvModel = tvModel;
@@ -98,7 +99,7 @@ public class DendroController implements ConfigNodePersistent {
 
 		// add listeners
 		addViewListeners();
-		addMenuButtonListeners();
+		addMenuBtnListeners();
 	}
 
 	/**
@@ -119,10 +120,15 @@ public class DendroController implements ConfigNodePersistent {
 		dendroView.addCompListener(new ResizeListener());
 	}
 
-	public void addMenuButtonListeners() {
+	/**
+	 * TODO Make sure only one listener is on each button, not multiple 
+	 * instances.
+	 */
+	public void addMenuBtnListeners() {
 
-		dendroView.addSearchButtonListener(new SearchButtonListener());
-		dendroView.addTreeButtonListener(new TreeButtonListener());
+		LogBuffer.println("Adding MenuBtnListeners.");
+		dendroView.addSearchBtnListener(new SearchButtonListener());
+		dendroView.addTreeBtnListener(new TreeBtnListener());
 	}
 
 	class SearchButtonListener implements ActionListener {
@@ -144,12 +150,12 @@ public class DendroController implements ConfigNodePersistent {
 	 * @author CKeil
 	 * 
 	 */
-	class TreeButtonListener implements ActionListener {
+	class TreeBtnListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			new TreeButtonClicker().run();
+			new TreeBtnClicker().run();
 		}
 	}
 
@@ -159,13 +165,14 @@ public class DendroController implements ConfigNodePersistent {
 	 * @author CKeil
 	 * 
 	 */
-	class TreeButtonClicker extends SwingWorker<Void, Void> {
+	class TreeBtnClicker extends SwingWorker<Void, Void> {
 		
 		@Override
 		protected Void doInBackground() throws Exception {
 			
 			setTreesVis(tvFrame.getTreeButton().isSelected());
-
+			
+			LogBuffer.println("Setting dendroView layout in TreeBtnClicker.");
 			dendroView.setupLayout();
 			addViewListeners();
 			return null;
@@ -312,8 +319,9 @@ public class DendroController implements ConfigNodePersistent {
 		double absGVHeight = dendroView.getGlobalView().getHeight() 
 				+ dendroView.getXScroll().getHeight();
 		
-		if(Math.abs(absGVWidth - absGVHeight) <= PRECISION_LEVEL) {
-			// TO-DO: get rid of this statement, as it does nothing!
+		if(Helper.nearlyEqual(absGVWidth, absGVHeight, EPSILON)) {
+			//Math.abs(absGVWidth - absGVHeight) <= EPSILON) {
+			/* TODO get rid of this statement, as it does nothing! */
 		
 		} else if(absGVWidth < absGVHeight) {
 			percentDiff = (absGVWidth/ absGVHeight);

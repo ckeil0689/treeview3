@@ -66,7 +66,7 @@ import edu.stanford.genetics.treeview.core.FileMruEditor;
 import edu.stanford.genetics.treeview.core.LogMessagesPanel;
 import edu.stanford.genetics.treeview.core.LogSettingsPanel;
 import edu.stanford.genetics.treeview.core.MenuHelpPluginsFrame;
-import edu.stanford.genetics.treeview.plugin.dendroview.DendroView2;
+import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 
 /**
  * This class is the main window of TreeView 3. It holds all views to be
@@ -92,7 +92,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	// Different Views to be displayed
 	private final WelcomeView welcomeView;
 	private final LoadErrorView loadErrorView;
-	private final DendroView2 dendroView;
+	private final DendroView dendroView;
 
 	private String loadErrorMessage;
 	
@@ -147,7 +147,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		// Initialize the views
 		welcomeView = new WelcomeView();
 		loadErrorView = new LoadErrorView();
-		dendroView = new DendroView2(this);
+		dendroView = new DendroView(this);
 
 		setWindowActive(true);
 
@@ -476,7 +476,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 * 
 	 * @return dendroView
 	 */
-	public DendroView2 getDendroView() {
+	public DendroView getDendroView() {
 
 		return dendroView;
 	}
@@ -1307,7 +1307,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		return treeToggleBtn;
 	}
 
-	public JButton getSearchButton() {
+	public JButton getSearchBtn() {
 
 		return searchBtn;
 	}
