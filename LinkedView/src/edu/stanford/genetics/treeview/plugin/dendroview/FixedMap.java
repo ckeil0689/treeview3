@@ -79,7 +79,7 @@ public class FixedMap extends IntegerMap {
 	@Override
 	public int getIndex(final int i) {
 
-		return (int) (i / scale) + minindex;
+		return (int) Math.floor(i / scale) + minindex;
 	}
 
 	/**
@@ -92,7 +92,7 @@ public class FixedMap extends IntegerMap {
 	@Override
 	public int getPixel(final int i) {
 
-		return (int) ((i - minindex) * scale);
+		return (int) Math.floor((i - minindex) * scale);
 	}
 
 	/**
@@ -114,9 +114,8 @@ public class FixedMap extends IntegerMap {
 			return 0;
 		}
 
-		final int i = (int) ((maxindex - minindex + 1) * scale);
-		final int j = (int) Math
-				.round((scale * (int) (availablepixels / scale)));
+		final int i = (int) Math.round((maxindex - minindex + 1) * scale);
+		final int j = (int) Math.round((scale * getViewableIndexes()));
 		if (i > j) {
 			return j;
 
@@ -131,7 +130,7 @@ public class FixedMap extends IntegerMap {
 	@Override
 	public int getViewableIndexes() {
 
-		final int i = (int) (availablepixels / scale);
+		final int i = (int) Math.round(availablepixels / scale);
 		return i;
 	}
 

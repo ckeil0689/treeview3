@@ -467,12 +467,11 @@ public class MapContainer extends Observable implements Observer,
 			setChanged();
 
 			if (getAvailablePixels() != getUsedPixels()) {
-				LogBuffer.println("Used pixels are not the same as "
-						+ "available pixels. Product value: "
+				LogBuffer.println("Scale sent in (d) = [" + d + "], d*int(AvailablePix/d) = ["
 						+ ((d * (int) (getAvailablePixels() / d)))
-						+ " UsedPix: " + getUsedPixels() + " AvailPix: "
-						+ getAvailablePixels() + " Scale: " + getScale()
-						+ " ScrollBar#: " + scrollbar.getVisibleAmount());
+						+ "] UsedPix = [" + getUsedPixels() + "] =? AvailPix = ["
+						+ getAvailablePixels() + "] Scale = [" + getScale()
+						+ "] ScrollBar#: " + scrollbar.getVisibleAmount());
 			}
 
 			configNode.putDouble("scale", d);
