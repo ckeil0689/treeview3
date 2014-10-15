@@ -46,7 +46,9 @@ public class FillMap extends IntegerMap {
 			return 0;
 		}
 
-		return i * (maxindex - minindex + 1) / availablepixels + minindex;
+		//Rob 10/14/2014
+		//Added Math.floor before casting as int instead of having that happen implicitly
+		return (int) Math.floor(i * (maxindex - minindex + 1) / availablepixels + minindex);
 	}
 
 	/**
