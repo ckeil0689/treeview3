@@ -28,6 +28,7 @@
 package Cluster;
 
 import java.awt.event.ActionListener;
+import java.awt.event.ItemListener;
 import java.util.Arrays;
 
 import javax.swing.JButton;
@@ -39,6 +40,7 @@ import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
+import javax.swing.event.ChangeListener;
 
 import edu.stanford.genetics.treeview.LogBuffer;
 import Utilities.GUIFactory;
@@ -281,9 +283,9 @@ public class ClusterView {
 		} else {
 			final JLabel kMeans = GUIFactory.createLabel("K-Means Options", 
 					GUIFactory.FONTL);
-			final JLabel clusters = GUIFactory.createLabel("Clusters: ", 
+			final JLabel clusters = GUIFactory.createLabel("Clusters*: ", 
 					GUIFactory.FONTS);
-			final JLabel its = GUIFactory.createLabel("Cycles: ", 
+			final JLabel its = GUIFactory.createLabel("Cycles*: ", 
 					GUIFactory.FONTS);
 			final JLabel filler = GUIFactory.createLabel(StringRes.empty, 
 					GUIFactory.FONTS);
@@ -291,20 +293,23 @@ public class ClusterView {
 					GUIFactory.FONTS);
 			final JLabel cols = GUIFactory.createLabel(StringRes.main_cols, 
 					GUIFactory.FONTS);
+			final JLabel req = GUIFactory.createLabel("* required", 
+					GUIFactory.FONTS);
 			
 			choicePanel.add(kMeans, "pushx, alignx 0%, span, wrap");
 			
-			choicePanel.add(filler, "w 20%!");
-			choicePanel.add(rows, "split 2");
+			choicePanel.add(filler, "w 25%!");
+			choicePanel.add(rows, "w 25%!, split 2");
 			choicePanel.add(cols, "wrap");
 			
-			choicePanel.add(clusters, "w 20%!");
-			choicePanel.add(rowGroupsSetr, "split 2");
+			choicePanel.add(clusters, "w 25%!");
+			choicePanel.add(rowGroupsSetr, "w 25%!, split 2");
 			choicePanel.add(colGroupsSetr, "wrap");
 
-			choicePanel.add(its, "w 20%!");
-			choicePanel.add(rowIterationsSetr, "split 2");
-			choicePanel.add(colIterationsSetr);
+			choicePanel.add(its, "w 25%!");
+			choicePanel.add(rowIterationsSetr, "w 25%!, split 2");
+			choicePanel.add(colIterationsSetr, "wrap");
+			choicePanel.add(req);
 		}
 		
 		return choicePanel;
@@ -364,6 +369,7 @@ public class ClusterView {
 		btnPanel.repaint();
 	}
 
+	/*-------Listeners ------*/
 	/**
 	 * Adds a listener to cancel_btn to register user interaction and notifies
 	 * ClusterController to call the cancel() method.
@@ -389,6 +395,24 @@ public class ClusterView {
 		
 		clusterChooser.addActionListener(l);
 	}
+	
+	public void addRowDistListener(final ItemListener l) {
+		
+		rowDistChooser.addItemListener(l);
+	}
+	
+	public void addColDistListener(final ItemListener l) {
+		
+		colDistChooser.addItemListener(l);
+	}
+	
+	public void addSpinnerListener(final ChangeListener l) {
+		
+		rowGroupsSetr.addChangeListener(l);
+		colGroupsSetr.addChangeListener(l);
+		rowIterationsSetr.addChangeListener(l);
+		colIterationsSetr.addChangeListener(l);
+	}
 
 	/**
 	 * Adds a load progress bar to loadpanel if a similarity measure has been
@@ -407,10 +431,16 @@ public class ClusterView {
 	 * Displays an error message if not at least one similarity measure has been
 	 * selected, since the data cannot be clustered in that case.
 	 */
-	public void displayErrorLabel() {
+	public void displayReadyStatus(boolean ready) {
 
-		loadLabel.setText(StringRes.clusterError_invalid);
-		loadLabel.setForeground(GUIFactory.RED1);
+		if(ready) {
+			loadLabel.setForeground(UIManager.getColor("Label.foreground"));
+			loadLabel.setText(StringRes.clusterInfo_Ready);
+			
+		} else {
+			loadLabel.setText(StringRes.clusterError_invalid);
+			loadLabel.setForeground(GUIFactory.RED1);
+		}
 
 		loadPanel.revalidate();
 		loadPanel.repaint();

@@ -96,7 +96,7 @@ public class ClusterViewDialog extends CustomDialog {
 			public void run() {
 				
 				ClusterViewDialog cd = new ClusterViewDialog(new JFrame(), 
-						StringRes.menu_Hier);
+						StringRes.menu_KMeans);
 				cd.setVisible(true);
 			}
 		});

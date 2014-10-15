@@ -2,12 +2,16 @@ package Controllers;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import Utilities.StringRes;
 import Cluster.CDTGenerator;
@@ -22,6 +26,11 @@ import edu.stanford.genetics.treeview.LogBuffer;
  * Controls user input from ClusterView. It handles user interactions 
  * by implementing listeners which in turn call appropriate methods to respond.
  * 
+ * TODO Make use of OOP methods to create more lean controllers. Use
+ * interfaces and inheritance and avoid passing of the TVFrameController
+ * object here, just to use its loading methods. Also inherits instance
+ * variables like tvModel..
+ * 
  * @author CKeil
  * 
  */
@@ -35,6 +44,9 @@ public class ClusterController {
 	private final TVFrameController tvController;
 	private final ClusterView clusterView;
 	private final ClusterViewDialog clusterDialog;
+	
+	private int rowSimilarity = 1; // initial option
+	private int colSimilarity = 1;
 
 	private SwingWorker<Void, Void> loadWorker;
 	private SwingWorker<Void, String> clusterProcess;
@@ -48,10 +60,6 @@ public class ClusterController {
 	 * @param dialog The JDialog that contains the cluster UI.
 	 * @param controller The TVFrameController, mostly used to enable file
 	 * loading. 
-	 * TODO Make use of OOP methods to create more lean controllers. Use
-	 * interfaces and inheritance and avoid passing of the TVFrameController
-	 * object here, just to use its loading methods. Also inherits instance
-	 * variables like tvModel..
 	 * TODO implement multi-core clustering.
 	 * TODO Measure time for all processes.
 	 */
@@ -63,11 +71,14 @@ public class ClusterController {
 		this.tvModel = controller.getDataModel();
 		this.clusterView = dialog.getClusterView();
 
-		/* Add listeners after creating them */
-		clusterView.addClusterListener(new ClusterListener());
+		/* Add all listeners after creating them */
+		clusterView.addClusterListener(new TaskStartListener());
 		clusterView.addClusterTypeListener(new ClusterTypeListener());
 		clusterView.addCancelListener(new CancelListener());
-		clusterView.addLinkageListener(new ClusterChoiceListener());
+		clusterView.addLinkageListener(new LinkChoiceListener());
+		clusterView.addRowDistListener(new RowDistListener());
+		clusterView.addColDistListener(new ColDistListener());
+		clusterView.addSpinnerListener(new SpinnerListener());
 	}
 	
 	/**
@@ -76,15 +87,16 @@ public class ClusterController {
 	 * @author CKeil
 	 * 
 	 */
-	class ClusterListener implements ActionListener {
+	class TaskStartListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-
-			//final ClusterProcessWorker 
-			clusterProcess = new ClusterProcessWorker();
 			
-			clusterProcess.execute();
+			/* Only starts with valid selections. */
+			if (isReady(rowSimilarity, ROW) || isReady(colSimilarity, COL)) {
+				clusterProcess = new ClusterProcessWorker();
+				clusterProcess.execute();
+			}
 		}
 	}
 
@@ -117,45 +129,36 @@ public class ClusterController {
 			/* Tell ClusterView that clustering begins */
 			clusterView.setClustering(true);
 			
-			/* Get chosen similarity options. */
-			int rowSimilarity = clusterView.getRowSimilarity();
-			int colSimilarity = clusterView.getColSimilarity();
-			
 			int rows = tvModel.getGeneHeaderInfo().getNumHeaders();
 			int cols = tvModel.getArrayHeaderInfo().getNumHeaders();
 			
-			/* Set maximum for progressbar */
+			/* 
+			 * Set maximum for progressbar. 
+			 * Needs to happen before any clustering!
+			 */
 			if(rowSimilarity != 0) {
-				pBarMax += (2 * rows);
 				
-				/* In case of ranking */
-				if(rowSimilarity == 5) pBarMax += rows;
+				/* Check if ranking first or not. */
+				pBarMax += (rowSimilarity == 5) ? (3 * rows) : (2 * rows);
 				
 			}
 			
 			if(colSimilarity != 0) {
-				pBarMax += (2 * tvModel.getArrayHeaderInfo().getNumHeaders());
 				
-				/* In case of ranking */
-				if(colSimilarity == 5) pBarMax += cols;
+				/* Check if ranking first or not. */
+				pBarMax += (colSimilarity == 5) ? (3 * cols) : (2 * cols);
 				
 			}
 			
 			ClusterView.setPBarMax(pBarMax);
-
-			/* If no options are selected, display error and return null. */
-			if (!checkSelections(rowSimilarity, ROW) 
-					&& !checkSelections(colSimilarity, COL)) {
-				clusterView.displayErrorLabel();
-				return null;
-			}
 			
 			/* When done, start distance measure */
 			ClusterProcessor processor = new ClusterProcessor(tvModel);
 			
 			/* Row axis cluster */
 			double[][] distMatrix = null;
-			if (checkSelections(rowSimilarity, ROW)) {
+			
+			if (isReady(rowSimilarity, ROW)) {
 				
 				/* ProgressBar label */
 				publish("Calculating row distances...");
@@ -178,7 +181,8 @@ public class ClusterController {
 			}
 			
 			/* Column axis cluster */
-			if (checkSelections(colSimilarity, COL)) {
+			if (isReady(colSimilarity, COL)) {
+				
 				/* ProgressBar label */
 				publish("Calculating column distances...");
 				
@@ -289,11 +293,16 @@ public class ClusterController {
 	 * Verifies whether all needed options are selected to 
 	 * perform clustering.
 	 * 
+	 * TODO What if the user selects a number for 1 of the 2 spinner values
+	 * for one axis, but both for the other? Cluster will still continue but
+	 * only cluster the correctly set up axis. How can a warning be displayed,
+	 * how can intent of the user be recognized?
+	 * 
 	 * @param distMeasure Selected distance measure.
 	 * @return boolean Whether all needed selections have 
 	 * appropriate values.
 	 */
-	public boolean checkSelections(final int distMeasure, int type) {
+	public boolean isReady(final int distMeasure, int type) {
 
 		if (isHierarchical()) {
 			return distMeasure != 0;
@@ -388,18 +397,73 @@ public class ClusterController {
 	}
 	
 	/**
-	 * Listener listens to a change in selection for the clusterChoice
+	 * Listener listens to a change in selection for the linkChooser
 	 * JComboBox in clusterView. Calls a new layout setup as a response.
 	 * @author CKeil
 	 *
 	 */
-	class ClusterChoiceListener implements ActionListener {
+	class LinkChoiceListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			
-			LogBuffer.println("Reset ClusterView layout.");
+			LogBuffer.println("Reprint link method tips.");
 			clusterView.setupLayout();
+		}
+	}
+	
+	/**
+	 * Listens to a change in selection in the JComboBox for row distance
+	 * measure selection.
+	 * @author CKeil
+	 */
+	class RowDistListener implements ItemListener {
+
+		@Override
+		public void itemStateChanged(ItemEvent event) {
+			
+			if(event.getStateChange() == ItemEvent.SELECTED) {
+				rowSimilarity = clusterView.getRowSimilarity();
+				
+				/* Ready indicator label */
+				clusterView.displayReadyStatus(isReady(rowSimilarity, ROW) 
+						|| isReady(colSimilarity, COL));
+			}
+		}
+	}
+	
+	/**
+	 * Listens to a change in selection in the JComboBox for col distance
+	 * measure selection.
+	 * @author CKeil
+	 */
+	class ColDistListener implements ItemListener {
+
+		@Override
+		public void itemStateChanged(ItemEvent event) {
+			
+			if(event.getStateChange() == ItemEvent.SELECTED) {
+				colSimilarity = clusterView.getColSimilarity();
+				
+				/* Ready indicator label */
+				clusterView.displayReadyStatus(isReady(rowSimilarity, ROW) 
+						|| isReady(colSimilarity, COL));
+			}
+		}
+	}
+	
+	/**
+	 * Listens to a change in selection in the JSpinners for k-means.
+	 * @author CKeil
+	 */
+	class SpinnerListener implements ChangeListener {
+
+		@Override
+		public void stateChanged(ChangeEvent arg0) {
+			
+			/* Ready indicator label */
+			clusterView.displayReadyStatus(isReady(rowSimilarity, ROW) 
+					|| isReady(colSimilarity, COL));
 		}
 	}
 

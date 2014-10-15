@@ -179,7 +179,7 @@ public class StringRes {
 	public static final String clusterInfo_Avg_DisAdv = "Expensive for " +
 			"large collections.";
 	public static final String clusterInfo_KMeans = "Splits the data into"
-			+ "groups.";
+			+ " groups.";
 	
 	// Cluster Info - Tip
 	public static final String clusterTip_Memory = "Memory tip.";
@@ -188,8 +188,8 @@ public class StringRes {
 	public static final String clusterTip_filePath = "File Path: ";
 	
 	// Cluster Error - Hints
-	public static final String clusterError_invalid = "Please pick valid "
-			+ "cluster options to begin clustering!";
+	public static final String clusterError_invalid = "Clustering parameters"
+			+ " are missing or incorrect. Check the input again!";
 	public static final String clusterError_notLoaded = "DataModel not "
 			+ "properly loaded.";
 
