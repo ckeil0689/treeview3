@@ -24,6 +24,8 @@ public class ClusterProcessor {
 
 	private final DataModel tvModel;
 	private int pBarCount;
+	private DistanceWorker distTask;
+	private ClusterWorker clusterTask;
 
 	/**
 	 * 
@@ -51,11 +53,11 @@ public class ClusterProcessor {
 		
 		try {
 			LogBuffer.println("Starting clusterAxis(): " + axis);
-			ClusterWorker clusterWorker = new ClusterWorker(distMatrix, 
+			this.clusterTask = new ClusterWorker(distMatrix, 
 					linkMethod, spinnerInput, hierarchical, axis);
-			clusterWorker.execute();
+			clusterTask.execute();
 			
-			return clusterWorker.get();
+			return clusterTask.get();
 			
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
@@ -63,6 +65,15 @@ public class ClusterProcessor {
 			LogBuffer.println(e.getLocalizedMessage());
 			return new String[]{"No clustered data."};
 		}
+	}
+	
+	/**
+	 * Cancel currently running threads.
+	 */
+	public void cancelAll() {
+		
+		if(distTask != null) distTask.cancel(true);
+		if(clusterTask != null) clusterTask.cancel(true);
 	}
 	
 	/**
@@ -75,10 +86,10 @@ public class ClusterProcessor {
 	public double[][] calcDistance(int distMeasure, int axis) {
 		
 		try {
-			DistanceWorker distWorker = new DistanceWorker(distMeasure,axis);
-			distWorker.execute();
+			this.distTask = new DistanceWorker(distMeasure,axis);
+			distTask.execute();
 			
-			return distWorker.get();
+			return distTask.get();
 			
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
@@ -151,7 +162,7 @@ public class ClusterProcessor {
 					/* Iterate over every row of the matrix. */
 					for (int i = 0; i < rankMatrix.length; i++) {
 						
-						if(isCancelled()) break;
+						if(isCancelled()) return new double[0][];
 						publish(i);
 						rankMatrix[i] = dCalc.spearman(data[i]);
 					}
@@ -169,7 +180,7 @@ public class ClusterProcessor {
 					/* take a row */
 					for (int i = 0; i < data.length; i++) {
 			 
-						if(isCancelled()) break;
+						if(isCancelled()) return new double[0][];
 						publish(i);
 						dCalc.calcRow(i);
 					}
@@ -201,9 +212,11 @@ public class ClusterProcessor {
 		@Override
 		public void done() {
 			
-			/* keep track of overall progress */
-			pBarCount += axisSize;
-			LogBuffer.println("pBarCount: " + pBarCount);
+			if(!isCancelled()) {
+				/* keep track of overall progress */
+				pBarCount += axisSize;
+				LogBuffer.println("pBarCount: " + pBarCount);
+			}
 		}
 		
 		/**

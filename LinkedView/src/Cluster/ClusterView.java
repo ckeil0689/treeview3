@@ -441,6 +441,8 @@ public class ClusterView {
 			loadLabel.setText(StringRes.clusterError_invalid);
 			loadLabel.setForeground(GUIFactory.RED1);
 		}
+		
+		cluster_btn.setEnabled(ready);
 
 		loadPanel.revalidate();
 		loadPanel.repaint();

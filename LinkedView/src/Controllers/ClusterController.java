@@ -45,11 +45,12 @@ public class ClusterController {
 	private final ClusterView clusterView;
 	private final ClusterViewDialog clusterDialog;
 	
+	private ClusterProcessor processor;
+	
 	private int rowSimilarity = 1; // initial option
 	private int colSimilarity = 1;
 
-	private SwingWorker<Void, Void> loadWorker;
-	private SwingWorker<Void, String> clusterProcess;
+	private SwingWorker<Void, String> clusterTask;
 	private SwingWorker<Void, Void> saveWorker;
 
 	/**
@@ -94,8 +95,8 @@ public class ClusterController {
 			
 			/* Only starts with valid selections. */
 			if (isReady(rowSimilarity, ROW) || isReady(colSimilarity, COL)) {
-				clusterProcess = new ClusterProcessWorker();
-				clusterProcess.execute();
+				clusterTask = new ClusterTask();
+				clusterTask.execute();
 			}
 		}
 	}
@@ -108,7 +109,7 @@ public class ClusterController {
 	 * @author CKeil
 	 *
 	 */
-	class ClusterProcessWorker extends SwingWorker<Void, String> {
+	class ClusterTask extends SwingWorker<Void, String> {
 		
 		/* The finished reordered axes */
 		private String[] reorderedRows;
@@ -153,55 +154,15 @@ public class ClusterController {
 			ClusterView.setPBarMax(pBarMax);
 			
 			/* When done, start distance measure */
-			ClusterProcessor processor = new ClusterProcessor(tvModel);
+			processor = new ClusterProcessor(tvModel);
 			
 			/* Row axis cluster */
-			double[][] distMatrix = null;
-			
-			if (isReady(rowSimilarity, ROW)) {
-				
-				/* ProgressBar label */
-				publish("Calculating row distances...");
-				
-				if(!isCancelled()) {
-					distMatrix = processor.calcDistance(rowSimilarity, ROW);
-				}
-				
-				if(distMatrix == null) return null;
-				
-				publish("Clustering row data...");
-				
-				if(!isCancelled()) {
-					reorderedRows = processor.clusterAxis(distMatrix, 
-						clusterView.getLinkageMethod(), 
-						clusterView.getSpinnerValues(), isHierarchical(), ROW);
-					LogBuffer.println("ReorderedRows length: " 
-						+ reorderedRows.length);
-				}
-			}
+			reorderedRows = calculateAxis(rowSimilarity, ROW);
+			LogBuffer.println("ReorderedRows length: " + reorderedRows.length);
 			
 			/* Column axis cluster */
-			if (isReady(colSimilarity, COL)) {
-				
-				/* ProgressBar label */
-				publish("Calculating column distances...");
-				
-				if(!isCancelled()) {
-					distMatrix = processor.calcDistance(colSimilarity, COL);
-				}
-				
-				if(distMatrix == null) return null;
-				
-				publish("Clustering column data...");
-				
-				if(!isCancelled()) {
-					reorderedCols = processor.clusterAxis(distMatrix, 
-						clusterView.getLinkageMethod(), 
-						clusterView.getSpinnerValues(), isHierarchical(), COL);
-					LogBuffer.println("ReorderedCols length: " 
-						+ reorderedCols.length);
-				}
-			}
+			reorderedCols = calculateAxis(colSimilarity, COL);
+			LogBuffer.println("ReorderedCols length: " + reorderedCols.length);
 			
 			return null;
 		}
@@ -209,7 +170,37 @@ public class ClusterController {
 		@Override
 		public void done() {
 			
-			saveClusterFile(reorderedRows, reorderedCols);
+			if(!isCancelled()) { 
+				saveClusterFile(reorderedRows, reorderedCols);
+				
+			} else {
+				clusterView.setClustering(false);
+				LogBuffer.println("Clustering has been cancelled.");
+			}
+		}
+		
+		private String[] calculateAxis(int similarity, int axis) {
+			
+			/* Row axis cluster */
+			double[][] distMatrix = null;
+			
+			if (!isReady(similarity, axis)) return new String[] {""};
+				
+			String axisPrefix = (axis == ROW) ? "row" : "column";
+			/* ProgressBar label */
+			publish("Calculating " + axisPrefix + " distances...");
+			
+			/* Calculating the distance matrix */
+			distMatrix = processor.calcDistance(similarity, axis);
+			
+			if(distMatrix == null) return null;
+			
+			publish("Clustering " + axisPrefix + " data...");
+			
+			return processor.clusterAxis(distMatrix, 
+					clusterView.getLinkageMethod(), 
+					clusterView.getSpinnerValues(), 
+					isHierarchical(), axis);
 		}
 	}
 
@@ -485,7 +476,7 @@ public class ClusterController {
 
 			LogBuffer.println("Setting view choice to begin loading.");
 			tvController.setViewChoice();
-			loadWorker = new LoadWorker(fileSet);
+			LoadWorker loadWorker = new LoadWorker(fileSet);
 			loadWorker.execute();
 
 		} else {
@@ -510,12 +501,18 @@ public class ClusterController {
 		public void actionPerformed(final ActionEvent e) {
 
 			LogBuffer.println("Trying to cancel.");
-			
-			if(clusterProcess != null) {
-				clusterProcess.cancel(true);
-				clusterProcess = null;
-			}
+			cancelAll();
 		}
+	}
+	
+	/**
+	 * Cancels all active threads related to clustering.
+	 */
+	public void cancelAll() {
+		
+		if(clusterTask != null) clusterTask.cancel(true);
+		if(processor != null) processor.cancelAll();
+		if(saveWorker!= null) saveWorker.cancel(true);
 	}
 
 	/**
