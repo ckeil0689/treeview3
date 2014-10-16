@@ -44,8 +44,6 @@ import edu.stanford.genetics.treeview.LogBuffer;
 public class ColorExtractor2 extends Observable implements
 		ConfigNodePersistent, ContrastSelectable {
 
-	private final double EPSILON = 0.0001;
-
 	private ColorSet2 defaultColorSet;
 	private final double default_contrast = 3.0;
 	private final ColorSet2 colorSet = new ColorSet2();// Will be backed by
@@ -278,8 +276,7 @@ public class ColorExtractor2 extends Observable implements
 	@Override
 	public void setContrast(final double contrastValue) {
 
-		if (Helper.nearlyEqual(contrast, contrastValue, EPSILON)) {
-			//Math.abs(contrast - contrastValue) < EPSILON) {
+		if (Helper.nearlyEqual(contrast, contrastValue)) {
 		
 			contrast = contrastValue;
 
@@ -304,8 +301,7 @@ public class ColorExtractor2 extends Observable implements
 
 	public void setLogCenter(final double center) {
 
-		if (Helper.nearlyEqual(m_logCenter, center, EPSILON)) { 
-			//Math.abs(m_logCenter - center) < EPSILON) {
+		if (Helper.nearlyEqual(m_logCenter, center)) { 
 			m_logCenter = center;
 
 			if (configNode != null) {
@@ -322,8 +318,7 @@ public class ColorExtractor2 extends Observable implements
 
 	public void setLogBase(final double base) {
 
-		if (Helper.nearlyEqual(m_logBase, base, EPSILON)) { 
-			//Math.abs(m_logBase - base) < EPSILON) {
+		if (Helper.nearlyEqual(m_logBase, base)) {
 			m_logBase = base;
 
 			m_logBaseDivisor = Math.log(base);
@@ -498,14 +493,12 @@ public class ColorExtractor2 extends Observable implements
 	public float[] getFloatColor(double dval, final float[] fractionVals,
 			final List<Color> colorVals) {
 
-		if (Helper.nearlyEqual(dval, nodata, EPSILON)) { 
-			//Math.abs(dval - nodata) < EPSILON) {
+		if (Helper.nearlyEqual(dval, nodata)) {
 			// System.out.println("value " + dval + " was nodata");
 			return missingColor;
 			// return new Color(missingColor[0], missingColor[1],
 			// missingColor[2]);
-		} else if (Helper.nearlyEqual(dval, empty, EPSILON)) { 
-			//Math.abs(dval - empty) < EPSILON) {
+		} else if (Helper.nearlyEqual(dval, empty)) { 
 			// System.out.println("value " + dval + " was empty");
 			return emptyColor;
 			// return new Color(emptyColor[0], emptyColor[1], emptyColor[2]);

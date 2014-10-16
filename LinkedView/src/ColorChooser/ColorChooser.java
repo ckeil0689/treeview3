@@ -42,8 +42,6 @@ import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet2;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
 
 public class ColorChooser implements ConfigNodePersistent {
-
-	final double EPSILON = 0.0001;
 	
 	private final TreeViewFrame tvFrame;
 	private final JPanel mainPanel;
@@ -605,9 +603,7 @@ public class ColorChooser implements ConfigNodePersistent {
 					ascending = false;
 					break;
 
-				} else if (Helper.nearlyEqual(fractions[i], fractions[i + 1], 
-						EPSILON)) {
-					//Math.abs(fractions[i] - fractions[i + 1]) < EPSILON) {
+				} else if (Helper.nearlyEqual(fractions[i], fractions[i + 1])) {
 					ascending = false;
 					break;
 				}
@@ -634,8 +630,7 @@ public class ColorChooser implements ConfigNodePersistent {
 				final double fraction2 = (double) Math
 						.round(fractions[thumbIndex] * 10000) / 10000;
 
-				if (Helper.nearlyEqual(fraction, fraction2, EPSILON)
-					//Math.abs(fraction - fraction2) < PRECISION_LEVEL
+				if (Helper.nearlyEqual(fraction, fraction2)
 						|| thumbList.get(thumbIndex).isSelected()) {
 					isPresent = true;
 				}

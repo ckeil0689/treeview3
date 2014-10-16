@@ -18,6 +18,7 @@ import Cluster.CDTGenerator;
 import Cluster.ClusterProcessor;
 import Cluster.ClusterView;
 import Cluster.ClusterViewDialog;
+import Cluster.DistMatrixCalculator;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -25,6 +26,10 @@ import edu.stanford.genetics.treeview.LogBuffer;
 /**
  * Controls user input from ClusterView. It handles user interactions 
  * by implementing listeners which in turn call appropriate methods to respond.
+ * When the user starts clustering by clicking the appropriate button in 
+ * ClusterView, a SwingWorker thread will be created which generates a cascade
+ * of multiple threads that take over various background calculations. 
+ * This prevents the GUI from locking up.
  * 
  * TODO Make use of OOP methods to create more lean controllers. Use
  * interfaces and inheritance and avoid passing of the TVFrameController
@@ -47,11 +52,12 @@ public class ClusterController {
 	
 	private ClusterProcessor processor;
 	
-	private int rowSimilarity = 1; // initial option
-	private int colSimilarity = 1;
+	/* Initialize with defaults for error checking parameters */
+	private int rowSimilarity = DistMatrixCalculator.PEARSON_UN;
+	private int colSimilarity = DistMatrixCalculator.PEARSON_UN;
 
 	private SwingWorker<Void, String> clusterTask;
-	private SwingWorker<Void, Void> saveWorker;
+	private SwingWorker<Void, Void> saveTask;
 
 	/**
 	 * Links the clustering functionality to the user interface. The object
@@ -62,7 +68,6 @@ public class ClusterController {
 	 * @param controller The TVFrameController, mostly used to enable file
 	 * loading. 
 	 * TODO implement multi-core clustering.
-	 * TODO Measure time for all processes.
 	 */
 	public ClusterController(final ClusterViewDialog dialog, 
 			final TVFrameController controller) {
@@ -84,7 +89,7 @@ public class ClusterController {
 	
 	/**
 	 * Begins cluster process if the user clicks the 'Cluster' button in
-	 * DendroView.
+	 * DendroView and sufficient parameters are set.
 	 * @author CKeil
 	 * 
 	 */
@@ -95,6 +100,8 @@ public class ClusterController {
 			
 			/* Only starts with valid selections. */
 			if (isReady(rowSimilarity, ROW) || isReady(colSimilarity, COL)) {
+				/* Tell ClusterView that clustering begins */
+				clusterView.setClustering(true);
 				clusterTask = new ClusterTask();
 				clusterTask.execute();
 			}
@@ -127,15 +134,11 @@ public class ClusterController {
 		@Override
 		protected Void doInBackground() throws Exception {
 			
-			/* Tell ClusterView that clustering begins */
-			clusterView.setClustering(true);
-			
 			int rows = tvModel.getGeneHeaderInfo().getNumHeaders();
 			int cols = tvModel.getArrayHeaderInfo().getNumHeaders();
 			
 			/* 
-			 * Set maximum for progressbar. 
-			 * Needs to happen before any clustering!
+			 * Set maximum for JProgressBar before any clustering!
 			 */
 			if(rowSimilarity != 0) {
 				
@@ -153,7 +156,7 @@ public class ClusterController {
 			
 			ClusterView.setPBarMax(pBarMax);
 			
-			/* When done, start distance measure */
+			/* Initialize the clustering processor and pass the model */
 			processor = new ClusterProcessor(tvModel);
 			
 			/* Row axis cluster */
@@ -171,7 +174,7 @@ public class ClusterController {
 		public void done() {
 			
 			if(!isCancelled()) { 
-				saveClusterFile(reorderedRows, reorderedCols);
+				saveClusterFile();
 				
 			} else {
 				clusterView.setClustering(false);
@@ -179,6 +182,12 @@ public class ClusterController {
 			}
 		}
 		
+		/**
+		 * Controls clustering procedures for one axis.
+		 * @param similarity The chosen similarity measure.
+		 * @param axis The chosen matrix axis.
+		 * @return A list of reordered axis elements.
+		 */
 		private String[] calculateAxis(int similarity, int axis) {
 			
 			/* Row axis cluster */
@@ -187,6 +196,7 @@ public class ClusterController {
 			if (!isReady(similarity, axis)) return new String[] {""};
 				
 			String axisPrefix = (axis == ROW) ? "row" : "column";
+			
 			/* ProgressBar label */
 			publish("Calculating " + axisPrefix + " distances...");
 			
@@ -202,26 +212,25 @@ public class ClusterController {
 					clusterView.getSpinnerValues(), 
 					isHierarchical(), axis);
 		}
-	}
+		
+		/**
+		 * Saves the clustering output (reordered axes) to a new CDT file, 
+		 * so it can later be loaded and displayed.
+		 */
+		private void saveClusterFile() {
 
-	/**
-	 * Saves the clustering output (reordered axes) to a new CDT file, 
-	 * so it can later be loaded and displayed.
-	 */
-	public void saveClusterFile(String[] reorderedRows, 
-			String[] reorderedCols) {
-
-		if (reorderedRows != null || reorderedCols != null) {
-			ClusterView.setLoadText("Saving...");
-			saveWorker = new SaveWorker(reorderedRows, reorderedCols);
-			saveWorker.execute();
-			LogBuffer.println("Saving started.");
-			
-		} else {
-			String message = "Cannot save. No clustered data was created.";
-			JOptionPane.showMessageDialog(JFrame.getFrames()[0], message, 
-					"Error", JOptionPane.ERROR_MESSAGE);
-			LogBuffer.println("Alert: " + message);
+			if (reorderedRows != null || reorderedCols != null) {
+				ClusterView.setLoadText("Saving...");
+				LogBuffer.println("Begin saving.");
+				saveTask = new SaveTask(reorderedRows, reorderedCols);
+				saveTask.execute();
+				
+			} else {
+				String message = "Cannot save. No clustered data was created.";
+				JOptionPane.showMessageDialog(JFrame.getFrames()[0], message, 
+						"Error", JOptionPane.ERROR_MESSAGE);
+				LogBuffer.println("Alert: " + message);
+			}
 		}
 	}
 		
@@ -233,14 +242,14 @@ public class ClusterController {
 	 * @param reorderedRows Reordered row axis.
 	 * @author CKeil
 	 */
-	class SaveWorker extends SwingWorker<Void, Void> {
+	class SaveTask extends SwingWorker<Void, Void> {
 
 		/* The finished reordered axes */
 		private String[] reorderedRows;
 		private String[] reorderedCols;
 		private String filePath;
 		
-		public SaveWorker(String[] reorderedRows, String[] reorderedCols) {
+		public SaveTask(String[] reorderedRows, String[] reorderedCols) {
 			
 			this.reorderedRows = reorderedRows;
 			this.reorderedCols = reorderedCols;
@@ -249,19 +258,17 @@ public class ClusterController {
 		@Override
 		protected Void doInBackground() throws Exception {
 			
-			if (!isCancelled()) {
-				LogBuffer.println("Initializing CDT writer.");
-				final CDTGenerator cdtGen = new CDTGenerator(
-						tvModel, clusterView, reorderedRows, reorderedCols, 
-						isHierarchical());
+			LogBuffer.println("Initializing CDT writer.");
+			final CDTGenerator cdtGen = new CDTGenerator(tvModel, clusterView, 
+					reorderedRows, reorderedCols, isHierarchical());
 
-				LogBuffer.println("Generating CDT.");
-				cdtGen.generateCDT();
-				
-				LogBuffer.println("Setting file path.");
-				filePath = cdtGen.getFilePath();
-				LogBuffer.println("Path: " + filePath);
-			}
+			LogBuffer.println("Generating CDT.");
+			cdtGen.generateCDT();
+			
+			LogBuffer.println("Setting file path.");
+			filePath = cdtGen.getFilePath();
+			LogBuffer.println(".CDT saved at: " + filePath);
+			
 			return null;
 		}
 
@@ -279,48 +286,34 @@ public class ClusterController {
 			}
 		}
 	}
-
+	
 	/**
-	 * Verifies whether all needed options are selected to 
-	 * perform clustering.
-	 * 
-	 * TODO What if the user selects a number for 1 of the 2 spinner values
-	 * for one axis, but both for the other? Cluster will still continue but
-	 * only cluster the correctly set up axis. How can a warning be displayed,
-	 * how can intent of the user be recognized?
-	 * 
-	 * @param distMeasure Selected distance measure.
-	 * @return boolean Whether all needed selections have 
-	 * appropriate values.
+	 * Sets a new DendroView with the new data loaded into TVModel, displaying
+	 * an updated HeatMap. It should also close the ClusterViewFrame.
 	 */
-	public boolean isReady(final int distMeasure, int type) {
+	public void visualizeData(String filePath) {
 
-		if (isHierarchical()) {
-			return distMeasure != 0;
+		LogBuffer.println("Getting files for loading clustered data.");
+		
+		File file = null;
+
+		if (filePath != null) {
+			file = new File(filePath);
+
+			FileSet fileSet = new FileSet(file.getName(), file.getParent()
+					+ File.separator);
+
+			LogBuffer.println("Setting view choice to begin loading.");
+			tvController.setViewChoice();
+			LoadWorker loadWorker = new LoadWorker(fileSet);
+			loadWorker.execute();
 
 		} else {
-			final Integer[] spinnerValues = clusterView.getSpinnerValues();
-
-			int groups;
-			int iterations;
-			
-			switch(type) {
-			
-			case ROW: 	
-				groups = spinnerValues[0]; 
-				iterations = spinnerValues[1];
-				break;
-			case COL: 	
-				groups = spinnerValues[2]; 
-				iterations = spinnerValues[3];
-				break;
-			default:	
-				groups = 0;
-				iterations = 0;
-				break;
-			}
-
-			return (distMeasure!= 0 && (groups > 0 && iterations > 0));
+			String alert = "When trying to load the clustered file, no "
+					+ "file path could be found.";
+			JOptionPane.showMessageDialog(clusterDialog.getParentFrame(), 
+					alert, "Alert", JOptionPane.WARNING_MESSAGE);
+			LogBuffer.println("Alert: " + alert);
 		}
 	}
 
@@ -371,6 +364,7 @@ public class ClusterController {
 		}
 	}
 	
+	/* ----Listeners----- */
 	/**
 	 * Listener listens to a change in selection for the clusterChoice
 	 * JComboBox in clusterView. Calls a new layout setup as a response.
@@ -459,36 +453,6 @@ public class ClusterController {
 	}
 
 	/**
-	 * Sets a new DendroView with the new data loaded into TVModel, displaying
-	 * an updated HeatMap. It should also close the ClusterViewFrame.
-	 */
-	public void visualizeData(String filePath) {
-
-		LogBuffer.println("Getting files for loading clustered data.");
-		
-		File file = null;
-
-		if (filePath != null) {
-			file = new File(filePath);
-
-			FileSet fileSet = new FileSet(file.getName(), file.getParent()
-					+ File.separator);
-
-			LogBuffer.println("Setting view choice to begin loading.");
-			tvController.setViewChoice();
-			LoadWorker loadWorker = new LoadWorker(fileSet);
-			loadWorker.execute();
-
-		} else {
-			String alert = "When trying to load the clustered file, no "
-					+ "file path could be found.";
-			JOptionPane.showMessageDialog(clusterDialog.getParentFrame(), 
-					alert, "Alert", JOptionPane.WARNING_MESSAGE);
-			LogBuffer.println("Alert: " + alert);
-		}
-	}
-
-	/**
 	 * Defines what happens if the user clicks the 'Cancel' button in
 	 * DendroView. Calls the cancel() method in the view.
 	 * TODO add cancel functionality to distance worker and cluster worker.
@@ -505,6 +469,52 @@ public class ClusterController {
 		}
 	}
 	
+	/* --- Helper methods --- */
+	/**
+	 * Verifies whether all needed options are selected to 
+	 * perform clustering.
+	 * 
+	 * TODO What if the user selects a number for 1 of the 2 spinner values
+	 * for one axis, but both for the other? Cluster will still continue but
+	 * only cluster the correctly set up axis. How can a warning be displayed,
+	 * how can intent of the user be recognized?
+	 * 
+	 * @param distMeasure Selected distance measure.
+	 * @return boolean Whether all needed selections have 
+	 * appropriate values.
+	 */
+	public boolean isReady(final int distMeasure, int type) {
+
+		if (isHierarchical()) {
+			return distMeasure != DistMatrixCalculator.NO_CLUSTER;
+
+		} else {
+			final Integer[] spinnerValues = clusterView.getSpinnerValues();
+
+			int groups;
+			int iterations;
+			
+			switch(type) {
+			
+			case ROW: 	
+				groups = spinnerValues[0]; 
+				iterations = spinnerValues[1];
+				break;
+			case COL: 	
+				groups = spinnerValues[2]; 
+				iterations = spinnerValues[3];
+				break;
+			default:	
+				groups = 0;
+				iterations = 0;
+				break;
+			}
+
+			return (distMeasure!= DistMatrixCalculator.NO_CLUSTER 
+					&& (groups > 0 && iterations > 0));
+		}
+	}
+	
 	/**
 	 * Cancels all active threads related to clustering.
 	 */
@@ -512,7 +522,7 @@ public class ClusterController {
 		
 		if(clusterTask != null) clusterTask.cancel(true);
 		if(processor != null) processor.cancelAll();
-		if(saveWorker!= null) saveWorker.cancel(true);
+		if(saveTask!= null) saveTask.cancel(true);
 	}
 
 	/**
