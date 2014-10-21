@@ -133,7 +133,9 @@ public class ClusterProcessor {
         protected void process(List<Integer> chunks) {
             
 			int i = chunks.get(chunks.size()-1);
-            ClusterView.updatePBar(pBarCount + i);
+			int progress = (isCancelled()) ? 0 : pBarCount + i;
+            ClusterView.updatePBar(progress);
+            //ClusterView.updatePBar(pBarCount + i);
         }
 
 		@Override
@@ -180,7 +182,10 @@ public class ClusterProcessor {
 					/* take a row */
 					for (int i = 0; i < data.length; i++) {
 			 
-						if(isCancelled()) return new double[0][];
+						if(isCancelled()) {
+							LogBuffer.println("DistTask cancelled.");
+							return new double[0][];
+						}
 						publish(i);
 						dCalc.calcRow(i);
 					}
@@ -268,7 +273,8 @@ public class ClusterProcessor {
         protected void process(List<Integer> chunks) {
             
 			int i = chunks.get(chunks.size()-1);
-            ClusterView.updatePBar(pBarCount + i);
+			int progress = (isCancelled()) ? 0 : pBarCount + i;
+            ClusterView.updatePBar(progress);
         }
 
 		@Override
@@ -302,7 +308,10 @@ public class ClusterProcessor {
 				LogBuffer.println("Clustering matrix done.");
 				
 				/* Return empty String[] if user cancels operation */
-				if(isCancelled()) return new String[]{""};
+				if(isCancelled()) {
+					LogBuffer.println("ClusterTask cancelled.");
+					return new String[]{""};
+				}
 				
 				/* Write the tree file */
 				LogBuffer.println("Writing clustered data.");
@@ -325,7 +334,7 @@ public class ClusterProcessor {
 		@Override
 		public void done() {
 			
-			pBarCount += max;
+			if(!isCancelled()) pBarCount += max;
 			LogBuffer.println("pBarCount: " + pBarCount);
 			LogBuffer.println("Clustering successful? " + !isCancelled());
 		}
@@ -336,6 +345,7 @@ public class ClusterProcessor {
 	 */
 	public void cancelAll() {
 		
+		LogBuffer.println("ClusterProcessor canceling all.");
 		if(distTask != null) distTask.cancel(true);
 		if(clusterTask != null) clusterTask.cancel(true);
 	}

@@ -163,6 +163,8 @@ public class ClusterController {
 			reorderedRows = calculateAxis(rowSimilarity, ROW);
 			LogBuffer.println("ReorderedRows length: " + reorderedRows.length);
 			
+			if(isCancelled()) return null;
+			
 			/* Column axis cluster */
 			reorderedCols = calculateAxis(colSimilarity, COL);
 			LogBuffer.println("ReorderedCols length: " + reorderedCols.length);
@@ -178,6 +180,7 @@ public class ClusterController {
 				
 			} else {
 				clusterView.setClustering(false);
+				LogBuffer.println("---------------------------------------");
 				LogBuffer.println("Clustering has been cancelled.");
 			}
 		}
@@ -203,7 +206,7 @@ public class ClusterController {
 			/* Calculating the distance matrix */
 			distMatrix = processor.calcDistance(similarity, axis);
 			
-			if(distMatrix == null) return null;
+			if(distMatrix == null || isCancelled()) return null;
 			
 			publish("Clustering " + axisPrefix + " data...");
 			

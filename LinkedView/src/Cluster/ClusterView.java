@@ -152,7 +152,6 @@ public class ClusterView {
 		
 		// ProgressBar for clustering process
 		pBar = GUIFactory.createPBar();
-		pBar.setEnabled(false); //initially disabled
 
 		// ComboBox to choose cluster method
 		final String[] clusterNames = { StringRes.menu_Hier,
@@ -350,19 +349,17 @@ public class ClusterView {
 	 */
 	public void setClustering(boolean isInProgress) {
 		
-		pBar.setValue(0); // reset ProgressBar
+		updatePBar(0); // set ProgressBar
 		
 		if(isInProgress) {
 			loadLabel.setForeground(UIManager.getColor("Label.foreground"));
 			btnPanel.remove(cluster_btn);
 			btnPanel.add(cancel_btn, "pushx, alignx 50%");
-			pBar.setEnabled(true);
 			
 		} else {
 			loadLabel.setText(StringRes.clusterInfo_Ready);
 			btnPanel.remove(cancel_btn);
 			btnPanel.add(cluster_btn, "pushx, alignx 50%");
-			pBar.setEnabled(false);
 		}
 		
 		btnPanel.revalidate();
