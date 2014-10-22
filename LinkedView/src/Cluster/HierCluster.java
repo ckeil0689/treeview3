@@ -14,14 +14,19 @@ import Controllers.ClusterController;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
- * Test class to assess whether the operation can work on half a matrix (due to
- * symmetry)
+ * Class that performs hierarchical clustering on a supplied distance 
+ * matrix. It implements multiple linkage methods and consists of one main
+ * method (cluster()) that is used to create one new cluster at a time.
  * 
  * @author CKeil
  * 
  */
 public class HierCluster {
 
+	/* Correspond to the JCombobox positions in ClusterView */
+	private final static int SINGLE = 0;
+	private final static int COMPLETE = 1;
+	private final static int AVG = 2;
 	/*
 	 * IMPORTANT NOTE: The variable prefixes row- and col- refer to the 
 	 * current distance matrix. This means that if columns of the original
@@ -33,7 +38,7 @@ public class HierCluster {
 	 * might be additional overhead during already intensive/ complex 
 	 * clustering algorithms.
 	 */
-	private final String linkMethod;
+	private final int linkMethod;
 	private final String axisPrefix;
 	private final int distMatrixSize;
 	private int loopNum;
@@ -86,7 +91,7 @@ public class HierCluster {
 	 * @param worker The worker thread which performs the clustering. Needs to
 	 * be interrupted in this class if the user cancels the operation.
 	 */
-	public HierCluster(String fileName, final String linkMethod, 
+	public HierCluster(String fileName, final int linkMethod, 
 			final double[][] distMatrix, final int axis) {
 
 		LogBuffer.println("Initializing HierCluster.");
@@ -199,11 +204,6 @@ public class HierCluster {
  * distance matrix. The pair of closest clusters is composed of the cluster
  * at rowMinIndex and the cluster at colMinIndex in currentClusters.
  */
-		/* 
-		 * The replacement row for the two removed row elements 
-		 * (when joining clusters).
-		 */
-		double[] newRow = new double[loopNum];
 
 		/* Get the two clusters to be fused */
 		/* Get the cluster at rowMinIndex */
@@ -265,7 +265,6 @@ public class HierCluster {
 		 * Adding the newly formed cluster to the list of current cluster at
 		 * the position of the old cluster that contains the minimum row index.
 		 */
-		/* TODO These function are wrong for row = 0 */
 		final int newClusterMin = findClusterMin(newCluster);
 		
 		final boolean rowClusHasMin = clusterHasMin(newClusterMin, targetRow);
@@ -301,18 +300,24 @@ public class HierCluster {
  */
 
 		/* 
+		 * The replacement row for the two removed row elements 
+		 * (when joining clusters).
+		 */
+		double[] newRow;// = new double[loopNum];
+		
+		/* 
 		 * newRow contains corresponding values depending on 
 		 * the cluster method 
 		 */
-		if (linkMethod.contentEquals("Single Linkage")
-				|| linkMethod.contentEquals("Complete Linkage")) {
+		if (linkMethod == SINGLE || linkMethod == COMPLETE) {
 			newRow = scLink(newCluster);
 
-		} else if (linkMethod.contentEquals("Average Linkage")) {
+		} else if (linkMethod == AVG) {
 			newRow = avgLink(newCluster);
 			
 		} else {
 			LogBuffer.println("No matching link method found.");
+			return -1;
 		}
 
 		/* 
@@ -616,19 +621,21 @@ public class HierCluster {
 	}
 
 	/**
-	 * Make trial the minimum value of that gene check whether min was used
-	 * before (in whole calculation process)<--- Why? TODO
+	 * Find minimum of an integer array that represents a cluster.
 	 * 
-	 * @return double trial
+	 * @return int
 	 */
-	public int findClusterMin(final int[] row) {
+	public int findClusterMin(final int[] cluster) {
 
-		// standard collection copy constructor to make deep copy to protect
-		// 'row' from mutation.
-		final int[] rowCopy = row.clone();
-		Arrays.sort(rowCopy);
+		/* 
+		 * Standard collection copy constructor to make deep copy to protect 
+		 * 'cluster' from mutation. 
+		 * Arrays.sort worst case is O(n^2) in Java 7.
+		 */
+		final int[] clusterCopy = cluster.clone();
+		Arrays.sort(clusterCopy);
 
-		return rowCopy[0];
+		return clusterCopy[0];
 	}
 
 	/**
@@ -807,6 +814,8 @@ public class HierCluster {
 	 * The values of the new row/col are calculated as maximum (complete) 
 	 * or minimum (single) of all distance values.
 	 * 
+	 * Complexity: O(n^3)
+	 * 
 	 * @param fusedClusters
 	 * @return newRow
 	 */
@@ -888,7 +897,7 @@ public class HierCluster {
 				 * Single Link - Minimum distance between the new cluster
 				 * and the other clusters.
 				 */
-				if (linkMethod.contentEquals("Single Linkage")) {
+				if (linkMethod == SINGLE) {
 					newRow[i] = distances[0];
 				} 
 				/* Complete Link - Maximum*/

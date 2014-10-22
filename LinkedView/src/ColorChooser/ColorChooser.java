@@ -25,6 +25,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -35,7 +36,6 @@ import Utilities.GUIFactory;
 import Utilities.Helper;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor2;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets2;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet2;
@@ -43,7 +43,6 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
 
 public class ColorChooser implements ConfigNodePersistent {
 	
-	private final TreeViewFrame tvFrame;
 	private final JPanel mainPanel;
 	private Preferences configNode;
 
@@ -75,10 +74,8 @@ public class ColorChooser implements ConfigNodePersistent {
 
 	private Thumb selectedThumb = null;
 
-	public ColorChooser(TreeViewFrame tvFrame, 
-			final ColorExtractor2 drawer, int minVal, int maxVal) {
+	public ColorChooser(final ColorExtractor2 drawer, int minVal, int maxVal) {
 
-		this.tvFrame = tvFrame;
 		this.colorExtractor = drawer;
 		this.colorPresets = DendrogramFactory.getColorPresets();
 		this.minVal = minVal;
@@ -812,8 +809,8 @@ public class ColorChooser implements ConfigNodePersistent {
 					positionInputDialog.getContentPane().add(panel);
 
 					positionInputDialog.pack();
-					positionInputDialog.setLocationRelativeTo(tvFrame
-							.getAppFrame());
+					positionInputDialog.setLocationRelativeTo(
+							JFrame.getFrames()[0]);
 					positionInputDialog.setVisible(true);
 				}
 			}

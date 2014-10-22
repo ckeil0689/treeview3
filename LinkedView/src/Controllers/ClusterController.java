@@ -17,7 +17,7 @@ import Utilities.StringRes;
 import Cluster.CDTGenerator;
 import Cluster.ClusterProcessor;
 import Cluster.ClusterView;
-import Cluster.ClusterViewDialog;
+import Cluster.ClusterDialog;
 import Cluster.DistMatrixCalculator;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
@@ -46,9 +46,9 @@ public class ClusterController {
 	public final static int COL = 2;
 
 	private final DataModel tvModel;
-	private final TVFrameController tvController;
+	private final TVController tvController;
 	private final ClusterView clusterView;
-	private final ClusterViewDialog clusterDialog;
+	private final ClusterDialog clusterDialog;
 	
 	private ClusterProcessor processor;
 	
@@ -69,15 +69,15 @@ public class ClusterController {
 	 * loading. 
 	 * TODO implement multi-core clustering.
 	 */
-	public ClusterController(final ClusterViewDialog dialog, 
-			final TVFrameController controller) {
+	public ClusterController(final ClusterDialog dialog, 
+			final TVController controller) {
 
 		this.clusterDialog = dialog;
 		this.tvController = controller;
 		this.tvModel = controller.getDataModel();
 		this.clusterView = dialog.getClusterView();
 
-		/* Add all listeners after creating them */
+		/* Create and add all view component listeners */
 		clusterView.addClusterListener(new TaskStartListener());
 		clusterView.addClusterTypeListener(new ClusterTypeListener());
 		clusterView.addCancelListener(new CancelListener());
@@ -93,7 +93,7 @@ public class ClusterController {
 	 * @author CKeil
 	 * 
 	 */
-	class TaskStartListener implements ActionListener {
+	private class TaskStartListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
@@ -116,7 +116,7 @@ public class ClusterController {
 	 * @author CKeil
 	 *
 	 */
-	class ClusterTask extends SwingWorker<Void, String> {
+	private class ClusterTask extends SwingWorker<Void, String> {
 		
 		/* The finished reordered axes */
 		private String[] reorderedRows;
@@ -196,7 +196,8 @@ public class ClusterController {
 			/* Row axis cluster */
 			double[][] distMatrix = null;
 			
-			if (!isReady(similarity, axis)) return new String[] {""};
+			/* Check if this axis should be clustered */
+			if (!isReady(similarity, axis)) return new String[] {};
 				
 			String axisPrefix = (axis == ROW) ? "row" : "column";
 			
@@ -211,7 +212,7 @@ public class ClusterController {
 			publish("Clustering " + axisPrefix + " data...");
 			
 			return processor.clusterAxis(distMatrix, 
-					clusterView.getLinkageMethod(), 
+					clusterView.getLinkMethod(), 
 					clusterView.getSpinnerValues(), 
 					isHierarchical(), axis);
 		}
@@ -245,7 +246,7 @@ public class ClusterController {
 	 * @param reorderedRows Reordered row axis.
 	 * @author CKeil
 	 */
-	class SaveTask extends SwingWorker<Void, Void> {
+	private class SaveTask extends SwingWorker<Void, Void> {
 
 		/* The finished reordered axes */
 		private String[] reorderedRows;
@@ -307,15 +308,17 @@ public class ClusterController {
 					+ File.separator);
 
 			LogBuffer.println("Setting view choice to begin loading.");
-			tvController.setViewChoice();
+			tvController.setViewChoice(false);
+			
+			/* TODO can this be inherited from TVController? */
 			LoadWorker loadWorker = new LoadWorker(fileSet);
 			loadWorker.execute();
 
 		} else {
 			String alert = "When trying to load the clustered file, no "
 					+ "file path could be found.";
-			JOptionPane.showMessageDialog(clusterDialog.getParentFrame(), 
-					alert, "Alert", JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(JFrame.getFrames()[0], alert, 
+					"Alert", JOptionPane.WARNING_MESSAGE);
 			LogBuffer.println("Alert: " + alert);
 		}
 	}
@@ -325,6 +328,7 @@ public class ClusterController {
 	 * successful, it sets the dataModel in the TVFrameController and loads the
 	 * DendroView. If not, it also ensures the appropriate response of 
 	 * DendroView and TVFrame.
+	 * TODO Implement inheritance from TVController... 
 	 */
 	private class LoadWorker extends SwingWorker<Void, Void> {
 
@@ -352,7 +356,7 @@ public class ClusterController {
 			if (tvController.getDataModel().getDataMatrix()
 					.getNumRow() > 0) {
 				tvController.setDataModel();
-				tvController.setViewChoice();
+				tvController.setViewChoice(false);
 				LogBuffer.println("Successfully loaded.");
 
 			} else {
@@ -361,7 +365,7 @@ public class ClusterController {
 						message, "Alert", JOptionPane.WARNING_MESSAGE);
 				LogBuffer.println("Alert: " + message);
 				clusterView.setClustering(false);
-				tvController.setViewChoice();
+				tvController.setViewChoice(true);
 				tvController.addViewListeners();
 			}
 		}
@@ -374,7 +378,7 @@ public class ClusterController {
 	 * @author CKeil
 	 *
 	 */
-	class ClusterTypeListener implements ActionListener {
+	private class ClusterTypeListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
@@ -390,7 +394,7 @@ public class ClusterController {
 	 * @author CKeil
 	 *
 	 */
-	class LinkChoiceListener implements ActionListener {
+	private class LinkChoiceListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
@@ -405,7 +409,7 @@ public class ClusterController {
 	 * measure selection.
 	 * @author CKeil
 	 */
-	class RowDistListener implements ItemListener {
+	private class RowDistListener implements ItemListener {
 
 		@Override
 		public void itemStateChanged(ItemEvent event) {
@@ -425,7 +429,7 @@ public class ClusterController {
 	 * measure selection.
 	 * @author CKeil
 	 */
-	class ColDistListener implements ItemListener {
+	private class ColDistListener implements ItemListener {
 
 		@Override
 		public void itemStateChanged(ItemEvent event) {
@@ -444,7 +448,7 @@ public class ClusterController {
 	 * Listens to a change in selection in the JSpinners for k-means.
 	 * @author CKeil
 	 */
-	class SpinnerListener implements ChangeListener {
+	private class SpinnerListener implements ChangeListener {
 
 		@Override
 		public void stateChanged(ChangeEvent arg0) {
@@ -462,7 +466,7 @@ public class ClusterController {
 	 * @author CKeil
 	 * 
 	 */
-	class CancelListener implements ActionListener {
+	private class CancelListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
@@ -486,7 +490,7 @@ public class ClusterController {
 	 * @return boolean Whether all needed selections have 
 	 * appropriate values.
 	 */
-	public boolean isReady(final int distMeasure, int type) {
+	private boolean isReady(final int distMeasure, int type) {
 
 		if (isHierarchical()) {
 			return distMeasure != DistMatrixCalculator.NO_CLUSTER;
@@ -521,7 +525,7 @@ public class ClusterController {
 	/**
 	 * Cancels all active threads related to clustering.
 	 */
-	public void cancelAll() {
+	private void cancelAll() {
 		
 		if(clusterTask != null) clusterTask.cancel(true);
 		if(processor != null) processor.cancelAll();
@@ -534,7 +538,7 @@ public class ClusterController {
 	 * @return boolean Whether the user selected hierarchical clustering (true)
 	 * or k-means (false).
 	 */
-	public boolean isHierarchical() {
+	private boolean isHierarchical() {
 
 		return clusterView.getClusterMethod()
 				.equalsIgnoreCase(StringRes.menu_Hier);

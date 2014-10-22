@@ -80,8 +80,8 @@ public class ClusterView {
 	private JSpinner rowIterationsSetr;
 	private JSpinner colIterationsSetr;
 
-	private final String[] linkageMethods = { "Average Linkage", 
-			"Single Linkage", "Complete Linkage" };
+	private final String[] linkageMethods = {"Single Linkage", 
+			"Complete Linkage", "Average Linkage" };
 
 	private final String clusterType;
 
@@ -501,11 +501,11 @@ public class ClusterView {
 	/**
 	 * Returns the selected linkage method as a String.
 	 * 
-	 * @return String choice
+	 * @return int choice
 	 */
-	public String getLinkageMethod() {
+	public int getLinkMethod() {
 
-		return (String) linkageChooser.getSelectedItem();
+		return linkageChooser.getSelectedIndex();
 	}
 
 	/**

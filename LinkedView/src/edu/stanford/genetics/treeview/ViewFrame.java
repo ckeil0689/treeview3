@@ -203,7 +203,7 @@ public abstract class ViewFrame implements Observer {
 
 		applicationFrame.setSize(new Dimension(screenSize.width,
 				screenSize.height - taskbarHeight));
-		applicationFrame.setMinimumSize(new Dimension(screenSize.width * 2 / 3,
+		applicationFrame.setMinimumSize(new Dimension(screenSize.width * 1 / 2,
 				screenSize.height * 2 / 3));
 	}
 

@@ -49,7 +49,7 @@ public class ClusterProcessor {
 	 * @param axis
 	 * @return
 	 */
-	public String[] clusterAxis(double[][] distMatrix, String linkMethod, 
+	public String[] clusterAxis(double[][] distMatrix, int linkMethod, 
 			final Integer[] spinnerInput, boolean hierarchical, 
 			final int axis) {
 		
@@ -250,13 +250,13 @@ public class ClusterProcessor {
 	private class ClusterTask extends SwingWorker<String[], Integer> {
 
 		private final double[][] distMatrix;
-		private final String linkMethod;
+		private final int linkMethod;
 		private final Integer[] spinnerInput;
 		private final int axis;
 		private final int max;
 		private boolean hierarchical;
 
-		public ClusterTask(final double[][] distMatrix, String linkMethod, 
+		public ClusterTask(final double[][] distMatrix, int linkMethod, 
 				final Integer[] spinnerInput, boolean hierarchical, 
 				final int axis) {
 
@@ -296,22 +296,25 @@ public class ClusterProcessor {
 				 * its own cluster (bottom-up clustering).
 				 */
 				int loopNum = 0;
-				int distMatrixLength = distMatrix.length;
+				int distMatrixSize = distMatrix.length;
 				
-				while (distMatrixLength > 1 && !isCancelled()) {
+				while (distMatrixSize > 1 && !isCancelled()) {
 					
-					distMatrixLength = cGen.cluster();
+					distMatrixSize = cGen.cluster();
 					publish(loopNum);
 					loopNum++;
 				}
 				
-				LogBuffer.println("Clustering matrix done.");
+				/* Distance matrix needs to be size 1 when cluster finishes! */
+				if(distMatrixSize != 1) this.cancel(true);
 				
 				/* Return empty String[] if user cancels operation */
 				if(isCancelled()) {
 					LogBuffer.println("ClusterTask cancelled.");
-					return new String[]{""};
+					return new String[]{};
 				}
+				
+				LogBuffer.println("Clustering matrix done.");
 				
 				/* Write the tree file */
 				LogBuffer.println("Writing clustered data.");
@@ -335,8 +338,7 @@ public class ClusterProcessor {
 		public void done() {
 			
 			if(!isCancelled()) pBarCount += max;
-			LogBuffer.println("pBarCount: " + pBarCount);
-			LogBuffer.println("Clustering successful? " + !isCancelled());
+			LogBuffer.println("Clustering canceled? " + !isCancelled());
 		}
 	}
 	

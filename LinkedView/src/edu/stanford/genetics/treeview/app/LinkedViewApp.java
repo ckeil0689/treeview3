@@ -30,7 +30,7 @@ import java.util.prefs.Preferences;
 
 import javax.swing.JOptionPane;
 
-import Controllers.TVFrameController;
+import Controllers.TVController;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.ExportException;
 import edu.stanford.genetics.treeview.FileSet;
@@ -68,10 +68,11 @@ public class LinkedViewApp extends TreeViewApp {
 	// "edu.stanford.genetics.treeview.plugin.karyoview.KaryoscopeFactory"
 	public LinkedViewApp() {
 
-		super();// creates or loads global config file (Preferences) here.
+		/* load configurations in parent class */
+		super();
 		scanForPlugins();
 
-		// added to circumvent standardStartup for now
+		/* added to circumvent standardStartup for now */
 		openNew().getAppFrame().setVisible(true);
 	}
 
@@ -117,33 +118,16 @@ public class LinkedViewApp extends TreeViewApp {
 				getGlobalConfig().node("Plugins"));
 	}
 
-	// private void dealWithRegistration() {
-	//
-	// ConfigNode node = getGlobalConfig().getNode("Registration");
-	// if (node != null) {
-	// try {
-	// edu.stanford.genetics.treeview.reg.RegEngine.verify(node);
-	// getGlobalConfig().store();
-	//
-	// } catch (Exception e) {
-	// JOptionPane.showMessageDialog(null, "registration error "+e);
-	// LogBuffer.println("registration error "+e);
-	// e.printStackTrace();
-	// }
-	// }
-	// }
-
 	/* inherit description */
 	@Override
 	public TreeViewFrame openNew() {
 
-		// setup toplevel
+		/* setup Model, View, and Controller */
 		// final LinkedViewFrame tvFrame = new LinkedViewFrame(this);
 		final DataModel model = new TVModel();
 		final TreeViewFrame tvFrame = new TreeViewFrame(this);
 		// tvFrame.addWindowListener(this);
-		final TVFrameController tvController = new TVFrameController(tvFrame,
-				model);
+		new TVController(tvFrame, model);
 
 		return tvFrame;
 	}
@@ -152,14 +136,12 @@ public class LinkedViewApp extends TreeViewApp {
 	@Override
 	public TreeViewFrame openNew(final FileSet fileSet) throws LoadException {
 
-		// setup toplevel
+		/* Setup Model, View, and Controller */
 		// final LinkedViewFrame tvFrame = new LinkedViewFrame(this);
 		final TreeViewFrame tvFrame = new TreeViewFrame(this);
 		final DataModel model = new TVModel();
-		final TVFrameController tvController = new TVFrameController(tvFrame,
-				model);
-
-		tvController.loadFileSet(fileSet);
+		new TVController(tvFrame, model).loadFileSet(fileSet);
+		
 		tvFrame.setLoaded(true);
 
 		// tvFrame.addWindowListener(this);

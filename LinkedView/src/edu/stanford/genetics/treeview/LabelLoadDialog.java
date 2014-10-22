@@ -3,6 +3,7 @@ package edu.stanford.genetics.treeview;
 import java.awt.Dialog;
 
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -18,7 +19,7 @@ public class LabelLoadDialog {
 	private final JPanel mainPanel;
 	private final JProgressBar pBar;
 
-	public LabelLoadDialog(final ViewFrame view, String type) {
+	public LabelLoadDialog(String type) {
 
 		labelLoadFrame = new JDialog();
 		labelLoadFrame.setTitle(StringRes.dlg_loadLabels);
@@ -39,7 +40,7 @@ public class LabelLoadDialog {
 
 		labelLoadFrame.getContentPane().add(mainPanel);
 		labelLoadFrame.pack();
-		labelLoadFrame.setLocationRelativeTo(view.getAppFrame());
+		labelLoadFrame.setLocationRelativeTo(JFrame.getFrames()[0]);
 	}
 
 	/**

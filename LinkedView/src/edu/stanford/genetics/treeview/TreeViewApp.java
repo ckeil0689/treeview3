@@ -29,7 +29,7 @@ import java.util.prefs.Preferences;
 
 import javax.swing.ToolTipManager;
 
-import Controllers.TVFrameController;
+import Controllers.TVController;
 import edu.stanford.genetics.treeview.model.TVModel;
 
 /**
@@ -213,7 +213,7 @@ public abstract class TreeViewApp {// implements WindowListener {
 		// setup toplevel
 		final TreeViewFrame tvFrame = new TreeViewFrame(this);
 		final DataModel model = new TVModel();
-		final TVFrameController tvController = new TVFrameController(tvFrame,
+		final TVController tvController = new TVController(tvFrame,
 				model);
 		if (fileSet != null) {
 			tvController.loadFileSet(fileSet);

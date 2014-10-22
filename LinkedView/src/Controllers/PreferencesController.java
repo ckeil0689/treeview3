@@ -116,7 +116,7 @@ public class PreferencesController {
 
 		labelWorker = new LabelWorker(type);
 
-		dialog = new LabelLoadDialog(tvFrame, type);
+		dialog = new LabelLoadDialog(type);
 
 		// A property listener used to update the progress bar
 		final PropertyChangeListener listener = new PropertyChangeListener() {
