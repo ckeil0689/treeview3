@@ -27,8 +27,9 @@ public class NewModelLoader {
 	protected TreeViewFrame tvFrame;
 	protected WelcomeView loadProgView;
 
-	// Instance variables for the actual data to be loaded.
-//	protected String[][] stringLabels;
+	/* 
+	 * Instance variables for the actual data to be loaded. 
+	 */
 	private double[][] doubleData;
 
 	private int lineNum;

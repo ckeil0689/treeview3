@@ -45,8 +45,6 @@ import edu.stanford.genetics.treeview.TreeDrawerNode;
 public class MapContainer extends Observable implements Observer,
 		AdjustmentListener, ConfigNodePersistent {
 
-	private final double EPSILON = 0.0001;
-
 	private final String default_map = "Fixed";
 	private double default_scale = 1.0;
 	private double minScale;
@@ -462,7 +460,7 @@ public class MapContainer extends Observable implements Observer,
 
 	public void setScale(final double d) {
 
-		if (!Helper.nearlyEqual(fixedMap.getScale(), d, EPSILON)) {
+		if (!Helper.nearlyEqual(fixedMap.getScale(), d)) {
 			fixedMap.setScale(d);
 			setupScrollbar();
 			setChanged();

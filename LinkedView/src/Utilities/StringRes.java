@@ -143,43 +143,57 @@ public class StringRes {
 	// Cluster Info
 	public static final String clusterInfo_Single_Similarity = "Joins the " +
 			"closest two clusters by finding the most similar pair of points.";
+	
 	public static final String clusterInfo_Single_Type = "Long straggly, " +
 			"chains, ellipsoidal.";
-	public static final String clusterInfo_Single_Time = "O(N**3). " +
-			"Implementation of SLINK (Sibson, 1972) will reduce " +
+	
+	public static final String clusterInfo_Single_Time = "O(N log N) to "
+			+ "O(N**5). Implementation of SLINK (Sibson, 1972) will reduce " +
 			"complexity to O(N**2).";
+	
 	public static final String clusterInfo_Single_Adv = "Theoretical " +
 			"properties, efficient implementations, widely used. " +
 			"No cluster centroid or representative required: " +
 			"no need to recalculate similarity matrix.";
+	
 	public static final String clusterInfo_Single_DisAdv = "Unsuitable for " +
 			"isolating spherical or poorly separated clusters.";
+	
 	public static final String clusterInfo_Ready = "Ready to cluster!";
 	
 	public static final String clusterInfo_Compl_Similarity = "Joins the " +
 			"most distant two clusters by finding the least similar pair " +
 			"of points.";
+	
 	public static final String clusterInfo_Compl_Type = "All entries in a " +
 			"cluster are linked to one another within some minimum " +
 			"similarity. Small, tightly bound clusters.";
+	
 	public static final String clusterInfo_Compl_Time = "O(N**3).";
+	
 	public static final String clusterInfo_Compl_Adv = "Good results from " +
 			"(Voorhees) comparative studies.";
+	
 	public static final String clusterInfo_Compl_DisAdv = "Difficult to " +
 			"apply to large data sets due to computational complexity.";
 	
 	public static final String clusterInfo_Avg_Similarity = "Use the average " +
 			"value of the pairwise links within a cluster, based upon all " +
 			"objects in the cluster.";
+	
 	public static final String clusterInfo_Avg_Type = "Intermediate in " +
 			"tightness between single link and complete link.";
+	
 	public static final String clusterInfo_Avg_Time = "O(N**2).";
+	
 	public static final String clusterInfo_Avg_Adv = "Ranked well in " +
 			"evaluation studies.";
+	
 	public static final String clusterInfo_Avg_DisAdv = "Expensive for " +
 			"large collections.";
+	
 	public static final String clusterInfo_KMeans = "Splits the data into"
-			+ "groups.";
+			+ " groups.";
 	
 	// Cluster Info - Tip
 	public static final String clusterTip_Memory = "Memory tip.";
@@ -188,8 +202,8 @@ public class StringRes {
 	public static final String clusterTip_filePath = "File Path: ";
 	
 	// Cluster Error - Hints
-	public static final String clusterError_invalid = "Please pick valid "
-			+ "cluster options to begin clustering!";
+	public static final String clusterError_invalid = "Clustering parameters"
+			+ " are missing or incorrect. Check the input again!";
 	public static final String clusterError_notLoaded = "DataModel not "
 			+ "properly loaded.";
 

@@ -63,8 +63,6 @@ import edu.stanford.genetics.treeview.LogBuffer;
  */
 public class DoubleArrayDrawer extends ArrayDrawer {
 
-	protected final double EPSILON = 0.0001;
-
 	/** Used to convert data values into colors */
 	protected ColorExtractor2 colorExtractor;
 
@@ -140,13 +138,11 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 
 				final double val = dataMatrix.getValue(row, col);
 
-				if (Helper.nearlyEqual(val, DataModel.NODATA, EPSILON)) { 
-					//Math.abs(val - DataModel.NODATA) < EPSILON) {
+				if (Helper.nearlyEqual(val, DataModel.NODATA)) {
 					continue;
 				}
 
-				if (Helper.nearlyEqual(val, DataModel.EMPTY, EPSILON)) { 
-					//Math.abs(val - DataModel.EMPTY) < EPSILON) {
+				if (Helper.nearlyEqual(val, DataModel.EMPTY)) {
 					continue;
 				}
 
@@ -238,22 +234,19 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 							final double thisVal = dataMatrix.getValue(j
 									+ source.x, actualGene);
 
-							if (Helper.nearlyEqual(thisVal, DataModel.EMPTY, EPSILON)) {
-								//Math.abs(thisVal - DataModel.EMPTY) < EPSILON) {
+							if (Helper.nearlyEqual(thisVal, DataModel.EMPTY)) {
 								val = DataModel.EMPTY;
 								count = 1;
 								break;
 							}
 
-							if (!Helper.nearlyEqual(thisVal, DataModel.EMPTY, EPSILON)) { 
-								//Math.abs(thisVal - DataModel.NODATA) > EPSILON) {
+							if (!Helper.nearlyEqual(thisVal, DataModel.EMPTY)) {
 								count++;
 								val += thisVal;
 							}
 						}
 
-						if (Helper.nearlyEqual(val, DataModel.EMPTY, EPSILON)) { 
-							//Math.abs(val - DataModel.EMPTY) < EPSILON) {
+						if (Helper.nearlyEqual(val, DataModel.EMPTY)) {
 							break;
 						}
 					}
@@ -313,15 +306,13 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 	@Override
 	public boolean isMissing(final int x, final int y) {
 
-		return Helper.nearlyEqual(getValue(x, y), DataModel.NODATA, EPSILON); 
-				//(Math.abs(getValue(x, y) - DataModel.NODATA) < EPSILON);
+		return Helper.nearlyEqual(getValue(x, y), DataModel.NODATA);
 	}
 
 	@Override
 	public boolean isEmpty(final int x, final int y) {
 
-		return Helper.nearlyEqual(getValue(x, y), DataModel.EMPTY, EPSILON);
-				//(Math.abs(getValue(x, y) - DataModel.EMPTY) < EPSILON);
+		return Helper.nearlyEqual(getValue(x, y), DataModel.EMPTY);
 	}
 
 	/** how many rows are there to draw? */

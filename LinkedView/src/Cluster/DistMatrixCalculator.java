@@ -20,7 +20,15 @@ import edu.stanford.genetics.treeview.LogBuffer;
  */
 public class DistMatrixCalculator {
 
-	private final double EPSILON = 0.0001;
+	/* Distance method indeces from JCombobox in ClusterView */
+	public static final int NO_CLUSTER = 0;
+	public static final int PEARSON_UN = 1;
+	public static final int PEARSON_CEN = 2;
+	public static final int ABSOLUTE_UN = 3;
+	public static final int ABSOLUTE_CEN = 4;
+	public static final int SPEARMAN = 5;
+	public static final int EUCLIDEAN = 6;
+	public static final int CITY_BLOCK = 7;
 	
 	/* 
 	 * reference for the matrix to be clustered. Spearman Rank generates
@@ -196,7 +204,7 @@ public class DistMatrixCalculator {
 			 * Check if following values in array are identical.
 			 */	
 			while (j + 1 < copyRow.length 
-					&& Helper.nearlyEqual(copyRow[j + 1], temp, EPSILON)) {
+					&& Helper.nearlyEqual(copyRow[j + 1], temp)) {
 				countDuplicates++;
 				duplicateRankSum += j;
 				temp = copyRow[j];
@@ -209,7 +217,7 @@ public class DistMatrixCalculator {
 				
 				for(int k = 0; k < row.length; k++) {
 					
-					if(Helper.nearlyEqual(row[k], temp, EPSILON)) {
+					if(Helper.nearlyEqual(row[k], temp)) {
 						rankRow[k] = avgRank; 	
 					} 
 				}
@@ -281,7 +289,7 @@ public class DistMatrixCalculator {
 		for (int k = 0; k < row.length; k++) {
 			
 			double diff = row[k] - otherRow[k];
-			sum += diff * diff; // using Math.pow is massive slow down...
+			sum += diff * diff; 
 		}
 		
 		return sum/ taskData.length;
@@ -316,7 +324,7 @@ public class DistMatrixCalculator {
 
 		for (int i = 0; i < array.length; i++) {
 
-			if (Helper.nearlyEqual(array[i], value, EPSILON)) {
+			if (Helper.nearlyEqual(array[i], value)) {
 				return i;
 			}
 		}
@@ -330,44 +338,29 @@ public class DistMatrixCalculator {
 	public void calcRow(int index) {
 		
 		/*
-		 * The switch condition is an int instead of the actual method String
-		 * name because until I figured out how to pass methods as variables
-		 * (or a better way to switch the methods) this function will be called
-		 * from a loop. Switching ints is much less expensive.
-		 * The ints follow the index position of the methods in the JComboBox
-		 * in ClusterView.
-		 * For reference here is a table that describes what each int 
-		 * stands for:
-		 * - Pearson Uncentered: 1
-		 * - Pearson Centered: 2
-		 * - Absolute Uncentered: 3
-		 * - Absolute Centered: 4
-		 * - Spearman: 5 (chooses pearson, because ranking was completed
-		 * before and the ranked data will be measured with pearson).
-		 * - Euclidean: 6
-		 * - City Block: 7
+		 * Switches JCombobox item indeces.
 		 */
 		switch(distMeasure) {
 		
-		case 1: 	
+		case PEARSON_UN: 	
 			pearson(false, false, index);
 			break;
-		case 2: 
+		case PEARSON_CEN: 
 			pearson(false, true, index);
 			break;
-		case 3: 	
+		case ABSOLUTE_UN: 	
 			pearson(true, false, index);
 			break;
-		case 4:	
+		case ABSOLUTE_CEN:	
 			pearson(true, true, index);
 			break;
-		case 5:	
-			pearson(false, false, index); // do pearson after ranking!
+		case SPEARMAN:	
+			pearson(false, false, index); // pearson after ranking!
 			break;
-		case 6: 	
+		case EUCLIDEAN: 	
 			taxicab(true, index);
 			break;
-		case 7:	
+		case CITY_BLOCK:	
 			taxicab(false, index);
 			break;
 		default:							

@@ -8,8 +8,6 @@ import edu.stanford.genetics.treeview.DataModel;
 
 public class CdtWriter {
 
-	private final double EPSILON = 0.001;
-
 	DataModel dataModel;
 
 	public CdtWriter(final DataModel dataModel) {
@@ -27,7 +25,8 @@ public class CdtWriter {
 					.getNumNames(); headerrow++) {
 				for (int column = 0; column < dataModel.getArrayHeaderInfo()
 						.getNumHeaders()
-						+ dataModel.getGeneHeaderInfo().getNumNames(); column++) {
+						+ dataModel.getGeneHeaderInfo().getNumNames(); 
+						column++) {
 					if (column > 0)
 						out.write("\t");
 					if (column < dataModel.getGeneHeaderInfo().getNumNames()) {
@@ -92,8 +91,7 @@ public class CdtWriter {
 	private void printNotNull2(final FileWriter out, final double value)
 			throws IOException {
 
-		if (Helper.nearlyEqual(value, DataModel.EMPTY, EPSILON)) {
-			//Math.abs(value - DataModel.EMPTY) < EPSILON) {
+		if (Helper.nearlyEqual(value, DataModel.EMPTY)) {
 			out.write("" + value);
 		}
 	}

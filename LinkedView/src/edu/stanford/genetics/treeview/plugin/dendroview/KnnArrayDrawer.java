@@ -24,6 +24,7 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.Rectangle;
 
+import Utilities.Helper;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.LogBuffer;
 
@@ -76,11 +77,14 @@ public class KnnArrayDrawer extends DoubleArrayDrawer {
 			for (int col = 0; col < nCol; col++) {
 
 				final double val = dataMatrix.getValue(row, col);
-				if (Math.abs(val - DataModel.NODATA) < EPSILON) {
+				if (Helper.nearlyEqual(val, DataModel.NODATA)) {
+					
+//				Math.abs(val - DataModel.NODATA) < EPSILON) {
 					continue;
 				}
 
-				if (Math.abs(val - DataModel.EMPTY) < EPSILON) {
+				if (Helper.nearlyEqual(val, DataModel.EMPTY)) {
+					//Math.abs(val - DataModel.EMPTY) < EPSILON) {
 					continue;
 				}
 				mean += Math.abs(val);
@@ -159,18 +163,18 @@ public class KnnArrayDrawer extends DoubleArrayDrawer {
 								actualGene = geneOrder[actualGene];
 							final double thisVal = dataMatrix.getValue(j
 									+ source.x, actualGene);
-							if (Math.abs(thisVal - DataModel.EMPTY) < EPSILON) {
+							if (Helper.nearlyEqual(val, DataModel.EMPTY)) {
 								val = DataModel.EMPTY;
 								count = 1;
 								break;
 							}
 
-							if (Math.abs(thisVal - DataModel.NODATA) > EPSILON) {
+							if (!Helper.nearlyEqual(val, DataModel.NODATA)) {
 								count++;
 								val += thisVal;
 							}
 						}
-						if (Math.abs(val - DataModel.EMPTY) < EPSILON) {
+						if (Helper.nearlyEqual(val, DataModel.EMPTY)) {
 							break;
 						}
 					}

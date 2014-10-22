@@ -24,9 +24,13 @@ public class ClusterProcessor {
 
 	private final DataModel tvModel;
 	private int pBarCount;
+	private DistanceWorker distTask;
+	private ClusterTask clusterTask;
 
 	/**
-	 * 
+	 * Constructor for the ClusterProcessor. Sets the pBarCount to 0,
+	 * which is the value that stores progress between multiple tasks, so that
+	 * a single progress bar for the entire process can be displayed. 
 	 * @param model
 	 */
 	public ClusterProcessor(final DataModel model) {
@@ -45,17 +49,21 @@ public class ClusterProcessor {
 	 * @param axis
 	 * @return
 	 */
-	public String[] clusterAxis(double[][] distMatrix, String linkMethod, 
+	public String[] clusterAxis(double[][] distMatrix, int linkMethod, 
 			final Integer[] spinnerInput, boolean hierarchical, 
 			final int axis) {
 		
 		try {
 			LogBuffer.println("Starting clusterAxis(): " + axis);
-			ClusterWorker clusterWorker = new ClusterWorker(distMatrix, 
-					linkMethod, spinnerInput, hierarchical, axis);
-			clusterWorker.execute();
+			this.clusterTask = new ClusterTask(distMatrix, linkMethod, 
+					spinnerInput, hierarchical, axis);
+			clusterTask.execute();
 			
-			return clusterWorker.get();
+			/* 
+			 * Get() blocks until this thread finishes, so the following
+			 * code waits for this procedure to finish. 
+		 	 */
+			return clusterTask.get();
 			
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
@@ -75,10 +83,14 @@ public class ClusterProcessor {
 	public double[][] calcDistance(int distMeasure, int axis) {
 		
 		try {
-			DistanceWorker distWorker = new DistanceWorker(distMeasure,axis);
-			distWorker.execute();
+			this.distTask = new DistanceWorker(distMeasure,axis);
+			distTask.execute();
 			
-			return distWorker.get();
+			/* 
+			 * Get() blocks until this thread finishes, so the following
+			 * code waits for this procedure to finish. 
+		 	 */
+			return distTask.get();
 			
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
@@ -95,9 +107,8 @@ public class ClusterProcessor {
 	 * finishes after the calculations were cancelled by the user, 
 	 * it let's the cluster dialog know so it can respond appropriately.
 	 * Input data is translated into output data here.
-	 * TODO Take switch statement outside the loop.
 	 */
-	class DistanceWorker extends SwingWorker<double[][], Integer> {
+	private class DistanceWorker extends SwingWorker<double[][], Integer> {
 
 		private final int distMeasure;
 		private final int axis;
@@ -122,7 +133,9 @@ public class ClusterProcessor {
         protected void process(List<Integer> chunks) {
             
 			int i = chunks.get(chunks.size()-1);
-            ClusterView.updatePBar(pBarCount + i);
+			int progress = (isCancelled()) ? 0 : pBarCount + i;
+            ClusterView.updatePBar(progress);
+            //ClusterView.updatePBar(pBarCount + i);
         }
 
 		@Override
@@ -143,7 +156,7 @@ public class ClusterProcessor {
 						new DistMatrixCalculator(data, distMeasure, axis);
 				
 				/* Ranking data if Spearman was chosen */
-				if(distMeasure == 5) {// Spearman --> change to final variables
+				if(distMeasure == DistMatrixCalculator.SPEARMAN) {
 					
 					double[][] rankMatrix = 
 							new double[data.length][data[0].length];
@@ -151,7 +164,7 @@ public class ClusterProcessor {
 					/* Iterate over every row of the matrix. */
 					for (int i = 0; i < rankMatrix.length; i++) {
 						
-						if(isCancelled()) break;
+						if(isCancelled()) return new double[0][];
 						publish(i);
 						rankMatrix[i] = dCalc.spearman(data[i]);
 					}
@@ -169,7 +182,10 @@ public class ClusterProcessor {
 					/* take a row */
 					for (int i = 0; i < data.length; i++) {
 			 
-						if(isCancelled()) break;
+						if(isCancelled()) {
+							LogBuffer.println("DistTask cancelled.");
+							return new double[0][];
+						}
 						publish(i);
 						dCalc.calcRow(i);
 					}
@@ -201,9 +217,11 @@ public class ClusterProcessor {
 		@Override
 		public void done() {
 			
-			/* keep track of overall progress */
-			pBarCount += axisSize;
-			LogBuffer.println("pBarCount: " + pBarCount);
+			if(!isCancelled()) {
+				/* keep track of overall progress */
+				pBarCount += axisSize;
+				LogBuffer.println("pBarCount: " + pBarCount);
+			}
 		}
 		
 		/**
@@ -229,20 +247,20 @@ public class ClusterProcessor {
 	 * it let's the cluster dialog know so it can respond appropriately.
 	 * Input data is translated into output data here.
 	 */
-	class ClusterWorker extends SwingWorker<String[], Integer> {
+	private class ClusterTask extends SwingWorker<String[], Integer> {
 
 		private final double[][] distMatrix;
-		private final String linkMethod;
+		private final int linkMethod;
 		private final Integer[] spinnerInput;
 		private final int axis;
 		private final int max;
 		private boolean hierarchical;
 
-		public ClusterWorker(final double[][] distMatrix, String linkMethod, 
+		public ClusterTask(final double[][] distMatrix, int linkMethod, 
 				final Integer[] spinnerInput, boolean hierarchical, 
 				final int axis) {
 
-			LogBuffer.println("Initializing ClusterWorker");
+			LogBuffer.println("Initializing ClusterTask.");
 			this.distMatrix = distMatrix;
 			this.linkMethod = linkMethod;
 			this.spinnerInput = spinnerInput;
@@ -255,7 +273,8 @@ public class ClusterProcessor {
         protected void process(List<Integer> chunks) {
             
 			int i = chunks.get(chunks.size()-1);
-            ClusterView.updatePBar(pBarCount + i);
+			int progress = (isCancelled()) ? 0 : pBarCount + i;
+            ClusterView.updatePBar(progress);
         }
 
 		@Override
@@ -263,7 +282,7 @@ public class ClusterProcessor {
 			
 			/* Hierarchical */
 			if (hierarchical) {
-				LogBuffer.println("Getting source file name.");
+				LogBuffer.println("Starting cluster.");
 				
 				String fileName = tvModel.getSource().substring(0, 
 						tvModel.getSource().length() - 4);
@@ -271,24 +290,31 @@ public class ClusterProcessor {
 				HierCluster cGen = new HierCluster(fileName, linkMethod, 
 								distMatrix, axis);
 				
-				LogBuffer.println("Starting cluster.");
 				/* 
 				 * Continue process until distMatrix has a size of 1, 
 				 * This array is the final cluster. Initially every row is 
 				 * its own cluster (bottom-up clustering).
 				 */
 				int loopNum = 0;
-				int distMatrixLength = distMatrix.length;
+				int distMatrixSize = distMatrix.length;
 				
-				while (distMatrixLength > 1 && !isCancelled()) {
+				while (distMatrixSize > 1 && !isCancelled()) {
 					
-					distMatrixLength = cGen.cluster();
+					distMatrixSize = cGen.cluster();
 					publish(loopNum);
 					loopNum++;
 				}
 				
+				/* Distance matrix needs to be size 1 when cluster finishes! */
+				if(distMatrixSize != 1) this.cancel(true);
+				
 				/* Return empty String[] if user cancels operation */
-				if(isCancelled()) return new String[]{""};
+				if(isCancelled()) {
+					LogBuffer.println("ClusterTask cancelled.");
+					return new String[]{};
+				}
+				
+				LogBuffer.println("Clustering matrix done.");
 				
 				/* Write the tree file */
 				LogBuffer.println("Writing clustered data.");
@@ -297,6 +323,7 @@ public class ClusterProcessor {
 				return cGen.getReorderedList();
 			} 
 			/* K-Means */
+			/*TODO Implement k-means correctly */
 			else {
 				KMeansCluster cGen = new KMeansCluster(tvModel, distMatrix, 
 						axis, spinnerInput[0], spinnerInput[1], this);
@@ -310,14 +337,18 @@ public class ClusterProcessor {
 		@Override
 		public void done() {
 			
-			pBarCount += max;
-			LogBuffer.println("pBarCount: " + pBarCount);
-			if (isCancelled()) {
-				LogBuffer.println("Clustering has been cancelled.");
-
-			} else {
-				LogBuffer.println("Cluster successfully completed.");
-			}
+			if(!isCancelled()) pBarCount += max;
+			LogBuffer.println("Clustering canceled? " + !isCancelled());
 		}
+	}
+	
+	/**
+	 * Cancels all currently running threads.
+	 */
+	public void cancelAll() {
+		
+		LogBuffer.println("ClusterProcessor canceling all.");
+		if(distTask != null) distTask.cancel(true);
+		if(clusterTask != null) clusterTask.cancel(true);
 	}
 }

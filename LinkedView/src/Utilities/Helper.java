@@ -2,6 +2,8 @@ package Utilities;
 
 public final class Helper {
 
+	private static final double EPSILON = 0.0000000001;
+	
 	/**
 	 * Compares to floating point numbers to find out whether they can
 	 * be considered equal.
@@ -10,7 +12,7 @@ public final class Helper {
 	 * @param epsilon
 	 * @return
 	 */
-	public static boolean nearlyEqual(double a, double b, double epsilon) {
+	public static boolean nearlyEqual(double a, double b) {
 		
 		final double absA = Math.abs(a);
 		final double absB = Math.abs(b);
@@ -21,9 +23,9 @@ public final class Helper {
 		} else if (a == 0 || b == 0 || diff < Float.MIN_NORMAL) {
 			// a or b is zero or both are extremely close to it
 			// relative error is less meaningful here
-			return diff < (epsilon * Float.MIN_NORMAL);
+			return diff < (EPSILON * Float.MIN_NORMAL);
 		} else { // use relative error
-			return diff / (absA + absB) < epsilon;
+			return diff / (absA + absB) < EPSILON;
 		}
 	}
 }

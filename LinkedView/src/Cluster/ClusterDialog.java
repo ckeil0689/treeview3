@@ -14,17 +14,13 @@ import Utilities.StringRes;
  * @author CKeil
  * 
  */
-public class ClusterViewDialog extends CustomDialog {
+public class ClusterDialog extends CustomDialog {
 
 	private final ClusterView clusterView;
-	private final JFrame parentFrame;
 
-	public ClusterViewDialog(final JFrame parentFrame,
-			final String clusterType) {
+	public ClusterDialog(final String clusterType) {
 		
 		super(StringRes.dlg_Cluster);
-		
-		this.parentFrame = parentFrame;
 
 		clusterView = new ClusterView(clusterType);
 		
@@ -49,10 +45,10 @@ public class ClusterViewDialog extends CustomDialog {
 	/**
 	 * Packs the JDialog layout and centers it in the application JFrame.
 	 */
-	public void packDialog() {
+	private void packDialog() {
 		
 		dialog.pack();
-		dialog.setLocationRelativeTo(parentFrame);
+		dialog.setLocationRelativeTo(JFrame.getFrames()[0]);
 	}
 
 	/**
@@ -63,17 +59,6 @@ public class ClusterViewDialog extends CustomDialog {
 	public ClusterView getClusterView() {
 
 		return clusterView;
-	}
-	
-	/**
-	 * Allows access to the dialog's parentFrame so that error dialogs or 
-	 * alerts can be properly displayed, since they need a JFrame 
-	 * to be centered.
-	 * @return JFrame parentFrame
-	 */
-	public JFrame getParentFrame() {
-		
-		return parentFrame;
 	}
 	
 	/**
@@ -95,9 +80,8 @@ public class ClusterViewDialog extends CustomDialog {
 			@Override
 			public void run() {
 				
-				ClusterViewDialog cd = new ClusterViewDialog(new JFrame(), 
-						StringRes.menu_Hier);
-				cd.setVisible(true);
+				new JFrame(); // needs top level frame to center jDialog
+				new ClusterDialog(StringRes.menu_KMeans).setVisible(true);
 			}
 		});
 	}

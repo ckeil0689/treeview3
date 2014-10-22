@@ -1,10 +1,7 @@
 package Controllers;
 
-import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -21,7 +18,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import Utilities.StringRes;
-import Cluster.ClusterViewDialog;
+import Cluster.ClusterDialog;
 import ColorChooser.ColorChooser;
 import ColorChooser.ColorChooserController;
 import edu.stanford.genetics.treeview.CdtFilter;
@@ -49,7 +46,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DoubleArrayDrawer;
  * @author CKeil
  * 
  */
-public class TVFrameController {
+public class TVController {
 
 	private final DataModel model;
 	private final TreeViewFrame tvFrame;
@@ -60,21 +57,16 @@ public class TVFrameController {
 	private File file;
 	private FileSet fileMenuSet;
 
-	private boolean error = false;
-
-	public TVFrameController(final TreeViewFrame tvFrame, 
+	public TVController(final TreeViewFrame tvFrame, 
 			final DataModel model) {
 
 		this.model = model;
 		this.tvFrame = tvFrame;
 		this.applicationFrame = tvFrame.getAppFrame();
-
-		LogBuffer.println("TVFrameC constructor on EDT? " 
-				+ SwingUtilities.isEventDispatchThread());
 		
 		dendroController = new DendroController(tvFrame);
 		
-		setViewChoice();
+		setViewChoice(false);
 		addViewListeners();
 	}
 	
@@ -91,13 +83,15 @@ public class TVFrameController {
 
 			switch (option) {
 
-				case JOptionPane.YES_OPTION:	tvFrame.getConfigNode()
-												.node("File").removeNode();
-												break;
+				case JOptionPane.YES_OPTION:	
+					tvFrame.getConfigNode().node("File").removeNode();
+					break;
 												
-				case JOptionPane.NO_OPTION:		break;
+				case JOptionPane.NO_OPTION:		
+					break;
 				
-				default:						return;
+				default:						
+					return;
 			}
 			
 		} catch (BackingStoreException e) {
@@ -127,76 +121,29 @@ public class TVFrameController {
 	/**
 	 * Adds listeners to the menubar.
 	 */
-	public void addMenuListeners() {
+	private void addMenuListeners() {
 		
-		menuActions = new MenubarController(tvFrame, TVFrameController.this);
+		menuActions = new MenubarController(tvFrame, TVController.this);
 
 		tvFrame.addMenuActionListeners(new StackMenuListener());
 		tvFrame.addFileMenuListeners(new FileMenuListener());
 	}
 
-//	/**
-//	 * Handles the loading of data.
-//	 * 
-//	 * @author CKeil
-//	 * 
-//	 */
-//	class LoadPanelListener implements ActionListener {
-//
-//		@Override
-//		public void actionPerformed(ActionEvent arg0) {
-//			
-//			openFile();
-//		}
-//	}
-
 	/**
 	 * Handles the new loading of data.
 	 * 
 	 * @author CKeil
-	 * 
 	 */
-	class LoadButtonListener implements ActionListener {
+	private class LoadButtonListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			// Setting screen for loading bar.
 			openFile();
 		}
 	}
 
-	class StackButtonListener implements MouseListener {
-
-		@Override
-		public void mouseClicked(final MouseEvent e) {
-
-			// tvFrame.getStackMenu().show(e.getComponent(), 0,
-			// e.getComponent().getHeight());
-		}
-
-		@Override
-		public void mouseEntered(final MouseEvent e) {
-
-			e.getComponent().setCursor(new Cursor(Cursor.HAND_CURSOR));
-		}
-
-		@Override
-		public void mouseExited(final MouseEvent e) {
-
-			e.getComponent().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-		}
-
-		@Override
-		public void mousePressed(final MouseEvent e) {
-		}
-
-		@Override
-		public void mouseReleased(final MouseEvent arg0) {
-		}
-	}
-
-	class StackMenuListener implements ActionListener {
+	private class StackMenuListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
@@ -212,9 +159,9 @@ public class TVFrameController {
 		}
 	}
 
-	public void setViewChoice() {
+	public void setViewChoice(boolean hasError) {
 
-		if (error) {
+		if (hasError) {
 			tvFrame.setRunning(false);
 			tvFrame.setLoaded(false);
 			tvFrame.setView(StringRes.view_LoadError);
@@ -251,9 +198,9 @@ public class TVFrameController {
 	}
 
 	/**
-	 * Setting up a worker thread to do the CDT generation if a non-cdt file was
-	 * selected by the user. This prevents the GUI from locking up and allows
-	 * the ProgressBar to display progress.
+	 * Setting up a worker thread to load the file selected by the user. 
+	 * This prevents the GUI from locking up and allows the ProgressBar 
+	 * to display progress.
 	 */
 	private class LoadWorker extends SwingWorker<Void, Void> {
 
@@ -269,7 +216,7 @@ public class TVFrameController {
 				fileSet = fileMenuSet;
 			}
 
-			// Loading TVModel
+			/* Loading TVModel */
 			loadFileSet(fileSet);
 
 			if (fileSet != null) {
@@ -286,20 +233,18 @@ public class TVFrameController {
 		@Override
 		protected void done() {
 
+			boolean hasError = false;
+			
 			if (model.isLoaded()) {
 				fileMenuSet = null;
 				setDataModel();
-				error = false;
 
 			} else {
-				error = true;
+				hasError = true;
 			}
-
-			LogBuffer.println("LoaderWorker on EDT? " 
-					+ SwingUtilities.isEventDispatchThread());
 			
 			tvFrame.setTitleString(model.getSource());
-			setViewChoice();
+			setViewChoice(hasError);
 		}
 	}
 
@@ -352,11 +297,10 @@ public class TVFrameController {
 	 */
 	public void loadFileSet(final FileSet fileSet) {
 
-		// Make TVModel object
+		/* Make local TVModel object */
 		TVModel tvModel = (TVModel) model;
 		tvModel.setFrame(tvFrame);
 
-//		setViewChoice();
 		tvFrame.setView("LoadProgressView");
 
 		try {
@@ -465,18 +409,13 @@ public class TVFrameController {
 			@Override
 			public void run() {
 				
-				// Making a new Window to display clustering components
-				final ClusterViewDialog clusterViewDialog = 
-						new ClusterViewDialog(tvFrame.getAppFrame(), 
-								clusterType);
+				/* Making a new Window to display clustering components */
+				final ClusterDialog clusterView = new ClusterDialog(clusterType);
 
-				// Creating the Controller for this view.
-//				final ClusterController clusControl = 
-						new ClusterController(clusterViewDialog, 
-								TVFrameController.this);
-
-				// Make the clustering window visible.
-				clusterViewDialog.setVisible(true);
+				/* Creating the Controller for this view. */
+				new ClusterController(clusterView, TVController.this);
+				
+				clusterView.setVisible(true);
 			}
 		});
 	}
@@ -513,7 +452,7 @@ public class TVFrameController {
 //		window.setLoaded(true);
 //		window.getAppFrame().setVisible(true);
 //		tvFrame.setDataModel(dataModel);
-		setViewChoice();
+		setViewChoice(false);
 	}
 
 	/**
@@ -693,7 +632,7 @@ public class TVFrameController {
 	/**
 	 * This class is an ActionListener which overrides the run() function.
 	 */
-	class FileMenuListener implements ActionListener {
+	private class FileMenuListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(final ActionEvent actionEvent) {
@@ -761,11 +700,11 @@ public class TVFrameController {
 					int min = (int)model.getDataMatrix().getMinVal();
 					int max = (int)model.getDataMatrix().getMaxVal();
 					
-					// View
-					ColorChooser gradientPick = new ColorChooser(tvFrame, 
-									((DoubleArrayDrawer) dendroController
-											.getArrayDrawer())
-											.getColorExtractor(), min, max);
+					/* View */
+					ColorChooser gradientPick = 
+							new ColorChooser(((DoubleArrayDrawer) 
+									dendroController.getArrayDrawer())
+									.getColorExtractor(), min, max);
 
 					/*
 					 *  Adding GradientColorChooser configurations to 
@@ -774,15 +713,18 @@ public class TVFrameController {
 					gradientPick.setConfigNode(((TVModel) model)
 							.getDocumentConfig());
 					
-					// Controller
+					/* Controller */
 					new ColorChooserController(gradientPick);
 					
 					preferences.setGradientChooser(gradientPick);
 					
-				} else if(menu.equalsIgnoreCase(
-						StringRes.menu_RowAndCol)) {
+				} else if(menu.equalsIgnoreCase(StringRes.menu_RowAndCol)) {
 					preferences.setHeaderInfo(model.getGeneHeaderInfo(), 
 							model.getArrayHeaderInfo());
+				} else {
+					String message = "A menu like this does not exist.";
+					JOptionPane.showMessageDialog(applicationFrame, message, 
+							"Warning", JOptionPane.WARNING_MESSAGE);
 				}
 				
 				preferences.setupLayout(menu);

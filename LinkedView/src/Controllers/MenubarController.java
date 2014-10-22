@@ -16,7 +16,7 @@ import edu.stanford.genetics.treeview.TreeViewFrame;
 public class MenubarController {
 
 	private final TreeViewFrame tvFrame;
-	private final TVFrameController controller;
+	private final TVController controller;
 
 	/**
 	 * A controller to handle user interaction with JMenuItems. It defines
@@ -25,7 +25,7 @@ public class MenubarController {
 	 * @param controller The controller for TVFrame.
 	 */
 	public MenubarController(final TreeViewFrame tvFrame,
-			final TVFrameController controller) {
+			final TVController controller) {
 
 		this.tvFrame = tvFrame;
 		this.controller = controller;
