@@ -480,14 +480,14 @@ public class DendroController implements ConfigNodePersistent {
 			minGeneZoomIndex = maxGeneIndex;
 		}
 
-		//Obtain the selection size of each dimension
-		double arrayIndexes = arraySelection.getNSelectedIndexes();
-		double geneIndexes  = geneSelection.getNSelectedIndexes();
-		
 		//We'll allow the user to surpass the min zoom index when they are near the edge, so that
 		//their selection is centered on the screen, so let's get the edges of the selection
 		double minSelectedArrayIndex = arraySelection.getMinIndex();
 		double minSelectedGeneIndex  = geneSelection.getMinIndex();
+		
+		//Obtain the selection size of each dimension
+		double arrayIndexes = arraySelection.getMaxIndex() - minSelectedArrayIndex + 1;
+		double geneIndexes  = geneSelection.getMaxIndex() - minSelectedGeneIndex + 1;
 		
 		//If the array selection is smaller than the minimum zoom level
 		if(arrayIndexes < minArrayZoomIndex) {
@@ -534,6 +534,13 @@ public class DendroController implements ConfigNodePersistent {
 			globalXmap.setScale(newScale);
 
 			newScale2 = (globalYmap.getAvailablePixels()) / geneIndexes;
+			
+			LogBuffer.println("Zooming. MinSelectedArrayIndex: [" + minSelectedArrayIndex + "] " +
+							  "MinSelectedGeneIndex: [" + minSelectedGeneIndex + "] " +
+							  "ArrayIndexesSelected: [" + arrayIndexes + "] " +
+							  "GeneIndexesSelected: [" + geneIndexes + "] " +
+							  "xscale: [" + newScale + "] " +
+							  "yscale: [" + newScale2 + "].");
 
 			if (newScale2 < globalYmap.getMinScale()) {
 				newScale2 = globalYmap.getMinScale();
