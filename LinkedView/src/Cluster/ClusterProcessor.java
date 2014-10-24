@@ -8,8 +8,8 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
 import Controllers.ClusterController;
-import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.model.IntHeaderInfo;
 import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 
 /**
@@ -22,7 +22,11 @@ import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
  */
 public class ClusterProcessor {
 
-	private final DataModel tvModel;
+	private final TVDataMatrix originalMatrix;
+	private final IntHeaderInfo geneHeaderI;
+	private final IntHeaderInfo arrayHeaderI;
+	
+	private final String fileName;
 	private int pBarCount;
 	private DistanceWorker distTask;
 	private ClusterTask clusterTask;
@@ -33,9 +37,13 @@ public class ClusterProcessor {
 	 * a single progress bar for the entire process can be displayed. 
 	 * @param model
 	 */
-	public ClusterProcessor(final DataModel model) {
+	public ClusterProcessor(final TVDataMatrix dataMatrix, final String fileName,
+			final IntHeaderInfo geneHeaderI, final IntHeaderInfo arrayHeaderI) {
 
-		this.tvModel = model;
+		this.originalMatrix = dataMatrix;
+		this.fileName = fileName;
+		this.geneHeaderI = geneHeaderI;
+		this.arrayHeaderI = arrayHeaderI;
 		this.pBarCount = 0;
 	}
 	
@@ -120,12 +128,10 @@ public class ClusterProcessor {
 			this.axis = axis;
 			
 			if(axis == ClusterController.ROW) {
-				this.axisSize = 
-						((TVDataMatrix) tvModel.getDataMatrix()).getNumRow();
+				this.axisSize = originalMatrix.getNumRow();
 				
 			} else {
-				this.axisSize = 
-						((TVDataMatrix) tvModel.getDataMatrix()).getNumCol();
+				this.axisSize = originalMatrix.getNumCol();
 			}
 		}
 		
@@ -135,7 +141,6 @@ public class ClusterProcessor {
 			int i = chunks.get(chunks.size()-1);
 			int progress = (isCancelled()) ? 0 : pBarCount + i;
             ClusterView.updatePBar(progress);
-            //ClusterView.updatePBar(pBarCount + i);
         }
 
 		@Override
@@ -144,11 +149,10 @@ public class ClusterProcessor {
 			/* Calculate distance matrix */
 			double[][] data = null;
 			if (axis == ClusterController.ROW) {
-				data = ((TVDataMatrix)tvModel.getDataMatrix()).getExprData();
+				data = originalMatrix.getExprData();
 
 			} else {
-				data = formatColData(((TVDataMatrix) tvModel.getDataMatrix())
-						.getExprData());
+				data = formatColData(originalMatrix.getExprData());
 			}
 
 			if (data != null) {
@@ -266,7 +270,9 @@ public class ClusterProcessor {
 			this.spinnerInput = spinnerInput;
 			this.hierarchical = hierarchical;
 			this.axis = axis;
-			this.max = distMatrix.length - 1; // 1 cluster remains
+			
+			/* Progress bar max dependent on selected clustering type */
+			this.max = (hierarchical) ? distMatrix.length - 1 : spinnerInput[0];
 		}
 		
 		@Override
@@ -280,15 +286,14 @@ public class ClusterProcessor {
 		@Override
 		public String[] doInBackground() {
 			
+			LogBuffer.println("Starting cluster.");
+			
 			/* Hierarchical */
 			if (hierarchical) {
-				LogBuffer.println("Starting cluster.");
-				
-				String fileName = tvModel.getSource().substring(0, 
-						tvModel.getSource().length() - 4);
-				
 				HierCluster cGen = new HierCluster(fileName, linkMethod, 
 								distMatrix, axis);
+				
+				cGen.setupFileWriter(axis, fileName);
 				
 				/* 
 				 * Continue process until distMatrix has a size of 1, 
@@ -323,12 +328,34 @@ public class ClusterProcessor {
 				return cGen.getReorderedList();
 			} 
 			/* K-Means */
-			/*TODO Implement k-means correctly */
 			else {
-				KMeansCluster cGen = new KMeansCluster(tvModel, distMatrix, 
-						axis, spinnerInput[0], spinnerInput[1], this);
+				int k = spinnerInput[0];
+				int iterations = spinnerInput[1];
+				
+				KMeansCluster cGen = new KMeansCluster(distMatrix, axis, k, 
+						fileName);
 
-				cGen.cluster();
+				/* 
+				 * Begin iteration of recalculating means and reassigning 
+				 * row distance means to clusters.
+				 */
+				for (int i = 0; i < iterations; i++) {
+					
+					cGen.cluster();
+					publish(i);
+				}
+				
+				/* Get axis labels */
+				String[][] headerArray;
+				if (axis == ClusterController.ROW) {
+					headerArray = arrayHeaderI.getHeaderArray();
+
+				} else {
+					headerArray = geneHeaderI.getHeaderArray();
+				}
+				
+				/* Write data and close writer */
+				cGen.finish(headerArray);
 
 				return cGen.getReorderedList();
 			}

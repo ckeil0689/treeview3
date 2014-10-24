@@ -28,4 +28,27 @@ public final class Helper {
 			return diff / (absA + absB) < EPSILON;
 		}
 	}
+	
+	/**
+	 * Method to make deep copy of distance matrix
+	 * 
+	 * @return A two-dimensional double array that is a copy of the distance
+	 * matrix used in both hierarchical and k-means clustering.
+	 */
+	public static double[][] cloneMatrix(final double[][] distMatrix) {
+
+		final double[][] deepCopy = new double[distMatrix.length][];
+
+		for (int i = 0; i < distMatrix.length; i++) {
+
+			final double[] oldList = distMatrix[i];
+			final double[] newList = new double[oldList.length];
+
+			System.arraycopy(oldList, 0, newList, 0, oldList.length);
+
+			deepCopy[i] = newList;
+		}
+
+		return deepCopy;
+	}
 }
