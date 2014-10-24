@@ -375,7 +375,7 @@ public class GlobalView2 extends ModelViewProduced implements
 		if (resetHome) {
 			xmap.setHome();
 			ymap.setHome();
-
+			
 			xmap.notifyObservers();
 			ymap.notifyObservers();
 
@@ -446,7 +446,7 @@ public class GlobalView2 extends ModelViewProduced implements
 				
 		if(selectedArrayIndexes.length > 0 || selectedGeneIndexes.length > 0) {
 
-			LogBuffer.println("Selected min array index: [" + selectedArrayIndexes[0] + "] Selected min gene index: [" + selectedGeneIndexes[0] + "].");
+			//LogBuffer.println("Selected min array index: [" + selectedArrayIndexes[0] + "] Selected min gene index: [" + selectedGeneIndexes[0] + "].");
 
 			List<List<Integer>> arrayBoundaryList = 
 					new ArrayList<List<Integer>>();

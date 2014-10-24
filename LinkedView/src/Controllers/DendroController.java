@@ -180,7 +180,7 @@ public class DendroController implements ConfigNodePersistent {
 		@Override
 		protected void done() {
 
-//			resetMapContainers();
+			resetMapContainers();
 			globalXmap.recalculateScale();
 			globalYmap.recalculateScale();
 			
@@ -535,12 +535,12 @@ public class DendroController implements ConfigNodePersistent {
 
 			newScale2 = (globalYmap.getAvailablePixels()) / geneIndexes;
 			
-			LogBuffer.println("Zooming. MinSelectedArrayIndex: [" + minSelectedArrayIndex + "] " +
-							  "MinSelectedGeneIndex: [" + minSelectedGeneIndex + "] " +
-							  "ArrayIndexesSelected: [" + arrayIndexes + "] " +
-							  "GeneIndexesSelected: [" + geneIndexes + "] " +
-							  "xscale: [" + newScale + "] " +
-							  "yscale: [" + newScale2 + "].");
+//			LogBuffer.println("Zooming. MinSelectedArrayIndex: [" + minSelectedArrayIndex + "] " +
+//							  "MinSelectedGeneIndex: [" + minSelectedGeneIndex + "] " +
+//							  "ArrayIndexesSelected: [" + arrayIndexes + "] " +
+//							  "GeneIndexesSelected: [" + geneIndexes + "] " +
+//							  "xscale: [" + newScale + "] " +
+//							  "yscale: [" + newScale2 + "].");
 
 			if (newScale2 < globalYmap.getMinScale()) {
 				newScale2 = globalYmap.getMinScale();

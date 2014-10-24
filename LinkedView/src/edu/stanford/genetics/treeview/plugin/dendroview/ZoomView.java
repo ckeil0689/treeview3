@@ -361,6 +361,7 @@ class ZoomView extends ModelViewProduced implements MouseMotionListener,
 	@Override
 	public void updatePixels() {
 
+
 		if (offscreenChanged) {
 			xmap.setAvailablePixels(offscreenSize.width);
 			ymap.setAvailablePixels(offscreenSize.height);
