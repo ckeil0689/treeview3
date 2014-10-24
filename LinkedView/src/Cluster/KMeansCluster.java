@@ -6,160 +6,164 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
-
+import Utilities.Helper;
 import Controllers.ClusterController;
-import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
- * Class to perform the calculations of the K-Means algorithm.
+ * Performs the calculations of the k-means algorithm.
  * @author CKeil
  *
  */
 public class KMeansCluster {
 
-	// Instance variables
-	private final DataModel model;
-
-	private ClusterFileWriter bufferedWriter;
-	private String filePath;
+	private ClusterFileWriter bufferedWriter;		/* Writer to save data */
+	
+	/* Parameters */
 	private int axis;
-	private final int groupNum;
-	private final int iterations;
+	private final int k;                     		/* Amount of clusters */
 
-	// Distance Matrix
+	/* Distance Matrix */
 	private final double[][] distMatrix;
 
-	// Half of the Distance Matrix (symmetry)
+	/* Object to store deep copy of distance matrix; avoids mutation */
 	private double[][] copyDistMatrix;
 
-	// list to return ordered GENE numbers for .cdt creation
+	/* Array which stores the seed means */
 	private double[] seedMeans;
+	
+	private double[] rowCentroidList;
+	private int[][] kClusters;
+	private double[][] clusterMeans;
 
-	// list to return ordered GENE numbers for .cdt creation
+	/* Ordered axis element numbers to be returned for .cdt creation */
 	private String[] reorderedList;
 
-	private final SwingWorker<String[], Integer> worker;
-
 	/**
-	 * The KMeansCluster object needs several parameters to be able to
-	 * start its calculations. It will eventually return a String array of 
-	 * reordered matrix elements. 
-	 * @param model The model which holds the loaded data as well as info
-	 * about this it.
+	 * Constructor for KMeansCluster. 
+	 * @param headerArray Array of labels to be written in the cluster file.
 	 * @param distMatrix The calculated distance matrix to be clustered.
 	 * @param axis The matrix axis to be clustered.
-	 * @param groupNum The number of groups (k) to be formed.
+	 * @param k The number of groups (k) to be formed.
 	 * @param iterations The number iterations the k-means algorithm is
 	 * run. This impacts the clustering result.
-	 * @param worker The clustering worker object. Used to check if the user
-	 * cancelled the operation, so that calculations can be interrupted.
 	 */
-	public KMeansCluster(final DataModel model, final double[][] distMatrix, 
-			final int axis, final int groupNum, final int iterations, 
-			final SwingWorker<String[], Integer> worker) {
+	public KMeansCluster(final double[][] distMatrix, final int axis, final int k, 
+			final String fileName) {
 
-		this.model = model;
 		this.distMatrix = distMatrix;
 		this.axis = axis;
-		this.groupNum = groupNum;
-		this.iterations = iterations;
-		this.worker = worker;
+		this.k = k;
+		
+		setupFileWriter(fileName);
+		prepare();
 	}
+	
+	/**
+	 * Sets up a buffered writer used to save the data created during the
+	 * process of k-means clustering.
+	 * @throws IOException
+	 */
+	public void setupFileWriter(String fileName) {
 
-	// method for clustering the distance matrix
+		String fileEnd = (axis == ClusterController.ROW) ? 
+				"_K_G" + k + ".kgg" : "_K_A" + k + ".kag";
+
+		final File file = new File(fileName + fileEnd);
+
+		try {
+			file.createNewFile();
+			bufferedWriter = new ClusterFileWriter(file);
+			
+		} catch (IOException e) {
+			LogBuffer.println(e.getMessage());
+			e.printStackTrace();
+		}
+	}
+	
+	/** 
+	 * Sets up important instance variables so that k-means calculation can
+	 * begin.
+	 */
+	public void prepare() {
+		
+		rowCentroidList = new double[distMatrix.length];
+		kClusters = new int[k][];
+		clusterMeans = new double[distMatrix.length][];
+
+		/* deep copy of distance matrix to avoid mutation */
+		copyDistMatrix = Helper.cloneMatrix(distMatrix);
+
+		/* Make a list of all means of distances for every gene */
+		rowCentroidList = generateCentroids(copyDistMatrix);
+
+		/* Seeds array should be of clusterN-size */
+		setSeeds(k, rowCentroidList);
+
+		/* Assign the centroids of each row to their closest seed cluster.*/
+		kClusters = assignToNearestCluster(rowCentroidList);
+		clusterMeans = indicesToMeans(rowCentroidList, kClusters);
+	}
+	
+	/**
+	 * Runs operations for k-means clustering.
+	 */
 	public void cluster() {
 
-		// Just checking for debugging
-		LogBuffer.println("Is KMeansCluster.cluster() on EDT? " 
-				+ SwingUtilities.isEventDispatchThread());
-				
-		double[] elementMeanList = new double[distMatrix.length];
-		int[][] clusters = new int[groupNum][];
-		double[][] clusterMeans = new double[distMatrix.length][];
+		computeNewCentroids(clusterMeans);
 
-		// ProgressBar maximum
-		ClusterView.setLoadText("Clustering data...");
-		ClusterView.setPBarMax(distMatrix.length);
-
-		// deep copy of distance matrix to avoid mutation
-		copyDistMatrix = deepCopy(distMatrix);
-
-		// The list containing the reordered gene names.
+		kClusters = assignToNearestCluster(rowCentroidList);
+		clusterMeans = indicesToMeans(rowCentroidList, kClusters);
+	}
+	
+	/**
+	 * Generates the KAG or KGG file (depends on chosen axis) 
+	 * from the calculated data. 
+	 * @param kClusters The k-clusters formed by the calculation.
+	 * @param headerArray Matrix labels from the tvModel.
+	 */
+	public void writeData(int[][] kClusters, String[][] headerArray) {
+		
+		/* The list containing the reordered gene names. */
 		reorderedList = new String[distMatrix.length];
+		
+		String[][] kClusters_string = new String[kClusters.length][];
 
-		// Make a list of all means of distances for every gene
-		elementMeanList = generateMeans(copyDistMatrix);
-
-		// List of seeds should be of clusterN-size
-		seedMeans = new double[groupNum];
-		setSeeds(groupNum, elementMeanList);
-
-		// Use the seedClusters to define Voronoi spaces. This means, assign
-		// the distance mean of each gene to the closest seed cluster.
-		clusters = assignMeansVals(elementMeanList);
-		clusterMeans = indexesToMeans(elementMeanList, clusters);
-
-		// Begin iteration of recalculating means and reassigning gene
-		// distance means to clusters
-		for (int i = 0; i < iterations; i++) {
-
-			if (worker.isCancelled()) {
-				break;
-			}
-
-			findNewMeans(clusterMeans);
-
-			clusters = assignMeansVals(elementMeanList);
-			clusterMeans = indexesToMeans(elementMeanList, clusters);
-		}
-
-		// Next Step: Generate CDT and KGG Excel file
-		String[][] geneGroups = new String[clusters.length][];
-
-		geneGroups = indexToString(clusters);
+		kClusters_string = indexToString(kClusters, headerArray);
 
 		final int pairSize = 2;
 		final String[] initial = new String[pairSize];
+		
 		int addIndex = 0;
 
-		// File Writer
-		try {
-			setupFileWriter();
-
-		} catch (final IOException e) {
-			System.out.println("FileWriter failed in KMeansCluster");
-			e.printStackTrace();
-		}
-
+		/* Setting up header line */
 		initial[addIndex] = (axis == ClusterController.ROW) ? "ORF" : "ARRAY";
 		addIndex++;
 
 		initial[addIndex] = "GROUP";
 		addIndex++;
 
+		/* Writing the header line */
 		bufferedWriter.writeContent(initial);
 
+		/* Write the calculated data */
 		addIndex = 0;
-		// Prepare data for writing
-		for (int i = 0; i < geneGroups.length; i++) {
+		for (int i = 0; i < kClusters_string.length; i++) {
 
-			final String[] group = geneGroups[i];
+			final String[] cluster = kClusters_string[i];
 
 			int addIndexInner = 0;
-			for (int j = 0; j < group.length; j++) {
+			for (int j = 0; j < cluster.length; j++) {
 
 				addIndexInner = 0;
 
-				reorderedList[addIndex] = group[j];
+				reorderedList[addIndex] = cluster[j];
 				addIndex++;
 
 				final String[] dataPair = new String[pairSize];
 				final String index = Integer.toString(i);
 
-				dataPair[addIndexInner] = group[j];
+				dataPair[addIndexInner] = cluster[j];
 				addIndexInner++;
 
 				dataPair[addIndexInner] = index;
@@ -167,56 +171,57 @@ public class KMeansCluster {
 				bufferedWriter.writeContent(dataPair);
 			}
 		}
-
+	}
+	
+	public void finish(String[][] headerArray) {
+		
+		writeData(kClusters, headerArray);
 		bufferedWriter.closeWriter();
 	}
 
-	public void setupFileWriter() throws IOException {
-
-		String fileEnd = (axis == ClusterController.ROW) ? 
-				"_K_G" + groupNum + ".kgg" : "_K_A" + groupNum + ".kag";
-
-		final File file = new File(model.getSource().substring(0,
-				model.getSource().length() - 4)
-				+ fileEnd);
-
-		file.createNewFile();
-
-		bufferedWriter = new ClusterFileWriter(file);
-
-		filePath = bufferedWriter.getFilePath();
-	}
-
-	// Cluster support methods
 	/**
-	 * Method to find the mean distances for every row element in the distance
-	 * matrix.
-	 * 
+	 * Finds the mean of all distance values in every row element of 
+	 * the distance matrix.
+	 * TODO Adapt to half-matrix....
 	 * @param matrix
-	 * @return
+	 * @return Array of means/ centroids.
 	 */
-	public double[] generateMeans(final double[][] matrix) {
+	private double[] generateCentroids(final double[][] matrix) {
 
-		final double[] meanList = new double[matrix.length];
+		final double[] centroidList = new double[matrix.length];
 
+		/* 
+		 * This algorithm gets the mean of each row for the half-matrix!
+		 * Hence, the row can't just be iterated, since values are missing.
+		 */
 		int addIndex = 0;
 		for (final double[] row : matrix) {
 
 			double sum = 0;
 			double mean;
 
-			for (final Double d : row) {
+			/* Add the row values to sum */
+			for (final double d : row) {
 
 				sum += d;
 			}
+			
+			/* 
+			 * Add the rest, which is the column values of each row at the
+			 * index of the current.
+			 */
+			for(int i = addIndex; i < matrix.length - 1; i++) {
+				
+				sum += matrix[i + 1][addIndex];
+			}
 
-			mean = sum / row.length;
+			mean = sum / matrix.length;
 
-			meanList[addIndex] = mean;
+			centroidList[addIndex] = mean;
 			addIndex++;
 		}
 
-		return meanList;
+		return centroidList;
 	}
 
 	/**
@@ -227,7 +232,7 @@ public class KMeansCluster {
 	 * @param meanList
 	 * @return
 	 */
-	public void setSeeds(final int seedNumber, final double[] meanList) {
+	private void setSeeds(final int seedNumber, final double[] meanList) {
 
 		final int[][] seedClusters = new int[seedNumber][];
 		final int[] indexList = new int[seedNumber];
@@ -263,40 +268,42 @@ public class KMeansCluster {
 	}
 
 	/**
-	 * This method assigns all the means from the distance matrix to the Voronoi
-	 * space of a set of previously chosen means. Each mean is assigned to the
-	 * closest 'seed mean'.
+	 * Assigns all the means from the distance matrix to the Voronoi space 
+	 * of a set of previously chosen means. Each mean is assigned to the
+	 * closest 'seed mean'. Partitions the data into k clusters.
 	 * 
 	 * @param meanList
 	 * @param seedClusters
 	 * @return
 	 */
-	public int[][] assignMeansVals(final double[] meanList) {
-
-		ClusterView.updatePBar(0);
+	private int[][] assignToNearestCluster(final double[] meanList) {
 
 		final List<List<Integer>> clusters = new ArrayList<List<Integer>>();
 
-		// fill clusters List with clusterN-amount of empty lists to
-		// avoid duplicates of the initial means later
-		for (int i = 0; i < groupNum; i++) {
+		/* 
+		 * Fill clusters list with k-amount of empty lists to 
+		 * avoid duplicates of the initial means later.
+		 */
+		for (int i = 0; i < k; i++) {
 
 			final List<Integer> group = new ArrayList<Integer>();
 			clusters.add(group);
 		}
 
-		// seedCluster has clusterN-amount of Integers designating the
-		// initial means
-		final double[] initialMeans = getSeedMeans();
+		/* 
+		 * seedCluster has k-amount of Integers designating 
+		 * the initial means
+		 */
+		final double[] initialMeans = seedMeans;
 
-		// Compare each mean from meanList to all seed means from seedClusters
-		// and assign the means to the according group.
+		/* 
+		 * Compare each mean from meanList to all seed means from 
+		 * seedClusters and assign the means to the according group.
+		 */
 		for (int i = 0; i < meanList.length; i++) {
 
 			final int geneID = i;
 			final double mean = meanList[i];
-
-			ClusterView.updatePBar(geneID);
 
 			final int[] meanIndexes = new int[initialMeans.length];
 
@@ -325,11 +332,11 @@ public class KMeansCluster {
 
 			final int bestCluster = meanIndexes[meanIndexes.length - 1];
 
-			// Add the current gene to appropriate cluster group
+			/* Add the current gene to appropriate cluster group */
 			clusters.get(bestCluster).add(geneID);
 		}
 
-		// Transform the list into arrays
+		/* Transform the list into arrays */
 		final int[][] clustersArray = new int[clusters.size()][];
 
 		for (int i = 0; i < clusters.size(); i++) {
@@ -344,53 +351,33 @@ public class KMeansCluster {
 			clustersArray[i] = cluster;
 		}
 
-		// Check if sum of group sizes match the amount of overall means
-		// for testing only
-		// int sum = 0;
-		// for (int i = 0; i < clustersArray.length; i++) {
-		//
-		// int[] group = clustersArray[i];
-		//
-		// sum += group.length;
-		// System.out.println("Group Size " + i + ": " + group.length);
-		// }
-		//
-		// if (sum == meanList.length) {
-		// System.out.println("Success! sum and meanList size match up.");
-		// System.out.println("Seed Means: " + Arrays.toString(getSeedMeans()));
-		//
-		// } else {
-		// System.out.println("Something's weird.");
-		// System.out.println("Sum: " + sum);
-		// System.out.println("MeanList Size: " + meanList.length);
-		// }
-
 		return clustersArray;
 	}
 
 	/**
-	 * Transforms the clusters of gene indexes to clusters of gene distance
-	 * means in order to use the resulting list for calculation.
+	 * Uses centroidList and kClusters to build another array of the clusters
+	 * which contains the centroids of the distance matrix rows in place of
+	 * the row indices. This list is needed to calculate the new centroids
+	 * during the next iteration, if there is one.
 	 * 
-	 * @param meanList
-	 * @param clusters
+	 * @param centroidList
+	 * @param kClusters
 	 * @return
 	 */
-	public double[][] indexesToMeans(final double[] meanList,
-			final int[][] clusters) {
+	private double[][] indicesToMeans(final double[] centroidList, 
+			final int[][] kClusters) {
 
-		final double[][] clusterMeans = new double[clusters.length][];
+		final double[][] clusterMeans = new double[kClusters.length][];
 
 		int addIndex = 0;
-		for (final int[] group : clusters) {
+		for (final int[] cluster : kClusters) {
 
-			final double[] meanCluster = new double[group.length];
+			final double[] meanCluster = new double[cluster.length];
 
 			int addIndexInner = 0;
-			for (final int gene : group) {
+			for (final int row : cluster) {
 
-				final double mean = meanList[gene];
-				meanCluster[addIndexInner] = mean;
+				meanCluster[addIndexInner] = centroidList[row];
 				addIndexInner++;
 			}
 
@@ -408,7 +395,7 @@ public class KMeansCluster {
 	 * @param clusterMeans
 	 * @return
 	 */
-	public void findNewMeans(final double[][] clusterMeans) {
+	private void computeNewCentroids(final double[][] clusterMeans) {
 
 		final double[] newSeedMeans = new double[clusterMeans.length];
 
@@ -436,78 +423,42 @@ public class KMeansCluster {
 	 * This method uses the list of clusters composed of gene indexes to find
 	 * the appropriate ORF names from the loaded model's headers.
 	 * 
-	 * @param clusters
+	 * @param kClusters
 	 * @return
 	 */
-	public String[][] indexToString(final int[][] clusters) {
+	private String[][] indexToString(final int[][] kClusters, 
+			String[][] headerArray) {
 
-		final String[][] stringClusters = new String[clusters.length][];
+		final String[][] kClusters_string = new String[kClusters.length][];
+		final String[] axisLabelArray = new String[headerArray.length];
 
-		String[][] headerArray;
-
-		// Get the right header array
-		if (axis == ClusterController.ROW) {
-			headerArray = model.getArrayHeaderInfo().getHeaderArray();
-
-		} else {
-			headerArray = model.getGeneHeaderInfo().getHeaderArray();
-		}
-
-		final String[] geneNameArray = new String[headerArray.length];
-
+		/* Get the name label only for each row */
 		int addIndex = 0;
-		for (final String[] element : headerArray) {
+		for (final String[] rowHeader : headerArray) {
 
-			geneNameArray[addIndex] = element[0];
+			axisLabelArray[addIndex] = rowHeader[0];
 			addIndex++;
 		}
 
+		/* Replace the integers in kClusters with the name label strings */
 		addIndex = 0;
-		for (final int[] group : clusters) {
+		for (final int[] cluster : kClusters) {
 
-			final String[] geneNames = new String[group.length];
+			final String[] geneNames = new String[cluster.length];
+			
 			int addIndexInner = 0;
-			for (final int mean : group) {
+			for (final int mean : cluster) {
 
-				final String gene = geneNameArray[mean];
-				geneNames[addIndexInner] = gene;
+				final String label = axisLabelArray[mean];
+				geneNames[addIndexInner] = label;
 				addIndexInner++;
 			}
 
-			stringClusters[addIndex] = geneNames;
+			kClusters_string[addIndex] = geneNames;
 			addIndex++;
 		}
 
-		return stringClusters;
-	}
-
-	// Other support methods
-	/**
-	 * Method to make deep copy of distance matrix
-	 * 
-	 * @return
-	 */
-	public double[][] deepCopy(final double[][] distanceMatrix) {
-
-		final double[][] deepCopy = new double[distanceMatrix.length][];
-
-		int addIndex = 0;
-		for (int i = 0; i < distanceMatrix.length; i++) {
-
-			final double[] newRow = new double[distanceMatrix[i].length];
-			deepCopy[addIndex] = newRow;
-			addIndex++;
-
-			int addIndexInner = 0;
-			for (int j = 0; j < distanceMatrix.length; j++) {
-
-				final double e = distanceMatrix[i][j];
-				newRow[addIndexInner] = e;
-				addIndexInner++;
-			}
-		}
-
-		return deepCopy;
+		return kClusters_string;
 	}
 
 	// Setters
@@ -517,9 +468,9 @@ public class KMeansCluster {
 	 * @param clusters
 	 * @param elementMeanList
 	 */
-	public void setSeedMeans(final double[] newSeedMeans) {
+	private void setSeedMeans(final double[] newSeedMeans) {
 
-		seedMeans = newSeedMeans;
+		this.seedMeans = newSeedMeans;
 	}
 
 	/**
@@ -528,16 +479,12 @@ public class KMeansCluster {
 	 * @param clusters
 	 * @param elementMeanList
 	 */
-	public void setSeedMeans(final int[] clusters,
+	private void setSeedMeans(final int[] clusters,
 			final double[] elementMeanList) {
 
-		// Clear seedMeans
-		for (int i = 0; i < seedMeans.length; i++) {
+		this.seedMeans = new double[k];
 
-			seedMeans[i] = -1;
-		}
-
-		// set new seed means
+		/* Set new seed means */
 		int addIndex = 0;
 		for (final int ind : clusters) {
 
@@ -547,34 +494,14 @@ public class KMeansCluster {
 		}
 	}
 
-	// Getters
+	/* Getters */
 	/**
-	 * Accessor for the reordered list
+	 * Getter for the reordered list
 	 * 
 	 * @return
 	 */
 	public String[] getReorderedList() {
 
 		return reorderedList;
-	}
-
-	/**
-	 * Accessor for the seed means
-	 * 
-	 * @return
-	 */
-	public double[] getSeedMeans() {
-
-		return seedMeans;
-	}
-
-	/**
-	 * Accessor for the file path
-	 * 
-	 * @return
-	 */
-	public String getFilePath() {
-
-		return filePath;
 	}
 }

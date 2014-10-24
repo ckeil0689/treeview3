@@ -3,9 +3,8 @@ package Cluster;
 import java.io.File;
 import java.io.IOException;
 
-import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
+import edu.stanford.genetics.treeview.model.IntHeaderInfo;
 
 /**
  * This class is used to generate the .CDT tab delimited file which Java
@@ -17,23 +16,21 @@ import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
  */
 public class CDTGenerator {
 
-	// Instance variables
-	private final DataModel model;
-	private final ClusterView clusterView;
+	private IntHeaderInfo geneHeaderI;
 
 	private String filePath;
 	private final boolean hierarchical;
 	private final boolean isRowMethodChosen;
 	private final boolean isColMethodChosen;
 
-	private final double[][] sepList;
-	private double[][] cdtDataDoubles;
+	private final double[][] origMatrix;
+	private double[][] cdtData_doubles;
 
 	private String[][] rowNames;
 	private String[][] colNames;
 	private String[][] rowNameListOrdered;
 	private String[][] colNameListOrdered;
-	private String[][] cdtDataStrings;
+	private String[][] cdtData_strings;
 
 	private final String[] orderedRows;
 	private final String[] orderedCols;
@@ -44,95 +41,33 @@ public class CDTGenerator {
 	 * The task for this class is to take supplied data that is the result
 	 * of clustering and format it into a new CDT file that can be read and 
 	 * interpreted by TreeView. 
-	 * @param model
-	 * @param clusterView
-	 * @param orderedRows
-	 * @param orderedCols
-	 * @param hierarchical
+	 * @param origMatrix The original data matrix.
+	 * @param orderedRows Row labels after clustering.
+	 * @param orderedCols Column labels after clustering.
+	 * @param hierarchical Indicates type of clustering.
 	 */
-	public CDTGenerator(final DataModel model,
-			final ClusterView clusterView, final String[] orderedRows, 
-			final String[] orderedCols, final boolean hierarchical) {
+	public CDTGenerator(final double[][] origMatrix, 
+			final String[] orderedRows, final String[] orderedCols, 
+			final int rowSimilarity, final int colSimilarity,
+			final boolean hierarchical) {
 
-		this.model = model;
-		this.clusterView = clusterView;
-		this.sepList = ((TVDataMatrix) model.getDataMatrix()).getExprData();
+		LogBuffer.println("Initializing CDTGenerator.");
+		
+		this.origMatrix = origMatrix;
 		this.orderedRows = orderedRows;
 		this.orderedCols = orderedCols;
+		this.isRowMethodChosen = (rowSimilarity != 0);
+		this.isColMethodChosen = (colSimilarity != 0);
 		this.hierarchical = hierarchical;
-		this.isRowMethodChosen = clusterView.getRowSimilarity() != 0;
-		this.isColMethodChosen = clusterView.getColSimilarity() != 0;
 	}
-
-	public void generateCDT() {
-
-		try {
-			LogBuffer.println("Setting up writer in CDTGenerator.");
-			setupWriter();
-
-		} catch (final IOException e) {
-			e.printStackTrace();
-		}
-
-		// the list containing all the reorganized row-data
-		cdtDataDoubles = new double[sepList.length][];
-
-		// retrieving names and weights of row elements
-		// format: [[YAL063C, 1.0], ..., [...]]
-		rowNames = model.getGeneHeaderInfo().getHeaderArray();
-
-		// retrieving names and weights of column elements
-		// format: [[YAL063C, 1.0], ..., [...]]
-		colNames = model.getArrayHeaderInfo().getHeaderArray();
-
-		// Lists to be filled with reordered strings
-		rowNameListOrdered = new String[rowNames.length][];
-		colNameListOrdered = new String[colNames.length][];
-
-		// Order Rows and/ or Columns
-		LogBuffer.println("Ordering data...");
-		orderData();
-
-		// transform cdtDataFile from double lists to string lists
-		LogBuffer.println("Making cdtDataStrings.");
-		cdtDataStrings = new String[cdtDataDoubles.length][];
-		LogBuffer.println("cdtDD Length: " + cdtDataDoubles.length);
-		LogBuffer.println("cdtDS Length: " + cdtDataStrings.length);
-		for (int i = 0; i < cdtDataDoubles.length; i++) {
-
-			final double[] element = cdtDataDoubles[i];
-			
-			final String[] newStringData = new String[element.length];
-
-			for (int j = 0; j < element.length; j++) {
-
-				newStringData[j] = String.valueOf(element[j]);
-			}
-			
-			cdtDataStrings[i] = newStringData;
-		}
-
-		// Add some string elements, as well as row/ column names
-		if (hierarchical) {
-			LogBuffer.println("Filling hierarchical...");
-			fillHierarchical();
-
-		} else {
-			LogBuffer.println("K-Means...");
-			fillKMeans();
-		}
-
-		LogBuffer.println("Closing writer.");
-		bufferedWriter.closeWriter();
-	}
-
+	
 	/**
 	 * Sets up a buffered writer to generate the .cdt file from the previously
 	 * clustered data.
 	 * 
 	 * @throws IOException
 	 */
-	public void setupWriter() throws IOException {
+	public void setupWriter(String fileName, Integer[] spinnerInput) {
 
 		String fileEnd = "";
 
@@ -142,8 +77,6 @@ public class CDTGenerator {
 		} else {
 			String rowC = "";
 			String colC = "";
-
-			final Integer[] spinnerInput = clusterView.getSpinnerValues();
 
 			final int row_clusterN = spinnerInput[0];
 			final int col_clusterN = spinnerInput[2];
@@ -159,28 +92,90 @@ public class CDTGenerator {
 			fileEnd = "_K" + rowC + colC + ".CDT";
 		}
 
-		final File file = new File(model.getSource().substring(0,
-				model.getSource().length() - 4)
-				+ fileEnd);
+		final File file = new File(fileName + fileEnd);
+		try {
+			file.createNewFile();
+			this.bufferedWriter = new ClusterFileWriter(file);
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Sets up instance variables needed for writing.
+	 * @param geneHeaderI
+	 * @param arrayHeaderI
+	 */
+	public void prepare(IntHeaderInfo geneHeaderI, 
+			IntHeaderInfo arrayHeaderI) {
+		
+		LogBuffer.println("Preparing.");
+		
+		this.geneHeaderI = geneHeaderI;
 
-		file.createNewFile();
+		/* The list containing all the reorganized row-data */
+		this.cdtData_doubles = new double[origMatrix.length][];
+		this.cdtData_strings = new String[origMatrix.length][];
 
-		// save file as excel tab-delimited file
-		bufferedWriter = new ClusterFileWriter(file);
+		// retrieving names and weights of row elements
+		// format: [[YAL063C, 1.0], ..., [...]]
+		this.rowNames = geneHeaderI.getHeaderArray();
 
-		filePath = bufferedWriter.getFilePath();
+		// retrieving names and weights of column elements
+		// format: [[YAL063C, 1.0], ..., [...]]
+		this.colNames = arrayHeaderI.getHeaderArray();
+
+		// Lists to be filled with reordered strings
+		this.rowNameListOrdered = new String[rowNames.length][];
+		this.colNameListOrdered = new String[colNames.length][];
+	}
+
+	public void generateCDT() {
+		
+		orderData();
+
+		LogBuffer.println("Making cdtDataStrings.");
+		
+		/* Transform cdtDataFile from double lists to string lists */
+		for (int i = 0; i < cdtData_doubles.length; i++) {
+
+			final double[] element = cdtData_doubles[i];
+			
+			final String[] newStringData = new String[element.length];
+
+			for (int j = 0; j < element.length; j++) {
+
+				newStringData[j] = String.valueOf(element[j]);
+			}
+			
+			cdtData_strings[i] = newStringData;
+		}
+
+		/* Add some string elements, as well as row/ column names */
+		if (hierarchical) {
+			LogBuffer.println("Writing hierarchical data.");
+			fillHierarchical();
+
+		} else {
+			LogBuffer.println("Writing k-means data.");
+			fillKMeans();
+		}
 	}
 
 	/**
 	 * This method orders the data if the user decided to use hierarchical
 	 * clustering.
 	 */
-	public void orderData() {
+	private void orderData() {
+		
+		LogBuffer.println("Ordering data.");
 
-		final int[] reorderedRowIndexes = new int[sepList.length];
+		final int[] reorderedRowIndexes = new int[origMatrix.length];
 		final int[] reorderedColIndexes = new int[colNames.length];
 
-		cdtDataDoubles = new double[reorderedRowIndexes.length]
+		cdtData_doubles = new double[reorderedRowIndexes.length]
 				[reorderedColIndexes.length];
 
 		if (isRowMethodChosen) {
@@ -272,9 +267,24 @@ public class CDTGenerator {
 			for (int j = 0; j < reorderedColIndexes.length; j++) {
 
 				col = reorderedColIndexes[j];
-				cdtDataDoubles[i][j] = sepList[row][col];
+				cdtData_doubles[i][j] = origMatrix[row][col];
 			}
 		}
+	}
+	
+	/**
+	 * Finishes up CDTGenerator by closing the buffered writer.
+	 * Returns the file path where the cdt file was saved.
+	 */
+	public String finish() {
+
+		LogBuffer.println("Finishing up.");
+		
+		String filePath = bufferedWriter.getFilePath();
+		
+		bufferedWriter.closeWriter();
+		
+		return filePath;
 	}
 
 	/**
@@ -284,7 +294,7 @@ public class CDTGenerator {
 	 * @param element
 	 * @return
 	 */
-	public int findIndex(final String[] array, final String element) {
+	private int findIndex(final String[] array, final String element) {
 
 		int index = -1;
 		for (int i = 0; i < array.length; i++) {
@@ -301,10 +311,10 @@ public class CDTGenerator {
 	 * This method fills the String matrix with names for rows/ columns and
 	 * other elements.
 	 */
-	public void fillHierarchical() {
+	private void fillHierarchical() {
 
 		// The first row
-		int rowLength = model.getGeneHeaderInfo().getNumNames()
+		int rowLength = geneHeaderI.getNumNames()
 				+ colNames.length;
 		int addIndex = 0;
 
@@ -319,7 +329,7 @@ public class CDTGenerator {
 			addIndex++;
 		}
 
-		final String[] rowHeaders = model.getGeneHeaderInfo().getNames();
+		final String[] rowHeaders = geneHeaderI.getNames();
 
 		for (final String element : rowHeaders) {
 
@@ -400,7 +410,7 @@ public class CDTGenerator {
 
 		// if(!choice.contentEquals("Do Not Cluster")) {
 		// Adding the values for ORF, NAME, GWEIGHT
-		for (int i = 0; i < cdtDataStrings.length; i++) {
+		for (int i = 0; i < cdtData_strings.length; i++) {
 
 			addIndex = 0;
 			final String[] row = new String[rowLength];
@@ -419,9 +429,9 @@ public class CDTGenerator {
 			}
 
 			// Adding data
-			for (int j = 0; j < cdtDataStrings[i].length; j++) {
+			for (int j = 0; j < cdtData_strings[i].length; j++) {
 
-				row[addIndex] = cdtDataStrings[i][j];
+				row[addIndex] = cdtData_strings[i][j];
 				addIndex++;
 			}
 
@@ -433,13 +443,12 @@ public class CDTGenerator {
 	 * This method fills the String matrix with names for rows/ columns and
 	 * other elements.
 	 */
-	public void fillKMeans() {
+	private void fillKMeans() {
 
-		final int rowLength = model.getGeneHeaderInfo().getNumNames()
-				+ colNames.length;
+		final int rowLength = geneHeaderI.getNumNames() + colNames.length;
 
 		final String[] cdtRow1 = new String[rowLength];
-		final String[] rowHeaders = model.getGeneHeaderInfo().getNames();
+		final String[] rowHeaders = geneHeaderI.getNames();
 
 		int addIndex = 0;
 		for (final String element : rowHeaders) {
@@ -481,7 +490,7 @@ public class CDTGenerator {
 
 		// Add gene names in ORF and NAME columns (0 & 1) and GWeights (2)
 		// buffer is just the amount of rows before the data starts
-		for (int i = 0; i < cdtDataStrings.length; i++) {
+		for (int i = 0; i < cdtData_strings.length; i++) {
 
 			addIndex = 0;
 			final String[] row = new String[rowLength];
@@ -492,9 +501,9 @@ public class CDTGenerator {
 				addIndex++;
 			}
 
-			for (int j = 0; j < cdtDataStrings[i].length; j++) {
+			for (int j = 0; j < cdtData_strings[i].length; j++) {
 
-				row[addIndex] = cdtDataStrings[i][j];
+				row[addIndex] = cdtData_strings[i][j];
 				addIndex++;
 			}
 

@@ -22,6 +22,8 @@ import Cluster.DistMatrixCalculator;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.model.IntHeaderInfo;
+import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 
 /**
  * Controls user input from ClusterView. It handles user interactions 
@@ -122,6 +124,8 @@ public class ClusterController {
 		private String[] reorderedRows;
 		private String[] reorderedCols;
 		
+		private String fileName;
+		
 		private int pBarMax = 0;
 		
 		@Override
@@ -156,17 +160,26 @@ public class ClusterController {
 			
 			ClusterView.setPBarMax(pBarMax);
 			
-			/* Initialize the clustering processor and pass the model */
-			processor = new ClusterProcessor(tvModel);
+			/* Get fileName for saving calculated data */
+			fileName = tvModel.getSource().substring(0, 
+					tvModel.getSource().length() - 4);
+			
+			IntHeaderInfo geneHeaderI = tvModel.getGeneHeaderInfo();
+			IntHeaderInfo arrayHeaderI = tvModel.getGeneHeaderInfo();
+			
+			/* Initialize the clustering processor and pass the data */
+			TVDataMatrix originalMatrix = (TVDataMatrix)tvModel.getDataMatrix();
+			processor = new ClusterProcessor(originalMatrix, fileName, 
+					geneHeaderI, arrayHeaderI);
 			
 			/* Row axis cluster */
-			reorderedRows = calculateAxis(rowSimilarity, ROW);
+			reorderedRows = calculateAxis(rowSimilarity, ROW, fileName);
 			LogBuffer.println("ReorderedRows length: " + reorderedRows.length);
 			
 			if(isCancelled()) return null;
 			
 			/* Column axis cluster */
-			reorderedCols = calculateAxis(colSimilarity, COL);
+			reorderedCols = calculateAxis(colSimilarity, COL, fileName);
 			LogBuffer.println("ReorderedCols length: " + reorderedCols.length);
 			
 			return null;
@@ -176,7 +189,7 @@ public class ClusterController {
 		public void done() {
 			
 			if(!isCancelled()) { 
-				saveClusterFile();
+				saveClusterFile(fileName);
 				
 			} else {
 				clusterView.setClustering(false);
@@ -191,7 +204,8 @@ public class ClusterController {
 		 * @param axis The chosen matrix axis.
 		 * @return A list of reordered axis elements.
 		 */
-		private String[] calculateAxis(int similarity, int axis) {
+		private String[] calculateAxis(int similarity, int axis, 
+				String fileName) {
 			
 			/* Row axis cluster */
 			double[][] distMatrix = null;
@@ -221,12 +235,11 @@ public class ClusterController {
 		 * Saves the clustering output (reordered axes) to a new CDT file, 
 		 * so it can later be loaded and displayed.
 		 */
-		private void saveClusterFile() {
+		private void saveClusterFile(String fileName) {
 
 			if (reorderedRows != null || reorderedCols != null) {
 				ClusterView.setLoadText("Saving...");
-				LogBuffer.println("Begin saving.");
-				saveTask = new SaveTask(reorderedRows, reorderedCols);
+				saveTask = new SaveTask(reorderedRows, reorderedCols, fileName);
 				saveTask.execute();
 				
 			} else {
@@ -251,26 +264,41 @@ public class ClusterController {
 		/* The finished reordered axes */
 		private String[] reorderedRows;
 		private String[] reorderedCols;
+		
+		private String fileName;
 		private String filePath;
 		
-		public SaveTask(String[] reorderedRows, String[] reorderedCols) {
+		public SaveTask(String[] reorderedRows, String[] reorderedCols, 
+				String fileName) {
 			
 			this.reorderedRows = reorderedRows;
 			this.reorderedCols = reorderedCols;
+			this.fileName = fileName;
 		}
 		
 		@Override
 		protected Void doInBackground() throws Exception {
 			
-			LogBuffer.println("Initializing CDT writer.");
-			final CDTGenerator cdtGen = new CDTGenerator(tvModel, clusterView, 
-					reorderedRows, reorderedCols, isHierarchical());
+			LogBuffer.println("Begin saving...");
+			
+			TVDataMatrix originalMatrix = (TVDataMatrix)tvModel.getDataMatrix();
+			double[][] data = originalMatrix.getExprData();
+			
+			final CDTGenerator cdtGen = new CDTGenerator(data, reorderedRows, 
+					reorderedCols, rowSimilarity, colSimilarity,
+					isHierarchical());
+			
+			LogBuffer.println("Setting up buffered writer...");
+			cdtGen.setupWriter(fileName, clusterView.getSpinnerValues());
 
-			LogBuffer.println("Generating CDT.");
+			IntHeaderInfo geneHeaderI = tvModel.getGeneHeaderInfo();
+			IntHeaderInfo arrayHeaderI = tvModel.getGeneHeaderInfo();
+			
+			cdtGen.prepare(geneHeaderI, arrayHeaderI);
 			cdtGen.generateCDT();
 			
-			LogBuffer.println("Setting file path.");
-			filePath = cdtGen.getFilePath();
+			filePath = cdtGen.finish();
+			
 			LogBuffer.println(".CDT saved at: " + filePath);
 			
 			return null;
@@ -281,12 +309,12 @@ public class ClusterController {
 
 			if (!isCancelled()) {
 				ClusterView.setLoadText("Done!");
-				LogBuffer.println("Done saving. Opening file now.");
+				LogBuffer.println("Done saving. Opening file.");
 				visualizeData(filePath);
 
 			} else {
 				clusterView.setClustering(false);
-				LogBuffer.println("Clustering has been cancelled.");
+				LogBuffer.println("Clustering was cancelled.");
 			}
 		}
 	}
