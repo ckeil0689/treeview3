@@ -402,7 +402,7 @@ public class TVController {
 	 * 
 	 * @param hierarchical
 	 */
-	public void setupClusterView(final String clusterType) {
+	public void setupClusterView(final int clusterType) {
 
 		SwingUtilities.invokeLater(new Runnable() {
 
@@ -410,7 +410,8 @@ public class TVController {
 			public void run() {
 				
 				/* Making a new Window to display clustering components */
-				final ClusterDialog clusterView = new ClusterDialog(clusterType);
+				final ClusterDialog clusterView = 
+						new ClusterDialog(clusterType);
 
 				/* Creating the Controller for this view. */
 				new ClusterController(clusterView, TVController.this);

@@ -29,7 +29,6 @@ package Cluster;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
-import java.util.Arrays;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -57,11 +56,18 @@ import Utilities.StringRes;
  */
 public class ClusterView {
 
-	// Static variables for updates from clustering classes
+	public static final int HIER = 0;
+	public static final int KMEANS = 1;
+	
+	/* Static variables for updates from clustering classes */
 	public static JLabel loadLabel;
 	public static JProgressBar pBar;
 	
-	// GUI components
+	/* Start values for k-means JSpinners */
+	private final int CLUSTER_START = 10;
+	private final int ITERATION_START = 100;
+	
+	/* GUI components */
 	private JPanel mainPanel;
 	private JPanel optionsPanel;
 	private JPanel btnPanel;
@@ -75,45 +81,51 @@ public class ClusterView {
 	private JButton cluster_btn;
 	private JButton cancel_btn;
 
-	private JSpinner rowGroupsSetr;
-	private JSpinner colGroupsSetr;
-	private JSpinner rowIterationsSetr;
-	private JSpinner colIterationsSetr;
+	private JSpinner rowClusterSettr;
+	private JSpinner colClusterSettr;
+	private JSpinner rowIterationsSettr;
+	private JSpinner colIterationsSettr;
 
 	private final String[] linkageMethods = {"Single Linkage", 
 			"Complete Linkage", "Average Linkage" };
 
-	private final String clusterType;
+	private int clusterType;
 
 	/**
 	 * Constructor for the ClusterView object which binds to an explicit
 	 * Preferences parent node.
-	 * 
-	 * @param root Parent node to which to bind this DendroView
-	 * @param name name of this view.
 	 */
-	public ClusterView(final String clusterType) {
-
-		this.clusterType = clusterType;
+	public ClusterView() {
 		
-		// Setting up the interactive components with listeners
-		setupInteractiveComponents();
 	}
 	
-	public JPanel makeClusterPanel() {
+	/**
+	 * Generates the mainPanel which is put into ClusterDialog. This base 
+	 * layer contains all the other layers with the information and 
+	 * interactive components.
+	 * @param int Integer that represents the type of clustering.
+	 * @return The base JPanel.
+	 */
+	public JPanel makeClusterPanel(final int clusterType) {
 		
-		// Main background panel
+		this.clusterType = clusterType;
+		
+		/* Main background panel */
 		mainPanel = GUIFactory.createJPanel(false, false, null);
 		
-		// Background Panel for the Cluster Options
+		/* Background panel for the cluster options */
 		optionsPanel = GUIFactory.createJPanel(false, true, null);
 		
-		// Panel for the Cluster/ Cancel buttons
+		/* Panel for the cluster/ cancel buttons */
 		btnPanel = GUIFactory.createJPanel(false, true, null);
 		
-		// ProgressBar Panel
+		/* ProgressBar panel */
 		loadPanel = GUIFactory.createJPanel(false, true, null);
 		
+		/* Setting up the interactive components with listeners */
+		setupInteractiveComponents();
+		
+		/* Setting up Swing layout */
 		setupLayout();
 		
 		return mainPanel;
@@ -126,7 +138,7 @@ public class ClusterView {
 
 		mainPanel.removeAll();
 
-		// Add all components to panels
+		/* Add all components to panels */
 		setLoadPanel();
 		setOptionsPanel();
 		setMainPanel();
@@ -140,27 +152,26 @@ public class ClusterView {
 	 */
 	public void setupInteractiveComponents() {
 
-		// Button to begin Clustering
+		/* Button to begin clustering */
 		cluster_btn = GUIFactory.createBtn(StringRes.btn_Cluster);
 
-		// Button to cancel worker thread in the controller
+		/* Button to cancel worker thread in the controller */
 		cancel_btn = GUIFactory.createBtn(StringRes.btn_Cancel);
 
-		// Label for cluster process
+		/* Label for cluster process */
 		loadLabel = GUIFactory.createLabel(StringRes.clusterInfo_Ready, 
 				GUIFactory.FONTS);
 		
-		// ProgressBar for clustering process
+		/* ProgressBar for clustering process */
 		pBar = GUIFactory.createPBar();
 
-		// ComboBox to choose cluster method
+		/* ComboBox to choose cluster method */
 		final String[] clusterNames = { StringRes.menu_Hier,
 				StringRes.menu_KMeans };
 
 		clusterChooser = GUIFactory.createComboBox(clusterNames);
 
-		clusterChooser.setSelectedIndex(Arrays.asList(clusterNames).indexOf(
-				clusterType));
+		clusterChooser.setSelectedIndex(clusterType);
 
 		final String[] measurements = { 
 				StringRes.cluster_DoNot,
@@ -173,27 +184,35 @@ public class ClusterView {
 				StringRes.cluster_cityBlock 
 		};
 
-		// Drop-down menu for row selection
+		/* Initially shown distance measure Euclidean for k-means! */
+		int initialDist;
+		if (clusterType == HIER) {
+			initialDist = DistMatrixCalculator.PEARSON_UN;
+		} else {
+			initialDist = DistMatrixCalculator.EUCLIDEAN;
+		}
+		
+		/* Drop-down menu for row selection */
 		rowDistChooser = GUIFactory.createComboBox(measurements);
-		rowDistChooser.setSelectedIndex(1);
+		rowDistChooser.setSelectedIndex(initialDist);
 
-		// Drop-down menu for column selection
+		/* Drop-down menu for column selection */
 		colDistChooser = GUIFactory.createComboBox(measurements);
-		colDistChooser.setSelectedIndex(1);
+		colDistChooser.setSelectedIndex(initialDist);
 
-		// Linkage choice drop-down menu
+		/* Linkage choice drop-down menu */
 		linkageChooser = GUIFactory.createComboBox(linkageMethods);
 
-		// Spinners for K-Means
-		rowGroupsSetr = setupSpinner();
-		colGroupsSetr = setupSpinner();
-		rowIterationsSetr = setupSpinner();
-		colIterationsSetr = setupSpinner();
+		/* Spinners for k-means */
+		rowClusterSettr = setupSpinner(CLUSTER_START);
+		colClusterSettr = setupSpinner(CLUSTER_START);
+		rowIterationsSettr = setupSpinner(ITERATION_START);
+		colIterationsSettr = setupSpinner(ITERATION_START);
 	}
 
-	// Layout setups for main UI elements
+	/* Layout setups for main UI elements */
 	/**
-	 * Sets up general elements of the mainPanel
+	 * Sets up general elements of the mainPanel.
 	 */
 	public void setMainPanel() {
 
@@ -207,7 +226,7 @@ public class ClusterView {
 	}
 
 	/**
-	 * Sets up general elements of the optionsPanel
+	 * Sets up general elements of the optionsPanel.
 	 */
 	public void setOptionsPanel() {
 		
@@ -266,8 +285,7 @@ public class ClusterView {
 		choicePanel.add(colLabel, "pushx, alignx 0%, w 20%");
 		choicePanel.add(colDistChooser, "w 80%, wrap 20px");
 
-		// Components for linkage choice
-		// Hierarchical
+		/* Components for hierarchical linkage choice */
 		if (clusterChooser.getSelectedIndex() == 0) {
 			final JLabel method = GUIFactory.createLabel("Linkage Method", 
 					GUIFactory.FONTL);
@@ -278,7 +296,7 @@ public class ClusterView {
 			choicePanel.add(choose, "pushx, alignx 0%, w 20%");
 			choicePanel.add(linkageChooser, "pushx, alignx 0%, w 80%, wrap");
 
-		// K-means
+		/* k-means */
 		} else {
 			final JLabel kMeans = GUIFactory.createLabel("K-Means Options", 
 					GUIFactory.FONTL);
@@ -302,12 +320,12 @@ public class ClusterView {
 			choicePanel.add(cols, "wrap");
 			
 			choicePanel.add(clusters, "w 25%!");
-			choicePanel.add(rowGroupsSetr, "w 25%!, split 2");
-			choicePanel.add(colGroupsSetr, "wrap");
+			choicePanel.add(rowClusterSettr, "w 25%!, split 2");
+			choicePanel.add(colClusterSettr, "wrap");
 
 			choicePanel.add(its, "w 25%!");
-			choicePanel.add(rowIterationsSetr, "w 25%!, split 2");
-			choicePanel.add(colIterationsSetr, "wrap");
+			choicePanel.add(rowIterationsSettr, "w 25%!, split 2");
+			choicePanel.add(colIterationsSettr, "wrap");
 			choicePanel.add(req);
 		}
 		
@@ -320,25 +338,13 @@ public class ClusterView {
 	 * 
 	 * @return JSpinner
 	 */
-	public JSpinner setupSpinner() {
+	public JSpinner setupSpinner(int start) {
 
-		final SpinnerNumberModel amountChoice = new SpinnerNumberModel(0, 0,
+		final SpinnerNumberModel amountChoice = new SpinnerNumberModel(start, 0,
 				5000, 1);
 		final JSpinner jft = new JSpinner(amountChoice);
 
 		return jft;
-	}
-
-	// Implementing methods to connect with Controller
-	/**
-	 * Adds a listener to cluster_button to register user interaction and notify
-	 * ClusterController to call the performCluster() method.
-	 * 
-	 * @param cluster
-	 */
-	public void addClusterListener(final ActionListener cluster) {
-
-		cluster_btn.addActionListener(cluster);
 	}
 	
 	/**
@@ -367,6 +373,17 @@ public class ClusterView {
 	}
 
 	/*-------Listeners ------*/
+	/**
+	 * Adds a listener to cluster_button to register user interaction and notify
+	 * ClusterController to call the performCluster() method.
+	 * 
+	 * @param cluster
+	 */
+	public void addClusterListener(final ActionListener cluster) {
+
+		cluster_btn.addActionListener(cluster);
+	}
+	
 	/**
 	 * Adds a listener to cancel_btn to register user interaction and notifies
 	 * ClusterController to call the cancel() method.
@@ -405,18 +422,15 @@ public class ClusterView {
 	
 	public void addSpinnerListener(final ChangeListener l) {
 		
-		rowGroupsSetr.addChangeListener(l);
-		colGroupsSetr.addChangeListener(l);
-		rowIterationsSetr.addChangeListener(l);
-		colIterationsSetr.addChangeListener(l);
+		rowClusterSettr.addChangeListener(l);
+		colClusterSettr.addChangeListener(l);
+		rowIterationsSettr.addChangeListener(l);
+		colIterationsSettr.addChangeListener(l);
 	}
 
 	/**
-	 * Adds a load progress bar to loadpanel if a similarity measure has been
+	 * Adds a load progress bar to loadPanel if a similarity measure has been
 	 * selected.
-	 * 
-	 * @param choice
-	 * @param choice2
 	 */
 	public void setLoadPanel() {
 		
@@ -445,29 +459,7 @@ public class ClusterView {
 		loadPanel.repaint();
 	}
 
-	/**
-	 * Changes of the layout when the worker thread in controller has completed
-	 * its calculations. (worker calls done())
-	 */
-	public void displayCompleted(final String finalFilePath) {
-
-		btnPanel.remove(cancel_btn);
-
-		final TextDisplay status1 = new TextDisplay(
-				StringRes.clusterTip_completed);
-
-		final TextDisplay status2 = new TextDisplay(
-				StringRes.clusterTip_filePath + finalFilePath);
-
-		btnPanel.add(cluster_btn, "pushx, alignx 50%");
-
-		loadPanel.add(status1, "pushx, alignx 50%, span, wrap");
-		loadPanel.add(status2, "pushx, alignx 50%, span, wrap");
-
-		mainPanel.revalidate();
-		mainPanel.repaint();
-	}
-
+	/* Getters to pass user input to the controller */
 	/**
 	 * Returns the selection of the cluster method as a String.
 	 * 
@@ -518,18 +510,19 @@ public class ClusterView {
 		final int spinners = 4;
 		final Integer[] spinnerValues = new Integer[spinners];
 
-		spinnerValues[0] = (Integer) rowGroupsSetr.getValue();
-		spinnerValues[1] = (Integer) rowIterationsSetr.getValue();
-		spinnerValues[2] = (Integer) colGroupsSetr.getValue();
-		spinnerValues[3] = (Integer) colIterationsSetr.getValue();
+		spinnerValues[0] = (Integer) rowClusterSettr.getValue();
+		spinnerValues[1] = (Integer) rowIterationsSettr.getValue();
+		spinnerValues[2] = (Integer) colClusterSettr.getValue();
+		spinnerValues[3] = (Integer) colIterationsSettr.getValue();
 
 		return spinnerValues;
 	}
 
+	/* GUI update methods */
 	/**
 	 * Defines the text to be displayed by loadLabel in ClusterView.
 	 * 
-	 * @param text
+	 * @param text Text to be shown by the loading indicator label.
 	 */
 	public static void setLoadText(final String text) {
 
@@ -539,7 +532,7 @@ public class ClusterView {
 	/**
 	 * Sets the maximum for the JProgressBar.
 	 * 
-	 * @param max
+	 * @param max Maximum value of the JProgressBar.
 	 */
 	public static void setPBarMax(final int max) {
 
@@ -550,7 +543,7 @@ public class ClusterView {
 	/**
 	 * Updates the value of the JProgressBar in ClusterView.
 	 * 
-	 * @param i
+	 * @param i Value to set the JProgressBar
 	 */
 	public static void updatePBar(final int i) {
 

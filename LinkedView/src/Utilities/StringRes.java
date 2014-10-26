@@ -11,7 +11,7 @@ package Utilities;
  */
 public class StringRes {
 
-	// Global Application Fields
+	/* Global Application Fields */
 	/** Version of application */
 	public final static String versionTag = "0.1";
 
@@ -140,7 +140,8 @@ public class StringRes {
 	/* Linkage Methods */
 	public static final String cluster_link_Avg = "Average Linkage";
 	
-	// Cluster Info
+	/* Linkage Method & clustering infos */
+	/* Single Linkage */
 	public static final String clusterInfo_Single_Similarity = "Joins the " +
 			"closest two clusters by finding the most similar pair of points.";
 	
@@ -161,6 +162,7 @@ public class StringRes {
 	
 	public static final String clusterInfo_Ready = "Ready to cluster!";
 	
+	/* Complete Linkage */
 	public static final String clusterInfo_Compl_Similarity = "Joins the " +
 			"most distant two clusters by finding the least similar pair " +
 			"of points.";
@@ -177,6 +179,7 @@ public class StringRes {
 	public static final String clusterInfo_Compl_DisAdv = "Difficult to " +
 			"apply to large data sets due to computational complexity.";
 	
+	/* Average Linkage */
 	public static final String clusterInfo_Avg_Similarity = "Use the average " +
 			"value of the pairwise links within a cluster, based upon all " +
 			"objects in the cluster.";
@@ -192,8 +195,21 @@ public class StringRes {
 	public static final String clusterInfo_Avg_DisAdv = "Expensive for " +
 			"large collections.";
 	
-	public static final String clusterInfo_KMeans = "Splits the data into"
-			+ " groups.";
+	/* k-means */
+	public static final String clusterInfo_KMeans = "Splits the data into "
+			+ "k clusters by initially choosing k random centroids (means) "
+			+ "from the distance matrix rows or columns. The rest of the "
+			+ "rows or columns is then each assigned to the group with the "
+			+ "closest centroid. ";
+	
+	public static final String clusterInfo_KMeans_Adv = "Faster than "
+			+ "hierarchical clustering, if k is small; "
+			+ "Produces tighter clusters than hierarchical clustering.";
+	
+	public static final String clusterInfo_KMeans_DisAdv = "Fixed number of "
+			+ "clusters: User has to decide what value k should be; "
+			+ "Unsuitable for non-globular clusters; "
+			+ "Randomly selected seed clusters generate different clusters.";
 	
 	// Cluster Info - Tip
 	public static final String clusterTip_Memory = "Memory tip.";

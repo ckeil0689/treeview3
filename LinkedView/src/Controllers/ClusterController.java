@@ -7,6 +7,7 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.List;
 
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
@@ -68,8 +69,7 @@ public class ClusterController {
 	 * controls the UI response to user interaction.
 	 * @param dialog The JDialog that contains the cluster UI.
 	 * @param controller The TVFrameController, mostly used to enable file
-	 * loading. 
-	 * TODO implement multi-core clustering.
+	 * loading.
 	 */
 	public ClusterController(final ClusterDialog dialog, 
 			final TVController controller) {
@@ -80,13 +80,23 @@ public class ClusterController {
 		this.clusterView = dialog.getClusterView();
 
 		/* Create and add all view component listeners */
-		clusterView.addClusterListener(new TaskStartListener());
-		clusterView.addClusterTypeListener(new ClusterTypeListener());
-		clusterView.addCancelListener(new CancelListener());
-		clusterView.addLinkageListener(new LinkChoiceListener());
-		clusterView.addRowDistListener(new RowDistListener());
-		clusterView.addColDistListener(new ColDistListener());
-		clusterView.addSpinnerListener(new SpinnerListener());
+		addAllListeners();
+	}
+	
+	public void addAllListeners() {
+		
+		if(clusterView != null) {
+			clusterView.addClusterListener(new TaskStartListener());
+			clusterView.addClusterTypeListener(new ClusterTypeListener());
+			clusterView.addCancelListener(new CancelListener());
+			clusterView.addLinkageListener(new LinkChoiceListener());
+			clusterView.addRowDistListener(new RowDistListener());
+			clusterView.addColDistListener(new ColDistListener());
+			clusterView.addSpinnerListener(new SpinnerListener());
+			
+		} else {
+			LogBuffer.println("Cannot add listeners, clusterView is null.");
+		}
 	}
 	
 	/**
@@ -165,7 +175,7 @@ public class ClusterController {
 					tvModel.getSource().length() - 4);
 			
 			IntHeaderInfo geneHeaderI = tvModel.getGeneHeaderInfo();
-			IntHeaderInfo arrayHeaderI = tvModel.getGeneHeaderInfo();
+			IntHeaderInfo arrayHeaderI = tvModel.getArrayHeaderInfo();
 			
 			/* Initialize the clustering processor and pass the data */
 			TVDataMatrix originalMatrix = (TVDataMatrix)tvModel.getDataMatrix();
@@ -292,7 +302,7 @@ public class ClusterController {
 			cdtGen.setupWriter(fileName, clusterView.getSpinnerValues());
 
 			IntHeaderInfo geneHeaderI = tvModel.getGeneHeaderInfo();
-			IntHeaderInfo arrayHeaderI = tvModel.getGeneHeaderInfo();
+			IntHeaderInfo arrayHeaderI = tvModel.getArrayHeaderInfo();
 			
 			cdtGen.prepare(geneHeaderI, arrayHeaderI);
 			cdtGen.generateCDT();
@@ -412,7 +422,9 @@ public class ClusterController {
 		public void actionPerformed(ActionEvent arg0) {
 			
 			LogBuffer.println("Reset cluster type.");
-			clusterDialog.reset();
+			clusterDialog.reset(((JComboBox<String>)arg0.getSource())
+					.getSelectedIndex());
+			addAllListeners();
 		}
 	}
 	
@@ -481,9 +493,12 @@ public class ClusterController {
 		@Override
 		public void stateChanged(ChangeEvent arg0) {
 			
-			/* Ready indicator label */
-			clusterView.displayReadyStatus(isReady(rowSimilarity, ROW) 
-					|| isReady(colSimilarity, COL));
+			/* XOR controlled ready indicator label */
+			clusterView.displayReadyStatus(
+					(isReady(rowSimilarity, ROW) 
+							&& !isReady(colSimilarity, COL)) 
+					|| (!isReady(rowSimilarity, ROW) 
+							&& isReady(colSimilarity, COL)));
 		}
 	}
 
@@ -545,7 +560,7 @@ public class ClusterController {
 				break;
 			}
 
-			return (distMeasure!= DistMatrixCalculator.NO_CLUSTER 
+			return (distMeasure != DistMatrixCalculator.NO_CLUSTER 
 					&& (groups > 0 && iterations > 0));
 		}
 	}

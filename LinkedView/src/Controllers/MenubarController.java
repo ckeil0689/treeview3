@@ -2,6 +2,7 @@ package Controllers;
 
 import javax.swing.JOptionPane;
 
+import Cluster.ClusterView;
 import Utilities.StringRes;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeViewFrame;
@@ -85,10 +86,10 @@ public class MenubarController {
 			controller.setMatrixSize("proportional");
 			break;
 		case StringRes.menu_Hier:		
-			controller.setupClusterView(name);
+			controller.setupClusterView(ClusterView.HIER);
 			break;
 		case StringRes.menu_KMeans:    	
-			controller.setupClusterView(name);
+			controller.setupClusterView(ClusterView.KMEANS);
 			break;
 		case "Functional Enrichment":	
 			tvFrame.displayWIP();

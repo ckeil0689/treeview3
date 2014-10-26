@@ -461,7 +461,7 @@ public class KMeansCluster {
 		return kClusters_string;
 	}
 
-	// Setters
+	/* Setters */
 	/**
 	 * Setter for the seed means for every cluster.
 	 * 

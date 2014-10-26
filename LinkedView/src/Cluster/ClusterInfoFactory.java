@@ -107,8 +107,33 @@ public class ClusterInfoFactory {
 		TextDisplay similarityText = new TextDisplay(
 				getSimilarity(KMEANS_INDEX));
 		
+		JLabel time = GUIFactory.createLabel("Time: ", GUIFactory.FONTS);
+		
+		TextDisplay timeText = new TextDisplay(getTime(KMEANS_INDEX));
+		
+		JLabel advantage = GUIFactory.createLabel("Advantages: ", 
+				GUIFactory.FONTS);
+		
+		TextDisplay advantageText = new TextDisplay(
+				getAdvantage(KMEANS_INDEX));
+		
+		JLabel disadvantage = GUIFactory.createLabel("Disadvantages: ", 
+				GUIFactory.FONTS);
+		
+		TextDisplay disadvantageText = new TextDisplay(
+				getDisadvantage(KMEANS_INDEX));
+		
 		mainPanel.add(similarity, "alignx 0%");
 		mainPanel.add(similarityText, "w 400:500:, wrap");
+		
+		mainPanel.add(time, "alignx 0%");
+		mainPanel.add(timeText, "w 400:500:, wrap");
+		
+		mainPanel.add(advantage, "alignx 0%");
+		mainPanel.add(advantageText, "w 400:500:, wrap");
+		
+		mainPanel.add(disadvantage, "alignx 0%");
+		mainPanel.add(disadvantageText, "w 400:500:, wrap");
 		
 		mainPanel.revalidate();
 		mainPanel.repaint();
@@ -128,13 +153,13 @@ public class ClusterInfoFactory {
 		
 		switch(index) {
 			case 0: 	
-				similarity = StringRes.clusterInfo_Avg_Similarity;
-				break;
-			case 1: 	
 				similarity = StringRes.clusterInfo_Single_Similarity;
 				break;
-			case 2: 	
+			case 1: 	
 				similarity = StringRes.clusterInfo_Compl_Similarity;
+				break;
+			case 2: 	
+				similarity = StringRes.clusterInfo_Avg_Similarity;
 				break;
 			case 3: 	
 				similarity = StringRes.clusterInfo_KMeans;
@@ -143,7 +168,6 @@ public class ClusterInfoFactory {
 				similarity = "N/ A";
 				break;
 		}
-		
 		return similarity;
 	}
 	
@@ -158,15 +182,19 @@ public class ClusterInfoFactory {
 		String type;
 		
 		switch(index) {
-			case 0: 	type = StringRes.clusterInfo_Avg_Type;
-						break;
-			case 1: 	type = StringRes.clusterInfo_Single_Type;
-						break;
-			case 2: 	type = StringRes.clusterInfo_Compl_Type;
-						break;
-			default: 	type = "N/ A";
+			case 0: 	
+				type = StringRes.clusterInfo_Single_Type;
+				break;
+			case 1: 	
+				type = StringRes.clusterInfo_Compl_Type;
+				break;
+			case 2: 	
+				type = StringRes.clusterInfo_Avg_Type;
+				break;
+			default: 	
+				type = "N/ A";
+				break;
 		}
-		
 		return type;
 	}
 	
@@ -181,15 +209,19 @@ public class ClusterInfoFactory {
 		String time;
 		
 		switch(index) {
-			case 0: 	time = StringRes.clusterInfo_Avg_Time;
-						break;
-			case 1: 	time = StringRes.clusterInfo_Single_Time;
-						break;
-			case 2: 	time = StringRes.clusterInfo_Compl_Time;
-						break;
-			default: 	time = "N/ A";
+			case 0: 	
+				time = StringRes.clusterInfo_Single_Time;
+				break;
+			case 1: 	
+				time = StringRes.clusterInfo_Compl_Time;
+				break;
+			case 2: 	
+				time = StringRes.clusterInfo_Avg_Time;
+				break;
+			default: 	
+				time = "N/ A";
+				break;
 		}
-		
 		return time;
 	}
 	
@@ -204,15 +236,22 @@ public class ClusterInfoFactory {
 		String advantage;
 		
 		switch(index) {
-			case 0: 	advantage = StringRes.clusterInfo_Avg_Adv;
-						break;
-			case 1: 	advantage = StringRes.clusterInfo_Single_Adv;
-						break;
-			case 2: 	advantage = StringRes.clusterInfo_Compl_Adv;
-						break;
-			default: 	advantage = "N/ A";
+			case 0: 	
+				advantage = StringRes.clusterInfo_Single_Adv;
+				break;
+			case 1: 	
+				advantage = StringRes.clusterInfo_Compl_Adv;
+				break;
+			case 2: 	
+				advantage = StringRes.clusterInfo_Avg_Adv;
+				break;
+			case 3: 	
+				advantage = StringRes.clusterInfo_KMeans_Adv;
+				break;
+			default: 	
+				advantage = "N/ A";
+				break;
 		}
-		
 		return advantage;
 	}
 	
@@ -227,16 +266,22 @@ public class ClusterInfoFactory {
 		String disadvantage;
 		
 		switch(index) {
-			case 0: 	disadvantage = StringRes.clusterInfo_Avg_DisAdv;
-						break;
-			case 1: 	disadvantage = StringRes.clusterInfo_Single_DisAdv;
-						break;
-			case 2: 	disadvantage = StringRes.clusterInfo_Compl_DisAdv;
-						break;
-			default: 	disadvantage = "N/ A";
+			case 0: 	
+				disadvantage = StringRes.clusterInfo_Single_DisAdv;
+				break;
+			case 1: 	
+				disadvantage = StringRes.clusterInfo_Compl_DisAdv;
+				break;
+			case 2: 	
+				disadvantage = StringRes.clusterInfo_Avg_DisAdv;
+				break;
+			case 3: 	
+				disadvantage = StringRes.clusterInfo_KMeans_DisAdv;
+				break;
+			default: 	
+				disadvantage = "N/ A";
+				break;
 		}
-		
 		return disadvantage;
 	}
-	
 }

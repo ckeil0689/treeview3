@@ -108,8 +108,7 @@ public class CDTGenerator {
 	 * @param geneHeaderI
 	 * @param arrayHeaderI
 	 */
-	public void prepare(IntHeaderInfo geneHeaderI, 
-			IntHeaderInfo arrayHeaderI) {
+	public void prepare(IntHeaderInfo geneHeaderI, IntHeaderInfo arrayHeaderI) {
 		
 		LogBuffer.println("Preparing.");
 		

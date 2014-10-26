@@ -18,13 +18,13 @@ public class ClusterDialog extends CustomDialog {
 
 	private final ClusterView clusterView;
 
-	public ClusterDialog(final String clusterType) {
+	public ClusterDialog(final int clusterType) {
 		
 		super(StringRes.dlg_Cluster);
 
-		clusterView = new ClusterView(clusterType);
+		clusterView = new ClusterView();
 		
-		mainPanel.add(clusterView.makeClusterPanel());
+		mainPanel.add(clusterView.makeClusterPanel(clusterType));
 		dialog.getContentPane().add(mainPanel);
 		
 		packDialog();
@@ -35,10 +35,10 @@ public class ClusterDialog extends CustomDialog {
 	 * the clustering type. This avoids a continuously growing dialog when
 	 * switches are performed and pack() is called.
 	 */
-	public void reset() {
+	public void reset(final int clusterType) {
 		
 		dialog.getContentPane().removeAll();
-		dialog.getContentPane().add(clusterView.makeClusterPanel());
+		dialog.getContentPane().add(clusterView.makeClusterPanel(clusterType));
 		packDialog();
 	}
 	
@@ -81,7 +81,7 @@ public class ClusterDialog extends CustomDialog {
 			public void run() {
 				
 				new JFrame(); // needs top level frame to center jDialog
-				new ClusterDialog(StringRes.menu_KMeans).setVisible(true);
+				new ClusterDialog(ClusterView.KMEANS).setVisible(true);
 			}
 		});
 	}

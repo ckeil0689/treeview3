@@ -348,10 +348,18 @@ public class ClusterProcessor {
 				/* Get axis labels */
 				String[][] headerArray;
 				if (axis == ClusterController.ROW) {
-					headerArray = arrayHeaderI.getHeaderArray();
+					headerArray = geneHeaderI.getHeaderArray();
 
 				} else {
-					headerArray = geneHeaderI.getHeaderArray();
+					headerArray = arrayHeaderI.getHeaderArray();
+				}
+				
+				if(headerArray.length != distMatrix.length) {
+					LogBuffer.println("Label array length does not match "
+							+ "size of distance matrix.");
+					LogBuffer.println("HeaderArray: " + headerArray.length);
+					LogBuffer.println("Distance Matrix: " + distMatrix.length);
+					return new String[]{};
 				}
 				
 				/* Write data and close writer */
