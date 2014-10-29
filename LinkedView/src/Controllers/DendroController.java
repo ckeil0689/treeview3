@@ -532,20 +532,34 @@ public class DendroController implements ConfigNodePersistent {
 				newScale = globalXmap.getMinScale();
 			}
 			globalXmap.setScale(newScale);
+			
+			//LogBuffer.println("Setting numVisible for arrays to round of double [" + arrayIndexes + "].");
+
+			//Track explicitly manipulated visible area (instead of the visible area) as
+			//is manipulated via indirect actions (such as resizing the window)
+			int numArrayIndexes = (int) Math.round(arrayIndexes);
+			globalXmap.setNumVisible(numArrayIndexes);
 
 			newScale2 = (globalYmap.getAvailablePixels()) / geneIndexes;
 			
-			LogBuffer.println("Zooming. MinSelectedArrayIndex: [" + minSelectedArrayIndex + "] " +
-							  "MinSelectedGeneIndex: [" + minSelectedGeneIndex + "] " +
-							  "ArrayIndexesSelected: [" + arrayIndexes + "] " +
-							  "GeneIndexesSelected: [" + geneIndexes + "] " +
-							  "xscale: [" + newScale + "] " +
-							  "yscale: [" + newScale2 + "].");
+			//LogBuffer.println("Zooming. MinSelectedArrayIndex: [" + minSelectedArrayIndex + "] " +
+			//				  "MinSelectedGeneIndex: [" + minSelectedGeneIndex + "] " +
+			//				  "ArrayIndexesSelected: [" + arrayIndexes + "] " +
+			//				  "GeneIndexesSelected: [" + geneIndexes + "] " +
+			//				  "xscale: [" + newScale + "] " +
+			//				  "yscale: [" + newScale2 + "].");
 
 			if (newScale2 < globalYmap.getMinScale()) {
 				newScale2 = globalYmap.getMinScale();
 			}
 			globalYmap.setScale(newScale2);
+
+			//LogBuffer.println("Setting numVisible for genes to round of double [" + geneIndexes + "].");
+
+			//Track explicitly manipulated visible area (instead of the visible area) as
+			//is manipulated via indirect actions (such as resizing the window)
+			int numGeneIndexes = (int) Math.round(geneIndexes);
+			globalYmap.setNumVisible(numGeneIndexes);
 		}
 
 		saveSettings();
@@ -575,7 +589,92 @@ public class DendroController implements ConfigNodePersistent {
 
 			globalXmap.scrollToIndex(scrollX);
 			globalYmap.scrollToIndex(scrollY);
+			
+			//Calculate the first visible data index in both dimensions
+			int firstX = 0;
+			while(firstX < globalXmap.getMaxIndex() && !globalXmap.isVisible(firstX)) {
+				firstX++;
+			}
+				
+			int firstY = 0;
+			while(firstY < globalYmap.getMaxIndex() && !globalYmap.isVisible(firstY)) {
+				firstY++;
+			}
+			
+			//Track explicitly manipulated visible area (instead of the visible area) as
+			//is manipulated via indirect actions (such as resizing the window)
+			globalXmap.setFirstVisible(firstX);
+			globalYmap.setFirstVisible(firstY);
 		}
+	}
+
+	/**
+	 * Uses the currently visible data indexes on the screen to update the scale
+	 * and zoom in conjunction with centerSelection() to handle window resize events.
+	 * Based on zoomSelection().  Does not change the number of visible data indexes.
+	 */
+	public void reZoomVisible() {
+
+		double newScale  = 0.0;
+		double newScale2 = 0.0;
+		
+		//Obtain the selection size of each dimension
+		//double arrayIndexes = globalXmap.getTileNumVisible();
+		//double geneIndexes  = globalYmap.getTileNumVisible();
+		double arrayIndexes = globalXmap.getNumVisible();
+		double geneIndexes  = globalYmap.getNumVisible();
+		
+		if (arrayIndexes == 0 || geneIndexes == 0 || (arrayIndexes == globalXmap.getMaxIndex() && geneIndexes == globalYmap.getMaxIndex())) {
+			//LogBuffer.println("No spots are visible. Resetting view.");
+			arrayIndexes = globalXmap.getMaxIndex();
+			geneIndexes  = globalYmap.getMaxIndex();
+			resetMapContainers();
+		}
+		else {
+			//LogBuffer.println("pixels / array indexes visible: [" + globalXmap.getAvailablePixels() + "/" + arrayIndexes + "] gene indexes visible: [" + globalYmap.getAvailablePixels() + "/" + geneIndexes + "].");
+			
+			newScale = (globalXmap.getAvailablePixels()) / arrayIndexes;
+
+			if (newScale < globalXmap.getMinScale()) {
+				newScale = globalXmap.getMinScale();
+			}
+			globalXmap.setScale(newScale);
+
+			newScale2 = (globalYmap.getAvailablePixels()) / geneIndexes;
+			
+			if (newScale2 < globalYmap.getMinScale()) {
+				newScale2 = globalYmap.getMinScale();
+			}
+			globalYmap.setScale(newScale2);
+			dendroView.getGlobalView().repaint();
+		}
+
+		saveSettings();
+	}
+
+	/**
+	 * Scrolls to the center of the visible rectangle.  Used when the window
+	 * or the image area is resized in order to keep the same data displayed.
+	 */
+	public void reCenterVisible() {
+
+		//final int visibleGenes  = globalYmap.getTileNumVisible();
+		//final int visibleArrays = globalXmap.getTileNumVisible();
+		final int visibleGenes  = globalYmap.getNumVisible();
+		final int visibleArrays = globalXmap.getNumVisible();
+
+		if (visibleGenes > 0 && visibleArrays > 0) {
+
+			int startX = globalXmap.getFirstVisible();
+			int startY = globalYmap.getFirstVisible();
+			
+			//LogBuffer.println("Firstx visible: [" + startX + "] Firsty visible: [" + startY + "].");
+
+			globalXmap.scrollToFirstIndex(startX);
+			globalYmap.scrollToFirstIndex(startY);
+		}
+		
+		saveSettings();
 	}
 
 	/**
@@ -598,8 +697,18 @@ public class DendroController implements ConfigNodePersistent {
 
 		@Override
 		public void componentResized(final ComponentEvent arg0) {
+			//LogBuffer.println("componentResized: globalYmap.getTileNumVisible: [" + globalYmap.getTileNumVisible() +
+			//					"] globalXmap.getTileNumVisible: [" + globalXmap.getTileNumVisible() +
+			//					"] dendroView.getXScroll().getValue(): [" + dendroView.getXScroll().getValue() +
+			//					"] dendroView.getYScroll().getValue(): [" + dendroView.getYScroll().getValue() + "].");
 
-			resetMapContainers();
+			//Previously, resetMapContainers was called here, but that caused
+			//the zoom level to change when the user resized the window, so I
+			//added a way to track the currently visible area in mapContainer
+			//and implemented these functions to make the necessary
+			//adjustments to the image when that happens
+			reZoomVisible();
+			reCenterVisible();
 		}
 
 		@Override

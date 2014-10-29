@@ -257,12 +257,12 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 			final int[] indexes = new int[nSelected];
 			int curr = 0;
 
-			LogBuffer.println("Num Selected: [" + nSelected + "].");
+			//LogBuffer.println("Num Selected: [" + nSelected + "].");
 			
 			for (int i = 0; i < isSelected.length; i++) {
 
 				if (isSelected[i]) {
-					LogBuffer.println("Index: [" + i + "] is selected.");
+					//LogBuffer.println("Index: [" + i + "] is selected.");
 					indexes[curr++] = i;
 				}
 			}
@@ -292,7 +292,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 
 			if ((i >= 0) && (i < isSelected.length)) {
 				TreeSelection.this.setChanged();
-				LogBuffer.println("Setting isSelected to [" + (b ? "true" : "false") + "] for index: [" + i + "].");
+				//LogBuffer.println("Setting isSelected to [" + (b ? "true" : "false") + "] for index: [" + i + "].");
 				isSelected[i] = b;
 			}
 		}
