@@ -2,8 +2,8 @@ package Controllers;
 
 import javax.swing.JOptionPane;
 
-import Cluster.ClusterView;
 import Utilities.StringRes;
+import Views.ClusterView;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 

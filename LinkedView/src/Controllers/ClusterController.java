@@ -15,11 +15,12 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import Utilities.StringRes;
+import Views.ClusterDialog;
+import Views.ClusterView;
 import Cluster.CDTGenerator;
 import Cluster.ClusterProcessor;
-import Cluster.ClusterView;
-import Cluster.ClusterDialog;
 import Cluster.DistMatrixCalculator;
+import Cluster.DistanceMatrix;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -218,7 +219,7 @@ public class ClusterController {
 				String fileName) {
 			
 			/* Row axis cluster */
-			double[][] distMatrix = null;
+			DistanceMatrix distMatrix = new DistanceMatrix(0);
 			
 			/* Check if this axis should be clustered */
 			if (!isReady(similarity, axis)) return new String[] {};
@@ -229,7 +230,7 @@ public class ClusterController {
 			publish("Calculating " + axisPrefix + " distances...");
 			
 			/* Calculating the distance matrix */
-			distMatrix = processor.calcDistance(similarity, axis);
+			distMatrix.setMatrix(processor.calcDistance(similarity, axis));
 			
 			if(distMatrix == null || isCancelled()) return null;
 			

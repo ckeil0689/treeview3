@@ -44,14 +44,14 @@ public class HierCluster {
 	private int loopNum;
 
 	/* Half of the Distance Matrix (symmetry) */
-	private double[][] distMatrix;
+	private DistanceMatrix distMatrix;
 
 	/* 
 	 * Deep copy of distance matrix because original will be mutated. 
 	 * The mutation happens when a new row is formed from to rows that
 	 * are being clustered together.
 	 */
-	private double[][] distMatrixCopy;
+	private DistanceMatrix distMatrixCopy;
 
 	/* list to keep track of previously used minimum values from distMatrix */
 	private double min;
@@ -92,13 +92,13 @@ public class HierCluster {
 	 * be interrupted in this class if the user cancels the operation.
 	 */
 	public HierCluster(String fileName, final int linkMethod, 
-			final double[][] distMatrix, final int axis) {
+			final DistanceMatrix distMatrix, final int axis) {
 
 		LogBuffer.println("Initializing HierCluster.");
 		
 		this.linkMethod = linkMethod;
 		this.distMatrix = distMatrix;
-		this.distMatrixSize = distMatrix.length;
+		this.distMatrixSize = distMatrix.getSize();
 		
 		prepareCluster();
 	}
@@ -129,7 +129,8 @@ public class HierCluster {
 		 * original values during generation of the new row when joining 
 		 * two rows. 
 		 */
-		distMatrixCopy = Helper.cloneMatrix(distMatrix);
+		distMatrixCopy = new DistanceMatrix(0);
+		distMatrixCopy.cloneFrom(distMatrix);
 
 		/* 
 		 * Groups of row indices to keep track of the formed clusters at all
@@ -172,7 +173,7 @@ public class HierCluster {
 	 */
 	public int cluster() {
 
-		loopNum = distMatrixSize - distMatrix.length;
+		loopNum = distMatrixSize - distMatrix.getSize();
 		
 //		LogBuffer.println("Loop: " + loopNum); // Debug
 		
@@ -206,7 +207,7 @@ public class HierCluster {
 		}
 
 		/* Fuse the two clusters into a new one. */
-		final int[] newCluster = concatArrays(targetRow, targetRow2);			
+		final int[] newCluster = concatIntArrays(targetRow, targetRow2);			
 		
 /*
  * Step 3: Match the newly created node with the others.
@@ -317,15 +318,20 @@ public class HierCluster {
 		 */
 		if (rowClusHasMin) {
 			/* replace element at row with newRow */
-			replaceRow(rowMinIndex, newRow);
+			distMatrix.replaceIndex(newRow, rowMinIndex);
 
-			/* remove the other row from distMatrix*/
-			updateDistMatrix(colMinIndex, rowMinIndex);
+			/* 
+			 * Remove the other row from distMatrix and keep the previously
+			 * replaced row.
+			 */
+			distMatrix.deleteIndex(colMinIndex);
 
-			for (int j = rowMinIndex; j < distMatrix.length; j++) {
+			/* ? */
+			for (int j = rowMinIndex; j < distMatrix.getSize(); j++) {
 
-				final double[] element = distMatrix[j];
-				 /* add to element at index 'row' if the element 
+				final double[] element = distMatrix.getRow(j);
+				 /* 
+				  * Add to element at index 'row' if the element 
 				  * is bigger than the row value otherwise the element
 				  * is too small to add a column value
 				  */
@@ -335,14 +341,15 @@ public class HierCluster {
 			}
 		} else {
 			/* replace element at row with newRow */
-			replaceRow(colMinIndex, newRow);
+			distMatrix.replaceIndex(newRow, colMinIndex);
 
 			/* remove the other row from distMatrix */
-			updateDistMatrix(rowMinIndex, colMinIndex);
+			distMatrix.deleteIndex(rowMinIndex);
 
-			for (int j = colMinIndex; j < distMatrix.length; j++) {
+			/* ? */
+			for (int j = colMinIndex; j < distMatrix.getSize(); j++) {
 
-				final double[] element = distMatrix[j];
+				final double[] element = distMatrix.getRow(j);
 
 				if (element.length > colMinIndex) {
 					element[colMinIndex] = newRow[j];
@@ -350,7 +357,7 @@ public class HierCluster {
 			}
 		}
 		
-		return distMatrix.length;
+		return distMatrix.getSize();
 	}
 	
 	/**
@@ -361,7 +368,7 @@ public class HierCluster {
 	public String[] writeData(String[] rowPair) {
 		
 		/*
-		 *  list to store the Strings which represent calculated data 
+		 *  List to store the Strings which represent calculated data 
 		 *  (such as row pairs) to be added to dataTable.
 		 */
 		final int nodeInfoSize = 4;
@@ -392,7 +399,7 @@ public class HierCluster {
 	public void finish() {
 
 		bufferedWriter.closeWriter();
-		reorderGen(currentClusters.get(0));
+		reorderRows(currentClusters.get(0));
 
 		/* Ensure garbage collection for large objects */
 		distMatrixCopy = null;
@@ -414,11 +421,13 @@ public class HierCluster {
 		/* New min must be bigger than previous matrix min */
 		double newMin = Double.MAX_VALUE;
 		
-		for(int i = 0; i < distMatrix.length; i++) {
+		for(int i = 0; i < distMatrix.getSize(); i++) {
 			
-			for(int j = 0; j < distMatrix[i].length; j++) {
+			double[] row = distMatrix.getRow(i);
+			
+			for(int j = 0; j < row.length; j++) {
 				
-				double element = distMatrix[i][j];
+				double element = row[j];
 				
 				if((element > min || Helper.nearlyEqual(element, min)) 
 						&& element < newMin) {
@@ -430,33 +439,6 @@ public class HierCluster {
 		}
 		
 		return newMin;
-	}
-
-	/**
-	 * Replaces a row in the distance matrix by first making a new matrix, 
-	 * then making a deep copy of the newRow to be added, and finally
-	 * of it
-	 * @param repInd The index of the row in distMatrix that will be replaced.
-	 * @param newRow The new row to replace the old row.
-	 */
-	public void replaceRow(final int repInd, final double[] newRow) {
-
-		final double[][] newMatrix = new double[distMatrix.length][];
-
-		final double[] replacementRow = new double[repInd];
-		System.arraycopy(newRow, 0, replacementRow, 0, repInd);
-
-		for (int i = 0; i < newMatrix.length; i++) {
-
-			if (i != repInd) {
-				newMatrix[i] = distMatrix[i];
-
-			} else {
-				newMatrix[i] = replacementRow;
-			}
-		}
-
-		distMatrix = newMatrix;
 	}
 
 	/**
@@ -507,67 +489,6 @@ public class HierCluster {
 	}
 
 	/**
-	 * This method updates the old distance matrix by replacing the two rows 
-	 * which are clustered together with the new row.
-	 * 
-	 * @param removeIndex Index of row to be removed from distance matrix.
-	 * @param keepIndex Index of row that will be replaced with the newly
-	 * generated row.
-	 */
-	public void updateDistMatrix(final int removeIndex, final int keepIndex) {
-
-		final double[][] newMatrix = new double[distMatrix.length - 1][];
-
-		/* This should shift the elements of distMatrix up by one 
-		 * once it reaches the index which should be removed.
-		 * A double of the last array in the element should remain at the end.
-		 */
-		for (int i = 0; i < newMatrix.length; i++) {
-
-			newMatrix[i] = (i < removeIndex) ? distMatrix[i] : distMatrix[i + 1];
-		}
-
-		/* This shrinks the current element after to a max size of '***Index' 
-		 * after this the longest element in distMatrix has size '***Index'
-		 */
-		if (removeIndex > keepIndex) {
-			for (int i = removeIndex; i < newMatrix.length; i++) {
-
-				final double[] element = newMatrix[i];
-				newMatrix[i] = removeCol(element, removeIndex);
-			}
-		} else {
-			for (int i = keepIndex; i < newMatrix.length; i++) {
-
-				final double[] element = newMatrix[i];
-				newMatrix[i] = removeCol(element, keepIndex);
-			}
-		}
-
-		distMatrix = newMatrix;
-	}
-
-	/**
-	 * Removes one value from a double[] array by making a new array without
-	 * this value and with a length of array.length - 1.
-	 * 
-	 * @param array Array from which a value should be removed.
-	 * @param toDelete The index of the value to be removed.
-	 * @return The supplied array with the value at toDelete removed.
-	 */
-	public double[] removeCol(final double[] array, final int toDelete) {
-
-		final double[] newArray = new double[array.length - 1];
-
-		for (int i = 0; i < newArray.length; i++) {
-
-			newArray[i] = (i < toDelete) ? array[i] : array[i + 1];
-		}
-
-		return newArray;
-	}
-
-	/**
 	 * Finds the index of a value in a double array.
 	 * 
 	 * @param array
@@ -593,7 +514,7 @@ public class HierCluster {
 	 * @param b Second array.
 	 * @return The merged array.
 	 */
-	public int[] concatArrays(final int[] a, final int[] b) {
+	public int[] concatIntArrays(final int[] a, final int[] b) {
 
 		final int[] c = new int[a.length + b.length];
 
@@ -716,18 +637,21 @@ public class HierCluster {
 			 */
 			for (int j = loopNum - 1; j >= 0; j--) {							
 
-				// this currently gets the last node that has a common element
-				// if the 2 groups have elements in common...
+				/* 
+				 * This currently gets the last node that has a common element
+				 * if the 2 groups have elements in common...
+				 */
 				if (rowIndexTable[j] != null) {
 					if (!checkDisjoint(rowIndexTable[j], rowGroup)) {
 
-						// assigns NODE # of last fusedGroup containing
-						// a rowGroup element
+						/* 
+						 * Assigns NODE # of last fusedGroup containing
+						 * a rowGroup element.
+						 */
 						geneRow = rowPairs[j][0];
 						break;
 
 					} else {
-						// random fix to see what happens
 						geneRow = axisPrefix + currentClusters.get(row).get(0) 
 								+ "X";
 					}
@@ -788,11 +712,11 @@ public class HierCluster {
 	}
 
 	/**
-	 * Reorders the finalCluster and returns it as a String[]
+	 * Reorders the finalCluster and returns it as a String[].
 	 * 
 	 * @param finalCluster
 	 */
-	public void reorderGen(final List<Integer> finalCluster) {
+	public void reorderRows(final List<Integer> finalCluster) {
 
 		String element = "";
 
@@ -854,7 +778,7 @@ public class HierCluster {
 					 * Get the corresponding row in the original, 
 					 * non-mutated matrix. 
 					 */
-					final double[] currentRow = distMatrixCopy[selectedRow];
+					final double[] currentRow = distMatrixCopy.getRow(selectedRow);
 
 					/* 
 					 * Go through all clusters and their elements.
@@ -874,9 +798,12 @@ public class HierCluster {
 							distanceVal = currentRow[currentCluster[k]];
 
 						} else {
-							// reverse index access because of distance
-							// matrix symmetry
-							distanceVal = distMatrixCopy[currentCluster[k]][selectedRow];
+							/* 
+							 * Reverse index access because of distance
+							 * matrix symmetry.
+							 */
+							distanceVal = distMatrixCopy.getRow(
+									currentCluster[k])[selectedRow];
 						}
 
 						distances[dInd] = distanceVal;
@@ -903,7 +830,7 @@ public class HierCluster {
 					newRow[i] = distances[distances.length - 1];
 				}
 			}
-			// all elements in common
+			/* all elements in common */
 			else {
 				newRow[i] = 0.0;
 			}
@@ -940,43 +867,50 @@ public class HierCluster {
 				currentGroup[z] = currentClusters.get(i).get(z);
 			}
 
-			// check if fusedGroup contains the current checked gene
-			// (then no mean should be calculated) no elements in common
+			/* 
+			 * Check if fusedGroup contains the current checked gene 
+			 * (then no mean should be calculated) no elements in common.
+			 */
 			if (checkDisjoint(currentGroup, fusedGroup)) {
 
-				// select members of the new clade (B & G)
+				/* select members of the new row (B & G) */
 				for (int j = 0; j < fusedGroup.length; j++) {
 
 					selectedGene = fusedGroup[j];
 
-					// take a row (gene) from the matrix which also appears
-					// in the fusedGroup (current cluster).
+					/* 
+					 * Take a row (gene) from the matrix which also appears 
+					 * in the fusedGroup (current cluster).
+					 */
+					double[] currentRow = distMatrixCopy.getRow(selectedGene);
 
-					// halfDMatrix is getting mutated. Needs deepCopy?
-					final double[] currentRow = distMatrixCopy[selectedGene];
-
-					// go through all clusters and their contained genes
-					// calculate the distance between each column (gene)
-					// and the current row (gene) from fusedGroup
-					// sum the distance values up
+					/* 
+					 * Go through all clusters and their contained genes
+					 * calculate the distance between each column (gene) 
+					 * and the current row (gene) from fusedGroup sum the 
+					 * distance values up.
+					 */
 					for (final int gene : currentClusters.get(i)) {
 
 						if (currentRow.length > gene) {
 							distanceVal = currentRow[gene];
 
 						} else {
-							distanceVal = distMatrixCopy[gene][selectedGene];
+							distanceVal = 
+									distMatrixCopy.getRow(gene)[selectedGene];
 						}
 						distanceSum += distanceVal;
 					}
 				}
 
-				// calculate the new value to be added to newClade
-				// as the average of distances
+				/* 
+				 * Calculate the new value to be added to newRow as the 
+				 * average of distances.
+				 */
 				newRow[i] = distanceSum / (fusedGroup.length 
 						* currentGroup.length);
 			}
-			// all elements in common
+			/* all elements in common */
 			else {
 				newRow[i] = 0.0;
 			}

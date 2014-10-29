@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import Utilities.Helper;
 import Controllers.ClusterController;
 import edu.stanford.genetics.treeview.LogBuffer;
 
@@ -24,10 +23,10 @@ public class KMeansCluster {
 	private final int k;                     		/* Amount of clusters */
 
 	/* Distance Matrix */
-	private final double[][] distMatrix;
+	private final DistanceMatrix distMatrix;
 
 	/* Object to store deep copy of distance matrix; avoids mutation */
-	private double[][] copyDistMatrix;
+	private DistanceMatrix copyDistMatrix;
 
 	/* Array which stores the seed means */
 	private double[] seedMeans;
@@ -48,8 +47,8 @@ public class KMeansCluster {
 	 * @param iterations The number iterations the k-means algorithm is
 	 * run. This impacts the clustering result.
 	 */
-	public KMeansCluster(final double[][] distMatrix, final int axis, final int k, 
-			final String fileName) {
+	public KMeansCluster(final DistanceMatrix distMatrix, final int axis, 
+			final int k, final String fileName) {
 
 		this.distMatrix = distMatrix;
 		this.axis = axis;
@@ -87,12 +86,13 @@ public class KMeansCluster {
 	 */
 	public void prepare() {
 		
-		rowCentroidList = new double[distMatrix.length];
+		rowCentroidList = new double[distMatrix.getSize()];
 		kClusters = new int[k][];
-		clusterMeans = new double[distMatrix.length][];
+		clusterMeans = new double[distMatrix.getSize()][];
 
 		/* deep copy of distance matrix to avoid mutation */
-		copyDistMatrix = Helper.cloneMatrix(distMatrix);
+		copyDistMatrix = new DistanceMatrix(0);
+		copyDistMatrix.cloneFrom(distMatrix);
 
 		/* Make a list of all means of distances for every gene */
 		rowCentroidList = generateCentroids(copyDistMatrix);
@@ -125,7 +125,7 @@ public class KMeansCluster {
 	public void writeData(int[][] kClusters, String[][] headerArray) {
 		
 		/* The list containing the reordered gene names. */
-		reorderedList = new String[distMatrix.length];
+		reorderedList = new String[distMatrix.getSize()];
 		
 		String[][] kClusters_string = new String[kClusters.length][];
 
@@ -186,17 +186,18 @@ public class KMeansCluster {
 	 * @param matrix
 	 * @return Array of means/ centroids.
 	 */
-	private double[] generateCentroids(final double[][] matrix) {
+	private double[] generateCentroids(final DistanceMatrix matrix) {
 
-		final double[] centroidList = new double[matrix.length];
+		final double[] centroidList = new double[matrix.getSize()];
 
 		/* 
 		 * This algorithm gets the mean of each row for the half-matrix!
 		 * Hence, the row can't just be iterated, since values are missing.
 		 */
 		int addIndex = 0;
-		for (final double[] row : matrix) {
+		for (int i = 0; i < matrix.getSize(); i++) {
 
+			double[] row = matrix.getRow(i);
 			double sum = 0;
 			double mean;
 
@@ -210,12 +211,12 @@ public class KMeansCluster {
 			 * Add the rest, which is the column values of each row at the
 			 * index of the current.
 			 */
-			for(int i = addIndex; i < matrix.length - 1; i++) {
+			for(int j = addIndex; j < matrix.getSize() - 1; j++) {
 				
-				sum += matrix[i + 1][addIndex];
+				sum += matrix.getRow(j + 1)[addIndex];
 			}
 
-			mean = sum / matrix.length;
+			mean = sum / matrix.getSize();
 
 			centroidList[addIndex] = mean;
 			addIndex++;

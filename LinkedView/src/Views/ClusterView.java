@@ -25,7 +25,7 @@
  *
  * END_HEADER 
  */
-package Cluster;
+package Views;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
@@ -42,6 +42,7 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeListener;
 
 import edu.stanford.genetics.treeview.LogBuffer;
+import Cluster.DistMatrixCalculator;
 import Utilities.GUIFactory;
 import Utilities.StringRes;
 

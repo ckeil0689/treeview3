@@ -7,6 +7,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
+import Views.ClusterView;
 import Controllers.ClusterController;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.model.IntHeaderInfo;
@@ -57,7 +58,7 @@ public class ClusterProcessor {
 	 * @param axis
 	 * @return
 	 */
-	public String[] clusterAxis(double[][] distMatrix, int linkMethod, 
+	public String[] clusterAxis(DistanceMatrix distMatrix, int linkMethod, 
 			final Integer[] spinnerInput, boolean hierarchical, 
 			final int axis) {
 		
@@ -253,26 +254,26 @@ public class ClusterProcessor {
 	 */
 	private class ClusterTask extends SwingWorker<String[], Integer> {
 
-		private final double[][] distMatrix;
+		private final DistanceMatrix distMatrix;
 		private final int linkMethod;
 		private final Integer[] spinnerInput;
 		private final int axis;
 		private final int max;
-		private boolean hierarchical;
+		private boolean hier;
 
-		public ClusterTask(final double[][] distMatrix, int linkMethod, 
-				final Integer[] spinnerInput, boolean hierarchical, 
+		public ClusterTask(final DistanceMatrix distMatrix, int linkMethod, 
+				final Integer[] spinnerInput, boolean hier, 
 				final int axis) {
 
 			LogBuffer.println("Initializing ClusterTask.");
 			this.distMatrix = distMatrix;
 			this.linkMethod = linkMethod;
 			this.spinnerInput = spinnerInput;
-			this.hierarchical = hierarchical;
+			this.hier = hier;
 			this.axis = axis;
 			
 			/* Progress bar max dependent on selected clustering type */
-			this.max = (hierarchical) ? distMatrix.length - 1 : spinnerInput[0];
+			this.max = (hier) ? distMatrix.getSize() - 1 : spinnerInput[0];
 		}
 		
 		@Override
@@ -289,7 +290,7 @@ public class ClusterProcessor {
 			LogBuffer.println("Starting cluster.");
 			
 			/* Hierarchical */
-			if (hierarchical) {
+			if (hier) {
 				HierCluster cGen = new HierCluster(fileName, linkMethod, 
 								distMatrix, axis);
 				
@@ -301,7 +302,7 @@ public class ClusterProcessor {
 				 * its own cluster (bottom-up clustering).
 				 */
 				int loopNum = 0;
-				int distMatrixSize = distMatrix.length;
+				int distMatrixSize = distMatrix.getSize();
 				
 				while (distMatrixSize > 1 && !isCancelled()) {
 					
@@ -354,11 +355,12 @@ public class ClusterProcessor {
 					headerArray = arrayHeaderI.getHeaderArray();
 				}
 				
-				if(headerArray.length != distMatrix.length) {
+				if(headerArray.length != distMatrix.getSize()) {
 					LogBuffer.println("Label array length does not match "
 							+ "size of distance matrix.");
 					LogBuffer.println("HeaderArray: " + headerArray.length);
-					LogBuffer.println("Distance Matrix: " + distMatrix.length);
+					LogBuffer.println("Distance Matrix: " 
+							+ distMatrix.getSize());
 					return new String[]{};
 				}
 				

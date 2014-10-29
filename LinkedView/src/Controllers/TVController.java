@@ -18,7 +18,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import Utilities.StringRes;
-import Cluster.ClusterDialog;
+import Views.ClusterDialog;
 import ColorChooser.ColorChooser;
 import ColorChooser.ColorChooserController;
 import edu.stanford.genetics.treeview.CdtFilter;

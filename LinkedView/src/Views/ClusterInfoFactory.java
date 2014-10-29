@@ -1,4 +1,4 @@
-package Cluster;
+package Views;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;

@@ -2,6 +2,7 @@ package Cluster;
 
 import javax.swing.SwingUtilities;
 
+import Views.ClusterView;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
