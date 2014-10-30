@@ -52,22 +52,27 @@ public class MapContainer extends Observable implements Observer,
 	private final String mapName;
 
 	private FixedMap fixedMap = null;
-	private FillMap fillMap = null;
-	private NullMap nullMap = null;
+	private FillMap fillMap   = null;
+	private NullMap nullMap   = null;
 
-	private JScrollBar scrollbar = null;
+	private JScrollBar scrollbar    = null;
 	private TreeDrawerNode selected = null;
-	private Preferences configNode = null;
+	private Preferences configNode  = null;
 
 	private double tileNumVisible;
+	
+	//Track explicitly manipulated visible area (instead of the visible area) as
+	//is manipulated via indirect actions (such as resizing the window)
+	private int numVisible   = 0;
+	private int firstVisible = 0;
 
 	public MapContainer(final String mapName) {
 
 		this.fixedMap = new FixedMap();
-		this.fillMap = new FillMap();
-		this.nullMap = new NullMap();
-		this.current = nullMap;
-		this.mapName = mapName;
+		this.fillMap  = new FillMap();
+		this.nullMap  = new NullMap();
+		this.current  = nullMap;
+		this.mapName  = mapName;
 	}
 
 	public MapContainer(final String type, final String mapName) {
@@ -117,8 +122,14 @@ public class MapContainer extends Observable implements Observer,
 	 * screen space.
 	 */
 	public void setHome() {
-
+		//LogBuffer.println("setHome() called.");
 		calculateNewMinScale();
+		
+		//Keep track of explicit changes, by the user, to the amount of
+		//visible data
+		firstVisible = 0;
+		numVisible = getMaxIndex();
+		
 		setScale(minScale);
 	}
 
@@ -127,7 +138,7 @@ public class MapContainer extends Observable implements Observer,
 		this.tileNumVisible = getMaxIndex();
 		minScale = getCalculatedMinScale();
 	}
-
+	
 	/**
 	 * Sets the scale of this MapContainer to the last saved value.
 	 */
@@ -173,6 +184,10 @@ public class MapContainer extends Observable implements Observer,
 		}
 
 		tileNumVisible = tileNumVisible + zoomVal;
+		
+		//Keep track of explicit changes, by the user, to the amount of
+		//visible data
+		numVisible = (int) tileNumVisible;
 
 		newScale = getAvailablePixels() / tileNumVisible;
 
@@ -207,6 +222,10 @@ public class MapContainer extends Observable implements Observer,
 		}
 
 		tileNumVisible = tileNumVisible - zoomVal;
+		
+		//Keep track of explicit changes, by the user, to the amount of
+		//visible data
+		numVisible = (int) tileNumVisible;
 
 		// Recalculating scale
 		newScale = getAvailablePixels() / tileNumVisible;
@@ -225,8 +244,13 @@ public class MapContainer extends Observable implements Observer,
 			}
 		}
 
-		final int range = getMaxIndex() - getMinIndex() + 1;
-		final double requiredScale = getAvailablePixels() / range;
+		//The divisor here was previously calculated by:
+		//getMaxIndex() - getMinIndex() + 1, which inadvertently resulted
+		//in zooming out the currently viewed area, however this function
+		//was being called in contexts where the user was not intending
+		//to do that, so instead, I changed the divisor to be the number
+		//of data indexes currently being viewed. -Rob
+		final double requiredScale = getAvailablePixels() / numVisible;
 		if (requiredScale > default_scale) {
 			setScale(requiredScale);
 
@@ -287,6 +311,24 @@ public class MapContainer extends Observable implements Observer,
 
 		final int j = scrollbar.getValue();
 		scrollbar.setValue(i - scrollbar.getVisibleAmount() / 2);
+		
+		//Keep track of the first visible index
+		setFirstVisible(i - scrollbar.getVisibleAmount() / 2);
+
+		if (j != scrollbar.getValue()) {
+			setChanged();
+		}
+	}
+
+	public void scrollToFirstIndex(final int i) {
+
+		final int j = scrollbar.getValue();
+		scrollbar.setValue(i);
+
+		//Keep track of the first visible index
+		setFirstVisible(i);
+		
+		//LogBuffer.println("Current scrollbar value: [" + j + "].  Scrolling to: [" + i + "].");
 
 		if (j != scrollbar.getValue()) {
 			setChanged();
@@ -298,6 +340,9 @@ public class MapContainer extends Observable implements Observer,
 		final int j = scrollbar.getValue();
 		scrollbar.setValue(j + i);
 
+		//Keep track of the first visible index
+		setFirstVisible(j + i);
+		
 		if (j != scrollbar.getValue()) {
 			setChanged();
 		}
@@ -329,6 +374,9 @@ public class MapContainer extends Observable implements Observer,
 				value = 0;
 			}
 
+			//Keep track of the first visible index
+			setFirstVisible(value);
+			
 			scrollbar.setValues(value, extent, 0, max);
 			scrollbar.setBlockIncrement(current.getViewableIndexes());
 		}
@@ -460,22 +508,45 @@ public class MapContainer extends Observable implements Observer,
 
 	public void setScale(final double d) {
 
+		//LogBuffer.println("Scale sent in (d) = [" + d + "], d*int(AvailablePix/d) = ["
+		//		+ ((d * (int) (getAvailablePixels() / d)))
+		//		+ "] UsedPix = [" + getUsedPixels() + "] =? AvailPix = ["
+		//		+ getAvailablePixels() + "] Scale = [" + getScale()
+		//		+ "] ScrollBar#: " + scrollbar.getVisibleAmount());
+
 		if (!Helper.nearlyEqual(fixedMap.getScale(), d)) {
 			fixedMap.setScale(d);
 			setupScrollbar();
 			setChanged();
 
-			if (getAvailablePixels() != getUsedPixels()) {
-				LogBuffer.println("Scale sent in (d) = [" + d + "], d*int(AvailablePix/d) = ["
-						+ ((d * (int) (getAvailablePixels() / d)))
-						+ "] UsedPix = [" + getUsedPixels() + "] =? AvailPix = ["
-						+ getAvailablePixels() + "] Scale = [" + getScale()
-						+ "] ScrollBar#: " + scrollbar.getVisibleAmount());
-			}
+			//LogBuffer.println("Scale set.");
 
 			configNode.putDouble("scale", d);
 			configNode.putDouble("minScale", minScale);
 		}
+		//else {
+		//	LogBuffer.println("Scale not set.  Scale sent in (d) = [" + d + "].  Apparently the scale is nearly equal to: [" + fixedMap.getScale() + "].");
+		//}
+	}
+	
+	/**
+	 * The purpose of these two functions (setNumVisible and setFirst visible),
+	 * other than to simply set values is to support the tracking of explicit
+	 * image manipulation by the user.  The main reasons these were implemented
+	 * was because the image was being changed by implicit actions, such as
+	 * resizing the window.  The pre-existing functionality, as far as I could
+	 * tell, only had a means to obtain information on what data indexes were
+	 * currently being displayed by way of converting a pixel index into a data
+	 * index.  These variables are manipulated only by actions that the user
+	 * explicitly takes to intentionally alter the image, meaning the range of
+	 * spots they are looking at.
+	 */
+	public void setNumVisible(int i) {
+		numVisible = i;
+	}
+
+	public void setFirstVisible(int i) {
+		firstVisible = i;
 	}
 
 	public int getMiddlePixel(final int i) {
@@ -536,7 +607,28 @@ public class MapContainer extends Observable implements Observer,
 	 */
 	public int getTileNumVisible() {
 		
-		return (int)tileNumVisible;
+		return (int) tileNumVisible;
+	}
+
+	/**
+	 * The purpose of these two functions (getNumVisible and getFirst visible),
+	 * other than to simply obtain values is to support the tracking of explicit
+	 * image manipulation by the user.  The main reasons these were implemented
+	 * was because the image was being changed by implicit actions, such as
+	 * resizing the window.  The pre-existing functionality, as far as I could
+	 * tell, only had a means to obtain information on what data indexes were
+	 * currently being displayed by way of converting a pixel index into a data
+	 * index.  These variables are manipulated only by actions that the user
+	 * explicitly takes to intentionally alter the image, meaning the range of
+	 * spots they are looking at.
+	 */
+	public int getNumVisible() {
+		
+		return numVisible;
+	}
+	public int getFirstVisible() {
+		
+		return firstVisible;
 	}
 
 	private void switchMap(final IntegerMap integerMap) {
