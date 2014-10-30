@@ -157,16 +157,36 @@ public class ClusterController {
 			 */
 			if(rowSimilarity != 0) {
 				
-				/* Check if ranking first or not. */
-				pBarMax += (rowSimilarity == 5) ? (3 * rows) : (2 * rows);
-				
+				if(isHierarchical()) {
+					/* Check if ranking first or not. */
+					pBarMax += (rowSimilarity == 5) ? (3 * rows) : (2 * rows);
+					
+				} else {
+					int cycles = clusterView.getSpinnerValues()[1];
+					if(rowSimilarity == 5){ 
+						pBarMax += 2 * rows + cycles;
+						
+					} else {
+						pBarMax += rows + cycles;
+					}
+				}
 			}
 			
 			if(colSimilarity != 0) {
 				
-				/* Check if ranking first or not. */
-				pBarMax += (colSimilarity == 5) ? (3 * cols) : (2 * cols);
-				
+				if(isHierarchical()) {
+					/* Check if ranking first or not. */
+					pBarMax += (colSimilarity == 5) ? (3 * cols) : (2 * cols);
+					
+				} else {
+					int cycles = clusterView.getSpinnerValues()[3];
+					if(colSimilarity == 5){ 
+						pBarMax += 2 * cols + cycles;
+						
+					} else {
+						pBarMax += cols + cycles;
+					}
+				}
 			}
 			
 			ClusterView.setPBarMax(pBarMax);
@@ -419,6 +439,8 @@ public class ClusterController {
 	 */
 	private class ClusterTypeListener implements ActionListener {
 
+		/* source of arg0 is a JComboBox<String> in ClusterView */
+		@SuppressWarnings("unchecked")
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			

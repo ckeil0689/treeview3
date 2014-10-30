@@ -182,7 +182,9 @@ public class HierCluster {
 * minimum that was found in the previous step! The matrix shrinks as rows are
 * clustered together (hence the need for a deep copy!).
 */
-		min = findMatrixMin();														
+		min = distMatrix.findCurrentMin(min);
+		rowMinIndex = distMatrix.getMinRowIndex();
+		colMinIndex = distMatrix.getMinColIndex();
 /* 
  * STEP 2: Link the two clusters, that are closest, in the cluster index list, 
  * which represents the clusters as row indexes of the distance matrix.
@@ -207,7 +209,7 @@ public class HierCluster {
 		}
 
 		/* Fuse the two clusters into a new one. */
-		final int[] newCluster = concatIntArrays(targetRow, targetRow2);			
+		final int[] newCluster = Helper.concatIntArrays(targetRow, targetRow2);			
 		
 /*
  * Step 3: Match the newly created node with the others.
@@ -406,40 +408,6 @@ public class HierCluster {
 		rowPairs = null;
 		currentClusters = null;
 	}
-	
-	/**
-	 * Finds and returns the current minimum value in the cluster matrix.
-	 * The minimum value determines which rows are closest together and will
-	 * be clustered. They will form a new row that replaces the other two and
-	 * as a result a new minimum must be found at each step to determine the
-	 * new row pair to be clustered.
-	 * Complexity: O(n^2)
-	 * @return The minimum value in the current distance matrix.
-	 */
-	public double findMatrixMin() {
-		
-		/* New min must be bigger than previous matrix min */
-		double newMin = Double.MAX_VALUE;
-		
-		for(int i = 0; i < distMatrix.getSize(); i++) {
-			
-			double[] row = distMatrix.getRow(i);
-			
-			for(int j = 0; j < row.length; j++) {
-				
-				double element = row[j];
-				
-				if((element > min || Helper.nearlyEqual(element, min)) 
-						&& element < newMin) {
-					newMin = element;
-					rowMinIndex = i;
-					colMinIndex = j;
-				}
-			}
-		}
-		
-		return newMin;
-	}
 
 	/**
 	 * Sets up a buffered writer to write & save the tree files (GTR & ATR).
@@ -486,42 +454,6 @@ public class HierCluster {
 		}
 		
 		LogBuffer.println("Tree file writer setup successful.");
-	}
-
-	/**
-	 * Finds the index of a value in a double array.
-	 * 
-	 * @param array
-	 * @param value
-	 * @return
-	 */
-	public int findValue(final double[] array, final double value) {
-
-		for (int i = 0; i < array.length; i++) {
-
-			if (Helper.nearlyEqual(array[i], value)) {
-				return i;
-			}
-		}
-
-		return -1;
-	}
-
-	/**
-	 * Fuses two arrays into a new third array and returns it.
-	 * 
-	 * @param a First array.
-	 * @param b Second array.
-	 * @return The merged array.
-	 */
-	public int[] concatIntArrays(final int[] a, final int[] b) {
-
-		final int[] c = new int[a.length + b.length];
-
-		System.arraycopy(a, 0, c, 0, a.length);
-		System.arraycopy(b, 0, c, a.length, b.length);
-
-		return c;
 	}
 
 	/**

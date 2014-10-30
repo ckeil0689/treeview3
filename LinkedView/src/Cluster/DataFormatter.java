@@ -1,10 +1,5 @@
 package Cluster;
 
-import javax.swing.SwingUtilities;
-
-import Views.ClusterView;
-import edu.stanford.genetics.treeview.LogBuffer;
-
 /**
  * This class is used to make an object which can take in the loaded data in its
  * format as originally coded in Java TreeView's first version and format it for
@@ -16,10 +11,6 @@ public class DataFormatter {
 
 	// getting the columns from raw data array
 	public double[][] splitColumns(final double[][] rawData) {
-
-		// Just checking for debugging
-		LogBuffer.println("Is DataFormatterArrays.splitColumns() on EDT? " 
-				+ SwingUtilities.isEventDispatchThread());
 				
 		// Number of arrays/ columns
 		// Assumes all arrays are same length
@@ -27,9 +18,6 @@ public class DataFormatter {
 		final int nRows = rawData.length;
 
 		final double[][] colList = new double[nCols][nRows];
-
-		// Setting up ProgressBar
-		ClusterView.setLoadText("Finding data columns...");
 
 		// Iterate through all columns
 		for (int j = 0; j < nCols; j++) {

@@ -431,18 +431,9 @@ public class KMeansCluster {
 			String[][] headerArray) {
 
 		final String[][] kClusters_string = new String[kClusters.length][];
-		final String[] axisLabelArray = new String[headerArray.length];
-
-		/* Get the name label only for each row */
-		int addIndex = 0;
-		for (final String[] rowHeader : headerArray) {
-
-			axisLabelArray[addIndex] = rowHeader[0];
-			addIndex++;
-		}
 
 		/* Replace the integers in kClusters with the name label strings */
-		addIndex = 0;
+		int addIndex = 0;
 		for (final int[] cluster : kClusters) {
 
 			final String[] geneNames = new String[cluster.length];
@@ -450,8 +441,7 @@ public class KMeansCluster {
 			int addIndexInner = 0;
 			for (final int mean : cluster) {
 
-				final String label = axisLabelArray[mean];
-				geneNames[addIndexInner] = label;
+				geneNames[addIndexInner] = headerArray[mean][0]; //label;
 				addIndexInner++;
 			}
 

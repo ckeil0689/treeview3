@@ -89,7 +89,7 @@ public class CDTGenerator {
 				colC = "_A" + col_clusterN;
 			}
 
-			fileEnd = "_K" + rowC + colC + ".CDT";
+			fileEnd = "_K" + rowC + colC + ".cdt";
 		}
 
 		final File file = new File(fileName + fileEnd);

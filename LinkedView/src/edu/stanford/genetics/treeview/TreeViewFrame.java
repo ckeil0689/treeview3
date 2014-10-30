@@ -78,7 +78,6 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		ConfigNodePersistent {
 
-	// Instance Variables
 	protected final JPanel bgPanel;
 	protected final JPanel btnPanel;
 	protected final JPanel waiting;
@@ -135,14 +134,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		treeView = treeview;
 		configNode = treeView.getGlobalConfig().node(
 				StringRes.pnode_TVFrame);
-		
-//		Debug stuff to clear configurations
-		// TODO make button out of this
-//		try {
-//			configNode.node("File").removeNode();
-//		} catch (BackingStoreException e) {
-//			e.printStackTrace();
-//		}
 		
 		// Initialize the views
 		welcomeView = new WelcomeView();

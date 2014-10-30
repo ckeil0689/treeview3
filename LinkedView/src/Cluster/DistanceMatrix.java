@@ -1,15 +1,24 @@
 package Cluster;
 
+import Utilities.Helper;
+
 
 public class DistanceMatrix {
 
 	private double[][] matrix;
+	
+	private int minRowIndex;
+	private int minColIndex;
+	
 	private int size;
 	
 	public DistanceMatrix(int size) {
 		
 		this.matrix = new double[size][];
 		this.size = size;
+		
+		/* To set the minimum indices. */
+		findCurrentMin(Double.MAX_VALUE);
 	}
 	
 	public void setMatrix(double[][] matrix) {
@@ -128,11 +137,63 @@ public class DistanceMatrix {
 	}
 	
 	/**
+	 * Finds and returns the current minimum value in the cluster matrix.
+	 * The minimum value determines which rows are closest together and will
+	 * be clustered. They will form a new row that replaces the other two and
+	 * as a result a new minimum must be found at each step to determine the
+	 * new row pair to be clustered.
+	 * Complexity: O(n^2)
+	 * @return The minimum value in the current distance matrix.
+	 */
+	public double findCurrentMin(double oldMin) {
+		
+		/* New min must be bigger than previous matrix min */
+		double newMin = Double.MAX_VALUE;
+		
+		for(int i = 0; i < matrix.length; i++) {
+			
+			double[] row = matrix[i];
+			
+			for(int j = 0; j < row.length; j++) {
+				
+				double element = row[j];
+				
+				if((element > oldMin || Helper.nearlyEqual(element, oldMin)) 
+						&& element < newMin) {
+					newMin = element;
+					minRowIndex = i;
+					minColIndex = j;
+				}
+			}
+		}
+		
+		return newMin;
+	}
+	
+	/**
 	 * Returns the amount of rows in the current distance matrix object.S
 	 * @return
 	 */
 	public int getSize() {
 		
 		return matrix.length;
+	}
+	
+	/**
+	 * Returns the row index of the matrix' current minimum value.
+	 * @return int Row index of current matrix minimum. 
+	 */
+	public int getMinRowIndex() {
+		
+		return minRowIndex;
+	}
+	
+	/**
+	 * Returns the col index of the matrix' current minimum value.
+	 * @return int Col index of current matrix minimum. 
+	 */
+	public int getMinColIndex() {
+		
+		return minColIndex;
 	}
 }

@@ -175,6 +175,7 @@ public class TVController {
 				tvFrame.setLoaded(true);
 				dendroController.setNew(tvFrame.getDendroView(), 
 						(TVModel) model);
+				tvFrame.setTitleString(model.getSource());
 				tvFrame.setView(StringRes.view_Dendro);
 
 			} else {

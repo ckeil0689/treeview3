@@ -330,8 +330,16 @@ public class ClusterProcessor {
 			} 
 			/* K-Means */
 			else {
-				int k = spinnerInput[0];
-				int iterations = spinnerInput[1];
+				int k; 
+				int iterations;
+				if(axis == ClusterController.ROW) {
+					k = spinnerInput[0];
+					iterations = spinnerInput[1];
+					
+				} else {
+					k = spinnerInput[2];
+					iterations = spinnerInput[3];
+				}
 				
 				KMeansCluster cGen = new KMeansCluster(distMatrix, axis, k, 
 						fileName);
