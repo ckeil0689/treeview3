@@ -572,6 +572,15 @@ public class DendroView implements Observer, DendroPanel {
 				+ "alignx 50%, wrap");
 		container.add(getArrayFinderPanel(arrayHI), "w 90%, h 40%, "
 				+ "alignx 50%");
+		
+		//Added this to de-select anything that was selected prior to
+		//clicking the search button so that the first search would not
+		//be restricted to what was selected prior to clicking the search
+		//button
+		tvFrame.getGeneSelection().deselectAllIndexes();
+		tvFrame.getGeneSelection().notifyObservers();
+		tvFrame.getArraySelection().deselectAllIndexes();
+		tvFrame.getArraySelection().notifyObservers();
 
 		dialog.getContentPane().add(container);
 		dialog.pack();
@@ -1194,6 +1203,9 @@ public class DendroView implements Observer, DendroPanel {
 				tvFrame.getGeneSelection());
 
 		final JPanel contentPanel = geneFinderBox.getContentPanel();
+		
+		//Added this as a test/kludge to de-select anything that was selected prior to clicking the search button
+		//geneFinderBox.seekAll();
 
 		return contentPanel;
 	}
@@ -1210,6 +1222,9 @@ public class DendroView implements Observer, DendroPanel {
 				tvFrame.getArraySelection());
 
 		final JPanel contentPanel = arrayFinderBox.getContentPanel();
+		
+		//Added this as a test/kludge to de-select anything that was selected prior to clicking the search button
+		//arrayFinderBox.seekAll();
 
 		return contentPanel;
 	}
