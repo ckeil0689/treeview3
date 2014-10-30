@@ -357,6 +357,7 @@ public class GlobalView2 extends ModelViewProduced implements
 	protected void updatePixels() {
 
 		if (offscreenChanged) {
+			//LogBuffer.println("OFFSCREEN CHANGED");
 			offscreenValid = false;
 			xmap.setAvailablePixels(offscreenSize.width);
 			ymap.setAvailablePixels(offscreenSize.height);
@@ -383,6 +384,7 @@ public class GlobalView2 extends ModelViewProduced implements
 		}
 
 		if (!offscreenValid) {
+			//LogBuffer.println("OFFSCREEN INVALID");
 			final Rectangle destRect = new Rectangle(0, 0,
 					xmap.getUsedPixels(), ymap.getUsedPixels());
 
