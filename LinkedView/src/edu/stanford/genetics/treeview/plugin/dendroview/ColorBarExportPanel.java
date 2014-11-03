@@ -73,12 +73,12 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 	// external links
 	private FileSet sourceSet;// FileSet from which current data was
 								// constructed.
-	private ColorExtractor2 colorExtractor;
+	private ColorExtractor colorExtractor;
 
 	/**
 	 * The ColorExtractor is used to determine colors for the color bar.
 	 */
-	public void setColorExtractor(final ColorExtractor2 colorExtractor) {
+	public void setColorExtractor(final ColorExtractor colorExtractor) {
 
 		this.colorExtractor = colorExtractor;
 	}
@@ -87,7 +87,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 	 * The ColorExtractor is used to determine colors for the global and zoom
 	 * views.
 	 */
-	public ColorExtractor2 getColorExtractor() {
+	public ColorExtractor getColorExtractor() {
 
 		return colorExtractor;
 	}
@@ -202,7 +202,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 	 * @param colorExtractor
 	 *            Description of the Parameter
 	 */
-	public ColorBarExportPanel(final ColorExtractor2 colorExtractor) {
+	public ColorBarExportPanel(final ColorExtractor colorExtractor) {
 
 		this.colorExtractor = colorExtractor;
 		setupWidgets();
@@ -216,7 +216,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 	 */
 	public final static void main(final String[] argv) {
 
-		final ColorExtractor2 colorE = new ColorExtractor2();
+		final ColorExtractor colorE = new ColorExtractor();
 		colorE.setDefaults();
 		final double contrast = colorE.getContrast();
 		colorE.setMissing(contrast * 2, contrast * 2);
@@ -1055,7 +1055,7 @@ class TestColorBarExportPanel extends ColorBarExportPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	TestColorBarExportPanel(final ColorExtractor2 colorExtractor) {
+	TestColorBarExportPanel(final ColorExtractor colorExtractor) {
 
 		super(colorExtractor);
 	}
