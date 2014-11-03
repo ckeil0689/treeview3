@@ -78,13 +78,15 @@ public class TVController {
 		
 		try {
 			final int option = JOptionPane.showConfirmDialog(applicationFrame,
-					"Are you sure you want to reset preferences?", 
+					"Are you sure you want to reset preferences and close TreeView?", 
 					"Reset Preferences?", JOptionPane.YES_NO_OPTION);
 
 			switch (option) {
 
 				case JOptionPane.YES_OPTION:	
 					tvFrame.getConfigNode().node("File").removeNode();
+					tvFrame.saveSettings();
+					tvFrame.getAppFrame().dispose();
 					break;
 												
 				case JOptionPane.NO_OPTION:		
