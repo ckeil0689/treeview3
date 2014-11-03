@@ -699,8 +699,8 @@ public class TVController {
 				
 				if(menu.equalsIgnoreCase(StringRes.menu_Color)) {
 					
-					int min = (int)model.getDataMatrix().getMinVal();
-					int max = (int)model.getDataMatrix().getMaxVal();
+					Double min = model.getDataMatrix().getMinVal();
+					Double max = model.getDataMatrix().getMaxVal();
 					
 					/* View */
 					ColorChooser gradientPick = 

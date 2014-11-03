@@ -74,7 +74,7 @@ public class ColorChooser implements ConfigNodePersistent {
 
 	private Thumb selectedThumb = null;
 
-	public ColorChooser(final ColorExtractor drawer, int minVal, int maxVal) {
+	public ColorChooser(final ColorExtractor drawer, Double minVal, Double maxVal) {
 
 		this.colorExtractor = drawer;
 		this.colorPresets = DendrogramFactory.getColorPresets();
@@ -699,7 +699,7 @@ public class ColorChooser implements ConfigNodePersistent {
 				final int deltaX = inputX - selectedThumb.getX();
 				final int newX = selectedThumb.getX() + deltaX;
 
-				if (previousPos < newX && newX < nextPos) {
+				if (previousPos <= newX && newX <= nextPos) {
 					selectedThumb.setCoords(newX, selectedThumb.getY());
 					fractions = updateFractions();
 
@@ -781,8 +781,8 @@ public class ColorChooser implements ConfigNodePersistent {
 								final double inputDataValue = Double
 										.parseDouble(inputField.getText());
 
-								if (inputDataValue > minVal
-										&& inputDataValue < maxVal) {
+								if (inputDataValue >= minVal
+										&& inputDataValue <= maxVal) {
 
 									final double fraction = Math
 											.abs(inputDataValue - minVal)
