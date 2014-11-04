@@ -251,8 +251,8 @@ public abstract class HeaderFinderBox {
 				(minIndex < globalSmap.getFirstVisible() ||
 				 maxIndex > (globalSmap.getFirstVisible() + globalSmap.getNumVisible() - 1))) {
 			
-			LogBuffer.println("The search result is outside the visible area.");
-			LogBuffer.println("The search result is outside the visible area: [" + minIndex + " < " + globalSmap.getFirstVisible() + "] || [" + maxIndex + " > (" + globalSmap.getFirstVisible() + " + " + globalSmap.getNumVisible() + " - 1)].");
+			//LogBuffer.println("The search result is outside the visible area.");
+			//LogBuffer.println("The search result is outside the visible area: [" + minIndex + " < " + globalSmap.getFirstVisible() + "] || [" + maxIndex + " > (" + globalSmap.getFirstVisible() + " + " + globalSmap.getNumVisible() + " - 1)].");
 			globalSmap.setHome();
 //Commented this out because it wasn't doing anything anyway
 //			scrollToIndex(indexList.get(0));
@@ -262,8 +262,8 @@ public abstract class HeaderFinderBox {
 				 otherMinIndex < globalOmap.getFirstVisible() ||
 				 otherMaxIndex > (globalOmap.getFirstVisible() + globalOmap.getNumVisible() - 1))) {
 			
-			LogBuffer.println("Search result: [" + minIndex + " < " + globalSmap.getFirstVisible() + "] || [" + maxIndex + " > (" + globalSmap.getFirstVisible() + " + " + globalSmap.getNumVisible() + " - 1)].");
-			LogBuffer.println("A whole row is being returned or the already-selected data is outside of the visible area: [" + otherIndexList.size() + " == 0] || [" + otherMinIndex + " < " + globalOmap.getFirstVisible() + "] || [" + otherMaxIndex + " > (" + globalOmap.getFirstVisible() + " + " + globalOmap.getNumVisible() + " - 1)].");
+			//LogBuffer.println("Search result: [" + minIndex + " < " + globalSmap.getFirstVisible() + "] || [" + maxIndex + " > (" + globalSmap.getFirstVisible() + " + " + globalSmap.getNumVisible() + " - 1)].");
+			//LogBuffer.println("A whole row is being returned or the already-selected data is outside of the visible area: [" + otherIndexList.size() + " == 0] || [" + otherMinIndex + " < " + globalOmap.getFirstVisible() + "] || [" + otherMaxIndex + " > (" + globalOmap.getFirstVisible() + " + " + globalOmap.getNumVisible() + " - 1)].");
 			globalOmap.setHome();
 		}
 	}

@@ -36,10 +36,6 @@ public class GeneFinderBox extends HeaderFinderBox {
 	 * @see edu.stanford.genetics.treeview.HeaderFinder#scrollToIndex(int)
 	 */
 	@Override
-	public void scrollToIndex(final int i) {
-
-		LogBuffer.println("Scrolling to gene index [" + i + "].");
-		//		viewFrame.scrollToGene(i);
-	}
+	public void scrollToIndex(final int i) {}
 
 }

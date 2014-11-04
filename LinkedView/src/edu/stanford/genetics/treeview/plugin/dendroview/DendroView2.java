@@ -1205,7 +1205,7 @@ public class DendroView2 implements Observer, DendroPanel {
 	 */
 	public JPanel getArrayFinderPanel(HeaderInfo arrayHI, HeaderInfo geneHI) {
 
-		LogBuffer.println("Creating array finder box.  Current visible array start index is: [" + globalYmap.getFirstVisible() + "].  Num visible array indexes is: [" + globalYmap.getNumVisible() + "].");
+		//LogBuffer.println("Creating array finder box.  Current visible array start index is: [" + globalYmap.getFirstVisible() + "].  Num visible array indexes is: [" + globalYmap.getNumVisible() + "].");
 		final HeaderFinderBox arrayFinderBox = new ArrayFinderBox(tvFrame,
 				arrayHI, getArraynameview().getHeaderSummary(),
 				tvFrame.getArraySelection(),globalXmap,globalYmap,tvFrame.getGeneSelection(),geneHI);

@@ -36,11 +36,5 @@ public class ArrayFinderBox extends HeaderFinderBox {
 	 * @see edu.stanford.genetics.treeview.HeaderFinder#scrollToIndex(int)
 	 */
 	@Override
-	public void scrollToIndex(final int i) {
-
-		LogBuffer.println("Scrolling to array index [" + i + "].");
-		if (viewFrame != null) {
-//			viewFrame.scrollToArray(i);
-		}
-	}
+	public void scrollToIndex(final int i) {}
 }
