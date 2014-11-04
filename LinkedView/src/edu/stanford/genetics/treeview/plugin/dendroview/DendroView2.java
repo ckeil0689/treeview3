@@ -134,6 +134,10 @@ public class DendroView2 implements Observer, DendroPanel {
 	private TreeSelectionI geneSelection = null;
 	private TreeSelectionI arraySelection = null;
 
+	//MapContainers in order to keep track of current visible data indexes
+	protected MapContainer globalXmap = null;
+	protected MapContainer globalYmap = null;
+
 	/**
 	 * Chained constructor for the DendroView object note this will reuse any
 	 * existing MainView subnode of the documentconfig.
@@ -559,9 +563,11 @@ public class DendroView2 implements Observer, DendroPanel {
 
 		container.add(wildTip, "span, wrap");
 		container.add(wildTip2, "span, wrap");
-		container.add(getGeneFinderPanel(geneHI), "w 90%, h 40%, "
+		//Adding arrayHI in order to be able to determine where the selected cells are and if they are currently visible
+		container.add(getGeneFinderPanel(geneHI,arrayHI), "w 90%, h 40%, "
 				+ "alignx 50%, wrap");
-		container.add(getArrayFinderPanel(arrayHI), "w 90%, h 40%, "
+		//Adding geneHI in order to be able to determine where the selected cells are and if they are currently visible
+		container.add(getArrayFinderPanel(arrayHI,geneHI), "w 90%, h 40%, "
 				+ "alignx 50%");
 
 		dialog.getContentPane().add(container);
@@ -1178,13 +1184,16 @@ public class DendroView2 implements Observer, DendroPanel {
 		this.tvFrame = viewFrame;
 	}
 
-	public JPanel getGeneFinderPanel(HeaderInfo geneHI) {
+	public JPanel getGeneFinderPanel(HeaderInfo geneHI, HeaderInfo arrayHI) {
 
 		final HeaderFinderBox geneFinderBox = new GeneFinderBox(tvFrame,
 				geneHI, getTextview().getHeaderSummary(), 
-				tvFrame.getGeneSelection());
+				tvFrame.getGeneSelection(),globalYmap,globalXmap,tvFrame.getArraySelection(),arrayHI);
 
 		final JPanel contentPanel = geneFinderBox.getContentPanel();
+		
+		//Added this as a test/kludge to de-select anything that was selected prior to clicking the search button
+		//geneFinderBox.seekAll();
 
 		return contentPanel;
 	}
@@ -1194,13 +1203,17 @@ public class DendroView2 implements Observer, DendroPanel {
 	 * 
 	 * @return HeaderFinderPanel arrayFinderPanel
 	 */
-	public JPanel getArrayFinderPanel(HeaderInfo arrayHI) {
+	public JPanel getArrayFinderPanel(HeaderInfo arrayHI, HeaderInfo geneHI) {
 
+		LogBuffer.println("Creating array finder box.  Current visible array start index is: [" + globalYmap.getFirstVisible() + "].  Num visible array indexes is: [" + globalYmap.getNumVisible() + "].");
 		final HeaderFinderBox arrayFinderBox = new ArrayFinderBox(tvFrame,
 				arrayHI, getArraynameview().getHeaderSummary(),
-				tvFrame.getArraySelection());
+				tvFrame.getArraySelection(),globalXmap,globalYmap,tvFrame.getGeneSelection(),geneHI);
 
 		final JPanel contentPanel = arrayFinderBox.getContentPanel();
+		
+		//Added this as a test/kludge to de-select anything that was selected prior to clicking the search button
+		//arrayFinderBox.seekAll();
 
 		return contentPanel;
 	}

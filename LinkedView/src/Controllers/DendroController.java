@@ -135,6 +135,10 @@ public class DendroController implements ConfigNodePersistent {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
+			//Putting the mapContainer objects in DendroView so that I can control zoom-out of the found genes/arrays are outside the visible area
+			dendroView.setGlobalXMap(globalXmap);
+			dendroView.setGlobalYMap(globalYmap);
+			//Adding the mapContainer objects here so that the search dialog can determine if results are visible in order to be able to determine whether to zoom out
 			dendroView.openSearchDialog(tvModel.getGeneHeaderInfo(), 
 					tvModel.getArrayHeaderInfo());
 		}

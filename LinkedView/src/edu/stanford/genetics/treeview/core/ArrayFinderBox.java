@@ -7,8 +7,10 @@ package edu.stanford.genetics.treeview.core;
 
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.ViewFrame;
+import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 
 /**
  * @author aloksaldanha
@@ -23,9 +25,9 @@ public class ArrayFinderBox extends HeaderFinderBox {
 	 */
 	public ArrayFinderBox(final ViewFrame f, final HeaderInfo hI, 
 			final HeaderSummary headerSummary, 
-			final TreeSelectionI geneSelection) {
+			final TreeSelectionI arraySelection, final MapContainer globalYmap, final MapContainer globalXmap, final TreeSelectionI geneSelection, final HeaderInfo geneHI) {
 
-		super(f, hI, headerSummary, geneSelection, "Column");
+		super(f, hI, headerSummary, arraySelection, "Column", globalYmap, globalXmap, geneSelection, geneHI);
 	}
 
 	/*
@@ -36,6 +38,7 @@ public class ArrayFinderBox extends HeaderFinderBox {
 	@Override
 	public void scrollToIndex(final int i) {
 
+		LogBuffer.println("Scrolling to array index [" + i + "].");
 		if (viewFrame != null) {
 //			viewFrame.scrollToArray(i);
 		}

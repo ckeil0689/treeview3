@@ -128,7 +128,7 @@ public class MapContainer extends Observable implements Observer,
 		//Keep track of explicit changes, by the user, to the amount of
 		//visible data
 		firstVisible = 0;
-		numVisible = getMaxIndex();
+		numVisible = getMaxIndex() + 1;
 		
 		setScale(minScale);
 	}

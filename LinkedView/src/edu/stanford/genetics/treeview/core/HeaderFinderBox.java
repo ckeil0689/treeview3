@@ -50,6 +50,8 @@ import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.WideComboBox;
+//import edu.stanford.genetics.treeview.plugin.dendroview.GlobalView2;
+import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 
 /**
  * This class allows users to look for row or column elements by choosing them
@@ -62,37 +64,54 @@ import edu.stanford.genetics.treeview.WideComboBox;
  */
 public abstract class HeaderFinderBox {
 
-	protected TreeSelectionI geneSelection;
+	protected TreeSelectionI searchSelection;
 	protected ViewFrame viewFrame;
 
 	private final HeaderInfo headerInfo;
 	private final HeaderSummary headerSummary;
 
-	private final List<String> geneList;
+	private final List<String> searchDataList;
 	private String[] genefHeaders = { "" };
 	private final WideComboBox genefBox;
 	private final JButton genefButton;
 
 	private final JPanel contentPanel;
+	
+	//These are in order to determine whether a search result is currently visible and if so, to zoom out
+	protected TreeSelectionI otherSelection;
+	private MapContainer globalSmap;
+	private MapContainer globalOmap;
+	private final HeaderInfo otherHeaderInfo;
+	private final List<String> otherDataList;
+	private String[] otherDataHeaders = { "" };
+	//private GlobalView2 globalview;
 
 	// "Search Gene Text for Substring"
 	public HeaderFinderBox(final ViewFrame f, final HeaderInfo hI, 
 			final HeaderSummary headerSummary, final TreeSelectionI 
-			geneSelection, final String type) {
+			searchSelection, final String type,
+			final MapContainer globalSmap, final MapContainer globalOmap, final TreeSelectionI otherSelection, final HeaderInfo ohI) {
 
-		this(f.getAppFrame(), hI, headerSummary, geneSelection, type);
+		this(f.getAppFrame(), hI, headerSummary, searchSelection, otherSelection, type, ohI);
 		this.viewFrame = f;
+		
+		//Hopefully this isn't too late of a place to set this, otherwise, I'll have to pass it along instead of set it here
+		this.globalSmap = globalSmap;
+		this.globalOmap = globalOmap;
+		//this.globalview = globalview;
 	}
 
 	private HeaderFinderBox(final JFrame f, final HeaderInfo hI, 
 			final HeaderSummary headerSummary,
-			final TreeSelectionI geneSelection, final String type) {
+			final TreeSelectionI searchSelection, final TreeSelectionI otherSelection, final String type, final HeaderInfo ohI) {
 
 		super();
-		this.viewFrame = null;
-		this.headerInfo = hI;
-		this.headerSummary = headerSummary;
-		this.geneSelection = geneSelection;
+		this.viewFrame       = null;
+		this.headerInfo      = hI;
+		this.headerSummary   = headerSummary;
+		this.searchSelection = searchSelection;
+		this.otherSelection  = otherSelection;
+		this.otherHeaderInfo = ohI;
 
 		contentPanel = GUIFactory.createJPanel(false, true, null);
 
@@ -100,12 +119,12 @@ public abstract class HeaderFinderBox {
 
 		final String genef = "Search " + type + " Labels... ";
 
-		geneList = new ArrayList<String>();
+		searchDataList = new ArrayList<String>();
 		genefHeaders = getGenes(hA);
 
 		for (final String gene : genefHeaders) {
 
-			geneList.add(gene);
+			searchDataList.add(gene);
 		}
 
 		final String[] labeledHeaders = new String[genefHeaders.length + 1];
@@ -113,6 +132,15 @@ public abstract class HeaderFinderBox {
 		labeledHeaders[0] = genef;
 
 		Arrays.sort(genefHeaders);
+
+		//Going to keep track of the other dimension's headers so that we can determine if the search results are currently visible (at current zoom level)
+		final String[][] ohA = otherHeaderInfo.getHeaderArray();
+		otherDataList = new ArrayList<String>();
+		otherDataHeaders = getGenes(ohA);
+		for (final String item : otherDataHeaders) {
+
+			otherDataList.add(item);
+		}
 
 		System.arraycopy(genefHeaders, 0, labeledHeaders, 1,
 				genefHeaders.length);
@@ -172,20 +200,71 @@ public abstract class HeaderFinderBox {
 
 	public void seekAll() {
 		
-		geneSelection.setSelectedNode(null);
-		geneSelection.deselectAllIndexes();
+		searchSelection.setSelectedNode(null);
+		searchSelection.deselectAllIndexes();
 
 		List<Integer> indexList = findSelected();
 		
+		//Initialize the min and max index used to determine whether result is currently visible
+		int minIndex = 0;
+		int maxIndex = 0;
+		if(indexList.size() > 0) {
+			minIndex = indexList.get(0);
+			maxIndex = indexList.get(0);
+		}
+		
+		//Set the found indexes as selected and determine min/max selected indexes
 		for(int i = 0; i < indexList.size(); i++) {
 			
-			geneSelection.setIndexSelection(indexList.get(i), true);
+			if(indexList.get(i) < minIndex) {
+				minIndex = indexList.get(i);
+			}
+			if(indexList.get(i) > maxIndex) {
+				maxIndex = indexList.get(i);
+			}
+			searchSelection.setIndexSelection(indexList.get(i), true);
 		}
 
-		geneSelection.notifyObservers();
+		searchSelection.notifyObservers();
+		
+		//Determine pre-selected min/max from the other dimension to see if they are visible
+		List<Integer> otherIndexList = getOtherSelected();
+		int otherMinIndex = 0;
+		int otherMaxIndex = 0;
+		if(indexList.size() > 0) {
+			otherMinIndex = otherIndexList.get(0);
+			otherMaxIndex = otherIndexList.get(0);
+		}
+		for(int i = 0; i < otherIndexList.size(); i++) {
+			
+			if(otherIndexList.get(i) < otherMinIndex) {
+				otherMinIndex = otherIndexList.get(i);
+			}
+			if(otherIndexList.get(i) > otherMaxIndex) {
+				otherMaxIndex = otherIndexList.get(i);
+			}
+		}
 
-		if ((viewFrame != null) && (indexList.size() > 0)) {
-			scrollToIndex(indexList.get(0));
+		if((viewFrame != null) && (indexList.size() > 0) &&
+				//At least part of the found min/max selected area is not visible
+				//This assumes that min is less than max and that the visible area is a contiguous block of visible indexes
+				(minIndex < globalSmap.getFirstVisible() ||
+				 maxIndex > (globalSmap.getFirstVisible() + globalSmap.getNumVisible() - 1))) {
+			
+			LogBuffer.println("The search result is outside the visible area.");
+			LogBuffer.println("The search result is outside the visible area: [" + minIndex + " < " + globalSmap.getFirstVisible() + "] || [" + maxIndex + " > (" + globalSmap.getFirstVisible() + " + " + globalSmap.getNumVisible() + " - 1)].");
+			globalSmap.setHome();
+//Commented this out because it wasn't doing anything anyway
+//			scrollToIndex(indexList.get(0));
+		}
+
+		if((viewFrame != null) && (otherIndexList.size() == 0 ||
+				 otherMinIndex < globalOmap.getFirstVisible() ||
+				 otherMaxIndex > (globalOmap.getFirstVisible() + globalOmap.getNumVisible() - 1))) {
+			
+			LogBuffer.println("Search result: [" + minIndex + " < " + globalSmap.getFirstVisible() + "] || [" + maxIndex + " > (" + globalSmap.getFirstVisible() + " + " + globalSmap.getNumVisible() + " - 1)].");
+			LogBuffer.println("A whole row is being returned or the already-selected data is outside of the visible area: [" + otherIndexList.size() + " == 0] || [" + otherMinIndex + " < " + globalOmap.getFirstVisible() + "] || [" + otherMaxIndex + " > (" + globalOmap.getFirstVisible() + " + " + globalOmap.getNumVisible() + " - 1)].");
+			globalOmap.setHome();
 		}
 	}
 	
@@ -195,16 +274,30 @@ public abstract class HeaderFinderBox {
 		
 		String sub = genefBox.getSelectedItem().toString();
 		
-		for(String gene : geneList) {
+		for(String gene : searchDataList) {
 			
 			if(wildCardMatch(gene, sub)) {
-				indexList.add(geneList.indexOf(gene));
+				indexList.add(searchDataList.indexOf(gene));
 			}
 		}
 		
 		return indexList;
 	}
 	
+	private List<Integer> getOtherSelected() {
+		
+		List<Integer> indexList = new ArrayList<Integer>();
+		
+		for(String item : otherDataList) {
+			
+			if(otherSelection.isIndexSelected(otherDataList.indexOf(item))) {
+				indexList.add(otherDataList.indexOf(item));
+			}
+		}
+		
+		return indexList;
+	}
+
 	/**
      * Performs a wildcard matching for the text and pattern 
      * provided. Matching is done based on regex patterns.
