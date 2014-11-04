@@ -50,13 +50,12 @@ import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.WideComboBox;
-//import edu.stanford.genetics.treeview.plugin.dendroview.GlobalView2;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 
 /**
  * This class allows users to look for row or column elements by choosing them
  * in a drop down menu. The menu is populated with headers from the loaded data
- * matrix. The class is abstract and a basis for the GeneFinderPanel class as
+ * matrix. The class is abstract and a basis for the defaultTextinderPanel class as
  * well as the ArrayFinderPanel class.
  * 
  * It extends JPanel and can be used as a Swing component.
@@ -71,9 +70,9 @@ public abstract class HeaderFinderBox {
 	private final HeaderSummary headerSummary;
 
 	private final List<String> searchDataList;
-	private String[] genefHeaders = { "" };
-	private final WideComboBox genefBox;
-	private final JButton genefButton;
+	private String[] searchDataHeaders = { "" };
+	private final WideComboBox searchTermBox;
+	private final JButton searchButton;
 
 	private final JPanel contentPanel;
 	
@@ -86,7 +85,7 @@ public abstract class HeaderFinderBox {
 	private String[] otherDataHeaders = { "" };
 	//private GlobalView2 globalview;
 
-	// "Search Gene Text for Substring"
+	// "Search for Substring"
 	public HeaderFinderBox(final ViewFrame f, final HeaderInfo hI, 
 			final HeaderSummary headerSummary, final TreeSelectionI 
 			searchSelection, final String type,
@@ -117,44 +116,44 @@ public abstract class HeaderFinderBox {
 
 		final String[][] hA = headerInfo.getHeaderArray();
 
-		final String genef = "Search " + type + " Labels... ";
+		final String defaultText = "Search " + type + " Labels... ";
 
 		searchDataList = new ArrayList<String>();
-		genefHeaders = getGenes(hA);
+		searchDataHeaders = getHeaders(hA);
 
-		for (final String gene : genefHeaders) {
+		for (final String gene : searchDataHeaders) {
 
 			searchDataList.add(gene);
 		}
 
-		final String[] labeledHeaders = new String[genefHeaders.length + 1];
+		final String[] labeledHeaders = new String[searchDataHeaders.length + 1];
 
-		labeledHeaders[0] = genef;
+		labeledHeaders[0] = defaultText;
 
-		Arrays.sort(genefHeaders);
+		Arrays.sort(searchDataHeaders);
 
 		//Going to keep track of the other dimension's headers so that we can determine if the search results are currently visible (at current zoom level)
 		final String[][] ohA = otherHeaderInfo.getHeaderArray();
 		otherDataList = new ArrayList<String>();
-		otherDataHeaders = getGenes(ohA);
+		otherDataHeaders = getHeaders(ohA);
 		for (final String item : otherDataHeaders) {
 
 			otherDataList.add(item);
 		}
 
-		System.arraycopy(genefHeaders, 0, labeledHeaders, 1,
-				genefHeaders.length);
+		System.arraycopy(searchDataHeaders, 0, labeledHeaders, 1,
+				searchDataHeaders.length);
 
-		genefBox = GUIFactory.createWideComboBox(labeledHeaders);
-		genefBox.setEditable(true);
-		AutoCompleteDecorator.decorate(genefBox);
+		searchTermBox = GUIFactory.createWideComboBox(labeledHeaders);
+		searchTermBox.setEditable(true);
+		AutoCompleteDecorator.decorate(searchTermBox);
 		
-		genefBox.getEditor().getEditorComponent().addKeyListener(
+		searchTermBox.getEditor().getEditorComponent().addKeyListener(
 				new BoxKeyListener());
 
-		genefButton = GUIFactory.createNavBtn("searchIcon");
-		genefButton.setToolTipText("Highlights the selected label.");
-		genefButton.addActionListener(new ActionListener() {
+		searchButton = GUIFactory.createNavBtn("searchIcon");
+		searchButton.setToolTipText("Highlights the selected label.");
+		searchButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -163,8 +162,8 @@ public abstract class HeaderFinderBox {
 			}
 		});
 
-		contentPanel.add(genefBox);
-		contentPanel.add(genefButton);
+		contentPanel.add(searchTermBox);
+		contentPanel.add(searchButton);
 	}
 
 	/**
@@ -184,18 +183,18 @@ public abstract class HeaderFinderBox {
 	 * @param hA
 	 * @return
 	 */
-	public String[] getGenes(final String[][] hA) {
+	public String[] getHeaders(final String[][] hA) {
 
-		final String[] geneArray = new String[hA.length];
+		final String[] headerArray = new String[hA.length];
 		int idIndex = headerSummary.getIncluded()[0];
 
 		for (int i = 0; i < hA.length; i++) {
 
 			final String yorf = hA[i][idIndex];
-			geneArray[i] = yorf;
+			headerArray[i] = yorf;
 		}
 
-		return geneArray;
+		return headerArray;
 	}
 
 	public void seekAll() {
@@ -272,12 +271,12 @@ public abstract class HeaderFinderBox {
 		
 		List<Integer> indexList = new ArrayList<Integer>();
 		
-		String sub = genefBox.getSelectedItem().toString();
+		String sub = searchTermBox.getSelectedItem().toString();
 		
-		for(String gene : searchDataList) {
+		for(String header : searchDataList) {
 			
-			if(wildCardMatch(gene, sub)) {
-				indexList.add(searchDataList.indexOf(gene));
+			if(wildCardMatch(header, sub)) {
+				indexList.add(searchDataList.indexOf(header));
 			}
 		}
 		
