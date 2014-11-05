@@ -13,7 +13,6 @@ import javax.swing.JColorChooser;
 import javax.swing.Timer;
 
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet2;
 
 public class ColorChooserController {
 
@@ -243,10 +242,10 @@ public class ColorChooserController {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			final ColorSet2 temp = new ColorSet2();
+			//final ColorSet temp = new ColorSet();
 			// colorExtractorEditor.copyStateTo(temp);
-			temp.setName("UserDefined");
-			gradientPick.addColorSet(temp);
+			//temp.setName("UserDefined");
+			//gradientPick.addColorSet(temp);
 		}
 
 	}

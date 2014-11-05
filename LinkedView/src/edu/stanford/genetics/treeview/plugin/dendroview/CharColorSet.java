@@ -274,7 +274,7 @@ public class CharColorSet implements ConfigNodePersistent {
 	 */
 	public final static Color decodeColor(final String colorString) {
 
-		return ColorSet2.decodeColor(colorString);
+		return ColorSet.decodeColor(colorString);
 	}
 
 	/**
@@ -286,6 +286,6 @@ public class CharColorSet implements ConfigNodePersistent {
 	 */
 	public final static String encodeColor(final Color color) {
 
-		return ColorSet2.encodeColor(color);
+		return ColorSet.encodeColor(color);
 	}
 }

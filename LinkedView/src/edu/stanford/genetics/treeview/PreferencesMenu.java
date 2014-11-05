@@ -187,7 +187,7 @@ public class PreferencesMenu extends CustomDialog implements ConfigNodePersisten
 //	 */
 //	class PixelSettingsPanel {
 //
-//		private final ColorExtractor2 ce = null;
+//		private final ColorExtractor ce = null;
 //		private final JScrollPane scrollPane;
 //
 //		public PixelSettingsPanel() {
