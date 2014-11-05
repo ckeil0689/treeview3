@@ -7,8 +7,8 @@ public class DistanceMatrix {
 
 	private double[][] matrix;
 	
-	private int minRowIndex;
-	private int minColIndex;
+	private int min_row_index;
+	private int min_col_index;
 	
 	private int size;
 	
@@ -45,20 +45,6 @@ public class DistanceMatrix {
 	public double[] getRow(int index) {
 		
 		return this.matrix[index];
-	}
-	
-	/**
-	 * Sets a column of the matrix by replacing values at a given 
-	 * column index for eac row.
-	 * @param col The array to be set.
-	 * @param index Index of the column to be set.
-	 */
-	public void setColumn(double[] col, int index) {
-		
-		for(int i = 0; i < matrix.length; i++) {
-			
-			matrix[i][index] = col[i];
-		}
 	}
 	
 	/**
@@ -161,8 +147,8 @@ public class DistanceMatrix {
 				if((element > oldMin || Helper.nearlyEqual(element, oldMin)) 
 						&& element < newMin) {
 					newMin = element;
-					minRowIndex = i;
-					minColIndex = j;
+					min_row_index = i;
+					min_col_index = j;
 				}
 			}
 		}
@@ -185,7 +171,7 @@ public class DistanceMatrix {
 	 */
 	public int getMinRowIndex() {
 		
-		return minRowIndex;
+		return min_row_index;
 	}
 	
 	/**
@@ -194,6 +180,6 @@ public class DistanceMatrix {
 	 */
 	public int getMinColIndex() {
 		
-		return minColIndex;
+		return min_col_index;
 	}
 }
