@@ -38,8 +38,8 @@ import edu.stanford.genetics.treeview.model.ReorderedDataModel;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.plugin.dendroview.ArrayDrawer;
 import edu.stanford.genetics.treeview.plugin.dendroview.AtrAligner;
-import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor2;
-import edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets2;
+import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
+import edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroException;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
@@ -73,7 +73,7 @@ public class DendroController implements ConfigNodePersistent {
 	private TreeSelectionI arraySelection = null;
 
 	// Color Extractor
-	private ColorExtractor2 colorExtractor;
+	private ColorExtractor colorExtractor;
 
 	public DendroController(final TreeViewFrame tvFrame) {
 
@@ -876,9 +876,9 @@ public class DendroController implements ConfigNodePersistent {
 		// Give components access to TVModel
 		// dendroView.getArraynameview().setDataModel(tvModel);
 
-		final ColorPresets2 colorPresets = DendrogramFactory.getColorPresets();
+		final ColorPresets colorPresets = DendrogramFactory.getColorPresets();
 		colorPresets.setConfigNode(configNode);
-		colorExtractor = new ColorExtractor2();
+		colorExtractor = new ColorExtractor();
 		colorExtractor.setDefaultColorSet(colorPresets.getDefaultColorSet());
 		colorExtractor.setMissing(DataModel.NODATA, DataModel.EMPTY);
 

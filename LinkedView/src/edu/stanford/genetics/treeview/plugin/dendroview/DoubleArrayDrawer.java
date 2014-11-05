@@ -64,7 +64,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
 public class DoubleArrayDrawer extends ArrayDrawer {
 
 	/** Used to convert data values into colors */
-	protected ColorExtractor2 colorExtractor;
+	protected ColorExtractor colorExtractor;
 
 	/** The array of data values to be rendered. */
 	protected DataMatrix dataMatrix;
@@ -81,7 +81,7 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 	 * @param colorExtractor
 	 *            A ColorExtractor to draw required pixels
 	 */
-	public void setColorExtractor(final ColorExtractor2 colorExtractor) {
+	public void setColorExtractor(final ColorExtractor colorExtractor) {
 
 		if (this.colorExtractor != null) {
 			this.colorExtractor.deleteObserver(this);
@@ -97,7 +97,7 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 	 * 
 	 * @return The colorExtractor value
 	 */
-	public ColorExtractor2 getColorExtractor() {
+	public ColorExtractor getColorExtractor() {
 
 		return colorExtractor;
 	}

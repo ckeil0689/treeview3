@@ -78,13 +78,15 @@ public class TVController {
 		
 		try {
 			final int option = JOptionPane.showConfirmDialog(applicationFrame,
-					"Are you sure you want to reset preferences?", 
+					"Are you sure you want to reset preferences and close TreeView?", 
 					"Reset Preferences?", JOptionPane.YES_NO_OPTION);
 
 			switch (option) {
 
 				case JOptionPane.YES_OPTION:	
 					tvFrame.getConfigNode().node("File").removeNode();
+					tvFrame.saveSettings();
+					tvFrame.getAppFrame().dispose();
 					break;
 												
 				case JOptionPane.NO_OPTION:		
@@ -699,8 +701,8 @@ public class TVController {
 				
 				if(menu.equalsIgnoreCase(StringRes.menu_Color)) {
 					
-					int min = (int)model.getDataMatrix().getMinVal();
-					int max = (int)model.getDataMatrix().getMaxVal();
+					Double min = model.getDataMatrix().getMinVal();
+					Double max = model.getDataMatrix().getMaxVal();
 					
 					/* View */
 					ColorChooser gradientPick = 

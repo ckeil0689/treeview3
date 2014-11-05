@@ -43,7 +43,7 @@ public class GifColorBarExportPanel extends ColorBarExportPanel implements
 		SettingsPanel {
 
 	// I wish I could just inherit this...
-	public GifColorBarExportPanel(final ColorExtractor2 colorExtractor) {
+	public GifColorBarExportPanel(final ColorExtractor colorExtractor) {
 
 		super(colorExtractor);
 	}
