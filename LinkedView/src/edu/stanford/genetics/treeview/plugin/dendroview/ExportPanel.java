@@ -1076,7 +1076,12 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		 */
 		destRect.setBounds(0, 0, width, height);
 		final int[] pixels = new int[width * height];
-		arrayDrawer.paint(pixels, sourceRect, destRect, width);
+		int[] geneSelections = new int[] {geneSelection.getMinIndex(), 
+				geneSelection.getMaxIndex()};
+		int[] arraySelections = new int[] {arraySelection.getMinIndex(), 
+				arraySelection.getMaxIndex()};
+		arrayDrawer.paint(pixels, sourceRect, destRect, width, 
+				geneSelections, arraySelections);
 		final MemoryImageSource source = new MemoryImageSource(width, height,
 				pixels, 0, width);
 		final Image image = createImage(source);

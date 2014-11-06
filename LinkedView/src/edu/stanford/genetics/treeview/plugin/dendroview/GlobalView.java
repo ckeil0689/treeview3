@@ -108,6 +108,9 @@ public class GlobalView extends ModelViewProduced implements
 	public GlobalView() {
 
 		super();
+		
+		/* Just checking if this is called at all. */
+		LogBuffer.println(">>>>>> GLOBALVIEW INSTANCE.");
 
 		setLayout(new MigLayout());
 
@@ -390,8 +393,13 @@ public class GlobalView extends ModelViewProduced implements
 							- ymap.getIndex(0));
 
 			if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
+				int[] geneSelections = new int[] {geneSelection.getMinIndex(), 
+						geneSelection.getMaxIndex()};
+				int[] arraySelections = new int[] {arraySelection.getMinIndex(), 
+						arraySelection.getMaxIndex()};
+				
 				drawer.paint(offscreenPixels, sourceRect, destRect,
-						offscreenScanSize);
+						offscreenScanSize, geneSelections, arraySelections);
 			}
 
 			offscreenSource.newPixels();

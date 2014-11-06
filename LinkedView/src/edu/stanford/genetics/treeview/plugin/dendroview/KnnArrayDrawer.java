@@ -116,10 +116,15 @@ public class KnnArrayDrawer extends DoubleArrayDrawer {
 	 *            mean indexes into this array. If the gene order is null, the
 	 *            indexes from the source rect are used as indexes into the data
 	 *            matrix.
+	 *            TODO if this class is actually used, then implement selection
+	 *            darkening of background elements.
 	 */
 	@Override
 	public void paint(final int[] pixels, final Rectangle source,
-			final Rectangle dest, final int scanSize, final int[] geneOrder) {
+			final Rectangle dest, final int scanSize, final int[] geneOrder,
+			int[] geneSelections, int[] arraySelections) {
+		
+		LogBuffer.println(">>>>>>> KNNDrawer paint() called!");
 
 		if (dataMatrix == null) {
 			LogBuffer.println("Data matrix wasn't set, "
@@ -184,7 +189,7 @@ public class KnnArrayDrawer extends DoubleArrayDrawer {
 					} else {
 						val /= count;
 					}
-					final int t_color = colorExtractor.getARGBColor(val);
+					final int t_color = colorExtractor.getARGBColor(val, false);
 					for (int x = xstart; x < xnext; x++) {
 
 						for (int y = ystart; y < ynext; y++) {

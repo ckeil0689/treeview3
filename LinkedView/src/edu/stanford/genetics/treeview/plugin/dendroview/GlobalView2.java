@@ -394,8 +394,13 @@ public class GlobalView2 extends ModelViewProduced implements
 							- ymap.getIndex(0));
 
 			if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
+				int[] geneSelections = new int[] {geneSelection.getMinIndex(), 
+						geneSelection.getMaxIndex()};
+				int[] arraySelections = new int[] {arraySelection.getMinIndex(), 
+						arraySelection.getMaxIndex()};
+				
 				drawer.paint(offscreenPixels, sourceRect, destRect,
-						offscreenScanSize);
+						offscreenScanSize, geneSelections, arraySelections);
 			}
 
 			offscreenSource.newPixels();
@@ -600,6 +605,9 @@ public class GlobalView2 extends ModelViewProduced implements
 			}
 			recalculateOverlay();
 			drawIndicatorCircle();
+			
+			/* trigger updatePixels() (only needed for one selection) */
+			offscreenValid = false;
 
 		} else if (o == arraySelection) {
 			if (geneSelection.getNSelectedIndexes() == 0) {

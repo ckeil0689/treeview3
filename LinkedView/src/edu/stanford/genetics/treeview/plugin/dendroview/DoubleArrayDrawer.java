@@ -178,13 +178,24 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 	 */
 	@Override
 	public void paint(final int[] pixels, final Rectangle source,
-			final Rectangle dest, final int scanSize, final int[] geneOrder) {
+			final Rectangle dest, final int scanSize, final int[] geneOrder, 
+			int[] geneSelections, int[] arraySelections) {
 
 		if (dataMatrix == null) {
 			LogBuffer.println("Data matrix wasn't set, "
 					+ "can't be used in paint() in DoubleArrayDrawer.");
 		}
-
+		
+		/* 
+		 * Set the selection ranges for rows and columns. 
+		 * All values are -1 if no selection was made. 
+		 */
+		int g_min = geneSelections[0];
+		int g_max = geneSelections[1];
+		
+		int a_min = arraySelections[0];
+		int a_max = arraySelections[1];
+		
 		// ynext will hold the first pixel of the next block.
 		int ynext = dest.y;
 
@@ -257,8 +268,21 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 					} else {
 						val /= count;
 					}
-
-					final int t_color = colorExtractor.getARGBColor(val);
+					
+					/* Darken non-selected rows/ cols if there's a selection */
+					boolean isBackground;
+					int geneInd = gene + source.y;
+					int arrayInd = array + source.x;
+					
+					if(g_min == -1) {
+						isBackground = false;
+					} else {
+						isBackground = !(geneInd >= g_min && geneInd <= g_max) 
+								|| !(arrayInd >= a_min && arrayInd <= a_max);
+					}
+					
+					final int t_color = colorExtractor.getARGBColor(val, 
+							isBackground);
 
 					for (int x = xstart; x < xnext; x++) {
 
