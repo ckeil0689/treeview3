@@ -48,6 +48,7 @@ When you tackle an issue:
 Testing is a part of the Developer Change Procedure above, but in addition, every 2 weeks, testing is performed by the Project Leader to test all recent change activity.  The following is the procedure for generating the project snapshot:
 
 Once every 2 weeks:
+
 1. Switch to master branch
 2. Pull & Sync repository
 3. Export a jar file
