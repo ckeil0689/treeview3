@@ -36,9 +36,9 @@ import Utilities.GUIFactory;
 import Utilities.Helper;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor2;
-import edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets2;
-import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet2;
+import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
+import edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets;
+import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
 
 public class ColorChooser implements ConfigNodePersistent {
@@ -69,12 +69,12 @@ public class ColorChooser implements ConfigNodePersistent {
 
 	private final ButtonGroup colorButtonGroup;
 
-	private final ColorExtractor2 colorExtractor;
-	private final ColorPresets2 colorPresets;
+	private final ColorExtractor colorExtractor;
+	private final ColorPresets colorPresets;
 
 	private Thumb selectedThumb = null;
 
-	public ColorChooser(final ColorExtractor2 drawer, int minVal, int maxVal) {
+	public ColorChooser(final ColorExtractor drawer, Double minVal, Double maxVal) {
 
 		this.colorExtractor = drawer;
 		this.colorPresets = DendrogramFactory.getColorPresets();
@@ -87,10 +87,8 @@ public class ColorChooser implements ConfigNodePersistent {
 		final JLabel hint = GUIFactory.createLabel("Move or add sliders "
 				+ "to adjust color scheme.", GUIFactory.FONTS);
 
-		colorList = new ArrayList<Color>();
+		this.colorList = new ArrayList<Color>();
 		thumbList = new ArrayList<Thumb>();
-
-		gradientBox = new GradientBox();
 
 		addButton = GUIFactory.createBtn("Add Color");
 		removeButton = GUIFactory.createBtn("Remove Selected");
@@ -115,7 +113,10 @@ public class ColorChooser implements ConfigNodePersistent {
 		radioButtonPanel.add(redGreenButton, "span, wrap");
 		radioButtonPanel.add(yellowBlueButton, "span, wrap");
 		radioButtonPanel.add(customColorButton, "span");
-
+		
+		gradientBox = this.new GradientBox();
+		gradientBox.setPresets();
+		
 		mainPanel.add(hint, "span, wrap");
 		mainPanel.add(gradientBox, "h 100:100:, w 400:400:, pushx, alignx 50%, "
 				+ "span, wrap");
@@ -179,6 +180,7 @@ public class ColorChooser implements ConfigNodePersistent {
 		public GradientBox() {
 
 			setFocusable(true);
+			setPresets();
 		}
 
 		@Override
@@ -204,7 +206,7 @@ public class ColorChooser implements ConfigNodePersistent {
 
 			} catch (final IllegalArgumentException e) {
 				LogBuffer.println("IllegalArgumentException in "
-						+ "drawGradientBox in ColorGradientChooser: "
+						+ "drawGradientBox in ColorChooser: "
 						+ e.getMessage());
 				LogBuffer.println("Fraction Keyframe not increasing "
 						+ "for LinearGradientPaint.");
@@ -419,28 +421,32 @@ public class ColorChooser implements ConfigNodePersistent {
 			fractions = resetFractions();
 
 			final String defaultColors = "RedGreen";
-			final String colorScheme = configNode.get("activeColors",
+			
+			String colorScheme = defaultColors;
+			if (configNode != null) {
+				colorScheme = configNode.get("activeColors",
 					defaultColors);
+			}
 
 			if (colorScheme.equalsIgnoreCase("Custom")) {
 				customColorButton.setSelected(true);
 				setCustomSelected(true);
-				final ColorSet2 savedColorSet = colorPresets
+				final ColorSet savedColorSet = colorPresets
 						.getColorSet(colorScheme);
 				loadPresets(savedColorSet);
 
 			} else if (colorScheme.equalsIgnoreCase(defaultColors)) {
-				// Colors should be defined as default ColorSet in ColorPresets2
+				// Colors should be defined as default ColorSet in ColorPresets
 				redGreenButton.setSelected(true);
 				setCustomSelected(false);
-				final ColorSet2 rgColorSet = colorPresets
+				final ColorSet rgColorSet = colorPresets
 						.getColorSet(colorScheme);
 				loadPresets(rgColorSet);
 
 			} else if (colorScheme.equalsIgnoreCase("YellowBlue")) {
 				yellowBlueButton.setSelected(true);
 				setCustomSelected(false);
-				final ColorSet2 ybColorSet = colorPresets
+				final ColorSet ybColorSet = colorPresets
 						.getColorSet("YellowBlue");
 				loadPresets(ybColorSet);
 
@@ -456,7 +462,7 @@ public class ColorChooser implements ConfigNodePersistent {
 		 * 
 		 * @param colorSet
 		 */
-		public void loadPresets(final ColorSet2 colorSet) {
+		public void loadPresets(final ColorSet colorSet) {
 
 			final String[] colors = colorSet.getColors();
 
@@ -484,7 +490,7 @@ public class ColorChooser implements ConfigNodePersistent {
 
 			final String colorSetName = "Custom";
 			colorPresets.addColorSet(colorSetName, colorList, fractionList,
-					"#ffffff");
+					 "#909090", "#FFFFFF");
 			
 			LogBuffer.println("Custom colors saved.");
 		}
@@ -693,7 +699,7 @@ public class ColorChooser implements ConfigNodePersistent {
 				final int deltaX = inputX - selectedThumb.getX();
 				final int newX = selectedThumb.getX() + deltaX;
 
-				if (previousPos < newX && newX < nextPos) {
+				if (previousPos <= newX && newX <= nextPos) {
 					selectedThumb.setCoords(newX, selectedThumb.getY());
 					fractions = updateFractions();
 
@@ -775,8 +781,8 @@ public class ColorChooser implements ConfigNodePersistent {
 								final double inputDataValue = Double
 										.parseDouble(inputField.getText());
 
-								if (inputDataValue > minVal
-										&& inputDataValue < maxVal) {
+								if (inputDataValue >= minVal
+										&& inputDataValue <= maxVal) {
 
 									final double fraction = Math
 											.abs(inputDataValue - minVal)
@@ -1098,7 +1104,7 @@ public class ColorChooser implements ConfigNodePersistent {
 		configNode.put("activeColors", name);
 	}
 
-	protected void addColorSet(final ColorSet2 temp) {
+	protected void addColorSet(final ColorSet temp) {
 
 		colorPresets.addColorSet(temp);
 	}
@@ -1194,7 +1200,7 @@ public class ColorChooser implements ConfigNodePersistent {
 	// if (returnVal == JFileChooser.APPROVE_OPTION) {
 	// final File f = chooser.getSelectedFile();
 	// try {
-	// final ColorSet2 temp = new ColorSet2();
+	// final ColorSet temp = new ColorSet();
 	// temp.loadEisen(f);
 	// colorExtractorEditor.copyStateFrom(temp);
 	//
@@ -1220,7 +1226,7 @@ public class ColorChooser implements ConfigNodePersistent {
 	// if (returnVal == JFileChooser.APPROVE_OPTION) {
 	// final File f = chooser.getSelectedFile();
 	// try {
-	// final ColorSet2 temp = new ColorSet2();
+	// final ColorSet temp = new ColorSet();
 	// colorExtractorEditor.copyStateTo(temp);
 	// temp.saveEisen(f);
 	//
@@ -1241,7 +1247,7 @@ public class ColorChooser implements ConfigNodePersistent {
 	// @Override
 	// public void actionPerformed(final ActionEvent e) {
 	//
-	// final ColorSet2 temp = new ColorSet2();
+	// final ColorSet temp = new ColorSet();
 	// colorExtractorEditor.copyStateTo(temp);
 	// temp.setName("UserDefined");
 	// colorPresets.addColorSet(temp);

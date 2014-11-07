@@ -25,6 +25,36 @@ This README would normally document whatever steps are necessary to get your app
 * Other guidelines
     1. Oracle Code Conventions: http://www.oracle.com/technetwork/java/javase/documentation/codeconvtoc-136057.html
 
+### Developer Change Procedure ###
+
+When you tackle an issue:
+
+1. Claim the issue
+2. Check to make sure no one's working on a similar issue (possibly involving same code)
+3. Switch to master branch
+4. Sync repository
+5. Branch
+6. Implement code
+7. Test on your own
+8. Commit/push
+9. Ask others to test
+10. Switch to master branch
+11. Merge in your branch
+12. Push the merged master branch
+13. Resolve the issue
+
+### Developer Testing Procedure ###
+
+Testing is a part of the Developer Change Procedure above, but in addition, every 2 weeks, testing is performed by the Project Leader to test all recent change activity.  The following is the procedure for generating the project snapshot:
+
+Once every 2 weeks:
+
+1. Switch to master branch
+2. Pull & Sync repository
+3. Export a jar file
+4. Upload jar file to the downloads page named with the short build number
+5. Notify project leader
+
 ### Who do I talk to? ###
 
 * Repo owner or admin

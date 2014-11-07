@@ -500,9 +500,11 @@ public class ClusterController {
 			if(event.getStateChange() == ItemEvent.SELECTED) {
 				colSimilarity = clusterView.getColSimilarity();
 				
-				/* Ready indicator label */
-				clusterView.displayReadyStatus(isReady(rowSimilarity, ROW) 
-						|| isReady(colSimilarity, COL));
+				/* OR controlled ready indicator label */
+				boolean rowReady = isReady(rowSimilarity, ROW);
+				boolean colReady = isReady(colSimilarity, COL);
+				
+				clusterView.displayReadyStatus(rowReady || colReady);
 			}
 		}
 	}
@@ -516,12 +518,11 @@ public class ClusterController {
 		@Override
 		public void stateChanged(ChangeEvent arg0) {
 			
-			/* XOR controlled ready indicator label */
-			clusterView.displayReadyStatus(
-					(isReady(rowSimilarity, ROW) 
-							&& !isReady(colSimilarity, COL)) 
-					|| (!isReady(rowSimilarity, ROW) 
-							&& isReady(colSimilarity, COL)));
+			/* OR controlled ready indicator label */
+			boolean rowReady = isReady(rowSimilarity, ROW);
+			boolean colReady = isReady(colSimilarity, COL);
+			
+			clusterView.displayReadyStatus(rowReady || colReady);
 		}
 	}
 

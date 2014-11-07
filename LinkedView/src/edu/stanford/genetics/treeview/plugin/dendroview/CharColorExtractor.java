@@ -118,15 +118,11 @@ public class CharColorExtractor extends Observable implements
 					+ "node because parentNode was null.");
 		}
 
-		// Preferences cand = root.fetchFirst("ColorSet");
 		try {
 			final String[] childrenNodes = configNode.childrenNames();
-			boolean nodePresent = false;
-
 			for (int i = 0; i < childrenNodes.length; i++) {
 
 				if (childrenNodes[i].contains("ColorSet")) {
-					nodePresent = true;
 				}
 			}
 
@@ -165,10 +161,10 @@ public class CharColorExtractor extends Observable implements
 	 */
 	public void setColor(final char c, final String newString) {
 
-		if (ColorSet2.encodeColor(colorSet.getColor(c)).equals(newString)) {
+		if (ColorSet.encodeColor(colorSet.getColor(c)).equals(newString)) {
 			return;
 		}
-		colorSet.setColor(c, ColorSet2.decodeColor(newString));
+		colorSet.setColor(c, ColorSet.decodeColor(newString));
 		setChanged();
 	}
 
@@ -177,10 +173,10 @@ public class CharColorExtractor extends Observable implements
 	 */
 	public void setMissingColor(final String newString) {
 
-		if (ColorSet2.encodeColor(colorSet.getMissing()).equals(newString)) {
+		if (ColorSet.encodeColor(colorSet.getMissing()).equals(newString)) {
 			return;
 		}
-		colorSet.setMissing(ColorSet2.decodeColor(newString));
+		colorSet.setMissing(ColorSet.decodeColor(newString));
 		setChanged();
 	}
 
@@ -193,11 +189,11 @@ public class CharColorExtractor extends Observable implements
 			return;
 		}
 
-		if (ColorSet2.encodeColor(colorSet.getEmpty()).equals(newString)) {
+		if (ColorSet.encodeColor(colorSet.getEmpty()).equals(newString)) {
 			return;
 		}
 
-		colorSet.setEmpty(ColorSet2.decodeColor(newString));
+		colorSet.setEmpty(ColorSet.decodeColor(newString));
 		setChanged();
 	}
 
@@ -285,8 +281,8 @@ public class CharColorExtractor extends Observable implements
 	/** resets the ColorExtractor to a default state. */
 	public void setDefaults() {
 
-		setMissingColor(ColorSet2.encodeColor(defaultColorSet.getMissing()));
-		setEmptyColor(ColorSet2.encodeColor(defaultColorSet.getEmpty()));
+		setMissingColor(ColorSet.encodeColor(defaultColorSet.getMissing()));
+		setEmptyColor(ColorSet.encodeColor(defaultColorSet.getEmpty()));
 		setChanged();
 	}
 }

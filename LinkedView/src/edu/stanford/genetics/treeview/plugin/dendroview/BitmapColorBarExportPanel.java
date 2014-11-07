@@ -53,7 +53,7 @@ public class BitmapColorBarExportPanel extends ColorBarExportPanel implements
 	JComboBox formatPulldown = new JComboBox(BitmapWriter.formats);
 
 	// I wish I could just inherit this...
-	public BitmapColorBarExportPanel(final ColorExtractor2 colorExtractor) {
+	public BitmapColorBarExportPanel(final ColorExtractor colorExtractor) {
 		super(colorExtractor);
 		final JPanel holder = new JPanel();
 		final JCheckBox appendExt = new JCheckBox("Append Extension?", true);

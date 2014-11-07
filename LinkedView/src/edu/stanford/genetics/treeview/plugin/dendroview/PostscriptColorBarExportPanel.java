@@ -39,7 +39,7 @@ public class PostscriptColorBarExportPanel extends ColorBarExportPanel
 		implements SettingsPanel {
 
 	// I wish I could just inherit this...
-	public PostscriptColorBarExportPanel(final ColorExtractor2 colorExtractor) {
+	public PostscriptColorBarExportPanel(final ColorExtractor colorExtractor) {
 		super(colorExtractor);
 	}
 
