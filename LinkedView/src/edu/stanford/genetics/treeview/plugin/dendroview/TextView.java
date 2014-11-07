@@ -231,11 +231,13 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 
 							g.setColor(fore);
 
-							// right-aligned text
+							// left-aligned text
 							g.drawString(
 									out,
-									offscreenSize.width
-											- metrics.stringWidth(out),
+									0,
+									//This is how you would do right-aligned text
+									//offscreenSize.width
+									//		- metrics.stringWidth(out),
 									map.getMiddlePixel(j) + ascent / 2);
 
 							if (fgColorIndex > 0) {
@@ -243,11 +245,13 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 							}
 						} else {
 							g.setColor(Color.black);
-							// right-aligned text
+							// left-aligned text
 							g.drawString(
 									out,
-									offscreenSize.width
-											- metrics.stringWidth(out),// 0,
+									0,
+									//This is how you would do right-aligned text
+									//offscreenSize.width
+									//		- metrics.stringWidth(out),// 0,
 									map.getMiddlePixel(j) + ascent / 2);
 							// g.setColor(fore);
 						}
