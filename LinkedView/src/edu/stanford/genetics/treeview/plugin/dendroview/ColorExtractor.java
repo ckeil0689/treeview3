@@ -654,7 +654,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 		 */
 		if(isBackground) {
 			for(int i = 0; i < comp.length; i++) {
-				comp[i] *= 0.5;
+				comp[i] *= 0.4;
 			}
 		}
 
