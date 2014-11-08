@@ -2,10 +2,8 @@ package edu.stanford.genetics.treeview.model;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.LineNumberReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -14,25 +12,29 @@ import java.util.regex.Pattern;
 
 import javax.swing.SwingWorker;
 
+import Utilities.Helper;
 import Views.WelcomeView;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 
+/**
+ * The class responsible for loading data into the TVModel.
+ * @author CKeil
+ *
+ */
 public class NewModelLoader {
 
 	protected TVModel targetModel;
 	private final FileSet fileSet;
 	protected TreeViewFrame tvFrame;
-	protected WelcomeView loadProgView;
 
-	/* 
-	 * Instance variables for the actual data to be loaded. 
-	 */
 	private double[][] doubleData;
+	
+	/* Holds pattern which recognizes data in a tab-delimited file */
+	private String fpRegex;
 
-	private int lineNum;
 	private int dataStartRow;
 	private int dataStartCol;
 
@@ -47,169 +49,16 @@ public class NewModelLoader {
 		this.targetModel = (TVModel)model;
 		this.tvFrame = ((TVModel)model).getFrame();
 		this.fileSet = model.getFileSet();
-		this.loadProgView = tvFrame.getWelcomeView();
+		
+		setupPattern();
 	}
-
-	public TVModel load() throws OutOfMemoryError {
-		
-		String[][] stringLabels = null;
-		try { 
-			// Read data from specified file location
-			loadProgView.resetLoadBar();
-			loadProgView.setLoadLabel("Getting file ready to load...");
-			lineNum = count(new File(fileSet.getCdt()));
-			loadProgView.setLoadBarMax(lineNum);
-			
-			BufferedReader br = new BufferedReader(new FileReader(
-				new File(fileSet.getCdt())));
-		
-			try {
-				// Get data from file into String and double arrays
-				// Put the arrays in ArrayLists for later access.
-				loadProgView.setLoadLabel("Extracting data.");
-				stringLabels = extractData(br);
 	
-				if (!hasData) {
-					final String noData = "No data could be identified "
-							+ "in the chosen file.";
-					tvFrame.setLoadErrorMessage(noData);
-					return null;
-				}
-			} catch (final FileNotFoundException e) {
-				final String fnfError = "Chosen file could not be found: "
-						+ e.getMessage();
-				LogBuffer.println(fnfError);
-				tvFrame.setLoadErrorMessage(fnfError);
-				e.printStackTrace();
-				
-			}  finally {
-				if(br != null) {
-					br.close();
-					br = null;
-				}
-			}
-		} catch (final IOException e) {
-			final String fnfError = "File could not be loaded: "
-					+ e.getMessage();
-			LogBuffer.println(fnfError);
-			tvFrame.setLoadErrorMessage(fnfError);
-			e.printStackTrace();
-		}
-
-		// Parse the CDT File
-		loadProgView.setLoadLabel("Parsing main file.");
-		parseCDT(stringLabels);
-
-		// If present, parse ATR File
-		if (hasAID) {
-			loadProgView.setLoadLabel("Reading ATR file.");
-			parseATR();
-
-		} else {
-			LogBuffer.println("No ATR file found for this CDT file.");
-			targetModel.aidFound(false);
-		}
-
-		// If present, parse GTR File
-		if (hasGID) {
-			loadProgView.setLoadLabel("Reading GTR file.");
-			parseGTR();
-
-		} else {
-			LogBuffer.println("No GTR file found for this CDT file.");
-			targetModel.gidFound(false);
-		}
-
-		// Load Config File
-		try {
-			loadProgView.setLoadLabel("Getting configurations...");
-			final String fileName = targetModel.getFileSet().getRoot();
-			final String fileExt = targetModel.getFileSet().getExt();
-
-			final Preferences fileNode = tvFrame.getConfigNode().node("File");
-
-			Preferences documentConfig = null;
-			final String[] childrenNodes = fileNode.childrenNames();
-
-			final String default_name = "No file.";
-
-			boolean fileFound = false;
-			if (childrenNodes.length > 0) {
-
-				for (int i = 0; i < childrenNodes.length; i++) {
-
-					if (fileNode.node(childrenNodes[i])
-							.get("name", default_name)
-							.equalsIgnoreCase(fileName)) {
-						documentConfig = fileNode.node(childrenNodes[i]);
-						fileFound = true;
-						break;
-					}
-				}
-			}
-
-			if (!fileFound) {
-				documentConfig = fileNode.node("Model "
-						+ (childrenNodes.length + 1));
-				documentConfig.put("name", fileName);
-				documentConfig.put("extension", fileExt);
-			}
-			
-			targetModel.setDocumentConfig(documentConfig);
-
-		} catch (final Exception e) {
-			targetModel.setDocumentConfig(null);
-			e.printStackTrace();
-		}
-
-		// Free the large objects for garbage collection
-		stringLabels = null;
-		doubleData = null;
-				
-		loadProgView.setLoadLabel("Done.");
-		targetModel.setLoaded(true);
-
-		return targetModel;
-	}
-
 	/**
-	 * Count amount of lines in the file to be loaded so that the progressBar
-	 * can get correct values for extractData(). Code from StackOverflow
-	 * (https://stackoverflow.com/questions/1277880).
+	 * Sets up regex patterns which will be used to differentiate between
+	 * labels and data in tab-delimited table entries. 
 	 */
-	public int count(final File aFile) throws IOException {
-
-		LineNumberReader reader = null;
-
-		try {
-			reader = new LineNumberReader(new FileReader(aFile));
-			while ((reader.readLine()) != null);
-			return reader.getLineNumber();
-
-		} catch (final Exception ex) {
-			LogBuffer.println("Exception when trying to count lines: "
-					+ ex.getMessage());
-			return -1;
-
-		} finally {
-			if (reader != null) {
-				reader.close();
-				reader = null;
-			}
-		}
-	}
-
-	/**
-	 * Reading the data separated by tab delimited \t The regex check if a
-	 * String can be parsed to double is taken from StackOverflow
-	 * (https://stackoverflow.com/questions/8564896).
-	 * 
-	 * @param reader
-	 * @param dataExtract
-	 */
-	public String[][] extractData(final BufferedReader reader) 
-			throws IOException {
-
+	private void setupPattern() {
+		
 		final String Digits = "(\\p{Digit}+)";
 		final String emptyDigits = "(\\p{Digit}*)";
 		final String HexDigits = "(\\p{XDigit}+)";
@@ -217,7 +66,8 @@ public class NewModelLoader {
 		// an exponent is 'e' or 'E' followed by an optionally
 		// signed decimal integer.
 		final String exp = "[eE][+-]?" + emptyDigits;
-		final String fpRegex = ("[\\x00-\\x20]*" + // Optional leading
+		
+		this.fpRegex = ("[\\x00-\\x20]*" + // Optional leading
 													// "whitespace"
 				"[+-]?(" + // Optional sign character
 				"NaN|" + // "NaN" string
@@ -242,174 +92,309 @@ public class NewModelLoader {
 				+ ")[pP][+-]?" + Digits + "))" + "[fFdD]?))" 
 				+ "[\\x00-\\x20]*");
 				// Optional trailing "whitespace"
+	}
+	
+	private class LoadTask extends SwingWorker<TVModel, Integer> {
 
-		String[][] stringLabels = new String[lineNum][];
+		private int lineNum;
+		
+		@Override
+        protected void process(List<Integer> chunks) {
+            
+			int i = chunks.get(chunks.size() - 1);
+			WelcomeView.updateLoadBar(i);
+        }
+		
+		@Override
+		protected TVModel doInBackground() throws Exception {
+			
+			/* Setup */
+			WelcomeView.resetLoadBar();
+			lineNum = Helper.countFileLines(new File(fileSet.getCdt()));
+			WelcomeView.setLoadBarMax(lineNum);
+			
+			File file = new File(fileSet.getCdt());
+			BufferedReader reader = new BufferedReader(new FileReader(file));
+			
+			/* Find data start */
+			String[][] stringLabels = new String[lineNum][];
 
-		String line;
-		dataStartRow = 0;
-		dataStartCol = 0;
-		int gWeightCol = 0;
-		int rowN = 0;
+			String line;
+			dataStartRow = 0;
+			dataStartCol = 0;
+			int rowN = 0;
 
-		while ((line = reader.readLine()) != null) {
-
-			loadProgView.updateLoadBar(rowN);
-
+			/* Read all lines and parse the data */
+			while ((line = reader.readLine()) != null) {
+				
+				if(hasData) {
+					stringLabels[rowN] = fillDoubles(line, rowN);
+					
+				} else {
+					stringLabels[rowN] = findData(line, rowN);
+				}
+				
+				publish(rowN++);
+			}
+			
+			LogBuffer.println("Lines read: " + rowN);
+			
+			reader.close();
+			
+			/* Parse tree and config files */ 
+			assignDataToModel(stringLabels);
+			
+			return targetModel;
+		}
+		
+		@Override
+		protected void done() {
+			
+			doubleData = null;
+			targetModel.setLoaded(true);
+		}
+		
+		/* ---- Loading methods -------- */
+		private String[] findData(String line, int rowN) {
+			
+			boolean containsEWeight = false;
+			
 			// load line as String array
 			String[] lineAsStrings = line.split("\\t", -1);
 			String[] labels;
+			int gWeightCol = 0;
 			double[] dataValues;
-
+			
 			// loop over String array to convert applicable String to double
 			// first find data start
-			if (!hasData) {
-				labels = new String[lineAsStrings.length];
-				boolean containsEWeight = false;
+			labels = new String[lineAsStrings.length];
 
-				for (int i = 0; i < lineAsStrings.length; i++) {
+			for (int i = 0; i < lineAsStrings.length; i++) {
 
-					final String element = lineAsStrings[i];
+				final String element = lineAsStrings[i];
 
-					if (element.equalsIgnoreCase("GID")) {
-						hasGID = true;
-					}
-
-					// Check for GWEIGHT to avoid the weight being
-					// recognized as row start of actual data
-					if (element.equalsIgnoreCase("GWEIGHT")) {
-						gWeightCol = i;
-						hasGWeight = true;
-					}
-
-					if (element.equalsIgnoreCase("AID")) {
-						hasAID = true;
-					}
-
-					// Check for EWEIGHT to avoid the weight being
-					// recognized as column start of actual data
-					if (element.equalsIgnoreCase("EWEIGHT")) {
-						containsEWeight = true;
-						hasEWeight = true;
-					}
-
-					if (Pattern.matches(fpRegex, element)
-							&& (!containsEWeight && i != gWeightCol)) {
-
-						dataStartRow = rowN;
-						dataStartCol = i;
-
-						hasData = true;
-						break;
-
-					} else {
-						labels[i] = element;
-						
-						// Concat empty String, otherwise this will store a 
-						// reference to the entire line from reader even when 
-						// loading method and SwingWorker are closed.
-						// Strings are immutable.
-						labels[i] += "";
-					}
+				if (element.equalsIgnoreCase("GID")) {
+					hasGID = true;
 				}
 
-				// avoid first datarow to be added with null values
-				if (hasData) {
-					final String[] firstDataRow = new String[dataStartCol];
+				// Check for GWEIGHT to avoid the weight being
+				// recognized as row start of actual data
+				if (element.equalsIgnoreCase("GWEIGHT")) {
+					gWeightCol = i;
+					hasGWeight = true;
+				}
 
-					for (int i = 0; i < labels.length; i++) {
+				if (element.equalsIgnoreCase("AID")) {
+					hasAID = true;
+				}
 
-						if (labels[i] != null) {
-							firstDataRow[i] = labels[i];
+				// Check for EWEIGHT to avoid the weight being
+				// recognized as column start of actual data
+				if (element.equalsIgnoreCase("EWEIGHT")) {
+					hasEWeight = true;
+					containsEWeight = true;
+					
+					LogBuffer.println(">>>>>>>>>>>> Has EWEIGHT: " + rowN);
+				}
 
-						} else {
-							break;
-						}
-					}
-					stringLabels[rowN] = firstDataRow;
+				if (Pattern.matches(fpRegex, element)
+						&& (!containsEWeight && i != gWeightCol)) {
+
+					dataStartRow = rowN;
+					dataStartCol = i;
+
+					hasData = true;
+					break;
 
 				} else {
-					// handle line in which data has been found
-					stringLabels[rowN] = labels;
-				}
-
-				if (hasData) {
-					doubleData = new double[lineNum - dataStartRow][];
-					dataValues = new double[lineAsStrings.length - dataStartCol];
-
-					for (int i = 0; i < lineAsStrings.length - dataStartCol; i++) {
-
-						String element = lineAsStrings[i + dataStartCol];
-
-						// Check whether string can be double and is not
-						// gweight
-						if (Pattern.matches(fpRegex, element)
-								&& i != gWeightCol) {
-
-							// For empty exponents apparently
-							// caused by Windows .txt
-							if (element.endsWith("e") || element.endsWith("E")) {
-								element = element + "+00";
-							}
-
-							final double val = Double.parseDouble(element);
-							dataValues[i] = val;
-
-						} else {
-							dataValues[i] = 0;
-						}
-					}
-
-					doubleData[rowN - dataStartRow] = dataValues;
-				}
-
-			} else {
-				labels = new String[dataStartCol];
-				dataValues = new double[lineAsStrings.length - dataStartCol];
-				
-				System.arraycopy(lineAsStrings, 0, labels, 0, dataStartCol);
-				
-				// This ensures that references to immutable string 
-				// (whole line from readline()!) do not stay in memory.
-				for (int i = 0; i < labels.length; i++){
+					labels[i] = element;
+					
+					// Concat empty String, otherwise this will store a 
+					// reference to the entire line from reader even when 
+					// loading method and SwingWorker are closed.
+					// Strings are immutable.
 					labels[i] += "";
 				}
-				
-				stringLabels[rowN] = labels;
+			}
+
+			if (hasData) {
+				doubleData = new double[lineNum - dataStartRow][];
+				dataValues = new double[lineAsStrings.length - dataStartCol];
 
 				for (int i = 0; i < lineAsStrings.length - dataStartCol; i++) {
 
 					String element = lineAsStrings[i + dataStartCol];
 
-					// handle parseDouble error somehow?
-					// using the Pattern.matches method screws up
-					// loading time by a factor of 1000....
-					if (element.endsWith("e") || element.endsWith("E")) {
-						element = element + "+00";
-					}
+					// Check whether string can be double and is not
+					// gweight
+					if (Pattern.matches(fpRegex, element) && i != gWeightCol) {
 
-					// Trying to parse the String, if not possible,
-					// add 0.
-					try {
+						// For empty exponents apparently
+						// caused by Windows .txt
+						if (element.endsWith("e") || element.endsWith("E")) {
+							element = element + "+00";
+						}
+
 						final double val = Double.parseDouble(element);
 						dataValues[i] = val;
 
-					} catch (final Exception e) {
-						LogBuffer.println("Exception when trying to parse "
-								+ "a double in extractData() in "
-								+ "NewModelLoader: " + e.getMessage());
-						final double val = Double.parseDouble("0.00E+00");
-						dataValues[i] = val;
+					} else {
+						dataValues[i] = 0;
 					}
 				}
 
-				// Issue with length of stringLabels
-				stringLabels[rowN] = labels;
 				doubleData[rowN - dataStartRow] = dataValues;
 			}
-			rowN++;
+			
+			// avoid first datarow to be added with null values
+			if (hasData) {
+				final String[] firstDataRow = new String[dataStartCol];
+
+				for (int i = 0; i < labels.length; i++) {
+
+					if (labels[i] == null) break;
+					firstDataRow[i] = labels[i];
+				}
+				
+				return firstDataRow;
+
+			} else {
+				// handle line in which data has been found
+				return labels;
+			}
 		}
 		
-		return stringLabels;
+		private String[] fillDoubles(String line, int rowN) {
+			
+			// load line as String array
+			String[] lineAsStrings = line.split("\\t", -1);
+			String[] labels = new String[dataStartCol];
+			double[] dataValues = new double[lineAsStrings.length - dataStartCol];
+			
+			System.arraycopy(lineAsStrings, 0, labels, 0, dataStartCol);
+			
+			// This ensures that references to immutable string 
+			// (whole line from readline()!) do not stay in memory.
+			for (int i = 0; i < labels.length; i++){
+				labels[i] += "";
+			}
+
+			for (int i = 0; i < lineAsStrings.length - dataStartCol; i++) {
+
+				String element = lineAsStrings[i + dataStartCol];
+
+				// handle parseDouble error somehow?
+				// using the Pattern.matches method screws up
+				// loading time by a factor of 1000....
+				if (element.endsWith("e") || element.endsWith("E")) {
+					element = element + "+00";
+				}
+
+				// Trying to parse the String. If not possible add 0.
+				try {
+					final double val = Double.parseDouble(element);
+					dataValues[i] = val;
+
+				} catch (final Exception e) {
+					LogBuffer.println("Exception when trying to parse "
+							+ "a double in extractData() in "
+							+ "NewModelLoader: " + e.getMessage());
+					final double val = Double.parseDouble("0.00E+00");
+					dataValues[i] = val;
+				}
+			}
+
+			// Issue with length of stringLabels
+			doubleData[rowN - dataStartRow] = dataValues;
+			
+			return labels;
+		}
+		
+		private void assignDataToModel(String[][] stringLabels) {
+			
+			/* ----- Tree file and config stuff ---- */ 
+
+			// Parse the CDT File
+			LogBuffer.println("Parsing main file.");
+			parseCDT(stringLabels);
+
+			// If present, parse ATR File
+			if (hasAID) {
+				LogBuffer.println("Reading ATR file.");
+				parseATR();
+
+			} else {
+				LogBuffer.println("No ATR file found for this CDT file.");
+				targetModel.aidFound(false);
+			}
+
+			// If present, parse GTR File
+			if (hasGID) {
+				LogBuffer.println("Reading GTR file.");
+				parseGTR();
+
+			} else {
+				LogBuffer.println("No GTR file found for this CDT file.");
+				targetModel.gidFound(false);
+			}
+
+			// Load Config File
+			try {
+				LogBuffer.println("Getting configurations...");
+				final String fileName = targetModel.getFileSet().getRoot();
+				final String fileExt = targetModel.getFileSet().getExt();
+
+				final Preferences fileNode = tvFrame.getConfigNode().node("File");
+
+				Preferences documentConfig = null;
+				final String[] childrenNodes = fileNode.childrenNames();
+
+				final String default_name = "No file.";
+
+				boolean fileFound = false;
+				if (childrenNodes.length > 0) {
+
+					for (int i = 0; i < childrenNodes.length; i++) {
+
+						if (fileNode.node(childrenNodes[i])
+								.get("name", default_name)
+								.equalsIgnoreCase(fileName)) {
+							documentConfig = fileNode.node(childrenNodes[i]);
+							fileFound = true;
+							break;
+						}
+					}
+				}
+
+				if (!fileFound) {
+					documentConfig = fileNode.node("Model "
+							+ (childrenNodes.length + 1));
+					documentConfig.put("name", fileName);
+					documentConfig.put("extension", fileExt);
+				}
+				
+				targetModel.setDocumentConfig(documentConfig);
+
+			} catch (final Exception e) {
+				targetModel.setDocumentConfig(null);
+				e.printStackTrace();
+			}
+		}
+		
+	}
+
+	public TVModel load() throws OutOfMemoryError {
+		
+		LoadTask loadTask = new LoadTask();
+		loadTask.execute();
+		
+		try {
+			return loadTask.get();
+			
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+			return new TVModel();
+		}
 	}
 
 	public List<String[]> extractGTR(final BufferedReader reader) {
@@ -556,9 +541,6 @@ public class NewModelLoader {
 
 		try {
 			// Read data from specified file location
-
-//			final FileInputStream fis = new FileInputStream(loadingSet);
-//			final DataInputStream in = new DataInputStream(fis);
 			final BufferedReader br = new BufferedReader(
 					new FileReader(loadingSet));
 
@@ -568,38 +550,10 @@ public class NewModelLoader {
 			
 			br.close();
 
-		} catch (final FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 
 		return gtrData;
-	}
-
-	class LoadWorker extends SwingWorker<Void, Void> {
-
-		@Override
-		protected Void doInBackground() throws Exception {
-
-			load();
-			return null;
-		}
-
-		@Override
-		protected void done() {
-
-			try {
-				// Wait for worker to finish.
-				get();
-
-			} catch (final InterruptedException e) {
-				e.printStackTrace();
-
-			} catch (final ExecutionException e) {
-				e.printStackTrace();
-			}
-		}
-
 	}
 }

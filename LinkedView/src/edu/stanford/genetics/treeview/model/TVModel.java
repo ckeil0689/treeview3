@@ -24,7 +24,6 @@ package edu.stanford.genetics.treeview.model;
 
 import java.util.Hashtable;
 import java.util.Observable;
-import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
 
 import edu.stanford.genetics.treeview.DataMatrix;
@@ -32,7 +31,6 @@ import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.FileSetListener;
 import edu.stanford.genetics.treeview.HeaderInfo;
-import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 
 public class TVModel extends Observable implements DataModel {
@@ -58,7 +56,7 @@ public class TVModel extends Observable implements DataModel {
 
 	/** has model been successfully loaded? */
 	private boolean loaded = false;
-	private final int appendIndex = -1;
+	private int appendIndex = -1;
 
 	/*
 	 * For cases where we are comparing two models (this needs to be changed).
@@ -797,30 +795,30 @@ public class TVModel extends Observable implements DataModel {
 	}
 
 	// loading stuff follows...
-	/**
-	 * 
-	 * 
-	 * @param fileSet
-	 *            fileset to load
-	 * @throws ExecutionException
-	 * @throws InterruptedException
-	 * 
-	 */
-	public void loadNew(final FileSet fileSet) throws LoadException,
-			InterruptedException, ExecutionException, OutOfMemoryError {
-
-		resetState();
-		setSource(fileSet);
-
-		NewModelLoader loader = new NewModelLoader(this);
-		loader.load();
-		loader = null;
-
-		if (!isLoaded()) {
-			throw new LoadException("Loading Cancelled", 
-					LoadException.INTPARSE);
-		}
-	}
+//	/**
+//	 * 
+//	 * 
+//	 * @param fileSet
+//	 *            fileset to load
+//	 * @throws ExecutionException
+//	 * @throws InterruptedException
+//	 * 
+//	 */
+//	public void loadNew(final FileSet fileSet) throws LoadException,
+//			InterruptedException, ExecutionException, OutOfMemoryError {
+//
+//		resetState();
+//		setSource(fileSet);
+//
+//		NewModelLoader loader = new NewModelLoader(this);
+//		loader.load();
+//		loader = null;
+//
+//		if (!isLoaded()) {
+//			throw new LoadException("Loading Cancelled", 
+//					LoadException.INTPARSE);
+//		}
+//	}
 
 	/**
 	 * @param b

@@ -90,13 +90,13 @@ public class AtrTVModel extends TVModel {
 		return null;
 	}
 
-	@Override
-	public void loadNew(final FileSet fileSet) throws LoadException {
-		resetState();
-		setSource(fileSet);
-		final AtrTVModelLoader loader = new AtrTVModelLoader(this);
-		// loader.loadInto();
-		loader.load();
-	}
+//	@Override
+//	public void loadNew(final FileSet fileSet) throws LoadException {
+//		resetState();
+//		setSource(fileSet);
+//		final AtrTVModelLoader loader = new AtrTVModelLoader(this);
+//		// loader.loadInto();
+//		loader.load();
+//	}
 
 }

@@ -54,6 +54,7 @@ public class ClusterController {
 	private final ClusterView clusterView;
 	private final ClusterDialog clusterDialog;
 	
+	/* Delegates the clustering process */
 	private ClusterProcessor processor;
 	
 	/* Initialize with defaults for error checking parameters */
@@ -74,7 +75,7 @@ public class ClusterController {
 	 */
 	public ClusterController(final ClusterDialog dialog, 
 			final TVController controller) {
-
+		
 		this.clusterDialog = dialog;
 		this.tvController = controller;
 		this.tvModel = controller.getDataModel();
@@ -84,7 +85,10 @@ public class ClusterController {
 		addAllListeners();
 	}
 	
-	public void addAllListeners() {
+	/**
+	 * Adds all GUI listeners defined in this controller to ClusterView.
+	 */
+	private void addAllListeners() {
 		
 		if(clusterView != null) {
 			clusterView.addClusterListener(new TaskStartListener());
@@ -354,7 +358,7 @@ public class ClusterController {
 	 * Sets a new DendroView with the new data loaded into TVModel, displaying
 	 * an updated HeatMap. It should also close the ClusterViewFrame.
 	 */
-	public void visualizeData(String filePath) {
+	private void visualizeData(String filePath) {
 
 		LogBuffer.println("Getting files for loading clustered data.");
 		
@@ -369,9 +373,10 @@ public class ClusterController {
 			LogBuffer.println("Setting view choice to begin loading.");
 			tvController.setViewChoice(false);
 			
-			/* TODO can this be inherited from TVController? */
-			LoadWorker loadWorker = new LoadWorker(fileSet);
-			loadWorker.execute();
+			LogBuffer.println("Loading data...");
+			clusterDialog.dispose();
+			
+			tvController.load(fileSet);
 
 		} else {
 			String alert = "When trying to load the clustered file, no "
@@ -381,59 +386,11 @@ public class ClusterController {
 			LogBuffer.println("Alert: " + alert);
 		}
 	}
-
-	/**
-	 * Worker thread to load data chosen by the user. If the loading is
-	 * successful, it sets the dataModel in the TVFrameController and loads the
-	 * DendroView. If not, it also ensures the appropriate response of 
-	 * DendroView and TVFrame.
-	 * TODO Implement inheritance from TVController... 
-	 */
-	private class LoadWorker extends SwingWorker<Void, Void> {
-
-		private FileSet fileSet;
-		
-		public LoadWorker(FileSet fileSet) {
-			
-			LogBuffer.println("Initializing LoadWorker.");
-			this.fileSet = fileSet;
-		}
-		
-		@Override
-		protected Void doInBackground() throws Exception {
-
-			LogBuffer.println("Loading data...");
-			clusterDialog.dispose();
-			
-			tvController.loadFileSet(fileSet);
-			return null;
-		}
-
-		@Override
-		protected void done() {
-
-			if (tvController.getDataModel().getDataMatrix()
-					.getNumRow() > 0) {
-				tvController.setDataModel();
-				tvController.setViewChoice(false);
-				LogBuffer.println("Successfully loaded.");
-
-			} else {
-				String message = "No clustered data matrix could be set.";
-				JOptionPane.showMessageDialog(JFrame.getFrames()[0], 
-						message, "Alert", JOptionPane.WARNING_MESSAGE);
-				LogBuffer.println("Alert: " + message);
-				clusterView.setClustering(false);
-				tvController.setViewChoice(true);
-				tvController.addViewListeners();
-			}
-		}
-	}
 	
-	/* ----Listeners----- */
+	/* -------------------- Listeners ------------------------------ */
 	/**
-	 * Listener listens to a change in selection for the clusterChoice
-	 * JComboBox in clusterView. Calls a new layout setup as a response.
+	 * Listens to a change in selection for the clusterChoice JComboBox 
+	 * in clusterView. Calls a new layout setup as a response.
 	 * @author CKeil
 	 *
 	 */
@@ -452,8 +409,8 @@ public class ClusterController {
 	}
 	
 	/**
-	 * Listener listens to a change in selection for the linkChooser
-	 * JComboBox in clusterView. Calls a new layout setup as a response.
+	 * Listens to a change in selection for the linkChooser JComboBox 
+	 * in clusterView. Calls a new layout setup as a response.
 	 * @author CKeil
 	 *
 	 */
@@ -543,15 +500,10 @@ public class ClusterController {
 		}
 	}
 	
-	/* --- Helper methods --- */
+	/* ------------------ Helper methods -------------------- */
 	/**
 	 * Verifies whether all needed options are selected to 
 	 * perform clustering.
-	 * 
-	 * TODO What if the user selects a number for 1 of the 2 spinner values
-	 * for one axis, but both for the other? Cluster will still continue but
-	 * only cluster the correctly set up axis. How can a warning be displayed,
-	 * how can intent of the user be recognized?
 	 * 
 	 * @param distMeasure Selected distance measure.
 	 * @return boolean Whether all needed selections have 

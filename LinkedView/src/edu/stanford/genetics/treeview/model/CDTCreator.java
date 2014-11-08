@@ -87,7 +87,7 @@ public class CDTCreator {
 
 		try {
 			// Loading screen
-			loadProgView.setLoadLabel("Transforming file to CDT format...");
+			loadProgView.setLoadText("Transforming file to CDT format...");
 			loadProgView.resetLoadBar();
 
 			// Count file lines for loadBar
@@ -99,13 +99,13 @@ public class CDTCreator {
 			// final String[][] dataExtract = extractData(reader, pBarMax);
 
 			// Arrays to ArrayLists
-			loadProgView.setLoadLabel("Preparing dataset.");
+			loadProgView.setLoadText("Preparing dataset.");
 			// dataSet = transformArray(dataExtract);
 			dataSet = extractData(reader, pBarMax);
 			rowSize = dataSet[0].length;
 
 			// Find positions of labels in the data set
-			loadProgView.setLoadLabel("Checking for labels.");
+			loadProgView.setLoadText("Checking for labels.");
 			findLabel(gidInd, "GID");
 			findLabel(aidInd, "AID");
 			findLabel(orfInd, "ORF");
@@ -118,10 +118,10 @@ public class CDTCreator {
 			dataStart[0] = eweightInd[0] + 1;
 			dataStart[1] = gweightInd[1] + 1;
 
-			loadProgView.setLoadLabel("Setting up file details.");
+			loadProgView.setLoadText("Setting up file details.");
 			setupFile();
 
-			loadProgView.setLoadLabel("Writing CDT file...");
+			loadProgView.setLoadText("Writing CDT file...");
 			generateCDT();
 
 			bw.close();

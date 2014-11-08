@@ -79,23 +79,23 @@ public class KnnModel extends TVModel implements DataModel {
 		/* build KnnModel, initially empty... */
 	}
 
-	/**
-	 * 
-	 * 
-	 * @param fileSet
-	 *            fileset to load
-	 * 
-	 */
-	@Override
-	public void loadNew(final FileSet fileSet) throws LoadException {
-
-		resetState();
-		setSource(fileSet);
-		// final KnnModelLoader loader = new KnnModelLoader(this);
-		// loader.loadInto();
-		final NewKnnModelLoader loader = new NewKnnModelLoader(this);
-		loader.load();
-	}
+//	/**
+//	 * 
+//	 * 
+//	 * @param fileSet
+//	 *            fileset to load
+//	 * 
+//	 */
+//	@Override
+//	public void loadNew(final FileSet fileSet) throws LoadException {
+//
+//		resetState();
+//		setSource(fileSet);
+//		// final KnnModelLoader loader = new KnnModelLoader(this);
+//		// loader.loadInto();
+//		final NewKnnModelLoader loader = new NewKnnModelLoader(this);
+//		loader.load();
+//	}
 
 	// /**
 	// * Don't open a loading window...
