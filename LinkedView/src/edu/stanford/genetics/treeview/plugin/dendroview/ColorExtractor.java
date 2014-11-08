@@ -632,11 +632,13 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	/**
 	 * Gets the aRGBColor attribute of the ColorExtractor object
 	 * 
-	 * @param dval
-	 *            Description of the Parameter
+	 * @param dval Description of the Parameter
+	 * @param isBackground If a row/ column in DoubleArrayDrawer is not selected
+	 * while there exists another selection, it is considered to be in the 
+	 * background.
 	 * @return The aRGBColor value
 	 */
-	public int getARGBColor(final double dval) {
+	public int getARGBColor(final double dval, boolean isBackground) {
 
 		final float[] comp;
 		if (fractions.length == 0 || colorList.isEmpty()) {
@@ -644,6 +646,16 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 
 		} else {
 			comp = getFloatColor(dval, fractions, colorList);
+		}
+		
+		/* 
+		 * If a pixel in DoubleArrayDrawer is in the background, darken the
+		 * RGB color by multiplying R, G, and B values with a fraction.
+		 */
+		if(isBackground) {
+			for(int i = 0; i < comp.length; i++) {
+				comp[i] *= 0.5;
+			}
 		}
 
 		return ((255 << 24) | ((int) (255 * comp[0]) << 16)
