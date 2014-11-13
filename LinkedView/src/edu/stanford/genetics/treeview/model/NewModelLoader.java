@@ -97,6 +97,7 @@ public class NewModelLoader {
 	private class LoadTask extends SwingWorker<TVModel, Integer> {
 
 		private int lineNum;
+		private int gWeightCol;
 		
 		@Override
         protected void process(List<Integer> chunks) {
@@ -120,6 +121,7 @@ public class NewModelLoader {
 			String[][] stringLabels = new String[lineNum][];
 
 			String line;
+			gWeightCol = 0;
 			dataStartRow = 0;
 			dataStartCol = 0;
 			int rowN = 0;
@@ -157,12 +159,12 @@ public class NewModelLoader {
 		/* ---- Loading methods -------- */
 		private String[] findData(String line, int rowN) {
 			
+			/* Flag for the current row to avoid adding weights as data. */
 			boolean containsEWeight = false;
 			
 			// load line as String array
 			String[] lineAsStrings = line.split("\\t", -1);
 			String[] labels;
-			int gWeightCol = 0;
 			double[] dataValues;
 			
 			// loop over String array to convert applicable String to double
