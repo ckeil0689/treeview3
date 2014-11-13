@@ -129,13 +129,15 @@ public class MapContainer extends Observable implements Observer,
 		//visible data
 		firstVisible = 0;
 		numVisible = getMaxIndex() + 1;
+		//LogBuffer.println("setHome: numVisible has been set to [" + numVisible + "].");
 		
 		setScale(minScale);
 	}
 
 	public void calculateNewMinScale() {
 
-		this.tileNumVisible = getMaxIndex();
+		this.tileNumVisible = getMaxIndex() + 1;
+		//LogBuffer.println("calculateNewMinScale: tileNumVisible has been set to [" + tileNumVisible + "].");
 		minScale = getCalculatedMinScale();
 	}
 	
@@ -175,6 +177,7 @@ public class MapContainer extends Observable implements Observer,
 		double newScale = getScale();
 
 		tileNumVisible = Math.round(getAvailablePixels() / getScale());
+		//LogBuffer.println("zoomOut: tileNumVisible has been set to [" + tileNumVisible + "].");
 
 		zoomVal = (int) Math.round(tileNumVisible / 20.0);
 
@@ -184,15 +187,21 @@ public class MapContainer extends Observable implements Observer,
 		}
 
 		tileNumVisible = tileNumVisible + zoomVal;
-		
+		if(tileNumVisible > (getMaxIndex() + 1)) {
+			tileNumVisible = getMaxIndex() + 1;
+		}
+		//LogBuffer.println("zoomOut: tileNumVisible has been set to [" + tileNumVisible + "].");
+
 		//Keep track of explicit changes, by the user, to the amount of
 		//visible data
 		numVisible = (int) tileNumVisible;
+		//LogBuffer.println("zoomOut: numVisible has been set to [" + numVisible + "].");
 
 		newScale = getAvailablePixels() / tileNumVisible;
 
-		if (newScale < minScale) {
-			newScale = minScale;
+		double myMinScale = getCalculatedMinScale();
+		if (newScale < myMinScale) {
+			newScale = myMinScale;
 		}
 		setScale(newScale);
 	}
@@ -208,11 +217,12 @@ public class MapContainer extends Observable implements Observer,
 	 */
 	public void zoomIn() {
 
-		final double maxScale = getAvailablePixels();
+		//final double maxScale = getAvailablePixels();
 		double newScale = getScale();
 		int zoomVal;
 
 		tileNumVisible = Math.round(getAvailablePixels() / getScale());
+		//LogBuffer.println("zoomIn: tileNumVisible has been set to [" + tileNumVisible + "].");
 
 		zoomVal = (int) Math.round(tileNumVisible / 20.0);
 
@@ -222,16 +232,22 @@ public class MapContainer extends Observable implements Observer,
 		}
 
 		tileNumVisible = tileNumVisible - zoomVal;
-		
+		if(tileNumVisible < 1) {
+			tileNumVisible = 1;
+		}
+		//LogBuffer.println("zoomIn: tileNumVisible has been set to [" + tileNumVisible + "].");
+
 		//Keep track of explicit changes, by the user, to the amount of
 		//visible data
 		numVisible = (int) tileNumVisible;
+		//LogBuffer.println("zoomIn: numVisible has been set to [" + numVisible + "].");
 
 		// Recalculating scale
 		newScale = getAvailablePixels() / tileNumVisible;
 
-		if (newScale > maxScale) {
-			newScale = maxScale;
+		double myMaxScale = getAvailablePixels();
+		if (newScale > myMaxScale) {
+			newScale = myMaxScale;
 		}
 		setScale(newScale);
 	}
@@ -250,6 +266,7 @@ public class MapContainer extends Observable implements Observer,
 		//was being called in contexts where the user was not intending
 		//to do that, so instead, I changed the divisor to be the number
 		//of data indexes currently being viewed. -Rob
+		LogBuffer.println("recalculateScale: numVisible: [" + tileNumVisible + "] was used to calculate requiredScale.");
 		final double requiredScale = getAvailablePixels() / numVisible;
 		if (requiredScale > default_scale) {
 			setScale(requiredScale);
@@ -542,6 +559,7 @@ public class MapContainer extends Observable implements Observer,
 	 * spots they are looking at.
 	 */
 	public void setNumVisible(int i) {
+		//LogBuffer.println("setNumVisible: numVisible has been set to [" + i + "].");
 		numVisible = i;
 	}
 

@@ -532,9 +532,9 @@ public class DendroController implements ConfigNodePersistent {
 		if (arrayIndexes > 0 && geneIndexes > 0) {
 			newScale = (globalXmap.getAvailablePixels()) / arrayIndexes;
 
-			if (newScale < globalXmap.getMinScale()) {
-				newScale = globalXmap.getMinScale();
-			}
+			//if (newScale < globalXmap.getMinScale()) {
+			//	newScale = globalXmap.getMinScale();
+			//}
 			globalXmap.setScale(newScale);
 			
 			//LogBuffer.println("Setting numVisible for arrays to round of double [" + arrayIndexes + "].");
@@ -553,9 +553,9 @@ public class DendroController implements ConfigNodePersistent {
 //							  "xscale: [" + newScale + "] " +
 //							  "yscale: [" + newScale2 + "].");
 
-			if (newScale2 < globalYmap.getMinScale()) {
-				newScale2 = globalYmap.getMinScale();
-			}
+			//if (newScale2 < globalYmap.getMinScale()) {
+			//	newScale2 = globalYmap.getMinScale();
+			//}
 			globalYmap.setScale(newScale2);
 
 			//LogBuffer.println("Setting numVisible for genes to round of double [" + geneIndexes + "].");
@@ -630,25 +630,26 @@ public class DendroController implements ConfigNodePersistent {
 		
 		if (arrayIndexes == 0 || geneIndexes == 0 || (arrayIndexes == globalXmap.getMaxIndex() && geneIndexes == globalYmap.getMaxIndex())) {
 			//LogBuffer.println("No spots are visible. Resetting view.");
-			arrayIndexes = globalXmap.getMaxIndex();
-			geneIndexes  = globalYmap.getMaxIndex();
+			arrayIndexes = globalXmap.getMaxIndex() + 1;
+			geneIndexes  = globalYmap.getMaxIndex() + 1;
 			resetMapContainers();
 		}
 		else {
 			//LogBuffer.println("pixels / array indexes visible: [" + globalXmap.getAvailablePixels() + "/" + arrayIndexes + "] gene indexes visible: [" + globalYmap.getAvailablePixels() + "/" + geneIndexes + "].");
-			
 			newScale = (globalXmap.getAvailablePixels()) / arrayIndexes;
+			//LogBuffer.println("reZoomVisible: numVisible: [" + arrayIndexes + "] is being used in calculations for new scale values: [" + newScale + "].  They cannot be less than the minscale: [" + globalXmap.getMinScale() + "]");
 
-			if (newScale < globalXmap.getMinScale()) {
-				newScale = globalXmap.getMinScale();
-			}
+			//if (newScale < globalXmap.getMinScale()) {
+			//	newScale = globalXmap.getMinScale();
+			//}
 			globalXmap.setScale(newScale);
 
 			newScale2 = (globalYmap.getAvailablePixels()) / geneIndexes;
+			//LogBuffer.println("reZoomVisible: numVisible: [" + geneIndexes + "] is being used in calculations for new scale values: [" + newScale2 + "].  They cannot be less than the minscale: [" + globalYmap.getMinScale() + "]");
 			
-			if (newScale2 < globalYmap.getMinScale()) {
-				newScale2 = globalYmap.getMinScale();
-			}
+			//if (newScale2 < globalYmap.getMinScale()) {
+			//	newScale2 = globalYmap.getMinScale();
+			//}
 			globalYmap.setScale(newScale2);
 			dendroView.getGlobalView().repaint();
 		}
