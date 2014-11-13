@@ -44,7 +44,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
  * @author aloksaldanha
  * 
  */
-public class NewKnnModelLoader extends NewModelLoader {
+public class NewKnnModelLoader extends ModelLoader {
 
 	/**
 	 * @param model

@@ -810,7 +810,7 @@ public class TVModel extends Observable implements DataModel {
 //		resetState();
 //		setSource(fileSet);
 //
-//		NewModelLoader loader = new NewModelLoader(this);
+//		ModelLoader loader = new ModelLoader(this);
 //		loader.load();
 //		loader = null;
 //

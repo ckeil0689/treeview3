@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -15,11 +16,11 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import ColorChooser.ColorChooser;
+import ColorChooser.ColorChooserController;
 import Utilities.StringRes;
 import Views.ClusterDialog;
 import Views.WelcomeView;
-import ColorChooser.ColorChooser;
-import ColorChooser.ColorChooserController;
 import edu.stanford.genetics.treeview.CdtFilter;
 import edu.stanford.genetics.treeview.DataMatrix;
 import edu.stanford.genetics.treeview.DataModel;
@@ -35,7 +36,7 @@ import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.UrlExtractor;
 import edu.stanford.genetics.treeview.UrlPresets;
 import edu.stanford.genetics.treeview.model.DataModelWriter;
-import edu.stanford.genetics.treeview.model.NewModelLoader;
+import edu.stanford.genetics.treeview.model.ModelLoader;
 import edu.stanford.genetics.treeview.model.ReorderedDataModel;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.plugin.dendroview.DoubleArrayDrawer;
@@ -213,6 +214,9 @@ public class TVController {
 	 * Setting up a worker thread to load the file selected by the user. 
 	 * This prevents the GUI from locking up and allows the ProgressBar 
 	 * to display progress.
+	 * TODO Reduce to one swingworker only by making a LoadStatus object 
+	 * which encapsulates both the load progress and the label update
+	 * so only one publish() is gonna be used and only one thread is gonna run.
 	 */
 	private class LoadWorker extends SwingWorker<Void, String> {
 
@@ -244,10 +248,13 @@ public class TVController {
 				
 				/* ------ Load Process -------- */
 				publish("Getting file ready to load...");
-				NewModelLoader loader = new NewModelLoader(tvModel);
+				ModelLoader loader = new ModelLoader(tvModel);
 				
 				publish("Loading data...");
-				tvModel = loader.load();
+				loader.execute();
+				
+				/* Wait for loading to finish using get() */
+				tvModel = loader.get();
 
 				if (!tvModel.isLoaded()) {
 					publish("Done.");
@@ -257,7 +264,8 @@ public class TVController {
 							LoadException.INTPARSE);
 				}
 
-			} catch (OutOfMemoryError | LoadException e) {
+			} catch (OutOfMemoryError | LoadException | InterruptedException 
+					| ExecutionException e) {
 				if(e instanceof OutOfMemoryError) {
 					final String oomError = "The data file is too large. "
 							+ "Increase the JVM's heap size. Error: " 
