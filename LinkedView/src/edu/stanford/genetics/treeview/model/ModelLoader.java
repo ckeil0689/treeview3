@@ -17,7 +17,6 @@ import Views.WelcomeView;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.model.ModelLoader.LoadStatus;
 
 /**
@@ -32,9 +31,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	/* Reference to the main model which will hold the data */
 	protected TVModel targetModel;
 	private final FileSet fileSet;
-	
-	/* Reference to the main view frame */
-	protected TreeViewFrame tvFrame;
 
 	/* 2D array to hold numerical data */
 	private double[][] doubleData;
@@ -59,7 +55,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 		this.controller = controller;
 		this.targetModel = (TVModel)model;
-		this.tvFrame = ((TVModel)model).getFrame();
 		this.fileSet = model.getFileSet();
 		
 		setupPattern();
@@ -94,11 +89,14 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		dataStartRow = 0;
 		dataStartCol = 0;
 		int current_row = 0;
+		
+		ls.setStatus("Finding data...");
 
 		/* Read all lines and parse the data */
 		while ((line = reader.readLine()) != null) {
 			
 			if(hasData) {
+				ls.setStatus("Loading...");
 				stringLabels[current_row] = fillDoubles(line, current_row);
 				
 			} else {
@@ -110,6 +108,9 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		}
 		
 		reader.close();
+		
+		ls.setStatus("Getting ready...");
+		publish(ls);
 		
 		/* Parse tree and config files */ 
 		assignDataToModel(stringLabels);
@@ -317,8 +318,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			LogBuffer.println("No GTR file found for this CDT file.");
 			targetModel.gidFound(false);
 		}
-		
-		targetModel.setLoaded(true);
 
 		// Load Config File
 		try {
@@ -326,7 +325,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			final String fileName = targetModel.getFileSet().getRoot();
 			final String fileExt = targetModel.getFileSet().getExt();
 
-			final Preferences fileNode = tvFrame.getConfigNode().node("File");
+			final Preferences fileNode = controller.getConfigNode().node("File");
 
 			Preferences documentConfig = null;
 			final String[] childrenNodes = fileNode.childrenNames();

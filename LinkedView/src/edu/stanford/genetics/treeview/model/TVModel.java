@@ -32,11 +32,10 @@ import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.FileSetListener;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.TreeViewFrame;
 
 public class TVModel extends Observable implements DataModel {
 
-	protected TreeViewFrame tvFrame;
+//	protected TreeViewFrame tvFrame;
 	protected FileSet source = null;
 	protected String dir = null;
 	protected String root;
@@ -254,15 +253,15 @@ public class TVModel extends Observable implements DataModel {
 		documentConfig = newVal;
 	}
 
-	public void setFrame(final TreeViewFrame f) {
-
-		tvFrame = f;
-	}
-
-	public TreeViewFrame getFrame() {
-
-		return tvFrame;
-	}
+//	public void setFrame(final TreeViewFrame f) {
+//
+//		tvFrame = f;
+//	}
+//
+//	public TreeViewFrame getFrame() {
+//
+//		return tvFrame;
+//	}
 
 	protected void hashAIDs() {
 
@@ -859,6 +858,7 @@ public class TVModel extends Observable implements DataModel {
 	public void setLoaded(final boolean loaded) {
 
 		this.loaded = loaded;
+		this.notifyObservers((Boolean)loaded);
 	}
 
 	@Override

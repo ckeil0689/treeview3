@@ -66,6 +66,7 @@ import edu.stanford.genetics.treeview.core.FileMruEditor;
 import edu.stanford.genetics.treeview.core.LogMessagesPanel;
 import edu.stanford.genetics.treeview.core.LogSettingsPanel;
 import edu.stanford.genetics.treeview.core.MenuHelpPluginsFrame;
+import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 
 /**
@@ -132,8 +133,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		super(appName);
 		treeView = treeview;
-		configNode = treeView.getGlobalConfig().node(
-				StringRes.pnode_TVFrame);
+		configNode = treeView.getGlobalConfig().node(StringRes.pnode_TVFrame);
 		
 		// Initialize the views
 		welcomeView = new WelcomeView();
@@ -162,7 +162,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		setupFileMru();
 
 		setupFrameSize();
-		setLoaded(false);
+		
+		/* Initial view */
+		setView(StringRes.view_Welcome);
 	}
 
 	@Override
@@ -210,17 +212,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 				view.add(error, "push, alignx 50%");
 			}
-
-			// Rebuild Menus
-//			buildMenuBar();
-
 		} else {
 			view = dendroView.makeDendroPanel();
-
-			// Rebuild Menus
-//			buildMenuBar();
-
-//			dendroController.setNew(dendroView);//,(TVModel) dataModel);
 		}
 
 		buildMenuBar();
@@ -480,29 +473,28 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	public void setRunning(final boolean isDendroLoaded) {
 
-		if(isDendroLoaded) { 
-			running = dendroView;
-			
-		} else {
-			running = null;
-		}
+		running = (isDendroLoaded) ? dendroView : null;
 	}
 
 	// Observer
 	@Override
-	public void update(final Observable observable, final Object object) {
+	public void update(final Observable o, final Object obj) {
 
-		LogBuffer.println("Updating fileMRU in TVFrame.");
-
-		if (observable == fileMru && menubar != null) {
+		if (o == fileMru && menubar != null) {
+			LogBuffer.println("Updating fileMRU in TVFrame.");
 			// System.out.println("Rebuilding file menu");
 			buildMenuBar();
-
+			
+		} else if(o instanceof TVModel) {
+			/* TVModel passes a boolean object to notify if it was loaded. */
+			setRunning((Boolean)obj);
+			setLoaded((Boolean)obj);
+			
 		} else {
+			LogBuffer.println("Observable is: " + o.getClass());
 			LogBuffer.println("Got weird update");
 		}
 	}
-
 
 	/**
 	 * This should be called whenever the loaded status changes It's
@@ -511,50 +503,30 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 * @param boolean flag
 	 */
 	@Override
-	public void setLoaded(final boolean flag) {
+	public void setLoaded(final boolean isModelLoaded) {
 		
 		// setGeneFinder(null);
-		this.loaded = flag;
+		this.loaded = isModelLoaded;
 
 		if (loaded) {
 			if (running == null) {
-				JOptionPane.showMessageDialog(applicationFrame,
-						"TreeViewFrame 253: No plugins to display");
+				setTitleString(applicationFrame.getName());
+				setView(StringRes.view_Welcome);
+//				JOptionPane.showMessageDialog(applicationFrame,
+//						"TreeViewFrame 253: No plugins to display");
 			} else {
 				setLoadedTitle();
+				setView(StringRes.view_Dendro);
 			}
 
 		} else {
 			applicationFrame.setTitle(StringRes.appName);
+			setTitleString(applicationFrame.getName());
+			setView(StringRes.view_LoadError);
 		}
 
 		buildMenuBar();
-//		setOptionButtons();
-		// menubar.rebuild...
-		// rebuildMainPanelMenu();
-		// treeView.rebuildWindowMenus();
 	}
-
-//	/**
-//	 * Builds the two menu buttons for TVFrame and generates the menubar for
-//	 * the application.
-//	 */
-//	public void buildMenu() {
-//
-////		btnPanel.removeAll();
-//		menuBar = new JMenuBar();
-//		applicationFrame.setJMenuBar(menuBar);
-//
-//		buildMenuBar();
-//
-////		if (running != null) {
-////			generateSearchMenu();
-////			generateTreeMenu();
-////		}
-//		
-////		btnPanel.revalidate();
-////		btnPanel.repaint();
-//	}
 	
 	/**
 	 * Controls the display of the search and tree toggle buttons.
@@ -1078,8 +1050,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	private void setLoadedTitle() {
 
-		applicationFrame.setTitle(StringRes.appName + " : "
-				+ title); //dataModel.getSource());
+		applicationFrame.setTitle(StringRes.appName + ": " + title);
 	}
 
 //	@Override
@@ -1090,7 +1061,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	
 	public void setTitleString(final String title) {
 
-		LogBuffer.println("Title: "  + title);
 		this.title = title;
 	}
 	
@@ -1116,7 +1086,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		}
 	}
 
-	// Adding MenuActionListeners
+	/* Adding MenuActionListeners */
 	public void addMenuActionListeners(final ActionListener l) {
 
 		for (final JMenuItem item : stackMenuList) {
@@ -1151,11 +1121,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 			}
 		}
 	}
-
-//	public void addSearchButtonListener(final MouseListener l) {
-//
-//		searchBtn.addMouseListener(l);
-//	}
 
 	public void addTreeButtonListener(final MouseListener l) {
 

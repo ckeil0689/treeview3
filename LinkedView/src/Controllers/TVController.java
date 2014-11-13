@@ -53,14 +53,15 @@ public class TVController {
 	private File file;
 	private FileSet fileMenuSet;
 
-	public TVController(final TreeViewFrame tvFrame, 
-			final DataModel model) {
+	public TVController(final TreeViewFrame tvFrame, final DataModel model) {
 
 		this.model = model;
 		this.tvFrame = tvFrame;
 		this.dendroController = new DendroController(tvFrame);
 		
-		setViewChoice(false);
+		/* Add the view as observer to the model */
+		((TVModel) model).addObserver(tvFrame);
+		
 		addViewListeners();
 	}
 	
@@ -170,31 +171,27 @@ public class TVController {
 	protected void setViewChoice(boolean hasError) {
 
 		if (hasError) {
-			tvFrame.setRunning(false);
-			tvFrame.setLoaded(false);
-			tvFrame.setView(StringRes.view_LoadError);
+//			tvFrame.setRunning(false);
+//			tvFrame.setLoaded(false);
 
 			LogBuffer.println(StringRes.clusterError_notLoaded);
 
 		} else {
 			if (model.isLoaded()) {
 				LogBuffer.println("Setting DendroView.");
-				tvFrame.setRunning(true);
-				tvFrame.setLoaded(true);
 				dendroController.setNew(tvFrame.getDendroView(), 
 						(TVModel) model);
-				tvFrame.setTitleString(model.getSource());
-				tvFrame.setView(StringRes.view_Dendro);
 
-			} else {
-				LogBuffer.println("Setting WelcomeView.");
-				tvFrame.setRunning(false);
-				tvFrame.setLoaded(false);
-				tvFrame.setView(StringRes.view_Welcome);
-			}
+			} 
+//			else {
+//				LogBuffer.println("Setting WelcomeView.");
+//				tvFrame.setRunning(false);
+//				tvFrame.setLoaded(false);
+//				tvFrame.setView(StringRes.view_Welcome);
+//			}
 		}
 		
-		addMenuListeners();
+//		addMenuListeners();
 	}
 	
 	/**
@@ -216,7 +213,6 @@ public class TVController {
 
 		/* Loading TVModel */
 		TVModel tvModel = (TVModel) model;
-		tvModel.setFrame(tvFrame);
 
 		try {
 			tvModel.resetState();
@@ -252,8 +248,16 @@ public class TVController {
 				LogBuffer.println("FileSet is null.");
 			}
 			
+			tvFrame.setTitleString(model.getSource());
+			
+			/* Will notify view of successful loading. */
+			((TVModel) model).setLoaded(true);
+			
 			setDataModel();
-			setViewChoice(false);
+			
+			LogBuffer.println("Setting DendroView.");
+			dendroController.setNew(tvFrame.getDendroView(), (TVModel) model);
+			
 			LogBuffer.println("Successfully loaded: " + model.getSource());
 
 		} else {
@@ -261,9 +265,13 @@ public class TVController {
 			JOptionPane.showMessageDialog(JFrame.getFrames()[0], 
 					message, "Alert", JOptionPane.WARNING_MESSAGE);
 			LogBuffer.println("Alert: " + message);
-			setViewChoice(true);
-			addViewListeners();
+			
+			/* Set model status, which will update the view. */
+			((TVModel) model).setLoaded(false);
 		}
+		
+		addViewListeners();
+		addMenuListeners();
 	}
 
 	/**
@@ -380,7 +388,7 @@ public class TVController {
 	}
 
 	/**
-	 * Setter for dataModel for TVFrame, also sets extractors, running.
+	 * Sets extractors and FileSetListeners.
 	 */
 	public void setDataModel() {
 
@@ -696,6 +704,14 @@ public class TVController {
 				preferences.setVisible(true);
 			}
 		});
+	}
+	
+	/*
+	 * Gets the main view's config node.
+	 */
+	public Preferences getConfigNode() {
+		
+		return tvFrame.getConfigNode();
 	}
 
 	/**
