@@ -480,12 +480,12 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	@Override
 	public void update(final Observable o, final Object obj) {
 
-		if (o == fileMru && menubar != null) {
+		if (o instanceof FileMru) {// && menuBar != null) {
 			LogBuffer.println("Updating fileMRU in TVFrame.");
 			// System.out.println("Rebuilding file menu");
 			buildMenuBar();
 			
-		} else if(o instanceof TVModel) {
+		} else if (o instanceof TVModel) {
 			/* TVModel passes a boolean object to notify if it was loaded. */
 			setRunning((Boolean)obj);
 			setLoaded((Boolean)obj);

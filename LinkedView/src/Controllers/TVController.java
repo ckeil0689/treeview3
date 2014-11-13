@@ -218,9 +218,13 @@ public class TVController {
 			tvModel.resetState();
 			tvModel.setSource(fileMenuSet);
 			
+			if(tvModel.getArrayHeaderInfo().getNumHeaders() == 0) {
 			/* ------ Load Process -------- */
 			ModelLoader loader = new ModelLoader(tvModel, this);
 			loader.execute();
+			} else {
+				LogBuffer.println("ArrayHeaders not reset, aborted loading.");
+			}
 
 		} catch (OutOfMemoryError  e) {
 			if(e instanceof OutOfMemoryError) {
@@ -265,6 +269,8 @@ public class TVController {
 			JOptionPane.showMessageDialog(JFrame.getFrames()[0], 
 					message, "Alert", JOptionPane.WARNING_MESSAGE);
 			LogBuffer.println("Alert: " + message);
+			
+			tvFrame.setLoadErrorMessage("Data in file unusable.");
 			
 			/* Set model status, which will update the view. */
 			((TVModel) model).setLoaded(false);

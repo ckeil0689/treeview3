@@ -73,7 +73,7 @@ public abstract class ViewFrame implements Observer {
 	private UrlExtractor arrayUrlExtractor;
 
 	// menubar for the application
-	protected TreeviewMenuBarI menubar;
+//	protected TreeviewMenuBarI menubar;
 
 	/**
 	 * Constructor for the ViewFrame object Sets title and window listeners
