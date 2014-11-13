@@ -1090,6 +1090,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	
 	public void setTitleString(final String title) {
 
+		LogBuffer.println("Title: "  + title);
 		this.title = title;
 	}
 	

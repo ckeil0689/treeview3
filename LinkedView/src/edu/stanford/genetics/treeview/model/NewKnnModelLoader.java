@@ -23,21 +23,7 @@
 
 package edu.stanford.genetics.treeview.model;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.prefs.Preferences;
-
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-
-import Utilities.GUIFactory;
-import edu.stanford.genetics.treeview.FileSet;
-import edu.stanford.genetics.treeview.LoadException;
+import Controllers.TVController;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
@@ -49,9 +35,10 @@ public class NewKnnModelLoader extends ModelLoader {
 	/**
 	 * @param model
 	 */
-	public NewKnnModelLoader(final KnnModel model) {
+	public NewKnnModelLoader(final KnnModel model, 
+			final TVController controller) {
 
-		super(model);
+		super(model, controller);
 		
 		/* TODO Not yet adapted to new loading code */
 		LogBuffer.println("KNNModel WAS DISABLED (commented out).");

@@ -141,7 +141,7 @@ public class LinkedViewApp extends TreeViewApp {
 		final TreeViewFrame tvFrame = new TreeViewFrame(this);
 		final DataModel model = new TVModel();
 //		new TVController(tvFrame, model).loadFileSet(fileSet);
-		new TVController(tvFrame, model).load(fileSet);
+		new TVController(tvFrame, model).loadData(fileSet);
 		
 		tvFrame.setLoaded(true);
 

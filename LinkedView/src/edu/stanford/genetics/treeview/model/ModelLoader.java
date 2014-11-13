@@ -11,20 +11,24 @@ import java.util.regex.Pattern;
 
 import javax.swing.SwingWorker;
 
+import Controllers.TVController;
 import Utilities.Helper;
 import Views.WelcomeView;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeViewFrame;
+import edu.stanford.genetics.treeview.model.ModelLoader.LoadStatus;
 
 /**
  * The class responsible for loading data into the TVModel.
  * @author CKeil
  *
  */
-public class ModelLoader extends SwingWorker<TVModel, Integer> {
+public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
+	protected TVController controller;
+	
 	/* Reference to the main model which will hold the data */
 	protected TVModel targetModel;
 	private final FileSet fileSet;
@@ -39,20 +43,21 @@ public class ModelLoader extends SwingWorker<TVModel, Integer> {
 	private String fpRegex;
 	
 	/* Total line number of file to be loaded */
-	private int lineNum;
+	private int row_num;
 
 	private int dataStartRow;
 	private int dataStartCol;
 	private int gWeightCol;
 
-	boolean hasData = false;
+	private boolean hasData = false;
 	private boolean hasGID = false;
 	private boolean hasAID = false;
 	private boolean hasEWeight = false;
 	private boolean hasGWeight = false;
 
-	public ModelLoader (final DataModel model) {
+	public ModelLoader (final DataModel model, TVController controller) {
 
+		this.controller = controller;
 		this.targetModel = (TVModel)model;
 		this.tvFrame = ((TVModel)model).getFrame();
 		this.fileSet = model.getFileSet();
@@ -61,66 +66,68 @@ public class ModelLoader extends SwingWorker<TVModel, Integer> {
 	}
 	
 	@Override
-    protected void process(List<Integer> chunks) {
+    protected void process(List<LoadStatus> chunks) {
         
-		int i = chunks.get(chunks.size() - 1);
-		WelcomeView.updateLoadBar(i);
+		LoadStatus ls = chunks.get(chunks.size() - 1);
+		WelcomeView.updateLoadBar(ls.getProgress());
+		WelcomeView.setLoadText(ls.getStatus());
     }
 	
 	@Override
-	protected TVModel doInBackground() throws Exception {
+	protected Void doInBackground() throws Exception {
 		
 		/* Setup */
 		WelcomeView.resetLoadBar();
-		lineNum = Helper.countFileLines(new File(fileSet.getCdt()));
-		WelcomeView.setLoadBarMax(lineNum);
+		row_num = Helper.countFileLines(new File(fileSet.getCdt()));
+		WelcomeView.setLoadBarMax(row_num);
+		
+		LoadStatus ls = new LoadStatus();
 		
 		File file = new File(fileSet.getCdt());
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		
 		/* Find data start */
-		String[][] stringLabels = new String[lineNum][];
+		String[][] stringLabels = new String[row_num][];
 
 		String line;
 		gWeightCol = 0;
 		dataStartRow = 0;
 		dataStartCol = 0;
-		int rowN = 0;
+		int current_row = 0;
 
 		/* Read all lines and parse the data */
 		while ((line = reader.readLine()) != null) {
 			
 			if(hasData) {
-				stringLabels[rowN] = fillDoubles(line, rowN);
+				stringLabels[current_row] = fillDoubles(line, current_row);
 				
 			} else {
-				stringLabels[rowN] = findData(line, rowN);
+				stringLabels[current_row] = findData(line, current_row);
 			}
 			
-			publish(rowN++);
+			ls.setProgress(current_row++);
+			publish(ls);
 		}
-		
-		LogBuffer.println("Lines read: " + rowN);
 		
 		reader.close();
 		
 		/* Parse tree and config files */ 
 		assignDataToModel(stringLabels);
 		
-		return targetModel;
+		return null;
 	}
 	
 	@Override
 	protected void done() {
 		
 		doubleData = null;
-		targetModel.setLoaded(true);
+		controller.finishLoading();
 	}
 	
 	/* ---- Loading methods -------- */
-	private String[] findData(String line, int rowN) {
+	private String[] findData(String line, int current_row) {
 		
-		/* Flag for the current row to avoid adding weights as data. */
+		/* Flag for the current_row to avoid adding weights as data. */
 		boolean containsEWeight = false;
 		
 		// load line as String array
@@ -136,52 +143,61 @@ public class ModelLoader extends SwingWorker<TVModel, Integer> {
 
 			final String element = lineAsStrings[i];
 
-			if (element.equalsIgnoreCase("GID")) {
-				hasGID = true;
-			}
+			/* Check string if it is the label for GIDs or AIDs. */
+			if (element.equalsIgnoreCase("GID")) hasGID = true;
+			if (element.equalsIgnoreCase("AID")) hasAID = true;
 
-			// Check for GWEIGHT to avoid the weight being
-			// recognized as row start of actual data
+			/* 
+			 * Check for GWEIGHT to avoid the weight being recognized 
+			 * as row start of actual data.
+			 */
 			if (element.equalsIgnoreCase("GWEIGHT")) {
 				gWeightCol = i;
 				hasGWeight = true;
 			}
-
-			if (element.equalsIgnoreCase("AID")) {
-				hasAID = true;
-			}
-
-			// Check for EWEIGHT to avoid the weight being
-			// recognized as column start of actual data
+			
+			/* 
+			 * Check for EWEIGHT to avoid the weight being recognized 
+			 * as column start of actual data.
+			 */
 			if (element.equalsIgnoreCase("EWEIGHT")) {
 				hasEWeight = true;
 				containsEWeight = true;
-				
-				LogBuffer.println(">>>>>>>>>>>> Has EWEIGHT: " + rowN);
 			}
 
+			/*
+			 * If the current string matches the pattern and is not in either
+			 * the GWEIGHT column or EWEIGHT row, we found the data start!
+			 */
 			if (Pattern.matches(fpRegex, element)
 					&& (!containsEWeight && i != gWeightCol)) {
 
-				dataStartRow = rowN;
+				dataStartRow = current_row;
 				dataStartCol = i;
+				
+				/* Initialize data matrix */
+				doubleData = new double[row_num - dataStartRow][];
 
 				hasData = true;
 				break;
 
 			} else {
-				labels[i] = element;
-				
-				// Concat empty String, otherwise this will store a 
-				// reference to the entire line from reader even when 
-				// loading method and SwingWorker are closed.
-				// Strings are immutable.
-				labels[i] += "";
+				/* 
+				 * Concatenate empty String, otherwise this will store a 
+				 * reference to the entire line from reader even when 
+				 * loading method and SwingWorker are closed. 
+				 * Strings are immutable!
+				 */
+				labels[i] = element + "";
 			}
 		}
-
+		
+		/* 
+		 * Rest of first line with data has to be handled here, because
+		 * reader.nextLine() will move on and cannot be set back.
+		 */
 		if (hasData) {
-			doubleData = new double[lineNum - dataStartRow][];
+			doubleData = new double[row_num - dataStartRow][];
 			dataValues = new double[lineAsStrings.length - dataStartCol];
 
 			for (int i = 0; i < lineAsStrings.length - dataStartCol; i++) {
@@ -206,7 +222,7 @@ public class ModelLoader extends SwingWorker<TVModel, Integer> {
 				}
 			}
 
-			doubleData[rowN - dataStartRow] = dataValues;
+			doubleData[current_row - dataStartRow] = dataValues;
 		}
 		
 		// avoid first datarow to be added with null values
@@ -227,7 +243,7 @@ public class ModelLoader extends SwingWorker<TVModel, Integer> {
 		}
 	}
 	
-	private String[] fillDoubles(String line, int rowN) {
+	private String[] fillDoubles(String line, int current_row) {
 		
 		// load line as String array
 		String[] lineAsStrings = line.split("\\t", -1);
@@ -236,11 +252,12 @@ public class ModelLoader extends SwingWorker<TVModel, Integer> {
 		
 		System.arraycopy(lineAsStrings, 0, labels, 0, dataStartCol);
 		
-		// This ensures that references to immutable string 
-		// (whole line from readline()!) do not stay in memory.
-		for (int i = 0; i < labels.length; i++){
-			labels[i] += "";
-		}
+		/* 
+		 * This ensures that references to immutable String (whole line 
+		 * from readline()!) do not stay in memory. This can and will screw
+		 * up RAM if not done like this.
+		 */
+		for (int i = 0; i < labels.length; i++) labels[i] += "";
 
 		for (int i = 0; i < lineAsStrings.length - dataStartCol; i++) {
 
@@ -250,10 +267,10 @@ public class ModelLoader extends SwingWorker<TVModel, Integer> {
 			// using the Pattern.matches method screws up
 			// loading time by a factor of 1000....
 			if (element.endsWith("e") || element.endsWith("E")) {
-				element = element + "+00";
+				element += "+00";
 			}
 
-			// Trying to parse the String. If not possible add 0.
+			/* Trying to parse the String. If not possible add 0. */
 			try {
 				final double val = Double.parseDouble(element);
 				dataValues[i] = val;
@@ -268,7 +285,7 @@ public class ModelLoader extends SwingWorker<TVModel, Integer> {
 		}
 
 		// Issue with length of stringLabels
-		doubleData[rowN - dataStartRow] = dataValues;
+		doubleData[current_row - dataStartRow] = dataValues;
 		
 		return labels;
 	}
@@ -300,6 +317,8 @@ public class ModelLoader extends SwingWorker<TVModel, Integer> {
 			LogBuffer.println("No GTR file found for this CDT file.");
 			targetModel.gidFound(false);
 		}
+		
+		targetModel.setLoaded(true);
 
 		// Load Config File
 		try {
@@ -346,7 +365,7 @@ public class ModelLoader extends SwingWorker<TVModel, Integer> {
 	
 	/**
 	 * Sets up regex patterns which will be used to differentiate between
-	 * labels and data in tab-delimited table entries. 
+	 * labels and numerical data in tab-delimited table entries. 
 	 */
 	private void setupPattern() {
 		
@@ -386,27 +405,27 @@ public class ModelLoader extends SwingWorker<TVModel, Integer> {
 	}
 
 
-	public List<String[]> extractGTR(final BufferedReader reader) {
+	private List<String[]> extractTreeData(final BufferedReader reader) {
 
-		final List<String[]> gtrData = new ArrayList<String[]>();
+		final List<String[]> treeData = new ArrayList<String[]>();
 		String line;
 
 		try {
 			while ((line = reader.readLine()) != null) {
 
 				// load line as String array
-				final String[] lineAsStrings = line.split("\t");
-				gtrData.add(lineAsStrings);
+				final String[] lineAsStrings = line.split("\\t", -1);
+				treeData.add(lineAsStrings);
 			}
 		} catch (final IOException e) {
 			LogBuffer.println("IOException during the "
 					+ "extraction of GTR file: " + e.getMessage());
 		}
 
-		return gtrData;
+		return treeData;
 	}
 
-	public void parseCDT(String[][] stringLabels) {
+	private void parseCDT(String[][] stringLabels) {
 
 		// Tell model whether EWEIGHT and GWEIGHT where found
 		targetModel.setEweightFound(hasEWeight);
@@ -456,10 +475,10 @@ public class ModelLoader extends SwingWorker<TVModel, Integer> {
 		targetModel.getDataMatrix().calculateMinMax();
 	}
 
-	public void parseGTR() {
+	private void parseGTR() {
 
 		// First, load the GTR File
-		final List<String[]> gtrData = loadSet(fileSet.getGtr());
+		final List<String[]> gtrData = loadTreeSet(fileSet.getGtr());
 
 		final String[] firstRow = gtrData.get(0);
 		if ( // decide if this is not an extended file..
@@ -490,10 +509,10 @@ public class ModelLoader extends SwingWorker<TVModel, Integer> {
 		targetModel.gidFound(hasGID);
 	}
 
-	public void parseATR() {
+	private void parseATR() {
 
 		// First, load the ATR File
-		final List<String[]> atrData = loadSet(fileSet.getAtr());
+		final List<String[]> atrData = loadTreeSet(fileSet.getAtr());
 
 		final String[] firstRow = atrData.get(0);
 		if ( // decide if this is not an extended file..
@@ -524,9 +543,9 @@ public class ModelLoader extends SwingWorker<TVModel, Integer> {
 		targetModel.aidFound(hasAID);
 	}
 
-	public List<String[]> loadSet(final String loadingSet) {
+	private List<String[]> loadTreeSet(final String loadingSet) {
 
-		List<String[]> gtrData = new ArrayList<String[]>();
+		List<String[]> treeData = new ArrayList<String[]>();
 
 		try {
 			// Read data from specified file location
@@ -535,7 +554,7 @@ public class ModelLoader extends SwingWorker<TVModel, Integer> {
 
 			// Get data from file into String and double arrays
 			// Put the arrays in ArrayLists for later access.
-			gtrData = extractGTR(br);
+			treeData = extractTreeData(br);
 			
 			br.close();
 
@@ -543,6 +562,42 @@ public class ModelLoader extends SwingWorker<TVModel, Integer> {
 			e.printStackTrace();
 		}
 
-		return gtrData;
+		return treeData;
+	}
+	
+	/* 
+	 * Encapsulates loading progress, so both label and progress bar 
+	 * can be updated using publish() and only one SwingWorker.
+	 */
+	class LoadStatus {
+		
+		private int progress;
+		private String status;
+		
+		public LoadStatus() {
+			
+			this.progress = 0;
+			this.status = "Ready.";
+		}
+		
+		public void setStatus(String status) {
+			
+			this.status = status;
+		}
+		
+		public void setProgress(int prog) {
+			
+			this.progress = prog;
+		}
+		
+		public String getStatus() {
+			
+			return status;
+		}
+		
+		public int getProgress() {
+			
+			return progress;
+		}
 	}
 }

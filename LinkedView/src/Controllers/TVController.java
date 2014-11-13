@@ -3,9 +3,7 @@ package Controllers;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -14,13 +12,11 @@ import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
 
 import ColorChooser.ColorChooser;
 import ColorChooser.ColorChooserController;
 import Utilities.StringRes;
 import Views.ClusterDialog;
-import Views.WelcomeView;
 import edu.stanford.genetics.treeview.CdtFilter;
 import edu.stanford.genetics.treeview.DataMatrix;
 import edu.stanford.genetics.treeview.DataModel;
@@ -209,121 +205,65 @@ public class TVController {
 		
 		dendroController.setMatrixSize(mode);
 	}
-
-	/**
-	 * Setting up a worker thread to load the file selected by the user. 
-	 * This prevents the GUI from locking up and allows the ProgressBar 
-	 * to display progress.
-	 * TODO Reduce to one swingworker only by making a LoadStatus object 
-	 * which encapsulates both the load progress and the label update
-	 * so only one publish() is gonna be used and only one thread is gonna run.
-	 */
-	private class LoadWorker extends SwingWorker<Void, String> {
-
-		@Override
-        protected void process(List<String> chunks) {
-            
-			String s = chunks.get(chunks.size() - 1);
-            WelcomeView.setLoadText(s);
-        }
+	
+	
+	public void loadData(FileSet fileSet) {
 		
-		@Override
-		public Void doInBackground() {
+		fileMenuSet = (fileSet != null) ? fileSet : tvFrame.getFileSet(file);
+		
+		/* Setting loading screen */
+		tvFrame.setView("LoadProgressView");
 
-			FileSet fileSet;
-			if (fileMenuSet == null) {
-				fileSet = tvFrame.getFileSet(file);
+		/* Loading TVModel */
+		TVModel tvModel = (TVModel) model;
+		tvModel.setFrame(tvFrame);
 
-			} else {
-				fileSet = fileMenuSet;
-			}
-
-			/* Loading TVModel */
-			TVModel tvModel = (TVModel) model;
-			tvModel.setFrame(tvFrame);
-
-			try {
-				tvModel.resetState();
-				tvModel.setSource(fileSet);
-				
-				/* ------ Load Process -------- */
-				publish("Getting file ready to load...");
-				ModelLoader loader = new ModelLoader(tvModel);
-				
-				publish("Loading data...");
-				loader.execute();
-				
-				/* Wait for loading to finish using get() */
-				tvModel = loader.get();
-
-				if (!tvModel.isLoaded()) {
-					publish("Done.");
-					
-				} else {
-					throw new LoadException("Loading Cancelled", 
-							LoadException.INTPARSE);
-				}
-
-			} catch (OutOfMemoryError | LoadException | InterruptedException 
-					| ExecutionException e) {
-				if(e instanceof OutOfMemoryError) {
-					final String oomError = "The data file is too large. "
-							+ "Increase the JVM's heap size. Error: " 
-							+ e.getMessage();
-					tvFrame.setLoadErrorMessage(oomError);
-					
-				} else {
-					JOptionPane.showMessageDialog(JFrame.getFrames()[0], e);
-				}
-			}
-
-			if (fileSet != null) {
-				fileSet = tvFrame.getFileMRU().addUnique(fileSet);
-				tvFrame.getFileMRU().setLast(fileSet);
-
-			} else {
-				LogBuffer.println("FileSet is null.");
-			}
-
-			return null;
-		}
-
-		@Override
-		protected void done() {
+		try {
+			tvModel.resetState();
+			tvModel.setSource(fileMenuSet);
 			
-			if (model.getDataMatrix().getNumRow() > 0) {
-				fileMenuSet = null;
-				setDataModel();
-				setViewChoice(false);
-				tvFrame.setTitleString(model.getSource());
-				LogBuffer.println("Successfully loaded.");
+			/* ------ Load Process -------- */
+			ModelLoader loader = new ModelLoader(tvModel, this);
+			loader.execute();
 
+		} catch (OutOfMemoryError  e) {
+			if(e instanceof OutOfMemoryError) {
+				final String oomError = "The data file is too large. "
+						+ "Increase the JVM's heap size. Error: " 
+						+ e.getMessage();
+				tvFrame.setLoadErrorMessage(oomError);
+				
 			} else {
-				String message = "No data matrix could be set.";
-				JOptionPane.showMessageDialog(JFrame.getFrames()[0], 
-						message, "Alert", JOptionPane.WARNING_MESSAGE);
-				LogBuffer.println("Alert: " + message);
-//				clusterView.setClustering(false);
-				setViewChoice(true);
-				addViewListeners();
+				JOptionPane.showMessageDialog(JFrame.getFrames()[0], e);
 			}
 		}
 	}
 	
-	/**
-	 * Initializes loading of a file if a fileSet is already supplied. 
-	 * openFile() is to be used, if a file should be selected by the user
-	 * first.
-	 * @param fileSet
-	 */
-	public void load(FileSet fileSet) {
+	public void finishLoading() {
 		
-		fileMenuSet = fileSet;
-		
-		/* Setting loading screen */
-		tvFrame.setView("LoadProgressView");
-		
-		new LoadWorker().execute();
+		if (model.getDataMatrix().getNumRow() > 0) {
+			
+			if (fileMenuSet != null) {
+				fileMenuSet = tvFrame.getFileMRU().addUnique(fileMenuSet);
+				tvFrame.getFileMRU().setLast(fileMenuSet);
+				fileMenuSet = null;
+
+			} else {
+				LogBuffer.println("FileSet is null.");
+			}
+			
+			setDataModel();
+			setViewChoice(false);
+			LogBuffer.println("Successfully loaded: " + model.getSource());
+
+		} else {
+			String message = "No data matrix could be set.";
+			JOptionPane.showMessageDialog(JFrame.getFrames()[0], 
+					message, "Alert", JOptionPane.WARNING_MESSAGE);
+			LogBuffer.println("Alert: " + message);
+			setViewChoice(true);
+			addViewListeners();
+		}
 	}
 
 	/**
@@ -338,11 +278,7 @@ public class TVController {
 			file = tvFrame.selectFile();
 
 			/* Only run loader, if JFileChooser wasn't canceled. */
-			if (file != null) {
-				/* Setting loading screen */
-				tvFrame.setView("LoadProgressView");
-				new LoadWorker().execute();
-			}
+			if (file != null) loadData(tvFrame.getFileSet(file));
 
 		} catch (final LoadException e) {
 			LogBuffer.println("Loading the FileSet was interrupted. "
@@ -445,7 +381,6 @@ public class TVController {
 
 	/**
 	 * Setter for dataModel for TVFrame, also sets extractors, running.
-	 * 
 	 */
 	public void setDataModel() {
 
@@ -669,7 +604,8 @@ public class TVController {
 					(JMenuItem)actionEvent.getSource());//tvFrame.getFileMenuSet();
 
 			tvFrame.setView(StringRes.view_LoadProg); //change
-			new LoadWorker().execute();
+			loadData(fileMenuSet);
+//			new LoadWorker().execute();
 
 			// } catch (final LoadException e) {
 			// if (e.getType() == LoadException.INTPARSE) {

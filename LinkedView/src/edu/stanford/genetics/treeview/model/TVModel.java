@@ -31,6 +31,7 @@ import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.FileSetListener;
 import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 
 public class TVModel extends Observable implements DataModel {
@@ -591,9 +592,12 @@ public class TVModel extends Observable implements DataModel {
 		public void calculateMinMax() {
 
 			if (exprData != null) {
-				for (int i = 0; i < nGene(); i++) {
+				int nGene = nGene();
+				int nExpr = nExpr();
+				
+				for (int i = 0; i < nGene; i++) {
 
-					for (int j = 0; j < nExpr(); j++) {
+					for (int j = 0; j < nExpr; j++) {
 
 						if (exprData[i][j] > maxVal) {
 
@@ -608,6 +612,7 @@ public class TVModel extends Observable implements DataModel {
 				}
 			} else {
 				// Log that exprdata is null
+				LogBuffer.println("ExprData in TVDataMatrix is null.");
 			}
 		}
 

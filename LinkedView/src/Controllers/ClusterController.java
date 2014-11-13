@@ -14,13 +14,13 @@ import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import Utilities.StringRes;
-import Views.ClusterDialog;
-import Views.ClusterView;
 import Cluster.CDTGenerator;
 import Cluster.ClusterProcessor;
 import Cluster.DistMatrixCalculator;
 import Cluster.DistanceMatrix;
+import Utilities.StringRes;
+import Views.ClusterDialog;
+import Views.ClusterView;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -376,7 +376,7 @@ public class ClusterController {
 			LogBuffer.println("Loading data...");
 			clusterDialog.dispose();
 			
-			tvController.load(fileSet);
+			tvController.loadData(fileSet);
 
 		} else {
 			String alert = "When trying to load the clustered file, no "

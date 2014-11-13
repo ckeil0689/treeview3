@@ -23,6 +23,8 @@
 
 package edu.stanford.genetics.treeview.model;
 
+import Controllers.TVController;
+
 
 /**
  * @author avsegal
@@ -35,8 +37,9 @@ public class AtrTVModelLoader extends ModelLoader { // TVModelLoader2 {
 	/**
 	 * @param targetModel
 	 */
-	public AtrTVModelLoader(final AtrTVModel targetModel) {
-		super(targetModel);
+	public AtrTVModelLoader(final AtrTVModel targetModel, 
+			final TVController controller) {
+		super(targetModel, controller);
 	}
 
 	// @Override
