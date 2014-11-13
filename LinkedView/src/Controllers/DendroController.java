@@ -643,6 +643,7 @@ public class DendroController implements ConfigNodePersistent {
 				newScale = globalXmap.getMinScale();
 			}
 			globalXmap.setScale(newScale);
+			globalXmap.notifyObservers();
 
 			newScale2 = (globalYmap.getAvailablePixels()) / geneIndexes;
 			
@@ -650,6 +651,7 @@ public class DendroController implements ConfigNodePersistent {
 				newScale2 = globalYmap.getMinScale();
 			}
 			globalYmap.setScale(newScale2);
+			globalYmap.notifyObservers();
 			dendroView.getGlobalView().repaint();
 		}
 
@@ -675,7 +677,10 @@ public class DendroController implements ConfigNodePersistent {
 			//LogBuffer.println("Firstx visible: [" + startX + "] Firsty visible: [" + startY + "].");
 
 			globalXmap.scrollToFirstIndex(startX);
+			globalXmap.notifyObservers();
+
 			globalYmap.scrollToFirstIndex(startY);
+			globalYmap.notifyObservers();
 		}
 		
 		saveSettings();
