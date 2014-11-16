@@ -63,7 +63,9 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	@Override
     protected void process(List<LoadStatus> chunks) {
         
+		/* Update the GUI */
 		LoadStatus ls = chunks.get(chunks.size() - 1);
+		WelcomeView.setLoadBarMax(ls.getMaxProgress());
 		WelcomeView.updateLoadBar(ls.getProgress());
 		WelcomeView.setLoadText(ls.getStatus());
     }
@@ -72,11 +74,12 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	protected Void doInBackground() throws Exception {
 		
 		/* Setup */
-		WelcomeView.resetLoadBar();
 		row_num = Helper.countFileLines(new File(fileSet.getCdt()));
-		WelcomeView.setLoadBarMax(row_num);
 		
 		LoadStatus ls = new LoadStatus();
+		ls.setProgress(0);
+		ls.setMaxProgress(row_num);
+		ls.setStatus("Preparing...");
 		
 		File file = new File(fileSet.getCdt());
 		BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -89,8 +92,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		dataStartRow = 0;
 		dataStartCol = 0;
 		int current_row = 0;
-		
-		ls.setStatus("Finding data...");
 
 		/* Read all lines and parse the data */
 		while ((line = reader.readLine()) != null) {
@@ -571,6 +572,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	class LoadStatus {
 		
 		private int progress;
+		private int max_progress;
 		private String status;
 		
 		public LoadStatus() {
@@ -587,6 +589,16 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		public void setProgress(int prog) {
 			
 			this.progress = prog;
+		}
+		
+		public void setMaxProgress(int max) {
+			
+			this.max_progress = max;
+		}
+		
+		public int getMaxProgress() {
+			
+			return max_progress;
 		}
 		
 		public String getStatus() {

@@ -11,7 +11,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 import ColorChooser.ColorChooser;
 import ColorChooser.ColorChooserController;
@@ -160,39 +159,6 @@ public class TVController {
 			}
 		}
 	}
-
-	/**
-	 * Instructs the main application frame (tvFrame) to set a specific
-	 * view panel based on the model's data status or if an error occured 
-	 * in the preceding code. 
-	 * @param hasError Whether an error occurred in the code preceding the
-	 * call of setViewChoice().
-	 */
-	protected void setViewChoice(boolean hasError) {
-
-		if (hasError) {
-//			tvFrame.setRunning(false);
-//			tvFrame.setLoaded(false);
-
-			LogBuffer.println(StringRes.clusterError_notLoaded);
-
-		} else {
-			if (model.isLoaded()) {
-				LogBuffer.println("Setting DendroView.");
-				dendroController.setNew(tvFrame.getDendroView(), 
-						(TVModel) model);
-
-			} 
-//			else {
-//				LogBuffer.println("Setting WelcomeView.");
-//				tvFrame.setRunning(false);
-//				tvFrame.setLoaded(false);
-//				tvFrame.setView(StringRes.view_Welcome);
-//			}
-		}
-		
-//		addMenuListeners();
-	}
 	
 	/**
 	 * Passes the resize call for the matrix to the DendroController.
@@ -219,9 +185,10 @@ public class TVController {
 			tvModel.setSource(fileMenuSet);
 			
 			if(tvModel.getArrayHeaderInfo().getNumHeaders() == 0) {
-			/* ------ Load Process -------- */
-			ModelLoader loader = new ModelLoader(tvModel, this);
-			loader.execute();
+				/* ------ Load Process -------- */
+				ModelLoader loader = new ModelLoader(tvModel, this);
+				loader.execute();
+			
 			} else {
 				LogBuffer.println("ArrayHeaders not reset, aborted loading.");
 			}
@@ -239,6 +206,10 @@ public class TVController {
 		}
 	}
 	
+	/**
+	 * Finish up loading by setting the model loaded status to true and
+	 * creating a new DendroView.
+	 */
 	public void finishLoading() {
 		
 		if (model.getDataMatrix().getNumRow() > 0) {
@@ -301,7 +272,6 @@ public class TVController {
 		}
 	}
 
-	// Loading Methods
 	/**
 	 * Allows user to load a file from a URL
 	 * 
@@ -376,21 +346,14 @@ public class TVController {
 	 */
 	public void setupClusterView(final int clusterType) {
 
-		SwingUtilities.invokeLater(new Runnable() {
+		/* Making a new Window to display clustering components */
+		final ClusterDialog clusterView = 
+				new ClusterDialog(clusterType);
 
-			@Override
-			public void run() {
-				
-				/* Making a new Window to display clustering components */
-				final ClusterDialog clusterView = 
-						new ClusterDialog(clusterType);
-
-				/* Creating the Controller for this view. */
-				new ClusterController(clusterView, TVController.this);
-				
-				clusterView.setVisible(true);
-			}
-		});
+		/* Creating the Controller for this view. */
+		new ClusterController(clusterView, TVController.this);
+		
+		clusterView.setVisible(true);
 	}
 
 	/**
@@ -424,7 +387,7 @@ public class TVController {
 //		window.setLoaded(true);
 //		window.getAppFrame().setVisible(true);
 //		tvFrame.setDataModel(dataModel);
-		setViewChoice(false);
+//		setViewChoice(false);
 	}
 
 	/**
@@ -659,57 +622,50 @@ public class TVController {
 	 * @param menu
 	 */
 	public void openPrefMenu(final String menu) {
+		
+		// View
+		final PreferencesMenu preferences = 
+				new PreferencesMenu(tvFrame);
+		
+		if(menu.equalsIgnoreCase(StringRes.menu_Color)) {
+			
+			Double min = model.getDataMatrix().getMinVal();
+			Double max = model.getDataMatrix().getMaxVal();
+			
+			/* View */
+			ColorChooser gradientPick = 
+					new ColorChooser(((DoubleArrayDrawer) 
+							dendroController.getArrayDrawer())
+							.getColorExtractor(), min, max);
 
-		SwingUtilities.invokeLater(new Runnable() {
+			/*
+			 *  Adding GradientColorChooser configurations to 
+			 *  DendroView node.
+			 */
+			gradientPick.setConfigNode(((TVModel) model)
+					.getDocumentConfig());
+			
+			/* Controller */
+			new ColorChooserController(gradientPick);
+			
+			preferences.setGradientChooser(gradientPick);
+			
+		}
+		
+		if(menu.equalsIgnoreCase(StringRes.menu_RowAndCol)) {
+			preferences.setHeaderInfo(model.getGeneHeaderInfo(), 
+					model.getArrayHeaderInfo());
+		}
+		
+		preferences.setupLayout(menu);
+		
+		preferences.setConfigNode(tvFrame.getConfigNode().node(
+				StringRes.pnode_Preferences));
 
-			@Override
-			public void run() {
-				
-				// View
-				final PreferencesMenu preferences = 
-						new PreferencesMenu(tvFrame);
-				
-				if(menu.equalsIgnoreCase(StringRes.menu_Color)) {
-					
-					Double min = model.getDataMatrix().getMinVal();
-					Double max = model.getDataMatrix().getMaxVal();
-					
-					/* View */
-					ColorChooser gradientPick = 
-							new ColorChooser(((DoubleArrayDrawer) 
-									dendroController.getArrayDrawer())
-									.getColorExtractor(), min, max);
+		// Controller
+		new PreferencesController(tvFrame, model, preferences);
 
-					/*
-					 *  Adding GradientColorChooser configurations to 
-					 *  DendroView node.
-					 */
-					gradientPick.setConfigNode(((TVModel) model)
-							.getDocumentConfig());
-					
-					/* Controller */
-					new ColorChooserController(gradientPick);
-					
-					preferences.setGradientChooser(gradientPick);
-					
-				}
-				
-				if(menu.equalsIgnoreCase(StringRes.menu_RowAndCol)) {
-					preferences.setHeaderInfo(model.getGeneHeaderInfo(), 
-							model.getArrayHeaderInfo());
-				}
-				
-				preferences.setupLayout(menu);
-				
-				preferences.setConfigNode(tvFrame.getConfigNode().node(
-						StringRes.pnode_Preferences));
-
-				// Controller
-				new PreferencesController(tvFrame, model, preferences);
-
-				preferences.setVisible(true);
-			}
-		});
+		preferences.setVisible(true);
 	}
 	
 	/*
@@ -721,7 +677,7 @@ public class TVController {
 	}
 
 	/**
-	 * Returns TVFrameController's model.
+	 * Returns TVController's model.
 	 * 
 	 * @return
 	 */

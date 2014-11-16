@@ -369,9 +369,6 @@ public class ClusterController {
 
 			FileSet fileSet = new FileSet(file.getName(), file.getParent()
 					+ File.separator);
-
-			LogBuffer.println("Setting view choice to begin loading.");
-			tvController.setViewChoice(false);
 			
 			LogBuffer.println("Loading data...");
 			clusterDialog.dispose();
