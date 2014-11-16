@@ -73,7 +73,10 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	@Override
 	protected Void doInBackground() throws Exception {
 		
-		/* Setup */
+		/* 
+		 * Count row numbers to be able to initialize stringLabels[][] and set
+		 * progress bar maximum. 
+		 */
 		row_num = Helper.countFileLines(new File(fileSet.getCdt()));
 		
 		LoadStatus ls = new LoadStatus();
@@ -123,6 +126,8 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	protected void done() {
 		
 		doubleData = null;
+		
+		/* Update GUI, set new DendroView */
 		controller.finishLoading();
 	}
 	
