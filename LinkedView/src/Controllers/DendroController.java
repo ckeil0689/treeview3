@@ -7,7 +7,6 @@ import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -111,8 +110,8 @@ public class DendroController implements ConfigNodePersistent {
 
 		dendroView.getGlobalView().resetHome(true);
 	}
-
-	public void addViewListeners() {
+	
+	private void addViewListeners() {
 
 		dendroView.addScaleListener(new ScaleListener());
 		dendroView.addZoomListener(new ZoomListener());
@@ -123,14 +122,20 @@ public class DendroController implements ConfigNodePersistent {
 	 * TODO Make sure only one listener is on each button, not multiple 
 	 * instances.
 	 */
-	public void addMenuBtnListeners() {
+	private void addMenuBtnListeners() {
 
-		LogBuffer.println("Adding MenuBtnListeners.");
 		dendroView.addSearchBtnListener(new SearchButtonListener());
 		dendroView.addTreeBtnListener(new TreeBtnListener());
 	}
-
-	class SearchButtonListener implements ActionListener {
+	
+	/* --------------  Listeners --------------------- */
+	/**
+	 * Listener for the search button. Opens a dialog when the button
+	 * is clicked.
+	 * @author CKeil
+	 *
+	 */
+	private class SearchButtonListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
@@ -153,7 +158,7 @@ public class DendroController implements ConfigNodePersistent {
 	 * @author CKeil
 	 * 
 	 */
-	class TreeBtnListener implements ActionListener {
+	private class TreeBtnListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
@@ -168,14 +173,13 @@ public class DendroController implements ConfigNodePersistent {
 	 * @author CKeil
 	 * 
 	 */
-	class TreeBtnClicker extends SwingWorker<Void, Void> {
+	private class TreeBtnClicker extends SwingWorker<Void, Void> {
 		
 		@Override
 		protected Void doInBackground() throws Exception {
 			
 			setTreesVis(tvFrame.getTreeButton().isSelected());
 			
-			LogBuffer.println("Setting dendroView layout in TreeBtnClicker.");
 			dendroView.setupLayout();
 			addViewListeners();
 			return null;
@@ -184,7 +188,6 @@ public class DendroController implements ConfigNodePersistent {
 		@Override
 		protected void done() {
 
-//			resetMapContainers();
 			globalXmap.recalculateScale();
 			globalYmap.recalculateScale();
 			
@@ -277,8 +280,6 @@ public class DendroController implements ConfigNodePersistent {
 	 * @param mode
 	 */
 	public void setMatrixSize(String mode) {
-		
-		// Checked, runs on EDT
 		
 		if(mode.equalsIgnoreCase("fill")) {
 			// Change so that height-/widthChange can be set directly
@@ -1048,30 +1049,30 @@ public class DendroController implements ConfigNodePersistent {
 		invertedTreeDrawer.notifyObservers();
 	}
 
-	/**
-	 * Loads a TVModel from a provided FileSet and then returns the new TVModel.
-	 * 
-	 * @param fileSet
-	 * @return DataModel
-	 * @throws LoadException
-	 */
-	protected DataModel makeCdtModel(final FileSet fileSet) 
-			throws LoadException {
-
-		final DataModel tvModel = new TVModel();
-
-		try {
-			((TVModel)tvModel).loadNew(fileSet);
-
-		} catch (LoadException | InterruptedException | ExecutionException e) {
-			String message = "Clustering was interrupted.";
-			JOptionPane.showMessageDialog(tvFrame.getAppFrame(), message, 
-					"Error", JOptionPane.ERROR_MESSAGE);
-			LogBuffer.logException(e);
-		}
-
-		return tvModel;
-	}
+//	/**
+//	 * Loads a TVModel from a provided FileSet and then returns the new TVModel.
+//	 * 
+//	 * @param fileSet
+//	 * @return DataModel
+//	 * @throws LoadException
+//	 */
+//	protected DataModel makeCdtModel(final FileSet fileSet) 
+//			throws LoadException {
+//
+//		final DataModel tvModel = new TVModel();
+//
+//		try {
+//			((TVModel)tvModel).loadNew(fileSet);
+//
+//		} catch (LoadException | InterruptedException | ExecutionException e) {
+//			String message = "Clustering was interrupted.";
+//			JOptionPane.showMessageDialog(tvFrame.getAppFrame(), message, 
+//					"Error", JOptionPane.ERROR_MESSAGE);
+//			LogBuffer.logException(e);
+//		}
+//
+//		return tvModel;
+//	}
 
 	// ATR Methods
 	/**
@@ -1189,30 +1190,30 @@ public class DendroController implements ConfigNodePersistent {
 		}
 	}
 
-	/**
-	 * Creates an AtrTVModel for use in tree alignment.
-	 * 
-	 * @param fileSet
-	 * @return a new AtrTVModel with the file set loaded into it.
-	 * @throws LoadException
-	 */
-	protected AtrTVModel makeAtrModel(final FileSet fileSet)
-			throws LoadException {
-
-		final AtrTVModel atrTVModel = new AtrTVModel();
-
-		try {
-			atrTVModel.loadNew(fileSet);
-
-		} catch (final LoadException e) {
-			String message = "Loading Atr model was interrupted.";
-			JOptionPane.showMessageDialog(tvFrame.getAppFrame(), message, 
-					"Error", JOptionPane.ERROR_MESSAGE);
-			LogBuffer.logException(e);
-		}
-
-		return atrTVModel;
-	}
+//	/**
+//	 * Creates an AtrTVModel for use in tree alignment.
+//	 * 
+//	 * @param fileSet
+//	 * @return a new AtrTVModel with the file set loaded into it.
+//	 * @throws LoadException
+//	 */
+//	protected AtrTVModel makeAtrModel(final FileSet fileSet)
+//			throws LoadException {
+//
+//		final AtrTVModel atrTVModel = new AtrTVModel();
+//
+//		try {
+//			atrTVModel.loadNew(fileSet);
+//
+//		} catch (final LoadException e) {
+//			String message = "Loading Atr model was interrupted.";
+//			JOptionPane.showMessageDialog(tvFrame.getAppFrame(), message, 
+//					"Error", JOptionPane.ERROR_MESSAGE);
+//			LogBuffer.logException(e);
+//		}
+//
+//		return atrTVModel;
+//	}
 
 	// GTR methods
 	/**

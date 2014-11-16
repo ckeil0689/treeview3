@@ -126,20 +126,20 @@ public abstract class TreeViewApp {// implements WindowListener {
 			fos = new FileOutputStream("prefs.xml");
 			globalConfig.exportSubtree(fos);
 			fos.close();
-
-		} catch (final IOException e1) {
-			e1.printStackTrace();
-
-		} catch (final BackingStoreException e1) {
-			e1.printStackTrace();
-		}
-
-		try {
+			
 			final ToolTipManager ttm = ToolTipManager.sharedInstance();
 			ttm.setEnabled(true);
 
-		} catch (final Exception e) {
+		} catch (final IOException | BackingStoreException e1) {
+			e1.printStackTrace();
 		}
+
+//		try {
+//			final ToolTipManager ttm = ToolTipManager.sharedInstance();
+//			ttm.setEnabled(true);
+//
+//		} catch (final Exception e) {
+//		}
 	}
 
 	/**
@@ -213,10 +213,10 @@ public abstract class TreeViewApp {// implements WindowListener {
 		// setup toplevel
 		final TreeViewFrame tvFrame = new TreeViewFrame(this);
 		final DataModel model = new TVModel();
-		final TVController tvController = new TVController(tvFrame,
-				model);
+		final TVController tvController = new TVController(tvFrame, model);
+		
 		if (fileSet != null) {
-			tvController.loadFileSet(fileSet);
+			tvController.loadData(fileSet);
 			tvFrame.setLoaded(true);
 		}
 		// tvFrame.addWindowListener(this);

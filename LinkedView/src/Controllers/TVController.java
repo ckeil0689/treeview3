@@ -3,10 +3,7 @@ package Controllers;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
-import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -14,13 +11,11 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
 
-import Utilities.StringRes;
-import Views.ClusterDialog;
 import ColorChooser.ColorChooser;
 import ColorChooser.ColorChooserController;
+import Utilities.StringRes;
+import Views.ClusterDialog;
 import edu.stanford.genetics.treeview.CdtFilter;
 import edu.stanford.genetics.treeview.DataMatrix;
 import edu.stanford.genetics.treeview.DataModel;
@@ -36,6 +31,7 @@ import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.UrlExtractor;
 import edu.stanford.genetics.treeview.UrlPresets;
 import edu.stanford.genetics.treeview.model.DataModelWriter;
+import edu.stanford.genetics.treeview.model.ModelLoader;
 import edu.stanford.genetics.treeview.model.ReorderedDataModel;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.plugin.dendroview.DoubleArrayDrawer;
@@ -50,23 +46,21 @@ public class TVController {
 
 	private final DataModel model;
 	private final TreeViewFrame tvFrame;
-	private final JFrame applicationFrame;
 	private final DendroController dendroController;
-	private MenubarController menuActions;
+	private MenubarController menuController;
 
 	private File file;
 	private FileSet fileMenuSet;
 
-	public TVController(final TreeViewFrame tvFrame, 
-			final DataModel model) {
+	public TVController(final TreeViewFrame tvFrame, final DataModel model) {
 
 		this.model = model;
 		this.tvFrame = tvFrame;
-		this.applicationFrame = tvFrame.getAppFrame();
+		this.dendroController = new DendroController(tvFrame);
 		
-		dendroController = new DendroController(tvFrame);
+		/* Add the view as observer to the model */
+		((TVModel) model).addObserver(tvFrame);
 		
-		setViewChoice(false);
 		addViewListeners();
 	}
 	
@@ -77,9 +71,11 @@ public class TVController {
 	public void resetPreferences() {
 		
 		try {
-			final int option = JOptionPane.showConfirmDialog(applicationFrame,
-					"Are you sure you want to reset preferences and close TreeView?", 
-					"Reset Preferences?", JOptionPane.YES_NO_OPTION);
+			final int option = 
+					JOptionPane.showConfirmDialog(JFrame.getFrames()[0],
+					"Are you sure you want to reset preferences and "
+					+ "close TreeView?", "Reset Preferences?", 
+					JOptionPane.YES_NO_OPTION);
 
 			switch (option) {
 
@@ -98,16 +94,17 @@ public class TVController {
 			
 		} catch (BackingStoreException e) {
 			String message = "Issue while resetting preferences.";
-			JOptionPane.showMessageDialog(applicationFrame, message, 
+			JOptionPane.showMessageDialog(JFrame.getFrames()[0], message, 
 					"Error", JOptionPane.ERROR_MESSAGE);
 			LogBuffer.println(e.getMessage());
 		}
 	}
 
+	/* ------------ Add listeners --------------------------------*/
 	/**
 	 * Adds listeners to views that are instantiated in TVFrame.
 	 */
-	public void addViewListeners() {
+	private void addViewListeners() {
 
 		if (tvFrame.getWelcomeView() != null) {
 			tvFrame.getWelcomeView().addLoadListener(
@@ -121,19 +118,21 @@ public class TVController {
 	}
 	
 	/**
-	 * Adds listeners to the menubar.
+	 * Generates the menubar controller. Causes listeners to be added 
+	 * for the main menubar as well as the listed file names in 'Recent Files'.
+	 * file names in . 
 	 */
 	private void addMenuListeners() {
 		
-		menuActions = new MenubarController(tvFrame, TVController.this);
+		menuController = new MenubarController(tvFrame, TVController.this);
 
 		tvFrame.addMenuActionListeners(new StackMenuListener());
 		tvFrame.addFileMenuListeners(new FileMenuListener());
 	}
 
 	/**
-	 * Handles the new loading of data.
-	 * 
+	 * Calls a sequence of methods related to loading a file, when its
+	 * button is clicked.
 	 * @author CKeil
 	 */
 	private class LoadButtonListener implements ActionListener {
@@ -145,131 +144,126 @@ public class TVController {
 		}
 	}
 
+	/**
+	 * Adds the listeners to all JMenuItems in the main menubar.
+	 * @author CKeil
+	 *
+	 */
 	private class StackMenuListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-
-			final List<JMenuItem> menuList = tvFrame.getStackMenus();
-
-			for (int i = 0; i < menuList.size(); i++) {
-				if (e.getSource() == menuList.get(i)) {
-
-					menuActions.execute(menuList.get(i).getText());
-				}
+			
+			if(e.getSource() instanceof JMenuItem) {
+				menuController.execute(((JMenuItem)e.getSource()).getText());
 			}
 		}
-	}
-
-	public void setViewChoice(boolean hasError) {
-
-		if (hasError) {
-			tvFrame.setRunning(false);
-			tvFrame.setLoaded(false);
-			tvFrame.setView(StringRes.view_LoadError);
-
-			LogBuffer.println(StringRes.clusterError_notLoaded);
-
-		} else {
-			if (model.isLoaded()) {
-				LogBuffer.println("Setting DendroView.");
-				tvFrame.setRunning(true);
-				tvFrame.setLoaded(true);
-				dendroController.setNew(tvFrame.getDendroView(), 
-						(TVModel) model);
-				tvFrame.setTitleString(model.getSource());
-				tvFrame.setView(StringRes.view_Dendro);
-
-			} else {
-				LogBuffer.println("Setting WelcomeView.");
-				tvFrame.setRunning(false);
-				tvFrame.setLoaded(false);
-				tvFrame.setView(StringRes.view_Welcome);
-			}
-		}
-		
-		addMenuListeners();
 	}
 	
 	/**
 	 * Passes the resize call for the matrix to the DendroController.
 	 * @param mode
 	 */
-	public void setMatrixSize(String mode) {
+	protected void setMatrixSize(String mode) {
 		
 		dendroController.setMatrixSize(mode);
 	}
+	
+	
+	public void loadData(FileSet fileSet) {
+		
+		fileMenuSet = (fileSet != null) ? fileSet : tvFrame.getFileSet(file);
+		
+		/* Setting loading screen */
+		tvFrame.setView("LoadProgressView");
 
-	/**
-	 * Setting up a worker thread to load the file selected by the user. 
-	 * This prevents the GUI from locking up and allows the ProgressBar 
-	 * to display progress.
-	 */
-	private class LoadWorker extends SwingWorker<Void, Void> {
+		/* Loading TVModel */
+		TVModel tvModel = (TVModel) model;
 
-		@Override
-		public Void doInBackground() {
-
-			FileSet fileSet = null;
-
-			if (fileMenuSet == null) {
-				fileSet = tvFrame.getFileSet(file);
-
+		try {
+			tvModel.resetState();
+			tvModel.setSource(fileMenuSet);
+			
+			if(tvModel.getArrayHeaderInfo().getNumHeaders() == 0) {
+				/* ------ Load Process -------- */
+				ModelLoader loader = new ModelLoader(tvModel, this);
+				loader.execute();
+			
 			} else {
-				fileSet = fileMenuSet;
+				LogBuffer.println("ArrayHeaders not reset, aborted loading.");
 			}
 
-			/* Loading TVModel */
-			loadFileSet(fileSet);
-
-			if (fileSet != null) {
-				fileSet = tvFrame.getFileMRU().addUnique(fileSet);
-				tvFrame.getFileMRU().setLast(fileSet);
+		} catch (OutOfMemoryError  e) {
+			if(e instanceof OutOfMemoryError) {
+				final String oomError = "The data file is too large. "
+						+ "Increase the JVM's heap size. Error: " 
+						+ e.getMessage();
+				tvFrame.setLoadErrorMessage(oomError);
+				
+			} else {
+				JOptionPane.showMessageDialog(JFrame.getFrames()[0], e);
+			}
+		}
+	}
+	
+	/**
+	 * Finish up loading by setting the model loaded status to true and
+	 * creating a new DendroView.
+	 */
+	public void finishLoading() {
+		
+		if (model.getDataMatrix().getNumRow() > 0) {
+			
+			if (fileMenuSet != null) {
+				fileMenuSet = tvFrame.getFileMRU().addUnique(fileMenuSet);
+				tvFrame.getFileMRU().setLast(fileMenuSet);
+				fileMenuSet = null;
 
 			} else {
 				LogBuffer.println("FileSet is null.");
 			}
-
-			return null;
-		}
-
-		@Override
-		protected void done() {
-
-			boolean hasError = false;
-			
-			if (model.isLoaded()) {
-				fileMenuSet = null;
-				setDataModel();
-
-			} else {
-				hasError = true;
-			}
 			
 			tvFrame.setTitleString(model.getSource());
-			setViewChoice(hasError);
+			
+			/* Will notify view of successful loading. */
+			((TVModel) model).setLoaded(true);
+			
+			setDataModel();
+			
+			LogBuffer.println("Setting DendroView.");
+			dendroController.setNew(tvFrame.getDendroView(), (TVModel) model);
+			
+			LogBuffer.println("Successfully loaded: " + model.getSource());
+
+		} else {
+			String message = "No data matrix could be set.";
+			JOptionPane.showMessageDialog(JFrame.getFrames()[0], 
+					message, "Alert", JOptionPane.WARNING_MESSAGE);
+			LogBuffer.println("Alert: " + message);
+			
+			tvFrame.setLoadErrorMessage("Data in file unusable.");
+			
+			/* Set model status, which will update the view. */
+			((TVModel) model).setLoaded(false);
 		}
+		
+		addViewListeners();
+		addMenuListeners();
 	}
 
 	/**
 	 * This method opens a file dialog to open either the visualization view or
 	 * the cluster view depending on which file type is chosen.
 	 * 
-	 * @throws IOException
-	 * 
 	 * @throws LoadException
 	 */
 	public void openFile() {
 
-		SwingWorker<Void, Void> worker = new LoadWorker();
-
 		try {
 			file = tvFrame.selectFile();
 
-			// Only run loader, if JFileChooser wasn't canceled.
-			if (file != null) {
-				worker.execute();
-			}
+			/* Only run loader, if JFileChooser wasn't canceled. */
+			if (file != null) loadData(tvFrame.getFileSet(file));
 
 		} catch (final LoadException e) {
 			LogBuffer.println("Loading the FileSet was interrupted. "
@@ -278,61 +272,6 @@ public class TVController {
 		}
 	}
 
-	/**
-	 * Loads a FileSet and calls setLoaded(true) to reset the MainPanel.
-	 * 
-	 * @param fileSet
-	 * @throws LoadException
-	 */
-	public void load(FileSet fileSet) throws LoadException {
-
-		loadFileSet(fileSet);
-
-		fileSet = tvFrame.getFileMRU().addUnique(fileSet);
-		tvFrame.getFileMRU().setLast(fileSet);
-		tvFrame.getFileMRU().notifyObservers();
-	}
-
-	/**
-	 * r * This is the workhorse. It creates a new DataModel of the file, and
-	 * then sets the Datamodel. A side effect of setting the datamodel is to
-	 * update the running window.
-	 */
-	public void loadFileSet(final FileSet fileSet) {
-
-		/* Make local TVModel object */
-		TVModel tvModel = (TVModel) model;
-		tvModel.setFrame(tvFrame);
-
-		tvFrame.setView("LoadProgressView");
-
-		try {
-			// load instance variables of TVModel with data
-			tvModel.loadNew(fileSet);
-
-		} catch (final OutOfMemoryError e) {
-			final String oomError = "The data file is too large. "
-					+ "Increase the JVM's heap size. Error: " + e.getMessage();
-			tvFrame.setLoadErrorMessage(oomError);
-			e.printStackTrace();
-
-		} catch (final LoadException e) {
-			if (e.getType() != LoadException.INTPARSE) {
-				JOptionPane.showMessageDialog(applicationFrame, e);
-			}
-		} catch (final InterruptedException e) {
-			LogBuffer.println("InterruptedException in "
-					+ "loadFileSet(): " + e.getMessage());
-			e.printStackTrace();
-
-		} catch (final ExecutionException e) {
-			LogBuffer.println("ExecutionException in "
-					+ "loadFileSet(): " + e.getMessage());
-			e.printStackTrace();
-		}
-	}
-
-	// Loading Methods
 	/**
 	 * Allows user to load a file from a URL
 	 * 
@@ -407,26 +346,18 @@ public class TVController {
 	 */
 	public void setupClusterView(final int clusterType) {
 
-		SwingUtilities.invokeLater(new Runnable() {
+		/* Making a new Window to display clustering components */
+		final ClusterDialog clusterView = 
+				new ClusterDialog(clusterType);
 
-			@Override
-			public void run() {
-				
-				/* Making a new Window to display clustering components */
-				final ClusterDialog clusterView = 
-						new ClusterDialog(clusterType);
-
-				/* Creating the Controller for this view. */
-				new ClusterController(clusterView, TVController.this);
-				
-				clusterView.setVisible(true);
-			}
-		});
+		/* Creating the Controller for this view. */
+		new ClusterController(clusterView, TVController.this);
+		
+		clusterView.setVisible(true);
 	}
 
 	/**
-	 * Setter for dataModel for TVFrame, also sets extractors, running.
-	 * 
+	 * Sets extractors and FileSetListeners.
 	 */
 	public void setDataModel() {
 
@@ -456,7 +387,7 @@ public class TVController {
 //		window.setLoaded(true);
 //		window.getAppFrame().setVisible(true);
 //		tvFrame.setDataModel(dataModel);
-		setViewChoice(false);
+//		setViewChoice(false);
 	}
 
 	/**
@@ -473,7 +404,8 @@ public class TVController {
 				def = source.getDir() + source.getRoot() + "_list.txt";
 			}
 
-			final GeneListMaker t = new GeneListMaker(applicationFrame,
+			final GeneListMaker t = 
+					new GeneListMaker((JFrame) JFrame.getFrames()[0],
 					tvFrame.getGeneSelection(), model.getGeneHeaderInfo(), def);
 
 			t.setDataMatrix(model.getDataMatrix(), model.getArrayHeaderInfo(), 
@@ -494,7 +426,8 @@ public class TVController {
 		if (warnSelectionEmpty()) {
 			final FileSet source = model.getFileSet();
 
-			final GeneListMaker t = new GeneListMaker(applicationFrame,
+			final GeneListMaker t = 
+					new GeneListMaker((JFrame) JFrame.getFrames()[0],
 					tvFrame.getGeneSelection(), model.getGeneHeaderInfo(), 
 					source.getDir() + source.getRoot() + "_data.cdt");
 
@@ -522,7 +455,7 @@ public class TVController {
 		if ((treeSelection == null)
 				|| (treeSelection.getNSelectedIndexes() <= 0)) {
 
-			JOptionPane.showMessageDialog(applicationFrame,
+			JOptionPane.showMessageDialog(JFrame.getFrames()[0],
 					"Cannot generate gene list, no gene selected");
 			return false;
 		}
@@ -581,7 +514,7 @@ public class TVController {
 	public void saveModelAs() {
 
 		if (model.getFileSet() == null) {
-			JOptionPane.showMessageDialog(applicationFrame,
+			JOptionPane.showMessageDialog(JFrame.getFrames()[0],
 					"Saving of datamodels not backed by "
 							+ "files is not yet supported.");
 
@@ -597,7 +530,7 @@ public class TVController {
 				fileDialog.setCurrentDirectory(new File(string));
 			}
 
-			final int retVal = fileDialog.showSaveDialog(applicationFrame);
+			final int retVal = fileDialog.showSaveDialog(JFrame.getFrames()[0]);
 
 			if (retVal == JFileChooser.APPROVE_OPTION) {
 				final File chosen = fileDialog.getSelectedFile();
@@ -647,9 +580,9 @@ public class TVController {
 			fileMenuSet = tvFrame.findFileSet(
 					(JMenuItem)actionEvent.getSource());//tvFrame.getFileMenuSet();
 
-			SwingWorker<Void, Void> worker = new LoadWorker();
 			tvFrame.setView(StringRes.view_LoadProg); //change
-			worker.execute();
+			loadData(fileMenuSet);
+//			new LoadWorker().execute();
 
 			// } catch (final LoadException e) {
 			// if (e.getType() == LoadException.INTPARSE) {
@@ -689,63 +622,62 @@ public class TVController {
 	 * @param menu
 	 */
 	public void openPrefMenu(final String menu) {
+		
+		// View
+		final PreferencesMenu preferences = 
+				new PreferencesMenu(tvFrame);
+		
+		if(menu.equalsIgnoreCase(StringRes.menu_Color)) {
+			
+			Double min = model.getDataMatrix().getMinVal();
+			Double max = model.getDataMatrix().getMaxVal();
+			
+			/* View */
+			ColorChooser gradientPick = 
+					new ColorChooser(((DoubleArrayDrawer) 
+							dendroController.getArrayDrawer())
+							.getColorExtractor(), min, max);
 
-		SwingUtilities.invokeLater(new Runnable() {
+			/*
+			 *  Adding GradientColorChooser configurations to 
+			 *  DendroView node.
+			 */
+			gradientPick.setConfigNode(((TVModel) model)
+					.getDocumentConfig());
+			
+			/* Controller */
+			new ColorChooserController(gradientPick);
+			
+			preferences.setGradientChooser(gradientPick);
+			
+		}
+		
+		if(menu.equalsIgnoreCase(StringRes.menu_RowAndCol)) {
+			preferences.setHeaderInfo(model.getGeneHeaderInfo(), 
+					model.getArrayHeaderInfo());
+		}
+		
+		preferences.setupLayout(menu);
+		
+		preferences.setConfigNode(tvFrame.getConfigNode().node(
+				StringRes.pnode_Preferences));
 
-			@Override
-			public void run() {
-				
-				// View
-				final PreferencesMenu preferences = 
-						new PreferencesMenu(tvFrame);
-				
-				if(menu.equalsIgnoreCase(StringRes.menu_Color)) {
-					
-					Double min = model.getDataMatrix().getMinVal();
-					Double max = model.getDataMatrix().getMaxVal();
-					
-					/* View */
-					ColorChooser gradientPick = 
-							new ColorChooser(((DoubleArrayDrawer) 
-									dendroController.getArrayDrawer())
-									.getColorExtractor(), min, max);
+		// Controller
+		new PreferencesController(tvFrame, model, preferences);
 
-					/*
-					 *  Adding GradientColorChooser configurations to 
-					 *  DendroView node.
-					 */
-					gradientPick.setConfigNode(((TVModel) model)
-							.getDocumentConfig());
-					
-					/* Controller */
-					new ColorChooserController(gradientPick);
-					
-					preferences.setGradientChooser(gradientPick);
-					
-				} else if(menu.equalsIgnoreCase(StringRes.menu_RowAndCol)) {
-					preferences.setHeaderInfo(model.getGeneHeaderInfo(), 
-							model.getArrayHeaderInfo());
-				} else {
-					String message = "A menu like this does not exist.";
-					JOptionPane.showMessageDialog(applicationFrame, message, 
-							"Warning", JOptionPane.WARNING_MESSAGE);
-				}
-				
-				preferences.setupLayout(menu);
-				
-				preferences.setConfigNode(tvFrame.getConfigNode().node(
-						StringRes.pnode_Preferences));
-
-				// Controller
-				new PreferencesController(tvFrame, model, preferences);
-
-				preferences.setVisible(true);
-			}
-		});
+		preferences.setVisible(true);
+	}
+	
+	/*
+	 * Gets the main view's config node.
+	 */
+	public Preferences getConfigNode() {
+		
+		return tvFrame.getConfigNode();
 	}
 
 	/**
-	 * Returns TVFrameController's model.
+	 * Returns TVController's model.
 	 * 
 	 * @return
 	 */

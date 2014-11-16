@@ -1,5 +1,6 @@
 package Controllers;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import Utilities.StringRes;
@@ -16,6 +17,7 @@ import edu.stanford.genetics.treeview.TreeViewFrame;
  */
 public class MenubarController {
 
+	/* References to main view and main controller */
 	private final TreeViewFrame tvFrame;
 	private final TVController controller;
 
@@ -156,7 +158,7 @@ public class MenubarController {
 	private void displayError() {
 		
 		String message = "A menu button could not be matched with a function.";
-		JOptionPane.showMessageDialog(tvFrame.getAppFrame(), message, 
+		JOptionPane.showMessageDialog(JFrame.getFrames()[0], message, 
 				"Alert", JOptionPane.WARNING_MESSAGE);
 		LogBuffer.println("Alert: " + message);
 	}

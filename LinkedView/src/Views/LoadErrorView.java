@@ -90,7 +90,9 @@ public class LoadErrorView {
 	 */
 	public void addLoadNewListener(final ActionListener l) {
 
-		loadNew.addActionListener(l);
+		if (loadNew.getActionListeners().length == 0) {
+			loadNew.addActionListener(l);
+		}
 	}
 	
 	public void setErrorMessage(String error) {

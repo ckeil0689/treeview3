@@ -1,5 +1,12 @@
 package Utilities;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.LineNumberReader;
+
+import edu.stanford.genetics.treeview.LogBuffer;
+
 /**
  * Class that is supposed to contain a bunch of static general helper methods,
  * which are usually operations that aren't necessarily unique to one class.
@@ -50,5 +57,32 @@ public final class Helper {
 		System.arraycopy(b, 0, c, a.length, b.length);
 
 		return c;
+	}
+	
+	/**
+	 * Count amount of lines in the file to be loaded so that the progressBar
+	 * can get correct values for extractData(). Code from StackOverflow
+	 * (https://stackoverflow.com/questions/1277880).
+	 */
+	public static int countFileLines(final File aFile) throws IOException {
+
+		LineNumberReader reader = null;
+
+		try {
+			reader = new LineNumberReader(new FileReader(aFile));
+			while ((reader.readLine()) != null);
+			return reader.getLineNumber();
+
+		} catch (final Exception ex) {
+			LogBuffer.println("Exception when trying to count lines: "
+					+ ex.getMessage());
+			return -1;
+
+		} finally {
+			if (reader != null) {
+				reader.close();
+				reader = null;
+			}
+		}
 	}
 }

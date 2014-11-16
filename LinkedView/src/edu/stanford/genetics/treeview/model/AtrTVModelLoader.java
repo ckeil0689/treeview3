@@ -23,6 +23,8 @@
 
 package edu.stanford.genetics.treeview.model;
 
+import Controllers.TVController;
+
 
 /**
  * @author avsegal
@@ -30,13 +32,14 @@ package edu.stanford.genetics.treeview.model;
  *         To change the template for this generated type comment go to
  *         Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
-public class AtrTVModelLoader extends NewModelLoader { // TVModelLoader2 {
+public class AtrTVModelLoader extends ModelLoader { // TVModelLoader2 {
 
 	/**
 	 * @param targetModel
 	 */
-	public AtrTVModelLoader(final AtrTVModel targetModel) {
-		super(targetModel);
+	public AtrTVModelLoader(final AtrTVModel targetModel, 
+			final TVController controller) {
+		super(targetModel, controller);
 	}
 
 	// @Override

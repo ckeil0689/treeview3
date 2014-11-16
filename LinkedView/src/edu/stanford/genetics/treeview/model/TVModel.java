@@ -24,7 +24,6 @@ package edu.stanford.genetics.treeview.model;
 
 import java.util.Hashtable;
 import java.util.Observable;
-import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
 
 import edu.stanford.genetics.treeview.DataMatrix;
@@ -32,12 +31,11 @@ import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.FileSetListener;
 import edu.stanford.genetics.treeview.HeaderInfo;
-import edu.stanford.genetics.treeview.LoadException;
-import edu.stanford.genetics.treeview.TreeViewFrame;
+import edu.stanford.genetics.treeview.LogBuffer;
 
 public class TVModel extends Observable implements DataModel {
 
-	protected TreeViewFrame tvFrame;
+//	protected TreeViewFrame tvFrame;
 	protected FileSet source = null;
 	protected String dir = null;
 	protected String root;
@@ -58,7 +56,7 @@ public class TVModel extends Observable implements DataModel {
 
 	/** has model been successfully loaded? */
 	private boolean loaded = false;
-	private final int appendIndex = -1;
+	private int appendIndex = -1;
 
 	/*
 	 * For cases where we are comparing two models (this needs to be changed).
@@ -255,15 +253,15 @@ public class TVModel extends Observable implements DataModel {
 		documentConfig = newVal;
 	}
 
-	public void setFrame(final TreeViewFrame f) {
-
-		tvFrame = f;
-	}
-
-	public TreeViewFrame getFrame() {
-
-		return tvFrame;
-	}
+//	public void setFrame(final TreeViewFrame f) {
+//
+//		tvFrame = f;
+//	}
+//
+//	public TreeViewFrame getFrame() {
+//
+//		return tvFrame;
+//	}
 
 	protected void hashAIDs() {
 
@@ -399,6 +397,8 @@ public class TVModel extends Observable implements DataModel {
 
 	public void resetState() {
 
+		LogBuffer.println("Resetting model.");
+		
 		// reset some state stuff.
 		// if (documentConfig != null)
 		// documentConfig.store();
@@ -593,9 +593,12 @@ public class TVModel extends Observable implements DataModel {
 		public void calculateMinMax() {
 
 			if (exprData != null) {
-				for (int i = 0; i < nGene(); i++) {
+				int nGene = nGene();
+				int nExpr = nExpr();
+				
+				for (int i = 0; i < nGene; i++) {
 
-					for (int j = 0; j < nExpr(); j++) {
+					for (int j = 0; j < nExpr; j++) {
 
 						if (exprData[i][j] > maxVal) {
 
@@ -610,6 +613,7 @@ public class TVModel extends Observable implements DataModel {
 				}
 			} else {
 				// Log that exprdata is null
+				LogBuffer.println("ExprData in TVDataMatrix is null.");
 			}
 		}
 
@@ -797,30 +801,30 @@ public class TVModel extends Observable implements DataModel {
 	}
 
 	// loading stuff follows...
-	/**
-	 * 
-	 * 
-	 * @param fileSet
-	 *            fileset to load
-	 * @throws ExecutionException
-	 * @throws InterruptedException
-	 * 
-	 */
-	public void loadNew(final FileSet fileSet) throws LoadException,
-			InterruptedException, ExecutionException, OutOfMemoryError {
-
-		resetState();
-		setSource(fileSet);
-
-		NewModelLoader loader = new NewModelLoader(this);
-		loader.load();
-		loader = null;
-
-		if (!isLoaded()) {
-			throw new LoadException("Loading Cancelled", 
-					LoadException.INTPARSE);
-		}
-	}
+//	/**
+//	 * 
+//	 * 
+//	 * @param fileSet
+//	 *            fileset to load
+//	 * @throws ExecutionException
+//	 * @throws InterruptedException
+//	 * 
+//	 */
+//	public void loadNew(final FileSet fileSet) throws LoadException,
+//			InterruptedException, ExecutionException, OutOfMemoryError {
+//
+//		resetState();
+//		setSource(fileSet);
+//
+//		ModelLoader loader = new ModelLoader(this);
+//		loader.load();
+//		loader = null;
+//
+//		if (!isLoaded()) {
+//			throw new LoadException("Loading Cancelled", 
+//					LoadException.INTPARSE);
+//		}
+//	}
 
 	/**
 	 * @param b
@@ -856,6 +860,7 @@ public class TVModel extends Observable implements DataModel {
 	public void setLoaded(final boolean loaded) {
 
 		this.loaded = loaded;
+		this.notifyObservers((Boolean)loaded);
 	}
 
 	@Override

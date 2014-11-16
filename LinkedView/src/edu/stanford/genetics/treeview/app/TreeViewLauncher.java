@@ -47,18 +47,9 @@ public class TreeViewLauncher {
 					new LinkedViewApp();
 				}
 			});
-
-		} catch (final ClassNotFoundException e) {
+		} catch (final ClassNotFoundException | InstantiationException 
+				|  IllegalAccessException | UnsupportedLookAndFeelException e) {
 			LogBuffer.logException(e);
-
-		} catch (final InstantiationException e) {
-			LogBuffer.logException(e);
-
-		} catch (final IllegalAccessException e) {
-			LogBuffer.logException(e);
-
-		} catch (final UnsupportedLookAndFeelException e) {
-			LogBuffer.logException(e);
-		}
+		} 
 	}
 }

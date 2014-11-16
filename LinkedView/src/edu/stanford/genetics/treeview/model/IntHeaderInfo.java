@@ -4,6 +4,7 @@ import java.util.Hashtable;
 import java.util.Observable;
 
 import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
  * A generic headerinfo, backed by private arrays.
@@ -76,7 +77,7 @@ public class IntHeaderInfo extends Observable implements HeaderInfo {
 				return getHeaderArray()[gene];
 			}
 		} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
-			System.out.println("error: tried to retrieve header for  index "
+			LogBuffer.println("error: tried to retrieve header for  index "
 					+ gene + " but max is " + getHeaderArray().length);
 			e.printStackTrace();
 			return new String[0];

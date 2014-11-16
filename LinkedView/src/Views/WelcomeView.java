@@ -25,8 +25,9 @@ public class WelcomeView {
 	private boolean isLoading = false;
 
 	// Loading stuff
-	private JProgressBar loadBar;
-	private JLabel loadLabel;
+	private static JProgressBar loadBar = GUIFactory.createPBar();
+	private static JLabel loadLabel = 
+			GUIFactory.createLabel("", GUIFactory.FONTL);
 
 	public WelcomeView() {
 
@@ -122,10 +123,6 @@ public class WelcomeView {
 		
 		jl.setText(StringRes.load_OneSec);
 		jl2.setText(StringRes.load_active);
-		
-		loadLabel = GUIFactory.createLabel("", GUIFactory.FONTL);
-		
-		loadBar = GUIFactory.createPBar();
 
 		loadContainer.add(loadLabel, "pushx, alignx 50%, wrap");
 		loadContainer.add(loadBar, "pushx, growx");
@@ -144,7 +141,7 @@ public class WelcomeView {
 	 * 
 	 * @param i
 	 */
-	public void updateLoadBar(final int i) {
+	public static void updateLoadBar(final int i) {
 
 		if (i <= loadBar.getMaximum()) {
 			loadBar.setValue(i);
@@ -156,7 +153,7 @@ public class WelcomeView {
 	 * 
 	 * @param i
 	 */
-	public void resetLoadBar() {
+	public static void resetLoadBar() {
 
 		loadBar.setValue(0);
 	}
@@ -166,7 +163,7 @@ public class WelcomeView {
 	 * 
 	 * @param max
 	 */
-	public void setLoadBarMax(final int max) {
+	public static void setLoadBarMax(final int max) {
 
 		loadBar.setMaximum(max);
 	}
@@ -176,7 +173,7 @@ public class WelcomeView {
 	 * 
 	 * @param text
 	 */
-	public void setLoadLabel(final String text) {
+	public static void setLoadText(final String text) {
 
 		loadLabel.setText(text);
 	}

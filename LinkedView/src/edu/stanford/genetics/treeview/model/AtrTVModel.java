@@ -33,10 +33,6 @@ package edu.stanford.genetics.treeview.model;
 import java.awt.MenuItem;
 import java.util.prefs.Preferences;
 
-import edu.stanford.genetics.treeview.FileSet;
-import edu.stanford.genetics.treeview.LoadException;
-import edu.stanford.genetics.treeview.TreeViewFrame;
-
 public class AtrTVModel extends TVModel {
 
 	/**
@@ -77,26 +73,17 @@ public class AtrTVModel extends TVModel {
 	public void setDocumentConfig(final Preferences newVal) {
 	}
 
-	@Override
-	public void setFrame(final TreeViewFrame f) {
-	}
-
-	@Override
-	public TreeViewFrame getFrame() {
-		return null;
-	}
-
 	public MenuItem getStatMenuItem() {
 		return null;
 	}
 
-	@Override
-	public void loadNew(final FileSet fileSet) throws LoadException {
-		resetState();
-		setSource(fileSet);
-		final AtrTVModelLoader loader = new AtrTVModelLoader(this);
-		// loader.loadInto();
-		loader.load();
-	}
+//	@Override
+//	public void loadNew(final FileSet fileSet) throws LoadException {
+//		resetState();
+//		setSource(fileSet);
+//		final AtrTVModelLoader loader = new AtrTVModelLoader(this);
+//		// loader.loadInto();
+//		loader.load();
+//	}
 
 }

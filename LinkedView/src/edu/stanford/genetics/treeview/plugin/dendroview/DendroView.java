@@ -238,7 +238,7 @@ public class DendroView implements Observer, DendroPanel {
 	 */
 	public void setupLayout() {
 
-		LogBuffer.println("Setting up DendroPane layout.");
+		LogBuffer.println("DendroPane layout called.");
 		
 		// Clear panel
 		dendroPane.removeAll();
@@ -495,16 +495,20 @@ public class DendroView implements Observer, DendroPanel {
 	 */
 	public void addSearchBtnListener(final ActionListener l) {
 
-		for( ActionListener al : tvFrame.getSearchBtn().getActionListeners() ) {
-			tvFrame.getSearchBtn().removeActionListener( al );
-	    }
-		LogBuffer.println("Adding Search Button Listener");
-		tvFrame.getSearchBtn().addActionListener(l);
+//		for (ActionListener al : tvFrame.getSearchBtn().getActionListeners()) {
+//			tvFrame.getSearchBtn().removeActionListener( al );
+//	    }
+		
+		if(tvFrame.getSearchBtn().getActionListeners().length == 0) {
+			tvFrame.getSearchBtn().addActionListener(l);
+		}
 	}
 
 	public void addTreeBtnListener(final ActionListener l) {
-
-		tvFrame.getTreeButton().addActionListener(l);
+		
+		if(tvFrame.getTreeButton().getActionListeners().length  == 0) {
+			tvFrame.getTreeButton().addActionListener(l);
+		}
 	}
 
 	// Methods
