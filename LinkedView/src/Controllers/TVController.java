@@ -175,7 +175,7 @@ public class TVController {
 		fileMenuSet = (fileSet != null) ? fileSet : tvFrame.getFileSet(file);
 		
 		/* Setting loading screen */
-		tvFrame.setView("LoadProgressView");
+		tvFrame.generateView(TreeViewFrame.PROGRESS_VIEW);
 
 		/* Loading TVModel */
 		TVModel tvModel = (TVModel) model;
@@ -580,7 +580,7 @@ public class TVController {
 			fileMenuSet = tvFrame.findFileSet(
 					(JMenuItem)actionEvent.getSource());//tvFrame.getFileMenuSet();
 
-			tvFrame.setView(StringRes.view_LoadProg); //change
+			tvFrame.generateView(TreeViewFrame.PROGRESS_VIEW);
 			loadData(fileMenuSet);
 //			new LoadWorker().execute();
 

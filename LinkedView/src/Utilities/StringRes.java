@@ -28,13 +28,6 @@ public class StringRes {
 	// General
 	public static final String empty = "";
 	public static final String dot = ".";
-	
-
-	// View Names
-	public static final String view_Welcome = "WelcomeView";
-	public static final String view_Dendro = "DendroView";
-	public static final String view_LoadProg = "LoadProgressView";
-	public static final String view_LoadError = "LoadErrorView";
 
 	// JDialog Titles
 	public static final String dlg_Cluster = "Cluster View";

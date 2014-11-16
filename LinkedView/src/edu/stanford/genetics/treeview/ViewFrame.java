@@ -603,7 +603,7 @@ public abstract class ViewFrame implements Observer {
 
 	// abstract public HeaderFinder getGeneFinder();
 
-	abstract public void setView(String name);
+	abstract public void generateView(final int view);
 
 	/**
 	 * Method opens a file chooser dialog

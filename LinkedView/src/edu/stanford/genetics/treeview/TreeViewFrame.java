@@ -78,6 +78,11 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
  */
 public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		ConfigNodePersistent {
+	
+	public static final int WELCOME_VIEW = 0;
+	public static final int LOADERROR_VIEW = 1;
+	public static final int PROGRESS_VIEW = 2;
+	public static final int DENDRO_VIEW = 3;
 
 	protected final JPanel bgPanel;
 	protected final JPanel btnPanel;
@@ -133,24 +138,26 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		super(appName);
 		treeView = treeview;
+		
+		/* Get configurations */
 		configNode = treeView.getGlobalConfig().node(StringRes.pnode_TVFrame);
 		
-		// Initialize the views
+		/* Initialize main views */
 		welcomeView = new WelcomeView();
 		loadErrorView = new LoadErrorView();
 		dendroView = new DendroView(this);
 
 		setWindowActive(true);
 
-		// Set up other stuff
+		/* Setting up main panels */
 		bgPanel = GUIFactory.createJPanel(true, true, null);
 		btnPanel = GUIFactory.createJPanel(true, false, null);
 		waiting = GUIFactory.createJPanel(true, true, null);
 
-		// Add the main background panel to the contentPane
+		/* Add main background panel to the application frame's contentPane */
 		applicationFrame.getContentPane().add(bgPanel);
 		
-		// Buttons
+		// Buttons TODO why not in dendroview?
 		searchBtn = GUIFactory.createBtn(StringRes.btn_SearchLabels);
 		searchBtn.setToolTipText(StringRes.tt_searchRowCol);
 		
@@ -158,13 +165,12 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 				.btn_ShowTrees);
 		treeToggleBtn.setToolTipText(StringRes.tt_showTrees);
 
-		// Load FileMRU
 		setupFileMru();
 
 		setupFrameSize();
 		
 		/* Initial view */
-		setView(StringRes.view_Welcome);
+		generateView(WELCOME_VIEW);
 	}
 
 	@Override
@@ -183,34 +189,38 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		}
 	}
 
-	// Setting different views
 	/**
-	 * Choosing JPanel to be displayed.
+	 * Generates the appropriate view panel. 
 	 */
 	@Override
-	public void setView(final String viewName) {
+	public void generateView(final int view_choice) {
 
 		JPanel view;
 
 		// Set view dependent of 'loaded'
-		if (!viewName.equalsIgnoreCase(StringRes.view_Dendro)) {
-			if (viewName.equalsIgnoreCase(StringRes.view_Welcome)) {
-				view = welcomeView.makeInitial();
-
-			} else if (viewName.equalsIgnoreCase(StringRes.view_LoadProg)) {
-				view = welcomeView.makeLoading();
-
-			} else if (viewName.equalsIgnoreCase(StringRes.view_LoadError)) {
-				loadErrorView.setErrorMessage(loadErrorMessage);
-				view = loadErrorView.makeErrorPanel();
-
-			} else {
-				view = GUIFactory.createJPanel(false, false, null);
-
-				final JLabel error = GUIFactory.createLabel("No view "
-						+ "could be loaded.", GUIFactory.FONTS);
-
-				view.add(error, "push, alignx 50%");
+		if (view_choice != DENDRO_VIEW) {
+			
+			switch(view_choice) {
+			
+				case WELCOME_VIEW:
+					view = welcomeView.makeInitial();
+					break;
+					
+				case PROGRESS_VIEW: 
+					view = welcomeView.makeLoading();
+					break;
+					
+				case LOADERROR_VIEW:
+					loadErrorView.setErrorMessage(loadErrorMessage);
+					view = loadErrorView.makeErrorPanel();
+					break;
+					
+				default:
+					view = GUIFactory.createJPanel(false, false, null);
+					final JLabel error = GUIFactory.createLabel("No view "
+							+ "could be loaded.", GUIFactory.FONTS);
+					view.add(error, "push, alignx 50%");
+					break;
 			}
 		} else {
 			view = dendroView.makeDendroPanel();
@@ -511,18 +521,18 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		if (loaded) {
 			if (running == null) {
 				setTitleString(applicationFrame.getName());
-				setView(StringRes.view_Welcome);
+				generateView(WELCOME_VIEW);
 //				JOptionPane.showMessageDialog(applicationFrame,
 //						"TreeViewFrame 253: No plugins to display");
 			} else {
 				setLoadedTitle();
-				setView(StringRes.view_Dendro);
+				generateView(DENDRO_VIEW);
 			}
 
 		} else {
 			applicationFrame.setTitle(StringRes.appName);
 			setTitleString(applicationFrame.getName());
-			setView(StringRes.view_LoadError);
+			generateView(LOADERROR_VIEW);
 		}
 
 		buildMenuBar();
