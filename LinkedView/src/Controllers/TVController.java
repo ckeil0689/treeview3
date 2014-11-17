@@ -164,7 +164,7 @@ public class TVController {
 	 * Passes the resize call for the matrix to the DendroController.
 	 * @param mode
 	 */
-	protected void setMatrixSize(String mode) {
+	protected void setMatrixSize(final int mode) {
 		
 		dendroController.setMatrixSize(mode);
 	}
