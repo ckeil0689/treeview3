@@ -136,8 +136,9 @@ public class MapContainer extends Observable implements Observer,
 
 	public void calculateNewMinScale() {
 
-		this.tileNumVisible = getMaxIndex() + 1;
 		//LogBuffer.println("calculateNewMinScale: tileNumVisible has been set to [" + tileNumVisible + "].");
+		//Added 1 because tileNumVisible is treated as number of indexes visible, not max index
+		this.tileNumVisible = getMaxIndex() + 1;
 		minScale = getCalculatedMinScale();
 	}
 	
@@ -347,7 +348,7 @@ public class MapContainer extends Observable implements Observer,
 		
 		//LogBuffer.println("Current scrollbar value: [" + j + "].  Scrolling to: [" + i + "].");
 
-		if (j != scrollbar.getValue()) {
+		if (j != i) {
 			setChanged();
 		}
 	}
@@ -519,6 +520,13 @@ public class MapContainer extends Observable implements Observer,
 		if (current.getMinIndex() != i || current.getMaxIndex() != j) {
 			current.setIndexRange(i, j);
 			setupScrollbar();
+			//Added this, but took it out because it was to fix something that
+			//previously wasn't broken, so instead of try to patch it, I'm going to
+			//check out the old code to see what went wrong
+			//if(current.getMinIndex() != i) {
+			//	//Keep track of explicitly changed position of visible data indexes
+			//	setFirstVisible(i);
+			//}
 			setChanged();
 		}
 	}
@@ -564,7 +572,9 @@ public class MapContainer extends Observable implements Observer,
 	}
 
 	public void setFirstVisible(int i) {
-		firstVisible = i;
+		if(i >= 0) {
+			firstVisible = i;
+		}
 	}
 
 	public int getMiddlePixel(final int i) {
@@ -660,6 +670,11 @@ public class MapContainer extends Observable implements Observer,
 					current.getMaxIndex());
 			current = integerMap;
 			setupScrollbar();
+			//Added this, but took it out because it was to fix something that
+			//previously wasn't broken, so instead of try to patch it, I'm going to
+			//check out the old code to see what went wrong
+			////Keep track of explicitly selected first visible data index - not sure if this one is an explicit change of the viewed data by the user...
+			//setFirstVisible(current.getMinIndex());
 			setChanged();
 		}
 	}
