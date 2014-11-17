@@ -17,7 +17,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import Utilities.Helper;
@@ -90,6 +89,8 @@ public class DendroController implements ConfigNodePersistent {
 		setConfigNode(tvFrame.getConfigNode());
 		updateHeaderInfo();
 		bindComponentFunctions();
+		
+		/* Get saved tree visibility status, default to false */
 		setTreesVis(configNode.getBoolean("treesVisible", false));
 
 		dendroView.setupLayout();
@@ -113,7 +114,7 @@ public class DendroController implements ConfigNodePersistent {
 	
 	private void addViewListeners() {
 
-		dendroView.addScaleListener(new ScaleListener());
+		dendroView.addScaleListeners(new ScaleListener());
 		dendroView.addZoomListener(new ZoomListener());
 		dendroView.addCompListener(new ResizeListener());
 	}
@@ -163,36 +164,10 @@ public class DendroController implements ConfigNodePersistent {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			new TreeBtnClicker().run();
-		}
-	}
-
-	/**
-	 * SwingWorker which changes the visibility of Dendrograms.
-	 * 
-	 * @author CKeil
-	 * 
-	 */
-	private class TreeBtnClicker extends SwingWorker<Void, Void> {
-		
-		@Override
-		protected Void doInBackground() throws Exception {
-			
-			setTreesVis(tvFrame.getTreeButton().isSelected());
+			setTreesVis(dendroView.getTreeButton().isSelected());
 			
 			dendroView.setupLayout();
 			addViewListeners();
-			return null;
-		}
-
-		@Override
-		protected void done() {
-
-			globalXmap.recalculateScale();
-			globalYmap.recalculateScale();
-			
-			dendroView.getGlobalView().revalidate();
-			dendroView.getGlobalView().repaint();
 		}
 	}
 
@@ -209,46 +184,21 @@ public class DendroController implements ConfigNodePersistent {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			new ScaleChanger(e).run();
-		}
-	}
-
-	/**
-	 * SwingWorker which changes the scale of either x or y MapContainer or
-	 * both. Notifies MapContainer's observers when done. Also resizes 
-	 * GlobalView if the resulting scale is too small to fill out 
-	 * the dedicated space in DendroView.
-	 * 
-	 * @author CKeil
-	 * 
-	 */
-	class ScaleChanger extends SwingWorker<Void, Void> {
-
-		private final ActionEvent event;
-
-		ScaleChanger(final ActionEvent e) {
-
-			this.event = e;
-		}
-
-		@Override
-		protected Void doInBackground() throws Exception {
-			
-			if (event.getSource() == dendroView.getXPlusButton()) {
+			if (e.getSource() == dendroView.getXPlusButton()) {
 				getGlobalXMap().zoomIn();
 
-			} else if (event.getSource() == dendroView.getXMinusButton()) {
+			} else if (e.getSource() == dendroView.getXMinusButton()) {
 				getGlobalXMap().zoomOut();
 
-			} else if (event.getSource() == dendroView.getYPlusButton()) {
+			} else if (e.getSource() == dendroView.getYPlusButton()) {
 				getGlobalYMap().zoomIn();
 				
 
-			} else if (event.getSource() == dendroView.getYMinusButton()) {
+			} else if (e.getSource() == dendroView.getYMinusButton()) {
 				getGlobalYMap().zoomOut();
 				
 
-			} else if (event.getSource() == dendroView.getHomeButton()) {
+			} else if (e.getSource() == dendroView.getHomeButton()) {
 				resetMapContainers();
 
 			} else {
@@ -256,14 +206,6 @@ public class DendroController implements ConfigNodePersistent {
 						+ "in DendroController ScaleListener.");
 			}
 			
-			return null;
-		}
-
-		@Override
-		protected void done() {
-
-//			setButtonEnabledStatus();
-
 			getGlobalXMap().notifyObservers();
 			getGlobalYMap().notifyObservers();
 		}
@@ -629,7 +571,9 @@ public class DendroController implements ConfigNodePersistent {
 		double arrayIndexes = globalXmap.getNumVisible();
 		double geneIndexes  = globalYmap.getNumVisible();
 		
-		if (arrayIndexes == 0 || geneIndexes == 0 || (arrayIndexes == globalXmap.getMaxIndex() && geneIndexes == globalYmap.getMaxIndex())) {
+		if (arrayIndexes == 0 || geneIndexes == 0 
+				|| (arrayIndexes == globalXmap.getMaxIndex() 
+				&& geneIndexes == globalYmap.getMaxIndex())) {
 			//LogBuffer.println("No spots are visible. Resetting view.");
 			arrayIndexes = globalXmap.getMaxIndex() + 1;
 			geneIndexes  = globalYmap.getMaxIndex() + 1;

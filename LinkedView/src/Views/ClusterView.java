@@ -112,16 +112,16 @@ public class ClusterView {
 		this.clusterType = clusterType;
 		
 		/* Main background panel */
-		mainPanel = GUIFactory.createJPanel(false, false, null);
+		mainPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, null);
 		
 		/* Background panel for the cluster options */
-		optionsPanel = GUIFactory.createJPanel(false, true, null);
+		optionsPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 		
 		/* Panel for the cluster/ cancel buttons */
-		btnPanel = GUIFactory.createJPanel(false, true, null);
+		btnPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 		
 		/* ProgressBar panel */
-		loadPanel = GUIFactory.createJPanel(false, true, null);
+		loadPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 		
 		/* Setting up the interactive components with listeners */
 		setupInteractiveComponents();
@@ -260,7 +260,8 @@ public class ClusterView {
 	 */
 	public JPanel setupChoicePanel() {
 
-		JPanel choicePanel = GUIFactory.createJPanel(false, true, null);
+		JPanel choicePanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, 
+				null);
 		
 		// Components for choosing Cluster type
 		final JLabel type = GUIFactory.createLabel("Cluster Type", 

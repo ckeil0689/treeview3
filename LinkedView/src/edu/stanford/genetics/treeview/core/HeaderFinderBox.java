@@ -46,7 +46,6 @@ import Utilities.GUIFactory;
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
-import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.WideComboBox;
@@ -112,7 +111,7 @@ public abstract class HeaderFinderBox {
 		this.otherSelection  = otherSelection;
 		this.otherHeaderInfo = ohI;
 
-		contentPanel = GUIFactory.createJPanel(false, true, null);
+		contentPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 
 		final String[][] hA = headerInfo.getHeaderArray();
 

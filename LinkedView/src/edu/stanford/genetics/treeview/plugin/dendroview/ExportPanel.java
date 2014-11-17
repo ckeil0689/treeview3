@@ -694,7 +694,8 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			setLayout(new BorderLayout());
 			add(new JLabel("Preview"), BorderLayout.NORTH);
 			drawingPanel = new DrawingPanel();
-			waitingPanel = GUIFactory.createJPanel(false, true, null);
+			waitingPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, 
+					null);
 			waitingPanel.add(new JLabel("Check Box to display preview."));
 					//new WaitScreen(new String[] { "Check Box to",
 					//"Display Preview" });

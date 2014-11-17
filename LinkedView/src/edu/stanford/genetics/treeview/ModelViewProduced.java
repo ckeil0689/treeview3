@@ -37,7 +37,9 @@ public abstract class ModelViewProduced extends ModelView {
 
 	private static final long serialVersionUID = 1L;
 
+	/* ARGB color integers for all pixels */
 	protected int[] offscreenPixels = null;
+	
 	protected MemoryImageSource offscreenSource = null;
 	protected Image offscreenBuffer = null;
 	protected Graphics offscreenGraphics = null;
@@ -104,9 +106,7 @@ public abstract class ModelViewProduced extends ModelView {
 		// super.paintComponent(g);
 
 		final Dimension newsize = getSize();
-		if (newsize == null) {
-			return;
-		}
+		if (newsize == null) return;
 
 		Dimension reqSize;
 		reqSize = newsize;

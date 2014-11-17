@@ -63,7 +63,8 @@ public class CancelableSettingsDialog extends JDialog {
 		super(frame, title, true);
 		settingsPanel = panel;
 		settingsFrame = this;
-		final JPanel inner = GUIFactory.createJPanel(false, false, null);
+		final JPanel inner = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, 
+				null);
 		
 		inner.add((Component) panel, "push, grow, wrap");
 		inner.add(new ButtonPanel(), "pushx, growx, alignx 50%");

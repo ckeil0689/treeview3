@@ -230,7 +230,8 @@ public class PreferencesMenu extends CustomDialog implements ConfigNodePersisten
 
 		public FontPanel() {
 
-			mainPanel = GUIFactory.createJPanel(false, true, null);
+			mainPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, 
+					null);
 
 			final FontSettings fontSettings = new FontSettings(
 					dendroView.getTextview(), dendroView.getArraynameview());
@@ -261,7 +262,8 @@ public class PreferencesMenu extends CustomDialog implements ConfigNodePersisten
 
 		public URLSettings() {
 
-			mainPanel = GUIFactory.createJPanel(false, true, null);
+			mainPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, 
+					null);
 
 			final UrlSettingsPanel genePanel = new UrlSettingsPanel(
 					tvFrame.getUrlExtractor(), tvFrame.getGeneUrlPresets());
@@ -295,7 +297,8 @@ public class PreferencesMenu extends CustomDialog implements ConfigNodePersisten
 
 		public AnnotationPanel() {
 
-			mainPanel = GUIFactory.createJPanel(false, true, null);
+			mainPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, 
+					null);
 
 			genePanel = new HeaderSummaryPanel(geneHI, 
 					dendroView.getTextview().getHeaderSummary(), tvFrame);
@@ -304,7 +307,7 @@ public class PreferencesMenu extends CustomDialog implements ConfigNodePersisten
 					dendroView.getArraynameview().getHeaderSummary(), tvFrame);
 
 			final JPanel loadLabelPanel = GUIFactory.createJPanel(false, 
-					true, null);
+					GUIFactory.NO_PADDING, null);
 			loadLabelPanel.setBorder(BorderFactory.createEtchedBorder());
 
 			custom_button = GUIFactory.createBtn(
@@ -376,7 +379,7 @@ public class PreferencesMenu extends CustomDialog implements ConfigNodePersisten
 			
 		} else {
 			// In case menu cannot be loaded, display excuse.
-			menuPanel = GUIFactory.createJPanel(false, true, null);
+			menuPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, null);
 
 			final JLabel hint = GUIFactory.createLabel("Menu cannot be "
 					+ "shown because it wasn't loaded.", GUIFactory.FONTS);

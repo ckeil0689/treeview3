@@ -45,9 +45,10 @@ public class LoadErrorView {
 	 */
 	public void setupMainPanel() {
 
-		homePanel = GUIFactory.createJPanel(false, false, null);
+		homePanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, null);
 
-		JPanel title_bg = GUIFactory.createJPanel(false, false, null);
+		JPanel title_bg = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, 
+				null);
 
 		JLabel jl = GUIFactory.createLabel(StringRes.load_Ohoh, 
 				GUIFactory.FONTXXL);
@@ -57,14 +58,14 @@ public class LoadErrorView {
 		homePanel.add(title_bg, "pushx, growx, alignx 50%, span, "
 				+ "height 20%::, wrap");
 		
-		errorPanel = GUIFactory.createJPanel(false, true, null);
+		errorPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 		
 		homePanel.add(errorPanel, "push, alignx 50%");
 		
 		loadNew = GUIFactory.createBtn(StringRes.btn_LoadNewFile);
 	}
 
-	public JPanel makeErrorPanel() {
+	public JPanel makeError() {
 
 		errorPanel.removeAll();
 		

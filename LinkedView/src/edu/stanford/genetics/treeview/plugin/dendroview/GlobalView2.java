@@ -357,7 +357,7 @@ public class GlobalView2 extends ModelViewProduced implements
 	protected void updatePixels() {
 
 		if (offscreenChanged) {
-			//LogBuffer.println("OFFSCREEN CHANGED");
+//			LogBuffer.println("OFFSCREEN CHANGED");
 			offscreenValid = false;
 			xmap.setAvailablePixels(offscreenSize.width);
 			ymap.setAvailablePixels(offscreenSize.height);
@@ -384,7 +384,7 @@ public class GlobalView2 extends ModelViewProduced implements
 		}
 
 		if (!offscreenValid) {
-			//LogBuffer.println("OFFSCREEN INVALID");
+//			LogBuffer.println("OFFSCREEN INVALID");
 			final Rectangle destRect = new Rectangle(0, 0,
 					xmap.getUsedPixels(), ymap.getUsedPixels());
 
@@ -399,6 +399,7 @@ public class GlobalView2 extends ModelViewProduced implements
 				int[] arraySelections = new int[] {arraySelection.getMinIndex(), 
 						arraySelection.getMaxIndex()};
 				
+				/* Set new offscreenPixels (pixel colors) */
 				drawer.paint(offscreenPixels, sourceRect, destRect,
 						offscreenScanSize, geneSelections, arraySelections);
 			}

@@ -31,7 +31,7 @@ public class CustomDialog {
 		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		dialog.setResizable(false);
 		
-		mainPanel = GUIFactory.createJPanel(false, true, null);
+		mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 	}
 	
 	/**

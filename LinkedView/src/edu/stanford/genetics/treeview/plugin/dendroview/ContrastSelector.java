@@ -89,7 +89,8 @@ class ContrastSelector extends JPanel implements AdjustmentListener {
 
 	public JPanel setPanelLayout() {
 
-		final JPanel panel = GUIFactory.createJPanel(false, true, null);
+		final JPanel panel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, 
+				null);
 
 		return panel;
 	}

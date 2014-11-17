@@ -32,7 +32,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,9 +51,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import Utilities.GUIFactory;
@@ -85,7 +82,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	public static final int DENDRO_VIEW = 3;
 
 	protected final JPanel bgPanel;
-	protected final JPanel btnPanel;
 	protected final JPanel waiting;
 	protected DendroPanel running;
 	protected JDialog presetsFrame = null;
@@ -108,22 +104,16 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	private List<JMenuItem> fileMenuList;
 	private List<FileSet> fileSetList;
 
-	// Buttons for interaction in dendroview.
-	// TODO move these buttons to DendroView
-	private final JButton searchBtn;
-	private final JToggleButton treeToggleBtn;
-
 	private JMenuBar menuBar;
 
 	private boolean loaded;
 
-	// Constructors
 	/**
 	 * Chained constructor
 	 * 
 	 * @param TreeViewApp treeview
 	 */
-	public TreeViewFrame(final TreeViewApp treeview) {
+	public TreeViewFrame (final TreeViewApp treeview) {
 
 		this(treeview, StringRes.appName);
 	}
@@ -134,7 +124,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 * @param TreeViewApp The instance of the current running application.
 	 * @param String The name of the application.
 	 */
-	public TreeViewFrame(final TreeViewApp treeview, final String appName) {
+	public TreeViewFrame (final TreeViewApp treeview, final String appName) {
 
 		super(appName);
 		treeView = treeview;
@@ -150,21 +140,13 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		setWindowActive(true);
 
 		/* Setting up main panels */
-		bgPanel = GUIFactory.createJPanel(true, true, null);
-		btnPanel = GUIFactory.createJPanel(true, false, null);
-		waiting = GUIFactory.createJPanel(true, true, null);
+		bgPanel = GUIFactory.createJPanel(true, GUIFactory.NO_PADDING, null);
+		waiting = GUIFactory.createJPanel(true, GUIFactory.NO_PADDING, null);
 
 		/* Add main background panel to the application frame's contentPane */
 		applicationFrame.getContentPane().add(bgPanel);
-		
-		// Buttons TODO why not in dendroview?
-		searchBtn = GUIFactory.createBtn(StringRes.btn_SearchLabels);
-		searchBtn.setToolTipText(StringRes.tt_searchRowCol);
-		
-		treeToggleBtn = GUIFactory.createToggleBtn(StringRes
-				.btn_ShowTrees);
-		treeToggleBtn.setToolTipText(StringRes.tt_showTrees);
 
+		/* Most recently used files */
 		setupFileMru();
 
 		setupFrameSize();
@@ -196,34 +178,32 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	public void generateView(final int view_choice) {
 
 		JPanel view;
-
-		// Set view dependent of 'loaded'
-		if (view_choice != DENDRO_VIEW) {
 			
-			switch(view_choice) {
-			
-				case WELCOME_VIEW:
-					view = welcomeView.makeInitial();
-					break;
-					
-				case PROGRESS_VIEW: 
-					view = welcomeView.makeLoading();
-					break;
-					
-				case LOADERROR_VIEW:
-					loadErrorView.setErrorMessage(loadErrorMessage);
-					view = loadErrorView.makeErrorPanel();
-					break;
-					
-				default:
-					view = GUIFactory.createJPanel(false, false, null);
-					final JLabel error = GUIFactory.createLabel("No view "
-							+ "could be loaded.", GUIFactory.FONTS);
-					view.add(error, "push, alignx 50%");
-					break;
-			}
-		} else {
-			view = dendroView.makeDendroPanel();
+		switch(view_choice) {
+		
+			case WELCOME_VIEW:
+				view = welcomeView.makeWelcome();
+				break;
+				
+			case PROGRESS_VIEW: 
+				view = welcomeView.makeLoading();
+				break;
+				
+			case LOADERROR_VIEW:
+				loadErrorView.setErrorMessage(loadErrorMessage);
+				view = loadErrorView.makeError();
+				break;
+				
+			case DENDRO_VIEW:
+				view = dendroView.makeDendro();
+				break;
+				
+			default:
+				view = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
+				final JLabel error = GUIFactory.createLabel("No view "
+						+ "could be loaded.", GUIFactory.FONTS);
+				view.add(error, "push, alignx 50%");
+				break;
 		}
 
 		buildMenuBar();
@@ -252,10 +232,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		waiting.removeAll();
 		
 		waiting.add(view, "push, grow");
-
-		if(isLoaded()) {
-			bgPanel.add(btnPanel, "pushx, h 3%, wrap");
-		}
 		
 		bgPanel.add(waiting, "push, grow, h 97%");
 		
@@ -268,14 +244,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	public void showRecentFileEditor() {
 
-		SwingUtilities.invokeLater(new Runnable(){
-
-			@Override
-			public void run() {
-				
-				new FileMruEditor(fileMru).showDialog(applicationFrame);
-			}
-		});
+		new FileMruEditor(fileMru).showDialog(applicationFrame);
 	}
 
 	/**
@@ -284,62 +253,42 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	public void openStatsView(final String source, final int rowNum, 
 			final int colNum) {
 
-		SwingUtilities.invokeLater(new Runnable(){
-
-			@Override
-			public void run() {
-				
-				final StatsPanel stats = new StatsPanel(TreeViewFrame.this);
-				stats.setupLayout(source, rowNum, colNum);
-				stats.setVisible(true);
-			}
-		});
+		final StatsPanel stats = new StatsPanel(TreeViewFrame.this);
+		stats.setupLayout(source, rowNum, colNum);
+		stats.setVisible(true);
 	}
 
 	/**
 	 * Displays messages in a JDialog which were logged by TreeView.
 	 */
 	public void showLogMessages() {
-
-		SwingUtilities.invokeLater(new Runnable(){
-
-			@Override
-			public void run() {
 				
-				final JPanel inner = GUIFactory.createJPanel(false, true, null);
-				inner.add(new JLabel("JTV Messages"), "span, wrap");
-				inner.add(new JScrollPane(
-						new LogMessagesPanel(LogBuffer.getSingleton())),
-						"push, grow, wrap");
+		final JPanel inner = GUIFactory.createJPanel(false, 
+				GUIFactory.NO_PADDING, null);
+		inner.add(new JLabel("JTV Messages"), "span, wrap");
+		inner.add(new JScrollPane(
+				new LogMessagesPanel(LogBuffer.getSingleton())),
+				"push, grow, wrap");
 
-				final LogBuffer buffer = LogBuffer.getSingleton();
-				buffer.setLog(true);
-				inner.add(new LogSettingsPanel(buffer), "span, push");
+		final LogBuffer buffer = LogBuffer.getSingleton();
+		buffer.setLog(true);
+		inner.add(new LogSettingsPanel(buffer), "span, push");
 
-				final JDialog top = new JDialog(applicationFrame, "JTV Messages", 
-						false);
-				top.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-				top.setContentPane(inner);
-				top.pack();
-				top.setLocationRelativeTo(applicationFrame);
-				top.setVisible(true);
-			}
-		});
+		final JDialog top = new JDialog(applicationFrame, "JTV Messages", 
+				false);
+		top.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		top.setContentPane(inner);
+		top.pack();
+		top.setLocationRelativeTo(applicationFrame);
+		top.setVisible(true);
 	}
 
 	/**
 	 * Displays a window with some helpful information about TreeView 3.
 	 */
 	public void showAboutWindow() {
-
-		SwingUtilities.invokeLater(new Runnable(){
-
-			@Override
-			public void run() {
-				
-				new AboutDialog(TreeViewFrame.this).setVisible(true);
-			}
-		});
+	
+		new AboutDialog(TreeViewFrame.this).setVisible(true);
 	}
 
 	/**
@@ -347,32 +296,25 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	public void showDocumentation() {
 
-		SwingUtilities.invokeLater(new Runnable(){
+		final JPanel message = new JPanel();
+		message.setLayout(new BoxLayout(message, BoxLayout.Y_AXIS));
+		message.add(new JLabel(StringRes.appName
+				+ " documentation is available from the website."));
+
+		final String docUrl = StringRes.updateUrl + "/manual.html";
+		message.add(new JTextField(docUrl));
+
+		final JButton lButton = new JButton("Launch Browser");
+		lButton.addActionListener(new ActionListener() {
 
 			@Override
-			public void run() {
-				
-				final JPanel message = new JPanel();
-				message.setLayout(new BoxLayout(message, BoxLayout.Y_AXIS));
-				message.add(new JLabel(StringRes.appName
-						+ " documentation is available from the website."));
-		
-				final String docUrl = StringRes.updateUrl + "/manual.html";
-				message.add(new JTextField(docUrl));
-		
-				final JButton lButton = new JButton("Launch Browser");
-				lButton.addActionListener(new ActionListener() {
-		
-					@Override
-					public void actionPerformed(final ActionEvent e) {
-		
-						displayURL(docUrl);
-					}
-				});
-				message.add(lButton);
-				JOptionPane.showMessageDialog(applicationFrame, message);
+			public void actionPerformed(final ActionEvent e) {
+
+				displayURL(docUrl);
 			}
 		});
+		message.add(lButton);
+		JOptionPane.showMessageDialog(applicationFrame, message);
 	}
 
 	/**
@@ -380,39 +322,32 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	public void showFeedbackDialog() {
 
-		SwingUtilities.invokeLater(new Runnable(){
+		final JPanel feedback = new JPanel();
+		feedback.setLayout(new BoxLayout(feedback, BoxLayout.Y_AXIS));
 
+		JComponent tmp = new JLabel("Please report bugs to ");
+		tmp.setAlignmentX((float) 0.0);
+		feedback.add(tmp);
+
+		tmp = new JLabel("For support, bugs reports, and requests "
+				+ "send email to ");
+		tmp.setAlignmentX((float) 0.0);
+		feedback.add(tmp);
+		final String supportURL = "ckeil@princeton.edu";
+		tmp = new JTextField(supportURL);
+		// tmp.setAlignmentX((float) 1.0);
+		feedback.add(tmp);
+		final JButton yesB = new JButton("Email Support");
+		yesB.addActionListener(new ActionListener() {
 			@Override
-			public void run() {
-			
-				final JPanel feedback = new JPanel();
-				feedback.setLayout(new BoxLayout(feedback, BoxLayout.Y_AXIS));
-		
-				JComponent tmp = new JLabel("Please report bugs to ");
-				tmp.setAlignmentX((float) 0.0);
-				feedback.add(tmp);
-		
-				tmp = new JLabel("For support, bugs reports, and requests "
-						+ "send email to ");
-				tmp.setAlignmentX((float) 0.0);
-				feedback.add(tmp);
-				final String supportURL = "ckeil@princeton.edu";
-				tmp = new JTextField(supportURL);
-				// tmp.setAlignmentX((float) 1.0);
-				feedback.add(tmp);
-				final JButton yesB = new JButton("Email Support");
-				yesB.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(final ActionEvent arg0) {
-						displayURL("mailto:" + supportURL);
-					}
-				});
-				feedback.add(yesB);
-		
-				JOptionPane.showMessageDialog(applicationFrame, feedback,
-						"Feedback...", JOptionPane.INFORMATION_MESSAGE);
+			public void actionPerformed(final ActionEvent arg0) {
+				displayURL("mailto:" + supportURL);
 			}
 		});
+		feedback.add(yesB);
+
+		JOptionPane.showMessageDialog(applicationFrame, feedback,
+				"Feedback...", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	/**
@@ -420,28 +355,21 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	public void displayWIP() {
 
-		SwingUtilities.invokeLater(new Runnable(){
+		final JDialog dialog = new JDialog(applicationFrame);
+		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
-			@Override
-			public void run() {
-				
-				final JDialog dialog = new JDialog(applicationFrame);
-				dialog.setDefaultCloseOperation(
-						WindowConstants.DISPOSE_ON_CLOSE);
+		final JPanel panel = GUIFactory.createJPanel(true, 
+				GUIFactory.NO_PADDING, null);
+		final JLabel l1 = GUIFactory.createLabel("Work in progress.", 
+				GUIFactory.FONTS);
+
+		panel.add(l1, "push, alignx 50%");
+		dialog.add(panel);
 		
-				final JPanel panel = GUIFactory.createJPanel(true, true, null);
-				final JLabel l1 = GUIFactory.createLabel("Work in progress.", 
-						GUIFactory.FONTS);
-		
-				panel.add(l1, "push, alignx 50%");
-				dialog.add(panel);
-				
-				dialog.pack();
-				dialog.setLocationRelativeTo(applicationFrame);
-		
-				dialog.setVisible(true);
-			}
-		});
+		dialog.pack();
+		dialog.setLocationRelativeTo(applicationFrame);
+
+		dialog.setVisible(true);
 	}
 
 	// Getters for Views
@@ -536,26 +464,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		}
 
 		buildMenuBar();
-	}
-	
-	/**
-	 * Controls the display of the search and tree toggle buttons.
-	 * @param hasTrees
-	 */
-	public void setOptionButtons(boolean hasTrees) {
-		
-		btnPanel.removeAll();
-		
-		if(loaded && hasTrees) {
-			btnPanel.add(searchBtn);
-			btnPanel.add(treeToggleBtn);
-			
-		} else if(loaded && !hasTrees) {
-			btnPanel.add(searchBtn);
-		}
-		
-		btnPanel.revalidate();
-		btnPanel.repaint();
 	}
 
 	/**
@@ -907,7 +815,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		dialog.setModalityType(JDialog.DEFAULT_MODALITY_TYPE);
 
-		final JPanel panel = GUIFactory.createJPanel(true, true, null);
+		final JPanel panel = GUIFactory.createJPanel(true, 
+				GUIFactory.NO_PADDING, null);
 
 		final JButton button = GUIFactory.createBtn("OK");
 		button.addActionListener(new ActionListener() {
@@ -1132,11 +1041,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		}
 	}
 
-	public void addTreeButtonListener(final MouseListener l) {
-
-		treeToggleBtn.addMouseListener(l);
-	}
-
 	public FileSet getFileMenuSet() {
 
 		return fileMenuSet;
@@ -1269,13 +1173,13 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		return running;
 	}
 
-	public JToggleButton getTreeButton() {
-
-		return treeToggleBtn;
-	}
-
-	public JButton getSearchBtn() {
-
-		return searchBtn;
-	}
+//	public JToggleButton getTreeButton() {
+//
+//		return treeToggleBtn;
+//	}
+//
+//	public JButton getSearchBtn() {
+//
+//		return searchBtn;
+//	}
 }

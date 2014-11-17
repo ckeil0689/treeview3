@@ -193,7 +193,7 @@ public class FileMruEditor {
 	 */
 	private void setupWidgets() {
 
-		mainPanel = GUIFactory.createJPanel(false, true, null);
+		mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 		fileSetDisplay = new FileSetDisplay();
 		buttonArrangement = new ButtonArrangement();
 		buttonArrangement.setThingsSelected(false);
@@ -236,7 +236,8 @@ public class FileMruEditor {
 				}
 			});
 			regenList();
-			fileSetDisplay = GUIFactory.createJPanel(false, true, null);
+			fileSetDisplay = GUIFactory.createJPanel(false, 
+					GUIFactory.DEFAULT, null);
 			final JScrollPane scrollPane = new JScrollPane(list);
 			fileSetDisplay.add(scrollPane, "push, grow");
 		}
@@ -358,7 +359,8 @@ public class FileMruEditor {
 		 */
 		private ButtonArrangement() {
 
-			buttonPanel = GUIFactory.createJPanel(false, true, null);
+			buttonPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, 
+					null);
 
 			openButton = GUIFactory.createBtn("Open");
 			openButton.addActionListener(new ActionListener() {

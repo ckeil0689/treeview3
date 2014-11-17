@@ -25,6 +25,7 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 import java.awt.ScrollPane;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentListener;
+import java.awt.event.ContainerListener;
 import java.awt.event.KeyEvent;
 import java.util.Observable;
 import java.util.Observer;
@@ -38,6 +39,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JSplitPane;
+import javax.swing.JToggleButton;
 
 import Utilities.GUIFactory;
 import Utilities.StringRes;
@@ -89,6 +91,7 @@ public class DendroView implements Observer, DendroPanel {
 
 	// Main container JPanel
 	private final JPanel dendroPane;
+	private JPanel firstPanel;
 
 	protected ScrollPane panes[];
 
@@ -122,6 +125,11 @@ public class DendroView implements Observer, DendroPanel {
 	private JButton scaleDecX;
 	private JButton scaleDecY;
 	private JButton scaleDefaultAll;
+	
+	// Buttons for interaction in dendroview.
+	// TODO move these buttons to DendroView
+	private final JButton searchBtn;
+	private final JToggleButton treeToggleBtn;
 	
 	// GlobalView default sizes as ints to keep track.
 	private double gvWidth;
@@ -174,7 +182,8 @@ public class DendroView implements Observer, DendroPanel {
 		this.tvFrame = tvFrame;
 		this.name = "DendroView";
 
-		dendroPane = GUIFactory.createJPanel(false, false, null);
+		dendroPane = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING_FILL, 
+				null);
 		
 		// Create the Global view (JPanel to display)
 		globalview = new GlobalView2();
@@ -196,6 +205,14 @@ public class DendroView implements Observer, DendroPanel {
 		// Set up column dendrogram
 		atrview = new ATRView();
 		atrview.getHeaderSummary().setIncluded(new int[] { 0, 3 });
+		
+		setupScaleButtons();
+		
+		searchBtn = GUIFactory.createBtn(StringRes.btn_SearchLabels);
+		searchBtn.setToolTipText(StringRes.tt_searchRowCol);
+		
+		treeToggleBtn = GUIFactory.createToggleBtn(StringRes.btn_ShowTrees);
+		treeToggleBtn.setToolTipText(StringRes.tt_showTrees);
 	}
 	
 	public void setGlobalXMap(MapContainer xmap) {
@@ -211,7 +228,7 @@ public class DendroView implements Observer, DendroPanel {
 	 * 
 	 * @return JPanel dendroPane
 	 */
-	public JPanel makeDendroPanel() {
+	public JPanel makeDendro() {
 
 		arraynameview.generateView(tvFrame.getUrlExtractor());
 		textview.generateView(tvFrame.getUrlExtractor(), -1);
@@ -255,55 +272,40 @@ public class DendroView implements Observer, DendroPanel {
 		JPanel navContainer;
 		JSplitPane gtrPane = null;
 		JSplitPane atrPane = null;
-		
-		JPanel firstPanel;
 		JPanel bottomPanel;
 
-		// Buttons
-		scaleDefaultAll = GUIFactory.createNavBtn(StringRes.icon_home);
-		scaleDefaultAll.setToolTipText("Reset the zoomed view");
-
-		scaleIncX = GUIFactory.createNavBtn(StringRes.icon_zoomIn);
-		scaleIncX.setToolTipText(StringRes.tt_xZoomIn);
-
-		scaleDecX = GUIFactory.createNavBtn(StringRes.icon_zoomOut);
-		scaleDecX.setToolTipText(StringRes.tt_xZoomOut);
-
-		scaleIncY = GUIFactory.createNavBtn(StringRes.icon_zoomIn);
-		scaleIncY.setToolTipText(StringRes.tt_yZoomIn);
-
-		scaleDecY = GUIFactory.createNavBtn(StringRes.icon_zoomOut);
-		scaleDecY.setToolTipText(StringRes.tt_yZoomOut);
-
-		zoomBtn = GUIFactory.createNavBtn(StringRes.icon_zoomAll);
-		zoomBtn.setToolTipText(StringRes.tt_home);
-
 		// Panels
-		btnPanel = GUIFactory.createJPanel(false, true, null);
+		btnPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, 
+				null);
 		
-		crossPanel = GUIFactory.createJPanel(false, true, null);
+		crossPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, 
+				null);
 		
-		globalViewContainer = GUIFactory.createJPanel(false, false, null); 
+		globalViewContainer = GUIFactory.createJPanel(false, 
+				GUIFactory.FILL, null); 
 		
-		navContainer = GUIFactory.createJPanel(true, false, null);
+		navContainer = GUIFactory.createJPanel(true, GUIFactory.NO_PADDING_FILL, 
+				null);
 
-		bottomPanel = GUIFactory.createJPanel(false, true, null); 
+		bottomPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null); 
 		
-		arrayContainer = GUIFactory.createJPanel(false, false, null);
+		arrayContainer = GUIFactory.createJPanel(false, GUIFactory.FILL, null);
 		
-		geneContainer = GUIFactory.createJPanel(false, false, null);
+		geneContainer = GUIFactory.createJPanel(false, GUIFactory.FILL, null);
 
-		firstPanel = GUIFactory.createJPanel(true, true, null);
+		firstPanel = GUIFactory.createJPanel(true, GUIFactory.DEFAULT, null);
 		firstPanel.setBorder(null);
 
-		navPanel = GUIFactory.createJPanel(false, true, null);
+		navPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, 
+				null);
 		navPanel.setBorder(null);
 
-		textpanel = GUIFactory.createJPanel(false, false, null); 
+		textpanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, null); 
 
-		arrayNamePanel = GUIFactory.createJPanel(false, false, null);
+		arrayNamePanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, 
+				null);
 
-		tvFrame.setOptionButtons(gtrview.isEnabled() || atrview.isEnabled());
+		setOptionButtons(gtrview.isEnabled() || atrview.isEnabled());
 
 		if (hasTrees) {
 			gtrPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, gtrview,
@@ -350,62 +352,31 @@ public class DendroView implements Observer, DendroPanel {
 		JScrollBar geneScroll = textview.getXScroll();
 		
 		// Widths
-		double textViewCol = 0;
-		double firstPanelCol = 0;
+		double textViewCol = 18.5;
+		double firstPanelCol = 18.5;
 		double navCol = 10.5;
-		double halfWidthChange = 0.0;
 		
 		// Heights
-		double arrayRow = 0;
-		double bottomRow = 5;
-		double halfHeightChange = 0.0;
+		double arrayRow = 20;
+		double bottomRow = 2;
+		
+		maxGVWidth = 72;
+		maxGVHeight = 75;
 
-		// Layout parameters depend on tree visibility and atr/gtr availability
+		/* Containers depend on tree visibility and atr/gtr availability */
 		if (hasTrees && (atrview.isEnabled() && gtrview.isEnabled())) {
-			maxGVWidth = 72;
-			maxGVHeight = 75;
-			
-			firstPanelCol = 18.5;
-			textViewCol = 18.5;
-			
-			arrayRow = 20;
-			
 			arrayContainer.add(atrPane, "w 99%, h 100%");
 			geneContainer.add(gtrPane, "w 100%, h 99%, wrap");
 
 		} else if (hasTrees && (atrview.isEnabled() && !gtrview.isEnabled())) {
-			maxGVWidth = 80;
-			maxGVHeight = 75;
-			
-			firstPanelCol = 18.5;
-			textViewCol = 10.5;
-			
-			arrayRow = 20;
-			
 			arrayContainer.add(atrPane, "w 99%, h 100%");
 			geneContainer.add(textpanel, "w 100%, h 99%, wrap");
 
 		} else if (hasTrees && (!atrview.isEnabled() && gtrview.isEnabled())) {
-			maxGVWidth = 72;
-			maxGVHeight = 85;
-			
-			firstPanelCol = 18.5;
-			textViewCol = 18.5;
-			
-			arrayRow = 10;
-			
 			arrayContainer.add(arrayNamePanel, "w 99%, h 100%");
 			geneContainer.add(gtrPane, "w 100%, h 99%, wrap");
 
 		} else {
-			maxGVWidth = 80;
-			maxGVHeight = 85;
-			
-			firstPanelCol = 10.5;
-			textViewCol = 10.5;
-			
-			arrayRow = 10;
-			
 			arrayContainer.add(arrayNamePanel, "w 99%, h 100%");
 			geneContainer.add(textpanel, "w 100%, h 99%, wrap");
 		}
@@ -417,20 +388,6 @@ public class DendroView implements Observer, DendroPanel {
 			gvWidth = maxGVWidth;
 			gvHeight = maxGVHeight;
 		}
-		
-		double widthChange = gvWidth - maxGVWidth;
-		double heightChange = gvHeight - maxGVHeight;
-		
-		halfWidthChange = widthChange/ 2.0;
-		halfHeightChange = heightChange/ 2.0;
-		
-		// Adjusting widths and heights
-		textViewCol = textViewCol - halfWidthChange;
-		firstPanelCol = firstPanelCol - halfWidthChange;
-		navCol = navCol - halfWidthChange;
-		
-		arrayRow = arrayRow - halfHeightChange;
-		bottomRow = bottomRow - halfHeightChange;
 		
 		// Adding all components to the dendroPane
 		dendroPane.add(firstPanel, "w " + firstPanelCol + "%, "
@@ -453,6 +410,43 @@ public class DendroView implements Observer, DendroPanel {
 		dendroPane.revalidate();
 		dendroPane.repaint();
 	}
+	
+	private void setupScaleButtons() {
+		
+		// Buttons
+		scaleDefaultAll = GUIFactory.createNavBtn(StringRes.icon_home);
+		scaleDefaultAll.setToolTipText("Reset the zoomed view");
+		
+		scaleIncX = GUIFactory.createNavBtn(StringRes.icon_zoomIn);
+		scaleIncX.setToolTipText(StringRes.tt_xZoomIn);
+		
+		scaleDecX = GUIFactory.createNavBtn(StringRes.icon_zoomOut);
+		scaleDecX.setToolTipText(StringRes.tt_xZoomOut);
+			
+		scaleIncY = GUIFactory.createNavBtn(StringRes.icon_zoomIn);
+		scaleIncY.setToolTipText(StringRes.tt_yZoomIn);
+		
+		scaleDecY = GUIFactory.createNavBtn(StringRes.icon_zoomOut);
+		scaleDecY.setToolTipText(StringRes.tt_yZoomOut);
+		
+		zoomBtn = GUIFactory.createNavBtn(StringRes.icon_zoomAll);
+		zoomBtn.setToolTipText(StringRes.tt_home);
+	}
+	
+	/**
+	 * Controls the display of the search and tree toggle buttons.
+	 * @param hasTrees
+	 */
+	private void setOptionButtons(boolean hasTrees) {
+		
+		firstPanel.removeAll();
+		
+		if(tvFrame.isLoaded()) firstPanel.add(searchBtn);
+		if(hasTrees) firstPanel.add(treeToggleBtn);
+		
+		firstPanel.revalidate();
+		firstPanel.repaint();
+	}
 
 	// Add Button Listeners
 	/**
@@ -460,7 +454,7 @@ public class DendroView implements Observer, DendroPanel {
 	 * 
 	 * @param l
 	 */
-	public void addScaleListener(final ActionListener l) {
+	public void addScaleListeners(final ActionListener l) {
 
 		scaleIncX.addActionListener(l);
 		scaleDecX.addActionListener(l);
@@ -488,6 +482,16 @@ public class DendroView implements Observer, DendroPanel {
 
 		getDendroPane().addComponentListener(l);
 	}
+	
+	/**
+	 * Adds a component listener to the main panel of DendroView.
+	 * 
+	 * @param l
+	 */
+	public void addContListener(final ContainerListener l) {
+
+		getDendroPane().addContainerListener(l);
+	}
 
 	/**
 	 * First removes all listeners from searchBtn, then adds one new listener.
@@ -495,19 +499,15 @@ public class DendroView implements Observer, DendroPanel {
 	 */
 	public void addSearchBtnListener(final ActionListener l) {
 
-//		for (ActionListener al : tvFrame.getSearchBtn().getActionListeners()) {
-//			tvFrame.getSearchBtn().removeActionListener( al );
-//	    }
-		
-		if(tvFrame.getSearchBtn().getActionListeners().length == 0) {
-			tvFrame.getSearchBtn().addActionListener(l);
+		if(getSearchBtn().getActionListeners().length == 0) {
+			getSearchBtn().addActionListener(l);
 		}
 	}
 
 	public void addTreeBtnListener(final ActionListener l) {
 		
-		if(tvFrame.getTreeButton().getActionListeners().length  == 0) {
-			tvFrame.getTreeButton().addActionListener(l);
+		if(getTreeButton().getActionListeners().length  == 0) {
+			getTreeButton().addActionListener(l);
 		}
 	}
 
@@ -573,7 +573,8 @@ public class DendroView implements Observer, DendroPanel {
 		dialog.setTitle(StringRes.dlg_search);
 		dialog.setResizable(false);
 
-		final JPanel container = GUIFactory.createJPanel(true, true, null);
+		final JPanel container = GUIFactory.createJPanel(true, 
+				GUIFactory.DEFAULT, null);
 		
 		JLabel wildTip = GUIFactory.createLabel("You can use wildcards "
 				+ "to search (*, ?).", GUIFactory.FONTS);
@@ -1351,6 +1352,16 @@ public class DendroView implements Observer, DendroPanel {
 	public ViewFrame getViewFrame() {
 
 		return tvFrame;
+	}
+	
+	public JToggleButton getTreeButton() {
+
+		return treeToggleBtn;
+	}
+
+	public JButton getSearchBtn() {
+
+		return searchBtn;
 	}
 
 	/**

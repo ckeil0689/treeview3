@@ -81,7 +81,7 @@ public class ColorChooser implements ConfigNodePersistent {
 		this.minVal = minVal;
 		this.maxVal = maxVal;
 
-		mainPanel = GUIFactory.createJPanel(false, true, null);
+		mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 		mainPanel.setBorder(BorderFactory.createEtchedBorder());
 
 		final JLabel hint = GUIFactory.createLabel("Move or add sliders "
@@ -104,7 +104,7 @@ public class ColorChooser implements ConfigNodePersistent {
 		colorButtonGroup.add(customColorButton);
 
 		final JPanel radioButtonPanel = 
-				GUIFactory.createJPanel(false, true, null);
+				GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 
 		final JLabel colorHint = GUIFactory.createLabel("Choose a Color "
 				+ "Scheme: ", GUIFactory.FONTS);
@@ -806,7 +806,7 @@ public class ColorChooser implements ConfigNodePersistent {
 					});
 
 					final JPanel panel = GUIFactory.createJPanel(false, 
-							false, null);
+							GUIFactory.NO_PADDING, null);
 
 					panel.add(enterPrompt, "push, span, wrap");
 					panel.add(inputField, "push, growx, span, wrap");

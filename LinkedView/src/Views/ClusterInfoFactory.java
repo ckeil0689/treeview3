@@ -19,7 +19,7 @@ public class ClusterInfoFactory {
 	
 	static {
 		
-		mainPanel = GUIFactory.createJPanel(false, true, null);
+		mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 	}
 	
 	/**

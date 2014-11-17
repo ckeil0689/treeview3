@@ -47,7 +47,8 @@ public class StatsPanel {
 	 */
 	public void setupLayout(String source, int rowNum, int colNum) {
 
-		final JPanel mainPanel = GUIFactory.createJPanel(false, true, null);
+		final JPanel mainPanel = GUIFactory.createJPanel(false, 
+				GUIFactory.NO_PADDING, null);
 
 		final JLabel header = GUIFactory.setupHeader("Data Stats");
 

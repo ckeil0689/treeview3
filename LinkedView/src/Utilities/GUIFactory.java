@@ -29,15 +29,20 @@ public class GUIFactory {
 	// Default
 	public static String QUESTIONICON = "questionIcon_dark.png";
 
-	public static Font FONTS = new Font("Sans Serif", Font.PLAIN, 14);
-	public static Font FONTM = new Font("Sans Serif", Font.PLAIN, 16);
-	public static Font FONTL = new Font("Sans Serif", Font.PLAIN, 20);
-	public static Font FONTXXL = new Font("Sans Serif", Font.PLAIN, 30);
+	public static final Font FONTS = new Font("Sans Serif", Font.PLAIN, 14);
+	public static final Font FONTM = new Font("Sans Serif", Font.PLAIN, 16);
+	public static final Font FONTL = new Font("Sans Serif", Font.PLAIN, 20);
+	public static final Font FONTXXL = new Font("Sans Serif", Font.PLAIN, 30);
 
-	public static Color DEFAULT_BG = UIManager.getColor ( "Panel.background" );
-	public static Color MAIN = new Color(30, 144, 255, 255);
-	public static Color ELEMENT_HOV = new Color(122, 214, 255, 255);
-	public static Color RED1 = new Color(240, 80, 50, 255);
+	public static final Color DEFAULT_BG = UIManager.getColor("Panel.background");
+	public static final Color MAIN = new Color(30, 144, 255, 255);
+	public static final Color ELEMENT_HOV = new Color(122, 214, 255, 255);
+	public static final Color RED1 = new Color(240, 80, 50, 255);
+	
+	public static final int DEFAULT = 0;
+	public static final int NO_PADDING_FILL = 1;
+	public static final int NO_PADDING = 2;
+	public static final int FILL = 3;
 	
 	/**
 	 * Creates and returns a simple JPanel with MigLayout to be used 
@@ -46,21 +51,30 @@ public class GUIFactory {
 	 * color can be determined. This function is mainly used to reduce
 	 * repeating code throughout the source code.
 	 * @param opaque
-	 * @param padding
+	 * @param panel_mode
 	 * @param backgroundColor
 	 * @return
 	 */
-	public static JPanel createJPanel(boolean opaque, boolean padding, 
+	public static JPanel createJPanel(boolean opaque, int panel_mode, 
 			Color backgroundColor) {
 		
 		JPanel panel = new JPanel();
 		panel.setOpaque(opaque);
 		
-		if(padding) {
-			panel.setLayout(new MigLayout());
-			
-		} else {
-			panel.setLayout(new MigLayout("ins 0"));
+		switch(panel_mode) {
+			case NO_PADDING_FILL:
+				panel.setLayout(new MigLayout("ins 0", "[grow, fill]"));
+				break;
+				
+			case NO_PADDING:
+				panel.setLayout(new MigLayout("ins 0"));
+				break;
+			case FILL:
+				panel.setLayout(new MigLayout("", "[grow, fill]"));
+				break;
+			default: 
+				panel.setLayout(new MigLayout());
+				break;
 		}
 		
 		// specify background, otherwise default to theme's backgroundColor.

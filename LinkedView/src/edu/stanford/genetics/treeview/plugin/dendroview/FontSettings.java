@@ -87,7 +87,7 @@ public class FontSettings implements SettingsPanel {
 	 */
 	public JPanel makeFontPanel() {
 
-		fontPanel = GUIFactory.createJPanel(false, true, null);
+		fontPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 		setupFonts();
 		setupWidgets();
 		updateExample();

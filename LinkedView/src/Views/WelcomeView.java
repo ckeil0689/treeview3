@@ -31,13 +31,14 @@ public class WelcomeView {
 
 	public WelcomeView() {
 
-		homePanel = GUIFactory.createJPanel(false, false, null);
+		homePanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 
-		title_bg = GUIFactory.createJPanel(false, true, null);
+		title_bg = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, null);
 		
-		JPanel titleContainer = GUIFactory.createJPanel(false, false, null);
+		JPanel titleContainer = GUIFactory.createJPanel(false, 
+				GUIFactory.NO_PADDING, null);
 		
-		loadPanel = GUIFactory.createJPanel(false, true, null);
+		loadPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 
 		jl = GUIFactory.createLabel(StringRes.title_Hello, GUIFactory.FONTL);
 
@@ -92,7 +93,7 @@ public class WelcomeView {
 	}
 
 
-	public JPanel makeInitial() {
+	public JPanel makeWelcome() {
 
 		isLoading = false;
 
@@ -119,7 +120,8 @@ public class WelcomeView {
 
 		loadPanel.removeAll();
 
-		JPanel loadContainer = GUIFactory.createJPanel(false, false, null);
+		JPanel loadContainer = GUIFactory.createJPanel(false, 
+				GUIFactory.DEFAULT, null);
 		
 		jl.setText(StringRes.load_OneSec);
 		jl2.setText(StringRes.load_active);
