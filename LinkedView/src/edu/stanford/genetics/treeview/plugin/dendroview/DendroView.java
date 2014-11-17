@@ -80,8 +80,7 @@ import edu.stanford.genetics.treeview.core.HeaderFinderBox;
 public class DendroView implements Observer, DendroPanel {
 
 	// Instance Variables
-	protected int gtr_div_size = 0;
-	protected int atr_div_size = 0;
+	private int div_size;
 
 	// Container JFrame
 	protected TreeViewFrame tvFrame;
@@ -308,21 +307,22 @@ public class DendroView implements Observer, DendroPanel {
 		setOptionButtons(gtrview.isEnabled() || atrview.isEnabled());
 
 		if (hasTrees) {
+			div_size = 5;
 			gtrPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, gtrview,
 					textpanel);
 			gtrPane.setResizeWeight(0.5);
 			gtrPane.setOpaque(false);
 			gtrPane.setBorder(null);
-			gtr_div_size = 3;
-			gtrPane.setDividerSize(gtr_div_size);
+			gtrPane.setOneTouchExpandable(true);
+			gtrPane.setDividerSize(div_size);
 
 			atrPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, atrview,
 					arrayNamePanel);
 			atrPane.setResizeWeight(0.5);
 			atrPane.setOpaque(false);
 			atrPane.setBorder(null);
-			atr_div_size = 3;
-			atrPane.setDividerSize(atr_div_size);
+			atrPane.setOneTouchExpandable(true);
+			atrPane.setDividerSize(div_size);
 		}
 
 		// Adding Components onto each other
@@ -352,15 +352,15 @@ public class DendroView implements Observer, DendroPanel {
 		JScrollBar geneScroll = textview.getXScroll();
 		
 		// Widths
-		double textViewCol = 18.5;
-		double firstPanelCol = 18.5;
-		double navCol = 10.5;
+		double textViewCol = 16;
+		double firstPanelCol = 16	;
+		double navCol = 10;
 		
 		// Heights
 		double arrayRow = 20;
 		double bottomRow = 2;
 		
-		maxGVWidth = 72;
+		maxGVWidth = 75;
 		maxGVHeight = 75;
 
 		/* Containers depend on tree visibility and atr/gtr availability */
