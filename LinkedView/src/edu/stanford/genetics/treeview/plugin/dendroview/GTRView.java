@@ -29,6 +29,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.Observable;
 
 import edu.stanford.genetics.treeview.HeaderInfo;
@@ -45,8 +46,8 @@ import edu.stanford.genetics.treeview.TreeSelectionI;
  * This object requires a MapContainer to figure out the offsets for the genes.
  */
 
-public class GTRView extends ModelViewBuffered implements MouseListener,
-		KeyListener {
+public class GTRView extends ModelViewBuffered implements MouseListener, 
+		MouseMotionListener, KeyListener {
 
 	private static final long serialVersionUID = 1L;;
 
@@ -56,6 +57,7 @@ public class GTRView extends ModelViewBuffered implements MouseListener,
 	private MapContainer map;
 	private TreePainter drawer = null;
 	private TreeDrawerNode selectedNode = null;
+	private TreeDrawerNode hoveredNode = null;
 	private Rectangle destRect = null;
 
 	private TreeSelectionI geneSelection;
@@ -74,6 +76,7 @@ public class GTRView extends ModelViewBuffered implements MouseListener,
 		destRect = new Rectangle();
 
 		addMouseListener(this);
+		addMouseMotionListener(this);
 		addKeyListener(this);
 	}
 
@@ -175,6 +178,8 @@ public class GTRView extends ModelViewBuffered implements MouseListener,
 
 	public void setSelectedNode(final TreeDrawerNode n) {
 
+		setHoveredNode(null);
+		
 		if (selectedNode == n) {
 			return;
 		}
@@ -194,6 +199,34 @@ public class GTRView extends ModelViewBuffered implements MouseListener,
 			}
 		} else {
 			selectedNode = n;
+		}
+
+		synchMap();
+		// offscreenValid = false;
+		repaint();
+	}
+	
+	public void setHoveredNode(final TreeDrawerNode n) {
+
+		if (hoveredNode == n) {
+			return;
+		}
+
+		if (getYScaleEq() != null) {
+
+			if (hoveredNode != null) {
+				drawer.paintSubtree(offscreenGraphics, getXScaleEq(),
+						getYScaleEq(), destRect, hoveredNode, false, ISLEFT);
+			}
+
+			hoveredNode = n;
+
+			if (hoveredNode != null) {
+				drawer.paintSubtree(offscreenGraphics, getXScaleEq(),
+						getYScaleEq(), destRect, hoveredNode, true, ISLEFT);
+			}
+		} else {
+			hoveredNode = n;
 		}
 
 		synchMap();
@@ -418,6 +451,40 @@ public class GTRView extends ModelViewBuffered implements MouseListener,
 							.inverseTransform(e.getX()), getXScaleEq()
 							.getSlope() / getYScaleEq().getSlope()));
 		}
+	}
+	
+	@Override
+	public void mouseMoved(final MouseEvent e) {
+
+		if (!isEnabled()) {
+			return;
+		}
+
+		if (!enclosingWindow().isActive()) {
+			return;
+		}
+
+		if (drawer != null && geneSelection.getNSelectedIndexes() == 0) {
+			// the trick is translating back to the normalized space...
+			setHoveredNode(drawer.getClosest(
+					getYScaleEq().inverseTransform(e.getY()), getXScaleEq()
+							.inverseTransform(e.getX()), getXScaleEq()
+							.getSlope() / getYScaleEq().getSlope()));
+		}
+	}
+	
+	@Override
+	public void mouseExited(final MouseEvent e) {
+
+		if (!isEnabled()) {
+			return;
+		}
+
+		if (!enclosingWindow().isActive()) {
+			return;
+		}
+
+		setHoveredNode(null);
 	}
 
 	// method from KeyListener

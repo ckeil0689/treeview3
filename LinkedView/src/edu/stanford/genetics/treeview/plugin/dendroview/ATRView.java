@@ -37,10 +37,12 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.Observable;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
+
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LinearTransformation;
@@ -58,8 +60,8 @@ import edu.stanford.genetics.treeview.TreeSelectionI;
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.2 $ $Date: 2010-05-02 13:39:00 $
  */
-public class ATRView extends ModelViewBuffered implements MouseListener,
-		KeyListener {
+public class ATRView extends ModelViewBuffered implements MouseListener, 
+		MouseMotionListener, KeyListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -73,6 +75,7 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 
 	private TreePainter drawer = null;
 	private TreeDrawerNode selectedNode = null;
+	private TreeDrawerNode hoveredNode = null;
 	private Rectangle destRect = null;
 
 	private final boolean ISLEFT = false;
@@ -92,6 +95,7 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 		panel.add(scrollbar, BorderLayout.NORTH);
 
 		addMouseListener(this);
+		addMouseMotionListener(this);
 		addKeyListener(this);
 	}
 
@@ -103,6 +107,8 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 	 *            already selected.
 	 */
 	public void setSelectedNode(final TreeDrawerNode n) {
+		
+		setHoveredNode(null);
 
 		if (selectedNode == n) {
 			return;
@@ -124,6 +130,30 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 		if ((status != null) && hasMouse) {
 			status.setMessages(getStatus());
 		}
+		synchMap();
+		repaint();
+	}
+	
+	public void setHoveredNode(final TreeDrawerNode n) {
+
+		if (hoveredNode == n) {
+			return;
+		}
+		
+		if (hoveredNode != null) {
+			drawer.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
+					destRect, hoveredNode, false, ISLEFT);
+		}
+
+		hoveredNode = n;
+
+		if (hoveredNode != null) {
+			if (xScaleEq != null) {
+				drawer.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
+						destRect, hoveredNode, true, ISLEFT);
+			}
+		}
+		
 		synchMap();
 		repaint();
 	}
@@ -404,6 +434,43 @@ public class ATRView extends ModelViewBuffered implements MouseListener,
 					yScaleEq.getSlope() / xScaleEq.getSlope()));
 		}
 	}
+	
+	@Override
+	public void mouseMoved(final MouseEvent e) {
+
+		if (!isEnabled()) {
+			return;
+		}
+
+		if (!enclosingWindow().isActive()) {
+			return;
+		}
+
+		if (drawer != null && arraySelection.getNSelectedIndexes() == 0) {
+			// the trick is translating back to the normalized space...
+			setHoveredNode(drawer.getClosest(
+					xScaleEq.inverseTransform(e.getX()),
+					yScaleEq.inverseTransform(e.getY()),
+					// weight must have correlation slope on top
+					yScaleEq.getSlope() / xScaleEq.getSlope()));
+		}
+	}
+	
+	@Override
+	public void mouseExited(final MouseEvent e) {
+
+		if (!isEnabled()) {
+			return;
+		}
+
+		if (!enclosingWindow().isActive()) {
+			return;
+		}
+
+		setHoveredNode(null);
+	}
+	
+	
 
 	// method from KeyListener
 	/**
