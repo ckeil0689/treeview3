@@ -32,6 +32,7 @@ import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 import java.util.Observable;
@@ -65,8 +66,8 @@ import edu.stanford.genetics.treeview.UrlExtractor;
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version @version $Revision: 1.4 $ $Date: 2010-05-02 13:39:00 $
  */
-public class ArrayNameView extends ModelView implements MouseListener,
-		FontSelectable, ConfigNodePersistent {
+public class ArrayNameView extends ModelView implements MouseListener, 
+		MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
 	private static final long serialVersionUID = 1L;
 
@@ -89,8 +90,10 @@ public class ArrayNameView extends ModelView implements MouseListener,
 	private boolean backBufferValid = false;
 	private Preferences configNode = null;
 	private UrlExtractor urlExtractor = null;
+	
 	private TreeSelectionI arraySelection;
 	private TreeSelectionI geneSelection;
+	private int hoverIndex = -1;
 
 	private final String d_face = "Dialog";
 	private final int d_style = 0;
@@ -117,6 +120,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 //		headerSummary.setIncluded(new int[] { 0 });
 //		headerSummary.addObserver(this);
 		
+		addMouseMotionListener(this);
 		addMouseListener(this);
 
 		l1 = GUIFactory.createLabel("", GUIFactory.FONTS);
@@ -328,7 +332,8 @@ public class ArrayNameView extends ModelView implements MouseListener,
 						 */
 						if (out != null) {
 							if ((arraySelection == null)
-									|| arraySelection.isIndexSelected(j)) {
+									|| arraySelection.isIndexSelected(j)
+									|| j == hoverIndex) {
 								if (colorIndex > 0) {
 									g.setColor(TreeColorer
 											.getColor(headers[colorIndex]));
@@ -575,6 +580,20 @@ public class ArrayNameView extends ModelView implements MouseListener,
 
 		geneSelection.notifyObservers();
 		arraySelection.notifyObservers();
+	}
+	
+	@Override
+	public void mouseMoved(final MouseEvent e) {
+		
+		hoverIndex = map.getIndex(e.getX());
+		repaint();
+	}
+	
+	@Override
+	public void mouseExited(final MouseEvent e) {
+		
+		hoverIndex = -1;
+		repaint();
 	}
 
 	// FontSelectable

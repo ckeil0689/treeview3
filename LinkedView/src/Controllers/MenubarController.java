@@ -7,6 +7,7 @@ import Utilities.StringRes;
 import Views.ClusterView;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeViewFrame;
+import edu.stanford.genetics.treeview.plugin.dendroview.GlobalView2;
 
 /**
  * This class contains all the different actions which are being mapped to
@@ -79,13 +80,13 @@ public class MenubarController {
 			controller.openPrefMenu(name);
 			break;	
 		case "Fill screen":				
-			controller.setMatrixSize("fill");
+			controller.setMatrixSize(GlobalView2.FILL);
 			break;
 		case "Equal axes":				
-			controller.setMatrixSize("equal");
+			controller.setMatrixSize(GlobalView2.EQUAL);
 			break;
 		case "Proportional axes":	    
-			controller.setMatrixSize("proportional");
+			controller.setMatrixSize(GlobalView2.PROPORT);
 			break;
 		case StringRes.menu_Hier:		
 			controller.setupClusterView(ClusterView.HIER);

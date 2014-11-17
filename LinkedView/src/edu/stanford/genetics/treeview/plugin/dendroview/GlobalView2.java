@@ -60,6 +60,10 @@ public class GlobalView2 extends ModelViewProduced implements
 		MouseMotionListener, MouseListener, MouseWheelListener, KeyListener {
 
 	private static final long serialVersionUID = 1L;
+	
+	public static final int FILL = 0;
+	public static final int EQUAL = 1;
+	public static final int PROPORT = 2;
 
 	protected boolean hasDrawn = false;
 	private boolean resetHome = false;

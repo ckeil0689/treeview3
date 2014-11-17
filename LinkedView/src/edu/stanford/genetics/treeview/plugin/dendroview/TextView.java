@@ -76,11 +76,13 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 
 	private TreeSelectionI geneSelection;
 	private TreeSelectionI arraySelection;
+	
 	private MapContainer map;
 	private UrlExtractor urlExtractor;
 	private int maxlength = 0;
 	private int col;
 	private boolean dragging = false;
+	private int hoverIndex;
 
 	private final JScrollPane scrollPane;
 	private final JLabel l1;
@@ -113,6 +115,8 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBorder(null);
 		panel = scrollPane;
+		
+		hoverIndex = -1;
 	}
 	
 	public JScrollBar getXScroll() {
@@ -221,7 +225,8 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 					if (out != null) {
 						final Color fore = GUIFactory.MAIN; // g.getColor();
 						if ((geneSelection == null)
-								|| geneSelection.isIndexSelected(j)) {
+								|| geneSelection.isIndexSelected(j)
+								|| j == hoverIndex) {
 							final String[] strings = headerInfo.getHeader(j);
 
 							if (fgColorIndex > 0) {
@@ -441,6 +446,20 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 	public void mouseReleased(final MouseEvent e) {
 
 		dragging = false;
+	}
+	
+	@Override
+	public void mouseMoved(final MouseEvent e) {
+		
+		hoverIndex = map.getIndex(e.getY());
+		repaint();
+	}
+	
+	@Override
+	public void mouseExited(final MouseEvent e) {
+		
+		hoverIndex = -1;
+		repaint();
 	}
 
 	// KeyListener

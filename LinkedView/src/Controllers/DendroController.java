@@ -42,6 +42,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendroException;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
 import edu.stanford.genetics.treeview.plugin.dendroview.DoubleArrayDrawer;
+import edu.stanford.genetics.treeview.plugin.dendroview.GlobalView2;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreeColorer;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreePainter;
@@ -221,79 +222,96 @@ public class DendroController implements ConfigNodePersistent {
 	 * show. 
 	 * @param mode
 	 */
-	public void setMatrixSize(String mode) {
+	public void setMatrixSize(int mode) {
 		
-		if(mode.equalsIgnoreCase("fill")) {
-			// Change so that height-/widthChange can be set directly
-			dendroView.setGVWidth(0);
-			dendroView.setGVHeight(0);
+		switch(mode) {
+		
+		case GlobalView2.FILL:
+			setMatrixFill();
+			break;
 			
-		} else if(mode.equalsIgnoreCase("equal")) {
+		case GlobalView2.EQUAL:
 			setMatrixAxesEqual();
+			break;
 			
-		} else if(mode.equalsIgnoreCase("proportional")) {
-			setPixelScalesEqual();
+		case GlobalView2.PROPORT:
+			setMatrixPropotional();
+			break;
 			
-		} else {
-			LogBuffer.println("Got weird resize option in "
-					+ "setMatrixSize(): " + mode);
+		default:
+			setMatrixFill();
+			break;
 		}
 		
 		dendroView.setupLayout();
 		addViewListeners();
 		resetMapContainers();
+	}
+	
+	/** 
+	 * Sets axis dimensions of heat map to their maximum values.
+	 */
+	private void setMatrixFill() {
 		
-		// only for debug - erase after
-		LogBuffer.println("--------------------------");
-		LogBuffer.println("GVWidth: " + dendroView.getGlobalView().getWidth());
-		LogBuffer.println("GVHeight: " + dendroView.getGlobalView().getHeight());
-		LogBuffer.println("XScale: " + getGlobalXMap().getScale());
-		LogBuffer.println("YScale: " + getGlobalYMap().getScale());
+		dendroView.setGVWidth(DendroView.MAX_GV_WIDTH);
+		dendroView.setGVHeight(DendroView.MAX_GV_HEIGHT);
 	}
 	
 	/**
 	 * Sets the size of each GlobalView axes to the smallest of both to
 	 * form a square.
 	 */
-	public void setMatrixAxesEqual() {
+	private void setMatrixAxesEqual() {
 		
-		double percentDiff = 0.0;
+		/* Get GlobalView dimensions */
+		double absGVWidth = dendroView.getGlobalView().getWidth();
+		double absGVHeight = dendroView.getGlobalView().getHeight();
 		
-		// Find absolute GlobalView dimensions
-		double absGVWidth = dendroView.getGlobalView().getWidth() 
-				+ dendroView.getYScroll().getWidth();
-		double absGVHeight = dendroView.getGlobalView().getHeight() 
-				+ dendroView.getXScroll().getHeight();
-		
-		if(Helper.nearlyEqual(absGVWidth, absGVHeight)) {
-			/* TODO get rid of this statement, as it does nothing! */
-		
-		} else if(absGVWidth < absGVHeight) {
-			percentDiff = (absGVWidth/ absGVHeight);
+		if(!Helper.nearlyEqual(absGVWidth, absGVHeight)) {
 			
-			double newHeight = dendroView.getMaxGVHeight() * percentDiff;
-			// rounding
-			newHeight =newHeight * 1000;
-			newHeight = (double)Math.round(newHeight);
-			newHeight = newHeight/ 1000;
+			/* 
+			 * Depends on app frame size (what if app used on a screen 
+			 * with larger height than width etc...)
+			 */
+			int screen_width = tvFrame.getAppFrame().getWidth();
+			int screen_height = tvFrame.getAppFrame().getHeight();
 			
-			dendroView.setGVHeight(newHeight);
-		
-		} else if(absGVHeight < absGVWidth) {
-			percentDiff = (absGVHeight/ absGVWidth);
-			
-			double newWidth = dendroView.getMaxGVWidth() * percentDiff;
-			// rounding
-			newWidth = newWidth * 1000;
-			newWidth = (double)Math.round(newWidth);
-			newWidth = newWidth/ 1000;
-			
-			dendroView.setGVWidth(newWidth);
-		
-		} else {
-			LogBuffer.println("Uncovered case when trying to set matrix "
-					+ "to squared matrix.");
+			/* Make sure the axis with the smallest screen side is maximized */
+			if(screen_height < screen_width) {		
+				double newWidth = calcAxisDimension(absGVWidth, absGVHeight, 
+						DendroView.MAX_GV_WIDTH);
+				
+				dendroView.setGVWidth(newWidth);
+				
+			} else {
+				double newHeight = calcAxisDimension(absGVHeight, absGVWidth, 
+						DendroView.MAX_GV_HEIGHT);
+				
+				dendroView.setGVHeight(newHeight);
+			}
 		}
+	}
+	
+	private double calcAxisDimension(double big, double small, double max) {
+		
+		double percentDiff = small / big;
+		
+		/* new abs-size for axis */
+		double newAbsSize = big * percentDiff;
+		
+		double newAxis = percentDiff * max;
+
+		LogBuffer.println("Adjusted other axis: " + newAbsSize);
+		
+		// rounding
+		newAxis *= 1000;
+		newAxis = (double) Math.round(newAxis);
+		newAxis /= 1000;
+		
+		LogBuffer.println("PercentDiff: " + percentDiff);
+		LogBuffer.println("New percent: " + newAxis);
+		
+		return newAxis;
 	}
 	
 	/**
@@ -301,7 +319,7 @@ public class DendroController implements ConfigNodePersistent {
 	 * If gvWidth or gvHeight would go below a certain size, the matrix is
 	 * adjusted such that the content remains viewable in a meaningful manner.
 	 */
-	public void setPixelScalesEqual() {
+	private void setMatrixPropotional() {
 		
 		// Condition: All pixels must be shown, but must have same scale.
 				
@@ -316,7 +334,7 @@ public class DendroController implements ConfigNodePersistent {
 			
 			double percentDiff = used/ avail;
 			
-			double newWidth = dendroView.getMaxGVWidth() * percentDiff;
+			double newWidth = DendroView.MAX_GV_WIDTH * percentDiff;
 			// rounding
 			newWidth = newWidth * 1000;
 			newWidth = (double)Math.round(newWidth);
@@ -332,7 +350,7 @@ public class DendroController implements ConfigNodePersistent {
 			
 			double percentDiff = used/ avail;
 			
-			double newHeight = dendroView.getMaxGVHeight() * percentDiff;
+			double newHeight = DendroView.MAX_GV_HEIGHT * percentDiff;
 			// rounding
 			newHeight = newHeight * 1000;
 			newHeight = (double)Math.round(newHeight);

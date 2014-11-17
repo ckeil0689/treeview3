@@ -134,8 +134,8 @@ public class DendroView implements Observer, DendroPanel {
 	private double gvWidth;
 	private double gvHeight;
 	
-	private double maxGVWidth;
-	private double maxGVHeight;
+	public static final double MAX_GV_WIDTH = 75;
+	public static final double MAX_GV_HEIGHT = 80;
 
 	// Booleans
 	private boolean hasTrees = false;
@@ -351,17 +351,18 @@ public class DendroView implements Observer, DendroPanel {
 		JScrollBar arrayScroll = arraynameview.getYScroll();
 		JScrollBar geneScroll = textview.getXScroll();
 		
-		// Widths
-		double textViewCol = 16;
-		double firstPanelCol = 16	;
-		double navCol = 10;
+		if(gvWidth == 0 && gvHeight == 0) {
+			gvWidth = MAX_GV_WIDTH;
+			gvHeight = MAX_GV_HEIGHT;
+		}
+		
+		/* Column widths */
+		double textViewCol = (100 - gvWidth - 1) / 2;
 		
 		// Heights
-		double arrayRow = 20;
+		double arrayRow = (100 - gvHeight - 2);
 		double bottomRow = 2;
 		
-		maxGVWidth = 75;
-		maxGVHeight = 75;
 
 		/* Containers depend on tree visibility and atr/gtr availability */
 		if (hasTrees && (atrview.isEnabled() && gtrview.isEnabled())) {
@@ -384,20 +385,15 @@ public class DendroView implements Observer, DendroPanel {
 		arrayContainer.add(arrayScroll, "w 1%, h 100%");
 		geneContainer.add(geneScroll, "w 100%, h 1%");
 		
-		if(gvWidth == 0 && gvHeight == 0) {
-			gvWidth = maxGVWidth;
-			gvHeight = maxGVHeight;
-		}
-		
 		// Adding all components to the dendroPane
-		dendroPane.add(firstPanel, "w " + firstPanelCol + "%, "
+		dendroPane.add(firstPanel, "w " + textViewCol + "%, "
 				+ "h " + arrayRow + "%, pushx");
 		
 		dendroPane.add(arrayContainer, "w " + gvWidth + "%, "
 				+ "h " + arrayRow + "%");
 		
-		dendroPane.add(navContainer, "span 1 3, w " + navCol + "%, h 100%, "
-				+ "wrap");
+		dendroPane.add(navContainer, "span 1 3, w " + (textViewCol - 1) 
+				+ "%, h 100%, wrap");
 		
 		dendroPane.add(geneContainer, "w " + textViewCol + "%, "
 				+ "h " + gvHeight + "%, pushx");
@@ -1152,15 +1148,15 @@ public class DendroView implements Observer, DendroPanel {
 //		this.heightChange = change;
 //	}
 	
-	public double getMaxGVWidth() {
-		
-		return maxGVWidth;
-	}
-	
-	public double getMaxGVHeight() {
-		
-		return maxGVHeight;
-	}
+//	public double getMaxGVWidth() {
+//		
+//		return maxGVWidth;
+//	}
+//	
+//	public double getMaxGVHeight() {
+//		
+//		return maxGVHeight;
+//	}
 	
 	// Selection methods
 	/**
