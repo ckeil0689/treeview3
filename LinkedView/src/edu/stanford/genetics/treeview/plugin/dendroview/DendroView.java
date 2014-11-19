@@ -95,9 +95,11 @@ public class DendroView implements Observer, DendroPanel {
 	protected ScrollPane panes[];
 
 	// Map Views
-	private final GlobalView2 globalview;
+	private final GlobalView globalview;
 
 	// Trees
+//	protected final GTRView gtrview;
+//	protected final ATRView atrview;
 	protected final GTRView gtrview;
 	protected final ATRView atrview;
 
@@ -185,7 +187,7 @@ public class DendroView implements Observer, DendroPanel {
 				null);
 		
 		// Create the Global view (JPanel to display)
-		globalview = new GlobalView2();
+		globalview = new GlobalView();
 
 		// scrollbars, mostly used by maps
 		globalXscrollbar = globalview.getXScroll();
@@ -198,10 +200,12 @@ public class DendroView implements Observer, DendroPanel {
 		textview = new TextView();
 
 		// Set up row dendrogram
+//		gtrview = new GTRView();
 		gtrview = new GTRView();
 		gtrview.getHeaderSummary().setIncluded(new int[] { 0, 3 });
 
 		// Set up column dendrogram
+//		atrview = new ATRView();
 		atrview = new ATRView();
 		atrview.getHeaderSummary().setIncluded(new int[] { 0, 3 });
 		
@@ -215,10 +219,12 @@ public class DendroView implements Observer, DendroPanel {
 	}
 	
 	public void setGlobalXMap(MapContainer xmap) {
+		
 		this.globalXmap = xmap;
 	}
 	
 	public void setGlobalYMap(MapContainer ymap) {
+		
 		this.globalYmap = ymap;
 	}
 
@@ -1176,7 +1182,8 @@ public class DendroView implements Observer, DendroPanel {
 		arraySelection.addObserver(this);
 
 		globalview.setArraySelection(arraySelection);
-		atrview.setArraySelection(arraySelection);
+//		atrview.setArraySelection(arraySelection);
+		atrview.setTreeSelection(arraySelection);
 		textview.setArraySelection(arraySelection);
 		arraynameview.setArraySelection(arraySelection);
 	}
@@ -1198,7 +1205,8 @@ public class DendroView implements Observer, DendroPanel {
 		geneSelection.addObserver(this);
 
 		globalview.setGeneSelection(geneSelection);
-		gtrview.setGeneSelection(geneSelection);
+//		gtrview.setGeneSelection(geneSelection);
+		gtrview.setTreeSelection(geneSelection);
 		textview.setGeneSelection(geneSelection);
 		arraynameview.setGeneSelection(geneSelection);
 	}
@@ -1302,7 +1310,7 @@ public class DendroView implements Observer, DendroPanel {
 		globalYscrollbar.setValue(i);
 	}
 
-	public GlobalView2 getGlobalView() {
+	public GlobalView getGlobalView() {
 
 		return globalview;
 	}
@@ -1327,11 +1335,21 @@ public class DendroView implements Observer, DendroPanel {
 		return arraynameview;
 	}
 
+//	public ATRView getAtrview() {
+//
+//		return atrview;
+//	}
+	
 	public ATRView getAtrview() {
 
 		return atrview;
 	}
 
+//	public GTRView getGtrview() {
+//
+//		return gtrview;
+//	}
+	
 	public GTRView getGtrview() {
 
 		return gtrview;
@@ -1368,13 +1386,13 @@ public class DendroView implements Observer, DendroPanel {
 	 */
 	public boolean treesEnabled() {
 
-		boolean enabled = false;
+//		boolean enabled = false;
+//
+//		if (gtrview.isEnabled() || atrview.isEnabled()) {
+//			enabled = true;
+//
+//		}
 
-		if (gtrview.isEnabled() || atrview.isEnabled()) {
-			enabled = true;
-
-		}
-
-		return enabled;
+		return (gtrview.isEnabled() || atrview.isEnabled());
 	}
 }

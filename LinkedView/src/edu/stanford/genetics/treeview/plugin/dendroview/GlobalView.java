@@ -38,6 +38,8 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Ellipse2D;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 
 import javax.swing.BorderFactory;
@@ -58,6 +60,10 @@ public class GlobalView extends ModelViewProduced implements
 		MouseMotionListener, MouseListener, MouseWheelListener, KeyListener {
 
 	private static final long serialVersionUID = 1L;
+	
+	public static final int FILL = 0;
+	public static final int EQUAL = 1;
+	public static final int PROPORT = 2;
 
 	protected boolean hasDrawn = false;
 	private boolean resetHome = false;
@@ -93,7 +99,7 @@ public class GlobalView extends ModelViewProduced implements
 	/**
 	 * Rectangle to track yellow selected rectangle (pixels)
 	 */
-	private Rectangle selectionRect = null;
+	private List<Rectangle> selectionRectList = new ArrayList<Rectangle>();
 
 	/**
 	 * Circle to be used as indicator for selection
@@ -108,9 +114,6 @@ public class GlobalView extends ModelViewProduced implements
 	public GlobalView() {
 
 		super();
-		
-		/* Just checking if this is called at all. */
-		LogBuffer.println(">>>>>> GLOBALVIEW INSTANCE.");
 
 		setLayout(new MigLayout());
 
@@ -120,10 +123,10 @@ public class GlobalView extends ModelViewProduced implements
 		
 		panel = scrollPane;
 		panel.setBorder(BorderFactory.createEtchedBorder());
+		panel.setBackground(GUIFactory.ELEMENT_HOV);
 
 		setToolTipText("This Turns Tooltips On");
-
-		// addComponentListener(this);
+		
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addMouseWheelListener(this);
@@ -153,13 +156,13 @@ public class GlobalView extends ModelViewProduced implements
 
 		try {
 			if (xmap.contains(overx) && ymap.contains(overy)) {
-				statustext[0] = "Row: ";// + (overy + 1);
+				statustext[0] = "Row: ";
 
 				if (geneHI != null) {
 					final int realGene = overy;
 					try {
 						statustext[0] += geneSummary.getSummary(geneHI, 
-								realGene);//geneHI.getHeader(realGene, 1);
+								realGene);
 
 					} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 						LogBuffer.println("ArrayIndexOutOfBoundsException "
@@ -168,7 +171,7 @@ public class GlobalView extends ModelViewProduced implements
 						statustext[0] += " (N/A)";
 					}
 				}
-				statustext[1] = "Column: ";// + (overx + 1);
+				statustext[1] = "Column: ";
 				if (arrayHI != null) {
 					try {
 						statustext[1] += arraySummary.getSummary(geneHI, 
@@ -332,7 +335,7 @@ public class GlobalView extends ModelViewProduced implements
 
 		if (!offscreenValid) {
 			// clear the pallette...
-			g.setColor(Color.white);
+			g.setColor(GUIFactory.DEFAULT_BG);
 			g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
 			g.setColor(Color.black);
 
@@ -358,6 +361,7 @@ public class GlobalView extends ModelViewProduced implements
 	protected void updatePixels() {
 
 		if (offscreenChanged) {
+//			LogBuffer.println("OFFSCREEN CHANGED");
 			offscreenValid = false;
 			xmap.setAvailablePixels(offscreenSize.width);
 			ymap.setAvailablePixels(offscreenSize.height);
@@ -376,7 +380,7 @@ public class GlobalView extends ModelViewProduced implements
 		if (resetHome) {
 			xmap.setHome();
 			ymap.setHome();
-
+			
 			xmap.notifyObservers();
 			ymap.notifyObservers();
 
@@ -384,6 +388,7 @@ public class GlobalView extends ModelViewProduced implements
 		}
 
 		if (!offscreenValid) {
+//			LogBuffer.println("OFFSCREEN INVALID");
 			final Rectangle destRect = new Rectangle(0, 0,
 					xmap.getUsedPixels(), ymap.getUsedPixels());
 
@@ -398,6 +403,7 @@ public class GlobalView extends ModelViewProduced implements
 				int[] arraySelections = new int[] {arraySelection.getMinIndex(), 
 						arraySelection.getMaxIndex()};
 				
+				/* Set new offscreenPixels (pixel colors) */
 				drawer.paint(offscreenPixels, sourceRect, destRect,
 						offscreenScanSize, geneSelections, arraySelections);
 			}
@@ -410,7 +416,7 @@ public class GlobalView extends ModelViewProduced implements
 	public synchronized void paintComposite(final Graphics g) {
 
 		// composite the rectangles...
-		if (selectionRect != null) {
+		if (selectionRectList != null) {
 			// if (zoomRect != null) {
 			// g.setColor(Color.cyan);
 			// g.drawRect(zoomRect.x, zoomRect.y,
@@ -418,8 +424,10 @@ public class GlobalView extends ModelViewProduced implements
 			// }
 
 			g.setColor(Color.yellow);
-			g.drawRect(selectionRect.x, selectionRect.y, selectionRect.width,
-					selectionRect.height);
+			
+			for(Rectangle rect : selectionRectList) {
+				g.drawRect(rect.x, rect.y, rect.width, rect.height);
+			}
 
 			if (indicatorCircle != null) {
 				final Graphics2D g2 = (Graphics2D) g;
@@ -439,38 +447,128 @@ public class GlobalView extends ModelViewProduced implements
 	protected void recalculateOverlay() {
 
 		if ((geneSelection == null) || (arraySelection == null)) {
+			selectionRectList = null;
 			return;
 		}
+		
+		selectionRectList = new ArrayList<Rectangle>();
 
-		int spx, spy, epx, epy;
-		spx = xmap.getPixel(arraySelection.getMinIndex());
-		// last pixel of last block
-		epx = xmap.getPixel(arraySelection.getMaxIndex() + 1) - 1;
+		int[] selectedArrayIndexes = arraySelection.getSelectedIndexes();
+		int[] selectedGeneIndexes = geneSelection.getSelectedIndexes();
+				
+		if(selectedArrayIndexes.length > 0 || selectedGeneIndexes.length > 0) {
 
-		spy = ymap.getPixel(geneSelection.getMinIndex());
-		epy = ymap.getPixel(geneSelection.getMaxIndex() + 1) - 1;
+			//LogBuffer.println("Selected min array index: [" + selectedArrayIndexes[0] + "] Selected min gene index: [" + selectedGeneIndexes[0] + "].");
 
-		if (epy < spy) {
-			epy = spy;
-			// correct for roundoff error above
+			List<List<Integer>> arrayBoundaryList = 
+					new ArrayList<List<Integer>>();
+			List<List<Integer>> geneBoundaryList = 
+					new ArrayList<List<Integer>>();
+
+			
+			arrayBoundaryList = findRectangleBoundaries(selectedArrayIndexes, 
+					xmap);
+			geneBoundaryList = findRectangleBoundaries(selectedGeneIndexes, 
+					ymap);
+	
+			// Make the rectangles
+			if (selectionRectList != null) {
+				for(List<Integer> xBoundaries : arrayBoundaryList) {
+					
+					for(List<Integer> yBoundaries : geneBoundaryList) {
+						
+						selectionRectList.add(new Rectangle(
+								xBoundaries.get(0), 
+								yBoundaries.get(0), 
+								xBoundaries.get(1) - xBoundaries.get(0), 
+								yBoundaries.get(1) - yBoundaries.get(0)));
+					}
+				}
+			}
+	
+			revalidate();
+			repaint();
 		}
-
-		if (selectionRect == null) {
-			selectionRect = new Rectangle(spx, spy, epx - spx, epy - spy);
-
-		} else {
-			selectionRect.setBounds(spx, spy, epx - spx, epy - spy);
+	}
+	
+	/**
+	 * Finds the boundaries needed to draw all selection rectangles
+	 * @param selectedIndexes
+	 * @param map
+	 * @return
+	 */
+	protected List<List<Integer>> findRectangleBoundaries(
+			int[] selectedIndexes, MapContainer map) {
+		
+		int sp = 0; 
+		int ep = 0;
+		
+		List<List<Integer>> rangeList = 
+				new ArrayList<List<Integer>>();
+		List<List<Integer>> boundaryList = 
+				new ArrayList<List<Integer>>();
+		List<Integer> rectangleRange = new ArrayList<Integer>();
+		
+		/*
+		 * If array is bigger than 1, check how many consecutive labels are
+		 * selected by finding out which elements are only 1 apart.
+		 * Store consecutive indexes separately to make separate rectangles
+		 * later.
+		 */
+		int loopStart = 0;
+		while(loopStart < selectedIndexes.length) {
+			
+			for(int i = loopStart; i < selectedIndexes.length; i++) {
+				
+				int current = selectedIndexes[i];
+				
+				if(rectangleRange.size() == 0 
+						|| rectangleRange.get(
+								rectangleRange.size() - 1) == current - 1) {
+					rectangleRange.add(current);
+					loopStart = i + 1;
+					
+				} else {
+					break;
+				}
+			}
+			
+			rangeList.add(rectangleRange);
+			rectangleRange = new ArrayList<Integer>();
 		}
-
-		revalidate();
-		repaint();
+		
+		/*
+		 * For every selection range produce map values 
+		 * (rectangle boundaries) for each rectangle to be drawn.
+		 */
+		for(List<Integer> selectionRange : rangeList) {
+			
+			List<Integer> boundaries = new ArrayList<Integer>(2);
+			
+			sp = map.getPixel(selectionRange.get(0));
+			// last pixel of last block
+			ep = map.getPixel(selectionRange.get(
+					selectionRange.size() - 1) + 1) - 1;
+			
+			if (ep < sp) {
+				ep = sp;
+				// correct for roundoff error above
+			}
+			
+			boundaries.add(sp);
+			boundaries.add(ep);
+			
+			boundaryList.add(boundaries);
+		}
+		
+		return boundaryList;
 	}
 
 	protected void recalculateZoom() {
 
-		if (selectionRect == null) {
-			return;
-		}
+//		if (selectionRect == null) {
+//			return;
+//		}
 
 		// int spx, epx, spy, epy;
 		// try {
@@ -512,6 +610,9 @@ public class GlobalView extends ModelViewProduced implements
 			}
 			recalculateOverlay();
 			drawIndicatorCircle();
+			
+			/* trigger updatePixels()  */
+			offscreenValid = false;
 
 		} else if (o == arraySelection) {
 			if (geneSelection.getNSelectedIndexes() == 0) {
@@ -525,9 +626,11 @@ public class GlobalView extends ModelViewProduced implements
 			}
 			recalculateOverlay();
 			drawIndicatorCircle();
+			
+			offscreenValid = false;
 
 		} else if ((o == xmap) || o == ymap) {
-			recalculateZoom(); // it moves around, you see...
+//			recalculateZoom(); // it moves around, you see...
 			recalculateOverlay();
 			drawIndicatorCircle();
 			offscreenValid = false;
@@ -678,7 +781,6 @@ public class GlobalView extends ModelViewProduced implements
 		if (drawer != null) {
 
 			final int geneRow = overy;
-			final int geneCol = overx;
 
 			if (xmap.contains(overx) && ymap.contains(overy)) {
 
