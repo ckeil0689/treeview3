@@ -11,13 +11,11 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
+import ColorChooser.ColorChooser;
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
 import Utilities.StringRes;
-import ColorChooser.ColorChooser;
-import Controllers.PreferencesController;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 import edu.stanford.genetics.treeview.plugin.dendroview.FontSettings;
 
@@ -235,8 +233,10 @@ implements ConfigNodePersistent {
 					tvFrame.getArrayUrlExtractor(),
 					tvFrame.getArrayUrlPresets());
 
-			mainPanel.add(genePanel, "pushx, alignx 50%, w 95%, wrap");
-			mainPanel.add(arrayPanel, "pushx, alignx 50%, w 95%");
+			mainPanel.add(genePanel.generate("Row URLs"), "pushx, "
+					+ "alignx 50%, w 95%, wrap");
+			mainPanel.add(arrayPanel.generate("Column URLs"), "pushx, "
+					+ "alignx 50%, w 95%");
 		}
 
 		public JPanel makeURLPanel() {
@@ -372,23 +372,22 @@ implements ConfigNodePersistent {
 		return configNode;
 	}
 	
-	// Layout Test
-	public static void main(String[] args) {
-		
-		SwingUtilities.invokeLater(new Runnable() {
-
-			@Override
-			public void run() {
-				
-				String menuTitle = ""; // change this to see different menus
-				
-				PreferencesMenu prefMenu = new PreferencesMenu(null);
-				
-				final PreferencesController pController = 
-						new PreferencesController(null, null, prefMenu);
-
-				prefMenu.setVisible(true);
-			}
-		});
-    }
+//	// Layout Test
+//	public static void main(String[] args) {
+//		
+//		SwingUtilities.invokeLater(new Runnable() {
+//
+//			@Override
+//			public void run() {
+//				
+//				String menuTitle = "URL"; // change this to see different menus
+//				
+//				PreferencesMenu prefMenu = new PreferencesMenu(null);
+//				
+//				new PreferencesController(null, null, prefMenu);
+//
+//				prefMenu.setVisible(true);
+//			}
+//		});
+//    }
 }

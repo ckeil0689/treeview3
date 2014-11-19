@@ -22,11 +22,6 @@
  */
 package edu.stanford.genetics.treeview;
 
-import java.awt.BorderLayout;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -34,35 +29,34 @@ import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
+
+import Utilities.GUIFactory;
 
 /**
  * This class displays editable Url settings.
  * 
  * It requires a UrlExtractor, HeaderInfo and optionally a UrlPresets
  */
-public class UrlSettingsPanel extends JPanel implements SettingsPanel {
-
-	private static final long serialVersionUID = 1L;
+public class UrlSettingsPanel implements SettingsPanel {
 
 	private final UrlExtractor urlExtractor;
 	private UrlPresets urlPresets = null;
 	private final HeaderInfo headerInfo;
-	private JDialog d;
-	private Window window;
+//	private JDialog d;
+	
+	private JPanel mainPanel;
 
 	private JButton[] buttons;
 	private JTextField previewField;
 	private final TemplateField templateField;
 	private HeaderChoice headerChoice;
-	private GridBagConstraints gbc;
 
 	public UrlSettingsPanel(final UrlExtractor ue, final UrlPresets up) {
 
@@ -78,10 +72,25 @@ public class UrlSettingsPanel extends JPanel implements SettingsPanel {
 		headerInfo = hi;
 		templateField = new TemplateField();
 		templateField.setText(urlExtractor.getUrlTemplate());
+//		
+//		mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
+//		mainPanel.setBorder(BorderFactory.createTitledBorder(up.g));
+//
+//		redoLayout();
+//		updatePreview();
+//		mainPanel.setEnabled(urlExtractor.isEnabled());
+	}
+	
+	public JPanel generate(String name) {
+		
+		mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
+		mainPanel.setBorder(BorderFactory.createTitledBorder(name));
 
 		redoLayout();
 		updatePreview();
-		UrlSettingsPanel.this.setEnabled(urlExtractor.isEnabled());
+		mainPanel.setEnabled(urlExtractor.isEnabled());
+		
+		return mainPanel;
 	}
 
 	public static void main(final String[] argv) {
@@ -92,8 +101,8 @@ public class UrlSettingsPanel extends JPanel implements SettingsPanel {
 		final UrlExtractor ue = new UrlExtractor(hi);
 
 		final UrlSettingsPanel e = new UrlSettingsPanel(ue, hi, p);
-		final Frame f = new Frame("Url Settings Test");
-		f.add(e);
+		final JFrame f = new JFrame("Url Settings Test");
+		f.add(e.generate("Test"));
 		f.addWindowListener(new WindowAdapter() {
 
 			@Override
@@ -110,103 +119,20 @@ public class UrlSettingsPanel extends JPanel implements SettingsPanel {
 	public void synchronizeFrom() {
 
 		redoLayout();
-		UrlSettingsPanel.this.setEnabled(urlExtractor.isEnabled());
+		mainPanel.setEnabled(urlExtractor.isEnabled());
 	}
 
 	@Override
 	public void synchronizeTo() {
 		// nothing to do...
 	}
-
-	class EnablePanel extends JPanel {
-
-		private static final long serialVersionUID = 1L;
-
-		JCheckBox enableBox;
-
-		public EnablePanel() {
-
-			setLayout(new BorderLayout());
-
-			add(new JLabel("Web Link:", SwingConstants.LEFT),
-					BorderLayout.NORTH);
-
-			enableBox = new JCheckBox("Enable", urlExtractor.isEnabled());
-			enableBox.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					urlExtractor.setEnabled(enableBox.isSelected());
-					UrlSettingsPanel.this.setEnabled(enableBox.isSelected());
-				}
-			});
-			add(enableBox, BorderLayout.CENTER);
-		}
-
-		public boolean isSelected() {
-
-			return enableBox.isSelected();
-		}
-	}
-
-	/**
-	 * Create a blocking dialog containing this component
-	 * 
-	 * @param f
-	 *            frame to block
-	 */
-	public void showDialog(final Frame f, final String title) {
-
-		d = new JDialog(f, title);
-		window = d;
-		d.setLayout(new BorderLayout());
-		d.add(this, BorderLayout.CENTER);
-		d.add(new ButtonPanel(), BorderLayout.SOUTH);
-		d.addWindowListener(new WindowAdapter() {
-
-			@Override
-			public void windowClosing(final WindowEvent we) {
-
-				we.getWindow().dispose();
-			}
-		});
-		d.pack();
-		d.setVisible(true);
-	}
-
-	public void showDialog(final Frame f) {
-
-		showDialog(f, "Url Settings Test");
-	}
-
-	@Override
-	public void setEnabled(final boolean b) {
-
-		templateField.setEnabled(b);
-		headerChoice.setEnabled(b);
-		previewField.setEnabled(b);
-		for (int i = 0; i < buttons.length; i++) {
-			if (buttons[i] != null) {
-				buttons[i].setEnabled(b);
-			}
-		}
-	}
-
 	public void redoLayout() {
 
 		String[] preset;
 		preset = urlPresets.getPresetNames();
 		final int nPresets = preset.length;
-		removeAll();
-		setLayout(new GridBagLayout());
-
-		gbc = new GridBagConstraints();
-		gbc.gridwidth = 1;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.anchor = GridBagConstraints.NORTH;
-		gbc.gridy = 0;
-		gbc.gridx = 0;
-		gbc.weightx = 100;
+		mainPanel.removeAll();
+		
 		final JCheckBox enableBox = new JCheckBox("Enable",
 				urlExtractor.isEnabled());
 		enableBox.addActionListener(new ActionListener() {
@@ -215,28 +141,20 @@ public class UrlSettingsPanel extends JPanel implements SettingsPanel {
 			public void actionPerformed(final ActionEvent e) {
 
 				urlExtractor.setEnabled(enableBox.isSelected());
-				UrlSettingsPanel.this.setEnabled(enableBox.isSelected());
+				mainPanel.setEnabled(enableBox.isSelected());
 			}
 		});
-		add(enableBox, gbc);
-
-		gbc.gridx = 1;
-		add(templateField, gbc);
-
-		gbc.gridx = 2;
+		mainPanel.add(enableBox, "alignx 0%, w 10%, split 2");
+		
 		headerChoice = new HeaderChoice();
-		gbc.fill = GridBagConstraints.NONE;
-		gbc.weightx = 0;
-		add(headerChoice, gbc);
+		mainPanel.add(headerChoice, "align 0%, pushx, wrap");
 
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.gridwidth = 3;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
+		mainPanel.add(templateField, "w 100%, wrap");
+
 		previewField = new JTextField("Ex: " + urlExtractor.getUrl(0));
 		// previewField = new JTextField(urlExtractor.substitute(tester));
 		previewField.setEditable(false);
-		add(previewField, gbc);
+		mainPanel.add(previewField, "w 100%, wrap");
 
 		final JPanel presetPanel = new JPanel();
 		buttons = new JButton[nPresets];
@@ -257,14 +175,10 @@ public class UrlSettingsPanel extends JPanel implements SettingsPanel {
 			buttons[index] = presetButton;
 		}
 
-		gbc.gridy = 2;
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.weighty = 100;
-		gbc.weightx = 100;
 		// add(new JScrollPane(presetPanel,
 		// JScrollPane.VERTICAL_SCROLLBAR_NEVER,
 		// JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS), gbc);
-		add(presetPanel, gbc);
+		mainPanel.add(presetPanel, "wrap");
 
 		try {
 			headerChoice.setSelectedIndex(urlExtractor.getIndex());
@@ -280,7 +194,7 @@ public class UrlSettingsPanel extends JPanel implements SettingsPanel {
 		previewField.setText("Ex: " + urlExtractor.getUrl(0));
 	}
 
-	private class HeaderChoice extends JComboBox implements ItemListener {
+	private class HeaderChoice extends JComboBox<String> implements ItemListener {
 
 		private static final long serialVersionUID = 1L;
 
@@ -333,25 +247,6 @@ public class UrlSettingsPanel extends JPanel implements SettingsPanel {
 					updatePreview();
 				}
 			});
-		}
-	}
-
-	private class ButtonPanel extends JPanel {
-
-		private static final long serialVersionUID = 1L;
-
-		public ButtonPanel() {
-
-			final JButton save_button = new JButton("Close");
-			save_button.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-
-					window.setVisible(false);
-				}
-			});
-			add(save_button);
 		}
 	}
 }

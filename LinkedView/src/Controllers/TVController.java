@@ -80,7 +80,8 @@ public class TVController {
 			switch (option) {
 
 				case JOptionPane.YES_OPTION:	
-					tvFrame.getConfigNode().node("File").removeNode();
+//					tvFrame.getConfigNode().node("File").removeNode();
+					tvFrame.getConfigNode().parent().removeNode();
 					tvFrame.saveSettings();
 					tvFrame.getAppFrame().dispose();
 					break;
