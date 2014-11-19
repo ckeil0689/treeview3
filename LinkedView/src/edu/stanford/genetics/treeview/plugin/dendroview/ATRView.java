@@ -204,7 +204,7 @@ public class ATRView extends TRView implements MouseListener,
 						// weight must have correlation slope on top
 						yScaleEq.getSlope() / xScaleEq.getSlope()));
 			} else {
-				setSelectedNode(null);
+//				setSelectedNode(null);
 				treeSelection.deselectAllIndexes();
 				treeSelection.notifyObservers();
 			}

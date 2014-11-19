@@ -648,27 +648,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 //		fileSubMenu.add(newWindowMenuItem);
 	}
 
-//	public void generateSearchMenu() {
-//
-//		searchButton = GUIFactory.createButton(StringRes.button_SearchLabels);
-//		searchButton.setToolTipText(StringRes.tooltip_searchRowCol);
-//
-//		buttonPanel.add(searchButton);
-//	}
-//
-//	public void generateTreeMenu() {
-//
-//		treeToggleButton = GUIFactory.createToggleButton(StringRes
-//				.button_ShowTrees);
-//		treeToggleButton.setToolTipText(StringRes.tooltip_showTrees);
-//
-//		// Initially disabled, will be enabled if gtrview or atrview in
-//		// DendroView are enabled.
-//		treeToggleButton.setEnabled(false);
-//
-//		buttonPanel.add(treeToggleButton);
-//	}
-
 //	/**
 //	 * This method populates the Export Menu with MenuItems.
 //	 * 
@@ -703,103 +682,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 //		menuList.add(saveDataMenuItem);
 //	}
 
-//	/**
-//	 * Populates the HelpMenu with MenuItems and subMenus.
-//	 * 
-//	 * @param menubar
-//	 */
-//	private void populateHelpMenu(final TreeviewMenuBarI menubar) {
-//
-//		final JMenuItem aboutMenuItem = (JMenuItem) menubar
-//				.addMenuItem("About...");
-//		menuList.add(aboutMenuItem);
-//		menubar.setMnemonic(KeyEvent.VK_A);
-//
-//		final JMenuItem logMenuItem = (JMenuItem) menubar
-//				.addMenuItem("Show Log");
-//		menuList.add(logMenuItem);
-//		menubar.setMnemonic(KeyEvent.VK_M);
-//
-//		final JMenuItem documentMenuItem = (JMenuItem) menubar
-//				.addMenuItem("Documentation...");
-//		menuList.add(documentMenuItem);
-//		menubar.setMnemonic(KeyEvent.VK_D);
-//
-//		menubar.addMenuItem("Plugins...");
-//		// , new ActionListener() {
-//		//
-//		// @Override
-//		// public void actionPerformed(final ActionEvent actionEvent) {
-//		//
-//		// displayPluginInfo();
-//		// }
-//		// });
-//		menubar.setMnemonic(KeyEvent.VK_P);
-//
-//		menubar.addMenuItem("Registration...");
-//		// , new ActionListener() {
-//		//
-//		// @Override
-//		// public void actionPerformed(final ActionEvent actionEvent) {
-//		//
-//		// final ConfigNode node = treeView.getGlobalConfig().getNode(
-//		// "Registration");
-//		// if (node != null) {
-//		// try {
-//		// edu.stanford.genetics.treeview.reg.RegEngine
-//		// .reverify(node);
-//		// } catch (final Exception e) {
-//		// LogBuffer.println("registration error " + e);
-//		// e.printStackTrace();
-//		// }
-//		// }
-//		// }
-//		// });
-//		menubar.setMnemonic(KeyEvent.VK_R);
-//
-//		final JMenuItem feedbackMenuItem = (JMenuItem) menubar
-//				.addMenuItem("Feedback");
-//		menuList.add(feedbackMenuItem);
-//		menubar.setMnemonic(KeyEvent.VK_F);
-//
-//		// menubar.addSeparator();
-//		//
-//		// menubar.addMenuItem("Memory...");
-//		// , new ActionListener() {
-//		//
-//		// @Override
-//		// public void actionPerformed(final ActionEvent e) {
-//		//
-//		// final MemMonitor m = new MemMonitor();
-//		// m.start();
-//		// }
-//		// });
-//		// menubar.setMnemonic(KeyEvent.VK_M);
-//		//
-//		// menubar.addMenuItem("Threads...");
-//		// , new ActionListener() {
-//		//
-//		// @Override
-//		// public void actionPerformed(final ActionEvent e) {
-//		//
-//		// final ThreadListener t = new ThreadListener();
-//		// t.start();
-//		// }
-//		// });
-//		// menubar.setMnemonic(KeyEvent.VK_T);
-//		//
-//		// menubar.addMenuItem("Global Pref Info...");
-//		// , new ActionListener() {
-//		//
-//		// @Override
-//		// public void actionPerformed(final ActionEvent e) {
-//		//
-//		// final GlobalPrefInfo gpi = new GlobalPrefInfo(getApp());
-//		// JOptionPane.showMessageDialog(null, gpi, "Global Pref Info...",
-//		// JOptionPane.INFORMATION_MESSAGE);
-//		// }
-//		// });
-//	}
 
 	// Various Methods
 	/**

@@ -98,8 +98,7 @@ public class UrlPresets implements ConfigNodePersistent {
 
 	public void addDefaultGenePresets() {
 
-		addPreset("SGD", "http://genome-www4.stanford.edu/cgi-bin/SGD/locus."
-				+ "pl?locus=HEADER");
+		addPreset("Google Scholar", "http://scholar.google.com/");
 
 		addPreset("YPD",
 				"http://www.proteome.com/databases/YPD/reports/HEADER.html");
@@ -107,18 +106,16 @@ public class UrlPresets implements ConfigNodePersistent {
 		addPreset("WormBase", "http://www.wormbase.org/db/searches/"
 				+ "basic?class=AnyGene&query=HEADER&Search=Search");
 
-		addPreset("Source_CloneID", "http://genome-www4.stanford.edu/cgi-bin/"
-				+ "SMD/source/sourceResult?option=CloneID&choice="
-				+ "Gene&criteria=HEADER");
+		/* URL dead */
+//		addPreset("Source_CloneID", "http://genome-www4.stanford.edu/cgi-bin/"
+//				+ "SMD/source/sourceResult?option=CloneID&choice="
+//				+ "Gene&criteria=HEADER");
 
-		addPreset("FlyBase",
-				"http://flybase.bio.indiana.edu/.bin/fbgenq.html?HEADER");
+		addPreset("FlyBase", "http://flybase.org/");
 
-		addPreset("MouseGD", "http://www.informatics.jax.org/javawi/servlet/"
-				+ "SearchTool?query=HEADER&selectedQuery=Genes+and+Markers");
+		addPreset("MouseGD", "http://www.informatics.jax.org/marker/");
 
-		addPreset("GenomeNetEcoli",
-				"http://www.genome.ad.jp/dbget-bin/www_bget?eco:HEADER");
+		addPreset("GenomeNetEcoli", "http://www.genome.jp/dbget/");
 	}
 
 	/**
@@ -202,12 +199,12 @@ public class UrlPresets implements ConfigNodePersistent {
 	 */
 	public String getTemplate(final int index) {
 
-		final Preferences presetNode = configNode.node("Preset");
+//		final Preferences presetNode = configNode.node("Preset");
 
 		try {
-			final String[] childrenNodes = presetNode.childrenNames();
+			final String[] childrenNodes = configNode.childrenNames();
 			if (index < childrenNodes.length) {
-				return presetNode.node(childrenNodes[index]).get("template",
+				return configNode.node(childrenNodes[index]).get("template",
 						null);
 
 			} else {

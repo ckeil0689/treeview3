@@ -31,24 +31,43 @@ import java.util.prefs.Preferences;
  * a configuration window.
  */
 public class UrlExtractor {
+	
+	// does the user actually want linking to happen?
+	private boolean isEnabled;
+	private boolean isDefaultEnabled = true;
+
+	// durlTemplate is the actual text of the url to be substituted
+	private String urlTemplate;
+	private String dUrlTemplate = "http://www.google.com/search?q=HEADER";
+
+	// the index is the header column of the cdt/pcl which is used for
+	// substitution
+	private int index;
+	private int dindex = 1;
+
+	private HeaderInfo headerInfo;
+	
+	private Preferences root;
+	UrlPresets uPresets;
+	
 	/**
 	 * This class must be constructed around gene header info
 	 */
 	public UrlExtractor(final HeaderInfo hI) {
 
-		headerInfo = hI;
-		urlTemplate = dUrlTemplate;
-		index = dindex;
-		isEnabled = isDefaultEnabled;
-		uPresets = null;
+		this.headerInfo = hI;
+		this.urlTemplate = dUrlTemplate;
+		this.index = dindex;
+		this.isEnabled = isDefaultEnabled;
+		this.uPresets = null;
 	}
 
 	public UrlExtractor(final HeaderInfo hI, final UrlPresets uPresets) {
 
-		headerInfo = hI;
-		urlTemplate = dUrlTemplate;
-		index = dindex;
-		isEnabled = isDefaultEnabled;
+		this.headerInfo = hI;
+		this.urlTemplate = dUrlTemplate;
+		this.index = dindex;
+		this.isEnabled = isDefaultEnabled;
 		this.uPresets = uPresets;
 		setDefaultTemplate(uPresets.getDefaultTemplate());
 		setDefaultEnabled(uPresets.isDefaultEnabled());
@@ -180,21 +199,6 @@ public class UrlExtractor {
 		return isEnabled;
 	}
 
-	// does the user actually want linking to happen?
-	private boolean isEnabled;
-	private boolean isDefaultEnabled = true;
-
-	// durlTemplate is the actual text of the url to be substituted
-	private String urlTemplate;
-	private String dUrlTemplate = "http://www.google.com/search?q=HEADER";
-
-	// the index is the header column of the cdt/pcl which is used for
-	// substitution
-	private int index;
-	private int dindex = 1;
-
-	private HeaderInfo headerInfo;
-
 	/** Setter for headerInfo */
 	public void setHeaderInfo(final HeaderInfo headerInfo) {
 		this.headerInfo = headerInfo;
@@ -204,7 +208,4 @@ public class UrlExtractor {
 	public HeaderInfo getHeaderInfo() {
 		return headerInfo;
 	}
-
-	private Preferences root;
-	UrlPresets uPresets;
 }

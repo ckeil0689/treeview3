@@ -28,7 +28,8 @@ import edu.stanford.genetics.treeview.plugin.dendroview.FontSettings;
  * @author CKeil
  *
  */
-public class PreferencesMenu extends CustomDialog implements ConfigNodePersistent {
+public class PreferencesMenu extends CustomDialog 
+implements ConfigNodePersistent {
 
 	private final TreeViewFrame tvFrame;
 	private HeaderInfo geneHI;
@@ -181,44 +182,6 @@ public class PreferencesMenu extends CustomDialog implements ConfigNodePersisten
 
 		dialog.addComponentListener(l);
 	}
-
-//	/**
-//	 * Create the panel for pixel settings.
-//	 */
-//	class PixelSettingsPanel {
-//
-//		private final ColorExtractor ce = null;
-//		private final JScrollPane scrollPane;
-//
-//		public PixelSettingsPanel() {
-//
-//			scrollPane = new JScrollPane();
-//
-//			final JPanel panel = GUIFactory.createJPanel(false, true, null);
-//
-//			 try {
-//			 ce = ((DoubleArrayDrawer) dendroController.getArrayDrawer())
-//			 .getColorExtractor();
-//			
-//			 } catch (final Exception e) {
-//			
-//			 }
-//			
-//			 PixelSettingsSelector pss = new PixelSettingsSelector(
-//			 dendroController.getGlobalXMap(),
-//			 dendroController.getGlobalYMap(), ce,
-//			 DendrogramFactory.getColorPresets());
-//			
-//			 panel.add(pss, "push, grow");
-//			
-//			 scrollPane.setViewportView(panel);
-//		}
-//
-//		public JScrollPane makePSPanel() {
-//
-//			return scrollPane;
-//		}
-//	}
 
 	/**
 	 * This class provides a JPanel which contains components to control
@@ -379,7 +342,8 @@ public class PreferencesMenu extends CustomDialog implements ConfigNodePersisten
 			
 		} else {
 			// In case menu cannot be loaded, display excuse.
-			menuPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, null);
+			menuPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, 
+					null);
 
 			final JLabel hint = GUIFactory.createLabel("Menu cannot be "
 					+ "shown because it wasn't loaded.", GUIFactory.FONTS);

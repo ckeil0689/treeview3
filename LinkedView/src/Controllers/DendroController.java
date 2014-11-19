@@ -42,7 +42,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendroException;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
 import edu.stanford.genetics.treeview.plugin.dendroview.DoubleArrayDrawer;
-import edu.stanford.genetics.treeview.plugin.dendroview.GlobalView2;
+import edu.stanford.genetics.treeview.plugin.dendroview.GlobalView;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreeColorer;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreePainter;
@@ -226,15 +226,15 @@ public class DendroController implements ConfigNodePersistent {
 		
 		switch(mode) {
 		
-		case GlobalView2.FILL:
+		case GlobalView.FILL:
 			setMatrixFill();
 			break;
 			
-		case GlobalView2.EQUAL:
+		case GlobalView.EQUAL:
 			setMatrixAxesEqual();
 			break;
 			
-		case GlobalView2.PROPORT:
+		case GlobalView.PROPORT:
 			setMatrixPropotional();
 			break;
 			
@@ -879,10 +879,12 @@ public class DendroController implements ConfigNodePersistent {
 
 		// leftTreeDrawer = new LeftTreeDrawer();
 		leftTreeDrawer = new TreePainter();
-		dendroView.getGtrview().setLeftTreeDrawer(leftTreeDrawer);
+//		dendroView.getGtrview().setLeftTreeDrawer(leftTreeDrawer);
+		dendroView.getGtrview().setTreeDrawer(leftTreeDrawer);
 
 		invertedTreeDrawer = new TreePainter();
-		dendroView.getAtrview().setInvertedTreeDrawer(invertedTreeDrawer);
+//		dendroView.getAtrview().setInvertedTreeDrawer(invertedTreeDrawer);
+		dendroView.getAtrview().setTreeDrawer(invertedTreeDrawer);
 
 		setPresets();
 
@@ -1527,7 +1529,8 @@ public class DendroController implements ConfigNodePersistent {
 		arraySelection.addObserver(dendroView);
 
 		dendroView.getGlobalView().setArraySelection(arraySelection);
-		dendroView.getAtrview().setArraySelection(arraySelection);
+//		dendroView.getAtrview().setArraySelection(arraySelection);
+		dendroView.getAtrview().setTreeSelection(arraySelection);
 		dendroView.getTextview().setArraySelection(arraySelection);
 		dendroView.getArraynameview().setArraySelection(arraySelection);
 	}
@@ -1548,7 +1551,8 @@ public class DendroController implements ConfigNodePersistent {
 		geneSelection.addObserver(dendroView);
 
 		dendroView.getGlobalView().setGeneSelection(geneSelection);
-		dendroView.getGtrview().setGeneSelection(geneSelection);
+//		dendroView.getGtrview().setGeneSelection(geneSelection);
+		dendroView.getGtrview().setTreeSelection(geneSelection);
 		dendroView.getTextview().setGeneSelection(geneSelection);
 		dendroView.getArraynameview().setGeneSelection(geneSelection);
 	}
