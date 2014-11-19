@@ -34,6 +34,7 @@ import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+
 import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
 
@@ -153,7 +154,7 @@ public class ATRView extends TRView implements MouseListener,
 			offscreenValid = false;
 		}
 
-		if ((!offscreenValid) && (drawer != null)) {
+		if ((!offscreenValid) && (treePainter != null)) {
 			map.setAvailablePixels(offscreenSize.width);
 
 			// clear the pallette...
@@ -166,12 +167,12 @@ public class ATRView extends TRView implements MouseListener,
 			xScaleEq = new LinearTransformation(map.getIndex(destRect.x),
 					destRect.x, map.getIndex(destRect.x + destRect.width),
 					destRect.x + destRect.width);
-			yScaleEq = new LinearTransformation(drawer.getCorrMin(),
-					destRect.y, drawer.getCorrMax(), destRect.y
+			yScaleEq = new LinearTransformation(treePainter.getCorrMin(),
+					destRect.y, treePainter.getCorrMax(), destRect.y
 							+ destRect.height);
 
 			// draw
-			drawer.paint(g, xScaleEq, yScaleEq, destRect, selectedNode, isLeft);
+			treePainter.paint(g, xScaleEq, yScaleEq, destRect, selectedNode, isLeft);
 
 		} else {
 			// System.out.println("didn't update buffer: valid =
@@ -194,19 +195,20 @@ public class ATRView extends TRView implements MouseListener,
 			return;
 		}
 
-		if (drawer != null) {
+		if (treePainter != null) {
 			
 			if(SwingUtilities.isLeftMouseButton(e)) {
 				// the trick is translating back to the normalized space...
-				setSelectedNode(drawer.getClosest(
+				setSelectedNode(treePainter.getClosest(
 						xScaleEq.inverseTransform(e.getX()),
 						yScaleEq.inverseTransform(e.getY()),
 						// weight must have correlation slope on top
 						yScaleEq.getSlope() / xScaleEq.getSlope()));
 			} else {
-//				setSelectedNode(null);
+				/* Sequence of these statements matters! */
 				treeSelection.deselectAllIndexes();
 				treeSelection.notifyObservers();
+				setSelectedNode(null);
 			}
 		}
 	}
@@ -222,9 +224,9 @@ public class ATRView extends TRView implements MouseListener,
 			return;
 		}
 
-		if (drawer != null && treeSelection.getNSelectedIndexes() == 0) {
+		if (treePainter != null && treeSelection.getNSelectedIndexes() == 0) {
 			// the trick is translating back to the normalized space...
-			setHoveredNode(drawer.getClosest(
+			setHoveredNode(treePainter.getClosest(
 					xScaleEq.inverseTransform(e.getX()),
 					yScaleEq.inverseTransform(e.getY()),
 					// weight must have correlation slope on top

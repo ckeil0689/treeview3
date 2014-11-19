@@ -1054,14 +1054,4 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		return running;
 	}
-
-//	public JToggleButton getTreeButton() {
-//
-//		return treeToggleBtn;
-//	}
-//
-//	public JButton getSearchBtn() {
-//
-//		return searchBtn;
-//	}
 }

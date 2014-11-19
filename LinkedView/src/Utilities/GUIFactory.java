@@ -21,8 +21,8 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
-import edu.stanford.genetics.treeview.WideComboBox;
 import net.miginfocom.swing.MigLayout;
+import edu.stanford.genetics.treeview.WideComboBox;
 
 public class GUIFactory {
 
@@ -42,7 +42,9 @@ public class GUIFactory {
 	public static final int DEFAULT = 0;
 	public static final int NO_PADDING_FILL = 1;
 	public static final int NO_PADDING = 2;
-	public static final int FILL = 3;
+	public static final int NO_PADDING_X = 3;
+	public static final int NO_PADDING_Y = 4;
+	public static final int FILL = 5;
 	
 	/**
 	 * Creates and returns a simple JPanel with MigLayout to be used 
@@ -69,9 +71,19 @@ public class GUIFactory {
 			case NO_PADDING:
 				panel.setLayout(new MigLayout("ins 0"));
 				break;
+				
+			case NO_PADDING_X:
+				panel.setLayout(new MigLayout("ins 5 0 5 0"));
+				break;
+				
+			case NO_PADDING_Y:
+				panel.setLayout(new MigLayout("ins 0 5 0 5"));
+				break;
+				
 			case FILL:
 				panel.setLayout(new MigLayout("", "[grow, fill]"));
 				break;
+				
 			default: 
 				panel.setLayout(new MigLayout());
 				break;

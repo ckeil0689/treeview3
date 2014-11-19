@@ -23,7 +23,7 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 	protected LinearTransformation xScaleEq, yScaleEq;
 	protected MapContainer map;
 
-	protected TreePainter drawer = null;
+	protected TreePainter treePainter = null;
 	protected TreeDrawerNode selectedNode = null;
 	protected TreeDrawerNode hoveredNode = null;
 	protected Rectangle destRect = null;
@@ -50,12 +50,12 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 	 */
 	public void setTreeDrawer(final TreePainter d) {
 
-		if (drawer != null) {
-			drawer.deleteObserver(this);
+		if (treePainter != null) {
+			treePainter.deleteObserver(this);
 		}
 
-		drawer = d;
-		drawer.addObserver(this);
+		treePainter = d;
+		treePainter.addObserver(this);
 	}
 	
 	/**
@@ -84,7 +84,7 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 	 */
 	public void scrollToNode(final String nodeName) {
 
-		final TreeDrawerNode node = drawer.getNodeById(nodeName);
+		final TreeDrawerNode node = treePainter.getNodeById(nodeName);
 		if (node != null) {
 			final int index = (int) node.getIndex();
 			if (!map.isVisible(index)) {
@@ -147,7 +147,7 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 			return;
 		}
 		if (selectedNode != null) {
-			drawer.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
+			treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
 					destRect, selectedNode, false, isLeft);
 		}
 
@@ -155,7 +155,7 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 
 		if (selectedNode != null) {
 			if (xScaleEq != null) {
-				drawer.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
+				treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
 						destRect, selectedNode, true, isLeft);
 			}
 		}
@@ -175,7 +175,7 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 		}
 		
 		if (hoveredNode != null) {
-			drawer.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
+			treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
 					destRect, hoveredNode, false, isLeft);
 		}
 
@@ -183,7 +183,7 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 
 		if (hoveredNode != null) {
 			if (xScaleEq != null) {
-				drawer.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
+				treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
 						destRect, hoveredNode, true, isLeft);
 			}
 		}
@@ -204,7 +204,7 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 			offscreenValid = false;
 			repaint();
 
-		} else if (o == drawer) {
+		} else if (o == treePainter) {
 			// System.out.println("Got an update from drawer");
 			offscreenValid = false;
 			repaint();
@@ -217,20 +217,20 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 				// single array is selected.
 				if (treeSelection.getMinIndex() == treeSelection
 						.getMaxIndex()) {
-					cand = drawer.getLeaf(treeSelection.getMinIndex());
+					cand = treePainter.getLeaf(treeSelection.getMinIndex());
 				}
 				// this clause selects the root node if all arrays are selected.
 				else if (treeSelection.getMinIndex() == map.getMinIndex()
 						&& treeSelection.getMaxIndex() == map.getMaxIndex()) {
-					cand = drawer.getRootNode();
+					cand = treePainter.getRootNode();
 
 				}
 				// // find node when multiple arrays are selected.
-				// } else if(arraySelection.getMinIndex() >= map.getMinIndex()
-				// && arraySelection.getMaxIndex() <= map.getMaxIndex()) {
-				// cand = drawer.getNearestNode(arraySelection.getMinIndex(),
-				// arraySelection.getMaxIndex());
-				// }
+//				 else if(treeSelection.getMinIndex() >= map.getMinIndex()
+//				 && treeSelection.getMaxIndex() <= map.getMaxIndex()) {
+//					 cand = treePainter.getNearestNode(treeSelection.getMinIndex(),
+//							 treeSelection.getMaxIndex());
+//				 }
 			}
 			// Only notify observers if we're changing the selected node.
 			if ((cand != null)
@@ -240,9 +240,10 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 				treeSelection.notifyObservers();
 
 			} else {
-				setSelectedNode(drawer.getNodeById(treeSelection
+				setSelectedNode(treePainter.getNodeById(treeSelection
 						.getSelectedNode()));
 			}
+			
 		} else {
 			System.out.println(viewName() + "Got an update from unknown " + o);
 		}
@@ -365,9 +366,9 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 			current = selectedNode.getLeft();
 		}
 
-		drawer.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
+		treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
 				destRect, current, true, isLeft);
-		drawer.paintSingle(offscreenGraphics, xScaleEq, yScaleEq,
+		treePainter.paintSingle(offscreenGraphics, xScaleEq, yScaleEq,
 				destRect, selectedNode, true, isLeft);
 
 		synchMap();
@@ -383,9 +384,9 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 		final TreeDrawerNode current = selectedNode;
 		selectedNode = current.getRight();
 
-		drawer.paintSingle(offscreenGraphics, xScaleEq, yScaleEq, destRect,
+		treePainter.paintSingle(offscreenGraphics, xScaleEq, yScaleEq, destRect,
 				current, false, isLeft);
-		drawer.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq, destRect,
+		treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq, destRect,
 				current.getLeft(), false, isLeft);
 
 		synchMap();
@@ -403,9 +404,9 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 		final TreeDrawerNode current = selectedNode;
 		selectedNode = current.getLeft();
 
-		drawer.paintSingle(offscreenGraphics, xScaleEq, yScaleEq, destRect,
+		treePainter.paintSingle(offscreenGraphics, xScaleEq, yScaleEq, destRect,
 				current, false, isLeft);
-		drawer.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq, destRect,
+		treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq, destRect,
 				current.getRight(), false, isLeft);
 
 		synchMap();

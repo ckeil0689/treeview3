@@ -48,8 +48,8 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
-import Utilities.GUIFactory;
 import net.miginfocom.swing.MigLayout;
+import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -607,6 +607,13 @@ public class GlobalView extends ModelViewProduced implements
 					arraySelection.notifyObservers();
 					return;
 				}
+			/* When deselecting a tree node with right click, this matters,
+			 * because in the eventlistener you can only deselect indices
+			 * for the local tree selection. other axis here! */
+			} else if(geneSelection.getNSelectedIndexes() == 0){
+				arraySelection.deselectAllIndexes();
+//				arraySelection.setSelectedNode(null);
+				arraySelection.notifyObservers();
 			}
 			recalculateOverlay();
 			drawIndicatorCircle();
@@ -623,6 +630,13 @@ public class GlobalView extends ModelViewProduced implements
 					geneSelection.notifyObservers();
 					return;
 				}
+			/* When deselecting a tree node with right click, this matters,
+			 * because in the eventlistener you can only deselect indices
+			 * for the local tree selection. other axis here! */
+			} else if(arraySelection.getNSelectedIndexes() == 0){
+				geneSelection.deselectAllIndexes();
+//				geneSelection.setSelectedNode(null);
+				geneSelection.notifyObservers();
 			}
 			recalculateOverlay();
 			drawIndicatorCircle();

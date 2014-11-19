@@ -81,6 +81,9 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	public void deselectAllIndexes() {
 
 		integerSelection.deselectAll();
+		
+		/* This should probably be here.... */
+		setSelectedNode(null);
 	}
 
 	/*

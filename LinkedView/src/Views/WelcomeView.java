@@ -101,12 +101,6 @@ public class WelcomeView {
 
 		loadButton = GUIFactory.createLargeBtn("Open...");
 		loadPanel.add(loadButton, "push, alignx 50%, aligny 0%");
-
-		// Set the colors
-//		homePanel.setBackground(GUIFactory.BG_COLOR);
-//		title_bg.setBackground(GUIFactory.MAIN);
-//		jl.setForeground(GUIFactory.BG_COLOR);
-//		jl2.setForeground(GUIFactory.BG_COLOR);
 		
 		homePanel.revalidate();
 		homePanel.repaint();
@@ -125,6 +119,9 @@ public class WelcomeView {
 		
 		jl.setText(StringRes.load_OneSec);
 		jl2.setText(StringRes.load_active);
+		
+		resetLoadBar();
+		setLoadText("Setting up...");
 
 		loadContainer.add(loadLabel, "pushx, alignx 50%, wrap");
 		loadContainer.add(loadBar, "pushx, growx");

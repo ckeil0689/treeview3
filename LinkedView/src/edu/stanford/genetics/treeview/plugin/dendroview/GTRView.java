@@ -135,7 +135,7 @@ public class GTRView extends TRView implements MouseListener,
 			offscreenValid = false;
 		}
 
-		if (!offscreenValid && (drawer != null)) {
+		if (!offscreenValid && (treePainter != null)) {
 			map.setAvailablePixels(offscreenSize.height);
 
 			// clear the pallette...
@@ -145,8 +145,8 @@ public class GTRView extends TRView implements MouseListener,
 
 			// calculate Scaling
 			destRect.setBounds(0, 0, offscreenSize.width, map.getUsedPixels());
-			setXScaleEq(new LinearTransformation(drawer.getCorrMin(),
-					destRect.x, drawer.getCorrMax(), destRect.x
+			setXScaleEq(new LinearTransformation(treePainter.getCorrMin(),
+					destRect.x, treePainter.getCorrMax(), destRect.x
 							+ destRect.width));
 
 			setYScaleEq(new LinearTransformation(map.getIndex(destRect.y),
@@ -155,7 +155,7 @@ public class GTRView extends TRView implements MouseListener,
 
 			// System.out.println("yScaleEq " + getYScaleEq());
 			// draw
-			drawer.paint(g, getXScaleEq(), getYScaleEq(), destRect,
+			treePainter.paint(g, getXScaleEq(), getYScaleEq(), destRect,
 					selectedNode, isLeft);
 
 		} else {
@@ -176,18 +176,21 @@ public class GTRView extends TRView implements MouseListener,
 			return;
 		}
 
-		if ((drawer != null) && (getXScaleEq() != null)) {
+		if ((treePainter != null) && (getXScaleEq() != null)) {
 			if(SwingUtilities.isLeftMouseButton(e)) {
 				// the trick is translating back to the normalized space...
-				setSelectedNode(drawer.getClosest(
+				setSelectedNode(treePainter.getClosest(
 						getYScaleEq().inverseTransform(e.getY()), getXScaleEq()
 								.inverseTransform(e.getX()), getXScaleEq()
 								.getSlope() / getYScaleEq().getSlope()));
 			} else {
+				/* Sequence of these statements matters! */
+				treeSelection.deselectAllIndexes();
+				treeSelection.notifyObservers();
 				setSelectedNode(null);
 			}
 		} else {
-			if (drawer == null) {
+			if (treePainter == null) {
 				LogBuffer.println("GTRView.mouseClicked() : drawer is null");
 			}
 
@@ -208,9 +211,9 @@ public class GTRView extends TRView implements MouseListener,
 			return;
 		}
 
-		if (drawer != null && treeSelection.getNSelectedIndexes() == 0) {
+		if (treePainter != null && treeSelection.getNSelectedIndexes() == 0) {
 			// the trick is translating back to the normalized space...
-			setHoveredNode(drawer.getClosest(
+			setHoveredNode(treePainter.getClosest(
 					getYScaleEq().inverseTransform(e.getY()), getXScaleEq()
 							.inverseTransform(e.getX()), getXScaleEq()
 							.getSlope() / getYScaleEq().getSlope()));

@@ -43,10 +43,11 @@ import javax.swing.JLabel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 
+import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
 import Utilities.StringRes;
-import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.HeaderInfo;
@@ -560,22 +561,27 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		// }
 		final int index = map.getIndex(e.getX()); 
 		
-		if (geneSelection.getNSelectedIndexes() == geneSelection
-				.getNumIndexes() && arraySelection.isIndexSelected(index)) {
-			geneSelection.deselectAllIndexes();
-			arraySelection.deselectAllIndexes();
-
-		} else if (geneSelection.getNSelectedIndexes() > 0) {
-			if(!e.isShiftDown()) {
+		if(SwingUtilities.isLeftMouseButton(e)) {
+			if (geneSelection.getNSelectedIndexes() == geneSelection
+					.getNumIndexes() && arraySelection.isIndexSelected(index)) {
 				geneSelection.deselectAllIndexes();
 				arraySelection.deselectAllIndexes();
+	
+			} else if (geneSelection.getNSelectedIndexes() > 0) {
+				if(!e.isShiftDown()) {
+					geneSelection.deselectAllIndexes();
+					arraySelection.deselectAllIndexes();
+				}
+				arraySelection.setIndexSelection(index, true);
+				geneSelection.selectAllIndexes();
+	
+			} else {
+				arraySelection.setIndexSelection(index, true);
+				geneSelection.selectAllIndexes();
 			}
-			arraySelection.setIndexSelection(index, true);
-			geneSelection.selectAllIndexes();
-
-		} else {
-			arraySelection.setIndexSelection(index, true);
-			geneSelection.selectAllIndexes();
+		}else {
+			geneSelection.deselectAllIndexes();
+			arraySelection.deselectAllIndexes();
 		}
 
 		geneSelection.notifyObservers();

@@ -280,29 +280,28 @@ public class DendroView implements Observer, DendroPanel {
 		JPanel bottomPanel;
 
 		// Panels
-		btnPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, 
-				null);
+		btnPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 		
-		crossPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, 
-				null);
+		crossPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 		
 		globalViewContainer = GUIFactory.createJPanel(false, 
-				GUIFactory.FILL, null); 
+				GUIFactory.NO_PADDING_FILL, null); 
 		
-		navContainer = GUIFactory.createJPanel(true, GUIFactory.NO_PADDING_FILL, 
-				null);
+		navContainer = GUIFactory.createJPanel(false, 
+				GUIFactory.NO_PADDING_FILL, null);
 
 		bottomPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null); 
 		
-		arrayContainer = GUIFactory.createJPanel(false, GUIFactory.FILL, null);
+		arrayContainer = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING_X,
+				null);
 		
-		geneContainer = GUIFactory.createJPanel(false, GUIFactory.FILL, null);
+		geneContainer = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING_Y, 
+				null);
 
-		firstPanel = GUIFactory.createJPanel(true, GUIFactory.DEFAULT, null);
+		firstPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 		firstPanel.setBorder(null);
 
-		navPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, 
-				null);
+		navPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, null);
 		navPanel.setBorder(null);
 
 		textpanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, null); 
@@ -396,16 +395,16 @@ public class DendroView implements Observer, DendroPanel {
 				+ "h " + arrayRow + "%, pushx");
 		
 		dendroPane.add(arrayContainer, "w " + gvWidth + "%, "
-				+ "h " + arrayRow + "%");
+				+ "h " + arrayRow + "%, growx");
 		
-		dendroPane.add(navContainer, "span 1 3, w " + (textViewCol - 1) 
+		dendroPane.add(navContainer, "span 1 2, w " + (textViewCol - 1) 
 				+ "%, h 100%, wrap");
 		
 		dendroPane.add(geneContainer, "w " + textViewCol + "%, "
-				+ "h " + gvHeight + "%, pushx");
+				+ "h " + gvHeight + "%, growy");//, pushx");
 		
 		dendroPane.add(globalViewContainer, "w " + gvWidth + "%, "
-				+ "h " + gvHeight + "%, wrap");
+				+ "h " + gvHeight + "%, grow, wrap");
 		
 		dendroPane.add(bottomPanel, "span, h " + bottomRow + "%");
 		
