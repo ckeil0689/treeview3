@@ -39,6 +39,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.text.JTextComponent;
 
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
@@ -46,6 +47,7 @@ import Utilities.GUIFactory;
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.WideComboBox;
@@ -72,6 +74,8 @@ public abstract class HeaderFinderBox {
 	private String[] searchDataHeaders = { "" };
 	private final WideComboBox searchTermBox;
 	private final JButton searchButton;
+	private List<Integer> selectedIndexStack = new ArrayList<Integer>();
+	private int curNumChars = 0;
 
 	private final JPanel contentPanel;
 	
@@ -150,6 +154,7 @@ public abstract class HeaderFinderBox {
 		searchTermBox.getEditor().getEditorComponent().addKeyListener(
 				new BoxKeyListener());
 
+		
 		searchButton = GUIFactory.createNavBtn("searchIcon");
 		searchButton.setToolTipText("Highlights the selected label.");
 		searchButton.addActionListener(new ActionListener() {
@@ -340,17 +345,142 @@ public abstract class HeaderFinderBox {
 	 */
 	class BoxKeyListener extends KeyAdapter {
 
-		@Override
-		public void keyPressed(KeyEvent e) {}
+		boolean recordSelectedIndex = false;
+
+		//NOTE: command-w never worked to close the search window before adding anything in this class other than the seekAll function, though command-q WOULD quit the app
 
 		@Override
-		public void keyReleased(KeyEvent e) {}
+		public void keyPressed(KeyEvent e) {
+			//The only purpose of the following code is to keep the popup menu hidden when the user is typing in a wildcard string that is not a perfect match to anything
+			//It tries to not get in the way though when certain other meaningful characters are typed
+			if(	//There are characters in the term field and
+				//the popup is not visible because there are more characters than there are selections in the stack
+				(curNumChars > 0 && curNumChars > selectedIndexStack.size()) ||
+					//The typed character has not been entered into the term field
+					((e.getKeyChar() < ' ' || e.getKeyChar() > '~') &&
+							//The typed key is not an up arrow, not a down arrow, and is not the enter key
+							e.getKeyCode() != KeyEvent.VK_DOWN && e.getKeyCode() != KeyEvent.VK_UP && e.getKeyCode() != KeyEvent.VK_ENTER && e.getKeyCode() != KeyEvent.VK_SHIFT)) {
+
+				searchTermBox.setPopupVisible(false);
+			}
+		}
+
+		//The delete key is selecting what one tries to delete, thus if
+		//you search for 'GENE105' and then decide you want 'GENE10',
+		//hitting delete does not result in the default selection of
+		//anything other than 'GENE105'.  The following is an attempt
+		//to make it work better...
+		@Override
+		public void keyReleased(KeyEvent e) {
+			LogBuffer.println("Upon key release, the selected index is: [" + searchTermBox.getSelectedIndex() + "].");
+			
+			//We determine whether we're going to record the currently selected index in
+			//the stack based on whether there was a valid character entered into the term box
+			if(recordSelectedIndex == true) {
+				int selectedIndex = searchTermBox.getSelectedIndex();
+				if(selectedIndex >= 0) {
+					LogBuffer.println("Adding selected index [" + selectedIndex + "] to stack");
+					selectedIndexStack.add(selectedIndex);
+					if(!searchTermBox.isPopupVisible()) searchTermBox.setPopupVisible(true);
+				}
+				//If there is no search result, eliminate the contextual menu
+				else {
+					if(searchTermBox.isPopupVisible()) searchTermBox.setPopupVisible(false);
+				}
+				recordSelectedIndex = false;
+			}
+
+			if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+				//This gives us access to the text box contents and highlight control
+				JTextComponent editor = ((JTextField) searchTermBox.getEditor().getEditorComponent());
+
+				//If all the text in the text field is selected
+				if(editor.getSelectionStart() != editor.getSelectionEnd() &&
+						editor.getSelectionStart() == 0) {
+					if(searchTermBox.isPopupVisible()) searchTermBox.setPopupVisible(false);
+					searchTermBox.setSelectedIndex(0);
+					curNumChars = 0;
+					selectedIndexStack.clear();
+					return;
+				}
+
+				//If there are characters in the text box
+				if(curNumChars > 0) {
+					//If the number of characters (minus 1 because the stack is always 1 behind the actual current number
+					//of characters) is equal to the number of previously selected indexes in the popup menu (meaning there are no non-matching characters)
+					if(curNumChars == selectedIndexStack.size()) {
+						//Pop the last thing off the selected index stack (each index is for an item in the select list)
+						if(selectedIndexStack.size() > 0) {
+							LogBuffer.println("Popping off the selected index stack");
+							selectedIndexStack.subList(selectedIndexStack.size() - 1, selectedIndexStack.size()).clear();
+						}
+					}
+					curNumChars--;
+				}
+
+				//This happens after the stack and curNumChars have been updated
+				if(curNumChars == selectedIndexStack.size()) {
+					//If there is still text in the field
+					if(selectedIndexStack.size() > 0) {
+						LogBuffer.println("Setting the next-to-last selected index: [" + selectedIndexStack.get(selectedIndexStack.size() - 1) + "]");
+						//Set the last selected index as selected
+						searchTermBox.setSelectedIndex(selectedIndexStack.get(selectedIndexStack.size() - 1));
+						//Set the selected text in the text box to the start of the autocomplete string
+						editor.setSelectionStart(selectedIndexStack.size());
+						//searchTermBox.getEditor().setSelectionEnd();
+
+						//If there is no search result
+						if(searchSelection.getNumIndexes() == 0) {
+							if(searchTermBox.isPopupVisible()) searchTermBox.setPopupVisible(false);
+						} else {
+							if(!searchTermBox.isPopupVisible()) searchTermBox.setPopupVisible(true);
+						}
+					}
+					else {
+						LogBuffer.println("Clearing out the selected index stack");
+						searchTermBox.setSelectedIndex(0);
+						if(searchTermBox.isPopupVisible()) searchTermBox.setPopupVisible(false);
+						curNumChars = 0;
+					}
+				}
+				//searchTermBox.setPopupVisible(false);
+			}
+			else if(e.getKeyCode() == KeyEvent.VK_DOWN) {
+				LogBuffer.println("Arrowing down.");
+				if(!searchTermBox.isPopupVisible()) searchTermBox.setPopupVisible(true);
+				selectedIndexStack.clear();
+				curNumChars = 0;
+			}
+			else if(e.getKeyCode() == KeyEvent.VK_UP) {
+				LogBuffer.println("Arrowing up.");
+				if(!searchTermBox.isPopupVisible()) searchTermBox.setPopupVisible(true);
+				selectedIndexStack.clear();
+				curNumChars = 0;
+			}
+			else if(e.getKeyCode() == KeyEvent.VK_ESCAPE || e.getKeyCode() == KeyEvent.VK_ENTER) {
+				if(searchTermBox.isPopupVisible()) searchTermBox.setPopupVisible(false);
+			}
+		}
 
 		@Override
 		public void keyTyped(KeyEvent e) {
 			
 			if(e.getKeyChar() == KeyEvent.VK_ENTER) {
+				selectedIndexStack.clear();
+				curNumChars = 0;
 				seekAll();
+			}
+			//Else if the typed character is a real character and not some sort of modifier
+			//else if(e.getKeyCode() != KeyEvent.VK_SHIFT && e.getKeyCode() != KeyEvent.VK_DOWN && e.getKeyCode() != KeyEvent.VK_UP && e.getKeyCode() != KeyEvent.CHAR_UNDEFINED) {
+			else if(e.getKeyChar() >= ' ' && e.getKeyChar() <= '~') {
+				curNumChars++;
+				LogBuffer.println("Adding character [" + e.getKeyChar() + "].");
+
+				//We determine whether we're going to record the currently selected index in
+				//the stack based on whether there was a valid character entered into the term box
+				//The current selected index upon keyTyped is actually one out-of-date, so we're going to tell
+				//keyReleased to do it by setting this flag to true
+				recordSelectedIndex = true;
 			}
 		}
 	}
