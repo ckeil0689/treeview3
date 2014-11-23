@@ -463,9 +463,15 @@ public class ArrayNameView extends ModelView implements MouseListener,
 
 		offscreenValid = false;
 		backBufferValid = false;
-
-		final int start = map.getMinIndex();
-		final int end = map.getMaxIndex();
+		
+		/* Why iterate over headers but use map to set the indices........? */
+		/* TODO ensure this is fixed, won't remove old code in case it's not */
+//		final int start = map.getMinIndex();
+//		final int end = map.getMaxIndex();
+		
+		final int start = 0;
+		final int end = headerInfo.getNumHeaders();
+		
 		int gidRow = headerInfo.getIndex("GID");
 		if (gidRow == -1) {
 			gidRow = 0;

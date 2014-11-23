@@ -105,8 +105,9 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 	 *            matrix.
 	 */
 	public abstract void paint(int[] pixels, Rectangle source, Rectangle dest,
-			int scanSize, int[] geneOrder, int[] geneSelections, 
-			int[] arraySelections);
+			int scanSize, int[] geneOrder);
+	/* Code for selection dimming */
+	// , int[] geneSelections, int[] arraySelections);
 
 	/** Constructor does nothing but set defaults */
 	public ArrayDrawer() {
@@ -202,9 +203,13 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 	 *            of the image)
 	 */
 	public void paint(final int[] pixels, final Rectangle source,
-			final Rectangle dest, final int scanSize, int[] gs, int[] as) {
+			final Rectangle dest, final int scanSize) {
+		
+		/* Code for selection dimming */
+		//, int[] gs, int[] as) {
+	
 
-		paint(pixels, source, dest, scanSize, null, gs, as);
+		paint(pixels, source, dest, scanSize, null);//, gs, as);
 	}
 
 	/**

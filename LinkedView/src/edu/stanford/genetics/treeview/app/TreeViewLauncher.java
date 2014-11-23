@@ -32,6 +32,7 @@ public class TreeViewLauncher {
 			 */
 			if (!isApplet && System.getProperty("os.name").contains("Mac")) {
 
+				/* Sets application name in menubar */
 				System.setProperty("com.apple.mrj.application"
 						+ ".apple.menu.about.name", "TreeView 3");
 

@@ -58,7 +58,7 @@ import Utilities.StringRes;
 public class ClusterView {
 
 	public static final int HIER = 0;
-	public static final int KMEANS = 1;
+//	public static final int KMEANS = 1;
 	
 	/* Static variables for updates from clustering classes */
 	public static JLabel loadLabel;
@@ -167,8 +167,8 @@ public class ClusterView {
 		pBar = GUIFactory.createPBar();
 
 		/* ComboBox to choose cluster method */
-		final String[] clusterNames = { StringRes.menu_Hier,
-				StringRes.menu_KMeans };
+		final String[] clusterNames = { StringRes.menu_Hier};
+//				, StringRes.menu_KMeans };
 
 		clusterChooser = GUIFactory.createComboBox(clusterNames);
 
