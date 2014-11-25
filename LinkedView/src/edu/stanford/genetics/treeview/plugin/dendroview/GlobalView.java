@@ -398,14 +398,20 @@ public class GlobalView extends ModelViewProduced implements
 							- ymap.getIndex(0));
 
 			if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
-				int[] geneSelections = new int[] {geneSelection.getMinIndex(), 
-						geneSelection.getMaxIndex()};
-				int[] arraySelections = new int[] {arraySelection.getMinIndex(), 
-						arraySelection.getMaxIndex()};
+				/* 
+				 * In case selection dimming should be brought back, 
+				 * there is this code below. 
+				 */
+//				int[] geneSelections = new int[] {geneSelection.getMinIndex(), 
+//						geneSelection.getMaxIndex()};
+//				int[] arraySelections = new int[] {arraySelection.getMinIndex(), 
+//						arraySelection.getMaxIndex()};
 				
 				/* Set new offscreenPixels (pixel colors) */
 				drawer.paint(offscreenPixels, sourceRect, destRect,
-						offscreenScanSize, geneSelections, arraySelections);
+						offscreenScanSize); 
+
+				//, geneSelections, arraySelections);
 			}
 
 			offscreenSource.newPixels();

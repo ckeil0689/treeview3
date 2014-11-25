@@ -121,8 +121,10 @@ public class KnnArrayDrawer extends DoubleArrayDrawer {
 	 */
 	@Override
 	public void paint(final int[] pixels, final Rectangle source,
-			final Rectangle dest, final int scanSize, final int[] geneOrder,
-			int[] geneSelections, int[] arraySelections) {
+			final Rectangle dest, final int scanSize, final int[] geneOrder) {
+		
+		/* Selection dimming */
+//	,int[] geneSelections, int[] arraySelections) {
 		
 		LogBuffer.println(">>>>>>> KNNDrawer paint() called!");
 
@@ -189,7 +191,8 @@ public class KnnArrayDrawer extends DoubleArrayDrawer {
 					} else {
 						val /= count;
 					}
-					final int t_color = colorExtractor.getARGBColor(val, false);
+					final int t_color = colorExtractor.getARGBColor(val);
+						//, false);
 					for (int x = xstart; x < xnext; x++) {
 
 						for (int y = ystart; y < ynext; y++) {

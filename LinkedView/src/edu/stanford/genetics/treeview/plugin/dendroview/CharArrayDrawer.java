@@ -129,8 +129,10 @@ public class CharArrayDrawer extends ArrayDrawer {
 	 */
 	@Override
 	public void paint(final int[] pixels, final Rectangle source,
-			final Rectangle dest, final int scanSize, final int[] geneOrder,
-			int[] geneSelection, int[] arraySelection) {
+			final Rectangle dest, final int scanSize, final int[] geneOrder) { 
+		
+		/* Selection dimming */
+//	, int[] geneSelection, int[] arraySelection) {
 
 		if (headerInfo == null) {
 			System.out.println("header info wasn't set");

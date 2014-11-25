@@ -91,9 +91,9 @@ public class MenubarController {
 		case StringRes.menu_Hier:		
 			controller.setupClusterView(ClusterView.HIER);
 			break;
-		case StringRes.menu_KMeans:    	
-			controller.setupClusterView(ClusterView.KMEANS);
-			break;
+//		case StringRes.menu_KMeans:    	
+//			controller.setupClusterView(ClusterView.KMEANS);
+//			break;
 		case "Functional Enrichment":	
 			tvFrame.displayWIP();
 			break;

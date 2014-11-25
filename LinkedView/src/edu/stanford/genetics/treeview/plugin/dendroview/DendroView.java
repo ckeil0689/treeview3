@@ -312,7 +312,7 @@ public class DendroView implements Observer, DendroPanel {
 		setOptionButtons(gtrview.isEnabled() || atrview.isEnabled());
 
 		if (hasTrees) {
-			div_size = 5;
+			div_size = 7;
 			gtrPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, gtrview,
 					textpanel);
 			gtrPane.setResizeWeight(0.5);
@@ -992,10 +992,10 @@ public class DendroView implements Observer, DendroPanel {
 		menu.add(hierMenuItem);
 		tvFrame.addToStackMenuList(hierMenuItem);
 
-		final JMenuItem kMeansMenuItem = new JMenuItem(
-				StringRes.menu_KMeans);
-		menu.add(kMeansMenuItem);
-		tvFrame.addToStackMenuList(kMeansMenuItem);
+//		final JMenuItem kMeansMenuItem = new JMenuItem(
+//				StringRes.menu_KMeans);
+//		menu.add(kMeansMenuItem);
+//		tvFrame.addToStackMenuList(kMeansMenuItem);
 	}
 
 	// /**

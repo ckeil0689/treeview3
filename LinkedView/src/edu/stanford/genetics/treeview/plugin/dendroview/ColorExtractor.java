@@ -638,7 +638,9 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	 * background.
 	 * @return The aRGBColor value
 	 */
-	public int getARGBColor(final double dval, boolean isBackground) {
+	public int getARGBColor(final double dval) { 
+		/* Selection Dimming */
+		//, boolean isBackground) {
 
 		final float[] comp;
 		if (fractions.length == 0 || colorList.isEmpty()) {
@@ -649,14 +651,15 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 		}
 		
 		/* 
+		 * Selection dimming 
 		 * If a pixel in DoubleArrayDrawer is in the background, darken the
 		 * RGB color by multiplying R, G, and B values with a fraction.
 		 */
-		if(isBackground) {
-			for(int i = 0; i < comp.length; i++) {
-				comp[i] *= 0.4;
-			}
-		}
+//		if(isBackground) {
+//			for(int i = 0; i < comp.length; i++) {
+//				comp[i] *= 0.4;
+//			}
+//		}
 
 		return ((255 << 24) | ((int) (255 * comp[0]) << 16)
 				| ((int) (255 * comp[1]) << 8) | (int) (255 * comp[2]));

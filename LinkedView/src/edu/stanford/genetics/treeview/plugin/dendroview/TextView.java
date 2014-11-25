@@ -333,8 +333,14 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 		maxlength = 1;
 		final FontMetrics fontMetrics = getFontMetrics(new Font(face, style,
 				size));
-		final int start = map.getIndex(0);
-		final int end = map.getIndex(map.getUsedPixels());
+		
+		/* Why iterate over headers but use map to set the indices........? */
+		/* TODO ensure this is fixed, won't remove old code in case it's not */
+//		final int start = map.getIndex(0);
+//		final int end = map.getIndex(map.getUsedPixels());
+		
+		final int start = 0;
+		final int end = headerInfo.getNumHeaders();
 
 		for (int j = start; j < end; j++) {
 
