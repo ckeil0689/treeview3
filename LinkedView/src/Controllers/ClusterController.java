@@ -162,7 +162,7 @@ public class ClusterController {
 			if(rowSimilarity != 0) {
 				
 				if(isHierarchical()) {
-					/* Check if ranking first or not. */
+					/* Check if should be ranked first or not. */
 					pBarMax += (rowSimilarity == 5) ? (3 * rows) : (2 * rows);
 					
 				} else {
@@ -177,13 +177,13 @@ public class ClusterController {
 			}
 			
 			if(colSimilarity != 0) {
-				
 				if(isHierarchical()) {
-					/* Check if ranking first or not. */
+					/* Check if should be ranked first or not. */
 					pBarMax += (colSimilarity == 5) ? (3 * cols) : (2 * cols);
 					
 				} else {
 					int cycles = clusterView.getSpinnerValues()[3];
+					
 					if(colSimilarity == 5){ 
 						pBarMax += 2 * cols + cycles;
 						
@@ -370,9 +370,9 @@ public class ClusterController {
 			FileSet fileSet = new FileSet(file.getName(), file.getParent()
 					+ File.separator);
 			
-			LogBuffer.println("Loading data...");
 			clusterDialog.dispose();
 			
+			LogBuffer.println("Loading data...");
 			tvController.loadData(fileSet);
 
 		} else {

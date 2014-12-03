@@ -43,7 +43,7 @@ public interface DendroPanel {
 
 	public void openSearchDialog(HeaderInfo geneHI, HeaderInfo arrayHI);
 
-	public void setTreesVisible(boolean visible);
+//	public void setTreesVisible(double atr_loc, double gtr_loc);
 
 	/**
 	 * 

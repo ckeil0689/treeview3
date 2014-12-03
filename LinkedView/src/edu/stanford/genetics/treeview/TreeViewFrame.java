@@ -290,6 +290,14 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	
 		new AboutDialog(TreeViewFrame.this).setVisible(true);
 	}
+	
+	/**
+	 * Displays a window with some helpful information about TreeView 3.
+	 */
+	public void showShortcuts() {
+	
+		new ShortcutDialog().setVisible(true);
+	}
 
 	/**
 	 * opens a helpful screen with links to documentation for TreeView.
@@ -611,6 +619,11 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 				StringRes.menu_About);
 		helpSubMenu.add(aboutMenuItem);
 		stackMenuList.add(aboutMenuItem);
+		
+		final JMenuItem shortcutMenuItem = new JMenuItem(
+				StringRes.menu_Shortcuts);
+		helpSubMenu.add(shortcutMenuItem);
+		stackMenuList.add(shortcutMenuItem);
 
 		final JMenuItem logMenuItem = new JMenuItem(
 				StringRes.menu_ShowLog);
@@ -1043,6 +1056,11 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	public FileMru getFileMRU() {
 
 		return fileMru;
+	}
+	
+	public JPanel getBGPanel() {
+		
+		return bgPanel;
 	}
 
 	/**

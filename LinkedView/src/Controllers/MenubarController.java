@@ -112,6 +112,9 @@ public class MenubarController {
 		case StringRes.menu_About:		
 			tvFrame.showAboutWindow();
 			break;
+		case StringRes.menu_Shortcuts:		
+			tvFrame.showShortcuts();
+			break;
 		case StringRes.menu_Docs:		
 			tvFrame.showDocumentation();
 			break;

@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
@@ -18,7 +19,7 @@ import Utilities.StringRes;
  * @author CKeil
  * 
  */
-public class AboutDialog extends CustomDialog{
+public class AboutDialog extends CustomDialog {
 
 	private final TreeViewFrame tvFrame;
 
@@ -30,14 +31,14 @@ public class AboutDialog extends CustomDialog{
 		setupLayout();
 
 		dialog.pack();
-		dialog.setLocationRelativeTo(tvFrame.getAppFrame());
+		dialog.setLocationRelativeTo(JFrame.getFrames()[0]);
 	}
 
 	/**
 	 * Setup the layout and content of the mainPanel and add it to the
 	 * dialog.
 	 */
-	public void setupLayout() {
+	private void setupLayout() {
 
 		final JLabel text = GUIFactory.createLabel(StringRes.appName
 				+ " was created by Chris Keil based on Alok Saldhana's "

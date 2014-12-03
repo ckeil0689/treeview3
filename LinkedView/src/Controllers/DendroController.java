@@ -1,9 +1,11 @@
 package Controllers;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -11,12 +13,16 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.InputMap;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import Utilities.Helper;
@@ -87,19 +93,58 @@ public class DendroController implements ConfigNodePersistent {
 		this.dendroView = dendroView;
 		this.tvModel = tvModel;
 
+		/* Get the saved settings */
 		setConfigNode(tvFrame.getConfigNode());
+		
 		updateHeaderInfo();
 		bindComponentFunctions();
+
+		/* Setup layout first! */
+		dendroView.setupLayout();
 		
 		/* Get saved tree visibility status, default to false */
-		setTreesVis(configNode.getBoolean("treesVisible", false));
-
-		dendroView.setupLayout();
+//		setTreesVis(configNode.getBoolean("treesVisible", false));
+		
 		setSavedScale();
+		
+		addKeyBindings();
 
-		// add listeners
 		addViewListeners();
 		addMenuBtnListeners();
+	}
+	
+	/* Adds all keyboard shortcuts that can be used with DendroView open.*/
+	private void addKeyBindings() {
+		
+		JPanel dendroPane = dendroView.getDendroPane();
+		
+		InputMap input_map = dendroPane.getInputMap(
+				JPanel.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		ActionMap action_map = dendroPane.getActionMap(); 
+		
+		/* Gets the system's modifier key (Ctrl or Cmd) */
+		int modifier = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+		
+		/* Assign 'Modifier + T' to toggle the trees */
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_T, modifier), 
+				"toggleTrees");
+		action_map.put("toggleTrees", new TreeToggleAction());
+		
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, modifier), 
+				"deselect");
+		action_map.put("deselect", new DeselectAction());
+		
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, modifier), 
+				"zoomSelection");
+		action_map.put("zoomSelection", new ZoomAction());
+		
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, modifier), 
+				"resetZoom");
+		action_map.put("resetZoom", new HomeAction());
+		
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, modifier), 
+				"searchLabels");
+		action_map.put("searchLabels", new SearchLabelAction());
 	}
 
 	/**
@@ -127,7 +172,7 @@ public class DendroController implements ConfigNodePersistent {
 	private void addMenuBtnListeners() {
 
 		dendroView.addSearchBtnListener(new SearchButtonListener());
-		dendroView.addTreeBtnListener(new TreeBtnListener());
+//		dendroView.addTreeBtnListener(new TreeBtnListener());
 	}
 	
 	/* --------------  Listeners --------------------- */
@@ -151,27 +196,123 @@ public class DendroController implements ConfigNodePersistent {
 		}
 	}
 
-	/**
-	 * Listener for the button that is responsible to show/ hide Dendrograms. It
-	 * switches between JSplitPanes and JPanels in DendroView and causes
-	 * DendroView to reset its layout, re-add the listeners, and reset the
-	 * MapContainers to adjust to the different size of GlobalView.
-	 * 
-	 * @author CKeil
-	 * 
+//	/**
+//	 * Listener for the button that is responsible to show/ hide Dendrograms. It
+//	 * switches between JSplitPanes and JPanels in DendroView and causes
+//	 * DendroView to reset its layout, re-add the listeners, and reset the
+//	 * MapContainers to adjust to the different size of GlobalView.
+//	 * 
+//	 * @author CKeil
+//	 * 
+//	 */
+//	private class TreeBtnListener implements ActionListener {
+//
+//		@Override
+//		public void actionPerformed(final ActionEvent e) {
+//
+//			setTreesVis(dendroView.getTreeButton().isSelected());
+//			
+////			dendroView.setupLayout();
+//			addViewListeners();
+//		}
+//	}
+	
+	/*>>>>>>> Keyboard Shortcut Actions <<<<<<<<< */
+	/* 
+	 * This AbstractAction is used to toggle both dendrograms when the user
+	 * uses the associated keyboard shortcut. It stores the location of the
+	 * JSplitPane dividers when the user wants to hide the trees and retrieves 
+	 * this information when the user decides to show them again.
 	 */
-	private class TreeBtnListener implements ActionListener {
+	private class TreeToggleAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			setTreesVis(dendroView.getTreeButton().isSelected());
+			double atr_loc = dendroView.getDivLoc(dendroView.getAtrview());
+			double gtr_loc = dendroView.getDivLoc(dendroView.getGtrview());
 			
-			dendroView.setupLayout();
-			addViewListeners();
+			if(atr_loc > 0.0 || gtr_loc > 0.0) {
+				
+				/* First save current setup */
+				configNode.putDouble("atr_Loc", atr_loc);
+				configNode.putDouble("gtr_Loc", gtr_loc);
+				
+				/* Shrink tree panel to 0 to make it invisible */
+				atr_loc = 0.0;
+				gtr_loc = 0.0;
+				
+			} else {
+				atr_loc = configNode.getDouble("atr_Loc", 0.5);
+				gtr_loc = configNode.getDouble("gtr_Loc", 0.5);
+			}
+			
+			dendroView.setTreesVisible(atr_loc, gtr_loc);
+		}
+	}
+	
+	/* Action to deselect everything */
+	private class SearchLabelAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+
+			dendroView.setGlobalXMap(globalXmap);
+			dendroView.setGlobalYMap(globalYmap);
+			
+			dendroView.openSearchDialog(tvModel.getGeneHeaderInfo(), 
+					tvModel.getArrayHeaderInfo());
+		}
+	}
+	
+	/* Action to deselect everything */
+	private class DeselectAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+
+			if(arraySelection.getNSelectedIndexes() > 0) {
+				arraySelection.deselectAllIndexes();
+				geneSelection.deselectAllIndexes();
+				
+				arraySelection.notifyObservers();
+				geneSelection.notifyObservers();
+			}
+		}
+	}
+	
+	/* Zooms into the selected area */
+	private class ZoomAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+
+			zoomSelection();
+			centerSelection();
+		}
+	}
+	
+	/* Resets the GlobalView to all zoomed-out state */
+	private class HomeAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+
+			resetMapContainers();
 		}
 	}
 
+	/*>>>>>>> Component Listeners <<<<<<<<< */
 	/**
 	 * Listener for the setScale-buttons in DendroView. Changes the scale in
 	 * xMap and yMap MapContainers, allowing the user to zoom in or out of each
@@ -407,7 +548,7 @@ public class DendroController implements ConfigNodePersistent {
 	 * @author CKeil
 	 * 
 	 */
-	class ZoomListener implements ActionListener {
+	private class ZoomListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
@@ -689,11 +830,25 @@ public class DendroController implements ConfigNodePersistent {
 		}
 	}
 
-	public void setTreesVis(final boolean vis) {
-
-		dendroView.setTreesVisible(vis);
-		configNode.putBoolean("treesVisible", vis);
-	}
+//	public void setTreesVis(final boolean vis) {
+//		
+//		double atr_loc = 0;
+//		double gtr_loc = 0;
+//		
+//		if(vis) {
+//			atr_loc = configNode.getDouble("atr_Loc", 0.5);
+//			gtr_loc = configNode.getDouble("gtr_Loc", 0.5);
+//			
+//		} else {
+//			configNode.putDouble("atr_Loc", dendroView.getATRLoc());
+//			configNode.putDouble("gtr_Loc", dendroView.getGTRLoc());
+//		}
+//		
+//		dendroView.setTreesVisible(atr_loc, gtr_loc);
+//		
+//		/* Save data */
+//		configNode.putBoolean("treesVisible", vis);
+//	}
 
 	public void saveImage(final JPanel panel) throws IOException {
 
