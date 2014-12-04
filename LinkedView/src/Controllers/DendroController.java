@@ -414,6 +414,15 @@ public class DendroController implements ConfigNodePersistent {
 
 			zoomSelection();
 			centerSelection();
+
+			//LogBuffer.println("globalXmap.getFirstVisible(): [" + globalXmap.getFirstVisible() + "] " +
+			//		"globalXmap.getNumVisible(): [" + globalXmap.getNumVisible() + "].  " +
+			//		"globalXmap.getScroll().getValue(): [" + globalXmap.getScroll().getValue() + "] " +
+			//		"globalXmap.getScroll().getVisibleAmount(): [" + globalXmap.getScroll().getVisibleAmount() + "].");
+			//LogBuffer.println("globalYmap.getFirstVisible(): [" + globalYmap.getFirstVisible() + "] " +
+			//		"globalYmap.getNumVisible(): [" + globalYmap.getNumVisible() + "].  " +
+			//		"globalYmap.getScroll().getValue(): [" + globalYmap.getScroll().getValue() + "] " +
+			//		"globalYmap.getScroll().getVisibleAmount(): [" + globalYmap.getScroll().getVisibleAmount() + "].");
 		}
 	}
 
@@ -496,7 +505,8 @@ public class DendroController implements ConfigNodePersistent {
 			//if (newScale < globalXmap.getMinScale()) {
 			//	newScale = globalXmap.getMinScale();
 			//}
-			globalXmap.setScale(newScale);
+			//Changed setScale to use numVisible, so I moved the call below where numVisible was changed
+			//globalXmap.setScale(newScale);
 			
 			//LogBuffer.println("Setting numVisible for arrays to round of double [" + arrayIndexes + "].");
 
@@ -504,6 +514,10 @@ public class DendroController implements ConfigNodePersistent {
 			//is manipulated via indirect actions (such as resizing the window)
 			int numArrayIndexes = (int) Math.round(arrayIndexes);
 			globalXmap.setNumVisible(numArrayIndexes);
+
+			globalXmap.setScale(newScale);
+
+			globalXmap.notifyObservers();
 
 			newScale2 = (globalYmap.getAvailablePixels()) / geneIndexes;
 			
@@ -517,7 +531,8 @@ public class DendroController implements ConfigNodePersistent {
 			//if (newScale2 < globalYmap.getMinScale()) {
 			//	newScale2 = globalYmap.getMinScale();
 			//}
-			globalYmap.setScale(newScale2);
+			//Changed setScale to use numVisible, so I moved the call below where numVisible was changed
+			//globalYmap.setScale(newScale2);
 
 			//LogBuffer.println("Setting numVisible for genes to round of double [" + geneIndexes + "].");
 
@@ -525,6 +540,10 @@ public class DendroController implements ConfigNodePersistent {
 			//is manipulated via indirect actions (such as resizing the window)
 			int numGeneIndexes = (int) Math.round(geneIndexes);
 			globalYmap.setNumVisible(numGeneIndexes);
+
+			globalYmap.setScale(newScale2);
+
+			globalYmap.notifyObservers();
 		}
 
 		saveSettings();
@@ -552,9 +571,10 @@ public class DendroController implements ConfigNodePersistent {
 			scrollX = (int) Math.round((endX + startX) / 2);
 			scrollY = (int) Math.round((endY + startY) / 2);
 
+			//LogBuffer.println("Scrolling to selected indexes: [" + startX + "-" + endX + "," + startY + "-" + endY + "] with centers [" + scrollX + "," + scrollY + "].");
 			globalXmap.scrollToIndex(scrollX);
 			globalYmap.scrollToIndex(scrollY);
-			
+
 			//Calculate the first visible data index in both dimensions
 			int firstX = 0;
 			while(firstX < globalXmap.getMaxIndex() && !globalXmap.isVisible(firstX)) {
@@ -570,6 +590,9 @@ public class DendroController implements ConfigNodePersistent {
 			//is manipulated via indirect actions (such as resizing the window)
 			globalXmap.setFirstVisible(firstX);
 			globalYmap.setFirstVisible(firstY);
+
+			globalXmap.notifyObservers();
+			globalYmap.notifyObservers();
 		}
 	}
 

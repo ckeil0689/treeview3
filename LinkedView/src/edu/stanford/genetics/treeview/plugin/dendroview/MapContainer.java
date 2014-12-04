@@ -328,10 +328,16 @@ public class MapContainer extends Observable implements Observer,
 	public void scrollToIndex(final int i) {
 
 		final int j = scrollbar.getValue();
-		scrollbar.setValue(i - scrollbar.getVisibleAmount() / 2);
+		//The getVisibleAmount return value can change by resizing the window, so use getNumVisible instead
+		//This assumes that getNumVisible is updated before this function is called.
+		//scrollbar.setValue(i - scrollbar.getVisibleAmount() / 2);
 		
+		//LogBuffer.println("scrollToIndex: Scrolling from [" + j + "] to (i - getNumVisible() / 2): [" + i + " - " + getNumVisible() + " / 2] or: [" + (i - getNumVisible() / 2) + "].");
+		scrollbar.setValue(i - getNumVisible() / 2);
+
 		//Keep track of the first visible index
-		setFirstVisible(i - scrollbar.getVisibleAmount() / 2);
+		//This used to be set using scrollbar.getVisibleAmount, but that can change implicitly when the window is resized.
+		setFirstVisible(i - getNumVisible() / 2);
 
 		if (j != scrollbar.getValue()) {
 			setChanged();
@@ -371,9 +377,13 @@ public class MapContainer extends Observable implements Observer,
 		return scrollbar;
 	}
 
+	//This is a listener for scroll events.  When a scroll happens, this executes.
 	@Override
 	public void adjustmentValueChanged(final AdjustmentEvent adjustmentEvent) {
 
+		//LogBuffer.println("Adjusting scrollbar position?: [" + adjustmentEvent.getValue() + "].");
+		//Keep track of explicit view changes made by the user
+		setFirstVisible(adjustmentEvent.getValue());
 		setChanged();
 		notifyObservers(scrollbar);
 	}
@@ -381,20 +391,29 @@ public class MapContainer extends Observable implements Observer,
 	private void setupScrollbar() {
 
 		if (scrollbar != null) {
-			int value = scrollbar.getValue();
-			final int extent = current.getViewableIndexes();
+			//This value can change when the window is resized larger, so use stored value instead
+			//int value = scrollbar.getValue();
+			int value = getFirstVisible();
+
+			//This value can change when the window is resized larger, so use stored value instead
+			//final int extent = current.getViewableIndexes();
+			int extent = getNumVisible();
+			if(extent < 1) {
+				extent = current.getViewableIndexes();
+			}
+
 			final int max = current.getMaxIndex() - current.getMinIndex() + 1;
 			if (value + extent > max) {
 				value = max - extent;
+				setFirstVisible(value);
 			}
 
 			if (value < 0) {
 				value = 0;
+				setFirstVisible(0);
 			}
 
-			//Keep track of the first visible index
-			setFirstVisible(value);
-			
+			//LogBuffer.println("Setting scrollbar values: [" + value + "," + extent + "," + 0 + "," + max + "]");
 			scrollbar.setValues(value, extent, 0, max);
 			scrollbar.setBlockIncrement(current.getViewableIndexes());
 		}
