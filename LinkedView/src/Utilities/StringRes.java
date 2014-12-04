@@ -67,6 +67,7 @@ public class StringRes {
 	public static final String menu_Hier = "Hierarchical";
 	public static final String menu_KMeans = "K-Means";
 	public static final String menu_Stats = "Stats...";
+	public static final String menu_Shortcuts = "Keyboard shortcuts...";
 	public static final String menu_About = "About...";
 	public static final String menu_ShowLog = "Show Log...";
 	public static final String menu_Docs = "Documentation...";

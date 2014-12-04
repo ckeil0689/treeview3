@@ -88,6 +88,10 @@ public class MenubarController {
 		case "Proportional axes":	    
 			controller.setMatrixSize(GlobalView.PROPORT);
 			break;
+		case "Show trees...":	
+		case "Hide trees...":
+			controller.toggleTrees();
+			break;
 		case StringRes.menu_Hier:		
 			controller.setupClusterView(ClusterView.HIER);
 			break;
@@ -111,6 +115,9 @@ public class MenubarController {
 			break;
 		case StringRes.menu_About:		
 			tvFrame.showAboutWindow();
+			break;
+		case StringRes.menu_Shortcuts:		
+			tvFrame.showShortcuts();
 			break;
 		case StringRes.menu_Docs:		
 			tvFrame.showDocumentation();

@@ -1,21 +1,29 @@
 package Controllers;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 
 import ColorChooser.ColorChooser;
 import ColorChooser.ColorChooserController;
 import Utilities.StringRes;
 import Views.ClusterDialog;
+import Views.ClusterView;
 import edu.stanford.genetics.treeview.CdtFilter;
 import edu.stanford.genetics.treeview.DataMatrix;
 import edu.stanford.genetics.treeview.DataModel;
@@ -62,6 +70,7 @@ public class TVController {
 		((TVModel) model).addObserver(tvFrame);
 		
 		addViewListeners();
+		addKeyBindings();
 	}
 	
 	/**
@@ -100,6 +109,22 @@ public class TVController {
 			LogBuffer.println(e.getMessage());
 		}
 	}
+	
+	private void addKeyBindings() {
+		
+		JPanel dendroPane = tvFrame.getBGPanel();
+		
+		InputMap input_map = dendroPane.getInputMap(
+				JPanel.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		ActionMap action_map = dendroPane.getActionMap(); 
+		
+		/* Gets the system's modifier key (Ctrl or Cmd) */
+		int modifier = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+		
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, modifier), 
+				"openCluster");
+		action_map.put("openCluster", new ClusterAction());
+	}
 
 	/* ------------ Add listeners --------------------------------*/
 	/**
@@ -116,6 +141,11 @@ public class TVController {
 			tvFrame.getLoadErrorView().addLoadNewListener(
 					new LoadButtonListener());
 		}
+	}
+	
+	public void toggleTrees() {
+		
+		dendroController.toggleTrees();
 	}
 	
 	/**
@@ -145,6 +175,19 @@ public class TVController {
 		}
 	}
 
+	/* Opens hierarchical cluster menu */
+	private class ClusterAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+
+			setupClusterView(ClusterView.HIER);
+		}
+	}
+	
+	/* >>>>>>>>> Component listeners <<<<<<<<<<<< */
 	/**
 	 * Adds the listeners to all JMenuItems in the main menubar.
 	 * @author CKeil
@@ -156,7 +199,9 @@ public class TVController {
 		public void actionPerformed(final ActionEvent e) {
 			
 			if(e.getSource() instanceof JMenuItem) {
-				menuController.execute(((JMenuItem)e.getSource()).getText());
+				
+				String title = ((JMenuItem)e.getSource()).getText();
+				menuController.execute(title);
 			}
 		}
 	}
