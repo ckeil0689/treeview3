@@ -42,8 +42,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import Utilities.GUIFactory;
+import Utilities.Helper;
 import Utilities.StringRes;
 import edu.stanford.genetics.treeview.DendroPanel;
 import edu.stanford.genetics.treeview.HeaderInfo;
@@ -120,6 +123,7 @@ public class DendroView implements Observer, DendroPanel {
 	// JMenuItems
 	private JMenuItem colorMenuItem;
 	private JMenuItem annotationsMenuItem;
+	private JMenuItem showTreesMenuItem;
 	private JMenu matrixMenu;
 
 	// JButtons
@@ -143,8 +147,8 @@ public class DendroView implements Observer, DendroPanel {
 	public static final double MAX_GV_HEIGHT = 80;
 
 	// Selections
-	private TreeSelectionI geneSelection = null;
-	private TreeSelectionI arraySelection = null;
+//	private TreeSelectionI geneSelection = null;
+//	private TreeSelectionI arraySelection = null;
 	
 	//MapContainers in order to keep track of current visible data indexes
 	protected MapContainer globalXmap = null;
@@ -317,6 +321,7 @@ public class DendroView implements Observer, DendroPanel {
 					.getDouble("gtr_loc", 0.5));
 		} else {
 			gtrPane.setDividerLocation(0.0);
+			gtrPane.setEnabled(false);
 		}
 
 		atrPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, atrview,
@@ -332,6 +337,7 @@ public class DendroView implements Observer, DendroPanel {
 					.getDouble("atr_loc", 0.5));
 		} else {
 			atrPane.setDividerLocation(0.0);
+			atrPane.setEnabled(false);
 		}
 			
 
@@ -550,6 +556,14 @@ public class DendroView implements Observer, DendroPanel {
 		
 		if(atrPane != null) atrPane.setDividerLocation(atr_loc);
 		if(gtrPane != null) gtrPane.setDividerLocation(gtr_loc);
+	
+		if(Helper.nearlyEqual(atr_loc, 0.0) 
+				&& Helper.nearlyEqual(gtr_loc, 0.0)) {
+			showTreesMenuItem.setText("Show trees...");
+			
+		} else {
+			showTreesMenuItem.setText("Hide trees...");
+		}
 		
 		refresh();
 	}
@@ -976,6 +990,15 @@ public class DendroView implements Observer, DendroPanel {
 		proportMatrixMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_3, 
 				Event.ALT_MASK));
 		tvFrame.addToStackMenuList(proportMatrixMenuItem);
+		
+		menu.addSeparator();
+		
+		showTreesMenuItem = new JMenuItem("Show trees...");
+		menu.add(showTreesMenuItem);
+		showTreesMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, 
+				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		tvFrame.addToStackMenuList(showTreesMenuItem);
+		
 //		
 //		isolateMenu = new JMenuItem("Isolate Selected");
 //		menu.add(isolateMenu);
@@ -1210,6 +1233,8 @@ public class DendroView implements Observer, DendroPanel {
 //		textview.setGeneSelection(geneSelection);
 //		arraynameview.setGeneSelection(geneSelection);
 //	}
+	
+	
 
 	/**
 	 * Setter for viewFrame

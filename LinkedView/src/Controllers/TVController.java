@@ -143,6 +143,11 @@ public class TVController {
 		}
 	}
 	
+	public void toggleTrees() {
+		
+		dendroController.toggleTrees();
+	}
+	
 	/**
 	 * Generates the menubar controller. Causes listeners to be added 
 	 * for the main menubar as well as the listed file names in 'Recent Files'.
@@ -194,7 +199,9 @@ public class TVController {
 		public void actionPerformed(final ActionEvent e) {
 			
 			if(e.getSource() instanceof JMenuItem) {
-				menuController.execute(((JMenuItem)e.getSource()).getText());
+				
+				String title = ((JMenuItem)e.getSource()).getText();
+				menuController.execute(title);
 			}
 		}
 	}

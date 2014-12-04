@@ -231,26 +231,50 @@ public class DendroController implements ConfigNodePersistent {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			double atr_loc = dendroView.getDivLoc(dendroView.getAtrview());
-			double gtr_loc = dendroView.getDivLoc(dendroView.getGtrview());
-			
-			if(atr_loc > 0.0 || gtr_loc > 0.0) {
-				
-				/* First save current setup */
-				configNode.putDouble("atr_Loc", atr_loc);
-				configNode.putDouble("gtr_Loc", gtr_loc);
-				
-				/* Shrink tree panel to 0 to make it invisible */
-				atr_loc = 0.0;
-				gtr_loc = 0.0;
-				
-			} else {
-				atr_loc = configNode.getDouble("atr_Loc", 0.5);
-				gtr_loc = configNode.getDouble("gtr_Loc", 0.5);
-			}
-			
-			dendroView.setTreesVisible(atr_loc, gtr_loc);
+//			double atr_loc = dendroView.getDivLoc(dendroView.getAtrview());
+//			double gtr_loc = dendroView.getDivLoc(dendroView.getGtrview());
+//			
+//			if(atr_loc > 0.0 || gtr_loc > 0.0) {
+//				
+//				/* First save current setup */
+//				configNode.putDouble("atr_Loc", atr_loc);
+//				configNode.putDouble("gtr_Loc", gtr_loc);
+//				
+//				/* Shrink tree panel to 0 to make it invisible */
+//				atr_loc = 0.0;
+//				gtr_loc = 0.0;
+//				
+//			} else {
+//				atr_loc = configNode.getDouble("atr_Loc", 0.5);
+//				gtr_loc = configNode.getDouble("gtr_Loc", 0.5);
+//			}
+//			
+//			dendroView.setTreesVisible(atr_loc, gtr_loc);
+			toggleTrees();
 		}
+	}
+	
+	public void toggleTrees() {
+		
+		double atr_loc = dendroView.getDivLoc(dendroView.getAtrview());
+		double gtr_loc = dendroView.getDivLoc(dendroView.getGtrview());
+		
+		if(atr_loc > 0.0 || gtr_loc > 0.0) {
+			
+			/* First save current setup */
+			configNode.putDouble("atr_Loc", atr_loc);
+			configNode.putDouble("gtr_Loc", gtr_loc);
+			
+			/* Shrink tree panel to 0 to make it invisible */
+			atr_loc = 0.0;
+			gtr_loc = 0.0;
+			
+		} else {
+			atr_loc = configNode.getDouble("atr_Loc", 0.5);
+			gtr_loc = configNode.getDouble("gtr_Loc", 0.5);
+		}
+		
+		dendroView.setTreesVisible(atr_loc, gtr_loc);
 	}
 	
 	/* Action to deselect everything */
