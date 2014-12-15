@@ -305,7 +305,7 @@ public class TVController {
 	 * @throws LoadException
 	 */
 	public void openFile() {
-
+		
 		try {
 			file = tvFrame.selectFile();
 

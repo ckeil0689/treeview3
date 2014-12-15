@@ -24,6 +24,7 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.Dimension;
+import java.awt.FileDialog;
 import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
 import java.awt.Rectangle;
@@ -613,6 +614,22 @@ public abstract class ViewFrame implements Observer {
 	 */
 	public File selectFile() throws LoadException {
 
+		boolean isMacOrUnix = System.getProperty("os.name").contains("Mac")
+				|| System.getProperty("os.name").contains("nix")
+				|| System.getProperty("os.name").contains("nux")
+				|| System.getProperty("os.name").contains("aix");
+
+		return isMacOrUnix ? selectFileNix() : selectFileWin();
+	}
+	
+	/**
+	 * Method opens a file chooser dialog for Windows systems
+	 * 
+	 * @return File file
+	 * @throws LoadException
+	 */
+	public File selectFileWin() throws LoadException {
+
 		File chosen = null;
 
 		final JFileChooser fileDialog = new JFileChooser();
@@ -626,6 +643,33 @@ public abstract class ViewFrame implements Observer {
 
 		} else {
 			System.out.println("File Dialog closed without selection...");
+		}
+
+		return chosen;
+	}
+	
+	/**
+	 * Method opens a file chooser dialog for Unix based systems.
+	 * 
+	 * @return File file
+	 */
+	public File selectFileNix() {
+
+		File chosen = null;
+
+		final FileDialog fileDialog = new FileDialog(applicationFrame, 
+				"Choose a file", FileDialog.LOAD);
+
+		String string = fileMru.getMostRecentDir();
+		if (string != null) {
+			 fileDialog.setDirectory(string);
+		}
+		fileDialog.setVisible(true);
+		
+		String dir = fileDialog.getDirectory();
+		String filename = fileDialog.getFile();
+		if (dir != null && filename != null) {
+			chosen = new File(dir + filename);
 		}
 
 		return chosen;
