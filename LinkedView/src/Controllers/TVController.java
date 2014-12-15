@@ -70,6 +70,7 @@ public class TVController {
 		((TVModel) model).addObserver(tvFrame);
 		
 		addViewListeners();
+		addMenuListeners();
 		addKeyBindings();
 	}
 	

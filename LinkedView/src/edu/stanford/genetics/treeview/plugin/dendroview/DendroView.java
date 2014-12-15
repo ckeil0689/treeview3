@@ -339,8 +339,15 @@ public class DendroView implements Observer, DendroPanel {
 			atrPane.setDividerLocation(0.0);
 			atrPane.setEnabled(false);
 		}
+		
+		if(!treesEnabled() && showTreesMenuItem != null) {
+			showTreesMenuItem.setEnabled(false);
+		}
+		
+		if(getDivLoc(atrview) > 0.0 || getDivLoc(gtrview) > 0.0) {
+			showTreesMenuItem.setText("Hide Trees...");
+		}
 			
-
 		textpanel.add(textview.getComponent(), "push, grow");
 		arrayNamePanel.add(arraynameview.getComponent(), "push, grow");
 		
@@ -384,7 +391,7 @@ public class DendroView implements Observer, DendroPanel {
 		/* Heights */
 		double arrayRow = (100 - gvHeight - 2);
 		double bottomRow = 2;
-		
+ 		
 		/* Adding all components to the dendroPane */
 		dendroPane.add(firstPanel, "w " + textViewCol + "%, "
 				+ "h " + arrayRow + "%, pushx");
