@@ -22,6 +22,7 @@
  */
 package edu.stanford.genetics.treeview;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -30,10 +31,10 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -49,12 +50,10 @@ public class UrlSettingsPanel implements SettingsPanel {
 	private final UrlExtractor urlExtractor;
 	private UrlPresets urlPresets = null;
 	private final HeaderInfo headerInfo;
-//	private JDialog d;
 	
 	private JPanel mainPanel;
 
-	private JButton[] buttons;
-	private JTextField previewField;
+	private JLabel previewLabel;
 	private final TemplateField templateField;
 	private HeaderChoice headerChoice;
 
@@ -72,13 +71,8 @@ public class UrlSettingsPanel implements SettingsPanel {
 		headerInfo = hi;
 		templateField = new TemplateField();
 		templateField.setText(urlExtractor.getUrlTemplate());
-//		
-//		mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
-//		mainPanel.setBorder(BorderFactory.createTitledBorder(up.g));
-//
-//		redoLayout();
-//		updatePreview();
-//		mainPanel.setEnabled(urlExtractor.isEnabled());
+		templateField.setMinimumSize(new Dimension(300, 
+				templateField.getHeight()));
 	}
 	
 	public JPanel generate(String name) {
@@ -128,9 +122,6 @@ public class UrlSettingsPanel implements SettingsPanel {
 	}
 	public void redoLayout() {
 
-		String[] preset;
-		preset = urlPresets.getPresetNames();
-		final int nPresets = preset.length;
 		mainPanel.removeAll();
 		
 		final JCheckBox enableBox = new JCheckBox("Enable",
@@ -149,41 +140,34 @@ public class UrlSettingsPanel implements SettingsPanel {
 		headerChoice = new HeaderChoice();
 		mainPanel.add(headerChoice, "align 0%, pushx, wrap");
 
-		mainPanel.add(templateField, "w 100%, wrap");
+		mainPanel.add(templateField, "w 90%, pushx, wrap");
 
-		previewField = new JTextField("Ex: " + urlExtractor.getUrl(0));
+		previewLabel = new JLabel("Ex: " + urlExtractor.getUrl(0));
 		// previewField = new JTextField(urlExtractor.substitute(tester));
-		previewField.setEditable(false);
-		mainPanel.add(previewField, "w 100%, wrap");
+//		previewLabel.setEditable(false);
+//		mainPanel.add(previewLabel, "w 100%, wrap");
+		
+		final JComboBox<String> options = 
+				new JComboBox<String>(urlPresets.getPresetNames());
+		
+		options.addActionListener(new ActionListener() {
 
-		final JPanel presetPanel = new JPanel();
-		buttons = new JButton[nPresets];
-		for (int i = 0; i < nPresets; i++) {
-			final JButton presetButton = new JButton(
-					(urlPresets.getPresetNames())[i]);
-			final int index = i;
-			presetButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
 
-				@Override
-				public void actionPerformed(final ActionEvent e) {
+				templateField.setText(urlPresets.getTemplate(
+						options.getSelectedIndex()));
+				updatePreview();
+			}
+		});
 
-					templateField.setText(urlPresets.getTemplate(index));
-					updatePreview();
-				}
-			});
-			presetPanel.add(presetButton);
-			buttons[index] = presetButton;
-		}
-
-		// add(new JScrollPane(presetPanel,
-		// JScrollPane.VERTICAL_SCROLLBAR_NEVER,
-		// JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS), gbc);
-		mainPanel.add(presetPanel, "wrap");
+		mainPanel.add(options, "alignx 0%, w 20%, pushx");
 
 		try {
 			headerChoice.setSelectedIndex(urlExtractor.getIndex());
-
-		} catch (final java.lang.IllegalArgumentException e) {
+		} catch (final IllegalArgumentException e) {
+			LogBuffer.logException(e);
+			headerChoice.setSelectedIndex(0);
 		}
 	}
 
@@ -191,7 +175,7 @@ public class UrlSettingsPanel implements SettingsPanel {
 
 		urlExtractor.setUrlTemplate(templateField.getText());
 		urlExtractor.setIndex(headerChoice.getSelectedIndex());
-		previewField.setText("Ex: " + urlExtractor.getUrl(0));
+		previewLabel.setText("Ex: " + urlExtractor.getUrl(0));
 	}
 
 	private class HeaderChoice extends JComboBox<String> implements ItemListener {

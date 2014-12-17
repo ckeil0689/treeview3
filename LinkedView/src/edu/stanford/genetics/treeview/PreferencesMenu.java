@@ -197,10 +197,6 @@ implements ConfigNodePersistent {
 			final FontSettings fontSettings = new FontSettings(
 					dendroView.getTextview(), dendroView.getArraynameview());
 
-			final JLabel labelFont = GUIFactory.createLabel("Set Label Font:", 
-					GUIFactory.FONTL);
-
-			mainPanel.add(labelFont, "span, wrap");
 			mainPanel.add(fontSettings.makeFontPanel(), 
 					"pushx, alignx 50%, w 95%");
 		}

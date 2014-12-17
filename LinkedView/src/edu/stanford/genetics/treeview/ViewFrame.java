@@ -24,8 +24,10 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.Dimension;
+import java.awt.FileDialog;
 import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
@@ -33,7 +35,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.prefs.Preferences;
@@ -537,18 +538,10 @@ public abstract class ViewFrame implements Observer {
 			}
 			browserControl.displayURL(string);
 
-		} catch (final MalformedURLException e) {
+		} catch (final IOException e) {
+			LogBuffer.logException(e);
 			final String message = new StringBuffer("Problem loading url: ")
 					.append(e).toString();
-			LogBuffer.println(message);
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(applicationFrame, message);
-
-		} catch (final IOException e) {
-			final String message = new StringBuffer("Could not load url: ")
-					.append(e).toString();
-			LogBuffer.println(message);
-			e.printStackTrace();
 			JOptionPane.showMessageDialog(applicationFrame, message);
 		}
 	}
@@ -606,12 +599,31 @@ public abstract class ViewFrame implements Observer {
 	abstract public void generateView(final int view);
 
 	/**
-	 * Method opens a file chooser dialog
+	 * Decides which dialog option to use for opening files, depending on the 
+	 * operating system of the user. This is meant to ensure a more native
+	 * feel of the application on the user's system although using FileDialog
+	 * isn't preferred because it's AWT while the rest of the GUI uses Swing.
 	 * 
 	 * @return File file
 	 * @throws LoadException
 	 */
 	public File selectFile() throws LoadException {
+
+		boolean isMacOrUnix = System.getProperty("os.name").contains("Mac")
+				|| System.getProperty("os.name").contains("nix")
+				|| System.getProperty("os.name").contains("nux")
+				|| System.getProperty("os.name").contains("aix");
+
+		return isMacOrUnix ? selectFileNix() : selectFileWin();
+	}
+	
+	/**
+	 * Method opens a file chooser dialog for Windows systems
+	 * 
+	 * @return File file
+	 * @throws LoadException
+	 */
+	public File selectFileWin() throws LoadException {
 
 		File chosen = null;
 
@@ -626,6 +638,56 @@ public abstract class ViewFrame implements Observer {
 
 		} else {
 			System.out.println("File Dialog closed without selection...");
+		}
+
+		return chosen;
+	}
+	
+	/**
+	 * Method opens a file chooser dialog for Unix based systems.
+	 * 
+	 * @return File file
+	 */
+	public File selectFileNix() {
+
+		File chosen = null;
+
+		final FileDialog fileDialog = new FileDialog(applicationFrame, 
+				"Choose a file", FileDialog.LOAD);
+
+		String string = fileMru.getMostRecentDir();
+		if (string != null) {
+			 fileDialog.setDirectory(string);
+		}
+		
+		/* Lots of code to be able to center an awt.FileDialog on screen... */
+	    Rectangle rect = applicationFrame.getContentPane().getBounds();
+	    
+	    /* 
+	     * Making sure FileDialog has a size before setVisible, otherwise
+	     * center cannot be found.
+	     */
+	    fileDialog.pack();
+	    fileDialog.setSize(800, 600);
+	    fileDialog.validate();
+	    
+	    double width = fileDialog.getBounds().getWidth();
+	    double height = fileDialog.getBounds().getHeight();
+		
+		double x = rect.getCenterX() - (width / 2);
+		double y = rect.getCenterY() - (height/ 2);
+		
+		Point newPoint = new Point();
+		newPoint.setLocation(x, y);
+		
+		fileDialog.setLocation(newPoint);
+		
+	    fileDialog.setVisible(true);
+		
+		String dir = fileDialog.getDirectory();
+		String filename = fileDialog.getFile();
+		if (dir != null && filename != null) {
+			chosen = new File(dir + filename);
 		}
 
 		return chosen;
