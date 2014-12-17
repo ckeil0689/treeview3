@@ -23,6 +23,7 @@
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.Event;
+import java.awt.Graphics;
 import java.awt.ScrollPane;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
@@ -42,8 +43,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
+import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.plaf.basic.BasicSplitPaneDivider;
+import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 import Utilities.GUIFactory;
 import Utilities.Helper;
@@ -316,6 +320,9 @@ public class DendroView implements Observer, DendroPanel {
 		gtrPane.setOneTouchExpandable(true); // does not work on Linux :(
 		gtrPane.setDividerSize(div_size);
 		
+		colorDivider(gtrPane);
+	    gtrPane.setBorder(null);
+		
 		if(gtrview.isEnabled()) {
 			gtrPane.setDividerLocation(tvFrame.getConfigNode()
 					.getDouble("gtr_loc", 0.5));
@@ -331,6 +338,9 @@ public class DendroView implements Observer, DendroPanel {
 		atrPane.setBorder(null);
 		atrPane.setOneTouchExpandable(true);
 		atrPane.setDividerSize(div_size);
+		
+		colorDivider(atrPane);
+	    atrPane.setBorder(null);
 		
 		if(atrview.isEnabled()) {
 			atrPane.setDividerLocation(tvFrame.getConfigNode()
@@ -434,6 +444,31 @@ public class DendroView implements Observer, DendroPanel {
 		
 		zoomBtn = GUIFactory.createNavBtn(StringRes.icon_zoomAll);
 		zoomBtn.setToolTipText(StringRes.tt_home);
+	}
+	
+	/* Colors the divider of a JSplitPane */
+	private void colorDivider(JSplitPane sPane) {
+		
+		sPane.setUI(new BasicSplitPaneUI() {
+			
+	        public BasicSplitPaneDivider createDefaultDivider() {
+	        	
+		        return new BasicSplitPaneDivider(this) {
+		        	
+					private static final long serialVersionUID = 1L;
+	
+					public void setBorder(Border b) {}
+	
+		            @Override
+	                public void paint(Graphics g) {
+		               
+		            	g.setColor(GUIFactory.DARK_BG);
+		                g.fillRect(0, 0, getSize().width, getSize().height);
+	                    super.paint(g);
+	                }
+		        };
+	        }
+	    });
 	}
 	
 	/**

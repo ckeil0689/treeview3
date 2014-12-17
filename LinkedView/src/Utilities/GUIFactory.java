@@ -36,6 +36,7 @@ public class GUIFactory {
 
 	public static final Color DEFAULT_BG = UIManager.getColor("Panel.background");
 	public static final Color MAIN = new Color(30, 144, 255, 255);
+	public static final Color DARK_BG= new Color(200, 200, 200, 255);
 	public static final Color ELEMENT_HOV = new Color(122, 214, 255, 255);
 	public static final Color RED1 = new Color(240, 80, 50, 255);
 	
