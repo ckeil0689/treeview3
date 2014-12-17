@@ -40,9 +40,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -71,7 +71,6 @@ public class FontSettings implements SettingsPanel {
 	private JComboBox<String> font_choice;
 	private JComboBox<String> style_choice;
 	private NatField size_field;
-	private JLabel exampleField;
 
 	public FontSettings(final FontSelectable fs, final FontSelectable fs2) {
 
@@ -88,9 +87,9 @@ public class FontSettings implements SettingsPanel {
 	public JPanel makeFontPanel() {
 
 		fontPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
+		fontPanel.setBorder(BorderFactory.createTitledBorder("Set Label Font"));
 		setupFonts();
 		setupWidgets();
-		updateExample();
 
 		return fontPanel;
 	}
@@ -278,21 +277,6 @@ public class FontSettings implements SettingsPanel {
 		size_field.getDocument().addDocumentListener(
 				new DocumentChangeListener());
 		fontPanel.add(size_field, "span, wrap");
-
-		exampleField = GUIFactory.createLabel("Font Example Text: ", 
-				GUIFactory.FONTS);
-		fontPanel.add(exampleField, "pushx, alignx 50%, span");
-	}
-
-	private void updateExample() {
-
-		final String string = (String) font_choice.getSelectedItem();
-		final int i = encode_style((String) style_choice.getSelectedItem());
-		final int size = size_field.getNat();
-		// System.out.println("Setting size to " + size);
-		exampleField.setFont(new Font(string, i, size));
-		exampleField.revalidate();
-		exampleField.repaint();
 	}
 
 	/**
@@ -307,7 +291,6 @@ public class FontSettings implements SettingsPanel {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			updateExample();
 			synchronizeClient();
 		}
 	}
@@ -322,14 +305,12 @@ public class FontSettings implements SettingsPanel {
 		@Override
 		public void insertUpdate(final DocumentEvent arg0) {
 
-			updateExample();
 			synchronizeClient();
 		}
 
 		@Override
 		public void removeUpdate(final DocumentEvent arg0) {
 
-			updateExample();
 			synchronizeClient();
 		}
 

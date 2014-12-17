@@ -25,7 +25,6 @@ package edu.stanford.genetics.treeview;
 
 import java.awt.Dimension;
 import java.awt.FileDialog;
-import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
 import java.awt.Point;
@@ -36,7 +35,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.prefs.Preferences;
@@ -540,18 +538,10 @@ public abstract class ViewFrame implements Observer {
 			}
 			browserControl.displayURL(string);
 
-		} catch (final MalformedURLException e) {
+		} catch (final IOException e) {
+			LogBuffer.logException(e);
 			final String message = new StringBuffer("Problem loading url: ")
 					.append(e).toString();
-			LogBuffer.println(message);
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(applicationFrame, message);
-
-		} catch (final IOException e) {
-			final String message = new StringBuffer("Could not load url: ")
-					.append(e).toString();
-			LogBuffer.println(message);
-			e.printStackTrace();
 			JOptionPane.showMessageDialog(applicationFrame, message);
 		}
 	}
@@ -670,24 +660,26 @@ public abstract class ViewFrame implements Observer {
 			 fileDialog.setDirectory(string);
 		}
 		
-//	    fileDialog.setLocationByPlatform(true);
-//	    fileDialog.setLocationRelativeTo(null);
-//		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		/* Lots of code to be able to center an awt.FileDialog on screen... */
 	    Rectangle rect = applicationFrame.getContentPane().getBounds();
 	    
+	    /* 
+	     * Making sure FileDialog has a size before setVisible, otherwise
+	     * center cannot be found.
+	     */
 	    fileDialog.pack();
 	    fileDialog.setSize(800, 600);
 	    fileDialog.validate();
 	    
 	    double width = fileDialog.getBounds().getWidth();
 	    double height = fileDialog.getBounds().getHeight();
-	    
-		Point newPoint = new Point();
 		
 		double x = rect.getCenterX() - (width / 2);
-		double y = rect.getCenterY() - (height / 2);
+		double y = rect.getCenterY() - (height/ 2);
 		
+		Point newPoint = new Point();
 		newPoint.setLocation(x, y);
+		
 		fileDialog.setLocation(newPoint);
 		
 	    fileDialog.setVisible(true);
