@@ -25,8 +25,10 @@ package edu.stanford.genetics.treeview;
 
 import java.awt.Dimension;
 import java.awt.FileDialog;
+import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
@@ -607,7 +609,10 @@ public abstract class ViewFrame implements Observer {
 	abstract public void generateView(final int view);
 
 	/**
-	 * Method opens a file chooser dialog
+	 * Decides which dialog option to use for opening files, depending on the 
+	 * operating system of the user. This is meant to ensure a more native
+	 * feel of the application on the user's system although using FileDialog
+	 * isn't preferred because it's AWT while the rest of the GUI uses Swing.
 	 * 
 	 * @return File file
 	 * @throws LoadException
@@ -664,7 +669,28 @@ public abstract class ViewFrame implements Observer {
 		if (string != null) {
 			 fileDialog.setDirectory(string);
 		}
-		fileDialog.setVisible(true);
+		
+//	    fileDialog.setLocationByPlatform(true);
+//	    fileDialog.setLocationRelativeTo(null);
+//		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+	    Rectangle rect = applicationFrame.getContentPane().getBounds();
+	    
+	    fileDialog.pack();
+	    fileDialog.setSize(800, 600);
+	    fileDialog.validate();
+	    
+	    double width = fileDialog.getBounds().getWidth();
+	    double height = fileDialog.getBounds().getHeight();
+	    
+		Point newPoint = new Point();
+		
+		double x = rect.getCenterX() - (width / 2);
+		double y = rect.getCenterY() - (height / 2);
+		
+		newPoint.setLocation(x, y);
+		fileDialog.setLocation(newPoint);
+		
+	    fileDialog.setVisible(true);
 		
 		String dir = fileDialog.getDirectory();
 		String filename = fileDialog.getFile();

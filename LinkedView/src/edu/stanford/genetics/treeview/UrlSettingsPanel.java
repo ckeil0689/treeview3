@@ -146,8 +146,6 @@ public class UrlSettingsPanel implements SettingsPanel {
 		// previewField = new JTextField(urlExtractor.substitute(tester));
 //		previewLabel.setEditable(false);
 //		mainPanel.add(previewLabel, "w 100%, wrap");
-
-		final JPanel presetPanel = new JPanel();
 		
 		final JComboBox<String> options = 
 				new JComboBox<String>(urlPresets.getPresetNames());
@@ -162,17 +160,14 @@ public class UrlSettingsPanel implements SettingsPanel {
 				updatePreview();
 			}
 		});
-		presetPanel.add(options);
 
-		// add(new JScrollPane(presetPanel,
-		// JScrollPane.VERTICAL_SCROLLBAR_NEVER,
-		// JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS), gbc);
-		mainPanel.add(presetPanel, "wrap");
+		mainPanel.add(options, "alignx 0%, w 20%, pushx");
 
 		try {
 			headerChoice.setSelectedIndex(urlExtractor.getIndex());
-
-		} catch (final java.lang.IllegalArgumentException e) {
+		} catch (final IllegalArgumentException e) {
+			LogBuffer.logException(e);
+			headerChoice.setSelectedIndex(0);
 		}
 	}
 
