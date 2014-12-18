@@ -108,7 +108,9 @@ public class StringRes {
 	public static final String tt_searchRowCol = "Find row or column elements";
 	public static final String tt_showTrees = "Determine dendrogram visibility";
 	public static final String tt_xZoomIn = "Zoom in on rows";
+	public static final String tt_xyZoomIn = "Zoom in both axes";
 	public static final String tt_xZoomOut = "Zoom out of rows";
+	public static final String tt_xyZoomOut = "Zoom out both axes";
 	public static final String tt_yZoomIn = "Zoom in on columns";
 	public static final String tt_yZoomOut = "Zoom out of columns";
 	public static final String tt_home = "Zoom into the selected area";

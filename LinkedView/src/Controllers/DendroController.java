@@ -355,12 +355,19 @@ public class DendroController implements ConfigNodePersistent {
 
 			} else if (e.getSource() == dendroView.getXMinusButton()) {
 				getGlobalXMap().zoomOut();
+				
+			} else if (e.getSource() == dendroView.getXYMinusButton()) {
+					getGlobalXMap().zoomOut();
+					getGlobalYMap().zoomOut();
+
+			} else if (e.getSource() == dendroView.getXYPlusButton()) {
+				getGlobalXMap().zoomIn();
+				getGlobalYMap().zoomIn();
 
 			} else if (e.getSource() == dendroView.getYPlusButton()) {
 				getGlobalYMap().zoomIn();
-				
 
-			} else if (e.getSource() == dendroView.getYMinusButton()) {
+			}else if (e.getSource() == dendroView.getYMinusButton()) {
 				getGlobalYMap().zoomOut();
 				
 

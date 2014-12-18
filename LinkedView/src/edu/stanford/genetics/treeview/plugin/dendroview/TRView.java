@@ -143,9 +143,8 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 		
 		setHoveredNode(null);
 
-		if (selectedNode == n) {
-			return;
-		}
+		if (selectedNode == n) return;
+		
 		if (selectedNode != null) {
 			treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
 					destRect, selectedNode, false, isLeft);
@@ -168,11 +167,13 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 		repaint();
 	}
 	
+	/* TODO color hovered nodes even when selected. For that, add all selected
+	 * nodes instead of just one to TreePainter.paintSubTree() and pass a stack
+	 * of them, which nodedrawer already uses anyways in draw()...
+	 */
 	public void setHoveredNode(final TreeDrawerNode n) {
 
-		if (hoveredNode == n) {
-			return;
-		}
+		if (hoveredNode == n) return;
 		
 		if (hoveredNode != null) {
 			treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,

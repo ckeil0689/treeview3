@@ -134,8 +134,10 @@ public class DendroView implements Observer, DendroPanel {
 	private JButton zoomBtn;
 	private JButton scaleIncX;
 	private JButton scaleIncY;
+	private JButton scaleIncXY;
 	private JButton scaleDecX;
 	private JButton scaleDecY;
+	private JButton scaleDecXY;
 	private JButton scaleDefaultAll;
 	
 	// Buttons for interaction in dendroview.
@@ -311,17 +313,16 @@ public class DendroView implements Observer, DendroPanel {
 
 		setOptionButtons();
 
-		div_size = 7;
+		div_size = 5;
 		gtrPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, gtrview,
 				textpanel);
 		gtrPane.setResizeWeight(0.5);
 		gtrPane.setOpaque(false);
-		gtrPane.setBorder(null);
 		gtrPane.setOneTouchExpandable(true); // does not work on Linux :(
 		gtrPane.setDividerSize(div_size);
 		
 		colorDivider(gtrPane);
-	    gtrPane.setBorder(null);
+		gtrPane.setBorder(null);
 		
 		if(gtrview.isEnabled()) {
 			gtrPane.setDividerLocation(tvFrame.getConfigNode()
@@ -335,12 +336,11 @@ public class DendroView implements Observer, DendroPanel {
 				arrayNamePanel);
 		atrPane.setResizeWeight(0.5);
 		atrPane.setOpaque(false);
-		atrPane.setBorder(null);
 		atrPane.setOneTouchExpandable(true);
 		atrPane.setDividerSize(div_size);
 		
 		colorDivider(atrPane);
-	    atrPane.setBorder(null);
+		atrPane.setBorder(null);
 		
 		if(atrview.isEnabled()) {
 			atrPane.setDividerLocation(tvFrame.getConfigNode()
@@ -367,11 +367,13 @@ public class DendroView implements Observer, DendroPanel {
 		globalViewContainer.add(globalXscrollbar, "span, pushx, alignx 50%, "
 				+ "w 100%, h 1%");
 
-		crossPanel.add(scaleIncY, "span, alignx 50%, h 33%, wrap");
+		crossPanel.add(scaleIncY, "span 2 1, alignx 100%, h 33%");
+		crossPanel.add(scaleIncXY, "h 33%, wrap");
 		crossPanel.add(scaleDecX, "h 33%");
 		crossPanel.add(zoomBtn, "h 33%");
 		crossPanel.add(scaleIncX, "h 33%, wrap");
-		crossPanel.add(scaleDecY, "span, h 33%, alignx 50%");
+		crossPanel.add(scaleDecXY, "h 33%");
+		crossPanel.add(scaleDecY, "span 2 1, h 33%, alignx 0%");
 
 		btnPanel.add(crossPanel, "pushx, alignx 50%, wrap");
 
@@ -433,11 +435,17 @@ public class DendroView implements Observer, DendroPanel {
 		scaleIncX = GUIFactory.createNavBtn(StringRes.icon_zoomIn);
 		scaleIncX.setToolTipText(StringRes.tt_xZoomIn);
 		
+		scaleIncXY = GUIFactory.createNavBtn(StringRes.icon_zoomIn);
+		scaleIncXY.setToolTipText(StringRes.tt_xyZoomIn);
+		
 		scaleDecX = GUIFactory.createNavBtn(StringRes.icon_zoomOut);
 		scaleDecX.setToolTipText(StringRes.tt_xZoomOut);
 			
 		scaleIncY = GUIFactory.createNavBtn(StringRes.icon_zoomIn);
 		scaleIncY.setToolTipText(StringRes.tt_yZoomIn);
+		
+		scaleDecXY = GUIFactory.createNavBtn(StringRes.icon_zoomOut);
+		scaleDecXY.setToolTipText(StringRes.tt_xyZoomOut);
 		
 		scaleDecY = GUIFactory.createNavBtn(StringRes.icon_zoomOut);
 		scaleDecY.setToolTipText(StringRes.tt_yZoomOut);
@@ -495,9 +503,11 @@ public class DendroView implements Observer, DendroPanel {
 	public void addScaleListeners(final ActionListener l) {
 
 		scaleIncX.addActionListener(l);
+		scaleIncXY.addActionListener(l);
 		scaleDecX.addActionListener(l);
 		scaleIncY.addActionListener(l);
 		scaleDecY.addActionListener(l);
+		scaleDecXY.addActionListener(l);
 		scaleDefaultAll.addActionListener(l);
 	}
 
@@ -1336,6 +1346,11 @@ public class DendroView implements Observer, DendroPanel {
 
 		return scaleIncX;
 	}
+	
+	public JButton getXYPlusButton() {
+
+		return scaleIncXY;
+	}
 
 	public JButton getXMinusButton() {
 
@@ -1350,6 +1365,11 @@ public class DendroView implements Observer, DendroPanel {
 	public JButton getYMinusButton() {
 
 		return scaleDecY;
+	}
+	
+	public JButton getXYMinusButton() {
+
+		return scaleDecXY;
 	}
 
 	public JButton getHomeButton() {
