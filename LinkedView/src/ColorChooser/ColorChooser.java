@@ -37,6 +37,7 @@ import Utilities.Helper;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
+import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractorEditor;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
@@ -57,17 +58,18 @@ public class ColorChooser implements ConfigNodePersistent {
 	private final List<Color> colorList;
 	private final List<Thumb> thumbList;
 
-	private final JButton addButton;
-	private final JButton removeButton;
+	private final JButton addBtn;
+	private final JButton removeBtn;
 	private JButton saveButton;
 
-	private final JRadioButton redGreenButton;
-	private final JRadioButton yellowBlueButton;
-	private final JRadioButton customColorButton;
+	private final JRadioButton redGreenBtn;
+	private final JRadioButton yellowBlueBtn;
+	private final JRadioButton customColorBtn;
+	private final JButton missingBtn;
 
 	private boolean customSelected;
 
-	private final ButtonGroup colorButtonGroup;
+	private final ButtonGroup colorBtnGroup;
 
 	private final ColorExtractor colorExtractor;
 	private final ColorPresets colorPresets;
@@ -90,18 +92,19 @@ public class ColorChooser implements ConfigNodePersistent {
 		this.colorList = new ArrayList<Color>();
 		thumbList = new ArrayList<Thumb>();
 
-		addButton = GUIFactory.createBtn("Add Color");
-		removeButton = GUIFactory.createBtn("Remove Selected");
+		addBtn = GUIFactory.createBtn("Add Color");
+		removeBtn = GUIFactory.createBtn("Remove Selected");
 
-		colorButtonGroup = new ButtonGroup();
+		colorBtnGroup = new ButtonGroup();
 
-		redGreenButton = GUIFactory.createRadioBtn("Red-Green");
-		yellowBlueButton = GUIFactory.createRadioBtn("Yellow-Blue");
-		customColorButton = GUIFactory.createRadioBtn("Custom Colors");
+		redGreenBtn = GUIFactory.createRadioBtn("Red-Green");
+		yellowBlueBtn = GUIFactory.createRadioBtn("Yellow-Blue");
+		customColorBtn = GUIFactory.createRadioBtn("Custom Colors");
+		missingBtn = GUIFactory.createBtn("Missing");
 
-		colorButtonGroup.add(redGreenButton);
-		colorButtonGroup.add(yellowBlueButton);
-		colorButtonGroup.add(customColorButton);
+		colorBtnGroup.add(redGreenBtn);
+		colorBtnGroup.add(yellowBlueBtn);
+		colorBtnGroup.add(customColorBtn);
 
 		final JPanel radioButtonPanel = 
 				GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
@@ -110,9 +113,10 @@ public class ColorChooser implements ConfigNodePersistent {
 				+ "Scheme: ", GUIFactory.FONTS);
 
 		radioButtonPanel.add(colorHint, "span, wrap");
-		radioButtonPanel.add(redGreenButton, "span, wrap");
-		radioButtonPanel.add(yellowBlueButton, "span, wrap");
-		radioButtonPanel.add(customColorButton, "span");
+		radioButtonPanel.add(redGreenBtn, "span, wrap");
+		radioButtonPanel.add(yellowBlueBtn, "span, wrap");
+		radioButtonPanel.add(customColorBtn, "span, wrap");
+		radioButtonPanel.add(missingBtn);
 		
 		gradientBox = this.new GradientBox();
 		gradientBox.setPresets();
@@ -120,9 +124,26 @@ public class ColorChooser implements ConfigNodePersistent {
 		mainPanel.add(hint, "span, wrap");
 		mainPanel.add(gradientBox, "h 100:100:, w 400:400:, pushx, alignx 50%, "
 				+ "span, wrap");
-		mainPanel.add(addButton, "pushx, split 2, alignx 50%");
-		mainPanel.add(removeButton, "pushx, wrap");
-		mainPanel.add(radioButtonPanel, "pushx");
+		mainPanel.add(addBtn, "pushx, split 2, alignx 50%");
+		mainPanel.add(removeBtn, "pushx, wrap");
+		mainPanel.add(radioButtonPanel, "pushx, wrap");
+		
+		missingBtn.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+
+				final Color trial = JColorChooser.showDialog(
+						mainPanel, "Pick Color for "
+								+ "Missing", colorExtractor.getMissing());
+				if (trial != null) {
+					colorExtractor.setMissingColor(trial);
+
+					colorExtractor.notifyObservers();
+					mainPanel.repaint();
+				}
+			}
+		});
 	}
 
 	@Override
@@ -152,12 +173,12 @@ public class ColorChooser implements ConfigNodePersistent {
 		this.customSelected = selected;
 
 		if (selected) {
-			addButton.setEnabled(true);
-			removeButton.setEnabled(true);
+			addBtn.setEnabled(true);
+			removeBtn.setEnabled(true);
 
 		} else {
-			addButton.setEnabled(false);
-			removeButton.setEnabled(false);
+			addBtn.setEnabled(false);
+			removeBtn.setEnabled(false);
 		}
 	}
 
@@ -429,7 +450,7 @@ public class ColorChooser implements ConfigNodePersistent {
 			}
 
 			if (colorScheme.equalsIgnoreCase("Custom")) {
-				customColorButton.setSelected(true);
+				customColorBtn.setSelected(true);
 				setCustomSelected(true);
 				final ColorSet savedColorSet = colorPresets
 						.getColorSet(colorScheme);
@@ -437,14 +458,14 @@ public class ColorChooser implements ConfigNodePersistent {
 
 			} else if (colorScheme.equalsIgnoreCase(defaultColors)) {
 				// Colors should be defined as default ColorSet in ColorPresets
-				redGreenButton.setSelected(true);
+				redGreenBtn.setSelected(true);
 				setCustomSelected(false);
 				final ColorSet rgColorSet = colorPresets
 						.getColorSet(colorScheme);
 				loadPresets(rgColorSet);
 
 			} else if (colorScheme.equalsIgnoreCase("YellowBlue")) {
-				yellowBlueButton.setSelected(true);
+				yellowBlueBtn.setSelected(true);
 				setCustomSelected(false);
 				final ColorSet ybColorSet = colorPresets
 						.getColorSet("YellowBlue");
@@ -1061,25 +1082,35 @@ public class ColorChooser implements ConfigNodePersistent {
 
 		return configNode;
 	}
+	
+	protected ColorExtractor getColorExtractor() {
+		
+		return colorExtractor;
+	}
+	
+	protected JPanel getMainPanel() {
+		
+		return mainPanel;
+	}
 
 	protected ButtonGroup getButtonGroup() {
 
-		return colorButtonGroup;
+		return colorBtnGroup;
 	}
 
 	protected JRadioButton getRGButton() {
 
-		return redGreenButton;
+		return redGreenBtn;
 	}
 
 	protected JRadioButton getYBButton() {
 
-		return yellowBlueButton;
+		return yellowBlueBtn;
 	}
 
 	protected JRadioButton getCustomColorButton() {
 
-		return customColorButton;
+		return customColorBtn;
 	}
 
 	public boolean isCustomSelected() {
@@ -1122,19 +1153,24 @@ public class ColorChooser implements ConfigNodePersistent {
 
 	protected void addAddListener(final ActionListener l) {
 
-		addButton.addActionListener(l);
+		addBtn.addActionListener(l);
 	}
 
 	protected void addRemoveListener(final ActionListener l) {
 
-		removeButton.addActionListener(l);
+		removeBtn.addActionListener(l);
 	}
 
 	protected void addDefaultListener(final ActionListener l) {
 
-		redGreenButton.addActionListener(l);
-		yellowBlueButton.addActionListener(l);
-		customColorButton.addActionListener(l);
+		redGreenBtn.addActionListener(l);
+		yellowBlueBtn.addActionListener(l);
+		customColorBtn.addActionListener(l);
+	}
+	
+	protected void addMissingListener(final ActionListener l) {
+		
+		missingBtn.addActionListener(l);
 	}
 
 	protected void addSavePresetListener(final ActionListener l) {

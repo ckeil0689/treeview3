@@ -658,6 +658,9 @@ public abstract class ViewFrame implements Observer {
 		String string = fileMru.getMostRecentDir();
 		if (string != null) {
 			 fileDialog.setDirectory(string);
+		} else {
+			string = configNode.get("lastDir", "/");
+			fileDialog.setDirectory(string);
 		}
 		
 		/* Lots of code to be able to center an awt.FileDialog on screen... */
@@ -683,11 +686,14 @@ public abstract class ViewFrame implements Observer {
 		fileDialog.setLocation(newPoint);
 		
 	    fileDialog.setVisible(true);
+	    
+	    
 		
 		String dir = fileDialog.getDirectory();
 		String filename = fileDialog.getFile();
 		if (dir != null && filename != null) {
 			chosen = new File(dir + filename);
+			configNode.put("lastdir", fileDialog.getDirectory());
 		}
 
 		return chosen;

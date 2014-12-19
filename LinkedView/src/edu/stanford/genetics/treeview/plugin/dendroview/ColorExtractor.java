@@ -235,7 +235,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 		}
 
 		setNewParams(colorSet.getFractions(), cList);
-		synchFloats();
+		synchFloats(); /* sets initial missing/ empty data colors */
 		contrast = configNode.getDouble("contrast", getContrast());
 		setLogCenter(configNode.getDouble("logcenter", 1.0));
 		setLogBase(configNode.getDouble("logbase", 2.0));
@@ -358,14 +358,17 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	public Color getEmpty() {
 		return colorSet.getEmpty();
 	}
-
+	
+	/* Imports colors from the current colorSet object to local variables */ 
 	private void synchFloats() {
 
 		synchFloats(colorSet.getMissing(), missingColor);
 		synchFloats(colorSet.getEmpty(), emptyColor);
 	}
 
+	/* Sets local variables' values from the colorSet object's colors */
 	private void synchFloats(final Color newColor, float[] comp) {
+		
 		comp[0] = (float) newColor.getRed() / 256;
 		comp[1] = (float) newColor.getGreen() / 256;
 		comp[2] = (float) newColor.getBlue() / 256;

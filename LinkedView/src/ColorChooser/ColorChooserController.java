@@ -31,7 +31,8 @@ public class ColorChooserController {
      * Returns the system multi-click interval.
      */
     public static int getMultiClickInterval() {
-        Integer multiClickInterval = (Integer) Toolkit.getDefaultToolkit().getDesktopProperty("awt.multiClickInterval");
+        Integer multiClickInterval = (Integer) Toolkit.getDefaultToolkit()
+        		.getDesktopProperty("awt.multiClickInterval");
 
         if (multiClickInterval == null) {
             multiClickInterval = DEFAULT_MULTI_CLICK_INTERVAL;
@@ -233,6 +234,22 @@ public class ColorChooserController {
 			} else {
 				LogBuffer.println("No source found for ActionEvent in "
 						+ "DefaultListener in ColorGradientController");
+			}
+		}
+	}
+	
+	class MissingBtnListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+
+			final Color trial = JColorChooser.showDialog(
+					gradientPick.getMainPanel(), "Pick Color for Missing", 
+					gradientPick.getColorExtractor().getMissing());
+			
+			if (trial != null) {
+				gradientPick.getColorExtractor().setMissingColor(trial);
+				gradientPick.getColorExtractor().notifyObservers();
 			}
 		}
 	}
