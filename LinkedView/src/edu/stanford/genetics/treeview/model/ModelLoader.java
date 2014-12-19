@@ -286,7 +286,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 				LogBuffer.println("Exception when trying to parse "
 						+ "a double in extractData() in "
 						+ "ModelLoader: " + e.getMessage());
-				final double val = Double.parseDouble("0.00E+00");
+				final double val = DataModel.NODATA;
 				dataValues[i] = val;
 			}
 		}

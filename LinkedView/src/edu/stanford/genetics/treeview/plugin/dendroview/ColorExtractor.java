@@ -24,6 +24,7 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Observable;
 import java.util.prefs.BackingStoreException;
@@ -78,9 +79,9 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 
 		// set a default defaultColorSet... should be superceded by a user
 		// setting...
-		// defaultColorSet = new ColorSet();
-		// defaultColorSet.setMissing(ColorSet.decodeColor("#909090"));
-		// defaultColorSet.setEmpty(ColorSet.decodeColor("#FFFFFF"));
+//		 defaultColorSet = new ColorSet();
+//		 defaultColorSet.setMissing(ColorSet.decodeColor("#909090"));
+//		 defaultColorSet.setEmpty(ColorSet.decodeColor("#FFFFFF"));
 		colorList_default = new ArrayList<Color>();
 		colorList_default.add(Color.red);
 		colorList_default.add(Color.black);
@@ -197,7 +198,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 				}
 			}
 			
-			if (! foundColorSet) {
+			if (!foundColorSet) {
 				// Set colorList and fractionList here, based on what the last
 				// active
 				// node was in GradientColorChooser. Otherwise keep defaults?
@@ -224,7 +225,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 						+ lastActive + "; using " + colorSet.getName());
 			}
 		} catch (final BackingStoreException e) {
-			e.printStackTrace();
+			LogBuffer.logException(e);
 		}
 
 		final String[] colors = colorSet.getColors();
@@ -234,7 +235,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 		}
 
 		setNewParams(colorSet.getFractions(), cList);
-		// synchFloats();
+		synchFloats();
 		contrast = configNode.getDouble("contrast", getContrast());
 		setLogCenter(configNode.getDouble("logcenter", 1.0));
 		setLogBase(configNode.getDouble("logbase", 2.0));
@@ -364,7 +365,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 		synchFloats(colorSet.getEmpty(), emptyColor);
 	}
 
-	private void synchFloats(final Color newColor, final float[] comp) {
+	private void synchFloats(final Color newColor, float[] comp) {
 		comp[0] = (float) newColor.getRed() / 256;
 		comp[1] = (float) newColor.getGreen() / 256;
 		comp[2] = (float) newColor.getBlue() / 256;
@@ -374,6 +375,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	 * The color for missing data.
 	 */
 	public void setMissingColor(final String newString) {
+	
 		if (ColorSet.encodeColor(colorSet.getMissing()).equals(newString)) {
 			return;
 		}
@@ -401,6 +403,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	 * The color for missing data.
 	 */
 	public void setMissingColor(final Color newColor) {
+		
 		if (colorSet.getMissing().equals(newColor)) {
 			return;
 		}
@@ -469,7 +472,8 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 			final List<Color> colorVals) {
 
 		if (Helper.nearlyEqual(dval, nodata)) {
-			// System.out.println("value " + dval + " was nodata");
+			LogBuffer.println("value " + dval + " was nodata");
+			LogBuffer.println(Arrays.toString(missingColor));
 			return missingColor;
 			// return new Color(missingColor[0], missingColor[1],
 			// missingColor[2]);

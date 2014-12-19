@@ -51,9 +51,9 @@ public class ColorPresets implements ConfigNodePersistent {
 	static {
 		defaultColorSets = new ColorSet[2];
 		defaultColorSets[0] = new ColorSet("RedGreen", "#FF0000", "#000000",
-				"#00FF00", "#909090", "#FFFFFF");
+				"#00FF00", "#FFFFFF", "#FFFFFF");
 		defaultColorSets[1] = new ColorSet("YellowBlue", "#FEFF00", "#000000",
-				"#1BB7E5", "#909090", "#FFFFFF");
+				"#1BB7E5", "#FFFFFF", "#FFFFFF");
 	}
 
 	private Preferences configNode;
@@ -124,6 +124,7 @@ public class ColorPresets implements ConfigNodePersistent {
 			return getColorSet(defaultPreset);
 
 		} catch (final Exception e) {
+			LogBuffer.logException(e);
 			return getColorSet(0);
 		}
 	}

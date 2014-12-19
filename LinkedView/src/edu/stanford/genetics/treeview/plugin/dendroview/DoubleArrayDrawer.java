@@ -138,11 +138,9 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 
 				final double val = dataMatrix.getValue(row, col);
 
-				if (Helper.nearlyEqual(val, DataModel.NODATA)) {
-					continue;
-				}
-
-				if (Helper.nearlyEqual(val, DataModel.EMPTY)) {
+				/* don't skew calculations with missing data */
+				if (Helper.nearlyEqual(val, DataModel.NODATA)
+						|| Helper.nearlyEqual(val, DataModel.EMPTY)) {
 					continue;
 				}
 

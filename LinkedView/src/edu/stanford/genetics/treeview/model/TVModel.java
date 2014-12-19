@@ -589,6 +589,7 @@ public class TVModel extends Observable implements DataModel {
 			exprData = null;
 		}
 
+		/* finds the maximum and minimum values in the data */
 		@Override
 		public void calculateMinMax() {
 
@@ -599,15 +600,21 @@ public class TVModel extends Observable implements DataModel {
 				for (int i = 0; i < nGene; i++) {
 
 					for (int j = 0; j < nExpr; j++) {
+						
+						double dataPoint = exprData[i][j];
 
-						if (exprData[i][j] > maxVal) {
+						if (dataPoint > maxVal 
+								&& dataPoint != DataModel.NODATA
+								&& dataPoint != DataModel.EMPTY) {
 
-							maxVal = exprData[i][j];
+							maxVal = dataPoint;
 						}
 
-						if (exprData[i][j] < minVal) {
+						if (dataPoint < minVal 
+								&& dataPoint != DataModel.NODATA
+								&& dataPoint != DataModel.EMPTY) {
 
-							minVal = exprData[i][j];
+							minVal = dataPoint;
 						}
 					}
 				}

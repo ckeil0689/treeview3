@@ -57,8 +57,8 @@ public class ColorSet {
 	private List<Color> colorList = new ArrayList<Color>();
 	private List<Double> fractionList = new ArrayList<Double>();
 
-	private final String default_missingColor = "#909090";
-	private final String default_emptyColor = "#FFFFFF";
+	private final String default_missingColor = "#FFFFFFFF";
+	private final String default_emptyColor = "#FFFFFFFF";
 	private final float[] default_fractions = { 0.0f, 0.5f, 1.0f };
 	private final String[] default_colors = { "#FF0000", "#000000", "#00FF00" };
 	private final String default_name = "RedGreen";
@@ -96,6 +96,7 @@ public class ColorSet {
 	 *            stored
 	 */
 	public ColorSet(Preferences colorSetNode) {
+		
 		this.name = colorSetNode.get("name", default_name);
 		this.missing = decodeColor(colorSetNode.get("missing",
 				default_missingColor));
