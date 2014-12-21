@@ -245,27 +245,16 @@ public class ColorChooserController {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			final Color missing = JColorChooser.showDialog(
-					gradientPick.getMainPanel(), "Pick Color for Missing", 
-					gradientPick.getColorExtractor().getMissing());
-			
-			if (missing != null) {
-				gradientPick.getColorExtractor().setMissingColor(missing);
-				gradientPick.getColorExtractor().notifyObservers();
+			if (gradientPick.isCustomSelected()) {
+				final Color missing = JColorChooser.showDialog(
+						gradientPick.getMainPanel(), "Pick Color for Missing", 
+						gradientPick.getColorExtractor().getMissing());
+				
+				if (missing != null) {
+					gradientPick.getColorExtractor().setMissingColor(missing);
+					gradientPick.getColorExtractor().notifyObservers();
+				}
 			}
 		}
-	}
-
-	class SaveColorPresetListener implements ActionListener {
-
-		@Override
-		public void actionPerformed(final ActionEvent e) {
-
-			//final ColorSet temp = new ColorSet();
-			// colorExtractorEditor.copyStateTo(temp);
-			//temp.setName("UserDefined");
-			//gradientPick.addColorSet(temp);
-		}
-
 	}
 }

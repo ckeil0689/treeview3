@@ -2,6 +2,7 @@ package ColorChooser;
 
 import java.awt.Color;
 import java.awt.Dialog;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.LinearGradientPaint;
@@ -43,32 +44,36 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
 
 public class ColorChooser implements ConfigNodePersistent {
 	
-	private JPanel mainPanel;
+	/* Saved data */
 	private Preferences configNode;
-
+	
+	/* GUI components */
+	private JPanel mainPanel;
 	private GradientBox gradientBox;
 
-	private Color[] colors;
+	/* Color data storage */
+	private List<Color> colorList;
 	private float[] fractions;
 
+	/* Data boundaries */
 	private final double minVal;
 	private final double maxVal;
 
-	private List<Color> colorList;
+	/* Flexible list of thumbs for gradient manipulation */
 	private List<Thumb> thumbList;
 
+	/* For custom ColorSet manipulation */
 	private JButton addBtn;
 	private JButton removeBtn;
-	private JButton saveButton;
+	private JButton missingBtn;
+	
+	/* Collection of ColorSet choice buttons */
+	private ButtonGroup colorBtnGroup;
 
+	/* ColorSet choices */
 	private JRadioButton redGreenBtn;
 	private JRadioButton yellowBlueBtn;
 	private JRadioButton customColorBtn;
-	private JButton missingBtn;
-
-	private boolean customSelected;
-
-	private ButtonGroup colorBtnGroup;
 
 	/* Responsible for active data-to-color mapping */
 	private final ColorExtractor colorExtractor;
@@ -78,9 +83,20 @@ public class ColorChooser implements ConfigNodePersistent {
 	
 	/* The currently active set of colors */
 	private ColorSet activeColorSet;
+	
+	/* Stores whether custom ColorSet is selected or not */
+	private boolean isCustomSelected;
 
+	/* Holds the currently selected thumb */
 	private Thumb selectedThumb = null;
 
+	/**
+	 * Constructs a ColorChooser object.
+	 * @param drawer The CoorExtractor which defines how colors are mapped
+	 * to data.
+	 * @param minVal Minimum boundary of the data.
+	 * @param maxVal Maximum boundary of the data.
+	 */
 	public ColorChooser(final ColorExtractor drawer, Double minVal, Double maxVal) {
 
 		this.colorExtractor = drawer;
@@ -91,6 +107,9 @@ public class ColorChooser implements ConfigNodePersistent {
 		setLayout();
 	}
 	
+	/**
+	 * Sets up the GUI layout of the ColorChooser object. 
+	 */
 	private void setLayout() {
 		
 		mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
@@ -110,7 +129,7 @@ public class ColorChooser implements ConfigNodePersistent {
 		redGreenBtn = GUIFactory.createRadioBtn("Red-Green");
 		yellowBlueBtn = GUIFactory.createRadioBtn("Yellow-Blue");
 		customColorBtn = GUIFactory.createRadioBtn("Custom Colors");
-		missingBtn = GUIFactory.createBtn("Missing");
+		missingBtn = GUIFactory.createBtn("Missing Data");
 
 		colorBtnGroup.add(redGreenBtn);
 		colorBtnGroup.add(yellowBlueBtn);
@@ -125,8 +144,7 @@ public class ColorChooser implements ConfigNodePersistent {
 		radioButtonPanel.add(colorHint, "span, wrap");
 		radioButtonPanel.add(redGreenBtn, "span, wrap");
 		radioButtonPanel.add(yellowBlueBtn, "span, wrap");
-		radioButtonPanel.add(customColorBtn, "span, wrap");
-		radioButtonPanel.add(missingBtn);
+		radioButtonPanel.add(customColorBtn, "span");
 		
 		gradientBox = this.new GradientBox();
 		gradientBox.setPresets();
@@ -134,8 +152,9 @@ public class ColorChooser implements ConfigNodePersistent {
 		mainPanel.add(hint, "span, wrap");
 		mainPanel.add(gradientBox, "h 100:100:, w 400:400:, pushx, alignx 50%, "
 				+ "span, wrap");
-		mainPanel.add(addBtn, "pushx, split 2, alignx 50%");
-		mainPanel.add(removeBtn, "pushx, wrap");
+		mainPanel.add(addBtn, "pushx, split 3, alignx 50%");
+		mainPanel.add(removeBtn, "pushx");
+		mainPanel.add(missingBtn, "wrap");
 		mainPanel.add(radioButtonPanel, "pushx, wrap");
 	}
 
@@ -155,36 +174,9 @@ public class ColorChooser implements ConfigNodePersistent {
 	}
 
 	/**
-	 * Saves the current colors and fractions as a ColorSet to the configNode.
-	 */
-	public void saveStatus() {
-
-		if (gradientBox != null) {
-			gradientBox.saveCustomPresets();
-		}
-	}
-
-	public void setCustomSelected(final boolean selected) {
-
-		this.customSelected = selected;
-
-		if (selected) {
-			addBtn.setEnabled(true);
-			removeBtn.setEnabled(true);
-
-		} else {
-			addBtn.setEnabled(false);
-			removeBtn.setEnabled(false);
-		}
-	}
-
-	/**
 	 * A special JPanel that represents a gradient colored box. It has a
 	 * MouseListener attached (via the controller class) which handles user
-	 * input and allows for the change of the color in the clicked area.
-	 * 
-	 * @author CKeil
-	 * 
+	 * input and allows for change of color in the clicked area.
 	 */
 	protected class GradientBox extends JPanel {
 
@@ -194,6 +186,9 @@ public class ColorChooser implements ConfigNodePersistent {
 		private final Rectangle2D thumbRect = new Rectangle2D.Float();
 		private final Rectangle2D numRect = new Rectangle2D.Float();
 
+		/**
+		 * Constructs a GradientBox object.
+		 */
 		public GradientBox() {
 
 			setFocusable(true);
@@ -215,7 +210,6 @@ public class ColorChooser implements ConfigNodePersistent {
 					RenderingHints.VALUE_ANTIALIAS_ON);
 
 			verifyThumbs();
-
 			drawThumbBox(g2);
 
 			try {
@@ -236,14 +230,14 @@ public class ColorChooser implements ConfigNodePersistent {
 			g2.dispose();
 		}
 
-		public void setupRects(final int width, final int height) {
+		private void setupRects(final int width, final int height) {
 
 			gradientRect.setRect(0, height * 1 / 4, width, height * 2 / 4);
 			thumbRect.setRect(0, 0, width, height * 1 / 4);
 			numRect.setRect(0, height * 3 / 4, width, height * 1 / 4);
 		}
 
-		public void drawGradientBox(final Graphics2D g2)
+		private void drawGradientBox(final Graphics2D g2)
 				throws IllegalArgumentException {
 
 			// Dimensions
@@ -253,7 +247,7 @@ public class ColorChooser implements ConfigNodePersistent {
 			final float endX = (float) gradientRect.getWidth() + startX;
 			final float endY = (float) gradientRect.getHeight() + startY;
 
-			colors = new Color[colorList.size()];
+			Color[] colors = new Color[colorList.size()];
 
 			for (int i = 0; i < colors.length; i++) {
 
@@ -269,7 +263,7 @@ public class ColorChooser implements ConfigNodePersistent {
 			g2.fillRect((int) startX, (int) startY, (int) endX, (int) endY);
 		}
 
-		public void drawThumbBox(final Graphics2D g2) {
+		private void drawThumbBox(final Graphics2D g2) {
 
 			// Fill thumbRect with background color
 			g2.setColor(GUIFactory.DEFAULT_BG);
@@ -282,7 +276,7 @@ public class ColorChooser implements ConfigNodePersistent {
 			}
 		}
 
-		public void drawNumBox(final Graphics2D g2) {
+		private void drawNumBox(final Graphics2D g2) {
 
 			g2.setColor(GUIFactory.DEFAULT_BG);
 			g2.fill(numRect);
@@ -290,27 +284,45 @@ public class ColorChooser implements ConfigNodePersistent {
 			g2.setColor(Color.black);
 			g2.setFont(GUIFactory.FONTS);
 
-			// Paint the thumbs
-			if (thumbList.size() == fractions.length) {
-				int i = 0;
-				for (final Thumb t : thumbList) {
-
-					// Rounding to 3 decimals
-					final float fraction = fractions[i];
-					Double value = Math.abs((maxVal - minVal) * fraction)
-							+ minVal;
-					value = (double) Math.round(value * 1000) / 1000;
-
-					g2.drawString(Double.toString(value), t.getX(),
-							(int) ((numRect.getHeight() / 2) + numRect
-									.getMinY()));
-					i++;
-				}
-			} else {
-				LogBuffer.println("ThumbList size (" + thumbList.size()
-						+ ") and fractions size (" + fractions.length
-						+ ") are different in drawNumbBox!");
-			}
+			// Paint the thumb values
+//			if (thumbList.size() == fractions.length) {
+//				int i = 0;
+//				for (final Thumb t : thumbList) {
+//
+//					// Rounding to 3 decimals
+//					final float fraction = fractions[i];
+//					Double value = Math.abs((maxVal - minVal) * fraction)
+//							+ minVal;
+//					value = (double) Math.round(value * 1000) / 1000;
+//
+//					g2.drawString(Double.toString(value), t.getX(),
+//							(int) ((numRect.getHeight() / 2) + numRect
+//									.getMinY()));
+//					i++;
+//				}
+//			} else {
+//				LogBuffer.println("ThumbList size (" + thumbList.size()
+//						+ ") and fractions size (" + fractions.length
+//						+ ") are different in drawNumbBox!");
+//			}
+			
+			FontMetrics fm = getFontMetrics(GUIFactory.FONTS);
+			
+			/* Draw first number */
+			double first = minVal;
+			int x = (int) numRect.getMinX();
+			
+			g2.drawString(Double.toString(first), x,
+					(int) ((numRect.getHeight() / 2) + numRect
+							.getMinY()));
+			
+			double last = minVal;
+			x = (int) numRect.getMaxX();
+			int stringWidth = fm.stringWidth(Double.toString(last));
+			
+			g2.drawString(Double.toString(last), x - stringWidth,
+					(int) ((numRect.getHeight() / 2) + numRect
+							.getMinY()));
 		}
 
 		/**
@@ -318,7 +330,7 @@ public class ColorChooser implements ConfigNodePersistent {
 		 * 
 		 * @param newCol
 		 */
-		public void addColor(final Color newCol) {
+		protected void addColor(final Color newCol) {
 
 			int selectedIndex = 0;
 			if (selectedThumb != null) {
@@ -355,7 +367,7 @@ public class ColorChooser implements ConfigNodePersistent {
 		/**
 		 * Removes a color from the gradient.
 		 */
-		public void removeColor() {
+		protected void removeColor() {
 
 			int index = 0;
 			for (final Thumb t : thumbList) {
@@ -1117,10 +1129,33 @@ public class ColorChooser implements ConfigNodePersistent {
 
 	public boolean isCustomSelected() {
 
-		return customSelected;
+		return isCustomSelected;
 	}
 
 	// Mutators
+	/**
+	 * Saves the current colors and fractions as a ColorSet to the configNode.
+	 */
+	public void saveStatus() {
+
+		if (gradientBox != null) {
+			gradientBox.saveCustomPresets();
+		}
+	}
+
+	/**
+	 * Sets button status and remembers if custom ColorSet is selected or not.
+	 * @param selected Whether the custom ColorSet was selected or not.
+	 */
+	public void setCustomSelected(final boolean selected) {
+
+		this.isCustomSelected = selected;
+
+		addBtn.setEnabled(selected);
+		removeBtn.setEnabled(selected);
+		missingBtn.setEnabled(selected);
+	}
+	
 	/**
 	 * Switched the currently used ColorSet to the one that matches the
 	 * specified entered name key in its 'ColorSet' configNode.
@@ -1180,10 +1215,5 @@ public class ColorChooser implements ConfigNodePersistent {
 	protected void addMissingListener(final ActionListener l) {
 		
 		missingBtn.addActionListener(l);
-	}
-
-	protected void addSavePresetListener(final ActionListener l) {
-
-		saveButton.addActionListener(l);
 	}
 }

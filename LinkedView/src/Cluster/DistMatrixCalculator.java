@@ -401,7 +401,7 @@ public class DistMatrixCalculator {
 	 * Shows a pop-up alert if the selected distance measure could not
 	 * be matched to an defined method to execute the calculations.
 	 */
-	public void showDistAlert() {
+	private void showDistAlert() {
 		
 		String message = "Could not start measuring distance, "
 				+ "because no match for the selected distance measure "
