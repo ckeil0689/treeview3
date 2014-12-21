@@ -27,8 +27,6 @@ import java.util.List;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import javax.swing.UIManager;
-
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
@@ -248,6 +246,7 @@ public class ColorPresets implements ConfigNodePersistent {
 	public void addColorSet(final String name, final List<Color> colors,
 			final List<Double> fractions, final String missing,
 			final String empty) {
+		
 		final ColorSet newColorSet = new ColorSet(name, colors, fractions,
 				missing, empty);
 		addColorSet(newColorSet);
@@ -262,7 +261,7 @@ public class ColorPresets implements ConfigNodePersistent {
 		// Make the children of ColorSet here by adding an int to the name?
 		// final ColorSet preset = new ColorSet();
 		final String[] childrenNodes = getRootChildrenNodes();
-		boolean customFound = false;
+		boolean isCustomFound = false;
 		String customNode = "";
 
 		for (final String node : childrenNodes) {
@@ -270,20 +269,20 @@ public class ColorPresets implements ConfigNodePersistent {
 			final String default_name = "RedGreen";
 			if (configNode.node(node).get("name", default_name)
 					.equalsIgnoreCase("Custom")) {
-				customFound = true;
+				isCustomFound = true;
 				customNode = node;
 			}
 		}
 
 		final ColorSet newColorSet = new ColorSet(set);
-		if (customFound) {
+		if (isCustomFound) {
 			newColorSet.save(configNode.node(customNode));
+			
 		} else {
 			int setNodeIndex = 0;
 			setNodeIndex = getRootChildrenNodes().length + 1;
 			newColorSet.save(configNode.node("ColorSet" + setNodeIndex));
 		}
-
 	}
 
 	/**

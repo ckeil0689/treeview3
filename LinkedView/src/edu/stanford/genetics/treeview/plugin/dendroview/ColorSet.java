@@ -57,8 +57,8 @@ public class ColorSet {
 	private List<Color> colorList = new ArrayList<Color>();
 	private List<Double> fractionList = new ArrayList<Double>();
 
-	private final String default_missingColor = "#FFFFFFFF";
-	private final String default_emptyColor = "#FFFFFFFF";
+	private final String default_missingColor = "#FFFFFF";
+	private final String default_emptyColor = "#FFFFFF";
 	private final float[] default_fractions = { 0.0f, 0.5f, 1.0f };
 	private final String[] default_colors = { "#FF0000", "#000000", "#00FF00" };
 	private final String default_name = "RedGreen";
@@ -159,6 +159,7 @@ public class ColorSet {
 	 * @param another
 	 */
 	public ColorSet(ColorSet another) {
+		
 		this.name = another.name;
 		this.colorList = another.colorList;
 		this.fractionList = another.fractionList;
@@ -173,19 +174,23 @@ public class ColorSet {
 	 *            colorSetNode Preferences node to store ColorSet in
 	 */
 	public void save(Preferences colorSetNode) {
+		
 		colorSetNode.put("name", this.name);
-		colorSetNode.put("missing", encodeColor(this.missing));
-		colorSetNode.put("empty", encodeColor(this.empty));
+		
 		int colorNum = colorList.size();
 		colorSetNode.putInt("colorNum", colorNum);
+		
 		for (int i = 0; i < colorNum; i++) {
 			colorSetNode.put("Color" + i + 1, encodeColor(colorList.get(i)));
 		}
+		
 		for (int i = 0; i < colorNum; i++) {
 			colorSetNode.putFloat("Fraction" + i + 1, fractionList.get(i)
 					.floatValue());
 		}
-
+		
+		colorSetNode.put("missing", encodeColor(this.missing));
+		colorSetNode.put("empty", encodeColor(this.empty));
 	}
 
 	/* inherit description */

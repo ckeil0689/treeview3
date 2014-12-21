@@ -7,6 +7,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import Utilities.Helper;
+import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
@@ -71,9 +72,9 @@ public class DistMatrixCalculator {
 	 * The parameters allow for selection of different versions of the Pearson
 	 * correlation (absolute Pearson correlation, centered vs. uncentered).
 	 * 
-	 * @param data The original dataset. 
 	 * @param absolute Whether pearson should be absolute or not.
 	 * @param centered Whether pearson should be centered or not.
+	 * @param limit Limit of the current data row (working with half-matrix)
 	 */
 	public void pearson(final boolean absolute, final boolean centered, 
 			final int limit) {
@@ -113,8 +114,15 @@ public class DistMatrixCalculator {
 		double sumXY = 0;
 		double rootProduct = 0;
 
+		/* 1) Get row mean */
 		if (centered) {
 			for(int k = 0; k < row.length; k++) {
+				
+				/* Skip missing data */
+				if(Helper.nearlyEqual(row[k], DataModel.NODATA) 
+						|| Helper.nearlyEqual(otherRow[k], DataModel.NODATA)) {
+					continue;
+				}
 				
 				mean_sumX += row[k];
 				mean_sumY += otherRow[k];
@@ -128,8 +136,14 @@ public class DistMatrixCalculator {
 			mean_y = 0;
 		}
 
-		/* compare each value of both genes */
+		/* sum squared errors from mean */
 		for (int k = 0; k < row.length; k++) {
+			
+			/* Skip missing data */
+			if(Helper.nearlyEqual(row[k], DataModel.NODATA) 
+					|| Helper.nearlyEqual(otherRow[k], DataModel.NODATA)) {
+				continue;
+			}
 
 			// part x
 			xi = row[k];
@@ -285,29 +299,43 @@ public class DistMatrixCalculator {
 	public double calcEuclid(double[] row, double[] otherRow) {
 		
 		double sum = 0;
+		int skipped = 0;
 		/* compare each value of both elements */
 		for (int k = 0; k < row.length; k++) {
+			
+			/* Skip missing data */
+			if(Helper.nearlyEqual(row[k], DataModel.NODATA) 
+					|| Helper.nearlyEqual(otherRow[k], DataModel.NODATA)) {
+				skipped++;
+				continue;
+			}
 			
 			double diff = row[k] - otherRow[k];
 			sum += diff * diff; 
 		}
 		
-		return sum/ taskData.length;
+		return sum/ (taskData.length - skipped);
 	}
 	
 	/**
 	 * Calculates the Manhattan distance between two elements.
-	 * @param element One matrix element.
-	 * @param otherElement Another matrix element.
+	 * @param row One matrix element.
+	 * @param otherRow Another matrix element.
 	 * @return double The Manhattan distance between the two elements.
 	 */
-	public double calcManhattan(double[] element, double[] otherElement) {
+	public double calcManhattan(double[] row, double[] otherRow) {
 		
 		double sum = 0;
 		/* compare each value of both elements */
-		for (int k = 0; k < element.length; k++) {
+		for (int k = 0; k < row.length; k++) {
 			
-			sum += Math.abs(element[k] - otherElement[k]);
+			/* Skip missing data */
+			if(Helper.nearlyEqual(row[k], DataModel.NODATA) 
+					|| Helper.nearlyEqual(otherRow[k], DataModel.NODATA)) {
+				continue;
+			}
+			
+			sum += Math.abs(row[k] - otherRow[k]);
 		}
 		
 		return sum;

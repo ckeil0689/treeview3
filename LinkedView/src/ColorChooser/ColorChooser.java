@@ -37,17 +37,16 @@ import Utilities.Helper;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
-import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractorEditor;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
 
 public class ColorChooser implements ConfigNodePersistent {
 	
-	private final JPanel mainPanel;
+	private JPanel mainPanel;
 	private Preferences configNode;
 
-	private final GradientBox gradientBox;
+	private GradientBox gradientBox;
 
 	private Color[] colors;
 	private float[] fractions;
@@ -55,24 +54,30 @@ public class ColorChooser implements ConfigNodePersistent {
 	private final double minVal;
 	private final double maxVal;
 
-	private final List<Color> colorList;
-	private final List<Thumb> thumbList;
+	private List<Color> colorList;
+	private List<Thumb> thumbList;
 
-	private final JButton addBtn;
-	private final JButton removeBtn;
+	private JButton addBtn;
+	private JButton removeBtn;
 	private JButton saveButton;
 
-	private final JRadioButton redGreenBtn;
-	private final JRadioButton yellowBlueBtn;
-	private final JRadioButton customColorBtn;
-	private final JButton missingBtn;
+	private JRadioButton redGreenBtn;
+	private JRadioButton yellowBlueBtn;
+	private JRadioButton customColorBtn;
+	private JButton missingBtn;
 
 	private boolean customSelected;
 
-	private final ButtonGroup colorBtnGroup;
+	private ButtonGroup colorBtnGroup;
 
+	/* Responsible for active data-to-color mapping */
 	private final ColorExtractor colorExtractor;
+	
+	/* Holds all preset color data */
 	private final ColorPresets colorPresets;
+	
+	/* The currently active set of colors */
+	private ColorSet activeColorSet;
 
 	private Thumb selectedThumb = null;
 
@@ -82,7 +87,12 @@ public class ColorChooser implements ConfigNodePersistent {
 		this.colorPresets = DendrogramFactory.getColorPresets();
 		this.minVal = minVal;
 		this.maxVal = maxVal;
-
+		
+		setLayout();
+	}
+	
+	private void setLayout() {
+		
 		mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 		mainPanel.setBorder(BorderFactory.createEtchedBorder());
 
@@ -127,23 +137,6 @@ public class ColorChooser implements ConfigNodePersistent {
 		mainPanel.add(addBtn, "pushx, split 2, alignx 50%");
 		mainPanel.add(removeBtn, "pushx, wrap");
 		mainPanel.add(radioButtonPanel, "pushx, wrap");
-		
-		missingBtn.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-
-				final Color trial = JColorChooser.showDialog(
-						mainPanel, "Pick Color for "
-								+ "Missing", colorExtractor.getMissing());
-				if (trial != null) {
-					colorExtractor.setMissingColor(trial);
-
-					colorExtractor.notifyObservers();
-					mainPanel.repaint();
-				}
-			}
-		});
 	}
 
 	@Override
@@ -151,6 +144,9 @@ public class ColorChooser implements ConfigNodePersistent {
 
 		if (parentNode != null) {
 			this.configNode = parentNode.node("GradientChooser");
+			
+			String colorSet = configNode.get("activeColors", "RedGreen");
+			this.activeColorSet = colorPresets.getColorSet(colorSet);
 
 		} else {
 			LogBuffer.println("Could not find or create GradientChooser "
@@ -352,7 +348,7 @@ public class ColorChooser implements ConfigNodePersistent {
 						+ ") are different in drawNumbBox!");
 			}
 
-			setColors();
+			setGradientColors();
 			repaint();
 		}
 
@@ -381,7 +377,7 @@ public class ColorChooser implements ConfigNodePersistent {
 						+ ") are different in drawNumbBox!");
 			}
 
-			setColors();
+			setGradientColors();
 			repaint();
 		}
 
@@ -391,7 +387,7 @@ public class ColorChooser implements ConfigNodePersistent {
 		 * @param newCol
 		 * @param point
 		 */
-		public void setGradientColor(final Point point) {
+		protected void setGradientColor(final Point point) {
 
 			Color newCol = null;
 
@@ -413,68 +409,54 @@ public class ColorChooser implements ConfigNodePersistent {
 			if (newCol != null) {
 				colorList.set(index, newCol);
 				thumbList.get(index).setColor(newCol);
-				setColors();
+				setGradientColors();
 			}
 		}
 
 		/**
-		 * Sets the color in colors[] at the specified index.
-		 * 
-		 * @param newCol
-		 * @param index
+		 * Set all default color values.
 		 */
-		public void setColors() {
+		private void setPresets() {
 
-			colorExtractor.setNewParams(fractions, colorList);
-			colorExtractor.notifyObservers();
-			mainPanel.repaint();
-		}
-
-		/**
-		 * Resets the color values to default.
-		 * 
-		 * @param redGreen
-		 */
-		public void setPresets() {
-
+			/* clearing all data */
 			colorList.clear();
 			thumbList.clear();
 			fractions = resetFractions();
 
 			final String defaultColors = "RedGreen";
 			
+			/* Get the active ColorSet name */
 			String colorScheme = defaultColors;
 			if (configNode != null) {
 				colorScheme = configNode.get("activeColors",
 					defaultColors);
 			}
 
+			/* Choose ColorSet according to name */
+			final ColorSet selectedColorSet;
 			if (colorScheme.equalsIgnoreCase("Custom")) {
 				customColorBtn.setSelected(true);
 				setCustomSelected(true);
-				final ColorSet savedColorSet = colorPresets
-						.getColorSet(colorScheme);
-				loadPresets(savedColorSet);
+				selectedColorSet = colorPresets.getColorSet(colorScheme);
 
 			} else if (colorScheme.equalsIgnoreCase(defaultColors)) {
-				// Colors should be defined as default ColorSet in ColorPresets
 				redGreenBtn.setSelected(true);
 				setCustomSelected(false);
-				final ColorSet rgColorSet = colorPresets
-						.getColorSet(colorScheme);
-				loadPresets(rgColorSet);
+				selectedColorSet = colorPresets.getColorSet(colorScheme);
 
 			} else if (colorScheme.equalsIgnoreCase("YellowBlue")) {
 				yellowBlueBtn.setSelected(true);
 				setCustomSelected(false);
-				final ColorSet ybColorSet = colorPresets
-						.getColorSet("YellowBlue");
-				loadPresets(ybColorSet);
+				selectedColorSet = colorPresets.getColorSet("YellowBlue");
 
 			} else {
+				/* Should never get here */
+				selectedColorSet = null;
 				LogBuffer.println("No matching ColorSet found in "
 						+ "ColorGradientChooser.setPresets()");
 			}
+			
+			loadPresets(selectedColorSet);
 		}
 
 		/**
@@ -483,7 +465,7 @@ public class ColorChooser implements ConfigNodePersistent {
 		 * 
 		 * @param colorSet
 		 */
-		public void loadPresets(final ColorSet colorSet) {
+		private void loadPresets(final ColorSet colorSet) {
 
 			final String[] colors = colorSet.getColors();
 
@@ -495,12 +477,26 @@ public class ColorChooser implements ConfigNodePersistent {
 			final float[] fracs = colorSet.getFractions();
 			fractions = fracs;
 		}
+		
+		/**
+		 * Sets the color in colors[] at the specified index.
+		 * 
+		 * @param newCol
+		 * @param index
+		 */
+		private void setGradientColors() {
+
+			colorExtractor.setNewParams(fractions, colorList);
+			colorExtractor.setMissingColor(activeColorSet.getMissing());
+			colorExtractor.notifyObservers();
+			mainPanel.repaint();
+		}
 
 		/**
 		 * Serves to store the currently chosen custom color setup in a
 		 * configNode.
 		 */
-		public void saveCustomPresets() {
+		protected void saveCustomPresets() {
 
 			final List<Double> fractionList = new ArrayList<Double>();
 
@@ -510,8 +506,14 @@ public class ColorChooser implements ConfigNodePersistent {
 			}
 
 			final String colorSetName = "Custom";
+			String missing = Integer.toHexString(colorExtractor.getMissing()
+					.getRGB());
+			missing = "#" + missing.substring(2, missing.length());
+			String empty = Integer.toHexString(colorExtractor.getEmpty()
+					.getRGB());
+			empty = "#" + empty.substring(2, empty.length());
 			colorPresets.addColorSet(colorSetName, colorList, fractionList,
-					 "#909090", "#FFFFFF");
+					 missing, empty);
 			
 			LogBuffer.println("Custom colors saved.");
 		}
@@ -523,7 +525,7 @@ public class ColorChooser implements ConfigNodePersistent {
 		 * @param point
 		 * @return
 		 */
-		public boolean isGradientArea(final Point point) {
+		protected boolean isGradientArea(final Point point) {
 
 			boolean inArea = false;
 
@@ -542,7 +544,7 @@ public class ColorChooser implements ConfigNodePersistent {
 		 * @param y
 		 * @return
 		 */
-		public boolean containsThumb(final int x, final int y) {
+		protected boolean containsThumb(final int x, final int y) {
 
 			boolean containsThumb = false;
 
@@ -562,7 +564,7 @@ public class ColorChooser implements ConfigNodePersistent {
 		 * 
 		 * @param point
 		 */
-		public void selectThumb(final Point point) {
+		protected void selectThumb(final Point point) {
 
 			for (final Thumb t : thumbList) {
 
@@ -585,7 +587,7 @@ public class ColorChooser implements ConfigNodePersistent {
 		 * aren't ascending. This would cause an exception with
 		 * LinearGradientPaint.
 		 */
-		public void verifyThumbs() {
+		private void verifyThumbs() {
 
 			final int x = (int) thumbRect.getX();
 			final int w = (int) thumbRect.getWidth();
@@ -607,7 +609,7 @@ public class ColorChooser implements ConfigNodePersistent {
 			}
 		}
 
-		public boolean verifyFractions() {
+		private boolean verifyFractions() {
 
 			boolean ascending = true;
 			for (int i = 0; i < fractions.length - 1; i++) {
@@ -642,7 +644,7 @@ public class ColorChooser implements ConfigNodePersistent {
 		 * @param pos
 		 * @return
 		 */
-		public boolean checkThumbPresence(final int thumbIndex) {
+		private boolean checkThumbPresence(final int thumbIndex) {
 
 			boolean isPresent = false;
 
@@ -670,7 +672,7 @@ public class ColorChooser implements ConfigNodePersistent {
 		 * @param x
 		 * @param color
 		 */
-		public void insertThumbAt(final int x, final Color color) {
+		private void insertThumbAt(final int x, final Color color) {
 
 			int index = 0;
 			for (final Thumb t : thumbList) {
@@ -687,7 +689,7 @@ public class ColorChooser implements ConfigNodePersistent {
 		/**
 		 * Sets all thumbs' selection status to 'false'.
 		 */
-		public void deselectAllThumbs() {
+		protected void deselectAllThumbs() {
 
 			for (final Thumb t : thumbList) {
 
@@ -696,7 +698,7 @@ public class ColorChooser implements ConfigNodePersistent {
 			}
 		}
 
-		public void updateThumbPos(final int inputX) {
+		protected void updateThumbPos(final int inputX) {
 
 			final float[] checkFracs = fractions.clone();
 
@@ -749,7 +751,7 @@ public class ColorChooser implements ConfigNodePersistent {
 							+ Arrays.toString(fractions));
 				}
 
-				setColors();
+				setGradientColors();
 				repaint();
 			}
 		}
@@ -759,7 +761,7 @@ public class ColorChooser implements ConfigNodePersistent {
 		 * 
 		 * @param thumbIndex
 		 */
-		public void adjustThumbPos(final int thumbIndex) {
+		private void adjustThumbPos(final int thumbIndex) {
 
 			final int inputX = (int) (fractions[thumbIndex] * thumbRect
 					.getWidth());
@@ -772,7 +774,7 @@ public class ColorChooser implements ConfigNodePersistent {
 			repaint();
 		}
 
-		public void specifyThumbPos(final Point point) {
+		protected void specifyThumbPos(final Point point) {
 
 			for (final Thumb t : thumbList) {
 
@@ -842,7 +844,7 @@ public class ColorChooser implements ConfigNodePersistent {
 				}
 			}
 
-			setColors();
+			setGradientColors();
 			repaint();
 		}
 
@@ -853,7 +855,7 @@ public class ColorChooser implements ConfigNodePersistent {
 		 * 
 		 * @return
 		 */
-		public float[] updateFractions() {
+		private float[] updateFractions() {
 
 			final float[] fractions = new float[colorList.size()];
 
@@ -872,7 +874,7 @@ public class ColorChooser implements ConfigNodePersistent {
 		 * 
 		 * @return
 		 */
-		public float[] resetFractions() {
+		private float[] resetFractions() {
 
 			return new float[] { 0.0f, 0.5f, 1.0f };
 		}
@@ -1125,13 +1127,20 @@ public class ColorChooser implements ConfigNodePersistent {
 	 */
 	public void switchColorSet(final String name) {
 
-		configNode.put("activeColors", name);
+		setActiveColorSet(name);
+		
+		/* Load and set data accordingly */
 		gradientBox.setPresets();
-		gradientBox.setColors();
+		gradientBox.setGradientColors();
 	}
 
+	/**
+	 * Sets the activeColors key in configNode  
+	 * @param name
+	 */
 	public void setActiveColorSet(final String name) {
 
+		this.activeColorSet = colorPresets.getColorSet(name);
 		configNode.put("activeColors", name);
 	}
 
@@ -1141,7 +1150,7 @@ public class ColorChooser implements ConfigNodePersistent {
 	}
 
 	// Listeners
-	protected void addThumbSelectionListener(final MouseListener l) {
+	protected void addThumbSelectListener(final MouseListener l) {
 
 		gradientBox.addMouseListener(l);
 	}
@@ -1177,135 +1186,4 @@ public class ColorChooser implements ConfigNodePersistent {
 
 		saveButton.addActionListener(l);
 	}
-
-	// // Inner Classes
-	// /**
-	// * this class allows the presets to be selected...
-	// */
-	// class ColorPresetsPanel extends JPanel {
-	//
-	// private static final long serialVersionUID = 1L;
-	//
-	// ColorPresetsPanel() {
-	//
-	// redoLayout();
-	// }
-	//
-	// public void redoLayout() {
-	//
-	// removeAll();
-	// this.setBackground(GUIParams.BG_COLOR);
-	// final int nPresets = colorPresets.getNumPresets();
-	// final JButton[] buttons = new JButton[nPresets];
-	// for (int i = 0; i < nPresets; i++) {
-	// final JButton presetButton = GUIParams.setButtonLayout((
-	// colorPresets.getPresetNames())[i], null);
-	// final int index = i;
-	// presetButton.addActionListener(new ActionListener() {
-	//
-	// @Override
-	// public void actionPerformed(final ActionEvent e) {
-	//
-	// colorExtractorEditor.copyStateFrom(colorPresets
-	// .getColorSet(index));
-	// }
-	// });
-	// this.add(presetButton);
-	//
-	// buttons[index] = presetButton;
-	// }
-	// }
-	// }
-	//
-	// class CEEButtons extends JPanel {
-	//
-	// private static final long serialVersionUID = 1L;
-	//
-	// CEEButtons() {
-	//
-	// this.setOpaque(false);
-	// final JButton loadButton = GUIParams.setButtonLayout("Load", null);
-	// loadButton.addActionListener(new ActionListener() {
-	//
-	// @Override
-	// public void actionPerformed(final ActionEvent e) {
-	//
-	// final JFileChooser chooser = new JFileChooser();
-	// final int returnVal = chooser
-	// .showOpenDialog(CEEButtons.this);
-	// if (returnVal == JFileChooser.APPROVE_OPTION) {
-	// final File f = chooser.getSelectedFile();
-	// try {
-	// final ColorSet temp = new ColorSet();
-	// temp.loadEisen(f);
-	// colorExtractorEditor.copyStateFrom(temp);
-	//
-	// } catch (final IOException ex) {
-	// JOptionPane.showMessageDialog(CEEButtons.this,
-	// "Could not load from " + f.toString()
-	// + "\n" + ex);
-	// }
-	// }
-	// }
-	// });
-	// this.add(loadButton);
-	//
-	// final JButton saveButton = GUIParams.setButtonLayout("Save", null);
-	// saveButton.addActionListener(new ActionListener() {
-	//
-	// @Override
-	// public void actionPerformed(final ActionEvent e) {
-	//
-	// final JFileChooser chooser = new JFileChooser();
-	// final int returnVal = chooser
-	// .showSaveDialog(CEEButtons.this);
-	// if (returnVal == JFileChooser.APPROVE_OPTION) {
-	// final File f = chooser.getSelectedFile();
-	// try {
-	// final ColorSet temp = new ColorSet();
-	// colorExtractorEditor.copyStateTo(temp);
-	// temp.saveEisen(f);
-	//
-	// } catch (final IOException ex) {
-	// JOptionPane.showMessageDialog(CEEButtons.this,
-	// "Could not save to " + f.toString() + "\n"
-	// + ex);
-	// }
-	// }
-	// }
-	// });
-	// this.add(saveButton);
-	//
-	// final JButton makeButton = GUIParams.setButtonLayout("Make Preset",
-	// null);
-	// makeButton.addActionListener(new ActionListener() {
-	//
-	// @Override
-	// public void actionPerformed(final ActionEvent e) {
-	//
-	// final ColorSet temp = new ColorSet();
-	// colorExtractorEditor.copyStateTo(temp);
-	// temp.setName("UserDefined");
-	// colorPresets.addColorSet(temp);
-	// colorPresetsPanel.redoLayout();
-	// colorPresetsPanel.invalidate();
-	// colorPresetsPanel.revalidate();
-	// colorPresetsPanel.repaint();
-	// }
-	// });
-	// this.add(makeButton);
-	//
-	// final JButton resetButton = GUIParams.setButtonLayout(
-	// "Reset Presets", null);
-	// resetButton.addActionListener(new ActionListener() {
-	//
-	// @Override
-	// public void actionPerformed(final ActionEvent e) {
-	//
-	// colorPresets.reset();
-	// }
-	// });
-	// this.add(resetButton);
-	// }
-	// }
 }

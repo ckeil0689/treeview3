@@ -338,6 +338,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	 *            The new empty value
 	 */
 	public void setMissing(final double missing, final double empty) {
+		
 		this.nodata = missing;
 		this.empty = empty;
 
@@ -348,6 +349,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	 * The color for missing data.
 	 */
 	public Color getMissing() {
+		
 		return colorSet.getMissing();
 	}
 
@@ -356,6 +358,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	 * data, like in the KnnView. These cells are just used for spacing.
 	 */
 	public Color getEmpty() {
+		
 		return colorSet.getEmpty();
 	}
 	
@@ -391,6 +394,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	 * The empty is a color to be used for cells which do not correspond to data
 	 */
 	public void setEmptyColor(final String newString) {
+		
 		if (newString == null) {
 			return;
 		}

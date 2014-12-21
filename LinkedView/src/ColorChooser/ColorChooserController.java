@@ -23,7 +23,6 @@ public class ColorChooserController {
 
 		this.gradientPick = gradientPick;
 
-		// Add listeners
 		addAllListeners();
 	}
 
@@ -42,17 +41,17 @@ public class ColorChooserController {
     }
     
 	/**
-	 * Adds all listeners to the ColorGradientChooser object.
+	 * Adds all defined listeners to the ColorGradientChooser object.
 	 */
 	public void addAllListeners() {
 
 		if (gradientPick != null) {
-			gradientPick
-					.addThumbSelectionListener(new ThumbSelectionListener());
+			gradientPick.addThumbSelectListener(new ThumbSelectListener());
 			gradientPick.addThumbMotionListener(new ThumbMotionListener());
 			gradientPick.addAddListener(new AddButtonListener());
 			gradientPick.addRemoveListener(new RemoveButtonListener());
 			gradientPick.addDefaultListener(new DefaultListener());
+			gradientPick.addMissingListener(new MissingBtnListener());
 		}
 	}
 
@@ -63,14 +62,15 @@ public class ColorChooserController {
 	 * @author CKeil
 	 * 
 	 */
-	protected class ThumbSelectionListener implements MouseListener,
+	protected class ThumbSelectListener implements MouseListener,
 			ActionListener {
 
 		private final Timer timer;
 		private MouseEvent lastEvent;
 
-		protected ThumbSelectionListener() {
-			timer = new Timer(ColorChooserController.getMultiClickInterval(), this);
+		protected ThumbSelectListener() {
+			timer = new Timer(ColorChooserController.getMultiClickInterval(), 
+					this);
 		}
 
 		/**
@@ -210,6 +210,7 @@ public class ColorChooserController {
 		public void actionPerformed(final ActionEvent arg0) {
 
 			if (arg0.getSource() == gradientPick.getRGButton()) {
+				/* Save if switching from 'Custom' */
 				if (gradientPick.getConfigNode()
 						.get("activeColors", "RedGreen")
 						.equalsIgnoreCase("Custom")) {
@@ -219,6 +220,7 @@ public class ColorChooserController {
 				gradientPick.setCustomSelected(false);
 
 			} else if (arg0.getSource() == gradientPick.getYBButton()) {
+				/* Save if switching from 'Custom' */
 				if (gradientPick.getConfigNode()
 						.get("activeColors", "YellowBlue")
 						.equalsIgnoreCase("Custom")) {
@@ -243,12 +245,12 @@ public class ColorChooserController {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			final Color trial = JColorChooser.showDialog(
+			final Color missing = JColorChooser.showDialog(
 					gradientPick.getMainPanel(), "Pick Color for Missing", 
 					gradientPick.getColorExtractor().getMissing());
 			
-			if (trial != null) {
-				gradientPick.getColorExtractor().setMissingColor(trial);
+			if (missing != null) {
+				gradientPick.getColorExtractor().setMissingColor(missing);
 				gradientPick.getColorExtractor().notifyObservers();
 			}
 		}
