@@ -257,7 +257,6 @@ public class ColorChooser implements ConfigNodePersistent {
 			final float startY = (float) gradientRect.getMinY();
 
 			final float endX = (float) gradientRect.getMaxX();
-			final float endY = (float) gradientRect.getMaxY();
 			
 			final int height = (int) gradientRect.getHeight();
 			final int width = (int) gradientRect.getWidth();
@@ -808,24 +807,6 @@ public class ColorChooser implements ConfigNodePersistent {
 				setGradientColors();
 				repaint();
 			}
-		}
-
-		/**
-		 * Adjust thumb positions when the PreferencesMenu JDialog is resized.
-		 * 
-		 * @param thumbIndex
-		 */
-		private void adjustThumbPos(final int thumbIndex) {
-
-			final int inputX = (int) (fractions[thumbIndex] * thumbRect
-					.getWidth());
-			final int deltaX = inputX - thumbList.get(thumbIndex).getX();
-			final int newX = thumbList.get(thumbIndex).getX() + deltaX;
-
-			thumbList.get(thumbIndex).setCoords(newX,
-					(int) thumbRect.getHeight());
-
-			repaint();
 		}
 
 		protected void specifyThumbPos(final Point point) {
