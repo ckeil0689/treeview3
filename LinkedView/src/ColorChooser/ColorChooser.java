@@ -11,6 +11,7 @@ import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.GeneralPath;
@@ -97,7 +98,8 @@ public class ColorChooser implements ConfigNodePersistent {
 	 * @param minVal Minimum boundary of the data.
 	 * @param maxVal Maximum boundary of the data.
 	 */
-	public ColorChooser(final ColorExtractor drawer, Double minVal, Double maxVal) {
+	public ColorChooser(final ColorExtractor drawer, Double minVal, 
+			Double maxVal) {
 
 		this.colorExtractor = drawer;
 		this.colorPresets = DendrogramFactory.getColorPresets();
@@ -198,6 +200,8 @@ public class ColorChooser implements ConfigNodePersistent {
 		public GradientBox() {
 			
 			this.fm = getFontMetrics(GUIFactory.FONTS);
+			
+			setToolTipText("This Turns Tooltips On");
 
 			setFocusable(true);
 			setPresets();
@@ -353,7 +357,7 @@ public class ColorChooser implements ConfigNodePersistent {
 					(int) ((numRect.getHeight() / 2) + numRect
 							.getMinY()));
 			
-			double last = minVal;
+			double last = maxVal;
 			x = (int) numRect.getMaxX();
 			int stringWidth = fm.stringWidth(Double.toString(last));
 			
@@ -913,6 +917,25 @@ public class ColorChooser implements ConfigNodePersistent {
 		private float[] resetFractions() {
 
 			return new float[] { 0.0f, 0.5f, 1.0f };
+		}
+		
+		@Override
+		public String getToolTipText(final MouseEvent e) {
+
+			String ret = "";
+			int i = 0;
+			for (final Thumb t : thumbList) {
+
+				if (t.contains((int) e.getX(), (int) e.getY())) {
+					final float fraction = fractions[i];
+					double value = Math.abs((maxVal - minVal) * fraction)
+							+ minVal;
+					value = (double) Math.round(value * 1000) / 1000;
+					ret = Double.toString(value);
+				}
+				i++;
+			}
+			return ret;
 		}
 	}
 
