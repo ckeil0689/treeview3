@@ -150,7 +150,7 @@ public class ColorChooser implements ConfigNodePersistent {
 		gradientBox.setPresets();
 		
 		mainPanel.add(hint, "span, wrap");
-		mainPanel.add(gradientBox, "h 100:100:, w 400:400:, pushx, alignx 50%, "
+		mainPanel.add(gradientBox, "h 150:150:, w 500:500:, pushx, alignx 50%, "
 				+ "span, wrap");
 		mainPanel.add(addBtn, "pushx, split 3, alignx 50%");
 		mainPanel.add(removeBtn, "pushx");
@@ -184,12 +184,20 @@ public class ColorChooser implements ConfigNodePersistent {
 
 		private final Rectangle2D gradientRect = new Rectangle2D.Float();
 		private final Rectangle2D thumbRect = new Rectangle2D.Float();
+		private final Rectangle2D rulerRect = new Rectangle2D.Float();
 		private final Rectangle2D numRect = new Rectangle2D.Float();
+		
+		private final FontMetrics fm;
+		
+		/* Adjust this to MigLayout variables of mainPanel! */
+		private static final int WIDTH = 450; 
 
 		/**
 		 * Constructs a GradientBox object.
 		 */
 		public GradientBox() {
+			
+			this.fm = getFontMetrics(GUIFactory.FONTS);
 
 			setFocusable(true);
 			setPresets();
@@ -200,8 +208,8 @@ public class ColorChooser implements ConfigNodePersistent {
 
 			super.paintComponent(g);
 
-			final int width = (int) getSize().getWidth();
-			final int height = (int) getSize().getHeight();
+			final double width = getSize().getWidth();
+			final double height = getSize().getHeight();
 
 			setupRects(width, height);
 
@@ -225,27 +233,34 @@ public class ColorChooser implements ConfigNodePersistent {
 				LogBuffer.println("Colors: " + colorList.toString());
 			}
 
+			drawRulerBox(g2);
 			drawNumBox(g2);
 
 			g2.dispose();
 		}
 
-		private void setupRects(final int width, final int height) {
-
-			gradientRect.setRect(0, height * 1 / 4, width, height * 2 / 4);
-			thumbRect.setRect(0, 0, width, height * 1 / 4);
-			numRect.setRect(0, height * 3 / 4, width, height * 1 / 4);
+		private void setupRects(final double width, final double height) {
+			
+			int start = ((int)width - WIDTH)/ 2;
+			
+			thumbRect.setRect(start, 0, WIDTH, 30);
+			gradientRect.setRect(start, 30, WIDTH, 70);
+			rulerRect.setRect(start, 100, WIDTH, 10);
+			numRect.setRect(start, 110, WIDTH, 40);
 		}
 
 		private void drawGradientBox(final Graphics2D g2)
 				throws IllegalArgumentException {
 
 			// Dimensions
-			final float startX = (float) gradientRect.getX();
-			final float startY = (float) gradientRect.getY();
+			final float startX = (float) gradientRect.getMinX();
+			final float startY = (float) gradientRect.getMinY();
 
-			final float endX = (float) gradientRect.getWidth() + startX;
-			final float endY = (float) gradientRect.getHeight() + startY;
+			final float endX = (float) gradientRect.getMaxX();
+			final float endY = (float) gradientRect.getMaxY();
+			
+			final int height = (int) gradientRect.getHeight();
+			final int width = (int) gradientRect.getWidth();
 
 			Color[] colors = new Color[colorList.size()];
 
@@ -256,11 +271,11 @@ public class ColorChooser implements ConfigNodePersistent {
 
 			// Generating Gradient to fill the rectangle with
 			final LinearGradientPaint gradient = new LinearGradientPaint(
-					startX, startY, endX, endY, fractions, colors,
+					startX, startY, endX, startY, fractions, colors, 
 					CycleMethod.NO_CYCLE);
 
 			g2.setPaint(gradient);
-			g2.fillRect((int) startX, (int) startY, (int) endX, (int) endY);
+			g2.fillRect((int) startX, (int) startY, width, height);
 		}
 
 		private void drawThumbBox(final Graphics2D g2) {
@@ -274,6 +289,31 @@ public class ColorChooser implements ConfigNodePersistent {
 
 				t.paint(g2);
 			}
+		}
+		
+		private void drawRulerBox(final Graphics2D g2) {
+			
+			g2.setColor(Color.black);
+		    
+			final int minY = (int) rulerRect.getMinY();
+			final int minX = (int) rulerRect.getMinX();
+			final int maxX = (int) rulerRect.getMaxX();
+		    
+		    for (int x = minX; x < maxX + 1; x++) {
+		    	
+		    	if(x == minX || x == maxX) {
+		    		g2.drawLine(x, minY, x, minY + 10);
+		    		
+		    	} else if ((x - minX) % 50 == 0) {
+		            g2.drawLine(x, minY, x, minY + 5);
+		     	}
+//		        else if (x % 10 == 0) {
+//		            g2.drawLine(x, maxY - 10, x, maxY);
+//		        }
+//		        else if (x % 2 == 0) {
+//		            g2.drawLine(x, maxY - 5, x, maxY);
+//		        }
+		    }
 		}
 
 		private void drawNumBox(final Graphics2D g2) {
@@ -305,8 +345,6 @@ public class ColorChooser implements ConfigNodePersistent {
 //						+ ") and fractions size (" + fractions.length
 //						+ ") are different in drawNumbBox!");
 //			}
-			
-			FontMetrics fm = getFontMetrics(GUIFactory.FONTS);
 			
 			/* Draw first number */
 			double first = minVal;
@@ -344,7 +382,8 @@ public class ColorChooser implements ConfigNodePersistent {
 
 			colorList.add(selectedIndex + 1, newCol);
 
-			final double halfRange = (fractions[selectedIndex + 1] - fractions[selectedIndex]) / 2;
+			final double halfRange = (fractions[selectedIndex + 1] 
+					- fractions[selectedIndex]) / 2;
 
 			final double newFraction = halfRange + fractions[selectedIndex];
 
@@ -601,7 +640,7 @@ public class ColorChooser implements ConfigNodePersistent {
 		 */
 		private void verifyThumbs() {
 
-			final int x = (int) thumbRect.getX();
+			final int x = (int) thumbRect.getMinX();
 			final int w = (int) thumbRect.getWidth();
 
 			for (int i = 0; i < fractions.length; i++) {
@@ -615,9 +654,10 @@ public class ColorChooser implements ConfigNodePersistent {
 								.size() == fractions.length)) {
 					insertThumbAt(pos, colorList.get(i));
 
-				} else {
-					adjustThumbPos(i);
-				}
+				} 
+//				else {
+//					adjustThumbPos(i);
+//				}
 			}
 		}
 
@@ -714,11 +754,13 @@ public class ColorChooser implements ConfigNodePersistent {
 
 			final float[] checkFracs = fractions.clone();
 
-			if (selectedThumb != null) {
+			if (selectedThumb != null
+					&& inputX >= (int)thumbRect.getMinX() 
+					&& inputX <= (int)thumbRect.getMaxX()) {
 				// get position of previous thumb
 				final int selectedIndex = thumbList.indexOf(selectedThumb);
 				int previousPos = 0;
-				int nextPos = gradientBox.getWidth();
+				int nextPos = (int)thumbRect.getMaxX();
 
 				if (selectedIndex == 0) {
 					nextPos = thumbList.get(selectedIndex + 1).getX();
@@ -746,7 +788,7 @@ public class ColorChooser implements ConfigNodePersistent {
 					selectedThumb.setCoords(newX, selectedThumb.getY());
 					fractions = updateFractions();
 
-				} else if (newX > nextPos && nextPos != gradientBox.getWidth()) {
+				} else if (newX > nextPos && nextPos != thumbRect.getMaxX()) {
 					Collections.swap(thumbList, selectedIndex,
 							selectedIndex + 1);
 					Collections.swap(colorList, selectedIndex,
@@ -874,7 +916,7 @@ public class ColorChooser implements ConfigNodePersistent {
 			int i = 0;
 			for (final Thumb t : thumbList) {
 
-				fractions[i] = (float) (t.getX() / gradientRect.getWidth());
+				fractions[i] = (float) (t.getX() / gradientRect.getMaxX());
 				i++;
 			}
 
