@@ -479,8 +479,6 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 			final List<Color> colorVals) {
 
 		if (Helper.nearlyEqual(dval, nodata)) {
-			LogBuffer.println("value " + dval + " was nodata");
-			LogBuffer.println(Arrays.toString(missingColor));
 			return missingColor;
 			// return new Color(missingColor[0], missingColor[1],
 			// missingColor[2]);

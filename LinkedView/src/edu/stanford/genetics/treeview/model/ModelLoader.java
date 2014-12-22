@@ -283,9 +283,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 				dataValues[i] = val;
 
 			} catch (final Exception e) {
-				LogBuffer.println("Exception when trying to parse "
-						+ "a double in extractData() in "
-						+ "ModelLoader: " + e.getMessage());
 				final double val = DataModel.NODATA;
 				dataValues[i] = val;
 			}

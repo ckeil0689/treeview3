@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import javax.swing.UIManager;
+
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
@@ -57,8 +59,10 @@ public class ColorPresets implements ConfigNodePersistent {
 		defaultColorSets = new ColorSet[2];
 		defaultColorSets[0] = new ColorSet("RedGreen", "#FF0000", "#000000",
 				"#00FF00", "#FFFFFF", "#FFFFFF");
+		defaultColorSets[0].setMissing(UIManager.getColor("Panel.background"));
 		defaultColorSets[1] = new ColorSet("YellowBlue", "#FEFF00", "#000000",
 				"#1BB7E5", "#FFFFFF", "#FFFFFF");
+		defaultColorSets[1].setMissing(UIManager.getColor("Panel.background"));
 	}
 
 	private Preferences configNode;	
@@ -74,7 +78,15 @@ public class ColorPresets implements ConfigNodePersistent {
 	 *            node to bind to
 	 */
 	public ColorPresets(final Preferences parent) {
+		
 		super();
+		
+//		Color sysBackground = UIManager.getColor("Panel.background");
+//		String sysBack = Integer.toHexString(sysBackground.getRGB());
+//		sysBack = sysBack.substring(2, sysBack.length());
+//		
+//		defaultColorSets[0].setMissing(UIManager.getColor("Panel.background"));
+		
 		setConfigNode(parent);
 	}
 
