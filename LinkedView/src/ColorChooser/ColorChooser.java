@@ -775,11 +775,12 @@ public class ColorChooser implements ConfigNodePersistent {
 				final int deltaX = inputX - selectedThumb.getX();
 				final int newX = selectedThumb.getX() + deltaX;
 
-				if (previousPos <= newX && newX <= nextPos) {
+				if (previousPos < newX && newX < nextPos) {
 					selectedThumb.setCoords(newX, selectedThumb.getY());
 					fractions = updateFractions();
 
-				} else if (newX < previousPos && previousPos != 0) {
+				} else if (newX < previousPos 
+						&& previousPos != thumbRect.getMinX()) {
 					Collections.swap(thumbList, selectedIndex,
 							selectedIndex - 1);
 					Collections.swap(colorList, selectedIndex,
@@ -787,7 +788,7 @@ public class ColorChooser implements ConfigNodePersistent {
 					selectedThumb.setCoords(newX, selectedThumb.getY());
 					fractions = updateFractions();
 
-				} else if (newX > nextPos && nextPos != thumbRect.getMaxX()) {
+				} else if (newX > nextPos && nextPos < thumbRect.getMaxX()) {
 					Collections.swap(thumbList, selectedIndex,
 							selectedIndex + 1);
 					Collections.swap(colorList, selectedIndex,
