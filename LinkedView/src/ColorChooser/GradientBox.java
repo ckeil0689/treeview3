@@ -50,6 +50,9 @@ public class GradientBox extends JPanel {
 	/* List of all active colors (depends on active ColorSet)  */
 	private List<Color> colorList;
 	
+	/* Inflexible array of colors for LinearGradientPaint */ 
+	private Color[] colors;
+	
 	/* List of all active thumbs (one per color) */
 	private List<Thumb> thumbList;
 	
@@ -150,12 +153,12 @@ public class GradientBox extends JPanel {
 		final int height = (int) gradientRect.getHeight();
 		final int width = (int) gradientRect.getWidth();
 
-		Color[] colors = new Color[colorList.size()];
-
-		for (int i = 0; i < colors.length; i++) {
-
-			colors[i] = colorList.get(i);
-		}
+//		Color[] colors = new Color[colorList.size()];
+//
+//		for (int i = 0; i < colors.length; i++) {
+//
+//			colors[i] = colorList.get(i);
+//		}
 
 		// Generating Gradient to fill the rectangle with
 		final LinearGradientPaint gradient = new LinearGradientPaint(
@@ -282,6 +285,7 @@ public class GradientBox extends JPanel {
 		}
 
 		setGradientColors();
+		updateColorArray();
 		repaint();
 	}
 
@@ -311,6 +315,7 @@ public class GradientBox extends JPanel {
 		}
 
 		setGradientColors();
+		updateColorArray();
 		repaint();
 	}
 
@@ -343,6 +348,21 @@ public class GradientBox extends JPanel {
 			colorList.set(index, newCol);
 			thumbList.get(index).setColor(newCol);
 			setGradientColors();
+			updateColorArray();
+		}
+	}
+	
+	/* 
+	 * Updates the color array when needed so LinearGradientPaint can use it
+	 * to generate the gradientRect.
+	 */
+	private void updateColorArray() {
+		
+		colors = new Color[colorList.size()];
+
+		for (int i = 0; i < colors.length; i++) {
+
+			colors[i] = colorList.get(i);
 		}
 	}
 
@@ -365,6 +385,8 @@ public class GradientBox extends JPanel {
 
 			colorList.add(Color.decode(color));
 		}
+		
+		updateColorArray();
 
 		final float[] fracs = colorSet.getFractions();
 		fractions = fracs;
@@ -412,8 +434,6 @@ public class GradientBox extends JPanel {
 		empty = "#" + empty.substring(2, empty.length());
 		
 		return new ColorSet(name, colorList, fractionList, missing, empty);
-//		colorPresets.addColorSet(colorSetName, colorList, fractionList,
-//				 missing, empty);
 	}
 
 	/**
@@ -641,6 +661,7 @@ public class GradientBox extends JPanel {
 						selectedIndex - 1);
 				selectedThumb.setCoords(newX, selectedThumb.getY());
 				fractions = updateFractions();
+				updateColorArray();
 
 			} else if (newX > nextPos && nextPos < thumbRect.getMaxX()) {
 				Collections.swap(thumbList, selectedIndex,
@@ -649,6 +670,7 @@ public class GradientBox extends JPanel {
 						selectedIndex + 1);
 				selectedThumb.setCoords(newX, selectedThumb.getY());
 				fractions = updateFractions();
+				updateColorArray();
 			}
 
 			final boolean fracsOK = verifyFractions();

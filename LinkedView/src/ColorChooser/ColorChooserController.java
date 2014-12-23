@@ -10,7 +10,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
 import javax.swing.JColorChooser;
-import javax.swing.Timer;
+import javax.swing.Timer;	
 
 public class ColorChooserController {
 
