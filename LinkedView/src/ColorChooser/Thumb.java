@@ -17,10 +17,11 @@ public class Thumb {
 	private int x;
 	private int y;
 
-	private final int width = 10;
-	private final int height = 15;
+	/* Thumb dimensions */
+	private final int width = 15;
+	private final int height = 10;
 
-	private GeneralPath innerthumbPath;
+//	private GeneralPath innerthumbPath;
 	private GeneralPath outerthumbPath;
 	private Color thumbColor;
 	private boolean selected = false;
@@ -60,11 +61,11 @@ public class Thumb {
 	 */
 	public void createThumbPath() {
 
-		innerthumbPath = new GeneralPath();
-		innerthumbPath.moveTo(x, y + height / 2);
-		innerthumbPath.lineTo(x + width / 4, y - height);
-		innerthumbPath.lineTo(x - width / 4, y - height);
-		innerthumbPath.closePath();
+//		innerthumbPath = new GeneralPath();
+//		innerthumbPath.moveTo(x, y + height / 2);
+//		innerthumbPath.lineTo(x + width / 4, y - height);
+//		innerthumbPath.lineTo(x - width / 4, y - height);
+//		innerthumbPath.closePath();
 
 		outerthumbPath = new GeneralPath();
 		outerthumbPath.moveTo(x, y);
@@ -86,17 +87,29 @@ public class Thumb {
 	 */
 	public void paint(final Graphics2D g2d) {
 
+		g2d.setColor(thumbColor);
+		
+		/* draw circle above thumb if selected */
 		if (isSelected()) {
-			g2d.setColor(Color.red);
-
-		} else {
-			g2d.setColor(Color.black);
+			int yPos = y - height - 5;
+			drawCenteredCircle(g2d, x, yPos, 5);
 		}
 
 		g2d.fill(outerthumbPath);
-
-		g2d.setColor(thumbColor);
-		g2d.fill(innerthumbPath);
+	}
+	
+	/**
+	 * Draw a small circle to be positioned above the selected thumb.
+	 * @param g Graphics object
+	 * @param x x-Position
+	 * @param y y-Position
+	 * @param r Circle radius
+	 */
+	public void drawCenteredCircle(Graphics2D g, int x, int y, int r) {
+		  
+		x = x-(r/2);
+		  y = y-(r/2);
+		  g.fillOval(x,y,r,r);
 	}
 
 	/**

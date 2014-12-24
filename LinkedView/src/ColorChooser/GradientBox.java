@@ -153,18 +153,16 @@ public class GradientBox extends JPanel {
 		final int height = (int) gradientRect.getHeight();
 		final int width = (int) gradientRect.getWidth();
 
-//		Color[] colors = new Color[colorList.size()];
-//
-//		for (int i = 0; i < colors.length; i++) {
-//
-//			colors[i] = colorList.get(i);
-//		}
-
 		// Generating Gradient to fill the rectangle with
 		final LinearGradientPaint gradient = new LinearGradientPaint(
 				startX, startY, endX, startY, fractions, colors, 
 				CycleMethod.NO_CYCLE);
+		
+		/* Outline of gradient box */
+		g2.setColor(Color.black);
+		g2.drawRect((int) startX, (int) startY, width, height);
 
+		/* fill gradient box with gradient */
 		g2.setPaint(gradient);
 		g2.fillRect((int) startX, (int) startY, width, height);
 	}
