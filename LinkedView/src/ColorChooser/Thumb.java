@@ -21,7 +21,7 @@ public class Thumb {
 	private final int width = 15;
 	private final int height = 10;
 
-//	private GeneralPath innerthumbPath;
+	private GeneralPath innerthumbPath;
 	private GeneralPath outerthumbPath;
 	private Color thumbColor;
 	private boolean selected = false;
@@ -61,16 +61,16 @@ public class Thumb {
 	 */
 	public void createThumbPath() {
 
-//		innerthumbPath = new GeneralPath();
-//		innerthumbPath.moveTo(x, y + height / 2);
-//		innerthumbPath.lineTo(x + width / 4, y - height);
-//		innerthumbPath.lineTo(x - width / 4, y - height);
-//		innerthumbPath.closePath();
+		innerthumbPath = new GeneralPath();
+		innerthumbPath.moveTo(x, y);
+		innerthumbPath.lineTo(x + width/ 2, y - height);
+		innerthumbPath.lineTo(x - width/ 2, y - height);
+		innerthumbPath.closePath();
 
 		outerthumbPath = new GeneralPath();
-		outerthumbPath.moveTo(x, y);
-		outerthumbPath.lineTo(x + width / 2, y - height);
-		outerthumbPath.lineTo(x - width / 2, y - height);
+		outerthumbPath.moveTo(x, y + 2);
+		outerthumbPath.lineTo(x + (width + 4)/ 2, y - (height + 1));
+		outerthumbPath.lineTo(x - (width + 4)/ 2, y - (height + 1));
 		outerthumbPath.closePath();
 	}
 
@@ -87,6 +87,9 @@ public class Thumb {
 	 */
 	public void paint(final Graphics2D g2d) {
 
+		g2d.setColor(Color.GRAY);
+		g2d.fill(outerthumbPath);
+		
 		g2d.setColor(thumbColor);
 		
 		/* draw circle above thumb if selected */
@@ -95,7 +98,7 @@ public class Thumb {
 			drawCenteredCircle(g2d, x, yPos, 5);
 		}
 
-		g2d.fill(outerthumbPath);
+		g2d.fill(innerthumbPath);
 	}
 	
 	/**
@@ -106,10 +109,19 @@ public class Thumb {
 	 * @param r Circle radius
 	 */
 	public void drawCenteredCircle(Graphics2D g, int x, int y, int r) {
-		  
+		
+		int r1 = r + 2;
+		int x1 = x-(r1/2);
+		int y1 = y-(r1/2);
+		
+		g.setColor(Color.GRAY);
+		g.fillOval(x1,y1,r1,r1);
+		
 		x = x-(r/2);
-		  y = y-(r/2);
-		  g.fillOval(x,y,r,r);
+		y = y-(r/2);
+		
+		g.setColor(thumbColor);
+		g.fillOval(x,y,r,r);
 	}
 
 	/**
