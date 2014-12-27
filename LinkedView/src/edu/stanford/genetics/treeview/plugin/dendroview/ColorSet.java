@@ -103,15 +103,19 @@ public class ColorSet {
 		this.empty = decodeColor(colorSetNode.get("empty", default_emptyColor));
 
 		int colorNum = colorSetNode.getInt("colorNum", default_colors.length);
+		/* 
+		 * default colors/ fracs is always length 3. The original code here
+		 * produced ArrayIndexOutOfBoundsExceptions if the user adds
+		 * colors and makes colorNum > 3
+		 */
 		for (int i = 0; i < colorNum; i++) {
 			colorList.add(decodeColor(colorSetNode.get("Color" + i + 1,
-					default_colors[i])));
+					default_colors[0])));//default_colors[i])));
 		}
 		for (int i = 0; i < colorNum; i++) {
 			fractionList.add(new Double(colorSetNode.getFloat("Fraction" + i
-					+ 1, default_fractions[i])));
+					+ 1, default_fractions[1])));//default_fractions[i])));
 		}
-
 	}
 
 	/**

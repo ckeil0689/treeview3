@@ -61,6 +61,7 @@ public class Thumb {
 	 */
 	public void createThumbPath() {
 
+		/* magic numbers in here are pixel offsets */
 		innerthumbPath = new GeneralPath();
 		innerthumbPath.moveTo(x, y);
 		innerthumbPath.lineTo(x + width/ 2, y - (height + 3));
@@ -95,7 +96,7 @@ public class Thumb {
 		/* draw circle above thumb if selected */
 		if (isSelected()) {
 			int yPos = y - height - 5;
-			drawCenteredCircle(g2d, x, yPos, 5);
+			drawCenteredCircle(g2d, x, yPos, 4);
 		}
 
 		g2d.fill(innerthumbPath);

@@ -771,8 +771,9 @@ public class GradientBox extends JPanel {
 		int i = 0;
 		for (final Thumb t : thumbList) {
 
-			fractions[i] = (float) (t.getX() / gradientRect.getMaxX());
-			i++;
+			/* normalize x for centered gradientRect (frac 0.0 is not at x = 0)*/
+			double x = t.getX() - gradientRect.getMinX();
+			fractions[i++] = (float) (x / gradientRect.getWidth());
 		}
 
 		return fractions;
