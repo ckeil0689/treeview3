@@ -14,7 +14,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,7 +28,6 @@ import javax.swing.WindowConstants;
 
 import Utilities.GUIFactory;
 import Utilities.Helper;
-import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
 
@@ -347,6 +345,7 @@ public class GradientBox extends JPanel {
 			thumbList.get(index).setColor(newCol);
 			setGradientColors();
 			updateColorArray();
+			repaint();
 		}
 	}
 	
@@ -386,8 +385,7 @@ public class GradientBox extends JPanel {
 		
 		updateColorArray();
 
-		final float[] fracs = colorSet.getFractions();
-		fractions = fracs;
+		fractions = colorSet.getFractions();
 	}
 	
 	/**
@@ -526,39 +524,7 @@ public class GradientBox extends JPanel {
 				insertThumbAt(pos, colorList.get(i));
 
 			} 
-//			else {
-//				adjustThumbPos(i);
-//			}
 		}
-	}
-
-	private boolean verifyFractions() {
-
-		boolean ascending = true;
-		for (int i = 0; i < fractions.length - 1; i++) {
-
-			// Ascending
-			if (fractions[i] > fractions[i + 1]) {
-				ascending = false;
-				break;
-			}
-
-			// Out of range
-			if (fractions[i] > 1.0 || fractions[i + 1] > 1.0) {
-				ascending = false;
-				break;
-
-			} else if (fractions[i] < 0.0 || fractions[i + 1] < 0.0) {
-				ascending = false;
-				break;
-
-			} else if (Helper.nearlyEqual(fractions[i], fractions[i + 1])) {
-				ascending = false;
-				break;
-			}
-		}
-
-		return ascending;
 	}
 
 	/**
@@ -623,65 +589,60 @@ public class GradientBox extends JPanel {
 
 	protected void updateThumbPos(final int inputX) {
 
-		final float[] checkFracs = fractions.clone();
-
-		if (selectedThumb != null
-				&& inputX >= (int)thumbRect.getMinX() 
-				&& inputX <= (int)thumbRect.getMaxX()) {
-			// get position of previous thumb
-			final int selectedIndex = thumbList.indexOf(selectedThumb);
-			int previousPos = 0;
-			int nextPos = (int)thumbRect.getMaxX();
-
-			if (selectedIndex == 0) {
-				nextPos = thumbList.get(selectedIndex + 1).getX();
-
-			} else if (selectedIndex == thumbList.size() - 1) {
-				previousPos = thumbList.get(selectedIndex - 1).getX();
-
-			} else {
-				previousPos = thumbList.get(selectedIndex - 1).getX();
-				nextPos = thumbList.get(selectedIndex + 1).getX();
-			}
-
-			final int deltaX = inputX - selectedThumb.getX();
-			final int newX = selectedThumb.getX() + deltaX;
-
-			if (previousPos < newX && newX < nextPos) {
-				selectedThumb.setCoords(newX, selectedThumb.getY());
-				fractions = updateFractions();
-
-			} else if (newX < previousPos 
-					&& previousPos != thumbRect.getMinX()) {
-				Collections.swap(thumbList, selectedIndex,
-						selectedIndex - 1);
-				Collections.swap(colorList, selectedIndex,
-						selectedIndex - 1);
-				selectedThumb.setCoords(newX, selectedThumb.getY());
-				fractions = updateFractions();
-				updateColorArray();
-
-			} else if (newX > nextPos && nextPos < thumbRect.getMaxX()) {
-				Collections.swap(thumbList, selectedIndex,
-						selectedIndex + 1);
-				Collections.swap(colorList, selectedIndex,
-						selectedIndex + 1);
-				selectedThumb.setCoords(newX, selectedThumb.getY());
-				fractions = updateFractions();
-				updateColorArray();
-			}
-
-			final boolean fracsOK = verifyFractions();
-
-			if (!fracsOK) {
-				LogBuffer.println("Fractions not ok. Original: "
-						+ Arrays.toString(checkFracs) + "\n" + "New: "
-						+ Arrays.toString(fractions));
-			}
-
-			setGradientColors();
-			repaint();
+		/* stay within boundaries */
+		if (selectedThumb == null || (inputX < (int)thumbRect.getMinX() 
+				|| inputX > (int)thumbRect.getMaxX())) {
+			return;
 		}
+		
+		/* get position of previous thumb */
+		final int selectedIndex = thumbList.indexOf(selectedThumb);
+		int previousPos = 0;
+		int nextPos = (int)thumbRect.getMaxX();
+
+		/* set positions around active thumb */
+		if (selectedIndex == 0) {
+			nextPos = thumbList.get(selectedIndex + 1).getX();
+
+		} else if (selectedIndex == thumbList.size() - 1) {
+			previousPos = thumbList.get(selectedIndex - 1).getX();
+
+		} else {
+			previousPos = thumbList.get(selectedIndex - 1).getX();
+			nextPos = thumbList.get(selectedIndex + 1).getX();
+		}
+
+		/* get updated x-values */
+		final int deltaX = inputX - selectedThumb.getX();
+		final int newX = selectedThumb.getX() + deltaX;
+
+		/* set new thumb position and check for boundaries/ other thumbs */
+		if (previousPos < newX && newX < nextPos) {
+			selectedThumb.setCoords(newX, selectedThumb.getY());
+			fractions = updateFractions();
+
+		} else if (newX < previousPos 
+				&& previousPos != thumbRect.getMinX()) {
+			Collections.swap(thumbList, selectedIndex,
+					selectedIndex - 1);
+			Collections.swap(colorList, selectedIndex,
+					selectedIndex - 1);
+			selectedThumb.setCoords(newX, selectedThumb.getY());
+			fractions = updateFractions();
+			updateColorArray();
+
+		} else if (newX > nextPos && nextPos < thumbRect.getMaxX()) {
+			Collections.swap(thumbList, selectedIndex,
+					selectedIndex + 1);
+			Collections.swap(colorList, selectedIndex,
+					selectedIndex + 1);
+			selectedThumb.setCoords(newX, selectedThumb.getY());
+			fractions = updateFractions();
+			updateColorArray();
+		}
+
+		setGradientColors();
+		repaint();
 	}
 
 	protected void setThumbPos(final Point point) {
