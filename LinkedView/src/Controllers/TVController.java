@@ -56,7 +56,6 @@ public class TVController {
 	private final TreeViewFrame tvFrame;
 	private final DendroController dendroController;
 	private MenubarController menuController;
-
 	private File file;
 	private FileSet fileMenuSet;
 
@@ -310,12 +309,16 @@ public class TVController {
 			file = tvFrame.selectFile();
 
 			/* Only run loader, if JFileChooser wasn't canceled. */
-			if (file != null) loadData(tvFrame.getFileSet(file));
-
+			if (file != null) {
+				loadData(tvFrame.getFileSet(file));
+				
+			} else {
+				LogBuffer.println("Selected file was null. Cannot begin"
+						+ " loading data.");
+			}
 		} catch (final LoadException e) {
-			LogBuffer.println("Loading the FileSet was interrupted. "
-					+ "Cause: " + e.getCause());
-			e.printStackTrace();
+			LogBuffer.println("Loading the FileSet was interrupted.");
+			LogBuffer.logException(e);
 		}
 	}
 

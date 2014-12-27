@@ -57,7 +57,7 @@ public class ColorSet {
 	private List<Color> colorList = new ArrayList<Color>();
 	private List<Double> fractionList = new ArrayList<Double>();
 
-	private final String default_missingColor = "#909090";
+	private final String default_missingColor = "#FFFFFF";
 	private final String default_emptyColor = "#FFFFFF";
 	private final float[] default_fractions = { 0.0f, 0.5f, 1.0f };
 	private final String[] default_colors = { "#FF0000", "#000000", "#00FF00" };
@@ -96,21 +96,26 @@ public class ColorSet {
 	 *            stored
 	 */
 	public ColorSet(Preferences colorSetNode) {
+		
 		this.name = colorSetNode.get("name", default_name);
 		this.missing = decodeColor(colorSetNode.get("missing",
 				default_missingColor));
 		this.empty = decodeColor(colorSetNode.get("empty", default_emptyColor));
 
 		int colorNum = colorSetNode.getInt("colorNum", default_colors.length);
+		/* 
+		 * default colors/ fracs is always length 3. The original code here
+		 * produced ArrayIndexOutOfBoundsExceptions if the user adds
+		 * colors and makes colorNum > 3
+		 */
 		for (int i = 0; i < colorNum; i++) {
 			colorList.add(decodeColor(colorSetNode.get("Color" + i + 1,
-					default_colors[i])));
+					default_colors[0])));//default_colors[i])));
 		}
 		for (int i = 0; i < colorNum; i++) {
 			fractionList.add(new Double(colorSetNode.getFloat("Fraction" + i
-					+ 1, default_fractions[i])));
+					+ 1, default_fractions[1])));//default_fractions[i])));
 		}
-
 	}
 
 	/**
@@ -158,6 +163,7 @@ public class ColorSet {
 	 * @param another
 	 */
 	public ColorSet(ColorSet another) {
+		
 		this.name = another.name;
 		this.colorList = another.colorList;
 		this.fractionList = another.fractionList;
@@ -172,19 +178,23 @@ public class ColorSet {
 	 *            colorSetNode Preferences node to store ColorSet in
 	 */
 	public void save(Preferences colorSetNode) {
+		
 		colorSetNode.put("name", this.name);
-		colorSetNode.put("missing", encodeColor(this.missing));
-		colorSetNode.put("empty", encodeColor(this.empty));
+		
 		int colorNum = colorList.size();
 		colorSetNode.putInt("colorNum", colorNum);
+		
 		for (int i = 0; i < colorNum; i++) {
 			colorSetNode.put("Color" + i + 1, encodeColor(colorList.get(i)));
 		}
+		
 		for (int i = 0; i < colorNum; i++) {
 			colorSetNode.putFloat("Fraction" + i + 1, fractionList.get(i)
 					.floatValue());
 		}
-
+		
+		colorSetNode.put("missing", encodeColor(this.missing));
+		colorSetNode.put("empty", encodeColor(this.empty));
 	}
 
 	/* inherit description */

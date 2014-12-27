@@ -8,6 +8,7 @@ import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JPanel;
 
+import edu.stanford.genetics.treeview.LogBuffer;
 import Utilities.GUIFactory;
 
 /**
@@ -22,6 +23,7 @@ public class ColorExtractorEditor extends JPanel {
 
 	public ColorExtractorEditor(final ColorExtractor colorExtractor) {
 
+		LogBuffer.println("Instantiated colorextractor editor");
 		this.colorExtractor = colorExtractor;
 		this.setOpaque(false);
 

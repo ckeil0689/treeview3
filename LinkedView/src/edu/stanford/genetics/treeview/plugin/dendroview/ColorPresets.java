@@ -49,14 +49,19 @@ public class ColorPresets implements ConfigNodePersistent {
 	public static ColorSet[] defaultColorSets;
 
 	static {
+		/* Get system background panel color */
+//		Color sysBackground = UIManager.getColor("Panel.background");
+//		String sysBack = Integer.toHexString(sysBackground.getRGB());
+//		sysBack = sysBack.substring(2, sysBack.length());
+		
 		defaultColorSets = new ColorSet[2];
 		defaultColorSets[0] = new ColorSet("RedGreen", "#FF0000", "#000000",
-				"#00FF00", "#909090", "#FFFFFF");
+				"#00FF00", "#8E8E8E", "#FFFFFF");
 		defaultColorSets[1] = new ColorSet("YellowBlue", "#FEFF00", "#000000",
-				"#1BB7E5", "#909090", "#FFFFFF");
+				"#1BB7E5", "#8E8E8E", "#FFFFFF");
 	}
 
-	private Preferences configNode;
+	private Preferences configNode;	
 	
 
 	// which preset to use if not by confignode?
@@ -69,7 +74,15 @@ public class ColorPresets implements ConfigNodePersistent {
 	 *            node to bind to
 	 */
 	public ColorPresets(final Preferences parent) {
+		
 		super();
+		
+//		Color sysBackground = UIManager.getColor("Panel.background");
+//		String sysBack = Integer.toHexString(sysBackground.getRGB());
+//		sysBack = sysBack.substring(2, sysBack.length());
+//		
+//		defaultColorSets[0].setMissing(UIManager.getColor("Panel.background"));
+		
 		setConfigNode(parent);
 	}
 
@@ -124,6 +137,7 @@ public class ColorPresets implements ConfigNodePersistent {
 			return getColorSet(defaultPreset);
 
 		} catch (final Exception e) {
+			LogBuffer.logException(e);
 			return getColorSet(0);
 		}
 	}
@@ -240,6 +254,7 @@ public class ColorPresets implements ConfigNodePersistent {
 	public void addColorSet(final String name, final List<Color> colors,
 			final List<Double> fractions, final String missing,
 			final String empty) {
+		
 		final ColorSet newColorSet = new ColorSet(name, colors, fractions,
 				missing, empty);
 		addColorSet(newColorSet);
@@ -254,7 +269,7 @@ public class ColorPresets implements ConfigNodePersistent {
 		// Make the children of ColorSet here by adding an int to the name?
 		// final ColorSet preset = new ColorSet();
 		final String[] childrenNodes = getRootChildrenNodes();
-		boolean customFound = false;
+		boolean isCustomFound = false;
 		String customNode = "";
 
 		for (final String node : childrenNodes) {
@@ -262,20 +277,20 @@ public class ColorPresets implements ConfigNodePersistent {
 			final String default_name = "RedGreen";
 			if (configNode.node(node).get("name", default_name)
 					.equalsIgnoreCase("Custom")) {
-				customFound = true;
+				isCustomFound = true;
 				customNode = node;
 			}
 		}
 
 		final ColorSet newColorSet = new ColorSet(set);
-		if (customFound) {
+		if (isCustomFound) {
 			newColorSet.save(configNode.node(customNode));
+			
 		} else {
 			int setNodeIndex = 0;
 			setNodeIndex = getRootChildrenNodes().length + 1;
 			newColorSet.save(configNode.node("ColorSet" + setNodeIndex));
 		}
-
 	}
 
 	/**

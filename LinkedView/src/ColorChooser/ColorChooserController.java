@@ -10,20 +10,19 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
 import javax.swing.JColorChooser;
-import javax.swing.Timer;
-
-import edu.stanford.genetics.treeview.LogBuffer;
+import javax.swing.Timer;	
 
 public class ColorChooserController {
 
 	public static final Integer DEFAULT_MULTI_CLICK_INTERVAL = 300;
 	private final ColorChooser gradientPick;
+	private final GradientBox gradientBox;
 
 	public ColorChooserController(final ColorChooser gradientPick) {
 
 		this.gradientPick = gradientPick;
+		this.gradientBox = gradientPick.getGradientBox();
 
-		// Add listeners
 		addAllListeners();
 	}
 
@@ -31,7 +30,8 @@ public class ColorChooserController {
      * Returns the system multi-click interval.
      */
     public static int getMultiClickInterval() {
-        Integer multiClickInterval = (Integer) Toolkit.getDefaultToolkit().getDesktopProperty("awt.multiClickInterval");
+        Integer multiClickInterval = (Integer) Toolkit.getDefaultToolkit()
+        		.getDesktopProperty("awt.multiClickInterval");
 
         if (multiClickInterval == null) {
             multiClickInterval = DEFAULT_MULTI_CLICK_INTERVAL;
@@ -41,17 +41,17 @@ public class ColorChooserController {
     }
     
 	/**
-	 * Adds all listeners to the ColorGradientChooser object.
+	 * Adds all defined listeners to the ColorGradientChooser object.
 	 */
-	public void addAllListeners() {
+	private void addAllListeners() {
 
 		if (gradientPick != null) {
-			gradientPick
-					.addThumbSelectionListener(new ThumbSelectionListener());
+			gradientPick.addThumbSelectListener(new ThumbSelectListener());
 			gradientPick.addThumbMotionListener(new ThumbMotionListener());
 			gradientPick.addAddListener(new AddButtonListener());
 			gradientPick.addRemoveListener(new RemoveButtonListener());
-			gradientPick.addDefaultListener(new DefaultListener());
+			gradientPick.addColorSetListener(new ColorSetListener());
+			gradientPick.addMissingListener(new MissingBtnListener());
 		}
 	}
 
@@ -62,14 +62,15 @@ public class ColorChooserController {
 	 * @author CKeil
 	 * 
 	 */
-	protected class ThumbSelectionListener implements MouseListener,
+	private class ThumbSelectListener implements MouseListener,
 			ActionListener {
 
 		private final Timer timer;
 		private MouseEvent lastEvent;
 
-		protected ThumbSelectionListener() {
-			timer = new Timer(ColorChooserController.getMultiClickInterval(), this);
+		protected ThumbSelectListener() {
+			timer = new Timer(ColorChooserController.getMultiClickInterval(), 
+					this);
 		}
 
 		/**
@@ -78,16 +79,13 @@ public class ColorChooserController {
 		private void clickOrPress() {
 
 			if (gradientPick.isCustomSelected()) {
-				if (gradientPick.getGradientBox().isGradientArea(
-						lastEvent.getPoint())) {
-					gradientPick.getGradientBox().setGradientColor(
-							lastEvent.getPoint());
+				if (gradientBox.isGradientArea(lastEvent.getPoint())) {
+					gradientBox.changeColor(lastEvent.getPoint());
 					gradientPick.setActiveColorSet("Custom");
 
 				} else {
-					gradientPick.getGradientBox().deselectAllThumbs();
-					gradientPick.getGradientBox().selectThumb(
-							lastEvent.getPoint());
+					gradientBox.deselectAllThumbs();
+					gradientBox.selectThumb(lastEvent.getPoint());
 				}
 			}
 		}
@@ -98,8 +96,7 @@ public class ColorChooserController {
 		private void doubleClick() {
 
 			if (gradientPick.isCustomSelected()) {
-				gradientPick.getGradientBox().specifyThumbPos(
-						lastEvent.getPoint());
+				gradientBox.setThumbPos(lastEvent.getPoint());
 			}
 		}
 
@@ -153,13 +150,13 @@ public class ColorChooserController {
 	 * @author CKeil
 	 * 
 	 */
-	class ThumbMotionListener implements MouseMotionListener {
+	private class ThumbMotionListener implements MouseMotionListener {
 
 		@Override
 		public void mouseDragged(final MouseEvent e) {
 
 			if (gradientPick.isCustomSelected()) {
-				gradientPick.getGradientBox().updateThumbPos(e.getX());
+				gradientBox.updateThumbPos(e.getX());
 			}
 		}
 
@@ -167,86 +164,102 @@ public class ColorChooserController {
 		public void mouseMoved(final MouseEvent e) {
 
 			if (gradientPick.isCustomSelected()) {
-				if (gradientPick.getGradientBox().containsThumb(e.getX(),
-						e.getY())) {
-					gradientPick.getGradientBox().setCursor(
-							new Cursor(Cursor.HAND_CURSOR));
+				if (gradientBox.containsThumb(e.getX(), e.getY())) {
+					gradientBox.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
 				} else {
-					gradientPick.getGradientBox().setCursor(
-							new Cursor(Cursor.DEFAULT_CURSOR));
+					gradientBox.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 				}
 			}
 		}
 	}
 
-	class AddButtonListener implements ActionListener {
+	/**
+	 * Adds a user-selected color to the colorList in the gradientBox.
+	 * @author chris0689
+	 *
+	 */
+	private class AddButtonListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
 			final Color newCol = JColorChooser.showDialog(
-					gradientPick.getGradientBox(), "Pick a Color", Color.black);
-
-			gradientPick.getGradientBox().addColor(newCol);
-		}
-	}
-
-	class RemoveButtonListener implements ActionListener {
-
-		@Override
-		public void actionPerformed(final ActionEvent arg0) {
-
-			if (gradientPick.getColorListSize() > 2) {
-				gradientPick.getGradientBox().removeColor();
+					gradientBox, "Pick a Color", Color.black);
+			
+			if(newCol != null) {
+				gradientBox.addColor(newCol);
 			}
 		}
 	}
 
-	class DefaultListener implements ActionListener {
+	/**
+	 * Removes a color from colorList in the gradientBox.
+	 * @author chris0689
+	 *
+	 */
+	private class RemoveButtonListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
+			if (gradientBox.getColorListSize() > 2) {
+				gradientBox.removeColor();
+			}
+		}
+	}
+
+	/**
+	 * Radio-button controls over which ColorSet is active.
+	 * @author chris0689
+	 *
+	 */
+	private class ColorSetListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+
+			boolean isCustom = gradientPick.isCustomSelected();
+			String colorSetName = "";
+			
+			/* Save if switching from 'Custom' */
+			if (isCustom) gradientPick.saveStatus();
+			
 			if (arg0.getSource() == gradientPick.getRGButton()) {
-				if (gradientPick.getConfigNode()
-						.get("activeColors", "RedGreen")
-						.equalsIgnoreCase("Custom")) {
-					gradientPick.saveStatus();
-				}
-				gradientPick.switchColorSet("RedGreen");
-				gradientPick.setCustomSelected(false);
+				/* Switch to RedGreen */
+				colorSetName = "RedGreen";
+				isCustom = false;
 
 			} else if (arg0.getSource() == gradientPick.getYBButton()) {
-				if (gradientPick.getConfigNode()
-						.get("activeColors", "YellowBlue")
-						.equalsIgnoreCase("Custom")) {
-					gradientPick.saveStatus();
-				}
-				gradientPick.switchColorSet("YellowBlue");
-				gradientPick.setCustomSelected(false);
-
-			} else if (arg0.getSource() == gradientPick.getCustomColorButton()) {
-				gradientPick.switchColorSet("Custom");
-				gradientPick.setCustomSelected(true);
+				/* Switch to YellowBlue */
+				colorSetName = "YellowBlue";
+				isCustom = false;
 
 			} else {
-				LogBuffer.println("No source found for ActionEvent in "
-						+ "DefaultListener in ColorGradientController");
+				/* Switch to Custom */
+				colorSetName = "Custom";
+				isCustom = true;
 			}
+			
+			gradientPick.switchColorSet(colorSetName);
+			gradientPick.setCustomSelected(isCustom);
 		}
 	}
-
-	class SaveColorPresetListener implements ActionListener {
+	
+	private class MissingBtnListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			//final ColorSet temp = new ColorSet();
-			// colorExtractorEditor.copyStateTo(temp);
-			//temp.setName("UserDefined");
-			//gradientPick.addColorSet(temp);
+			if (gradientPick.isCustomSelected()) {
+				final Color missing = JColorChooser.showDialog(
+						gradientPick.getMainPanel(), "Pick Color for Missing", 
+						gradientBox.getMissing());
+				
+				if (missing != null) {
+					gradientBox.setMissing(missing);
+				}
+			}
 		}
-
 	}
 }
