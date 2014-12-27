@@ -95,17 +95,20 @@ public class ColorChooser implements ConfigNodePersistent {
 				+ "Scheme: ", GUIFactory.FONTS);
 
 		radioButtonPanel.add(colorHint, "span, wrap");
-		radioButtonPanel.add(redGreenBtn, "span, wrap");
-		radioButtonPanel.add(yellowBlueBtn, "span, wrap");
-		radioButtonPanel.add(customColorBtn, "span");
+//		radioButtonPanel.add(redGreenBtn, "span, wrap");
+//		radioButtonPanel.add(yellowBlueBtn, "span, wrap");
+//		radioButtonPanel.add(customColorBtn, "span");
+		radioButtonPanel.add(redGreenBtn, "growx, pushx");
+		radioButtonPanel.add(yellowBlueBtn, "growx, pushx");
+		radioButtonPanel.add(customColorBtn, "growx, pushx");
 		
+		mainPanel.add(radioButtonPanel, "span, pushx, wrap");
 		mainPanel.add(hint, "span, wrap");
 		mainPanel.add(gradientBox, "h 150:150:, w 500:500:, pushx, alignx 50%,"
 				+ "span, wrap");
 		mainPanel.add(addBtn, "pushx, split 3, alignx 50%");
 		mainPanel.add(removeBtn, "pushx");
 		mainPanel.add(missingBtn, "wrap");
-		mainPanel.add(radioButtonPanel, "pushx, wrap");
 	}
 
 	@Override

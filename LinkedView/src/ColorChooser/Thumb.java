@@ -18,8 +18,8 @@ public class Thumb {
 	private int y;
 
 	/* Thumb dimensions */
-	private final int width = 15;
-	private final int height = 10;
+	private final int width = 12;
+	private final int height = 8;
 
 	private GeneralPath innerthumbPath;
 	private GeneralPath outerthumbPath;
@@ -63,14 +63,14 @@ public class Thumb {
 
 		innerthumbPath = new GeneralPath();
 		innerthumbPath.moveTo(x, y);
-		innerthumbPath.lineTo(x + width/ 2, y - height);
-		innerthumbPath.lineTo(x - width/ 2, y - height);
+		innerthumbPath.lineTo(x + width/ 2, y - (height + 3));
+		innerthumbPath.lineTo(x - width/ 2, y - (height + 3));
 		innerthumbPath.closePath();
 
 		outerthumbPath = new GeneralPath();
-		outerthumbPath.moveTo(x, y + 2);
-		outerthumbPath.lineTo(x + (width + 4)/ 2, y - (height + 1));
-		outerthumbPath.lineTo(x - (width + 4)/ 2, y - (height + 1));
+		outerthumbPath.moveTo(x, y);
+		outerthumbPath.lineTo(x + (width + 4)/ 2, y - (height + 4));
+		outerthumbPath.lineTo(x - (width + 4)/ 2, y - (height + 4));
 		outerthumbPath.closePath();
 	}
 
