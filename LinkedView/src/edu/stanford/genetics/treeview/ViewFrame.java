@@ -645,6 +645,10 @@ public abstract class ViewFrame implements Observer {
 	
 	/**
 	 * Method opens a file chooser dialog for Unix based systems.
+	 * This uses AWT FileDialog rather than JFileChooser because it provides
+	 * the more 'native' way of selecting files for Linux and OSX systems.
+	 * It's ugly to deal with though (centering on screen, steals focus under 
+	 * Ubuntu...)
 	 * 
 	 * @return File file
 	 */
@@ -690,6 +694,9 @@ public abstract class ViewFrame implements Observer {
 			chosen = new File(dir + filename);
 			configNode.put("lastdir", fileDialog.getDirectory());
 		}
+		
+		/* AWT FileDialog steals focus... this is necessary */
+		applicationFrame.requestFocus();
 
 		return chosen;
 	}
