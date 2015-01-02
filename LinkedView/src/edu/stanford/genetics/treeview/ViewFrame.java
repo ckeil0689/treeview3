@@ -637,7 +637,7 @@ public abstract class ViewFrame implements Observer {
 			chosen = fileDialog.getSelectedFile();
 
 		} else {
-			System.out.println("File Dialog closed without selection...");
+			LogBuffer.println("File Dialog closed without selection...");
 		}
 
 		return chosen;
@@ -656,12 +656,10 @@ public abstract class ViewFrame implements Observer {
 				"Choose a file", FileDialog.LOAD);
 
 		String string = fileMru.getMostRecentDir();
-		if (string != null) {
-			 fileDialog.setDirectory(string);
-		} else {
+		if (string == null) {
 			string = configNode.get("lastDir", "/");
-			fileDialog.setDirectory(string);
 		}
+		fileDialog.setDirectory(string);
 		
 		/* Lots of code to be able to center an awt.FileDialog on screen... */
 	    Rectangle rect = applicationFrame.getContentPane().getBounds();
@@ -684,11 +682,8 @@ public abstract class ViewFrame implements Observer {
 		newPoint.setLocation(x, y);
 		
 		fileDialog.setLocation(newPoint);
-		
 	    fileDialog.setVisible(true);
 	    
-	    
-		
 		String dir = fileDialog.getDirectory();
 		String filename = fileDialog.getFile();
 		if (dir != null && filename != null) {

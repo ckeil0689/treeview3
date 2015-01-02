@@ -240,15 +240,10 @@ public class TVController {
 			}
 
 		} catch (OutOfMemoryError  e) {
-			if(e instanceof OutOfMemoryError) {
-				final String oomError = "The data file is too large. "
-						+ "Increase the JVM's heap size. Error: " 
-						+ e.getMessage();
-				tvFrame.setLoadErrorMessage(oomError);
-				
-			} else {
-				JOptionPane.showMessageDialog(JFrame.getFrames()[0], e);
-			}
+			final String oomError = "The data file is too large. "
+					+ "Increase the JVM's heap size. Error: " 
+					+ e.getMessage();
+			tvFrame.setLoadErrorMessage(oomError);
 		}
 	}
 	

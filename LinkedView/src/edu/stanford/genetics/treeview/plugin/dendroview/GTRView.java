@@ -168,13 +168,7 @@ public class GTRView extends TRView implements MouseListener,
 	@Override
 	public void mouseClicked(final MouseEvent e) {
 
-		if (!isEnabled()) {
-			return;
-		}
-
-		if (!enclosingWindow().isActive()) {
-			return;
-		}
+		if (!isEnabled() || !enclosingWindow().isActive()) return;
 
 		if ((treePainter != null) && (getXScaleEq() != null)) {
 			if(SwingUtilities.isLeftMouseButton(e)) {
@@ -203,13 +197,7 @@ public class GTRView extends TRView implements MouseListener,
 	@Override
 	public void mouseMoved(final MouseEvent e) {
 
-		if (!isEnabled()) {
-			return;
-		}
-
-		if (!enclosingWindow().isActive()) {
-			return;
-		}
+		if (!isEnabled() || !enclosingWindow().isActive()) return;
 
 		if (treePainter != null && treeSelection.getNSelectedIndexes() == 0) {
 			// the trick is translating back to the normalized space...
@@ -223,13 +211,7 @@ public class GTRView extends TRView implements MouseListener,
 	@Override
 	public void mouseExited(final MouseEvent e) {
 
-		if (!isEnabled()) {
-			return;
-		}
-
-		if (!enclosingWindow().isActive()) {
-			return;
-		}
+		if (!isEnabled() || !enclosingWindow().isActive()) return;
 
 		setHoveredNode(null);
 	}

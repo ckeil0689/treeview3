@@ -44,8 +44,6 @@ import javax.swing.JScrollBar;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.border.Border;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
@@ -57,7 +55,6 @@ import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.TabbedSettingsPanel;
-import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.TreeviewMenuBarI;
 import edu.stanford.genetics.treeview.ViewFrame;
@@ -141,7 +138,6 @@ public class DendroView implements Observer, DendroPanel {
 	private JButton scaleDefaultAll;
 	
 	// Buttons for interaction in dendroview.
-	// TODO move these buttons to DendroView
 	private final JButton searchBtn;
 //	private final JToggleButton treeToggleBtn;
 	
@@ -189,17 +185,18 @@ public class DendroView implements Observer, DendroPanel {
 		this.tvFrame = tvFrame;
 		this.name = "DendroView";
 
+		/* main panel */
 		dendroPane = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING_FILL, 
 				null);
 		
-		// Create the Global view (JPanel to display)
+		/* Create the Global view (JPanel to display) */
 		globalview = new GlobalView();
 
-		// scrollbars, mostly used by maps
+		/* scrollbars, mostly used by maps */
 		globalXscrollbar = globalview.getXScroll();
 		globalYscrollbar = globalview.getYScroll();
 
-		// Set up the column name display
+		/* Set up the column name display */
 		arraynameview = new ArrayNameView();
 		// arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
 
@@ -269,7 +266,7 @@ public class DendroView implements Observer, DendroPanel {
 		/* Clear dendroPane first */
 		dendroPane.removeAll();
 
-		// Components for layout setup
+		/* Panels for layout setup */
 		JPanel btnPanel;
 		JPanel crossPanel;
 		JPanel textpanel;

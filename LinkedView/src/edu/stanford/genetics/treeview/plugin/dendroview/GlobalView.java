@@ -462,14 +462,12 @@ public class GlobalView extends ModelViewProduced implements
 		int[] selectedArrayIndexes = arraySelection.getSelectedIndexes();
 		int[] selectedGeneIndexes = geneSelection.getSelectedIndexes();
 				
-		if(selectedArrayIndexes.length > 0 || selectedGeneIndexes.length > 0) {
+		if(selectedArrayIndexes.length > 0) {
 
 			//LogBuffer.println("Selected min array index: [" + selectedArrayIndexes[0] + "] Selected min gene index: [" + selectedGeneIndexes[0] + "].");
 
-			List<List<Integer>> arrayBoundaryList = 
-					new ArrayList<List<Integer>>();
-			List<List<Integer>> geneBoundaryList = 
-					new ArrayList<List<Integer>>();
+			List<List<Integer>> arrayBoundaryList;
+			List<List<Integer>> geneBoundaryList;
 
 			
 			arrayBoundaryList = findRectangleBoundaries(selectedArrayIndexes, 
@@ -553,8 +551,8 @@ public class GlobalView extends ModelViewProduced implements
 			
 			sp = map.getPixel(selectionRange.get(0));
 			// last pixel of last block
-			ep = map.getPixel(selectionRange.get(
-					selectionRange.size() - 1) + 1) - 1;
+			ep = map.getPixel(
+					selectionRange.get(selectionRange.size() - 1) + 1) - 1;
 			
 			if (ep < sp) {
 				ep = sp;
@@ -568,36 +566,6 @@ public class GlobalView extends ModelViewProduced implements
 		}
 		
 		return boundaryList;
-	}
-
-	protected void recalculateZoom() {
-
-//		if (selectionRect == null) {
-//			return;
-//		}
-
-		// int spx, epx, spy, epy;
-		// try {
-		// spx = xmap.getPixel(zoomXmap.getIndex(0));
-		// epx = xmap.getPixel(zoomXmap.getIndex(
-		// zoomXmap.getUsedPixels())) - 1;
-		//
-		// spy = ymap.getPixel(zoomYmap.getIndex(0));
-		// epy = ymap.getPixel(zoomYmap.getIndex(
-		// zoomYmap.getUsedPixels())) - 1;
-		//
-		// } catch (java.lang.ArithmeticException e) {
-		// // silently ignore div zero exceptions, which arise when
-		// // some dimension is zero and fillmap is selected...
-		// return;
-		// }
-
-		// if (zoomRect == null) {
-		// zoomRect = new Rectangle(spx, spy, epx - spx, epy - spy);
-		//
-		// } else {
-		// zoomRect.setBounds(spx, spy, epx - spx, epy - spy);
-		// }
 	}
 
 	// Observer Methods
@@ -618,7 +586,6 @@ public class GlobalView extends ModelViewProduced implements
 			 * for the local tree selection. other axis here! */
 			} else if(geneSelection.getNSelectedIndexes() == 0){
 				arraySelection.deselectAllIndexes();
-//				arraySelection.setSelectedNode(null);
 				arraySelection.notifyObservers();
 			}
 			recalculateOverlay();
@@ -641,7 +608,6 @@ public class GlobalView extends ModelViewProduced implements
 			 * for the local tree selection. other axis here! */
 			} else if(arraySelection.getNSelectedIndexes() == 0){
 				geneSelection.deselectAllIndexes();
-//				geneSelection.setSelectedNode(null);
 				geneSelection.notifyObservers();
 			}
 			recalculateOverlay();
@@ -650,7 +616,6 @@ public class GlobalView extends ModelViewProduced implements
 			offscreenValid = false;
 
 		} else if ((o == xmap) || o == ymap) {
-//			recalculateZoom(); // it moves around, you see...
 			recalculateOverlay();
 			drawIndicatorCircle();
 			offscreenValid = false;
@@ -674,9 +639,7 @@ public class GlobalView extends ModelViewProduced implements
 	@Override
 	public void mousePressed(final MouseEvent e) {
 
-		if (!enclosingWindow().isActive()) {
-			return;
-		}
+		if (!enclosingWindow().isActive()) return;
 
 		// if left button is used
 		if (SwingUtilities.isLeftMouseButton(e)) {
@@ -716,14 +679,13 @@ public class GlobalView extends ModelViewProduced implements
 	@Override
 	public void mouseReleased(final MouseEvent e) {
 
-		if (!enclosingWindow().isActive()) {
-			return;
-		}
-
+		if (!enclosingWindow().isActive()) return;
+		
 		// When left button is used
 		if (SwingUtilities.isLeftMouseButton(e)) {
 			mouseDragged(e);
 			drawBand(dragRect);
+			LogBuffer.println("Released: " + dragRect.toString());
 
 			if (e.isShiftDown()) {
 				final Point start = new Point(xmap.getMinIndex(), startPoint.y);

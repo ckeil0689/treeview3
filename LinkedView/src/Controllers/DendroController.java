@@ -125,23 +125,27 @@ public class DendroController implements ConfigNodePersistent {
 		/* Gets the system's modifier key (Ctrl or Cmd) */
 		int modifier = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 		
-		/* Assign 'Modifier + T' to toggle the trees */
+		/* Toggle the trees */
 		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_T, modifier), 
 				"toggleTrees");
 		action_map.put("toggleTrees", new TreeToggleAction());
 		
+		/* Select/ deselect */
 		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, modifier), 
 				"deselect");
 		action_map.put("deselect", new DeselectAction());
 		
+		/* Zoom selection */
 		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, modifier), 
 				"zoomSelection");
 		action_map.put("zoomSelection", new ZoomAction());
 		
+		/* Reset zoom */
 		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, modifier), 
 				"resetZoom");
 		action_map.put("resetZoom", new HomeAction());
 		
+		/* Open search dialog */
 		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, modifier), 
 				"searchLabels");
 		action_map.put("searchLabels", new SearchLabelAction());
