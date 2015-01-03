@@ -45,7 +45,7 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 
 	private HeaderInfo headerInfo;
 	private HeaderSummary headerSummary;
-	private final JList headerList = new JList(new String[0]);
+	private final JList<String> headerList = new JList<String>(new String[0]);
 
 	public HeaderSummaryPanel(final HeaderInfo headerInfo,
 			final HeaderSummary headerSummary, final TreeViewFrame frame) {
@@ -119,7 +119,7 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 	}
 
 	/** Getter for headerList */
-	public JList getHeaderList() {
+	public JList<String> getHeaderList() {
 
 		return headerList;
 	}
@@ -138,7 +138,7 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 	public void synchronizeFrom() {
 
 		final int[] included = getHeaderSummary().getIncluded();
-		final JList list = getHeaderList();
+		final JList<String> list = getHeaderList();
 		if (list == null) {
 			return;
 		}

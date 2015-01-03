@@ -427,52 +427,104 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		return treeData;
 	}
 
-	private void parseCDT(String[][] stringLabels) {
-
-		// Tell model whether EWEIGHT and GWEIGHT where found
-		targetModel.setEweightFound(hasEWeight);
-		targetModel.setGweightFound(hasGWeight);
-
-		final int nExpr = doubleData[0].length;
-		final int nExprPrefix = dataStartRow;
-
+	/**
+	 * Parses the prefixes for the labels from the header data collected
+	 * until this point.
+	 * @param stringLabels
+	 */
+	private void parsePrefixes(String[][] stringLabels) {
+		
+		/* lengths of prefix arrays */
 		final int nGenePrefix = dataStartCol;
-		final int nGene = doubleData.length;
-
-		// Set Array Prefix and Headers
-		final String[] arrayPrefix = new String[nExprPrefix];
-		final String[][] aHeaders = new String[nExpr][nExprPrefix];
-
-		// fill prefix array
+		final int nExprPrefix = dataStartRow;
+		
+		final String[] readGPrefixes = new String[nGenePrefix];
+		final String[] readAPrefixes = new String[nExprPrefix];
+		
+		/* read gene prefixes */
+		System.arraycopy(stringLabels[0], 0, readGPrefixes, 0, nGenePrefix);
+		
+		/* read array prefixes */
 		for (int i = 0; i < nExprPrefix; i++) {
 
-			arrayPrefix[i] = stringLabels[i][0];
-
-			final String[] labelRow = stringLabels[i];
-
-			// fill column header array
-			for (int j = 0; j < nExpr; j++) {
-
-				aHeaders[j][i] = labelRow[j + nGenePrefix];
+			readAPrefixes[i] = stringLabels[i][0];
+		}
+		
+		/* 
+		 * The regex assurance is needed because the CDT-format is
+		 * completely inconsistent and we wanna keep backwards compatibility.
+		 */
+		if(readAPrefixes[0].equalsIgnoreCase("GID")) {
+			
+			readAPrefixes[0] = assurePrefixNames(readGPrefixes);
+		}
+		
+		/* set the prefixes */
+		targetModel.setGenePrefix(readGPrefixes);
+		targetModel.setArrayPrefix(readAPrefixes);
+		
+		/* set weight status */
+		targetModel.setEweightFound(hasEWeight);
+		targetModel.setGweightFound(hasGWeight);
+	}
+	
+	/**
+	 * Switches out false axis labeling due to inconsistent CDT format.
+	 * @param gPrefixes The row prefixes contain the right label.
+	 * @return The correct prefix
+	 */
+	private String assurePrefixNames(String[] gPrefixes) {
+		
+		String finalPrefix = "OTHER";
+		
+		for(int i = 0; i < gPrefixes.length; i++) {
+			
+			if(!gPrefixes[i].equalsIgnoreCase("YORF")
+					&& !gPrefixes[i].equalsIgnoreCase("GID")
+					&& !gPrefixes[i].equalsIgnoreCase("GWEIGHT")) {
+				finalPrefix = gPrefixes[i];
+				break;
 			}
 		}
+		
+		return finalPrefix;
+	}
+	
+	/**
+	 * Reads the label prefixes and headers from the data and stores
+	 * the data in the TVModel.
+	 * @param stringLabels
+	 */
+	private void parseCDT(String[][] stringLabels) {
 
-		targetModel.setArrayPrefix(arrayPrefix);
-		targetModel.setArrayHeaders(aHeaders);
+		parsePrefixes(stringLabels);
+		
+		/* # of headers */
+		final int nGene = doubleData.length;
+		final int nExpr = doubleData[0].length;
 
-		final String[] genePrefix = new String[nGenePrefix];
-		final String[][] gHeaders = new String[nGene][nGenePrefix];
+		/* fill row header array */
+		final String[][] gHeaders = new String[nGene][dataStartCol];
 
-		System.arraycopy(stringLabels[0], 0, genePrefix, 0, nGenePrefix);
-
-		// Fill Header array
 		for (int i = 0; i < nGene; i++) {
 
-			gHeaders[i] = stringLabels[i + nExprPrefix];
+			gHeaders[i] = stringLabels[i + dataStartRow];
 		}
-
-		targetModel.setGenePrefix(genePrefix);
 		targetModel.setGeneHeaders(gHeaders);
+		
+		/* fill column header array */
+		final String[][] aHeaders = new String[nExpr][dataStartRow];
+		
+		for (int i = 0; i < dataStartRow; i++) {
+			
+			for (int j = 0; j < nExpr; j++) {
+
+				aHeaders[j][i] = stringLabels[i][j + dataStartCol];
+			}
+		}
+		targetModel.setArrayHeaders(aHeaders);
+		
+		/* set data in TVModel */
 		targetModel.setExprData(doubleData);
 		targetModel.getDataMatrix().calculateMinMax();
 	}

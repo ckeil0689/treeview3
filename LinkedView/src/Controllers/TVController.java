@@ -391,6 +391,9 @@ public class TVController {
 	 */
 	public void setupClusterView(final int clusterType) {
 
+		/* Erase selection */
+		dendroController.deselectAll();
+		
 		/* Making a new Window to display clustering components */
 		final ClusterDialog clusterView = 
 				new ClusterDialog(clusterType);

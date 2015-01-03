@@ -51,8 +51,6 @@ public class CDTGenerator {
 			final int rowSimilarity, final int colSimilarity,
 			final boolean hierarchical) {
 
-		LogBuffer.println("Initializing CDTGenerator.");
-		
 		this.origMatrix = origMatrix;
 		this.orderedRows = orderedRows;
 		this.orderedCols = orderedCols;
@@ -98,8 +96,7 @@ public class CDTGenerator {
 			this.bufferedWriter = new ClusterFileWriter(file);
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogBuffer.logException(e);
 		}
 	}
 	
@@ -109,8 +106,6 @@ public class CDTGenerator {
 	 * @param arrayHeaderI
 	 */
 	public void prepare(IntHeaderInfo geneHeaderI, IntHeaderInfo arrayHeaderI) {
-		
-		LogBuffer.println("Preparing.");
 		
 		this.geneHeaderI = geneHeaderI;
 
@@ -134,8 +129,6 @@ public class CDTGenerator {
 	public void generateCDT() {
 		
 		orderData();
-
-		LogBuffer.println("Making cdtDataStrings.");
 		
 		/* Transform cdtDataFile from double lists to string lists */
 		for (int i = 0; i < cdtData_doubles.length; i++) {
@@ -276,8 +269,6 @@ public class CDTGenerator {
 	 * Returns the file path where the cdt file was saved.
 	 */
 	public String finish() {
-
-		LogBuffer.println("Finishing up.");
 		
 		String filePath = bufferedWriter.getFilePath();
 		

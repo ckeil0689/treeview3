@@ -685,7 +685,6 @@ public class GlobalView extends ModelViewProduced implements
 		if (SwingUtilities.isLeftMouseButton(e)) {
 			mouseDragged(e);
 			drawBand(dragRect);
-			LogBuffer.println("Released: " + dragRect.toString());
 
 			if (e.isShiftDown()) {
 				final Point start = new Point(xmap.getMinIndex(), startPoint.y);
