@@ -99,7 +99,6 @@ public class DendroController implements ConfigNodePersistent {
 		updateHeaderInfo();
 		bindComponentFunctions();
 
-		/* Setup layout first! */
 		dendroView.setupLayout();
 		
 		/* Get saved tree visibility status, default to false */
@@ -233,26 +232,7 @@ public class DendroController implements ConfigNodePersistent {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-
-//			double atr_loc = dendroView.getDivLoc(dendroView.getAtrview());
-//			double gtr_loc = dendroView.getDivLoc(dendroView.getGtrview());
-//			
-//			if(atr_loc > 0.0 || gtr_loc > 0.0) {
-//				
-//				/* First save current setup */
-//				configNode.putDouble("atr_Loc", atr_loc);
-//				configNode.putDouble("gtr_Loc", gtr_loc);
-//				
-//				/* Shrink tree panel to 0 to make it invisible */
-//				atr_loc = 0.0;
-//				gtr_loc = 0.0;
-//				
-//			} else {
-//				atr_loc = configNode.getDouble("atr_Loc", 0.5);
-//				gtr_loc = configNode.getDouble("gtr_Loc", 0.5);
-//			}
-//			
-//			dendroView.setTreesVisible(atr_loc, gtr_loc);
+			
 			toggleTrees();
 		}
 	}
@@ -1767,6 +1747,30 @@ public class DendroController implements ConfigNodePersistent {
 		dendroView.getGtrview().setTreeSelection(geneSelection);
 		dendroView.getTextview().setGeneSelection(geneSelection);
 		dendroView.getArraynameview().setGeneSelection(geneSelection);
+	}
+	
+	public void setNewIncluded(int[] gIncluded, int[] aIncluded) {
+		
+		dendroView.getTextview().getHeaderSummary().setIncluded(gIncluded);
+		dendroView.getArraynameview().getHeaderSummary().setIncluded(aIncluded);
+	}
+	
+	public int[] getArrayIncluded() {
+		
+		int[] included = new int[]{0};
+		if(dendroView != null) {
+			included = dendroView.getArraynameview().getHeaderSummary().getIncluded();
+		}
+		return included;
+	}
+	
+	public int[] getGeneIncluded() {
+		
+		int[] included = new int[]{0};
+		if(dendroView != null) {
+			included = dendroView.getTextview().getHeaderSummary().getIncluded();
+		}
+		return included;
 	}
 
 	// Getters for fields

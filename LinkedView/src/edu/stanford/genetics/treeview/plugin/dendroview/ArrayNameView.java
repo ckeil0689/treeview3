@@ -113,13 +113,8 @@ public class ArrayNameView extends ModelView implements MouseListener,
 
 		super();
 		this.setLayout(new MigLayout());
-
-//		this.headerInfo = hInfo;
+		
 //		this.urlExtractor = uExtractor;
-//
-//		this.headerSummary = new HeaderSummary("ArraySummary");
-//		headerSummary.setIncluded(new int[] { 0 });
-//		headerSummary.addObserver(this);
 		
 		addMouseMotionListener(this);
 		addMouseListener(this);
@@ -145,7 +140,6 @@ public class ArrayNameView extends ModelView implements MouseListener,
 
 		this.urlExtractor = uExtractor;
 
-//		this.headerSummary = new HeaderSummary("ArraySummary");
 		headerSummary.setIncluded(new int[] { 0 });
 		headerSummary.addObserver(this);
 	}
@@ -341,29 +335,29 @@ public class ArrayNameView extends ModelView implements MouseListener,
 								}
 
 								g2d.setColor(fore);
-								// g2d.drawString(out, 0, map.getMiddlePixel(j)
-								// + ascent / 2);
+								 g2d.drawString(out, 0, map.getMiddlePixel(j)
+								 + ascent / 2);
 
 								// Unknown Mac OS X issue with drawString,
-								// mysteriously fixed by this.
-								g2d.drawGlyphVector(g2d.getFont()
-										.createGlyphVector(frc, out), 0,
-										map.getMiddlePixel(j) + ascent / 2);
+								// mysteriously fixed by this. Java 1.6
+//								g2d.drawGlyphVector(g2d.getFont()
+//										.createGlyphVector(frc, out), 0,
+//										map.getMiddlePixel(j) + ascent / 2);
 
 								if (colorIndex > 0) {
 									g.setColor(fore);
 								}
 							} else {
 								g2d.setColor(Color.black);
-								// g2d.drawString(out, 0, map.getMiddlePixel(j)
-								// + ascent / 2);
+								 g2d.drawString(out, 0, map.getMiddlePixel(j)
+								 + ascent / 2);
 								// g.setColor(fore);
 
 								// Unknown Mac OS X issue with drawString,
-								// mysteriously fixed by this.
-								g2d.drawGlyphVector(g2d.getFont()
-										.createGlyphVector(frc, out), 0,
-										map.getMiddlePixel(j) + ascent / 2);
+								// mysteriously fixed by this. java 1.6!
+//								g2d.drawGlyphVector(g2d.getFont()
+//										.createGlyphVector(frc, out), 0,
+//										map.getMiddlePixel(j) + ascent / 2);
 							}
 
 						}
@@ -487,9 +481,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 			 * String[] headers = headerInfo.getHeader(j); String out =
 			 * headers[gidRow];
 			 */
-			if (out == null) {
-				continue;
-			}
+			if (out == null) continue;
 
 			final int length = fontMetrics.stringWidth(out);
 			if (maxlength < length) {

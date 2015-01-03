@@ -48,7 +48,7 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 	private final JList<String> headerList = new JList<String>(new String[0]);
 
 	public HeaderSummaryPanel(final HeaderInfo headerInfo,
-			final HeaderSummary headerSummary, final TreeViewFrame frame) {
+			final HeaderSummary headerSummary) {
 
 		this.headerInfo = headerInfo;
 		this.headerSummary = headerSummary;
@@ -127,7 +127,7 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 	/**
 	 * Returns the smallest index from a selected range in the header list.
 	 * 
-	 * @return
+	 * @return The index of the selected list item.
 	 */
 	public int getSmallestSelectedIndex() {
 
@@ -139,9 +139,9 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 
 		final int[] included = getHeaderSummary().getIncluded();
 		final JList<String> list = getHeaderList();
-		if (list == null) {
-			return;
-		}
+		
+		if (list == null) return;
+		
 		list.clearSelection();
 		for (int i = 0; i < included.length; i++) {
 			final int index = included[i];

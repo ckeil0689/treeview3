@@ -54,7 +54,6 @@ import edu.stanford.genetics.treeview.DendroPanel;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelView;
-import edu.stanford.genetics.treeview.TabbedSettingsPanel;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.TreeviewMenuBarI;
 import edu.stanford.genetics.treeview.ViewFrame;
@@ -116,10 +115,6 @@ public class DendroView implements Observer, DendroPanel {
 
 	protected JScrollBar globalXscrollbar;
 	protected JScrollBar globalYscrollbar;
-
-	// Persistent popups
-	protected JDialog settingsFrame;
-	protected TabbedSettingsPanel settingsPanel;
 
 	// JMenuItems
 	private JMenuItem colorMenuItem;
@@ -248,10 +243,6 @@ public class DendroView implements Observer, DendroPanel {
 		registerView(arraynameview);
 		registerView(textview);
 		registerView(gtrview);
-
-		// reset persistent popups
-		settingsFrame = null;
-		settingsPanel = null;
 		
 		return dendroPane;
 	}

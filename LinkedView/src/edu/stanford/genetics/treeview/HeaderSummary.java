@@ -73,16 +73,11 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 			return null;
 		}
 
-		if (strings == null) {
-
-			return "";
-		}
+		if (strings == null) return "";
 
 		final StringBuffer out = new StringBuffer();
 		int count = 0;
-		if (included.length == 0) {
-			return "";
-		}
+		if (included.length == 0) return "";
 
 		for (int i = 0; i < included.length; i++) {
 			try {
@@ -95,6 +90,7 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 					count++;
 				}
 			} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
+				LogBuffer.logException(e);
 				// out.append(strings[1]);
 				// LogBuffer.println("ArrayIndexOutOfBoundsException in " +
 				// "getSummary() in HeaderSummary: " + e.getMessage());
@@ -103,15 +99,11 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 			}
 		}
 
-		if (count == 0) {
-			return "";
-
-		} else {
-			return out.toString();
-		}
+		return (count == 0) ? "" : out.toString();
 	}
 
-	public String[] getSummaryArray(final HeaderInfo headerInfo, final int index) {
+	public String[] getSummaryArray(final HeaderInfo headerInfo, 
+			final int index) {
 
 		String[] strings = null;
 		try {
@@ -126,13 +118,10 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 			return null;
 		}
 
-		if (strings == null) {
-			return null;
-		}
+		if (strings == null) return null;
 
-		if (included.length == 0) {
-			return null;
-		}
+		if (included.length == 0) return null;
+
 
 		final String[] out = new String[included.length];
 		int count = 0;
@@ -166,9 +155,7 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 
 	private void synchronizeFrom() {
 
-		if (configNode == null) {
-			return;
-		}
+		if (configNode == null) return;
 
 		if (nodeHasAttribute("included")) {
 			final String incString = configNode.get("included", "1");
@@ -211,9 +198,7 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 
 	private void synchronizeTo() {
 
-		if (configNode == null) {
-			return;
-		}
+		if (configNode == null) return;
 
 		final int[] vec = getIncluded();
 		final StringBuffer temp = new StringBuffer();
@@ -246,7 +231,7 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 			return contains;
 
 		} catch (final BackingStoreException e) {
-			e.printStackTrace();
+			LogBuffer.logException(e);;
 			return contains;
 		}
 	}

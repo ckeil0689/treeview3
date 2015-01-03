@@ -260,10 +260,10 @@ implements ConfigNodePersistent {
 					null);
 
 			genePanel = new HeaderSummaryPanel(geneHI, 
-					dendroView.getTextview().getHeaderSummary(), tvFrame);
+					dendroView.getTextview().getHeaderSummary());
 
 			arrayPanel = new HeaderSummaryPanel(arrayHI, 
-					dendroView.getArraynameview().getHeaderSummary(), tvFrame);
+					dendroView.getArraynameview().getHeaderSummary());
 
 			final JPanel loadLabelPanel = GUIFactory.createJPanel(false, 
 					GUIFactory.NO_PADDING, null);

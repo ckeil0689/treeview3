@@ -42,6 +42,7 @@ import edu.stanford.genetics.treeview.model.DataModelWriter;
 import edu.stanford.genetics.treeview.model.ModelLoader;
 import edu.stanford.genetics.treeview.model.ReorderedDataModel;
 import edu.stanford.genetics.treeview.model.TVModel;
+import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 import edu.stanford.genetics.treeview.plugin.dendroview.DoubleArrayDrawer;
 
 /**
@@ -58,12 +59,14 @@ public class TVController {
 	private MenubarController menuController;
 	private File file;
 	private FileSet fileMenuSet;
+	private final String[] selectedLabels;
 
 	public TVController(final TreeViewFrame tvFrame, final DataModel model) {
 
 		this.model = model;
 		this.tvFrame = tvFrame;
 		this.dendroController = new DendroController(tvFrame);
+		this.selectedLabels = new String[2];
 		
 		/* Add the view as observer to the model */
 		((TVModel) model).addObserver(tvFrame);
@@ -227,6 +230,18 @@ public class TVController {
 		TVModel tvModel = (TVModel) model;
 
 		try {
+			/* save label type selection before loading new file */
+			int geneIncluded = dendroController.getGeneIncluded()[0];
+			int arrayIncluded = dendroController.getArrayIncluded()[0];
+			
+			String[] geneNames = tvModel.getGeneHeaderInfo().getNames();
+			String[] arrayNames = tvModel.getArrayHeaderInfo().getNames();
+			
+			if(geneNames.length > 0 && arrayNames.length > 0) {
+				selectedLabels[0] = geneNames[geneIncluded];
+				selectedLabels[1] = arrayNames[arrayIncluded];
+			}
+			
 			tvModel.resetState();
 			tvModel.setSource(fileMenuSet);
 			
@@ -271,8 +286,29 @@ public class TVController {
 			
 			setDataModel();
 			
-			LogBuffer.println("Setting DendroView.");
 			dendroController.setNew(tvFrame.getDendroView(), (TVModel) model);
+			
+			/* set the selected label type to the old one */
+			int[] newGSelected = new int[]{0};
+			String[] geneNames = model.getGeneHeaderInfo().getNames();
+			for(int i = 0; i < geneNames.length; i++) {
+				if(geneNames[i].equalsIgnoreCase(selectedLabels[0])) {
+					newGSelected[0] = i;
+					break;
+				}
+			}
+			
+			int[] newASelected = new int[]{0};
+			String[] arrayNames = model.getArrayHeaderInfo().getNames();
+			for(int i = 0; i < arrayNames.length; i++) {
+				if(arrayNames[i].equalsIgnoreCase(selectedLabels[1])) {
+					newASelected[0] = i;
+					break;
+				}
+			}
+			
+			dendroController.setNewIncluded(newGSelected, newASelected);
+			
 			
 			LogBuffer.println("Successfully loaded: " + model.getSource());
 
