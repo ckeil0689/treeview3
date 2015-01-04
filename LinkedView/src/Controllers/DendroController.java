@@ -1757,20 +1757,17 @@ public class DendroController implements ConfigNodePersistent {
 	
 	public int[] getArrayIncluded() {
 		
-		int[] included = new int[]{0};
-		if(dendroView != null) {
-			included = dendroView.getArraynameview().getHeaderSummary().getIncluded();
-		}
-		return included;
+		return dendroView.getArraynameview().getHeaderSummary().getIncluded();
 	}
 	
 	public int[] getGeneIncluded() {
 		
-		int[] included = new int[]{0};
-		if(dendroView != null) {
-			included = dendroView.getTextview().getHeaderSummary().getIncluded();
-		}
-		return included;
+		return dendroView.getTextview().getHeaderSummary().getIncluded();
+	}
+	
+	public boolean hasDendroView() {
+		
+		return dendroView != null;
 	}
 
 	// Getters for fields

@@ -42,7 +42,6 @@ import edu.stanford.genetics.treeview.model.DataModelWriter;
 import edu.stanford.genetics.treeview.model.ModelLoader;
 import edu.stanford.genetics.treeview.model.ReorderedDataModel;
 import edu.stanford.genetics.treeview.model.TVModel;
-import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 import edu.stanford.genetics.treeview.plugin.dendroview.DoubleArrayDrawer;
 
 /**
@@ -91,8 +90,7 @@ public class TVController {
 
 			switch (option) {
 
-				case JOptionPane.YES_OPTION:	
-//					tvFrame.getConfigNode().node("File").removeNode();
+				case JOptionPane.YES_OPTION:
 					tvFrame.getConfigNode().parent().removeNode();
 					tvFrame.saveSettings();
 					tvFrame.getAppFrame().dispose();
@@ -230,16 +228,11 @@ public class TVController {
 		TVModel tvModel = (TVModel) model;
 
 		try {
-			/* save label type selection before loading new file */
-			int geneIncluded = dendroController.getGeneIncluded()[0];
-			int arrayIncluded = dendroController.getArrayIncluded()[0];
-			
-			String[] geneNames = tvModel.getGeneHeaderInfo().getNames();
-			String[] arrayNames = tvModel.getArrayHeaderInfo().getNames();
-			
-			if(geneNames.length > 0 && arrayNames.length > 0) {
-				selectedLabels[0] = geneNames[geneIncluded];
-				selectedLabels[1] = arrayNames[arrayIncluded];
+			if(dendroController.hasDendroView()) {
+				String[] geneNames = tvModel.getGeneHeaderInfo().getNames();
+				String[] arrayNames = tvModel.getArrayHeaderInfo().getNames();
+				
+				storeSelectedLabels(geneNames, arrayNames);
 			}
 			
 			tvModel.resetState();
@@ -289,26 +282,7 @@ public class TVController {
 			dendroController.setNew(tvFrame.getDendroView(), (TVModel) model);
 			
 			/* set the selected label type to the old one */
-			int[] newGSelected = new int[]{0};
-			String[] geneNames = model.getGeneHeaderInfo().getNames();
-			for(int i = 0; i < geneNames.length; i++) {
-				if(geneNames[i].equalsIgnoreCase(selectedLabels[0])) {
-					newGSelected[0] = i;
-					break;
-				}
-			}
-			
-			int[] newASelected = new int[]{0};
-			String[] arrayNames = model.getArrayHeaderInfo().getNames();
-			for(int i = 0; i < arrayNames.length; i++) {
-				if(arrayNames[i].equalsIgnoreCase(selectedLabels[1])) {
-					newASelected[0] = i;
-					break;
-				}
-			}
-			
-			dendroController.setNewIncluded(newGSelected, newASelected);
-			
+			resetLabelSelection();
 			
 			LogBuffer.println("Successfully loaded: " + model.getSource());
 
@@ -326,6 +300,51 @@ public class TVController {
 		
 		addViewListeners();
 		addMenuListeners();
+	}
+	
+	/**
+	 * Store the currently selected labels.
+	 * @param geneNames
+	 * @param arrayNames
+	 */
+	private void storeSelectedLabels(String[] geneNames, String[] arrayNames) {
+		
+		/* save label type selection before loading new file */
+		int geneIncluded = dendroController.getGeneIncluded()[0];
+		int arrayIncluded = dendroController.getArrayIncluded()[0];
+		
+		if(geneNames.length > 0 && arrayNames.length > 0) {
+			selectedLabels[0] = geneNames[geneIncluded];
+			selectedLabels[1] = arrayNames[arrayIncluded];
+		}
+	}
+	
+	/**
+	 * Use the selected labels that have been stored and select them again
+	 * in the model. This should happen right after the model has been loaded
+	 * and the new DendroView was set up.
+	 */
+	private void resetLabelSelection() {
+		
+		int[] newGSelected = new int[]{0};
+		String[] geneNames = model.getGeneHeaderInfo().getNames();
+		for(int i = 0; i < geneNames.length; i++) {
+			if(geneNames[i].equalsIgnoreCase(selectedLabels[0])) {
+				newGSelected[0] = i;
+				break;
+			}
+		}
+		
+		int[] newASelected = new int[]{0};
+		String[] arrayNames = model.getArrayHeaderInfo().getNames();
+		for(int i = 0; i < arrayNames.length; i++) {
+			if(arrayNames[i].equalsIgnoreCase(selectedLabels[1])) {
+				newASelected[0] = i;
+				break;
+			}
+		}
+		
+		dendroController.setNewIncluded(newGSelected, newASelected);
 	}
 
 	/**
