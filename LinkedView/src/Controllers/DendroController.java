@@ -237,12 +237,17 @@ public class DendroController implements ConfigNodePersistent {
 		}
 	}
 	
+	/**
+	 * Toggles trees. If visible, the divider position will be saved and 
+	 * set to 0.0. If invisible, the divider location will be reset to the
+	 * last saved value or the default value.
+	 */
 	public void toggleTrees() {
 		
 		double atr_loc = dendroView.getDivLoc(dendroView.getAtrview());
 		double gtr_loc = dendroView.getDivLoc(dendroView.getGtrview());
 		
-		if(atr_loc > 0.0 || gtr_loc > 0.0) {
+		if(atr_loc > 0.0 || gtr_loc > 0.0 ) {
 			
 			/* First save current setup */
 			configNode.putDouble("atr_Loc", atr_loc);
@@ -257,7 +262,7 @@ public class DendroController implements ConfigNodePersistent {
 			gtr_loc = configNode.getDouble("gtr_Loc", 0.5);
 		}
 		
-		dendroView.setTreesVisible(atr_loc, gtr_loc);
+		dendroView.setTreeVisibility(atr_loc, gtr_loc);
 	}
 	
 	/* Action to deselect everything */
@@ -1757,20 +1762,17 @@ public class DendroController implements ConfigNodePersistent {
 	
 	public int[] getArrayIncluded() {
 		
-		int[] included = new int[]{0};
-		if(dendroView != null) {
-			included = dendroView.getArraynameview().getHeaderSummary().getIncluded();
-		}
-		return included;
+		return dendroView.getArraynameview().getHeaderSummary().getIncluded();
 	}
 	
 	public int[] getGeneIncluded() {
 		
-		int[] included = new int[]{0};
-		if(dendroView != null) {
-			included = dendroView.getTextview().getHeaderSummary().getIncluded();
-		}
-		return included;
+		return dendroView.getTextview().getHeaderSummary().getIncluded();
+	}
+	
+	public boolean hasDendroView() {
+		
+		return dendroView != null;
 	}
 
 	// Getters for fields

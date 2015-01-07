@@ -53,11 +53,11 @@ import edu.stanford.genetics.treeview.core.FileMru;
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version @version $Revision: 1.37 $ $Date: 2009-08-26 11:48:27 $
  */
-public abstract class ViewFrame implements Observer {
+public abstract class ViewFrame implements Observer, ConfigNodePersistent {
 	// extends JFrame implements Observer {
 
 	// Main application frame
-	protected JFrame applicationFrame;
+	protected JFrame appFrame;
 
 	protected Preferences configNode;
 
@@ -82,9 +82,23 @@ public abstract class ViewFrame implements Observer {
 	 * @param title
 	 *            Title for the ViewFrame.
 	 */
-	public ViewFrame(final String title) {
+	public ViewFrame(final String title, final Preferences configNode) {
 
-		this.applicationFrame = new JFrame(title);
+		this.appFrame = new JFrame(title);
+		this.configNode = configNode;
+		
+		/* maximize frame first */
+		setupFrameSize();
+		
+		int init_width = appFrame.getWidth();
+		int init_height = appFrame.getHeight();
+		
+		int left = configNode.getInt("frame_left", 0);
+		int top = configNode.getInt("frame_top", 0);
+		int width = configNode.getInt("frame_width", init_width);
+		int height = configNode.getInt("frame_height", init_height);
+		
+		appFrame.setBounds(left, top, width, height);
 
 		setupWindowListener();
 	}
@@ -94,7 +108,7 @@ public abstract class ViewFrame implements Observer {
 	 */
 	public ViewFrame() {
 
-		this.applicationFrame = new JFrame();
+		this.appFrame = new JFrame();
 
 		setupWindowListener();
 	}
@@ -106,7 +120,7 @@ public abstract class ViewFrame implements Observer {
 	 */
 	public JFrame getAppFrame() {
 
-		return applicationFrame;
+		return appFrame;
 	}
 
 	// must override in subclass...
@@ -170,8 +184,8 @@ public abstract class ViewFrame implements Observer {
 	 */
 	private void center(final Rectangle rectangle) {
 
-		final Dimension dimension = applicationFrame.getSize();
-		applicationFrame.setLocation((rectangle.width - dimension.width) / 3
+		final Dimension dimension = appFrame.getSize();
+		appFrame.setLocation((rectangle.width - dimension.width) / 3
 				+ rectangle.x, (rectangle.height - dimension.height) / 3
 				+ rectangle.y);
 	}
@@ -202,9 +216,9 @@ public abstract class ViewFrame implements Observer {
 				.getDefaultConfiguration());
 		final int taskbarHeight = screenInsets.bottom;
 
-		applicationFrame.setSize(new Dimension(screenSize.width,
+		appFrame.setSize(new Dimension(screenSize.width,
 				screenSize.height - taskbarHeight));
-		applicationFrame.setMinimumSize(new Dimension(screenSize.width * 1 / 2,
+		appFrame.setMinimumSize(new Dimension(screenSize.width * 1 / 2,
 				screenSize.height * 2 / 3));
 	}
 
@@ -215,9 +229,9 @@ public abstract class ViewFrame implements Observer {
 	 */
 	private void setupWindowListener() {
 
-		applicationFrame
+		appFrame
 				.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		applicationFrame.addWindowListener(new WindowAdapter() {
+		appFrame.addWindowListener(new WindowAdapter() {
 
 			@Override
 			public void windowActivated(final WindowEvent windowEvent) {
@@ -309,20 +323,23 @@ public abstract class ViewFrame implements Observer {
 //			LogBuffer.println("ViewFrame.closeWindow() Got exception: " + e);
 //		}
 		
-		// Confirm user's intent to exit the application.
-		final int option = JOptionPane.showConfirmDialog(applicationFrame,
+		/* Confirm user's intent to exit the application. */
+		final int option = JOptionPane.showConfirmDialog(appFrame,
 				"Are you sure you want to close TreeView?", "Exit TreeView?",
 			    JOptionPane.YES_NO_OPTION);
 
 		switch (option) {
 
-			case JOptionPane.YES_OPTION:	saveSettings();
-											applicationFrame.dispose();
-											break;
+			case JOptionPane.YES_OPTION:	
+				saveSettings();
+				appFrame.dispose();
+				break;
 											
-			case JOptionPane.NO_OPTION:		break;
+			case JOptionPane.NO_OPTION:		
+				break;
 			
-			default:						return;
+			default:						
+				return;
 		}
 	}
 
@@ -542,7 +559,7 @@ public abstract class ViewFrame implements Observer {
 			LogBuffer.logException(e);
 			final String message = new StringBuffer("Problem loading url: ")
 					.append(e).toString();
-			JOptionPane.showMessageDialog(applicationFrame, message);
+			JOptionPane.showMessageDialog(appFrame, message);
 		}
 	}
 
@@ -631,7 +648,7 @@ public abstract class ViewFrame implements Observer {
 
 		setupFileDialog(fileDialog);
 
-		final int retVal = fileDialog.showOpenDialog(applicationFrame);
+		final int retVal = fileDialog.showOpenDialog(appFrame);
 
 		if (retVal == JFileChooser.APPROVE_OPTION) {
 			chosen = fileDialog.getSelectedFile();
@@ -656,7 +673,7 @@ public abstract class ViewFrame implements Observer {
 
 		File chosen = null;
 
-		final FileDialog fileDialog = new FileDialog(applicationFrame, 
+		final FileDialog fileDialog = new FileDialog(appFrame, 
 				"Choose a file", FileDialog.LOAD);
 
 		String string = fileMru.getMostRecentDir();
@@ -666,7 +683,7 @@ public abstract class ViewFrame implements Observer {
 		fileDialog.setDirectory(string);
 		
 		/* Lots of code to be able to center an awt.FileDialog on screen... */
-	    Rectangle rect = applicationFrame.getContentPane().getBounds();
+	    Rectangle rect = appFrame.getContentPane().getBounds();
 	    
 	    /* 
 	     * Making sure FileDialog has a size before setVisible, otherwise
@@ -696,7 +713,7 @@ public abstract class ViewFrame implements Observer {
 		}
 		
 		/* AWT FileDialog steals focus... this is necessary */
-		applicationFrame.requestFocus();
+		appFrame.requestFocus();
 
 		return chosen;
 	}
