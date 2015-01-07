@@ -592,7 +592,7 @@ public class DendroView implements Observer, DendroPanel {
 	 * 
 	 * @param visible
 	 */
-	public void setTreesVisible(final double atr_loc, final double gtr_loc) {
+	public void setTreeVisibility(final double atr_loc, final double gtr_loc) {
 		
 		if(atrPane != null) atrPane.setDividerLocation(atr_loc);
 		if(gtrPane != null) gtrPane.setDividerLocation(gtr_loc);
@@ -1425,11 +1425,18 @@ public class DendroView implements Observer, DendroPanel {
 		return textview;
 	}
 	
+	/**
+	 * Returns the current location of the divider in the supplied TRView's
+	 * JSplitPane
+	 * @param dendrogram
+	 * @return Location of divider (max = 1.0)
+	 */
 	public double getDivLoc(TRView dendrogram) {
 		
 		/* Get value for correct dendrogram JSplitPane */
 		JSplitPane treePane = (dendrogram == atrview) ? atrPane : gtrPane;
 		
+		/* returns imprecise position? -- no bug reports found */
 		double abs_div_loc = (double)treePane.getDividerLocation();
 		double max_div_loc = treePane.getMaximumDividerLocation();
 		
@@ -1437,7 +1444,7 @@ public class DendroView implements Observer, DendroPanel {
 		int tmp = (int) ((abs_div_loc / max_div_loc) * 100);
 		double rel_div_loc = tmp / 100.0;
 		
-		return rel_div_loc;
+		return (rel_div_loc > 1.0) ? 1.0 : rel_div_loc;
 	}
 
 	/**

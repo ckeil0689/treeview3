@@ -124,13 +124,13 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 * @param TreeViewApp The instance of the current running application.
 	 * @param String The name of the application.
 	 */
-	public TreeViewFrame (final TreeViewApp treeview, final String appName) {
+	public TreeViewFrame (final TreeViewApp treeView, final String appName) {
 
-		super(appName);
-		treeView = treeview;
+		super(appName, treeView.getGlobalConfig().node(StringRes.pnode_TVFrame));
+		this.treeView = treeView;
 		
 		/* Get configurations */
-		configNode = treeView.getGlobalConfig().node(StringRes.pnode_TVFrame);
+//		configNode = treeView.getGlobalConfig().node(StringRes.pnode_TVFrame);
 		
 		/* Initialize main views */
 		welcomeView = new WelcomeView();
@@ -144,12 +144,12 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		waiting = GUIFactory.createJPanel(true, GUIFactory.NO_PADDING, null);
 
 		/* Add main background panel to the application frame's contentPane */
-		applicationFrame.getContentPane().add(bgPanel);
+		appFrame.getContentPane().add(bgPanel);
 
 		/* Most recently used files */
 		setupFileMru();
 
-		setupFrameSize();
+//		setupFrameSize();
 		
 		/* Initial view */
 		generateView(WELCOME_VIEW);
@@ -165,6 +165,17 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 	@Override
 	public void saveSettings() {
+		
+		/* store screen size and position */
+		int left = appFrame.getX();
+		int top = appFrame.getY();
+		int width = appFrame.getWidth();
+		int height = appFrame.getHeight();
+		
+		configNode.putInt("frame_left", left);
+		configNode.putInt("frame_top", top);
+		configNode.putInt("frame_width", width);
+		configNode.putInt("frame_height", height);
 
 		if (isLoaded()) {
 //			dendroController.saveSettings();
@@ -244,7 +255,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	public void showRecentFileEditor() {
 
-		new FileMruEditor(fileMru).showDialog(applicationFrame);
+		new FileMruEditor(fileMru).showDialog(appFrame);
 	}
 
 	/**
@@ -274,12 +285,12 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		buffer.setLog(true);
 		inner.add(new LogSettingsPanel(buffer), "span, push");
 
-		final JDialog top = new JDialog(applicationFrame, "JTV Messages", 
+		final JDialog top = new JDialog(appFrame, "JTV Messages", 
 				false);
 		top.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		top.setContentPane(inner);
 		top.pack();
-		top.setLocationRelativeTo(applicationFrame);
+		top.setLocationRelativeTo(appFrame);
 		top.setVisible(true);
 	}
 
@@ -322,7 +333,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 			}
 		});
 		message.add(lButton);
-		JOptionPane.showMessageDialog(applicationFrame, message);
+		JOptionPane.showMessageDialog(appFrame, message);
 	}
 
 	/**
@@ -354,7 +365,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		});
 		feedback.add(yesB);
 
-		JOptionPane.showMessageDialog(applicationFrame, feedback,
+		JOptionPane.showMessageDialog(appFrame, feedback,
 				"Feedback...", JOptionPane.INFORMATION_MESSAGE);
 	}
 
@@ -363,7 +374,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	public void displayWIP() {
 
-		final JDialog dialog = new JDialog(applicationFrame);
+		final JDialog dialog = new JDialog(appFrame);
 		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
 		final JPanel panel = GUIFactory.createJPanel(true, 
@@ -375,7 +386,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		dialog.add(panel);
 		
 		dialog.pack();
-		dialog.setLocationRelativeTo(applicationFrame);
+		dialog.setLocationRelativeTo(appFrame);
 
 		dialog.setVisible(true);
 	}
@@ -456,7 +467,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		if (loaded) {
 			if (running == null) {
-				setTitleString(applicationFrame.getName());
+				setTitleString(appFrame.getName());
 				generateView(WELCOME_VIEW);
 //				JOptionPane.showMessageDialog(applicationFrame,
 //						"TreeViewFrame 253: No plugins to display");
@@ -466,8 +477,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 			}
 
 		} else {
-			applicationFrame.setTitle(StringRes.appName);
-			setTitleString(applicationFrame.getName());
+			appFrame.setTitle(StringRes.appName);
+			setTitleString(appFrame.getName());
 			generateView(LOADERROR_VIEW);
 		}
 
@@ -481,7 +492,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	public void buildMenuBar() {
 
 		menuBar = new JMenuBar();
-		applicationFrame.setJMenuBar(menuBar);
+		appFrame.setJMenuBar(menuBar);
 		
 		stackMenuList = new ArrayList<JMenuItem>();
 
@@ -705,7 +716,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	public void openSaveDialog(final boolean writerEmpty, final String msg) {
 
-		final JDialog dialog = new JDialog(applicationFrame);
+		final JDialog dialog = new JDialog(appFrame);
 		dialog.setTitle("Information");
 		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		dialog.setModalityType(JDialog.DEFAULT_MODALITY_TYPE);
@@ -864,7 +875,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	private void setLoadedTitle() {
 
-		applicationFrame.setTitle(StringRes.appName + ": " + title);
+		appFrame.setTitle(StringRes.appName + ": " + title);
 	}
 
 //	@Override
