@@ -1024,11 +1024,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	// return arrayFinder;
 	// }
 
-//	public DendroController getDendroController() {
-//
-//		return dendroController;
-//	}
-
 	/**
 	 * Returns TreeViewFrame's configNode.
 	 * 
@@ -1038,15 +1033,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		return configNode;
 	}
-
-//	/**
-//	 * Returns TVFrame's instance of dataModel
-//	 */
-//	@Override
-//	public DataModel getDataModel() {
-//
-//		return dataModel;
-//	}
 
 	/**
 	 * Returns TVFrame's instance of FileMRU

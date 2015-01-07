@@ -42,7 +42,6 @@ import edu.stanford.genetics.treeview.model.DataModelWriter;
 import edu.stanford.genetics.treeview.model.ModelLoader;
 import edu.stanford.genetics.treeview.model.ReorderedDataModel;
 import edu.stanford.genetics.treeview.model.TVModel;
-import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 import edu.stanford.genetics.treeview.plugin.dendroview.DoubleArrayDrawer;
 
 /**
@@ -242,6 +241,7 @@ public class TVController {
 				selectedLabels[1] = arrayNames[arrayIncluded];
 			}
 			
+			/* ensure reset of the model data */
 			tvModel.resetState();
 			tvModel.setSource(fileMenuSet);
 			
