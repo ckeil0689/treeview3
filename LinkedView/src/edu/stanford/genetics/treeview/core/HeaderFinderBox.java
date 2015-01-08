@@ -342,41 +342,37 @@ public abstract class HeaderFinderBox {
 	 *
 	 */
 	class BoxKeyListener extends KeyAdapter {
-
-		private boolean recordSelectedIndex = false;
-		private boolean textSelected = false;
-		private List<Integer> selectedIndexStack = new ArrayList<Integer>();
-		private int curNumChars = 0;
-		private int selStart = 0;
-		private int selEnd = 0;
-		private int len = 0;
+		private int selStartPressed = 0;
+		private int selEndPressed = 0;
+		private int lenPressed = 0;
+		private int selIndexPressed = -1;
+		private String fullTextPressed = "";
+		private int selStartTyped = 0;
+		private int selEndTyped = 0;
+		private int lenTyped = 0;
+		private int selIndexTyped = -1;
 		private boolean debug = false;
+		private boolean changed = false;
+		JTextComponent editor = ((JTextField) searchTermBox.getEditor().getEditorComponent());
 
 		//NOTE: command-w never worked to close the search window before adding anything in this class other than the seekAll function, though command-q WOULD quit the app
 
 		@Override
 		public void keyPressed(KeyEvent e) {
-			//This gives us access to the text box contents and highlight control
-			JTextComponent editor = ((JTextField) searchTermBox.getEditor().getEditorComponent());
-			selStart = editor.getSelectionStart();
-			selEnd   = editor.getSelectionEnd() - 1;
-			len      = editor.getText().length();
-			if(selEnd < selStart) selEnd = selStart;
-			//When text is selected from right to left, the values are off - couldn't figure out a way to detect this!  It will cause the deleted text to be expanded 1 character on each side
-			if(debug) LogBuffer.println("Pressed - Selection start: [" + selStart + "] Selection end: [" + selEnd + "] curNumChars: [" + curNumChars + "] String length: [" + len + "].  Selected text: [" + editor.getSelectedText() + "].  Full text: [" + editor.getText() + "]");
+			selStartPressed = editor.getSelectionStart();
+			selEndPressed   = editor.getSelectionEnd();
+			lenPressed      = editor.getText().length();
+			selIndexPressed = searchTermBox.getSelectedIndex();
+			fullTextPressed = editor.getText();
 
-			//The only purpose of the following code is to keep the popup menu hidden when the user is typing in a wildcard string that is not a perfect match to anything
-			//It tries to not get in the way though when certain other meaningful characters are typed
-			if(	//There are characters in the term field and
-				//the popup is not visible because there are more characters than there are selections in the stack
-				(curNumChars > 0 && curNumChars > selectedIndexStack.size()) ||
-					//The typed character has not been entered into the term field
-					((e.getKeyChar() < ' ' || e.getKeyChar() > '~') &&
-							//The typed key is not an up arrow, not a down arrow, and is not the enter key
-							e.getKeyCode() != KeyEvent.VK_DOWN && e.getKeyCode() != KeyEvent.VK_UP && e.getKeyCode() != KeyEvent.VK_ENTER && e.getKeyCode() != KeyEvent.VK_SHIFT)) {
-
-				searchTermBox.setPopupVisible(false);
-			}
+			if(debug) LogBuffer.println("Pressed - Selection start: [" + selStartPressed + "] " +
+					"Selection end: [" + selEndPressed + "] " +
+					"String length: [" + lenPressed + "]. " +
+					"Selected text: [" + editor.getSelectedText() + "]. " +
+					"Full text: [" + editor.getText() + "]. " +
+					"Selected index is: [" + selIndexPressed + "]. " +
+					"Character: [" + e.getKeyChar() + "]. " +
+					"When cast to int: [" + (int) e.getKeyChar() + "].");
 		}
 
 		//The delete key is selecting what one tries to delete, thus if
@@ -386,273 +382,319 @@ public abstract class HeaderFinderBox {
 		//to make it work better...
 		@Override
 		public void keyReleased(KeyEvent e) {
-			//This gives us access to the text box contents and highlight control
-			JTextComponent editor = ((JTextField) searchTermBox.getEditor().getEditorComponent());
-			//Handle the case where we added a null character to allow the user to delete the end of a matched string
-			if(editor.getText().endsWith("\0")) {
-				if(debug) LogBuffer.println("Removing null character.");
-				editor.setText(editor.getText().trim());
-				selStart--;
-				selEnd = editor.getText().length();
-				editor.setSelectionStart(selStart);
-				editor.setSelectionEnd(selEnd);
-				if(!searchTermBox.isPopupVisible()) searchTermBox.setPopupVisible(true);
-			}
+			int selStartRel = editor.getSelectionStart();         //Selection start before having typed
+			int selEndRel   = editor.getSelectionEnd();           //Selection end before having typed
+			int lenRel      = editor.getText().length();          //Length before having typed
+			int selIndexRel = searchTermBox.getSelectedIndex();   //Selected index before having typed
 
-			//When text is selected from right to left, the values are off - couldn't figure out a way to detect this!  It will cause the deleted text to be expanded 1 character on each side
-			if(debug) LogBuffer.println("Released - Selection start: [" + selStart + "] Selection end: [" + selEnd + "] curNumChars: [" + curNumChars + "] String length: [" + len + "].  Selected text: [" + editor.getSelectedText() + "].  Full text: [" + editor.getText() + "]");
-			if(debug) LogBuffer.println("Released - the selected index is: [" + searchTermBox.getSelectedIndex() + "]  Selected index stack size: [" + selectedIndexStack.size() + "].");
-			
-			//We determine whether we're going to record the currently selected index in
-			//the stack based on whether there was a valid character entered into the term box
-			if(recordSelectedIndex == true) {
-				if(debug) LogBuffer.println("Recording selected index.");
-				int selectedIndex = searchTermBox.getSelectedIndex();
-				//If the user has manually changed the highlight to be at a position smaller than the stack size, pop off the difference
-				if(selStart < selectedIndexStack.size()) {
-					int diff = selectedIndexStack.size() - selStart;
-					selectedIndexStack.subList(selectedIndexStack.size() - diff, selectedIndexStack.size()).clear();
+			if(debug) LogBuffer.println("  Relsd - Selection start: [" + selStartRel + "] " +
+					"Selection end: [" + selEndRel + "] " +
+					"String length: [" + lenRel + "]. " +
+					"Selected text: [" + editor.getSelectedText() + "]. " +
+					"Full text: [" + editor.getText() + "]. " +
+					"Selected index is: [" + selIndexRel + "]. " +
+					"Character typed: [" + e.getKeyChar() + "]. " +
+					"When cast to int: [" + (int) e.getKeyChar() + "].");
+
+			//If the contents of the text field have changed and nothing in the select list is selected
+			if((changed || lenPressed != lenRel) && searchTermBox.getSelectedIndex() == -1) {
+				if(((int) e.getKeyChar()) == 127 ||                       //Delete (forward)
+					((int) e.getKeyChar()) == 8) {                         //Backspace
+					editor.setSelectionStart(selStartTyped);
+					editor.setSelectionEnd(selStartTyped);
 				}
-				if(selectedIndex >= 0) {
-					if(debug) LogBuffer.println("Adding selected index [" + selectedIndex + "] to stack");
-					selectedIndexStack.add(selectedIndex);
-					selStart = editor.getSelectionStart();
-					if(selStart == selEnd) {
-						selEnd   = editor.getSelectionEnd();
-						len      = editor.getText().length();
-					}
-					if(!searchTermBox.isPopupVisible()) searchTermBox.setPopupVisible(true);
-				}
-				//If there is no search result, eliminate the contextual menu
 				else {
-					if(searchTermBox.isPopupVisible()) searchTermBox.setPopupVisible(false);
-
-					if(debug) LogBuffer.println("There was no selected index.");
-					//Whether there was text selected or not, we're either keeping no text selected,
-					//or we're not selecting more text after its deletion from typing a character
-					selStart++;
-					selEnd = selStart;
-					editor.setSelectionStart(selStart);
-					editor.setSelectionEnd(selStart);
-				}
-				curNumChars = selStart;
-				if(debug) LogBuffer.println("Released[after recording index] - Selection start: [" + selStart + "] Selection end: [" + selEnd + "] curNumChars: [" + curNumChars + "] String length: [" + len + "].  Selected text: [" + editor.getSelectedText() + "].  Full text: [" + editor.getText() + "]");
-				recordSelectedIndex = false;
-			}
-			else if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
-				//For some reason, between keyPressed and here, when selected text is deleted, the selection positions get changed, so I'm resetting them to what was saved in keyPressed
-				editor.setSelectionStart(selStart);
-				editor.setSelectionEnd(selEnd);
-
-				//If there are characters in the text box
-				if(curNumChars > 0) {
-					//If the selection start is at the current number of typed characters (and a single character was deleted or highlighted)
-					if(selStart == curNumChars && len <= (editor.getText().length() + 1)) {
-						//If the number of characters is equal to the number of previously selected indexes in the popup menu (meaning there are no non-matching characters)
-						if(curNumChars == selectedIndexStack.size()) {
-							//Pop the last thing off the selected index stack (each index is for an item in the select list)
-							if(selectedIndexStack.size() > 0) {
-								if(debug) LogBuffer.println("Popping off the selected index stack");
-								selectedIndexStack.subList(selectedIndexStack.size() - 1, selectedIndexStack.size()).clear();
-							}
-						}
-						if(selStart == selEnd) {
-							selEnd--;
-							editor.setSelectionEnd(selEnd);
-						}
-						selStart--;
-						editor.setSelectionStart(selStart);
-						editor.setSelectionEnd(selEnd + 1);
-						curNumChars--;
-						if(debug) LogBuffer.println("Released - Setting new Selection start: [" + selStart + "] Selection end: [" + selEnd + "] curNumChars: [" + curNumChars + "].");
-					}
-					//Else - we're no longer doing the stack, so empty it out
-					else {
-						if(debug) LogBuffer.println("RELEASED - selStart [" + selStart + "] differs from curNumChars: [" + curNumChars + "].  Setting selEnd: [" + selEnd + "] and clearing stack.");
-						selectedIndexStack.clear();
-						editor.setSelectionEnd(selEnd);
-					}
-				}
-
-				//If all the text in the text field is selected
-				if(selStart == 0 && (selEnd + 1) == len) {
-					if(searchTermBox.isPopupVisible()) searchTermBox.setPopupVisible(false);
-					searchTermBox.setSelectedIndex(0);
-					curNumChars = 0;
-					selectedIndexStack.clear();
-					return;
-				}
-				//Else if the selection does not go to the end or the selection start is not the number of typed characters -
-				//implying the user wants to delete that specific text
-				else if(selStart != selEnd &&
-						//When prev typed char was a backspace, the last char ends up not selected and the beginning of the selection has not backed up at the time of this check, thus check that selection end is not equal to length and not equal to length - 1 and that the start is not equal to curnumchars and not equalt to that plus 1
-						((selEnd + 1) < editor.getText().length() || (selStart != curNumChars && selStart != (curNumChars + 1)))) {
-					if(debug) LogBuffer.println("Manual cursor manipulation detected with selection.  Selection start: [" + selStart +
-							"] Selection end: [" + selEnd + "] Current Selection end: [" + editor.getText().length() + "] curNumChars: [" + curNumChars + "] String length: [" + len + "].");
-					if(debug && searchTermBox.getSelectedIndex() > -1) LogBuffer.println("Old String: [" + editor.getText() + "].  New string: [" +
-							editor.getText().substring(0, selStart) + editor.getText().substring((selEnd + 1), editor.getText().length()) + "].");
-					//Clear out the stack and set the curnumchars to the cursor position
-					selectedIndexStack.clear();
-					curNumChars = selStart;
-					if(searchTermBox.getSelectedIndex() > -1 && len == editor.getText().length()) {
-						if((selEnd + 1) != len && selStart != 0) {
-							if(debug) LogBuffer.println("Edited case 1.");
-							editor.setText(editor.getText().substring(0, selStart) + editor.getText().substring((selEnd + 1), editor.getText().length()));
-						}
-						else if((selEnd + 1) == len) {
-							if(debug) LogBuffer.println("Edited case 2: substring(0, " + selStart + ").");
-							//If they have manually selected some point in the middle to the end,
-							//backspace should delete, but unless we add a trailing null character,
-							//autocomplete will re-fill in what they just tried to delete
-							editor.setText(editor.getText().substring(0, selStart) + "\0");
-						}
-						else if(selStart == 0) {
-							if(debug) LogBuffer.println("Edited case 3.");
-							editor.setText(editor.getText().substring((selEnd + 1), len));
-						}
-					}
-					editor.setSelectionStart(curNumChars);
-					selStart = curNumChars;
-					editor.setSelectionEnd(curNumChars);
-					selEnd = curNumChars;
-					if(debug) LogBuffer.println("Edited String: [" + editor.getText() + "].");
-					curNumChars = editor.getText().length();
-				}
-				//Or nothing is selected and the cursor is not at the number of curNumChars and is not at the end
-				else if(selStart == selEnd && selStart != curNumChars && curNumChars != len) {
-					if(debug) LogBuffer.println("Manual cursor manipulation detected without selection.");
-					//Clear out the stack and set the curnumchars to the cursor position
-					curNumChars = selStart;
-					selectedIndexStack.clear();
-				}
-
-				//This happens after the stack and curNumChars have been updated
-				//If the stack and the number of current characters typed are in sync
-				if(curNumChars == selectedIndexStack.size()) {
-					//If there is still text in the field
-					if(selectedIndexStack.size() > 0) {
-						if(debug) LogBuffer.println("Setting the next-to-last selected index: [" + selectedIndexStack.get(selectedIndexStack.size() - 1) + "]");
-						//Set the last selected index as selected
-						searchTermBox.setSelectedIndex(selectedIndexStack.get(selectedIndexStack.size() - 1));
-						//Set the selected text in the text box to the start of the autocomplete string
-						editor.setSelectionStart(selectedIndexStack.size());
-						selStart = selectedIndexStack.size();
-						//searchTermBox.getEditor().setSelectionEnd();
-
-						//If there is no search result
-						if(searchSelection.getNumIndexes() == 0) {
-							if(searchTermBox.isPopupVisible()) searchTermBox.setPopupVisible(false);
-						} else {
-							if(!searchTermBox.isPopupVisible()) searchTermBox.setPopupVisible(true);
-						}
-					}
-					else {
-						if(debug) LogBuffer.println("Clearing out the selected index stack");
-						searchTermBox.setSelectedIndex(0);
-						if(searchTermBox.isPopupVisible()) searchTermBox.setPopupVisible(false);
-						curNumChars = 0;
-					}
-				}
-				//Else if there is still text in the field that the user has typed
-				else if (curNumChars > 0) {
-					if(debug) LogBuffer.println("Released[stack != curNumChars] - Selection start: [" + selStart + "] Selection end: [" + selEnd + "] curNumChars: [" + curNumChars + "] String length: [" + len + "].  Selected text: [" + editor.getSelectedText() + "].  Full text: [" + editor.getText() + "]");
-					if(debug) LogBuffer.println("Released[stack != curNumChars] - the selected index is: [" + searchTermBox.getSelectedIndex() + "]  Selected index stack size: [" + selectedIndexStack.size() + "].");
-
-					//If the selection Start (i.e. the cursor) is at the current number of characters, the stack is empty, and there is selected text: delete the selected text
-					if(curNumChars == selStart && selectedIndexStack.size() == 0 && selStart != selEnd) {
-						if((selEnd + 1) != len && selStart != 0) {
-							if(debug) LogBuffer.println("Edited case 1a.");
-							editor.setText(editor.getText().substring(0, selStart) + editor.getText().substring((selEnd + 1), len));
-						}
-						else if((selEnd + 1) == len) {
-							if(debug) LogBuffer.println("Edited case 2a: substring(0, " + selStart + ").");
-							editor.setText(editor.getText().substring(0, selStart));
-						}
-						else if(selStart == 0) {
-							if(debug) LogBuffer.println("Edited case 3a.");
-							editor.setText(editor.getText().substring((selEnd + 1), len));
-						}
-						
-						
-					}
-
-
+					editor.setSelectionStart(selStartRel);
+					editor.setSelectionEnd(selStartRel);
 				}
 				//searchTermBox.setPopupVisible(false);
 			}
-			else if(e.getKeyCode() == KeyEvent.VK_DOWN && e.getModifiers() == -1) {
-				if(debug) LogBuffer.println("Arrowing down with modifiers [" + e.getModifiers() + "].");
-				if(!searchTermBox.isPopupVisible()) searchTermBox.setPopupVisible(true);
-				selectedIndexStack.clear();
-				curNumChars = 0;
+			//Else if no text changed, there was selected text, and a left or right arrow was pressed without modifiers
+			else if(!changed && lenPressed == lenRel) {
+				if(selStartPressed != selEndPressed && (e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_LEFT) && e.getModifiers() == 0) {
+					if(debug) LogBuffer.println("Positioning cursor at edge of selection...");
+					if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
+						editor.setSelectionStart(selEndPressed);
+						editor.setSelectionEnd(selEndPressed);
+					}
+					else if(e.getKeyCode() == KeyEvent.VK_LEFT) {
+						editor.setSelectionStart(selStartPressed);
+						editor.setSelectionEnd(selStartPressed);
+					}
+				}
+				else if((e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_DOWN) && e.getModifiers() == 1 && e.getModifiersEx() == KeyEvent.SHIFT_DOWN_MASK) {
+					if(debug) LogBuffer.println("Expanding selection to end...");
+					if(e.getKeyCode() == KeyEvent.VK_UP) {
+						editor.setSelectionStart(0);
+						editor.setSelectionEnd(selEndPressed);
+					}
+					else if(e.getKeyCode() == KeyEvent.VK_DOWN) {
+						editor.setSelectionStart(selStartPressed);
+						editor.setSelectionEnd(lenPressed);
+					}
+				}
 			}
-			else if(e.getKeyCode() == KeyEvent.VK_UP && e.getModifiers() == -1) {
-				if(debug) LogBuffer.println("Arrowing up with modifiers [" + e.getModifiers() + "].");
-				if(!searchTermBox.isPopupVisible()) searchTermBox.setPopupVisible(true);
-				selectedIndexStack.clear();
-				curNumChars = 0;
-			}
-			else if(e.getKeyCode() == KeyEvent.VK_ESCAPE || e.getKeyCode() == KeyEvent.VK_ENTER) {
-				if(searchTermBox.isPopupVisible()) searchTermBox.setPopupVisible(false);
-			}
-			//Else assume that something has been pasted or cut and make sure no text is left selected
 			else {
-				if(debug) LogBuffer.println("Released - Previous selection start: [" + selStart + "] Selection end: [" + selEnd + "] curNumChars: [" + curNumChars + "] String length: [" + len + "].  Selected text: [" + editor.getSelectedText() + "].  Full text: [" + editor.getText() + "]");
-				if(debug) LogBuffer.println("Released - Current selection start: [" + editor.getSelectionStart() + "] Selection end: [" + editor.getSelectionEnd() + "] curNumChars: [" + curNumChars + "] String length: [" + editor.getText().length() + "].  Selected text: [" + editor.getSelectedText() + "].  Full text: [" + editor.getText() + "]");
-				//If the string got longer, set the selection end as the current selection start
-				if(len < editor.getText().length()) {
-					editor.setSelectionEnd(editor.getSelectionStart());
-				}
-				//When the string gets shorter, it appears to work correctly, though I haven't tested to see what happens if the resulting text matches anything
-
-				//If nothing is selected, hide the popup
-				if(searchTermBox.getSelectedIndex() == -1) {
-					if(searchTermBox.isPopupVisible()) searchTermBox.setPopupVisible(false);
-				}
+				if(debug) LogBuffer.println("Nothing to do because changed is " + (changed ? "" : "not ") + "true, the length has " +
+						(lenPressed == lenRel ? "not " : "") + "changed and not sideways arrow keys were pressed and there were " + e.getModifiers() + " modifiers.");
 			}
+
+			changed = false;
 		}
 
 		@Override
 		public void keyTyped(KeyEvent e) {
-			//This gives us access to the text box contents and highlight control
-			JTextComponent editor = ((JTextField) searchTermBox.getEditor().getEditorComponent());
-			//Get the length of the text in the box (including auto-completed characters)
-			int len = editor.getText().length();
-			//When text is selected from right to left, the values are off - couldn't figure out a way to detect this!  It will cause the deleted text to be expanded 1 character on each side
-			if(debug) LogBuffer.println("Typed - Selection start: [" + selStart + "] Selection end: [" + selEnd + "] curNumChars: [" + curNumChars + "] String length: [" + len + "].  Selected text: [" + editor.getSelectedText() + "].  Full text: [" + editor.getText() + "]");
-			if(debug) LogBuffer.println("Typed - the selected index is: [" + searchTermBox.getSelectedIndex() + "].");
+			//There's a weird case where sometimes hitting backspace after having manually selected some text causes the selection end to decrement.  The selection end in the keyPressed function always seems to be right, so we'll make sure we keep it:
+			editor.setSelectionEnd(selEndPressed);
 
+			selStartTyped = editor.getSelectionStart();         //Selection start before having typed
+			selEndTyped   = editor.getSelectionEnd();           //Selection end before having typed
+			lenTyped      = editor.getText().length();          //Length before having typed
+			selIndexTyped = searchTermBox.getSelectedIndex();   //Selected index before having typed
+
+			if(debug) LogBuffer.println("  Typed - Selection start: [" + selStartTyped + "] " +
+					"Selection end: [" + selEndTyped + "] " +
+					"String length: [" + lenTyped + "]. " +
+					"Selected text: [" + editor.getSelectedText() + "]. " +
+					"Full text: [" + editor.getText() + "]. " +
+					"Selected index is: [" + selIndexTyped + "]. " +
+					"Character typed: [" + e.getKeyChar() + "]. " +
+					"When cast to int: [" + (int) e.getKeyChar() + "].");
+			
+			//If the backspace was typed, there was a selection, and the selStartPressed is 1 more than the selStartTyped,
+			//it most likely means that text was highlighted from right to left and the text will be incorrectly edited
+			//(a bug of the parent class - because they didn't anticipate text to be manipulated this way), so let's nip that in the bud
+			if(((int) e.getKeyChar()) == 8 && selStartPressed != selEndPressed && (selStartPressed - 1) == selStartTyped) {
+				selStartTyped = selStartPressed;
+				editor.setSelectionStart(selStartPressed);
+			}
+			//Else if the selStartPressed is the same, but the selEndPressed == lenPressed (and not equal to selStartPressed)
+			//and the selEndTyped is equal to selStartTyped and selIndexPressed is > -1 and selIndexTyped == -1 and a backspace was typed,
+			//it most likely means that text was previously (on a previous backspace keystroke) selected and deleted to create a resulting matching string
+			//and the current backspace inadvertently does nothing (a bug of the parent class as well), so let's nip that in the bud.
+			else if(selStartPressed == selStartTyped && selEndPressed == lenPressed && selEndPressed != selStartPressed && selEndTyped == selStartTyped && selIndexPressed > -1 && selIndexTyped == -1 && ((int) e.getKeyChar()) == 8) {
+				editor.setText(fullTextPressed);
+				selStartTyped = selStartPressed;
+				editor.setSelectionStart(selStartPressed);
+				selEndTyped = selEndPressed;
+				editor.setSelectionEnd(selEndPressed);
+				lenTyped = lenPressed;
+				selIndexTyped = selIndexPressed;
+				searchTermBox.setSelectedIndex(selIndexPressed);
+			}
+
+			//searchTermBox.setPopupVisible(true);
+
+			//Perform the search to highlight the result in the main window if enter key is typed
 			if(e.getKeyChar() == KeyEvent.VK_ENTER) {
-				selectedIndexStack.clear();
-				curNumChars = 0;
 				seekAll();
 			}
-			//Else if the typed character is a real character and not some sort of modifier
-			//else if(e.getKeyCode() != KeyEvent.VK_SHIFT && e.getKeyCode() != KeyEvent.VK_DOWN && e.getKeyCode() != KeyEvent.VK_UP && e.getKeyCode() != KeyEvent.CHAR_UNDEFINED) {
-			//else if(e.getKeyChar() >= ' ' && e.getKeyChar() <= '~') {    //<--ASCII support. V--Unicode support
-			else if(((int) e.getKeyChar()) != 27  &&                       //Escape
-					((int) e.getKeyChar()) != 127 &&                       //Delete (forward)
-					((int) e.getKeyChar()) != 8) {                         //Backspace
-				curNumChars++;
-				if(debug) LogBuffer.println("Adding character [" + e.getKeyChar() + "].");
+			//If the delete or backspace is typed, set the new text content to force autocomplete to update
+			else if(((int) e.getKeyChar()) == 127 ||                       //Delete (forward)
+					((int) e.getKeyChar()) == 8) {                         //Backspace
+				//Only need to manipulate the edit action if there's a currently selected index
+				if(selIndexPressed > -1) {
+					if(lenTyped > 0) {
+						if(selEndTyped != lenTyped && selStartTyped != 0) {
+							if(debug) LogBuffer.println("Edited case 1a.");
+							if(selStartTyped != selEndTyped) {
+								String editedText = editor.getText().substring(0, selStartTyped) + editor.getText().substring(selEndTyped, lenTyped);
+								if(debug) LogBuffer.println("Setting text to [" + editedText + "].");
+								editor.setText(editedText);
+							}
+							else {
+								editor.setText(editor.getText().substring(0, selStartTyped) + editor.getText().substring(selEndTyped, lenTyped));
+							}
+						}
+						else if(selEndTyped == lenTyped) {
+							if(debug) LogBuffer.println("Edited case 2a: substring(0, " + selStartTyped + ").");
+							if(selStartTyped == 0) {
+								searchTermBox.setSelectedIndex(0);
+							}
+							else {
+								editor.setText(editor.getText().substring(0, selStartTyped));
+								if(searchTermBox.getSelectedIndex() == -1) {
+									editor.setSelectionStart(selStartTyped);
+									editor.setSelectionEnd(selStartTyped);
+									//searchTermBox.setPopupVisible(false);
+								}
+							}
+						}
+						else if(selStartTyped == 0) {
+							if(debug) LogBuffer.println("Edited case 3a.");
+							editor.setText(editor.getText().substring(selEndTyped, lenTyped));
+							if(searchTermBox.getSelectedIndex() == -1) {
+								editor.setSelectionStart(selStartTyped);
+								editor.setSelectionEnd(selStartTyped);
+								//searchTermBox.setPopupVisible(false);
+							}
+						}
+					}
+					else {
+						searchTermBox.setSelectedIndex(0);
+					}
+				}
+			}
+			//Else if a character was entered into the field, ensure the selected text was replaced
+			else if(((int) e.getKeyChar()) != 27) {
+				//If the previous selected index is -1, make the edit manually because typing over selected text doesn't seem to work otherwise
+				if(searchTermBox.getSelectedIndex() == -1) {
+					if(debug) LogBuffer.println("Trying to force editing manually selected text to work");
+					
+					if(lenTyped > 0) {
+						if(selEndTyped != lenTyped && selStartTyped != 0) {
+							if(debug) LogBuffer.println("Edited case 1b.");
+							if(selStartTyped != selEndTyped) {
+								//All I have to do is remove the selected text and what was typed will be inserted between here and keyReleased
+								editor.setText(editor.getText().substring(0, selStartTyped) + editor.getText().substring((selEndTyped), lenTyped));
+							}
+							else {
+								//Actually the default behavior appears to work automatically in this instance - it's only when there's selected text when there's a problem
+								//editor.setText(editor.getText().substring(0, selStartTyped) + e.getKeyChar() + editor.getText().substring(selEndTyped, lenTyped));
+							}
+						}
+						else if(selEndTyped == lenTyped) {
+							if(debug) LogBuffer.println("Edited case 2b: substring(0, " + selStartTyped + ").");
+							if(selStartTyped == 0) {
+								searchTermBox.setSelectedIndex(0);
+							}
+							else {
+								//All I have to do is remove the selected text and what was typed will be inserted between here and keyReleased
+								editor.setText(editor.getText().substring(0, selStartTyped));// + e.getKeyChar());
+								if(searchTermBox.getSelectedIndex() == -1) {
+									editor.setSelectionStart(selStartTyped);
+									editor.setSelectionEnd(selStartTyped);
+									//searchTermBox.setPopupVisible(false);
+								}
+							}
+						}
+						else if(selStartTyped == 0) {
+							if(debug) LogBuffer.println("Edited case 3b.");
+							//The parent class will add the typed character at the beginning between keyTyped and keyReleased (but apparently we need to delete the selected text manually)
+							editor.setText(/*e.getKeyChar() + */editor.getText().substring(selEndTyped, lenTyped));
+							if(searchTermBox.getSelectedIndex() == -1) {
+								editor.setSelectionStart(selStartTyped);
+								editor.setSelectionEnd(selStartTyped);
+								//searchTermBox.setPopupVisible(false);
+							}
+						}
+					}
+					else {
+						searchTermBox.setSelectedIndex(0);
+					}
+				}
+			}
 
-				//Record whether text was selected when this character was typed so that the selection state can
-				//be preserved in KeyReleased or a new selection can be made if the term matches something in the select list
-				if(selStart == selEnd) {
-					textSelected = false;
+			//If the content of the text field changed (i.e. an escape or enter character was not typed - assumes no other non-chars get in here)
+			//Ensure autocomplete worked, the selected index is correct, and that the text selection/cursor-placement is accurate
+			if(((int) e.getKeyChar()) != 27 && e.getKeyChar() != KeyEvent.VK_ENTER) {
+				//If the previous selected index is -1, try to force a matching index to be selected
+				if(searchTermBox.getSelectedIndex() == -1 && selIndexTyped == -1) {
+					
+					//Get the current text content
+					String content = editor.getText();
+
+					if(debug) LogBuffer.println("Trying to force a selection to be made 1.  Current text: [" + content + "].");
+
+					//searchTermBox.setKeySelectionManager(searchTermBox.getKeySelectionManager());  //Doesn't work
+					//searchTermBox.setEnabled(false);searchTermBox.setEnabled(true);  //Doesn't work
+					//Force entry into a mode where indexes are selected by entering an S (Corresponding to the default text field entry of "Search Row/Column Labels... "
+					searchTermBox.selectWithKeyChar('S');
+					//Now reset the text back to what it was to force a selection (if one exists)
+					if(content.length() > 0) editor.setText(content);
+					//The above puts the cursor at the end of the total text
+					//Now put the cursor back where it was
+					//If the typed key was backspace or delete
+					if(((int) e.getKeyChar()) == 127) {                       //Delete (forward)
+						//Put the cursor at the beginning of the previously selected text (because that text is now gone)
+						editor.setSelectionStart(selStartTyped);
+						//If there is still not a selected index, also set the end position there (otherwise, it will stay at the end)
+						if(searchTermBox.getSelectedIndex() == -1) editor.setSelectionStart(selStartTyped);
+						if(searchTermBox.getSelectedIndex() > -1) editor.setSelectionEnd(editor.getText().length());
+					}
+					else if(((int) e.getKeyChar()) == 8) {                    //Backspace
+						//Put the cursor at 1 before the beginning of the previously selected text (because that text is now gone and the way this is set up to behave is that the selected text contains autofill characters, not an explicit selection to delete without deleting a new character)
+						editor.setSelectionStart(selStartTyped);
+						//If there is still not a selected index, also set the end position there (otherwise, it will stay at the end)
+						if(searchTermBox.getSelectedIndex() == -1) {
+							editor.setSelectionStart(selStartTyped);
+						}
+						else if(searchTermBox.getSelectedIndex() > -1) {
+							editor.setSelectionEnd(editor.getText().length());
+						}
+					}
+					else {
+						//Put the cursor after the typed character
+						editor.setSelectionStart(selStartTyped + 1);
+						//If there is still not a selected index, also set the end position there (otherwise, it will stay at the end)
+						if(searchTermBox.getSelectedIndex() == -1) {
+							editor.setSelectionStart(selStartTyped);
+							editor.setSelectionEnd(selStartTyped);
+						}
+						if(searchTermBox.getSelectedIndex() > -1) editor.setSelectionEnd(editor.getText().length());
+					}
 				}
 				else {
-					textSelected = true;
+					if(((int) e.getKeyChar()) == 8) {                    //Backspace
+						if(selEndTyped == lenTyped) {
+							if(debug) LogBuffer.println("Trying to force the selection to regress");
+							//Put the cursor at 1 before the beginning of the previously selected text (because that text is now gone and the way this is set up to behave is that the selected text contains autofill characters, not an explicit selection to delete without deleting a new character)
+							if(selStartTyped == selStartPressed) {
+								editor.setSelectionStart(selStartTyped - 1);
+								editor.setSelectionEnd(editor.getText().length());
+								
+								String content = "";
+								if(editor.getText().length() >= (selStartTyped - 1)) {
+								//Get the current unselected text content
+									content = editor.getText().substring(0,selStartTyped - 1);
+								}
+								
+								if(debug) LogBuffer.println("Trying to force a selection to be made 2.  Current text: [" + content + "].");
+
+								//searchTermBox.setKeySelectionManager(searchTermBox.getKeySelectionManager());  //Doesn't work
+								//searchTermBox.setEnabled(false);searchTermBox.setEnabled(true);                //Doesn't work
+								//Force entry into a mode where indexes are selected by entering an S (Corresponding to the default text field entry of "Search Row/Column Labels... ")
+								searchTermBox.selectWithKeyChar('S');
+								searchTermBox.setSelectedIndex(0);  //We're doing this just in case there's a different S match and content is an empty string
+								if(content.length() > 0) {
+									//Now reset the text back to what it was to force a selection (if one exists)
+									editor.setText(content);
+								}
+							}
+						}
+						else if(searchTermBox.getSelectedIndex() > -1) {
+							editor.setSelectionEnd(editor.getText().length());
+						}
+					}
 				}
 
-				//We determine whether we're going to record the currently selected index in
-				//the stack based on whether there was a valid character entered into the term box
-				//The current selected index upon keyTyped is actually one out-of-date, so we're going to tell
-				//keyReleased to do it by setting this flag to true
-				recordSelectedIndex = true;
+				//There's a weird case where the second backspace after removing a non-matching character to create a matching string causes the end of the selection to decrement instead of the beginning of the selection to decrement and the character preceding the selStart isn't removed.  So...
+				if(selIndexTyped == -1 && selIndexPressed > -1 && ((int) e.getKeyChar()) == 8 &&
+						selStartTyped == selStartPressed && (selEndTyped + 1) == selEndPressed) {
+					if(debug) LogBuffer.println("Trying to force a selection to be made 3");
+					if((selStartTyped - 1) > 0) {
+						//Get the current text content
+						String content = editor.getText().substring(0, selStartTyped - 1);
+						//Force entry into a mode where indexes are selected by entering an S (Corresponding to the default text field entry of "Search Row/Column Labels... "
+						searchTermBox.selectWithKeyChar('S');
+						//Now reset the text back to what it was to force a selection (if one exists)
+						editor.setText(content);
+						//Now set the selected text properly
+						editor.setSelectionStart(selStartTyped - 1);
+						if(searchTermBox.getSelectedIndex() > -1) {
+							editor.setSelectionEnd(editor.getText().length());
+						}
+						else {
+							editor.setSelectionEnd(selStartTyped - 1);
+						}
+					}
+					else {
+						searchTermBox.setSelectedIndex(0);
+					}
+						
+				}
+				changed = true;
 			}
-			if(debug) LogBuffer.println("Character typed: [" + e.getKeyChar() + "]. Undefined?: [" + ((e.getKeyChar() == KeyEvent.CHAR_UNDEFINED) ? "yes" : "no") + "]." +
-					"When cast to int: [" + (int) e.getKeyChar() + "].");
 		}
 	}
 	
