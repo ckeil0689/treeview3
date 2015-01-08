@@ -255,8 +255,6 @@ public abstract class HeaderFinderBox {
 			//LogBuffer.println("The search result is outside the visible area.");
 			//LogBuffer.println("The search result is outside the visible area: [" + minIndex + " < " + globalSmap.getFirstVisible() + "] || [" + maxIndex + " > (" + globalSmap.getFirstVisible() + " + " + globalSmap.getNumVisible() + " - 1)].");
 			globalSmap.setHome();
-//Commented this out because it wasn't doing anything anyway
-//			scrollToIndex(indexList.get(0));
 		}
 
 		if((viewFrame != null) && (otherIndexList.size() == 0 ||
@@ -272,17 +270,32 @@ public abstract class HeaderFinderBox {
 	private List<Integer> findSelected() {
 		
 		List<Integer> indexList = new ArrayList<Integer>();
-		
+		List<Integer> substrList = new ArrayList<Integer>();
+
 		String sub = searchTermBox.getSelectedItem().toString();
-		
+
+		String wildcardsub = sub;
+		if(wildcardsub.substring(0,1) != "*") {
+			wildcardsub = "*" + wildcardsub;
+		}
+		if(wildcardsub.substring((wildcardsub.length() - 1),wildcardsub.length()) != "*") {
+			wildcardsub = wildcardsub + "*";
+		}
+
 		for(String header : searchDataList) {
 			
 			if(wildCardMatch(header, sub)) {
 				indexList.add(searchDataList.indexOf(header));
 			}
+			if(wildCardMatch(header, wildcardsub)) {
+				substrList.add(searchDataList.indexOf(header));
+			}
 		}
 		
-		return indexList;
+		if(indexList.size() > 0) {
+			return indexList;
+		}
+		return(substrList);
 	}
 	
 	private List<Integer> getOtherSelected() {
