@@ -82,6 +82,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 	private String face;
 	private int style;
 	private int size;
+	private boolean isRightJustified;
 
 	private Image backBuffer;
 	private final JScrollPane scrollPane;
@@ -99,6 +100,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 	private final String d_face = "Dialog";
 	private final int d_style = 0;
 	private final int d_size = 12;
+	private final boolean d_justified = false;
 
 	private final JLabel l1;
 
@@ -335,8 +337,14 @@ public class ArrayNameView extends ModelView implements MouseListener,
 								}
 
 								g2d.setColor(fore);
-								 g2d.drawString(out, 0, map.getMiddlePixel(j)
-								 + ascent / 2);
+								if(isRightJustified) {
+									g2d.drawString(out, offscreenSize.height
+													- metrics.stringWidth(out),
+											map.getMiddlePixel(j) + ascent / 2);
+								} else {
+									g2d.drawString(out, 0, map.getMiddlePixel(j)
+											+ ascent / 2);
+								}
 
 								// Unknown Mac OS X issue with drawString,
 								// mysteriously fixed by this. Java 1.6
@@ -349,8 +357,14 @@ public class ArrayNameView extends ModelView implements MouseListener,
 								}
 							} else {
 								g2d.setColor(Color.black);
-								 g2d.drawString(out, 0, map.getMiddlePixel(j)
-								 + ascent / 2);
+								if(isRightJustified) {
+									g2d.drawString(out, offscreenSize.height
+													- metrics.stringWidth(out),
+											map.getMiddlePixel(j) + ascent / 2);
+								} else {
+									g2d.drawString(out, 0, map.getMiddlePixel(j)
+											+ ascent / 2);
+								}
 								// g.setColor(fore);
 
 								// Unknown Mac OS X issue with drawString,
@@ -621,6 +635,12 @@ public class ArrayNameView extends ModelView implements MouseListener,
 
 		return style;
 	}
+	
+	@Override
+	public boolean getJustifyOption() {
+		
+		return isRightJustified;
+	}
 
 	/* inherit description */
 	@Override
@@ -668,6 +688,25 @@ public class ArrayNameView extends ModelView implements MouseListener,
 			revalidate();
 			repaint();
 		}
+	}
+
+	@Override
+	public void setJustifyOption(boolean isRightJustified) {
+		
+		this.isRightJustified = isRightJustified;
+		
+		if (configNode != null) {
+			configNode.putBoolean("colRightJustified", isRightJustified);
+		}
+		
+		if(isRightJustified) {
+			int scrollMax = scrollPane.getVerticalScrollBar().getMaximum();
+			scrollPane.getVerticalScrollBar().setValue(scrollMax);
+		} else {
+			scrollPane.getVerticalScrollBar().setValue(0);
+		}
+		
+		repaint();
 	}
 
 //	private HeaderSummary headerSummary;
@@ -718,6 +757,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		setFace(configNode.get("face", d_face));
 		setStyle(configNode.getInt("style", d_style));
 		setPoints(configNode.getInt("size", d_size));
+		setJustifyOption(configNode.getBoolean("colRightJustified", d_justified));
 	}
 
 	/**

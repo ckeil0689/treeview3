@@ -68,12 +68,14 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 	private final String d_face = "Dialog";
 	private final int d_style = 0;
 	private final int d_size = 12;
+	private final boolean d_justified = true;
 
 	private Preferences configNode = null;
 
 	private String face;
 	private int style;
 	private int size;
+	private boolean isRightJustified;
 
 	private TreeSelectionI geneSelection;
 	private TreeSelectionI arraySelection;
@@ -237,28 +239,29 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 
 							g.setColor(fore);
 
-							// left-aligned text
-							g.drawString(
-									out,
-									0,
-									//This is how you would do right-aligned text
-									//offscreenSize.width
-									//		- metrics.stringWidth(out),
-									map.getMiddlePixel(j) + ascent / 2);
+							// TODO move if outside of loop?
+							if(isRightJustified) {
+								g.drawString(out, offscreenSize.width
+												- metrics.stringWidth(out),
+										map.getMiddlePixel(j) + ascent / 2);
+							} else {
+								g.drawString(out, 0,
+										map.getMiddlePixel(j) + ascent / 2);
+							}
 
 							if (fgColorIndex > 0) {
 								g.setColor(fore);
 							}
 						} else {
 							g.setColor(Color.black);
-							// left-aligned text
-							g.drawString(
-									out,
-									0,
-									//This is how you would do right-aligned text
-									//offscreenSize.width
-									//		- metrics.stringWidth(out),// 0,
-									map.getMiddlePixel(j) + ascent / 2);
+							if(isRightJustified) {
+								g.drawString(out, offscreenSize.width
+												- metrics.stringWidth(out),
+										map.getMiddlePixel(j) + ascent / 2);
+							} else {
+								g.drawString(out, 0,
+										map.getMiddlePixel(j) + ascent / 2);
+							}
 							// g.setColor(fore);
 						}
 
@@ -509,7 +512,7 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 	public void adjustmentValueChanged(final AdjustmentEvent evt) {
 
 		offscreenValid = false;
-		revalidate();
+//		revalidate();
 		repaint();
 	}
 
@@ -517,7 +520,7 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 
 		// scrollbar.setValue(offset);
 		offscreenValid = false;
-		revalidate();
+//		revalidate();
 		repaint();
 	}
 
@@ -539,6 +542,12 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 
 		return style;
 	}
+	
+	@Override
+	public boolean getJustifyOption() {
+		
+		return isRightJustified;
+	}
 
 	@Override
 	public void setFace(final String string) {
@@ -551,7 +560,7 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 			}
 
 			setFont(new Font(face, style, size));
-			revalidate();
+//			revalidate();
 			repaint();
 		}
 	}
@@ -567,7 +576,7 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 			}
 
 			setFont(new Font(face, style, size));
-			revalidate();
+//			revalidate();
 			repaint();
 		}
 	}
@@ -583,22 +592,30 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 			}
 
 			setFont(new Font(face, style, size));
-			revalidate();
+//			revalidate();
 			repaint();
 		}
 	}
-
-	// public void bindConfig(final Preferences configNode) {
-	//
-	// root = configNode;
-	//
-	// setFace(root.get("face", d_face));
-	// setStyle(root.getInt("style", d_style));
-	// setPoints(root.getInt("size", d_size));
-	//
-	// // getHeaderSummary().bindConfig(root.fetchOrCreate("GeneSummary"));
-	// getHeaderSummary().setConfigNode("GeneSummary");
-	// }
+	
+	@Override
+	public void setJustifyOption(boolean isRightJustified) {
+		
+		this.isRightJustified = isRightJustified;
+		
+		if (configNode != null) {
+			configNode.putBoolean("rowRightJustified", isRightJustified);
+		}
+		
+		if(isRightJustified) {
+			int scrollMax = scrollPane.getHorizontalScrollBar().getMaximum();
+			scrollPane.getHorizontalScrollBar().setValue(scrollMax);
+		} else {
+			scrollPane.getHorizontalScrollBar().setValue(0);
+		}
+		
+		repaint();
+	}
+	
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
 
@@ -613,6 +630,7 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 		setFace(configNode.get("face", d_face));
 		setStyle(configNode.getInt("style", d_style));
 		setPoints(configNode.getInt("size", d_size));
+		setJustifyOption(configNode.getBoolean("rowRightJustified", d_justified));
 
 		// getHeaderSummary().bindConfig(root.fetchOrCreate("GeneSummary"));
 		getHeaderSummary().setConfigNode(configNode);

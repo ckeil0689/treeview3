@@ -13,6 +13,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.List;
 
+import javax.swing.JRadioButton;
 import javax.swing.SwingWorker;
 
 import Utilities.StringRes;
@@ -60,6 +61,7 @@ public class PreferencesController {
 		preferences.addOKButtonListener(new ConfirmationListener());
 		preferences.addCustomLabelListener(new CustomLabelListener());
 		preferences.addComponentListener(new PreferencesComponentListener());
+		preferences.addJustifyListener(new LabelJustifyListener());
 	}
 
 	class MenuPanelListener implements MouseListener {
@@ -167,6 +169,47 @@ public class PreferencesController {
 
 			checkForColorSave();
 			preferences.getPreferencesFrame().dispose();
+		}
+	}
+	
+	class LabelJustifyListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			
+			JRadioButton[] alignBtns = preferences.getAlignBtns();
+			
+			boolean isRowRight = tvFrame.getDendroView().getTextview()
+					.getJustifyOption();
+			boolean isColRight = tvFrame.getDendroView().getArraynameview()
+					.getJustifyOption();
+			
+			int btnCounter = 0;
+			for(JRadioButton btn : alignBtns) {
+				
+				if(e.getSource() == btn) {
+					switch(btnCounter) {
+					case 0:
+						isRowRight = false;
+						break;
+					case 1:
+						isRowRight = true;
+						break;
+					case 2:
+						isColRight = false;
+						break;
+					case 3:
+						isColRight = true;
+						break;
+					default:
+						break;
+					}
+					break;
+				}
+				btnCounter++;
+			}
+			tvFrame.getDendroView().getTextview().setJustifyOption(isRowRight);
+			tvFrame.getDendroView().getArraynameview().setJustifyOption(isColRight);
 		}
 	}
 

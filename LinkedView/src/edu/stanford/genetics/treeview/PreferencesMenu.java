@@ -7,10 +7,12 @@ import java.awt.event.WindowEvent;
 import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 
 import ColorChooser.ColorChooser;
 import Utilities.CustomDialog;
@@ -168,6 +170,13 @@ implements ConfigNodePersistent {
 					listener);
 		}
 	}
+	
+	public void addJustifyListener(final ActionListener listener) {
+		
+		if (annotationSettings != null) {
+			annotationSettings.addJustifyListener(listener);
+		}
+	}
 
 	/**
 	 * Adds a component listener to the JDialog in which the content of this
@@ -251,8 +260,14 @@ implements ConfigNodePersistent {
 
 		private final JPanel mainPanel;
 		private final JButton custom_button;
+		
 		private final HeaderSummaryPanel genePanel;
 		private final HeaderSummaryPanel arrayPanel;
+		
+		private JRadioButton rowRightJustBtn;
+		private JRadioButton rowLeftJustBtn;
+		private JRadioButton colRightJustBtn;
+		private JRadioButton colLeftJustBtn;
 
 		public AnnotationPanel() {
 
@@ -274,11 +289,59 @@ implements ConfigNodePersistent {
 
 			final JLabel rows = GUIFactory.setupHeader(StringRes.main_rows);
 			final JLabel cols = GUIFactory.setupHeader(StringRes.main_cols);
+			
+			
+			/* Label alignment */
+			final JLabel justifyHint = GUIFactory.createLabel(
+					"Label justification: ", GUIFactory.FONTS);
+			
+			ButtonGroup rowJustifyBtnGroup = new ButtonGroup();
+
+			rowLeftJustBtn = GUIFactory.createRadioBtn("Left");
+			rowRightJustBtn = GUIFactory.createRadioBtn("Right");
+			
+			if(dendroView.getTextview().getJustifyOption()) {
+				rowRightJustBtn.setSelected(true);
+			} else {
+				rowLeftJustBtn.setSelected(true);
+			}
+			
+			rowJustifyBtnGroup.add(rowLeftJustBtn);
+			rowJustifyBtnGroup.add(rowRightJustBtn);
+			
+			final JPanel rowRadioBtnPanel = 
+					GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
+	
+			rowRadioBtnPanel.add(rowLeftJustBtn, "span, wrap");
+			rowRadioBtnPanel.add(rowRightJustBtn, "span, wrap");
+			
+			ButtonGroup colJustifyBtnGroup = new ButtonGroup();
+			
+			colLeftJustBtn = GUIFactory.createRadioBtn("Left");
+			colRightJustBtn = GUIFactory.createRadioBtn("Right");
+			
+			if(dendroView.getArraynameview().getJustifyOption()) {
+				colRightJustBtn.setSelected(true);
+			} else {
+				colLeftJustBtn.setSelected(true);
+			}
+			
+			colJustifyBtnGroup.add(colLeftJustBtn);
+			colJustifyBtnGroup.add(colRightJustBtn);
+			
+			final JPanel colRadioBtnPanel = 
+					GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
+
+			colRadioBtnPanel.add(colLeftJustBtn, "span, wrap");
+			colRadioBtnPanel.add(colRightJustBtn, "span, wrap");
 
 			mainPanel.add(rows, "pushx, alignx 50%");
 			mainPanel.add(cols, "pushx, alignx 50%, wrap");
 			mainPanel.add(genePanel, "pushx, alignx 50%, w 45%");
 			mainPanel.add(arrayPanel, "pushx, alignx 50%, w 45%, wrap");
+			mainPanel.add(justifyHint, "pushx, alignx 0%, span, wrap");
+			mainPanel.add(rowRadioBtnPanel, "pushx, alignx 50%, w 45%");
+			mainPanel.add(colRadioBtnPanel, "pushx, alignx 50%, w 45%, wrap");
 			mainPanel.add(custom_button, "pushx, alignx 50%, span");
 		}
 
@@ -296,6 +359,20 @@ implements ConfigNodePersistent {
 
 			genePanel.synchronizeTo();
 			arrayPanel.synchronizeTo();
+		}
+		
+		public void addJustifyListener(final ActionListener l) {
+
+			rowLeftJustBtn.addActionListener(l);
+			rowRightJustBtn.addActionListener(l);
+			colLeftJustBtn.addActionListener(l);
+			colRightJustBtn.addActionListener(l);
+		}
+		
+		public JRadioButton[] getAlignBtns() {
+			
+			return new JRadioButton[]{rowLeftJustBtn, rowRightJustBtn, 
+					colLeftJustBtn, colRightJustBtn};
 		}
 
 		public int getSelectedGeneIndex() {
@@ -357,6 +434,11 @@ implements ConfigNodePersistent {
 		dialog.pack();
 		dialog.setLocationRelativeTo(tvFrame.getAppFrame());
 	}
+	
+	public JRadioButton[] getAlignBtns() {
+		
+		return annotationSettings.getAlignBtns();
+	}
 
 	/**
 	 * Returns PreferencesMenu's configNode.
@@ -367,23 +449,4 @@ implements ConfigNodePersistent {
 
 		return configNode;
 	}
-	
-//	// Layout Test
-//	public static void main(String[] args) {
-//		
-//		SwingUtilities.invokeLater(new Runnable() {
-//
-//			@Override
-//			public void run() {
-//				
-//				String menuTitle = "URL"; // change this to see different menus
-//				
-//				PreferencesMenu prefMenu = new PreferencesMenu(null);
-//				
-//				new PreferencesController(null, null, prefMenu);
-//
-//				prefMenu.setVisible(true);
-//			}
-//		});
-//    }
 }
