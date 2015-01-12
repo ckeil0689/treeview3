@@ -119,9 +119,10 @@ public class MenubarController {
 		case StringRes.menu_Shortcuts:		
 			tvFrame.showShortcuts();
 			break;
-		case StringRes.menu_Docs:		
-			tvFrame.showDocumentation();
-			break;
+//There's currently no documentation page - don't need it for the first release
+//		case StringRes.menu_Docs:		
+//			tvFrame.showDocumentation();
+//			break;
 		case StringRes.menu_ShowLog:	
 			tvFrame.showLogMessages();
 			break;

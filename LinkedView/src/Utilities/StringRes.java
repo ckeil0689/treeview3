@@ -70,7 +70,8 @@ public class StringRes {
 	public static final String menu_Shortcuts = "Keyboard shortcuts...";
 	public static final String menu_About = "About...";
 	public static final String menu_ShowLog = "Show Log...";
-	public static final String menu_Docs = "Documentation...";
+//There's currently no documentation page - don't need it for the first release
+//	public static final String menu_Docs = "Documentation...";
 	public static final String menu_Feedback = "Send Feedback...";
 	public static final String menu_NewWindow = "New Window";
 	public static final String menu_QuitWindow = "Close Window";
