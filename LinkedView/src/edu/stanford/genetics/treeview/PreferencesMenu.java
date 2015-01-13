@@ -317,8 +317,8 @@ implements ConfigNodePersistent {
 			
 			ButtonGroup colJustifyBtnGroup = new ButtonGroup();
 			
-			colLeftJustBtn = GUIFactory.createRadioBtn("Left");
-			colRightJustBtn = GUIFactory.createRadioBtn("Right");
+			colLeftJustBtn = GUIFactory.createRadioBtn("Bottom");
+			colRightJustBtn = GUIFactory.createRadioBtn("Top");
 			
 			if(dendroView.getArraynameview().getJustifyOption()) {
 				colRightJustBtn.setSelected(true);
@@ -326,8 +326,8 @@ implements ConfigNodePersistent {
 				colLeftJustBtn.setSelected(true);
 			}
 			
-			colJustifyBtnGroup.add(colLeftJustBtn);
 			colJustifyBtnGroup.add(colRightJustBtn);
+			colJustifyBtnGroup.add(colLeftJustBtn);
 			
 			final JPanel colRadioBtnPanel = 
 					GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
@@ -367,12 +367,6 @@ implements ConfigNodePersistent {
 			rowRightJustBtn.addActionListener(l);
 			colLeftJustBtn.addActionListener(l);
 			colRightJustBtn.addActionListener(l);
-		}
-		
-		public JRadioButton[] getAlignBtns() {
-			
-			return new JRadioButton[]{rowLeftJustBtn, rowRightJustBtn, 
-					colLeftJustBtn, colRightJustBtn};
 		}
 
 		public int getSelectedGeneIndex() {
@@ -433,11 +427,6 @@ implements ConfigNodePersistent {
 		
 		dialog.pack();
 		dialog.setLocationRelativeTo(tvFrame.getAppFrame());
-	}
-	
-	public JRadioButton[] getAlignBtns() {
-		
-		return annotationSettings.getAlignBtns();
 	}
 
 	/**

@@ -84,13 +84,11 @@ import edu.stanford.genetics.treeview.core.HeaderFinderBox;
  */
 public class DendroView implements Observer, DendroPanel {
 
-	// Instance Variables
 	private int div_size;
 
 	// Container JFrame
 	protected TreeViewFrame tvFrame;
 
-	// Name
 	private String name;
 
 	// Main container JPanel
@@ -134,18 +132,14 @@ public class DendroView implements Observer, DendroPanel {
 	
 	// Buttons for interaction in dendroview.
 	private final JButton searchBtn;
-//	private final JToggleButton treeToggleBtn;
 	
 	// GlobalView default sizes as ints to keep track.
 	private double gvWidth;
 	private double gvHeight;
 	
+	/* Maximum GlobalView dimensions in percent */
 	public static final double MAX_GV_WIDTH = 75;
 	public static final double MAX_GV_HEIGHT = 80;
-
-	// Selections
-//	private TreeSelectionI geneSelection = null;
-//	private TreeSelectionI arraySelection = null;
 	
 	//MapContainers in order to keep track of current visible data indexes
 	protected MapContainer globalXmap = null;
@@ -209,9 +203,6 @@ public class DendroView implements Observer, DendroPanel {
 		
 		searchBtn = GUIFactory.createBtn(StringRes.btn_SearchLabels);
 		searchBtn.setToolTipText(StringRes.tt_searchRowCol);
-		
-//		treeToggleBtn = GUIFactory.createToggleBtn(StringRes.btn_ShowTrees);
-//		treeToggleBtn.setToolTipText(StringRes.tt_showTrees);
 	}
 	
 	public void setGlobalXMap(MapContainer xmap) {
@@ -377,6 +368,9 @@ public class DendroView implements Observer, DendroPanel {
 		JScrollBar arrayScroll = arraynameview.getYScroll();
 		JScrollBar geneScroll = textview.getXScroll();
 		
+		arraynameview.resetJustify();
+		textview.resetJustify();
+		
 		arrayContainer.add(arrayScroll, "w 1%, h 100%");
 		geneContainer.add(geneScroll, "w 100%, h 1%");
 
@@ -403,7 +397,7 @@ public class DendroView implements Observer, DendroPanel {
 				+ "%, h 100%, wrap");
 		
 		dendroPane.add(geneContainer, "w " + textViewCol + "%, "
-				+ "h " + gvHeight + "%, growy");//, pushx");
+				+ "h " + gvHeight + "%, growy");
 		
 		dendroPane.add(globalViewContainer, "w " + gvWidth + "%, "
 				+ "h " + gvHeight + "%, grow, wrap");
@@ -476,7 +470,6 @@ public class DendroView implements Observer, DendroPanel {
 		firstPanel.removeAll();
 		
 		if(tvFrame.isLoaded()) firstPanel.add(searchBtn);
-//		if(hasTrees) firstPanel.add(treeToggleBtn);
 		
 		firstPanel.revalidate();
 		firstPanel.repaint();
@@ -540,24 +533,7 @@ public class DendroView implements Observer, DendroPanel {
 		}
 	}
 
-//	public void addTreeBtnListener(final ActionListener l) {
-//		
-//		if(getTreeButton().getActionListeners().length  == 0) {
-//			getTreeButton().addActionListener(l);
-//		}
-//	}
-
 	// Methods
-	/**
-	 * Redoing all the layout if parameters changed.
-	 */
-	@Override
-	public void refresh() {
-
-		dendroPane.revalidate();
-		dendroPane.repaint();
-	}
-
 	/**
 	 * 
 	 * @param o
@@ -605,7 +581,34 @@ public class DendroView implements Observer, DendroPanel {
 			showTreesMenuItem.setText("Hide trees...");
 		}
 		
-		refresh();
+//		dendroPane.revalidate();
+		dendroPane.repaint();
+	}
+	
+	/**
+	 * Returns information about the current alignment of TextView and
+	 * ArrayNameView
+	 * @return [isRowRight, isColRight]
+	 */
+	public boolean[] getLabelAligns() {
+		
+		boolean[] alignments = {getTextview().getJustifyOption(), 
+				getArraynameview().getJustifyOption()};
+		
+		return alignments;
+	}
+	
+	/**
+	 * Sets the label alignment for TextView and ArrayNameView.
+	 * @param isRowRight TextView label justification.
+	 * @param isColRight ArrayNameView label justification.
+	 */
+	public void setLabelAlignment(boolean isRowRight, boolean isColRight) {
+		
+		if(getTextview() == null || getArraynameview() == null) return;
+		
+		getTextview().setJustifyOption(isRowRight);
+		getArraynameview().setJustifyOption(isColRight);
 	}
 
 	/**
@@ -1194,87 +1197,6 @@ public class DendroView implements Observer, DendroPanel {
 		
 		return gvHeight;
 	}
-	
-//	public double getWidthChange() {
-//		
-//		return widthChange;
-//	}
-//	
-//	public void setWidthChange(double change) {
-//		
-////		this.widthChange = widthChange + change;
-//		this.widthChange = change;
-//	}
-//	
-//	public double getHeightChange() {
-//		
-//		return heightChange;
-//	}
-//	
-//	public void setHeightChange(double change) {
-//		
-////		this.heightChange = heightChange + change;
-//		this.heightChange = change;
-//	}
-	
-//	public double getMaxGVWidth() {
-//		
-//		return maxGVWidth;
-//	}
-//	
-//	public double getMaxGVHeight() {
-//		
-//		return maxGVHeight;
-//	}
-	
-	// Selection methods
-	/**
-	 * This should be called after setDataModel has been set to the appropriate
-	 * model
-	 * 
-	 * @param arraySelection
-	 */
-//	public void setArraySelection(final TreeSelectionI arraySelection) {
-//
-//		if (this.arraySelection != null) {
-//
-//			this.arraySelection.deleteObserver(this);
-//		}
-//
-//		this.arraySelection = arraySelection;
-//		arraySelection.addObserver(this);
-//
-//		globalview.setArraySelection(arraySelection);
-////		atrview.setArraySelection(arraySelection);
-//		atrview.setTreeSelection(arraySelection);
-//		textview.setArraySelection(arraySelection);
-//		arraynameview.setArraySelection(arraySelection);
-//	}
-
-	/**
-	 * This should be called after setDataModel has been set to the appropriate
-	 * model
-	 * 
-	 * @param geneSelection
-	 */
-//	public void setGeneSelection(final TreeSelectionI geneSelection) {
-//
-//		if (this.geneSelection != null) {
-//
-//			this.geneSelection.deleteObserver(this);
-//		}
-//
-//		this.geneSelection = geneSelection;
-//		geneSelection.addObserver(this);
-//
-//		globalview.setGeneSelection(geneSelection);
-////		gtrview.setGeneSelection(geneSelection);
-//		gtrview.setTreeSelection(geneSelection);
-//		textview.setGeneSelection(geneSelection);
-//		arraynameview.setGeneSelection(geneSelection);
-//	}
-	
-	
 
 	/**
 	 * Setter for viewFrame
@@ -1395,16 +1317,6 @@ public class DendroView implements Observer, DendroPanel {
 		return dendroPane;
 	}
 
-//	public TreeSelectionI getGeneSelection() {
-//
-//		return geneSelection;
-//	}
-//
-//	public TreeSelectionI getArraySelection() {
-//
-//		return arraySelection;
-//	}
-
 	public ArrayNameView getArraynameview() {
 
 		return arraynameview;
@@ -1454,11 +1366,6 @@ public class DendroView implements Observer, DendroPanel {
 
 		return tvFrame;
 	}
-	
-//	public JToggleButton getTreeButton() {
-//
-//		return treeToggleBtn;
-//	}
 
 	public JButton getSearchBtn() {
 

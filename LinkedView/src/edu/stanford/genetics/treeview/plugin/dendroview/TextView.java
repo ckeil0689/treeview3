@@ -384,7 +384,7 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 			selectionChanged();
 
 		} else {
-			System.out.println("Textview got funny update!");
+			LogBuffer.println("Textview got funny update!");
 		}
 	}
 
@@ -512,7 +512,6 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 	public void adjustmentValueChanged(final AdjustmentEvent evt) {
 
 		offscreenValid = false;
-//		revalidate();
 		repaint();
 	}
 
@@ -520,7 +519,6 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 
 		// scrollbar.setValue(offset);
 		offscreenValid = false;
-//		revalidate();
 		repaint();
 	}
 
@@ -560,7 +558,6 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 			}
 
 			setFont(new Font(face, style, size));
-//			revalidate();
 			repaint();
 		}
 	}
@@ -576,7 +573,6 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 			}
 
 			setFont(new Font(face, style, size));
-//			revalidate();
 			repaint();
 		}
 	}
@@ -592,7 +588,6 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 			}
 
 			setFont(new Font(face, style, size));
-//			revalidate();
 			repaint();
 		}
 	}
@@ -602,11 +597,30 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 		
 		this.isRightJustified = isRightJustified;
 		
+		LogBuffer.println("Setting TextView Scroll: " + isRightJustified);
+		
 		if (configNode != null) {
 			configNode.putBoolean("rowRightJustified", isRightJustified);
 		}
 		
 		if(isRightJustified) {
+			int scrollMax = scrollPane.getHorizontalScrollBar().getMaximum();
+			scrollPane.getHorizontalScrollBar().setValue(scrollMax);
+		} else {
+			scrollPane.getHorizontalScrollBar().setValue(0);
+		}
+		
+		repaint();
+	}
+	
+	public void resetJustify() {
+		
+		boolean isRight = false;
+		if (configNode != null) {
+			isRight = configNode.getBoolean("rowRightJustified", isRightJustified);
+		}
+		
+		if(isRight) {
 			int scrollMax = scrollPane.getHorizontalScrollBar().getMaximum();
 			scrollPane.getHorizontalScrollBar().setValue(scrollMax);
 		} else {

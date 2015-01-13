@@ -33,7 +33,6 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 import java.util.Observable;
 import java.util.prefs.BackingStoreException;
@@ -280,9 +279,6 @@ public class ArrayNameView extends ModelView implements MouseListener,
 				final Graphics2D g2d = (Graphics2D) g;
 				final AffineTransform orig = g2d.getTransform();
 
-				final FontRenderContext frc = new FontRenderContext(orig, true,
-						true);
-
 				g2d.rotate(Math.PI * 3 / 2);
 				g2d.translate(-offscreenSize.height, 0);
 
@@ -346,15 +342,8 @@ public class ArrayNameView extends ModelView implements MouseListener,
 											+ ascent / 2);
 								}
 
-								// Unknown Mac OS X issue with drawString,
-								// mysteriously fixed by this. Java 1.6
-//								g2d.drawGlyphVector(g2d.getFont()
-//										.createGlyphVector(frc, out), 0,
-//										map.getMiddlePixel(j) + ascent / 2);
-
-								if (colorIndex > 0) {
-									g.setColor(fore);
-								}
+								if (colorIndex > 0) g.setColor(fore);
+								
 							} else {
 								g2d.setColor(Color.black);
 								if(isRightJustified) {
@@ -365,13 +354,6 @@ public class ArrayNameView extends ModelView implements MouseListener,
 									g2d.drawString(out, 0, map.getMiddlePixel(j)
 											+ ascent / 2);
 								}
-								// g.setColor(fore);
-
-								// Unknown Mac OS X issue with drawString,
-								// mysteriously fixed by this. java 1.6!
-//								g2d.drawGlyphVector(g2d.getFont()
-//										.createGlyphVector(frc, out), 0,
-//										map.getMiddlePixel(j) + ascent / 2);
 							}
 
 						}
@@ -653,7 +635,6 @@ public class ArrayNameView extends ModelView implements MouseListener,
 			}
 			setFont(new Font(face, style, size));
 			backBufferValid = false;
-			revalidate();
 			repaint();
 		}
 	}
@@ -669,7 +650,6 @@ public class ArrayNameView extends ModelView implements MouseListener,
 			}
 			setFont(new Font(face, style, size));
 			backBufferValid = false;
-			revalidate();
 			repaint();
 		}
 	}
@@ -685,7 +665,6 @@ public class ArrayNameView extends ModelView implements MouseListener,
 				configNode.putInt("style", style);
 			}
 			setFont(new Font(face, style, size));
-			revalidate();
 			repaint();
 		}
 	}
@@ -695,21 +674,38 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		
 		this.isRightJustified = isRightJustified;
 		
+		LogBuffer.println("Setting ArrayNameView Scroll: " + isRightJustified);
+		
 		if (configNode != null) {
 			configNode.putBoolean("colRightJustified", isRightJustified);
 		}
 		
 		if(isRightJustified) {
+			scrollPane.getVerticalScrollBar().setValue(0);
+		} else {
 			int scrollMax = scrollPane.getVerticalScrollBar().getMaximum();
 			scrollPane.getVerticalScrollBar().setValue(scrollMax);
-		} else {
-			scrollPane.getVerticalScrollBar().setValue(0);
 		}
 		
 		repaint();
 	}
-
-//	private HeaderSummary headerSummary;
+	
+	public void resetJustify() {
+		
+		boolean isRight = false;
+		if (configNode != null) {
+			isRight = configNode.getBoolean("colRightJustified", isRightJustified);
+		}
+		
+		if(isRight) {
+			scrollPane.getVerticalScrollBar().setValue(0);
+		} else {
+			int scrollMax = scrollPane.getVerticalScrollBar().getMaximum();
+			scrollPane.getVerticalScrollBar().setValue(scrollMax);
+		}
+		
+		repaint();
+	}
 
 	/** Setter for headerSummary */
 	public void setHeaderSummary(final HeaderSummary headerSummary) {

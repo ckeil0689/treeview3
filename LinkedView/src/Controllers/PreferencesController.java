@@ -172,44 +172,41 @@ public class PreferencesController {
 		}
 	}
 	
+	/**
+	 * Listens to changing radio buttons in the AnnotationSettings and
+	 * sets the justify-flag in TextView and ArrayNameView respectively.
+	 * @author chris0689
+	 *
+	 */
 	class LabelJustifyListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
-			JRadioButton[] alignBtns = preferences.getAlignBtns();
+			boolean[] labelAligns = tvFrame.getDendroView().getLabelAligns();
 			
-			boolean isRowRight = tvFrame.getDendroView().getTextview()
-					.getJustifyOption();
-			boolean isColRight = tvFrame.getDendroView().getArraynameview()
-					.getJustifyOption();
+			boolean isRowRight = labelAligns[0];
+			boolean isColRight = labelAligns[1];
 			
-			int btnCounter = 0;
-			for(JRadioButton btn : alignBtns) {
-				
-				if(e.getSource() == btn) {
-					switch(btnCounter) {
-					case 0:
-						isRowRight = false;
-						break;
-					case 1:
-						isRowRight = true;
-						break;
-					case 2:
-						isColRight = false;
-						break;
-					case 3:
-						isColRight = true;
-						break;
-					default:
-						break;
-					}
-					break;
-				}
-				btnCounter++;
+			/* counter to recognize the selected JRadioButton */
+			switch(((JRadioButton)e.getSource()).getText()) {
+			case "Left":
+				isRowRight = false;
+				break;
+			case "Right":
+				isRowRight = true;
+				break;
+			case "Bottom":
+				isColRight = false;
+				break;
+			case "Top":
+				isColRight = true;
+				break;
+			default:
+				break;
 			}
-			tvFrame.getDendroView().getTextview().setJustifyOption(isRowRight);
-			tvFrame.getDendroView().getArraynameview().setJustifyOption(isColRight);
+			
+			tvFrame.getDendroView().setLabelAlignment(isRowRight, isColRight);
 		}
 	}
 

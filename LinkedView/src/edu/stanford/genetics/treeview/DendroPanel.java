@@ -35,8 +35,6 @@ import javax.swing.JMenu;
  */
 public interface DendroPanel {
 
-	public void refresh();
-
 	public void addDendroMenus(JMenu menu);
 
 	public void addClusterMenus(JMenu menu);
