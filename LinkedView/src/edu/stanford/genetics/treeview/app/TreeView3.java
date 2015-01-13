@@ -15,7 +15,8 @@ import edu.stanford.genetics.treeview.LogBuffer;
  * Mac OSX menubar, for example.
  * @author CKeil
  */
-public class TreeViewLauncher {
+//public class TreeViewLauncher {
+public class TreeView3 {
 
 	private static void macSetup() {
 		String os = System.getProperty("os.name").toLowerCase();
