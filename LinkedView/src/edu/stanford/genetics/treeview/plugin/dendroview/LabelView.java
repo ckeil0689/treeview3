@@ -77,13 +77,16 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		
 		if(axis_id == ROW) {
 			add(zoomHint, "alignx 0%, aligny 50%, push, wrap");
+			scrollPane = new JScrollPane(this,
+					ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
+					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		} else {
 			add(zoomHint, "alignx 50%, aligny 100%, push");
+			scrollPane = new JScrollPane(this,
+					ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		}
-
-		scrollPane = new JScrollPane(this,
-				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		
 		scrollPane.setBorder(null);
 
 		panel = scrollPane;
