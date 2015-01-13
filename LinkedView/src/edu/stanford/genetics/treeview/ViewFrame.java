@@ -42,7 +42,7 @@ import java.util.prefs.Preferences;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.WindowConstants;
+//import javax.swing.WindowConstants;
 
 import Cluster.ClusterFileFilter;
 import edu.stanford.genetics.treeview.core.FileMru;
@@ -99,6 +99,9 @@ public abstract class ViewFrame implements Observer, ConfigNodePersistent {
 		int height = configNode.getInt("frame_height", init_height);
 		
 		appFrame.setBounds(left, top, width, height);
+
+//		//Not sure if the following actually works - The app quits, but it was quitting before I added this line of code (but it wasn't quitting sometimes and when it quits, it quits after a confirm popup and a delay.  It still has the confirm & delay.
+//		appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		setupWindowListener();
 	}
@@ -229,8 +232,11 @@ public abstract class ViewFrame implements Observer, ConfigNodePersistent {
 	 */
 	private void setupWindowListener() {
 
-		appFrame
-				.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		//JFrame.EXIT_ON_CLOSE works much more reliably than what was being done before. I replaced WindowConstants.DO_NOTHING_ON_CLOSE and confirmed that saveSettings is called by the window listener before exiting...
+		//appFrame
+		//		.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
 		appFrame.addWindowListener(new WindowAdapter() {
 
 			@Override
@@ -331,11 +337,14 @@ public abstract class ViewFrame implements Observer, ConfigNodePersistent {
 		switch (option) {
 
 			case JOptionPane.YES_OPTION:	
+				LogBuffer.println("Saving settings before window close.");
+				appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				saveSettings();
 				appFrame.dispose();
 				break;
 											
 			case JOptionPane.NO_OPTION:		
+				appFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 				break;
 			
 			default:						
@@ -474,7 +483,6 @@ public abstract class ViewFrame implements Observer, ConfigNodePersistent {
 		arraySelection.deselectAllIndexes();
 		arraySelection.setIndexSelection(i, true);
 		arraySelection.notifyObservers();
-//		scrollToGene(i);
 	}
 
 	/**
@@ -488,8 +496,6 @@ public abstract class ViewFrame implements Observer, ConfigNodePersistent {
 
 		geneSelection.setIndexSelection(i, true);
 		geneSelection.notifyObservers();
-
-//		scrollToGene(i);
 	}
 
 	public boolean geneIsSelected(final int i) {

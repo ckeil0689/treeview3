@@ -619,6 +619,11 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		// Help
 		final JMenu helpSubMenu = new JMenu(StringRes.mbar_Help);
 
+		final JMenuItem aboutMenuItem = new JMenuItem(
+				StringRes.menu_About);
+		helpSubMenu.add(aboutMenuItem);
+		stackMenuList.add(aboutMenuItem);
+		
 		if (running != null) {
 			final JMenuItem statsMenuItem = new JMenuItem(
 					StringRes.menu_Stats);
@@ -626,11 +631,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 			stackMenuList.add(statsMenuItem);
 		}
 
-		final JMenuItem aboutMenuItem = new JMenuItem(
-				StringRes.menu_About);
-		helpSubMenu.add(aboutMenuItem);
-		stackMenuList.add(aboutMenuItem);
-		
 		final JMenuItem shortcutMenuItem = new JMenuItem(
 				StringRes.menu_Shortcuts);
 		helpSubMenu.add(shortcutMenuItem);

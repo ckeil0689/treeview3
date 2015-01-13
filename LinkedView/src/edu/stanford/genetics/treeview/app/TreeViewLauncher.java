@@ -2,6 +2,9 @@ package edu.stanford.genetics.treeview.app;
 
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+//import java.awt.EventQueue;
+//import javax.swing.JFrame;
+//import javax.swing.JMenuBar;
 
 import edu.stanford.genetics.treeview.LogBuffer;
 
@@ -14,38 +17,50 @@ import edu.stanford.genetics.treeview.LogBuffer;
  */
 public class TreeViewLauncher {
 
+	private static void macSetup() {
+		String os = System.getProperty("os.name").toLowerCase();
+		boolean isMac = os.startsWith("mac os x");    
+
+		if(!isMac)
+			return;
+
+		LogBuffer.println("Running on a mac.");
+
+		System.setProperty("apple.laf.useScreenMenuBar", "true");
+		System.setProperty("com.apple.mrj.application.apple.menu.about.name",
+				"TreeView3");  
+		System.setProperty("apple.awt.showGrowBox", "true");
+	}
+
 	public static void main(final String[] args) {
 
 		try {
-			final boolean isApplet = false;
-			
+			macSetup();
+
 			/*
 			 * Set the look and feel to the system look and feel of the 
 			 * user's individual machine.
 			 */
-			UIManager.setLookAndFeel(UIManager
-					.getSystemLookAndFeelClassName());
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			
-			/*
-			 * Check for OS and use menubar for Mac if applicable, 
-			 * for a more native feel.
-			 */
-			if (!isApplet && System.getProperty("os.name").contains("Mac")) {
-
-				/* Sets application name in menubar */
-				System.setProperty("com.apple.mrj.application"
-						+ ".apple.menu.about.name", "TreeView 3");
-
-				/* Activate OSX native menubar */
-				System.setProperty("apple.laf.useScreenMenuBar", "true");
-				System.setProperty("apple.awt.showGrowBox", "true");
-			}
-
 			javax.swing.SwingUtilities.invokeLater(new Runnable() {
+//			EventQueue.invokeLater(new Runnable() {
 
 				@Override
 				public void run() {
+//	                JFrame frame = new JFrame("Gabby");
+//	                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//	                frame.setLocationByPlatform(true);
+//	                JMenuBar menuBar = new JMenuBar();
+//	                frame.setJMenuBar(menuBar);
+//	                frame.setVisible(true);
 					new LinkedViewApp();
+//					Application app = new LinkedViewApp();
+//					Main main = new Main();           
+//					app.addApplicationListener(main.getApplicationListener());
+//
+//					app.addPreferencesMenuItem();
+//					app.setEnabledPreferencesMenu(true);           
 				}
 			});
 		} catch (final ClassNotFoundException | InstantiationException 

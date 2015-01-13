@@ -41,8 +41,8 @@ public class AboutDialog extends CustomDialog {
 	private void setupLayout() {
 
 		final JLabel text = GUIFactory.createLabel(StringRes.appName
-				+ " was created by Chris Keil based on Alok Saldhana's "
-				+ "Java TreeView.", GUIFactory.FONTS);
+				+ " was created by Chris Keil, Lance Parsons, Robert Leach, & Anastasija Baryshnikova\n"
+				+ "and is based on Alok Saldhana's Java TreeView.", GUIFactory.FONTS);
 
 		final JLabel version = GUIFactory.createLabel("Version: " 
 				+ StringRes.versionTag, GUIFactory.FONTS);
