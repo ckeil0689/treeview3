@@ -55,7 +55,7 @@ import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.UrlExtractor;
 
-public class TextView extends ModelView implements ConfigNodePersistent,
+public class TextView_deprec extends ModelView implements ConfigNodePersistent,
 		FontSelectable, KeyListener, AdjustmentListener, MouseListener,
 		MouseMotionListener {
 
@@ -100,7 +100,7 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 //		this(hI, uExtractor, -1);
 //	}
 
-	public TextView() {
+	public TextView_deprec() {
 
 		super();
 		this.setLayout(new MigLayout());
@@ -115,17 +115,17 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 
 		scrollPane = new JScrollPane(this,
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
-				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		scrollPane.setBorder(null);
 		panel = scrollPane;
 		
 		hoverIndex = -1;
 	}
 	
-	public JScrollBar getXScroll() {
-		
-		return scrollPane.getHorizontalScrollBar();
-	}
+//	public JScrollBar getXScroll() {
+//		
+//		return scrollPane.getHorizontalScrollBar();
+//	}
 	
 	public void generateView(final UrlExtractor uExtractor, final int col) {
 		
@@ -350,9 +350,7 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 			final int actualGene = j;
 			final String out = headerSummary.getSummary(headerInfo, actualGene);
 
-			if (out == null) {
-				continue;
-			}
+			if (out == null) continue;
 
 			final int length = fontMetrics.stringWidth(out);
 			if (maxlength < length) {
@@ -621,9 +619,11 @@ public class TextView extends ModelView implements ConfigNodePersistent,
 		}
 		
 		if(isRight) {
+			LogBuffer.println("TextView print max.");
 			int scrollMax = scrollPane.getHorizontalScrollBar().getMaximum();
 			scrollPane.getHorizontalScrollBar().setValue(scrollMax);
 		} else {
+			LogBuffer.println("TextView print min.");
 			scrollPane.getHorizontalScrollBar().setValue(0);
 		}
 		

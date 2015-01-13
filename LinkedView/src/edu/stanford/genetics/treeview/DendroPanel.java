@@ -41,8 +41,6 @@ public interface DendroPanel {
 
 	public void openSearchDialog(HeaderInfo geneHI, HeaderInfo arrayHI);
 
-//	public void setTreesVisible(double atr_loc, double gtr_loc);
-
 	/**
 	 * 
 	 * @return name suitable for displaying in tab

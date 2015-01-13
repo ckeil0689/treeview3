@@ -129,9 +129,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		super(appName, treeView.getGlobalConfig().node(StringRes.pnode_TVFrame));
 		this.treeView = treeView;
 		
-		/* Get configurations */
-//		configNode = treeView.getGlobalConfig().node(StringRes.pnode_TVFrame);
-		
 		/* Initialize main views */
 		welcomeView = new WelcomeView();
 		loadErrorView = new LoadErrorView();
@@ -148,8 +145,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		/* Most recently used files */
 		setupFileMru();
-
-//		setupFrameSize();
 		
 		/* Initial view */
 		generateView(WELCOME_VIEW);

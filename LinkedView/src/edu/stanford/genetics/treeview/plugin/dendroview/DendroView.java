@@ -108,8 +108,11 @@ public class DendroView implements Observer, DendroPanel {
 	private JSplitPane atrPane;
 
 	// Row and column names
-	protected final TextView textview;
-	protected final ArrayNameView arraynameview;
+//	protected final TextView_deprec textview;
+//	protected final ArrayNameView_deprec arraynameview;
+	
+	protected final RowLabelView textview;
+	protected final ColumnLabelView arraynameview;
 
 	protected JScrollBar globalXscrollbar;
 	protected JScrollBar globalYscrollbar;
@@ -186,10 +189,12 @@ public class DendroView implements Observer, DendroPanel {
 		globalYscrollbar = globalview.getYScroll();
 
 		/* Set up the column name display */
-		arraynameview = new ArrayNameView();
+//		arraynameview = new ArrayNameView_deprec();
+		arraynameview = new ColumnLabelView();
 		// arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
 
-		textview = new TextView();
+//		textview = new TextView_deprec();
+		textview = new RowLabelView();
 
 		// Set up row dendrogram
 		gtrview = new GTRView();
@@ -361,18 +366,19 @@ public class DendroView implements Observer, DendroPanel {
 		
 		navContainer.add(navPanel, "push, h 50%, alignx 100%, aligny 50%");
 		
-		arrayContainer.add(atrPane, "w 99%, h 100%");
-		geneContainer.add(gtrPane, "w 100%, h 99%, wrap");
-				
+		arrayContainer.add(atrPane, "w 100%, h 100%");
+		geneContainer.add(gtrPane, "w 100%, h 100%, wrap");
+		
+		/* TODO Possibly necessary for good visual alignment of components...*/
 		/* Add the scrollbars */
-		JScrollBar arrayScroll = arraynameview.getYScroll();
-		JScrollBar geneScroll = textview.getXScroll();
-		
-		arraynameview.resetJustify();
-		textview.resetJustify();
-		
-		arrayContainer.add(arrayScroll, "w 1%, h 100%");
-		geneContainer.add(geneScroll, "w 100%, h 1%");
+//		JScrollBar arrayScroll = arraynameview.getYScroll();
+//		JScrollBar geneScroll = textview.getXScroll();
+//		
+//		arraynameview.resetJustify();
+////		textview.resetJustify();
+//		
+//		arrayContainer.add(arrayScroll, "w 1%, h 100%");
+//		geneContainer.add(geneScroll, "w 100%, h 1%");
 
 		if(gvWidth == 0 && gvHeight == 0) {
 			gvWidth = MAX_GV_WIDTH;
@@ -1317,7 +1323,12 @@ public class DendroView implements Observer, DendroPanel {
 		return dendroPane;
 	}
 
-	public ArrayNameView getArraynameview() {
+//	public ArrayNameView_deprec getArraynameview() {
+//
+//		return arraynameview;
+//	}
+	
+	public LabelView getArraynameview() {
 
 		return arraynameview;
 	}
@@ -1332,7 +1343,12 @@ public class DendroView implements Observer, DendroPanel {
 		return gtrview;
 	}
 
-	public TextView getTextview() {
+//	public TextView_deprec getTextview() {
+//
+//		return textview;
+//	}
+	
+	public LabelView getTextview() {
 
 		return textview;
 	}

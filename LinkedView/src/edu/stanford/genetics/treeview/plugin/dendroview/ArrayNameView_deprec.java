@@ -66,7 +66,7 @@ import edu.stanford.genetics.treeview.UrlExtractor;
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version @version $Revision: 1.4 $ $Date: 2010-05-02 13:39:00 $
  */
-public class ArrayNameView extends ModelView implements MouseListener, 
+public class ArrayNameView_deprec extends ModelView implements MouseListener, 
 		MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
 	private static final long serialVersionUID = 1L;
@@ -110,7 +110,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 	 * @param hInfo
 	 *            Header containing array names as first row.
 	 */
-	public ArrayNameView() {
+	public ArrayNameView_deprec() {
 
 		super();
 		this.setLayout(new MigLayout());
@@ -121,21 +121,20 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		addMouseListener(this);
 
 		l1 = GUIFactory.createLabel("", GUIFactory.FONTS);
-
 		add(l1, "alignx 50%, aligny 100%, push");
 
 		scrollPane = new JScrollPane(this,
-				ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBorder(null);
 
 		panel = scrollPane;
 	}
 	
-	public JScrollBar getYScroll() {
-		
-		return scrollPane.getVerticalScrollBar();
-	}
+//	public JScrollBar getYScroll() {
+//		
+//		return scrollPane.getVerticalScrollBar();
+//	}
 	
 	public void generateView(final UrlExtractor uExtractor) {
 
@@ -150,10 +149,10 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		return headerInfo;
 	}
 
-	public DataModel getDataModel() {
-
-		return dataModel;
-	}
+//	public DataModel getDataModel() {
+//
+//		return dataModel;
+//	}
 
 	public void setHeaderInfo(final HeaderInfo headerInfo) {
 
@@ -411,7 +410,6 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		} else {
 			l1.setText(StringRes.lbl_ZoomColLabels);
 		}
-		// end of if
 	}
 
 	// /**
