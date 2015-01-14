@@ -14,13 +14,13 @@ import javax.swing.SwingUtilities;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.UrlExtractor;
 
-public class ColumnLabelView extends LabelView implements LabelDisplay {
+public class ArrayLabelView extends LabelView implements LabelDisplay {
 
 	private static final long serialVersionUID = 1L;
 	
 	private int oldHeight = 0;
 
-	public ColumnLabelView() {
+	public ArrayLabelView() {
 		
 		super(LabelView.COL);
 	}

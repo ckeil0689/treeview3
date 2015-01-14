@@ -111,8 +111,8 @@ public class DendroView implements Observer, DendroPanel {
 //	protected final TextView_deprec textview;
 //	protected final ArrayNameView_deprec arraynameview;
 	
-	protected final RowLabelView textview;
-	protected final ColumnLabelView arraynameview;
+	protected final GeneLabelView textview;
+	protected final ArrayLabelView arraynameview;
 
 	protected JScrollBar globalXscrollbar;
 	protected JScrollBar globalYscrollbar;
@@ -190,11 +190,11 @@ public class DendroView implements Observer, DendroPanel {
 
 		/* Set up the column name display */
 //		arraynameview = new ArrayNameView_deprec();
-		arraynameview = new ColumnLabelView();
+		arraynameview = new ArrayLabelView();
 		// arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
 
 //		textview = new TextView_deprec();
-		textview = new RowLabelView();
+		textview = new GeneLabelView();
 
 		// Set up row dendrogram
 		gtrview = new GTRView();

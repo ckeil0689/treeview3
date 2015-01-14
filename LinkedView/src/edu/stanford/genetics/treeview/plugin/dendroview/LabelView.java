@@ -59,6 +59,8 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	
 	protected TreeSelectionI arraySelection;
 	protected TreeSelectionI geneSelection;
+	
+	/* stores a reference to the TreeSelection relevant for drawing */
 	protected TreeSelectionI drawSelection;
 	
 	protected Preferences configNode;
