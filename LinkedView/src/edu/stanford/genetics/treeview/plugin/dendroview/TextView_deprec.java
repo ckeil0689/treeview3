@@ -39,7 +39,6 @@ import java.util.Observable;
 import java.util.prefs.Preferences;
 
 import javax.swing.JLabel;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
@@ -88,7 +87,7 @@ public class TextView_deprec extends ModelView implements ConfigNodePersistent,
 	private int hoverIndex;
 
 	private final JScrollPane scrollPane;
-	private final JLabel l1;
+	private final JLabel zoomHint;
 
 	/**
 	 * should really take a HeaderSummary instead of HeaderInfo, since the
@@ -110,8 +109,8 @@ public class TextView_deprec extends ModelView implements ConfigNodePersistent,
 		addMouseMotionListener(this);
 		addKeyListener(this);
 
-		l1 = GUIFactory.createLabel("", GUIFactory.FONTS);
-		add(l1, "alignx 0%, aligny 50%, push, wrap");
+		zoomHint = GUIFactory.createLabel("", GUIFactory.FONTS);
+		add(zoomHint, "alignx 0%, aligny 50%, push, wrap");
 
 		scrollPane = new JScrollPane(this,
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
@@ -173,7 +172,7 @@ public class TextView_deprec extends ModelView implements ConfigNodePersistent,
 		// clear the pallette...
 		if (map.getScale() > 12.0) {
 
-			l1.setText("");
+			zoomHint.setText("");
 
 			if ((map.getMinIndex() >= 0) && (offscreenSize.height > 0)) {
 
@@ -262,11 +261,7 @@ public class TextView_deprec extends ModelView implements ConfigNodePersistent,
 								g.drawString(out, 0,
 										map.getMiddlePixel(j) + ascent / 2);
 							}
-							// g.setColor(fore);
 						}
-
-						// g2d.translate(offscreenSize.height, 0);
-						// g2d.rotate(Math.PI / 2);
 					}
 				}
 			} else {
@@ -275,7 +270,7 @@ public class TextView_deprec extends ModelView implements ConfigNodePersistent,
 				// offscreenSize.height / 2 );
 			}
 		} else {
-			l1.setText(StringRes.lbl_ZoomRowLabels);
+			zoomHint.setText(StringRes.lbl_ZoomRowLabels);
 		}
 	}
 

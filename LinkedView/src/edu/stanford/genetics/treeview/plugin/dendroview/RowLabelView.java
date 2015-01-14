@@ -1,23 +1,20 @@
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Image;
+import java.awt.event.MouseEvent;
 import java.util.Observable;
 
 import javax.swing.JScrollBar;
+import javax.swing.SwingUtilities;
 
-import Utilities.GUIFactory;
-import Utilities.StringRes;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.UrlExtractor;
 
 public class RowLabelView extends LabelView implements LabelDisplay {
 
-	private int col;
+	private static final long serialVersionUID = 1L;
 	
 	public RowLabelView() {
 		
@@ -56,7 +53,6 @@ public class RowLabelView extends LabelView implements LabelDisplay {
 	public void generateView(final UrlExtractor uExtractor, final int col) {
 		
 		super.setUrlExtractor(uExtractor);
-		this.col = col;
 
 		headerSummary.setIncluded(new int[] { 0 });
 		headerSummary.addObserver(this);
@@ -89,11 +85,6 @@ public class RowLabelView extends LabelView implements LabelDisplay {
 		final FontMetrics fontMetrics = getFontMetrics(new Font(face, style,
 				size));
 		
-		/* Why iterate over headers but use map to set the indices........? */
-		/* TODO ensure this is fixed, won't remove old code in case it's not */
-//		final int start = map.getIndex(0);
-//		final int end = map.getIndex(map.getUsedPixels());
-		
 		final int start = 0;
 		final int end = headerInfo.getNumHeaders();
 
@@ -115,124 +106,62 @@ public class RowLabelView extends LabelView implements LabelDisplay {
 	}
 	
 	@Override
-	public void updateBuffer(final Graphics g) {
-
-		updateBuffer(g, offscreenSize);
+	public void mouseMoved(final MouseEvent e) {
+		
+		hoverIndex = map.getIndex(e.getY());
+		repaint();
 	}
+	
+	@Override
+	public void mouseClicked(final MouseEvent e) {
 
-	public void updateBuffer(final Graphics g, final Dimension offscreenSize) {
+		// if (urlExtractor == null) {
+		// return;
+		// }
+		//
+		// urlExtractor.setEnabled(true);
+		//
+		// if (urlExtractor.isEnabled() == false) {
+		// return;
+		// }
+		//
+		// // now, want mouse click to signal browser...
+		// final int index = map.getIndex(e.getY());
+		// if (map.contains(index)) {
+		// if (col != -1) {
+		// viewFrame.displayURL(urlExtractor.getUrl(index,
+		// headerInfo.getNames()[col]));
+		//
+		// } else {
+		// viewFrame.displayURL(urlExtractor.getUrl(index));
+		// }
+		// }
+		final int index = map.getIndex(e.getY());
 
-		g.setColor(this.getBackground());
-		g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
-		g.setColor(Color.black);
-
-		// clear the pallette...
-		if (map.getScale() > 12.0) {
-
-			zoomHint.setText("");
-
-			if ((map.getMinIndex() >= 0) && (offscreenSize.height > 0)) {
-
-				final int start = map.getIndex(0);
-				final int end = map.getIndex(map.getUsedPixels());
-				g.setFont(new Font(face, style, size));
-				final FontMetrics metrics = getFontMetrics(g.getFont());
-				final int ascent = metrics.getAscent();
-
-				// draw backgrounds first...
-				final int bgColorIndex = headerInfo.getIndex("BGCOLOR");
-				if (bgColorIndex > 0) {
-					final Color back = g.getColor();
-					for (int j = start; j < end; j++) {
-						if ((geneSelection == null)
-								|| geneSelection.isIndexSelected(j)) {
-							final String[] strings = headerInfo.getHeader(j);
-
-							try {
-								g.setColor(TreeColorer
-										.getColor(strings[bgColorIndex]));
-
-							} catch (final Exception e) {
-								// ignore
-							}
-							g.fillRect(0, map.getMiddlePixel(j) - ascent / 2,
-									offscreenSize.width, ascent);
-						}
-					}
-					g.setColor(back);
+		if(SwingUtilities.isLeftMouseButton(e)) {
+			if (arraySelection.getNSelectedIndexes() == arraySelection
+					.getNumIndexes() && geneSelection.isIndexSelected(index)) {
+				arraySelection.deselectAllIndexes();
+				geneSelection.deselectAllIndexes();
+	
+			} else if (arraySelection.getNSelectedIndexes() > 0) {
+				if(!e.isShiftDown()) {
+					arraySelection.deselectAllIndexes();
+					geneSelection.deselectAllIndexes();
 				}
-
-				// now, foreground text
-				final int fgColorIndex = headerInfo.getIndex("FGCOLOR");
-				for (int j = start; j < end; j++) {
-
-					String out = null;
-
-					if (col == -1) {
-						out = headerSummary.getSummary(headerInfo, j);
-
-					} else {
-						final String[] summaryArray = headerSummary
-								.getSummaryArray(headerInfo, j);
-
-						if ((summaryArray != null)
-								&& (col < summaryArray.length)) {
-							out = summaryArray[col];
-						}
-					}
-
-					if (out != null) {
-						final Color fore = GUIFactory.MAIN; // g.getColor();
-						if ((geneSelection == null)
-								|| geneSelection.isIndexSelected(j)
-								|| j == hoverIndex) {
-							final String[] strings = headerInfo.getHeader(j);
-
-							if (fgColorIndex > 0) {
-								g.setColor(TreeColorer
-										.getColor(strings[fgColorIndex]));
-							}
-
-							g.setColor(fore);
-
-							// TODO move if outside of loop?
-							if(isRightJustified) {
-								g.drawString(out, offscreenSize.width
-												- metrics.stringWidth(out),
-										map.getMiddlePixel(j) + ascent / 2);
-							} else {
-								g.drawString(out, 0,
-										map.getMiddlePixel(j) + ascent / 2);
-							}
-
-							if (fgColorIndex > 0) {
-								g.setColor(fore);
-							}
-						} else {
-							g.setColor(Color.black);
-							if(isRightJustified) {
-								g.drawString(out, offscreenSize.width
-												- metrics.stringWidth(out),
-										map.getMiddlePixel(j) + ascent / 2);
-							} else {
-								g.drawString(out, 0,
-										map.getMiddlePixel(j) + ascent / 2);
-							}
-							// g.setColor(fore);
-						}
-
-						// g2d.translate(offscreenSize.height, 0);
-						// g2d.rotate(Math.PI / 2);
-					}
-				}
+				geneSelection.setIndexSelection(index, true);
+				arraySelection.selectAllIndexes();
+	
 			} else {
-				// some kind of blank default image?
-				// backG.drawString("Select something already!", 0,
-				// offscreenSize.height / 2 );
+				geneSelection.setIndexSelection(index, true);
+				arraySelection.selectAllIndexes();
 			}
 		} else {
-			zoomHint.setText(StringRes.lbl_ZoomRowLabels);
+			geneSelection.deselectAllIndexes();
+			arraySelection.deselectAllIndexes();
 		}
-	}
 
+		arraySelection.notifyObservers();
+		geneSelection.notifyObservers();
+	}
 }

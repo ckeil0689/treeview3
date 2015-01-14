@@ -1,19 +1,26 @@
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.AffineTransform;
 import java.util.Observable;
 import java.util.prefs.Preferences;
 
 import javax.swing.JLabel;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
 import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
+import Utilities.StringRes;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.HeaderInfo;
@@ -26,6 +33,8 @@ import edu.stanford.genetics.treeview.UrlExtractor;
 public class LabelView extends ModelView implements MouseListener, 
 MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
+	private static final long serialVersionUID = 1L;
+	
 	protected final static int ROW = 0;
 	protected final static int COL = 1;
 	
@@ -50,6 +59,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	
 	protected TreeSelectionI arraySelection;
 	protected TreeSelectionI geneSelection;
+	protected TreeSelectionI drawSelection;
 	
 	protected Preferences configNode;
 	
@@ -154,6 +164,10 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
 		this.geneSelection = geneSelection;
 		this.geneSelection.addObserver(this);
+		
+		if(axis_id == ROW) {
+			this.drawSelection = geneSelection;
+		}
 	}
 	
 	/**
@@ -170,6 +184,10 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		}
 		this.arraySelection = arraySelection;
 		this.arraySelection.addObserver(this);
+		
+		if(axis_id == COL) {
+			this.drawSelection = arraySelection;
+		}
 	}
 
 	@Override
@@ -216,7 +234,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
 	@Override
 	public boolean getJustifyOption() {
-		// TODO Auto-generated method stub
+		
 		return isRightJustified;
 	}
 
@@ -229,7 +247,6 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 				configNode.put("face", face);
 			}
 			setFont(new Font(face, style, size));
-//			backBufferValid = false;
 			repaint();
 		}
 	}
@@ -243,7 +260,6 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 				configNode.putInt("size", size);
 			}
 			setFont(new Font(face, style, size));
-//			backBufferValid = false;
 			repaint();
 		}
 	}
@@ -253,7 +269,6 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		
 		if (style != i) {
 			style = i;
-//			backBufferValid = false;
 			if (configNode != null) {
 				configNode.putInt("style", style);
 			}
@@ -278,10 +293,123 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		return "LabelView";
 	}
 	
-
+	/* inherit description */
 	@Override
-	protected void updateBuffer(Graphics g) {
-		// TODO Auto-generated method stub
+	public void updateBuffer(final Graphics g) {
+
+		updateBuffer(g, offscreenSize);
+	}
+	
+	public void updateBuffer(final Image buf) {
+
+		updateBuffer(buf.getGraphics(),
+				new Dimension(buf.getWidth(null), buf.getHeight(null)));
+	}
+
+	public void updateBuffer(final Graphics g, final Dimension offscreenSize) {
+
+		int stringX = (axis_id == ROW) ? offscreenSize.width : offscreenSize.height;
 		
+		g.setColor(this.getBackground());
+		g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
+		g.setColor(Color.black);
+
+		if (map.getScale() > 12.0) {
+			zoomHint.setText("");
+
+			final Graphics2D g2d = (Graphics2D) g;
+			final AffineTransform orig = g2d.getTransform();
+
+			if(axis_id == COL) {
+				g2d.rotate(Math.PI * 3 / 2);
+				g2d.translate(-offscreenSize.height, 0);
+			}
+
+			final int start = map.getIndex(0);
+			final int end = map.getIndex(map.getUsedPixels()) - 1;
+			
+			final int colorIndex = headerInfo.getIndex("FGCOLOR");
+			g.setFont(new Font(face, style, size));
+			final FontMetrics metrics = getFontMetrics(g.getFont());
+			final int ascent = metrics.getAscent();
+
+			// draw backgrounds first...
+			final int bgColorIndex = headerInfo.getIndex("BGCOLOR");
+			if (bgColorIndex > 0) {
+				final Color back = g.getColor();
+				for (int j = start; j <= end; j++) {
+					final String[] strings = headerInfo.getHeader(j);
+					try {
+						g.setColor(TreeColorer
+								.getColor(strings[bgColorIndex]));
+
+					} catch (final Exception e) {
+						// ingore...
+					}
+					g.fillRect(0, map.getMiddlePixel(j) - ascent / 2,
+							stringX, ascent);
+				}
+				g.setColor(back);
+			}
+
+			// Foreground Text
+			final Color fore = GUIFactory.MAIN;
+			for (int j = start; j <= end; j++) {
+
+				try {
+					final String out = headerSummary.getSummary(headerInfo,
+							j);
+					final String[] headers = headerInfo.getHeader(j);
+				
+					if (out != null) {
+						if ((drawSelection == null)
+								|| drawSelection.isIndexSelected(j)
+								|| j == hoverIndex) {
+							if (colorIndex > 0) {
+								g.setColor(TreeColorer
+										.getColor(headers[colorIndex]));
+							}
+
+							g2d.setColor(fore);
+							if(isRightJustified) {
+								g2d.drawString(out, stringX
+												- metrics.stringWidth(out),
+										map.getMiddlePixel(j) + ascent / 2);
+							} else {
+								g2d.drawString(out, 0, map.getMiddlePixel(j)
+										+ ascent / 2);
+							}
+
+							if (colorIndex > 0) g.setColor(fore);
+							
+						} else {
+							g2d.setColor(Color.black);
+							if(isRightJustified) {
+								g2d.drawString(out, stringX
+												- metrics.stringWidth(out),
+										map.getMiddlePixel(j) + ascent / 2);
+							} else {
+								g2d.drawString(out, 0, map.getMiddlePixel(j)
+										+ ascent / 2);
+							}
+						}
+
+					}
+				} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
+				}
+			}
+
+			g2d.setTransform(orig);
+
+		} else {
+			zoomHint.setText(StringRes.lbl_ZoomColLabels);
+		}
+	}
+	
+	@Override
+	public void mouseExited(final MouseEvent e) {
+		
+		hoverIndex = -1;
+		repaint();
 	}
 }
