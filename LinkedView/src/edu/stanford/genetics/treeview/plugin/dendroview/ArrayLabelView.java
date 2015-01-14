@@ -8,13 +8,12 @@ import java.awt.event.MouseEvent;
 import java.util.Observable;
 import java.util.prefs.Preferences;
 
-import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
 
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.UrlExtractor;
 
-public class ArrayLabelView extends LabelView implements LabelDisplay {
+public class ArrayLabelView extends LabelView {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -23,12 +22,6 @@ public class ArrayLabelView extends LabelView implements LabelDisplay {
 	public ArrayLabelView() {
 		
 		super(LabelView.COL);
-	}
-
-	@Override
-	public JScrollBar getMainScrollBar() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	public void generateView(final UrlExtractor uExtractor) {
@@ -40,16 +33,26 @@ public class ArrayLabelView extends LabelView implements LabelDisplay {
 	}
 	
 	@Override
-	public void setJustifyOption(boolean isRightJustified) {
+	public void setJustifyOption(final boolean isRightJustified) {
 		
 		super.setJustifyOption(isRightJustified);
 		
-		if(isRightJustified) {
-			scrollPane.getVerticalScrollBar().setValue(0);
-		} else {
-			int scrollMax = scrollPane.getVerticalScrollBar().getMaximum();
-			scrollPane.getVerticalScrollBar().setValue(scrollMax);
-		}
+		/* 
+		 * Absolutely HAS to be via Runnable. Otherwise adding/ removing 
+		 * components in DendroView will reset whatever was set here.
+		 */
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			   
+			public void run() { 
+			       
+				if(isRightJustified) {
+					scrollPane.getVerticalScrollBar().setValue(0);
+				} else {
+					int scrollMax = scrollPane.getVerticalScrollBar().getMaximum();
+					scrollPane.getVerticalScrollBar().setValue(scrollMax);
+				}
+			}
+		});
 		
 		repaint();
 	}

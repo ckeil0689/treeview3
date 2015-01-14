@@ -6,13 +6,12 @@ import java.awt.FontMetrics;
 import java.awt.event.MouseEvent;
 import java.util.Observable;
 
-import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
 
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.UrlExtractor;
 
-public class GeneLabelView extends LabelView implements LabelDisplay {
+public class GeneLabelView extends LabelView {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -30,32 +29,27 @@ public class GeneLabelView extends LabelView implements LabelDisplay {
 	}
 	
 	@Override
-	public void setJustifyOption(boolean isRightJustified) {
+	public void setJustifyOption(final boolean isRightJustified) {
 		
 		super.setJustifyOption(isRightJustified);
 		
-		if(isRightJustified) {
-			int scrollMax = scrollPane.getHorizontalScrollBar().getMaximum();
-			scrollPane.getHorizontalScrollBar().setValue(scrollMax);
-		} else {
-			scrollPane.getHorizontalScrollBar().setValue(0);
-		}
+		/* 
+		 * Absolutely HAS to be via Runnable. Otherwise adding/ removing 
+		 * components in DendroView will reset whatever was set here.
+		 */
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			   
+			public void run() { 
+				if(isRightJustified) {
+					int scrollMax = scrollPane.getHorizontalScrollBar().getMaximum();
+					scrollPane.getHorizontalScrollBar().setValue(scrollMax);
+				} else {
+					scrollPane.getHorizontalScrollBar().setValue(0);
+				}
+			}
+		});
 		
 		repaint();
-	}
-
-	@Override
-	public JScrollBar getMainScrollBar() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public void generateView(final UrlExtractor uExtractor, final int col) {
-		
-		super.setUrlExtractor(uExtractor);
-
-		headerSummary.setIncluded(new int[] { 0 });
-		headerSummary.addObserver(this);
 	}
 	
 	@Override

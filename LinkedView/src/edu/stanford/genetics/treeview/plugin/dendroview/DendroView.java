@@ -228,7 +228,7 @@ public class DendroView implements Observer, DendroPanel {
 	public JPanel makeDendro() {
 
 		arraynameview.generateView(tvFrame.getUrlExtractor());
-		textview.generateView(tvFrame.getUrlExtractor(), -1);
+		textview.generateView(tvFrame.getUrlExtractor());
 		
 		globalview.setHeaderSummary(textview.getHeaderSummary(), 
 				arraynameview.getHeaderSummary());

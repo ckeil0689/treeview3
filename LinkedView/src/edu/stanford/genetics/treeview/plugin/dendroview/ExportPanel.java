@@ -1001,7 +1001,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		tempMap.setAvailablePixels(height + getBorderPixels());
 //		final TextView_deprec anv = new TextView_deprec();
 		final GeneLabelView anv = new GeneLabelView();
-		anv.generateView(null, 0);
+		anv.generateView(null);
 		anv.setHeaderInfo(geneHeaderInfo);
 		anv.setMap(tempMap);
 		anv.setHeaderSummary(headerSelectionPanel.getGeneSummary());

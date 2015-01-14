@@ -35,37 +35,57 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
 	private static final long serialVersionUID = 1L;
 	
+	/* Axis IDs */
 	protected final static int ROW = 0;
 	protected final static int COL = 1;
 	
-	/* DataModel observes this view */
+	/* DataModel is an observer */
 	protected DataModel dataModel;
+	
+	/* Required label data */
 	protected HeaderInfo headerInfo;
 	protected HeaderSummary headerSummary;
+	
+	/* Maps label position to GlobalView */
 	protected MapContainer map;
+	
+	/* Use labels to generate URLs for look-up */
 	protected UrlExtractor urlExtractor;
 	
+	/* Default label settings */
 	protected final String d_face = "Dialog";
 	protected final int d_style = 0;
 	protected final int d_size = 12;
 	protected final boolean d_justified = false;
 	
+	/* Custom label settings */
 	protected String face;
 	protected int style;
 	protected int size;
+	
+	/* Panel sizing */
 	protected int maxlength = 0;
+	
+	/* Keeps track of label index with mouse cursor on top */
 	protected int hoverIndex;
+	
+	/* Alignment status */
 	protected boolean isRightJustified;
 	
+	/* Selection of row/ column indices */
 	protected TreeSelectionI arraySelection;
 	protected TreeSelectionI geneSelection;
 	
-	/* stores a reference to the TreeSelection relevant for drawing */
+	/* 
+	 * Stores a reference to the TreeSelection relevant for drawing -- allows
+	 * to keep one paint method updateBuffer() for gene- and arraySelection 
+	 */
 	protected TreeSelectionI drawSelection;
 	
+	/* Contains all the saved information */
 	protected Preferences configNode;
 	
-	private final int axis_id;
+	private final boolean isGeneAxis;
 	
 	protected JScrollPane scrollPane;
 	protected JLabel zoomHint;
@@ -74,10 +94,10 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		
 		super();
 		
-		this.axis_id = axis_id;
+		this.isGeneAxis = (axis_id == ROW);
 		this.setLayout(new MigLayout());
 		
-		String summary = (axis_id == ROW) ? "GeneSummary" : "ArraySummary";
+		String summary = (isGeneAxis) ? "GeneSummary" : "ArraySummary";
 		this.headerSummary = new HeaderSummary(summary);
 		
 //		this.urlExtractor = uExtractor;
@@ -87,7 +107,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
 		zoomHint = GUIFactory.createLabel("", GUIFactory.FONTS);
 		
-		if(axis_id == ROW) {
+		if(isGeneAxis) {
 			add(zoomHint, "alignx 0%, aligny 50%, push, wrap");
 			scrollPane = new JScrollPane(this,
 					ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
@@ -167,7 +187,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		this.geneSelection = geneSelection;
 		this.geneSelection.addObserver(this);
 		
-		if(axis_id == ROW) {
+		if(isGeneAxis) {
 			this.drawSelection = geneSelection;
 		}
 	}
@@ -187,7 +207,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		this.arraySelection = arraySelection;
 		this.arraySelection.addObserver(this);
 		
-		if(axis_id == COL) {
+		if(!isGeneAxis) {
 			this.drawSelection = arraySelection;
 		}
 	}
@@ -309,12 +329,14 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	}
 
 	public void updateBuffer(final Graphics g, final Dimension offscreenSize) {
-
-		int stringX = (axis_id == ROW) ? offscreenSize.width : offscreenSize.height;
 		
-		g.setColor(this.getBackground());
-		g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
-		g.setColor(Color.black);
+		/* Shouldn't draw if there's no TreeSelection defined */
+		if(drawSelection == null) {
+			LogBuffer.println("drawSelection not defined. Can't draw labels.");
+			return;
+		}
+
+		int stringX = (isGeneAxis) ? offscreenSize.width : offscreenSize.height;
 
 		if (map.getScale() > 12.0) {
 			zoomHint.setText("");
@@ -322,22 +344,26 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 			final Graphics2D g2d = (Graphics2D) g;
 			final AffineTransform orig = g2d.getTransform();
 
-			if(axis_id == COL) {
+			/* Rotate plane for array axis */
+			if(!isGeneAxis) {
 				g2d.rotate(Math.PI * 3 / 2);
 				g2d.translate(-offscreenSize.height, 0);
 			}
 
+			/* Get label indices range */
 			final int start = map.getIndex(0);
 			final int end = map.getIndex(map.getUsedPixels()) - 1;
 			
 			final int colorIndex = headerInfo.getIndex("FGCOLOR");
 			g.setFont(new Font(face, style, size));
+			
 			final FontMetrics metrics = getFontMetrics(g.getFont());
 			final int ascent = metrics.getAscent();
 
-			// draw backgrounds first...
+			/* Draw label backgrounds first if color is defined */
 			final int bgColorIndex = headerInfo.getIndex("BGCOLOR");
 			if (bgColorIndex > 0) {
+				LogBuffer.println("BgLabel");
 				final Color back = g.getColor();
 				for (int j = start; j <= end; j++) {
 					final String[] strings = headerInfo.getHeader(j);
@@ -354,50 +380,44 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 				g.setColor(back);
 			}
 
-			// Foreground Text
+			/* Draw the labels */
 			final Color fore = GUIFactory.MAIN;
 			for (int j = start; j <= end; j++) {
 
 				try {
-					final String out = headerSummary.getSummary(headerInfo,
-							j);
+					String out = headerSummary.getSummary(headerInfo, j);
 					final String[] headers = headerInfo.getHeader(j);
 				
-					if (out != null) {
-						if ((drawSelection == null)
-								|| drawSelection.isIndexSelected(j)
-								|| j == hoverIndex) {
-							if (colorIndex > 0) {
-								g.setColor(TreeColorer
-										.getColor(headers[colorIndex]));
-							}
-
-							g2d.setColor(fore);
-							if(isRightJustified) {
-								g2d.drawString(out, stringX
-												- metrics.stringWidth(out),
-										map.getMiddlePixel(j) + ascent / 2);
-							} else {
-								g2d.drawString(out, 0, map.getMiddlePixel(j)
-										+ ascent / 2);
-							}
-
-							if (colorIndex > 0) g.setColor(fore);
-							
-						} else {
-							g2d.setColor(Color.black);
-							if(isRightJustified) {
-								g2d.drawString(out, stringX
-												- metrics.stringWidth(out),
-										map.getMiddlePixel(j) + ascent / 2);
-							} else {
-								g2d.drawString(out, 0, map.getMiddlePixel(j)
-										+ ascent / 2);
-							}
+					if (out == null) {
+						out = "No Label";
+					}
+					
+					/* Set label color */
+					if (drawSelection.isIndexSelected(j) || j == hoverIndex) {
+						if (colorIndex > 0) {
+							g.setColor(TreeColorer
+									.getColor(headers[colorIndex]));
 						}
 
+						g2d.setColor(fore);
+
+						if (colorIndex > 0) g.setColor(fore);
+						
+					} else {
+						g2d.setColor(Color.black);
 					}
+					
+					/* Finally draw label (alignment-dependent) */
+					int xPos = 0;
+					if (isRightJustified) {
+						xPos = stringX - metrics.stringWidth(out);
+					}
+					
+					g2d.drawString(out, xPos, map.getMiddlePixel(j) + ascent/2);
+					
 				} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
+					LogBuffer.logException(e);
+					break;
 				}
 			}
 
@@ -413,5 +433,15 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		
 		hoverIndex = -1;
 		repaint();
+	}
+
+	@Override
+	public void mouseDragged(MouseEvent e) {
+		
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent e) {
+		
 	}
 }
