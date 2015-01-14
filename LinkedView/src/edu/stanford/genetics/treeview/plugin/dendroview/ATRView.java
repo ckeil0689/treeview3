@@ -229,4 +229,10 @@ public class ATRView extends TRView implements MouseListener,
 
 		setHoveredNode(null);
 	}
+
+	@Override
+	public void mouseDragged(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
 }

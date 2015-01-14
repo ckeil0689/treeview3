@@ -350,6 +350,16 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 		}
 	}
 	
+	@Override
+	public void keyTyped(KeyEvent e) {
+		
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		
+	}
+	
 	private void selectParent() {
 
 		TreeDrawerNode current = selectedNode;
@@ -443,5 +453,4 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 
 		return yScaleEq;
 	}
-
 }
