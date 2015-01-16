@@ -146,10 +146,7 @@ public abstract class ModelView extends JPanel implements Observer,
 		g.fillRect(clip.x, clip.y, clip.width, clip.height);
 
 		final Dimension reqSize = getSize();
-		if (reqSize == null) {
-
-			return;
-		}
+		if (reqSize == null) return;
 
 		// monitor size changes
 		if ((offscreenSize == null) || (reqSize.width != offscreenSize.width)
@@ -164,8 +161,6 @@ public abstract class ModelView extends JPanel implements Observer,
 			updateBuffer(g);
 			paintComposite(g);
 		}
-
-		// System.out.println("Exiting " + viewName() + " to clip " + clip );
 	}
 
 	/**
@@ -247,17 +242,5 @@ public abstract class ModelView extends JPanel implements Observer,
 
 	@Override
 	public void mouseReleased(final MouseEvent e) {
-	}
-
-	public void mouseMoved(final MouseEvent e) {
-	}
-
-	public void mouseDragged(final MouseEvent e) {
-	}
-
-	public void keyReleased(final KeyEvent e) {
-	}
-
-	public void keyTyped(final KeyEvent e) {
 	}
 }

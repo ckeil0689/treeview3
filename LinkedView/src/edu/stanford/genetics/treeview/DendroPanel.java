@@ -35,15 +35,11 @@ import javax.swing.JMenu;
  */
 public interface DendroPanel {
 
-	public void refresh();
-
 	public void addDendroMenus(JMenu menu);
 
 	public void addClusterMenus(JMenu menu);
 
 	public void openSearchDialog(HeaderInfo geneHI, HeaderInfo arrayHI);
-
-//	public void setTreesVisible(double atr_loc, double gtr_loc);
 
 	/**
 	 * 

@@ -25,6 +25,8 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 
 import javax.swing.SwingUtilities;
 
@@ -37,7 +39,8 @@ import edu.stanford.genetics.treeview.LinearTransformation;
  * This object requires a MapContainer to figure out the offsets for the genes.
  */
 
-public class GTRView extends TRView {
+public class GTRView extends TRView implements 
+MouseMotionListener, MouseListener{
 
 	private static final long serialVersionUID = 1L;;
 
@@ -159,5 +162,19 @@ public class GTRView extends TRView {
 				getYScaleEq().inverseTransform(e.getY()), 
 				getXScaleEq().inverseTransform(e.getX()), 
 				getXScaleEq().getSlope() / getYScaleEq().getSlope()));
+	}
+
+	@Override
+	public void mouseExited(final MouseEvent e) {
+
+		if (!isEnabled() || !enclosingWindow().isActive()) return;
+		
+		setHoveredNode(null);
+	}
+
+	@Override
+	public void mouseDragged(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 }

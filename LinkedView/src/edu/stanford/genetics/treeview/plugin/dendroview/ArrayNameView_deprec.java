@@ -33,7 +33,6 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 import java.util.Observable;
 import java.util.prefs.BackingStoreException;
@@ -67,7 +66,7 @@ import edu.stanford.genetics.treeview.UrlExtractor;
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version @version $Revision: 1.4 $ $Date: 2010-05-02 13:39:00 $
  */
-public class ArrayNameView extends ModelView implements MouseListener, 
+public class ArrayNameView_deprec extends ModelView implements MouseListener, 
 		MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
 	private static final long serialVersionUID = 1L;
@@ -82,6 +81,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 	private String face;
 	private int style;
 	private int size;
+	private boolean isRightJustified;
 
 	private Image backBuffer;
 	private final JScrollPane scrollPane;
@@ -99,6 +99,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 	private final String d_face = "Dialog";
 	private final int d_style = 0;
 	private final int d_size = 12;
+	private final boolean d_justified = false;
 
 	private final JLabel l1;
 
@@ -109,7 +110,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 	 * @param hInfo
 	 *            Header containing array names as first row.
 	 */
-	public ArrayNameView() {
+	public ArrayNameView_deprec() {
 
 		super();
 		this.setLayout(new MigLayout());
@@ -120,21 +121,20 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		addMouseListener(this);
 
 		l1 = GUIFactory.createLabel("", GUIFactory.FONTS);
-
 		add(l1, "alignx 50%, aligny 100%, push");
 
 		scrollPane = new JScrollPane(this,
-				ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBorder(null);
 
 		panel = scrollPane;
 	}
 	
-	public JScrollBar getYScroll() {
-		
-		return scrollPane.getVerticalScrollBar();
-	}
+//	public JScrollBar getYScroll() {
+//		
+//		return scrollPane.getVerticalScrollBar();
+//	}
 	
 	public void generateView(final UrlExtractor uExtractor) {
 
@@ -149,10 +149,10 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		return headerInfo;
 	}
 
-	public DataModel getDataModel() {
-
-		return dataModel;
-	}
+//	public DataModel getDataModel() {
+//
+//		return dataModel;
+//	}
 
 	public void setHeaderInfo(final HeaderInfo headerInfo) {
 
@@ -278,9 +278,6 @@ public class ArrayNameView extends ModelView implements MouseListener,
 				final Graphics2D g2d = (Graphics2D) g;
 				final AffineTransform orig = g2d.getTransform();
 
-				final FontRenderContext frc = new FontRenderContext(orig, true,
-						true);
-
 				g2d.rotate(Math.PI * 3 / 2);
 				g2d.translate(-offscreenSize.height, 0);
 
@@ -335,29 +332,27 @@ public class ArrayNameView extends ModelView implements MouseListener,
 								}
 
 								g2d.setColor(fore);
-								 g2d.drawString(out, 0, map.getMiddlePixel(j)
-								 + ascent / 2);
-
-								// Unknown Mac OS X issue with drawString,
-								// mysteriously fixed by this. Java 1.6
-//								g2d.drawGlyphVector(g2d.getFont()
-//										.createGlyphVector(frc, out), 0,
-//										map.getMiddlePixel(j) + ascent / 2);
-
-								if (colorIndex > 0) {
-									g.setColor(fore);
+								if(isRightJustified) {
+									g2d.drawString(out, offscreenSize.height
+													- metrics.stringWidth(out),
+											map.getMiddlePixel(j) + ascent / 2);
+								} else {
+									g2d.drawString(out, 0, map.getMiddlePixel(j)
+											+ ascent / 2);
 								}
+
+								if (colorIndex > 0) g.setColor(fore);
+								
 							} else {
 								g2d.setColor(Color.black);
-								 g2d.drawString(out, 0, map.getMiddlePixel(j)
-								 + ascent / 2);
-								// g.setColor(fore);
-
-								// Unknown Mac OS X issue with drawString,
-								// mysteriously fixed by this. java 1.6!
-//								g2d.drawGlyphVector(g2d.getFont()
-//										.createGlyphVector(frc, out), 0,
-//										map.getMiddlePixel(j) + ascent / 2);
+								if(isRightJustified) {
+									g2d.drawString(out, offscreenSize.height
+													- metrics.stringWidth(out),
+											map.getMiddlePixel(j) + ascent / 2);
+								} else {
+									g2d.drawString(out, 0, map.getMiddlePixel(j)
+											+ ascent / 2);
+								}
 							}
 
 						}
@@ -415,7 +410,6 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		} else {
 			l1.setText(StringRes.lbl_ZoomColLabels);
 		}
-		// end of if
 	}
 
 	// /**
@@ -621,6 +615,12 @@ public class ArrayNameView extends ModelView implements MouseListener,
 
 		return style;
 	}
+	
+	@Override
+	public boolean getJustifyOption() {
+		
+		return isRightJustified;
+	}
 
 	/* inherit description */
 	@Override
@@ -633,7 +633,6 @@ public class ArrayNameView extends ModelView implements MouseListener,
 			}
 			setFont(new Font(face, style, size));
 			backBufferValid = false;
-			revalidate();
 			repaint();
 		}
 	}
@@ -649,7 +648,6 @@ public class ArrayNameView extends ModelView implements MouseListener,
 			}
 			setFont(new Font(face, style, size));
 			backBufferValid = false;
-			revalidate();
 			repaint();
 		}
 	}
@@ -665,12 +663,47 @@ public class ArrayNameView extends ModelView implements MouseListener,
 				configNode.putInt("style", style);
 			}
 			setFont(new Font(face, style, size));
-			revalidate();
 			repaint();
 		}
 	}
 
-//	private HeaderSummary headerSummary;
+	@Override
+	public void setJustifyOption(boolean isRightJustified) {
+		
+		this.isRightJustified = isRightJustified;
+		
+		LogBuffer.println("Setting ArrayNameView Scroll: " + isRightJustified);
+		
+		if (configNode != null) {
+			configNode.putBoolean("colRightJustified", isRightJustified);
+		}
+		
+		if(isRightJustified) {
+			scrollPane.getVerticalScrollBar().setValue(0);
+		} else {
+			int scrollMax = scrollPane.getVerticalScrollBar().getMaximum();
+			scrollPane.getVerticalScrollBar().setValue(scrollMax);
+		}
+		
+		repaint();
+	}
+	
+	public void resetJustify() {
+		
+		boolean isRight = false;
+		if (configNode != null) {
+			isRight = configNode.getBoolean("colRightJustified", isRightJustified);
+		}
+		
+		if(isRight) {
+			scrollPane.getVerticalScrollBar().setValue(0);
+		} else {
+			int scrollMax = scrollPane.getVerticalScrollBar().getMaximum();
+			scrollPane.getVerticalScrollBar().setValue(scrollMax);
+		}
+		
+		repaint();
+	}
 
 	/** Setter for headerSummary */
 	public void setHeaderSummary(final HeaderSummary headerSummary) {
@@ -718,6 +751,7 @@ public class ArrayNameView extends ModelView implements MouseListener,
 		setFace(configNode.get("face", d_face));
 		setStyle(configNode.getInt("style", d_style));
 		setPoints(configNode.getInt("size", d_size));
+		setJustifyOption(configNode.getBoolean("colRightJustified", d_justified));
 	}
 
 	/**

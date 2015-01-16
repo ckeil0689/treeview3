@@ -13,6 +13,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.List;
 
+import javax.swing.JRadioButton;
 import javax.swing.SwingWorker;
 
 import Utilities.StringRes;
@@ -60,6 +61,7 @@ public class PreferencesController {
 		preferences.addOKButtonListener(new ConfirmationListener());
 		preferences.addCustomLabelListener(new CustomLabelListener());
 		preferences.addComponentListener(new PreferencesComponentListener());
+		preferences.addJustifyListener(new LabelJustifyListener());
 	}
 
 	class MenuPanelListener implements MouseListener {
@@ -167,6 +169,44 @@ public class PreferencesController {
 
 			checkForColorSave();
 			preferences.getPreferencesFrame().dispose();
+		}
+	}
+	
+	/**
+	 * Listens to changing radio buttons in the AnnotationSettings and
+	 * sets the justify-flag in TextView and ArrayNameView respectively.
+	 * @author chris0689
+	 *
+	 */
+	class LabelJustifyListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			
+			boolean[] labelAligns = tvFrame.getDendroView().getLabelAligns();
+			
+			boolean isRowRight = labelAligns[0];
+			boolean isColRight = labelAligns[1];
+			
+			/* counter to recognize the selected JRadioButton */
+			switch(((JRadioButton)e.getSource()).getText()) {
+			case "Left":
+				isRowRight = false;
+				break;
+			case "Right":
+				isRowRight = true;
+				break;
+			case "Bottom":
+				isColRight = false;
+				break;
+			case "Top":
+				isColRight = true;
+				break;
+			default:
+				break;
+			}
+			
+			tvFrame.getDendroView().setLabelAlignment(isRowRight, isColRight);
 		}
 	}
 

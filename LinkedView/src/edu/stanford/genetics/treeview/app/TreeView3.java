@@ -2,9 +2,6 @@ package edu.stanford.genetics.treeview.app;
 
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-//import java.awt.EventQueue;
-//import javax.swing.JFrame;
-//import javax.swing.JMenuBar;
 
 import edu.stanford.genetics.treeview.LogBuffer;
 
@@ -29,7 +26,7 @@ public class TreeView3 {
 
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
 		System.setProperty("com.apple.mrj.application.apple.menu.about.name",
-				"TreeView3");  
+				"TreeView3");
 		System.setProperty("apple.awt.showGrowBox", "true");
 	}
 
@@ -45,23 +42,10 @@ public class TreeView3 {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			
 			javax.swing.SwingUtilities.invokeLater(new Runnable() {
-//			EventQueue.invokeLater(new Runnable() {
 
 				@Override
 				public void run() {
-//	                JFrame frame = new JFrame("Gabby");
-//	                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//	                frame.setLocationByPlatform(true);
-//	                JMenuBar menuBar = new JMenuBar();
-//	                frame.setJMenuBar(menuBar);
-//	                frame.setVisible(true);
 					new LinkedViewApp();
-//					Application app = new LinkedViewApp();
-//					Main main = new Main();           
-//					app.addApplicationListener(main.getApplicationListener());
-//
-//					app.addPreferencesMenuItem();
-//					app.setEnabledPreferencesMenu(true);           
 				}
 			});
 		} catch (final ClassNotFoundException | InstantiationException 

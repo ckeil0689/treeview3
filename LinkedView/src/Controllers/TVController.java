@@ -91,8 +91,8 @@ public class TVController {
 			switch (option) {
 
 				case JOptionPane.YES_OPTION:
-					tvFrame.getConfigNode().parent().removeNode();
 					tvFrame.saveSettings();
+					tvFrame.getConfigNode().parent().removeNode();
 					tvFrame.getAppFrame().dispose();
 					break;
 												

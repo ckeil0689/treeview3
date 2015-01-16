@@ -235,6 +235,10 @@ public abstract class ViewFrame implements Observer, ConfigNodePersistent {
 		//JFrame.EXIT_ON_CLOSE works much more reliably than what was being done before. I replaced WindowConstants.DO_NOTHING_ON_CLOSE and confirmed that saveSettings is called by the window listener before exiting...
 		//appFrame
 		//		.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		//appFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		//THIS WORKS BUT, it could present problems either current, in the future (when we support multiple windows) or both.
+		//Take a look at bitBucket issue #74 if you decide to re-open this issue and solve it properly.
+		//Note, the no-exit bug when dispose is used can be reproduced by performing a search and then closing the main window.
 		appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		appFrame.addWindowListener(new WindowAdapter() {
@@ -341,6 +345,7 @@ public abstract class ViewFrame implements Observer, ConfigNodePersistent {
 				appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				saveSettings();
 				appFrame.dispose();
+				LogBuffer.println("Will this print, and when?.");
 				break;
 											
 			case JOptionPane.NO_OPTION:		

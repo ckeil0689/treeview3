@@ -43,6 +43,11 @@ public abstract interface FontSelectable {
 	 * @return The current style
 	 */
 	public abstract int getStyle();
+	
+	/**
+	 * @return gets label justification
+	 */
+	public abstract boolean getJustifyOption();
 
 	public abstract java.awt.Font getFont();
 
@@ -69,4 +74,12 @@ public abstract interface FontSelectable {
 	 *            The new style value
 	 */
 	public abstract void setStyle(int i);
+	
+	/**
+	 * Sets label justification
+	 * 
+	 * @param i
+	 *            The new style value
+	 */
+	public abstract void setJustifyOption(boolean isRightJustified);
 }

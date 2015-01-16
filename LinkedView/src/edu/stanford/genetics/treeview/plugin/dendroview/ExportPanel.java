@@ -999,8 +999,9 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		tempMap.setScale(spacing);
 		tempMap.setIndexRange(min, max);
 		tempMap.setAvailablePixels(height + getBorderPixels());
-		final TextView anv = new TextView();
-		anv.generateView(null, 0);
+//		final TextView_deprec anv = new TextView_deprec();
+		final GeneLabelView anv = new GeneLabelView();
+		anv.generateView(null);
 		anv.setHeaderInfo(geneHeaderInfo);
 		anv.setMap(tempMap);
 		anv.setHeaderSummary(headerSelectionPanel.getGeneSummary());
@@ -1040,7 +1041,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		tempMap.setScale(spacing);
 		tempMap.setIndexRange(min, max);
 		tempMap.setAvailablePixels(width + getBorderPixels());
-		final ArrayNameView anv = new ArrayNameView();
+		final ArrayLabelView anv = new ArrayLabelView();
 		anv.generateView(null);
 		anv.setHeaderInfo(arrayHeaderInfo);
 		anv.setFace(getArrayFont().getName());
@@ -1077,10 +1078,10 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		 */
 		destRect.setBounds(0, 0, width, height);
 		final int[] pixels = new int[width * height];
-		int[] geneSelections = new int[] {geneSelection.getMinIndex(), 
-				geneSelection.getMaxIndex()};
-		int[] arraySelections = new int[] {arraySelection.getMinIndex(), 
-				arraySelection.getMaxIndex()};
+//		int[] geneSelections = new int[] {geneSelection.getMinIndex(), 
+//				geneSelection.getMaxIndex()};
+//		int[] arraySelections = new int[] {arraySelection.getMinIndex(), 
+//				arraySelection.getMaxIndex()};
 		arrayDrawer.paint(pixels, sourceRect, destRect, width);
 		/* Selection dimming */
 //		, geneSelections, arraySelections);
@@ -1547,7 +1548,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			return arraySummary;
 		}
 
-		public JList geneList, arrayList;
+		public JList<String> geneList, arrayList;
 
 		public String getGeneAnno(final int i) {
 			return geneSummary.getSummary(geneHeaderInfo, i);
@@ -1646,9 +1647,9 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			add(new JLabel("Gene Headers"));
 			final String[] geneHeaders = geneHeaderInfo.getNames();
 			if (geneHeaders == null) {
-				geneList = new JList(new String[0]);
+				geneList = new JList<String>(new String[0]);
 			} else {
-				geneList = new JList(geneHeaders);
+				geneList = new JList<String>(geneHeaders);
 			}
 			geneList.setVisibleRowCount(5);
 			add(new JScrollPane(geneList));
@@ -1659,9 +1660,9 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 
 			final String[] arrayHeaders = arrayHeaderInfo.getNames();
 			if (arrayHeaders == null) {
-				arrayList = new JList(new String[0]);
+				arrayList = new JList<String>(new String[0]);
 			} else {
-				arrayList = new JList(arrayHeaders);
+				arrayList = new JList<String>(arrayHeaders);
 			}
 			arrayList.setVisibleRowCount(5);
 			add(new JScrollPane(arrayList));

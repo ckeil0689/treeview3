@@ -32,6 +32,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 
 import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
@@ -49,7 +51,8 @@ import edu.stanford.genetics.treeview.LinearTransformation;
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.2 $ $Date: 2010-05-02 13:39:00 $
  */
-public class ATRView extends TRView {
+public class ATRView extends TRView implements 
+MouseMotionListener, MouseListener{
 
 	private static final long serialVersionUID = 1L;
 
@@ -192,5 +195,19 @@ public class ATRView extends TRView {
 					yScaleEq.inverseTransform(e.getY()),
 					yScaleEq.getSlope() / xScaleEq.getSlope()));
 //		}
+	}
+
+	@Override
+	public void mouseDragged(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void mouseExited(final MouseEvent e) {
+
+		if (!isEnabled() || !enclosingWindow().isActive()) return;
+		
+		setHoveredNode(null);
 	}
 }

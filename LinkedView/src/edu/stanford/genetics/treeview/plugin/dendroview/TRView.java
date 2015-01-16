@@ -19,8 +19,7 @@ import edu.stanford.genetics.treeview.ModelViewBuffered;
 import edu.stanford.genetics.treeview.TreeDrawerNode;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 
-public class TRView extends ModelViewBuffered implements KeyListener, 
-MouseMotionListener, MouseListener {
+public class TRView extends ModelViewBuffered implements KeyListener {
 	
 	private static final long serialVersionUID = 1L;
 
@@ -371,6 +370,16 @@ MouseMotionListener, MouseListener {
 		}
 	}
 	
+	@Override
+	public void keyTyped(KeyEvent e) {
+		
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		
+	}
+	
 	private void selectParent() {
 
 		TreeDrawerNode current = selectedNode;
@@ -459,13 +468,5 @@ MouseMotionListener, MouseListener {
 	public LinearTransformation getYScaleEq() {
 
 		return yScaleEq;
-	}
-	
-	@Override
-	public void mouseExited(final MouseEvent e) {
-
-		if (!isEnabled() || !enclosingWindow().isActive()) return;
-		
-		setHoveredNode(null);
 	}
 }
