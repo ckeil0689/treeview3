@@ -295,7 +295,7 @@ public class TreePainter extends TreeDrawer {
 				ry = (int) yT.transform(right.getIndex() + .5);
 				ly = (int) yT.transform(left.getIndex() + .5);
 
-				// ATRView
+			// ATRView
 			} else {
 				ry = (int) yT.transform(right.getCorr());
 				ly = (int) yT.transform(left.getCorr());

@@ -32,14 +32,11 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 
 import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
 
 import edu.stanford.genetics.treeview.HeaderInfo;
-import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LinearTransformation;
 
 /**
@@ -52,24 +49,19 @@ import edu.stanford.genetics.treeview.LinearTransformation;
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.2 $ $Date: 2010-05-02 13:39:00 $
  */
-public class ATRView extends TRView implements MouseListener, 
-		MouseMotionListener {
+public class ATRView extends TRView {
 
 	private static final long serialVersionUID = 1L;
-
-	protected HeaderSummary headerSummary = new HeaderSummary("AtrSummary");
 
 	private HeaderInfo atrHI;
 	private final JScrollBar scrollbar;
 
-	/** Constructor, sets up AWT components */
 	public ATRView() {
 
-		super();
+		super(false);
 
 		scrollbar = new JScrollBar(Adjustable.VERTICAL, 0, 1, 0, 1);
 		
-		// EDIT
 		panel.add(scrollbar, BorderLayout.NORTH);
 		
 		isLeft = false;
@@ -79,7 +71,6 @@ public class ATRView extends TRView implements MouseListener,
 		addKeyListener(this);
 	}
 
-	// method from ModelView
 	/**
 	 * Implements abstract method from ModelView. In this case, returns
 	 * "ATRView".
@@ -92,7 +83,6 @@ public class ATRView extends TRView implements MouseListener,
 		return "ATRView";
 	}
 
-	// method from ModelView
 	/**
 	 * Gets the status attribute of the ATRView object. The status is some
 	 * information which the user might find useful.
@@ -128,41 +118,30 @@ public class ATRView extends TRView implements MouseListener,
 
 		return status;
 	}
-
-	/** Setter for headerSummary */
-	public void setHeaderSummary(final HeaderSummary headerSummary) {
-
-		this.headerSummary = headerSummary;
-	}
-
-	/** Getter for headerSummary */
-	public HeaderSummary getHeaderSummary() {
-
-		return headerSummary;
-	}
 	
 	public void setATRHeaderInfo(final HeaderInfo atrHI) {
 		
 		this.atrHI = atrHI;
 	}
 	
-	/* inherit description */
 	@Override
 	public void updateBuffer(final Graphics g) {
 
+		if(treePainter == null) return;
+		
 		if (offscreenChanged) {
 			offscreenValid = false;
 		}
 
-		if ((!offscreenValid) && (treePainter != null)) {
+		if (!offscreenValid) {
 			map.setAvailablePixels(offscreenSize.width);
 
-			// clear the pallette...
+			/* clear the panel */
 			g.setColor(this.getBackground());
 			g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
 			g.setColor(Color.black);
 
-			// calculate Scaling
+			/* calculate scaling */
 			destRect.setBounds(0, 0, map.getUsedPixels(), offscreenSize.height);
 			xScaleEq = new LinearTransformation(map.getIndex(destRect.x),
 					destRect.x, map.getIndex(destRect.x + destRect.width),
@@ -171,8 +150,9 @@ public class ATRView extends TRView implements MouseListener,
 					destRect.y, treePainter.getCorrMax(), destRect.y
 							+ destRect.height);
 
-			// draw
-			treePainter.paint(g, xScaleEq, yScaleEq, destRect, selectedNode, isLeft);
+			/* draw trees */
+			treePainter.paint(g, xScaleEq, yScaleEq, destRect, selectedNode, 
+					isLeft);
 
 		} else {
 			// System.out.println("didn't update buffer: valid =
@@ -180,7 +160,6 @@ public class ATRView extends TRView implements MouseListener,
 		}
 	}
 
-	// Mouse Listener
 	/**
 	 * When a mouse is clicked, a node is selected.
 	 */
@@ -188,22 +167,16 @@ public class ATRView extends TRView implements MouseListener,
 	public void mouseClicked(final MouseEvent e) {
 
 		if (!isEnabled() || !enclosingWindow().isActive()) return;
-
-		if (treePainter != null) {
+		if (treePainter == null) return;
 			
-			if(SwingUtilities.isLeftMouseButton(e)) {
-				// the trick is translating back to the normalized space...
-				setSelectedNode(treePainter.getClosest(
-						xScaleEq.inverseTransform(e.getX()),
-						yScaleEq.inverseTransform(e.getY()),
-						// weight must have correlation slope on top
-						yScaleEq.getSlope() / xScaleEq.getSlope()));
-			} else {
-				/* Sequence of these statements matters! */
-				treeSelection.deselectAllIndexes();
-				treeSelection.notifyObservers();
-				setSelectedNode(null);
-			}
+		if(SwingUtilities.isLeftMouseButton(e)) {
+			setSelectedNode(treePainter.getClosest(
+					xScaleEq.inverseTransform(e.getX()),
+					yScaleEq.inverseTransform(e.getY()),
+					yScaleEq.getSlope() / xScaleEq.getSlope()));
+		} else {
+			treeSelection.deselectAllIndexes();
+			treeSelection.notifyObservers();
 		}
 	}
 	
@@ -211,22 +184,13 @@ public class ATRView extends TRView implements MouseListener,
 	public void mouseMoved(final MouseEvent e) {
 
 		if (!isEnabled() || !enclosingWindow().isActive()) return;
-
-		if (treePainter != null && treeSelection.getNSelectedIndexes() == 0) {
-			// the trick is translating back to the normalized space...
+		if (treePainter == null) return;
+		
+//		if (treeSelection.getNSelectedIndexes() == 0) {
 			setHoveredNode(treePainter.getClosest(
 					xScaleEq.inverseTransform(e.getX()),
 					yScaleEq.inverseTransform(e.getY()),
-					// weight must have correlation slope on top
 					yScaleEq.getSlope() / xScaleEq.getSlope()));
-		}
-	}
-	
-	@Override
-	public void mouseExited(final MouseEvent e) {
-
-		if (!isEnabled() || !enclosingWindow().isActive()) return;
-
-		setHoveredNode(null);
+//		}
 	}
 }

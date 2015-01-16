@@ -25,15 +25,11 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 
 import javax.swing.SwingUtilities;
 
 import edu.stanford.genetics.treeview.HeaderInfo;
-import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LinearTransformation;
-import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
  * Draws a gene tree to show the relations between genes
@@ -41,21 +37,15 @@ import edu.stanford.genetics.treeview.LogBuffer;
  * This object requires a MapContainer to figure out the offsets for the genes.
  */
 
-public class GTRView extends TRView implements MouseListener, 
-		MouseMotionListener {
+public class GTRView extends TRView {
 
 	private static final long serialVersionUID = 1L;;
 
-	protected HeaderSummary headerSummary = new HeaderSummary("GtrSummary");
-
 	private HeaderInfo gtrHI;
 
-	/**
-	 * Constructor. You still need to specify a map to have this thing draw.
-	 */
 	public GTRView() {
 
-		super();
+		super(true);
 		panel = this;
 		
 		isLeft = true;
@@ -63,37 +53,18 @@ public class GTRView extends TRView implements MouseListener,
 		addMouseListener(this);
 		addMouseMotionListener(this);
 	}
-
-	/**
-	 * Setter for headerSummary
-	 * 
-	 */
-	public void setHeaderSummary(final HeaderSummary headerSummary) {
-
-		this.headerSummary = headerSummary;
-	}
-
-	/**
-	 * Getter for headerSummary
-	 */
-	public HeaderSummary getHeaderSummary() {
-
-		return headerSummary;
-	}
 	
 	public void setGTRHeaderInfo(HeaderInfo gtrHI) {
 		
 		this.gtrHI = gtrHI;
 	}
 
-	// method from ModelView
 	@Override
 	public String viewName() {
 
 		return "GTRView";
 	}
 
-	// method from ModelView
 	@Override
 	public String[] getStatus() {
 
@@ -124,26 +95,24 @@ public class GTRView extends TRView implements MouseListener,
 		return status;
 	}
 
-	// method from ModelView
 	@Override
 	public void updateBuffer(final Graphics g) {
 
-		// System.out.println("GTRView updateBuffer() called offscreenChanged "
-		// + offscreenChanged + " valid " + offscreenValid + " yScaleEq "
-		// + getYScaleEq());
+		if (treePainter == null) return;
+		
 		if (offscreenChanged) {
 			offscreenValid = false;
 		}
 
-		if (!offscreenValid && (treePainter != null)) {
+		if (!offscreenValid) {
 			map.setAvailablePixels(offscreenSize.height);
 
-			// clear the pallette...
+			/* clear the panel */
 			g.setColor(this.getBackground());
 			g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
 			g.setColor(Color.black);
 
-			// calculate Scaling
+			/* calculate Scaling */
 			destRect.setBounds(0, 0, offscreenSize.width, map.getUsedPixels());
 			setXScaleEq(new LinearTransformation(treePainter.getCorrMin(),
 					destRect.x, treePainter.getCorrMax(), destRect.x
@@ -152,9 +121,8 @@ public class GTRView extends TRView implements MouseListener,
 			setYScaleEq(new LinearTransformation(map.getIndex(destRect.y),
 					destRect.y, map.getIndex(destRect.y + destRect.height),
 					destRect.y + destRect.height));
-
-			// System.out.println("yScaleEq " + getYScaleEq());
-			// draw
+			
+			/* draw trees */
 			treePainter.paint(g, getXScaleEq(), getYScaleEq(), destRect,
 					selectedNode, isLeft);
 
@@ -164,33 +132,20 @@ public class GTRView extends TRView implements MouseListener,
 		}
 	}
 
-	// Mouse Listener
 	@Override
 	public void mouseClicked(final MouseEvent e) {
 
 		if (!isEnabled() || !enclosingWindow().isActive()) return;
+		if (treePainter == null) return;
 
-		if ((treePainter != null) && (getXScaleEq() != null)) {
-			if(SwingUtilities.isLeftMouseButton(e)) {
-				// the trick is translating back to the normalized space...
-				setSelectedNode(treePainter.getClosest(
-						getYScaleEq().inverseTransform(e.getY()), getXScaleEq()
-								.inverseTransform(e.getX()), getXScaleEq()
-								.getSlope() / getYScaleEq().getSlope()));
-			} else {
-				/* Sequence of these statements matters! */
-				treeSelection.deselectAllIndexes();
-				treeSelection.notifyObservers();
-				setSelectedNode(null);
-			}
+		if(SwingUtilities.isLeftMouseButton(e)) {
+			setSelectedNode(treePainter.getClosest(
+					getYScaleEq().inverseTransform(e.getY()), 
+					getXScaleEq().inverseTransform(e.getX()),
+					getXScaleEq().getSlope() / getYScaleEq().getSlope()));
 		} else {
-			if (treePainter == null) {
-				LogBuffer.println("GTRView.mouseClicked() : drawer is null");
-			}
-
-			if (getXScaleEq() == null) {
-				LogBuffer.println("GTRView.mouseClicked() : xscaleEq is null");
-			}
+			treeSelection.deselectAllIndexes();
+			treeSelection.notifyObservers();
 		}
 	}
 	
@@ -198,21 +153,11 @@ public class GTRView extends TRView implements MouseListener,
 	public void mouseMoved(final MouseEvent e) {
 
 		if (!isEnabled() || !enclosingWindow().isActive()) return;
-
-		if (treePainter != null && treeSelection.getNSelectedIndexes() == 0) {
-			// the trick is translating back to the normalized space...
-			setHoveredNode(treePainter.getClosest(
-					getYScaleEq().inverseTransform(e.getY()), getXScaleEq()
-							.inverseTransform(e.getX()), getXScaleEq()
-							.getSlope() / getYScaleEq().getSlope()));
-		}
-	}
-	
-	@Override
-	public void mouseExited(final MouseEvent e) {
-
-		if (!isEnabled() || !enclosingWindow().isActive()) return;
-
-		setHoveredNode(null);
+		if (treePainter == null) return;
+		
+		setHoveredNode(treePainter.getClosest(
+				getYScaleEq().inverseTransform(e.getY()), 
+				getXScaleEq().inverseTransform(e.getX()), 
+				getXScaleEq().getSlope() / getYScaleEq().getSlope()));
 	}
 }
