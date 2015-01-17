@@ -111,6 +111,10 @@ public class TVController {
 		}
 	}
 	
+	/**
+	 * Adds keyboard mapping to general TreeViewFrame. The keyboard mapping
+	 * here is general application stuff, as opposed to GlobalView specific etc.
+	 */
 	private void addKeyBindings() {
 		
 		JPanel dendroPane = tvFrame.getBGPanel();
@@ -190,14 +194,15 @@ public class TVController {
 			FileSet last = tvFrame.getFileMRU().getLast();
 			
 			if(last == null) {
-				tvFrame.getWelcomeView().setStatusLabel("No last file to load!");
+				tvFrame.getWelcomeView().setWarning();
+				
 			} else {
 				loadData(last);
 			}
 		}
 	}
 
-	/* Opens hierarchical cluster menu */
+	/** Opens hierarchical cluster menu */
 	private class ClusterAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;

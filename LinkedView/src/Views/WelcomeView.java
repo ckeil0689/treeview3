@@ -196,9 +196,14 @@ public class WelcomeView {
 		loadLabel.setText(text);
 	}
 	
-	public void setStatusLabel(String text) {
+	/**
+	 * Sets the status label to give out a warning. Used if no last file can
+	 * be loaded when the user clicks the loadLastBtn.
+	 */
+	public void setWarning() {
 		
-		status.setText(text);
+		status.setForeground(GUIFactory.RED1);
+		status.setText("No last file to load!");
 		loadPanel.repaint();
 	}
 }
