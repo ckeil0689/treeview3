@@ -20,7 +20,10 @@ public class WelcomeView {
 
 	private final JLabel jl;
 	private final JLabel jl2;
+	private JLabel status;
+	
 	private JButton loadButton;
+	private JButton loadLastButton;
 
 	private boolean isLoading = false;
 
@@ -91,6 +94,16 @@ public class WelcomeView {
 
 		loadButton.addActionListener(loadData);
 	}
+	
+	/**
+	 * Equipping the loadLastButton with an ActionListener
+	 * 
+	 * @param loadData
+	 */
+	public void addLoadLastListener(final ActionListener loadData) {
+
+		loadLastButton.addActionListener(loadData);
+	}
 
 
 	public JPanel makeWelcome() {
@@ -100,7 +113,13 @@ public class WelcomeView {
 		loadPanel.removeAll();
 
 		loadButton = GUIFactory.createLargeBtn("Open...");
-		loadPanel.add(loadButton, "push, alignx 50%, aligny 0%");
+		loadLastButton = GUIFactory.createBtn("Load last file...");
+		
+		status = GUIFactory.createLabel("Ready to go!", GUIFactory.FONTS);
+		
+		loadPanel.add(status, "pushx, alignx 50%, aligny 0%, wrap");
+		loadPanel.add(loadButton, "pushx, alignx 50%, aligny 0%, wrap");
+		loadPanel.add(loadLastButton, "pushx, alignx 50%, aligny 0%");
 		
 		homePanel.revalidate();
 		homePanel.repaint();
@@ -175,5 +194,11 @@ public class WelcomeView {
 	public static void setLoadText(final String text) {
 
 		loadLabel.setText(text);
+	}
+	
+	public void setStatusLabel(String text) {
+		
+		status.setText(text);
+		loadPanel.repaint();
 	}
 }

@@ -136,6 +136,8 @@ public class TVController {
 		if (tvFrame.getWelcomeView() != null) {
 			tvFrame.getWelcomeView().addLoadListener(
 					new LoadButtonListener());
+			tvFrame.getWelcomeView().addLoadLastListener(
+					new LoadLastButtonListener());
 		}
 
 		if (tvFrame.getLoadErrorView() != null) {
@@ -173,6 +175,25 @@ public class TVController {
 		public void actionPerformed(final ActionEvent arg0) {
 
 			openFile();
+		}
+	}
+	
+	/**
+	 * Initiates loading of last used file.
+	 * @author CKeil
+	 */
+	private class LoadLastButtonListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+
+			FileSet last = tvFrame.getFileMRU().getLast();
+			
+			if(last == null) {
+				tvFrame.getWelcomeView().setStatusLabel("No last file to load!");
+			} else {
+				loadData(last);
+			}
 		}
 	}
 

@@ -158,9 +158,8 @@ public class FileMru extends java.util.Observable implements
 		// final ConfigNode aconfigNode[] = root.fetch("File");
 		final String[] childrenNodes = getRootChildrenNodes();
 
-		if (childrenNodes.length == 0) {
-			return null;
-		}
+		if (childrenNodes.length == 0) return null;
+	
 		final Preferences childNode = configNode
 				.node(childrenNodes[childrenNodes.length - 1]);
 		return childNode.get("dir", null);
@@ -230,15 +229,30 @@ public class FileMru extends java.util.Observable implements
 	 */
 	public synchronized void setLast(final Preferences configNode) {
 
-		// final ConfigNode[] all = root.fetch("File");
 		final String[] childrenNodes = getRootChildrenNodes();
 
-//		Preferences last = configNode
-//				.node(childrenNodes[childrenNodes.length - 1]);
-//		if (!configNode.equals(last)) {
-//			last = configNode;
-//			setChanged();
-//		}
+		Preferences last = configNode
+				.node(childrenNodes[childrenNodes.length - 1]);
+		if (!configNode.equals(last)) {
+			last = configNode;
+			setChanged();
+		}
+	}
+	
+	/**
+	 * Returns the last FileSet that was opened by the user.
+	 * @return The last open FileSet
+	 */ 
+	public FileSet getLast() {
+		
+		final Preferences[] nodes = getConfigs();
+		
+		FileSet fileSet = null;
+		if(nodes.length > 0) {
+			fileSet = new FileSet(nodes[nodes.length - 1]);
+		}
+		
+		return fileSet;
 	}
 
 	/**
