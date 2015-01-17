@@ -21,8 +21,11 @@ public class ShortcutDialog extends CustomDialog {
 	
 	private void setupData() {
 		
-		String os_name = System.getProperty("os.name");
-		String mod_key = (os_name.contains("Mac")) ? "CMD" : "CTRL";
+		String os = System.getProperty("os.name").toLowerCase();
+		boolean isMac = os.startsWith("mac os x"); 
+		
+		String mod_key = (isMac) ? "CMD" : "CTRL";
+		String opt_key = (isMac) ? "Option" : "Alt";
 		
 		String[] col_names = {"Shortcut", "Function"};
 		
@@ -35,9 +38,17 @@ public class ShortcutDialog extends CustomDialog {
 				{mod_key + " + X", "Reset zoom"},
 				{mod_key + " + C", "Open cluster menu"},
 				{mod_key + " + F", "Open label search dialog"},
-				{"Alt + 1", "Set matrix to 'Fill'"},
-				{"Alt + 2", "Set matrix to 'Equal axes'"},
-				{"Alt + 3", "Set matrix to 'Proportional'"}
+				{"HOME", "Scroll matrix y-axis to start"},
+				{"END", "Scroll matrix y-axis to end"},
+				{"PAGE UP", "Scroll matrix y-axis up"},
+				{"PAGE DOWN", "Scroll matrix y-axis down"},
+				{mod_key + " + HOME", "Scroll matrix x-axis to start"},
+				{mod_key + " + END", "Scroll matrix x-axis to end"},
+				{mod_key + " + PAGE UP", "Scroll matrix x-axis left"},
+				{mod_key + " + PAGE DOWN", "Scroll matrix x-axis right"},
+				{opt_key + " + 1", "Set matrix to 'Fill'"},
+				{opt_key + " + 2", "Set matrix to 'Equal axes'"},
+				{opt_key + " + 3", "Set matrix to 'Proportional'"}
 				};
 		
 		setupLayout(col_names, data);

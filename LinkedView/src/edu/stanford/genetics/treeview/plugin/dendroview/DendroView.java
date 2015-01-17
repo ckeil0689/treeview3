@@ -366,19 +366,15 @@ public class DendroView implements Observer, DendroPanel {
 		
 		navContainer.add(navPanel, "push, h 50%, alignx 100%, aligny 50%");
 		
-		arrayContainer.add(atrPane, "w 100%, h 100%");
-		geneContainer.add(gtrPane, "w 100%, h 100%, wrap");
+		arrayContainer.add(atrPane, "w 99%, h 100%");
+		geneContainer.add(gtrPane, "w 100%, h 99%, wrap");
 		
-		/* TODO Possibly necessary for good visual alignment of components...*/
-		/* Add the scrollbars */
-//		JScrollBar arrayScroll = arraynameview.getYScroll();
-//		JScrollBar geneScroll = textview.getXScroll();
-//		
-//		arraynameview.resetJustify();
-////		textview.resetJustify();
-//		
-//		arrayContainer.add(arrayScroll, "w 1%, h 100%");
-//		geneContainer.add(geneScroll, "w 100%, h 1%");
+		/* Add the scrollbars (outside of LabelViews) */
+		JScrollBar arrayScroll = arraynameview.getScrollBar();
+		JScrollBar geneScroll = textview.getScrollBar();
+		
+		arrayContainer.add(arrayScroll, "w 1%, h 100%");
+		geneContainer.add(geneScroll, "w 100%, h 1%");
 
 		if(gvWidth == 0 && gvHeight == 0) {
 			gvWidth = MAX_GV_WIDTH;

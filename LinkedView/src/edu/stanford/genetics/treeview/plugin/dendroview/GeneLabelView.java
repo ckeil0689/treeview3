@@ -28,6 +28,7 @@ public class GeneLabelView extends LabelView {
 		headerSummary.addObserver(this);
 	}
 	
+	
 	@Override
 	public void setJustifyOption(final boolean isRightJustified) {
 		

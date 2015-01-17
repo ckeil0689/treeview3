@@ -53,6 +53,12 @@ import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreeColorer;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreePainter;
 
+/* TODO separate some parts into dedicated GlobalView controller */
+/**
+ * Controller class handling UI input and calculations related to DendroView.
+ * @author chris0689
+ *
+ */
 public class DendroController implements ConfigNodePersistent {
 
 	private DendroView dendroView;
@@ -101,9 +107,6 @@ public class DendroController implements ConfigNodePersistent {
 
 		dendroView.setupLayout();
 		
-		/* Get saved tree visibility status, default to false */
-//		setTreesVis(configNode.getBoolean("treesVisible", false));
-		
 		setSavedScale();
 		
 		addKeyBindings();
@@ -112,7 +115,7 @@ public class DendroController implements ConfigNodePersistent {
 		addMenuBtnListeners();
 	}
 	
-	/* Adds all keyboard shortcuts that can be used with DendroView open.*/
+	/** Adds all keyboard shortcuts that can be used with DendroView open.*/
 	private void addKeyBindings() {
 		
 		JPanel dendroPane = dendroView.getDendroPane();
@@ -148,6 +151,37 @@ public class DendroController implements ConfigNodePersistent {
 		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, modifier), 
 				"searchLabels");
 		action_map.put("searchLabels", new SearchLabelAction());
+		
+		/* Scroll through GlobalView */
+		input_map.put(KeyStroke.getKeyStroke("HOME"), 
+				"scrollYToStart");
+		action_map.put("scrollYToStart", new HomeKeyYAction());
+		
+		input_map.put(KeyStroke.getKeyStroke("END"), 
+				"scrollYToEnd");
+		action_map.put("scrollYToEnd", new EndKeyYAction());
+		
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, modifier), 
+				"scrollXToStart");
+		action_map.put("scrollXToStart", new HomeKeyXAction());
+		
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_END, modifier), 
+				"scrollXToEnd");
+		action_map.put("scrollXToEnd", new EndKeyXAction());
+		
+		input_map.put(KeyStroke.getKeyStroke("PAGE_UP"), "scrollYUp");
+		action_map.put("scrollYUp", new PageUpYAction());
+		
+		input_map.put(KeyStroke.getKeyStroke("PAGE_DOWN"), "scrollYDown");
+		action_map.put("scrollYDown", new PageDownYAction());
+		
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, modifier), 
+				"scrollXUp");
+		action_map.put("scrollXUp", new PageUpXAction());
+		
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, modifier), 
+				"scrollXDown");
+		action_map.put("scrollXDown", new PageDownXAction());
 	}
 
 	/**
@@ -161,6 +195,9 @@ public class DendroController implements ConfigNodePersistent {
 		dendroView.getGlobalView().resetHome(true);
 	}
 	
+	/**
+	 * Adds listeners to DendroView's UI components. 
+	 */
 	private void addViewListeners() {
 
 		dendroView.addScaleListeners(new ScaleListener());
@@ -174,7 +211,6 @@ public class DendroController implements ConfigNodePersistent {
 	private void addMenuBtnListeners() {
 
 		dendroView.addSearchBtnListener(new SearchButtonListener());
-//		dendroView.addTreeBtnListener(new TreeBtnListener());
 	}
 	
 	/* --------------  Listeners --------------------- */
@@ -189,38 +225,25 @@ public class DendroController implements ConfigNodePersistent {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			//Putting the mapContainer objects in DendroView so that I can control zoom-out of the found genes/arrays are outside the visible area
+			/* 
+			 * Putting the mapContainer objects in DendroView so 
+			 * that I can control zoom-out of the found genes/arrays are 
+			 * outside the visible area.
+			 */
 			dendroView.setGlobalXMap(globalXmap);
 			dendroView.setGlobalYMap(globalYmap);
-			//Adding the mapContainer objects here so that the search dialog can determine if results are visible in order to be able to determine whether to zoom out
+			/* 
+			 * Adding the mapContainer objects here so that the search 
+			 * dialog can determine if results are visible in order to be 
+			 * able to determine whether to zoom out.
+			 */
 			dendroView.openSearchDialog(tvModel.getGeneHeaderInfo(), 
 					tvModel.getArrayHeaderInfo());
 		}
 	}
-
-//	/**
-//	 * Listener for the button that is responsible to show/ hide Dendrograms. It
-//	 * switches between JSplitPanes and JPanels in DendroView and causes
-//	 * DendroView to reset its layout, re-add the listeners, and reset the
-//	 * MapContainers to adjust to the different size of GlobalView.
-//	 * 
-//	 * @author CKeil
-//	 * 
-//	 */
-//	private class TreeBtnListener implements ActionListener {
-//
-//		@Override
-//		public void actionPerformed(final ActionEvent e) {
-//
-//			setTreesVis(dendroView.getTreeButton().isSelected());
-//			
-////			dendroView.setupLayout();
-//			addViewListeners();
-//		}
-//	}
 	
 	/*>>>>>>> Keyboard Shortcut Actions <<<<<<<<< */
-	/* 
+	/** 
 	 * This AbstractAction is used to toggle both dendrograms when the user
 	 * uses the associated keyboard shortcut. It stores the location of the
 	 * JSplitPane dividers when the user wants to hide the trees and retrieves 
@@ -281,7 +304,115 @@ public class DendroController implements ConfigNodePersistent {
 		}
 	}
 	
-	/* Action to deselect everything */
+	/*>>>>>>> Mapped Key Actions <<<<<<<<< */
+	/* TODO make all this key-scroll code more compact... */
+	/** Action to scroll the y-axis to top. */
+	private class HomeKeyYAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+
+			getGlobalYMap().scrollToIndex(0);
+			getGlobalYMap().notifyObservers();
+		}
+	}
+	
+	/** Action to scroll the y-axis to bottom. */
+	private class EndKeyYAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+
+			int max = getGlobalYMap().getMaxIndex();
+			getGlobalYMap().scrollToIndex(max);
+			getGlobalYMap().notifyObservers();
+		}
+	}
+	
+	/** Action to scroll the y-axis to top. */
+	private class HomeKeyXAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+
+			getGlobalXMap().scrollToIndex(0);
+			getGlobalXMap().notifyObservers();
+		}
+	}
+	
+	/** Action to scroll the y-axis to bottom. */
+	private class EndKeyXAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+
+			int max = getGlobalXMap().getMaxIndex();
+			getGlobalXMap().scrollToIndex(max);
+			getGlobalXMap().notifyObservers();
+		}
+	}
+	
+	private class PageUpYAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+
+			int scrollBy = getGlobalYMap().getNumVisible();
+			getGlobalYMap().scrollBy(-scrollBy);
+			getGlobalYMap().notifyObservers();
+		}
+	}
+	
+	private class PageDownYAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+
+			int scrollBy = getGlobalYMap().getNumVisible();
+			getGlobalYMap().scrollBy(scrollBy);
+			getGlobalYMap().notifyObservers();
+		}
+	}
+	
+	private class PageUpXAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+
+			int scrollBy = getGlobalXMap().getNumVisible();
+			getGlobalXMap().scrollBy(-scrollBy);
+			getGlobalXMap().notifyObservers();
+		}
+	}
+	
+	private class PageDownXAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+
+			int scrollBy = getGlobalXMap().getNumVisible();
+			getGlobalXMap().scrollBy(scrollBy);
+			getGlobalXMap().notifyObservers();
+		}
+	}
+	
+	/** Action to deselect everything */
 	private class DeselectAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
@@ -293,7 +424,7 @@ public class DendroController implements ConfigNodePersistent {
 		}
 	}
 	
-	/* Zooms into the selected area */
+	/** Zooms into the selected area */
 	private class ZoomAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
@@ -306,7 +437,7 @@ public class DendroController implements ConfigNodePersistent {
 		}
 	}
 	
-	/* Resets the GlobalView to all zoomed-out state */
+	/** Resets the GlobalView to all zoomed-out state */
 	private class HomeAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;

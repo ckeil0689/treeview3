@@ -15,6 +15,7 @@ import java.util.Observable;
 import java.util.prefs.Preferences;
 
 import javax.swing.JLabel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
@@ -109,16 +110,13 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		
 		if(isGeneAxis) {
 			add(zoomHint, "alignx 0%, aligny 50%, push, wrap");
-			scrollPane = new JScrollPane(this,
-					ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
-					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		} else {
 			add(zoomHint, "alignx 50%, aligny 100%, push");
-			scrollPane = new JScrollPane(this,
-					ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		}
 		
+		scrollPane = new JScrollPane(this,
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBorder(null);
 
 		panel = scrollPane;
@@ -258,6 +256,20 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	public boolean getJustifyOption() {
 		
 		return isRightJustified;
+	}
+	
+	/**
+	 * Access a LabelView's main scrollBar.
+	 * @return The horizontal scrollbar for gene labels, the vertical scrollbar
+	 * for array labels.
+	 */
+	public JScrollBar getScrollBar() {
+		
+		if (isGeneAxis) {
+			return scrollPane.getHorizontalScrollBar();
+		} else {
+			return scrollPane.getVerticalScrollBar();
+		}
 	}
 
 	@Override
