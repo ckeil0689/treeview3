@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -126,6 +127,7 @@ public class DendroController implements ConfigNodePersistent {
 		
 		/* Gets the system's modifier key (Ctrl or Cmd) */
 		int modifier = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+		int shift_mask = InputEvent.SHIFT_MASK;
 		
 		/* Toggle the trees */
 		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_T, modifier), 
@@ -137,51 +139,100 @@ public class DendroController implements ConfigNodePersistent {
 				"deselect");
 		action_map.put("deselect", new DeselectAction());
 		
-		/* Zoom selection */
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, modifier), 
-				"zoomSelection");
-		action_map.put("zoomSelection", new ZoomAction());
-		
-		/* Reset zoom */
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, modifier), 
-				"resetZoom");
-		action_map.put("resetZoom", new HomeAction());
-		
 		/* Open search dialog */
 		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, modifier), 
 				"searchLabels");
 		action_map.put("searchLabels", new SearchLabelAction());
 		
-		/* Scroll through GlobalView */
-		input_map.put(KeyStroke.getKeyStroke("HOME"), 
-				"scrollYToStart");
-		action_map.put("scrollYToStart", new HomeKeyYAction());
+		/* Scroll through GlobalView with HOME, END, PgUP, PgDOWN */
+		input_map.put(KeyStroke.getKeyStroke("HOME"), "pageYToStart");
+		action_map.put("pageYToStart", new HomeKeyYAction());
 		
-		input_map.put(KeyStroke.getKeyStroke("END"), 
-				"scrollYToEnd");
-		action_map.put("scrollYToEnd", new EndKeyYAction());
+		input_map.put(KeyStroke.getKeyStroke("END"), "pageYToEnd");
+		action_map.put("pageYToEnd", new EndKeyYAction());
 		
 		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, modifier), 
-				"scrollXToStart");
-		action_map.put("scrollXToStart", new HomeKeyXAction());
+				"pageXToStart");
+		action_map.put("pageXToStart", new HomeKeyXAction());
 		
 		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_END, modifier), 
-				"scrollXToEnd");
-		action_map.put("scrollXToEnd", new EndKeyXAction());
+				"pageXToEnd");
+		action_map.put("pageXToEnd", new EndKeyXAction());
 		
-		input_map.put(KeyStroke.getKeyStroke("PAGE_UP"), "scrollYUp");
-		action_map.put("scrollYUp", new PageUpYAction());
+		input_map.put(KeyStroke.getKeyStroke("PAGE_UP"), "pageYUp");
+		action_map.put("pageYUp", new PageUpYAction());
 		
-		input_map.put(KeyStroke.getKeyStroke("PAGE_DOWN"), "scrollYDown");
-		action_map.put("scrollYDown", new PageDownYAction());
+		input_map.put(KeyStroke.getKeyStroke("PAGE_DOWN"), "pageYDown");
+		action_map.put("pageYDown", new PageDownYAction());
 		
 		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, modifier), 
-				"scrollXUp");
-		action_map.put("scrollXUp", new PageUpXAction());
+				"pageXUp");
+		action_map.put("pageXUp", new PageUpXAction());
 		
 		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, modifier), 
-				"scrollXDown");
-		action_map.put("scrollXDown", new PageDownXAction());
+				"pageXDown");
+		action_map.put("pageXDown", new PageDownXAction());
+		
+		/* Scroll through GlobalView with arrow keys */
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, modifier), 
+				"arrowYToStart");
+		action_map.put("arrowYToStart", new HomeKeyYAction());
+		
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, modifier), 
+				"arrowYToEnd");
+		action_map.put("arrowYToEnd", new EndKeyYAction());
+		
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, modifier), 
+				"arrowXToStart");
+		action_map.put("arrowXToStart", new HomeKeyXAction());
+		
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, modifier), 
+				"arrowXToEnd");
+		action_map.put("arrowXToEnd", new EndKeyXAction());
+		
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, shift_mask), 
+				"arrowYUp");
+		action_map.put("arrowYUp", new PageUpYAction());
+		
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, shift_mask), 
+				"arrowYDown");
+		action_map.put("arrowYDown", new PageDownYAction());
+		
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, shift_mask), 
+				"arrowXUp");
+		action_map.put("arrowXUp", new PageUpXAction());
+		
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, shift_mask), 
+				"arrowXDown");
+		action_map.put("arrowXDown", new PageDownXAction());
+		
+		/* arrow 1-step */
+		input_map.put(KeyStroke.getKeyStroke("UP"), "arrowUp");
+		action_map.put("arrowUp", new ArrowUpAction());
+		
+		input_map.put(KeyStroke.getKeyStroke("DOWN"), "arrowDown");
+		action_map.put("arrowDown", new ArrowDownAction());
+		
+		input_map.put(KeyStroke.getKeyStroke("LEFT"), "arrowLeft");
+		action_map.put("arrowLeft", new ArrowLeftAction());
+		
+		input_map.put(KeyStroke.getKeyStroke("RIGHT"), "arrowRight");
+		action_map.put("arrowRight", new ArrowRightAction());
+		
+		/* zoom actions */
+		input_map.put(KeyStroke.getKeyStroke("MINUS"), "zoomOut");
+		action_map.put("zoomOut", new ZoomInAction());
+		
+		input_map.put(KeyStroke.getKeyStroke("EQUALS"), "zoomIn");
+		action_map.put("zoomIn", new ZoomOutAction());
+		
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, modifier), 
+				"zoomSelection");
+		action_map.put("zoomSelection", new ZoomAction());
+		
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, modifier), 
+				"resetZoom");
+		action_map.put("resetZoom", new HomeAction());
 	}
 
 	/**
@@ -412,6 +463,54 @@ public class DendroController implements ConfigNodePersistent {
 		}
 	}
 	
+	private class ArrowLeftAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+
+			getGlobalXMap().scrollBy(-1);
+			getGlobalXMap().notifyObservers();
+		}
+	}
+	
+	private class ArrowRightAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+
+			getGlobalXMap().scrollBy(1);
+			getGlobalXMap().notifyObservers();
+		}
+	}
+	
+	private class ArrowUpAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+
+			getGlobalYMap().scrollBy(-1);
+			getGlobalYMap().notifyObservers();
+		}
+	}
+	
+	private class ArrowDownAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+
+			getGlobalYMap().scrollBy(1);
+			getGlobalYMap().notifyObservers();
+		}
+	}
+	
 	/** Action to deselect everything */
 	private class DeselectAction extends AbstractAction {
 
@@ -424,7 +523,9 @@ public class DendroController implements ConfigNodePersistent {
 		}
 	}
 	
-	/** Zooms into the selected area */
+	/** 
+	 * Zooms into the selected area 
+	 */
 	private class ZoomAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
@@ -434,6 +535,38 @@ public class DendroController implements ConfigNodePersistent {
 
 			zoomSelection();
 			centerSelection();
+		}
+	}
+	
+	/**Zooms into GlobalView by 1 scale step (depends on previous scale). */
+	private class ZoomInAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+
+			getGlobalXMap().zoomIn();
+			getGlobalYMap().zoomIn();
+			
+			getGlobalXMap().notifyObservers();
+			getGlobalYMap().notifyObservers();
+		}
+	}
+	
+	/** Zooms out of GlobalView by 1 scale step (depends on previous scale). */
+	private class ZoomOutAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+
+			getGlobalXMap().zoomOut();
+			getGlobalYMap().zoomOut();
+			
+			getGlobalXMap().notifyObservers();
+			getGlobalYMap().notifyObservers();
 		}
 	}
 	

@@ -30,8 +30,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -57,7 +55,7 @@ import edu.stanford.genetics.treeview.ModelViewProduced;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 
 public class GlobalView extends ModelViewProduced implements
-		MouseMotionListener, MouseListener, MouseWheelListener, KeyListener {
+		MouseMotionListener, MouseListener, MouseWheelListener {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -130,7 +128,6 @@ public class GlobalView extends ModelViewProduced implements
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addMouseWheelListener(this);
-		addKeyListener(this);
 	}
 
 	public JScrollBar getXScroll() {
@@ -847,59 +844,6 @@ public class GlobalView extends ModelViewProduced implements
 		} else if (indicatorCircle != null) {
 			indicatorCircle.setFrame(x, y, w, h);
 		}
-	}
-
-	// KeyListener
-	@Override
-	public void keyPressed(final KeyEvent e) {
-
-		final int c = e.getKeyCode();
-		int shift;
-
-		if (e.isShiftDown()) {
-			shift = 10;
-
-		} else {
-			shift = 1;
-		}
-
-		switch (c) {
-		case KeyEvent.VK_LEFT:
-			xmap.scrollBy(-shift);
-			break;
-		case KeyEvent.VK_RIGHT:
-			xmap.scrollBy(shift);
-			break;
-		case KeyEvent.VK_UP:
-			ymap.scrollBy(-shift);
-			break;
-		case KeyEvent.VK_DOWN:
-			ymap.scrollBy(shift);
-			break;
-		case KeyEvent.VK_MINUS:
-			xmap.zoomOut();
-			ymap.zoomOut();
-			break;
-		case KeyEvent.VK_EQUALS:
-			xmap.zoomIn();
-			ymap.zoomIn();
-			break;
-		}
-
-		revalidate();
-		repaint();
-	}
-	
-	@Override
-	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	/**
