@@ -22,6 +22,7 @@
  */
 package edu.stanford.genetics.treeview.core;
 
+import java.util.Observable;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -43,8 +44,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.1 $ $Date: 2006-09-25 22:02:02 $
  */
-public class FileMru extends java.util.Observable implements
-		ConfigNodePersistent {
+public class FileMru extends Observable implements ConfigNodePersistent {
 
 	private Preferences configNode;
 
@@ -196,7 +196,6 @@ public class FileMru extends java.util.Observable implements
 	 */
 	public synchronized void removeFile(final int i) {
 
-		// final ConfigNode aconfigNode[] = root.fetch("File");
 		String[] childrenNodes = getRootChildrenNodes();
 		try {
 			Preferences node = configNode.node(childrenNodes[i]);

@@ -142,7 +142,7 @@ implements ConfigNodePersistent {
 		}
 	}
 
-	// Listeners
+	/* >>>>>> GUI component listeners <<<<< */
 	/**
 	 * Adds an ActionListener to the ok_button.
 	 * 

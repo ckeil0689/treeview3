@@ -339,25 +339,25 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 			Preferences documentConfig = null;
 			final String[] childrenNodes = fileNode.childrenNames();
-
-			if (childrenNodes.length == 0) return;
 			
 			final String default_name = "No file.";
 			final String default_ext = "nan";
 
 			boolean fileFound = false;
-			for (int i = 0; i < childrenNodes.length; i++) {
-
-				String childName = fileNode.node(childrenNodes[i]).get(
-						"name", default_name);
-				String childExt = fileNode.node(childrenNodes[i]).get(
-						"extension", default_ext);
-				
-				if (childName.equalsIgnoreCase(fileName)
-						&& childExt.equalsIgnoreCase(fileExt)) {
-					documentConfig = fileNode.node(childrenNodes[i]);
-					fileFound = true;
-					break;
+			if (childrenNodes.length > 0) {
+				for (int i = 0; i < childrenNodes.length; i++) {
+	
+					String childName = fileNode.node(childrenNodes[i]).get(
+							"name", default_name);
+					String childExt = fileNode.node(childrenNodes[i]).get(
+							"extension", default_ext);
+					
+					if (childName.equalsIgnoreCase(fileName)
+							&& childExt.equalsIgnoreCase(fileExt)) {
+						documentConfig = fileNode.node(childrenNodes[i]);
+						fileFound = true;
+						break;
+					}
 				}
 			}
 

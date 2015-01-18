@@ -53,7 +53,8 @@ import edu.stanford.genetics.treeview.core.FileMru;
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version @version $Revision: 1.37 $ $Date: 2009-08-26 11:48:27 $
  */
-public abstract class ViewFrame implements Observer, ConfigNodePersistent {
+public abstract class ViewFrame extends Observable 
+implements Observer, ConfigNodePersistent {
 	// extends JFrame implements Observer {
 
 	// Main application frame
@@ -172,7 +173,7 @@ public abstract class ViewFrame implements Observer, ConfigNodePersistent {
 		} catch (final Exception e) {
 			LogBuffer.println("problem checking MRU in ViewFrame constructor: "
 					+ e.toString());
-			e.printStackTrace();
+			LogBuffer.logException(e);
 		}
 
 		fileMru.addObserver(this);

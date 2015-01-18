@@ -1391,7 +1391,8 @@ public class DendroView implements Observer, DendroPanel {
 	 * @return
 	 */
 	public boolean treesEnabled() {
-
-		return gtrview.isEnabled() || atrview.isEnabled();
+		
+		boolean treesEnabled = gtrview.isEnabled() || atrview.isEnabled();
+		return treesEnabled;
 	}
 }

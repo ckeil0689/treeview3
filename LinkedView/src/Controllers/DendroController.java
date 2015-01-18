@@ -307,7 +307,9 @@ public class DendroController implements ConfigNodePersistent {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 			
-			toggleTrees();
+			if(dendroView.treesEnabled()) {
+				toggleTrees();
+			}
 		}
 	}
 	

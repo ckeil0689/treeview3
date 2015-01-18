@@ -428,14 +428,14 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		running = (isDendroLoaded) ? dendroView : null;
 	}
 
-	// Observer
 	@Override
 	public void update(final Observable o, final Object obj) {
 
-		if (o instanceof FileMru) {// && menuBar != null) {
+		if (o instanceof FileMru) {
 			LogBuffer.println("Updating fileMRU in TVFrame.");
-			// System.out.println("Rebuilding file menu");
 			buildMenuBar();
+			setChanged();
+			notifyObservers();
 			
 		} else if (o instanceof TVModel) {
 			/* TVModel passes a boolean object to notify if it was loaded. */

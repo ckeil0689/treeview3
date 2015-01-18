@@ -5,6 +5,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -38,6 +40,7 @@ import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.UrlExtractor;
 import edu.stanford.genetics.treeview.UrlPresets;
+import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.model.DataModelWriter;
 import edu.stanford.genetics.treeview.model.ModelLoader;
 import edu.stanford.genetics.treeview.model.ReorderedDataModel;
@@ -50,7 +53,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DoubleArrayDrawer;
  * @author CKeil
  * 
  */
-public class TVController {
+public class TVController implements Observer {
 
 	private final DataModel model;
 	private final TreeViewFrame tvFrame;
@@ -69,6 +72,8 @@ public class TVController {
 		
 		/* Add the view as observer to the model */
 		((TVModel) model).addObserver(tvFrame);
+		
+		tvFrame.addObserver(this);
 		
 		addViewListeners();
 		addMenuListeners();
@@ -162,6 +167,7 @@ public class TVController {
 	 */
 	private void addMenuListeners() {
 		
+		LogBuffer.println("Adding menu listeners.");
 		menuController = new MenubarController(tvFrame, TVController.this);
 
 		tvFrame.addMenuActionListeners(new StackMenuListener());
@@ -815,5 +821,16 @@ public class TVController {
 	public DataModel getDataModel() {
 
 		return model;
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+		
+		LogBuffer.println("Updating TVController");
+		/* when tvFrame rebuilds its menu */
+		if(o instanceof ViewFrame) {
+			addMenuListeners();
+		}
+		
 	}
 }
