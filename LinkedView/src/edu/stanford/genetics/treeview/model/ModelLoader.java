@@ -322,7 +322,14 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			targetModel.gidFound(false);
 		}
 
-		// Load Config File
+		setConfigData();
+	}
+	
+	/**
+	 * Loads or sets up configuration data for the file.
+	 */
+	private void setConfigData() {
+		
 		try {
 			LogBuffer.println("Getting configurations...");
 			final String fileName = targetModel.getFileSet().getRoot();
@@ -333,20 +340,24 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			Preferences documentConfig = null;
 			final String[] childrenNodes = fileNode.childrenNames();
 
+			if (childrenNodes.length == 0) return;
+			
 			final String default_name = "No file.";
+			final String default_ext = "nan";
 
 			boolean fileFound = false;
-			if (childrenNodes.length > 0) {
+			for (int i = 0; i < childrenNodes.length; i++) {
 
-				for (int i = 0; i < childrenNodes.length; i++) {
-
-					if (fileNode.node(childrenNodes[i])
-							.get("name", default_name)
-							.equalsIgnoreCase(fileName)) {
-						documentConfig = fileNode.node(childrenNodes[i]);
-						fileFound = true;
-						break;
-					}
+				String childName = fileNode.node(childrenNodes[i]).get(
+						"name", default_name);
+				String childExt = fileNode.node(childrenNodes[i]).get(
+						"extension", default_ext);
+				
+				if (childName.equalsIgnoreCase(fileName)
+						&& childExt.equalsIgnoreCase(fileExt)) {
+					documentConfig = fileNode.node(childrenNodes[i]);
+					fileFound = true;
+					break;
 				}
 			}
 
@@ -360,8 +371,8 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			targetModel.setDocumentConfig(documentConfig);
 
 		} catch (final Exception e) {
+			LogBuffer.logException(e);
 			targetModel.setDocumentConfig(null);
-			e.printStackTrace();
 		}
 	}
 	

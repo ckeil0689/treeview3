@@ -199,6 +199,10 @@ public class FileMru extends java.util.Observable implements
 		// final ConfigNode aconfigNode[] = root.fetch("File");
 		String[] childrenNodes = getRootChildrenNodes();
 		try {
+			Preferences node = configNode.node(childrenNodes[i]);
+			
+			LogBuffer.println("Removing " + node.name());
+			
 			configNode.node(childrenNodes[i]).removeNode();
 			
 		} catch (BackingStoreException e) {

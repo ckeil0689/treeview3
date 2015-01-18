@@ -347,6 +347,7 @@ public class TVController {
 	}
 	
 	/**
+	 * TODO move this to DendroController!
 	 * Use the selected labels that have been stored and select them again
 	 * in the model. This should happen right after the model has been loaded
 	 * and the new DendroView was set up.

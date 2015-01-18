@@ -313,12 +313,12 @@ implements ConfigNodePersistent {
 					GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 	
 			rowRadioBtnPanel.add(rowLeftJustBtn, "span, wrap");
-			rowRadioBtnPanel.add(rowRightJustBtn, "span, wrap");
+			rowRadioBtnPanel.add(rowRightJustBtn, "span");
 			
 			ButtonGroup colJustifyBtnGroup = new ButtonGroup();
 			
-			colLeftJustBtn = GUIFactory.createRadioBtn("Bottom");
 			colRightJustBtn = GUIFactory.createRadioBtn("Top");
+			colLeftJustBtn = GUIFactory.createRadioBtn("Bottom");
 			
 			if(dendroView.getArraynameview().getJustifyOption()) {
 				colRightJustBtn.setSelected(true);
@@ -332,8 +332,8 @@ implements ConfigNodePersistent {
 			final JPanel colRadioBtnPanel = 
 					GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 
-			colRadioBtnPanel.add(colLeftJustBtn, "span, wrap");
 			colRadioBtnPanel.add(colRightJustBtn, "span, wrap");
+			colRadioBtnPanel.add(colLeftJustBtn, "span");
 
 			mainPanel.add(rows, "pushx, alignx 50%");
 			mainPanel.add(cols, "pushx, alignx 50%, wrap");

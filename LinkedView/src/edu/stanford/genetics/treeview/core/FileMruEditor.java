@@ -112,20 +112,15 @@ public class FileMruEditor {
 		dialog.setVisible(true);
 		final Object selectedValue = pane.getValue();
 
-		if (selectedValue == null) {
-			return CANCEL;
-		}
+		if (selectedValue == null) return CANCEL;
 
 		if (options[0].equals(selectedValue)) {
 			// must execute find...
-			if (searchFile(node, parentComponent)) {
-				return FIND;
-			}
+			if (searchFile(node, parentComponent)) return FIND;
 		}
 
-		if (options[1].equals(selectedValue)) {
-			return REMOVE;
-		}
+		if (options[1].equals(selectedValue)) return REMOVE;
+		
 
 		return CANCEL;
 	}
@@ -148,35 +143,6 @@ public class FileMruEditor {
 		window = dialog;
 		dialog.setVisible(true);
 	}
-
-//	/**
-//	 * put editor in a dialog
-//	 * 
-//	 * @param f
-//	 *            Window to block
-//	 */
-//	public void showDialog(final Frame f) {
-//
-//		final JDialog d = new JDialog(f, getTitle(), true);
-//		d.setContentPane(this);
-//		d.addWindowListener(new WindowAdapter() {
-//
-//			@Override
-//			public void windowClosing(final WindowEvent we) {
-//				we.getWindow().dispose();
-//			}
-//		});
-//		d.pack();
-//
-//		window = d;
-////		final Dimension ts = d.getSize();
-////		final Dimension dim = f.getSize();
-////		if (dim.height / 2 < ts.height) {
-////			d.setSize(ts.width, dim.height / 2);
-////		}
-////		System.out.println("Size of parent " + dim + " my size " + ts);
-//		d.setVisible(true);
-//	}
 
 	/**
 	 * Gets the title attribute of the FileMruEditor object
