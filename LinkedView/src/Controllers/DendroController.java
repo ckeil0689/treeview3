@@ -1483,31 +1483,6 @@ public class DendroController implements ConfigNodePersistent {
 		invertedTreeDrawer.notifyObservers();
 	}
 
-//	/**
-//	 * Loads a TVModel from a provided FileSet and then returns the new TVModel.
-//	 * 
-//	 * @param fileSet
-//	 * @return DataModel
-//	 * @throws LoadException
-//	 */
-//	protected DataModel makeCdtModel(final FileSet fileSet) 
-//			throws LoadException {
-//
-//		final DataModel tvModel = new TVModel();
-//
-//		try {
-//			((TVModel)tvModel).loadNew(fileSet);
-//
-//		} catch (LoadException | InterruptedException | ExecutionException e) {
-//			String message = "Clustering was interrupted.";
-//			JOptionPane.showMessageDialog(tvFrame.getAppFrame(), message, 
-//					"Error", JOptionPane.ERROR_MESSAGE);
-//			LogBuffer.logException(e);
-//		}
-//
-//		return tvModel;
-//	}
-
 	// ATR Methods
 	/**
 	 * Open a dialog which allows the user to select a new CDT data file for

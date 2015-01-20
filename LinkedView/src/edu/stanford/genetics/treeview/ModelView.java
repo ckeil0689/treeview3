@@ -51,7 +51,7 @@ public abstract class ModelView extends JPanel implements Observer,
 	protected ViewFrame viewFrame = null;
 	protected JFrame applicationFrame = null;
 
-	protected MessagePanel status = null;
+	protected DataTicker status = null;
 	protected boolean hasMouse = false;
 
 	/* here so that subclass will work with BufferedModelView too */
@@ -90,7 +90,7 @@ public abstract class ModelView extends JPanel implements Observer,
 		return viewFrame;
 	}
 
-	public void setStatusPanel(final MessagePanel s) {
+	public void setStatusPanel(final DataTicker s) {
 
 		status = s;
 	}

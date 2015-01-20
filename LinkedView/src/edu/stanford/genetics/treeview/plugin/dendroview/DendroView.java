@@ -47,12 +47,14 @@ import javax.swing.border.Border;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
+import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
 import Utilities.Helper;
 import Utilities.StringRes;
 import edu.stanford.genetics.treeview.DendroPanel;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.DataTicker;
 import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.TreeviewMenuBarI;
@@ -91,39 +93,42 @@ public class DendroView implements Observer, DendroPanel {
 
 	private String name;
 
-	// Main container JPanel
+	// Main containers
 	private final JPanel dendroPane;
 	private JPanel firstPanel;
 
 	protected ScrollPane panes[];
 
-	// Map Views
+	// Matrix view
 	private final GlobalView globalview;
 
-	// Trees
+	// Tree views
 	protected final GTRView gtrview;
 	protected final ATRView atrview;
 	
+	/* JSplitPanes containing trees & labels */
 	private JSplitPane gtrPane;
 	private JSplitPane atrPane;
 
-	// Row and column names
-//	protected final TextView_deprec textview;
-//	protected final ArrayNameView_deprec arraynameview;
-	
+	/* Gene and array label views */
 	protected final GeneLabelView textview;
 	protected final ArrayLabelView arraynameview;
 
+	/* JScrollBars for GlobalView */
+	/* TODO one glorious day, update GlobalView to a scrollpane... */
 	protected JScrollBar globalXscrollbar;
 	protected JScrollBar globalYscrollbar;
+	
+	protected DataTicker dataTicker;
 
-	// JMenuItems
+	/* Some important class-wide JMenuItems */
 	private JMenuItem colorMenuItem;
 	private JMenuItem annotationsMenuItem;
 	private JMenuItem showTreesMenuItem;
 	private JMenu matrixMenu;
 
-	// JButtons
+	/* JButtons for scaling the matrix */
+	/* TODO should be controlled in a GlobalViewController...when it exists */
 	private JButton zoomBtn;
 	private JButton scaleIncX;
 	private JButton scaleIncY;
@@ -134,9 +139,11 @@ public class DendroView implements Observer, DendroPanel {
 	private JButton scaleDefaultAll;
 	
 	// Buttons for interaction in dendroview.
+	/* TODO depreciate when clickable searchbar is implemented */
 	private final JButton searchBtn;
 	
-	// GlobalView default sizes as ints to keep track.
+	/* GlobalView default sizes */
+	/* TODO needed? ... */
 	private double gvWidth;
 	private double gvHeight;
 	
@@ -144,7 +151,10 @@ public class DendroView implements Observer, DendroPanel {
 	public static final double MAX_GV_WIDTH = 75;
 	public static final double MAX_GV_HEIGHT = 80;
 	
-	//MapContainers in order to keep track of current visible data indexes
+	/* 
+	 * MapContainers map tile size (scale) to selection rectangles 
+	 * in GlobalView, label & tree positions 
+	 */
 	protected MapContainer globalXmap = null;
 	protected MapContainer globalYmap = null;
 
@@ -159,6 +169,7 @@ public class DendroView implements Observer, DendroPanel {
 		this(tvFrame, "Dendrogram");
 	}
 
+	/* TODO why does this even exist... */
 	public DendroView(final Preferences root, final TreeViewFrame tvFrame) {
 
 		this(tvFrame, "Dendrogram");
@@ -180,6 +191,9 @@ public class DendroView implements Observer, DendroPanel {
 		/* main panel */
 		dendroPane = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING_FILL, 
 				null);
+		
+		/* data ticker panel */
+		dataTicker = new DataTicker();
 		
 		/* Create the Global view (JPanel to display) */
 		globalview = new GlobalView();
@@ -260,7 +274,6 @@ public class DendroView implements Observer, DendroPanel {
 		JPanel arrayNamePanel;
 		JPanel arrayContainer;
 		JPanel geneContainer;
-		JPanel navPanel;
 		JPanel globalViewContainer;
 		JPanel navContainer;
 		JPanel bottomPanel;
@@ -286,9 +299,6 @@ public class DendroView implements Observer, DendroPanel {
 
 		firstPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 		firstPanel.setBorder(null);
-
-		navPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, null);
-		navPanel.setBorder(null);
 
 		textpanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, null); 
 
@@ -358,13 +368,12 @@ public class DendroView implements Observer, DendroPanel {
 		crossPanel.add(scaleIncX, "h 33%, wrap");
 		crossPanel.add(scaleDecXY, "h 33%");
 		crossPanel.add(scaleDecY, "span 2 1, h 33%, alignx 0%");
-
-		btnPanel.add(crossPanel, "pushx, alignx 50%, wrap");
-
-		navPanel.add(btnPanel, "pushx, h 20%, w 90%, alignx 50%, wrap");
-		navPanel.add(scaleDefaultAll, "push, alignx 50%, aligny 5%");
 		
-		navContainer.add(navPanel, "push, h 50%, alignx 100%, aligny 50%");
+		btnPanel.add(crossPanel, "pushx, alignx 50%, wrap");
+		btnPanel.add(scaleDefaultAll, "push, alignx 50%, aligny 5%");
+		
+		navContainer.add(btnPanel, "push, alignx 50%, aligny 100%, wrap");
+		navContainer.add(dataTicker.getTickerPanel(), "push, h 25%!, aligny 5%");
 		
 		arrayContainer.add(atrPane, "w 99%, h 100%");
 		geneContainer.add(gtrPane, "w 100%, h 99%, wrap");
@@ -396,7 +405,7 @@ public class DendroView implements Observer, DendroPanel {
 				+ "h " + arrayRow + "%, growx");
 		
 		dendroPane.add(navContainer, "span 1 2, w " + (textViewCol - 1) 
-				+ "%, h 100%, wrap");
+				+ "%!, h 100%, wrap");
 		
 		dendroPane.add(geneContainer, "w " + textViewCol + "%, "
 				+ "h " + gvHeight + "%, growy");
@@ -563,6 +572,7 @@ public class DendroView implements Observer, DendroPanel {
 	private void registerView(final ModelView modelView) {
 
 		modelView.setViewFrame(tvFrame);
+		modelView.setStatusPanel(dataTicker);
 	}
 
 	/**
@@ -583,7 +593,6 @@ public class DendroView implements Observer, DendroPanel {
 			showTreesMenuItem.setText("Hide trees...");
 		}
 		
-//		dendroPane.revalidate();
 		dendroPane.repaint();
 	}
 	
@@ -1318,11 +1327,6 @@ public class DendroView implements Observer, DendroPanel {
 
 		return dendroPane;
 	}
-
-//	public ArrayNameView_deprec getArraynameview() {
-//
-//		return arraynameview;
-//	}
 	
 	public LabelView getArraynameview() {
 
@@ -1338,11 +1342,6 @@ public class DendroView implements Observer, DendroPanel {
 
 		return gtrview;
 	}
-
-//	public TextView_deprec getTextview() {
-//
-//		return textview;
-//	}
 	
 	public LabelView getTextview() {
 

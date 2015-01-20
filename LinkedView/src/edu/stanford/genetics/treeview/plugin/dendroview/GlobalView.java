@@ -123,7 +123,7 @@ public class GlobalView extends ModelViewProduced implements
 		panel.setBorder(BorderFactory.createEtchedBorder());
 		panel.setBackground(GUIFactory.ELEMENT_HOV);
 
-		setToolTipText("This Turns Tooltips On");
+//		setToolTipText("This Turns Tooltips On");
 		
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -153,7 +153,7 @@ public class GlobalView extends ModelViewProduced implements
 
 		try {
 			if (xmap.contains(overx) && ymap.contains(overy)) {
-				statustext[0] = "Row: ";
+				statustext[0] = "";//"Row: ";
 
 				if (geneHI != null) {
 					final int realGene = overy;
@@ -168,11 +168,10 @@ public class GlobalView extends ModelViewProduced implements
 						statustext[0] += " (N/A)";
 					}
 				}
-				statustext[1] = "Column: ";
+				statustext[1] = "";//"Column: ";
 				if (arrayHI != null) {
 					try {
-						statustext[1] += arraySummary.getSummary(geneHI, 
-								overx);
+						statustext[1] += arraySummary.getSummary(arrayHI, overx);
 
 					} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 						LogBuffer.println("ArrayIndexOutOfBoundsException "
@@ -184,14 +183,13 @@ public class GlobalView extends ModelViewProduced implements
 
 				if (drawer != null) {
 					if (drawer.isMissing(overx, overy)) {
-						statustext[2] = "Value:  No Data";
+						statustext[2] = "No Data";
 
 					} else if (drawer.isEmpty(overx, overy)) {
 						statustext[2] = "";
 
 					} else {
-						statustext[2] = "Value:  "
-								+ drawer.getSummary(overx, overy);
+						statustext[2] = drawer.getSummary(overx, overy);
 					}
 				}
 			}
@@ -418,20 +416,19 @@ public class GlobalView extends ModelViewProduced implements
 	@Override
 	public synchronized void paintComposite(final Graphics g) {
 
-		// composite the rectangles...
 		if (selectionRectList != null) {
-			// if (zoomRect != null) {
-			// g.setColor(Color.cyan);
-			// g.drawRect(zoomRect.x, zoomRect.y,
-			// zoomRect.width, zoomRect.height);
-			// }
-
+			
+			/* draw all selection rectangles in yellow */
 			g.setColor(Color.yellow);
 			
 			for(Rectangle rect : selectionRectList) {
 				g.drawRect(rect.x, rect.y, rect.width, rect.height);
 			}
 
+			/* 
+			 * draw white selection circle if only 1 tile is selected and
+			 * small enough.
+			 */
 			if (indicatorCircle != null) {
 				final Graphics2D g2 = (Graphics2D) g;
 				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -663,14 +660,14 @@ public class GlobalView extends ModelViewProduced implements
 	@Override
 	public void mouseExited(final MouseEvent e) {
 
-		// hasMouse = false;
-		//
-		// // Display empty field
-		// statustext[0] = "";
-		// statustext[1] = "";
-		// statustext[2] = "";
-		//
-		// status.setMessages(statustext);
+		 hasMouse = false;
+		
+		 // Display empty field
+		 statustext[0] = "";
+		 statustext[1] = "";
+		 statustext[2] = "";
+		
+		 status.setMessages(statustext);
 	}
 
 	@Override
@@ -683,16 +680,19 @@ public class GlobalView extends ModelViewProduced implements
 			mouseDragged(e);
 			drawBand(dragRect);
 
+			/* Full gene selection */
 			if (e.isShiftDown()) {
 				final Point start = new Point(xmap.getMinIndex(), startPoint.y);
 				final Point end = new Point(xmap.getMaxIndex(), endPoint.y);
 				selectRectangle(start, end);
 
+			/* Full array selection */
 			} else if (e.isControlDown()) {
 				final Point start = new Point(startPoint.x, ymap.getMinIndex());
 				final Point end = new Point(endPoint.x, ymap.getMaxIndex());
 				selectRectangle(start, end);
-
+				
+			/* Normal selection */
 			} else {
 				selectRectangle(startPoint, endPoint);
 			}
@@ -701,7 +701,7 @@ public class GlobalView extends ModelViewProduced implements
 			// do something else?
 		}
 
-		revalidate();
+//		revalidate();
 		repaint();
 	}
 
@@ -716,11 +716,19 @@ public class GlobalView extends ModelViewProduced implements
 			endPoint.setLocation(xmap.getIndex(e.getX()),
 					ymap.getIndex(e.getY()));
 
+			/* Full gene selection */
 			if (e.isShiftDown()) {
 				dragRect.setLocation(xmap.getMinIndex(), startPoint.y);
 				dragRect.setSize(0, 0);
 				dragRect.add(xmap.getMaxIndex(), endPoint.y);
-
+				
+			/* Full array selection */
+			} else if (e.isControlDown()) {
+				dragRect.setLocation(startPoint.x, ymap.getMinIndex());
+				dragRect.setSize(0, 0);
+				dragRect.add(endPoint.x, ymap.getMaxIndex());
+				
+			/* Normal selection */
 			} else {
 				dragRect.setLocation(startPoint.x, startPoint.y);
 				dragRect.setSize(0, 0);
@@ -745,52 +753,52 @@ public class GlobalView extends ModelViewProduced implements
 		}
 	}
 
-	@Override
-	public String getToolTipText(final MouseEvent e) {
-		/*
-		 * Do we want to do mouseovers if value already visible? if
-		 * (getShowVal()) return null; // don't do tooltips and vals at same
-		 * time.
-		 */
-		String ret = "";
-		String row = "";
-		String col = "";
-
-		if (drawer != null) {
-
-			final int geneRow = overy;
-
-			if (xmap.contains(overx) && ymap.contains(overy)) {
-
-				if (geneHI != null) {
-					row = geneSummary.getSummary(geneHI, overy);
-
-				} else {
-					row = "N/A";
-				}
-
-				if (arrayHI != null) {
-					col = arraySummary.getSummary(arrayHI, overx);
-
-				} else {
-					col = "N/A";
-				}
-
-				if (drawer.isMissing(overx, geneRow)) {
-					ret = "No data";
-
-				} else if (drawer.isEmpty(overx, geneRow)) {
-					ret = null;
-
-				} else {
-					ret = "<html>Row: " + row + " <br>Column: " + col
-							+ " <br>Value: "
-							+ drawer.getSummary(overx, geneRow) + "</html>";
-				}
-			}
-		}
-		return ret;
-	}
+//	@Override
+//	public String getToolTipText(final MouseEvent e) {
+//		/*
+//		 * Do we want to do mouseovers if value already visible? if
+//		 * (getShowVal()) return null; // don't do tooltips and vals at same
+//		 * time.
+//		 */
+//		String ret = "";
+//		String row = "";
+//		String col = "";
+//
+//		if (drawer != null) {
+//
+//			final int geneRow = overy;
+//
+//			if (xmap.contains(overx) && ymap.contains(overy)) {
+//
+//				if (geneHI != null) {
+//					row = geneSummary.getSummary(geneHI, overy);
+//
+//				} else {
+//					row = "N/A";
+//				}
+//
+//				if (arrayHI != null) {
+//					col = arraySummary.getSummary(arrayHI, overx);
+//
+//				} else {
+//					col = "N/A";
+//				}
+//
+//				if (drawer.isMissing(overx, geneRow)) {
+//					ret = "No data";
+//
+//				} else if (drawer.isEmpty(overx, geneRow)) {
+//					ret = null;
+//
+//				} else {
+//					ret = "<html>Row: " + row + " <br>Column: " + col
+//							+ " <br>Value: "
+//							+ drawer.getSummary(overx, geneRow) + "</html>";
+//				}
+//			}
+//		}
+//		return ret;
+//	}
 
 	private void drawBand(final Rectangle l) {
 
