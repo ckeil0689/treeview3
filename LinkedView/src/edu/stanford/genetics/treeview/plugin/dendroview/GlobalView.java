@@ -367,19 +367,20 @@ public class GlobalView extends ModelViewProduced implements
 				ymap.recalculateScale();
 				hasDrawn = true;
 			}
-
+			
 			xmap.notifyObservers();
 			ymap.notifyObservers();
 		}
 
 		if (resetHome) {
+			LogBuffer.println("Resetting GV");
 			xmap.setHome();
 			ymap.setHome();
 			
 			xmap.notifyObservers();
 			ymap.notifyObservers();
 
-			resetHome = false;
+			resetHome(false);
 		}
 
 		if (!offscreenValid) {
@@ -484,7 +485,6 @@ public class GlobalView extends ModelViewProduced implements
 				}
 			}
 	
-			revalidate();
 			repaint();
 		}
 	}
@@ -701,7 +701,6 @@ public class GlobalView extends ModelViewProduced implements
 			// do something else?
 		}
 
-//		revalidate();
 		repaint();
 	}
 
@@ -957,7 +956,8 @@ public class GlobalView extends ModelViewProduced implements
 
 	public void resetHome(final boolean resized) {
 
+		LogBuffer.println("GV Reset: " + resized);
 		this.resetHome = resized;
-		repaint();
+//		repaint();
 	}
 }

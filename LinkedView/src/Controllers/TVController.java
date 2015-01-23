@@ -160,6 +160,11 @@ public class TVController implements Observer {
 		dendroController.toggleTrees();
 	}
 	
+	public void toggleSearch() {
+		
+		dendroController.toggleSearch();
+	}
+	
 	/**
 	 * Generates the menubar controller. Causes listeners to be added 
 	 * for the main menubar as well as the listed file names in 'Recent Files'.

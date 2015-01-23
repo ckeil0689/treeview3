@@ -73,9 +73,9 @@ public abstract class HeaderFinderBox {
 	private final List<String> searchDataList;
 	private String[] searchDataHeaders = { "" };
 	private final WideComboBox searchTermBox;
-	private final JButton searchButton;
+//	private final JButton searchButton;
 
-	private final JPanel contentPanel;
+//	private final JPanel contentPanel;
 	
 	//These are in order to determine whether a search result is currently visible and if so, to zoom out
 	protected TreeSelectionI otherSelection;
@@ -113,7 +113,7 @@ public abstract class HeaderFinderBox {
 		this.otherSelection  = otherSelection;
 		this.otherHeaderInfo = ohI;
 
-		contentPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
+//		contentPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 
 		final String[][] hA = headerInfo.getHeaderArray();
 
@@ -147,25 +147,27 @@ public abstract class HeaderFinderBox {
 
 		searchTermBox = GUIFactory.createWideComboBox(labeledHeaders);
 		searchTermBox.setEditable(true);
+		searchTermBox.setBorder(null);
+		searchTermBox.setBackground(GUIFactory.DARK_BG);
 		AutoCompleteDecorator.decorate(searchTermBox);
 		
 		searchTermBox.getEditor().getEditorComponent().addKeyListener(
 				new BoxKeyListener());
 
 		
-		searchButton = GUIFactory.createNavBtn("searchIcon");
-		searchButton.setToolTipText("Highlights the selected label.");
-		searchButton.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				
-				seekAll();
-			}
-		});
-
-		contentPanel.add(searchTermBox);
-		contentPanel.add(searchButton);
+//		searchButton = GUIFactory.createNavBtn("searchIcon");
+//		searchButton.setToolTipText("Highlights the selected label.");
+//		searchButton.addActionListener(new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent e) {
+//				
+//				seekAll();
+//			}
+//		});
+//
+//		contentPanel.add(searchTermBox);
+//		contentPanel.add(searchButton);
 	}
 
 	/**
@@ -173,9 +175,9 @@ public abstract class HeaderFinderBox {
 	 * 
 	 * @return JPanel
 	 */
-	public JPanel getContentPanel() {
+	public WideComboBox getSearchTermBox() {
 
-		return contentPanel;
+		return searchTermBox;
 	}
 
 	/**

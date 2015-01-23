@@ -24,6 +24,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import Utilities.Helper;
@@ -106,12 +107,13 @@ public class DendroController implements ConfigNodePersistent {
 		updateHeaderInfo();
 		bindComponentFunctions();
 
-		dendroView.setupLayout();
+		dendroView.prepareView(tvModel.getGeneHeaderInfo(), 
+					tvModel.getArrayHeaderInfo(),
+					globalXmap, globalYmap);
 		
 		setSavedScale();
 		
 		addKeyBindings();
-
 		addViewListeners();
 		addMenuBtnListeners();
 	}
@@ -122,7 +124,7 @@ public class DendroController implements ConfigNodePersistent {
 		JPanel dendroPane = dendroView.getDendroPane();
 		
 		InputMap input_map = dendroPane.getInputMap(
-				JPanel.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+				JPanel.WHEN_IN_FOCUSED_WINDOW);
 		ActionMap action_map = dendroPane.getActionMap(); 
 		
 		/* Gets the system's modifier key (Ctrl or Cmd) */
@@ -243,7 +245,17 @@ public class DendroController implements ConfigNodePersistent {
 	 */
 	public void resetMapContainers() {
 
-		dendroView.getGlobalView().resetHome(true);
+		dendroView.setMatrixHome(true);
+		
+		updateGlobalView();
+	}
+	
+	private void updateGlobalView() {
+		
+		globalXmap.notifyObservers();
+		globalYmap.notifyObservers();
+		
+		dendroView.getGlobalView().repaint();
 	}
 	
 	/**
@@ -288,9 +300,19 @@ public class DendroController implements ConfigNodePersistent {
 			 * dialog can determine if results are visible in order to be 
 			 * able to determine whether to zoom out.
 			 */
-			dendroView.openSearchDialog(tvModel.getGeneHeaderInfo(), 
-					tvModel.getArrayHeaderInfo());
+//			dendroView.openSearchDialog(tvModel.getGeneHeaderInfo(), 
+//					tvModel.getArrayHeaderInfo());
+			deselectAll();
+			dendroView.searchLabels();
 		}
+	}
+	
+	private void resetDendroView() {
+		
+		resetMapContainers();
+		
+		reZoomVisible();
+		reCenterVisible();
 	}
 	
 	/*>>>>>>> Keyboard Shortcut Actions <<<<<<<<< */
@@ -349,11 +371,7 @@ public class DendroController implements ConfigNodePersistent {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			dendroView.setGlobalXMap(globalXmap);
-			dendroView.setGlobalYMap(globalYmap);
-			
-			dendroView.openSearchDialog(tvModel.getGeneHeaderInfo(), 
-					tvModel.getArrayHeaderInfo());
+			toggleSearch();
 		}
 	}
 	
@@ -633,6 +651,20 @@ public class DendroController implements ConfigNodePersistent {
 	}
 	
 	/**
+	 * Deselects all of both axes' current selections.
+	 */
+	public void deselectAll() {
+		
+		if(arraySelection.getNSelectedIndexes() > 0) {
+			arraySelection.deselectAllIndexes();
+			geneSelection.deselectAllIndexes();
+			
+			arraySelection.notifyObservers();
+			geneSelection.notifyObservers();
+		}
+	}
+	
+	/**
 	 * Sets the dimensions of the GlobalView axes. There are three options, 
 	 * passed from the MenuBar when the user selects it.
 	 * Fill: This fills all of the available space on the screen 
@@ -663,7 +695,7 @@ public class DendroController implements ConfigNodePersistent {
 			break;
 		}
 		
-		dendroView.setupLayout();
+		dendroView.resetMatrixSize();;
 		addViewListeners();
 		resetMapContainers();
 	}
@@ -675,17 +707,6 @@ public class DendroController implements ConfigNodePersistent {
 		
 		dendroView.setGVWidth(DendroView.MAX_GV_WIDTH);
 		dendroView.setGVHeight(DendroView.MAX_GV_HEIGHT);
-	}
-	
-	public void deselectAll() {
-		
-		if(arraySelection.getNSelectedIndexes() > 0) {
-			arraySelection.deselectAllIndexes();
-			geneSelection.deselectAllIndexes();
-			
-			arraySelection.notifyObservers();
-			geneSelection.notifyObservers();
-		}
 	}
 	
 	/**
@@ -727,20 +748,12 @@ public class DendroController implements ConfigNodePersistent {
 		
 		double percentDiff = small / big;
 		
-		/* new abs-size for axis */
-		double newAbsSize = big * percentDiff;
-		
 		double newAxis = percentDiff * max;
-
-		LogBuffer.println("Adjusted other axis: " + newAbsSize);
 		
 		// rounding
 		newAxis *= 1000;
 		newAxis = (double) Math.round(newAxis);
 		newAxis /= 1000;
-		
-		LogBuffer.println("PercentDiff: " + percentDiff);
-		LogBuffer.println("New percent: " + newAxis);
 		
 		return newAxis;
 	}
@@ -789,6 +802,21 @@ public class DendroController implements ConfigNodePersistent {
 			
 			dendroView.setGVHeight(newHeight);
 		}
+	}
+	
+	/**
+	 * Toggles the search bars in DendroView.
+	 */
+	public void toggleSearch() {
+		
+//		dendroView.setGlobalXMap(globalXmap);
+//		dendroView.setGlobalYMap(globalYmap);
+		
+//		dendroView.openSearchDialog(tvModel.getGeneHeaderInfo(), 
+//				tvModel.getArrayHeaderInfo());
+			
+		dendroView.setShowSearch();
+		resetDendroView();
 	}
 
 	public void saveSettings() {
@@ -1142,26 +1170,6 @@ public class DendroController implements ConfigNodePersistent {
 		public void componentShown(final ComponentEvent arg0) {
 		}
 	}
-
-//	public void setTreesVis(final boolean vis) {
-//		
-//		double atr_loc = 0;
-//		double gtr_loc = 0;
-//		
-//		if(vis) {
-//			atr_loc = configNode.getDouble("atr_Loc", 0.5);
-//			gtr_loc = configNode.getDouble("gtr_Loc", 0.5);
-//			
-//		} else {
-//			configNode.putDouble("atr_Loc", dendroView.getATRLoc());
-//			configNode.putDouble("gtr_Loc", dendroView.getGTRLoc());
-//		}
-//		
-//		dendroView.setTreesVisible(atr_loc, gtr_loc);
-//		
-//		/* Save data */
-//		configNode.putBoolean("treesVisible", vis);
-//	}
 
 	public void saveImage(final JPanel panel) throws IOException {
 

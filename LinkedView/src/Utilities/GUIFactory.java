@@ -22,6 +22,7 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
 import net.miginfocom.swing.MigLayout;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.WideComboBox;
 
 public class GUIFactory {
@@ -217,16 +218,12 @@ public class GUIFactory {
 		
 		String iconType;
 		Image img = null;
+		String subStr = iconFileName.substring(iconFileName.length() - 3,
+				iconFileName.length());
 
-		if (!iconFileName.substring(iconFileName.length() - 4,
-				iconFileName.length() - 1).equalsIgnoreCase("png")) {
+		if (!subStr.equalsIgnoreCase("png")) {
 			iconType = "_dark.png";
-//			if (dark) {
-//				iconType = "_dark.png";
-//
-//			} else {
-//				iconType = "_light.png";
-//			}
+			
 		} else {
 			iconType = "";
 		}
@@ -238,7 +235,9 @@ public class GUIFactory {
 					.getResourceAsStream(iconFileName + iconType);
 
 			img = ImageIO.read(input);
+			
 		} catch (final IOException ex) {
+			LogBuffer.logException(ex);
 		}
 		
 		return img;

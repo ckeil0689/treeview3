@@ -24,20 +24,24 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.Event;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.ScrollPane;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentListener;
 import java.awt.event.ContainerListener;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.prefs.Preferences;
 
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
@@ -47,7 +51,6 @@ import javax.swing.border.Border;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
-import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
 import Utilities.Helper;
 import Utilities.StringRes;
@@ -120,6 +123,9 @@ public class DendroView implements Observer, DendroPanel {
 	protected JScrollBar globalYscrollbar;
 	
 	protected DataTicker dataTicker;
+	
+	private HeaderFinderBox geneFinderBox;
+	private HeaderFinderBox arrayFinderBox;
 
 	/* Some important class-wide JMenuItems */
 	private JMenuItem colorMenuItem;
@@ -140,12 +146,14 @@ public class DendroView implements Observer, DendroPanel {
 	
 	// Buttons for interaction in dendroview.
 	/* TODO depreciate when clickable searchbar is implemented */
-	private final JButton searchBtn;
+	private JButton searchBtn;
 	
 	/* GlobalView default sizes */
 	/* TODO needed? ... */
 	private double gvWidth;
 	private double gvHeight;
+	
+	private boolean showSearch;
 	
 	/* Maximum GlobalView dimensions in percent */
 	public static final double MAX_GV_WIDTH = 75;
@@ -218,10 +226,9 @@ public class DendroView implements Observer, DendroPanel {
 		atrview = new ATRView();
 		atrview.getHeaderSummary().setIncluded(new int[] { 0, 3 });
 		
-		setupScaleButtons();
+		showSearch = false;
 		
-		searchBtn = GUIFactory.createBtn(StringRes.btn_SearchLabels);
-		searchBtn.setToolTipText(StringRes.tt_searchRowCol);
+		setupScaleButtons();
 	}
 	
 	public void setGlobalXMap(MapContainer xmap) {
@@ -232,6 +239,29 @@ public class DendroView implements Observer, DendroPanel {
 	public void setGlobalYMap(MapContainer ymap) {
 		
 		this.globalYmap = ymap;
+	}
+	
+	public void prepareView(final HeaderInfo geneHI, final HeaderInfo arrayHI,
+			MapContainer xmap, MapContainer ymap) {
+		
+		setupSearch(geneHI, arrayHI, xmap, ymap);
+		setupLayout();
+	}
+	
+	public void resetMatrixSize() {
+		
+		setupLayout();
+	}
+	
+	public void setMatrixHome(boolean isHome) {
+		
+		globalview.resetHome(isHome);
+	}
+	
+	public void setShowSearch() {
+		
+		showSearch = !showSearch;
+		setupLayout();
 	}
 
 	/**
@@ -257,10 +287,45 @@ public class DendroView implements Observer, DendroPanel {
 		return dendroPane;
 	}
 	
+	private JPanel makeSearchPanel() {
+		
+		if(geneFinderBox == null || arrayFinderBox == null) return null;
+		
+		JPanel searchPanel = GUIFactory.createJPanel(true, GUIFactory.DEFAULT, 
+				GUIFactory.DARK_BG);
+		
+		String tooltip = "You can use wildcards to search (*, ?). E.g.: *complex* --> "
+				+ "Rpd3s complex, ATP Synthase (complex V), etc...";
+		searchPanel.setToolTipText(tooltip);
+		
+		Image img = GUIFactory.getIconImage("close_x.png");
+		ImageIcon close_x = new ImageIcon(img);
+		
+		searchPanel.add(new JLabel(close_x), "push, al right");
+		searchPanel.add(arrayFinderBox.getSearchTermBox());
+		searchPanel.add(geneFinderBox.getSearchTermBox());
+		searchPanel.add(searchBtn);
+		
+		return searchPanel;
+	}
+	
+	private void setupSearch(final HeaderInfo geneHI, 
+			final HeaderInfo arrayHI, MapContainer xmap, MapContainer ymap) {
+		
+		setSearchTermBoxes(geneHI, arrayHI, xmap, ymap);
+//		setArrayFinderPanel(arrayHI, geneHI);
+		
+		searchBtn = GUIFactory.createNavBtn("searchIcon");
+		//GUIFactory.createBtn(StringRes.btn_SearchLabels);
+		searchBtn.setToolTipText(StringRes.tt_searchRowCol);
+	}
+	
+	
+	
 	/**
 	 * Manages the component layout in TreeViewFrame
 	 */
-	public void setupLayout() {
+	private void setupLayout() {
 
 		LogBuffer.println("DendroPane layout called.");
 		
@@ -277,6 +342,8 @@ public class DendroView implements Observer, DendroPanel {
 		JPanel globalViewContainer;
 		JPanel navContainer;
 		JPanel bottomPanel;
+		
+//		searchPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 
 		/* Generate the sub-panels */
 		btnPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
@@ -304,8 +371,6 @@ public class DendroView implements Observer, DendroPanel {
 
 		arrayNamePanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, 
 				null);
-
-		setOptionButtons();
 
 		div_size = 5;
 		gtrPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, gtrview,
@@ -398,6 +463,13 @@ public class DendroView implements Observer, DendroPanel {
 		double bottomRow = 2;
  		
 		/* Adding all components to the dendroPane */
+		if(showSearch) {
+			gvHeight -= 2;
+			dendroPane.add(this.makeSearchPanel(), "w 100%, h 2%, span, wrap");
+		} else {
+			gvHeight = MAX_GV_HEIGHT;
+		}
+		
 		dendroPane.add(firstPanel, "w " + textViewCol + "%, "
 				+ "h " + arrayRow + "%, pushx");
 		
@@ -484,6 +556,12 @@ public class DendroView implements Observer, DendroPanel {
 		
 		firstPanel.revalidate();
 		firstPanel.repaint();
+	}
+	
+	public void searchLabels() {
+		
+		geneFinderBox.seekAll();
+		arrayFinderBox.seekAll();
 	}
 
 	// Add Button Listeners
@@ -630,43 +708,43 @@ public class DendroView implements Observer, DendroPanel {
 	public void openSearchDialog(final HeaderInfo geneHI, 
 			final HeaderInfo arrayHI) {
 
-		final JDialog dialog = new JDialog();
-		dialog.setModalityType(JDialog.DEFAULT_MODALITY_TYPE);
-		dialog.setTitle(StringRes.dlg_search);
-		dialog.setResizable(false);
-
-		final JPanel container = GUIFactory.createJPanel(true, 
-				GUIFactory.DEFAULT, null);
-		
-		JLabel wildTip = GUIFactory.createLabel("You can use wildcards "
-				+ "to search (*, ?).", GUIFactory.FONTS);
-		
-		JLabel wildTip2 = GUIFactory.createLabel("E.g.: *complex* --> "
-				+ "Rpd3s complex, ATP Synthase (complex V), etc...", 
-				GUIFactory.FONTS);
-
-		container.add(wildTip, "span, wrap");
-		container.add(wildTip2, "span, wrap");
-		//Adding arrayHI in order to be able to determine where the selected cells are and if they are currently visible
-		container.add(getGeneFinderPanel(geneHI,arrayHI), "w 90%, h 40%, "
-				+ "alignx 50%, wrap");
-		//Adding geneHI in order to be able to determine where the selected cells are and if they are currently visible
-		container.add(getArrayFinderPanel(arrayHI,geneHI), "w 90%, h 40%, "
-				+ "alignx 50%");
-		
-		//Added this to de-select anything that was selected prior to
-		//clicking the search button so that the first search would not
-		//be restricted to what was selected prior to clicking the search
-		//button
-		tvFrame.getGeneSelection().deselectAllIndexes();
-		tvFrame.getGeneSelection().notifyObservers();
-		tvFrame.getArraySelection().deselectAllIndexes();
-		tvFrame.getArraySelection().notifyObservers();
-
-		dialog.getContentPane().add(container);
-		dialog.pack();
-		dialog.setLocationRelativeTo(tvFrame.getAppFrame());
-		dialog.setVisible(true);
+//		final JDialog dialog = new JDialog();
+//		dialog.setModalityType(JDialog.DEFAULT_MODALITY_TYPE);
+//		dialog.setTitle(StringRes.dlg_search);
+//		dialog.setResizable(false);
+//
+//		final JPanel container = GUIFactory.createJPanel(true, 
+//				GUIFactory.DEFAULT, null);
+//		
+//		JLabel wildTip = GUIFactory.createLabel("You can use wildcards "
+//				+ "to search (*, ?).", GUIFactory.FONTS);
+//		
+//		JLabel wildTip2 = GUIFactory.createLabel("E.g.: *complex* --> "
+//				+ "Rpd3s complex, ATP Synthase (complex V), etc...", 
+//				GUIFactory.FONTS);
+//
+//		container.add(wildTip, "span, wrap");
+//		container.add(wildTip2, "span, wrap");
+//		//Adding arrayHI in order to be able to determine where the selected cells are and if they are currently visible
+//		container.add(setGeneFinderPanel(geneHI,arrayHI), "w 90%, h 40%, "
+//				+ "alignx 50%, wrap");
+//		//Adding geneHI in order to be able to determine where the selected cells are and if they are currently visible
+//		container.add(setArrayFinderPanel(arrayHI,geneHI), "w 90%, h 40%, "
+//				+ "alignx 50%");
+//		
+//		//Added this to de-select anything that was selected prior to
+//		//clicking the search button so that the first search would not
+//		//be restricted to what was selected prior to clicking the search
+//		//button
+//		tvFrame.getGeneSelection().deselectAllIndexes();
+//		tvFrame.getGeneSelection().notifyObservers();
+//		tvFrame.getArraySelection().deselectAllIndexes();
+//		tvFrame.getArraySelection().notifyObservers();
+//
+//		dialog.getContentPane().add(container);
+//		dialog.pack();
+//		dialog.setLocationRelativeTo(tvFrame.getAppFrame());
+//		dialog.setVisible(true);
 	}
 
 	// @Override
@@ -1074,6 +1152,17 @@ public class DendroView implements Observer, DendroPanel {
 //				StringRes.menu_KMeans);
 //		menu.add(kMeansMenuItem);
 //		tvFrame.addToStackMenuList(kMeansMenuItem);
+		
+	}
+	
+	@Override
+	public void addSearchMenus(final JMenu menu) {
+		
+		final JMenuItem searchMenuItem = new JMenuItem("Labels");
+		searchMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, 
+				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		menu.add(searchMenuItem);
+		tvFrame.addToStackMenuList(searchMenuItem);
 	}
 
 	// /**
@@ -1217,39 +1306,48 @@ public class DendroView implements Observer, DendroPanel {
 		this.tvFrame = viewFrame;
 	}
 
-	public JPanel getGeneFinderPanel(HeaderInfo geneHI, HeaderInfo arrayHI) {
+	public void setSearchTermBoxes(HeaderInfo geneHI, HeaderInfo arrayHI,
+			MapContainer xmap, MapContainer ymap) {
 
-		final HeaderFinderBox geneFinderBox = new GeneFinderBox(tvFrame,
+		this.geneFinderBox = new GeneFinderBox(tvFrame,
 				geneHI, getTextview().getHeaderSummary(), 
-				tvFrame.getGeneSelection(),globalYmap,globalXmap,tvFrame.getArraySelection(),arrayHI);
+				tvFrame.getGeneSelection(), ymap, xmap, 
+				tvFrame.getArraySelection(), arrayHI);
+		
+		this.arrayFinderBox = new ArrayFinderBox(tvFrame,
+				arrayHI, getArraynameview().getHeaderSummary(),
+				tvFrame.getArraySelection(), xmap, ymap, 
+				tvFrame.getGeneSelection(), geneHI);
 
-		final JPanel contentPanel = geneFinderBox.getContentPanel();
+//		final JPanel contentPanel = geneFinderBox.getContentPanel();
 		
 		//Added this as a test/kludge to de-select anything that was selected prior to clicking the search button
 		//geneFinderBox.seekAll();
 
-		return contentPanel;
+//		return contentPanel;
 	}
 
-	/**
-	 * Getter for geneFinderPanel
-	 * 
-	 * @return HeaderFinderPanel arrayFinderPanel
-	 */
-	public JPanel getArrayFinderPanel(HeaderInfo arrayHI, HeaderInfo geneHI) {
-
-		//LogBuffer.println("Creating array finder box.  Current visible array start index is: [" + globalYmap.getFirstVisible() + "].  Num visible array indexes is: [" + globalYmap.getNumVisible() + "].");
-		final HeaderFinderBox arrayFinderBox = new ArrayFinderBox(tvFrame,
-				arrayHI, getArraynameview().getHeaderSummary(),
-				tvFrame.getArraySelection(),globalXmap,globalYmap,tvFrame.getGeneSelection(),geneHI);
-
-		final JPanel contentPanel = arrayFinderBox.getContentPanel();
-		
-		//Added this as a test/kludge to de-select anything that was selected prior to clicking the search button
-		//arrayFinderBox.seekAll();
-
-		return contentPanel;
-	}
+//	/**
+//	 * Getter for geneFinderPanel
+//	 * 
+//	 * @return HeaderFinderPanel arrayFinderPanel
+//	 */
+//	public void setArrayFinderPanel(HeaderInfo arrayHI, HeaderInfo geneHI,
+//			MapContainer xmap, MapContainer ymap) {
+//
+//		//LogBuffer.println("Creating array finder box.  Current visible array start index is: [" + globalYmap.getFirstVisible() + "].  Num visible array indexes is: [" + globalYmap.getNumVisible() + "].");
+//		arrayFinderBox = new ArrayFinderBox(tvFrame,
+//				arrayHI, getArraynameview().getHeaderSummary(),
+//				tvFrame.getArraySelection(), xmap, ymap, 
+//				tvFrame.getGeneSelection(),geneHI);
+//
+////		final JPanel contentPanel = arrayFinderBox.getContentPanel();
+//		
+//		//Added this as a test/kludge to de-select anything that was selected prior to clicking the search button
+//		//arrayFinderBox.seekAll();
+//
+////		return contentPanel;
+//	}
 
 	@Override
 	public String getName() {

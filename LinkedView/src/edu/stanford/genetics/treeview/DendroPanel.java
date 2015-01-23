@@ -38,6 +38,8 @@ public interface DendroPanel {
 	public void addDendroMenus(JMenu menu);
 
 	public void addClusterMenus(JMenu menu);
+	
+	public void addSearchMenus(JMenu menu);
 
 	public void openSearchDialog(HeaderInfo geneHI, HeaderInfo arrayHI);
 
