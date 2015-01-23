@@ -291,6 +291,9 @@ public class DendroView implements Observer, DendroPanel {
 		
 		if(geneFinderBox == null || arrayFinderBox == null) return null;
 		
+		JPanel bgPanel = GUIFactory.createJPanel(false, 
+				GUIFactory.NO_PADDING_FILL, null);
+		
 		JPanel searchPanel = GUIFactory.createJPanel(true, GUIFactory.DEFAULT, 
 				GUIFactory.DARK_BG);
 		
@@ -301,12 +304,13 @@ public class DendroView implements Observer, DendroPanel {
 		Image img = GUIFactory.getIconImage("close_x.png");
 		ImageIcon close_x = new ImageIcon(img);
 		
-		searchPanel.add(new JLabel(close_x), "push, al right");
-		searchPanel.add(arrayFinderBox.getSearchTermBox());
+		searchPanel.add(new JLabel(close_x));
+		searchPanel.add(arrayFinderBox.getSearchTermBox(), "push, al right");
 		searchPanel.add(geneFinderBox.getSearchTermBox());
 		searchPanel.add(searchBtn);
 		
-		return searchPanel;
+		bgPanel.add(searchPanel, "w 40%!, push, al right");
+		return bgPanel;
 	}
 	
 	private void setupSearch(final HeaderInfo geneHI, 
