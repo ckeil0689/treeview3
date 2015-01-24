@@ -39,14 +39,14 @@ import edu.stanford.genetics.treeview.LinearTransformation;
  * This object requires a MapContainer to figure out the offsets for the genes.
  */
 
-public class GTRView extends TRView implements 
+public class GeneTreeView extends TRView implements 
 MouseMotionListener, MouseListener{
 
 	private static final long serialVersionUID = 1L;;
 
 	private HeaderInfo gtrHI;
 
-	public GTRView() {
+	public GeneTreeView() {
 
 		super(true);
 		panel = this;

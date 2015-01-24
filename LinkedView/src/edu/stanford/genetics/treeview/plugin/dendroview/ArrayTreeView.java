@@ -51,7 +51,7 @@ import edu.stanford.genetics.treeview.LinearTransformation;
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.2 $ $Date: 2010-05-02 13:39:00 $
  */
-public class ATRView extends TRView implements 
+public class ArrayTreeView extends TRView implements 
 MouseMotionListener, MouseListener{
 
 	private static final long serialVersionUID = 1L;
@@ -59,7 +59,7 @@ MouseMotionListener, MouseListener{
 	private HeaderInfo atrHI;
 	private final JScrollBar scrollbar;
 
-	public ATRView() {
+	public ArrayTreeView() {
 
 		super(false);
 

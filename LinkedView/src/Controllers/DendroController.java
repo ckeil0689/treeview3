@@ -1,5 +1,6 @@
 package Controllers;
 
+import java.awt.Cursor;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -7,6 +8,9 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -266,6 +270,7 @@ public class DendroController implements ConfigNodePersistent {
 		dendroView.addScaleListeners(new ScaleListener());
 		dendroView.addZoomListener(new ZoomListener());
 		dendroView.addCompListener(new ResizeListener());
+		dendroView.addSearchCloseListener(new CloseSearchAction());
 	}
 
 	/**
@@ -373,6 +378,36 @@ public class DendroController implements ConfigNodePersistent {
 
 			toggleSearch();
 		}
+	}
+	
+	/**
+	 * Determines mouse behavior over the close-x icon of search panel.
+	 * @author chris0689
+	 *
+	 */
+	private class CloseSearchAction extends MouseAdapter {
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			
+			toggleSearch();
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			
+			dendroView.getCloseSearchLabel().setCursor(
+					new Cursor(Cursor.HAND_CURSOR));
+			
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+			
+			dendroView.getCloseSearchLabel().setCursor(
+					new Cursor(Cursor.DEFAULT_CURSOR));
+		}
+		
 	}
 	
 	/*>>>>>>> Mapped Key Actions <<<<<<<<< */
