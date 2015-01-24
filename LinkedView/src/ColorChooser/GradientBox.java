@@ -645,7 +645,7 @@ public class GradientBox extends JPanel {
 		repaint();
 	}
 
-	protected void setThumbPos(final Point point) {
+	protected void setThumbPosition(final Point point) {
 
 		for (final Thumb t : thumbList) {
 
@@ -664,6 +664,9 @@ public class GradientBox extends JPanel {
 
 				final JTextField inputField = new JTextField();
 				inputField.setEditable(true);
+				
+				/* Initially display thumb position */
+				inputField.setText(Double.toString(getThumbPosition(t)));
 
 				final JButton okButton = GUIFactory.createBtn("OK");
 				okButton.addActionListener(new ActionListener() {
@@ -718,12 +721,12 @@ public class GradientBox extends JPanel {
 		repaint();
 	}
 
-	// Fraction list Methods
 	/**
 	 * Calculates the fractions needed for the LinearGradient object to
 	 * determine where the center of each color is displayed.
 	 * 
-	 * @return
+	 * @return A float array containing the thumb positions as fractions of
+	 * the width of gradientRect.
 	 */
 	private float[] updateFractions() {
 
@@ -732,12 +735,36 @@ public class GradientBox extends JPanel {
 		int i = 0;
 		for (final Thumb t : thumbList) {
 
-			/* normalize x for centered gradientRect (frac 0.0 is not at x = 0)*/
-			double x = t.getX() - gradientRect.getMinX();
-			fractions[i++] = (float) (x / gradientRect.getWidth());
+			fractions[i++] = getThumbFraction(t);
 		}
 
 		return fractions;
+	}
+	
+	/**
+	 * Returns the fraction of the width of the gradientRect where
+	 * a thumb is currently positioned.
+	 * @param t
+	 * @return a float value between 0.0 and 1.0
+	 */
+	private float getThumbFraction(Thumb t) {
+		
+		double x = t.getX() - gradientRect.getMinX();
+		return (float) (x / gradientRect.getWidth());
+	}
+	
+	/**
+	 * Gets a thumb's position in terms of the data range.
+	 * @param t
+	 * @return A double value between minimum and maximum of the 
+	 * currently relevant data range for coloring.
+	 */
+	private double getThumbPosition(Thumb t) {
+		
+		final float fraction = getThumbFraction(t);
+		double value = Math.abs((maxVal - minVal) * fraction) + minVal;
+		
+		return (double) Math.round(value * 1000) / 1000;
 	}
 
 	/**
@@ -754,17 +781,12 @@ public class GradientBox extends JPanel {
 	public String getToolTipText(final MouseEvent e) {
 
 		String ret = "";
-		int i = 0;
 		for (final Thumb t : thumbList) {
 
 			if (t.contains((int) e.getX(), (int) e.getY())) {
-				final float fraction = fractions[i];
-				double value = Math.abs((maxVal - minVal) * fraction)
-						+ minVal;
-				value = (double) Math.round(value * 1000) / 1000;
+				double value = getThumbPosition(t);
 				ret = Double.toString(value);
 			}
-			i++;
 		}
 		return ret;
 	}

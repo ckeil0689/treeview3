@@ -96,7 +96,7 @@ public class ColorChooserController {
 		private void doubleClick() {
 
 			if (gradientPick.isCustomSelected()) {
-				gradientBox.setThumbPos(lastEvent.getPoint());
+				gradientBox.setThumbPosition(lastEvent.getPoint());
 			}
 		}
 
