@@ -204,7 +204,7 @@ implements ConfigNodePersistent {
 					null);
 
 			final FontSettings fontSettings = new FontSettings(
-					dendroView.getTextview(), dendroView.getArraynameview());
+					dendroView.getRowLabelView(), dendroView.getColumnLabelView());
 
 			mainPanel.add(fontSettings.makeFontPanel(), 
 					"pushx, alignx 50%, w 95%");
@@ -275,10 +275,10 @@ implements ConfigNodePersistent {
 					null);
 
 			genePanel = new HeaderSummaryPanel(geneHI, 
-					dendroView.getTextview().getHeaderSummary());
+					dendroView.getRowLabelView().getHeaderSummary());
 
 			arrayPanel = new HeaderSummaryPanel(arrayHI, 
-					dendroView.getArraynameview().getHeaderSummary());
+					dendroView.getColumnLabelView().getHeaderSummary());
 
 			final JPanel loadLabelPanel = GUIFactory.createJPanel(false, 
 					GUIFactory.NO_PADDING, null);
@@ -300,7 +300,7 @@ implements ConfigNodePersistent {
 			rowLeftJustBtn = GUIFactory.createRadioBtn("Left");
 			rowRightJustBtn = GUIFactory.createRadioBtn("Right");
 			
-			if(dendroView.getTextview().getJustifyOption()) {
+			if(dendroView.getRowLabelView().getJustifyOption()) {
 				rowRightJustBtn.setSelected(true);
 			} else {
 				rowLeftJustBtn.setSelected(true);
@@ -320,7 +320,7 @@ implements ConfigNodePersistent {
 			colRightJustBtn = GUIFactory.createRadioBtn("Top");
 			colLeftJustBtn = GUIFactory.createRadioBtn("Bottom");
 			
-			if(dendroView.getArraynameview().getJustifyOption()) {
+			if(dendroView.getColumnLabelView().getJustifyOption()) {
 				colRightJustBtn.setSelected(true);
 			} else {
 				colLeftJustBtn.setSelected(true);

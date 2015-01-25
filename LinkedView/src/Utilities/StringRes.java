@@ -104,6 +104,8 @@ public class StringRes {
 	public static final String icon_zoomIn = "zoomInIcon";
 	public static final String icon_zoomOut = "zoomOutIcon";
 	public static final String icon_zoomAll = "fullscreenIcon";
+	public static final String icon_fullZoomIn = "full_zoom_in_icon.png";
+	public static final String icon_fullZoomOut = "full_zoom_out_icon.png";
 	
 	// Tooltips
 	public static final String tt_searchRowCol = "Find row or column elements";

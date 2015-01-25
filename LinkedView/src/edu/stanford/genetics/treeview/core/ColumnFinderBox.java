@@ -16,18 +16,18 @@ import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
  * @author aloksaldanha
  * 
  */
-public class GeneFinderBox extends HeaderFinderBox {
+public class ColumnFinderBox extends HeaderFinderBox {
 
 	/**
 	 * @param f
 	 * @param hI
 	 * @param geneSelection
 	 */
-	public GeneFinderBox(final ViewFrame f, final HeaderInfo hI, 
+	public ColumnFinderBox(final ViewFrame f, final HeaderInfo hI, 
 			final HeaderSummary headerSummary, 
-			final TreeSelectionI geneSelection, final MapContainer globalXmap, final MapContainer globalYmap, final TreeSelectionI arraySelection, final HeaderInfo arrayHI) {
+			final TreeSelectionI arraySelection, final MapContainer globalYmap, final MapContainer globalXmap, final TreeSelectionI geneSelection, final HeaderInfo geneHI) {
 
-		super(f, hI, headerSummary, geneSelection, "Row", globalXmap, globalYmap, arraySelection, arrayHI);
+		super(f, hI, headerSummary, arraySelection, "Column", globalYmap, globalXmap, geneSelection, geneHI);
 	}
 
 	/*
@@ -37,5 +37,4 @@ public class GeneFinderBox extends HeaderFinderBox {
 	 */
 	@Override
 	public void scrollToIndex(final int i) {}
-
 }
