@@ -41,8 +41,6 @@ public interface DendroPanel {
 	
 	public void addSearchMenus(JMenu menu);
 
-	public void openSearchDialog(HeaderInfo geneHI, HeaderInfo arrayHI);
-
 	/**
 	 * 
 	 * @return name suitable for displaying in tab

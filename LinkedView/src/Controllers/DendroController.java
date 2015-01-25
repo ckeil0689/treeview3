@@ -281,7 +281,7 @@ public class DendroController implements ConfigNodePersistent {
 	 */
 	private void addMenuBtnListeners() {
 
-		dendroView.addSearchBtnListener(new SearchButtonListener());
+		dendroView.addSearchBtnListener(new SearchBtnListener());
 	}
 	
 	/* --------------  Listeners --------------------- */
@@ -291,7 +291,7 @@ public class DendroController implements ConfigNodePersistent {
 	 * @author CKeil
 	 *
 	 */
-	private class SearchButtonListener implements ActionListener {
+	private class SearchBtnListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
@@ -308,8 +308,6 @@ public class DendroController implements ConfigNodePersistent {
 			 * dialog can determine if results are visible in order to be 
 			 * able to determine whether to zoom out.
 			 */
-//			dendroView.openSearchDialog(tvModel.getGeneHeaderInfo(), 
-//					tvModel.getArrayHeaderInfo());
 			deselectAll();
 			dendroView.searchLabels();
 		}
@@ -350,8 +348,8 @@ public class DendroController implements ConfigNodePersistent {
 	 */
 	public void toggleTrees() {
 		
-		double atr_loc = dendroView.getDivLoc(dendroView.getAtrview());
-		double gtr_loc = dendroView.getDivLoc(dendroView.getGtrview());
+		double atr_loc = dendroView.getDivLoc(dendroView.getColumnTreeView());
+		double gtr_loc = dendroView.getDivLoc(dendroView.getRowTreeView());
 		
 		if(atr_loc > 0.0 || gtr_loc > 0.0 ) {
 			
@@ -852,12 +850,6 @@ public class DendroController implements ConfigNodePersistent {
 	 */
 	public void toggleSearch() {
 		
-//		dendroView.setGlobalXMap(globalXmap);
-//		dendroView.setGlobalYMap(globalYmap);
-		
-//		dendroView.openSearchDialog(tvModel.getGeneHeaderInfo(), 
-//				tvModel.getArrayHeaderInfo());
-			
 		dendroView.setShowSearch();
 		resetDendroView();
 	}
@@ -1365,9 +1357,6 @@ public class DendroController implements ConfigNodePersistent {
 			setArraySelection(tvFrame.getArraySelection());
 		}
 
-		// Give components access to TVModel
-		// dendroView.getArraynameview().setDataModel(tvModel);
-
 		final ColorPresets colorPresets = DendrogramFactory.getColorPresets();
 		colorPresets.setConfigNode(configNode);
 		colorExtractor = new ColorExtractor();
@@ -1397,10 +1386,10 @@ public class DendroController implements ConfigNodePersistent {
 		dendroView.getGlobalView().setArrayDrawer(arrayDrawer);
 
 		leftTreeDrawer = new TreePainter();
-		dendroView.getGtrview().setTreeDrawer(leftTreeDrawer);
+		dendroView.getRowTreeView().setTreeDrawer(leftTreeDrawer);
 
 		invertedTreeDrawer = new TreePainter();
-		dendroView.getAtrview().setTreeDrawer(invertedTreeDrawer);
+		dendroView.getColumnTreeView().setTreeDrawer(invertedTreeDrawer);
 
 		setPresets();
 
@@ -1424,10 +1413,10 @@ public class DendroController implements ConfigNodePersistent {
 		// URLs
 		colorExtractor.setConfigNode(configNode);// getFirst("ColorExtractor"));
 
-		dendroView.getTextview().setConfigNode(configNode);// getFirst("TextView"));
-		dendroView.getArraynameview().setConfigNode(configNode);// getFirst("ArrayNameView"));
-		dendroView.getAtrview().getHeaderSummary().setConfigNode(configNode);
-		dendroView.getGtrview().getHeaderSummary().setConfigNode(configNode);
+		dendroView.getRowLabelView().setConfigNode(configNode);// getFirst("TextView"));
+		dendroView.getColumnLabelView().setConfigNode(configNode);// getFirst("ArrayNameView"));
+		dendroView.getColumnTreeView().getHeaderSummary().setConfigNode(configNode);
+		dendroView.getRowTreeView().getHeaderSummary().setConfigNode(configNode);
 	}
 
 	/**
@@ -1435,10 +1424,10 @@ public class DendroController implements ConfigNodePersistent {
 	 */
 	public void setMapContainers() {
 
-		dendroView.getAtrview().setMap(globalXmap);
-		dendroView.getArraynameview().setMap(globalXmap);
-		dendroView.getGtrview().setMap(globalYmap);
-		dendroView.getTextview().setMap(globalYmap);
+		dendroView.getColumnTreeView().setMap(globalXmap);
+		dendroView.getColumnLabelView().setMap(globalXmap);
+		dendroView.getRowTreeView().setMap(globalYmap);
+		dendroView.getRowLabelView().setMap(globalYmap);
 
 		dendroView.getGlobalView().setXMap(globalXmap);
 		dendroView.getGlobalView().setYMap(globalYmap);
@@ -1449,11 +1438,11 @@ public class DendroController implements ConfigNodePersistent {
 	 */
 	public void updateHeaderInfo() {
 		
-		dendroView.getAtrview().setATRHeaderInfo(tvModel.getAtrHeaderInfo());
-		dendroView.getGtrview().setGTRHeaderInfo(tvModel.getGtrHeaderInfo());
-		dendroView.getArraynameview().setHeaderInfo(
+		dendroView.getColumnTreeView().setATRHeaderInfo(tvModel.getAtrHeaderInfo());
+		dendroView.getRowTreeView().setGTRHeaderInfo(tvModel.getGtrHeaderInfo());
+		dendroView.getColumnLabelView().setHeaderInfo(
 				tvModel.getArrayHeaderInfo());
-		dendroView.getTextview().setHeaderInfo(tvModel.getGeneHeaderInfo());
+		dendroView.getRowLabelView().setHeaderInfo(tvModel.getGeneHeaderInfo());
 		dendroView.getGlobalView().setHeaders(tvModel.getGeneHeaderInfo(),
 				tvModel.getArrayHeaderInfo());
 	}
@@ -1513,7 +1502,7 @@ public class DendroController implements ConfigNodePersistent {
 			JOptionPane.showMessageDialog(tvFrame.getAppFrame(), mismatch,
 					"Tree Construction Error", JOptionPane.ERROR_MESSAGE);
 
-			dendroView.getAtrview().setEnabled(false);
+			dendroView.getColumnTreeView().setEnabled(false);
 
 			try {
 				invertedTreeDrawer.setData(null, null);
@@ -1528,7 +1517,7 @@ public class DendroController implements ConfigNodePersistent {
 				.findNode(selectedID);
 
 		arraySelection.setSelectedNode(arrayNode.getId());
-		dendroView.getAtrview().setSelectedNode(arrayNode);
+		dendroView.getColumnTreeView().setSelectedNode(arrayNode);
 
 		arraySelection.notifyObservers();
 		invertedTreeDrawer.notifyObservers();
@@ -1711,7 +1700,7 @@ public class DendroController implements ConfigNodePersistent {
 			JOptionPane.showMessageDialog(tvFrame.getAppFrame(), mismatch,
 					"Tree Construction Error", JOptionPane.ERROR_MESSAGE);
 
-			dendroView.getGtrview().setEnabled(false);
+			dendroView.getRowTreeView().setEnabled(false);
 
 			try {
 				leftTreeDrawer.setData(null, null);
@@ -1727,7 +1716,7 @@ public class DendroController implements ConfigNodePersistent {
 				selectedID);
 
 		geneSelection.setSelectedNode(arrayNode.getId());
-		dendroView.getGtrview().setSelectedNode(arrayNode);
+		dendroView.getRowTreeView().setSelectedNode(arrayNode);
 
 		geneSelection.notifyObservers();
 		leftTreeDrawer.notifyObservers();
@@ -1856,7 +1845,7 @@ public class DendroController implements ConfigNodePersistent {
 
 		if ((tvModel != null) && tvModel.aidFound()) {
 			try {
-				dendroView.getAtrview().setEnabled(true);
+				dendroView.getColumnTreeView().setEnabled(true);
 
 				invertedTreeDrawer.setData(tvModel.getAtrHeaderInfo(),
 						tvModel.getArrayHeaderInfo());
@@ -1876,7 +1865,7 @@ public class DendroController implements ConfigNodePersistent {
 						"Error", JOptionPane.ERROR_MESSAGE);
 				LogBuffer.logException(e);
 
-				dendroView.getAtrview().setEnabled(false);
+				dendroView.getColumnTreeView().setEnabled(false);
 
 				try {
 					invertedTreeDrawer.setData(null, null);
@@ -1892,7 +1881,7 @@ public class DendroController implements ConfigNodePersistent {
 				}
 			}
 		} else {
-			dendroView.getAtrview().setEnabled(false);
+			dendroView.getColumnTreeView().setEnabled(false);
 
 			try {
 				invertedTreeDrawer.setData(null, null);
@@ -1912,7 +1901,7 @@ public class DendroController implements ConfigNodePersistent {
 
 		if ((tvModel != null) && tvModel.gidFound()) {
 			try {
-				dendroView.getGtrview().setEnabled(true);
+				dendroView.getRowTreeView().setEnabled(true);
 
 				leftTreeDrawer.setData(tvModel.getGtrHeaderInfo(),
 						tvModel.getGeneHeaderInfo());
@@ -1938,7 +1927,7 @@ public class DendroController implements ConfigNodePersistent {
 						"Error", JOptionPane.ERROR_MESSAGE);
 				LogBuffer.logException(e);
 				
-				dendroView.getGtrview().setEnabled(false);
+				dendroView.getRowTreeView().setEnabled(false);
 
 				try {
 					leftTreeDrawer.setData(null, null);
@@ -1954,7 +1943,7 @@ public class DendroController implements ConfigNodePersistent {
 				}
 			}
 		} else {
-			dendroView.getGtrview().setEnabled(false);
+			dendroView.getRowTreeView().setEnabled(false);
 
 			try {
 				leftTreeDrawer.setData(null, null);
@@ -2020,9 +2009,9 @@ public class DendroController implements ConfigNodePersistent {
 		arraySelection.addObserver(dendroView);
 
 		dendroView.getGlobalView().setArraySelection(arraySelection);
-		dendroView.getAtrview().setTreeSelection(arraySelection);
-		dendroView.getTextview().setArraySelection(arraySelection);
-		dendroView.getArraynameview().setArraySelection(arraySelection);
+		dendroView.getColumnTreeView().setTreeSelection(arraySelection);
+		dendroView.getRowLabelView().setArraySelection(arraySelection);
+		dendroView.getColumnLabelView().setArraySelection(arraySelection);
 	}
 
 	/**
@@ -2041,25 +2030,25 @@ public class DendroController implements ConfigNodePersistent {
 		geneSelection.addObserver(dendroView);
 
 		dendroView.getGlobalView().setGeneSelection(geneSelection);
-		dendroView.getGtrview().setTreeSelection(geneSelection);
-		dendroView.getTextview().setGeneSelection(geneSelection);
-		dendroView.getArraynameview().setGeneSelection(geneSelection);
+		dendroView.getRowTreeView().setTreeSelection(geneSelection);
+		dendroView.getRowLabelView().setGeneSelection(geneSelection);
+		dendroView.getColumnLabelView().setGeneSelection(geneSelection);
 	}
 	
 	public void setNewIncluded(int[] gIncluded, int[] aIncluded) {
 		
-		dendroView.getTextview().getHeaderSummary().setIncluded(gIncluded);
-		dendroView.getArraynameview().getHeaderSummary().setIncluded(aIncluded);
+		dendroView.getRowLabelView().getHeaderSummary().setIncluded(gIncluded);
+		dendroView.getColumnLabelView().getHeaderSummary().setIncluded(aIncluded);
 	}
 	
 	public int[] getArrayIncluded() {
 		
-		return dendroView.getArraynameview().getHeaderSummary().getIncluded();
+		return dendroView.getColumnLabelView().getHeaderSummary().getIncluded();
 	}
 	
 	public int[] getGeneIncluded() {
 		
-		return dendroView.getTextview().getHeaderSummary().getIncluded();
+		return dendroView.getRowLabelView().getHeaderSummary().getIncluded();
 	}
 	
 	public boolean hasDendroView() {

@@ -77,13 +77,13 @@ public class DataTicker {
 
 		private void setupDataTicker() {
 			
-			final JLabel row = GUIFactory.createLabel("Gene:", GUIFactory.FONTS);
+			final JLabel row = GUIFactory.createLabel("Row:", GUIFactory.FONTS);
 			add(row, "w 10%");
 			
 			final JTextArea rowText = setupLabel();
 			add(rowText, "w 90%, growx, wrap");
 
-			final JLabel col = GUIFactory.createLabel("Array:", GUIFactory.FONTS);
+			final JLabel col = GUIFactory.createLabel("Column:", GUIFactory.FONTS);
 			add(col, "w 10%");
 			
 			final JTextArea colText = setupLabel();
