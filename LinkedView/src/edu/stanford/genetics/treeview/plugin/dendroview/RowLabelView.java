@@ -11,11 +11,11 @@ import javax.swing.SwingUtilities;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.UrlExtractor;
 
-public class GeneLabelView extends LabelView {
+public class RowLabelView extends LabelView {
 
 	private static final long serialVersionUID = 1L;
 	
-	public GeneLabelView() {
+	public RowLabelView() {
 		
 		super(LabelView.ROW);
 	}

@@ -1000,7 +1000,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		tempMap.setIndexRange(min, max);
 		tempMap.setAvailablePixels(height + getBorderPixels());
 //		final TextView_deprec anv = new TextView_deprec();
-		final GeneLabelView anv = new GeneLabelView();
+		final RowLabelView anv = new RowLabelView();
 		anv.generateView(null);
 		anv.setHeaderInfo(geneHeaderInfo);
 		anv.setMap(tempMap);
@@ -1041,7 +1041,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		tempMap.setScale(spacing);
 		tempMap.setIndexRange(min, max);
 		tempMap.setAvailablePixels(width + getBorderPixels());
-		final ArrayLabelView anv = new ArrayLabelView();
+		final ColumnLabelView anv = new ColumnLabelView();
 		anv.generateView(null);
 		anv.setHeaderInfo(arrayHeaderInfo);
 		anv.setFace(getArrayFont().getName());

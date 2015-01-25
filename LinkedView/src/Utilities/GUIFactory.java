@@ -154,7 +154,7 @@ public class GUIFactory {
 	 * @param iconFileName
 	 * @return
 	 */
-	public static JButton createNavBtn(final String iconFileName) {
+	public static JButton createIconBtn(final String iconFileName) {
 
 		final JButton button = new JButton();
 		button.setFocusPainted(false);

@@ -20,6 +20,7 @@ import java.util.prefs.Preferences;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.InputMap;
@@ -30,6 +31,8 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+import com.sun.java.swing.plaf.motif.MotifBorders.BevelBorder;
 
 import Utilities.Helper;
 import edu.stanford.genetics.treeview.CdtFilter;
@@ -385,27 +388,32 @@ public class DendroController implements ConfigNodePersistent {
 	 * @author chris0689
 	 *
 	 */
-	private class CloseSearchAction extends MouseAdapter {
+	private class CloseSearchAction extends MouseAdapter 
+	implements ActionListener {
 
-		@Override
-		public void mouseClicked(MouseEvent e) {
-			
-			toggleSearch();
-		}
 
 		@Override
 		public void mouseEntered(MouseEvent e) {
 			
-			dendroView.getCloseSearchLabel().setCursor(
+			dendroView.getCloseSearchBtn().setCursor(
 					new Cursor(Cursor.HAND_CURSOR));
+			dendroView.getCloseSearchBtn().setBorder(BorderFactory
+					.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 			
 		}
 
 		@Override
 		public void mouseExited(MouseEvent e) {
 			
-			dendroView.getCloseSearchLabel().setCursor(
+			dendroView.getCloseSearchBtn().setCursor(
 					new Cursor(Cursor.DEFAULT_CURSOR));
+			dendroView.getCloseSearchBtn().setBorder(null);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			
+			toggleSearch();
 		}
 		
 	}

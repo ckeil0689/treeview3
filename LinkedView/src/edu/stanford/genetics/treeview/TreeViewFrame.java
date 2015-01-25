@@ -484,22 +484,29 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 * Builds the JMenubar, fills it with JMenuItems and adds listeners
 	 * to them. The listeners are called in MenubarController.
 	 */
-	public void buildMenuBar() {
+	private void buildMenuBar() {
 
 		menuBar = new JMenuBar();
 		appFrame.setJMenuBar(menuBar);
 		
 		stackMenuList = new ArrayList<JMenuItem>();
-
-		// File
-		final JMenu fileSubMenu = new JMenu(StringRes.mbar_File);
+		
+		constructFileMenu();
+		constructHelpMenu();
+	}
+	
+	private void constructFileMenu() {
+		
+		/* File */
+		final JMenu fileMenu = new JMenu(StringRes.mbar_File);
+		fileMenu.setMnemonic(KeyEvent.VK_F);
 		
 		// Open new file Menu
 		final JMenuItem openMenuItem = new JMenuItem(StringRes.menu_Open,
 				KeyEvent.VK_O);
 		openMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, 
 				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		fileSubMenu.add(openMenuItem);
+		fileMenu.add(openMenuItem);
 		stackMenuList.add(openMenuItem);
 
 		// menubar.addMenuItem("Open Url...", new ActionListener() {
@@ -539,37 +546,36 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 			fileMenuList.add(fileSetMenuItem);
 		}
 
-		fileSubMenu.add(recentSubMenu);
+		fileMenu.add(recentSubMenu);
 
 		final JMenuItem editRecentMenuItem = new JMenuItem(
 				StringRes.menu_EditRecent);
-		fileSubMenu.add(editRecentMenuItem);
+		fileMenu.add(editRecentMenuItem);
 		stackMenuList.add(editRecentMenuItem);
-		// --------
 
-		fileSubMenu.addSeparator();
+		fileMenu.addSeparator();
 		
-		// Quit Program Menu
+		/* Quit Program Menu */
 		final JMenuItem quitMenuItem = new JMenuItem(
 				StringRes.menu_QuitWindow, KeyEvent.VK_W);
 		quitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, 
 				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		fileSubMenu.add(quitMenuItem);
+		fileMenu.add(quitMenuItem);
 		stackMenuList.add(quitMenuItem);
 
 		final JMenuItem saveMenuItem = new JMenuItem(StringRes.menu_Save, 
 				KeyEvent.VK_S);
 		saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, 
 				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		fileSubMenu.add(saveMenuItem);
+		fileMenu.add(saveMenuItem);
 		stackMenuList.add(saveMenuItem);
 
 		final JMenuItem saveAsMenuItem = new JMenuItem(
 				StringRes.menu_SaveAs);
-		fileSubMenu.add(saveAsMenuItem);
+		fileMenu.add(saveAsMenuItem);
 		stackMenuList.add(saveAsMenuItem);
 
-		menuBar.add(fileSubMenu);
+		menuBar.add(fileMenu);
 
 		// Preferences
 		final JMenu prefSubMenu = new JMenu(StringRes.menu_Prefs);
@@ -583,6 +589,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		// Preferences specific to DendroView
 		if (running != null) {
 			final JMenu viewMenu = new JMenu(StringRes.mbar_View);
+			viewMenu.setMnemonic(KeyEvent.VK_V);
 			running.addDendroMenus(viewMenu);
 			menuBar.add(viewMenu);
 			
@@ -592,6 +599,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 			menuBar.add(searchMenu);
 
 			final JMenu clusterMenu = new JMenu(StringRes.mbar_Cluster);
+			clusterMenu.setMnemonic(KeyEvent.VK_C);
 			running.addClusterMenus(clusterMenu);
 			menuBar.add(clusterMenu);
 			
@@ -613,32 +621,36 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 			// stackMenuList.add(funcEnrMenuItem);
 		}
 
-		fileSubMenu.addSeparator();
-		fileSubMenu.add(prefSubMenu);
-
-		// Help
-		final JMenu helpSubMenu = new JMenu(StringRes.mbar_Help);
+		fileMenu.addSeparator();
+		fileMenu.add(prefSubMenu);
+	}
+	
+	private void constructHelpMenu() {
+		
+		/* Help */
+		final JMenu helpMenu = new JMenu(StringRes.mbar_Help);
+		helpMenu.setMnemonic(KeyEvent.VK_H);
 
 		final JMenuItem aboutMenuItem = new JMenuItem(
 				StringRes.menu_About);
-		helpSubMenu.add(aboutMenuItem);
+		helpMenu.add(aboutMenuItem);
 		stackMenuList.add(aboutMenuItem);
 		
 		if (running != null) {
 			final JMenuItem statsMenuItem = new JMenuItem(
 					StringRes.menu_Stats);
-			helpSubMenu.add(statsMenuItem);
+			helpMenu.add(statsMenuItem);
 			stackMenuList.add(statsMenuItem);
 		}
 
 		final JMenuItem shortcutMenuItem = new JMenuItem(
 				StringRes.menu_Shortcuts);
-		helpSubMenu.add(shortcutMenuItem);
+		helpMenu.add(shortcutMenuItem);
 		stackMenuList.add(shortcutMenuItem);
 
 		final JMenuItem logMenuItem = new JMenuItem(
 				StringRes.menu_ShowLog);
-		helpSubMenu.add(logMenuItem);
+		helpMenu.add(logMenuItem);
 		stackMenuList.add(logMenuItem);
 
 //There's currently no documentation page - don't need it for the first release
@@ -659,18 +671,10 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		final JMenuItem feedbackMenuItem = new JMenuItem(
 				StringRes.menu_Feedback);
-		helpSubMenu.add(feedbackMenuItem);
+		helpMenu.add(feedbackMenuItem);
 		stackMenuList.add(feedbackMenuItem);
 
-		menuBar.add(helpSubMenu);
-
-//		// New Window
-//		final JMenuItem newWindowMenuItem = new JMenuItem(
-//				StringRes.menu_title_NewWindow, KeyEvent.VK_N);
-//		newWindowMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, 
-//				ActionEvent.CTRL_MASK));
-//		stackMenuList.add(newWindowMenuItem);
-//		fileSubMenu.add(newWindowMenuItem);
+		menuBar.add(helpMenu);
 	}
 
 //	/**

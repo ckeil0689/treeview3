@@ -98,7 +98,7 @@ public class MenubarController {
 //		case StringRes.menu_KMeans:    	
 //			controller.setupClusterView(ClusterView.KMEANS);
 //			break;
-		case "Labels":		
+		case "Find Labels...":		
 			controller.toggleSearch();
 			break;
 		case "Functional Enrichment":	

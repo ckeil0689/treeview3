@@ -113,8 +113,6 @@ public abstract class HeaderFinderBox {
 		this.otherSelection  = otherSelection;
 		this.otherHeaderInfo = ohI;
 
-//		contentPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
-
 		final String[][] hA = headerInfo.getHeaderArray();
 
 		final String defaultText = "Search " + type + " Labels... ";
@@ -153,21 +151,6 @@ public abstract class HeaderFinderBox {
 		
 		searchTermBox.getEditor().getEditorComponent().addKeyListener(
 				new BoxKeyListener());
-
-		
-//		searchButton = GUIFactory.createNavBtn("searchIcon");
-//		searchButton.setToolTipText("Highlights the selected label.");
-//		searchButton.addActionListener(new ActionListener() {
-//
-//			@Override
-//			public void actionPerformed(final ActionEvent e) {
-//				
-//				seekAll();
-//			}
-//		});
-//
-//		contentPanel.add(searchTermBox);
-//		contentPanel.add(searchButton);
 	}
 
 	/**
