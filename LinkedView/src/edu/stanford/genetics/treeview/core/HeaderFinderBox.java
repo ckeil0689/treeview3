@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -67,52 +68,56 @@ public abstract class HeaderFinderBox {
 	protected TreeSelectionI searchSelection;
 	protected ViewFrame viewFrame;
 
-	private final HeaderInfo headerInfo;
-	private final HeaderSummary headerSummary;
+	private HeaderInfo headerInfo;
+	private HeaderSummary headerSummary;
 
-	private final List<String> searchDataList;
+	private List<String> searchDataList;
 	private String[] searchDataHeaders = { "" };
-	private final WideComboBox searchTermBox;
-//	private final JButton searchButton;
-
-//	private final JPanel contentPanel;
+	private WideComboBox searchTermBox;
 	
 	//These are in order to determine whether a search result is currently visible and if so, to zoom out
 	protected TreeSelectionI otherSelection;
 	private MapContainer globalSmap;
 	private MapContainer globalOmap;
-	private final HeaderInfo otherHeaderInfo;
-	private final List<String> otherDataList;
+	private HeaderInfo otherHeaderInfo;
+	private List<String> otherDataList;
 	private String[] otherDataHeaders = { "" };
 	//private GlobalView2 globalview;
 
 	// "Search for Substring"
-	public HeaderFinderBox(final ViewFrame f, final HeaderInfo hI, 
-			final HeaderSummary headerSummary, final TreeSelectionI 
-			searchSelection, final String type,
-			final MapContainer globalSmap, final MapContainer globalOmap, final TreeSelectionI otherSelection, final HeaderInfo ohI) {
+//	public HeaderFinderBox(final ViewFrame f, final HeaderInfo hI, 
+//			final HeaderSummary headerSummary, final TreeSelectionI 
+//			searchSelection, final String type,
+//			final MapContainer globalSmap, final MapContainer globalOmap, final TreeSelectionI otherSelection, final HeaderInfo ohI) {
+//
+//		this(f.getAppFrame(), hI, headerSummary, searchSelection, otherSelection, type, ohI);
+//		this.viewFrame = f;
+//		
+//		//Hopefully this isn't too late of a place to set this, otherwise, I'll have to pass it along instead of set it here
+////		this.globalSmap = globalSmap;
+////		this.globalOmap = globalOmap;
+//		//this.globalview = globalview;
+//	}
 
-		this(f.getAppFrame(), hI, headerSummary, searchSelection, otherSelection, type, ohI);
-		this.viewFrame = f;
-		
-		//Hopefully this isn't too late of a place to set this, otherwise, I'll have to pass it along instead of set it here
-		this.globalSmap = globalSmap;
-		this.globalOmap = globalOmap;
-		//this.globalview = globalview;
-	}
-
-	private HeaderFinderBox(final JFrame f, final HeaderInfo hI, 
-			final HeaderSummary headerSummary,
-			final TreeSelectionI searchSelection, final TreeSelectionI otherSelection, final String type, final HeaderInfo ohI) {
+	private HeaderFinderBox(final JFrame f) {
 
 		super();
-		this.viewFrame       = null;
-		this.headerInfo      = hI;
-		this.headerSummary   = headerSummary;
-		this.searchSelection = searchSelection;
-		this.otherSelection  = otherSelection;
-		this.otherHeaderInfo = ohI;
-
+		this.viewFrame = null;
+		
+//		final String[] labeledHeaders = setupData(type);
+//
+//		searchTermBox = GUIFactory.createWideComboBox(labeledHeaders);
+//		searchTermBox.setEditable(true);
+//		searchTermBox.setBorder(null);
+//		searchTermBox.setBackground(GUIFactory.DARK_BG);
+//		AutoCompleteDecorator.decorate(searchTermBox);
+//		
+//		searchTermBox.getEditor().getEditorComponent().addKeyListener(
+//				new BoxKeyListener());
+	}
+	
+	private String[] setupData(String type) {
+		
 		final String[][] hA = headerInfo.getHeaderArray();
 
 		final String defaultText = "Search " + type + " Labels... ";
@@ -142,15 +147,9 @@ public abstract class HeaderFinderBox {
 
 		System.arraycopy(searchDataHeaders, 0, labeledHeaders, 1,
 				searchDataHeaders.length);
-
-		searchTermBox = GUIFactory.createWideComboBox(labeledHeaders);
-		searchTermBox.setEditable(true);
-		searchTermBox.setBorder(null);
-		searchTermBox.setBackground(GUIFactory.DARK_BG);
-		AutoCompleteDecorator.decorate(searchTermBox);
 		
-		searchTermBox.getEditor().getEditorComponent().addKeyListener(
-				new BoxKeyListener());
+		return labeledHeaders;
+		
 	}
 
 	/**
@@ -694,6 +693,46 @@ public abstract class HeaderFinderBox {
 				changed = true;
 			}
 		}
+	}
+	
+	/* >>>> Update the object with new data <<<<<< */
+	public void setSelection(TreeSelectionI searchSelection, 
+			TreeSelectionI otherSelection) {
+		
+		this.searchSelection = searchSelection;
+		this.otherSelection = otherSelection;
+	}
+	
+	public void setHeaderSummary(HeaderSummary headerSummary) {
+		
+		this.headerSummary = headerSummary;
+	}
+	
+	public void setHeaderInfo(HeaderInfo searchHI, HeaderInfo otherHI) {
+		
+		this.headerInfo = searchHI;
+		this.otherHeaderInfo = otherHI;
+	}
+	
+	public void setMapContainers(MapContainer searchMap, 
+			MapContainer otherMap) {
+		
+		this.globalSmap = searchMap;
+		this.globalOmap = otherMap;
+	}
+	
+	public void setNewSearchTermBox(String type) {
+		
+		String[] labels = setupData(type);
+		
+		this.searchTermBox = GUIFactory.createWideComboBox(labels);
+		searchTermBox.setEditable(true);
+		searchTermBox.setBorder(null);
+		searchTermBox.setBackground(GUIFactory.DARK_BG);
+		AutoCompleteDecorator.decorate(searchTermBox);
+		
+		searchTermBox.getEditor().getEditorComponent().addKeyListener(
+				new BoxKeyListener());
 	}
 	
 	/**

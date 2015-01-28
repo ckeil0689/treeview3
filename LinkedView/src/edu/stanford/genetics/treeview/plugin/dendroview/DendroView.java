@@ -147,7 +147,7 @@ public class DendroView implements Observer, DendroPanel {
 	private double gvWidth;
 	private double gvHeight;
 	
-	private boolean showSearch;
+	private boolean isSearchVisible;
 	
 	/* Maximum GlobalView dimensions in percent */
 	public static final double MAX_GV_WIDTH = 75;
@@ -220,7 +220,7 @@ public class DendroView implements Observer, DendroPanel {
 		colTreeView = new ColumnTreeView();
 		colTreeView.getHeaderSummary().setIncluded(new int[] { 0, 3 });
 		
-		showSearch = false;
+		isSearchVisible = false;
 		
 		setupScaleButtons();
 	}
@@ -242,7 +242,7 @@ public class DendroView implements Observer, DendroPanel {
 		setupLayout();
 	}
 	
-	public void resetMatrixSize() {
+	public void redoLayout() {
 		
 		setupLayout();
 	}
@@ -252,10 +252,15 @@ public class DendroView implements Observer, DendroPanel {
 		globalview.resetHome(isHome);
 	}
 	
-	public void setShowSearch() {
+	public void setSearchVisible(boolean visible) {
 		
-		showSearch = !showSearch;
-		setupLayout();
+		this.isSearchVisible = visible;
+		redoLayout();
+	}
+	
+	public boolean isSearchVisible() {
+		
+		return isSearchVisible;
 	}
 
 	/**
@@ -476,7 +481,7 @@ public class DendroView implements Observer, DendroPanel {
 		double bottomRow = 2;
  		
 		/* Adding all components to the dendroPane */
-		if(showSearch) {
+		if(isSearchVisible) {
 			gvHeight -= 2;
 			dendroPane.add(this.makeSearchPanel(), "w 100%, h 2%, span, wrap");
 		} else {

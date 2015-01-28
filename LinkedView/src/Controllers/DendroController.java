@@ -377,7 +377,9 @@ public class DendroController implements ConfigNodePersistent {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			toggleSearch();
+			if(!dendroView.isSearchVisible()) {
+				setSearchVisible(true);
+			}
 		}
 	}
 	
@@ -411,7 +413,7 @@ public class DendroController implements ConfigNodePersistent {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
-			toggleSearch();
+			setSearchVisible(false);
 		}
 		
 	}
@@ -736,7 +738,7 @@ public class DendroController implements ConfigNodePersistent {
 			break;
 		}
 		
-		dendroView.resetMatrixSize();;
+		dendroView.redoLayout();;
 		addViewListeners();
 		resetMapContainers();
 	}
@@ -848,9 +850,9 @@ public class DendroController implements ConfigNodePersistent {
 	/**
 	 * Toggles the search bars in DendroView.
 	 */
-	public void toggleSearch() {
+	public void setSearchVisible(boolean visible) {
 		
-		dendroView.setShowSearch();
+		dendroView.setSearchVisible(visible);
 		resetDendroView();
 	}
 

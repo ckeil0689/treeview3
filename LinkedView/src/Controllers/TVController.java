@@ -160,9 +160,12 @@ public class TVController implements Observer {
 		dendroController.toggleTrees();
 	}
 	
-	public void toggleSearch() {
+	public void setSearchVisible() {
 		
-		dendroController.toggleSearch();
+		/* Don't do anything if search panel is visible (closing only via X) */
+		if(!tvFrame.getDendroView().isSearchVisible()) {
+			dendroController.setSearchVisible(true);
+		}
 	}
 	
 	/**
