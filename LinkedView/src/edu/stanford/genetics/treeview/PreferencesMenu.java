@@ -342,7 +342,8 @@ implements ConfigNodePersistent {
 			mainPanel.add(justifyHint, "pushx, alignx 0%, span, wrap");
 			mainPanel.add(rowRadioBtnPanel, "pushx, alignx 50%, w 45%");
 			mainPanel.add(colRadioBtnPanel, "pushx, alignx 50%, w 45%, wrap");
-			mainPanel.add(custom_button, "pushx, alignx 50%, span");
+			//Commented out for version 3.0alpha1 because it doesn't work yet
+			//mainPanel.add(custom_button, "pushx, alignx 50%, span");
 		}
 
 		public JPanel makeLabelPane() {
