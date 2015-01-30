@@ -489,7 +489,7 @@ public class DendroView implements Observer, DendroPanel {
 		dendroPane.add(arrayContainer, "w " + gvWidth + "%, "
 				+ "h " + arrayRow + "%, growx");
 		
-		dendroPane.add(navContainer, "span 1 2, w 300, h 100%, wrap");
+		dendroPane.add(navContainer, "span 1 2, w 300, growx 0, h 100%, wrap");
 		
 		dendroPane.add(geneContainer, "w " + textViewCol + "%, "
 				+ "h " + gvHeight + "%, growy");
