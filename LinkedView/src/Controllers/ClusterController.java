@@ -153,8 +153,8 @@ public class ClusterController {
 		@Override
 		protected Void doInBackground() throws Exception {
 			
-			int rows = tvModel.getGeneHeaderInfo().getNumHeaders();
-			int cols = tvModel.getArrayHeaderInfo().getNumHeaders();
+			int rows = tvModel.getRowHeaderInfo().getNumHeaders();
+			int cols = tvModel.getColumnHeaderInfo().getNumHeaders();
 			
 			/* 
 			 * Set maximum for JProgressBar before any clustering!
@@ -199,8 +199,8 @@ public class ClusterController {
 			fileName = tvModel.getSource().substring(0, 
 					tvModel.getSource().length() - 4);
 			
-			IntHeaderInfo geneHeaderI = tvModel.getGeneHeaderInfo();
-			IntHeaderInfo arrayHeaderI = tvModel.getArrayHeaderInfo();
+			IntHeaderInfo geneHeaderI = tvModel.getRowHeaderInfo();
+			IntHeaderInfo arrayHeaderI = tvModel.getColumnHeaderInfo();
 			
 			/* Initialize the clustering processor and pass the data */
 			TVDataMatrix originalMatrix = (TVDataMatrix)tvModel.getDataMatrix();
@@ -326,8 +326,8 @@ public class ClusterController {
 			LogBuffer.println("Setting up buffered writer...");
 			cdtGen.setupWriter(fileName, clusterView.getSpinnerValues());
 
-			IntHeaderInfo geneHeaderI = tvModel.getGeneHeaderInfo();
-			IntHeaderInfo arrayHeaderI = tvModel.getArrayHeaderInfo();
+			IntHeaderInfo geneHeaderI = tvModel.getRowHeaderInfo();
+			IntHeaderInfo arrayHeaderI = tvModel.getColumnHeaderInfo();
 			
 			cdtGen.prepare(geneHeaderI, arrayHeaderI);
 			cdtGen.generateCDT();

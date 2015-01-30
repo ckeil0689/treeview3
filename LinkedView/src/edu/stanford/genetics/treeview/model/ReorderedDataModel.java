@@ -65,14 +65,14 @@ public class ReorderedDataModel extends Observable implements DataModel {
 		this.arrayIndex = arrayIndex;
 		if (geneIndex != null) {
 			geneHeaderInfo = new ReorderedHeaderInfo(
-					source.getGeneHeaderInfo(), geneIndex);
+					source.getRowHeaderInfo(), geneIndex);
 			gtrHeaderInfo = new ReorderedHeaderInfo(source.getGtrHeaderInfo(),
 					geneIndex);
 		}
 
 		if (arrayIndex != null) {
 			arrayHeaderInfo = new ReorderedHeaderInfo(
-					source.getArrayHeaderInfo(), arrayIndex);
+					source.getColumnHeaderInfo(), arrayIndex);
 			atrHeaderInfo = new ReorderedHeaderInfo(source.getAtrHeaderInfo(),
 					arrayIndex);
 		}
@@ -413,10 +413,10 @@ public class ReorderedDataModel extends Observable implements DataModel {
 	 * @see edu.stanford.genetics.treeview.DataModel#getGeneHeaderInfo()
 	 */
 	@Override
-	public IntHeaderInfo getGeneHeaderInfo() { // IntHeaderInfo
+	public IntHeaderInfo getRowHeaderInfo() { // IntHeaderInfo
 
 		if (geneHeaderInfo == null) {
-			return parent.getGeneHeaderInfo();
+			return parent.getRowHeaderInfo();
 
 		} else {
 			return geneHeaderInfo; // (IntHeaderInfo)
@@ -429,10 +429,10 @@ public class ReorderedDataModel extends Observable implements DataModel {
 	 * @see edu.stanford.genetics.treeview.DataModel#getArrayHeaderInfo()
 	 */
 	@Override
-	public IntHeaderInfo getArrayHeaderInfo() {
+	public IntHeaderInfo getColumnHeaderInfo() {
 
 		if (arrayHeaderInfo == null) {
-			return parent.getArrayHeaderInfo();
+			return parent.getColumnHeaderInfo();
 
 		} else {
 			return arrayHeaderInfo;// (IntHeaderInfo)

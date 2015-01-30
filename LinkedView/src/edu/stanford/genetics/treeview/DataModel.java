@@ -104,12 +104,12 @@ public interface DataModel {
 	 * column and the description column, respectively. See
 	 * TVModel.TVModelHeaderInfo for details.
 	 */
-	public IntHeaderInfo getGeneHeaderInfo();
+	public IntHeaderInfo getRowHeaderInfo();
 
 	/**
 	 * Gets the HeaderInfo associated with arrays for this DataModel.
 	 */
-	public IntHeaderInfo getArrayHeaderInfo();
+	public IntHeaderInfo getColumnHeaderInfo();
 
 	/**
 	 * Gets the HeaderInfo associated with gene tree for this DataModel.

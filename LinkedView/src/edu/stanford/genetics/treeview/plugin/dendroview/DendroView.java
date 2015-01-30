@@ -235,18 +235,6 @@ public class DendroView implements Observer, DendroPanel {
 		this.globalYmap = ymap;
 	}
 	
-	public void prepareView(final HeaderInfo geneHI, final HeaderInfo arrayHI,
-			MapContainer xmap, MapContainer ymap) {
-		
-		setupSearch(geneHI, arrayHI, xmap, ymap);
-		setupLayout();
-	}
-	
-	public void redoLayout() {
-		
-		setupLayout();
-	}
-	
 	public void setMatrixHome(boolean isHome) {
 		
 		globalview.resetHome(isHome);
@@ -255,7 +243,7 @@ public class DendroView implements Observer, DendroPanel {
 	public void setSearchVisible(boolean visible) {
 		
 		this.isSearchVisible = visible;
-		redoLayout();
+		setupLayout();
 	}
 	
 	public boolean isSearchVisible() {
@@ -324,10 +312,11 @@ public class DendroView implements Observer, DendroPanel {
 	 * @param xmap
 	 * @param ymap
 	 */
-	private void setupSearch(final HeaderInfo geneHI, 
+	public void setupSearch(final HeaderInfo geneHI, 
 			final HeaderInfo arrayHI, MapContainer xmap, MapContainer ymap) {
 		
-		setSearchTermBoxes(geneHI, arrayHI, xmap, ymap);
+		setSearchTermBoxes();
+		updateSearchTermBoxes(geneHI, arrayHI, xmap, ymap);
 		
 		searchBtn = GUIFactory.createIconBtn("searchIcon");
 		searchBtn.setBorder(null);
@@ -340,11 +329,10 @@ public class DendroView implements Observer, DendroPanel {
 	}
 	
 	
-	
 	/**
 	 * Manages the component layout in TreeViewFrame
 	 */
-	private void setupLayout() {
+	public void setupLayout() {
 
 		LogBuffer.println("DendroPane layout called.");
 		
@@ -1283,18 +1271,34 @@ public class DendroView implements Observer, DendroPanel {
 		this.tvFrame = viewFrame;
 	}
 
-	public void setSearchTermBoxes(HeaderInfo geneHI, HeaderInfo arrayHI,
-			MapContainer xmap, MapContainer ymap) {
+	public void setSearchTermBoxes() {
 
-		this.rowFinderBox = new RowFinderBox(tvFrame,
-				geneHI, getRowLabelView().getHeaderSummary(), 
-				tvFrame.getGeneSelection(), ymap, xmap, 
-				tvFrame.getArraySelection(), arrayHI);
+		this.rowFinderBox = new RowFinderBox();
+//		rowFinderBox.setHeaderInfo(rowHI, columnHI);
+//		rowFinderBox.setHeaderSummary(getRowLabelView().getHeaderSummary());
+//		rowFinderBox.setMapContainers(ymap, xmap);
+//		rowFinderBox.setNewSearchTermBox();
 		
-		this.colFinderBox = new ColumnFinderBox(tvFrame,
-				arrayHI, getColumnLabelView().getHeaderSummary(),
-				tvFrame.getArraySelection(), xmap, ymap, 
-				tvFrame.getGeneSelection(), geneHI);
+		this.colFinderBox = new ColumnFinderBox();
+//		colFinderBox.setHeaderInfo(columnHI, rowHI);
+//		colFinderBox.setHeaderSummary(getColumnLabelView().getHeaderSummary());
+//		colFinderBox.setMapContainers(xmap, ymap);
+//		colFinderBox.setNewSearchTermBox();
+	}
+	
+	public void updateSearchTermBoxes(HeaderInfo rowHI, HeaderInfo columnHI,
+			MapContainer xmap, MapContainer ymap) {
+		
+		rowFinderBox.setHeaderInfo(rowHI, columnHI);
+		rowFinderBox.setHeaderSummary(getRowLabelView().getHeaderSummary());
+		rowFinderBox.setMapContainers(ymap, xmap);
+		rowFinderBox.setNewSearchTermBox();
+		
+		colFinderBox.setHeaderInfo(columnHI, rowHI);
+		colFinderBox.setHeaderSummary(getColumnLabelView().getHeaderSummary());
+		colFinderBox.setMapContainers(xmap, ymap);
+		colFinderBox.setNewSearchTermBox();
+		
 	}
 
 	@Override

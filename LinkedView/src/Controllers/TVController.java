@@ -269,8 +269,8 @@ public class TVController implements Observer {
 
 		try {
 			if(dendroController.hasDendroView()) {
-				String[] geneNames = tvModel.getGeneHeaderInfo().getNames();
-				String[] arrayNames = tvModel.getArrayHeaderInfo().getNames();
+				String[] geneNames = tvModel.getRowHeaderInfo().getNames();
+				String[] arrayNames = tvModel.getColumnHeaderInfo().getNames();
 				
 				storeSelectedLabels(geneNames, arrayNames);
 			}
@@ -279,7 +279,7 @@ public class TVController implements Observer {
 			tvModel.resetState();
 			tvModel.setSource(fileMenuSet);
 			
-			if(tvModel.getArrayHeaderInfo().getNumHeaders() == 0) {
+			if(tvModel.getColumnHeaderInfo().getNumHeaders() == 0) {
 				/* ------ Load Process -------- */
 				ModelLoader loader = new ModelLoader(tvModel, this);
 				loader.execute();
@@ -369,7 +369,7 @@ public class TVController implements Observer {
 	private void resetLabelSelection() {
 		
 		int[] newGSelected = new int[]{0};
-		String[] geneNames = model.getGeneHeaderInfo().getNames();
+		String[] geneNames = model.getRowHeaderInfo().getNames();
 		for(int i = 0; i < geneNames.length; i++) {
 			if(geneNames[i].equalsIgnoreCase(selectedLabels[0])) {
 				newGSelected[0] = i;
@@ -378,7 +378,7 @@ public class TVController implements Observer {
 		}
 		
 		int[] newASelected = new int[]{0};
-		String[] arrayNames = model.getArrayHeaderInfo().getNames();
+		String[] arrayNames = model.getColumnHeaderInfo().getNames();
 		for(int i = 0; i < arrayNames.length; i++) {
 			if(arrayNames[i].equalsIgnoreCase(selectedLabels[1])) {
 				newASelected[0] = i;
@@ -466,13 +466,13 @@ public class TVController implements Observer {
 		// extractors...
 		final UrlPresets genePresets = tvFrame.getGeneUrlPresets();
 		final UrlExtractor urlExtractor = new UrlExtractor(model
-				.getGeneHeaderInfo(), genePresets);
+				.getRowHeaderInfo(), genePresets);
 		urlExtractor.bindConfig(documentConfig.node("UrlExtractor"));
 		tvFrame.setUrlExtractor(urlExtractor);
 
 		final UrlPresets arrayPresets = tvFrame.getArrayUrlPresets();
 		final UrlExtractor arrayUrlExtractor = new UrlExtractor(model
-				.getArrayHeaderInfo(), arrayPresets);
+				.getColumnHeaderInfo(), arrayPresets);
 		arrayUrlExtractor.bindConfig(documentConfig.node("ArrayUrlExtractor"));
 		tvFrame.setArrayUrlExtractor(arrayUrlExtractor);
 
@@ -551,9 +551,9 @@ public class TVController implements Observer {
 
 			final GeneListMaker t = 
 					new GeneListMaker((JFrame) JFrame.getFrames()[0],
-					tvFrame.getGeneSelection(), model.getGeneHeaderInfo(), def);
+					tvFrame.getGeneSelection(), model.getRowHeaderInfo(), def);
 
-			t.setDataMatrix(model.getDataMatrix(), model.getArrayHeaderInfo(), 
+			t.setDataMatrix(model.getDataMatrix(), model.getColumnHeaderInfo(), 
 					DataModel.NODATA);
 
 			t.setConfigNode(tvFrame.getConfigNode());
@@ -573,10 +573,10 @@ public class TVController implements Observer {
 
 			final GeneListMaker t = 
 					new GeneListMaker((JFrame) JFrame.getFrames()[0],
-					tvFrame.getGeneSelection(), model.getGeneHeaderInfo(), 
+					tvFrame.getGeneSelection(), model.getRowHeaderInfo(), 
 					source.getDir() + source.getRoot() + "_data.cdt");
 
-			t.setDataMatrix(model.getDataMatrix(), model.getArrayHeaderInfo(), 
+			t.setDataMatrix(model.getDataMatrix(), model.getColumnHeaderInfo(), 
 					DataModel.NODATA);
 
 			t.setConfigNode(tvFrame.getConfigNode());
@@ -798,8 +798,8 @@ public class TVController implements Observer {
 		}
 		
 		if(menu.equalsIgnoreCase(StringRes.menu_RowAndCol)) {
-			preferences.setHeaderInfo(model.getGeneHeaderInfo(), 
-					model.getArrayHeaderInfo());
+			preferences.setHeaderInfo(model.getRowHeaderInfo(), 
+					model.getColumnHeaderInfo());
 		}
 		
 		preferences.setupLayout(menu);

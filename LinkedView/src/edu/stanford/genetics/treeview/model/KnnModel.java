@@ -116,7 +116,7 @@ public class KnnModel extends TVModel implements DataModel {
 
 		final String[] msg = { "Selected KnnModel Stats",
 				"Source = " + source.getCdt(), "Nexpr   = " + nExpr(),
-				"NGeneHeader = " + getGeneHeaderInfo().getNumNames(),
+				"NGeneHeader = " + getRowHeaderInfo().getNumNames(),
 				"Ngene   = " + nGene(), "eweight  = " + eweightFound,
 				"gweight  = " + gweightFound, "aid  = " + aidFound,
 				"gid  = " + gidFound };
@@ -178,7 +178,7 @@ public class KnnModel extends TVModel implements DataModel {
 
 	public void setGClusters(final String[][] labels, final int ptype) {
 
-		final HeaderInfo geneHeader = getGeneHeaderInfo();
+		final HeaderInfo geneHeader = getRowHeaderInfo();
 		// final boolean result = checkCorrespondence(tempTable, geneHeader,
 		// ptype);
 		final boolean result = checkCorrespondence(labels, geneHeader, ptype);
@@ -197,7 +197,7 @@ public class KnnModel extends TVModel implements DataModel {
 
 	public void setAClusters(final String[][] labels, final int kagparse) {
 
-		final HeaderInfo arrayHeader = getArrayHeaderInfo();
+		final HeaderInfo arrayHeader = getColumnHeaderInfo();
 		// final boolean result = checkCorrespondence(tempTable, arrayHeader,
 		// kagparse);
 		final boolean result = checkCorrespondence(labels, arrayHeader,
@@ -217,8 +217,8 @@ public class KnnModel extends TVModel implements DataModel {
 
 	public void parseClusters() throws LoadException {
 
-		gClusterMembers = calculateMembership(getGeneHeaderInfo(), "GROUP");
-		aClusterMembers = calculateMembership(getArrayHeaderInfo(), "GROUP");
+		gClusterMembers = calculateMembership(getRowHeaderInfo(), "GROUP");
+		aClusterMembers = calculateMembership(getColumnHeaderInfo(), "GROUP");
 	}
 
 	public int[][] calculateMembership(final HeaderInfo headerInfo,

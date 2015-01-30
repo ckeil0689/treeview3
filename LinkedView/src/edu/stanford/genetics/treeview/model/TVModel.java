@@ -101,13 +101,13 @@ public class TVModel extends Observable implements DataModel {
 
 	// accessor methods
 	@Override
-	public IntHeaderInfo getGeneHeaderInfo() {
+	public IntHeaderInfo getRowHeaderInfo() {
 
 		return geneHeaderInfo;
 	}
 
 	@Override
-	public IntHeaderInfo getArrayHeaderInfo() {
+	public IntHeaderInfo getColumnHeaderInfo() {
 
 		return arrayHeaderInfo;
 	}
@@ -433,7 +433,7 @@ public class TVModel extends Observable implements DataModel {
 
 		final String[] msg = { "Selected TVModel Stats",
 				"Source = " + getSource(), "Nexpr   = " + nExpr(),
-				"NGeneHeader = " + getGeneHeaderInfo().getNumNames(),
+				"NGeneHeader = " + getRowHeaderInfo().getNumNames(),
 				"Ngene   = " + nGene(), "eweight  = " + eweightFound,
 				"gweight  = " + gweightFound, "aid  = " + aidFound,
 				"gid  = " + gidFound };

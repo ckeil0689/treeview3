@@ -32,10 +32,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -50,7 +48,6 @@ import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeSelectionI;
-import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.WideComboBox;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 
@@ -66,7 +63,6 @@ import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 public abstract class HeaderFinderBox {
 
 	protected TreeSelectionI searchSelection;
-	protected ViewFrame viewFrame;
 
 	private HeaderInfo headerInfo;
 	private HeaderSummary headerSummary;
@@ -74,6 +70,7 @@ public abstract class HeaderFinderBox {
 	private List<String> searchDataList;
 	private String[] searchDataHeaders = { "" };
 	private WideComboBox searchTermBox;
+	private final String type;
 	
 	//These are in order to determine whether a search result is currently visible and if so, to zoom out
 	protected TreeSelectionI otherSelection;
@@ -99,11 +96,9 @@ public abstract class HeaderFinderBox {
 //		//this.globalview = globalview;
 //	}
 
-	private HeaderFinderBox(final JFrame f) {
-
-		super();
-		this.viewFrame = null;
+	public HeaderFinderBox(final String type) {
 		
+		this.type = type;
 //		final String[] labeledHeaders = setupData(type);
 //
 //		searchTermBox = GUIFactory.createWideComboBox(labeledHeaders);
@@ -116,7 +111,66 @@ public abstract class HeaderFinderBox {
 //				new BoxKeyListener());
 	}
 	
-	private String[] setupData(String type) {
+	/* >>>> Update the object with new data <<<<<< */
+	public void setSelection(TreeSelectionI searchSelection, 
+			TreeSelectionI otherSelection) {
+		
+		this.searchSelection = searchSelection;
+		this.otherSelection = otherSelection;
+	}
+	
+	public void setHeaderSummary(HeaderSummary headerSummary) {
+		
+		this.headerSummary = headerSummary;
+	}
+	
+	public void setHeaderInfo(HeaderInfo searchHI, HeaderInfo otherHI) {
+		
+		this.headerInfo = searchHI;
+		this.otherHeaderInfo = otherHI;
+	}
+	
+	public void setMapContainers(MapContainer searchMap, 
+			MapContainer otherMap) {
+		
+		this.globalSmap = searchMap;
+		this.globalOmap = otherMap;
+	}
+	
+	public void setNewSearchTermBox() {
+		
+		if(headerSummary == null 
+				|| (headerInfo == null || otherHeaderInfo == null) ) {
+			setEmptySearchTermBox();
+			return;
+		}
+		
+		String[] labels = setupData();
+		
+		this.searchTermBox = GUIFactory.createWideComboBox(labels);
+		searchTermBox.setEditable(true);
+		searchTermBox.setBorder(null);
+		searchTermBox.setBackground(GUIFactory.DARK_BG);
+		AutoCompleteDecorator.decorate(searchTermBox);
+		
+		searchTermBox.getEditor().getEditorComponent().addKeyListener(
+				new BoxKeyListener());
+	}
+	
+	/**
+	 * Used for errors.
+	 */
+	public void setEmptySearchTermBox() {
+		
+		String[] labels = {"No data"};
+		
+		this.searchTermBox = GUIFactory.createWideComboBox(labels);
+		searchTermBox.setEditable(true);
+		searchTermBox.setBorder(null);
+		searchTermBox.setBackground(GUIFactory.DARK_BG);
+	}
+	
+	private String[] setupData() {
 		
 		final String[][] hA = headerInfo.getHeaderArray();
 
@@ -230,7 +284,7 @@ public abstract class HeaderFinderBox {
 			}
 		}
 
-		if((viewFrame != null) && (indexList.size() > 0) &&
+		if((indexList.size() > 0) &&
 				//At least part of the found min/max selected area is not visible
 				//This assumes that min is less than max and that the visible area is a contiguous block of visible indexes
 				(minIndex < globalSmap.getFirstVisible() ||
@@ -241,7 +295,7 @@ public abstract class HeaderFinderBox {
 			globalSmap.setHome();
 		}
 
-		if((viewFrame != null) && (otherIndexList.size() == 0 ||
+		if((otherIndexList.size() == 0 ||
 				 otherMinIndex < globalOmap.getFirstVisible() ||
 				 otherMaxIndex > (globalOmap.getFirstVisible() + globalOmap.getNumVisible() - 1))) {
 			
@@ -695,45 +749,6 @@ public abstract class HeaderFinderBox {
 		}
 	}
 	
-	/* >>>> Update the object with new data <<<<<< */
-	public void setSelection(TreeSelectionI searchSelection, 
-			TreeSelectionI otherSelection) {
-		
-		this.searchSelection = searchSelection;
-		this.otherSelection = otherSelection;
-	}
-	
-	public void setHeaderSummary(HeaderSummary headerSummary) {
-		
-		this.headerSummary = headerSummary;
-	}
-	
-	public void setHeaderInfo(HeaderInfo searchHI, HeaderInfo otherHI) {
-		
-		this.headerInfo = searchHI;
-		this.otherHeaderInfo = otherHI;
-	}
-	
-	public void setMapContainers(MapContainer searchMap, 
-			MapContainer otherMap) {
-		
-		this.globalSmap = searchMap;
-		this.globalOmap = otherMap;
-	}
-	
-	public void setNewSearchTermBox(String type) {
-		
-		String[] labels = setupData(type);
-		
-		this.searchTermBox = GUIFactory.createWideComboBox(labels);
-		searchTermBox.setEditable(true);
-		searchTermBox.setBorder(null);
-		searchTermBox.setBackground(GUIFactory.DARK_BG);
-		AutoCompleteDecorator.decorate(searchTermBox);
-		
-		searchTermBox.getEditor().getEditorComponent().addKeyListener(
-				new BoxKeyListener());
-	}
 	
 	/**
 	 * Test method for wild card search.
