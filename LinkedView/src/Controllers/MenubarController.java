@@ -143,8 +143,8 @@ public class MenubarController {
 	private void showSubData() {
 		
 		controller.showSubDataModel(
-				tvFrame.getGeneSelection().getSelectedIndexes(), 
-				tvFrame.getArraySelection().getSelectedIndexes(), 
+				tvFrame.getRowSelection().getSelectedIndexes(), 
+				tvFrame.getColumnSelection().getSelectedIndexes(), 
 				null, null);
 	}
 	

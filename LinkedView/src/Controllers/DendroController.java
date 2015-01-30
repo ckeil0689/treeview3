@@ -112,11 +112,14 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		
 		updateHeaderInfo();
 		bindComponentFunctions();
+		
 
 		dendroView.setupSearch(tvModel.getRowHeaderInfo(), 
 					tvModel.getColumnHeaderInfo(),
 					globalXmap, globalYmap);
 		dendroView.setupLayout();
+		
+		setObservables();
 		
 		setSavedScale();
 		
@@ -242,6 +245,12 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, modifier), 
 				"resetZoom");
 		action_map.put("resetZoom", new HomeAction());
+	}
+	
+	private void setObservables() {
+		
+		dendroView.getRowLabelView().getHeaderSummary().addObserver(this);
+		dendroView.getColumnLabelView().getHeaderSummary().addObserver(this);
 	}
 
 	/**
@@ -1325,18 +1334,18 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		// Handle selection
 		if (geneIndex != null) {
 			setGeneSelection(new ReorderedTreeSelection(
-					tvFrame.getGeneSelection(), geneIndex));
+					tvFrame.getRowSelection(), geneIndex));
 
 		} else {
-			setGeneSelection(tvFrame.getGeneSelection());
+			setGeneSelection(tvFrame.getRowSelection());
 		}
 
 		if (arrayIndex != null) {
 			setArraySelection(new ReorderedTreeSelection(
-					tvFrame.getArraySelection(), arrayIndex));
+					tvFrame.getColumnSelection(), arrayIndex));
 
 		} else {
-			setArraySelection(tvFrame.getArraySelection());
+			setArraySelection(tvFrame.getColumnSelection());
 		}
 
 		final ColorPresets colorPresets = DendrogramFactory.getColorPresets();

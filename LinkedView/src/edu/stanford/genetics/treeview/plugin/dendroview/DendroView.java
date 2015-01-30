@@ -1274,16 +1274,7 @@ public class DendroView implements Observer, DendroPanel {
 	public void setSearchTermBoxes() {
 
 		this.rowFinderBox = new RowFinderBox();
-//		rowFinderBox.setHeaderInfo(rowHI, columnHI);
-//		rowFinderBox.setHeaderSummary(getRowLabelView().getHeaderSummary());
-//		rowFinderBox.setMapContainers(ymap, xmap);
-//		rowFinderBox.setNewSearchTermBox();
-		
 		this.colFinderBox = new ColumnFinderBox();
-//		colFinderBox.setHeaderInfo(columnHI, rowHI);
-//		colFinderBox.setHeaderSummary(getColumnLabelView().getHeaderSummary());
-//		colFinderBox.setMapContainers(xmap, ymap);
-//		colFinderBox.setNewSearchTermBox();
 	}
 	
 	public void updateSearchTermBoxes(HeaderInfo rowHI, HeaderInfo columnHI,
@@ -1292,11 +1283,15 @@ public class DendroView implements Observer, DendroPanel {
 		rowFinderBox.setHeaderInfo(rowHI, columnHI);
 		rowFinderBox.setHeaderSummary(getRowLabelView().getHeaderSummary());
 		rowFinderBox.setMapContainers(ymap, xmap);
+		rowFinderBox.setSelection(tvFrame.getRowSelection(), 
+				tvFrame.getColumnSelection());
 		rowFinderBox.setNewSearchTermBox();
 		
 		colFinderBox.setHeaderInfo(columnHI, rowHI);
 		colFinderBox.setHeaderSummary(getColumnLabelView().getHeaderSummary());
 		colFinderBox.setMapContainers(xmap, ymap);
+		colFinderBox.setSelection(tvFrame.getColumnSelection(), 
+				tvFrame.getRowSelection());
 		colFinderBox.setNewSearchTermBox();
 		
 	}

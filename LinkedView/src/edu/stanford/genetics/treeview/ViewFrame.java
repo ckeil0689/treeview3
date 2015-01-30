@@ -365,7 +365,7 @@ implements Observer, ConfigNodePersistent {
 	 * 
 	 * @return The shared TreeSelection object for genes.
 	 */
-	public TreeSelectionI getGeneSelection() {
+	public TreeSelectionI getRowSelection() {
 
 		return geneSelection;
 	}
@@ -380,7 +380,7 @@ implements Observer, ConfigNodePersistent {
 	 * 
 	 * @return The shared TreeSelection object for arrays.
 	 */
-	public TreeSelectionI getArraySelection() {
+	public TreeSelectionI getColumnSelection() {
 
 		return arraySelection;
 	}
@@ -506,7 +506,7 @@ implements Observer, ConfigNodePersistent {
 
 	public boolean geneIsSelected(final int i) {
 
-		return getGeneSelection().isIndexSelected(i);
+		return getRowSelection().isIndexSelected(i);
 	}
 
 	/**

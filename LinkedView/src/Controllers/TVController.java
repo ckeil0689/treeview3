@@ -551,7 +551,7 @@ public class TVController implements Observer {
 
 			final GeneListMaker t = 
 					new GeneListMaker((JFrame) JFrame.getFrames()[0],
-					tvFrame.getGeneSelection(), model.getRowHeaderInfo(), def);
+					tvFrame.getRowSelection(), model.getRowHeaderInfo(), def);
 
 			t.setDataMatrix(model.getDataMatrix(), model.getColumnHeaderInfo(), 
 					DataModel.NODATA);
@@ -573,7 +573,7 @@ public class TVController implements Observer {
 
 			final GeneListMaker t = 
 					new GeneListMaker((JFrame) JFrame.getFrames()[0],
-					tvFrame.getGeneSelection(), model.getRowHeaderInfo(), 
+					tvFrame.getRowSelection(), model.getRowHeaderInfo(), 
 					source.getDir() + source.getRoot() + "_data.cdt");
 
 			t.setDataMatrix(model.getDataMatrix(), model.getColumnHeaderInfo(), 
@@ -595,7 +595,7 @@ public class TVController implements Observer {
 	 */
 	public boolean warnSelectionEmpty() {
 
-		final TreeSelectionI treeSelection = tvFrame.getGeneSelection();
+		final TreeSelectionI treeSelection = tvFrame.getRowSelection();
 
 		if ((treeSelection == null)
 				|| (treeSelection.getNSelectedIndexes() <= 0)) {
