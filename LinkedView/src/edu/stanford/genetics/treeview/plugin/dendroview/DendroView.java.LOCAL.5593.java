@@ -470,11 +470,7 @@ public class DendroView implements Observer, DendroPanel {
 		}
 
 		/* Column widths */
-//<<<<<<< HEAD
 		final double textViewCol = (100 - gvWidth - 1) / 2;
-//=======
-//		double textViewCol = (100 - gvWidth - 1) / 2;
-//>>>>>>> 09c8ed0345319804c3b449623edf0facadf70c62
 
 		/* Heights */
 		final double arrayRow = (100 - gvHeight - 2);
@@ -487,40 +483,22 @@ public class DendroView implements Observer, DendroPanel {
 		} else {
 			gvHeight = MAX_GV_HEIGHT;
 		}
-//<<<<<<< HEAD
-//
-//		dendroPane.add(firstPanel, "w " + textViewCol + "%, " + "h " + arrayRow
-//				+ "%, pushx");
-//
-//		dendroPane.add(arrayContainer, "w " + gvWidth + "%, " + "h " + arrayRow
-//				+ "%, growx");
-//
-//		dendroPane.add(navContainer, "span 1 2, w " + (textViewCol - 1)
-//				+ "%!, h 100%, wrap");
-//
-//		dendroPane.add(geneContainer, "w " + textViewCol + "%, " + "h "
-//				+ gvHeight + "%, growy");
-//
-//		dendroPane.add(globalViewContainer, "w " + gvWidth + "%, " + "h "
-//				+ gvHeight + "%, grow, wrap");
-//
-//=======
-		
-		dendroPane.add(firstPanel, "w " + textViewCol + "%, wmin 200, "
-				+ "h " + arrayRow + "%, pushx");
-		
-		dendroPane.add(arrayContainer, "w " + gvWidth + "%, "
-				+ "h " + arrayRow + "%, growx");
-		
-		dendroPane.add(navContainer, "span 1 2, w 300, growx 0, h 100%, wrap");
-		
-		dendroPane.add(geneContainer, "w " + textViewCol + "%, "
-				+ "h " + gvHeight + "%, growy");
-		
-		dendroPane.add(globalViewContainer, "w " + gvWidth + "%, "
-				+ "h " + gvHeight + "%, grow, wrap");
-		
-//>>>>>>> 09c8ed0345319804c3b449623edf0facadf70c62
+
+		dendroPane.add(firstPanel, "w " + textViewCol + "%, " + "h " + arrayRow
+				+ "%, pushx");
+
+		dendroPane.add(arrayContainer, "w " + gvWidth + "%, " + "h " + arrayRow
+				+ "%, growx");
+
+		dendroPane.add(navContainer, "span 1 2, w " + (textViewCol - 1)
+				+ "%!, h 100%, wrap");
+
+		dendroPane.add(geneContainer, "w " + textViewCol + "%, " + "h "
+				+ gvHeight + "%, growy");
+
+		dendroPane.add(globalViewContainer, "w " + gvWidth + "%, " + "h "
+				+ gvHeight + "%, grow, wrap");
+
 		dendroPane.add(bottomPanel, "span, h " + bottomRow + "%");
 
 		dendroPane.revalidate();
