@@ -1,6 +1,5 @@
 package Controllers;
 
-import java.awt.Cursor;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,9 +7,9 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.Observable;
@@ -21,7 +20,6 @@ import java.util.prefs.Preferences;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.InputMap;
@@ -29,6 +27,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -283,6 +282,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		dendroView.addZoomListener(new ZoomListener());
 		dendroView.addCompListener(new ResizeListener());
 		dendroView.addSearchCloseListener(new CloseSearchAction());
+		dendroView.addDividerListener(new DividerListener());
 	}
 
 	/**
@@ -406,6 +406,16 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			LogBuffer.println("Hiding search.");
 			setSearchVisible(false);
 		}
+	}
+	
+	private class DividerListener implements PropertyChangeListener {
+
+		@Override
+		public void propertyChange(PropertyChangeEvent evt) {
+			
+			dendroView.updateTreeMenuBtn((JSplitPane)evt.getSource());
+		}
+		
 	}
 	
 	/*>>>>>>> Mapped Key Actions <<<<<<<<< */

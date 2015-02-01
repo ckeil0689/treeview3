@@ -30,6 +30,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentListener;
 import java.awt.event.ContainerListener;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.prefs.Preferences;
@@ -391,8 +392,7 @@ public class DendroView implements Observer, DendroPanel {
 		
 		double oldRowDiv = tvFrame.getConfigNode().getDouble("gtr_loc", 0.5);
 		if(rowTreeView.isEnabled()) {
-			rowTreePane.setDividerLocation(oldRowDiv);//tvFrame.getConfigNode()
-					//.getDouble("gtr_loc", 0.5));
+			rowTreePane.setDividerLocation(oldRowDiv);
 		} else {
 			rowTreePane.setDividerLocation(0.0);
 			rowTreePane.setEnabled(false);
@@ -411,7 +411,6 @@ public class DendroView implements Observer, DendroPanel {
 		double oldColDiv = tvFrame.getConfigNode().getDouble("atr_loc", 0.5);
 		if(colTreeView.isEnabled()) {
 			colTreePane.setDividerLocation(oldColDiv);
-					//tvFrame.getConfigNode().getDouble("atr_loc", 0.5));
 		} else {
 			colTreePane.setDividerLocation(0.0);
 			colTreePane.setEnabled(false);
@@ -562,6 +561,15 @@ public class DendroView implements Observer, DendroPanel {
 		rowFinderBox.seekAll();
 		colFinderBox.seekAll();
 	}
+	
+	public void updateTreeMenuBtn(JSplitPane srcPane) {
+		
+		if(srcPane.getDividerLocation() == 0) {
+			showTreesMenuItem.setText("Show trees...");
+		} else {
+			showTreesMenuItem.setText("Hide trees...");
+		}
+	}
 
 	/*>>>>>>>>>> UI component listeners <<<<<<<<<<*/
 	/**
@@ -631,6 +639,17 @@ public class DendroView implements Observer, DendroPanel {
 		if(searchCloseBtn.getActionListeners().length == 0) {
 			searchCloseBtn.addActionListener(l);
 		}
+	}
+	
+	/**
+	 * Add listener for divider movement and position for the Tree/ Label
+	 * JSplitPanes. 
+	 * @param l
+	 */
+	public void addDividerListener(final PropertyChangeListener l) {
+		
+		rowTreePane.addPropertyChangeListener(l);
+		colTreePane.addPropertyChangeListener(l);
 	}
 
 	// Methods
