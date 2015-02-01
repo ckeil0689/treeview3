@@ -389,9 +389,10 @@ public class DendroView implements Observer, DendroPanel {
 		colorDivider(rowTreePane);
 		rowTreePane.setBorder(null);
 		
+		double oldRowDiv = tvFrame.getConfigNode().getDouble("gtr_loc", 0.5);
 		if(rowTreeView.isEnabled()) {
-			rowTreePane.setDividerLocation(tvFrame.getConfigNode()
-					.getDouble("gtr_loc", 0.5));
+			rowTreePane.setDividerLocation(oldRowDiv);//tvFrame.getConfigNode()
+					//.getDouble("gtr_loc", 0.5));
 		} else {
 			rowTreePane.setDividerLocation(0.0);
 			rowTreePane.setEnabled(false);
@@ -407,20 +408,23 @@ public class DendroView implements Observer, DendroPanel {
 		colorDivider(colTreePane);
 		colTreePane.setBorder(null);
 		
+		double oldColDiv = tvFrame.getConfigNode().getDouble("atr_loc", 0.5);
 		if(colTreeView.isEnabled()) {
-			colTreePane.setDividerLocation(tvFrame.getConfigNode()
-					.getDouble("atr_loc", 0.5));
+			colTreePane.setDividerLocation(oldColDiv);
+					//tvFrame.getConfigNode().getDouble("atr_loc", 0.5));
 		} else {
 			colTreePane.setDividerLocation(0.0);
 			colTreePane.setEnabled(false);
 		}
 		
+		/* If trees in general are disabled */
 		if(!treesEnabled() && showTreesMenuItem != null) {
 			showTreesMenuItem.setEnabled(false);
-		}
-		
-		if(getDivLoc(colTreeView) > 0.0 || getDivLoc(rowTreeView) > 0.0) {
-			showTreesMenuItem.setText("Hide Trees...");
+		} else {
+			/* If trees are visible from the start */
+			if(oldRowDiv > 0.0 || oldColDiv > 0.0) {
+				showTreesMenuItem.setText("Hide trees...");
+			}
 		}
 			
 		rowLabelpanel.add(rowLabelView.getComponent(), "push, grow");
