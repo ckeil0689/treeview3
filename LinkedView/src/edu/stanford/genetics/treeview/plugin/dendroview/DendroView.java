@@ -30,6 +30,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentListener;
 import java.awt.event.ContainerListener;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.prefs.Preferences;
@@ -145,9 +146,15 @@ public class DendroView implements Observer, DendroPanel {
 	/* TODO needed? ... */
 	private double gvWidth;
 	private double gvHeight;
-
-	private boolean showSearch;
-
+//<<<<<<< HEAD
+//
+//	private boolean showSearch;
+//
+//=======
+	
+	private boolean isSearchVisible;
+	
+//>>>>>>> bugFix
 	/* Maximum GlobalView dimensions in percent */
 	public static final double MAX_GV_WIDTH = 75;
 	public static final double MAX_GV_HEIGHT = 80;
@@ -218,9 +225,15 @@ public class DendroView implements Observer, DendroPanel {
 		// Set up column dendrogram
 		colTreeView = new ColumnTreeView();
 		colTreeView.getHeaderSummary().setIncluded(new int[] { 0, 3 });
-
-		showSearch = false;
-
+//<<<<<<< HEAD
+//
+//		showSearch = false;
+//
+//=======
+		
+		isSearchVisible = false;
+		
+//>>>>>>> bugFix
 		setupScaleButtons();
 	}
 
@@ -233,28 +246,46 @@ public class DendroView implements Observer, DendroPanel {
 
 		this.globalYmap = ymap;
 	}
-
-	public void prepareView(final HeaderInfo geneHI, final HeaderInfo arrayHI,
-			final MapContainer xmap, final MapContainer ymap) {
-
-		setupSearch(geneHI, arrayHI, xmap, ymap);
-		setupLayout();
-	}
-
-	public void resetMatrixSize() {
-
-		setupLayout();
-	}
-
-	public void setMatrixHome(final boolean isHome) {
-
+//<<<<<<< HEAD
+//
+//	public void prepareView(final HeaderInfo geneHI, final HeaderInfo arrayHI,
+//			final MapContainer xmap, final MapContainer ymap) {
+//
+//		setupSearch(geneHI, arrayHI, xmap, ymap);
+//		setupLayout();
+//	}
+//
+//	public void resetMatrixSize() {
+//
+//		setupLayout();
+//	}
+//
+//	public void setMatrixHome(final boolean isHome) {
+//
+//		globalview.resetHome(isHome);
+//	}
+//
+//	public void setShowSearch() {
+//
+//		showSearch = !showSearch;
+//		setupLayout();
+//=======
+	
+	public void setMatrixHome(boolean isHome) {
+		
 		globalview.resetHome(isHome);
 	}
-
-	public void setShowSearch() {
-
-		showSearch = !showSearch;
+	
+	public void setSearchVisible(boolean visible) {
+		
+		this.isSearchVisible = visible;
 		setupLayout();
+	}
+	
+	public boolean isSearchVisible() {
+		
+		return isSearchVisible;
+//>>>>>>> bugFix
 	}
 
 	/**
@@ -321,11 +352,20 @@ public class DendroView implements Observer, DendroPanel {
 	 * @param xmap
 	 * @param ymap
 	 */
-	private void setupSearch(final HeaderInfo geneHI, final HeaderInfo arrayHI,
-			final MapContainer xmap, final MapContainer ymap) {
-
-		setSearchTermBoxes(geneHI, arrayHI, xmap, ymap);
-
+//<<<<<<< HEAD
+//	private void setupSearch(final HeaderInfo geneHI, final HeaderInfo arrayHI,
+//			final MapContainer xmap, final MapContainer ymap) {
+//
+//		setSearchTermBoxes(geneHI, arrayHI, xmap, ymap);
+//
+//=======
+	public void setupSearch(final HeaderInfo geneHI, 
+			final HeaderInfo arrayHI, MapContainer xmap, MapContainer ymap) {
+		
+		setSearchTermBoxes();
+		updateSearchTermBoxes(geneHI, arrayHI, xmap, ymap);
+		
+//>>>>>>> bugFix
 		searchBtn = GUIFactory.createIconBtn("searchIcon");
 		searchBtn.setBorder(null);
 		searchBtn.setToolTipText(StringRes.tt_searchRowCol);
@@ -335,11 +375,16 @@ public class DendroView implements Observer, DendroPanel {
 		searchCloseBtn.setBorder(null);
 		searchCloseBtn.setBackground(null);
 	}
-
+//<<<<<<< HEAD
+//
+//=======
+//	
+//	
+//>>>>>>> bugFix
 	/**
 	 * Manages the component layout in TreeViewFrame
 	 */
-	private void setupLayout() {
+	public void setupLayout() {
 
 		LogBuffer.println("DendroPane layout called.");
 
@@ -395,10 +440,17 @@ public class DendroView implements Observer, DendroPanel {
 
 		colorDivider(rowTreePane);
 		rowTreePane.setBorder(null);
-
-		if (rowTreeView.isEnabled()) {
-			rowTreePane.setDividerLocation(tvFrame.getConfigNode().getDouble(
-					"gtr_loc", 0.5));
+//<<<<<<< HEAD
+//
+//		if (rowTreeView.isEnabled()) {
+//			rowTreePane.setDividerLocation(tvFrame.getConfigNode().getDouble(
+//					"gtr_loc", 0.5));
+//=======
+		
+		double oldRowDiv = tvFrame.getConfigNode().getDouble("gtr_loc", 0.5);
+		if(rowTreeView.isEnabled()) {
+			rowTreePane.setDividerLocation(oldRowDiv);
+//>>>>>>> bugFix
 		} else {
 			rowTreePane.setDividerLocation(0.0);
 			rowTreePane.setEnabled(false);
@@ -413,21 +465,40 @@ public class DendroView implements Observer, DendroPanel {
 
 		colorDivider(colTreePane);
 		colTreePane.setBorder(null);
-
-		if (colTreeView.isEnabled()) {
-			colTreePane.setDividerLocation(tvFrame.getConfigNode().getDouble(
-					"atr_loc", 0.5));
+//<<<<<<< HEAD
+//
+//		if (colTreeView.isEnabled()) {
+//			colTreePane.setDividerLocation(tvFrame.getConfigNode().getDouble(
+//					"atr_loc", 0.5));
+//=======
+		
+		double oldColDiv = tvFrame.getConfigNode().getDouble("atr_loc", 0.5);
+		if(colTreeView.isEnabled()) {
+			colTreePane.setDividerLocation(oldColDiv);
+//>>>>>>> bugFix
 		} else {
 			colTreePane.setDividerLocation(0.0);
 			colTreePane.setEnabled(false);
 		}
-
-		if (!treesEnabled() && showTreesMenuItem != null) {
+//<<<<<<< HEAD
+//
+//		if (!treesEnabled() && showTreesMenuItem != null) {
+//			showTreesMenuItem.setEnabled(false);
+//		}
+//
+//		if (getDivLoc(colTreeView) > 0.0 || getDivLoc(rowTreeView) > 0.0) {
+//			showTreesMenuItem.setText("Hide Trees...");
+//=======
+		
+		/* If trees in general are disabled */
+		if(!treesEnabled() && showTreesMenuItem != null) {
 			showTreesMenuItem.setEnabled(false);
-		}
-
-		if (getDivLoc(colTreeView) > 0.0 || getDivLoc(rowTreeView) > 0.0) {
-			showTreesMenuItem.setText("Hide Trees...");
+		} else {
+			/* If trees are visible from the start */
+			if(oldRowDiv > 0.0 || oldColDiv > 0.0) {
+				showTreesMenuItem.setText("Hide trees...");
+			}
+//>>>>>>> bugFix
 		}
 
 		rowLabelpanel.add(rowLabelView.getComponent(), "push, grow");
@@ -477,7 +548,11 @@ public class DendroView implements Observer, DendroPanel {
 		final double bottomRow = 2;
 
 		/* Adding all components to the dendroPane */
-		if (showSearch) {
+//<<<<<<< HEAD
+//		if (showSearch) {
+//=======
+		if(isSearchVisible) {
+//>>>>>>> bugFix
 			gvHeight -= 2;
 			dendroPane.add(this.makeSearchPanel(), "w 100%, h 2%, span, wrap");
 		} else {
@@ -568,6 +643,15 @@ public class DendroView implements Observer, DendroPanel {
 		rowFinderBox.seekAll();
 		colFinderBox.seekAll();
 	}
+	
+	public void updateTreeMenuBtn(JSplitPane srcPane) {
+		
+		if(srcPane.getDividerLocation() == 0) {
+			showTreesMenuItem.setText("Show trees...");
+		} else {
+			showTreesMenuItem.setText("Hide trees...");
+		}
+	}
 
 	/* >>>>>>>>>> UI component listeners <<<<<<<<<< */
 	/**
@@ -639,6 +723,17 @@ public class DendroView implements Observer, DendroPanel {
 		if (searchCloseBtn.getActionListeners().length == 0) {
 			searchCloseBtn.addActionListener(l);
 		}
+	}
+	
+	/**
+	 * Add listener for divider movement and position for the Tree/ Label
+	 * JSplitPanes. 
+	 * @param l
+	 */
+	public void addDividerListener(final PropertyChangeListener l) {
+		
+		rowTreePane.addPropertyChangeListener(l);
+		colTreePane.addPropertyChangeListener(l);
 	}
 
 	// Methods
@@ -1195,18 +1290,44 @@ public class DendroView implements Observer, DendroPanel {
 		this.tvFrame = viewFrame;
 	}
 
-	public void setSearchTermBoxes(final HeaderInfo geneHI,
-			final HeaderInfo arrayHI, final MapContainer xmap,
-			final MapContainer ymap) {
+//<<<<<<< HEAD
+//	public void setSearchTermBoxes(final HeaderInfo geneHI,
+//			final HeaderInfo arrayHI, final MapContainer xmap,
+//			final MapContainer ymap) {
+//
+//		this.rowFinderBox = new RowFinderBox(tvFrame, geneHI, getRowLabelView()
+//				.getHeaderSummary(), tvFrame.getGeneSelection(), ymap, xmap,
+//				tvFrame.getArraySelection(), arrayHI);
+//
+//		this.colFinderBox = new ColumnFinderBox(tvFrame, arrayHI,
+//				getColumnLabelView().getHeaderSummary(),
+//				tvFrame.getArraySelection(), xmap, ymap,
+//				tvFrame.getGeneSelection(), geneHI);
+//=======
+	public void setSearchTermBoxes() {
 
-		this.rowFinderBox = new RowFinderBox(tvFrame, geneHI, getRowLabelView()
-				.getHeaderSummary(), tvFrame.getGeneSelection(), ymap, xmap,
-				tvFrame.getArraySelection(), arrayHI);
-
-		this.colFinderBox = new ColumnFinderBox(tvFrame, arrayHI,
-				getColumnLabelView().getHeaderSummary(),
-				tvFrame.getArraySelection(), xmap, ymap,
-				tvFrame.getGeneSelection(), geneHI);
+		this.rowFinderBox = new RowFinderBox();
+		this.colFinderBox = new ColumnFinderBox();
+	}
+	
+	public void updateSearchTermBoxes(HeaderInfo rowHI, HeaderInfo columnHI,
+			MapContainer xmap, MapContainer ymap) {
+		
+		rowFinderBox.setHeaderInfo(rowHI, columnHI);
+		rowFinderBox.setHeaderSummary(getRowLabelView().getHeaderSummary());
+		rowFinderBox.setMapContainers(ymap, xmap);
+		rowFinderBox.setSelection(tvFrame.getRowSelection(), 
+				tvFrame.getColumnSelection());
+		rowFinderBox.setNewSearchTermBox();
+		
+		colFinderBox.setHeaderInfo(columnHI, rowHI);
+		colFinderBox.setHeaderSummary(getColumnLabelView().getHeaderSummary());
+		colFinderBox.setMapContainers(xmap, ymap);
+		colFinderBox.setSelection(tvFrame.getColumnSelection(), 
+				tvFrame.getRowSelection());
+		colFinderBox.setNewSearchTermBox();
+		
+//>>>>>>> bugFix
 	}
 
 	@Override

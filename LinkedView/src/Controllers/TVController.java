@@ -161,10 +161,20 @@ public class TVController implements Observer {
 
 		dendroController.toggleTrees();
 	}
-
-	public void toggleSearch() {
-
-		dendroController.toggleSearch();
+//<<<<<<< HEAD
+//
+//	public void toggleSearch() {
+//
+//		dendroController.toggleSearch();
+//=======
+	
+	public void setSearchVisible() {
+		
+		/* Don't do anything if search panel is visible (closing only via X) */
+		if(!tvFrame.getDendroView().isSearchVisible()) {
+			dendroController.setSearchVisible(true);
+		}
+//>>>>>>> bugFix
 	}
 
 	/**
@@ -270,20 +280,32 @@ public class TVController implements Observer {
 		final TVModel tvModel = (TVModel) model;
 
 		try {
-			if (dendroController.hasDendroView()) {
-				final String[] geneNames = tvModel.getGeneHeaderInfo()
-						.getNames();
-				final String[] arrayNames = tvModel.getArrayHeaderInfo()
-						.getNames();
-
+//<<<<<<< HEAD
+//			if (dendroController.hasDendroView()) {
+//				final String[] geneNames = tvModel.getGeneHeaderInfo()
+//						.getNames();
+//				final String[] arrayNames = tvModel.getArrayHeaderInfo()
+//						.getNames();
+//
+//=======
+			if(dendroController.hasDendroView()) {
+				String[] geneNames = tvModel.getRowHeaderInfo().getNames();
+				String[] arrayNames = tvModel.getColumnHeaderInfo().getNames();
+				
+//>>>>>>> bugFix
 				storeSelectedLabels(geneNames, arrayNames);
 			}
 
 			/* ensure reset of the model data */
 			tvModel.resetState();
 			tvModel.setSource(fileMenuSet);
-
-			if (tvModel.getArrayHeaderInfo().getNumHeaders() == 0) {
+//<<<<<<< HEAD
+//
+//			if (tvModel.getArrayHeaderInfo().getNumHeaders() == 0) {
+//=======
+			
+			if(tvModel.getColumnHeaderInfo().getNumHeaders() == 0) {
+//>>>>>>> bugFix
 				/* ------ Load Process -------- */
 				final ModelLoader loader = new ModelLoader(tvModel, this);
 				loader.execute();
@@ -371,20 +393,36 @@ public class TVController implements Observer {
 	 * after the model has been loaded and the new DendroView was set up.
 	 */
 	private void resetLabelSelection() {
-
-		final int[] newGSelected = new int[] { 0 };
-		final String[] geneNames = model.getGeneHeaderInfo().getNames();
-		for (int i = 0; i < geneNames.length; i++) {
-			if (geneNames[i].equalsIgnoreCase(selectedLabels[0])) {
+//<<<<<<< HEAD
+//
+//		final int[] newGSelected = new int[] { 0 };
+//		final String[] geneNames = model.getGeneHeaderInfo().getNames();
+//		for (int i = 0; i < geneNames.length; i++) {
+//			if (geneNames[i].equalsIgnoreCase(selectedLabels[0])) {
+//=======
+		
+		int[] newGSelected = new int[]{0};
+		String[] geneNames = model.getRowHeaderInfo().getNames();
+		for(int i = 0; i < geneNames.length; i++) {
+			if(geneNames[i].equalsIgnoreCase(selectedLabels[0])) {
+//>>>>>>> bugFix
 				newGSelected[0] = i;
 				break;
 			}
 		}
-
-		final int[] newASelected = new int[] { 0 };
-		final String[] arrayNames = model.getArrayHeaderInfo().getNames();
-		for (int i = 0; i < arrayNames.length; i++) {
-			if (arrayNames[i].equalsIgnoreCase(selectedLabels[1])) {
+//<<<<<<< HEAD
+//
+//		final int[] newASelected = new int[] { 0 };
+//		final String[] arrayNames = model.getArrayHeaderInfo().getNames();
+//		for (int i = 0; i < arrayNames.length; i++) {
+//			if (arrayNames[i].equalsIgnoreCase(selectedLabels[1])) {
+//=======
+		
+		int[] newASelected = new int[]{0};
+		String[] arrayNames = model.getColumnHeaderInfo().getNames();
+		for(int i = 0; i < arrayNames.length; i++) {
+			if(arrayNames[i].equalsIgnoreCase(selectedLabels[1])) {
+//>>>>>>> bugFix
 				newASelected[0] = i;
 				break;
 			}
@@ -468,14 +506,24 @@ public class TVController implements Observer {
 
 		// extractors...
 		final UrlPresets genePresets = tvFrame.getGeneUrlPresets();
-		final UrlExtractor urlExtractor = new UrlExtractor(
-				model.getGeneHeaderInfo(), genePresets);
+//<<<<<<< HEAD
+//		final UrlExtractor urlExtractor = new UrlExtractor(
+//				model.getGeneHeaderInfo(), genePresets);
+//=======
+		final UrlExtractor urlExtractor = new UrlExtractor(model
+				.getRowHeaderInfo(), genePresets);
+//>>>>>>> bugFix
 		urlExtractor.bindConfig(documentConfig.node("UrlExtractor"));
 		tvFrame.setUrlExtractor(urlExtractor);
 
 		final UrlPresets arrayPresets = tvFrame.getArrayUrlPresets();
-		final UrlExtractor arrayUrlExtractor = new UrlExtractor(
-				model.getArrayHeaderInfo(), arrayPresets);
+//<<<<<<< HEAD
+//		final UrlExtractor arrayUrlExtractor = new UrlExtractor(
+//				model.getArrayHeaderInfo(), arrayPresets);
+//=======
+		final UrlExtractor arrayUrlExtractor = new UrlExtractor(model
+				.getColumnHeaderInfo(), arrayPresets);
+//>>>>>>> bugFix
 		arrayUrlExtractor.bindConfig(documentConfig.node("ArrayUrlExtractor"));
 		tvFrame.setArrayUrlExtractor(arrayUrlExtractor);
 
@@ -551,11 +599,19 @@ public class TVController implements Observer {
 				def = source.getDir() + source.getRoot() + "_list.txt";
 			}
 
-			final GeneListMaker t = new GeneListMaker(
-					(JFrame) Frame.getFrames()[0], tvFrame.getGeneSelection(),
-					model.getGeneHeaderInfo(), def);
+//<<<<<<< HEAD
+//			final GeneListMaker t = new GeneListMaker(
+//					(JFrame) Frame.getFrames()[0], tvFrame.getGeneSelection(),
+//					model.getGeneHeaderInfo(), def);
+//
+//			t.setDataMatrix(model.getDataMatrix(), model.getArrayHeaderInfo(),
+//=======
+			final GeneListMaker t = 
+					new GeneListMaker((JFrame) JFrame.getFrames()[0],
+					tvFrame.getRowSelection(), model.getRowHeaderInfo(), def);
 
-			t.setDataMatrix(model.getDataMatrix(), model.getArrayHeaderInfo(),
+			t.setDataMatrix(model.getDataMatrix(), model.getColumnHeaderInfo(), 
+//>>>>>>> bugFix
 					DataModel.NODATA);
 
 			t.setConfigNode(tvFrame.getConfigNode());
@@ -573,12 +629,21 @@ public class TVController implements Observer {
 		if (warnSelectionEmpty()) {
 			final FileSet source = model.getFileSet();
 
-			final GeneListMaker t = new GeneListMaker(
-					(JFrame) Frame.getFrames()[0], tvFrame.getGeneSelection(),
-					model.getGeneHeaderInfo(), source.getDir()
-							+ source.getRoot() + "_data.cdt");
+//<<<<<<< HEAD
+//			final GeneListMaker t = new GeneListMaker(
+//					(JFrame) Frame.getFrames()[0], tvFrame.getGeneSelection(),
+//					model.getGeneHeaderInfo(), source.getDir()
+//							+ source.getRoot() + "_data.cdt");
+//
+//			t.setDataMatrix(model.getDataMatrix(), model.getArrayHeaderInfo(),
+//=======
+			final GeneListMaker t = 
+					new GeneListMaker((JFrame) JFrame.getFrames()[0],
+					tvFrame.getRowSelection(), model.getRowHeaderInfo(), 
+					source.getDir() + source.getRoot() + "_data.cdt");
 
-			t.setDataMatrix(model.getDataMatrix(), model.getArrayHeaderInfo(),
+			t.setDataMatrix(model.getDataMatrix(), model.getColumnHeaderInfo(), 
+//>>>>>>> bugFix
 					DataModel.NODATA);
 
 			t.setConfigNode(tvFrame.getConfigNode());
@@ -597,7 +662,7 @@ public class TVController implements Observer {
 	 */
 	public boolean warnSelectionEmpty() {
 
-		final TreeSelectionI treeSelection = tvFrame.getGeneSelection();
+		final TreeSelectionI treeSelection = tvFrame.getRowSelection();
 
 		if ((treeSelection == null)
 				|| (treeSelection.getNSelectedIndexes() <= 0)) {
@@ -795,10 +860,17 @@ public class TVController implements Observer {
 			preferences.setGradientChooser(gradientPick);
 
 		}
-
-		if (menu.equalsIgnoreCase(StringRes.menu_RowAndCol)) {
-			preferences.setHeaderInfo(model.getGeneHeaderInfo(),
-					model.getArrayHeaderInfo());
+//<<<<<<< HEAD
+//
+//		if (menu.equalsIgnoreCase(StringRes.menu_RowAndCol)) {
+//			preferences.setHeaderInfo(model.getGeneHeaderInfo(),
+//					model.getArrayHeaderInfo());
+//=======
+		
+		if(menu.equalsIgnoreCase(StringRes.menu_RowAndCol)) {
+			preferences.setHeaderInfo(model.getRowHeaderInfo(), 
+					model.getColumnHeaderInfo());
+//>>>>>>> bugFix
 		}
 
 		preferences.setupLayout(menu);

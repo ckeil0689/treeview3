@@ -100,11 +100,19 @@ public class MenubarController {
 		case StringRes.menu_Hier:
 			controller.setupClusterView(ClusterView.HIER);
 			break;
-		// case StringRes.menu_KMeans:
-		// controller.setupClusterView(ClusterView.KMEANS);
-		// break;
-		case "Find Labels...":
-			controller.toggleSearch();
+//<<<<<<< HEAD
+//		// case StringRes.menu_KMeans:
+//		// controller.setupClusterView(ClusterView.KMEANS);
+//		// break;
+//		case "Find Labels...":
+//			controller.toggleSearch();
+//=======
+//		case StringRes.menu_KMeans:    	
+//			controller.setupClusterView(ClusterView.KMEANS);
+//			break;
+		case "Find Labels...":		
+			controller.setSearchVisible();
+//>>>>>>> bugFix
 			break;
 		case "Functional Enrichment":
 			tvFrame.displayWIP();
@@ -147,21 +155,37 @@ public class MenubarController {
 	 * a new view that only displays the selected data.
 	 */
 	private void showSubData() {
-
-		controller.showSubDataModel(tvFrame.getGeneSelection()
-				.getSelectedIndexes(), tvFrame.getArraySelection()
-				.getSelectedIndexes(), null, null);
+//<<<<<<< HEAD
+//
+//		controller.showSubDataModel(tvFrame.getGeneSelection()
+//				.getSelectedIndexes(), tvFrame.getArraySelection()
+//				.getSelectedIndexes(), null, null);
+//=======
+		
+		controller.showSubDataModel(
+				tvFrame.getRowSelection().getSelectedIndexes(), 
+				tvFrame.getColumnSelection().getSelectedIndexes(), 
+				null, null);
+//>>>>>>> bugFix
 	}
 
 	/**
 	 * Just opens a stats dialog.
 	 */
 	private void openStats() {
-
-		final String source = controller.getDataModel().getSource();
-		final int rowNum = controller.getDataModel().getGeneHeaderInfo()
+//<<<<<<< HEAD
+//
+//		final String source = controller.getDataModel().getSource();
+//		final int rowNum = controller.getDataModel().getGeneHeaderInfo()
+//				.getNumHeaders();
+//		final int colNum = controller.getDataModel().getArrayHeaderInfo()
+//=======
+		
+		String source = controller.getDataModel().getSource();
+		int rowNum = controller.getDataModel().getRowHeaderInfo()
 				.getNumHeaders();
-		final int colNum = controller.getDataModel().getArrayHeaderInfo()
+		int colNum = controller.getDataModel().getColumnHeaderInfo()
+//>>>>>>> bugFix
 				.getNumHeaders();
 
 		tvFrame.openStatsView(source, rowNum, colNum);

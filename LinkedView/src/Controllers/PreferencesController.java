@@ -269,17 +269,17 @@ public class PreferencesController {
 
 			HeaderInfo headerInfo = null;
 			if (type.equalsIgnoreCase(StringRes.main_rows)) {
-				headerInfo = model.getGeneHeaderInfo();
+				headerInfo = model.getRowHeaderInfo();
 
 			} else if (type.equalsIgnoreCase(StringRes.main_cols)) {
-				headerInfo = model.getArrayHeaderInfo();
+				headerInfo = model.getColumnHeaderInfo();
 			}
 
 			/*
 			 * Get number of rows without GID row. Done here to avoid passing
 			 * model.
 			 */
-			int geneNum = model.getGeneHeaderInfo().getNumNames();
+			int geneNum = model.getRowHeaderInfo().getNumNames();
 
 			if (model.gidFound()) {
 				geneNum--;

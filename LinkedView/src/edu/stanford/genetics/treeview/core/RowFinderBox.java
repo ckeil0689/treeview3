@@ -5,11 +5,14 @@
  */
 package edu.stanford.genetics.treeview.core;
 
-import edu.stanford.genetics.treeview.HeaderInfo;
-import edu.stanford.genetics.treeview.HeaderSummary;
-import edu.stanford.genetics.treeview.TreeSelectionI;
-import edu.stanford.genetics.treeview.ViewFrame;
-import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
+//<<<<<<< HEAD
+//import edu.stanford.genetics.treeview.HeaderInfo;
+//import edu.stanford.genetics.treeview.HeaderSummary;
+//import edu.stanford.genetics.treeview.TreeSelectionI;
+//import edu.stanford.genetics.treeview.ViewFrame;
+//import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
+//=======
+//>>>>>>> bugFix
 
 /**
  * @author aloksaldanha
@@ -22,14 +25,20 @@ public class RowFinderBox extends HeaderFinderBox {
 	 * @param hI
 	 * @param geneSelection
 	 */
-	public RowFinderBox(final ViewFrame f, final HeaderInfo hI,
-			final HeaderSummary headerSummary,
-			final TreeSelectionI geneSelection, final MapContainer globalXmap,
-			final MapContainer globalYmap, final TreeSelectionI arraySelection,
-			final HeaderInfo arrayHI) {
+//<<<<<<< HEAD
+//	public RowFinderBox(final ViewFrame f, final HeaderInfo hI,
+//			final HeaderSummary headerSummary,
+//			final TreeSelectionI geneSelection, final MapContainer globalXmap,
+//			final MapContainer globalYmap, final TreeSelectionI arraySelection,
+//			final HeaderInfo arrayHI) {
+//
+//		super(f, hI, headerSummary, geneSelection, "Row", globalXmap,
+//				globalYmap, arraySelection, arrayHI);
+//=======
+	public RowFinderBox() {
 
-		super(f, hI, headerSummary, geneSelection, "Row", globalXmap,
-				globalYmap, arraySelection, arrayHI);
+		super("Row");
+//>>>>>>> bugFix
 	}
 
 	/*

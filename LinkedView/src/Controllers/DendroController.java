@@ -1,6 +1,5 @@
 package Controllers;
 
-import java.awt.Cursor;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,18 +7,24 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+//<<<<<<< HEAD
+//import java.awt.event.MouseAdapter;
+//import java.awt.event.MouseEvent;
+//=======
+//>>>>>>> bugFix
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.InputMap;
@@ -28,6 +33,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -37,6 +43,7 @@ import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ReorderedTreeSelection;
@@ -66,7 +73,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.TreePainter;
  * @author chris0689
  *
  */
-public class DendroController implements ConfigNodePersistent {
+public class DendroController implements ConfigNodePersistent, Observer {
 
 	private DendroView dendroView;
 	private final TreeViewFrame tvFrame;
@@ -111,10 +118,21 @@ public class DendroController implements ConfigNodePersistent {
 
 		updateHeaderInfo();
 		bindComponentFunctions();
+		
 
-		dendroView.prepareView(tvModel.getGeneHeaderInfo(),
-				tvModel.getArrayHeaderInfo(), globalXmap, globalYmap);
+//<<<<<<< HEAD
+//		dendroView.prepareView(tvModel.getGeneHeaderInfo(),
+//				tvModel.getArrayHeaderInfo(), globalXmap, globalYmap);
 
+//=======
+		dendroView.setupSearch(tvModel.getRowHeaderInfo(), 
+					tvModel.getColumnHeaderInfo(),
+					globalXmap, globalYmap);
+		dendroView.setupLayout();
+		
+		setObservables();
+		
+//>>>>>>> bugFix
 		setSavedScale();
 
 		addKeyBindings();
@@ -241,6 +259,12 @@ public class DendroController implements ConfigNodePersistent {
 				"resetZoom");
 		action_map.put("resetZoom", new HomeAction());
 	}
+	
+	private void setObservables() {
+		
+		dendroView.getRowLabelView().getHeaderSummary().addObserver(this);
+		dendroView.getColumnLabelView().getHeaderSummary().addObserver(this);
+	}
 
 	/**
 	 * Recalculates proportions for the MapContainers, when the layout was
@@ -272,6 +296,7 @@ public class DendroController implements ConfigNodePersistent {
 		dendroView.addZoomListener(new ZoomListener());
 		dendroView.addCompListener(new ResizeListener());
 		dendroView.addSearchCloseListener(new CloseSearchAction());
+		dendroView.addDividerListener(new DividerListener());
 	}
 
 	/**
@@ -295,10 +320,18 @@ public class DendroController implements ConfigNodePersistent {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
+//<<<<<<< HEAD
 			/*
 			 * Putting the mapContainer objects in DendroView so that I can
 			 * control zoom-out of the found genes/arrays are outside the
 			 * visible area.
+=======
+			LogBuffer.println("Search init");
+			/* 
+			 * Putting the mapContainer objects in DendroView so 
+			 * that I can control zoom-out of the found genes/arrays are 
+			 * outside the visible area.
+>>>>>>> bugFix
 			 */
 			dendroView.setGlobalXMap(globalXmap);
 			dendroView.setGlobalYMap(globalYmap);
@@ -376,7 +409,9 @@ public class DendroController implements ConfigNodePersistent {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			toggleSearch();
+			if(!dendroView.isSearchVisible()) {
+				setSearchVisible(true);
+			}
 		}
 	}
 
@@ -386,34 +421,53 @@ public class DendroController implements ConfigNodePersistent {
 	 * @author chris0689
 	 *
 	 */
-	private class CloseSearchAction extends MouseAdapter implements
-			ActionListener {
+//<<<<<<< HEAD
+//	private class CloseSearchAction extends MouseAdapter implements
+//			ActionListener {
+//
+//		@Override
+//		public void mouseEntered(final MouseEvent e) {
+//
+//			dendroView.getCloseSearchBtn().setCursor(
+//					new Cursor(Cursor.HAND_CURSOR));
+//			dendroView
+//					.getCloseSearchBtn()
+//					.setBorder(
+//							BorderFactory
+//									.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+//
+//		}
+//
+//		@Override
+//		public void mouseExited(final MouseEvent e) {
+//
+//			dendroView.getCloseSearchBtn().setCursor(
+//					new Cursor(Cursor.DEFAULT_CURSOR));
+//			dendroView.getCloseSearchBtn().setBorder(null);
+//=======
+	private class CloseSearchAction implements ActionListener {
 
 		@Override
-		public void mouseEntered(final MouseEvent e) {
-
-			dendroView.getCloseSearchBtn().setCursor(
-					new Cursor(Cursor.HAND_CURSOR));
-			dendroView
-					.getCloseSearchBtn()
-					.setBorder(
-							BorderFactory
-									.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-
+		public void actionPerformed(ActionEvent e) {
+			
+			LogBuffer.println("Hiding search.");
+			setSearchVisible(false);
+//>>>>>>> bugFix
 		}
+	}
+	
+	private class DividerListener implements PropertyChangeListener {
 
 		@Override
-		public void mouseExited(final MouseEvent e) {
-
-			dendroView.getCloseSearchBtn().setCursor(
-					new Cursor(Cursor.DEFAULT_CURSOR));
-			dendroView.getCloseSearchBtn().setBorder(null);
-		}
-
-		@Override
-		public void actionPerformed(final ActionEvent e) {
-
-			toggleSearch();
+//<<<<<<< HEAD
+//		public void actionPerformed(final ActionEvent e) {
+//
+//			toggleSearch();
+//=======
+		public void propertyChange(PropertyChangeEvent evt) {
+			
+			dendroView.updateTreeMenuBtn((JSplitPane)evt.getSource());
+//>>>>>>> bugFix
 		}
 
 	}
@@ -735,11 +789,15 @@ public class DendroController implements ConfigNodePersistent {
 			setMatrixFill();
 			break;
 		}
-
-		dendroView.resetMatrixSize();
-		;
+//<<<<<<< HEAD
+//
+//		dendroView.resetMatrixSize();
+//		;
+//=======
+//		
+//>>>>>>> bugFix
 		addViewListeners();
-		resetMapContainers();
+		resetDendroView();
 	}
 
 	/**
@@ -850,9 +908,15 @@ public class DendroController implements ConfigNodePersistent {
 	/**
 	 * Toggles the search bars in DendroView.
 	 */
-	public void toggleSearch() {
-
-		dendroView.setShowSearch();
+//<<<<<<< HEAD
+//	public void toggleSearch() {
+//
+//		dendroView.setShowSearch();
+//=======
+	public void setSearchVisible(boolean visible) {
+		
+		dendroView.setSearchVisible(visible);
+//>>>>>>> bugFix
 		resetDendroView();
 	}
 
@@ -1312,8 +1376,8 @@ public class DendroController implements ConfigNodePersistent {
 	 */
 	public void setKMeansIndexes() {
 
-		if (tvModel.getArrayHeaderInfo().getIndex("GROUP") != -1) {
-			final HeaderInfo headerInfo = tvModel.getArrayHeaderInfo();
+		if (tvModel.getColumnHeaderInfo().getIndex("GROUP") != -1) {
+			final HeaderInfo headerInfo = tvModel.getColumnHeaderInfo();
 			final int groupIndex = headerInfo.getIndex("GROUP");
 
 			arrayIndex = getGroupVector(headerInfo, groupIndex);
@@ -1322,9 +1386,9 @@ public class DendroController implements ConfigNodePersistent {
 			arrayIndex = null;
 		}
 
-		if (tvModel.getGeneHeaderInfo().getIndex("GROUP") != -1) {
+		if (tvModel.getRowHeaderInfo().getIndex("GROUP") != -1) {
 			System.err.println("got gene group header");
-			final HeaderInfo headerInfo = tvModel.getGeneHeaderInfo();
+			final HeaderInfo headerInfo = tvModel.getRowHeaderInfo();
 			final int groupIndex = headerInfo.getIndex("GROUP");
 			geneIndex = getGroupVector(headerInfo, groupIndex);
 
@@ -1388,18 +1452,18 @@ public class DendroController implements ConfigNodePersistent {
 		// Handle selection
 		if (geneIndex != null) {
 			setGeneSelection(new ReorderedTreeSelection(
-					tvFrame.getGeneSelection(), geneIndex));
+					tvFrame.getRowSelection(), geneIndex));
 
 		} else {
-			setGeneSelection(tvFrame.getGeneSelection());
+			setGeneSelection(tvFrame.getRowSelection());
 		}
 
 		if (arrayIndex != null) {
 			setArraySelection(new ReorderedTreeSelection(
-					tvFrame.getArraySelection(), arrayIndex));
+					tvFrame.getColumnSelection(), arrayIndex));
 
 		} else {
-			setArraySelection(tvFrame.getArraySelection());
+			setArraySelection(tvFrame.getColumnSelection());
 		}
 
 		final ColorPresets colorPresets = DendrogramFactory.getColorPresets();
@@ -1490,10 +1554,10 @@ public class DendroController implements ConfigNodePersistent {
 		dendroView.getRowTreeView()
 				.setGTRHeaderInfo(tvModel.getGtrHeaderInfo());
 		dendroView.getColumnLabelView().setHeaderInfo(
-				tvModel.getArrayHeaderInfo());
-		dendroView.getRowLabelView().setHeaderInfo(tvModel.getGeneHeaderInfo());
-		dendroView.getGlobalView().setHeaders(tvModel.getGeneHeaderInfo(),
-				tvModel.getArrayHeaderInfo());
+				tvModel.getColumnHeaderInfo());
+		dendroView.getRowLabelView().setHeaderInfo(tvModel.getRowHeaderInfo());
+		dendroView.getGlobalView().setHeaders(tvModel.getRowHeaderInfo(),
+				tvModel.getColumnHeaderInfo());
 	}
 
 	/**
@@ -1529,7 +1593,7 @@ public class DendroController implements ConfigNodePersistent {
 
 		try {
 			invertedTreeDrawer.setData(tvModel.getAtrHeaderInfo(),
-					tvModel.getArrayHeaderInfo());
+					tvModel.getColumnHeaderInfo());
 			final HeaderInfo trHeaderInfo = tvModel.getAtrHeaderInfo();
 
 			if (trHeaderInfo.getIndex("NODECOLOR") >= 0) {
@@ -1665,8 +1729,8 @@ public class DendroController implements ConfigNodePersistent {
 
 			int[] ordering;
 			ordering = AtrAligner.align(tvModel.getAtrHeaderInfo(),
-					tvModel.getArrayHeaderInfo(), model.getAtrHeaderInfo(),
-					model.getArrayHeaderInfo());
+					tvModel.getColumnHeaderInfo(), model.getAtrHeaderInfo(),
+					model.getColumnHeaderInfo());
 
 			/*
 			 * System.out.print("New ordering: "); for(int i = 0; i <
@@ -1687,6 +1751,7 @@ public class DendroController implements ConfigNodePersistent {
 		}
 	}
 
+//<<<<<<< HEAD
 	// /**
 	// * Creates an AtrTVModel for use in tree alignment.
 	// *
@@ -1711,6 +1776,90 @@ public class DendroController implements ConfigNodePersistent {
 	//
 	// return atrTVModel;
 	// }
+//=======
+//	/**
+//	 * Creates an AtrTVModel for use in tree alignment.
+//	 * 
+//	 * @param fileSet
+//	 * @return a new AtrTVModel with the file set loaded into it.
+//	 * @throws LoadException
+//	 */
+//	protected AtrTVModel makeAtrModel(final FileSet fileSet)
+//			throws LoadException {
+//
+//		final AtrTVModel atrTVModel = new AtrTVModel();
+//
+//		try {
+//			atrTVModel.loadNew(fileSet);
+//
+//		} catch (final LoadException e) {
+//			String message = "Loading Atr model was interrupted.";
+//			JOptionPane.showMessageDialog(tvFrame.getAppFrame(), message, 
+//					"Error", JOptionPane.ERROR_MESSAGE);
+//			LogBuffer.logException(e);
+//		}
+//
+//		return atrTVModel;
+//	}
+
+	// GTR methods
+	/**
+	 * Updates the GTRDrawer to reflect changes in the DataModel gene order;
+	 * rebuilds the TreeDrawerNode tree.
+	 * 
+	 * @param selectedID
+	 *            ID of the node selected before a change in tree structure was
+	 *            made. This node is then found and reselected after the ATR
+	 *            tree is rebuilt.
+	 */
+	private void updateGTRDrawer(final String selectedID) {
+
+		try {
+			leftTreeDrawer.setData(tvModel.getGtrHeaderInfo(),
+					tvModel.getRowHeaderInfo());
+
+			final HeaderInfo trHeaderInfo = tvModel.getGtrHeaderInfo();
+
+			if (trHeaderInfo.getIndex("NODECOLOR") >= 0) {
+				TreeColorer.colorUsingHeader(leftTreeDrawer.getRootNode(),
+						trHeaderInfo, trHeaderInfo.getIndex("NODECOLOR"));
+			}
+		} catch (final DendroException e) {
+
+			// LogPanel.println("Had problem setting up the array tree : "
+			// + e.getMessage());
+			// e.printStackTrace();
+			final Box mismatch = new Box(BoxLayout.Y_AXIS);
+			mismatch.add(new JLabel(e.getMessage()));
+			mismatch.add(new JLabel("Perhaps there is a mismatch "
+					+ "between your ATR and CDT files?"));
+			mismatch.add(new JLabel("Ditching Gene Tree, since it's lame."));
+
+			JOptionPane.showMessageDialog(tvFrame.getAppFrame(), mismatch,
+					"Tree Construction Error", JOptionPane.ERROR_MESSAGE);
+
+			dendroView.getRowTreeView().setEnabled(false);
+
+			try {
+				leftTreeDrawer.setData(null, null);
+
+			} catch (final DendroException ex) {
+				LogBuffer.println("Got exception in setData() "
+						+ "for leftTreeDrawer in updateGTRDrawer(): "
+						+ e.getMessage());
+			}
+		}
+
+		final TreeDrawerNode arrayNode = leftTreeDrawer.getRootNode().findNode(
+				selectedID);
+
+		geneSelection.setSelectedNode(arrayNode.getId());
+		dendroView.getRowTreeView().setSelectedNode(arrayNode);
+
+		geneSelection.notifyObservers();
+		leftTreeDrawer.notifyObservers();
+	}
+//>>>>>>> bugFix
 
 	// Flipping the trees
 	// /**
@@ -1838,7 +1987,7 @@ public class DendroController implements ConfigNodePersistent {
 				dendroView.getColumnTreeView().setEnabled(true);
 
 				invertedTreeDrawer.setData(tvModel.getAtrHeaderInfo(),
-						tvModel.getArrayHeaderInfo());
+						tvModel.getColumnHeaderInfo());
 				final HeaderInfo trHeaderInfo = tvModel.getAtrHeaderInfo();
 
 				if (trHeaderInfo.getIndex("NODECOLOR") >= 0) {
@@ -1894,7 +2043,7 @@ public class DendroController implements ConfigNodePersistent {
 				dendroView.getRowTreeView().setEnabled(true);
 
 				leftTreeDrawer.setData(tvModel.getGtrHeaderInfo(),
-						tvModel.getGeneHeaderInfo());
+						tvModel.getRowHeaderInfo());
 				final HeaderInfo gtrHeaderInfo = tvModel.getGtrHeaderInfo();
 
 				if (gtrHeaderInfo.getIndex("NODECOLOR") >= 0) {
@@ -1904,8 +2053,13 @@ public class DendroController implements ConfigNodePersistent {
 
 				} else {
 					TreeColorer.colorUsingLeaf(leftTreeDrawer.getRootNode(),
-							tvModel.getGeneHeaderInfo(), tvModel
-							.getGeneHeaderInfo().getIndex("FGCOLOR"));
+//<<<<<<< HEAD
+//							tvModel.getGeneHeaderInfo(), tvModel
+//							.getGeneHeaderInfo().getIndex("FGCOLOR"));
+//=======
+							tvModel.getRowHeaderInfo(), tvModel
+									.getRowHeaderInfo().getIndex("FGCOLOR"));
+//>>>>>>> bugFix
 				}
 
 			} catch (final DendroException e) {
@@ -2061,5 +2215,16 @@ public class DendroController implements ConfigNodePersistent {
 	public MapContainer getGlobalYMap() {
 
 		return globalYmap;
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+		
+		if(o instanceof HeaderSummary) {
+			dendroView.updateSearchTermBoxes(tvModel.getRowHeaderInfo(), 
+					tvModel.getColumnHeaderInfo(),
+					globalXmap, globalYmap);
+		}
+		
 	}
 }
