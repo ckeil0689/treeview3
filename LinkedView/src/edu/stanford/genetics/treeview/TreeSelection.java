@@ -27,7 +27,7 @@ import java.util.Observable;
 /**
  * A quasi-model independant selection model for leaf indexes as well as
  * internal nodes of trees.
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version @version $Revision: 1.5 $ $Date: 2006-03-20 06:18:43 $
  */
@@ -38,7 +38,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 
 	/**
 	 * Constructor for the TreeSelection object
-	 * 
+	 *
 	 * @param nIndex
 	 *            number of indexes which can be selected
 	 */
@@ -49,7 +49,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#resize(int)
 	 */
 	@Override
@@ -74,21 +74,21 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	// index methods
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#deselectAllIndexes()
 	 */
 	@Override
 	public void deselectAllIndexes() {
 
 		integerSelection.deselectAll();
-		
+
 		/* This should probably be here.... */
 		setSelectedNode(null);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#selectAllIndexes()
 	 */
 	@Override
@@ -99,7 +99,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#setIndex(int, boolean)
 	 */
 	@Override
@@ -110,7 +110,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#isIndexSelected(int)
 	 */
 	@Override
@@ -121,7 +121,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#getMinIndex()
 	 */
 	@Override
@@ -132,7 +132,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#getSelectedIndexes()
 	 */
 	@Override
@@ -143,7 +143,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#getMaxIndex()
 	 */
 	@Override
@@ -154,7 +154,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#getNumIndexes()
 	 */
 	@Override
@@ -165,7 +165,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#selectIndexRange(int,
 	 * int)
 	 */
@@ -186,7 +186,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#getNSelectedIndexes()
 	 */
 	@Override
@@ -198,7 +198,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	// node methods
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * edu.stanford.genetics.treeview.TreeSelectionI#setSelectedNode(java.lang
 	 * .String)
@@ -214,7 +214,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#getSelectedNode()
 	 */
 	@Override
@@ -244,9 +244,9 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 		public int getNSelected() {
 			int n = 0;
 
-			for (int i = 0; i < isSelected.length; i++) {
+			for (final boolean element : isSelected) {
 
-				if (isSelected[i]) {
+				if (element) {
 					n++;
 				}
 			}
@@ -260,12 +260,12 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 			final int[] indexes = new int[nSelected];
 			int curr = 0;
 
-			//LogBuffer.println("Num Selected: [" + nSelected + "].");
-			
+			// LogBuffer.println("Num Selected: [" + nSelected + "].");
+
 			for (int i = 0; i < isSelected.length; i++) {
 
 				if (isSelected[i]) {
-					//LogBuffer.println("Index: [" + i + "] is selected.");
+					// LogBuffer.println("Index: [" + i + "] is selected.");
 					indexes[curr++] = i;
 				}
 			}
@@ -295,7 +295,8 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 
 			if ((i >= 0) && (i < isSelected.length)) {
 				TreeSelection.this.setChanged();
-				//LogBuffer.println("Setting isSelected to [" + (b ? "true" : "false") + "] for index: [" + i + "].");
+				// LogBuffer.println("Setting isSelected to [" + (b ? "true" :
+				// "false") + "] for index: [" + i + "].");
 				isSelected[i] = b;
 			}
 		}
@@ -310,9 +311,8 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 			final int min = -1;
 			for (int i = 0; i < isSelected.length; i++) {
 
-				if (isSelected[i]) {
+				if (isSelected[i])
 					return i;
-				}
 			}
 
 			return min;

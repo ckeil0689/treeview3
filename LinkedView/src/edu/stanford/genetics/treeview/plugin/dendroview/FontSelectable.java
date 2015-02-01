@@ -9,7 +9,7 @@
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
  *
- * This software is provided under the GNU GPL Version 2. In particular, 
+ * This software is provided under the GNU GPL Version 2. In particular,
  *
  * 1) If you modify a source file, make a comment in it containing your name and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
@@ -18,13 +18,13 @@
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
  *
- * END_HEADER 
+ * END_HEADER
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
 /**
  * Interface for things which I want to change the font of
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.1 $ $Date: 2006-08-16 19:13:45 $
  */
@@ -43,7 +43,7 @@ public abstract interface FontSelectable {
 	 * @return The current style
 	 */
 	public abstract int getStyle();
-	
+
 	/**
 	 * @return gets label justification
 	 */
@@ -53,7 +53,7 @@ public abstract interface FontSelectable {
 
 	/**
 	 * sets the face
-	 * 
+	 *
 	 * @param string
 	 *            The new face value
 	 */
@@ -61,7 +61,7 @@ public abstract interface FontSelectable {
 
 	/**
 	 * Sets the point size
-	 * 
+	 *
 	 * @param i
 	 *            The new points value
 	 */
@@ -69,15 +69,15 @@ public abstract interface FontSelectable {
 
 	/**
 	 * Sets the style
-	 * 
+	 *
 	 * @param i
 	 *            The new style value
 	 */
 	public abstract void setStyle(int i);
-	
+
 	/**
 	 * Sets label justification
-	 * 
+	 *
 	 * @param i
 	 *            The new style value
 	 */

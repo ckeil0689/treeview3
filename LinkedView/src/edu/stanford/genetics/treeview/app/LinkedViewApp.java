@@ -46,13 +46,13 @@ import edu.stanford.genetics.treeview.model.TVModel;
 /**
  * Main class of LinkedView application. Mostly manages windows, and
  * communication between windows, as well as communication between them.
- * 
+ *
  * There are two differences between this class and the TreeViewApp - which
  * <code>ViewFrame</code> they use. <code>LinkedViewApp</code> uses
  * <code>LinkedViewFrame</code>.
- * 
+ *
  * - LinkedViewApp scans for plugins explicitly, TreeViewApp doesn't anymore
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.34 $ $Date: 2010-05-02 13:55:11 $
  */
@@ -79,7 +79,9 @@ public class LinkedViewApp extends TreeViewApp {
 	/**
 	 * Constructor for the TreeViewApp object takes configuration from the
 	 * passed in XmlConfig.
-	 * @param Preferences The preferences data for this instance of TreeView.
+	 * 
+	 * @param Preferences
+	 *            The preferences data for this instance of TreeView.
 	 */
 	public LinkedViewApp(final Preferences configurations) {
 
@@ -140,9 +142,9 @@ public class LinkedViewApp extends TreeViewApp {
 		// final LinkedViewFrame tvFrame = new LinkedViewFrame(this);
 		final TreeViewFrame tvFrame = new TreeViewFrame(this);
 		final DataModel model = new TVModel();
-//		new TVController(tvFrame, model).loadFileSet(fileSet);
+		// new TVController(tvFrame, model).loadFileSet(fileSet);
 		new TVController(tvFrame, model).loadData(fileSet);
-		
+
 		tvFrame.setLoaded(true);
 
 		// tvFrame.addWindowListener(this);
@@ -151,7 +153,7 @@ public class LinkedViewApp extends TreeViewApp {
 
 	/**
 	 * Method that sets up the initial View
-	 * 
+	 *
 	 * @param astring
 	 */
 	protected void standardStartup(final String astring[]) {
@@ -225,12 +227,12 @@ public class LinkedViewApp extends TreeViewApp {
 
 	/**
 	 * Main method for TreeView application.
-	 * 
+	 *
 	 * Usage: java -jar treeview.jar -r <my cdt> -t
 	 * [auto|classic|kmeans|linked].
-	 * 
+	 *
 	 * uses auto by default.
-	 * 
+	 *
 	 * @param astring
 	 *            Standard argument string.
 	 */
@@ -258,9 +260,8 @@ public class LinkedViewApp extends TreeViewApp {
 	@Override
 	public URL getCodeBase() {
 
-		if (codeBase != null) {
+		if (codeBase != null)
 			return codeBase;
-		}
 		try {
 			// from http://weblogs.java.net/blog/ljnelson/archive/2004/09/
 			// cheap_hack_i_re.html
@@ -296,12 +297,10 @@ public class LinkedViewApp extends TreeViewApp {
 				}
 			}
 
-			if (token == null) {
+			if (token == null)
 				return (new File(".")).toURI().toURL();
-
-			} else {
+			else
 				return new URL(token);
-			}
 		} catch (final MalformedURLException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, e);

@@ -9,7 +9,7 @@
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
  *
- * This software is provided under the GNU GPL Version 2. In particular, 
+ * This software is provided under the GNU GPL Version 2. In particular,
  *
  * 1) If you modify a source file, make a comment in it containing your name and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
@@ -18,14 +18,13 @@
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
  *
- * END_HEADER 
+ * END_HEADER
  */
 package edu.stanford.genetics.treeview.model;
 
 import java.util.Vector;
 
 import edu.stanford.genetics.treeview.DataModel;
-import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LoadException;
 
@@ -57,8 +56,9 @@ public class KnnModel extends TVModel implements DataModel {
 			return null;
 		final int n = aClusterMembers.length;
 		final int[] clusters = new int[n];
-		for (int i = 0; i < n; i++)
+		for (int i = 0; i < n; i++) {
 			clusters[i] = aClusterMembers[i].length;
+		}
 		return clusters;
 	};
 
@@ -68,8 +68,9 @@ public class KnnModel extends TVModel implements DataModel {
 			return null;
 		final int n = gClusterMembers.length;
 		final int[] clusters = new int[n];
-		for (int i = 0; i < n; i++)
+		for (int i = 0; i < n; i++) {
 			clusters[i] = gClusterMembers[i].length;
+		}
 		return clusters;
 	};
 
@@ -79,23 +80,23 @@ public class KnnModel extends TVModel implements DataModel {
 		/* build KnnModel, initially empty... */
 	}
 
-//	/**
-//	 * 
-//	 * 
-//	 * @param fileSet
-//	 *            fileset to load
-//	 * 
-//	 */
-//	@Override
-//	public void loadNew(final FileSet fileSet) throws LoadException {
-//
-//		resetState();
-//		setSource(fileSet);
-//		// final KnnModelLoader loader = new KnnModelLoader(this);
-//		// loader.loadInto();
-//		final NewKnnModelLoader loader = new NewKnnModelLoader(this);
-//		loader.load();
-//	}
+	// /**
+	// *
+	// *
+	// * @param fileSet
+	// * fileset to load
+	// *
+	// */
+	// @Override
+	// public void loadNew(final FileSet fileSet) throws LoadException {
+	//
+	// resetState();
+	// setSource(fileSet);
+	// // final KnnModelLoader loader = new KnnModelLoader(this);
+	// // loader.loadInto();
+	// final NewKnnModelLoader loader = new NewKnnModelLoader(this);
+	// loader.load();
+	// }
 
 	// /**
 	// * Don't open a loading window...
@@ -125,7 +126,7 @@ public class KnnModel extends TVModel implements DataModel {
 		 * Enumeration e = genePrefix.elements(); msg += "GPREFIX: " +
 		 * e.nextElement(); for (; e.hasMoreElements() ;) { msg += " " +
 		 * e.nextElement(); }
-		 * 
+		 *
 		 * e = aHeaders.elements(); msg += "\naHeaders: " + e.nextElement(); for
 		 * (; e.hasMoreElements() ;) { msg += ":" + e.nextElement(); }
 		 */
@@ -137,7 +138,7 @@ public class KnnModel extends TVModel implements DataModel {
 
 	/**
 	 * This method adds a GROUP column to the CDT
-	 * 
+	 *
 	 * @param tempTable
 	 *            - RectData object with two columns, the first of gene names
 	 *            and the second of group membership
@@ -240,8 +241,9 @@ public class KnnModel extends TVModel implements DataModel {
 			final HeaderInfo headerInfo, final int index) {
 
 		final int[] counts = new int[members.length];
-		for (int i = 0; i < counts.length; i++)
+		for (int i = 0; i < counts.length; i++) {
 			counts[i] = 0;
+		}
 		for (int i = 0; i < headerInfo.getNumHeaders(); i++) {
 			final Integer group = new Integer(headerInfo.getHeader(i, index));
 			final int g = group.intValue();
@@ -253,7 +255,7 @@ public class KnnModel extends TVModel implements DataModel {
 	/**
 	 * For a column of ints, returns the number of occurrences of each int in
 	 * the column.
-	 * 
+	 *
 	 * @param headerInfo
 	 * @param columnIndex
 	 * @return
@@ -267,8 +269,9 @@ public class KnnModel extends TVModel implements DataModel {
 					columnIndex));
 			final Integer current = counts.elementAt(group.intValue());
 			Integer insertElement = new Integer(1);
-			if (current != null)
+			if (current != null) {
 				insertElement = new Integer(current.intValue() + 1);
+			}
 			counts.insertElementAt(insertElement, group.intValue());
 		}
 		final int[] cv = new int[counts.size()];
@@ -281,7 +284,7 @@ public class KnnModel extends TVModel implements DataModel {
 	/**
 	 * check to see that the order of names in the first column of the temptable
 	 * matches the headerinfo.
-	 * 
+	 *
 	 * @param tempTable
 	 * @param headerInfo
 	 * @param ptype

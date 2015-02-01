@@ -9,7 +9,7 @@
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
  *
- * This software is provided under the GNU GPL Version 2. In particular, 
+ * This software is provided under the GNU GPL Version 2. In particular,
  *
  * 1) If you modify a source file, make a comment in it containing your name and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
@@ -18,7 +18,7 @@
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
  *
- * END_HEADER 
+ * END_HEADER
  */
 package edu.stanford.genetics.treeview;
 
@@ -49,7 +49,7 @@ import javax.swing.table.AbstractTableModel;
 
 /**
  * This class is designed to save lists of genes to a file.
- * 
+ *
  * The class will pop up a window and prompt the user for further interaction
  * before killing itself like a good slave.
  */
@@ -74,7 +74,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 
 	/**
 	 * @author aloksaldanha
-	 * 
+	 *
 	 *         Table model to support preview of data. Probably should base
 	 *         export off of it for simplicity.
 	 */
@@ -83,7 +83,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 		private static final long serialVersionUID = 1L;
 
 		/**
-		 * 
+		 *
 		 * @return call to indicate table structure changed.
 		 */
 		public void dataChanged() {
@@ -93,40 +93,36 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see javax.swing.table.TableModel#getRowCount()
 		 */
 		@Override
 		public int getRowCount() {
 
-			if (fieldRow.includeHeader()) {
+			if (fieldRow.includeHeader())
 				return geneSelection.getNSelectedIndexes() + 1;
-
-			} else {
+			else
 				return geneSelection.getNSelectedIndexes();
-			}
 		}
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see javax.swing.table.TableModel#getColumnCount()
 		 */
 		@Override
 		public int getColumnCount() {
 
 			final int[] selectedPrefix = fieldRow.getSelectedPrefix();
-			if (fieldRow.includeExpr()) {
+			if (fieldRow.includeExpr())
 				return nArray + selectedPrefix.length;
-
-			} else {
+			else
 				return selectedPrefix.length;
-			}
 		}
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see javax.swing.table.TableModel#getValueAt(int, int)
 		 */
 		@Override
@@ -135,25 +131,26 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 			if (fieldRow.includeHeader()) {
 				if (rowIndex == 0) {
 					final String[] pNames = headerInfo.getNames();
-					if (columnIndex < selectedPrefix.length) {
+					if (columnIndex < selectedPrefix.length)
 						// gene annotation column headers
 						return pNames[selectedPrefix[columnIndex]];
-					} else if (fieldRow.includeExpr()) {
+					else if (fieldRow.includeExpr()) {
 						// array headers
 						int gidRow = aHeaderInfo.getIndex("GID");
-						if (gidRow == -1)
+						if (gidRow == -1) {
 							gidRow = 0;
+						}
 						final String[] headers = aHeaderInfo
 								.getHeader(columnIndex - selectedPrefix.length);
 						return headers[gidRow];
 					}
 				} else if (rowIndex == 1 && eRow != -1) {
 					// eweight
-					if ((selectedPrefix.length > 0) && (columnIndex == 0)) {
+					if ((selectedPrefix.length > 0) && (columnIndex == 0))
 						return "EWEIGHT";
-					} else if (columnIndex < selectedPrefix.length) {
+					else if (columnIndex < selectedPrefix.length)
 						return "";
-					} else {
+					else {
 						final String[] headers = aHeaderInfo
 								.getHeader(columnIndex - selectedPrefix.length);
 						return headers[eRow];
@@ -168,12 +165,10 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 			} else {
 				final double val = dataMatrix.getValue(columnIndex
 						- selectedPrefix.length, rowIndex + top);
-				if (Math.abs(val - DataModel.NODATA) < PRECISION_LEVEL) {
+				if (Math.abs(val - DataModel.NODATA) < PRECISION_LEVEL)
 					return null;
-				}
-				if (Math.abs(val - DataModel.EMPTY) < PRECISION_LEVEL) {
+				if (Math.abs(val - DataModel.EMPTY) < PRECISION_LEVEL)
 					return null;
-				}
 				return new Double(val);
 			}
 			/*
@@ -194,14 +189,16 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 	private class Notifier implements ActionListener, ListSelectionListener {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			if (tableModel != null)
+			if (tableModel != null) {
 				tableModel.dataChanged();
+			}
 		}
 
 		@Override
 		public void valueChanged(final ListSelectionEvent e) {
-			if (tableModel != null)
+			if (tableModel != null) {
 				tableModel.dataChanged();
+			}
 		}
 	};
 
@@ -230,12 +227,10 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 
 	public String getFile() {
 
-		if (configNode == null) {
+		if (configNode == null)
 			return defaultFile;
-
-		} else {
+		else
 			return configNode.get("file", defaultFile);
-		}
 	}
 
 	FileRow fileRow = null;
@@ -339,8 +334,9 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 				}
 				if (fieldRow.includeExpr()) {
 					int gidRow = aHeaderInfo.getIndex("GID");
-					if (gidRow == -1)
+					if (gidRow == -1) {
 						gidRow = 0;
+					}
 					for (int j = 0; j < nArray; j++) {
 						output.print('\t');
 						try {
@@ -461,7 +457,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 
 	class FileRow extends JPanel {
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = 1L;
 		JTextField file;

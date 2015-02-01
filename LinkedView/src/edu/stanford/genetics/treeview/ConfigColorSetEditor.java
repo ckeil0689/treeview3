@@ -33,7 +33,7 @@ import javax.swing.JPanel;
 
 /**
  * This class allows editing of a color set.
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version @version $Revision: 1.4 $ $Date: 2004-12-21 03:28:14 $
  */
@@ -46,7 +46,7 @@ public class ConfigColorSetEditor extends JPanel {
 
 	/**
 	 * Constructor for the ConfigColorSetEditor object
-	 * 
+	 *
 	 * @param colorSet
 	 *            A ConfigColorSet to be edited
 	 */
@@ -60,14 +60,14 @@ public class ConfigColorSetEditor extends JPanel {
 
 	/**
 	 * A simple test program. Allowed editing, and prints out the results.
-	 * 
+	 *
 	 * @param argv
 	 *            none required.
 	 */
 	public final static void main(final String[] argv) {
 		final String[] types = new String[] { "Up", "Down", "Left", "Right" };
 		final String[] colors = new String[] { "#FF0000", "#FFFF00", "#FF00FF",
-				"#00FFFF" };
+		"#00FFFF" };
 
 		final ConfigColorSet temp = new ConfigColorSet("Bob", types, colors);
 		final ConfigColorSetEditor cse = new ConfigColorSetEditor(temp);

@@ -59,12 +59,12 @@ import edu.stanford.genetics.treeview.RotateImageFilter;
  * This class is a superclass which implements a GUI for selection of options
  * relating to output. It makes most of the relevant variables accessible to
  * subclasses through protected methods.
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version @version $Revision: 1.2 $ $Date: 2008-06-11 01:58:57 $
  */
 public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
-		ConfigNodePersistent {
+ConfigNodePersistent {
 
 	private static final long serialVersionUID = 1L;
 
@@ -72,7 +72,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 
 	// external links
 	private FileSet sourceSet;// FileSet from which current data was
-								// constructed.
+	// constructed.
 	private ColorExtractor colorExtractor;
 
 	/**
@@ -119,7 +119,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 	/**
 	 * for communication with subclass. Should be overridden by subclass if you
 	 * don't need the Bbox configuration stuff.
-	 * 
+	 *
 	 * @return true if need Bbox options, false otherwise.
 	 */
 	protected boolean hasBbox() {
@@ -145,7 +145,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 
 	/**
 	 * Reflects user choices from GUI.
-	 * 
+	 *
 	 * @return A file path to print image to.
 	 */
 	protected File getFile() {
@@ -166,7 +166,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 	/**
 	 * Gets the initialExtension. Should be overriden by subclasses to specift a
 	 * reasonable extension for the type.
-	 * 
+	 *
 	 * @return The initialExtension value
 	 */
 	protected String getInitialExtension() {
@@ -177,7 +177,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 	/**
 	 * Gets the initialFilePath. Constructed from the sourceSet and the
 	 * initialExtension.
-	 * 
+	 *
 	 * @return The initialFilePath value
 	 */
 	protected String getInitialFilePath() {
@@ -189,16 +189,15 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 			defaultPath = sourceSet.getDir() + sourceSet.getRoot()
 					+ getInitialExtension();
 		}
-		if (configNode == null) {
+		if (configNode == null)
 			return defaultPath;
-		} else {
+		else
 			return configNode.get("file", defaultPath);
-		}
 	}
 
 	/**
 	 * Constructor for the ColorBarExportPanel object
-	 * 
+	 *
 	 * @param colorExtractor
 	 *            Description of the Parameter
 	 */
@@ -210,7 +209,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 
 	/**
 	 * Simple test program.
-	 * 
+	 *
 	 * @param argv
 	 *            none required
 	 */
@@ -268,7 +267,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 	/**
 	 * Reflects user choices from GUI. number of pixels to use for each box
 	 * along the x
-	 * 
+	 *
 	 * @return The xscale value
 	 */
 	public double getXscale() {
@@ -278,7 +277,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 	/**
 	 * Reflects user choices from GUI. number of pixels to use for each box
 	 * along the y
-	 * 
+	 *
 	 * @return The yscale value
 	 */
 	public double getYscale() {
@@ -288,7 +287,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 	/**
 	 * Reflects user choices from GUI. Number of decimals to print for numbers
 	 * on the color bar legend.
-	 * 
+	 *
 	 * @return The decimals value
 	 */
 	public int getDecimals() {
@@ -297,7 +296,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 
 	/**
 	 * Reflects user choices from GUI. number of boxes to print.
-	 * 
+	 *
 	 * @return The numBoxes value
 	 */
 	public int getNumBoxes() {
@@ -307,7 +306,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 	/**
 	 * Reflects user choices from GUI. Should the color bar be vertical or
 	 * horizontal?
-	 * 
+	 *
 	 * @return Description of the Return Value
 	 */
 	public boolean drawVertical() {
@@ -316,7 +315,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 
 	/**
 	 * Reflects user choices from GUI. how wide should the bbox be?
-	 * 
+	 *
 	 * @return The bboxWidth value
 	 */
 	public int getBboxWidth() {
@@ -325,7 +324,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 
 	/**
 	 * Reflects user choices from GUI. how high should the bbox be?
-	 * 
+	 *
 	 * @return The bboxHeight value
 	 */
 	public int getBboxHeight() {
@@ -334,7 +333,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 
 	/**
 	 * The font to use for the legend.
-	 * 
+	 *
 	 * @return The font value
 	 */
 	@Override
@@ -395,22 +394,20 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 	 * estimated height of box graphic alone.
 	 */
 	public int estimateHeight() {
-		if (drawVertical()) {
+		if (drawVertical())
 			return (int) (getNumBoxes() * getYscale());
-		} else {
+		else
 			return (int) (getXscale() + textLength());
-		}
 	}
 
 	/**
 	 * estimated width of box graphic alone.
 	 */
 	public int estimateWidth() {
-		if (drawVertical()) {
+		if (drawVertical())
 			return (int) (getXscale() + textLength());
-		} else {
+		else
 			return (int) (getNumBoxes() * getXscale());
-		}
 	}
 
 	class PreviewPanel extends JPanel {
@@ -449,9 +446,8 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 				final Dimension size = getSize();
 				int width = estimateWidth();
 				int height = estimateHeight();
-				if ((width == 0) || (height == 0)) {
+				if ((width == 0) || (height == 0))
 					return;
-				}
 				// if the width * size.height is greater than the the height
 				// *size.width
 				// then if we make width = size.width, the height will be less
@@ -526,14 +522,13 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 
 	/**
 	 * does the dirty work by calling methods in the superclass.
-	 * 
+	 *
 	 */
 	private void drawAll(final Graphics g) {
 		final int width = estimateWidth();
 		final int height = estimateHeight();
-		if ((width == 0) || (height == 0)) {
+		if ((width == 0) || (height == 0))
 			return;
-		}
 		final double scale = 1.0;// full size, of course...
 		drawBoxes(g, 0, 0, scale);
 		if (drawVertical()) {
@@ -549,7 +544,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 	 * draws the boxes. The "scale" is used if you are drawing at some other
 	 * scale than the final output; otherwise the regular xscale and yscale are
 	 * used.
-	 * 
+	 *
 	 * @param g
 	 *            graphics element to draw on
 	 * @param x
@@ -603,7 +598,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 	/**
 	 * draws an appropriately sized box for each scale mark at the specific
 	 * location
-	 * 
+	 *
 	 * @param g
 	 *            graphics element to draw on
 	 * @param x
@@ -647,7 +642,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 
 	/**
 	 * renders the text of the values for the color bar.
-	 * 
+	 *
 	 * @param g
 	 *            graphics element to draw on
 	 * @param x
@@ -1017,7 +1012,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 
 		/**
 		 * Constructor for the FilePanel object
-		 * 
+		 *
 		 * @param initial
 		 *            Description of the Parameter
 		 */
@@ -1095,9 +1090,8 @@ class SimpleDataMatrix implements DataMatrix {
 	}
 
 	public void removeAppended() {
-		if (appendIndex == -1) {
+		if (appendIndex == -1)
 			return;
-		}
 
 		final double[] temp = new double[nRow * appendIndex];
 
@@ -1110,7 +1104,7 @@ class SimpleDataMatrix implements DataMatrix {
 
 	public void append(final DataMatrix m) {
 		final double[] temp = new double[dataMatrix.length + m.getNumRow()
-				* m.getNumCol()];
+		                                 * m.getNumCol()];
 
 		int i;
 		for (i = 0; i < dataMatrix.length; i++) {

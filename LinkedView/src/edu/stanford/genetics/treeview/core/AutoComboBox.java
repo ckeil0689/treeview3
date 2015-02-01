@@ -112,7 +112,7 @@ public class AutoComboBox extends JComboBox implements FocusListener {
 	/**
 	 * Set the popup width to be the optimum (as for setOptimumPopupWidth)
 	 * before displaying it.
-	 * 
+	 *
 	 * @param autoPopupWidth
 	 *            true to set the optimum width, false for the default behavior.
 	 */
@@ -127,7 +127,7 @@ public class AutoComboBox extends JComboBox implements FocusListener {
 	/**
 	 * Indicates whether the popup width is automatically optimised before
 	 * display.
-	 * 
+	 *
 	 * @return true if the popup width is automatically optimised, false if not.
 	 */
 	public boolean isAutoPopupWidth() {

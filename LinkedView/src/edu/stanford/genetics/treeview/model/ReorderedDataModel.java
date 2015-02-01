@@ -17,14 +17,14 @@ import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
- * 
+ *
  * This class produces a reordered version of the parent DataModel It can a
  * subset, if the integer arrays passed in have fewer members, or a superset, if
  * the arrays passed in have more members. Gaps can be introduced between genes
  * or arrays by inserting "-1" at an index.
- * 
+ *
  * @author aloksaldanha
- * 
+ *
  */
 public class ReorderedDataModel extends Observable implements DataModel {
 
@@ -42,7 +42,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 	/**
 	 * Builds data model which corresponds to a reordered version of the source
 	 * datamodel, as specified by geneIndex
-	 * 
+	 *
 	 * @param source
 	 * @param geneIndex
 	 */
@@ -54,7 +54,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 	/**
 	 * Builds data model which corresponds to a reordered version of the source
 	 * datamodel, as specified by geneIndex and arrayIndex.
-	 * 
+	 *
 	 * @param source
 	 * @param geneIndex
 	 */
@@ -86,7 +86,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/**
 	 * @author aloksaldanha
-	 * 
+	 *
 	 */
 	private class SubDataMatrix implements DataMatrix {
 
@@ -101,12 +101,10 @@ public class ReorderedDataModel extends Observable implements DataModel {
 				col = arrayIndex[col];
 			}
 
-			if ((row == -1) || (col == -1)) {
+			if ((row == -1) || (col == -1))
 				return DataModel.EMPTY;
-
-			} else {
+			else
 				return parent.getDataMatrix().getValue(col, row);
-			}
 		}
 
 		@Override
@@ -120,9 +118,9 @@ public class ReorderedDataModel extends Observable implements DataModel {
 				col = arrayIndex[col];
 			}
 
-			if ((row == -1) || (col == -1)) {
+			if ((row == -1) || (col == -1))
 				return;
-			} else {
+			else {
 				LogBuffer.getSingleton().log(
 						"Error: cannot modifiy " + "reordered data model");
 				return;
@@ -132,23 +130,19 @@ public class ReorderedDataModel extends Observable implements DataModel {
 		@Override
 		public int getNumRow() {
 
-			if (geneIndex != null) {
+			if (geneIndex != null)
 				return geneIndex.length;
-
-			} else {
+			else
 				return parent.getDataMatrix().getNumRow();
-			}
 		}
 
 		@Override
 		public int getNumCol() {
 
-			if (arrayIndex != null) {
+			if (arrayIndex != null)
 				return arrayIndex.length;
-
-			} else {
+			else
 				return parent.getDataMatrix().getNumCol();
-			}
 		}
 
 		@Override
@@ -193,11 +187,11 @@ public class ReorderedDataModel extends Observable implements DataModel {
 	}
 
 	/**
-	 * 
+	 *
 	 * Represents reordered HeaderInfo of parent.
 	 */
 	private class ReorderedHeaderInfo extends IntHeaderInfo {// implements
-																// HeaderInfo {
+		// HeaderInfo {
 
 		private final HeaderInfo parentHeaderInfo;
 		private final int[] reorderedIndex;
@@ -212,9 +206,8 @@ public class ReorderedDataModel extends Observable implements DataModel {
 		public String[] getHeader(final int i) {
 
 			final int index = reorderedIndex[i];
-			if (index == -1) {
+			if (index == -1)
 				return null;
-			}
 
 			return parentHeaderInfo.getHeader(index);
 		}
@@ -223,9 +216,8 @@ public class ReorderedDataModel extends Observable implements DataModel {
 		public String getHeader(final int i, final String name) {
 
 			final int index = reorderedIndex[i];
-			if (index == -1) {
+			if (index == -1)
 				return null;
-			}
 
 			return parentHeaderInfo.getHeader(index, name);
 		}
@@ -234,12 +226,10 @@ public class ReorderedDataModel extends Observable implements DataModel {
 		public String getHeader(final int rowIndex, final int columnIndex) {
 
 			final String[] header = getHeader(rowIndex);
-			if (header != null) {
+			if (header != null)
 				return header[columnIndex];
-
-			} else {
+			else
 				return "";
-			}
 		}
 
 		@Override
@@ -270,15 +260,13 @@ public class ReorderedDataModel extends Observable implements DataModel {
 		public int getHeaderIndex(final String id) {
 
 			final int parentIndex = parentHeaderInfo.getHeaderIndex(id);
-			if (reorderedIndex[parentIndex] == parentIndex) {
+			if (reorderedIndex[parentIndex] == parentIndex)
 				return parentIndex;
-
-			} else {
+			else {
 				for (int i = 0; i < reorderedIndex.length; i++)
 
-					if (reorderedIndex[i] == parentIndex) {
+					if (reorderedIndex[i] == parentIndex)
 						return i;
-					}
 			}
 
 			return -1;
@@ -328,7 +316,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.DataModel#getDocumentConfig()
 	 */
 	@Override
@@ -341,7 +329,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.DataModel#getSource()
 	 */
 	@Override
@@ -352,12 +340,10 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	@Override
 	public String getFileName() {
-		if (source == null) {
+		if (source == null)
 			return "No Data Loaded";
-
-		} else {
+		else
 			return source;
-		}
 	}
 
 	public void setSource(final String string) {
@@ -380,7 +366,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.DataModel
 	 * #setModelForCompare(edu.stanford.genetics.treeview.DataModel)
 	 */
@@ -390,7 +376,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.DataModel#getFileSet()
 	 */
 	@Override
@@ -409,71 +395,63 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.DataModel#getGeneHeaderInfo()
 	 */
 	@Override
 	public IntHeaderInfo getGeneHeaderInfo() { // IntHeaderInfo
 
-		if (geneHeaderInfo == null) {
+		if (geneHeaderInfo == null)
 			return parent.getGeneHeaderInfo();
-
-		} else {
+		else
 			return geneHeaderInfo; // (IntHeaderInfo)
-		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.DataModel#getArrayHeaderInfo()
 	 */
 	@Override
 	public IntHeaderInfo getArrayHeaderInfo() {
 
-		if (arrayHeaderInfo == null) {
+		if (arrayHeaderInfo == null)
 			return parent.getArrayHeaderInfo();
-
-		} else {
+		else
 			return arrayHeaderInfo;// (IntHeaderInfo)
-		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.DataModel#getGtrHeaderInfo()
 	 */
 	@Override
 	public HeaderInfo getGtrHeaderInfo() {
 
-		if (gtrHeaderInfo == null) {
+		if (gtrHeaderInfo == null)
 			return parent.getGtrHeaderInfo();
-
-		} else {
+		else
 			return gtrHeaderInfo;
-		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.DataModel#getAtrHeaderInfo()
 	 */
 	@Override
 	public HeaderInfo getAtrHeaderInfo() {
 
-		if (atrHeaderInfo == null) {
+		if (atrHeaderInfo == null)
 			return parent.getAtrHeaderInfo();
-
-		} else {
+		else
 			return atrHeaderInfo;
-		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.DataModel#getType()
 	 */
 	@Override
@@ -484,7 +462,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.DataModel#getDataMatrix()
 	 */
 	@Override
@@ -495,7 +473,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.DataModel
 	 * #append(edu.stanford.genetics.treeview.DataModel)
 	 */
@@ -505,7 +483,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.DataModel#removeAppended()
 	 */
 	@Override
@@ -515,24 +493,20 @@ public class ReorderedDataModel extends Observable implements DataModel {
 	@Override
 	public boolean aidFound() {
 
-		if (atrHeaderInfo == null) {
+		if (atrHeaderInfo == null)
 			return parent.aidFound();
-
-		} else {
+		else
 			return false;
-		}
 	}
 
 	@Override
 	public boolean gidFound() {
 
 		// the following causes a mismatch if not all genes were selected.
-		if (gtrHeaderInfo == null) {
+		if (gtrHeaderInfo == null)
 			return parent.gidFound();
-
-		} else {
+		else
 			return false;
-		}
 	}
 
 	@Override

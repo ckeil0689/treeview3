@@ -2,9 +2,9 @@
  *
  * $Author: avsegal
  * $RCSfile: AtrAligner.java
- * $Revision: 
+ * $Revision:
  * $Date: Jun 25, 2004
- * $Name:  
+ * $Name:
  *
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
@@ -26,7 +26,7 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 /**
  * @author avsegal
  *
- * Aligns the array ordering to match a different array tree. 
+ * Aligns the array ordering to match a different array tree.
  * Used statically two align one fileset to another.
  */
 
@@ -38,7 +38,7 @@ import edu.stanford.genetics.treeview.HeaderInfo;
 public class AtrAligner {
 
 	/**
-	 * 
+	 *
 	 * @param atrHeader1
 	 *            the atr header to be aligned
 	 * @param arrayHeader1
@@ -71,7 +71,7 @@ public class AtrAligner {
 
 	/**
 	 * Creates an AtrAnalysis tree based on the atr and array headers.
-	 * 
+	 *
 	 * @param atrHeader
 	 *            ATR header
 	 * @param arrayHeader
@@ -81,7 +81,7 @@ public class AtrAligner {
 	 */
 	private static AtrAnalysisNode createAnalysisTree(
 			final HeaderInfo atrHeader, final HeaderInfo arrayHeader)
-			throws DendroException {
+					throws DendroException {
 
 		final int numArrays = arrayHeader.getNumHeaders();
 
@@ -115,10 +115,9 @@ public class AtrAligner {
 				int val; // stores index (y location)
 				val = arrayHeader.getHeaderIndex(leftId);
 
-				if (val == -1) {
+				if (val == -1)
 					throw new DendroException("Identifier " + leftId
 							+ " from tree file not found in CDT");
-				}
 
 				leftN = new AtrAnalysisNode(leftId, newN);
 				leftN.setIndex(val);
@@ -134,10 +133,9 @@ public class AtrAligner {
 				int val; // stores index (y location)
 				val = arrayHeader.getHeaderIndex(rightId);
 
-				if (val == -1) {
+				if (val == -1)
 					throw new DendroException("Identifier " + rightId
 							+ " from tree file not found in CDT.");
-				}
 
 				rightN = new AtrAnalysisNode(rightId, newN);
 				rightN.setIndex(val);
@@ -165,7 +163,7 @@ public class AtrAligner {
 
 	/**
 	 * Aligns tree rooted at root1 to a different atr tree as best as possible.
-	 * 
+	 *
 	 * @param root1
 	 *            root of the tree to align
 	 * @param arrayHeader1

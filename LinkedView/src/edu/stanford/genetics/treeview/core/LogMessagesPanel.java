@@ -15,7 +15,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
 
 public class LogMessagesPanel extends JTextArea implements Observer {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 	private final LogBuffer logBuffer;

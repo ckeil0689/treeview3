@@ -20,14 +20,14 @@ import edu.stanford.genetics.treeview.core.PluginManager;
 public class AlignmentFactory extends PluginFactory {
 
 	private HeaderInfo geneHI;
-	
+
 	static {
 		PluginManager.registerPlugin(new AlignmentFactory());
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.PluginFactory#getName()
 	 */
 	@Override
@@ -38,7 +38,7 @@ public class AlignmentFactory extends PluginFactory {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * edu.stanford.genetics.treeview.PluginFactory#createPlugin(edu.stanford
 	 * .genetics.treeview.ConfigNode)
@@ -64,7 +64,7 @@ public class AlignmentFactory extends PluginFactory {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * edu.stanford.genetics.treeview.PluginFactory#configurePlugin(edu.stanford
 	 * .genetics.treeview.ConfigNode, edu.stanford.genetics.treeview.ViewFrame)
@@ -85,9 +85,9 @@ public class AlignmentFactory extends PluginFactory {
 			return false;
 		}
 	}
-	
-	public void setGeneHeaderInfo(HeaderInfo geneHI) {
-		
+
+	public void setGeneHeaderInfo(final HeaderInfo geneHI) {
+
 		this.geneHI = geneHI;
 	}
 

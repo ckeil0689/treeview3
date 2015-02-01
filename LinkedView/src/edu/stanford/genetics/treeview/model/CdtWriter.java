@@ -25,10 +25,10 @@ public class CdtWriter {
 					.getNumNames(); headerrow++) {
 				for (int column = 0; column < dataModel.getArrayHeaderInfo()
 						.getNumHeaders()
-						+ dataModel.getGeneHeaderInfo().getNumNames(); 
-						column++) {
-					if (column > 0)
+						+ dataModel.getGeneHeaderInfo().getNumNames(); column++) {
+					if (column > 0) {
 						out.write("\t");
+					}
 					if (column < dataModel.getGeneHeaderInfo().getNumNames()) {
 						if (headerrow == 0) {
 							// we need to write out the names from the gene
@@ -49,8 +49,8 @@ public class CdtWriter {
 								out,
 								dataModel.getArrayHeaderInfo().getHeader(
 										column
-												- dataModel.getGeneHeaderInfo()
-														.getNumNames(),
+										- dataModel.getGeneHeaderInfo()
+										.getNumNames(),
 										headerrow));
 					}
 				}
@@ -62,8 +62,9 @@ public class CdtWriter {
 				for (int column = 0; column < dataModel.getArrayHeaderInfo()
 						.getNumHeaders()
 						+ dataModel.getGeneHeaderInfo().getNumNames(); column++) {
-					if (column > 0)
+					if (column > 0) {
 						out.write("\t");
+					}
 					if (column < dataModel.getGeneHeaderInfo().getNumNames()) {
 						printNotNull(out, dataModel.getGeneHeaderInfo()
 								.getHeader(gene, column));
@@ -73,8 +74,8 @@ public class CdtWriter {
 								out,
 								dataModel.getDataMatrix().getValue(
 										column
-												- dataModel.getGeneHeaderInfo()
-														.getNumNames(), gene));
+										- dataModel.getGeneHeaderInfo()
+										.getNumNames(), gene));
 					}
 				}
 				out.write("\n");

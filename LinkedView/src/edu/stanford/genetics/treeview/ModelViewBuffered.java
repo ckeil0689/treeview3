@@ -9,7 +9,7 @@
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
  *
- * This software is provided under the GNU GPL Version 2. In particular, 
+ * This software is provided under the GNU GPL Version 2. In particular,
  *
  * 1) If you modify a source file, make a comment in it containing your name and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
@@ -18,7 +18,7 @@
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
  *
- * END_HEADER 
+ * END_HEADER
  */
 package edu.stanford.genetics.treeview;
 
@@ -34,7 +34,7 @@ import Utilities.GUIFactory;
 
 /**
  * superclass, to hold info and code common to all model views
- * 
+ *
  * This adds buffer management to the modelview. Interestingly, but necessarily,
  * it has no dependancy on any models.
  */
@@ -58,9 +58,8 @@ public abstract class ModelViewBuffered extends ModelView {
 	 */
 	public Image ensureCapacity(final Image i, final Dimension req) {
 
-		if (i == null) {
+		if (i == null)
 			return createImage(req.width, req.height);
-		}
 
 		int w = i.getWidth(null);
 		int h = i.getHeight(null);
@@ -76,9 +75,8 @@ public abstract class ModelViewBuffered extends ModelView {
 			n.getGraphics().drawImage(i, 0, 0, null);
 			return n;
 
-		} else {
+		} else
 			return i;
-		}
 	}
 
 	/**
@@ -127,7 +125,7 @@ public abstract class ModelViewBuffered extends ModelView {
 	 * The double buffer in Swing doesn't seem to be persistent across draws.
 	 * for instance, every time another window obscures one of our windows and
 	 * then moves, a repaint is triggered by most VMs.
-	 * 
+	 *
 	 * We apparently need to maintain our own persistent offscreen buffer for
 	 * speed reasons...
 	 */
@@ -138,9 +136,8 @@ public abstract class ModelViewBuffered extends ModelView {
 		// System.out.println("Entering " + viewName() + " to clip " + clip );
 
 		final Dimension newsize = getSize();
-		if (newsize == null) {
+		if (newsize == null)
 			return;
-		}
 
 		Dimension reqSize;
 		reqSize = newsize;

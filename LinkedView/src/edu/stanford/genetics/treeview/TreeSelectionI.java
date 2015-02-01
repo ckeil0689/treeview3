@@ -6,7 +6,7 @@ public interface TreeSelectionI {
 
 	/**
 	 * Resizes the size of the TreeSelection to accomodate more elements.
-	 * 
+	 *
 	 * @param nIndex
 	 *            - The new size.
 	 */
@@ -27,7 +27,7 @@ public interface TreeSelectionI {
 
 	/**
 	 * sets the selection status for a particular index.
-	 * 
+	 *
 	 * @param i
 	 *            The gene index
 	 * @param b
@@ -37,7 +37,7 @@ public interface TreeSelectionI {
 
 	/**
 	 * gets the selection status for a particular index.
-	 * 
+	 *
 	 * @param i
 	 *            The gene index
 	 * @return The current selection status
@@ -45,7 +45,7 @@ public interface TreeSelectionI {
 	public abstract boolean isIndexSelected(int i);
 
 	/**
-	 * 
+	 *
 	 * @return The minimum selected index
 	 */
 	public abstract int getMinIndex();
@@ -53,21 +53,21 @@ public interface TreeSelectionI {
 	public abstract int[] getSelectedIndexes();
 
 	/**
-	 * 
+	 *
 	 * @return The maximum selected index.
 	 */
 	public abstract int getMaxIndex();
 
 	/**
 	 * Nice for find boxes which are curious.
-	 * 
+	 *
 	 * @return The number of indexes which could be selected.
 	 */
 	public abstract int getNumIndexes();
 
 	/**
 	 * Selects a range of indexes.
-	 * 
+	 *
 	 * @param min
 	 *            the minimum gene to select
 	 * @param max
@@ -83,7 +83,7 @@ public interface TreeSelectionI {
 	// node methods
 	/**
 	 * Selects a tree node
-	 * 
+	 *
 	 * @param n
 	 *            Id of node to select
 	 */
@@ -91,7 +91,7 @@ public interface TreeSelectionI {
 
 	/**
 	 * Gets the selected tree node
-	 * 
+	 *
 	 * @return Index of selected Node
 	 */
 	public abstract String getSelectedNode();

@@ -10,41 +10,42 @@ import edu.stanford.genetics.treeview.LogBuffer;
 /**
  * Class that is supposed to contain a bunch of static general helper methods,
  * which are usually operations that aren't necessarily unique to one class.
+ * 
  * @author CKeil
  *
  */
 public final class Helper {
 
 	private static final double EPSILON = 0.0000000001;
-	
+
 	/**
-	 * Compares to floating point numbers to find out whether they can
-	 * be considered equal. '==' can never be used to compare floating point
+	 * Compares to floating point numbers to find out whether they can be
+	 * considered equal. '==' can never be used to compare floating point
 	 * numbers!
+	 * 
 	 * @param double a First floating point number.
 	 * @param double b Second floating point number.
 	 * @return boolean Whether 2 floats can be considered equal.
 	 */
-	public static boolean nearlyEqual(double a, double b) {
-		
+	public static boolean nearlyEqual(final double a, final double b) {
+
 		final double absA = Math.abs(a);
 		final double absB = Math.abs(b);
 		final double diff = Math.abs(a - b);
 
-		if (a == b) { // shortcut, handles infinities
+		if (a == b)
 			return true;
-		} else if (a == 0 || b == 0 || diff < Float.MIN_NORMAL) {
+		else if (a == 0 || b == 0 || diff < Float.MIN_NORMAL)
 			// a or b is zero or both are extremely close to it
 			// relative error is less meaningful here
 			return diff < (EPSILON * Float.MIN_NORMAL);
-		} else { // use relative error
+		else
 			return diff / (absA + absB) < EPSILON;
-		}
 	}
-	
+
 	/**
 	 * Fuses two int arrays into a new third array and returns it.
-	 * 
+	 *
 	 * @param int[] a First array.
 	 * @param int[] b Second array.
 	 * @return The merged array.
@@ -58,7 +59,7 @@ public final class Helper {
 
 		return c;
 	}
-	
+
 	/**
 	 * Count amount of lines in the file to be loaded so that the progressBar
 	 * can get correct values for extractData(). Code from StackOverflow
@@ -70,7 +71,9 @@ public final class Helper {
 
 		try {
 			reader = new LineNumberReader(new FileReader(aFile));
-			while ((reader.readLine()) != null);
+			while ((reader.readLine()) != null) {
+				;
+			}
 			return reader.getLineNumber();
 
 		} catch (final Exception ex) {

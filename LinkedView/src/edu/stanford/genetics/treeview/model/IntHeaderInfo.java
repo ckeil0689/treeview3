@@ -8,16 +8,15 @@ import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
  * A generic headerinfo, backed by private arrays.
- * 
+ *
  * @author aloksaldanha
- * 
+ *
  */
 public class IntHeaderInfo extends Observable implements HeaderInfo {
 
 	private String[] prefixArray = new String[0];
 	private String[][] labelArray = new String[0][];
-	private Hashtable<String, Integer> id2row = new Hashtable<String, 
-			Integer>();
+	private Hashtable<String, Integer> id2row = new Hashtable<String, Integer>();
 
 	private boolean modified = false;
 
@@ -68,14 +67,12 @@ public class IntHeaderInfo extends Observable implements HeaderInfo {
 	 */
 	@Override
 	public String[] getHeader(final int gene) {
-		
+
 		try {
-			if (getHeaderArray()[gene] == null) {
+			if (getHeaderArray()[gene] == null)
 				return new String[0];
-				
-			} else {
+			else
 				return getHeaderArray()[gene];
-			}
 		} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 			LogBuffer.println("error: tried to retrieve header for  index "
 					+ gene + " but max is " + getHeaderArray().length);
@@ -92,9 +89,8 @@ public class IntHeaderInfo extends Observable implements HeaderInfo {
 	public String getHeader(final int gene, final String col) {
 
 		final int index = getIndex(col);
-		if (index == -1) {
+		if (index == -1)
 			return null;
-		}
 		return getHeader(gene, index);
 	}
 
@@ -118,17 +114,15 @@ public class IntHeaderInfo extends Observable implements HeaderInfo {
 	public int getHeaderIndex(final String id) {
 
 		final Object ind = id2row.get(id);
-		if (ind == null) {
+		if (ind == null)
 			return -1;
-
-		} else {
+		else
 			return ((Integer) ind).intValue();
-		}
 	}
 
 	/**
 	 * adds new header column of specified name at specified index.
-	 * 
+	 *
 	 * @param name
 	 * @param index
 	 * @return
@@ -138,10 +132,8 @@ public class IntHeaderInfo extends Observable implements HeaderInfo {
 
 		final int existing = getIndex(name);
 		// already have this header
-		if (existing != -1) {
-
+		if (existing != -1)
 			return false;
-		}
 
 		final int newNumNames = getNumNames() + 1;
 		for (int row = 0; row < getNumHeaders(); row++) {
@@ -204,26 +196,22 @@ public class IntHeaderInfo extends Observable implements HeaderInfo {
 			setHeaderArray(temp2);
 			return true;
 
-		} else {
+		} else
 			return false;
-		}
 	}
 
 	@Override
 	public boolean setHeader(final int i, final String name, final String value) {
 
-		if (getHeaderArray().length < i) {
+		if (getHeaderArray().length < i)
 			return false;
-		}
 
 		final int nameIndex = getIndex(name);
-		if (nameIndex == -1) {
+		if (nameIndex == -1)
 			return false;
-		}
 
-		if (getHeaderArray()[i][nameIndex].equalsIgnoreCase(value)) {
+		if (getHeaderArray()[i][nameIndex].equalsIgnoreCase(value))
 			return false;
-		}
 
 		getHeaderArray()[i][nameIndex] = value;
 		setModified(true);

@@ -44,8 +44,8 @@ public class MenuHelpPluginsFrame extends JDialog {
 
 		} else {
 			s = "<html><br><ol>";
-			for (int i = 0; i < plugins.length; i++) {
-				s += "<li>" + plugins[i].getPluginName();
+			for (final PluginFactory plugin : plugins) {
+				s += "<li>" + plugin.getPluginName();
 			}
 			s += "</ol><br></html>";
 			height = plugins.length;

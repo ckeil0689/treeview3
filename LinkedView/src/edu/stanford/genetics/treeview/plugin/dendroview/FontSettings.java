@@ -7,24 +7,24 @@
  * $Name:  $
  *
  * This file is part of Java TreeView
- * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. 
- * Modified by Alex Segal 2004/08/13. Modifications Copyright (C) 
+ * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved.
+ * Modified by Alex Segal 2004/08/13. Modifications Copyright (C)
  * Lawrence Berkeley Lab.
  *
- * This software is provided under the GNU GPL Version 2. In particular, 
+ * This software is provided under the GNU GPL Version 2. In particular,
  *
- * 1) If you modify a source file, make a comment in it containing your name 
+ * 1) If you modify a source file, make a comment in it containing your name
  * and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
- * 3) Developers are encouraged but not required to notify the Java TreeView 
- * maintainers at alok@genome.stanford.edu when they make a useful addition. 
- * It would be nice if significant contributions could be merged into the 
+ * 3) Developers are encouraged but not required to notify the Java TreeView
+ * maintainers at alok@genome.stanford.edu when they make a useful addition.
+ * It would be nice if significant contributions could be merged into the
  * main distribution.
  *
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
  *
- * END_HEADER 
+ * END_HEADER
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
@@ -60,7 +60,7 @@ public class FontSettings implements SettingsPanel {
 
 	private final String[] preferredFonts = {
 
-	"Arial", "Tahoma", "Verdana", "Times New Roman", "Helvetica", "Calibri",
+			"Arial", "Tahoma", "Verdana", "Times New Roman", "Helvetica", "Calibri",
 			"Courier", "Dialog", "Myriad" };
 
 	private Font[] fonts;
@@ -81,7 +81,7 @@ public class FontSettings implements SettingsPanel {
 	/**
 	 * Makes a JPanel that includes the font selection options. Then returns
 	 * this JPanel.
-	 * 
+	 *
 	 * @return JPanel
 	 */
 	public JPanel makeFontPanel() {
@@ -96,23 +96,23 @@ public class FontSettings implements SettingsPanel {
 
 	public static void main(final String[] argv) {
 
-//		final HeaderInfo hi = new DummyHeaderInfo();
-//		final UrlExtractor ue = new UrlExtractor(hi);
-//
-//		final FontSelectable fs = new TextView(hi, ue);
-//		final FontSelectable fs2 = new ArrayNameView(hi, ue);
-//		fs.setPoints(10);
-//		final FontSettings e = new FontSettings(fs, fs2);
-//		final JFrame f = new JFrame(StringRes.test_title_FontSelector);
-//		f.add(e.makeFontPanel());
-//		f.addWindowListener(new WindowAdapter() {
-//			@Override
-//			public void windowClosing(final WindowEvent we) {
-//				System.exit(0);
-//			}
-//		});
-//		f.pack();
-//		f.setVisible(true);
+		// final HeaderInfo hi = new DummyHeaderInfo();
+		// final UrlExtractor ue = new UrlExtractor(hi);
+		//
+		// final FontSelectable fs = new TextView(hi, ue);
+		// final FontSelectable fs2 = new ArrayNameView(hi, ue);
+		// fs.setPoints(10);
+		// final FontSettings e = new FontSettings(fs, fs2);
+		// final JFrame f = new JFrame(StringRes.test_title_FontSelector);
+		// f.add(e.makeFontPanel());
+		// f.addWindowListener(new WindowAdapter() {
+		// @Override
+		// public void windowClosing(final WindowEvent we) {
+		// System.exit(0);
+		// }
+		// });
+		// f.pack();
+		// f.setVisible(true);
 	}
 
 	@Override
@@ -132,11 +132,11 @@ public class FontSettings implements SettingsPanel {
 	 */
 	public final static String[] styles = {
 
-	"Plain", "Italic", "Bold", "Bold Italic" };
+		"Plain", "Italic", "Bold", "Bold Italic" };
 
 	/**
 	 * turn a style number from class java.awt.Font into a string
-	 * 
+	 *
 	 * @param style
 	 *            style index
 	 * @return string description
@@ -161,7 +161,7 @@ public class FontSettings implements SettingsPanel {
 
 	/**
 	 * turn a string into a style number
-	 * 
+	 *
 	 * @param style
 	 *            string description
 	 * @return integer encoded representation
@@ -170,8 +170,8 @@ public class FontSettings implements SettingsPanel {
 
 		return style.equalsIgnoreCase(styles[0]) ? Font.PLAIN : style
 				.equalsIgnoreCase(styles[1]) ? Font.ITALIC : style
-				.equalsIgnoreCase(styles[2]) ? Font.BOLD : Font.BOLD
-				+ Font.ITALIC;
+						.equalsIgnoreCase(styles[2]) ? Font.BOLD : Font.BOLD
+								+ Font.ITALIC;
 	}
 
 	/**
@@ -204,7 +204,7 @@ public class FontSettings implements SettingsPanel {
 
 	/**
 	 * Create a blocking dialog containing this component
-	 * 
+	 *
 	 * @param f
 	 *            frame to block
 	 */
@@ -282,9 +282,9 @@ public class FontSettings implements SettingsPanel {
 	/**
 	 * Listener to remove need for a button. When the user chooses a value for a
 	 * Swing component with this listener, the font is automatically updated.
-	 * 
+	 *
 	 * @author CKeil
-	 * 
+	 *
 	 */
 	class SelectionListener implements ActionListener {
 

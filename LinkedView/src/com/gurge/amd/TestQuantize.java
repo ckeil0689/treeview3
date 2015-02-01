@@ -12,19 +12,19 @@ import java.io.IOException;
 
 /**
  * Test color quantization of an image.
- * 
+ *
  * <p>
  * <b>Usage: Test [image file] [# colors] [# colors] ...</b>
  * <p>
- * 
+ *
  * For example:
- * 
+ *
  * <pre>
  * java quantize.TestQuantize gub.jpg 100 50 20 10
  * </pre>
- * 
+ *
  * will display gub.jpg with 100, 50, 20, and 10 colors.
- * 
+ *
  * @version 0.90 19 Sep 2000
  * @author <a href="http://www.gurge.com/amd/">Adam Doppelt</a>
  */
@@ -56,10 +56,9 @@ public class TestQuantize {
 				0, w);
 
 		try {
-			if (grabber.grabPixels() != true) {
+			if (grabber.grabPixels() != true)
 				throw new IOException("Grabber returned false: "
 						+ grabber.status());
-			}
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}

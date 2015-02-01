@@ -9,7 +9,7 @@
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
  *
- * This software is provided under the GNU GPL Version 2. In particular, 
+ * This software is provided under the GNU GPL Version 2. In particular,
  *
  * 1) If you modify a source file, make a comment in it containing your name and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
@@ -18,7 +18,7 @@
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
  *
- * END_HEADER 
+ * END_HEADER
  */
 package edu.stanford.genetics.treeview;
 
@@ -31,18 +31,16 @@ public class DummyHeaderInfo implements HeaderInfo {
 
 	@Override
 	public String[] getHeader(final int i) {
-		if (i == 1) {
+		if (i == 1)
 			return header1;
-		}
-		if (i == 2) {
+		if (i == 2)
 			return header2;
-		}
 		return header3;
 	}
 
 	/**
 	 * Gets the header info for gene/array i, col name
-	 * 
+	 *
 	 * @param i
 	 *            index of the header to get
 	 * @return The array of header values
@@ -56,7 +54,7 @@ public class DummyHeaderInfo implements HeaderInfo {
 
 	/**
 	 * Gets the names of the headers
-	 * 
+	 *
 	 * @return The list of names
 	 */
 	@Override
@@ -76,18 +74,16 @@ public class DummyHeaderInfo implements HeaderInfo {
 
 	@Override
 	public int getIndex(final String name) {
-		if (name.equals("Bob")) {
+		if (name.equals("Bob"))
 			return 0;
-		}
 		return 1;
 	}
 
 	@Override
 	public int getHeaderIndex(final String id) {
 		for (int i = 0; i < getNumHeaders(); i++) {
-			if ((getHeader(i)[0]).equals(id)) {
+			if ((getHeader(i)[0]).equals(id))
 				return i;
-			}
 		}
 		return -1;
 	}

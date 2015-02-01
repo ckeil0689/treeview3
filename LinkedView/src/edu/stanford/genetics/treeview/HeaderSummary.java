@@ -9,7 +9,7 @@
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
  *
- * This software is provided under the GNU GPL Version 2. In particular, 
+ * This software is provided under the GNU GPL Version 2. In particular,
  *
  * 1) If you modify a source file, make a comment in it containing your name and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
@@ -18,7 +18,7 @@
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
  *
- * END_HEADER 
+ * END_HEADER
  */
 package edu.stanford.genetics.treeview;
 
@@ -56,7 +56,7 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 
 	/**
 	 * returns the best possible summary for the specified index.
-	 * 
+	 *
 	 * If no headers are applicable, will return the empty string.
 	 */
 	public String getSummary(final HeaderInfo headerInfo, final int index) {
@@ -73,15 +73,17 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 			return null;
 		}
 
-		if (strings == null) return "";
+		if (strings == null)
+			return "";
 
 		final StringBuffer out = new StringBuffer();
 		int count = 0;
-		if (included.length == 0) return "";
+		if (included.length == 0)
+			return "";
 
-		for (int i = 0; i < included.length; i++) {
+		for (final int element : included) {
 			try {
-				final String test = strings[included[i]];
+				final String test = strings[element];
 				if (test != null) {
 					if (count != 0) {
 						out.append(", ");
@@ -102,8 +104,7 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		return (count == 0) ? "" : out.toString();
 	}
 
-	public String[] getSummaryArray(final HeaderInfo headerInfo, 
-			final int index) {
+	public String[] getSummaryArray(final HeaderInfo headerInfo, final int index) {
 
 		String[] strings = null;
 		try {
@@ -118,16 +119,17 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 			return null;
 		}
 
-		if (strings == null) return null;
+		if (strings == null)
+			return null;
 
-		if (included.length == 0) return null;
-
+		if (included.length == 0)
+			return null;
 
 		final String[] out = new String[included.length];
 		int count = 0;
-		for (int i = 0; i < included.length; i++) {
+		for (final int element : included) {
 			try {
-				final String test = strings[included[i]];
+				final String test = strings[element];
 				out[count] = test;
 				count++;
 			} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
@@ -155,7 +157,8 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 
 	private void synchronizeFrom() {
 
-		if (configNode == null) return;
+		if (configNode == null)
+			return;
 
 		if (nodeHasAttribute("included")) {
 			final String incString = configNode.get("included", "1");
@@ -165,8 +168,9 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 			} else {
 				int numComma = 0;
 				for (int i = 0; i < incString.length(); i++) {
-					if (incString.charAt(i) == ',')
+					if (incString.charAt(i) == ',') {
 						numComma++;
+					}
 				}
 
 				final int[] array = new int[numComma + 1];
@@ -198,7 +202,8 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 
 	private void synchronizeTo() {
 
-		if (configNode == null) return;
+		if (configNode == null)
+			return;
 
 		final int[] vec = getIncluded();
 		final StringBuffer temp = new StringBuffer();
@@ -221,9 +226,9 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		try {
 			final String[] keys = configNode.keys();
 
-			for (int i = 0; i < keys.length; i++) {
+			for (final String key : keys) {
 
-				if (keys[i].equalsIgnoreCase(name)) {
+				if (key.equalsIgnoreCase(name)) {
 					contains = true;
 					break;
 				}
@@ -231,7 +236,8 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 			return contains;
 
 		} catch (final BackingStoreException e) {
-			LogBuffer.logException(e);;
+			LogBuffer.logException(e);
+			;
 			return contains;
 		}
 	}

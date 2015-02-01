@@ -33,34 +33,34 @@ import edu.stanford.genetics.treeview.LogBuffer;
 /**
  * Class for Drawing A Colored Grid Representation of a Sequence Alignment from
  * an annotation column.
- * 
+ *
  * Each cell in the view corresponds to a character in the alignment. The color
  * of the pixels is determined by the CharColorExtractor, which is passed in the
  * char to be converted.
  * <p>
- * 
+ *
  * The ArrayDrawer is Observable. It setsChanged() itself when the annotation is
  * changed, but you have to call notifyObservers() yourself. Notifications from
  * the CharColorExtractor, however, are immediately passed on to listeners.
  * <p>
- * 
+ *
  * Upon setting a data array, ArrayDrawer will keep a reference to the data
  * array, and may refer to it when it asked to draw things. Of course, it may
  * form some kind of internal buffer- you're advised to call setData() if you
  * change the data, and not to change the data unless you call setData() too.
  * <p>
- * 
+ *
  * The ArrayDrawer can draw on a Graphics object. It requires a source rectangle
  * in units of array indexes, to determine which array values to render, and a
  * destination rectangle to draw them to.
  * <p>
- * 
+ *
  * At some point, we many want to allow arrays of ints to specify source rows
  * and columns to grab data from for non-contiguous views.
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.1 $ $Date: 2006-08-16 19:13:45 $
- * 
+ *
  */
 public class CharArrayDrawer extends ArrayDrawer {
 	/** Constructor does nothing but set defaults */
@@ -70,7 +70,7 @@ public class CharArrayDrawer extends ArrayDrawer {
 
 	/**
 	 * Set CharColorExtractor for future draws
-	 * 
+	 *
 	 * @param colorExtractor
 	 *            A CharColorExtractor to draw required pixels
 	 */
@@ -85,7 +85,7 @@ public class CharArrayDrawer extends ArrayDrawer {
 
 	/**
 	 * Gets the colorExtractor attribute of the ArrayDrawer object
-	 * 
+	 *
 	 * @return The colorExtractor value
 	 */
 	public CharColorExtractor getColorExtractor() {
@@ -94,7 +94,7 @@ public class CharArrayDrawer extends ArrayDrawer {
 
 	/**
 	 * Set the source of the data.
-	 * 
+	 *
 	 * @param info
 	 *            A HeaderInfo containing the column of aligned sequence
 	 * @param name
@@ -111,7 +111,7 @@ public class CharArrayDrawer extends ArrayDrawer {
 	/**
 	 * Paint the array values onto pixels. This method will do averaging if
 	 * multiple values map to the same pixel.
-	 * 
+	 *
 	 * @param pixels
 	 *            The pixel buffer to draw to.
 	 * @param source
@@ -129,10 +129,10 @@ public class CharArrayDrawer extends ArrayDrawer {
 	 */
 	@Override
 	public void paint(final int[] pixels, final Rectangle source,
-			final Rectangle dest, final int scanSize, final int[] geneOrder) { 
-		
+			final Rectangle dest, final int scanSize, final int[] geneOrder) {
+
 		/* Selection dimming */
-//	, int[] geneSelection, int[] arraySelection) {
+		// , int[] geneSelection, int[] arraySelection) {
 
 		if (headerInfo == null) {
 			System.out.println("header info wasn't set");
@@ -169,8 +169,9 @@ public class CharArrayDrawer extends ArrayDrawer {
 					for (int i = geneFirst; i <= gene; i++) {
 						for (int j = arrayFirst; j <= array; j++) {
 							int actualGene = source.y + i;
-							if (geneOrder != null)
+							if (geneOrder != null) {
 								actualGene = geneOrder[actualGene];
+							}
 							final Color thisC = getColor(j + source.x,
 									actualGene);
 							r += thisC.getRed();
@@ -249,7 +250,7 @@ public class CharArrayDrawer extends ArrayDrawer {
 
 	/**
 	 * Get char for a given array element
-	 * 
+	 *
 	 * @param x
 	 *            x coordinate of array element
 	 * @param y
@@ -259,9 +260,8 @@ public class CharArrayDrawer extends ArrayDrawer {
 	public char getChar(final int x, final int y) {
 		final String aln = headerInfo.getHeader(y, headerName);
 		try {
-			if (aln != null) {
+			if (aln != null)
 				return aln.charAt(x);
-			}
 		} catch (final IndexOutOfBoundsException e) {
 			LogBuffer.println("IndexOutOfBoundsException in "
 					+ "getChar() in CharArrayDrawer: " + e.getMessage());
@@ -279,12 +279,10 @@ public class CharArrayDrawer extends ArrayDrawer {
 	public boolean isMissing(final int x, final int y) {
 
 		final String aln = headerInfo.getHeader(y, headerName);
-		@SuppressWarnings("unused")
-		// used to test whether char in bounds
-		char test;
 		try {
-			if (aln != null)
-				test = aln.charAt(x);
+			if (aln != null) {
+				aln.charAt(x);
+			}
 			return false;
 		} catch (final IndexOutOfBoundsException e) {
 			LogBuffer.println("IndexOutOfBoundsException in "
@@ -301,9 +299,8 @@ public class CharArrayDrawer extends ArrayDrawer {
 	/** how many rows are there to draw? */
 	@Override
 	public int getNumRow() {
-		if ((headerInfo != null) && (headerName != null)) {
+		if ((headerInfo != null) && (headerName != null))
 			return headerInfo.getNumHeaders();
-		}
 		return 0;
 	}
 
@@ -317,8 +314,9 @@ public class CharArrayDrawer extends ArrayDrawer {
 					final String header = headerInfo.getHeader(i, headerName);
 					if (header != null) {
 						final int length = header.length();
-						if (length > max)
+						if (length > max) {
 							max = length;
+						}
 					}
 				}
 				return max;
@@ -332,7 +330,7 @@ public class CharArrayDrawer extends ArrayDrawer {
 
 	/**
 	 * Get Color for a given array element
-	 * 
+	 *
 	 * @param x
 	 *            x coordinate of array element
 	 * @param y

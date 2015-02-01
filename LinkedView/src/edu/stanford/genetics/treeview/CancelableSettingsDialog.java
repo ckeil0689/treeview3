@@ -37,7 +37,7 @@ import Utilities.GUIFactory;
 
 /**
  * this is a dialog which displays a single cancelable settings panel
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version @version $Revision: 1.6 $ $Date: 2004-12-21 03:28:13 $
  */
@@ -49,7 +49,7 @@ public class CancelableSettingsDialog extends JDialog {
 	JDialog settingsFrame;
 
 	/**
-	 * 
+	 *
 	 * @param frame
 	 *            <code>JFrame</code> to block on
 	 * @param title
@@ -63,12 +63,12 @@ public class CancelableSettingsDialog extends JDialog {
 		super(frame, title, true);
 		settingsPanel = panel;
 		settingsFrame = this;
-		final JPanel inner = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, 
+		final JPanel inner = GUIFactory.createJPanel(false, GUIFactory.DEFAULT,
 				null);
-		
+
 		inner.add((Component) panel, "push, grow, wrap");
 		inner.add(new ButtonPanel(), "pushx, growx, alignx 50%");
-		
+
 		getContentPane().add(inner);
 		pack();
 	}

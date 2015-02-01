@@ -5,19 +5,19 @@
  *
  * Permission to use, copy, modify, and distribute this software
  * and its documentation for NON-COMMERCIAL or COMMERCIAL purposes and
- * without fee is hereby granted. 
+ * without fee is hereby granted.
  * Please refer to the file http://java.sun.com/copy_trademarks.html
  * for further important copyright and trademark information and to
  * http://java.sun.com/licensing.html for further important licensing
  * information for the Java (tm) Technology.
- * 
+ *
  * SUN MAKES NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF
  * THE SOFTWARE, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
  * TO THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
  * PARTICULAR PURPOSE, OR NON-INFRINGEMENT. SUN SHALL NOT BE LIABLE FOR
  * ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, MODIFYING OR
  * DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES.
- * 
+ *
  * THIS SOFTWARE IS NOT DESIGNED OR INTENDED FOR USE OR RESALE AS ON-LINE
  * CONTROL EQUIPMENT IN HAZARDOUS ENVIRONMENTS REQUIRING FAIL-SAFE
  * PERFORMANCE, SUCH AS IN THE OPERATION OF NUCLEAR FACILITIES, AIRCRAFT
@@ -41,14 +41,14 @@ package edu.stanford.genetics.treeview;
 /**
  * 19 Feb 1996: Fixed to avoid infinite loop discoved by Paul Haeberli.
  * Misbehaviour expressed when the pivot element was not unique. -Jason Harrison
- * 
+ *
  * 21 Jun 1996: Modified code based on comments from Paul Haeberli, and Peter
  * Schweizer (Peter.Schweizer@mni.fh-giessen.de). Used Daeron Meyer's
  * (daeron@geom.umn.edu) code for the new pivoting code. - Jason Harrison
- * 
+ *
  * 09 Jan 1998: Another set of bug fixes by Thomas Everth (everth@wave.co.nz)
  * and John Brzustowski (jbrzusto@gpu.srv.ualberta.ca).
- * 
+ *
  * 05 Jan 2003: Commented calls to pause(), Added static sort(double) commented
  * refs to stopRequested (camel@alum.mit.edu)
  */
@@ -58,9 +58,9 @@ public class QSortAlgorithm {
 		int lo = lo0;
 		int hi = hi0;
 		// pause(lo, hi);
-		if (lo >= hi) {
+		if (lo >= hi)
 			return;
-		} else if (lo == hi - 1) {
+		else if (lo == hi - 1) {
 			/*
 			 * sort a two element list by swapping if necessary
 			 */
@@ -134,9 +134,9 @@ public class QSortAlgorithm {
 		int lo = lo0;
 		int hi = hi0;
 		// pause(lo, hi);
-		if (lo >= hi) {
+		if (lo >= hi)
 			return;
-		} else if (lo == hi - 1) {
+		else if (lo == hi - 1) {
 			/*
 			 * sort a two element list by swapping if necessary
 			 */

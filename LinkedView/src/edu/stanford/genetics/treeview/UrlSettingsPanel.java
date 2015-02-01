@@ -9,7 +9,7 @@
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
  *
- * This software is provided under the GNU GPL Version 2. In particular, 
+ * This software is provided under the GNU GPL Version 2. In particular,
  *
  * 1) If you modify a source file, make a comment in it containing your name and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
@@ -18,7 +18,7 @@
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
  *
- * END_HEADER 
+ * END_HEADER
  */
 package edu.stanford.genetics.treeview;
 
@@ -42,7 +42,7 @@ import Utilities.GUIFactory;
 
 /**
  * This class displays editable Url settings.
- * 
+ *
  * It requires a UrlExtractor, HeaderInfo and optionally a UrlPresets
  */
 public class UrlSettingsPanel implements SettingsPanel {
@@ -50,7 +50,7 @@ public class UrlSettingsPanel implements SettingsPanel {
 	private final UrlExtractor urlExtractor;
 	private UrlPresets urlPresets = null;
 	private final HeaderInfo headerInfo;
-	
+
 	private JPanel mainPanel;
 
 	private JLabel previewLabel;
@@ -71,19 +71,19 @@ public class UrlSettingsPanel implements SettingsPanel {
 		headerInfo = hi;
 		templateField = new TemplateField();
 		templateField.setText(urlExtractor.getUrlTemplate());
-		templateField.setMinimumSize(new Dimension(300, 
-				templateField.getHeight()));
+		templateField.setMinimumSize(new Dimension(300, templateField
+				.getHeight()));
 	}
-	
-	public JPanel generate(String name) {
-		
+
+	public JPanel generate(final String name) {
+
 		mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 		mainPanel.setBorder(BorderFactory.createTitledBorder(name));
 
 		redoLayout();
 		updatePreview();
 		mainPanel.setEnabled(urlExtractor.isEnabled());
-		
+
 		return mainPanel;
 	}
 
@@ -120,10 +120,11 @@ public class UrlSettingsPanel implements SettingsPanel {
 	public void synchronizeTo() {
 		// nothing to do...
 	}
+
 	public void redoLayout() {
 
 		mainPanel.removeAll();
-		
+
 		final JCheckBox enableBox = new JCheckBox("Enable",
 				urlExtractor.isEnabled());
 		enableBox.addActionListener(new ActionListener() {
@@ -136,7 +137,7 @@ public class UrlSettingsPanel implements SettingsPanel {
 			}
 		});
 		mainPanel.add(enableBox, "alignx 0%, w 10%, split 2");
-		
+
 		headerChoice = new HeaderChoice();
 		mainPanel.add(headerChoice, "align 0%, pushx, wrap");
 
@@ -144,19 +145,19 @@ public class UrlSettingsPanel implements SettingsPanel {
 
 		previewLabel = new JLabel("Ex: " + urlExtractor.getUrl(0));
 		// previewField = new JTextField(urlExtractor.substitute(tester));
-//		previewLabel.setEditable(false);
-//		mainPanel.add(previewLabel, "w 100%, wrap");
-		
-		final JComboBox<String> options = 
-				new JComboBox<String>(urlPresets.getPresetNames());
-		
+		// previewLabel.setEditable(false);
+		// mainPanel.add(previewLabel, "w 100%, wrap");
+
+		final JComboBox<String> options = new JComboBox<String>(
+				urlPresets.getPresetNames());
+
 		options.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 
-				templateField.setText(urlPresets.getTemplate(
-						options.getSelectedIndex()));
+				templateField.setText(urlPresets.getTemplate(options
+						.getSelectedIndex()));
 				updatePreview();
 			}
 		});
@@ -178,7 +179,8 @@ public class UrlSettingsPanel implements SettingsPanel {
 		previewLabel.setText("Ex: " + urlExtractor.getUrl(0));
 	}
 
-	private class HeaderChoice extends JComboBox<String> implements ItemListener {
+	private class HeaderChoice extends JComboBox<String> implements
+			ItemListener {
 
 		private static final long serialVersionUID = 1L;
 

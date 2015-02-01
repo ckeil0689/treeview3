@@ -28,7 +28,7 @@ import java.util.prefs.Preferences;
 
 /**
  * a color set which can be stored in an ConfigNode.
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version @version $Revision: 1.5 $ $Date: 2004-12-21 03:28:14 $
  */
@@ -62,7 +62,7 @@ public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 
 	/**
 	 * used by subclasses to set what they want their default colors to be.
-	 * 
+	 *
 	 * @param defaultColors
 	 *            The new defaultColors value
 	 */
@@ -74,7 +74,7 @@ public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 
 	/**
 	 * Setter for name of the ColorSet
-	 * 
+	 *
 	 * @param name
 	 *            The new name value
 	 */
@@ -106,7 +106,7 @@ public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 
 	/**
 	 * Getter for defaultName
-	 * 
+	 *
 	 * @return The defaultName value
 	 */
 	public String getDefaultName() {
@@ -116,7 +116,7 @@ public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 
 	/**
 	 * Constructor for the ConfigColorSet object
-	 * 
+	 *
 	 * @param defaultName
 	 *            The name of this kind of color set.
 	 * @param types
@@ -138,14 +138,13 @@ public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 	 * Copies entires state from another ConfigColorSet. In general, only do
 	 * this with things that are actually the same class, not between
 	 * subclasses.
-	 * 
+	 *
 	 * @param other
 	 *            The color set to copy state from.
 	 */
 	public void copyStateFrom(final ConfigColorSet other) {
-		if (other == null) {
+		if (other == null)
 			return;
-		}
 		for (int i = 0; i < colors.length; i++) {
 			final Color otherC = other.getColor(getType(i));
 			if (otherC != null) {
@@ -221,14 +220,14 @@ public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 		// final ConfigNode[] colorNodes = configNode.fetch("Color");
 		final String[] childrenNodes = getRootChildrenNodes();
 
-		for (int i = 0; i < childrenNodes.length; i++) {
-			final int type = getIndex(configNode.node(childrenNodes[i]).get(
-					"type", "none"));
+		for (final String childrenNode : childrenNodes) {
+			final int type = getIndex(configNode.node(childrenNode).get("type",
+					"none"));
 			if (type == -1) {
 				continue;
 			}
-			colors[type] = decodeColor(configNode.node(childrenNodes[i]).get(
-					"hex", defaultColors[type]));
+			colors[type] = decodeColor(configNode.node(childrenNode).get("hex",
+					defaultColors[type]));
 		}
 		setName(configNode.get("name", defaultName));
 
@@ -272,11 +271,10 @@ public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 	/* inherit description */
 	@Override
 	public Color getColor(final int i) {
-		if (i == -1) {
+		if (i == -1)
 			return null;
-		} else {
+		else
 			return colors[i];
-		}
 	}
 
 	/* inherit description */
@@ -312,27 +310,25 @@ public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 
 	/**
 	 * Get an index given a type.
-	 * 
+	 *
 	 * @param type
 	 *            The exact string specifying the type
 	 * @return Returns the index of the type, or -1 if there is no such type
 	 */
 	public int getIndex(final String type) {
-		if (type == null) {
+		if (type == null)
 			return -1;
-		}
 		final String[] types = getTypes();
 		for (int i = 0; i < types.length; i++) {
-			if (type.equals(types[i])) {
+			if (type.equals(types[i]))
 				return i;
-			}
 		}
 		return -1;
 	}
 
 	/**
 	 * utility routine to which converts a string to a color
-	 * 
+	 *
 	 * @param colorString
 	 *            a string to be converted
 	 * @return the cognate <code>Color</code>
@@ -343,7 +339,7 @@ public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 
 	/**
 	 * converts a color to a string
-	 * 
+	 *
 	 * @param color
 	 *            a <code>Color</code> to be converted.
 	 * @return the cognate string.
@@ -402,7 +398,7 @@ public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 
 	/**
 	 * Returns the names of the current children of this class' root node.
-	 * 
+	 *
 	 * @return
 	 */
 	public String[] getRootChildrenNodes() {
@@ -417,8 +413,7 @@ public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 				e.printStackTrace();
 				return null;
 			}
-		} else {
+		} else
 			return null;
-		}
 	}
 }

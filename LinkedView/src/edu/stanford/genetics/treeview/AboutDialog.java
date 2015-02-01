@@ -1,10 +1,10 @@
 package edu.stanford.genetics.treeview;
 
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
@@ -15,9 +15,9 @@ import Utilities.StringRes;
 /**
  * A class that generates a JDialog to display some small amounts of
  * information.
- * 
+ *
  * @author CKeil
- * 
+ *
  */
 public class AboutDialog extends CustomDialog {
 
@@ -31,20 +31,23 @@ public class AboutDialog extends CustomDialog {
 		setupLayout();
 
 		dialog.pack();
-		dialog.setLocationRelativeTo(JFrame.getFrames()[0]);
+		dialog.setLocationRelativeTo(Frame.getFrames()[0]);
 	}
 
 	/**
-	 * Setup the layout and content of the mainPanel and add it to the
-	 * dialog.
+	 * Setup the layout and content of the mainPanel and add it to the dialog.
 	 */
 	private void setupLayout() {
 
-		final JLabel text = GUIFactory.createLabel(StringRes.appName
-				+ " was created by Chris Keil, Lance Parsons, Robert Leach, & Anastasia Baryshnikova\n"
-				+ "and is based on Alok Saldhana's Java TreeView.", GUIFactory.FONTS);
+		final JLabel text = GUIFactory
+				.createLabel(
+						StringRes.appName
+								+ " was created by Chris Keil, Lance Parsons, "
+								+ "Robert Leach, & Anastasia Baryshnikova\n"
+								+ "and is based on Alok Saldhana's Java TreeView.",
+						GUIFactory.FONTS);
 
-		final JLabel version = GUIFactory.createLabel("Version: " 
+		final JLabel version = GUIFactory.createLabel("Version: "
 				+ StringRes.versionTag, GUIFactory.FONTS);
 
 		mainPanel.add(text, "span, wrap");
@@ -67,7 +70,7 @@ public class AboutDialog extends CustomDialog {
 		});
 		mainPanel.add(yesB, "wrap");
 
-		final JLabel announce = GUIFactory.createLabel("Announcements", 
+		final JLabel announce = GUIFactory.createLabel("Announcements",
 				GUIFactory.FONTS);
 
 		mainPanel.add(announce);

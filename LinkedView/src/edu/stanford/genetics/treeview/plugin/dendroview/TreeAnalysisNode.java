@@ -2,9 +2,9 @@
  *
  * $Author: avsegal
  * $RCSfile: TreeAnalysisNode.java
- * $Revision: 
+ * $Revision:
  * $Date: Jun 25, 2004
- * $Name:  
+ * $Name:
  *
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
@@ -35,7 +35,7 @@ public abstract class TreeAnalysisNode {
 
 	/**
 	 * Create a new node with given id.
-	 * 
+	 *
 	 * @param pID
 	 *            the id of the node
 	 */
@@ -48,7 +48,7 @@ public abstract class TreeAnalysisNode {
 
 	/**
 	 * Create a new node with a given id and parent.
-	 * 
+	 *
 	 * @param pID
 	 *            the id of the node
 	 * @param pParent
@@ -63,7 +63,7 @@ public abstract class TreeAnalysisNode {
 
 	/**
 	 * Gets the node's id.
-	 * 
+	 *
 	 * @return the id
 	 */
 	public String getID() {
@@ -72,7 +72,7 @@ public abstract class TreeAnalysisNode {
 
 	/**
 	 * Gets the index of this node.
-	 * 
+	 *
 	 * @return the index
 	 */
 	public int getIndex() {
@@ -81,7 +81,7 @@ public abstract class TreeAnalysisNode {
 
 	/**
 	 * Sets the index of this node.
-	 * 
+	 *
 	 * @param ind
 	 *            index to set
 	 */
@@ -91,7 +91,7 @@ public abstract class TreeAnalysisNode {
 
 	/**
 	 * Is this a root node?
-	 * 
+	 *
 	 * @return true if this node is a root, false otherwise
 	 */
 	public boolean isRoot() {
@@ -100,7 +100,7 @@ public abstract class TreeAnalysisNode {
 
 	/**
 	 * Is this a leaf node?
-	 * 
+	 *
 	 * @return true if this node is a leaf, false otherwise
 	 */
 	public boolean isLeaf() {
@@ -109,43 +109,39 @@ public abstract class TreeAnalysisNode {
 
 	/**
 	 * Gets the leftmost leaf of the subtree rooted at this node.
-	 * 
+	 *
 	 * @return the leftmost leaf of subtree.
 	 */
 	public TreeAnalysisNode getLeftLeaf() {
-		if (isLeaf()) {
+		if (isLeaf())
 			return this;
-		}
 
-		if (left != null) {
+		if (left != null)
 			return left.getLeftLeaf();
-		}
 
 		return right.getLeftLeaf(); // right cannot be null, otherwise this is a
-									// leaf
+		// leaf
 	}
 
 	/**
 	 * Gets the rightmost leaf of the subtree rooted at this node.
-	 * 
+	 *
 	 * @return the rightmost leaf of subtree.
 	 */
 	public TreeAnalysisNode getRightLeaf() {
-		if (isLeaf()) {
+		if (isLeaf())
 			return this;
-		}
 
-		if (right != null) {
+		if (right != null)
 			return right.getRightLeaf();
-		}
 
 		return left.getRightLeaf(); // left cannot be null, otherwise this is a
-									// leaf
+		// leaf
 	}
 
 	/**
 	 * Switched the left and right child.
-	 * 
+	 *
 	 */
 	public void flip() {
 		TreeAnalysisNode temp;
@@ -157,7 +153,7 @@ public abstract class TreeAnalysisNode {
 
 	/**
 	 * Gives a listing, in order, of all nodes in this tree.
-	 * 
+	 *
 	 * @param v
 	 *            vector to be filled with the listing
 	 */
@@ -175,20 +171,19 @@ public abstract class TreeAnalysisNode {
 
 	/**
 	 * Computes the root of this node's tree.
-	 * 
+	 *
 	 * @return the root node
 	 */
 	public TreeAnalysisNode findRoot() {
-		if (isRoot()) {
+		if (isRoot())
 			return this;
-		}
 
 		return parent.findRoot();
 	}
 
 	/**
 	 * Find a node with given id in this subtree.
-	 * 
+	 *
 	 * @param id
 	 *            id to look for
 	 * @return node found, or null if no such node exists
@@ -196,22 +191,19 @@ public abstract class TreeAnalysisNode {
 	public TreeAnalysisNode find(final String id) {
 		TreeAnalysisNode temp;
 
-		if (getID().equals(id)) {
+		if (getID().equals(id))
 			return this;
-		}
 
 		if (left != null) {
 			temp = left.find(id);
-			if (temp != null) {
+			if (temp != null)
 				return temp;
-			}
 		}
 
 		if (right != null) {
 			temp = right.find(id);
-			if (temp != null) {
+			if (temp != null)
 				return temp;
-			}
 		}
 
 		return null;
@@ -219,7 +211,7 @@ public abstract class TreeAnalysisNode {
 
 	/**
 	 * Set the left child.
-	 * 
+	 *
 	 * @param node
 	 *            left child
 	 */
@@ -229,7 +221,7 @@ public abstract class TreeAnalysisNode {
 
 	/**
 	 * Gets the left child.
-	 * 
+	 *
 	 * @return left child
 	 */
 	public TreeAnalysisNode getLeft() {
@@ -238,7 +230,7 @@ public abstract class TreeAnalysisNode {
 
 	/**
 	 * Set the right child.
-	 * 
+	 *
 	 * @param node
 	 *            right child
 	 */
@@ -248,7 +240,7 @@ public abstract class TreeAnalysisNode {
 
 	/**
 	 * Gets the right child.
-	 * 
+	 *
 	 * @return right child
 	 */
 	public TreeAnalysisNode getRight() {
@@ -257,7 +249,7 @@ public abstract class TreeAnalysisNode {
 
 	/**
 	 * Sets the parent.
-	 * 
+	 *
 	 * @param node
 	 *            parent
 	 */
@@ -267,7 +259,7 @@ public abstract class TreeAnalysisNode {
 
 	/**
 	 * Gets the parent.
-	 * 
+	 *
 	 * @return parent
 	 */
 	public TreeAnalysisNode getParent() {

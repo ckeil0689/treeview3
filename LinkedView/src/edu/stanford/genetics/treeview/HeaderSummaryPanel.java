@@ -9,7 +9,7 @@
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
  *
- * This software is provided under the GNU GPL Version 2. In particular, 
+ * This software is provided under the GNU GPL Version 2. In particular,
  *
  * 1) If you modify a source file, make a comment in it containing your name and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
@@ -18,7 +18,7 @@
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
  *
- * END_HEADER 
+ * END_HEADER
  */
 package edu.stanford.genetics.treeview;
 
@@ -32,14 +32,14 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import Utilities.GUIFactory;
 import net.miginfocom.swing.MigLayout;
+import Utilities.GUIFactory;
 
 /**
  * enables editing of a headerSummary object.
  */
 public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
-		Observer {
+Observer {
 
 	private static final long serialVersionUID = 1L;
 
@@ -126,7 +126,7 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 
 	/**
 	 * Returns the smallest index from a selected range in the header list.
-	 * 
+	 *
 	 * @return The index of the selected list item.
 	 */
 	public int getSmallestSelectedIndex() {
@@ -139,12 +139,12 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 
 		final int[] included = getHeaderSummary().getIncluded();
 		final JList<String> list = getHeaderList();
-		
-		if (list == null) return;
-		
+
+		if (list == null)
+			return;
+
 		list.clearSelection();
-		for (int i = 0; i < included.length; i++) {
-			final int index = included[i];
+		for (final int index : included) {
 			if ((index >= 0) && (index < list.getModel().getSize())) {
 				list.addSelectionInterval(index, index);
 			}
@@ -159,7 +159,7 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
 	 */
 	@Override

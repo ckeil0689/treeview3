@@ -18,8 +18,8 @@ import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import Utilities.GUIFactory;
 import net.miginfocom.swing.MigLayout;
+import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.ContrastSelectable;
 
 class ContrastSelector extends JPanel implements AdjustmentListener {
@@ -89,7 +89,7 @@ class ContrastSelector extends JPanel implements AdjustmentListener {
 
 	public JPanel setPanelLayout() {
 
-		final JPanel panel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, 
+		final JPanel panel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT,
 				null);
 
 		return panel;

@@ -13,14 +13,14 @@ import edu.stanford.genetics.treeview.PluginFactory;
 /**
  * Prints info about the installed modules Currently, this is a very boring
  * class.
- * 
+ *
  * @author aloksaldanha
- * 
+ *
  */
 public class PluginInfo extends JPanel {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -1205246332280997485L;
 
@@ -29,8 +29,8 @@ public class PluginInfo extends JPanel {
 		if (plugins == null || plugins.length == 0) {
 			add(new JLabel("No Plugins Found"));
 		} else {
-			for (int i = 0; i < plugins.length; i++) {
-				add(new JLabel(plugins[i].getPluginName()));
+			for (final PluginFactory plugin : plugins) {
+				add(new JLabel(plugin.getPluginName()));
 			}
 		}
 	}

@@ -9,7 +9,7 @@
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
  *
- * This software is provided under the GNU GPL Version 2. In particular, 
+ * This software is provided under the GNU GPL Version 2. In particular,
  *
  * 1) If you modify a source file, make a comment in it containing your name and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
@@ -18,7 +18,7 @@
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
  *
- * END_HEADER 
+ * END_HEADER
  */
 package edu.stanford.genetics.treeview;
 
@@ -66,10 +66,12 @@ public class ThreadListener extends Thread {
 				+ g.getMaxPriority()
 				+ (g.isDaemon() ? " Daemon" : " Not Daemon"));
 
-		for (int i = 0; i < num_threads; i++)
+		for (int i = 0; i < num_threads; i++) {
 			print_thread_info(out, threads[i], indent + " ");
-		for (int i = 0; i < num_groups; i++)
+		}
+		for (int i = 0; i < num_groups; i++) {
 			list_group(out, groups[i], indent + " ");
+		}
 	}
 
 	// find root thread and list recursively

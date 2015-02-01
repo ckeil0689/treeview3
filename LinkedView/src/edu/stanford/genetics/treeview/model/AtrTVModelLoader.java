@@ -2,9 +2,9 @@
  *
  * $Author: avsegal
  * $RCSfile: AtrTVModelLoader.java
- * $Revision: 
+ * $Revision:
  * $Date: Jun 25, 2004
- * $Name:  
+ * $Name:
  *
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
@@ -25,10 +25,9 @@ package edu.stanford.genetics.treeview.model;
 
 import Controllers.TVController;
 
-
 /**
  * @author avsegal
- * 
+ *
  *         To change the template for this generated type comment go to
  *         Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
@@ -37,7 +36,7 @@ public class AtrTVModelLoader extends ModelLoader { // TVModelLoader2 {
 	/**
 	 * @param targetModel
 	 */
-	public AtrTVModelLoader(final AtrTVModel targetModel, 
+	public AtrTVModelLoader(final AtrTVModel targetModel,
 			final TVController controller) {
 		super(targetModel, controller);
 	}

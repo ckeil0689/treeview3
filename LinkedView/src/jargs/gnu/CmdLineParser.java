@@ -11,7 +11,7 @@ import java.util.Vector;
  * long-form (--verbose) option support, and also allows options with associated
  * values (-d 2, --debug 2, --debug=2). Option processing can be explicitly
  * terminated by the argument '--'.
- * 
+ *
  * @author Steve Purcell
  * @version $Revision: 1.10 $
  * @see jargs.examples.gnu.OptionTest
@@ -56,11 +56,11 @@ public class CmdLineParser {
 	 * Thrown when the parsed commandline contains multiple concatenated short
 	 * options, such as -abcd, where one is unknown. <code>getMessage()</code>
 	 * returns an english human-readable error string.
-	 * 
+	 *
 	 * @author Vidar Holen
 	 */
 	public static class UnknownSuboptionException extends
-			UnknownOptionException {
+	UnknownOptionException {
 		private final char suboption;
 
 		UnknownSuboptionException(final String option, final char suboption) {
@@ -78,7 +78,7 @@ public class CmdLineParser {
 	 * Thrown when the parsed commandline contains multiple concatenated short
 	 * options, such as -abcd, where one or more requires a value.
 	 * <code>getMessage()</code> returns an english human-readable error string.
-	 * 
+	 *
 	 * @author Vidar Holen
 	 */
 	public static class NotFlagException extends UnknownOptionException {
@@ -173,13 +173,11 @@ public class CmdLineParser {
 		public final Object getValue(final String arg, final Locale locale)
 				throws IllegalOptionValueException {
 			if (this.wantsValue) {
-				if (arg == null) {
+				if (arg == null)
 					throw new IllegalOptionValueException(this, "");
-				}
 				return this.parseValue(arg, locale);
-			} else {
+			} else
 				return Boolean.TRUE;
-			}
 		}
 
 		/**
@@ -300,15 +298,16 @@ public class CmdLineParser {
 	 * Add the specified Option to the list of accepted options
 	 */
 	public final Option addOption(final Option opt) {
-		if (opt.shortForm() != null)
+		if (opt.shortForm() != null) {
 			this.options.put("-" + opt.shortForm(), opt);
+		}
 		this.options.put("--" + opt.longForm(), opt);
 		return opt;
 	}
 
 	/**
 	 * Convenience method for adding a string option.
-	 * 
+	 *
 	 * @return the new Option
 	 */
 	public final Option addStringOption(final char shortForm,
@@ -318,7 +317,7 @@ public class CmdLineParser {
 
 	/**
 	 * Convenience method for adding a string option.
-	 * 
+	 *
 	 * @return the new Option
 	 */
 	public final Option addStringOption(final String longForm) {
@@ -327,7 +326,7 @@ public class CmdLineParser {
 
 	/**
 	 * Convenience method for adding an integer option.
-	 * 
+	 *
 	 * @return the new Option
 	 */
 	public final Option addIntegerOption(final char shortForm,
@@ -337,7 +336,7 @@ public class CmdLineParser {
 
 	/**
 	 * Convenience method for adding an integer option.
-	 * 
+	 *
 	 * @return the new Option
 	 */
 	public final Option addIntegerOption(final String longForm) {
@@ -346,7 +345,7 @@ public class CmdLineParser {
 
 	/**
 	 * Convenience method for adding a long integer option.
-	 * 
+	 *
 	 * @return the new Option
 	 */
 	public final Option addLongOption(final char shortForm,
@@ -356,7 +355,7 @@ public class CmdLineParser {
 
 	/**
 	 * Convenience method for adding a long integer option.
-	 * 
+	 *
 	 * @return the new Option
 	 */
 	public final Option addLongOption(final String longForm) {
@@ -365,7 +364,7 @@ public class CmdLineParser {
 
 	/**
 	 * Convenience method for adding a double option.
-	 * 
+	 *
 	 * @return the new Option
 	 */
 	public final Option addDoubleOption(final char shortForm,
@@ -375,7 +374,7 @@ public class CmdLineParser {
 
 	/**
 	 * Convenience method for adding a double option.
-	 * 
+	 *
 	 * @return the new Option
 	 */
 	public final Option addDoubleOption(final String longForm) {
@@ -384,7 +383,7 @@ public class CmdLineParser {
 
 	/**
 	 * Convenience method for adding a boolean option.
-	 * 
+	 *
 	 * @return the new Option
 	 */
 	public final Option addBooleanOption(final char shortForm,
@@ -394,7 +393,7 @@ public class CmdLineParser {
 
 	/**
 	 * Convenience method for adding a boolean option.
-	 * 
+	 *
 	 * @return the new Option
 	 */
 	public final Option addBooleanOption(final String longForm) {
@@ -416,11 +415,11 @@ public class CmdLineParser {
 	public final Object getOptionValue(final Option o, final Object def) {
 		final Vector v = (Vector) values.get(o.longForm());
 
-		if (v == null) {
+		if (v == null)
 			return def;
-		} else if (v.isEmpty()) {
+		else if (v.isEmpty())
 			return null;
-		} else {
+		else {
 			final Object result = v.elementAt(0);
 			v.removeElementAt(0);
 			return result;
@@ -437,9 +436,9 @@ public class CmdLineParser {
 		while (true) {
 			final Object o = getOptionValue(option, null);
 
-			if (o == null) {
+			if (o == null)
 				return result;
-			} else {
+			else {
 				result.addElement(o);
 			}
 		}
@@ -513,9 +512,8 @@ public class CmdLineParser {
 				}
 
 				final Option opt = (Option) this.options.get(curArg);
-				if (opt == null) {
+				if (opt == null)
 					throw new UnknownOptionException(curArg);
-				}
 				Object value = null;
 				if (opt.wantsValue()) {
 					if (valueArg == null) {

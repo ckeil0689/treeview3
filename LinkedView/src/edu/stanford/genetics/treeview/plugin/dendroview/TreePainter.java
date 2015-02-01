@@ -9,7 +9,7 @@
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
  *
- * This software is provided under the GNU GPL Version 2. In particular, 
+ * This software is provided under the GNU GPL Version 2. In particular,
  *
  * 1) If you modify a source file, make a comment in it containing your name and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
@@ -18,7 +18,7 @@
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
  *
- * END_HEADER 
+ * END_HEADER
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
@@ -34,7 +34,7 @@ import edu.stanford.genetics.treeview.TreeDrawerNode;
 
 /**
  * Class for drawing ATR-style inverted trees
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version Alpha
  */
@@ -49,11 +49,10 @@ public class TreePainter extends TreeDrawer {
 			final LinearTransformation yScaleEq, final Rectangle dest,
 			final TreeDrawerNode selected, final boolean isLeft) {
 
-		if ((getRootNode() == null) || (getRootNode().isLeaf()))
+		if ((getRootNode() == null) || (getRootNode().isLeaf())) {
 			LogBuffer.println("Root node is null or leaf in paint() "
 					+ "in InvertedTreeDrawer!");
-
-		else {
+		} else {
 			this.isLeft = isLeft;
 			// recursively drawtree...
 			final NodeDrawer nd = new NodeDrawer(graphics, xScaleEq, yScaleEq,
@@ -70,10 +69,9 @@ public class TreePainter extends TreeDrawer {
 			final boolean isLeft) {
 
 		if ((root == null) || (root.isLeaf()) || (xScaleEq == null)
-				|| (yScaleEq == null)) {
+				|| (yScaleEq == null))
 			return;
-
-		} else {
+		else {
 			this.isLeft = isLeft;
 			// recursively drawtree...
 			final NodeDrawer nd = new NodeDrawer(graphics, xScaleEq, yScaleEq,
@@ -89,10 +87,9 @@ public class TreePainter extends TreeDrawer {
 			final TreeDrawerNode root, final TreeDrawerNode selected,
 			final boolean isLeft) {
 
-		if ((root == null) || (root.isLeaf())) {
+		if ((root == null) || (root.isLeaf()))
 			return;
-
-		} else {
+		else {
 			this.isLeft = isLeft;
 			// recursively drawtree...
 			final NodeDrawer nd = new NodeDrawer(graphics, xScaleEq, yScaleEq,
@@ -107,10 +104,9 @@ public class TreePainter extends TreeDrawer {
 			final TreeDrawerNode root, final boolean isSelected,
 			final boolean isLeft) {
 
-		if ((root == null) || (root.isLeaf())) {
+		if ((root == null) || (root.isLeaf()))
 			return;
-
-		} else {
+		else {
 			this.isLeft = isLeft;
 			// just draw single..
 			final NodeDrawer nd = new NodeDrawer(graphics, xScaleEq, yScaleEq,
@@ -127,7 +123,7 @@ public class TreePainter extends TreeDrawer {
 
 	/**
 	 * this is an internal helper class which does a sort of recursive drawing
-	 * 
+	 *
 	 * @author Alok Saldanha <alok@genome.stanford.edu>
 	 * @version Alpha
 	 */
@@ -145,18 +141,18 @@ public class TreePainter extends TreeDrawer {
 
 		/**
 		 * The constructor sets the variables
-		 * 
+		 *
 		 * @param g
 		 *            The graphics object to print to
-		 * 
+		 *
 		 * @param xScaleEq
 		 *            The equation to be applied to scale the index of the nodes
 		 *            to graphics object
-		 * 
+		 *
 		 * @param yScaleEq
 		 *            The equation to be applied to scale the correlation of the
 		 *            nodes to the graphics object
-		 * 
+		 *
 		 *            maybe foreground color, selection color and node color
 		 *            should be options?
 		 */
@@ -236,27 +232,27 @@ public class TreePainter extends TreeDrawer {
 		/*
 		 * // just return if no subkids visible. if ((node.getMaxIndex() <
 		 * minInd) || (node.getMinIndex() > maxInd)) return;
-		 * 
+		 *
 		 * // lots of stack allocation... TreeDrawerNode left = node.getLeft();
 		 * TreeDrawerNode right = node.getRight();
-		 * 
+		 *
 		 * int ry = (int) yT.transform(right.getCorr()); int ly = (int)
 		 * yT.transform(left.getCorr()); int ty = (int)
 		 * yT.transform(node.getCorr());
-		 * 
+		 *
 		 * int rx = (int) xT.transform(right.getIndex() + .5); int lx = (int)
 		 * xT.transform(left.getIndex() + .5); int tx = (int)
 		 * xT.transform(node.getIndex() + .5); Color t = graphics.getColor();
-		 * 
+		 *
 		 * isSelected = (node == selected); // System.out.println("rx = " + rx +
 		 * ", ry = " + ry + ", lx = " + lx + ", ly = " + ly);
-		 * 
+		 *
 		 * // oval first?... // graphics.setColor(node_color); //
 		 * graphics.drawOval(tx - 1,ty - 1,2,2);
-		 * 
+		 *
 		 * //draw our (flipped) polyline... if (isSelected)
 		 * graphics.setColor(sel_color); else graphics.setColor(t);
-		 * 
+		 *
 		 * graphics.drawPolyline(new int[] {rx, rx, lx, lx}, new int[] {ry, ty,
 		 * ty, ly}, 4); if (left.isLeaf() == false) draw(left); if
 		 * (right.isLeaf() == false) draw(right); if (isSelected)
@@ -295,7 +291,7 @@ public class TreePainter extends TreeDrawer {
 				ry = (int) yT.transform(right.getIndex() + .5);
 				ly = (int) yT.transform(left.getIndex() + .5);
 
-			// ATRView
+				// ATRView
 			} else {
 				ry = (int) yT.transform(right.getCorr());
 				ly = (int) yT.transform(left.getCorr());

@@ -34,11 +34,11 @@ import edu.stanford.genetics.treeview.ColorIcon;
 
 /**
  * This class allows editing of a color set...
- * 
+ *
  * NOTE: This is superceded by the ConfigColorSet stuff in
  * edu.stanford.genetics.treeview, although this code is still used within the
  * dendroview package.
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version @version $Revision: 1.1 $ $Date: 2006-08-16 19:13:46 $
  */
@@ -55,7 +55,7 @@ public class ColorSetEditor extends JPanel {
 
 	/**
 	 * Constructor for the ColorSetEditor object
-	 * 
+	 *
 	 * @param colorSet
 	 *            <code>ColorSet</code> to be edited
 	 */
@@ -68,25 +68,25 @@ public class ColorSetEditor extends JPanel {
 		add(new ColorPanel(MISSING));
 	}
 
-//	/**
-//	 * A simple test program
-//	 * 
-//	 * @param argv
-//	 *            ignored
-//	 */
-//	public final static void main(final String[] argv) {
-//
-//		final ColorSet temp = new ColorSet();
-//		final ColorSetEditor cse = new ColorSetEditor(temp);
-//		final JFrame frame = new JFrame("ColorSetEditor Test");
-//		frame.getContentPane().add(cse);
-//		frame.pack();
-//		frame.setVisible(true);
-//	}
+	// /**
+	// * A simple test program
+	// *
+	// * @param argv
+	// * ignored
+	// */
+	// public final static void main(final String[] argv) {
+	//
+	// final ColorSet temp = new ColorSet();
+	// final ColorSetEditor cse = new ColorSetEditor(temp);
+	// final JFrame frame = new JFrame("ColorSetEditor Test");
+	// frame.getContentPane().add(cse);
+	// frame.pack();
+	// frame.setVisible(true);
+	// }
 
 	class ColorPanel extends JPanel {
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = 1L;
 		ColorIcon colorIcon;
@@ -105,8 +105,8 @@ public class ColorSetEditor extends JPanel {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final Color trial = JColorChooser.showDialog(
-							ColorSetEditor.this, "Pick Color for "
-									+ getLabel(), getColor());
+							ColorSetEditor.this,
+							"Pick Color for " + getLabel(), getColor());
 					if (trial != null) {
 						setColor(trial);
 					}

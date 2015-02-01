@@ -32,14 +32,14 @@ import edu.stanford.genetics.treeview.LogBuffer;
  * This class represents a set of colors which can be used by a color extractor
  * to translate char values into colors. The max char value is set by a
  * constant, usually 128.
- * 
- * 
+ *
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version @version $Revision: 1.1 $ $Date: 2006-08-16 19:13:46 $
  */
 public class CharColorSet implements ConfigNodePersistent {
 	public static final int maxChar = 128; // maximum char value which can be
-											// translated
+	// translated
 
 	private final String default_missingColor = "#FFFFFF";
 	private final String default_emptyColor = "#FFFFFF";
@@ -59,7 +59,7 @@ public class CharColorSet implements ConfigNodePersistent {
 
 	/**
 	 * Constructor for the ColorSet object
-	 * 
+	 *
 	 * @param name
 	 *            inital name
 	 * @param missing
@@ -198,9 +198,8 @@ public class CharColorSet implements ConfigNodePersistent {
 					+ maxChar + " to CharColorSet.java");
 		}
 
-		if (cand == null) {
+		if (cand == null)
 			return getMissing();
-		}
 		return cand;
 	}
 
@@ -267,7 +266,7 @@ public class CharColorSet implements ConfigNodePersistent {
 
 	/**
 	 * Convert a color from a hex string to a Java <code>Color</code> object.
-	 * 
+	 *
 	 * @param colorString
 	 *            hex string, such as #FF11FF
 	 * @return The corresponding java color object.
@@ -279,7 +278,7 @@ public class CharColorSet implements ConfigNodePersistent {
 
 	/**
 	 * Convert a java <code>Color</code> object to a hex string.
-	 * 
+	 *
 	 * @param color
 	 *            A java color object
 	 * @return The corresponding hex string

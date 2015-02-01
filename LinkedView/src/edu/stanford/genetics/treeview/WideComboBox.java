@@ -6,8 +6,8 @@ import javax.swing.ComboBoxModel;
 
 import edu.stanford.genetics.treeview.core.AutoComboBox;
 
-// got this workaround from the following bug: 
-//      http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4618607 
+// got this workaround from the following bug:
+//      http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4618607
 public class WideComboBox extends AutoComboBox {
 
 	private static final long serialVersionUID = 1L;
@@ -38,8 +38,9 @@ public class WideComboBox extends AutoComboBox {
 	public Dimension getSize() {
 
 		final Dimension dim = super.getSize();
-		if (!layingOut)
+		if (!layingOut) {
 			dim.width = Math.max(dim.width, getPreferredSize().width);
+		}
 		return dim;
 	}
 }

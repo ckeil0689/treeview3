@@ -12,9 +12,9 @@ import Utilities.StringRes;
 /**
  * A class which prepares JPanels to display in case of errors during the data
  * loading process.
- * 
+ *
  * @author CKeil
- * 
+ *
  */
 public class LoadErrorView {
 
@@ -27,51 +27,52 @@ public class LoadErrorView {
 
 	/**
 	 * Constructor with required parameters to show a load-error screen.
-	 * 
+	 *
 	 * @param tvFrame
 	 *            The parent TreeViewFrame
 	 * @param message
 	 *            The error message
 	 */
 	public LoadErrorView() {
-		
+
 		setupMainPanel();
 	}
 
 	/**
 	 * Returns the panel of this view instance, which contains all the content.
-	 * 
+	 *
 	 * @return
 	 */
 	public void setupMainPanel() {
 
 		homePanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, null);
 
-		JPanel title_bg = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, 
-				null);
+		final JPanel title_bg = GUIFactory.createJPanel(false,
+				GUIFactory.NO_PADDING, null);
 
-		JLabel jl = GUIFactory.createLabel(StringRes.load_Ohoh, 
+		final JLabel jl = GUIFactory.createLabel(StringRes.load_Ohoh,
 				GUIFactory.FONTXXL);
 
 		title_bg.add(jl, "push, alignx 50%, span");
 
 		homePanel.add(title_bg, "pushx, growx, alignx 50%, span, "
 				+ "height 20%::, wrap");
-		
+
 		errorPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
-		
+
 		homePanel.add(errorPanel, "push, alignx 50%");
-		
+
 		loadNew = GUIFactory.createBtn(StringRes.btn_LoadNewFile);
 	}
 
 	public JPanel makeError() {
 
 		errorPanel.removeAll();
-		
-		JLabel errorLabel = GUIFactory.createLabel(StringRes.load_Error, 
+
+		final JLabel errorLabel = GUIFactory.createLabel(StringRes.load_Error,
 				GUIFactory.FONTL);
-		JLabel message = GUIFactory.createLabel(errorMessage, GUIFactory.FONTS);
+		final JLabel message = GUIFactory.createLabel(errorMessage,
+				GUIFactory.FONTS);
 
 		errorPanel.add(errorLabel, "pushx, alignx 50%, span, wrap");
 		errorPanel.add(message, "pushx, alignx 50%, span, wrap");
@@ -86,7 +87,7 @@ public class LoadErrorView {
 	/**
 	 * Gives the 'Load New' button an ActionListener to be able to open new
 	 * files.
-	 * 
+	 *
 	 * @param l
 	 */
 	public void addLoadNewListener(final ActionListener l) {
@@ -95,9 +96,9 @@ public class LoadErrorView {
 			loadNew.addActionListener(l);
 		}
 	}
-	
-	public void setErrorMessage(String error) {
-		
+
+	public void setErrorMessage(final String error) {
+
 		this.errorMessage = error;
 	}
 }

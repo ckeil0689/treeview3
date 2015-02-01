@@ -2,12 +2,12 @@
  * Created on May 17, 2008
  *
  * The purpose of this interface is to make it easy to switch underlying menu
- * toolkits (i.e. JMenu vs Menu). To use it, the caller should 
+ * toolkits (i.e. JMenu vs Menu). To use it, the caller should
  * 1) grab the lock using a synchronized block
  * 2) call setMenu and setSubMenu to set the menus
  * 3) pass object to a popluate method. The populate method should assume that
  *   the caller has already positioned the TreeViewMenuBar to the correct menu.
- * 
+ *
  * Copyright Alok Saldnaha, all rights reserved.
  */
 package edu.stanford.genetics.treeview;
@@ -30,7 +30,7 @@ public abstract class TreeviewMenuBarI {
 
 	/**
 	 * this will make the newly added menu current
-	 * 
+	 *
 	 * @param name
 	 *            of menu to add to menu bar
 	 * @return menu added
@@ -39,7 +39,7 @@ public abstract class TreeviewMenuBarI {
 
 	/**
 	 * add sub menu to current menu and make it the current menu
-	 * 
+	 *
 	 * @param name
 	 *            of new menu
 	 * @return sub menu added
@@ -83,14 +83,14 @@ public abstract class TreeviewMenuBarI {
 
 	/**
 	 * this adds a shortcut, i.e. Ctrl-key or Cmd-key on mac
-	 * 
+	 *
 	 * @param key
 	 */
 	public abstract void setAccelerator(int key);
 
 	/**
 	 * this adds a menu item on windows and mac.
-	 * 
+	 *
 	 * @param key
 	 */
 	public abstract void setMnemonic(int key);

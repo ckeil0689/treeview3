@@ -1,0 +1,64 @@
+package edu.stanford.genetics.treeview;
+
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+
+import Utilities.CustomDialog;
+import Utilities.GUIFactory;
+
+public class StatsDialog extends CustomDialog {
+
+
+	/**
+	 * Constructor
+	 *
+	 * @param viewFrame
+	 */
+	public StatsDialog(String title) {
+		super(title);
+	}
+
+	/**
+	 * Sets up layout and content of this window.
+	 */
+	public void setupLayout(final String source, final int rowNum,
+			final int colNum) {
+
+		final JLabel srcLabel = GUIFactory.createLabel("Source: ", 
+				GUIFactory.FONTS);
+		
+		final JLabel srcTxt = GUIFactory.createLabel(source, GUIFactory.FONTS);
+
+		final JLabel colLabel = GUIFactory.createLabel("Columns: ",
+				GUIFactory.FONTS);
+		
+		final JLabel cols = GUIFactory.createLabel("" + colNum, 
+				GUIFactory.FONTS);
+
+		final JLabel rowLabel = GUIFactory.createLabel("Rows: ",
+				GUIFactory.FONTS);
+		
+		final JLabel rows = GUIFactory.createLabel("" +rowNum, GUIFactory.FONTS);
+		
+		final JLabel sizeLabel = GUIFactory.createLabel("Matrix Size (includes "
+				+ "N/A-values): ",
+				GUIFactory.FONTS);
+
+		final JLabel size = GUIFactory.createLabel("" + (rowNum * colNum), 
+				GUIFactory.FONTS);
+
+		mainPanel.setBorder(BorderFactory.createEtchedBorder());
+		
+		mainPanel.add(srcLabel, "tag label");
+		mainPanel.add(srcTxt, "wrap");
+		mainPanel.add(rowLabel, "tag label");
+		mainPanel.add(rows, "wrap");
+		mainPanel.add(colLabel, "tag label");
+		mainPanel.add(cols, "wrap");
+		mainPanel.add(sizeLabel, "tag label");
+		mainPanel.add(size, "wrap");
+		mainPanel.add(closeBtn, "span, al right");
+		
+		dialog.add(mainPanel);
+	}
+}

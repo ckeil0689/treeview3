@@ -9,7 +9,7 @@
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
  *
- * This software is provided under the GNU GPL Version 2. In particular, 
+ * This software is provided under the GNU GPL Version 2. In particular,
  *
  * 1) If you modify a source file, make a comment in it containing your name and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
@@ -18,7 +18,7 @@
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
  *
- * END_HEADER 
+ * END_HEADER
  */
 package edu.stanford.genetics.treeview;
 
@@ -35,7 +35,7 @@ public class UrlPresets implements ConfigNodePersistent {
 	private final static int dIndex = 0;
 
 	private Preferences configNode; // which preset to use if not by
-									// confignode?
+	// confignode?
 	private final String type;
 
 	// /**
@@ -79,9 +79,8 @@ public class UrlPresets implements ConfigNodePersistent {
 
 		final int defaultPreset = getDefaultPreset();
 
-		if (defaultPreset == -1) {
+		if (defaultPreset == -1)
 			return null;
-		}
 
 		try {
 			return getTemplate(defaultPreset);
@@ -107,9 +106,10 @@ public class UrlPresets implements ConfigNodePersistent {
 				+ "basic?class=AnyGene&query=HEADER&Search=Search");
 
 		/* URL dead */
-//		addPreset("Source_CloneID", "http://genome-www4.stanford.edu/cgi-bin/"
-//				+ "SMD/source/sourceResult?option=CloneID&choice="
-//				+ "Gene&criteria=HEADER");
+		// addPreset("Source_CloneID",
+		// "http://genome-www4.stanford.edu/cgi-bin/"
+		// + "SMD/source/sourceResult?option=CloneID&choice="
+		// + "Gene&criteria=HEADER");
 
 		addPreset("FlyBase", "http://flybase.org/");
 
@@ -138,7 +138,7 @@ public class UrlPresets implements ConfigNodePersistent {
 	/**
 	 * Returns a boolean array which contains information about whether each
 	 * preset is enabled or not.
-	 * 
+	 *
 	 * @return
 	 */
 	public boolean[] getPresetEnablings() {
@@ -172,7 +172,7 @@ public class UrlPresets implements ConfigNodePersistent {
 
 	/**
 	 * Returns a String array of preset headers.
-	 * 
+	 *
 	 * @return
 	 */
 	public String[] getPresetHeaders() {
@@ -183,9 +183,10 @@ public class UrlPresets implements ConfigNodePersistent {
 			final String[] childrenNodes = presetNode.childrenNames();
 			final String astring[] = new String[childrenNodes.length];
 
-			for (int i = 0; i < childrenNodes.length; i++)
+			for (int i = 0; i < childrenNodes.length; i++) {
 				astring[i] = presetNode.node(childrenNodes[i])
 						.get("header", "");
+			}
 			return astring;
 
 		} catch (final BackingStoreException e) {
@@ -199,17 +200,15 @@ public class UrlPresets implements ConfigNodePersistent {
 	 */
 	public String getTemplate(final int index) {
 
-//		final Preferences presetNode = configNode.node("Preset");
+		// final Preferences presetNode = configNode.node("Preset");
 
 		try {
 			final String[] childrenNodes = configNode.childrenNames();
-			if (index < childrenNodes.length) {
+			if (index < childrenNodes.length)
 				return configNode.node(childrenNodes[index]).get("template",
 						null);
-
-			} else {
+			else
 				return null;
-			}
 
 		} catch (final BackingStoreException e) {
 			e.printStackTrace();
@@ -227,11 +226,11 @@ public class UrlPresets implements ConfigNodePersistent {
 		try {
 			final String[] childrenNodes = presetNode.childrenNames();
 
-			for (int i = 0; i < childrenNodes.length; i++) {
+			for (final String childrenNode : childrenNodes) {
 
-				if (name.equalsIgnoreCase(childrenNodes[i])) {
-					template = presetNode.node(childrenNodes[i]).get(
-							"template", null);
+				if (name.equalsIgnoreCase(childrenNode)) {
+					template = presetNode.node(childrenNode).get("template",
+							null);
 				}
 			}
 
@@ -244,7 +243,7 @@ public class UrlPresets implements ConfigNodePersistent {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param header
 	 *            the header for which we want a URL template
 	 * @return null if header is not specified in presets
@@ -281,11 +280,11 @@ public class UrlPresets implements ConfigNodePersistent {
 
 		for (int i = 0, j = 0; i < pattern.length(); i++, j++) {
 			if (pattern.charAt(i) == '*') {
-				if (i == pattern.length() - 1) {
+				if (i == pattern.length() - 1)
 					return true;
-				} else if (j == string.length() - 1) {
+				else if (j == string.length() - 1)
 					return false;
-				} else if (pattern.charAt(i + 1) == '*') {
+				else if (pattern.charAt(i + 1) == '*') {
 					j--;
 					continue;
 				} else if (pattern.charAt(i + 1) == string.charAt(j + 1)) {
@@ -294,9 +293,8 @@ public class UrlPresets implements ConfigNodePersistent {
 					i--;
 					continue;
 				}
-			} else if (pattern.charAt(i) != string.charAt(j)) {
+			} else if (pattern.charAt(i) != string.charAt(j))
 				return false;
-			}
 		}
 		return true;
 	}
@@ -385,7 +383,7 @@ public class UrlPresets implements ConfigNodePersistent {
 
 	/**
 	 * Creates a new subNode for the Preset node.
-	 * 
+	 *
 	 * @param name
 	 * @param template
 	 * @param header

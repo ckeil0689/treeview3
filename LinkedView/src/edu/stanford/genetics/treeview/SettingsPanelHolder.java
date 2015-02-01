@@ -34,7 +34,7 @@ import javax.swing.JPanel;
 
 /**
  * @author aloksaldanha
- * 
+ *
  *         Makes a JPanel with Save and Cancel buttons. The buttons will hide
  *         the window if the window is not null.
  */
@@ -47,7 +47,7 @@ public class SettingsPanelHolder extends JPanel {
 
 	/**
 	 * Please use this constructor.
-	 * 
+	 *
 	 * @param w
 	 *            Window to close on Save or Cancel
 	 * @param c
