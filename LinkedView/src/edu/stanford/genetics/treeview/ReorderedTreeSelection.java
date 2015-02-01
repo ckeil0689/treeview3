@@ -12,7 +12,7 @@ import java.util.Vector;
  *
  */
 public class ReorderedTreeSelection extends Observable implements
-TreeSelectionI, Observer {
+		TreeSelectionI, Observer {
 
 	private final TreeSelectionI parent;
 	private final int[] reorderedIndex;

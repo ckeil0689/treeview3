@@ -175,7 +175,7 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 
 	/**
 	 * Sets the node which currently is closest to the mouse cursor.
-	 * 
+	 *
 	 * @param n
 	 *            The node close to the mouse cursor.
 	 */
@@ -203,7 +203,7 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 
 	/**
 	 * Paint a node and its children.
-	 * 
+	 *
 	 * @param node
 	 *            The node which is supposed to be painted.
 	 * @param isColored

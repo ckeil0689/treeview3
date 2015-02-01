@@ -25,12 +25,12 @@ import edu.stanford.genetics.treeview.plugin.dendroview.FontSettings;
  * A dialog that can contain various menus, depending on which the user chooses
  * to open. This is done by setting the contents of the dialog's contentPane
  * based on the clicked JMenuItem in the menubar.
- * 
+ *
  * @author CKeil
  *
  */
 public class PreferencesMenu extends CustomDialog implements
-		ConfigNodePersistent {
+ConfigNodePersistent {
 
 	private final TreeViewFrame tvFrame;
 	private HeaderInfo geneHI;
@@ -91,7 +91,7 @@ public class PreferencesMenu extends CustomDialog implements
 
 	/**
 	 * Setting the configNode for the PreferencesMenu
-	 * 
+	 *
 	 * @param configNode
 	 */
 	@Override
@@ -136,7 +136,7 @@ public class PreferencesMenu extends CustomDialog implements
 
 		if (annotationSettings != null)
 			return new int[] { annotationSettings.getSelectedGeneIndex(),
-				annotationSettings.getSelectedArrayIndex() };
+					annotationSettings.getSelectedArrayIndex() };
 		else {
 			LogBuffer.println("AnnotationSettings object was null. "
 					+ "Could not get selected indeces.");

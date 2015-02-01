@@ -244,7 +244,7 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 
 	/**
 	 * Returns the last FileSet that was opened by the user.
-	 * 
+	 *
 	 * @return The last open FileSet
 	 */
 	public FileSet getLast() {
@@ -305,7 +305,7 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 		LogBuffer.println("Creating new fileset " + fileSet3);
 		return fileSet3;
 		/*
-		 *
+		 * 
 		 * loadFileSet(fileSet); fileMru.setLast(fileSet);
 		 * fileMru.notifyObservers(); setLoaded(true);
 		 * fileMru.setLast(configNode); fileMru.notifyObservers();

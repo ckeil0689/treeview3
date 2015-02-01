@@ -54,7 +54,7 @@ public class GUIFactory {
 	 * container. Opaqueness, whether it should have padding, and a custom
 	 * background color can be determined. This function is mainly used to
 	 * reduce repeating code throughout the source code.
-	 * 
+	 *
 	 * @param opaque
 	 * @param panel_mode
 	 * @param backgroundColor
@@ -103,7 +103,7 @@ public class GUIFactory {
 	/**
 	 * Creates and returns a JLabel with the appropriate text color and a small
 	 * font size.
-	 * 
+	 *
 	 * @param text
 	 * @return
 	 */
@@ -213,7 +213,7 @@ public class GUIFactory {
 
 	/**
 	 * Generates an image that can be used as an icon on a JButton.
-	 * 
+	 *
 	 * @param iconFileName
 	 * @return
 	 */
@@ -284,7 +284,7 @@ public class GUIFactory {
 
 	/**
 	 * Setting up a layout for a wide ComboBox object.
-	 * 
+	 *
 	 * @param combo
 	 * @return
 	 */

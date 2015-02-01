@@ -23,7 +23,7 @@ public class RowFinderBox extends HeaderFinderBox {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see edu.stanford.genetics.treeview.HeaderFinder#scrollToIndex(int)
 	 */
 	@Override

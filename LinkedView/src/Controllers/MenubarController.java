@@ -26,7 +26,7 @@ public class MenubarController {
 	/**
 	 * A controller to handle user interaction with JMenuItems. It defines what
 	 * methods are executed when the JMenuItems are clicked.
-	 * 
+	 *
 	 * @param tvFrame
 	 *            The main JFrame of the application.
 	 * @param controller
@@ -100,10 +100,10 @@ public class MenubarController {
 		case StringRes.menu_Hier:
 			controller.setupClusterView(ClusterView.HIER);
 			break;
-//		case StringRes.menu_KMeans:    	
-//			controller.setupClusterView(ClusterView.KMEANS);
-//			break;
-		case "Find Labels...":		
+		// case StringRes.menu_KMeans:
+		// controller.setupClusterView(ClusterView.KMEANS);
+		// break;
+		case "Find Labels...":
 			controller.setSearchVisible();
 			break;
 		case "Functional Enrichment":
@@ -127,11 +127,11 @@ public class MenubarController {
 		case StringRes.menu_Shortcuts:
 			tvFrame.showShortcuts();
 			break;
-		// There's currently no documentation page - don't need it for the first
-		// release
-		// case StringRes.menu_Docs:
-		// tvFrame.showDocumentation();
-		// break;
+			// There's currently no documentation page - don't need it for the first
+			// release
+			// case StringRes.menu_Docs:
+			// tvFrame.showDocumentation();
+			// break;
 		case StringRes.menu_ShowLog:
 			tvFrame.showLogMessages();
 			break;
@@ -147,22 +147,21 @@ public class MenubarController {
 	 * a new view that only displays the selected data.
 	 */
 	private void showSubData() {
-		
-		controller.showSubDataModel(
-				tvFrame.getRowSelection().getSelectedIndexes(), 
-				tvFrame.getColumnSelection().getSelectedIndexes(), 
-				null, null);
+
+		controller.showSubDataModel(tvFrame.getRowSelection()
+				.getSelectedIndexes(), tvFrame.getColumnSelection()
+				.getSelectedIndexes(), null, null);
 	}
 
 	/**
 	 * Just opens a stats dialog.
 	 */
 	private void openStats() {
-		
-		String source = controller.getDataModel().getSource();
-		int rowNum = controller.getDataModel().getRowHeaderInfo()
+
+		final String source = controller.getDataModel().getSource();
+		final int rowNum = controller.getDataModel().getRowHeaderInfo()
 				.getNumHeaders();
-		int colNum = controller.getDataModel().getColumnHeaderInfo()
+		final int colNum = controller.getDataModel().getColumnHeaderInfo()
 				.getNumHeaders();
 
 		tvFrame.openStatsView(source, rowNum, colNum);

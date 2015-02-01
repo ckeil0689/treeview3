@@ -70,7 +70,7 @@ public class ClusterDialog extends CustomDialog {
 
 	/**
 	 * Test method to check UI and UX.
-	 * 
+	 *
 	 * @param args
 	 */
 	public static void main(final String[] args) {

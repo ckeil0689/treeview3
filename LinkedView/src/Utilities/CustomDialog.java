@@ -12,7 +12,7 @@ import javax.swing.WindowConstants;
 
 /**
  * Basic custom JDialog that can be extended for more specified behavior.
- * 
+ *
  * @author CKeil
  *
  */
@@ -26,7 +26,7 @@ public class CustomDialog {
 	 * Constructs a basic JDialog with some custom behavior that differs from a
 	 * raw JDialog. For example, CustomDialog objects are always modal by
 	 * default (cannot be unfocused on Windows machines).
-	 * 
+	 *
 	 * @param String
 	 *            Title to be given to this dialog.
 	 */
@@ -37,26 +37,26 @@ public class CustomDialog {
 		dialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
 		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		dialog.setResizable(false);
-		
+
 		this.closeBtn = GUIFactory.createBtn("Close");
 		closeBtn.addActionListener(new CloseListener());
 
-		this.mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, 
+		this.mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT,
 				null);
 	}
-	
+
 	private class CloseListener implements ActionListener {
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			
+		public void actionPerformed(final ActionEvent e) {
+
 			dialog.dispose();
 		}
 	}
 
 	/**
 	 * Sets the visibility of exitFrame;
-	 * 
+	 *
 	 * @param ViewFrame
 	 *            The main view, used to center the dialog on screen.
 	 * @param boolean Sets the visibility status of the dialog.

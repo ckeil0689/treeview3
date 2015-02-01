@@ -74,8 +74,9 @@ public abstract class HeaderFinderBox {
 	private String[] searchDataHeaders = { "" };
 	private WideComboBox searchTermBox;
 	private final String type;
-	
-	//These are in order to determine whether a search result is currently visible and if so, to zoom out
+
+	// These are in order to determine whether a search result is currently
+	// visible and if so, to zoom out
 	protected TreeSelectionI otherSelection;
 	private MapContainer globalSmap;
 	private MapContainer globalOmap;
@@ -85,81 +86,82 @@ public abstract class HeaderFinderBox {
 
 	// "Search for Substring"
 	public HeaderFinderBox(final String type) {
-		
+
 		this.type = type;
-//		final String[] labeledHeaders = setupData(type);
-//
-//		searchTermBox = GUIFactory.createWideComboBox(labeledHeaders);
-//		searchTermBox.setEditable(true);
-//		searchTermBox.setBorder(null);
-//		searchTermBox.setBackground(GUIFactory.DARK_BG);
-//		AutoCompleteDecorator.decorate(searchTermBox);
-//		
-//		searchTermBox.getEditor().getEditorComponent().addKeyListener(
-//				new BoxKeyListener());
+		// final String[] labeledHeaders = setupData(type);
+		//
+		// searchTermBox = GUIFactory.createWideComboBox(labeledHeaders);
+		// searchTermBox.setEditable(true);
+		// searchTermBox.setBorder(null);
+		// searchTermBox.setBackground(GUIFactory.DARK_BG);
+		// AutoCompleteDecorator.decorate(searchTermBox);
+		//
+		// searchTermBox.getEditor().getEditorComponent().addKeyListener(
+		// new BoxKeyListener());
 	}
-	
+
 	/* >>>> Update the object with new data <<<<<< */
-	public void setSelection(TreeSelectionI searchSelection, 
-			TreeSelectionI otherSelection) {
-		
+	public void setSelection(final TreeSelectionI searchSelection,
+			final TreeSelectionI otherSelection) {
+
 		this.searchSelection = searchSelection;
 		this.otherSelection = otherSelection;
 	}
-	
-	public void setHeaderSummary(HeaderSummary headerSummary) {
-		
+
+	public void setHeaderSummary(final HeaderSummary headerSummary) {
+
 		this.headerSummary = headerSummary;
 	}
-	
-	public void setHeaderInfo(HeaderInfo searchHI, HeaderInfo otherHI) {
-		
+
+	public void setHeaderInfo(final HeaderInfo searchHI,
+			final HeaderInfo otherHI) {
+
 		this.headerInfo = searchHI;
 		this.otherHeaderInfo = otherHI;
 	}
-	
-	public void setMapContainers(MapContainer searchMap, 
-			MapContainer otherMap) {
-		
+
+	public void setMapContainers(final MapContainer searchMap,
+			final MapContainer otherMap) {
+
 		this.globalSmap = searchMap;
 		this.globalOmap = otherMap;
 	}
-	
+
 	public void setNewSearchTermBox() {
-		
-		if(headerSummary == null 
-				|| (headerInfo == null || otherHeaderInfo == null) ) {
+
+		if (headerSummary == null
+				|| (headerInfo == null || otherHeaderInfo == null)) {
 			setEmptySearchTermBox();
 			return;
 		}
-		
-		String[] labels = setupData();
-		
+
+		final String[] labels = setupData();
+
 		this.searchTermBox = GUIFactory.createWideComboBox(labels);
 		searchTermBox.setEditable(true);
 		searchTermBox.setBorder(null);
 		searchTermBox.setBackground(GUIFactory.DARK_BG);
 		AutoCompleteDecorator.decorate(searchTermBox);
-		
-		searchTermBox.getEditor().getEditorComponent().addKeyListener(
-				new BoxKeyListener());
+
+		searchTermBox.getEditor().getEditorComponent()
+				.addKeyListener(new BoxKeyListener());
 	}
-	
+
 	/**
 	 * Used for errors.
 	 */
 	public void setEmptySearchTermBox() {
-		
-		String[] labels = {"No data"};
-		
+
+		final String[] labels = { "No data" };
+
 		this.searchTermBox = GUIFactory.createWideComboBox(labels);
 		searchTermBox.setEditable(true);
 		searchTermBox.setBorder(null);
 		searchTermBox.setBackground(GUIFactory.DARK_BG);
 	}
-	
+
 	private String[] setupData() {
-		
+
 		final String[][] hA = headerInfo.getHeaderArray();
 
 		final String defaultText = "Search " + type + " Labels... ";
@@ -191,7 +193,7 @@ public abstract class HeaderFinderBox {
 
 		System.arraycopy(searchDataHeaders, 0, labeledHeaders, 1,
 				searchDataHeaders.length);
-		
+
 		return labeledHeaders;
 	}
 
@@ -275,24 +277,35 @@ public abstract class HeaderFinderBox {
 				otherMaxIndex = otherIndexList.get(i);
 			}
 		}
-		
-		if((indexList.size() > 0) &&
-				//At least part of the found min/max selected area is not visible
-				//This assumes that min is less than max and that the visible area is a contiguous block of visible indexes
-				(minIndex < globalSmap.getFirstVisible() ||
-				 maxIndex > (globalSmap.getFirstVisible() + globalSmap.getNumVisible() - 1))) {
-			
-			//LogBuffer.println("The search result is outside the visible area.");
-			//LogBuffer.println("The search result is outside the visible area: [" + minIndex + " < " + globalSmap.getFirstVisible() + "] || [" + maxIndex + " > (" + globalSmap.getFirstVisible() + " + " + globalSmap.getNumVisible() + " - 1)].");
+
+		if ((indexList.size() > 0) &&
+		// At least part of the found min/max selected area is not visible
+		// This assumes that min is less than max and that the visible area is a
+		// contiguous block of visible indexes
+				(minIndex < globalSmap.getFirstVisible() || maxIndex > (globalSmap
+						.getFirstVisible() + globalSmap.getNumVisible() - 1))) {
+
+			// LogBuffer.println("The search result is outside the visible area.");
+			// LogBuffer.println("The search result is outside the visible area: ["
+			// + minIndex + " < " + globalSmap.getFirstVisible() + "] || [" +
+			// maxIndex + " > (" + globalSmap.getFirstVisible() + " + " +
+			// globalSmap.getNumVisible() + " - 1)].");
 			globalSmap.setHome();
 		}
 
-		if((otherIndexList.size() == 0 ||
-				 otherMinIndex < globalOmap.getFirstVisible() ||
-				 otherMaxIndex > (globalOmap.getFirstVisible() + globalOmap.getNumVisible() - 1))) {
-			
-			//LogBuffer.println("Search result: [" + minIndex + " < " + globalSmap.getFirstVisible() + "] || [" + maxIndex + " > (" + globalSmap.getFirstVisible() + " + " + globalSmap.getNumVisible() + " - 1)].");
-			//LogBuffer.println("A whole row is being returned or the already-selected data is outside of the visible area: [" + otherIndexList.size() + " == 0] || [" + otherMinIndex + " < " + globalOmap.getFirstVisible() + "] || [" + otherMaxIndex + " > (" + globalOmap.getFirstVisible() + " + " + globalOmap.getNumVisible() + " - 1)].");
+		if ((otherIndexList.size() == 0
+				|| otherMinIndex < globalOmap.getFirstVisible() || otherMaxIndex > (globalOmap
+				.getFirstVisible() + globalOmap.getNumVisible() - 1))) {
+
+			// LogBuffer.println("Search result: [" + minIndex + " < " +
+			// globalSmap.getFirstVisible() + "] || [" + maxIndex + " > (" +
+			// globalSmap.getFirstVisible() + " + " + globalSmap.getNumVisible()
+			// + " - 1)].");
+			// LogBuffer.println("A whole row is being returned or the already-selected data is outside of the visible area: ["
+			// + otherIndexList.size() + " == 0] || [" + otherMinIndex + " < " +
+			// globalOmap.getFirstVisible() + "] || [" + otherMaxIndex + " > ("
+			// + globalOmap.getFirstVisible() + " + " +
+			// globalOmap.getNumVisible() + " - 1)].");
 			globalOmap.setHome();
 		}
 	}
@@ -345,14 +358,14 @@ public abstract class HeaderFinderBox {
 	/**
 	 * Performs a wildcard matching for the text and pattern provided. Matching
 	 * is done based on regex patterns.
-	 * 
+	 *
 	 * @param text
 	 *            the text to be tested for matches.
-	 * 
+	 *
 	 * @param pattern
 	 *            the pattern to be matched for. This can contain the wildcard
 	 *            character '*' (asterisk).
-	 * 
+	 *
 	 * @return <tt>true</tt> if a match is found, <tt>false</tt> otherwise.
 	 */
 	public static boolean wildCardMatch(final String text, String pattern) {
@@ -381,7 +394,7 @@ public abstract class HeaderFinderBox {
 	/**
 	 * KeyListener to implement search by pressing enter when the combobox has
 	 * focus.
-	 * 
+	 *
 	 * @author CKeil
 	 *
 	 */
@@ -433,18 +446,18 @@ public abstract class HeaderFinderBox {
 		@Override
 		public void keyReleased(final KeyEvent e) {
 			final int selStartRel = editor.getSelectionStart(); // Selection
-																// start before
-																// having typed
+			// start before
+			// having typed
 			final int selEndRel = editor.getSelectionEnd(); // Selection end
-															// before having
-															// typed
+			// before having
+			// typed
 			final int lenRel = editor.getText().length(); // Length before
-															// having typed
+			// having typed
 			final int selIndexRel = searchTermBox.getSelectedIndex(); // Selected
-																		// index
-																		// before
-																		// having
-																		// typed
+			// index
+			// before
+			// having
+			// typed
 
 			if (debug) {
 				LogBuffer.println("  Relsd - Selection start: [" + selStartRel
@@ -476,11 +489,11 @@ public abstract class HeaderFinderBox {
 			else if (!changed && lenPressed == lenRel) {
 				if (selStartPressed != selEndPressed
 						&& (e.getKeyCode() == KeyEvent.VK_RIGHT || e
-								.getKeyCode() == KeyEvent.VK_LEFT)
+						.getKeyCode() == KeyEvent.VK_LEFT)
 						&& e.getModifiers() == 0) {
 					if (debug) {
 						LogBuffer
-								.println("Positioning cursor at edge of selection...");
+						.println("Positioning cursor at edge of selection...");
 					}
 					if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
 						editor.setSelectionStart(selEndPressed);
@@ -506,12 +519,12 @@ public abstract class HeaderFinderBox {
 			} else {
 				if (debug) {
 					LogBuffer
-							.println("Nothing to do because changed is "
-									+ (changed ? "" : "not ")
-									+ "true, the length has "
-									+ (lenPressed == lenRel ? "not " : "")
-									+ "changed and not sideways arrow keys were pressed and there were "
-									+ e.getModifiers() + " modifiers.");
+					.println("Nothing to do because changed is "
+							+ (changed ? "" : "not ")
+							+ "true, the length has "
+							+ (lenPressed == lenRel ? "not " : "")
+							+ "changed and not sideways arrow keys were pressed and there were "
+							+ e.getModifiers() + " modifiers.");
 				}
 			}
 
@@ -527,13 +540,13 @@ public abstract class HeaderFinderBox {
 			editor.setSelectionEnd(selEndPressed);
 
 			selStartTyped = editor.getSelectionStart(); // Selection start
-														// before having typed
+			// before having typed
 			selEndTyped = editor.getSelectionEnd(); // Selection end before
-													// having typed
+			// having typed
 			lenTyped = editor.getText().length(); // Length before having typed
 			selIndexTyped = searchTermBox.getSelectedIndex(); // Selected index
-																// before having
-																// typed
+			// before having
+			// typed
 
 			if (debug) {
 				LogBuffer.println("  Typed - Selection start: ["
@@ -619,8 +632,8 @@ public abstract class HeaderFinderBox {
 						} else if (selEndTyped == lenTyped) {
 							if (debug) {
 								LogBuffer
-										.println("Edited case 2a: substring(0, "
-												+ selStartTyped + ").");
+								.println("Edited case 2a: substring(0, "
+										+ selStartTyped + ").");
 							}
 							if (selStartTyped == 0) {
 								searchTermBox.setSelectedIndex(0);
@@ -659,7 +672,7 @@ public abstract class HeaderFinderBox {
 				if (searchTermBox.getSelectedIndex() == -1) {
 					if (debug) {
 						LogBuffer
-								.println("Trying to force editing manually selected text to work");
+						.println("Trying to force editing manually selected text to work");
 					}
 
 					if (lenTyped > 0) {
@@ -688,8 +701,8 @@ public abstract class HeaderFinderBox {
 						} else if (selEndTyped == lenTyped) {
 							if (debug) {
 								LogBuffer
-										.println("Edited case 2b: substring(0, "
-												+ selStartTyped + ").");
+								.println("Edited case 2b: substring(0, "
+										+ selStartTyped + ").");
 							}
 							if (selStartTyped == 0) {
 								searchTermBox.setSelectedIndex(0);
@@ -742,8 +755,8 @@ public abstract class HeaderFinderBox {
 
 					if (debug) {
 						LogBuffer
-								.println("Trying to force a selection to be made 1.  Current text: ["
-										+ content + "].");
+						.println("Trying to force a selection to be made 1.  Current text: ["
+								+ content + "].");
 					}
 
 					// searchTermBox.setKeySelectionManager(searchTermBox.getKeySelectionManager());
@@ -810,7 +823,7 @@ public abstract class HeaderFinderBox {
 						if (selEndTyped == lenTyped) {
 							if (debug) {
 								LogBuffer
-										.println("Trying to force the selection to regress");
+								.println("Trying to force the selection to regress");
 							}
 							// Put the cursor at 1 before the beginning of the
 							// previously selected text (because that text is
@@ -832,8 +845,8 @@ public abstract class HeaderFinderBox {
 
 								if (debug) {
 									LogBuffer
-											.println("Trying to force a selection to be made 2.  Current text: ["
-													+ content + "].");
+									.println("Trying to force a selection to be made 2.  Current text: ["
+											+ content + "].");
 								}
 
 								// searchTermBox.setKeySelectionManager(searchTermBox.getKeySelectionManager());
@@ -846,17 +859,17 @@ public abstract class HeaderFinderBox {
 								// "Search Row/Column Labels... ")
 								searchTermBox.selectWithKeyChar('S');
 								searchTermBox.setSelectedIndex(0); // We're
-																	// doing
-																	// this just
-																	// in case
-																	// there's a
-																	// different
-																	// S match
-																	// and
-																	// content
-																	// is an
-																	// empty
-																	// string
+								// doing
+								// this just
+								// in case
+								// there's a
+								// different
+								// S match
+								// and
+								// content
+								// is an
+								// empty
+								// string
 								if (content.length() > 0) {
 									// Now reset the text back to what it was to
 									// force a selection (if one exists)
@@ -880,7 +893,7 @@ public abstract class HeaderFinderBox {
 						&& (selEndTyped + 1) == selEndPressed) {
 					if (debug) {
 						LogBuffer
-								.println("Trying to force a selection to be made 3");
+						.println("Trying to force a selection to be made 3");
 					}
 					if ((selStartTyped - 1) > 0) {
 						// Get the current text content
@@ -909,10 +922,10 @@ public abstract class HeaderFinderBox {
 			}
 		}
 	}
-	
+
 	/**
 	 * Test method for wild card search.
-	 * 
+	 *
 	 * @param args
 	 */
 	public static void main(final String[] args) {

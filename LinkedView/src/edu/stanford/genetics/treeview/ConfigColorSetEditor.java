@@ -67,7 +67,7 @@ public class ConfigColorSetEditor extends JPanel {
 	public final static void main(final String[] argv) {
 		final String[] types = new String[] { "Up", "Down", "Left", "Right" };
 		final String[] colors = new String[] { "#FF0000", "#FFFF00", "#FF00FF",
-		"#00FFFF" };
+				"#00FFFF" };
 
 		final ConfigColorSet temp = new ConfigColorSet("Bob", types, colors);
 		final ConfigColorSetEditor cse = new ConfigColorSetEditor(temp);

@@ -18,7 +18,7 @@ import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
  * to mathematical principles of hierarchical clustering. It generates files to
  * display dendrograms (.gtr and .atr) as well as a reordered original data file
  * (.cdt).
- * 
+ *
  * @author CKeil
  *
  */
@@ -37,7 +37,7 @@ public class ClusterProcessor {
 	 * Constructor for the ClusterProcessor. Sets the pBarCount to 0, which is
 	 * the value that stores progress between multiple tasks, so that a single
 	 * progress bar for the entire process can be displayed.
-	 * 
+	 *
 	 * @param model
 	 */
 	public ClusterProcessor(final TVDataMatrix dataMatrix,
@@ -54,7 +54,7 @@ public class ClusterProcessor {
 	/**
 	 * Starts a SwingWorker thread to do the clustering and waits for it to
 	 * return a String array containing the reordered axis elements.
-	 * 
+	 *
 	 * @param distMatrix
 	 * @param linkMethod
 	 * @param spinnerInput
@@ -89,7 +89,7 @@ public class ClusterProcessor {
 	/**
 	 * Creates a SwingWorker to calculate the distance matrix for the loaded
 	 * data.
-	 * 
+	 *
 	 * @param distMeasure
 	 * @param axis
 	 * @return

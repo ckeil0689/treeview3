@@ -36,6 +36,7 @@ public class TreeColorer {
 	private static String[][] headers; // used when inferring node colors from
 	// gene colors
 	private static HeaderInfo headerInfo; // used when coloring using column
+
 	// from GTR.
 
 	/**

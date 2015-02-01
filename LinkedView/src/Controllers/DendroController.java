@@ -64,7 +64,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.TreePainter;
 /* TODO separate some parts into dedicated GlobalView controller */
 /**
  * Controller class handling UI input and calculations related to DendroView.
- * 
+ *
  * @author chris0689
  *
  */
@@ -113,14 +113,13 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 		updateHeaderInfo();
 		bindComponentFunctions();
-		
-		dendroView.setupSearch(tvModel.getRowHeaderInfo(), 
-					tvModel.getColumnHeaderInfo(),
-					globalXmap, globalYmap);
+
+		dendroView.setupSearch(tvModel.getRowHeaderInfo(),
+				tvModel.getColumnHeaderInfo(), globalXmap, globalYmap);
 		dendroView.setupLayout();
-		
+
 		setObservables();
-		
+
 		setSavedScale();
 
 		addKeyBindings();
@@ -247,9 +246,9 @@ public class DendroController implements ConfigNodePersistent, Observer {
 				"resetZoom");
 		action_map.put("resetZoom", new HomeAction());
 	}
-	
+
 	private void setObservables() {
-		
+
 		dendroView.getRowLabelView().getHeaderSummary().addObserver(this);
 		dendroView.getColumnLabelView().getHeaderSummary().addObserver(this);
 	}
@@ -299,7 +298,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	/**
 	 * Listener for the search button. Opens a dialog when the button is
 	 * clicked.
-	 * 
+	 *
 	 * @author CKeil
 	 *
 	 */
@@ -309,10 +308,10 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		public void actionPerformed(final ActionEvent e) {
 
 			LogBuffer.println("Search init");
-			/* 
-			 * Putting the mapContainer objects in DendroView so 
-			 * that I can control zoom-out of the found genes/arrays are 
-			 * outside the visible area.
+			/*
+			 * Putting the mapContainer objects in DendroView so that I can
+			 * control zoom-out of the found genes/arrays are outside the
+			 * visible area.
 			 */
 			dendroView.setGlobalXMap(globalXmap);
 			dendroView.setGlobalYMap(globalYmap);
@@ -390,7 +389,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			if(!dendroView.isSearchVisible()) {
+			if (!dendroView.isSearchVisible()) {
 				setSearchVisible(true);
 			}
 		}
@@ -398,26 +397,26 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 	/**
 	 * Determines mouse behavior over the close-x icon of search panel.
-	 * 
+	 *
 	 * @author chris0689
 	 *
 	 */
 	private class CloseSearchAction implements ActionListener {
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			
+		public void actionPerformed(final ActionEvent e) {
+
 			LogBuffer.println("Hiding search.");
 			setSearchVisible(false);
 		}
 	}
-	
+
 	private class DividerListener implements PropertyChangeListener {
 
 		@Override
-		public void propertyChange(PropertyChangeEvent evt) {
-			
-			dendroView.updateTreeMenuBtn((JSplitPane)evt.getSource());
+		public void propertyChange(final PropertyChangeEvent evt) {
+
+			dendroView.updateTreeMenuBtn((JSplitPane) evt.getSource());
 		}
 
 	}
@@ -716,7 +715,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	 * the available space on the screen with the matrix. Equal: Both axes are
 	 * equally sized, forming a square matrix. Proportional: Axes are sized in
 	 * proportion to how many elements they show.
-	 * 
+	 *
 	 * @param mode
 	 */
 	public void setMatrixSize(final int mode) {
@@ -739,7 +738,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			setMatrixFill();
 			break;
 		}
-		
+
 		addViewListeners();
 		resetDendroView();
 	}
@@ -852,8 +851,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	/**
 	 * Toggles the search bars in DendroView.
 	 */
-	public void setSearchVisible(boolean visible) {
-		
+	public void setSearchVisible(final boolean visible) {
+
 		dendroView.setSearchVisible(visible);
 		resetDendroView();
 	}
@@ -1143,7 +1142,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		if (arrayIndexes == 0
 				|| geneIndexes == 0
 				|| (arrayIndexes == globalXmap.getMaxIndex() && geneIndexes == globalYmap
-						.getMaxIndex())) {
+				.getMaxIndex())) {
 			// LogBuffer.println("No spots are visible. Resetting view.");
 			arrayIndexes = globalXmap.getMaxIndex() + 1;
 			geneIndexes = globalYmap.getMaxIndex() + 1;
@@ -1463,9 +1462,9 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		dendroView.getRowLabelView().setConfigNode(configNode);// getFirst("TextView"));
 		dendroView.getColumnLabelView().setConfigNode(configNode);// getFirst("ArrayNameView"));
 		dendroView.getColumnTreeView().getHeaderSummary()
-				.setConfigNode(configNode);
+		.setConfigNode(configNode);
 		dendroView.getRowTreeView().getHeaderSummary()
-				.setConfigNode(configNode);
+		.setConfigNode(configNode);
 	}
 
 	/**
@@ -1490,7 +1489,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		dendroView.getColumnTreeView().setATRHeaderInfo(
 				tvModel.getAtrHeaderInfo());
 		dendroView.getRowTreeView()
-				.setGTRHeaderInfo(tvModel.getGtrHeaderInfo());
+		.setGTRHeaderInfo(tvModel.getGtrHeaderInfo());
 		dendroView.getColumnLabelView().setHeaderInfo(
 				tvModel.getColumnHeaderInfo());
 		dendroView.getRowLabelView().setHeaderInfo(tvModel.getRowHeaderInfo());
@@ -1626,20 +1625,20 @@ public class DendroController implements ConfigNodePersistent, Observer {
 					+ "and setAcceptAllFileFilterUsed(): " + e.getMessage());
 			// hmm... I'll just assume that there's no accept all.
 			fileDialog
-			.addChoosableFileFilter(new javax.swing.filechooser.FileFilter() {
+					.addChoosableFileFilter(new javax.swing.filechooser.FileFilter() {
 
-				@Override
-				public boolean accept(final File f) {
+						@Override
+						public boolean accept(final File f) {
 
-					return true;
-				}
+							return true;
+						}
 
-				@Override
-				public String getDescription() {
+						@Override
+						public String getDescription() {
 
-					return "All Files";
-				}
-			});
+							return "All Files";
+						}
+					});
 		}
 
 		fileDialog.setFileFilter(ff);
@@ -1689,88 +1688,30 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		}
 	}
 
-//	/**
-//	 * Creates an AtrTVModel for use in tree alignment.
-//	 * 
-//	 * @param fileSet
-//	 * @return a new AtrTVModel with the file set loaded into it.
-//	 * @throws LoadException
-//	 */
-//	protected AtrTVModel makeAtrModel(final FileSet fileSet)
-//			throws LoadException {
-//
-//		final AtrTVModel atrTVModel = new AtrTVModel();
-//
-//		try {
-//			atrTVModel.loadNew(fileSet);
-//
-//		} catch (final LoadException e) {
-//			String message = "Loading Atr model was interrupted.";
-//			JOptionPane.showMessageDialog(tvFrame.getAppFrame(), message, 
-//					"Error", JOptionPane.ERROR_MESSAGE);
-//			LogBuffer.logException(e);
-//		}
-//
-//		return atrTVModel;
-//	}
-
-	// GTR methods
-	/**
-	 * Updates the GTRDrawer to reflect changes in the DataModel gene order;
-	 * rebuilds the TreeDrawerNode tree.
-	 * 
-	 * @param selectedID
-	 *            ID of the node selected before a change in tree structure was
-	 *            made. This node is then found and reselected after the ATR
-	 *            tree is rebuilt.
-	 */
-	private void updateGTRDrawer(final String selectedID) {
-
-		try {
-			leftTreeDrawer.setData(tvModel.getGtrHeaderInfo(),
-					tvModel.getRowHeaderInfo());
-
-			final HeaderInfo trHeaderInfo = tvModel.getGtrHeaderInfo();
-
-			if (trHeaderInfo.getIndex("NODECOLOR") >= 0) {
-				TreeColorer.colorUsingHeader(leftTreeDrawer.getRootNode(),
-						trHeaderInfo, trHeaderInfo.getIndex("NODECOLOR"));
-			}
-		} catch (final DendroException e) {
-
-			// LogPanel.println("Had problem setting up the array tree : "
-			// + e.getMessage());
-			// e.printStackTrace();
-			final Box mismatch = new Box(BoxLayout.Y_AXIS);
-			mismatch.add(new JLabel(e.getMessage()));
-			mismatch.add(new JLabel("Perhaps there is a mismatch "
-					+ "between your ATR and CDT files?"));
-			mismatch.add(new JLabel("Ditching Gene Tree, since it's lame."));
-
-			JOptionPane.showMessageDialog(tvFrame.getAppFrame(), mismatch,
-					"Tree Construction Error", JOptionPane.ERROR_MESSAGE);
-
-			dendroView.getRowTreeView().setEnabled(false);
-
-			try {
-				leftTreeDrawer.setData(null, null);
-
-			} catch (final DendroException ex) {
-				LogBuffer.println("Got exception in setData() "
-						+ "for leftTreeDrawer in updateGTRDrawer(): "
-						+ e.getMessage());
-			}
-		}
-
-		final TreeDrawerNode arrayNode = leftTreeDrawer.getRootNode().findNode(
-				selectedID);
-
-		geneSelection.setSelectedNode(arrayNode.getId());
-		dendroView.getRowTreeView().setSelectedNode(arrayNode);
-
-		geneSelection.notifyObservers();
-		leftTreeDrawer.notifyObservers();
-	}
+	// /**
+	// * Creates an AtrTVModel for use in tree alignment.
+	// *
+	// * @param fileSet
+	// * @return a new AtrTVModel with the file set loaded into it.
+	// * @throws LoadException
+	// */
+	// protected AtrTVModel makeAtrModel(final FileSet fileSet)
+	// throws LoadException {
+	//
+	// final AtrTVModel atrTVModel = new AtrTVModel();
+	//
+	// try {
+	// atrTVModel.loadNew(fileSet);
+	//
+	// } catch (final LoadException e) {
+	// String message = "Loading Atr model was interrupted.";
+	// JOptionPane.showMessageDialog(tvFrame.getAppFrame(), message,
+	// "Error", JOptionPane.ERROR_MESSAGE);
+	// LogBuffer.logException(e);
+	// }
+	//
+	// return atrTVModel;
+	// }
 
 	// Flipping the trees
 	// /**
@@ -1965,7 +1906,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 				} else {
 					TreeColorer.colorUsingLeaf(leftTreeDrawer.getRootNode(),
 							tvModel.getRowHeaderInfo(), tvModel
-									.getRowHeaderInfo().getIndex("FGCOLOR"));
+							.getRowHeaderInfo().getIndex("FGCOLOR"));
 				}
 
 			} catch (final DendroException e) {
@@ -2089,7 +2030,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 		dendroView.getRowLabelView().getHeaderSummary().setIncluded(gIncluded);
 		dendroView.getColumnLabelView().getHeaderSummary()
-				.setIncluded(aIncluded);
+		.setIncluded(aIncluded);
 	}
 
 	public int[] getArrayIncluded() {
@@ -2124,13 +2065,12 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	}
 
 	@Override
-	public void update(Observable o, Object arg) {
-		
-		if(o instanceof HeaderSummary) {
-			dendroView.updateSearchTermBoxes(tvModel.getRowHeaderInfo(), 
-					tvModel.getColumnHeaderInfo(),
-					globalXmap, globalYmap);
+	public void update(final Observable o, final Object arg) {
+
+		if (o instanceof HeaderSummary) {
+			dendroView.updateSearchTermBoxes(tvModel.getRowHeaderInfo(),
+					tvModel.getColumnHeaderInfo(), globalXmap, globalYmap);
 		}
-		
+
 	}
 }

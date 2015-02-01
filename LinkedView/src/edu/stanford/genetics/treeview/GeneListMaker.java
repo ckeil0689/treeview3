@@ -93,7 +93,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 
 		/*
 		 * (non-Javadoc)
-		 *
+		 * 
 		 * @see javax.swing.table.TableModel#getRowCount()
 		 */
 		@Override
@@ -107,7 +107,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 
 		/*
 		 * (non-Javadoc)
-		 *
+		 * 
 		 * @see javax.swing.table.TableModel#getColumnCount()
 		 */
 		@Override
@@ -122,7 +122,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 
 		/*
 		 * (non-Javadoc)
-		 *
+		 * 
 		 * @see javax.swing.table.TableModel#getValueAt(int, int)
 		 */
 		@Override

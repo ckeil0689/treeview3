@@ -79,7 +79,7 @@ public class LinkedViewApp extends TreeViewApp {
 	/**
 	 * Constructor for the TreeViewApp object takes configuration from the
 	 * passed in XmlConfig.
-	 * 
+	 *
 	 * @param Preferences
 	 *            The preferences data for this instance of TreeView.
 	 */

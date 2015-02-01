@@ -103,7 +103,7 @@ public class GradientBox extends JPanel {
 	/**
 	 * Sets the activeColors key in configNode. This represents the currently
 	 * selected ColorSet choice by the user.
-	 * 
+	 *
 	 * @param name
 	 *            ConfigNode name of the active ColorSet
 	 */
@@ -642,9 +642,9 @@ public class GradientBox extends JPanel {
 
 				final JDialog positionInputDialog = new JDialog();
 				positionInputDialog
-				.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
+						.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
 				positionInputDialog
-				.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+						.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 				positionInputDialog.setTitle("New Position");
 
 				final JLabel enterPrompt = GUIFactory.createLabel(
@@ -731,7 +731,7 @@ public class GradientBox extends JPanel {
 	/**
 	 * Returns the fraction of the width of the gradientRect where a thumb is
 	 * currently positioned.
-	 * 
+	 *
 	 * @param t
 	 * @return a float value between 0.0 and 1.0
 	 */
@@ -743,7 +743,7 @@ public class GradientBox extends JPanel {
 
 	/**
 	 * Gets a thumb's position in terms of the data range.
-	 * 
+	 *
 	 * @param t
 	 * @return A double value between minimum and maximum of the currently
 	 *         relevant data range for coloring.
@@ -792,7 +792,7 @@ public class GradientBox extends JPanel {
 
 	/**
 	 * Returns the Color set for missing data.
-	 * 
+	 *
 	 * @return Color
 	 */
 	protected Color getMissing() {

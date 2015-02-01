@@ -11,7 +11,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
  * Performs the calculations of the k-means algorithm.
- * 
+ *
  * @author CKeil
  *
  */
@@ -41,7 +41,7 @@ public class KMeansCluster {
 
 	/**
 	 * Constructor for KMeansCluster.
-	 * 
+	 *
 	 * @param headerArray
 	 *            Array of labels to be written in the cluster file.
 	 * @param distMatrix
@@ -68,7 +68,7 @@ public class KMeansCluster {
 	/**
 	 * Sets up a buffered writer used to save the data created during the
 	 * process of k-means clustering.
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	public void setupFileWriter(final String fileName) {
@@ -127,7 +127,7 @@ public class KMeansCluster {
 	/**
 	 * Generates the KAG or KGG file (depends on chosen axis) from the
 	 * calculated data.
-	 * 
+	 *
 	 * @param kClusters
 	 *            The k-clusters formed by the calculation.
 	 * @param headerArray
@@ -193,7 +193,7 @@ public class KMeansCluster {
 	/**
 	 * Finds the mean of all distance values in every row element of the
 	 * distance matrix. TODO Adapt to half-matrix....
-	 * 
+	 *
 	 * @param matrix
 	 * @return Array of means/ centroids.
 	 */

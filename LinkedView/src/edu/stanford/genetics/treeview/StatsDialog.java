@@ -8,13 +8,12 @@ import Utilities.GUIFactory;
 
 public class StatsDialog extends CustomDialog {
 
-
 	/**
 	 * Constructor
 	 *
 	 * @param viewFrame
 	 */
-	public StatsDialog(String title) {
+	public StatsDialog(final String title) {
 		super(title);
 	}
 
@@ -24,31 +23,31 @@ public class StatsDialog extends CustomDialog {
 	public void setupLayout(final String source, final int rowNum,
 			final int colNum) {
 
-		final JLabel srcLabel = GUIFactory.createLabel("Source: ", 
+		final JLabel srcLabel = GUIFactory.createLabel("Source: ",
 				GUIFactory.FONTS);
-		
+
 		final JLabel srcTxt = GUIFactory.createLabel(source, GUIFactory.FONTS);
 
 		final JLabel colLabel = GUIFactory.createLabel("Columns: ",
 				GUIFactory.FONTS);
-		
-		final JLabel cols = GUIFactory.createLabel("" + colNum, 
+
+		final JLabel cols = GUIFactory.createLabel("" + colNum,
 				GUIFactory.FONTS);
 
 		final JLabel rowLabel = GUIFactory.createLabel("Rows: ",
 				GUIFactory.FONTS);
-		
-		final JLabel rows = GUIFactory.createLabel("" +rowNum, GUIFactory.FONTS);
-		
-		final JLabel sizeLabel = GUIFactory.createLabel("Matrix Size (includes "
-				+ "N/A-values): ",
+
+		final JLabel rows = GUIFactory.createLabel("" + rowNum,
 				GUIFactory.FONTS);
 
-		final JLabel size = GUIFactory.createLabel("" + (rowNum * colNum), 
+		final JLabel sizeLabel = GUIFactory.createLabel(
+				"Matrix Size (includes " + "N/A-values): ", GUIFactory.FONTS);
+
+		final JLabel size = GUIFactory.createLabel("" + (rowNum * colNum),
 				GUIFactory.FONTS);
 
 		mainPanel.setBorder(BorderFactory.createEtchedBorder());
-		
+
 		mainPanel.add(srcLabel, "tag label");
 		mainPanel.add(srcTxt, "wrap");
 		mainPanel.add(rowLabel, "tag label");
@@ -58,7 +57,7 @@ public class StatsDialog extends CustomDialog {
 		mainPanel.add(sizeLabel, "tag label");
 		mainPanel.add(size, "wrap");
 		mainPanel.add(closeBtn, "span, al right");
-		
+
 		dialog.add(mainPanel);
 	}
 }

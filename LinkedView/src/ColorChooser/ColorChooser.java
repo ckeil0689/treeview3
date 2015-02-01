@@ -47,7 +47,7 @@ public class ColorChooser implements ConfigNodePersistent {
 
 	/**
 	 * Constructs a ColorChooser object.
-	 * 
+	 *
 	 * @param drawer
 	 *            The CoorExtractor which defines how colors are mapped to data.
 	 * @param minVal
@@ -233,7 +233,7 @@ public class ColorChooser implements ConfigNodePersistent {
 	/**
 	 * Sets button status and remembers if custom ColorSet is selected or not.
 	 * If not, it disables the add-, remove- and missing color buttons.
-	 * 
+	 *
 	 * @param selected
 	 *            Whether the custom ColorSet is selected or not.
 	 */

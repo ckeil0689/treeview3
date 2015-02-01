@@ -40,11 +40,9 @@ import edu.stanford.genetics.treeview.LinearTransformation;
  */
 
 public class RowTreeView extends TRView implements MouseMotionListener,
-		MouseListener {
+MouseListener {
 
 	private static final long serialVersionUID = 1L;;
-
-	private HeaderInfo gtrHI;
 
 	public RowTreeView() {
 
@@ -58,8 +56,6 @@ public class RowTreeView extends TRView implements MouseMotionListener,
 	}
 
 	public void setGTRHeaderInfo(final HeaderInfo gtrHI) {
-
-		this.gtrHI = gtrHI;
 	}
 
 	@Override
@@ -72,59 +68,59 @@ public class RowTreeView extends TRView implements MouseMotionListener,
 	public String[] getStatus() {
 
 		String[] status;
-//<<<<<<< HEAD
-//		if (selectedNode != null) {
-//			if (selectedNode.isLeaf()) {
-//				status = new String[2];
-//				status[0] = "Leaf Node " + selectedNode.getId();
-//				status[1] = "Pos " + selectedNode.getCorr();
-//
-//			} else {
-//				final int[] nameIndex = getHeaderSummary().getIncluded();
-//				status = new String[nameIndex.length * 2];
-//				final String[] names = gtrHI.getNames();
-//
-//				for (int i = 0; i < nameIndex.length; i++) {
-//					status[2 * i] = names[nameIndex[i]] + ":";
-//					status[2 * i + 1] = " "
-//							+ gtrHI.getHeader(gtrHI.getHeaderIndex(selectedNode
-//									.getId()))[nameIndex[i]];
-//				}
-//			}
-//		} else {
-//			status = new String[2];
-//			status[0] = "Select Node to ";
-//			status[1] = "view annotation.";
-//		}
-//=======
-//		if (selectedNode != null) {
-//			if (selectedNode.isLeaf()) {
-//				status = new String[2];
-//				status[0] = "Leaf Node " + selectedNode.getId();
-//				status[1] = "Pos " + selectedNode.getCorr();
-//
-//			} else {
-//				final int[] nameIndex = getHeaderSummary().getIncluded();
-//				status = new String[nameIndex.length * 2];
-//				final String[] names = gtrHI.getNames();
-//
-//				for (int i = 0; i < nameIndex.length; i++) {
-//					status[2 * i] = names[nameIndex[i]] + ":";
-//					status[2 * i + 1] = " "
-//							+ gtrHI.getHeader(gtrHI.getHeaderIndex(
-//									selectedNode.getId()))[nameIndex[i]];
-//				}
-//			}
-//		} else {
-//			status = new String[2];
-//			status[0] = "Select Node to ";
-//			status[1] = "view annotation.";
-//		}
-		
+		// <<<<<<< HEAD
+		// if (selectedNode != null) {
+		// if (selectedNode.isLeaf()) {
+		// status = new String[2];
+		// status[0] = "Leaf Node " + selectedNode.getId();
+		// status[1] = "Pos " + selectedNode.getCorr();
+		//
+		// } else {
+		// final int[] nameIndex = getHeaderSummary().getIncluded();
+		// status = new String[nameIndex.length * 2];
+		// final String[] names = gtrHI.getNames();
+		//
+		// for (int i = 0; i < nameIndex.length; i++) {
+		// status[2 * i] = names[nameIndex[i]] + ":";
+		// status[2 * i + 1] = " "
+		// + gtrHI.getHeader(gtrHI.getHeaderIndex(selectedNode
+		// .getId()))[nameIndex[i]];
+		// }
+		// }
+		// } else {
+		// status = new String[2];
+		// status[0] = "Select Node to ";
+		// status[1] = "view annotation.";
+		// }
+		// =======
+		// if (selectedNode != null) {
+		// if (selectedNode.isLeaf()) {
+		// status = new String[2];
+		// status[0] = "Leaf Node " + selectedNode.getId();
+		// status[1] = "Pos " + selectedNode.getCorr();
+		//
+		// } else {
+		// final int[] nameIndex = getHeaderSummary().getIncluded();
+		// status = new String[nameIndex.length * 2];
+		// final String[] names = gtrHI.getNames();
+		//
+		// for (int i = 0; i < nameIndex.length; i++) {
+		// status[2 * i] = names[nameIndex[i]] + ":";
+		// status[2 * i + 1] = " "
+		// + gtrHI.getHeader(gtrHI.getHeaderIndex(
+		// selectedNode.getId()))[nameIndex[i]];
+		// }
+		// }
+		// } else {
+		// status = new String[2];
+		// status[0] = "Select Node to ";
+		// status[1] = "view annotation.";
+		// }
+
 		/* TODO temporary solution until we decide what info to display" */
 		status = new String[3];
-		
-//>>>>>>> bugFix
+
+		// >>>>>>> bugFix
 		return status;
 	}
 
@@ -150,7 +146,7 @@ public class RowTreeView extends TRView implements MouseMotionListener,
 			destRect.setBounds(0, 0, offscreenSize.width, map.getUsedPixels());
 			setXScaleEq(new LinearTransformation(treePainter.getCorrMin(),
 					destRect.x, treePainter.getCorrMax(), destRect.x
-					+ destRect.width));
+							+ destRect.width));
 
 			setYScaleEq(new LinearTransformation(map.getIndex(destRect.y),
 					destRect.y, map.getIndex(destRect.y + destRect.height),
@@ -195,8 +191,8 @@ public class RowTreeView extends TRView implements MouseMotionListener,
 
 		setHoveredNode(treePainter.getClosest(
 				getYScaleEq().inverseTransform(e.getY()), getXScaleEq()
-						.inverseTransform(e.getX()), getXScaleEq().getSlope()
-						/ getYScaleEq().getSlope()));
+				.inverseTransform(e.getX()), getXScaleEq().getSlope()
+				/ getYScaleEq().getSlope()));
 	}
 
 	@Override

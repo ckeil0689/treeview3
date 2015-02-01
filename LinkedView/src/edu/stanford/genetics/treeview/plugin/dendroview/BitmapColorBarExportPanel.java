@@ -48,7 +48,7 @@ import edu.stanford.genetics.treeview.SettingsPanel;
  *
  */
 public class BitmapColorBarExportPanel extends ColorBarExportPanel implements
-SettingsPanel {
+		SettingsPanel {
 
 	JComboBox formatPulldown = new JComboBox(BitmapWriter.formats);
 

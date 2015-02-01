@@ -60,7 +60,7 @@ public class FontSettings implements SettingsPanel {
 
 	private final String[] preferredFonts = {
 
-			"Arial", "Tahoma", "Verdana", "Times New Roman", "Helvetica", "Calibri",
+	"Arial", "Tahoma", "Verdana", "Times New Roman", "Helvetica", "Calibri",
 			"Courier", "Dialog", "Myriad" };
 
 	private Font[] fonts;
@@ -132,7 +132,7 @@ public class FontSettings implements SettingsPanel {
 	 */
 	public final static String[] styles = {
 
-		"Plain", "Italic", "Bold", "Bold Italic" };
+	"Plain", "Italic", "Bold", "Bold Italic" };
 
 	/**
 	 * turn a style number from class java.awt.Font into a string
@@ -170,8 +170,8 @@ public class FontSettings implements SettingsPanel {
 
 		return style.equalsIgnoreCase(styles[0]) ? Font.PLAIN : style
 				.equalsIgnoreCase(styles[1]) ? Font.ITALIC : style
-						.equalsIgnoreCase(styles[2]) ? Font.BOLD : Font.BOLD
-								+ Font.ITALIC;
+				.equalsIgnoreCase(styles[2]) ? Font.BOLD : Font.BOLD
+				+ Font.ITALIC;
 	}
 
 	/**

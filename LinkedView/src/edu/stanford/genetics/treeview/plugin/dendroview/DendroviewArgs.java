@@ -50,7 +50,7 @@ public class DendroviewArgs {
 			sResource = (String) parser.getOptionValue(filePath, null);
 			final String defaultType = (sResource == null || sResource
 					.lastIndexOf('.') < 0) ? null : sResource
-							.substring(sResource.lastIndexOf('.') + 1);
+					.substring(sResource.lastIndexOf('.') + 1);
 			sExportType = (String) parser.getOptionValue(exportType,
 					defaultType);
 			parseScaling((String) parser.getOptionValue(scaling, null));
@@ -66,7 +66,7 @@ public class DendroviewArgs {
 			dLogcenter = (Double) parser.getOptionValue(logcenter, null);
 		} catch (final IllegalOptionValueException e) {
 			System.err
-			.println("Error parsing args, defaulting to type auto, no file loading");
+					.println("Error parsing args, defaulting to type auto, no file loading");
 			System.err.println(e.getMessage());
 			printUsage();
 			e.printStackTrace();
@@ -76,7 +76,7 @@ public class DendroviewArgs {
 			dLogcenter = null;
 		} catch (final UnknownOptionException e) {
 			System.err
-			.println("Error parsing args, defaulting to type auto, no file loading");
+					.println("Error parsing args, defaulting to type auto, no file loading");
 			System.err.println(e.getMessage());
 			printUsage();
 			e.printStackTrace();
@@ -125,50 +125,50 @@ public class DendroviewArgs {
 				+ filePath.longForm()
 				+ ": path of file to export to (required)");
 		System.err
-		.println(" -"
-				+ exportType.shortForm()
-				+ "/--"
-				+ exportType.longForm()
-				+ ": string indicating output format (ps | png | gif), defaults to ending of file path (after '.')");
+				.println(" -"
+						+ exportType.shortForm()
+						+ "/--"
+						+ exportType.longForm()
+						+ ": string indicating output format (ps | png | gif), defaults to ending of file path (after '.')");
 		System.err
-		.println(" -"
-				+ scaling.shortForm()
-				+ "/--"
-				+ scaling.longForm()
-				+ ": string indicating pixel scaling, i.e. 10x2 for 10 pixels horizontal, 2 vertical.");
+				.println(" -"
+						+ scaling.shortForm()
+						+ "/--"
+						+ scaling.longForm()
+						+ ": string indicating pixel scaling, i.e. 10x2 for 10 pixels horizontal, 2 vertical.");
 		System.err
-		.println(" -"
-				+ aHeaders.shortForm()
-				+ "/--"
-				+ aHeaders.longForm()
-				+ ": comma separated list of array headers to include (default is none).");
+				.println(" -"
+						+ aHeaders.shortForm()
+						+ "/--"
+						+ aHeaders.longForm()
+						+ ": comma separated list of array headers to include (default is none).");
 		System.err
-		.println(" -"
-				+ gHeaders.shortForm()
-				+ "/--"
-				+ gHeaders.longForm()
-				+ ": comma separated list of gene headers to include (default is none).");
+				.println(" -"
+						+ gHeaders.shortForm()
+						+ "/--"
+						+ gHeaders.longForm()
+						+ ": comma separated list of gene headers to include (default is none).");
 		System.err.println(" -" + atrHeight.shortForm() + "/--"
 				+ atrHeight.longForm()
 				+ ": explicitly set height of array tree");
 		System.err.println(" -" + gtrWidth.shortForm() + "/--"
 				+ gtrWidth.longForm() + ": explicitly set width of gene tree");
 		System.err
-		.println("Note: the following two options will change the settings the next time the file is loaded.");
+				.println("Note: the following two options will change the settings the next time the file is loaded.");
 		System.err
-		.println("      they are similar to making the changes through the GUI, and they are saved in the .jtv file");
+				.println("      they are similar to making the changes through the GUI, and they are saved in the .jtv file");
 		System.err
-		.println(" -"
-				+ contrast.shortForm()
-				+ "/--"
-				+ contrast.longForm()
-				+ ": set contrast value, similar to that in Settings->Pixel Settings... from the GUI");
+				.println(" -"
+						+ contrast.shortForm()
+						+ "/--"
+						+ contrast.longForm()
+						+ ": set contrast value, similar to that in Settings->Pixel Settings... from the GUI");
 		System.err
-		.println(" -"
-				+ logcenter.shortForm()
-				+ "/--"
-				+ logcenter.longForm()
-				+ ": turn on logscaling base 2 of specified center, similar to Settings->Pixel Settings...");
+				.println(" -"
+						+ logcenter.shortForm()
+						+ "/--"
+						+ logcenter.longForm()
+						+ ": turn on logscaling base 2 of specified center, similar to Settings->Pixel Settings...");
 	}
 
 	public String getFilePath() {

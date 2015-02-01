@@ -8,7 +8,7 @@ import Utilities.StringRes;
 
 /**
  * Provides a JPanel that displays information about a selected cluster method.
- * 
+ *
  * @author CKeil
  *
  */
@@ -25,7 +25,7 @@ public class ClusterInfoFactory {
 	/**
 	 * Generates an infoPanel depending on the supplied method index that stands
 	 * for the type of clustering algorithm.
-	 * 
+	 *
 	 * @param methodIndex
 	 * @return
 	 */
@@ -88,7 +88,7 @@ public class ClusterInfoFactory {
 	/**
 	 * Generates an infoPanel depending on the supplied method index that stands
 	 * for the type of clustering algorithm.
-	 * 
+	 *
 	 * @param methodIndex
 	 * @return
 	 */
@@ -144,7 +144,7 @@ public class ClusterInfoFactory {
 	/**
 	 * Gets the appropriate similarity String resource depending on which method
 	 * is selected by the user (designated by index).
-	 * 
+	 *
 	 * @param index
 	 * @return
 	 */
@@ -175,7 +175,7 @@ public class ClusterInfoFactory {
 	/**
 	 * Gets the appropriate type String resource depending on which method is
 	 * selected by the user (designated by index).
-	 * 
+	 *
 	 * @param index
 	 * @return
 	 */
@@ -203,7 +203,7 @@ public class ClusterInfoFactory {
 	/**
 	 * Gets the appropriate time String resource depending on which method is
 	 * selected by the user (designated by index).
-	 * 
+	 *
 	 * @param index
 	 * @return
 	 */
@@ -231,7 +231,7 @@ public class ClusterInfoFactory {
 	/**
 	 * Gets the appropriate advantage String resource depending on which method
 	 * is selected by the user (designated by index).
-	 * 
+	 *
 	 * @param index
 	 * @return
 	 */
@@ -262,7 +262,7 @@ public class ClusterInfoFactory {
 	/**
 	 * Gets the appropriate disadvantage String resource depending on which
 	 * method is selected by the user (designated by index).
-	 * 
+	 *
 	 * @param index
 	 * @return
 	 */

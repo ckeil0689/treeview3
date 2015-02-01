@@ -105,7 +105,7 @@ public class ClusterView {
 	 * Generates the mainPanel which is put into ClusterDialog. This base layer
 	 * contains all the other layers with the information and interactive
 	 * components.
-	 * 
+	 *
 	 * @param int Integer that represents the type of clustering.
 	 * @return The base JPanel.
 	 */
@@ -349,7 +349,7 @@ public class ClusterView {
 	 * Sets the state of clustering. If true, clustering is considered in
 	 * progress and the UI has to change accordingly. The cluster button will be
 	 * replaced by a cancel button, and vice versa.
-	 * 
+	 *
 	 * @param isInProgress
 	 */
 	public void setClustering(final boolean isInProgress) {
@@ -397,7 +397,7 @@ public class ClusterView {
 	/**
 	 * Listener for the linkage JComboBox in order to change the display of
 	 * information about linkage methods when the selection is changed.
-	 * 
+	 *
 	 * @param l
 	 */
 	public void addLinkageListener(final ActionListener l) {

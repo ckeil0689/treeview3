@@ -10,7 +10,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
 /**
  * Class that is supposed to contain a bunch of static general helper methods,
  * which are usually operations that aren't necessarily unique to one class.
- * 
+ *
  * @author CKeil
  *
  */
@@ -22,7 +22,7 @@ public final class Helper {
 	 * Compares to floating point numbers to find out whether they can be
 	 * considered equal. '==' can never be used to compare floating point
 	 * numbers!
-	 * 
+	 *
 	 * @param double a First floating point number.
 	 * @param double b Second floating point number.
 	 * @return boolean Whether 2 floats can be considered equal.

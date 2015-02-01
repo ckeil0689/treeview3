@@ -43,7 +43,7 @@ import edu.stanford.genetics.treeview.TreeDrawerNode;
  * This is distinct from which genes are selected (see the TreeSelection object)
  */
 public class MapContainer extends Observable implements Observer,
-AdjustmentListener, ConfigNodePersistent {
+		AdjustmentListener, ConfigNodePersistent {
 
 	private final String default_map = "Fixed";
 	private double default_scale = 1.0;
@@ -674,7 +674,7 @@ AdjustmentListener, ConfigNodePersistent {
 
 	/**
 	 * Returns amount of tiles currently visible on this map.
-	 * 
+	 *
 	 * @return
 	 */
 	public int getTileNumVisible() {

@@ -104,7 +104,7 @@ public class Thumb {
 
 	/**
 	 * Draw a small circle to be positioned above the selected thumb.
-	 * 
+	 *
 	 * @param g
 	 *            Graphics object
 	 * @param x

@@ -68,7 +68,7 @@ public class ClusterController {
 	 * controls what happens in response to user actions. It makes sure that the
 	 * right parameters are supplied to clustering methods and controls the UI
 	 * response to user interaction.
-	 * 
+	 *
 	 * @param dialog
 	 *            The JDialog that contains the cluster UI.
 	 * @param controller
@@ -108,7 +108,7 @@ public class ClusterController {
 	/**
 	 * Begins cluster process if the user clicks the 'Cluster' button in
 	 * DendroView and sufficient parameters are set.
-	 * 
+	 *
 	 * @author CKeil
 	 *
 	 */
@@ -132,7 +132,7 @@ public class ClusterController {
 	 * for the UI to remain responsive during these tasks. This is useful for
 	 * updating the progress bar and progress label. When the thread is done it
 	 * calls a function to save the results to a CDT file.
-	 * 
+	 *
 	 * @author CKeil
 	 *
 	 */
@@ -155,11 +155,11 @@ public class ClusterController {
 
 		@Override
 		protected Void doInBackground() throws Exception {
-			
-			int rows = tvModel.getRowHeaderInfo().getNumHeaders();
-			int cols = tvModel.getColumnHeaderInfo().getNumHeaders();
-			
-			/* 
+
+			final int rows = tvModel.getRowHeaderInfo().getNumHeaders();
+			final int cols = tvModel.getColumnHeaderInfo().getNumHeaders();
+
+			/*
 			 * Set maximum for JProgressBar before any clustering!
 			 */
 			if (rowSimilarity != 0) {
@@ -201,10 +201,10 @@ public class ClusterController {
 			/* Get fileName for saving calculated data */
 			fileName = tvModel.getSource().substring(0,
 					tvModel.getSource().length() - 4);
-			
-			IntHeaderInfo geneHeaderI = tvModel.getRowHeaderInfo();
-			IntHeaderInfo arrayHeaderI = tvModel.getColumnHeaderInfo();
-			
+
+			final IntHeaderInfo geneHeaderI = tvModel.getRowHeaderInfo();
+			final IntHeaderInfo arrayHeaderI = tvModel.getColumnHeaderInfo();
+
 			/* Initialize the clustering processor and pass the data */
 			final TVDataMatrix originalMatrix = (TVDataMatrix) tvModel
 					.getDataMatrix();
@@ -240,7 +240,7 @@ public class ClusterController {
 
 		/**
 		 * Controls clustering procedures for one axis.
-		 * 
+		 *
 		 * @param similarity
 		 *            The chosen similarity measure.
 		 * @param axis
@@ -300,7 +300,7 @@ public class ClusterController {
 	 * the newly clustered matrix. Makes sure that the newly created file is
 	 * visualized right after clustering, given that the process was not
 	 * cancelled.
-	 * 
+	 *
 	 * @param reorderedRows
 	 *            Reordered row axis.
 	 * @author CKeil
@@ -338,9 +338,9 @@ public class ClusterController {
 			LogBuffer.println("Setting up buffered writer...");
 			cdtGen.setupWriter(fileName, clusterView.getSpinnerValues());
 
-			IntHeaderInfo geneHeaderI = tvModel.getRowHeaderInfo();
-			IntHeaderInfo arrayHeaderI = tvModel.getColumnHeaderInfo();
-			
+			final IntHeaderInfo geneHeaderI = tvModel.getRowHeaderInfo();
+			final IntHeaderInfo arrayHeaderI = tvModel.getColumnHeaderInfo();
+
 			cdtGen.prepare(geneHeaderI, arrayHeaderI);
 			cdtGen.generateCDT();
 
@@ -400,7 +400,7 @@ public class ClusterController {
 	/**
 	 * Listens to a change in selection for the clusterChoice JComboBox in
 	 * clusterView. Calls a new layout setup as a response.
-	 * 
+	 *
 	 * @author CKeil
 	 *
 	 */
@@ -421,7 +421,7 @@ public class ClusterController {
 	/**
 	 * Listens to a change in selection for the linkChooser JComboBox in
 	 * clusterView. Calls a new layout setup as a response.
-	 * 
+	 *
 	 * @author CKeil
 	 *
 	 */
@@ -438,7 +438,7 @@ public class ClusterController {
 	/**
 	 * Listens to a change in selection in the JComboBox for row distance
 	 * measure selection.
-	 * 
+	 *
 	 * @author CKeil
 	 */
 	private class RowDistListener implements ItemListener {
@@ -459,7 +459,7 @@ public class ClusterController {
 	/**
 	 * Listens to a change in selection in the JComboBox for col distance
 	 * measure selection.
-	 * 
+	 *
 	 * @author CKeil
 	 */
 	private class ColDistListener implements ItemListener {
@@ -481,7 +481,7 @@ public class ClusterController {
 
 	/**
 	 * Listens to a change in selection in the JSpinners for k-means.
-	 * 
+	 *
 	 * @author CKeil
 	 */
 	private class SpinnerListener implements ChangeListener {
@@ -501,7 +501,7 @@ public class ClusterController {
 	 * Defines what happens if the user clicks the 'Cancel' button in
 	 * DendroView. Calls the cancel() method in the view. TODO add cancel
 	 * functionality to distance worker and cluster worker.
-	 * 
+	 *
 	 * @author CKeil
 	 *
 	 */

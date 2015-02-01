@@ -32,7 +32,7 @@ import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.UrlExtractor;
 
 public class LabelView extends ModelView implements MouseListener,
-		MouseMotionListener, FontSelectable, ConfigNodePersistent {
+MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
 	private static final long serialVersionUID = 1L;
 
@@ -91,8 +91,8 @@ public class LabelView extends ModelView implements MouseListener,
 	protected JScrollPane scrollPane;
 	protected JLabel zoomHint;
 	private final String hintText;
-	
-	public LabelView(int axis_id) {
+
+	public LabelView(final int axis_id) {
 		super();
 
 		this.isGeneAxis = (axis_id == ROW);
@@ -107,8 +107,8 @@ public class LabelView extends ModelView implements MouseListener,
 		addMouseListener(this);
 
 		zoomHint = GUIFactory.createLabel("", GUIFactory.FONTS);
-		
-		if(isGeneAxis) {
+
+		if (isGeneAxis) {
 			this.hintText = StringRes.lbl_ZoomRowLabels;
 			add(zoomHint, "alignx 0%, aligny 50%, push, wrap");
 		} else {
@@ -263,7 +263,7 @@ public class LabelView extends ModelView implements MouseListener,
 
 	/**
 	 * Access a LabelView's main scrollBar.
-	 * 
+	 *
 	 * @return The horizontal scrollbar for gene labels, the vertical scrollbar
 	 *         for array labels.
 	 */

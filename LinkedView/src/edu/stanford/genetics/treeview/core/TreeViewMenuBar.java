@@ -24,7 +24,7 @@ public class TreeViewMenuBar extends TreeviewMenuBarI {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * edu.stanford.genetics.treeview.TreeviewMenuBarI#getUnderlyingMenuBar()
 	 */
@@ -34,7 +34,7 @@ public class TreeViewMenuBar extends TreeviewMenuBarI {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * edu.stanford.genetics.treeview.TreeviewMenuBarI#setUnderlyingMenuBar(
 	 * java.awt.MenuBar)
@@ -45,7 +45,7 @@ public class TreeViewMenuBar extends TreeviewMenuBarI {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * edu.stanford.genetics.treeview.TreeviewMenuBarI#addMenu(java.lang.String)
 	 */
@@ -58,7 +58,7 @@ public class TreeViewMenuBar extends TreeviewMenuBarI {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * edu.stanford.genetics.treeview.TreeviewMenuBarI#addMenuItem(java.lang
 	 * .String, java.awt.event.ActionListener)
@@ -98,7 +98,7 @@ public class TreeViewMenuBar extends TreeviewMenuBarI {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * edu.stanford.genetics.treeview.TreeviewMenuBarI#addSubMenu(java.lang.
 	 * String)
@@ -113,7 +113,7 @@ public class TreeViewMenuBar extends TreeviewMenuBarI {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see edu.stanford.genetics.treeview.TreeviewMenuBarI#setAccelerator(int)
 	 */
 	@Override
@@ -123,7 +123,7 @@ public class TreeViewMenuBar extends TreeviewMenuBarI {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see edu.stanford.genetics.treeview.TreeviewMenuBarI#setMnemonic(int)
 	 */
 	@Override
@@ -133,7 +133,7 @@ public class TreeViewMenuBar extends TreeviewMenuBarI {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * edu.stanford.genetics.treeview.TreeviewMenuBarI#setMenu(java.lang.String)
 	 */
@@ -151,7 +151,7 @@ public class TreeViewMenuBar extends TreeviewMenuBarI {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * edu.stanford.genetics.treeview.TreeviewMenuBarI#setSubMenu(java.lang.
 	 * String)
@@ -170,7 +170,7 @@ public class TreeViewMenuBar extends TreeviewMenuBarI {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see edu.stanford.genetics.treeview.TreeviewMenuBarI#clearMenu()
 	 */
 	public void clearMenu() {

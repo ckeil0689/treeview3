@@ -64,8 +64,8 @@ public class ReorderedDataModel extends Observable implements DataModel {
 		this.geneIndex = geneIndex;
 		this.arrayIndex = arrayIndex;
 		if (geneIndex != null) {
-			geneHeaderInfo = new ReorderedHeaderInfo(
-					source.getRowHeaderInfo(), geneIndex);
+			geneHeaderInfo = new ReorderedHeaderInfo(source.getRowHeaderInfo(),
+					geneIndex);
 			gtrHeaderInfo = new ReorderedHeaderInfo(source.getGtrHeaderInfo(),
 					geneIndex);
 		}
@@ -315,7 +315,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see edu.stanford.genetics.treeview.DataModel#getDocumentConfig()
 	 */
 	@Override
@@ -328,7 +328,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see edu.stanford.genetics.treeview.DataModel#getSource()
 	 */
 	@Override
@@ -365,7 +365,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see edu.stanford.genetics.treeview.DataModel
 	 * #setModelForCompare(edu.stanford.genetics.treeview.DataModel)
 	 */
@@ -375,7 +375,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see edu.stanford.genetics.treeview.DataModel#getFileSet()
 	 */
 	@Override
@@ -394,39 +394,35 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see edu.stanford.genetics.treeview.DataModel#getGeneHeaderInfo()
 	 */
 	@Override
 	public IntHeaderInfo getRowHeaderInfo() {
 
-		if (geneHeaderInfo == null) {
+		if (geneHeaderInfo == null)
 			return parent.getRowHeaderInfo();
-
-		} else {
+		else
 			return geneHeaderInfo;
-		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see edu.stanford.genetics.treeview.DataModel#getArrayHeaderInfo()
 	 */
 	@Override
 	public IntHeaderInfo getColumnHeaderInfo() {
 
-		if (arrayHeaderInfo == null) {
+		if (arrayHeaderInfo == null)
 			return parent.getColumnHeaderInfo();
-
-		} else {
+		else
 			return arrayHeaderInfo;
-		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see edu.stanford.genetics.treeview.DataModel#getGtrHeaderInfo()
 	 */
 	@Override
@@ -440,7 +436,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see edu.stanford.genetics.treeview.DataModel#getAtrHeaderInfo()
 	 */
 	@Override
@@ -454,7 +450,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see edu.stanford.genetics.treeview.DataModel#getType()
 	 */
 	@Override
@@ -465,7 +461,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see edu.stanford.genetics.treeview.DataModel#getDataMatrix()
 	 */
 	@Override
@@ -476,7 +472,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see edu.stanford.genetics.treeview.DataModel
 	 * #append(edu.stanford.genetics.treeview.DataModel)
 	 */
@@ -486,7 +482,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see edu.stanford.genetics.treeview.DataModel#removeAppended()
 	 */
 	@Override

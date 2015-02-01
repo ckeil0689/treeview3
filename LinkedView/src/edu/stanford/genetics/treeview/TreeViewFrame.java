@@ -75,7 +75,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
  *
  */
 public class TreeViewFrame extends ViewFrame implements FileSetListener,
-ConfigNodePersistent {
+		ConfigNodePersistent {
 
 	public static final int WELCOME_VIEW = 0;
 	public static final int LOADERROR_VIEW = 1;
@@ -895,7 +895,7 @@ ConfigNodePersistent {
 	 * FileSet is found by matching the index of the MenuItem to the index of
 	 * the FileSet list which is created by checking the 'FileMRU' Preferences
 	 * node for previously stored fileSets.
-	 * 
+	 *
 	 * @param menuItem
 	 * @return FileSet
 	 */
@@ -907,8 +907,8 @@ ConfigNodePersistent {
 			return fileSetList.get(index);
 		else {
 			LogBuffer
-					.println("Sizes of FileSetList and FileMenuList in TVFrame"
-							+ "don't match.");
+			.println("Sizes of FileSetList and FileMenuList in TVFrame"
+					+ "don't match.");
 			return null;
 		}
 	}

@@ -79,7 +79,7 @@ public class HierCluster {
 	 * supplied distance matrix. It uses input parameters such as the chosen
 	 * linkage method and the axis of the original dataset to be clustered to
 	 * perform the clustering.
-	 * 
+	 *
 	 * @param fileName
 	 *            The name of the original loaded file which will serve as the
 	 *            basis for the name of the newly generated files.
@@ -249,7 +249,7 @@ public class HierCluster {
 	 * index values of the minimum value in the current step's distance matrix.
 	 * The pair of closest clusters is composed of the cluster at rowMinIndex
 	 * and the cluster at colMinIndex in currentClusters.
-	 * 
+	 *
 	 * @return The new cluster.
 	 */
 	private int[] linkClosestClusters() {
@@ -257,7 +257,7 @@ public class HierCluster {
 		/* Get the two clusters to be fused */
 		/* Get the cluster at rowMinIndex */
 		final int[] row_cluster = new int[currentClusters.get(min_row_index)
-				.size()];
+		                                  .size()];
 		for (int i = 0; i < row_cluster.length; i++) {
 
 			row_cluster[i] = currentClusters.get(min_row_index).get(i);
@@ -265,7 +265,7 @@ public class HierCluster {
 
 		/* Get the cluster at colMinIndex */
 		final int[] col_cluster = new int[currentClusters.get(min_col_index)
-				.size()];
+		                                  .size()];
 		for (int i = 0; i < col_cluster.length; i++) {
 
 			col_cluster[i] = currentClusters.get(min_col_index).get(i);
@@ -276,7 +276,7 @@ public class HierCluster {
 
 	/**
 	 * Takes information about a newly formed cluster and writes it to a file.
-	 * 
+	 *
 	 * @param link
 	 *            The pair of clustered rows.
 	 * @return
@@ -308,7 +308,7 @@ public class HierCluster {
 	/**
 	 * Updates the list of all current clusters by removing the old clusters and
 	 * adding the newly formed cluster at the appropriate index.
-	 * 
+	 *
 	 * @param newCluster
 	 * @return Whether the row cluster contains the minimum.
 	 */
@@ -368,7 +368,7 @@ public class HierCluster {
 	/**
 	 * Updates the distance matrix by removing old rows and columns and
 	 * inserting the newly formed row and column at the appropriate indices.
-	 * 
+	 *
 	 * @param rowClusHasMin
 	 * @param newRow
 	 */
@@ -505,7 +505,7 @@ public class HierCluster {
 
 	/**
 	 * Checks a cluster if it contains a certain value.
-	 * 
+	 *
 	 * @param min
 	 * @return
 	 */
@@ -718,7 +718,7 @@ public class HierCluster {
 			 */
 			if (!shareCommonElements(currentCluster, fusedClusters)) {
 				final double[] distances = new double[fusedClusters.length
-				                                      * currentCluster.length];
+						* currentCluster.length];
 
 				double min = Double.MAX_VALUE;
 				double max = Double.MIN_VALUE;

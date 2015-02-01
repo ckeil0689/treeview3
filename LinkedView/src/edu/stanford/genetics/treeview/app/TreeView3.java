@@ -10,7 +10,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
  * in LinkedViewApp in a Swing thread and allows to modify some UIManager
  * configurations beforehand. This is useful for the activation of the native
  * Mac OSX menubar, for example.
- * 
+ *
  * @author CKeil
  */
 // public class TreeViewLauncher {

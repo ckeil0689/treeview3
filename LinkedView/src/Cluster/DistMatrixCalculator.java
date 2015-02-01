@@ -46,7 +46,7 @@ public class DistMatrixCalculator {
 	/**
 	 * Constructs a DistMatrixCalculator which is used to obtain distance
 	 * matrices for supplied datasets.
-	 * 
+	 *
 	 * @param data
 	 *            The original data from which to construct a distance matrix.
 	 * @param distMeasure
@@ -100,7 +100,7 @@ public class DistMatrixCalculator {
 
 	/**
 	 * Calculates the pearson correlation coefficient of two rows.
-	 * 
+	 *
 	 * @param row
 	 *            A matrix row.
 	 * @param otherRow
@@ -200,7 +200,7 @@ public class DistMatrixCalculator {
 		 * Step 1: Go through each row. Step 2: Rank the values in the data
 		 * array by increasing numerical value. Step 3: For all identical
 		 * values, make rank the average rank.
-		 * 
+		 *
 		 * If the value is the same as the 'next' one in the sorted array (e.g.
 		 * 0.0 following 0.0), it doesn't matter to what index in the array it
 		 * corresponds to. All of the same values will be assigned the same
@@ -278,7 +278,7 @@ public class DistMatrixCalculator {
 
 	/**
 	 * Uses one of the two 'taxicab' distance measures: Euclidean or Manhattan.
-	 * 
+	 *
 	 * @param isEuclid
 	 *            Whether Euclidean distance is used or not.
 	 */
@@ -305,7 +305,7 @@ public class DistMatrixCalculator {
 
 	/**
 	 * Calculates the Euclidean distance between two rows.
-	 * 
+	 *
 	 * @param row
 	 *            One matrix row.
 	 * @param otherRow
@@ -335,7 +335,7 @@ public class DistMatrixCalculator {
 
 	/**
 	 * Calculates the Manhattan distance between two elements.
-	 * 
+	 *
 	 * @param row
 	 *            One matrix element.
 	 * @param otherRow
@@ -438,7 +438,7 @@ public class DistMatrixCalculator {
 
 	/**
 	 * Getter to retrieve the distance matrix.
-	 * 
+	 *
 	 * @return The calculated distance matrix.
 	 */
 	public double[][] getDistanceMatrix() {

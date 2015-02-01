@@ -179,7 +179,7 @@ public class PreferencesController {
 	/**
 	 * Listens to changing radio buttons in the AnnotationSettings and sets the
 	 * justify-flag in TextView and ArrayNameView respectively.
-	 * 
+	 *
 	 * @author chris0689
 	 *
 	 */
@@ -298,7 +298,7 @@ public class PreferencesController {
 			final String[] oldNames = headerInfo.getNames();
 
 			final String[][] headersToAdd = new String[oldHeaders.length
-			                                           + headerNum][];
+					+ headerNum][];
 
 			// Iterate over loadedLabels
 			for (int i = 0; i < oldHeaders.length; i++) {

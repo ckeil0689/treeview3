@@ -42,7 +42,7 @@ public class CDTGenerator {
 	 * The task for this class is to take supplied data that is the result of
 	 * clustering and format it into a new CDT file that can be read and
 	 * interpreted by TreeView.
-	 * 
+	 *
 	 * @param origMatrix
 	 *            The original data matrix.
 	 * @param orderedRows
@@ -108,7 +108,7 @@ public class CDTGenerator {
 
 	/**
 	 * Sets up instance variables needed for writing.
-	 * 
+	 *
 	 * @param geneHeaderI
 	 * @param arrayHeaderI
 	 */

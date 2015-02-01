@@ -28,7 +28,7 @@ public class DistanceMatrix {
 
 	/**
 	 * Sets a row of the matrix at the specified index.
-	 * 
+	 *
 	 * @param row
 	 *            The array to be set.
 	 * @param index
@@ -41,7 +41,7 @@ public class DistanceMatrix {
 
 	/**
 	 * Returns a reference to the row at the provided index of the matrix.
-	 * 
+	 *
 	 * @param index
 	 * @return
 	 */
@@ -53,7 +53,7 @@ public class DistanceMatrix {
 	/**
 	 * Deletes the row and column at a given index in the distance matrix
 	 * object, effectively shrinking it.
-	 * 
+	 *
 	 * @param index
 	 *            Index of the row and column to be deleted.
 	 */
@@ -96,7 +96,7 @@ public class DistanceMatrix {
 
 	/**
 	 * Replaces a row at the provided index with another new row.
-	 * 
+	 *
 	 * @param newRow
 	 * @param index
 	 */
@@ -112,7 +112,7 @@ public class DistanceMatrix {
 	/**
 	 * Clones a supplied matrix and stores it in the matrix instance of this
 	 * object.
-	 * 
+	 *
 	 * @param oldMatrix
 	 *            The matrix to be cloned.
 	 * @return
@@ -138,7 +138,7 @@ public class DistanceMatrix {
 	 * clustered. They will form a new row that replaces the other two and as a
 	 * result a new minimum must be found at each step to determine the new row
 	 * pair to be clustered. Complexity: O(n^2)
-	 * 
+	 *
 	 * @return The minimum value in the current distance matrix.
 	 */
 	public double findCurrentMin(final double oldMin) {
@@ -168,7 +168,7 @@ public class DistanceMatrix {
 
 	/**
 	 * Returns the amount of rows in the current distance matrix object.S
-	 * 
+	 *
 	 * @return
 	 */
 	public int getSize() {
@@ -178,7 +178,7 @@ public class DistanceMatrix {
 
 	/**
 	 * Returns the row index of the matrix' current minimum value.
-	 * 
+	 *
 	 * @return int Row index of current matrix minimum.
 	 */
 	public int getMinRowIndex() {
@@ -188,7 +188,7 @@ public class DistanceMatrix {
 
 	/**
 	 * Returns the col index of the matrix' current minimum value.
-	 * 
+	 *
 	 * @return int Col index of current matrix minimum.
 	 */
 	public int getMinColIndex() {

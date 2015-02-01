@@ -175,7 +175,7 @@ public class ColorChooserController {
 
 	/**
 	 * Adds a user-selected color to the colorList in the gradientBox.
-	 * 
+	 *
 	 * @author chris0689
 	 *
 	 */
@@ -195,7 +195,7 @@ public class ColorChooserController {
 
 	/**
 	 * Removes a color from colorList in the gradientBox.
-	 * 
+	 *
 	 * @author chris0689
 	 *
 	 */
@@ -212,7 +212,7 @@ public class ColorChooserController {
 
 	/**
 	 * Radio-button controls over which ColorSet is active.
-	 * 
+	 *
 	 * @author chris0689
 	 *
 	 */
