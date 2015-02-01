@@ -483,13 +483,13 @@ public class DendroView implements Observer, DendroPanel {
 			gvHeight = MAX_GV_HEIGHT;
 		}
 
-		dendroPane.add(firstPanel, "w " + textViewCol + "%, w 300::, " + "h "
+		dendroPane.add(firstPanel, "w " + textViewCol + "%, w 250::, " + "h "
 				+ arrayRow + "%, pushx");
 
 		dendroPane.add(arrayContainer, "w " + gvWidth + "%, " + "h " + arrayRow
 				+ "%, growx");
 
-		dendroPane.add(navContainer, "span 1 2, w 300::, h 100%, wrap");
+		dendroPane.add(navContainer, "span 1 2, w 250::, h 100%, wrap");
 
 		dendroPane.add(geneContainer, "w " + textViewCol + "%, " + "h "
 				+ gvHeight + "%, growy");
