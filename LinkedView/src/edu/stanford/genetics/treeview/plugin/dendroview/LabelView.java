@@ -90,6 +90,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	
 	protected JScrollPane scrollPane;
 	protected JLabel zoomHint;
+	private final String hintText;
 	
 	public LabelView(int axis_id) {
 		
@@ -109,8 +110,10 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		zoomHint = GUIFactory.createLabel("", GUIFactory.FONTS);
 		
 		if(isGeneAxis) {
+			this.hintText = StringRes.lbl_ZoomRowLabels;
 			add(zoomHint, "alignx 0%, aligny 50%, push, wrap");
 		} else {
+			this.hintText = StringRes.lbl_ZoomColLabels;
 			add(zoomHint, "alignx 50%, aligny 100%, push");
 		}
 		
@@ -436,7 +439,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 			g2d.setTransform(orig);
 
 		} else {
-			zoomHint.setText(StringRes.lbl_ZoomColLabels);
+			zoomHint.setText(hintText);
 		}
 	}
 	
