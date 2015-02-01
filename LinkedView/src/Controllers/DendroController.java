@@ -7,11 +7,6 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-//<<<<<<< HEAD
-//import java.awt.event.MouseAdapter;
-//import java.awt.event.MouseEvent;
-//=======
-//>>>>>>> bugFix
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -119,12 +114,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		updateHeaderInfo();
 		bindComponentFunctions();
 		
-
-//<<<<<<< HEAD
-//		dendroView.prepareView(tvModel.getGeneHeaderInfo(),
-//				tvModel.getArrayHeaderInfo(), globalXmap, globalYmap);
-
-//=======
 		dendroView.setupSearch(tvModel.getRowHeaderInfo(), 
 					tvModel.getColumnHeaderInfo(),
 					globalXmap, globalYmap);
@@ -132,7 +121,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		
 		setObservables();
 		
-//>>>>>>> bugFix
 		setSavedScale();
 
 		addKeyBindings();
@@ -320,18 +308,11 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-//<<<<<<< HEAD
-			/*
-			 * Putting the mapContainer objects in DendroView so that I can
-			 * control zoom-out of the found genes/arrays are outside the
-			 * visible area.
-=======
 			LogBuffer.println("Search init");
 			/* 
 			 * Putting the mapContainer objects in DendroView so 
 			 * that I can control zoom-out of the found genes/arrays are 
 			 * outside the visible area.
->>>>>>> bugFix
 			 */
 			dendroView.setGlobalXMap(globalXmap);
 			dendroView.setGlobalYMap(globalYmap);
@@ -421,30 +402,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	 * @author chris0689
 	 *
 	 */
-//<<<<<<< HEAD
-//	private class CloseSearchAction extends MouseAdapter implements
-//			ActionListener {
-//
-//		@Override
-//		public void mouseEntered(final MouseEvent e) {
-//
-//			dendroView.getCloseSearchBtn().setCursor(
-//					new Cursor(Cursor.HAND_CURSOR));
-//			dendroView
-//					.getCloseSearchBtn()
-//					.setBorder(
-//							BorderFactory
-//									.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-//
-//		}
-//
-//		@Override
-//		public void mouseExited(final MouseEvent e) {
-//
-//			dendroView.getCloseSearchBtn().setCursor(
-//					new Cursor(Cursor.DEFAULT_CURSOR));
-//			dendroView.getCloseSearchBtn().setBorder(null);
-//=======
 	private class CloseSearchAction implements ActionListener {
 
 		@Override
@@ -452,22 +409,15 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			
 			LogBuffer.println("Hiding search.");
 			setSearchVisible(false);
-//>>>>>>> bugFix
 		}
 	}
 	
 	private class DividerListener implements PropertyChangeListener {
 
 		@Override
-//<<<<<<< HEAD
-//		public void actionPerformed(final ActionEvent e) {
-//
-//			toggleSearch();
-//=======
 		public void propertyChange(PropertyChangeEvent evt) {
 			
 			dendroView.updateTreeMenuBtn((JSplitPane)evt.getSource());
-//>>>>>>> bugFix
 		}
 
 	}
@@ -789,13 +739,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			setMatrixFill();
 			break;
 		}
-//<<<<<<< HEAD
-//
-//		dendroView.resetMatrixSize();
-//		;
-//=======
-//		
-//>>>>>>> bugFix
+		
 		addViewListeners();
 		resetDendroView();
 	}
@@ -908,15 +852,9 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	/**
 	 * Toggles the search bars in DendroView.
 	 */
-//<<<<<<< HEAD
-//	public void toggleSearch() {
-//
-//		dendroView.setShowSearch();
-//=======
 	public void setSearchVisible(boolean visible) {
 		
 		dendroView.setSearchVisible(visible);
-//>>>>>>> bugFix
 		resetDendroView();
 	}
 
@@ -1751,32 +1689,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		}
 	}
 
-//<<<<<<< HEAD
-	// /**
-	// * Creates an AtrTVModel for use in tree alignment.
-	// *
-	// * @param fileSet
-	// * @return a new AtrTVModel with the file set loaded into it.
-	// * @throws LoadException
-	// */
-	// protected AtrTVModel makeAtrModel(final FileSet fileSet)
-	// throws LoadException {
-	//
-	// final AtrTVModel atrTVModel = new AtrTVModel();
-	//
-	// try {
-	// atrTVModel.loadNew(fileSet);
-	//
-	// } catch (final LoadException e) {
-	// String message = "Loading Atr model was interrupted.";
-	// JOptionPane.showMessageDialog(tvFrame.getAppFrame(), message,
-	// "Error", JOptionPane.ERROR_MESSAGE);
-	// LogBuffer.logException(e);
-	// }
-	//
-	// return atrTVModel;
-	// }
-//=======
 //	/**
 //	 * Creates an AtrTVModel for use in tree alignment.
 //	 * 
@@ -1859,7 +1771,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		geneSelection.notifyObservers();
 		leftTreeDrawer.notifyObservers();
 	}
-//>>>>>>> bugFix
 
 	// Flipping the trees
 	// /**
@@ -2053,13 +1964,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 				} else {
 					TreeColorer.colorUsingLeaf(leftTreeDrawer.getRootNode(),
-//<<<<<<< HEAD
-//							tvModel.getGeneHeaderInfo(), tvModel
-//							.getGeneHeaderInfo().getIndex("FGCOLOR"));
-//=======
 							tvModel.getRowHeaderInfo(), tvModel
 									.getRowHeaderInfo().getIndex("FGCOLOR"));
-//>>>>>>> bugFix
 				}
 
 			} catch (final DendroException e) {

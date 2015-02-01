@@ -169,17 +169,6 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 			paintNode(selectedNode, true);
 		}
 
-//<<<<<<< HEAD
-//		if ((status != null) && hasMouse) {
-//			status.setMessages(getStatus());
-//		}
-//
-//=======
-//		if ((status != null) && hasMouse) {
-//			status.setMessages(getStatus());
-//		}
-		
-//>>>>>>> bugFix
 		synchMap();
 		repaint();
 	}

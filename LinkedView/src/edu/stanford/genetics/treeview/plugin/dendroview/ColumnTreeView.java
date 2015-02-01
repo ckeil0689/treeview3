@@ -96,30 +96,6 @@ public class ColumnTreeView extends TRView implements MouseMotionListener,
 	public String[] getStatus() {
 
 		String[] status;
-//<<<<<<< HEAD
-//		if (selectedNode != null) {
-//			if (selectedNode.isLeaf()) {
-//				status = new String[2];
-//				status[0] = "Leaf Node " + selectedNode.getId();
-//				status[1] = "Pos " + selectedNode.getCorr();
-//
-//			} else {
-//				final int[] nameIndex = getHeaderSummary().getIncluded();
-//				status = new String[nameIndex.length * 2];
-//				final String[] names = atrHI.getNames();
-//				for (int i = 0; i < nameIndex.length; i++) {
-//					status[2 * i] = names[nameIndex[i]] + ":";
-//					status[2 * i + 1] = " "
-//							+ atrHI.getHeader(atrHI.getHeaderIndex(selectedNode
-//									.getId()))[nameIndex[i]];
-//				}
-//			}
-//		} else {
-//			status = new String[2];
-//			status[0] = "Select node to ";
-//			status[1] = "view annotation.";
-//		}
-//=======
 //		if (selectedNode != null) {
 //			if (selectedNode.isLeaf()) {
 //				status = new String[2];
@@ -145,7 +121,6 @@ public class ColumnTreeView extends TRView implements MouseMotionListener,
 		
 		/* TODO temporary solution until we decide what info to display" */
 		status = new String[3];
-//>>>>>>> bugFix
 
 		return status;
 	}

@@ -72,20 +72,10 @@ public abstract class HeaderFinderBox {
 
 	private List<String> searchDataList;
 	private String[] searchDataHeaders = { "" };
-//<<<<<<< HEAD
-//	private final WideComboBox searchTermBox;
-//	// private final JButton searchButton;
-//
-//	// private final JPanel contentPanel;
-//
-//	// These are in order to determine whether a search result is currently
-//	// visible and if so, to zoom out
-//=======
 	private WideComboBox searchTermBox;
 	private final String type;
 	
 	//These are in order to determine whether a search result is currently visible and if so, to zoom out
-//>>>>>>> bugFix
 	protected TreeSelectionI otherSelection;
 	private MapContainer globalSmap;
 	private MapContainer globalOmap;
@@ -93,56 +83,7 @@ public abstract class HeaderFinderBox {
 	private List<String> otherDataList;
 	private String[] otherDataHeaders = { "" };
 
-	// private GlobalView2 globalview;
-
 	// "Search for Substring"
-//<<<<<<< HEAD
-//	public HeaderFinderBox(final ViewFrame f, final HeaderInfo hI,
-//			final HeaderSummary headerSummary,
-//			final TreeSelectionI searchSelection, final String type,
-//			final MapContainer globalSmap, final MapContainer globalOmap,
-//			final TreeSelectionI otherSelection, final HeaderInfo ohI) {
-//
-//		this(f.getAppFrame(), hI, headerSummary, searchSelection,
-//				otherSelection, type, ohI);
-//		this.viewFrame = f;
-//
-//		// Hopefully this isn't too late of a place to set this, otherwise, I'll
-//		// have to pass it along instead of set it here
-//		this.globalSmap = globalSmap;
-//		this.globalOmap = globalOmap;
-//		// this.globalview = globalview;
-//	}
-//
-//	private HeaderFinderBox(final JFrame f, final HeaderInfo hI,
-//			final HeaderSummary headerSummary,
-//			final TreeSelectionI searchSelection,
-//			final TreeSelectionI otherSelection, final String type,
-//			final HeaderInfo ohI) {
-//
-//		super();
-//		this.viewFrame = null;
-//		this.headerInfo = hI;
-//		this.headerSummary = headerSummary;
-//		this.searchSelection = searchSelection;
-//		this.otherSelection = otherSelection;
-//		this.otherHeaderInfo = ohI;
-//
-//=======
-//	public HeaderFinderBox(final ViewFrame f, final HeaderInfo hI, 
-//			final HeaderSummary headerSummary, final TreeSelectionI 
-//			searchSelection, final String type,
-//			final MapContainer globalSmap, final MapContainer globalOmap, final TreeSelectionI otherSelection, final HeaderInfo ohI) {
-//
-//		this(f.getAppFrame(), hI, headerSummary, searchSelection, otherSelection, type, ohI);
-//		this.viewFrame = f;
-//		
-//		//Hopefully this isn't too late of a place to set this, otherwise, I'll have to pass it along instead of set it here
-////		this.globalSmap = globalSmap;
-////		this.globalOmap = globalOmap;
-//		//this.globalview = globalview;
-//	}
-
 	public HeaderFinderBox(final String type) {
 		
 		this.type = type;
@@ -219,7 +160,6 @@ public abstract class HeaderFinderBox {
 	
 	private String[] setupData() {
 		
-//>>>>>>> bugFix
 		final String[][] hA = headerInfo.getHeaderArray();
 
 		final String defaultText = "Search " + type + " Labels... ";
@@ -251,21 +191,8 @@ public abstract class HeaderFinderBox {
 
 		System.arraycopy(searchDataHeaders, 0, labeledHeaders, 1,
 				searchDataHeaders.length);
-//<<<<<<< HEAD
-//
-//		searchTermBox = GUIFactory.createWideComboBox(labeledHeaders);
-//		searchTermBox.setEditable(true);
-//		searchTermBox.setBorder(null);
-//		searchTermBox.setBackground(GUIFactory.DARK_BG);
-//		AutoCompleteDecorator.decorate(searchTermBox);
-//
-//		searchTermBox.getEditor().getEditorComponent()
-//				.addKeyListener(new BoxKeyListener());
-//=======
 		
 		return labeledHeaders;
-		
-//>>>>>>> bugFix
 	}
 
 	/**
@@ -348,38 +275,7 @@ public abstract class HeaderFinderBox {
 				otherMaxIndex = otherIndexList.get(i);
 			}
 		}
-
-//<<<<<<< HEAD
-//		if ((viewFrame != null) && (indexList.size() > 0) &&
-//		// At least part of the found min/max selected area is not visible
-//		// This assumes that min is less than max and that the visible area is a
-//		// contiguous block of visible indexes
-//				(minIndex < globalSmap.getFirstVisible() || maxIndex > (globalSmap
-//						.getFirstVisible() + globalSmap.getNumVisible() - 1))) {
-//
-//			// LogBuffer.println("The search result is outside the visible area.");
-//			// LogBuffer.println("The search result is outside the visible area: ["
-//			// + minIndex + " < " + globalSmap.getFirstVisible() + "] || [" +
-//			// maxIndex + " > (" + globalSmap.getFirstVisible() + " + " +
-//			// globalSmap.getNumVisible() + " - 1)].");
-//			globalSmap.setHome();
-//		}
-//
-//		if ((viewFrame != null)
-//				&& (otherIndexList.size() == 0
-//						|| otherMinIndex < globalOmap.getFirstVisible() || otherMaxIndex > (globalOmap
-//						.getFirstVisible() + globalOmap.getNumVisible() - 1))) {
-//
-//			// LogBuffer.println("Search result: [" + minIndex + " < " +
-//			// globalSmap.getFirstVisible() + "] || [" + maxIndex + " > (" +
-//			// globalSmap.getFirstVisible() + " + " + globalSmap.getNumVisible()
-//			// + " - 1)].");
-//			// LogBuffer.println("A whole row is being returned or the already-selected data is outside of the visible area: ["
-//			// + otherIndexList.size() + " == 0] || [" + otherMinIndex + " < " +
-//			// globalOmap.getFirstVisible() + "] || [" + otherMaxIndex + " > ("
-//			// + globalOmap.getFirstVisible() + " + " +
-//			// globalOmap.getNumVisible() + " - 1)].");
-//=======
+		
 		if((indexList.size() > 0) &&
 				//At least part of the found min/max selected area is not visible
 				//This assumes that min is less than max and that the visible area is a contiguous block of visible indexes
@@ -397,7 +293,6 @@ public abstract class HeaderFinderBox {
 			
 			//LogBuffer.println("Search result: [" + minIndex + " < " + globalSmap.getFirstVisible() + "] || [" + maxIndex + " > (" + globalSmap.getFirstVisible() + " + " + globalSmap.getNumVisible() + " - 1)].");
 			//LogBuffer.println("A whole row is being returned or the already-selected data is outside of the visible area: [" + otherIndexList.size() + " == 0] || [" + otherMinIndex + " < " + globalOmap.getFirstVisible() + "] || [" + otherMaxIndex + " > (" + globalOmap.getFirstVisible() + " + " + globalOmap.getNumVisible() + " - 1)].");
-//>>>>>>> bugFix
 			globalOmap.setHome();
 		}
 	}
@@ -1014,12 +909,7 @@ public abstract class HeaderFinderBox {
 			}
 		}
 	}
-//<<<<<<< HEAD
-//
-//=======
-//	
-//	
-//>>>>>>> bugFix
+	
 	/**
 	 * Test method for wild card search.
 	 * 

@@ -90,16 +90,9 @@ public class LabelView extends ModelView implements MouseListener,
 
 	protected JScrollPane scrollPane;
 	protected JLabel zoomHint;
-//<<<<<<< HEAD
-//
-//	public LabelView(final int axis_id) {
-//
-//=======
 	private final String hintText;
 	
 	public LabelView(int axis_id) {
-		
-//>>>>>>> bugFix
 		super();
 
 		this.isGeneAxis = (axis_id == ROW);
@@ -114,14 +107,9 @@ public class LabelView extends ModelView implements MouseListener,
 		addMouseListener(this);
 
 		zoomHint = GUIFactory.createLabel("", GUIFactory.FONTS);
-//<<<<<<< HEAD
-//
-//		if (isGeneAxis) {
-//=======
 		
 		if(isGeneAxis) {
 			this.hintText = StringRes.lbl_ZoomRowLabels;
-//>>>>>>> bugFix
 			add(zoomHint, "alignx 0%, aligny 50%, push, wrap");
 		} else {
 			this.hintText = StringRes.lbl_ZoomColLabels;

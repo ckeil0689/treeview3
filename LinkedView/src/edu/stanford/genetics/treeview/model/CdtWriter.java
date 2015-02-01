@@ -25,19 +25,11 @@ public class CdtWriter {
 					.getNumNames(); headerrow++) {
 				for (int column = 0; column < dataModel.getColumnHeaderInfo()
 						.getNumHeaders()
-//<<<<<<< HEAD
-//						+ dataModel.getGeneHeaderInfo().getNumNames(); column++) {
-//					if (column > 0) {
-//						out.write("\t");
-//					}
-//					if (column < dataModel.getGeneHeaderInfo().getNumNames()) {
-//=======
 						+ dataModel.getRowHeaderInfo().getNumNames(); 
 						column++) {
 					if (column > 0)
 						out.write("\t");
 					if (column < dataModel.getRowHeaderInfo().getNumNames()) {
-//>>>>>>> bugFix
 						if (headerrow == 0) {
 							// we need to write out the names from the gene
 							// header info
@@ -56,14 +48,8 @@ public class CdtWriter {
 						printNotNull(
 								out,
 								dataModel.getColumnHeaderInfo().getHeader(
-										column
-//<<<<<<< HEAD
-//										- dataModel.getGeneHeaderInfo()
-//										.getNumNames(),
-//=======
-												- dataModel.getRowHeaderInfo()
+										column- dataModel.getRowHeaderInfo()
 														.getNumNames(),
-//>>>>>>> bugFix
 										headerrow));
 					}
 				}
@@ -73,35 +59,20 @@ public class CdtWriter {
 			for (int gene = 0; gene < dataModel.getRowHeaderInfo()
 					.getNumHeaders(); gene++) {
 				for (int column = 0; column < dataModel.getColumnHeaderInfo()
-						.getNumHeaders()
-//<<<<<<< HEAD
-//						+ dataModel.getGeneHeaderInfo().getNumNames(); column++) {
-//					if (column > 0) {
-//						out.write("\t");
-//					}
-//					if (column < dataModel.getGeneHeaderInfo().getNumNames()) {
-//						printNotNull(out, dataModel.getGeneHeaderInfo()
-//=======
+						.getNumHeaders() 
 						+ dataModel.getRowHeaderInfo().getNumNames(); column++) {
 					if (column > 0)
 						out.write("\t");
 					if (column < dataModel.getRowHeaderInfo().getNumNames()) {
 						printNotNull(out, dataModel.getRowHeaderInfo()
-//>>>>>>> bugFix
 								.getHeader(gene, column));
 					} else {
 						// write out actual data.
 						printNotNull2(
 								out,
 								dataModel.getDataMatrix().getValue(
-										column
-//<<<<<<< HEAD
-//										- dataModel.getGeneHeaderInfo()
-//										.getNumNames(), gene));
-//=======
-												- dataModel.getRowHeaderInfo()
+										column- dataModel.getRowHeaderInfo()
 														.getNumNames(), gene));
-//>>>>>>> bugFix
 					}
 				}
 				out.write("\n");

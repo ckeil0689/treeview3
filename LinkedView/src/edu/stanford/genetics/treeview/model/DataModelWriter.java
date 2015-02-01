@@ -65,15 +65,9 @@ public class DataModelWriter {
 			}
 		}
 		if (dataModel.getDataMatrix().getModified()
-//<<<<<<< HEAD
-//				|| dataModel.getArrayHeaderInfo().getModified()
-//				|| dataModel.getGeneHeaderInfo().getModified()) {
-//			if (writeCdt(fileSet.getCdt())) {
-//=======
 				|| dataModel.getColumnHeaderInfo().getModified()
 				|| dataModel.getRowHeaderInfo().getModified()) {
 			if (writeCdt(fileSet.getCdt())) {
-//>>>>>>> bugFix
 				written.add(DataModelFileType.CDT);
 			}
 		}

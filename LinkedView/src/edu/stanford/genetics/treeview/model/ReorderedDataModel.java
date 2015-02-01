@@ -190,8 +190,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 	 *
 	 * Represents reordered HeaderInfo of parent.
 	 */
-	private class ReorderedHeaderInfo extends IntHeaderInfo {// implements
-		// HeaderInfo {
+	private class ReorderedHeaderInfo extends IntHeaderInfo {
 
 		private final HeaderInfo parentHeaderInfo;
 		private final int[] reorderedIndex;
@@ -399,19 +398,13 @@ public class ReorderedDataModel extends Observable implements DataModel {
 	 * @see edu.stanford.genetics.treeview.DataModel#getGeneHeaderInfo()
 	 */
 	@Override
-	public IntHeaderInfo getRowHeaderInfo() { // IntHeaderInfo
+	public IntHeaderInfo getRowHeaderInfo() {
 
-//<<<<<<< HEAD
-//		if (geneHeaderInfo == null)
-//			return parent.getGeneHeaderInfo();
-//		else
-//=======
 		if (geneHeaderInfo == null) {
 			return parent.getRowHeaderInfo();
 
 		} else {
-//>>>>>>> bugFix
-			return geneHeaderInfo; // (IntHeaderInfo)
+			return geneHeaderInfo;
 		}
 	}
 
@@ -423,17 +416,11 @@ public class ReorderedDataModel extends Observable implements DataModel {
 	@Override
 	public IntHeaderInfo getColumnHeaderInfo() {
 
-//<<<<<<< HEAD
-//		if (arrayHeaderInfo == null)
-//			return parent.getArrayHeaderInfo();
-//		else
-//=======
 		if (arrayHeaderInfo == null) {
 			return parent.getColumnHeaderInfo();
 
 		} else {
-//>>>>>>> bugFix
-			return arrayHeaderInfo;// (IntHeaderInfo)
+			return arrayHeaderInfo;
 		}
 	}
 
