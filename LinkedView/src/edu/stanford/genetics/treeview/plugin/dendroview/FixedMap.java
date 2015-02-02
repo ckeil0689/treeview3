@@ -102,7 +102,7 @@ public class FixedMap extends IntegerMap {
 
 		if ((Math.round(i / scale) + minindex) > 0
 				&& ((i / scale) + minindex)
-				/ (Math.round(i / scale) + minindex) > (1 - 0.000001))
+						/ (Math.round(i / scale) + minindex) > (1 - 0.000001))
 			// LogBuffer.println("Returning round [" + ((int) Math.round(i /
 			// scale) + minindex) + "]");
 			return (int) Math.round(i / scale) + minindex;

@@ -49,7 +49,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#resize(int)
 	 */
 	@Override
@@ -74,7 +74,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	// index methods
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#deselectAllIndexes()
 	 */
 	@Override
@@ -88,7 +88,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#selectAllIndexes()
 	 */
 	@Override
@@ -99,7 +99,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#setIndex(int, boolean)
 	 */
 	@Override
@@ -110,7 +110,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#isIndexSelected(int)
 	 */
 	@Override
@@ -121,7 +121,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#getMinIndex()
 	 */
 	@Override
@@ -132,7 +132,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#getSelectedIndexes()
 	 */
 	@Override
@@ -143,7 +143,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#getMaxIndex()
 	 */
 	@Override
@@ -154,7 +154,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#getNumIndexes()
 	 */
 	@Override
@@ -165,7 +165,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#selectIndexRange(int,
 	 * int)
 	 */
@@ -186,7 +186,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#getNSelectedIndexes()
 	 */
 	@Override
@@ -198,7 +198,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	// node methods
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * edu.stanford.genetics.treeview.TreeSelectionI#setSelectedNode(java.lang
 	 * .String)
@@ -214,7 +214,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.TreeSelectionI#getSelectedNode()
 	 */
 	@Override

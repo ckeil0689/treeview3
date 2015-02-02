@@ -295,9 +295,9 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 					}
 				} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 					LogBuffer
-							.println("ArrayIndexOutOfBoundsException in "
-									+ "paint() in DoubleArrayDrawer: "
-									+ e.getMessage());
+					.println("ArrayIndexOutOfBoundsException in "
+							+ "paint() in DoubleArrayDrawer: "
+							+ e.getMessage());
 				}
 				arrayFirst = array + 1;
 			}

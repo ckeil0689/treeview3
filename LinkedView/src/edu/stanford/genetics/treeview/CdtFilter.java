@@ -32,7 +32,7 @@ import java.io.FilenameFilter;
  * @version $Revision: 1.5 $ $Date: 2004-12-21 03:28:14 $
  */
 public class CdtFilter extends javax.swing.filechooser.FileFilter implements
-		FilenameFilter {
+FilenameFilter {
 	/**
 	 * from the <code>FilenameFilter</code> interface.
 	 *

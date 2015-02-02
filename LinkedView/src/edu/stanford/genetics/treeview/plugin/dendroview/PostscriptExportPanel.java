@@ -497,7 +497,7 @@ public class PostscriptExportPanel extends ExportPanel implements SettingsPanel 
 
 			if (ps.checkError()) {
 				LogBuffer
-						.println("Some error occured during PostScript export");
+				.println("Some error occured during PostScript export");
 			}
 		}
 	}

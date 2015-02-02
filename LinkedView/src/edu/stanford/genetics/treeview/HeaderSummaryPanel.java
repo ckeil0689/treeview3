@@ -39,7 +39,7 @@ import Utilities.GUIFactory;
  * enables editing of a headerSummary object.
  */
 public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
-		Observer {
+Observer {
 
 	private static final long serialVersionUID = 1L;
 
@@ -159,7 +159,7 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
 	 */
 	@Override

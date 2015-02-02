@@ -43,7 +43,7 @@ import javax.swing.JPanel;
  * Interestingly, but necessarily, it has no dependency on any models.
  */
 public abstract class ModelView extends JPanel implements Observer,
-		MouseListener {
+MouseListener {
 
 	private static final long serialVersionUID = 1L;
 

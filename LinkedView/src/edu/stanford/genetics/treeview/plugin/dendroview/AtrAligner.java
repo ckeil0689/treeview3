@@ -81,7 +81,7 @@ public class AtrAligner {
 	 */
 	private static AtrAnalysisNode createAnalysisTree(
 			final HeaderInfo atrHeader, final HeaderInfo arrayHeader)
-			throws DendroException {
+					throws DendroException {
 
 		final int numArrays = arrayHeader.getNumHeaders();
 

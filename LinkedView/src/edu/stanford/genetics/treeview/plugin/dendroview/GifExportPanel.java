@@ -133,8 +133,8 @@ public class GifExportPanel extends ExportPanel implements SettingsPanel {
 				enc.Write(output);
 			} catch (final Exception e) {
 				LogBuffer
-						.println("In GifExportPanel.DendroGifWriter() got exception "
-								+ e);
+				.println("In GifExportPanel.DendroGifWriter() got exception "
+						+ e);
 			}
 		}
 

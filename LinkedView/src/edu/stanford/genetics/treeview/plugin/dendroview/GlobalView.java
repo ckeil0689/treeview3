@@ -55,7 +55,7 @@ import edu.stanford.genetics.treeview.ModelViewProduced;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 
 public class GlobalView extends ModelViewProduced implements
-		MouseMotionListener, MouseListener, MouseWheelListener {
+MouseMotionListener, MouseListener, MouseWheelListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -341,8 +341,8 @@ public class GlobalView extends ModelViewProduced implements
 
 			final Rectangle sourceRect = new Rectangle(xmap.getIndex(0),
 					ymap.getIndex(0), xmap.getIndex(destRect.width)
-							- xmap.getIndex(0), ymap.getIndex(destRect.height)
-							- ymap.getIndex(0));
+					- xmap.getIndex(0), ymap.getIndex(destRect.height)
+					- ymap.getIndex(0));
 
 			if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
 				drawer.paint(g, sourceRect, destRect, null);
@@ -392,8 +392,8 @@ public class GlobalView extends ModelViewProduced implements
 
 			final Rectangle sourceRect = new Rectangle(xmap.getIndex(0),
 					ymap.getIndex(0), xmap.getIndex(destRect.width)
-							- xmap.getIndex(0), ymap.getIndex(destRect.height)
-							- ymap.getIndex(0));
+					- xmap.getIndex(0), ymap.getIndex(destRect.height)
+					- ymap.getIndex(0));
 
 			if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
 				/*
@@ -483,8 +483,8 @@ public class GlobalView extends ModelViewProduced implements
 
 						selectionRectList.add(new Rectangle(xBoundaries.get(0),
 								yBoundaries.get(0), xBoundaries.get(1)
-								- xBoundaries.get(0), yBoundaries
-								.get(1) - yBoundaries.get(0)));
+										- xBoundaries.get(0), yBoundaries
+										.get(1) - yBoundaries.get(0)));
 					}
 				}
 			}
@@ -866,12 +866,11 @@ public class GlobalView extends ModelViewProduced implements
 	public void mouseWheelMoved(final MouseWheelEvent e) {
 
 		final int notches = e.getWheelRotation();
-		final int shift = 3;
+		final int shift = (notches < 0) ? -3 : 3;
 
 		if (!e.isShiftDown()) {
-			if (notches < 0) {
-				ymap.scrollBy(-shift);
-
+			if (e.isAltDown()) {
+				xmap.scrollBy(shift);
 			} else {
 				ymap.scrollBy(shift);
 			}

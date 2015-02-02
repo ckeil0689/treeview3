@@ -37,7 +37,7 @@ public class DendrogramFactory extends PluginFactory {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.PluginFactory#getName()
 	 */
 	@Override
@@ -48,7 +48,7 @@ public class DendrogramFactory extends PluginFactory {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.PluginFactory
 	 * #createPlugin(edu.stanford.genetics.treeview.ConfigNode)
 	 */
@@ -63,7 +63,7 @@ public class DendrogramFactory extends PluginFactory {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.PluginFactory
 	 * #setGlobalNode(edu.stanford.genetics.treeview.ConfigNode)
 	 */
@@ -74,7 +74,7 @@ public class DendrogramFactory extends PluginFactory {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview
 	 * .PluginFactory#addPluginConfig(java.awt.Menu)
 	 */

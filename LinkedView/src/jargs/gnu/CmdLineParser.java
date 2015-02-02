@@ -60,7 +60,7 @@ public class CmdLineParser {
 	 * @author Vidar Holen
 	 */
 	public static class UnknownSuboptionException extends
-			UnknownOptionException {
+	UnknownOptionException {
 		private final char suboption;
 
 		UnknownSuboptionException(final String option, final char suboption) {

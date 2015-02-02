@@ -30,7 +30,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.FontSettings;
  *
  */
 public class PreferencesMenu extends CustomDialog implements
-ConfigNodePersistent {
+		ConfigNodePersistent {
 
 	private final TreeViewFrame tvFrame;
 	private HeaderInfo geneHI;
@@ -136,7 +136,7 @@ ConfigNodePersistent {
 
 		if (annotationSettings != null)
 			return new int[] { annotationSettings.getSelectedGeneIndex(),
-					annotationSettings.getSelectedArrayIndex() };
+				annotationSettings.getSelectedArrayIndex() };
 		else {
 			LogBuffer.println("AnnotationSettings object was null. "
 					+ "Could not get selected indeces.");

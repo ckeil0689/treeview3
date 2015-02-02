@@ -42,7 +42,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
  */
 
 public class ColorExtractor extends Observable implements ConfigNodePersistent,
-		ContrastSelectable {
+ContrastSelectable {
 
 	private ColorSet defaultColorSet;
 	private final double default_contrast = 3.0;

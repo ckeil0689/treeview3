@@ -1142,7 +1142,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		if (arrayIndexes == 0
 				|| geneIndexes == 0
 				|| (arrayIndexes == globalXmap.getMaxIndex() && geneIndexes == globalYmap
-				.getMaxIndex())) {
+						.getMaxIndex())) {
 			// LogBuffer.println("No spots are visible. Resetting view.");
 			arrayIndexes = globalXmap.getMaxIndex() + 1;
 			geneIndexes = globalYmap.getMaxIndex() + 1;
@@ -1462,9 +1462,9 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		dendroView.getRowLabelView().setConfigNode(configNode);// getFirst("TextView"));
 		dendroView.getColumnLabelView().setConfigNode(configNode);// getFirst("ArrayNameView"));
 		dendroView.getColumnTreeView().getHeaderSummary()
-		.setConfigNode(configNode);
+				.setConfigNode(configNode);
 		dendroView.getRowTreeView().getHeaderSummary()
-		.setConfigNode(configNode);
+				.setConfigNode(configNode);
 	}
 
 	/**
@@ -1489,7 +1489,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		dendroView.getColumnTreeView().setATRHeaderInfo(
 				tvModel.getAtrHeaderInfo());
 		dendroView.getRowTreeView()
-		.setGTRHeaderInfo(tvModel.getGtrHeaderInfo());
+				.setGTRHeaderInfo(tvModel.getGtrHeaderInfo());
 		dendroView.getColumnLabelView().setHeaderInfo(
 				tvModel.getColumnHeaderInfo());
 		dendroView.getRowLabelView().setHeaderInfo(tvModel.getRowHeaderInfo());
@@ -1625,20 +1625,20 @@ public class DendroController implements ConfigNodePersistent, Observer {
 					+ "and setAcceptAllFileFilterUsed(): " + e.getMessage());
 			// hmm... I'll just assume that there's no accept all.
 			fileDialog
-					.addChoosableFileFilter(new javax.swing.filechooser.FileFilter() {
+			.addChoosableFileFilter(new javax.swing.filechooser.FileFilter() {
 
-						@Override
-						public boolean accept(final File f) {
+				@Override
+				public boolean accept(final File f) {
 
-							return true;
-						}
+					return true;
+				}
 
-						@Override
-						public String getDescription() {
+				@Override
+				public String getDescription() {
 
-							return "All Files";
-						}
-					});
+					return "All Files";
+				}
+			});
 		}
 
 		fileDialog.setFileFilter(ff);
@@ -1906,7 +1906,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 				} else {
 					TreeColorer.colorUsingLeaf(leftTreeDrawer.getRootNode(),
 							tvModel.getRowHeaderInfo(), tvModel
-							.getRowHeaderInfo().getIndex("FGCOLOR"));
+									.getRowHeaderInfo().getIndex("FGCOLOR"));
 				}
 
 			} catch (final DendroException e) {
@@ -2030,7 +2030,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 		dendroView.getRowLabelView().getHeaderSummary().setIncluded(gIncluded);
 		dendroView.getColumnLabelView().getHeaderSummary()
-		.setIncluded(aIncluded);
+				.setIncluded(aIncluded);
 	}
 
 	public int[] getArrayIncluded() {

@@ -40,7 +40,7 @@ import edu.stanford.genetics.treeview.SettingsPanel;
  *
  */
 public class GifColorBarExportPanel extends ColorBarExportPanel implements
-		SettingsPanel {
+SettingsPanel {
 
 	// I wish I could just inherit this...
 	public GifColorBarExportPanel(final ColorExtractor colorExtractor) {
@@ -70,7 +70,7 @@ public class GifColorBarExportPanel extends ColorBarExportPanel implements
 			output.close();
 		} catch (final Exception e) {
 			LogBuffer
-					.println("GIF ColorBar Export Panel caught exception " + e);
+			.println("GIF ColorBar Export Panel caught exception " + e);
 		}
 	}
 
@@ -111,8 +111,8 @@ public class GifColorBarExportPanel extends ColorBarExportPanel implements
 				enc.Write(output);
 			} catch (final Exception e) {
 				LogBuffer
-						.println("In GifExportPanel.DendroGifWriter() got exception "
-								+ e);
+				.println("In GifExportPanel.DendroGifWriter() got exception "
+						+ e);
 			}
 		}
 	}

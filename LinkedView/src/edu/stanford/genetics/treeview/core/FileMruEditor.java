@@ -61,7 +61,7 @@ public class FileMruEditor {
 	private ButtonArrangement buttonArrangement;
 
 	private static String[] options = new String[] { "Find...", "Remove",
-			"Cancel" };
+	"Cancel" };
 	/**
 	 * Constant signifying what type of action to take. Used to keep track of
 	 * options.
@@ -320,7 +320,7 @@ public class FileMruEditor {
 	private class ButtonArrangement {
 
 		private final JButton openButton, searchButton, deleteButton,
-				deleteAllButton, closeButton;
+		deleteAllButton, closeButton;
 		private final JPanel buttonPanel;
 
 		/**

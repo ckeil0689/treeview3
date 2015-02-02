@@ -32,7 +32,7 @@ import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.UrlExtractor;
 
 public class LabelView extends ModelView implements MouseListener,
-MouseMotionListener, FontSelectable, ConfigNodePersistent {
+		MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
 	private static final long serialVersionUID = 1L;
 

@@ -232,27 +232,27 @@ public class TreePainter extends TreeDrawer {
 		/*
 		 * // just return if no subkids visible. if ((node.getMaxIndex() <
 		 * minInd) || (node.getMinIndex() > maxInd)) return;
-		 * 
+		 *
 		 * // lots of stack allocation... TreeDrawerNode left = node.getLeft();
 		 * TreeDrawerNode right = node.getRight();
-		 * 
+		 *
 		 * int ry = (int) yT.transform(right.getCorr()); int ly = (int)
 		 * yT.transform(left.getCorr()); int ty = (int)
 		 * yT.transform(node.getCorr());
-		 * 
+		 *
 		 * int rx = (int) xT.transform(right.getIndex() + .5); int lx = (int)
 		 * xT.transform(left.getIndex() + .5); int tx = (int)
 		 * xT.transform(node.getIndex() + .5); Color t = graphics.getColor();
-		 * 
+		 *
 		 * isSelected = (node == selected); // System.out.println("rx = " + rx +
 		 * ", ry = " + ry + ", lx = " + lx + ", ly = " + ly);
-		 * 
+		 *
 		 * // oval first?... // graphics.setColor(node_color); //
 		 * graphics.drawOval(tx - 1,ty - 1,2,2);
-		 * 
+		 *
 		 * //draw our (flipped) polyline... if (isSelected)
 		 * graphics.setColor(sel_color); else graphics.setColor(t);
-		 * 
+		 *
 		 * graphics.drawPolyline(new int[] {rx, rx, lx, lx}, new int[] {ry, ty,
 		 * ty, ly}, 4); if (left.isLeaf() == false) draw(left); if
 		 * (right.isLeaf() == false) draw(right); if (isSelected)

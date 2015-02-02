@@ -58,7 +58,7 @@ public class FileSet {
 	public static final int LINKED_STYLE = 3;
 	private static final String validStyles = "auto|classic|kmeans|linked";
 	private static final String[] validStylesArray = { "Auto", "Classic",
-			"Kmeans", "Linked" };
+		"Kmeans", "Linked" };
 
 	// the following concerns whether quoted strings are parsed
 	public static final int PARSE_QUOTED = 1;

@@ -100,9 +100,9 @@ public class MenubarController {
 		case StringRes.menu_Hier:
 			controller.setupClusterView(ClusterView.HIER);
 			break;
-		// case StringRes.menu_KMeans:
-		// controller.setupClusterView(ClusterView.KMEANS);
-		// break;
+			// case StringRes.menu_KMeans:
+			// controller.setupClusterView(ClusterView.KMEANS);
+			// break;
 		case "Find Labels...":
 			controller.setSearchVisible();
 			break;
@@ -127,11 +127,11 @@ public class MenubarController {
 		case StringRes.menu_Shortcuts:
 			tvFrame.showShortcuts();
 			break;
-			// There's currently no documentation page - don't need it for the first
-			// release
-			// case StringRes.menu_Docs:
-			// tvFrame.showDocumentation();
-			// break;
+		// There's currently no documentation page - don't need it for the first
+		// release
+		// case StringRes.menu_Docs:
+		// tvFrame.showDocumentation();
+		// break;
 		case StringRes.menu_ShowLog:
 			tvFrame.showLogMessages();
 			break;

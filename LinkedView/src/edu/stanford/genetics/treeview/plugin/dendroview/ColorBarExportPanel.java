@@ -64,7 +64,7 @@ import edu.stanford.genetics.treeview.RotateImageFilter;
  * @version @version $Revision: 1.2 $ $Date: 2008-06-11 01:58:57 $
  */
 public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
-		ConfigNodePersistent {
+ConfigNodePersistent {
 
 	private static final long serialVersionUID = 1L;
 
@@ -1104,7 +1104,7 @@ class SimpleDataMatrix implements DataMatrix {
 
 	public void append(final DataMatrix m) {
 		final double[] temp = new double[dataMatrix.length + m.getNumRow()
-				* m.getNumCol()];
+		                                 * m.getNumCol()];
 
 		int i;
 		for (i = 0; i < dataMatrix.length; i++) {

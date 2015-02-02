@@ -75,7 +75,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
  *
  */
 public class TreeViewFrame extends ViewFrame implements FileSetListener,
-		ConfigNodePersistent {
+ConfigNodePersistent {
 
 	public static final int WELCOME_VIEW = 0;
 	public static final int LOADERROR_VIEW = 1;
@@ -494,11 +494,14 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		stackMenuList = new ArrayList<JMenuItem>();
 
-		constructFileMenu();
-		constructHelpMenu();
+		final String os = System.getProperty("os.name").toLowerCase();
+		final boolean isMac = os.startsWith("mac os x");
+
+		constructFileMenu(isMac);
+		constructHelpMenu(isMac);
 	}
 
-	private void constructFileMenu() {
+	private void constructFileMenu(final boolean isMac) {
 
 		/* File */
 		final JMenu fileMenu = new JMenu(StringRes.mbar_File);
@@ -624,15 +627,19 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		fileMenu.add(prefSubMenu);
 	}
 
-	private void constructHelpMenu() {
+	private void constructHelpMenu(final boolean isMac) {
 
 		/* Help */
 		final JMenu helpMenu = new JMenu(StringRes.mbar_Help);
 		helpMenu.setMnemonic(KeyEvent.VK_H);
 
+		// if(isMac) {
+		// new MacOSXAboutHandler();
+		// } else {
 		final JMenuItem aboutMenuItem = new JMenuItem(StringRes.menu_About);
 		helpMenu.add(aboutMenuItem);
 		stackMenuList.add(aboutMenuItem);
+		// }
 
 		if (running != null) {
 			final JMenuItem statsMenuItem = new JMenuItem(StringRes.menu_Stats);
@@ -706,6 +713,13 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	// .addMenuItem("Save Data");
 	// menubar.setMnemonic(KeyEvent.VK_D);
 	// menuList.add(saveDataMenuItem);
+	// }
+
+	/* >>>>>>>>>> OSX menu handlers <<<<<<<<< */
+	// public class MacOSAboutHandler extends Application {
+	// public MacOSAboutHandler() {
+	// addApplicationListener(new AboutBoxHandler());
+	// }
 	// }
 
 	// Various Methods
@@ -907,8 +921,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 			return fileSetList.get(index);
 		else {
 			LogBuffer
-			.println("Sizes of FileSetList and FileMenuList in TVFrame"
-					+ "don't match.");
+					.println("Sizes of FileSetList and FileMenuList in TVFrame"
+							+ "don't match.");
 			return null;
 		}
 	}

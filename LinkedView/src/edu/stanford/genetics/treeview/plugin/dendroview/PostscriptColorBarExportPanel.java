@@ -36,7 +36,7 @@ import edu.stanford.genetics.treeview.SettingsPanel;
  *
  */
 public class PostscriptColorBarExportPanel extends ColorBarExportPanel
-		implements SettingsPanel {
+implements SettingsPanel {
 
 	// I wish I could just inherit this...
 	public PostscriptColorBarExportPanel(final ColorExtractor colorExtractor) {
@@ -64,8 +64,8 @@ public class PostscriptColorBarExportPanel extends ColorBarExportPanel
 			output.close();
 		} catch (final Exception e) {
 			LogBuffer
-					.println("Postscript ColorBar Export Panel caught exception "
-							+ e);
+			.println("Postscript ColorBar Export Panel caught exception "
+					+ e);
 		}
 	}
 
@@ -249,7 +249,7 @@ public class PostscriptColorBarExportPanel extends ColorBarExportPanel
 
 			if (ps.checkError()) {
 				LogBuffer
-						.println("Some error occured during PostScript export");
+				.println("Some error occured during PostScript export");
 			}
 		}
 	}

@@ -46,6 +46,7 @@ import javax.swing.border.Border;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
+import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
 import Utilities.Helper;
 import Utilities.StringRes;
@@ -362,6 +363,7 @@ public class DendroView implements Observer, DendroPanel {
 
 		navContainer = GUIFactory.createJPanel(false,
 				GUIFactory.NO_PADDING_FILL, null);
+		navContainer.setLayout(new MigLayout("debug"));
 
 		bottomPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 
@@ -449,9 +451,9 @@ public class DendroView implements Observer, DendroPanel {
 		btnPanel.add(crossPanel, "pushx, alignx 50%, wrap");
 		btnPanel.add(scaleDefaultAll, "push, alignx 50%, aligny 5%");
 
-		navContainer.add(btnPanel, "push, alignx 50%, aligny 100%, wrap");
-		navContainer
-		.add(dataTicker.getTickerPanel(), "push, h 25%!, aligny 5%");
+		navContainer.add(btnPanel, "push, alignx 50%, aligny 95%, wrap");
+		navContainer.add(dataTicker.getTickerPanel(), "push, w 95%!, h 25%!, "
+				+ "aligny 5%");
 
 		arrayContainer.add(colTreePane, "w 99%, h 100%");
 		geneContainer.add(rowTreePane, "w 100%, h 99%, wrap");
@@ -483,13 +485,13 @@ public class DendroView implements Observer, DendroPanel {
 			gvHeight = MAX_GV_HEIGHT;
 		}
 
-		dendroPane.add(firstPanel, "w " + textViewCol + "%, w 250::, " + "h "
+		dendroPane.add(firstPanel, "w " + textViewCol + "%, w 200::, " + "h "
 				+ arrayRow + "%, pushx");
 
 		dendroPane.add(arrayContainer, "w " + gvWidth + "%, " + "h " + arrayRow
 				+ "%, growx");
 
-		dendroPane.add(navContainer, "span 1 2, w 250::, h 100%, wrap");
+		dendroPane.add(navContainer, "span 1 2, w 200::, h 100%, wrap");
 
 		dendroPane.add(geneContainer, "w " + textViewCol + "%, " + "h "
 				+ gvHeight + "%, growy");
@@ -652,7 +654,7 @@ public class DendroView implements Observer, DendroPanel {
 	/**
 	 * Add listener for divider movement and position for the Tree/ Label
 	 * JSplitPanes.
-	 * 
+	 *
 	 * @param l
 	 */
 	public void addDividerListener(final PropertyChangeListener l) {

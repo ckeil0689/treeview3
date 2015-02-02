@@ -304,7 +304,7 @@ class UnixBrowserControl extends BrowserControl {
 				// cmd = "netscape \"http://www.javaworld.com\""
 				cmd = UNIX_PATH + " \"" + url + "\"";
 				System.out
-						.println("Opening new netscape on unix can be flaky, paste this into a terminal if nothing happens... ");
+				.println("Opening new netscape on unix can be flaky, paste this into a terminal if nothing happens... ");
 				System.out.println(cmd);
 				p = Runtime.getRuntime().exec(cmd);
 			}

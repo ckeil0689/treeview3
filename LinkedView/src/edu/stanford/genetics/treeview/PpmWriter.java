@@ -74,11 +74,11 @@ public class PpmWriter {
 			throws java.io.IOException {
 		final int blue = val;
 		final int green = val >> 8;
-		final int red = val >> 16;
+			final int red = val >> 16;
 
-		out.write(red);
-		out.write(green);
-		out.write(blue);
+			out.write(red);
+			out.write(green);
+			out.write(blue);
 	}
 
 	/**

@@ -93,7 +93,7 @@ public class TVController implements Observer {
 					Frame.getFrames()[0],
 					"Are you sure you want to reset preferences and "
 							+ "close TreeView?", "Reset Preferences?",
-							JOptionPane.YES_NO_OPTION);
+					JOptionPane.YES_NO_OPTION);
 
 			switch (option) {
 
@@ -580,7 +580,7 @@ public class TVController implements Observer {
 			final GeneListMaker t = new GeneListMaker(
 					(JFrame) Frame.getFrames()[0], tvFrame.getRowSelection(),
 					model.getRowHeaderInfo(), source.getDir()
-							+ source.getRoot() + "_data.cdt");
+					+ source.getRoot() + "_data.cdt");
 
 			t.setDataMatrix(model.getDataMatrix(), model.getColumnHeaderInfo(),
 					DataModel.NODATA);
@@ -785,7 +785,7 @@ public class TVController implements Observer {
 			/* View */
 			final ColorChooser gradientPick = new ColorChooser(
 					((DoubleArrayDrawer) dendroController.getArrayDrawer())
-					.getColorExtractor(),
+							.getColorExtractor(),
 					min, max);
 
 			/*

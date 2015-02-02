@@ -261,7 +261,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		final String[] lineAsStrings = line.split("\\t", -1);
 		final String[] labels = new String[dataStartCol];
 		final double[] dataValues = new double[lineAsStrings.length
-		                                       - dataStartCol];
+				- dataStartCol];
 
 		System.arraycopy(lineAsStrings, 0, labels, 0, dataStartCol);
 
@@ -558,11 +558,11 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 		final String[] firstRow = gtrData.get(0);
 		if ( // decide if this is not an extended file..
-		(firstRow.length == 4)// is the length classic?
+				(firstRow.length == 4)// is the length classic?
 				&& !(firstRow[0].equalsIgnoreCase("NODEID"))) {
 			// okay, need to assign headers...
 			targetModel.setGtrPrefix(new String[] { "NODEID", "LEFT", "RIGHT",
-					"CORRELATION" });
+			"CORRELATION" });
 
 			final String[][] gtrHeaders = new String[gtrData.size()][];
 			for (int i = 0; i < gtrHeaders.length; i++) {
@@ -592,12 +592,12 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 		final String[] firstRow = atrData.get(0);
 		if ( // decide if this is not an extended file..
-		(firstRow.length == 4)// is the length classic?
+				(firstRow.length == 4)// is the length classic?
 				&& !(firstRow[0].equalsIgnoreCase("NODEID"))) {
 
 			// okay, need to assign headers...
 			targetModel.setAtrPrefix(new String[] { "NODEID", "LEFT", "RIGHT",
-					"CORRELATION" });
+			"CORRELATION" });
 
 			final String[][] atrHeaders = new String[atrData.size()][];
 			for (int i = 0; i < atrHeaders.length; i++) {

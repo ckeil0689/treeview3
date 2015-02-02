@@ -257,7 +257,7 @@ public class HierCluster {
 		/* Get the two clusters to be fused */
 		/* Get the cluster at rowMinIndex */
 		final int[] row_cluster = new int[currentClusters.get(min_row_index)
-		                                  .size()];
+				.size()];
 		for (int i = 0; i < row_cluster.length; i++) {
 
 			row_cluster[i] = currentClusters.get(min_row_index).get(i);
@@ -265,7 +265,7 @@ public class HierCluster {
 
 		/* Get the cluster at colMinIndex */
 		final int[] col_cluster = new int[currentClusters.get(min_col_index)
-		                                  .size()];
+				.size()];
 		for (int i = 0; i < col_cluster.length; i++) {
 
 			col_cluster[i] = currentClusters.get(min_col_index).get(i);
@@ -718,7 +718,7 @@ public class HierCluster {
 			 */
 			if (!shareCommonElements(currentCluster, fusedClusters)) {
 				final double[] distances = new double[fusedClusters.length
-						* currentCluster.length];
+				                                      * currentCluster.length];
 
 				double min = Double.MAX_VALUE;
 				double max = Double.MIN_VALUE;

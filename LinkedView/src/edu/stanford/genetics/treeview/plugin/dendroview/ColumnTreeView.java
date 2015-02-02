@@ -52,7 +52,7 @@ import edu.stanford.genetics.treeview.LinearTransformation;
  * @version $Revision: 1.2 $ $Date: 2010-05-02 13:39:00 $
  */
 public class ColumnTreeView extends TRView implements MouseMotionListener,
-MouseListener {
+		MouseListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -152,7 +152,7 @@ MouseListener {
 					destRect.x + destRect.width);
 			yScaleEq = new LinearTransformation(treePainter.getCorrMin(),
 					destRect.y, treePainter.getCorrMax(), destRect.y
-							+ destRect.height);
+					+ destRect.height);
 
 			/* draw trees */
 			treePainter.paint(g, xScaleEq, yScaleEq, destRect, selectedNode,
@@ -179,7 +179,7 @@ MouseListener {
 			setSelectedNode(treePainter.getClosest(
 					xScaleEq.inverseTransform(e.getX()),
 					yScaleEq.inverseTransform(e.getY()), yScaleEq.getSlope()
-					/ xScaleEq.getSlope()));
+							/ xScaleEq.getSlope()));
 		} else {
 			treeSelection.deselectAllIndexes();
 			treeSelection.notifyObservers();
@@ -198,7 +198,7 @@ MouseListener {
 		setHoveredNode(treePainter.getClosest(
 				xScaleEq.inverseTransform(e.getX()),
 				yScaleEq.inverseTransform(e.getY()), yScaleEq.getSlope()
-				/ xScaleEq.getSlope()));
+						/ xScaleEq.getSlope()));
 		// }
 	}
 

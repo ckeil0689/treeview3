@@ -38,7 +38,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
  */
 
 public class CharColorExtractor extends Observable implements
-		ConfigNodePersistent {
+ConfigNodePersistent {
 
 	private static CharColorSet defaultColorSet = new CharColorSet();
 	private final CharColorSet colorSet;// Will be backed by confignode when we

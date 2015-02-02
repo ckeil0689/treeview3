@@ -305,7 +305,7 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 		LogBuffer.println("Creating new fileset " + fileSet3);
 		return fileSet3;
 		/*
-		 * 
+		 *
 		 * loadFileSet(fileSet); fileMru.setLast(fileSet);
 		 * fileMru.notifyObservers(); setLoaded(true);
 		 * fileMru.setLast(configNode); fileMru.notifyObservers();
