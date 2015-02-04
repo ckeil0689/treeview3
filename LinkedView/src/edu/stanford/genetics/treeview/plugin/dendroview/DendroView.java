@@ -46,7 +46,6 @@ import javax.swing.border.Border;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
-import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
 import Utilities.Helper;
 import Utilities.StringRes;
@@ -84,7 +83,6 @@ import edu.stanford.genetics.treeview.core.RowFinderBox;
  */
 public class DendroView implements Observer, DendroPanel {
 
-	private int div_size;
 
 	// Container JFrame
 	protected TreeViewFrame tvFrame;
@@ -363,7 +361,6 @@ public class DendroView implements Observer, DendroPanel {
 
 		navContainer = GUIFactory.createJPanel(false,
 				GUIFactory.NO_PADDING_FILL, null);
-		navContainer.setLayout(new MigLayout("debug"));
 
 		bottomPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 
@@ -382,13 +379,11 @@ public class DendroView implements Observer, DendroPanel {
 		colLabelPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING,
 				null);
 
-		div_size = 5;
 		rowTreePane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rowTreeView,
 				rowLabelpanel);
 		rowTreePane.setResizeWeight(0.5);
 		rowTreePane.setOpaque(false);
 		rowTreePane.setOneTouchExpandable(true); // does not work on Linux :(
-		rowTreePane.setDividerSize(div_size);
 
 		colorDivider(rowTreePane);
 		rowTreePane.setBorder(null);
@@ -407,7 +402,6 @@ public class DendroView implements Observer, DendroPanel {
 		colTreePane.setResizeWeight(0.5);
 		colTreePane.setOpaque(false);
 		colTreePane.setOneTouchExpandable(true);
-		colTreePane.setDividerSize(div_size);
 
 		colorDivider(colTreePane);
 		colTreePane.setBorder(null);
