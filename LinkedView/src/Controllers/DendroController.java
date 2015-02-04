@@ -238,11 +238,11 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		input_map.put(KeyStroke.getKeyStroke("EQUALS"), "zoomIn");
 		action_map.put("zoomIn", new ZoomInAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, modifier),
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, modifier),
 				"zoomSelection");
 		action_map.put("zoomSelection", new ZoomAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, modifier),
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, modifier),
 				"resetZoom");
 		action_map.put("resetZoom", new HomeAction());
 	}
