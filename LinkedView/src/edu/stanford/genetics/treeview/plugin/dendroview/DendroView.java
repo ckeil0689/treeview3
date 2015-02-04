@@ -46,6 +46,7 @@ import javax.swing.border.Border;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
+import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
 import Utilities.Helper;
 import Utilities.StringRes;
@@ -361,6 +362,7 @@ public class DendroView implements Observer, DendroPanel {
 
 		navContainer = GUIFactory.createJPanel(false,
 				GUIFactory.NO_PADDING_FILL, null);
+		navContainer.setLayout(new MigLayout("debug"));
 
 		bottomPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 
@@ -421,7 +423,7 @@ public class DendroView implements Observer, DendroPanel {
 		} else {
 			/* If trees are visible from the start */
 			if (oldRowDiv > 0.0 || oldColDiv > 0.0) {
-				showTreesMenuItem.setText("Hide trees...");
+				showTreesMenuItem.setText(StringRes.menu_hideTrees);
 			}
 		}
 
@@ -566,10 +568,12 @@ public class DendroView implements Observer, DendroPanel {
 
 	public void updateTreeMenuBtn(final JSplitPane srcPane) {
 
-		if (srcPane.getDividerLocation() == 0) {
-			showTreesMenuItem.setText("Show trees...");
+		/* Should always be "Show trees" if any tree panel is invisible */
+		if(rowTreePane.getDividerLocation() == 0 
+				|| colTreePane.getDividerLocation() == 0) {
+			showTreesMenuItem.setText(StringRes.menu_showTrees);
 		} else {
-			showTreesMenuItem.setText("Hide trees...");
+			showTreesMenuItem.setText(StringRes.menu_hideTrees);
 		}
 	}
 
@@ -710,11 +714,11 @@ public class DendroView implements Observer, DendroPanel {
 		}
 
 		if (Helper.nearlyEqual(atr_loc, 0.0)
-				&& Helper.nearlyEqual(gtr_loc, 0.0)) {
-			showTreesMenuItem.setText("Show trees...");
+				|| Helper.nearlyEqual(gtr_loc, 0.0)) {
+			showTreesMenuItem.setText(StringRes.menu_showTrees);
 
 		} else {
-			showTreesMenuItem.setText("Hide trees...");
+			showTreesMenuItem.setText(StringRes.menu_hideTrees);
 		}
 
 		dendroPane.repaint();
@@ -1331,6 +1335,16 @@ public class DendroView implements Observer, DendroPanel {
 	public LabelView getRowLabelView() {
 
 		return rowLabelView;
+	}
+	
+	public JSplitPane getRowSplitPane() {
+		
+		return rowTreePane;
+	}
+	
+	public JSplitPane getColSplitPane() {
+		
+		return colTreePane;
 	}
 
 	/**

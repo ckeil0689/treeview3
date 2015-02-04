@@ -363,7 +363,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		double atr_loc = dendroView.getDivLoc(dendroView.getColumnTreeView());
 		double gtr_loc = dendroView.getDivLoc(dendroView.getRowTreeView());
 
-		if (atr_loc > 0.0 || gtr_loc > 0.0) {
+		if (atr_loc > 0.0 && gtr_loc > 0.0) {
 
 			/* First save current setup */
 			configNode.putDouble("atr_Loc", atr_loc);
@@ -374,8 +374,14 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			gtr_loc = 0.0;
 
 		} else {
-			atr_loc = configNode.getDouble("atr_Loc", 0.5);
-			gtr_loc = configNode.getDouble("gtr_Loc", 0.5);
+			/* Only update trees which are currently at 0.0 */
+			if(Helper.nearlyEqual(0.0, atr_loc)) {
+				atr_loc = configNode.getDouble("atr_Loc", 0.5);
+			}
+			
+			if(Helper.nearlyEqual(0.0, gtr_loc)) {
+				gtr_loc = configNode.getDouble("gtr_Loc", 0.5);
+			}
 		}
 
 		dendroView.setTreeVisibility(atr_loc, gtr_loc);
@@ -417,8 +423,18 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		public void propertyChange(final PropertyChangeEvent evt) {
 
 			dendroView.updateTreeMenuBtn((JSplitPane) evt.getSource());
+			
+			/* save state */
+//			if((JSplitPane) evt.getSource() == dendroView.getRowSplitPane()) {
+//				double gtr_loc = dendroView.getDivLoc(
+//						dendroView.getRowTreeView());
+//				configNode.putDouble("gtr_Loc", gtr_loc);
+//			} else {
+//				double atr_loc = dendroView.getDivLoc(
+//						dendroView.getColumnTreeView());
+//				configNode.putDouble("atr_Loc", atr_loc);
+//			}
 		}
-
 	}
 
 	/* >>>>>>> Mapped Key Actions <<<<<<<<< */

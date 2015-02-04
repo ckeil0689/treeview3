@@ -62,12 +62,14 @@ public class StringRes {
 	public static final String menu_URL = "URL...";
 	public static final String menu_Prefs = "Preferences";
 	public static final String menu_ResetPrefs = "Reset Preferences";
-	public static final String menu_RowAndCol = "Row and Column Labels...";
-	public static final String menu_Color = "Color Settings...";
+	public static final String menu_RowAndCol = "Labels...";
+	public static final String menu_Color = "Color settings...";
+	public static final String menu_showTrees = "Show Trees...";
+	public static final String menu_hideTrees = "Hide Trees...";
 	public static final String menu_Hier = "Hierarchical";
 	public static final String menu_KMeans = "K-Means";
 	public static final String menu_Stats = "Stats...";
-	public static final String menu_Shortcuts = "Keyboard shortcuts...";
+	public static final String menu_Shortcuts = "Shortcuts...";
 	public static final String menu_About = "About...";
 	public static final String menu_ShowLog = "Show Log...";
 	// There's currently no documentation page - don't need it for the first
