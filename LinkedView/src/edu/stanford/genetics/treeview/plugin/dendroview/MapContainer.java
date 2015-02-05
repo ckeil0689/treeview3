@@ -212,6 +212,8 @@ AdjustmentListener, ConfigNodePersistent {
 			newScale = myMinScale;
 		}
 		setScale(newScale);
+		
+		notifyObservers();
 	}
 
 	/**
@@ -261,6 +263,8 @@ AdjustmentListener, ConfigNodePersistent {
 			newScale = myMaxScale;
 		}
 		setScale(newScale);
+		
+		notifyObservers();
 	}
 
 	public void recalculateScale() {
@@ -372,6 +376,8 @@ AdjustmentListener, ConfigNodePersistent {
 		if (j != i) {
 			setChanged();
 		}
+		
+		notifyObservers();
 	}
 
 	public void scrollBy(final int i) {
@@ -385,6 +391,8 @@ AdjustmentListener, ConfigNodePersistent {
 		if (j != scrollbar.getValue()) {
 			setChanged();
 		}
+		
+		notifyObservers();
 	}
 
 	public JScrollBar getScroll() {

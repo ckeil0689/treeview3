@@ -3,6 +3,7 @@ package Controllers;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.InputEvent;
@@ -123,7 +124,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		setSavedScale();
 
 		addKeyBindings();
-		addViewListeners();
+		addDendroViewListeners();
 		addMenuBtnListeners();
 	}
 
@@ -266,6 +267,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		updateGlobalView();
 	}
 
+	/* TODO get rid of this .... */
 	private void updateGlobalView() {
 
 		globalXmap.notifyObservers();
@@ -277,13 +279,14 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	/**
 	 * Adds listeners to DendroView's UI components.
 	 */
-	private void addViewListeners() {
+	private void addDendroViewListeners() {
 
 		dendroView.addScaleListeners(new ScaleListener());
 		dendroView.addZoomListener(new ZoomListener());
-		dendroView.addCompListener(new ResizeListener());
+		dendroView.addCompListener(new AppFrameListener());
 		dendroView.addSearchCloseListener(new CloseSearchAction());
 		dendroView.addDividerListener(new DividerListener());
+		dendroView.addSplitPaneListener(new SplitPaneListener());
 	}
 
 	/**
@@ -448,7 +451,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		public void actionPerformed(final ActionEvent e) {
 
 			getGlobalYMap().scrollToIndex(0);
-			getGlobalYMap().notifyObservers();
 		}
 	}
 
@@ -462,7 +464,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 			final int max = getGlobalYMap().getMaxIndex();
 			getGlobalYMap().scrollToIndex(max);
-			getGlobalYMap().notifyObservers();
 		}
 	}
 
@@ -475,7 +476,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		public void actionPerformed(final ActionEvent e) {
 
 			getGlobalXMap().scrollToIndex(0);
-			getGlobalXMap().notifyObservers();
 		}
 	}
 
@@ -489,7 +489,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 			final int max = getGlobalXMap().getMaxIndex();
 			getGlobalXMap().scrollToIndex(max);
-			getGlobalXMap().notifyObservers();
 		}
 	}
 
@@ -502,7 +501,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 			final int scrollBy = getGlobalYMap().getNumVisible();
 			getGlobalYMap().scrollBy(-scrollBy);
-			getGlobalYMap().notifyObservers();
 		}
 	}
 
@@ -515,7 +513,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 			final int scrollBy = getGlobalYMap().getNumVisible();
 			getGlobalYMap().scrollBy(scrollBy);
-			getGlobalYMap().notifyObservers();
 		}
 	}
 
@@ -528,7 +525,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 			final int scrollBy = getGlobalXMap().getNumVisible();
 			getGlobalXMap().scrollBy(-scrollBy);
-			getGlobalXMap().notifyObservers();
 		}
 	}
 
@@ -541,7 +537,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 			final int scrollBy = getGlobalXMap().getNumVisible();
 			getGlobalXMap().scrollBy(scrollBy);
-			getGlobalXMap().notifyObservers();
 		}
 	}
 
@@ -553,7 +548,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		public void actionPerformed(final ActionEvent e) {
 
 			getGlobalXMap().scrollBy(-1);
-			getGlobalXMap().notifyObservers();
 		}
 	}
 
@@ -565,7 +559,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		public void actionPerformed(final ActionEvent e) {
 
 			getGlobalXMap().scrollBy(1);
-			getGlobalXMap().notifyObservers();
 		}
 	}
 
@@ -577,7 +570,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		public void actionPerformed(final ActionEvent e) {
 
 			getGlobalYMap().scrollBy(-1);
-			getGlobalYMap().notifyObservers();
 		}
 	}
 
@@ -589,7 +581,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		public void actionPerformed(final ActionEvent e) {
 
 			getGlobalYMap().scrollBy(1);
-			getGlobalYMap().notifyObservers();
 		}
 	}
 
@@ -630,9 +621,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 			getGlobalXMap().zoomIn();
 			getGlobalYMap().zoomIn();
-
-			getGlobalXMap().notifyObservers();
-			getGlobalYMap().notifyObservers();
 		}
 	}
 
@@ -646,9 +634,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 			getGlobalXMap().zoomOut();
 			getGlobalYMap().zoomOut();
-
-			getGlobalXMap().notifyObservers();
-			getGlobalYMap().notifyObservers();
 		}
 	}
 
@@ -705,9 +690,60 @@ public class DendroController implements ConfigNodePersistent, Observer {
 				LogBuffer.println("Got weird source for actionPerformed() "
 						+ "in DendroController ScaleListener.");
 			}
+		}
+	}
+	
+	/**
+	 * Defines what happens when component properties of the two JSplitPanes
+	 * which contain labels and trees are changed by the system or the user. 
+	 * @author chris0689
+	 *
+	 */
+	private class SplitPaneListener extends ComponentAdapter {
 
-			getGlobalXMap().notifyObservers();
-			getGlobalYMap().notifyObservers();
+		@Override
+		public void componentResized(ComponentEvent e) {
+			
+			LogBuffer.println("Splitpane resized");
+		}
+
+		@Override
+		public void componentShown(ComponentEvent e) {
+			
+			double atr_loc = configNode.getDouble("atr_Loc", 0.5);
+			double gtr_loc = configNode.getDouble("gtr_Loc", 0.5);
+
+			dendroView.setTreeVisibility(atr_loc, gtr_loc);
+		}
+	}
+	
+	/**
+	 * Listens to the resizing of DendroView2 and makes changes to MapContainers
+	 * as a result.
+	 *
+	 * @author CKeil
+	 *
+	 */
+	private class AppFrameListener extends ComponentAdapter{
+
+		@Override
+		public void componentResized(final ComponentEvent arg0) {
+			// LogBuffer.println("componentResized: globalYmap.getTileNumVisible: ["
+			// + globalYmap.getTileNumVisible() +
+			// "] globalXmap.getTileNumVisible: [" +
+			// globalXmap.getTileNumVisible() +
+			// "] dendroView.getXScroll().getValue(): [" +
+			// dendroView.getXScroll().getValue() +
+			// "] dendroView.getYScroll().getValue(): [" +
+			// dendroView.getYScroll().getValue() + "].");
+
+			// Previously, resetMapContainers was called here, but that caused
+			// the zoom level to change when the user resized the window, so I
+			// added a way to track the currently visible area in mapContainer
+			// and implemented these functions to make the necessary
+			// adjustments to the image when that happens
+			reZoomVisible();
+			reCenterVisible();
 		}
 	}
 
@@ -716,13 +752,11 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	 */
 	public void deselectAll() {
 
-		if (arraySelection.getNSelectedIndexes() > 0) {
-			arraySelection.deselectAllIndexes();
-			geneSelection.deselectAllIndexes();
+		arraySelection.deselectAllIndexes();
+		geneSelection.deselectAllIndexes();
 
-			arraySelection.notifyObservers();
-			geneSelection.notifyObservers();
-		}
+		arraySelection.notifyObservers();
+		geneSelection.notifyObservers();
 	}
 
 	/**
@@ -755,7 +789,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			break;
 		}
 
-		addViewListeners();
+		addDendroViewListeners();
 		resetDendroView();
 	}
 
@@ -1144,7 +1178,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	 * events. Based on zoomSelection(). Does not change the number of visible
 	 * data indexes.
 	 */
-	public void reZoomVisible() {
+	private void reZoomVisible() {
 
 		double newScale = 0.0;
 		double newScale2 = 0.0;
@@ -1201,7 +1235,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	 * Scrolls to the center of the visible rectangle. Used when the window or
 	 * the image area is resized in order to keep the same data displayed.
 	 */
-	public void reCenterVisible() {
+	private void reCenterVisible() {
 
 		// final int visibleGenes = globalYmap.getTileNumVisible();
 		// final int visibleArrays = globalXmap.getTileNumVisible();
@@ -1226,48 +1260,48 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		saveSettings();
 	}
 
-	/**
-	 * Listens to the resizing of DendroView2 and makes changes to MapContainers
-	 * as a result.
-	 *
-	 * @author CKeil
-	 *
-	 */
-	class ResizeListener implements ComponentListener {
-
-		// Component Listeners
-		@Override
-		public void componentHidden(final ComponentEvent arg0) {
-		}
-
-		@Override
-		public void componentMoved(final ComponentEvent arg0) {
-		}
-
-		@Override
-		public void componentResized(final ComponentEvent arg0) {
-			// LogBuffer.println("componentResized: globalYmap.getTileNumVisible: ["
-			// + globalYmap.getTileNumVisible() +
-			// "] globalXmap.getTileNumVisible: [" +
-			// globalXmap.getTileNumVisible() +
-			// "] dendroView.getXScroll().getValue(): [" +
-			// dendroView.getXScroll().getValue() +
-			// "] dendroView.getYScroll().getValue(): [" +
-			// dendroView.getYScroll().getValue() + "].");
-
-			// Previously, resetMapContainers was called here, but that caused
-			// the zoom level to change when the user resized the window, so I
-			// added a way to track the currently visible area in mapContainer
-			// and implemented these functions to make the necessary
-			// adjustments to the image when that happens
-			reZoomVisible();
-			reCenterVisible();
-		}
-
-		@Override
-		public void componentShown(final ComponentEvent arg0) {
-		}
-	}
+//	/**
+//	 * Listens to the resizing of DendroView2 and makes changes to MapContainers
+//	 * as a result.
+//	 *
+//	 * @author CKeil
+//	 *
+//	 */
+//	private class ResizeListener implements ComponentListener {
+//
+//		// Component Listeners
+//		@Override
+//		public void componentHidden(final ComponentEvent arg0) {
+//		}
+//
+//		@Override
+//		public void componentMoved(final ComponentEvent arg0) {
+//		}
+//
+//		@Override
+//		public void componentResized(final ComponentEvent arg0) {
+//			// LogBuffer.println("componentResized: globalYmap.getTileNumVisible: ["
+//			// + globalYmap.getTileNumVisible() +
+//			// "] globalXmap.getTileNumVisible: [" +
+//			// globalXmap.getTileNumVisible() +
+//			// "] dendroView.getXScroll().getValue(): [" +
+//			// dendroView.getXScroll().getValue() +
+//			// "] dendroView.getYScroll().getValue(): [" +
+//			// dendroView.getYScroll().getValue() + "].");
+//
+//			// Previously, resetMapContainers was called here, but that caused
+//			// the zoom level to change when the user resized the window, so I
+//			// added a way to track the currently visible area in mapContainer
+//			// and implemented these functions to make the necessary
+//			// adjustments to the image when that happens
+//			reZoomVisible();
+//			reCenterVisible();
+//		}
+//
+//		@Override
+//		public void componentShown(final ComponentEvent arg0) {
+//		}
+//	}
 
 	public void saveImage(final JPanel panel) throws IOException {
 

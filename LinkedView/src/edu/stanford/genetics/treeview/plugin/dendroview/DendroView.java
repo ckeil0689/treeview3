@@ -27,6 +27,7 @@ import java.awt.Graphics;
 import java.awt.ScrollPane;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentListener;
 import java.awt.event.ContainerListener;
 import java.awt.event.KeyEvent;
@@ -104,8 +105,8 @@ public class DendroView implements Observer, DendroPanel {
 	protected final ColumnTreeView colTreeView;
 
 	/* JSplitPanes containing trees & labels */
-	private JSplitPane rowTreePane;
-	private JSplitPane colTreePane;
+	private JSplitPane rowDataPane;
+	private JSplitPane colDataPane;
 
 	/* Gene and array label views */
 	protected final RowLabelView rowLabelView;
@@ -193,6 +194,7 @@ public class DendroView implements Observer, DendroPanel {
 		/* main panel */
 		dendroPane = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING_FILL,
 				null);
+//		dendroPane.setLayout(new MigLayout("debug"));
 
 		/* >>> Init all views --- they should be final <<< */
 		/* data ticker panel */
@@ -362,7 +364,7 @@ public class DendroView implements Observer, DendroPanel {
 
 		navContainer = GUIFactory.createJPanel(false,
 				GUIFactory.NO_PADDING_FILL, null);
-		navContainer.setLayout(new MigLayout("debug"));
+//		navContainer.setLayout(new MigLayout("debug"));
 
 		bottomPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 
@@ -381,40 +383,40 @@ public class DendroView implements Observer, DendroPanel {
 		colLabelPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING,
 				null);
 
-		rowTreePane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rowTreeView,
+		rowDataPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rowTreeView,
 				rowLabelpanel);
-		rowTreePane.setResizeWeight(0.5);
-		rowTreePane.setOpaque(false);
-		rowTreePane.setOneTouchExpandable(true); // does not work on Linux :(
+		rowDataPane.setResizeWeight(0.5);
+		rowDataPane.setOpaque(false);
+		rowDataPane.setOneTouchExpandable(true); // does not work on Linux :(
 
-		colorDivider(rowTreePane);
-		rowTreePane.setBorder(null);
+		colorDivider(rowDataPane);
+		rowDataPane.setBorder(null);
 
 		final double oldRowDiv = tvFrame.getConfigNode().getDouble("gtr_loc",
 				0.5);
 		if (rowTreeView.isEnabled()) {
-			rowTreePane.setDividerLocation(oldRowDiv);
+			rowDataPane.setDividerLocation(oldRowDiv);
 		} else {
-			rowTreePane.setDividerLocation(0.0);
-			rowTreePane.setEnabled(false);
+			rowDataPane.setDividerLocation(0.0);
+			rowDataPane.setEnabled(false);
 		}
 
-		colTreePane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, colTreeView,
+		colDataPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, colTreeView,
 				colLabelPanel);
-		colTreePane.setResizeWeight(0.5);
-		colTreePane.setOpaque(false);
-		colTreePane.setOneTouchExpandable(true);
+		colDataPane.setResizeWeight(0.0);
+		colDataPane.setOpaque(false);
+		colDataPane.setOneTouchExpandable(true);
 
-		colorDivider(colTreePane);
-		colTreePane.setBorder(null);
+		colorDivider(colDataPane);
+		colDataPane.setBorder(null);
 
 		final double oldColDiv = tvFrame.getConfigNode().getDouble("atr_loc",
 				0.5);
 		if (colTreeView.isEnabled()) {
-			colTreePane.setDividerLocation(oldColDiv);
+			colDataPane.setDividerLocation(oldColDiv);
 		} else {
-			colTreePane.setDividerLocation(0.0);
-			colTreePane.setEnabled(false);
+			colDataPane.setDividerLocation(0.0);
+			colDataPane.setEnabled(false);
 		}
 
 		/* If trees in general are disabled */
@@ -451,8 +453,8 @@ public class DendroView implements Observer, DendroPanel {
 		navContainer.add(dataTicker.getTickerPanel(), "push, w 95%!, h 25%!, "
 				+ "aligny 5%");
 
-		arrayContainer.add(colTreePane, "w 99%, h 100%");
-		geneContainer.add(rowTreePane, "w 100%, h 99%, wrap");
+		arrayContainer.add(colDataPane, "w 99%, h 100%");
+		geneContainer.add(rowDataPane, "w 100%, h 99%, wrap");
 
 		/* Add the scrollbars (outside of LabelViews) */
 		final JScrollBar arrayScroll = colLabelView.getScrollBar();
@@ -461,42 +463,61 @@ public class DendroView implements Observer, DendroPanel {
 		arrayContainer.add(arrayScroll, "w 1%, h 100%");
 		geneContainer.add(geneScroll, "w 100%, h 1%");
 
-		if (gvWidth == 0 && gvHeight == 0) {
-			gvWidth = MAX_GV_WIDTH;
-			gvHeight = MAX_GV_HEIGHT;
-		}
-
-		/* Column widths */
-		final double textViewCol = (100 - gvWidth - 1) / 2;
-
-		/* Heights */
-		final double arrayRow = (100 - gvHeight - 2);
-		final double bottomRow = 2;
-
+//		if (gvWidth == 0 && gvHeight == 0) {
+//			gvWidth = MAX_GV_WIDTH;
+//			gvHeight = MAX_GV_HEIGHT;
+//		}
+//
+//		/* Column widths */
+//		final double sidePanel_w = (100 - gvWidth) / 2.0;
+//		final int panelMin = 200;
+//
+//		/* Heights */
+//		final double bottomPanel_h = 1;
+//		final double topPanel_h = (100 - gvHeight - bottomPanel_h);
+		
 		/* Adding all components to the dendroPane */
 		if (isSearchVisible) {
-			gvHeight -= 2;
+//			final double searchHeight = 2;
+//			gvHeight -= searchHeight;
 			dendroPane.add(this.makeSearchPanel(), "w 100%, h 2%, span, wrap");
 		} else {
 			gvHeight = MAX_GV_HEIGHT;
 		}
+		
+//		LogBuffer.println("SidePanel width: " + sidePanel_w);
+//		LogBuffer.println("matrix width: " + gvWidth);
 
-		dendroPane.add(firstPanel, "w " + textViewCol + "%, w 200::, " + "h "
-				+ arrayRow + "%, pushx");
+//		dendroPane.add(firstPanel, "w " + panelMin + "::, "
+//				+ "w " + sidePanel_w + "%," + "h " + panelMin + "::, "
+//						+ "h " + topPanel_h + "%");
+//
+//		dendroPane.add(arrayContainer, "w " + gvWidth + "%, " 
+//				+ " h " + panelMin + "::," + "h " + topPanel_h + "%");
+//
+//		dendroPane.add(navContainer, "span 1 2, w " + panelMin + "::, "
+//				+ "w " + sidePanel_w + "%, h 100%, wrap");
+//
+//		dendroPane.add(geneContainer, "w " + panelMin + "::, "
+//				+ "w " + sidePanel_w + "%, " + "h " + gvHeight + "%, growy");
+//
+//		dendroPane.add(globalViewContainer, "w " + gvWidth + "%, " + "h "
+//				+ gvHeight + "%, wrap");
+//
+//		dendroPane.add(bottomPanel, "span, h " + bottomPanel_h + "%");
+		
+		dendroPane.add(firstPanel, "w 12.5%!, h 19%");
 
-		dendroPane.add(arrayContainer, "w " + gvWidth + "%, " + "h " + arrayRow
-				+ "%, growx");
+		dendroPane.add(arrayContainer, "w 75%, h 19%");
 
-		dendroPane.add(navContainer, "span 1 2, w 200::, h 100%, wrap");
+		dendroPane.add(navContainer, "span 1 2, w 12.5%, h 100%, wrap");
 
-		dendroPane.add(geneContainer, "w " + textViewCol + "%, " + "h "
-				+ gvHeight + "%, growy");
+		dendroPane.add(geneContainer, "w 12.5%!, h 80%");
 
-		dendroPane.add(globalViewContainer, "w " + gvWidth + "%, " + "h "
-				+ gvHeight + "%, grow, wrap");
+		dendroPane.add(globalViewContainer, "w 75%, h 80%, wrap");
 
-		dendroPane.add(bottomPanel, "span, h " + bottomRow + "%");
-
+		dendroPane.add(bottomPanel, "span, w 87.5%, h 1%");
+				
 		dendroPane.revalidate();
 		dendroPane.repaint();
 	}
@@ -569,8 +590,8 @@ public class DendroView implements Observer, DendroPanel {
 	public void updateTreeMenuBtn(final JSplitPane srcPane) {
 
 		/* Should always be "Show trees" if any tree panel is invisible */
-		if(rowTreePane.getDividerLocation() == 0 
-				|| colTreePane.getDividerLocation() == 0) {
+		if(rowDataPane.getDividerLocation() == 0 
+				|| colDataPane.getDividerLocation() == 0) {
 			showTreesMenuItem.setText(StringRes.menu_showTrees);
 		} else {
 			showTreesMenuItem.setText(StringRes.menu_hideTrees);
@@ -657,8 +678,14 @@ public class DendroView implements Observer, DendroPanel {
 	 */
 	public void addDividerListener(final PropertyChangeListener l) {
 
-		rowTreePane.addPropertyChangeListener(l);
-		colTreePane.addPropertyChangeListener(l);
+		rowDataPane.addPropertyChangeListener(l);
+		colDataPane.addPropertyChangeListener(l);
+	}
+	
+	public void addSplitPaneListener(final ComponentAdapter c) {
+		
+		rowDataPane.addComponentListener(c);
+		colDataPane.addComponentListener(c);
 	}
 
 	// Methods
@@ -706,11 +733,11 @@ public class DendroView implements Observer, DendroPanel {
 	 */
 	public void setTreeVisibility(final double atr_loc, final double gtr_loc) {
 
-		if (colTreePane != null) {
-			colTreePane.setDividerLocation(atr_loc);
+		if (colDataPane != null) {
+			colDataPane.setDividerLocation(atr_loc);
 		}
-		if (rowTreePane != null) {
-			rowTreePane.setDividerLocation(gtr_loc);
+		if (rowDataPane != null) {
+			rowDataPane.setDividerLocation(gtr_loc);
 		}
 
 		if (Helper.nearlyEqual(atr_loc, 0.0)
@@ -1339,12 +1366,12 @@ public class DendroView implements Observer, DendroPanel {
 	
 	public JSplitPane getRowSplitPane() {
 		
-		return rowTreePane;
+		return rowDataPane;
 	}
 	
 	public JSplitPane getColSplitPane() {
 		
-		return colTreePane;
+		return colDataPane;
 	}
 
 	/**
@@ -1357,8 +1384,8 @@ public class DendroView implements Observer, DendroPanel {
 	public double getDivLoc(final TRView dendrogram) {
 
 		/* Get value for correct dendrogram JSplitPane */
-		final JSplitPane treePane = (dendrogram == colTreeView) ? colTreePane
-				: rowTreePane;
+		final JSplitPane treePane = (dendrogram == colTreeView) ? colDataPane
+				: rowDataPane;
 
 		/* returns imprecise position? -- no bug reports found */
 		final double abs_div_loc = treePane.getDividerLocation();
