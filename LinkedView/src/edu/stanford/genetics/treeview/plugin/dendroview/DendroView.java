@@ -47,7 +47,6 @@ import javax.swing.border.Border;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
-import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
 import Utilities.Helper;
 import Utilities.StringRes;
@@ -451,7 +450,7 @@ public class DendroView implements Observer, DendroPanel {
 		btnPanel.add(scaleDefaultAll, "push, alignx 50%, aligny 5%");
 
 		navContainer.add(btnPanel, "push, alignx 50%, aligny 100%, wrap");
-		navContainer.add(dataTicker.getTickerPanel(), "push, w 95%!, h 25%!, "
+		navContainer.add(dataTicker.getTickerPanel(), "push, w 95%, h 25%!, "
 				+ "aligny 5%");
 
 		arrayContainer.add(colDataPane, "w 99%, h 100%");

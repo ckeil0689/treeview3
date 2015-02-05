@@ -668,9 +668,9 @@ MouseMotionListener, MouseListener, MouseWheelListener {
 		hasMouse = false;
 
 		// Display empty field
-		statustext[0] = "";
-		statustext[1] = "";
-		statustext[2] = "";
+		statustext[0] = "-";
+		statustext[1] = "-";
+		statustext[2] = "-";
 
 		status.setMessages(statustext);
 	}
