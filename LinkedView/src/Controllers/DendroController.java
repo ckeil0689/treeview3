@@ -426,17 +426,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		public void propertyChange(final PropertyChangeEvent evt) {
 
 			dendroView.updateTreeMenuBtn((JSplitPane) evt.getSource());
-			
-			/* save state */
-//			if((JSplitPane) evt.getSource() == dendroView.getRowSplitPane()) {
-//				double gtr_loc = dendroView.getDivLoc(
-//						dendroView.getRowTreeView());
-//				configNode.putDouble("gtr_Loc", gtr_loc);
-//			} else {
-//				double atr_loc = dendroView.getDivLoc(
-//						dendroView.getColumnTreeView());
-//				configNode.putDouble("atr_Loc", atr_loc);
-//			}
 		}
 	}
 
@@ -704,7 +693,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void componentResized(ComponentEvent e) {
 			
-			LogBuffer.println("Splitpane resized");
+			/* TODO define JSplitPane behavior */
 		}
 
 		@Override

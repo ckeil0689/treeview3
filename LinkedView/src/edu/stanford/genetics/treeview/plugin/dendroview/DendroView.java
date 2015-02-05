@@ -356,7 +356,7 @@ public class DendroView implements Observer, DendroPanel {
 
 		/* Generate the sub-panels */
 		btnPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
-		btnPanel.setLayout(new MigLayout("debug"));
+//		btnPanel.setLayout(new MigLayout("debug"));
 
 		crossPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 
