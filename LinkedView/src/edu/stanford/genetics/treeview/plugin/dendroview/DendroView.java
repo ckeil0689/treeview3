@@ -356,6 +356,7 @@ public class DendroView implements Observer, DendroPanel {
 
 		/* Generate the sub-panels */
 		btnPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
+		btnPanel.setLayout(new MigLayout("debug"));
 
 		crossPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 
@@ -363,7 +364,7 @@ public class DendroView implements Observer, DendroPanel {
 				GUIFactory.NO_PADDING_FILL, null);
 
 		navContainer = GUIFactory.createJPanel(false,
-				GUIFactory.NO_PADDING_FILL, null);
+				GUIFactory.DEFAULT, null);
 //		navContainer.setLayout(new MigLayout("debug"));
 
 		bottomPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
@@ -449,7 +450,7 @@ public class DendroView implements Observer, DendroPanel {
 		btnPanel.add(crossPanel, "pushx, alignx 50%, wrap");
 		btnPanel.add(scaleDefaultAll, "push, alignx 50%, aligny 5%");
 
-		navContainer.add(btnPanel, "push, alignx 50%, aligny 95%, wrap");
+		navContainer.add(btnPanel, "push, alignx 50%, aligny 100%, wrap");
 		navContainer.add(dataTicker.getTickerPanel(), "push, w 95%!, h 25%!, "
 				+ "aligny 5%");
 
