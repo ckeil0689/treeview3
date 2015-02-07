@@ -915,7 +915,14 @@ ConfigNodePersistent {
 	 */
 	public FileSet findFileSet(final JMenuItem menuItem) {
 
-		final int index = fileMenuList.indexOf(menuItem);
+		int index = -1;
+		for(int i = 0; i < fileMenuList.size(); i++) {
+			
+			if(fileMenuList.get(i).getText().equalsIgnoreCase(menuItem.getText())) {
+				index = i;
+				break;
+			}
+		}
 
 		if (fileSetList.size() == fileMenuList.size())
 			return fileSetList.get(index);

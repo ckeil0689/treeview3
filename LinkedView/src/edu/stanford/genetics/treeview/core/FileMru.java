@@ -48,19 +48,6 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 
 	private Preferences configNode;
 
-	// /**
-	// * Binds FileMru to a ConfigNode
-	// *
-	// * @param configNode
-	// * Node to be bound to
-	// */
-	// @Override
-	// public synchronized void bindConfig(final Preferences configNode) {
-	//
-	// root = configNode;
-	// setChanged();
-	// }
-
 	/**
 	 * Binds FileMru to a ConfigNode
 	 *
@@ -101,7 +88,6 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 	 */
 	public Preferences getConfig(final int i) {
 
-		// final ConfigNode aconfigNode[] = root.fetch("File");
 		final String[] childrenNodes = getRootChildrenNodes();
 
 		if ((i < childrenNodes.length) && (i >= 0))
@@ -134,7 +120,6 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 	 */
 	public String[] getFileNames() {
 
-		// final ConfigNode aconfigNode[] = root.fetch("File");
 		final String[] childrenNodes = getRootChildrenNodes();
 
 		final String astring[] = new String[childrenNodes.length];
@@ -199,8 +184,6 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 		final String[] childrenNodes = getRootChildrenNodes();
 		try {
 			final Preferences node = configNode.node(childrenNodes[i]);
-
-			LogBuffer.println("Removing " + node.name());
 
 			configNode.node(childrenNodes[i]).removeNode();
 
@@ -304,12 +287,6 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 		fileSet3.copyState(inSet);
 		LogBuffer.println("Creating new fileset " + fileSet3);
 		return fileSet3;
-		/*
-		 *
-		 * loadFileSet(fileSet); fileMru.setLast(fileSet);
-		 * fileMru.notifyObservers(); setLoaded(true);
-		 * fileMru.setLast(configNode); fileMru.notifyObservers();
-		 */
 	}
 
 	/**
@@ -386,7 +363,7 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 
 		} catch (final BackingStoreException e) {
 			e.printStackTrace();
-			return null;
+			return new String[0];
 		}
 	}
 
