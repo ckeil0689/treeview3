@@ -9,7 +9,7 @@
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
  *
- * This software is provided under the GNU GPL Version 2. In particular, 
+ * This software is provided under the GNU GPL Version 2. In particular,
  *
  * 1) If you modify a source file, make a comment in it containing your name and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
@@ -18,7 +18,7 @@
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
  *
- * END_HEADER 
+ * END_HEADER
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
@@ -37,7 +37,7 @@ import edu.stanford.genetics.treeview.TreeSelectionI;
 
 /**
  * Subclass of ExportPanel which outputs a postscript version of a DendroView.
- * 
+ *
  */
 public class PostscriptExportPanel extends ExportPanel implements SettingsPanel {
 
@@ -93,7 +93,7 @@ public class PostscriptExportPanel extends ExportPanel implements SettingsPanel 
 
 	/**
 	 * Inner class which outputs a postscript version of Dendroview like things
-	 * 
+	 *
 	 * It is loosely coupled in that it only calls protected methods in the
 	 * ExporPanel superclass.
 	 */
@@ -149,7 +149,7 @@ public class PostscriptExportPanel extends ExportPanel implements SettingsPanel 
 		/**
 		 * draws boxes using maps with the lower left corner at the current
 		 * origin.
-		 * 
+		 *
 		 */
 		private void writeBoxes(final PrintStream ps) {
 			final int height = (int) getYmapHeight();
@@ -195,12 +195,14 @@ public class PostscriptExportPanel extends ExportPanel implements SettingsPanel 
 			// translate over
 			if (getGeneAnnoLength() <= 0)
 				return;
-			if (includeArrayMap())
+			if (includeArrayMap()) {
 				ps.println(getXmapWidth() + " 0 translate");
-			if (includeGtr())
+			}
+			if (includeGtr()) {
 				ps.println(getGtrWidth() + " 0 translate");
-			// if (includeAtr()) ps.println("0 " + getAtrHeight() +
-			// " translate");
+				// if (includeAtr()) ps.println("0 " + getAtrHeight() +
+				// " translate");
+			}
 
 			ps.println(" /Courier findfont");
 			ps.println("8 scalefont");
@@ -248,10 +250,12 @@ public class PostscriptExportPanel extends ExportPanel implements SettingsPanel 
 			// translate back
 			// if (includeAtr()) ps.println("0 " + - getAtrHeight() +
 			// " translate");
-			if (includeGtr())
+			if (includeGtr()) {
 				ps.println(-getGtrWidth() + " 0 translate");
-			if (includeArrayMap())
+			}
+			if (includeArrayMap()) {
 				ps.println(-getXmapWidth() + " 0 translate");
+			}
 		}
 
 		private void writeArrayNames(final PrintStream ps) {
@@ -259,13 +263,15 @@ public class PostscriptExportPanel extends ExportPanel implements SettingsPanel 
 				return;
 			int tHeight = 0;
 			int tWidth = 0;
-			if (includeGeneMap())
+			if (includeGeneMap()) {
 				tHeight += getYmapHeight();
+			}
 			if (includeAtr() && (getArrayAnnoInside() == false)) {
 				tHeight += getAtrHeight();
 			}
-			if (includeGtr())
+			if (includeGtr()) {
 				tWidth += getGtrWidth();
+			}
 
 			ps.println(tWidth + " " + tHeight + " translate");
 
@@ -382,12 +388,15 @@ public class PostscriptExportPanel extends ExportPanel implements SettingsPanel 
 			scaleATR = (getAtrHeight() - offsetATR) / (1.0 - corrATR);
 			int widthOffset = 0;
 			int heightOffset = 0;
-			if (includeGtr())
+			if (includeGtr()) {
 				widthOffset += getGtrWidth();
-			if (includeGeneMap())
+			}
+			if (includeGeneMap()) {
 				heightOffset += getYmapHeight();
-			if (getArrayAnnoInside())
+			}
+			if (getArrayAnnoInside()) {
 				heightOffset += getArrayAnnoLength();
+			}
 
 			ps.println(widthOffset + " " + (heightOffset - offsetATR / 2)
 					+ " translate");
@@ -429,10 +438,12 @@ public class PostscriptExportPanel extends ExportPanel implements SettingsPanel 
 				ps.println(rx + " " + (height - ry) + " " + tx + " "
 						+ (height - ly) + " " + lx + " snGTR");
 
-				if (left.isLeaf() == false)
+				if (left.isLeaf() == false) {
 					remaining.push(left);
-				if (right.isLeaf() == false)
+				}
+				if (right.isLeaf() == false) {
 					remaining.push(right);
+				}
 			}
 		}
 
@@ -454,10 +465,12 @@ public class PostscriptExportPanel extends ExportPanel implements SettingsPanel 
 			ps.println((height - ry) + " " + rx + " " + (height - ty) + " "
 					+ lx + " " + (height - ly) + " snATR");
 
-			if (left.isLeaf() == false)
+			if (left.isLeaf() == false) {
 				recurseATR(ps, left);
-			if (right.isLeaf() == false)
+			}
+			if (right.isLeaf() == false) {
 				recurseATR(ps, right);
+			}
 		}
 
 		public void write(final PrintStream ps) {
@@ -484,7 +497,7 @@ public class PostscriptExportPanel extends ExportPanel implements SettingsPanel 
 
 			if (ps.checkError()) {
 				LogBuffer
-						.println("Some error occured during PostScript export");
+				.println("Some error occured during PostScript export");
 			}
 		}
 	}

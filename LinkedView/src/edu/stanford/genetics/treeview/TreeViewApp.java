@@ -35,26 +35,26 @@ import edu.stanford.genetics.treeview.model.TVModel;
 /**
  * This class defines the treeview application. In practice, it holds the common
  * functionality of the LinkedViewApp and the AppletApp.
- * 
+ *
  * The main responsibilities of this class are to - hold static global
  * configuration variables, such as version and URLs - hold link to global
  * XmlConfig object - hold gene and array url preset objects - keep track of all
  * open windows - at one point, it kept track of plugins, but now the
  * PluginManager does that.
- * 
+ *
  * The actual Gui handling of a given window is done by TreeViewFrame, which
  * represents a single document. Because multiple documents can be open at a
  * given time, there can be multiple TVFrame objects. However, there can be only
  * one TreeView object. What this really means is that TreeView itself just
  * manages two resources, the window list and the global config. Anything that
  * effects these resources should bottleneck through TreeView.
- * 
+ *
  * 1/16/2003 by popular demand (with the exception of my advisor) I have decided
  * to try and make an applet version. As a first cut, I'm just going to make
  * this class extend applet and pop open a JFrame.
- * 
+ *
  * 9/24/2003 this has now been superceded by the applet.ButtonApplet class.
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.16 $ $Date: 2010-05-11 13:31:51 $
  */
@@ -92,9 +92,11 @@ public abstract class TreeViewApp {// implements WindowListener {
 	/**
 	 * Constructor for the TreeViewApp object takes configuration from the
 	 * passed in XmlConfig.
-	 * @param Preferences The saved preferences file.
-	 * @param boolean checks if the current running instance is a browser 
-	 * applet or desktop application.
+	 *
+	 * @param Preferences
+	 *            The saved preferences file.
+	 * @param boolean checks if the current running instance is a browser applet
+	 *        or desktop application.
 	 */
 	public TreeViewApp(final Preferences preferences, final boolean isApplet) {
 
@@ -126,7 +128,7 @@ public abstract class TreeViewApp {// implements WindowListener {
 			fos = new FileOutputStream("prefs.xml");
 			globalConfig.exportSubtree(fos);
 			fos.close();
-			
+
 			final ToolTipManager ttm = ToolTipManager.sharedInstance();
 			ttm.setEnabled(true);
 
@@ -134,12 +136,12 @@ public abstract class TreeViewApp {// implements WindowListener {
 			e1.printStackTrace();
 		}
 
-//		try {
-//			final ToolTipManager ttm = ToolTipManager.sharedInstance();
-//			ttm.setEnabled(true);
-//
-//		} catch (final Exception e) {
-//		}
+		// try {
+		// final ToolTipManager ttm = ToolTipManager.sharedInstance();
+		// ttm.setEnabled(true);
+		//
+		// } catch (final Exception e) {
+		// }
 	}
 
 	/**
@@ -158,9 +160,9 @@ public abstract class TreeViewApp {// implements WindowListener {
 	}
 
 	/**
-	 * Loads the Preferences file stored on the users machine.
-	 * If none is present with the root node 'TreeViewApp', it creates
-	 * a new one.
+	 * Loads the Preferences file stored on the users machine. If none is
+	 * present with the root node 'TreeViewApp', it creates a new one.
+	 *
 	 * @return Preferences
 	 */
 	public Preferences setPreferences() {
@@ -173,7 +175,7 @@ public abstract class TreeViewApp {// implements WindowListener {
 
 	/**
 	 * returns an XmlConfig representing global configuration variables
-	 * 
+	 *
 	 * @return The globalConfig value
 	 */
 	public Preferences getGlobalConfig() {
@@ -183,7 +185,7 @@ public abstract class TreeViewApp {// implements WindowListener {
 
 	/**
 	 * creates a ViewFrame window
-	 * 
+	 *
 	 * @throws LoadException
 	 */
 	public TreeViewFrame openNew() {
@@ -200,7 +202,7 @@ public abstract class TreeViewApp {// implements WindowListener {
 	/**
 	 * creates a new ViewFrame window displaying the specified
 	 * <code>FileSet</code>
-	 * 
+	 *
 	 * @param fileSet
 	 *            FileSet to be displayed
 	 * @exception LoadException
@@ -214,7 +216,7 @@ public abstract class TreeViewApp {// implements WindowListener {
 		final TreeViewFrame tvFrame = new TreeViewFrame(this);
 		final DataModel model = new TVModel();
 		final TVController tvController = new TVController(tvFrame, model);
-		
+
 		if (fileSet != null) {
 			tvController.loadData(fileSet);
 			tvFrame.setLoaded(true);

@@ -4,14 +4,14 @@ package Cluster;
  * This class is used to make an object which can take in the loaded data in its
  * format as originally coded in Java TreeView's first version and format it for
  * use in the clustering module.
- * 
+ *
  * @author CKeil
  */
 public class DataFormatter {
 
 	// getting the columns from raw data array
 	public double[][] splitColumns(final double[][] rawData) {
-				
+
 		// Number of arrays/ columns
 		// Assumes all arrays are same length
 		final int nCols = rawData[0].length;
@@ -34,7 +34,7 @@ public class DataFormatter {
 
 			colList[j] = sArray;
 		}
-		
+
 		return colList;
 	}
 }

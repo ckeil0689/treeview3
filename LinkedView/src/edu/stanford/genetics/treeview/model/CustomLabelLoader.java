@@ -18,7 +18,7 @@ import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 public class CustomLabelLoader {
-	
+
 	private final HeaderInfo headerInfo;
 	private String[][] labels;
 	private String[] newNames;
@@ -29,7 +29,7 @@ public class CustomLabelLoader {
 
 	boolean namesFound = false;
 
-	public CustomLabelLoader(final HeaderInfo headerInfo, 
+	public CustomLabelLoader(final HeaderInfo headerInfo,
 			final int[] selectedIndeces) {
 
 		this.headerInfo = headerInfo;
@@ -41,11 +41,11 @@ public class CustomLabelLoader {
 	 * the file content to a String[][] which contains the new labels. The
 	 * method then calls addNewLabels() to add the newly loaded labels to the
 	 * currently loaded TVModel object.
-	 * 
+	 *
 	 * @param customFile
 	 * @param int geneNum
 	 */
-	public void load(final File customFile, int geneNum) {
+	public void load(final File customFile, final int geneNum) {
 
 		try {
 			final String fileName = customFile.getAbsolutePath();
@@ -63,12 +63,12 @@ public class CustomLabelLoader {
 			int rowN = 0;
 
 			// Number of row labels without GID
-//			int geneLabelNum = tvFrame.getDataModel().getGeneHeaderInfo()
-//					.getNumNames();
-//
-//			if (tvFrame.getDataModel().gidFound()) {
-//				geneLabelNum--;
-//			}
+			// int geneLabelNum = tvFrame.getDataModel().getGeneHeaderInfo()
+			// .getNumNames();
+			//
+			// if (tvFrame.getDataModel().gidFound()) {
+			// geneLabelNum--;
+			// }
 
 			labels = new String[lineNum][geneNum];
 
@@ -187,7 +187,7 @@ public class CustomLabelLoader {
 
 	/**
 	 * Fuses two arrays together.
-	 * 
+	 *
 	 * @param a
 	 * @param b
 	 * @return
@@ -204,7 +204,7 @@ public class CustomLabelLoader {
 
 	/**
 	 * Replacing matching values in the old headerArray with loaded labels.
-	 * 
+	 *
 	 * @param model
 	 * @param loadedLabels
 	 */
@@ -224,7 +224,7 @@ public class CustomLabelLoader {
 	 * Checks the loadedLabels array whether it contains a label from the old
 	 * headerArray and then replaces it accordingly with the newly loaded
 	 * version. Returns the new
-	 * 
+	 *
 	 * @param oldLabels
 	 * @param loadedLabels
 	 * @return
@@ -242,9 +242,7 @@ public class CustomLabelLoader {
 
 			final String[] loadedLabelElement = loadedLabels[i];
 
-			for (int j = 0; j < loadedLabelElement.length; j++) {
-
-				final String newLabel = loadedLabelElement[j];
+			for (final String newLabel : loadedLabelElement) {
 
 				if (newLabel.toLowerCase().contains(oldLabel.toLowerCase())) {
 					match = true;
@@ -282,13 +280,13 @@ public class CustomLabelLoader {
 
 	/**
 	 * Sets the new names for the labels in the TVModel object.
-	 * 
+	 *
 	 * @param model
 	 */
 	public void setHeaders(final DataModel model, final String type,
 			final String[][] headersToAdd) {
 
-		TVModel tvModel = (TVModel) model;
+		final TVModel tvModel = (TVModel) model;
 		// Set the new headers for the TVModel
 		if (type.equalsIgnoreCase("Row")) {
 			tvModel.setGeneHeaders(headersToAdd);
@@ -331,7 +329,7 @@ public class CustomLabelLoader {
 	 * Count amount of lines in the file to be loaded so that the progressBar
 	 * can get correct values for extractData(). Code from StackOverflow
 	 * (https://stackoverflow.com/questions/453018).
-	 * 
+	 *
 	 * @param filename
 	 * @return
 	 * @throws IOException

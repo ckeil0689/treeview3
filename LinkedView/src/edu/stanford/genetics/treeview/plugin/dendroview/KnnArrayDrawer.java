@@ -9,7 +9,7 @@
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
  *
- * This software is provided under the GNU GPL Version 2. In particular, 
+ * This software is provided under the GNU GPL Version 2. In particular,
  *
  * 1) If you modify a source file, make a comment in it containing your name and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
@@ -18,7 +18,7 @@
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
  *
- * END_HEADER 
+ * END_HEADER
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
@@ -30,7 +30,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
  * Class for Drawing PixelViews.
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.1 $ $Date: 2006-08-16 19:13:45 $ A PixelView is a view
  *          of an array. Each cell in the view corresponds to an element in the
@@ -39,28 +39,28 @@ import edu.stanford.genetics.treeview.LogBuffer;
  *          the color is green, otherwise it is red. There is also a special
  *          nodata value, draw grey.
  *          <p>
- * 
+ *
  *          replacing this by a more general mapping from array value to color
  *          may be desirable in the future.
  *          <p>
- * 
+ *
  *          The KnnArrayDrawer is Observable. It setsChanged() whenever the data
  *          array or color mapping (contrast) is changed, but you have to call
  *          notifyObservers() yourself.
  *          <p>
- * 
+ *
  *          Upon setting a data array, KnnArrayDrawer may set a reference to the
  *          data array, and may refer to it when it asked to draw things. Of
  *          course, it may form some kind of internal buffer- you're advised to
  *          call setData() if you change the data, and not to change the data
  *          unless you call setData() too.
  *          <p>
- * 
+ *
  *          The KnnArrayDrawer can draw on a Graphics object. It requires a
  *          source rectangle in units of array indexes, to determine which array
  *          values to render, and a destination rectangle to draw them to.
  *          <p>
- * 
+ *
  *          At some point, we many want to allow arrays of ints to specify
  *          source rows and columns to grab data from for non-contiguous views.
  */
@@ -78,13 +78,13 @@ public class KnnArrayDrawer extends DoubleArrayDrawer {
 
 				final double val = dataMatrix.getValue(row, col);
 				if (Helper.nearlyEqual(val, DataModel.NODATA)) {
-					
-//				Math.abs(val - DataModel.NODATA) < EPSILON) {
+
+					// Math.abs(val - DataModel.NODATA) < EPSILON) {
 					continue;
 				}
 
 				if (Helper.nearlyEqual(val, DataModel.EMPTY)) {
-					//Math.abs(val - DataModel.EMPTY) < EPSILON) {
+					// Math.abs(val - DataModel.EMPTY) < EPSILON) {
 					continue;
 				}
 				mean += Math.abs(val);
@@ -101,7 +101,7 @@ public class KnnArrayDrawer extends DoubleArrayDrawer {
 	/**
 	 * Paint the array values onto pixels. This method will do averaging if
 	 * multiple values map to the same pixel.
-	 * 
+	 *
 	 * @param pixels
 	 *            The pixel buffer to draw to.
 	 * @param source
@@ -115,17 +115,16 @@ public class KnnArrayDrawer extends DoubleArrayDrawer {
 	 *            the order of the genes. The source rect y values are taken to
 	 *            mean indexes into this array. If the gene order is null, the
 	 *            indexes from the source rect are used as indexes into the data
-	 *            matrix.
-	 *            TODO if this class is actually used, then implement selection
-	 *            darkening of background elements.
+	 *            matrix. TODO if this class is actually used, then implement
+	 *            selection darkening of background elements.
 	 */
 	@Override
 	public void paint(final int[] pixels, final Rectangle source,
 			final Rectangle dest, final int scanSize, final int[] geneOrder) {
-		
+
 		/* Selection dimming */
-//	,int[] geneSelections, int[] arraySelections) {
-		
+		// ,int[] geneSelections, int[] arraySelections) {
+
 		LogBuffer.println(">>>>>>> KNNDrawer paint() called!");
 
 		if (dataMatrix == null) {
@@ -166,8 +165,9 @@ public class KnnArrayDrawer extends DoubleArrayDrawer {
 						for (int j = arrayFirst; j <= array; j++) {
 
 							int actualGene = source.y + i;
-							if (geneOrder != null)
+							if (geneOrder != null) {
 								actualGene = geneOrder[actualGene];
+							}
 							final double thisVal = dataMatrix.getValue(j
 									+ source.x, actualGene);
 							if (Helper.nearlyEqual(val, DataModel.EMPTY)) {
@@ -192,7 +192,7 @@ public class KnnArrayDrawer extends DoubleArrayDrawer {
 						val /= count;
 					}
 					final int t_color = colorExtractor.getARGBColor(val);
-						//, false);
+					// , false);
 					for (int x = xstart; x < xnext; x++) {
 
 						for (int y = ystart; y < ynext; y++) {
@@ -202,9 +202,9 @@ public class KnnArrayDrawer extends DoubleArrayDrawer {
 					}
 				} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 					LogBuffer
-							.println("ArrayIndexOutOfBoundsException "
-									+ "in paint() in KnnArrayDrawer: "
-									+ e.getMessage());
+					.println("ArrayIndexOutOfBoundsException "
+							+ "in paint() in KnnArrayDrawer: "
+							+ e.getMessage());
 				}
 				arrayFirst = array + 1;
 			}

@@ -36,14 +36,14 @@ import java.util.prefs.Preferences;
 /**
  * This class represents a set of colors which can be used by a color extractor
  * to translate data values into colors.
- * 
+ *
  * NOTE: This class has been superceded by the ConfigColorSet in the
  * edu.stanford.genetics.treeview package, although I am not likely to actually
  * rewrite any of this code spontaneously.
- * 
+ *
  * NOTE: Attempting to rewrite to separate ColorSet from the persistence of the
  * ColorSet
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version @version $Revision: 1.1 $ $Date: 2006-08-16 19:13:45 $
  */
@@ -53,7 +53,7 @@ public class ColorSet {
 	private Color missing;
 	private Color empty;
 
-	private String name;
+	private final String name;
 	private List<Color> colorList = new ArrayList<Color>();
 	private List<Double> fractionList = new ArrayList<Double>();
 
@@ -65,7 +65,7 @@ public class ColorSet {
 
 	/**
 	 * Constructor for the ColorSet object
-	 * 
+	 *
 	 * @param name
 	 *            initial name
 	 * @param List
@@ -90,37 +90,38 @@ public class ColorSet {
 
 	/**
 	 * Constructor for ColorSet that loads values from ConfigNode
-	 * 
+	 *
 	 * @param Preferences
 	 *            colorSetNode Preferences node with color set information
 	 *            stored
 	 */
-	public ColorSet(Preferences colorSetNode) {
-		
+	public ColorSet(final Preferences colorSetNode) {
+
 		this.name = colorSetNode.get("name", default_name);
 		this.missing = decodeColor(colorSetNode.get("missing",
 				default_missingColor));
 		this.empty = decodeColor(colorSetNode.get("empty", default_emptyColor));
 
-		int colorNum = colorSetNode.getInt("colorNum", default_colors.length);
-		/* 
+		final int colorNum = colorSetNode.getInt("colorNum",
+				default_colors.length);
+		/*
 		 * default colors/ fracs is always length 3. The original code here
-		 * produced ArrayIndexOutOfBoundsExceptions if the user adds
-		 * colors and makes colorNum > 3
+		 * produced ArrayIndexOutOfBoundsExceptions if the user adds colors and
+		 * makes colorNum > 3
 		 */
 		for (int i = 0; i < colorNum; i++) {
 			colorList.add(decodeColor(colorSetNode.get("Color" + i + 1,
-					default_colors[0])));//default_colors[i])));
+					default_colors[0])));// default_colors[i])));
 		}
 		for (int i = 0; i < colorNum; i++) {
 			fractionList.add(new Double(colorSetNode.getFloat("Fraction" + i
-					+ 1, default_fractions[1])));//default_fractions[i])));
+					+ 1, default_fractions[1])));// default_fractions[i])));
 		}
 	}
 
 	/**
 	 * Constructor for the ColorSet object
-	 * 
+	 *
 	 * @param name
 	 *            inital name
 	 * @param color1
@@ -141,11 +142,11 @@ public class ColorSet {
 		// final String name, final List<Color> colorList,
 		// final List<Double> fractionList, final Color missing,
 		// final Color empty
-		List<Color> newColorList = new ArrayList<Color>();
+		final List<Color> newColorList = new ArrayList<Color>();
 		newColorList.add(decodeColor(color1));
 		newColorList.add(decodeColor(color2));
 		newColorList.add(decodeColor(color3));
-		List<Double> newFractionList = new ArrayList<Double>();
+		final List<Double> newFractionList = new ArrayList<Double>();
 		newFractionList.add(0.0);
 		newFractionList.add(0.5);
 		newFractionList.add(1.0);
@@ -159,11 +160,11 @@ public class ColorSet {
 
 	/**
 	 * Copy Constructor
-	 * 
+	 *
 	 * @param another
 	 */
-	public ColorSet(ColorSet another) {
-		
+	public ColorSet(final ColorSet another) {
+
 		this.name = another.name;
 		this.colorList = another.colorList;
 		this.fractionList = another.fractionList;
@@ -173,26 +174,26 @@ public class ColorSet {
 
 	/**
 	 * Save ColorSet to ConfigNode
-	 * 
+	 *
 	 * @param Preferences
 	 *            colorSetNode Preferences node to store ColorSet in
 	 */
-	public void save(Preferences colorSetNode) {
-		
+	public void save(final Preferences colorSetNode) {
+
 		colorSetNode.put("name", this.name);
-		
-		int colorNum = colorList.size();
+
+		final int colorNum = colorList.size();
 		colorSetNode.putInt("colorNum", colorNum);
-		
+
 		for (int i = 0; i < colorNum; i++) {
 			colorSetNode.put("Color" + i + 1, encodeColor(colorList.get(i)));
 		}
-		
+
 		for (int i = 0; i < colorNum; i++) {
 			colorSetNode.putFloat("Fraction" + i + 1, fractionList.get(i)
 					.floatValue());
 		}
-		
+
 		colorSetNode.put("missing", encodeColor(this.missing));
 		colorSetNode.put("empty", encodeColor(this.empty));
 	}
@@ -218,22 +219,22 @@ public class ColorSet {
 				+ getEmpty().toString() + "\t";
 	}
 
-	public void setMissing(Color missing) {
+	public void setMissing(final Color missing) {
 		this.missing = missing;
 	}
 
-	public void setEmpty(Color empty) {
+	public void setEmpty(final Color empty) {
 		this.empty = empty;
 	}
 
 	/**
 	 * Retrieves hex representations of colors
-	 * 
+	 *
 	 * @return String[]
 	 */
 	public String[] getColors() {
 
-		int colorNum = colorList.size();
+		final int colorNum = colorList.size();
 		final String[] colors = new String[colorNum];
 
 		for (int i = 0; i < colorNum; i++) {
@@ -255,16 +256,16 @@ public class ColorSet {
 
 	/**
 	 * Retrieves the fraction values stored in the current configNode.
-	 * 
+	 *
 	 * @return
 	 */
 	public float[] getFractions() {
 
-		int colorNum = colorList.size();
+		final int colorNum = colorList.size();
 		final float[] fractions = new float[colorNum];
 
 		for (int i = 0; i < colorNum; i++) {
-			fractions[i] = (Float) fractionList.get(i).floatValue();
+			fractions[i] = fractionList.get(i).floatValue();
 		}
 
 		return fractions;
@@ -296,7 +297,7 @@ public class ColorSet {
 
 	/**
 	 * Convert a color from a hex string to a Java <code>Color</code> object.
-	 * 
+	 *
 	 * @param colorString
 	 *            hex string, such as #FF11FF
 	 * @return The corresponding java color object.
@@ -308,7 +309,7 @@ public class ColorSet {
 
 	/**
 	 * Convert a java <code>Color</code> object to a hex string.
-	 * 
+	 *
 	 * @param color
 	 *            A java color object
 	 * @return The corresponding hex string
@@ -376,7 +377,7 @@ public class ColorSet {
 	 * as RBGA values specifying red, green, blue and alpha values from 0-255
 	 * (00 - FF in base 16) for up-regulated genes, the next four are the values
 	 * for unchanged, then down regulated, then the color for missing values.
-	 * 
+	 *
 	 * @param file
 	 *            file to load from
 	 * @exception IOException
@@ -389,7 +390,7 @@ public class ColorSet {
 
 	/**
 	 * extract values from Eisen-formatted file
-	 * 
+	 *
 	 * @param file
 	 *            file to load from
 	 * @exception IOException
@@ -404,7 +405,7 @@ public class ColorSet {
 
 	/**
 	 * save values to Eisen-formatted file specified by the String
-	 * 
+	 *
 	 * @param file
 	 *            file to store to
 	 * @exception IOException
@@ -417,7 +418,7 @@ public class ColorSet {
 
 	/**
 	 * save values to Eisen-formatted file sp
-	 * 
+	 *
 	 * @param file
 	 *            file to store to
 	 * @exception IOException

@@ -1,9 +1,9 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.Dialog;
+import java.awt.Frame;
 
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -19,18 +19,18 @@ public class LabelLoadDialog {
 	private final JPanel mainPanel;
 	private final JProgressBar pBar;
 
-	public LabelLoadDialog(String type) {
+	public LabelLoadDialog(final String type) {
 
 		labelLoadFrame = new JDialog();
 		labelLoadFrame.setTitle(StringRes.dlg_loadLabels);
 		labelLoadFrame
-				.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		labelLoadFrame.setResizable(false);
 		labelLoadFrame.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
 
 		mainPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, null);
 
-		prompt = GUIFactory.createLabel("Loading new " + type + " labels...", 
+		prompt = GUIFactory.createLabel("Loading new " + type + " labels...",
 				GUIFactory.FONTM);
 
 		pBar = GUIFactory.createPBar();
@@ -40,12 +40,12 @@ public class LabelLoadDialog {
 
 		labelLoadFrame.getContentPane().add(mainPanel);
 		labelLoadFrame.pack();
-		labelLoadFrame.setLocationRelativeTo(JFrame.getFrames()[0]);
+		labelLoadFrame.setLocationRelativeTo(Frame.getFrames()[0]);
 	}
 
 	/**
 	 * Sets the visibility of exitFrame;
-	 * 
+	 *
 	 * @param visible
 	 */
 	public void setVisible(final boolean visible) {

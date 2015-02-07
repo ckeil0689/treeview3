@@ -16,7 +16,7 @@ import java.io.IOException;
 /**
  * A frame that displays an image. Create an ImageFrame, then use one of the
  * setImage() methods to show the image.
- * 
+ *
  * @version 0.90 19 Sep 2000
  * @author <a href="http://www.gurge.com/amd/">Adam Doppelt</a>
  */
@@ -52,10 +52,9 @@ public class ImageFrame extends Frame {
 			e.printStackTrace();
 		}
 
-		if (tracker.statusID(0, true) != MediaTracker.COMPLETE) {
+		if (tracker.statusID(0, true) != MediaTracker.COMPLETE)
 			throw new IOException("Could not load: " + file + " "
 					+ tracker.statusID(0, true));
-		}
 
 		setTitle(file.getName());
 		setImage(image);

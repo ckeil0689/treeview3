@@ -16,11 +16,11 @@ import edu.stanford.genetics.treeview.UrlExtractor;
 public class ColumnLabelView extends LabelView {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private int oldHeight = 0;
 
 	public ColumnLabelView() {
-		
+
 		super(LabelView.COL);
 	}
 
@@ -31,35 +31,37 @@ public class ColumnLabelView extends LabelView {
 		headerSummary.setIncluded(new int[] { 0 });
 		headerSummary.addObserver(this);
 	}
-	
+
 	@Override
 	public void setJustifyOption(final boolean isRightJustified) {
-		
+
 		super.setJustifyOption(isRightJustified);
-		
-		/* 
-		 * Absolutely HAS to be via Runnable. Otherwise adding/ removing 
+
+		/*
+		 * Absolutely HAS to be via Runnable. Otherwise adding/ removing
 		 * components in DendroView will reset whatever was set here.
 		 */
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-			   
-			public void run() { 
-			       
-				if(isRightJustified) {
+
+			@Override
+			public void run() {
+
+				if (isRightJustified) {
 					scrollPane.getVerticalScrollBar().setValue(0);
 				} else {
-					int scrollMax = scrollPane.getVerticalScrollBar().getMaximum();
+					final int scrollMax = scrollPane.getVerticalScrollBar()
+							.getMaximum();
 					scrollPane.getVerticalScrollBar().setValue(scrollMax);
 				}
 			}
 		});
-		
+
 		repaint();
 	}
-	
+
 	@Override
-	public void setConfigNode(Preferences parentNode) {
-		
+	public void setConfigNode(final Preferences parentNode) {
+
 		if (parentNode != null) {
 			super.setConfigNode(parentNode.node("ColLabelView"));
 
@@ -68,10 +70,10 @@ public class ColumnLabelView extends LabelView {
 					+ "node because parentNode was null.");
 		}
 	}
-	
+
 	@Override
-	public void update(Observable o, Object arg) {
-		
+	public void update(final Observable o, final Object arg) {
+
 		if (o == map) {
 			selectionChanged(); // gene locations changed
 
@@ -85,7 +87,7 @@ public class ColumnLabelView extends LabelView {
 			LogBuffer.println("LabelView got funny update!");
 		}
 	}
-	
+
 	/**
 	 * This method is called when the selection is changed. It causes the
 	 * component to recalculate it's width, and call repaint.
@@ -93,7 +95,7 @@ public class ColumnLabelView extends LabelView {
 	protected void selectionChanged() {
 
 		offscreenValid = false;
-		
+
 		final int start = 0;
 		final int end = headerInfo.getNumHeaders();
 
@@ -103,11 +105,15 @@ public class ColumnLabelView extends LabelView {
 		for (int j = start; j < end; j++) {
 
 			final String out = headerSummary.getSummary(headerInfo, j);
-			
-			if (out == null) continue;
+
+			if (out == null) {
+				continue;
+			}
 
 			final int length = fontMetrics.stringWidth(out);
-			if (maxlength < length) maxlength = length;
+			if (maxlength < length) {
+				maxlength = length;
+			}
 		}
 
 		final Rectangle visible = getVisibleRect();
@@ -122,14 +128,14 @@ public class ColumnLabelView extends LabelView {
 		}
 		oldHeight = maxlength;
 	}
-	
+
 	@Override
 	public void mouseMoved(final MouseEvent e) {
-		
+
 		hoverIndex = map.getIndex(e.getX());
 		repaint();
 	}
-	
+
 	/**
 	 * Starts external browser if the urlExtractor is enabled.
 	 */
@@ -148,27 +154,27 @@ public class ColumnLabelView extends LabelView {
 		// if (map.contains(index)) {
 		// viewFrame.displayURL(urlExtractor.getUrl(index));
 		// }
-		final int index = map.getIndex(e.getX()); 
-		
-		if(SwingUtilities.isLeftMouseButton(e)) {
+		final int index = map.getIndex(e.getX());
+
+		if (SwingUtilities.isLeftMouseButton(e)) {
 			if (geneSelection.getNSelectedIndexes() == geneSelection
 					.getNumIndexes() && arraySelection.isIndexSelected(index)) {
 				geneSelection.deselectAllIndexes();
 				arraySelection.deselectAllIndexes();
-	
+
 			} else if (geneSelection.getNSelectedIndexes() > 0) {
-				if(!e.isShiftDown()) {
+				if (!e.isShiftDown()) {
 					geneSelection.deselectAllIndexes();
 					arraySelection.deselectAllIndexes();
 				}
 				arraySelection.setIndexSelection(index, true);
 				geneSelection.selectAllIndexes();
-	
+
 			} else {
 				arraySelection.setIndexSelection(index, true);
 				geneSelection.selectAllIndexes();
 			}
-		}else {
+		} else {
 			geneSelection.deselectAllIndexes();
 			arraySelection.deselectAllIndexes();
 		}

@@ -9,7 +9,7 @@
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
  *
- * This software is provided under the GNU GPL Version 2. In particular, 
+ * This software is provided under the GNU GPL Version 2. In particular,
  *
  * 1) If you modify a source file, make a comment in it containing your name and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
@@ -18,7 +18,7 @@
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
  *
- * END_HEADER 
+ * END_HEADER
  */
 package edu.stanford.genetics.treeview;
 
@@ -33,9 +33,9 @@ import javax.swing.JTextArea;
 /**
  * The purpose of this class is to collect all the messy special-case code for
  * exporting to bitmap images from java.
- * 
+ *
  * Unlike the PpmWriter, it is fairly specific to Java Treeview.
- * 
+ *
  * It will consist entirely of static methods
  */
 public class BitmapWriter {
@@ -44,7 +44,7 @@ public class BitmapWriter {
 	/**
 	 * write image in the specified format to the output stream, popping up
 	 * dialogs with specified parent in the event of a problem.
-	 * 
+	 *
 	 */
 	public static boolean writeBitmap(final BufferedImage i,
 			final String format, final OutputStream output,
@@ -89,38 +89,38 @@ public class BitmapWriter {
 
 	/**
 	 * return true on success, false on failure.
-	 * 
+	 *
 	 * may throw up warning screens or messages using parent.
 	 */
 	public static boolean writeJpg(final BufferedImage i,
 			final OutputStream output, final JComponent parent)
-			throws java.io.IOException {
+					throws java.io.IOException {
 		final String version = System.getProperty("java.version");
 		if (version.startsWith("1.4.0") || version.startsWith("1.4.1")) {
 			JOptionPane
-					.showMessageDialog(
-							parent,
-							new JTextArea(
-									"You are using Java Version "
-											+ version
-											+ "\n which has known issues with JPEG export. \nPlease try PNG format or upgrade to 1.4.2 or later if this export fails."));
+			.showMessageDialog(
+					parent,
+					new JTextArea(
+							"You are using Java Version "
+									+ version
+									+ "\n which has known issues with JPEG export. \nPlease try PNG format or upgrade to 1.4.2 or later if this export fails."));
 		}
 
 		try {
 			ImageIO.write(i, "jpg", output);
 		} catch (final Exception e) {
 			JOptionPane
-					.showMessageDialog(
-							parent,
-							new JTextArea(
-									"Problem Saving JPEG "
-											+ e
-											+ "\n"
-											+ "Jpeg export requires Java Version 1.4.1 or better.\n"
-											+ "You are running "
-											+ version
-											+ "\n"
-											+ "If problem persists, try PPM format, which should always work"));
+			.showMessageDialog(
+					parent,
+					new JTextArea(
+							"Problem Saving JPEG "
+									+ e
+									+ "\n"
+									+ "Jpeg export requires Java Version 1.4.1 or better.\n"
+									+ "You are running "
+									+ version
+									+ "\n"
+									+ "If problem persists, try PPM format, which should always work"));
 			return false;
 		}
 		return true;
@@ -128,29 +128,29 @@ public class BitmapWriter {
 
 	/**
 	 * return true on success, false on failure.
-	 * 
+	 *
 	 * may throw up warning screens or messages using parent.
 	 */
 	public static boolean writePng(final BufferedImage i,
 			final OutputStream output, final JComponent parent)
-			throws java.io.IOException {
+					throws java.io.IOException {
 		final String version = System.getProperty("java.version");
 
 		try {
 			ImageIO.write(i, "png", output);
 		} catch (final Exception e) {
 			JOptionPane
-					.showMessageDialog(
-							parent,
-							new JTextArea(
-									"Problem Saving PNG "
-											+ e
-											+ " \n"
-											+ "Png export requires Java Version 1.4.1 or better.\n"
-											+ "You are running "
-											+ version
-											+ "\n"
-											+ "If problem persists, try PPM format, which should always work"));
+			.showMessageDialog(
+					parent,
+					new JTextArea(
+							"Problem Saving PNG "
+									+ e
+									+ " \n"
+									+ "Png export requires Java Version 1.4.1 or better.\n"
+									+ "You are running "
+									+ version
+									+ "\n"
+									+ "If problem persists, try PPM format, which should always work"));
 			return false;
 		}
 		return true;

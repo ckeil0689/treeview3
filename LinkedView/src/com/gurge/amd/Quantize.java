@@ -11,9 +11,9 @@ package com.gurge.amd;
  * are placed into an oct tree. The oct tree is reduced in size, and the pixels
  * from the original image are reassigned to the nodes in the reduced tree.
  * <p>
- * 
+ *
  * Here is the copyright notice from ImageMagick:
- * 
+ *
  * <pre>
  * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  * %  Permission is hereby granted, free of charge, to any person obtaining a    %
@@ -41,8 +41,8 @@ package com.gurge.amd;
  * %                                                                             %
  * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  * </pre>
- * 
- * 
+ *
+ *
  * @version 0.90 19 Sep 2000
  * @author <a href="http://www.gurge.com/amd/">Adam Doppelt</a>
  */
@@ -205,7 +205,7 @@ public class Quantize {
 	/**
 	 * Reduce the image to the given number of colors. The pixels are reduced in
 	 * place.
-	 * 
+	 *
 	 * @return The new color palette.
 	 */
 	public static int[] quantizeImage(final int pixels[][], final int max_colors) {
@@ -263,25 +263,25 @@ public class Quantize {
 		 * root node to allow representing each possible input color in a leaf.
 		 * This becomes prohibitive because the tree's total number of nodes is
 		 * 1 + sum(i=1,k,8k).
-		 * 
+		 *
 		 * A complete tree would require 19,173,961 nodes for k = 8, cmax = 255.
 		 * Therefore, to avoid building a fully populated tree, QUANTIZE: (1)
 		 * Initializes data structures for nodes only as they are needed; (2)
 		 * Chooses a maximum depth for the tree as a function of the desired
 		 * number of colors in the output image (currently log2(colormap size)).
-		 * 
+		 *
 		 * For each pixel in the input image, classification scans downward from
 		 * the root of the color description tree. At each level of the tree it
 		 * identifies the single node which represents a cube in RGB space
 		 * containing It updates the following data for each such node:
-		 * 
+		 *
 		 * number_pixels : Number of pixels whose color is contained in the RGB
 		 * cube which this node represents;
-		 * 
+		 *
 		 * unique : Number of pixels whose color is not represented in a node at
 		 * lower depth in the tree; initially, n2 = 0 for all nodes except
 		 * leaves of the tree.
-		 * 
+		 *
 		 * total_red/green/blue : Sums of the red, green, and blue component
 		 * values for all pixels not classified at a lower depth. The
 		 * combination of these sums and n2 will ultimately characterize the
@@ -314,7 +314,7 @@ public class Quantize {
 					for (int level = 1; level <= depth; ++level) {
 						final int id = (((red > node.mid_red ? 1 : 0) << 0)
 								| ((green > node.mid_green ? 1 : 0) << 1) | ((blue > node.mid_blue ? 1
-								: 0) << 2));
+										: 0) << 2));
 						if (node.child[id] == null) {
 							new Node(node, id, level);
 						}
@@ -334,7 +334,7 @@ public class Quantize {
 		 * reduction repeatedly prunes the tree until the number of nodes with
 		 * unique > 0 is less than or equal to the maximum number of colors
 		 * allowed in the output image.
-		 * 
+		 *
 		 * When a node to be pruned has offspring, the pruning procedure invokes
 		 * itself recursively in order to prune the tree from the leaves upward.
 		 * The statistics of the node being pruned are always added to the
@@ -363,13 +363,13 @@ public class Quantize {
 		 * array of color descriptions (RGB triples) for each color present in
 		 * the output image; (2) A pixel array, which represents each pixel as
 		 * an index into the color map array.
-		 * 
+		 *
 		 * First, the assignment phase makes one pass over the pruned color
 		 * description tree to establish the image's color map. For each node
 		 * with n2 > 0, it divides Sr, Sg, and Sb by n2. This produces the mean
 		 * color of all pixels that classify no lower than this node. Each of
 		 * these colors becomes an entry in the color map.
-		 * 
+		 *
 		 * Finally, the assignment phase reclassifies each pixel in the pruned
 		 * tree to identify the deepest node containing the pixel's color. The
 		 * pixel's value in the pixel array becomes the index of this node's
@@ -401,7 +401,7 @@ public class Quantize {
 					for (;;) {
 						final int id = (((red > node.mid_red ? 1 : 0) << 0)
 								| ((green > node.mid_green ? 1 : 0) << 1) | ((blue > node.mid_blue ? 1
-								: 0) << 2));
+										: 0) << 2));
 						if (node.child[id] == null) {
 							break;
 						}
@@ -468,8 +468,8 @@ public class Quantize {
 				this.number_pixels = Integer.MAX_VALUE;
 
 				this.mid_red = (MAX_RGB + 1) >> 1;
-				this.mid_green = (MAX_RGB + 1) >> 1;
-				this.mid_blue = (MAX_RGB + 1) >> 1;
+								this.mid_green = (MAX_RGB + 1) >> 1;
+								this.mid_blue = (MAX_RGB + 1) >> 1;
 			}
 
 			Node(final Node parent, final int id, final int level) {
@@ -531,7 +531,7 @@ public class Quantize {
 			/**
 			 * Remove any nodes that have fewer than threshold pixels. Also, as
 			 * long as we're walking the tree:
-			 * 
+			 *
 			 * - figure out the color with the fewest pixels - recalculate the
 			 * total number of colors in the tree
 			 */
@@ -612,7 +612,7 @@ public class Quantize {
 					final int g, final int b) {
 				return (SQUARES[((color >> 16) & 0xFF) - r + MAX_RGB]
 						+ SQUARES[((color >> 8) & 0xFF) - g + MAX_RGB] + SQUARES[((color >> 0) & 0xFF)
-						- b + MAX_RGB]);
+						                                                         - b + MAX_RGB]);
 			}
 
 			@Override

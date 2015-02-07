@@ -9,7 +9,7 @@
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
  *
- * This software is provided under the GNU GPL Version 2. In particular, 
+ * This software is provided under the GNU GPL Version 2. In particular,
  *
  * 1) If you modify a source file, make a comment in it containing your name and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
@@ -18,7 +18,7 @@
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
  *
- * END_HEADER 
+ * END_HEADER
  */
 package edu.stanford.genetics.treeview;
 
@@ -27,7 +27,6 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Window;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Observer;
@@ -39,12 +38,12 @@ import javax.swing.JPanel;
 
 /**
  * superclass, to hold info and code common to all model views
- * 
+ *
  * This currently consists of buffer management, status and hints panels.
  * Interestingly, but necessarily, it has no dependency on any models.
  */
 public abstract class ModelView extends JPanel implements Observer,
-		MouseListener {
+MouseListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -74,7 +73,7 @@ public abstract class ModelView extends JPanel implements Observer,
 	/**
 	 * viewName, returns name of view suitable for printing perhaps this should
 	 * be replaced by reflection?
-	 * 
+	 *
 	 * @return String containing name of view.
 	 */
 	public abstract String viewName();
@@ -97,7 +96,7 @@ public abstract class ModelView extends JPanel implements Observer,
 
 	/**
 	 * Strings describing status to user, suitable for display.
-	 * 
+	 *
 	 * @return Array of strings, representing status
 	 */
 	public String[] getStatus() {
@@ -118,11 +117,11 @@ public abstract class ModelView extends JPanel implements Observer,
 	/**
 	 * Update the double buffer, if buffered. Otherwise, just called by
 	 * paintComponent to paint the main component.
-	 * 
+	 *
 	 * called only when offscreen buffer is marked as invalid, or if the
 	 * onscreen size has changed.
-	 * 
-	 * 
+	 *
+	 *
 	 * note: now actually called by paintcomponent to update the swing double
 	 * buffer.
 	 */
@@ -146,7 +145,8 @@ public abstract class ModelView extends JPanel implements Observer,
 		g.fillRect(clip.x, clip.y, clip.width, clip.height);
 
 		final Dimension reqSize = getSize();
-		if (reqSize == null) return;
+		if (reqSize == null)
+			return;
 
 		// monitor size changes
 		if ((offscreenSize == null) || (reqSize.width != offscreenSize.width)
@@ -167,7 +167,7 @@ public abstract class ModelView extends JPanel implements Observer,
 	 * This call is to be used to add a quick addition to the component which
 	 * you don't want to put on the doublebuffer. The composite could
 	 * potentially be another buffer.
-	 * 
+	 *
 	 * Currently, this is only used by globalview for adding the zoom rect and
 	 * focus rect.
 	 */

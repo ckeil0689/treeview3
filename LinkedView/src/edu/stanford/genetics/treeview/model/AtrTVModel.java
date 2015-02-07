@@ -2,9 +2,9 @@
  *
  * $Author: avsegal
  * $RCSfile: AtrTVModel.java
- * $Revision: 
+ * $Revision:
  * $Date: Jun 25, 2004
- * $Name:  
+ * $Name:
  *
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
@@ -36,7 +36,7 @@ import java.util.prefs.Preferences;
 public class AtrTVModel extends TVModel {
 
 	/**
-	 * 
+	 *
 	 */
 	public AtrTVModel() {
 		super();
@@ -77,13 +77,13 @@ public class AtrTVModel extends TVModel {
 		return null;
 	}
 
-//	@Override
-//	public void loadNew(final FileSet fileSet) throws LoadException {
-//		resetState();
-//		setSource(fileSet);
-//		final AtrTVModelLoader loader = new AtrTVModelLoader(this);
-//		// loader.loadInto();
-//		loader.load();
-//	}
+	// @Override
+	// public void loadNew(final FileSet fileSet) throws LoadException {
+	// resetState();
+	// setSource(fileSet);
+	// final AtrTVModelLoader loader = new AtrTVModelLoader(this);
+	// // loader.loadInto();
+	// loader.load();
+	// }
 
 }

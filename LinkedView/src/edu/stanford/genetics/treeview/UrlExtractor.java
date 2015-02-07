@@ -9,7 +9,7 @@
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
  *
- * This software is provided under the GNU GPL Version 2. In particular, 
+ * This software is provided under the GNU GPL Version 2. In particular,
  *
  * 1) If you modify a source file, make a comment in it containing your name and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
@@ -18,7 +18,7 @@
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
  *
- * END_HEADER 
+ * END_HEADER
  */
 package edu.stanford.genetics.treeview;
 
@@ -31,7 +31,7 @@ import java.util.prefs.Preferences;
  * a configuration window.
  */
 public class UrlExtractor {
-	
+
 	// does the user actually want linking to happen?
 	private boolean isEnabled;
 	private boolean isDefaultEnabled = true;
@@ -46,10 +46,10 @@ public class UrlExtractor {
 	private int dindex = 1;
 
 	private HeaderInfo headerInfo;
-	
+
 	private Preferences root;
 	UrlPresets uPresets;
-	
+
 	/**
 	 * This class must be constructed around gene header info
 	 */
@@ -84,8 +84,9 @@ public class UrlExtractor {
 		index = root.getInt("index", dindex);
 		// some shennanigans since I can't store booleans in a confignode...
 		int ide = 0;
-		if (isDefaultEnabled == true)
+		if (isDefaultEnabled == true) {
 			ide = 1;
+		}
 		isEnabled = (root.getInt("isEnabled", ide) == 1);
 	}
 
@@ -112,8 +113,9 @@ public class UrlExtractor {
 		if (headers == null)
 			return null;
 		String tmpTemplate = uPresets.getTemplateByHeader(header);
-		if (tmpTemplate == null)
+		if (tmpTemplate == null) {
 			tmpTemplate = urlTemplate;
+		}
 		return substitute(tmpTemplate, headers[index]);
 	}
 
@@ -149,8 +151,9 @@ public class UrlExtractor {
 	// accessors
 	public void setIndex(final int i) {
 		index = i;
-		if (root != null)
+		if (root != null) {
 			root.putInt("index", index);
+		}
 	}
 
 	public int getIndex() {
@@ -159,8 +162,9 @@ public class UrlExtractor {
 
 	public void setUrlTemplate(final String c) {
 		urlTemplate = c;
-		if (root != null)
+		if (root != null) {
 			root.put("urlTemplate", urlTemplate);
+		}
 	}
 
 	public String getUrlTemplate() {
@@ -181,17 +185,17 @@ public class UrlExtractor {
 
 	public void setEnabled(final boolean b) {
 		isEnabled = b;
-		// some shennanigans since I can't store booleans in a confignode...
-		int ide = 0;
-		if (isDefaultEnabled == true)
-			ide = 1;
+		if (isDefaultEnabled == true) {
+		}
 
 		int ie = 0;
-		if (isEnabled == true)
+		if (isEnabled == true) {
 			ie = 1;
+		}
 
-		if (root != null)
+		if (root != null) {
 			root.putInt("isEnabled", ie);
+		}
 
 	}
 

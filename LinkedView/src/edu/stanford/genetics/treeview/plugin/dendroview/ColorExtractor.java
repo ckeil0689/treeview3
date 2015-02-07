@@ -24,7 +24,6 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Observable;
 import java.util.prefs.BackingStoreException;
@@ -37,19 +36,19 @@ import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
  * The purpose of this class is to convert a data value into a color.
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version @version $Revision: 1.2 $ $Date: 2007-07-13 02:33:47 $
  */
 
 public class ColorExtractor extends Observable implements ConfigNodePersistent,
-		ContrastSelectable {
+ContrastSelectable {
 
 	private ColorSet defaultColorSet;
 	private final double default_contrast = 3.0;
 	private ColorSet colorSet = null;// new ColorSet();// Will be backed by
-										// confignode when we
-										// get one...
+	// confignode when we
+	// get one...
 	private boolean m_logTranform = false;
 	private double m_logCenter = 1.0;
 	private double m_logBaseDivisor;
@@ -79,9 +78,9 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 
 		// set a default defaultColorSet... should be superceded by a user
 		// setting...
-//		 defaultColorSet = new ColorSet();
-//		 defaultColorSet.setMissing(ColorSet.decodeColor("#909090"));
-//		 defaultColorSet.setEmpty(ColorSet.decodeColor("#FFFFFF"));
+		// defaultColorSet = new ColorSet();
+		// defaultColorSet.setMissing(ColorSet.decodeColor("#909090"));
+		// defaultColorSet.setEmpty(ColorSet.decodeColor("#FFFFFF"));
 		colorList_default = new ArrayList<Color>();
 		colorList_default.add(Color.red);
 		colorList_default.add(Color.black);
@@ -168,7 +167,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	/**
 	 * binds this ColorExtractor to a particular ConfigNode. This makes colors
 	 * persistent
-	 * 
+	 *
 	 * @param configNode
 	 *            confignode to bind to
 	 */
@@ -190,14 +189,14 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 						"activeColors", lastActive);
 			}
 			Boolean foundColorSet = false;
-			
-			for (int i = 0; i < ColorPresets.defaultColorSets.length; i++) {
-				if (ColorPresets.defaultColorSets[i].getName().equalsIgnoreCase(lastActive)) {
-					colorSet = new ColorSet(ColorPresets.defaultColorSets[i]);
+
+			for (final ColorSet defaultColorSet2 : ColorPresets.defaultColorSets) {
+				if (defaultColorSet2.getName().equalsIgnoreCase(lastActive)) {
+					colorSet = new ColorSet(defaultColorSet2);
 					foundColorSet = true;
 				}
 			}
-			
+
 			if (!foundColorSet) {
 				// Set colorList and fractionList here, based on what the last
 				// active
@@ -206,12 +205,12 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 						.node("ColorPresets");
 				final String[] childrenNodes = colorPresetNode.childrenNames();
 
-				for (int i = 0; i < childrenNodes.length; i++) {
-					if (colorPresetNode.node(childrenNodes[i])
+				for (final String childrenNode : childrenNodes) {
+					if (colorPresetNode.node(childrenNode)
 							.get("name", lastActive)
 							.equalsIgnoreCase(lastActive)) {
 						colorSet = new ColorSet(
-								colorPresetNode.node(childrenNodes[i]));
+								colorPresetNode.node(childrenNode));
 						foundColorSet = true;
 						break;
 					}
@@ -245,7 +244,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 
 	/**
 	 * Set contrast value for future draws
-	 * 
+	 *
 	 * @param contrastValue
 	 *            The desired contrast value
 	 */
@@ -317,7 +316,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 
 	/**
 	 * Get contrast value
-	 * 
+	 *
 	 * @return contrastValue The current contrast value
 	 */
 	@Override
@@ -331,14 +330,14 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	 * default, missing data is drawn gray and empty data is drawn white. Empty
 	 * data only occurs in some KNN views right now, and means that the square
 	 * does not represent data, and is only there as a spacer.
-	 * 
+	 *
 	 * @param missing
 	 *            The new missing value
 	 * @param empty
 	 *            The new empty value
 	 */
 	public void setMissing(final double missing, final double empty) {
-		
+
 		this.nodata = missing;
 		this.empty = empty;
 
@@ -349,7 +348,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	 * The color for missing data.
 	 */
 	public Color getMissing() {
-		
+
 		return colorSet.getMissing();
 	}
 
@@ -358,11 +357,11 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	 * data, like in the KnnView. These cells are just used for spacing.
 	 */
 	public Color getEmpty() {
-		
+
 		return colorSet.getEmpty();
 	}
-	
-	/* Imports colors from the current colorSet object to local variables */ 
+
+	/* Imports colors from the current colorSet object to local variables */
 	private void synchFloats() {
 
 		synchFloats(colorSet.getMissing(), missingColor);
@@ -370,8 +369,8 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	}
 
 	/* Sets local variables' values from the colorSet object's colors */
-	private void synchFloats(final Color newColor, float[] comp) {
-		
+	private void synchFloats(final Color newColor, final float[] comp) {
+
 		comp[0] = (float) newColor.getRed() / 256;
 		comp[1] = (float) newColor.getGreen() / 256;
 		comp[2] = (float) newColor.getBlue() / 256;
@@ -381,10 +380,9 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	 * The color for missing data.
 	 */
 	public void setMissingColor(final String newString) {
-	
-		if (ColorSet.encodeColor(colorSet.getMissing()).equals(newString)) {
+
+		if (ColorSet.encodeColor(colorSet.getMissing()).equals(newString))
 			return;
-		}
 		colorSet.setMissing(ColorSet.decodeColor(newString));
 		synchFloats(colorSet.getMissing(), missingColor);
 		setChanged();
@@ -394,13 +392,11 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	 * The empty is a color to be used for cells which do not correspond to data
 	 */
 	public void setEmptyColor(final String newString) {
-		
-		if (newString == null) {
+
+		if (newString == null)
 			return;
-		}
-		if (ColorSet.encodeColor(colorSet.getEmpty()).equals(newString)) {
+		if (ColorSet.encodeColor(colorSet.getEmpty()).equals(newString))
 			return;
-		}
 		colorSet.setEmpty(ColorSet.decodeColor(newString));
 		synchFloats(colorSet.getEmpty(), emptyColor);
 		setChanged();
@@ -410,10 +406,9 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	 * The color for missing data.
 	 */
 	public void setMissingColor(final Color newColor) {
-		
-		if (colorSet.getMissing().equals(newColor)) {
+
+		if (colorSet.getMissing().equals(newColor))
 			return;
-		}
 		colorSet.setMissing(newColor);
 		synchFloats(colorSet.getMissing(), missingColor);
 		setChanged();
@@ -424,12 +419,10 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	 * cells which do not correspond to data
 	 */
 	public void setEmptyColor(final Color newColor) {
-		if (newColor == null) {
+		if (newColor == null)
 			return;
-		}
-		if (colorSet.getEmpty().equals(newColor)) {
+		if (colorSet.getEmpty().equals(newColor))
 			return;
-		}
 		colorSet.setEmpty(newColor);
 		synchFloats(colorSet.getEmpty(), emptyColor);
 		setChanged();
@@ -437,7 +430,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 
 	/**
 	 * Gets the color corresponding to a particular data value.
-	 * 
+	 *
 	 * @param dval
 	 *            double representing value we want color for
 	 * @return The color value
@@ -470,7 +463,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 
 	/**
 	 * Gets the floatColor attribute of the ColorExtractor object
-	 * 
+	 *
 	 * @param dval
 	 *            Description of the Parameter
 	 * @return The floatColor value
@@ -478,15 +471,15 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	public float[] getFloatColor(double dval, final float[] fractionVals,
 			final List<Color> colorVals) {
 
-		if (Helper.nearlyEqual(dval, nodata)) {
+		if (Helper.nearlyEqual(dval, nodata))
 			return missingColor;
-			// return new Color(missingColor[0], missingColor[1],
-			// missingColor[2]);
-		} else if (Helper.nearlyEqual(dval, empty)) {
+		// return new Color(missingColor[0], missingColor[1],
+		// missingColor[2]);
+		else if (Helper.nearlyEqual(dval, empty))
 			// System.out.println("value " + dval + " was empty");
 			return emptyColor;
-			// return new Color(emptyColor[0], emptyColor[1], emptyColor[2]);
-		} else {
+		// return new Color(emptyColor[0], emptyColor[1], emptyColor[2]);
+		else {
 
 			if (m_logTranform) {
 				dval = Math.log(dval / m_logCenter) / m_logBaseDivisor;
@@ -640,16 +633,18 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 
 	/**
 	 * Gets the aRGBColor attribute of the ColorExtractor object
-	 * 
-	 * @param dval Description of the Parameter
-	 * @param isBackground If a row/ column in DoubleArrayDrawer is not selected
-	 * while there exists another selection, it is considered to be in the 
-	 * background.
+	 *
+	 * @param dval
+	 *            Description of the Parameter
+	 * @param isBackground
+	 *            If a row/ column in DoubleArrayDrawer is not selected while
+	 *            there exists another selection, it is considered to be in the
+	 *            background.
 	 * @return The aRGBColor value
 	 */
-	public int getARGBColor(final double dval) { 
+	public int getARGBColor(final double dval) {
 		/* Selection Dimming */
-		//, boolean isBackground) {
+		// , boolean isBackground) {
 
 		final float[] comp;
 		if (fractions.length == 0 || colorList.isEmpty()) {
@@ -658,17 +653,17 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 		} else {
 			comp = getFloatColor(dval, fractions, colorList);
 		}
-		
-		/* 
-		 * Selection dimming 
-		 * If a pixel in DoubleArrayDrawer is in the background, darken the
-		 * RGB color by multiplying R, G, and B values with a fraction.
+
+		/*
+		 * Selection dimming If a pixel in DoubleArrayDrawer is in the
+		 * background, darken the RGB color by multiplying R, G, and B values
+		 * with a fraction.
 		 */
-//		if(isBackground) {
-//			for(int i = 0; i < comp.length; i++) {
-//				comp[i] *= 0.4;
-//			}
-//		}
+		// if(isBackground) {
+		// for(int i = 0; i < comp.length; i++) {
+		// comp[i] *= 0.4;
+		// }
+		// }
 
 		return ((255 << 24) | ((int) (255 * comp[0]) << 16)
 				| ((int) (255 * comp[1]) << 8) | (int) (255 * comp[2]));
@@ -686,7 +681,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 
 	/**
 	 * Returns the names of the current children of this class' root node.
-	 * 
+	 *
 	 * @return
 	 */
 	public String[] getRootChildrenNodes() {
@@ -701,8 +696,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 				e.printStackTrace();
 				return null;
 			}
-		} else {
+		} else
 			return null;
-		}
 	}
 }

@@ -9,7 +9,7 @@
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
  *
- * This software is provided under the GNU GPL Version 2. In particular, 
+ * This software is provided under the GNU GPL Version 2. In particular,
  *
  * 1) If you modify a source file, make a comment in it containing your name and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
@@ -18,7 +18,7 @@
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
  *
- * END_HEADER 
+ * END_HEADER
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
@@ -55,10 +55,10 @@ import edu.stanford.genetics.treeview.ModelViewProduced;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 
 public class GlobalView extends ModelViewProduced implements
-		MouseMotionListener, MouseListener, MouseWheelListener {
+MouseMotionListener, MouseListener, MouseWheelListener {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	public static final int FILL = 0;
 	public static final int EQUAL = 1;
 	public static final int PROPORT = 2;
@@ -73,7 +73,7 @@ public class GlobalView extends ModelViewProduced implements
 			"", "" };
 	private HeaderInfo arrayHI;
 	private HeaderInfo geneHI;
-	
+
 	private HeaderSummary geneSummary;
 	private HeaderSummary arraySummary;
 
@@ -118,13 +118,13 @@ public class GlobalView extends ModelViewProduced implements
 		scrollPane = new JScrollPane(this,
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		
+
 		panel = scrollPane;
 		panel.setBorder(BorderFactory.createEtchedBorder());
 		panel.setBackground(GUIFactory.ELEMENT_HOV);
 
-//		setToolTipText("This Turns Tooltips On");
-		
+		// setToolTipText("This Turns Tooltips On");
+
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addMouseWheelListener(this);
@@ -153,12 +153,12 @@ public class GlobalView extends ModelViewProduced implements
 
 		try {
 			if (xmap.contains(overx) && ymap.contains(overy)) {
-				statustext[0] = "";//"Row: ";
+				statustext[0] = "";// "Row: ";
 
 				if (geneHI != null) {
 					final int realGene = overy;
 					try {
-						statustext[0] += geneSummary.getSummary(geneHI, 
+						statustext[0] += geneSummary.getSummary(geneHI,
 								realGene);
 
 					} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
@@ -168,10 +168,11 @@ public class GlobalView extends ModelViewProduced implements
 						statustext[0] += " (N/A)";
 					}
 				}
-				statustext[1] = "";//"Column: ";
+				statustext[1] = "";// "Column: ";
 				if (arrayHI != null) {
 					try {
-						statustext[1] += arraySummary.getSummary(arrayHI, overx);
+						statustext[1] += arraySummary
+								.getSummary(arrayHI, overx);
 
 					} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 						LogBuffer.println("ArrayIndexOutOfBoundsException "
@@ -202,7 +203,7 @@ public class GlobalView extends ModelViewProduced implements
 
 	/**
 	 * Set geneSelection
-	 * 
+	 *
 	 * @param geneSelection
 	 *            The TreeSelection which is set by selecting genes in the
 	 *            GlobalView
@@ -219,7 +220,7 @@ public class GlobalView extends ModelViewProduced implements
 
 	/**
 	 * Set arraySelection
-	 * 
+	 *
 	 * @param arraySelection
 	 *            The TreeSelection which is set by selecting arrays in the
 	 *            GlobalView
@@ -236,7 +237,7 @@ public class GlobalView extends ModelViewProduced implements
 
 	/**
 	 * Set ArrayDrawer
-	 * 
+	 *
 	 * @param arrayDrawer
 	 *            The ArrayDrawer to be used as a source
 	 */
@@ -249,16 +250,17 @@ public class GlobalView extends ModelViewProduced implements
 		drawer = arrayDrawer;
 		drawer.addObserver(this);
 	}
-	
-	public void setHeaderSummary(HeaderSummary gene, HeaderSummary array) {
-		
+
+	public void setHeaderSummary(final HeaderSummary gene,
+			final HeaderSummary array) {
+
 		this.geneSummary = gene;
 		this.arraySummary = array;
 	}
 
 	/**
 	 * Get ArrayDrawer
-	 * 
+	 *
 	 * @return The current ArrayDrawer
 	 */
 	public ArrayDrawer getArrayDrawer() {
@@ -268,7 +270,7 @@ public class GlobalView extends ModelViewProduced implements
 
 	/**
 	 * DEPRECATE set the xmapping for this view
-	 * 
+	 *
 	 * @param m
 	 *            the new mapping
 	 */
@@ -284,7 +286,7 @@ public class GlobalView extends ModelViewProduced implements
 
 	/**
 	 * DEPRECATE set the ymapping for this view
-	 * 
+	 *
 	 * @param m
 	 *            the new mapping
 	 */
@@ -339,8 +341,8 @@ public class GlobalView extends ModelViewProduced implements
 
 			final Rectangle sourceRect = new Rectangle(xmap.getIndex(0),
 					ymap.getIndex(0), xmap.getIndex(destRect.width)
-							- xmap.getIndex(0), ymap.getIndex(destRect.height)
-							- ymap.getIndex(0));
+					- xmap.getIndex(0), ymap.getIndex(destRect.height)
+					- ymap.getIndex(0));
 
 			if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
 				drawer.paint(g, sourceRect, destRect, null);
@@ -356,7 +358,7 @@ public class GlobalView extends ModelViewProduced implements
 	protected void updatePixels() {
 
 		if (offscreenChanged) {
-//			LogBuffer.println("OFFSCREEN CHANGED");
+			// LogBuffer.println("OFFSCREEN CHANGED");
 			offscreenValid = false;
 			xmap.setAvailablePixels(offscreenSize.width);
 			ymap.setAvailablePixels(offscreenSize.height);
@@ -367,7 +369,7 @@ public class GlobalView extends ModelViewProduced implements
 				ymap.recalculateScale();
 				hasDrawn = true;
 			}
-			
+
 			xmap.notifyObservers();
 			ymap.notifyObservers();
 		}
@@ -376,7 +378,7 @@ public class GlobalView extends ModelViewProduced implements
 			LogBuffer.println("Resetting GV");
 			xmap.setHome();
 			ymap.setHome();
-			
+
 			xmap.notifyObservers();
 			ymap.notifyObservers();
 
@@ -384,30 +386,32 @@ public class GlobalView extends ModelViewProduced implements
 		}
 
 		if (!offscreenValid) {
-//			LogBuffer.println("OFFSCREEN INVALID");
+			// LogBuffer.println("OFFSCREEN INVALID");
 			final Rectangle destRect = new Rectangle(0, 0,
 					xmap.getUsedPixels(), ymap.getUsedPixels());
 
 			final Rectangle sourceRect = new Rectangle(xmap.getIndex(0),
 					ymap.getIndex(0), xmap.getIndex(destRect.width)
-							- xmap.getIndex(0), ymap.getIndex(destRect.height)
-							- ymap.getIndex(0));
+					- xmap.getIndex(0), ymap.getIndex(destRect.height)
+					- ymap.getIndex(0));
 
 			if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
-				/* 
-				 * In case selection dimming should be brought back, 
-				 * there is this code below. 
+				/*
+				 * In case selection dimming should be brought back, there is
+				 * this code below.
 				 */
-//				int[] geneSelections = new int[] {geneSelection.getMinIndex(), 
-//						geneSelection.getMaxIndex()};
-//				int[] arraySelections = new int[] {arraySelection.getMinIndex(), 
-//						arraySelection.getMaxIndex()};
-				
+				// int[] geneSelections = new int[]
+				// {geneSelection.getMinIndex(),
+				// geneSelection.getMaxIndex()};
+				// int[] arraySelections = new int[]
+				// {arraySelection.getMinIndex(),
+				// arraySelection.getMaxIndex()};
+
 				/* Set new offscreenPixels (pixel colors) */
 				drawer.paint(offscreenPixels, sourceRect, destRect,
-						offscreenScanSize); 
+						offscreenScanSize);
 
-				//, geneSelections, arraySelections);
+				// , geneSelections, arraySelections);
 			}
 
 			offscreenSource.newPixels();
@@ -418,17 +422,17 @@ public class GlobalView extends ModelViewProduced implements
 	public synchronized void paintComposite(final Graphics g) {
 
 		if (selectionRectList != null) {
-			
+
 			/* draw all selection rectangles in yellow */
 			g.setColor(Color.yellow);
-			
-			for(Rectangle rect : selectionRectList) {
+
+			for (final Rectangle rect : selectionRectList) {
 				g.drawRect(rect.x, rect.y, rect.width, rect.height);
 			}
 
-			/* 
-			 * draw white selection circle if only 1 tile is selected and
-			 * small enough.
+			/*
+			 * draw white selection circle if only 1 tile is selected and small
+			 * enough.
 			 */
 			if (indicatorCircle != null) {
 				final Graphics2D g2 = (Graphics2D) g;
@@ -451,114 +455,110 @@ public class GlobalView extends ModelViewProduced implements
 			selectionRectList = null;
 			return;
 		}
-		
+
 		selectionRectList = new ArrayList<Rectangle>();
 
-		int[] selectedArrayIndexes = arraySelection.getSelectedIndexes();
-		int[] selectedGeneIndexes = geneSelection.getSelectedIndexes();
-				
-		if(selectedArrayIndexes.length > 0) {
+		final int[] selectedArrayIndexes = arraySelection.getSelectedIndexes();
+		final int[] selectedGeneIndexes = geneSelection.getSelectedIndexes();
 
-			//LogBuffer.println("Selected min array index: [" + selectedArrayIndexes[0] + "] Selected min gene index: [" + selectedGeneIndexes[0] + "].");
+		if (selectedArrayIndexes.length > 0) {
+
+			// LogBuffer.println("Selected min array index: [" +
+			// selectedArrayIndexes[0] + "] Selected min gene index: [" +
+			// selectedGeneIndexes[0] + "].");
 
 			List<List<Integer>> arrayBoundaryList;
 			List<List<Integer>> geneBoundaryList;
 
-			
-			arrayBoundaryList = findRectangleBoundaries(selectedArrayIndexes, 
+			arrayBoundaryList = findRectangleBoundaries(selectedArrayIndexes,
 					xmap);
-			geneBoundaryList = findRectangleBoundaries(selectedGeneIndexes, 
+			geneBoundaryList = findRectangleBoundaries(selectedGeneIndexes,
 					ymap);
-	
+
 			// Make the rectangles
 			if (selectionRectList != null) {
-				for(List<Integer> xBoundaries : arrayBoundaryList) {
-					
-					for(List<Integer> yBoundaries : geneBoundaryList) {
-						
-						selectionRectList.add(new Rectangle(
-								xBoundaries.get(0), 
-								yBoundaries.get(0), 
-								xBoundaries.get(1) - xBoundaries.get(0), 
-								yBoundaries.get(1) - yBoundaries.get(0)));
+				for (final List<Integer> xBoundaries : arrayBoundaryList) {
+
+					for (final List<Integer> yBoundaries : geneBoundaryList) {
+
+						selectionRectList.add(new Rectangle(xBoundaries.get(0),
+								yBoundaries.get(0), xBoundaries.get(1)
+										- xBoundaries.get(0), yBoundaries
+										.get(1) - yBoundaries.get(0)));
 					}
 				}
 			}
-	
+
 			repaint();
 		}
 	}
-	
+
 	/**
 	 * Finds the boundaries needed to draw all selection rectangles
+	 *
 	 * @param selectedIndexes
 	 * @param map
 	 * @return
 	 */
 	protected List<List<Integer>> findRectangleBoundaries(
-			int[] selectedIndexes, MapContainer map) {
-		
-		int sp = 0; 
+			final int[] selectedIndexes, final MapContainer map) {
+
+		int sp = 0;
 		int ep = 0;
-		
-		List<List<Integer>> rangeList = 
-				new ArrayList<List<Integer>>();
-		List<List<Integer>> boundaryList = 
-				new ArrayList<List<Integer>>();
+
+		final List<List<Integer>> rangeList = new ArrayList<List<Integer>>();
+		final List<List<Integer>> boundaryList = new ArrayList<List<Integer>>();
 		List<Integer> rectangleRange = new ArrayList<Integer>();
-		
+
 		/*
 		 * If array is bigger than 1, check how many consecutive labels are
-		 * selected by finding out which elements are only 1 apart.
-		 * Store consecutive indexes separately to make separate rectangles
-		 * later.
+		 * selected by finding out which elements are only 1 apart. Store
+		 * consecutive indexes separately to make separate rectangles later.
 		 */
 		int loopStart = 0;
-		while(loopStart < selectedIndexes.length) {
-			
-			for(int i = loopStart; i < selectedIndexes.length; i++) {
-				
-				int current = selectedIndexes[i];
-				
-				if(rectangleRange.size() == 0 
-						|| rectangleRange.get(
-								rectangleRange.size() - 1) == current - 1) {
+		while (loopStart < selectedIndexes.length) {
+
+			for (int i = loopStart; i < selectedIndexes.length; i++) {
+
+				final int current = selectedIndexes[i];
+
+				if (rectangleRange.size() == 0
+						|| rectangleRange.get(rectangleRange.size() - 1) == current - 1) {
 					rectangleRange.add(current);
 					loopStart = i + 1;
-					
+
 				} else {
 					break;
 				}
 			}
-			
+
 			rangeList.add(rectangleRange);
 			rectangleRange = new ArrayList<Integer>();
 		}
-		
+
 		/*
-		 * For every selection range produce map values 
-		 * (rectangle boundaries) for each rectangle to be drawn.
+		 * For every selection range produce map values (rectangle boundaries)
+		 * for each rectangle to be drawn.
 		 */
-		for(List<Integer> selectionRange : rangeList) {
-			
-			List<Integer> boundaries = new ArrayList<Integer>(2);
-			
+		for (final List<Integer> selectionRange : rangeList) {
+
+			final List<Integer> boundaries = new ArrayList<Integer>(2);
+
 			sp = map.getPixel(selectionRange.get(0));
 			// last pixel of last block
-			ep = map.getPixel(
-					selectionRange.get(selectionRange.size() - 1) + 1) - 1;
-			
+			ep = map.getPixel(selectionRange.get(selectionRange.size() - 1) + 1) - 1;
+
 			if (ep < sp) {
 				ep = sp;
 				// correct for roundoff error above
 			}
-			
+
 			boundaries.add(sp);
 			boundaries.add(ep);
-			
+
 			boundaryList.add(boundaries);
 		}
-		
+
 		return boundaryList;
 	}
 
@@ -575,17 +575,19 @@ public class GlobalView extends ModelViewProduced implements
 					arraySelection.notifyObservers();
 					return;
 				}
-			/* When deselecting a tree node with right click, this matters,
-			 * because in the eventlistener you can only deselect indices
-			 * for the local tree selection. other axis here! */
-			} else if(geneSelection.getNSelectedIndexes() == 0){
+				/*
+				 * When deselecting a tree node with right click, this matters,
+				 * because in the eventlistener you can only deselect indices
+				 * for the local tree selection. other axis here!
+				 */
+			} else if (geneSelection.getNSelectedIndexes() == 0) {
 				arraySelection.deselectAllIndexes();
 				arraySelection.notifyObservers();
 			}
 			recalculateOverlay();
 			drawIndicatorCircle();
-			
-			/* trigger updatePixels()  */
+
+			/* trigger updatePixels() */
 			offscreenValid = false;
 
 		} else if (o == arraySelection) {
@@ -597,16 +599,18 @@ public class GlobalView extends ModelViewProduced implements
 					geneSelection.notifyObservers();
 					return;
 				}
-			/* When deselecting a tree node with right click, this matters,
-			 * because in the eventlistener you can only deselect indices
-			 * for the local tree selection. other axis here! */
-			} else if(arraySelection.getNSelectedIndexes() == 0){
+				/*
+				 * When deselecting a tree node with right click, this matters,
+				 * because in the eventlistener you can only deselect indices
+				 * for the local tree selection. other axis here!
+				 */
+			} else if (arraySelection.getNSelectedIndexes() == 0) {
 				geneSelection.deselectAllIndexes();
 				geneSelection.notifyObservers();
 			}
 			recalculateOverlay();
 			drawIndicatorCircle();
-			
+
 			offscreenValid = false;
 
 		} else if ((o == xmap) || o == ymap) {
@@ -633,7 +637,8 @@ public class GlobalView extends ModelViewProduced implements
 	@Override
 	public void mousePressed(final MouseEvent e) {
 
-		if (!enclosingWindow().isActive()) return;
+		if (!enclosingWindow().isActive())
+			return;
 
 		// if left button is used
 		if (SwingUtilities.isLeftMouseButton(e)) {
@@ -660,21 +665,22 @@ public class GlobalView extends ModelViewProduced implements
 	@Override
 	public void mouseExited(final MouseEvent e) {
 
-		 hasMouse = false;
-		
-		 // Display empty field
-		 statustext[0] = "";
-		 statustext[1] = "";
-		 statustext[2] = "";
-		
-		 status.setMessages(statustext);
+		hasMouse = false;
+
+		// Display empty field
+		statustext[0] = "-";
+		statustext[1] = "-";
+		statustext[2] = "-";
+
+		status.setMessages(statustext);
 	}
 
 	@Override
 	public void mouseReleased(final MouseEvent e) {
 
-		if (!enclosingWindow().isActive()) return;
-		
+		if (!enclosingWindow().isActive())
+			return;
+
 		// When left button is used
 		if (SwingUtilities.isLeftMouseButton(e)) {
 			mouseDragged(e);
@@ -686,13 +692,13 @@ public class GlobalView extends ModelViewProduced implements
 				final Point end = new Point(xmap.getMaxIndex(), endPoint.y);
 				selectRectangle(start, end);
 
-			/* Full array selection */
+				/* Full array selection */
 			} else if (e.isControlDown()) {
 				final Point start = new Point(startPoint.x, ymap.getMinIndex());
 				final Point end = new Point(endPoint.x, ymap.getMaxIndex());
 				selectRectangle(start, end);
-				
-			/* Normal selection */
+
+				/* Normal selection */
 			} else {
 				selectRectangle(startPoint, endPoint);
 			}
@@ -720,14 +726,14 @@ public class GlobalView extends ModelViewProduced implements
 				dragRect.setLocation(xmap.getMinIndex(), startPoint.y);
 				dragRect.setSize(0, 0);
 				dragRect.add(xmap.getMaxIndex(), endPoint.y);
-				
-			/* Full array selection */
+
+				/* Full array selection */
 			} else if (e.isControlDown()) {
 				dragRect.setLocation(startPoint.x, ymap.getMinIndex());
 				dragRect.setSize(0, 0);
 				dragRect.add(endPoint.x, ymap.getMaxIndex());
-				
-			/* Normal selection */
+
+				/* Normal selection */
 			} else {
 				dragRect.setLocation(startPoint.x, startPoint.y);
 				dragRect.setSize(0, 0);
@@ -752,52 +758,52 @@ public class GlobalView extends ModelViewProduced implements
 		}
 	}
 
-//	@Override
-//	public String getToolTipText(final MouseEvent e) {
-//		/*
-//		 * Do we want to do mouseovers if value already visible? if
-//		 * (getShowVal()) return null; // don't do tooltips and vals at same
-//		 * time.
-//		 */
-//		String ret = "";
-//		String row = "";
-//		String col = "";
-//
-//		if (drawer != null) {
-//
-//			final int geneRow = overy;
-//
-//			if (xmap.contains(overx) && ymap.contains(overy)) {
-//
-//				if (geneHI != null) {
-//					row = geneSummary.getSummary(geneHI, overy);
-//
-//				} else {
-//					row = "N/A";
-//				}
-//
-//				if (arrayHI != null) {
-//					col = arraySummary.getSummary(arrayHI, overx);
-//
-//				} else {
-//					col = "N/A";
-//				}
-//
-//				if (drawer.isMissing(overx, geneRow)) {
-//					ret = "No data";
-//
-//				} else if (drawer.isEmpty(overx, geneRow)) {
-//					ret = null;
-//
-//				} else {
-//					ret = "<html>Row: " + row + " <br>Column: " + col
-//							+ " <br>Value: "
-//							+ drawer.getSummary(overx, geneRow) + "</html>";
-//				}
-//			}
-//		}
-//		return ret;
-//	}
+	// @Override
+	// public String getToolTipText(final MouseEvent e) {
+	// /*
+	// * Do we want to do mouseovers if value already visible? if
+	// * (getShowVal()) return null; // don't do tooltips and vals at same
+	// * time.
+	// */
+	// String ret = "";
+	// String row = "";
+	// String col = "";
+	//
+	// if (drawer != null) {
+	//
+	// final int geneRow = overy;
+	//
+	// if (xmap.contains(overx) && ymap.contains(overy)) {
+	//
+	// if (geneHI != null) {
+	// row = geneSummary.getSummary(geneHI, overy);
+	//
+	// } else {
+	// row = "N/A";
+	// }
+	//
+	// if (arrayHI != null) {
+	// col = arraySummary.getSummary(arrayHI, overx);
+	//
+	// } else {
+	// col = "N/A";
+	// }
+	//
+	// if (drawer.isMissing(overx, geneRow)) {
+	// ret = "No data";
+	//
+	// } else if (drawer.isEmpty(overx, geneRow)) {
+	// ret = null;
+	//
+	// } else {
+	// ret = "<html>Row: " + row + " <br>Column: " + col
+	// + " <br>Value: "
+	// + drawer.getSummary(overx, geneRow) + "</html>";
+	// }
+	// }
+	// }
+	// return ret;
+	// }
 
 	private void drawBand(final Rectangle l) {
 
@@ -825,10 +831,9 @@ public class GlobalView extends ModelViewProduced implements
 		double w = 0;
 		double h = 0;
 
-		if (geneSelection == null || arraySelection == null) {
+		if (geneSelection == null || arraySelection == null)
 			return;
-
-		} else if ((geneSelection.getNSelectedIndexes() == 1 && arraySelection
+		else if ((geneSelection.getNSelectedIndexes() == 1 && arraySelection
 				.getNSelectedIndexes() == 1)
 				&& (xmap.getScale() < 20.0 && ymap.getScale() < 20.0)) {
 
@@ -861,12 +866,11 @@ public class GlobalView extends ModelViewProduced implements
 	public void mouseWheelMoved(final MouseWheelEvent e) {
 
 		final int notches = e.getWheelRotation();
-		final int shift = 3;
+		final int shift = (notches < 0) ? -3 : 3;
 
 		if (!e.isShiftDown()) {
-			if (notches < 0) {
-				ymap.scrollBy(-shift);
-
+			if (e.isAltDown()) {
+				xmap.scrollBy(shift);
 			} else {
 				ymap.scrollBy(shift);
 			}
@@ -887,7 +891,7 @@ public class GlobalView extends ModelViewProduced implements
 
 	/**
 	 * Selecting a rectangular area in GlobalView
-	 * 
+	 *
 	 * @param start
 	 * @param end
 	 */
@@ -944,7 +948,7 @@ public class GlobalView extends ModelViewProduced implements
 
 	/**
 	 * Sets the gene header instance variables of GlobalView.
-	 * 
+	 *
 	 * @param ghi
 	 * @param ahi
 	 */
@@ -958,6 +962,6 @@ public class GlobalView extends ModelViewProduced implements
 
 		LogBuffer.println("GV Reset: " + resized);
 		this.resetHome = resized;
-//		repaint();
+		// repaint();
 	}
 }

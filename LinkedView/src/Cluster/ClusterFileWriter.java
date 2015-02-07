@@ -12,9 +12,9 @@ import edu.stanford.genetics.treeview.LogBuffer;
 /**
  * This class is used to save data from clustering to the local storage by
  * converting it to a tab-delimited string and using a BufferedWriter.
- * 
+ *
  * @author CKeil
- * 
+ *
  */
 public class ClusterFileWriter extends BufferedWriter {
 
@@ -23,7 +23,7 @@ public class ClusterFileWriter extends BufferedWriter {
 	private final String END_OF_ROW = "\n";
 
 	public ClusterFileWriter(final File file) throws IOException,
-			FileNotFoundException {
+	FileNotFoundException {
 
 		super(new OutputStreamWriter(new FileOutputStream(
 				file.getAbsoluteFile()), "UTF-8"));
@@ -33,7 +33,7 @@ public class ClusterFileWriter extends BufferedWriter {
 	/**
 	 * This methods writes the string from the doParse() method to local storage
 	 * using the original name of the file and the specified file extension.
-	 * 
+	 *
 	 * @param input
 	 * @param fileEnd
 	 */
@@ -66,7 +66,7 @@ public class ClusterFileWriter extends BufferedWriter {
 
 	/**
 	 * A method to parse the String matrix into a tab-delimited string.
-	 * 
+	 *
 	 * @param input
 	 * @param lastLine
 	 * @return

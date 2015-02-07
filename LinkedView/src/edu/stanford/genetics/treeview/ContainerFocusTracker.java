@@ -9,7 +9,7 @@
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved.
  *
- * This software is provided under the GNU GPL Version 2. In particular, 
+ * This software is provided under the GNU GPL Version 2. In particular,
  *
  * 1) If you modify a source file, make a comment in it containing your name and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
@@ -18,7 +18,7 @@
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
  *
- * END_HEADER 
+ * END_HEADER
  */
 package edu.stanford.genetics.treeview;
 
@@ -31,7 +31,7 @@ import java.awt.event.FocusListener;
 
 /**
  * Note: I, Alok, didn't write this class.
- * 
+ *
  * Class for Containers which won't take the keyboard focus. Because of what
  * appears to be a bug in Java 1.1, when you move the focus on to a Frame, or
  * other Container, it keeps the focus, rather than handing it on to an
@@ -49,8 +49,9 @@ public class ContainerFocusTracker implements FocusListener, ContainerListener {
 	// Constructors
 	// ****************************
 	public ContainerFocusTracker(final Container c) {
-		if (debug)
+		if (debug) {
 			System.out.println("FocusTracker(" + c.getName() + ")");
+		}
 		container = c;
 		addComponent(c);
 	}
@@ -61,15 +62,17 @@ public class ContainerFocusTracker implements FocusListener, ContainerListener {
 
 	@Override
 	public void componentAdded(final ContainerEvent e) {
-		if (debug)
+		if (debug) {
 			System.out.println(container.getName() + " - Adding...");
+		}
 		addComponent(e.getChild());
 	}
 
 	@Override
 	public void componentRemoved(final ContainerEvent e) {
-		if (debug)
+		if (debug) {
 			System.out.println(container.getName() + " - Removing...");
+		}
 		removeComponent(e.getChild());
 	}
 
@@ -78,20 +81,23 @@ public class ContainerFocusTracker implements FocusListener, ContainerListener {
 		final Component c = e.getComponent();
 
 		if (c == container) {
-			if (debug)
+			if (debug) {
 				System.out.println("Container " + container.getName()
 						+ " got focus");
+			}
 			if (focus != null) {
-				if (debug)
+				if (debug) {
 					System.out.println("Returning focus to " + focus.getName());
+				}
 				focus.requestFocus();
 			} else {
 				switchFocus(container);
 			}
 		} else if (c.isVisible() && c.isEnabled() && c.isFocusable()) {
-			if (debug)
+			if (debug) {
 				System.out.println(container.getName()
 						+ " - Tracking focus to " + e.getComponent().getName());
+			}
 			focus = c;
 		}
 	}
@@ -109,12 +115,14 @@ public class ContainerFocusTracker implements FocusListener, ContainerListener {
 			for (int i = 0; i < container.getComponentCount(); i++) {
 				final Component c = container.getComponent(i);
 
-				if (c == null)
+				if (c == null) {
 					break;
+				}
 				if (c.isVisible() && c.isEnabled() && c.isFocusable()) {
-					if (debug)
+					if (debug) {
 						System.out.println(this.container.getName()
 								+ " - Giving focus to " + c.getName());
+					}
 					c.requestFocus();
 					return true;
 				} else if (c instanceof Container) {
@@ -131,11 +139,13 @@ public class ContainerFocusTracker implements FocusListener, ContainerListener {
 	}
 
 	private void addComponent(final Component c) {
-		if (debug)
+		if (debug) {
 			System.out.println(" " + c.getName());
+		}
 		c.addFocusListener(this);
-		if (c instanceof Container)
+		if (c instanceof Container) {
 			addContainer((Container) c);
+		}
 	}
 
 	private void addContainer(final Container container) {
@@ -149,13 +159,16 @@ public class ContainerFocusTracker implements FocusListener, ContainerListener {
 	}
 
 	private void removeComponent(final Component c) {
-		if (debug)
+		if (debug) {
 			System.out.println(" " + c.getName());
-		if (c == focus)
+		}
+		if (c == focus) {
 			focus = null;
+		}
 		c.removeFocusListener(this);
-		if (c instanceof Container)
+		if (c instanceof Container) {
 			removeContainer((Container) c);
+		}
 	}
 
 	private void removeContainer(final Container container) {

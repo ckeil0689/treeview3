@@ -25,17 +25,17 @@ package edu.stanford.genetics.treeview;
 
 /**
  * Description of the Interface
- * 
+ *
  * Provides a simple interface to the actual gene expression data, using the
  * same indexes as the corresponding HeaderInfo objects.
- * 
- * 
+ *
+ *
  * @author aloksaldanha
  */
 public interface DataMatrix {
 	/**
 	 * Gets the value attribute of the DataMatrix object
-	 * 
+	 *
 	 * @param row
 	 *            row (gene) of interest
 	 * @param col
@@ -53,7 +53,7 @@ public interface DataMatrix {
 	/**
 	 * Return the minimum value of the dataset. Used to calculate colors to draw
 	 * the pixels with DoubleArrayDrawer in DendroView.
-	 * 
+	 *
 	 * @return
 	 */
 	double getMinVal();
@@ -61,14 +61,14 @@ public interface DataMatrix {
 	/**
 	 * Return the maximum value of the dataset. Used to calculate colors to draw
 	 * the pixels with DoubleArrayDrawer in DendroView.
-	 * 
+	 *
 	 * @return
 	 */
 	double getMaxVal();
 
 	/**
 	 * Sets the value attribute of an element in the DataMatrix object
-	 * 
+	 *
 	 * @param value
 	 *            value to be set
 	 * @param row
@@ -80,7 +80,7 @@ public interface DataMatrix {
 
 	/**
 	 * Gets the numRow attribute of the DataMatrix object
-	 * 
+	 *
 	 * @return The number of rows (genes) in this data matrix.
 	 */
 	int getNumRow();
@@ -88,14 +88,14 @@ public interface DataMatrix {
 	/**
 	 * Appends a data matrix to the right of this one. Used for comparison of
 	 * two data sets.
-	 * 
+	 *
 	 * @param m
 	 *            The DataMatrix being appended.
 	 */
 
 	/**
 	 * Gets the numCol attribute of the DataMatrix object
-	 * 
+	 *
 	 * @return The number of columns (arrays) in this data matrix.
 	 */
 	int getNumCol();
@@ -103,7 +103,7 @@ public interface DataMatrix {
 	/**
 	 * Gets the numCol attribute of the DataMatrix object before anything was
 	 * appended to it.
-	 * 
+	 *
 	 * @return The number of columns (arrays) in this data matrix before
 	 *         anything was appended.
 	 */
@@ -114,7 +114,7 @@ public interface DataMatrix {
 	/**
 	 * return true if data matrix has been modified and should be written to
 	 * file.
-	 * 
+	 *
 	 * @return
 	 */
 	boolean getModified();

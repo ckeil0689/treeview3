@@ -9,7 +9,7 @@
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
  *
- * This software is provided under the GNU GPL Version 2. In particular, 
+ * This software is provided under the GNU GPL Version 2. In particular,
  *
  * 1) If you modify a source file, make a comment in it containing your name and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
@@ -18,7 +18,7 @@
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
  *
- * END_HEADER 
+ * END_HEADER
  */
 package edu.stanford.genetics.treeview;
 
@@ -37,10 +37,10 @@ import java.util.prefs.Preferences;
  * <li>atr: The extension for the atr</li>
  * <li>jtv: The extension for the jtv</li>
  * </ul>
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.15 $ $Date: 2008-06-11 01:58:57 $
- * 
+ *
  *          Note: Should be flexible enough to have a url base instead of dir
  *          (1/16/2003)
  */
@@ -63,7 +63,7 @@ public class CDTFileSet extends FileSet {
 
 	/**
 	 * Constructor for the FileSet object
-	 * 
+	 *
 	 * @param configNode
 	 *            ConfigNode to base this fileset on.
 	 */
@@ -76,7 +76,7 @@ public class CDTFileSet extends FileSet {
 	/**
 	 * Make fileset based upon unrooted DummyConfigNode with the specified
 	 * values
-	 * 
+	 *
 	 * @param string1
 	 *            name of cdt which this fileset is based on
 	 * @param string2
@@ -92,7 +92,7 @@ public class CDTFileSet extends FileSet {
 
 	/**
 	 * Copies state from another fileset
-	 * 
+	 *
 	 * @param fileSet
 	 *            FileSet to copy state from
 	 */
@@ -114,7 +114,7 @@ public class CDTFileSet extends FileSet {
 
 	/**
 	 * Determines equality by looking at the cdt base alone.
-	 * 
+	 *
 	 * @param fileSet
 	 *            FileSet to compare to
 	 * @return true if equal
@@ -143,7 +143,7 @@ public class CDTFileSet extends FileSet {
 
 	/**
 	 * Sets the base of the FileSet object. Parses out extension, root
-	 * 
+	 *
 	 * @param string1
 	 *            Name of base of the FileSet
 	 */
@@ -157,7 +157,7 @@ public class CDTFileSet extends FileSet {
 
 	/**
 	 * Sets the extension associated with the base of the fileset.
-	 * 
+	 *
 	 * @param string
 	 *            The new ext value
 	 */

@@ -29,9 +29,9 @@ import edu.stanford.genetics.treeview.model.CustomLabelLoader;
 /**
  * Controller for the PreferencesMenu class. Handles user interaction with Swing
  * components such as buttons.
- * 
+ *
  * @author CKeil
- * 
+ *
  */
 public class PreferencesController {
 
@@ -42,8 +42,8 @@ public class PreferencesController {
 	private LabelLoadDialog dialog;
 	private File customFile;
 
-	public PreferencesController(final TreeViewFrame tvFrame, DataModel model,
-			final PreferencesMenu preferences) {
+	public PreferencesController(final TreeViewFrame tvFrame,
+			final DataModel model, final PreferencesMenu preferences) {
 
 		this.tvFrame = tvFrame;
 		this.model = model;
@@ -73,23 +73,27 @@ public class PreferencesController {
 		}
 
 		@Override
-		public void mouseEntered(final MouseEvent arg0) {}
+		public void mouseEntered(final MouseEvent arg0) {
+		}
 
 		@Override
-		public void mouseExited(final MouseEvent arg0) {}
+		public void mouseExited(final MouseEvent arg0) {
+		}
 
 		@Override
-		public void mousePressed(final MouseEvent arg0) {}
+		public void mousePressed(final MouseEvent arg0) {
+		}
 
 		@Override
-		public void mouseReleased(final MouseEvent arg0) {}
+		public void mouseReleased(final MouseEvent arg0) {
+		}
 	}
 
 	/**
 	 * Listener for 'use custom labels' button.
-	 * 
+	 *
 	 * @author CKeil
-	 * 
+	 *
 	 */
 	class CustomLabelListener implements ActionListener {
 
@@ -142,9 +146,9 @@ public class PreferencesController {
 
 	/**
 	 * Listener for the "Ok" button in the preferences frame.
-	 * 
+	 *
 	 * @author CKeil
-	 * 
+	 *
 	 */
 	class ConfirmationListener implements ActionListener {
 
@@ -158,9 +162,9 @@ public class PreferencesController {
 
 	/**
 	 * WindowAdapter for the Preferences menu.
-	 * 
+	 *
 	 * @author CKeil
-	 * 
+	 *
 	 */
 	class WindowListener extends WindowAdapter {
 
@@ -171,25 +175,27 @@ public class PreferencesController {
 			preferences.getPreferencesFrame().dispose();
 		}
 	}
-	
+
 	/**
-	 * Listens to changing radio buttons in the AnnotationSettings and
-	 * sets the justify-flag in TextView and ArrayNameView respectively.
+	 * Listens to changing radio buttons in the AnnotationSettings and sets the
+	 * justify-flag in TextView and ArrayNameView respectively.
+	 *
 	 * @author chris0689
 	 *
 	 */
 	class LabelJustifyListener implements ActionListener {
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			
-			boolean[] labelAligns = tvFrame.getDendroView().getLabelAligns();
-			
+		public void actionPerformed(final ActionEvent e) {
+
+			final boolean[] labelAligns = tvFrame.getDendroView()
+					.getLabelAligns();
+
 			boolean isRowRight = labelAligns[0];
 			boolean isColRight = labelAligns[1];
-			
+
 			/* counter to recognize the selected JRadioButton */
-			switch(((JRadioButton)e.getSource()).getText()) {
+			switch (((JRadioButton) e.getSource()).getText()) {
 			case "Left":
 				isRowRight = false;
 				break;
@@ -205,7 +211,7 @@ public class PreferencesController {
 			default:
 				break;
 			}
-			
+
 			tvFrame.getDendroView().setLabelAlignment(isRowRight, isColRight);
 		}
 	}
@@ -213,10 +219,12 @@ public class PreferencesController {
 	class PreferencesComponentListener implements ComponentListener {
 
 		@Override
-		public void componentHidden(final ComponentEvent arg0) {}
+		public void componentHidden(final ComponentEvent arg0) {
+		}
 
 		@Override
-		public void componentMoved(final ComponentEvent arg0) {}
+		public void componentMoved(final ComponentEvent arg0) {
+		}
 
 		@Override
 		public void componentResized(final ComponentEvent arg0) {
@@ -225,7 +233,8 @@ public class PreferencesController {
 		}
 
 		@Override
-		public void componentShown(final ComponentEvent arg0) {}
+		public void componentShown(final ComponentEvent arg0) {
+		}
 
 	}
 
@@ -235,11 +244,11 @@ public class PreferencesController {
 	 */
 	public void checkForColorSave() {
 
-//		if (preferences.getActiveMenu().equalsIgnoreCase(
-//				StringRes.menu_title_Color)
-//				&& preferences.getGradientPick().isCustomSelected()) {
-//			preferences.getGradientPick().saveStatus();
-//		}
+		// if (preferences.getActiveMenu().equalsIgnoreCase(
+		// StringRes.menu_title_Color)
+		// && preferences.getGradientPick().isCustomSelected()) {
+		// preferences.getGradientPick().saveStatus();
+		// }
 	}
 
 	/**
@@ -260,25 +269,25 @@ public class PreferencesController {
 
 			HeaderInfo headerInfo = null;
 			if (type.equalsIgnoreCase(StringRes.main_rows)) {
-				headerInfo = model.getGeneHeaderInfo();
+				headerInfo = model.getRowHeaderInfo();
 
 			} else if (type.equalsIgnoreCase(StringRes.main_cols)) {
-				headerInfo = model.getArrayHeaderInfo();
+				headerInfo = model.getColumnHeaderInfo();
 			}
-			
+
 			/*
-			 * Get number of rows without GID row. Done here to avoid passing 
+			 * Get number of rows without GID row. Done here to avoid passing
 			 * model.
 			 */
-			int geneNum = model.getGeneHeaderInfo().getNumNames();
+			int geneNum = model.getRowHeaderInfo().getNumNames();
 
 			if (model.gidFound()) {
 				geneNum--;
 			}
 
 			// Load new labels
-			final CustomLabelLoader clLoader = new CustomLabelLoader(headerInfo, 
-					preferences.getSelectedLabelIndexes());
+			final CustomLabelLoader clLoader = new CustomLabelLoader(
+					headerInfo, preferences.getSelectedLabelIndexes());
 
 			clLoader.load(customFile, geneNum);
 
@@ -289,7 +298,7 @@ public class PreferencesController {
 			final String[] oldNames = headerInfo.getNames();
 
 			final String[][] headersToAdd = new String[oldHeaders.length
-					+ headerNum][];
+			                                           + headerNum][];
 
 			// Iterate over loadedLabels
 			for (int i = 0; i < oldHeaders.length; i++) {

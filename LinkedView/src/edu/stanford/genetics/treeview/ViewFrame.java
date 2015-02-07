@@ -16,7 +16,7 @@
  * 3) Developers are encouraged but not required to notify the Java TreeView maintainers at alok@genome.stanford.edu when they make a useful addition. It would be nice if significant contributions could be merged into the main distribution.
  *
  * A full copy of the license can be found in gpl.txt or online at
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt *
  * END_HEADER
  */
@@ -43,18 +43,19 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 //import javax.swing.WindowConstants;
+import javax.swing.WindowConstants;
 
 import Cluster.ClusterFileFilter;
 import edu.stanford.genetics.treeview.core.FileMru;
 
 /**
  * Any frame that wants to contain MainPanels must extend this.
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version @version $Revision: 1.37 $ $Date: 2009-08-26 11:48:27 $
  */
-public abstract class ViewFrame extends Observable 
-implements Observer, ConfigNodePersistent {
+public abstract class ViewFrame extends Observable implements Observer,
+		ConfigNodePersistent {
 	// extends JFrame implements Observer {
 
 	// Main application frame
@@ -75,11 +76,11 @@ implements Observer, ConfigNodePersistent {
 	private UrlExtractor arrayUrlExtractor;
 
 	// menubar for the application
-//	protected TreeviewMenuBarI menubar;
+	// protected TreeviewMenuBarI menubar;
 
 	/**
 	 * Constructor for the ViewFrame object Sets title and window listeners
-	 * 
+	 *
 	 * @param title
 	 *            Title for the ViewFrame.
 	 */
@@ -87,22 +88,25 @@ implements Observer, ConfigNodePersistent {
 
 		this.appFrame = new JFrame(title);
 		this.configNode = configNode;
-		
+
 		/* maximize frame first */
 		setupFrameSize();
-		
-		int init_width = appFrame.getWidth();
-		int init_height = appFrame.getHeight();
-		
-		int left = configNode.getInt("frame_left", 0);
-		int top = configNode.getInt("frame_top", 0);
-		int width = configNode.getInt("frame_width", init_width);
-		int height = configNode.getInt("frame_height", init_height);
-		
+
+		final int init_width = appFrame.getWidth();
+		final int init_height = appFrame.getHeight();
+
+		final int left = configNode.getInt("frame_left", 0);
+		final int top = configNode.getInt("frame_top", 0);
+		final int width = configNode.getInt("frame_width", init_width);
+		final int height = configNode.getInt("frame_height", init_height);
+
 		appFrame.setBounds(left, top, width, height);
 
-//		//Not sure if the following actually works - The app quits, but it was quitting before I added this line of code (but it wasn't quitting sometimes and when it quits, it quits after a confirm popup and a delay.  It still has the confirm & delay.
-//		appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		// //Not sure if the following actually works - The app quits, but it
+		// was quitting before I added this line of code (but it wasn't quitting
+		// sometimes and when it quits, it quits after a confirm popup and a
+		// delay. It still has the confirm & delay.
+		// appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		setupWindowListener();
 	}
@@ -119,7 +123,7 @@ implements Observer, ConfigNodePersistent {
 
 	/**
 	 * Returns the applications main JFrame.
-	 * 
+	 *
 	 * @return
 	 */
 	public JFrame getAppFrame() {
@@ -130,7 +134,7 @@ implements Observer, ConfigNodePersistent {
 	// must override in subclass...
 	/**
 	 * This is to ensure that we can observe the MainPanels when they change.
-	 * 
+	 *
 	 * @param observable
 	 *            The MainPanel or other thing which changed.
 	 * @param object
@@ -158,7 +162,7 @@ implements Observer, ConfigNodePersistent {
 	 * build a node ('FileMRU') with Java's Preferences API. This node contains
 	 * information about the Most Recently Used files and can be used to
 	 * conveniently load or edit them.
-	 * 
+	 *
 	 * @param fileMruNode
 	 *            Node which will be bound to the FileMru
 	 */
@@ -182,7 +186,7 @@ implements Observer, ConfigNodePersistent {
 
 	/**
 	 * Centers the frame on screen.
-	 * 
+	 *
 	 * @param rectangle
 	 *            A rectangle describing the outlines of the screen.
 	 */
@@ -217,11 +221,11 @@ implements Observer, ConfigNodePersistent {
 		final Dimension screenSize = toolkit.getScreenSize();
 		final Insets screenInsets = toolkit.getScreenInsets(GraphicsEnvironment
 				.getLocalGraphicsEnvironment().getScreenDevices()[0]
-				.getDefaultConfiguration());
+						.getDefaultConfiguration());
 		final int taskbarHeight = screenInsets.bottom;
 
-		appFrame.setSize(new Dimension(screenSize.width,
-				screenSize.height - taskbarHeight));
+		appFrame.setSize(new Dimension(screenSize.width, screenSize.height
+				- taskbarHeight));
 		appFrame.setMinimumSize(new Dimension(screenSize.width * 1 / 2,
 				screenSize.height * 2 / 3));
 	}
@@ -233,13 +237,19 @@ implements Observer, ConfigNodePersistent {
 	 */
 	private void setupWindowListener() {
 
-		//JFrame.EXIT_ON_CLOSE works much more reliably than what was being done before. I replaced WindowConstants.DO_NOTHING_ON_CLOSE and confirmed that saveSettings is called by the window listener before exiting...
-		//appFrame
-		//		.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		//appFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		//THIS WORKS BUT, it could present problems either current, in the future (when we support multiple windows) or both.
-		//Take a look at bitBucket issue #74 if you decide to re-open this issue and solve it properly.
-		//Note, the no-exit bug when dispose is used can be reproduced by performing a search and then closing the main window.
+		// JFrame.EXIT_ON_CLOSE works much more reliably than what was being
+		// done before. I replaced WindowConstants.DO_NOTHING_ON_CLOSE and
+		// confirmed that saveSettings is called by the window listener before
+		// exiting...
+		// appFrame
+		// .setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		// appFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		// THIS WORKS BUT, it could present problems either current, in the
+		// future (when we support multiple windows) or both.
+		// Take a look at bitBucket issue #74 if you decide to re-open this
+		// issue and solve it properly.
+		// Note, the no-exit bug when dispose is used can be reproduced by
+		// performing a search and then closing the main window.
 		appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		appFrame.addWindowListener(new WindowAdapter() {
@@ -267,7 +277,7 @@ implements Observer, ConfigNodePersistent {
 	/**
 	 * Keep track of when active, so that clicks don't get passed through too
 	 * much.
-	 * 
+	 *
 	 * @param flag
 	 *            The new windowActive value
 	 */
@@ -279,7 +289,7 @@ implements Observer, ConfigNodePersistent {
 	/**
 	 * Keep track of when active, so that clicks don't get passed through too
 	 * much.
-	 * 
+	 *
 	 * @return True if window is active.
 	 */
 	public boolean windowActive() {
@@ -299,62 +309,62 @@ implements Observer, ConfigNodePersistent {
 	 */
 	public void closeWindow() {
 
-//		try {
-////			final DataModel dataModel = getDataModel();
-//
-//			if (dataModel != null) {
-//				if (dataModel.getModified()) {
-//					final int option = JOptionPane.showConfirmDialog(
-//							applicationFrame,
-//							"DataModel is modified. Do you wish to save?");
-//
-//					switch (option) {
-//
-//					case JOptionPane.YES_OPTION:
-//						final DataModelWriter writer = new DataModelWriter(
-//								getDataModel());
-//						writer.writeIncremental(getDataModel().getFileSet());
-//						break;
-//
-//					case JOptionPane.CANCEL_OPTION:
-//						return;
-//
-//					case JOptionPane.NO_OPTION:
-//						break;
-//					}
-//				}
-//
-//				final Preferences documentConfig = dataModel
-//						.getDocumentConfigRoot();
-//				if (documentConfig != null) {
-//					// documentConfig.store();
-//				}
-//			}
-//		} catch (final Exception e) {
-//			LogBuffer.println("ViewFrame.closeWindow() Got exception: " + e);
-//		}
-		
+		// try {
+		// // final DataModel dataModel = getDataModel();
+		//
+		// if (dataModel != null) {
+		// if (dataModel.getModified()) {
+		// final int option = JOptionPane.showConfirmDialog(
+		// applicationFrame,
+		// "DataModel is modified. Do you wish to save?");
+		//
+		// switch (option) {
+		//
+		// case JOptionPane.YES_OPTION:
+		// final DataModelWriter writer = new DataModelWriter(
+		// getDataModel());
+		// writer.writeIncremental(getDataModel().getFileSet());
+		// break;
+		//
+		// case JOptionPane.CANCEL_OPTION:
+		// return;
+		//
+		// case JOptionPane.NO_OPTION:
+		// break;
+		// }
+		// }
+		//
+		// final Preferences documentConfig = dataModel
+		// .getDocumentConfigRoot();
+		// if (documentConfig != null) {
+		// // documentConfig.store();
+		// }
+		// }
+		// } catch (final Exception e) {
+		// LogBuffer.println("ViewFrame.closeWindow() Got exception: " + e);
+		// }
+
 		/* Confirm user's intent to exit the application. */
 		final int option = JOptionPane.showConfirmDialog(appFrame,
 				"Are you sure you want to close TreeView?", "Exit TreeView?",
-			    JOptionPane.YES_NO_OPTION);
+				JOptionPane.YES_NO_OPTION);
 
 		switch (option) {
 
-			case JOptionPane.YES_OPTION:	
-				LogBuffer.println("Saving settings before window close.");
-				appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-				saveSettings();
-				appFrame.dispose();
-				LogBuffer.println("Will this print, and when?.");
-				break;
-											
-			case JOptionPane.NO_OPTION:		
-				appFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-				break;
-			
-			default:						
-				return;
+		case JOptionPane.YES_OPTION:
+			LogBuffer.println("Saving settings before window close.");
+			appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			saveSettings();
+			appFrame.dispose();
+			LogBuffer.println("Will this print, and when?.");
+			break;
+
+		case JOptionPane.NO_OPTION:
+			appFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+			break;
+
+		default:
+			return;
 		}
 	}
 
@@ -362,10 +372,10 @@ implements Observer, ConfigNodePersistent {
 
 	/**
 	 * required by all <code>ModelPanel</code>s
-	 * 
+	 *
 	 * @return The shared TreeSelection object for genes.
 	 */
-	public TreeSelectionI getGeneSelection() {
+	public TreeSelectionI getRowSelection() {
 
 		return geneSelection;
 	}
@@ -377,10 +387,10 @@ implements Observer, ConfigNodePersistent {
 
 	/**
 	 * required by all <code>ModelPanel</code>s
-	 * 
+	 *
 	 * @return The shared TreeSelection object for arrays.
 	 */
-	public TreeSelectionI getArraySelection() {
+	public TreeSelectionI getColumnSelection() {
 
 		return arraySelection;
 	}
@@ -393,7 +403,7 @@ implements Observer, ConfigNodePersistent {
 	/**
 	 * used by data model to signal completion of loading. The
 	 * <code>ViewFrame</code> will react by reconfiguring it's widgets.
-	 * 
+	 *
 	 * @param b
 	 *            The new loaded value
 	 */
@@ -402,7 +412,7 @@ implements Observer, ConfigNodePersistent {
 	/**
 	 * returns special no data value. generally, just cribs from the
 	 * <code>DataModel</code>
-	 * 
+	 *
 	 * @return A special double which means no data available.
 	 */
 
@@ -411,7 +421,7 @@ implements Observer, ConfigNodePersistent {
 	/**
 	 * returns the UrlPresets for the views to make use of when configuring
 	 * linking for genes
-	 * 
+	 *
 	 * @return The shared <code>UrlPresets</code> object for genes
 	 */
 	public abstract UrlPresets getGeneUrlPresets();
@@ -419,42 +429,42 @@ implements Observer, ConfigNodePersistent {
 	/**
 	 * returns the UrlPresets for the views to make use of when configuring
 	 * linking for arrays
-	 * 
+	 *
 	 * @return The shared <code>UrlPresets</code> object for arrays
 	 */
 	public abstract UrlPresets getArrayUrlPresets();
 
 	/**
 	 * Gets the loaded attribute of the ViewFrame object
-	 * 
+	 *
 	 * @return True if there is currently a model loaded.
 	 */
 	public abstract boolean isLoaded();
 
-//	/**
-//	 * Gets the shared <code>DataModel</code>
-//	 * 
-//	 * @return Gets the shared <code>DataModel</code>
-//	 */
-//	public abstract DataModel getDataModel();
+	// /**
+	// * Gets the shared <code>DataModel</code>
+	// *
+	// * @return Gets the shared <code>DataModel</code>
+	// */
+	// public abstract DataModel getDataModel();
 
-//	/**
-//	 * Sets the shared <code>DataModel</code>
-//	 * 
-//	 * @return Sets the shared <code>DataModel</code>
-//	 * @throws LoadException
-//	 */
-//	public abstract void setDataModel(DataModel model);
-//	/**
-//	 * Should scroll all MainPanels in this view frame to the specified gene.
-//	 * The index provided is respect to the TreeSelection object.
-//	 * 
-//	 * @param i
-//	 *            gene index in model to scroll the MainPanel to.
-//	 */
-//	public abstract void scrollToGene(int i);
-//
-//	public abstract void scrollToArray(int i);
+	// /**
+	// * Sets the shared <code>DataModel</code>
+	// *
+	// * @return Sets the shared <code>DataModel</code>
+	// * @throws LoadException
+	// */
+	// public abstract void setDataModel(DataModel model);
+	// /**
+	// * Should scroll all MainPanels in this view frame to the specified gene.
+	// * The index provided is respect to the TreeSelection object.
+	// *
+	// * @param i
+	// * gene index in model to scroll the MainPanel to.
+	// */
+	// public abstract void scrollToGene(int i);
+	//
+	// public abstract void scrollToArray(int i);
 
 	/**
 	 * The shared selection objects
@@ -477,7 +487,7 @@ implements Observer, ConfigNodePersistent {
 		geneSelection.deselectAllIndexes();
 		geneSelection.setIndexSelection(i, true);
 		geneSelection.notifyObservers();
-//		scrollToGene(i);
+		// scrollToGene(i);
 	}
 
 	/**
@@ -506,12 +516,12 @@ implements Observer, ConfigNodePersistent {
 
 	public boolean geneIsSelected(final int i) {
 
-		return getGeneSelection().isIndexSelected(i);
+		return getRowSelection().isIndexSelected(i);
 	}
 
 	/**
 	 * url linking support
-	 * 
+	 *
 	 * @param i
 	 *            index of gene who's url you would like to display.
 	 */
@@ -522,45 +532,42 @@ implements Observer, ConfigNodePersistent {
 
 	/**
 	 * Gets the url for a particular gene.
-	 * 
+	 *
 	 * @param i
 	 *            index of the gene, for the gene's <code>UrlExtractor</code>
 	 * @return A string representation of the url
 	 */
 	public String getUrl(final int i) {
 
-		if (urlExtractor == null) {
+		if (urlExtractor == null)
 			return null;
-		}
 		return urlExtractor.getUrl(i);
 	}
 
 	/**
 	 * Gets the url for a particular array.
-	 * 
+	 *
 	 * @param i
 	 *            index of the array, for the array's <code>UrlExtractor</code>
 	 * @return A string representation of the url
 	 */
 	public String getArrayUrl(final int i) {
 
-		if (arrayUrlExtractor == null) {
+		if (arrayUrlExtractor == null)
 			return null;
-		}
 		return arrayUrlExtractor.getUrl(i);
 	}
 
 	/**
 	 * Pops up a browser window with the specified url
-	 * 
+	 *
 	 * @param string
 	 *            String representation of the url.
 	 */
 	public void displayURL(final String string) {
 
-		if (string == null) {
+		if (string == null)
 			return;
-		}
 		try {
 			if (browserControl == null) {
 				browserControl = BrowserControl.getBrowserControl();
@@ -570,17 +577,17 @@ implements Observer, ConfigNodePersistent {
 		} catch (final IOException e) {
 			LogBuffer.logException(e);
 			final String message = new StringBuffer("Problem loading url: ")
-					.append(e).toString();
+			.append(e).toString();
 			JOptionPane.showMessageDialog(appFrame, message);
 		}
 	}
 
 	/**
 	 * Gets the UrlExtractor for the arrays.
-	 * 
+	 *
 	 * This object is used to convert a given array index into a url string. It
 	 * can be configured to do this in multiple ways.
-	 * 
+	 *
 	 * @return The UrlExtractor for the arrays
 	 */
 	public UrlExtractor getArrayUrlExtractor() {
@@ -590,10 +597,10 @@ implements Observer, ConfigNodePersistent {
 
 	/**
 	 * Gets the UrlExtractor for the genes.
-	 * 
+	 *
 	 * This object is used to convert a given gene index into a url string. It
 	 * can be configured to do this in multiple ways.
-	 * 
+	 *
 	 * @return The UrlExtractor for the genes
 	 */
 	public UrlExtractor getUrlExtractor() {
@@ -603,7 +610,7 @@ implements Observer, ConfigNodePersistent {
 
 	/**
 	 * Sets the arrayUrlExtractor attribute of the ViewFrame object
-	 * 
+	 *
 	 * @param ue
 	 *            The new arrayUrlExtractor value
 	 */
@@ -614,7 +621,7 @@ implements Observer, ConfigNodePersistent {
 
 	/**
 	 * Sets the urlExtractor attribute of the ViewFrame object
-	 * 
+	 *
 	 * @param ue
 	 *            The new urlExtractor value
 	 */
@@ -628,27 +635,28 @@ implements Observer, ConfigNodePersistent {
 	abstract public void generateView(final int view);
 
 	/**
-	 * Decides which dialog option to use for opening files, depending on the 
-	 * operating system of the user. This is meant to ensure a more native
-	 * feel of the application on the user's system although using FileDialog
-	 * isn't preferred because it's AWT while the rest of the GUI uses Swing.
-	 * 
+	 * Decides which dialog option to use for opening files, depending on the
+	 * operating system of the user. This is meant to ensure a more native feel
+	 * of the application on the user's system although using FileDialog isn't
+	 * preferred because it's AWT while the rest of the GUI uses Swing.
+	 *
 	 * @return File file
 	 * @throws LoadException
 	 */
 	public File selectFile() throws LoadException {
 
-		boolean isMacOrUnix = System.getProperty("os.name").contains("Mac")
+		final boolean isMacOrUnix = System.getProperty("os.name").contains(
+				"Mac")
 				|| System.getProperty("os.name").contains("nix")
 				|| System.getProperty("os.name").contains("nux")
 				|| System.getProperty("os.name").contains("aix");
 
 		return isMacOrUnix ? selectFileNix() : selectFileWin();
 	}
-	
+
 	/**
 	 * Method opens a file chooser dialog for Windows systems
-	 * 
+	 *
 	 * @return File file
 	 * @throws LoadException
 	 */
@@ -671,59 +679,58 @@ implements Observer, ConfigNodePersistent {
 
 		return chosen;
 	}
-	
+
 	/**
-	 * Method opens a file chooser dialog for Unix based systems.
-	 * This uses AWT FileDialog rather than JFileChooser because it provides
-	 * the more 'native' way of selecting files for Linux and OSX systems.
-	 * It's ugly to deal with though (centering on screen, steals focus under 
-	 * Ubuntu...)
-	 * 
+	 * Method opens a file chooser dialog for Unix based systems. This uses AWT
+	 * FileDialog rather than JFileChooser because it provides the more 'native'
+	 * way of selecting files for Linux and OSX systems. It's ugly to deal with
+	 * though (centering on screen, steals focus under Ubuntu...)
+	 *
 	 * @return File file
 	 */
 	public File selectFileNix() {
 
 		File chosen = null;
 
-		final FileDialog fileDialog = new FileDialog(appFrame, 
-				"Choose a file", FileDialog.LOAD);
+		final FileDialog fileDialog = new FileDialog(appFrame, "Choose a file",
+				FileDialog.LOAD);
 
 		String string = fileMru.getMostRecentDir();
 		if (string == null) {
 			string = configNode.get("lastDir", "/");
 		}
 		fileDialog.setDirectory(string);
-		
+
 		/* Lots of code to be able to center an awt.FileDialog on screen... */
-	    Rectangle rect = appFrame.getContentPane().getBounds();
-	    
-	    /* 
-	     * Making sure FileDialog has a size before setVisible, otherwise
-	     * center cannot be found.
-	     */
-	    fileDialog.pack();
-	    fileDialog.setSize(800, 600);
-	    fileDialog.validate();
-	    
-	    double width = fileDialog.getBounds().getWidth();
-	    double height = fileDialog.getBounds().getHeight();
-		
-		double x = rect.getCenterX() - (width / 2);
-		double y = rect.getCenterY() - (height/ 2);
-		
-		Point newPoint = new Point();
+		final Rectangle rect = appFrame.getContentPane().getBounds();
+
+		/*
+		 * Making sure FileDialog has a size before setVisible, otherwise center
+		 * cannot be found.
+		 */
+		fileDialog.pack();
+		fileDialog.setSize(800, 600);
+		fileDialog.validate();
+
+		final double width = fileDialog.getBounds().getWidth();
+		final double height = fileDialog.getBounds().getHeight();
+
+		final double x = rect.getCenterX() - (width / 2);
+		final double y = rect.getCenterY() - (height / 2);
+
+		final Point newPoint = new Point();
 		newPoint.setLocation(x, y);
-		
+
 		fileDialog.setLocation(newPoint);
-	    fileDialog.setVisible(true);
-	    
-		String dir = fileDialog.getDirectory();
-		String filename = fileDialog.getFile();
+		fileDialog.setVisible(true);
+
+		final String dir = fileDialog.getDirectory();
+		final String filename = fileDialog.getFile();
 		if (dir != null && filename != null) {
 			chosen = new File(dir + filename);
 			configNode.put("lastdir", fileDialog.getDirectory());
 		}
-		
+
 		/* AWT FileDialog steals focus... this is necessary */
 		appFrame.requestFocus();
 
@@ -732,7 +739,7 @@ implements Observer, ConfigNodePersistent {
 
 	/**
 	 * Open a dialog which allows the user to select a new data file
-	 * 
+	 *
 	 * @return The fileset corresponding to the dataset.
 	 */
 	public FileSet getFileSet(final File file) {
@@ -801,7 +808,7 @@ implements Observer, ConfigNodePersistent {
 	/**
 	 * Overloaded setupFileDialog Setting up a file choosing dialog with
 	 * appropriate file filter
-	 * 
+	 *
 	 * @param fileDialog
 	 * @param viz
 	 */
@@ -819,20 +826,20 @@ implements Observer, ConfigNodePersistent {
 
 			// hmm... I'll just assume that there's no accept all.
 			fileDialog
-					.addChoosableFileFilter(new javax.swing.filechooser.FileFilter() {
+			.addChoosableFileFilter(new javax.swing.filechooser.FileFilter() {
 
-						@Override
-						public boolean accept(final File f) {
+				@Override
+				public boolean accept(final File f) {
 
-							return true;
-						}
+					return true;
+				}
 
-						@Override
-						public String getDescription() {
+				@Override
+				public String getDescription() {
 
-							return "All Files";
-						}
-					});
+					return "All Files";
+				}
+			});
 		}
 
 		fileDialog.setFileFilter(ff);
@@ -955,7 +962,7 @@ implements Observer, ConfigNodePersistent {
 
 	/**
 	 * Gets the key corresponding to a particular number.
-	 * 
+	 *
 	 * @param i
 	 *            The number
 	 * @return The VK_blah key value
@@ -986,34 +993,34 @@ implements Observer, ConfigNodePersistent {
 		return 0;
 	}
 
-//	public void showSubDataModel(final int[] indexes, final String source,
-//			final String name) {
-//
-//		if (indexes.length == 0) {
-//			JOptionPane.showMessageDialog(applicationFrame,
-//					"No Genes to show summary of!");
-//			return;
-//		}
-//
-//		showSubDataModel(indexes, null, source, name);
-//	}
-//
-//	public void showSubDataModel(final int[] geneIndexes,
-//			final int[] arrayIndexes, final String source, final String name) {
-//
-//		final ReorderedDataModel dataModel = new ReorderedDataModel(
-//				getDataModel(), geneIndexes, arrayIndexes);
-//		if (source != null) {
-//			dataModel.setSource(source);
-//		}
-//
-//		if (name != null) {
-//			dataModel.setName(name);
-//		}
-//
-//		final ViewFrame window = getApp().openNew();
-//		window.setDataModel(dataModel);
-//		window.setLoaded(true);
-//		window.getAppFrame().setVisible(true);
-//	}
+	// public void showSubDataModel(final int[] indexes, final String source,
+	// final String name) {
+	//
+	// if (indexes.length == 0) {
+	// JOptionPane.showMessageDialog(applicationFrame,
+	// "No Genes to show summary of!");
+	// return;
+	// }
+	//
+	// showSubDataModel(indexes, null, source, name);
+	// }
+	//
+	// public void showSubDataModel(final int[] geneIndexes,
+	// final int[] arrayIndexes, final String source, final String name) {
+	//
+	// final ReorderedDataModel dataModel = new ReorderedDataModel(
+	// getDataModel(), geneIndexes, arrayIndexes);
+	// if (source != null) {
+	// dataModel.setSource(source);
+	// }
+	//
+	// if (name != null) {
+	// dataModel.setName(name);
+	// }
+	//
+	// final ViewFrame window = getApp().openNew();
+	// window.setDataModel(dataModel);
+	// window.setLoaded(true);
+	// window.getAppFrame().setVisible(true);
+	// }
 }

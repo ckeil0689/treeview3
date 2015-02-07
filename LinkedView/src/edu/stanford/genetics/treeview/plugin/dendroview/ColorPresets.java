@@ -29,12 +29,11 @@ import java.util.prefs.Preferences;
 
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
 
 /**
  * This class encapsulates a list of Color presets. This is the class to edit
  * the default presets in...
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version @version $Revision: 1.1 $ $Date: 2006-08-16 19:13:45 $
  */
@@ -50,10 +49,10 @@ public class ColorPresets implements ConfigNodePersistent {
 
 	static {
 		/* Get system background panel color */
-//		Color sysBackground = UIManager.getColor("Panel.background");
-//		String sysBack = Integer.toHexString(sysBackground.getRGB());
-//		sysBack = sysBack.substring(2, sysBack.length());
-		
+		// Color sysBackground = UIManager.getColor("Panel.background");
+		// String sysBack = Integer.toHexString(sysBackground.getRGB());
+		// sysBack = sysBack.substring(2, sysBack.length());
+
 		defaultColorSets = new ColorSet[2];
 		defaultColorSets[0] = new ColorSet("RedGreen", "#FF0000", "#000000",
 				"#00FF00", "#8E8E8E", "#FFFFFF");
@@ -61,28 +60,27 @@ public class ColorPresets implements ConfigNodePersistent {
 				"#1BB7E5", "#8E8E8E", "#FFFFFF");
 	}
 
-	private Preferences configNode;	
-	
+	private Preferences configNode;
 
 	// which preset to use if not by confignode?
 
 	/**
 	 * creates a new ColorPresets object and binds it to the node adds default
 	 * Presets if none are currently set.
-	 * 
+	 *
 	 * @param parent
 	 *            node to bind to
 	 */
 	public ColorPresets(final Preferences parent) {
-		
+
 		super();
-		
-//		Color sysBackground = UIManager.getColor("Panel.background");
-//		String sysBack = Integer.toHexString(sysBackground.getRGB());
-//		sysBack = sysBack.substring(2, sysBack.length());
-//		
-//		defaultColorSets[0].setMissing(UIManager.getColor("Panel.background"));
-		
+
+		// Color sysBackground = UIManager.getColor("Panel.background");
+		// String sysBack = Integer.toHexString(sysBackground.getRGB());
+		// sysBack = sysBack.substring(2, sysBack.length());
+		//
+		// defaultColorSets[0].setMissing(UIManager.getColor("Panel.background"));
+
 		setConfigNode(parent);
 	}
 
@@ -119,7 +117,7 @@ public class ColorPresets implements ConfigNodePersistent {
 
 	/**
 	 * True if there a particular preset which we are to default to.
-	 * 
+	 *
 	 */
 	public boolean isDefaultEnabled() {
 
@@ -192,7 +190,7 @@ public class ColorPresets implements ConfigNodePersistent {
 					+ getDefaultIndex() + "\n";
 		}
 
-		for (int index = 0; index < childrenNodes.length; index++) {
+		for (final String childrenNode : childrenNodes) {
 
 			// tmp.setConfigNode(configNode.node(childrenNodes[index]));
 			// ret += tmp.toString() + "\n";
@@ -206,9 +204,9 @@ public class ColorPresets implements ConfigNodePersistent {
 	 */
 	public ColorSet getColorSet(final int index) {
 
-		if (index < defaultColorSets.length) {
+		if (index < defaultColorSets.length)
 			return defaultColorSets[index];
-		} else {
+		else {
 			try {
 				final String[] childrenNodes = getRootChildrenNodes();
 				final ColorSet ret = new ColorSet(
@@ -227,20 +225,18 @@ public class ColorPresets implements ConfigNodePersistent {
 	 */
 	public ColorSet getColorSet(final String name) {
 
-		for (int i = 0; i < defaultColorSets.length; i++) {
-			if (defaultColorSets[i].getName() == name) {
-				return defaultColorSets[i];
-			}
+		for (final ColorSet defaultColorSet : defaultColorSets) {
+			if (defaultColorSet.getName() == name)
+				return defaultColorSet;
 		}
 		final String[] childrenNodes = getRootChildrenNodes();
 
 		// First check for the node with the supplied name.
-		for (int i = 0; i < childrenNodes.length; i++) {
+		for (final String childrenNode : childrenNodes) {
 
-			final ColorSet ret = new ColorSet(configNode.node(childrenNodes[i]));
-			if (name.equals(ret.getName())) {
+			final ColorSet ret = new ColorSet(configNode.node(childrenNode));
+			if (name.equals(ret.getName()))
 				return ret;
-			}
 		}
 
 		// Default to first defaultColorSet (RedGreen)
@@ -254,7 +250,7 @@ public class ColorPresets implements ConfigNodePersistent {
 	public void addColorSet(final String name, final List<Color> colors,
 			final List<Double> fractions, final String missing,
 			final String empty) {
-		
+
 		final ColorSet newColorSet = new ColorSet(name, colors, fractions,
 				missing, empty);
 		addColorSet(newColorSet);
@@ -285,7 +281,7 @@ public class ColorPresets implements ConfigNodePersistent {
 		final ColorSet newColorSet = new ColorSet(set);
 		if (isCustomFound) {
 			newColorSet.save(configNode.node(customNode));
-			
+
 		} else {
 			int setNodeIndex = 0;
 			setNodeIndex = getRootChildrenNodes().length + 1;
@@ -295,7 +291,7 @@ public class ColorPresets implements ConfigNodePersistent {
 
 	/**
 	 * Remove color set permanently from presets
-	 * 
+	 *
 	 * @param i
 	 *            index of color set
 	 */
@@ -323,7 +319,7 @@ public class ColorPresets implements ConfigNodePersistent {
 
 	/**
 	 * Returns the names of the current children of this class' root node.
-	 * 
+	 *
 	 * @return
 	 */
 	public String[] getRootChildrenNodes() {
@@ -338,14 +334,13 @@ public class ColorPresets implements ConfigNodePersistent {
 				e.printStackTrace();
 				return null;
 			}
-		} else {
+		} else
 			return null;
-		}
 	}
 
 	/**
 	 * Returns the configNode of ColorPresets
-	 * 
+	 *
 	 * @return
 	 */
 	public Preferences getConfigNode() {

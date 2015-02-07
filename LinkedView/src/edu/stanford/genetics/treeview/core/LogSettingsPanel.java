@@ -39,8 +39,9 @@ public class LogSettingsPanel extends JPanel implements Observer {
 	}
 
 	private void synchronizeFrom() {
-		if (logBox.isSelected() != logBuffer.getLog())
+		if (logBox.isSelected() != logBuffer.getLog()) {
 			logBox.setSelected(logBuffer.getLog());
+		}
 	}
 
 	private void synchronizeTo() {
@@ -49,7 +50,8 @@ public class LogSettingsPanel extends JPanel implements Observer {
 
 	@Override
 	public void update(final Observable arg0, final Object arg1) {
-		if (arg1 == null)
+		if (arg1 == null) {
 			synchronizeFrom();
+		}
 	}
 }

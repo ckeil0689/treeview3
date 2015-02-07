@@ -17,8 +17,8 @@ import edu.stanford.genetics.treeview.core.PluginManager;
 
 /**
  * @author aloksaldanha
- * 
- * 
+ *
+ *
  */
 public class DendrogramFactory extends PluginFactory {
 
@@ -37,7 +37,7 @@ public class DendrogramFactory extends PluginFactory {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.PluginFactory#getName()
 	 */
 	@Override
@@ -48,7 +48,7 @@ public class DendrogramFactory extends PluginFactory {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.PluginFactory
 	 * #createPlugin(edu.stanford.genetics.treeview.ConfigNode)
 	 */
@@ -63,7 +63,7 @@ public class DendrogramFactory extends PluginFactory {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview.PluginFactory
 	 * #setGlobalNode(edu.stanford.genetics.treeview.ConfigNode)
 	 */
@@ -74,7 +74,7 @@ public class DendrogramFactory extends PluginFactory {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see edu.stanford.genetics.treeview
 	 * .PluginFactory#addPluginConfig(java.awt.Menu)
 	 */
@@ -107,7 +107,7 @@ public class DendrogramFactory extends PluginFactory {
 
 	/**
 	 * mechanism by which Dendroview can access the presets.
-	 * 
+	 *
 	 * @return color presets for dendrogram view
 	 */
 	public static ColorPresets getColorPresets() {

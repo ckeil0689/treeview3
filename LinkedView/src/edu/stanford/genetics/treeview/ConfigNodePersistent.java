@@ -7,17 +7,17 @@
  * $Name:  $
  *
  * This file is part of Java TreeView
- * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by 
+ * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by
  * Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
  *
  * This software is provided under the GNU GPL Version 2. In particular,
  *
- * 1) If you modify a source file, make a comment in it containing your name 
+ * 1) If you modify a source file, make a comment in it containing your name
  * and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
- * 3) Developers are encouraged but not required to notify the 
- * Java TreeView maintainers at alok@genome.stanford.edu when they make 
- * a useful addition. It would be nice if significant contributions could 
+ * 3) Developers are encouraged but not required to notify the
+ * Java TreeView maintainers at alok@genome.stanford.edu when they make
+ * a useful addition. It would be nice if significant contributions could
  * be merged into the main distribution.
  *
  * A full copy of the license can be found in gpl.txt or online at
@@ -31,7 +31,7 @@ import java.util.prefs.Preferences;
 
 /**
  * Defines an interface by which objects can be bound to ConfigNodes.
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.5 $ $Date: 2004-12-21 03:28:13 $
  */
@@ -50,9 +50,9 @@ public interface ConfigNodePersistent {
 
 	/**
 	 * If a configuration node is needed to store preferences, use this method.
-	 * It accepts a parent node as parameter so the new node can be added
-	 * to the exisiting hierarchy of Preferences nodes. The node will be a child 
-	 * of the supplied parent node.
+	 * It accepts a parent node as parameter so the new node can be added to the
+	 * exisiting hierarchy of Preferences nodes. The node will be a child of the
+	 * supplied parent node.
 	 */
 	public void setConfigNode(Preferences parentNode);
 }

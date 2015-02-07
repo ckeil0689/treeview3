@@ -34,7 +34,7 @@ import java.net.URL;
 /**
  * Abstract class to allow platform-independant control of an external web
  * browser
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.15 $ $Date: 2008-03-09 21:06:34 $
  */
@@ -44,7 +44,7 @@ public abstract class BrowserControl {
 	// shit, you would think they would object orient a bit more...
 	/**
 	 * Method to display a url
-	 * 
+	 *
 	 * @param url
 	 *            String representing url
 	 * @exception IOException
@@ -60,7 +60,7 @@ public abstract class BrowserControl {
 
 	/**
 	 * Pops up a window with the html source of a url. Primarily for debugging.
-	 * 
+	 *
 	 * @param url
 	 *            url to show.
 	 */
@@ -95,7 +95,7 @@ public abstract class BrowserControl {
 
 	/**
 	 * Simple example, causes a browser window pop up.
-	 * 
+	 *
 	 * @param args
 	 *            no arguments required.
 	 */
@@ -112,8 +112,7 @@ public abstract class BrowserControl {
 
 	public boolean isValidUrl(final String urlString) {
 		try {
-			@SuppressWarnings("unused")
-			final URL url = new URL(urlString);
+			new URL(urlString);
 			// url.openConnection()... can test to see if live (throws
 			// IOException)
 			return true;
@@ -125,28 +124,25 @@ public abstract class BrowserControl {
 	/**
 	 * Generates an appropriate <code>BrowserControl</code> for the current
 	 * platform.
-	 * 
+	 *
 	 * @return A new <code>BrowserControl</code>
 	 */
 	public static BrowserControl getBrowserControl() {
 		// christ, need to detect os type...
 		final String os = System.getProperty("os.name");
 
-		if (os == null) {
+		if (os == null)
 			return new UnixBrowserControl();
-		}
 
 		if (os.startsWith(WIN_ID)) {
-			if (os.indexOf("NT") > 0) {
+			if (os.indexOf("NT") > 0)
 				return new WinNTBrowserControl();
-			} else {
+			else
 				return new Win32BrowserControl();
-			}
 		}
 
-		if (os.startsWith(MAC_ID)) {
+		if (os.startsWith(MAC_ID))
 			return new MacBrowserControl();
-		}
 		// default to unix style?
 		return new UnixBrowserControl();
 	}
@@ -155,7 +151,7 @@ public abstract class BrowserControl {
 
 /**
  * Win32 browser control subclass for windows
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version @version $Revision: 1.15 $ $Date: 2008-03-09 21:06:34 $
  */
@@ -164,7 +160,7 @@ class Win32BrowserControl extends BrowserControl {
 	/**
 	 * Display a file in the system browser. If you want to display a file, you
 	 * must include the absolute path name.
-	 * 
+	 *
 	 * @param url
 	 *            the file's url (the url must start with either "http://" or
 	 *            "file://").
@@ -211,7 +207,7 @@ class Win32BrowserControl extends BrowserControl {
 
 /**
  * Win32 browser control subclass for windows
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version @version $Revision: 1.15 $ $Date: 2008-03-09 21:06:34 $
  */
@@ -221,11 +217,11 @@ class WinNTBrowserControl extends BrowserControl {
 		final String cons = "&|()<>^,\"\\";
 		final StringBuffer buf = new StringBuffer();
 		final char[] inChars = url.toCharArray();
-		for (int i = 0; i < inChars.length; i++) {
-			if (cons.indexOf(inChars[i]) >= 0) {
+		for (final char inChar : inChars) {
+			if (cons.indexOf(inChar) >= 0) {
 				buf.append("\\");
 			}
-			buf.append(inChars[i]);
+			buf.append(inChar);
 		}
 		return buf.toString();
 	}
@@ -233,7 +229,7 @@ class WinNTBrowserControl extends BrowserControl {
 	/**
 	 * Display a file in the system browser. If you want to display a file, you
 	 * must include the absolute path name.
-	 * 
+	 *
 	 * @param url
 	 *            the file's url (the url must start with either "http://" or
 	 *            "file://").
@@ -265,7 +261,7 @@ class WinNTBrowserControl extends BrowserControl {
 
 /**
  * Subclass for unix
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version @version $Revision: 1.15 $ $Date: 2008-03-09 21:06:34 $
  */
@@ -274,7 +270,7 @@ class UnixBrowserControl extends BrowserControl {
 	/**
 	 * Display a file in netscape. If you want to display a file, you must
 	 * include the absolute path name.
-	 * 
+	 *
 	 * @param url
 	 *            the file's url (the url must start with either "http://" or
 	 *            "file://").
@@ -308,7 +304,7 @@ class UnixBrowserControl extends BrowserControl {
 				// cmd = "netscape \"http://www.javaworld.com\""
 				cmd = UNIX_PATH + " \"" + url + "\"";
 				System.out
-						.println("Opening new netscape on unix can be flaky, paste this into a terminal if nothing happens... ");
+				.println("Opening new netscape on unix can be flaky, paste this into a terminal if nothing happens... ");
 				System.out.println(cmd);
 				p = Runtime.getRuntime().exec(cmd);
 			}
@@ -330,7 +326,7 @@ class UnixBrowserControl extends BrowserControl {
 
 /**
  * Subclass for mac
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version @version $Revision: 1.15 $ $Date: 2008-03-09 21:06:34 $
  */
@@ -339,7 +335,7 @@ class MacBrowserControl extends BrowserControl {
 	/**
 	 * Display a file in the system browser. If you want to display a file, you
 	 * must include the absolute path name.
-	 * 
+	 *
 	 * @param url
 	 *            the file's url (the url must start with either "http://" or
 	 *            "file://").

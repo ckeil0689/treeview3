@@ -33,7 +33,7 @@ import javax.swing.JPanel;
 /**
  * encapsulates a panel which can be used to edit a single color within a color
  * set.
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version @version $Revision: 1.4 $ $Date: 2004-12-21 03:28:13 $
  */

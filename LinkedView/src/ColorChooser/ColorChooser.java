@@ -21,13 +21,13 @@ import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
 
 public class ColorChooser implements ConfigNodePersistent {
-	
+
 	/* Saved data */
 	private Preferences configNode;
-	
+
 	/* GUI components */
 	private JPanel mainPanel;
-	private GradientBox gradientBox;
+	private final GradientBox gradientBox;
 
 	/* For custom ColorSet manipulation */
 	private JButton addBtn;
@@ -41,43 +41,46 @@ public class ColorChooser implements ConfigNodePersistent {
 
 	/* Holds all preset color data */
 	private final ColorPresets colorPresets;
-	
+
 	/* Stores whether custom ColorSet is selected or not */
 	private boolean isCustomSelected;
 
 	/**
 	 * Constructs a ColorChooser object.
-	 * @param drawer The CoorExtractor which defines how colors are mapped
-	 * to data.
-	 * @param minVal Minimum boundary of the data.
-	 * @param maxVal Maximum boundary of the data.
+	 *
+	 * @param drawer
+	 *            The CoorExtractor which defines how colors are mapped to data.
+	 * @param minVal
+	 *            Minimum boundary of the data.
+	 * @param maxVal
+	 *            Maximum boundary of the data.
 	 */
-	public ColorChooser(ColorExtractor drawer, double minVal, double maxVal) {
+	public ColorChooser(final ColorExtractor drawer, final double minVal,
+			final double maxVal) {
 
 		this.colorPresets = DendrogramFactory.getColorPresets();
 		this.gradientBox = new GradientBox(drawer, minVal, maxVal);
-		
+
 		setLayout();
 		setPresets();
 	}
-	
+
 	/**
-	 * Sets up the GUI layout of the ColorChooser object. 
+	 * Sets up the GUI layout of the ColorChooser object.
 	 */
 	private void setLayout() {
-		
+
 		mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 		mainPanel.setBorder(BorderFactory.createEtchedBorder());
 
 		final JLabel hint = GUIFactory.createLabel("Move or add sliders "
 				+ "to adjust color scheme.", GUIFactory.FONTS);
 
-
 		addBtn = GUIFactory.createBtn("Add Color");
 		removeBtn = GUIFactory.createBtn("Remove Selected");
 
 		/* Collection of ColorSet choice buttons */
-		ButtonGroup colorBtnGroup = new ButtonGroup();
+		final ButtonGroup colorBtnGroup = new ButtonGroup();
 
 		redGreenBtn = GUIFactory.createRadioBtn("Red-Green");
 		yellowBlueBtn = GUIFactory.createRadioBtn("Yellow-Blue");
@@ -88,8 +91,8 @@ public class ColorChooser implements ConfigNodePersistent {
 		colorBtnGroup.add(yellowBlueBtn);
 		colorBtnGroup.add(customColorBtn);
 
-		final JPanel radioButtonPanel = 
-				GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
+		final JPanel radioButtonPanel = GUIFactory.createJPanel(false,
+				GUIFactory.DEFAULT, null);
 
 		final JLabel colorHint = GUIFactory.createLabel("Choose a Color "
 				+ "Scheme: ", GUIFactory.FONTS);
@@ -98,7 +101,7 @@ public class ColorChooser implements ConfigNodePersistent {
 		radioButtonPanel.add(redGreenBtn, "span, wrap");
 		radioButtonPanel.add(yellowBlueBtn, "span, wrap");
 		radioButtonPanel.add(customColorBtn, "span");
-		
+
 		mainPanel.add(radioButtonPanel, "span, pushx, wrap");
 		mainPanel.add(hint, "span, wrap");
 		mainPanel.add(gradientBox, "h 150:150:, w 500:500:, pushx, alignx 50%,"
@@ -113,8 +116,8 @@ public class ColorChooser implements ConfigNodePersistent {
 
 		if (parentNode != null) {
 			this.configNode = parentNode.node("GradientChooser");
-			
-			String colorSet = configNode.get("activeColors", "RedGreen");
+
+			final String colorSet = configNode.get("activeColors", "RedGreen");
 			gradientBox.setActiveColorSet(colorPresets.getColorSet(colorSet));
 
 		} else {
@@ -126,7 +129,7 @@ public class ColorChooser implements ConfigNodePersistent {
 	/**
 	 * Returns the mainPanel which contains all the GUI components for the
 	 * ColorGradientChooser.
-	 * 
+	 *
 	 * @return
 	 */
 	public JPanel makeGradientPanel() {
@@ -138,7 +141,7 @@ public class ColorChooser implements ConfigNodePersistent {
 	/**
 	 * Gives access to the GradientBox object which is the JPanel containing the
 	 * actual color gradient and thumbs.
-	 * 
+	 *
 	 * @return
 	 */
 	protected GradientBox getGradientBox() {
@@ -146,14 +149,14 @@ public class ColorChooser implements ConfigNodePersistent {
 		return gradientBox;
 	}
 
-	/* ------------ Accessors -------------*/
+	/* ------------ Accessors ------------- */
 	protected Preferences getConfigNode() {
 
 		return configNode;
 	}
-	
+
 	protected JPanel getMainPanel() {
-		
+
 		return mainPanel;
 	}
 
@@ -193,7 +196,7 @@ public class ColorChooser implements ConfigNodePersistent {
 	protected void setPresets() {
 
 		final String defaultColors = "RedGreen";
-		
+
 		/* Get the active ColorSet name */
 		String colorScheme = defaultColors;
 		if (configNode != null) {
@@ -223,14 +226,16 @@ public class ColorChooser implements ConfigNodePersistent {
 			LogBuffer.println("No matching ColorSet found in "
 					+ "ColorGradientChooser.setPresets()");
 		}
-		
+
 		gradientBox.loadPresets(selectedColorSet);
 	}
-	
+
 	/**
 	 * Sets button status and remembers if custom ColorSet is selected or not.
 	 * If not, it disables the add-, remove- and missing color buttons.
-	 * @param selected Whether the custom ColorSet is selected or not.
+	 *
+	 * @param selected
+	 *            Whether the custom ColorSet is selected or not.
 	 */
 	public void setCustomSelected(final boolean selected) {
 
@@ -240,15 +245,15 @@ public class ColorChooser implements ConfigNodePersistent {
 		removeBtn.setEnabled(selected);
 		missingBtn.setEnabled(selected);
 	}
-	
+
 	public void setActiveColorSet(final String name) {
-		
-		ColorSet set = colorPresets.getColorSet(name);
+
+		final ColorSet set = colorPresets.getColorSet(name);
 		gradientBox.setActiveColorSet(set);
-		
+
 		configNode.put("activeColors", name);
 	}
-	
+
 	/**
 	 * Switched the currently used ColorSet to the one that matches the
 	 * specified entered name key in its 'ColorSet' configNode.
@@ -256,22 +261,22 @@ public class ColorChooser implements ConfigNodePersistent {
 	public void switchColorSet(final String name) {
 
 		setActiveColorSet(name);
-		
+
 		/* Load and set data accordingly */
 		setPresets();
 		gradientBox.setGradientColors();
-		
+
 		/* Update view! */
 		mainPanel.repaint();
 	}
-	
-	protected ColorSet getColorSet(String name) {
-		
+
+	protected ColorSet getColorSet(final String name) {
+
 		return colorPresets.getColorSet(name);
 	}
 
 	/* ------- GUI component listeners ------------ */
-	
+
 	protected void addThumbSelectListener(final MouseListener l) {
 
 		gradientBox.addMouseListener(l);
@@ -298,9 +303,9 @@ public class ColorChooser implements ConfigNodePersistent {
 		yellowBlueBtn.addActionListener(l);
 		customColorBtn.addActionListener(l);
 	}
-	
+
 	protected void addMissingListener(final ActionListener l) {
-		
+
 		missingBtn.addActionListener(l);
 	}
 }

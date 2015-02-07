@@ -9,7 +9,7 @@
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
  *
- * This software is provided under the GNU GPL Version 2. In particular, 
+ * This software is provided under the GNU GPL Version 2. In particular,
  *
  * 1) If you modify a source file, make a comment in it containing your name and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
@@ -18,7 +18,7 @@
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
  *
- * END_HEADER 
+ * END_HEADER
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
@@ -34,12 +34,13 @@ import edu.stanford.genetics.treeview.TreeDrawerNode;
 public class TreeColorer {
 	private static int colorInd;
 	private static String[][] headers; // used when inferring node colors from
-										// gene colors
+	// gene colors
 	private static HeaderInfo headerInfo; // used when coloring using column
-											// from GTR.
+
+	// from GTR.
 
 	/**
-	 * 
+	 *
 	 * @param rootNode
 	 * @param geneHeaderInfo
 	 */
@@ -53,7 +54,7 @@ public class TreeColorer {
 
 	/**
 	 * colors using header stored in nodes of tree
-	 * 
+	 *
 	 * @param root
 	 *            root node of tree
 	 * @param h
@@ -84,9 +85,9 @@ public class TreeColorer {
 			final TreeDrawerNode node) {
 		// wrong index
 		// String [] headers = headerInfo.getHeader((int) node.getIndex());
-		if (node.isLeaf()) {
+		if (node.isLeaf())
 			return;
-		} else {
+		else {
 			final int index = headerInfo.getHeaderIndex(node.getId());
 			if (index < 0) {
 				LogBuffer.println("Problem finding node " + node.getId());
@@ -103,7 +104,7 @@ public class TreeColorer {
 
 	/**
 	 * colors using leaf nodes
-	 * 
+	 *
 	 * @param root
 	 * @param h
 	 * @param ci
@@ -116,10 +117,9 @@ public class TreeColorer {
 			LogBuffer.println("headers null");
 			return;
 		}
-		if (colorInd < 0) {
+		if (colorInd < 0)
 			// LogPanel.println("colorInd < 0");
 			return;
-		}
 		recursiveColorUsingLeaf(root);
 	}
 
@@ -127,14 +127,12 @@ public class TreeColorer {
 			final String[][] h, final int ci) {
 		colorInd = ci;
 		headers = h;
-		if (headers == null) {
+		if (headers == null)
 			// System.out.println("headers null");
 			return;
-		}
-		if (colorInd < 0) {
+		if (colorInd < 0)
 			// System.out.println("colorInd < 0");
 			return;
-		}
 		recursiveColor(root);
 	}
 
@@ -200,9 +198,8 @@ public class TreeColorer {
 		for (i = 0; i < colornames.length; i++) {
 			if (colornames[i] == null) {
 				break;
-			} else if (colornames[i].equals(color)) {
+			} else if (colornames[i].equals(color))
 				return i;
-			}
 		}
 		// need to allocate new color
 		colornames[i] = color;

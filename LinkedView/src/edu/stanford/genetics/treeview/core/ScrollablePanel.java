@@ -11,9 +11,9 @@ import javax.swing.SwingConstants;
  * Class to make JPanel work well with ScrollPane, advice taken from
  * http://stackoverflow.com/questions/15783014/jtextarea-on-jpanel-inside-
  * jscrollpane-does-not-resize-properly
- * 
+ *
  * @author CKeil
- * 
+ *
  */
 public class ScrollablePanel extends JPanel implements Scrollable {
 

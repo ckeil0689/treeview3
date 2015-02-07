@@ -36,12 +36,14 @@ When you tackle an issue:
 5. Branch
 6. Implement code
 7. Test on your own
-8. Commit/push
-9. Ask others to test
-10. Switch to master branch
-11. Merge in your branch
-12. Push the merged master branch
-13. Resolve the issue
+8. Run a code clean up if using Eclipse (Project Explorer > Right-click > Source > Clean-up)
+The XML-protocol is available for download in the download section of this repository (cleanup_prefs_alpha01.xml). Import this to Eclipse for use.
+9. Commit/push
+10. Ask others to test
+11. Switch to master branch
+12. Merge in your branch
+13. Push the merged master branch
+14. Resolve the issue
 
 ### Developer Testing Procedure ###
 

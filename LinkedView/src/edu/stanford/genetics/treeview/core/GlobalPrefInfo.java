@@ -19,7 +19,7 @@ import edu.stanford.genetics.treeview.TreeViewApp;
 public class GlobalPrefInfo extends JPanel implements Observer {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 	private final JPanel msgPanel = new JPanel();

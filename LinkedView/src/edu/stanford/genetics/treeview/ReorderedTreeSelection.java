@@ -7,12 +7,12 @@ import java.util.Vector;
 
 /**
  * represents a reordered version of the underlying TreeSelectionI
- * 
+ *
  * @author Alok@caltech.edu
- * 
+ *
  */
 public class ReorderedTreeSelection extends Observable implements
-		TreeSelectionI, Observer {
+TreeSelectionI, Observer {
 
 	private final TreeSelectionI parent;
 	private final int[] reorderedIndex;
@@ -63,9 +63,8 @@ public class ReorderedTreeSelection extends Observable implements
 	public boolean isIndexSelected(final int i) {
 
 		final int index = reorderedIndex[i];
-		if (index != -1) {
+		if (index != -1)
 			return parent.isIndexSelected(index);
-		}
 
 		return false;
 	}
@@ -74,15 +73,13 @@ public class ReorderedTreeSelection extends Observable implements
 	public int getMinIndex() {
 
 		final int start = parent.getMinIndex();
-		if (start == -1) {
+		if (start == -1)
 			return -1;
-		}
 
 		for (int i = 0; i < reorderedIndex.length; i++) {
 
-			if (reorderedIndex[i] == start) {
+			if (reorderedIndex[i] == start)
 				return i;
-			}
 		}
 		return -1;
 	}
@@ -97,14 +94,12 @@ public class ReorderedTreeSelection extends Observable implements
 	public int getMaxIndex() {
 
 		final int stop = parent.getMaxIndex();
-		if (stop == -1) {
+		if (stop == -1)
 			return -1;
-		}
 
 		for (int i = reorderedIndex.length - 1; i >= 0; i--) {
-			if (reorderedIndex[i] == stop) {
+			if (reorderedIndex[i] == stop)
 				return i;
-			}
 		}
 		return -1;
 	}

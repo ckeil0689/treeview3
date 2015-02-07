@@ -9,7 +9,7 @@
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
  *
- * This software is provided under the GNU GPL Version 2. In particular, 
+ * This software is provided under the GNU GPL Version 2. In particular,
  *
  * 1) If you modify a source file, make a comment in it containing your name and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
@@ -18,7 +18,7 @@
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
  *
- * END_HEADER 
+ * END_HEADER
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
@@ -45,10 +45,10 @@ import edu.stanford.genetics.treeview.SettingsPanel;
 /**
  * Subclass of ColorBarExportPanel which outputs a bitmap version of color bar
  * scale
- * 
+ *
  */
 public class BitmapColorBarExportPanel extends ColorBarExportPanel implements
-		SettingsPanel {
+SettingsPanel {
 
 	JComboBox formatPulldown = new JComboBox(BitmapWriter.formats);
 
@@ -99,11 +99,7 @@ public class BitmapColorBarExportPanel extends ColorBarExportPanel implements
 					new FileOutputStream(getFile()));
 			final BufferedImage i = generateImage();
 			final String format = (String) formatPulldown.getSelectedItem();
-			@SuppressWarnings("unused")
-			// ignore success, could keep window open on failure if save could
-			// indicate success.
-			final boolean success = BitmapWriter.writeBitmap(i, format, output,
-					this);
+			BitmapWriter.writeBitmap(i, format, output, this);
 
 			output.close();
 		} catch (final Exception e) {

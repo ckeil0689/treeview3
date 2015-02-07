@@ -32,34 +32,34 @@ import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
  * Class for Drawing A Colored Grid Representation of a Data Matrix.
- * 
+ *
  * Each cell in the view corresponds to an element in the array. The color of
  * the pixels is determined by the ColorExtractor, which is passed in the value
  * to be converted.
  * <p>
- * 
+ *
  * The ArrayDrawer is Observable. It setsChanged() itself when the data array is
  * changed, but you have to call notifyObservers() yourself. Notifications from
  * the ColorExtractor, however, are immediately passed on to listeners.
  * <p>
- * 
+ *
  * Upon setting a data array, ArrayDrawer will set a reference to the data
  * array, and may refer to it when it asked to draw things. Of course, it may
  * form some kind of internal buffer- you're advised to call setData() if you
  * change the data, and not to change the data unless you call setData() too.
  * <p>
- * 
+ *
  * The ArrayDrawer can draw on a Graphics object. It requires a source rectangle
  * in units of array indexes, to determine which array values to render, and a
  * destination rectangle to draw them to.
  * <p>
- * 
+ *
  * At some point, we many want to allow arrays of ints to specify source rows
  * and columns to grab data from for non-contiguous views.
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.1 $ $Date: 2006-08-16 19:13:46 $
- * 
+ *
  */
 public class DoubleArrayDrawer extends ArrayDrawer {
 
@@ -77,7 +77,7 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 
 	/**
 	 * Set ColorExtractor for future draws
-	 * 
+	 *
 	 * @param colorExtractor
 	 *            A ColorExtractor to draw required pixels
 	 */
@@ -94,7 +94,7 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 
 	/**
 	 * Gets the colorExtractor attribute of the ArrayDrawer object
-	 * 
+	 *
 	 * @return The colorExtractor value
 	 */
 	public ColorExtractor getColorExtractor() {
@@ -104,7 +104,7 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 
 	/**
 	 * Set the source of the data.
-	 * 
+	 *
 	 * @param matrix
 	 *            A DataMatrix of values to be rendered.
 	 */
@@ -158,7 +158,7 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 	/**
 	 * Paint the array values onto pixels. This method will do averaging if
 	 * multiple values map to the same pixel.
-	 * 
+	 *
 	 * @param pixels
 	 *            The pixel buffer to draw to.
 	 * @param source
@@ -177,26 +177,25 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 	@Override
 	public void paint(final int[] pixels, final Rectangle source,
 			final Rectangle dest, final int scanSize, final int[] geneOrder) {
-		
+
 		/* Selection dimming code, selections passed from GlobalView */
-		//, int[] geneSelections, int[] arraySelections) {
+		// , int[] geneSelections, int[] arraySelections) {
 
 		if (dataMatrix == null) {
 			LogBuffer.println("Data matrix wasn't set, "
 					+ "can't be used in paint() in DoubleArrayDrawer.");
 		}
-		
-		/* 
-		 * Selection Dimming
-		 * Set the selection ranges for rows and columns. 
-		 * All values are -1 if no selection was made. 
+
+		/*
+		 * Selection Dimming Set the selection ranges for rows and columns. All
+		 * values are -1 if no selection was made.
 		 */
-//		int g_min = geneSelections[0];
-//		int g_max = geneSelections[1];
-//		
-//		int a_min = arraySelections[0];
-//		int a_max = arraySelections[1];
-		
+		// int g_min = geneSelections[0];
+		// int g_max = geneSelections[1];
+		//
+		// int a_min = arraySelections[0];
+		// int a_max = arraySelections[1];
+
 		// ynext will hold the first pixel of the next block.
 		int ynext = dest.y;
 
@@ -269,22 +268,22 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 					} else {
 						val /= count;
 					}
-					
+
 					/* Darken non-selected rows/ cols if there's a selection */
-//					boolean isBackground;
-//					int geneInd = gene + source.y;
-//					int arrayInd = array + source.x;
-					
+					// boolean isBackground;
+					// int geneInd = gene + source.y;
+					// int arrayInd = array + source.x;
+
 					/* Selection Dimming */
-//					if(g_min == -1) {
-//						isBackground = false;
-//					} else {
-//						isBackground = !(geneInd >= g_min && geneInd <= g_max) 
-//								|| !(arrayInd >= a_min && arrayInd <= a_max);
-//					}
-					
+					// if(g_min == -1) {
+					// isBackground = false;
+					// } else {
+					// isBackground = !(geneInd >= g_min && geneInd <= g_max)
+					// || !(arrayInd >= a_min && arrayInd <= a_max);
+					// }
+
 					final int t_color = colorExtractor.getARGBColor(val);
-					/*Selection dimming */
+					/* Selection dimming */
 					// , isBackground);
 
 					for (int x = xstart; x < xnext; x++) {
@@ -296,9 +295,9 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 					}
 				} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 					LogBuffer
-							.println("ArrayIndexOutOfBoundsException in "
-									+ "paint() in DoubleArrayDrawer: "
-									+ e.getMessage());
+					.println("ArrayIndexOutOfBoundsException in "
+							+ "paint() in DoubleArrayDrawer: "
+							+ e.getMessage());
 				}
 				arrayFirst = array + 1;
 			}
@@ -308,7 +307,7 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 
 	/**
 	 * Get value for a given array element
-	 * 
+	 *
 	 * @param x
 	 *            x coordinate of array element
 	 * @param y
@@ -346,9 +345,8 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 	@Override
 	public int getNumRow() {
 
-		if (dataMatrix != null) {
+		if (dataMatrix != null)
 			return dataMatrix.getNumRow();
-		}
 		return 0;
 	}
 
@@ -356,15 +354,14 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 	@Override
 	public int getNumCol() {
 
-		if (dataMatrix != null) {
+		if (dataMatrix != null)
 			return dataMatrix.getNumCol();
-		}
 		return 0;
 	}
 
 	/**
 	 * Get Color for a given array element
-	 * 
+	 *
 	 * @param x
 	 *            x coordinate of array element
 	 * @param y

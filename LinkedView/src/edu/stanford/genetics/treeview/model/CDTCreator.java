@@ -20,9 +20,9 @@ import edu.stanford.genetics.treeview.TreeViewFrame;
  * and adjusting a lot of the source code. The cdt file type used by Java
  * TreeView assumes a certain format, so any loaded file will be scanned for the
  * required data and a formatted cdt file is generated.
- * 
+ *
  * @author CKeil
- * 
+ *
  */
 public class CDTCreator {
 
@@ -60,7 +60,7 @@ public class CDTCreator {
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param file
 	 */
 	public CDTCreator(final File file, final String fileType,
@@ -71,11 +71,11 @@ public class CDTCreator {
 
 	/**
 	 * Constructor for custom ORF/ NAME lists
-	 * 
+	 *
 	 * @param file
 	 */
-	public CDTCreator(final File file, final File file2,
-			final String fileType, final TreeViewFrame tvFrame) {
+	public CDTCreator(final File file, final File file2, final String fileType,
+			final TreeViewFrame tvFrame) {
 
 		this.file = file;
 		this.customFile = file2;
@@ -87,25 +87,25 @@ public class CDTCreator {
 
 		try {
 			// Loading screen
-			loadProgView.setLoadText("Transforming file to CDT format...");
-			loadProgView.resetLoadBar();
+			WelcomeView.setLoadText("Transforming file to CDT format...");
+			WelcomeView.resetLoadBar();
 
 			// Count file lines for loadBar
 			final int pBarMax = count(file.getAbsolutePath());
-			loadProgView.setLoadBarMax(pBarMax);
+			WelcomeView.setLoadBarMax(pBarMax);
 
 			reader = new BufferedReader(new FileReader(file));
 
 			// final String[][] dataExtract = extractData(reader, pBarMax);
 
 			// Arrays to ArrayLists
-			loadProgView.setLoadText("Preparing dataset.");
+			WelcomeView.setLoadText("Preparing dataset.");
 			// dataSet = transformArray(dataExtract);
 			dataSet = extractData(reader, pBarMax);
 			rowSize = dataSet[0].length;
 
 			// Find positions of labels in the data set
-			loadProgView.setLoadText("Checking for labels.");
+			WelcomeView.setLoadText("Checking for labels.");
 			findLabel(gidInd, "GID");
 			findLabel(aidInd, "AID");
 			findLabel(orfInd, "ORF");
@@ -118,10 +118,10 @@ public class CDTCreator {
 			dataStart[0] = eweightInd[0] + 1;
 			dataStart[1] = gweightInd[1] + 1;
 
-			loadProgView.setLoadText("Setting up file details.");
+			WelcomeView.setLoadText("Setting up file details.");
 			setupFile();
 
-			loadProgView.setLoadText("Writing CDT file...");
+			WelcomeView.setLoadText("Writing CDT file...");
 			generateCDT();
 
 			bw.close();
@@ -142,7 +142,7 @@ public class CDTCreator {
 	/**
 	 * Finds the positions of given labels in the data set and assigns the
 	 * values to instance variables for further use.
-	 * 
+	 *
 	 * @param labelPos
 	 * @param dataSet
 	 * @param label
@@ -210,7 +210,7 @@ public class CDTCreator {
 	 * column elements to display certain data in its various views. This
 	 * function assembles such a .cdt file from the scavenged data of the loaded
 	 * input file.
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	private void generateCDT() throws IOException {
@@ -360,7 +360,7 @@ public class CDTCreator {
 			// Check whether it's the last line
 			bw.writeContent(rowElement);
 			line++;
-			loadProgView.updateLoadBar(line);
+			WelcomeView.updateLoadBar(line);
 		}
 
 		bw.closeWriter();
@@ -399,7 +399,7 @@ public class CDTCreator {
 
 	/**
 	 * Reading the data separated by tab delimited \t
-	 * 
+	 *
 	 * @param reader
 	 * @param dataExtract
 	 * @return
@@ -483,7 +483,7 @@ public class CDTCreator {
 
 	/**
 	 * Checking a custom string whether it contains
-	 * 
+	 *
 	 * @param original
 	 * @param custom
 	 * @return
@@ -506,7 +506,7 @@ public class CDTCreator {
 	 * Count amount of lines in the file to be loaded so that the progressBar
 	 * can get correct values for extractData(). Code from StackOverflow
 	 * (https://stackoverflow.com/questions/453018).
-	 * 
+	 *
 	 * @param filename
 	 * @return
 	 * @throws IOException
@@ -540,7 +540,7 @@ public class CDTCreator {
 
 	/**
 	 * Getter for file path
-	 * 
+	 *
 	 * @return
 	 */
 	public String getFilePath() {

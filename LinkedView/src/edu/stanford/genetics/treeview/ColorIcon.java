@@ -30,7 +30,7 @@ import javax.swing.Icon;
 
 /**
  * A little icon with a changeable color.
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version @version $Revision: 1.5 $ $Date: 2004-12-21 03:28:14 $
  */
@@ -54,7 +54,7 @@ public class ColorIcon implements Icon {
 
 	/**
 	 * Sets the color, but doesn't redraw or anything.
-	 * 
+	 *
 	 * @param c
 	 *            The new color
 	 */

@@ -17,20 +17,20 @@ import java.io.OutputStream;
  * (which must be fully loaded) or a set of RGB arrays. The image can be written
  * out with a call to <CODE>Write</CODE>.
  * <P>
- * 
+ *
  * Three caveats:
  * <UL>
  * <LI>GIFEncoder will convert the image to indexed color upon construction.
  * This will take some time, depending on the size of the image. Also, actually
  * writing the image out (Write) will take time.
  * <P>
- * 
+ *
  * <LI>The image cannot have more than 256 colors, since GIF is an 8 bit format.
  * For a 24 bit to 8 bit quantization algorithm, see Graphics Gems II III.2 by
  * Xialoin Wu. Or check out his <A
  * HREF="http://www.csd.uwo.ca/faculty/wu/cq.c">C source</A>.
  * <P>
- * 
+ *
  * <LI>Since the image must be completely loaded into memory, GIFEncoder may
  * have problems with large images. Attempting to encode an image which will not
  * fit into memory will probably result in the following exception:
@@ -39,7 +39,7 @@ import java.io.OutputStream;
  * <P>
  * </UL>
  * <P>
- * 
+ *
  * GIFEncoder is based upon gifsave.c, which was written and released by:
  * <P>
  * <CENTER> Sverre H. Huseby<BR>
@@ -47,12 +47,12 @@ import java.io.OutputStream;
  * N-0468 Oslo<BR>
  * Norway
  * <P>
- * 
+ *
  * Phone: +47 2 230539<BR>
  * sverrehu@ifi.uio.no
  * <P>
  * </CENTER>
- * 
+ *
  * @version 0.90 21 Apr 1996
  * @author <A HREF="http://www.cs.brown.edu/people/amd/">Adam Doppelt</A>
  */
@@ -69,7 +69,7 @@ public class GIFEncoder {
 	 * Construct a GIFEncoder. The constructor will convert the image to an
 	 * indexed color array. <B>This may take some time.</B>
 	 * <P>
-	 * 
+	 *
 	 * @param image
 	 *            The image to encode. The image <B>must</B> be completely
 	 *            loaded.
@@ -120,18 +120,18 @@ public class GIFEncoder {
 	 * Construct a GIFEncoder. The constructor will convert the image to an
 	 * indexed color array. <B>This may take some time.</B>
 	 * <P>
-	 * 
+	 *
 	 * Each array stores intensity values for the image. In other words, r[x][y]
 	 * refers to the red intensity of the pixel at column x, row y.
 	 * <P>
-	 * 
+	 *
 	 * @param r
 	 *            An array containing the red intensity values.
 	 * @param g
 	 *            An array containing the green intensity values.
 	 * @param b
 	 *            An array containing the blue intensity values.
-	 * 
+	 *
 	 * @exception AWTException
 	 *                Will be thrown if the image contains more than 256 colors.
 	 * */
@@ -149,11 +149,11 @@ public class GIFEncoder {
 	 * single GIF87a image, non-interlaced, with no background color. <B>This
 	 * may take some time.</B>
 	 * <P>
-	 * 
+	 *
 	 * @param output
 	 *            The stream to output to. This should probably be a buffered
 	 *            stream.
-	 * 
+	 *
 	 * @exception IOException
 	 *                Will be thrown if a write operation fails.
 	 * */
@@ -202,14 +202,13 @@ public class GIFEncoder {
 				for (search = 0; search < colornum; ++search) {
 					if (colors_[search * 3] == r[x][y]
 							&& colors_[search * 3 + 1] == g[x][y]
-							&& colors_[search * 3 + 2] == b[x][y])
+									&& colors_[search * 3 + 2] == b[x][y]) {
 						break;
+					}
 				}
 
-				if (search > 255) {
-
+				if (search > 255)
 					throw new AWTException("Too many colors.");
-				}
 
 				pixels_[y * width_ + x] = (byte) search;
 
@@ -316,8 +315,9 @@ class LZWStringTable {
 			return 0xFFFF;
 
 		hshidx = Hash(index, b);
-		while (strHsh_[hshidx] != HASH_FREE)
+		while (strHsh_[hshidx] != HASH_FREE) {
 			hshidx = (hshidx + HASHSTEP) % HASHSIZE;
+		}
 
 		strHsh_[hshidx] = numStrings_;
 		strChr_[numStrings_] = b;
@@ -350,8 +350,9 @@ class LZWStringTable {
 		}
 
 		final int w = (1 << codesize) + RES_CODES;
-		for (int q = 0; q < w; q++)
+		for (int q = 0; q < w; q++) {
 			AddCharString((short) 0xFFFF, (byte) q);
+		}
 	}
 
 	static public int Hash(final short index, final byte lastbyte) {
@@ -380,11 +381,11 @@ class LZWCompressor {
 		strings.ClearTable(codesize);
 		bitFile.WriteBits(clearcode, numbits);
 
-		for (int loop = 0; loop < toCompress.length; ++loop) {
-			c = toCompress[loop];
-			if ((index = strings.FindCharString(prefix, c)) != -1)
+		for (final byte toCompres : toCompress) {
+			c = toCompres;
+			if ((index = strings.FindCharString(prefix, c)) != -1) {
 				prefix = index;
-			else {
+			} else {
 				bitFile.WriteBits(prefix, numbits);
 				if (strings.AddCharString(prefix, c) > limit) {
 					if (++numbits > 12) {
@@ -399,8 +400,9 @@ class LZWCompressor {
 			}
 		}
 
-		if (prefix != -1)
+		if (prefix != -1) {
 			bitFile.WriteBits(prefix, numbits);
+		}
 
 		bitFile.WriteBits(endofinfo, numbits);
 		bitFile.Flush();
@@ -505,8 +507,9 @@ class BitUtils {
 		if (n-- == 0)
 			return 0;
 
-		while ((n >>= 1) != 0)
+		while ((n >>= 1) != 0) {
 			++ret;
+		}
 
 		return ret;
 	}
@@ -519,7 +522,8 @@ class BitUtils {
 
 	static void WriteString(final OutputStream output, final String string)
 			throws IOException {
-		for (int loop = 0; loop < string.length(); ++loop)
+		for (int loop = 0; loop < string.length(); ++loop) {
 			output.write((byte) (string.charAt(loop)));
+		}
 	}
 }

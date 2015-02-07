@@ -6,9 +6,6 @@ import java.awt.Rectangle;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.util.Observable;
 
 import javax.swing.JPanel;
@@ -20,7 +17,7 @@ import edu.stanford.genetics.treeview.TreeDrawerNode;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 
 public class TRView extends ModelViewBuffered implements KeyListener {
-	
+
 	private static final long serialVersionUID = 1L;
 
 	protected TreeSelectionI treeSelection;
@@ -32,15 +29,14 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 	protected TreeDrawerNode selectedNode = null;
 	protected TreeDrawerNode hoveredNode = null;
 	protected Rectangle destRect = null;
-	
 
 	protected boolean isLeft;
-	
-	public TRView(boolean isGeneTree) {
+
+	public TRView(final boolean isGeneTree) {
 
 		super();
 
-		String summary = (isGeneTree) ? "GtrSummary" : "AtrSummary";
+		final String summary = (isGeneTree) ? "GtrSummary" : "AtrSummary";
 		this.headerSummary = new HeaderSummary(summary);
 		panel = new JPanel();
 		destRect = new Rectangle();
@@ -48,10 +44,10 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 		panel.setLayout(new BorderLayout());
 		panel.add(this, BorderLayout.CENTER);
 	}
-	
+
 	/**
 	 * Set the drawer
-	 * 
+	 *
 	 * @param d
 	 *            The new drawer
 	 */
@@ -64,11 +60,11 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 		treePainter = d;
 		treePainter.addObserver(this);
 	}
-	
+
 	/**
 	 * Set the map. For the ATRView, this determines where the leaves of the
 	 * tree will be.
-	 * 
+	 *
 	 * @param m
 	 *            The new map to be used for determining the spacing between
 	 *            indexes.
@@ -81,11 +77,11 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 
 		map = m;
 		map.addObserver(this);
-		
+
 		offscreenValid = false;
 		repaint();
 	}
-	
+
 	/**
 	 * @param nodeName
 	 */
@@ -100,7 +96,7 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 			}
 		}
 	}
-	
+
 	/**
 	 * make sure the selected array range reflects the selected node, if any.
 	 */
@@ -116,18 +112,18 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 			treeSelection.notifyObservers();
 		}
 
-//		if ((status != null) && hasMouse) {
-//			status.setMessages(getStatus());
-//		}
+		// if ((status != null) && hasMouse) {
+		// status.setMessages(getStatus());
+		// }
 	}
-	
+
 	/**
 	 * Set <code>TreeSelection</code> object which coordinates the shared
 	 * selection state.
-	 * 
+	 *
 	 * @param treeSelection
-	 *            The <code>TreeSelection</code> which is set by selecting
-	 *            rows or columns in the </code>GlobalView</code>
+	 *            The <code>TreeSelection</code> which is set by selecting rows
+	 *            or columns in the </code>GlobalView</code>
 	 */
 	public void setTreeSelection(final TreeSelectionI treeSelection) {
 
@@ -138,7 +134,7 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 		this.treeSelection = treeSelection;
 		this.treeSelection.addObserver(this);
 	}
-	
+
 	public void setHeaderSummary(final HeaderSummary headerSummary) {
 
 		this.headerSummary = headerSummary;
@@ -148,18 +144,19 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 
 		return headerSummary;
 	}
-	
+
 	/**
 	 * Set the selected node and redraw
-	 * 
+	 *
 	 * @param n
 	 *            The new node to be selected Does nothing if the node is
 	 *            already selected.
 	 */
 	public void setSelectedNode(final TreeDrawerNode n) {
-		
-		if (selectedNode == n) return;
-		
+
+		if (selectedNode == n)
+			return;
+
 		/* deselecting previously selected node -- painting it black again */
 		if (selectedNode != null) {
 			paintNode(selectedNode, false);
@@ -172,47 +169,49 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 			paintNode(selectedNode, true);
 		}
 
-		if ((status != null) && hasMouse) {
-			status.setMessages(getStatus());
-		}
-		
 		synchMap();
 		repaint();
 	}
-	
+
 	/**
 	 * Sets the node which currently is closest to the mouse cursor.
-	 * @param n The node close to the mouse cursor.
+	 *
+	 * @param n
+	 *            The node close to the mouse cursor.
 	 */
 	public void setHoveredNode(final TreeDrawerNode n) {
 
-		if (hoveredNode == n) return;
-		
+		if (hoveredNode == n)
+			return;
+
 		/* painting old hovered node black again */
 		paintNode(hoveredNode, false);
-		
+
 		/* keep selected node colored while hovering */
 		if (selectedNode != null) {
 			paintNode(selectedNode, true);
 		}
-		
+
 		hoveredNode = n;
 
 		/* paint the hovered node and its children */
 		paintNode(hoveredNode, true);
-		
+
 		synchMap();
 		repaint();
 	}
-	
+
 	/**
-	 * Paint a node and its children. 
-	 * @param node The node which is supposed to be painted.
-	 * @param isColored Whether the node and its children should be black
-	 * or colored. Colored is used for hovering and selected nodes.
+	 * Paint a node and its children.
+	 *
+	 * @param node
+	 *            The node which is supposed to be painted.
+	 * @param isColored
+	 *            Whether the node and its children should be black or colored.
+	 *            Colored is used for hovering and selected nodes.
 	 */
-	private void paintNode(TreeDrawerNode node, boolean isColored) {
-		
+	private void paintNode(final TreeDrawerNode node, final boolean isColored) {
+
 		if (xScaleEq != null) {
 			treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
 					destRect, node, isColored, isLeft);
@@ -220,9 +219,10 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 	}
 
 	@Override
-	public void update(Observable o, Object arg) {
-		
-		if (!isEnabled()) return;
+	public void update(final Observable o, final Object arg) {
+
+		if (!isEnabled())
+			return;
 
 		if (o == map) {
 			offscreenValid = false;
@@ -237,8 +237,7 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 			if (treeSelection.getNSelectedIndexes() > 0) {
 				// This clause selects the array node if only a
 				// single array is selected.
-				if (treeSelection.getMinIndex() == treeSelection
-						.getMaxIndex()) {
+				if (treeSelection.getMinIndex() == treeSelection.getMaxIndex()) {
 					cand = treePainter.getLeaf(treeSelection.getMinIndex());
 				}
 				// this clause selects the root node if all arrays are selected.
@@ -248,11 +247,12 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 
 				}
 				// // find node when multiple arrays are selected.
-//				 else if(treeSelection.getMinIndex() >= map.getMinIndex()
-//				 && treeSelection.getMaxIndex() <= map.getMaxIndex()) {
-//					 cand = treePainter.getNearestNode(treeSelection.getMinIndex(),
-//							 treeSelection.getMaxIndex());
-//				 }
+				// else if(treeSelection.getMinIndex() >= map.getMinIndex()
+				// && treeSelection.getMaxIndex() <= map.getMaxIndex()) {
+				// cand =
+				// treePainter.getNearestNode(treeSelection.getMinIndex(),
+				// treeSelection.getMaxIndex());
+				// }
 			} else {
 				setSelectedNode(null);
 			}
@@ -267,7 +267,7 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 				setSelectedNode(treePainter.getNodeById(treeSelection
 						.getSelectedNode()));
 			}
-			
+
 		} else {
 			System.out.println(viewName() + "Got an update from unknown " + o);
 		}
@@ -275,46 +275,45 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 		revalidate();
 		repaint();
 	}
-	
+
 	/* inherit description */
 	@Override
 	public void updateBuffer(final Graphics g) {
 
-//		if (offscreenChanged) {
-//			offscreenValid = false;
-//		}
-//
-//		if ((!offscreenValid) && (drawer != null)) {
-//			map.setAvailablePixels(offscreenSize.width);
-//
-//			// clear the pallette...
-//			g.setColor(this.getBackground());
-//			g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
-//			g.setColor(Color.black);
-//
-//			// calculate Scaling
-//			destRect.setBounds(0, 0, map.getUsedPixels(), offscreenSize.height);
-//			xScaleEq = new LinearTransformation(map.getIndex(destRect.x),
-//					destRect.x, map.getIndex(destRect.x + destRect.width),
-//					destRect.x + destRect.width);
-//			yScaleEq = new LinearTransformation(drawer.getCorrMin(),
-//					destRect.y, drawer.getCorrMax(), destRect.y
-//							+ destRect.height);
-//
-//			// draw
-//			drawer.paint(g, xScaleEq, yScaleEq, destRect, selectedNode, isLeft);
-//
-//		} else {
-//			// System.out.println("didn't update buffer: valid =
-//			// " + offscreenValid + " drawer = " + drawer);
-//		}
+		// if (offscreenChanged) {
+		// offscreenValid = false;
+		// }
+		//
+		// if ((!offscreenValid) && (drawer != null)) {
+		// map.setAvailablePixels(offscreenSize.width);
+		//
+		// // clear the pallette...
+		// g.setColor(this.getBackground());
+		// g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
+		// g.setColor(Color.black);
+		//
+		// // calculate Scaling
+		// destRect.setBounds(0, 0, map.getUsedPixels(), offscreenSize.height);
+		// xScaleEq = new LinearTransformation(map.getIndex(destRect.x),
+		// destRect.x, map.getIndex(destRect.x + destRect.width),
+		// destRect.x + destRect.width);
+		// yScaleEq = new LinearTransformation(drawer.getCorrMin(),
+		// destRect.y, drawer.getCorrMax(), destRect.y
+		// + destRect.height);
+		//
+		// // draw
+		// drawer.paint(g, xScaleEq, yScaleEq, destRect, selectedNode, isLeft);
+		//
+		// } else {
+		// // System.out.println("didn't update buffer: valid =
+		// // " + offscreenValid + " drawer = " + drawer);
+		// }
 	}
-	
-	
+
 	/**
 	 * Need to blit another part of the buffer to the screen when the scrollbar
 	 * moves.
-	 * 
+	 *
 	 * @param evt
 	 *            The adjustment event generated by the scrollbar
 	 */
@@ -325,15 +324,16 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 
 	/**
 	 * Arrow keys are used to change the selected node.
-	 * 
+	 *
 	 * up selects parent of current. left selects left child. right selects
 	 * right child down selects child with most descendants.
-	 * 
+	 *
 	 */
 	@Override
 	public void keyPressed(final KeyEvent e) {
 
-		if (selectedNode == null) return;
+		if (selectedNode == null)
+			return;
 
 		final int c = e.getKeyCode();
 
@@ -369,17 +369,17 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 			break;
 		}
 	}
-	
+
 	@Override
-	public void keyTyped(KeyEvent e) {
-		
+	public void keyTyped(final KeyEvent e) {
+
 	}
 
 	@Override
-	public void keyReleased(KeyEvent e) {
-		
+	public void keyReleased(final KeyEvent e) {
+
 	}
-	
+
 	private void selectParent() {
 
 		TreeDrawerNode current = selectedNode;
@@ -405,36 +405,36 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 		synchMap();
 		repaint();
 	}
-	
+
 	private void selectRight() {
 
-		if (selectedNode.isLeaf()) return;
+		if (selectedNode.isLeaf())
+			return;
 
 		final TreeDrawerNode current = selectedNode;
 		selectedNode = current.getRight();
 
-		treePainter.paintSingle(offscreenGraphics, xScaleEq, yScaleEq, destRect,
-				current, false, isLeft);
-		treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq, destRect,
-				current.getLeft(), false, isLeft);
+		treePainter.paintSingle(offscreenGraphics, xScaleEq, yScaleEq,
+				destRect, current, false, isLeft);
+		treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
+				destRect, current.getLeft(), false, isLeft);
 
 		synchMap();
 		repaint();
 	}
-	
-	
 
 	private void selectLeft() {
 
-		if (selectedNode.isLeaf()) return;
+		if (selectedNode.isLeaf())
+			return;
 
 		final TreeDrawerNode current = selectedNode;
 		selectedNode = current.getLeft();
 
-		treePainter.paintSingle(offscreenGraphics, xScaleEq, yScaleEq, destRect,
-				current, false, isLeft);
-		treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq, destRect,
-				current.getRight(), false, isLeft);
+		treePainter.paintSingle(offscreenGraphics, xScaleEq, yScaleEq,
+				destRect, current, false, isLeft);
+		treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
+				destRect, current.getRight(), false, isLeft);
 
 		synchMap();
 		repaint();
@@ -442,10 +442,10 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 
 	@Override
 	public String viewName() {
-		
+
 		return "TRView";
 	}
-	
+
 	/** Setter for xScaleEq */
 	public void setXScaleEq(final LinearTransformation xScaleEq) {
 

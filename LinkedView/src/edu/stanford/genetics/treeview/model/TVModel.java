@@ -9,7 +9,7 @@
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
  *
- * This software is provided under the GNU GPL Version 2. In particular, 
+ * This software is provided under the GNU GPL Version 2. In particular,
  *
  * 1) If you modify a source file, make a comment in it containing your name and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
@@ -18,7 +18,7 @@
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
  *
- * END_HEADER 
+ * END_HEADER
  */
 package edu.stanford.genetics.treeview.model;
 
@@ -35,7 +35,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
 
 public class TVModel extends Observable implements DataModel {
 
-//	protected TreeViewFrame tvFrame;
+	// protected TreeViewFrame tvFrame;
 	protected FileSet source = null;
 	protected String dir = null;
 	protected String root;
@@ -56,7 +56,7 @@ public class TVModel extends Observable implements DataModel {
 
 	/** has model been successfully loaded? */
 	private boolean loaded = false;
-	private int appendIndex = -1;
+	private final int appendIndex = -1;
 
 	/*
 	 * For cases where we are comparing two models (this needs to be changed).
@@ -101,13 +101,13 @@ public class TVModel extends Observable implements DataModel {
 
 	// accessor methods
 	@Override
-	public IntHeaderInfo getGeneHeaderInfo() {
+	public IntHeaderInfo getRowHeaderInfo() {
 
 		return geneHeaderInfo;
 	}
 
 	@Override
-	public IntHeaderInfo getArrayHeaderInfo() {
+	public IntHeaderInfo getColumnHeaderInfo() {
 
 		return arrayHeaderInfo;
 	}
@@ -158,18 +158,15 @@ public class TVModel extends Observable implements DataModel {
 		final int nexpr = nExpr();
 		final int ngene = nGene();
 		if (x >= nexpr + 2) {
-			if (compareModel != null) {
+			if (compareModel != null)
 				return compareModel.getValue(x - (nexpr + 2), y); // check
-																	// offsets
-			}
+			// offsets
 
-		} else if (x >= nexpr && y < ngene) {
+		} else if (x >= nexpr && y < ngene)
 			return 0; // gray border
-		}
 
-		if ((x < nexpr && y < ngene) && (x >= 0 && y >= 0)) {
+		if ((x < nexpr && y < ngene) && (x >= 0 && y >= 0))
 			return dataMatrix.getValue(x, y);
-		}
 
 		return NODATA;
 	}
@@ -205,12 +202,10 @@ public class TVModel extends Observable implements DataModel {
 	@Override
 	public String getSource() {
 
-		if (source == null) {
+		if (source == null)
 			return "No Data Loaded";
-
-		} else {
+		else
 			return source.getCdt();
-		}
 	}
 
 	@Override
@@ -253,15 +248,15 @@ public class TVModel extends Observable implements DataModel {
 		documentConfig = newVal;
 	}
 
-//	public void setFrame(final TreeViewFrame f) {
-//
-//		tvFrame = f;
-//	}
-//
-//	public TreeViewFrame getFrame() {
-//
-//		return tvFrame;
-//	}
+	// public void setFrame(final TreeViewFrame f) {
+	//
+	// tvFrame = f;
+	// }
+	//
+	// public TreeViewFrame getFrame() {
+	//
+	// return tvFrame;
+	// }
 
 	protected void hashAIDs() {
 
@@ -317,17 +312,15 @@ public class TVModel extends Observable implements DataModel {
 
 	/**
 	 * Reorders all the arrays in the new ordering.
-	 * 
+	 *
 	 * @param ordering
 	 *            the new ordering of arrays, must have size equal to number of
 	 *            arrays.
 	 */
 	public void reorderArrays(final int[] ordering) {
 		if (ordering == null
-				|| ordering.length != dataMatrix.getNumUnappendedCol()) {
-
+				|| ordering.length != dataMatrix.getNumUnappendedCol())
 			return;
-		}
 
 		final DataMatrix data = getDataMatrix();
 
@@ -361,23 +354,15 @@ public class TVModel extends Observable implements DataModel {
 
 	/**
 	 * Reorders all the arrays in the new ordering.
-	 * 
+	 *
 	 * @param ordering
 	 *            the new ordering of arrays, must have size equal to number of
 	 *            arrays
 	 */
 	public void reorderGenes(final int[] ordering) {
 
-		if (ordering == null || ordering.length != dataMatrix.getNumRow()) { // make
-																				// sure
-																				// input
-																				// to
-																				// function
-																				// makes
-																				// sense
-
+		if (ordering == null || ordering.length != dataMatrix.getNumRow())
 			return;
-		}
 
 		final DataMatrix data = getDataMatrix();
 		final double[] temp = new double[data.getNumRow()];
@@ -398,7 +383,7 @@ public class TVModel extends Observable implements DataModel {
 	public void resetState() {
 
 		LogBuffer.println("Resetting model.");
-		
+
 		// reset some state stuff.
 		// if (documentConfig != null)
 		// documentConfig.store();
@@ -423,8 +408,8 @@ public class TVModel extends Observable implements DataModel {
 
 		final String[] strings = toStrings();
 		String msg = "";
-		for (int i = 0; i < strings.length; i++) {
-			msg += strings[i] + "\n";
+		for (final String string : strings) {
+			msg += string + "\n";
 		}
 		return msg;
 	}
@@ -433,7 +418,7 @@ public class TVModel extends Observable implements DataModel {
 
 		final String[] msg = { "Selected TVModel Stats",
 				"Source = " + getSource(), "Nexpr   = " + nExpr(),
-				"NGeneHeader = " + getGeneHeaderInfo().getNumNames(),
+				"NGeneHeader = " + getRowHeaderInfo().getNumNames(),
 				"Ngene   = " + nGene(), "eweight  = " + eweightFound,
 				"gweight  = " + gweightFound, "aid  = " + aidFound,
 				"gid  = " + gidFound };
@@ -442,7 +427,7 @@ public class TVModel extends Observable implements DataModel {
 		 * Enumeration e = genePrefix.elements(); msg += "GPREFIX: " +
 		 * e.nextElement(); for (; e.hasMoreElements() ;) { msg += " " +
 		 * e.nextElement(); }
-		 * 
+		 *
 		 * e = aHeaders.elements(); msg += "\naHeaders: " + e.nextElement(); for
 		 * (; e.hasMoreElements() ;) { msg += ":" + e.nextElement(); }
 		 */
@@ -458,9 +443,9 @@ public class TVModel extends Observable implements DataModel {
 	 * FlatFileStreamTokenizer.TT_NUMBER; err += " ttype TT_WORD = " +
 	 * FlatFileStreamTokenizer.TT_WORD; err += " '\t' = " + '\t'; err +=
 	 * " '\n' = " + '\n'; err += " '\r' = " + '\r';
-	 * 
+	 *
 	 * return err; }
-	 * 
+	 *
 	 * private void printStream(FlatFileStreamTokenizer st) throws IOException {
 	 * int tt = st.nextToken(); while (tt != st.TT_EOF) { String msg; switch(tt)
 	 * { case FlatFileStreamTokenizer.TT_WORD: msg = "Word: " + st.sval; break;
@@ -510,7 +495,7 @@ public class TVModel extends Observable implements DataModel {
 	 * Appends a second matrix to this one provided they have the same height.
 	 * Used for comparison of two data sets where the data is displayed side by
 	 * side.
-	 * 
+	 *
 	 */
 	@Override
 	public void append(final DataModel m) {
@@ -573,9 +558,9 @@ public class TVModel extends Observable implements DataModel {
 
 	/**
 	 * Really just a thin wrapper around exprData array.
-	 * 
+	 *
 	 * @author aloksaldanha
-	 * 
+	 *
 	 */
 	public class TVDataMatrix implements DataMatrix {
 
@@ -594,24 +579,22 @@ public class TVModel extends Observable implements DataModel {
 		public void calculateMinMax() {
 
 			if (exprData != null) {
-				int nGene = nGene();
-				int nExpr = nExpr();
-				
+				final int nGene = nGene();
+				final int nExpr = nExpr();
+
 				for (int i = 0; i < nGene; i++) {
 
 					for (int j = 0; j < nExpr; j++) {
-						
-						double dataPoint = exprData[i][j];
 
-						if (dataPoint > maxVal 
-								&& dataPoint != DataModel.NODATA
+						final double dataPoint = exprData[i][j];
+
+						if (dataPoint > maxVal && dataPoint != DataModel.NODATA
 								&& dataPoint != DataModel.EMPTY) {
 
 							maxVal = dataPoint;
 						}
 
-						if (dataPoint < minVal 
-								&& dataPoint != DataModel.NODATA
+						if (dataPoint < minVal && dataPoint != DataModel.NODATA
 								&& dataPoint != DataModel.EMPTY) {
 
 							minVal = dataPoint;
@@ -641,12 +624,10 @@ public class TVModel extends Observable implements DataModel {
 
 			final int nexpr = nExpr();
 			final int ngene = nGene();
-			if ((x < nexpr) && (y < ngene) && (x >= 0) && (y >= 0)) {
+			if ((x < nexpr) && (y < ngene) && (x >= 0) && (y >= 0))
 				return exprData[y][x];
-
-			} else {
+			else
 				return DataModel.NODATA;
-			}
 		}
 
 		public void setExprData(final double[][] newData) {
@@ -751,23 +732,18 @@ public class TVModel extends Observable implements DataModel {
 
 		public int getYorfIndex() {
 
-			if (getIndex("GID") == -1) {
-
+			if (getIndex("GID") == -1)
 				return 0;
-
-			} else {
+			else
 				return 1;
-			}
 		}
 
 		public int getNameIndex() {
 
-			if (getIndex("GID") == -1) {
+			if (getIndex("GID") == -1)
 				return 1;
-
-			} else {
+			else
 				return 2;
-			}
 		}
 
 		/**
@@ -778,20 +754,14 @@ public class TVModel extends Observable implements DataModel {
 
 			final int retval = super.getIndex(header);
 
-			if (retval != -1) {
-
+			if (retval != -1)
 				return retval;
-			}
 
-			if (header.equals("YORF")) {
-
+			if (header.equals("YORF"))
 				return getYorfIndex();
-			}
 
-			if (header.equals("NAME")) {
-
+			if (header.equals("NAME"))
 				return getNameIndex();
-			}
 
 			return -1;
 		}
@@ -808,30 +778,30 @@ public class TVModel extends Observable implements DataModel {
 	}
 
 	// loading stuff follows...
-//	/**
-//	 * 
-//	 * 
-//	 * @param fileSet
-//	 *            fileset to load
-//	 * @throws ExecutionException
-//	 * @throws InterruptedException
-//	 * 
-//	 */
-//	public void loadNew(final FileSet fileSet) throws LoadException,
-//			InterruptedException, ExecutionException, OutOfMemoryError {
-//
-//		resetState();
-//		setSource(fileSet);
-//
-//		ModelLoader loader = new ModelLoader(this);
-//		loader.load();
-//		loader = null;
-//
-//		if (!isLoaded()) {
-//			throw new LoadException("Loading Cancelled", 
-//					LoadException.INTPARSE);
-//		}
-//	}
+	// /**
+	// *
+	// *
+	// * @param fileSet
+	// * fileset to load
+	// * @throws ExecutionException
+	// * @throws InterruptedException
+	// *
+	// */
+	// public void loadNew(final FileSet fileSet) throws LoadException,
+	// InterruptedException, ExecutionException, OutOfMemoryError {
+	//
+	// resetState();
+	// setSource(fileSet);
+	//
+	// ModelLoader loader = new ModelLoader(this);
+	// loader.load();
+	// loader = null;
+	//
+	// if (!isLoaded()) {
+	// throw new LoadException("Loading Cancelled",
+	// LoadException.INTPARSE);
+	// }
+	// }
 
 	/**
 	 * @param b
@@ -853,8 +823,8 @@ public class TVModel extends Observable implements DataModel {
 	public boolean getModified() {
 
 		return getGtrHeaderInfo().getModified() ||
-		// getGeneHeaderInfo().getModified() ||
-		// getArrayHeaderInfo().getModified() ||
+				// getGeneHeaderInfo().getModified() ||
+				// getArrayHeaderInfo().getModified() ||
 				getAtrHeaderInfo().getModified();
 	}
 
@@ -867,16 +837,14 @@ public class TVModel extends Observable implements DataModel {
 	public void setLoaded(final boolean loaded) {
 
 		this.loaded = loaded;
-		this.notifyObservers((Boolean)loaded);
+		this.notifyObservers(loaded);
 	}
 
 	@Override
 	public String getFileName() {
-		if (source == null) {
+		if (source == null)
 			return "No Data Loaded";
-
-		} else {
+		else
 			return source.getRoot() + source.getExt();
-		}
 	}
 }

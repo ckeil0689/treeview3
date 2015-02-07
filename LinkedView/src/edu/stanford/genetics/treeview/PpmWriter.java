@@ -9,7 +9,7 @@
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
  *
- * This software is provided under the GNU GPL Version 2. In particular, 
+ * This software is provided under the GNU GPL Version 2. In particular,
  *
  * 1) If you modify a source file, make a comment in it containing your name and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
@@ -18,7 +18,7 @@
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
  *
- * END_HEADER 
+ * END_HEADER
  */
 package edu.stanford.genetics.treeview;
 
@@ -74,16 +74,16 @@ public class PpmWriter {
 			throws java.io.IOException {
 		final int blue = val;
 		final int green = val >> 8;
-		final int red = val >> 16;
+			final int red = val >> 16;
 
-		out.write(red);
-		out.write(green);
-		out.write(blue);
+			out.write(red);
+			out.write(green);
+			out.write(blue);
 	}
 
 	/**
 	 * Snag the pixels from an image.
-	 * 
+	 *
 	 * Copied verbatim from com.gurge.amd.TestQuantize by <a
 	 * href="http://www.gurge.com/amd/">Adam Doppelt</a>
 	 */
@@ -95,10 +95,9 @@ public class PpmWriter {
 				0, w);
 
 		try {
-			if (grabber.grabPixels() != true) {
+			if (grabber.grabPixels() != true)
 				throw new IOException("Grabber returned false: "
 						+ grabber.status());
-			}
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}

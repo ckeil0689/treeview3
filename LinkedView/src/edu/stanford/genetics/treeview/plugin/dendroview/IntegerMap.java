@@ -9,7 +9,7 @@
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
  *
- * This software is provided under the GNU GPL Version 2. In particular, 
+ * This software is provided under the GNU GPL Version 2. In particular,
  *
  * 1) If you modify a source file, make a comment in it containing your name and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
@@ -18,7 +18,7 @@
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
  *
- * END_HEADER 
+ * END_HEADER
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
@@ -65,7 +65,7 @@ public abstract class IntegerMap implements ConfigNodePersistent {
 	/**
 	 * Sets the String type to either Fixed or Full, so that different
 	 * configNode can be created.
-	 * 
+	 *
 	 * @param type
 	 */
 	public void setTypeString(final String type) {
@@ -75,13 +75,11 @@ public abstract class IntegerMap implements ConfigNodePersistent {
 
 	public IntegerMap createMap(final String string) {
 
-		if (string.equals("Fixed")) {
+		if (string.equals("Fixed"))
 			return new FixedMap();
-
-		} else if (string.equals("Fill")) {
+		else if (string.equals("Fill"))
 			return new FillMap();
-
-		} else {
+		else {
 			System.out.println(string + " not found");
 			return null;
 		}
@@ -121,24 +119,21 @@ public abstract class IntegerMap implements ConfigNodePersistent {
 
 	public boolean contains(final int i) {
 
-		if (i < getMinIndex()) {
+		if (i < getMinIndex())
 			return false;
-
-		} else if (i > getMaxIndex()) {
+		else if (i > getMaxIndex())
 			return false;
-
-		} else {
+		else
 			return true;
-		}
 	}
 
 	// subclasses implement actual mapping functions
 	/**
 	 * note: if i == maxindex + 1, return the first pixel beyond end of max
-	 * 
+	 *
 	 * @param i
 	 *            the index for which we want the first pixel of
-	 * 
+	 *
 	 * @return first pixel corresponding to index
 	 */
 	public abstract int getPixel(int i);
@@ -146,17 +141,17 @@ public abstract class IntegerMap implements ConfigNodePersistent {
 	/**
 	 * @param indval
 	 *            the (fractional) index for which we want the pixel.
-	 * 
+	 *
 	 *            This is determined by assuming that the actual index
 	 *            corresponds to the middle of the block of pixels assigned to
 	 *            that index, and then linearly interpolating the unit interval
 	 *            onto the block.
-	 * 
+	 *
 	 *            This means that 6.0 would map to the middle of the block, and
 	 *            6.5 would map to the boundary of the 6 and 7 blocks. Values
 	 *            between 6.0 and 6.5 would be linearly interpolated between
 	 *            those points.
-	 * 
+	 *
 	 *            The relation getPixel(i) == getPixel (i -0.5) should hold.
 	 */
 	public int getPixel(final double indval) {
@@ -207,7 +202,7 @@ public abstract class IntegerMap implements ConfigNodePersistent {
 
 	/**
 	 * Set the range of pixels to map to
-	 * 
+	 *
 	 * @param i
 	 *            lower bound
 	 * @param j

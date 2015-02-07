@@ -10,9 +10,9 @@ import edu.stanford.genetics.treeview.model.IntHeaderInfo;
  * This class is used to generate the .CDT tab delimited file which Java
  * TreeView will use for visualization. It takes in the previously calculated
  * data and forms String lists to make them writable.
- * 
+ *
  * @author CKeil
- * 
+ *
  */
 public class CDTGenerator {
 
@@ -39,17 +39,22 @@ public class CDTGenerator {
 	private ClusterFileWriter bufferedWriter;
 
 	/**
-	 * The task for this class is to take supplied data that is the result
-	 * of clustering and format it into a new CDT file that can be read and 
-	 * interpreted by TreeView. 
-	 * @param origMatrix The original data matrix.
-	 * @param orderedRows Row labels after clustering.
-	 * @param orderedCols Column labels after clustering.
-	 * @param isHier Indicates type of clustering.
+	 * The task for this class is to take supplied data that is the result of
+	 * clustering and format it into a new CDT file that can be read and
+	 * interpreted by TreeView.
+	 *
+	 * @param origMatrix
+	 *            The original data matrix.
+	 * @param orderedRows
+	 *            Row labels after clustering.
+	 * @param orderedCols
+	 *            Column labels after clustering.
+	 * @param isHier
+	 *            Indicates type of clustering.
 	 */
-	public CDTGenerator(final double[][] origMatrix, 
-			final String[] orderedRows, final String[] orderedCols, 
-			final int rowSimilarity, final int colSimilarity, 
+	public CDTGenerator(final double[][] origMatrix,
+			final String[] orderedRows, final String[] orderedCols,
+			final int rowSimilarity, final int colSimilarity,
 			final boolean isHier) {
 
 		this.origMatrix = origMatrix;
@@ -59,14 +64,14 @@ public class CDTGenerator {
 		this.isColClustered = (colSimilarity != 0);
 		this.isHier = isHier;
 	}
-	
+
 	/**
 	 * Sets up a buffered writer to generate the .cdt file from the previously
 	 * clustered data.
-	 * 
+	 *
 	 * @throws IOException
 	 */
-	public void setupWriter(String fileName, Integer[] spinnerInput) {
+	public void setupWriter(final String fileName, final Integer[] spinnerInput) {
 
 		String fileEnd = "";
 
@@ -95,19 +100,21 @@ public class CDTGenerator {
 		try {
 			file.createNewFile();
 			this.bufferedWriter = new ClusterFileWriter(file);
-			
-		} catch (IOException e) {
+
+		} catch (final IOException e) {
 			LogBuffer.logException(e);
 		}
 	}
-	
+
 	/**
 	 * Sets up instance variables needed for writing.
+	 *
 	 * @param geneHeaderI
 	 * @param arrayHeaderI
 	 */
-	public void prepare(IntHeaderInfo geneHeaderI, IntHeaderInfo arrayHeaderI) {
-		
+	public void prepare(final IntHeaderInfo geneHeaderI,
+			final IntHeaderInfo arrayHeaderI) {
+
 		this.rowHeaders = geneHeaderI.getNames();
 		this.colHeaders = arrayHeaderI.getNames();
 
@@ -129,22 +136,22 @@ public class CDTGenerator {
 	}
 
 	public void generateCDT() {
-		
+
 		/* First order the data according to clustering */
 		orderData();
-		
+
 		/* Transform cdtDataFile from double lists to string lists */
 		for (int i = 0; i < cdtData_doubles.length; i++) {
 
 			final double[] element = cdtData_doubles[i];
-			
+
 			final String[] newStringData = new String[element.length];
 
 			for (int j = 0; j < element.length; j++) {
 
 				newStringData[j] = String.valueOf(element[j]);
 			}
-			
+
 			cdtData_s[i] = newStringData;
 		}
 
@@ -167,8 +174,7 @@ public class CDTGenerator {
 		final int[] reorderedRowIndices = new int[origMatrix.length];
 		final int[] reorderedColIndices = new int[colNames.length];
 
-		cdtData_doubles = new double[reorderedRowIndices.length]
-				[reorderedColIndices.length];
+		cdtData_doubles = new double[reorderedRowIndices.length][reorderedColIndices.length];
 
 		if (isRowClustered) {
 			final String[] geneNames = new String[rowNames.length];
@@ -197,16 +203,17 @@ public class CDTGenerator {
 					rowIndex = findIndex(geneNames, rowElement);
 				}
 
-//				reorderedRowIndices[i] = rowIndex;
+				// reorderedRowIndices[i] = rowIndex;
 
 				// Order the row names
-				String target = "GENE" + rowIndex + "X";
-				int newRowIndex = findID(rowNames, target, 0);
-				
-				int finalIndex = (newRowIndex == -1) ? rowIndex : newRowIndex;
-				
+				final String target = "GENE" + rowIndex + "X";
+				final int newRowIndex = findID(rowNames, target, 0);
+
+				final int finalIndex = (newRowIndex == -1) ? rowIndex
+						: newRowIndex;
+
 				reorderedRowIndices[i] = finalIndex;
-				
+
 				rowNamesOrdered[i] = rowNames[finalIndex];
 			}
 		} else {
@@ -242,13 +249,14 @@ public class CDTGenerator {
 					colIndex = findIndex(geneNames, colElement);
 				}
 
-//				reorderedColIndices[i] = colIndex;
-				
-				String target = "ARRY" + colIndex + "X";
-				int newColIndex = findID(colNames, target, 1);
-				
-				int finalIndex = (newColIndex == -1) ? colIndex : newColIndex;
-				
+				// reorderedColIndices[i] = colIndex;
+
+				final String target = "ARRY" + colIndex + "X";
+				final int newColIndex = findID(colNames, target, 1);
+
+				final int finalIndex = (newColIndex == -1) ? colIndex
+						: newColIndex;
+
 				reorderedColIndices[i] = finalIndex;
 
 				// reordering column names
@@ -278,23 +286,23 @@ public class CDTGenerator {
 			}
 		}
 	}
-	
+
 	/**
-	 * Finishes up CDTGenerator by closing the buffered writer.
-	 * Returns the file path where the cdt file was saved.
+	 * Finishes up CDTGenerator by closing the buffered writer. Returns the file
+	 * path where the cdt file was saved.
 	 */
 	public String finish() {
-		
-		String filePath = bufferedWriter.getFilePath();
-		
+
+		final String filePath = bufferedWriter.getFilePath();
+
 		bufferedWriter.closeWriter();
-		
+
 		return filePath;
 	}
 
 	/**
 	 * Finds the index of an element in a String array.
-	 * 
+	 *
 	 * @param array
 	 * @param element
 	 * @return
@@ -311,15 +319,16 @@ public class CDTGenerator {
 
 		return index;
 	}
-	
+
 	/**
 	 * Finds the index of an element in a String array.
-	 * 
+	 *
 	 * @param array
 	 * @param element
 	 * @return
 	 */
-	private int findID(final String[][] array, final String element, int axis) {
+	private int findID(final String[][] array, final String element,
+			final int axis) {
 
 		int index = -1;
 		for (int i = 0; i < array.length; i++) {
@@ -337,26 +346,30 @@ public class CDTGenerator {
 	 * other elements.
 	 */
 	private void fillHierarchical() {
-		
-		boolean hasGID = findIndex(rowHeaders, "GID") != - 1;
-		
+
+		final boolean hasGID = findIndex(rowHeaders, "GID") != -1;
+
 		int rowLength = rowHeaders.length + colNames.length;
-		if (isRowClustered && !hasGID) rowLength++;
-		
-		int dataStart = rowLength - colNames.length;
-		
+		if (isRowClustered && !hasGID) {
+			rowLength++;
+		}
+
+		final int dataStart = rowLength - colNames.length;
+
 		final String[] cdtRow = new String[rowLength];
 		int addIndex;
-		
+
 		/* The first row */
 		addIndex = 0;
-		if (isRowClustered && !hasGID) cdtRow[addIndex++] = "GID";
-		
+		if (isRowClustered && !hasGID) {
+			cdtRow[addIndex++] = "GID";
+		}
+
 		System.arraycopy(rowHeaders, 0, cdtRow, addIndex, rowHeaders.length);
 		addIndex += rowHeaders.length;
 
 		/* Adding column names to first row */
-		for (String[] names : colNamesOrdered) {
+		for (final String[] names : colNamesOrdered) {
 
 			cdtRow[addIndex++] = names[0];
 		}
@@ -371,25 +384,27 @@ public class CDTGenerator {
 			cdtRow[0] = "AID";
 
 			/* Fill with AIDs ("ARRY3X") */
-			System.arraycopy(orderedAIDs, 0, cdtRow, dataStart, 
+			System.arraycopy(orderedAIDs, 0, cdtRow, dataStart,
 					orderedAIDs.length);
 
 			bufferedWriter.writeContent(cdtRow);
 		}
-		
+
 		/* remaining label rows */
-		for(int i = 1; i < colHeaders.length; i++) {
-			
-			if(colHeaders[i].equalsIgnoreCase("AID")) continue;
-			
+		for (int i = 1; i < colHeaders.length; i++) {
+
+			if (colHeaders[i].equalsIgnoreCase("AID")) {
+				continue;
+			}
+
 			addIndex = 0;
 			cdtRow[addIndex++] = colHeaders[i];
-			
-			while(addIndex < dataStart) {
+
+			while (addIndex < dataStart) {
 				cdtRow[addIndex++] = "";
 			}
 
-			for (String[] names : colNamesOrdered) {
+			for (final String[] names : colNamesOrdered) {
 
 				cdtRow[addIndex++] = names[i];
 			}
@@ -399,20 +414,22 @@ public class CDTGenerator {
 
 		/* Filling the data rows */
 		for (int i = 0; i < cdtData_s.length; i++) {
-			
+
 			addIndex = 0;
 			final String[] row = new String[rowLength];
 
 			/* Adding GIDs ("GENE130X") */
-			if (isRowClustered && !hasGID) row[addIndex++] = orderedGIDs[i];
+			if (isRowClustered && !hasGID) {
+				row[addIndex++] = orderedGIDs[i];
+			}
 
 			/* Adding row names */
-			System.arraycopy(rowNamesOrdered[i], 0, row, addIndex, 
+			System.arraycopy(rowNamesOrdered[i], 0, row, addIndex,
 					rowNamesOrdered[i].length);
 			addIndex += rowNamesOrdered[i].length;
-			
+
 			/* Adding data values */
-			System.arraycopy(cdtData_s[i], 0, row, addIndex, 
+			System.arraycopy(cdtData_s[i], 0, row, addIndex,
 					cdtData_s[i].length);
 
 			bufferedWriter.writeContent(row);
@@ -436,9 +453,9 @@ public class CDTGenerator {
 		}
 
 		// Adding column names to first row
-		for (int i = 0; i < colNamesOrdered.length; i++) {
+		for (final String[] element : colNamesOrdered) {
 
-			cdtRow1[addIndex++] = colNamesOrdered[i][0];
+			cdtRow1[addIndex++] = element[0];
 		}
 
 		bufferedWriter.writeContent(cdtRow1);
@@ -455,9 +472,9 @@ public class CDTGenerator {
 		}
 
 		// Fill with weights
-		for (int i = 0; i < colNamesOrdered.length; i++) {
+		for (final String[] element : colNamesOrdered) {
 
-			cdtRow2[addIndex++] = colNamesOrdered[i][1];
+			cdtRow2[addIndex++] = element[1];
 		}
 
 		bufferedWriter.writeContent(cdtRow2);
@@ -486,7 +503,7 @@ public class CDTGenerator {
 
 	/**
 	 * Gets the filePath for the current source file.
-	 * 
+	 *
 	 * @return
 	 */
 	public String getFilePath() {

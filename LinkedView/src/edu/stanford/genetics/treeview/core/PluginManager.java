@@ -95,7 +95,7 @@ public class PluginManager {
 			throw e;
 
 		} catch (final RuntimeException e) {
-			LogBuffer.println("RunTimeException in PluginManager: " 
+			LogBuffer.println("RunTimeException in PluginManager: "
 					+ e.getMessage());
 			e.printStackTrace();
 		}
@@ -121,22 +121,22 @@ public class PluginManager {
 		String s_loadedPlugins = "";
 		String s_notloadedPlugins = "";
 
-		for (int i = 0; i < f_jars.length; i++) {
+		for (final File f_jar : f_jars) {
 
 			try {
 				final URL jarURL = new URL("jar:"
-						+ f_jars[i].toURI().toURL().toString() + "!/");
+						+ f_jar.toURI().toURL().toString() + "!/");
 
 				final boolean b_loadedPlugin = loadPlugin(jarURL);
 
 				if (b_loadedPlugin) {
-					s_loadedPlugins += "<li>" + f_jars[i].getName() + "</li>";
+					s_loadedPlugins += "<li>" + f_jar.getName() + "</li>";
 				} else {
-					s_loadedPlugins += "<li>" + f_jars[i].getName() + "*</li>";
+					s_loadedPlugins += "<li>" + f_jar.getName() + "*</li>";
 				}
 			} catch (final NullPointerException e) {
 				e.printStackTrace();
-				s_notloadedPlugins += "<li>" + f_jars[i].getName() + "</li>";
+				s_notloadedPlugins += "<li>" + f_jar.getName() + "</li>";
 				Debug.print(e);
 			} catch (final MalformedURLException e) {
 				Debug.print(e);
@@ -166,13 +166,7 @@ public class PluginManager {
 				if (!pluginExists((String) al_classnames.get(j))) {
 					final Class c = urlcl.loadClass((String) al_classnames
 							.get(j));
-					/*
-					 * XXX: Supposedly, loadClass should call the static
-					 * initializer for the class, but I'm finding it doesn't so
-					 * I'm forcing an instantiation with new Instance.
-					 */
-					@SuppressWarnings("unused")
-					final PluginFactory pp = (PluginFactory) c.newInstance();
+					c.newInstance();
 					b_loadedPlugin |= true;
 
 				} else {
@@ -182,13 +176,13 @@ public class PluginManager {
 		} catch (final ClassNotFoundException e) {
 			e.printStackTrace();
 			LogBuffer.println("ClassNotFound " + e);
-			
+
 		} catch (final InstantiationException e) {
 			Debug.print(e);
-			
+
 		} catch (final IllegalAccessException e) {
 			Debug.print(e);
-			
+
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
@@ -196,9 +190,9 @@ public class PluginManager {
 	}
 
 	/**
-	 * 
+	 *
 	 * remember, static methods cannot be overridden.
-	 * 
+	 *
 	 * @param pf
 	 */
 	public static void registerPlugin(final PluginFactory pf) {
@@ -209,16 +203,16 @@ public class PluginManager {
 	/**
 	 * Assigns corresponding nodes from the global config to the appropriate
 	 * plugin factories.
-	 * 
+	 *
 	 * needs to be called whenever a plugin is loaded or the global confignode
 	 * changes.
-	 * 
+	 *
 	 */
 	public void pluginAssignConfigNodes(final Preferences node) {
 
 		final PluginFactory[] plugins = getPluginFactories();
 
-		for (int i = 0; i < plugins.length; i++) {
+		for (final PluginFactory plugin : plugins) {
 
 			Preferences pluginNode = null;
 			// final Preferences pluginPresetsNode = node.node("PluginGlobal");
@@ -226,24 +220,24 @@ public class PluginManager {
 			try {
 				pluginPresetsChildrenNodes = node.childrenNames();
 
-				for (int j = 0; j < pluginPresetsChildrenNodes.length; j++) {
+				for (final String pluginPresetsChildrenNode : pluginPresetsChildrenNodes) {
 
 					// scan existing pluginPresets for correct name
-					if (node.node(pluginPresetsChildrenNodes[j])
-							.get("name", "").equals(plugins[i].getPluginName())) {
+					if (node.node(pluginPresetsChildrenNode).get("name", "")
+							.equals(plugin.getPluginName())) {
 
-						pluginNode = node.node(pluginPresetsChildrenNodes[j]);
+						pluginNode = node.node(pluginPresetsChildrenNode);
 						break;
 					}
 				}
 
 				if (pluginNode == null) {
 					// no existing presets node for plugin, must create
-					pluginNode = node.node(plugins[i].getPluginName());
-					pluginNode.put("name", plugins[i].getPluginName());
+					pluginNode = node.node(plugin.getPluginName());
+					pluginNode.put("name", plugin.getPluginName());
 				}
 
-				plugins[i].setGlobalNode(pluginNode);
+				plugin.setGlobalNode(pluginNode);
 
 			} catch (final BackingStoreException e) {
 				e.printStackTrace();
@@ -255,8 +249,9 @@ public class PluginManager {
 		final PluginFactory[] ret = new PluginFactory[pluginFactories.size()];
 		final Enumeration e = pluginFactories.elements();
 		int i = 0;
-		while (e.hasMoreElements())
+		while (e.hasMoreElements()) {
 			ret[i++] = (PluginFactory) e.nextElement();
+		}
 		return ret;
 	}
 
@@ -264,9 +259,8 @@ public class PluginManager {
 		final Enumeration e = pluginFactories.elements();
 		while (e.hasMoreElements()) {
 			final PluginFactory factory = (PluginFactory) e.nextElement();
-			if (name.equals(factory.getPluginName())) {
+			if (name.equals(factory.getPluginName()))
 				return factory;
-			}
 		}
 		return null;
 	}
@@ -282,14 +276,14 @@ public class PluginManager {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param i
 	 * @return ith plugin, or null if no such plugin.
 	 */
 	public PluginFactory getPluginFactory(final int i) {
-		if ((i < pluginFactories.size()) && (i >= 0)) {
+		if ((i < pluginFactories.size()) && (i >= 0))
 			return (PluginFactory) pluginFactories.elementAt(i);
-		} else {
+		else {
 			System.out.println("returns null");
 			return null;
 		}
@@ -304,9 +298,8 @@ public class PluginManager {
 			 * The toString function on an (Object) always adds some funny
 			 * strings to the end of the string, so we have to use "contains".
 			 */
-			if (s.indexOf(qualified_name) != -1) {
+			if (s.indexOf(qualified_name) != -1)
 				return true;
-			}
 		}
 		return false;
 	}

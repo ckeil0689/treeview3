@@ -9,7 +9,7 @@
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
  *
- * This software is provided under the GNU GPL Version 2. In particular, 
+ * This software is provided under the GNU GPL Version 2. In particular,
  *
  * 1) If you modify a source file, make a comment in it containing your name and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
@@ -18,15 +18,15 @@
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
  *
- * END_HEADER 
+ * END_HEADER
  */
 package edu.stanford.genetics.treeview;
 
 /**
  * Represents nodes in ATRView and GTRView.
  *
- * HACK Should really retrofit this so that it's a subclass of 
- * DefaultMutableTreeNode. 
+ * HACK Should really retrofit this so that it's a subclass of
+ * DefaultMutableTreeNode.
  *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version Alpha
@@ -49,7 +49,7 @@ public class TreeDrawerNode {
 
 	/**
 	 * Constructor for leaves.
-	 * 
+	 *
 	 * @param i
 	 * @param correlation
 	 * @param index
@@ -66,7 +66,7 @@ public class TreeDrawerNode {
 
 	/**
 	 * Constructor for internal nodes.
-	 * 
+	 *
 	 * @param i
 	 * @param correlation
 	 * @param l
@@ -84,10 +84,9 @@ public class TreeDrawerNode {
 		minInd = Math.min(right.getMinIndex(), left.getMinIndex());
 		maxInd = Math.max(right.getMaxIndex(), left.getMaxIndex());
 
-		if (minInd > maxInd) {
+		if (minInd > maxInd)
 			throw new RuntimeException(
 					"min was less than max! this should not happen.");
-		}
 	}
 
 	/**
@@ -96,9 +95,8 @@ public class TreeDrawerNode {
 	public double getMaxCorr() {
 
 		double curCorr = getCorr();
-		if (isLeaf()) {
+		if (isLeaf())
 			return curCorr;
-		}
 
 		final Stack<TreeDrawerNode> remaining = new Stack<TreeDrawerNode>();
 		remaining.push(this);
@@ -130,9 +128,8 @@ public class TreeDrawerNode {
 
 		double curCorr = getCorr();
 
-		if (isLeaf()) {
+		if (isLeaf())
 			return curCorr;
-		}
 
 		final Stack<TreeDrawerNode> remaining = new Stack<TreeDrawerNode>();
 		remaining.push(this);
@@ -158,7 +155,7 @@ public class TreeDrawerNode {
 
 	/**
 	 * This method interatively finds the node with the given id.
-	 * 
+	 *
 	 * @param nodeid
 	 *            ID of the node to be found.
 	 * @return the node found, or null if no such node exists
@@ -171,9 +168,8 @@ public class TreeDrawerNode {
 		while (remaining.empty() == false) {
 			final TreeDrawerNode node = remaining.pop();
 
-			if (node.getId().equals(nodeid)) {
+			if (node.getId().equals(nodeid))
 				return node;
-			}
 
 			final TreeDrawerNode leftNode = node.getLeft();
 			if (leftNode != null) {

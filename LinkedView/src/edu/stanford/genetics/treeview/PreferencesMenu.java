@@ -22,20 +22,21 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 import edu.stanford.genetics.treeview.plugin.dendroview.FontSettings;
 
 /**
- * A dialog that can contain various menus, depending on which the user
- * chooses to open. This is done by setting the contents of the dialog's
- * contentPane based on the clicked JMenuItem in the menubar.
+ * A dialog that can contain various menus, depending on which the user chooses
+ * to open. This is done by setting the contents of the dialog's contentPane
+ * based on the clicked JMenuItem in the menubar.
+ *
  * @author CKeil
  *
  */
-public class PreferencesMenu extends CustomDialog 
-implements ConfigNodePersistent {
+public class PreferencesMenu extends CustomDialog implements
+		ConfigNodePersistent {
 
 	private final TreeViewFrame tvFrame;
 	private HeaderInfo geneHI;
 	private HeaderInfo arrayHI;
 	private Preferences configNode;
-	
+
 	private final DendroView dendroView;
 	private ColorChooser gradientPick;
 	private JButton ok_btn;
@@ -45,7 +46,7 @@ implements ConfigNodePersistent {
 
 	/**
 	 * Chained constructor
-	 * 
+	 *
 	 * @param viewFrame
 	 */
 	public PreferencesMenu() {
@@ -55,7 +56,7 @@ implements ConfigNodePersistent {
 
 	/**
 	 * Main constructor for Preferences Menu
-	 * 
+	 *
 	 * @param tvFrame
 	 */
 	public PreferencesMenu(final TreeViewFrame tvFrame) {
@@ -66,35 +67,36 @@ implements ConfigNodePersistent {
 
 		dialog.getContentPane().add(mainPanel);
 		dialog.addWindowListener(new WindowAdapter() {
-			
+
 			@Override
-			public void windowClosed(WindowEvent e) {
-				
-				if(gradientPick != null && gradientPick.isCustomSelected()) {
+			public void windowClosed(final WindowEvent e) {
+
+				if (gradientPick != null && gradientPick.isCustomSelected()) {
 					gradientPick.saveStatus();
 				}
 			}
 		});
 	}
-	
-	public void setGradientChooser(ColorChooser gradientPick) {
-		
+
+	public void setGradientChooser(final ColorChooser gradientPick) {
+
 		this.gradientPick = gradientPick;
 	}
-	
-	public void setHeaderInfo(HeaderInfo geneHI, HeaderInfo arrayHI) {
-		
+
+	public void setHeaderInfo(final HeaderInfo geneHI, final HeaderInfo arrayHI) {
+
 		this.geneHI = geneHI;
 		this.arrayHI = arrayHI;
 	}
-	
+
 	/**
 	 * Setting the configNode for the PreferencesMenu
+	 *
 	 * @param configNode
 	 */
 	@Override
-	public void setConfigNode(Preferences parentNode) {
-		
+	public void setConfigNode(final Preferences parentNode) {
+
 		if (parentNode != null) {
 			this.configNode = parentNode.node(StringRes.pnode_Preferences);
 
@@ -106,7 +108,7 @@ implements ConfigNodePersistent {
 
 	/**
 	 * Returns the menu frame holding all the JPanels to display to the user.
-	 * 
+	 *
 	 * @return JDialog
 	 */
 	public JDialog getPreferencesFrame() {
@@ -127,15 +129,15 @@ implements ConfigNodePersistent {
 
 	/**
 	 * Returns the two indeces which represent the currently selected la
-	 * 
+	 *
 	 * @return
 	 */
 	public int[] getSelectedLabelIndexes() {
 
-		if (annotationSettings != null) {
+		if (annotationSettings != null)
 			return new int[] { annotationSettings.getSelectedGeneIndex(),
-					annotationSettings.getSelectedArrayIndex() };
-		} else {
+				annotationSettings.getSelectedArrayIndex() };
+		else {
 			LogBuffer.println("AnnotationSettings object was null. "
 					+ "Could not get selected indeces.");
 			return null;
@@ -145,7 +147,7 @@ implements ConfigNodePersistent {
 	/* >>>>>> GUI component listeners <<<<< */
 	/**
 	 * Adds an ActionListener to the ok_button.
-	 * 
+	 *
 	 * @param listener
 	 */
 	public void addOKButtonListener(final ActionListener listener) {
@@ -155,7 +157,7 @@ implements ConfigNodePersistent {
 
 	/**
 	 * Equips the preferences JFrame with a window listener.
-	 * 
+	 *
 	 * @param listener
 	 */
 	public void addWindowListener(final WindowAdapter listener) {
@@ -170,9 +172,9 @@ implements ConfigNodePersistent {
 					listener);
 		}
 	}
-	
+
 	public void addJustifyListener(final ActionListener listener) {
-		
+
 		if (annotationSettings != null) {
 			annotationSettings.addJustifyListener(listener);
 		}
@@ -182,7 +184,7 @@ implements ConfigNodePersistent {
 	 * Adds a component listener to the JDialog in which the content of this
 	 * class is held. This ensures repainting of all child components when the
 	 * JDialog is being resized.
-	 * 
+	 *
 	 * @param l
 	 */
 	public void addComponentListener(final ComponentListener l) {
@@ -191,8 +193,8 @@ implements ConfigNodePersistent {
 	}
 
 	/**
-	 * This class provides a JPanel which contains components to control
-	 * font settings for the label views.
+	 * This class provides a JPanel which contains components to control font
+	 * settings for the label views.
 	 */
 	class FontPanel {
 
@@ -200,13 +202,14 @@ implements ConfigNodePersistent {
 
 		public FontPanel() {
 
-			mainPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, 
+			mainPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING,
 					null);
 
 			final FontSettings fontSettings = new FontSettings(
-					dendroView.getRowLabelView(), dendroView.getColumnLabelView());
+					dendroView.getRowLabelView(),
+					dendroView.getColumnLabelView());
 
-			mainPanel.add(fontSettings.makeFontPanel(), 
+			mainPanel.add(fontSettings.makeFontPanel(),
 					"pushx, alignx 50%, w 95%");
 		}
 
@@ -228,7 +231,7 @@ implements ConfigNodePersistent {
 
 		public URLSettings() {
 
-			mainPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, 
+			mainPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING,
 					null);
 
 			final UrlSettingsPanel genePanel = new UrlSettingsPanel(
@@ -252,85 +255,83 @@ implements ConfigNodePersistent {
 
 	/**
 	 * Subclass for the Annotation settings panel.
-	 * 
+	 *
 	 * @author CKeil
-	 * 
+	 *
 	 */
 	class AnnotationPanel {
 
 		private final JPanel mainPanel;
-		private final JButton custom_button;
-		
+		private final JButton custom_btn;
+
 		private final HeaderSummaryPanel genePanel;
 		private final HeaderSummaryPanel arrayPanel;
-		
-		private JRadioButton rowRightJustBtn;
-		private JRadioButton rowLeftJustBtn;
-		private JRadioButton colRightJustBtn;
-		private JRadioButton colLeftJustBtn;
+
+		private final JRadioButton rowRightJustBtn;
+		private final JRadioButton rowLeftJustBtn;
+		private final JRadioButton colRightJustBtn;
+		private final JRadioButton colLeftJustBtn;
 
 		public AnnotationPanel() {
 
-			mainPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, 
+			mainPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING,
 					null);
 
-			genePanel = new HeaderSummaryPanel(geneHI, 
-					dendroView.getRowLabelView().getHeaderSummary());
+			genePanel = new HeaderSummaryPanel(geneHI, dendroView
+					.getRowLabelView().getHeaderSummary());
 
-			arrayPanel = new HeaderSummaryPanel(arrayHI, 
-					dendroView.getColumnLabelView().getHeaderSummary());
+			arrayPanel = new HeaderSummaryPanel(arrayHI, dendroView
+					.getColumnLabelView().getHeaderSummary());
 
-			final JPanel loadLabelPanel = GUIFactory.createJPanel(false, 
+			final JPanel loadLabelPanel = GUIFactory.createJPanel(false,
 					GUIFactory.NO_PADDING, null);
 			loadLabelPanel.setBorder(BorderFactory.createEtchedBorder());
 
-			custom_button = GUIFactory.createBtn(
-					StringRes.btn_CustomLabels);
+			custom_btn = GUIFactory.createBtn(StringRes.btn_CustomLabels);
 
 			final JLabel rows = GUIFactory.setupHeader(StringRes.main_rows);
 			final JLabel cols = GUIFactory.setupHeader(StringRes.main_cols);
-			
-			
+
 			/* Label alignment */
 			final JLabel justifyHint = GUIFactory.createLabel(
 					"Label justification: ", GUIFactory.FONTS);
-			
-			ButtonGroup rowJustifyBtnGroup = new ButtonGroup();
+
+			final ButtonGroup rowJustifyBtnGroup = new ButtonGroup();
 
 			rowLeftJustBtn = GUIFactory.createRadioBtn("Left");
 			rowRightJustBtn = GUIFactory.createRadioBtn("Right");
-			
-			if(dendroView.getRowLabelView().getJustifyOption()) {
+
+			if (dendroView.getRowLabelView().getJustifyOption()) {
 				rowRightJustBtn.setSelected(true);
 			} else {
 				rowLeftJustBtn.setSelected(true);
 			}
-			
+
 			rowJustifyBtnGroup.add(rowLeftJustBtn);
 			rowJustifyBtnGroup.add(rowRightJustBtn);
-			
-			final JPanel rowRadioBtnPanel = 
-					GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
-	
+
+			final JPanel rowRadioBtnPanel = GUIFactory.createJPanel(false,
+					GUIFactory.DEFAULT, null);
+
 			rowRadioBtnPanel.add(rowLeftJustBtn, "span, wrap");
 			rowRadioBtnPanel.add(rowRightJustBtn, "span");
-			
-			ButtonGroup colJustifyBtnGroup = new ButtonGroup();
-			
+
+			final ButtonGroup colJustifyBtnGroup = new ButtonGroup();
+
 			colRightJustBtn = GUIFactory.createRadioBtn("Top");
 			colLeftJustBtn = GUIFactory.createRadioBtn("Bottom");
-			
-			if(dendroView.getColumnLabelView().getJustifyOption()) {
+
+			if (dendroView.getColumnLabelView().getJustifyOption()) {
 				colRightJustBtn.setSelected(true);
 			} else {
 				colLeftJustBtn.setSelected(true);
 			}
-			
+
 			colJustifyBtnGroup.add(colRightJustBtn);
 			colJustifyBtnGroup.add(colLeftJustBtn);
-			
-			final JPanel colRadioBtnPanel = 
-					GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
+
+			final JPanel colRadioBtnPanel = GUIFactory.createJPanel(false,
+					GUIFactory.DEFAULT, null);
 
 			colRadioBtnPanel.add(colRightJustBtn, "span, wrap");
 			colRadioBtnPanel.add(colLeftJustBtn, "span");
@@ -342,8 +343,10 @@ implements ConfigNodePersistent {
 			mainPanel.add(justifyHint, "pushx, alignx 0%, span, wrap");
 			mainPanel.add(rowRadioBtnPanel, "pushx, alignx 50%, w 45%");
 			mainPanel.add(colRadioBtnPanel, "pushx, alignx 50%, w 45%, wrap");
+
 			//Commented out for version 3.0alpha1 because it doesn't work yet
 			//mainPanel.add(custom_button, "pushx, alignx 50%, span");
+
 		}
 
 		public JPanel makeLabelPane() {
@@ -353,7 +356,7 @@ implements ConfigNodePersistent {
 
 		public JButton getCustomLabelButton() {
 
-			return custom_button;
+			return custom_btn;
 		}
 
 		public void synchronize() {
@@ -361,7 +364,7 @@ implements ConfigNodePersistent {
 			genePanel.synchronizeTo();
 			arrayPanel.synchronizeTo();
 		}
-		
+
 		public void addJustifyListener(final ActionListener l) {
 
 			rowLeftJustBtn.addActionListener(l);
@@ -384,33 +387,31 @@ implements ConfigNodePersistent {
 	/**
 	 * Dynamically adds JScrollPane to the frame based on the MouseListener in
 	 * MenuPanel.
-	 * 
+	 *
 	 * @param title
 	 */
 	public void setupLayout(final String menu) {
 
 		mainPanel.removeAll();
-		
+
 		JPanel menuPanel;
-		if (menu.equalsIgnoreCase(StringRes.menu_Font)
-				&& tvFrame.isLoaded()) {
+		if (menu.equalsIgnoreCase(StringRes.menu_Font) && tvFrame.isLoaded()) {
 			menuPanel = new FontPanel().makeFontPanel();
 
 		} else if (menu.equalsIgnoreCase(StringRes.menu_RowAndCol)) {
 			annotationSettings = new AnnotationPanel();
 			menuPanel = annotationSettings.makeLabelPane();
 
-		} else if (menu.equalsIgnoreCase(StringRes.menu_Color) 
+		} else if (menu.equalsIgnoreCase(StringRes.menu_Color)
 				&& gradientPick != null) {
 			menuPanel = gradientPick.makeGradientPanel();
-		
 
 		} else if (menu.equalsIgnoreCase(StringRes.menu_URL)) {
 			menuPanel = new URLSettings().makeURLPanel();
-			
+
 		} else {
 			// In case menu cannot be loaded, display excuse.
-			menuPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, 
+			menuPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING,
 					null);
 
 			final JLabel hint = GUIFactory.createLabel("Menu cannot be "
@@ -419,20 +420,20 @@ implements ConfigNodePersistent {
 		}
 
 		ok_btn = GUIFactory.createBtn(StringRes.btn_OK);
-		
+
 		mainPanel.add(menuPanel, "push, grow, wrap");
 		mainPanel.add(ok_btn, "pushx, alignx 100%, span");
 
 		mainPanel.revalidate();
 		mainPanel.repaint();
-		
+
 		dialog.pack();
 		dialog.setLocationRelativeTo(tvFrame.getAppFrame());
 	}
 
 	/**
 	 * Returns PreferencesMenu's configNode.
-	 * 
+	 *
 	 * @return
 	 */
 	public Preferences getConfigNode() {

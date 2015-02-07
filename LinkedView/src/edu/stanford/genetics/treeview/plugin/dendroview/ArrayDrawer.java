@@ -31,26 +31,26 @@ import java.util.prefs.Preferences;
 
 /**
  * Class for Drawing A Colored Grid Representation of a Matrix.
- * 
+ *
  * Each cell in the view corresponds to an element in an array. The color of the
  * pixels is determined by subclasses.
  * <p>
- * 
+ *
  * The ArrayDrawer is Observable. It setsChanged() itself when the data array is
  * changed, but you have to call notifyObservers() yourself.
  * <p>
- * 
+ *
  * The ArrayDrawer can draw on a Graphics object. It requires a source rectangle
  * in units of array indexes, to determine which array values to render, and a
  * destination rectangle to draw them to.
  * <p>
- * 
+ *
  * At some point, we many want to allow arrays of ints to specify source rows
  * and columns to grab data from for non-contiguous views.
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.1 $ $Date: 2006-08-16 19:13:46 $
- * 
+ *
  */
 public abstract class ArrayDrawer extends Observable implements Observer {
 
@@ -58,7 +58,7 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 
 	/**
 	 * Get Color for a given array element
-	 * 
+	 *
 	 * @param x
 	 *            x coordinate of array element
 	 * @param y
@@ -88,7 +88,7 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 	/**
 	 * Paint the array values onto pixels. This method will do averaging if
 	 * multiple values map to the same pixel.
-	 * 
+	 *
 	 * @param pixels
 	 *            The pixel buffer to draw to.
 	 * @param source
@@ -106,6 +106,7 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 	 */
 	public abstract void paint(int[] pixels, Rectangle source, Rectangle dest,
 			int scanSize, int[] geneOrder);
+
 	/* Code for selection dimming */
 	// , int[] geneSelections, int[] arraySelections);
 
@@ -128,7 +129,7 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 
 	/**
 	 * binds this arraydrawer to a particular ConfigNode.
-	 * 
+	 *
 	 * @param configNode
 	 *            confignode to bind to
 	 */
@@ -144,7 +145,7 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 
 	/**
 	 * Paint the view of the Pixels
-	 * 
+	 *
 	 * @param g
 	 *            The Graphics element to draw on
 	 * @param source
@@ -191,7 +192,7 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 	/**
 	 * Paint the array values onto pixels. This method will do averaging if
 	 * multiple values map to the same pixel.
-	 * 
+	 *
 	 * @param pixels
 	 *            The pixel buffer to draw to.
 	 * @param source
@@ -204,17 +205,16 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 	 */
 	public void paint(final int[] pixels, final Rectangle source,
 			final Rectangle dest, final int scanSize) {
-		
-		/* Code for selection dimming */
-		//, int[] gs, int[] as) {
-	
 
-		paint(pixels, source, dest, scanSize, null);//, gs, as);
+		/* Code for selection dimming */
+		// , int[] gs, int[] as) {
+
+		paint(pixels, source, dest, scanSize, null);// , gs, as);
 	}
 
 	/**
 	 * Method to draw a single point (x,y) on grapics g using xmap and ymap
-	 * 
+	 *
 	 * @param g
 	 *            Graphics to draw to
 	 * @param xmap
@@ -250,7 +250,7 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 	/**
 	 * This drawer can only draw from a single, unchanging model. This method
 	 * may not be necessary. Neither may the observer/observable stuff.
-	 * 
+	 *
 	 * @param o
 	 *            Object sending update
 	 * @param arg

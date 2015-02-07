@@ -32,17 +32,17 @@ import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
  * The purpose of this class is to convert a character into a color.
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version @version $Revision: 1.1 $ $Date: 2006-08-16 19:13:45 $
  */
 
 public class CharColorExtractor extends Observable implements
-		ConfigNodePersistent {
+ConfigNodePersistent {
 
 	private static CharColorSet defaultColorSet = new CharColorSet();
 	private final CharColorSet colorSet;// Will be backed by confignode when we
-										// get one...
+	// get one...
 	private Preferences configNode;
 
 	/** Constructor for the CharColorExtractor object */
@@ -103,7 +103,7 @@ public class CharColorExtractor extends Observable implements
 	/**
 	 * binds this CharColorExtractor to a particular ConfigNode. This makes
 	 * colors persistent
-	 * 
+	 *
 	 * @param configNode
 	 *            confignode to bind to
 	 */
@@ -120,9 +120,9 @@ public class CharColorExtractor extends Observable implements
 
 		try {
 			final String[] childrenNodes = configNode.childrenNames();
-			for (int i = 0; i < childrenNodes.length; i++) {
+			for (final String childrenNode : childrenNodes) {
 
-				if (childrenNodes[i].contains("ColorSet")) {
+				if (childrenNode.contains("ColorSet")) {
 				}
 			}
 
@@ -161,9 +161,8 @@ public class CharColorExtractor extends Observable implements
 	 */
 	public void setColor(final char c, final String newString) {
 
-		if (ColorSet.encodeColor(colorSet.getColor(c)).equals(newString)) {
+		if (ColorSet.encodeColor(colorSet.getColor(c)).equals(newString))
 			return;
-		}
 		colorSet.setColor(c, ColorSet.decodeColor(newString));
 		setChanged();
 	}
@@ -173,9 +172,8 @@ public class CharColorExtractor extends Observable implements
 	 */
 	public void setMissingColor(final String newString) {
 
-		if (ColorSet.encodeColor(colorSet.getMissing()).equals(newString)) {
+		if (ColorSet.encodeColor(colorSet.getMissing()).equals(newString))
 			return;
-		}
 		colorSet.setMissing(ColorSet.decodeColor(newString));
 		setChanged();
 	}
@@ -185,13 +183,11 @@ public class CharColorExtractor extends Observable implements
 	 */
 	public void setEmptyColor(final String newString) {
 
-		if (newString == null) {
+		if (newString == null)
 			return;
-		}
 
-		if (ColorSet.encodeColor(colorSet.getEmpty()).equals(newString)) {
+		if (ColorSet.encodeColor(colorSet.getEmpty()).equals(newString))
 			return;
-		}
 
 		colorSet.setEmpty(ColorSet.decodeColor(newString));
 		setChanged();
@@ -201,9 +197,8 @@ public class CharColorExtractor extends Observable implements
 	 * The color for chars.
 	 */
 	public void setColor(final char c, final Color newColor) {
-		if (colorSet.getColor(c).equals(newColor)) {
+		if (colorSet.getColor(c).equals(newColor))
 			return;
-		}
 		colorSet.setColor(c, newColor);
 		setChanged();
 	}
@@ -212,9 +207,8 @@ public class CharColorExtractor extends Observable implements
 	 * The color for missing data.
 	 */
 	public void setMissingColor(final Color newColor) {
-		if (colorSet.getMissing().equals(newColor)) {
+		if (colorSet.getMissing().equals(newColor))
 			return;
-		}
 		colorSet.setMissing(newColor);
 		setChanged();
 	}
@@ -225,19 +219,17 @@ public class CharColorExtractor extends Observable implements
 	 */
 	public void setEmptyColor(final Color newColor) {
 
-		if (newColor == null) {
+		if (newColor == null)
 			return;
-		}
-		if (colorSet.getEmpty().equals(newColor)) {
+		if (colorSet.getEmpty().equals(newColor))
 			return;
-		}
 		colorSet.setEmpty(newColor);
 		setChanged();
 	}
 
 	/**
 	 * Gets the color corresponding to a particular char.
-	 * 
+	 *
 	 * @param c
 	 *            char representing value we want color for
 	 * @return The color value
@@ -249,7 +241,7 @@ public class CharColorExtractor extends Observable implements
 
 	/**
 	 * Gets the floatColor attribute of the ColorExtractor object
-	 * 
+	 *
 	 * @param c
 	 *            char representing value we want color for
 	 * @return The floatColor value
@@ -268,7 +260,7 @@ public class CharColorExtractor extends Observable implements
 
 	/**
 	 * Gets the aRGBColor attribute of the ColorExtractor object
-	 * 
+	 *
 	 * @param c
 	 *            Description of the Parameter
 	 * @return The aRGBColor value

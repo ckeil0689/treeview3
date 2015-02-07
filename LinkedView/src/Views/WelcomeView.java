@@ -7,6 +7,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
 
 import Utilities.GUIFactory;
 import Utilities.StringRes;
@@ -21,7 +22,7 @@ public class WelcomeView {
 	private final JLabel jl;
 	private final JLabel jl2;
 	private JLabel status;
-	
+
 	private JButton loadButton;
 	private JButton loadLastButton;
 
@@ -29,40 +30,39 @@ public class WelcomeView {
 
 	// Loading stuff
 	private static JProgressBar loadBar = GUIFactory.createPBar();
-	private static JLabel loadLabel = 
-			GUIFactory.createLabel("", GUIFactory.FONTL);
+	private static JLabel loadLabel = GUIFactory.createLabel("",
+			GUIFactory.FONTL);
 
 	public WelcomeView() {
 
 		homePanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 
 		title_bg = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, null);
-		
-		JPanel titleContainer = GUIFactory.createJPanel(false, 
+
+		final JPanel titleContainer = GUIFactory.createJPanel(false,
 				GUIFactory.NO_PADDING, null);
-		
+
 		loadPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 
 		jl = GUIFactory.createLabel(StringRes.title_Hello, GUIFactory.FONTL);
 
-		jl2 = GUIFactory.createLabel(StringRes.title_Welcome 
+		jl2 = GUIFactory.createLabel(StringRes.title_Welcome
 				+ StringRes.appName + StringRes.dot, GUIFactory.FONTXXL);
 
 		titleContainer.add(jl, "pushx, alignx 50%, aligny 50%, span, wrap");
 		titleContainer.add(jl2, "pushx, alignx 50%, span");
-		titleContainer.add(new JSeparator(JSeparator.HORIZONTAL), "w 30%, "
+		titleContainer.add(new JSeparator(SwingConstants.HORIZONTAL), "w 30%, "
 				+ "pushx, alignx 50%");
-		
+
 		title_bg.add(titleContainer, "push, growx, align 50%");
-		
-		homePanel.add(title_bg, "push, grow, alignx 50%, "
-				+ "span, wrap");
+
+		homePanel.add(title_bg, "push, grow, alignx 50%, " + "span, wrap");
 		homePanel.add(loadPanel, "push, grow, alignx 50%");
 	}
 
 	/**
 	 * Access TreeViewFrame's load_Icon panel.
-	 * 
+	 *
 	 * @return
 	 */
 	public JPanel getLoadIcon() {
@@ -72,7 +72,7 @@ public class WelcomeView {
 
 	/**
 	 * Access TreeViewFrame's load_Icon panel.
-	 * 
+	 *
 	 * @return
 	 */
 	public JButton getLoadButton() {
@@ -87,24 +87,23 @@ public class WelcomeView {
 
 	/**
 	 * Equipping the loadButton with an ActionListener
-	 * 
+	 *
 	 * @param loadData
 	 */
 	public void addLoadListener(final ActionListener loadData) {
 
 		loadButton.addActionListener(loadData);
 	}
-	
+
 	/**
 	 * Equipping the loadLastButton with an ActionListener
-	 * 
+	 *
 	 * @param loadData
 	 */
 	public void addLoadLastListener(final ActionListener loadData) {
 
 		loadLastButton.addActionListener(loadData);
 	}
-
 
 	public JPanel makeWelcome() {
 
@@ -114,13 +113,13 @@ public class WelcomeView {
 
 		loadButton = GUIFactory.createLargeBtn("Open...");
 		loadLastButton = GUIFactory.createBtn("Load last file...");
-		
+
 		status = GUIFactory.createLabel("Ready to go!", GUIFactory.FONTS);
-		
+
 		loadPanel.add(status, "pushx, alignx 50%, aligny 0%, wrap");
 		loadPanel.add(loadButton, "pushx, alignx 50%, aligny 0%, wrap");
 		loadPanel.add(loadLastButton, "pushx, alignx 50%, aligny 0%");
-		
+
 		homePanel.revalidate();
 		homePanel.repaint();
 
@@ -133,18 +132,18 @@ public class WelcomeView {
 
 		loadPanel.removeAll();
 
-		JPanel loadContainer = GUIFactory.createJPanel(false, 
+		final JPanel loadContainer = GUIFactory.createJPanel(false,
 				GUIFactory.DEFAULT, null);
-		
+
 		jl.setText(StringRes.load_OneSec);
 		jl2.setText(StringRes.load_active);
-		
+
 		resetLoadBar();
 		setLoadText("Setting up...");
 
 		loadContainer.add(loadLabel, "pushx, alignx 50%, wrap");
 		loadContainer.add(loadBar, "pushx, growx");
-		
+
 		loadPanel.add(loadContainer, "pushx, growx, align 50%, w 60%!");
 
 		homePanel.revalidate();
@@ -156,7 +155,7 @@ public class WelcomeView {
 	// LoadBar functions
 	/**
 	 * Updates the loading bar by setting it to i.
-	 * 
+	 *
 	 * @param i
 	 */
 	public static void updateLoadBar(final int i) {
@@ -168,7 +167,7 @@ public class WelcomeView {
 
 	/**
 	 * Resets the loading bar to 0.
-	 * 
+	 *
 	 * @param i
 	 */
 	public static void resetLoadBar() {
@@ -178,7 +177,7 @@ public class WelcomeView {
 
 	/**
 	 * Sets the maximum of the loading bar.
-	 * 
+	 *
 	 * @param max
 	 */
 	public static void setLoadBarMax(final int max) {
@@ -188,20 +187,20 @@ public class WelcomeView {
 
 	/**
 	 * Changes the text of the loading label.
-	 * 
+	 *
 	 * @param text
 	 */
 	public static void setLoadText(final String text) {
 
 		loadLabel.setText(text);
 	}
-	
+
 	/**
-	 * Sets the status label to give out a warning. Used if no last file can
-	 * be loaded when the user clicks the loadLastBtn.
+	 * Sets the status label to give out a warning. Used if no last file can be
+	 * loaded when the user clicks the loadLastBtn.
 	 */
 	public void setWarning() {
-		
+
 		status.setForeground(GUIFactory.RED1);
 		status.setText("No last file to load!");
 		loadPanel.repaint();

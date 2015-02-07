@@ -2,9 +2,9 @@
  *
  * $Author: avsegal
  * $RCSfile: AtrAnalysisNode.java
- * $Revision: 
+ * $Revision:
  * $Date: Jun 25, 2004
- * $Name:  
+ * $Name:
  *
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
@@ -38,7 +38,7 @@ public class AtrAnalysisNode extends TreeAnalysisNode {
 
 	/**
 	 * Creates a new node.
-	 * 
+	 *
 	 * @param pID
 	 *            ID of the node in the ATR file
 	 */
@@ -51,7 +51,7 @@ public class AtrAnalysisNode extends TreeAnalysisNode {
 
 	/**
 	 * Creates a new node with a given parent.
-	 * 
+	 *
 	 * @param pID
 	 *            ID of the node in the ATR file
 	 * @param pParent
@@ -66,7 +66,7 @@ public class AtrAnalysisNode extends TreeAnalysisNode {
 
 	/**
 	 * Sets the name of this node.
-	 * 
+	 *
 	 * @param name
 	 *            the name to set
 	 */
@@ -76,7 +76,7 @@ public class AtrAnalysisNode extends TreeAnalysisNode {
 
 	/**
 	 * Returns the node's name.
-	 * 
+	 *
 	 * @return the node's name
 	 */
 	public String getName() {
@@ -86,7 +86,7 @@ public class AtrAnalysisNode extends TreeAnalysisNode {
 	/**
 	 * Returns the average of all leaf weights in this subtree. This is used in
 	 * the alignment algorithm.
-	 * 
+	 *
 	 * @return the average index of leaves
 	 */
 	public double getAverageSubtreeIndex() {
@@ -109,7 +109,7 @@ public class AtrAnalysisNode extends TreeAnalysisNode {
 
 	/**
 	 * Returns a vector of all leaves in this subtree, in order.
-	 * 
+	 *
 	 * @param v
 	 *            the vector to fill with leaves
 	 */
@@ -131,7 +131,7 @@ public class AtrAnalysisNode extends TreeAnalysisNode {
 
 	/**
 	 * Gets the number of leaves.
-	 * 
+	 *
 	 * @return the number of leaves in this subtree
 	 */
 	public int getLeafCount() {
@@ -154,7 +154,7 @@ public class AtrAnalysisNode extends TreeAnalysisNode {
 
 	/**
 	 * Calculates the average index of all nodes.
-	 * 
+	 *
 	 * @param arrayHeader
 	 *            the arrayHeader to use for index look up
 	 * @param gid2index
@@ -197,12 +197,11 @@ public class AtrAnalysisNode extends TreeAnalysisNode {
 
 	/**
 	 * Rearranged the tree by average index.
-	 * 
+	 *
 	 */
 	private void arrangeByAverageIndex() {
-		if (left == null || right == null) {
+		if (left == null || right == null)
 			return;
-		}
 
 		AtrAnalysisNode temp;
 
@@ -219,7 +218,7 @@ public class AtrAnalysisNode extends TreeAnalysisNode {
 
 	/**
 	 * Calculates all the indecies.
-	 * 
+	 *
 	 * @param arrayHeader
 	 *            the arrayHeader to use for index look up
 	 * @param gid2index
@@ -233,7 +232,7 @@ public class AtrAnalysisNode extends TreeAnalysisNode {
 
 	/**
 	 * Gets the average index of this subtree.
-	 * 
+	 *
 	 * @return the average index of this subtree.
 	 */
 	public double getAverageIndex() {

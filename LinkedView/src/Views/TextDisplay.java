@@ -6,9 +6,9 @@ import Utilities.GUIFactory;
 
 /**
  * Small helper class to set up TextAreas for the display of long texts.
- * 
+ *
  * @author CKeil
- * 
+ *
  */
 public class TextDisplay extends JTextArea {
 

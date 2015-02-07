@@ -9,7 +9,7 @@
  * This file is part of Java TreeView
  * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
  *
- * This software is provided under the GNU GPL Version 2. In particular, 
+ * This software is provided under the GNU GPL Version 2. In particular,
  *
  * 1) If you modify a source file, make a comment in it containing your name and the date.
  * 2) If you distribute a modified version, you must do it under the GPL 2.
@@ -18,10 +18,11 @@
  * A full copy of the license can be found in gpl.txt or online at
  * http://www.gnu.org/licenses/gpl.txt
  *
- * END_HEADER 
+ * END_HEADER
  */
 package edu.stanford.genetics.treeview.core;
 
+import java.awt.Dialog;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -37,6 +38,7 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.WindowConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -46,7 +48,7 @@ import edu.stanford.genetics.treeview.FileSet;
 
 /**
  * This class allows you to edit the file mru, and also get some info about them
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.2 $ $Date: 2010-05-02 13:39:00 $
  */
@@ -59,7 +61,7 @@ public class FileMruEditor {
 	private ButtonArrangement buttonArrangement;
 
 	private static String[] options = new String[] { "Find...", "Remove",
-			"Cancel" };
+	"Cancel" };
 	/**
 	 * Constant signifying what type of action to take. Used to keep track of
 	 * options.
@@ -78,7 +80,7 @@ public class FileMruEditor {
 
 	/**
 	 * This constructs a full edit panel
-	 * 
+	 *
 	 * @param fm
 	 *            the FileMru to be edited
 	 */
@@ -90,7 +92,7 @@ public class FileMruEditor {
 
 	/**
 	 * This just offers a search for a particular node...
-	 * 
+	 *
 	 * @param node
 	 *            Node to search for
 	 * @param parentComponent
@@ -112,15 +114,17 @@ public class FileMruEditor {
 		dialog.setVisible(true);
 		final Object selectedValue = pane.getValue();
 
-		if (selectedValue == null) return CANCEL;
+		if (selectedValue == null)
+			return CANCEL;
 
 		if (options[0].equals(selectedValue)) {
 			// must execute find...
-			if (searchFile(node, parentComponent)) return FIND;
+			if (searchFile(node, parentComponent))
+				return FIND;
 		}
 
-		if (options[1].equals(selectedValue)) return REMOVE;
-		
+		if (options[1].equals(selectedValue))
+			return REMOVE;
 
 		return CANCEL;
 	}
@@ -128,17 +132,16 @@ public class FileMruEditor {
 	/**
 	 * put editor in a top level frame and show
 	 */
-	public void showDialog(JFrame appFrame) {
+	public void showDialog(final JFrame appFrame) {
 
 		final JDialog dialog = new JDialog();
 		dialog.setTitle(getTitle());
-		dialog.setModalityType(JDialog.DEFAULT_MODALITY_TYPE);
+		dialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
 		dialog.getContentPane().add(mainPanel);
-		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		
+		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
 		dialog.pack();
 		dialog.setLocationRelativeTo(appFrame);
-		
 
 		window = dialog;
 		dialog.setVisible(true);
@@ -146,7 +149,7 @@ public class FileMruEditor {
 
 	/**
 	 * Gets the title attribute of the FileMruEditor object
-	 * 
+	 *
 	 * @return The title value
 	 */
 	private String getTitle() {
@@ -171,14 +174,14 @@ public class FileMruEditor {
 		mainPanel.add(l1, "pushx, alignx 50%, wrap");
 		mainPanel.add(upper, "push, grow, alignx 50%, wrap");
 		mainPanel.add(buttonPanel, "pushx, alignx 50%");
-		
+
 		mainPanel.revalidate();
 		mainPanel.repaint();
 	}
 
 	/**
 	 * Internal class to encapsulate displaying the FileSets
-	 * 
+	 *
 	 * @author Alok Saldanha <alok@genome.stanford.edu>
 	 */
 	private class FileSetDisplay {
@@ -202,14 +205,14 @@ public class FileMruEditor {
 				}
 			});
 			regenList();
-			fileSetDisplay = GUIFactory.createJPanel(false, 
-					GUIFactory.DEFAULT, null);
+			fileSetDisplay = GUIFactory.createJPanel(false, GUIFactory.DEFAULT,
+					null);
 			final JScrollPane scrollPane = new JScrollPane(list);
 			fileSetDisplay.add(scrollPane, "push, grow");
 		}
-		
+
 		public JPanel getFileSetPanel() {
-			
+
 			return fileSetDisplay;
 		}
 
@@ -229,7 +232,7 @@ public class FileMruEditor {
 
 		/**
 		 * Removes the currently selected files, if any
-		 * 
+		 *
 		 * @return The index of the first file removed, or -1
 		 */
 		public int removeSelected() {
@@ -282,7 +285,7 @@ public class FileMruEditor {
 	/**
 	 * Offers a search for a file corresponding to a fileset. Useful if you
 	 * moved the file.
-	 * 
+	 *
 	 * @param fileSet
 	 *            FileSet to find
 	 * @param w
@@ -311,13 +314,13 @@ public class FileMruEditor {
 
 	/**
 	 * Class to encapsulate buttons and callbacks for buttons
-	 * 
+	 *
 	 * @author Alok Saldanha <alok@genome.stanford.edu>
 	 */
 	private class ButtonArrangement {
 
 		private final JButton openButton, searchButton, deleteButton,
-				deleteAllButton, closeButton;
+		deleteAllButton, closeButton;
 		private final JPanel buttonPanel;
 
 		/**
@@ -325,7 +328,7 @@ public class FileMruEditor {
 		 */
 		private ButtonArrangement() {
 
-			buttonPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, 
+			buttonPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT,
 					null);
 
 			openButton = GUIFactory.createBtn("Open");
@@ -351,10 +354,10 @@ public class FileMruEditor {
 
 			deleteButton = GUIFactory.createBtn("Remove");
 			deleteButton.addActionListener(new ActionListener() {
-				
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					
+
 					fileSetDisplay.removeSelected();
 				}
 			});
@@ -365,7 +368,7 @@ public class FileMruEditor {
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					
+
 					fileSetDisplay.removeAll();
 				}
 			});
@@ -381,16 +384,16 @@ public class FileMruEditor {
 			});
 			buttonPanel.add(closeButton, "pushx");
 		}
-		
+
 		public JPanel getButtonPanel() {
-			
+
 			return buttonPanel;
 		}
 
 		/**
 		 * This method is called to let the button panel know if anything is
 		 * selected. The button panel will (dis)enable buttons as required.
-		 * 
+		 *
 		 * @param thingsSelected
 		 *            The new thingsSelected value
 		 */
@@ -403,7 +406,7 @@ public class FileMruEditor {
 
 	/**
 	 * test code, loads an XmlConfig...
-	 * 
+	 *
 	 * @param args
 	 *            The command line arguments
 	 */

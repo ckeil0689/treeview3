@@ -30,7 +30,7 @@ import java.awt.Color;
  * configure or get colors can do it through this interface in a general way.
  * They can also down-cast if they need to. In general, the types should be
  * constants within the subclass. See an existing example to get the idea.
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version @version $Revision: 1.4 $ $Date: 2004-12-21 03:28:14 $
  */
@@ -42,7 +42,7 @@ public interface ColorSetI {
 
 	/**
 	 * get the color corresponding to the i'th type.
-	 * 
+	 *
 	 * @param i
 	 *            type index
 	 * @return The actual color
@@ -51,7 +51,7 @@ public interface ColorSetI {
 
 	/**
 	 * set the i'th color to something new.
-	 * 
+	 *
 	 * @param i
 	 *            index of the type
 	 * @param newColor
@@ -61,7 +61,7 @@ public interface ColorSetI {
 
 	/**
 	 * get the description of the i'th type
-	 * 
+	 *
 	 * @param i
 	 *            index of the type
 	 * @return The description of the type
@@ -70,7 +70,7 @@ public interface ColorSetI {
 
 	/**
 	 * get the name of the color set
-	 * 
+	 *
 	 * @return Usually the name of the subclass.
 	 */
 	public String getName();

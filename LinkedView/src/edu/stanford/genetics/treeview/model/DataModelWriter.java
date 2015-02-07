@@ -18,9 +18,9 @@ import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.HeaderInfo;
 
 /**
- * 
+ *
  * The purpose of this class is to write a DataModel out to flat file format.
- * 
+ *
  */
 public class DataModelWriter {
 	DataModel dataModel;
@@ -31,7 +31,7 @@ public class DataModelWriter {
 
 	/**
 	 * Write all parts of Datamodel out to disk
-	 * 
+	 *
 	 * @param fileSet
 	 *            fileset to write to
 	 * @return
@@ -39,12 +39,15 @@ public class DataModelWriter {
 	public Set<DataModelFileType> writeAll(final FileSet fileSet) {
 		final EnumSet<DataModelFileType> written = EnumSet
 				.noneOf(DataModelFileType.class);
-		if (writeAtr(fileSet.getAtr()))
+		if (writeAtr(fileSet.getAtr())) {
 			written.add(DataModelFileType.ATR);
-		if (writeGtr(fileSet.getGtr()))
+		}
+		if (writeGtr(fileSet.getGtr())) {
 			written.add(DataModelFileType.GTR);
-		if (writeCdt(fileSet.getCdt()))
+		}
+		if (writeCdt(fileSet.getCdt())) {
 			written.add(DataModelFileType.CDT);
+		}
 		return written;
 	}
 
@@ -52,25 +55,28 @@ public class DataModelWriter {
 		final EnumSet<DataModelFileType> written = EnumSet
 				.noneOf(DataModelFileType.class);
 		if (dataModel.aidFound() && dataModel.getAtrHeaderInfo().getModified()) {
-			if (writeAtr(fileSet.getAtr()))
+			if (writeAtr(fileSet.getAtr())) {
 				written.add(DataModelFileType.ATR);
+			}
 		}
 		if (dataModel.gidFound() && dataModel.getGtrHeaderInfo().getModified()) {
-			if (writeGtr(fileSet.getGtr()))
+			if (writeGtr(fileSet.getGtr())) {
 				written.add(DataModelFileType.GTR);
+			}
 		}
 		if (dataModel.getDataMatrix().getModified()
-				|| dataModel.getArrayHeaderInfo().getModified()
-				|| dataModel.getGeneHeaderInfo().getModified()) {
-			if (writeCdt(fileSet.getCdt()))
+				|| dataModel.getColumnHeaderInfo().getModified()
+				|| dataModel.getRowHeaderInfo().getModified()) {
+			if (writeCdt(fileSet.getCdt())) {
 				written.add(DataModelFileType.CDT);
+			}
 		}
 		return written;
 	}
 
 	/**
 	 * write out atr to file
-	 * 
+	 *
 	 * @param atr
 	 *            complete path of file to write to
 	 */
@@ -80,7 +86,7 @@ public class DataModelWriter {
 
 	/**
 	 * write out gtr to file
-	 * 
+	 *
 	 * @param gtr
 	 *            complete path of file to write to
 	 */
@@ -90,7 +96,7 @@ public class DataModelWriter {
 
 	/**
 	 * write out HeaderInfo of tree to file
-	 * 
+	 *
 	 * @param info
 	 *            HeaderInfo to write out
 	 * @param filePath
@@ -122,8 +128,8 @@ public class DataModelWriter {
 			final File f = new File(spool);
 			if (f.renameTo(new File(file))) {
 				dataModel.getDataMatrix().setModified(false);
-				dataModel.getArrayHeaderInfo().setModified(false);
-				dataModel.getGeneHeaderInfo().setModified(false);
+				dataModel.getColumnHeaderInfo().setModified(false);
+				dataModel.getRowHeaderInfo().setModified(false);
 			}
 			return true;
 		} catch (final IOException e) {

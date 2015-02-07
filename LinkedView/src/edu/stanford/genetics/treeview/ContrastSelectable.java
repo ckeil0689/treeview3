@@ -25,7 +25,7 @@ package edu.stanford.genetics.treeview;
 /**
  * Mostly a fossil interface, since the only contrast selectable thing is the
  * ColorExtractor.
- * 
+ *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version @version $Revision: 1.4 $ $Date: 2004-12-21 03:28:13 $
  */
