@@ -262,7 +262,7 @@ public class PreferencesMenu extends CustomDialog implements
 	class AnnotationPanel {
 
 		private final JPanel mainPanel;
-		private final JButton custom_button;
+		private final JButton custom_btn;
 
 		private final HeaderSummaryPanel genePanel;
 		private final HeaderSummaryPanel arrayPanel;
@@ -287,7 +287,10 @@ public class PreferencesMenu extends CustomDialog implements
 					GUIFactory.NO_PADDING, null);
 			loadLabelPanel.setBorder(BorderFactory.createEtchedBorder());
 
-			custom_button = GUIFactory.createBtn(StringRes.btn_CustomLabels);
+			custom_btn = GUIFactory.createBtn(StringRes.btn_CustomLabels);
+			
+			/* TODO Loading custom labels disabled until feature works well. */
+			custom_btn.setEnabled(false);
 
 			final JLabel rows = GUIFactory.setupHeader(StringRes.main_rows);
 			final JLabel cols = GUIFactory.setupHeader(StringRes.main_cols);
@@ -343,7 +346,7 @@ public class PreferencesMenu extends CustomDialog implements
 			mainPanel.add(justifyHint, "pushx, alignx 0%, span, wrap");
 			mainPanel.add(rowRadioBtnPanel, "pushx, alignx 50%, w 45%");
 			mainPanel.add(colRadioBtnPanel, "pushx, alignx 50%, w 45%, wrap");
-			mainPanel.add(custom_button, "pushx, alignx 50%, span");
+			mainPanel.add(custom_btn, "pushx, alignx 50%, span");
 		}
 
 		public JPanel makeLabelPane() {
@@ -353,7 +356,7 @@ public class PreferencesMenu extends CustomDialog implements
 
 		public JButton getCustomLabelButton() {
 
-			return custom_button;
+			return custom_btn;
 		}
 
 		public void synchronize() {
