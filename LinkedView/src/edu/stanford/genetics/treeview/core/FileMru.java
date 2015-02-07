@@ -183,7 +183,7 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 
 		final String[] childrenNodes = getRootChildrenNodes();
 		try {
-			final Preferences node = configNode.node(childrenNodes[i]);
+//			final Preferences node = configNode.node(childrenNodes[i]);
 
 			configNode.node(childrenNodes[i]).removeNode();
 
@@ -213,16 +213,10 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 	 * @param configNode
 	 *            Node to move to end
 	 */
-	public synchronized void setLast(final Preferences configNode) {
+	public synchronized void setLast(final Preferences fileSetNode) {
 
-		final String[] childrenNodes = getRootChildrenNodes();
-
-		Preferences last = configNode
-				.node(childrenNodes[childrenNodes.length - 1]);
-		if (!configNode.equals(last)) {
-			last = configNode;
-			setChanged();
-		}
+		configNode.put("last_node", fileSetNode.name());
+		setChanged();
 	}
 
 	/**
@@ -231,14 +225,10 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 	 * @return The last open FileSet
 	 */
 	public FileSet getLast() {
+		
+		String lastNode = configNode.get("last_node", "none");
 
-		final Preferences[] nodes = getConfigs();
-
-		FileSet fileSet = null;
-		if (nodes.length > 0) {
-			fileSet = new FileSet(nodes[nodes.length - 1]);
-		}
-
+		FileSet fileSet = new FileSet(configNode.node(lastNode));
 		return fileSet;
 	}
 
