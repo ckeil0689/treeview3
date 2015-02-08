@@ -39,6 +39,8 @@ import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.BorderFactory;
 import javax.swing.JScrollBar;
@@ -103,6 +105,11 @@ MouseMotionListener, MouseListener, MouseWheelListener {
 	 * Circle to be used as indicator for selection
 	 */
 	private Ellipse2D.Double indicatorCircle = null;
+	
+	/**
+	 * Used to reduce amount of repaints() on mouse movements (CPU + RAM...)
+	 */
+	private final Timer timer;
 
 	/**
 	 * GlobalView also likes to have an globalxmap and globalymap (both of type
@@ -113,6 +120,8 @@ MouseMotionListener, MouseListener, MouseWheelListener {
 
 		super();
 
+		this.timer = new Timer();
+		
 		setLayout(new MigLayout());
 
 		scrollPane = new JScrollPane(this,
@@ -751,11 +760,26 @@ MouseMotionListener, MouseListener, MouseWheelListener {
 		final int oovery = overy;
 		overx = xmap.getIndex(e.getX());
 		overy = ymap.getIndex(e.getY());
-		if (oovery != overy || ooverx != overx) {
-			if (status != null) {
-				status.setMessages(getStatus());
-			}
-		}
+		
+		/* Timed repaint to avoid constant unnecessary repainting. */
+		timer.schedule(new TimerTask() {
+
+	        @Override
+	        public void run() {
+	        	
+	            SwingUtilities.invokeLater(new Runnable() {
+	                @Override
+	                public void run() {
+	                    
+	                	if (oovery != overy || ooverx != overx) {
+	            			if (status != null) {
+	            				status.setMessages(getStatus());
+	            			}
+	            		}
+	                }
+	            });
+	        }
+	    }, 300);
 	}
 
 	// @Override

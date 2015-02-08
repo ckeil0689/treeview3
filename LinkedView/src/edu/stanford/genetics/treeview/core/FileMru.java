@@ -226,9 +226,13 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 	 */
 	public FileSet getLast() {
 		
-		String lastNode = configNode.get("last_node", "none");
+		String lastNode = configNode.get("last_node", "no_last");
 
-		FileSet fileSet = new FileSet(configNode.node(lastNode));
+		FileSet fileSet;
+		if(lastNode.equalsIgnoreCase("no_last"))
+			return null;
+		
+		fileSet = new FileSet(configNode.node(lastNode));
 		return fileSet;
 	}
 

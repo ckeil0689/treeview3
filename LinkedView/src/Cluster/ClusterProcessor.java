@@ -60,7 +60,7 @@ public class ClusterProcessor {
 	 * @param spinnerInput
 	 * @param hierarchical
 	 * @param axis
-	 * @return
+	 * @return Reordered matrix headers.
 	 */
 	public String[] clusterAxis(final DistanceMatrix distMatrix,
 			final int linkMethod, final Integer[] spinnerInput,
@@ -92,7 +92,8 @@ public class ClusterProcessor {
 	 *
 	 * @param distMeasure
 	 * @param axis
-	 * @return
+	 * @return m x m distance matrix where m is the clustered axis length
+	 * of the original data matrix.
 	 */
 	public double[][] calcDistance(final int distMeasure, final int axis) {
 
@@ -183,8 +184,6 @@ public class ClusterProcessor {
 
 					/* Keep track of progress */
 					pBarCount += axisSize;
-
-					LogBuffer.println("Ranking has completed.");
 				}
 
 				try {
@@ -230,7 +229,6 @@ public class ClusterProcessor {
 			if (!isCancelled()) {
 				/* keep track of overall progress */
 				pBarCount += axisSize;
-				LogBuffer.println("pBarCount: " + pBarCount);
 			}
 		}
 
@@ -271,7 +269,6 @@ public class ClusterProcessor {
 				final int linkMethod, final Integer[] spinnerInput,
 				final boolean hier, final int axis) {
 
-			LogBuffer.println("Initializing ClusterTask.");
 			this.distMatrix = distMatrix;
 			this.linkMethod = linkMethod;
 			this.spinnerInput = spinnerInput;
@@ -293,8 +290,6 @@ public class ClusterProcessor {
 		@Override
 		public String[] doInBackground() {
 
-			LogBuffer.println("Starting cluster.");
-
 			/* Hierarchical */
 			if (hier) {
 				final HierCluster cGen = new HierCluster(fileName, linkMethod,
@@ -313,8 +308,7 @@ public class ClusterProcessor {
 				while (distMatrixSize > 1 && !isCancelled()) {
 
 					distMatrixSize = cGen.cluster();
-					publish(loopNum);
-					loopNum++;
+					publish(loopNum++);
 				}
 
 				/* Distance matrix needs to be size 1 when cluster finishes! */
@@ -328,10 +322,7 @@ public class ClusterProcessor {
 					return new String[] {};
 				}
 
-				LogBuffer.println("Clustering matrix done.");
-
 				/* Write the tree file */
-				LogBuffer.println("Writing clustered data.");
 				cGen.finish();
 
 				return cGen.getReorderedList();
@@ -393,7 +384,6 @@ public class ClusterProcessor {
 			if (!isCancelled()) {
 				pBarCount += max;
 			}
-			LogBuffer.println("Clustering canceled? " + !isCancelled());
 		}
 	}
 
@@ -402,7 +392,6 @@ public class ClusterProcessor {
 	 */
 	public void cancelAll() {
 
-		LogBuffer.println("ClusterProcessor canceling all.");
 		if (distTask != null) {
 			distTask.cancel(true);
 		}

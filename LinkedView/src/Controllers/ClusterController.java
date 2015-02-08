@@ -213,14 +213,12 @@ public class ClusterController {
 
 			/* Row axis cluster */
 			reorderedRows = calculateAxis(rowSimilarity, ROW, fileName);
-			LogBuffer.println("ReorderedRows length: " + reorderedRows.length);
 
 			if (isCancelled())
 				return null;
 
 			/* Column axis cluster */
 			reorderedCols = calculateAxis(colSimilarity, COL, fileName);
-			LogBuffer.println("ReorderedCols length: " + reorderedCols.length);
 
 			return null;
 		}
@@ -325,8 +323,6 @@ public class ClusterController {
 		@Override
 		protected Void doInBackground() throws Exception {
 
-			LogBuffer.println("Begin saving...");
-
 			final TVDataMatrix originalMatrix = (TVDataMatrix) tvModel
 					.getDataMatrix();
 			final double[][] data = originalMatrix.getExprData();
@@ -335,7 +331,6 @@ public class ClusterController {
 					reorderedCols, rowSimilarity, colSimilarity,
 					isHierarchical());
 
-			LogBuffer.println("Setting up buffered writer...");
 			cdtGen.setupWriter(fileName, clusterView.getSpinnerValues());
 
 			final IntHeaderInfo geneHeaderI = tvModel.getRowHeaderInfo();
@@ -356,7 +351,6 @@ public class ClusterController {
 
 			if (!isCancelled()) {
 				ClusterView.setLoadText("Done!");
-				LogBuffer.println("Done saving. Opening file.");
 				visualizeData(filePath);
 
 			} else {
@@ -384,7 +378,6 @@ public class ClusterController {
 
 			clusterDialog.dispose();
 
-			LogBuffer.println("Loading data...");
 			tvController.loadData(fileSet);
 
 		} else {
