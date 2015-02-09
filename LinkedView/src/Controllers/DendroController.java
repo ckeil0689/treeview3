@@ -126,16 +126,16 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		addKeyBindings();
 		addDendroViewListeners();
 		addMenuBtnListeners();
+		
+		globalXmap.notifyObservers();
+		globalYmap.notifyObservers();
 	}
 
 	/** Adds all keyboard shortcuts that can be used with DendroView open. */
 	private void addKeyBindings() {
 
-		final JPanel dendroPane = dendroView.getDendroPane();
-
-		final InputMap input_map = dendroPane
-				.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-		final ActionMap action_map = dendroPane.getActionMap();
+		final InputMap input_map = dendroView.getInputMap();
+		final ActionMap action_map = dendroView.getActionMap();
 
 		/* Gets the system's modifier key (Ctrl or Cmd) */
 		final int modifier = Toolkit.getDefaultToolkit()
@@ -1294,30 +1294,30 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 	public void saveImage(final JPanel panel) throws IOException {
 
-		File saveFile = new File("savedImage.png");
-
-		final JFileChooser fc = new JFileChooser();
-
-		fc.setFileFilter(new FileNameExtensionFilter("PNG", "png"));
-		fc.setSelectedFile(saveFile);
-		final int returnVal = fc.showSaveDialog(dendroView.getDendroPane());
-
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			saveFile = fc.getSelectedFile();
-
-			String fileName = saveFile.toString();
-
-			if (!fileName.endsWith(".png")) {
-				fileName += ".png";
-				saveFile = new File(fileName);
-			}
-
-			final BufferedImage im = new BufferedImage(panel.getWidth(),
-					panel.getHeight(), BufferedImage.TYPE_INT_ARGB);
-
-			panel.paint(im.getGraphics());
-			ImageIO.write(im, "PNG", saveFile);
-		}
+//		File saveFile = new File("savedImage.png");
+//
+//		final JFileChooser fc = new JFileChooser();
+//
+//		fc.setFileFilter(new FileNameExtensionFilter("PNG", "png"));
+//		fc.setSelectedFile(saveFile);
+//		final int returnVal = fc.showSaveDialog(dendroView.getDendroPane());
+//
+//		if (returnVal == JFileChooser.APPROVE_OPTION) {
+//			saveFile = fc.getSelectedFile();
+//
+//			String fileName = saveFile.toString();
+//
+//			if (!fileName.endsWith(".png")) {
+//				fileName += ".png";
+//				saveFile = new File(fileName);
+//			}
+//
+//			final BufferedImage im = new BufferedImage(panel.getWidth(),
+//					panel.getHeight(), BufferedImage.TYPE_INT_ARGB);
+//
+//			panel.paint(im.getGraphics());
+//			ImageIO.write(im, "PNG", saveFile);
+//		}
 	}
 
 	/**
@@ -1625,24 +1625,25 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	 */
 	protected FileSet offerATRFileSelection() throws LoadException {
 
-		FileSet fileSet1; // will be chosen...
-
-		final JFileChooser fileDialog = new JFileChooser();
-		setupATRFileDialog(fileDialog);
-
-		final int retVal = fileDialog
-				.showOpenDialog(dendroView.getDendroPane());
-
-		if (retVal == JFileChooser.APPROVE_OPTION) {
-			final File chosen = fileDialog.getSelectedFile();
-			fileSet1 = new FileSet(chosen.getName(), chosen.getParent()
-					+ File.separator);
-
-		} else
-			throw new LoadException("File Dialog closed without selection...",
-					LoadException.NOFILE);
-
-		return fileSet1;
+//		FileSet fileSet1; // will be chosen...
+//
+//		final JFileChooser fileDialog = new JFileChooser();
+//		setupATRFileDialog(fileDialog);
+//
+//		final int retVal = fileDialog
+//				.showOpenDialog(dendroView.getDendroPane());
+//
+//		if (retVal == JFileChooser.APPROVE_OPTION) {
+//			final File chosen = fileDialog.getSelectedFile();
+//			fileSet1 = new FileSet(chosen.getName(), chosen.getParent()
+//					+ File.separator);
+//
+//		} else
+//			throw new LoadException("File Dialog closed without selection...",
+//					LoadException.NOFILE);
+//
+//		return fileSet1;
+		return null;
 	}
 
 	/**

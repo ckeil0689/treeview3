@@ -30,16 +30,14 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
-import java.util.Timer;
 
 import javax.swing.BorderFactory;
 import javax.swing.JScrollBar;
@@ -56,7 +54,8 @@ import edu.stanford.genetics.treeview.ModelViewProduced;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 
 public class GlobalView extends ModelViewProduced implements
-MouseMotionListener, MouseListener, MouseWheelListener {
+//MouseMotionListener, MouseListener, 
+MouseWheelListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -104,11 +103,6 @@ MouseMotionListener, MouseListener, MouseWheelListener {
 	 * Circle to be used as indicator for selection
 	 */
 	private Ellipse2D.Double indicatorCircle = null;
-	
-	/**
-	 * Used to reduce amount of repaints() on mouse movements (CPU + RAM...)
-	 */
-	private final Timer timer;
 
 	/**
 	 * GlobalView also likes to have an globalxmap and globalymap (both of type
@@ -118,8 +112,6 @@ MouseMotionListener, MouseListener, MouseWheelListener {
 	public GlobalView() {
 
 		super();
-
-		this.timer = new Timer();
 		
 		setLayout(new MigLayout());
 
@@ -133,8 +125,8 @@ MouseMotionListener, MouseListener, MouseWheelListener {
 
 		// setToolTipText("This Turns Tooltips On");
 
-		addMouseListener(this);
-		addMouseMotionListener(this);
+		addMouseListener(new MatrixMouseListener());
+		addMouseMotionListener(new MatrixMouseListener());
 		addMouseWheelListener(this);
 	}
 
@@ -161,7 +153,7 @@ MouseMotionListener, MouseListener, MouseWheelListener {
 
 		try {
 			if (xmap.contains(overx) && ymap.contains(overy)) {
-				statustext[0] = "";// "Row: ";
+				statustext[0] = "-";// "Row: ";
 
 				if (geneHI != null) {
 					final int realGene = overy;
@@ -176,7 +168,7 @@ MouseMotionListener, MouseListener, MouseWheelListener {
 						statustext[0] += " (N/A)";
 					}
 				}
-				statustext[1] = "";// "Column: ";
+				statustext[1] = "-";// "Column: ";
 				if (arrayHI != null) {
 					try {
 						statustext[1] += arraySummary
@@ -195,7 +187,7 @@ MouseMotionListener, MouseListener, MouseWheelListener {
 						statustext[2] = "No Data";
 
 					} else if (drawer.isEmpty(overx, overy)) {
-						statustext[2] = "";
+						statustext[2] = "-";
 
 					} else {
 						statustext[2] = drawer.getSummary(overx, overy);
@@ -383,7 +375,6 @@ MouseMotionListener, MouseListener, MouseWheelListener {
 		}
 
 		if (resetHome) {
-			LogBuffer.println("Resetting GV");
 			xmap.setHome();
 			ymap.setHome();
 
@@ -640,145 +631,172 @@ MouseMotionListener, MouseListener, MouseWheelListener {
 		revalidate();
 		repaint();
 	}
+	
+	/* TODO move to a specified controller class */
+	private class MatrixMouseListener extends MouseAdapter {
+		
+		@Override
+		public void mouseMoved(final MouseEvent e) {
 
-	// Mouse Listener
-	@Override
-	public void mousePressed(final MouseEvent e) {
-
-		if (!enclosingWindow().isActive())
-			return;
-
-		// if left button is used
-		if (SwingUtilities.isLeftMouseButton(e)) {
-			startPoint.setLocation(xmap.getIndex(e.getX()),
-					ymap.getIndex(e.getY()));
-			endPoint.setLocation(startPoint.x, startPoint.y);
-			dragRect.setLocation(startPoint.x, startPoint.y);
-			dragRect.setSize(endPoint.x - dragRect.x, endPoint.y - dragRect.y);
-
-			drawBand(dragRect);
-
-		} else if (SwingUtilities.isRightMouseButton(e)) {
-			geneSelection.setSelectedNode(null);
-			geneSelection.deselectAllIndexes();
-
-			arraySelection.setSelectedNode(null);
-			arraySelection.deselectAllIndexes();
-
-			geneSelection.notifyObservers();
-			arraySelection.notifyObservers();
+			setDataStatus(e);
 		}
-	}
+		
+		private void setDataStatus(MouseEvent e) {
+			
+			final int ooverx = overx;
+			final int oovery = overy;
+			overx = xmap.getIndex(e.getX());
+			overy = ymap.getIndex(e.getY());
+			
+			/* Timed repaint to avoid constant unnecessary repainting. */
+		                    
+	    	if (oovery != overy || ooverx != overx) {
+				if (status != null) {
+					status.setMessages(getStatus());
+				}
+			}
+		}
+		
+		@Override
+		public void mouseDragged(final MouseEvent e) {
 
-	@Override
-	public void mouseExited(final MouseEvent e) {
+			// When left button is used
+			if (SwingUtilities.isLeftMouseButton(e)) {
+				// rubber band?
+				drawBand(dragRect);
+				endPoint.setLocation(xmap.getIndex(e.getX()),
+						ymap.getIndex(e.getY()));
 
-		hasMouse = false;
+				/* Full gene selection */
+				if (e.isShiftDown()) {
+					dragRect.setLocation(xmap.getMinIndex(), startPoint.y);
+					dragRect.setSize(0, 0);
+					dragRect.add(xmap.getMaxIndex(), endPoint.y);
 
-		// Display empty field
-		statustext[0] = "-";
-		statustext[1] = "-";
-		statustext[2] = "-";
+					/* Full array selection */
+				} else if (e.isControlDown()) {
+					dragRect.setLocation(startPoint.x, ymap.getMinIndex());
+					dragRect.setSize(0, 0);
+					dragRect.add(endPoint.x, ymap.getMaxIndex());
 
-		status.setMessages(statustext);
-	}
+					/* Normal selection */
+				} else {
+					dragRect.setLocation(startPoint.x, startPoint.y);
+					dragRect.setSize(0, 0);
+					dragRect.add(endPoint.x, endPoint.y);
+				}
 
-	@Override
-	public void mouseReleased(final MouseEvent e) {
+				drawBand(dragRect);
+			}
+		}
+		
+		@Override
+		public void mouseReleased(final MouseEvent e) {
 
-		if (!enclosingWindow().isActive())
-			return;
+			if (!enclosingWindow().isActive())
+				return;
 
-		// When left button is used
-		if (SwingUtilities.isLeftMouseButton(e)) {
-			mouseDragged(e);
-			drawBand(dragRect);
+			// When left button is used
+			if (SwingUtilities.isLeftMouseButton(e)) {
+				mouseDragged(e);
+				drawBand(dragRect);
 
-			/* Full gene selection */
-			if (e.isShiftDown()) {
-				final Point start = new Point(xmap.getMinIndex(), startPoint.y);
-				final Point end = new Point(xmap.getMaxIndex(), endPoint.y);
-				selectRectangle(start, end);
+				/* Full gene selection */
+				if (e.isShiftDown()) {
+					final Point start = new Point(xmap.getMinIndex(), startPoint.y);
+					final Point end = new Point(xmap.getMaxIndex(), endPoint.y);
+					selectRectangle(start, end);
 
-				/* Full array selection */
-			} else if (e.isControlDown()) {
-				final Point start = new Point(startPoint.x, ymap.getMinIndex());
-				final Point end = new Point(endPoint.x, ymap.getMaxIndex());
-				selectRectangle(start, end);
+					/* Full array selection */
+				} else if (e.isControlDown()) {
+					final Point start = new Point(startPoint.x, ymap.getMinIndex());
+					final Point end = new Point(endPoint.x, ymap.getMaxIndex());
+					selectRectangle(start, end);
 
-				/* Normal selection */
+					/* Normal selection */
+				} else {
+					selectRectangle(startPoint, endPoint);
+				}
+
 			} else {
-				selectRectangle(startPoint, endPoint);
+				// do something else?
 			}
 
-		} else {
-			// do something else?
+			repaint();
 		}
+		
+		// Mouse Listener
+		@Override
+		public void mousePressed(final MouseEvent e) {
 
-		repaint();
-	}
+			if (!enclosingWindow().isActive())
+				return;
 
-	// MouseMotionListener
-	@Override
-	public void mouseDragged(final MouseEvent e) {
-
-		// When left button is used
-		if (SwingUtilities.isLeftMouseButton(e)) {
-			// rubber band?
-			drawBand(dragRect);
-			endPoint.setLocation(xmap.getIndex(e.getX()),
-					ymap.getIndex(e.getY()));
-
-			/* Full gene selection */
-			if (e.isShiftDown()) {
-				dragRect.setLocation(xmap.getMinIndex(), startPoint.y);
-				dragRect.setSize(0, 0);
-				dragRect.add(xmap.getMaxIndex(), endPoint.y);
-
-				/* Full array selection */
-			} else if (e.isControlDown()) {
-				dragRect.setLocation(startPoint.x, ymap.getMinIndex());
-				dragRect.setSize(0, 0);
-				dragRect.add(endPoint.x, ymap.getMaxIndex());
-
-				/* Normal selection */
-			} else {
+			// if left button is used
+			if (SwingUtilities.isLeftMouseButton(e)) {
+				startPoint.setLocation(xmap.getIndex(e.getX()),
+						ymap.getIndex(e.getY()));
+				endPoint.setLocation(startPoint.x, startPoint.y);
 				dragRect.setLocation(startPoint.x, startPoint.y);
-				dragRect.setSize(0, 0);
-				dragRect.add(endPoint.x, endPoint.y);
-			}
+				dragRect.setSize(endPoint.x - dragRect.x, endPoint.y - dragRect.y);
 
-			drawBand(dragRect);
+				drawBand(dragRect);
+
+			} else if (SwingUtilities.isRightMouseButton(e)) {
+				geneSelection.setSelectedNode(null);
+				geneSelection.deselectAllIndexes();
+
+				arraySelection.setSelectedNode(null);
+				arraySelection.deselectAllIndexes();
+
+				geneSelection.notifyObservers();
+				arraySelection.notifyObservers();
+			}
+		}
+
+		@Override
+		public void mouseExited(final MouseEvent e) {
+
+			hasMouse = false;
+
+			// Display empty field
+			statustext[0] = "-";
+			statustext[1] = "-";
+			statustext[2] = "-";
+
+			status.setMessages(statustext);
 		}
 	}
-
+	
+	/**
+	 * Zooming when the mouse wheel is used in conjunction with the shift key.
+	 * Vertical scrolling if the shift key is not pressed.
+	 */
 	@Override
-	public void mouseMoved(final MouseEvent e) {
+	public void mouseWheelMoved(final MouseWheelEvent e) {
 
-//		final int ooverx = overx;
-//		final int oovery = overy;
-//		overx = xmap.getIndex(e.getX());
-//		overy = ymap.getIndex(e.getY());
-//		
-//		/* Timed repaint to avoid constant unnecessary repainting. */
-//		timer.schedule(new TimerTask() {
-//
-//	        @Override
-//	        public void run() {
-//	        	
-//	            SwingUtilities.invokeLater(new Runnable() {
-//	                @Override
-//	                public void run() {
-//	                    
-//	                	if (oovery != overy || ooverx != overx) {
-//	            			if (status != null) {
-//	            				status.setMessages(getStatus());
-//	            			}
-//	            		}
-//	                }
-//	            });
-//	        }
-//	    }, 300);
+		final int notches = e.getWheelRotation();
+		final int shift = (notches < 0) ? -3 : 3;
+
+		if (!e.isShiftDown()) {
+			if (e.isAltDown()) {
+				xmap.scrollBy(shift);
+			} else {
+				ymap.scrollBy(shift);
+			}
+		} else {
+			if (notches < 0) {
+				xmap.zoomIn();
+				ymap.zoomIn();
+
+			} else {
+				xmap.zoomOut();
+				ymap.zoomOut();
+			}
+		}
+
+		revalidate();
+		repaint();
 	}
 
 	// @Override
@@ -882,37 +900,6 @@ MouseMotionListener, MouseListener, MouseWheelListener {
 	}
 
 	/**
-	 * Zooming when the mouse wheel is used in conjunction with the shift key.
-	 * Vertical scrolling if the shift key is not pressed.
-	 */
-	@Override
-	public void mouseWheelMoved(final MouseWheelEvent e) {
-
-		final int notches = e.getWheelRotation();
-		final int shift = (notches < 0) ? -3 : 3;
-
-		if (!e.isShiftDown()) {
-			if (e.isAltDown()) {
-				xmap.scrollBy(shift);
-			} else {
-				ymap.scrollBy(shift);
-			}
-		} else {
-			if (notches < 0) {
-				xmap.zoomIn();
-				ymap.zoomIn();
-
-			} else {
-				xmap.zoomOut();
-				ymap.zoomOut();
-			}
-		}
-
-		revalidate();
-		repaint();
-	}
-
-	/**
 	 * Selecting a rectangular area in GlobalView
 	 *
 	 * @param start
@@ -983,8 +970,6 @@ MouseMotionListener, MouseListener, MouseWheelListener {
 
 	public void resetHome(final boolean resized) {
 
-		LogBuffer.println("GV Reset: " + resized);
 		this.resetHome = resized;
-		// repaint();
 	}
 }

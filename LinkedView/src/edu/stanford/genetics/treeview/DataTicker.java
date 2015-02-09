@@ -22,7 +22,6 @@
  */
 package edu.stanford.genetics.treeview;
 
-import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -39,14 +38,16 @@ public class DataTicker {
 
 	private final JPanel tickerPanel;
 	protected final Vector<String> messages;
+	private final List<JTextArea> textList;
 
 	/**
 	 * Creates a new DataTicker instance.
 	 */
 	public DataTicker() {
 
-		tickerPanel = new TickerPanel();
-		messages = new Vector<String>(5, 5);
+		this.messages = new Vector<String>(5, 5);
+		this.textList = new ArrayList<JTextArea>();
+		this.tickerPanel = new TickerPanel();
 	}
 
 	public JPanel getTickerPanel() {
@@ -61,12 +62,9 @@ public class DataTicker {
 
 		private static final long serialVersionUID = 1L;
 
-		private final List<JTextArea> textList;
-
 		public TickerPanel() {
 
 			super();
-			this.textList = new ArrayList<JTextArea>();
 
 			setLayout(new MigLayout());
 			setOpaque(false);
@@ -118,35 +116,29 @@ public class DataTicker {
 
 			return label;
 		}
-
-		@Override
-		public void paintComponent(final Graphics g) {
-
-			// resetting labels
-			for (final JTextArea label : textList) {
-
-				label.setText("-");
-			}
-
-			// Setting text for all labels
-			for (final String message : messages) {
-
-				textList.get(messages.indexOf(message)).setText(message);
-			}
-		}
 	}
 
 	public void setMessages(final String[] m) {
 
+		/* TODO stupid logic... can remove half the code later */
 		resetMessages();
 		for (final String message : m) {
 			addMessage(message);
+		}
+		
+		for (final String message : messages) {
+
+			textList.get(messages.indexOf(message)).setText(message);
 		}
 	}
 
 	public void resetMessages() {
 
 		messages.removeAllElements();
+		for (final JTextArea label : textList) {
+
+			label.setText("-");
+		}
 	}
 
 	public void addMessage(final String message) {
