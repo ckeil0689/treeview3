@@ -309,8 +309,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-
-			LogBuffer.println("Search init");
+			
 			/*
 			 * Putting the mapContainer objects in DendroView so that I can
 			 * control zoom-out of the found genes/arrays are outside the
@@ -415,7 +414,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			LogBuffer.println("Hiding search.");
 			setSearchVisible(false);
 		}
 	}

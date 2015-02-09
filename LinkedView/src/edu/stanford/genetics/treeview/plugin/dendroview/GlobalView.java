@@ -753,6 +753,13 @@ MouseWheelListener {
 				arraySelection.notifyObservers();
 			}
 		}
+		
+		@Override
+		public void mouseEntered(final MouseEvent e) {
+			
+			hasMouse = true;
+			requestFocus();
+		}
 
 		@Override
 		public void mouseExited(final MouseEvent e) {

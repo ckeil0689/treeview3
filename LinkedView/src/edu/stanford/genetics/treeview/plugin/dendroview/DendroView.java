@@ -397,7 +397,7 @@ public class DendroView implements Observer, DendroPanel {
 		rowDataPane.setBorder(null);
 
 		final double oldRowDiv = tvFrame.getConfigNode().getDouble("gtr_loc",
-				0.5);
+				0.5d);
 		if (rowTreeView.isEnabled()) {
 			rowDataPane.setDividerLocation(oldRowDiv);
 		} else {
@@ -415,7 +415,7 @@ public class DendroView implements Observer, DendroPanel {
 		colDataPane.setBorder(null);
 
 		final double oldColDiv = tvFrame.getConfigNode().getDouble("atr_loc",
-				0.5);
+				0.5d);
 		if (colTreeView.isEnabled()) {
 			colDataPane.setDividerLocation(oldColDiv);
 		} else {
