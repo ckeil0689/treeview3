@@ -1,7 +1,13 @@
 package Views;
 
+import java.awt.Graphics;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
+import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -9,6 +15,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
+import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
 import Utilities.StringRes;
 
@@ -43,21 +50,51 @@ public class WelcomeView {
 				GUIFactory.NO_PADDING, null);
 
 		loadPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
+		
+		JPanel logo = new ImagePanel();
 
 		jl = GUIFactory.createLabel(StringRes.title_Hello, GUIFactory.FONTL);
 
 		jl2 = GUIFactory.createLabel(StringRes.title_Welcome
 				+ StringRes.appName + StringRes.dot, GUIFactory.FONTXXL);
 
-		titleContainer.add(jl, "pushx, alignx 50%, aligny 50%, span, wrap");
-		titleContainer.add(jl2, "pushx, alignx 50%, span");
-		titleContainer.add(new JSeparator(SwingConstants.HORIZONTAL), "w 30%, "
-				+ "pushx, alignx 50%");
+		titleContainer.add(logo, "span 1 2, push, grow, w 100::, h 100::");
+		titleContainer.add(jl, "push, alignx 0%, aligny 100%, span, wrap");
+		titleContainer.add(jl2, "push, alignx 0%, aligny 0%, span");
+		titleContainer.add(new JSeparator(SwingConstants.HORIZONTAL), "w 80%, "
+				+ "pushx, alignx 50%, span");
 
 		title_bg.add(titleContainer, "push, growx, align 50%");
 
-		homePanel.add(title_bg, "push, grow, alignx 50%, " + "span, wrap");
+		homePanel.add(title_bg, "push,, alignx 50%, span, wrap");
 		homePanel.add(loadPanel, "push, grow, alignx 50%");
+	}
+	
+	public class ImagePanel extends JPanel {
+
+	    private BufferedImage image;
+
+	    public ImagePanel() {
+	       try {                
+	    	   final ClassLoader classLoader = Thread.currentThread()
+						.getContextClassLoader();
+				final InputStream input = classLoader
+						.getResourceAsStream("logo_small.png");
+
+				image = ImageIO.read(input);
+				
+	       } catch (IOException ex) {
+	            // handle exception...
+	       }
+	    }
+
+	    @Override
+	    protected void paintComponent(Graphics g) {
+	        
+	    	super.paintComponent(g);
+	        g.drawImage(image, 0, 0, null);          
+	    }
+
 	}
 
 	/**
