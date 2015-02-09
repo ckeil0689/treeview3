@@ -133,8 +133,6 @@ public class DataTicker {
 
 				textList.get(messages.indexOf(message)).setText(message);
 			}
-
-			repaint();
 		}
 	}
 
@@ -144,7 +142,6 @@ public class DataTicker {
 		for (final String message : m) {
 			addMessage(message);
 		}
-		tickerPanel.repaint();
 	}
 
 	public void resetMessages() {

@@ -40,7 +40,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.swing.BorderFactory;
 import javax.swing.JScrollBar;
@@ -756,30 +755,30 @@ MouseMotionListener, MouseListener, MouseWheelListener {
 	@Override
 	public void mouseMoved(final MouseEvent e) {
 
-		final int ooverx = overx;
-		final int oovery = overy;
-		overx = xmap.getIndex(e.getX());
-		overy = ymap.getIndex(e.getY());
-		
-		/* Timed repaint to avoid constant unnecessary repainting. */
-		timer.schedule(new TimerTask() {
-
-	        @Override
-	        public void run() {
-	        	
-	            SwingUtilities.invokeLater(new Runnable() {
-	                @Override
-	                public void run() {
-	                    
-	                	if (oovery != overy || ooverx != overx) {
-	            			if (status != null) {
-	            				status.setMessages(getStatus());
-	            			}
-	            		}
-	                }
-	            });
-	        }
-	    }, 300);
+//		final int ooverx = overx;
+//		final int oovery = overy;
+//		overx = xmap.getIndex(e.getX());
+//		overy = ymap.getIndex(e.getY());
+//		
+//		/* Timed repaint to avoid constant unnecessary repainting. */
+//		timer.schedule(new TimerTask() {
+//
+//	        @Override
+//	        public void run() {
+//	        	
+//	            SwingUtilities.invokeLater(new Runnable() {
+//	                @Override
+//	                public void run() {
+//	                    
+//	                	if (oovery != overy || ooverx != overx) {
+//	            			if (status != null) {
+//	            				status.setMessages(getStatus());
+//	            			}
+//	            		}
+//	                }
+//	            });
+//	        }
+//	    }, 300);
 	}
 
 	// @Override
