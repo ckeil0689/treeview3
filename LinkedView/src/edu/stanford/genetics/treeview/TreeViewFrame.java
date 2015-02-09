@@ -29,6 +29,7 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.Dialog;
+import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -40,7 +41,9 @@ import java.util.List;
 import java.util.Observable;
 import java.util.prefs.Preferences;
 
+import javax.swing.ActionMap;
 import javax.swing.BoxLayout;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -55,6 +58,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
+import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
 import Utilities.StringRes;
 import Views.LoadErrorView;
@@ -82,8 +86,8 @@ ConfigNodePersistent {
 	public static final int PROGRESS_VIEW = 2;
 	public static final int DENDRO_VIEW = 3;
 
-	protected final JPanel bgPanel;
-	protected final JPanel waiting;
+	protected final JPanel viewPanel;
+	protected final JPanel mainPanel;
 	protected DendroPanel running;
 	protected JDialog presetsFrame = null;
 	protected TabbedSettingsPanel presetsPanel = null;
@@ -139,13 +143,14 @@ ConfigNodePersistent {
 		dendroView = new DendroView(this);
 
 		setWindowActive(true);
+		
+		mainPanel = GUIFactory.createJPanel(true, GUIFactory.NO_PADDING, null);
 
 		/* Setting up main panels */
-		bgPanel = GUIFactory.createJPanel(true, GUIFactory.NO_PADDING, null);
-		waiting = GUIFactory.createJPanel(true, GUIFactory.NO_PADDING, null);
+		viewPanel = GUIFactory.createJPanel(true, GUIFactory.NO_PADDING, null);
 
 		/* Add main background panel to the application frame's contentPane */
-		appFrame.getContentPane().add(bgPanel);
+		appFrame.add(mainPanel);
 
 		/* Most recently used files */
 		setupFileMru();
@@ -238,15 +243,13 @@ ConfigNodePersistent {
 	 */
 	public void displayView(final JPanel view) {
 
-		bgPanel.removeAll();
-		waiting.removeAll();
+		viewPanel.removeAll();
 
-		waiting.add(view, "push, grow");
+		viewPanel.add(view, "push, grow");
+		mainPanel.add(viewPanel, "push, grow");
 
-		bgPanel.add(waiting, "push, grow, h 97%");
-
-		bgPanel.revalidate();
-		bgPanel.repaint();
+		viewPanel.revalidate();
+		viewPanel.repaint();
 	}
 
 	/**
@@ -915,7 +918,14 @@ ConfigNodePersistent {
 	 */
 	public FileSet findFileSet(final JMenuItem menuItem) {
 
-		final int index = fileMenuList.indexOf(menuItem);
+		int index = -1;
+		for(int i = 0; i < fileMenuList.size(); i++) {
+			
+			if(fileMenuList.get(i).getText().equalsIgnoreCase(menuItem.getText())) {
+				index = i;
+				break;
+			}
+		}
 
 		if (fileSetList.size() == fileMenuList.size())
 			return fileSetList.get(index);
@@ -973,23 +983,6 @@ ConfigNodePersistent {
 		return stackMenuList;
 	}
 
-	// /**
-	// * Setter for geneFinder
-	// *
-	// * @param HeaderFinder
-	// * geneFinder
-	// */
-	// public void setGeneFinder(final HeaderFinder geneFinder) {
-	//
-	// this.geneFinder = geneFinder;
-	// }
-	//
-	// /** Setter for geneFinder */
-	// public void setArrayFinder(final HeaderFinder geneFinder) {
-	//
-	// this.geneFinder = geneFinder;
-	// }
-
 	public void setArraySelection(final TreeSelection aSelect) {
 
 		this.arraySelection = aSelect;
@@ -1025,32 +1018,6 @@ ConfigNodePersistent {
 		return loaded;
 	}
 
-	// @Override
-	// public HeaderFinder getGeneFinder() {
-	//
-	// if (geneFinder == null) {
-	// geneFinder = new GeneFinder(TreeViewFrame.this, getDataModel()
-	// .getGeneHeaderInfo(), getGeneSelection());
-	// }
-	//
-	// return geneFinder;
-	// }
-	//
-	// /**
-	// * Getter for geneFinder
-	// *
-	// * @return HeaderFinder arrayFinder
-	// */
-	// public HeaderFinder getArrayFinder() {
-	//
-	// if (arrayFinder == null) {
-	//
-	// arrayFinder = new ArrayFinder(TreeViewFrame.this, getDataModel()
-	// .getArrayHeaderInfo(), getArraySelection());
-	// }
-	// return arrayFinder;
-	// }
-
 	/**
 	 * Returns TreeViewFrame's configNode.
 	 *
@@ -1070,10 +1037,15 @@ ConfigNodePersistent {
 
 		return fileMru;
 	}
-
-	public JPanel getBGPanel() {
-
-		return bgPanel;
+	
+	public InputMap getInputMap() {
+		
+		return viewPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+	}
+	
+	public ActionMap getActionMap() {
+		
+		return viewPanel.getActionMap();
 	}
 
 	/**

@@ -32,21 +32,27 @@ import java.awt.event.ComponentListener;
 import java.awt.event.ContainerListener;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.prefs.Preferences;
 
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.border.Border;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
+import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
 import Utilities.Helper;
 import Utilities.StringRes;
@@ -336,8 +342,6 @@ public class DendroView implements Observer, DendroPanel {
 	 * Manages the component layout in TreeViewFrame
 	 */
 	public void setupLayout() {
-
-		LogBuffer.println("DendroPane layout called.");
 
 		/* Clear dendroPane first */
 		dendroPane.removeAll();
@@ -632,7 +636,7 @@ public class DendroView implements Observer, DendroPanel {
 	 */
 	public void addCompListener(final ComponentListener l) {
 
-		getDendroPane().addComponentListener(l);
+		dendroPane.addComponentListener(l);
 	}
 
 	/**
@@ -642,7 +646,7 @@ public class DendroView implements Observer, DendroPanel {
 	 */
 	public void addContListener(final ContainerListener l) {
 
-		getDendroPane().addContainerListener(l);
+		dendroPane.addContainerListener(l);
 	}
 
 	/**
@@ -748,6 +752,7 @@ public class DendroView implements Observer, DendroPanel {
 			showTreesMenuItem.setText(StringRes.menu_hideTrees);
 		}
 
+		LogBuffer.println("Repaint from treeVisibilty");
 		dendroPane.repaint();
 	}
 
@@ -1037,28 +1042,29 @@ public class DendroView implements Observer, DendroPanel {
 		tvFrame.addToStackMenuList(colorMenuItem);
 
 		menu.addSeparator();
-
-		matrixMenu = new JMenu("Matrix Size");
-		menu.add(matrixMenu);
-
-		final JMenuItem fillScreenMenuItem = new JMenuItem("Fill screen");
-		matrixMenu.add(fillScreenMenuItem);
-		fillScreenMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1,
-				Event.ALT_MASK));
-		tvFrame.addToStackMenuList(fillScreenMenuItem);
-
-		final JMenuItem equalAxesMenuItem = new JMenuItem("Equal axes");
-		matrixMenu.add(equalAxesMenuItem);
-		equalAxesMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_2,
-				Event.ALT_MASK));
-		tvFrame.addToStackMenuList(equalAxesMenuItem);
-
-		final JMenuItem proportMatrixMenuItem = new JMenuItem(
-				"Proportional axes");
-		matrixMenu.add(proportMatrixMenuItem);
-		proportMatrixMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_3, Event.ALT_MASK));
-		tvFrame.addToStackMenuList(proportMatrixMenuItem);
+		
+		/* TODO add back when feature works well */
+//		matrixMenu = new JMenu("Matrix Size");
+//		menu.add(matrixMenu);
+//
+//		final JMenuItem fillScreenMenuItem = new JMenuItem("Fill screen");
+//		matrixMenu.add(fillScreenMenuItem);
+//		fillScreenMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1,
+//				Event.ALT_MASK));
+//		tvFrame.addToStackMenuList(fillScreenMenuItem);
+//
+//		final JMenuItem equalAxesMenuItem = new JMenuItem("Equal axes");
+//		matrixMenu.add(equalAxesMenuItem);
+//		equalAxesMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_2,
+//				Event.ALT_MASK));
+//		tvFrame.addToStackMenuList(equalAxesMenuItem);
+//
+//		final JMenuItem proportMatrixMenuItem = new JMenuItem(
+//				"Proportional axes");
+//		matrixMenu.add(proportMatrixMenuItem);
+//		proportMatrixMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+//				KeyEvent.VK_3, Event.ALT_MASK));
+//		tvFrame.addToStackMenuList(proportMatrixMenuItem);
 
 		menu.addSeparator();
 
@@ -1339,11 +1345,6 @@ public class DendroView implements Observer, DendroPanel {
 		return globalview;
 	}
 
-	public JPanel getDendroPane() {
-
-		return dendroPane;
-	}
-
 	public LabelView getColumnLabelView() {
 
 		return colLabelView;
@@ -1372,6 +1373,16 @@ public class DendroView implements Observer, DendroPanel {
 	public JSplitPane getColSplitPane() {
 		
 		return colDataPane;
+	}
+	
+	public InputMap getInputMap() {
+		
+		return dendroPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+	}
+	
+	public ActionMap getActionMap() {
+		
+		return dendroPane.getActionMap();
 	}
 
 	/**

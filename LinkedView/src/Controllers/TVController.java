@@ -124,11 +124,8 @@ public class TVController implements Observer {
 	 */
 	private void addKeyBindings() {
 
-		final JPanel dendroPane = tvFrame.getBGPanel();
-
-		final InputMap input_map = dendroPane
-				.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-		final ActionMap action_map = dendroPane.getActionMap();
+		final InputMap input_map = tvFrame.getInputMap();
+		final ActionMap action_map = tvFrame.getActionMap();
 
 		/* Gets the system's modifier key (Ctrl or Cmd) */
 		final int modifier = Toolkit.getDefaultToolkit()
@@ -177,7 +174,6 @@ public class TVController implements Observer {
 	 */
 	private void addMenuListeners() {
 
-		LogBuffer.println("Adding menu listeners.");
 		menuController = new MenubarController(tvFrame, TVController.this);
 
 		tvFrame.addMenuActionListeners(new StackMenuListener());
@@ -211,6 +207,7 @@ public class TVController implements Observer {
 
 			final FileSet last = tvFrame.getFileMRU().getLast();
 
+			/* Notify user if no previous file can be found. */
 			if (last == null) {
 				tvFrame.getWelcomeView().setWarning();
 

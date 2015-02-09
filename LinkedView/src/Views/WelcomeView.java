@@ -120,8 +120,8 @@ public class WelcomeView {
 		loadPanel.add(loadButton, "pushx, alignx 50%, aligny 0%, wrap");
 		loadPanel.add(loadLastButton, "pushx, alignx 50%, aligny 0%");
 
-		homePanel.revalidate();
-		homePanel.repaint();
+		loadPanel.revalidate();
+		loadPanel.repaint();
 
 		return homePanel;
 	}
@@ -146,8 +146,8 @@ public class WelcomeView {
 
 		loadPanel.add(loadContainer, "pushx, growx, align 50%, w 60%!");
 
-		homePanel.revalidate();
-		homePanel.repaint();
+		loadPanel.revalidate();
+		loadPanel.repaint();
 
 		return homePanel;
 	}
