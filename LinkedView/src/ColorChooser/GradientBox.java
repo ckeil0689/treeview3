@@ -585,8 +585,8 @@ public class GradientBox extends JPanel {
 
 		/* stay within boundaries */
 		if (selectedThumb == null
-				|| (inputX < (int) thumbRect.getMinX() || inputX > (int) thumbRect
-						.getMaxX()))
+				|| (inputX < ((int) thumbRect.getMinX()) || inputX > ((int) thumbRect
+						.getMaxX())))
 			return;
 
 		/* get position of previous thumb */
@@ -611,7 +611,10 @@ public class GradientBox extends JPanel {
 		final int newX = selectedThumb.getX() + deltaX;
 
 		/* set new thumb position and check for boundaries/ other thumbs */
-		if (previousPos < newX && newX < nextPos) {
+		//If the user is resetting the last thumb back to the max, we want to get in here, so check if the newX is equal to the max...
+		//This logic doesn't apply to the min because it was set to 0 and the min is actually 25, and we can expect to never receive a value less than 25.
+		//The point here is to catch when the order of the sliders/thumbs is not changing
+		if (previousPos < newX && (newX < nextPos || newX == (int) thumbRect.getMaxX())) {
 			selectedThumb.setCoords(newX, selectedThumb.getY());
 			fractions = updateFractions();
 
@@ -676,15 +679,16 @@ public class GradientBox extends JPanel {
 								final int inputXValue = (int) Math
 										.round((fraction * WIDTH));
 
-								updateThumbPos(inputXValue);
+								/* TODO I added 25 here because the minX is 25. I don't know how to get the minX from here, but if I added 25 in the updateThumbPos function, it messed up the mouse drag function and would be off by 25. */
+								updateThumbPos(inputXValue + 25);
 								positionInputDialog.dispose();
 
 							} else {
-								inputField.setText("Number out of range!");
+								inputField.setText("Out of range");
 							}
 
 						} catch (final NumberFormatException e) {
-							inputField.setText("Enter a number!");
+							inputField.setText("Enter a number");
 						}
 					}
 				});
@@ -693,8 +697,8 @@ public class GradientBox extends JPanel {
 						GUIFactory.DEFAULT, null);
 
 				panel.add(enterPrompt, "push, span, wrap");
-				panel.add(inputField, "push, growx, span, wrap");
-				panel.add(okButton, "pushx, alignx 50%");
+				panel.add(inputField,  "push, growx, span, wrap");
+				panel.add(okButton,    "pushx, alignx 50%");
 
 				positionInputDialog.getContentPane().add(panel);
 
