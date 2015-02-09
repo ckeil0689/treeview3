@@ -785,21 +785,19 @@ MouseWheelListener {
 		final int notches = e.getWheelRotation();
 		final int shift = (notches < 0) ? -3 : 3;
 
-		if (!e.isShiftDown()) {
-			if (e.isAltDown()) {
-				xmap.scrollBy(shift);
-			} else {
-				ymap.scrollBy(shift);
-			}
-		} else {
+		//On macs' magic mouse, horizontal scroll comes in as if the shift was down
+		if (e.isAltDown()) {
 			if (notches < 0) {
 				xmap.zoomIn();
 				ymap.zoomIn();
-
 			} else {
 				xmap.zoomOut();
 				ymap.zoomOut();
 			}
+		} else if (e.isShiftDown()) {
+			xmap.scrollBy(shift);
+		} else {
+			ymap.scrollBy(shift);
 		}
 
 		revalidate();
