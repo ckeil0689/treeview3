@@ -104,7 +104,7 @@ public class MenubarController {
 			// controller.setupClusterView(ClusterView.KMEANS);
 			// break;
 		case "Find Labels...":
-			controller.setSearchVisible();
+//			controller.setSearchVisible();
 			break;
 		case "Functional Enrichment":
 			tvFrame.displayWIP();

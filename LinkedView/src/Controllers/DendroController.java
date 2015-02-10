@@ -125,7 +125,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 		addKeyBindings();
 		addDendroViewListeners();
-		addMenuBtnListeners();
+//		addMenuBtnListeners();
 		
 		globalXmap.notifyObservers();
 		globalYmap.notifyObservers();
@@ -284,18 +284,18 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		dendroView.addScaleListeners(new ScaleListener());
 		dendroView.addZoomListener(new ZoomListener());
 		dendroView.addCompListener(new AppFrameListener());
-		dendroView.addSearchCloseListener(new CloseSearchAction());
+//		dendroView.addSearchCloseListener(new CloseSearchAction());
 		dendroView.addDividerListener(new DividerListener());
 		dendroView.addSplitPaneListener(new SplitPaneListener());
 	}
 
-	/**
-	 * Add listener to the search button.
-	 */
-	private void addMenuBtnListeners() {
-
-		dendroView.addSearchBtnListener(new SearchBtnListener());
-	}
+//	/**
+//	 * Add listener to the search button.
+//	 */
+//	private void addMenuBtnListeners() {
+//
+//		dendroView.addSearchBtnListener(new SearchBtnListener());
+//	}
 
 	/* -------------- Listeners --------------------- */
 	/**
@@ -397,26 +397,27 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			if (!dendroView.isSearchVisible()) {
-				setSearchVisible(true);
-			}
+//			if (!dendroView.isSearchVisible()) {
+//				setSearchVisible(true);
+//			}
+			dendroView.setRowFinderBoxFocused();
 		}
 	}
 
-	/**
-	 * Determines mouse behavior over the close-x icon of search panel.
-	 *
-	 * @author chris0689
-	 *
-	 */
-	private class CloseSearchAction implements ActionListener {
-
-		@Override
-		public void actionPerformed(final ActionEvent e) {
-
-			setSearchVisible(false);
-		}
-	}
+//	/**
+//	 * Determines mouse behavior over the close-x icon of search panel.
+//	 *
+//	 * @author chris0689
+//	 *
+//	 */
+//	private class CloseSearchAction implements ActionListener {
+//
+//		@Override
+//		public void actionPerformed(final ActionEvent e) {
+//
+//			setSearchVisible(false);
+//		}
+//	}
 
 	private class DividerListener implements PropertyChangeListener {
 
@@ -885,14 +886,14 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		}
 	}
 
-	/**
-	 * Toggles the search bars in DendroView.
-	 */
-	public void setSearchVisible(final boolean visible) {
-
-		dendroView.setSearchVisible(visible);
-		resetDendroView();
-	}
+//	/**
+//	 * Toggles the search bars in DendroView.
+//	 */
+//	public void setSearchVisible(final boolean visible) {
+//
+//		dendroView.setSearchVisible(visible);
+//		resetDendroView();
+//	}
 
 	public void saveSettings() {
 

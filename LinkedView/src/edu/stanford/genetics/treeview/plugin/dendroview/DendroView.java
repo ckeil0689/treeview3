@@ -99,6 +99,7 @@ public class DendroView implements Observer, DendroPanel {
 	// Main containers
 	private final JPanel dendroPane;
 	private JPanel firstPanel;
+	private JPanel searchPanel;
 
 	protected ScrollPane panes[];
 
@@ -197,9 +198,11 @@ public class DendroView implements Observer, DendroPanel {
 		this.name = "DendroView";
 
 		/* main panel */
-		dendroPane = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING_FILL,
+		dendroPane = GUIFactory.createJPanel(false, GUIFactory.FILL,
 				null);
 //		dendroPane.setLayout(new MigLayout("debug"));
+		
+		searchPanel = GUIFactory.createJPanel(false, GUIFactory.FILL, null);
 
 		/* >>> Init all views --- they should be final <<< */
 		/* data ticker panel */
@@ -247,16 +250,16 @@ public class DendroView implements Observer, DendroPanel {
 		globalview.resetHome(isHome);
 	}
 
-	public void setSearchVisible(final boolean visible) {
-
-		this.isSearchVisible = visible;
-		setupLayout();
-	}
-
-	public boolean isSearchVisible() {
-
-		return isSearchVisible;
-	}
+//	public void setSearchVisible(final boolean visible) {
+//
+//		this.isSearchVisible = visible;
+//		setupLayout();
+//	}
+//
+//	public boolean isSearchVisible() {
+//
+//		return isSearchVisible;
+//	}
 
 	/**
 	 * Returns the dendroPane so it can be displayed in TVFrame.
@@ -287,29 +290,25 @@ public class DendroView implements Observer, DendroPanel {
 	 *
 	 * @return JPanel
 	 */
-	private JPanel makeSearchPanel() {
+	private void setSearchPanel() {
 
 		if (rowFinderBox == null || colFinderBox == null)
-			return null;
-
-		final JPanel bgPanel = GUIFactory.createJPanel(false,
-				GUIFactory.NO_PADDING, null);
-
-		final JPanel searchPanel = GUIFactory.createJPanel(true,
-				GUIFactory.DEFAULT, GUIFactory.DARK_BG);
+			return;
+		
+		searchPanel.removeAll();
 
 		final String tooltip = "You can use wildcards to search (*, ?). "
 				+ "E.g.: *complex* --> Rpd3s complex, ATP Synthase "
 				+ "(complex V), etc...";
 		searchPanel.setToolTipText(tooltip);
-
-		searchPanel.add(searchCloseBtn, "split 4, push, al right");
-		searchPanel.add(rowFinderBox.getSearchTermBox(), "pushx");
-		searchPanel.add(colFinderBox.getSearchTermBox(), "pushx");
-		searchPanel.add(searchBtn);
-
-		bgPanel.add(searchPanel, "shrink 100, push, al right");
-		return bgPanel;
+		
+		searchPanel.add(rowFinderBox.getSearchTermBox(), "pushx, w 200::, "
+				+ "span, wrap");
+		searchPanel.add(colFinderBox.getSearchTermBox(), "pushx, w 200::, "
+				+ "span, wrap");
+		
+		searchPanel.revalidate();
+		searchPanel.repaint();
 	}
 
 	/**
@@ -327,15 +326,16 @@ public class DendroView implements Observer, DendroPanel {
 
 		setSearchTermBoxes();
 		updateSearchTermBoxes(geneHI, arrayHI, xmap, ymap);
+		setSearchPanel();
 
-		searchBtn = GUIFactory.createIconBtn("searchIcon");
-		searchBtn.setBorder(null);
-		searchBtn.setToolTipText(StringRes.tt_searchRowCol);
-
-		/* Init here for listener addition in DendroController */
-		searchCloseBtn = GUIFactory.createIconBtn("close_x.png");
-		searchCloseBtn.setBorder(null);
-		searchCloseBtn.setBackground(null);
+//		searchBtn = GUIFactory.createIconBtn("searchIcon");
+//		searchBtn.setBorder(null);
+//		searchBtn.setToolTipText(StringRes.tt_searchRowCol);
+//
+//		/* Init here for listener addition in DendroController */
+//		searchCloseBtn = GUIFactory.createIconBtn("close_x.png");
+//		searchCloseBtn.setBorder(null);
+//		searchCloseBtn.setBackground(null);
 	}
 
 	/**
@@ -355,7 +355,7 @@ public class DendroView implements Observer, DendroPanel {
 		JPanel geneContainer;
 		JPanel globalViewContainer;
 		JPanel navContainer;
-		JPanel bottomPanel;
+//		JPanel bottomPanel;
 
 		/* Generate the sub-panels */
 		btnPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
@@ -370,7 +370,7 @@ public class DendroView implements Observer, DendroPanel {
 				GUIFactory.DEFAULT, null);
 //		navContainer.setLayout(new MigLayout("debug"));
 
-		bottomPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
+//		bottomPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 
 		arrayContainer = GUIFactory.createJPanel(false,
 				GUIFactory.NO_PADDING_X, null);
@@ -407,7 +407,7 @@ public class DendroView implements Observer, DendroPanel {
 
 		colDataPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, colTreeView,
 				colLabelPanel);
-		colDataPane.setResizeWeight(0.0);
+		colDataPane.setResizeWeight(0.5);
 		colDataPane.setOpaque(false);
 		colDataPane.setOneTouchExpandable(true);
 
@@ -481,13 +481,13 @@ public class DendroView implements Observer, DendroPanel {
 //		final double topPanel_h = (100 - gvHeight - bottomPanel_h);
 		
 		/* Adding all components to the dendroPane */
-		if (isSearchVisible) {
+//		if (isSearchVisible) {
 //			final double searchHeight = 2;
 //			gvHeight -= searchHeight;
-			dendroPane.add(this.makeSearchPanel(), "w 100%, h 2%, span, wrap");
-		} else {
-			gvHeight = MAX_GV_HEIGHT;
-		}
+//			searchPanel.add(this.setSearchPanel(), "pushx");
+//		} else {
+//			gvHeight = MAX_GV_HEIGHT;
+//		}
 		
 //		LogBuffer.println("SidePanel width: " + sidePanel_w);
 //		LogBuffer.println("matrix width: " + gvWidth);
@@ -510,17 +510,19 @@ public class DendroView implements Observer, DendroPanel {
 //
 //		dendroPane.add(bottomPanel, "span, h " + bottomPanel_h + "%");
 		
-		dendroPane.add(firstPanel, "w 12.5%!, h 19%");
+		dendroPane.add(firstPanel, "w 13%, w 200::, h 20%");
 
-		dendroPane.add(arrayContainer, "w 75%, h 19%");
+		dendroPane.add(arrayContainer, "w 74%, h 20%");
+		
+		dendroPane.add(searchPanel, "w 13%, h 20%, pushx, wrap");
 
-		dendroPane.add(navContainer, "span 1 2, w 12.5%, h 100%, wrap");
+		dendroPane.add(geneContainer, "w 13%, h 80%");
 
-		dendroPane.add(geneContainer, "w 12.5%!, h 80%");
+		dendroPane.add(globalViewContainer, "w 74%, h 80%");
+		
+		dendroPane.add(navContainer, "w 13%, h 80%");
 
-		dendroPane.add(globalViewContainer, "w 75%, h 80%, wrap");
-
-		dendroPane.add(bottomPanel, "span, w 87.5%, h 1%");
+//		dendroPane.add(bottomPanel, "span, w 87.5%, h 1%");
 				
 		dendroPane.revalidate();
 		dendroPane.repaint();
@@ -649,30 +651,30 @@ public class DendroView implements Observer, DendroPanel {
 		dendroPane.addContainerListener(l);
 	}
 
-	/**
-	 * First removes all listeners from searchBtn, then adds one new listener.
-	 *
-	 * @param l
-	 */
-	public void addSearchBtnListener(final ActionListener l) {
+//	/**
+//	 * First removes all listeners from searchBtn, then adds one new listener.
+//	 *
+//	 * @param l
+//	 */
+//	public void addSearchBtnListener(final ActionListener l) {
+//
+//		if (getSearchBtn().getActionListeners().length == 0) {
+//			getSearchBtn().addActionListener(l);
+//		}
+//	}
 
-		if (getSearchBtn().getActionListeners().length == 0) {
-			getSearchBtn().addActionListener(l);
-		}
-	}
-
-	/**
-	 * Adds a MouseListener to the close-search JLabel so that the user can
-	 * click it in order to close the search panel.
-	 *
-	 * @param l
-	 */
-	public void addSearchCloseListener(final ActionListener l) {
-
-		if (searchCloseBtn.getActionListeners().length == 0) {
-			searchCloseBtn.addActionListener(l);
-		}
-	}
+//	/**
+//	 * Adds a MouseListener to the close-search JLabel so that the user can
+//	 * click it in order to close the search panel.
+//	 *
+//	 * @param l
+//	 */
+//	public void addSearchCloseListener(final ActionListener l) {
+//
+//		if (searchCloseBtn.getActionListeners().length == 0) {
+//			searchCloseBtn.addActionListener(l);
+//		}
+//	}
 
 	/**
 	 * Add listener for divider movement and position for the Tree/ Label
@@ -1097,15 +1099,15 @@ public class DendroView implements Observer, DendroPanel {
 
 	}
 
-	@Override
-	public void addSearchMenus(final JMenu menu) {
-
-		final JMenuItem searchMenuItem = new JMenuItem("Find Labels...");
-		searchMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F,
-				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		menu.add(searchMenuItem);
-		tvFrame.addToStackMenuList(searchMenuItem);
-	}
+//	@Override
+//	public void addSearchMenus(final JMenu menu) {
+//
+//		final JMenuItem searchMenuItem = new JMenuItem("Find Labels...");
+//		searchMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F,
+//				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+//		menu.add(searchMenuItem);
+//		tvFrame.addToStackMenuList(searchMenuItem);
+//	}
 
 	// /**
 	// * @param initXmap
@@ -1253,6 +1255,11 @@ public class DendroView implements Observer, DendroPanel {
 		this.rowFinderBox = new RowFinderBox();
 		this.colFinderBox = new ColumnFinderBox();
 	}
+	
+	public void setRowFinderBoxFocused() {
+		
+		rowFinderBox.getSearchTermBox().requestFocusInWindow();
+	}
 
 	public void updateSearchTermBoxes(final HeaderInfo rowHI,
 			final HeaderInfo columnHI, final MapContainer xmap,
@@ -1271,6 +1278,8 @@ public class DendroView implements Observer, DendroPanel {
 		colFinderBox.setSelection(tvFrame.getColumnSelection(),
 				tvFrame.getRowSelection());
 		colFinderBox.setNewSearchTermBox();
+		
+		setSearchPanel();
 	}
 
 	@Override

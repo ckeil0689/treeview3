@@ -159,13 +159,13 @@ public class TVController implements Observer {
 		dendroController.toggleTrees();
 	}
 
-	public void setSearchVisible() {
-
-		/* Don't do anything if search panel is visible (closing only via X) */
-		if (!tvFrame.getDendroView().isSearchVisible()) {
-			dendroController.setSearchVisible(true);
-		}
-	}
+//	public void setSearchVisible() {
+//
+//		/* Don't do anything if search panel is visible (closing only via X) */
+//		if (!tvFrame.getDendroView().isSearchVisible()) {
+//			dendroController.setSearchVisible(true);
+//		}
+//	}
 
 	/**
 	 * Generates the menubar controller. Causes listeners to be added for the
