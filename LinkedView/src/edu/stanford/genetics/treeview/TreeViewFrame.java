@@ -600,10 +600,10 @@ ConfigNodePersistent {
 			running.addDendroMenus(viewMenu);
 			menuBar.add(viewMenu);
 
-			final JMenu searchMenu = new JMenu("Search");
-			searchMenu.setMnemonic(KeyEvent.VK_S);
-			running.addSearchMenus(searchMenu);
-			menuBar.add(searchMenu);
+//			final JMenu searchMenu = new JMenu("Search");
+//			searchMenu.setMnemonic(KeyEvent.VK_S);
+//			running.addSearchMenus(searchMenu);
+//			menuBar.add(searchMenu);
 
 			final JMenu clusterMenu = new JMenu(StringRes.mbar_Cluster);
 			clusterMenu.setMnemonic(KeyEvent.VK_C);

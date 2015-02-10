@@ -156,6 +156,7 @@ public abstract class HeaderFinderBox {
 
 		this.searchTermBox = GUIFactory.createWideComboBox(labels);
 		searchTermBox.setEditable(true);
+		searchTermBox.setFocusable(true);
 		searchTermBox.setBorder(null);
 		searchTermBox.setBackground(GUIFactory.DARK_BG);
 	}
@@ -164,7 +165,7 @@ public abstract class HeaderFinderBox {
 
 		final String[][] hA = headerInfo.getHeaderArray();
 
-		final String defaultText = "Search " + type + " Labels... ";
+		final String defaultText = "Search " + type + "s...";
 
 		searchDataList = new ArrayList<String>();
 		searchDataHeaders = getHeaders(hA);
@@ -399,6 +400,7 @@ public abstract class HeaderFinderBox {
 	 *
 	 */
 	class BoxKeyListener extends KeyAdapter {
+		
 		private int selStartPressed = 0;
 		private int selEndPressed = 0;
 		private int lenPressed = 0;
@@ -445,6 +447,14 @@ public abstract class HeaderFinderBox {
 		// to make it work better...
 		@Override
 		public void keyReleased(final KeyEvent e) {
+			
+			/* If enter key is pressed, search */
+			if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+				LogBuffer.println("search initialized");
+				seekAll();
+				return;
+			}
+			
 			final int selStartRel = editor.getSelectionStart(); // Selection
 			// start before
 			// having typed
@@ -533,6 +543,7 @@ public abstract class HeaderFinderBox {
 
 		@Override
 		public void keyTyped(final KeyEvent e) {
+			
 			// There's a weird case where sometimes hitting backspace after
 			// having manually selected some text causes the selection end to
 			// decrement. The selection end in the keyPressed function always
