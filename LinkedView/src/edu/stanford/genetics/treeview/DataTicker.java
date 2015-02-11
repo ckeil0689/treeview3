@@ -32,7 +32,7 @@ import javax.swing.JTextArea;
 
 import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
-
+	
 public class DataTicker {
 
 	private final JPanel tickerPanel;
@@ -121,7 +121,7 @@ public class DataTicker {
 			
 			String message = m[i];
 			
-			if(message.length() == 0) {
+			if(message == null || message.length() == 0) {
 				message = "-";
 			}
 			
