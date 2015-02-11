@@ -153,7 +153,7 @@ MouseWheelListener {
 
 		try {
 			if (xmap.contains(overx) && ymap.contains(overy)) {
-				statustext[0] = "-";// "Row: ";
+				statustext[0] = "";// "Row: ";
 
 				if (geneHI != null) {
 					final int realGene = overy;
@@ -168,7 +168,7 @@ MouseWheelListener {
 						statustext[0] += " (N/A)";
 					}
 				}
-				statustext[1] = "-";// "Column: ";
+				statustext[1] = "";// "Column: ";
 				if (arrayHI != null) {
 					try {
 						statustext[1] += arraySummary
@@ -187,7 +187,7 @@ MouseWheelListener {
 						statustext[2] = "No Data";
 
 					} else if (drawer.isEmpty(overx, overy)) {
-						statustext[2] = "-";
+						statustext[2] = "";
 
 					} else {
 						statustext[2] = drawer.getSummary(overx, overy);
@@ -767,9 +767,9 @@ MouseWheelListener {
 			hasMouse = false;
 
 			// Display empty field
-			statustext[0] = "-";
-			statustext[1] = "-";
-			statustext[2] = "-";
+			statustext[0] = "";
+			statustext[1] = "";
+			statustext[2] = "";
 
 			status.setMessages(statustext);
 		}

@@ -119,30 +119,18 @@ public class DataTicker {
 	}
 
 	public void setMessages(final String[] m) {
-
-		/* TODO stupid logic... can remove half the code later */
-		resetMessages();
-		for (final String message : m) {
-			addMessage(message);
-		}
 		
-		for (final String message : messages) {
-
-			textList.get(messages.indexOf(message)).setText(message);
+		for(int i = 0; i < m.length; i++) {
+			
+			String message = m[i];
+			
+			if(message.length() == 0) {
+				message = "-";
+			}
+			
+			if(i >= textList.size()) break;
+			
+			textList.get(i).setText(message);
 		}
-	}
-
-	public void resetMessages() {
-
-		messages.removeAllElements();
-		for (final JTextArea label : textList) {
-
-			label.setText("-");
-		}
-	}
-
-	public void addMessage(final String message) {
-
-		messages.addElement(message);
 	}
 }
