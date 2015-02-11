@@ -24,7 +24,6 @@ package edu.stanford.genetics.treeview;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -37,7 +36,6 @@ import Utilities.GUIFactory;
 public class DataTicker {
 
 	private final JPanel tickerPanel;
-	protected final Vector<String> messages;
 	private final List<JTextArea> textList;
 
 	/**
@@ -45,7 +43,6 @@ public class DataTicker {
 	 */
 	public DataTicker() {
 
-		this.messages = new Vector<String>(5, 5);
 		this.textList = new ArrayList<JTextArea>();
 		this.tickerPanel = new TickerPanel();
 	}
