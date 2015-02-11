@@ -4,10 +4,14 @@ import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import net.miginfocom.swing.MigLayout;
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
 import Utilities.StringRes;
@@ -30,6 +34,7 @@ public class AboutDialog extends CustomDialog {
 
 		setupLayout();
 
+		dialog.add(mainPanel);
 		dialog.pack();
 		dialog.setLocationRelativeTo(Frame.getFrames()[0]);
 	}
@@ -38,23 +43,38 @@ public class AboutDialog extends CustomDialog {
 	 * Setup the layout and content of the mainPanel and add it to the dialog.
 	 */
 	private void setupLayout() {
+		
+		/* 
+		 * TextArea because JLabel cannot properly line break without
+		 * manual HTML....
+		 */
+		JTextArea text = setupLabel();
+		text.setText(StringRes.appName
+				+ " was created by Chris Keil, Lance Parsons,"
+				+ "Robert Leach, & Anastasia Baryshnikova and "
+				+ "is based on Alok Saldhana's Java TreeView.");
 
-		final JLabel text = GUIFactory.createLabel(StringRes.appName
-				+ " was created by Chris Keil, Lance Parsons, "
-				+ "Robert Leach, & Anastasia Baryshnikova\n"
-				+ "and is based on Alok Saldhana's Java TreeView.",
+		final JLabel version = GUIFactory.createLabel("Version:", 
 				GUIFactory.FONTS);
+		
+		final JLabel tag = GUIFactory.createLabel(StringRes.versionTag, 
+				GUIFactory.FONTS);
+		
+		JPanel contentPanel = GUIFactory.createJPanel(false, 
+				GUIFactory.DEFAULT, null);
+		
+		JPanel detailPanel = GUIFactory.createJPanel(false, 
+				GUIFactory.DEFAULT, null);
+		detailPanel.setBorder(BorderFactory.createTitledBorder("Details"));
 
-		final JLabel version = GUIFactory.createLabel("Version: "
-				+ StringRes.versionTag, GUIFactory.FONTS);
+		contentPanel.add(text, "span, grow, wrap");
+		detailPanel.add(version);
+		detailPanel.add(tag, "wrap");
 
-		mainPanel.add(text, "span, wrap");
-		mainPanel.add(version, "span, wrap");
+		final JLabel hp = GUIFactory.createLabel("Homepage:", GUIFactory.FONTS);
 
-		final JLabel hp = GUIFactory.createLabel("Homepage", GUIFactory.FONTS);
-
-		mainPanel.add(hp);
-		mainPanel.add(new JTextField(StringRes.updateUrl));
+		detailPanel.add(hp);
+		detailPanel.add(new JTextField(StringRes.updateUrl));
 
 		JButton yesB = GUIFactory.createBtn("Open");
 		yesB.addActionListener(new ActionListener() {
@@ -66,13 +86,13 @@ public class AboutDialog extends CustomDialog {
 			}
 
 		});
-		mainPanel.add(yesB, "wrap");
+		detailPanel.add(yesB, "wrap");
 
-		final JLabel announce = GUIFactory.createLabel("Announcements",
+		final JLabel announce = GUIFactory.createLabel("Announcements:",
 				GUIFactory.FONTS);
 
-		mainPanel.add(announce);
-		mainPanel.add(new JTextField(StringRes.announcementUrl));
+		detailPanel.add(announce);
+		detailPanel.add(new JTextField(StringRes.announcementUrl));
 
 		yesB = GUIFactory.createBtn("Sign Up");
 		yesB.addActionListener(new ActionListener() {
@@ -82,8 +102,23 @@ public class AboutDialog extends CustomDialog {
 				tvFrame.displayURL(StringRes.announcementUrl);
 			}
 		});
-		mainPanel.add(yesB);
+		detailPanel.add(yesB, "wrap");
 
-		dialog.add(mainPanel);
+		contentPanel.add(detailPanel, "push, grow");
+		mainPanel.add(contentPanel, "push, grow");
+	}
+	
+	private JTextArea setupLabel() {
+
+		final JTextArea label = new JTextArea();
+		label.setFont(GUIFactory.FONTS);
+		label.setBorder(null);
+		label.setOpaque(false);
+		label.setEditable(false);
+		label.setFocusable(false);
+		label.setLineWrap(true);
+		label.setWrapStyleWord(true);
+
+		return label;
 	}
 }
