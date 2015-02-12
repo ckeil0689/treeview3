@@ -266,8 +266,7 @@ ConfigNodePersistent {
 	public void openStatsView(final String source, final int rowNum,
 			final int colNum) {
 
-		final StatsDialog stats = new StatsDialog("Data Stats");
-		stats.setupLayout(source, rowNum, colNum);
+		final StatsDialog stats = new StatsDialog(source, rowNum, colNum);
 		stats.setVisible(true);
 	}
 

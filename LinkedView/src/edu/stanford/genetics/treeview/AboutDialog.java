@@ -48,7 +48,7 @@ public class AboutDialog extends CustomDialog {
 		 * TextArea because JLabel cannot properly line break without
 		 * manual HTML....
 		 */
-		JTextArea text = setupLabel();
+		JTextArea text = GUIFactory.createWrappableTextArea();
 		text.setText(StringRes.appName
 				+ " was created by Chris Keil, Lance Parsons,"
 				+ "Robert Leach, & Anastasia Baryshnikova and "
@@ -106,19 +106,5 @@ public class AboutDialog extends CustomDialog {
 
 		contentPanel.add(detailPanel, "push, grow");
 		mainPanel.add(contentPanel, "push, grow");
-	}
-	
-	private JTextArea setupLabel() {
-
-		final JTextArea label = new JTextArea();
-		label.setFont(GUIFactory.FONTS);
-		label.setBorder(null);
-		label.setOpaque(false);
-		label.setEditable(false);
-		label.setFocusable(false);
-		label.setLineWrap(true);
-		label.setWrapStyleWord(true);
-
-		return label;
 	}
 }

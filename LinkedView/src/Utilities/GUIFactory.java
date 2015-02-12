@@ -17,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
+import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
@@ -111,6 +112,25 @@ public class GUIFactory {
 
 		final JLabel label = new JLabel(text);
 		label.setFont(font);
+
+		return label;
+	}
+	
+	/**
+	 * Create a JTextArea that acts like a JLabel that can wrap. Good for 
+	 * long passages of text.
+	 * @return a JTextArea that resembles a JLabel.
+	 */
+	public static JTextArea createWrappableTextArea() {
+
+		final JTextArea label = new JTextArea();
+		label.setFont(GUIFactory.FONTS);
+		label.setBorder(null);
+		label.setOpaque(false);
+		label.setEditable(false);
+		label.setFocusable(false);
+		label.setLineWrap(true);
+		label.setWrapStyleWord(true);
 
 		return label;
 	}

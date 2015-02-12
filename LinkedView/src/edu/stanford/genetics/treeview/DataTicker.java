@@ -75,21 +75,21 @@ public class DataTicker {
 			final JLabel row = GUIFactory.createLabel("Row:", GUIFactory.FONTS);
 			add(row, "w 10%");
 
-			final JTextArea rowText = setupLabel();
+			final JTextArea rowText = GUIFactory.createWrappableTextArea();
 			add(rowText, "w 90%, growx, wrap");
 
 			final JLabel col = GUIFactory.createLabel("Column:",
 					GUIFactory.FONTS);
 			add(col, "w 10%");
 
-			final JTextArea colText = setupLabel();
+			final JTextArea colText = GUIFactory.createWrappableTextArea();
 			add(colText, "w 90%, growx, wrap");
 
 			final JLabel val = GUIFactory.createLabel("Value:",
 					GUIFactory.FONTS);
 			add(val, "w 10%");
 
-			final JTextArea valText = setupLabel();
+			final JTextArea valText = GUIFactory.createWrappableTextArea();
 			add(valText, "w 90%, growx, wrap");
 
 			textList.add(rowText);
@@ -99,33 +99,19 @@ public class DataTicker {
 			revalidate();
 			repaint();
 		}
-
-		private JTextArea setupLabel() {
-
-			final JTextArea label = new JTextArea();
-			label.setFont(GUIFactory.FONTS);
-			label.setBorder(null);
-			label.setOpaque(false);
-			label.setEditable(false);
-			label.setFocusable(false);
-			label.setLineWrap(true);
-			label.setWrapStyleWord(true);
-
-			return label;
-		}
 	}
 
 	public void setMessages(final String[] m) {
 		
 		for(int i = 0; i < m.length; i++) {
 			
+			if(i >= textList.size()) break;
+			
 			String message = m[i];
 			
 			if(message == null || message.length() == 0) {
 				message = "-";
 			}
-			
-			if(i >= textList.size()) break;
 			
 			textList.get(i).setText(message);
 		}

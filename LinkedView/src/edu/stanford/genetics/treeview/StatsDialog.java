@@ -2,6 +2,7 @@ package edu.stanford.genetics.treeview;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
@@ -13,8 +14,15 @@ public class StatsDialog extends CustomDialog {
 	 *
 	 * @param viewFrame
 	 */
-	public StatsDialog(final String title) {
-		super(title);
+	public StatsDialog(final String source, final int rowNum,
+			final int colNum) {
+		
+		super("Stats");
+		setupLayout(source, rowNum, colNum);
+		dialog.add(mainPanel);
+		dialog.pack();
+		
+		closeBtn.requestFocusInWindow();
 	}
 
 	/**
@@ -22,6 +30,9 @@ public class StatsDialog extends CustomDialog {
 	 */
 	public void setupLayout(final String source, final int rowNum,
 			final int colNum) {
+		
+		final JPanel contentPanel = GUIFactory.createJPanel(false, 
+				GUIFactory.DEFAULT, null);
 
 		final JLabel srcLabel = GUIFactory.createLabel("Source: ",
 				GUIFactory.FONTS);
@@ -46,18 +57,19 @@ public class StatsDialog extends CustomDialog {
 		final JLabel size = GUIFactory.createLabel("" + (rowNum * colNum),
 				GUIFactory.FONTS);
 
-		mainPanel.setBorder(BorderFactory.createEtchedBorder());
+		contentPanel.setBorder(BorderFactory.createTitledBorder(
+				"Data Statistics"));
 
-		mainPanel.add(srcLabel, "tag label");
-		mainPanel.add(srcTxt, "wrap");
-		mainPanel.add(rowLabel, "tag label");
-		mainPanel.add(rows, "wrap");
-		mainPanel.add(colLabel, "tag label");
-		mainPanel.add(cols, "wrap");
-		mainPanel.add(sizeLabel, "tag label");
-		mainPanel.add(size, "wrap");
+		contentPanel.add(srcLabel, "tag label");
+		contentPanel.add(srcTxt, "wrap");
+		contentPanel.add(rowLabel, "tag label");
+		contentPanel.add(rows, "wrap");
+		contentPanel.add(colLabel, "tag label");
+		contentPanel.add(cols, "wrap");
+		contentPanel.add(sizeLabel, "tag label");
+		contentPanel.add(size);
+		
+		mainPanel.add(contentPanel, "push, grow, wrap");
 		mainPanel.add(closeBtn, "span, al right");
-
-		dialog.add(mainPanel);
 	}
 }

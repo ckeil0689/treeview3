@@ -2,6 +2,7 @@ package Views;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 
 import Utilities.GUIFactory;
 import Utilities.StringRes;
@@ -41,28 +42,30 @@ public class ClusterInfoFactory {
 		final JLabel similarity = GUIFactory.createLabel("Similarity: ",
 				GUIFactory.FONTS);
 
-		final TextDisplay similarityText = new TextDisplay(
-				getSimilarity(methodIndex));
+		final JTextArea similarityText = GUIFactory.createWrappableTextArea();
+		similarityText.setText(getSimilarity(methodIndex));
 
 		final JLabel type = GUIFactory.createLabel("Type: ", GUIFactory.FONTS);
 
-		final TextDisplay typeText = new TextDisplay(getType(methodIndex));
+		final JTextArea typeText = GUIFactory.createWrappableTextArea();
+		typeText.setText(getType(methodIndex));
 
 		final JLabel time = GUIFactory.createLabel("Time: ", GUIFactory.FONTS);
 
-		final TextDisplay timeText = new TextDisplay(getTime(methodIndex));
+		final JTextArea timeText = GUIFactory.createWrappableTextArea();
+		timeText.setText(getTime(methodIndex));
 
 		final JLabel advantage = GUIFactory.createLabel("Advantages: ",
 				GUIFactory.FONTS);
 
-		final TextDisplay advantageText = new TextDisplay(
-				getAdvantage(methodIndex));
+		final JTextArea advantageText = GUIFactory.createWrappableTextArea();
+		advantageText.setText(getAdvantage(methodIndex));
 
 		final JLabel disadvantage = GUIFactory.createLabel("Disadvantages: ",
 				GUIFactory.FONTS);
 
-		final TextDisplay disadvantageText = new TextDisplay(
-				getDisadvantage(methodIndex));
+		final JTextArea disadvantageText = GUIFactory.createWrappableTextArea();
+		disadvantageText.setText(getDisadvantage(methodIndex));
 
 		mainPanel.add(similarity, "alignx 0%");
 		mainPanel.add(similarityText, "w 400:500:, wrap");
@@ -104,24 +107,25 @@ public class ClusterInfoFactory {
 		final JLabel similarity = GUIFactory.createLabel("Similarity: ",
 				GUIFactory.FONTS);
 
-		final TextDisplay similarityText = new TextDisplay(
-				getSimilarity(KMEANS_INDEX));
+		final JTextArea similarityText = GUIFactory.createWrappableTextArea();
+		similarityText.setText(getSimilarity(KMEANS_INDEX));
 
 		final JLabel time = GUIFactory.createLabel("Time: ", GUIFactory.FONTS);
 
-		final TextDisplay timeText = new TextDisplay(getTime(KMEANS_INDEX));
+		final JTextArea timeText = GUIFactory.createWrappableTextArea();
+		timeText.setText(getTime(KMEANS_INDEX));
 
 		final JLabel advantage = GUIFactory.createLabel("Advantages: ",
 				GUIFactory.FONTS);
 
-		final TextDisplay advantageText = new TextDisplay(
-				getAdvantage(KMEANS_INDEX));
+		final JTextArea advantageText = GUIFactory.createWrappableTextArea();
+		advantageText.setText(getAdvantage(KMEANS_INDEX));
 
 		final JLabel disadvantage = GUIFactory.createLabel("Disadvantages: ",
 				GUIFactory.FONTS);
 
-		final TextDisplay disadvantageText = new TextDisplay(
-				getDisadvantage(KMEANS_INDEX));
+		final JTextArea disadvantageText = GUIFactory.createWrappableTextArea();
+		disadvantageText.setText(getDisadvantage(KMEANS_INDEX));
 
 		mainPanel.add(similarity, "alignx 0%");
 		mainPanel.add(similarityText, "w 400:500:, wrap");
