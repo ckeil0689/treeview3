@@ -15,12 +15,10 @@ import java.util.prefs.Preferences;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import ColorChooser.ColorChooser;
@@ -93,7 +91,7 @@ public class TVController implements Observer {
 					Frame.getFrames()[0],
 					"Are you sure you want to reset preferences and "
 							+ "close TreeView?", "Reset Preferences?",
-					JOptionPane.YES_NO_OPTION);
+							JOptionPane.YES_NO_OPTION);
 
 			switch (option) {
 
@@ -159,13 +157,13 @@ public class TVController implements Observer {
 		dendroController.toggleTrees();
 	}
 
-//	public void setSearchVisible() {
-//
-//		/* Don't do anything if search panel is visible (closing only via X) */
-//		if (!tvFrame.getDendroView().isSearchVisible()) {
-//			dendroController.setSearchVisible(true);
-//		}
-//	}
+	// public void setSearchVisible() {
+	//
+	// /* Don't do anything if search panel is visible (closing only via X) */
+	// if (!tvFrame.getDendroView().isSearchVisible()) {
+	// dendroController.setSearchVisible(true);
+	// }
+	// }
 
 	/**
 	 * Generates the menubar controller. Causes listeners to be added for the
@@ -577,7 +575,7 @@ public class TVController implements Observer {
 			final GeneListMaker t = new GeneListMaker(
 					(JFrame) Frame.getFrames()[0], tvFrame.getRowSelection(),
 					model.getRowHeaderInfo(), source.getDir()
-					+ source.getRoot() + "_data.cdt");
+							+ source.getRoot() + "_data.cdt");
 
 			t.setDataMatrix(model.getDataMatrix(), model.getColumnHeaderInfo(),
 					DataModel.NODATA);
@@ -782,7 +780,7 @@ public class TVController implements Observer {
 			/* View */
 			final ColorChooser gradientPick = new ColorChooser(
 					((DoubleArrayDrawer) dendroController.getArrayDrawer())
-							.getColorExtractor(),
+					.getColorExtractor(),
 					min, max);
 
 			/*

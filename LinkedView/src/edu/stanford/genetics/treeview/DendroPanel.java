@@ -39,7 +39,7 @@ public interface DendroPanel {
 
 	public void addClusterMenus(JMenu menu);
 
-//	public void addSearchMenus(JMenu menu);
+	// public void addSearchMenus(JMenu menu);
 
 	/**
 	 *

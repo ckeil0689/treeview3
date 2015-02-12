@@ -5,10 +5,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -18,20 +16,17 @@ import java.util.Observer;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.InputMap;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import Utilities.Helper;
 import edu.stanford.genetics.treeview.CdtFilter;
@@ -125,8 +120,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 		addKeyBindings();
 		addDendroViewListeners();
-//		addMenuBtnListeners();
-		
+
 		globalXmap.notifyObservers();
 		globalYmap.notifyObservers();
 	}
@@ -284,48 +278,39 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		dendroView.addScaleListeners(new ScaleListener());
 		dendroView.addZoomListener(new ZoomListener());
 		dendroView.addCompListener(new AppFrameListener());
-//		dendroView.addSearchCloseListener(new CloseSearchAction());
 		dendroView.addDividerListener(new DividerListener());
 		dendroView.addSplitPaneListener(new SplitPaneListener());
 	}
 
-//	/**
-//	 * Add listener to the search button.
-//	 */
-//	private void addMenuBtnListeners() {
-//
-//		dendroView.addSearchBtnListener(new SearchBtnListener());
-//	}
-
 	/* -------------- Listeners --------------------- */
-	/**
-	 * Listener for the search button. Opens a dialog when the button is
-	 * clicked.
-	 *
-	 * @author CKeil
-	 *
-	 */
-	private class SearchBtnListener implements ActionListener {
-
-		@Override
-		public void actionPerformed(final ActionEvent e) {
-			
-			/*
-			 * Putting the mapContainer objects in DendroView so that I can
-			 * control zoom-out of the found genes/arrays are outside the
-			 * visible area.
-			 */
-			dendroView.setGlobalXMap(globalXmap);
-			dendroView.setGlobalYMap(globalYmap);
-			/*
-			 * Adding the mapContainer objects here so that the search dialog
-			 * can determine if results are visible in order to be able to
-			 * determine whether to zoom out.
-			 */
-			deselectAll();
-			dendroView.searchLabels();
-		}
-	}
+	// /**
+	// * Listener for the search button. Opens a dialog when the button is
+	// * clicked.
+	// *
+	// * @author CKeil
+	// *
+	// */
+	// private class SearchBtnListener implements ActionListener {
+	//
+	// @Override
+	// public void actionPerformed(final ActionEvent e) {
+	//
+	// /*
+	// * Putting the mapContainer objects in DendroView so that I can
+	// * control zoom-out of the found genes/arrays are outside the
+	// * visible area.
+	// */
+	// dendroView.setGlobalXMap(globalXmap);
+	// dendroView.setGlobalYMap(globalYmap);
+	// /*
+	// * Adding the mapContainer objects here so that the search dialog
+	// * can determine if results are visible in order to be able to
+	// * determine whether to zoom out.
+	// */
+	// deselectAll();
+	// dendroView.searchLabels();
+	// }
+	// }
 
 	private void resetDendroView() {
 
@@ -377,11 +362,11 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 		} else {
 			/* Only update trees which are currently at 0.0 */
-			if(Helper.nearlyEqual(0.0, atr_loc)) {
+			if (Helper.nearlyEqual(0.0, atr_loc)) {
 				atr_loc = configNode.getDouble("atr_Loc", 0.5);
 			}
-			
-			if(Helper.nearlyEqual(0.0, gtr_loc)) {
+
+			if (Helper.nearlyEqual(0.0, gtr_loc)) {
 				gtr_loc = configNode.getDouble("gtr_Loc", 0.5);
 			}
 		}
@@ -397,27 +382,9 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-//			if (!dendroView.isSearchVisible()) {
-//				setSearchVisible(true);
-//			}
 			dendroView.setRowFinderBoxFocused();
 		}
 	}
-
-//	/**
-//	 * Determines mouse behavior over the close-x icon of search panel.
-//	 *
-//	 * @author chris0689
-//	 *
-//	 */
-//	private class CloseSearchAction implements ActionListener {
-//
-//		@Override
-//		public void actionPerformed(final ActionEvent e) {
-//
-//			setSearchVisible(false);
-//		}
-//	}
 
 	private class DividerListener implements PropertyChangeListener {
 
@@ -680,31 +647,32 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			}
 		}
 	}
-	
+
 	/**
 	 * Defines what happens when component properties of the two JSplitPanes
-	 * which contain labels and trees are changed by the system or the user. 
+	 * which contain labels and trees are changed by the system or the user.
+	 * 
 	 * @author chris0689
 	 *
 	 */
 	private class SplitPaneListener extends ComponentAdapter {
 
 		@Override
-		public void componentResized(ComponentEvent e) {
-			
+		public void componentResized(final ComponentEvent e) {
+
 			/* TODO define JSplitPane behavior */
 		}
 
 		@Override
-		public void componentShown(ComponentEvent e) {
-			
-			double atr_loc = configNode.getDouble("atr_Loc", 0.5);
-			double gtr_loc = configNode.getDouble("gtr_Loc", 0.5);
+		public void componentShown(final ComponentEvent e) {
+
+			final double atr_loc = configNode.getDouble("atr_Loc", 0.5);
+			final double gtr_loc = configNode.getDouble("gtr_Loc", 0.5);
 
 			dendroView.setTreeVisibility(atr_loc, gtr_loc);
 		}
 	}
-	
+
 	/**
 	 * Listens to the resizing of DendroView2 and makes changes to MapContainers
 	 * as a result.
@@ -712,7 +680,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	 * @author CKeil
 	 *
 	 */
-	private class AppFrameListener extends ComponentAdapter{
+	private class AppFrameListener extends ComponentAdapter {
 
 		@Override
 		public void componentResized(final ComponentEvent arg0) {
@@ -885,15 +853,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			dendroView.setGVHeight(newHeight);
 		}
 	}
-
-//	/**
-//	 * Toggles the search bars in DendroView.
-//	 */
-//	public void setSearchVisible(final boolean visible) {
-//
-//		dendroView.setSearchVisible(visible);
-//		resetDendroView();
-//	}
 
 	public void saveSettings() {
 
@@ -1180,7 +1139,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		if (arrayIndexes == 0
 				|| geneIndexes == 0
 				|| (arrayIndexes == globalXmap.getMaxIndex() && geneIndexes == globalYmap
-						.getMaxIndex())) {
+				.getMaxIndex())) {
 			// LogBuffer.println("No spots are visible. Resetting view.");
 			arrayIndexes = globalXmap.getMaxIndex() + 1;
 			geneIndexes = globalYmap.getMaxIndex() + 1;
@@ -1248,75 +1207,32 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		saveSettings();
 	}
 
-//	/**
-//	 * Listens to the resizing of DendroView2 and makes changes to MapContainers
-//	 * as a result.
-//	 *
-//	 * @author CKeil
-//	 *
-//	 */
-//	private class ResizeListener implements ComponentListener {
-//
-//		// Component Listeners
-//		@Override
-//		public void componentHidden(final ComponentEvent arg0) {
-//		}
-//
-//		@Override
-//		public void componentMoved(final ComponentEvent arg0) {
-//		}
-//
-//		@Override
-//		public void componentResized(final ComponentEvent arg0) {
-//			// LogBuffer.println("componentResized: globalYmap.getTileNumVisible: ["
-//			// + globalYmap.getTileNumVisible() +
-//			// "] globalXmap.getTileNumVisible: [" +
-//			// globalXmap.getTileNumVisible() +
-//			// "] dendroView.getXScroll().getValue(): [" +
-//			// dendroView.getXScroll().getValue() +
-//			// "] dendroView.getYScroll().getValue(): [" +
-//			// dendroView.getYScroll().getValue() + "].");
-//
-//			// Previously, resetMapContainers was called here, but that caused
-//			// the zoom level to change when the user resized the window, so I
-//			// added a way to track the currently visible area in mapContainer
-//			// and implemented these functions to make the necessary
-//			// adjustments to the image when that happens
-//			reZoomVisible();
-//			reCenterVisible();
-//		}
-//
-//		@Override
-//		public void componentShown(final ComponentEvent arg0) {
-//		}
-//	}
-
 	public void saveImage(final JPanel panel) throws IOException {
 
-//		File saveFile = new File("savedImage.png");
-//
-//		final JFileChooser fc = new JFileChooser();
-//
-//		fc.setFileFilter(new FileNameExtensionFilter("PNG", "png"));
-//		fc.setSelectedFile(saveFile);
-//		final int returnVal = fc.showSaveDialog(dendroView.getDendroPane());
-//
-//		if (returnVal == JFileChooser.APPROVE_OPTION) {
-//			saveFile = fc.getSelectedFile();
-//
-//			String fileName = saveFile.toString();
-//
-//			if (!fileName.endsWith(".png")) {
-//				fileName += ".png";
-//				saveFile = new File(fileName);
-//			}
-//
-//			final BufferedImage im = new BufferedImage(panel.getWidth(),
-//					panel.getHeight(), BufferedImage.TYPE_INT_ARGB);
-//
-//			panel.paint(im.getGraphics());
-//			ImageIO.write(im, "PNG", saveFile);
-//		}
+		// File saveFile = new File("savedImage.png");
+		//
+		// final JFileChooser fc = new JFileChooser();
+		//
+		// fc.setFileFilter(new FileNameExtensionFilter("PNG", "png"));
+		// fc.setSelectedFile(saveFile);
+		// final int returnVal = fc.showSaveDialog(dendroView.getDendroPane());
+		//
+		// if (returnVal == JFileChooser.APPROVE_OPTION) {
+		// saveFile = fc.getSelectedFile();
+		//
+		// String fileName = saveFile.toString();
+		//
+		// if (!fileName.endsWith(".png")) {
+		// fileName += ".png";
+		// saveFile = new File(fileName);
+		// }
+		//
+		// final BufferedImage im = new BufferedImage(panel.getWidth(),
+		// panel.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		//
+		// panel.paint(im.getGraphics());
+		// ImageIO.write(im, "PNG", saveFile);
+		// }
 	}
 
 	/**
@@ -1500,9 +1416,9 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		dendroView.getRowLabelView().setConfigNode(configNode);// getFirst("TextView"));
 		dendroView.getColumnLabelView().setConfigNode(configNode);// getFirst("ArrayNameView"));
 		dendroView.getColumnTreeView().getHeaderSummary()
-				.setConfigNode(configNode);
+		.setConfigNode(configNode);
 		dendroView.getRowTreeView().getHeaderSummary()
-				.setConfigNode(configNode);
+		.setConfigNode(configNode);
 	}
 
 	/**
@@ -1527,7 +1443,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		dendroView.getColumnTreeView().setATRHeaderInfo(
 				tvModel.getAtrHeaderInfo());
 		dendroView.getRowTreeView()
-				.setGTRHeaderInfo(tvModel.getGtrHeaderInfo());
+		.setGTRHeaderInfo(tvModel.getGtrHeaderInfo());
 		dendroView.getColumnLabelView().setHeaderInfo(
 				tvModel.getColumnHeaderInfo());
 		dendroView.getRowLabelView().setHeaderInfo(tvModel.getRowHeaderInfo());
@@ -1624,24 +1540,24 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	 */
 	protected FileSet offerATRFileSelection() throws LoadException {
 
-//		FileSet fileSet1; // will be chosen...
-//
-//		final JFileChooser fileDialog = new JFileChooser();
-//		setupATRFileDialog(fileDialog);
-//
-//		final int retVal = fileDialog
-//				.showOpenDialog(dendroView.getDendroPane());
-//
-//		if (retVal == JFileChooser.APPROVE_OPTION) {
-//			final File chosen = fileDialog.getSelectedFile();
-//			fileSet1 = new FileSet(chosen.getName(), chosen.getParent()
-//					+ File.separator);
-//
-//		} else
-//			throw new LoadException("File Dialog closed without selection...",
-//					LoadException.NOFILE);
-//
-//		return fileSet1;
+		// FileSet fileSet1; // will be chosen...
+		//
+		// final JFileChooser fileDialog = new JFileChooser();
+		// setupATRFileDialog(fileDialog);
+		//
+		// final int retVal = fileDialog
+		// .showOpenDialog(dendroView.getDendroPane());
+		//
+		// if (retVal == JFileChooser.APPROVE_OPTION) {
+		// final File chosen = fileDialog.getSelectedFile();
+		// fileSet1 = new FileSet(chosen.getName(), chosen.getParent()
+		// + File.separator);
+		//
+		// } else
+		// throw new LoadException("File Dialog closed without selection...",
+		// LoadException.NOFILE);
+		//
+		// return fileSet1;
 		return null;
 	}
 
@@ -1664,20 +1580,20 @@ public class DendroController implements ConfigNodePersistent, Observer {
 					+ "and setAcceptAllFileFilterUsed(): " + e.getMessage());
 			// hmm... I'll just assume that there's no accept all.
 			fileDialog
-			.addChoosableFileFilter(new javax.swing.filechooser.FileFilter() {
+					.addChoosableFileFilter(new javax.swing.filechooser.FileFilter() {
 
-				@Override
-				public boolean accept(final File f) {
+						@Override
+						public boolean accept(final File f) {
 
-					return true;
-				}
+							return true;
+						}
 
-				@Override
-				public String getDescription() {
+						@Override
+						public String getDescription() {
 
-					return "All Files";
-				}
-			});
+							return "All Files";
+						}
+					});
 		}
 
 		fileDialog.setFileFilter(ff);
@@ -1945,7 +1861,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 				} else {
 					TreeColorer.colorUsingLeaf(leftTreeDrawer.getRootNode(),
 							tvModel.getRowHeaderInfo(), tvModel
-									.getRowHeaderInfo().getIndex("FGCOLOR"));
+							.getRowHeaderInfo().getIndex("FGCOLOR"));
 				}
 
 			} catch (final DendroException e) {
@@ -2069,7 +1985,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 		dendroView.getRowLabelView().getHeaderSummary().setIncluded(gIncluded);
 		dendroView.getColumnLabelView().getHeaderSummary()
-				.setIncluded(aIncluded);
+		.setIncluded(aIncluded);
 	}
 
 	public int[] getArrayIncluded() {

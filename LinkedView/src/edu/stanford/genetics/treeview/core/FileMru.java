@@ -183,7 +183,7 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 
 		final String[] childrenNodes = getRootChildrenNodes();
 		try {
-//			final Preferences node = configNode.node(childrenNodes[i]);
+			// final Preferences node = configNode.node(childrenNodes[i]);
 
 			configNode.node(childrenNodes[i]).removeNode();
 
@@ -225,13 +225,13 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 	 * @return The last open FileSet
 	 */
 	public FileSet getLast() {
-		
-		String lastNode = configNode.get("last_node", "no_last");
+
+		final String lastNode = configNode.get("last_node", "no_last");
 
 		FileSet fileSet;
-		if(lastNode.equalsIgnoreCase("no_last"))
+		if (lastNode.equalsIgnoreCase("no_last"))
 			return null;
-		
+
 		fileSet = new FileSet(configNode.node(lastNode));
 		return fileSet;
 	}

@@ -40,7 +40,7 @@ import edu.stanford.genetics.treeview.LinearTransformation;
  */
 
 public class RowTreeView extends TRView implements MouseMotionListener,
-		MouseListener {
+MouseListener {
 
 	private static final long serialVersionUID = 1L;;
 
@@ -146,7 +146,7 @@ public class RowTreeView extends TRView implements MouseMotionListener,
 			destRect.setBounds(0, 0, offscreenSize.width, map.getUsedPixels());
 			setXScaleEq(new LinearTransformation(treePainter.getCorrMin(),
 					destRect.x, treePainter.getCorrMax(), destRect.x
-					+ destRect.width));
+							+ destRect.width));
 
 			setYScaleEq(new LinearTransformation(map.getIndex(destRect.y),
 					destRect.y, map.getIndex(destRect.y + destRect.height),
@@ -191,8 +191,8 @@ public class RowTreeView extends TRView implements MouseMotionListener,
 
 		setHoveredNode(treePainter.getClosest(
 				getYScaleEq().inverseTransform(e.getY()), getXScaleEq()
-						.inverseTransform(e.getX()), getXScaleEq().getSlope()
-						/ getYScaleEq().getSlope()));
+				.inverseTransform(e.getX()), getXScaleEq().getSlope()
+				/ getYScaleEq().getSlope()));
 	}
 
 	@Override

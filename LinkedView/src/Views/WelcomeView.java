@@ -3,7 +3,6 @@ package Views;
 import java.awt.Graphics;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -15,7 +14,6 @@ import javax.swing.JProgressBar;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
-import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
 import Utilities.StringRes;
 
@@ -50,8 +48,8 @@ public class WelcomeView {
 				GUIFactory.NO_PADDING, null);
 
 		loadPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
-		
-		JPanel logo = new ImagePanel();
+
+		final JPanel logo = new ImagePanel();
 
 		jl = GUIFactory.createLabel(StringRes.title_Hello, GUIFactory.FONTL);
 
@@ -69,31 +67,31 @@ public class WelcomeView {
 		homePanel.add(title_bg, "push,, alignx 50%, span, wrap");
 		homePanel.add(loadPanel, "push, grow, alignx 50%");
 	}
-	
+
 	public class ImagePanel extends JPanel {
 
-	    private BufferedImage image;
+		private BufferedImage image;
 
-	    public ImagePanel() {
-	       try {                
-	    	   final ClassLoader classLoader = Thread.currentThread()
+		public ImagePanel() {
+			try {
+				final ClassLoader classLoader = Thread.currentThread()
 						.getContextClassLoader();
 				final InputStream input = classLoader
 						.getResourceAsStream("logo_small.png");
 
 				image = ImageIO.read(input);
-				
-	       } catch (IOException ex) {
-	            // handle exception...
-	       }
-	    }
 
-	    @Override
-	    protected void paintComponent(Graphics g) {
-	        
-	    	super.paintComponent(g);
-	        g.drawImage(image, 0, 0, null);          
-	    }
+			} catch (final IOException ex) {
+				// handle exception...
+			}
+		}
+
+		@Override
+		protected void paintComponent(final Graphics g) {
+
+			super.paintComponent(g);
+			g.drawImage(image, 0, 0, null);
+		}
 
 	}
 

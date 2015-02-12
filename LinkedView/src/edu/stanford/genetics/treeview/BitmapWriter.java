@@ -94,33 +94,33 @@ public class BitmapWriter {
 	 */
 	public static boolean writeJpg(final BufferedImage i,
 			final OutputStream output, final JComponent parent)
-					throws java.io.IOException {
+			throws java.io.IOException {
 		final String version = System.getProperty("java.version");
 		if (version.startsWith("1.4.0") || version.startsWith("1.4.1")) {
 			JOptionPane
-			.showMessageDialog(
-					parent,
-					new JTextArea(
-							"You are using Java Version "
-									+ version
-									+ "\n which has known issues with JPEG export. \nPlease try PNG format or upgrade to 1.4.2 or later if this export fails."));
+					.showMessageDialog(
+							parent,
+							new JTextArea(
+									"You are using Java Version "
+											+ version
+											+ "\n which has known issues with JPEG export. \nPlease try PNG format or upgrade to 1.4.2 or later if this export fails."));
 		}
 
 		try {
 			ImageIO.write(i, "jpg", output);
 		} catch (final Exception e) {
 			JOptionPane
-			.showMessageDialog(
-					parent,
-					new JTextArea(
-							"Problem Saving JPEG "
-									+ e
-									+ "\n"
-									+ "Jpeg export requires Java Version 1.4.1 or better.\n"
-									+ "You are running "
-									+ version
-									+ "\n"
-									+ "If problem persists, try PPM format, which should always work"));
+					.showMessageDialog(
+							parent,
+							new JTextArea(
+									"Problem Saving JPEG "
+											+ e
+											+ "\n"
+											+ "Jpeg export requires Java Version 1.4.1 or better.\n"
+											+ "You are running "
+											+ version
+											+ "\n"
+											+ "If problem persists, try PPM format, which should always work"));
 			return false;
 		}
 		return true;
@@ -133,24 +133,24 @@ public class BitmapWriter {
 	 */
 	public static boolean writePng(final BufferedImage i,
 			final OutputStream output, final JComponent parent)
-					throws java.io.IOException {
+			throws java.io.IOException {
 		final String version = System.getProperty("java.version");
 
 		try {
 			ImageIO.write(i, "png", output);
 		} catch (final Exception e) {
 			JOptionPane
-			.showMessageDialog(
-					parent,
-					new JTextArea(
-							"Problem Saving PNG "
-									+ e
-									+ " \n"
-									+ "Png export requires Java Version 1.4.1 or better.\n"
-									+ "You are running "
-									+ version
-									+ "\n"
-									+ "If problem persists, try PPM format, which should always work"));
+					.showMessageDialog(
+							parent,
+							new JTextArea(
+									"Problem Saving PNG "
+											+ e
+											+ " \n"
+											+ "Png export requires Java Version 1.4.1 or better.\n"
+											+ "You are running "
+											+ version
+											+ "\n"
+											+ "If problem persists, try PPM format, which should always work"));
 			return false;
 		}
 		return true;

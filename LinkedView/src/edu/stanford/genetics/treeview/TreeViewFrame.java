@@ -29,7 +29,6 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.Dialog;
-import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -58,7 +57,6 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
-import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
 import Utilities.StringRes;
 import Views.LoadErrorView;
@@ -79,7 +77,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
  *
  */
 public class TreeViewFrame extends ViewFrame implements FileSetListener,
-ConfigNodePersistent {
+		ConfigNodePersistent {
 
 	public static final int WELCOME_VIEW = 0;
 	public static final int LOADERROR_VIEW = 1;
@@ -143,7 +141,7 @@ ConfigNodePersistent {
 		dendroView = new DendroView(this);
 
 		setWindowActive(true);
-		
+
 		mainPanel = GUIFactory.createJPanel(true, GUIFactory.NO_PADDING, null);
 
 		/* Setting up main panels */
@@ -599,10 +597,10 @@ ConfigNodePersistent {
 			running.addDendroMenus(viewMenu);
 			menuBar.add(viewMenu);
 
-//			final JMenu searchMenu = new JMenu("Search");
-//			searchMenu.setMnemonic(KeyEvent.VK_S);
-//			running.addSearchMenus(searchMenu);
-//			menuBar.add(searchMenu);
+			// final JMenu searchMenu = new JMenu("Search");
+			// searchMenu.setMnemonic(KeyEvent.VK_S);
+			// running.addSearchMenus(searchMenu);
+			// menuBar.add(searchMenu);
 
 			final JMenu clusterMenu = new JMenu(StringRes.mbar_Cluster);
 			clusterMenu.setMnemonic(KeyEvent.VK_C);
@@ -918,9 +916,10 @@ ConfigNodePersistent {
 	public FileSet findFileSet(final JMenuItem menuItem) {
 
 		int index = -1;
-		for(int i = 0; i < fileMenuList.size(); i++) {
-			
-			if(fileMenuList.get(i).getText().equalsIgnoreCase(menuItem.getText())) {
+		for (int i = 0; i < fileMenuList.size(); i++) {
+
+			if (fileMenuList.get(i).getText()
+					.equalsIgnoreCase(menuItem.getText())) {
 				index = i;
 				break;
 			}
@@ -930,8 +929,8 @@ ConfigNodePersistent {
 			return fileSetList.get(index);
 		else {
 			LogBuffer
-					.println("Sizes of FileSetList and FileMenuList in TVFrame"
-							+ "don't match.");
+			.println("Sizes of FileSetList and FileMenuList in TVFrame"
+					+ "don't match.");
 			return null;
 		}
 	}
@@ -1036,14 +1035,14 @@ ConfigNodePersistent {
 
 		return fileMru;
 	}
-	
+
 	public InputMap getInputMap() {
-		
+
 		return viewPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 	}
-	
+
 	public ActionMap getActionMap() {
-		
+
 		return viewPanel.getActionMap();
 	}
 

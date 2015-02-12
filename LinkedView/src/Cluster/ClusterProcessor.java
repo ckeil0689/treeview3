@@ -92,8 +92,8 @@ public class ClusterProcessor {
 	 *
 	 * @param distMeasure
 	 * @param axis
-	 * @return m x m distance matrix where m is the clustered axis length
-	 * of the original data matrix.
+	 * @return m x m distance matrix where m is the clustered axis length of the
+	 *         original data matrix.
 	 */
 	public double[][] calcDistance(final int distMeasure, final int axis) {
 

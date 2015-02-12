@@ -24,7 +24,7 @@ public class LabelLoadDialog {
 		labelLoadFrame = new JDialog();
 		labelLoadFrame.setTitle(StringRes.dlg_loadLabels);
 		labelLoadFrame
-		.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+				.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		labelLoadFrame.setResizable(false);
 		labelLoadFrame.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
 

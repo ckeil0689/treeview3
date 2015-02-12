@@ -37,7 +37,7 @@ public class MainProgramArgs {
 			remaining = parser.getRemainingArgs();
 		} catch (final IllegalOptionValueException e) {
 			System.err
-			.println("Error parsing args, defaulting to type auto, no file loading");
+					.println("Error parsing args, defaulting to type auto, no file loading");
 			System.err.println(e.getMessage());
 			printUsage();
 			e.printStackTrace();
@@ -47,7 +47,7 @@ public class MainProgramArgs {
 			sExportType = null;
 		} catch (final UnknownOptionException e) {
 			System.err
-			.println("Error parsing args, defaulting to type auto, no file loading");
+					.println("Error parsing args, defaulting to type auto, no file loading");
 			System.err.println(e.getMessage());
 			printUsage();
 			e.printStackTrace();
@@ -60,22 +60,22 @@ public class MainProgramArgs {
 
 	public void printUsage() {
 		System.err
-		.println("Usage: all arguments are optional. By default will open a window with no files loaded.");
+				.println("Usage: all arguments are optional. By default will open a window with no files loaded.");
 		System.err.println(" -" + resource.shortForm() + "/--"
 				+ resource.longForm()
 				+ ": resource to load (could be file or url)");
 		System.err
-		.println(" -"
-				+ filePath.shortForm()
-				+ "/--"
-				+ filePath.longForm()
-				+ ": path of file to load (deprecated, use resource arg instead)");
+				.println(" -"
+						+ filePath.shortForm()
+						+ "/--"
+						+ filePath.longForm()
+						+ ": path of file to load (deprecated, use resource arg instead)");
 		System.err
-		.println(" -"
-				+ frameType.shortForm()
-				+ "/--"
-				+ frameType.longForm()
-				+ ": string indicating type of frame (auto | linked | classic | kmeans), default is auto");
+				.println(" -"
+						+ frameType.shortForm()
+						+ "/--"
+						+ frameType.longForm()
+						+ ": string indicating type of frame (auto | linked | classic | kmeans), default is auto");
 	}
 
 	public String getFrameType() {

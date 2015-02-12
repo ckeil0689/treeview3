@@ -14,14 +14,13 @@ public class StatsDialog extends CustomDialog {
 	 *
 	 * @param viewFrame
 	 */
-	public StatsDialog(final String source, final int rowNum,
-			final int colNum) {
-		
+	public StatsDialog(final String source, final int rowNum, final int colNum) {
+
 		super("Stats");
 		setupLayout(source, rowNum, colNum);
 		dialog.add(mainPanel);
 		dialog.pack();
-		
+
 		closeBtn.requestFocusInWindow();
 	}
 
@@ -30,8 +29,8 @@ public class StatsDialog extends CustomDialog {
 	 */
 	public void setupLayout(final String source, final int rowNum,
 			final int colNum) {
-		
-		final JPanel contentPanel = GUIFactory.createJPanel(false, 
+
+		final JPanel contentPanel = GUIFactory.createJPanel(false,
 				GUIFactory.DEFAULT, null);
 
 		final JLabel srcLabel = GUIFactory.createLabel("Source: ",
@@ -57,8 +56,8 @@ public class StatsDialog extends CustomDialog {
 		final JLabel size = GUIFactory.createLabel("" + (rowNum * colNum),
 				GUIFactory.FONTS);
 
-		contentPanel.setBorder(BorderFactory.createTitledBorder(
-				"Data Statistics"));
+		contentPanel.setBorder(BorderFactory
+				.createTitledBorder("Data Statistics"));
 
 		contentPanel.add(srcLabel, "tag label");
 		contentPanel.add(srcTxt, "wrap");
@@ -68,7 +67,7 @@ public class StatsDialog extends CustomDialog {
 		contentPanel.add(cols, "wrap");
 		contentPanel.add(sizeLabel, "tag label");
 		contentPanel.add(size);
-		
+
 		mainPanel.add(contentPanel, "push, grow, wrap");
 		mainPanel.add(closeBtn, "span, al right");
 	}

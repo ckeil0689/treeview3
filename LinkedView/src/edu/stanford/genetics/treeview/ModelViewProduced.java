@@ -93,7 +93,7 @@ public abstract class ModelViewProduced extends ModelView {
 	 * The double buffer in Swing doesn't seem to be persistent across draws.
 	 * for instance, every time another window obscures one of our windows and
 	 * then moves, a repaint is triggered by most VMs.
-	 *
+	 * 
 	 * We apparently need to maintain our own persistent offscreen buffer for
 	 * speed reasons...
 	 */

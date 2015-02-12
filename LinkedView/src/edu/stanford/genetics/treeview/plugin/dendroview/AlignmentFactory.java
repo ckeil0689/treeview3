@@ -27,7 +27,7 @@ public class AlignmentFactory extends PluginFactory {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see edu.stanford.genetics.treeview.PluginFactory#getName()
 	 */
 	@Override
@@ -38,7 +38,7 @@ public class AlignmentFactory extends PluginFactory {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * edu.stanford.genetics.treeview.PluginFactory#createPlugin(edu.stanford
 	 * .genetics.treeview.ConfigNode)
@@ -64,7 +64,7 @@ public class AlignmentFactory extends PluginFactory {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * edu.stanford.genetics.treeview.PluginFactory#configurePlugin(edu.stanford
 	 * .genetics.treeview.ConfigNode, edu.stanford.genetics.treeview.ViewFrame)

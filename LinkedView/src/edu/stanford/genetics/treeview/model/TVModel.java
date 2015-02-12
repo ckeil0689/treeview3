@@ -427,7 +427,7 @@ public class TVModel extends Observable implements DataModel {
 		 * Enumeration e = genePrefix.elements(); msg += "GPREFIX: " +
 		 * e.nextElement(); for (; e.hasMoreElements() ;) { msg += " " +
 		 * e.nextElement(); }
-		 *
+		 * 
 		 * e = aHeaders.elements(); msg += "\naHeaders: " + e.nextElement(); for
 		 * (; e.hasMoreElements() ;) { msg += ":" + e.nextElement(); }
 		 */
@@ -443,9 +443,9 @@ public class TVModel extends Observable implements DataModel {
 	 * FlatFileStreamTokenizer.TT_NUMBER; err += " ttype TT_WORD = " +
 	 * FlatFileStreamTokenizer.TT_WORD; err += " '\t' = " + '\t'; err +=
 	 * " '\n' = " + '\n'; err += " '\r' = " + '\r';
-	 *
+	 * 
 	 * return err; }
-	 *
+	 * 
 	 * private void printStream(FlatFileStreamTokenizer st) throws IOException {
 	 * int tt = st.nextToken(); while (tt != st.TT_EOF) { String msg; switch(tt)
 	 * { case FlatFileStreamTokenizer.TT_WORD: msg = "Word: " + st.sval; break;
@@ -823,8 +823,8 @@ public class TVModel extends Observable implements DataModel {
 	public boolean getModified() {
 
 		return getGtrHeaderInfo().getModified() ||
-				// getGeneHeaderInfo().getModified() ||
-				// getArrayHeaderInfo().getModified() ||
+		// getGeneHeaderInfo().getModified() ||
+		// getArrayHeaderInfo().getModified() ||
 				getAtrHeaderInfo().getModified();
 	}
 

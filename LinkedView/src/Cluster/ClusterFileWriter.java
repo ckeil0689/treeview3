@@ -23,7 +23,7 @@ public class ClusterFileWriter extends BufferedWriter {
 	private final String END_OF_ROW = "\n";
 
 	public ClusterFileWriter(final File file) throws IOException,
-	FileNotFoundException {
+			FileNotFoundException {
 
 		super(new OutputStreamWriter(new FileOutputStream(
 				file.getAbsoluteFile()), "UTF-8"));

@@ -54,8 +54,8 @@ import edu.stanford.genetics.treeview.ModelViewProduced;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 
 public class GlobalView extends ModelViewProduced implements
-//MouseMotionListener, MouseListener, 
-MouseWheelListener {
+// MouseMotionListener, MouseListener,
+		MouseWheelListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -112,7 +112,7 @@ MouseWheelListener {
 	public GlobalView() {
 
 		super();
-		
+
 		setLayout(new MigLayout());
 
 		scrollPane = new JScrollPane(this,
@@ -341,8 +341,8 @@ MouseWheelListener {
 
 			final Rectangle sourceRect = new Rectangle(xmap.getIndex(0),
 					ymap.getIndex(0), xmap.getIndex(destRect.width)
-					- xmap.getIndex(0), ymap.getIndex(destRect.height)
-					- ymap.getIndex(0));
+							- xmap.getIndex(0), ymap.getIndex(destRect.height)
+							- ymap.getIndex(0));
 
 			if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
 				drawer.paint(g, sourceRect, destRect, null);
@@ -391,8 +391,8 @@ MouseWheelListener {
 
 			final Rectangle sourceRect = new Rectangle(xmap.getIndex(0),
 					ymap.getIndex(0), xmap.getIndex(destRect.width)
-					- xmap.getIndex(0), ymap.getIndex(destRect.height)
-					- ymap.getIndex(0));
+							- xmap.getIndex(0), ymap.getIndex(destRect.height)
+							- ymap.getIndex(0));
 
 			if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
 				/*
@@ -482,8 +482,8 @@ MouseWheelListener {
 
 						selectionRectList.add(new Rectangle(xBoundaries.get(0),
 								yBoundaries.get(0), xBoundaries.get(1)
-										- xBoundaries.get(0), yBoundaries
-										.get(1) - yBoundaries.get(0)));
+								- xBoundaries.get(0), yBoundaries
+								.get(1) - yBoundaries.get(0)));
 					}
 				}
 			}
@@ -631,32 +631,32 @@ MouseWheelListener {
 		revalidate();
 		repaint();
 	}
-	
+
 	/* TODO move to a specified controller class */
 	private class MatrixMouseListener extends MouseAdapter {
-		
+
 		@Override
 		public void mouseMoved(final MouseEvent e) {
 
 			setDataStatus(e);
 		}
-		
-		private void setDataStatus(MouseEvent e) {
-			
+
+		private void setDataStatus(final MouseEvent e) {
+
 			final int ooverx = overx;
 			final int oovery = overy;
 			overx = xmap.getIndex(e.getX());
 			overy = ymap.getIndex(e.getY());
-			
+
 			/* Timed repaint to avoid constant unnecessary repainting. */
-		                    
-	    	if (oovery != overy || ooverx != overx) {
+
+			if (oovery != overy || ooverx != overx) {
 				if (status != null) {
 					status.setMessages(getStatus());
 				}
 			}
 		}
-		
+
 		@Override
 		public void mouseDragged(final MouseEvent e) {
 
@@ -689,7 +689,7 @@ MouseWheelListener {
 				drawBand(dragRect);
 			}
 		}
-		
+
 		@Override
 		public void mouseReleased(final MouseEvent e) {
 
@@ -703,13 +703,15 @@ MouseWheelListener {
 
 				/* Full gene selection */
 				if (e.isShiftDown()) {
-					final Point start = new Point(xmap.getMinIndex(), startPoint.y);
+					final Point start = new Point(xmap.getMinIndex(),
+							startPoint.y);
 					final Point end = new Point(xmap.getMaxIndex(), endPoint.y);
 					selectRectangle(start, end);
 
 					/* Full array selection */
 				} else if (e.isControlDown()) {
-					final Point start = new Point(startPoint.x, ymap.getMinIndex());
+					final Point start = new Point(startPoint.x,
+							ymap.getMinIndex());
 					final Point end = new Point(endPoint.x, ymap.getMaxIndex());
 					selectRectangle(start, end);
 
@@ -724,7 +726,7 @@ MouseWheelListener {
 
 			repaint();
 		}
-		
+
 		// Mouse Listener
 		@Override
 		public void mousePressed(final MouseEvent e) {
@@ -738,7 +740,8 @@ MouseWheelListener {
 						ymap.getIndex(e.getY()));
 				endPoint.setLocation(startPoint.x, startPoint.y);
 				dragRect.setLocation(startPoint.x, startPoint.y);
-				dragRect.setSize(endPoint.x - dragRect.x, endPoint.y - dragRect.y);
+				dragRect.setSize(endPoint.x - dragRect.x, endPoint.y
+						- dragRect.y);
 
 				drawBand(dragRect);
 
@@ -753,10 +756,10 @@ MouseWheelListener {
 				arraySelection.notifyObservers();
 			}
 		}
-		
+
 		@Override
 		public void mouseEntered(final MouseEvent e) {
-			
+
 			hasMouse = true;
 			requestFocus();
 		}
@@ -774,7 +777,7 @@ MouseWheelListener {
 			status.setMessages(statustext);
 		}
 	}
-	
+
 	/**
 	 * Zooming when the mouse wheel is used in conjunction with the shift key.
 	 * Vertical scrolling if the shift key is not pressed.
@@ -785,7 +788,8 @@ MouseWheelListener {
 		final int notches = e.getWheelRotation();
 		final int shift = (notches < 0) ? -3 : 3;
 
-		//On macs' magic mouse, horizontal scroll comes in as if the shift was down
+		// On macs' magic mouse, horizontal scroll comes in as if the shift was
+		// down
 		if (e.isAltDown()) {
 			if (notches < 0) {
 				xmap.zoomIn();

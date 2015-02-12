@@ -32,7 +32,7 @@ import javax.swing.JTextArea;
 
 import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
-	
+
 public class DataTicker {
 
 	private final JPanel tickerPanel;
@@ -102,17 +102,19 @@ public class DataTicker {
 	}
 
 	public void setMessages(final String[] m) {
-		
-		for(int i = 0; i < m.length; i++) {
-			
-			if(i >= textList.size()) break;
-			
+
+		for (int i = 0; i < m.length; i++) {
+
+			if (i >= textList.size()) {
+				break;
+			}
+
 			String message = m[i];
-			
-			if(message == null || message.length() == 0) {
+
+			if (message == null || message.length() == 0) {
 				message = "-";
 			}
-			
+
 			textList.get(i).setText(message);
 		}
 	}

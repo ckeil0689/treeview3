@@ -202,9 +202,9 @@ public class KnnArrayDrawer extends DoubleArrayDrawer {
 					}
 				} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 					LogBuffer
-					.println("ArrayIndexOutOfBoundsException "
-							+ "in paint() in KnnArrayDrawer: "
-							+ e.getMessage());
+							.println("ArrayIndexOutOfBoundsException "
+									+ "in paint() in KnnArrayDrawer: "
+									+ e.getMessage());
 				}
 				arrayFirst = array + 1;
 			}

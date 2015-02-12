@@ -11,7 +11,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import net.miginfocom.swing.MigLayout;
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
 import Utilities.StringRes;
@@ -43,27 +42,27 @@ public class AboutDialog extends CustomDialog {
 	 * Setup the layout and content of the mainPanel and add it to the dialog.
 	 */
 	private void setupLayout() {
-		
-		/* 
-		 * TextArea because JLabel cannot properly line break without
-		 * manual HTML....
+
+		/*
+		 * TextArea because JLabel cannot properly line break without manual
+		 * HTML....
 		 */
-		JTextArea text = GUIFactory.createWrappableTextArea();
+		final JTextArea text = GUIFactory.createWrappableTextArea();
 		text.setText(StringRes.appName
 				+ " was created by Chris Keil, Lance Parsons,"
 				+ "Robert Leach, & Anastasia Baryshnikova and "
 				+ "is based on Alok Saldhana's Java TreeView.");
 
-		final JLabel version = GUIFactory.createLabel("Version:", 
+		final JLabel version = GUIFactory.createLabel("Version:",
 				GUIFactory.FONTS);
-		
-		final JLabel tag = GUIFactory.createLabel(StringRes.versionTag, 
+
+		final JLabel tag = GUIFactory.createLabel(StringRes.versionTag,
 				GUIFactory.FONTS);
-		
-		JPanel contentPanel = GUIFactory.createJPanel(false, 
+
+		final JPanel contentPanel = GUIFactory.createJPanel(false,
 				GUIFactory.DEFAULT, null);
-		
-		JPanel detailPanel = GUIFactory.createJPanel(false, 
+
+		final JPanel detailPanel = GUIFactory.createJPanel(false,
 				GUIFactory.DEFAULT, null);
 		detailPanel.setBorder(BorderFactory.createTitledBorder("Details"));
 

@@ -105,10 +105,9 @@ public class UrlPresets implements ConfigNodePersistent {
 		addPreset("WormBase", "http://www.wormbase.org/db/searches/"
 				+ "basic?class=AnyGene&query=HEADER&Search=Search");
 
-
-		 addPreset("Source_CloneID", "source-search.princeton.edu/"
-		 		+ "cgi-bin/source/sourceResult?"
-		 		+ "option=CloneID&choice=Gene&criteria=HEADER");
+		addPreset("Source_CloneID", "source-search.princeton.edu/"
+				+ "cgi-bin/source/sourceResult?"
+				+ "option=CloneID&choice=Gene&criteria=HEADER");
 
 		addPreset("FlyBase", "http://flybase.org/");
 

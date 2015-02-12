@@ -202,7 +202,7 @@ public class GIFEncoder {
 				for (search = 0; search < colornum; ++search) {
 					if (colors_[search * 3] == r[x][y]
 							&& colors_[search * 3 + 1] == g[x][y]
-									&& colors_[search * 3 + 2] == b[x][y]) {
+							&& colors_[search * 3 + 2] == b[x][y]) {
 						break;
 					}
 				}

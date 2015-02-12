@@ -43,7 +43,7 @@ import edu.stanford.genetics.treeview.TreeDrawerNode;
  * This is distinct from which genes are selected (see the TreeSelection object)
  */
 public class MapContainer extends Observable implements Observer,
-AdjustmentListener, ConfigNodePersistent {
+		AdjustmentListener, ConfigNodePersistent {
 
 	private final String default_map = "Fixed";
 	private double default_scale = 1.0;
@@ -212,7 +212,7 @@ AdjustmentListener, ConfigNodePersistent {
 			newScale = myMinScale;
 		}
 		setScale(newScale);
-		
+
 		notifyObservers();
 	}
 
@@ -263,7 +263,7 @@ AdjustmentListener, ConfigNodePersistent {
 			newScale = myMaxScale;
 		}
 		setScale(newScale);
-		
+
 		notifyObservers();
 	}
 
@@ -376,7 +376,7 @@ AdjustmentListener, ConfigNodePersistent {
 		if (j != i) {
 			setChanged();
 		}
-		
+
 		notifyObservers();
 	}
 
@@ -391,7 +391,7 @@ AdjustmentListener, ConfigNodePersistent {
 		if (j != scrollbar.getValue()) {
 			setChanged();
 		}
-		
+
 		notifyObservers();
 	}
 

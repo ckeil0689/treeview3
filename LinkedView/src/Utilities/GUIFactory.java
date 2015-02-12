@@ -115,10 +115,11 @@ public class GUIFactory {
 
 		return label;
 	}
-	
+
 	/**
-	 * Create a JTextArea that acts like a JLabel that can wrap. Good for 
-	 * long passages of text.
+	 * Create a JTextArea that acts like a JLabel that can wrap. Good for long
+	 * passages of text.
+	 * 
 	 * @return a JTextArea that resembles a JLabel.
 	 */
 	public static JTextArea createWrappableTextArea() {

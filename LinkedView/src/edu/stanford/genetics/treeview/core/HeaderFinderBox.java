@@ -144,7 +144,7 @@ public abstract class HeaderFinderBox {
 		AutoCompleteDecorator.decorate(searchTermBox);
 
 		searchTermBox.getEditor().getEditorComponent()
-		.addKeyListener(new BoxKeyListener());
+				.addKeyListener(new BoxKeyListener());
 	}
 
 	/**
@@ -280,9 +280,9 @@ public abstract class HeaderFinderBox {
 		}
 
 		if ((indexList.size() > 0) &&
-				// At least part of the found min/max selected area is not visible
-				// This assumes that min is less than max and that the visible area is a
-				// contiguous block of visible indexes
+		// At least part of the found min/max selected area is not visible
+		// This assumes that min is less than max and that the visible area is a
+		// contiguous block of visible indexes
 				(minIndex < globalSmap.getFirstVisible() || maxIndex > (globalSmap
 						.getFirstVisible() + globalSmap.getNumVisible() - 1))) {
 
@@ -296,7 +296,7 @@ public abstract class HeaderFinderBox {
 
 		if ((otherIndexList.size() == 0
 				|| otherMinIndex < globalOmap.getFirstVisible() || otherMaxIndex > (globalOmap
-						.getFirstVisible() + globalOmap.getNumVisible() - 1))) {
+				.getFirstVisible() + globalOmap.getNumVisible() - 1))) {
 
 			// LogBuffer.println("Search result: [" + minIndex + " < " +
 			// globalSmap.getFirstVisible() + "] || [" + maxIndex + " > (" +
@@ -400,7 +400,7 @@ public abstract class HeaderFinderBox {
 	 *
 	 */
 	class BoxKeyListener extends KeyAdapter {
-		
+
 		private int selStartPressed = 0;
 		private int selEndPressed = 0;
 		private int lenPressed = 0;
@@ -447,14 +447,14 @@ public abstract class HeaderFinderBox {
 		// to make it work better...
 		@Override
 		public void keyReleased(final KeyEvent e) {
-			
+
 			/* If enter key is pressed, search */
-			if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+			if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 				LogBuffer.println("search initialized");
 				seekAll();
 				return;
 			}
-			
+
 			final int selStartRel = editor.getSelectionStart(); // Selection
 			// start before
 			// having typed
@@ -499,11 +499,11 @@ public abstract class HeaderFinderBox {
 			else if (!changed && lenPressed == lenRel) {
 				if (selStartPressed != selEndPressed
 						&& (e.getKeyCode() == KeyEvent.VK_RIGHT || e
-								.getKeyCode() == KeyEvent.VK_LEFT)
+						.getKeyCode() == KeyEvent.VK_LEFT)
 						&& e.getModifiers() == 0) {
 					if (debug) {
 						LogBuffer
-								.println("Positioning cursor at edge of selection...");
+						.println("Positioning cursor at edge of selection...");
 					}
 					if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
 						editor.setSelectionStart(selEndPressed);
@@ -529,12 +529,12 @@ public abstract class HeaderFinderBox {
 			} else {
 				if (debug) {
 					LogBuffer
-							.println("Nothing to do because changed is "
-									+ (changed ? "" : "not ")
-									+ "true, the length has "
-									+ (lenPressed == lenRel ? "not " : "")
-									+ "changed and not sideways arrow keys were pressed and there were "
-									+ e.getModifiers() + " modifiers.");
+					.println("Nothing to do because changed is "
+							+ (changed ? "" : "not ")
+							+ "true, the length has "
+							+ (lenPressed == lenRel ? "not " : "")
+							+ "changed and not sideways arrow keys were pressed and there were "
+							+ e.getModifiers() + " modifiers.");
 				}
 			}
 
@@ -543,7 +543,7 @@ public abstract class HeaderFinderBox {
 
 		@Override
 		public void keyTyped(final KeyEvent e) {
-			
+
 			// There's a weird case where sometimes hitting backspace after
 			// having manually selected some text causes the selection end to
 			// decrement. The selection end in the keyPressed function always
@@ -643,8 +643,8 @@ public abstract class HeaderFinderBox {
 						} else if (selEndTyped == lenTyped) {
 							if (debug) {
 								LogBuffer
-										.println("Edited case 2a: substring(0, "
-												+ selStartTyped + ").");
+								.println("Edited case 2a: substring(0, "
+										+ selStartTyped + ").");
 							}
 							if (selStartTyped == 0) {
 								searchTermBox.setSelectedIndex(0);
@@ -683,7 +683,7 @@ public abstract class HeaderFinderBox {
 				if (searchTermBox.getSelectedIndex() == -1) {
 					if (debug) {
 						LogBuffer
-								.println("Trying to force editing manually selected text to work");
+						.println("Trying to force editing manually selected text to work");
 					}
 
 					if (lenTyped > 0) {
@@ -712,8 +712,8 @@ public abstract class HeaderFinderBox {
 						} else if (selEndTyped == lenTyped) {
 							if (debug) {
 								LogBuffer
-										.println("Edited case 2b: substring(0, "
-												+ selStartTyped + ").");
+								.println("Edited case 2b: substring(0, "
+										+ selStartTyped + ").");
 							}
 							if (selStartTyped == 0) {
 								searchTermBox.setSelectedIndex(0);
@@ -766,8 +766,8 @@ public abstract class HeaderFinderBox {
 
 					if (debug) {
 						LogBuffer
-								.println("Trying to force a selection to be made 1.  Current text: ["
-										+ content + "].");
+						.println("Trying to force a selection to be made 1.  Current text: ["
+								+ content + "].");
 					}
 
 					// searchTermBox.setKeySelectionManager(searchTermBox.getKeySelectionManager());
@@ -834,7 +834,7 @@ public abstract class HeaderFinderBox {
 						if (selEndTyped == lenTyped) {
 							if (debug) {
 								LogBuffer
-										.println("Trying to force the selection to regress");
+								.println("Trying to force the selection to regress");
 							}
 							// Put the cursor at 1 before the beginning of the
 							// previously selected text (because that text is
@@ -856,8 +856,8 @@ public abstract class HeaderFinderBox {
 
 								if (debug) {
 									LogBuffer
-											.println("Trying to force a selection to be made 2.  Current text: ["
-													+ content + "].");
+									.println("Trying to force a selection to be made 2.  Current text: ["
+											+ content + "].");
 								}
 
 								// searchTermBox.setKeySelectionManager(searchTermBox.getKeySelectionManager());
@@ -904,7 +904,7 @@ public abstract class HeaderFinderBox {
 						&& (selEndTyped + 1) == selEndPressed) {
 					if (debug) {
 						LogBuffer
-								.println("Trying to force a selection to be made 3");
+						.println("Trying to force a selection to be made 3");
 					}
 					if ((selStartTyped - 1) > 0) {
 						// Get the current text content

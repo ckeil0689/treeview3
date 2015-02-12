@@ -315,7 +315,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see edu.stanford.genetics.treeview.DataModel#getDocumentConfig()
 	 */
 	@Override
@@ -328,7 +328,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see edu.stanford.genetics.treeview.DataModel#getSource()
 	 */
 	@Override
@@ -365,7 +365,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see edu.stanford.genetics.treeview.DataModel
 	 * #setModelForCompare(edu.stanford.genetics.treeview.DataModel)
 	 */
@@ -375,7 +375,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see edu.stanford.genetics.treeview.DataModel#getFileSet()
 	 */
 	@Override
@@ -394,7 +394,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see edu.stanford.genetics.treeview.DataModel#getGeneHeaderInfo()
 	 */
 	@Override
@@ -408,7 +408,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see edu.stanford.genetics.treeview.DataModel#getArrayHeaderInfo()
 	 */
 	@Override
@@ -422,7 +422,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see edu.stanford.genetics.treeview.DataModel#getGtrHeaderInfo()
 	 */
 	@Override
@@ -436,7 +436,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see edu.stanford.genetics.treeview.DataModel#getAtrHeaderInfo()
 	 */
 	@Override
@@ -450,7 +450,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see edu.stanford.genetics.treeview.DataModel#getType()
 	 */
 	@Override
@@ -461,7 +461,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see edu.stanford.genetics.treeview.DataModel#getDataMatrix()
 	 */
 	@Override
@@ -472,7 +472,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see edu.stanford.genetics.treeview.DataModel
 	 * #append(edu.stanford.genetics.treeview.DataModel)
 	 */
@@ -482,7 +482,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see edu.stanford.genetics.treeview.DataModel#removeAppended()
 	 */
 	@Override

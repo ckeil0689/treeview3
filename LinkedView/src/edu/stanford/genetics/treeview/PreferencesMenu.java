@@ -30,7 +30,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.FontSettings;
  *
  */
 public class PreferencesMenu extends CustomDialog implements
-		ConfigNodePersistent {
+ConfigNodePersistent {
 
 	private final TreeViewFrame tvFrame;
 	private HeaderInfo geneHI;
@@ -136,7 +136,7 @@ public class PreferencesMenu extends CustomDialog implements
 
 		if (annotationSettings != null)
 			return new int[] { annotationSettings.getSelectedGeneIndex(),
-				annotationSettings.getSelectedArrayIndex() };
+					annotationSettings.getSelectedArrayIndex() };
 		else {
 			LogBuffer.println("AnnotationSettings object was null. "
 					+ "Could not get selected indeces.");
@@ -344,8 +344,8 @@ public class PreferencesMenu extends CustomDialog implements
 			mainPanel.add(rowRadioBtnPanel, "pushx, alignx 50%, w 45%");
 			mainPanel.add(colRadioBtnPanel, "pushx, alignx 50%, w 45%, wrap");
 
-			//Commented out for version 3.0alpha1 because it doesn't work yet
-			//mainPanel.add(custom_button, "pushx, alignx 50%, span");
+			// Commented out for version 3.0alpha1 because it doesn't work yet
+			// mainPanel.add(custom_button, "pushx, alignx 50%, span");
 
 		}
 

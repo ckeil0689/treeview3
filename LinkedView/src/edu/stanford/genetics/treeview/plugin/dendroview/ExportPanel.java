@@ -207,7 +207,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		if (drawSelected()) {
 			if (geneTreeDrawer == null) {
 				LogBuffer
-				.println("ExportPanel.getMinGeneCorr: geneTreeDrawer null");
+						.println("ExportPanel.getMinGeneCorr: geneTreeDrawer null");
 			}
 			final TreeSelectionI selection = getGeneSelection();
 			if (selection == null) {
@@ -216,14 +216,14 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			final String selectedId = selection.getSelectedNode();
 			if (selectedId == null) {
 				LogBuffer
-				.println("ExportPanel.getMinGeneCorr: selectedId null");
+						.println("ExportPanel.getMinGeneCorr: selectedId null");
 			}
 			final TreeDrawerNode selectedNode = geneTreeDrawer
 					.getNodeById(selectedId);
 			if (selectedNode == null) {
 				LogBuffer
-				.println("ExportPanel.getMinGeneCorr: selectedNode null , id "
-						+ selectedId);
+						.println("ExportPanel.getMinGeneCorr: selectedNode null , id "
+								+ selectedId);
 			}
 			return selectedNode.getCorr();
 		} else
@@ -868,11 +868,11 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		final double minCorr = getMinGeneCorr();
 		final LinearTransformation xScaleEq = new LinearTransformation(minCorr,
 				destRect.x, geneTreeDrawer.getCorrMax(), destRect.x
-				+ destRect.width);
+						+ destRect.width);
 
 		final LinearTransformation yScaleEq = new LinearTransformation(
 				minGene(), destRect.y, maxGene() + 1, destRect.y
-				+ destRect.height);
+						+ destRect.height);
 
 		// draw
 		geneTreeDrawer.paintSubtree(g, xScaleEq, yScaleEq, destRect,
@@ -898,7 +898,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		destRect.setBounds(x, y, width, height);
 		final LinearTransformation xScaleEq = new LinearTransformation(
 				minArray(), destRect.x, maxArray() + 1, destRect.x
-				+ destRect.width);
+						+ destRect.width);
 		double minCorr = arrayTreeDrawer.getCorrMin();
 		if (drawSelected()) {
 			minCorr = arrayTreeDrawer.getNodeById(
@@ -906,7 +906,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		}
 		final LinearTransformation yScaleEq = new LinearTransformation(minCorr,
 				destRect.y, arrayTreeDrawer.getCorrMax(), destRect.y
-				+ destRect.height);
+						+ destRect.height);
 
 		// draw
 		arrayTreeDrawer.paintSubtree(g, xScaleEq, yScaleEq, destRect,
@@ -1689,7 +1689,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 						inclusionPanel.updateSize();
 						geneSummary.setIncluded(geneList.getSelectedIndices());
 						arraySummary
-						.setIncluded(arrayList.getSelectedIndices());
+								.setIncluded(arrayList.getSelectedIndices());
 					}
 					if (previewPanel != null) {
 						previewPanel.updatePreview();

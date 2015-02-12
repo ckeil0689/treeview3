@@ -55,7 +55,7 @@ import edu.stanford.genetics.treeview.core.FileMru;
  * @version @version $Revision: 1.37 $ $Date: 2009-08-26 11:48:27 $
  */
 public abstract class ViewFrame extends Observable implements Observer,
-		ConfigNodePersistent {
+ConfigNodePersistent {
 	// extends JFrame implements Observer {
 
 	// Main application frame
@@ -221,7 +221,7 @@ public abstract class ViewFrame extends Observable implements Observer,
 		final Dimension screenSize = toolkit.getScreenSize();
 		final Insets screenInsets = toolkit.getScreenInsets(GraphicsEnvironment
 				.getLocalGraphicsEnvironment().getScreenDevices()[0]
-						.getDefaultConfiguration());
+				.getDefaultConfiguration());
 		final int taskbarHeight = screenInsets.bottom;
 
 		appFrame.setSize(new Dimension(screenSize.width, screenSize.height
@@ -577,7 +577,7 @@ public abstract class ViewFrame extends Observable implements Observer,
 		} catch (final IOException e) {
 			LogBuffer.logException(e);
 			final String message = new StringBuffer("Problem loading url: ")
-			.append(e).toString();
+					.append(e).toString();
 			JOptionPane.showMessageDialog(appFrame, message);
 		}
 	}
@@ -826,20 +826,20 @@ public abstract class ViewFrame extends Observable implements Observer,
 
 			// hmm... I'll just assume that there's no accept all.
 			fileDialog
-			.addChoosableFileFilter(new javax.swing.filechooser.FileFilter() {
+					.addChoosableFileFilter(new javax.swing.filechooser.FileFilter() {
 
-				@Override
-				public boolean accept(final File f) {
+						@Override
+						public boolean accept(final File f) {
 
-					return true;
-				}
+							return true;
+						}
 
-				@Override
-				public String getDescription() {
+						@Override
+						public String getDescription() {
 
-					return "All Files";
-				}
-			});
+							return "All Files";
+						}
+					});
 		}
 
 		fileDialog.setFileFilter(ff);

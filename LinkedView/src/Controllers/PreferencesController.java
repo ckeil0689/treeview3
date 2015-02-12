@@ -298,7 +298,7 @@ public class PreferencesController {
 			final String[] oldNames = headerInfo.getNames();
 
 			final String[][] headersToAdd = new String[oldHeaders.length
-			                                           + headerNum][];
+					+ headerNum][];
 
 			// Iterate over loadedLabels
 			for (int i = 0; i < oldHeaders.length; i++) {
