@@ -6,6 +6,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 import edu.stanford.genetics.treeview.LogBuffer;
 
@@ -16,18 +20,96 @@ import edu.stanford.genetics.treeview.LogBuffer;
  * @author CKeil
  *
  */
-public class ClusterFileWriter extends BufferedWriter {
+public class ClusterFileWriter {
 
-	private final File file;
 	private final String SEPARATOR = "\t";
 	private final String END_OF_ROW = "\n";
+	
+	private File file;
+	private BufferedWriter bw;
 
-	public ClusterFileWriter(final File file) throws IOException,
-	FileNotFoundException {
-
-		super(new OutputStreamWriter(new FileOutputStream(
-				file.getAbsoluteFile()), "UTF-8"));
+	public ClusterFileWriter(final String fileName, final String fileEnd) {
+		
+		String dir = setFolder(fileName);
+		setFile(dir, fileName, fileEnd);
+		setupWriter();
+	}
+	
+	/**
+	 * Creates a folder with the general file name to store all
+	 * variations and subfiles of clustering in one folder.
+	 * @param fileName
+	 * @return The file directory.
+	 */
+	private String setFolder(String fileName) {
+		
+		File file = new File(fileName);
+		
+		/* Create folder if it does not exist */
+		if(!(file.exists() && file.isDirectory())) {
+			file.mkdirs();
+		}
+		
+		return fileName += "/" + fileName;
+	}
+	
+	private void setFile(String dir, String fileName, String fileEnd) {
+		
+		String fullFileID = dir + fileName + fileEnd;
+		File file = new File(fullFileID);
+		
+		try {
+			if(file.exists()) {
+				int n = JOptionPane.showConfirmDialog(
+					    JFrame.getFrames()[0],
+					    "File already exists (" + fullFileID + "). Overwrite?",
+					    "Confirm File Storage",
+					    JOptionPane.YES_NO_OPTION);
+				
+				switch(n) {
+				
+				case JOptionPane.YES_OPTION:
+					file.createNewFile();
+					break;
+				case JOptionPane.NO_OPTION:
+				default: 
+					file = getNewFile(dir, fileName, fileEnd);
+					file.createNewFile();
+					break;
+				}
+			}
+		} catch (IOException e) {
+			LogBuffer.logException(e);
+		}
+		
 		this.file = file;
+	}
+	
+	private File getNewFile(String dir, String oldName, String fileEnd) {
+		
+		File file = new File(oldName + fileEnd);
+		int fileCount = 0;
+		
+		while(file.exists()) {
+			fileCount++;
+			file = new File(dir + oldName + "_" + fileCount + fileEnd);
+		}
+		
+		return file;
+	}
+	
+	private void setupWriter() {
+		
+		try {
+			bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
+					file.getAbsoluteFile()), "UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -42,7 +124,7 @@ public class ClusterFileWriter extends BufferedWriter {
 		final String content = doParse(input);
 
 		try {
-			write(content);
+			bw.write(content);
 
 		} catch (final IOException e) {
 
@@ -55,7 +137,7 @@ public class ClusterFileWriter extends BufferedWriter {
 	public void closeWriter() {
 
 		try {
-			close();
+			bw.close();
 
 		} catch (final IOException e) {
 

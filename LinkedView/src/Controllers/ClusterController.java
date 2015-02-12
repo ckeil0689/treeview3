@@ -265,6 +265,8 @@ public class ClusterController {
 
 			if (distMatrix == null || isCancelled())
 				return null;
+			
+			distMatrix.writeMatrix(axisPrefix);
 
 			publish("Clustering " + axisPrefix + " data...");
 

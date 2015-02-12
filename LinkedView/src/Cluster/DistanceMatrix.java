@@ -1,5 +1,14 @@
 package Cluster;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
 import Utilities.Helper;
 
 public class DistanceMatrix {
@@ -194,5 +203,61 @@ public class DistanceMatrix {
 	public int getMinColIndex() {
 
 		return min_col_index;
+	}
+	
+	public void writeMatrix(String axis) {
+		
+		String fileName = "test_distMatrix_" + axis + ".txt";
+		File file = new File(fileName);
+		try {
+			if(file.exists()) {
+				int n = JOptionPane.showConfirmDialog(
+					    JFrame.getFrames()[0],
+					    "File already exists. Overwrite?",
+					    "Confirmation",
+					    JOptionPane.YES_NO_OPTION);
+				
+				switch(n) {
+				
+				case JOptionPane.YES_OPTION:
+					file.createNewFile();
+					break;
+				case JOptionPane.NO_OPTION:
+				default: 
+					file = getNewFile(fileName);
+					file.createNewFile();
+					break;
+				}
+			}
+			
+			BufferedWriter bw = new BufferedWriter((new OutputStreamWriter(
+					new FileOutputStream(file.getAbsoluteFile()), "UTF-8")));
+			
+			for(double[] row : matrix) {
+				for(double val : row) {
+					bw.write(Double.toString(val) + "\t");
+				}
+				bw.write("\n");
+			}
+			
+			bw.close();
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private File getNewFile(String oldName) {
+		
+		File file = new File(oldName);
+		int fileCount = 0;
+		
+		while(file.exists()) {
+			fileCount++;
+			file = new File("test_distMatrix_" + fileCount + ".txt");
+		}
+		
+		return file;
 	}
 }

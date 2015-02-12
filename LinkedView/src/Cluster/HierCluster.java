@@ -1,8 +1,6 @@
 package Cluster;
 
 import java.awt.Frame;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -463,25 +461,7 @@ public class HierCluster {
 			fileSuffix = ".atr";
 		}
 
-		fileName += fileSuffix;
-
-		final File file = new File(fileName);
-
-		try {
-			file.createNewFile();
-			bufferedWriter = new ClusterFileWriter(file);
-
-		} catch (final IOException e) {
-			LogBuffer.logException(e);
-			final String message = "There was trouble when trying to setup the"
-					+ "buffered writer to save ATR or GTR files.";
-			JOptionPane.showMessageDialog(Frame.getFrames()[0], message,
-					"Error", JOptionPane.ERROR_MESSAGE);
-			LogBuffer.println("Setting up buffered writer failed.");
-			return;
-		}
-
-		LogBuffer.println("Tree file writer setup successful.");
+		bufferedWriter = new ClusterFileWriter(fileName, fileSuffix);
 	}
 
 	/**

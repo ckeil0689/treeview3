@@ -1,13 +1,11 @@
 package Cluster;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import Controllers.ClusterController;
-import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
  * Performs the calculations of the k-means algorithm.
@@ -76,16 +74,7 @@ public class KMeansCluster {
 		final String fileEnd = (axis == ClusterController.ROW) ? "_K_G" + k
 				+ ".kgg" : "_K_A" + k + ".kag";
 
-		final File file = new File(fileName + fileEnd);
-
-		try {
-			file.createNewFile();
-			bufferedWriter = new ClusterFileWriter(file);
-
-		} catch (final IOException e) {
-			LogBuffer.println(e.getMessage());
-			e.printStackTrace();
-		}
+		bufferedWriter = new ClusterFileWriter(fileName, fileEnd);
 	}
 
 	/**

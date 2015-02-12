@@ -95,15 +95,8 @@ public class CDTGenerator {
 
 			fileEnd = "_K" + rowC + colC + ".cdt";
 		}
-
-		final File file = new File(fileName + fileEnd);
-		try {
-			file.createNewFile();
-			this.bufferedWriter = new ClusterFileWriter(file);
-
-		} catch (final IOException e) {
-			LogBuffer.logException(e);
-		}
+		
+		this.bufferedWriter = new ClusterFileWriter(fileName, fileEnd);
 	}
 
 	/**

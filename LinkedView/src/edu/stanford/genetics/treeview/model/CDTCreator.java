@@ -26,7 +26,6 @@ import edu.stanford.genetics.treeview.TreeViewFrame;
  */
 public class CDTCreator {
 
-	private final WelcomeView loadProgView;
 	private BufferedReader reader = null;
 	private final File file;
 	private final File customFile;
@@ -80,7 +79,6 @@ public class CDTCreator {
 		this.file = file;
 		this.customFile = file2;
 		this.fileType = fileType;
-		this.loadProgView = tvFrame.getWelcomeView();
 	}
 
 	public void createFile() throws IOException {
@@ -124,7 +122,7 @@ public class CDTCreator {
 			WelcomeView.setLoadText("Writing CDT file...");
 			generateCDT();
 
-			bw.close();
+			bw.closeWriter();
 
 		} catch (final FileNotFoundException e) {
 			e.printStackTrace();
@@ -384,17 +382,9 @@ public class CDTCreator {
 		final String fileName = file.getAbsolutePath().substring(0,
 				file.getAbsolutePath().length() - fileType.length());
 
-		try {
-			final File file2 = new File(fileName + fileEnd);
-			file2.createNewFile();
-
-			filePath = file2.getAbsolutePath();
-
-			bw = new ClusterFileWriter(file2);
-
-		} catch (final IOException e) {
-			e.printStackTrace();
-		}
+		bw = new ClusterFileWriter(fileName, fileEnd);
+			
+		filePath = bw.getFilePath();
 	}
 
 	/**
