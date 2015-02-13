@@ -74,7 +74,40 @@ public class ClusterFileWriter {
 			}				
 		}
 		
-		return fileDirectory.substring(startIndex + 1, fileDirectory.length());
+		return checkSuffixes(fileDirectory.substring(startIndex + 1, 
+				fileDirectory.length()));
+	}
+	
+	private String checkSuffixes(String name) {
+		
+		String single_suff = "_single";
+		String complete_suff = "_complete";
+		String average_suff = "_average";
+		String kmeans_suff = "_kmeans";
+		
+		int start_s = name.length() - single_suff.length();
+		int start_c = name.length() - complete_suff.length();
+		int start_a = name.length() - average_suff.length();
+		int start_k = name.length() - kmeans_suff.length();
+		
+		int end;
+		if(start_s > 0 && name.substring(start_s, name.length())
+				.equalsIgnoreCase(single_suff)) {
+			end = start_s;
+		} else if(start_c > 0 && name.substring(start_c, name.length())
+				.equalsIgnoreCase(complete_suff)) {
+			end = start_c;
+		} else if(start_a > 0 && name.substring(start_a, name.length())
+				.equalsIgnoreCase(average_suff)) {
+			end = start_a;
+		} else if(start_k > 0 && name.substring(start_k, name.length())
+				.equalsIgnoreCase(kmeans_suff)) {
+			end = start_k;
+		} else {
+			end = name.length();
+		}
+		
+		return name.substring(0, end);
 	}
 	
 	/**
@@ -99,7 +132,7 @@ public class ClusterFileWriter {
 	private void setFile(String dir, String fileName, String linkName, 
 			String fileEnd) {
 		
-		String fullFileID = dir + fileName + linkName + fileEnd;
+		String fullFileID = dir + fileName +  "_" + linkName + fileEnd;
 		File file = new File(fullFileID);
 		
 		try {
