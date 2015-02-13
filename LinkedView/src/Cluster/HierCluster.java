@@ -21,9 +21,9 @@ import edu.stanford.genetics.treeview.LogBuffer;
 public class HierCluster {
 
 	/* Correspond to the JCombobox positions in ClusterView */
-	private final static int SINGLE = 0;
-	private final static int COMPLETE = 1;
-	private final static int AVG = 2;
+	protected final static int SINGLE = 0;
+	protected final static int COMPLETE = 1;
+	protected final static int AVG = 2;
 
 	/*
 	 * IMPORTANT NOTE: The variable prefixes row- and col- refer to the current
@@ -445,8 +445,6 @@ public class HierCluster {
 	 */
 	public void setupFileWriter(final int axis, String fileName) {
 
-		LogBuffer.println("Setting up file writer in HierCluster.");
-
 		/*
 		 * Setting up labels for ATR and GTR tree files and file name for
 		 * writing.
@@ -460,8 +458,9 @@ public class HierCluster {
 			this.axisPrefix = "ARRY";
 			fileSuffix = ".atr";
 		}
-
-		bufferedWriter = new ClusterFileWriter(fileName, fileSuffix);
+		
+		bufferedWriter = new ClusterFileWriter(fileName, fileSuffix, 
+				linkMethod);
 	}
 
 	/**

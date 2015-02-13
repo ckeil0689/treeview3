@@ -28,34 +28,78 @@ public class ClusterFileWriter {
 	private File file;
 	private BufferedWriter bw;
 
-	public ClusterFileWriter(final String fileName, final String fileEnd) {
+	public ClusterFileWriter(final String fileDirectory, final String fileEnd,
+			final int linkMethod) {
 		
-		String dir = setFolder(fileName);
-		setFile(dir, fileName, fileEnd);
+		String linkName = getLinkName(linkMethod);
+		String fileName = getName(fileDirectory);
+		String dir = setFolder(fileDirectory, linkName);
+		setFile(dir, fileName, linkName, fileEnd);
 		setupWriter();
+	}
+	
+	private String getLinkName(int link) {
+		
+		String linkName;
+		switch(link) {
+		
+		case HierCluster.SINGLE:
+			linkName = "single";
+			break;
+		case HierCluster.AVG: 
+			linkName = "average";
+			break;
+		case HierCluster.COMPLETE:
+			linkName = "complete";
+			break;
+		case KMeansCluster.KMEANS:
+			linkName = "kmeans";
+			break;
+		default:
+			linkName = "no_link";
+			break;
+		}
+		
+		return linkName;
+	}
+	
+	private String getName(String fileDirectory) {
+		
+		char[] nameArray = fileDirectory.toCharArray();
+		int startIndex = 0;
+		for(int i = 0; i < nameArray.length; i++) {
+			
+			if(nameArray[i] == File.separatorChar) {
+				startIndex = i;
+			}				
+		}
+		
+		return fileDirectory.substring(startIndex + 1, fileDirectory.length());
 	}
 	
 	/**
 	 * Creates a folder with the general file name to store all
 	 * variations and subfiles of clustering in one folder.
-	 * @param fileName
-	 * @return The file directory.
+	 * @param fileDir The directory plus file name without file type.
+	 * @return The main file's directory.
 	 */
-	private String setFolder(String fileName) {
+	private String setFolder(String fileDir, String linkName) {
 		
-		File file = new File(fileName);
+		String newDir = fileDir + File.separator + linkName;
+		File file = new File(newDir);
 		
 		/* Create folder if it does not exist */
 		if(!(file.exists() && file.isDirectory())) {
 			file.mkdirs();
 		}
 		
-		return fileName += "/" + fileName;
+		return newDir += File.separator;
 	}
 	
-	private void setFile(String dir, String fileName, String fileEnd) {
+	private void setFile(String dir, String fileName, String linkName, 
+			String fileEnd) {
 		
-		String fullFileID = dir + fileName + fileEnd;
+		String fullFileID = dir + fileName + linkName + fileEnd;
 		File file = new File(fullFileID);
 		
 		try {

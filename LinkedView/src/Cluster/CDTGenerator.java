@@ -71,7 +71,8 @@ public class CDTGenerator {
 	 *
 	 * @throws IOException
 	 */
-	public void setupWriter(final String fileName, final Integer[] spinnerInput) {
+	public void setupWriter(final String fileName, final int link, 
+			final Integer[] spinnerInput) {
 
 		String fileEnd = "";
 
@@ -96,7 +97,7 @@ public class CDTGenerator {
 			fileEnd = "_K" + rowC + colC + ".cdt";
 		}
 		
-		this.bufferedWriter = new ClusterFileWriter(fileName, fileEnd);
+		this.bufferedWriter = new ClusterFileWriter(fileName, fileEnd, link);
 	}
 
 	/**

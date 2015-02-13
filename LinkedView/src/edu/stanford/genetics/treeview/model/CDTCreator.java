@@ -382,7 +382,7 @@ public class CDTCreator {
 		final String fileName = file.getAbsolutePath().substring(0,
 				file.getAbsolutePath().length() - fileType.length());
 
-		bw = new ClusterFileWriter(fileName, fileEnd);
+		bw = new ClusterFileWriter(fileName, fileEnd, -1);
 			
 		filePath = bw.getFilePath();
 	}

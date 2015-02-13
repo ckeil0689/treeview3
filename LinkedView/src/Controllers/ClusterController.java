@@ -333,7 +333,8 @@ public class ClusterController {
 					reorderedCols, rowSimilarity, colSimilarity,
 					isHierarchical());
 
-			cdtGen.setupWriter(fileName, clusterView.getSpinnerValues());
+			cdtGen.setupWriter(fileName, clusterView.getLinkMethod(), 
+					clusterView.getSpinnerValues());
 
 			final IntHeaderInfo geneHeaderI = tvModel.getRowHeaderInfo();
 			final IntHeaderInfo arrayHeaderI = tvModel.getColumnHeaderInfo();

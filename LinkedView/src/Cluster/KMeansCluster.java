@@ -14,6 +14,8 @@ import Controllers.ClusterController;
  *
  */
 public class KMeansCluster {
+	
+	protected final static int KMEANS = 3;
 
 	private ClusterFileWriter bufferedWriter; /* Writer to save data */
 
@@ -62,7 +64,6 @@ public class KMeansCluster {
 		setupFileWriter(fileName);
 		prepare();
 	}
-
 	/**
 	 * Sets up a buffered writer used to save the data created during the
 	 * process of k-means clustering.
@@ -74,7 +75,7 @@ public class KMeansCluster {
 		final String fileEnd = (axis == ClusterController.ROW) ? "_K_G" + k
 				+ ".kgg" : "_K_A" + k + ".kag";
 
-		bufferedWriter = new ClusterFileWriter(fileName, fileEnd);
+		bufferedWriter = new ClusterFileWriter(fileName, fileEnd, -1);
 	}
 
 	/**
