@@ -35,7 +35,7 @@ public class ClusterFileWriter {
 		String fileName = getName(fileDirectory);
 		String rootDir = getRootDir(fileDirectory, fileName);
 		String subDir = setLinkDir(rootDir, fileName, linkName);
-		setFile(subDir, fileName, linkName, fileEnd); /* TODO find root */
+		setFile(subDir, fileName, linkName, fileEnd);
 		setupWriter();
 	}
 	
@@ -77,12 +77,10 @@ public class ClusterFileWriter {
 		
 		return getRootFileName(fileDirectory.substring(startIndex + 1, 
 				fileDirectory.length()));
-//		return fileDirectory.substring(startIndex + 1, fileDirectory.length());
 	}
 	
 	private String getRootDir(String fileDirectory, String fileName) {
 		
-//		int cutoff = fileDirectory.length() - fileName.length();
 		int first = fileDirectory.indexOf(fileName, 0);
 		
 		return fileDirectory.substring(0, first);
