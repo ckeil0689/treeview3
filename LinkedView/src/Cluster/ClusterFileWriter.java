@@ -33,8 +33,9 @@ public class ClusterFileWriter {
 		
 		String linkName = getLinkName(linkMethod);
 		String fileName = getName(fileDirectory);
-		String dir = setFolder(fileDirectory, linkName);
-		setFile(dir, fileName, linkName, fileEnd);
+		String rootDir = getRootDir(fileDirectory, fileName);
+		String subDir = setLinkDir(rootDir, fileName, linkName);
+		setFile(subDir, fileName, linkName, fileEnd); /* TODO find root */
 		setupWriter();
 	}
 	
@@ -74,33 +75,49 @@ public class ClusterFileWriter {
 			}				
 		}
 		
-		return checkSuffixes(fileDirectory.substring(startIndex + 1, 
+		return getRootFileName(fileDirectory.substring(startIndex + 1, 
 				fileDirectory.length()));
+//		return fileDirectory.substring(startIndex + 1, fileDirectory.length());
 	}
 	
-	private String checkSuffixes(String name) {
+	private String getRootDir(String fileDirectory, String fileName) {
+		
+//		int cutoff = fileDirectory.length() - fileName.length();
+		int first = fileDirectory.indexOf(fileName, 0);
+		
+		return fileDirectory.substring(0, first);
+	}
+	
+	private String getRootFileName(String name) {
 		
 		String single_suff = "_single";
 		String complete_suff = "_complete";
 		String average_suff = "_average";
 		String kmeans_suff = "_kmeans";
 		
-		int start_s = name.length() - single_suff.length();
-		int start_c = name.length() - complete_suff.length();
-		int start_a = name.length() - average_suff.length();
-		int start_k = name.length() - kmeans_suff.length();
+		int start_s = name.indexOf(single_suff, 0);
+		int end_s = start_s + single_suff.length();
+		
+		int start_c = name.indexOf(complete_suff, 0);
+		int end_c = start_c + complete_suff.length();
+		
+		int start_a = name.indexOf(average_suff, 0);
+		int end_a = start_a + average_suff.length();
+		
+		int start_k = name.indexOf(kmeans_suff, 0);;
+		int end_k = start_k + kmeans_suff.length();
 		
 		int end;
-		if(start_s > 0 && name.substring(start_s, name.length())
+		if(start_s > 0 && name.substring(start_s, end_s)
 				.equalsIgnoreCase(single_suff)) {
 			end = start_s;
-		} else if(start_c > 0 && name.substring(start_c, name.length())
+		} else if(start_c > 0 && name.substring(start_c, end_c)
 				.equalsIgnoreCase(complete_suff)) {
 			end = start_c;
-		} else if(start_a > 0 && name.substring(start_a, name.length())
+		} else if(start_a > 0 && name.substring(start_a, end_a)
 				.equalsIgnoreCase(average_suff)) {
 			end = start_a;
-		} else if(start_k > 0 && name.substring(start_k, name.length())
+		} else if(start_k > 0 && name.substring(start_k, end_k)
 				.equalsIgnoreCase(kmeans_suff)) {
 			end = start_k;
 		} else {
@@ -116,23 +133,24 @@ public class ClusterFileWriter {
 	 * @param fileDir The directory plus file name without file type.
 	 * @return The main file's directory.
 	 */
-	private String setFolder(String fileDir, String linkName) {
+	private String setLinkDir(String rootDir, String fileName, String linkName) {
 		
-		String newDir = fileDir + File.separator + linkName;
-		File file = new File(newDir);
+		String linkSubDir = rootDir + fileName + File.separator + linkName;
+		File file = new File(linkSubDir);
 		
 		/* Create folder if it does not exist */
 		if(!(file.exists() && file.isDirectory())) {
 			file.mkdirs();
 		}
 		
-		return newDir += File.separator;
+		return linkSubDir += File.separator;
 	}
 	
 	private void setFile(String dir, String fileName, String linkName, 
 			String fileEnd) {
 		
-		String fullFileID = dir + fileName +  "_" + linkName + fileEnd;
+		fileName += "_" + linkName;
+		String fullFileID = dir + fileName + fileEnd;
 		File file = new File(fullFileID);
 		
 		try {
@@ -164,7 +182,7 @@ public class ClusterFileWriter {
 	
 	private File getNewFile(String dir, String oldName, String fileEnd) {
 		
-		File file = new File(oldName + fileEnd);
+		File file = new File(dir + oldName + fileEnd);
 		int fileCount = 0;
 		
 		while(file.exists()) {
