@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import edu.stanford.genetics.treeview.LogBuffer;
 import Controllers.ClusterController;
 
 /**
@@ -42,26 +43,20 @@ public class KMeansCluster {
 	/**
 	 * Constructor for KMeansCluster.
 	 *
-	 * @param headerArray
-	 *            Array of labels to be written in the cluster file.
 	 * @param distMatrix
 	 *            The calculated distance matrix to be clustered.
 	 * @param axis
 	 *            The matrix axis to be clustered.
 	 * @param k
 	 *            The number of groups (k) to be formed.
-	 * @param iterations
-	 *            The number iterations the k-means algorithm is run. This
-	 *            impacts the clustering result.
 	 */
 	public KMeansCluster(final DistanceMatrix distMatrix, final int axis,
-			final int k, final String fileName) {
+			final int k) {
 
 		this.distMatrix = distMatrix;
 		this.axis = axis;
 		this.k = k;
-
-		setupFileWriter(fileName);
+		
 		prepare();
 	}
 	/**
@@ -123,8 +118,14 @@ public class KMeansCluster {
 	 * @param headerArray
 	 *            Matrix labels from the tvModel.
 	 */
-	public void writeData(final int[][] kClusters, final String[][] headerArray) {
+	public void writeData(final int[][] kClusters, 
+			final String[][] headerArray) {
 
+		if(bufferedWriter == null) {
+			LogBuffer.println("Cannot write KMeans clustering data.");
+			return;
+		}
+		
 		/* The list containing the reordered gene names. */
 		reorderedList = new String[distMatrix.getSize()];
 

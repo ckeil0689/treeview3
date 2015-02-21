@@ -143,16 +143,16 @@ public class DistanceMatrix {
 
 	/**
 	 * Finds and returns the current minimum value in the cluster matrix. The
-	 * minimum value determines which rows are closest together and will be
-	 * clustered. They will form a new row that replaces the other two and as a
-	 * result a new minimum must be found at each step to determine the new row
-	 * pair to be clustered. Complexity: O(n^2)
+	 * minimum value determines which rows/ columns are closest together and 
+	 * will be clustered. They will form a new row that replaces the other 
+	 * two and as a result a new minimum must be found at each step to 
+	 * determine the new row pair to be clustered. Complexity: O(n^2)
 	 *
 	 * @return The minimum value in the current distance matrix.
 	 */
 	public double findCurrentMin(final double oldMin) {
 
-		/* New min must be bigger than previous matrix min */
+		/* New min must be bigger than old min */
 		double newMin = Double.MAX_VALUE;
 
 		for (int i = 0; i < matrix.length; i++) {
@@ -205,6 +205,10 @@ public class DistanceMatrix {
 		return min_col_index;
 	}
 	
+	/**
+	 * Writes the distance matrix values to a tab-delimited TXT-file.
+	 * @param axis
+	 */
 	public void writeMatrix(String axis) {
 		
 		String fileName = "test_distMatrix_" + axis + ".txt";

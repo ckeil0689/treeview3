@@ -307,12 +307,10 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		/* ----- Tree file and config stuff ---- */
 
 		// Parse the CDT File
-		LogBuffer.println("Parsing main file.");
 		parseCDT(stringLabels);
 
 		// If present, parse ATR File
 		if (hasAID) {
-			LogBuffer.println("Reading ATR file.");
 			parseATR();
 
 		} else {
@@ -322,7 +320,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 		// If present, parse GTR File
 		if (hasGID) {
-			LogBuffer.println("Reading GTR file.");
 			parseGTR();
 
 		} else {
@@ -339,7 +336,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	private void setConfigData() {
 
 		try {
-			LogBuffer.println("Getting configurations...");
 			final String fileName = targetModel.getFileSet().getRoot();
 			final String fileExt = targetModel.getFileSet().getExt();
 
@@ -555,6 +551,13 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 		// First, load the GTR File
 		final List<String[]> gtrData = loadTreeSet(fileSet.getGtr());
+		
+		/* In case an gtr file exists but is empty */
+		if(gtrData.isEmpty()) {
+			LogBuffer.println("GTR file empty.");
+			targetModel.gidFound(false);
+			return;
+		}
 
 		final String[] firstRow = gtrData.get(0);
 		if ( // decide if this is not an extended file..
@@ -590,6 +593,13 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		// First, load the ATR File
 		final List<String[]> atrData = loadTreeSet(fileSet.getAtr());
 
+		/* In case an atr file exists but is empty */
+		if(atrData.isEmpty()) {
+			LogBuffer.println("ATR file empty.");
+			targetModel.aidFound(false);
+			return;
+		}
+		
 		final String[] firstRow = atrData.get(0);
 		if ( // decide if this is not an extended file..
 				(firstRow.length == 4)// is the length classic?
@@ -635,7 +645,8 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			br.close();
 
 		} catch (final IOException e) {
-			e.printStackTrace();
+			LogBuffer.logException(e);
+			return new ArrayList<String[]>();
 		}
 
 		return treeData;

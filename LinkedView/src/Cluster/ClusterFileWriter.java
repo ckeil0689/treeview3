@@ -44,13 +44,13 @@ public class ClusterFileWriter {
 		String linkName;
 		switch(link) {
 		
-		case HierCluster.SINGLE:
+		case Linker.SINGLE:
 			linkName = "single";
 			break;
-		case HierCluster.AVG: 
+		case Linker.AVG: 
 			linkName = "average";
 			break;
-		case HierCluster.COMPLETE:
+		case Linker.COMPLETE:
 			linkName = "complete";
 			break;
 		case KMeansCluster.KMEANS:

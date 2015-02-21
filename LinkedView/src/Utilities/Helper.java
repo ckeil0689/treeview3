@@ -88,4 +88,45 @@ public final class Helper {
 			}
 		}
 	}
+	
+	/**
+	 * Checks if two int[] have elements in common.
+	 *
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	public static boolean shareCommonElements(final int[] a, final int[] b) {
+
+		int[] toIterate;
+		int[] toSearch;
+
+		boolean joint = false;
+
+		if (a.length > b.length) {
+			toIterate = b;
+			toSearch = a;
+
+		} else {
+			toIterate = a;
+			toSearch = b;
+		}
+
+		for (final int element : toIterate) {
+
+			for (final int element2 : toSearch) {
+
+				if (element == element2) {
+					joint = true;
+					break;
+				}
+
+				if (joint) {
+					break;
+				}
+			}
+		}
+
+		return joint;
+	}
 }

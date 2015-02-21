@@ -1,9 +1,17 @@
 package Cluster;
 
-import java.awt.Frame;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import Controllers.ClusterController;
@@ -20,11 +28,6 @@ import edu.stanford.genetics.treeview.LogBuffer;
  */
 public class HierCluster {
 
-	/* Correspond to the JCombobox positions in ClusterView */
-	protected final static int SINGLE = 0;
-	protected final static int COMPLETE = 1;
-	protected final static int AVG = 2;
-
 	/*
 	 * IMPORTANT NOTE: The variable prefixes row- and col- refer to the current
 	 * distance matrix. This means that if columns of the original matrix are
@@ -33,19 +36,13 @@ public class HierCluster {
 	 * arrays and column access doesn't always need to jump between arrays.
 	 */
 	private final int linkMethod;
+	private Linker linker;
 	private String axisPrefix;
 	private final int initial_matrix_size;
-	private int loopNum;
+	private int iterNum;
 
 	/* Half of the Distance Matrix (symmetry) */
 	private final DistanceMatrix distMatrix;
-
-	/*
-	 * Deep copy of distance matrix because original will be mutated. The
-	 * mutation happens when a new row is formed from to rows that are being
-	 * clustered together.
-	 */
-	private DistanceMatrix distMatrixCopy;
 
 	/* list to keep track of previously used minimum values from distMatrix */
 	private double min;
@@ -58,8 +55,10 @@ public class HierCluster {
 	 */
 	private String[] reorderedRows;
 
-	/* Writer that generates the ATR/ GTR files for trees */
-	private ClusterFileWriter bufferedWriter;
+	/**
+	 * TEST
+	 */
+	private List<Node> nodeList;
 
 	/*
 	 * List to keep track of all clusters during each iteration of the
@@ -69,8 +68,10 @@ public class HierCluster {
 	 */
 	private List<List<Integer>> currentClusters;
 	private int[][] rowIndexTable;
+	
+	private TreeFileWriter treeWriter;
 
-	private String[][] links; // needed for connectNodes??? better way?
+	private String[] links; // needed for connectNodes??? better way?
 
 	/**
 	 * The class that is responsible for the hierarchical clustering of the
@@ -78,9 +79,6 @@ public class HierCluster {
 	 * linkage method and the axis of the original dataset to be clustered to
 	 * perform the clustering.
 	 *
-	 * @param fileName
-	 *            The name of the original loaded file which will serve as the
-	 *            basis for the name of the newly generated files.
 	 * @param linkMethod
 	 *            The cluster linkage method chosen by the user.
 	 * @param distMatrix
@@ -91,14 +89,15 @@ public class HierCluster {
 	 *            The worker thread which performs the clustering. Needs to be
 	 *            interrupted in this class if the user cancels the operation.
 	 */
-	public HierCluster(final String fileName, final int linkMethod,
-			final DistanceMatrix distMatrix, final int axis) {
-
-		LogBuffer.println("Initializing HierCluster.");
+	public HierCluster(final int linkMethod, final DistanceMatrix distMatrix,
+			final int axis) {
 
 		this.linkMethod = linkMethod;
+		this.linker = new Linker(linkMethod);
 		this.distMatrix = distMatrix;
 		this.initial_matrix_size = distMatrix.getSize();
+		
+		this.axisPrefix = (axis == ClusterController.ROW) ? "GENE" : "ARRY";
 
 		prepareCluster();
 	}
@@ -111,18 +110,15 @@ public class HierCluster {
 	 */
 	public void prepareCluster() {
 
-		LogBuffer.println("Preparing for cluster.");
-
 		/*
 		 * Deep copy of distance matrix to avoid mutation. Needs to access
 		 * original values during generation of the new row when joining two
 		 * rows.
 		 */
-		distMatrixCopy = new DistanceMatrix(0);
-		distMatrixCopy.cloneFrom(distMatrix);
+		linker.cloneDistmatrix(distMatrix);
 
 		/* Data to be written to file */
-		links = new String[initial_matrix_size][];
+		links = new String[initial_matrix_size];
 
 		/*
 		 * Integer representation of rows for references in calculations (list
@@ -140,6 +136,8 @@ public class HierCluster {
 		 */
 		currentClusters = new ArrayList<List<Integer>>(initial_matrix_size);
 
+		nodeList = new ArrayList<Node>(initial_matrix_size);
+
 		/*
 		 * Fill list with integers corresponding to the row indices. Initially,
 		 * every matrix row is its own little cluster.
@@ -152,19 +150,15 @@ public class HierCluster {
 		}
 
 		/* Ensure all needed variables are set up and initialized */
-		if (links == null || rowIndexTable == null || distMatrixCopy == null
-				|| currentClusters == null
-				|| (distMatrixCopy.getSize() != distMatrix.getSize())) {
+		if (links == null || rowIndexTable == null | currentClusters == null) {
 			final String message = "Looks like clustering was not properly "
 					+ "set up by the software. Can't proceed with "
 					+ "clustering.";
-			JOptionPane.showMessageDialog(Frame.getFrames()[0], message,
+			JOptionPane.showMessageDialog(JFrame.getFrames()[0], message,
 					"Error", JOptionPane.ERROR_MESSAGE);
 			LogBuffer.println("Cluster preparation failed.");
 			return;
 		}
-
-		LogBuffer.println("Cluster preparation successful.");
 	}
 
 	/**
@@ -173,56 +167,42 @@ public class HierCluster {
 	 */
 	public int cluster() {
 
-		loopNum = initial_matrix_size - distMatrix.getSize();
+		/* Set current iteration number */
+		iterNum = initial_matrix_size - distMatrix.getSize();
 
-		/* STEP 1: Find current(!) matrix minimum. */
+		/* STEP 1: Find and set current(!) matrix minimum. */
+		setMatrixMinimum();
 
-		getMatrixMinimum();
-
-		/* STEP 2: Link the two clusters with the minimum distance */
-
+		/* STEP 2: Link the two old clusters with the minimum distance */
 		final int[] newCluster = linkClosestClusters();
 
 		/* STEP 3: Write info about the new connection to file. */
-
+		
+		/* First determine if new cluster is linked to a previous node. */
 		final String[] link = connectNodes(newCluster, min_row_index,
 				min_col_index);
 		/*
-		 * Add the new node to links, so the next clusters can be checked in
-		 * connectNodes().
+		 * Then write data to buffer and add the new node to links, 
+		 * so the next clusters can be checked in connectNodes() during 
+		 * future iterations.
 		 */
-		links[loopNum] = writeData(link);
+		links[iterNum] = treeWriter.writeData(link, iterNum, min);
+		
+		/* Record new node with its data, so it can be sorted later. */
+//		addNodeToList(link);
 
 		/* STEP 4: Update the lists that keep track of clusters. */
 
 		/* Register clustering of the two rows */
-		rowIndexTable[loopNum] = newCluster;
+		rowIndexTable[iterNum] = newCluster;
 
 		final boolean rowClusHasMin = updateCurrentClusters(newCluster);
 
-		/* STEP 5: Generate new row based on the chosen linkage method. */
-
-		/*
-		 * The replacement row for the two removed row elements (when joining
-		 * clusters). Will contain corresponding values depending on the cluster
-		 * method.
-		 */
-		double[] newRow;
-
-		if (linkMethod == SINGLE || linkMethod == COMPLETE) {
-			newRow = scLink(newCluster);
-
-		} else if (linkMethod == AVG) {
-			newRow = avgLink(newCluster);
-
-		} else {
-			LogBuffer.println("No matching link method found.");
-			return -1;
-		}
+		/* STEP 5: Generate new row/ col based on the chosen linkage method. */
+		double[] newMatrixElement = linker.link(newCluster, currentClusters);
 
 		/* STEP 6: Update the distance matrix to reflect the new cluster. */
-
-		updateDistMatrix(rowClusHasMin, newRow);
+		updateDistMatrix(rowClusHasMin, newMatrixElement);
 
 		return distMatrix.getSize();
 	}
@@ -234,11 +214,12 @@ public class HierCluster {
 	 * was found in the previous step! The matrix shrinks as rows are clustered
 	 * together (hence the need for a deep copy!).
 	 */
-	private void getMatrixMinimum() {
+	private void setMatrixMinimum() {
 
 		this.min = distMatrix.findCurrentMin(min);
 		this.min_row_index = distMatrix.getMinRowIndex();
 		this.min_col_index = distMatrix.getMinColIndex();
+
 	}
 
 	/**
@@ -271,36 +252,83 @@ public class HierCluster {
 
 		return Helper.concatIntArrays(row_cluster, col_cluster);
 	}
-
+	
+	private void addNodeToList(String[] link) {
+		
+		/* Add new node object to list */
+		int id = iterNum + 1;
+		double dist_val = 1 - min;
+		Node newNode = new Node(id, dist_val);
+		
+		/* Link to children */
+		int maxChildNum = 2;
+		List<Node> nodes = new ArrayList<Node>();
+		
+		for(int i = 0; i < maxChildNum; i++) {
+			
+			if(link[i].substring(0, "NODE".length()).equalsIgnoreCase("NODE")) {
+				String index_s = link[i].replaceAll("[\\D]", "");
+				int index_i = Integer.parseInt(index_s);
+				nodes.add(nodeList.get(index_i - 1));
+			}
+		}
+		
+		nodes = orderNodes(nodes);
+		
+		/* Left child is the one with larger dist value */
+		if(nodes.size() > 0 && nodes.get(0) != null) {
+			newNode.setLeftChild(nodes.get(0));
+		}
+		
+		if(nodes.size() > 1 && nodes.get(1) != null) {
+			newNode.setRightChild(nodes.get(1));
+		}
+		
+		nodeList.add(newNode);
+	}
+	
 	/**
-	 * Takes information about a newly formed cluster and writes it to a file.
-	 *
-	 * @param link
-	 *            The pair of clustered rows.
-	 * @return
+	 * Order 2 nodes decreasing by their dist_value.
+	 * TODO replace with actual comparator later.
+	 * @param nodes
+	 * @return Ordered list of nodes.
 	 */
-	public String[] writeData(final String[] link) {
-
-		/*
-		 * List to store the Strings which represent calculated data (such as
-		 * row pairs) to be added to dataTable.
-		 */
-		final int nodeInfoSize = 4;
-		final String[] nodeInfo = new String[nodeInfoSize];
-
-		/*
-		 * Create a list that stores the info of the current new node to be
-		 * formed. This will be written down in the corresponding tree file.
-		 */
-		nodeInfo[0] = "NODE" + (loopNum + 1) + "X";
-		nodeInfo[1] = link[0];
-		nodeInfo[2] = link[1];
-		nodeInfo[3] = String.valueOf(1 - min);
-
-		/* Write the node info to the tree output file */
-		bufferedWriter.writeContent(nodeInfo);
-
-		return nodeInfo;
+	private List<Node> orderNodes(List<Node> nodes) {
+		
+		if(nodes.size() < 2) 
+			return nodes;
+		
+		double val_1 = -1;
+		double val_2 = -1;
+		
+		if(nodes.get(0) != null) {
+			val_1 = nodes.get(0).getDistValue();
+		}
+		
+		if(nodes.get(1) != null) {
+			val_2 = nodes.get(1).getDistValue();
+		}
+		
+		if(val_2 > val_1) {
+			Collections.swap(nodes, 0, 1);
+		}
+		
+		return nodes;
+	}
+	
+	private Node extractOrderedNodes(Node root, List<Node> nodeList) {
+		
+		if(root == null) return null;
+		
+		if(root.getLeftChild() == null && root.getRightChild() == null) {
+			nodeList.add(root);
+			return null;
+		}
+		
+		extractOrderedNodes(root.getLeftChild(), nodeList);
+		extractOrderedNodes(root.getRightChild(), nodeList);
+		
+		return root;
 	}
 
 	/**
@@ -308,6 +336,7 @@ public class HierCluster {
 	 * adding the newly formed cluster at the appropriate index.
 	 *
 	 * @param newCluster
+	 *            The new cluster to be added.
 	 * @return Whether the row cluster contains the minimum.
 	 */
 	private boolean updateCurrentClusters(final int[] newCluster) {
@@ -337,8 +366,8 @@ public class HierCluster {
 		}
 
 		/*
-		 * Transform newCluster array into a list so it can be added to
-		 * currentClusters
+		 * TODO Better method? Transform newCluster array into a list so it can
+		 * be added to currentClusters
 		 */
 		final List<Integer> newVals = new ArrayList<Integer>();
 		for (final int element : newCluster) {
@@ -427,13 +456,51 @@ public class HierCluster {
 	 */
 	public void finish() {
 
-		bufferedWriter.closeWriter();
+		// LogBuffer.println("Min-List: " + Arrays.toString(minList));
+		// LogBuffer.println("Link-List: " + Arrays.deepToString(links));
+//		LogBuffer.println("currentClusters: " + currentClusters);
+		
+//		List<Node> orderedNodes = new ArrayList<Node>();
+//		
+//		extractOrderedNodes(nodeList.get(0), orderedNodes);
+//		
+//		LogBuffer.println("Ordered nodes: " + orderedNodes);
+
+		treeWriter.close();
+		linker.close();
 		reorderRows(currentClusters.get(0));
 
+//		writeReordered();
+
 		/* Ensure garbage collection for large objects */
-		distMatrixCopy = null;
 		links = null;
 		currentClusters = null;
+	}
+
+	private void writeReordered() {
+
+		String fileName = "reordered.txt";
+		File file = new File(fileName);
+		BufferedWriter bw;
+		try {
+			bw = new BufferedWriter((new OutputStreamWriter(
+					new FileOutputStream(file.getAbsoluteFile()), "UTF-8")));
+
+			for (String element : reorderedRows) {
+				bw.write(element + "\n");
+
+				bw.write("\n");
+			}
+
+			bw.close();
+
+		} catch (UnsupportedEncodingException | FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -444,23 +511,8 @@ public class HierCluster {
 	 * filePath where the cluster data could be saved anyways.
 	 */
 	public void setupFileWriter(final int axis, String fileName) {
-
-		/*
-		 * Setting up labels for ATR and GTR tree files and file name for
-		 * writing.
-		 */
-		String fileSuffix = ".notchanged";
-		if (axis == ClusterController.ROW) {
-			this.axisPrefix = "GENE";
-			fileSuffix = ".gtr";
-
-		} else {
-			this.axisPrefix = "ARRY";
-			fileSuffix = ".atr";
-		}
 		
-		bufferedWriter = new ClusterFileWriter(fileName, fileSuffix, 
-				linkMethod);
+		this.treeWriter = new TreeFileWriter(axis, fileName, linkMethod);
 	}
 
 	/**
@@ -572,20 +624,20 @@ public class HierCluster {
 			group[i] = currentClusters.get(index).get(i);
 		}
 
-		for (int j = loopNum - 1; j >= 0; j--) {
+		for (int j = iterNum - 1; j >= 0; j--) {
 
 			/*
 			 * This currently gets the last node that has a common element if
 			 * the 2 groups have elements in common...
 			 */
 			if (rowIndexTable[j] != null) {
-				if (shareCommonElements(rowIndexTable[j], group)) {
+				if (Helper.shareCommonElements(rowIndexTable[j], group)) {
 
 					/*
 					 * Assigns NODE # of last fusedGroup containing a colGroup
 					 * element.
 					 */
-					name = links[j][0];
+					name = links[j];
 					break;
 				}
 				/*
@@ -602,47 +654,6 @@ public class HierCluster {
 	}
 
 	/**
-	 * Checks if two int[] have elements in common.
-	 *
-	 * @param a
-	 * @param b
-	 * @return
-	 */
-	public boolean shareCommonElements(final int[] a, final int[] b) {
-
-		int[] toIterate;
-		int[] toSearch;
-
-		boolean joint = false;
-
-		if (a.length > b.length) {
-			toIterate = b;
-			toSearch = a;
-
-		} else {
-			toIterate = a;
-			toSearch = b;
-		}
-
-		for (final int element : toIterate) {
-
-			for (final int element2 : toSearch) {
-
-				if (element == element2) {
-					joint = true;
-					break;
-				}
-
-				if (joint) {
-					break;
-				}
-			}
-		}
-
-		return joint;
-	}
-
-	/**
 	 * Reorders the finalCluster and returns it as a String[].
 	 *
 	 * @param finalCluster
@@ -650,208 +661,17 @@ public class HierCluster {
 	public void reorderRows(final List<Integer> finalCluster) {
 
 		String element = "";
+		
+		int limit = finalCluster.size();
 
-		reorderedRows = new String[finalCluster.size()];
+		reorderedRows = new String[limit];
 
-		for (int i = 0; i < finalCluster.size(); i++) {
+		for (int i = 0; i < limit; i++) {
 
-			element = axisPrefix + finalCluster.get(i) + "X";
+			element = axisPrefix + finalCluster.get((limit -1) - i) + "X";
+//			element = axisPrefix + finalCluster.get(i) + "X";
 			reorderedRows[i] = element;
 		}
-	}
-
-	/**
-	 * Method used to generate a new row/col for the distance matrix which is
-	 * processed. The new row/col represents the joint row pair which has been
-	 * chosen as the one with the minimum distance in the current iteration. The
-	 * values of the new row/col are calculated as maximum (complete) or minimum
-	 * (single) of all distance values.
-	 *
-	 * Time complexity: ?
-	 *
-	 * @param fusedClusters
-	 * @return newRow
-	 */
-	public double[] scLink(final int[] fusedClusters) {
-
-		/* Make a new row that has the same size as the number of clusters. */
-		final double[] newRow = new double[currentClusters.size()];
-
-		/* Iterate over all clusters */
-		for (int i = 0; i < currentClusters.size(); i++) {
-
-			double distanceVal = 0;
-			int selectedRow = 0;
-
-			final int[] currentCluster = new int[currentClusters.get(i).size()];
-
-			/* Filling the array */
-			for (int z = 0; z < currentCluster.length; z++) {
-
-				currentCluster[z] = currentClusters.get(i).get(z);
-			}
-
-			/*
-			 * Only calculate distance if the current cluster is not part of the
-			 * newly formed cluster. If it is, then the distance is 0.
-			 */
-			if (!shareCommonElements(currentCluster, fusedClusters)) {
-				final double[] distances = new double[fusedClusters.length
-				                                      * currentCluster.length];
-
-				double min = Double.MAX_VALUE;
-				double max = Double.MIN_VALUE;
-
-				int dInd = 0; // Iterator
-				for (final int fusedCluster : fusedClusters) {
-
-					/* select element from new cluster */
-					selectedRow = fusedCluster;
-
-					/*
-					 * Get the corresponding row in the original, non-mutated
-					 * matrix.
-					 */
-					final double[] currentRow = distMatrixCopy
-							.getRow(selectedRow);
-
-					/*
-					 * Go through all clusters and their elements. Finds the
-					 * distances between a row in currentCluster (remaining
-					 * non-clustered) and all rows in the new cluster
-					 * (fusedClusters, current row cluster).
-					 */
-					for (final int element : currentCluster) {
-
-						// if-else to allow for use of halfDMatrix
-						if (currentRow.length > element) {
-							/*
-							 * distance value in the current row at the indices
-							 * which correspond to the elements of the new
-							 * current cluster.
-							 */
-							distanceVal = currentRow[element];
-
-						} else {
-							/*
-							 * Reverse index access because of distance matrix
-							 * symmetry.
-							 */
-							distanceVal = distMatrixCopy.getRow(element)[selectedRow];
-						}
-
-						/* Determine min and max */
-						if (distanceVal < min) {
-							min = distanceVal;
-						}
-						if (distanceVal > max) {
-							max = distanceVal;
-						}
-
-						distances[dInd] = distanceVal;
-						dInd++;
-					}
-				}
-
-				/*
-				 * Single Link - Minimum distance between the new cluster and
-				 * the other clusters.
-				 */
-				if (linkMethod == SINGLE) {
-					newRow[i] = min;
-				}
-				/* Complete Link - Maximum */
-				else {
-					newRow[i] = max;
-				}
-			}
-			/* all elements in common */
-			else {
-				newRow[i] = 0.0;
-			}
-		}
-
-		return newRow;
-	}
-
-	/**
-	 * Method used to generate a new row/col for the distance matrix which is
-	 * processed. The new row/col represents the joint gene pair which has been
-	 * chosen as the one with the minimum distance in each iteration. The values
-	 * of the new row/col are calculated as average of the sum of all distances.
-	 *
-	 * @param fusedGroup
-	 * @param currentClusters
-	 * @param newRow
-	 * @return newRow
-	 */
-	public double[] avgLink(final int[] fusedGroup) {
-
-		final double[] newRow = new double[currentClusters.size()];
-
-		for (int i = 0; i < currentClusters.size(); i++) {
-
-			double distanceSum = 0;
-			double distanceVal = 0;
-			int selectedGene = 0;
-
-			final int[] currentGroup = new int[currentClusters.get(i).size()];
-
-			for (int z = 0; z < currentGroup.length; z++) {
-
-				currentGroup[z] = currentClusters.get(i).get(z);
-			}
-
-			/*
-			 * Check if fusedGroup contains the current checked gene (then no
-			 * mean should be calculated) no elements in common.
-			 */
-			if (!shareCommonElements(currentGroup, fusedGroup)) {
-
-				/* select members of the new row (B & G) */
-				for (final int element : fusedGroup) {
-
-					selectedGene = element;
-
-					/*
-					 * Take a row (gene) from the matrix which also appears in
-					 * the fusedGroup (current cluster).
-					 */
-					final double[] currentRow = distMatrixCopy
-							.getRow(selectedGene);
-
-					/*
-					 * Go through all clusters and their contained genes
-					 * calculate the distance between each column (gene) and the
-					 * current row (gene) from fusedGroup sum the distance
-					 * values up.
-					 */
-					for (final int gene : currentClusters.get(i)) {
-
-						if (currentRow.length > gene) {
-							distanceVal = currentRow[gene];
-
-						} else {
-							distanceVal = distMatrixCopy.getRow(gene)[selectedGene];
-						}
-						distanceSum += distanceVal;
-					}
-				}
-
-				/*
-				 * Calculate the new value to be added to newRow as the average
-				 * of distances.
-				 */
-				newRow[i] = distanceSum
-						/ (fusedGroup.length * currentGroup.length);
-			}
-			/* all elements in common */
-			else {
-				newRow[i] = 0.0;
-			}
-		}
-
-		return newRow;
 	}
 
 	/**

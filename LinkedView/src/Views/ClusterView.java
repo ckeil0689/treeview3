@@ -88,8 +88,8 @@ public class ClusterView {
 	private JSpinner rowIterationsSettr;
 	private JSpinner colIterationsSettr;
 
-	private final String[] linkageMethods = { "Single Linkage",
-			"Complete Linkage", "Average Linkage" };
+	private final String[] linkageMethods = { "Average Linkage", 
+			"Single Linkage", "Complete Linkage" };
 
 	private int clusterType;
 

@@ -344,8 +344,6 @@ public class ClusterController {
 
 			filePath = cdtGen.finish();
 
-			LogBuffer.println(".CDT saved at: " + filePath);
-
 			return null;
 		}
 
@@ -368,8 +366,6 @@ public class ClusterController {
 	 * an updated HeatMap. It should also close the ClusterViewFrame.
 	 */
 	private void visualizeData(final String filePath) {
-
-		LogBuffer.println("Getting files for loading clustered data.");
 
 		File file = null;
 

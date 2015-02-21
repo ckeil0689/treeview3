@@ -50,49 +50,14 @@ public class ClusterProcessor {
 		this.arrayHeaderI = arrayHeaderI;
 		this.pBarCount = 0;
 	}
-
+	
 	/**
-	 * Starts a SwingWorker thread to do the clustering and waits for it to
-	 * return a String array containing the reordered axis elements.
-	 *
-	 * @param distMatrix
-	 * @param linkMethod
-	 * @param spinnerInput
-	 * @param hierarchical
-	 * @param axis
-	 * @return Reordered matrix headers.
-	 */
-	public String[] clusterAxis(final DistanceMatrix distMatrix,
-			final int linkMethod, final Integer[] spinnerInput,
-			final boolean hierarchical, final int axis) {
-
-		try {
-			LogBuffer.println("Starting clusterAxis(): " + axis);
-			this.clusterTask = new ClusterTask(distMatrix, linkMethod,
-					spinnerInput, hierarchical, axis);
-			clusterTask.execute();
-
-			/*
-			 * Get() blocks until this thread finishes, so the following code
-			 * waits for this procedure to finish.
-			 */
-			return clusterTask.get();
-
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
-			LogBuffer.logException(e);
-			LogBuffer.println(e.getLocalizedMessage());
-			return new String[] { "No clustered data." };
-		}
-	}
-
-	/**
-	 * Creates a SwingWorker to calculate the distance matrix for the loaded
-	 * data.
+	 * Starts a SwingWorker thread to calculate the distance matrix 
+	 * for the loaded data.
 	 *
 	 * @param distMeasure
 	 * @param axis
-	 * @return m x m distance matrix where m is the clustered axis length
+	 * @return m * m distance matrix where m is the clustered axis length
 	 * of the original data matrix.
 	 */
 	public double[][] calcDistance(final int distMeasure, final int axis) {
@@ -112,6 +77,40 @@ public class ClusterProcessor {
 			LogBuffer.logException(e);
 			LogBuffer.println(e.getLocalizedMessage());
 			return new double[][] { { 0 }, { 0 } };
+		}
+	}
+
+	/**
+	 * Starts a SwingWorker thread to do the clustering and waits for it to
+	 * return a String array containing the reordered axis elements.
+	 *
+	 * @param distMatrix
+	 * @param linkMethod
+	 * @param spinnerInput
+	 * @param hierarchical
+	 * @param axis
+	 * @return Reordered matrix headers.
+	 */
+	public String[] clusterAxis(final DistanceMatrix distMatrix,
+			final int linkMethod, final Integer[] spinnerInput,
+			final boolean hierarchical, final int axis) {
+
+		try {
+			this.clusterTask = new ClusterTask(distMatrix, linkMethod,
+					spinnerInput, hierarchical, axis);
+			clusterTask.execute();
+
+			/*
+			 * Get() blocks until this thread finishes, so the following code
+			 * waits for this procedure to finish.
+			 */
+			return clusterTask.get();
+
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+			LogBuffer.logException(e);
+			LogBuffer.println(e.getLocalizedMessage());
+			return new String[] { "No clustered data." };
 		}
 	}
 
@@ -292,10 +291,10 @@ public class ClusterProcessor {
 
 			/* Hierarchical */
 			if (hier) {
-				final HierCluster cGen = new HierCluster(fileName, linkMethod,
-						distMatrix, axis);
+				final HierCluster clusterer = 
+						new HierCluster(linkMethod, distMatrix, axis);
 
-				cGen.setupFileWriter(axis, fileName);
+				clusterer.setupFileWriter(axis, fileName);
 
 				/*
 				 * Continue process until distMatrix has a size of 1, This array
@@ -307,7 +306,7 @@ public class ClusterProcessor {
 
 				while (distMatrixSize > 1 && !isCancelled()) {
 
-					distMatrixSize = cGen.cluster();
+					distMatrixSize = clusterer.cluster();
 					publish(loopNum++);
 				}
 
@@ -323,9 +322,9 @@ public class ClusterProcessor {
 				}
 
 				/* Write the tree file */
-				cGen.finish();
+				clusterer.finish();
 
-				return cGen.getReorderedList();
+				return clusterer.getReorderedList();
 			}
 			/* K-Means */
 			else {
@@ -340,8 +339,10 @@ public class ClusterProcessor {
 					iterations = spinnerInput[3];
 				}
 
-				final KMeansCluster cGen = new KMeansCluster(distMatrix, axis,
-						k, fileName);
+				final KMeansCluster clusterer = 
+						new KMeansCluster(distMatrix, axis, k);
+				
+				clusterer.setupFileWriter(fileName);
 
 				/*
 				 * Begin iteration of recalculating means and reassigning row
@@ -349,7 +350,7 @@ public class ClusterProcessor {
 				 */
 				for (int i = 0; i < iterations; i++) {
 
-					cGen.cluster();
+					clusterer.cluster();
 					publish(i);
 				}
 
@@ -372,9 +373,9 @@ public class ClusterProcessor {
 				}
 
 				/* Write data and close writer */
-				cGen.finish(headerArray);
+				clusterer.finish(headerArray);
 
-				return cGen.getReorderedList();
+				return clusterer.getReorderedList();
 			}
 		}
 
