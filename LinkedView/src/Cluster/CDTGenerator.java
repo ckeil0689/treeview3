@@ -1,6 +1,5 @@
 package Cluster;
 
-import java.io.File;
 import java.io.IOException;
 
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -71,7 +70,8 @@ public class CDTGenerator {
 	 *
 	 * @throws IOException
 	 */
-	public void setupWriter(final String fileName, final Integer[] spinnerInput) {
+	public void setupWriter(final String fileName, final int link, 
+			final Integer[] spinnerInput) {
 
 		String fileEnd = "";
 
@@ -95,15 +95,8 @@ public class CDTGenerator {
 
 			fileEnd = "_K" + rowC + colC + ".cdt";
 		}
-
-		final File file = new File(fileName + fileEnd);
-		try {
-			file.createNewFile();
-			this.bufferedWriter = new ClusterFileWriter(file);
-
-		} catch (final IOException e) {
-			LogBuffer.logException(e);
-		}
+		
+		this.bufferedWriter = new ClusterFileWriter(fileName, fileEnd, link);
 	}
 
 	/**
@@ -157,11 +150,9 @@ public class CDTGenerator {
 
 		/* Add some string elements, as well as row/ column names */
 		if (isHier) {
-			LogBuffer.println("Writing hierarchical data.");
 			fillHierarchical();
 
 		} else {
-			LogBuffer.println("Writing k-means data.");
 			fillKMeans();
 		}
 	}
@@ -171,51 +162,50 @@ public class CDTGenerator {
 	 */
 	private void orderData() {
 
-		final int[] reorderedRowIndices = new int[origMatrix.length];
-		final int[] reorderedColIndices = new int[colNames.length];
+		int[] reorderedRowIndices = new int[origMatrix.length];
+		int[] reorderedColIndices = new int[colNames.length];
 
 		cdtData_doubles = new double[reorderedRowIndices.length][reorderedColIndices.length];
 
 		if (isRowClustered) {
-			final String[] geneNames = new String[rowNames.length];
-			if (!isHier) {
-				for (int i = 0; i < geneNames.length; i++) {
-
-					geneNames[i] = rowNames[i][0];
-				}
-			}
-
-			int rowIndex = -1;
-			for (int i = 0; i < orderedGIDs.length; i++) {
-
-				final String rowElement = orderedGIDs[i];
-
-				if (isHier) {
-					// Regex: Non-digits ('\D') are replaced with "" (no space!)
-					// This means: GENE456X -> 456
-					final String adjusted = rowElement.replaceAll("[\\D]", "");
-
-					// Adjusted spring is made into integer which can be used
-					// as index
-					rowIndex = Integer.parseInt(adjusted);
-
-				} else {
-					rowIndex = findIndex(geneNames, rowElement);
-				}
-
-				// reorderedRowIndices[i] = rowIndex;
-
-				// Order the row names
-				final String target = "GENE" + rowIndex + "X";
-				final int newRowIndex = findID(rowNames, target, 0);
-
-				final int finalIndex = (newRowIndex == -1) ? rowIndex
-						: newRowIndex;
-
-				reorderedRowIndices[i] = finalIndex;
-
-				rowNamesOrdered[i] = rowNames[finalIndex];
-			}
+			reorderedRowIndices = orderElements(rowNames, orderedGIDs, "GENE");
+//			final String[] geneNames = new String[rowNames.length];
+//			if (!isHier) {
+//				for (int i = 0; i < geneNames.length; i++) {
+//
+//					geneNames[i] = rowNames[i][0];
+//				}
+//			}
+//
+//			int rowIndex = -1;
+//			for (int i = 0; i < orderedGIDs.length; i++) {
+//
+//				final String rowElement = orderedGIDs[i];
+//
+//				if (isHier) {
+//					// Regex: Non-digits ('\D') are replaced with "" (no space!)
+//					// This means: GENE456X -> 456
+//					final String adjusted = rowElement.replaceAll("[\\D]", "");
+//
+//					// Adjusted spring is made into integer which can be used
+//					// as index
+//					rowIndex = Integer.parseInt(adjusted);
+//
+//				} else {
+//					rowIndex = findIndex(geneNames, rowElement);
+//				}
+//
+//				 reorderedRowIndices[i] = rowIndex;
+//
+//				// Order the row names
+//				final String target = "GENE" + rowIndex + "X";
+//				final int newRowIndex = findID(rowNames, target, 0);
+//
+//				final int finalIndex = (newRowIndex == -1) ? rowIndex
+//						: newRowIndex;
+//
+//				rowNamesOrdered[i] = rowNames[finalIndex];
+//			}
 		} else {
 			for (int i = 0; i < reorderedRowIndices.length; i++) {
 				reorderedRowIndices[i] = i;
@@ -224,44 +214,43 @@ public class CDTGenerator {
 		}
 
 		if (isColClustered) {
-			// Make list of gene names to quickly access indexes
-			final String[] geneNames = new String[colNames.length];
-
-			if (!isHier) {
-				for (int i = 0; i < geneNames.length; i++) {
-
-					geneNames[i] = colNames[i][0];
-				}
-			}
-
-			int colIndex = -1;
-			// Make an array of indexes from the ordered column list.
-			for (int i = 0; i < reorderedColIndices.length; i++) {
-
-				final String colElement = orderedAIDs[i];
-				if (isHier) {
-					final String adjusted = colElement.replaceAll("[\\D]", "");
-
-					// gets index from ordered list, e.g. ARRY45X --> 45;
-					colIndex = Integer.parseInt(adjusted);
-
-				} else {
-					colIndex = findIndex(geneNames, colElement);
-				}
-
-				// reorderedColIndices[i] = colIndex;
-
-				final String target = "ARRY" + colIndex + "X";
-				final int newColIndex = findID(colNames, target, 1);
-
-				final int finalIndex = (newColIndex == -1) ? colIndex
-						: newColIndex;
-
-				reorderedColIndices[i] = finalIndex;
-
-				// reordering column names
-				colNamesOrdered[i] = colNames[finalIndex];
-			}
+			reorderedColIndices = orderElements(colNames, orderedAIDs, "ARRY");
+//			// Make list of gene names to quickly access indexes
+//			final String[] geneNames = new String[colNames.length];
+//
+//			if (!isHier) {
+//				for (int i = 0; i < geneNames.length; i++) {
+//
+//					geneNames[i] = colNames[i][0];
+//				}
+//			}
+//
+//			int colIndex = -1;
+//			// Make an array of indexes from the ordered column list.
+//			for (int i = 0; i < reorderedColIndices.length; i++) {
+//
+//				final String colElement = orderedAIDs[i];
+//				if (isHier) {
+//					final String adjusted = colElement.replaceAll("[\\D]", "");
+//
+//					// gets index from ordered list, e.g. ARRY45X --> 45;
+//					colIndex = Integer.parseInt(adjusted);
+//
+//				} else {
+//					colIndex = findIndex(geneNames, colElement);
+//				}
+//
+//				 reorderedColIndices[i] = colIndex;
+//
+//				final String target = "ARRY" + colIndex + "X";
+//				final int newColIndex = findID(colNames, target, 1);
+//
+//				final int finalIndex = (newColIndex == -1) ? colIndex
+//						: newColIndex;
+//
+//				// reordering column names
+//				colNamesOrdered[i] = colNames[finalIndex];
+//			}
 		} else {
 			/* TODO change to use index from orderedAIDs instead */
 			for (int i = 0; i < reorderedColIndices.length; i++) {
@@ -284,6 +273,84 @@ public class CDTGenerator {
 				col = reorderedColIndices[j];
 				cdtData_doubles[i][j] = origMatrix[row][col];
 			}
+		}
+	}
+	
+	/**
+	 * Orders the labels for the CDT data based on the ordered ID String arrays.
+	 * @param origNames The original axis labels before clustering.
+	 * @param orderedIDs The newly ordered axis IDs.
+	 * @param axisPrefix The axis prefix to identify which axis is being
+	 * reordered.
+	 * @return List of new element order indices that can be used to
+	 * rearrange the matrix data consistent with the new element ordering.
+	 */
+	private int[] orderElements(String[][] origNames, String[] orderedIDs, 
+			String axisPrefix) {
+		
+		String[][] orderedNames = new String[origNames.length][];
+		int[] reorderedIndices = new int[origNames.length];
+		
+		// Make list of gene names to quickly access indexes
+		final String[] geneNames = new String[origNames.length];
+
+		if (!isHier) {
+			for (int i = 0; i < geneNames.length; i++) {
+
+				geneNames[i] = origNames[i][0];
+			}
+		}
+
+		int index = -1;
+		// Make an array of indexes from the ordered column list.
+		for (int i = 0; i < reorderedIndices.length; i++) {
+
+			final String id = orderedIDs[i];
+			if (isHier) {
+				final String adjusted = id.replaceAll("[\\D]", "");
+
+				// gets index from ordered list, e.g. ARRY45X --> 45;
+				index = Integer.parseInt(adjusted);
+
+			} else {
+				index = findIndex(geneNames, id);
+			}
+
+			reorderedIndices[i] = index;
+
+//			final String target = axisPrefix + index + "X";
+			int axisID; 
+			if(axisPrefix.equalsIgnoreCase("GENE")) {
+				axisID = 0;
+			} else {
+				axisID = 1;
+			}
+			
+			final int newColIndex = findID(origNames, id, axisID);
+
+			final int finalIndex = (newColIndex == -1) ? index : newColIndex;
+
+			// reordering column names
+			orderedNames[i] = origNames[finalIndex];
+		}
+		
+		setReorderedNames(orderedNames, axisPrefix);
+		
+		return reorderedIndices;
+	}
+	
+	/**
+	 * Setting the ordered names depending on the axis to be ordered.
+	 * @param orderedNames
+	 * @param axisPrefix
+	 */
+	private void setReorderedNames(String[][] orderedNames, 
+			String axisPrefix) {
+		
+		if(axisPrefix.equalsIgnoreCase("GENE")) {
+			this.rowNamesOrdered = orderedNames;
+		} else if(axisPrefix.equalsIgnoreCase("ARRY")) {
+			this.colNamesOrdered = orderedNames;
 		}
 	}
 

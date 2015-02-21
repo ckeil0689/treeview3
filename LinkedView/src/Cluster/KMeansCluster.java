@@ -1,13 +1,12 @@
 package Cluster;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import Controllers.ClusterController;
 import edu.stanford.genetics.treeview.LogBuffer;
+import Controllers.ClusterController;
 
 /**
  * Performs the calculations of the k-means algorithm.
@@ -16,6 +15,8 @@ import edu.stanford.genetics.treeview.LogBuffer;
  *
  */
 public class KMeansCluster {
+	
+	protected final static int KMEANS = 3;
 
 	private ClusterFileWriter bufferedWriter; /* Writer to save data */
 
@@ -42,29 +43,22 @@ public class KMeansCluster {
 	/**
 	 * Constructor for KMeansCluster.
 	 *
-	 * @param headerArray
-	 *            Array of labels to be written in the cluster file.
 	 * @param distMatrix
 	 *            The calculated distance matrix to be clustered.
 	 * @param axis
 	 *            The matrix axis to be clustered.
 	 * @param k
 	 *            The number of groups (k) to be formed.
-	 * @param iterations
-	 *            The number iterations the k-means algorithm is run. This
-	 *            impacts the clustering result.
 	 */
 	public KMeansCluster(final DistanceMatrix distMatrix, final int axis,
-			final int k, final String fileName) {
+			final int k) {
 
 		this.distMatrix = distMatrix;
 		this.axis = axis;
 		this.k = k;
-
-		setupFileWriter(fileName);
+		
 		prepare();
 	}
-
 	/**
 	 * Sets up a buffered writer used to save the data created during the
 	 * process of k-means clustering.
@@ -76,16 +70,7 @@ public class KMeansCluster {
 		final String fileEnd = (axis == ClusterController.ROW) ? "_K_G" + k
 				+ ".kgg" : "_K_A" + k + ".kag";
 
-		final File file = new File(fileName + fileEnd);
-
-		try {
-			file.createNewFile();
-			bufferedWriter = new ClusterFileWriter(file);
-
-		} catch (final IOException e) {
-			LogBuffer.println(e.getMessage());
-			e.printStackTrace();
-		}
+		bufferedWriter = new ClusterFileWriter(fileName, fileEnd, -1);
 	}
 
 	/**
@@ -133,8 +118,14 @@ public class KMeansCluster {
 	 * @param headerArray
 	 *            Matrix labels from the tvModel.
 	 */
-	public void writeData(final int[][] kClusters, final String[][] headerArray) {
+	public void writeData(final int[][] kClusters, 
+			final String[][] headerArray) {
 
+		if(bufferedWriter == null) {
+			LogBuffer.println("Cannot write KMeans clustering data.");
+			return;
+		}
+		
 		/* The list containing the reordered gene names. */
 		reorderedList = new String[distMatrix.getSize()];
 

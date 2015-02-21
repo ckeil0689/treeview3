@@ -265,6 +265,8 @@ public class ClusterController {
 
 			if (distMatrix == null || isCancelled())
 				return null;
+			
+//			distMatrix.writeMatrix(axisPrefix);
 
 			publish("Clustering " + axisPrefix + " data...");
 
@@ -331,7 +333,8 @@ public class ClusterController {
 					reorderedCols, rowSimilarity, colSimilarity,
 					isHierarchical());
 
-			cdtGen.setupWriter(fileName, clusterView.getSpinnerValues());
+			cdtGen.setupWriter(fileName, clusterView.getLinkMethod(), 
+					clusterView.getSpinnerValues());
 
 			final IntHeaderInfo geneHeaderI = tvModel.getRowHeaderInfo();
 			final IntHeaderInfo arrayHeaderI = tvModel.getColumnHeaderInfo();
@@ -340,8 +343,6 @@ public class ClusterController {
 			cdtGen.generateCDT();
 
 			filePath = cdtGen.finish();
-
-			LogBuffer.println(".CDT saved at: " + filePath);
 
 			return null;
 		}
@@ -365,8 +366,6 @@ public class ClusterController {
 	 * an updated HeatMap. It should also close the ClusterViewFrame.
 	 */
 	private void visualizeData(final String filePath) {
-
-		LogBuffer.println("Getting files for loading clustered data.");
 
 		File file = null;
 
