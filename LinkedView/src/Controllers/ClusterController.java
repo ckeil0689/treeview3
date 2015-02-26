@@ -210,6 +210,11 @@ public class ClusterController {
 					.getDataMatrix();
 			processor = new ClusterProcessor(originalMatrix, fileName,
 					geneHeaderI, arrayHeaderI);
+			
+			/* Set zeroes invalid if they should be ignored. */
+			if(clusterView.isIgnoreZeroesChecked()) {
+				originalMatrix.setZeroesToMissing();
+			}
 
 			/* Row axis cluster */
 			reorderedRows = calculateAxis(rowSimilarity, ROW, fileName);

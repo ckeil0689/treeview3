@@ -31,6 +31,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -74,6 +75,8 @@ public class ClusterView {
 	private JPanel optionsPanel;
 	private JPanel btnPanel;
 	private JPanel loadPanel;
+	
+	private JCheckBox ignoreZeroes;
 
 	private JComboBox<String> rowDistChooser;
 	private JComboBox<String> colDistChooser;
@@ -206,6 +209,8 @@ public class ClusterView {
 		colClusterSettr = setupSpinner(CLUSTER_START);
 		rowIterationsSettr = setupSpinner(ITERATION_START);
 		colIterationsSettr = setupSpinner(ITERATION_START);
+		
+		ignoreZeroes = new JCheckBox("Ignore zeroes?");
 	}
 
 	/* Layout setups for main UI elements */
@@ -325,8 +330,10 @@ public class ClusterView {
 			choicePanel.add(its, "w 25%!");
 			choicePanel.add(rowIterationsSettr, "w 25%!, split 2");
 			choicePanel.add(colIterationsSettr, "wrap");
-			choicePanel.add(req);
+			choicePanel.add(req, "wrap");
 		}
+		
+		choicePanel.add(ignoreZeroes);
 
 		return choicePanel;
 	}
@@ -498,6 +505,11 @@ public class ClusterView {
 	public int getLinkMethod() {
 
 		return linkageChooser.getSelectedIndex();
+	}
+	
+	public boolean isIgnoreZeroesChecked() {
+		
+		return ignoreZeroes.isSelected();
 	}
 
 	/**
