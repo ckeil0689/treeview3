@@ -1,10 +1,11 @@
 package edu.stanford.genetics.treeview;
 
-import java.awt.Frame;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
@@ -31,7 +32,7 @@ public class AboutDialog extends CustomDialog {
 		setupLayout();
 
 		dialog.pack();
-		dialog.setLocationRelativeTo(Frame.getFrames()[0]);
+		dialog.setLocationRelativeTo(JFrame.getFrames()[0]);
 	}
 
 	/**

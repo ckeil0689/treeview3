@@ -23,7 +23,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
-import ColorChooser.ColorChooser;
+import ColorChooser.ColorChooserUI;
 import ColorChooser.ColorChooserController;
 import Utilities.StringRes;
 import Views.ClusterDialog;
@@ -47,6 +47,7 @@ import edu.stanford.genetics.treeview.model.DataModelWriter;
 import edu.stanford.genetics.treeview.model.ModelLoader;
 import edu.stanford.genetics.treeview.model.ReorderedDataModel;
 import edu.stanford.genetics.treeview.model.TVModel;
+import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
 import edu.stanford.genetics.treeview.plugin.dendroview.DoubleArrayDrawer;
 
 /**
@@ -774,29 +775,6 @@ public class TVController implements Observer {
 		// View
 		final PreferencesMenu preferences = new PreferencesMenu(tvFrame);
 
-		if (menu.equalsIgnoreCase(StringRes.menu_Color)) {
-
-			final Double min = model.getDataMatrix().getMinVal();
-			final Double max = model.getDataMatrix().getMaxVal();
-
-			/* View */
-			final ColorChooser gradientPick = new ColorChooser(
-					((DoubleArrayDrawer) dendroController.getArrayDrawer())
-							.getColorExtractor(),
-					min, max);
-
-			/*
-			 * Adding GradientColorChooser configurations to DendroView node.
-			 */
-			gradientPick.setConfigNode(((TVModel) model).getDocumentConfig());
-
-			/* Controller */
-			new ColorChooserController(gradientPick);
-
-			preferences.setGradientChooser(gradientPick);
-
-		}
-
 		if (menu.equalsIgnoreCase(StringRes.menu_RowAndCol)) {
 			preferences.setHeaderInfo(model.getRowHeaderInfo(),
 					model.getColumnHeaderInfo());
@@ -811,6 +789,38 @@ public class TVController implements Observer {
 		new PreferencesController(tvFrame, model, preferences);
 
 		preferences.setVisible(true);
+	}
+	
+	/* TODO implement this and others to deprecate PreferencesMenu, which is
+	 * a remnant of a unified menu system (as opposed to separate dialogs) */
+	public void openLabelMenu() {
+		
+		
+	}
+	
+	/**
+	 * Opens up the color chooser dialog.
+	 */
+	public void openColorMenu() {
+		
+		final Double min = model.getDataMatrix().getMinVal();
+		final Double max = model.getDataMatrix().getMaxVal();
+
+		/* View */
+		ColorExtractor drawer = ((DoubleArrayDrawer) dendroController
+				.getArrayDrawer()).getColorExtractor();
+		
+		final ColorChooserUI gradientPick = 
+				new ColorChooserUI(drawer, min, max);
+
+		/* Controller */
+		ColorChooserController controller = 
+				new ColorChooserController(gradientPick);
+		
+		/* Adding GradientColorChooser configurations to DendroView node. */
+		controller.setConfigNode(((TVModel) model).getDocumentConfig());
+		
+		gradientPick.setVisible(true);
 	}
 
 	/*

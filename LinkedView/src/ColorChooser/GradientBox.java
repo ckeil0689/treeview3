@@ -40,8 +40,6 @@ public class GradientBox extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	// private Preferences configNode;
-
 	/* Responsible for active data-to-color mapping */
 	private final ColorExtractor colorExtractor;
 
@@ -436,13 +434,7 @@ public class GradientBox extends JPanel {
 	 */
 	protected boolean isGradientArea(final Point point) {
 
-		boolean inArea = false;
-
-		if (gradientRect.contains(point)) {
-			inArea = true;
-		}
-
-		return inArea;
+		return gradientRect.contains(point);
 	}
 
 	// Thumb related methods

@@ -3,7 +3,6 @@ package edu.stanford.genetics.treeview;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentListener;
 import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
@@ -14,7 +13,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
-import ColorChooser.ColorChooser;
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
 import Utilities.StringRes;
@@ -38,8 +36,7 @@ public class PreferencesMenu extends CustomDialog implements
 	private Preferences configNode;
 
 	private final DendroView dendroView;
-	private ColorChooser gradientPick;
-	private JButton ok_btn;
+	private JButton okBtn;
 
 	// Menus
 	private AnnotationPanel annotationSettings;
@@ -66,21 +63,6 @@ public class PreferencesMenu extends CustomDialog implements
 		this.dendroView = tvFrame.getDendroView();
 
 		dialog.getContentPane().add(mainPanel);
-		dialog.addWindowListener(new WindowAdapter() {
-
-			@Override
-			public void windowClosed(final WindowEvent e) {
-
-				if (gradientPick != null && gradientPick.isCustomSelected()) {
-					gradientPick.saveStatus();
-				}
-			}
-		});
-	}
-
-	public void setGradientChooser(final ColorChooser gradientPick) {
-
-		this.gradientPick = gradientPick;
 	}
 
 	public void setHeaderInfo(final HeaderInfo geneHI, final HeaderInfo arrayHI) {
@@ -152,7 +134,7 @@ public class PreferencesMenu extends CustomDialog implements
 	 */
 	public void addOKButtonListener(final ActionListener listener) {
 
-		ok_btn.addActionListener(listener);
+		okBtn.addActionListener(listener);
 	}
 
 	/**
@@ -402,10 +384,6 @@ public class PreferencesMenu extends CustomDialog implements
 			annotationSettings = new AnnotationPanel();
 			menuPanel = annotationSettings.makeLabelPane();
 
-		} else if (menu.equalsIgnoreCase(StringRes.menu_Color)
-				&& gradientPick != null) {
-			menuPanel = gradientPick.makeGradientPanel();
-
 		} else if (menu.equalsIgnoreCase(StringRes.menu_URL)) {
 			menuPanel = new URLSettings().makeURLPanel();
 
@@ -419,10 +397,10 @@ public class PreferencesMenu extends CustomDialog implements
 			menuPanel.add(hint, "push, alignx 50%");
 		}
 
-		ok_btn = GUIFactory.createBtn(StringRes.btn_OK);
+		okBtn = GUIFactory.createBtn(StringRes.btn_OK);
 
 		mainPanel.add(menuPanel, "push, grow, wrap");
-		mainPanel.add(ok_btn, "pushx, alignx 100%, span");
+		mainPanel.add(okBtn, "pushx, alignx 100%, span");
 
 		mainPanel.revalidate();
 		mainPanel.repaint();
