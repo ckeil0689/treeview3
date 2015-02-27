@@ -152,25 +152,29 @@ public class ClusterFileWriter {
 		File file = new File(fullFileID);
 		
 		try {
-			if(file.exists()) {
-				int n = JOptionPane.showConfirmDialog(
-					    JFrame.getFrames()[0],
-					    "File already exists (" + fullFileID + "). Overwrite?",
-					    "Confirm File Storage",
-					    JOptionPane.YES_NO_OPTION);
-				
-				switch(n) {
-				
-				case JOptionPane.YES_OPTION:
-					file.createNewFile();
-					break;
-				case JOptionPane.NO_OPTION:
-				default: 
-					file = getNewFile(dir, fileName, fileEnd);
-					file.createNewFile();
-					break;
-				}
-			}
+			/* Do not overwrite at the moment */
+			file = getNewFile(dir, fileName, fileEnd);
+			file.createNewFile();
+			
+//			if(file.exists()) {
+//				int n = JOptionPane.showConfirmDialog(
+//					    JFrame.getFrames()[0],
+//					    "File already exists (" + fullFileID + "). Overwrite?",
+//					    "Confirm File Storage",
+//					    JOptionPane.YES_NO_OPTION);
+//				
+//				switch(n) {
+//				
+//				case JOptionPane.YES_OPTION:
+//					file.createNewFile();
+//					break;
+//				case JOptionPane.NO_OPTION:
+//				default: 
+//					file = getNewFile(dir, fileName, fileEnd);
+//					file.createNewFile();
+//					break;
+//				}
+//			}
 		} catch (IOException e) {
 			LogBuffer.logException(e);
 		}

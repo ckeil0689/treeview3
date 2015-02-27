@@ -876,6 +876,12 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	}
 
 	public void setSavedScale() {
+		
+		/* 
+		 * Do a reset before setting new scale to make sure screen dimensions
+		 * are properly set.
+		 */
+		resetMapContainers();
 
 		try {
 			if (configNode.nodeExists("GlobalXMap") && globalXmap != null) {
@@ -892,6 +898,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 		} catch (final BackingStoreException e) {
 			LogBuffer.logException(e);
+			resetMapContainers();
 		}
 	}
 
