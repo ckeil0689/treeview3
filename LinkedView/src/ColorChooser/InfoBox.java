@@ -11,9 +11,11 @@ import javax.swing.JPanel;
 
 import Utilities.GUIFactory;
 
-public class InfoBox extends JPanel{
+public class InfoBox {//extends JPanel{
 	
-	private static final long serialVersionUID = 1L;
+//	private static final long serialVersionUID = 1L;
+	
+	private final ColorPicker colorPicker;
 
 	private final FontMetrics fm;
 
@@ -24,29 +26,28 @@ public class InfoBox extends JPanel{
 	private final double minVal;
 	private final double maxVal;
 	
-	public InfoBox(final double minVal, final double maxVal) {
+	public InfoBox(ColorPicker colorPicker) {
 		
-		this.minVal = minVal;
-		this.maxVal = maxVal;
+		this.colorPicker = colorPicker;
 		
 		/* Font details for text-alignment in numBox */
 		this.fm = getFontMetrics(GUIFactory.FONTS);
 	}
 	
-	@Override
-	public void paintComponent(final Graphics g) {
-
-		super.paintComponent(g);
-
-		final Graphics2D g2 = (Graphics2D) g;
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
-		
-		drawRulerBox(g2);
-		drawNumBox(g2);
-	}
+//	@Override
+//	public void paintComponent(final Graphics g) {
+//
+//		super.paintComponent(g);
+//
+//		final Graphics2D g2 = (Graphics2D) g;
+//		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+//				RenderingHints.VALUE_ANTIALIAS_ON);
+//		
+//		drawRulerBox(g2);
+//		drawNumBox(g2);
+//	}
 	
-	private void drawRulerBox(final Graphics2D g2) {
+	protected void drawRulerBox(final Graphics2D g2) {
 
 		g2.setColor(Color.black);
 
@@ -65,7 +66,7 @@ public class InfoBox extends JPanel{
 		}
 	}
 
-	private void drawNumBox(final Graphics2D g2) {
+	protected void drawNumBox(final Graphics2D g2) {
 
 		g2.setColor(GUIFactory.DEFAULT_BG);
 		g2.fill(numRect);
@@ -108,6 +109,13 @@ public class InfoBox extends JPanel{
 
 		g2.drawString(Double.toString(last), x - stringWidth,
 				(int) ((numRect.getHeight() / 2) + numRect.getMinY()));
+	}
+	
+	protected void setRect(int start, int left, int width, int height) {
+		
+		rulerRect.setRect(start, left - 10, width, height);
+		numRect.setRect(start, left, width, height);
+		
 	}
 	
 	protected Rectangle2D getNumRect() {

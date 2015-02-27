@@ -1,11 +1,16 @@
 package ColorChooser;
 
 import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JColorChooser;
+import javax.swing.JPanel;
 
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
@@ -14,6 +19,10 @@ public class ColorPicker {
 
 	/* Adjust this to MigLayout variables of mainPanel! */
 	private static final int WIDTH = 450;
+	
+	private GradientBox gradientBox;
+	private ThumbBox thumbBox;
+	private InfoBox infoBox;
 	
 	/* The currently active set of colors */
 	private ColorSet activeColorSet;
@@ -45,9 +54,44 @@ public class ColorPicker {
 		this.thumbList = new ArrayList<Thumb>();
 		this.colorList = new ArrayList<Color>();
 		
+		this.gradientBox = new GradientBox(this);
+		this.thumbBox = new ThumbBox(this);
+		this.infoBox = new InfoBox(this);
+		
 		/* data range */
 		this.minVal = minVal;
 		this.maxVal = maxVal;
+		
+		
+	}
+	
+	private class ContainerPanel extends JPanel {
+		
+		@Override
+		public void paintComponent(final Graphics g) {
+		 
+			super.paintComponent(g);
+
+			final Graphics2D g2 = (Graphics2D) g;
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+					RenderingHints.VALUE_ANTIALIAS_ON);
+			
+			positionRects(getWidth());
+			
+			thumbBox.drawThumbBox(g2);
+			gradientBox.drawGradientBox(g2);
+			infoBox.drawRulerBox(g2);
+			infoBox.drawNumBox(g2);
+		}
+		
+		private void positionRects(final double width) {
+
+			final int start = ((int) width - WIDTH) / 2;
+
+			thumbBox.setRect(start, 0, WIDTH, 30);
+			gradientBox.setRect(start, 30, WIDTH, 70);
+			infoBox.setRect(start, 100, WIDTH, 10);
+		}
 	}
 	
 	/**
@@ -60,7 +104,7 @@ public class ColorPicker {
 		/* clearing all data */
 		colorList.clear();
 		thumbList.clear();
-		fractions = resetFractions();
+		resetFractions();
 
 		final String[] colors = colorSet.getColors();
 
@@ -116,16 +160,6 @@ public class ColorPicker {
 		colorExtractor.notifyObservers();
 	}
 	
-	private void positionRects(final double width) {
-
-		final int start = ((int) width - WIDTH) / 2;
-
-		thumbRect.setRect(start, 0, WIDTH, 30);
-		gradientRect.setRect(start, 30, WIDTH, 70);
-		rulerRect.setRect(start, 100, WIDTH, 10);
-		numRect.setRect(start, 110, WIDTH, 40);
-	}
-	
 	private void refresh() {
 		
 		setGradientColors();
@@ -158,8 +192,8 @@ public class ColorPicker {
 
 		final int x = (int) (newFraction * getSize().getWidth());
 
-		insertThumbAt(x, newCol);
-		fractions = updateFractions();
+		thumbBox.insertThumbAt(x, newCol);
+		updateFractions();
 
 		if (thumbList.size() != fractions.length) {
 			System.out.println("ThumbList size (" + thumbList.size()
@@ -232,23 +266,31 @@ public class ColorPicker {
 	}
 	
 	/**
+	 * Resets the fractions float[] to a default value with 3 colors.
+	 */
+	protected void resetFractions() {
+
+		this.fractions = new float[] { 0.0f, 0.5f, 1.0f };
+	}
+	
+	/**
 	 * Calculates the fractions needed for the LinearGradient object to
 	 * determine where the center of each color is displayed.
 	 *
 	 * @return A float array containing the thumb positions as fractions of the
 	 *         width of gradientRect.
 	 */
-	private float[] updateFractions() {
+	protected void updateFractions() {
 
-		final float[] fractions = new float[colorList.size()];
+		final float[] newFractions = new float[colorList.size()];
 
 		int i = 0;
 		for (final Thumb t : thumbList) {
 
-			fractions[i++] = getThumbFraction(t);
+			newFractions[i++] = thumbBox.getThumbFraction(t);
 		}
-
-		return fractions;
+		
+		this.fractions = newFractions;
 	}
 	
 	/**
@@ -261,6 +303,27 @@ public class ColorPicker {
 	public void setActiveColorSet(final ColorSet set) {
 
 		this.activeColorSet = set;
+	}
+	
+	/** 
+	 * Repaints all related UI elements.
+	 */
+	protected void repaint() {
+		
+		gradientBox.repaint();
+		thumbBox.repaint();
+		infoBox.repaint();
+	}
+	
+	/**
+	 * Swaps positions of thumbs and colors in their specific lists.
+	 * @param oldIndex
+	 * @param newIndex
+	 */
+	protected void swapPositions(int oldIndex, int newIndex) {
+		
+		Collections.swap(thumbList, oldIndex, newIndex);
+		Collections.swap(colorList, oldIndex, newIndex);
 	}
 	
 	/**
@@ -278,9 +341,24 @@ public class ColorPicker {
 		return thumbList;
 	}
 	
+	protected int getThumbNumber() {
+		
+		return thumbList.size();
+	}
+	
+	protected Thumb getThumb(int index) {
+		
+		return thumbList.get(index);
+	}
+	
 	protected List<Color> getColorList() {
 		
 		return colorList;
+	}
+	
+	protected int getColorNumber() {
+		
+		return colorList.size();
 	}
 	
 	protected float[] getFractions() {

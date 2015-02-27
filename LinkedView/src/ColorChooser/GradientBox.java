@@ -36,112 +36,115 @@ import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
  * MouseListener attached (via the controller class) which handles user input
  * and allows for change of color in the clicked area.
  */
-public class GradientBox extends JPanel {
+public class GradientBox { //extends JPanel {
 
-	private static final long serialVersionUID = 1L;
+//	private static final long serialVersionUID = 1L;
+	
+	private ColorPicker colorPicker;
 
-	/* Responsible for active data-to-color mapping */
-	private final ColorExtractor colorExtractor;
-
-	/* List of all active colors (depends on active ColorSet) */
-	private final List<Color> colorList;
-
-	/* Inflexible array of colors for LinearGradientPaint */
-	private Color[] colors;
-
-	/* List of all active thumbs (one per color) */
-	private final List<Thumb> thumbList;
-
-	/* Fractions for LinearGradientPaint (depend on thumb positions) */
-	private float[] fractions;
+//	/* Responsible for active data-to-color mapping */
+//	private final ColorExtractor colorExtractor;
+//
+//	/* List of all active colors (depends on active ColorSet) */
+//	private final List<Color> colorList;
+//
+//	/* Inflexible array of colors for LinearGradientPaint */
+//	private Color[] colors;
+//
+//	/* List of all active thumbs (one per color) */
+//	private final List<Thumb> thumbList;
+//
+//	/* Fractions for LinearGradientPaint (depend on thumb positions) */
+//	private float[] fractions;
 
 	/* The currently active set of colors */
-	private ColorSet activeColorSet;
+//	private ColorSet activeColorSet;
 
-	/* Data boundaries */
-	private final double minVal;
-	private final double maxVal;
+//	/* Data boundaries */
+//	private final double minVal;
+//	private final double maxVal;
 
 	/* Holds the currently selected thumb */
-	private Thumb selectedThumb = null;
+//	private Thumb selectedThumb = null;
 
 	private final Rectangle2D gradientRect = new Rectangle2D.Float();
-	private final Rectangle2D thumbRect = new Rectangle2D.Float();
-	private final Rectangle2D rulerRect = new Rectangle2D.Float();
-	private final Rectangle2D numRect = new Rectangle2D.Float();
+//	private final Rectangle2D thumbRect = new Rectangle2D.Float();
+//	private final Rectangle2D rulerRect = new Rectangle2D.Float();
+//	private final Rectangle2D numRect = new Rectangle2D.Float();
 
-	private final FontMetrics fm;
+//	private final FontMetrics fm;
 
 	/* Adjust this to MigLayout variables of mainPanel! */
-	private static final int WIDTH = 450;
+//	private static final int WIDTH = 450;
 
 	/**
 	 * Constructs a GradientBox object.
 	 */
-	public GradientBox(final ColorExtractor drawer, final double minVal,
-			final double maxVal) {
+	public GradientBox(ColorPicker colorPicker) {
+		
+		this.colorPicker = colorPicker;
 
-		this.colorExtractor = drawer;
+//		this.colorExtractor = drawer;
 
 		/* Font details for text-alignment in numBox */
-		this.fm = getFontMetrics(GUIFactory.FONTS);
+//		this.fm = getFontMetrics(GUIFactory.FONTS);
 
 		/* data range */
-		this.minVal = minVal;
-		this.maxVal = maxVal;
+//		this.minVal = minVal;
+//		this.maxVal = maxVal;
 
-		/* active colors and thumbs */
-		this.colorList = new ArrayList<Color>();
-		this.thumbList = new ArrayList<Thumb>();
+//		/* active colors and thumbs */
+//		this.colorList = new ArrayList<Color>();
+//		this.thumbList = new ArrayList<Thumb>();
 
-		setToolTipText("This Turns Tooltips On");
-		setFocusable(true);
+//		setToolTipText("This Turns Tooltips On");
+//		setFocusable(true);
 	}
 
-	/**
-	 * Sets the activeColors key in configNode. This represents the currently
-	 * selected ColorSet choice by the user.
-	 *
-	 * @param name
-	 *            ConfigNode name of the active ColorSet
-	 */
-	public void setActiveColorSet(final ColorSet set) {
+//	/**
+//	 * Sets the activeColors key in configNode. This represents the currently
+//	 * selected ColorSet choice by the user.
+//	 *
+//	 * @param name
+//	 *            ConfigNode name of the active ColorSet
+//	 */
+//	public void setActiveColorSet(final ColorSet set) {
+//
+//		this.activeColorSet = set;
+//	}
 
-		this.activeColorSet = set;
-	}
+//	@Override
+//	public void paintComponent(final Graphics g) {
+//
+//		super.paintComponent(g);
+//
+//		final Graphics2D g2 = (Graphics2D) g;
+//		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+//				RenderingHints.VALUE_ANTIALIAS_ON);
 
-	@Override
-	public void paintComponent(final Graphics g) {
+//		positionRects(getWidth());
+//
+//		verifyThumbs();
+//
+//		drawThumbBox(g2);
+//		drawGradientBox(g2);
+//		drawRulerBox(g2);
+//		drawNumBox(g2);
 
-		super.paintComponent(g);
+//		g2.dispose();
+//	}
 
-		final Graphics2D g2 = (Graphics2D) g;
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
+//	private void positionRects(final double width) {
+//
+//		final int start = ((int) width - WIDTH) / 2;
+//
+//		thumbRect.setRect(start, 0, WIDTH, 30);
+//		gradientRect.setRect(start, 30, WIDTH, 70);
+//		rulerRect.setRect(start, 100, WIDTH, 10);
+//		numRect.setRect(start, 110, WIDTH, 40);
+//	}
 
-		positionRects(getWidth());
-
-		verifyThumbs();
-
-		drawThumbBox(g2);
-		drawGradientBox(g2);
-		drawRulerBox(g2);
-		drawNumBox(g2);
-
-		g2.dispose();
-	}
-
-	private void positionRects(final double width) {
-
-		final int start = ((int) width - WIDTH) / 2;
-
-		thumbRect.setRect(start, 0, WIDTH, 30);
-		gradientRect.setRect(start, 30, WIDTH, 70);
-		rulerRect.setRect(start, 100, WIDTH, 10);
-		numRect.setRect(start, 110, WIDTH, 40);
-	}
-
-	private void drawGradientBox(final Graphics2D g2) {
+	protected void drawGradientBox(final Graphics2D g2) {
 
 		// Dimensions
 		final float startX = (float) gradientRect.getMinX();
@@ -720,66 +723,71 @@ public class GradientBox extends JPanel {
 		return fractions;
 	}
 
-	/**
-	 * Returns the fraction of the width of the gradientRect where a thumb is
-	 * currently positioned.
-	 *
-	 * @param t
-	 * @return a float value between 0.0 and 1.0
-	 */
-	private float getThumbFraction(final Thumb t) {
+//	/**
+//	 * Returns the fraction of the width of the gradientRect where a thumb is
+//	 * currently positioned.
+//	 *
+//	 * @param t
+//	 * @return a float value between 0.0 and 1.0
+//	 */
+//	private float getThumbFraction(final Thumb t) {
+//
+//		final double x = t.getX() - gradientRect.getMinX();
+//		return (float) (x / gradientRect.getWidth());
+//	}
+//
+//	/**
+//	 * Gets a thumb's position in terms of the data range.
+//	 *
+//	 * @param t
+//	 * @return A double value between minimum and maximum of the currently
+//	 *         relevant data range for coloring.
+//	 */
+//	private double getThumbPosition(final Thumb t) {
+//
+//		final float fraction = getThumbFraction(t);
+//		final double value = Math.abs((maxVal - minVal) * fraction) + minVal;
+//
+//		return (double) Math.round(value * 1000) / 1000;
+//	}
 
-		final double x = t.getX() - gradientRect.getMinX();
-		return (float) (x / gradientRect.getWidth());
-	}
+//	/**
+//	 * Resets the fractions float[] to a default value with 3 colors.
+//	 *
+//	 * @return
+//	 */
+//	private float[] resetFractions() {
+//
+//		return new float[] { 0.0f, 0.5f, 1.0f };
+//	}
 
-	/**
-	 * Gets a thumb's position in terms of the data range.
-	 *
-	 * @param t
-	 * @return A double value between minimum and maximum of the currently
-	 *         relevant data range for coloring.
-	 */
-	private double getThumbPosition(final Thumb t) {
-
-		final float fraction = getThumbFraction(t);
-		final double value = Math.abs((maxVal - minVal) * fraction) + minVal;
-
-		return (double) Math.round(value * 1000) / 1000;
-	}
-
-	/**
-	 * Resets the fractions float[] to a default value with 3 colors.
-	 *
-	 * @return
-	 */
-	private float[] resetFractions() {
-
-		return new float[] { 0.0f, 0.5f, 1.0f };
-	}
-
-	@Override
-	public String getToolTipText(final MouseEvent e) {
-
-		String ret = "";
-		for (final Thumb t : thumbList) {
-
-			if (t.contains(e.getX(), e.getY())) {
-				final double value = getThumbPosition(t);
-				ret = Double.toString(value);
-			}
-		}
-		return ret;
-	}
+//	@Override
+//	public String getToolTipText(final MouseEvent e) {
+//
+//		String ret = "";
+//		for (final Thumb t : thumbList) {
+//
+//			if (t.contains(e.getX(), e.getY())) {
+//				final double value = getThumbPosition(t);
+//				ret = Double.toString(value);
+//			}
+//		}
+//		return ret;
+//	}
+//	
+//	protected float[] getFractions() {
+//		
+//		return fractions;
+//	}
+//	
+//	protected List<Color> getColorList() {
+//		
+//		return colorList;
+//	}
 	
-	protected float[] getFractions() {
+	protected void setRect(int start, int left, int width, int height) {
 		
-		return fractions;
-	}
-	
-	protected List<Color> getColorList() {
-		
-		return colorList;
+		gradientRect.setRect(start, left, width, height);
 	}
 
 	/**
