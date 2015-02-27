@@ -771,6 +771,16 @@ public class GradientBox extends JPanel {
 		}
 		return ret;
 	}
+	
+	protected float[] getFractions() {
+		
+		return fractions;
+	}
+	
+	protected List<Color> getColorList() {
+		
+		return colorList;
+	}
 
 	/**
 	 * Returns the current size of colorList in ColorGradientChooser.
