@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.event.MouseEvent;
 import java.util.Observable;
+import java.util.prefs.Preferences;
 
 import javax.swing.SwingUtilities;
 
@@ -18,6 +19,19 @@ public class RowLabelView extends LabelView {
 	public RowLabelView() {
 
 		super(LabelView.ROW);
+	}
+	
+	@Override
+	public void setConfigNode(final Preferences parentNode) {
+
+		if (parentNode != null) {
+			super.setConfigNode(parentNode.node("RowLabelView"));
+
+		} else {
+			LogBuffer.println("Could not find or create ArrayameView"
+					+ "node because parentNode was null.");
+			return;
+		}
 	}
 
 	public void generateView(final UrlExtractor uExtractor) {

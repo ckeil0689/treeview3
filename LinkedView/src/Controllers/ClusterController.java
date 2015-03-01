@@ -382,7 +382,7 @@ public class ClusterController {
 
 			clusterDialog.dispose();
 
-			tvController.loadData(fileSet);
+			tvController.loadData(fileSet, true);
 
 		} else {
 			final String alert = "When trying to load the clustered file, no "

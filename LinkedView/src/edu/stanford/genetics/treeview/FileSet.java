@@ -30,6 +30,8 @@ import java.util.prefs.Preferences;
 
 import javax.swing.JOptionPane;
 
+import Utilities.StringRes;
+
 /**
  * Encapsulates a set of files corresponding to a typical hierarchical cluster
  * analysis. Such things are always based upon a cdt or pcl file.
@@ -111,7 +113,9 @@ public class FileSet {
 	 */
 	public FileSet(final String cdt, final String dir) {
 
-		node = Preferences.userRoot().node(this.getClass().getName());
+		node = Preferences.userRoot().node(StringRes.pnode_TVFrame)
+				.node("FileSet");
+		//this.getClass().getName());
 		setCdt(cdt);
 		setDir(dir);
 	}

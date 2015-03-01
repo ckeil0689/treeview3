@@ -45,6 +45,8 @@ import edu.stanford.genetics.treeview.model.DataModelWriter;
 import edu.stanford.genetics.treeview.model.ModelLoader;
 import edu.stanford.genetics.treeview.model.ReorderedDataModel;
 import edu.stanford.genetics.treeview.model.TVModel;
+import edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets;
+import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 import edu.stanford.genetics.treeview.plugin.dendroview.DoubleArrayDrawer;
 
@@ -62,6 +64,9 @@ public class TVController implements Observer {
 	private MenubarController menuController;
 	private File file;
 	private FileSet fileMenuSet;
+	
+	private Preferences oldNode;
+	private String[] clusterNodeSourceKeys;
 	private final String[] selectedLabels;
 
 	public TVController(final TreeViewFrame tvFrame, final DataModel model) {
@@ -114,6 +119,7 @@ public class TVController implements Observer {
 			JOptionPane.showMessageDialog(Frame.getFrames()[0], message,
 					"Error", JOptionPane.ERROR_MESSAGE);
 			LogBuffer.println(e.getMessage());
+			return;
 		}
 	}
 
@@ -157,14 +163,6 @@ public class TVController implements Observer {
 
 		dendroController.toggleTrees();
 	}
-
-	// public void setSearchVisible() {
-	//
-	// /* Don't do anything if search panel is visible (closing only via X) */
-	// if (!tvFrame.getDendroView().isSearchVisible()) {
-	// dendroController.setSearchVisible(true);
-	// }
-	// }
 
 	/**
 	 * Generates the menubar controller. Causes listeners to be added for the
@@ -211,7 +209,7 @@ public class TVController implements Observer {
 				tvFrame.getWelcomeView().setWarning();
 
 			} else {
-				loadData(last);
+				loadData(last, false);
 			}
 		}
 	}
@@ -258,15 +256,32 @@ public class TVController implements Observer {
 		dendroController.setMatrixSize(mode);
 	}
 
-	public void loadData(final FileSet fileSet) {
-
-		fileMenuSet = (fileSet != null) ? fileSet : tvFrame.getFileSet(file);
+	/**
+	 * Load data into the model.
+	 * @param fileSet The fileSet to be loaded.
+	 * @param isClusterFile Whether a clustered file is loaded or not. This
+	 * is important when figuring out whether preferences from the previous
+	 * file should be copied to the new one. It should only occur when a 
+	 * file is being clustered.
+	 */
+	public void loadData(final FileSet fileSet, final boolean isClusterFile) {
 
 		/* Setting loading screen */
 		tvFrame.generateView(TreeViewFrame.PROGRESS_VIEW);
 
+
 		/* Loading TVModel */
 		final TVModel tvModel = (TVModel) model;
+		
+		if(isClusterFile && clusterNodeSourceKeys != null) {
+			String srcName = clusterNodeSourceKeys[0];
+			String srcExtension = clusterNodeSourceKeys[1];
+			this.oldNode = getOldPreferences(srcName, srcExtension);
+		} else {
+			this.oldNode = null;
+		}
+		
+		fileMenuSet = (fileSet != null) ? fileSet : tvFrame.getFileSet(file);
 
 		try {
 			if (dendroController.hasDendroView()) {
@@ -306,6 +321,8 @@ public class TVController implements Observer {
 
 		if (model.getDataMatrix().getNumRow() > 0) {
 
+			copyOldPreferences(fileMenuSet.getRoot(), fileMenuSet.getExt());
+			
 			if (fileMenuSet != null) {
 				fileMenuSet = tvFrame.getFileMRU().addUnique(fileMenuSet);
 				tvFrame.getFileMRU().setLast(fileMenuSet);
@@ -343,6 +360,166 @@ public class TVController implements Observer {
 
 		addViewListeners();
 		addMenuListeners();
+	}
+	
+	private Preferences getOldPreferences(String srcName, String srcExtension) {
+		
+		try {
+			/* First, get the relevant old node... */
+			Preferences root;
+			if(getConfigNode().nodeExists("File")) {
+				root = getConfigNode().node("File");
+			} else {
+				LogBuffer.println("File node not found. Could not"
+						+ " copy data.");
+				return null;
+			}
+			
+			return getTargetNode(root, srcName, srcExtension);
+			
+		} catch (BackingStoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	/**
+	 * TODO Nasty hotfix code... try to put into another class to handle 
+	 * the transfer of data... Preferences API seems weird about copying 
+	 * node content.
+	 * 
+	 * Copies label and color data from the pre-clustered file to the 
+	 * Preferences node of the post-clustered file.
+	 * @param srcName Source name of the post-clustered file.
+	 * @param srcExtension Source file extension of the post-clustered file.
+	 */
+	private void copyOldPreferences(String srcName, String srcExtension) {
+		
+		if(oldNode != null) {
+			
+			try {
+				/* First, get the relevant old node... */
+				Preferences root;
+				if(getConfigNode().nodeExists("File")) {
+					root = getConfigNode().node("File");
+				} else {
+					LogBuffer.println("File node not found. Could not"
+							+ " copy data.");
+					return;
+				}
+				
+				Preferences newNode = getTargetNode(root, srcName, 
+						srcExtension);
+				
+				/* Add relevant data from old node back */
+				Preferences newKeys;
+				Preferences oldKeys;
+				
+				if(oldNode.nodeExists("ColLabelView")) {
+					newKeys = newNode.node("ColLabelView");
+					oldKeys = oldNode.node("ColLabelView");
+					
+					/* Labels */
+					newKeys.put("face", oldKeys.get("face", "Dialog"));
+					newKeys.putBoolean("isRightJustified", 
+							oldKeys.getBoolean("isRightJustified", true));
+					newKeys.putInt("size", oldKeys.getInt("size", 12));
+				}
+				
+				if(oldNode.nodeExists("RowLabelView")) {
+					newKeys = newNode.node("RowLabelView");
+					oldKeys = oldNode.node("RowLabelView");
+					
+					newKeys.put("face", oldKeys.get("face", "Dialog"));
+					newKeys.putBoolean("isRightJustified", 
+							oldKeys.getBoolean("isRightJustified", true));
+					newKeys.putInt("size", oldKeys.getInt("size", 12));
+				}
+				
+				if(oldNode.nodeExists("ColorPresets")) {
+					/* Colors */
+					newKeys = newNode.node("ColorPresets").node("ColorSet1");
+					oldKeys = oldNode.node("ColorPresets").node("ColorSet1");
+					
+					ColorSet defaultCS = ColorPresets.defaultColorSets[0];
+					
+					newKeys.put("Color01", oldKeys.get("Color01", 
+							defaultCS.getColors()[0]));
+					newKeys.put("Color11", oldKeys.get("Color11", 
+							defaultCS.getColors()[1]));
+					newKeys.put("Color21", oldKeys.get("Color21", 
+							defaultCS.getColors()[2]));
+					
+					newKeys.putDouble("Fraction01", 
+							oldKeys.getDouble("Fraction01", 0.0));
+					newKeys.putDouble("Fraction11", 
+							oldKeys.getDouble("Fraction11", 0.5));
+					newKeys.putDouble("Fraction21", 
+							oldKeys.getDouble("Fraction21", 1.0));
+					
+					newKeys.putInt("colorNum", oldKeys.getInt("colorNum", 3));
+					
+					newKeys.put("empty", oldKeys.get("empty", 
+							defaultCS.getEmpty().toString()));
+					newKeys.put("missing", oldKeys.get("missing", 
+							defaultCS.getMissing().toString()));
+					newKeys.put("name", oldKeys.get("name", "Custom"));
+					
+				}
+				
+				if(oldNode.nodeExists("GradientChooser")) {
+					
+					newKeys = newNode.node("GradientChooser");
+					oldKeys = oldNode.node("GradientChooser");
+					
+					newKeys.put("activeColors", oldKeys.get("activeColors", 
+							"RedGreen"));
+				}
+				
+			} catch (BackingStoreException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			oldNode = null;
+		}
+	}
+	
+	/**
+	 * Finds a specific sub-node in a root node.
+	 * @param root
+	 * @param srcName
+	 * @param srcExtension
+	 * @return The target Preferences node.
+	 * @throws BackingStoreException 
+	 */
+	private Preferences getTargetNode(Preferences root, String srcName, 
+			String srcExtension) throws BackingStoreException {
+		
+		String[] fileNodes = root.childrenNames();
+		
+		Preferences targetNode = null;
+		for(String nodeName : fileNodes) {
+			Preferences node = root.node(nodeName);
+			String name = node.get("name", "none");
+			String extension = node.get("extension", ".txt");
+			
+			if(name.equalsIgnoreCase(srcName) 
+					&& extension.equalsIgnoreCase(srcExtension)) {
+				targetNode = node;
+				break;
+			}
+		}
+		
+		/* Interrupt if no node is found to copy old data. */
+		if(targetNode == null) {
+			LogBuffer.println("Target node not found. Could not"
+					+ " copy data.");
+			return null;
+		}
+		
+		return targetNode;
 	}
 
 	/**
@@ -405,7 +582,7 @@ public class TVController implements Observer {
 
 			/* Only run loader, if JFileChooser wasn't canceled. */
 			if (file != null) {
-				loadData(tvFrame.getFileSet(file));
+				loadData(tvFrame.getFileSet(file), false);
 
 			} else {
 				LogBuffer.println("Selected file was null. Cannot begin"
@@ -492,6 +669,13 @@ public class TVController implements Observer {
 	 */
 	public void setupClusterView(final int clusterType) {
 
+		/* 
+		 * To quickly find Preferences node of pre-cluster file to carry over
+		 * settings like color and font.
+		 */
+		FileSet fs = ((TVModel) model).getFileSet();
+		this.clusterNodeSourceKeys = new String[]{fs.getRoot(), fs.getExt()};
+		
 		/* Erase selection */
 		dendroController.deselectAll();
 
@@ -728,7 +912,7 @@ public class TVController implements Observer {
 					.getSource());// tvFrame.getFileMenuSet();
 
 			tvFrame.generateView(TreeViewFrame.PROGRESS_VIEW);
-			loadData(fileMenuSet);
+			loadData(fileMenuSet, false);
 			// new LoadWorker().execute();
 
 			// } catch (final LoadException e) {

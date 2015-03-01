@@ -68,6 +68,7 @@ public class ColumnLabelView extends LabelView {
 		} else {
 			LogBuffer.println("Could not find or create ArrayameView"
 					+ "node because parentNode was null.");
+			return;
 		}
 	}
 

@@ -348,6 +348,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			final String default_name = "No file.";
 			final String default_ext = "nan";
 
+			/* Look if there's already a node for the file */
 			boolean fileFound = false;
 			if (childrenNodes.length > 0) {
 				for (final String childrenNode : childrenNodes) {
@@ -366,6 +367,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 				}
 			}
 
+			/* If no node for the file has been found, add one. */
 			if (!fileFound) {
 				documentConfig = fileNode.node("Model "
 						+ (childrenNodes.length + 1));

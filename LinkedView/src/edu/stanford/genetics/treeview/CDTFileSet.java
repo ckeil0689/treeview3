@@ -25,6 +25,8 @@ package edu.stanford.genetics.treeview;
 import java.io.File;
 import java.util.prefs.Preferences;
 
+import Utilities.StringRes;
+
 /**
  * Encapsulates a set of files corresponding to a typical hierarchical cluster
  * analysis. Such things are always based upon a cdt or pcl file.
@@ -86,7 +88,8 @@ public class CDTFileSet extends FileSet {
 
 		super(dir);
 		// node = new DummyConfigNode("FileSet");
-		node = Preferences.userRoot().node(this.getClass().getName());
+		node = Preferences.userRoot().node(StringRes.pnode_TVFrame)
+				.node("CDTFileSet");
 		setCdt(cdt);
 	}
 
