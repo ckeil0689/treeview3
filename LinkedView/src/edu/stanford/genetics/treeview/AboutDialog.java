@@ -49,9 +49,9 @@ public class AboutDialog extends CustomDialog {
 		 */
 		final JTextArea text = GUIFactory.createWrappableTextArea();
 		text.setText(StringRes.appName
-				+ " was created by Chris Keil, Lance Parsons,"
-				+ "Robert Leach, & Anastasia Baryshnikova and "
-				+ "is based on Alok Saldhana's Java TreeView.");
+				+ " was created by Chris Keil, Lance Parsons, "
+				+ "Robert Leach & Anastasia Baryshnikova and "
+				+ "is based on Alok Saldanha's Java TreeView.");
 
 		final JLabel version = GUIFactory.createLabel("Version:",
 				GUIFactory.FONTS);
