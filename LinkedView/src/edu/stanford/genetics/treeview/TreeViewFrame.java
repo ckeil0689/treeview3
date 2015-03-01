@@ -673,10 +673,10 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		// }
 		// });
 
-		final JMenuItem feedbackMenuItem = new JMenuItem(
-				StringRes.menu_Feedback);
-		helpMenu.add(feedbackMenuItem);
-		stackMenuList.add(feedbackMenuItem);
+//		final JMenuItem feedbackMenuItem = new JMenuItem(
+//				StringRes.menu_Feedback);
+//		helpMenu.add(feedbackMenuItem);
+//		stackMenuList.add(feedbackMenuItem);
 
 		menuBar.add(helpMenu);
 	}
