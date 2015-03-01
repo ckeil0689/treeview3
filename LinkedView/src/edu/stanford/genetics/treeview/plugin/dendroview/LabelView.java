@@ -57,7 +57,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	protected final String d_face = "Dialog";
 	protected final int d_style = 0;
 	protected final int d_size = 12;
-	protected final boolean d_justified = false;
+	protected final boolean d_justified = true;
 
 	/* Custom label settings */
 	protected String face;
