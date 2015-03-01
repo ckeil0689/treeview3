@@ -185,12 +185,25 @@ public class ClusterFileWriter {
 	private File getNewFile(String dir, String oldName, String fileEnd) {
 		
 		File file = new File(dir + oldName + fileEnd);
+		
+		/* 
+		 * Even for gtr and atr files, the cdt files are what should be 
+		 * counted ONLY. While single axes might be clustered, if the user hits
+		 * cancel during clustering, no .cdt file will exist. That makes the
+		 * rest useless so it can be overwritten and avoids number errors
+		 * with tree files.
+		 */
+		File cdtFile = new File(dir + oldName + ".cdt");
+		
 		int fileCount = 0;
 		
-		while(file.exists()) {
+		while(cdtFile.exists()) {
 			fileCount++;
+			cdtFile = new File(dir + oldName + "_" + fileCount + ".cdt");
 			file = new File(dir + oldName + "_" + fileCount + fileEnd);
 		}
+		
+		cdtFile = null;
 		
 		return file;
 	}
