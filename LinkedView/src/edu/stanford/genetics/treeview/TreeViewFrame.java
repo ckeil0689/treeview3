@@ -569,16 +569,16 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		fileMenu.add(quitMenuItem);
 		stackMenuList.add(quitMenuItem);
 
-		final JMenuItem saveMenuItem = new JMenuItem(StringRes.menu_Save,
-				KeyEvent.VK_S);
-		saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
-				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		fileMenu.add(saveMenuItem);
-		stackMenuList.add(saveMenuItem);
-
-		final JMenuItem saveAsMenuItem = new JMenuItem(StringRes.menu_SaveAs);
-		fileMenu.add(saveAsMenuItem);
-		stackMenuList.add(saveAsMenuItem);
+//		final JMenuItem saveMenuItem = new JMenuItem(StringRes.menu_Save,
+//				KeyEvent.VK_S);
+//		saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
+//				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+//		fileMenu.add(saveMenuItem);
+//		stackMenuList.add(saveMenuItem);
+//
+//		final JMenuItem saveAsMenuItem = new JMenuItem(StringRes.menu_SaveAs);
+//		fileMenu.add(saveAsMenuItem);
+//		stackMenuList.add(saveAsMenuItem);
 
 		menuBar.add(fileMenu);
 
@@ -607,9 +607,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 			running.addClusterMenus(clusterMenu);
 			menuBar.add(clusterMenu);
 
-			final JMenuItem fontMenuItem = new JMenuItem(StringRes.menu_Font);
-			prefSubMenu.add(fontMenuItem);
-			stackMenuList.add(fontMenuItem);
+//			final JMenuItem fontMenuItem = new JMenuItem(StringRes.menu_Font);
+//			prefSubMenu.add(fontMenuItem);
+//			stackMenuList.add(fontMenuItem);
 
 			final JMenuItem urlMenuItem = new JMenuItem(StringRes.menu_URL);
 			prefSubMenu.add(urlMenuItem);

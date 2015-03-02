@@ -79,7 +79,9 @@ public class WelcomeView {
 				final InputStream input = classLoader
 						.getResourceAsStream("logo_small.png");
 
-				image = ImageIO.read(input);
+				if(input != null) {
+					image = ImageIO.read(input);
+				}
 
 			} catch (final IOException ex) {
 				// handle exception...
@@ -90,7 +92,10 @@ public class WelcomeView {
 		protected void paintComponent(final Graphics g) {
 
 			super.paintComponent(g);
-			g.drawImage(image, 0, 0, null);
+			
+			if(image != null) {
+				g.drawImage(image, 0, 0, null);
+			}
 		}
 
 	}

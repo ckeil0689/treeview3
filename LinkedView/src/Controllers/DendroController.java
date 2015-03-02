@@ -7,6 +7,8 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -280,6 +282,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		dendroView.addCompListener(new AppFrameListener());
 		dendroView.addDividerListener(new DividerListener());
 		dendroView.addSplitPaneListener(new SplitPaneListener());
+		dendroView.addDeselectClickListener(new Deselector());
 	}
 
 	/* -------------- Listeners --------------------- */
@@ -311,6 +314,15 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	// dendroView.searchLabels();
 	// }
 	// }
+	
+	private class Deselector extends MouseAdapter {
+		
+		@Override 
+		public void mouseClicked(MouseEvent e) {
+			
+			deselectAll();
+		}
+	}
 
 	private void resetDendroView() {
 

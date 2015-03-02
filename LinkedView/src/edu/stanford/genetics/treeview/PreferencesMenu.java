@@ -198,19 +198,18 @@ ConfigNodePersistent {
 	 */
 	class FontPanel {
 
-		private final JPanel mainPanel;
+		private JPanel mainPanel;
 
 		public FontPanel() {
 
-			mainPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING,
-					null);
+//			mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT,
+//					null);
 
 			final FontSettings fontSettings = new FontSettings(
 					dendroView.getRowLabelView(),
 					dendroView.getColumnLabelView());
 
-			mainPanel.add(fontSettings.makeFontPanel(),
-					"pushx, alignx 50%, w 95%");
+			mainPanel = fontSettings.makeFontPanel();
 		}
 
 		public JPanel makeFontPanel() {
@@ -293,8 +292,10 @@ ConfigNodePersistent {
 			final JLabel cols = GUIFactory.setupHeader(StringRes.main_cols);
 
 			/* Label alignment */
-			final JLabel justifyHint = GUIFactory.createLabel(
-					"Label justification: ", GUIFactory.FONTS);
+			JPanel justifyPanel = GUIFactory.createJPanel(false, 
+					GUIFactory.DEFAULT, null);
+			justifyPanel.setBorder(BorderFactory.createTitledBorder(
+					"Label justification"));
 
 			final ButtonGroup rowJustifyBtnGroup = new ButtonGroup();
 
@@ -340,9 +341,13 @@ ConfigNodePersistent {
 			mainPanel.add(cols, "pushx, alignx 50%, wrap");
 			mainPanel.add(genePanel, "pushx, alignx 50%, w 45%");
 			mainPanel.add(arrayPanel, "pushx, alignx 50%, w 45%, wrap");
-			mainPanel.add(justifyHint, "pushx, alignx 0%, span, wrap");
-			mainPanel.add(rowRadioBtnPanel, "pushx, alignx 50%, w 45%");
-			mainPanel.add(colRadioBtnPanel, "pushx, alignx 50%, w 45%, wrap");
+			justifyPanel.add(rowRadioBtnPanel, "pushx, alignx 50%, w 45%");
+			justifyPanel.add(colRadioBtnPanel, "pushx, alignx 50%, w 45%");
+			mainPanel.add(justifyPanel, "push, grow, alignx 50%, span, wrap");
+			
+			JPanel fontPanel = new FontPanel().makeFontPanel();
+			
+			mainPanel.add(fontPanel, "push, grow, alignx 50%, span");
 
 			// Commented out for version 3.0alpha1 because it doesn't work yet
 			// mainPanel.add(custom_button, "pushx, alignx 50%, span");

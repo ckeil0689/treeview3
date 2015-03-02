@@ -30,6 +30,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentListener;
 import java.awt.event.ContainerListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseListener;
 import java.beans.PropertyChangeListener;
 import java.util.Observable;
 import java.util.Observer;
@@ -602,6 +603,11 @@ public class DendroView implements Observer, DendroPanel {
 
 		rowDataPane.addComponentListener(c);
 		colDataPane.addComponentListener(c);
+	}
+	
+	public void addDeselectClickListener(MouseListener l) {
+		
+		dendroPane.addMouseListener(l);
 	}
 
 	// Methods

@@ -54,12 +54,12 @@ public class MenubarController {
 		case StringRes.menu_Open:
 			controller.openFile();
 			break;
-		case StringRes.menu_Save:
-			controller.doModelSave(true);
-			break;
-		case StringRes.menu_SaveAs:
-			controller.saveModelAs();
-			break;
+//		case StringRes.menu_Save:
+//			controller.doModelSave(true);
+//			break;
+//		case StringRes.menu_SaveAs:
+//			controller.saveModelAs();
+//			break;
 		case StringRes.menu_EditRecent:
 			tvFrame.showRecentFileEditor();
 			break;
@@ -78,9 +78,9 @@ public class MenubarController {
 		case StringRes.menu_Color:
 			controller.openPrefMenu(name);
 			break;
-		case StringRes.menu_Font:
-			controller.openPrefMenu(name);
-			break;
+//		case StringRes.menu_Font:
+//			controller.openPrefMenu(name);
+//			break;
 		case StringRes.menu_URL:
 			controller.openPrefMenu(name);
 			break;
