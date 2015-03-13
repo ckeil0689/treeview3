@@ -22,7 +22,6 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import java.awt.Event;
 import java.awt.Graphics;
 import java.awt.ScrollPane;
 import java.awt.Toolkit;
@@ -32,12 +31,12 @@ import java.awt.event.ComponentListener;
 import java.awt.event.ContainerListener;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.prefs.Preferences;
 
 import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -46,13 +45,11 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.border.Border;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
-import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
 import Utilities.Helper;
 import Utilities.StringRes;
@@ -347,8 +344,10 @@ public class DendroView implements Observer, DendroPanel {
 		dendroPane.removeAll();
 
 		/* Panels for layout setup */
-		JPanel btnPanel;
+		JPanel globalOverviewPanel;
 		JPanel crossPanel;
+		JPanel zoomXPanel;
+		JPanel zoomYPanel;
 		JPanel rowLabelpanel;
 		JPanel colLabelPanel;
 		JPanel arrayContainer;
@@ -358,16 +357,23 @@ public class DendroView implements Observer, DendroPanel {
 		JPanel bottomPanel;
 
 		/* Generate the sub-panels */
-		btnPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
+//		btnPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 //		btnPanel.setLayout(new MigLayout("debug"));
 
+		globalOverviewPanel = GUIFactory.createJPanel(false, 
+				GUIFactory.DEFAULT, null);
+		globalOverviewPanel.setBorder(
+				BorderFactory.createTitledBorder("Overview"));
+		
 		crossPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
+		zoomXPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, null);
+		zoomYPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, null);
 
 		globalViewContainer = GUIFactory.createJPanel(false,
 				GUIFactory.NO_PADDING_FILL, null);
 
 		navContainer = GUIFactory.createJPanel(false,
-				GUIFactory.DEFAULT, null);
+				GUIFactory.NO_PADDING, null);
 //		navContainer.setLayout(new MigLayout("debug"));
 
 		bottomPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
@@ -435,27 +441,34 @@ public class DendroView implements Observer, DendroPanel {
 
 		rowLabelpanel.add(rowLabelView.getComponent(), "push, grow");
 		colLabelPanel.add(colLabelView.getComponent(), "push, grow");
+		
+		zoomXPanel.add(scaleDecX);
+		zoomXPanel.add(scaleIncX);
+		
+		zoomYPanel.add(scaleIncY, "wrap");
+		zoomYPanel.add(scaleDecY);
 
-		globalViewContainer.add(globalview, "w 99%, h 99%, push, alignx 50%, "
-				+ "aligny 50%");
-		globalViewContainer.add(matrixYscrollbar, "w 1%, h 100%, wrap");
-		globalViewContainer.add(matrixXscrollbar, "span, pushx, alignx 50%, "
-				+ "w 100%, h 1%");
+		globalViewContainer.add(globalview, "w 98%, h 98%, push, alignx 50%, "
+				+ "aligny 50%, span 2 2");
+		globalViewContainer.add(matrixYscrollbar, "w 2%, h 95%, wrap");
+		globalViewContainer.add(zoomYPanel, "w 2%, wrap");
+		globalViewContainer.add(matrixXscrollbar, "w 95%, h 2%");
+		globalViewContainer.add(zoomXPanel, "h 2%");
+		
+		crossPanel.add(scaleIncXY);
+		crossPanel.add(zoomBtn);
+		crossPanel.add(scaleDecXY, "wrap");
+		crossPanel.add(scaleDefaultAll, "pushx, alignx 50%, span");
 
-		crossPanel.add(scaleIncY, "span 2 1, alignx 100%, h 33%");
-		crossPanel.add(scaleIncXY, "h 33%, wrap");
-		crossPanel.add(scaleDecX, "h 33%");
-		crossPanel.add(zoomBtn, "h 33%");
-		crossPanel.add(scaleIncX, "h 33%, wrap");
-		crossPanel.add(scaleDecXY, "h 33%");
-		crossPanel.add(scaleDecY, "span 2 1, h 33%, alignx 0%");
+//		btnPanel.add(crossPanel, "pushx, alignx 50%, wrap");
 
-		btnPanel.add(crossPanel, "pushx, alignx 50%, wrap");
-		btnPanel.add(scaleDefaultAll, "push, alignx 50%, aligny 5%");
-
-		navContainer.add(btnPanel, "push, alignx 50%, aligny 100%, wrap");
-		navContainer.add(dataTicker.getTickerPanel(), "push, w 95%, h 25%!, "
-				+ "aligny 5%");
+		navContainer.add(globalOverviewPanel, " w 95%, h 25%, wrap");
+		navContainer.add(crossPanel, "push, alignx 50%, wrap");
+		navContainer.add(dataTicker.getTickerPanel(), "pushx, grow, w 95%, "
+				+ "h 25%, wrap");
+//		navContainer.add(zoomYPanel, "push, al left, aligny 100%");
+		
+//		bottomPanel.add(zoomXPanel, "pushx, alignx 87.5%");
 
 		arrayContainer.add(colDataPane, "w 99%, h 100%");
 		geneContainer.add(rowDataPane, "w 100%, h 99%, wrap");
@@ -532,22 +545,26 @@ public class DendroView implements Observer, DendroPanel {
 		scaleDefaultAll = GUIFactory.createIconBtn(StringRes.icon_home);
 		scaleDefaultAll.setToolTipText("Reset the zoomed view");
 
-		scaleIncX = GUIFactory.createIconBtn(StringRes.icon_zoomIn);
+		scaleIncX = GUIFactory.createSquareBtn("+", 20);
+				//GUIFactory.createIconBtn(StringRes.icon_zoomIn);
 		scaleIncX.setToolTipText(StringRes.tt_xZoomIn);
 
 		scaleIncXY = GUIFactory.createIconBtn(StringRes.icon_fullZoomIn);
 		scaleIncXY.setToolTipText(StringRes.tt_xyZoomIn);
 
-		scaleDecX = GUIFactory.createIconBtn(StringRes.icon_zoomOut);
+		scaleDecX = GUIFactory.createSquareBtn("-", 20);
+				//GUIFactory.createIconBtn(StringRes.icon_zoomOut);
 		scaleDecX.setToolTipText(StringRes.tt_xZoomOut);
 
-		scaleIncY = GUIFactory.createIconBtn(StringRes.icon_zoomIn);
+		scaleIncY = GUIFactory.createSquareBtn("+", 20);
+				//GUIFactory.createIconBtn(StringRes.icon_zoomIn);
 		scaleIncY.setToolTipText(StringRes.tt_yZoomIn);
 
 		scaleDecXY = GUIFactory.createIconBtn(StringRes.icon_fullZoomOut);
 		scaleDecXY.setToolTipText(StringRes.tt_xyZoomOut);
 
-		scaleDecY = GUIFactory.createIconBtn(StringRes.icon_zoomOut);
+		scaleDecY = GUIFactory.createSquareBtn("-", 20);
+				//GUIFactory.createIconBtn(StringRes.icon_zoomOut);
 		scaleDecY.setToolTipText(StringRes.tt_yZoomOut);
 
 		zoomBtn = GUIFactory.createIconBtn(StringRes.icon_zoomAll);
