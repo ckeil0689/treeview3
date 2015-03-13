@@ -23,12 +23,12 @@ public class SquareButton extends JButton {
 	
 	@Override
 	public Dimension getPreferredSize() {
-		
-//		Dimension d = super.getPreferredSize();
-//		int w = (int) d.getWidth();
-//		int h = (int) d.getHeight();
-//		
-//		int size = (int)(w > h ? w : h);
+				
+		return new Dimension(size, size);
+	}
+	
+	@Override
+	public Dimension getMinimumSize() {
 		
 		return new Dimension(size, size);
 	}

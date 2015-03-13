@@ -450,26 +450,21 @@ public class DendroView implements Observer, DendroPanel {
 
 		globalViewContainer.add(globalview, "w 98%, h 98%, push, alignx 50%, "
 				+ "aligny 50%, span 2 2");
-		globalViewContainer.add(matrixYscrollbar, "w 2%, h 95%, wrap");
-		globalViewContainer.add(zoomYPanel, "w 2%, wrap");
-		globalViewContainer.add(matrixXscrollbar, "w 95%, h 2%");
-		globalViewContainer.add(zoomXPanel, "h 2%");
+		globalViewContainer.add(matrixYscrollbar, "w 2%, h 95%, pushy, wrap");
+		globalViewContainer.add(zoomYPanel, "h 5%, w 2%, growy, wrap");
+		globalViewContainer.add(matrixXscrollbar, "w 95%, h 2%, pushx");
+		globalViewContainer.add(zoomXPanel, "h 2%, growx");
 		
 		crossPanel.add(scaleIncXY);
 		crossPanel.add(zoomBtn);
 		crossPanel.add(scaleDecXY, "wrap");
 		crossPanel.add(scaleDefaultAll, "pushx, alignx 50%, span");
 
-//		btnPanel.add(crossPanel, "pushx, alignx 50%, wrap");
-
 		navContainer.add(globalOverviewPanel, " w 95%, h 25%, wrap");
 		navContainer.add(crossPanel, "push, alignx 50%, wrap");
 		navContainer.add(dataTicker.getTickerPanel(), "pushx, grow, w 95%, "
 				+ "h 25%, wrap");
-//		navContainer.add(zoomYPanel, "push, al left, aligny 100%");
 		
-//		bottomPanel.add(zoomXPanel, "pushx, alignx 87.5%");
-
 		arrayContainer.add(colDataPane, "w 99%, h 100%");
 		geneContainer.add(rowDataPane, "w 100%, h 99%, wrap");
 
