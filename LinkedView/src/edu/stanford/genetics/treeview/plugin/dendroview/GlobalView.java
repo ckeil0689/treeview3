@@ -54,7 +54,6 @@ import edu.stanford.genetics.treeview.ModelViewProduced;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 
 public class GlobalView extends ModelViewProduced implements
-//MouseMotionListener, MouseListener, 
 MouseWheelListener {
 
 	private static final long serialVersionUID = 1L;
@@ -199,6 +198,10 @@ MouseWheelListener {
 					+ "in getStatus() in GlobalView: " + e.getMessage());
 		}
 		return statustext;
+	}
+	
+	public void setObserver() {
+		
 	}
 
 	/**

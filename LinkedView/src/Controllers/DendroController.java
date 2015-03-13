@@ -5,10 +5,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -18,20 +16,17 @@ import java.util.Observer;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.InputMap;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import Utilities.Helper;
 import edu.stanford.genetics.treeview.CdtFilter;
@@ -252,6 +247,9 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 		dendroView.getRowLabelView().getHeaderSummary().addObserver(this);
 		dendroView.getColumnLabelView().getHeaderSummary().addObserver(this);
+		
+		globalXmap.addObserver(this);
+		globalYmap.addObserver(this);
 	}
 
 	/**
@@ -2107,10 +2105,25 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	@Override
 	public void update(final Observable o, final Object arg) {
 
+		LogBuffer.println("DVC observed: " + o.getClass());
+		
 		if (o instanceof HeaderSummary) {
 			dendroView.updateSearchTermBoxes(tvModel.getRowHeaderInfo(),
 					tvModel.getColumnHeaderInfo(), globalXmap, globalYmap);
+			
+		} else if(o instanceof MapContainer) {
+			boolean isXMin = Helper.nearlyEqual(globalXmap.getMinScale(), 
+					globalXmap.getScale());
+			boolean isYMin = Helper.nearlyEqual(globalYmap.getMinScale(), 
+					globalYmap.getScale());
+			
+			dendroView.getHomeButton().setEnabled(!(isXMin && isYMin));
+			dendroView.getYMinusButton().setEnabled(!isYMin);
+			dendroView.getXMinusButton().setEnabled(!isXMin);
+			dendroView.getXYMinusButton().setEnabled(!(isXMin && isYMin));
+			
+		} else if(o instanceof TreeSelectionI) {
+			dendroView.getHomeButton().requestFocusInWindow();
 		}
-
 	}
 }

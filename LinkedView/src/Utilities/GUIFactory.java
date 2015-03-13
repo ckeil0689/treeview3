@@ -99,6 +99,19 @@ public class GUIFactory {
 
 		return panel;
 	}
+	
+	/**
+	 * Overloaded method to return a JPanel without background color 
+	 * specification.
+	 * @param opaque Whether the JPanel should be opaque or not.
+	 * @param panel_mode Sets the main MigLayout constrains for panel insets.
+	 * @return A JPanel.
+	 */
+	public static JPanel createJPanel(final boolean opaque,
+			final int panel_mode) {
+		
+		return createJPanel(opaque, panel_mode, null);
+	}
 
 	/**
 	 * Creates and returns a JLabel with the appropriate text color and a small

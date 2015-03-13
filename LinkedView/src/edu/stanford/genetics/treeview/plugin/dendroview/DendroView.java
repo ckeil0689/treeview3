@@ -194,8 +194,7 @@ public class DendroView implements Observer, DendroPanel {
 		this.name = "DendroView";
 
 		/* main panel */
-		dendroPane = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING_FILL,
-				null);
+		dendroPane = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING_FILL);
 //		dendroPane.setLayout(new MigLayout("debug"));
 
 		/* >>> Init all views --- they should be final <<< */
@@ -348,54 +347,36 @@ public class DendroView implements Observer, DendroPanel {
 		JPanel crossPanel;
 		JPanel zoomXPanel;
 		JPanel zoomYPanel;
-		JPanel rowLabelpanel;
+		JPanel rowLabelPanel;
 		JPanel colLabelPanel;
-//		JPanel arrayContainer;
-//		JPanel geneContainer;
-//		JPanel globalViewContainer;
+		JPanel columnNavPanel;
+		JPanel rowNavPanel;
 		JPanel navContainer;
 		JPanel bottomPanel;
 
-		/* Generate the sub-panels */
-//		btnPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
-//		btnPanel.setLayout(new MigLayout("debug"));
-
-		globalOverviewPanel = GUIFactory.createJPanel(false, 
-				GUIFactory.DEFAULT, null);
+		globalOverviewPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 		globalOverviewPanel.setBorder(
 				BorderFactory.createTitledBorder("Overview"));
 		
-		crossPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
-		zoomXPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, null);
-		zoomYPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, null);
+		crossPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 
-//		globalViewContainer = GUIFactory.createJPanel(false,
-//				GUIFactory.NO_PADDING, null);
-//		globalViewContainer.setLayout(new MigLayout("debug"));
 
 		navContainer = GUIFactory.createJPanel(false,
-				GUIFactory.NO_PADDING, null);
+				GUIFactory.NO_PADDING);
 //		navContainer.setLayout(new MigLayout("debug"));
 
-		bottomPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
+		bottomPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 
-//		arrayContainer = GUIFactory.createJPanel(false,
-//				GUIFactory.NO_PADDING_X, null);
+		columnNavPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		rowNavPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		zoomXPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		zoomYPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
 
-//		geneContainer = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING_Y,
-//				null);
-
-//		firstPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
-//		firstPanel.setBorder(null);
-
-		rowLabelpanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING,
-				null);
-
-		colLabelPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING,
-				null);
+		rowLabelPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		colLabelPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
 
 		rowDataPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rowTreeView,
-				rowLabelpanel);
+				rowLabelPanel);
 		rowDataPane.setResizeWeight(0.5);
 		rowDataPane.setOpaque(false);
 		rowDataPane.setOneTouchExpandable(true); // does not work on Linux :(
@@ -440,7 +421,7 @@ public class DendroView implements Observer, DendroPanel {
 			}
 		}
 
-		rowLabelpanel.add(rowLabelView.getComponent(), "push, grow");
+		rowLabelPanel.add(rowLabelView.getComponent(), "push, grow");
 		colLabelPanel.add(colLabelView.getComponent(), "push, grow");
 		
 		zoomXPanel.add(scaleDecX);
@@ -448,77 +429,48 @@ public class DendroView implements Observer, DendroPanel {
 		
 		zoomYPanel.add(scaleDecY, "wrap");
 		zoomYPanel.add(scaleIncY);
-		
-//		globalViewContainer.add(globalview, "grow, push, span 2 2");
-//		globalViewContainer.add(matrixYscrollbar, "h 95%, wrap");
-//		globalViewContainer.add(zoomYPanel, "h 5%, growy, wrap");
-//		globalViewContainer.add(matrixXscrollbar, "w 95%");
-//		globalViewContainer.add(zoomXPanel, "growx");
-		
+				
 		crossPanel.add(scaleDecXY);
-		crossPanel.add(scaleIncXY, "wrap");
 		crossPanel.add(zoomBtn);
-		crossPanel.add(scaleDefaultAll);
+		crossPanel.add(scaleIncXY, "wrap");
+		crossPanel.add(scaleDefaultAll, "span, pushx, alignx 50%");
 
-//		navContainer.add(this.makeSearchPanel(), "w 95%, h 25%, wrap");
 		navContainer.add(crossPanel, "push, alignx 50%, wrap");
 		navContainer.add(dataTicker.getTickerPanel(), "pushx, grow, w 95%, "
 				+ "h 25%, wrap");
 		
-//		arrayContainer.add(colDataPane, "w 99%, h 100%");
-//		geneContainer.add(rowDataPane, "w 100%, h 99%, wrap");
-
 		/* Add the scrollbars (outside of LabelViews) */
 		final JScrollBar colLabelScroll = colLabelView.getScrollBar();
 		final JScrollBar rowLabelScroll = rowLabelView.getScrollBar();
-
-//		arrayContainer.add(colLabelScroll, "w 1%, h 100%");
-//		geneContainer.add(geneScroll, "w 100%, h 1%");
-
-//		if (gvWidth == 0 && gvHeight == 0) {
-//			gvWidth = MAX_GV_WIDTH;
-//			gvHeight = MAX_GV_HEIGHT;
-//		}
-//
-//		/* Column widths */
-//		final double sidePanel_w = (100 - gvWidth) / 2.0;
-//		final int panelMin = 200;
-//
-//		/* Heights */
-//		final double bottomPanel_h = 1;
-//		final double topPanel_h = (100 - gvHeight - bottomPanel_h);
 		
-		/* Adding all components to the dendroPane */
-//		if (isSearchVisible) {
-//			final double searchHeight = 2;
-//			gvHeight -= searchHeight;
-//			dendroPane.add(this.makeSearchPanel(), "w 100%, h 2%, span, wrap");
-//		} else {
-//			gvHeight = MAX_GV_HEIGHT;
-//		}
+		/* Panels for scrollbars and axis-zoom buttons */
+		columnNavPanel.add(matrixXscrollbar, "growx, pushx");
+		columnNavPanel.add(zoomXPanel);
 		
-		dendroPane.add(globalOverviewPanel, "w 12.5%!, h 19%");
+		rowNavPanel.add(matrixYscrollbar, "growy, pushy, wrap");
+		rowNavPanel.add(zoomYPanel);
+		
+		
+		/* Adding elements to the main JPanel */
+		dendroPane.add(globalOverviewPanel, "w 12.5%!, h 19%!");
 
-		/* Column tree view: w 75%, h 19% */
-		dendroPane.add(colDataPane, "w 75%, h 19%");
-		dendroPane.add(colLabelScroll, "h 19%");
+		/* Column tree view */
+		dendroPane.add(colDataPane, "w 74%, h 19%!");
+		dendroPane.add(colLabelScroll, "h 19%!");
 
 		/* Navigation panel */
-		dendroPane.add(navContainer, "span 1 3, w 12.5%, h 100%, wrap");
+		dendroPane.add(navContainer, "span 1 3, w 12.5%!, h 100%, wrap");
 
 		/* Row tree view */
-		dendroPane.add(rowDataPane, "w 12.5%!, h 80%");
+		dendroPane.add(rowDataPane, "w 12.5%!, h 79%");
 		
 		/* Matrix view */
-		dendroPane.add(globalview, "w 75%, h 80%, grow, push");
-		dendroPane.add(matrixYscrollbar, "split 2, growy, h 95%, wrap");
-		dendroPane.add(zoomYPanel, "wrap");
-		dendroPane.add(rowLabelScroll);
-		dendroPane.add(matrixXscrollbar, "split 2, growx");
-		dendroPane.add(zoomXPanel);
-
-		/* Matrix view */
-//		dendroPane.add(globalViewContainer, "w 75%, h 80%, wrap");
+		dendroPane.add(globalview, "w 74%, h 79%, grow, push");
+		dendroPane.add(rowNavPanel, "growy, h 95%, wrap");
+		
+		dendroPane.add(rowLabelScroll, "w 12.5%!");
+		
+		dendroPane.add(columnNavPanel, "growx, wrap");
 
 		/* Bottom panel for spacing */
 		dendroPane.add(bottomPanel, "span, w 87.5%, h 1%");
@@ -706,8 +658,6 @@ public class DendroView implements Observer, DendroPanel {
 	@Override
 	public void update(final Observable o, final Object arg) {
 
-		// LogBuffer.println("Update in DendroView, Observable: " +
-		// o.getClass());
 
 		// if (o == geneSelection) {
 		// gtrview.scrollToNode(geneSelection.getSelectedNode());
