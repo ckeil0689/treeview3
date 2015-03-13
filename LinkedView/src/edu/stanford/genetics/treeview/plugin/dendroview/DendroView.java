@@ -95,7 +95,7 @@ public class DendroView implements Observer, DendroPanel {
 
 	// Main containers
 	private final JPanel dendroPane;
-	private JPanel firstPanel;
+//	private JPanel firstPanel;
 
 	protected ScrollPane panes[];
 
@@ -350,9 +350,9 @@ public class DendroView implements Observer, DendroPanel {
 		JPanel zoomYPanel;
 		JPanel rowLabelpanel;
 		JPanel colLabelPanel;
-		JPanel arrayContainer;
-		JPanel geneContainer;
-		JPanel globalViewContainer;
+//		JPanel arrayContainer;
+//		JPanel geneContainer;
+//		JPanel globalViewContainer;
 		JPanel navContainer;
 		JPanel bottomPanel;
 
@@ -369,8 +369,9 @@ public class DendroView implements Observer, DendroPanel {
 		zoomXPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, null);
 		zoomYPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, null);
 
-		globalViewContainer = GUIFactory.createJPanel(false,
-				GUIFactory.NO_PADDING_FILL, null);
+//		globalViewContainer = GUIFactory.createJPanel(false,
+//				GUIFactory.NO_PADDING, null);
+//		globalViewContainer.setLayout(new MigLayout("debug"));
 
 		navContainer = GUIFactory.createJPanel(false,
 				GUIFactory.NO_PADDING, null);
@@ -378,14 +379,14 @@ public class DendroView implements Observer, DendroPanel {
 
 		bottomPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 
-		arrayContainer = GUIFactory.createJPanel(false,
-				GUIFactory.NO_PADDING_X, null);
+//		arrayContainer = GUIFactory.createJPanel(false,
+//				GUIFactory.NO_PADDING_X, null);
 
-		geneContainer = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING_Y,
-				null);
+//		geneContainer = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING_Y,
+//				null);
 
-		firstPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
-		firstPanel.setBorder(null);
+//		firstPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
+//		firstPanel.setBorder(null);
 
 		rowLabelpanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING,
 				null);
@@ -445,35 +446,34 @@ public class DendroView implements Observer, DendroPanel {
 		zoomXPanel.add(scaleDecX);
 		zoomXPanel.add(scaleIncX);
 		
-		zoomYPanel.add(scaleIncY, "wrap");
-		zoomYPanel.add(scaleDecY);
-
-		globalViewContainer.add(globalview, "w 98%, h 98%, push, alignx 50%, "
-				+ "aligny 50%, span 2 2");
-		globalViewContainer.add(matrixYscrollbar, "w 2%, h 95%, pushy, wrap");
-		globalViewContainer.add(zoomYPanel, "h 5%, w 2%, growy, wrap");
-		globalViewContainer.add(matrixXscrollbar, "w 95%, h 2%, pushx");
-		globalViewContainer.add(zoomXPanel, "h 2%, growx");
+		zoomYPanel.add(scaleDecY, "wrap");
+		zoomYPanel.add(scaleIncY);
 		
-		crossPanel.add(scaleIncXY);
+//		globalViewContainer.add(globalview, "grow, push, span 2 2");
+//		globalViewContainer.add(matrixYscrollbar, "h 95%, wrap");
+//		globalViewContainer.add(zoomYPanel, "h 5%, growy, wrap");
+//		globalViewContainer.add(matrixXscrollbar, "w 95%");
+//		globalViewContainer.add(zoomXPanel, "growx");
+		
+		crossPanel.add(scaleDecXY);
+		crossPanel.add(scaleIncXY, "wrap");
 		crossPanel.add(zoomBtn);
-		crossPanel.add(scaleDecXY, "wrap");
-		crossPanel.add(scaleDefaultAll, "pushx, alignx 50%, span");
+		crossPanel.add(scaleDefaultAll);
 
-		navContainer.add(globalOverviewPanel, " w 95%, h 25%, wrap");
+//		navContainer.add(this.makeSearchPanel(), "w 95%, h 25%, wrap");
 		navContainer.add(crossPanel, "push, alignx 50%, wrap");
 		navContainer.add(dataTicker.getTickerPanel(), "pushx, grow, w 95%, "
 				+ "h 25%, wrap");
 		
-		arrayContainer.add(colDataPane, "w 99%, h 100%");
-		geneContainer.add(rowDataPane, "w 100%, h 99%, wrap");
+//		arrayContainer.add(colDataPane, "w 99%, h 100%");
+//		geneContainer.add(rowDataPane, "w 100%, h 99%, wrap");
 
 		/* Add the scrollbars (outside of LabelViews) */
-		final JScrollBar arrayScroll = colLabelView.getScrollBar();
-		final JScrollBar geneScroll = rowLabelView.getScrollBar();
+		final JScrollBar colLabelScroll = colLabelView.getScrollBar();
+		final JScrollBar rowLabelScroll = rowLabelView.getScrollBar();
 
-		arrayContainer.add(arrayScroll, "w 1%, h 100%");
-		geneContainer.add(geneScroll, "w 100%, h 1%");
+//		arrayContainer.add(colLabelScroll, "w 1%, h 100%");
+//		geneContainer.add(geneScroll, "w 100%, h 1%");
 
 //		if (gvWidth == 0 && gvHeight == 0) {
 //			gvWidth = MAX_GV_WIDTH;
@@ -489,45 +489,38 @@ public class DendroView implements Observer, DendroPanel {
 //		final double topPanel_h = (100 - gvHeight - bottomPanel_h);
 		
 		/* Adding all components to the dendroPane */
-		if (isSearchVisible) {
+//		if (isSearchVisible) {
 //			final double searchHeight = 2;
 //			gvHeight -= searchHeight;
-			dendroPane.add(this.makeSearchPanel(), "w 100%, h 2%, span, wrap");
-		} else {
-			gvHeight = MAX_GV_HEIGHT;
-		}
+//			dendroPane.add(this.makeSearchPanel(), "w 100%, h 2%, span, wrap");
+//		} else {
+//			gvHeight = MAX_GV_HEIGHT;
+//		}
 		
-//		LogBuffer.println("SidePanel width: " + sidePanel_w);
-//		LogBuffer.println("matrix width: " + gvWidth);
+		dendroPane.add(globalOverviewPanel, "w 12.5%!, h 19%");
 
-//		dendroPane.add(firstPanel, "w " + panelMin + "::, "
-//				+ "w " + sidePanel_w + "%," + "h " + panelMin + "::, "
-//						+ "h " + topPanel_h + "%");
-//
-//		dendroPane.add(arrayContainer, "w " + gvWidth + "%, " 
-//				+ " h " + panelMin + "::," + "h " + topPanel_h + "%");
-//
-//		dendroPane.add(navContainer, "span 1 2, w " + panelMin + "::, "
-//				+ "w " + sidePanel_w + "%, h 100%, wrap");
-//
-//		dendroPane.add(geneContainer, "w " + panelMin + "::, "
-//				+ "w " + sidePanel_w + "%, " + "h " + gvHeight + "%, growy");
-//
-//		dendroPane.add(globalViewContainer, "w " + gvWidth + "%, " + "h "
-//				+ gvHeight + "%, wrap");
-//
-//		dendroPane.add(bottomPanel, "span, h " + bottomPanel_h + "%");
+		/* Column tree view: w 75%, h 19% */
+		dendroPane.add(colDataPane, "w 75%, h 19%");
+		dendroPane.add(colLabelScroll, "h 19%");
+
+		/* Navigation panel */
+		dendroPane.add(navContainer, "span 1 3, w 12.5%, h 100%, wrap");
+
+		/* Row tree view */
+		dendroPane.add(rowDataPane, "w 12.5%!, h 80%");
 		
-		dendroPane.add(firstPanel, "w 12.5%!, h 19%");
+		/* Matrix view */
+		dendroPane.add(globalview, "w 75%, h 80%, grow, push");
+		dendroPane.add(matrixYscrollbar, "split 2, growy, h 95%, wrap");
+		dendroPane.add(zoomYPanel, "wrap");
+		dendroPane.add(rowLabelScroll);
+		dendroPane.add(matrixXscrollbar, "split 2, growx");
+		dendroPane.add(zoomXPanel);
 
-		dendroPane.add(arrayContainer, "w 75%, h 19%");
+		/* Matrix view */
+//		dendroPane.add(globalViewContainer, "w 75%, h 80%, wrap");
 
-		dendroPane.add(navContainer, "span 1 2, w 12.5%, h 100%, wrap");
-
-		dendroPane.add(geneContainer, "w 12.5%!, h 80%");
-
-		dendroPane.add(globalViewContainer, "w 75%, h 80%, wrap");
-
+		/* Bottom panel for spacing */
 		dendroPane.add(bottomPanel, "span, w 87.5%, h 1%");
 				
 		dendroPane.revalidate();
