@@ -117,6 +117,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 		setObservables();
 		
+		/* In case the app frame size changed since the matrix was closed. */
 		resetMapContainers();
 		
 		/* TODO Find solution...
@@ -288,8 +289,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		dendroView.addZoomListener(new ZoomListener());
 		dendroView.addDividerListener(new DividerListener());
 		dendroView.addSplitPaneListener(new SplitPaneListener());
-		
-		tvFrame.getAppFrame().addComponentListener(new AppFrameListener());
+		dendroView.addResizeListener(new AppFrameListener());
 	}
 
 	/* -------------- Listeners --------------------- */
@@ -879,15 +879,15 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 		try {
 			if (configNode.nodeExists("GlobalXMap") && globalXmap != null) {
-				configNode.node("GlobalXMap").putDouble("scale",
-						globalXmap.getScale());
+				configNode.node("GlobalXMap").putInt("scale",
+						globalXmap.getTileNumVisible());
 				configNode.node("GlobalXMap").putInt("XScrollValue",
 						dendroView.getXScroll().getValue());
 			}
 
 			if (configNode.nodeExists("GlobalYMap") && globalYmap != null) {
-				configNode.node("GlobalYMap").putDouble("scale",
-						globalYmap.getScale());
+				configNode.node("GlobalYMap").putInt("scale",
+						globalYmap.getTileNumVisible());
 				configNode.node("GlobalYMap").putInt("YScrollValue",
 						dendroView.getYScroll().getValue());
 			}

@@ -148,12 +148,18 @@ AdjustmentListener, ConfigNodePersistent {
 	}
 
 	/**
-	 * Sets the scale of this MapContainer to the last saved value.
+	 * Sets the scale of this MapContainer to the last saved value. The 
+	 * value needs to be the tile number that is visible on screen. The actual
+	 * scale value does not apply if the screen size changed since that would
+	 * mean that too few or too many tiles might be visible.
 	 */
 	public void setLastScale() {
 
 		if (configNode != null) {
-			setScale(configNode.getDouble("scale", getCalculatedMinScale()));
+			int lastNumVisible = configNode.getInt("scale", getMaxIndex());
+			double lastScale = getAvailablePixels() / lastNumVisible;
+			
+			setScale(lastScale);
 		}
 	}
 

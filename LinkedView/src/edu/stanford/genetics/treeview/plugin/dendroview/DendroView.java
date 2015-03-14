@@ -27,6 +27,7 @@ import java.awt.ScrollPane;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentListener;
 import java.awt.event.ContainerListener;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeListener;
@@ -515,6 +516,10 @@ public class DendroView implements Observer, DendroPanel {
 	}
 
 	/* >>>>>>>>>> UI component listeners <<<<<<<<<< */
+	public void addResizeListener(final ComponentListener l) {
+		
+		dendroPane.addComponentListener(l);
+	}
 	/**
 	 * Adds an ActionListener to the scale buttons in DendroView.
 	 *
