@@ -408,25 +408,25 @@ public class DendroView implements Observer, DendroPanel {
 		
 		
 		/* Adding elements to the main JPanel */
-		dendroPane.add(globalOverviewPanel, "w 200::, h 19%!");
+		dendroPane.add(globalOverviewPanel, "w 13%, h 19%");
 
 		/* Column tree view */
 		dendroPane.add(colDataPane, "w 73%, h 19%!");
 		dendroPane.add(colLabelScroll, "h 19%!");
 
 		/* Navigation panel */
-		dendroPane.add(navContainer, "span 1 3, w 200::, h 100%, wrap");
+		dendroPane.add(navContainer, "span 1 3, w 200:13%:, h 100%, wrap");
 
 		/* Row tree view */
-		dendroPane.add(rowDataPane, "w 13%!, h 79%");
+		dendroPane.add(rowDataPane, "w 200:13%:, h 79%");
 		
 		/* Matrix view */
 		dendroPane.add(globalview, "w 73%, h 79%, grow, push");
-		dendroPane.add(rowNavPanel, "growy, h 95%, wrap");
+		dendroPane.add(rowNavPanel, "growy, w 1%, h 95%, wrap");
 		
-		dendroPane.add(rowLabelScroll, "w 13%!");
+		dendroPane.add(rowLabelScroll, "w 13%, h 1%");
 		
-		dendroPane.add(columnNavPanel, "growx, wrap");
+		dendroPane.add(columnNavPanel, "growx, w 73%, h 1%, wrap");
 
 		/* Bottom panel for spacing */
 		dendroPane.add(bottomPanel, "span, w 87.5%, h 1%");
