@@ -99,7 +99,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		globalYmap = new MapContainer("Fixed", "GlobalYMap");
 	}
 
-	public void setNew(final DendroView dendroView, final DataModel tvModel) {
+	public void setNewMatrix(final DendroView dendroView, 
+			final DataModel tvModel) {
 
 		this.dendroView = dendroView;
 		this.tvModel = tvModel;
@@ -117,11 +118,17 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		setObservables();
 		
 		resetMapContainers();
-		setSavedScale();
+		
+		/* TODO Find solution...
+		 * doesn't work because of resetMapContainers which needs
+		 * to run to reset MapContainer scales in GlobalView for potentially
+		 * changed AppFrame size between closing TreeView 
+		 * and loading a new matrix (changed availablePixels in GlobalView).
+		 */
+//		setSavedScale();
 
 		addKeyBindings();
 		addDendroViewListeners();
-		addMenuBtnListeners();
 	}
 
 	/** Adds all keyboard shortcuts that can be used with DendroView open. */
@@ -279,18 +286,10 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 		dendroView.addScaleListeners(new ScaleListener());
 		dendroView.addZoomListener(new ZoomListener());
-		dendroView.addCompListener(new AppFrameListener());
-		dendroView.addSearchCloseListener(new CloseSearchAction());
 		dendroView.addDividerListener(new DividerListener());
 		dendroView.addSplitPaneListener(new SplitPaneListener());
-	}
-
-	/**
-	 * Add listener to the search button.
-	 */
-	private void addMenuBtnListeners() {
-
-		dendroView.addSearchBtnListener(new SearchBtnListener());
+		
+		tvFrame.getAppFrame().addComponentListener(new AppFrameListener());
 	}
 
 	/* -------------- Listeners --------------------- */
@@ -396,22 +395,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			if (!dendroView.isSearchVisible()) {
 				setSearchVisible(true);
 			}
-		}
-	}
-
-	/**
-	 * Determines mouse behavior over the close-x icon of search panel.
-	 *
-	 * @author chris0689
-	 *
-	 */
-	private class CloseSearchAction implements ActionListener {
-
-		@Override
-		public void actionPerformed(final ActionEvent e) {
-
-			LogBuffer.println("Hiding search.");
-			setSearchVisible(false);
 		}
 	}
 
@@ -883,6 +866,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	}
 
 	/**
+	 * TODO remove?
 	 * Toggles the search bars in DendroView.
 	 */
 	public void setSearchVisible(final boolean visible) {
@@ -912,8 +896,10 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		}
 	}
 
-	private void setSavedScale() {
+	public void setSavedScale() {
 
+		LogBuffer.println("Setting saved scale.");
+		
 		try {
 			if (configNode.nodeExists("GlobalXMap") && globalXmap != null) {
 				globalXmap.setLastScale();
@@ -1176,13 +1162,14 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		double arrayIndexes = globalXmap.getNumVisible();
 		double geneIndexes = globalYmap.getNumVisible();
 
-		if (arrayIndexes == 0
-				|| geneIndexes == 0
+		if (arrayIndexes == 0 || geneIndexes == 0
 				|| (arrayIndexes == globalXmap.getMaxIndex() && geneIndexes == globalYmap
 						.getMaxIndex())) {
 			// LogBuffer.println("No spots are visible. Resetting view.");
 			arrayIndexes = globalXmap.getMaxIndex() + 1;
 			geneIndexes = globalYmap.getMaxIndex() + 1;
+			
+			LogBuffer.println("Setting zoom to default");
 			resetMapContainers();
 			
 		} else {

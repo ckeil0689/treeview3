@@ -375,6 +375,7 @@ MouseWheelListener {
 		}
 
 		if (resetHome) {
+			LogBuffer.println("Resetting GV");
 			xmap.setHome();
 			ymap.setHome();
 

@@ -580,7 +580,7 @@ AdjustmentListener, ConfigNodePersistent {
 	}
 
 	public void setScale(final double d) {
-
+		
 		// LogBuffer.println("Scale sent in (d) = [" + d +
 		// "], d*int(AvailablePix/d) = ["
 		// + ((d * (int) (getAvailablePixels() / d)))

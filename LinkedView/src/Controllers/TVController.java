@@ -15,12 +15,10 @@ import java.util.prefs.Preferences;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import ColorChooser.ColorChooser;
@@ -323,7 +321,7 @@ public class TVController implements Observer {
 
 			setDataModel();
 
-			dendroController.setNew(tvFrame.getDendroView(), model);
+			dendroController.setNewMatrix(tvFrame.getDendroView(), model);
 
 			/* set the selected label type to the old one */
 			resetLabelSelection();

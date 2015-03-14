@@ -27,7 +27,6 @@ import java.awt.ScrollPane;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentListener;
 import java.awt.event.ContainerListener;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeListener;
@@ -137,10 +136,6 @@ public class DendroView implements Observer, DendroPanel {
 	private JButton scaleDecY;
 	private JButton scaleDecXY;
 	private JButton scaleDefaultAll;
-
-	/* Search related buttons */
-	private JButton searchBtn;
-	private JButton searchCloseBtn;
 
 	private HeaderFinderBox rowFinderBox;
 	private HeaderFinderBox colFinderBox;
@@ -278,37 +273,6 @@ public class DendroView implements Observer, DendroPanel {
 	}
 
 	/**
-	 * Setup the search panel which contains tow editable JComboBoxes containing
-	 * all labels for each axis.
-	 *
-	 * @return JPanel
-	 */
-	private JPanel makeSearchPanel() {
-
-		if (rowFinderBox == null || colFinderBox == null)
-			return null;
-
-		final JPanel bgPanel = GUIFactory.createJPanel(false,
-				GUIFactory.NO_PADDING, null);
-
-		final JPanel searchPanel = GUIFactory.createJPanel(true,
-				GUIFactory.DEFAULT, GUIFactory.DARK_BG);
-
-		final String tooltip = "You can use wildcards to search (*, ?). "
-				+ "E.g.: *complex* --> Rpd3s complex, ATP Synthase "
-				+ "(complex V), etc...";
-		searchPanel.setToolTipText(tooltip);
-
-		searchPanel.add(searchCloseBtn, "split 4, push, al right");
-		searchPanel.add(rowFinderBox.getSearchTermBox(), "pushx");
-		searchPanel.add(colFinderBox.getSearchTermBox(), "pushx");
-		searchPanel.add(searchBtn);
-
-		bgPanel.add(searchPanel, "shrink 100, push, al right");
-		return bgPanel;
-	}
-
-	/**
 	 * Initializes the objects associated with label search. These are the
 	 * JComboBoxes containing all the label names as well as the buttons on that
 	 * panel.
@@ -323,15 +287,6 @@ public class DendroView implements Observer, DendroPanel {
 
 		setSearchTermBoxes();
 		updateSearchTermBoxes(geneHI, arrayHI, xmap, ymap);
-
-		searchBtn = GUIFactory.createIconBtn("searchIcon");
-		searchBtn.setBorder(null);
-		searchBtn.setToolTipText(StringRes.tt_searchRowCol);
-
-		/* Init here for listener addition in DendroController */
-		searchCloseBtn = GUIFactory.createIconBtn("close_x.png");
-		searchCloseBtn.setBorder(null);
-		searchCloseBtn.setBackground(null);
 	}
 
 	/**
@@ -591,44 +546,9 @@ public class DendroView implements Observer, DendroPanel {
 	 *
 	 * @param l
 	 */
-	public void addCompListener(final ComponentListener l) {
-
-		dendroPane.addComponentListener(l);
-	}
-
-	/**
-	 * Adds a component listener to the main panel of DendroView.
-	 *
-	 * @param l
-	 */
 	public void addContListener(final ContainerListener l) {
 
 		dendroPane.addContainerListener(l);
-	}
-
-	/**
-	 * First removes all listeners from searchBtn, then adds one new listener.
-	 *
-	 * @param l
-	 */
-	public void addSearchBtnListener(final ActionListener l) {
-
-		if (getSearchBtn().getActionListeners().length == 0) {
-			getSearchBtn().addActionListener(l);
-		}
-	}
-
-	/**
-	 * Adds a MouseListener to the close-search JLabel so that the user can
-	 * click it in order to close the search panel.
-	 *
-	 * @param l
-	 */
-	public void addSearchCloseListener(final ActionListener l) {
-
-		if (searchCloseBtn.getActionListeners().length == 0) {
-			searchCloseBtn.addActionListener(l);
-		}
 	}
 
 	/**
@@ -678,11 +598,6 @@ public class DendroView implements Observer, DendroPanel {
 
 		modelView.setViewFrame(tvFrame);
 		modelView.setStatusPanel(dataTicker);
-	}
-
-	public JButton getCloseSearchBtn() {
-
-		return searchCloseBtn;
 	}
 
 	/**
@@ -1377,10 +1292,6 @@ public class DendroView implements Observer, DendroPanel {
 		return tvFrame;
 	}
 
-	public JButton getSearchBtn() {
-
-		return searchBtn;
-	}
 
 	/**
 	 * Returns a boolean which indicates whether the dendrogram ModelViews are
