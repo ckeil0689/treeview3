@@ -115,15 +115,13 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		dendroView.setupLayout();
 
 		setObservables();
-
+		
+		resetMapContainers();
 		setSavedScale();
 
 		addKeyBindings();
 		addDendroViewListeners();
 		addMenuBtnListeners();
-		
-		globalXmap.notifyObservers();
-		globalYmap.notifyObservers();
 	}
 
 	/** Adds all keyboard shortcuts that can be used with DendroView open. */
@@ -243,13 +241,23 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		action_map.put("resetZoom", new HomeAction());
 	}
 
+	/**
+	 * Adds DendroController as an observer to various classes so that the
+	 * GUI can update as a response to updates in these classes.
+	 */
 	private void setObservables() {
 
+		/* Label views */
 		dendroView.getRowLabelView().getHeaderSummary().addObserver(this);
 		dendroView.getColumnLabelView().getHeaderSummary().addObserver(this);
 		
+		/* MapContainers */
 		globalXmap.addObserver(this);
 		globalYmap.addObserver(this);
+		
+		/* Selections */
+		geneSelection.addObserver(this);
+		arraySelection.addObserver(this);
 	}
 
 	/**
@@ -261,16 +269,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	public void resetMapContainers() {
 
 		dendroView.setMatrixHome(true);
-
-		updateGlobalView();
-	}
-
-	/* TODO get rid of this .... */
-	private void updateGlobalView() {
-
-		globalXmap.notifyObservers();
-		globalYmap.notifyObservers();
-
 		dendroView.getGlobalView().repaint();
 	}
 
@@ -329,7 +327,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	private void resetDendroView() {
 
 		resetMapContainers();
-
 		reZoomVisible();
 		reCenterVisible();
 	}
@@ -894,7 +891,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		resetDendroView();
 	}
 
-	public void saveSettings() {
+	private void saveSettings() {
 
 		try {
 			if (configNode.nodeExists("GlobalXMap") && globalXmap != null) {
@@ -915,7 +912,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		}
 	}
 
-	public void setSavedScale() {
+	private void setSavedScale() {
 
 		try {
 			if (configNode.nodeExists("GlobalXMap") && globalXmap != null) {
@@ -929,6 +926,9 @@ public class DendroController implements ConfigNodePersistent, Observer {
 				dendroView.setYScroll(configNode.node("GlobalYMap").getInt(
 						"YScrollValue", 0));
 			}
+			
+			globalXmap.notifyObservers();
+			globalYmap.notifyObservers();
 
 		} catch (final BackingStoreException e) {
 			LogBuffer.logException(e);
@@ -1184,6 +1184,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			arrayIndexes = globalXmap.getMaxIndex() + 1;
 			geneIndexes = globalYmap.getMaxIndex() + 1;
 			resetMapContainers();
+			
 		} else {
 			// LogBuffer.println("pixels / array indexes visible: [" +
 			// globalXmap.getAvailablePixels() + "/" + arrayIndexes +
@@ -2104,26 +2105,58 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 	@Override
 	public void update(final Observable o, final Object arg) {
-
-		LogBuffer.println("DVC observed: " + o.getClass());
 		
 		if (o instanceof HeaderSummary) {
-			dendroView.updateSearchTermBoxes(tvModel.getRowHeaderInfo(),
-					tvModel.getColumnHeaderInfo(), globalXmap, globalYmap);
+			updateSearchBoxes();
 			
 		} else if(o instanceof MapContainer) {
-			boolean isXMin = Helper.nearlyEqual(globalXmap.getMinScale(), 
-					globalXmap.getScale());
-			boolean isYMin = Helper.nearlyEqual(globalYmap.getMinScale(), 
-					globalYmap.getScale());
-			
-			dendroView.getHomeButton().setEnabled(!(isXMin && isYMin));
-			dendroView.getYMinusButton().setEnabled(!isYMin);
-			dendroView.getXMinusButton().setEnabled(!isXMin);
-			dendroView.getXYMinusButton().setEnabled(!(isXMin && isYMin));
+			setAdaptiveButtonStatus();
 			
 		} else if(o instanceof TreeSelectionI) {
-			dendroView.getHomeButton().requestFocusInWindow();
+			requestFocusForZoomBtn();
 		}
+	}
+	
+	/**
+	 * Updates the content of the search boxes to the up-to-date headers.
+	 */
+	private void updateSearchBoxes() {
+		
+		dendroView.updateSearchTermBoxes(tvModel.getRowHeaderInfo(),
+				tvModel.getColumnHeaderInfo(), globalXmap, globalYmap);
+	}
+	
+	/**
+	 * Requests the focus for the zoom button to draw attention to it,
+	 * for example when the user makes a selection in the matrix.
+	 */
+	private void requestFocusForZoomBtn() {
+		
+		if(geneSelection.getNSelectedIndexes() > 0) {
+			dendroView.getZoomButton().requestFocusInWindow();
+		} else {
+			dendroView.getXYPlusButton().requestFocusInWindow();
+		}
+	}
+	
+	/**
+	 * Enables or disables button based on the current zoom status of the
+	 * two different axis maps. If they are set to minimum scale, then the
+	 * relevant buttons should be disabled as they become useless. This
+	 * provides intuitive visual clues to the user.
+	 */
+	private void setAdaptiveButtonStatus() {
+		
+		/* Determine if either MapContainer is at minimum scale */
+		boolean isXMin = Helper.nearlyEqual(globalXmap.getMinScale(), 
+				globalXmap.getScale());
+		boolean isYMin = Helper.nearlyEqual(globalYmap.getMinScale(), 
+				globalYmap.getScale());
+		
+		/* Set button status accordingly. */
+		dendroView.getHomeButton().setEnabled(!(isXMin && isYMin));
+		dendroView.getYMinusButton().setEnabled(!isYMin);
+		dendroView.getXMinusButton().setEnabled(!isXMin);
+		dendroView.getXYMinusButton().setEnabled(!(isXMin && isYMin));
 	}
 }

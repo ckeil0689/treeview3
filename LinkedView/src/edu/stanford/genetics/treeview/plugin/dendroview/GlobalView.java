@@ -372,17 +372,11 @@ MouseWheelListener {
 				ymap.recalculateScale();
 				hasDrawn = true;
 			}
-
-			xmap.notifyObservers();
-			ymap.notifyObservers();
 		}
 
 		if (resetHome) {
 			xmap.setHome();
 			ymap.setHome();
-
-			xmap.notifyObservers();
-			ymap.notifyObservers();
 
 			resetHome(false);
 		}
@@ -418,6 +412,9 @@ MouseWheelListener {
 
 			offscreenSource.newPixels();
 		}
+		
+		xmap.notifyObservers();
+		ymap.notifyObservers();
 	}
 
 	@Override

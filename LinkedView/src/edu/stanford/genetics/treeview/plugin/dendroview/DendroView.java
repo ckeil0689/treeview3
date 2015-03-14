@@ -1274,6 +1274,11 @@ public class DendroView implements Observer, DendroPanel {
 
 		return scaleDefaultAll;
 	}
+	
+	public JButton getZoomButton() {
+		
+		return zoomBtn;
+	}
 
 	public JScrollBar getXScroll() {
 

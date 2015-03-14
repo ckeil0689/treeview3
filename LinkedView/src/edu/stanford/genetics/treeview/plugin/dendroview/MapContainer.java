@@ -144,6 +144,7 @@ AdjustmentListener, ConfigNodePersistent {
 		// visible, not max index
 		this.tileNumVisible = getMaxIndex() + 1;
 		minScale = getCalculatedMinScale();
+		
 	}
 
 	/**
