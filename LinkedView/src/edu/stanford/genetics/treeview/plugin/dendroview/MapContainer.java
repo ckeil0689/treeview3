@@ -74,16 +74,20 @@ public class MapContainer extends Observable implements Observer,
 		this.nullMap = new NullMap();
 		this.current = nullMap;
 		this.mapName = mapName;
-		
-		/* Default should NOT be zero, but max value! */
-		this.numVisible = getMaxIndex() + 1;
-		this.firstVisible = 0;
+	
 	}
 
 	public MapContainer(final String type, final String mapName) {
 
 		this(mapName);
 		setMap(type);
+		
+		/* 
+		 * TODO Initial numVisible currently set in setIndexRange()
+		 * Default should NOT be zero, but max value! 
+		 */
+//		this.numVisible = getAvailablePixels();
+		this.firstVisible = 0;
 	}
 
 	@Override
@@ -576,6 +580,12 @@ public class MapContainer extends Observable implements Observer,
 		if (current.getMinIndex() != i || current.getMaxIndex() != j) {
 			current.setIndexRange(i, j);
 			setupScrollbar();
+			/* 
+			 * TODO improve numVisible implementation
+			 * Setting default numVisible here for now '
+			 */
+			setNumVisible(j + 1);
+			
 			// Added this, but took it out because it was to fix something that
 			// previously wasn't broken, so instead of try to patch it, I'm
 			// going to
