@@ -100,6 +100,19 @@ public class GUIFactory {
 
 		return panel;
 	}
+	
+	/**
+	 * Overloaded method to return a JPanel without background color 
+	 * specification.
+	 * @param opaque Whether the JPanel should be opaque or not.
+	 * @param panel_mode Sets the main MigLayout constrains for panel insets.
+	 * @return A JPanel.
+	 */
+	public static JPanel createJPanel(final boolean opaque,
+			final int panel_mode) {
+		
+		return createJPanel(opaque, panel_mode, null);
+	}
 
 	/**
 	 * Creates and returns a JLabel with the appropriate text color and a small
@@ -147,9 +160,22 @@ public class GUIFactory {
 	public static JButton createBtn(final String title) {
 
 		final JButton btn = new JButton(title);
-		btn.setFocusPainted(false);
+//		btn.setFocusPainted(false);
 
 		return btn;
+	}
+	
+	/**
+	 * Creates a button with a title and icon if desired. The method centralizes
+	 * the layout setting for buttons so that all buttons will look similar.
+	 *
+	 * @param title
+	 * @param iconFileName
+	 * @return
+	 */
+	public static SquareButton createSquareBtn(final String title, int size) {
+
+		return new SquareButton(title, size);
 	}
 
 	/**
