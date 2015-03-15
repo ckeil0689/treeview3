@@ -339,7 +339,7 @@ public class TVController implements Observer {
 
 			setDataModel();
 
-			dendroController.setNew(tvFrame.getDendroView(), model);
+			dendroController.setNewMatrix(tvFrame.getDendroView(), model);
 
 			/* set the selected label type to the old one */
 			resetLabelSelection();

@@ -54,8 +54,7 @@ import edu.stanford.genetics.treeview.ModelViewProduced;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 
 public class GlobalView extends ModelViewProduced implements
-// MouseMotionListener, MouseListener,
-		MouseWheelListener {
+MouseWheelListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -199,6 +198,10 @@ public class GlobalView extends ModelViewProduced implements
 					+ "in getStatus() in GlobalView: " + e.getMessage());
 		}
 		return statustext;
+	}
+	
+	public void setObserver() {
+		
 	}
 
 	/**
@@ -369,17 +372,12 @@ public class GlobalView extends ModelViewProduced implements
 				ymap.recalculateScale();
 				hasDrawn = true;
 			}
-
-			xmap.notifyObservers();
-			ymap.notifyObservers();
 		}
 
 		if (resetHome) {
+			LogBuffer.println("Resetting GV");
 			xmap.setHome();
 			ymap.setHome();
-
-			xmap.notifyObservers();
-			ymap.notifyObservers();
 
 			resetHome(false);
 		}
@@ -415,6 +413,9 @@ public class GlobalView extends ModelViewProduced implements
 
 			offscreenSource.newPixels();
 		}
+		
+		xmap.notifyObservers();
+		ymap.notifyObservers();
 	}
 
 	@Override

@@ -64,8 +64,8 @@ public class MapContainer extends Observable implements Observer,
 	// Track explicitly manipulated visible area (instead of the visible area)
 	// as
 	// is manipulated via indirect actions (such as resizing the window)
-	private int numVisible = 0;
-	private int firstVisible = 0;
+	private int numVisible;
+	private int firstVisible;
 
 	public MapContainer(final String mapName) {
 
@@ -74,12 +74,20 @@ public class MapContainer extends Observable implements Observer,
 		this.nullMap = new NullMap();
 		this.current = nullMap;
 		this.mapName = mapName;
+	
 	}
 
 	public MapContainer(final String type, final String mapName) {
 
 		this(mapName);
 		setMap(type);
+		
+		/* 
+		 * TODO Initial numVisible currently set in setIndexRange()
+		 * Default should NOT be zero, but max value! 
+		 */
+//		this.numVisible = getAvailablePixels();
+		this.firstVisible = 0;
 	}
 
 	@Override
@@ -144,15 +152,22 @@ public class MapContainer extends Observable implements Observer,
 		// visible, not max index
 		this.tileNumVisible = getMaxIndex() + 1;
 		minScale = getCalculatedMinScale();
+		
 	}
 
 	/**
-	 * Sets the scale of this MapContainer to the last saved value.
+	 * Sets the scale of this MapContainer to the last saved value. The 
+	 * value needs to be the tile number that is visible on screen. The actual
+	 * scale value does not apply if the screen size changed since that would
+	 * mean that too few or too many tiles might be visible.
 	 */
 	public void setLastScale() {
 
 		if (configNode != null) {
-			setScale(configNode.getDouble("scale", getCalculatedMinScale()));
+			int lastNumVisible = configNode.getInt("scale", getMaxIndex());
+			double lastScale = getAvailablePixels() / lastNumVisible;
+			
+			setScale(lastScale);
 		}
 	}
 
@@ -565,6 +580,12 @@ public class MapContainer extends Observable implements Observer,
 		if (current.getMinIndex() != i || current.getMaxIndex() != j) {
 			current.setIndexRange(i, j);
 			setupScrollbar();
+			/* 
+			 * TODO improve numVisible implementation
+			 * Setting default numVisible here for now '
+			 */
+			setNumVisible(j + 1);
+			
 			// Added this, but took it out because it was to fix something that
 			// previously wasn't broken, so instead of try to patch it, I'm
 			// going to
@@ -579,7 +600,7 @@ public class MapContainer extends Observable implements Observer,
 	}
 
 	public void setScale(final double d) {
-
+		
 		// LogBuffer.println("Scale sent in (d) = [" + d +
 		// "], d*int(AvailablePix/d) = ["
 		// + ((d * (int) (getAvailablePixels() / d)))

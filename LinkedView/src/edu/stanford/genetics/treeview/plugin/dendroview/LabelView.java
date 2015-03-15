@@ -56,7 +56,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	/* Default label settings */
 	protected final String d_face = "Dialog";
 	protected final int d_style = 0;
-	protected final int d_size = 12;
+	protected final int d_size = 14;
 	protected final boolean d_justified = true;
 
 	/* Custom label settings */
@@ -354,7 +354,10 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		final int stringX = (isGeneAxis) ? offscreenSize.width
 				: offscreenSize.height;
 
-		if (map.getScale() > 12.0) {
+		if (map.getScale() > 10.0) {
+			
+			setDynamicFontSize();
+			
 			zoomHint.setText("");
 
 			final Graphics2D g2d = (Graphics2D) g;
@@ -443,6 +446,28 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
 		} else {
 			zoomHint.setText(hintText);
+		}
+	}
+	
+	/**
+	 * Sets a dynamic font size based on current scale of each independent
+	 * axis map.
+	 */
+	private void setDynamicFontSize() {
+		
+		double scale = map.getScale();
+		
+		int multiple = (int) scale / 10;
+		
+		/* Guarantee max font size of 16 */
+		if(multiple > 10) {
+			multiple = 10;
+		}
+		
+		if(multiple < 2) {
+			setPoints(6);
+		} else {
+			setPoints(6 + multiple);
 		}
 	}
 
