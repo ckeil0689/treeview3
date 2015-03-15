@@ -344,7 +344,7 @@ public class DendroView implements Observer, DendroPanel {
 
 
 		navContainer = GUIFactory.createJPanel(false,
-				GUIFactory.NO_PADDING);
+				GUIFactory.DEFAULT);
 //		navContainer.setLayout(new MigLayout("debug"));
 
 		bottomPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
@@ -426,10 +426,11 @@ public class DendroView implements Observer, DendroPanel {
 		crossPanel.add(scaleIncXY, "wrap");
 		crossPanel.add(scaleDefaultAll, "span, pushx, alignx 50%");
 
-		navContainer.add(searchPanel, "push, alignx 50%, aligny 0%, wrap");
-		navContainer.add(crossPanel, "push, alignx 50%, wrap");
+		navContainer.add(searchPanel, "pushx, alignx 50%, aligny 0%, h 50%, "
+				+ "wrap");
+		navContainer.add(crossPanel, "pushx, alignx 50%, wrap");
 		navContainer.add(dataTicker.getTickerPanel(), "pushx, grow, w 95%, "
-				+ "h 25%, wrap");
+				+ "wrap");
 		
 		/* Add the scrollbars (outside of LabelViews) */
 		final JScrollBar colLabelScroll = colLabelView.getScrollBar();
