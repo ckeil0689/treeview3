@@ -27,6 +27,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 
 import Utilities.Helper;
 import edu.stanford.genetics.treeview.CdtFilter;
@@ -127,6 +128,18 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		 * and loading a new matrix (changed availablePixels in GlobalView).
 		 */
 //		setSavedScale();
+		
+		/* 
+		 * Needs to wait for repaint() called from resetMapContainer() and
+		 * component listener. TODO implement resetMapContainer differently...
+		 */
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				setSavedScale();
+			}
+		});
 
 		addKeyBindings();
 		addDendroViewListeners();
@@ -954,7 +967,11 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		}
 	}
 
-	/**
+	/**'
+	 * TODO this should all be code inside MapContainer. This way it doesn't
+	 * have to be done twice and the zoom code can take advantage of the
+	 * inner state of each MapContainer object (globalXmap, globalYmap) - Chris
+	 * 
 	 * Uses the array- and geneSelection and currently available pixels on
 	 * screen retrieved from the MapContainer objects to calculate a new scale
 	 * and zoom in on it by working in conjunction with centerSelection().
@@ -2140,10 +2157,21 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		boolean isYMin = Helper.nearlyEqual(globalYmap.getMinScale(), 
 				globalYmap.getScale());
 		
-		/* Set button status accordingly. */
+		int xTilesVisible = globalXmap.getNumVisible();
+		int yTilesVisible = globalYmap.getNumVisible();
+		
+		/* Zoom-out buttons disabled if min scale for axis is reached. */
 		dendroView.getHomeButton().setEnabled(!(isXMin && isYMin));
 		dendroView.getYMinusButton().setEnabled(!isYMin);
 		dendroView.getXMinusButton().setEnabled(!isXMin);
 		dendroView.getXYMinusButton().setEnabled(!(isXMin && isYMin));
+		
+		/* Zoom-in buttons disabled if visible tile number for axis is 1 */
+		dendroView.getXPlusButton().setEnabled((xTilesVisible != 1));
+		dendroView.getYPlusButton().setEnabled((yTilesVisible != 1));
+		dendroView.getXYPlusButton().setEnabled((xTilesVisible != 1) 
+				|| (yTilesVisible != 1));
+		
+		
 	}
 }
