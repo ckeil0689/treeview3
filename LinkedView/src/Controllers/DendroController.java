@@ -651,25 +651,49 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			if (e.getSource() == dendroView.getXPlusButton()) {
+			/* 
+			 * TODO Adapt zoom methods in MapContainer to differentiate between
+			 * adding/ removing tiles on the opposite axis sides. 
+			 * Can reduce this button madness to something more compact later.
+			 */
+			if (e.getSource() == dendroView.getXRightPlusButton()) {
+				// Adds column on right side
 				getGlobalXMap().zoomIn();
-
-			} else if (e.getSource() == dendroView.getXMinusButton()) {
+				
+			} else if(e.getSource() == dendroView.getXLeftPlusButton()) {
+				// Add a column on the left side
+				
+			} else if (e.getSource() == dendroView.getXMinusRightButton()) {
+				// Removes column on right side
 				getGlobalXMap().zoomOut();
+				
+			} else if (e.getSource() == dendroView.getXMinusLeftButton()) {
+				// Remove column on left side
 
 			} else if (e.getSource() == dendroView.getXYMinusButton()) {
+				// Both axes ... need to discuss what to do here. 
+				// No new buttons to use here yet.
 				getGlobalXMap().zoomOut();
 				getGlobalYMap().zoomOut();
 
 			} else if (e.getSource() == dendroView.getXYPlusButton()) {
+				// Same as above.
 				getGlobalXMap().zoomIn();
 				getGlobalYMap().zoomIn();
 
-			} else if (e.getSource() == dendroView.getYPlusButton()) {
+			} else if (e.getSource() == dendroView.getYPlusBottomButton()) {
+				// Adds a row to the bottom.
 				getGlobalYMap().zoomIn();
+				
+			} else if (e.getSource() == dendroView.getYPlusTopButton()) {
+				// Add row to top here
 
-			} else if (e.getSource() == dendroView.getYMinusButton()) {
+			} else if (e.getSource() == dendroView.getYMinusBottomButton()) {
+				// Removes row from bottom
 				getGlobalYMap().zoomOut();
+				
+			} else if (e.getSource() == dendroView.getYMinusTopButton()) {
+				// Remove row from top here
 
 			} else if (e.getSource() == dendroView.getHomeButton()) {
 				resetMapContainers();
@@ -1951,13 +1975,17 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		
 		/* Zoom-out buttons disabled if min scale for axis is reached. */
 		dendroView.getHomeButton().setEnabled(!(isXMin && isYMin));
-		dendroView.getYMinusButton().setEnabled(!isYMin);
-		dendroView.getXMinusButton().setEnabled(!isXMin);
+		dendroView.getYMinusBottomButton().setEnabled(!isYMin);
+		dendroView.getYMinusTopButton().setEnabled(!isYMin);
+		dendroView.getXMinusRightButton().setEnabled(!isXMin);
+		dendroView.getXMinusLeftButton().setEnabled(!isXMin);
 		dendroView.getXYMinusButton().setEnabled(!(isXMin && isYMin));
 		
 		/* Zoom-in buttons disabled if visible tile number for axis is 1 */
-		dendroView.getXPlusButton().setEnabled((xTilesVisible != 1));
-		dendroView.getYPlusButton().setEnabled((yTilesVisible != 1));
+		dendroView.getXRightPlusButton().setEnabled((xTilesVisible != 1));
+		dendroView.getYPlusBottomButton().setEnabled((yTilesVisible != 1));
+		dendroView.getXLeftPlusButton().setEnabled((xTilesVisible != 1));
+		dendroView.getYPlusTopButton().setEnabled((yTilesVisible != 1));
 		dendroView.getXYPlusButton().setEnabled((xTilesVisible != 1) 
 				|| (yTilesVisible != 1));
 		
