@@ -64,8 +64,8 @@ AdjustmentListener, ConfigNodePersistent {
 	// Track explicitly manipulated visible area (instead of the visible area)
 	// as
 	// is manipulated via indirect actions (such as resizing the window)
-	private int numVisible = 0;
-	private int firstVisible = 0;
+	private int numVisible;
+	private int firstVisible;
 
 	public MapContainer(final String mapName) {
 
@@ -74,6 +74,10 @@ AdjustmentListener, ConfigNodePersistent {
 		this.nullMap = new NullMap();
 		this.current = nullMap;
 		this.mapName = mapName;
+		
+		/* Default should NOT be zero, but max value! */
+		this.numVisible = getMaxIndex() + 1;
+		this.firstVisible = 0;
 	}
 
 	public MapContainer(final String type, final String mapName) {

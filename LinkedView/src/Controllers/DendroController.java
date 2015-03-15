@@ -893,14 +893,14 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		try {
 			if (configNode.nodeExists("GlobalXMap") && globalXmap != null) {
 				configNode.node("GlobalXMap").putInt("scale",
-						globalXmap.getTileNumVisible());
+						globalXmap.getNumVisible());
 				configNode.node("GlobalXMap").putInt("XScrollValue",
 						dendroView.getXScroll().getValue());
 			}
 
 			if (configNode.nodeExists("GlobalYMap") && globalYmap != null) {
 				configNode.node("GlobalYMap").putInt("scale",
-						globalYmap.getTileNumVisible());
+						globalYmap.getNumVisible());
 				configNode.node("GlobalYMap").putInt("YScrollValue",
 						dendroView.getYScroll().getValue());
 			}
@@ -1251,49 +1251,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 		saveSettings();
 	}
-
-//	/**
-//	 * Listens to the resizing of DendroView2 and makes changes to MapContainers
-//	 * as a result.
-//	 *
-//	 * @author CKeil
-//	 *
-//	 */
-//	private class ResizeListener implements ComponentListener {
-//
-//		// Component Listeners
-//		@Override
-//		public void componentHidden(final ComponentEvent arg0) {
-//		}
-//
-//		@Override
-//		public void componentMoved(final ComponentEvent arg0) {
-//		}
-//
-//		@Override
-//		public void componentResized(final ComponentEvent arg0) {
-//			// LogBuffer.println("componentResized: globalYmap.getTileNumVisible: ["
-//			// + globalYmap.getTileNumVisible() +
-//			// "] globalXmap.getTileNumVisible: [" +
-//			// globalXmap.getTileNumVisible() +
-//			// "] dendroView.getXScroll().getValue(): [" +
-//			// dendroView.getXScroll().getValue() +
-//			// "] dendroView.getYScroll().getValue(): [" +
-//			// dendroView.getYScroll().getValue() + "].");
-//
-//			// Previously, resetMapContainers was called here, but that caused
-//			// the zoom level to change when the user resized the window, so I
-//			// added a way to track the currently visible area in mapContainer
-//			// and implemented these functions to make the necessary
-//			// adjustments to the image when that happens
-//			reZoomVisible();
-//			reCenterVisible();
-//		}
-//
-//		@Override
-//		public void componentShown(final ComponentEvent arg0) {
-//		}
-//	}
 
 	public void saveImage(final JPanel panel) throws IOException {
 
@@ -2171,7 +2128,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		dendroView.getYPlusButton().setEnabled((yTilesVisible != 1));
 		dendroView.getXYPlusButton().setEnabled((xTilesVisible != 1) 
 				|| (yTilesVisible != 1));
-		
 		
 	}
 }
