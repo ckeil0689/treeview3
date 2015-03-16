@@ -1375,6 +1375,9 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		
 		dendroView.getGlobalMatrixView().setXMap(globalXmap);
 		dendroView.getGlobalMatrixView().setYMap(globalYmap);
+		
+		dendroView.getGlobalMatrixView().setInteractiveXMap(interactiveXmap);
+		dendroView.getGlobalMatrixView().setInteractiveYMap(interactiveYmap);
 	}
 
 	/**

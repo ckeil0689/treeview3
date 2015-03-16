@@ -124,6 +124,7 @@ public abstract class MatrixView extends ModelViewProduced {
 		ymap.setHome();
 	}
 	
+	
 	/**
 	 * Set geneSelection
 	 *

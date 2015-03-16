@@ -9,6 +9,7 @@ import java.awt.RenderingHints;
 import java.util.Observable;
 
 import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.TreeSelectionI;
 
 public class GlobalMatrixView extends MatrixView {
 
@@ -16,6 +17,14 @@ public class GlobalMatrixView extends MatrixView {
 	 * Default so warings don't pop up...
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	/* 
+	 * Also needs reference to interactive MapContainers to get knowledge
+	 * about which specific tiles are currently visible and update the 
+	 * viewport rectangle through the observer pattern.
+	 */
+	private MapContainer interactiveXmap;
+	private MapContainer interactiveYmap;
 	
 	private final Rectangle viewPortRect = new Rectangle();
 
@@ -25,21 +34,16 @@ public class GlobalMatrixView extends MatrixView {
 		
 	}
 	
-//	@Override
-//	public synchronized void paintComposite(final Graphics g) {
-/* TODO draw viewport rectangle here so user will know where in the 
- * matrix he is.
- */
-//		if (selectionRectList != null) {
-//
-//			/* draw all selection rectangles in yellow */
-//			g.setColor(Color.yellow);
-//
-//			for (final Rectangle rect : selectionRectList) {
-//				g.drawRect(rect.x, rect.y, rect.width, rect.height);
-//			}
-//		}
-//	}
+	@Override
+	public synchronized void paintComposite(final Graphics g) {
+		if (viewPortRect != null) {
+			/* draw all selection rectangles in yellow */
+			g.setColor(Color.white);
+
+			g.drawRect(viewPortRect.x, viewPortRect.y, viewPortRect.width, 
+					viewPortRect.height);
+		}
+	}
 	
 	/**
 	 * This method updates a pixel buffer. The alternative is to update the
@@ -72,9 +76,7 @@ public class GlobalMatrixView extends MatrixView {
 	@Override
 	public void update(Observable o, Object arg) {
 		
-		LogBuffer.println("GlobalMatrixView got update : " + o);
-		
-		if ((o == xmap) || o == ymap) {
+		if (o == interactiveXmap || o == interactiveYmap) {
 			recalculateOverlay();
 			offscreenValid = false;
 
@@ -84,9 +86,16 @@ public class GlobalMatrixView extends MatrixView {
 			 * different.
 			 */
 			offscreenValid = false;
-
+			
+		} else if(o == xmap || o == ymap) {
+			revalidateScreen();
+			
+		} else if(o instanceof TreeSelectionI) {
+			return;
+			
 		} else {
 			LogBuffer.println("GlobalMatrixView got weird update : " + o);
+			return;
 		}
 
 		revalidate();
@@ -100,15 +109,62 @@ public class GlobalMatrixView extends MatrixView {
 	}
 	
 	/**
+	 * Sets a reference to the interactive x-MapContainer to keep track of
+	 * of currently visible tiles. 
+	 * @param m
+	 */
+	public void setInteractiveXMap(final MapContainer m) {
+
+		if (interactiveXmap != null) {
+			interactiveXmap.deleteObserver(this);
+		}
+
+		interactiveXmap = m;
+		interactiveXmap.addObserver(this);
+	}
+
+	/**
+	 * Sets a reference to the interactive y-MapContainer to keep track of
+	 * of currently visible tiles. 
+	 * @param m
+	 */
+	public void setInteractiveYMap(final MapContainer m) {
+
+		if (interactiveYmap != null) {
+			interactiveYmap.deleteObserver(this);
+		}
+
+		interactiveYmap = m;
+		interactiveYmap.addObserver(this);
+	}
+	
+	/**
 	 * Checks the current view of rows and columns and calculates 
 	 * the appropriate viewport rectangle.
 	 */
 	protected void recalculateOverlay() {
 		
-		int xFirst = xmap.getFirstVisible();
-		int xLast = xFirst + xmap.getNumVisible();
+		int xFirst = interactiveXmap.getFirstVisible();
+		int xLast = xFirst + interactiveXmap.getNumVisible();
 		
-		LogBuffer.println("xFirst: " + xFirst);
-		LogBuffer.println("xLast: " + xLast);
+		int yFirst = interactiveYmap.getFirstVisible();
+		int yLast = yFirst + interactiveYmap.getNumVisible();
+		
+		int spx = xmap.getPixel(xFirst);
+		int epx = xmap.getPixel(xLast + 1) - 1;
+		int spy = ymap.getPixel(yFirst);
+		int epy = ymap.getPixel(yLast + 1) - 1;
+
+		if (epx < spx) {
+			epx = spx;
+			// correct for roundoff error above
+		}
+
+		if (epy < spy) {
+			epy = spy;
+			// correct for roundoff error above
+		}
+		
+		viewPortRect.setBounds(spx, spy, epx - spx, epy - spy);
 	}
 }
