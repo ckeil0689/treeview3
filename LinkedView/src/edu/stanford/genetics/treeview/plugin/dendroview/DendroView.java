@@ -284,9 +284,9 @@ public class DendroView implements Observer, DendroPanel {
 				+ "(complex V), etc...";
 		searchPanel.setToolTipText(tooltip);
 
-		searchPanel.add(rowFinderBox.getSearchTermBox(), "pushx, w 180::, "
+		searchPanel.add(rowFinderBox.getSearchTermBox(), "pushx, w 50::, "
 				+ "span, wrap");
-		searchPanel.add(colFinderBox.getSearchTermBox(), "pushx, w 180::, "
+		searchPanel.add(colFinderBox.getSearchTermBox(), "pushx, w 50::, "
 				+ "span, wrap");
 
 		searchPanel.revalidate();
@@ -373,7 +373,7 @@ public class DendroView implements Observer, DendroPanel {
 			rowDataPane.setDividerLocation(oldRowDiv);
 		} else {
 			rowDataPane.setDividerLocation(0.0);
-			rowDataPane.setEnabled(false);
+//			rowDataPane.setEnabled(false);
 		}
 
 		colDataPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, colTreeView,
@@ -391,7 +391,7 @@ public class DendroView implements Observer, DendroPanel {
 			colDataPane.setDividerLocation(oldColDiv);
 		} else {
 			colDataPane.setDividerLocation(0.0);
-			colDataPane.setEnabled(false);
+//			colDataPane.setEnabled(false);
 		}
 
 		/* If trees in general are disabled */
@@ -427,7 +427,7 @@ public class DendroView implements Observer, DendroPanel {
 		navContainer.add(searchPanel, "pushx, alignx 50%, aligny 0%, h 50%, "
 				+ "wrap");
 		navContainer.add(crossPanel, "pushx, alignx 50%, wrap");
-		navContainer.add(dataTicker.getTickerPanel(), "pushx, grow, w 95%, "
+		navContainer.add(dataTicker.getTickerPanel(), "pushx, growy, "
 				+ "wrap");
 		
 		/* Add the scrollbars (outside of LabelViews) */
@@ -445,28 +445,28 @@ public class DendroView implements Observer, DendroPanel {
 		
 		
 		/* Adding elements to the main JPanel */
-		dendroPane.add(globalOverviewPanel, "w 13%, h 19%");
+		dendroPane.add(globalOverviewPanel, "w 10%, h 19%");
 
 		/* Column tree view */
-		dendroPane.add(colDataPane, "w 73%, h 19%!");
+		dendroPane.add(colDataPane, "w 75%, h 19%!");
 		dendroPane.add(colLabelScroll, "h 19%!");
 
 		/* Navigation panel */
-		dendroPane.add(navContainer, "span 1 3, w 200:13%:, h 100%, wrap");
+		dendroPane.add(navContainer, "span 1 3, w 220:10%:, h 100%, wrap");
 
 		/* Row tree view */
-		dendroPane.add(rowDataPane, "w 200:13%:, h 79%");
+		dendroPane.add(rowDataPane, "w 200:10%:, h 79%");
 		
 		/* Matrix view */
-		dendroPane.add(globalview, "w 73%, h 79%, grow, push");
+		dendroPane.add(globalview, "w 75%, h 79%, grow, push");
 		dendroPane.add(rowNavPanel, "growy, w 1%, h 95%, wrap");
 		
 		dendroPane.add(rowLabelScroll, "w 13%, h 1%");
 		
-		dendroPane.add(columnNavPanel, "growx, w 73%, h 1%, wrap");
+		dendroPane.add(columnNavPanel, "growx, w 75%, h 1%, wrap");
 
 		/* Bottom panel for spacing */
-		dendroPane.add(bottomPanel, "span, w 87.5%, h 1%");
+		dendroPane.add(bottomPanel, "span, h 1%");
 				
 		dendroPane.revalidate();
 		dendroPane.repaint();
