@@ -287,11 +287,10 @@ public class MapContainer extends Observable implements Observer,
 		 */
 	
 		/* Set an appropriate minimum tile number. */
-		double minTileNum;
+		double minTileNum = MIN_TILE_NUM;
+		
 		if(getMaxIndex() < MIN_TILE_NUM) {
 			minTileNum = getMaxIndex();
-		} else {
-			minTileNum = MIN_TILE_NUM;
 		}
 		
 		/* 
@@ -301,23 +300,34 @@ public class MapContainer extends Observable implements Observer,
 		 * */
 		double numSelected = selectedMax - selectedMin + 1;
 		
+		// If the gene selection is smaller than the minimum zoom level
 		if(numSelected < minTileNum) {
 			
+			// If the center of the selection is less than half the distance to
+			// the near edge
 			if ((selectedMin + numSelected / 2) < (minTileNum / 2)) {
 				numSelected = (selectedMin + numSelected / 2) * 2;
+				LogBuffer.println("Case 1");
 			}
 			// Else if the center of the selection is less than half the
 			// distance to the far edge
 			else if ((selectedMin + numSelected / 2) > (selectedMax 
 					- (minTileNum / 2))) {
-				numSelected = (selectedMax - (selectedMin 
-						+ numSelected / 2 - 1)) * 2;
+				double newStuff = (selectedMax 
+						- (selectedMin + numSelected / 2 - 1)) * 2;
+				numSelected = newStuff;
+//						(selectedMax 
+//						- (selectedMin + numSelected / 2 - 1)) * 2;
+				LogBuffer.println("Case 2");
 			}
 			// Otherwise, set the standard minimum zoom
 			else {
+				LogBuffer.println("Case 3");
 				numSelected = minTileNum;
 			}
 		}
+		
+		LogBuffer.println("Num selected: " + numSelected);
 		
 		if(numSelected > 0) {
 			double newScale = getAvailablePixels() / numSelected;

@@ -341,8 +341,6 @@ public class DendroView implements Observer, DendroPanel {
 		
 		crossPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 
-
-
 		navContainer = GUIFactory.createJPanel(false,
 				GUIFactory.DEFAULT);
 //		navContainer.setLayout(new MigLayout("debug"));
