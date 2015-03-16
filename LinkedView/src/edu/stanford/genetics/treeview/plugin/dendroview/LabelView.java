@@ -459,7 +459,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		
 		int multiple = (int) scale / 10;
 		
-		/* Guarantee max font size of 16 */
+		/* Guarantee max font size of 14 */
 		if(multiple > 8) {
 			multiple = 8;
 		}
