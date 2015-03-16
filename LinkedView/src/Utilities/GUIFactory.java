@@ -160,7 +160,6 @@ public class GUIFactory {
 	public static JButton createBtn(final String title) {
 
 		final JButton btn = new JButton(title);
-//		btn.setFocusPainted(false);
 
 		return btn;
 	}
@@ -206,7 +205,6 @@ public class GUIFactory {
 	public static JButton createIconBtn(final String iconFileName) {
 
 		final JButton button = new JButton();
-		button.setFocusPainted(false);
 		button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
 		// If provided, add icon to button
@@ -245,7 +243,6 @@ public class GUIFactory {
 	public static JButton createLargeBtn(final String title) {
 
 		final JButton btn = new JButton(title);
-		btn.setFocusPainted(false);
 
 		// Basic layout
 		btn.setFont(FONTXXL);

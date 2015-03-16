@@ -467,7 +467,8 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		if(multiple < 2) {
 			setPoints(6);
 		} else {
-			setPoints(6 + (2 * multiple));
+			/* rate of 2 is too much, rate of 1 too little... */
+			setPoints(6 + (int)(1.5 * multiple));
 		}
 	}
 

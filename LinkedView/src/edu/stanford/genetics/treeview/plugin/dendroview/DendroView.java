@@ -266,7 +266,6 @@ public class DendroView implements Observer, DendroPanel {
 	}
 
 	/**
-<<<<<<< HEAD
 	 * Setup the search panel which contains tow editable JComboBoxes containing
 	 * all labels for each axis.
 	 *
@@ -294,8 +293,6 @@ public class DendroView implements Observer, DendroPanel {
 	}
 
 	/**
-=======
->>>>>>> ui_update
 	 * Initializes the objects associated with label search. These are the
 	 * JComboBoxes containing all the label names as well as the buttons on that
 	 * panel.
