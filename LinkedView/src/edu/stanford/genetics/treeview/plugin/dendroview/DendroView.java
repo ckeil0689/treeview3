@@ -184,7 +184,7 @@ public class DendroView implements Observer, DendroPanel {
 	/**
 	 * Constructor for the DendroView object
 	 *
-	 * @param vFrame
+	 * @param tvFrame
 	 *            parent ViewFrame of DendroView
 	 * @param name
 	 *            name of this view.
@@ -197,7 +197,7 @@ public class DendroView implements Observer, DendroPanel {
 		/* main panel */
 
 		searchPanel = GUIFactory.createJPanel(false, GUIFactory.FILL, null);
-		dendroPane = GUIFactory.createJPanel(true, GUIFactory.NO_PADDING_FILL, Color.white);
+		dendroPane = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING_FILL);
 //		dendroPane.setLayout(new MigLayout("debug"));
 
 		/* >>> Init all views --- they should be final <<< */
@@ -234,6 +234,9 @@ public class DendroView implements Observer, DendroPanel {
 
 		interactiveMatrixView.resetView();
 		interactiveMatrixView.repaint();
+		
+		globalMatrixView.resetView();
+		globalMatrixView.repaint();
 	}
 
 	/**

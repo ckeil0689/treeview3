@@ -266,7 +266,6 @@ public class MapContainer extends Observable implements Observer,
 		
 		setScale(newScale);
 
-		notifyObservers();
 	}
 	
 	/**

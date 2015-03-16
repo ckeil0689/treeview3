@@ -8,11 +8,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.util.Observable;
 
-import javax.swing.BorderFactory;
-
 import edu.stanford.genetics.treeview.LogBuffer;
-import net.miginfocom.swing.MigLayout;
-import Utilities.GUIFactory;
 
 public class GlobalMatrixView extends MatrixView {
 
@@ -20,15 +16,13 @@ public class GlobalMatrixView extends MatrixView {
 	 * Default so warings don't pop up...
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	private final Rectangle viewPortRect = new Rectangle();
 
 	public GlobalMatrixView() {
 		
 		super();
 		
-//		setLayout(new MigLayout());
-//		
-//		panel.setBorder(BorderFactory.createEtchedBorder());
-//		panel.setBackground(GUIFactory.ELEMENT_HOV);
 	}
 	
 //	@Override
@@ -54,19 +48,7 @@ public class GlobalMatrixView extends MatrixView {
 	@Override
 	protected void updatePixels() {
 
-		if (offscreenChanged) {
-			// LogBuffer.println("OFFSCREEN CHANGED");
-			offscreenValid = false;
-			xmap.setAvailablePixels(offscreenSize.width);
-			ymap.setAvailablePixels(offscreenSize.height);
-
-			if (!hasDrawn) {
-				// total kludge, but addnotify isn't working correctly...
-				xmap.recalculateScale();
-				ymap.recalculateScale();
-				hasDrawn = true;
-			}
-		}
+		revalidateScreen();
 
 		if (!offscreenValid) {
 			// LogBuffer.println("OFFSCREEN INVALID");
@@ -90,6 +72,8 @@ public class GlobalMatrixView extends MatrixView {
 	@Override
 	public void update(Observable o, Object arg) {
 		
+		LogBuffer.println("GlobalMatrixView got update : " + o);
+		
 		if ((o == xmap) || o == ymap) {
 			recalculateOverlay();
 			offscreenValid = false;
@@ -109,12 +93,22 @@ public class GlobalMatrixView extends MatrixView {
 		repaint();
 	}
 	
+	@Override
+	public String viewName() {
+
+		return "GlobalMatrixView";
+	}
+	
 	/**
 	 * Checks the current view of rows and columns and calculates 
 	 * the appropriate viewport rectangle.
 	 */
 	protected void recalculateOverlay() {
 		
+		int xFirst = xmap.getFirstVisible();
+		int xLast = xFirst + xmap.getNumVisible();
 		
+		LogBuffer.println("xFirst: " + xFirst);
+		LogBuffer.println("xLast: " + xLast);
 	}
 }

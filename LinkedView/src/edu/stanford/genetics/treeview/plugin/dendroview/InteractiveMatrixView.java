@@ -110,40 +110,29 @@ MouseWheelListener {
 
 		super();
 
-//		setLayout(new MigLayout());
-
-//		scrollPane = new JScrollPane(this,
-//				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-//				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-//
-//		panel = scrollPane;
-//		panel.setBorder(BorderFactory.createEtchedBorder());
-//		panel.setBackground(GUIFactory.ELEMENT_HOV);
-
-		// setToolTipText("This Turns Tooltips On");
-
+		/* Listeners for interactivity */
 		addMouseListener(new MatrixMouseListener());
 		addMouseMotionListener(new MatrixMouseListener());
 		addMouseWheelListener(this);
 	}
 
+	/**
+	 * 
+	 * @return x-axis scroll bar (horizontal) for the InteractiveMatrixView.
+	 */
 	public JScrollBar getXScroll() {
 
 		return scrollPane.getHorizontalScrollBar();
 	}
 
+	/**
+	 * 
+	 * @return y-axis scroll bar (vertical) for the InteractiveMatrixView.
+	 */
 	public JScrollBar getYScroll() {
 
 		return scrollPane.getVerticalScrollBar();
 	}
-
-//	@Override
-//	public Dimension getPreferredSize() {
-//
-//		final Dimension p = new Dimension(xmap.getRequiredPixels(),
-//				ymap.getRequiredPixels());
-//		return p;
-//	}
 
 	@Override
 	public String[] getStatus() {
@@ -198,56 +187,6 @@ MouseWheelListener {
 		return statustext;
 	}
 
-//	/**
-//	 * Set geneSelection
-//	 *
-//	 * @param geneSelection
-//	 *            The TreeSelection which is set by selecting genes in the
-//	 *            GlobalView
-//	 */
-//	public void setGeneSelection(final TreeSelectionI geneSelection) {
-//
-//		if (this.geneSelection != null) {
-//			this.geneSelection.deleteObserver(this);
-//		}
-//
-//		this.geneSelection = geneSelection;
-//		this.geneSelection.addObserver(this);
-//	}
-//
-//	/**
-//	 * Set arraySelection
-//	 *
-//	 * @param arraySelection
-//	 *            The TreeSelection which is set by selecting arrays in the
-//	 *            GlobalView
-//	 */
-//	public void setArraySelection(final TreeSelectionI arraySelection) {
-//
-//		if (this.arraySelection != null) {
-//			this.arraySelection.deleteObserver(this);
-//		}
-//
-//		this.arraySelection = arraySelection;
-//		this.arraySelection.addObserver(this);
-//	}
-
-//	/**
-//	 * Set ArrayDrawer
-//	 *
-//	 * @param arrayDrawer
-//	 *            The ArrayDrawer to be used as a source
-//	 */
-//	public void setArrayDrawer(final ArrayDrawer arrayDrawer) {
-//
-//		if (drawer != null) {
-//			drawer.deleteObserver(this);
-//		}
-//
-//		drawer = arrayDrawer;
-//		drawer.addObserver(this);
-//	}
-
 	public void setHeaderSummary(final HeaderSummary gene,
 			final HeaderSummary array) {
 
@@ -265,42 +204,10 @@ MouseWheelListener {
 		return drawer;
 	}
 
-//	/**
-//	 * DEPRECATE set the xmapping for this view
-//	 *
-//	 * @param m
-//	 *            the new mapping
-//	 */
-//	public void setXMap(final MapContainer m) {
-//
-//		if (xmap != null) {
-//			xmap.deleteObserver(this);
-//		}
-//
-//		xmap = m;
-//		xmap.addObserver(this);
-//	}
-//
-//	/**
-//	 * DEPRECATE set the ymapping for this view
-//	 *
-//	 * @param m
-//	 *            the new mapping
-//	 */
-//	public void setYMap(final MapContainer m) {
-//
-//		if (ymap != null) {
-//			ymap.deleteObserver(this);
-//		}
-//
-//		ymap = m;
-//		ymap.addObserver(this);
-//	}
-
 	@Override
 	public String viewName() {
 
-		return "GlobalView";
+		return "InteractiveMatrixView";
 	}
 
 	// Canvas Methods
@@ -312,20 +219,7 @@ MouseWheelListener {
 	@Override
 	protected void updateBuffer(final Graphics g) {
 
-		if (offscreenChanged) {
-			xmap.setAvailablePixels(offscreenSize.width);
-			ymap.setAvailablePixels(offscreenSize.height);
-
-			if (!hasDrawn) {
-				// total kludge, but addnotify isn't working correctly...
-				xmap.recalculateScale();
-				ymap.recalculateScale();
-				hasDrawn = true;
-			}
-
-			xmap.notifyObservers();
-			ymap.notifyObservers();
-		}
+		revalidateScreen();
 
 		if (!offscreenValid) {
 			// clear the pallette...
@@ -354,28 +248,7 @@ MouseWheelListener {
 	@Override
 	protected void updatePixels() {
 
-//		if (offscreenChanged) {
-//			// LogBuffer.println("OFFSCREEN CHANGED");
-//			offscreenValid = false;
-//			xmap.setAvailablePixels(offscreenSize.width);
-//			ymap.setAvailablePixels(offscreenSize.height);
-//
-//			if (!hasDrawn) {
-//				// total kludge, but addnotify isn't working correctly...
-//				xmap.recalculateScale();
-//				ymap.recalculateScale();
-//				hasDrawn = true;
-//			}
-//		}
 		revalidateScreen();
-
-//		if (resetHome) {
-////			LogBuffer.println("Resetting GV");
-//			xmap.setHome();
-//			ymap.setHome();
-//
-//			resetHome(false);
-//		}
 
 		if (!offscreenValid) {
 			// LogBuffer.println("OFFSCREEN INVALID");
@@ -971,13 +844,5 @@ MouseWheelListener {
 
 		geneHI = ghi;
 		arrayHI = ahi;
-	}
-
-	public void resetView() {
-		
-		revalidateScreen();
-		
-		xmap.setHome();
-		ymap.setHome();
 	}
 }

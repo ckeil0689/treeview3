@@ -13,6 +13,14 @@ import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.ModelViewProduced;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 
+/**
+ * Basic skeleton for a MatrixView. Can be used as a basis for the interactive
+ * MatrixView as well as the overview MatrixView since their only difference
+ * is interactivity.
+ * 
+ * @author chris0689
+ *
+ */
 public abstract class MatrixView extends ModelViewProduced {
 
 	protected MapContainer xmap;
@@ -70,8 +78,8 @@ public abstract class MatrixView extends ModelViewProduced {
 
 	@Override
 	public String viewName() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return "MatrixView";
 	}
 
 	@Override
@@ -106,6 +114,14 @@ public abstract class MatrixView extends ModelViewProduced {
 				hasDrawn = true;
 			}
 		}
+	}
+	
+	public void resetView() {
+		
+		revalidateScreen();
+		
+		xmap.setHome();
+		ymap.setHome();
 	}
 	
 	/**

@@ -617,6 +617,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 			getGlobalXMap().zoomIn();
 			getGlobalYMap().zoomIn();
+			
+			notifyAllMapObservers();
 		}
 	}
 
@@ -630,6 +632,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 			getGlobalXMap().zoomOut();
 			getGlobalYMap().zoomOut();
+			
+			notifyAllMapObservers();
 		}
 	}
 
@@ -710,6 +714,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 				LogBuffer.println("Got weird source for actionPerformed() "
 						+ "in DendroController ScaleListener.");
 			}
+			
+			notifyAllMapObservers();
 		}
 	}
 
@@ -766,6 +772,18 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			reZoomVisible();
 			reCenterVisible();
 		}
+	}
+	
+	/**
+	 * Notifies all MapContainers' observers.
+	 */
+	private void notifyAllMapObservers() {
+		
+		globalXmap.notifyObservers();
+		globalYmap.notifyObservers();
+		
+		interactiveXmap.notifyObservers();
+		interactiveYmap.notifyObservers();
 	}
 
 	/**
@@ -963,8 +981,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 						"YScrollValue", 0));
 			}
 			
-			interactiveXmap.notifyObservers();
-			interactiveYmap.notifyObservers();
+			notifyAllMapObservers();
 
 		} catch (final BackingStoreException e) {
 			LogBuffer.logException(e);
@@ -1001,6 +1018,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		
 		interactiveXmap.zoomToSelected(minSelectedColIndex, maxSelectedColIndex);
 		interactiveYmap.zoomToSelected(minSelectedRowIndex, maxSelectedRowIndex);
+		
+		notifyAllMapObservers();
 
 		saveSettings();
 	}
@@ -1068,7 +1087,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			// newScale = globalXmap.getMinScale();
 			// }
 			interactiveXmap.setScale(newScale);
-			interactiveXmap.notifyObservers();
+//			interactiveXmap.notifyObservers();
 
 			newScale2 = (interactiveYmap.getAvailablePixels()) / geneIndexes;
 			// LogBuffer.println("reZoomVisible: numVisible: [" + geneIndexes +
@@ -1080,7 +1099,9 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			// newScale2 = globalYmap.getMinScale();
 			// }
 			interactiveYmap.setScale(newScale2);
-			interactiveYmap.notifyObservers();
+//			interactiveYmap.notifyObservers();
+			
+			notifyAllMapObservers();
 			dendroView.getInteractiveMatrixView().repaint();
 		}
 
@@ -1107,10 +1128,12 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			// "] Firsty visible: [" + startY + "].");
 
 			interactiveXmap.scrollToFirstIndex(startX);
-			interactiveXmap.notifyObservers();
+//			interactiveXmap.notifyObservers();
 
 			interactiveYmap.scrollToFirstIndex(startY);
-			interactiveYmap.notifyObservers();
+//			interactiveYmap.notifyObservers();
+			
+			notifyAllMapObservers();
 		}
 
 		saveSettings();
