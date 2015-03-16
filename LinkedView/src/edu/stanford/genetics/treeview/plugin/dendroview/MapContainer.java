@@ -307,27 +307,19 @@ public class MapContainer extends Observable implements Observer,
 			// the near edge
 			if ((selectedMin + numSelected / 2) < (minTileNum / 2)) {
 				numSelected = (selectedMin + numSelected / 2) * 2;
-				LogBuffer.println("Case 1");
 			}
 			// Else if the center of the selection is less than half the
 			// distance to the far edge
-			else if ((selectedMin + numSelected / 2) > (selectedMax 
+			else if ((selectedMin + numSelected / 2) > (getMaxIndex() 
 					- (minTileNum / 2))) {
-				double newStuff = (selectedMax 
-						- (selectedMin + numSelected / 2 - 1)) * 2;
-				numSelected = newStuff;
-//						(selectedMax 
-//						- (selectedMin + numSelected / 2 - 1)) * 2;
-				LogBuffer.println("Case 2");
+				numSelected = (getMaxIndex() - (selectedMin 
+						+ numSelected / 2 - 1)) * 2;
 			}
 			// Otherwise, set the standard minimum zoom
 			else {
-				LogBuffer.println("Case 3");
 				numSelected = minTileNum;
 			}
 		}
-		
-		LogBuffer.println("Num selected: " + numSelected);
 		
 		if(numSelected > 0) {
 			double newScale = getAvailablePixels() / numSelected;
