@@ -87,6 +87,28 @@ public abstract class MatrixView extends ModelViewProduced {
 	protected abstract void recalculateOverlay();
 	
 	/**
+	 * Checks current availability of space on the screen (pixels) and
+	 * updates the MapContainers accordingly. Setting offScreenValid to false
+	 * results in a repaint by the drawer when updatePixels() is called.
+	 */
+	protected void revalidateScreen() {
+		
+		if (offscreenChanged) {
+			// LogBuffer.println("OFFSCREEN CHANGED");
+			offscreenValid = false;
+			xmap.setAvailablePixels(offscreenSize.width);
+			ymap.setAvailablePixels(offscreenSize.height);
+
+			if (!hasDrawn) {
+				// total kludge, but addnotify isn't working correctly...
+				xmap.recalculateScale();
+				ymap.recalculateScale();
+				hasDrawn = true;
+			}
+		}
+	}
+	
+	/**
 	 * Set geneSelection
 	 *
 	 * @param geneSelection

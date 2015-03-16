@@ -127,7 +127,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		setObservables();
 		
 		/* In case the app frame size changed since the matrix was closed. */
-		resetMapContainers();
+		resetInteractiveMatrixView();
 		
 		/* TODO Find solution...
 		 * doesn't work because of resetMapContainers which needs
@@ -298,10 +298,9 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	 * works if GlobalView is already resized (has availablePixels set to new
 	 * value!).
 	 */
-	public void resetMapContainers() {
+	public void resetInteractiveMatrixView() {
 
-		dendroView.setMatrixHome(true);
-		dendroView.getInteractiveMatrixView().repaint();
+		dendroView.setMatrixHome();
 	}
 
 	/**
@@ -357,7 +356,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 	private void resetDendroView() {
 
-		resetMapContainers();
+		resetInteractiveMatrixView();
 		reZoomVisible();
 		reCenterVisible();
 	}
@@ -642,7 +641,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			resetMapContainers();
+			resetInteractiveMatrixView();
 		}
 	}
 
@@ -705,7 +704,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 				// Remove row from top here
 
 			} else if (e.getSource() == dendroView.getHomeButton()) {
-				resetMapContainers();
+				resetInteractiveMatrixView();
 
 			} else {
 				LogBuffer.println("Got weird source for actionPerformed() "
@@ -947,7 +946,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		 * Do a reset before setting new scale to make sure screen dimensions
 		 * are properly set.
 		 */
-		resetMapContainers();
+		resetInteractiveMatrixView();
 
 		LogBuffer.println("Setting saved scale.");
 		
@@ -969,7 +968,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 		} catch (final BackingStoreException e) {
 			LogBuffer.logException(e);
-			resetMapContainers();
+			resetInteractiveMatrixView();
 		}
 	}
 
@@ -1052,7 +1051,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			geneIndexes = interactiveYmap.getMaxIndex() + 1;
 			
 			LogBuffer.println("Setting zoom to default");
-			resetMapContainers();
+			resetInteractiveMatrixView();
 			
 		} else {
 			// LogBuffer.println("pixels / array indexes visible: [" +

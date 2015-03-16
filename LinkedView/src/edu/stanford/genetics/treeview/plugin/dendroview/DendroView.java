@@ -22,6 +22,7 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.ScrollPane;
 import java.awt.Toolkit;
@@ -196,7 +197,7 @@ public class DendroView implements Observer, DendroPanel {
 		/* main panel */
 
 		searchPanel = GUIFactory.createJPanel(false, GUIFactory.FILL, null);
-		dendroPane = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING_FILL);
+		dendroPane = GUIFactory.createJPanel(true, GUIFactory.NO_PADDING_FILL, Color.white);
 //		dendroPane.setLayout(new MigLayout("debug"));
 
 		/* >>> Init all views --- they should be final <<< */
@@ -229,19 +230,10 @@ public class DendroView implements Observer, DendroPanel {
 		setupScaleButtons();
 	}
 
-	public void setGlobalXMap(final MapContainer xmap) {
+	public void setMatrixHome() {
 
-		this.globalXmap = xmap;
-	}
-
-	public void setGlobalYMap(final MapContainer ymap) {
-
-		this.globalYmap = ymap;
-	}
-
-	public void setMatrixHome(final boolean isHome) {
-
-		interactiveMatrixView.resetHome(isHome);
+		interactiveMatrixView.resetView();
+		interactiveMatrixView.repaint();
 	}
 
 	/**

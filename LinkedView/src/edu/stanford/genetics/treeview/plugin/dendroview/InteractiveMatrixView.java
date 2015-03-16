@@ -61,7 +61,7 @@ MouseWheelListener {
 	public static final int EQUAL = 1;
 	public static final int PROPORT = 2;
 
-	private boolean resetHome = false;
+//	private boolean resetHome = false;
 //	protected TreeSelectionI geneSelection;
 //	protected TreeSelectionI arraySelection;
 //	protected MapContainer xmap;
@@ -110,7 +110,7 @@ MouseWheelListener {
 
 		super();
 
-		setLayout(new MigLayout());
+//		setLayout(new MigLayout());
 
 //		scrollPane = new JScrollPane(this,
 //				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
@@ -354,27 +354,28 @@ MouseWheelListener {
 	@Override
 	protected void updatePixels() {
 
-		if (offscreenChanged) {
-			// LogBuffer.println("OFFSCREEN CHANGED");
-			offscreenValid = false;
-			xmap.setAvailablePixels(offscreenSize.width);
-			ymap.setAvailablePixels(offscreenSize.height);
+//		if (offscreenChanged) {
+//			// LogBuffer.println("OFFSCREEN CHANGED");
+//			offscreenValid = false;
+//			xmap.setAvailablePixels(offscreenSize.width);
+//			ymap.setAvailablePixels(offscreenSize.height);
+//
+//			if (!hasDrawn) {
+//				// total kludge, but addnotify isn't working correctly...
+//				xmap.recalculateScale();
+//				ymap.recalculateScale();
+//				hasDrawn = true;
+//			}
+//		}
+		revalidateScreen();
 
-			if (!hasDrawn) {
-				// total kludge, but addnotify isn't working correctly...
-				xmap.recalculateScale();
-				ymap.recalculateScale();
-				hasDrawn = true;
-			}
-		}
-
-		if (resetHome) {
-			LogBuffer.println("Resetting GV");
-			xmap.setHome();
-			ymap.setHome();
-
-			resetHome(false);
-		}
+//		if (resetHome) {
+////			LogBuffer.println("Resetting GV");
+//			xmap.setHome();
+//			ymap.setHome();
+//
+//			resetHome(false);
+//		}
 
 		if (!offscreenValid) {
 			// LogBuffer.println("OFFSCREEN INVALID");
@@ -972,8 +973,11 @@ MouseWheelListener {
 		arrayHI = ahi;
 	}
 
-	public void resetHome(final boolean resized) {
-
-		this.resetHome = resized;
+	public void resetView() {
+		
+		revalidateScreen();
+		
+		xmap.setHome();
+		ymap.setHome();
 	}
 }
