@@ -50,10 +50,9 @@ import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.ModelViewProduced;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 
-public class GlobalView extends ModelViewProduced implements
+public class InteractiveMatrixView extends MatrixView implements
 MouseWheelListener {
 
 	private static final long serialVersionUID = 1L;
@@ -62,12 +61,11 @@ MouseWheelListener {
 	public static final int EQUAL = 1;
 	public static final int PROPORT = 2;
 
-	protected boolean hasDrawn = false;
 	private boolean resetHome = false;
-	protected TreeSelectionI geneSelection;
-	protected TreeSelectionI arraySelection;
-	protected MapContainer xmap;
-	protected MapContainer ymap;
+//	protected TreeSelectionI geneSelection;
+//	protected TreeSelectionI arraySelection;
+//	protected MapContainer xmap;
+//	protected MapContainer ymap;
 	private final String[] statustext = new String[] { "Mouseover Selection",
 			"", "" };
 	private HeaderInfo arrayHI;
@@ -76,10 +74,10 @@ MouseWheelListener {
 	private HeaderSummary geneSummary;
 	private HeaderSummary arraySummary;
 
-	private ArrayDrawer drawer;
+//	private ArrayDrawer drawer;
 	private int overx;
 	private int overy;
-	private final JScrollPane scrollPane;
+//	private final JScrollPane scrollPane;
 
 	/**
 	 * Points to track candidate selected rows/cols should reflect where the
@@ -108,19 +106,19 @@ MouseWheelListener {
 	 * MapContainer) to help it figure out where to draw things. It also tries
 	 * to
 	 */
-	public GlobalView() {
+	public InteractiveMatrixView() {
 
 		super();
 
 		setLayout(new MigLayout());
 
-		scrollPane = new JScrollPane(this,
-				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-
-		panel = scrollPane;
-		panel.setBorder(BorderFactory.createEtchedBorder());
-		panel.setBackground(GUIFactory.ELEMENT_HOV);
+//		scrollPane = new JScrollPane(this,
+//				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+//				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+//
+//		panel = scrollPane;
+//		panel.setBorder(BorderFactory.createEtchedBorder());
+//		panel.setBackground(GUIFactory.ELEMENT_HOV);
 
 		// setToolTipText("This Turns Tooltips On");
 
@@ -139,13 +137,13 @@ MouseWheelListener {
 		return scrollPane.getVerticalScrollBar();
 	}
 
-	@Override
-	public Dimension getPreferredSize() {
-
-		final Dimension p = new Dimension(xmap.getRequiredPixels(),
-				ymap.getRequiredPixels());
-		return p;
-	}
+//	@Override
+//	public Dimension getPreferredSize() {
+//
+//		final Dimension p = new Dimension(xmap.getRequiredPixels(),
+//				ymap.getRequiredPixels());
+//		return p;
+//	}
 
 	@Override
 	public String[] getStatus() {
@@ -199,60 +197,56 @@ MouseWheelListener {
 		}
 		return statustext;
 	}
-	
-	public void setObserver() {
-		
-	}
 
-	/**
-	 * Set geneSelection
-	 *
-	 * @param geneSelection
-	 *            The TreeSelection which is set by selecting genes in the
-	 *            GlobalView
-	 */
-	public void setGeneSelection(final TreeSelectionI geneSelection) {
+//	/**
+//	 * Set geneSelection
+//	 *
+//	 * @param geneSelection
+//	 *            The TreeSelection which is set by selecting genes in the
+//	 *            GlobalView
+//	 */
+//	public void setGeneSelection(final TreeSelectionI geneSelection) {
+//
+//		if (this.geneSelection != null) {
+//			this.geneSelection.deleteObserver(this);
+//		}
+//
+//		this.geneSelection = geneSelection;
+//		this.geneSelection.addObserver(this);
+//	}
+//
+//	/**
+//	 * Set arraySelection
+//	 *
+//	 * @param arraySelection
+//	 *            The TreeSelection which is set by selecting arrays in the
+//	 *            GlobalView
+//	 */
+//	public void setArraySelection(final TreeSelectionI arraySelection) {
+//
+//		if (this.arraySelection != null) {
+//			this.arraySelection.deleteObserver(this);
+//		}
+//
+//		this.arraySelection = arraySelection;
+//		this.arraySelection.addObserver(this);
+//	}
 
-		if (this.geneSelection != null) {
-			this.geneSelection.deleteObserver(this);
-		}
-
-		this.geneSelection = geneSelection;
-		this.geneSelection.addObserver(this);
-	}
-
-	/**
-	 * Set arraySelection
-	 *
-	 * @param arraySelection
-	 *            The TreeSelection which is set by selecting arrays in the
-	 *            GlobalView
-	 */
-	public void setArraySelection(final TreeSelectionI arraySelection) {
-
-		if (this.arraySelection != null) {
-			this.arraySelection.deleteObserver(this);
-		}
-
-		this.arraySelection = arraySelection;
-		this.arraySelection.addObserver(this);
-	}
-
-	/**
-	 * Set ArrayDrawer
-	 *
-	 * @param arrayDrawer
-	 *            The ArrayDrawer to be used as a source
-	 */
-	public void setArrayDrawer(final ArrayDrawer arrayDrawer) {
-
-		if (drawer != null) {
-			drawer.deleteObserver(this);
-		}
-
-		drawer = arrayDrawer;
-		drawer.addObserver(this);
-	}
+//	/**
+//	 * Set ArrayDrawer
+//	 *
+//	 * @param arrayDrawer
+//	 *            The ArrayDrawer to be used as a source
+//	 */
+//	public void setArrayDrawer(final ArrayDrawer arrayDrawer) {
+//
+//		if (drawer != null) {
+//			drawer.deleteObserver(this);
+//		}
+//
+//		drawer = arrayDrawer;
+//		drawer.addObserver(this);
+//	}
 
 	public void setHeaderSummary(final HeaderSummary gene,
 			final HeaderSummary array) {
@@ -271,37 +265,37 @@ MouseWheelListener {
 		return drawer;
 	}
 
-	/**
-	 * DEPRECATE set the xmapping for this view
-	 *
-	 * @param m
-	 *            the new mapping
-	 */
-	public void setXMap(final MapContainer m) {
-
-		if (xmap != null) {
-			xmap.deleteObserver(this);
-		}
-
-		xmap = m;
-		xmap.addObserver(this);
-	}
-
-	/**
-	 * DEPRECATE set the ymapping for this view
-	 *
-	 * @param m
-	 *            the new mapping
-	 */
-	public void setYMap(final MapContainer m) {
-
-		if (ymap != null) {
-			ymap.deleteObserver(this);
-		}
-
-		ymap = m;
-		ymap.addObserver(this);
-	}
+//	/**
+//	 * DEPRECATE set the xmapping for this view
+//	 *
+//	 * @param m
+//	 *            the new mapping
+//	 */
+//	public void setXMap(final MapContainer m) {
+//
+//		if (xmap != null) {
+//			xmap.deleteObserver(this);
+//		}
+//
+//		xmap = m;
+//		xmap.addObserver(this);
+//	}
+//
+//	/**
+//	 * DEPRECATE set the ymapping for this view
+//	 *
+//	 * @param m
+//	 *            the new mapping
+//	 */
+//	public void setYMap(final MapContainer m) {
+//
+//		if (ymap != null) {
+//			ymap.deleteObserver(this);
+//		}
+//
+//		ymap = m;
+//		ymap.addObserver(this);
+//	}
 
 	@Override
 	public String viewName() {
@@ -626,7 +620,7 @@ MouseWheelListener {
 			offscreenValid = false;
 
 		} else {
-			LogBuffer.println("GlobalView got weird update : " + o);
+			LogBuffer.println("InteractiveMatrixView got weird update : " + o);
 		}
 
 		revalidate();
