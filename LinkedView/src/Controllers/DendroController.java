@@ -141,13 +141,13 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		 * Needs to wait for repaint() called from resetMapContainer() and
 		 * component listener. TODO implement resetMapContainer differently...
 		 */
-		SwingUtilities.invokeLater(new Runnable() {
-
-			@Override
-			public void run() {
-				setSavedScale();
-			}
-		});
+//		SwingUtilities.invokeLater(new Runnable() {
+//
+//			@Override
+//			public void run() {
+//				setSavedScale();
+//			}
+//		});
 
 		addKeyBindings();
 		addDendroViewListeners();
