@@ -14,7 +14,7 @@ import edu.stanford.genetics.treeview.TreeSelectionI;
 public class GlobalMatrixView extends MatrixView {
 
 	/**
-	 * Default so warings don't pop up...
+	 * Default so warnings don't pop up...
 	 */
 	private static final long serialVersionUID = 1L;
 	
@@ -58,9 +58,10 @@ public class GlobalMatrixView extends MatrixView {
 			// LogBuffer.println("OFFSCREEN INVALID");
 			final Rectangle destRect = new Rectangle(0, 0,
 					xmap.getUsedPixels(), ymap.getUsedPixels());
-
+			
 			final Rectangle sourceRect = new Rectangle(xmap.getIndex(0),
-					ymap.getIndex(0), xmap.getMaxIndex(), ymap.getMaxIndex());
+					ymap.getIndex(0), xmap.getNumVisible(), 
+					ymap.getNumVisible());
 
 			if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
 
@@ -145,10 +146,10 @@ public class GlobalMatrixView extends MatrixView {
 	protected void recalculateOverlay() {
 		
 		int xFirst = interactiveXmap.getFirstVisible();
-		int xLast = xFirst + interactiveXmap.getNumVisible();
+		int xLast = xFirst + (interactiveXmap.getNumVisible() - 1);
 		
 		int yFirst = interactiveYmap.getFirstVisible();
-		int yLast = yFirst + interactiveYmap.getNumVisible();
+		int yLast = yFirst + (interactiveYmap.getNumVisible() - 1);
 		
 		int spx = xmap.getPixel(xFirst);
 		int epx = xmap.getPixel(xLast + 1) - 1;
@@ -157,12 +158,10 @@ public class GlobalMatrixView extends MatrixView {
 
 		if (epx < spx) {
 			epx = spx;
-			// correct for roundoff error above
 		}
 
 		if (epy < spy) {
 			epy = spy;
-			// correct for roundoff error above
 		}
 		
 		viewPortRect.setBounds(spx, spy, epx - spx, epy - spy);

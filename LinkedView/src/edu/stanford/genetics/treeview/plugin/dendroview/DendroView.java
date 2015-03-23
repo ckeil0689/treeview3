@@ -330,7 +330,8 @@ public class DendroView implements Observer, DendroPanel {
 		JPanel navContainer;
 		JPanel bottomPanel;
 
-		globalOverviewPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		globalOverviewPanel = GUIFactory.createJPanel(false, 
+				GUIFactory.NO_PADDING);
 		globalOverviewPanel.setBorder(
 				BorderFactory.createTitledBorder("Overview"));
 		

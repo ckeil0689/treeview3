@@ -760,7 +760,7 @@ MouseWheelListener {
 			w = xmap.getUsedPixels() * 0.05;
 			h = w;
 
-			// Get coords for center of circle
+			// coords for center of circle
 			x = xmap.getPixel(arraySelection.getSelectedIndexes()[0]) - (w / 2)
 					+ (xmap.getScale() / 2);
 			y = ymap.getPixel(geneSelection.getSelectedIndexes()[0]) - (h / 2)
