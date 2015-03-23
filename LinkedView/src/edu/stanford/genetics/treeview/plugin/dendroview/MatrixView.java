@@ -116,6 +116,10 @@ public abstract class MatrixView extends ModelViewProduced {
 		}
 	}
 	
+	/**
+	 * Initiates a revalidation of the available screen space and sets the
+	 * MapContainers to minimum scale.
+	 */
 	public void resetView() {
 		
 		revalidateScreen();

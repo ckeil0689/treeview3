@@ -127,7 +127,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		setObservables();
 		
 		/* In case the app frame size changed since the matrix was closed. */
-		resetInteractiveMatrixView();
+//		resetInteractiveMatrixView();
 		
 		/* TODO Find solution...
 		 * doesn't work because of resetMapContainers which needs
@@ -139,15 +139,17 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		
 		/* 
 		 * Needs to wait for repaint() called from resetMapContainer() and
-		 * component listener. TODO implement resetMapContainer differently...
+		 * component listener. TODO implement resetMapContainer/ 
+		 * setSavedScale differently...
 		 */
-//		SwingUtilities.invokeLater(new Runnable() {
-//
-//			@Override
-//			public void run() {
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
 //				setSavedScale();
-//			}
-//		});
+				resetInteractiveMatrixView();
+			}
+		});
 
 		addKeyBindings();
 		addDendroViewListeners();

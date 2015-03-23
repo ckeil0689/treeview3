@@ -61,11 +61,6 @@ MouseWheelListener {
 	public static final int EQUAL = 1;
 	public static final int PROPORT = 2;
 
-//	private boolean resetHome = false;
-//	protected TreeSelectionI geneSelection;
-//	protected TreeSelectionI arraySelection;
-//	protected MapContainer xmap;
-//	protected MapContainer ymap;
 	private final String[] statustext = new String[] { "Mouseover Selection",
 			"", "" };
 	private HeaderInfo arrayHI;
@@ -74,10 +69,8 @@ MouseWheelListener {
 	private HeaderSummary geneSummary;
 	private HeaderSummary arraySummary;
 
-//	private ArrayDrawer drawer;
 	private int overx;
 	private int overy;
-//	private final JScrollPane scrollPane;
 
 	/**
 	 * Points to track candidate selected rows/cols should reflect where the
