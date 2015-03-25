@@ -91,8 +91,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	protected final MapContainer globalYmap;
 
 	// Selections
-	private TreeSelectionI geneSelection = null;
-	private TreeSelectionI arraySelection = null;
+	private TreeSelectionI rowSelection = null;
+	private TreeSelectionI colSelection = null;
 
 	// Color Extractor
 	private ColorExtractor colorExtractor;
@@ -126,9 +126,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 		setObservables();
 		
-		/* In case the app frame size changed since the matrix was closed. */
-//		resetInteractiveMatrixView();
-		
 		/* TODO Find solution...
 		 * doesn't work because of resetMapContainers which needs
 		 * to run to reset MapContainer scales in GlobalView for potentially
@@ -142,14 +139,14 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		 * component listener. TODO implement resetMapContainer/ 
 		 * setSavedScale differently...
 		 */
-		SwingUtilities.invokeLater(new Runnable() {
-
-			@Override
-			public void run() {
+//		SwingUtilities.invokeLater(new Runnable() {
+//
+//			@Override
+//			public void run() {
 //				setSavedScale();
-				resetInteractiveMatrixView();
-			}
-		});
+				resetMatrixViews();
+//			}
+//		});
 
 		addKeyBindings();
 		addDendroViewListeners();
@@ -290,8 +287,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		globalYmap.addObserver(this);
 		
 		/* Selections */
-		geneSelection.addObserver(this);
-		arraySelection.addObserver(this);
+		rowSelection.addObserver(this);
+		colSelection.addObserver(this);
 	}
 
 	/**
@@ -300,9 +297,16 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	 * works if GlobalView is already resized (has availablePixels set to new
 	 * value!).
 	 */
-	public void resetInteractiveMatrixView() {
+	public void resetMatrixViews() {
 
-		dendroView.setMatrixHome();
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				LogBuffer.println("Resetting matrix views");
+				dendroView.setMatrixHome();
+			}
+		});
 	}
 
 	/**
@@ -318,35 +322,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	}
 
 	/* -------------- Listeners --------------------- */
-	// /**
-	// * Listener for the search button. Opens a dialog when the button is
-	// * clicked.
-	// *
-	// * @author CKeil
-	// *
-	// */
-	// private class SearchBtnListener implements ActionListener {
-	//
-	// @Override
-	// public void actionPerformed(final ActionEvent e) {
-	//
-	// /*
-	// * Putting the mapContainer objects in DendroView so that I can
-	// * control zoom-out of the found genes/arrays are outside the
-	// * visible area.
-	// */
-	// dendroView.setGlobalXMap(globalXmap);
-	// dendroView.setGlobalYMap(globalYmap);
-	// /*
-	// * Adding the mapContainer objects here so that the search dialog
-	// * can determine if results are visible in order to be able to
-	// * determine whether to zoom out.
-	// */
-	// deselectAll();
-	// dendroView.searchLabels();
-	// }
-	// }
-	
 	private class Deselector extends MouseAdapter {
 		
 		@Override 
@@ -354,13 +329,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			
 			deselectAll();
 		}
-	}
-
-	private void resetDendroView() {
-
-		resetInteractiveMatrixView();
-		reZoomVisible();
-		reCenterVisible();
 	}
 
 	/* >>>>>>> Keyboard Shortcut Actions <<<<<<<<< */
@@ -448,7 +416,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			getGlobalYMap().scrollToIndex(0);
+			getInteractiveYMap().scrollToIndex(0);
 		}
 	}
 
@@ -460,8 +428,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			final int max = getGlobalYMap().getMaxIndex();
-			getGlobalYMap().scrollToIndex(max);
+			final int max = getInteractiveYMap().getMaxIndex();
+			getInteractiveYMap().scrollToIndex(max);
 		}
 	}
 
@@ -473,7 +441,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			getGlobalXMap().scrollToIndex(0);
+			getInteractiveXMap().scrollToIndex(0);
 		}
 	}
 
@@ -485,8 +453,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			final int max = getGlobalXMap().getMaxIndex();
-			getGlobalXMap().scrollToIndex(max);
+			final int max = getInteractiveXMap().getMaxIndex();
+			getInteractiveXMap().scrollToIndex(max);
 		}
 	}
 
@@ -497,8 +465,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			final int scrollBy = getGlobalYMap().getNumVisible();
-			getGlobalYMap().scrollBy(-scrollBy);
+			final int scrollBy = getInteractiveYMap().getNumVisible();
+			getInteractiveYMap().scrollBy(-scrollBy);
 		}
 	}
 
@@ -509,8 +477,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			final int scrollBy = getGlobalYMap().getNumVisible();
-			getGlobalYMap().scrollBy(scrollBy);
+			final int scrollBy = getInteractiveYMap().getNumVisible();
+			getInteractiveYMap().scrollBy(scrollBy);
 		}
 	}
 
@@ -521,8 +489,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			final int scrollBy = getGlobalXMap().getNumVisible();
-			getGlobalXMap().scrollBy(-scrollBy);
+			final int scrollBy = getInteractiveXMap().getNumVisible();
+			getInteractiveXMap().scrollBy(-scrollBy);
 		}
 	}
 
@@ -533,8 +501,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			final int scrollBy = getGlobalXMap().getNumVisible();
-			getGlobalXMap().scrollBy(scrollBy);
+			final int scrollBy = getInteractiveXMap().getNumVisible();
+			getInteractiveXMap().scrollBy(scrollBy);
 		}
 	}
 
@@ -545,7 +513,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			getGlobalXMap().scrollBy(-1);
+			getInteractiveXMap().scrollBy(-1);
 		}
 	}
 
@@ -556,7 +524,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			getGlobalXMap().scrollBy(1);
+			getInteractiveXMap().scrollBy(1);
 		}
 	}
 
@@ -567,7 +535,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			getGlobalYMap().scrollBy(-1);
+			getInteractiveYMap().scrollBy(-1);
 		}
 	}
 
@@ -578,7 +546,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			getGlobalYMap().scrollBy(1);
+			getInteractiveYMap().scrollBy(1);
 		}
 	}
 
@@ -605,7 +573,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		public void actionPerformed(final ActionEvent arg0) {
 
 			zoomSelection();
-			centerSelection();
 		}
 	}
 
@@ -617,8 +584,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			getGlobalXMap().zoomIn();
-			getGlobalYMap().zoomIn();
+			getInteractiveXMap().zoomIn();
+			getInteractiveYMap().zoomIn();
 			
 			notifyAllMapObservers();
 		}
@@ -632,8 +599,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			getGlobalXMap().zoomOut();
-			getGlobalYMap().zoomOut();
+			getInteractiveXMap().zoomOut();
+			getInteractiveYMap().zoomOut();
 			
 			notifyAllMapObservers();
 		}
@@ -647,7 +614,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			resetInteractiveMatrixView();
+			resetMatrixViews();
 		}
 	}
 
@@ -672,14 +639,14 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			 */
 			if (e.getSource() == dendroView.getXRightPlusButton()) {
 				// Adds column on right side
-				getGlobalXMap().zoomIn();
+				getInteractiveXMap().zoomIn();
 				
 			} else if(e.getSource() == dendroView.getXLeftPlusButton()) {
 				// Add a column on the left side
 				
 			} else if (e.getSource() == dendroView.getXMinusRightButton()) {
 				// Removes column on right side
-				getGlobalXMap().zoomOut();
+				getInteractiveXMap().zoomOut();
 				
 			} else if (e.getSource() == dendroView.getXMinusLeftButton()) {
 				// Remove column on left side
@@ -687,30 +654,30 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			} else if (e.getSource() == dendroView.getXYMinusButton()) {
 				// Both axes ... need to discuss what to do here. 
 				// No new buttons to use here yet.
-				getGlobalXMap().zoomOut();
-				getGlobalYMap().zoomOut();
+				getInteractiveXMap().zoomOut();
+				getInteractiveYMap().zoomOut();
 
 			} else if (e.getSource() == dendroView.getXYPlusButton()) {
 				// Same as above.
-				getGlobalXMap().zoomIn();
-				getGlobalYMap().zoomIn();
+				getInteractiveXMap().zoomIn();
+				getInteractiveYMap().zoomIn();
 
 			} else if (e.getSource() == dendroView.getYPlusBottomButton()) {
 				// Adds a row to the bottom.
-				getGlobalYMap().zoomIn();
+				getInteractiveYMap().zoomIn();
 				
 			} else if (e.getSource() == dendroView.getYPlusTopButton()) {
 				// Add row to top here
 
 			} else if (e.getSource() == dendroView.getYMinusBottomButton()) {
 				// Removes row from bottom
-				getGlobalYMap().zoomOut();
+				getInteractiveYMap().zoomOut();
 				
 			} else if (e.getSource() == dendroView.getYMinusTopButton()) {
 				// Remove row from top here
 
 			} else if (e.getSource() == dendroView.getHomeButton()) {
-				resetInteractiveMatrixView();
+				resetMatrixViews();
 
 			} else {
 				LogBuffer.println("Got weird source for actionPerformed() "
@@ -771,8 +738,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			// added a way to track the currently visible area in mapContainer
 			// and implemented these functions to make the necessary
 			// adjustments to the image when that happens
-			reZoomVisible();
-			reCenterVisible();
+			refocusViewPort();
 		}
 	}
 	
@@ -793,11 +759,11 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	 */
 	public void deselectAll() {
 
-		arraySelection.deselectAllIndexes();
-		geneSelection.deselectAllIndexes();
+		colSelection.deselectAllIndexes();
+		rowSelection.deselectAllIndexes();
 
-		arraySelection.notifyObservers();
-		geneSelection.notifyObservers();
+		colSelection.notifyObservers();
+		rowSelection.notifyObservers();
 	}
 
 	/**
@@ -831,7 +797,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		}
 
 		addDendroViewListeners();
-		resetDendroView();
+		refocusViewPort();
 	}
 
 	/**
@@ -878,21 +844,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		}
 	}
 
-	private double calcAxisDimension(final double big, final double small,
-			final double max) {
-
-		final double percentDiff = small / big;
-
-		double newAxis = percentDiff * max;
-
-		// rounding
-		newAxis *= 1000;
-		newAxis = Math.round(newAxis);
-		newAxis /= 1000;
-
-		return newAxis;
-	}
-
 	/**
 	 * Resizes the matrix such that it fits all pixels as squares. If gvWidth or
 	 * gvHeight would go below a certain size, the matrix is adjusted such that
@@ -908,35 +859,51 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		if (xScale >= yScale) {
 			interactiveXmap.setScale(yScale);
 
-			final double used = interactiveXmap.getUsedPixels();
-			final double avail = interactiveXmap.getAvailablePixels();
-
-			final double percentDiff = used / avail;
-
-			double newWidth = DendroView.MAX_GV_WIDTH * percentDiff;
-			// rounding
-			newWidth = newWidth * 1000;
-			newWidth = Math.round(newWidth);
-			newWidth = newWidth / 1000;
+			double newWidth = calcAxisDimensionFromMap(interactiveXmap, 
+					DendroView.MAX_GV_WIDTH);
 
 			dendroView.setGVWidth(newWidth);
 
 		} else {
 			interactiveYmap.setScale(xScale);
-
-			final double used = interactiveYmap.getUsedPixels();
-			final double avail = interactiveYmap.getAvailablePixels();
-
-			final double percentDiff = used / avail;
-
-			double newHeight = DendroView.MAX_GV_HEIGHT * percentDiff;
-			// rounding
-			newHeight = newHeight * 1000;
-			newHeight = Math.round(newHeight);
-			newHeight = newHeight / 1000;
+			
+			double newHeight = calcAxisDimensionFromMap(interactiveYmap, 
+					DendroView.MAX_GV_HEIGHT);
 
 			dendroView.setGVHeight(newHeight);
 		}
+	}
+	
+	private static double calcAxisDimensionFromMap(final MapContainer map, 
+			final double max) {
+
+		final double used = map.getUsedPixels();
+		final double avail = map.getAvailablePixels();
+
+		return calcAxisDimension(avail, used, max);
+	}
+	
+	/**
+	 * TODO just deprecate this method when this feature will be implemented...
+	 * You can just take the smaller of WIDTH or HEIGHT of a maximized matrix. 
+	 * @param big
+	 * @param small
+	 * @param max
+	 * @return
+	 */
+	private static double calcAxisDimension(final double big, final double small,
+			final double max) {
+
+		final double percentDiff = small / big;
+
+		double newAxis = percentDiff * max;
+
+		// rounding
+		newAxis *= 1000;
+		newAxis = Math.round(newAxis);
+		newAxis /= 1000;
+
+		return newAxis;
 	}
 
 	public void saveSettings() {
@@ -962,11 +929,11 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 	public void setSavedScale() {
 		
-		/* 
-		 * Do a reset before setting new scale to make sure screen dimensions
-		 * are properly set.
-		 */
-		resetInteractiveMatrixView();
+//		/* 
+//		 * Do a reset before setting new scale to make sure screen dimensions
+//		 * are properly set.
+//		 */
+//		resetMatrixViews();
 
 		LogBuffer.println("Setting saved scale.");
 		
@@ -987,7 +954,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 		} catch (final BackingStoreException e) {
 			LogBuffer.logException(e);
-			resetInteractiveMatrixView();
+			resetMatrixViews();
 		}
 	}
 
@@ -1003,23 +970,24 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		public void actionPerformed(final ActionEvent arg0) {
 
 			zoomSelection();
-			centerSelection();
 		}
 	}
 
 	/**'
 	 * Zooms MapContainers in on the user selected area.
 	 */
-	public void zoomSelection() {
+	private void zoomSelection() {
 		
-		final int minSelectedColIndex = arraySelection.getMinIndex();
-		final int minSelectedRowIndex = geneSelection.getMinIndex();
+		final int minSelectedColIndex = colSelection.getMinIndex();
+		final int minSelectedRowIndex = rowSelection.getMinIndex();
 
-		final int maxSelectedColIndex = arraySelection.getMaxIndex();
-		final int maxSelectedRowIndex = geneSelection.getMaxIndex();
+		final int maxSelectedColIndex = colSelection.getMaxIndex();
+		final int maxSelectedRowIndex = rowSelection.getMaxIndex();
 		
 		interactiveXmap.zoomToSelected(minSelectedColIndex, maxSelectedColIndex);
 		interactiveYmap.zoomToSelected(minSelectedRowIndex, maxSelectedRowIndex);
+		
+		centerSelection();
 		
 		notifyAllMapObservers();
 
@@ -1029,10 +997,10 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	/**
 	 * Scrolls each MapContainer to the center of the selected rectangle.
 	 */
-	public void centerSelection() {
+	private void centerSelection() {
 
-		final int[] selectedGenes = geneSelection.getSelectedIndexes();
-		final int[] selectedArrays = arraySelection.getSelectedIndexes();
+		final int[] selectedGenes = rowSelection.getSelectedIndexes();
+		final int[] selectedArrays = colSelection.getSelectedIndexes();
 
 		if (selectedGenes.length > 0 && selectedArrays.length > 0) {
 
@@ -1046,6 +1014,12 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			interactiveYmap.centerScrollOnSelection(startY, endY);
 		}
 	}
+	
+	private void refocusViewPort() {
+		
+		reZoomVisible();
+		saveSettings();
+	}
 
 	/**
 	 * Uses the currently visible data indexes on the screen to update the scale
@@ -1054,15 +1028,16 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	 * data indexes.
 	 */
 	private void reZoomVisible() {
+		
+		LogBuffer.println("Rezooming visible");
 
 		double newScale = 0.0;
 		double newScale2 = 0.0;
 
 		// Obtain the selection size of each dimension
-		// double arrayIndexes = globalXmap.getTileNumVisible();
-		// double geneIndexes = globalYmap.getTileNumVisible();
 		double arrayIndexes = interactiveXmap.getNumVisible();
 		double geneIndexes = interactiveYmap.getNumVisible();
+		
 
 		if (arrayIndexes == 0 || geneIndexes == 0
 				|| (arrayIndexes == interactiveXmap.getMaxIndex() 
@@ -1071,43 +1046,37 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			arrayIndexes = interactiveXmap.getMaxIndex() + 1;
 			geneIndexes = interactiveYmap.getMaxIndex() + 1;
 			
-			LogBuffer.println("Setting zoom to default");
-			resetInteractiveMatrixView();
+			LogBuffer.println("ReZoom setting zoom to default");
+			resetMatrixViews();
 			
 		} else {
-			// LogBuffer.println("pixels / array indexes visible: [" +
-			// globalXmap.getAvailablePixels() + "/" + arrayIndexes +
-			// "] gene indexes visible: [" + globalYmap.getAvailablePixels() +
-			// "/" + geneIndexes + "].");
 			newScale = (interactiveXmap.getAvailablePixels()) / arrayIndexes;
-			// LogBuffer.println("reZoomVisible: numVisible: [" + arrayIndexes +
-			// "] is being used in calculations for new scale values: [" +
-			// newScale + "].  They cannot be less than the minscale: [" +
-			// globalXmap.getMinScale() + "]");
 
 			// if (newScale < globalXmap.getMinScale()) {
 			// newScale = globalXmap.getMinScale();
 			// }
 			interactiveXmap.setScale(newScale);
-//			interactiveXmap.notifyObservers();
 
 			newScale2 = (interactiveYmap.getAvailablePixels()) / geneIndexes;
-			// LogBuffer.println("reZoomVisible: numVisible: [" + geneIndexes +
-			// "] is being used in calculations for new scale values: [" +
-			// newScale2 + "].  They cannot be less than the minscale: [" +
-			// globalYmap.getMinScale() + "]");
 
 			// if (newScale2 < globalYmap.getMinScale()) {
 			// newScale2 = globalYmap.getMinScale();
 			// }
 			interactiveYmap.setScale(newScale2);
-//			interactiveYmap.notifyObservers();
+			
+			/* Updating GlobalMatrixView */
+			globalXmap.setToMinScale();
+			globalYmap.setToMinScale();
+			
+			/* 
+			 * Call inside here. No need for it outside this else statement.
+			 * Also saves a redundant notification call to observers in
+			 * reCenterVisible.
+			 */
+			reCenterVisible();
 			
 			notifyAllMapObservers();
-			dendroView.getInteractiveMatrixView().repaint();
 		}
-
-		saveSettings();
 	}
 
 	/**
@@ -1116,8 +1085,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	 */
 	private void reCenterVisible() {
 
-		// final int visibleGenes = globalYmap.getTileNumVisible();
-		// final int visibleArrays = globalXmap.getTileNumVisible();
 		final int visibleGenes = interactiveYmap.getNumVisible();
 		final int visibleArrays = interactiveXmap.getNumVisible();
 
@@ -1126,19 +1093,9 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			final int startX = interactiveXmap.getFirstVisible();
 			final int startY = interactiveYmap.getFirstVisible();
 
-			// LogBuffer.println("Firstx visible: [" + startX +
-			// "] Firsty visible: [" + startY + "].");
-
 			interactiveXmap.scrollToFirstIndex(startX);
-//			interactiveXmap.notifyObservers();
-
 			interactiveYmap.scrollToFirstIndex(startY);
-//			interactiveYmap.notifyObservers();
-			
-			notifyAllMapObservers();
 		}
-
-		saveSettings();
 	}
 
 	public void saveImage(final JPanel panel) throws IOException {
@@ -1272,23 +1229,23 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	/**
 	 * Binds functionality to Swing components in DendroView.
 	 */
-	public void bindComponentFunctions() {
+	private void bindComponentFunctions() {
 
 		// Handle selection
 		if (geneIndex != null) {
-			setGeneSelection(new ReorderedTreeSelection(
+			setRowSelection(new ReorderedTreeSelection(
 					tvFrame.getRowSelection(), geneIndex));
 
 		} else {
-			setGeneSelection(tvFrame.getRowSelection());
+			setRowSelection(tvFrame.getRowSelection());
 		}
 
 		if (arrayIndex != null) {
-			setArraySelection(new ReorderedTreeSelection(
+			setColumnSelection(new ReorderedTreeSelection(
 					tvFrame.getColumnSelection(), arrayIndex));
 
 		} else {
-			setArraySelection(tvFrame.getColumnSelection());
+			setColumnSelection(tvFrame.getColumnSelection());
 		}
 
 		final ColorPresets colorPresets = DendrogramFactory.getColorPresets();
@@ -1311,7 +1268,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		// globalmaps tell globalview, atrview, and gtrview
 		// where to draw each data point.
 		// the scrollbars "scroll" by communicating with the maps.
-		setMapContainers();
+		setupMapContainers();
 
 		interactiveXmap.setScrollbar(dendroView.getXScroll());
 		interactiveYmap.setScrollbar(dendroView.getYScroll());
@@ -1343,19 +1300,19 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	 * Connects all sub components with DendroView's configuration node, so that
 	 * the hierarchical structure of Java's Preferences API can be followed.
 	 */
-	public void setPresets() {
+	private void setPresets() {
 
-		interactiveXmap.setConfigNode(configNode);// getFirst("GlobalXMap"));
-		interactiveYmap.setConfigNode(configNode);// getFirst("GlobalYMap"));
+		interactiveXmap.setConfigNode(configNode);
+		interactiveYmap.setConfigNode(configNode);
 		
 		globalXmap.setConfigNode(configNode);
 		globalYmap.setConfigNode(configNode);
 
 		// URLs
-		colorExtractor.setConfigNode(configNode);// getFirst("ColorExtractor"));
+		colorExtractor.setConfigNode(configNode);
 
-		dendroView.getRowLabelView().setConfigNode(configNode);// getFirst("TextView"));
-		dendroView.getColumnLabelView().setConfigNode(configNode);// getFirst("ArrayNameView"));
+		dendroView.getRowLabelView().setConfigNode(configNode);
+		dendroView.getColumnLabelView().setConfigNode(configNode);
 		dendroView.getColumnTreeView().getHeaderSummary()
 		.setConfigNode(configNode);
 		dendroView.getRowTreeView().getHeaderSummary()
@@ -1363,9 +1320,9 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	}
 
 	/**
-	 * Sets up the views with the MapContainers.
+	 * Assigns the MapContainers to classes which need to know about them.
 	 */
-	public void setMapContainers() {
+	private void setupMapContainers() {
 
 		dendroView.getColumnTreeView().setMap(interactiveXmap);
 		dendroView.getColumnLabelView().setMap(interactiveXmap);
@@ -1385,7 +1342,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	/**
 	 * Updates all headerInfo instances for all the view components.
 	 */
-	public void updateHeaderInfo() {
+	private void updateHeaderInfo() {
 
 		dendroView.getColumnTreeView().setATRHeaderInfo(
 				tvModel.getAtrHeaderInfo());
@@ -1409,8 +1366,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		tvModel.removeAppended();
 		tvModel.append(model);
 
-		arraySelection.resize(tvModel.getDataMatrix().getNumCol());
-		arraySelection.notifyObservers();
+		colSelection.resize(tvModel.getDataMatrix().getNumCol());
+		colSelection.notifyObservers();
 
 		interactiveXmap.setIndexRange(0, tvModel.getDataMatrix().getNumCol() - 1);
 		interactiveXmap.notifyObservers();
@@ -1467,10 +1424,10 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		final TreeDrawerNode arrayNode = invertedTreeDrawer.getRootNode()
 				.findNode(selectedID);
 
-		arraySelection.setSelectedNode(arrayNode.getId());
+		colSelection.setSelectedNode(arrayNode.getId());
 		dendroView.getColumnTreeView().setSelectedNode(arrayNode);
 
-		arraySelection.notifyObservers();
+		colSelection.notifyObservers();
 		invertedTreeDrawer.notifyObservers();
 	}
 
@@ -1560,7 +1517,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			String selectedID = null;
 
 			try {
-				selectedID = arraySelection.getSelectedNode();
+				selectedID = colSelection.getSelectedNode();
 
 			} catch (final NullPointerException npe) {
 				npe.printStackTrace();
@@ -1862,8 +1819,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	 */
 	public void scrollToGene(final int i) {
 
-		getGlobalYMap().scrollToIndex(i);
-		getGlobalYMap().notifyObservers();
+		getInteractiveYMap().scrollToIndex(i);
+		getInteractiveYMap().notifyObservers();
 	}
 
 	/**
@@ -1873,8 +1830,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	 */
 	public void scrollToArray(final int i) {
 
-		getGlobalXMap().scrollToIndex(i);
-		getGlobalXMap().notifyObservers();
+		getInteractiveXMap().scrollToIndex(i);
+		getInteractiveXMap().notifyObservers();
 	}
 
 	// /**
@@ -1890,42 +1847,42 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	 * This should be called after setDataModel has been set to the appropriate
 	 * model
 	 *
-	 * @param arraySelection
+	 * @param colSelection
 	 */
-	public void setArraySelection(final TreeSelectionI arraySelection) {
+	public void setColumnSelection(final TreeSelectionI colSelection) {
 
-		if (this.arraySelection != null) {
-			this.arraySelection.deleteObserver(dendroView);
+		if (this.colSelection != null) {
+			this.colSelection.deleteObserver(dendroView);
 		}
 
-		this.arraySelection = arraySelection;
-		arraySelection.addObserver(dendroView);
+		this.colSelection = colSelection;
+		colSelection.addObserver(dendroView);
 
-		dendroView.getInteractiveMatrixView().setArraySelection(arraySelection);
-		dendroView.getColumnTreeView().setTreeSelection(arraySelection);
-		dendroView.getRowLabelView().setArraySelection(arraySelection);
-		dendroView.getColumnLabelView().setArraySelection(arraySelection);
+		dendroView.getInteractiveMatrixView().setColSelection(colSelection);
+		dendroView.getColumnTreeView().setTreeSelection(colSelection);
+		dendroView.getRowLabelView().setColSelection(colSelection);
+		dendroView.getColumnLabelView().setColSelection(colSelection);
 	}
 
 	/**
-	 * This should be called after setDataModel has been set to the appropriate
-	 * model
+	 * General setup for the row selection object. A reference of it is
+	 * passed to all classes that need to know about the row selection state.
 	 *
-	 * @param geneSelection
+	 * @param rowSelection
 	 */
-	public void setGeneSelection(final TreeSelectionI geneSelection) {
+	public void setRowSelection(final TreeSelectionI rowSelection) {
 
-		if (this.geneSelection != null) {
-			this.geneSelection.deleteObserver(dendroView);
+		if (this.rowSelection != null) {
+			this.rowSelection.deleteObserver(dendroView);
 		}
 
-		this.geneSelection = geneSelection;
-		geneSelection.addObserver(dendroView);
+		this.rowSelection = rowSelection;
+		rowSelection.addObserver(dendroView);
 
-		dendroView.getInteractiveMatrixView().setGeneSelection(geneSelection);
-		dendroView.getRowTreeView().setTreeSelection(geneSelection);
-		dendroView.getRowLabelView().setGeneSelection(geneSelection);
-		dendroView.getColumnLabelView().setGeneSelection(geneSelection);
+		dendroView.getInteractiveMatrixView().setRowSelection(rowSelection);
+		dendroView.getRowTreeView().setTreeSelection(rowSelection);
+		dendroView.getRowLabelView().setRowSelection(rowSelection);
+		dendroView.getColumnLabelView().setRowSelection(rowSelection);
 	}
 
 	public void setNewIncluded(final int[] gIncluded, final int[] aIncluded) {
@@ -1935,12 +1892,12 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		.setIncluded(aIncluded);
 	}
 
-	public int[] getArrayIncluded() {
+	public int[] getColumnIncluded() {
 
 		return dendroView.getColumnLabelView().getHeaderSummary().getIncluded();
 	}
 
-	public int[] getGeneIncluded() {
+	public int[] getRowIncluded() {
 
 		return dendroView.getRowLabelView().getHeaderSummary().getIncluded();
 	}
@@ -1956,12 +1913,12 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		return arrayDrawer;
 	}
 
-	public MapContainer getGlobalXMap() {
+	public MapContainer getInteractiveXMap() {
 
 		return interactiveXmap;
 	}
 
-	public MapContainer getGlobalYMap() {
+	public MapContainer getInteractiveYMap() {
 
 		return interactiveYmap;
 	}
@@ -1995,7 +1952,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	 */
 	private void requestFocusForZoomBtn() {
 		
-		if(geneSelection.getNSelectedIndexes() > 0) {
+		if(rowSelection.getNSelectedIndexes() > 0) {
 			dendroView.getZoomButton().requestFocusInWindow();
 		} else {
 			dendroView.getXYPlusButton().requestFocusInWindow();

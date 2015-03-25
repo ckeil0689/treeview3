@@ -532,8 +532,8 @@ public class TVController implements Observer {
 			final String[] arrayNames) {
 
 		/* save label type selection before loading new file */
-		final int geneIncluded = dendroController.getGeneIncluded()[0];
-		final int arrayIncluded = dendroController.getArrayIncluded()[0];
+		final int geneIncluded = dendroController.getRowIncluded()[0];
+		final int arrayIncluded = dendroController.getColumnIncluded()[0];
 
 		if (geneNames.length > 0 && arrayNames.length > 0) {
 			selectedLabels[0] = geneNames[geneIncluded];

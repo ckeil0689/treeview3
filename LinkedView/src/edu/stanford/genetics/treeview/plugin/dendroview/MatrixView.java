@@ -10,6 +10,7 @@ import javax.swing.ScrollPaneConstants;
 
 import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelViewProduced;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 
@@ -59,15 +60,36 @@ public abstract class MatrixView extends ModelViewProduced {
 	@Override
 	public Dimension getPreferredSize() {
 
-		final Dimension p = new Dimension(xmap.getRequiredPixels(),
+		return new Dimension(xmap.getRequiredPixels(),
 				ymap.getRequiredPixels());
-		return p;
 	}
 
 	@Override
 	public void update(Observable o, Object arg) {
-		// TODO Auto-generated method stub
+		
+		if (o == xmap || o == ymap) {
+			recalculateOverlay();
+			offscreenValid = false;
 
+		} else if (o == drawer && drawer != null) {
+			/*
+			 * signal from drawer means that it need to draw something
+			 * different.
+			 */
+			offscreenValid = false;
+			
+		} else if(o == xmap || o == ymap) {
+			offscreenValid = false;
+			
+		} else if(o instanceof TreeSelectionI) {
+			return;
+			
+		} else {
+			LogBuffer.println(viewName() + " got weird update : " + o);
+			return;
+		}
+
+		repaint();
 	}
 
 	@Override
@@ -102,7 +124,6 @@ public abstract class MatrixView extends ModelViewProduced {
 	protected void revalidateScreen() {
 		
 		if (offscreenChanged) {
-			// LogBuffer.println("OFFSCREEN CHANGED");
 			offscreenValid = false;
 			xmap.setAvailablePixels(offscreenSize.width);
 			ymap.setAvailablePixels(offscreenSize.height);
@@ -122,10 +143,12 @@ public abstract class MatrixView extends ModelViewProduced {
 	 */
 	public void resetView() {
 		
-		revalidateScreen();
+		LogBuffer.println("Resetting view: " + viewName());
 		
-		xmap.setHome();
-		ymap.setHome();
+		xmap.setToMinScale();
+		ymap.setToMinScale();
+		
+		revalidateScreen();
 	}
 	
 	
@@ -136,7 +159,7 @@ public abstract class MatrixView extends ModelViewProduced {
 	 *            The TreeSelection which is set by selecting genes in the
 	 *            GlobalView
 	 */
-	public void setGeneSelection(final TreeSelectionI geneSelection) {
+	public void setRowSelection(final TreeSelectionI geneSelection) {
 
 		if (this.geneSelection != null) {
 			this.geneSelection.deleteObserver(this);
@@ -153,7 +176,7 @@ public abstract class MatrixView extends ModelViewProduced {
 	 *            The TreeSelection which is set by selecting arrays in the
 	 *            GlobalView
 	 */
-	public void setArraySelection(final TreeSelectionI arraySelection) {
+	public void setColSelection(final TreeSelectionI arraySelection) {
 
 		if (this.arraySelection != null) {
 			this.arraySelection.deleteObserver(this);

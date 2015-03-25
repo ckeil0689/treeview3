@@ -24,7 +24,6 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -39,13 +38,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
-import javax.swing.BorderFactory;
 import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
-import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
@@ -241,9 +236,10 @@ MouseWheelListener {
 	@Override
 	protected void updatePixels() {
 
-		revalidateScreen();
-
 		if (!offscreenValid) {
+			
+			revalidateScreen();
+			
 			// LogBuffer.println("OFFSCREEN INVALID");
 			final Rectangle destRect = new Rectangle(0, 0,
 					xmap.getUsedPixels(), ymap.getUsedPixels());
@@ -310,6 +306,7 @@ MouseWheelListener {
 	 * Checks the selection of genes and arrays and calculates the appropriate
 	 * selection rectangle.
 	 */
+	@Override
 	protected void recalculateOverlay() {
 
 		if ((geneSelection == null) || (arraySelection == null)) {
@@ -349,9 +346,9 @@ MouseWheelListener {
 					}
 				}
 			}
-
-			repaint();
 		}
+		
+		setIndicatorCircleBounds();
 	}
 
 	/**
@@ -423,75 +420,54 @@ MouseWheelListener {
 		return boundaryList;
 	}
 
-	// Observer Methods
 	@Override
 	public void update(final Observable o, final Object arg) {
 
 		if (o == geneSelection) {
-			if (arraySelection.getNSelectedIndexes() == 0) {
-				if (geneSelection.getNSelectedIndexes() != 0) {
-					// select all arrays if some genes selected...
-					arraySelection.selectAllIndexes();
-					// notifies self...
-					arraySelection.notifyObservers();
-					return;
-				}
-				/*
-				 * When deselecting a tree node with right click, this matters,
-				 * because in the eventlistener you can only deselect indices
-				 * for the local tree selection. other axis here!
-				 */
-			} else if (geneSelection.getNSelectedIndexes() == 0) {
-				arraySelection.deselectAllIndexes();
-				arraySelection.notifyObservers();
-			}
+			updateSelection(geneSelection, arraySelection);
 			recalculateOverlay();
-			drawIndicatorCircle();
 
 			/* trigger updatePixels() */
 			offscreenValid = false;
 
 		} else if (o == arraySelection) {
-			if (geneSelection.getNSelectedIndexes() == 0) {
-				if (arraySelection.getNSelectedIndexes() != 0) {
-					// select all genes if some arrays selected...
-					geneSelection.selectAllIndexes();
-					// notifies self...
-					geneSelection.notifyObservers();
-					return;
-				}
-				/*
-				 * When deselecting a tree node with right click, this matters,
-				 * because in the eventlistener you can only deselect indices
-				 * for the local tree selection. other axis here!
-				 */
-			} else if (arraySelection.getNSelectedIndexes() == 0) {
-				geneSelection.deselectAllIndexes();
-				geneSelection.notifyObservers();
-			}
+			updateSelection(arraySelection, geneSelection);
 			recalculateOverlay();
-			drawIndicatorCircle();
-
+			
 			offscreenValid = false;
-
-		} else if ((o == xmap) || o == ymap) {
-			recalculateOverlay();
-			drawIndicatorCircle();
-			offscreenValid = false;
-
-		} else if (o == drawer && drawer != null) {
-			/*
-			 * signal from drawer means that it need to draw something
-			 * different.
-			 */
-			offscreenValid = false;
+			repaint();
 
 		} else {
-			LogBuffer.println("InteractiveMatrixView got weird update : " + o);
+			super.update(o, arg);
 		}
-
-		revalidate();
-		repaint();
+	}
+	
+	/**
+	 * Adjusts one axis selection to changes in the other.
+	 * @param origin The axis selection object that has previously been
+	 * changed.
+	 * @param adjusting The axis selection object that needs to be adjusted.
+	 */
+	private static void updateSelection(TreeSelectionI origin, 
+			TreeSelectionI adjusting) {
+		
+		if (adjusting.getNSelectedIndexes() == 0) {
+			if (origin.getNSelectedIndexes() != 0) {
+				// select all genes if some arrays selected...
+				adjusting.selectAllIndexes();
+				// notifies self...
+				adjusting.notifyObservers();
+				return;
+			}
+			/*
+			 * When deselecting a tree node with right click, this matters,
+			 * because in the eventlistener you can only deselect indices
+			 * for the local tree selection. other axis here!
+			 */
+		} else if (origin.getNSelectedIndexes() == 0) {
+			adjusting.deselectAllIndexes();
+			adjusting.notifyObservers();
+		}
 	}
 
 	/* TODO move to a specified controller class */
@@ -670,53 +646,6 @@ MouseWheelListener {
 		repaint();
 	}
 
-	// @Override
-	// public String getToolTipText(final MouseEvent e) {
-	// /*
-	// * Do we want to do mouseovers if value already visible? if
-	// * (getShowVal()) return null; // don't do tooltips and vals at same
-	// * time.
-	// */
-	// String ret = "";
-	// String row = "";
-	// String col = "";
-	//
-	// if (drawer != null) {
-	//
-	// final int geneRow = overy;
-	//
-	// if (xmap.contains(overx) && ymap.contains(overy)) {
-	//
-	// if (geneHI != null) {
-	// row = geneSummary.getSummary(geneHI, overy);
-	//
-	// } else {
-	// row = "N/A";
-	// }
-	//
-	// if (arrayHI != null) {
-	// col = arraySummary.getSummary(arrayHI, overx);
-	//
-	// } else {
-	// col = "N/A";
-	// }
-	//
-	// if (drawer.isMissing(overx, geneRow)) {
-	// ret = "No data";
-	//
-	// } else if (drawer.isEmpty(overx, geneRow)) {
-	// ret = null;
-	//
-	// } else {
-	// ret = "<html>Row: " + row + " <br>Column: " + col
-	// + " <br>Value: "
-	// + drawer.getSummary(overx, geneRow) + "</html>";
-	// }
-	// }
-	// }
-	// return ret;
-	// }
-
 	private void drawBand(final Rectangle l) {
 
 		final Graphics g = getGraphics();
@@ -736,7 +665,7 @@ MouseWheelListener {
 	 * Draws a circle if the user selects one rectangle in the clustergram to
 	 * indicate the position of this rectangle.
 	 */
-	private void drawIndicatorCircle() {
+	private void setIndicatorCircleBounds() {
 
 		double x = 0;
 		double y = 0;

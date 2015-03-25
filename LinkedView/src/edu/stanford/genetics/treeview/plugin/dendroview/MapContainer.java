@@ -133,7 +133,7 @@ public class MapContainer extends Observable implements Observer,
 	 * Resets the MapContainer so that it completely fills out the available
 	 * screen space.
 	 */
-	public void setHome() {
+	public void setToMinScale() {
 		// LogBuffer.println("setHome() called.");
 		calculateNewMinScale();
 

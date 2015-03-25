@@ -1,15 +1,9 @@
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
 import java.util.Observable;
-
-import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.TreeSelectionI;
 
 public class GlobalMatrixView extends MatrixView {
 
@@ -17,6 +11,9 @@ public class GlobalMatrixView extends MatrixView {
 	 * Default so warnings don't pop up...
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	private final int MAP_SIZE_LIMIT = 300;
+	private final int MIN_VIEWPORT_SIZE = 10;
 	
 	/* 
 	 * Also needs reference to interactive MapContainers to get knowledge
@@ -26,12 +23,14 @@ public class GlobalMatrixView extends MatrixView {
 	private MapContainer interactiveXmap;
 	private MapContainer interactiveYmap;
 	
+	private int xViewMin;
+	private int yViewMin;
+	
 	private final Rectangle viewPortRect = new Rectangle();
 
 	public GlobalMatrixView() {
 		
 		super();
-		
 	}
 	
 	@Override
@@ -52,9 +51,10 @@ public class GlobalMatrixView extends MatrixView {
 	@Override
 	protected void updatePixels() {
 
-		revalidateScreen();
-
 		if (!offscreenValid) {
+			
+			revalidateScreen();
+			
 			// LogBuffer.println("OFFSCREEN INVALID");
 			final Rectangle destRect = new Rectangle(0, 0,
 					xmap.getUsedPixels(), ymap.getUsedPixels());
@@ -80,27 +80,11 @@ public class GlobalMatrixView extends MatrixView {
 		if (o == interactiveXmap || o == interactiveYmap) {
 			recalculateOverlay();
 			offscreenValid = false;
-
-		} else if (o == drawer && drawer != null) {
-			/*
-			 * signal from drawer means that it need to draw something
-			 * different.
-			 */
-			offscreenValid = false;
-			
-		} else if(o == xmap || o == ymap) {
-			revalidateScreen();
-			
-		} else if(o instanceof TreeSelectionI) {
-			return;
+			repaint();
 			
 		} else {
-			LogBuffer.println("GlobalMatrixView got weird update : " + o);
-			return;
+			super.update(o, arg);
 		}
-
-		revalidate();
-		repaint();
 	}
 	
 	@Override
@@ -140,16 +124,70 @@ public class GlobalMatrixView extends MatrixView {
 	}
 	
 	/**
+	 * DEPRECATE set the xmapping for this view
+	 *
+	 * @param m
+	 *            the new mapping
+	 */
+	@Override
+	public void setXMap(final MapContainer m) {
+
+		super.setXMap(m);
+		
+		if(xmap.getMaxIndex() > MAP_SIZE_LIMIT) {
+			this.xViewMin = (xmap.getMaxIndex() / 100) * 2;
+			
+		} else {
+			this.xViewMin = MIN_VIEWPORT_SIZE;
+		}
+	}
+
+	/**
+	 * DEPRECATE set the ymapping for this view
+	 *
+	 * @param m
+	 *            the new mapping
+	 */
+	@Override
+	public void setYMap(final MapContainer m) {
+
+		super.setYMap(m);
+		
+		if(ymap.getMaxIndex() > MAP_SIZE_LIMIT) {
+			this.yViewMin = (ymap.getMaxIndex() / 100) * 2;
+			
+		} else {
+			this.yViewMin = MIN_VIEWPORT_SIZE;
+		}
+	}
+	
+	/**
 	 * Checks the current view of rows and columns and calculates 
 	 * the appropriate viewport rectangle.
 	 */
+	@Override
 	protected void recalculateOverlay() {
 		
+		/* Assure minimum draw size for viewport rectangle */
+		int xRange; 
+		if(interactiveXmap.getNumVisible() > xViewMin) {
+			xRange = interactiveXmap.getNumVisible();
+		} else {
+			xRange = xViewMin;
+		}
+		
+		int yRange; 
+		if(interactiveYmap.getNumVisible() > yViewMin) {
+			yRange = interactiveYmap.getNumVisible();
+		} else {
+			yRange = yViewMin;
+		}
+		
 		int xFirst = interactiveXmap.getFirstVisible();
-		int xLast = xFirst + (interactiveXmap.getNumVisible() - 1);
+		int xLast = xFirst + (xRange - 1);
 		
 		int yFirst = interactiveYmap.getFirstVisible();
-		int yLast = yFirst + (interactiveYmap.getNumVisible() - 1);
+		int yLast = yFirst + (yRange - 1);
 		
 		int spx = xmap.getPixel(xFirst);
 		int epx = xmap.getPixel(xLast + 1) - 1;

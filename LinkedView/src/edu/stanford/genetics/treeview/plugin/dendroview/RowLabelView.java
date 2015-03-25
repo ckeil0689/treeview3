@@ -42,28 +42,17 @@ public class RowLabelView extends LabelView {
 		headerSummary.addObserver(this);
 	}
 
+	
 	@Override
-	public void setJustifyOption(final boolean isRightJustified) {
+	protected void adjustScrollBar() {
 
-		super.setJustifyOption(isRightJustified);
-
-		/*
-		 * Absolutely HAS to be via Runnable. Otherwise adding/ removing
-		 * components in DendroView will reset whatever was set here.
-		 */
-		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-
-			@Override
-			public void run() {
-				if (isRightJustified) {
-					final int scrollMax = scrollPane.getHorizontalScrollBar()
-							.getMaximum();
-					scrollPane.getHorizontalScrollBar().setValue(scrollMax);
-				} else {
-					scrollPane.getHorizontalScrollBar().setValue(0);
-				}
-			}
-		});
+		if (isRightJustified) {
+			final int scrollMax = scrollPane.getHorizontalScrollBar()
+					.getMaximum();
+			scrollPane.getHorizontalScrollBar().setValue(scrollMax);
+		} else {
+			scrollPane.getHorizontalScrollBar().setValue(0);
+		}
 
 		repaint();
 	}
