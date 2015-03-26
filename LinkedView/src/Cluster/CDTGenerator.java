@@ -2,7 +2,6 @@ package Cluster;
 
 import java.io.IOException;
 
-import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.model.IntHeaderInfo;
 
 /**

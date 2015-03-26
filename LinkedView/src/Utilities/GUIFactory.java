@@ -277,6 +277,8 @@ public class GUIFactory {
 		} else {
 			iconType = "";
 		}
+		LogBuffer.println("Icon image used: [" + iconFileName + "].");
+
 
 		try {
 			final ClassLoader classLoader = Thread.currentThread()

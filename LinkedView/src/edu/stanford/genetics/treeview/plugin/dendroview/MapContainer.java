@@ -191,6 +191,79 @@ public class MapContainer extends Observable implements Observer,
 	 *
 	 * @param double zoomVal
 	 */
+	//This is for gradually zooming away from the center of the currently displayed dots
+	public void zoomOutCenter() {
+
+		LogBuffer.println("zoomOutCenter...");
+		LogBuffer.println("zoomOut: Value of firstVisible at start: [" + firstVisible + "].");
+		int zoomVal;
+		int initialFirstVisible = firstVisible;
+		double newScale = getScale();
+
+		tileNumVisible = Math.round(getAvailablePixels() / getScale());
+		// LogBuffer.println("zoomOut: tileNumVisible has been set to [" +
+		// tileNumVisible + "].");
+
+		zoomVal = (int) Math.round(tileNumVisible / 20.0);
+
+		// Ensure that at least one tile will be zoomed out.
+		if (zoomVal < 2) {
+			zoomVal = 2;
+		}
+
+		tileNumVisible = tileNumVisible + zoomVal;
+		if (tileNumVisible > (getMaxIndex() + 1)) {
+			tileNumVisible = getMaxIndex() + 1;
+		}
+		// LogBuffer.println("zoomOut: tileNumVisible has been set to [" +
+		// tileNumVisible + "].");
+
+		// Keep track of explicit changes, by the user, to the amount of
+		// visible data
+		int prevNumVisible = numVisible;
+		numVisible = (int) tileNumVisible;
+		
+		//Ensure that the difference between the previous number visible and the new number visible is even
+		if((numVisible - prevNumVisible) % 2 == 1 && numVisible < (getMaxIndex() + 1)) {
+			numVisible++;
+			tileNumVisible += 1;
+		}
+		LogBuffer.println("zoomOut: numVisible has been changed from [" + prevNumVisible + "] to [" + numVisible + "] or more precisely [" + tileNumVisible + "].  Max index: [" + (getMaxIndex() + 1) + "].");
+
+		newScale = getAvailablePixels() / tileNumVisible;
+
+		final double myMinScale = getCalculatedMinScale();
+		if (newScale < myMinScale) {
+			newScale = myMinScale;
+		}
+		setScale(newScale);
+
+		int newFirstVisible = initialFirstVisible - (numVisible - prevNumVisible) / 2;
+		if((newFirstVisible + numVisible) > (getMaxIndex() + 1)) {
+			newFirstVisible = (getMaxIndex() + 1) - numVisible;
+		}
+		if(newFirstVisible < 0) {
+			newFirstVisible = 0;
+		}
+		LogBuffer.println("zoomOut: firstVisible has been changed from [" + initialFirstVisible + "] to [" + newFirstVisible + "].");
+		if(newFirstVisible != firstVisible) {
+			scrollToFirstIndex(newFirstVisible);
+		}
+		LogBuffer.println("zoomOut: Official new firstVisible: [" + initialFirstVisible + "].");
+		
+		notifyObservers();
+	}
+
+	/**
+	 * Method to zoom out of the MapContainer and set the scale for drawing
+	 * lower than before. It's important to take the range of genes displayed on
+	 * screen (range of scrollbar -> visibleAmount()) into account, as well as
+	 * the amount of available pixels on screen. Otherwise there will be drawing
+	 * and selection issues.
+	 *
+	 * @param double zoomVal
+	 */
+	//This is for gradually zooming out from the top or left of the currently displayed dots
 	public void zoomOut() {
 
 		int zoomVal;
@@ -231,6 +304,563 @@ public class MapContainer extends Observable implements Observer,
 		notifyObservers();
 	}
 
+	//This is for gradually zooming toward the center of the currently displayed dots
+	public void zoomInCenter() {
+
+		// final double maxScale = getAvailablePixels();
+		double newScale = getScale();
+		int zoomVal;
+
+		tileNumVisible = Math.round(getAvailablePixels() / getScale());
+		// LogBuffer.println("zoomIn: tileNumVisible has been set to [" +
+		// tileNumVisible + "].");
+
+		zoomVal = (int) Math.round(tileNumVisible / 20.0);
+
+		// Ensure that at least 2 tiles will be zoomed in (1 on each side of the current zoom dimension).
+		if (zoomVal < 2) {
+			zoomVal = 2;
+		}
+
+		tileNumVisible = tileNumVisible - zoomVal;
+		if (tileNumVisible < 1) {
+			tileNumVisible = 1;
+		}
+		// LogBuffer.println("zoomIn: tileNumVisible has been set to [" +
+		// tileNumVisible + "].");
+
+		// Keep track of explicit changes, by the user, to the amount of
+		// visible data
+		int prevNumVisible = numVisible;
+		numVisible = (int) tileNumVisible;
+		
+		//Ensure that the difference between the previous number visible and the new number visible is even
+		if((prevNumVisible - numVisible) % 2 == 1 && numVisible > 1) {
+			numVisible--;
+			tileNumVisible -= 1;
+		}
+		LogBuffer.println("zoomIn: numVisible has been changed from [" + prevNumVisible + "] to [" + numVisible + "].");
+
+		// Recalculating scale
+		newScale = getAvailablePixels() / tileNumVisible;
+
+		final double myMaxScale = getAvailablePixels();
+		if (newScale > myMaxScale) {
+			newScale = myMaxScale;
+		}
+		setScale(newScale);
+		
+		int newFirstVisible = firstVisible + (prevNumVisible - numVisible) / 2;
+		LogBuffer.println("zoomIn: firstVisible has been changed from [" + firstVisible + "] to [" + newFirstVisible + "].");
+		scrollToFirstIndex(newFirstVisible);
+
+		notifyObservers();
+	}
+
+	//This is for gradually zooming toward a selected block of dots (there's currently no corresponding zoom away function)
+	public int zoomToward(int firstIndex,int numIndexes) {
+		int updateAspectRatio = 0;
+		//Catch errors - If num indexes is less than 1 or greater than the number of pixels available
+		if(numIndexes < 1 || numIndexes > getAvailablePixels() || firstIndex < 0 || (firstIndex + numIndexes - 1) > getMaxIndex()) {
+			LogBuffer.println("zoomToward: Invalid parameters. firstIndex: [" + firstIndex + "] numIndexes: [" + numIndexes + "] available pixels: [" +
+					getAvailablePixels() + "] maxIndex: [" + getMaxIndex() + "].");
+			return(updateAspectRatio);
+		}
+
+		int initialFirstVisible = firstVisible;
+		double newScale = getScale();
+		int zoomVal;
+		tileNumVisible = Math.round(getAvailablePixels() / getScale());
+		zoomVal = (int) Math.round(tileNumVisible / 20.0);
+		// Ensure that at least 2 tiles will be zoomed in (1 on each side of the current zoom dimension).
+		if (zoomVal < 2) {
+			zoomVal = 2;
+		}
+		
+		tileNumVisible = tileNumVisible - zoomVal;
+		if (tileNumVisible < 1) {
+			tileNumVisible = 1;
+		}
+
+		// Keep track of explicit changes, by the user, to the amount of
+		// visible data
+		int prevNumVisible = numVisible;
+		numVisible = (int) tileNumVisible;
+		
+		//Ensure that the difference between the previous number visible and the new number visible is even
+		if((prevNumVisible - numVisible) % 2 == 1 && numVisible > 1) {
+			numVisible--;
+			tileNumVisible -= 1;
+		}
+
+		if (tileNumVisible < numIndexes) {
+			tileNumVisible = numIndexes;
+			numVisible = numIndexes;
+		}
+		//LogBuffer.println("zoomToward: numVisible has been changed from [" + prevNumVisible + "] to [" + numVisible + "].");
+
+		// Recalculating scale
+		newScale = getAvailablePixels() / tileNumVisible;
+
+		final double myMaxScale = getAvailablePixels();
+		if (newScale > myMaxScale) {
+			newScale = myMaxScale;
+		}
+		setScale(newScale);
+		
+		int newFirstVisible = 0;
+		if(numIndexes == numVisible) {
+			newFirstVisible = firstIndex;
+		} else {
+			int diff = numVisible - numIndexes;
+			
+			//If the first visible index is inside the target area
+			if(initialFirstVisible > firstIndex) {
+				newFirstVisible = firstIndex;
+				//LogBuffer.println("zoomToward: Shifting selection start into view.");
+			}
+			//Else if the last visible index is inside the target area
+			else if((initialFirstVisible + prevNumVisible - 1) < (firstIndex + numIndexes - 1)) {
+				newFirstVisible = (firstIndex + numIndexes) - numVisible;
+				//LogBuffer.println("zoomToward: Shifting selection end into view because ((" +
+				//		initialFirstVisible + " + " + prevNumVisible + " - 1) < (" + firstIndex + " + " + numIndexes + " - 1)).");
+			}
+			//If the left/top side is closer than or equal to half the difference in area sizes
+			else if((firstIndex - initialFirstVisible) <= (diff / 2) &&
+					((initialFirstVisible + prevNumVisible - 1) - (firstIndex + numIndexes - 1)) > (diff / 2)) {
+				newFirstVisible = initialFirstVisible;
+				//LogBuffer.println("zoomToward: Left/top is remaining fixed.");
+				
+				updateAspectRatio = 1;
+			}
+			//If the right/bottom side is closer than or equal to half the difference in area sizes
+			else if(((initialFirstVisible + prevNumVisible - 1) - (firstIndex + numIndexes - 1)) <= (diff / 2) &&
+					(firstIndex - initialFirstVisible) > (diff / 2)) {
+				newFirstVisible = (initialFirstVisible + prevNumVisible - 1) - numVisible + 1;
+				//LogBuffer.println("zoomToward: Right/Bottom is remaining fixed.");
+
+				updateAspectRatio = 1;
+			}
+			else {
+				newFirstVisible = firstIndex - diff / 2;
+				//LogBuffer.println("zoomToward: Zooming in equally. " + newFirstVisible + " = " + firstIndex + " - (int) (" + diff + " / 2)");
+			}
+		}
+		//LogBuffer.println("zoomToward: firstVisible has been changed from [" + initialFirstVisible + "] to [" + newFirstVisible + "].");
+		scrollToFirstIndex(newFirstVisible);
+
+		notifyObservers();
+
+		return(updateAspectRatio);
+	}
+
+	//This function does the same as zoomToward, but tries to keep the dot the cursor is currently over under the cursor.
+	//Some of the code is generalized in case it's ever called with a value out of range
+	//Set customZoomVal to a negative number (e.g. -1) to dynamically determine the zoomVal based on a 5% zoom increment
+	public int zoomTowardPixel(int pixelPos,int customZoomVal) {
+		int updateAspectRatio = 0;
+		int firstIndex = getIndex(pixelPos);
+		//Catch errors - If num indexes is less than 1 or greater than the number of pixels available
+		if(firstIndex < 0 || firstIndex > getMaxIndex()) {
+			return(updateAspectRatio);
+		}
+		
+		int dotOver = getIndex(pixelPos);
+		int initialFirstVisible = firstVisible;
+		double newScale = getScale();
+		int zoomVal;
+		int pxAvail = getAvailablePixels();
+		tileNumVisible = Math.round(pxAvail / newScale);
+		double targetZoomFrac = 0.05; //5% zoom increment
+
+		//This is a test of selecting the best zoom value using the getBestZoomVal method (called from outside of this class)
+		if(customZoomVal >= 0) {
+			zoomVal = customZoomVal;
+			LogBuffer.println("zoomTowardPixel: Custom zoom value: [" + zoomVal + "].");
+		}
+		//If a custom zoom value has not been supplied (in order to correct dot aspect ratios (see GlobalView)),
+		//select the best zoom value to make the zooming as smooth as possible
+		else if(customZoomVal < 0 && tileNumVisible > 15) {
+			zoomVal = getBestZoomInVal(pixelPos,pxAvail,numVisible,targetZoomFrac);
+			if (zoomVal < 1) {
+				zoomVal = 1;
+			}
+			LogBuffer.println("zoomTowardPixel: Best zoom value: [" + zoomVal + "].");
+		}
+		//Zooming with no smoothing
+		else {
+			zoomVal = (int) Math.round(tileNumVisible * targetZoomFrac);
+
+			if (zoomVal < 1) {
+				zoomVal = 1;
+			}
+			LogBuffer.println("zoomTowardPixel: No smoothing zoom value: [" + zoomVal + "].");
+		}
+
+		//Make sure we're left with at least 1 dot on the screen
+		tileNumVisible = tileNumVisible - zoomVal;
+		if (tileNumVisible < 1) {
+			tileNumVisible = 1;
+		}
+
+		// Keep track of explicit changes, by the user, to the amount of
+		// visible data
+		int prevNumVisible = numVisible;
+		numVisible = (int) tileNumVisible;
+
+		// Recalculating scale
+		newScale = pxAvail / tileNumVisible;
+
+		final double myMaxScale = getAvailablePixels();
+		if (newScale > myMaxScale) {
+			newScale = myMaxScale;
+		}
+		setScale(newScale);
+
+		//Now determine where to scroll to to keep the cursor over the same dot
+		int newFirstVisible = 0;
+		if(1 == numVisible) {
+			newFirstVisible = firstIndex;
+		} else {
+			//If the first visible index is inside the target area
+			if(initialFirstVisible > firstIndex) {
+				newFirstVisible = firstIndex;
+			}
+			//Else if the last visible index is inside the target area (assuming the size of the area we're zooming toward is 1 data cell)
+			else if((initialFirstVisible + prevNumVisible - 1) < firstIndex) {
+				newFirstVisible = (firstIndex + 1) - numVisible;
+			} else {
+				newFirstVisible = (int) ((double) dotOver + 1 - (double) pixelPos / newScale);
+
+				//If the result of pixelPos / newScale is a whole number, newFirstVisible must be decremented (discovered via trial & error)
+				if(newFirstVisible > 0 && (double) (pixelPos / newScale) == (int) (pixelPos / newScale)) {
+					//LogBuffer.println("zoomTowardPixel: Adjusting calculation for whole number results.");
+					newFirstVisible--;
+				}
+
+				//If the target has shifted off the left/top side of the screen
+				if(newFirstVisible > firstIndex) {
+					newFirstVisible = firstIndex;
+					//LogBuffer.println("zoomTowardPixel: Left/top is remaining fixed.");
+					updateAspectRatio = 1;
+				}
+				//If the target cell has shifted off the right/bottom side of the screen
+				else if((newFirstVisible + numVisible - 1) < firstIndex) {
+					newFirstVisible = firstIndex - (numVisible - 1);
+					//LogBuffer.println("zoomTowardPixel: Right/Bottom is remaining fixed.");
+					updateAspectRatio = 1;
+				} else {
+					//LogBuffer.println("zoomSpreadToward: (newFirstVisible = (int) ((double) dotOver + 1 - (double) pixelPos / newScale)) = " +
+					//		"[" + newFirstVisible + " = (int) ((double) " + dotOver + " + 1 - (double) " + pixelPos + " / " + newScale + ")].");
+				}
+			}
+		}
+
+		scrollToFirstIndex(newFirstVisible);
+		
+		//Catch and correct bad calculations - this is useless now that the whole-number result test was added above
+		if(dotOver != getIndex(pixelPos)) {
+			int correction = dotOver - getIndex(pixelPos);
+			newFirstVisible += correction;
+			//LogBuffer.println("Warning: The data cell hovered over has shifted. It was over [" + dotOver + "].  Now it is over: [" + getIndex(pixelPos) +
+			//		"].  Previous dotOver calculation: [firstVisible + (int) ((double) pixelPos / newScale))] = [" + firstVisible + " + (int) ((double) " + pixelPos + " / " + newScale + "))].  Correcting this retroactively...");
+			scrollToFirstIndex(newFirstVisible);
+		}
+
+		notifyObservers();
+
+		return(updateAspectRatio);
+	}
+
+	//This function does the same as zoomToward, but tries to keep the dot the cursor is currently over under the cursor.
+	//Some of the code is generalized in case it's ever called with a value out of range
+	public int zoomAwayPixel(int pixelPos,int customZoomVal) {
+		int updateAspectRatio = 0;
+		int firstIndex = getIndex(pixelPos);
+		//Catch errors - If num indexes is less than 1 or greater than the number of pixels available
+		if(firstIndex < 0 || firstIndex > getMaxIndex()) {
+			return(updateAspectRatio);
+		}
+		
+		int dotOver = getIndex(pixelPos);
+		int initialFirstVisible = firstVisible;
+		double newScale = getScale();
+		int zoomVal;
+		int pxAvail = getAvailablePixels();
+		tileNumVisible = Math.round(pxAvail / newScale);
+		double targetZoomFrac = 0.05; //5% zoom increment
+
+		//This is a test of selecting the best zoom value using the getBestZoomVal method (called from outside of this class)
+		if(customZoomVal >= 0) {
+			zoomVal = customZoomVal;
+		}
+		//If a custom zoom value has not been supplied (in order to correct dot aspect ratios (see GlobalView)),
+		//select the best zoom value to make the zooming as smooth as possible
+		else if(customZoomVal < 0 && tileNumVisible >= 15) {
+			zoomVal = getBestZoomOutVal(pixelPos,pxAvail,numVisible,targetZoomFrac);
+			if (zoomVal < 1) {
+				zoomVal = 1;
+			}
+		}
+		//Zooming with no smoothing
+		else {
+			zoomVal = (int) Math.round(tileNumVisible * targetZoomFrac);
+
+			if (zoomVal < 2) {
+				zoomVal = 2;
+			}
+		}
+
+		tileNumVisible = tileNumVisible + zoomVal;
+		if (tileNumVisible > (getMaxIndex() + 1)) {
+			tileNumVisible = getMaxIndex() + 1;
+			updateAspectRatio = 1;
+		}
+
+		//Keep track of explicit changes, by the user, to the amount of visible data
+		int prevNumVisible = numVisible;
+		numVisible = (int) tileNumVisible;
+		//LogBuffer.println("zoomOut: numVisible has been set to [" + numVisible + "].");
+
+		newScale = pxAvail / tileNumVisible;
+
+		final double myMinScale = getCalculatedMinScale();
+		if (newScale < myMinScale) {
+			newScale = myMinScale;
+			updateAspectRatio = 1;
+		}
+		setScale(newScale);
+
+		//LogBuffer.println("new scale: [" + newScale + "].");
+		int newFirstVisible = 0;
+		if(1 == numVisible) {
+			newFirstVisible = firstIndex;
+		} else {
+			//If the first visible index is inside the target area
+			if(initialFirstVisible > firstIndex) {
+				newFirstVisible = firstIndex;
+				//LogBuffer.println("zoomAwayPixel: Shifting selection start into view.");
+			}
+			//Else if the last visible index is inside the target area
+			else if((initialFirstVisible + prevNumVisible - 1) < firstIndex) {
+				newFirstVisible = (firstIndex + 1) - numVisible;
+			} else {
+				newFirstVisible = (int) ((double) dotOver + 1 - (double) pixelPos / newScale);
+				//newFirstVisible = (int) ((double) dotOverFrac + 1.0 - (double) pixelPos / newScale);
+
+				//If the result of pixelPos / newScale is a whole number, newFirstVisible must be decremented (discovered via trial & error)
+				if(newFirstVisible > 0 && (double) (pixelPos / newScale) == (int) (pixelPos / newScale)) {
+					//LogBuffer.println("zoomAwayPixel: Adjusting calculation for whole number results.");
+					newFirstVisible--;
+				}
+
+				//If the left/top side is closer than or equal to half the difference in area sizes
+				if(newFirstVisible > firstIndex) {
+					newFirstVisible = firstIndex;
+					//LogBuffer.println("zoomAwayPixel: Left/top is remaining fixed.");
+					updateAspectRatio = 1;
+				}
+				//If the right/bottom side is closer than or equal to half the difference in area sizes
+				else if((newFirstVisible + numVisible - 1) < firstIndex) {
+					newFirstVisible = firstIndex - (numVisible - 1);
+					//LogBuffer.println("zoomAwayPixel: Right/Bottom is remaining fixed.");
+					updateAspectRatio = 1;
+				} else {
+					//LogBuffer.println("zoomAwayPixel: (newFirstVisible = (int) ((double) dotOver - (double) pixelPos / newScale)) = " +
+					//		"[" + newFirstVisible + " = (int) ((double) " + dotOver + " - (double) " + pixelPos + " / " + newScale + ")].");
+				}
+			}
+		}
+
+		scrollToFirstIndex(newFirstVisible);
+
+		//Catch and correct bad calculations - this is useless now that the whole-number result test was added above
+		if(dotOver != getIndex(pixelPos)) {
+			int correction = dotOver - getIndex(pixelPos);
+			newFirstVisible += correction;
+			//LogBuffer.println("Warning: The data cell hovered over has shifted. It was over [" + dotOver + "].  Now it is over: [" + getIndex(pixelPos) +
+			//		"].  Previous dotOver calculation: [firstVisible + (int) ((double) pixelPos / newScale))] = [" + firstVisible + " + (int) ((double) " + pixelPos + " / " + newScale + "))].  Correcting this retroactively...");
+			scrollToFirstIndex(newFirstVisible);
+			updateAspectRatio = 1;
+		}
+
+		notifyObservers();
+
+		return(updateAspectRatio);
+	}
+	
+	//This assumes that the cells are roughly square-ish. Pronounced rectangle shapes may distort using this method to smooth as you zoom
+	public int getBestZoomInVal(int pixel,int maxPixel,int cells,double targetZoomFrac) {
+		int zoomVal = (int) Math.round((double) cells * targetZoomFrac);
+
+		LogBuffer.println("getBestZoomOutVal: Called with cells [" + cells + "] targetZoomFrac [" + targetZoomFrac + "] and calculated zoomVal as [" + zoomVal + "].");
+		//If we're at the minimum zoom level, do not zoom in any more
+		if((cells == 1 && targetZoomFrac <= 1) || (targetZoomFrac % 1 == 0) && ((int) Math.round(targetZoomFrac)) == 0) {
+			return(0);
+		}
+		if (zoomVal < 2) {
+			zoomVal = 2;
+		}
+		//If the amount of zoom is larger than the number of cells currently visible
+		if (zoomVal > cells) {
+			zoomVal = cells - 1;
+		}
+		int smallThresh = 15;
+		int adjustWindow = 10;
+		if(cells <= smallThresh) {
+			adjustWindow = 3;
+		}
+		int bestZoomVal = zoomVal;
+		//Select the best zoom value within a range of 5 of the target zoom val to make the zooming as smooth as possible
+		int zoomMin = zoomVal - adjustWindow;
+		if(zoomMin < 0) {
+			zoomMin = 0;
+		}
+		//if(zoomMin > cells) {
+		//	zoomMin = cells - 1;
+		//}
+		int zoomMax = zoomVal + adjustWindow;
+		if((cells - zoomMax) > (getMaxIndex() + 1)) {
+			zoomMax = getMaxIndex() + 1 - cells;
+		}
+
+		//Sort the range of zoom values such that the target zoomVal is first, then +1, -1, +2, -2,...
+		//We're arbitrarily using the target zoom value to start out - the sort is just a heuristic anyway - doesn't really matter that much other than to prefer the target values
+		double minDiff = 1.0;
+		//LogBuffer.println("Creating array of size zoomMax - zoomMin + 2: [" + zoomMax + " - " + zoomMin + " + 2].");
+		int[] zoomRange = new int[zoomMax - zoomMin + 2]; //2 was just to be on the safe side.
+		int i = 0;
+		for(int l = 0;l <= (zoomMax - zoomMin);l++) {
+			if(l >= 0 && (zoomVal + l) <= zoomMax) {
+				zoomRange[i] = zoomVal + l;
+				i++;
+				if(l == 0) continue;
+			}
+			if(i > (zoomMax - zoomMin)) break;
+			if(l > 0 && (zoomVal - l) >= zoomMin) {
+				zoomRange[i] = zoomVal - l;
+				i++;
+			}
+			if(i > (zoomMax - zoomMin)) break;
+		}
+		
+		double minDiffThresh = 0.005; //0=best possible ratio. "Good enough value" for when the ratio of the relative cell position of the cell under
+		//the cursor is really close to the ratio of the relative pixel position of the cursor
+
+		//The corresponding zoom-out function uses relative pixel position, but on zoom-in, it's more accurate to use the relative cell position the mouse is over
+		double targetFrac = ((double) getIndex(pixel) + 1.0) / ((double) getMaxIndex() + 1.0);
+		double diff = 0.0;
+		LogBuffer.println("getBestZoomOutVal: minZoom: [" + zoomMin + "] maxZoom: [" + zoomMax + "].");
+		//Loop through the zoomVals and find which one will result in a ratio with the relative index that is closest to the pixelPos to pxAvail ratio
+		for(i = 0;i <= (zoomMax - zoomMin);i++) {
+			int z = zoomRange[i];
+			int relCell = (int) (targetFrac * (double) z);
+			LogBuffer.println("getBestZoomInVal: [relCell = (int) (pixel / maxPixel * z)] = [" + relCell + " = (int) (" + pixel + " / " + maxPixel + " * " + z + ")].");
+			if(z == 0) continue;
+			diff = Math.abs(((double) relCell / (double) z) - targetFrac);
+			LogBuffer.println("getBestZoomInVal: [diff = Math.abs((double) (relCell / z) - (double) (pixel / maxPixel))] = [" +
+					diff + " = Math.abs((double) (" + relCell + " / " + z + ") - (double) (" + pixel + " / " + maxPixel + ")].");
+			if(diff < minDiff) {
+				bestZoomVal = z;
+				minDiff = diff;
+				//Stop if the difference from the target is "good enough", i.e. close to zero
+				if(minDiff < minDiffThresh) {
+					break;
+				}
+			}
+		}
+		LogBuffer.println("getBestZoomInVal: Selected zoomVal [" + bestZoomVal + "] instead of defaults [" + zoomVal + "] Diff: [" + diff + "].");
+		
+		//Do not force a zoom amount here because a minimum zoom should be enforced after this has been called
+		if(bestZoomVal < 0) bestZoomVal = 0;
+		return(bestZoomVal);
+	}
+
+	//This assumes that the cells are roughly square-ish. Pronounced rectangle shapes may distort using this method to smooth as you zoom
+	public int getBestZoomOutVal(int pixel,int maxPixel,int cells,double targetZoomFrac) {
+		int zoomVal = (int) Math.round((double) cells * targetZoomFrac);
+
+		//If the closest zoom amount is 0, return 0 because it's the smoothest possible scroll value (and the math below will result in NaN)
+		//The calling function is expected to handle cases resulting in no zoom
+		if (zoomVal < 1) {
+			return(0);
+		}
+		//If the resulting zoom level is bigger than the max zoom-out
+		if ((zoomVal + cells) > (getMaxIndex() + 1)) {
+			zoomVal = getMaxIndex() - cells;
+		}
+		int smallThresh = 15;
+		int adjustWindow = 7;
+		//If we're getting close to full zoom-out, search a smaller window so that the last bit of zoom-out isn't likely to be all on 1 axis
+		if(((getMaxIndex() + 1) - cells) <= smallThresh) {
+			adjustWindow = 3;
+		}
+		int bestZoomVal = zoomVal;
+		//Select the best zoom value within a range of 5 of the target zoom val to make the zooming as smooth as possible
+		int zoomMin = zoomVal - adjustWindow;
+		if(zoomMin < 1) {
+			zoomMin = 1;
+		}
+		//IUf the minimum number of cells to zoom is larger than the current number of cells displayed on this axis - this mitigates occurrences of "zoom jumping"
+		//if(zoomMin > cells) {
+		//	zoomMin = cells - 1;
+		//}
+		//If the resulting zoom max is bigger than the max zoom-out
+		int zoomMax = zoomVal + adjustWindow;
+		if((zoomMax + cells) > (getMaxIndex() + 1)) {
+			zoomMax = getMaxIndex() + 1 - cells;
+		}
+
+		//Sort the range of zoom values such that the target zoomVal is first, then +1, -1, +2, -2,...
+		//We're arbitrarily using the target zoom value to start out - the sort is just a heuristic anyway - doesn't really matter that much other than to prefer the target values
+		double minDiff = 1.0;
+		//LogBuffer.println("Creating array of size zoomMax - zoomMin + 2: [" + zoomMax + " - " + zoomMin + " + 2].");
+		int[] zoomRange = new int[zoomMax - zoomMin + 2]; //2 was just to be on the safe side.
+		int i = 0;
+		for(int l = 0;l <= (zoomMax - zoomMin);l++) {
+			if(l >= 0 && (zoomVal + l) <= zoomMax) {
+				zoomRange[i] = zoomVal + l;
+				i++;
+				if(l == 0) continue;
+			}
+			if(i > (zoomMax - zoomMin)) break;
+			if(l > 0 && (zoomVal - l) >= zoomMin) {
+				zoomRange[i] = zoomVal - l;
+				i++;
+			}
+			if(i > (zoomMax - zoomMin)) break;
+		}
+		
+		double minDiffThresh = 0.005; //0=best possible ratio. "Good enough value" for when the ratio of the relative cell position of the cell under
+		//the cursor is really close to the ratio of the relative pixel position of the cursor
+
+		LogBuffer.println("getBestZoomOutVal: minZoom: [" + zoomMin + "] maxZoom: [" + zoomMax + "].");
+		double diff = 0.0;
+		//Loop through the zoomVals and find which one will result in a ratio with the relative index that is closest to the pixelPos to pxAvail ratio
+		for(i = 0;i <= (zoomMax - zoomMin);i++) {
+			int z = zoomRange[i];
+			int relCell = (int) ((double) pixel / (double) maxPixel * (double) z);
+			LogBuffer.println("getBestZoomOutVal: [relCell = (int) (pixel / maxPixel * z)] = [" + relCell + " = (int) (" + pixel + " / " + maxPixel + " * " + z + ")].");
+			if(z == 0) continue;
+			diff = Math.abs(((double) relCell / (double) z) - ((double) pixel / (double) maxPixel));
+			LogBuffer.println("getBestZoomOutVal: [diff = Math.abs((double) (relCell / z) - (double) (pixel / maxPixel))] = [" +
+					diff + " = Math.abs((double) (" + relCell + " / " + z + ") - (double) (" + pixel + " / " + maxPixel + ")].");
+			if(diff < minDiff) {
+				bestZoomVal = z;
+				minDiff = diff;
+				//Stop if the difference from the target is "good enough", i.e. close to zero
+				if(minDiff < minDiffThresh) {
+					break;
+				}
+			}
+		}
+		
+		//Do not force a zoom amount here because a minimum zoom should be enforced after this has been called
+		if(bestZoomVal < 0) bestZoomVal = 0;
+		LogBuffer.println("getBestZoomOutVal: Selected zoomVal [" + bestZoomVal + "] instead of default [" + zoomVal + "] Difference in smoothness accuracy: [" + diff + "].");
+		return(bestZoomVal);
+	}
+
 	/**
 	 * Method to zoom in to the MapContainer and set the scale for drawing
 	 * higher than before. It's important to take the range of genes displayed
@@ -252,7 +882,7 @@ public class MapContainer extends Observable implements Observer,
 
 		zoomVal = (int) Math.round(tileNumVisible / 20.0);
 
-		// Ensure that at least one tile will be zoomed in.
+		// Ensure that at least 2 tiles will be zoomed in (1 on each side of the current zoom dimension).
 		if (zoomVal < 1) {
 			zoomVal = 1;
 		}
@@ -267,9 +897,7 @@ public class MapContainer extends Observable implements Observer,
 		// Keep track of explicit changes, by the user, to the amount of
 		// visible data
 		numVisible = (int) tileNumVisible;
-		// LogBuffer.println("zoomIn: numVisible has been set to [" + numVisible
-		// + "].");
-
+		
 		// Recalculating scale
 		newScale = getAvailablePixels() / tileNumVisible;
 

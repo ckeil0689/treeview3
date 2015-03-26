@@ -1,5 +1,6 @@
 package Cluster;
 
+import java.awt.Frame;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -216,7 +217,7 @@ public class DistanceMatrix {
 		try {
 			if(file.exists()) {
 				int n = JOptionPane.showConfirmDialog(
-					    JFrame.getFrames()[0],
+					    Frame.getFrames()[0],
 					    "File already exists. Overwrite?",
 					    "Confirmation",
 					    JOptionPane.YES_NO_OPTION);

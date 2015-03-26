@@ -634,6 +634,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		public void actionPerformed(final ActionEvent arg0) {
 
 			resetMapContainers();
+			dendroView.getGlobalView().updateAspectRatio();
 		}
 	}
 
@@ -653,26 +654,36 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 			if (e.getSource() == dendroView.getXPlusButton()) {
 				getGlobalXMap().zoomIn();
+				//Doing this here because many times zoomIn is called successively for each dimension
+				dendroView.getGlobalView().updateAspectRatio();
 
 			} else if (e.getSource() == dendroView.getXMinusButton()) {
 				getGlobalXMap().zoomOut();
+				//Doing this here because many times zoomIn is called successively for each dimension
+				dendroView.getGlobalView().updateAspectRatio();
 
 			} else if (e.getSource() == dendroView.getXYMinusButton()) {
-				getGlobalXMap().zoomOut();
-				getGlobalYMap().zoomOut();
+				getGlobalXMap().zoomOutCenter();
+				getGlobalYMap().zoomOutCenter();
 
 			} else if (e.getSource() == dendroView.getXYPlusButton()) {
-				getGlobalXMap().zoomIn();
-				getGlobalYMap().zoomIn();
+				getGlobalXMap().zoomInCenter();
+				getGlobalYMap().zoomInCenter();
 
 			} else if (e.getSource() == dendroView.getYPlusButton()) {
 				getGlobalYMap().zoomIn();
+				//Doing this here because many times zoomIn is called successively for each dimension
+				dendroView.getGlobalView().updateAspectRatio();
 
 			} else if (e.getSource() == dendroView.getYMinusButton()) {
 				getGlobalYMap().zoomOut();
+				//Doing this here because many times zoomIn is called successively for each dimension
+				dendroView.getGlobalView().updateAspectRatio();
 
 			} else if (e.getSource() == dendroView.getHomeButton()) {
 				resetMapContainers();
+				//Doing this here because many times zoomIn is called successively for each dimension
+				dendroView.getGlobalView().updateAspectRatio();
 
 			} else {
 				LogBuffer.println("Got weird source for actionPerformed() "
@@ -950,9 +961,18 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
+			final int[] selectedGenes = geneSelection.getSelectedIndexes();
+			final int[] selectedArrays = arraySelection.getSelectedIndexes();
+			int mask = InputEvent.ALT_MASK;
 
-			zoomSelection();
-			centerSelection();
+			if((selectedGenes.length > 0 || selectedArrays.length > 0) && (arg0.getModifiers() & InputEvent.ALT_MASK) == mask) {
+				getGlobalXMap().zoomToward(arraySelection.getMinIndex(),(arraySelection.getMaxIndex() - arraySelection.getMinIndex() + 1));
+				getGlobalYMap().zoomToward(geneSelection.getMinIndex(),(geneSelection.getMaxIndex() - geneSelection.getMinIndex() + 1));
+			}
+			else {
+				zoomSelection();
+				centerSelection();
+			}
 
 			// LogBuffer.println("globalXmap.getFirstVisible(): [" +
 			// globalXmap.getFirstVisible() + "] " +
@@ -1113,6 +1133,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			globalYmap.notifyObservers();
 		}
 
+		dendroView.getGlobalView().updateAspectRatio();
 		saveSettings();
 	}
 

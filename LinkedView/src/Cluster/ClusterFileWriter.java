@@ -8,9 +8,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /**

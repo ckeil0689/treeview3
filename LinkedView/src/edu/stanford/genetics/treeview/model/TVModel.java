@@ -586,7 +586,7 @@ public class TVModel extends Observable implements DataModel {
 			for(int i = 0; i < exprData.length; i++) {
 				for(int j = 0; j < exprData[i].length; j++) {
 					if(Helper.nearlyEqual(0.0, exprData[i][j])) {
-						exprData[i][j] = TVModel.NODATA;
+						exprData[i][j] = DataModel.NODATA;
 					}
 				}
 			}

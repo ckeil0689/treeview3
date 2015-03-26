@@ -1,5 +1,6 @@
 package Cluster;
 
+import java.awt.Frame;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -154,7 +155,7 @@ public class HierCluster {
 			final String message = "Looks like clustering was not properly "
 					+ "set up by the software. Can't proceed with "
 					+ "clustering.";
-			JOptionPane.showMessageDialog(JFrame.getFrames()[0], message,
+			JOptionPane.showMessageDialog(Frame.getFrames()[0], message,
 					"Error", JOptionPane.ERROR_MESSAGE);
 			LogBuffer.println("Cluster preparation failed.");
 			return;
