@@ -194,8 +194,8 @@ public class MapContainer extends Observable implements Observer,
 	//This is for gradually zooming away from the center of the currently displayed dots
 	public void zoomOutCenter() {
 
-		LogBuffer.println("zoomOutCenter...");
-		LogBuffer.println("zoomOut: Value of firstVisible at start: [" + firstVisible + "].");
+		//LogBuffer.println("zoomOutCenter...");
+		//LogBuffer.println("zoomOut: Value of firstVisible at start: [" + firstVisible + "].");
 		int zoomVal;
 		int initialFirstVisible = firstVisible;
 		double newScale = getScale();
@@ -228,7 +228,7 @@ public class MapContainer extends Observable implements Observer,
 			numVisible++;
 			tileNumVisible += 1;
 		}
-		LogBuffer.println("zoomOut: numVisible has been changed from [" + prevNumVisible + "] to [" + numVisible + "] or more precisely [" + tileNumVisible + "].  Max index: [" + (getMaxIndex() + 1) + "].");
+		//LogBuffer.println("zoomOut: numVisible has been changed from [" + prevNumVisible + "] to [" + numVisible + "] or more precisely [" + tileNumVisible + "].  Max index: [" + (getMaxIndex() + 1) + "].");
 
 		newScale = getAvailablePixels() / tileNumVisible;
 
@@ -245,11 +245,11 @@ public class MapContainer extends Observable implements Observer,
 		if(newFirstVisible < 0) {
 			newFirstVisible = 0;
 		}
-		LogBuffer.println("zoomOut: firstVisible has been changed from [" + initialFirstVisible + "] to [" + newFirstVisible + "].");
+		//LogBuffer.println("zoomOut: firstVisible has been changed from [" + initialFirstVisible + "] to [" + newFirstVisible + "].");
 		if(newFirstVisible != firstVisible) {
 			scrollToFirstIndex(newFirstVisible);
 		}
-		LogBuffer.println("zoomOut: Official new firstVisible: [" + initialFirstVisible + "].");
+		//LogBuffer.println("zoomOut: Official new firstVisible: [" + initialFirstVisible + "].");
 		
 		notifyObservers();
 	}
@@ -339,7 +339,7 @@ public class MapContainer extends Observable implements Observer,
 			numVisible--;
 			tileNumVisible -= 1;
 		}
-		LogBuffer.println("zoomIn: numVisible has been changed from [" + prevNumVisible + "] to [" + numVisible + "].");
+		//LogBuffer.println("zoomIn: numVisible has been changed from [" + prevNumVisible + "] to [" + numVisible + "].");
 
 		// Recalculating scale
 		newScale = getAvailablePixels() / tileNumVisible;
@@ -351,19 +351,22 @@ public class MapContainer extends Observable implements Observer,
 		setScale(newScale);
 		
 		int newFirstVisible = firstVisible + (prevNumVisible - numVisible) / 2;
-		LogBuffer.println("zoomIn: firstVisible has been changed from [" + firstVisible + "] to [" + newFirstVisible + "].");
+		//LogBuffer.println("zoomIn: firstVisible has been changed from [" + firstVisible + "] to [" + newFirstVisible + "].");
 		scrollToFirstIndex(newFirstVisible);
 
 		notifyObservers();
 	}
 
 	//This is for gradually zooming toward a selected block of dots (there's currently no corresponding zoom away function)
+	//This function is deprecated. It works, but is a little jerky when it runs into an edge.
+	//It has essentially been replaced by smoothZoomTowardSelection in GlobalView and the functions it calls in here called getZoomTowardPixelOfSelection and zoomTowardPixel
+	//smoothZoomTowardSelection resides in GlobalView instead of here because it keeps track of the aspect ratio, needing info on both dimensions
 	public int zoomToward(int firstIndex,int numIndexes) {
 		int updateAspectRatio = 0;
 		//Catch errors - If num indexes is less than 1 or greater than the number of pixels available
 		if(numIndexes < 1 || numIndexes > getAvailablePixels() || firstIndex < 0 || (firstIndex + numIndexes - 1) > getMaxIndex()) {
-			LogBuffer.println("zoomToward: Invalid parameters. firstIndex: [" + firstIndex + "] numIndexes: [" + numIndexes + "] available pixels: [" +
-					getAvailablePixels() + "] maxIndex: [" + getMaxIndex() + "].");
+			//LogBuffer.println("zoomToward: Invalid parameters. firstIndex: [" + firstIndex + "] numIndexes: [" + numIndexes + "] available pixels: [" +
+			//		getAvailablePixels() + "] maxIndex: [" + getMaxIndex() + "].");
 			return(updateAspectRatio);
 		}
 
@@ -414,6 +417,17 @@ public class MapContainer extends Observable implements Observer,
 		} else {
 			int diff = numVisible - numIndexes;
 			
+			//If the difference is odd and greater than 2, the selection isn't going to be quite centered by the time we get to it,
+			//so we'll shift things early on by 1 to correct it so it's centered as soon as possible
+			if(diff % 2 == 1 && diff > 2) {
+				numVisible--;
+				tileNumVisible -= 1;
+				numIndexes--;
+				newScale = getAvailablePixels() / tileNumVisible;
+				setScale(newScale);
+				diff++;
+			}
+
 			//If the first visible index is inside the target area
 			if(initialFirstVisible > firstIndex) {
 				newFirstVisible = firstIndex;
@@ -454,7 +468,7 @@ public class MapContainer extends Observable implements Observer,
 		return(updateAspectRatio);
 	}
 
-	//This function does the same as zoomToward, but tries to keep the dot the cursor is currently over under the cursor.
+	//This function smoothly zooms while trying to keep the dot the cursor is currently over under the cursor.
 	//Some of the code is generalized in case it's ever called with a value out of range
 	//Set customZoomVal to a negative number (e.g. -1) to dynamically determine the zoomVal based on a 5% zoom increment
 	public int zoomTowardPixel(int pixelPos,int customZoomVal) {
@@ -476,7 +490,7 @@ public class MapContainer extends Observable implements Observer,
 		//This is a test of selecting the best zoom value using the getBestZoomVal method (called from outside of this class)
 		if(customZoomVal >= 0) {
 			zoomVal = customZoomVal;
-			LogBuffer.println("zoomTowardPixel: Custom zoom value: [" + zoomVal + "].");
+			//LogBuffer.println("zoomTowardPixel: Custom zoom value: [" + zoomVal + "].");
 		}
 		//If a custom zoom value has not been supplied (in order to correct dot aspect ratios (see GlobalView)),
 		//select the best zoom value to make the zooming as smooth as possible
@@ -485,7 +499,7 @@ public class MapContainer extends Observable implements Observer,
 			if (zoomVal < 1) {
 				zoomVal = 1;
 			}
-			LogBuffer.println("zoomTowardPixel: Best zoom value: [" + zoomVal + "].");
+			//LogBuffer.println("zoomTowardPixel: Best zoom value: [" + zoomVal + "].");
 		}
 		//Zooming with no smoothing
 		else {
@@ -494,7 +508,7 @@ public class MapContainer extends Observable implements Observer,
 			if (zoomVal < 1) {
 				zoomVal = 1;
 			}
-			LogBuffer.println("zoomTowardPixel: No smoothing zoom value: [" + zoomVal + "].");
+			//LogBuffer.println("zoomTowardPixel: No smoothing zoom value: [" + zoomVal + "].");
 		}
 
 		//Make sure we're left with at least 1 dot on the screen
@@ -572,7 +586,142 @@ public class MapContainer extends Observable implements Observer,
 		return(updateAspectRatio);
 	}
 
-	//This function does the same as zoomToward, but tries to keep the dot the cursor is currently over under the cursor.
+	//Use this function to pick a pixel to zoom toward when zooming toward a selection
+	//Assumes that the full selection is visible on the screen
+	public int getZoomTowardPixelOfSelection(int pixelIndexOfSelec,int numPixelsOfSelec) {
+		int numPixelsOffsetOfSelec = pixelIndexOfSelec;
+		int numTotalPixels = getAvailablePixels() + 1;   //getAvailablePixels actually is returning the max pixel index (starting from 0)
+		
+		//numTotalPixels SHOULD be a count of pixels (i.e. starting from 1), but apparently it's actually the index of the last pixel!
+		if(pixelIndexOfSelec < 0 && (pixelIndexOfSelec + numPixelsOfSelec) >= numTotalPixels) {
+			//I should be able to use the code below for this calculation, but that currently doesn't work and
+			//for right now, I'm debugging other code and need a quick approximate value returned here.
+			return((int) Math.round((double) numTotalPixels / 2.0));
+		}
+		//If all or part of the selected area is above/before the visible area
+		else if(pixelIndexOfSelec < 0 && (pixelIndexOfSelec + numPixelsOfSelec) < numTotalPixels) {
+			//LogBuffer.println("Error: start Pixel: [" + pixelIndexOfSelec + "] or end pixel: [" + pixelIndexOfSelec + " + " + numTotalPixels + "] of selection is out of range: [0 to (" + numTotalPixels + " - 1)].");
+			return(0);
+		}
+		//If all or part of the selected area is below/after the visible area
+		else if((pixelIndexOfSelec + numPixelsOfSelec) >= numTotalPixels) {
+			return(numTotalPixels - 1);
+		}
+
+		//The following equation is based on the merging of 2 equations and then solving for targetPixel
+		//Let's say that numPixelsOffsetOfSelec is the number of pixels above/left of the start of the selection
+		//Let's say that numPixelsOfSelec is the number of pixels in the selected box (in the current dimension)
+		//We want the pixel where these fractions are equal: targetPixelRelativeToSelection / numPixelsOfSelec = targetPixel / numTotalPixels
+		//We know that targetPixel = numPixelsOffsetOfSelec + targetPixelRelativeToSelection
+		//Solve for targetPixelRelativeToSelection = targetPixel - numPixelsOffsetOfSelec
+		//Substitute targetPixelRelativeToSelection with targetPixel - numPixelsOffsetOfSelec in the first selection and solve for targetPixel and you get the equation below
+		int targetPixel = (int) Math.round((double) numTotalPixels * (double) numPixelsOffsetOfSelec / ((double) numPixelsOfSelec - (double) numTotalPixels));
+		//LogBuffer.println("Target Pixel calculation: targetPixel = numTotalPixels * numPixelsOffsetOfSelec / (numPixelsOfSelec - numTotalPixels)");
+		//LogBuffer.println("Target Pixel calculation: " + targetPixel + " = " + numTotalPixels + " * " + numPixelsOffsetOfSelec + " / (" + numPixelsOfSelec + " - " + numTotalPixels + ")");
+		
+		//The equation above actually has 2 solutions.  If the solution is negative, we just need to negate it, otherwise,
+		//the solution turns out to need a slight adjustment because it is on the outside of the selected area.
+		//I'm not sure why, but the difference with the offset just needs to be added to the offset.
+		if(targetPixel < 0) {
+			targetPixel = Math.abs(targetPixel);
+		} else {
+			targetPixel = numPixelsOffsetOfSelec + Math.abs(numPixelsOffsetOfSelec-targetPixel);
+		}
+		
+		//Decrement because pixels are indexed from 0 and the equation above assumes indexing from 1
+		targetPixel--;
+		
+		if(targetPixel < 0 || targetPixel >= numTotalPixels) {
+			LogBuffer.println("Error: target Pixel is out of range: [" + targetPixel + "]");
+			targetPixel = 0;
+		}
+		
+		return(targetPixel);
+	}
+
+
+
+
+
+	//This function returns a pixel to zoom toward that represents the same percentage  relative distance from the start of the selection as from the start of the vurrent visible area
+	//The purpose is to zoom toward that spot and end up with the selected area filling the view
+	//Note, if the target pixel should be outside of the visible area, the nearest bound of the visible area is returned.  It is up to the calling function to scroll to the selection.
+	public int getZoomTowardPixelOfSelectionUniversal(int pixelIndexOfSelec,int numPixelsOfSelec) {
+		int imaginaryPixelIndexOfSelec = pixelIndexOfSelec;
+		int imaginaryPixelIndexOfView = 0; //This is true when fully zoomed out
+		int imaginaryNumTotalPixels = (int) Math.round((getMaxIndex() + 1) * getScale());
+		int numPixelsOfView = getAvailablePixels() + 1;   //getAvailablePixels actually is returning the max pixel index (starting from 0)
+		int targetPixel;
+		int adjust = getPixel(0);  //Assuming this will return a negative number when zoomed into a spot other than the beginning
+		//LogBuffer.println("Pixel for data index 0: [" + adjust + "].");
+		imaginaryPixelIndexOfSelec -= adjust;
+		imaginaryPixelIndexOfView = Math.abs(adjust);
+
+		int numPixelsOffsetOfSelec = imaginaryPixelIndexOfSelec - imaginaryPixelIndexOfView;
+		//LogBuffer.println("UNIVERSAL: numPixelsOffsetOfSelec = imaginaryPixelIndexOfSelec - imaginaryPixelIndexOfView");
+		//LogBuffer.println("UNIVERSAL: " + numPixelsOffsetOfSelec + " = " + imaginaryPixelIndexOfSelec + " - " + imaginaryPixelIndexOfView);
+		//LogBuffer.println("UNIVERSAL: Why isn't that the same as pixelIndexOfSelec: [" + pixelIndexOfSelec + "]?");
+
+		//If we are zooming in (or not zooming at all)
+		if(numPixelsOfSelec <= numPixelsOfView) {
+			targetPixel = (int) Math.round((double) numPixelsOfView * (double) numPixelsOffsetOfSelec / ((double) numPixelsOfSelec - (double) numPixelsOfView));
+			//LogBuffer.println("UNIVERSAL (adjust): targetPixel = numPixelsOfView * numPixelsOffsetOfSelec / (numPixelsOfSelec - numPixelsOfView)");
+			//LogBuffer.println("UNIVERSAL (" + adjust + "): " + targetPixel + " = " + numPixelsOfView + " * " + numPixelsOffsetOfSelec + " / (" + numPixelsOfSelec + " - " + numPixelsOfView + ")");
+			if(targetPixel < 0) {
+				targetPixel = Math.abs(targetPixel);
+			} else {
+				targetPixel = numPixelsOffsetOfSelec + Math.abs(numPixelsOffsetOfSelec-targetPixel);
+			}
+		} else {
+			//If we are zoomed in inside the selection
+			if(numPixelsOffsetOfSelec < 0 && (numPixelsOffsetOfSelec + numPixelsOfSelec) > (firstVisible + numVisible)) {
+				targetPixel = (int) Math.round((double) numPixelsOfSelec * (double) numPixelsOffsetOfSelec / ((double) numPixelsOfView - (double) numPixelsOfSelec));
+				//LogBuffer.println("UNIVERSAL (adjust): targetPixel = numPixelsOfSelec * numPixelsOffsetOfSelec / (numPixelsOfView - numPixelsOfSelec)");
+				//LogBuffer.println("UNIVERSAL (" + adjust + "): " + targetPixel + " = " + numPixelsOfSelec + " * " + numPixelsOffsetOfSelec + " / (" + numPixelsOfView + " - " + numPixelsOfSelec + ")");
+			
+				//The target pixel is currently in terms of the imaginary selected pixels  I need to convert it to the smaller view pixels
+				targetPixel = (int) Math.round((double) numPixelsOfView * ((double) targetPixel / (double) numPixelsOfSelec));
+				//LogBuffer.println("UNIVERSAL (adjust): targetPixel = numPixelsOfView * (targetPixel / numPixelsOfSelec");
+				//LogBuffer.println("UNIVERSAL (" + adjust + "): " + targetPixel + " = " + numPixelsOfView + " * (" + targetPixel + " / " + numPixelsOfSelec + ")");
+
+				if(targetPixel < 0) {
+					targetPixel = Math.abs(targetPixel);
+				} else {
+					targetPixel = numPixelsOffsetOfSelec + Math.abs(numPixelsOffsetOfSelec-targetPixel);
+				}
+			}
+			//Else if we are zoomed in left of or above the selection
+			else if(numPixelsOffsetOfSelec < 0) {
+				targetPixel = 1;
+			}
+			//Else we are zoomed in right of or below the selection
+			else {
+				targetPixel = numPixelsOfView;
+			}
+		}
+		
+		//I think this might be erroneous - at least for some of the calculation contexts
+		//Now let's put the pixel coordinate back into the real realm
+		//targetPixel -= adjust;
+	
+		//Decrement because pixels are indexed from 0 and the equation above assumes indexing from 1
+		targetPixel--;
+		
+		if(targetPixel < 0) {
+			targetPixel = 0;
+		} else if(targetPixel >= numPixelsOfView) {
+			targetPixel = numPixelsOfView - 1;
+		}
+		
+		return(targetPixel);
+	}
+
+
+
+
+
+
+	//This function does the reverse of zoomTowardPixel
 	//Some of the code is generalized in case it's ever called with a value out of range
 	public int zoomAwayPixel(int pixelPos,int customZoomVal) {
 		int updateAspectRatio = 0;
@@ -688,12 +837,13 @@ public class MapContainer extends Observable implements Observer,
 
 		return(updateAspectRatio);
 	}
-	
-	//This assumes that the cells are roughly square-ish. Pronounced rectangle shapes may distort using this method to smooth as you zoom
-	public int getBestZoomInVal(int pixel,int maxPixel,int cells,double targetZoomFrac) {
+
+	//This calculates an optimal number of data indexes to remove that will result in as smooth a zoom as possible.
+	//It uses relative data index hovered over to calculate the target position of the zoom (as opposed to the relative pixel position of the cursor)
+	public int getBestZoomInVal(int pixel,int numPixels,int cells,double targetZoomFrac) {
 		int zoomVal = (int) Math.round((double) cells * targetZoomFrac);
 
-		LogBuffer.println("getBestZoomOutVal: Called with cells [" + cells + "] targetZoomFrac [" + targetZoomFrac + "] and calculated zoomVal as [" + zoomVal + "].");
+		//LogBuffer.println("getBestZoomInVal: Called with cells [" + cells + "] targetZoomFrac [" + targetZoomFrac + "] and calculated zoomVal as [" + zoomVal + "].");
 		//If we're at the minimum zoom level, do not zoom in any more
 		if((cells == 1 && targetZoomFrac <= 1) || (targetZoomFrac % 1 == 0) && ((int) Math.round(targetZoomFrac)) == 0) {
 			return(0);
@@ -748,18 +898,19 @@ public class MapContainer extends Observable implements Observer,
 		//the cursor is really close to the ratio of the relative pixel position of the cursor
 
 		//The corresponding zoom-out function uses relative pixel position, but on zoom-in, it's more accurate to use the relative cell position the mouse is over
-		double targetFrac = ((double) getIndex(pixel) + 1.0) / ((double) getMaxIndex() + 1.0);
+		//double targetFrac = ((double) getIndex(pixel) + 1.0) / ((double) getMaxIndex() + 1.0);
+		double targetFrac = ((double) getIndex(pixel) + 1.0 - (double) firstVisible) / ((double) numVisible);
 		double diff = 0.0;
-		LogBuffer.println("getBestZoomOutVal: minZoom: [" + zoomMin + "] maxZoom: [" + zoomMax + "].");
+		//LogBuffer.println("getBestZoomInVal: minZoom: [" + zoomMin + "] maxZoom: [" + zoomMax + "].");
 		//Loop through the zoomVals and find which one will result in a ratio with the relative index that is closest to the pixelPos to pxAvail ratio
 		for(i = 0;i <= (zoomMax - zoomMin);i++) {
 			int z = zoomRange[i];
 			int relCell = (int) (targetFrac * (double) z);
-			LogBuffer.println("getBestZoomInVal: [relCell = (int) (pixel / maxPixel * z)] = [" + relCell + " = (int) (" + pixel + " / " + maxPixel + " * " + z + ")].");
+			//LogBuffer.println("getBestZoomInVal: [relCell = (int) (pixel / numPixels * z)] = [" + relCell + " = (int) (" + pixel + " / " + numPixels + " * " + z + ")].");
 			if(z == 0) continue;
 			diff = Math.abs(((double) relCell / (double) z) - targetFrac);
-			LogBuffer.println("getBestZoomInVal: [diff = Math.abs((double) (relCell / z) - (double) (pixel / maxPixel))] = [" +
-					diff + " = Math.abs((double) (" + relCell + " / " + z + ") - (double) (" + pixel + " / " + maxPixel + ")].");
+			//LogBuffer.println("getBestZoomInVal: [diff = Math.abs((double) (relCell / z) - (double) (pixel / numPixels))] = [" +
+			//		diff + " = Math.abs((double) (" + relCell + " / " + z + ") - (double) (" + pixel + " / " + numPixels + ")].");
 			if(diff < minDiff) {
 				bestZoomVal = z;
 				minDiff = diff;
@@ -769,15 +920,15 @@ public class MapContainer extends Observable implements Observer,
 				}
 			}
 		}
-		LogBuffer.println("getBestZoomInVal: Selected zoomVal [" + bestZoomVal + "] instead of defaults [" + zoomVal + "] Diff: [" + diff + "].");
+		//LogBuffer.println("getBestZoomInVal: Selected zoomVal [" + bestZoomVal + "] instead of defaults [" + zoomVal + "] Diff: [" + diff + "].");
 		
 		//Do not force a zoom amount here because a minimum zoom should be enforced after this has been called
 		if(bestZoomVal < 0) bestZoomVal = 0;
 		return(bestZoomVal);
 	}
 
-	//This assumes that the cells are roughly square-ish. Pronounced rectangle shapes may distort using this method to smooth as you zoom
-	public int getBestZoomOutVal(int pixel,int maxPixel,int cells,double targetZoomFrac) {
+	//This function performs the reverse of getBestZoomInVal, except it uses the relative pixel position of the cursor to calculate the zoom position that is targeted for smoothing
+	public int getBestZoomOutVal(int pixel,int numPixels,int cells,double targetZoomFrac) {
 		int zoomVal = (int) Math.round((double) cells * targetZoomFrac);
 
 		//If the closest zoom amount is 0, return 0 because it's the smoothest possible scroll value (and the math below will result in NaN)
@@ -834,17 +985,17 @@ public class MapContainer extends Observable implements Observer,
 		double minDiffThresh = 0.005; //0=best possible ratio. "Good enough value" for when the ratio of the relative cell position of the cell under
 		//the cursor is really close to the ratio of the relative pixel position of the cursor
 
-		LogBuffer.println("getBestZoomOutVal: minZoom: [" + zoomMin + "] maxZoom: [" + zoomMax + "].");
+		//LogBuffer.println("getBestZoomOutVal: minZoom: [" + zoomMin + "] maxZoom: [" + zoomMax + "].");
 		double diff = 0.0;
 		//Loop through the zoomVals and find which one will result in a ratio with the relative index that is closest to the pixelPos to pxAvail ratio
 		for(i = 0;i <= (zoomMax - zoomMin);i++) {
 			int z = zoomRange[i];
-			int relCell = (int) ((double) pixel / (double) maxPixel * (double) z);
-			LogBuffer.println("getBestZoomOutVal: [relCell = (int) (pixel / maxPixel * z)] = [" + relCell + " = (int) (" + pixel + " / " + maxPixel + " * " + z + ")].");
+			int relCell = (int) ((double) (pixel + 1) / (double) numPixels * (double) z + 1);
+			//LogBuffer.println("getBestZoomOutVal: [relCell = (int) (pixel / numPixels * z)] = [" + relCell + " = (int) (" + pixel + " / " + numPixels + " * " + z + ")].");
 			if(z == 0) continue;
-			diff = Math.abs(((double) relCell / (double) z) - ((double) pixel / (double) maxPixel));
-			LogBuffer.println("getBestZoomOutVal: [diff = Math.abs((double) (relCell / z) - (double) (pixel / maxPixel))] = [" +
-					diff + " = Math.abs((double) (" + relCell + " / " + z + ") - (double) (" + pixel + " / " + maxPixel + ")].");
+			diff = Math.abs(((double) relCell / (double) z) - ((double) (pixel + 1) / (double) numPixels));
+			//LogBuffer.println("getBestZoomOutVal: [diff = Math.abs((double) (relCell / z) - (double) (pixel / numPixels))] = [" +
+			//		diff + " = Math.abs((double) (" + relCell + " / " + z + ") - (double) (" + pixel + " / " + numPixels + ")].");
 			if(diff < minDiff) {
 				bestZoomVal = z;
 				minDiff = diff;
@@ -857,7 +1008,7 @@ public class MapContainer extends Observable implements Observer,
 		
 		//Do not force a zoom amount here because a minimum zoom should be enforced after this has been called
 		if(bestZoomVal < 0) bestZoomVal = 0;
-		LogBuffer.println("getBestZoomOutVal: Selected zoomVal [" + bestZoomVal + "] instead of default [" + zoomVal + "] Difference in smoothness accuracy: [" + diff + "].");
+		//LogBuffer.println("getBestZoomOutVal: Selected zoomVal [" + bestZoomVal + "] instead of default [" + zoomVal + "] Difference in smoothness accuracy: [" + diff + "].");
 		return(bestZoomVal);
 	}
 

@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.concurrent.TimeUnit;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -30,6 +31,7 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 import Utilities.Helper;
 import edu.stanford.genetics.treeview.CdtFilter;
@@ -966,12 +968,47 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			int mask = InputEvent.ALT_MASK;
 
 			if((selectedGenes.length > 0 || selectedArrays.length > 0) && (arg0.getModifiers() & InputEvent.ALT_MASK) == mask) {
-				getGlobalXMap().zoomToward(arraySelection.getMinIndex(),(arraySelection.getMaxIndex() - arraySelection.getMinIndex() + 1));
-				getGlobalYMap().zoomToward(geneSelection.getMinIndex(),(geneSelection.getMaxIndex() - geneSelection.getMinIndex() + 1));
+				//getGlobalXMap().zoomToward(arraySelection.getMinIndex(),(arraySelection.getMaxIndex() - arraySelection.getMinIndex() + 1));
+				//getGlobalYMap().zoomToward(geneSelection.getMinIndex(),(geneSelection.getMaxIndex() - geneSelection.getMinIndex() + 1));
+				dendroView.getGlobalView().smoothZoomTowardSelection(arraySelection.getMinIndex(),
+						(arraySelection.getMaxIndex() - arraySelection.getMinIndex() + 1),
+						geneSelection.getMinIndex(),
+						(geneSelection.getMaxIndex() - geneSelection.getMinIndex() + 1));
 			}
 			else {
-				zoomSelection();
+				//Let's calculate the relative position of the center of the selection and gradually zoom toward that spot in a loop
+				while(globalXmap.getNumVisible() != (arraySelection.getMaxIndex() - arraySelection.getMinIndex() + 1) ||
+					globalYmap.getNumVisible() != (geneSelection.getMaxIndex() - geneSelection.getMinIndex() + 1)) {
+					//globalXmap.zoomToward(arraySelection.getMinIndex(),(arraySelection.getMaxIndex() - arraySelection.getMinIndex() + 1));
+					//globalYmap.zoomToward(geneSelection.getMinIndex(),(geneSelection.getMaxIndex() - geneSelection.getMinIndex() + 1));
+					dendroView.getGlobalView().smoothZoomTowardSelection(arraySelection.getMinIndex(),
+							(arraySelection.getMaxIndex() - arraySelection.getMinIndex() + 1),
+							geneSelection.getMinIndex(),
+							(geneSelection.getMaxIndex() - geneSelection.getMinIndex() + 1));
+					
+					//Force an immediate repaint
+					//Found this in a thread here: https://community.oracle.com/thread/1663771
+					dendroView.getGlobalView().paintImmediately(0,0,
+							dendroView.getGlobalView().getWidth(),
+							dendroView.getGlobalView().getHeight());
+
+					//Sleep a few milliseconds
+					try{
+						//Use this to debug, by slowing the zool down to see what's happening at each step
+						//Thread.sleep(500);
+						Thread.sleep(10);
+					} catch(InterruptedException e){
+						LogBuffer.println("Error: Couldn't sleep.");
+						e.printStackTrace();
+					}
+				}
+				//Once the loop is done, we're guaranteed to be at the correct zoom level, however the scroll could be off (which happened to me only once in my testing - so it is rare), so we should do a scroll here just to be certain
 				centerSelection();
+				//We will update the aspect ratio just in case it didn't happen automatically
+				dendroView.getGlobalView().updateAspectRatio();
+
+				//zoomSelection();
+				//centerSelection();
 			}
 
 			// LogBuffer.println("globalXmap.getFirstVisible(): [" +
@@ -1009,9 +1046,10 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 		// Declare the min number of spots to zoom in on for each dimension.
 		// We should set this as a preference in the future. -Rob
-		final double minZoomIndex = 20;
+		final double minZoomIndex = 1;
 		double minArrayZoomIndex = minZoomIndex;
 		double minGeneZoomIndex = minZoomIndex;
+		boolean centerEdgeSelections = false;
 
 		// Determine the boundaries of the data (so that we do not exceed them)
 		final double maxArrayIndex = globalXmap.getMaxIndex();
@@ -1044,12 +1082,12 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 			// If the center of the selection is less than half the distance to
 			// the near edge
-			if ((minSelectedArrayIndex + arrayIndexes / 2) < (minArrayZoomIndex / 2)) {
+			if (centerEdgeSelections && (minSelectedArrayIndex + arrayIndexes / 2) < (minArrayZoomIndex / 2)) {
 				arrayIndexes = (minSelectedArrayIndex + arrayIndexes / 2) * 2;
 			}
 			// Else if the center of the selection is less than half the
 			// distance to the far edge
-			else if ((minSelectedArrayIndex + arrayIndexes / 2) > (maxArrayIndex - (minArrayZoomIndex / 2))) {
+			else if (centerEdgeSelections && (minSelectedArrayIndex + arrayIndexes / 2) > (maxArrayIndex - (minArrayZoomIndex / 2))) {
 				arrayIndexes = (maxArrayIndex - (minSelectedArrayIndex
 						+ arrayIndexes / 2 - 1)) * 2;
 			}
@@ -1064,12 +1102,12 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 			// If the center of the selection is less than half the distance to
 			// the near edge
-			if ((minSelectedGeneIndex + geneIndexes / 2) < (minGeneZoomIndex / 2)) {
+			if (centerEdgeSelections && (minSelectedGeneIndex + geneIndexes / 2) < (minGeneZoomIndex / 2)) {
 				geneIndexes = (minSelectedGeneIndex + geneIndexes / 2) * 2;
 			}
 			// Else if the center of the selection is less than half the
 			// distance to the far edge
-			else if ((minSelectedGeneIndex + geneIndexes / 2) > (maxGeneIndex - (minGeneZoomIndex / 2))) {
+			else if (centerEdgeSelections && (minSelectedGeneIndex + geneIndexes / 2) > (maxGeneIndex - (minGeneZoomIndex / 2))) {
 				geneIndexes = (maxGeneIndex - (minSelectedGeneIndex
 						+ geneIndexes / 2 - 1)) * 2;
 			}
