@@ -22,6 +22,7 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.ScrollPane;
 import java.awt.Toolkit;
@@ -99,8 +100,9 @@ public class DendroView implements Observer, DendroPanel {
 
 	protected ScrollPane panes[];
 
-	// Matrix view
-	private final GlobalView globalview;
+	// Matrix views
+	private final GlobalMatrixView globalMatrixView;
+	private final InteractiveMatrixView interactiveMatrixView;
 
 	// Tree views
 	protected final RowTreeView rowTreeView;
@@ -182,7 +184,7 @@ public class DendroView implements Observer, DendroPanel {
 	/**
 	 * Constructor for the DendroView object
 	 *
-	 * @param vFrame
+	 * @param tvFrame
 	 *            parent ViewFrame of DendroView
 	 * @param name
 	 *            name of this view.
@@ -203,11 +205,12 @@ public class DendroView implements Observer, DendroPanel {
 		dataTicker = new DataTicker();
 
 		/* Create the Global view (JPanel to display) */
-		globalview = new GlobalView();
+		globalMatrixView = new GlobalMatrixView();
+		interactiveMatrixView = new InteractiveMatrixView();
 
 		/* scrollbars, mostly used by maps */
-		matrixXscrollbar = globalview.getXScroll();
-		matrixYscrollbar = globalview.getYScroll();
+		matrixXscrollbar = interactiveMatrixView.getXScroll();
+		matrixYscrollbar = interactiveMatrixView.getYScroll();
 
 		/* Set up the gene label display */
 		rowLabelView = new RowLabelView();
@@ -227,20 +230,15 @@ public class DendroView implements Observer, DendroPanel {
 		setupScaleButtons();
 	}
 
-	public void setGlobalXMap(final MapContainer xmap) {
+	public void setMatrixHome() {
 
-		this.globalXmap = xmap;
+		interactiveMatrixView.resetView();
+		interactiveMatrixView.repaint();
+		
+		globalMatrixView.resetView();
+		globalMatrixView.repaint();
 	}
-
-	public void setGlobalYMap(final MapContainer ymap) {
-
-		this.globalYmap = ymap;
-	}
-
-	public void setMatrixHome(final boolean isHome) {
-
-		globalview.resetHome(isHome);
-	}
+	
 
 	/**
 	 * Returns the dendroPane so it can be displayed in TVFrame.
@@ -252,11 +250,12 @@ public class DendroView implements Observer, DendroPanel {
 		colLabelView.generateView(tvFrame.getUrlExtractor());
 		rowLabelView.generateView(tvFrame.getUrlExtractor());
 
-		globalview.setHeaderSummary(rowLabelView.getHeaderSummary(),
+		interactiveMatrixView.setHeaderSummary(rowLabelView.getHeaderSummary(),
 				colLabelView.getHeaderSummary());
 
 		// Register Views
-		registerView(globalview);
+		registerView(globalMatrixView);
+		registerView(interactiveMatrixView);
 		registerView(colTreeView);
 		registerView(colLabelView);
 		registerView(rowLabelView);
@@ -332,7 +331,8 @@ public class DendroView implements Observer, DendroPanel {
 		JPanel navContainer;
 		JPanel bottomPanel;
 
-		globalOverviewPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
+		globalOverviewPanel = GUIFactory.createJPanel(false, 
+				GUIFactory.NO_PADDING);
 		globalOverviewPanel.setBorder(
 				BorderFactory.createTitledBorder("Overview"));
 		
@@ -400,6 +400,8 @@ public class DendroView implements Observer, DendroPanel {
 				showTreesMenuItem.setText(StringRes.menu_hideTrees);
 			}
 		}
+		
+		globalOverviewPanel.add(globalMatrixView, "push, grow");
 
 		rowLabelPanel.add(rowLabelView.getComponent(), "push, grow");
 		colLabelPanel.add(colLabelView.getComponent(), "push, grow");
@@ -455,7 +457,7 @@ public class DendroView implements Observer, DendroPanel {
 		dendroPane.add(rowDataPane, "w 200:10%:, h 79%");
 		
 		/* Matrix view */
-		dendroPane.add(globalview, "w 75%, h 79%, grow, push");
+		dendroPane.add(interactiveMatrixView, "w 75%, h 79%, grow, push");
 		dendroPane.add(rowNavPanel, "growy, w 1%, h 95%, wrap");
 		
 		dendroPane.add(rowLabelScroll, "w 13%, h 1%");
@@ -1306,9 +1308,14 @@ public class DendroView implements Observer, DendroPanel {
 		matrixYscrollbar.setValue(i);
 	}
 
-	public GlobalView getGlobalView() {
+	public InteractiveMatrixView getInteractiveMatrixView() {
 
-		return globalview;
+		return interactiveMatrixView;
+	}
+	
+	public GlobalMatrixView getGlobalMatrixView() {
+
+		return globalMatrixView;
 	}
 
 	public LabelView getColumnLabelView() {

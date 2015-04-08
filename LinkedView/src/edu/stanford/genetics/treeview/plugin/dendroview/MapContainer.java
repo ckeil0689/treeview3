@@ -133,7 +133,7 @@ public class MapContainer extends Observable implements Observer,
 	 * Resets the MapContainer so that it completely fills out the available
 	 * screen space.
 	 */
-	public void setHome() {
+	public void setToMinScale() {
 		// LogBuffer.println("setHome() called.");
 		calculateNewMinScale();
 
@@ -329,7 +329,6 @@ public class MapContainer extends Observable implements Observer,
 		
 		setScale(newScale);
 
-		notifyObservers();
 	}
 
 	//This is for gradually zooming toward the center of the currently displayed dots

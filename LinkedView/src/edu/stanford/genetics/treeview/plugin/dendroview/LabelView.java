@@ -31,7 +31,7 @@ import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.UrlExtractor;
 
-public class LabelView extends ModelView implements MouseListener,
+public abstract class LabelView extends ModelView implements MouseListener,
 MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
 	private static final long serialVersionUID = 1L;
@@ -123,6 +123,8 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
 		panel = scrollPane;
 	}
+	
+	protected abstract void adjustScrollBar();
 
 	/**
 	 * Used to space the array names.
@@ -180,7 +182,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	 *            The TreeSelection which is set by selecting genes in the
 	 *            GlobalView
 	 */
-	public void setGeneSelection(final TreeSelectionI geneSelection) {
+	public void setRowSelection(final TreeSelectionI geneSelection) {
 
 		if (this.geneSelection != null) {
 			this.geneSelection.deleteObserver(this);
@@ -201,7 +203,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	 *            The TreeSelection which is set by selecting genes in the
 	 *            GlobalView
 	 */
-	public void setArraySelection(final TreeSelectionI arraySelection) {
+	public void setColSelection(final TreeSelectionI arraySelection) {
 
 		if (this.arraySelection != null) {
 			this.arraySelection.deleteObserver(this);
@@ -271,8 +273,8 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
 		if (isGeneAxis)
 			return scrollPane.getHorizontalScrollBar();
-		else
-			return scrollPane.getVerticalScrollBar();
+		
+		return scrollPane.getVerticalScrollBar();
 	}
 
 	@Override
@@ -322,6 +324,14 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		if (configNode != null) {
 			configNode.putBoolean("isRightJustified", isRightJustified);
 		}
+		
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				adjustScrollBar();
+			}
+		});
 	}
 
 	@Override
@@ -464,11 +474,17 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 			multiple = 8;
 		}
 		
+		int newPoints;
 		if(multiple < 2) {
-			setPoints(6);
+			newPoints = 6;
 		} else {
 			/* rate of 2 is too much, rate of 1 too little... */
-			setPoints(6 + (int)(1.5 * multiple));
+			newPoints = 6 + (int)(1.5 * multiple);
+		}
+		
+		if(newPoints != getPoints()) {
+			setPoints(newPoints);
+//			adjustScrollBar();
 		}
 	}
 

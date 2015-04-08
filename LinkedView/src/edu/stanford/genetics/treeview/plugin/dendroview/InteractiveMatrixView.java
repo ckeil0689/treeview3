@@ -24,7 +24,6 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -39,21 +38,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
-import javax.swing.BorderFactory;
 import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
-import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.ModelViewProduced;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 
-public class GlobalView extends ModelViewProduced implements
+public class InteractiveMatrixView extends MatrixView implements
 MouseWheelListener {
 
 	private static final long serialVersionUID = 1L;
@@ -62,12 +56,6 @@ MouseWheelListener {
 	public static final int EQUAL = 1;
 	public static final int PROPORT = 2;
 
-	protected boolean hasDrawn = false;
-	private boolean resetHome = false;
-	protected TreeSelectionI geneSelection;
-	protected TreeSelectionI arraySelection;
-	protected MapContainer xmap;
-	protected MapContainer ymap;
 	private final String[] statustext = new String[] { "Mouseover Selection",
 			"", "" };
 	private HeaderInfo arrayHI;
@@ -76,12 +64,14 @@ MouseWheelListener {
 	private HeaderSummary geneSummary;
 	private HeaderSummary arraySummary;
 
-	private ArrayDrawer drawer;
 	private int overx;
 	private int overy;
-	private final JScrollPane scrollPane;
+//<<<<<<< HEAD:LinkedView/src/edu/stanford/genetics/treeview/plugin/dendroview/GlobalView.java
+//	private final JScrollPane scrollPane;
 	
 	private double aspectRatio = -1;
+//=======
+//>>>>>>> global_overview:LinkedView/src/edu/stanford/genetics/treeview/plugin/dendroview/InteractiveMatrixView.java
 
 	/**
 	 * Points to track candidate selected rows/cols should reflect where the
@@ -110,43 +100,32 @@ MouseWheelListener {
 	 * MapContainer) to help it figure out where to draw things. It also tries
 	 * to
 	 */
-	public GlobalView() {
+	public InteractiveMatrixView() {
 
 		super();
 
-		setLayout(new MigLayout());
-
-		scrollPane = new JScrollPane(this,
-				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-
-		panel = scrollPane;
-		panel.setBorder(BorderFactory.createEtchedBorder());
-		panel.setBackground(GUIFactory.ELEMENT_HOV);
-
-		// setToolTipText("This Turns Tooltips On");
-
+		/* Listeners for interactivity */
 		addMouseListener(new MatrixMouseListener());
 		addMouseMotionListener(new MatrixMouseListener());
 		addMouseWheelListener(this);
 	}
 
+	/**
+	 * 
+	 * @return x-axis scroll bar (horizontal) for the InteractiveMatrixView.
+	 */
 	public JScrollBar getXScroll() {
 
 		return scrollPane.getHorizontalScrollBar();
 	}
 
+	/**
+	 * 
+	 * @return y-axis scroll bar (vertical) for the InteractiveMatrixView.
+	 */
 	public JScrollBar getYScroll() {
 
 		return scrollPane.getVerticalScrollBar();
-	}
-
-	@Override
-	public Dimension getPreferredSize() {
-
-		final Dimension p = new Dimension(xmap.getRequiredPixels(),
-				ymap.getRequiredPixels());
-		return p;
 	}
 
 	@Override
@@ -201,60 +180,6 @@ MouseWheelListener {
 		}
 		return statustext;
 	}
-	
-	public void setObserver() {
-		
-	}
-
-	/**
-	 * Set geneSelection
-	 *
-	 * @param geneSelection
-	 *            The TreeSelection which is set by selecting genes in the
-	 *            GlobalView
-	 */
-	public void setGeneSelection(final TreeSelectionI geneSelection) {
-
-		if (this.geneSelection != null) {
-			this.geneSelection.deleteObserver(this);
-		}
-
-		this.geneSelection = geneSelection;
-		this.geneSelection.addObserver(this);
-	}
-
-	/**
-	 * Set arraySelection
-	 *
-	 * @param arraySelection
-	 *            The TreeSelection which is set by selecting arrays in the
-	 *            GlobalView
-	 */
-	public void setArraySelection(final TreeSelectionI arraySelection) {
-
-		if (this.arraySelection != null) {
-			this.arraySelection.deleteObserver(this);
-		}
-
-		this.arraySelection = arraySelection;
-		this.arraySelection.addObserver(this);
-	}
-
-	/**
-	 * Set ArrayDrawer
-	 *
-	 * @param arrayDrawer
-	 *            The ArrayDrawer to be used as a source
-	 */
-	public void setArrayDrawer(final ArrayDrawer arrayDrawer) {
-
-		if (drawer != null) {
-			drawer.deleteObserver(this);
-		}
-
-		drawer = arrayDrawer;
-		drawer.addObserver(this);
-	}
 
 	public void setHeaderSummary(final HeaderSummary gene,
 			final HeaderSummary array) {
@@ -273,42 +198,10 @@ MouseWheelListener {
 		return drawer;
 	}
 
-	/**
-	 * DEPRECATE set the xmapping for this view
-	 *
-	 * @param m
-	 *            the new mapping
-	 */
-	public void setXMap(final MapContainer m) {
-
-		if (xmap != null) {
-			xmap.deleteObserver(this);
-		}
-
-		xmap = m;
-		xmap.addObserver(this);
-	}
-
-	/**
-	 * DEPRECATE set the ymapping for this view
-	 *
-	 * @param m
-	 *            the new mapping
-	 */
-	public void setYMap(final MapContainer m) {
-
-		if (ymap != null) {
-			ymap.deleteObserver(this);
-		}
-
-		ymap = m;
-		ymap.addObserver(this);
-	}
-
 	@Override
 	public String viewName() {
 
-		return "GlobalView";
+		return "InteractiveMatrixView";
 	}
 
 	// Canvas Methods
@@ -320,20 +213,7 @@ MouseWheelListener {
 	@Override
 	protected void updateBuffer(final Graphics g) {
 
-		if (offscreenChanged) {
-			xmap.setAvailablePixels(offscreenSize.width);
-			ymap.setAvailablePixels(offscreenSize.height);
-
-			if (!hasDrawn) {
-				// total kludge, but addnotify isn't working correctly...
-				xmap.recalculateScale();
-				ymap.recalculateScale();
-				hasDrawn = true;
-			}
-
-			xmap.notifyObservers();
-			ymap.notifyObservers();
-		}
+		revalidateScreen();
 
 		if (!offscreenValid) {
 			// clear the pallette...
@@ -362,31 +242,37 @@ MouseWheelListener {
 	@Override
 	protected void updatePixels() {
 
-		if (offscreenChanged) {
-			// LogBuffer.println("OFFSCREEN CHANGED");
-			offscreenValid = false;
-			xmap.setAvailablePixels(offscreenSize.width);
-			ymap.setAvailablePixels(offscreenSize.height);
-
-			if (!hasDrawn) {
-				// total kludge, but addnotify isn't working correctly...
-				xmap.recalculateScale();
-				ymap.recalculateScale();
-				hasDrawn = true;
-			}
-		}
-
-		if (resetHome) {
-			LogBuffer.println("Resetting GV");
-			xmap.setHome();
-			ymap.setHome();
-			
-			updateAspectRatio();
-
-			resetHome(false);
-		}
-
+//<<<<<<< HEAD:LinkedView/src/edu/stanford/genetics/treeview/plugin/dendroview/GlobalView.java
+//		if (offscreenChanged) {
+//			// LogBuffer.println("OFFSCREEN CHANGED");
+//			offscreenValid = false;
+//			xmap.setAvailablePixels(offscreenSize.width);
+//			ymap.setAvailablePixels(offscreenSize.height);
+//
+//			if (!hasDrawn) {
+//				// total kludge, but addnotify isn't working correctly...
+//				xmap.recalculateScale();
+//				ymap.recalculateScale();
+//				hasDrawn = true;
+//			}
+//		}
+//
+//		if (resetHome) {
+//			LogBuffer.println("Resetting GV");
+//			xmap.setHome();
+//			ymap.setHome();
+//			
+//			updateAspectRatio();
+//
+//			resetHome(false);
+//		}
+//
+//=======
+//>>>>>>> global_overview:LinkedView/src/edu/stanford/genetics/treeview/plugin/dendroview/InteractiveMatrixView.java
 		if (!offscreenValid) {
+			
+			revalidateScreen();
+			
 			// LogBuffer.println("OFFSCREEN INVALID");
 			final Rectangle destRect = new Rectangle(0, 0,
 					xmap.getUsedPixels(), ymap.getUsedPixels());
@@ -453,6 +339,7 @@ MouseWheelListener {
 	 * Checks the selection of genes and arrays and calculates the appropriate
 	 * selection rectangle.
 	 */
+	@Override
 	protected void recalculateOverlay() {
 
 		if ((geneSelection == null) || (arraySelection == null)) {
@@ -492,9 +379,9 @@ MouseWheelListener {
 					}
 				}
 			}
-
-			repaint();
 		}
+		
+		setIndicatorCircleBounds();
 	}
 
 	/**
@@ -566,75 +453,54 @@ MouseWheelListener {
 		return boundaryList;
 	}
 
-	// Observer Methods
 	@Override
 	public void update(final Observable o, final Object arg) {
 
 		if (o == geneSelection) {
-			if (arraySelection.getNSelectedIndexes() == 0) {
-				if (geneSelection.getNSelectedIndexes() != 0) {
-					// select all arrays if some genes selected...
-					arraySelection.selectAllIndexes();
-					// notifies self...
-					arraySelection.notifyObservers();
-					return;
-				}
-				/*
-				 * When deselecting a tree node with right click, this matters,
-				 * because in the eventlistener you can only deselect indices
-				 * for the local tree selection. other axis here!
-				 */
-			} else if (geneSelection.getNSelectedIndexes() == 0) {
-				arraySelection.deselectAllIndexes();
-				arraySelection.notifyObservers();
-			}
+			updateSelection(geneSelection, arraySelection);
 			recalculateOverlay();
-			drawIndicatorCircle();
 
 			/* trigger updatePixels() */
 			offscreenValid = false;
 
 		} else if (o == arraySelection) {
-			if (geneSelection.getNSelectedIndexes() == 0) {
-				if (arraySelection.getNSelectedIndexes() != 0) {
-					// select all genes if some arrays selected...
-					geneSelection.selectAllIndexes();
-					// notifies self...
-					geneSelection.notifyObservers();
-					return;
-				}
-				/*
-				 * When deselecting a tree node with right click, this matters,
-				 * because in the eventlistener you can only deselect indices
-				 * for the local tree selection. other axis here!
-				 */
-			} else if (arraySelection.getNSelectedIndexes() == 0) {
-				geneSelection.deselectAllIndexes();
-				geneSelection.notifyObservers();
-			}
+			updateSelection(arraySelection, geneSelection);
 			recalculateOverlay();
-			drawIndicatorCircle();
-
+			
 			offscreenValid = false;
-
-		} else if ((o == xmap) || o == ymap) {
-			recalculateOverlay();
-			drawIndicatorCircle();
-			offscreenValid = false;
-
-		} else if (o == drawer && drawer != null) {
-			/*
-			 * signal from drawer means that it need to draw something
-			 * different.
-			 */
-			offscreenValid = false;
+			repaint();
 
 		} else {
-			LogBuffer.println("GlobalView got weird update : " + o);
+			super.update(o, arg);
 		}
-
-		revalidate();
-		repaint();
+	}
+	
+	/**
+	 * Adjusts one axis selection to changes in the other.
+	 * @param origin The axis selection object that has previously been
+	 * changed.
+	 * @param adjusting The axis selection object that needs to be adjusted.
+	 */
+	private static void updateSelection(TreeSelectionI origin, 
+			TreeSelectionI adjusting) {
+		
+		if (adjusting.getNSelectedIndexes() == 0) {
+			if (origin.getNSelectedIndexes() != 0) {
+				// select all genes if some arrays selected...
+				adjusting.selectAllIndexes();
+				// notifies self...
+				adjusting.notifyObservers();
+				return;
+			}
+			/*
+			 * When deselecting a tree node with right click, this matters,
+			 * because in the eventlistener you can only deselect indices
+			 * for the local tree selection. other axis here!
+			 */
+		} else if (origin.getNSelectedIndexes() == 0) {
+			adjusting.deselectAllIndexes();
+			adjusting.notifyObservers();
+		}
 	}
 
 	/* TODO move to a specified controller class */
@@ -824,52 +690,53 @@ MouseWheelListener {
 		repaint();
 	}
 
-	// @Override
-	// public String getToolTipText(final MouseEvent e) {
-	// /*
-	// * Do we want to do mouseovers if value already visible? if
-	// * (getShowVal()) return null; // don't do tooltips and vals at same
-	// * time.
-	// */
-	// String ret = "";
-	// String row = "";
-	// String col = "";
-	//
-	// if (drawer != null) {
-	//
-	// final int geneRow = overy;
-	//
-	// if (xmap.contains(overx) && ymap.contains(overy)) {
-	//
-	// if (geneHI != null) {
-	// row = geneSummary.getSummary(geneHI, overy);
-	//
-	// } else {
-	// row = "N/A";
-	// }
-	//
-	// if (arrayHI != null) {
-	// col = arraySummary.getSummary(arrayHI, overx);
-	//
-	// } else {
-	// col = "N/A";
-	// }
-	//
-	// if (drawer.isMissing(overx, geneRow)) {
-	// ret = "No data";
-	//
-	// } else if (drawer.isEmpty(overx, geneRow)) {
-	// ret = null;
-	//
-	// } else {
-	// ret = "<html>Row: " + row + " <br>Column: " + col
-	// + " <br>Value: "
-	// + drawer.getSummary(overx, geneRow) + "</html>";
-	// }
-	// }
-	// }
-	// return ret;
-	// }
+//<<<<<<< HEAD:LinkedView/src/edu/stanford/genetics/treeview/plugin/dendroview/GlobalView.java
+//	// @Override
+//	// public String getToolTipText(final MouseEvent e) {
+//	// /*
+//	// * Do we want to do mouseovers if value already visible? if
+//	// * (getShowVal()) return null; // don't do tooltips and vals at same
+//	// * time.
+//	// */
+//	// String ret = "";
+//	// String row = "";
+//	// String col = "";
+//	//
+//	// if (drawer != null) {
+//	//
+//	// final int geneRow = overy;
+//	//
+//	// if (xmap.contains(overx) && ymap.contains(overy)) {
+//	//
+//	// if (geneHI != null) {
+//	// row = geneSummary.getSummary(geneHI, overy);
+//	//
+//	// } else {
+//	// row = "N/A";
+//	// }
+//	//
+//	// if (arrayHI != null) {
+//	// col = arraySummary.getSummary(arrayHI, overx);
+//	//
+//	// } else {
+//	// col = "N/A";
+//	// }
+//	//
+//	// if (drawer.isMissing(overx, geneRow)) {
+//	// ret = "No data";
+//	//
+//	// } else if (drawer.isEmpty(overx, geneRow)) {
+//	// ret = null;
+//	//
+//	// } else {
+//	// ret = "<html>Row: " + row + " <br>Column: " + col
+//	// + " <br>Value: "
+//	// + drawer.getSummary(overx, geneRow) + "</html>";
+//	// }
+//	// }
+//	// }
+//	// return ret;
+//	// }
 
 	public void smoothZoomTowardPixel(int xPxPos,int yPxPos) {
 		int zoomXVal = 0;
@@ -1408,6 +1275,8 @@ MouseWheelListener {
 		//LogBuffer.println("Aspect Ratio updated to [" + aspectRatio + "].");
 	}
 
+//=======
+//>>>>>>> global_overview:LinkedView/src/edu/stanford/genetics/treeview/plugin/dendroview/InteractiveMatrixView.java
 	private void drawBand(final Rectangle l) {
 
 		final Graphics g = getGraphics();
@@ -1427,7 +1296,7 @@ MouseWheelListener {
 	 * Draws a circle if the user selects one rectangle in the clustergram to
 	 * indicate the position of this rectangle.
 	 */
-	private void drawIndicatorCircle() {
+	private void setIndicatorCircleBounds() {
 
 		double x = 0;
 		double y = 0;
@@ -1444,7 +1313,7 @@ MouseWheelListener {
 			w = xmap.getUsedPixels() * 0.05;
 			h = w;
 
-			// Get coords for center of circle
+			// coords for center of circle
 			x = xmap.getPixel(arraySelection.getSelectedIndexes()[0]) - (w / 2)
 					+ (xmap.getScale() / 2);
 			y = ymap.getPixel(geneSelection.getSelectedIndexes()[0]) - (h / 2)
@@ -1528,10 +1397,5 @@ MouseWheelListener {
 
 		geneHI = ghi;
 		arrayHI = ahi;
-	}
-
-	public void resetHome(final boolean resized) {
-
-		this.resetHome = resized;
 	}
 }

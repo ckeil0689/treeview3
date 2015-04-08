@@ -291,7 +291,7 @@ public abstract class HeaderFinderBox {
 			// + minIndex + " < " + globalSmap.getFirstVisible() + "] || [" +
 			// maxIndex + " > (" + globalSmap.getFirstVisible() + " + " +
 			// globalSmap.getNumVisible() + " - 1)].");
-			globalSmap.setHome();
+			globalSmap.setToMinScale();
 		}
 
 		if ((otherIndexList.size() == 0
@@ -307,7 +307,7 @@ public abstract class HeaderFinderBox {
 			// globalOmap.getFirstVisible() + "] || [" + otherMaxIndex + " > ("
 			// + globalOmap.getFirstVisible() + " + " +
 			// globalOmap.getNumVisible() + " - 1)].");
-			globalOmap.setHome();
+			globalOmap.setToMinScale();
 		}
 	}
 
