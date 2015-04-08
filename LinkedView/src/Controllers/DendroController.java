@@ -683,9 +683,66 @@ public class DendroController implements ConfigNodePersistent, Observer {
 				dendroView.getGlobalView().updateAspectRatio();
 
 			} else if (e.getSource() == dendroView.getHomeButton()) {
-				resetMapContainers();
-				//Doing this here because many times zoomIn is called successively for each dimension
-				dendroView.getGlobalView().updateAspectRatio();
+				
+				int mask = InputEvent.ALT_MASK;
+
+				if((e.getModifiers() & InputEvent.ALT_MASK) == mask) {
+					/* TODO: Fix the smoothZoomToward function below and then remove the work-around code - Rob */
+					int prevXNumVisible = globalXmap.getNumVisible();
+					int prevYNumVisible = globalXmap.getNumVisible();
+					dendroView.getGlobalView().smoothZoomTowardSelection(0,(globalXmap.getMaxIndex() + 1),
+							0,(globalYmap.getMaxIndex() + 1));
+					//The function above has a bug that prevents full zoom out - this works around that:
+					if(prevXNumVisible == globalXmap.getNumVisible() &&
+							prevYNumVisible == globalXmap.getNumVisible()) {
+						resetMapContainers();
+						dendroView.getGlobalView().updateAspectRatio();
+					}
+				}
+				else {
+
+					/* TODO: Create a separate function for this loop - Rob */
+					long startTime = System.currentTimeMillis();
+					//Let's calculate the relative position of the center of the selection and gradually zoom toward that spot in a loop
+					while(globalXmap.getNumVisible() != (globalXmap.getMaxIndex() + 1) ||
+						globalYmap.getNumVisible() != (globalYmap.getMaxIndex() + 1)) {
+
+						//If drawing the zoom increment levels is taking too long, snap out of it.
+						if((System.currentTimeMillis() - startTime) > 70) {
+							resetMapContainers();
+							break;
+						}
+
+						dendroView.getGlobalView().smoothZoomTowardSelection(0,(globalXmap.getMaxIndex() + 1),
+								0,(globalYmap.getMaxIndex() + 1));
+
+						//Force an immediate repaint
+						//Found this in a thread here: https://community.oracle.com/thread/1663771
+						dendroView.getGlobalView().paintImmediately(0,0,
+								dendroView.getGlobalView().getWidth(),
+								dendroView.getGlobalView().getHeight());
+
+						//Sleep a few milliseconds
+						try{
+							//Use this to debug, by slowing the zool down to see what's happening at each step
+							//Thread.sleep(500);
+							Thread.sleep(10);
+						} catch(InterruptedException ex){
+							LogBuffer.println("Error: Couldn't sleep.");
+							ex.printStackTrace();
+						}
+					}
+					//We will update the aspect ratio just in case it didn't happen automatically
+					dendroView.getGlobalView().updateAspectRatio();
+				}
+				
+				
+				
+				
+				
+				//resetMapContainers();
+				////Doing this here because many times zoomIn is called successively for each dimension
+				//dendroView.getGlobalView().updateAspectRatio();
 
 			} else {
 				LogBuffer.println("Got weird source for actionPerformed() "
@@ -976,16 +1033,26 @@ public class DendroController implements ConfigNodePersistent, Observer {
 						(geneSelection.getMaxIndex() - geneSelection.getMinIndex() + 1));
 			}
 			else {
+				/* TODO: Create a separate function for this loop - Rob */
+				long startTime = System.currentTimeMillis();
+
 				//Let's calculate the relative position of the center of the selection and gradually zoom toward that spot in a loop
 				while(globalXmap.getNumVisible() != (arraySelection.getMaxIndex() - arraySelection.getMinIndex() + 1) ||
 					globalYmap.getNumVisible() != (geneSelection.getMaxIndex() - geneSelection.getMinIndex() + 1)) {
+
+					//If drawing the zoom increment levels is taking too long, snap out of it.
+					if((System.currentTimeMillis() - startTime) > 150) {
+						zoomSelection();
+						break;
+					}
+
 					//globalXmap.zoomToward(arraySelection.getMinIndex(),(arraySelection.getMaxIndex() - arraySelection.getMinIndex() + 1));
 					//globalYmap.zoomToward(geneSelection.getMinIndex(),(geneSelection.getMaxIndex() - geneSelection.getMinIndex() + 1));
 					dendroView.getGlobalView().smoothZoomTowardSelection(arraySelection.getMinIndex(),
 							(arraySelection.getMaxIndex() - arraySelection.getMinIndex() + 1),
 							geneSelection.getMinIndex(),
 							(geneSelection.getMaxIndex() - geneSelection.getMinIndex() + 1));
-					
+
 					//Force an immediate repaint
 					//Found this in a thread here: https://community.oracle.com/thread/1663771
 					dendroView.getGlobalView().paintImmediately(0,0,
@@ -1006,27 +1073,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 				centerSelection();
 				//We will update the aspect ratio just in case it didn't happen automatically
 				dendroView.getGlobalView().updateAspectRatio();
-
-				//zoomSelection();
-				//centerSelection();
 			}
-
-			// LogBuffer.println("globalXmap.getFirstVisible(): [" +
-			// globalXmap.getFirstVisible() + "] " +
-			// "globalXmap.getNumVisible(): [" + globalXmap.getNumVisible() +
-			// "].  " +
-			// "globalXmap.getScroll().getValue(): [" +
-			// globalXmap.getScroll().getValue() + "] " +
-			// "globalXmap.getScroll().getVisibleAmount(): [" +
-			// globalXmap.getScroll().getVisibleAmount() + "].");
-			// LogBuffer.println("globalYmap.getFirstVisible(): [" +
-			// globalYmap.getFirstVisible() + "] " +
-			// "globalYmap.getNumVisible(): [" + globalYmap.getNumVisible() +
-			// "].  " +
-			// "globalYmap.getScroll().getValue(): [" +
-			// globalYmap.getScroll().getValue() + "] " +
-			// "globalYmap.getScroll().getVisibleAmount(): [" +
-			// globalYmap.getScroll().getVisibleAmount() + "].");
 		}
 	}
 
