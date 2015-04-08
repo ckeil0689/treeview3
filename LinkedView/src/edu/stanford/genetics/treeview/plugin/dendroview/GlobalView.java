@@ -1045,6 +1045,7 @@ MouseWheelListener {
 			updateAspectRatio();
 	}
 
+	/* TODO: Simplify/streamline this function and move a bunch of steps to independent functions in MapContainer - Rob */
 	//Currently, this function assumes that the selected cells are smaller than or equal to the number of cells currently visible
 	//I should rename it to smoothZoomToSelection and update it to be able to handle zooming out when the visible area is smaller
 	//(or 1 dimension smaller, the other larger) and to be able to smoothly zoom/scroll to a selection outside of the visible area
@@ -1085,23 +1086,6 @@ MouseWheelListener {
 		int prevYNumVisible = ymap.getNumVisible();
 		int centerYIndex = ymap.getFirstVisible() + (int) Math.floor((double) ymap.getNumVisible() / 2.0);
 
-		//double targetZoomFrac = 0.05; //This is the amount by which we incrementally zoom in.  It is hard-coded here and in separate unrelated zooming functions in MapContainer
-
-		//We're going to zoom more linearly the larger the visible area is with a max zoom increment of 0.5 and a min of 0.05
-		//double targetZoomFracX = 0.0001186 * (double) numXCells - 0.03814;  //This equation is based on these 2 linear equations: 0.05 = a100 + b and 0.5 = a6000 + b and solved for a & b
-		//LogBuffer.println("Zoom fractionX: [" + targetZoomFracX + "] = 0.00009 * " + numXCells + " - 0.04");
-		//if(targetZoomFracX < 0) targetZoomFracX += 0.07628;
-		//double zoomFracMin = 0.05;
-		//double zoomFracMax = 0.75;
-		//if(targetZoomFracX < zoomFracMin) targetZoomFracX = zoomFracMin;
-		//if(targetZoomFracX > zoomFracMax) targetZoomFracX = zoomFracMax;
-		
-		//double targetZoomFracY = 0.0001186 * (double) numYCells - 0.03814;
-		//LogBuffer.println("Zoom fractionY: [" + targetZoomFracY + "].");
-		//if(targetZoomFracY < 0) targetZoomFracY += 0.07628;
-		//if(targetZoomFracY < zoomFracMin) targetZoomFracY = zoomFracMin;
-		//if(targetZoomFracY > zoomFracMax) targetZoomFracY = zoomFracMax;
-
 		double targetZoomFracX = 0.5;
 		//The following loop cycles through zoom increments 0.05,0.1,0.15,... to 0.5
 		//and stops when the zoom increment is large enough to overcome the long time it takes to draw huge matrices
@@ -1109,9 +1093,13 @@ MouseWheelListener {
 		//6000 = a * b^0.5 and 100 = a * b^0.05
 		//Basically, when the number of visible spots is 6000, the zoom increment will be 50%.
 		//When the number of visible spots is 100, the zoom increment will be 5%.  There's a log scale in between.
+		int largerXSize = numXSelectedIndexes;
+		if(numXCells > largerXSize) {
+			largerXSize = numXCells;
+		}
 		for(int zf = 1;zf<=10;zf++) {
 			double zmfc = (double) zf * 0.05;
-			if(63.45*Math.pow(8942,zmfc) > numXCells) {
+			if(63.45*Math.pow(8942,zmfc) > largerXSize) {
 				targetZoomFracX = zmfc;
 				break;
 			}
@@ -1124,9 +1112,13 @@ MouseWheelListener {
 		//6000 = a * b^0.5 and 100 = a * b^0.05
 		//Basically, when the number of visible spots is 6000, the zoom increment will be 50%.
 		//When the number of visible spots is 100, the zoom increment will be 5%.  There's a log scale in between.
+		int largerYSize = numYSelectedIndexes;
+		if(numYCells > largerYSize) {
+			largerYSize = numYCells;
+		}
 		for(int zf = 1;zf<=10;zf++) {
 			double zmfc = (double) zf * 0.05;
-			if(63.45*Math.pow(8942,zmfc) > numXCells) {
+			if(63.45*Math.pow(8942,zmfc) > largerYSize) {
 				targetZoomFracY = zmfc;
 				break;
 			}
@@ -1330,86 +1322,75 @@ MouseWheelListener {
 			ymap.scrollToFirstIndex(selecYStartIndex);
 		} else {
 			//Scroll toward by half of the same fraction as the zoom changed
-			double scrollFrac =  ((double) xmap.getNumVisible() / (double) prevXNumVisible); //We don't want to scroll all the way in 1 jolt, so we'll scroll to be closer to the center of the selection by this fraction (unless we're at the zoom level of the selection)
+			//We don't want to scroll all the way in 1 sudden jolt, so we'll scroll to be closer to the center of the selection by (half) the same fraction as the incremental zoom (unless we're at the zoom level of the selection)
+			double scrollFrac =  ((double) xmap.getNumVisible() / (double) prevXNumVisible);
 			if(scrollFrac > 1) {
 				scrollFrac =  (double) prevXNumVisible / (double) xmap.getNumVisible();
 			}
 			scrollFrac /= 2.0;
 			
-			////If the X selection size is smaller than the visible area
-			//if(numXSelectedIndexes < xmap.getNumVisible()) {
-				int scrollDistDirX = (selecXStartIndex + (int) Math.floor(numXSelectedIndexes / 2)) - centerXIndex;
-				scrollDistDirX = (int) Math.round((double) scrollDistDirX * scrollFrac);
-				
-				int prevFarEdge = prevXFirstVisible + prevXNumVisible;
-				int selecFarEdge = selecXStartIndex + numXSelectedIndexes;
-				int newFarEdge = (selecXStartIndex + (int) Math.floor(numXSelectedIndexes / 2)) - scrollDistDirX + (int) Math.floor((double) xmap.getNumVisible() / 2);
-				//Make sure we don't scroll an edge out of view
-				//if(selecFarEdge <= prevFarEdge && selecFarEdge > newFarEdge) {
-					//LEFT OFF HERE - ROB
-				//}
-				
-				//if(Math.abs(scrollDistDirX) == 0) {
-				//	if(((double) numXSelectedIndexes + (double) numXSelectedIndexes / 2) < ((double) xmap.getFirstVisible() + (double) xmap.getNumVisible() / 2)) {
-				//		scrollDistDirX = -1;
-				//	} else {
-				//		scrollDistDirX = 1;
-				//	}
-				//}
-				xmap.scrollToIndex((selecXStartIndex + (int) Math.floor(numXSelectedIndexes / 2)) - scrollDistDirX);
-
-				////If the position of the center of the selection is less than the center of the visible area
-				//if((numXSelectedIndexes + numXSelectedIndexes) / 2 < (xmap.getFirstVisible() + xmap.getNumVisible()) / 2) {
-				//	int offBy = (int) Math.round(((double) xmap.getFirstVisible() - (double) selecXStartIndex) * scrollFrac);
-				//	if(offBy <= 0) offBy = 1;
-				//	xmap.scrollToFirstIndex(xmap.getFirstVisible() - offBy);
-				//} else if((selecXStartIndex + numXSelectedIndexes - 1) > (xmap.getFirstVisible() + xmap.getNumVisible() - 1)) {
-				//	int offBy = (int) Math.round((((double) selecXStartIndex + (double) numXSelectedIndexes - 1.0) - ((double) xmap.getFirstVisible() + (double) xmap.getNumVisible() - 1.0)) * scrollFrac);
-				//	if(offBy <= 0) offBy = 1;
-				//	xmap.scrollToFirstIndex(xmap.getFirstVisible() + offBy);
-				//}
-			//}
-
-				//Scroll toward by half of the same fraction as the zoom changed
-				scrollFrac =  ((double) ymap.getNumVisible() / (double) prevYNumVisible); //We don't want to scroll all the way in 1 jolt, so we'll scroll to be closer to the center of the selection by this fraction (unless we're at the zoom level of the selection)
-				if(scrollFrac > 1) {
-					scrollFrac =  (double) prevYNumVisible / (double) ymap.getNumVisible();
+			int scrollDistDirX = (selecXStartIndex + (int) Math.floor(numXSelectedIndexes / 2)) - centerXIndex;
+			scrollDistDirX = (int) Math.round((double) scrollDistDirX * scrollFrac);
+			
+			/* TODO: Refactor the scrolling so that these checks do not have to be done. - Rob */
+			//The following correction calculations are to prevent scrolling a visible selected edge out of view./
+			//The calculations are not perfect and are only necessary because the zoomToward* functions only really work when
+			//the selection is either completely in view or we're zoomed in inside the selected area.
+			int prevFarEdge = prevXFirstVisible + prevXNumVisible;
+			int selecFarEdge = selecXStartIndex + numXSelectedIndexes;
+			int newNearEdge = (selecXStartIndex + (int) Math.floor(numXSelectedIndexes / 2)) - scrollDistDirX - (int) Math.floor((double) xmap.getNumVisible() / 2);
+			int newFarEdge = (selecXStartIndex + (int) Math.floor(numXSelectedIndexes / 2)) - scrollDistDirX + (int) Math.ceil((double) xmap.getNumVisible() / 2);
+			//Make sure we don't scroll an edge from either in view or before the view to out of view/past the view
+			if(selecFarEdge <= prevFarEdge && selecFarEdge > newFarEdge) {
+				scrollDistDirX -= (selecFarEdge - newFarEdge) + (int) Math.round((1.0 - scrollFrac) * ((double) selecFarEdge - (double) newFarEdge));
+				newNearEdge = (selecXStartIndex + (int) Math.floor(numXSelectedIndexes / 2)) - scrollDistDirX - (int) Math.ceil((double) xmap.getNumVisible() / 2);
+				if(selecFarEdge > newFarEdge || selecXStartIndex >= prevXFirstVisible && selecXStartIndex < newNearEdge) {
+					scrollDistDirX = 0;
 				}
-				scrollFrac /= 2.0;
+			} else if(selecXStartIndex >= prevXFirstVisible && selecXStartIndex < newNearEdge) {
+				scrollDistDirX += (newNearEdge - selecXStartIndex) + (int) Math.round((1.0 - scrollFrac) * ((double) newNearEdge - (double) selecXStartIndex));
+				newFarEdge = (selecXStartIndex + (int) Math.floor(numXSelectedIndexes / 2)) - scrollDistDirX + (int) Math.ceil((double) xmap.getNumVisible() / 2);
+				if(selecXStartIndex < newNearEdge || selecFarEdge <= prevFarEdge && selecFarEdge > newFarEdge) {
+					scrollDistDirX = 0;
+				}
+			}
+			
+			xmap.scrollToIndex((selecXStartIndex + (int) Math.floor(numXSelectedIndexes / 2)) - scrollDistDirX);
 
-				int scrollDistDirY = (selecYStartIndex + (int) Math.floor(numYSelectedIndexes / 2)) - centerYIndex;
-				scrollDistDirY = (int) Math.round((double) scrollDistDirY * scrollFrac);
-				//if(Math.abs(scrollDistDirY) == 0) {
-				//	if(((double) numYSelectedIndexes + (double) numYSelectedIndexes) / 2 < ((double) ymap.getFirstVisible() + (double) ymap.getNumVisible() / 2)) {
-				//		scrollDistDirY = -1;
-				//	} else {
-				//		scrollDistDirY = 1;
-				//	}
-				//}
-				ymap.scrollToIndex((selecYStartIndex + (int) Math.floor(numYSelectedIndexes / 2)) - scrollDistDirY);
-				
-				
-				
-				
-				//LogBuffer.println("SCROLLING by x/y values: [" + scrollDistDirX + "/" + scrollDistDirY + "].");
-				
-				
-				
-				
-				
-			////If the Y selection size is smaller than the visible area
-			//if(numYSelectedIndexes < ymap.getNumVisible()) {
-			//	//If the selection is off the edge of the visible Y axis
-			//	if(selecYStartIndex < ymap.getFirstVisible()) {
-			//		int offBy = (int) Math.round(((double) ymap.getFirstVisible() - (double) selecYStartIndex) * scrollFrac);
-			//		if(offBy <= 0) offBy = 1;
-			//		ymap.scrollToFirstIndex(ymap.getFirstVisible() - offBy);
-			//	} else if((selecYStartIndex + numYSelectedIndexes - 1) > (ymap.getFirstVisible() + ymap.getNumVisible() - 1)) {
-			//		int offBy = (int) Math.round((((double) selecYStartIndex + (double) numYSelectedIndexes - 1.0) - ((double) ymap.getFirstVisible() + (double) ymap.getNumVisible() - 1.0)) * scrollFrac);
-			//		if(offBy <= 0) offBy = 1;
-			//		ymap.scrollToFirstIndex(ymap.getFirstVisible() + offBy);
-			//	}
-			//}
+			//Scroll toward by half of the same fraction as the zoom changed
+			scrollFrac =  ((double) ymap.getNumVisible() / (double) prevYNumVisible); //We don't want to scroll all the way in 1 jolt, so we'll scroll to be closer to the center of the selection by this fraction (unless we're at the zoom level of the selection)
+			if(scrollFrac > 1) {
+				scrollFrac =  (double) prevYNumVisible / (double) ymap.getNumVisible();
+			}
+			scrollFrac /= 2.0;
+
+			int scrollDistDirY = (selecYStartIndex + (int) Math.floor(numYSelectedIndexes / 2)) - centerYIndex;
+			scrollDistDirY = (int) Math.round((double) scrollDistDirY * scrollFrac);
+
+			/* TODO: Refactor the scrolling so that these checks do not have to be done. - Rob */
+			//The following correction calculations are to prevent scrolling a visible selected edge out of view./
+			//The calculations are not perfect and are only necessary because the zoomToward* functions only really work when
+			//the selection is either completely in view or we're zoomed in inside the selected area.
+			prevFarEdge = prevYFirstVisible + prevYNumVisible;
+			selecFarEdge = selecYStartIndex + numYSelectedIndexes;
+			newNearEdge = (selecYStartIndex + (int) Math.floor(numYSelectedIndexes / 2)) - scrollDistDirY - (int) Math.ceil((double) ymap.getNumVisible() / 2);
+			newFarEdge = (selecYStartIndex + (int) Math.floor(numYSelectedIndexes / 2)) - scrollDistDirY + (int) Math.ceil((double) ymap.getNumVisible() / 2);
+			//Make sure we don't scroll an edge from either in view or before the view to out of view/past the view
+			if(selecFarEdge <= prevFarEdge && selecFarEdge > newFarEdge) {
+				scrollDistDirY -= (selecFarEdge - newFarEdge) + (int) Math.round((1.0 - scrollFrac) * ((double) selecFarEdge - (double) newFarEdge));
+				newNearEdge = (selecYStartIndex + (int) Math.floor(numYSelectedIndexes / 2)) - scrollDistDirY - (int) Math.ceil((double) ymap.getNumVisible() / 2);
+				if(selecFarEdge > newFarEdge || selecYStartIndex >= prevYFirstVisible && selecYStartIndex < newNearEdge) {
+					scrollDistDirY = 0;
+				}
+			} else if(selecYStartIndex >= prevYFirstVisible && selecYStartIndex < newNearEdge) {
+				scrollDistDirY += (int) Math.round((1.0 - scrollFrac) * ((double) newNearEdge - (double) selecYStartIndex));
+				newFarEdge = (selecYStartIndex + (int) Math.floor(numYSelectedIndexes / 2)) - scrollDistDirY + (int) Math.ceil((double) ymap.getNumVisible() / 2);
+				if(selecYStartIndex < newNearEdge || selecFarEdge <= prevFarEdge && selecFarEdge > newFarEdge) {
+					scrollDistDirY = 0;
+				}
+			}
+			
+			ymap.scrollToIndex((selecYStartIndex + (int) Math.floor(numYSelectedIndexes / 2)) - scrollDistDirY);
 		}
 		
 		//Update the aspect ratio once we have arrived at our destination (as we are going to be using the starting aspect ratio to use it to gradually adjust the target aspect ratio)

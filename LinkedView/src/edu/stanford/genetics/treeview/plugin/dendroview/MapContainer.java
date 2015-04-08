@@ -385,6 +385,7 @@ public class MapContainer extends Observable implements Observer,
 		notifyObservers();
 	}
 
+	/* TODO: Delete this function - it's outdated (though it is more consistent than its replacements). - Rob */
 	//This is for gradually zooming toward a selected block of dots (there's currently no corresponding zoom away function)
 	//This function is deprecated. It works, but is a little jerky when it runs into an edge.
 	//It has essentially been replaced by smoothZoomTowardSelection in GlobalView and the functions it calls in here called getZoomTowardPixelOfSelection and zoomTowardPixel
@@ -614,6 +615,7 @@ public class MapContainer extends Observable implements Observer,
 		return(updateAspectRatio);
 	}
 
+	/* TODO: Remove this function and replace it with the one below that has "Universal" appended to the name. - Rob */
 	//Use this function to pick a pixel to zoom toward when zooming toward a selection
 	//Assumes that the full selection is visible on the screen
 	public int getZoomTowardPixelOfSelection(int pixelIndexOfSelec,int numPixelsOfSelec) {
@@ -666,10 +668,6 @@ public class MapContainer extends Observable implements Observer,
 		
 		return(targetPixel);
 	}
-
-
-
-
 
 	//This function returns a pixel to zoom toward that represents the same percentage  relative distance from the start of the selection as from the start of the vurrent visible area
 	//The purpose is to zoom toward that spot and end up with the selected area filling the view
@@ -861,6 +859,7 @@ public class MapContainer extends Observable implements Observer,
 		return(updateAspectRatio);
 	}
 
+	/* TODO: Merge this function with getBestZoomOutVal - there are only subtle differences that could be handled in an if statement. - Rob */
 	//This calculates an optimal number of data indexes to remove that will result in as smooth a zoom as possible.
 	//It uses relative data index hovered over to calculate the target position of the zoom (as opposed to the relative pixel position of the cursor)
 	public int getBestZoomInVal(int pixel,int numPixels,int cells,double targetZoomFrac) {
@@ -950,6 +949,7 @@ public class MapContainer extends Observable implements Observer,
 		return(bestZoomVal);
 	}
 
+	/* TODO: Merge this function with getBestZoomInVal - there are only subtle differences that could be handled in an if statement. - Rob */
 	//This function performs the reverse of getBestZoomInVal, except it uses the relative pixel position of the cursor to calculate the zoom position that is targeted for smoothing
 	public int getBestZoomOutVal(int pixel,int numPixels,int cells,double targetZoomFrac) {
 		int zoomVal = (int) Math.round((double) cells * targetZoomFrac);
