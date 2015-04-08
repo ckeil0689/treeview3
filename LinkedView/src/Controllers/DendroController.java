@@ -654,16 +654,17 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			if (e.getSource() == dendroView.getXPlusButton()) {
+			/* 
+			 * TODO Adapt zoom methods in MapContainer to differentiate between
+			 * adding/ removing tiles on the opposite axis sides. 
+			 * Can reduce this button madness to something more compact later.
+			 */
+			if (e.getSource() == dendroView.getXRightPlusButton()) {
+				// Adds column on right side
 				getGlobalXMap().zoomIn();
 				//Doing this here because many times zoomIn is called successively for each dimension
 				dendroView.getGlobalView().updateAspectRatio();
-
-			} else if (e.getSource() == dendroView.getXMinusButton()) {
-				getGlobalXMap().zoomOut();
-				//Doing this here because many times zoomIn is called successively for each dimension
-				dendroView.getGlobalView().updateAspectRatio();
-
+				
 			} else if (e.getSource() == dendroView.getXYMinusButton()) {
 				getGlobalXMap().zoomOutCenter();
 				getGlobalYMap().zoomOutCenter();
@@ -671,16 +672,36 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			} else if (e.getSource() == dendroView.getXYPlusButton()) {
 				getGlobalXMap().zoomInCenter();
 				getGlobalYMap().zoomInCenter();
+				
+			} else if(e.getSource() == dendroView.getXLeftPlusButton()) {
+				// Add a column on the left side
+				
+			} else if (e.getSource() == dendroView.getXMinusRightButton()) {
+				// Removes column on right side
+				getGlobalXMap().zoomOut();
+				//Doing this here because many times zoomIn is called successively for each dimension
+				dendroView.getGlobalView().updateAspectRatio();
+				
+			} else if (e.getSource() == dendroView.getXMinusLeftButton()) {
+				// Remove column on left side
 
-			} else if (e.getSource() == dendroView.getYPlusButton()) {
+			} else if (e.getSource() == dendroView.getYPlusBottomButton()) {
+				// Adds a row to the bottom.
 				getGlobalYMap().zoomIn();
 				//Doing this here because many times zoomIn is called successively for each dimension
 				dendroView.getGlobalView().updateAspectRatio();
+				
+			} else if (e.getSource() == dendroView.getYPlusTopButton()) {
+				// Add row to top here
 
-			} else if (e.getSource() == dendroView.getYMinusButton()) {
+			} else if (e.getSource() == dendroView.getYMinusBottomButton()) {
+				// Removes row from bottom
 				getGlobalYMap().zoomOut();
 				//Doing this here because many times zoomIn is called successively for each dimension
 				dendroView.getGlobalView().updateAspectRatio();
+				
+			} else if (e.getSource() == dendroView.getYMinusTopButton()) {
+				// Remove row from top here
 
 			} else if (e.getSource() == dendroView.getHomeButton()) {
 				resetMapContainers();
@@ -956,13 +977,15 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	/**
 	 * The Zoom listener which allows the user to zoom into a selection.
 	 *
-	 * @author CKeil
-	 *
 	 */
 	private class ZoomListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
+			
+			/* TODO use ints instead of arrays. TreeSelection has a function
+			 * to get the number of selected indices.
+			 */
 			final int[] selectedGenes = geneSelection.getSelectedIndexes();
 			final int[] selectedArrays = arraySelection.getSelectedIndexes();
 			int mask = InputEvent.ALT_MASK;
@@ -1007,223 +1030,48 @@ public class DendroController implements ConfigNodePersistent, Observer {
 				//We will update the aspect ratio just in case it didn't happen automatically
 				dendroView.getGlobalView().updateAspectRatio();
 
+				/* Old code before animated zoom */
 				//zoomSelection();
 				//centerSelection();
 			}
-
-			// LogBuffer.println("globalXmap.getFirstVisible(): [" +
-			// globalXmap.getFirstVisible() + "] " +
-			// "globalXmap.getNumVisible(): [" + globalXmap.getNumVisible() +
-			// "].  " +
-			// "globalXmap.getScroll().getValue(): [" +
-			// globalXmap.getScroll().getValue() + "] " +
-			// "globalXmap.getScroll().getVisibleAmount(): [" +
-			// globalXmap.getScroll().getVisibleAmount() + "].");
-			// LogBuffer.println("globalYmap.getFirstVisible(): [" +
-			// globalYmap.getFirstVisible() + "] " +
-			// "globalYmap.getNumVisible(): [" + globalYmap.getNumVisible() +
-			// "].  " +
-			// "globalYmap.getScroll().getValue(): [" +
-			// globalYmap.getScroll().getValue() + "] " +
-			// "globalYmap.getScroll().getVisibleAmount(): [" +
-			// globalYmap.getScroll().getVisibleAmount() + "].");
 		}
 	}
 
 	/**'
-	 * TODO this should all be code inside MapContainer. This way it doesn't
-	 * have to be done twice and the zoom code can take advantage of the
-	 * inner state of each MapContainer object (globalXmap, globalYmap) - Chris
-	 * 
-	 * Uses the array- and geneSelection and currently available pixels on
-	 * screen retrieved from the MapContainer objects to calculate a new scale
-	 * and zoom in on it by working in conjunction with centerSelection().
+	 * Zooms MapContainers in on the user selected area.
 	 */
 	public void zoomSelection() {
-
-		double newScale = 0.0;
-		double newScale2 = 0.0;
-
-		// Declare the min number of spots to zoom in on for each dimension.
-		// We should set this as a preference in the future. -Rob
-		final double minZoomIndex = 1;
-		double minArrayZoomIndex = minZoomIndex;
-		double minGeneZoomIndex = minZoomIndex;
-		boolean centerEdgeSelections = false;
-
-		// Determine the boundaries of the data (so that we do not exceed them)
-		final double maxArrayIndex = globalXmap.getMaxIndex();
-		final double maxGeneIndex = globalYmap.getMaxIndex();
-
-		// Make sure our zoom limits have not exceeded the boundaries of the
-		// data (if the data matrix is really small)
-		if (maxArrayIndex < minArrayZoomIndex) {
-			minArrayZoomIndex = maxArrayIndex;
-		}
-		if (maxGeneIndex < minGeneZoomIndex) {
-			minGeneZoomIndex = maxGeneIndex;
-		}
-
-		// We'll allow the user to surpass the min zoom index when they are near
-		// the edge, so that
-		// their selection is centered on the screen, so let's get the edges of
-		// the selection
-		final double minSelectedArrayIndex = arraySelection.getMinIndex();
-		final double minSelectedGeneIndex = geneSelection.getMinIndex();
-
-		// Obtain the selection size of each dimension
-		double arrayIndexes = arraySelection.getMaxIndex()
-				- minSelectedArrayIndex + 1;
-		double geneIndexes = geneSelection.getMaxIndex() - minSelectedGeneIndex
-				+ 1;
-
-		// If the array selection is smaller than the minimum zoom level
-		if (arrayIndexes < minArrayZoomIndex) {
-
-			// If the center of the selection is less than half the distance to
-			// the near edge
-			if (centerEdgeSelections && (minSelectedArrayIndex + arrayIndexes / 2) < (minArrayZoomIndex / 2)) {
-				arrayIndexes = (minSelectedArrayIndex + arrayIndexes / 2) * 2;
-			}
-			// Else if the center of the selection is less than half the
-			// distance to the far edge
-			else if (centerEdgeSelections && (minSelectedArrayIndex + arrayIndexes / 2) > (maxArrayIndex - (minArrayZoomIndex / 2))) {
-				arrayIndexes = (maxArrayIndex - (minSelectedArrayIndex
-						+ arrayIndexes / 2 - 1)) * 2;
-			}
-			// Otherwise, set the standard minimum zoom
-			else {
-				arrayIndexes = minArrayZoomIndex;
-			}
-		}
-
-		// If the gene selection is smaller than the minimum zoom level
-		if (geneIndexes < minGeneZoomIndex) {
-
-			// If the center of the selection is less than half the distance to
-			// the near edge
-			if (centerEdgeSelections && (minSelectedGeneIndex + geneIndexes / 2) < (minGeneZoomIndex / 2)) {
-				geneIndexes = (minSelectedGeneIndex + geneIndexes / 2) * 2;
-			}
-			// Else if the center of the selection is less than half the
-			// distance to the far edge
-			else if (centerEdgeSelections && (minSelectedGeneIndex + geneIndexes / 2) > (maxGeneIndex - (minGeneZoomIndex / 2))) {
-				geneIndexes = (maxGeneIndex - (minSelectedGeneIndex
-						+ geneIndexes / 2 - 1)) * 2;
-			}
-			// Otherwise, set the standard minimum zoom
-			else {
-				geneIndexes = minGeneZoomIndex;
-			}
-		}
-
-		if (arrayIndexes > 0 && geneIndexes > 0) {
-			newScale = (globalXmap.getAvailablePixels()) / arrayIndexes;
-
-			// if (newScale < globalXmap.getMinScale()) {
-			// newScale = globalXmap.getMinScale();
-			// }
-			// Changed setScale to use numVisible, so I moved the call below
-			// where numVisible was changed
-			// globalXmap.setScale(newScale);
-
-			// LogBuffer.println("Setting numVisible for arrays to round of double ["
-			// + arrayIndexes + "].");
-
-			// Track explicitly manipulated visible area (instead of the visible
-			// area) as
-			// is manipulated via indirect actions (such as resizing the window)
-			final int numArrayIndexes = (int) Math.round(arrayIndexes);
-			globalXmap.setNumVisible(numArrayIndexes);
-
-			globalXmap.setScale(newScale);
-
-			globalXmap.notifyObservers();
-
-			newScale2 = (globalYmap.getAvailablePixels()) / geneIndexes;
-
-			// LogBuffer.println("Zooming. MinSelectedArrayIndex: [" +
-			// minSelectedArrayIndex + "] " +
-			// "MinSelectedGeneIndex: [" + minSelectedGeneIndex + "] " +
-			// "ArrayIndexesSelected: [" + arrayIndexes + "] " +
-			// "GeneIndexesSelected: [" + geneIndexes + "] " +
-			// "xscale: [" + newScale + "] " +
-			// "yscale: [" + newScale2 + "].");
-
-			// if (newScale2 < globalYmap.getMinScale()) {
-			// newScale2 = globalYmap.getMinScale();
-			// }
-			// Changed setScale to use numVisible, so I moved the call below
-			// where numVisible was changed
-			// globalYmap.setScale(newScale2);
-
-			// LogBuffer.println("Setting numVisible for genes to round of double ["
-			// + geneIndexes + "].");
-
-			// Track explicitly manipulated visible area (instead of the visible
-			// area) as
-			// is manipulated via indirect actions (such as resizing the window)
-			final int numGeneIndexes = (int) Math.round(geneIndexes);
-			globalYmap.setNumVisible(numGeneIndexes);
-
-			globalYmap.setScale(newScale2);
-
-			globalYmap.notifyObservers();
-		}
+		
+		final int minSelectedColIndex = arraySelection.getMinIndex();
+		final int minSelectedRowIndex = geneSelection.getMinIndex();
+		final int maxSelectedColIndex = arraySelection.getMaxIndex();
+		final int maxSelectedRowIndex = geneSelection.getMaxIndex();
+		
+		globalXmap.zoomToSelected(minSelectedColIndex, maxSelectedColIndex);
+		globalYmap.zoomToSelected(minSelectedRowIndex, maxSelectedRowIndex);
 
 		dendroView.getGlobalView().updateAspectRatio();
 		saveSettings();
 	}
 
 	/**
-	 * Scrolls to the center of the selected rectangle
+	 * Scrolls each MapContainer to the center of the selected rectangle.
 	 */
 	public void centerSelection() {
-
-		int scrollX;
-		int scrollY;
 
 		final int[] selectedGenes = geneSelection.getSelectedIndexes();
 		final int[] selectedArrays = arraySelection.getSelectedIndexes();
 
 		if (selectedGenes.length > 0 && selectedArrays.length > 0) {
 
-			final double endX = selectedArrays[selectedArrays.length - 1];
-			final double endY = selectedGenes[selectedGenes.length - 1];
+			final int endX = selectedArrays[selectedArrays.length - 1];
+			final int endY = selectedGenes[selectedGenes.length - 1];
 
-			final double startX = selectedArrays[0];
-			final double startY = selectedGenes[0];
-
-			scrollX = (int) Math.round((endX + startX) / 2);
-			scrollY = (int) Math.round((endY + startY) / 2);
-
-			// LogBuffer.println("Scrolling to selected indexes: [" + startX +
-			// "-" + endX + "," + startY + "-" + endY + "] with centers [" +
-			// scrollX + "," + scrollY + "].");
-			globalXmap.scrollToIndex(scrollX);
-			globalYmap.scrollToIndex(scrollY);
-
-			// Calculate the first visible data index in both dimensions
-			int firstX = 0;
-			while (firstX < globalXmap.getMaxIndex()
-					&& !globalXmap.isVisible(firstX)) {
-				firstX++;
-			}
-
-			int firstY = 0;
-			while (firstY < globalYmap.getMaxIndex()
-					&& !globalYmap.isVisible(firstY)) {
-				firstY++;
-			}
-
-			// Track explicitly manipulated visible area (instead of the visible
-			// area) as
-			// is manipulated via indirect actions (such as resizing the window)
-			globalXmap.setFirstVisible(firstX);
-			globalYmap.setFirstVisible(firstY);
-
-			globalXmap.notifyObservers();
-			globalYmap.notifyObservers();
+			final int startX = selectedArrays[0];
+			final int startY = selectedGenes[0];
+			
+			globalXmap.centerScrollOnSelection(startX, endX);
+			globalYmap.centerScrollOnSelection(startY, endY);
 		}
 	}
 
@@ -1245,8 +1093,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		double geneIndexes = globalYmap.getNumVisible();
 
 		if (arrayIndexes == 0 || geneIndexes == 0
-				|| (arrayIndexes == globalXmap.getMaxIndex() && geneIndexes == globalYmap
-				.getMaxIndex())) {
+				|| (arrayIndexes == globalXmap.getMaxIndex() 
+				&& geneIndexes == globalYmap.getMaxIndex())) {
 			// LogBuffer.println("No spots are visible. Resetting view.");
 			arrayIndexes = globalXmap.getMaxIndex() + 1;
 			geneIndexes = globalYmap.getMaxIndex() + 1;
@@ -2184,13 +2032,17 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		
 		/* Zoom-out buttons disabled if min scale for axis is reached. */
 		dendroView.getHomeButton().setEnabled(!(isXMin && isYMin));
-		dendroView.getYMinusButton().setEnabled(!isYMin);
-		dendroView.getXMinusButton().setEnabled(!isXMin);
+		dendroView.getYMinusBottomButton().setEnabled(!isYMin);
+		dendroView.getYMinusTopButton().setEnabled(!isYMin);
+		dendroView.getXMinusRightButton().setEnabled(!isXMin);
+		dendroView.getXMinusLeftButton().setEnabled(!isXMin);
 		dendroView.getXYMinusButton().setEnabled(!(isXMin && isYMin));
 		
 		/* Zoom-in buttons disabled if visible tile number for axis is 1 */
-		dendroView.getXPlusButton().setEnabled((xTilesVisible != 1));
-		dendroView.getYPlusButton().setEnabled((yTilesVisible != 1));
+		dendroView.getXRightPlusButton().setEnabled((xTilesVisible != 1));
+		dendroView.getYPlusBottomButton().setEnabled((yTilesVisible != 1));
+		dendroView.getXLeftPlusButton().setEnabled((xTilesVisible != 1));
+		dendroView.getYPlusTopButton().setEnabled((yTilesVisible != 1));
 		dendroView.getXYPlusButton().setEnabled((xTilesVisible != 1) 
 				|| (yTilesVisible != 1));
 		

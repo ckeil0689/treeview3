@@ -44,6 +44,9 @@ import edu.stanford.genetics.treeview.TreeDrawerNode;
  */
 public class MapContainer extends Observable implements Observer,
 		AdjustmentListener, ConfigNodePersistent {
+	
+	/* TODO should be int... related to calculation in zoomToSelected() */
+	private static final double MIN_TILE_NUM = 20.0;
 
 	private final String default_map = "Fixed";
 	private double default_scale = 1.0;
@@ -181,16 +184,31 @@ public class MapContainer extends Observable implements Observer,
 		final double divider = getMaxIndex() - getMinIndex() + 1;
 		return pixels / divider;
 	}
-
+	
 	/**
-	 * Method to zoom out of the MapContainer and set the scale for drawing
-	 * lower than before. It's important to take the range of genes displayed on
-	 * screen (range of scrollbar -> visibleAmount()) into account, as well as
-	 * the amount of available pixels on screen. Otherwise there will be drawing
-	 * and selection issues.
-	 *
-	 * @param double zoomVal
+	 * This method allows for a more intuitive call from other classes so
+	 * that the meaning is conveyed and parameters don't have to be understood
+	 * and set first.
+	 * TODO expand on this to implement adding/ removing tiles on either side
+	 * of the axis.
 	 */
+	public void zoomOut() {
+		
+		incrementalZoom(false);
+	}
+	
+	/**
+	 * This method allows for a more intuitive call from other classes so
+	 * that the meaning is conveyed and parameters don't have to be understood
+	 * and set first.
+	 * TODO expand on this to implement adding/ removing tiles on either side
+	 * of the axis.
+	 */
+	public void zoomIn() {
+		
+		incrementalZoom(true);
+	}
+	
 	//This is for gradually zooming away from the center of the currently displayed dots
 	public void zoomOutCenter() {
 
@@ -255,50 +273,60 @@ public class MapContainer extends Observable implements Observer,
 	}
 
 	/**
-	 * Method to zoom out of the MapContainer and set the scale for drawing
-	 * lower than before. It's important to take the range of genes displayed on
+	 * Method to zoom in the MapContainer and set the scale for drawing. 
+	 * It's important to take the range of elements displayed on
 	 * screen (range of scrollbar -> visibleAmount()) into account, as well as
 	 * the amount of available pixels on screen. Otherwise there will be drawing
 	 * and selection issues.
 	 *
-	 * @param double zoomVal
+	 * @param boolean zoomsIn Tells the method if it should zoom in or out.
 	 */
-	//This is for gradually zooming out from the top or left of the currently displayed dots
-	public void zoomOut() {
+	private void incrementalZoom(boolean zoomsIn) {
 
 		int zoomVal;
 		double newScale = getScale();
 
 		tileNumVisible = Math.round(getAvailablePixels() / getScale());
-		// LogBuffer.println("zoomOut: tileNumVisible has been set to [" +
-		// tileNumVisible + "].");
 
-		zoomVal = (int) Math.round(tileNumVisible / 20.0);
+		zoomVal = (int) Math.round(tileNumVisible / MIN_TILE_NUM);
 
 		// Ensure that at least one tile will be zoomed out.
 		if (zoomVal < 1) {
 			zoomVal = 1;
 		}
 
-		tileNumVisible = tileNumVisible + zoomVal;
-		if (tileNumVisible > (getMaxIndex() + 1)) {
-			tileNumVisible = getMaxIndex() + 1;
+		if(zoomsIn) {
+			tileNumVisible -= zoomVal;
+			if (tileNumVisible < 1) {
+				tileNumVisible = 1;
+			}
+		} else {
+			tileNumVisible += zoomVal;
+			if (tileNumVisible > (getMaxIndex() + 1)) {
+				tileNumVisible = getMaxIndex() + 1;
+			}
 		}
-		// LogBuffer.println("zoomOut: tileNumVisible has been set to [" +
-		// tileNumVisible + "].");
 
 		// Keep track of explicit changes, by the user, to the amount of
 		// visible data
 		numVisible = (int) tileNumVisible;
-		// LogBuffer.println("zoomOut: numVisible has been set to [" +
-		// numVisible + "].");
 
 		newScale = getAvailablePixels() / tileNumVisible;
 
-		final double myMinScale = getCalculatedMinScale();
-		if (newScale < myMinScale) {
-			newScale = myMinScale;
+		/* Take care of boundary cases */
+		final double limitScale;
+		if(zoomsIn) {
+			limitScale = getAvailablePixels();
+			if (newScale > limitScale) {
+				newScale = limitScale;
+			}
+		} else {
+			limitScale = getCalculatedMinScale();
+			if (newScale < limitScale) {
+				newScale = limitScale;
+			}
 		}
+		
 		setScale(newScale);
 
 		notifyObservers();
@@ -716,11 +744,6 @@ public class MapContainer extends Observable implements Observer,
 		return(targetPixel);
 	}
 
-
-
-
-
-
 	//This function does the reverse of zoomTowardPixel
 	//Some of the code is generalized in case it's ever called with a value out of range
 	public int zoomAwayPixel(int pixelPos,int customZoomVal) {
@@ -877,7 +900,7 @@ public class MapContainer extends Observable implements Observer,
 		//Sort the range of zoom values such that the target zoomVal is first, then +1, -1, +2, -2,...
 		//We're arbitrarily using the target zoom value to start out - the sort is just a heuristic anyway - doesn't really matter that much other than to prefer the target values
 		double minDiff = 1.0;
-		//LogBuffer.println("Creating array of size zoomMax - zoomMin + 2: [" + zoomMax + " - " + zoomMin + " + 2].");
+		//LogBuffer.println("Creating array 	of size zoomMax - zoomMin + 2: [" + zoomMax + " - " + zoomMin + " + 2].");
 		int[] zoomRange = new int[zoomMax - zoomMin + 2]; //2 was just to be on the safe side.
 		int i = 0;
 		for(int l = 0;l <= (zoomMax - zoomMin);l++) {
@@ -1013,51 +1036,106 @@ public class MapContainer extends Observable implements Observer,
 	}
 
 	/**
-	 * Method to zoom in to the MapContainer and set the scale for drawing
-	 * higher than before. It's important to take the range of genes displayed
-	 * on screen (range of scrollbar -> visibleAmount()) into account, as well
-	 * as the amount of available pixels on screen. Otherwise there will be
-	 * drawing and selection issues.
-	 *
-	 * @param double zoomVal
+	 * Zooms to the selected index range for this MapContainer. 
+	 * Uses the array- and geneSelection and currently available pixels on
+	 * screen retrieved from the MapContainer objects to calculate a new scale
+	 * and zoom in on it by working in conjunction with centerSelection().
+	 * 
+	 * @param selectedMin Minimum index of selected area.
+	 * @param selectedMax Maximum index of selected area.
 	 */
-	public void zoomIn() {
-
-		// final double maxScale = getAvailablePixels();
-		double newScale = getScale();
-		int zoomVal;
-
-		tileNumVisible = Math.round(getAvailablePixels() / getScale());
-		// LogBuffer.println("zoomIn: tileNumVisible has been set to [" +
-		// tileNumVisible + "].");
-
-		zoomVal = (int) Math.round(tileNumVisible / 20.0);
-
-		// Ensure that at least 2 tiles will be zoomed in (1 on each side of the current zoom dimension).
-		if (zoomVal < 1) {
-			zoomVal = 1;
-		}
-
-		tileNumVisible = tileNumVisible - zoomVal;
-		if (tileNumVisible < 1) {
-			tileNumVisible = 1;
-		}
-		// LogBuffer.println("zoomIn: tileNumVisible has been set to [" +
-		// tileNumVisible + "].");
-
-		// Keep track of explicit changes, by the user, to the amount of
-		// visible data
-		numVisible = (int) tileNumVisible;
+	public void zoomToSelected(final int selectedMin, final int selectedMax) {
 		
-		// Recalculating scale
-		newScale = getAvailablePixels() / tileNumVisible;
-
-		final double myMaxScale = getAvailablePixels();
-		if (newScale > myMaxScale) {
-			newScale = myMaxScale;
+		/* 
+		 * We'll allow the user to surpass the min zoom index when 
+		 * they are near the edge, so that their selection is centered 
+		 * on the screen, so let's get the edges of the selection.
+		 */
+	
+		/* Set an appropriate minimum tile number. */
+		double minTileNum = MIN_TILE_NUM;
+		
+		if(getMaxIndex() < MIN_TILE_NUM) {
+			minTileNum = getMaxIndex();
 		}
-		setScale(newScale);
+		
+		/* 
+		 * TODO Why double...Makes no logical sense. But if int there are 
+		 * calculation (precision/ rounding) errors. Should find out where 
+		 * that happens some time later...
+		 * */
+		double numSelected = selectedMax - selectedMin + 1;
+		
+		// If the gene selection is smaller than the minimum zoom level
+		if(numSelected < minTileNum) {
+			
+			// If the center of the selection is less than half the distance to
+			// the near edge
+			if ((selectedMin + numSelected / 2) < (minTileNum / 2)) {
+				numSelected = (selectedMin + numSelected / 2) * 2;
+			}
+			// Else if the center of the selection is less than half the
+			// distance to the far edge
+			else if ((selectedMin + numSelected / 2) > (getMaxIndex() 
+					- (minTileNum / 2))) {
+				numSelected = (getMaxIndex() - (selectedMin 
+						+ numSelected / 2 - 1)) * 2;
+			}
+			// Otherwise, set the standard minimum zoom
+			else {
+				numSelected = minTileNum;
+			}
+		}
+		
+		if(numSelected > 0) {
+			double newScale = getAvailablePixels() / numSelected;
+			
+			// Track explicitly manipulated visible area (instead of the visible
+			// area) as
+			// is manipulated via indirect actions (such as resizing the window)
+			final int numArrayIndexes = (int) Math.round(numSelected);
+			setNumVisible(numArrayIndexes);
 
+			setScale(newScale);
+
+			/* 
+			 * TODO move this outside to avoid multiple calls? center and zoom 
+			 * are usually called together... 
+			 */
+			notifyObservers();
+		}
+	}
+	
+	public void centerScrollOnSelection(final int startIndex, 
+			final int endIndex) {
+		
+		int scrollVal = (int) Math.round((endIndex + startIndex) / 2.0);;
+		
+		scrollToIndex(scrollVal);
+		
+		int firstX = 0;
+		while (firstX < getMaxIndex() && !isVisible(firstX)) {
+			firstX++;
+		}
+		
+		setFirstVisible(firstX);
+		
+		/* 
+		 * TODO move this outside to avoid multiple calls? center and zoom 
+		 * are usually called together... 
+		 */
+		notifyObservers();
+	}
+	
+	/**
+	 * Checks how many tiles are visible and uses the current available pixels
+	 * to adjust the tile scale to the screen size.
+	 */
+	public void adjustScaleToScreen() {
+		
+		double newScale = getAvailablePixels() / numVisible;
+		setScale(newScale);
+		
 		notifyObservers();
 	}
 

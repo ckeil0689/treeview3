@@ -13,7 +13,7 @@ public class StringRes {
 
 	/* Global Application Fields */
 	/** Version of application */
-	public final static String versionTag = "3.0alpha";
+	public final static String versionTag = "3.0alpha02";
 
 	/** Homepage for updates */
 	public final static String updateUrl = "https://www.princeton.edu/"

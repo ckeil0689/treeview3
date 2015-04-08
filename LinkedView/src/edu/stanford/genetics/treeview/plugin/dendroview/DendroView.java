@@ -128,11 +128,18 @@ public class DendroView implements Observer, DendroPanel {
 	/* JButtons for scaling the matrix */
 	/* TODO should be controlled in a GlobalViewController...when it exists */
 	private JButton zoomBtn;
-	private JButton scaleIncX;
-	private JButton scaleIncY;
+	
+	private JButton scaleAddRightX;
+	private JButton scaleAddBottomY;
+	private JButton scaleAddLeftX;
+	private JButton scaleAddTopY;
+	
+	private JButton scaleRemoveRightX;
+	private JButton scaleRemoveBottomY;
+	private JButton scaleRemoveLeftX;
+	private JButton scaleRemoveTopY;
+	
 	private JButton scaleIncXY;
-	private JButton scaleDecX;
-	private JButton scaleDecY;
 	private JButton scaleDecXY;
 	private JButton scaleDefaultAll;
 
@@ -259,7 +266,6 @@ public class DendroView implements Observer, DendroPanel {
 	}
 
 	/**
-<<<<<<< HEAD
 	 * Setup the search panel which contains tow editable JComboBoxes containing
 	 * all labels for each axis.
 	 *
@@ -277,9 +283,9 @@ public class DendroView implements Observer, DendroPanel {
 				+ "(complex V), etc...";
 		searchPanel.setToolTipText(tooltip);
 
-		searchPanel.add(rowFinderBox.getSearchTermBox(), "pushx, w 180::, "
+		searchPanel.add(rowFinderBox.getSearchTermBox(), "pushx, w 50::, "
 				+ "span, wrap");
-		searchPanel.add(colFinderBox.getSearchTermBox(), "pushx, w 180::, "
+		searchPanel.add(colFinderBox.getSearchTermBox(), "pushx, w 50::, "
 				+ "span, wrap");
 
 		searchPanel.revalidate();
@@ -287,8 +293,6 @@ public class DendroView implements Observer, DendroPanel {
 	}
 
 	/**
-=======
->>>>>>> ui_update
 	 * Initializes the objects associated with label search. These are the
 	 * JComboBoxes containing all the label names as well as the buttons on that
 	 * panel.
@@ -317,8 +321,10 @@ public class DendroView implements Observer, DendroPanel {
 		/* Panels for layout setup */
 		JPanel globalOverviewPanel;
 		JPanel crossPanel;
-		JPanel zoomXPanel;
-		JPanel zoomYPanel;
+		JPanel zoomXRightPanel;
+		JPanel zoomYBottomPanel;
+		JPanel zoomXLeftPanel;
+		JPanel zoomYTopPanel;
 		JPanel rowLabelPanel;
 		JPanel colLabelPanel;
 		JPanel columnNavPanel;
@@ -332,18 +338,19 @@ public class DendroView implements Observer, DendroPanel {
 		
 		crossPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 
-
-
 		navContainer = GUIFactory.createJPanel(false,
-				GUIFactory.NO_PADDING);
+				GUIFactory.DEFAULT);
 //		navContainer.setLayout(new MigLayout("debug"));
 
 		bottomPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 
 		columnNavPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
 		rowNavPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
-		zoomXPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
-		zoomYPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		
+		zoomXRightPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		zoomYBottomPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		zoomXLeftPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		zoomYTopPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
 
 		rowLabelPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
 		colLabelPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
@@ -363,7 +370,7 @@ public class DendroView implements Observer, DendroPanel {
 			rowDataPane.setDividerLocation(oldRowDiv);
 		} else {
 			rowDataPane.setDividerLocation(0.0);
-			rowDataPane.setEnabled(false);
+//			rowDataPane.setEnabled(false);
 		}
 
 		colDataPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, colTreeView,
@@ -381,7 +388,7 @@ public class DendroView implements Observer, DendroPanel {
 			colDataPane.setDividerLocation(oldColDiv);
 		} else {
 			colDataPane.setDividerLocation(0.0);
-			colDataPane.setEnabled(false);
+//			colDataPane.setEnabled(false);
 		}
 
 		/* If trees in general are disabled */
@@ -397,90 +404,113 @@ public class DendroView implements Observer, DendroPanel {
 		rowLabelPanel.add(rowLabelView.getComponent(), "push, grow");
 		colLabelPanel.add(colLabelView.getComponent(), "push, grow");
 		
-		zoomXPanel.add(scaleDecX);
-		zoomXPanel.add(scaleIncX);
+		zoomXRightPanel.add(scaleRemoveRightX);
+		zoomXRightPanel.add(scaleAddRightX);
 		
-		zoomYPanel.add(scaleDecY, "wrap");
-		zoomYPanel.add(scaleIncY);
+		zoomYBottomPanel.add(scaleRemoveBottomY, "wrap");
+		zoomYBottomPanel.add(scaleAddBottomY);
+		
+		zoomXLeftPanel.add(scaleAddLeftX);
+		zoomXLeftPanel.add(scaleRemoveLeftX);
+		
+		zoomYTopPanel.add(scaleAddTopY, "wrap");
+		zoomYTopPanel.add(scaleRemoveTopY);
 				
 		crossPanel.add(scaleDecXY);
 		crossPanel.add(zoomBtn);
 		crossPanel.add(scaleIncXY, "wrap");
 		crossPanel.add(scaleDefaultAll, "span, pushx, alignx 50%");
 
-		navContainer.add(searchPanel, "push, alignx 50%, aligny 0%, wrap");
-		navContainer.add(crossPanel, "push, alignx 50%, wrap");
-		navContainer.add(dataTicker.getTickerPanel(), "pushx, grow, w 95%, "
-				+ "h 25%, wrap");
+		navContainer.add(searchPanel, "pushx, alignx 50%, aligny 0%, h 50%, "
+				+ "wrap");
+		navContainer.add(crossPanel, "pushx, alignx 50%, wrap");
+		navContainer.add(dataTicker.getTickerPanel(), "pushx, growy, "
+				+ "wrap");
 		
 		/* Add the scrollbars (outside of LabelViews) */
 		final JScrollBar colLabelScroll = colLabelView.getScrollBar();
 		final JScrollBar rowLabelScroll = rowLabelView.getScrollBar();
 		
 		/* Panels for scrollbars and axis-zoom buttons */
+		columnNavPanel.add(zoomXLeftPanel);
 		columnNavPanel.add(matrixXscrollbar, "growx, pushx");
-		columnNavPanel.add(zoomXPanel);
+		columnNavPanel.add(zoomXRightPanel);
 		
+		rowNavPanel.add(zoomYTopPanel, "wrap");
 		rowNavPanel.add(matrixYscrollbar, "growy, pushy, wrap");
-		rowNavPanel.add(zoomYPanel);
+		rowNavPanel.add(zoomYBottomPanel);
 		
 		
 		/* Adding elements to the main JPanel */
-		dendroPane.add(globalOverviewPanel, "w 13%, h 19%");
+		dendroPane.add(globalOverviewPanel, "w 10%, h 19%");
 
 		/* Column tree view */
-		dendroPane.add(colDataPane, "w 73%, h 19%!");
+		dendroPane.add(colDataPane, "w 75%, h 19%!");
 		dendroPane.add(colLabelScroll, "h 19%!");
 
 		/* Navigation panel */
-		dendroPane.add(navContainer, "span 1 3, w 200:13%:, h 100%, wrap");
+		dendroPane.add(navContainer, "span 1 3, w 220:10%:, h 100%, wrap");
 
 		/* Row tree view */
-		dendroPane.add(rowDataPane, "w 200:13%:, h 79%");
+		dendroPane.add(rowDataPane, "w 200:10%:, h 79%");
 		
 		/* Matrix view */
-		dendroPane.add(globalview, "w 73%, h 79%, grow, push");
+		dendroPane.add(globalview, "w 75%, h 79%, grow, push");
 		dendroPane.add(rowNavPanel, "growy, w 1%, h 95%, wrap");
 		
 		dendroPane.add(rowLabelScroll, "w 13%, h 1%");
 		
-		dendroPane.add(columnNavPanel, "growx, w 73%, h 1%, wrap");
+		dendroPane.add(columnNavPanel, "growx, w 75%, h 1%, wrap");
 
 		/* Bottom panel for spacing */
-		dendroPane.add(bottomPanel, "span, w 87.5%, h 1%");
+		dendroPane.add(bottomPanel, "span, h 1%");
 				
 		dendroPane.revalidate();
 		dendroPane.repaint();
 	}
 
-	/* Sets up the buttons which control scaling and zooming */
+	/** 
+	 * Sets up the buttons which control scaling and zooming 
+	 */
 	private void setupScaleButtons() {
 
 		scaleDefaultAll = GUIFactory.createIconBtn(StringRes.icon_home);
 		scaleDefaultAll.setToolTipText("Reset the zoomed view");
 
-		scaleIncX = GUIFactory.createSquareBtn("+", 20);
-				//GUIFactory.createIconBtn(StringRes.icon_zoomIn);
-		scaleIncX.setToolTipText(StringRes.tt_xZoomIn);
+		/* Scale x-axis */
+		scaleAddRightX = GUIFactory.createSquareBtn("+", 20);
+		scaleAddRightX.setToolTipText(StringRes.tt_xZoomIn);
+		
+		scaleRemoveRightX = GUIFactory.createSquareBtn("-", 20);
+		scaleRemoveRightX.setToolTipText(StringRes.tt_xZoomOut);
+		
+		scaleAddLeftX = GUIFactory.createSquareBtn("+", 20);
+		scaleAddLeftX.setToolTipText(StringRes.tt_xZoomIn);
+		
+		scaleRemoveLeftX = GUIFactory.createSquareBtn("-", 20);
+		scaleRemoveLeftX.setToolTipText(StringRes.tt_xZoomOut);
 
+		/* Scale y-axis */
+		scaleAddBottomY = GUIFactory.createSquareBtn("+", 20);
+		scaleAddBottomY.setToolTipText(StringRes.tt_yZoomIn);
+		
+		scaleRemoveBottomY = GUIFactory.createSquareBtn("-", 20);
+		scaleRemoveBottomY.setToolTipText(StringRes.tt_yZoomOut);
+		
+		scaleAddTopY = GUIFactory.createSquareBtn("+", 20);
+		scaleAddTopY.setToolTipText(StringRes.tt_yZoomIn);
+		
+		scaleRemoveTopY = GUIFactory.createSquareBtn("-", 20);
+		scaleRemoveTopY.setToolTipText(StringRes.tt_yZoomOut);
+
+		/* Scale both axes */
 		scaleIncXY = GUIFactory.createIconBtn(StringRes.icon_fullZoomIn);
 		scaleIncXY.setToolTipText(StringRes.tt_xyZoomIn);
-
-		scaleDecX = GUIFactory.createSquareBtn("-", 20);
-				//GUIFactory.createIconBtn(StringRes.icon_zoomOut);
-		scaleDecX.setToolTipText(StringRes.tt_xZoomOut);
-
-		scaleIncY = GUIFactory.createSquareBtn("+", 20);
-				//GUIFactory.createIconBtn(StringRes.icon_zoomIn);
-		scaleIncY.setToolTipText(StringRes.tt_yZoomIn);
-
+		
 		scaleDecXY = GUIFactory.createIconBtn(StringRes.icon_fullZoomOut);
 		scaleDecXY.setToolTipText(StringRes.tt_xyZoomOut);
 
-		scaleDecY = GUIFactory.createSquareBtn("-", 20);
-				//GUIFactory.createIconBtn(StringRes.icon_zoomOut);
-		scaleDecY.setToolTipText(StringRes.tt_yZoomOut);
-
+		/* Reset zoom */
 		zoomBtn = GUIFactory.createIconBtn(StringRes.icon_zoomAll);
 		zoomBtn.setToolTipText(StringRes.tt_home);
 	}
@@ -545,11 +575,17 @@ public class DendroView implements Observer, DendroPanel {
 	 */
 	public void addScaleListeners(final ActionListener l) {
 
-		scaleIncX.addActionListener(l);
+		scaleAddRightX.addActionListener(l);
+		scaleRemoveRightX.addActionListener(l);
+		scaleAddBottomY.addActionListener(l);
+		scaleRemoveBottomY.addActionListener(l);
+		
+		scaleAddLeftX.addActionListener(l);
+		scaleRemoveLeftX.addActionListener(l);
+		scaleAddTopY.addActionListener(l);
+		scaleRemoveTopY.addActionListener(l);
+		
 		scaleIncXY.addActionListener(l);
-		scaleDecX.addActionListener(l);
-		scaleIncY.addActionListener(l);
-		scaleDecY.addActionListener(l);
 		scaleDecXY.addActionListener(l);
 		scaleDefaultAll.addActionListener(l);
 	}
@@ -1190,29 +1226,49 @@ public class DendroView implements Observer, DendroPanel {
 	}
 
 	// Getters
-	public JButton getXPlusButton() {
+	public JButton getXLeftPlusButton() {
 
-		return scaleIncX;
+		return scaleAddLeftX;
+	}
+	
+	public JButton getXRightPlusButton() {
+
+		return scaleAddRightX;
 	}
 
 	public JButton getXYPlusButton() {
 
 		return scaleIncXY;
 	}
+	
+	public JButton getXMinusLeftButton() {
 
-	public JButton getXMinusButton() {
-
-		return scaleDecX;
+		return scaleRemoveLeftX;
 	}
 
-	public JButton getYPlusButton() {
+	public JButton getXMinusRightButton() {
 
-		return scaleIncY;
+		return scaleRemoveRightX;
+	}
+	
+	public JButton getYPlusTopButton() {
+
+		return scaleAddTopY;
 	}
 
-	public JButton getYMinusButton() {
+	public JButton getYPlusBottomButton() {
 
-		return scaleDecY;
+		return scaleAddBottomY;
+	}
+	
+	public JButton getYMinusTopButton() {
+
+		return scaleRemoveTopY;
+	}
+
+	public JButton getYMinusBottomButton() {
+
+		return scaleRemoveBottomY;
 	}
 
 	public JButton getXYMinusButton() {
