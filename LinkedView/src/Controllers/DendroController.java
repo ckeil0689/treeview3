@@ -610,7 +610,9 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		public void actionPerformed(final ActionEvent arg0) {
 			
 			resetMatrixViews();
-			dendroView.getInteractiveMatrixView().updateAspectRatio();
+			dendroView.getInteractiveMatrixView().setAspectRatio(
+					interactiveXmap.getMaxIndex() + 1,
+					interactiveYmap.getMaxIndex() + 1);
 		}
 	}
 
@@ -634,7 +636,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			if (e.getSource() == dendroView.getXRightPlusButton()) {
 				// Adds column on right side
 				interactiveXmap.zoomIn();
-				//Doing this here because many times zoomIn is called successively for each dimension
+				//Doing this here because many times zoomIn is called
+				//successively for each dimension
 				dendroView.getInteractiveMatrixView().updateAspectRatio();
 				
 			} else if (e.getSource() == dendroView.getXYMinusButton()) {
@@ -651,7 +654,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			} else if (e.getSource() == dendroView.getXMinusRightButton()) {
 				// Removes column on right side
 				getInteractiveXMap().zoomOut();
-				//Doing this here because many times zoomIn is called successively for each dimension
+				//Doing this here because many times zoomIn is called
+				//successively for each dimension
 				dendroView.getInteractiveMatrixView().updateAspectRatio();
 				
 			} else if (e.getSource() == dendroView.getXMinusLeftButton()) {
@@ -661,7 +665,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			} else if (e.getSource() == dendroView.getYPlusBottomButton()) {
 				// Adds a row to the bottom.
 				getInteractiveYMap().zoomIn();
-				//Doing this here because many times zoomIn is called successively for each dimension
+				//Doing this here because many times zoomIn is called
+				//successively for each dimension
 				dendroView.getInteractiveMatrixView().updateAspectRatio();
 				
 			} else if (e.getSource() == dendroView.getYPlusTopButton()) {
@@ -670,7 +675,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			} else if (e.getSource() == dendroView.getYMinusBottomButton()) {
 				// Removes row from bottom
 				getInteractiveYMap().zoomOut();
-				//Doing this here because many times zoomIn is called successively for each dimension
+				//Doing this here because many times zoomIn is called
+				//successively for each dimension
 				dendroView.getInteractiveMatrixView().updateAspectRatio();
 				
 			} else if (e.getSource() == dendroView.getYMinusTopButton()) {
@@ -692,7 +698,9 @@ public class DendroController implements ConfigNodePersistent, Observer {
 							prevYNumVisible == interactiveYmap.getNumVisible()) {
 //						resetMapContainers();
 						resetMatrixViews();
-						dendroView.getInteractiveMatrixView().updateAspectRatio();
+						dendroView.getInteractiveMatrixView().setAspectRatio(
+								interactiveXmap.getMaxIndex() + 1,
+								interactiveYmap.getMaxIndex() + 1);
 					}
 				}
 				else {
@@ -730,7 +738,9 @@ public class DendroController implements ConfigNodePersistent, Observer {
 						}
 					}
 					//We will update the aspect ratio just in case it didn't happen automatically
-					dendroView.getInteractiveMatrixView().updateAspectRatio();
+					dendroView.getInteractiveMatrixView().setAspectRatio(
+							interactiveXmap.getMaxIndex() + 1,
+							interactiveYmap.getMaxIndex() + 1);
 				}
 				
 				//resetMapContainers();
@@ -1146,7 +1156,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	 */
 	private void reZoomVisible() {
 		
-		LogBuffer.println("Rezooming visible");
+		//LogBuffer.println("Rezooming visible");
 
 		double newScale = 0.0;
 		double newScale2 = 0.0;
@@ -1163,7 +1173,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			arrayIndexes = interactiveXmap.getMaxIndex() + 1;
 			geneIndexes = interactiveYmap.getMaxIndex() + 1;
 			
-			LogBuffer.println("ReZoom setting zoom to default");
+			//LogBuffer.println("ReZoom setting zoom to default");
 			resetMatrixViews();
 			
 		} else {

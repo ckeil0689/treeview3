@@ -45,8 +45,12 @@ import edu.stanford.genetics.treeview.TreeDrawerNode;
 public class MapContainer extends Observable implements Observer,
 		AdjustmentListener, ConfigNodePersistent {
 	
-	/* TODO should be int... related to calculation in zoomToSelected() */
-	private static final double MIN_TILE_NUM = 20.0;
+	/* TODO Should remove MIN_TILE_NUM as per the discussion on bitbucket issue
+	 * #65. Besides, should be an int and it should prevent zooming past it
+	 * instead of bouncing back as it is currently doing... related to
+	 * calculation in zoomToSelected() */
+	private static final double MIN_TILE_NUM = 1.0;
+	private static final double ZOOM_INCREMENT = 0.05;
 
 	private final String default_map = "Fixed";
 	private double default_scale = 1.0;
@@ -288,7 +292,11 @@ public class MapContainer extends Observable implements Observer,
 
 		tileNumVisible = Math.round(getAvailablePixels() / getScale());
 
-		zoomVal = (int) Math.round(tileNumVisible / MIN_TILE_NUM);
+		//Changed the zoom percentage to be based on a percentage instead of on
+		//the minimum number of tiles to display, as this causes a problem with
+		//the zoom buttons when you want zoomToSelection to be able to zoom to a
+		//single cell (i.e. MIN_TILE_NUM = 1)
+		zoomVal = (int) Math.round((double) tileNumVisible * ZOOM_INCREMENT);
 
 		// Ensure that at least one tile will be zoomed out.
 		if (zoomVal < 1) {
@@ -513,7 +521,7 @@ public class MapContainer extends Observable implements Observer,
 		int zoomVal;
 		int pxAvail = getAvailablePixels();
 		tileNumVisible = Math.round(pxAvail / newScale);
-		double targetZoomFrac = 0.05; //5% zoom increment
+		double targetZoomFrac = ZOOM_INCREMENT;
 
 		//This is a test of selecting the best zoom value using the getBestZoomVal method (called from outside of this class)
 		if(customZoomVal >= 0) {
@@ -621,20 +629,36 @@ public class MapContainer extends Observable implements Observer,
 		int numPixelsOffsetOfSelec = pixelIndexOfSelec;
 		int numTotalPixels = getAvailablePixels() + 1;   //getAvailablePixels actually is returning the max pixel index (starting from 0)
 		
-		//numTotalPixels SHOULD be a count of pixels (i.e. starting from 1), but apparently it's actually the index of the last pixel!
-		if(pixelIndexOfSelec < 0 && (pixelIndexOfSelec + numPixelsOfSelec) >= numTotalPixels) {
-			//I should be able to use the code below for this calculation, but that currently doesn't work and
-			//for right now, I'm debugging other code and need a quick approximate value returned here.
-			return((int) Math.round((double) numTotalPixels / 2.0));
+		//numTotalPixels SHOULD be a count of pixels (i.e. starting from 1)
+		//if(pixelIndexOfSelec < 0 && (pixelIndexOfSelec + numPixelsOfSelec) > numTotalPixels) {
+		//	//I should be able to use the code below for this calculation, but that currently doesn't work and
+		//	//for right now, I'm debugging other code and need a quick approximate value returned here.
+		//	return((int) Math.round((double) numTotalPixels / 2.0));
+		//} else
+		//If any of the selected area is above/before the visible area
+		//if((pixelIndexOfSelec + numPixelsOfSelec) < 0) {
+		if(pixelIndexOfSelec < 0 && (pixelIndexOfSelec + numPixelsOfSelec) < numTotalPixels) {
+			//LogBuffer.println("Start Pixel: [" + pixelIndexOfSelec + "] and end pixel: [" + pixelIndexOfSelec + " + " + numTotalPixels + "] of selection is out of range/less than 0.");
+			//If zooming out, return the furthest pixel, otherwise return the closest pixel
+			if(numPixelsOfSelec > numTotalPixels) {
+				//LogBuffer.println("Returning Target pixel: [" + (numTotalPixels - 1) + "].");
+				return(numTotalPixels - 1);
+			} else {
+				//LogBuffer.println("Returning Target pixel: [0].");
+				return(0);
+			}
 		}
-		//If all or part of the selected area is above/before the visible area
-		else if(pixelIndexOfSelec < 0 && (pixelIndexOfSelec + numPixelsOfSelec) < numTotalPixels) {
-			//LogBuffer.println("Error: start Pixel: [" + pixelIndexOfSelec + "] or end pixel: [" + pixelIndexOfSelec + " + " + numTotalPixels + "] of selection is out of range: [0 to (" + numTotalPixels + " - 1)].");
-			return(0);
-		}
-		//If all or part of the selected area is below/after the visible area
-		else if((pixelIndexOfSelec + numPixelsOfSelec) >= numTotalPixels) {
-			return(numTotalPixels - 1);
+		//If any of the selected area is below/after the visible area, return the first pixel so that
+		else if((pixelIndexOfSelec + numPixelsOfSelec) > numTotalPixels && pixelIndexOfSelec > numPixelsOfSelec) {
+			//LogBuffer.println("Start Pixel: [" + pixelIndexOfSelec + "] and end pixel: [" + pixelIndexOfSelec + " + " + numTotalPixels + "] of selection is out of range/greater than the number of pixels that are in the display.");
+			//If zooming out, return the furthest pixel, otherwise return the closest pixel
+			if(numPixelsOfSelec > numTotalPixels) {
+				//LogBuffer.println("Returning Target pixel: [0].");
+				return(0);
+			} else {
+				//LogBuffer.println("Returning Target pixel: [" + (numTotalPixels - 1) + "].");
+				return(numTotalPixels - 1);
+			}
 		}
 
 		//The following equation is based on the merging of 2 equations and then solving for targetPixel
@@ -652,8 +676,10 @@ public class MapContainer extends Observable implements Observer,
 		//the solution turns out to need a slight adjustment because it is on the outside of the selected area.
 		//I'm not sure why, but the difference with the offset just needs to be added to the offset.
 		if(targetPixel < 0) {
+			//LogBuffer.println("Negating Target pixel: [" + targetPixel + "].");
 			targetPixel = Math.abs(targetPixel);
 		} else {
+			//LogBuffer.println("Adjusting Target pixel by offset: [" + targetPixel + "].");
 			targetPixel = numPixelsOffsetOfSelec + Math.abs(numPixelsOffsetOfSelec-targetPixel);
 		}
 		
@@ -661,83 +687,11 @@ public class MapContainer extends Observable implements Observer,
 		targetPixel--;
 		
 		if(targetPixel < 0 || targetPixel >= numTotalPixels) {
-			LogBuffer.println("Error: target Pixel is out of range: [" + targetPixel + "]");
+			//LogBuffer.println("Error: target Pixel is out of range: [" + targetPixel + "]");
 			targetPixel = 0;
 		}
 		
-		return(targetPixel);
-	}
-
-	//This function returns a pixel to zoom toward that represents the same percentage  relative distance from the start of the selection as from the start of the vurrent visible area
-	//The purpose is to zoom toward that spot and end up with the selected area filling the view
-	//Note, if the target pixel should be outside of the visible area, the nearest bound of the visible area is returned.  It is up to the calling function to scroll to the selection.
-	public int getZoomTowardPixelOfSelectionUniversal(int pixelIndexOfSelec,int numPixelsOfSelec) {
-		int imaginaryPixelIndexOfSelec = pixelIndexOfSelec;
-		int imaginaryPixelIndexOfView = 0; //This is true when fully zoomed out
-		int imaginaryNumTotalPixels = (int) Math.round((getMaxIndex() + 1) * getScale());
-		int numPixelsOfView = getAvailablePixels() + 1;   //getAvailablePixels actually is returning the max pixel index (starting from 0)
-		int targetPixel;
-		int adjust = getPixel(0);  //Assuming this will return a negative number when zoomed into a spot other than the beginning
-		//LogBuffer.println("Pixel for data index 0: [" + adjust + "].");
-		imaginaryPixelIndexOfSelec -= adjust;
-		imaginaryPixelIndexOfView = Math.abs(adjust);
-
-		int numPixelsOffsetOfSelec = imaginaryPixelIndexOfSelec - imaginaryPixelIndexOfView;
-		//LogBuffer.println("UNIVERSAL: numPixelsOffsetOfSelec = imaginaryPixelIndexOfSelec - imaginaryPixelIndexOfView");
-		//LogBuffer.println("UNIVERSAL: " + numPixelsOffsetOfSelec + " = " + imaginaryPixelIndexOfSelec + " - " + imaginaryPixelIndexOfView);
-		//LogBuffer.println("UNIVERSAL: Why isn't that the same as pixelIndexOfSelec: [" + pixelIndexOfSelec + "]?");
-
-		//If we are zooming in (or not zooming at all)
-		if(numPixelsOfSelec <= numPixelsOfView) {
-			targetPixel = (int) Math.round((double) numPixelsOfView * (double) numPixelsOffsetOfSelec / ((double) numPixelsOfSelec - (double) numPixelsOfView));
-			//LogBuffer.println("UNIVERSAL (adjust): targetPixel = numPixelsOfView * numPixelsOffsetOfSelec / (numPixelsOfSelec - numPixelsOfView)");
-			//LogBuffer.println("UNIVERSAL (" + adjust + "): " + targetPixel + " = " + numPixelsOfView + " * " + numPixelsOffsetOfSelec + " / (" + numPixelsOfSelec + " - " + numPixelsOfView + ")");
-			if(targetPixel < 0) {
-				targetPixel = Math.abs(targetPixel);
-			} else {
-				targetPixel = numPixelsOffsetOfSelec + Math.abs(numPixelsOffsetOfSelec-targetPixel);
-			}
-		} else {
-			//If we are zoomed in inside the selection
-			if(numPixelsOffsetOfSelec < 0 && (numPixelsOffsetOfSelec + numPixelsOfSelec) > (firstVisible + numVisible)) {
-				targetPixel = (int) Math.round((double) numPixelsOfSelec * (double) numPixelsOffsetOfSelec / ((double) numPixelsOfView - (double) numPixelsOfSelec));
-				//LogBuffer.println("UNIVERSAL (adjust): targetPixel = numPixelsOfSelec * numPixelsOffsetOfSelec / (numPixelsOfView - numPixelsOfSelec)");
-				//LogBuffer.println("UNIVERSAL (" + adjust + "): " + targetPixel + " = " + numPixelsOfSelec + " * " + numPixelsOffsetOfSelec + " / (" + numPixelsOfView + " - " + numPixelsOfSelec + ")");
-			
-				//The target pixel is currently in terms of the imaginary selected pixels  I need to convert it to the smaller view pixels
-				targetPixel = (int) Math.round((double) numPixelsOfView * ((double) targetPixel / (double) numPixelsOfSelec));
-				//LogBuffer.println("UNIVERSAL (adjust): targetPixel = numPixelsOfView * (targetPixel / numPixelsOfSelec");
-				//LogBuffer.println("UNIVERSAL (" + adjust + "): " + targetPixel + " = " + numPixelsOfView + " * (" + targetPixel + " / " + numPixelsOfSelec + ")");
-
-				if(targetPixel < 0) {
-					targetPixel = Math.abs(targetPixel);
-				} else {
-					targetPixel = numPixelsOffsetOfSelec + Math.abs(numPixelsOffsetOfSelec-targetPixel);
-				}
-			}
-			//Else if we are zoomed in left of or above the selection
-			else if(numPixelsOffsetOfSelec < 0) {
-				targetPixel = 1;
-			}
-			//Else we are zoomed in right of or below the selection
-			else {
-				targetPixel = numPixelsOfView;
-			}
-		}
-		
-		//I think this might be erroneous - at least for some of the calculation contexts
-		//Now let's put the pixel coordinate back into the real realm
-		//targetPixel -= adjust;
-	
-		//Decrement because pixels are indexed from 0 and the equation above assumes indexing from 1
-		targetPixel--;
-		
-		if(targetPixel < 0) {
-			targetPixel = 0;
-		} else if(targetPixel >= numPixelsOfView) {
-			targetPixel = numPixelsOfView - 1;
-		}
-		
+		//LogBuffer.println("Returning Target pixel: [" + targetPixel + "].");
 		return(targetPixel);
 	}
 
@@ -757,7 +711,7 @@ public class MapContainer extends Observable implements Observer,
 		int zoomVal;
 		int pxAvail = getAvailablePixels();
 		tileNumVisible = Math.round(pxAvail / newScale);
-		double targetZoomFrac = 0.05; //5% zoom increment
+		double targetZoomFrac = ZOOM_INCREMENT;
 
 		//This is a test of selecting the best zoom value using the getBestZoomVal method (called from outside of this class)
 		if(customZoomVal >= 0) {

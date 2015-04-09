@@ -925,14 +925,12 @@ MouseWheelListener {
 		double pixelsPerXIndex = xmap.getScale();
 		int numSelectedXPixels = (int) Math.round((double) numXSelectedIndexes * pixelsPerXIndex);
 		//int xPxPos = xmap.getZoomTowardPixelOfSelection(startXPixel,numSelectedXPixels);
-		int xPxPos = xmap.getZoomTowardPixelOfSelectionUniversal(startXPixel,numSelectedXPixels);
-		xmap.getZoomTowardPixelOfSelection(startXPixel,numSelectedXPixels);
+		int xPxPos = xmap.getZoomTowardPixelOfSelection(startXPixel,numSelectedXPixels);
 		int startYPixel = ymap.getPixel(selecYStartIndex);
 		double pixelsPerYIndex = ymap.getScale();
 		int numSelectedYPixels = (int) Math.round((double) numYSelectedIndexes * pixelsPerYIndex);
 		//int yPxPos = ymap.getZoomTowardPixelOfSelection(startYPixel,numSelectedYPixels);
-		int yPxPos = ymap.getZoomTowardPixelOfSelectionUniversal(startYPixel,numSelectedYPixels);
-		ymap.getZoomTowardPixelOfSelection(startYPixel,numSelectedYPixels);
+		int yPxPos = ymap.getZoomTowardPixelOfSelection(startYPixel,numSelectedYPixels);
 		
 		//LogBuffer.println("Going to zoom toward pixel at: [x" + xPxPos + ",y" + yPxPos + "] determined from data cell at: [x" + selecXStartIndex + ",y" + selecYStartIndex +
 		//		"].  Selected pixel start/number: [x" + startXPixel + "/" + numSelectedXPixels + ",y" + startYPixel + "/" + numSelectedYPixels + "].");
@@ -947,11 +945,11 @@ MouseWheelListener {
 		int xPxNum    = xmap.getAvailablePixels();
 		int yPxNum    = ymap.getAvailablePixels();
 		int prevXFirstVisible = xmap.getFirstVisible();
-		int prevXNumVisible = xmap.getNumVisible();
-		int centerXIndex = xmap.getFirstVisible() + (int) Math.floor((double) xmap.getNumVisible() / 2.0);
+		int prevXNumVisible   = xmap.getNumVisible();
+		int centerXIndex      = xmap.getFirstVisible() + (int) Math.floor((double) xmap.getNumVisible() / 2.0);
 		int prevYFirstVisible = ymap.getFirstVisible();
-		int prevYNumVisible = ymap.getNumVisible();
-		int centerYIndex = ymap.getFirstVisible() + (int) Math.floor((double) ymap.getNumVisible() / 2.0);
+		int prevYNumVisible   = ymap.getNumVisible();
+		int centerYIndex      = ymap.getFirstVisible() + (int) Math.floor((double) ymap.getNumVisible() / 2.0);
 
 		double targetZoomFracX = 0.5;
 		//The following loop cycles through zoom increments 0.05,0.1,0.15,... to 0.5
@@ -1010,7 +1008,7 @@ MouseWheelListener {
 			zoomXVal = xmap.getBestZoomInVal(xPxPos,xPxNum,numXCells,targetZoomFrac);
 			zoomYVal = ymap.getBestZoomInVal(yPxPos,yPxNum,numYCells,targetZoomFrac);
 			
-			LogBuffer.println("Jumping to [" + numXCellsShouldHave + "] because it's an integer equal to the target number of cells.");
+			//LogBuffer.println("Jumping to [" + numXCellsShouldHave + "] because it's an integer equal to the target number of cells.");
 			
 			//If no zoom has occurred
 			if(zoomXVal == 0 && zoomYVal == 0) {
@@ -1181,13 +1179,15 @@ MouseWheelListener {
 			
 			ymap.zoomAwayPixel(yPxPos,zoomYVal);
 		}
-			
+
 		//Now that we have zoomed, we should scroll if the selection is off the screen
 		//If zooming has finished, scroll all the way
 		if(xmap.getNumVisible() == numXSelectedIndexes && ymap.getNumVisible() == numYSelectedIndexes) {
 			xmap.scrollToFirstIndex(selecXStartIndex);
 			ymap.scrollToFirstIndex(selecYStartIndex);
-		} else {
+		}
+		//Else if the pixel we are zooming to is on an edge, assume we need to scroll some
+		else if(xPxPos <= 0 || yPxPos <= 0 || xPxPos >= xPxNum || yPxPos >= yPxNum) {
 			//Scroll toward by half of the same fraction as the zoom changed
 			//We don't want to scroll all the way in 1 sudden jolt, so we'll scroll to be closer to the center of the selection by (half) the same fraction as the incremental zoom (unless we're at the zoom level of the selection)
 			double scrollFrac =  ((double) xmap.getNumVisible() / (double) prevXNumVisible);
@@ -1197,28 +1197,36 @@ MouseWheelListener {
 			scrollFrac /= 2.0;
 			
 			int scrollDistDirX = (selecXStartIndex + (int) Math.floor(numXSelectedIndexes / 2)) - centerXIndex;
+			//LogBuffer.println("ScrollX difference before fractioning: " + scrollDistDirX + " = selecXStartIndex + numXSelectedIndexes / 2) - centerXIndex /// " + selecXStartIndex + " + " + numXSelectedIndexes + " / 2) - " + centerXIndex + ".");
 			scrollDistDirX = (int) Math.round((double) scrollDistDirX * scrollFrac);
-			
+			//LogBuffer.println("ScrollX difference after fractioning: [" + scrollDistDirX + "].");
+
 			/* TODO: Refactor the scrolling so that these checks do not have to be done. - Rob */
 			//The following correction calculations are to prevent scrolling a visible selected edge out of view./
 			//The calculations are not perfect and are only necessary because the zoomToward* functions only really work when
 			//the selection is either completely in view or we're zoomed in inside the selected area.
 			int prevFarEdge = prevXFirstVisible + prevXNumVisible;
 			int selecFarEdge = selecXStartIndex + numXSelectedIndexes;
-			int newNearEdge = (selecXStartIndex + (int) Math.floor(numXSelectedIndexes / 2)) - scrollDistDirX - (int) Math.floor((double) xmap.getNumVisible() / 2);
+			int newNearEdge = (selecXStartIndex + (int) Math.floor(numXSelectedIndexes / 2)) - scrollDistDirX - (int) Math.ceil((double) xmap.getNumVisible() / 2);
 			int newFarEdge = (selecXStartIndex + (int) Math.floor(numXSelectedIndexes / 2)) - scrollDistDirX + (int) Math.ceil((double) xmap.getNumVisible() / 2);
 			//Make sure we don't scroll an edge from either in view or before the view to out of view/past the view
 			if(selecFarEdge <= prevFarEdge && selecFarEdge > newFarEdge) {
-				scrollDistDirX -= (selecFarEdge - newFarEdge) + (int) Math.round((1.0 - scrollFrac) * ((double) selecFarEdge - (double) newFarEdge));
+				scrollDistDirX -= (selecFarEdge - newFarEdge) + (int) Math.round((1.0 - scrollFrac) * Math.abs((double) selecFarEdge - (double) prevFarEdge));
+				//LogBuffer.println("ScrollX difference after correcting for far edge overscroll: [" + scrollDistDirX + "].");
 				newNearEdge = (selecXStartIndex + (int) Math.floor(numXSelectedIndexes / 2)) - scrollDistDirX - (int) Math.ceil((double) xmap.getNumVisible() / 2);
-				if(selecFarEdge > newFarEdge || selecXStartIndex >= prevXFirstVisible && selecXStartIndex < newNearEdge) {
+				newFarEdge = (selecXStartIndex + (int) Math.floor(numXSelectedIndexes / 2)) - scrollDistDirX + (int) Math.ceil((double) xmap.getNumVisible() / 2);
+				if(selecFarEdge > newFarEdge || (selecXStartIndex >= prevXFirstVisible && selecXStartIndex < newNearEdge)) {
 					scrollDistDirX = 0;
+					//LogBuffer.println("ScrollX difference after correcting for far edge overscroll: [" + scrollDistDirX + "].");
 				}
 			} else if(selecXStartIndex >= prevXFirstVisible && selecXStartIndex < newNearEdge) {
-				scrollDistDirX += (newNearEdge - selecXStartIndex) + (int) Math.round((1.0 - scrollFrac) * ((double) newNearEdge - (double) selecXStartIndex));
+				scrollDistDirX += (newNearEdge - selecXStartIndex) + (int) Math.round((1.0 - scrollFrac) * ((double) selecXStartIndex - (double) prevXFirstVisible));
+				//LogBuffer.println("ScrollX difference after correcting for near edge overscroll: [" + scrollDistDirX + "].");
+				newNearEdge = (selecXStartIndex + (int) Math.floor(numXSelectedIndexes / 2)) - scrollDistDirX - (int) Math.ceil((double) xmap.getNumVisible() / 2);
 				newFarEdge = (selecXStartIndex + (int) Math.floor(numXSelectedIndexes / 2)) - scrollDistDirX + (int) Math.ceil((double) xmap.getNumVisible() / 2);
-				if(selecXStartIndex < newNearEdge || selecFarEdge <= prevFarEdge && selecFarEdge > newFarEdge) {
+				if(selecXStartIndex < newNearEdge || (selecFarEdge <= prevFarEdge && selecFarEdge > newFarEdge)) {
 					scrollDistDirX = 0;
+					//LogBuffer.println("ScrollX difference after correcting for far edge overscroll: [" + scrollDistDirX + "].");
 				}
 			}
 			
@@ -1232,7 +1240,9 @@ MouseWheelListener {
 			scrollFrac /= 2.0;
 
 			int scrollDistDirY = (selecYStartIndex + (int) Math.floor(numYSelectedIndexes / 2)) - centerYIndex;
+			//LogBuffer.println("ScrollY difference before fractioning: " + scrollDistDirY + " = selecYStartIndex + numYSelectedIndexes / 2) - centerYIndex /// " + selecYStartIndex + " + " + numYSelectedIndexes + " / 2) - " + centerYIndex + ".");
 			scrollDistDirY = (int) Math.round((double) scrollDistDirY * scrollFrac);
+			//LogBuffer.println("ScrollY difference after fractioning: [" + scrollDistDirY + "].");
 
 			/* TODO: Refactor the scrolling so that these checks do not have to be done. - Rob */
 			//The following correction calculations are to prevent scrolling a visible selected edge out of view./
@@ -1244,15 +1254,21 @@ MouseWheelListener {
 			newFarEdge = (selecYStartIndex + (int) Math.floor(numYSelectedIndexes / 2)) - scrollDistDirY + (int) Math.ceil((double) ymap.getNumVisible() / 2);
 			//Make sure we don't scroll an edge from either in view or before the view to out of view/past the view
 			if(selecFarEdge <= prevFarEdge && selecFarEdge > newFarEdge) {
-				scrollDistDirY -= (selecFarEdge - newFarEdge) + (int) Math.round((1.0 - scrollFrac) * ((double) selecFarEdge - (double) newFarEdge));
+				scrollDistDirY -= (selecFarEdge - newFarEdge) + (int) Math.round((1.0 - scrollFrac) * Math.abs((double) selecFarEdge - (double) prevFarEdge));
+				//LogBuffer.println("ScrollY difference after correcting for far edge overscroll: [" + scrollDistDirY + "].");
 				newNearEdge = (selecYStartIndex + (int) Math.floor(numYSelectedIndexes / 2)) - scrollDistDirY - (int) Math.ceil((double) ymap.getNumVisible() / 2);
-				if(selecFarEdge > newFarEdge || selecYStartIndex >= prevYFirstVisible && selecYStartIndex < newNearEdge) {
+				newFarEdge = (selecYStartIndex + (int) Math.floor(numYSelectedIndexes / 2)) - scrollDistDirY + (int) Math.ceil((double) ymap.getNumVisible() / 2);
+				if(selecFarEdge > newFarEdge || (selecYStartIndex >= prevYFirstVisible && selecYStartIndex < newNearEdge)) {
 					scrollDistDirY = 0;
+					//LogBuffer.println("ScrollY difference after correcting for far edge overscroll: [" + scrollDistDirY + "].");
 				}
 			} else if(selecYStartIndex >= prevYFirstVisible && selecYStartIndex < newNearEdge) {
-				scrollDistDirY += (int) Math.round((1.0 - scrollFrac) * ((double) newNearEdge - (double) selecYStartIndex));
+				scrollDistDirY += (newNearEdge - selecYStartIndex) + (int) Math.round((1.0 - scrollFrac) * ((double) selecYStartIndex - (double) prevYFirstVisible));
+				//LogBuffer.println("ScrollY difference after correcting for near edge overscroll: [" + scrollDistDirY + "].");
+				newNearEdge = (selecYStartIndex + (int) Math.floor(numYSelectedIndexes / 2)) - scrollDistDirY - (int) Math.ceil((double) ymap.getNumVisible() / 2);
 				newFarEdge = (selecYStartIndex + (int) Math.floor(numYSelectedIndexes / 2)) - scrollDistDirY + (int) Math.ceil((double) ymap.getNumVisible() / 2);
-				if(selecYStartIndex < newNearEdge || selecFarEdge <= prevFarEdge && selecFarEdge > newFarEdge) {
+				if(selecYStartIndex < newNearEdge || (selecFarEdge <= prevFarEdge && selecFarEdge > newFarEdge)) {
+					//LogBuffer.println("ScrollY difference after correcting for far edge overscroll: [" + scrollDistDirY + "].");
 					scrollDistDirY = 0;
 				}
 			}
@@ -1272,7 +1288,12 @@ MouseWheelListener {
 	
 	public void updateAspectRatio() {
 		aspectRatio = getAspectRatio(xmap.getNumVisible(),ymap.getNumVisible());
-		//LogBuffer.println("Aspect Ratio updated to [" + aspectRatio + "].");
+		//LogBuffer.println("Aspect Ratio updated to [" + aspectRatio + " : " + xmap.getNumVisible() + "/" + ymap.getNumVisible() + "].");
+	}
+
+	public void setAspectRatio(int numXDots,int numYDots) {
+		aspectRatio = getAspectRatio(numXDots,numYDots);
+		//LogBuffer.println("Aspect Ratio set to [" + aspectRatio + " : " + xmap.getNumVisible() + "/" + ymap.getNumVisible() + "].");
 	}
 
 //=======
