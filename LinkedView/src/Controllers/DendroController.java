@@ -685,68 +685,22 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			} else if (e.getSource() == dendroView.getHomeButton()) {
 				
 				/* TODO move out to separate method(s) */
-				int mask = InputEvent.ALT_MASK;
+				int stepMask = InputEvent.ALT_MASK;
+				int fullMask = InputEvent.META_MASK;
 
-				if((e.getModifiers() & InputEvent.ALT_MASK) == mask) {
-					/* TODO: Fix the smoothZoomToward function below and then remove the work-around code - Rob */
-					int prevXNumVisible = interactiveXmap.getNumVisible();
-					int prevYNumVisible = interactiveYmap.getNumVisible();
-					dendroView.getInteractiveMatrixView().smoothZoomTowardSelection(0,(interactiveXmap.getMaxIndex() + 1),
-							0,(interactiveYmap.getMaxIndex() + 1));
-					//The function above has a bug that prevents full zoom out - this works around that:
-					if(prevXNumVisible == interactiveXmap.getNumVisible() &&
-							prevYNumVisible == interactiveYmap.getNumVisible()) {
-//						resetMapContainers();
-						resetMatrixViews();
-						dendroView.getInteractiveMatrixView().setAspectRatio(
-								interactiveXmap.getMaxIndex() + 1,
-								interactiveYmap.getMaxIndex() + 1);
-					}
-				}
-				else {
-
-					/* TODO: Create a separate function for this loop - Rob */
-					long startTime = System.currentTimeMillis();
-					//Let's calculate the relative position of the center of the selection and gradually zoom toward that spot in a loop
-					while(interactiveXmap.getNumVisible() != (interactiveXmap.getMaxIndex() + 1) ||
-							interactiveYmap.getNumVisible() != (interactiveYmap.getMaxIndex() + 1)) {
-
-						//If drawing the zoom increment levels is taking too long, snap out of it.
-						if((System.currentTimeMillis() - startTime) > 70) {
-//							resetMapContainers();
-							resetMatrixViews();
-							break;
-						}
-
-						dendroView.getInteractiveMatrixView().smoothZoomTowardSelection(0,(interactiveXmap.getMaxIndex() + 1),
-								0,(interactiveYmap.getMaxIndex() + 1));
-
-						//Force an immediate repaint
-						//Found this in a thread here: https://community.oracle.com/thread/1663771
-						dendroView.getInteractiveMatrixView().paintImmediately(0,0,
-								dendroView.getInteractiveMatrixView().getWidth(),
-								dendroView.getInteractiveMatrixView().getHeight());
-
-						//Sleep a few milliseconds
-						try{
-							//Use this to debug, by slowing the zool down to see what's happening at each step
-							//Thread.sleep(500);
-							Thread.sleep(10);
-						} catch(InterruptedException ex){
-							LogBuffer.println("Error: Couldn't sleep.");
-							ex.printStackTrace();
-						}
-					}
-					//We will update the aspect ratio just in case it didn't happen automatically
+				if((e.getModifiers() & InputEvent.META_MASK) == fullMask) {
+					resetMatrixViews();
 					dendroView.getInteractiveMatrixView().setAspectRatio(
 							interactiveXmap.getMaxIndex() + 1,
 							interactiveYmap.getMaxIndex() + 1);
 				}
-				
-				//resetMapContainers();
-				////Doing this here because many times zoomIn is called successively for each dimension
-				//dendroView.getGlobalView().updateAspectRatio();
-
+				else if((e.getModifiers() & InputEvent.ALT_MASK) == stepMask) {
+					dendroView.getInteractiveMatrixView()
+					.smoothIncrementalZoomOut();
+				} else {
+					dendroView.getInteractiveMatrixView()
+						.smoothAnimatedZoomOut();
+				}
 			} else {
 				LogBuffer.println("Got weird source for actionPerformed() "
 						+ "in DendroController ScaleListener.");
@@ -1035,66 +989,37 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 			
-			/* TODO use ints instead of arrays. TreeSelection has a function
-			 * to get the number of selected indices.
-			 */
-			final int[] selectedGenes = rowSelection.getSelectedIndexes();
-			final int[] selectedArrays = colSelection.getSelectedIndexes();
-			int mask = InputEvent.ALT_MASK;
+			final boolean genesSelected =
+					rowSelection.getNSelectedIndexes() > 0;
+			final boolean arraysSelected =
+					colSelection.getNSelectedIndexes() > 0;
 
-			if((selectedGenes.length > 0 || selectedArrays.length > 0) && (arg0.getModifiers() & InputEvent.ALT_MASK) == mask) {
-				//getGlobalXMap().zoomToward(arraySelection.getMinIndex(),(arraySelection.getMaxIndex() - arraySelection.getMinIndex() + 1));
-				//getGlobalYMap().zoomToward(geneSelection.getMinIndex(),(geneSelection.getMaxIndex() - geneSelection.getMinIndex() + 1));
-				dendroView.getInteractiveMatrixView().smoothZoomTowardSelection(colSelection.getMinIndex(),
-						(colSelection.getMaxIndex() - colSelection.getMinIndex() + 1),
-						rowSelection.getMinIndex(),
-						(rowSelection.getMaxIndex() - rowSelection.getMinIndex() + 1));
-			}
-			else {
-				/* TODO: Create a separate function for this loop - Rob */
-				long startTime = System.currentTimeMillis();
+			int stepMask = InputEvent.ALT_MASK;
+			int fullMask = InputEvent.META_MASK;
 
-				//Let's calculate the relative position of the center of the selection and gradually zoom toward that spot in a loop
-				while(globalXmap.getNumVisible() != (colSelection.getMaxIndex() - colSelection.getMinIndex() + 1) ||
-					globalYmap.getNumVisible() != (rowSelection.getMaxIndex() - rowSelection.getMinIndex() + 1)) {
-
-					//If drawing the zoom increment levels is taking too long, snap out of it.
-					if((System.currentTimeMillis() - startTime) > 150) {
-						zoomSelection();
-						break;
-					}
-
-					//globalXmap.zoomToward(arraySelection.getMinIndex(),(arraySelection.getMaxIndex() - arraySelection.getMinIndex() + 1));
-					//globalYmap.zoomToward(geneSelection.getMinIndex(),(geneSelection.getMaxIndex() - geneSelection.getMinIndex() + 1));
-					dendroView.getInteractiveMatrixView().smoothZoomTowardSelection(colSelection.getMinIndex(),
-							(colSelection.getMaxIndex() - colSelection.getMinIndex() + 1),
+			if(genesSelected || arraysSelected) {
+				if((arg0.getModifiers() & InputEvent.META_MASK) == fullMask) {
+					zoomSelection();
+					centerSelection();
+				} else if((arg0.getModifiers() & InputEvent.ALT_MASK) == stepMask) {
+					dendroView.getInteractiveMatrixView()
+						.smoothZoomTowardSelection(
+							colSelection.getMinIndex(),
+							(colSelection.getMaxIndex() -
+								colSelection.getMinIndex() + 1),
 							rowSelection.getMinIndex(),
-							(rowSelection.getMaxIndex() - rowSelection.getMinIndex() + 1));
-
-					//Force an immediate repaint
-					//Found this in a thread here: https://community.oracle.com/thread/1663771
-					dendroView.getInteractiveMatrixView().paintImmediately(0,0,
-							dendroView.getInteractiveMatrixView().getWidth(),
-							dendroView.getInteractiveMatrixView().getHeight());
-
-					//Sleep a few milliseconds
-					try{
-						//Use this to debug, by slowing the zool down to see what's happening at each step
-						//Thread.sleep(500);
-						Thread.sleep(10);
-					} catch(InterruptedException e){
-						LogBuffer.println("Error: Couldn't sleep.");
-						e.printStackTrace();
-					}
+							(rowSelection.getMaxIndex() -
+								rowSelection.getMinIndex() + 1));
+				} else {
+					dendroView.getInteractiveMatrixView()
+						.smoothAnimatedZoomTowardSelection(
+							colSelection.getMinIndex(),
+							(colSelection.getMaxIndex() -
+								colSelection.getMinIndex() + 1),
+							rowSelection.getMinIndex(),
+							(rowSelection.getMaxIndex() -
+								rowSelection.getMinIndex() + 1));
 				}
-				//Once the loop is done, we're guaranteed to be at the correct zoom level, however the scroll could be off (which happened to me only once in my testing - so it is rare), so we should do a scroll here just to be certain
-				centerSelection();
-				//We will update the aspect ratio just in case it didn't happen automatically
-				dendroView.getInteractiveMatrixView().updateAspectRatio();
-
-				/* Old code before animated zoom */
-				//zoomSelection();
-				//centerSelection();
 			}
 		}
 	}
@@ -1815,7 +1740,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	 * are generated from the current model, and enables/disables them as
 	 * required.
 	 *
-	 * I factored it out because it is common betwen DendroView and
+	 * I factored it out because it is common between DendroView and
 	 * KnnDendroView.
 	 */
 	protected void bindTrees() {
@@ -2103,6 +2028,21 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		int xTilesVisible = interactiveXmap.getNumVisible();
 		int yTilesVisible = interactiveYmap.getNumVisible();
 		
+		final boolean genesSelected =
+				rowSelection.getNSelectedIndexes() > 0;
+		final boolean arraysSelected =
+				colSelection.getNSelectedIndexes() > 0;
+
+		boolean isSelectionZoomed =
+				genesSelected &&
+				rowSelection.getMinIndex() == interactiveYmap.getFirstVisible()
+				&& (rowSelection.getMaxIndex() - rowSelection.getMinIndex() + 1)
+				== yTilesVisible &&
+				arraysSelected &&
+				colSelection.getMinIndex() == interactiveXmap.getFirstVisible()
+				&& (colSelection.getMaxIndex() - colSelection.getMinIndex() + 1)
+				== xTilesVisible;
+		
 		/* Zoom-out buttons disabled if min scale for axis is reached. */
 		dendroView.getHomeButton().setEnabled(!(isXMin && isYMin));
 		dendroView.getYMinusBottomButton().setEnabled(!isYMin);
@@ -2118,6 +2058,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		dendroView.getYPlusTopButton().setEnabled((yTilesVisible != 1));
 		dendroView.getXYPlusButton().setEnabled((xTilesVisible != 1) 
 				|| (yTilesVisible != 1));
+		dendroView.getZoomButton().setEnabled(!isSelectionZoomed);
 		
 	}
 }

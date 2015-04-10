@@ -226,7 +226,7 @@ public class MapContainer extends Observable implements Observer,
 		// LogBuffer.println("zoomOut: tileNumVisible has been set to [" +
 		// tileNumVisible + "].");
 
-		zoomVal = (int) Math.round(tileNumVisible / 20.0);
+		zoomVal = (int) Math.round(ZOOM_INCREMENT * tileNumVisible);
 
 		// Ensure that at least one tile will be zoomed out.
 		if (zoomVal < 2) {
@@ -350,7 +350,7 @@ public class MapContainer extends Observable implements Observer,
 		// LogBuffer.println("zoomIn: tileNumVisible has been set to [" +
 		// tileNumVisible + "].");
 
-		zoomVal = (int) Math.round(tileNumVisible / 20.0);
+		zoomVal = (int) Math.round(ZOOM_INCREMENT * tileNumVisible);
 
 		// Ensure that at least 2 tiles will be zoomed in (1 on each side of the current zoom dimension).
 		if (zoomVal < 2) {
@@ -410,7 +410,7 @@ public class MapContainer extends Observable implements Observer,
 		double newScale = getScale();
 		int zoomVal;
 		tileNumVisible = Math.round(getAvailablePixels() / getScale());
-		zoomVal = (int) Math.round(tileNumVisible / 20.0);
+		zoomVal = (int) Math.round(ZOOM_INCREMENT * tileNumVisible);
 		// Ensure that at least 2 tiles will be zoomed in (1 on each side of the current zoom dimension).
 		if (zoomVal < 2) {
 			zoomVal = 2;
@@ -531,7 +531,7 @@ public class MapContainer extends Observable implements Observer,
 		//If a custom zoom value has not been supplied (in order to correct dot aspect ratios (see GlobalView)),
 		//select the best zoom value to make the zooming as smooth as possible
 		else if(customZoomVal < 0 && tileNumVisible > 15) {
-			zoomVal = getBestZoomInVal(pixelPos,pxAvail,numVisible,targetZoomFrac);
+			zoomVal = getBestZoomInVal(pixelPos,numVisible,targetZoomFrac);
 			if (zoomVal < 1) {
 				zoomVal = 1;
 			}
@@ -720,7 +720,7 @@ public class MapContainer extends Observable implements Observer,
 		//If a custom zoom value has not been supplied (in order to correct dot aspect ratios (see GlobalView)),
 		//select the best zoom value to make the zooming as smooth as possible
 		else if(customZoomVal < 0 && tileNumVisible >= 15) {
-			zoomVal = getBestZoomOutVal(pixelPos,pxAvail,numVisible,targetZoomFrac);
+			zoomVal = getBestZoomOutVal(pixelPos,numVisible,targetZoomFrac);
 			if (zoomVal < 1) {
 				zoomVal = 1;
 			}
@@ -815,8 +815,9 @@ public class MapContainer extends Observable implements Observer,
 	/* TODO: Merge this function with getBestZoomOutVal - there are only subtle differences that could be handled in an if statement. - Rob */
 	//This calculates an optimal number of data indexes to remove that will result in as smooth a zoom as possible.
 	//It uses relative data index hovered over to calculate the target position of the zoom (as opposed to the relative pixel position of the cursor)
-	public int getBestZoomInVal(int pixel,int numPixels,int cells,double targetZoomFrac) {
+	public int getBestZoomInVal(int pixel,int cells,double targetZoomFrac) {
 		int zoomVal = (int) Math.round((double) cells * targetZoomFrac);
+		int numPixels = getAvailablePixels();
 
 		//LogBuffer.println("getBestZoomInVal: Called with cells [" + cells + "] targetZoomFrac [" + targetZoomFrac + "] and calculated zoomVal as [" + zoomVal + "].");
 		//If we're at the minimum zoom level, do not zoom in any more
@@ -904,8 +905,9 @@ public class MapContainer extends Observable implements Observer,
 
 	/* TODO: Merge this function with getBestZoomInVal - there are only subtle differences that could be handled in an if statement. - Rob */
 	//This function performs the reverse of getBestZoomInVal, except it uses the relative pixel position of the cursor to calculate the zoom position that is targeted for smoothing
-	public int getBestZoomOutVal(int pixel,int numPixels,int cells,double targetZoomFrac) {
+	public int getBestZoomOutVal(int pixel,int cells,double targetZoomFrac) {
 		int zoomVal = (int) Math.round((double) cells * targetZoomFrac);
+		int numPixels = getAvailablePixels();
 
 		//If the closest zoom amount is 0, return 0 because it's the smoothest possible scroll value (and the math below will result in NaN)
 		//The calling function is expected to handle cases resulting in no zoom
@@ -986,6 +988,10 @@ public class MapContainer extends Observable implements Observer,
 		if(bestZoomVal < 0) bestZoomVal = 0;
 		//LogBuffer.println("getBestZoomOutVal: Selected zoomVal [" + bestZoomVal + "] instead of default [" + zoomVal + "] Difference in smoothness accuracy: [" + diff + "].");
 		return(bestZoomVal);
+	}
+
+	public void fullZoomOut() {
+		zoomToSelected(0,getMaxIndex());
 	}
 
 	/**
