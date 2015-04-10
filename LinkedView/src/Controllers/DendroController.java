@@ -786,6 +786,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 		colSelection.notifyObservers();
 		rowSelection.notifyObservers();
+
+		setAdaptiveButtonStatus();
 	}
 
 	/**
@@ -2009,6 +2011,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		} else {
 			dendroView.getXYPlusButton().requestFocusInWindow();
 		}
+		setAdaptiveButtonStatus();
 	}
 	
 	/**
@@ -2028,9 +2031,9 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		int xTilesVisible = interactiveXmap.getNumVisible();
 		int yTilesVisible = interactiveYmap.getNumVisible();
 		
-		final boolean genesSelected =
+		final boolean genesSelected = this.rowSelection != null &&
 				rowSelection.getNSelectedIndexes() > 0;
-		final boolean arraysSelected =
+		final boolean arraysSelected = this.colSelection != null &&
 				colSelection.getNSelectedIndexes() > 0;
 
 		boolean isSelectionZoomed =

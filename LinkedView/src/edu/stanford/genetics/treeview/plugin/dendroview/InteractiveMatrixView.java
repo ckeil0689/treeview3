@@ -1050,6 +1050,7 @@ MouseWheelListener {
 		//and stops when the zoom increment is large enough to overcome the long time it takes to draw huge matrices
 		//It uses an equation that was solved using these 2 equations (forcing a logarithmic curve to pass through 2 points)
 		//6000 = a * b^0.5 and 100 = a * b^0.05
+		//where a = 63.45, b = 8942
 		//Basically, when the number of visible spots is 6000, the zoom increment will be 50%.
 		//When the number of visible spots is 100, the zoom increment will be 5%.  There's a log scale in between.
 		int largerXSize = numXSelectedIndexes;
