@@ -567,7 +567,27 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			zoomSelection();
+			final boolean genesSelected =
+					rowSelection.getNSelectedIndexes() > 0;
+			final boolean arraysSelected =
+					colSelection.getNSelectedIndexes() > 0;
+
+			if(genesSelected || arraysSelected) {
+				//Zoom in (or out)
+				getInteractiveXMap().zoomToSelected(
+						colSelection.getMinIndex(),
+						colSelection.getMaxIndex());
+				getInteractiveYMap().zoomToSelected(
+						rowSelection.getMinIndex(),
+						rowSelection.getMaxIndex());
+
+				//Then scroll
+				getInteractiveXMap().scrollToFirstIndex(
+						colSelection.getMinIndex());
+				getInteractiveYMap().scrollToFirstIndex(
+						rowSelection.getMinIndex());
+			}
+			//zoomSelection();
 		}
 	}
 
@@ -996,14 +1016,26 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			final boolean arraysSelected =
 					colSelection.getNSelectedIndexes() > 0;
 
-			int stepMask = InputEvent.ALT_MASK;
-			int fullMask = InputEvent.META_MASK;
-
 			if(genesSelected || arraysSelected) {
-				if((arg0.getModifiers() & InputEvent.META_MASK) == fullMask) {
-					zoomSelection();
-					centerSelection();
-				} else if((arg0.getModifiers() & InputEvent.ALT_MASK) == stepMask) {
+				if((arg0.getModifiers() & InputEvent.META_MASK) != 0) {
+
+					//Zoom in (or out)
+					getInteractiveXMap().zoomToSelected(
+							colSelection.getMinIndex(),
+							colSelection.getMaxIndex());
+					getInteractiveYMap().zoomToSelected(
+							rowSelection.getMinIndex(),
+							rowSelection.getMaxIndex());
+
+					//Then scroll
+					getInteractiveXMap().scrollToFirstIndex(
+							colSelection.getMinIndex());
+					getInteractiveYMap().scrollToFirstIndex(
+							rowSelection.getMinIndex());
+
+					//zoomSelection();
+					//centerSelection();
+				} else if((arg0.getModifiers() & InputEvent.ALT_MASK) != 0) {
 					dendroView.getInteractiveMatrixView()
 						.smoothZoomTowardSelection(
 							colSelection.getMinIndex(),
@@ -1026,49 +1058,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		}
 	}
 
-	/**'
-	 * Zooms MapContainers in on the user selected area.
-	 */
-	private void zoomSelection() {
-
-		final int minSelectedColIndex = colSelection.getMinIndex();
-		final int minSelectedRowIndex = rowSelection.getMinIndex();
-
-		final int maxSelectedColIndex = colSelection.getMaxIndex();
-		final int maxSelectedRowIndex = rowSelection.getMaxIndex();
-		
-		interactiveXmap.zoomToSelected(minSelectedColIndex, maxSelectedColIndex);
-		interactiveYmap.zoomToSelected(minSelectedRowIndex, maxSelectedRowIndex);
-		
-		centerSelection();
-		
-		notifyAllMapObservers();
-
-		dendroView.getInteractiveMatrixView().updateAspectRatio();
-		saveSettings();
-	}
-
-	/**
-	 * Scrolls each MapContainer to the center of the selected rectangle.
-	 */
-	private void centerSelection() {
-
-		final int[] selectedGenes = rowSelection.getSelectedIndexes();
-		final int[] selectedArrays = colSelection.getSelectedIndexes();
-
-		if (selectedGenes.length > 0 && selectedArrays.length > 0) {
-
-			final int endX = selectedArrays[selectedArrays.length - 1];
-			final int endY = selectedGenes[selectedGenes.length - 1];
-
-			final int startX = selectedArrays[0];
-			final int startY = selectedGenes[0];
-			
-			interactiveXmap.centerScrollOnSelection(startX, endX);
-			interactiveYmap.centerScrollOnSelection(startY, endY);
-		}
-	}
-	
 	private void refocusViewPort() {
 		
 		reZoomVisible();

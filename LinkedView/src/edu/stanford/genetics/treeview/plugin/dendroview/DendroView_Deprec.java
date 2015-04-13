@@ -488,8 +488,18 @@ MainPanel, Observer {
 			@Override
 			public void actionPerformed(final ActionEvent arg0) {
 
-				globalview.zoomSelection();
-				globalview.centerSelection();
+				globalXmap.zoomToSelected(
+						colSelection.getMinIndex(),
+						colSelection.getMaxIndex());
+				globalYmap.zoomToSelected(
+						rowSelection.getMinIndex(),
+						rowSelection.getMaxIndex());
+				globalXmap.scrollToFirstIndex(
+						colSelection.getMinIndex());
+				globalYmap.scrollToFirstIndex(
+						rowSelection.getMinIndex());
+				//globalview.zoomSelection();
+				//globalview.centerSelection();
 			}
 		});
 

@@ -1088,13 +1088,14 @@ public class MapContainer extends Observable implements Observer,
 	
 	/**
 	 * Checks how many tiles are visible and uses the current available pixels
-	 * to adjust the tile scale to the screen size.
+	 * to adjust the tile scale to the screen size and then re-scrolls to the
+	 * position currently in focus.
 	 */
 	public void adjustScaleToScreen() {
 		
 		double newScale = getAvailablePixels() / numVisible;
 		setScale(newScale);
-		
+
 		notifyObservers();
 	}
 
