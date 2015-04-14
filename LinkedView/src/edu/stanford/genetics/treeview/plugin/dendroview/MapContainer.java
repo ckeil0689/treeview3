@@ -149,6 +149,8 @@ public class MapContainer extends Observable implements Observer,
 		// numVisible + "].");
 
 		setScale(minScale);
+
+		notifyObservers();
 	}
 
 	public void calculateNewMinScale() {
@@ -1092,11 +1094,31 @@ public class MapContainer extends Observable implements Observer,
 	 * position currently in focus.
 	 */
 	public void adjustScaleToScreen() {
-		
-		double newScale = getAvailablePixels() / numVisible;
+		if(numVisible == 0) {
+			setNumVisible(getMaxIndex() + 1);
+		}
+
+		double newScale = (double) getAvailablePixels() / (double) numVisible;
 		setScale(newScale);
 
 		notifyObservers();
+	}
+
+	public void adjustScrollToScreen() {
+		
+		if (getNumVisible() > 0 && getNumVisible() > 0) {
+			scrollToFirstIndex(getFirstVisible());
+		} else {
+			setFirstVisible(0);
+			scrollToFirstIndex(0);
+		}
+
+		notifyObservers();
+	}
+
+	public void adjustToScreenChange() {
+		adjustScaleToScreen();
+		adjustScrollToScreen();
 	}
 
 	public void recalculateScale() {
