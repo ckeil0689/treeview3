@@ -1937,32 +1937,33 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	 * provides intuitive visual clues to the user.
 	 */
 	private void setAdaptiveButtonStatus() {
-		
+
 		/* Determine if either MapContainer is at minimum scale */
 		boolean isXMin = Helper.nearlyEqual(interactiveXmap.getMinScale(), 
 				interactiveXmap.getScale());
 		boolean isYMin = Helper.nearlyEqual(interactiveYmap.getMinScale(), 
 				interactiveYmap.getScale());
-		
+
 		int xTilesVisible = interactiveXmap.getNumVisible();
 		int yTilesVisible = interactiveYmap.getNumVisible();
-		
+
 		final boolean genesSelected = this.rowSelection != null &&
 				rowSelection.getNSelectedIndexes() > 0;
 		final boolean arraysSelected = this.colSelection != null &&
 				colSelection.getNSelectedIndexes() > 0;
 
-		boolean isSelectionZoomed =
-				genesSelected &&
+		//Note: A selection is "fully zoomed" if there is no selection - this
+		//will disable the zoom selection button
+		boolean isSelectionZoomed = (!genesSelected && !arraysSelected) ||
+				(genesSelected &&
 				rowSelection.getMinIndex() == interactiveYmap.getFirstVisible()
 				&& (rowSelection.getMaxIndex() - rowSelection.getMinIndex() + 1)
 				== yTilesVisible &&
 				arraysSelected &&
 				colSelection.getMinIndex() == interactiveXmap.getFirstVisible()
 				&& (colSelection.getMaxIndex() - colSelection.getMinIndex() + 1)
-				== xTilesVisible;
-		
-		LogBuffer.println("Genes selected: [" + (genesSelected ? "yes" : "no") + "] Arrays selected: [" + (arraysSelected ? "yes" : "no") + "] Selection zoomed: [" + (isSelectionZoomed ? "yes" : "no") + "].");
+				== xTilesVisible);
+
 		/* Zoom-out buttons disabled if min scale for axis is reached. */
 		dendroView.getHomeButton().setEnabled(!(isXMin && isYMin));
 		dendroView.getYMinusBottomButton().setEnabled(!isYMin);
@@ -1970,8 +1971,9 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		dendroView.getXMinusRightButton().setEnabled(!isXMin);
 		dendroView.getXMinusLeftButton().setEnabled(!isXMin);
 		dendroView.getXYMinusButton().setEnabled(!(isXMin && isYMin));
-		
-		/* Zoom-in buttons disabled if visible tile number for axis is 1 */
+
+		/* Zoom-in buttons disabled if visible tile number for axis is 1 or if
+		 * the zoom target is already fully zoomed */
 		dendroView.getXRightPlusButton().setEnabled((xTilesVisible != 1));
 		dendroView.getYPlusBottomButton().setEnabled((yTilesVisible != 1));
 		dendroView.getXLeftPlusButton().setEnabled((xTilesVisible != 1));
@@ -1979,6 +1981,5 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		dendroView.getXYPlusButton().setEnabled((xTilesVisible != 1) 
 				|| (yTilesVisible != 1));
 		dendroView.getZoomButton().setEnabled(!isSelectionZoomed);
-		
 	}
 }
