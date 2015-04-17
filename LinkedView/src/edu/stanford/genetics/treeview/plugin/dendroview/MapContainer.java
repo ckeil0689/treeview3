@@ -506,6 +506,10 @@ public class MapContainer extends Observable implements Observer,
 		return(updateAspectRatio);
 	}
 
+	/** TODO: Make customZoomVal required (no ability to supply -1) and strip
+	 * out the code that picks the zoom value - this has been replaced with
+	 * getBestZoomIn/OutVal.  Merge with zoomAwayPixel.
+	 */
 	//This function smoothly zooms while trying to keep the dot the cursor is currently over under the cursor.
 	//Some of the code is generalized in case it's ever called with a value out of range
 	//Set customZoomVal to a negative number (e.g. -1) to dynamically determine the zoomVal based on a 5% zoom increment
@@ -624,7 +628,10 @@ public class MapContainer extends Observable implements Observer,
 		return(updateAspectRatio);
 	}
 
-	/* TODO: Remove this function and replace it with the one below that has "Universal" appended to the name. - Rob */
+	/* TODO: This function SHOULD be able to select a pixel offscreen, though I
+	 * have checks early-on to prevent that and return an edge pixel.  Make it
+	 * to it can return a negative pixel index or a pixel index larger than max.
+	 * - Rob */
 	//Use this function to pick a pixel to zoom toward when zooming toward a selection
 	//Assumes that the full selection is visible on the screen
 	public int getZoomTowardPixelOfSelection(int pixelIndexOfSelec,int numPixelsOfSelec) {
@@ -697,6 +704,10 @@ public class MapContainer extends Observable implements Observer,
 		return(targetPixel);
 	}
 
+	/** TODO: Make customZoomVal required (no ability to supply -1) and strip
+	 * out the code that picks the zoom value - this has been replaced with
+	 * getBestZoomIn/OutVal.  Merge with zoomTowardPixel.
+	 */
 	//This function does the reverse of zoomTowardPixel
 	//Some of the code is generalized in case it's ever called with a value out of range
 	public int zoomAwayPixel(int pixelPos,int customZoomVal) {
@@ -802,11 +813,12 @@ public class MapContainer extends Observable implements Observer,
 		}
 
 		//LogBuffer.println("zoomAwayPixel: Scrolling to new first visible index: [" + newFirstVisible + "].");
-		scrollToFirstIndex(newFirstVisible);
+		if(newFirstVisible != getFirstVisible())
+			scrollToFirstIndex(newFirstVisible);
 
+		int correction = dotOver - getIndex(pixelPos);
 		//Catch and correct bad calculations - this is useless now that the whole-number result test was added above
-		if(dotOver != getIndex(pixelPos)) {
-			int correction = dotOver - getIndex(pixelPos);
+		if(correction != 0 && !(newFirstVisible == 0 && correction < 0) && !((newFirstVisible + numVisible - 1) > getMaxIndex()) && correction > 0) {
 			newFirstVisible += correction;
 			LogBuffer.println("WARNING: The data cell hovered over has shifted. It was over [" + dotOver + "].  Now it is over: [" + getIndex(pixelPos) +
 					"].  Previous dotOver calculation: [firstVisible + (int) ((double) pixelPos / newScale))] = [" + firstVisible + " + (int) ((double) " + pixelPos + " / " + newScale + "))].  Correcting this retroactively...");
@@ -819,7 +831,9 @@ public class MapContainer extends Observable implements Observer,
 		return(updateAspectRatio);
 	}
 
-	/* TODO: Merge this function with getBestZoomOutVal - there are only subtle differences that could be handled in an if statement. - Rob */
+	/* TODO: Merge this function with getBestZoomOutVal - there are only subtle
+	 * differences that could be handled in an if statement. - Rob
+	 */
 	//This calculates an optimal number of data indexes to remove that will result in as smooth a zoom as possible.
 	//It uses relative data index hovered over to calculate the target position of the zoom (as opposed to the relative pixel position of the cursor)
 	public int getBestZoomInVal(int pixel,double targetZoomFrac) {
@@ -911,7 +925,9 @@ public class MapContainer extends Observable implements Observer,
 		return(bestZoomVal);
 	}
 
-	/* TODO: Merge this function with getBestZoomInVal - there are only subtle differences that could be handled in an if statement. - Rob */
+	/* TODO: Merge this function with getBestZoomInVal - there are only subtle
+	 * differences that could be handled in an if statement. - Rob
+	 */
 	//This function performs the reverse of getBestZoomInVal, except it uses the relative pixel position of the cursor to calculate the zoom position that is targeted for smoothing
 	public int getBestZoomOutVal(int pixel,double targetZoomFrac) {
 		int cells = getNumVisible();
@@ -1000,31 +1016,45 @@ public class MapContainer extends Observable implements Observer,
 		return(bestZoomVal);
 	}
 	
-	/** This function calculates the fraction by which the zoom increment should
+	/**
+	 * This function calculates the fraction by which the zoom increment should
 	 * be if you want to draw increments in an animation (e.g. an animated
 	 * zoom).  Drawing large matrices takes a lot of time, thus animations
 	 * should zoom more when there are large abounts of squares to zoom
-	 * through */
+	 * through
+	 */
 	public double getOptimalZoomIncrement(int targetNumIndexes) {
-		double maxZoomFrac = 0.5;
+		//double maxZoomFrac = 0.5;
+		double maxZoomFrac = 0.6;
+		if(ZOOM_INCREMENT > maxZoomFrac) {
+			return(maxZoomFrac);
+		}
+		int maxZF = (int) Math.round(maxZoomFrac/ZOOM_INCREMENT);
 		double targetZoomFrac = maxZoomFrac;
 		//The following loop cycles through zoom increments 0.05,0.1,0.15,... to 0.5
 		//and stops when the zoom increment is large enough to overcome the long time it takes to draw huge matrices
 		//It uses an equation that was solved using these 2 equations (forcing a logarithmic curve to pass through 2 points)
 		//6000 = a * b^0.5 and 100 = a * b^0.05
-		//where a = 63.45, b = 8942
+		//where
+		//double a = 63.45;    //6000 = a * b^0.5 and 100 = a * b^0.05
+		//double b = 8942;     //6000 = a * b^0.5 and 100 = a * b^0.05
+		double a = 68.39;  //6000 = a * b^0.6 and 100 = a * b^0.05
+		double b = 1732;   //6000 = a * b^0.6 and 100 = a * b^0.05
 		//Basically, when the number of visible spots is 6000, the zoom increment will be 50%.
 		//When the number of visible spots is 100, the zoom increment will be 5%.  There's a log scale in between.
 		int largerXSize = getNumVisible();
 		if(targetNumIndexes > largerXSize) {
 			largerXSize = targetNumIndexes;
 		}
-		for(int zf = 1;zf<=10;zf++) {
-			double zmfc = (double) zf * 0.05; //0.05 is basically the ZOOM_INCREMENT, but not necessarily
-			if(63.45*Math.pow(8942,zmfc) >= largerXSize) {
+		for(int zf = 1;zf<=maxZF;zf++) {
+			double zmfc = (double) zf * ZOOM_INCREMENT;
+			if(a*Math.pow(b,zmfc) >= largerXSize) {
 				targetZoomFrac = zmfc;
 				break;
 			}
+		}
+		if(targetZoomFrac > maxZoomFrac) {
+			targetZoomFrac = maxZoomFrac;
 		}
 		return(targetZoomFrac);
 	}
