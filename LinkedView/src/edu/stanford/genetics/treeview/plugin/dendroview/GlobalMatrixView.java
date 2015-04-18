@@ -1,9 +1,15 @@
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.geom.Ellipse2D;
 import java.util.Observable;
+
+import edu.stanford.genetics.treeview.LogBuffer;
 
 public class GlobalMatrixView extends MatrixView {
 
@@ -13,7 +19,7 @@ public class GlobalMatrixView extends MatrixView {
 	private static final long serialVersionUID = 1L;
 	
 	private final int MAP_SIZE_LIMIT = 300;
-	private final int MIN_VIEWPORT_SIZE = 10;
+	private final int MIN_VIEWPORT_SIZE = 1;
 	
 	/* 
 	 * Also needs reference to interactive MapContainers to get knowledge
@@ -28,6 +34,11 @@ public class GlobalMatrixView extends MatrixView {
 	
 	private final Rectangle viewPortRect = new Rectangle();
 
+	/**
+	 * Circle to be used as indicator for selection
+	 */
+	private Ellipse2D.Double indicatorCircle = null;
+
 	public GlobalMatrixView() {
 		
 		super();
@@ -41,6 +52,19 @@ public class GlobalMatrixView extends MatrixView {
 
 			g.drawRect(viewPortRect.x, viewPortRect.y, viewPortRect.width, 
 					viewPortRect.height);
+
+			/*
+			 * draw white selection circle if only 1 tile is selected and small
+			 * enough.
+			 */
+			if (indicatorCircle != null) {
+				final Graphics2D g2 = (Graphics2D) g;
+				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+						RenderingHints.VALUE_ANTIALIAS_ON);
+				g2.setColor(Color.white);
+				g2.setStroke(new BasicStroke(2));
+				g2.draw(indicatorCircle);
+			}
 		}
 	}
 	
@@ -203,5 +227,43 @@ public class GlobalMatrixView extends MatrixView {
 		}
 		
 		viewPortRect.setBounds(spx, spy, epx - spx, epy - spy);
+
+		setIndicatorCircleBounds();
 	}
+
+	/**
+	 * Draws a circle if the user selects one rectangle in the clustergram to
+	 * indicate the position of this rectangle.
+	 */
+	private void setIndicatorCircleBounds() {
+
+		double x = 0;
+		double y = 0;
+		double w = 0;
+		double h = 0;
+
+		if (interactiveXmap.getNumVisible() < 5 &&
+				interactiveYmap.getNumVisible() < 5) {
+
+			// Width and height of rectangle which spans the Ellipse2D object
+			w = interactiveXmap.getNumVisible() * xmap.getScale();
+			h = interactiveYmap.getNumVisible() * ymap.getScale();
+
+			// coords for top left of circle
+			x = xmap.getPixel(interactiveXmap.getFirstVisible()) + w/2.0 - 5;
+			y = ymap.getPixel(interactiveYmap.getFirstVisible()) + w/2.0 - 5;
+			
+			//LogBuffer.println("Circle coords: x y w h: " + x+" "+y+" "+w+" "+h);
+
+			if (indicatorCircle == null) {
+				indicatorCircle = new Ellipse2D.Double(x, y, 10, 10);
+
+			} else {
+				indicatorCircle.setFrame(x, y, 10, 10);
+			}
+		} else if (indicatorCircle != null) {
+			indicatorCircle.setFrame(x, y, 0, 0);
+		}
+	}
+
 }

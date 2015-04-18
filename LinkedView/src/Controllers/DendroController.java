@@ -650,7 +650,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 			/* 
 			 * TODO Adapt zoom methods in MapContainer to differentiate between
-			 * adding/ removing tiles on the opposite axis sides. 
+			 * adding/removing tiles on the opposite axis sides. 
 			 * Can reduce this button madness to something more compact later.
 			 */
 			if (e.getSource() == dendroView.getXRightPlusButton()) {
@@ -703,8 +703,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 				// Remove row from top here
 
 			} else if (e.getSource() == dendroView.getHomeButton()) {
-				
-				/* TODO move out to separate method(s) */
+
 				int stepMask = InputEvent.ALT_MASK;
 				int fullMask = InputEvent.META_MASK;
 
@@ -1059,86 +1058,14 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	}
 
 	private void refocusViewPort() {
-		
-		reZoomVisible();
+
+		interactiveXmap.adjustToScreenChange();
+		interactiveYmap.adjustToScreenChange();
+
+		globalXmap.setToMinScale();
+		globalYmap.setToMinScale();
+
 		saveSettings();
-	}
-
-	/**
-	 * Uses the currently visible data indexes on the screen to update the scale
-	 * and zoom in conjunction with centerSelection() to handle window resize
-	 * events. Based on zoomSelection(). Does not change the number of visible
-	 * data indexes.
-	 */
-	private void reZoomVisible() {
-		
-		//LogBuffer.println("Rezooming visible");
-
-		double newScale = 0.0;
-		double newScale2 = 0.0;
-
-		// Obtain the selection size of each dimension
-		double arrayIndexes = interactiveXmap.getNumVisible();
-		double geneIndexes = interactiveYmap.getNumVisible();
-		
-
-		if (arrayIndexes == 0 || geneIndexes == 0
-				|| (arrayIndexes == interactiveXmap.getMaxIndex() 
-				&& geneIndexes == interactiveYmap.getMaxIndex())) {
-			// LogBuffer.println("No spots are visible. Resetting view.");
-			arrayIndexes = interactiveXmap.getMaxIndex() + 1;
-			geneIndexes = interactiveYmap.getMaxIndex() + 1;
-			
-			//LogBuffer.println("ReZoom setting zoom to default");
-			resetMatrixViews();
-			
-		} else {
-			newScale = (interactiveXmap.getAvailablePixels()) / arrayIndexes;
-
-			// if (newScale < globalXmap.getMinScale()) {
-			// newScale = globalXmap.getMinScale();
-			// }
-			interactiveXmap.setScale(newScale);
-
-			newScale2 = (interactiveYmap.getAvailablePixels()) / geneIndexes;
-
-			// if (newScale2 < globalYmap.getMinScale()) {
-			// newScale2 = globalYmap.getMinScale();
-			// }
-			interactiveYmap.setScale(newScale2);
-			
-			/* Updating GlobalMatrixView */
-			globalXmap.setToMinScale();
-			globalYmap.setToMinScale();
-			
-			/* 
-			 * Call inside here. No need for it outside this else statement.
-			 * Also saves a redundant notification call to observers in
-			 * reCenterVisible.
-			 */
-			reCenterVisible();
-			
-			notifyAllMapObservers();
-		}
-	}
-
-	/**
-	 * Scrolls to the center of the visible rectangle. Used when the window or
-	 * the image area is resized in order to keep the same data displayed.
-	 */
-	private void reCenterVisible() {
-
-		final int visibleGenes = interactiveYmap.getNumVisible();
-		final int visibleArrays = interactiveXmap.getNumVisible();
-
-		if (visibleGenes > 0 && visibleArrays > 0) {
-
-			final int startX = interactiveXmap.getFirstVisible();
-			final int startY = interactiveYmap.getFirstVisible();
-
-			interactiveXmap.scrollToFirstIndex(startX);
-			interactiveYmap.scrollToFirstIndex(startY);
-		}
 	}
 
 	public void saveImage(final JPanel panel) throws IOException {
@@ -2010,31 +1937,33 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	 * provides intuitive visual clues to the user.
 	 */
 	private void setAdaptiveButtonStatus() {
-		
+
 		/* Determine if either MapContainer is at minimum scale */
 		boolean isXMin = Helper.nearlyEqual(interactiveXmap.getMinScale(), 
 				interactiveXmap.getScale());
 		boolean isYMin = Helper.nearlyEqual(interactiveYmap.getMinScale(), 
 				interactiveYmap.getScale());
-		
+
 		int xTilesVisible = interactiveXmap.getNumVisible();
 		int yTilesVisible = interactiveYmap.getNumVisible();
-		
+
 		final boolean genesSelected = this.rowSelection != null &&
 				rowSelection.getNSelectedIndexes() > 0;
 		final boolean arraysSelected = this.colSelection != null &&
 				colSelection.getNSelectedIndexes() > 0;
 
-		boolean isSelectionZoomed =
-				genesSelected &&
+		//Note: A selection is "fully zoomed" if there is no selection - this
+		//will disable the zoom selection button
+		boolean isSelectionZoomed = (!genesSelected && !arraysSelected) ||
+				(genesSelected &&
 				rowSelection.getMinIndex() == interactiveYmap.getFirstVisible()
 				&& (rowSelection.getMaxIndex() - rowSelection.getMinIndex() + 1)
 				== yTilesVisible &&
 				arraysSelected &&
 				colSelection.getMinIndex() == interactiveXmap.getFirstVisible()
 				&& (colSelection.getMaxIndex() - colSelection.getMinIndex() + 1)
-				== xTilesVisible;
-		
+				== xTilesVisible);
+
 		/* Zoom-out buttons disabled if min scale for axis is reached. */
 		dendroView.getHomeButton().setEnabled(!(isXMin && isYMin));
 		dendroView.getYMinusBottomButton().setEnabled(!isYMin);
@@ -2042,8 +1971,9 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		dendroView.getXMinusRightButton().setEnabled(!isXMin);
 		dendroView.getXMinusLeftButton().setEnabled(!isXMin);
 		dendroView.getXYMinusButton().setEnabled(!(isXMin && isYMin));
-		
-		/* Zoom-in buttons disabled if visible tile number for axis is 1 */
+
+		/* Zoom-in buttons disabled if visible tile number for axis is 1 or if
+		 * the zoom target is already fully zoomed */
 		dendroView.getXRightPlusButton().setEnabled((xTilesVisible != 1));
 		dendroView.getYPlusBottomButton().setEnabled((yTilesVisible != 1));
 		dendroView.getXLeftPlusButton().setEnabled((xTilesVisible != 1));
@@ -2051,6 +1981,5 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		dendroView.getXYPlusButton().setEnabled((xTilesVisible != 1) 
 				|| (yTilesVisible != 1));
 		dendroView.getZoomButton().setEnabled(!isSelectionZoomed);
-		
 	}
 }

@@ -409,8 +409,9 @@ MouseWheelListener {
 
 				final int current = selectedIndexes[i];
 
-				if (rectangleRange.size() == 0
-						|| rectangleRange.get(rectangleRange.size() - 1) == current - 1) {
+				if (rectangleRange.size() == 0 ||
+					rectangleRange.get(rectangleRange.size() - 1) ==
+					current - 1) {
 					rectangleRange.add(current);
 					loopStart = i + 1;
 
@@ -433,7 +434,8 @@ MouseWheelListener {
 
 			sp = map.getPixel(selectionRange.get(0));
 			// last pixel of last block
-			ep = map.getPixel(selectionRange.get(selectionRange.size() - 1) + 1) - 1;
+			ep = map.getPixel(selectionRange.get(selectionRange.size() - 1) + 1)
+					- 1;
 
 			if (ep < sp) {
 				ep = sp;
@@ -659,7 +661,8 @@ MouseWheelListener {
 		// down
 		if (e.isAltDown()) {
 			if (notches < 0) {
-				//This ensures we only zoom toward the cursor when the cursor is over the map
+				//This ensures we only zoom toward the cursor when the cursor is
+				//over the map
 				if (status != null) {
 					smoothZoomTowardPixel(e.getX(),e.getY());
 				}
@@ -702,19 +705,29 @@ MouseWheelListener {
 			updateAspectRatio();
 		}
 
-		double targetZoomFrac = 0.05; //This is the amount by which we incrementally zoom in.  It is hard-coded here and in separate unrelated zooming functions in MapContainer
+		//This is the amount by which we incrementally zoom in.  It is hard-
+		//coded here in addition to inside MapContainer because we need to
+		//adjust the value based on aspect ratio
+		double targetZoomFrac = 0.05;
 
-		//This will tell us how out of sync the aspect ratio has gotten from the smooth-zooming trick and
-		//how many cells on the x axis we must add or remove to correct the aspect ratio
-		//(to what it was before we started zooming)
+		//This will tell us how out of sync the aspect ratio has gotten from the
+		//smooth-zooming trick and how many cells on the x axis we must add or
+		//remove to correct the aspect ratio (to what it was before we started
+		//zooming)
 		double numXCellsShouldHave = aspectRatio * (double) numYCells;
 
 		//Could check for possible div by zero here, but should be impossible
-		double targetZoomFracCorrection = Math.abs(numXCellsShouldHave - (double) numXCells) / (double) numXCells;
-		//If numXCellsShouldHave is basically an integer and is equal to numXCells
-		if((numXCellsShouldHave % 1) == 0 && ((int) Math.round(numXCellsShouldHave)) == numXCells) {
-			zoomXVal = xmap.getBestZoomInVal(xPxPos,numXCells,targetZoomFrac);
-			zoomYVal = ymap.getBestZoomInVal(yPxPos,numYCells,targetZoomFrac);
+		double targetZoomFracCorrection =
+				Math.abs(numXCellsShouldHave - (double) numXCells) /
+				(double) numXCells;
+
+		//If numXCellsShouldHave is basically an integer and equals numXCells,
+		//we will ensure there is a zoom on both axes (this really is only good
+		//for equal numbers of visible cells on both axes -possibly unnecessary)
+		if((numXCellsShouldHave % 1) == 0 &&
+				((int) Math.round(numXCellsShouldHave)) == numXCells) {
+			zoomXVal = xmap.getBestZoomInVal(xPxPos,targetZoomFrac);
+			zoomYVal = ymap.getBestZoomInVal(yPxPos,targetZoomFrac);
 			//If no zoom has occurred
 			if(zoomXVal == 0 && zoomYVal == 0) {
 				//If there's room to zoom in both dimensions
@@ -728,16 +741,21 @@ MouseWheelListener {
 				}
 			}
 		} else if(numXCellsShouldHave > numXCells) {
-			//If the X axis should have more cells on it, so zoom in on the y axis more (resulting in fewer rows) to relatively make the x axis have more cells in comparison
-			//The fraction calculation is different for the Y axis.  The following calculation is based on the merging of a few equations:
+			//If the X axis should have more cells on it, so zoom in on the y
+			//axis more (resulting in fewer rows) to relatively make the x axis
+			//have more cells in comparison.
+			//The fraction calculation is different for the Y axis.  The
+			//following calculation is based on the merging of a few equations:
 			//current aspectRatio           = numXCells/numYCells
 			//numXCellsShouldHave           = aspectRatio*numYCells                                     //If we decide to make Y "correct", we can calculate what X should be
 			//numXCellsShouldHave/numYCells = numXCells/(numYCells+_numYCellsShouldHave_) = aspectRatio //We do not know _numYCellsShouldHave_, solving for it, we have:
 			//_numYCellsShouldHave_         = numXCells*numYCells/numXCellsShouldHave-numYCells         //Then, canceling out numYCells, we have:
 			//_numYCellsShouldHave_         = numXCells/numXCellsShouldHave-1                           //_numYCellsShouldHave_ will be a ratio, i.e. the same as targetZoomFracCorrection
-			targetZoomFracCorrection = Math.abs((double) numXCells / numXCellsShouldHave - 1);
-			zoomXVal = xmap.getBestZoomInVal(xPxPos,numXCells,targetZoomFrac);
-			zoomYVal = ymap.getBestZoomInVal(yPxPos,numYCells,targetZoomFrac + targetZoomFracCorrection);
+			targetZoomFracCorrection =
+					Math.abs((double) numXCells / numXCellsShouldHave - 1);
+			zoomXVal = xmap.getBestZoomInVal(xPxPos,targetZoomFrac);
+			zoomYVal = ymap.getBestZoomInVal(yPxPos,
+					targetZoomFrac + targetZoomFracCorrection);
 			//If no zoom has occurred
 			if(zoomXVal == 0 && zoomYVal == 0) {
 				//If there's room to zoom in the Y dimension
@@ -749,11 +767,9 @@ MouseWheelListener {
 			}
 		}
 		else {
-			//This should theoretically be more accurate, but it is not for some reason:
-			//targetZoomFracCorrection = numXCellsShouldHave / (double) numXCells;
-
-			zoomXVal = xmap.getBestZoomInVal(xPxPos,numXCells,targetZoomFrac + targetZoomFracCorrection);
-			zoomYVal = ymap.getBestZoomInVal(yPxPos,numYCells,targetZoomFrac);
+			zoomXVal = xmap.getBestZoomInVal(xPxPos,
+					targetZoomFrac + targetZoomFracCorrection);
+			zoomYVal = ymap.getBestZoomInVal(yPxPos,targetZoomFrac);
 			//If no zoom has occurred
 			if(zoomXVal == 0 && zoomYVal == 0) {
 				//If there's room to zoom in the X dimension
@@ -764,7 +780,11 @@ MouseWheelListener {
 				}
 			}
 		}
-		//LogBuffer.println("Aspect ratio.  Current: [" + numXCells + " / " + numYCells + "] Target: [" + aspectRatio + "].  targetZoomFracCorrection: [" + targetZoomFracCorrection + "].  New zoomXVal: [" + zoomXVal + "] New zoomYVal: [" + zoomYVal + "] numXCellsShouldHave: [" + numXCellsShouldHave + "].");
+		//LogBuffer.println("Aspect ratio.  Current: [" + numXCells + " / " +
+		//numYCells + "] Target: [" + aspectRatio +
+		//"].  targetZoomFracCorrection: [" + targetZoomFracCorrection +
+		//"].  New zoomXVal: [" + zoomXVal + "] New zoomYVal: [" + zoomYVal +
+		//"] numXCellsShouldHave: [" + numXCellsShouldHave + "].");
 
 		if(xmap.zoomTowardPixel(xPxPos,zoomXVal) == 1)
 			updateAspectRatio();
@@ -789,30 +809,42 @@ MouseWheelListener {
 			updateAspectRatio();
 		}
 
-		double targetZoomFrac = 0.05; //This is the amount by which we incrementally zoom in.  It is hard-coded here and in separate unrelated zooming functions in MapContainer
+		//This is the amount by which we incrementally zoom out.  It is hard-
+		//coded here in addition to inside MapContainer because we need to
+		//adjust the value based on aspect ratio
+		double targetZoomFrac = 0.05;
 
-		//This will tell us how out of sync the aspect ratio has gotten from the smooth-zooming trick and
-		//how many cells on the x axis we must add or remove to correct the aspect ratio
-		//(to what it was before we started zooming)
+		//This will tell us how out of sync the aspect ratio has gotten from the
+		//smooth-zooming trick and how many cells on the x axis we must add or
+		//remove to correct the aspect ratio (to what it was before we started
+		//zooming)
 		double numXCellsShouldHave = aspectRatio * (double) numYCells;
 
 		//Could check for possible div by zero here, but should be impossible
-		double targetZoomFracCorrection = Math.abs(numXCellsShouldHave - (double) numXCells) / (double) numXCells;
-		//If numXCellsShouldHave is basically an integer and equal to numXCells
-		if((numXCellsShouldHave % 1) == 0 && ((int) Math.round(numXCellsShouldHave)) == numXCells) {
-			zoomXVal = xmap.getBestZoomOutVal(xPxPos,numXCells,targetZoomFrac);
-			zoomYVal = ymap.getBestZoomOutVal(yPxPos,numYCells,targetZoomFrac);
+		double targetZoomFracCorrection = Math.abs(numXCellsShouldHave -
+				(double) numXCells) / (double) numXCells;
+
+		//If numXCellsShouldHave is basically an integer and equals numXCells,
+		//we will ensure there is a zoom on both axes (this really is only good
+		//for equal numbers of visible cells on both axes -possibly unnecessary)
+		if((numXCellsShouldHave % 1) == 0 &&
+				((int) Math.round(numXCellsShouldHave)) == numXCells) {
+			zoomXVal = xmap.getBestZoomOutVal(xPxPos,targetZoomFrac);
+			zoomYVal = ymap.getBestZoomOutVal(yPxPos,targetZoomFrac);
 			//If no zoom has occurred
 			if(zoomXVal == 0 && zoomYVal == 0) {
-				//If there's room to zoom in both dimensions, try to zoom out 2, then 1
-				if(numYCells < ymap.getMaxIndex() && numXCells < xmap.getMaxIndex()) {
+				//If there's room to zoom in both dimensions, try to zoom out 2,
+				//then 1 : Probably unnecessary
+				if(numYCells < ymap.getMaxIndex() &&
+						numXCells < xmap.getMaxIndex()) {
 					zoomXVal = 2;
 					zoomYVal = 2;
 				} else if(numYCells < ymap.getMaxIndex()) {
 					zoomYVal = 2;
 				} else if(numXCells < xmap.getMaxIndex()) {
 					zoomXVal = 2;
-				} else if(numYCells < (ymap.getMaxIndex() + 1) && numXCells < (xmap.getMaxIndex() + 1)) {
+				} else if(numYCells < (ymap.getMaxIndex() + 1) &&
+						numXCells < (xmap.getMaxIndex() + 1)) {
 					zoomXVal = 1;
 					zoomYVal = 1;
 				} else if(numYCells < (ymap.getMaxIndex() + 1)) {
@@ -822,12 +854,11 @@ MouseWheelListener {
 				}
 			}
 		} else if(numXCellsShouldHave > numXCells) {
-			//This should theoretically be more accurate, but it is not for some reason:
-			//targetZoomFracCorrection = numXCellsShouldHave / (double) numXCells;
-
-			//If the X axis should have more cells on it, zoom out on the x axis more
-			zoomXVal = xmap.getBestZoomOutVal(xPxPos,numXCells,targetZoomFrac + targetZoomFracCorrection);
-			zoomYVal = ymap.getBestZoomOutVal(yPxPos,numYCells,targetZoomFrac);
+			//If the X axis should have more cells on it, zoom out on the x axis
+			//more
+			zoomXVal = xmap.getBestZoomOutVal(xPxPos,
+					targetZoomFrac + targetZoomFracCorrection);
+			zoomYVal = ymap.getBestZoomOutVal(yPxPos,targetZoomFrac);
 			//If no zoom has occurred
 			if(zoomXVal == 0 && zoomYVal == 0) {
 				//If there's room to zoom out in the X dimension
@@ -839,16 +870,20 @@ MouseWheelListener {
 			}
 		}
 		else {
-			//Else, the X axis should have fewer cells on it, so zoom out on the y axis more
-			//The fraction calculation is different for the Y axis.  The following calculation is based on the merging of a few equations:
+			//Else, the X axis should have fewer cells on it, so zoom out on the
+			//y axis more.
+			//The fraction calculation is different for the Y axis.  The
+			//following calculation is based on the merging of a few equations:
 			//current aspectRatio           = numXCells/numYCells
 			//numXCellsShouldHave           = aspectRatio*numYCells                                     //If we decide to make Y "correct", we can calculate what X should be
 			//numXCellsShouldHave/numYCells = numXCells/(numYCells+_numYCellsShouldHave_) = aspectRatio //We do not know _numYCellsShouldHave_, solving for it, we have:
 			//_numYCellsShouldHave_         = numXCells*numYCells/numXCellsShouldHave-numYCells         //Then, canceling out numYCells, we have:
 			//_numYCellsShouldHave_         = numXCells/numXCellsShouldHave-1                           //_numYCellsShouldHave_ will be a ratio, i.e. the same as targetZoomFracCorrection
-			targetZoomFracCorrection = Math.abs((double) numXCells / numXCellsShouldHave - 1);
-			zoomXVal = xmap.getBestZoomOutVal(xPxPos,numXCells,targetZoomFrac);
-			zoomYVal = ymap.getBestZoomOutVal(yPxPos,numYCells,targetZoomFrac + targetZoomFracCorrection);
+			targetZoomFracCorrection =
+					Math.abs((double) numXCells / numXCellsShouldHave - 1);
+			zoomXVal = xmap.getBestZoomOutVal(xPxPos,targetZoomFrac);
+			zoomYVal = ymap.getBestZoomOutVal(yPxPos,
+					targetZoomFrac + targetZoomFracCorrection);
 			//If no zoom has occurred
 			if(zoomXVal == 0 && zoomYVal == 0) {
 				//If there's room to zoom out in the Y dimension
@@ -859,7 +894,11 @@ MouseWheelListener {
 				}
 			}
 		}
-		//LogBuffer.println("Aspect ratio.  Current: [" + numXCells + " / " + numYCells + "] Target: [" + aspectRatio + "].  targetZoomFracCorrection: [" + targetZoomFracCorrection + "].  New zoomXVal: [" + zoomXVal + "] New zoomYVal: [" + zoomYVal + "] numXCellsShouldHave: [" + numXCellsShouldHave + "].");
+		//LogBuffer.println("Aspect ratio.  Current: [" + numXCells + " / " +
+		//numYCells + "] Target: [" + aspectRatio +
+		//"].  targetZoomFracCorrection: [" + targetZoomFracCorrection +
+		//"].  New zoomXVal: [" + zoomXVal + "] New zoomYVal: [" + zoomYVal +
+		//"] numXCellsShouldHave: [" + numXCellsShouldHave + "].");
 
 		if(xmap.zoomAwayPixel(xPxPos,zoomXVal) == 1)
 			updateAspectRatio();
@@ -869,7 +908,7 @@ MouseWheelListener {
 	
 	public void smoothIncrementalZoomOut() {
 		//The function below has a bug that prevents full zoom out
-		// - this works around that:
+		// - this works around that - though it may have already been fixed
 		int prevXNumVisible = xmap.getNumVisible();
 		int prevYNumVisible = ymap.getNumVisible();
 
@@ -878,10 +917,17 @@ MouseWheelListener {
 		smoothZoomTowardSelection(0,(xmap.getMaxIndex() + 1),
 				0,(ymap.getMaxIndex() + 1));
 
-		//The function above has a bug that prevents full zoom out
-		// - this works around that:
+		//The function above has a bug that prevents full zoom out sometimes
+		// - this works around that, though it may have been fixed
 		if(prevXNumVisible == xmap.getNumVisible() &&
 				prevYNumVisible == ymap.getNumVisible()) {
+
+			//If you've never seen this message and you use the home button a
+			//lot, you can probably remove this if-conditional and the prev*
+			//variables
+			//LogBuffer.println("smoothZoomTowardSelection bug still exists." +
+			//					"  Working around it.");
+
 			xmap.zoomOutCenter();
 			ymap.zoomOutCenter();
 		}
@@ -899,9 +945,9 @@ MouseWheelListener {
 	}
 
 	public void smoothAnimatedZoomTowardSelection(int selecXStartIndex,
-													int numXSelectedIndexes,
-													int selecYStartIndex,
-													int numYSelectedIndexes) {
+												  int numXSelectedIndexes,
+												  int selecYStartIndex,
+												  int numYSelectedIndexes) {
 		long startTime = System.currentTimeMillis();
 
 		//Zooming out is slower on large matrices because it just takes longer
@@ -914,22 +960,21 @@ MouseWheelListener {
 						ymap.getNumVisible() < numYSelectedIndexes)) {
 			doneWaitingMillis = 70;
 		}
-		boolean done = true;
 
-		//Let's calculate the relative position of the center of the selection and gradually zoom toward that spot in a loop
+		//Let's calculate the relative position of the center of the selection
+		//and gradually zoom toward that spot in a loop
 		while(xmap.getNumVisible() != numXSelectedIndexes ||
-			ymap.getNumVisible() != numYSelectedIndexes) {
+			  ymap.getNumVisible() != numYSelectedIndexes) {
 
-			//If drawing the zoom increment levels is taking too long, snap out of it.
-			if((System.currentTimeMillis() - startTime) > doneWaitingMillis) {
-				done = false;
+			//If drawing the zoom increment levels is taking too long, snap out
+			//of it.
+			if((System.currentTimeMillis() - startTime) > doneWaitingMillis)
 				break;
-			}
 
 			smoothZoomTowardSelection(selecXStartIndex,
-										numXSelectedIndexes,
-										selecYStartIndex,
-										numYSelectedIndexes);
+									  numXSelectedIndexes,
+									  selecYStartIndex,
+									  numYSelectedIndexes);
 
 			//Force an immediate repaint.  Found this in a thread here:
 			//https://community.oracle.com/thread/1663771
@@ -951,158 +996,247 @@ MouseWheelListener {
 		//level or scroll position, so we should do a zoom & scroll here just to
 		//be certain. Scroll could be off because of the way it is separated
 		//from the zoom, so we will always do that
-		if(!done) {
+		if(xmap.getNumVisible() != numXSelectedIndexes)
 			xmap.zoomToSelected(selecXStartIndex,
 					(selecXStartIndex + numXSelectedIndexes - 1));
+		if(ymap.getNumVisible() != numYSelectedIndexes)
 			ymap.zoomToSelected(selecYStartIndex,
 					(selecYStartIndex + numYSelectedIndexes - 1));
-		}
-		xmap.scrollToFirstIndex(selecXStartIndex);
-		ymap.scrollToFirstIndex(selecYStartIndex);
+		if(xmap.getFirstVisible() != selecXStartIndex)
+			xmap.scrollToFirstIndex(selecXStartIndex);
+		if(ymap.getFirstVisible() != selecYStartIndex)
+			ymap.scrollToFirstIndex(selecYStartIndex);
 
 		//We will update the aspect ratio just in case it didn't happen
 		//automatically
 		updateAspectRatio();
 	}
 
-	/* TODO: Simplify/streamline this function and move a bunch of steps to independent functions in MapContainer - Rob */
-	//Currently, this function assumes that the selected cells are smaller than or equal to the number of cells currently visible
-	//I should rename it to smoothZoomToSelection and update it to be able to handle zooming out when the visible area is smaller
-	//(or 1 dimension smaller, the other larger) and to be able to smoothly zoom/scroll to a selection outside of the visible area
-	//Essentially, all this function does is it calls getZoomTowardPixelOfSelection to determine the pixel in the selection to zoom toward
-	//  (so that the selection ends up filling the view) and then uses that pixel to call zoomTowardPixel.
-	public void smoothZoomTowardSelection(int selecXStartIndex,int numXSelectedIndexes,int selecYStartIndex,int numYSelectedIndexes) {
+	/* TODO: Simplify/streamline this function, move a bunch of steps to
+	 * independent functions in MapContainer, and make it able to handle pixel
+	 * positions that are out of view (xPxPos and yPxPos) - Rob */
+	/* TODO: There appears to be a minor bug when zooming out.  The final zoom
+	 * steps tends to be very very small, perhaps a single row/col.  That can't
+	 * be coincidence. - Rob */
+	/**
+	 * Essentially, all this function does is call getZoomTowardPixelOfSelection
+	 * to determine the pixel in the selection to zoom toward (so that the
+	 * selection ends up filling the view) and then uses that pixel to call
+	 * zoomTowardPixel.
+	 */
+	public void smoothZoomTowardSelection(int selecXStartIndex,
+										  int numXSelectedIndexes,
+										  int selecYStartIndex,
+										  int numYSelectedIndexes) {
 		
-		//Find the pixel inside the selected area to "zoom toward" such that the selected area essentially expands to fill the screen
+		//Find the pixel inside the selected area to "zoom toward" such that the
+		//selected area essentially expands to fill the screen
 		int startXPixel = xmap.getPixel(selecXStartIndex);
 		double pixelsPerXIndex = xmap.getScale();
-		int numSelectedXPixels = (int) Math.round((double) numXSelectedIndexes * pixelsPerXIndex);
-		//int xPxPos = xmap.getZoomTowardPixelOfSelection(startXPixel,numSelectedXPixels);
-		int xPxPos = xmap.getZoomTowardPixelOfSelection(startXPixel,numSelectedXPixels);
+		int numSelectedXPixels = (int) Math.round((double) numXSelectedIndexes *
+				pixelsPerXIndex);
+		int xPxPos = xmap.getZoomTowardPixelOfSelection(startXPixel,
+														numSelectedXPixels);
+		//LogBuffer.println("smoothZoomTowardSelection: Starting X index " +
+		//"sent in: [" + selecXStartIndex + "] and pixel index obtained for " +
+		//"that data index: [" + startXPixel + "] and then pixel selected to " +
+		//"zoom toward is: [" + xPxPos + "].");
 		int startYPixel = ymap.getPixel(selecYStartIndex);
 		double pixelsPerYIndex = ymap.getScale();
-		int numSelectedYPixels = (int) Math.round((double) numYSelectedIndexes * pixelsPerYIndex);
-		//int yPxPos = ymap.getZoomTowardPixelOfSelection(startYPixel,numSelectedYPixels);
-		int yPxPos = ymap.getZoomTowardPixelOfSelection(startYPixel,numSelectedYPixels);
+		int numSelectedYPixels = (int) Math.round((double) numYSelectedIndexes *
+				pixelsPerYIndex);
+		int yPxPos = ymap.getZoomTowardPixelOfSelection(startYPixel,
+														numSelectedYPixels);
+		//LogBuffer.println("smoothZoomTowardSelection: Starting Y index " +
+		//"sent in: [" + selecYStartIndex + "] and pixel index obtained for " +
+		//"that data index: [" + startYPixel + "] and then pixel selected to " +
+		//"zoom toward is: [" + yPxPos + "].");
+
+		//LogBuffer.println("Going to zoom toward pixel at: [x" + xPxPos +
+		//		",y" + yPxPos + "] determined from data cell at: [x" +
+		//		selecXStartIndex + ",y" + selecYStartIndex +
+		//		"].  Selected pixel start/number: [x" + startXPixel + "/" +
+		//		numSelectedXPixels + ",y" + startYPixel + "/" +
+		//		numSelectedYPixels + "].");
 		
-		//LogBuffer.println("Going to zoom toward pixel at: [x" + xPxPos + ",y" + yPxPos + "] determined from data cell at: [x" + selecXStartIndex + ",y" + selecYStartIndex +
-		//		"].  Selected pixel start/number: [x" + startXPixel + "/" + numSelectedXPixels + ",y" + startYPixel + "/" + numSelectedYPixels + "].");
+		//The final aspect ratio of the selected area will be our target aspect
+		//ratio (used for smoothness corrections)
+		double targetAspectRatio =
+				(double) numXSelectedIndexes / (double) numYSelectedIndexes;
 		
-		//The final aspect ratio of the selected area will be our target aspect ratio (used for smoothness corrections)
-		double targetAspectRatio = (double) numXSelectedIndexes / (double) numYSelectedIndexes;
-		
-		int zoomXVal  = 0;
-		int zoomYVal  = 0;
-		int numXCells = xmap.getNumVisible();
-		int numYCells = ymap.getNumVisible();
-		int xPxNum    = xmap.getAvailablePixels();
-		int yPxNum    = ymap.getAvailablePixels();
+		int zoomXVal          = 0;
+		int zoomYVal          = 0;
+		int numXCells         = xmap.getNumVisible();
+		int numYCells         = ymap.getNumVisible();
+		int xPxNum            = xmap.getAvailablePixels();
+		int yPxNum            = ymap.getAvailablePixels();
 		int prevXFirstVisible = xmap.getFirstVisible();
 		int prevXNumVisible   = xmap.getNumVisible();
-		int centerXIndex      = xmap.getFirstVisible() + (int) Math.floor((double) xmap.getNumVisible() / 2.0);
+		int centerXIndex      = xmap.getFirstVisible() +
+				(int) Math.floor((double) xmap.getNumVisible() / 2.0);
 		int prevYFirstVisible = ymap.getFirstVisible();
 		int prevYNumVisible   = ymap.getNumVisible();
-		int centerYIndex      = ymap.getFirstVisible() + (int) Math.floor((double) ymap.getNumVisible() / 2.0);
+		int centerYIndex      = ymap.getFirstVisible() +
+				(int) Math.floor((double) ymap.getNumVisible() / 2.0);
 
-		double targetZoomFracX = 0.5;
-		//The following loop cycles through zoom increments 0.05,0.1,0.15,... to 0.5
-		//and stops when the zoom increment is large enough to overcome the long time it takes to draw huge matrices
-		//It uses an equation that was solved using these 2 equations (forcing a logarithmic curve to pass through 2 points)
-		//6000 = a * b^0.5 and 100 = a * b^0.05
-		//where a = 63.45, b = 8942
-		//Basically, when the number of visible spots is 6000, the zoom increment will be 50%.
-		//When the number of visible spots is 100, the zoom increment will be 5%.  There's a log scale in between.
-		int largerXSize = numXSelectedIndexes;
-		if(numXCells > largerXSize) {
-			largerXSize = numXCells;
-		}
-		for(int zf = 1;zf<=10;zf++) {
-			double zmfc = (double) zf * 0.05;
-			if(63.45*Math.pow(8942,zmfc) > largerXSize) {
-				targetZoomFracX = zmfc;
-				break;
-			}
-		}
-
-		double targetZoomFracY = 0.5;
-		//The following loop cycles through zoom increments 0.05,0.1,0.15,... to 0.5
-		//and stops when the zoom increment is large enough to overcome the long time it takes to draw huge matrices
-		//It uses an equation that was solved using these 2 equations (forcing a logarithmic curve to pass through 2 points)
-		//6000 = a * b^0.5 and 100 = a * b^0.05
-		//Basically, when the number of visible spots is 6000, the zoom increment will be 50%.
-		//When the number of visible spots is 100, the zoom increment will be 5%.  There's a log scale in between.
-		int largerYSize = numYSelectedIndexes;
-		if(numYCells > largerYSize) {
-			largerYSize = numYCells;
-		}
-		for(int zf = 1;zf<=10;zf++) {
-			double zmfc = (double) zf * 0.05;
-			if(63.45*Math.pow(8942,zmfc) > largerYSize) {
-				targetZoomFracY = zmfc;
-				break;
-			}
-		}
-
+		//Since it takes a lot of time to draw large matrices, select a zoom
+		//fraction based on the size of the matrix we are going to draw at each
+		//increment so that we skip increments that take too much time to draw
+		double targetZoomFracX =
+				xmap.getOptimalZoomIncrement(numXSelectedIndexes);
+		double targetZoomFracY =
+				ymap.getOptimalZoomIncrement(numYSelectedIndexes);
 		//Select the larger zoom increment from the 2 dimensions
 		double targetZoomFrac = targetZoomFracX;
 		if(targetZoomFrac < targetZoomFracY) targetZoomFrac = targetZoomFracY;
-		//LogBuffer.println("Zoom fraction: [" + targetZoomFrac + "] XtargetFrac: [" + targetZoomFracX + "] YtargetFrac: [" + targetZoomFracY + "].");
 
-		double aspectRatioFracCorrection = 0.2; //This makes the change in aspect ratio *somewhat* gradual, though it's not synced up with the zoom fraction (because we don't know how many iterations it will take)
+		//If the starting aspect ratio is different from the target aspect
+		//ratio, we don't want to snap to that ratio on the first step - we want
+		//to get there gradually, so we'll adjust based on the
+		//targetZoomFraction.  Matching that value doesn't seem to be very
+		//effective, so as long as the targetZoomFraction is less than 33%,
+		//we'll multiply the value by 3.  That seems to end up with the gradual
+		//changing of the aspect ratio to look much more appealing and natural.
+		//We might end up reaching the target aspect ratio before or after we've
+		//reached the target zoom level, so there's probably a better way, but
+		//this works OK.
+		double aspectRatioFracCorrection = targetZoomFrac;
+			//1 - targetZoomFrac;
+			//(targetZoomFrac < 0.33 ? targetZoomFrac * 3.0 : targetZoomFrac);
+				
+		//LogBuffer.println("Zoom fraction: [" + targetZoomFrac +
+		//		"] XtargetFrac: [" + targetZoomFracX + "] YtargetFrac: [" +
+		//		targetZoomFracY + "] Aspect Ratio fraction correction: [" +
+		//		aspectRatioFracCorrection + "].");
 
-		//This will tell us how out of sync the aspect ratio has gotten from the smooth-zooming trick and
-		//how many cells on the x axis we must add or remove to correct the aspect ratio
-		//(to what it was before we started zooming)
+		//This will tell us how out of sync the aspect ratio has gotten from the
+		//smooth-zooming trick and how many cells on the x axis we must add or
+		//remove to correct the aspect ratio (to what it was before we started
+		//zooming)
 		double numXCellsShouldHave = targetAspectRatio * (double) numYCells;
+
+		//LogBuffer.println("numXCellsShouldHave before fractioning the " +
+		//"targetAspectRatio: [" + numXCellsShouldHave + "].");
+
+		//To cause the targetAspectRatio to be arrived at gradually, let's
+		//only correct by a percentage of the correction:
+		numXCellsShouldHave = (double) numXCells +
+				(numXCellsShouldHave -
+						(double) numXCells) * aspectRatioFracCorrection;
+
+		//LogBuffer.println("numXCellsShouldHave after fractioning the " +
+		//"targetAspectRatio: [" + numXCellsShouldHave + "].");
 
 		double targetZoomFracCorrection = 0.0;
 		
-		//If numXCellsShouldHave is basically an integer and is equal to numXCells
-		if((numXCellsShouldHave % 1) == 0 && ((int) Math.round(numXCellsShouldHave)) == numXCells) {
-			zoomXVal = xmap.getBestZoomInVal(xPxPos,numXCells,targetZoomFrac);
-			zoomYVal = ymap.getBestZoomInVal(yPxPos,numYCells,targetZoomFrac);
+		//If numXCellsShouldHave is basically an integer and is equal to
+		//numXCells, we are at the exact aspect ratio and no correction to it is
+		//necessary
+		if((numXCellsShouldHave % 1) == 0 &&
+				((int) Math.round(numXCellsShouldHave)) == numXCells) {
+
+			//If we're zooming in on the X axis
+			if(numXCells >= numXSelectedIndexes) {
+				zoomXVal = xmap.getBestZoomInVal(xPxPos,targetZoomFrac);
+			} else {
+				zoomXVal = xmap.getBestZoomOutVal(xPxPos,targetZoomFrac);
+			}
+			//If we're zooming in on the Y axis
+			if(numYCells >= numYSelectedIndexes) {
+				zoomYVal = ymap.getBestZoomInVal(yPxPos,targetZoomFrac);
+			} else {
+				zoomYVal = ymap.getBestZoomOutVal(yPxPos,targetZoomFrac);
+			}
+
+			//LogBuffer.println("Jumping to [" + numXCellsShouldHave +
+			//"] because it's an integer equal to the target number of cells.");
+			//LogBuffer.println("Zooming by [x" + zoomXVal + ",y" + zoomYVal +
+			//"] target aspect ratio: [" + targetAspectRatio +
+			//"]. Target zoom frac: [" + targetZoomFrac + "]");
 			
-			//LogBuffer.println("Jumping to [" + numXCellsShouldHave + "] because it's an integer equal to the target number of cells.");
-			
-			//If no zoom has occurred
+			//If no zoom has occurred (due to selection of 0 due to smoothing -
+			//a possibility that helps to allow aspect ratio changes, but is not
+			//relevant here) - force a zoom to happen
 			if(zoomXVal == 0 && zoomYVal == 0) {
-				//If there's room to zoom in both dimensions
-				if(((numXSelectedIndexes <= xmap.getNumVisible() && numXCells > 1) ||
-						(numXSelectedIndexes > xmap.getNumVisible() && numXCells < (xmap.getMaxIndex() + 1))) &&
-					((numYSelectedIndexes <= ymap.getNumVisible() && numYCells > 1) ||
-						(numYSelectedIndexes > ymap.getNumVisible() && numYCells < (ymap.getMaxIndex() + 1)))) {
+
+				//If there's room to zoom 2 in both dimensions
+				if(((numXSelectedIndexes <= xmap.getNumVisible() &&
+					 numXCells > 2) ||
+					(numXSelectedIndexes > xmap.getNumVisible() &&
+					 numXCells < (xmap.getMaxIndex() + 2))) &&
+					((numYSelectedIndexes <= ymap.getNumVisible() &&
+					  numYCells > 2) ||
+					 (numYSelectedIndexes > ymap.getNumVisible() &&
+					  numYCells < (ymap.getMaxIndex() + 2)))) {
+					zoomXVal = 2;
+					zoomYVal = 2;
+				} else if((numXSelectedIndexes <= xmap.getNumVisible() &&
+						   numXCells > 1) ||
+						  (numXSelectedIndexes > xmap.getNumVisible() &&
+						   numXCells < (xmap.getMaxIndex() + 1))) {
 					zoomXVal = 1;
-					zoomYVal = 1;
-				} else if((numXSelectedIndexes <= xmap.getNumVisible() && numXCells > 1) ||
-						(numXSelectedIndexes > xmap.getNumVisible() && numXCells < (xmap.getMaxIndex() + 1))) {
-					zoomXVal = 1;
-				} else if((numYSelectedIndexes <= ymap.getNumVisible() && numYCells > 1) ||
-						(numYSelectedIndexes > ymap.getNumVisible() && numYCells < (ymap.getMaxIndex() + 1))) {
+				} else if((numYSelectedIndexes <= ymap.getNumVisible() &&
+						   numYCells > 1) ||
+						  (numYSelectedIndexes > ymap.getNumVisible() &&
+						   numYCells < (ymap.getMaxIndex() + 1))) {
 					zoomYVal = 1;
 				}
 			}
 		}
-		//Else if we should have more X cells and we are zooming in on the Y axis
-		else if((numXCellsShouldHave > numXCells && numYCells > numYSelectedIndexes) || (numXCellsShouldHave < numXCells && numYCells < numYSelectedIndexes)) {
-			double numYCellsShouldHave = (double) numXCells / targetAspectRatio;
-			if(numYCellsShouldHave < numYSelectedIndexes) {
-				numYCellsShouldHave = numYSelectedIndexes;
-			} else if(numYCellsShouldHave > (ymap.getMaxIndex() + 1)) {
-				numYCellsShouldHave = (ymap.getMaxIndex() + 1);
-			}
+		//Else if we should have more X cells and we are zooming in on the Y
+		//axis OR we should have fewer X cells and we are zooming out on the Y
+		//axis
+		else if((numXCellsShouldHave > numXCells &&
+				 numYCells > numYSelectedIndexes) ||
+				(numXCellsShouldHave < numXCells &&
+				 numYCells < numYSelectedIndexes)) {
 
-			//To cause the targetAspectRatio to be arrived at gradually, let's only correct by a percentage of the correction:
-			numYCellsShouldHave = (double) numYCells - Math.abs(numYCellsShouldHave - (double) numYCells) * aspectRatioFracCorrection;
-			//LogBuffer.println("Zooming in on Y axis more: numYCellsShouldHave = numYCells - Math.abs(numYCellsShouldHave - numYCells) * aspectRatioFracCorrection");
-			//LogBuffer.println("Zooming in on Y axis more: " + numYCellsShouldHave + " = " + numYCells + " - Math.abs(" + numYCellsShouldHave + " - " + numYCells + ") * " + aspectRatioFracCorrection);
+			double numYCellsShouldHave = (double) numXCells / targetAspectRatio;
+
+			//LogBuffer.println("Actual number of cells that should be on " +
+			//"the Y axis: [" + numYCellsShouldHave + "]");
+			//if(numYCellsShouldHave < numYSelectedIndexes) {
+			//	numYCellsShouldHave = numYSelectedIndexes;
+			//} else if(numYCellsShouldHave > (ymap.getMaxIndex() + 1)) {
+			//	numYCellsShouldHave = (ymap.getMaxIndex() + 1);
+			//}
+
+			//LogBuffer.println("Zooming in on Y axis more: " +
+			//"numYCellsShouldHave = numYCells - Math.abs(numYCellsShouldHave" +
+			//" - numYCells) * aspectRatioFracCorrection");
+			//LogBuffer.println("Zooming in on Y axis more: " +
+			//"numYCellsShouldHave = " + numYCells + " - Math.abs(" +
+			//numYCellsShouldHave + " - " + numYCells + ") * " +
+			//aspectRatioFracCorrection);
+
+			//To cause the targetAspectRatio to be arrived at gradually, let's
+			//only correct by a percentage of the correction:
+			numYCellsShouldHave = (double) numYCells +
+					(numYCellsShouldHave -
+							(double) numYCells) * aspectRatioFracCorrection;
 			
-			//Could check for possible div by zero here, but should be impossible
-			targetZoomFracCorrection = Math.abs(numYCellsShouldHave - (double) numYCells) / (double) numYCells;
-			//LogBuffer.println("Zooming in on Y axis more: targetZoomFracCorrection = Math.abs(numYCellsShouldHave - numYCells) / numYCells");
-			//LogBuffer.println("Zooming in on Y axis more: " + targetZoomFracCorrection + " = Math.abs(" + numYCellsShouldHave + " - " + numYCells + ") / " + numYCells);
+			//Could check for possible div by zero here, but should be
+			//impossible
+			targetZoomFracCorrection =
+					Math.abs(numYCellsShouldHave -
+							 (double) numYCells) / (double) numYCells;
+			if(targetZoomFracCorrection > 1.0) {
+				targetZoomFracCorrection =
+						Math.abs(numYCellsShouldHave - (double) numYCells) /
+						(double) numYCellsShouldHave;
+			}
+			//LogBuffer.println("Zooming in on Y axis more: " +
+			//"targetZoomFracCorrection = Math.abs(numYCellsShouldHave - " +
+			//"numYCells) / numYCells");
+			//LogBuffer.println("Zooming in on Y axis more: " +
+			//targetZoomFracCorrection + " = Math.abs(" + numYCellsShouldHave +
+			//" - " + numYCells + ") / " + numYCells);
 			
-			//If the X axis should have more cells on it, so zoom in on the y axis more (resulting in fewer rows) to relatively make the x axis have more cells in comparison
-			//The fraction calculation is different for the Y axis.  The following calculation is based on the merging of a few equations:
+			//If the X axis should have more cells on it, so zoom in on the y
+			//axis more (resulting in fewer rows) to relatively make the x axis
+			//have more cells in comparison
+			//The fraction calculation is different for the Y axis.  The
+			//following calculation is based on the merging of a few equations:
 			//current aspectRatio           = numXCells/numYCells
 			//numXCellsShouldHave           = aspectRatio*numYCells                                     //If we decide to make Y "correct", we can calculate what X should be
 			//numXCellsShouldHave/numYCells = numXCells/(numYCells+_numYCellsShouldHave_) = aspectRatio //We do not know _numYCellsShouldHave_, solving for it, we have:
@@ -1110,228 +1244,446 @@ MouseWheelListener {
 			//_numYCellsShouldHave_         = numXCells/numXCellsShouldHave-1                           //_numYCellsShouldHave_ will be a ratio, i.e. the same as targetZoomFracCorrection
 			////////targetZoomFracCorrection = Math.abs((double) numXCells / numXCellsShouldHave - 1);
 			if(numXCells >= numXSelectedIndexes) {
-				zoomXVal = xmap.getBestZoomInVal(xPxPos,numXCells,targetZoomFrac);
+				zoomXVal = xmap.getBestZoomInVal(xPxPos,targetZoomFrac);
 			} else {
-				zoomXVal = xmap.getBestZoomOutVal(xPxPos,numXCells,targetZoomFrac);
+				zoomXVal = xmap.getBestZoomOutVal(xPxPos,targetZoomFrac);
 			}
 			if(numYCells >= numYSelectedIndexes) {
-				zoomYVal = ymap.getBestZoomInVal(yPxPos,numYCells,targetZoomFrac + targetZoomFracCorrection);
+				zoomYVal = ymap.getBestZoomInVal(yPxPos,
+						targetZoomFrac +
+						(1 - targetZoomFrac) * targetZoomFracCorrection);
 			} else {
-				zoomYVal = ymap.getBestZoomOutVal(yPxPos,numYCells,targetZoomFrac + targetZoomFracCorrection);
+				zoomYVal = ymap.getBestZoomOutVal(yPxPos,
+						targetZoomFrac +
+						(1 - targetZoomFrac) * targetZoomFracCorrection);
 			}
 
-			//LogBuffer.println("Zooming in more on the Y axis because the number of X cells we should have [" + numXCellsShouldHave + "] is greater than the current number of cells [" + numXCells + "], so we calculated this many Y cells we should have given a gradual aspect ratio change: [" + numYCellsShouldHave + "].");
+			//LogBuffer.println("targetZoomFracCorrection: [" +
+			//		targetZoomFracCorrection + "].  Resulting zoomXVal: [" +
+			//		zoomXVal + "].");
+
+			//LogBuffer.println("Zooming more on the Y axis because the " +
+			//"number of X cells we should have [" + numXCellsShouldHave +
+			//"] is greater than the current number of cells [" + numXCells +
+			//"] and we are zooming in on the Y axis or the number of X " +
+			//"cells we should have is fewer than the current number of " +
+			//"cells, so we calculated this many Y cells we should have " +
+			//"given a gradual aspect ratio change: [" + numYCellsShouldHave +
+			//"].");
 
 			//If no zoom has occurred
 			if(zoomXVal == 0 && zoomYVal == 0) {
 				//If there's room to zoom in the X dimension
-				if((numXSelectedIndexes <= xmap.getNumVisible() && numXCells > 1) ||
-						(numXSelectedIndexes > xmap.getNumVisible() && numXCells < (xmap.getMaxIndex() + 1))) {
+				if((numXSelectedIndexes <= xmap.getNumVisible() &&
+					numXCells > 1) ||
+				   (numXSelectedIndexes > xmap.getNumVisible() &&
+					numXCells < (xmap.getMaxIndex() + 1))) {
 					zoomXVal = 1;
-				} else if((numYSelectedIndexes <= ymap.getNumVisible() && numYCells > 1) ||
-						(numYSelectedIndexes > ymap.getNumVisible() && numYCells < (ymap.getMaxIndex() + 1))) {
+				} else if((numYSelectedIndexes <= ymap.getNumVisible() &&
+						   numYCells > 1) ||
+						(numYSelectedIndexes > ymap.getNumVisible() &&
+						 numYCells < (ymap.getMaxIndex() + 1))) {
 					zoomYVal = 1;
 				}
 			}
 		}
 		else {
-			//To cause the targetAspectRatio to be arrived at gradually, let's only correct by a percentage of the correction:
-			numXCellsShouldHave = numXCells + (numXCells - numXCellsShouldHave) * aspectRatioFracCorrection;
+			//LogBuffer.println("Actual number of cells that should be on " +
+			//"the X axis: [" + numXCellsShouldHave + "]");
 			
-			//Could check for possible div by zero here, but should be impossible
-			targetZoomFracCorrection = Math.abs(numXCellsShouldHave - (double) numXCells) / (double) numXCells;
-			
-			//This should theoretically be more accurate, but it is not for some reason:
-			//targetZoomFracCorrection = numXCellsShouldHave / (double) numXCells;
+			//Could check for possible div by zero here, but should be
+			//impossible
+			targetZoomFracCorrection =
+					Math.abs(numXCellsShouldHave -
+							 (double) numXCells) / (double) numXCells;
+			if(targetZoomFracCorrection > 1.0) {
+				targetZoomFracCorrection =
+						Math.abs(numXCellsShouldHave - (double) numXCells) /
+						(double) numXCellsShouldHave;
+			}
+
+			//This should theoretically be more accurate, but it is not for some
+			//reason:
+			//targetZoomFracCorrection =
+			//		numXCellsShouldHave / (double) numXCells;
 
 			if(numXCells >= numXSelectedIndexes) {
-				zoomXVal = xmap.getBestZoomInVal(xPxPos,numXCells,targetZoomFrac + targetZoomFracCorrection);
+				//LogBuffer.println("Zooming in on the X axis.");
+				zoomXVal = xmap.getBestZoomInVal(xPxPos,
+						targetZoomFrac +
+						(1 - targetZoomFrac) * targetZoomFracCorrection);
 			} else {
-				zoomXVal = xmap.getBestZoomOutVal(xPxPos,numXCells,targetZoomFrac + targetZoomFracCorrection);
+				//LogBuffer.println("Zooming out on the X axis.");
+				zoomXVal = xmap.getBestZoomOutVal(xPxPos,
+						targetZoomFrac +
+						(1 - targetZoomFrac) * targetZoomFracCorrection);
 			}
 			if(numYCells >= numYSelectedIndexes) {
-				zoomYVal = ymap.getBestZoomInVal(yPxPos,numYCells,targetZoomFrac);
+				//LogBuffer.println("Zooming in on the Y axis.");
+				zoomYVal = ymap.getBestZoomInVal(yPxPos,targetZoomFrac);
 			} else {
-				zoomYVal = ymap.getBestZoomOutVal(yPxPos,numYCells,targetZoomFrac);
+				//LogBuffer.println("Zooming out on the Y axis.");
+				zoomYVal = ymap.getBestZoomOutVal(yPxPos,targetZoomFrac);
 			}
 
-			//LogBuffer.println("Zooming in more on the X axis because the number of X cells we should have [" + numXCellsShouldHave + "] is less than or equal to the target number of X cells [" + numXCells + "].");
+			//LogBuffer.println("targetZoomFracCorrection: [" +
+			//		targetZoomFracCorrection + "].  Resulting zoomXVal: [" +
+			//		zoomXVal + "].");
+
+			//LogBuffer.println("Zooming more on the X axis because the " +
+			//"number of X cells we should have [" + numXCellsShouldHave +
+			//"] is less than or equal to the target number of X cells [" +
+			//numXCells + "].");
 
 			//If no zoom has occurred
 			if(zoomXVal == 0 && zoomYVal == 0) {
 				//If there's room to zoom in the X dimension
-				if((numXSelectedIndexes <= xmap.getNumVisible() && numXCells > 1) ||
-						(numXSelectedIndexes > xmap.getNumVisible() && numXCells < (xmap.getMaxIndex() + 1))) {
+				if((numXSelectedIndexes <= xmap.getNumVisible() &&
+					numXCells > 1) ||
+				   (numXSelectedIndexes > xmap.getNumVisible() &&
+					numXCells < (xmap.getMaxIndex() + 1))) {
 					zoomXVal = 1;
-				} else if((numYSelectedIndexes <= ymap.getNumVisible() && numYCells > 1) ||
-						(numYSelectedIndexes > ymap.getNumVisible() && numYCells < (ymap.getMaxIndex() + 1))) {
+				} else if((numYSelectedIndexes <= ymap.getNumVisible() &&
+						   numYCells > 1) ||
+						  (numYSelectedIndexes > ymap.getNumVisible() &&
+						   numYCells < (ymap.getMaxIndex() + 1))) {
 					zoomYVal = 1;
 				}
 			}
 		}
-		//LogBuffer.println("Aspect ratio.  Current: [" + numXCells + " / " + numYCells + "] Target: [" + targetAspectRatio + "].  targetZoomFracCorrection: [" + targetZoomFracCorrection + "].  New zoomXVal: [" + zoomXVal + "] New zoomYVal: [" + zoomYVal + "] numXCellsShouldHave: [" + numXCellsShouldHave + "].");
+		//LogBuffer.println("Aspect ratio.  Current: [" + numXCells + " / " +
+		//numYCells + "] Target: [" + targetAspectRatio +
+		//"].  targetZoomFracCorrection: [" + targetZoomFracCorrection +
+		//"].  New zoomXVal: [" + zoomXVal + "] New zoomYVal: [" + zoomYVal +
+		//"] numXCellsShouldHave: [" + numXCellsShouldHave + "].");
 
-		if(numXSelectedIndexes <= xmap.getNumVisible()) {
-			//Let's make sure that we're not going to zoom past our target area
-			if((xmap.getNumVisible() - zoomXVal) < numXSelectedIndexes) {
-				zoomXVal = xmap.getNumVisible() - numXSelectedIndexes;
+		//Double-check that a zoom will indeed happen - a fail-safe because
+		//The above code does not guarantee a zoom in rare circumstances - a
+		//side-effect of the way we're smoothing the zoom
+		if(zoomXVal == 0 && zoomYVal == 0) {
+			if(numXSelectedIndexes != numXCells) {
+				zoomXVal = 1;
 			}
-			
-			//Now double-check that a zoom will indeed happen
-			if(zoomXVal == 0 && zoomYVal == 0 && numYSelectedIndexes != ymap.getNumVisible()) {
+			if(numYSelectedIndexes != numYCells) {
 				zoomYVal = 1;
 			}
-			
+		}
+
+		//Zoom the x axis
+		if(numXSelectedIndexes <= numXCells) {
+			//Let's make sure that we're not going to zoom past our target area
+			if((numXCells - zoomXVal) < numXSelectedIndexes) {
+				zoomXVal = numXCells - numXSelectedIndexes;
+			}
+
+			//LogBuffer.println("Zooming in on the x axis");
 			xmap.zoomTowardPixel(xPxPos,zoomXVal);
 		} else {
 			//Let's make sure that we're not going to zoom past our target area
-			if((xmap.getNumVisible() + zoomXVal) > numXSelectedIndexes) {
-				zoomXVal = Math.abs(xmap.getNumVisible() - numXSelectedIndexes);
+			if((numXCells + zoomXVal) > numXSelectedIndexes) {
+				zoomXVal = Math.abs(numXCells - numXSelectedIndexes);
 			}
-			
-			//Now double-check that a zoom will indeed happen
-			if(zoomXVal == 0 && zoomYVal == 0 && numYSelectedIndexes != ymap.getNumVisible()) {
-				zoomYVal = 1;
-			}
-			
+
+			//LogBuffer.println("Zooming out on the x axis with xPxPos [" +
+			//xPxPos + "] and zoomXVal [" + zoomXVal + "].");
 			xmap.zoomAwayPixel(xPxPos,zoomXVal);
 		}
-		if(numYSelectedIndexes <= ymap.getNumVisible()) {
+
+		//Zoom the y axis
+		if(numYSelectedIndexes <= numYCells) {
 			//Let's make sure that we're not going to zoom past our target area
-			if((ymap.getNumVisible() - zoomYVal) < numYSelectedIndexes) {
-				zoomYVal = ymap.getNumVisible() - numYSelectedIndexes;
+			if((numYCells - zoomYVal) < numYSelectedIndexes) {
+				zoomYVal = numYCells - numYSelectedIndexes;
 			}
 
-			//Now double-check that a zoom will indeed happen
-			if(zoomXVal == 0 && zoomYVal == 0 && numXSelectedIndexes != xmap.getNumVisible()) {
-				zoomXVal = 1;
-				//We have to do an extra here because we didn't do any x zooming above
-				if(numXSelectedIndexes <= xmap.getNumVisible()) {
-					xmap.zoomTowardPixel(xPxPos,zoomXVal);
-				} else {
-					xmap.zoomAwayPixel(xPxPos,zoomXVal);
-				}
-			}
-			
+			//LogBuffer.println("Zooming in on the y axis");
 			ymap.zoomTowardPixel(yPxPos,zoomYVal);
-		} else {
+		}
+		//Else we were supposed to be zooming out
+		else {
 			//Let's make sure that we're not going to zoom past our target area
-			if((ymap.getNumVisible() + zoomYVal) > numYSelectedIndexes) {
-				zoomYVal = Math.abs(ymap.getNumVisible() - numYSelectedIndexes);
+			if((numYCells + zoomYVal) > numYSelectedIndexes) {
+				zoomYVal = Math.abs(numYCells - numYSelectedIndexes);
 			}
 
-			//Now double-check that a zoom will indeed happen
-			if(zoomXVal == 0 && zoomYVal == 0 && numXSelectedIndexes != xmap.getNumVisible()) {
-				zoomXVal = 1;
-				//We have to do an extra here because we didn't do any x zooming above
-				if(numXSelectedIndexes <= xmap.getNumVisible()) {
-					xmap.zoomTowardPixel(xPxPos,zoomXVal);
-				} else {
-					xmap.zoomAwayPixel(xPxPos,zoomXVal);
-				}
-			}
-			
+			//LogBuffer.println("Zooming out on the y axis");
 			ymap.zoomAwayPixel(yPxPos,zoomYVal);
 		}
 
-		//Now that we have zoomed, we should scroll if the selection is off the screen
+		//LogBuffer.println("Should have zoomed by [x" + zoomXVal + ",y" +
+		//zoomYVal + "].");
+
+		//Now that we have zoomed, we should scroll if the selection is off the
+		//screen.
 		//If zooming has finished, scroll all the way
-		if(xmap.getNumVisible() == numXSelectedIndexes && ymap.getNumVisible() == numYSelectedIndexes) {
+		if(xmap.getNumVisible() == numXSelectedIndexes &&
+				ymap.getNumVisible() == numYSelectedIndexes) {
 			xmap.scrollToFirstIndex(selecXStartIndex);
 			ymap.scrollToFirstIndex(selecYStartIndex);
 		}
-		//Else if the pixel we are zooming to is on an edge, assume we need to scroll some
-		else if(xPxPos <= 0 || yPxPos <= 0 || xPxPos >= xPxNum || yPxPos >= yPxNum) {
-			//Scroll toward by half of the same fraction as the zoom changed
-			//We don't want to scroll all the way in 1 sudden jolt, so we'll scroll to be closer to the center of the selection by (half) the same fraction as the incremental zoom (unless we're at the zoom level of the selection)
-			double scrollFrac =  ((double) xmap.getNumVisible() / (double) prevXNumVisible);
-			if(scrollFrac > 1) {
-				scrollFrac =  (double) prevXNumVisible / (double) xmap.getNumVisible();
-			}
-			scrollFrac /= 2.0;
+		else {
+			//LogBuffer.println("Correcting the scroll because (xPxPos <= 0 " +
+			//"|| yPxPos <= 0 || xPxPos >= (xPxNum - 1) || yPxPos >= (yPxNum " +
+			//"- 1)) = (" + xPxPos + " <= 0 || " + yPxPos + " <= 0 || " +
+			//xPxPos + " >= (" + xPxNum + " - 1) || " + yPxPos + " >= (" +
+			//yPxNum + " - 1)).");
+
+			//If a selected edge (toward which we are zooming) is outside the
+			//previously visible corresponding boundary AND the selected area is
+			//not surrounding the visible area AND the pixel we are zooming to
+			//is on an edge, assume we need to scroll incrementally to bring the
+			//pixel we are zooming to/from into view
+			if((((//The target start is left of the view
+				  selecXStartIndex < prevXFirstVisible ||
+				  //The target stop is right of the view
+				  (selecXStartIndex + numXSelectedIndexes - 1) >
+				  (prevXFirstVisible + prevXNumVisible - 1)) &&
+				//The view is not inside the target dimensions
+				!(selecXStartIndex < prevXFirstVisible &&
+				  (selecXStartIndex + numXSelectedIndexes - 1) >
+				  (prevXFirstVisible + prevXNumVisible - 1)))) &&
+			   //The zoom-toward-pixel reported is on an edge
+			   (xPxPos <= 0 || xPxPos >= (xPxNum - 1))) {
+
+				//Scroll toward by half of the same fraction as the zoom changed
+				//We don't want to scroll all the way in 1 sudden jolt, so we'll
+				//scroll to be closer to the center of the selection by (half)
+				//the same fraction as the incremental zoom (unless we're at the
+				//zoom level of the selection)
+				double scrollFrac =  ((double) xmap.getNumVisible() /
+						(double) numXSelectedIndexes);
+				if(scrollFrac > 1) {
+					scrollFrac =  (double) numXSelectedIndexes /
+							(double) xmap.getNumVisible();
+				}
+				scrollFrac /= 2.0;
 			
-			int scrollDistDirX = (selecXStartIndex + (int) Math.floor(numXSelectedIndexes / 2)) - centerXIndex;
-			//LogBuffer.println("ScrollX difference before fractioning: " + scrollDistDirX + " = selecXStartIndex + numXSelectedIndexes / 2) - centerXIndex /// " + selecXStartIndex + " + " + numXSelectedIndexes + " / 2) - " + centerXIndex + ".");
-			scrollDistDirX = (int) Math.round((double) scrollDistDirX * scrollFrac);
-			//LogBuffer.println("ScrollX difference after fractioning: [" + scrollDistDirX + "].");
+				int scrollDistDirX = (selecXStartIndex +
+						(int) Math.floor(numXSelectedIndexes / 2)) -
+						centerXIndex;
 
-			/* TODO: Refactor the scrolling so that these checks do not have to be done. - Rob */
-			//The following correction calculations are to prevent scrolling a visible selected edge out of view./
-			//The calculations are not perfect and are only necessary because the zoomToward* functions only really work when
-			//the selection is either completely in view or we're zoomed in inside the selected area.
-			int prevFarEdge = prevXFirstVisible + prevXNumVisible;
-			int selecFarEdge = selecXStartIndex + numXSelectedIndexes;
-			int newNearEdge = (selecXStartIndex + (int) Math.floor(numXSelectedIndexes / 2)) - scrollDistDirX - (int) Math.ceil((double) xmap.getNumVisible() / 2);
-			int newFarEdge = (selecXStartIndex + (int) Math.floor(numXSelectedIndexes / 2)) - scrollDistDirX + (int) Math.ceil((double) xmap.getNumVisible() / 2);
-			//Make sure we don't scroll an edge from either in view or before the view to out of view/past the view
-			if(selecFarEdge <= prevFarEdge && selecFarEdge > newFarEdge) {
-				scrollDistDirX -= (selecFarEdge - newFarEdge) + (int) Math.round((1.0 - scrollFrac) * Math.abs((double) selecFarEdge - (double) prevFarEdge));
-				//LogBuffer.println("ScrollX difference after correcting for far edge overscroll: [" + scrollDistDirX + "].");
-				newNearEdge = (selecXStartIndex + (int) Math.floor(numXSelectedIndexes / 2)) - scrollDistDirX - (int) Math.ceil((double) xmap.getNumVisible() / 2);
-				newFarEdge = (selecXStartIndex + (int) Math.floor(numXSelectedIndexes / 2)) - scrollDistDirX + (int) Math.ceil((double) xmap.getNumVisible() / 2);
-				if(selecFarEdge > newFarEdge || (selecXStartIndex >= prevXFirstVisible && selecXStartIndex < newNearEdge)) {
-					scrollDistDirX = 0;
-					//LogBuffer.println("ScrollX difference after correcting for far edge overscroll: [" + scrollDistDirX + "].");
+				//LogBuffer.println("ScrollX difference before fractioning: " +
+				//scrollDistDirX + " = selecXStartIndex + " +
+				//"numXSelectedIndexes / 2) - centerXIndex /// " +
+				//selecXStartIndex + " + " + numXSelectedIndexes + " / 2) - " +
+				//centerXIndex + ".");
+				scrollDistDirX =
+						(int) Math.round((double) scrollDistDirX * scrollFrac);
+				//LogBuffer.println("ScrollX difference after fractioning: [" +
+				//scrollDistDirX + "].");
+
+				/* TODO: Refactor the scrolling so that these checks do not have
+				 * to be done. - Rob */
+				//The following correction calculations are to prevent scrolling
+				//a visible selected edge out of view.
+				//The calculations are not perfect and are only necessary
+				//because the zoomToward* functions only really work when the
+				//selection is either completely in view or we're zoomed in
+				//inside the selected area.
+				int prevFarEdge = prevXFirstVisible + prevXNumVisible;
+				int selecFarEdge = selecXStartIndex + numXSelectedIndexes;
+				int newNearEdge = (selecXStartIndex +
+						(int) Math.floor(numXSelectedIndexes / 2)) -
+						scrollDistDirX -
+						(int) Math.ceil((double) xmap.getNumVisible() / 2);
+				int newFarEdge = (selecXStartIndex +
+						(int) Math.floor(numXSelectedIndexes / 2)) -
+						scrollDistDirX +
+						(int) Math.ceil((double) xmap.getNumVisible() / 2);
+				//Make sure we don't scroll an edge from either in view or
+				//before the view to out of view/past the view
+				if(selecFarEdge <= prevFarEdge && selecFarEdge > newFarEdge) {
+					scrollDistDirX -= (selecFarEdge - newFarEdge) +
+							(int) Math.round((1.0 - scrollFrac) *
+									Math.abs((double) selecFarEdge -
+											(double) prevFarEdge));
+					//LogBuffer.println("ScrollX difference after correcting " +
+					//"for far edge overscroll: [" + scrollDistDirX + "].");
+					newNearEdge = (selecXStartIndex +
+							(int) Math.floor(numXSelectedIndexes / 2)) -
+							scrollDistDirX -
+							(int) Math.ceil((double) xmap.getNumVisible() / 2);
+					newFarEdge = (selecXStartIndex +
+							(int) Math.floor(numXSelectedIndexes / 2)) -
+							scrollDistDirX +
+							(int) Math.ceil((double) xmap.getNumVisible() / 2);
+					if(selecFarEdge > newFarEdge ||
+					   (selecXStartIndex >= prevXFirstVisible &&
+						selecXStartIndex < newNearEdge)) {
+						scrollDistDirX = 0;
+						//LogBuffer.println("ScrollX difference after " +
+						//"correcting for far edge overscroll: [" +
+						//scrollDistDirX + "].");
+					}
+				} else if(selecXStartIndex >= prevXFirstVisible &&
+						  selecXStartIndex < newNearEdge) {
+					scrollDistDirX += (newNearEdge - selecXStartIndex) +
+							(int) Math.round((1.0 - scrollFrac) *
+									((double) selecXStartIndex -
+											(double) prevXFirstVisible));
+					//LogBuffer.println("ScrollX difference after correcting " +
+					//"for near edge overscroll: [" + scrollDistDirX + "].");
+					newNearEdge = (selecXStartIndex +
+							(int) Math.floor(numXSelectedIndexes / 2)) -
+							scrollDistDirX -
+							(int) Math.ceil((double) xmap.getNumVisible() / 2);
+					newFarEdge = (selecXStartIndex +
+							(int) Math.floor(numXSelectedIndexes / 2)) -
+							scrollDistDirX +
+							(int) Math.ceil((double) xmap.getNumVisible() / 2);
+					if(selecXStartIndex < newNearEdge ||
+					   (selecFarEdge <= prevFarEdge &&
+					    selecFarEdge > newFarEdge)) {
+						scrollDistDirX = 0;
+						//LogBuffer.println("ScrollX difference after " +
+						//"correcting for far edge overscroll: [" +
+						//scrollDistDirX + "].");
+					}
 				}
-			} else if(selecXStartIndex >= prevXFirstVisible && selecXStartIndex < newNearEdge) {
-				scrollDistDirX += (newNearEdge - selecXStartIndex) + (int) Math.round((1.0 - scrollFrac) * ((double) selecXStartIndex - (double) prevXFirstVisible));
-				//LogBuffer.println("ScrollX difference after correcting for near edge overscroll: [" + scrollDistDirX + "].");
-				newNearEdge = (selecXStartIndex + (int) Math.floor(numXSelectedIndexes / 2)) - scrollDistDirX - (int) Math.ceil((double) xmap.getNumVisible() / 2);
-				newFarEdge = (selecXStartIndex + (int) Math.floor(numXSelectedIndexes / 2)) - scrollDistDirX + (int) Math.ceil((double) xmap.getNumVisible() / 2);
-				if(selecXStartIndex < newNearEdge || (selecFarEdge <= prevFarEdge && selecFarEdge > newFarEdge)) {
-					scrollDistDirX = 0;
-					//LogBuffer.println("ScrollX difference after correcting for far edge overscroll: [" + scrollDistDirX + "].");
-				}
+	
+				//LogBuffer.println("Correcting the X scroll because the " +
+				//"pixel we are zooming to/from is on an edge.");
+				//LogBuffer.println("(selecXStartIndex + numXSelectedIndexes " +
+				//"/ 2) - scrollDistDirX");
+				//LogBuffer.println(((selecXStartIndex + (int) Math.floor(" +
+				//"numXSelectedIndexes / 2)) - scrollDistDirX) + " = (" +
+				//selecXStartIndex + " + " + numXSelectedIndexes + " / 2) - " +
+				//scrollDistDirX);
+				xmap.scrollToIndex((selecXStartIndex +
+						(int) Math.floor(numXSelectedIndexes / 2)) -
+						scrollDistDirX);
 			}
-			
-			xmap.scrollToIndex((selecXStartIndex + (int) Math.floor(numXSelectedIndexes / 2)) - scrollDistDirX);
 
-			//Scroll toward by half of the same fraction as the zoom changed
-			scrollFrac =  ((double) ymap.getNumVisible() / (double) prevYNumVisible); //We don't want to scroll all the way in 1 jolt, so we'll scroll to be closer to the center of the selection by this fraction (unless we're at the zoom level of the selection)
-			if(scrollFrac > 1) {
-				scrollFrac =  (double) prevYNumVisible / (double) ymap.getNumVisible();
-			}
-			scrollFrac /= 2.0;
+			//If a selected edge (toward which we are zooming) is outside the
+			//previously visible corresponding boundary AND the selected area is
+			//not surrounding the visible area AND the pixel we are zooming to
+			//is on an edge, assume we need to scroll incrementally to bring the
+			//pixel we are zooming to/from into view
+			if((((selecYStartIndex < prevYFirstVisible ||
+				  (selecYStartIndex + numYSelectedIndexes - 1) >
+				  (prevYFirstVisible + prevYNumVisible - 1)) &&
+				 !(selecYStartIndex < prevYFirstVisible &&
+				   (selecYStartIndex + numYSelectedIndexes - 1) >
+				   (prevYFirstVisible + prevYNumVisible - 1)))) &&
+			   (yPxPos <= 0 || yPxPos >= (yPxNum - 1))) {
 
-			int scrollDistDirY = (selecYStartIndex + (int) Math.floor(numYSelectedIndexes / 2)) - centerYIndex;
-			//LogBuffer.println("ScrollY difference before fractioning: " + scrollDistDirY + " = selecYStartIndex + numYSelectedIndexes / 2) - centerYIndex /// " + selecYStartIndex + " + " + numYSelectedIndexes + " / 2) - " + centerYIndex + ".");
-			scrollDistDirY = (int) Math.round((double) scrollDistDirY * scrollFrac);
-			//LogBuffer.println("ScrollY difference after fractioning: [" + scrollDistDirY + "].");
-
-			/* TODO: Refactor the scrolling so that these checks do not have to be done. - Rob */
-			//The following correction calculations are to prevent scrolling a visible selected edge out of view./
-			//The calculations are not perfect and are only necessary because the zoomToward* functions only really work when
-			//the selection is either completely in view or we're zoomed in inside the selected area.
-			prevFarEdge = prevYFirstVisible + prevYNumVisible;
-			selecFarEdge = selecYStartIndex + numYSelectedIndexes;
-			newNearEdge = (selecYStartIndex + (int) Math.floor(numYSelectedIndexes / 2)) - scrollDistDirY - (int) Math.ceil((double) ymap.getNumVisible() / 2);
-			newFarEdge = (selecYStartIndex + (int) Math.floor(numYSelectedIndexes / 2)) - scrollDistDirY + (int) Math.ceil((double) ymap.getNumVisible() / 2);
-			//Make sure we don't scroll an edge from either in view or before the view to out of view/past the view
-			if(selecFarEdge <= prevFarEdge && selecFarEdge > newFarEdge) {
-				scrollDistDirY -= (selecFarEdge - newFarEdge) + (int) Math.round((1.0 - scrollFrac) * Math.abs((double) selecFarEdge - (double) prevFarEdge));
-				//LogBuffer.println("ScrollY difference after correcting for far edge overscroll: [" + scrollDistDirY + "].");
-				newNearEdge = (selecYStartIndex + (int) Math.floor(numYSelectedIndexes / 2)) - scrollDistDirY - (int) Math.ceil((double) ymap.getNumVisible() / 2);
-				newFarEdge = (selecYStartIndex + (int) Math.floor(numYSelectedIndexes / 2)) - scrollDistDirY + (int) Math.ceil((double) ymap.getNumVisible() / 2);
-				if(selecFarEdge > newFarEdge || (selecYStartIndex >= prevYFirstVisible && selecYStartIndex < newNearEdge)) {
-					scrollDistDirY = 0;
-					//LogBuffer.println("ScrollY difference after correcting for far edge overscroll: [" + scrollDistDirY + "].");
+				//We don't want to scroll all the way in 1 jolt, so we'll scroll
+				//to be closer to the center of the selection by this fraction
+				//(unless we're at the zoom level of the selection)
+				//Scroll toward by half of the same fraction as the zoom changed
+				double scrollFrac = ((double) ymap.getNumVisible() /
+						(double) numYSelectedIndexes);
+				if(scrollFrac > 1) {
+					scrollFrac =  (double) numYSelectedIndexes /
+							(double) ymap.getNumVisible();
 				}
-			} else if(selecYStartIndex >= prevYFirstVisible && selecYStartIndex < newNearEdge) {
-				scrollDistDirY += (newNearEdge - selecYStartIndex) + (int) Math.round((1.0 - scrollFrac) * ((double) selecYStartIndex - (double) prevYFirstVisible));
-				//LogBuffer.println("ScrollY difference after correcting for near edge overscroll: [" + scrollDistDirY + "].");
-				newNearEdge = (selecYStartIndex + (int) Math.floor(numYSelectedIndexes / 2)) - scrollDistDirY - (int) Math.ceil((double) ymap.getNumVisible() / 2);
-				newFarEdge = (selecYStartIndex + (int) Math.floor(numYSelectedIndexes / 2)) - scrollDistDirY + (int) Math.ceil((double) ymap.getNumVisible() / 2);
-				if(selecYStartIndex < newNearEdge || (selecFarEdge <= prevFarEdge && selecFarEdge > newFarEdge)) {
-					//LogBuffer.println("ScrollY difference after correcting for far edge overscroll: [" + scrollDistDirY + "].");
-					scrollDistDirY = 0;
+				scrollFrac /= 2.0;
+
+				int scrollDistDirY = (selecYStartIndex +
+						(int) Math.floor(numYSelectedIndexes / 2)) -
+						centerYIndex;
+				//LogBuffer.println("ScrollY difference before fractioning: " +
+				//scrollDistDirY + " = selecYStartIndex + " +
+				//"numYSelectedIndexes / 2) - centerYIndex /// " +
+				//selecYStartIndex + " + " + numYSelectedIndexes + " / 2) - " +
+				//centerYIndex + ".");
+				scrollDistDirY = (int) Math.round((double) scrollDistDirY *
+						scrollFrac);
+				//LogBuffer.println("ScrollY difference after fractioning: [" +
+				//scrollDistDirY + "].");
+	
+				/* TODO: Refactor the scrolling so that these checks do not have
+				 * to be done. - Rob */
+				//The following correction calculations are to prevent scrolling
+				//a visible selected edge out of view.
+				//The calculations are not perfect and are only necessary
+				//because the zoomToward* functions only really work when the
+				//selection is either completely in view or we're zoomed in
+				//inside the selected area.
+				int prevFarEdge = prevYFirstVisible + prevYNumVisible;
+				int selecFarEdge = selecYStartIndex + numYSelectedIndexes;
+				int newNearEdge = (selecYStartIndex +
+						(int) Math.floor(numYSelectedIndexes / 2)) -
+						scrollDistDirY -
+						(int) Math.ceil((double) ymap.getNumVisible() / 2);
+				int newFarEdge = (selecYStartIndex +
+						(int) Math.floor(numYSelectedIndexes / 2)) -
+						scrollDistDirY +
+						(int) Math.ceil((double) ymap.getNumVisible() / 2);
+				//Make sure we don't scroll an edge from either in view or
+				//before the view to out of view/past the view
+				if(selecFarEdge <= prevFarEdge && selecFarEdge > newFarEdge) {
+					scrollDistDirY -= (selecFarEdge - newFarEdge) +
+							(int) Math.round((1.0 - scrollFrac) *
+									Math.abs((double) selecFarEdge -
+											(double) prevFarEdge));
+					//LogBuffer.println("ScrollY difference after correcting " +
+					//"for far edge overscroll: [" + scrollDistDirY + "].");
+					newNearEdge = (selecYStartIndex +
+							(int) Math.floor(numYSelectedIndexes / 2)) -
+							scrollDistDirY -
+							(int) Math.ceil((double) ymap.getNumVisible() / 2);
+					newFarEdge = (selecYStartIndex +
+							(int) Math.floor(numYSelectedIndexes / 2)) -
+							scrollDistDirY +
+							(int) Math.ceil((double) ymap.getNumVisible() / 2);
+					if(selecFarEdge > newFarEdge ||
+					   (selecYStartIndex >= prevYFirstVisible &&
+						selecYStartIndex < newNearEdge)) {
+						scrollDistDirY = 0;
+						//LogBuffer.println("ScrollY difference after " +
+						//"correcting for far edge overscroll: [" +
+						//scrollDistDirY + "].");
+					}
+				} else if(selecYStartIndex >= prevYFirstVisible &&
+						  selecYStartIndex < newNearEdge) {
+					scrollDistDirY += (newNearEdge - selecYStartIndex) +
+							(int) Math.round((1.0 - scrollFrac) *
+									((double) selecYStartIndex -
+											(double) prevYFirstVisible));
+					//LogBuffer.println("ScrollY difference after correcting " +
+					//"for near edge overscroll: [" + scrollDistDirY +
+					//"] because (selecYStartIndex >= prevYFirstVisible && " +
+					//"selecYStartIndex < newNearEdge) = (" + selecYStartIndex +
+					//" >= " + prevYFirstVisible + " && " + selecYStartIndex +
+					//" < " + newNearEdge + ").");
+					newNearEdge = (selecYStartIndex +
+							(int) Math.floor(numYSelectedIndexes / 2)) -
+							scrollDistDirY -
+							(int) Math.ceil((double) ymap.getNumVisible() / 2);
+					newFarEdge = (selecYStartIndex +
+							(int) Math.floor(numYSelectedIndexes / 2)) -
+							scrollDistDirY +
+							(int) Math.ceil((double) ymap.getNumVisible() / 2);
+					if(selecYStartIndex < newNearEdge ||
+					   (selecFarEdge <= prevFarEdge &&
+					    selecFarEdge > newFarEdge)) {
+						//LogBuffer.println("ScrollY difference after " +
+						//"correcting for far edge overscroll: [" +
+						//scrollDistDirY + "].");
+						scrollDistDirY = 0;
+					}
 				}
+				
+				//LogBuffer.println("Correcting the Y scroll because the " +
+				//"pixel we are zooming to/from is on an edge.");
+				//LogBuffer.println("(selecYStartIndex + numYSelectedIndexes " +
+				//"/ 2) - scrollDistDirY");
+				//LogBuffer.println(((selecYStartIndex +
+				//(int) Math.floor((double) numYSelectedIndexes / 2.0)) -
+				//scrollDistDirY) + " = (" + selecYStartIndex + " + " +
+				//numYSelectedIndexes + " / 2) - " + scrollDistDirY);
+				ymap.scrollToIndex((selecYStartIndex +
+						(int) Math.floor((double) numYSelectedIndexes / 2.0)) -
+						scrollDistDirY);
 			}
-			
-			ymap.scrollToIndex((selecYStartIndex + (int) Math.floor(numYSelectedIndexes / 2)) - scrollDistDirY);
 		}
 		
-		//Update the aspect ratio once we have arrived at our destination (as we are going to be using the starting aspect ratio to use it to gradually adjust the target aspect ratio)
-		if(xmap.getNumVisible() == numXSelectedIndexes && ymap.getNumVisible() == numYSelectedIndexes) {
+		//Update the aspect ratio once we have arrived at our destination (as we
+		//are going to be using the starting aspect ratio to use it to gradually
+		//adjust the target aspect ratio)
+		if(xmap.getNumVisible() == numXSelectedIndexes &&
+		   ymap.getNumVisible() == numYSelectedIndexes) {
 			updateAspectRatio();
 		}
 	}
@@ -1342,12 +1694,14 @@ MouseWheelListener {
 	
 	public void updateAspectRatio() {
 		aspectRatio = getAspectRatio(xmap.getNumVisible(),ymap.getNumVisible());
-		//LogBuffer.println("Aspect Ratio updated to [" + aspectRatio + " : " + xmap.getNumVisible() + "/" + ymap.getNumVisible() + "].");
+		//LogBuffer.println("Aspect Ratio updated to [" + aspectRatio + " : " +
+		//xmap.getNumVisible() + "/" + ymap.getNumVisible() + "].");
 	}
 
 	public void setAspectRatio(int numXDots,int numYDots) {
 		aspectRatio = getAspectRatio(numXDots,numYDots);
-		//LogBuffer.println("Aspect Ratio set to [" + aspectRatio + " : " + xmap.getNumVisible() + "/" + ymap.getNumVisible() + "].");
+		//LogBuffer.println("Aspect Ratio set to [" + aspectRatio + " : " +
+		//xmap.getNumVisible() + "/" + ymap.getNumVisible() + "].");
 	}
 
 	
