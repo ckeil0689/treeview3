@@ -82,8 +82,8 @@ public class DragBarUI extends BasicSplitPaneUI {
 			
 			this.img = img_light;
 			
-			this.lightColor = this.getBackground();
-			this.darkColor = new Color(237, 237, 237);
+			this.lightColor = new Color(235, 235, 235);
+			this.darkColor = new Color(228, 228, 228);
 			this.foreColor = lightColor;
 			
 			addMouseListener(new MouseAdapter() {
