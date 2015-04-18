@@ -86,6 +86,8 @@ public class RowLabelView extends LabelView {
 
 		final int start = 0;
 		final int end = headerInfo.getNumHeaders();
+		
+//		LogBuffer.println("NumHeaders: " + end);
 
 		for (int j = start; j < end; j++) {
 

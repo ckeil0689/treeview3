@@ -107,14 +107,14 @@ public class ColumnLabelView extends LabelView {
 		final Rectangle visible = getVisibleRect();
 		setPreferredSize(new Dimension(map.getUsedPixels(), maxlength));
 
-		revalidate();
-		repaint();
-
 		if (maxlength > oldHeight) {
 			visible.y += maxlength - oldHeight;
 			scrollRectToVisible(visible);
 		}
 		oldHeight = maxlength;
+		
+		revalidate();
+		repaint();
 	}
 
 	@Override
