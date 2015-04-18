@@ -66,12 +66,8 @@ MouseWheelListener {
 
 	private int overx;
 	private int overy;
-//<<<<<<< HEAD:LinkedView/src/edu/stanford/genetics/treeview/plugin/dendroview/GlobalView.java
-//	private final JScrollPane scrollPane;
 	
 	private double aspectRatio = -1;
-//=======
-//>>>>>>> global_overview:LinkedView/src/edu/stanford/genetics/treeview/plugin/dendroview/InteractiveMatrixView.java
 
 	/**
 	 * Points to track candidate selected rows/cols should reflect where the
@@ -690,54 +686,11 @@ MouseWheelListener {
 		repaint();
 	}
 
-//<<<<<<< HEAD:LinkedView/src/edu/stanford/genetics/treeview/plugin/dendroview/GlobalView.java
-//	// @Override
-//	// public String getToolTipText(final MouseEvent e) {
-//	// /*
-//	// * Do we want to do mouseovers if value already visible? if
-//	// * (getShowVal()) return null; // don't do tooltips and vals at same
-//	// * time.
-//	// */
-//	// String ret = "";
-//	// String row = "";
-//	// String col = "";
-//	//
-//	// if (drawer != null) {
-//	//
-//	// final int geneRow = overy;
-//	//
-//	// if (xmap.contains(overx) && ymap.contains(overy)) {
-//	//
-//	// if (geneHI != null) {
-//	// row = geneSummary.getSummary(geneHI, overy);
-//	//
-//	// } else {
-//	// row = "N/A";
-//	// }
-//	//
-//	// if (arrayHI != null) {
-//	// col = arraySummary.getSummary(arrayHI, overx);
-//	//
-//	// } else {
-//	// col = "N/A";
-//	// }
-//	//
-//	// if (drawer.isMissing(overx, geneRow)) {
-//	// ret = "No data";
-//	//
-//	// } else if (drawer.isEmpty(overx, geneRow)) {
-//	// ret = null;
-//	//
-//	// } else {
-//	// ret = "<html>Row: " + row + " <br>Column: " + col
-//	// + " <br>Value: "
-//	// + drawer.getSummary(overx, geneRow) + "</html>";
-//	// }
-//	// }
-//	// }
-//	// return ret;
-//	// }
-
+	/**
+	 * TODO add JavaDoc description here
+	 * @param xPxPos
+	 * @param yPxPos
+	 */
 	public void smoothZoomTowardPixel(int xPxPos,int yPxPos) {
 		int zoomXVal = 0;
 		int zoomYVal = 0;
@@ -819,7 +772,13 @@ MouseWheelListener {
 			updateAspectRatio();
 	}
 
+	/**
+	 * TODO add JavaDoc description here
+	 * @param xPxPos
+	 * @param yPxPos
+	 */
 	public void smoothZoomFromPixel(int xPxPos,int yPxPos) {
+		
 		int zoomXVal = 0;
 		int zoomYVal = 0;
 		int numXCells = xmap.getNumVisible();
@@ -1391,8 +1350,7 @@ MouseWheelListener {
 		//LogBuffer.println("Aspect Ratio set to [" + aspectRatio + " : " + xmap.getNumVisible() + "/" + ymap.getNumVisible() + "].");
 	}
 
-//=======
-//>>>>>>> global_overview:LinkedView/src/edu/stanford/genetics/treeview/plugin/dendroview/InteractiveMatrixView.java
+	
 	private void drawBand(final Rectangle l) {
 
 		final Graphics g = getGraphics();

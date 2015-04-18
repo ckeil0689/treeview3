@@ -4,8 +4,8 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -27,9 +27,6 @@ import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.WideComboBox;
 
 public class GUIFactory {
-
-	// Default
-	public static String QUESTIONICON = "questionIcon_dark.png";
 
 	public static final Font FONTS = new Font("Sans Serif", Font.PLAIN, 14);
 	public static final Font FONTM = new Font("Sans Serif", Font.PLAIN, 16);
@@ -209,7 +206,7 @@ public class GUIFactory {
 
 		// If provided, add icon to button
 		if (iconFileName != null) {
-			final Image img = getIconImage(iconFileName);
+			final BufferedImage img = getIconImage(iconFileName);
 
 			if (img != null) {
 				button.setIcon(new ImageIcon(img));
@@ -261,19 +258,17 @@ public class GUIFactory {
 	 * @param iconFileName
 	 * @return
 	 */
-	public static Image getIconImage(final String iconFileName) {
+	public static BufferedImage getIconImage(final String iconFileName) {
 
-		String iconType;
-		Image img = null;
+		String iconType = "";
+		BufferedImage img = null;
 		final String subStr = iconFileName.substring(iconFileName.length() - 3,
 				iconFileName.length());
 
 		if (!subStr.equalsIgnoreCase("png")) {
 			iconType = "_dark.png";
-
-		} else {
-			iconType = "";
-		}
+		} 
+		
 		LogBuffer.println("Icon image used: [" + iconFileName + "].");
 
 
@@ -284,6 +279,8 @@ public class GUIFactory {
 					.getResourceAsStream(iconFileName + iconType);
 
 			img = ImageIO.read(input);
+			
+			input.close();
 
 		} catch (final IOException ex) {
 			LogBuffer.logException(ex);

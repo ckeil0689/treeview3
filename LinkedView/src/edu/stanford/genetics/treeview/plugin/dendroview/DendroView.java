@@ -24,6 +24,7 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.ScrollPane;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
@@ -32,11 +33,15 @@ import java.awt.event.ComponentListener;
 import java.awt.event.ContainerListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.prefs.Preferences;
 
+import javax.imageio.ImageIO;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.InputMap;
@@ -359,10 +364,11 @@ public class DendroView implements Observer, DendroPanel {
 				rowLabelPanel);
 		rowDataPane.setResizeWeight(0.5);
 		rowDataPane.setOpaque(false);
-		rowDataPane.setOneTouchExpandable(true); // does not work on Linux :(
 
-		colorDivider(rowDataPane);
+		rowDataPane.setUI(new DragBarUI(StringRes.icon_dragbar_vert, 
+				StringRes.icon_dragbar_vert_light));
 		rowDataPane.setBorder(null);
+		rowDataPane.setDividerSize(10);
 
 		final double oldRowDiv = tvFrame.getConfigNode().getDouble("gtr_loc",
 				0.5d);
@@ -377,10 +383,11 @@ public class DendroView implements Observer, DendroPanel {
 				colLabelPanel);
 		colDataPane.setResizeWeight(0.5);
 		colDataPane.setOpaque(false);
-		colDataPane.setOneTouchExpandable(true);
 
-		colorDivider(colDataPane);
+		colDataPane.setUI(new DragBarUI(StringRes.icon_dragbar_horiz,
+				StringRes.icon_dragbar_horiz_light));
 		colDataPane.setBorder(null);
+		colDataPane.setDividerSize(10);
 
 		final double oldColDiv = tvFrame.getConfigNode().getDouble("atr_loc",
 				0.5d);
@@ -515,34 +522,6 @@ public class DendroView implements Observer, DendroPanel {
 		/* Reset zoom */
 		zoomBtn = GUIFactory.createIconBtn(StringRes.icon_zoomAll);
 		zoomBtn.setToolTipText(StringRes.tt_home);
-	}
-
-	/* Colors the divider of a JSplitPane */
-	private void colorDivider(final JSplitPane sPane) {
-
-		sPane.setUI(new BasicSplitPaneUI() {
-
-			@Override
-			public BasicSplitPaneDivider createDefaultDivider() {
-
-				return new BasicSplitPaneDivider(this) {
-
-					private static final long serialVersionUID = 1L;
-
-					@Override
-					public void setBorder(final Border b) {
-					}
-
-					@Override
-					public void paint(final Graphics g) {
-
-						g.setColor(GUIFactory.DARK_BG);
-						g.fillRect(0, 0, getSize().width, getSize().height);
-						super.paint(g);
-					}
-				};
-			}
-		});
 	}
 
 	/**
