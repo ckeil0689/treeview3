@@ -60,8 +60,8 @@ public class ThumbBox {
 	/**
 	 * Checks if a thumb is located at the x,y-coordinates.
 	 *
-	 * @param x
-	 * @param y
+	 * @param x x-coordinate of the point to be checked.
+	 * @param y y-coordinate of the point to be checked.
 	 * @return
 	 */
 	protected boolean containsThumb(final int x, final int y) {
@@ -91,16 +91,11 @@ public class ThumbBox {
 			if (t.contains((int) point.getX(), (int) point.getY())) {
 				t.setSelected(!t.isSelected());
 
-				if (t.isSelected()) {
-					selectedThumb = t;
-				} else {
-					selectedThumb = null;
-				}
+				selectedThumb = (t.isSelected()) ? t : null;
 				break;
-
-			} else {
-				t.setSelected(false);
-			}
+			} 
+				
+			t.setSelected(false);
 		}
 
 		colorPicker.repaint();
@@ -141,10 +136,11 @@ public class ThumbBox {
 	 */
 	private boolean checkThumbPresence(final int thumbIndex) {
 
-		boolean isPresent = false;
+		List<Thumb> thumbs = colorPicker.getThumbList();
+		float[] fractions = colorPicker.getFractions();
 
-		if (thumbList.size() > thumbIndex) {
-			double fraction = thumbList.get(thumbIndex).getX()
+		if (thumbs.size() > thumbIndex) {
+			double fraction = thumbs.get(thumbIndex).getX() 
 					/ thumbRect.getWidth();
 			fraction = (double) Math.round(fraction * 10000) / 10000;
 
@@ -152,12 +148,12 @@ public class ThumbBox {
 					.round(fractions[thumbIndex] * 10000) / 10000;
 
 			if (Helper.nearlyEqual(fraction, fraction2)
-					|| thumbList.get(thumbIndex).isSelected()) {
-				isPresent = true;
+					|| thumbs.get(thumbIndex).isSelected()) {
+				return true;
 			}
 		}
 
-		return isPresent;
+		return false;
 	}
 	
 	/**
@@ -169,8 +165,9 @@ public class ThumbBox {
 	 */
 	protected void insertThumbAt(final int x, final Color color) {
 
+		List<Thumb> thumbs = colorPicker.getThumbList();
 		int index = 0;
-		for (final Thumb t : thumbList) {
+		for (final Thumb t : thumbs) {
 
 			if (x > t.getX()) {
 				index++;
@@ -178,7 +175,9 @@ public class ThumbBox {
 		}
 
 		final int y = (int) (thumbRect.getHeight());
-		thumbList.add(index, new Thumb(x, y, color));
+		thumbs.add(index, new Thumb(x, y, color));
+		
+		colorPicker.setThumbList(thumbs);
 	}
 
 	/**
@@ -186,7 +185,8 @@ public class ThumbBox {
 	 */
 	protected void deselectAllThumbs() {
 
-		for (final Thumb t : thumbList) {
+		List<Thumb> thumbs = colorPicker.getThumbList();
+		for (final Thumb t : thumbs) {
 
 			t.setSelected(false);
 			selectedThumb = null;
@@ -231,18 +231,15 @@ public class ThumbBox {
 		} else if (newX < previousPos && previousPos != thumbRect.getMinX()) {
 			colorPicker.swapPositions(selectedIndex, selectedIndex - 1);
 			selectedThumb.setCoords(newX, selectedThumb.getY());
-			colorPicker.updateFractions();
-			updateColorArray();
 
 		} else if (newX > nextPos && nextPos < thumbRect.getMaxX()) {
 			colorPicker.swapPositions(selectedIndex, selectedIndex + 1);
 			selectedThumb.setCoords(newX, selectedThumb.getY());
-			colorPicker.updateFractions();
-			updateColorArray();
 		}
 
-		setGradientColors();
-		repaint();
+//		colorPicker.setGradientColors();
+//		repaint();
+		colorPicker.refreshColors();
 	}
 
 	protected void setThumbPosition(final Point point) {
@@ -274,15 +271,17 @@ public class ThumbBox {
 					public void actionPerformed(final ActionEvent arg0) {
 
 						try {
-							final double inputDataValue = Double
+							final double inputValue = Double
 									.parseDouble(inputField.getText());
+							
+							double minVal = colorPicker.getMinVal();
+							double maxVal = colorPicker.getMaxVal();
+							double range = colorPicker.getRange();
 
-							if (inputDataValue >= minVal
-									&& inputDataValue <= maxVal) {
+							if (inputValue >= minVal && inputValue <= maxVal) {
 
 								final double fraction = 
-										Math.abs(inputDataValue- minVal)
-										/ (maxVal - minVal);
+										Math.abs(inputValue- minVal) / (range);
 
 								final int inputXValue = (int) Math
 										.round((fraction * ColorPicker.WIDTH));
@@ -315,8 +314,9 @@ public class ThumbBox {
 			}
 		}
 
-		setGradientColors();
-		repaint();
+		colorPicker.refreshColors();
+//		setGradientColors();
+//		repaint();
 	}
 	
 	protected void setRect(int start, int left, int width, int height) {
@@ -333,8 +333,8 @@ public class ThumbBox {
 	 */
 	protected float getThumbFraction(final Thumb t) {
 
-		final double x = t.getX() - gradientRect.getMinX();
-		return (float) (x / gradientRect.getWidth());
+		final double x = t.getX() - thumbRect.getMinX();
+		return (float) (x / thumbRect.getWidth());
 	}
 
 	/**
@@ -346,8 +346,11 @@ public class ThumbBox {
 	 */
 	protected double getThumbPosition(final Thumb t) {
 
+		double range = colorPicker.getRange();
+		double minVal = colorPicker.getMinVal();
+		
 		final float fraction = getThumbFraction(t);
-		final double value = Math.abs((maxVal - minVal) * fraction) + minVal;
+		final double value = Math.abs((range) * fraction) + minVal;
 
 		return (double) Math.round(value * 1000) / 1000;
 	}
@@ -367,17 +370,28 @@ public class ThumbBox {
 	 */
 	protected int getSelectedThumbIndex() {
 		
+		List<Thumb> thumbs = colorPicker.getThumbList();
+		
 		int selectedIndex = 0;
 		if (selectedThumb != null) {
-			selectedIndex = thumbList.indexOf(selectedThumb);
+			selectedIndex = thumbs.indexOf(selectedThumb);
 		}
 
-		if (thumbList.get(selectedIndex).getX() == thumbList.get(
-				thumbList.size() - 1).getX()) {
+		if (thumbs.get(selectedIndex).getX() == thumbs.get(thumbs.size() - 1)
+				.getX()) {
 			selectedIndex--;
 		}
 		
 		return selectedIndex;
+	}
+	
+	/**
+	 * Set a new value for the selected thumb.
+	 * @param t The new thumb to be set as the selected one.
+	 */
+	protected void setSelectedThumb(Thumb t) {
+		
+		this.selectedThumb = t;
 	}
 }
 

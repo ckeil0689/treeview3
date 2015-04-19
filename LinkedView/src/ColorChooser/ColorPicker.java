@@ -18,8 +18,11 @@ import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
 public class ColorPicker {
 
 	/* Adjust this to MigLayout variables of mainPanel! */
-	private static final int WIDTH = 450;
+	protected static final int WIDTH = 450;
 	
+	private final JPanel containerPanel;
+	
+	/* The different components which make up the ColorPicker */
 	private GradientBox gradientBox;
 	private ThumbBox thumbBox;
 	private InfoBox infoBox;
@@ -35,7 +38,7 @@ public class ColorPicker {
 	private float[] fractions;
 	
 	/* List of all active thumbs (one per color) */
-	private final List<Thumb> thumbList;
+	private List<Thumb> thumbList;
 	
 	/* List of all active colors (depends on active ColorSet) */
 	private final List<Color> colorList;
@@ -46,6 +49,7 @@ public class ColorPicker {
 	/* Data boundaries */
 	private final double minVal;
 	private final double maxVal;
+	private double range;
 	
 	public ColorPicker(final ColorExtractor drawer, final double minVal,
 			final double maxVal) {
@@ -61,8 +65,15 @@ public class ColorPicker {
 		/* data range */
 		this.minVal = minVal;
 		this.maxVal = maxVal;
+		this.range = maxVal - minVal;
 		
+		this.containerPanel = new ContainerPanel();
 		
+	}
+	
+	public JPanel getContainerPanel() {
+		
+		return containerPanel;
 	}
 	
 	private class ContainerPanel extends JPanel {
@@ -84,6 +95,12 @@ public class ColorPicker {
 			infoBox.drawNumBox(g2);
 		}
 		
+		/**
+		 * Gives the boxes which make up ColorPicker a start x-position
+		 * and a size which is based on the size on a set size for the 
+		 * ColorPicker as a whole.
+		 * @param width
+		 */
 		private void positionRects(final double width) {
 
 			final int start = ((int) width - WIDTH) / 2;
@@ -120,6 +137,8 @@ public class ColorPicker {
 	
 	/**
 	 * Serves to store the currently chosen custom color setup in a configNode.
+	 * @return The new ColorSet object created from the current custom colors
+	 * and the relative positions of the associated thumbs.
 	 */
 	protected ColorSet saveCustomPresets() {
 
@@ -160,110 +179,110 @@ public class ColorPicker {
 		colorExtractor.notifyObservers();
 	}
 	
-	private void refresh() {
+	protected void refreshColors() {
 		
+		updateColorArray(); // swapped
 		setGradientColors();
-		updateColorArray();
 		repaint();
 	}
 	
-	/**
-	 * Adds a color to the gradient.
-	 *
-	 * @param newCol
-	 */
-	protected void addColor(final Color newCol) {
-
-		int selectedIndex = 0;
-		if (selectedThumb != null) {
-			selectedIndex = thumbList.indexOf(selectedThumb);
-		}
-
-		if (thumbList.get(selectedIndex).getX() == thumbList.get(
-				thumbList.size() - 1).getX()) {
-			selectedIndex--;
-		}
-
-		colorList.add(selectedIndex + 1, newCol);
-
-		final double halfRange = (fractions[selectedIndex + 1] - fractions[selectedIndex]) / 2;
-
-		final double newFraction = halfRange + fractions[selectedIndex];
-
-		final int x = (int) (newFraction * getSize().getWidth());
-
-		thumbBox.insertThumbAt(x, newCol);
-		updateFractions();
-
-		if (thumbList.size() != fractions.length) {
-			System.out.println("ThumbList size (" + thumbList.size()
-					+ ") and fractions size (" + fractions.length
-					+ ") are different in drawNumbBox!");
-		}
-
-		refresh();
-	}
-	
-	/**
-	 * Removes a color from the gradient.
-	 */
-	protected void removeColor() {
-
-		int index = 0;
-		for (final Thumb t : thumbList) {
-
-			if (t.isSelected()) {
-				thumbList.remove(index);
-				colorList.remove(index);
-				selectedThumb = null;
-				break;
-			}
-			index++;
-		}
-
-		fractions = updateFractions();
-
-		if (thumbList.size() != fractions.length) {
-			System.out.println("ThumbList size (" + thumbList.size()
-					+ ") and fractions size (" + fractions.length
-					+ ") are different in drawNumbBox!");
-		}
-
-		refresh();
-	}
-	
-	/**
-	 * Changes the gradient color in the area the mouse was clicked in.
-	 *
-	 * @param newCol
-	 * @param point
-	 */
-	protected void changeColor(final Point point) {
-
-		Color newCol = null;
-
-		final int clickPos = (int) point.getX();
-		int index = 0;
-		int distance = WIDTH;
-
-		for (final Thumb t : thumbList) {
-
-			if (Math.abs(t.getX() - clickPos) < distance) {
-				distance = Math.abs(t.getX() - clickPos);
-				index = thumbList.indexOf(t);
-			}
-		}
-
-		newCol = JColorChooser.showDialog(this, "Pick a Color",
-				thumbList.get(index).getColor());
-
-		if (newCol != null) {
-			colorList.set(index, newCol);
-			thumbList.get(index).setColor(newCol);
-			
-			refresh();
-		}
-	}
+//	/**
+//	 * Adds a color to the gradient.
+//	 *
+//	 * @param newCol
+//	 */
+//	protected void addColor(final Color newCol) {
+//
+//		int selectedIndex = 0;
+//		if (selectedThumb != null) {
+//			selectedIndex = thumbList.indexOf(selectedThumb);
+//		}
+//
+//		if (thumbList.get(selectedIndex).getX() == thumbList.get(
+//				thumbList.size() - 1).getX()) {
+//			selectedIndex--;
+//		}
+//
+//		colorList.add(selectedIndex + 1, newCol);
+//
+//		final double halfRange = (fractions[selectedIndex + 1] - fractions[selectedIndex]) / 2;
+//
+//		final double newFraction = halfRange + fractions[selectedIndex];
+//
+//		final int x = (int) (newFraction * getSize().getWidth());
+//
+//		thumbBox.insertThumbAt(x, newCol);
+//		updateFractions();
+//
+//		if (thumbList.size() != fractions.length) {
+//			System.out.println("ThumbList size (" + thumbList.size()
+//					+ ") and fractions size (" + fractions.length
+//					+ ") are different in drawNumbBox!");
+//		}
+//
+//		refreshColors();
+//	}
+//	
+//	/**
+//	 * Removes a color and its matching thumb from the gradient.
+//	 */
+//	protected void removeColor() {
+//
+//		int index = 0;
+//		for (final Thumb t : thumbList) {
+//
+//			if (t.isSelected()) {
+//				thumbList.remove(index);
+//				colorList.remove(index);
+//				selectedThumb = null;
+//				break;
+//			}
+//			index++;
+//		}
+//
+//		updateFractions();
+//
+//		if (thumbList.size() != fractions.length) {
+//			System.out.println("ThumbList size (" + thumbList.size()
+//					+ ") and fractions size (" + fractions.length
+//					+ ") are different in drawNumbBox!");
+//		}
+//
+//		refreshColors();
+//	}
+//	
+//	/**
+//	 * Changes the gradient color in the area the mouse was clicked on.
+//	 *
+//	 * @param newCol
+//	 * @param point
+//	 */
+//	protected void changeColor(final Point point) {
+//
+//		Color newCol = null;
+//
+//		final int clickPos = (int) point.getX();
+//		int index = 0;
+//		int distance = WIDTH;
+//
+//		for (final Thumb t : thumbList) {
+//
+//			if (Math.abs(t.getX() - clickPos) < distance) {
+//				distance = Math.abs(t.getX() - clickPos);
+//				index = thumbList.indexOf(t);
+//			}
+//		}
+//
+//		newCol = JColorChooser.showDialog(this, "Pick a Color",
+//				thumbList.get(index).getColor());
+//
+//		if (newCol != null) {
+//			colorList.set(index, newCol);
+//			thumbList.get(index).setColor(newCol);
+//			
+//			refreshColors();
+//		}
+//	}
 	
 	/**
 	 * Resets the fractions float[] to a default value with 3 colors.
@@ -291,6 +310,20 @@ public class ColorPicker {
 		}
 		
 		this.fractions = newFractions;
+	}
+	
+	/*
+	 * Updates the color array when needed so LinearGradientPaint can use it to
+	 * generate the gradientRect.
+	 */
+	protected void updateColorArray() {
+
+		colors = new Color[colorList.size()];
+
+		for (int i = 0; i < colors.length; i++) {
+
+			colors[i] = colorList.get(i);
+		}
 	}
 	
 	/**
@@ -324,6 +357,24 @@ public class ColorPicker {
 		
 		Collections.swap(thumbList, oldIndex, newIndex);
 		Collections.swap(colorList, oldIndex, newIndex);
+		
+		updateColorArray();
+		updateFractions();
+	}
+	
+	protected double getMinVal() {
+		
+		return minVal;
+	}
+	
+	protected double getMaxVal() {
+		
+		return maxVal;
+	}
+	
+	protected double getRange() { 
+		
+		return range;
 	}
 	
 	/**
@@ -339,6 +390,16 @@ public class ColorPicker {
 	protected List<Thumb> getThumbList() {
 		
 		return thumbList;
+	}
+	
+	protected void setThumbList(List<Thumb> thumbs) {
+		
+		this.thumbList = thumbs;
+	}
+	
+	protected ThumbBox getThumbBox() {
+		
+		return thumbBox;
 	}
 	
 	protected int getThumbNumber() {
@@ -364,5 +425,10 @@ public class ColorPicker {
 	protected float[] getFractions() {
 		
 		return fractions;
+	}
+	
+	protected Color[] getColors() {
+		
+		return colors;
 	}
 }

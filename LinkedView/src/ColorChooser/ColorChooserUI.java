@@ -31,7 +31,10 @@ public class ColorChooserUI extends CustomDialog {//implements ConfigNodePersist
 	/* GUI components */
 	private JPanel contentPanel;
 	private JPanel mainPanel;
-	private final GradientBox gradientBox;
+	
+	private ColorPicker colorPicker;
+	private JPanel gradientPanel;
+//	private final GradientBox gradientBox;
 
 	/* For custom ColorSet manipulation */
 	private JButton addBtn;
@@ -63,7 +66,8 @@ public class ColorChooserUI extends CustomDialog {//implements ConfigNodePersist
 			final double maxVal) {
 
 		super("Choose matrix colors");
-		this.gradientBox = new GradientBox(drawer, minVal, maxVal);
+		this.colorPicker = new ColorPicker(drawer, minVal,maxVal);
+		this.gradientPanel = colorPicker.getContainerPanel();
 		
 		setLayout();
 		
@@ -114,8 +118,8 @@ public class ColorChooserUI extends CustomDialog {//implements ConfigNodePersist
 
 		contentPanel.add(radioButtonPanel, "span, pushx, wrap");
 		contentPanel.add(hint, "span, wrap");
-		contentPanel.add(gradientBox, "h 150:150:, w 500:500:, pushx, alignx 50%,"
-				+ "span, wrap");
+		contentPanel.add(gradientPanel, "h 150:150:, w 500:500:, pushx, "
+				+ "alignx 50%, span, wrap");
 		contentPanel.add(addBtn, "pushx, split 3, alignx 50%");
 		contentPanel.add(removeBtn, "pushx");
 		contentPanel.add(missingBtn, "wrap");
@@ -132,9 +136,9 @@ public class ColorChooserUI extends CustomDialog {//implements ConfigNodePersist
 	 *
 	 * @return
 	 */
-	protected GradientBox getGradientBox() {
+	protected ColorPicker getColorPicker() {
 
-		return gradientBox;
+		return colorPicker;
 	}
 
 	/* ------------ Accessors ------------- */

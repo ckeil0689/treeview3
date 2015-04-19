@@ -26,7 +26,6 @@ public class ColorChooserController implements ConfigNodePersistent {
 
 	public static final Integer DEFAULT_MULTI_CLICK_INTERVAL = 300;
 	private final ColorChooserUI colorChooserUI;
-	private final GradientBox gradientBox;
 	
 	/* Node for saved data */
 	private Preferences configNode;
@@ -34,10 +33,9 @@ public class ColorChooserController implements ConfigNodePersistent {
 	/* Holds all preset color data */
 	private final ColorPresets colorPresets;
 
-	public ColorChooserController(final ColorChooserUI gradientPick) {
+	public ColorChooserController(final ColorChooserUI colorChooserUI) {
 
-		this.colorChooserUI = gradientPick;
-		this.gradientBox = gradientPick.getGradientBox();
+		this.colorChooserUI = colorChooserUI;
 		this.colorPresets = DendrogramFactory.getColorPresets();
 		
 		setPresets();
@@ -52,7 +50,9 @@ public class ColorChooserController implements ConfigNodePersistent {
 			this.configNode = parentNode.node("GradientChooser");
 
 			final String colorSet = configNode.get("activeColors", "RedGreen");
-			gradientBox.setActiveColorSet(colorPresets.getColorSet(colorSet));
+			ColorSet activeSet = colorPresets.getColorSet(colorSet);
+			
+			colorChooserUI.getColorPicker().setActiveColorSet(activeSet);
 
 		} else {
 			LogBuffer.println("Could not find or create GradientChooser "
@@ -97,7 +97,7 @@ public class ColorChooserController implements ConfigNodePersistent {
 					+ "ColorGradientChooser.setPresets()");
 		}
 
-		gradientBox.loadPresets(selectedColorSet);
+		colorChooserUI.getColorPicker().loadPresets(selectedColorSet);
 	}
 	
 	/**
@@ -105,15 +105,17 @@ public class ColorChooserController implements ConfigNodePersistent {
 	 */
 	private void saveStatus() {
 
-		if (gradientBox != null) {
-			colorPresets.addColorSet(gradientBox.saveCustomPresets());
+		if (colorChooserUI.getColorPicker() != null) {
+			ColorSet colorSet = colorChooserUI.getColorPicker()
+					.saveCustomPresets();
+			colorPresets.addColorSet(colorSet);
 		}
 	}
 	
 	public void setActiveColorSet(final String name) {
 
 		final ColorSet set = colorPresets.getColorSet(name);
-		gradientBox.setActiveColorSet(set);
+		colorChooserUI.getColorPicker().setActiveColorSet(set);
 
 		configNode.put("activeColors", name);
 	}
@@ -128,7 +130,7 @@ public class ColorChooserController implements ConfigNodePersistent {
 
 		/* Load and set data accordingly */
 		setPresets();
-		gradientBox.setGradientColors();
+		colorChooserUI.getColorPicker().setGradientColors();
 
 		/* Update view! */
 		colorChooserUI.getMainPanel().repaint();
