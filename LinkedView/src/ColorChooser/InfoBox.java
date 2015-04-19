@@ -115,10 +115,10 @@ public class InfoBox {//extends JPanel{
 //				(int) ((numRect.getHeight() / 2) + numRect.getMinY()));
 	}
 	
-	protected void setRect(int start, int left, int width, int height) {
+	protected void setRect(int start_x, int start_y, int width, int height) {
 		
-		rulerRect.setRect(start, left - 10, width, height);
-		numRect.setRect(start, left, width, height);
+		rulerRect.setRect(start_x, start_y, width, height);
+		numRect.setRect(start_x, start_y + 10, width, height);
 		
 	}
 	

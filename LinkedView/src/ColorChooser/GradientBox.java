@@ -155,17 +155,8 @@ public class GradientBox { //extends JPanel {
 	 */
 	protected void addColor(final Color newCol) {
 
-//		int selectedIndex = 0;
-//		if (selectedThumb != null) {
-//			selectedIndex = thumbList.indexOf(selectedThumb);
-//		}
-//
-//		if (thumbList.get(selectedIndex).getX() == thumbList.get(
-//				thumbList.size() - 1).getX()) {
-//			selectedIndex--;
-//		}
 		List<Thumb> thumbs = colorPicker.getThumbList();
-		int newColorIndex = thumbs.size() / 2 + 1;
+		int newColorIndex = (thumbs.size() - 1) / 2;
 
 		colorPicker.getColorList().add(newColorIndex + 1, newCol);
 		
