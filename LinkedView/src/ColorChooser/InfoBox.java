@@ -6,9 +6,11 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
+import java.util.List;
 
 import javax.swing.JPanel;
 
+import edu.stanford.genetics.treeview.LogBuffer;
 import Utilities.GUIFactory;
 
 public class InfoBox {//extends JPanel{
@@ -23,15 +25,16 @@ public class InfoBox {//extends JPanel{
 	private final Rectangle2D numRect = new Rectangle2D.Float();
 	
 	/* Data boundaries */
-	private final double minVal;
-	private final double maxVal;
+//	private final double minVal;
+//	private final double maxVal;
 	
 	public InfoBox(ColorPicker colorPicker) {
 		
 		this.colorPicker = colorPicker;
 		
 		/* Font details for text-alignment in numBox */
-		this.fm = getFontMetrics(GUIFactory.FONTS);
+		this.fm = colorPicker.getContainerPanel()
+				.getFontMetrics(GUIFactory.FONTS);
 	}
 	
 //	@Override
@@ -73,42 +76,43 @@ public class InfoBox {//extends JPanel{
 
 		g2.setColor(Color.black);
 		g2.setFont(GUIFactory.FONTS);
+		
+		List<Thumb> thumbs = colorPicker.getThumbList();
+		float[] fractions = colorPicker.getFractions();
+		double range = colorPicker.getRange();
+		double minVal = colorPicker.getMinVal();
 
-		// Paint the thumb values
-		// if (thumbList.size() == fractions.length) {
-		// int i = 0;
-		// for (final Thumb t : thumbList) {
-		//
-		// // Rounding to 3 decimals
-		// final float fraction = fractions[i];
-		// Double value = Math.abs((maxVal - minVal) * fraction)
-		// + minVal;
-		// value = (double) Math.round(value * 1000) / 1000;
-		//
-		// g2.drawString(Double.toString(value), t.getX(),
-		// (int) ((numRect.getHeight() / 2) + numRect
-		// .getMinY()));
-		// i++;
-		// }
-		// } else {
-		// LogBuffer.println("ThumbList size (" + thumbList.size()
-		// + ") and fractions size (" + fractions.length
-		// + ") are different in drawNumbBox!");
-		// }
+//		 Paint the thumb values
+		 if (thumbs.size() == fractions.length) {
+			 int i = 0;
+			 for (final Thumb t : thumbs) {
+				 // Rounding to 3 decimals
+				 final float fraction = fractions[i++];
+				 double value = Math.abs((range) * fraction) + minVal;
+				 value = (double) Math.round(value * 1000) / 1000;
+				
+				 g2.drawString(Double.toString(value), t.getX(), 
+						 (int) ((numRect.getHeight() / 2) + numRect.getMinY()));
+			 }
+		 } else {
+			 LogBuffer.println("ThumbList size (" + thumbs.size()
+			 + ") and fractions size (" + fractions.length
+			 + ") are different in drawNumbBox!");
+		 }
 
 		/* Draw first number */
-		final double first = minVal;
-		int x = (int) numRect.getMinX();
-
-		g2.drawString(Double.toString(first), x,
-				(int) ((numRect.getHeight() / 2) + numRect.getMinY()));
-
-		final double last = maxVal;
-		x = (int) numRect.getMaxX();
-		final int stringWidth = fm.stringWidth(Double.toString(last));
-
-		g2.drawString(Double.toString(last), x - stringWidth,
-				(int) ((numRect.getHeight() / 2) + numRect.getMinY()));
+//		final double first = minVal;
+//		int x = (int) numRect.getMinX();
+//
+//		g2.drawString(Double.toString(first), x,
+//				(int) ((numRect.getHeight() / 2) + numRect.getMinY()));
+//
+//		final double last = maxVal;
+//		x = (int) numRect.getMaxX();
+//		final int stringWidth = fm.stringWidth(Double.toString(last));
+//
+//		g2.drawString(Double.toString(last), x - stringWidth,
+//				(int) ((numRect.getHeight() / 2) + numRect.getMinY()));
 	}
 	
 	protected void setRect(int start, int left, int width, int height) {

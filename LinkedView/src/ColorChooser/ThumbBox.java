@@ -58,19 +58,18 @@ public class ThumbBox {
 	}
 	
 	/**
-	 * Checks if a thumb is located at the x,y-coordinates.
+	 * Checks if a thumb is located at a certain point.
 	 *
-	 * @param x x-coordinate of the point to be checked.
-	 * @param y y-coordinate of the point to be checked.
-	 * @return
+	 * @param point The point to be checked.
+	 * @return boolean - Whether a thumb is located at the point or not.
 	 */
-	protected boolean containsThumb(final int x, final int y) {
+	protected boolean containsThumb(final Point point) {
 
 		boolean containsThumb = false;
 
 		for (final Thumb t : colorPicker.getThumbList()) {
 
-			if (t.contains(x, y)) {
+			if (t.contains(point.x, point.y)) {
 				containsThumb = true;
 				break;
 			}
@@ -98,7 +97,7 @@ public class ThumbBox {
 			t.setSelected(false);
 		}
 
-		colorPicker.repaint();
+		colorPicker.getContainerPanel().repaint();
 	}
 	
 	/**
@@ -319,9 +318,9 @@ public class ThumbBox {
 //		repaint();
 	}
 	
-	protected void setRect(int start, int left, int width, int height) {
+	protected void setRect(int start_x, int start_y, int width, int height) {
 		
-		thumbRect.setRect(start, left, width, height);
+		thumbRect.setRect(start_x, start_y, width, height);
 	}
 	
 	/**

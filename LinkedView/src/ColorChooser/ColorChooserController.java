@@ -26,6 +26,7 @@ public class ColorChooserController implements ConfigNodePersistent {
 
 	public static final Integer DEFAULT_MULTI_CLICK_INTERVAL = 300;
 	private final ColorChooserUI colorChooserUI;
+	private final ColorPicker colorPicker;
 	
 	/* Node for saved data */
 	private Preferences configNode;
@@ -36,6 +37,7 @@ public class ColorChooserController implements ConfigNodePersistent {
 	public ColorChooserController(final ColorChooserUI colorChooserUI) {
 
 		this.colorChooserUI = colorChooserUI;
+		this.colorPicker = colorChooserUI.getColorPicker();
 		this.colorPresets = DendrogramFactory.getColorPresets();
 		
 		setPresets();
@@ -201,13 +203,15 @@ public class ColorChooserController implements ConfigNodePersistent {
 		private void clickOrPress() {
 
 			if (colorChooserUI.isCustomSelected()) {
-				if (gradientBox.isGradientArea(lastEvent.getPoint())) {
-					gradientBox.changeColor(lastEvent.getPoint());
+				if (colorPicker.getGradientBox()
+						.isGradientArea(lastEvent.getPoint())) {
+					colorPicker.getGradientBox()
+						.changeColor(lastEvent.getPoint());
 					setActiveColorSet("Custom");
 
 				} else {
-					gradientBox.deselectAllThumbs();
-					gradientBox.selectThumb(lastEvent.getPoint());
+					colorPicker.getThumbBox().deselectAllThumbs();
+					colorPicker.getThumbBox().selectThumb(lastEvent.getPoint());
 				}
 			}
 		}
@@ -218,7 +222,8 @@ public class ColorChooserController implements ConfigNodePersistent {
 		private void doubleClick() {
 
 			if (colorChooserUI.isCustomSelected()) {
-				gradientBox.setThumbPosition(lastEvent.getPoint());
+				colorPicker.getThumbBox()
+					.setThumbPosition(lastEvent.getPoint());
 			}
 		}
 
@@ -266,21 +271,23 @@ public class ColorChooserController implements ConfigNodePersistent {
 		public void mouseDragged(final MouseEvent e) {
 
 			if (colorChooserUI.isCustomSelected()) {
-				gradientBox.updateThumbPos(e.getX());
+				colorPicker.getThumbBox().updateThumbPos(e.getX());
 			}
 		}
 
 		@Override
 		public void mouseMoved(final MouseEvent e) {
 
-			if (colorChooserUI.isCustomSelected()) {
-				if (gradientBox.containsThumb(e.getX(), e.getY())) {
-					gradientBox.setCursor(new Cursor(Cursor.HAND_CURSOR));
+			Cursor cursor;
+			if (colorChooserUI.isCustomSelected() 
+					&& colorPicker.getThumbBox().containsThumb(e.getPoint())) {
+				cursor = new Cursor(Cursor.HAND_CURSOR);
 
-				} else {
-					gradientBox.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-				}
+			} else {
+				cursor = new Cursor(Cursor.DEFAULT_CURSOR);
 			}
+		
+			colorPicker.getContainerPanel().setCursor(cursor);
 		}
 	}
 
@@ -295,11 +302,12 @@ public class ColorChooserController implements ConfigNodePersistent {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			final Color newCol = JColorChooser.showDialog(gradientBox,
+			final Color newCol = JColorChooser.showDialog(
+					colorPicker.getContainerPanel(), 
 					"Pick a Color", Color.black);
 
 			if (newCol != null) {
-				gradientBox.addColor(newCol);
+				colorPicker.getGradientBox().addColor(newCol);
 			}
 		}
 	}
@@ -315,8 +323,8 @@ public class ColorChooserController implements ConfigNodePersistent {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			if (gradientBox.getColorListSize() > 2) {
-				gradientBox.removeColor();
+			if (colorPicker.getColorList().size() > 2) {
+				colorPicker.getGradientBox().removeColor();
 			}
 		}
 	}
@@ -369,10 +377,10 @@ public class ColorChooserController implements ConfigNodePersistent {
 			if (colorChooserUI.isCustomSelected()) {
 				final Color missing = JColorChooser.showDialog(
 						colorChooserUI.getMainPanel(), "Pick Color for Missing",
-						gradientBox.getMissing());
+						colorPicker.getMissing());
 
 				if (missing != null) {
-					gradientBox.setMissing(missing);
+					colorPicker.setMissing(missing);
 				}
 			}
 		}

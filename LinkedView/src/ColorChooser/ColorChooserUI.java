@@ -14,6 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
+import net.miginfocom.swing.MigLayout;
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
@@ -85,6 +86,7 @@ public class ColorChooserUI extends CustomDialog {//implements ConfigNodePersist
 		mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 		
 		contentPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
+		contentPanel.setLayout(new MigLayout("debug"));
 		contentPanel.setBorder(BorderFactory.createEtchedBorder());
 
 		final JLabel hint = GUIFactory.createLabel("Move or add sliders "
@@ -187,12 +189,12 @@ public class ColorChooserUI extends CustomDialog {//implements ConfigNodePersist
 
 	protected void addThumbSelectListener(final MouseListener l) {
 
-		gradientBox.addMouseListener(l);
+		colorPicker.getContainerPanel().addMouseListener(l);
 	}
 
 	protected void addThumbMotionListener(final MouseMotionListener l) {
 
-		gradientBox.addMouseMotionListener(l);
+		colorPicker.getContainerPanel().addMouseMotionListener(l);
 	}
 
 	protected void addAddListener(final ActionListener l) {

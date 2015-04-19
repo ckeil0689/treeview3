@@ -12,6 +12,7 @@ import java.util.List;
 import javax.swing.JColorChooser;
 import javax.swing.JPanel;
 
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
 
@@ -58,6 +59,8 @@ public class ColorPicker {
 		this.thumbList = new ArrayList<Thumb>();
 		this.colorList = new ArrayList<Color>();
 		
+		this.containerPanel = new ContainerPanel();
+		
 		this.gradientBox = new GradientBox(this);
 		this.thumbBox = new ThumbBox(this);
 		this.infoBox = new InfoBox(this);
@@ -67,7 +70,7 @@ public class ColorPicker {
 		this.maxVal = maxVal;
 		this.range = maxVal - minVal;
 		
-		this.containerPanel = new ContainerPanel();
+//		this.containerPanel = new ContainerPanel();
 		
 	}
 	
@@ -78,6 +81,11 @@ public class ColorPicker {
 	
 	private class ContainerPanel extends JPanel {
 		
+		/**
+		 * Default serial version ID to keep Eclipse happy...
+		 */
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public void paintComponent(final Graphics g) {
 		 
@@ -101,13 +109,13 @@ public class ColorPicker {
 		 * ColorPicker as a whole.
 		 * @param width
 		 */
-		private void positionRects(final double width) {
+		private void positionRects(final int width) {
 
-			final int start = ((int) width - WIDTH) / 2;
+			final int start = (width - ColorPicker.WIDTH) / 2;
 
-			thumbBox.setRect(start, 0, WIDTH, 30);
-			gradientBox.setRect(start, 30, WIDTH, 70);
-			infoBox.setRect(start, 100, WIDTH, 10);
+			thumbBox.setRect(start, 0, ColorPicker.WIDTH, 30);
+			gradientBox.setRect(start, 30, ColorPicker.WIDTH, 70);
+			infoBox.setRect(start, 100, ColorPicker.WIDTH, 50);
 		}
 	}
 	
@@ -183,7 +191,7 @@ public class ColorPicker {
 		
 		updateColorArray(); // swapped
 		setGradientColors();
-		repaint();
+		containerPanel.repaint();
 	}
 	
 //	/**
@@ -338,15 +346,15 @@ public class ColorPicker {
 		this.activeColorSet = set;
 	}
 	
-	/** 
-	 * Repaints all related UI elements.
-	 */
-	protected void repaint() {
-		
-		gradientBox.repaint();
-		thumbBox.repaint();
-		infoBox.repaint();
-	}
+//	/** 
+//	 * Repaints all related UI elements.
+//	 */
+//	protected void repaint() {
+//		
+//		gradientBox.repaint();
+//		thumbBox.repaint();
+//		infoBox.repaint();
+//	}
 	
 	/**
 	 * Swaps positions of thumbs and colors in their specific lists.
@@ -400,6 +408,11 @@ public class ColorPicker {
 	protected ThumbBox getThumbBox() {
 		
 		return thumbBox;
+	}
+	
+	protected GradientBox getGradientBox() {
+		
+		return gradientBox;
 	}
 	
 	protected int getThumbNumber() {
