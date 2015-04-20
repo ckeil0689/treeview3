@@ -14,6 +14,7 @@ import java.awt.event.WindowEvent;
 import java.util.prefs.Preferences;
 
 import javax.swing.JColorChooser;
+import javax.swing.JComboBox;
 import javax.swing.Timer;
 
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
@@ -78,17 +79,17 @@ public class ColorChooserController implements ConfigNodePersistent {
 		/* Choose ColorSet according to name */
 		final ColorSet selectedColorSet;
 		if (colorScheme.equalsIgnoreCase("Custom")) {
-			colorChooserUI.getCustomColorBtn().setSelected(true);
+			colorChooserUI.getPresetChoices().setSelectedItem("Custom Colors");
 			colorChooserUI.setCustomSelected(true);
 			selectedColorSet = colorPresets.getColorSet(colorScheme);
 
 		} else if (colorScheme.equalsIgnoreCase(defaultColors)) {
-			colorChooserUI.getRGBtn().setSelected(true);
+			colorChooserUI.getPresetChoices().setSelectedItem("RedGreen");
 			colorChooserUI.setCustomSelected(false);
 			selectedColorSet = colorPresets.getColorSet(colorScheme);
 
 		} else if (colorScheme.equalsIgnoreCase("YellowBlue")) {
-			colorChooserUI.getYBBtn().setSelected(true);
+			colorChooserUI.getPresetChoices().setSelectedItem("YellowBlue");
 			colorChooserUI.setCustomSelected(false);
 			selectedColorSet = colorPresets.getColorSet("YellowBlue");
 
@@ -162,7 +163,7 @@ public class ColorChooserController implements ConfigNodePersistent {
 			colorChooserUI.addThumbMotionListener(new ThumbMotionListener());
 			colorChooserUI.addAddListener(new AddButtonListener());
 			colorChooserUI.addRemoveListener(new RemoveButtonListener());
-			colorChooserUI.addColorSetListener(new ColorSetListener());
+			colorChooserUI.addPresetChoiceListener(new ColorSetListener());
 			colorChooserUI.addMissingListener(new MissingBtnListener());
 			colorChooserUI.addDialogCloseListener(new WindowCloseListener());
 		}
@@ -347,13 +348,17 @@ public class ColorChooserController implements ConfigNodePersistent {
 			if (isCustom) {
 				saveStatus();
 			}
+			
+			@SuppressWarnings("unchecked")
+			String selected = (String) ((JComboBox<String>) arg0.getSource())
+					.getSelectedItem();
 
-			if (arg0.getSource() == colorChooserUI.getRGBtn()) {
+			if (selected.equalsIgnoreCase("RedGreen")) {
 				/* Switch to RedGreen */
 				colorSetName = "RedGreen";
 				isCustom = false;
 
-			} else if (arg0.getSource() == colorChooserUI.getYBBtn()) {
+			} else if (selected.equalsIgnoreCase("YellowBlue")) {
 				/* Switch to YellowBlue */
 				colorSetName = "YellowBlue";
 				isCustom = false;

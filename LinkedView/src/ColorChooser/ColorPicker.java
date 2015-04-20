@@ -25,8 +25,9 @@ public class ColorPicker {
 	
 	/* The different components which make up the ColorPicker */
 	private GradientBox gradientBox;
+	private NumBox numBox;
 	private ThumbBox thumbBox;
-	private InfoBox infoBox;
+	private RulerBox rulerBox;
 	
 	/* The currently active set of colors */
 	private ColorSet activeColorSet;
@@ -62,15 +63,14 @@ public class ColorPicker {
 		this.containerPanel = new ContainerPanel();
 		
 		this.gradientBox = new GradientBox(this);
+		this.numBox = new NumBox(this);
 		this.thumbBox = new ThumbBox(this);
-		this.infoBox = new InfoBox(this);
+		this.rulerBox = new RulerBox();
 		
 		/* data range */
 		this.minVal = minVal;
 		this.maxVal = maxVal;
 		this.range = maxVal - minVal;
-		
-//		this.containerPanel = new ContainerPanel();
 		
 	}
 	
@@ -97,10 +97,10 @@ public class ColorPicker {
 			
 			positionRects(getWidth());
 			
+			numBox.drawNumBox(g2);
 			thumbBox.drawThumbBox(g2);
 			gradientBox.drawGradientBox(g2);
-			infoBox.drawRulerBox(g2);
-			infoBox.drawNumBox(g2);
+			rulerBox.drawRulerBox(g2);
 		}
 		
 		/**
@@ -113,9 +113,10 @@ public class ColorPicker {
 
 			final int start = (width - ColorPicker.WIDTH) / 2;
 
-			thumbBox.setRect(start, 0, ColorPicker.WIDTH, 30);
-			gradientBox.setRect(start, 30, ColorPicker.WIDTH, 70);
-			infoBox.setRect(start, 100, ColorPicker.WIDTH, 50);
+			numBox.setRect(start, 0, ColorPicker.WIDTH, 40);
+			thumbBox.setRect(start, 40, ColorPicker.WIDTH, 40);
+			gradientBox.setRect(start, 40, ColorPicker.WIDTH, 100);
+			rulerBox.setRect(start, 140, ColorPicker.WIDTH, 10);
 		}
 	}
 	
@@ -194,104 +195,6 @@ public class ColorPicker {
 		containerPanel.repaint();
 	}
 	
-//	/**
-//	 * Adds a color to the gradient.
-//	 *
-//	 * @param newCol
-//	 */
-//	protected void addColor(final Color newCol) {
-//
-//		int selectedIndex = 0;
-//		if (selectedThumb != null) {
-//			selectedIndex = thumbList.indexOf(selectedThumb);
-//		}
-//
-//		if (thumbList.get(selectedIndex).getX() == thumbList.get(
-//				thumbList.size() - 1).getX()) {
-//			selectedIndex--;
-//		}
-//
-//		colorList.add(selectedIndex + 1, newCol);
-//
-//		final double halfRange = (fractions[selectedIndex + 1] - fractions[selectedIndex]) / 2;
-//
-//		final double newFraction = halfRange + fractions[selectedIndex];
-//
-//		final int x = (int) (newFraction * getSize().getWidth());
-//
-//		thumbBox.insertThumbAt(x, newCol);
-//		updateFractions();
-//
-//		if (thumbList.size() != fractions.length) {
-//			System.out.println("ThumbList size (" + thumbList.size()
-//					+ ") and fractions size (" + fractions.length
-//					+ ") are different in drawNumbBox!");
-//		}
-//
-//		refreshColors();
-//	}
-//	
-//	/**
-//	 * Removes a color and its matching thumb from the gradient.
-//	 */
-//	protected void removeColor() {
-//
-//		int index = 0;
-//		for (final Thumb t : thumbList) {
-//
-//			if (t.isSelected()) {
-//				thumbList.remove(index);
-//				colorList.remove(index);
-//				selectedThumb = null;
-//				break;
-//			}
-//			index++;
-//		}
-//
-//		updateFractions();
-//
-//		if (thumbList.size() != fractions.length) {
-//			System.out.println("ThumbList size (" + thumbList.size()
-//					+ ") and fractions size (" + fractions.length
-//					+ ") are different in drawNumbBox!");
-//		}
-//
-//		refreshColors();
-//	}
-//	
-//	/**
-//	 * Changes the gradient color in the area the mouse was clicked on.
-//	 *
-//	 * @param newCol
-//	 * @param point
-//	 */
-//	protected void changeColor(final Point point) {
-//
-//		Color newCol = null;
-//
-//		final int clickPos = (int) point.getX();
-//		int index = 0;
-//		int distance = WIDTH;
-//
-//		for (final Thumb t : thumbList) {
-//
-//			if (Math.abs(t.getX() - clickPos) < distance) {
-//				distance = Math.abs(t.getX() - clickPos);
-//				index = thumbList.indexOf(t);
-//			}
-//		}
-//
-//		newCol = JColorChooser.showDialog(this, "Pick a Color",
-//				thumbList.get(index).getColor());
-//
-//		if (newCol != null) {
-//			colorList.set(index, newCol);
-//			thumbList.get(index).setColor(newCol);
-//			
-//			refreshColors();
-//		}
-//	}
-	
 	/**
 	 * Resets the fractions float[] to a default value with 3 colors.
 	 */
@@ -345,16 +248,6 @@ public class ColorPicker {
 
 		this.activeColorSet = set;
 	}
-	
-//	/** 
-//	 * Repaints all related UI elements.
-//	 */
-//	protected void repaint() {
-//		
-//		gradientBox.repaint();
-//		thumbBox.repaint();
-//		infoBox.repaint();
-//	}
 	
 	/**
 	 * Swaps positions of thumbs and colors in their specific lists.

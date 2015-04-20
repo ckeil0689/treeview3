@@ -2,71 +2,28 @@ package ColorChooser;
 
 import java.awt.Color;
 import java.awt.FontMetrics;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 
-import javax.swing.JPanel;
-
-import edu.stanford.genetics.treeview.LogBuffer;
 import Utilities.GUIFactory;
+import edu.stanford.genetics.treeview.LogBuffer;
 
-public class InfoBox {//extends JPanel{
-	
-//	private static final long serialVersionUID = 1L;
+public class NumBox {
 	
 	private final ColorPicker colorPicker;
 
 	private final FontMetrics fm;
 
-	private final Rectangle2D rulerRect = new Rectangle2D.Float();
 	private final Rectangle2D numRect = new Rectangle2D.Float();
 	
-	/* Data boundaries */
-//	private final double minVal;
-//	private final double maxVal;
-	
-	public InfoBox(ColorPicker colorPicker) {
+	public NumBox(ColorPicker colorPicker) {
 		
 		this.colorPicker = colorPicker;
 		
 		/* Font details for text-alignment in numBox */
 		this.fm = colorPicker.getContainerPanel()
 				.getFontMetrics(GUIFactory.FONTS);
-	}
-	
-//	@Override
-//	public void paintComponent(final Graphics g) {
-//
-//		super.paintComponent(g);
-//
-//		final Graphics2D g2 = (Graphics2D) g;
-//		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-//				RenderingHints.VALUE_ANTIALIAS_ON);
-//		
-//		drawRulerBox(g2);
-//		drawNumBox(g2);
-//	}
-	
-	protected void drawRulerBox(final Graphics2D g2) {
-
-		g2.setColor(Color.black);
-
-		final int minY = (int) rulerRect.getMinY();
-		final int minX = (int) rulerRect.getMinX();
-		final int maxX = (int) rulerRect.getMaxX();
-
-		for (int x = minX; x < maxX + 1; x++) {
-
-			if (x == minX || x == maxX) {
-				g2.drawLine(x, minY, x, minY + 10);
-
-			} else if ((x - minX) % 50 == 0) {
-				g2.drawLine(x, minY, x, minY + 5);
-			}
-		}
 	}
 
 	protected void drawNumBox(final Graphics2D g2) {
@@ -82,7 +39,6 @@ public class InfoBox {//extends JPanel{
 		double range = colorPicker.getRange();
 		double minVal = colorPicker.getMinVal();
 
-//		 Paint the thumb values
 		 if (thumbs.size() == fractions.length) {
 			 int i = 0;
 			 for (final Thumb t : thumbs) {
@@ -117,18 +73,11 @@ public class InfoBox {//extends JPanel{
 	
 	protected void setRect(int start_x, int start_y, int width, int height) {
 		
-		rulerRect.setRect(start_x, start_y, width, height);
-		numRect.setRect(start_x, start_y + 10, width, height);
-		
+		numRect.setRect(start_x, start_y, width, height);
 	}
 	
 	protected Rectangle2D getNumRect() {
 		
 		return numRect;
-	}
-	
-	protected Rectangle2D getRulerRect() {
-		
-		return rulerRect;
 	}
 }

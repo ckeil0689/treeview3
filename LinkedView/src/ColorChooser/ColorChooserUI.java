@@ -9,6 +9,7 @@ import java.util.prefs.Preferences;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -35,20 +36,16 @@ public class ColorChooserUI extends CustomDialog {//implements ConfigNodePersist
 	
 	private ColorPicker colorPicker;
 	private JPanel gradientPanel;
-//	private final GradientBox gradientBox;
 
 	/* For custom ColorSet manipulation */
 	private JButton addBtn;
+	private JButton editBtn;
 	private JButton removeBtn;
 	private JButton missingBtn;
 
 	/* ColorSet choices */
-	private JRadioButton redGreenBtn;
-	private JRadioButton yellowBlueBtn;
-	private JRadioButton customColorBtn;
-
-//	/* Holds all preset color data */
-//	private final ColorPresets colorPresets;
+	private JComboBox<String> presetChoice;
+	private final String[] presets = {"RedGreen", "YellowBlue", "Custom Colors"};
 
 	/* Stores whether custom ColorSet is selected or not */
 	private boolean isCustomSelected;
@@ -86,44 +83,35 @@ public class ColorChooserUI extends CustomDialog {//implements ConfigNodePersist
 		mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 		
 		contentPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
-		contentPanel.setLayout(new MigLayout("debug"));
 		contentPanel.setBorder(BorderFactory.createEtchedBorder());
 
-		final JLabel hint = GUIFactory.createLabel("Move or add sliders "
+		final JLabel hint = GUIFactory.createLabel("Move, add or edit sliders "
 				+ "to adjust color scheme.", GUIFactory.FONTS);
 
-		addBtn = GUIFactory.createBtn("Add Color");
-		removeBtn = GUIFactory.createBtn("Remove Selected");
+		addBtn = GUIFactory.createBtn("Add New Color");
+		editBtn = GUIFactory.createBtn("Edit Selected Color");
+		removeBtn = GUIFactory.createBtn("Remove Selected Color");
 
-		/* Collection of ColorSet choice buttons */
-		final ButtonGroup colorBtnGroup = new ButtonGroup();
 
-		redGreenBtn = GUIFactory.createRadioBtn("Red-Green");
-		yellowBlueBtn = GUIFactory.createRadioBtn("Yellow-Blue");
-		customColorBtn = GUIFactory.createRadioBtn("Custom Colors");
+		presetChoice = new JComboBox<String>(presets);
 		missingBtn = GUIFactory.createBtn("Missing Data");
 
-		colorBtnGroup.add(redGreenBtn);
-		colorBtnGroup.add(yellowBlueBtn);
-		colorBtnGroup.add(customColorBtn);
-
-		final JPanel radioButtonPanel = GUIFactory.createJPanel(false,
+		final JPanel presetChoicePanel = GUIFactory.createJPanel(false,
 				GUIFactory.DEFAULT, null);
 
 		final JLabel colorHint = GUIFactory.createLabel("Choose a Color "
 				+ "Scheme: ", GUIFactory.FONTS);
 
-		radioButtonPanel.add(colorHint, "span, wrap");
-		radioButtonPanel.add(redGreenBtn, "span, wrap");
-		radioButtonPanel.add(yellowBlueBtn, "span, wrap");
-		radioButtonPanel.add(customColorBtn, "span");
+		presetChoicePanel.add(colorHint, "span, wrap");
+		presetChoicePanel.add(presetChoice, "span");
 
-		contentPanel.add(radioButtonPanel, "span, pushx, wrap");
+		contentPanel.add(presetChoicePanel, "span, pushx, wrap");
 		contentPanel.add(hint, "span, wrap");
 		contentPanel.add(gradientPanel, "h 150:150:, w 500:500:, pushx, "
 				+ "alignx 50%, span, wrap");
 		contentPanel.add(addBtn, "pushx, split 3, alignx 50%");
 		contentPanel.add(removeBtn, "pushx");
+		contentPanel.add(editBtn, "pushx");
 		contentPanel.add(missingBtn, "wrap");
 		
 		mainPanel.add(contentPanel, "push, grow, wrap");
@@ -149,19 +137,9 @@ public class ColorChooserUI extends CustomDialog {//implements ConfigNodePersist
 		return contentPanel;
 	}
 
-	protected JRadioButton getRGBtn() {
+	protected JComboBox<String> getPresetChoices() {
 
-		return redGreenBtn;
-	}
-
-	protected JRadioButton getYBBtn() {
-
-		return yellowBlueBtn;
-	}
-
-	protected JRadioButton getCustomColorBtn() {
-
-		return customColorBtn;
+		return presetChoice;
 	}
 
 	public boolean isCustomSelected() {
@@ -207,11 +185,9 @@ public class ColorChooserUI extends CustomDialog {//implements ConfigNodePersist
 		removeBtn.addActionListener(l);
 	}
 
-	protected void addColorSetListener(final ActionListener l) {
+	protected void addPresetChoiceListener(final ActionListener l) {
 
-		redGreenBtn.addActionListener(l);
-		yellowBlueBtn.addActionListener(l);
-		customColorBtn.addActionListener(l);
+		presetChoice.addActionListener(l);
 	}
 
 	protected void addMissingListener(final ActionListener l) {

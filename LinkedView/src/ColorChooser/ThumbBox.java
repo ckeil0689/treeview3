@@ -47,7 +47,7 @@ public class ThumbBox {
 				RenderingHints.VALUE_ANTIALIAS_ON);
 
 		// Fill thumbRect with background color
-		g2.setColor(GUIFactory.DEFAULT_BG);
+		g2.setColor(Color.CYAN);//GUIFactory.DEFAULT_BG);
 		g2.fill(thumbRect);
 
 		// Paint the thumbs
@@ -236,8 +236,6 @@ public class ThumbBox {
 			selectedThumb.setCoords(newX, selectedThumb.getY());
 		}
 
-//		colorPicker.setGradientColors();
-//		repaint();
 		colorPicker.refreshColors();
 	}
 
@@ -314,8 +312,6 @@ public class ThumbBox {
 		}
 
 		colorPicker.refreshColors();
-//		setGradientColors();
-//		repaint();
 	}
 	
 	protected void setRect(int start_x, int start_y, int width, int height) {
