@@ -126,7 +126,7 @@ public class GradientBox {
 					+ ") are different in drawNumbBox!");
 		}
 
-		colorPicker.refreshColors();
+		colorPicker.refreshLists();
 	}
 	
 	/**
@@ -158,7 +158,7 @@ public class GradientBox {
 					+ ") are different in drawNumbBox!");
 		}
 
-		colorPicker.refreshColors();
+		colorPicker.refreshLists();
 	}
 	
 	/**
@@ -194,7 +194,7 @@ public class GradientBox {
 			colorList.set(index, newCol);
 			thumbs.get(index).setColor(newCol);
 			
-			colorPicker.refreshColors();
+			colorPicker.refreshLists();
 		}
 	}
 }

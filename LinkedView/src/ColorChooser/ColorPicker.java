@@ -39,14 +39,15 @@ public class ColorPicker {
 	/* Fractions for LinearGradientPaint (depend on thumb positions) */
 	private float[] fractions;
 	
+	/* Inflexible array of colors for LinearGradientPaint */
+	private Color[] colors;
+	
 	/* List of all active thumbs (one per color) */
 	private List<Thumb> thumbList;
 	
 	/* List of all active colors (depends on active ColorSet) */
 	private final List<Color> colorList;
 	
-	/* Inflexible array of colors for LinearGradientPaint */
-	private Color[] colors;
 	
 	/* Data boundaries */
 	private final double minVal;
@@ -188,8 +189,9 @@ public class ColorPicker {
 		colorExtractor.notifyObservers();
 	}
 	
-	protected void refreshColors() {
+	protected void refreshLists() {
 		
+		updateFractions();
 		updateColorArray(); // swapped
 		setGradientColors();
 		containerPanel.repaint();
@@ -259,8 +261,8 @@ public class ColorPicker {
 		Collections.swap(thumbList, oldIndex, newIndex);
 		Collections.swap(colorList, oldIndex, newIndex);
 		
-		updateColorArray();
-		updateFractions();
+//		updateColorArray();
+//		updateFractions();
 	}
 	
 	protected double getMinVal() {
