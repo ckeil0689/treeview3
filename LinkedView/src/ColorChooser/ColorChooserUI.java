@@ -92,7 +92,6 @@ public class ColorChooserUI extends CustomDialog {//implements ConfigNodePersist
 		editBtn = GUIFactory.createBtn("Edit Selected Color");
 		removeBtn = GUIFactory.createBtn("Remove Selected Color");
 
-
 		presetChoice = new JComboBox<String>(presets);
 		missingBtn = GUIFactory.createBtn("Missing Data");
 

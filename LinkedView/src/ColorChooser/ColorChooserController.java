@@ -202,19 +202,18 @@ public class ColorChooserController implements ConfigNodePersistent {
 		 * Specifies what happens when a single click is performed by the user.
 		 */
 		private void clickOrPress() {
-
-			if (colorChooserUI.isCustomSelected()) {
-				if (colorPicker.getGradientBox()
-						.isGradientArea(lastEvent.getPoint())) {
-					colorPicker.getGradientBox()
-						.changeColor(lastEvent.getPoint());
+	
+				GradientBox gBox = colorPicker.getGradientBox();
+				boolean isCustom = colorChooserUI.isCustomSelected();
+				
+				if (gBox.isGradientArea(lastEvent.getPoint()) && isCustom) {
+					gBox.changeColor(lastEvent.getPoint());
 					setActiveColorSet("Custom");
 
 				} else {
 					colorPicker.getThumbBox().deselectAllThumbs();
 					colorPicker.getThumbBox().selectThumb(lastEvent.getPoint());
 				}
-			}
 		}
 
 		/**
@@ -271,17 +270,14 @@ public class ColorChooserController implements ConfigNodePersistent {
 		@Override
 		public void mouseDragged(final MouseEvent e) {
 
-			if (colorChooserUI.isCustomSelected()) {
-				colorPicker.getThumbBox().updateThumbPos(e.getX());
-			}
+			colorPicker.getThumbBox().updateThumbPos(e.getX());
 		}
 
 		@Override
 		public void mouseMoved(final MouseEvent e) {
 
 			Cursor cursor;
-			if (colorChooserUI.isCustomSelected() 
-					&& colorPicker.getThumbBox().containsThumb(e.getPoint())) {
+			if (colorPicker.getThumbBox().containsThumb(e.getPoint())) {
 				cursor = new Cursor(Cursor.HAND_CURSOR);
 
 			} else {

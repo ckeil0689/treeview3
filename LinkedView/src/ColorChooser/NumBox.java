@@ -47,7 +47,12 @@ public class NumBox {
 				 double value = Math.abs((range) * fraction) + minVal;
 				 value = (double) Math.round(value * 1000) / 1000;
 				
-				 g2.drawString(Double.toString(value), t.getX(), 
+				 /* Center string using font metrics to get string width */
+				 String value_s = Double.toString(value);
+				 int stringWidth = fm.stringWidth(value_s);
+				 
+				 g2.drawString(Double.toString(value), 
+						 t.getX() - (stringWidth/2), 
 						 (int) ((numRect.getHeight() / 2) + numRect.getMinY()));
 			 }
 		 } else {
