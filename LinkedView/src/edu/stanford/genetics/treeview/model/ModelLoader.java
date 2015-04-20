@@ -135,8 +135,8 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	/* ---- Loading methods -------- */
 	private String[] findData(final String line, final int current_row) {
 
-		/* Flag for the current_row to avoid adding weights as data. */
-		boolean containsEWeight = false;
+		/* Flag for the current_row to avoid adding weights/labels as data. */
+		boolean is_label_row    = false;
 
 		// load line as String array
 		final String[] lineAsStrings = line.split("\\t", -1);
@@ -154,9 +154,11 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			/* Check string if it is the label for GIDs or AIDs. */
 			if (element.equalsIgnoreCase("GID")) {
 				hasGID = true;
+				is_label_row = true;
 			}
 			if (element.equalsIgnoreCase("AID")) {
 				hasAID = true;
+				is_label_row = true;
 			}
 
 			/*
@@ -166,6 +168,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			if (element.equalsIgnoreCase("GWEIGHT")) {
 				gWeightCol = i;
 				hasGWeight = true;
+				is_label_row = true;
 			}
 
 			/*
@@ -174,15 +177,15 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			 */
 			if (element.equalsIgnoreCase("EWEIGHT")) {
 				hasEWeight = true;
-				containsEWeight = true;
+				is_label_row = true;
 			}
 
 			/*
 			 * If the current string matches the pattern and is not in either
 			 * the GWEIGHT column or EWEIGHT row, we found the data start!
 			 */
-			if (Pattern.matches(fpRegex, element)
-					&& (!containsEWeight && i != gWeightCol)) {
+			if (Pattern.matches(fpRegex, element) && !is_label_row
+					&& i > gWeightCol) {
 
 				dataStartRow = current_row;
 				dataStartCol = i;
