@@ -44,7 +44,8 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 	private int dataStartRow;
 	private int dataStartCol;
-	private int gWeightCol;
+	private int lastLabelCol;
+	private int possibleLastLabelCol;
 
 	private boolean hasData = false;
 	private boolean hasGID = false;
@@ -92,10 +93,11 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		final String[][] stringLabels = new String[row_num][];
 
 		String line;
-		gWeightCol = 0;
-		dataStartRow = 0;
-		dataStartCol = 0;
-		int current_row = 0;
+		lastLabelCol         = -1;
+		possibleLastLabelCol = -1;
+		dataStartRow         = 0;
+		dataStartCol         = 0;
+		int current_row      = 0;
 
 		/* Read all lines and parse the data */
 		while ((line = reader.readLine()) != null) {
@@ -106,6 +108,9 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 			} else {
 				stringLabels[current_row] = findData(line, current_row);
+				//Take care of the first row of data
+				if(hasData)
+					stringLabels[current_row] = fillDoubles(line, current_row);
 			}
 
 			ls.setProgress(current_row++);
@@ -141,7 +146,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		// load line as String array
 		final String[] lineAsStrings = line.split("\\t", -1);
 		String[] labels;
-		double[] dataValues;
 
 		// loop over String array to convert applicable String to double
 		// first find data start
@@ -153,39 +157,57 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 			/* Check string if it is the label for GIDs or AIDs. */
 			if (element.equalsIgnoreCase("GID")) {
+				if(i > lastLabelCol) {
+					lastLabelCol = i;
+				}
 				hasGID = true;
 				is_label_row = true;
 			}
-			if (element.equalsIgnoreCase("AID")) {
+			else if (element.equalsIgnoreCase("AID")) {
+				if(i > lastLabelCol) {
+					lastLabelCol = i;
+				}
 				hasAID = true;
 				is_label_row = true;
 			}
-
-			/*
-			 * Check for GWEIGHT to avoid the weight being recognized as row
-			 * start of actual data.
-			 */
-			if (element.equalsIgnoreCase("GWEIGHT")) {
-				gWeightCol = i;
+			else if (element.equalsIgnoreCase("GWEIGHT")) {
+				if(i > lastLabelCol) {
+					lastLabelCol = i;
+				}
 				hasGWeight = true;
 				is_label_row = true;
 			}
-
-			/*
-			 * Check for EWEIGHT to avoid the weight being recognized as column
-			 * start of actual data.
-			 */
-			if (element.equalsIgnoreCase("EWEIGHT")) {
+			else if (element.equalsIgnoreCase("EWEIGHT")) {
+				if(i > lastLabelCol) {
+					lastLabelCol = i;
+				}
 				hasEWeight = true;
 				is_label_row = true;
 			}
+			else if (element.equalsIgnoreCase("ORF") ||
+					 element.equalsIgnoreCase("NAME") ||
+					 element.equalsIgnoreCase("UID")) {
+				if(i > lastLabelCol) {
+					lastLabelCol = i;
+				}
+				is_label_row = true;
+			}
+			//Else if the value is empty and this has either already been
+			//identified as a label row or we're on the first row and the
+			//previous value was also empty (implying it's still a label column)
+			else if(element.equalsIgnoreCase("") &&
+					(is_label_row ||
+					 (current_row == 0 && (possibleLastLabelCol - 1) == i))) {
+				possibleLastLabelCol = i;
+			}
 
 			/*
-			 * If the current string matches the pattern and is not in either
-			 * the GWEIGHT column or EWEIGHT row, we found the data start!
+			 * If the current string matches the pattern and is not in a label
+			 * row and the index is greater than the last label column, we found
+			 * the data start!
 			 */
 			if (Pattern.matches(fpRegex, element) && !is_label_row
-					&& i > gWeightCol) {
+					&& i > lastLabelCol) {
 
 				dataStartRow = current_row;
 				dataStartCol = i;
@@ -206,56 +228,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			}
 		}
 
-		/*
-		 * Rest of first line with data has to be handled here, because
-		 * reader.nextLine() will move on and cannot be set back.
-		 */
-		if (hasData) {
-			doubleData = new double[row_num - dataStartRow][];
-			dataValues = new double[lineAsStrings.length - dataStartCol];
-
-			for (int i = 0; i < lineAsStrings.length - dataStartCol; i++) {
-
-				String element = lineAsStrings[i + dataStartCol];
-
-				// Check whether string can be double and is not
-				// gweight
-				if (Pattern.matches(fpRegex, element) && i != gWeightCol) {
-
-					// For empty exponents apparently
-					// caused by Windows .txt
-					if (element.endsWith("e") || element.endsWith("E")) {
-						element = element + "+00";
-					}
-
-					final double val = Double.parseDouble(element);
-					dataValues[i] = val;
-
-				} else {
-					dataValues[i] = 0;
-				}
-			}
-
-			doubleData[current_row - dataStartRow] = dataValues;
-		}
-
-		// avoid first datarow to be added with null values
-		if (hasData) {
-			final String[] firstDataRow = new String[dataStartCol];
-
-			for (int i = 0; i < labels.length; i++) {
-
-				if (labels[i] == null) {
-					break;
-				}
-				firstDataRow[i] = labels[i];
-			}
-
-			return firstDataRow;
-
-		} else
-			// handle line in which data has been found
-			return labels;
+		return labels;
 	}
 
 	private String[] fillDoubles(final String line, final int current_row) {
