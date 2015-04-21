@@ -19,7 +19,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
 public class ColorPicker {
 
 	/* Adjust this to MigLayout variables of mainPanel! */
-	protected static final int WIDTH = 450;
+	protected static final int WIDTH = 430;
 	
 	private final JPanel containerPanel;
 	

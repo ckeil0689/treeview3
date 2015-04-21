@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.imageio.ImageIO;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -125,7 +126,24 @@ public class GUIFactory {
 	 */
 	public static JButton createBtn(final String title) {
 
-		final JButton btn = new JButton(title);
+//		final JButton btn = new JButton(title);
+//		btn.setFocusPainted(false);
+//
+//		return btn;
+		return createColorIconBtn(title, null);
+	}
+	
+	/**
+	 * Creates a button with a title and icon if desired. The method centralizes
+	 * the layout setting for buttons so that all buttons will look similar.
+	 *
+	 * @param title
+	 * @param iconFileName
+	 * @return
+	 */
+	public static JButton createColorIconBtn(final String title, Icon icon) {
+
+		final JButton btn = new JButton(title, icon);
 		btn.setFocusPainted(false);
 
 		return btn;

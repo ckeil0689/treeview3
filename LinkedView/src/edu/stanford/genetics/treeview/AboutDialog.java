@@ -22,6 +22,11 @@ import Utilities.StringRes;
  */
 public class AboutDialog extends CustomDialog {
 
+	/**
+	 * Default serial version ID to keep Eclipse happy...
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	private final TreeViewFrame tvFrame;
 
 	public AboutDialog(final TreeViewFrame tvFrame) {
@@ -31,8 +36,8 @@ public class AboutDialog extends CustomDialog {
 
 		setupLayout();
 
-		dialog.pack();
-		dialog.setLocationRelativeTo(JFrame.getFrames()[0]);
+//		dialog.pack();
+//		dialog.setLocationRelativeTo(JFrame.getFrames()[0]);
 	}
 
 	/**
@@ -85,6 +90,6 @@ public class AboutDialog extends CustomDialog {
 		});
 		mainPanel.add(yesB);
 
-		dialog.add(mainPanel);
+		add(mainPanel);
 	}
 }

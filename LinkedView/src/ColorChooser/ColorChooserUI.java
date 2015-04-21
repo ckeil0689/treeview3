@@ -1,5 +1,6 @@
 package ColorChooser;
 
+import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -25,10 +26,12 @@ import edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
 
-public class ColorChooserUI extends CustomDialog {//implements ConfigNodePersistent {
-
-//	/* Node for saved data */
-//	private Preferences configNode;
+/**
+ * Constructs the GUI for color selection and manipulation.
+ * @author chris0689
+ *
+ */
+public class ColorChooserUI extends CustomDialog {
 
 	/* GUI components */
 	private JPanel contentPanel;
@@ -42,6 +45,8 @@ public class ColorChooserUI extends CustomDialog {//implements ConfigNodePersist
 	private JButton editBtn;
 	private JButton removeBtn;
 	private JButton missingBtn;
+	
+	private ColorIcon missingColorIcon;
 
 	/* ColorSet choices */
 	private JComboBox<String> presetChoice;
@@ -69,10 +74,10 @@ public class ColorChooserUI extends CustomDialog {//implements ConfigNodePersist
 		
 		setLayout();
 		
-		dialog.add(mainPanel);
+		add(mainPanel);
 		
-		dialog.pack();
-		dialog.setLocationRelativeTo(JFrame.getFrames()[0]);
+		pack();
+		setLocationRelativeTo(JFrame.getFrames()[0]);
 	}
 
 	/**
@@ -85,16 +90,17 @@ public class ColorChooserUI extends CustomDialog {//implements ConfigNodePersist
 		contentPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 		contentPanel.setBorder(BorderFactory.createEtchedBorder());
 
-		final JLabel hint = GUIFactory.createLabel("Move, add or edit sliders "
-				+ "to adjust color scheme.", GUIFactory.FONTS);
-
 		addBtn = GUIFactory.createBtn("Add New Color");
 		editBtn = GUIFactory.createBtn("Edit Selected Color");
 		removeBtn = GUIFactory.createBtn("Remove Selected Color");
+		
+		missingColorIcon = new ColorIcon();
+		missingBtn = GUIFactory.createColorIconBtn("Missing Data", 
+				missingColorIcon);
 
 		presetChoice = new JComboBox<String>(presets);
-		missingBtn = GUIFactory.createBtn("Missing Data");
 
+		/* Preset choice panel */
 		final JPanel presetChoicePanel = GUIFactory.createJPanel(false,
 				GUIFactory.DEFAULT, null);
 
@@ -103,20 +109,31 @@ public class ColorChooserUI extends CustomDialog {//implements ConfigNodePersist
 
 		presetChoicePanel.add(colorHint, "span, wrap");
 		presetChoicePanel.add(presetChoice, "span");
-
+		
+		final JLabel hint = GUIFactory.createLabel("Move, add or edit sliders "
+				+ "to adjust color scheme.", GUIFactory.FONTS);
+		
 		contentPanel.add(presetChoicePanel, "span, pushx, wrap");
 		contentPanel.add(hint, "span, wrap");
 		contentPanel.add(gradientPanel, "h 150:150:, w 500:500:, pushx, "
 				+ "alignx 50%, span, wrap");
+		contentPanel.add(missingBtn, "pushx, alignx 50%, wrap");
 		contentPanel.add(addBtn, "pushx, split 3, alignx 50%");
 		contentPanel.add(removeBtn, "pushx");
 		contentPanel.add(editBtn, "pushx");
-		contentPanel.add(missingBtn, "wrap");
 		
 		mainPanel.add(contentPanel, "push, grow, wrap");
 		
 		mainPanel.add(closeBtn, "al right, pushx");
+	}
+	
+	/**
+	 * Sets the icon of the missing color button to the new color.
+	 * @param newColor The new color to be displayed.
+	 */
+	protected void updateMissingColorIcon(Color newColor) {
 		
+		missingColorIcon.setColor(newColor);
 	}
 
 	/**
@@ -141,7 +158,7 @@ public class ColorChooserUI extends CustomDialog {//implements ConfigNodePersist
 		return presetChoice;
 	}
 
-	public boolean isCustomSelected() {
+	protected boolean isCustomSelected() {
 
 		return isCustomSelected;
 	}
@@ -153,7 +170,7 @@ public class ColorChooserUI extends CustomDialog {//implements ConfigNodePersist
 	 * @param selected
 	 *            Whether the custom ColorSet is selected or not.
 	 */
-	public void setCustomSelected(final boolean selected) {
+	protected void setCustomSelected(final boolean selected) {
 
 		this.isCustomSelected = selected;
 
@@ -196,6 +213,6 @@ public class ColorChooserUI extends CustomDialog {//implements ConfigNodePersist
 	
 	protected void addDialogCloseListener(final WindowListener l) {
 		
-		dialog.addWindowListener(l);
+		this.addWindowListener(l);
 	}
 }

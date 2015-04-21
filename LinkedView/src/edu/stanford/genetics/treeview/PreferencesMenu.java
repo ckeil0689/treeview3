@@ -30,6 +30,11 @@ import edu.stanford.genetics.treeview.plugin.dendroview.FontSettings;
 public class PreferencesMenu extends CustomDialog implements
 		ConfigNodePersistent {
 
+	/**
+	 * Default serial version ID to keep Eclipse happy...
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	private final TreeViewFrame tvFrame;
 	private HeaderInfo geneHI;
 	private HeaderInfo arrayHI;
@@ -62,7 +67,7 @@ public class PreferencesMenu extends CustomDialog implements
 		this.tvFrame = tvFrame;
 		this.dendroView = tvFrame.getDendroView();
 
-		dialog.getContentPane().add(mainPanel);
+		getContentPane().add(mainPanel);
 	}
 
 	public void setHeaderInfo(final HeaderInfo geneHI, final HeaderInfo arrayHI) {
@@ -95,7 +100,7 @@ public class PreferencesMenu extends CustomDialog implements
 	 */
 	public JDialog getPreferencesFrame() {
 
-		return dialog;
+		return this;
 	}
 
 	public void synchronizeAnnotation() {
@@ -116,14 +121,14 @@ public class PreferencesMenu extends CustomDialog implements
 	 */
 	public int[] getSelectedLabelIndexes() {
 
-		if (annotationSettings != null)
-			return new int[] { annotationSettings.getSelectedGeneIndex(),
-				annotationSettings.getSelectedArrayIndex() };
-		else {
+		if (annotationSettings == null) {
 			LogBuffer.println("AnnotationSettings object was null. "
 					+ "Could not get selected indeces.");
 			return null;
 		}
+		
+		return new int[] { annotationSettings.getSelectedGeneIndex(),
+				annotationSettings.getSelectedArrayIndex() };
 	}
 
 	/* >>>>>> GUI component listeners <<<<< */
@@ -144,7 +149,7 @@ public class PreferencesMenu extends CustomDialog implements
 	 */
 	public void addWindowListener(final WindowAdapter listener) {
 
-		dialog.addWindowListener(listener);
+		addWindowListener(listener);
 	}
 
 	public void addCustomLabelListener(final ActionListener listener) {
@@ -169,9 +174,9 @@ public class PreferencesMenu extends CustomDialog implements
 	 *
 	 * @param l
 	 */
-	public void addComponentListener(final ComponentListener l) {
+	public void addResizeDialogListener(final ComponentListener l) {
 
-		dialog.addComponentListener(l);
+		addComponentListener(l);
 	}
 
 	/**
@@ -405,8 +410,8 @@ public class PreferencesMenu extends CustomDialog implements
 		mainPanel.revalidate();
 		mainPanel.repaint();
 
-		dialog.pack();
-		dialog.setLocationRelativeTo(tvFrame.getAppFrame());
+//		dialog.pack();
+//		dialog.setLocationRelativeTo(tvFrame.getAppFrame());
 	}
 
 	/**

@@ -221,10 +221,7 @@ public class ColorChooserController implements ConfigNodePersistent {
 		 */
 		private void doubleClick() {
 
-			if (colorChooserUI.isCustomSelected()) {
-				colorPicker.getThumbBox()
-					.setThumbPosition(lastEvent.getPoint());
-			}
+			colorPicker.getThumbBox().setThumbPosition(lastEvent.getPoint());			
 		}
 
 		@Override
@@ -383,6 +380,9 @@ public class ColorChooserController implements ConfigNodePersistent {
 				if (missing != null) {
 					colorPicker.setMissing(missing);
 				}
+				
+				/* update the color icon */
+				colorChooserUI.updateMissingColorIcon(missing);
 			}
 		}
 	}

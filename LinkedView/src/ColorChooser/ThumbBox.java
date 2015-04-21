@@ -21,6 +21,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 
+import edu.stanford.genetics.treeview.LogBuffer;
+import Utilities.CustomDialog;
 import Utilities.GUIFactory;
 import Utilities.Helper;
 
@@ -238,81 +240,75 @@ public class ThumbBox {
 		colorPicker.refreshLists();
 	}
 
+	/**
+	 * Finds if an existing thumb contains the passed coordinate point.
+	 * This is used to open an edit dialog for a thumb if it was double-clicked. 
+	 * @param point Coordinate point of the clicked area.
+	 */
 	protected void setThumbPosition(final Point point) {
 
 		for (final Thumb t : colorPicker.getThumbList()) {
 
 			if (t.contains((int) point.getX(), (int) point.getY())) {
 
-				final JDialog positionInputDialog = new JDialog();
-				positionInputDialog
-				.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
-				positionInputDialog
-				.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-				positionInputDialog.setTitle("New Position");
-
-				final JLabel enterPrompt = GUIFactory.createLabel(
-						"Enter data value: ", GUIFactory.FONTS);
-
-				final JTextField inputField = new JTextField();
-				inputField.setEditable(true);
-
-				/* Initially display thumb position */
-				inputField.setText(Double.toString(getThumbPosition(t)));
-
-				final JButton okButton = GUIFactory.createBtn("OK");
-				okButton.addActionListener(new ActionListener() {
-
-					@Override
-					public void actionPerformed(final ActionEvent arg0) {
-
-						try {
-							final double inputValue = Double
-									.parseDouble(inputField.getText());
-							
-							double minVal = colorPicker.getMinVal();
-							double maxVal = colorPicker.getMaxVal();
-							double range = colorPicker.getRange();
-
-							if (inputValue >= minVal && inputValue <= maxVal) {
-
-								final double fraction = 
-										Math.abs(inputValue- minVal) / (range);
-
-								final int inputXValue = (int) Math
-										.round((fraction * ColorPicker.WIDTH));
-
-								updateThumbPos(inputXValue);
-								positionInputDialog.dispose();
-
-							} else {
-								inputField.setText("Number out of range!");
-							}
-
-						} catch (final NumberFormatException e) {
-							inputField.setText("Enter a number!");
-						}
-					}
-				});
-
-				final JPanel panel = GUIFactory.createJPanel(false,
-						GUIFactory.DEFAULT, null);
-
-				panel.add(enterPrompt, "push, span, wrap");
-				panel.add(inputField, "push, growx, span, wrap");
-				panel.add(okButton, "pushx, alignx 50%");
-
-				positionInputDialog.getContentPane().add(panel);
-
-				positionInputDialog.pack();
-				positionInputDialog.setLocationRelativeTo(Frame.getFrames()[0]);
-				positionInputDialog.setVisible(true);
+				openThumbEditDialog(t);
 			}
 		}
 
 		colorPicker.refreshLists();
 	}
 	
+	/**
+	 * Opens a JDialog for editing a thumb. 
+	 * @param t The thumb which is to be edited.
+	 */
+	private void openThumbEditDialog(Thumb t) {
+		
+		final EditThumbDialog posInputDialog = new EditThumbDialog(t, this);
+		
+		double dataVal = posInputDialog.showDialog();
+		alignThumbWithDataVal(dataVal);
+	}
+	
+	/**
+	 * Finds the correct x-position for a thumb for a given data value.
+	 * @param dataVal A data value for which the corresponding thumb's 
+	 * x-position is to be determined.
+	 */
+	protected void alignThumbWithDataVal(double dataVal) {
+		
+		double minVal = colorPicker.getMinVal();
+		double maxVal = colorPicker.getMaxVal();
+		double range = colorPicker.getRange();
+		
+		/* TODO adapt range if values are outside */
+		if (dataVal < minVal || dataVal > maxVal) {
+			
+			/* adapt gradient range if number outside boundaries 
+			 * don forget to update local min/max/range variables
+			 * */
+			
+			LogBuffer.println("Entered!");
+		}
+
+		double diff = Math.abs(dataVal - minVal);
+		final double fraction = diff / (range);
+		
+		LogBuffer.println("Thumb fraction: " + fraction);
+
+		int thumbXValue = (int) Math.round((fraction * ColorPicker.WIDTH));
+		thumbXValue += (int)thumbRect.getMinX(); // offset in the panel
+
+		updateThumbPos(thumbXValue);
+	}
+	
+	/**
+	 * Set the size of the ThumbBox rectangle.
+	 * @param start_x X-coordinate of left corner point of the rectangle.
+	 * @param start_y Y-coordinate of left corner point of the rectangle.
+	 * @param width Width of the rectangle.
+	 * @param height Height of the rectangle.
+	 */
 	protected void setRect(int start_x, int start_y, int width, int height) {
 		
 		thumbRect.setRect(start_x, start_y, width, height);

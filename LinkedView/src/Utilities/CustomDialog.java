@@ -1,12 +1,12 @@
 package Utilities;
 
 import java.awt.Dialog;
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
@@ -16,9 +16,13 @@ import javax.swing.WindowConstants;
  * @author CKeil
  *
  */
-public class CustomDialog {
+public class CustomDialog extends JDialog {
 
-	protected JDialog dialog;
+	/**
+	 * Default serial version ID to keep Eclipse happy...
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	protected JPanel mainPanel;
 	protected JButton closeBtn;
 
@@ -32,11 +36,11 @@ public class CustomDialog {
 	 */
 	public CustomDialog(final String title) {
 
-		this.dialog = new JDialog();
-		dialog.setTitle(title);
-		dialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
-		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		dialog.setResizable(false);
+		super();
+		setTitle(title);
+		setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		setResizable(false);
 
 		this.closeBtn = GUIFactory.createBtn("Close");
 		closeBtn.addActionListener(new CloseListener());
@@ -50,7 +54,7 @@ public class CustomDialog {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			dialog.dispose();
+			dispose();
 		}
 	}
 
@@ -61,11 +65,13 @@ public class CustomDialog {
 	 *            The main view, used to center the dialog on screen.
 	 * @param boolean Sets the visibility status of the dialog.
 	 */
+	@Override
 	public void setVisible(final boolean visible) {
 
-		dialog.pack();
-		dialog.setLocationRelativeTo(Frame.getFrames()[0]);
+		pack();
+		setLocationRelativeTo(JFrame.getFrames()[0]);
 		closeBtn.requestFocus();
-		dialog.setVisible(visible);
+		
+		super.setVisible(visible);
 	}
 }

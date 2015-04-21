@@ -60,7 +60,7 @@ public class PreferencesController {
 		preferences.addWindowListener(new WindowListener());
 		preferences.addOKButtonListener(new ConfirmationListener());
 		preferences.addCustomLabelListener(new CustomLabelListener());
-		preferences.addComponentListener(new PreferencesComponentListener());
+		preferences.addResizeDialogListener(new PreferencesComponentListener());
 		preferences.addJustifyListener(new LabelJustifyListener());
 	}
 

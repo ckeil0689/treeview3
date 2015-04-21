@@ -15,6 +15,11 @@ import Utilities.StringRes;
  */
 public class ClusterDialog extends CustomDialog {
 
+	/**
+	 * Default serial version ID to keep Eclipse happy...
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	private final ClusterView clusterView;
 
 	public ClusterDialog(final int clusterType) {
@@ -24,9 +29,7 @@ public class ClusterDialog extends CustomDialog {
 		clusterView = new ClusterView();
 
 		mainPanel.add(clusterView.makeClusterPanel(clusterType));
-		dialog.getContentPane().add(mainPanel);
-
-		packDialog();
+		getContentPane().add(mainPanel);
 	}
 
 	/**
@@ -36,8 +39,8 @@ public class ClusterDialog extends CustomDialog {
 	 */
 	public void reset(final int clusterType) {
 
-		dialog.getContentPane().removeAll();
-		dialog.getContentPane().add(clusterView.makeClusterPanel(clusterType));
+		getContentPane().removeAll();
+		getContentPane().add(clusterView.makeClusterPanel(clusterType));
 		packDialog();
 	}
 
@@ -46,8 +49,8 @@ public class ClusterDialog extends CustomDialog {
 	 */
 	private void packDialog() {
 
-		dialog.pack();
-		dialog.setLocationRelativeTo(Frame.getFrames()[0]);
+		pack();
+		setLocationRelativeTo(Frame.getFrames()[0]);
 	}
 
 	/**
@@ -58,14 +61,6 @@ public class ClusterDialog extends CustomDialog {
 	public ClusterView getClusterView() {
 
 		return clusterView;
-	}
-
-	/**
-	 * Closes the JDialog.
-	 */
-	public void dispose() {
-
-		dialog.dispose();
 	}
 
 	/**

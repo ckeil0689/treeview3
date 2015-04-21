@@ -9,6 +9,11 @@ import Utilities.GUIFactory;
 public class StatsDialog extends CustomDialog {
 
 	/**
+	 * Default serial version ID to keep Eclipse happy...
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * Constructor
 	 *
 	 * @param viewFrame
@@ -58,6 +63,6 @@ public class StatsDialog extends CustomDialog {
 		mainPanel.add(size, "wrap");
 		mainPanel.add(closeBtn, "span, al right");
 
-		dialog.add(mainPanel);
+		add(mainPanel);
 	}
 }
