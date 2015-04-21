@@ -157,39 +157,44 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 			/* Check string if it is the label for GIDs or AIDs. */
 			if (element.equalsIgnoreCase("GID")) {
-				if(i > lastLabelCol) {
+				if(i > lastLabelCol)
 					lastLabelCol = i;
-				}
+				if(i > possibleLastLabelCol)
+					possibleLastLabelCol = i;
 				hasGID = true;
 				is_label_row = true;
 			}
 			else if (element.equalsIgnoreCase("AID")) {
-				if(i > lastLabelCol) {
+				if(i > lastLabelCol)
 					lastLabelCol = i;
-				}
+				if(i > possibleLastLabelCol)
+					possibleLastLabelCol = i;
 				hasAID = true;
 				is_label_row = true;
 			}
 			else if (element.equalsIgnoreCase("GWEIGHT")) {
-				if(i > lastLabelCol) {
+				if(i > lastLabelCol)
 					lastLabelCol = i;
-				}
+				if(i > possibleLastLabelCol)
+					possibleLastLabelCol = i;
 				hasGWeight = true;
 				is_label_row = true;
 			}
 			else if (element.equalsIgnoreCase("EWEIGHT")) {
-				if(i > lastLabelCol) {
+				if(i > lastLabelCol)
 					lastLabelCol = i;
-				}
+				if(i > possibleLastLabelCol)
+					possibleLastLabelCol = i;
 				hasEWeight = true;
 				is_label_row = true;
 			}
 			else if (element.equalsIgnoreCase("ORF") ||
 					 element.equalsIgnoreCase("NAME") ||
 					 element.equalsIgnoreCase("UID")) {
-				if(i > lastLabelCol) {
+				if(i > lastLabelCol)
 					lastLabelCol = i;
-				}
+				if(i > possibleLastLabelCol)
+					possibleLastLabelCol = i;
 				is_label_row = true;
 			}
 			//Else if the value is empty and this has either already been
@@ -209,8 +214,17 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			if (Pattern.matches(fpRegex, element) && !is_label_row
 					&& i > lastLabelCol) {
 
+				if((possibleLastLabelCol + 1) < i) {
+					LogBuffer.println("WARNING: Assuming data starts in " +
+							"column [" + (possibleLastLabelCol + 2) +
+							"].");
+					dataStartCol = possibleLastLabelCol + 1;
+				} else {
+					//LogBuffer.println("Assuming data starts in " +
+					//		"column [" + (i + 1) + "].  If data starts earlier");
+					dataStartCol = i;
+				}
 				dataStartRow = current_row;
-				dataStartCol = i;
 
 				/* Initialize data matrix */
 				doubleData = new double[row_num - dataStartRow][];
