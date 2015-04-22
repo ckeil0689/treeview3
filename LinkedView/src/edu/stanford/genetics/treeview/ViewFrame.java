@@ -30,6 +30,11 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -42,6 +47,7 @@ import java.util.prefs.Preferences;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.Timer;
 //import javax.swing.WindowConstants;
 import javax.swing.WindowConstants;
 
@@ -109,6 +115,8 @@ ConfigNodePersistent {
 		// appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		setupWindowListener();
+
+		setupWindowPosListener();
 	}
 
 	/**
@@ -275,6 +283,56 @@ ConfigNodePersistent {
 	}
 
 	/**
+	 * Listens to the resizing of DendroView2 and makes changes to MapContainers
+	 * as a result.
+	 *
+	 * @author CKeil
+	 *
+	 */
+	private class AppWindowPosListener extends ComponentAdapter {
+
+		//Timer to prevent repeatedly saving window dimensions upon resize
+		private final int saveResizeDelay = 1000;
+		private javax.swing.Timer saveResizeTimer;
+		ActionListener saveWindowAttrs = new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				if (evt.getSource() == saveResizeTimer) {
+					/* Stop timer */
+					saveResizeTimer.stop();
+					saveResizeTimer = null;
+					LogBuffer.println("Saving window dimensions & position.");
+				
+					saveSettings();
+				}
+			}
+		};
+
+		public void componentMoved(ComponentEvent e) {
+			//Save the new dimensions/position if it's done changing
+			if (this.saveResizeTimer == null) {
+				/* Start waiting for saveResizeDelay millis to elapse and then
+				 * call actionPerformed of the ActionListener
+				 * "saveWindowAttrs". */
+				this.saveResizeTimer = new Timer(this.saveResizeDelay,
+												 saveWindowAttrs);
+				this.saveResizeTimer.start();
+			} else {
+				/* Event came too soon, swallow it by resetting the timer.. */
+				this.saveResizeTimer.restart();
+			}
+		}
+	}
+
+	public void addAppWindowPosListener() {
+		
+		appFrame.addComponentListener( new AppWindowPosListener());
+	}
+
+	private void setupWindowPosListener() {
+		addAppWindowPosListener();
+	}
+
+	/**
 	 * Keep track of when active, so that clicks don't get passed through too
 	 * much.
 	 *
@@ -354,6 +412,12 @@ ConfigNodePersistent {
 		case JOptionPane.YES_OPTION:
 			LogBuffer.println("Saving settings before window close.");
 			appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			//Not sure a call to saveSettings is necessary anymore because added
+			//calls upon window resize and winow move in DendroController and
+			//ViewFrame respectively.  If it does something other than save
+			//those two things, then sure, there's reason to keep it.  However,
+			//note that resizing the window without data loaded does not save
+			//settings because it's tied to the matrix jpanel
 			saveSettings();
 			appFrame.dispose();
 			LogBuffer.println("Will this print, and when?.");

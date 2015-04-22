@@ -99,6 +99,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	// Color Extractor
 	private ColorExtractor colorExtractor;
 
+
 	public DendroController(final TreeViewFrame tvFrame) {
 
 		this.tvFrame = tvFrame;
@@ -763,6 +764,21 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	 */
 	private class AppFrameListener extends ComponentAdapter {
 
+		//Timer to prevent repeatedly saving window dimensions upon resize
+		private final int saveResizeDelay = 1000;
+		private javax.swing.Timer saveResizeTimer;
+		ActionListener saveWindowAttrs = new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				if (evt.getSource() == saveResizeTimer) {
+					/* Stop timer */
+					saveResizeTimer.stop();
+					saveResizeTimer = null;
+				
+					tvFrame.saveSettings();
+				}
+			}
+		};
+
 		@Override
 		public void componentResized(final ComponentEvent arg0) {
 			// LogBuffer.println("componentResized: globalYmap.getTileNumVisible: ["
@@ -780,6 +796,19 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			// and implemented these functions to make the necessary
 			// adjustments to the image when that happens
 			refocusViewPort();
+			
+			//Save the new dimensions/position if it's done changing
+			if (this.saveResizeTimer == null) {
+				/* Start waiting for saveResizeDelay millis to elapse and then
+				 * call actionPerformed of the ActionListener
+				 * "saveWindowAttrs". */
+				this.saveResizeTimer = new Timer(this.saveResizeDelay,
+												 saveWindowAttrs);
+				this.saveResizeTimer.start();
+			} else {
+				/* Event came too soon, swallow it by resetting the timer.. */
+				this.saveResizeTimer.restart();
+			}
 		}
 	}
 	
