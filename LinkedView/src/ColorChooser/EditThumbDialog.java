@@ -30,6 +30,9 @@ public class EditThumbDialog extends CustomDialog {
 		
 		final JLabel enterPrompt = GUIFactory.createLabel(
 				"Enter data value: ", GUIFactory.FONTS);
+		
+		/* default */
+		inputX = thumb.getX();
 
 		inputField = new JTextField();
 		inputField.setEditable(true);
