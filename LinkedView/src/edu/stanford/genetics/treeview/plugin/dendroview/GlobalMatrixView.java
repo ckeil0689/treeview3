@@ -242,16 +242,15 @@ public class GlobalMatrixView extends MatrixView {
 		double w = 0;
 		double h = 0;
 
-		if (interactiveXmap.getNumVisible() < 5 &&
-				interactiveYmap.getNumVisible() < 5) {
+		// Width and height of rectangle which spans the Ellipse2D object
+		w = interactiveXmap.getNumVisible() * xmap.getScale();
+		h = interactiveYmap.getNumVisible() * ymap.getScale();
 
-			// Width and height of rectangle which spans the Ellipse2D object
-			w = interactiveXmap.getNumVisible() * xmap.getScale();
-			h = interactiveYmap.getNumVisible() * ymap.getScale();
+		if (w < 5 && h < 5) {
 
 			// coords for top left of circle
 			x = xmap.getPixel(interactiveXmap.getFirstVisible()) + w/2.0 - 5;
-			y = ymap.getPixel(interactiveYmap.getFirstVisible()) + w/2.0 - 5;
+			y = ymap.getPixel(interactiveYmap.getFirstVisible()) + h/2.0 - 5;
 			
 			//LogBuffer.println("Circle coords: x y w h: " + x+" "+y+" "+w+" "+h);
 
