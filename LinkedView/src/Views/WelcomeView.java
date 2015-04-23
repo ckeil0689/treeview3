@@ -153,7 +153,7 @@ public class WelcomeView {
 
 		loadButton = GUIFactory.createLargeBtn("Open...");
 		loadButton.requestFocusInWindow();
-		loadLastButton = GUIFactory.createBtn("Load last file...");
+		loadLastButton = GUIFactory.createBtn("Load last file");
 
 		status = GUIFactory.createLabel("Ready to go!", GUIFactory.FONTS);
 
