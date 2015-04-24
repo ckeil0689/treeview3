@@ -207,6 +207,13 @@ public class ThumbBox {
 		}
 	}
 
+	/**
+	 * TODO fractions cannot be dependent on thumb x-coords because a full
+	 * data range does not fit into 430 pixels which is the width of the color
+	 * gradient box. (-> obv. can only represent 430 data points). Separate
+	 * fractions from thumb x position and keep thumbList + fractions synced!!
+	 * @param inputX
+	 */
 	protected void updateThumbPos(final int inputX) {
 
 		/* stay within boundaries */
@@ -260,12 +267,14 @@ public class ThumbBox {
 	 */
 	protected void setThumbPosition(final Point point) {
 
+		int index = 0;
 		for (final Thumb t : colorPicker.getThumbList()) {
 
 			if (t.contains((int) point.getX(), (int) point.getY())) {
 
-				openThumbEditDialog(t);
+				openThumbEditDialog(t, index);
 			}
+			index++;
 		}
 
 		colorPicker.refreshLists();
@@ -275,11 +284,13 @@ public class ThumbBox {
 	 * Opens a JDialog for editing a thumb. 
 	 * @param t The thumb which is to be edited.
 	 */
-	private void openThumbEditDialog(Thumb t) {
+	private void openThumbEditDialog(Thumb t, int thumbIndex) {
 		
-		final EditThumbDialog posInputDialog = new EditThumbDialog(t, this);
+		final EditThumbDialog posInputDialog = new EditThumbDialog(t, 
+				thumbIndex, this, colorPicker.getColorList());
 		
-		double dataVal = posInputDialog.showDialog();
+		double dataVal = posInputDialog.showDialog(
+				colorPicker.getContainerPanel());
 		alignThumbWithDataVal(dataVal);
 	}
 	
@@ -306,11 +317,9 @@ public class ThumbBox {
 
 		double diff = Math.abs(dataVal - minVal);
 		final double fraction = diff / (range);
-		
-		LogBuffer.println("Thumb fraction: " + fraction);
 
 		int thumbXValue = (int) Math.round((fraction * ColorPicker.WIDTH));
-		thumbXValue += (int)thumbRect.getMinX(); // offset in the panel
+		thumbXValue += (int) thumbRect.getMinX(); // offset in the panel
 
 		updateThumbPos(thumbXValue);
 	}
