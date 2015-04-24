@@ -13,7 +13,7 @@ import Utilities.GUIFactory;
 public class EditThumbDialog extends CustomDialog {
 
 	/**
-	 * Default serial version ID to keep Eclispe happy...
+	 * Default serial version ID to keep Eclipse happy...
 	 */
 	private static final long serialVersionUID = 1L;
 

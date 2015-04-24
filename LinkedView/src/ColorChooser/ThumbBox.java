@@ -48,14 +48,27 @@ public class ThumbBox {
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
 
-		// Fill thumbRect with background color
+		/* Clear thumbRect with background color */
 		g2.setColor(GUIFactory.DEFAULT_BG);
 		g2.fill(thumbRect);
 
-		// Paint the thumbs
+		Thumb selected_thumb = null;
+		
+		/* Paint the thumbs */
 		for (final Thumb t : colorPicker.getThumbList()) {
-
+			
+			/* skip selected thumb to draw it last (keeps it on top) */
+			if(t.isSelected()) {
+				selected_thumb = t;
+				continue;
+			}
+			
 			t.paint(g2);
+		}
+		
+		/* finally paint selected thumb */
+		if(selected_thumb != null) {
+			selected_thumb.paint(g2);
 		}
 	}
 	

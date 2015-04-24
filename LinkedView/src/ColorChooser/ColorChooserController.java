@@ -379,10 +379,9 @@ public class ColorChooserController implements ConfigNodePersistent {
 
 				if (missing != null) {
 					colorPicker.setMissing(missing);
+					/* update the color icon */
+					colorChooserUI.updateMissingColorIcon(missing);
 				}
-				
-				/* update the color icon */
-				colorChooserUI.updateMissingColorIcon(missing);
 			}
 		}
 	}
