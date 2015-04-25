@@ -3,13 +3,11 @@ package ColorChooser;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.RenderingHints;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.swing.JColorChooser;
 import javax.swing.JPanel;
 
 import Utilities.Helper;
@@ -194,8 +192,7 @@ public class ColorPicker {
 	
 	protected void updateColors() {
 		
-//		updateFractions();
-		updateColorArray(); // swapped
+		updateColorArray();
 		setGradientColors();
 		containerPanel.repaint();
 	}
@@ -219,29 +216,6 @@ public class ColorPicker {
 
 		this.fractions = new float[] { 0.0f, 0.5f, 1.0f };
 	}
-	
-	/**
-	 * deprecate -- should never get fractions from thumb position due to
-	 * inaccuracies.
-	 * 
-	 * Calculates the fractions needed for the LinearGradient object to
-	 * determine where the center of each color is displayed.
-	 *
-	 * @return A float array containing the thumb positions as fractions of the
-	 *         width of gradientRect.
-	 */
-//	protected void updateFractions() {
-//
-//		final float[] newFractions = new float[colorList.size()];
-//
-//		int i = 0;
-//		for (final Thumb t : thumbList) {
-//
-//			newFractions[i++] = thumbBox.getThumbFraction(t);
-//		}
-//		
-//		this.fractions = newFractions;
-//	}
 	
 	/*
 	 * Updates the color array when needed so LinearGradientPaint can use it to

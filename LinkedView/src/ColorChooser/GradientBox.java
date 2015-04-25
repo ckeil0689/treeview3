@@ -1,38 +1,18 @@
 package ColorChooser;
 
 import java.awt.Color;
-import java.awt.Dialog;
-import java.awt.FontMetrics;
-import java.awt.Frame;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.LinearGradientPaint;
 import java.awt.MultipleGradientPaint.CycleMethod;
 import java.awt.Point;
-import java.awt.RenderingHints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
-import javax.swing.JButton;
 import javax.swing.JColorChooser;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.WindowConstants;
 
-import Utilities.GUIFactory;
-import Utilities.Helper;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
-import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
 
 /**
  * A special JPanel that represents a gradient colored box. It has a
@@ -106,19 +86,31 @@ public class GradientBox {
 
 		List<Thumb> thumbs = colorPicker.getThumbList();
 		int newColorIndex = (thumbs.size() - 1) / 2;
-
-		colorPicker.getColorList().add(newColorIndex + 1, newCol);
 		
 		float[] fractions = colorPicker.getFractions();
-		final double halfRange = (fractions[newColorIndex + 1] 
-				- fractions[newColorIndex]) / 2;
-		final double newFraction = halfRange + fractions[newColorIndex];
-
+		final double halfRange = fractions[newColorIndex] 
+				- (fractions[newColorIndex] / 2);
+		final double newFraction = halfRange;// + fractions[newColorIndex];
+		
+		float[] newFractions = new float[fractions.length + 1];
+		
+		int j = 0;
+		for(int i = 0; i < newFractions.length; i++) {
+			
+			if(i == newColorIndex) {
+				newFractions[i] = (float) newFraction;
+				continue;
+			}
+			newFractions[i] = fractions[j++];
+		}
+		
+		LogBuffer.println("New fractions: " + Arrays.toString(newFractions));
 		
 		final int x = (int) (newFraction * gradientRect.getWidth());
 
+		colorPicker.getColorList().add(newColorIndex, newCol);
 		colorPicker.getThumbBox().insertThumbAt(x, newCol);
-//		colorPicker.updateFractions();
+		colorPicker.setFractions(newFractions);
 
 		if (thumbs.size() != fractions.length) {
 			System.out.println("ThumbList size (" + thumbs.size()
@@ -135,6 +127,7 @@ public class GradientBox {
 	protected void removeColor() {
 
 		float[] fractions = colorPicker.getFractions();
+		int removeIndex = 0;
 		List<Thumb> thumbs = colorPicker.getThumbList();
 		List<Color> colorList = colorPicker.getColorList();
 		
@@ -142,6 +135,7 @@ public class GradientBox {
 		for (final Thumb t : thumbs) {
 
 			if (t.isSelected()) {
+				removeIndex = index;
 				thumbs.remove(index);
 				colorList.remove(index);
 				colorPicker.getThumbBox().setSelectedThumb(null);
@@ -150,7 +144,17 @@ public class GradientBox {
 			index++;
 		}
 
-//		colorPicker.updateFractions();
+		/* update fractions */
+		float[] newFractions = new float[fractions.length - 1];
+		
+		int j = 0;
+		for(int i = 0; i < fractions.length; i++) {
+			
+			if(i == removeIndex) {
+				continue;
+			}
+			newFractions[j++] = fractions[i];
+		}
 
 		if (thumbs.size() != fractions.length) {
 			System.out.println("ThumbList size (" + thumbs.size()
@@ -158,6 +162,7 @@ public class GradientBox {
 					+ ") are different in drawNumbBox!");
 		}
 
+		colorPicker.setFractions(newFractions);
 		colorPicker.updateColors();
 	}
 	

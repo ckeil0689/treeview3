@@ -1,29 +1,14 @@
 package ColorChooser;
 
 import java.awt.Color;
-import java.awt.Dialog;
-import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.WindowConstants;
-
 import edu.stanford.genetics.treeview.LogBuffer;
-import Utilities.CustomDialog;
 import Utilities.GUIFactory;
 import Utilities.Helper;
 
@@ -34,7 +19,7 @@ public class ThumbBox {
 	private final Rectangle2D thumbRect = new Rectangle2D.Float();
 	
 	/* Holds the currently selected thumb */
-	private Thumb selectedThumb = null;
+	private Thumb selectedThumb;
 	
 	public ThumbBox(ColorPicker colorPicker) {
 		
@@ -320,7 +305,9 @@ public class ThumbBox {
 	 */
 	protected void editSelectedThumb() {
 		
-		openThumbEditDialog(selectedThumb, this.getSelectedThumbIndex());
+		if(selectedThumb != null) {
+			openThumbEditDialog(selectedThumb, this.getSelectedThumbIndex());
+		}
 	}
 	
 	/**

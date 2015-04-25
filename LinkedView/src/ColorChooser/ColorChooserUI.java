@@ -5,26 +5,17 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowListener;
-import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 
-import net.miginfocom.swing.MigLayout;
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
-import edu.stanford.genetics.treeview.ConfigNodePersistent;
-import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
-import edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets;
-import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
-import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
 
 /**
  * Constructs the GUI for color selection and manipulation.
