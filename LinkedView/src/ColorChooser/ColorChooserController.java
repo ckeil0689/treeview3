@@ -165,6 +165,7 @@ public class ColorChooserController implements ConfigNodePersistent {
 			colorChooserUI.addRemoveListener(new RemoveButtonListener());
 			colorChooserUI.addPresetChoiceListener(new ColorSetListener());
 			colorChooserUI.addMissingListener(new MissingBtnListener());
+			colorChooserUI.addEditListener(new EditButtonListener());
 			colorChooserUI.addDialogCloseListener(new WindowCloseListener());
 		}
 	}
@@ -303,6 +304,21 @@ public class ColorChooserController implements ConfigNodePersistent {
 			if (newCol != null) {
 				colorPicker.getGradientBox().addColor(newCol);
 			}
+		}
+	}
+	
+	/**
+	 * Removes a color from colorList in the gradientBox.
+	 *
+	 * @author chris0689
+	 *
+	 */
+	private class EditButtonListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+
+			colorPicker.getThumbBox().editSelectedThumb();
 		}
 	}
 

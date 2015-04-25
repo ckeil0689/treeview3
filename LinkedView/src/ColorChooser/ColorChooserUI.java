@@ -33,6 +33,11 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
  */
 public class ColorChooserUI extends CustomDialog {
 
+	/**
+	 * Default serial version ID to keep Eclipse happy...
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	/* GUI components */
 	private JPanel contentPanel;
 	private JPanel mainPanel;
@@ -91,7 +96,7 @@ public class ColorChooserUI extends CustomDialog {
 		contentPanel.setBorder(BorderFactory.createEtchedBorder());
 
 		addBtn = GUIFactory.createBtn("Add New Color");
-		editBtn = GUIFactory.createBtn("Edit Selected Color");
+		editBtn = GUIFactory.createBtn("Edit Selected Thumb");
 		removeBtn = GUIFactory.createBtn("Remove Selected Color");
 		
 		missingColorIcon = new ColorIcon();
@@ -108,7 +113,8 @@ public class ColorChooserUI extends CustomDialog {
 				+ "Scheme: ", GUIFactory.FONTS);
 
 		presetChoicePanel.add(colorHint, "span, wrap");
-		presetChoicePanel.add(presetChoice, "span");
+		presetChoicePanel.add(presetChoice, "pushx");
+		presetChoicePanel.add(missingBtn, "pushx");
 		
 		final JLabel hint = GUIFactory.createLabel("Move, add or edit sliders "
 				+ "to adjust color scheme.", GUIFactory.FONTS);
@@ -117,7 +123,6 @@ public class ColorChooserUI extends CustomDialog {
 		contentPanel.add(hint, "span, wrap");
 		contentPanel.add(gradientPanel, "h 150:150:, w 500:500:, pushx, "
 				+ "alignx 50%, span, wrap");
-		contentPanel.add(missingBtn, "pushx, alignx 50%, wrap");
 		contentPanel.add(addBtn, "pushx, split 3, alignx 50%");
 		contentPanel.add(removeBtn, "pushx");
 		contentPanel.add(editBtn, "pushx");
@@ -209,6 +214,11 @@ public class ColorChooserUI extends CustomDialog {
 	protected void addMissingListener(final ActionListener l) {
 
 		missingBtn.addActionListener(l);
+	}
+	
+	protected void addEditListener(final ActionListener l) {
+
+		editBtn.addActionListener(l);
 	}
 	
 	protected void addDialogCloseListener(final WindowListener l) {

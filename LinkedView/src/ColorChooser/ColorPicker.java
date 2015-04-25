@@ -12,6 +12,7 @@ import java.util.List;
 import javax.swing.JColorChooser;
 import javax.swing.JPanel;
 
+import Utilities.Helper;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
@@ -182,19 +183,33 @@ public class ColorPicker {
 		colorExtractor.notifyObservers();
 	}
 	
-	/* Updates the missing color object in active ColorExtractor */
+	/**
+	 *  Updates the missing color object in active ColorExtractor. 
+	 */
 	protected void setMissing(final Color color) {
 
 		colorExtractor.setMissingColor(color);
 		colorExtractor.notifyObservers();
 	}
 	
-	protected void refreshLists() {
+	protected void updateColors() {
 		
-		updateFractions();
+//		updateFractions();
 		updateColorArray(); // swapped
 		setGradientColors();
 		containerPanel.repaint();
+	}
+	
+	/**
+	 * Updates the state of the fractions. Also updates the thumb positions
+	 * as a result.
+	 * @param newFracs The new set of fractions.
+	 */
+	protected void setFractions(float[] newFracs) {
+		
+		this.fractions = newFracs;
+		
+		thumbBox.adjustThumbsToFractions();
 	}
 	
 	/**
@@ -206,24 +221,27 @@ public class ColorPicker {
 	}
 	
 	/**
+	 * deprecate -- should never get fractions from thumb position due to
+	 * inaccuracies.
+	 * 
 	 * Calculates the fractions needed for the LinearGradient object to
 	 * determine where the center of each color is displayed.
 	 *
 	 * @return A float array containing the thumb positions as fractions of the
 	 *         width of gradientRect.
 	 */
-	protected void updateFractions() {
-
-		final float[] newFractions = new float[colorList.size()];
-
-		int i = 0;
-		for (final Thumb t : thumbList) {
-
-			newFractions[i++] = thumbBox.getThumbFraction(t);
-		}
-		
-		this.fractions = newFractions;
-	}
+//	protected void updateFractions() {
+//
+//		final float[] newFractions = new float[colorList.size()];
+//
+//		int i = 0;
+//		for (final Thumb t : thumbList) {
+//
+//			newFractions[i++] = thumbBox.getThumbFraction(t);
+//		}
+//		
+//		this.fractions = newFractions;
+//	}
 	
 	/*
 	 * Updates the color array when needed so LinearGradientPaint can use it to
@@ -253,29 +271,50 @@ public class ColorPicker {
 	
 	/**
 	 * Swaps positions of thumbs and colors in their specific lists.
-	 * @param oldIndex
-	 * @param newIndex
+	 * 
+	 * @param oldIndex Previous position of color/ thumb in their 
+	 * respective lists.
+	 * @param newIndex New position of color/ thumb in their 
+	 * respective lists.
 	 */
 	protected void swapPositions(int oldIndex, int newIndex) {
 		
 		Collections.swap(thumbList, oldIndex, newIndex);
 		Collections.swap(colorList, oldIndex, newIndex);
-		
-//		updateColorArray();
-//		updateFractions();
 	}
 	
+	/**
+	 * 
+	 * @return The currently defined minimum data value.
+	 */
 	protected double getMinVal() {
 		
 		return minVal;
 	}
 	
+	/**
+	 * 
+	 * @return The currently defined maximum data value.
+	 */
 	protected double getMaxVal() {
 		
 		return maxVal;
 	}
 	
+	/**
+	 * 
+	 * @return Returns the currently defined range of the 
+	 * dataset (maxVal - minVal).
+	 */
 	protected double getRange() { 
+		
+		double testRange = maxVal - minVal;
+		
+		/* make sure the range is always defined correctly */
+		if(!Helper.nearlyEqual(range, testRange)) {
+			LogBuffer.println("Range was not defined properly!");
+			this.range = testRange;
+		}
 		
 		return range;
 	}
@@ -310,6 +349,10 @@ public class ColorPicker {
 		return gradientBox;
 	}
 	
+	/**
+	 * 
+	 * @return The number of thumbs in the thumbList.
+	 */
 	protected int getThumbNumber() {
 		
 		return thumbList.size();

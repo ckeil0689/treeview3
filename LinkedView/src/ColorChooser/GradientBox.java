@@ -118,7 +118,7 @@ public class GradientBox {
 		final int x = (int) (newFraction * gradientRect.getWidth());
 
 		colorPicker.getThumbBox().insertThumbAt(x, newCol);
-		colorPicker.updateFractions();
+//		colorPicker.updateFractions();
 
 		if (thumbs.size() != fractions.length) {
 			System.out.println("ThumbList size (" + thumbs.size()
@@ -126,7 +126,7 @@ public class GradientBox {
 					+ ") are different in drawNumbBox!");
 		}
 
-		colorPicker.refreshLists();
+		colorPicker.updateColors();
 	}
 	
 	/**
@@ -150,7 +150,7 @@ public class GradientBox {
 			index++;
 		}
 
-		colorPicker.updateFractions();
+//		colorPicker.updateFractions();
 
 		if (thumbs.size() != fractions.length) {
 			System.out.println("ThumbList size (" + thumbs.size()
@@ -158,7 +158,7 @@ public class GradientBox {
 					+ ") are different in drawNumbBox!");
 		}
 
-		colorPicker.refreshLists();
+		colorPicker.updateColors();
 	}
 	
 	/**
@@ -194,7 +194,7 @@ public class GradientBox {
 			colorList.set(index, newCol);
 			thumbs.get(index).setColor(newCol);
 			
-			colorPicker.refreshLists();
+			colorPicker.updateColors();
 		}
 	}
 }

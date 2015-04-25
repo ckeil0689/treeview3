@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -121,7 +122,7 @@ public class ThumbBox {
 	 * be drawn in the paintComponent method, if the fractions aren't ascending.
 	 * This would cause an exception with LinearGradientPaint.
 	 */
-	private void verifyThumbs() {
+	protected void verifyThumbs() {
 
 		final int x = (int) thumbRect.getMinX();
 		final int w = (int) thumbRect.getWidth();
@@ -208,56 +209,89 @@ public class ThumbBox {
 	}
 
 	/**
-	 * TODO fractions cannot be dependent on thumb x-coords because a full
-	 * data range does not fit into 430 pixels which is the width of the color
-	 * gradient box. (-> obv. can only represent 430 data points). Separate
-	 * fractions from thumb x position and keep thumbList + fractions synced!!
-	 * @param inputX
+	 * Updates a thumb position based on a supplied x-coordinate. This is
+	 * mainly useful to implement the drag-to-position feature to allow
+	 * sliding thumbs.
+	 * @param inputX New x-coordinate of the selected thumb.
 	 */
-	protected void updateThumbPos(final int inputX) {
+	protected void updateThumbPos(int inputX) {
 
+		/* adjust offset */
+		inputX -= (int)thumbRect.getMinX();
+		
 		/* stay within boundaries */
 		if (selectedThumb == null
 				|| (inputX < (int) thumbRect.getMinX() 
-						|| inputX > (int) thumbRect.getMaxX()))
+						|| inputX > (int) thumbRect.getMaxX())) {
 			return;
+		}
+		
+		float newFrac = ((float)inputX) / ColorPicker.WIDTH;
+		
+		updateFracsForThumbPos(newFrac);
+	}
+	
+	/**
+	 * TODO fractions cannot be dependent on thumb x-coords because a full
+	 * data range does not fit into 430 pixels which is the width of the color
+	 * gradient box. (-> obv. can only represent 430 data points). Separate
+	 * fractions from thumb x-coords and keep thumbList + fractions synced!!
+	 * @param inputX
+	 */
+	protected void updateFracsForThumbPos(final float inputFrac) {
+
+		/* stay within boundaries */
+		if (selectedThumb == null
+				|| (inputFrac < 0.0 || inputFrac > 1.0)) {
+			return;
+		}
+		
+		float[] fractions = colorPicker.getFractions();
 
 		/* get position of previous thumb */
 		final int selectedIndex = colorPicker.getThumbList()
 				.indexOf(selectedThumb);
-		int previousPos = 0;
-		int nextPos = (int) thumbRect.getMaxX();
-
-		/* set positions around active thumb */
+		
+		/* define the boundaries around active thumb's fraction */
+		float selectedFrac = fractions[selectedIndex];
+		float previousFrac = 0.0f;
+		float nextFrac = 1.0f;
+		
 		if (selectedIndex == 0) {
-			nextPos = colorPicker.getThumb(selectedIndex + 1).getX();
+			nextFrac = fractions[selectedIndex + 1];
 
 		} else if (selectedIndex == colorPicker.getThumbNumber() - 1) {
-			previousPos = colorPicker.getThumb(selectedIndex - 1).getX();
+			previousFrac = fractions[selectedIndex - 1];
 
 		} else {
-			previousPos = colorPicker.getThumb(selectedIndex - 1).getX();
-			nextPos = colorPicker.getThumb(selectedIndex + 1).getX();
+			previousFrac = fractions[selectedIndex - 1];
+			nextFrac = fractions[selectedIndex + 1];
 		}
 
 		/* get updated x-values */
-		final int deltaX = inputX - selectedThumb.getX();
-		final int newX = selectedThumb.getX() + deltaX;
+		final float deltaFrac = inputFrac - selectedFrac;
+		final float newFrac = selectedFrac + deltaFrac;
 
 		/* set new thumb position and check for boundaries/ other thumbs */
-		if (previousPos < newX && newX < nextPos) {
-			selectedThumb.setCoords(newX, selectedThumb.getY());
+		if (previousFrac < newFrac && newFrac < nextFrac) {
+			fractions[selectedIndex] = newFrac;
 
-		} else if (newX < previousPos && previousPos != thumbRect.getMinX()) {
+		} else if (newFrac < previousFrac && !Helper.nearlyEqual(previousFrac, 
+				0.0)) {
 			colorPicker.swapPositions(selectedIndex, selectedIndex - 1);
-			selectedThumb.setCoords(newX, selectedThumb.getY());
+			
+			fractions[selectedIndex] = fractions[selectedIndex - 1];
+			fractions[selectedIndex - 1] = newFrac;
 
-		} else if (newX > nextPos && nextPos < thumbRect.getMaxX()) {
+		} else if (newFrac > nextFrac && nextFrac < 1.0) {
 			colorPicker.swapPositions(selectedIndex, selectedIndex + 1);
-			selectedThumb.setCoords(newX, selectedThumb.getY());
+			
+			fractions[selectedIndex] = fractions[selectedIndex + 1];
+			fractions[selectedIndex + 1] = newFrac;
 		}
 
-		colorPicker.refreshLists();
+		colorPicker.setFractions(fractions);
+		colorPicker.updateColors();
 	}
 
 	/**
@@ -273,11 +307,42 @@ public class ThumbBox {
 			if (t.contains((int) point.getX(), (int) point.getY())) {
 
 				openThumbEditDialog(t, index);
+				break;
 			}
 			index++;
 		}
 
-		colorPicker.refreshLists();
+		colorPicker.updateColors();
+	}
+	
+	/**
+	 * Opens the edit dialog for the currently selected thumb.
+	 */
+	protected void editSelectedThumb() {
+		
+		openThumbEditDialog(selectedThumb, this.getSelectedThumbIndex());
+	}
+	
+	/**
+	 * Uses the currently defined fractions to adjust the thumb positions.
+	 */
+	protected void adjustThumbsToFractions() {
+		
+		final int x = (int) thumbRect.getMinX();
+		final int w = (int) thumbRect.getWidth();
+		
+		float[] fractions = colorPicker.getFractions();
+
+		for (int i = 0; i < fractions.length; i++) {
+
+			// Avoid rounding errors when casting to int
+			final double widthFactor = Math.round(w * fractions[i]);
+			final int pos = x + (int) (widthFactor);
+			
+			Thumb t = colorPicker.getThumb(i);
+			t.setCoords(pos, t.getY());
+
+		}
 	}
 	
 	/**
@@ -291,6 +356,7 @@ public class ThumbBox {
 		
 		double dataVal = posInputDialog.showDialog(
 				colorPicker.getContainerPanel());
+		
 		alignThumbWithDataVal(dataVal);
 	}
 	
@@ -316,12 +382,9 @@ public class ThumbBox {
 		}
 
 		double diff = Math.abs(dataVal - minVal);
-		final double fraction = diff / (range);
-
-		int thumbXValue = (int) Math.round((fraction * ColorPicker.WIDTH));
-		thumbXValue += (int) thumbRect.getMinX(); // offset in the panel
-
-		updateThumbPos(thumbXValue);
+		final float fraction = (float) (diff / (range));
+		
+		updateFracsForThumbPos(fraction);
 	}
 	
 	/**
@@ -335,34 +398,24 @@ public class ThumbBox {
 		
 		thumbRect.setRect(start_x, start_y, width, height);
 	}
-	
-	/**
-	 * Returns the fraction of the width of the gradientRect where a thumb is
-	 * currently positioned.
-	 *
-	 * @param t
-	 * @return a float value between 0.0 and 1.0
-	 */
-	protected float getThumbFraction(final Thumb t) {
-
-		final double x = t.getX() - thumbRect.getMinX();
-		return (float) (x / thumbRect.getWidth());
-	}
 
 	/**
-	 * Gets a thumb's position in terms of the data range.
+	 * Gets the data value a thumb represents.
 	 *
 	 * @param t
 	 * @return A double value between minimum and maximum of the currently
 	 *         relevant data range for coloring.
 	 */
-	protected double getThumbPosition(final Thumb t) {
+	protected double getThumbDataVal(final int thumbIndex) {
 
 		double range = colorPicker.getRange();
 		double minVal = colorPicker.getMinVal();
 		
-		final float fraction = getThumbFraction(t);
+		final float fraction = colorPicker.getFractions()[thumbIndex];
 		final double value = Math.abs((range) * fraction) + minVal;
+		
+//		LogBuffer.println("Thumb data: " + value);
+//		LogBuffer.println("Rounded: " + (double) Math.round(value * 1000) / 1000);
 
 		return (double) Math.round(value * 1000) / 1000;
 	}

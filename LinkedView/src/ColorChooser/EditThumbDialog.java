@@ -51,7 +51,7 @@ public class EditThumbDialog extends CustomDialog {
 		this.index = thumbIndex;
 		
 		final JLabel enterPrompt = GUIFactory.createLabel(
-				"Enter data value: ", GUIFactory.FONTS);
+				"Set data value: ", GUIFactory.FONTS);
 		
 		/* default */
 		inputX = thumb.getX();
@@ -60,7 +60,7 @@ public class EditThumbDialog extends CustomDialog {
 		inputField.setEditable(true);
 
 		/* Initially display thumb position */
-		inputField.setText(Double.toString(thumbBox.getThumbPosition(thumb)));
+		inputField.setText(Double.toString(thumbBox.getThumbDataVal(thumbIndex)));
 		inputField.addActionListener(new SetValueListener());
 		
 		colorIcon = new ColorIcon(thumb.getColor());
@@ -73,7 +73,7 @@ public class EditThumbDialog extends CustomDialog {
 		final JPanel panel = GUIFactory.createJPanel(false,
 				GUIFactory.DEFAULT, null);
 
-		panel.add(colorButton, "pushx, alignx 0%, wrap");
+		panel.add(colorButton, "push, alignx 0%, wrap");
 		panel.add(enterPrompt, "push, span, wrap");
 		panel.add(inputField, "push, growx, span, wrap");
 		panel.add(okButton, "pushx, alignx 50%");
