@@ -202,16 +202,13 @@ public class ThumbBox {
 	protected void updateThumbPos(int inputX) {
 
 		/* adjust offset */
-		inputX -= (int)thumbRect.getMinX();
+		inputX -= (int) thumbRect.getMinX();
 		
-		/* stay within boundaries */
-		if (selectedThumb == null
-				|| (inputX < (int) thumbRect.getMinX() 
-						|| inputX > (int) thumbRect.getMaxX())) {
+		if (selectedThumb == null) {
 			return;
 		}
 		
-		float newFrac = ((float)inputX) / ColorPicker.WIDTH;
+		float newFrac = inputX / (float) thumbRect.getWidth();
 		
 		updateFracsForThumbPos(newFrac);
 	}
@@ -239,8 +236,10 @@ public class ThumbBox {
 		
 		/* define the boundaries around active thumb's fraction */
 		float selectedFrac = fractions[selectedIndex];
-		float previousFrac = 0.0f;
-		float nextFrac = 1.0f;
+		
+		/* defined out of range in case no previous/ next thumb exists */
+		float previousFrac = -1.0f;
+		float nextFrac = 2.0f;
 		
 		if (selectedIndex == 0) {
 			nextFrac = fractions[selectedIndex + 1];
@@ -258,7 +257,7 @@ public class ThumbBox {
 		final float newFrac = selectedFrac + deltaFrac;
 
 		/* set new thumb position and check for boundaries/ other thumbs */
-		if (previousFrac < newFrac && newFrac < nextFrac) {
+		if ((previousFrac < newFrac && newFrac < nextFrac)) {
 			fractions[selectedIndex] = newFrac;
 
 		} else if (newFrac < previousFrac && !Helper.nearlyEqual(previousFrac, 

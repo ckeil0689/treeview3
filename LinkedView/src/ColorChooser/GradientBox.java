@@ -83,7 +83,7 @@ public class GradientBox {
 	 * @param newCol
 	 */
 	protected void addColor(final Color newCol) {
-
+		
 		List<Thumb> thumbs = colorPicker.getThumbList();
 		int newColorIndex = (thumbs.size() - 1) / 2;
 		
@@ -130,6 +130,7 @@ public class GradientBox {
 		int removeIndex = 0;
 		List<Thumb> thumbs = colorPicker.getThumbList();
 		List<Color> colorList = colorPicker.getColorList();
+		boolean updated = false;
 		
 		int index = 0;
 		for (final Thumb t : thumbs) {
@@ -139,31 +140,34 @@ public class GradientBox {
 				thumbs.remove(index);
 				colorList.remove(index);
 				colorPicker.getThumbBox().setSelectedThumb(null);
+				updated = true;
 				break;
 			}
 			index++;
 		}
 
-		/* update fractions */
-		float[] newFractions = new float[fractions.length - 1];
-		
-		int j = 0;
-		for(int i = 0; i < fractions.length; i++) {
+		if(updated) {
+			/* update fractions */
+			float[] newFractions = new float[fractions.length - 1];
 			
-			if(i == removeIndex) {
-				continue;
+			int j = 0;
+			for(int i = 0; i < fractions.length; i++) {
+				
+				if(i == removeIndex) {
+					continue;
+				}
+				newFractions[j++] = fractions[i];
 			}
-			newFractions[j++] = fractions[i];
+	
+			if (thumbs.size() != fractions.length) {
+				System.out.println("ThumbList size (" + thumbs.size()
+						+ ") and fractions size (" + fractions.length
+						+ ") are different in drawNumbBox!");
+			}
+	
+			colorPicker.setFractions(newFractions);
+			colorPicker.updateColors();
 		}
-
-		if (thumbs.size() != fractions.length) {
-			System.out.println("ThumbList size (" + thumbs.size()
-					+ ") and fractions size (" + fractions.length
-					+ ") are different in drawNumbBox!");
-		}
-
-		colorPicker.setFractions(newFractions);
-		colorPicker.updateColors();
 	}
 	
 	/**

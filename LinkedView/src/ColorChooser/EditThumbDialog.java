@@ -117,7 +117,6 @@ public class EditThumbDialog extends CustomDialog {
 				colorIcon.setColor(newCol);
 				colorList.set(index, newCol);
 			}
-		
 		}
 	}
 }

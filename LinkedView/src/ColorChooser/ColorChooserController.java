@@ -41,7 +41,6 @@ public class ColorChooserController implements ConfigNodePersistent {
 		this.colorPresets = DendrogramFactory.getColorPresets();
 		
 		setPresets();
-
 		addAllListeners();
 	}
 	
@@ -79,17 +78,17 @@ public class ColorChooserController implements ConfigNodePersistent {
 		final ColorSet selectedColorSet;
 		if (colorScheme.equalsIgnoreCase("Custom")) {
 			colorChooserUI.getPresetChoices().setSelectedItem("Custom Colors");
-			colorChooserUI.setCustomSelected(true);
+//			colorChooserUI.setCustomSelected(true);
 			selectedColorSet = colorPresets.getColorSet(colorScheme);
 
 		} else if (colorScheme.equalsIgnoreCase(defaultColors)) {
 			colorChooserUI.getPresetChoices().setSelectedItem("RedGreen");
-			colorChooserUI.setCustomSelected(false);
+//			colorChooserUI.setCustomSelected(false);
 			selectedColorSet = colorPresets.getColorSet(colorScheme);
 
 		} else if (colorScheme.equalsIgnoreCase("YellowBlue")) {
 			colorChooserUI.getPresetChoices().setSelectedItem("YellowBlue");
-			colorChooserUI.setCustomSelected(false);
+//			colorChooserUI.setCustomSelected(false);
 			selectedColorSet = colorPresets.getColorSet("YellowBlue");
 
 		} else {
@@ -204,9 +203,9 @@ public class ColorChooserController implements ConfigNodePersistent {
 		private void clickOrPress() {
 	
 				GradientBox gBox = colorPicker.getGradientBox();
-				boolean isCustom = colorChooserUI.isCustomSelected();
+//				boolean isCustom = colorChooserUI.isCustomSelected();
 				
-				if (gBox.isGradientArea(lastEvent.getPoint()) && isCustom) {
+				if (gBox.isGradientArea(lastEvent.getPoint())) {
 					gBox.changeColor(lastEvent.getPoint());
 					setActiveColorSet("Custom");
 
@@ -378,7 +377,7 @@ public class ColorChooserController implements ConfigNodePersistent {
 			}
 
 			switchColorSet(colorSetName);
-			colorChooserUI.setCustomSelected(isCustom);
+//			colorChooserUI.setCustomSelected(isCustom);
 		}
 	}
 
@@ -386,17 +385,15 @@ public class ColorChooserController implements ConfigNodePersistent {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
+			
+			final Color missing = JColorChooser.showDialog(
+					colorChooserUI.getMainPanel(), "Pick Color for Missing",
+					colorPicker.getMissing());
 
-			if (colorChooserUI.isCustomSelected()) {
-				final Color missing = JColorChooser.showDialog(
-						colorChooserUI.getMainPanel(), "Pick Color for Missing",
-						colorPicker.getMissing());
-
-				if (missing != null) {
-					colorPicker.setMissing(missing);
-					/* update the color icon */
-					colorChooserUI.updateMissingColorIcon(missing);
-				}
+			if (missing != null) {
+				colorPicker.setMissing(missing);
+				/* update the color icon */
+				colorChooserUI.updateMissingColorIcon(missing);
 			}
 		}
 	}
