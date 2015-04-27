@@ -155,7 +155,7 @@ public class ColorChooserController implements ConfigNodePersistent {
 	 * Adds all defined listeners to the ColorGradientChooser object.
 	 */
 	private void addAllListeners() {
-
+		
 		if (colorChooserUI != null) {
 			colorChooserUI.addThumbSelectListener(new ThumbSelectListener());
 			colorChooserUI.addThumbMotionListener(new ThumbMotionListener());
@@ -178,6 +178,7 @@ public class ColorChooserController implements ConfigNodePersistent {
 			}
 		}
 	}
+	
 
 	/**
 	 * This listener specifically defines what happens when a user clicks on a
