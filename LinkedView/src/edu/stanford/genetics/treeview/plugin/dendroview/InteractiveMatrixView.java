@@ -89,7 +89,9 @@ MouseWheelListener {
 	/**
 	 * Circle to be used as indicator for selection
 	 */
-	private Ellipse2D.Double indicatorCircle = null;
+	private List<Ellipse2D.Double> indicatorCircleList = null;
+
+	GlobalMatrixView globalMatrixView = null;
 
 	/**
 	 * GlobalView also likes to have an globalxmap and globalymap (both of type
@@ -122,6 +124,10 @@ MouseWheelListener {
 	public JScrollBar getYScroll() {
 
 		return scrollPane.getVerticalScrollBar();
+	}
+
+	public void setGlobalMatrixView(GlobalMatrixView gmv) {
+		globalMatrixView = gmv;
 	}
 
 	@Override
@@ -316,17 +322,21 @@ MouseWheelListener {
 				g.drawRect(rect.x, rect.y, rect.width, rect.height);
 			}
 
+			//LogBuffer.println("Preparing to draw ellipses.");
 			/*
 			 * draw white selection circle if only 1 tile is selected and small
 			 * enough.
 			 */
-			if (indicatorCircle != null) {
-				final Graphics2D g2 = (Graphics2D) g;
+			if (indicatorCircleList != null) {
+				Graphics2D g2 = (Graphics2D) g;
 				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 						RenderingHints.VALUE_ANTIALIAS_ON);
-				g2.setColor(Color.white);
+				g2.setColor(Color.yellow);
 				g2.setStroke(new BasicStroke(3));
-				g2.draw(indicatorCircle);
+				for(Ellipse2D.Double indicatorCircle : indicatorCircleList) {
+					//LogBuffer.println("Drawing ellipse.");
+					g2.draw(indicatorCircle);
+				}
 			}
 		}
 	}
@@ -339,14 +349,18 @@ MouseWheelListener {
 	protected void recalculateOverlay() {
 
 		if ((geneSelection == null) || (arraySelection == null)) {
-			selectionRectList = null;
+			selectionRectList   = null;
+			indicatorCircleList = null;
 			return;
 		}
 
 		selectionRectList = new ArrayList<Rectangle>();
 
 		final int[] selectedArrayIndexes = arraySelection.getSelectedIndexes();
-		final int[] selectedGeneIndexes = geneSelection.getSelectedIndexes();
+		final int[] selectedGeneIndexes  = geneSelection.getSelectedIndexes();
+
+		globalMatrixView.setIMVselectedIndexes(selectedArrayIndexes,
+											   selectedGeneIndexes);
 
 		if (selectedArrayIndexes.length > 0) {
 
@@ -621,9 +635,15 @@ MouseWheelListener {
 				arraySelection.setSelectedNode(null);
 				arraySelection.deselectAllIndexes();
 
+				//LogBuffer.println("Deselecting.");
+
 				geneSelection.notifyObservers();
 				arraySelection.notifyObservers();
 			}
+
+			globalMatrixView.setIMVselectedIndexes(
+					arraySelection.getSelectedIndexes(),
+					geneSelection.getSelectedIndexes());
 		}
 
 		@Override
@@ -1731,30 +1751,70 @@ MouseWheelListener {
 		double w = 0;
 		double h = 0;
 
-		if (geneSelection == null || arraySelection == null)
+		if (geneSelection == null || arraySelection == null ||
+			arraySelection.getNSelectedIndexes() == 0 ||
+			geneSelection.getNSelectedIndexes()  == 0) {
+			indicatorCircleList = null;
 			return;
-		else if ((geneSelection.getNSelectedIndexes() == 1 && arraySelection
-				.getNSelectedIndexes() == 1)
-				&& (xmap.getScale() < 20.0 && ymap.getScale() < 20.0)) {
+		} else {
 
-			// Width and height of rectangle which spans the Ellipse2D object
-			w = xmap.getUsedPixels() * 0.05;
-			h = w;
+			//Empty the list of
+			indicatorCircleList = new ArrayList<Ellipse2D.Double>();
+			
+			final int[] selectedArrayIndexes = arraySelection.getSelectedIndexes();
+			final int[] selectedGeneIndexes  = geneSelection.getSelectedIndexes();
 
-			// coords for center of circle
-			x = xmap.getPixel(arraySelection.getSelectedIndexes()[0]) - (w / 2)
-					+ (xmap.getScale() / 2);
-			y = ymap.getPixel(geneSelection.getSelectedIndexes()[0]) - (h / 2)
-					+ (ymap.getScale() / 2);
+			List<List<Integer>> arrayBoundaryList;
+			List<List<Integer>> geneBoundaryList;
 
-			if (indicatorCircle == null) {
-				indicatorCircle = new Ellipse2D.Double(x, y, w, h);
+			arrayBoundaryList = findRectangleBoundaries(selectedArrayIndexes,
+					xmap);
+			geneBoundaryList = findRectangleBoundaries(selectedGeneIndexes,
+					ymap);
 
-			} else {
-				indicatorCircle.setFrame(x, y, w, h);
+			double lastxb = -1;
+			double lastyb = -1;
+
+			// Make the rectangles
+			for (final List<Integer> xBoundaries : arrayBoundaryList) {
+
+				w = (xBoundaries.get(1) - xBoundaries.get(0));
+
+				for (final List<Integer> yBoundaries : geneBoundaryList) {
+
+					//LogBuffer.println("Preparing to create ellipse.");
+
+					// Width and height of rectangle which spans the Ellipse2D object
+					h = (yBoundaries.get(1) - yBoundaries.get(0));
+
+					if(w < 20 && h < 20 &&
+					   //This is not the first selection and the last selection is far away OR this is the first selection and the next selection either doesn't exists or is far away
+					   ((lastxb >= 0 &&
+					     Math.abs(xBoundaries.get(0) - lastxb) > 20) ||
+					    (lastxb < 0 &&
+					     (arrayBoundaryList.size() == 1 ||
+					      Math.abs(arrayBoundaryList.get(1).get(0) -
+					               xBoundaries.get(1)) > 20))) &&
+					   ((lastyb >= 0 &&
+					     Math.abs(yBoundaries.get(0) - lastyb) > 20) ||
+					    (lastyb < 0 &&
+					     (geneBoundaryList.size() == 1 ||
+					      Math.abs(geneBoundaryList.get(1).get(0) -
+					               yBoundaries.get(1)) > 20)))) {
+						// coords for top left of circle
+						x = xBoundaries.get(0) + (w / 2.0) - 20;
+						y = yBoundaries.get(0) + (h / 2.0) - 20;
+
+						//LogBuffer.println("Ellipse created at [" + x + "x" + y + "] and is dimensions [" + w + "x" + h + "].");
+
+						indicatorCircleList.add(new Ellipse2D.Double(x, y, 40, 40));
+					//} else {
+						//LogBuffer.println("Selection was too big [" + w + "x" + h + "] or [(" + xBoundaries.get(1) + " - " + xBoundaries.get(0) + ") x (" + yBoundaries.get(1) + " - " + yBoundaries.get(0) + ")].");
+					}
+					lastyb = yBoundaries.get(1);
+				}
+				lastxb = xBoundaries.get(1);
 			}
-		} else if (indicatorCircle != null) {
-			indicatorCircle.setFrame(x, y, w, h);
 		}
 	}
 
@@ -1799,6 +1859,11 @@ MouseWheelListener {
 			arraySelection.setIndexSelection(i, true);
 		}
 
+		//LogBuffer.println("Rectangle selected.");
+		globalMatrixView.setIMVselectedIndexes(
+				arraySelection.getSelectedIndexes(),
+				geneSelection.getSelectedIndexes());
+
 		geneSelection.notifyObservers();
 		arraySelection.notifyObservers();
 	}
@@ -1825,5 +1890,13 @@ MouseWheelListener {
 
 		geneHI = ghi;
 		arrayHI = ahi;
+	}
+
+	public TreeSelectionI getGeneSelection() {
+		return(geneSelection);
+	}
+
+	public TreeSelectionI getArraySelection() {
+		return(arraySelection);
 	}
 }
