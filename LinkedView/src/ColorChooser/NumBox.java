@@ -46,7 +46,7 @@ public class NumBox {
 		Thumb selected_thumb = null;
 		int frac_index = -1;
 
-		 if (thumbs.size() == fractions.length) {
+		if (thumbs.size() == fractions.length) {
 			 int i = 0;
 			 for (final Thumb t : thumbs) {
 				 

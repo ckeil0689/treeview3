@@ -10,6 +10,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.prefs.Preferences;
 
 import javax.swing.JColorChooser;
@@ -204,15 +206,19 @@ public class ColorChooserController implements ConfigNodePersistent {
 		private void clickOrPress() {
 	
 				GradientBox gBox = colorPicker.getGradientBox();
-//				boolean isCustom = colorChooserUI.isCustomSelected();
-				
+
 				if (gBox.isGradientArea(lastEvent.getPoint())) {
 					gBox.changeColor(lastEvent.getPoint());
 					setActiveColorSet("Custom");
 
 				} else {
-					colorPicker.getThumbBox().deselectAllThumbs();
-					colorPicker.getThumbBox().selectThumb(lastEvent.getPoint());
+					ThumbBox tb = colorPicker.getThumbBox();
+					tb.deselectAllThumbs();
+					tb.selectThumb(lastEvent.getPoint());
+					
+					boolean hasSelected = tb.getSelectedThumbIndex() != -1;
+					colorChooserUI.setSelectionDependentBtnStatus(hasSelected);
+						
 				}
 		}
 

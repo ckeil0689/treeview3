@@ -83,15 +83,19 @@ public class ThumbBox {
 	 * Selects a thumb if it is not yet selected, deselects it otherwise.
 	 *
 	 * @param point
+	 * @return Whether a thumb was selected or not.
 	 */
-	protected void selectThumb(final Point point) {
+	protected boolean selectThumb(final Point point) {
 
+		boolean isSelected = false;
+		
 		for (final Thumb t : colorPicker.getThumbList()) {
 
 			if (t.contains((int) point.getX(), (int) point.getY())) {
 				t.setSelected(!t.isSelected());
 
 				selectedThumb = (t.isSelected()) ? t : null;
+				isSelected = t.isSelected();
 				break;
 			} 
 				
@@ -99,6 +103,8 @@ public class ThumbBox {
 		}
 
 		colorPicker.getContainerPanel().repaint();
+		
+		return isSelected;
 	}
 	
 	/**
@@ -417,16 +423,20 @@ public class ThumbBox {
 	
 	/**
 	 * Finds out which thumb in thumbList is currently selected and returns it.
-	 * @return The index of the selected thumb in thumbList.
+	 * @return The index of the selected thumb in thumbList. If no thumb is 
+	 * selected, the function returns -1.
 	 */
 	protected int getSelectedThumbIndex() {
 		
+		int selectedIndex = -1;
+		
+		if (selectedThumb == null) {
+			return selectedIndex;
+		}
+		
 		List<Thumb> thumbs = colorPicker.getThumbList();
 		
-		int selectedIndex = 0;
-		if (selectedThumb != null) {
-			selectedIndex = thumbs.indexOf(selectedThumb);
-		}
+		selectedIndex = thumbs.indexOf(selectedThumb);
 
 		if (thumbs.get(selectedIndex).getX() == thumbs.get(thumbs.size() - 1)
 				.getX()) {

@@ -91,6 +91,8 @@ public class ColorChooserUI extends CustomDialog {
 		editBtn = GUIFactory.createBtn("Edit Selected Thumb");
 		removeBtn = GUIFactory.createBtn("Remove Selected Color");
 		
+		setSelectionDependentBtnStatus(false);
+		
 		missingColorIcon = new ColorIcon();
 		missingBtn = GUIFactory.createColorIconBtn("Missing Data", 
 				missingColorIcon);
@@ -131,6 +133,17 @@ public class ColorChooserUI extends CustomDialog {
 	protected void updateMissingColorIcon(Color newColor) {
 		
 		missingColorIcon.setColor(newColor);
+	}
+	
+	/**
+	 * Updates the status of buttons which are dependent on whether there
+	 * is any thumb selected or not.
+	 * @param enabled
+	 */
+	protected void setSelectionDependentBtnStatus(boolean enabled) {
+		
+		editBtn.setEnabled(enabled);
+		removeBtn.setEnabled(enabled);
 	}
 
 	/**

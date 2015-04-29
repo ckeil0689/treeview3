@@ -12,6 +12,7 @@ import java.util.List;
 import javax.swing.JColorChooser;
 import javax.swing.JPanel;
 
+import Utilities.Helper;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
@@ -85,20 +86,35 @@ public class GradientBox {
 	protected void addColor(final Color newCol) {
 		
 		List<Thumb> thumbs = colorPicker.getThumbList();
-		int newColorIndex = (thumbs.size() - 1) / 2;
-		
 		float[] fractions = colorPicker.getFractions();
-		final double halfRange = fractions[newColorIndex] 
-				- (fractions[newColorIndex] / 2);
-		final double newFraction = halfRange;// + fractions[newColorIndex];
+		
+		/* find largest diff between fractions */
+		int newColIndex = 0;
+		float maxDiff = 0.0f;
+		for(int i = 0; i < fractions.length - 1; i++) {
+			
+			float diff = fractions[i+1] - fractions[i];
+			if(diff > maxDiff) {
+				maxDiff = diff;
+				newColIndex = i;
+			}
+		}
+		
+		final float halfDiff = (fractions[newColIndex + 1] 
+				- fractions[newColIndex]) / 2;
+		final float addFrac = fractions[newColIndex] + halfDiff;
 		
 		float[] newFractions = new float[fractions.length + 1];
+		
+		/** TODO avoid this.... 
+		 * break method into smaller methods...*/
+		newColIndex++;
 		
 		int j = 0;
 		for(int i = 0; i < newFractions.length; i++) {
 			
-			if(i == newColorIndex) {
-				newFractions[i] = (float) newFraction;
+			if(i == newColIndex) {
+				newFractions[i] = addFrac;
 				continue;
 			}
 			newFractions[i] = fractions[j++];
@@ -106,9 +122,9 @@ public class GradientBox {
 		
 		LogBuffer.println("New fractions: " + Arrays.toString(newFractions));
 		
-		final int x = (int) (newFraction * gradientRect.getWidth());
+		final int x = (int) (addFrac * gradientRect.getWidth());
 
-		colorPicker.getColorList().add(newColorIndex, newCol);
+		colorPicker.getColorList().add(newColIndex, newCol);
 		colorPicker.getThumbBox().insertThumbAt(x, newCol);
 		colorPicker.setFractions(newFractions);
 
@@ -127,23 +143,21 @@ public class GradientBox {
 	protected void removeColor() {
 
 		float[] fractions = colorPicker.getFractions();
-		int removeIndex = 0;
 		List<Thumb> thumbs = colorPicker.getThumbList();
 		List<Color> colorList = colorPicker.getColorList();
+		int removeIndex = 0;
 		boolean updated = false;
 		
-		int index = 0;
 		for (final Thumb t : thumbs) {
 
 			if (t.isSelected()) {
-				removeIndex = index;
-				thumbs.remove(index);
-				colorList.remove(index);
+				removeIndex = thumbs.indexOf(t);
+				thumbs.remove(removeIndex);
+				colorList.remove(removeIndex);
 				colorPicker.getThumbBox().setSelectedThumb(null);
 				updated = true;
 				break;
 			}
-			index++;
 		}
 
 		if(updated) {
