@@ -474,6 +474,7 @@ MouseWheelListener {
 
 			/* trigger updatePixels() */
 			offscreenValid = false;
+			repaint();
 
 		} else if (o == arraySelection) {
 			updateSelection(arraySelection, geneSelection);
@@ -1772,12 +1773,18 @@ MouseWheelListener {
 			geneBoundaryList = findRectangleBoundaries(selectedGeneIndexes,
 					ymap);
 
+			/* TODO: Instead of just checking the last(/next) selection
+			 * position, should group all small selections together too see
+			 * if the cluster is smaller than our limits. */
 			double lastxb = -1;
-			double lastyb = -1;
 
 			// Make the rectangles
 			for (final List<Integer> xBoundaries : arrayBoundaryList) {
 
+				/* TODO: Instead of just checking the last(/next) selection
+				 * position, should group all small selections together too see
+				 * if the cluster is smaller than our limits. */
+				double lastyb = -1;
 				w = (xBoundaries.get(1) - xBoundaries.get(0));
 
 				for (final List<Integer> yBoundaries : geneBoundaryList) {

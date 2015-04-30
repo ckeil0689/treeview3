@@ -3,6 +3,7 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.util.Observable;
 import java.util.prefs.Preferences;
@@ -17,31 +18,35 @@ public class RowLabelView extends LabelView {
 
 	private static final long serialVersionUID = 1L;
 
+	private int oldWidth = 0;
+
 	public RowLabelView() {
 
 		super(LabelView.ROW);
 	}
-	
-	@Override
-	public void setConfigNode(final Preferences parentNode) {
 
-		if (parentNode != null) {
-			super.setConfigNode(parentNode.node("RowLabelView"));
+	//public void generateView(final UrlExtractor uExtractor) {
 
-		} else {
-			LogBuffer.println("Could not find or create ArrayameView"
-					+ "node because parentNode was null.");
-			return;
-		}
-	}
+	//	this.urlExtractor = uExtractor;
 
+	//	headerSummary.setIncluded(new int[] { 0 });
+	//	headerSummary.addObserver(this);
+	//}
 	public void generateView(final UrlExtractor uExtractor) {
 
-		this.urlExtractor = uExtractor;
+		super.setUrlExtractor(uExtractor);
 
 		headerSummary.setIncluded(new int[] { 0 });
 		headerSummary.addObserver(this);
 	}
+
+	//public void generateView(final UrlExtractor uExtractor) {
+
+	//	this.urlExtractor = uExtractor;
+
+	//	headerSummary.setIncluded(new int[] { 0 });
+	//	headerSummary.addObserver(this);
+	//}
 
 	
 	@Override
@@ -56,6 +61,19 @@ public class RowLabelView extends LabelView {
 		}
 
 		repaint();
+	}
+
+	@Override
+	public void setConfigNode(final Preferences parentNode) {
+
+		if (parentNode != null) {
+			super.setConfigNode(parentNode.node("RowLabelView"));
+
+		} else {
+			LogBuffer.println("Could not find or create ArrayameView"
+					+ "node because parentNode was null.");
+			return;
+		}
 	}
 
 	@Override
@@ -79,21 +97,50 @@ public class RowLabelView extends LabelView {
 	 * This method is called when the selection is changed. It causes the
 	 * component to recalculate it's width, and call repaint.
 	 */
+	//protected void selectionChanged() {
+
+	//	maxlength = 1;
+	//	final FontMetrics fontMetrics = getFontMetrics(new Font(face, style,
+	//			size));
+
+	//	final int start = 0;
+	//	final int end = headerInfo.getNumHeaders();
+	//	
+//		LogBuffer.println("NumHeaders: " + end);
+
+	//	for (int j = start; j < end; j++) {
+
+	//		final int actualGene = j;
+	//		final String out = headerSummary.getSummary(headerInfo, actualGene);
+
+	//		if (out == null) {
+	//			continue;
+	//		}
+
+	//		final int length = fontMetrics.stringWidth(out);
+	//		if (maxlength < length) {
+	//			maxlength = length;
+	//		}
+
+	//	}
+
+	//	setPreferredSize(new Dimension(maxlength, map.getUsedPixels()));
+	//	revalidate();
+	//	repaint();
+	//}
 	protected void selectionChanged() {
 
-		maxlength = 1;
-		final FontMetrics fontMetrics = getFontMetrics(new Font(face, style,
-				size));
+		offscreenValid = false;
 
 		final int start = 0;
 		final int end = headerInfo.getNumHeaders();
-		
-//		LogBuffer.println("NumHeaders: " + end);
 
+		final FontMetrics fontMetrics = getFontMetrics(new Font(face, style,
+				size));
+		maxlength = 1;
 		for (int j = start; j < end; j++) {
 
-			final int actualGene = j;
-			final String out = headerSummary.getSummary(headerInfo, actualGene);
+			final String out = headerSummary.getSummary(headerInfo, j);
 
 			if (out == null) {
 				continue;
@@ -103,10 +150,17 @@ public class RowLabelView extends LabelView {
 			if (maxlength < length) {
 				maxlength = length;
 			}
-
 		}
 
+		final Rectangle visible = getVisibleRect();
 		setPreferredSize(new Dimension(maxlength, map.getUsedPixels()));
+
+		if (maxlength > oldWidth) {
+			visible.y += maxlength - oldWidth;
+			scrollRectToVisible(visible);
+		}
+		oldWidth = maxlength;
+		
 		revalidate();
 		repaint();
 	}
@@ -120,7 +174,6 @@ public class RowLabelView extends LabelView {
 
 	@Override
 	public void mouseClicked(final MouseEvent e) {
-
 		// if (urlExtractor == null) {
 		// return;
 		// }
@@ -181,10 +234,10 @@ public class RowLabelView extends LabelView {
 				   Math.abs(i - index) <
 				   Math.abs(closest - index)) {
 					closest = i;
-					LogBuffer.println("Closest index updated to [" +
-							closest + "] because index [" + index +
-							"] is closer [distance: " +
-							Math.abs(i - index) + "] to it.");
+					//LogBuffer.println("Closest index updated to [" +
+					//		closest + "] because index [" + index +
+					//		"] is closer [distance: " +
+					//		Math.abs(i - index) + "] to it.");
 				}
 			}
 			if(closest < index) {
@@ -204,10 +257,10 @@ public class RowLabelView extends LabelView {
 				if(Math.abs(selArrays[i] - index) <
 				   Math.abs(closest - index)) {
 					closest = selArrays[i];
-					LogBuffer.println("Closest index updated to [" +
-							closest + "] because index [" + index +
-							"] is closer [distance: " +
-							Math.abs(selArrays[i] - index) + "] to it.");
+					//LogBuffer.println("Closest index updated to [" +
+					//		closest + "] because index [" + index +
+					//		"] is closer [distance: " +
+					//		Math.abs(selArrays[i] - index) + "] to it.");
 				}
 			}
 			if(closest < index) {

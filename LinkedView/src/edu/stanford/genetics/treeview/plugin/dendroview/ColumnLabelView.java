@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Rectangle;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.Observable;
 import java.util.prefs.Preferences;
@@ -183,10 +182,10 @@ public class ColumnLabelView extends LabelView {
 				   Math.abs(i - index) <
 				   Math.abs(closest - index)) {
 					closest = i;
-					LogBuffer.println("Closest index updated to [" +
-							closest + "] because index [" + index +
-							"] is closer [distance: " +
-							Math.abs(i - index) + "] to it.");
+					//LogBuffer.println("Closest index updated to [" +
+					//		closest + "] because index [" + index +
+					//		"] is closer [distance: " +
+					//		Math.abs(i - index) + "] to it.");
 				}
 			}
 			if(closest < index) {
@@ -206,10 +205,10 @@ public class ColumnLabelView extends LabelView {
 				if(Math.abs(selArrays[i] - index) <
 				   Math.abs(closest - index)) {
 					closest = selArrays[i];
-					LogBuffer.println("Closest index updated to [" +
-							closest + "] because index [" + index +
-							"] is closer [distance: " +
-							Math.abs(selArrays[i] - index) + "] to it.");
+					//LogBuffer.println("Closest index updated to [" +
+					//		closest + "] because index [" + index +
+					//		"] is closer [distance: " +
+					//		Math.abs(selArrays[i] - index) + "] to it.");
 				}
 			}
 			if(closest < index) {
