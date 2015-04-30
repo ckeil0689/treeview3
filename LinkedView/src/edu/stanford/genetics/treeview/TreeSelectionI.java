@@ -5,7 +5,7 @@ import java.util.Observer;
 public interface TreeSelectionI {
 
 	/**
-	 * Resizes the size of the TreeSelection to accomodate more elements.
+	 * Resizes the size of the TreeSelection to accommodate more elements.
 	 *
 	 * @param nIndex
 	 *            - The new size.

@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Rectangle;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.Observable;
 import java.util.prefs.Preferences;
@@ -11,6 +12,7 @@ import java.util.prefs.Preferences;
 import javax.swing.SwingUtilities;
 
 import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.UrlExtractor;
 
 public class ColumnLabelView extends LabelView {
@@ -145,20 +147,16 @@ public class ColumnLabelView extends LabelView {
 		final int index = map.getIndex(e.getX());
 
 		if (SwingUtilities.isLeftMouseButton(e)) {
-			if (geneSelection.getNSelectedIndexes() == geneSelection
-					.getNumIndexes() && arraySelection.isIndexSelected(index)) {
-				geneSelection.deselectAllIndexes();
-				arraySelection.deselectAllIndexes();
-
-			} else if (geneSelection.getNSelectedIndexes() > 0) {
-				if (!e.isShiftDown()) {
-					geneSelection.deselectAllIndexes();
-					arraySelection.deselectAllIndexes();
+			if (geneSelection.getNSelectedIndexes() > 0) {
+				if(e.isShiftDown()) {
+					toggleSelectFromClosestToIndex(arraySelection,index);
+				} else if(e.isMetaDown()) {
+					toggleSelect(arraySelection,index);
+				} else {
+					selectAnew(arraySelection,index);
 				}
-				arraySelection.setIndexSelection(index, true);
-				geneSelection.selectAllIndexes();
-
 			} else {
+				//Assumes there is no selection at all
 				arraySelection.setIndexSelection(index, true);
 				geneSelection.selectAllIndexes();
 			}
@@ -169,5 +167,81 @@ public class ColumnLabelView extends LabelView {
 
 		geneSelection.notifyObservers();
 		arraySelection.notifyObservers();
+	}
+
+	/** TODO: This needs to go into a generic selection class and then the
+	 * TreeSelectionI param can be removed */
+	public void toggleSelectFromClosestToIndex(TreeSelectionI selection,
+											   int index) {
+		//If this index is selected (implying other selections may exist),
+		//deselect from closest deselected to sent index
+		if(selection.isIndexSelected(index)) {
+
+			int closest = 0;
+			for(int i = 0;i < selection.getNumIndexes();i++) {
+				if(!selection.isIndexSelected(i) &&
+				   Math.abs(i - index) <
+				   Math.abs(closest - index)) {
+					closest = i;
+					LogBuffer.println("Closest index updated to [" +
+							closest + "] because index [" + index +
+							"] is closer [distance: " +
+							Math.abs(i - index) + "] to it.");
+				}
+			}
+			if(closest < index) {
+				for(int i = closest + 1;i <= index;i++)
+					selection.setIndexSelection(i, false);
+			} else {
+				for(int i = index;i < closest;i++)
+					selection.setIndexSelection(i, false);
+			}
+		}
+		//Else if other selections exist (implied that current index is not
+		//selected), select from sent index to closest selected
+		else if(selection.getNSelectedIndexes() > 0) {
+			int[] selArrays = selection.getSelectedIndexes();
+			int closest = selArrays[0];
+			for(int i = 0;i < selArrays.length;i++) {
+				if(Math.abs(selArrays[i] - index) <
+				   Math.abs(closest - index)) {
+					closest = selArrays[i];
+					LogBuffer.println("Closest index updated to [" +
+							closest + "] because index [" + index +
+							"] is closer [distance: " +
+							Math.abs(selArrays[i] - index) + "] to it.");
+				}
+			}
+			if(closest < index) {
+				for(int i = closest + 1;i <= index;i++) {
+					selection.setIndexSelection(i, true);
+				}
+			} else {
+				for(int i = index;i < closest;i++) {
+					selection.setIndexSelection(i, true);
+				}
+			}
+		}
+		//Else when no selections exist, just select this index
+		else {
+			selection.deselectAllIndexes();
+			selection.setIndexSelection(index, true);
+		}
+	}
+
+	/** TODO: This needs to go into a generic selection class and then the
+	 * TreeSelectionI param can be removed */
+	public void toggleSelect(TreeSelectionI selection,int index) {
+		if(selection.isIndexSelected(index))
+			selection.setIndexSelection(index, false);
+		else
+			selection.setIndexSelection(index, true);
+	}
+
+	/** TODO: This needs to go into a generic selection class and then the
+	 * TreeSelectionI param can be removed */
+	public void selectAnew(TreeSelectionI selection,int index) {
+		selection.deselectAllIndexes();
+		selection.setIndexSelection(index, true);
 	}
 }
