@@ -47,6 +47,8 @@ public class CustomDialog extends JDialog {
 
 		this.mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT,
 				null);
+		
+		getContentPane().add(mainPanel);
 	}
 
 	private class CloseListener implements ActionListener {

@@ -80,6 +80,51 @@ public class ThumbBox {
 	}
 	
 	/**
+	 * Check if there is any thumb associated with the given data value.
+	 * @param dataVal
+	 * @return
+	 */
+	protected boolean dataValHasThumb(double dataVal) {
+		
+		boolean hasThumb = false;
+		List<Thumb> thumbs = colorPicker.getThumbList();
+
+		for (final Thumb t : thumbs) {
+			
+			double tDataVal = getThumbDataVal(thumbs.indexOf(t));
+			if (Helper.nearlyEqual(tDataVal, dataVal)) {
+				hasThumb = true;
+				break;
+			}
+		}
+
+		return hasThumb;
+	}
+	
+//	/**
+//	 * Retrieve the data value that is associated with a thumb.
+//	 * @param t
+//	 * @return
+//	 */
+//	protected double getThumbDataVal(Thumb t) {
+//		
+//		if(t == null) {
+//			LogBuffer.println("Could not return thumb data value. Thumb was"
+//					+ " null.");
+//			return 0.0;
+//		}
+//		
+//		int index = colorPicker.getThumbList().indexOf(t);
+//		float frac = colorPicker.getFractions()[index];
+//		
+//		double minVal = colorPicker.getMinVal();
+//		double range = colorPicker.getRange();
+//		
+//		return Math.abs((range) * frac) + minVal;
+//		
+//	}
+	
+	/**
 	 * Selects a thumb if it is not yet selected, deselects it otherwise.
 	 *
 	 * @param point

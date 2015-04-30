@@ -47,17 +47,16 @@ public class NumBox {
 		int frac_index = -1;
 
 		if (thumbs.size() == fractions.length) {
-			 int i = 0;
 			 for (final Thumb t : thumbs) {
 				 
 				 if(t.isSelected()) {
 					 /* store a reference to t for later */
 					 selected_thumb = t;
-					 frac_index = i++;
+					 frac_index = thumbs.indexOf(t);
 					 continue;
 				 }
 				 
-				 paintString(g2, fractions[i++], t, range, minVal);
+				 paintString(g2, fractions[thumbs.indexOf(t)], t, range, minVal);
 			 }
 			 
 			 /* 
@@ -81,6 +80,7 @@ public class NumBox {
 		
 		double value = Math.abs((range) * fraction) + minVal;
 		value = (double) Math.round(value * 1000) / 1000;
+		
 		String value_s = Double.toString(value);
 		int stringWidth = fm.stringWidth(value_s);
 		

@@ -23,10 +23,12 @@ public class EditThumbDialog extends CustomDialog {
 
 	/* GUI components */
 	private JPanel parent;
+	private JLabel enterPrompt;
 	private final JTextField inputField;
 	private final JButton colorButton;
 	private final ColorIcon colorIcon;
 	
+	private ThumbBox thumbBox;
 	private List<Color> colorList;
 	private final Thumb t;
 	private final int index;
@@ -47,11 +49,12 @@ public class EditThumbDialog extends CustomDialog {
 		super("Edit Thumb");
 		
 		this.t = thumb;
+		this.thumbBox = thumbBox;
 		this.colorList = colorList;
 		this.index = thumbIndex;
 		
-		final JLabel enterPrompt = GUIFactory.createLabel(
-				"Set data value: ", GUIFactory.FONTS);
+		enterPrompt = GUIFactory.createLabel("Set data value: ", 
+				GUIFactory.FONTS);
 		
 		/* default */
 		inputX = thumb.getX();
@@ -78,10 +81,10 @@ public class EditThumbDialog extends CustomDialog {
 		panel.add(inputField, "push, growx, span, wrap");
 		panel.add(okButton, "pushx, alignx 50%");
 
-		getContentPane().add(panel);
+		mainPanel.add(panel, "w 200::, h 150::");
 	}
 	
-	public double showDialog(JPanel parent) {
+	protected double showDialog(JPanel parent) {
 		
 		setVisible(true);
 		return inputX;
@@ -92,15 +95,34 @@ public class EditThumbDialog extends CustomDialog {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			try {
-				inputX = Double.parseDouble(inputField.getText());
-				
-				setVisible(false);
-				dispose();
-				
-			} catch (final NumberFormatException e) {
-				inputField.setText("Enter a valid number!");
+			if(isValueInvalid()) {
+				return;
 			}
+			
+			setVisible(false);
+			dispose();
+		}
+	}
+	
+	/**
+	 * Parses the input and checks if it should be accepted.
+	 * @return Whether the user input is considered valid.
+	 */
+	private boolean isValueInvalid() {
+		
+		boolean isInvalid = false;
+		try {
+			inputX = Double.parseDouble(inputField.getText());
+			isInvalid = thumbBox.dataValHasThumb(inputX);
+			
+			enterPrompt.setForeground(GUIFactory.RED1);
+			enterPrompt.setText("Value already has a handle!");
+				
+			return isInvalid;
+			
+		} catch (final NumberFormatException e) {
+			inputField.setText("Enter a valid number!");
+			return false;
 		}
 	}
 	
