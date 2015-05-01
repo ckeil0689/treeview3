@@ -174,22 +174,6 @@ public class ColorChooserUI extends CustomDialog {
 		return isCustomSelected;
 	}
 
-//	/**
-//	 * Sets button status and remembers if custom ColorSet is selected or not.
-//	 * If not, it disables the add-, remove- and missing color buttons.
-//	 *
-//	 * @param selected
-//	 *            Whether the custom ColorSet is selected or not.
-//	 */
-//	protected void setCustomSelected(final boolean selected) {
-//
-//		this.isCustomSelected = selected;
-//
-//		addBtn.setEnabled(selected);
-//		removeBtn.setEnabled(selected);
-//		missingBtn.setEnabled(selected);
-//	}
-
 	/* ------- GUI component listeners ------------ */
 
 	protected void addThumbSelectListener(final MouseListener l) {

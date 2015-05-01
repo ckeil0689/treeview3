@@ -8,30 +8,27 @@ import java.awt.geom.Rectangle2D;
 
 import Utilities.GUIFactory;
 
-public class BoundaryBox {
+public class BoundaryBox extends ThumbBox {
 
-	private ColorPicker colorPicker;
 	private boolean isMin;
 	
 	private final FontMetrics fm;
 	
 	private Thumb thumb;
-	private Color color;
 	
 	private final Rectangle2D boundaryRect = new Rectangle2D.Float();
 
 	/**
 	 * Constructs a GradientBox object.
 	 */
-	public BoundaryBox(ColorPicker cP, boolean isMin) {
-
-		this.colorPicker = cP;
-		this.isMin = isMin;
+	public BoundaryBox(ColorPicker cP, Thumb thumb, boolean isMin) {
 		
+		super(cP);
+
+		this.isMin = isMin;
 		this.fm = colorPicker.getContainerPanel()
 				.getFontMetrics(GUIFactory.FONTS);
-		
-		this.thumb = new BoundaryThumb(0, 0, isMin);
+		this.thumb = thumb;
 	}
 	
 	protected void drawBoundaryBox(final Graphics2D g2) {
@@ -69,12 +66,7 @@ public class BoundaryBox {
 				(int) ((boundaryRect.getHeight() / 4) + boundaryRect.getMinY()));
 	}
 	
-	protected void setColor(Color newCol) {
-		
-		this.color = newCol;
-		thumb.setColor(newCol);
-	}
-	
+	@Override
 	protected void setRect(int start_x, int start_y, int width, int height) {
 		
 		boundaryRect.setRect(start_x, start_y, width, height);
@@ -83,11 +75,6 @@ public class BoundaryBox {
 		int thumb_y = start_y + (height/ 2);
 		
 		thumb.setCoords(thumb_x, thumb_y);
-	}
-	
-	protected Color getColor() {
-		
-		return color;
 	}
 	
 	/**

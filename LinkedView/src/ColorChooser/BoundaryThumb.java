@@ -6,11 +6,11 @@ public class BoundaryThumb extends Thumb {
 
 	private boolean isMin;
 	
-	public BoundaryThumb(int x, int y, boolean isMin) {
-		super(x, y);
+	public BoundaryThumb(boolean isMin) {
+		
+		super(0, 0);
 		
 		this.isMin = isMin;
-		
 		this.width = 20;
 		this.height = 20;
 		

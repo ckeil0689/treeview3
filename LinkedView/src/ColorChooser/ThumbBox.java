@@ -14,7 +14,7 @@ import Utilities.Helper;
 
 public class ThumbBox {
 
-	private final ColorPicker colorPicker;
+	protected final ColorPicker colorPicker;
 	
 	private final Rectangle2D thumbRect = new Rectangle2D.Float();
 	
@@ -93,7 +93,7 @@ public class ThumbBox {
 		
 		float[] fractions = colorPicker.getFractions();
 
-		for (int i = 0; i < fractions.length; i++) {
+		for (int i = 1; i < fractions.length - 1; i++) {
 
 			// Avoid rounding errors when casting to int
 			final double widthFactor = Math.round(w * fractions[i]);
@@ -173,9 +173,15 @@ public class ThumbBox {
 	 */
 	protected void updateFracsForThumbPos(final float inputFrac) {
 
-		/* stay within boundaries */
+		/* Stay between boundaries */
 		if (selectedThumb == null
 				|| (inputFrac < 0.0 || inputFrac > 1.0)) {
+			return;
+		}
+		
+		/* Cannot move to boundary fractions */
+		if(Helper.nearlyEqual(0.0, inputFrac)
+				|| Helper.nearlyEqual(1.0, inputFrac)) {
 			return;
 		}
 		

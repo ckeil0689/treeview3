@@ -44,6 +44,8 @@ public class ColorPicker {
 	private Color[] colors;
 	
 	/* List of all active thumbs (one per color) */
+	protected Thumb minThumb;
+	protected Thumb maxThumb;
 	private List<Thumb> thumbList;
 	
 	/* List of all active colors (depends on active ColorSet) */
@@ -67,15 +69,18 @@ public class ColorPicker {
 		this.maxVal = maxVal;
 		this.range = maxVal - minVal;
 		
+		this.minThumb = new BoundaryThumb(true);
+		this.maxThumb = new BoundaryThumb(false);
+		
 		this.containerPanel = new ContainerPanel();
 		
 		this.gradientBox = new GradientBox(this);
 		this.numBox = new NumBox(this);
 		this.thumbBox = new ThumbBox(this);
 		this.rulerBox = new RulerBox();
-		this.minBox = new BoundaryBox(this, true);
-		this.maxBox = new BoundaryBox(this, false);
-		
+		this.minBox = new BoundaryBox(this, minThumb, true);
+		this.maxBox = new BoundaryBox(this, maxThumb, false);
+
 	}
 	
 	public JPanel getContainerPanel() {
@@ -139,6 +144,9 @@ public class ColorPicker {
 		colorList.clear();
 		thumbList.clear();
 		resetFractions();
+		
+		thumbList.add(minThumb);
+		thumbList.add(maxThumb);
 
 		final String[] colors = colorSet.getColors();
 
@@ -146,7 +154,8 @@ public class ColorPicker {
 
 			colorList.add(Color.decode(color));
 		}
-
+		
+		updateBoundaryColors();
 		updateColorArray();
 
 		fractions = colorSet.getFractions();
@@ -200,17 +209,22 @@ public class ColorPicker {
 	
 	protected void updateColors() {
 		
-		updateBoundaries();
+		updateBoundaryColors();
 		
 		updateColorArray();
 		setGradientColors();
 		containerPanel.repaint();
 	}
 	
-	protected void updateBoundaries() {
+	protected void updateBoundaryColors() {
 		
-		minBox.setColor(colorList.get(0));
-		maxBox.setColor(colorList.get(getColorNumber() - 1));
+		minThumb.setColor(colorList.get(0));
+		maxThumb.setColor(colorList.get(getColorNumber() - 1));
+	}
+	
+	protected void updateThumbList() {
+		
+		
 	}
 	
 	/**
@@ -230,7 +244,7 @@ public class ColorPicker {
 	 */
 	protected void resetFractions() {
 
-		this.fractions = new float[] { 0.0f, 0.5f, 1.0f };
+		this.fractions = new float[] { 0.0f, 0.001f, 0.5f, 0.999f, 1.0f };
 	}
 	
 	/*

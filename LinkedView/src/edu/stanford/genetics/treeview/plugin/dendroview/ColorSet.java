@@ -59,8 +59,8 @@ public class ColorSet {
 
 	private final String default_missingColor = "#FFFFFF";
 	private final String default_emptyColor = "#FFFFFF";
-	private final float[] default_fractions = { 0.0f, 0.5f, 1.0f };
-	private final String[] default_colors = { "#FF0000", "#000000", "#00FF00" };
+	private final float[] default_fractions = { 0.0f, 0.001f, 0.5f, 0.999f, 1.0f };
+	private final String[] default_colors = { "#FF0000", "#FF0000", "#000000", "#00FF00", "#00FF00" };
 	private final String default_name = "RedGreen";
 
 	/**
@@ -143,13 +143,16 @@ public class ColorSet {
 		// final List<Double> fractionList, final Color missing,
 		// final Color empty
 		final List<Color> newColorList = new ArrayList<Color>();
-		newColorList.add(decodeColor(color1));
+		newColorList.add(decodeColor(color1)); /* min in ColorChooser */
+		newColorList.add(decodeColor(color1)); 
 		newColorList.add(decodeColor(color2));
 		newColorList.add(decodeColor(color3));
+		newColorList.add(decodeColor(color3)); /* max in ColorChooser */
+		
 		final List<Double> newFractionList = new ArrayList<Double>();
-		newFractionList.add(0.0);
-		newFractionList.add(0.5);
-		newFractionList.add(1.0);
+		for(int i = 0; i < default_fractions.length; i++) {
+			newFractionList.add((double)default_fractions[i]);
+		}
 
 		this.name = name;
 		this.colorList = newColorList;

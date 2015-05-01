@@ -49,6 +49,12 @@ public class NumBox {
 		if (thumbs.size() == fractions.length) {
 			 for (final Thumb t : thumbs) {
 				 
+				 /* do not paint min/ max thumb data values here */
+				 if(thumbs.indexOf(t) == 0 
+						 || thumbs.indexOf(t) == thumbs.size() - 1) {
+					 continue;
+				 }
+				 
 				 if(t.isSelected()) {
 					 /* store a reference to t for later */
 					 selected_thumb = t;
