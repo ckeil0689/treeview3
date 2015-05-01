@@ -113,7 +113,7 @@ public class EditThumbDialog extends CustomDialog {
 		boolean isInvalid = false;
 		try {
 			inputX = Double.parseDouble(inputField.getText());
-			isInvalid = thumbBox.dataValHasThumb(inputX);
+			isInvalid = thumbBox.hasThumbForDataVal(inputX);
 			
 			enterPrompt.setForeground(GUIFactory.RED1);
 			enterPrompt.setText("Value already has a handle!");

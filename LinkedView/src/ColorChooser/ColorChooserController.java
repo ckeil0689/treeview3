@@ -80,17 +80,14 @@ public class ColorChooserController implements ConfigNodePersistent {
 		final ColorSet selectedColorSet;
 		if (colorScheme.equalsIgnoreCase("Custom")) {
 			colorChooserUI.getPresetChoices().setSelectedItem("Custom Colors");
-//			colorChooserUI.setCustomSelected(true);
 			selectedColorSet = colorPresets.getColorSet(colorScheme);
 
 		} else if (colorScheme.equalsIgnoreCase(defaultColors)) {
 			colorChooserUI.getPresetChoices().setSelectedItem("RedGreen");
-//			colorChooserUI.setCustomSelected(false);
 			selectedColorSet = colorPresets.getColorSet(colorScheme);
 
 		} else if (colorScheme.equalsIgnoreCase("YellowBlue")) {
 			colorChooserUI.getPresetChoices().setSelectedItem("YellowBlue");
-//			colorChooserUI.setCustomSelected(false);
 			selectedColorSet = colorPresets.getColorSet("YellowBlue");
 
 		} else {
@@ -205,21 +202,20 @@ public class ColorChooserController implements ConfigNodePersistent {
 		 */
 		private void clickOrPress() {
 	
-				GradientBox gBox = colorPicker.getGradientBox();
+			GradientBox gBox = colorPicker.getGradientBox();
 
-				if (gBox.isGradientArea(lastEvent.getPoint())) {
-					gBox.changeColor(lastEvent.getPoint());
-					setActiveColorSet("Custom");
+			if (gBox.isGradientArea(lastEvent.getPoint())) {
+				gBox.changeColor(lastEvent.getPoint());
+				setActiveColorSet("Custom");
 
-				} else {
-					ThumbBox tb = colorPicker.getThumbBox();
-					tb.deselectAllThumbs();
-					tb.selectThumb(lastEvent.getPoint());
-					
-					boolean hasSelected = tb.getSelectedThumbIndex() != -1;
-					colorChooserUI.setSelectionDependentBtnStatus(hasSelected);
-						
-				}
+			} else {
+				ThumbBox tb = colorPicker.getThumbBox();
+				tb.deselectAllThumbs();
+				
+				tb.selectThumbAtPoint(lastEvent.getPoint());
+				
+				updateSelectionBtnStatus();	
+			}
 		}
 
 		/**
@@ -227,7 +223,7 @@ public class ColorChooserController implements ConfigNodePersistent {
 		 */
 		private void doubleClick() {
 
-			colorPicker.getThumbBox().setThumbPosition(lastEvent.getPoint());			
+			colorPicker.getThumbBox().editClickedThumb(lastEvent.getPoint());			
 		}
 
 		@Override
@@ -273,14 +269,14 @@ public class ColorChooserController implements ConfigNodePersistent {
 		@Override
 		public void mouseDragged(final MouseEvent e) {
 
-			colorPicker.getThumbBox().updateThumbPos(e.getX());
+			colorPicker.getThumbBox().setThumbPosition(e.getX());
 		}
 
 		@Override
 		public void mouseMoved(final MouseEvent e) {
 
 			Cursor cursor;
-			if (colorPicker.getThumbBox().containsThumb(e.getPoint())) {
+			if (colorPicker.getThumbBox().isPointInThumb(e.getPoint())) {
 				cursor = new Cursor(Cursor.HAND_CURSOR);
 
 			} else {
@@ -308,6 +304,7 @@ public class ColorChooserController implements ConfigNodePersistent {
 
 			if (newCol != null) {
 				colorPicker.getGradientBox().addColor(newCol);
+				updateSelectionBtnStatus();
 			}
 		}
 	}
@@ -340,8 +337,20 @@ public class ColorChooserController implements ConfigNodePersistent {
 
 			if (colorPicker.getColorList().size() > 2) {
 				colorPicker.getGradientBox().removeColor();
+				colorChooserUI.setSelectionDependentBtnStatus(false, false);
 			}
 		}
+	}
+	
+	private void updateSelectionBtnStatus() {
+		
+		ThumbBox tb = colorPicker.getThumbBox();
+		
+		boolean isEditAllowed = tb.hasSelectedThumb();
+		boolean isRemoveAllowed = isEditAllowed 
+				&& colorPicker.getThumbNumber() > 2;
+		colorChooserUI.setSelectionDependentBtnStatus(isEditAllowed, 
+				isRemoveAllowed);
 	}
 
 	/**
@@ -370,21 +379,17 @@ public class ColorChooserController implements ConfigNodePersistent {
 			if (selected.equalsIgnoreCase("RedGreen")) {
 				/* Switch to RedGreen */
 				colorSetName = "RedGreen";
-				isCustom = false;
 
 			} else if (selected.equalsIgnoreCase("YellowBlue")) {
 				/* Switch to YellowBlue */
 				colorSetName = "YellowBlue";
-				isCustom = false;
 
 			} else {
 				/* Switch to Custom */
 				colorSetName = "Custom";
-				isCustom = true;
 			}
 
 			switchColorSet(colorSetName);
-//			colorChooserUI.setCustomSelected(isCustom);
 		}
 	}
 

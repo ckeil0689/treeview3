@@ -91,7 +91,7 @@ public class ColorChooserUI extends CustomDialog {
 		editBtn = GUIFactory.createBtn("Edit Selected Thumb");
 		removeBtn = GUIFactory.createBtn("Remove Selected Color");
 		
-		setSelectionDependentBtnStatus(false);
+		setSelectionDependentBtnStatus(false, false);
 		
 		missingColorIcon = new ColorIcon();
 		missingBtn = GUIFactory.createColorIconBtn("Missing Data", 
@@ -115,7 +115,7 @@ public class ColorChooserUI extends CustomDialog {
 		
 		contentPanel.add(presetChoicePanel, "span, pushx, wrap");
 		contentPanel.add(hint, "span, wrap");
-		contentPanel.add(gradientPanel, "h 150:150:, w 500:500:, pushx, "
+		contentPanel.add(gradientPanel, "h 150:150:, w 650:650:, pushx, "
 				+ "alignx 50%, span, wrap");
 		contentPanel.add(addBtn, "pushx, split 3, alignx 50%");
 		contentPanel.add(removeBtn, "pushx");
@@ -140,10 +140,11 @@ public class ColorChooserUI extends CustomDialog {
 	 * is any thumb selected or not.
 	 * @param enabled
 	 */
-	protected void setSelectionDependentBtnStatus(boolean enabled) {
+	protected void setSelectionDependentBtnStatus(boolean editEnabled, 
+			boolean removeEnabled) {
 		
-		editBtn.setEnabled(enabled);
-		removeBtn.setEnabled(enabled);
+		editBtn.setEnabled(editEnabled);
+		removeBtn.setEnabled(removeEnabled);
 	}
 
 	/**

@@ -27,6 +27,8 @@ public class ColorPicker {
 	private NumBox numBox;
 	private ThumbBox thumbBox;
 	private RulerBox rulerBox;
+	private BoundaryBox minBox;
+	private BoundaryBox maxBox;
 	
 	/* The currently active set of colors */
 	private ColorSet activeColorSet;
@@ -60,17 +62,19 @@ public class ColorPicker {
 		this.thumbList = new ArrayList<Thumb>();
 		this.colorList = new ArrayList<Color>();
 		
+		/* data range */
+		this.minVal = minVal;
+		this.maxVal = maxVal;
+		this.range = maxVal - minVal;
+		
 		this.containerPanel = new ContainerPanel();
 		
 		this.gradientBox = new GradientBox(this);
 		this.numBox = new NumBox(this);
 		this.thumbBox = new ThumbBox(this);
 		this.rulerBox = new RulerBox();
-		
-		/* data range */
-		this.minVal = minVal;
-		this.maxVal = maxVal;
-		this.range = maxVal - minVal;
+		this.minBox = new BoundaryBox(this, true);
+		this.maxBox = new BoundaryBox(this, false);
 		
 	}
 	
@@ -97,10 +101,12 @@ public class ColorPicker {
 			
 			positionRects(getWidth());
 			
+			minBox.drawBoundaryBox(g2);
 			numBox.drawNumBox(g2);
 			thumbBox.drawThumbBox(g2);
 			gradientBox.drawGradientBox(g2);
 			rulerBox.drawRulerBox(g2);
+			maxBox.drawBoundaryBox(g2);
 		}
 		
 		/**
@@ -113,10 +119,12 @@ public class ColorPicker {
 
 			final int start = (width - ColorPicker.WIDTH) / 2;
 
+			minBox.setRect(start - 80, 40, 80, 100);
 			numBox.setRect(start, 0, ColorPicker.WIDTH, 40);
 			thumbBox.setRect(start, 40, ColorPicker.WIDTH, 40);
 			gradientBox.setRect(start, 40, ColorPicker.WIDTH, 100);
 			rulerBox.setRect(start, 140, ColorPicker.WIDTH, 10);
+			maxBox.setRect(start + ColorPicker.WIDTH, 40, 80, 100);
 		}
 	}
 	
@@ -192,9 +200,17 @@ public class ColorPicker {
 	
 	protected void updateColors() {
 		
+		updateBoundaries();
+		
 		updateColorArray();
 		setGradientColors();
 		containerPanel.repaint();
+	}
+	
+	protected void updateBoundaries() {
+		
+		minBox.setColor(colorList.get(0));
+		maxBox.setColor(colorList.get(getColorNumber() - 1));
 	}
 	
 	/**

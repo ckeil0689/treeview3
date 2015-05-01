@@ -28,6 +28,7 @@ public class ThumbBox {
 	
 	protected void drawThumbBox(Graphics g) {
 		
+		/* TODO Replace this with observer in other methods... */
 		verifyThumbs();
 
 		final Graphics2D g2 = (Graphics2D) g;
@@ -48,7 +49,6 @@ public class ThumbBox {
 				selected_thumb = t;
 				continue;
 			}
-			
 			t.paint(g2);
 		}
 		
@@ -59,80 +59,11 @@ public class ThumbBox {
 	}
 	
 	/**
-	 * Checks if a thumb is located at a certain point.
-	 *
-	 * @param point The point to be checked.
-	 * @return boolean - Whether a thumb is located at the point or not.
-	 */
-	protected boolean containsThumb(final Point point) {
-
-		boolean containsThumb = false;
-
-		for (final Thumb t : colorPicker.getThumbList()) {
-
-			if (t.contains(point.x, point.y)) {
-				containsThumb = true;
-				break;
-			}
-		}
-
-		return containsThumb;
-	}
-	
-	/**
-	 * Check if there is any thumb associated with the given data value.
-	 * @param dataVal
-	 * @return
-	 */
-	protected boolean dataValHasThumb(double dataVal) {
-		
-		boolean hasThumb = false;
-		List<Thumb> thumbs = colorPicker.getThumbList();
-
-		for (final Thumb t : thumbs) {
-			
-			double tDataVal = getThumbDataVal(thumbs.indexOf(t));
-			if (Helper.nearlyEqual(tDataVal, dataVal)) {
-				hasThumb = true;
-				break;
-			}
-		}
-
-		return hasThumb;
-	}
-	
-//	/**
-//	 * Retrieve the data value that is associated with a thumb.
-//	 * @param t
-//	 * @return
-//	 */
-//	protected double getThumbDataVal(Thumb t) {
-//		
-//		if(t == null) {
-//			LogBuffer.println("Could not return thumb data value. Thumb was"
-//					+ " null.");
-//			return 0.0;
-//		}
-//		
-//		int index = colorPicker.getThumbList().indexOf(t);
-//		float frac = colorPicker.getFractions()[index];
-//		
-//		double minVal = colorPicker.getMinVal();
-//		double range = colorPicker.getRange();
-//		
-//		return Math.abs((range) * frac) + minVal;
-//		
-//	}
-	
-	/**
 	 * Selects a thumb if it is not yet selected, deselects it otherwise.
 	 *
 	 * @param point
-	 * @return Whether a thumb was selected or not.
 	 */
-	protected boolean selectThumb(final Point point) {
-
-		boolean isSelected = false;
+	protected void selectThumbAtPoint(final Point point) {
 		
 		for (final Thumb t : colorPicker.getThumbList()) {
 
@@ -140,7 +71,6 @@ public class ThumbBox {
 				t.setSelected(!t.isSelected());
 
 				selectedThumb = (t.isSelected()) ? t : null;
-				isSelected = t.isSelected();
 				break;
 			} 
 				
@@ -148,8 +78,6 @@ public class ThumbBox {
 		}
 
 		colorPicker.getContainerPanel().repaint();
-		
-		return isSelected;
 	}
 	
 	/**
@@ -171,40 +99,12 @@ public class ThumbBox {
 			final double widthFactor = Math.round(w * fractions[i]);
 			final int pos = x + (int) (widthFactor);
 
-			if (!checkThumbPresence(i)
+			if (!hasThumbForFraction(i)
 					&& !((colorPicker.getThumbNumber() == colorPicker.getColorNumber()) 
 							&& colorPicker.getThumbNumber() == fractions.length)) {
 				insertThumbAt(pos, colorPicker.getColorList().get(i));
 			}
 		}
-	}
-	
-	/**
-	 * Checks if a thumb is present at the given x-position.
-	 *
-	 * @param pos
-	 * @return
-	 */
-	private boolean checkThumbPresence(final int thumbIndex) {
-
-		List<Thumb> thumbs = colorPicker.getThumbList();
-		float[] fractions = colorPicker.getFractions();
-
-		if (thumbs.size() > thumbIndex) {
-			double fraction = thumbs.get(thumbIndex).getX() 
-					/ thumbRect.getWidth();
-			fraction = (double) Math.round(fraction * 10000) / 10000;
-
-			final double fraction2 = (double) Math
-					.round(fractions[thumbIndex] * 10000) / 10000;
-
-			if (Helper.nearlyEqual(fraction, fraction2)
-					|| thumbs.get(thumbIndex).isSelected()) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 	
 	/**
@@ -250,7 +150,7 @@ public class ThumbBox {
 	 * sliding thumbs.
 	 * @param inputX New x-coordinate of the selected thumb.
 	 */
-	protected void updateThumbPos(int inputX) {
+	protected void setThumbPosition(int inputX) {
 
 		/* adjust offset */
 		inputX -= (int) thumbRect.getMinX();
@@ -334,7 +234,7 @@ public class ThumbBox {
 	 * This is used to open an edit dialog for a thumb if it was double-clicked. 
 	 * @param point Coordinate point of the clicked area.
 	 */
-	protected void setThumbPosition(final Point point) {
+	protected void editClickedThumb(final Point point) {
 
 		int index = 0;
 		for (final Thumb t : colorPicker.getThumbList()) {
@@ -435,6 +335,15 @@ public class ThumbBox {
 		
 		thumbRect.setRect(start_x, start_y, width, height);
 	}
+	
+	/**
+	 * Set a new value for the selected thumb.
+	 * @param t The new thumb to be set as the selected one.
+	 */
+	protected void setSelectedThumb(Thumb t) {
+		
+		this.selectedThumb = t;
+	}
 
 	/**
 	 * Gets the data value a thumb represents.
@@ -450,9 +359,6 @@ public class ThumbBox {
 		
 		final float fraction = colorPicker.getFractions()[thumbIndex];
 		final double value = Math.abs((range) * fraction) + minVal;
-		
-//		LogBuffer.println("Thumb data: " + value);
-//		LogBuffer.println("Rounded: " + (double) Math.round(value * 1000) / 1000);
 
 		return (double) Math.round(value * 1000) / 1000;
 	}
@@ -492,12 +398,80 @@ public class ThumbBox {
 	}
 	
 	/**
-	 * Set a new value for the selected thumb.
-	 * @param t The new thumb to be set as the selected one.
+	 * Checks if a thumb is present for a given fraction.
+	 *
+	 * @param fracIndex
+	 * @return boolean
 	 */
-	protected void setSelectedThumb(Thumb t) {
+	private boolean hasThumbForFraction(final int fracIndex) {
+
+		List<Thumb> thumbs = colorPicker.getThumbList();
+		float[] fractions = colorPicker.getFractions();
+
+		if (thumbs.size() > fracIndex) {
+			double frac = thumbs.get(fracIndex).getX() / thumbRect.getWidth();
+			double frac2 = fractions[fracIndex];
+
+			if (Helper.nearlyEqual(frac, frac2)
+					|| thumbs.get(fracIndex).isSelected()) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+	
+	/**
+	 * Checks if a thumb is located at a certain point.
+	 *
+	 * @param point The point to be checked.
+	 * @return boolean - Whether a thumb is located at the point or not.
+	 */
+	protected boolean isPointInThumb(final Point point) {
+
+		boolean containsThumb = false;
+
+		for (final Thumb t : colorPicker.getThumbList()) {
+
+			if (t.contains(point.x, point.y)) {
+				containsThumb = true;
+				break;
+			}
+		}
+
+		return containsThumb;
+	}
+	
+	/**
+	 * Check if there is any thumb associated with the given data value.
+	 * @param dataVal
+	 * @return
+	 */
+	protected boolean hasThumbForDataVal(double dataVal) {
 		
-		this.selectedThumb = t;
+		boolean hasThumb = false;
+		List<Thumb> thumbs = colorPicker.getThumbList();
+
+		for (final Thumb t : thumbs) {
+			
+			double tDataVal = getThumbDataVal(thumbs.indexOf(t));
+			if (Helper.nearlyEqual(tDataVal, dataVal)) {
+				hasThumb = true;
+				break;
+			}
+		}
+
+		return hasThumb;
+	}
+	
+	/**
+	 * Requests if selected thumb is currently set or not. If yes, that means
+	 * there generally is a thumb in selected status.
+	 * @return boolean 
+	 */
+	protected boolean hasSelectedThumb() {
+		
+		return (selectedThumb != null);
 	}
 }
 

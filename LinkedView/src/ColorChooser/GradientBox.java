@@ -120,8 +120,6 @@ public class GradientBox {
 			newFractions[i] = fractions[j++];
 		}
 		
-		LogBuffer.println("New fractions: " + Arrays.toString(newFractions));
-		
 		final int x = (int) (addFrac * gradientRect.getWidth());
 
 		colorPicker.getColorList().add(newColIndex, newCol);
@@ -131,7 +129,7 @@ public class GradientBox {
 		if (thumbs.size() != fractions.length) {
 			System.out.println("ThumbList size (" + thumbs.size()
 					+ ") and fractions size (" + fractions.length
-					+ ") are different in drawNumbBox!");
+					+ ") are different in addColor()!");
 		}
 
 		colorPicker.updateColors();
@@ -176,7 +174,7 @@ public class GradientBox {
 			if (thumbs.size() != fractions.length) {
 				System.out.println("ThumbList size (" + thumbs.size()
 						+ ") and fractions size (" + fractions.length
-						+ ") are different in drawNumbBox!");
+						+ ") are different in removeColor()!");
 			}
 	
 			colorPicker.setFractions(newFractions);
