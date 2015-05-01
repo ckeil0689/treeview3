@@ -228,17 +228,24 @@ public class RowLabelView extends LabelView {
 		//deselect from closest deselected to sent index
 		if(selection.isIndexSelected(index)) {
 
-			int closest = 0;
+			int closest = -1;
 			for(int i = 0;i < selection.getNumIndexes();i++) {
 				if(!selection.isIndexSelected(i) &&
-				   Math.abs(i - index) <
-				   Math.abs(closest - index)) {
+				   (closest == -1 ||
+				    Math.abs(i - index) <
+				    Math.abs(closest - index))) {
 					closest = i;
 					//LogBuffer.println("Closest index updated to [" +
 					//		closest + "] because index [" + index +
 					//		"] is closer [distance: " +
 					//		Math.abs(i - index) + "] to it.");
 				}
+			}
+			//If everything was selected, see whether the closest is 1 after the
+			//last index
+			if(closest == -1 &&
+			   (double) index / (double) selection.getNumIndexes() > 0.5) {
+				closest = selection.getNumIndexes();
 			}
 			if(closest < index) {
 				for(int i = closest + 1;i <= index;i++)

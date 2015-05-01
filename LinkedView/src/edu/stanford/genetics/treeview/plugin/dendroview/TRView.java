@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LinearTransformation;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelViewBuffered;
 import edu.stanford.genetics.treeview.TreeDrawerNode;
 import edu.stanford.genetics.treeview.TreeSelectionI;
@@ -102,7 +103,8 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 	 */
 	private void synchMap() {
 
-		if ((selectedNode != null) && (treeSelection != null)) {
+		if ((selectedNode != null) && (treeSelection != null)) {// &&
+			//treeSelection.getNSelectedIndexes() == 1) {
 			final int start = (int) (selectedNode.getLeftLeaf().getIndex());
 			final int end = (int) (selectedNode.getRightLeaf().getIndex());
 
@@ -234,26 +236,50 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 
 		} else if (o == treeSelection) {
 			TreeDrawerNode cand = null;
+			boolean oddSelection = false;
 			if (treeSelection.getNSelectedIndexes() > 0) {
 				// This clause selects the array node if only a
 				// single array is selected.
-				if (treeSelection.getMinIndex() == treeSelection.getMaxIndex()) {
+				if (treeSelection.getMinIndex() ==
+					treeSelection.getMaxIndex()) {
 					cand = treePainter.getLeaf(treeSelection.getMinIndex());
 				}
 				// this clause selects the root node if all arrays are selected.
-				else if (treeSelection.getMinIndex() == map.getMinIndex()
-						&& treeSelection.getMaxIndex() == map.getMaxIndex()) {
+				else if (treeSelection.getMinIndex() == map.getMinIndex() &&
+						 treeSelection.getMaxIndex() == map.getMaxIndex() &&
+						 //All the intervening rows/cols are selected
+						 (treeSelection.getMaxIndex() -
+						  treeSelection.getMinIndex() + 1) ==
+						 treeSelection.getNSelectedIndexes()) {
 					cand = treePainter.getRootNode();
 
 				}
-				// // find node when multiple arrays are selected.
-				// else if(treeSelection.getMinIndex() >= map.getMinIndex()
-				// && treeSelection.getMaxIndex() <= map.getMaxIndex()) {
-				// cand =
-				// treePainter.getNearestNode(treeSelection.getMinIndex(),
-				// treeSelection.getMaxIndex());
-				// }
-			} else {
+				else if(treeSelection.getMinIndex() >= map.getMinIndex() &&
+						treeSelection.getMaxIndex() <= map.getMaxIndex() &&
+						//All the intervening rows/cols are selected
+						(treeSelection.getMaxIndex() -
+						 treeSelection.getMinIndex() + 1) ==
+						treeSelection.getNSelectedIndexes()) {
+					cand = treePainter.getNearestNode(
+							treeSelection.getMinIndex(),
+							treeSelection.getMaxIndex());
+					//If no candidate was found or the candidate is not an exact
+					//match
+					if(cand == null ||
+					   ((int) Math.round(cand.getMinIndex()) !=
+							treeSelection.getMinIndex() ||
+							(int) Math.round(cand.getMaxIndex()) !=
+							treeSelection.getMaxIndex())) {
+						oddSelection = true;
+					}
+				}
+				//Otherwise, it's an odd selection that doesn't match a tree
+				//node
+				else {
+					oddSelection = true;
+				}
+			} else if(treeSelection.getMinIndex() >= map.getMinIndex() &&
+					  treeSelection.getMaxIndex() <= map.getMaxIndex()) {
 				setSelectedNode(null);
 			}
 			// Only notify observers if we're changing the selected node.
@@ -263,9 +289,10 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 				treeSelection.setSelectedNode(cand.getId());
 				treeSelection.notifyObservers();
 
+			} else if(oddSelection) {
+				setSelectedNode(null);
 			} else {
-				setSelectedNode(treePainter.getNodeById(treeSelection
-						.getSelectedNode()));
+				setSelectedNode(cand);
 			}
 
 		} else {
