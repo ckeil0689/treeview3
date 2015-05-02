@@ -1,5 +1,7 @@
 package ColorChooser;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.geom.GeneralPath;
 
 public class BoundaryThumb extends Thumb {
@@ -41,6 +43,28 @@ public class BoundaryThumb extends Thumb {
 		outerthumbPath.lineTo(x - fact * (height + 4), y - 
 				fact * ((width + 4) / 2));
 		outerthumbPath.closePath();
+	}
+	
+	/**
+	 * Paints the GeneralPath object with the set color and makes the boundary 
+	 * thumb visible to the user.
+	 *
+	 * @param g2d
+	 */
+	@Override
+	public void paint(final Graphics2D g2d) {
+
+		g2d.setColor(Color.GRAY);
+		g2d.fill(outerthumbPath);
+
+		g2d.setColor(thumbColor);
+
+		/* draw circle above thumb if selected */
+		if (isSelected()) {
+			drawCenteredCircle(g2d, x, y, 6);
+		}
+
+		g2d.fill(innerthumbPath);
 	}
 	
 	protected boolean isMin() {

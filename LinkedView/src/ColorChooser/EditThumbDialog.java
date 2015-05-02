@@ -3,6 +3,8 @@ package ColorChooser;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -13,6 +15,7 @@ import javax.swing.JTextField;
 
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
+import Utilities.Helper;
 
 public class EditThumbDialog extends CustomDialog {
 
@@ -33,8 +36,13 @@ public class EditThumbDialog extends CustomDialog {
 	private final Thumb t;
 	private final int index;
 	
+	private Color newColor;
+	
+	private double startX;
 	private double inputX;
-	private boolean changed;
+	private double finalX;
+	
+	private boolean colorChanged;
 	
 	/**
 	 * Constructs a dialog which is allows the user to edit the details 
@@ -58,7 +66,10 @@ public class EditThumbDialog extends CustomDialog {
 				GUIFactory.FONTS);
 		
 		/* default */
-		inputX = thumb.getX();
+		startX = thumbBox.getThumbDataVal(thumbIndex);
+		finalX = startX;
+		
+		newColor = t.getColor();
 
 		inputField = new JTextField();
 		inputField.setEditable(true);
@@ -88,7 +99,7 @@ public class EditThumbDialog extends CustomDialog {
 	protected double showDialog(JPanel parent) {
 		
 		setVisible(true);
-		return (changed) ? inputX : t.getX();
+		return finalX;
 	}
 	
 	private class SetValueListener implements ActionListener {
@@ -97,11 +108,20 @@ public class EditThumbDialog extends CustomDialog {
 		public void actionPerformed(final ActionEvent arg0) {
 
 			if(isValueInvalid()) {
-				changed = false;
 				return;
 			}
 			
-			changed = true;
+			finalX = inputX;
+			
+			/* 
+			 * Only change if enter or ok button was used to quit and
+			 * the entered values were valid.
+			 */
+			if(colorChanged) {
+				t.setColor(newColor);
+				colorList.set(index, newColor);
+			}
+			
 			setVisible(false);
 			dispose();
 		}
@@ -116,6 +136,8 @@ public class EditThumbDialog extends CustomDialog {
 		boolean isInvalid = false;
 		try {
 			inputX = Double.parseDouble(inputField.getText());
+			double currentThumbData = thumbBox.getThumbDataVal(index);
+			boolean isCurrentThumbData = Helper.nearlyEqual(inputX, currentThumbData);
 			isInvalid = thumbBox.hasThumbForDataVal(inputX);
 			
 			if(t instanceof BoundaryThumb) {
@@ -133,7 +155,7 @@ public class EditThumbDialog extends CustomDialog {
 			} else {
 				setError("Value already has a handle!");
 			}
-			return isInvalid;
+			return isInvalid && !isCurrentThumbData;
 			
 		} catch (final NumberFormatException e) {
 			inputField.setText("Enter a valid number!");
@@ -156,9 +178,9 @@ public class EditThumbDialog extends CustomDialog {
 					"Pick Color for Missing", t.getColor());
 
 			if (newCol != null) {
-				t.setColor(newCol);
+				newColor = newCol;
 				colorIcon.setColor(newCol);
-				colorList.set(index, newCol);
+				colorChanged = true;
 			}
 		}
 	}
