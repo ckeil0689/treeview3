@@ -55,7 +55,7 @@ public class ColorChooserController implements ConfigNodePersistent {
 			final String colorSet = configNode.get("activeColors", "RedGreen");
 			ColorSet activeSet = colorPresets.getColorSet(colorSet);
 			
-			colorChooserUI.getColorPicker().setActiveColorSet(activeSet);
+//			colorChooserUI.getColorPicker().setActiveColorSet(activeSet);
 
 		} else {
 			LogBuffer.println("Could not find or create GradientChooser "
@@ -97,7 +97,8 @@ public class ColorChooserController implements ConfigNodePersistent {
 					+ "ColorGradientChooser.setPresets()");
 		}
 
-		colorChooserUI.getColorPicker().loadPresets(selectedColorSet);
+		colorChooserUI.getColorPicker().setActiveColorSet(selectedColorSet);
+		colorChooserUI.getColorPicker().loadPresets();//selectedColorSet);
 	}
 	
 	/**

@@ -226,8 +226,9 @@ public class ColorPresets implements ConfigNodePersistent {
 	public ColorSet getColorSet(final String name) {
 
 		for (final ColorSet defaultColorSet : defaultColorSets) {
-			if (defaultColorSet.getName() == name)
+			if (defaultColorSet.getName().equals(name)) {
 				return defaultColorSet;
+			}
 		}
 		final String[] childrenNodes = getRootChildrenNodes();
 

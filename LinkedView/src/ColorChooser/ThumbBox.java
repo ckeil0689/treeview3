@@ -87,22 +87,15 @@ public class ThumbBox {
 	 * This would cause an exception with LinearGradientPaint.
 	 */
 	protected void verifyThumbs() {
-
-		final int x = (int) thumbRect.getMinX();
-		final int w = (int) thumbRect.getWidth();
 		
 		float[] fractions = colorPicker.getFractions();
 
 		for (int i = 1; i < fractions.length - 1; i++) {
 
-			// Avoid rounding errors when casting to int
-			final double widthFactor = Math.round(w * fractions[i]);
-			final int pos = x + (int) (widthFactor);
-
 			if (!hasThumbForFraction(i)
 					&& !((colorPicker.getThumbNumber() == colorPicker.getColorNumber()) 
 							&& colorPicker.getThumbNumber() == fractions.length)) {
-				insertThumbAt(pos, colorPicker.getColorList().get(i));
+				insertThumbAt(fractions[i], colorPicker.getColorList().get(i));
 			}
 		}
 	}
@@ -111,11 +104,14 @@ public class ThumbBox {
 	 * Inserts a thumb at a specific x-value and passes a color to the Thumb
 	 * constructor.
 	 *
-	 * @param x
-	 * @param color
+	 * @param frac The fraction for which to insert a thumb.
+	 * @param color The color of the thumb to be inserted.
 	 */
-	protected void insertThumbAt(final int x, final Color color) {
+	protected void insertThumbAt(final float frac, final Color color) {
 
+		final int offset = (int) thumbRect.getMinX();
+		final int x = offset +  (int) (frac * thumbRect.getWidth());
+		
 		List<Thumb> thumbs = colorPicker.getThumbList();
 		int index = 0;
 		for (final Thumb t : thumbs) {

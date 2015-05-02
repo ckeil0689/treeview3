@@ -91,9 +91,9 @@ public class GradientBox {
 		/* find largest diff between fractions */
 		int newColIndex = 0;
 		float maxDiff = 0.0f;
-		for(int i = 0; i < fractions.length - 1; i++) {
+		for(int i = 1; i < fractions.length - 1; i++) {
 			
-			float diff = fractions[i+1] - fractions[i];
+			float diff = fractions[i + 1] - fractions[i];
 			if(diff > maxDiff) {
 				maxDiff = diff;
 				newColIndex = i;
@@ -119,11 +119,9 @@ public class GradientBox {
 			}
 			newFractions[i] = fractions[j++];
 		}
-		
-		final int x = (int) (addFrac * gradientRect.getWidth());
 
 		colorPicker.getColorList().add(newColIndex, newCol);
-		colorPicker.getThumbBox().insertThumbAt(x, newCol);
+		colorPicker.getThumbBox().insertThumbAt(addFrac, newCol);
 		colorPicker.setFractions(newFractions);
 
 		if (thumbs.size() != fractions.length) {

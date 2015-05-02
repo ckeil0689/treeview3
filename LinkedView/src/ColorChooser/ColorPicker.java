@@ -138,7 +138,7 @@ public class ColorPicker {
 	 *
 	 * @param colorSet
 	 */
-	protected void loadPresets(final ColorSet colorSet) {
+	protected void loadPresets() {
 
 		/* clearing all data */
 		colorList.clear();
@@ -148,7 +148,7 @@ public class ColorPicker {
 		thumbList.add(minThumb);
 		thumbList.add(maxThumb);
 
-		final String[] colors = colorSet.getColors();
+		final String[] colors = activeColorSet.getColors();
 
 		for (final String color : colors) {
 
@@ -157,8 +157,6 @@ public class ColorPicker {
 		
 		updateBoundaryColors();
 		updateColorArray();
-
-		fractions = colorSet.getFractions();
 	}
 	
 	/**
@@ -183,6 +181,34 @@ public class ColorPicker {
 		empty = "#" + empty.substring(2, empty.length());
 
 		return new ColorSet(name, colorList, fractionList, missing, empty);
+	}
+	
+	protected void syncToFractions() {
+		
+		/* clearing all data */
+		colorList.clear();
+		thumbList.clear();
+		
+		thumbList.add(minThumb);
+		thumbList.add(maxThumb);
+
+		final String[] colors = activeColorSet.getColors();
+		
+		if(colors.length != fractions.length) {
+			LogBuffer.println("Fractions not in sync with saved colors.");
+			return;
+		}
+
+		for (final String color : colors) {
+
+			colorList.add(Color.decode(color));
+		}
+		
+		updateBoundaryColors();
+		updateColorArray();
+		thumbBox.verifyThumbs();
+
+//		fractions = colorSet.getFractions();
 	}
 	
 	/**
@@ -244,7 +270,7 @@ public class ColorPicker {
 	 */
 	protected void resetFractions() {
 
-		this.fractions = new float[] { 0.0f, 0.001f, 0.5f, 0.999f, 1.0f };
+		this.fractions = activeColorSet.getFractions();//new float[] { 0.0f, 0.001f, 0.5f, 0.999f, 1.0f };
 	}
 	
 	/*
