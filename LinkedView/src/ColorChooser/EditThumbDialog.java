@@ -34,6 +34,7 @@ public class EditThumbDialog extends CustomDialog {
 	private final int index;
 	
 	private double inputX;
+	private boolean changed;
 	
 	/**
 	 * Constructs a dialog which is allows the user to edit the details 
@@ -87,7 +88,7 @@ public class EditThumbDialog extends CustomDialog {
 	protected double showDialog(JPanel parent) {
 		
 		setVisible(true);
-		return inputX;
+		return (changed) ? inputX : t.getX();
 	}
 	
 	private class SetValueListener implements ActionListener {
@@ -96,9 +97,11 @@ public class EditThumbDialog extends CustomDialog {
 		public void actionPerformed(final ActionEvent arg0) {
 
 			if(isValueInvalid()) {
+				changed = false;
 				return;
 			}
 			
+			changed = true;
 			setVisible(false);
 			dispose();
 		}
@@ -115,15 +118,33 @@ public class EditThumbDialog extends CustomDialog {
 			inputX = Double.parseDouble(inputField.getText());
 			isInvalid = thumbBox.hasThumbForDataVal(inputX);
 			
-			enterPrompt.setForeground(GUIFactory.RED1);
-			enterPrompt.setText("Value already has a handle!");
+			if(t instanceof BoundaryThumb) {
+				BoundaryThumb bT = (BoundaryThumb) t;
 				
+				if(bT.isMin()) {
+					isInvalid = !(inputX < thumbBox.getThumbDataVal(1));
+					setError("Cannot be bigger than next thumb.");
+				} else {
+					int last = colorList.size() - 1; // same size as thumbList
+					isInvalid = !(inputX < thumbBox.getThumbDataVal(last));
+					setError("Cannot be smaller than last thumb.");
+				}
+				
+			} else {
+				setError("Value already has a handle!");
+			}
 			return isInvalid;
 			
 		} catch (final NumberFormatException e) {
 			inputField.setText("Enter a valid number!");
 			return false;
 		}
+	}
+	
+	private void setError(String message) {
+		
+		enterPrompt.setForeground(GUIFactory.RED1);
+		enterPrompt.setText(message);
 	}
 	
 	private class SetColorListener implements ActionListener {

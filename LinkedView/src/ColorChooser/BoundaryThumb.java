@@ -42,5 +42,10 @@ public class BoundaryThumb extends Thumb {
 				fact * ((width + 4) / 2));
 		outerthumbPath.closePath();
 	}
+	
+	protected boolean isMin() {
+		
+		return isMin;
+	}
 
 }

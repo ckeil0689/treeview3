@@ -246,7 +246,6 @@ public class ThumbBox {
 		for (final Thumb t : colorPicker.getThumbList()) {
 
 			if (t.contains((int) point.getX(), (int) point.getY())) {
-
 				openThumbEditDialog(t, index);
 				break;
 			}
@@ -315,19 +314,19 @@ public class ThumbBox {
 		double range = colorPicker.getRange();
 		
 		/* TODO adapt range if values are outside */
-		if (dataVal < minVal || dataVal > maxVal) {
+		if (dataVal < minVal) {
+			colorPicker.setMinVal(dataVal);
 			
-			/* adapt gradient range if number outside boundaries 
-			 * don forget to update local min/max/range variables
-			 * */
+		} else if (dataVal > maxVal) {
+			colorPicker.setMaxVal(dataVal);
 			
-			LogBuffer.println("Entered!");
-		}
+		} else {
 
-		double diff = Math.abs(dataVal - minVal);
-		final float fraction = (float) (diff / (range));
-		
-		updateFracsForThumbPos(fraction);
+			double diff = Math.abs(dataVal - minVal);
+			final float fraction = (float) (diff / (range));
+			
+			updateFracsForThumbPos(fraction);
+		}
 	}
 	
 	/**

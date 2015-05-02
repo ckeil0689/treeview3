@@ -53,8 +53,8 @@ public class ColorPicker {
 	
 	
 	/* Data boundaries */
-	private final double minVal;
-	private final double maxVal;
+	private double minVal;
+	private double maxVal;
 	private double range;
 	
 	public ColorPicker(final ColorExtractor drawer, final double minVal,
@@ -285,6 +285,16 @@ public class ColorPicker {
 		
 		Collections.swap(thumbList, oldIndex, newIndex);
 		Collections.swap(colorList, oldIndex, newIndex);
+	}
+	
+	protected void setMinVal(double minVal) {
+		
+		this.minVal = minVal;
+	}
+	
+	protected void setMaxVal(double maxVal) {
+		
+		this.maxVal = maxVal;
 	}
 	
 	/**
