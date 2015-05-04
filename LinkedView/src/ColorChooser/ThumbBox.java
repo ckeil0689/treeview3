@@ -108,7 +108,6 @@ public class ThumbBox {
 	 */
 	protected void insertThumbAt(final float frac, final Color color) {
 
-		LogBuffer.println("Inserting thumb.");
 		final int offset = (int) thumbRect.getMinX();
 		final int x = offset +  (int) (frac * thumbRect.getWidth());
 		

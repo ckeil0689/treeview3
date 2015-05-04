@@ -146,6 +146,7 @@ public class ColorPicker {
 		thumbList.add(minThumb);
 		thumbList.add(maxThumb);
 
+		colorExtractor.setMissingColor(activeColorSet.getMissing());
 		final String[] colors = activeColorSet.getColors();
 
 		for (final String color : colors) {
@@ -190,7 +191,7 @@ public class ColorPicker {
 	protected void setGradientColors() {
 
 		colorExtractor.setNewParams(fractions, colorList);
-		colorExtractor.setMissingColor(activeColorSet.getMissing());
+//		colorExtractor.setMissingColor(activeColorSet.getMissing());
 		colorExtractor.notifyObservers();
 	}
 	
@@ -315,6 +316,7 @@ public class ColorPicker {
 	protected void setMinVal(double minVal) {
 		
 		this.minVal = minVal;
+		colorExtractor.setMin(minVal);
 		minThumb.setDataValue(minVal);
 		updateRange();
 		
@@ -328,6 +330,7 @@ public class ColorPicker {
 	protected void setMaxVal(double maxVal) {
 		
 		this.maxVal = maxVal;
+		colorExtractor.setMax(maxVal);
 		maxThumb.setDataValue(maxVal);
 		updateRange();
 		

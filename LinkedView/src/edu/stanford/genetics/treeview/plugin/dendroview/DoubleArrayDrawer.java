@@ -114,8 +114,8 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 			dataMatrix = matrix;
 
 			if (colorExtractor != null) {
-				colorExtractor.setMinMax(dataMatrix.getMinVal(),
-						dataMatrix.getMaxVal());
+				colorExtractor.setMin(dataMatrix.getMinVal());
+				colorExtractor.setMax(dataMatrix.getMaxVal());
 			} else {
 				// Log null value for color extractor
 			}
