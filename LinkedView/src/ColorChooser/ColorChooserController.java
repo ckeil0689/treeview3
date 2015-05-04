@@ -348,9 +348,9 @@ public class ColorChooserController implements ConfigNodePersistent {
 		
 		boolean isBoundary = tb.isSelectedBoundaryThumb();
 		boolean isEditAllowed = tb.hasSelectedThumb();
-		boolean isRemoveAllowed = !isBoundary
-				&& isEditAllowed 
+		boolean isRemoveAllowed = !isBoundary && isEditAllowed 
 				&& colorPicker.getThumbNumber() > 2;
+				
 		colorChooserUI.setSelectionDependentBtnStatus(isEditAllowed, 
 				isRemoveAllowed);
 	}

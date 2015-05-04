@@ -206,13 +206,25 @@ public class ThumbBox {
 		double previousData = colorPicker.getMinVal();
 		double nextData = colorPicker.getMaxVal();
 		
-		/* cannot move boundary thumbs */
-		if (selectedIndex == 0) {
-			return;
-
-		} else if (selectedIndex == colorPicker.getThumbNumber() - 1) {
-			return;
-
+		/* deal with boundary cases */
+		if(selectedIndex == 0) {
+			boolean isSafeShrink = inputData < thumbDataVals[selectedIndex + 1];
+			if(isSafeShrink) {
+				previousData = Double.MIN_VALUE;
+				nextData = thumbDataVals[selectedIndex + 1];
+			} else {
+				/* TODO eat up old thumbs outside of new range */ 
+			}
+			
+		} else if(selectedIndex == colorPicker.getThumbNumber() - 1) {
+			boolean isSafeShrink = (inputData > thumbDataVals[selectedIndex - 1]);
+			if(isSafeShrink) {
+				previousData = thumbDataVals[selectedIndex - 1];
+				nextData = Double.MAX_VALUE;
+			} else {
+				/* TODO eat up old thumbs outside of new range */ 
+			}
+		/* Non-boundary */
 		} else {
 			previousData = thumbDataVals[selectedIndex - 1];
 			nextData = thumbDataVals[selectedIndex + 1];
@@ -329,7 +341,6 @@ public class ThumbBox {
 		
 		double minVal = colorPicker.getMinVal();
 		double maxVal = colorPicker.getMaxVal();
-//		double range = colorPicker.getRange();
 		
 		/* TODO adapt range if values are outside */
 		if (dataVal < minVal) {

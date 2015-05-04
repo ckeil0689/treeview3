@@ -297,6 +297,10 @@ public class ColorPicker {
 		Collections.swap(colorList, oldIndex, newIndex);
 	}
 	
+	/**
+	 * Defines a new minimum value for the color range.
+	 * @param minVal
+	 */
 	protected void setMinVal(double minVal) {
 		
 		this.minVal = minVal;
@@ -306,6 +310,10 @@ public class ColorPicker {
 		updateFractions();
 	}
 	
+	/**
+	 * Defines a new maximum value for the color range.
+	 * @param maxVal
+	 */
 	protected void setMaxVal(double maxVal) {
 		
 		this.maxVal = maxVal;
