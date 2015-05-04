@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
+import java.util.Iterator;
 import java.util.List;
 
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -167,12 +168,8 @@ public class ThumbBox {
 	}
 	
 	/**
-	 * TODO copy function but using data values. Then implement function to
-	 * derive fractions from data values. Possibly give each thumb a state
-	 * variable for its represented data value.
-	 * 
-	 * derive new position from input data val, not input fractions val.
-	 * @param inputX
+	 * TODO break up method into smaller parts
+	 * @param inputData
 	 */
 	protected void updateThumbDataVal(final double inputData) {
 
@@ -199,7 +196,7 @@ public class ThumbBox {
 
 		/* get position of previous thumb */
 		List<Thumb> thumbs = colorPicker.getThumbList();
-		final int selectedIndex = thumbs.indexOf(selectedThumb);
+		int selectedIndex = thumbs.indexOf(selectedThumb);
 		
 		/* define the boundaries around active thumb's fraction */
 		/* defined out of range in case no previous/ next thumb exists */
@@ -209,22 +206,28 @@ public class ThumbBox {
 		/* deal with boundary cases */
 		if(selectedIndex == 0) {
 			boolean isSafeShrink = inputData < thumbDataVals[selectedIndex + 1];
-			if(isSafeShrink) {
-				previousData = Double.MIN_VALUE;
-				nextData = thumbDataVals[selectedIndex + 1];
-			} else {
-				/* TODO eat up old thumbs outside of new range */ 
+			int removed = 0;
+			if(!isSafeShrink) {
+				removed = shrinkThumbsToDataRange(inputData, true);
 			}
+			int nextIndex = selectedIndex + 1 + removed;
+			previousData = -1.0 * Double.MAX_VALUE;
+			nextData = thumbDataVals[nextIndex];
+			colorPicker.setMinVal(inputData); //calls updateFractions()...maybe theres a better way
 			
 		} else if(selectedIndex == colorPicker.getThumbNumber() - 1) {
 			boolean isSafeShrink = (inputData > thumbDataVals[selectedIndex - 1]);
-			if(isSafeShrink) {
-				previousData = thumbDataVals[selectedIndex - 1];
-				nextData = Double.MAX_VALUE;
-			} else {
-				/* TODO eat up old thumbs outside of new range */ 
+			int removed = 0;
+			if(!isSafeShrink) {
+				removed = shrinkThumbsToDataRange(inputData, false);
+				selectedIndex -= removed;
 			}
-		/* Non-boundary */
+			int prevIndex = selectedIndex - 1;
+			previousData = thumbDataVals[prevIndex];
+			nextData = Double.MAX_VALUE;
+			colorPicker.setMaxVal(inputData);
+			
+		/* Non-boundary */	
 		} else {
 			previousData = thumbDataVals[selectedIndex - 1];
 			nextData = thumbDataVals[selectedIndex + 1];
@@ -250,6 +253,41 @@ public class ThumbBox {
 
 		colorPicker.updateFractions();
 		colorPicker.updateColors();
+	}
+	
+	/**
+	 * Shrinks the thumb and color lists so that new min/max can be set.
+	 * @param boundaryData The new min or max data value.
+	 * @param isMin Whether the affected boundary is the minimum.
+	 * @return Number of removed thumbs.
+	 */
+	private int shrinkThumbsToDataRange(double boundaryData, boolean isMin) {
+		
+		List<Thumb> thumbs = colorPicker.getThumbList();
+		Iterator<Thumb> iter = thumbs.iterator();
+		
+		int removed = 0;
+		
+		while(iter.hasNext()) {
+			
+			Thumb t = iter.next();
+			
+			if(isMin && t.getDataValue() < boundaryData) {
+				colorPicker.getColorList().remove(thumbs.indexOf(t));
+				iter.remove();
+				removed++;
+			} 
+			
+			if(!isMin && t.getDataValue() > boundaryData) {
+				colorPicker.getColorList().remove(thumbs.indexOf(t));
+				iter.remove();
+				removed++;
+			} 
+		}
+		
+		colorPicker.updateFractions();
+		
+		return removed;
 	}
 
 	/**

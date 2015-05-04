@@ -227,9 +227,20 @@ public class ColorPicker {
 		float[] newFractions = new float[thumbList.size()];
 		
 		for(int i = 0; i < newFractions.length; i++) {
+			
 			double dataVal = thumbList.get(i).getDataValue();
 			double diff = Math.abs(dataVal - minVal);
-			final float frac = (float) (diff / (range));
+			final float frac;
+			
+			if(i == 0) {
+				frac = 0.0f;
+				
+			} else if(i == newFractions.length - 1) {
+				frac = 1.0f;
+				
+			} else {
+				frac = (float) (diff / (range));
+			}
 			
 			newFractions[i] = frac;
 		}

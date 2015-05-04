@@ -142,14 +142,18 @@ public class EditThumbDialog extends CustomDialog {
 			
 			if(t instanceof BoundaryThumb) {
 				BoundaryThumb bT = (BoundaryThumb) t;
-				
+				double boundVal;
 				if(bT.isMin()) {
-					isInvalid = !(inputX < thumbBox.getThumbDataVal(1));
-					setError("Cannot be bigger than next thumb.");
+					boundVal = thumbBox.getThumbDataVal(colorList.size() - 1);
+					isInvalid = (inputX > boundVal)
+							|| Helper.nearlyEqual(inputX, boundVal);
+					setError("Cannot be bigger than max.");
+					
 				} else {
-					int last = colorList.size() - 1; // same size as thumbList
-					isInvalid = !(inputX < thumbBox.getThumbDataVal(last));
-					setError("Cannot be smaller than last thumb.");
+					boundVal = thumbBox.getThumbDataVal(0);
+					isInvalid = (inputX < boundVal)
+							|| Helper.nearlyEqual(inputX, boundVal);
+					setError("Cannot be smaller than min.");
 				}
 				
 			} else {
