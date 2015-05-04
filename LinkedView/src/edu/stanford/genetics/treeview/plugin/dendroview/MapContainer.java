@@ -51,6 +51,8 @@ public class MapContainer extends Observable implements Observer,
 	 * calculation in zoomToSelected() */
 	private static final double MIN_TILE_NUM = 1.0;
 	private static final double ZOOM_INCREMENT = 0.05;
+	private static final double ZOOM_INCREMENT_FAST = 0.15;
+	//"ZOOM_INCREMENT_SLOW" == single row/col on each side
 
 	private final String default_map = "Fixed";
 	private double default_scale = 1.0;
@@ -216,7 +218,7 @@ public class MapContainer extends Observable implements Observer,
 	}
 	
 	//This is for gradually zooming away from the center of the currently displayed dots
-	public void zoomOutCenter() {
+	public void zoomOutCenter(String speed) {
 
 		//LogBuffer.println("zoomOutCenter...");
 		//LogBuffer.println("zoomOut: Value of firstVisible at start: [" + firstVisible + "].");
@@ -228,7 +230,15 @@ public class MapContainer extends Observable implements Observer,
 		// LogBuffer.println("zoomOut: tileNumVisible has been set to [" +
 		// tileNumVisible + "].");
 
-		zoomVal = (int) Math.round(ZOOM_INCREMENT * tileNumVisible);
+		if(speed == "slow") {
+			zoomVal = 2;
+		} else if(speed == "fast") {
+			zoomVal = (int) Math.round(ZOOM_INCREMENT_FAST * tileNumVisible);
+		} else if(speed == "slam") {
+			zoomVal = getMaxIndex() + 1 - (int) Math.round(tileNumVisible);
+		} else {
+			zoomVal = (int) Math.round(ZOOM_INCREMENT * tileNumVisible);
+		}
 
 		// Ensure that at least one tile will be zoomed out.
 		if (zoomVal < 2) {
@@ -342,7 +352,7 @@ public class MapContainer extends Observable implements Observer,
 	}
 
 	//This is for gradually zooming toward the center of the currently displayed dots
-	public void zoomInCenter() {
+	public void zoomInCenter(String speed) {
 
 		// final double maxScale = getAvailablePixels();
 		double newScale = getScale();
@@ -352,7 +362,15 @@ public class MapContainer extends Observable implements Observer,
 		// LogBuffer.println("zoomIn: tileNumVisible has been set to [" +
 		// tileNumVisible + "].");
 
-		zoomVal = (int) Math.round(ZOOM_INCREMENT * tileNumVisible);
+		if(speed == "slow") {
+			zoomVal = 2;
+		} else if(speed == "fast") {
+			zoomVal = (int) Math.round(ZOOM_INCREMENT_FAST * tileNumVisible);
+		} else if(speed == "slam") {
+			zoomVal = (int) Math.round(tileNumVisible) - 1;
+		} else {
+			zoomVal = (int) Math.round(ZOOM_INCREMENT * tileNumVisible);
+		}
 
 		// Ensure that at least 2 tiles will be zoomed in (1 on each side of the current zoom dimension).
 		if (zoomVal < 2) {

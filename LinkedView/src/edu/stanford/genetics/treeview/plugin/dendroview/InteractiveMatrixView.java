@@ -711,7 +711,9 @@ MouseWheelListener {
 	}
 
 	/**
-	 * TODO add JavaDoc description here
+	 * This function, given a pixel location (e.g. where the cursor is), will
+	 * intelligently choose a zoom amount to given the appearance of a smooth
+	 * zoom that expands from the given pixel
 	 * @param xPxPos
 	 * @param yPxPos
 	 */
@@ -814,7 +816,9 @@ MouseWheelListener {
 	}
 
 	/**
-	 * TODO add JavaDoc description here
+	 * This function, given a pixel location (e.g. where the cursor is), will
+	 * intelligently choose a zoom amount to given the appearance of a smooth
+	 * zoom that contracts on the given pixel
 	 * @param xPxPos
 	 * @param yPxPos
 	 */
@@ -926,7 +930,12 @@ MouseWheelListener {
 		if(ymap.zoomAwayPixel(yPxPos,zoomYVal) == 1)
 			updateAspectRatio();
 	}
-	
+
+	/**
+	 * This is a wrapper function for smoothZoomTowardSelection which allows one
+	 * to call this function without providing any parameters. So it just fills
+	 * in the target zoom level info.
+	 */
 	public void smoothIncrementalZoomOut() {
 		//The function below has a bug that prevents full zoom out
 		// - this works around that - though it may have already been fixed
@@ -941,7 +950,7 @@ MouseWheelListener {
 		//The function above has a bug that prevents full zoom out sometimes
 		// - this works around that, though it may have been fixed
 		if(prevXNumVisible == xmap.getNumVisible() &&
-				prevYNumVisible == ymap.getNumVisible()) {
+		   prevYNumVisible == ymap.getNumVisible()) {
 
 			//If you've never seen this message and you use the home button a
 			//lot, you can probably remove this if-conditional and the prev*
@@ -949,8 +958,8 @@ MouseWheelListener {
 			//LogBuffer.println("smoothZoomTowardSelection bug still exists." +
 			//					"  Working around it.");
 
-			xmap.zoomOutCenter();
-			ymap.zoomOutCenter();
+			xmap.zoomOutCenter("fast");
+			ymap.zoomOutCenter("fast");
 		}
 
 		//If we've reached full zoom-out, reset the aspect ratio
@@ -959,12 +968,24 @@ MouseWheelListener {
 			setAspectRatio(xmap.getMaxIndex() + 1,ymap.getMaxIndex() + 1);
 		}
 	}
-	
+
+	/**
+	 * This is just a wrapper for smoothAnimatedZoomTowardSelection which fills
+	 * in the dimensions of the matrix
+	 */
 	public void smoothAnimatedZoomOut() {
 		smoothAnimatedZoomTowardSelection(0,(xmap.getMaxIndex() + 1),
 											0,(ymap.getMaxIndex() + 1));
 	}
 
+	/**
+	 * This is a wrapper for smoothZoomTowardSelection which calls it repeatedly
+	 * until a target location is reached to animate a full zoom to target
+	 * @param selecXStartIndex
+	 * @param numXSelectedIndexes
+	 * @param selecYStartIndex
+	 * @param numYSelectedIndexes
+	 */
 	public void smoothAnimatedZoomTowardSelection(int selecXStartIndex,
 												  int numXSelectedIndexes,
 												  int selecYStartIndex,

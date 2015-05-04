@@ -602,7 +602,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 			getInteractiveXMap().zoomIn();
 			getInteractiveYMap().zoomIn();
-			
+
 			notifyAllMapObservers();
 		}
 	}
@@ -662,12 +662,36 @@ public class DendroController implements ConfigNodePersistent, Observer {
 				dendroView.getInteractiveMatrixView().updateAspectRatio();
 				
 			} else if (e.getSource() == dendroView.getXYMinusButton()) {
-				interactiveXmap.zoomOutCenter();
-				interactiveYmap.zoomOutCenter();
+				if((e.getModifiers() & InputEvent.META_MASK) != 0) {
+					resetMatrixViews();
+					dendroView.getInteractiveMatrixView().setAspectRatio(
+							interactiveXmap.getMaxIndex() + 1,
+							interactiveYmap.getMaxIndex() + 1);
+				} else if((e.getModifiers() & InputEvent.SHIFT_MASK) != 0) {
+					interactiveXmap.zoomOutCenter("fast");
+					interactiveYmap.zoomOutCenter("fast");
+				} else if((e.getModifiers() & InputEvent.ALT_MASK) != 0) {
+					interactiveXmap.zoomOutCenter("slow");
+					interactiveYmap.zoomOutCenter("slow");
+				} else {
+					interactiveXmap.zoomOutCenter("medium");
+					interactiveYmap.zoomOutCenter("medium");
+				}
 
 			} else if (e.getSource() == dendroView.getXYPlusButton()) {
-				interactiveXmap.zoomInCenter();
-				interactiveYmap.zoomInCenter();
+				if((e.getModifiers() & InputEvent.META_MASK) != 0) {
+					interactiveXmap.zoomInCenter("slam");
+					interactiveYmap.zoomInCenter("slam");
+				} else if((e.getModifiers() & InputEvent.SHIFT_MASK) != 0) {
+					interactiveXmap.zoomInCenter("fast");
+					interactiveYmap.zoomInCenter("fast");
+				} else if((e.getModifiers() & InputEvent.ALT_MASK) != 0) {
+					interactiveXmap.zoomInCenter("slow");
+					interactiveYmap.zoomInCenter("slow");
+				} else {
+					interactiveXmap.zoomInCenter("medium");
+					interactiveYmap.zoomInCenter("medium");
+				}
 				
 			} else if(e.getSource() == dendroView.getXLeftPlusButton()) {
 				// Add a column on the left side
@@ -705,16 +729,14 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 			} else if (e.getSource() == dendroView.getHomeButton()) {
 
-				int stepMask = InputEvent.ALT_MASK;
-				int fullMask = InputEvent.META_MASK;
-
-				if((e.getModifiers() & InputEvent.META_MASK) == fullMask) {
+				if((e.getModifiers() & InputEvent.META_MASK)  != 0 ||
+				   (e.getModifiers() & InputEvent.SHIFT_MASK) != 0) {
 					resetMatrixViews();
 					dendroView.getInteractiveMatrixView().setAspectRatio(
 							interactiveXmap.getMaxIndex() + 1,
 							interactiveYmap.getMaxIndex() + 1);
 				}
-				else if((e.getModifiers() & InputEvent.ALT_MASK) == stepMask) {
+				else if((e.getModifiers() & InputEvent.ALT_MASK) != 0) {
 					dendroView.getInteractiveMatrixView()
 					.smoothIncrementalZoomOut();
 				} else {
@@ -1045,7 +1067,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 					colSelection.getNSelectedIndexes() > 0;
 
 			if(genesSelected || arraysSelected) {
-				if((arg0.getModifiers() & InputEvent.META_MASK) != 0) {
+				if((arg0.getModifiers() & InputEvent.SHIFT_MASK) != 0 ||
+				   (arg0.getModifiers() & InputEvent.META_MASK)  != 0) {
 
 					//Zoom in (or out)
 					getInteractiveXMap().zoomToSelected(
