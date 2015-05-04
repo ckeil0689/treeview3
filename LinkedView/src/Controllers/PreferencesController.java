@@ -57,7 +57,7 @@ public class PreferencesController {
 	 */
 	public void addListeners() {
 
-		preferences.addWindowListener(new WindowListener());
+		preferences.addSaveAndCloseListener(new SaveAndCloseListener());
 		preferences.addOKButtonListener(new ConfirmationListener());
 		preferences.addCustomLabelListener(new CustomLabelListener());
 		preferences.addResizeDialogListener(new PreferencesComponentListener());
@@ -166,7 +166,7 @@ public class PreferencesController {
 	 * @author CKeil
 	 *
 	 */
-	class WindowListener extends WindowAdapter {
+	class SaveAndCloseListener extends WindowAdapter {
 
 		@Override
 		public void windowClosing(final WindowEvent we) {

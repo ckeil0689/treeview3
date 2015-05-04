@@ -168,6 +168,11 @@ public class ColorChooserUI extends CustomDialog {
 
 		return presetChoice;
 	}
+	
+	protected void setCustomSelected(boolean isCustom) {
+		
+		this.isCustomSelected = true;
+	}
 
 	protected boolean isCustomSelected() {
 

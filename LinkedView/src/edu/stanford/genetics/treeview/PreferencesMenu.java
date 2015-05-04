@@ -147,7 +147,7 @@ public class PreferencesMenu extends CustomDialog implements
 	 *
 	 * @param listener
 	 */
-	public void addWindowListener(final WindowAdapter listener) {
+	public void addSaveAndCloseListener(final WindowAdapter listener) {
 
 		addWindowListener(listener);
 	}

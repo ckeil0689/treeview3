@@ -7,7 +7,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 import Utilities.GUIFactory;
-import edu.stanford.genetics.treeview.LogBuffer;
 
 public class NumBox {
 	
@@ -38,64 +37,46 @@ public class NumBox {
 		g2.setFont(GUIFactory.FONTS);
 		
 		List<Thumb> thumbs = colorPicker.getThumbList();
-		float[] fractions = colorPicker.getFractions();
-		double range = colorPicker.getRange();
-		double minVal = colorPicker.getMinVal();
 		
 		/* store the selected thumb because it always has to be painted last */
 		Thumb selected_thumb = null;
-		int frac_index = -1;
-
-		if (thumbs.size() == fractions.length) {
-			 for (final Thumb t : thumbs) {
-				 
-				 /* do not paint min/ max thumb data values here */
-				 if(thumbs.indexOf(t) == 0 
-						 || thumbs.indexOf(t) == thumbs.size() - 1) {
-					 continue;
-				 }
-				 
-				 if(t.isSelected()) {
-					 /* store a reference to t for later */
-					 selected_thumb = t;
-					 frac_index = thumbs.indexOf(t);
-					 continue;
-				 }
-				 
-				 paintString(g2, fractions[thumbs.indexOf(t)], t, range, minVal);
-			 }
+		for (final Thumb t : thumbs) {
 			 
-			 /* 
-			  * selected thumb NEEDS to be painted last because it should always
-			  * be on top over the other values.
-			  */
-			 if (selected_thumb != null) {
-				 paintString(g2, fractions[frac_index], selected_thumb, 
-						 range, minVal);
-			 }
+			/* do not paint min/ max thumb data values here */
+			if(thumbs.indexOf(t) == 0 
+					|| thumbs.indexOf(t) == thumbs.size() - 1) {
+				continue;
+			}
+		 
+			if(t.isSelected()) {
+				/* store a reference to t for later */
+				selected_thumb = t;
+				continue;
+			}
 			 
-		 } else {
-			 LogBuffer.println("ThumbList size (" + thumbs.size()
-			 + ") and fractions size (" + fractions.length
-			 + ") are different in drawNumbBox!");
-		 }
+			paintString(g2, t);
+		}
+		 
+		/* 
+		 * selected thumb NEEDS to be painted last because it should always
+		 * be on top over the other values.
+		 */
+		if (selected_thumb != null) {
+			paintString(g2, selected_thumb);
+		}
 	}
 	
-	private void paintString(Graphics2D g2, float fraction, Thumb t, 
-			double range, double minVal) {
+	private void paintString(Graphics2D g2, Thumb t) { 
 		
-		double value = Math.abs((range) * fraction) + minVal;
-		value = (double) Math.round(value * 1000) / 1000;
-		
-		String value_s = Double.toString(value);
+		String value_s = Double.toString(t.getDataValue());
 		int stringWidth = fm.stringWidth(value_s);
 		
 		g2.setColor(GUIFactory.DEFAULT_BG);
 		g2.fillRect(t.getX() - (stringWidth / 2) - (TOTAL_MARGIN / 2), 
-				0, stringWidth + TOTAL_MARGIN, (int)numRect.getHeight());
+				0, stringWidth + TOTAL_MARGIN, (int) numRect.getHeight());
 		g2.setColor(Color.black);
 		
-		g2.drawString(Double.toString(value),  t.getX() - (stringWidth/2), 
+		g2.drawString(value_s,  t.getX() - (stringWidth/2), 
 				(int) ((numRect.getHeight() / 2) + numRect.getMinY()));
 	}
 	

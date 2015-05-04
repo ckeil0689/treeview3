@@ -10,8 +10,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.prefs.Preferences;
 
 import javax.swing.JColorChooser;
@@ -46,14 +44,31 @@ public class ColorChooserController implements ConfigNodePersistent {
 		addAllListeners();
 	}
 	
+	/**
+	 * Adds all defined listeners to the ColorGradientChooser object.
+	 */
+	private void addAllListeners() {
+		
+		if (colorChooserUI != null) {
+			colorChooserUI.addThumbSelectListener(new ThumbSelectListener());
+			colorChooserUI.addThumbMotionListener(new ThumbMotionListener());
+			colorChooserUI.addAddListener(new AddButtonListener());
+			colorChooserUI.addRemoveListener(new RemoveButtonListener());
+			colorChooserUI.addPresetChoiceListener(new ColorSetListener());
+			colorChooserUI.addMissingListener(new MissingBtnListener());
+			colorChooserUI.addEditListener(new EditButtonListener());
+			colorChooserUI.addDialogCloseListener(new WindowCloseListener());
+		}
+	}
+	
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
 
 		if (parentNode != null) {
 			this.configNode = parentNode.node("GradientChooser");
 
-			final String colorSet = configNode.get("activeColors", "RedGreen");
-			ColorSet activeSet = colorPresets.getColorSet(colorSet);
+//			final String colorSet = configNode.get("activeColors", "RedGreen");
+//			ColorSet activeSet = colorPresets.getColorSet(colorSet);
 			
 //			colorChooserUI.getColorPicker().setActiveColorSet(activeSet);
 
@@ -150,30 +165,14 @@ public class ColorChooserController implements ConfigNodePersistent {
 
 		return multiClickInterval;
 	}
-
-	/**
-	 * Adds all defined listeners to the ColorGradientChooser object.
-	 */
-	private void addAllListeners() {
-		
-		if (colorChooserUI != null) {
-			colorChooserUI.addThumbSelectListener(new ThumbSelectListener());
-			colorChooserUI.addThumbMotionListener(new ThumbMotionListener());
-			colorChooserUI.addAddListener(new AddButtonListener());
-			colorChooserUI.addRemoveListener(new RemoveButtonListener());
-			colorChooserUI.addPresetChoiceListener(new ColorSetListener());
-			colorChooserUI.addMissingListener(new MissingBtnListener());
-			colorChooserUI.addEditListener(new EditButtonListener());
-			colorChooserUI.addDialogCloseListener(new WindowCloseListener());
-		}
-	}
 	
 	private class WindowCloseListener extends WindowAdapter {
 		
 		@Override
 		public void windowClosed(final WindowEvent e) {
 
-			if (colorChooserUI != null && colorChooserUI.isCustomSelected()) {
+			if (colorChooserUI.isCustomSelected()) {
+				LogBuffer.println("Saving colorset...");
 				saveStatus();
 			}
 		}
@@ -270,7 +269,7 @@ public class ColorChooserController implements ConfigNodePersistent {
 		@Override
 		public void mouseDragged(final MouseEvent e) {
 
-			colorPicker.getThumbBox().setThumbPosition(e.getX());
+			colorPicker.getThumbBox().moveThumbTo(e.getX());
 		}
 
 		@Override
@@ -347,8 +346,10 @@ public class ColorChooserController implements ConfigNodePersistent {
 		
 		ThumbBox tb = colorPicker.getThumbBox();
 		
+		boolean isBoundary = tb.isSelectedBoundaryThumb();
 		boolean isEditAllowed = tb.hasSelectedThumb();
-		boolean isRemoveAllowed = isEditAllowed 
+		boolean isRemoveAllowed = !isBoundary
+				&& isEditAllowed 
 				&& colorPicker.getThumbNumber() > 2;
 		colorChooserUI.setSelectionDependentBtnStatus(isEditAllowed, 
 				isRemoveAllowed);
@@ -380,14 +381,17 @@ public class ColorChooserController implements ConfigNodePersistent {
 			if (selected.equalsIgnoreCase("RedGreen")) {
 				/* Switch to RedGreen */
 				colorSetName = "RedGreen";
+				colorChooserUI.setCustomSelected(false);
 
 			} else if (selected.equalsIgnoreCase("YellowBlue")) {
 				/* Switch to YellowBlue */
 				colorSetName = "YellowBlue";
+				colorChooserUI.setCustomSelected(false);
 
 			} else {
 				/* Switch to Custom */
 				colorSetName = "Custom";
+				colorChooserUI.setCustomSelected(true);
 			}
 
 			switchColorSet(colorSetName);

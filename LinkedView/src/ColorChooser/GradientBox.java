@@ -6,14 +6,10 @@ import java.awt.LinearGradientPaint;
 import java.awt.MultipleGradientPaint.CycleMethod;
 import java.awt.Point;
 import java.awt.geom.Rectangle2D;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JColorChooser;
 import javax.swing.JPanel;
-
-import Utilities.Helper;
-import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
  * A special JPanel that represents a gradient colored box. It has a
@@ -85,13 +81,33 @@ public class GradientBox {
 	 */
 	protected void addColor(final Color newCol) {
 		
-		List<Thumb> thumbs = colorPicker.getThumbList();
 		float[] fractions = colorPicker.getFractions();
 		
-		/* find largest diff between fractions */
+		/* find largest diff between fractions and set index there */
+		int newColIndex = findAddIndex(fractions);
+
+		final float halfDiff = (fractions[newColIndex + 1] 
+				- fractions[newColIndex]) / 2;
+		final float addFrac = fractions[newColIndex] + halfDiff;
+
+		colorPicker.getColorList().add(newColIndex + 1, newCol);
+		colorPicker.getThumbBox().insertThumbAt(addFrac, newCol);
+
+		colorPicker.updateFractions();
+		colorPicker.updateColors();
+	}
+	
+	/**
+	 * Serves to find the largest space between fractions where a thumb can
+	 * be inserted.
+	 * @param fractions
+	 */
+	private static int findAddIndex(float[] fractions) {
+		
 		int newColIndex = 0;
 		float maxDiff = 0.0f;
-		for(int i = 1; i < fractions.length - 1; i++) {
+		
+		for(int i = 0; i < fractions.length - 1; i++) {
 			
 			float diff = fractions[i + 1] - fractions[i];
 			if(diff > maxDiff) {
@@ -100,37 +116,7 @@ public class GradientBox {
 			}
 		}
 		
-		final float halfDiff = (fractions[newColIndex + 1] 
-				- fractions[newColIndex]) / 2;
-		final float addFrac = fractions[newColIndex] + halfDiff;
-		
-		float[] newFractions = new float[fractions.length + 1];
-		
-		/** TODO avoid this.... 
-		 * break method into smaller methods...*/
-		newColIndex++;
-		
-		int j = 0;
-		for(int i = 0; i < newFractions.length; i++) {
-			
-			if(i == newColIndex) {
-				newFractions[i] = addFrac;
-				continue;
-			}
-			newFractions[i] = fractions[j++];
-		}
-
-		colorPicker.getColorList().add(newColIndex, newCol);
-		colorPicker.getThumbBox().insertThumbAt(addFrac, newCol);
-		colorPicker.setFractions(newFractions);
-
-		if (thumbs.size() != fractions.length) {
-			System.out.println("ThumbList size (" + thumbs.size()
-					+ ") and fractions size (" + fractions.length
-					+ ") are different in addColor()!");
-		}
-
-		colorPicker.updateColors();
+		return newColIndex;
 	}
 	
 	/**
@@ -138,11 +124,9 @@ public class GradientBox {
 	 */
 	protected void removeColor() {
 
-		float[] fractions = colorPicker.getFractions();
 		List<Thumb> thumbs = colorPicker.getThumbList();
 		List<Color> colorList = colorPicker.getColorList();
 		int removeIndex = 0;
-		boolean updated = false;
 		
 		for (final Thumb t : thumbs) {
 
@@ -151,34 +135,14 @@ public class GradientBox {
 				thumbs.remove(removeIndex);
 				colorList.remove(removeIndex);
 				colorPicker.getThumbBox().setSelectedThumb(null);
-				updated = true;
 				break;
 			}
 		}
-
-		if(updated) {
-			/* update fractions */
-			float[] newFractions = new float[fractions.length - 1];
-			
-			int j = 0;
-			for(int i = 0; i < fractions.length; i++) {
-				
-				if(i == removeIndex) {
-					continue;
-				}
-				newFractions[j++] = fractions[i];
-			}
-	
-			if (thumbs.size() != fractions.length) {
-				System.out.println("ThumbList size (" + thumbs.size()
-						+ ") and fractions size (" + fractions.length
-						+ ") are different in removeColor()!");
-			}
-	
-			colorPicker.setFractions(newFractions);
-			colorPicker.updateColors();
-		}
+		
+		colorPicker.updateFractions();
+		colorPicker.updateColors();
 	}
+	
 	
 	/**
 	 * Changes the gradient color in the area the mouse was clicked on.

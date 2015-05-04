@@ -17,6 +17,8 @@ public class Thumb {
 
 	protected int x;
 	protected int y;
+	
+	protected double dataVal;
 
 	/* Thumb dimensions */
 	protected int width = 12;
@@ -51,6 +53,24 @@ public class Thumb {
 
 		this.thumbColor = color;
 		setCoords(x, y);
+	}
+	
+	/**
+	 * Sets the data value which the thumb represents on the gradient. 
+	 * @param dataVal
+	 */
+	public void setDataValue(final double dataVal) {
+		
+		this.dataVal = dataVal;
+	}
+	
+	/**
+	 * Accessor for the thumb's associated data value.
+	 * @return
+	 */
+	public double getDataValue() {
+		
+		return dataVal;
 	}
 
 	/**

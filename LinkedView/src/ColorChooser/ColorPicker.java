@@ -64,11 +64,6 @@ public class ColorPicker {
 		this.thumbList = new ArrayList<Thumb>();
 		this.colorList = new ArrayList<Color>();
 		
-		/* data range */
-		this.minVal = minVal;
-		this.maxVal = maxVal;
-		this.range = maxVal - minVal;
-		
 		this.minThumb = new BoundaryThumb(true);
 		this.maxThumb = new BoundaryThumb(false);
 		
@@ -80,7 +75,10 @@ public class ColorPicker {
 		this.rulerBox = new RulerBox();
 		this.minBox = new BoundaryBox(this, minThumb, true);
 		this.maxBox = new BoundaryBox(this, maxThumb, false);
-
+		
+		setMinVal(minVal);
+		setMaxVal(maxVal);
+		updateRange();
 	}
 	
 	public JPanel getContainerPanel() {
@@ -183,34 +181,6 @@ public class ColorPicker {
 		return new ColorSet(name, colorList, fractionList, missing, empty);
 	}
 	
-	protected void syncToFractions() {
-		
-		/* clearing all data */
-		colorList.clear();
-		thumbList.clear();
-		
-		thumbList.add(minThumb);
-		thumbList.add(maxThumb);
-
-		final String[] colors = activeColorSet.getColors();
-		
-		if(colors.length != fractions.length) {
-			LogBuffer.println("Fractions not in sync with saved colors.");
-			return;
-		}
-
-		for (final String color : colors) {
-
-			colorList.add(Color.decode(color));
-		}
-		
-		updateBoundaryColors();
-		updateColorArray();
-		thumbBox.verifyThumbs();
-
-//		fractions = colorSet.getFractions();
-	}
-	
 	/**
 	 * Sets the color in colors[] at the specified index.
 	 *
@@ -248,9 +218,23 @@ public class ColorPicker {
 		maxThumb.setColor(colorList.get(getColorNumber() - 1));
 	}
 	
-	protected void updateThumbList() {
+	/**
+	 * Adjusts the fractions to new data values.
+	 * @param dataValues
+	 */
+	protected void updateFractions() {
 		
+		float[] newFractions = new float[thumbList.size()];
 		
+		for(int i = 0; i < newFractions.length; i++) {
+			double dataVal = thumbList.get(i).getDataValue();
+			double diff = Math.abs(dataVal - minVal);
+			final float frac = (float) (diff / (range));
+			
+			newFractions[i] = frac;
+		}
+		
+		setFractions(newFractions);
 	}
 	
 	/**
@@ -316,11 +300,27 @@ public class ColorPicker {
 	protected void setMinVal(double minVal) {
 		
 		this.minVal = minVal;
+		minThumb.setDataValue(minVal);
+		updateRange();
+		
+		updateFractions();
 	}
 	
 	protected void setMaxVal(double maxVal) {
 		
 		this.maxVal = maxVal;
+		maxThumb.setDataValue(maxVal);
+		updateRange();
+		
+		updateFractions();
+	}
+	
+	/**
+	 * Updates the range.
+	 */
+	private void updateRange() {
+		
+		this.range = maxVal - minVal;
 	}
 	
 	/**
@@ -357,6 +357,21 @@ public class ColorPicker {
 		}
 		
 		return range;
+	}
+	
+	/**
+	 * Turns a fraction into a data value.
+	 * @param frac
+	 * @return
+	 */
+	protected double getDataFromFraction(float frac) {
+		
+		double dataVal;
+		
+		dataVal = Math.abs((range) * frac) + minVal;
+		dataVal = (double) Math.round(dataVal * 1000) / 1000;
+		
+		return dataVal;
 	}
 	
 	/**
@@ -421,5 +436,17 @@ public class ColorPicker {
 	protected Color[] getColors() {
 		
 		return colors;
+	}
+	
+	/**
+	 * The color, fraction, and thumb list should always be the same size.
+	 * This method gives information whether this condition is currently
+	 * fulfilled.
+	 * @return boolean
+	 */
+	protected boolean isSynced() {
+		
+		return (fractions.length == colorList.size())
+				&& (colorList.size() == thumbList.size());
 	}
 }

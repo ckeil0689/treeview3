@@ -92,9 +92,7 @@ public class ThumbBox {
 
 		for (int i = 1; i < fractions.length - 1; i++) {
 
-			if (!hasThumbForFraction(i)
-					&& !((colorPicker.getThumbNumber() == colorPicker.getColorNumber()) 
-							&& colorPicker.getThumbNumber() == fractions.length)) {
+			if (!hasThumbForFraction(i) && !colorPicker.isSynced()) {
 				insertThumbAt(fractions[i], colorPicker.getColorList().get(i));
 			}
 		}
@@ -109,6 +107,7 @@ public class ThumbBox {
 	 */
 	protected void insertThumbAt(final float frac, final Color color) {
 
+		LogBuffer.println("Inserting thumb.");
 		final int offset = (int) thumbRect.getMinX();
 		final int x = offset +  (int) (frac * thumbRect.getWidth());
 		
@@ -122,8 +121,12 @@ public class ThumbBox {
 		}
 
 		final int y = (int) (thumbRect.getHeight());
-		thumbs.add(index, new Thumb(x, y, color));
+		double dataValue = colorPicker.getDataFromFraction(frac);
 		
+		Thumb newThumb = new Thumb(x, y, color);
+		newThumb.setDataValue(dataValue);
+		
+		thumbs.add(index, newThumb);
 		colorPicker.setThumbList(thumbs);
 	}
 
@@ -146,88 +149,94 @@ public class ThumbBox {
 	 * sliding thumbs.
 	 * @param inputX New x-coordinate of the selected thumb.
 	 */
-	protected void setThumbPosition(int inputX) {
-
-		/* adjust offset */
-		inputX -= (int) thumbRect.getMinX();
+	protected void moveThumbTo(int inputX) {
 		
-		if (selectedThumb == null) {
+		if (selectedThumb == null
+				|| inputX < (int) thumbRect.getMinX()
+				|| inputX > (int) thumbRect.getMaxX()) {
 			return;
 		}
 		
-		float newFrac = inputX / (float) thumbRect.getWidth();
+		/* adjust offset */
+		inputX -= (int) thumbRect.getMinX();
 		
-		updateFracsForThumbPos(newFrac);
+		float newFrac = inputX / (float) thumbRect.getWidth();
+		double dataVal = colorPicker.getDataFromFraction(newFrac);
+		
+		updateThumbDataVal(dataVal);
 	}
 	
 	/**
-	 * TODO fractions cannot be dependent on thumb x-coords because a full
-	 * data range does not fit into 430 pixels which is the width of the color
-	 * gradient box. (-> obv. can only represent 430 data points). Separate
-	 * fractions from thumb x-coords and keep thumbList + fractions synced!!
+	 * TODO copy function but using data values. Then implement function to
+	 * derive fractions from data values. Possibly give each thumb a state
+	 * variable for its represented data value.
+	 * 
+	 * derive new position from input data val, not input fractions val.
 	 * @param inputX
 	 */
-	protected void updateFracsForThumbPos(final float inputFrac) {
+	protected void updateThumbDataVal(final double inputData) {
 
 		/* Stay between boundaries */
 		if (selectedThumb == null
-				|| (inputFrac < 0.0 || inputFrac > 1.0)) {
+				|| inputData < colorPicker.getMinVal()
+				|| inputData > colorPicker.getMaxVal()) {
 			return;
 		}
 		
 		/* Cannot move to boundary fractions */
-		if(Helper.nearlyEqual(0.0, inputFrac)
-				|| Helper.nearlyEqual(1.0, inputFrac)) {
+		if(Helper.nearlyEqual(colorPicker.getMinVal(), inputData)
+				|| Helper.nearlyEqual(colorPicker.getMaxVal(), inputData)) {
 			return;
 		}
 		
-		float[] fractions = colorPicker.getFractions();
+		double[] thumbDataVals = new double[colorPicker.getThumbNumber()];
+		
+		for(int i = 0; i < thumbDataVals.length; i++) {
+			
+			thumbDataVals[i] = getThumbDataVal(i);
+		}
+		
 
 		/* get position of previous thumb */
-		final int selectedIndex = colorPicker.getThumbList()
-				.indexOf(selectedThumb);
+		List<Thumb> thumbs = colorPicker.getThumbList();
+		final int selectedIndex = thumbs.indexOf(selectedThumb);
 		
 		/* define the boundaries around active thumb's fraction */
-		float selectedFrac = fractions[selectedIndex];
-		
 		/* defined out of range in case no previous/ next thumb exists */
-		float previousFrac = -1.0f;
-		float nextFrac = 2.0f;
+		double previousData = colorPicker.getMinVal();
+		double nextData = colorPicker.getMaxVal();
 		
+		/* cannot move boundary thumbs */
 		if (selectedIndex == 0) {
-			nextFrac = fractions[selectedIndex + 1];
+			return;
 
 		} else if (selectedIndex == colorPicker.getThumbNumber() - 1) {
-			previousFrac = fractions[selectedIndex - 1];
+			return;
 
 		} else {
-			previousFrac = fractions[selectedIndex - 1];
-			nextFrac = fractions[selectedIndex + 1];
+			previousData = thumbDataVals[selectedIndex - 1];
+			nextData = thumbDataVals[selectedIndex + 1];
 		}
-
-		/* get updated x-values */
-		final float deltaFrac = inputFrac - selectedFrac;
-		final float newFrac = selectedFrac + deltaFrac;
 
 		/* set new thumb position and check for boundaries/ other thumbs */
-		if ((previousFrac < newFrac && newFrac < nextFrac)) {
-			fractions[selectedIndex] = newFrac;
+		if ((previousData < inputData && inputData < nextData)) {
+			thumbs.get(selectedIndex).setDataValue(inputData);
 
-		} else if (newFrac < previousFrac && !Helper.nearlyEqual(previousFrac, 
-				0.0)) {
+		} else if (inputData < previousData && !Helper.nearlyEqual(previousData, 
+				colorPicker.getMinVal())) {
 			colorPicker.swapPositions(selectedIndex, selectedIndex - 1);
 			
-			fractions[selectedIndex] = fractions[selectedIndex - 1];
-			fractions[selectedIndex - 1] = newFrac;
+			thumbs.get(selectedIndex).setDataValue(previousData);
+			thumbs.get(selectedIndex - 1).setDataValue(inputData);
 
-		} else if (newFrac > nextFrac && nextFrac < 1.0) {
+		} else if (inputData > nextData && nextData < colorPicker.getMaxVal()) {
 			colorPicker.swapPositions(selectedIndex, selectedIndex + 1);
 			
-			fractions[selectedIndex] = fractions[selectedIndex + 1];
-			fractions[selectedIndex + 1] = newFrac;
+			thumbs.get(selectedIndex).setDataValue(nextData);
+			thumbs.get(selectedIndex + 1).setDataValue(inputData);
 		}
 
-		colorPicker.setFractions(fractions);
+		colorPicker.updateFractions();
 		colorPicker.updateColors();
 	}
 
@@ -266,21 +275,32 @@ public class ThumbBox {
 	 */
 	protected void adjustThumbsToFractions() {
 		
-		final int x = (int) thumbRect.getMinX();
-		final int w = (int) thumbRect.getWidth();
-		
 		float[] fractions = colorPicker.getFractions();
 
 		for (int i = 0; i < fractions.length; i++) {
-
-			// Avoid rounding errors when casting to int
-			final double widthFactor = Math.round(w * fractions[i]);
-			final int pos = x + (int) (widthFactor);
+			
+			final int pos = getPosFromFraction(fractions[i]);
 			
 			Thumb t = colorPicker.getThumb(i);
 			t.setCoords(pos, t.getY());
-
 		}
+	}
+	
+	/**
+	 * Turns a fraction into a data value.
+	 * @param frac
+	 * @return
+	 */
+	protected int getPosFromFraction(float frac) {
+		
+		int x = (int) getThumbRect().getMinX();
+		int w = (int) getThumbRect().getWidth();
+		
+		// Avoid rounding errors when casting to int
+		final double widthFactor = Math.round(w * frac);
+		final int pos = x + (int) (widthFactor);
+		
+		return pos;
 	}
 	
 	/**
@@ -295,6 +315,8 @@ public class ThumbBox {
 		double dataVal = posInputDialog.showDialog(
 				colorPicker.getContainerPanel());
 		
+		t.setDataValue(dataVal);
+
 		alignThumbWithDataVal(dataVal);
 	}
 	
@@ -307,7 +329,7 @@ public class ThumbBox {
 		
 		double minVal = colorPicker.getMinVal();
 		double maxVal = colorPicker.getMaxVal();
-		double range = colorPicker.getRange();
+//		double range = colorPicker.getRange();
 		
 		/* TODO adapt range if values are outside */
 		if (dataVal < minVal) {
@@ -317,11 +339,7 @@ public class ThumbBox {
 			colorPicker.setMaxVal(dataVal);
 			
 		} else {
-
-			double diff = Math.abs(dataVal - minVal);
-			final float fraction = (float) (diff / (range));
-			
-			updateFracsForThumbPos(fraction);
+			updateThumbDataVal(dataVal);
 		}
 	}
 	
@@ -473,6 +491,20 @@ public class ThumbBox {
 	protected boolean hasSelectedThumb() {
 		
 		return (selectedThumb != null);
+	}
+	
+	/**
+	 * Gives information whether the currently selected thumb is a boundary
+	 * thumb or not.
+	 * @return
+	 */
+	protected boolean isSelectedBoundaryThumb() {
+		
+		/* could be done with instanceof but rather not... */
+		int thumbNum = colorPicker.getThumbNumber();
+		int selectedIndex = getSelectedThumbIndex();
+		
+		return selectedIndex == 0 || selectedIndex == thumbNum - 1;
 	}
 }
 
