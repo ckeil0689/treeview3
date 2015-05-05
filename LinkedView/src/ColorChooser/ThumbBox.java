@@ -8,8 +8,6 @@ import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 import java.util.List;
-
-import edu.stanford.genetics.treeview.LogBuffer;
 import Utilities.GUIFactory;
 import Utilities.Helper;
 
@@ -270,14 +268,16 @@ public class ThumbBox {
 		while(iter.hasNext()) {
 			
 			Thumb t = iter.next();
-			
-			if(isMin && t.getDataValue() < boundaryData) {
+			double tData = t.getDataValue();
+			if(isMin && (tData < boundaryData
+					|| Helper.nearlyEqual(tData, boundaryData))) {
 				colorPicker.getColorList().remove(thumbs.indexOf(t));
 				iter.remove();
 				removed++;
 			} 
 			
-			if(!isMin && t.getDataValue() > boundaryData) {
+			if(!isMin && (tData > boundaryData
+					|| Helper.nearlyEqual(tData, boundaryData))) {
 				colorPicker.getColorList().remove(thumbs.indexOf(t));
 				iter.remove();
 				removed++;
