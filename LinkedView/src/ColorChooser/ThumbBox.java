@@ -112,7 +112,7 @@ public class ThumbBox {
 		
 		List<Thumb> thumbs = colorPicker.getThumbList();
 
-		final int y = (int) (thumbRect.getHeight());
+		final int y = ColorPicker.THUMB_HEIGHT;
 		double dataValue = colorPicker.getDataFromFraction(frac);
 		
 		Thumb newThumb = new Thumb(x, y, color);

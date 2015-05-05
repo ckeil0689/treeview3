@@ -20,6 +20,7 @@ public class ColorPicker {
 	/* Adjust this to MigLayout variables of mainPanel! */
 	protected static final int WIDTH = 510;
 	protected static final int OFFSET = 70;
+	protected static final int THUMB_HEIGHT = 40;
 	
 	private final JPanel containerPanel;
 	
@@ -142,7 +143,6 @@ public class ColorPicker {
 		/* clearing all data */
 		colorList.clear();
 		thumbList.clear();
-//		resetFractions();
 		
 		thumbList.add(minThumb);
 		thumbList.add(maxThumb);
@@ -159,9 +159,6 @@ public class ColorPicker {
 		}
 		
 		setFractions(activeColorSet.getFractions());
-		
-//		updateBoundaryColors();
-//		updateColorArray();
 		updateColors();
 	}
 	
@@ -268,14 +265,6 @@ public class ColorPicker {
 		thumbBox.verifyThumbs();
 		thumbBox.adjustThumbsToFractions();
 	}
-	
-//	/**
-//	 * Resets the fractions float[] to a default value with 3 colors.
-//	 */
-//	protected void resetFractions() {
-//
-//		this.fractions = activeColorSet.getFractions();
-//	}
 	
 	/*
 	 * Updates the color array when needed so LinearGradientPaint can use it to
