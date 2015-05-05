@@ -1,11 +1,12 @@
 package edu.stanford.genetics.treeview;
 
-import java.awt.Frame;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
@@ -24,6 +25,11 @@ import Utilities.StringRes;
  */
 public class AboutDialog extends CustomDialog {
 
+	/**
+	 * Default serial version ID to keep Eclipse happy...
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	private final TreeViewFrame tvFrame;
 
 	public AboutDialog(final TreeViewFrame tvFrame) {
@@ -33,9 +39,9 @@ public class AboutDialog extends CustomDialog {
 
 		setupLayout();
 
-		dialog.add(mainPanel);
-		dialog.pack();
-		dialog.setLocationRelativeTo(Frame.getFrames()[0]);
+//		dialog.pack();
+//		dialog.setLocationRelativeTo(JFrame.getFrames()[0]);
+
 	}
 
 	/**
@@ -102,8 +108,5 @@ public class AboutDialog extends CustomDialog {
 			}
 		});
 		detailPanel.add(yesB, "wrap");
-
-		contentPanel.add(detailPanel, "push, grow");
-		mainPanel.add(contentPanel, "push, grow");
 	}
 }

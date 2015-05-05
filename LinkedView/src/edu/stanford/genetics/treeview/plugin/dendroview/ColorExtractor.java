@@ -95,9 +95,13 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 		setLogBase(2.0);
 	}
 
-	public void setMinMax(final double min, final double max) {
+	public void setMin(final double min) {
 
 		this.dataMin = min;
+	}
+	
+	public void setMax(final double max) {
+
 		this.dataMax = max;
 	}
 

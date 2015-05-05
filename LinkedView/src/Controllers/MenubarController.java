@@ -76,7 +76,8 @@ public class MenubarController {
 			controller.openPrefMenu(name);
 			break;
 		case StringRes.menu_Color:
-			controller.openPrefMenu(name);
+//			controller.openPrefMenu(name);
+			controller.openColorMenu();
 			break;
 //		case StringRes.menu_Font:
 //			controller.openPrefMenu(name);

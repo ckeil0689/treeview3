@@ -5,25 +5,143 @@ import java.awt.Cursor;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.prefs.Preferences;
 
 import javax.swing.JColorChooser;
+import javax.swing.JComboBox;
 import javax.swing.Timer;
 
-public class ColorChooserController {
+import edu.stanford.genetics.treeview.ConfigNodePersistent;
+import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets;
+import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
+import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
+
+public class ColorChooserController implements ConfigNodePersistent {
 
 	public static final Integer DEFAULT_MULTI_CLICK_INTERVAL = 300;
-	private final ColorChooser gradientPick;
-	private final GradientBox gradientBox;
+	private final ColorChooserUI colorChooserUI;
+	private final ColorPicker colorPicker;
+	
+	/* Node for saved data */
+	private Preferences configNode;
+	
+	/* Holds all preset color data */
+	private final ColorPresets colorPresets;
 
-	public ColorChooserController(final ColorChooser gradientPick) {
+	public ColorChooserController(final ColorChooserUI colorChooserUI) {
 
-		this.gradientPick = gradientPick;
-		this.gradientBox = gradientPick.getGradientBox();
-
+		this.colorChooserUI = colorChooserUI;
+		this.colorPicker = colorChooserUI.getColorPicker();
+		this.colorPresets = DendrogramFactory.getColorPresets();
+		
 		addAllListeners();
+	}
+	
+	/**
+	 * Adds all defined listeners to the ColorGradientChooser object.
+	 */
+	private void addAllListeners() {
+		
+		if (colorChooserUI != null) {
+			colorChooserUI.addThumbSelectListener(new ThumbSelectListener());
+			colorChooserUI.addThumbMotionListener(new ThumbMotionListener());
+			colorChooserUI.addAddListener(new AddButtonListener());
+			colorChooserUI.addRemoveListener(new RemoveButtonListener());
+			colorChooserUI.addPresetChoiceListener(new ColorSetListener());
+			colorChooserUI.addMissingListener(new MissingBtnListener());
+			colorChooserUI.addEditListener(new EditButtonListener());
+			colorChooserUI.addDialogCloseListener(new WindowCloseListener());
+		}
+	}
+	
+	@Override
+	public void setConfigNode(final Preferences parentNode) {
+
+		if (parentNode != null) {
+			this.configNode = parentNode.node("GradientChooser");
+			setPresets();
+			colorChooserUI.getColorPicker().loadPresets();
+
+		} else {
+			LogBuffer.println("Could not find or create GradientChooser "
+					+ "node because parentNode was null.");
+		}
+	}
+	
+	/**
+	 * Set all default color values.
+	 */
+	protected void setPresets() {
+
+		final String defaultColors = "RedGreen";
+
+		/* Get the active ColorSet name */
+		String colorScheme = defaultColors;
+		if (configNode != null) {
+			colorScheme = configNode.get("activeColors", defaultColors);
+		}
+
+		/* Choose ColorSet according to name */
+		final ColorSet selectedColorSet;
+		if (colorScheme.equalsIgnoreCase("Custom")) {
+			colorChooserUI.getPresetChoices().setSelectedItem("Custom");
+			selectedColorSet = colorPresets.getColorSet(colorScheme);
+
+		} else if (colorScheme.equalsIgnoreCase(defaultColors)) {
+			colorChooserUI.getPresetChoices().setSelectedItem("RedGreen");
+			selectedColorSet = colorPresets.getColorSet(colorScheme);
+
+		} else if (colorScheme.equalsIgnoreCase("YellowBlue")) {
+			colorChooserUI.getPresetChoices().setSelectedItem("YellowBlue");
+			selectedColorSet = colorPresets.getColorSet("YellowBlue");
+
+		} else {
+			/* Should never get here */
+			selectedColorSet = null;
+			LogBuffer.println("No matching ColorSet found in "
+					+ "ColorGradientChooser.setPresets()");
+		}
+
+		colorChooserUI.getColorPicker().setActiveColorSet(selectedColorSet);
+	}
+	
+	/**
+	 * Saves the current colors and fractions as a ColorSet to the configNode.
+	 */
+	private void saveStatus() {
+
+		ColorSet colorSet = colorChooserUI.getColorPicker()
+					.saveCustomPresets();
+		colorPresets.addColorSet(colorSet);
+	}
+	
+	public void setActiveColorSet(final String name) {
+
+		final ColorSet set = colorPresets.getColorSet(name);
+		colorChooserUI.getColorPicker().setActiveColorSet(set);
+		
+		if("Custom".equals(name)) {
+			colorChooserUI.getPresetChoices().setSelectedItem("Custom");
+		}
+
+		configNode.put("activeColors", name);
+	}
+	
+	/**
+	 * Switched the currently used ColorSet to the one that matches the
+	 * specified entered name key in its 'ColorSet' configNode.
+	 */
+	public void switchColorSet(final String name) {
+
+		setActiveColorSet(name);
+		
+		/* Load and set data accordingly */
+		colorChooserUI.getColorPicker().loadPresets();
 	}
 
 	/**
@@ -39,21 +157,18 @@ public class ColorChooserController {
 
 		return multiClickInterval;
 	}
+	
+	private class WindowCloseListener extends WindowAdapter {
+		
+		@Override
+		public void windowClosed(final WindowEvent e) {
 
-	/**
-	 * Adds all defined listeners to the ColorGradientChooser object.
-	 */
-	private void addAllListeners() {
-
-		if (gradientPick != null) {
-			gradientPick.addThumbSelectListener(new ThumbSelectListener());
-			gradientPick.addThumbMotionListener(new ThumbMotionListener());
-			gradientPick.addAddListener(new AddButtonListener());
-			gradientPick.addRemoveListener(new RemoveButtonListener());
-			gradientPick.addColorSetListener(new ColorSetListener());
-			gradientPick.addMissingListener(new MissingBtnListener());
+			if (colorChooserUI.isCustomSelected()) {
+				saveStatus();
+			}
 		}
 	}
+	
 
 	/**
 	 * This listener specifically defines what happens when a user clicks on a
@@ -62,7 +177,8 @@ public class ColorChooserController {
 	 * @author CKeil
 	 *
 	 */
-	private class ThumbSelectListener implements MouseListener, ActionListener {
+	private class ThumbSelectListener extends MouseAdapter 
+	implements ActionListener {
 
 		private final Timer timer;
 		private MouseEvent lastEvent;
@@ -76,16 +192,27 @@ public class ColorChooserController {
 		 * Specifies what happens when a single click is performed by the user.
 		 */
 		private void clickOrPress() {
+	
+			GradientBox gBox = colorPicker.getGradientBox();
 
-			if (gradientPick.isCustomSelected()) {
-				if (gradientBox.isGradientArea(lastEvent.getPoint())) {
-					gradientBox.changeColor(lastEvent.getPoint());
-					gradientPick.setActiveColorSet("Custom");
+			if (gBox.isGradientArea(lastEvent.getPoint())) {
+				/* loading new presets erases selected thumb... */
+				int selectedThumb = colorPicker.getThumbBox()
+						.getSelectedThumbIndex();
+				gBox.changeColor(lastEvent.getPoint());
+				colorChooserUI.setCustomSelected(true);
+				setActiveColorSet("Custom");
+				Thumb t_selected = colorPicker.getThumb(selectedThumb);
+				colorPicker.getThumbBox().setSelectedThumb(t_selected);
+//				colorPicker.getThumb(selectedThumb).setSelected(true);
 
-				} else {
-					gradientBox.deselectAllThumbs();
-					gradientBox.selectThumb(lastEvent.getPoint());
-				}
+			} else {
+				ThumbBox tb = colorPicker.getThumbBox();
+				tb.deselectAllThumbs();
+				
+				tb.selectThumbAtPoint(lastEvent.getPoint());
+				
+				updateSelectionBtnStatus();	
 			}
 		}
 
@@ -94,9 +221,7 @@ public class ColorChooserController {
 		 */
 		private void doubleClick() {
 
-			if (gradientPick.isCustomSelected()) {
-				gradientBox.setThumbPosition(lastEvent.getPoint());
-			}
+			colorPicker.getThumbBox().editClickedThumb(lastEvent.getPoint());			
 		}
 
 		@Override
@@ -116,22 +241,10 @@ public class ColorChooserController {
 		}
 
 		@Override
-		public void mouseEntered(final MouseEvent e) {
-		}
-
-		@Override
-		public void mouseExited(final MouseEvent e) {
-		}
-
-		@Override
 		public void mousePressed(final MouseEvent e) {
 
 			lastEvent = e;
 			clickOrPress();
-		}
-
-		@Override
-		public void mouseReleased(final MouseEvent e) {
 		}
 
 		@Override
@@ -149,26 +262,38 @@ public class ColorChooserController {
 	 * @author CKeil
 	 *
 	 */
-	private class ThumbMotionListener implements MouseMotionListener {
+	private class ThumbMotionListener extends MouseAdapter {
 
+		private boolean dragged = false;
+		
 		@Override
 		public void mouseDragged(final MouseEvent e) {
 
-			if (gradientPick.isCustomSelected()) {
-				gradientBox.updateThumbPos(e.getX());
-			}
+			dragged = true;
+			colorPicker.getThumbBox().moveThumbTo(e.getX());
 		}
 
 		@Override
 		public void mouseMoved(final MouseEvent e) {
 
-			if (gradientPick.isCustomSelected()) {
-				if (gradientBox.containsThumb(e.getX(), e.getY())) {
-					gradientBox.setCursor(new Cursor(Cursor.HAND_CURSOR));
+			Cursor cursor;
+			if (colorPicker.getThumbBox().isPointInThumb(e.getPoint())) {
+				cursor = new Cursor(Cursor.HAND_CURSOR);
 
-				} else {
-					gradientBox.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-				}
+			} else {
+				cursor = new Cursor(Cursor.DEFAULT_CURSOR);
+			}
+		
+			colorPicker.getContainerPanel().setCursor(cursor);
+		}
+		
+		@Override
+		public void mouseReleased(final MouseEvent e) {
+			
+			if(!colorChooserUI.isCustomSelected() && dragged) {
+				colorChooserUI.setCustomSelected(true);
+				setActiveColorSet("Custom");
+				dragged = false;
 			}
 		}
 	}
@@ -184,12 +309,29 @@ public class ColorChooserController {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			final Color newCol = JColorChooser.showDialog(gradientBox,
+			final Color newCol = JColorChooser.showDialog(
+					colorPicker.getContainerPanel(), 
 					"Pick a Color", Color.black);
 
 			if (newCol != null) {
-				gradientBox.addColor(newCol);
+				colorPicker.getGradientBox().addColor(newCol);
+				updateSelectionBtnStatus();
 			}
+		}
+	}
+	
+	/**
+	 * Removes a color from colorList in the gradientBox.
+	 *
+	 * @author chris0689
+	 *
+	 */
+	private class EditButtonListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+
+			colorPicker.getThumbBox().editSelectedThumb();
 		}
 	}
 
@@ -204,10 +346,24 @@ public class ColorChooserController {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			if (gradientBox.getColorListSize() > 2) {
-				gradientBox.removeColor();
+			if (colorPicker.getColorList().size() > 2) {
+				colorPicker.getGradientBox().removeColor();
+				colorChooserUI.setSelectionDependentBtnStatus(false, false);
 			}
 		}
+	}
+	
+	private void updateSelectionBtnStatus() {
+		
+		ThumbBox tb = colorPicker.getThumbBox();
+		
+		boolean isBoundary = tb.isSelectedBoundaryThumb();
+		boolean isEditAllowed = tb.hasSelectedThumb();
+		boolean isRemoveAllowed = !isBoundary && isEditAllowed 
+				&& colorPicker.getThumbNumber() > 2;
+				
+		colorChooserUI.setSelectionDependentBtnStatus(isEditAllowed, 
+				isRemoveAllowed);
 	}
 
 	/**
@@ -221,32 +377,35 @@ public class ColorChooserController {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			boolean isCustom = gradientPick.isCustomSelected();
+			boolean isCustom = colorChooserUI.isCustomSelected();
 			String colorSetName = "";
 
 			/* Save if switching from 'Custom' */
 			if (isCustom) {
-				gradientPick.saveStatus();
+				saveStatus();
 			}
+			
+			@SuppressWarnings("unchecked")
+			String selected = (String) ((JComboBox<String>) arg0.getSource())
+					.getSelectedItem();
 
-			if (arg0.getSource() == gradientPick.getRGButton()) {
+			if (selected.equalsIgnoreCase("RedGreen")) {
 				/* Switch to RedGreen */
 				colorSetName = "RedGreen";
-				isCustom = false;
+				colorChooserUI.setCustomSelected(false);
 
-			} else if (arg0.getSource() == gradientPick.getYBButton()) {
+			} else if (selected.equalsIgnoreCase("YellowBlue")) {
 				/* Switch to YellowBlue */
 				colorSetName = "YellowBlue";
-				isCustom = false;
+				colorChooserUI.setCustomSelected(false);
 
 			} else {
 				/* Switch to Custom */
 				colorSetName = "Custom";
-				isCustom = true;
+				colorChooserUI.setCustomSelected(true);
 			}
 
-			gradientPick.switchColorSet(colorSetName);
-			gradientPick.setCustomSelected(isCustom);
+			switchColorSet(colorSetName);
 		}
 	}
 
@@ -254,16 +413,26 @@ public class ColorChooserController {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
+			
+			final Color missing = JColorChooser.showDialog(
+					colorChooserUI.getMainPanel(), "Pick Color for Missing",
+					colorPicker.getMissing());
 
-			if (gradientPick.isCustomSelected()) {
-				final Color missing = JColorChooser.showDialog(
-						gradientPick.getMainPanel(), "Pick Color for Missing",
-						gradientBox.getMissing());
-
-				if (missing != null) {
-					gradientBox.setMissing(missing);
-				}
+			if (missing != null) {
+				colorPicker.setMissing(missing);
+				/* update the color icon */
+				colorChooserUI.updateMissingColorIcon(missing);
 			}
 		}
+	}
+	
+	protected Preferences getConfigNode() {
+
+		return configNode;
+	}
+	
+	protected ColorSet getColorSet(final String name) {
+
+		return colorPresets.getColorSet(name);
 	}
 }

@@ -3,7 +3,6 @@ package edu.stanford.genetics.treeview;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentListener;
 import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
@@ -14,7 +13,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
-import ColorChooser.ColorChooser;
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
 import Utilities.StringRes;
@@ -32,14 +30,18 @@ import edu.stanford.genetics.treeview.plugin.dendroview.FontSettings;
 public class PreferencesMenu extends CustomDialog implements
 ConfigNodePersistent {
 
+	/**
+	 * Default serial version ID to keep Eclipse happy...
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	private final TreeViewFrame tvFrame;
 	private HeaderInfo geneHI;
 	private HeaderInfo arrayHI;
 	private Preferences configNode;
 
 	private final DendroView dendroView;
-	private ColorChooser gradientPick;
-	private JButton ok_btn;
+	private JButton okBtn;
 
 	// Menus
 	private AnnotationPanel annotationSettings;
@@ -65,22 +67,7 @@ ConfigNodePersistent {
 		this.tvFrame = tvFrame;
 		this.dendroView = tvFrame.getDendroView();
 
-		dialog.getContentPane().add(mainPanel);
-		dialog.addWindowListener(new WindowAdapter() {
-
-			@Override
-			public void windowClosed(final WindowEvent e) {
-
-				if (gradientPick != null && gradientPick.isCustomSelected()) {
-					gradientPick.saveStatus();
-				}
-			}
-		});
-	}
-
-	public void setGradientChooser(final ColorChooser gradientPick) {
-
-		this.gradientPick = gradientPick;
+		getContentPane().add(mainPanel);
 	}
 
 	public void setHeaderInfo(final HeaderInfo geneHI, final HeaderInfo arrayHI) {
@@ -113,7 +100,7 @@ ConfigNodePersistent {
 	 */
 	public JDialog getPreferencesFrame() {
 
-		return dialog;
+		return this;
 	}
 
 	public void synchronizeAnnotation() {
@@ -134,14 +121,14 @@ ConfigNodePersistent {
 	 */
 	public int[] getSelectedLabelIndexes() {
 
-		if (annotationSettings != null)
-			return new int[] { annotationSettings.getSelectedGeneIndex(),
-					annotationSettings.getSelectedArrayIndex() };
-		else {
+		if (annotationSettings == null) {
 			LogBuffer.println("AnnotationSettings object was null. "
 					+ "Could not get selected indeces.");
 			return null;
 		}
+		
+		return new int[] { annotationSettings.getSelectedGeneIndex(),
+				annotationSettings.getSelectedArrayIndex() };
 	}
 
 	/* >>>>>> GUI component listeners <<<<< */
@@ -152,7 +139,7 @@ ConfigNodePersistent {
 	 */
 	public void addOKButtonListener(final ActionListener listener) {
 
-		ok_btn.addActionListener(listener);
+		okBtn.addActionListener(listener);
 	}
 
 	/**
@@ -160,9 +147,9 @@ ConfigNodePersistent {
 	 *
 	 * @param listener
 	 */
-	public void addWindowListener(final WindowAdapter listener) {
+	public void addSaveAndCloseListener(final WindowAdapter listener) {
 
-		dialog.addWindowListener(listener);
+		addWindowListener(listener);
 	}
 
 	public void addCustomLabelListener(final ActionListener listener) {
@@ -187,9 +174,9 @@ ConfigNodePersistent {
 	 *
 	 * @param l
 	 */
-	public void addComponentListener(final ComponentListener l) {
+	public void addResizeDialogListener(final ComponentListener l) {
 
-		dialog.addComponentListener(l);
+		addComponentListener(l);
 	}
 
 	/**
@@ -407,10 +394,6 @@ ConfigNodePersistent {
 			annotationSettings = new AnnotationPanel();
 			menuPanel = annotationSettings.makeLabelPane();
 
-		} else if (menu.equalsIgnoreCase(StringRes.menu_Color)
-				&& gradientPick != null) {
-			menuPanel = gradientPick.makeGradientPanel();
-
 		} else if (menu.equalsIgnoreCase(StringRes.menu_URL)) {
 			menuPanel = new URLSettings().makeURLPanel();
 
@@ -424,16 +407,16 @@ ConfigNodePersistent {
 			menuPanel.add(hint, "push, alignx 50%");
 		}
 
-		ok_btn = GUIFactory.createBtn(StringRes.btn_OK);
+		okBtn = GUIFactory.createBtn(StringRes.btn_OK);
 
 		mainPanel.add(menuPanel, "push, grow, wrap");
-		mainPanel.add(ok_btn, "pushx, alignx 100%, span");
+		mainPanel.add(okBtn, "pushx, alignx 100%, span");
 
 		mainPanel.revalidate();
 		mainPanel.repaint();
 
-		dialog.pack();
-		dialog.setLocationRelativeTo(tvFrame.getAppFrame());
+//		dialog.pack();
+//		dialog.setLocationRelativeTo(tvFrame.getAppFrame());
 	}
 
 	/**

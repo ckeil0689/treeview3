@@ -1,7 +1,5 @@
 package edu.stanford.genetics.treeview;
 
-import java.awt.Frame;
-
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -11,15 +9,20 @@ import Utilities.GUIFactory;
 
 public class ShortcutDialog extends CustomDialog {
 
+	/**
+	 * Defualt serial version ID to keep Eclipse happy...
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public ShortcutDialog() {
 
 		super("Keyboard Shortcuts");
 
 		setupData();
 
-		dialog.add(mainPanel);
-		dialog.pack();
-		dialog.setLocationRelativeTo(Frame.getFrames()[0]);
+		add(mainPanel);
+//		dialog.pack();
+//		dialog.setLocationRelativeTo(Frame.getFrames()[0]);
 	}
 
 	private void setupData() {

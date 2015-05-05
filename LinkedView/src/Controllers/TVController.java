@@ -21,7 +21,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
-import ColorChooser.ColorChooser;
+import ColorChooser.ColorChooserUI;
 import ColorChooser.ColorChooserController;
 import Utilities.StringRes;
 import Views.ClusterDialog;
@@ -45,8 +45,12 @@ import edu.stanford.genetics.treeview.model.DataModelWriter;
 import edu.stanford.genetics.treeview.model.ModelLoader;
 import edu.stanford.genetics.treeview.model.ReorderedDataModel;
 import edu.stanford.genetics.treeview.model.TVModel;
-import edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets;
-import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
+//<<<<<<< HEAD
+//import edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets;
+//import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
+//=======
+import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
+//>>>>>>> colorUpdate
 import edu.stanford.genetics.treeview.plugin.dendroview.DoubleArrayDrawer;
 
 /**
@@ -436,45 +440,45 @@ public class TVController implements Observer {
 					newKeys.putInt("size", oldKeys.getInt("size", 12));
 				}
 				
-				if(oldNode.nodeExists("ColorPresets")) {
-					/* Colors */
-					newKeys = newNode.node("ColorPresets").node("ColorSet1");
-					oldKeys = oldNode.node("ColorPresets").node("ColorSet1");
-					
-					ColorSet defaultCS = ColorPresets.defaultColorSets[0];
-					
-					newKeys.put("Color01", oldKeys.get("Color01", 
-							defaultCS.getColors()[0]));
-					newKeys.put("Color11", oldKeys.get("Color11", 
-							defaultCS.getColors()[1]));
-					newKeys.put("Color21", oldKeys.get("Color21", 
-							defaultCS.getColors()[2]));
-					
-					newKeys.putDouble("Fraction01", 
-							oldKeys.getDouble("Fraction01", 0.0));
-					newKeys.putDouble("Fraction11", 
-							oldKeys.getDouble("Fraction11", 0.5));
-					newKeys.putDouble("Fraction21", 
-							oldKeys.getDouble("Fraction21", 1.0));
-					
-					newKeys.putInt("colorNum", oldKeys.getInt("colorNum", 3));
-					
-					newKeys.put("empty", oldKeys.get("empty", 
-							defaultCS.getEmpty().toString()));
-					newKeys.put("missing", oldKeys.get("missing", 
-							defaultCS.getMissing().toString()));
-					newKeys.put("name", oldKeys.get("name", "Custom"));
-					
-				}
-				
-				if(oldNode.nodeExists("GradientChooser")) {
-					
-					newKeys = newNode.node("GradientChooser");
-					oldKeys = oldNode.node("GradientChooser");
-					
-					newKeys.put("activeColors", oldKeys.get("activeColors", 
-							"RedGreen"));
-				}
+//				if(oldNode.nodeExists("ColorPresets")) {
+//					/* Colors */
+//					newKeys = newNode.node("ColorPresets").node("ColorSet1");
+//					oldKeys = oldNode.node("ColorPresets").node("ColorSet1");
+//					
+//					ColorSet defaultCS = ColorPresets.defaultColorSets[0];
+//					
+//					newKeys.put("Color01", oldKeys.get("Color01", 
+//							defaultCS.getColors()[0]));
+//					newKeys.put("Color11", oldKeys.get("Color11", 
+//							defaultCS.getColors()[1]));
+//					newKeys.put("Color21", oldKeys.get("Color21", 
+//							defaultCS.getColors()[2]));
+//					
+//					newKeys.putDouble("Fraction01", 
+//							oldKeys.getDouble("Fraction01", 0.0));
+//					newKeys.putDouble("Fraction11", 
+//							oldKeys.getDouble("Fraction11", 0.5));
+//					newKeys.putDouble("Fraction21", 
+//							oldKeys.getDouble("Fraction21", 1.0));
+//					
+//					newKeys.putInt("colorNum", oldKeys.getInt("colorNum", 3));
+//					
+//					newKeys.put("empty", oldKeys.get("empty", 
+//							defaultCS.getEmpty().toString()));
+//					newKeys.put("missing", oldKeys.get("missing", 
+//							defaultCS.getMissing().toString()));
+//					newKeys.put("name", oldKeys.get("name", "Custom"));
+//					
+//				}
+//				
+//				if(oldNode.nodeExists("GradientChooser")) {
+//					
+//					newKeys = newNode.node("GradientChooser");
+//					oldKeys = oldNode.node("GradientChooser");
+//					
+//					newKeys.put("activeColors", oldKeys.get("activeColors", 
+//							"RedGreen"));
+//				}
 				
 			} catch (BackingStoreException e) {
 				// TODO Auto-generated catch block
@@ -956,29 +960,32 @@ public class TVController implements Observer {
 		// View
 		final PreferencesMenu preferences = new PreferencesMenu(tvFrame);
 
-		if (menu.equalsIgnoreCase(StringRes.menu_Color)) {
-
-			final Double min = model.getDataMatrix().getMinVal();
-			final Double max = model.getDataMatrix().getMaxVal();
-
-			/* View */
-			final ColorChooser gradientPick = new ColorChooser(
-					((DoubleArrayDrawer) dendroController.getArrayDrawer())
-					.getColorExtractor(),
-					min, max);
-
-			/*
-			 * Adding GradientColorChooser configurations to DendroView node.
-			 */
-			gradientPick.setConfigNode(((TVModel) model).getDocumentConfig());
-
-			/* Controller */
-			new ColorChooserController(gradientPick);
-
-			preferences.setGradientChooser(gradientPick);
-
-		}
-
+//<<<<<<< HEAD
+//		if (menu.equalsIgnoreCase(StringRes.menu_Color)) {
+//
+//			final Double min = model.getDataMatrix().getMinVal();
+//			final Double max = model.getDataMatrix().getMaxVal();
+//
+//			/* View */
+//			final ColorChooser gradientPick = new ColorChooser(
+//					((DoubleArrayDrawer) dendroController.getArrayDrawer())
+//					.getColorExtractor(),
+//					min, max);
+//
+//			/*
+//			 * Adding GradientColorChooser configurations to DendroView node.
+//			 */
+//			gradientPick.setConfigNode(((TVModel) model).getDocumentConfig());
+//
+//			/* Controller */
+//			new ColorChooserController(gradientPick);
+//
+//			preferences.setGradientChooser(gradientPick);
+//
+//		}
+//
+//=======
+//>>>>>>> colorUpdate
 		if (menu.equalsIgnoreCase(StringRes.menu_RowAndCol)) {
 			preferences.setHeaderInfo(model.getRowHeaderInfo(),
 					model.getColumnHeaderInfo());
@@ -993,6 +1000,38 @@ public class TVController implements Observer {
 		new PreferencesController(tvFrame, model, preferences);
 
 		preferences.setVisible(true);
+	}
+	
+	/* TODO implement this and others to deprecate PreferencesMenu, which is
+	 * a remnant of a unified menu system (as opposed to separate dialogs) */
+	public void openLabelMenu() {
+		
+		
+	}
+	
+	/**
+	 * Opens up the color chooser dialog.
+	 */
+	public void openColorMenu() {
+		
+		final Double min = model.getDataMatrix().getMinVal();
+		final Double max = model.getDataMatrix().getMaxVal();
+
+		/* View */
+		ColorExtractor drawer = ((DoubleArrayDrawer) dendroController
+				.getArrayDrawer()).getColorExtractor();
+		
+		final ColorChooserUI gradientPick = 
+				new ColorChooserUI(drawer, min, max);
+
+		/* Controller */
+		ColorChooserController controller = 
+				new ColorChooserController(gradientPick);
+		
+		/* Adding GradientColorChooser configurations to DendroView node. */
+		controller.setConfigNode(((TVModel) model).getDocumentConfig());
+		
+		gradientPick.setVisible(true);
 	}
 
 	/*

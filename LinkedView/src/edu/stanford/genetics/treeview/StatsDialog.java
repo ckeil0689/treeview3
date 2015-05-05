@@ -10,6 +10,11 @@ import Utilities.GUIFactory;
 public class StatsDialog extends CustomDialog {
 
 	/**
+	 * Default serial version ID to keep Eclipse happy...
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * Constructor
 	 *
 	 * @param viewFrame
@@ -18,8 +23,6 @@ public class StatsDialog extends CustomDialog {
 
 		super("Stats");
 		setupLayout(source, rowNum, colNum);
-		dialog.add(mainPanel);
-		dialog.pack();
 
 		closeBtn.requestFocusInWindow();
 	}
@@ -68,7 +71,11 @@ public class StatsDialog extends CustomDialog {
 		contentPanel.add(sizeLabel, "tag label");
 		contentPanel.add(size);
 
-		mainPanel.add(contentPanel, "push, grow, wrap");
-		mainPanel.add(closeBtn, "span, al right");
+//<<<<<<< HEAD
+//		mainPanel.add(contentPanel, "push, grow, wrap");
+//		mainPanel.add(closeBtn, "span, al right");
+//=======
+		add(mainPanel);
+//>>>>>>> colorUpdate
 	}
 }

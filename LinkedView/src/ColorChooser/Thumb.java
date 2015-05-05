@@ -2,6 +2,7 @@ package ColorChooser;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 
 /**
@@ -14,18 +15,33 @@ import java.awt.geom.GeneralPath;
  */
 public class Thumb {
 
-	private int x;
-	private int y;
+	protected int x;
+	protected int y;
+	
+	protected double dataVal;
 
 	/* Thumb dimensions */
-	private final int width = 12;
-	private final int height = 8;
+	protected int width = 12;
+	protected int height = 8;
 
-	private GeneralPath innerthumbPath;
-	private GeneralPath outerthumbPath;
-	private Color thumbColor;
-	private boolean selected = false;
+	protected GeneralPath innerthumbPath;
+	protected GeneralPath outerthumbPath;
+	
+	protected Color thumbColor;
+	protected boolean selected = false;
 
+	/**
+	 * Constructs a thumb object if given the x/y-coordinates and a color.
+	 *
+	 * @param x
+	 * @param y
+	 * @param color
+	 */
+	public Thumb(final int x, final int y) {
+
+		this(x, y,Color.GRAY);
+	}
+	
 	/**
 	 * Constructs a thumb object if given the x/y-coordinates and a color.
 	 *
@@ -36,8 +52,25 @@ public class Thumb {
 	public Thumb(final int x, final int y, final Color color) {
 
 		this.thumbColor = color;
-
 		setCoords(x, y);
+	}
+	
+	/**
+	 * Sets the data value which the thumb represents on the gradient. 
+	 * @param dataVal
+	 */
+	public void setDataValue(final double dataVal) {
+		
+		this.dataVal = dataVal;
+	}
+	
+	/**
+	 * Accessor for the thumb's associated data value.
+	 * @return
+	 */
+	public double getDataValue() {
+		
+		return dataVal;
 	}
 
 	/**

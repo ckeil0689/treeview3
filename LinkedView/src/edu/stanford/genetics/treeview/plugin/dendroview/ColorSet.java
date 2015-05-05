@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
 
+import edu.stanford.genetics.treeview.LogBuffer;
+
 /**
  * This class represents a set of colors which can be used by a color extractor
  * to translate data values into colors.
@@ -50,18 +52,27 @@ import java.util.prefs.Preferences;
 
 public class ColorSet {
 
-	private Color missing;
-	private Color empty;
-
+	/* Default values for a ColorSet. */
+	private final static String default_name = "RedGreen";
+	private final static float[] default_fractions = 
+//		{ 0.0f, 0.001f, 0.5f, 0.999f, 1.0f };
+		{ 0.0f, 0.5f,  1.0f };
+	private final static String[] default_colors = 
+//		{ "#FF0000", "#FF0000", "#000000", "#00FF00", "#00FF00" };
+		{ "#FF0000", "#000000", "#00FF00" };
+	private final static String default_missingColor = "#FFFFFF";
+	private final static String default_emptyColor = "#FFFFFF";
+	private final static double default_min = -1.0;
+	private final static double default_max = 1.0;
+	
+	
 	private final String name;
 	private List<Color> colorList = new ArrayList<Color>();
 	private List<Double> fractionList = new ArrayList<Double>();
-
-	private final String default_missingColor = "#FFFFFF";
-	private final String default_emptyColor = "#FFFFFF";
-	private final float[] default_fractions = { 0.0f, 0.5f, 1.0f };
-	private final String[] default_colors = { "#FF0000", "#000000", "#00FF00" };
-	private final String default_name = "RedGreen";
+	private double min;
+	private double max;
+	private Color missing;
+	private Color empty;
 
 	/**
 	 * Constructor for the ColorSet object
@@ -78,12 +89,14 @@ public class ColorSet {
 	 *            string representing initial empty color
 	 */
 	public ColorSet(final String name, final List<Color> colorList,
-			final List<Double> fractionList, final String missing,
-			final String empty) {
+			final List<Double> fractionList, final double min, final double max,
+			final String missing, final String empty) {
 
+		this.name = name;
 		this.colorList = colorList;
 		this.fractionList = fractionList;
-		this.name = name;
+		this.min = min;
+		this.max = max;
 		this.missing = decodeColor(missing);
 		this.empty = decodeColor(empty);
 	}
@@ -98,25 +111,36 @@ public class ColorSet {
 	public ColorSet(final Preferences colorSetNode) {
 
 		this.name = colorSetNode.get("name", default_name);
+
+		int colorNum = colorSetNode.getInt("colorNum", default_colors.length);
+
+		try {
+			for (int i = 0; i < colorNum; i++) {
+				
+				colorList.add(decodeColor(colorSetNode.get("Color" + i + 1,
+						default_colors[0])));// default_colors[i])));
+				fractionList.add(new Double(colorSetNode.getFloat("Fraction" + i
+						+ 1, default_fractions[1])));
+			}
+			
+		} catch(ArrayIndexOutOfBoundsException e) {
+			LogBuffer.logException(e);
+			
+			/* Add defaults if there's an issue */
+			colorNum = default_colors.length;
+			for (int i = 0; i < colorNum; i++) {
+				
+				colorList.add(decodeColor(default_colors[i]));// default_colors[i])));
+				fractionList.add(new Double(default_fractions[i]));
+			}
+		}
+		
+		this.min = colorSetNode.getDouble("min", default_min);
+		this.max = colorSetNode.getDouble("max", default_max);
+		
 		this.missing = decodeColor(colorSetNode.get("missing",
 				default_missingColor));
 		this.empty = decodeColor(colorSetNode.get("empty", default_emptyColor));
-
-		final int colorNum = colorSetNode.getInt("colorNum",
-				default_colors.length);
-		/*
-		 * default colors/ fracs is always length 3. The original code here
-		 * produced ArrayIndexOutOfBoundsExceptions if the user adds colors and
-		 * makes colorNum > 3
-		 */
-		for (int i = 0; i < colorNum; i++) {
-			colorList.add(decodeColor(colorSetNode.get("Color" + i + 1,
-					default_colors[0])));// default_colors[i])));
-		}
-		for (int i = 0; i < colorNum; i++) {
-			fractionList.add(new Double(colorSetNode.getFloat("Fraction" + i
-					+ 1, default_fractions[1])));// default_fractions[i])));
-		}
 	}
 
 	/**
@@ -135,25 +159,25 @@ public class ColorSet {
 	 * @param empty
 	 *            string representing inital empty color
 	 */
-	public ColorSet(final String name, final String color1,
-			final String color2, final String color3, final String missing,
-			final String empty) {
+	public ColorSet(final String name, final String[] colors, 
+			final String missing, final String empty) {
 
-		// final String name, final List<Color> colorList,
-		// final List<Double> fractionList, final Color missing,
-		// final Color empty
+		
 		final List<Color> newColorList = new ArrayList<Color>();
-		newColorList.add(decodeColor(color1));
-		newColorList.add(decodeColor(color2));
-		newColorList.add(decodeColor(color3));
+		for(String color : colors) {
+			newColorList.add(decodeColor(color)); /* min in ColorChooser */
+		}
+		
 		final List<Double> newFractionList = new ArrayList<Double>();
-		newFractionList.add(0.0);
-		newFractionList.add(0.5);
-		newFractionList.add(1.0);
+		for(int i = 0; i < default_fractions.length; i++) {
+			newFractionList.add((double)default_fractions[i]);
+		}
 
 		this.name = name;
 		this.colorList = newColorList;
 		this.fractionList = newFractionList;
+		this.min = default_min;
+		this.max = default_max;
 		this.missing = decodeColor(missing);
 		this.empty = decodeColor(empty);
 	}
@@ -168,6 +192,8 @@ public class ColorSet {
 		this.name = another.name;
 		this.colorList = another.colorList;
 		this.fractionList = another.fractionList;
+		this.min = another.min;
+		this.max = another.max;
 		this.missing = another.missing;
 		this.empty = another.empty;
 	}
@@ -193,6 +219,9 @@ public class ColorSet {
 			colorSetNode.putFloat("Fraction" + i + 1, fractionList.get(i)
 					.floatValue());
 		}
+		
+		colorSetNode.putDouble("min", min);
+		colorSetNode.putDouble("max", max);
 
 		colorSetNode.put("missing", encodeColor(this.missing));
 		colorSetNode.put("empty", encodeColor(this.empty));
@@ -252,6 +281,16 @@ public class ColorSet {
 	public List<Double> getFractionList() {
 
 		return fractionList;
+	}
+	
+	public double getMin() {
+		
+		return min;
+	}
+	
+	public double getMax() {
+		
+		return max;
 	}
 
 	/**
@@ -366,8 +405,9 @@ public class ColorSet {
 			return "E";
 		case 15:
 			return "F";
+		default:
+			return "F";
 		}
-		return "F";
 	}
 
 	// Save/ load methods
@@ -431,7 +471,7 @@ public class ColorSet {
 		stream.close();
 	}
 
-	private Color unpackEisen(final InputStream stream) throws IOException {
+	private static Color unpackEisen(final InputStream stream) throws IOException {
 
 		final int red = stream.read();
 		final int green = stream.read();
@@ -441,7 +481,7 @@ public class ColorSet {
 		return new Color(red, green, blue, alpha);
 	}
 
-	private void packEisen(final Color out, final OutputStream stream)
+	private static void packEisen(final Color out, final OutputStream stream)
 			throws IOException {
 
 		stream.write(out.getRed());
