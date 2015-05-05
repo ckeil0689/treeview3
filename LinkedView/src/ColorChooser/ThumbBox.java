@@ -315,9 +315,12 @@ public class ThumbBox {
 	 */
 	protected void editSelectedThumb() {
 		
-		if(selectedThumb != null) {
-			openThumbEditDialog(selectedThumb, this.getSelectedThumbIndex());
+		int selected = getSelectedThumbIndex();
+		
+		if(selected > -1) {
+			openThumbEditDialog(selectedThumb, selected);
 		}
+		
 	}
 	
 	/**
@@ -411,6 +414,7 @@ public class ThumbBox {
 	protected void setSelectedThumb(Thumb t) {
 		
 		this.selectedThumb = t;
+		t.setSelected(true);
 	}
 
 	/**

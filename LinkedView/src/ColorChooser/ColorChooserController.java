@@ -196,9 +196,15 @@ public class ColorChooserController implements ConfigNodePersistent {
 			GradientBox gBox = colorPicker.getGradientBox();
 
 			if (gBox.isGradientArea(lastEvent.getPoint())) {
+				/* loading new presets erases selected thumb... */
+				int selectedThumb = colorPicker.getThumbBox()
+						.getSelectedThumbIndex();
 				gBox.changeColor(lastEvent.getPoint());
 				colorChooserUI.setCustomSelected(true);
 				setActiveColorSet("Custom");
+				Thumb t_selected = colorPicker.getThumb(selectedThumb);
+				colorPicker.getThumbBox().setSelectedThumb(t_selected);
+//				colorPicker.getThumb(selectedThumb).setSelected(true);
 
 			} else {
 				ThumbBox tb = colorPicker.getThumbBox();
