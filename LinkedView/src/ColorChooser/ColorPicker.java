@@ -141,12 +141,15 @@ public class ColorPicker {
 		/* clearing all data */
 		colorList.clear();
 		thumbList.clear();
-		resetFractions();
+//		resetFractions();
 		
 		thumbList.add(minThumb);
 		thumbList.add(maxThumb);
 
 		colorExtractor.setMissingColor(activeColorSet.getMissing());
+		setMinVal(activeColorSet.getMin());
+		setMaxVal(activeColorSet.getMax());
+		
 		final String[] colors = activeColorSet.getColors();
 
 		for (final String color : colors) {
@@ -154,8 +157,11 @@ public class ColorPicker {
 			colorList.add(Color.decode(color));
 		}
 		
-		updateBoundaryColors();
-		updateColorArray();
+		setFractions(activeColorSet.getFractions());
+		
+//		updateBoundaryColors();
+//		updateColorArray();
+		updateColors();
 	}
 	
 	/**
@@ -179,7 +185,8 @@ public class ColorPicker {
 		String empty = Integer.toHexString(colorExtractor.getEmpty().getRGB());
 		empty = "#" + empty.substring(2, empty.length());
 
-		return new ColorSet(name, colorList, fractionList, missing, empty);
+		return new ColorSet(name, colorList, fractionList, minVal, maxVal,
+				missing, empty);
 	}
 	
 	/**
@@ -191,7 +198,6 @@ public class ColorPicker {
 	protected void setGradientColors() {
 
 		colorExtractor.setNewParams(fractions, colorList);
-//		colorExtractor.setMissingColor(activeColorSet.getMissing());
 		colorExtractor.notifyObservers();
 	}
 	
@@ -258,16 +264,17 @@ public class ColorPicker {
 		
 		this.fractions = newFracs;
 		
+		thumbBox.verifyThumbs();
 		thumbBox.adjustThumbsToFractions();
 	}
 	
-	/**
-	 * Resets the fractions float[] to a default value with 3 colors.
-	 */
-	protected void resetFractions() {
-
-		this.fractions = activeColorSet.getFractions();//new float[] { 0.0f, 0.001f, 0.5f, 0.999f, 1.0f };
-	}
+//	/**
+//	 * Resets the fractions float[] to a default value with 3 colors.
+//	 */
+//	protected void resetFractions() {
+//
+//		this.fractions = activeColorSet.getFractions();
+//	}
 	
 	/*
 	 * Updates the color array when needed so LinearGradientPaint can use it to

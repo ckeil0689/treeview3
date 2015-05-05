@@ -84,14 +84,14 @@ public class GradientBox {
 		float[] fractions = colorPicker.getFractions();
 		
 		/* find largest diff between fractions and set index there */
-		int newColIndex = findAddIndex(fractions);
+		int newColorIndex = findAddIndex(fractions);
 
-		final float halfDiff = (fractions[newColIndex + 1] 
-				- fractions[newColIndex]) / 2;
-		final float addFrac = fractions[newColIndex] + halfDiff;
+		final float halfDiff = (fractions[newColorIndex] 
+				- fractions[newColorIndex - 1]) / 2;
+		final float addFrac = fractions[newColorIndex - 1] + halfDiff;
 
-		colorPicker.getColorList().add(newColIndex + 1, newCol);
-		colorPicker.getThumbBox().insertThumbAt(addFrac, newCol);
+		colorPicker.getColorList().add(newColorIndex, newCol);
+		colorPicker.getThumbBox().insertThumbAt(addFrac, newColorIndex, newCol);
 
 		colorPicker.updateFractions();
 		colorPicker.updateColors();
@@ -116,7 +116,7 @@ public class GradientBox {
 			}
 		}
 		
-		return newColIndex;
+		return newColIndex + 1;
 	}
 	
 	/**

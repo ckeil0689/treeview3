@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.prefs.Preferences;
@@ -40,7 +39,6 @@ public class ColorChooserController implements ConfigNodePersistent {
 		this.colorPicker = colorChooserUI.getColorPicker();
 		this.colorPresets = DendrogramFactory.getColorPresets();
 		
-		setPresets();
 		addAllListeners();
 	}
 	
@@ -66,11 +64,8 @@ public class ColorChooserController implements ConfigNodePersistent {
 
 		if (parentNode != null) {
 			this.configNode = parentNode.node("GradientChooser");
-
-//			final String colorSet = configNode.get("activeColors", "RedGreen");
-//			ColorSet activeSet = colorPresets.getColorSet(colorSet);
-			
-//			colorChooserUI.getColorPicker().setActiveColorSet(activeSet);
+			setPresets();
+			colorChooserUI.getColorPicker().loadPresets();
 
 		} else {
 			LogBuffer.println("Could not find or create GradientChooser "
@@ -94,7 +89,7 @@ public class ColorChooserController implements ConfigNodePersistent {
 		/* Choose ColorSet according to name */
 		final ColorSet selectedColorSet;
 		if (colorScheme.equalsIgnoreCase("Custom")) {
-			colorChooserUI.getPresetChoices().setSelectedItem("Custom Colors");
+			colorChooserUI.getPresetChoices().setSelectedItem("Custom");
 			selectedColorSet = colorPresets.getColorSet(colorScheme);
 
 		} else if (colorScheme.equalsIgnoreCase(defaultColors)) {
@@ -113,7 +108,6 @@ public class ColorChooserController implements ConfigNodePersistent {
 		}
 
 		colorChooserUI.getColorPicker().setActiveColorSet(selectedColorSet);
-		colorChooserUI.getColorPicker().loadPresets();//selectedColorSet);
 	}
 	
 	/**
@@ -121,17 +115,19 @@ public class ColorChooserController implements ConfigNodePersistent {
 	 */
 	private void saveStatus() {
 
-		if (colorChooserUI.getColorPicker() != null) {
-			ColorSet colorSet = colorChooserUI.getColorPicker()
+		ColorSet colorSet = colorChooserUI.getColorPicker()
 					.saveCustomPresets();
-			colorPresets.addColorSet(colorSet);
-		}
+		colorPresets.addColorSet(colorSet);
 	}
 	
 	public void setActiveColorSet(final String name) {
 
 		final ColorSet set = colorPresets.getColorSet(name);
 		colorChooserUI.getColorPicker().setActiveColorSet(set);
+		
+		if("Custom".equals(name)) {
+			colorChooserUI.getPresetChoices().setSelectedItem("Custom");
+		}
 
 		configNode.put("activeColors", name);
 	}
@@ -143,13 +139,9 @@ public class ColorChooserController implements ConfigNodePersistent {
 	public void switchColorSet(final String name) {
 
 		setActiveColorSet(name);
-
+		
 		/* Load and set data accordingly */
-		setPresets();
-		colorChooserUI.getColorPicker().setGradientColors();
-
-		/* Update view! */
-		colorChooserUI.getMainPanel().repaint();
+		colorChooserUI.getColorPicker().loadPresets();
 	}
 
 	/**
@@ -172,7 +164,6 @@ public class ColorChooserController implements ConfigNodePersistent {
 		public void windowClosed(final WindowEvent e) {
 
 			if (colorChooserUI.isCustomSelected()) {
-				LogBuffer.println("Saving colorset...");
 				saveStatus();
 			}
 		}
@@ -264,7 +255,7 @@ public class ColorChooserController implements ConfigNodePersistent {
 	 * @author CKeil
 	 *
 	 */
-	private class ThumbMotionListener implements MouseMotionListener {
+	private class ThumbMotionListener extends MouseAdapter {
 
 		@Override
 		public void mouseDragged(final MouseEvent e) {
@@ -284,6 +275,15 @@ public class ColorChooserController implements ConfigNodePersistent {
 			}
 		
 			colorPicker.getContainerPanel().setCursor(cursor);
+		}
+		
+		@Override
+		public void mouseReleased(final MouseEvent e) {
+			
+			if(!colorChooserUI.isCustomSelected()) {
+				colorChooserUI.setCustomSelected(true);
+				setActiveColorSet("Custom");
+			}
 		}
 	}
 

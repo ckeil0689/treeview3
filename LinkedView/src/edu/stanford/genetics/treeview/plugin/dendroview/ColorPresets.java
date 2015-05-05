@@ -54,10 +54,12 @@ public class ColorPresets implements ConfigNodePersistent {
 		// sysBack = sysBack.substring(2, sysBack.length());
 
 		defaultColorSets = new ColorSet[2];
-		defaultColorSets[0] = new ColorSet("RedGreen", "#FF0000", "#000000",
-				"#00FF00", "#8E8E8E", "#FFFFFF");
-		defaultColorSets[1] = new ColorSet("YellowBlue", "#FEFF00", "#000000",
-				"#1BB7E5", "#8E8E8E", "#FFFFFF");
+		defaultColorSets[0] = new ColorSet("RedGreen", 
+				new String[]{"#FF0000", "#000000", "#00FF00"}, 
+				"#8E8E8E", "#FFFFFF");
+		defaultColorSets[1] = new ColorSet("YellowBlue", 
+				new String[]{ "#FEFF00", "#000000", "#1BB7E5"}, 
+				"#8E8E8E", "#FFFFFF");
 	}
 
 	private Preferences configNode;
@@ -181,7 +183,7 @@ public class ColorPresets implements ConfigNodePersistent {
 	@Override
 	public String toString() {
 
-		final String[] childrenNodes = getRootChildrenNodes();
+//		final String[] childrenNodes = getRootChildrenNodes();
 		// final ColorSet tmp = new ColorSet();
 		final String[] names = getPresetNames();
 		String ret = "No Presets";
@@ -190,11 +192,11 @@ public class ColorPresets implements ConfigNodePersistent {
 					+ getDefaultIndex() + "\n";
 		}
 
-		for (final String childrenNode : childrenNodes) {
+//		for (final String childrenNode : childrenNodes) {
 
 			// tmp.setConfigNode(configNode.node(childrenNodes[index]));
 			// ret += tmp.toString() + "\n";
-		}
+//		}
 		return ret;
 	}
 
@@ -204,19 +206,21 @@ public class ColorPresets implements ConfigNodePersistent {
 	 */
 	public ColorSet getColorSet(final int index) {
 
-		if (index < defaultColorSets.length)
+		if (index < defaultColorSets.length) {
 			return defaultColorSets[index];
-		else {
-			try {
-				final String[] childrenNodes = getRootChildrenNodes();
-				final ColorSet ret = new ColorSet(
-						configNode.node(childrenNodes[index]));
-				// ret.setConfigNode(configNode.node(childrenNodes[index]));
-				return ret;
+		}
+		
+		try {
+			final String[] childrenNodes = getRootChildrenNodes();
+			final ColorSet ret = new ColorSet(
+					configNode.node(childrenNodes[index]));
+			// ret.setConfigNode(configNode.node(childrenNodes[index]));
+			return ret;
 
-			} catch (final Exception e) {
-				return null;
-			}
+		} catch (final Exception e) {
+			LogBuffer.logException(e);
+			LogBuffer.println("Error retrieving ColorSet.");
+			return null;
 		}
 	}
 
@@ -249,11 +253,11 @@ public class ColorPresets implements ConfigNodePersistent {
 	 * attributes.
 	 */
 	public void addColorSet(final String name, final List<Color> colors,
-			final List<Double> fractions, final String missing,
-			final String empty) {
+			final List<Double> fractions, final double min, final double max, 
+			final String missing, final String empty) {
 
 		final ColorSet newColorSet = new ColorSet(name, colors, fractions,
-				missing, empty);
+				min, max, missing, empty);
 		addColorSet(newColorSet);
 	}
 
@@ -332,11 +336,14 @@ public class ColorPresets implements ConfigNodePersistent {
 				return childrenNodes;
 
 			} catch (final BackingStoreException e) {
-				e.printStackTrace();
+				LogBuffer.logException(e);
+				LogBuffer.println("Issue when retrieving children nodes for "
+						+ "Preferences.");
 				return null;
 			}
-		} else
-			return null;
+		}
+		
+		return null;
 	}
 
 	/**

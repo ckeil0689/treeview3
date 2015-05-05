@@ -92,7 +92,7 @@ public class ThumbBox {
 		for (int i = 1; i < fractions.length - 1; i++) {
 
 			if (!hasThumbForFraction(i) && !colorPicker.isSynced()) {
-				insertThumbAt(fractions[i], colorPicker.getColorList().get(i));
+				insertThumbAt(fractions[i], i, colorPicker.getColorList().get(i));
 			}
 		}
 	}
@@ -104,19 +104,20 @@ public class ThumbBox {
 	 * @param frac The fraction for which to insert a thumb.
 	 * @param color The color of the thumb to be inserted.
 	 */
-	protected void insertThumbAt(final float frac, final Color color) {
+	protected void insertThumbAt(final float frac, final int index, 
+			final Color color) {
 
 		final int offset = (int) thumbRect.getMinX();
-		final int x = offset +  (int) (frac * thumbRect.getWidth());
+		final int x = offset +  (int) (frac * ColorPicker.WIDTH);
 		
 		List<Thumb> thumbs = colorPicker.getThumbList();
-		int index = 0;
-		for (final Thumb t : thumbs) {
-
-			if (x > t.getX()) {
-				index++;
-			}
-		}
+//		int index = 0;
+//		for (final Thumb t : thumbs) {
+//
+//			if (x > t.getX()) {
+//				index++;
+//			}
+//		}
 
 		final int y = (int) (thumbRect.getHeight());
 		double dataValue = colorPicker.getDataFromFraction(frac);
@@ -268,6 +269,13 @@ public class ThumbBox {
 		while(iter.hasNext()) {
 			
 			Thumb t = iter.next();
+			
+			/* Never remove boundary thumbs */
+			if(thumbs.indexOf(t) == 0 
+					|| thumbs.indexOf(t) == thumbs.size() - 1) {
+				continue;
+			}
+			
 			double tData = t.getDataValue();
 			if(isMin && (tData < boundaryData
 					|| Helper.nearlyEqual(tData, boundaryData))) {

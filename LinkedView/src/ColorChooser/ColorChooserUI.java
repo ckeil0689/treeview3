@@ -2,6 +2,7 @@ package ColorChooser;
 
 import java.awt.Color;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowListener;
@@ -46,8 +47,7 @@ public class ColorChooserUI extends CustomDialog {
 
 	/* ColorSet choices */
 	private JComboBox<String> presetChoice;
-	private final String[] presets = {"RedGreen", "YellowBlue", 
-			"Custom Colors"};
+	private final String[] presets = {"RedGreen", "YellowBlue", "Custom"};
 
 	/* Stores whether custom ColorSet is selected or not */
 	private boolean isCustomSelected;
@@ -171,7 +171,7 @@ public class ColorChooserUI extends CustomDialog {
 	
 	protected void setCustomSelected(boolean isCustom) {
 		
-		this.isCustomSelected = true;
+		this.isCustomSelected = isCustom;
 	}
 
 	protected boolean isCustomSelected() {
@@ -186,8 +186,9 @@ public class ColorChooserUI extends CustomDialog {
 		colorPicker.getContainerPanel().addMouseListener(l);
 	}
 
-	protected void addThumbMotionListener(final MouseMotionListener l) {
+	protected void addThumbMotionListener(final MouseAdapter l) {
 
+		colorPicker.getContainerPanel().addMouseListener(l);
 		colorPicker.getContainerPanel().addMouseMotionListener(l);
 	}
 
