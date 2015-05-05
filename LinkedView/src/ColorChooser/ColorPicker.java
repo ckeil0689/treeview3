@@ -18,7 +18,8 @@ import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
 public class ColorPicker {
 
 	/* Adjust this to MigLayout variables of mainPanel! */
-	protected static final int WIDTH = 430;
+	protected static final int WIDTH = 510;
+	protected static final int OFFSET = 70;
 	
 	private final JPanel containerPanel;
 	
@@ -102,7 +103,7 @@ public class ColorPicker {
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 					RenderingHints.VALUE_ANTIALIAS_ON);
 			
-			positionRects(getWidth());
+			positionRects();
 			
 			minBox.drawBoundaryBox(g2);
 			numBox.drawNumBox(g2);
@@ -118,9 +119,9 @@ public class ColorPicker {
 		 * ColorPicker as a whole.
 		 * @param width
 		 */
-		private void positionRects(final int width) {
+		private void positionRects() {
 
-			final int start = (width - ColorPicker.WIDTH) / 2;
+			final int start = OFFSET;
 
 			minBox.setRect(start - 80, 40, 80, 100);
 			numBox.setRect(start, 0, ColorPicker.WIDTH, 40);

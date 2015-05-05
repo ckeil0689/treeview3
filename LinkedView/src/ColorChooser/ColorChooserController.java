@@ -197,6 +197,7 @@ public class ColorChooserController implements ConfigNodePersistent {
 
 			if (gBox.isGradientArea(lastEvent.getPoint())) {
 				gBox.changeColor(lastEvent.getPoint());
+				colorChooserUI.setCustomSelected(true);
 				setActiveColorSet("Custom");
 
 			} else {
@@ -257,9 +258,12 @@ public class ColorChooserController implements ConfigNodePersistent {
 	 */
 	private class ThumbMotionListener extends MouseAdapter {
 
+		private boolean dragged = false;
+		
 		@Override
 		public void mouseDragged(final MouseEvent e) {
 
+			dragged = true;
 			colorPicker.getThumbBox().moveThumbTo(e.getX());
 		}
 
@@ -280,9 +284,10 @@ public class ColorChooserController implements ConfigNodePersistent {
 		@Override
 		public void mouseReleased(final MouseEvent e) {
 			
-			if(!colorChooserUI.isCustomSelected()) {
+			if(!colorChooserUI.isCustomSelected() && dragged) {
 				colorChooserUI.setCustomSelected(true);
 				setActiveColorSet("Custom");
+				dragged = false;
 			}
 		}
 	}

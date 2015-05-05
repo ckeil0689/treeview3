@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.prefs.Preferences;
 
@@ -406,8 +405,9 @@ public class ColorSet {
 			return "E";
 		case 15:
 			return "F";
+		default:
+			return "F";
 		}
-		return "F";
 	}
 
 	// Save/ load methods
@@ -471,7 +471,7 @@ public class ColorSet {
 		stream.close();
 	}
 
-	private Color unpackEisen(final InputStream stream) throws IOException {
+	private static Color unpackEisen(final InputStream stream) throws IOException {
 
 		final int red = stream.read();
 		final int green = stream.read();
@@ -481,7 +481,7 @@ public class ColorSet {
 		return new Color(red, green, blue, alpha);
 	}
 
-	private void packEisen(final Color out, final OutputStream stream)
+	private static void packEisen(final Color out, final OutputStream stream)
 			throws IOException {
 
 		stream.write(out.getRed());

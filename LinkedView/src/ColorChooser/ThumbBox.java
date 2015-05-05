@@ -107,17 +107,10 @@ public class ThumbBox {
 	protected void insertThumbAt(final float frac, final int index, 
 			final Color color) {
 
-		final int offset = (int) thumbRect.getMinX();
+		final int offset = ColorPicker.OFFSET;
 		final int x = offset +  (int) (frac * ColorPicker.WIDTH);
 		
 		List<Thumb> thumbs = colorPicker.getThumbList();
-//		int index = 0;
-//		for (final Thumb t : thumbs) {
-//
-//			if (x > t.getX()) {
-//				index++;
-//			}
-//		}
 
 		final int y = (int) (thumbRect.getHeight());
 		double dataValue = colorPicker.getDataFromFraction(frac);
@@ -350,8 +343,8 @@ public class ThumbBox {
 	 */
 	protected int getPosFromFraction(float frac) {
 		
-		int x = (int) getThumbRect().getMinX();
-		int w = (int) getThumbRect().getWidth();
+		int x = ColorPicker.OFFSET;
+		int w = ColorPicker.WIDTH;
 		
 		// Avoid rounding errors when casting to int
 		final double widthFactor = Math.round(w * frac);
