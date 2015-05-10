@@ -14,14 +14,12 @@ import java.awt.geom.AffineTransform;
 import java.util.Observable;
 import java.util.prefs.Preferences;
 
-import javax.swing.JLabel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
 import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
-import Utilities.StringRes;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.HeaderInfo;
@@ -39,6 +37,8 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	/* Axis IDs */
 	protected final static int ROW = 0;
 	protected final static int COL = 1;
+	
+	protected final static int HINTFONTSIZE = 14; 
 
 	/* DataModel is an observer */
 	protected DataModel dataModel;
@@ -57,7 +57,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	protected final String d_face = "Courier";
 	protected final int d_style = 0;
 	protected final int d_size = 14;
-	protected final boolean d_justified = true;
+	protected boolean d_justified;
 
 	/* Custom label settings */
 	protected String face;
@@ -89,10 +89,10 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	private final boolean isGeneAxis;
 
 	protected JScrollPane scrollPane;
-	protected JLabel zoomHint;
-	private final String hintText;
+	protected String zoomHint;
 
 	public LabelView(final int axis_id) {
+		
 		super();
 
 		this.isGeneAxis = (axis_id == ROW);
@@ -105,16 +105,6 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
 		addMouseMotionListener(this);
 		addMouseListener(this);
-
-		zoomHint = GUIFactory.createLabel("", GUIFactory.FONTS);
-
-		if (isGeneAxis) {
-			this.hintText = StringRes.lbl_ZoomRowLabels;
-			add(zoomHint, "alignx 0%, aligny 50%, push, wrap");
-		} else {
-			this.hintText = StringRes.lbl_ZoomColLabels;
-			add(zoomHint, "alignx 50%, aligny 100%, push");
-		}
 
 		scrollPane = new JScrollPane(this,
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
@@ -271,8 +261,9 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	 */
 	public JScrollBar getScrollBar() {
 
-		if (isGeneAxis)
+		if (isGeneAxis) {
 			return scrollPane.getHorizontalScrollBar();
+		}
 		
 		return scrollPane.getVerticalScrollBar();
 	}
@@ -325,6 +316,9 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 			configNode.putBoolean("isRightJustified", isRightJustified);
 		}
 		
+		/**
+		 * Queue up this action so it will be run after LabelView is set up.
+		 */
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 
 			@Override
@@ -364,24 +358,23 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		final int stringX = (isGeneAxis) ? offscreenSize.width
 				: offscreenSize.height;
 
+		/* Get label indices range */
+		final int start = map.getIndex(0);
+		final int end = map.getIndex(map.getUsedPixels()) - 1;
+		
+		final Graphics2D g2d = (Graphics2D) g;
+		final AffineTransform orig = g2d.getTransform();
+		
+		/* Draw labels if zoom level allows it */
 		if (map.getScale() > 10.0) {
 			
 			setDynamicFontSize();
-			
-			zoomHint.setText("");
 
-			final Graphics2D g2d = (Graphics2D) g;
-			final AffineTransform orig = g2d.getTransform();
-
-			/* Rotate plane for array axis */
+			/* Rotate plane for array axis (not for zoomHint) */
 			if (!isGeneAxis) {
 				g2d.rotate(Math.PI * 3 / 2);
 				g2d.translate(-offscreenSize.height, 0);
 			}
-
-			/* Get label indices range */
-			final int start = map.getIndex(0);
-			final int end = map.getIndex(map.getUsedPixels()) - 1;
 
 			final int colorIndex = headerInfo.getIndex("FGCOLOR");
 			g.setFont(new Font(face, style, size));
@@ -455,8 +448,63 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 			g2d.setTransform(orig);
 
 		} else {
-			zoomHint.setText(hintText);
+			setPoints(HINTFONTSIZE);
+			
+			int xPos = getHintX(g2d, stringX);
+			int yPos = getHintY(g2d);
+			
+			g2d.setColor(Color.black);
+			g2d.drawString(zoomHint, xPos, yPos);
 		}
+	}
+	
+	/**
+	 * Gets x-position for the hint label based on axis and justification.
+	 * @param g2d
+	 * @param stringX
+	 * @return x-position for hint label.
+	 */
+	private int getHintX(Graphics2D g2d, int stringX) {
+		
+		int xPos = 0;
+		int offSet = 10;
+		final FontMetrics metrics = getFontMetrics(g2d.getFont());
+			
+		if (isGeneAxis) {
+			if(isRightJustified) {
+				xPos = stringX - metrics.stringWidth(zoomHint) - offSet;
+			} else {
+				xPos = offSet;
+			}
+			
+		} else {
+			xPos = (offscreenSize.width  - metrics.stringWidth(zoomHint)) / 2;
+		}
+		
+		return xPos;
+	}
+	
+	/**
+	 * Gets y-position for the hint label based on axis and justification.
+	 * @param g2d
+	 * @return y-position for hint label.
+	 */
+	private int getHintY(Graphics2D g2d) {
+		
+		int yPos = 0;
+		if(isGeneAxis) {
+			yPos = panel.getHeight() / 2;
+			
+		} else {
+			if(isRightJustified) {
+				yPos = panel.getHeight() / 2;
+				
+			} else {
+				yPos = (int) offscreenSize.getHeight() - (panel.getHeight() / 2);
+			}
+		}
+		
+		return yPos;
 	}
 	
 	/**

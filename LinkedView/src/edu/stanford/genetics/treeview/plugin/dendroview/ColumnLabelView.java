@@ -10,6 +10,7 @@ import java.util.prefs.Preferences;
 
 import javax.swing.SwingUtilities;
 
+import Utilities.StringRes;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.UrlExtractor;
@@ -23,6 +24,8 @@ public class ColumnLabelView extends LabelView {
 	public ColumnLabelView() {
 
 		super(LabelView.COL);
+		d_justified = false;
+		zoomHint = StringRes.lbl_ZoomColLabels;
 	}
 
 	public void generateView(final UrlExtractor uExtractor) {

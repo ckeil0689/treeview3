@@ -14,6 +14,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
+import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
 import Utilities.GUIFactory;
 import Utilities.StringRes;
@@ -153,7 +154,7 @@ public class WelcomeView {
 		loadLastButton.addActionListener(loadData);
 	}
 
-	public JPanel makeWelcome(boolean hasLastFile) {
+	public JPanel makeWelcome(FileSet fs) {
 
 		isLoading = false;
 
@@ -162,10 +163,20 @@ public class WelcomeView {
 		loadButton = GUIFactory.createLargeBtn("Open...");
 		loadButton.requestFocusInWindow();
 		loadLastButton = GUIFactory.createBtn("Load last file");
-		loadLastButton.setEnabled(hasLastFile);
+		loadLastButton.setEnabled(fs != null);
+		
+		String filename;
+		if(fs != null) {
+			filename = fs.getRoot() + fs.getExt();
+		} else {
+			filename = "none";
+		}
+		
+		JLabel lastFile = new JLabel("Last file: " + filename);
 
 		loadPanel.add(loadButton, "pushx, alignx 50%, aligny 0%, wrap");
-		loadPanel.add(loadLastButton, "pushx, alignx 50%, aligny 0%");
+		loadPanel.add(loadLastButton, "pushx, alignx 50%, aligny 0%, wrap");
+		loadPanel.add(lastFile, "pushx, alignx 50%, aligny 0%, wrap");
 
 		loadPanel.revalidate();
 		loadPanel.repaint();
