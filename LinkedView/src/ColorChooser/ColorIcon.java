@@ -18,7 +18,6 @@ public class ColorIcon implements Icon {
 	private static final Color DEFAULT_COLOR = Color.GRAY;
 	private static final int WIDTH = 15;
 	private static final int HEIGHT = 15;
-	private static final int STROKE = 2;
 	
 	private Color iconColor;
 	
@@ -42,14 +41,9 @@ public class ColorIcon implements Icon {
 	@Override
 	public void paintIcon(Component c, Graphics g, int x, int y) {
 		
-		/* outline */
-		g.setColor(Color.BLACK);
-		g.fillRect(x, y, getIconWidth(), getIconHeight());
-		
 		/* filled area */
 		g.setColor(iconColor);
-		g.fillRect(x, y, getIconWidth() - ColorIcon.STROKE, 
-				getIconHeight() - ColorIcon.STROKE);
+		g.fillRect(x, y, getIconWidth(), getIconHeight());
 	}
 
 	@Override
