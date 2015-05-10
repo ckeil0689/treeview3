@@ -54,7 +54,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	protected UrlExtractor urlExtractor;
 
 	/* Default label settings */
-	protected final String d_face = "Dialog";
+	protected final String d_face = "Courier";
 	protected final int d_style = 0;
 	protected final int d_size = 14;
 	protected final boolean d_justified = true;

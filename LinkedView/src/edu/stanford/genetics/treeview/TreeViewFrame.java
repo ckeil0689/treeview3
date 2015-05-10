@@ -195,7 +195,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		switch (view_choice) {
 
 		case WELCOME_VIEW:
-			view = welcomeView.makeWelcome();
+			boolean hasLastFile = getFileMRU().getLast() != null;
+			view = welcomeView.makeWelcome(hasLastFile);
 			break;
 
 		case PROGRESS_VIEW:

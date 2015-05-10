@@ -194,7 +194,7 @@ public class DendroView implements Observer, DendroPanel {
 
 		searchPanel = GUIFactory.createJPanel(false, GUIFactory.FILL, null);
 		dendroPane = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING_FILL);
-		dendroPane.setLayout(new MigLayout("debug"));
+//		dendroPane.setLayout(new MigLayout("debug"));
 
 		/* >>> Init all views --- they should be final <<< */
 		/* data ticker panel */

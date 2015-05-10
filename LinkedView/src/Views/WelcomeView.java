@@ -14,6 +14,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
+import edu.stanford.genetics.treeview.LogBuffer;
 import Utilities.GUIFactory;
 import Utilities.StringRes;
 
@@ -26,7 +27,6 @@ public class WelcomeView {
 
 	private final JLabel jl;
 	private final JLabel jl2;
-	private JLabel status;
 
 	private JButton loadButton;
 	private JButton loadLastButton;
@@ -70,6 +70,11 @@ public class WelcomeView {
 
 	public class ImagePanel extends JPanel {
 
+		/**
+		 * Default serial version ID to keep Eclipse happy...
+		 */
+		private static final long serialVersionUID = 1L;
+		
 		private BufferedImage image;
 
 		public ImagePanel() {
@@ -82,9 +87,12 @@ public class WelcomeView {
 				if(input != null) {
 					image = ImageIO.read(input);
 				}
+				
+				input.close();
 
 			} catch (final IOException ex) {
-				// handle exception...
+				LogBuffer.logException(ex);
+				image = new BufferedImage(50, 50, BufferedImage.TYPE_BYTE_GRAY);
 			}
 		}
 
@@ -145,7 +153,7 @@ public class WelcomeView {
 		loadLastButton.addActionListener(loadData);
 	}
 
-	public JPanel makeWelcome() {
+	public JPanel makeWelcome(boolean hasLastFile) {
 
 		isLoading = false;
 
@@ -154,10 +162,8 @@ public class WelcomeView {
 		loadButton = GUIFactory.createLargeBtn("Open...");
 		loadButton.requestFocusInWindow();
 		loadLastButton = GUIFactory.createBtn("Load last file");
+		loadLastButton.setEnabled(hasLastFile);
 
-		status = GUIFactory.createLabel("Ready to go!", GUIFactory.FONTS);
-
-		loadPanel.add(status, "pushx, alignx 50%, aligny 0%, wrap");
 		loadPanel.add(loadButton, "pushx, alignx 50%, aligny 0%, wrap");
 		loadPanel.add(loadLastButton, "pushx, alignx 50%, aligny 0%");
 
@@ -234,16 +240,5 @@ public class WelcomeView {
 	public static void setLoadText(final String text) {
 
 		loadLabel.setText(text);
-	}
-
-	/**
-	 * Sets the status label to give out a warning. Used if no last file can be
-	 * loaded when the user clicks the loadLastBtn.
-	 */
-	public void setWarning() {
-
-		status.setForeground(GUIFactory.RED1);
-		status.setText("No last file to load!");
-		loadPanel.repaint();
 	}
 }

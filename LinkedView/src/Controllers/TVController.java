@@ -206,14 +206,7 @@ public class TVController implements Observer {
 		public void actionPerformed(final ActionEvent arg0) {
 
 			final FileSet last = tvFrame.getFileMRU().getLast();
-
-			/* Notify user if no previous file can be found. */
-			if (last == null) {
-				tvFrame.getWelcomeView().setWarning();
-
-			} else {
-				loadData(last, false);
-			}
+			loadData(last, false);	
 		}
 	}
 
