@@ -22,9 +22,6 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.ScrollPane;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
@@ -33,15 +30,11 @@ import java.awt.event.ComponentListener;
 import java.awt.event.ContainerListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseListener;
-import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.prefs.Preferences;
 
-import javax.imageio.ImageIO;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.InputMap;
@@ -53,10 +46,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
-import javax.swing.border.Border;
-import javax.swing.plaf.basic.BasicSplitPaneDivider;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
 
+import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
 import Utilities.Helper;
 import Utilities.StringRes;
@@ -203,7 +194,7 @@ public class DendroView implements Observer, DendroPanel {
 
 		searchPanel = GUIFactory.createJPanel(false, GUIFactory.FILL, null);
 		dendroPane = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING_FILL);
-//		dendroPane.setLayout(new MigLayout("debug"));
+		dendroPane.setLayout(new MigLayout("debug"));
 
 		/* >>> Init all views --- they should be final <<< */
 		/* data ticker panel */
@@ -613,9 +604,15 @@ public class DendroView implements Observer, DendroPanel {
 		colDataPane.addComponentListener(c);
 	}
 	
+	/**
+	 * A small listener for the main dendroPane and the searchPanel which
+	 * causes deselection of all elements upon clicking within these panels.
+	 * @param l
+	 */
 	public void addDeselectClickListener(MouseListener l) {
 		
 		dendroPane.addMouseListener(l);
+		searchPanel.addMouseListener(l);
 	}
 
 	// Methods

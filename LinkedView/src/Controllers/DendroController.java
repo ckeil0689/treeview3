@@ -315,10 +315,17 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		dendroView.addDividerListener(new DividerListener());
 		dendroView.addSplitPaneListener(new SplitPaneListener());
 		dendroView.addResizeListener(new AppFrameListener());
+		dendroView.addDeselectClickListener(new PanelClickDeselector());
 	}
 
 	/* -------------- Listeners --------------------- */
-	private class Deselector extends MouseAdapter {
+	/** 
+	 * When mouse click happens on dendroPane in DendroView, everything 
+	 * will be deselected.
+	 * @author chris0689
+	 *
+	 */
+	private class PanelClickDeselector extends MouseAdapter {
 		
 		@Override 
 		public void mouseClicked(MouseEvent e) {
