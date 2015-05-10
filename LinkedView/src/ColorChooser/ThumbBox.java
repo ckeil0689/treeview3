@@ -8,11 +8,21 @@ import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 import java.util.List;
+
+import edu.stanford.genetics.treeview.LogBuffer;
 import Utilities.GUIFactory;
 import Utilities.Helper;
 
 public class ThumbBox {
 
+	/* When mouse is quickly moved outside thumbBox we need to max out the 
+	 * thumb on the edge. However, it cannot have the same data value as the
+	 * max or min thumb because then its position cannot be updated.
+	 * Thumbs cannot be stacked. So a small correction is needed to put the 
+	 * non-boundary thumbs on the edges of thumb box.
+	 */
+	private final static double CORRECTION = 0.001;
+	
 	protected final ColorPicker colorPicker;
 	
 	private final Rectangle2D thumbRect = new Rectangle2D.Float();
@@ -143,17 +153,26 @@ public class ThumbBox {
 	 */
 	protected void moveThumbTo(int inputX) {
 		
-		if (selectedThumb == null
-				|| inputX < (int) thumbRect.getMinX()
-				|| inputX > (int) thumbRect.getMaxX()) {
+		if (selectedThumb == null) {
 			return;
 		}
 		
-		/* adjust offset */
-		inputX -= (int) thumbRect.getMinX();
+		double dataVal;
 		
-		float newFrac = inputX / (float) thumbRect.getWidth();
-		double dataVal = colorPicker.getDataFromFraction(newFrac);
+		/* Max out on edges */
+		if(inputX < (int) thumbRect.getMinX()) {
+			dataVal = colorPicker.getMinVal() + CORRECTION;
+			
+		} else if(inputX > (int) thumbRect.getMaxX()) {
+			dataVal = colorPicker.getMaxVal() - CORRECTION;
+			
+		} else {
+			/* adjust offset */
+			inputX -= (int) thumbRect.getMinX();
+			
+			float newFrac = inputX / (float) thumbRect.getWidth();
+			dataVal = colorPicker.getDataFromFraction(newFrac);
+		}
 		
 		updateThumbDataVal(dataVal);
 	}
@@ -320,7 +339,6 @@ public class ThumbBox {
 		if(selected > -1) {
 			openThumbEditDialog(selectedThumb, selected);
 		}
-		
 	}
 	
 	/**
@@ -329,6 +347,12 @@ public class ThumbBox {
 	protected void adjustThumbsToFractions() {
 		
 		float[] fractions = colorPicker.getFractions();
+		
+		if(fractions.length != colorPicker.getThumbNumber()) {
+			LogBuffer.println("Could not adjust thumb fractions. "
+					+ "Unequal thumb list and fraction list sizes.");
+			return;
+		}
 
 		for (int i = 0; i < fractions.length; i++) {
 			
@@ -454,22 +478,11 @@ public class ThumbBox {
 	 */
 	protected int getSelectedThumbIndex() {
 		
-		int selectedIndex = -1;
-		
 		if (selectedThumb == null) {
-			return selectedIndex;
+			return -1;
 		}
 		
-		List<Thumb> thumbs = colorPicker.getThumbList();
-		
-		selectedIndex = thumbs.indexOf(selectedThumb);
-
-		if (thumbs.get(selectedIndex).getX() == thumbs.get(thumbs.size() - 1)
-				.getX()) {
-			selectedIndex--;
-		}
-		
-		return selectedIndex;
+		return colorPicker.getThumbList().indexOf(selectedThumb);
 	}
 	
 	/**
@@ -487,8 +500,8 @@ public class ThumbBox {
 			double frac = thumbs.get(fracIndex).getX() / thumbRect.getWidth();
 			double frac2 = fractions[fracIndex];
 
-			if (Helper.nearlyEqual(frac, frac2)
-					|| thumbs.get(fracIndex).isSelected()) {
+			if (Helper.nearlyEqual(frac, frac2)){
+//					|| thumbs.get(fracIndex).isSelected()) { /* TODO bug */
 				return true;
 			}
 		}

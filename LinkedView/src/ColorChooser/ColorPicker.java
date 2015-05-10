@@ -148,8 +148,13 @@ public class ColorPicker {
 		thumbList.add(maxThumb);
 
 		colorExtractor.setMissingColor(activeColorSet.getMissing());
-		setMinVal(activeColorSet.getMin());
-		setMaxVal(activeColorSet.getMax());
+		
+		/* Only load non-dataset min/max if custom colorset is loaded */
+		if(!("RedGreen".equalsIgnoreCase(activeColorSet.getName())
+				|| "YellowBlue".equalsIgnoreCase(activeColorSet.getName()))) {
+			setMinVal(activeColorSet.getMin());
+			setMaxVal(activeColorSet.getMax());
+		}
 		
 		final String[] colors = activeColorSet.getColors();
 

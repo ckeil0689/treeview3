@@ -797,6 +797,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		private final int saveResizeDelay = 1000;
 		private javax.swing.Timer saveResizeTimer;
 		ActionListener saveWindowAttrs = new ActionListener() {
+			
+			@Override
 			public void actionPerformed(ActionEvent evt) {
 				if (evt.getSource() == saveResizeTimer) {
 					/* Stop timer */
@@ -1343,9 +1345,9 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		dendroView.getRowLabelView().setConfigNode(configNode);
 		dendroView.getColumnLabelView().setConfigNode(configNode);
 		dendroView.getColumnTreeView().getHeaderSummary()
-		.setConfigNode(configNode);
+			.setConfigNode(configNode);
 		dendroView.getRowTreeView().getHeaderSummary()
-		.setConfigNode(configNode);
+			.setConfigNode(configNode);
 	}
 
 	/**

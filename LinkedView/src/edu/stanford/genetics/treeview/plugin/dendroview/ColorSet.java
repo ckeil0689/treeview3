@@ -55,16 +55,14 @@ public class ColorSet {
 	/* Default values for a ColorSet. */
 	private final static String default_name = "RedGreen";
 	private final static float[] default_fractions = 
-//		{ 0.0f, 0.001f, 0.5f, 0.999f, 1.0f };
 		{ 0.0f, 0.5f,  1.0f };
 	private final static String[] default_colors = 
-//		{ "#FF0000", "#FF0000", "#000000", "#00FF00", "#00FF00" };
 		{ "#FF0000", "#000000", "#00FF00" };
 	private final static String default_missingColor = "#FFFFFF";
 	private final static String default_emptyColor = "#FFFFFF";
+	
 	private final static double default_min = -1.0;
 	private final static double default_max = 1.0;
-	
 	
 	private final String name;
 	private List<Color> colorList = new ArrayList<Color>();
@@ -135,6 +133,9 @@ public class ColorSet {
 			}
 		}
 		
+		/* TODO this is bad... will screw up dataset colors on first load
+		 * since min/max by default have nothing to do with 
+		 */
 		this.min = colorSetNode.getDouble("min", default_min);
 		this.max = colorSetNode.getDouble("max", default_max);
 		

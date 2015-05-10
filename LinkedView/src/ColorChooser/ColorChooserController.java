@@ -136,7 +136,7 @@ public class ColorChooserController implements ConfigNodePersistent {
 	 * Switched the currently used ColorSet to the one that matches the
 	 * specified entered name key in its 'ColorSet' configNode.
 	 */
-	public void switchColorSet(final String name) {
+	private void switchColorSet(final String name) {
 
 		setActiveColorSet(name);
 		
@@ -202,9 +202,11 @@ public class ColorChooserController implements ConfigNodePersistent {
 				gBox.changeColor(lastEvent.getPoint());
 				colorChooserUI.setCustomSelected(true);
 				setActiveColorSet("Custom");
-				Thumb t_selected = colorPicker.getThumb(selectedThumb);
-				colorPicker.getThumbBox().setSelectedThumb(t_selected);
-//				colorPicker.getThumb(selectedThumb).setSelected(true);
+				
+				if(selectedThumb > -1) {
+					Thumb t_selected = colorPicker.getThumb(selectedThumb);
+					colorPicker.getThumbBox().setSelectedThumb(t_selected);
+				}
 
 			} else {
 				ThumbBox tb = colorPicker.getThumbBox();
@@ -221,7 +223,9 @@ public class ColorChooserController implements ConfigNodePersistent {
 		 */
 		private void doubleClick() {
 
-			colorPicker.getThumbBox().editClickedThumb(lastEvent.getPoint());			
+			colorPicker.getThumbBox().editClickedThumb(lastEvent.getPoint());
+			colorChooserUI.setCustomSelected(true);
+			setActiveColorSet("Custom");
 		}
 
 		@Override
@@ -291,6 +295,7 @@ public class ColorChooserController implements ConfigNodePersistent {
 		public void mouseReleased(final MouseEvent e) {
 			
 			if(!colorChooserUI.isCustomSelected() && dragged) {
+				colorPicker.getThumbBox().moveThumbTo(e.getX());
 				colorChooserUI.setCustomSelected(true);
 				setActiveColorSet("Custom");
 				dragged = false;

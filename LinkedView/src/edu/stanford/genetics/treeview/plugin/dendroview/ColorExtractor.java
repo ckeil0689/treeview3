@@ -192,7 +192,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 				lastActive = parentNode.node("GradientChooser").get(
 						"activeColors", lastActive);
 			}
-			Boolean foundColorSet = false;
+			boolean foundColorSet = false;
 
 			for (final ColorSet defaultColorSet2 : ColorPresets.defaultColorSets) {
 				if (defaultColorSet2.getName().equalsIgnoreCase(lastActive)) {
@@ -211,7 +211,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 
 				for (final String childrenNode : childrenNodes) {
 					if (colorPresetNode.node(childrenNode)
-							.get("name", lastActive)
+							.get("name", lastActive) /* TODO second argument here needs to be a default, not the local variable */
 							.equalsIgnoreCase(lastActive)) {
 						colorSet = new ColorSet(
 								colorPresetNode.node(childrenNode));
@@ -238,6 +238,8 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 		}
 
 		setNewParams(colorSet.getFractions(), cList);
+		setMin(colorSet.getMin());
+		setMax(colorSet.getMax());
 		synchFloats(); /* sets initial missing/ empty data colors */
 		contrast = configNode.getDouble("contrast", getContrast());
 		setLogCenter(configNode.getDouble("logcenter", 1.0));
@@ -373,7 +375,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	}
 
 	/* Sets local variables' values from the colorSet object's colors */
-	private void synchFloats(final Color newColor, final float[] comp) {
+	private static void synchFloats(final Color newColor, final float[] comp) {
 
 		comp[0] = (float) newColor.getRed() / 256;
 		comp[1] = (float) newColor.getGreen() / 256;
@@ -700,7 +702,8 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 				e.printStackTrace();
 				return null;
 			}
-		} else
-			return null;
+		}
+		
+		return null;
 	}
 }
