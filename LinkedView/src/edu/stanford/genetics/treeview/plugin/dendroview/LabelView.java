@@ -542,8 +542,8 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		int multiple = (int) scale / 10;
 		
 		/* Guarantee max font size of 14 */
-		if(multiple > 8) {
-			multiple = 8;
+		if(multiple > 10) {
+			multiple = 10;
 		}
 		
 		int newPoints;
@@ -551,12 +551,11 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 			newPoints = 6;
 		} else {
 			/* rate of 2 is too much, rate of 1 too little... */
-			newPoints = 6 + (int)(1.5 * multiple);
+			newPoints = 6 + 2 * multiple;
 		}
 		
 		if(newPoints != getPoints()) {
 			setPoints(newPoints);
-//			adjustScrollBar();
 		}
 	}
 
