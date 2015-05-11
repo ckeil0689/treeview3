@@ -419,11 +419,11 @@ public class DendroView implements Observer, DendroPanel {
 		
 		zoomYTopPanel.add(scaleAddTopY, "wrap");
 		zoomYTopPanel.add(scaleRemoveTopY);
-				
+			
+		crossPanel.add(scaleIncXY);
+		crossPanel.add(zoomBtn, "wrap");
 		crossPanel.add(scaleDecXY);
-		crossPanel.add(zoomBtn);
-		crossPanel.add(scaleIncXY, "wrap");
-		crossPanel.add(scaleDefaultAll, "span, pushx, alignx 50%");
+		crossPanel.add(scaleDefaultAll);
 
 		navContainer.add(searchPanel, "pushx, alignx 50%, aligny 0%, h 50%, "
 				+ "wrap");
