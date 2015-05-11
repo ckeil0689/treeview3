@@ -669,7 +669,6 @@ public class DendroView implements Observer, DendroPanel {
 			showTreesMenuItem.setText(StringRes.menu_hideTrees);
 		}
 
-		LogBuffer.println("Repaint from treeVisibilty");
 		dendroPane.repaint();
 	}
 

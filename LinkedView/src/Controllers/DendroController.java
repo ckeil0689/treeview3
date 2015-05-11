@@ -53,6 +53,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.ArrayDrawer;
 import edu.stanford.genetics.treeview.plugin.dendroview.AtrAligner;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets;
+import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroException;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
@@ -1854,6 +1855,16 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		}
 
 		leftTreeDrawer.notifyObservers();
+	}
+	
+	/**
+	 * Update the state of color extractor to reflect settings from an 
+	 * imported node.
+	 * @param node
+	 */
+	public void importColorPreferences(Preferences node) {
+		
+		colorExtractor.importPreferences(node);
 	}
 
 	/**

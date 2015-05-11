@@ -97,6 +97,94 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 		setDefaultColorSet(defaultColorSet);
 		setLogBase(2.0);
 	}
+	
+	/**
+	 * Updates the state of the ColorExtractor instance to reflect the 
+	 * stored settings from the supplied node.
+	 * @param node Preferences node which contains stored color settings.
+	 */
+	public void importPreferences(Preferences node) {
+		
+		this.colorSet = findColorSetFromNode(node);
+		
+		final String[] colors = colorSet.getColors();
+		final List<Color> cList = new ArrayList<Color>(colors.length);
+		for (final String color : colors) {
+			cList.add(Color.decode(color));
+		}
+		
+		setNewParams(colorSet.getFractions(), cList);
+		
+		if("Custom".equalsIgnoreCase(colorSet.getName())) {
+			setMin(colorSet.getMin());
+			setMax(colorSet.getMax());
+		}
+		
+		synchFloats(); /* sets initial missing/ empty data colors */
+		contrast = node.getDouble("contrast", getContrast());
+		setLogCenter(node.getDouble("logcenter", 1.0));
+		setLogBase(node.getDouble("logbase", 2.0));
+		m_logTranform = (node.getInt("logtransform", 0) == 1);
+		setChanged();
+	}
+	
+	/**
+	 * Find the last active colorset from a supplied Preferences node.
+	 * @param node
+	 * @return The last active colorset or a default in case it cannot be 
+	 * found.
+	 */
+	private ColorSet findColorSetFromNode(Preferences node) {
+		
+		ColorSet nodeColorSet = defaultColorSet;
+		
+		String lastActive = "RedGreen";
+		try {
+			if (node.nodeExists("GradientChooser")) {
+				lastActive = node.node("GradientChooser").get("activeColors", 
+						lastActive);
+			}
+			boolean foundColorSet = false;
+
+			for (final ColorSet defaultColorSet2 : ColorPresets.defaultColorSets) {
+				if (defaultColorSet2.getName().equalsIgnoreCase(lastActive)) {
+					nodeColorSet = new ColorSet(defaultColorSet2);
+					foundColorSet = true;
+				}
+			}
+
+			if (!foundColorSet) {
+				// Set colorList and fractionList here, based on what the last
+				// active
+				// node was in GradientColorChooser. Otherwise keep defaults?
+				final Preferences colorPresetNode = node.node("ColorPresets");
+				final String[] childrenNodes = colorPresetNode.childrenNames();
+
+				for (final String childNode : childrenNodes) {
+					/* TODO second argument here needs to be a default, not the local variable */
+					if (colorPresetNode.node(childNode).get("name", lastActive)
+							.equalsIgnoreCase(lastActive)) {
+						nodeColorSet = new ColorSet(colorPresetNode.node(
+								childNode));
+						foundColorSet = true;
+						break;
+					}
+				}
+			}
+			// TODO This should be a more robust way of choosing a default
+			// colorset
+			if (!foundColorSet) {
+				nodeColorSet = new ColorSet(ColorPresets.defaultColorSets[0]);
+				LogBuffer.println("Unable to find last used colorset: "
+						+ lastActive + "; using " + colorSet.getName());
+			}
+		} catch (final BackingStoreException e) {
+			LogBuffer.logException(e);
+			nodeColorSet = defaultColorSet;
+		}
+		
+		return nodeColorSet;
+	}
 
 	public void setMin(final double min) {
 
@@ -125,52 +213,6 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 		defaultColorSet = set;
 	}
 
-	// /**
-	// * binds this ColorExtractor to a particular ConfigNode. This makes colors
-	// * persistent
-	// *
-	// * @param configNode
-	// * confignode to bind to
-	// */
-	// @Override
-	// public void bindConfig(final Preferences configNode) {
-	//
-	// if (root != configNode) {
-	//
-	// root = configNode;
-	// try {
-	// String[] childrenNodes = root.childrenNames();
-	// boolean nodePresent = false;
-	//
-	// for(int i = 0; i < childrenNodes.length; i++) {
-	//
-	// // This should later be about the children of ColorSet
-	// if(childrenNodes[i].equalsIgnoreCase("ColorSet")) {
-	// nodePresent = true;
-	// }
-	// }
-	//
-	// // Preferences cand = root.fetchFirst("ColorSet");
-	// // if (cand == null) {
-	// // cand = root.create("ColorSet");
-	// // }
-	//
-	// Preferences cand = root.node("ColorSet");
-	//
-	// colorSet.bindConfig(cand);
-	// synchFloats();
-	// contrast = root.getDouble("contrast", getContrast());
-	// setLogCenter(root.getDouble("logcenter", 1.0));
-	// setLogBase(root.getDouble("logbase", 2.0));
-	// m_logTranform = (root.getInt("logtransform", 0) == 1);
-	// setChanged();
-	//
-	// } catch (BackingStoreException e) {
-	// e.printStackTrace();
-	// }
-	// }
-	// }
-
 	/**
 	 * binds this ColorExtractor to a particular ConfigNode. This makes colors
 	 * persistent
@@ -189,70 +231,69 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 					+ "node because parentNode was null.");
 		}
 
-		String lastActive = "RedGreen";
-		try {
-			if (parentNode.nodeExists("GradientChooser")) {
-				lastActive = parentNode.node("GradientChooser").get(
-						"activeColors", lastActive);
-			}
-			boolean foundColorSet = false;
+		importPreferences(parentNode);
+//		String lastActive = "RedGreen";
+//		try {
+//			if (parentNode.nodeExists("GradientChooser")) {
+//				lastActive = parentNode.node("GradientChooser").get(
+//						"activeColors", lastActive);
+//			}
+//			boolean foundColorSet = false;
+//
+//			for (final ColorSet defaultColorSet2 : ColorPresets.defaultColorSets) {
+//				if (defaultColorSet2.getName().equalsIgnoreCase(lastActive)) {
+//					setNewColorSet(new ColorSet(defaultColorSet2));
+//					foundColorSet = true;
+//				}
+//			}
+//
+//			if (!foundColorSet) {
+//				// Set colorList and fractionList here, based on what the last
+//				// active
+//				// node was in GradientColorChooser. Otherwise keep defaults?
+//				final Preferences colorPresetNode = parentNode
+//						.node("ColorPresets");
+//				final String[] childrenNodes = colorPresetNode.childrenNames();
+//
+//				for (final String childNode : childrenNodes) {
+//					if (colorPresetNode.node(childNode).get("name", lastActive) /* TODO second argument here needs to be a default, not the local variable */
+//							.equalsIgnoreCase(lastActive)) {
+//						setNewColorSet(new ColorSet(colorPresetNode.node(childNode)));
+//						foundColorSet = true;
+//						break;
+//					}
+//				}
+//			}
+//			// TODO This should be a more robust way of choosing a default
+//			// colorset
+//			if (!foundColorSet) {
+//				setNewColorSet(new ColorSet(ColorPresets.defaultColorSets[0]));
+//				LogBuffer.println("Unable to find last used colorset: "
+//						+ lastActive + "; using " + colorSet.getName());
+//			}
+//		} catch (final BackingStoreException e) {
+//			LogBuffer.logException(e);
+//		}
 
-			for (final ColorSet defaultColorSet2 : ColorPresets.defaultColorSets) {
-				if (defaultColorSet2.getName().equalsIgnoreCase(lastActive)) {
-					colorSet = new ColorSet(defaultColorSet2);
-					foundColorSet = true;
-				}
-			}
-
-			if (!foundColorSet) {
-				// Set colorList and fractionList here, based on what the last
-				// active
-				// node was in GradientColorChooser. Otherwise keep defaults?
-				final Preferences colorPresetNode = parentNode
-						.node("ColorPresets");
-				final String[] childrenNodes = colorPresetNode.childrenNames();
-
-				for (final String childrenNode : childrenNodes) {
-					if (colorPresetNode.node(childrenNode)
-							.get("name", lastActive) /* TODO second argument here needs to be a default, not the local variable */
-							.equalsIgnoreCase(lastActive)) {
-						colorSet = new ColorSet(
-								colorPresetNode.node(childrenNode));
-						foundColorSet = true;
-						break;
-					}
-				}
-			}
-			// TODO This should be a more robust way of choosing a default
-			// colorset
-			if (!foundColorSet) {
-				colorSet = new ColorSet(ColorPresets.defaultColorSets[0]);
-				LogBuffer.println("Unable to find last used colorset: "
-						+ lastActive + "; using " + colorSet.getName());
-			}
-		} catch (final BackingStoreException e) {
-			LogBuffer.logException(e);
-		}
-
-		final String[] colors = colorSet.getColors();
-		final List<Color> cList = new ArrayList<Color>(colors.length);
-		for (final String color : colors) {
-			cList.add(Color.decode(color));
-		}
-
-		setNewParams(colorSet.getFractions(), cList);
-		
-		if("Custom".equalsIgnoreCase(colorSet.getName())) {
-			setMin(colorSet.getMin());
-			setMax(colorSet.getMax());
-		}
-		
-		synchFloats(); /* sets initial missing/ empty data colors */
-		contrast = configNode.getDouble("contrast", getContrast());
-		setLogCenter(configNode.getDouble("logcenter", 1.0));
-		setLogBase(configNode.getDouble("logbase", 2.0));
-		m_logTranform = (configNode.getInt("logtransform", 0) == 1);
-		setChanged();
+//		final String[] colors = colorSet.getColors();
+//		final List<Color> cList = new ArrayList<Color>(colors.length);
+//		for (final String color : colors) {
+//			cList.add(Color.decode(color));
+//		}
+//
+//		setNewParams(colorSet.getFractions(), cList);
+//		
+//		if("Custom".equalsIgnoreCase(colorSet.getName())) {
+//			setMin(colorSet.getMin());
+//			setMax(colorSet.getMax());
+//		}
+//		
+//		synchFloats(); /* sets initial missing/ empty data colors */
+//		contrast = configNode.getDouble("contrast", getContrast());
+//		setLogCenter(configNode.getDouble("logcenter", 1.0));
+//		setLogBase(configNode.getDouble("logbase", 2.0));
+//		m_logTranform = (configNode.getInt("logtransform", 0) == 1);
+//		setChanged();
 	}
 
 	/**

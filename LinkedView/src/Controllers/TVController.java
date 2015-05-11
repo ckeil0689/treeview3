@@ -50,6 +50,7 @@ import edu.stanford.genetics.treeview.model.TVModel;
 //import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
 //=======
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
+import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
 //>>>>>>> colorUpdate
 import edu.stanford.genetics.treeview.plugin.dendroview.DoubleArrayDrawer;
 
@@ -273,6 +274,7 @@ public class TVController implements Observer {
 			String srcName = clusterNodeSourceKeys[0];
 			String srcExtension = clusterNodeSourceKeys[1];
 			this.oldNode = getOldPreferences(srcName, srcExtension);
+			
 		} else {
 			this.oldNode = null;
 		}
@@ -317,6 +319,19 @@ public class TVController implements Observer {
 
 		if (model.getDataMatrix().getNumRow() > 0) {
 
+			tvFrame.setTitleString(model.getSource());
+
+			/* Will notify view of successful loading. */
+			((TVModel) model).setLoaded(true);
+
+			setDataModel();
+
+			dendroController.setNewMatrix(tvFrame.getDendroView(), model);
+			
+			/* TODO Needs to happen after setNewMatrix because a new ColorExtractor object is created,
+			 * which would void the updated ColorExtractor state if copying happens before.
+			 * Implement a nicer solution one day...
+			 */
 			copyOldPreferences(fileMenuSet.getRoot(), fileMenuSet.getExt());
 			
 			if (fileMenuSet != null) {
@@ -327,15 +342,6 @@ public class TVController implements Observer {
 			} else {
 				LogBuffer.println("FileSet is null.");
 			}
-
-			tvFrame.setTitleString(model.getSource());
-
-			/* Will notify view of successful loading. */
-			((TVModel) model).setLoaded(true);
-
-			setDataModel();
-
-			dendroController.setNewMatrix(tvFrame.getDendroView(), model);
 
 			/* set the selected label type to the old one */
 			resetLabelSelection();
@@ -412,6 +418,7 @@ public class TVController implements Observer {
 				Preferences newKeys;
 				Preferences oldKeys;
 				
+				/* TODO delete this... just import the node to Row/ColLabelView */
 				if(oldNode.nodeExists("ColLabelView")) {
 					newKeys = newNode.node("ColLabelView");
 					oldKeys = oldNode.node("ColLabelView");
@@ -433,49 +440,12 @@ public class TVController implements Observer {
 					newKeys.putInt("size", oldKeys.getInt("size", 12));
 				}
 				
-//				if(oldNode.nodeExists("ColorPresets")) {
-//					/* Colors */
-//					newKeys = newNode.node("ColorPresets").node("ColorSet1");
-//					oldKeys = oldNode.node("ColorPresets").node("ColorSet1");
-//					
-//					ColorSet defaultCS = ColorPresets.defaultColorSets[0];
-//					
-//					newKeys.put("Color01", oldKeys.get("Color01", 
-//							defaultCS.getColors()[0]));
-//					newKeys.put("Color11", oldKeys.get("Color11", 
-//							defaultCS.getColors()[1]));
-//					newKeys.put("Color21", oldKeys.get("Color21", 
-//							defaultCS.getColors()[2]));
-//					
-//					newKeys.putDouble("Fraction01", 
-//							oldKeys.getDouble("Fraction01", 0.0));
-//					newKeys.putDouble("Fraction11", 
-//							oldKeys.getDouble("Fraction11", 0.5));
-//					newKeys.putDouble("Fraction21", 
-//							oldKeys.getDouble("Fraction21", 1.0));
-//					
-//					newKeys.putInt("colorNum", oldKeys.getInt("colorNum", 3));
-//					
-//					newKeys.put("empty", oldKeys.get("empty", 
-//							defaultCS.getEmpty().toString()));
-//					newKeys.put("missing", oldKeys.get("missing", 
-//							defaultCS.getMissing().toString()));
-//					newKeys.put("name", oldKeys.get("name", "Custom"));
-//					
-//				}
-//				
-//				if(oldNode.nodeExists("GradientChooser")) {
-//					
-//					newKeys = newNode.node("GradientChooser");
-//					oldKeys = oldNode.node("GradientChooser");
-//					
-//					newKeys.put("activeColors", oldKeys.get("activeColors", 
-//							"RedGreen"));
-//				}
+				if(oldNode.nodeExists("ColorPresets")) {
+					dendroController.importColorPreferences(oldNode);
+				}
 				
 			} catch (BackingStoreException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LogBuffer.logException(e);
 			}
 			
 			oldNode = null;
@@ -490,7 +460,7 @@ public class TVController implements Observer {
 	 * @return The target Preferences node.
 	 * @throws BackingStoreException 
 	 */
-	private Preferences getTargetNode(Preferences root, String srcName, 
+	private static Preferences getTargetNode(Preferences root, String srcName, 
 			String srcExtension) throws BackingStoreException {
 		
 		String[] fileNodes = root.childrenNames();
