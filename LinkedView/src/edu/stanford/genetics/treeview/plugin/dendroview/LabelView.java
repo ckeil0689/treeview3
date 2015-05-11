@@ -58,11 +58,13 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	protected final int d_style = 0;
 	protected final int d_size = 14;
 	protected boolean d_justified;
+	protected boolean d_fixed = false;
 
 	/* Custom label settings */
 	protected String face;
 	protected int style;
 	protected int size;
+	protected boolean isFixed;
 
 	/* Panel sizing */
 	protected int maxlength = 0;
@@ -225,6 +227,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		setStyle(configNode.getInt("style", d_style));
 		setPoints(configNode.getInt("size", d_size));
 		setJustifyOption(configNode.getBoolean("isRightJustified", d_justified));
+		setFixed(configNode.getBoolean("isFixed", d_fixed));
 
 		getHeaderSummary().setConfigNode(configNode);
 	}
@@ -245,6 +248,12 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	public int getStyle() {
 
 		return style;
+	}
+	
+	@Override
+	public boolean getFixed() {
+
+		return isFixed;
 	}
 
 	@Override
@@ -277,6 +286,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 				configNode.put("face", face);
 			}
 			setFont(new Font(face, style, size));
+			adjustScrollBar();
 			repaint();
 		}
 	}
@@ -290,6 +300,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 				configNode.putInt("size", size);
 			}
 			setFont(new Font(face, style, size));
+			adjustScrollBar();
 			repaint();
 		}
 	}
@@ -303,6 +314,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 				configNode.putInt("style", style);
 			}
 			setFont(new Font(face, style, size));
+			adjustScrollBar();
 			repaint();
 		}
 	}
@@ -327,6 +339,16 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 			}
 		});
 	}
+	
+	@Override
+	public void setFixed(boolean fixed) {
+		
+		this.isFixed = fixed;
+		
+		if (configNode != null) {
+			configNode.putBoolean("isFixed", fixed);
+		}
+	};
 
 	@Override
 	public String viewName() {
@@ -368,7 +390,9 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		/* Draw labels if zoom level allows it */
 		if (map.getScale() > 10.0) {
 			
-			setDynamicFontSize();
+			if(!isFixed) {
+				setDynamicFontSize();
+			}
 
 			/* Rotate plane for array axis (not for zoomHint) */
 			if (!isGeneAxis) {

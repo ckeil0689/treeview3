@@ -43,6 +43,12 @@ public abstract interface FontSelectable {
 	 * @return The current style
 	 */
 	public abstract int getStyle();
+	
+	/**
+	 * 
+	 * @return Whether fonts size is fixed.
+	 */
+	public abstract boolean getFixed();
 
 	/**
 	 * @return gets label justification
@@ -66,6 +72,12 @@ public abstract interface FontSelectable {
 	 *            The new points value
 	 */
 	public abstract void setPoints(int i);
+	
+	/**
+	 * Sets whether the font size changes dynamically or remains fixed.
+	 * @param fixed
+	 */
+	public abstract void setFixed(boolean fixed);
 
 	/**
 	 * Sets the style

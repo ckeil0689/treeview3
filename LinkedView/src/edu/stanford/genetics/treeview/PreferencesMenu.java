@@ -8,6 +8,7 @@ import java.util.prefs.Preferences;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -188,9 +189,6 @@ ConfigNodePersistent {
 		private JPanel mainPanel;
 
 		public FontPanel() {
-
-//			mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT,
-//					null);
 
 			final FontSettings fontSettings = new FontSettings(
 					dendroView.getRowLabelView(),

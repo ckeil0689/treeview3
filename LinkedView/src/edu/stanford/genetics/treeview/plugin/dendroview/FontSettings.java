@@ -41,6 +41,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
@@ -70,6 +71,7 @@ public class FontSettings implements SettingsPanel {
 	private JPanel fontPanel;
 	private JComboBox<String> font_choice;
 	private JComboBox<String> style_choice;
+	private JCheckBox fixedBox;
 	private NatField size_field;
 
 	public FontSettings(final FontSelectable fs, final FontSelectable fs2) {
@@ -250,14 +252,17 @@ public class FontSettings implements SettingsPanel {
 		final String string = (String) font_choice.getSelectedItem();
 		final int i = encode_style((String) style_choice.getSelectedItem());
 		final int size = size_field.getNat();
+		final boolean isFixed = fixedBox.isSelected();
 
 		client.setFace(string);
 		client.setStyle(i);
 		client.setPoints(size);
+		client.setFixed(isFixed);
 
 		client2.setFace(string);
 		client2.setStyle(i);
 		client2.setPoints(size);
+		client2.setFixed(isFixed);
 	}
 
 	/**
@@ -276,7 +281,12 @@ public class FontSettings implements SettingsPanel {
 		size_field = new NatField(client.getPoints(), 3);
 		size_field.getDocument().addDocumentListener(
 				new DocumentChangeListener());
-		fontPanel.add(size_field, "span, wrap");
+		fontPanel.add(size_field);
+		
+		fixedBox = new JCheckBox("Keep fixed");
+		fixedBox.setSelected(client.getFixed());
+		fixedBox.addActionListener(new SelectionListener());
+		fontPanel.add(fixedBox);
 	}
 
 	/**
