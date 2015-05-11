@@ -387,10 +387,6 @@ public class TVController implements Observer {
 	}
 	
 	/**
-	 * TODO Nasty hotfix code... try to put into another class to handle 
-	 * the transfer of data... Preferences API seems weird about copying 
-	 * node content.
-	 * 
 	 * Copies label and color data from the pre-clustered file to the 
 	 * Preferences node of the post-clustered file.
 	 * @param srcName Source name of the post-clustered file.
@@ -401,44 +397,7 @@ public class TVController implements Observer {
 		if(oldNode != null) {
 			
 			try {
-				/* First, get the relevant old node... */
-				Preferences root;
-				if(getConfigNode().nodeExists("File")) {
-					root = getConfigNode().node("File");
-				} else {
-					LogBuffer.println("File node not found. Could not"
-							+ " copy data.");
-					return;
-				}
-				
-				Preferences newNode = getTargetNode(root, srcName, 
-						srcExtension);
-				
-				/* Add relevant data from old node back */
-				Preferences newKeys;
-				Preferences oldKeys;
-				
-				/* TODO delete this... just import the node to Row/ColLabelView */
-				if(oldNode.nodeExists("ColLabelView")) {
-					newKeys = newNode.node("ColLabelView");
-					oldKeys = oldNode.node("ColLabelView");
-					
-					/* Labels */
-					newKeys.put("face", oldKeys.get("face", "Dialog"));
-					newKeys.putBoolean("isRightJustified", 
-							oldKeys.getBoolean("isRightJustified", true));
-					newKeys.putInt("size", oldKeys.getInt("size", 12));
-				}
-				
-				if(oldNode.nodeExists("RowLabelView")) {
-					newKeys = newNode.node("RowLabelView");
-					oldKeys = oldNode.node("RowLabelView");
-					
-					newKeys.put("face", oldKeys.get("face", "Dialog"));
-					newKeys.putBoolean("isRightJustified", 
-							oldKeys.getBoolean("isRightJustified", true));
-					newKeys.putInt("size", oldKeys.getInt("size", 12));
-				}
+				dendroController.importLabelPreferences(oldNode);
 				
 				if(oldNode.nodeExists("ColorPresets")) {
 					dendroController.importColorPreferences(oldNode);

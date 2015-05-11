@@ -1866,6 +1866,18 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		
 		colorExtractor.importPreferences(node);
 	}
+	
+	/**
+	 * Update the state of label views to reflect settings from an 
+	 * imported node.
+	 * @param node
+	 */
+	public void importLabelPreferences(Preferences node) {
+		
+		LogBuffer.println("Importing labels...");
+		dendroView.getRowLabelView().importSettingsFromNode(node.node("RowLabelView"));
+		dendroView.getColumnLabelView().importSettingsFromNode(node.node("ColLabelView"));
+	}
 
 	/**
 	 * Scrolls to index i in the Y-MapContainer

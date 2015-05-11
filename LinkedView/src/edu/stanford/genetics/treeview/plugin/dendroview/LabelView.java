@@ -223,13 +223,19 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 			return;
 		}
 
-		setFace(configNode.get("face", d_face));
-		setStyle(configNode.getInt("style", d_style));
-		setPoints(configNode.getInt("size", d_size));
-		setJustifyOption(configNode.getBoolean("isRightJustified", d_justified));
-		setFixed(configNode.getBoolean("isFixed", d_fixed));
+		LogBuffer.println("Setting new label configNode");
+		importSettingsFromNode(configNode);
+	}
+	
+	public void importSettingsFromNode(Preferences node) {
+		
+		setFace(node.get("face", d_face));
+		setStyle(node.getInt("style", d_style));
+		setPoints(node.getInt("size", d_size));
+		setJustifyOption(node.getBoolean("isRightJustified", d_justified));
+		setFixed(node.getBoolean("isFixed", d_fixed));
 
-		getHeaderSummary().setConfigNode(configNode);
+		getHeaderSummary().setConfigNode(node);
 	}
 
 	@Override

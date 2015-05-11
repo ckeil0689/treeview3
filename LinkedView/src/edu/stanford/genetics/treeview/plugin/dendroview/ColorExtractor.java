@@ -232,68 +232,6 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 		}
 
 		importPreferences(parentNode);
-//		String lastActive = "RedGreen";
-//		try {
-//			if (parentNode.nodeExists("GradientChooser")) {
-//				lastActive = parentNode.node("GradientChooser").get(
-//						"activeColors", lastActive);
-//			}
-//			boolean foundColorSet = false;
-//
-//			for (final ColorSet defaultColorSet2 : ColorPresets.defaultColorSets) {
-//				if (defaultColorSet2.getName().equalsIgnoreCase(lastActive)) {
-//					setNewColorSet(new ColorSet(defaultColorSet2));
-//					foundColorSet = true;
-//				}
-//			}
-//
-//			if (!foundColorSet) {
-//				// Set colorList and fractionList here, based on what the last
-//				// active
-//				// node was in GradientColorChooser. Otherwise keep defaults?
-//				final Preferences colorPresetNode = parentNode
-//						.node("ColorPresets");
-//				final String[] childrenNodes = colorPresetNode.childrenNames();
-//
-//				for (final String childNode : childrenNodes) {
-//					if (colorPresetNode.node(childNode).get("name", lastActive) /* TODO second argument here needs to be a default, not the local variable */
-//							.equalsIgnoreCase(lastActive)) {
-//						setNewColorSet(new ColorSet(colorPresetNode.node(childNode)));
-//						foundColorSet = true;
-//						break;
-//					}
-//				}
-//			}
-//			// TODO This should be a more robust way of choosing a default
-//			// colorset
-//			if (!foundColorSet) {
-//				setNewColorSet(new ColorSet(ColorPresets.defaultColorSets[0]));
-//				LogBuffer.println("Unable to find last used colorset: "
-//						+ lastActive + "; using " + colorSet.getName());
-//			}
-//		} catch (final BackingStoreException e) {
-//			LogBuffer.logException(e);
-//		}
-
-//		final String[] colors = colorSet.getColors();
-//		final List<Color> cList = new ArrayList<Color>(colors.length);
-//		for (final String color : colors) {
-//			cList.add(Color.decode(color));
-//		}
-//
-//		setNewParams(colorSet.getFractions(), cList);
-//		
-//		if("Custom".equalsIgnoreCase(colorSet.getName())) {
-//			setMin(colorSet.getMin());
-//			setMax(colorSet.getMax());
-//		}
-//		
-//		synchFloats(); /* sets initial missing/ empty data colors */
-//		contrast = configNode.getDouble("contrast", getContrast());
-//		setLogCenter(configNode.getDouble("logcenter", 1.0));
-//		setLogBase(configNode.getDouble("logbase", 2.0));
-//		m_logTranform = (configNode.getInt("logtransform", 0) == 1);
-//		setChanged();
 	}
 
 	/**
