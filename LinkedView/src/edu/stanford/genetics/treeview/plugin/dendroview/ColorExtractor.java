@@ -74,7 +74,10 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	private final float[] emptyColor = new float[3];
 
 	/** Constructor for the ColorExtractor object */
-	public ColorExtractor() {
+	public ColorExtractor(double min, double max) {
+		
+		setMin(min);
+		setMax(max);
 
 		// set a default defaultColorSet... should be superceded by a user
 		// setting...
@@ -238,8 +241,12 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 		}
 
 		setNewParams(colorSet.getFractions(), cList);
-		setMin(colorSet.getMin());
-		setMax(colorSet.getMax());
+		
+		if("Custom".equalsIgnoreCase(colorSet.getName())) {
+			setMin(colorSet.getMin());
+			setMax(colorSet.getMax());
+		}
+		
 		synchFloats(); /* sets initial missing/ empty data colors */
 		contrast = configNode.getDouble("contrast", getContrast());
 		setLogCenter(configNode.getDouble("logcenter", 1.0));

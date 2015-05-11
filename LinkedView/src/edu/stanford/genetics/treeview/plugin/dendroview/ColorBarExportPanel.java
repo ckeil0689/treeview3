@@ -215,7 +215,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 	 */
 	public final static void main(final String[] argv) {
 
-		final ColorExtractor colorE = new ColorExtractor();
+		final ColorExtractor colorE = new ColorExtractor(-1, 1);
 		colorE.setDefaults();
 		final double contrast = colorE.getContrast();
 		colorE.setMissing(contrast * 2, contrast * 2);

@@ -1281,7 +1281,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 		final ColorPresets colorPresets = DendrogramFactory.getColorPresets();
 		colorPresets.setConfigNode(configNode);
-		colorExtractor = new ColorExtractor();
+		colorExtractor = new ColorExtractor(tvModel.getDataMatrix().getMinVal(), 
+				tvModel.getDataMatrix().getMaxVal());
 		colorExtractor.setDefaultColorSet(colorPresets.getDefaultColorSet());
 		colorExtractor.setMissing(DataModel.NODATA, DataModel.EMPTY);
 
