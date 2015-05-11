@@ -17,7 +17,7 @@ public class LabelContextMenu extends JPopupMenu {
 	public LabelContextMenu() {
 		
 		super();
-		labelStyles = new JMenuItem("Edit labels...");
+		labelStyles = new JMenuItem("Label settings...");
 		add(labelStyles);
 	}
 	

@@ -123,6 +123,7 @@ public class DendroView implements Observer, DendroPanel {
 	private JMenuItem colorMenuItem;
 	private JMenuItem annotationsMenuItem;
 	private JMenuItem showTreesMenuItem;
+	
 	/* JButtons for scaling the matrix */
 	/* TODO should be controlled in a GlobalViewController...when it exists */
 	private JButton zoomBtn;
