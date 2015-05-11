@@ -58,6 +58,8 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
 import edu.stanford.genetics.treeview.plugin.dendroview.DoubleArrayDrawer;
 import edu.stanford.genetics.treeview.plugin.dendroview.InteractiveMatrixView;
+import edu.stanford.genetics.treeview.plugin.dendroview.LabelContextMenu;
+import edu.stanford.genetics.treeview.plugin.dendroview.LabelContextMenuController;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreeColorer;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreePainter;
@@ -73,6 +75,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 	private DendroView dendroView;
 	private final TreeViewFrame tvFrame;
+	private final TVController tvController;
 	private DataModel tvModel;
 
 	protected Preferences configNode;
@@ -100,9 +103,11 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	private ColorExtractor colorExtractor;
 
 
-	public DendroController(final TreeViewFrame tvFrame) {
+	public DendroController(final TreeViewFrame tvFrame, 
+			final TVController tvController) {
 
 		this.tvFrame = tvFrame;
+		this.tvController = tvController;
 
 		interactiveXmap = new MapContainer("Fixed", "GlobalXMap");
 		interactiveYmap = new MapContainer("Fixed", "GlobalYMap");
@@ -1026,7 +1031,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 						dendroView.getYScroll().getValue());
 			}
 		} catch (final BackingStoreException e) {
-			e.printStackTrace();
+			LogBuffer.logException(e);
 		}
 	}
 
@@ -1319,6 +1324,13 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 		// this is here because my only subclass shares this code.
 		bindTrees();
+		
+		// Set context menu for LabelViews
+		LabelContextMenu lCMenu = new LabelContextMenu();
+		LabelContextMenuController lCMenuController = 
+				new LabelContextMenuController(lCMenu, tvController);
+		dendroView.getRowLabelView().setComponentPopupMenu(lCMenu);
+		dendroView.getColumnLabelView().setComponentPopupMenu(lCMenu);
 
 		// perhaps I could remember this stuff in the MapContainer...
 		interactiveXmap.setIndexRange(0, tvModel.getDataMatrix().getNumCol() - 1);
@@ -1379,12 +1391,12 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		dendroView.getColumnTreeView().setATRHeaderInfo(
 				tvModel.getAtrHeaderInfo());
 		dendroView.getRowTreeView()
-		.setGTRHeaderInfo(tvModel.getGtrHeaderInfo());
+				.setGTRHeaderInfo(tvModel.getGtrHeaderInfo());
 		dendroView.getColumnLabelView().setHeaderInfo(
 				tvModel.getColumnHeaderInfo());
 		dendroView.getRowLabelView().setHeaderInfo(tvModel.getRowHeaderInfo());
-		dendroView.getInteractiveMatrixView().setHeaders(tvModel.getRowHeaderInfo(),
-				tvModel.getColumnHeaderInfo());
+		dendroView.getInteractiveMatrixView().setHeaders(
+				tvModel.getRowHeaderInfo(), tvModel.getColumnHeaderInfo());
 	}
 
 	/**

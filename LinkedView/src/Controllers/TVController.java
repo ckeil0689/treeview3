@@ -76,7 +76,7 @@ public class TVController implements Observer {
 
 		this.model = model;
 		this.tvFrame = tvFrame;
-		this.dendroController = new DendroController(tvFrame);
+		this.dendroController = new DendroController(tvFrame, this);
 		this.selectedLabels = new String[2];
 
 		/* Add the view as observer to the model */
@@ -679,9 +679,10 @@ public class TVController implements Observer {
 		final ClusterDialog clusterView = new ClusterDialog(clusterType);
 
 		/* Creating the Controller for this view. */
-		new ClusterController(clusterView, TVController.this);
+		ClusterController cController = new ClusterController(clusterView, 
+				TVController.this);
 
-		clusterView.setVisible(true);
+		cController.displayView();
 	}
 
 	/**
@@ -810,29 +811,29 @@ public class TVController implements Observer {
 		if (written.isEmpty()) {
 			tvFrame.openSaveDialog(written.isEmpty(), null);
 			return false;
-
-		} else {
-			String msg = "Model changes were written to ";
-			int i = 0;
-
-			for (final DataModelFileType type : written) {
-				msg += type.name();
-				i++;
-
-				if (i == written.size()) {
-					// nothing after last one.
-
-				} else if (i + 1 == written.size()) {
-					msg += " and ";
-
-				} else {
-					msg += ",";
-				}
-			}
-
-			tvFrame.openSaveDialog(written.isEmpty(), msg);
-			return true;
 		}
+		
+		String msg = "Model changes were written to ";
+		int i = 0;
+
+		for (final DataModelFileType type : written) {
+			msg += type.name();
+			i++;
+
+			if (i == written.size()) {
+				// nothing after last one.
+
+			} else if (i + 1 == written.size()) {
+				msg += " and ";
+
+			} else {
+				msg += ",";
+			}
+		}
+
+		tvFrame.openSaveDialog(written.isEmpty(), msg);
+		return true;
+		
 	}
 
 	/**
@@ -953,32 +954,6 @@ public class TVController implements Observer {
 		// View
 		final PreferencesMenu preferences = new PreferencesMenu(tvFrame);
 
-//<<<<<<< HEAD
-//		if (menu.equalsIgnoreCase(StringRes.menu_Color)) {
-//
-//			final Double min = model.getDataMatrix().getMinVal();
-//			final Double max = model.getDataMatrix().getMaxVal();
-//
-//			/* View */
-//			final ColorChooser gradientPick = new ColorChooser(
-//					((DoubleArrayDrawer) dendroController.getArrayDrawer())
-//					.getColorExtractor(),
-//					min, max);
-//
-//			/*
-//			 * Adding GradientColorChooser configurations to DendroView node.
-//			 */
-//			gradientPick.setConfigNode(((TVModel) model).getDocumentConfig());
-//
-//			/* Controller */
-//			new ColorChooserController(gradientPick);
-//
-//			preferences.setGradientChooser(gradientPick);
-//
-//		}
-//
-//=======
-//>>>>>>> colorUpdate
 		if (menu.equalsIgnoreCase(StringRes.menu_RowAndCol)) {
 			preferences.setHeaderInfo(model.getRowHeaderInfo(),
 					model.getColumnHeaderInfo());

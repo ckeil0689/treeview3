@@ -104,6 +104,11 @@ public class ClusterController {
 			LogBuffer.println("Cannot add listeners, clusterView is null.");
 		}
 	}
+	
+	public void displayView() {
+		
+		clusterDialog.setVisible(true);
+	}
 
 	/**
 	 * Begins cluster process if the user clicks the 'Cluster' button in
@@ -268,8 +273,9 @@ public class ClusterController {
 			/* Calculating the distance matrix */
 			distMatrix.setMatrix(processor.calcDistance(similarity, axis));
 
-			if (distMatrix == null || isCancelled())
+			if (isCancelled()) {
 				return null;
+			}
 			
 //			distMatrix.writeMatrix(axisPrefix);
 
@@ -522,32 +528,34 @@ public class ClusterController {
 	 */
 	private boolean isReady(final int distMeasure, final int type) {
 
-		if (isHierarchical())
+		if (isHierarchical()) {
 			return distMeasure != DistMatrixCalculator.NO_CLUSTER;
-		else {
-			final Integer[] spinnerValues = clusterView.getSpinnerValues();
-
-			int groups;
-			int iterations;
-
-			switch (type) {
-
-			case ROW:
-				groups = spinnerValues[0];
-				iterations = spinnerValues[1];
-				break;
-			case COL:
-				groups = spinnerValues[2];
-				iterations = spinnerValues[3];
-				break;
-			default:
-				groups = 0;
-				iterations = 0;
-				break;
-			}
-
-			return (distMeasure != DistMatrixCalculator.NO_CLUSTER && (groups > 0 && iterations > 0));
 		}
+		
+		final Integer[] spinnerValues = clusterView.getSpinnerValues();
+
+		int groups;
+		int iterations;
+
+		switch (type) {
+
+		case ROW:
+			groups = spinnerValues[0];
+			iterations = spinnerValues[1];
+			break;
+		case COL:
+			groups = spinnerValues[2];
+			iterations = spinnerValues[3];
+			break;
+		default:
+			groups = 0;
+			iterations = 0;
+			break;
+		}
+
+		return (distMeasure != DistMatrixCalculator.NO_CLUSTER 
+				&& (groups > 0 && iterations > 0));
+		
 	}
 
 	/**
