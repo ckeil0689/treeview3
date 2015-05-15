@@ -197,24 +197,40 @@ public class MapContainer extends Observable implements Observer,
 	 * This method allows for a more intuitive call from other classes so
 	 * that the meaning is conveyed and parameters don't have to be understood
 	 * and set first.
-	 * TODO expand on this to implement adding/ removing tiles on either side
-	 * of the axis.
 	 */
-	public void zoomOut() {
+	public void zoomOutBegin() {
 		
-		incrementalZoom(false);
+		incrementalZoom(false,true,true);
 	}
 	
 	/**
 	 * This method allows for a more intuitive call from other classes so
 	 * that the meaning is conveyed and parameters don't have to be understood
 	 * and set first.
-	 * TODO expand on this to implement adding/ removing tiles on either side
-	 * of the axis.
 	 */
-	public void zoomIn() {
+	public void zoomInBegin() {
 		
-		incrementalZoom(true);
+		incrementalZoom(true,true,true);
+	}
+	
+	/**
+	 * This method allows for a more intuitive call from other classes so
+	 * that the meaning is conveyed and parameters don't have to be understood
+	 * and set first.
+	 */
+	public void zoomOutEnd() {
+		
+		incrementalZoom(false,false,true);
+	}
+	
+	/**
+	 * This method allows for a more intuitive call from other classes so
+	 * that the meaning is conveyed and parameters don't have to be understood
+	 * and set first.
+	 */
+	public void zoomInEnd() {
+		
+		incrementalZoom(true,false,true);
 	}
 	
 	//This is for gradually zooming away from the center of the currently displayed dots
@@ -296,11 +312,15 @@ public class MapContainer extends Observable implements Observer,
 	 * and selection issues.
 	 *
 	 * @param boolean zoomsIn Tells the method if it should zoom in or out.
+	 * @param boolean zoomsIn Tells the method if it should fix the beginning
+	 * (e.g. left/top) or end (e.g. right/bottom).
 	 */
-	private void incrementalZoom(boolean zoomsIn) {
+	private void incrementalZoom(boolean zoomsIn,boolean beginFixed,
+								 boolean hardFixed) {
 
 		int zoomVal;
 		double newScale = getScale();
+		int newFirstVis = getFirstVisible();
 
 		tileNumVisible = Math.round(getAvailablePixels() / getScale());
 
@@ -321,6 +341,24 @@ public class MapContainer extends Observable implements Observer,
 				tileNumVisible = 1;
 			}
 		} else {
+			//Don't add columns on the side that is fixed
+			if(hardFixed) {
+				if(beginFixed) {
+					if(zoomVal > ((getMaxIndex() + 1) - (firstVisible + numVisible))) {
+						zoomVal = (getMaxIndex() + 1) - (firstVisible + numVisible);
+						if(zoomVal <= 0) {
+							return;
+						}
+					}
+				} else {
+					if(zoomVal > firstVisible) {
+						zoomVal = firstVisible;
+						if(zoomVal <= 0) {
+							return;
+						}
+					}
+				}
+			}
 			tileNumVisible += zoomVal;
 			if (tileNumVisible > (getMaxIndex() + 1)) {
 				tileNumVisible = getMaxIndex() + 1;
@@ -348,7 +386,11 @@ public class MapContainer extends Observable implements Observer,
 		}
 		
 		setScale(newScale);
-
+		
+		if(!beginFixed && zoomVal != 0) {
+			newFirstVis += (zoomsIn ? zoomVal : -zoomVal);
+			scrollToFirstIndex(newFirstVis);
+		}
 	}
 
 	//This is for gradually zooming toward the center of the currently displayed dots
