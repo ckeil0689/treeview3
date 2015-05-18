@@ -1013,14 +1013,15 @@ MouseWheelListener {
 			if((System.currentTimeMillis() - startTime) > doneWaitingMillis)
 				break;
 
-			smoothZoomTowardSelection(selecXStartIndex,
-									  numXSelectedIndexes,
-									  selecYStartIndex,
-									  numYSelectedIndexes);
+			int[] redrawDims = smoothZoomTowardSelection(selecXStartIndex,
+														 numXSelectedIndexes,
+														 selecYStartIndex,
+														 numYSelectedIndexes);
 
 			//Force an immediate repaint.  Found this in a thread here:
 			//https://community.oracle.com/thread/1663771
-			paintImmediately(0,0,getWidth(),getHeight());
+			paintImmediately(redrawDims[0],redrawDims[1],
+							 redrawDims[2],redrawDims[3]);
 
 			//Sleep a few milliseconds
 			try{
@@ -1066,7 +1067,7 @@ MouseWheelListener {
 	 * selection ends up filling the view) and then uses that pixel to call
 	 * zoomTowardPixel.
 	 */
-	public void smoothZoomTowardSelection(int selecXStartIndex,
+	public int[] smoothZoomTowardSelection(int selecXStartIndex,
 										  int numXSelectedIndexes,
 										  int selecYStartIndex,
 										  int numYSelectedIndexes) {
@@ -1728,6 +1729,29 @@ MouseWheelListener {
 		   ymap.getNumVisible() == numYSelectedIndexes) {
 			updateAspectRatio();
 		}
+
+		LogBuffer.println("Zoom redraw bounds initial: [" + startXPixel + "," + startYPixel + "," + (startXPixel + numSelectedXPixels - 1) + "," + (startYPixel + numSelectedYPixels - 1) + "].");
+		//Now let's return the pixel indexes of the selection post-zoom
+		int[] redrawPixelBounds = new int[4];
+		redrawPixelBounds[0] = xmap.getPixel(selecXStartIndex);
+		redrawPixelBounds[2] = xmap.getPixel(selecXStartIndex + numXSelectedIndexes) - 1;//redrawPixelBounds[0] + (int) Math.round((double) numXSelectedIndexes *
+		//		pixelsPerXIndex);
+		redrawPixelBounds[1] = ymap.getPixel(selecYStartIndex);
+		redrawPixelBounds[3] = ymap.getPixel(selecYStartIndex + numYSelectedIndexes) - 1;//redrawPixelBounds[1] + (int) Math.round((double) numYSelectedIndexes *
+		//		pixelsPerYIndex);
+		LogBuffer.println("Zoom redraw bounds before fix: [" + redrawPixelBounds[0] + "," + redrawPixelBounds[1] + "," + redrawPixelBounds[2] + "," + redrawPixelBounds[3] + "].");
+		int maxWidth = getWidth();
+		int maxHeight = getHeight();
+		if(redrawPixelBounds[0] < 0) redrawPixelBounds[0] = 0;
+		if(redrawPixelBounds[0] > maxWidth) redrawPixelBounds[0] = maxWidth;
+		if(redrawPixelBounds[2] < 0) redrawPixelBounds[2] = 0;
+		if(redrawPixelBounds[2] > maxWidth) redrawPixelBounds[2] = maxWidth;
+		if(redrawPixelBounds[1] < 0) redrawPixelBounds[1] = 0;
+		if(redrawPixelBounds[1] > maxHeight) redrawPixelBounds[1] = maxHeight;
+		if(redrawPixelBounds[3] < 0) redrawPixelBounds[3] = 0;
+		if(redrawPixelBounds[3] > maxHeight) redrawPixelBounds[3] = maxHeight;
+		LogBuffer.println("Zoom redraw bounds after fix: [" + redrawPixelBounds[0] + "," + redrawPixelBounds[1] + "," + redrawPixelBounds[2] + "," + redrawPixelBounds[3] + "].");
+		return(redrawPixelBounds);
 	}
 
 	public double getAspectRatio(int numXDots,int numYDots) {
