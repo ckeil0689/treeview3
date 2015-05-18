@@ -25,6 +25,7 @@ package edu.stanford.genetics.treeview;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.MouseEvent;
@@ -138,11 +139,13 @@ public abstract class ModelView extends JPanel implements Observer,
 
 		// Call JComponent's paintComponent method to clear panel
 		// before every redraw.
-		super.paintComponent(g);
+		Graphics2D g2d = (Graphics2D) g;
+		
+		super.paintComponent(g2d);
 
-		final Rectangle clip = g.getClipBounds();
-		g.setColor(this.getBackground());
-		g.fillRect(clip.x, clip.y, clip.width, clip.height);
+		final Rectangle clip = g2d.getClipBounds();
+		g2d.setColor(this.getBackground());
+		g2d.fillRect(clip.x, clip.y, clip.width, clip.height);
 
 		final Dimension reqSize = getSize();
 		if (reqSize == null)
@@ -158,8 +161,8 @@ public abstract class ModelView extends JPanel implements Observer,
 
 		if (isEnabled()) {
 			offscreenValid = false;
-			updateBuffer(g);
-			paintComposite(g);
+			updateBuffer(g2d);
+			paintComposite(g2d);
 		}
 	}
 

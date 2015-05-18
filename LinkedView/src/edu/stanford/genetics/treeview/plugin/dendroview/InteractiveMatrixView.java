@@ -135,7 +135,7 @@ MouseWheelListener {
 
 		try {
 			if (xmap.contains(overx) && ymap.contains(overy)) {
-				statustext[0] = "";// "Row: ";
+				statustext[0] = "";
 
 				if (geneHI != null) {
 					final int realGene = overy;
@@ -150,7 +150,7 @@ MouseWheelListener {
 						statustext[0] += " (N/A)";
 					}
 				}
-				statustext[1] = "";// "Column: ";
+				statustext[1] = "";
 				if (arrayHI != null) {
 					try {
 						statustext[1] += arraySummary
@@ -215,13 +215,15 @@ MouseWheelListener {
 	@Override
 	protected void updateBuffer(final Graphics g) {
 
+		Graphics2D g2d = (Graphics2D) g;
+		
 		revalidateScreen();
 
 		if (!offscreenValid) {
 			// clear the pallette...
-			g.setColor(GUIFactory.DEFAULT_BG);
-			g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
-			g.setColor(Color.black);
+			g2d.setColor(GUIFactory.DEFAULT_BG);
+			g2d.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
+			g2d.setColor(Color.black);
 
 			final Rectangle destRect = new Rectangle(0, 0,
 					xmap.getUsedPixels(), ymap.getUsedPixels());
@@ -232,7 +234,7 @@ MouseWheelListener {
 							- ymap.getIndex(0));
 
 			if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
-				drawer.paint(g, sourceRect, destRect, null);
+				drawer.paint(g2d, sourceRect, destRect, null);
 			}
 		}
 	}
@@ -244,33 +246,6 @@ MouseWheelListener {
 	@Override
 	protected void updatePixels() {
 
-//<<<<<<< HEAD:LinkedView/src/edu/stanford/genetics/treeview/plugin/dendroview/GlobalView.java
-//		if (offscreenChanged) {
-//			// LogBuffer.println("OFFSCREEN CHANGED");
-//			offscreenValid = false;
-//			xmap.setAvailablePixels(offscreenSize.width);
-//			ymap.setAvailablePixels(offscreenSize.height);
-//
-//			if (!hasDrawn) {
-//				// total kludge, but addnotify isn't working correctly...
-//				xmap.recalculateScale();
-//				ymap.recalculateScale();
-//				hasDrawn = true;
-//			}
-//		}
-//
-//		if (resetHome) {
-//			LogBuffer.println("Resetting GV");
-//			xmap.setHome();
-//			ymap.setHome();
-//			
-//			updateAspectRatio();
-//
-//			resetHome(false);
-//		}
-//
-//=======
-//>>>>>>> global_overview:LinkedView/src/edu/stanford/genetics/treeview/plugin/dendroview/InteractiveMatrixView.java
 		if (!offscreenValid) {
 			
 			revalidateScreen();
@@ -313,13 +288,15 @@ MouseWheelListener {
 	@Override
 	public synchronized void paintComposite(final Graphics g) {
 
+		Graphics2D g2 = (Graphics2D) g;
+		
 		if (selectionRectList != null) {
 
 			/* draw all selection rectangles in yellow */
-			g.setColor(Color.yellow);
+			g2.setColor(Color.yellow);
 
 			for (final Rectangle rect : selectionRectList) {
-				g.drawRect(rect.x, rect.y, rect.width, rect.height);
+				g2.drawRect(rect.x, rect.y, rect.width, rect.height);
 			}
 
 			//LogBuffer.println("Preparing to draw ellipses.");
@@ -328,7 +305,6 @@ MouseWheelListener {
 			 * enough.
 			 */
 			if (indicatorCircleList != null) {
-				Graphics2D g2 = (Graphics2D) g;
 				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 						RenderingHints.VALUE_ANTIALIAS_ON);
 				g2.setColor(Color.yellow);
@@ -737,12 +713,12 @@ MouseWheelListener {
 		//smooth-zooming trick and how many cells on the x axis we must add or
 		//remove to correct the aspect ratio (to what it was before we started
 		//zooming)
-		double numXCellsShouldHave = aspectRatio * (double) numYCells;
+		double numXCellsShouldHave = aspectRatio * numYCells;
 
 		//Could check for possible div by zero here, but should be impossible
 		double targetZoomFracCorrection =
-				Math.abs(numXCellsShouldHave - (double) numXCells) /
-				(double) numXCells;
+				Math.abs(numXCellsShouldHave - numXCells) /
+				numXCells;
 
 		//If numXCellsShouldHave is basically an integer and equals numXCells,
 		//we will ensure there is a zoom on both axes (this really is only good
@@ -775,7 +751,7 @@ MouseWheelListener {
 			//_numYCellsShouldHave_         = numXCells*numYCells/numXCellsShouldHave-numYCells         //Then, canceling out numYCells, we have:
 			//_numYCellsShouldHave_         = numXCells/numXCellsShouldHave-1                           //_numYCellsShouldHave_ will be a ratio, i.e. the same as targetZoomFracCorrection
 			targetZoomFracCorrection =
-					Math.abs((double) numXCells / numXCellsShouldHave - 1);
+					Math.abs(numXCells / numXCellsShouldHave - 1);
 			zoomXVal = xmap.getBestZoomInVal(xPxPos,targetZoomFrac);
 			zoomYVal = ymap.getBestZoomInVal(yPxPos,
 					targetZoomFrac + targetZoomFracCorrection);
@@ -843,11 +819,11 @@ MouseWheelListener {
 		//smooth-zooming trick and how many cells on the x axis we must add or
 		//remove to correct the aspect ratio (to what it was before we started
 		//zooming)
-		double numXCellsShouldHave = aspectRatio * (double) numYCells;
+		double numXCellsShouldHave = aspectRatio * numYCells;
 
 		//Could check for possible div by zero here, but should be impossible
 		double targetZoomFracCorrection = Math.abs(numXCellsShouldHave -
-				(double) numXCells) / (double) numXCells;
+				numXCells) / numXCells;
 
 		//If numXCellsShouldHave is basically an integer and equals numXCells,
 		//we will ensure there is a zoom on both axes (this really is only good
@@ -905,7 +881,7 @@ MouseWheelListener {
 			//_numYCellsShouldHave_         = numXCells*numYCells/numXCellsShouldHave-numYCells         //Then, canceling out numYCells, we have:
 			//_numYCellsShouldHave_         = numXCells/numXCellsShouldHave-1                           //_numYCellsShouldHave_ will be a ratio, i.e. the same as targetZoomFracCorrection
 			targetZoomFracCorrection =
-					Math.abs((double) numXCells / numXCellsShouldHave - 1);
+					Math.abs(numXCells / numXCellsShouldHave - 1);
 			zoomXVal = xmap.getBestZoomOutVal(xPxPos,targetZoomFrac);
 			zoomYVal = ymap.getBestZoomOutVal(yPxPos,
 					targetZoomFrac + targetZoomFracCorrection);
@@ -1075,7 +1051,7 @@ MouseWheelListener {
 		//selected area essentially expands to fill the screen
 		int startXPixel = xmap.getPixel(selecXStartIndex);
 		double pixelsPerXIndex = xmap.getScale();
-		int numSelectedXPixels = (int) Math.round((double) numXSelectedIndexes *
+		int numSelectedXPixels = (int) Math.round(numXSelectedIndexes *
 				pixelsPerXIndex);
 		int xPxPos = xmap.getZoomTowardPixelOfSelection(startXPixel,
 														numSelectedXPixels);
@@ -1085,7 +1061,7 @@ MouseWheelListener {
 		//"zoom toward is: [" + xPxPos + "].");
 		int startYPixel = ymap.getPixel(selecYStartIndex);
 		double pixelsPerYIndex = ymap.getScale();
-		int numSelectedYPixels = (int) Math.round((double) numYSelectedIndexes *
+		int numSelectedYPixels = (int) Math.round(numYSelectedIndexes *
 				pixelsPerYIndex);
 		int yPxPos = ymap.getZoomTowardPixelOfSelection(startYPixel,
 														numSelectedYPixels);
@@ -1115,11 +1091,11 @@ MouseWheelListener {
 		int prevXFirstVisible = xmap.getFirstVisible();
 		int prevXNumVisible   = xmap.getNumVisible();
 		int centerXIndex      = xmap.getFirstVisible() +
-				(int) Math.floor((double) xmap.getNumVisible() / 2.0);
+				(int) Math.floor(xmap.getNumVisible() / 2.0);
 		int prevYFirstVisible = ymap.getFirstVisible();
 		int prevYNumVisible   = ymap.getNumVisible();
 		int centerYIndex      = ymap.getFirstVisible() +
-				(int) Math.floor((double) ymap.getNumVisible() / 2.0);
+				(int) Math.floor(ymap.getNumVisible() / 2.0);
 
 		//Since it takes a lot of time to draw large matrices, select a zoom
 		//fraction based on the size of the matrix we are going to draw at each
@@ -1155,16 +1131,16 @@ MouseWheelListener {
 		//smooth-zooming trick and how many cells on the x axis we must add or
 		//remove to correct the aspect ratio (to what it was before we started
 		//zooming)
-		double numXCellsShouldHave = targetAspectRatio * (double) numYCells;
+		double numXCellsShouldHave = targetAspectRatio * numYCells;
 
 		//LogBuffer.println("numXCellsShouldHave before fractioning the " +
 		//"targetAspectRatio: [" + numXCellsShouldHave + "].");
 
 		//To cause the targetAspectRatio to be arrived at gradually, let's
 		//only correct by a percentage of the correction:
-		numXCellsShouldHave = (double) numXCells +
+		numXCellsShouldHave = numXCells +
 				(numXCellsShouldHave -
-						(double) numXCells) * aspectRatioFracCorrection;
+						numXCells) * aspectRatioFracCorrection;
 
 		//LogBuffer.println("numXCellsShouldHave after fractioning the " +
 		//"targetAspectRatio: [" + numXCellsShouldHave + "].");
@@ -1233,7 +1209,7 @@ MouseWheelListener {
 				(numXCellsShouldHave < numXCells &&
 				 numYCells < numYSelectedIndexes)) {
 
-			double numYCellsShouldHave = (double) numXCells / targetAspectRatio;
+			double numYCellsShouldHave = numXCells / targetAspectRatio;
 
 			//LogBuffer.println("Actual number of cells that should be on " +
 			//"the Y axis: [" + numYCellsShouldHave + "]");
@@ -1253,19 +1229,19 @@ MouseWheelListener {
 
 			//To cause the targetAspectRatio to be arrived at gradually, let's
 			//only correct by a percentage of the correction:
-			numYCellsShouldHave = (double) numYCells +
+			numYCellsShouldHave = numYCells +
 					(numYCellsShouldHave -
-							(double) numYCells) * aspectRatioFracCorrection;
+							numYCells) * aspectRatioFracCorrection;
 			
 			//Could check for possible div by zero here, but should be
 			//impossible
 			targetZoomFracCorrection =
 					Math.abs(numYCellsShouldHave -
-							 (double) numYCells) / (double) numYCells;
+							 numYCells) / numYCells;
 			if(targetZoomFracCorrection > 1.0) {
 				targetZoomFracCorrection =
-						Math.abs(numYCellsShouldHave - (double) numYCells) /
-						(double) numYCellsShouldHave;
+						Math.abs(numYCellsShouldHave - numYCells) /
+						numYCellsShouldHave;
 			}
 			//LogBuffer.println("Zooming in on Y axis more: " +
 			//"targetZoomFracCorrection = Math.abs(numYCellsShouldHave - " +
@@ -1337,11 +1313,11 @@ MouseWheelListener {
 			//impossible
 			targetZoomFracCorrection =
 					Math.abs(numXCellsShouldHave -
-							 (double) numXCells) / (double) numXCells;
+							 numXCells) / numXCells;
 			if(targetZoomFracCorrection > 1.0) {
 				targetZoomFracCorrection =
-						Math.abs(numXCellsShouldHave - (double) numXCells) /
-						(double) numXCellsShouldHave;
+						Math.abs(numXCellsShouldHave - numXCells) /
+						numXCellsShouldHave;
 			}
 
 			//This should theoretically be more accurate, but it is not for some
@@ -1510,7 +1486,7 @@ MouseWheelListener {
 				//selecXStartIndex + " + " + numXSelectedIndexes + " / 2) - " +
 				//centerXIndex + ".");
 				scrollDistDirX =
-						(int) Math.round((double) scrollDistDirX * scrollFrac);
+						(int) Math.round(scrollDistDirX * scrollFrac);
 				//LogBuffer.println("ScrollX difference after fractioning: [" +
 				//scrollDistDirX + "].");
 
@@ -1629,7 +1605,7 @@ MouseWheelListener {
 				//"numYSelectedIndexes / 2) - centerYIndex /// " +
 				//selecYStartIndex + " + " + numYSelectedIndexes + " / 2) - " +
 				//centerYIndex + ".");
-				scrollDistDirY = (int) Math.round((double) scrollDistDirY *
+				scrollDistDirY = (int) Math.round(scrollDistDirY *
 						scrollFrac);
 				//LogBuffer.println("ScrollY difference after fractioning: [" +
 				//scrollDistDirY + "].");
@@ -1716,7 +1692,7 @@ MouseWheelListener {
 				//scrollDistDirY) + " = (" + selecYStartIndex + " + " +
 				//numYSelectedIndexes + " / 2) - " + scrollDistDirY);
 				ymap.scrollToIndex((selecYStartIndex +
-						(int) Math.floor((double) numYSelectedIndexes / 2.0)) -
+						(int) Math.floor(numYSelectedIndexes / 2.0)) -
 						scrollDistDirY);
 			}
 		}
@@ -1750,16 +1726,17 @@ MouseWheelListener {
 	private void drawBand(final Rectangle l) {
 
 		final Graphics g = getGraphics();
-		g.setXORMode(getBackground());
-		g.setColor(GUIFactory.MAIN);
+		Graphics2D g2d = (Graphics2D) g;
+		g2d.setXORMode(getBackground());
+		g2d.setColor(GUIFactory.MAIN);
 
 		final int x = xmap.getPixel(l.x);
 		final int y = ymap.getPixel(l.y);
 		final int w = xmap.getPixel(l.x + l.width + 1) - x;
 		final int h = ymap.getPixel(l.y + l.height + 1) - y;
 
-		g.drawRect(x, y, w, h);
-		g.setPaintMode();
+		g2d.drawRect(x, y, w, h);
+		g2d.setPaintMode();
 	}
 
 	/**
@@ -1778,72 +1755,72 @@ MouseWheelListener {
 			geneSelection.getNSelectedIndexes()  == 0) {
 			indicatorCircleList = null;
 			return;
-		} else {
+		} 
 
-			//Empty the list of
-			indicatorCircleList = new ArrayList<Ellipse2D.Double>();
-			
-			final int[] selectedArrayIndexes = arraySelection.getSelectedIndexes();
-			final int[] selectedGeneIndexes  = geneSelection.getSelectedIndexes();
+		//Empty the list of
+		indicatorCircleList = new ArrayList<Ellipse2D.Double>();
+		
+		final int[] selectedArrayIndexes = arraySelection.getSelectedIndexes();
+		final int[] selectedGeneIndexes  = geneSelection.getSelectedIndexes();
 
-			List<List<Integer>> arrayBoundaryList;
-			List<List<Integer>> geneBoundaryList;
+		List<List<Integer>> arrayBoundaryList;
+		List<List<Integer>> geneBoundaryList;
 
-			arrayBoundaryList = findRectangleBoundaries(selectedArrayIndexes,
-					xmap);
-			geneBoundaryList = findRectangleBoundaries(selectedGeneIndexes,
-					ymap);
+		arrayBoundaryList = findRectangleBoundaries(selectedArrayIndexes,
+				xmap);
+		geneBoundaryList = findRectangleBoundaries(selectedGeneIndexes,
+				ymap);
+
+		/* TODO: Instead of just checking the last(/next) selection
+		 * position, should group all small selections together too see
+		 * if the cluster is smaller than our limits. */
+		double lastxb = -1;
+
+		// Make the rectangles
+		for (final List<Integer> xBoundaries : arrayBoundaryList) {
 
 			/* TODO: Instead of just checking the last(/next) selection
 			 * position, should group all small selections together too see
 			 * if the cluster is smaller than our limits. */
-			double lastxb = -1;
+			double lastyb = -1;
+			w = (xBoundaries.get(1) - xBoundaries.get(0));
 
-			// Make the rectangles
-			for (final List<Integer> xBoundaries : arrayBoundaryList) {
+			for (final List<Integer> yBoundaries : geneBoundaryList) {
 
-				/* TODO: Instead of just checking the last(/next) selection
-				 * position, should group all small selections together too see
-				 * if the cluster is smaller than our limits. */
-				double lastyb = -1;
-				w = (xBoundaries.get(1) - xBoundaries.get(0));
+				//LogBuffer.println("Preparing to create ellipse.");
 
-				for (final List<Integer> yBoundaries : geneBoundaryList) {
+				// Width and height of rectangle which spans the Ellipse2D object
+				h = (yBoundaries.get(1) - yBoundaries.get(0));
 
-					//LogBuffer.println("Preparing to create ellipse.");
+				if(w < 20 && h < 20 &&
+				   //This is not the first selection and the last selection is far away OR this is the first selection and the next selection either doesn't exists or is far away
+				   ((lastxb >= 0 &&
+				     Math.abs(xBoundaries.get(0) - lastxb) > 20) ||
+				    (lastxb < 0 &&
+				     (arrayBoundaryList.size() == 1 ||
+				      Math.abs(arrayBoundaryList.get(1).get(0) -
+				               xBoundaries.get(1)) > 20))) &&
+				   ((lastyb >= 0 &&
+				     Math.abs(yBoundaries.get(0) - lastyb) > 20) ||
+				    (lastyb < 0 &&
+				     (geneBoundaryList.size() == 1 ||
+				      Math.abs(geneBoundaryList.get(1).get(0) -
+				               yBoundaries.get(1)) > 20)))) {
+					// coords for top left of circle
+					x = xBoundaries.get(0) + (w / 2.0) - 20;
+					y = yBoundaries.get(0) + (h / 2.0) - 20;
 
-					// Width and height of rectangle which spans the Ellipse2D object
-					h = (yBoundaries.get(1) - yBoundaries.get(0));
+					//LogBuffer.println("Ellipse created at [" + x + "x" + y + "] and is dimensions [" + w + "x" + h + "].");
 
-					if(w < 20 && h < 20 &&
-					   //This is not the first selection and the last selection is far away OR this is the first selection and the next selection either doesn't exists or is far away
-					   ((lastxb >= 0 &&
-					     Math.abs(xBoundaries.get(0) - lastxb) > 20) ||
-					    (lastxb < 0 &&
-					     (arrayBoundaryList.size() == 1 ||
-					      Math.abs(arrayBoundaryList.get(1).get(0) -
-					               xBoundaries.get(1)) > 20))) &&
-					   ((lastyb >= 0 &&
-					     Math.abs(yBoundaries.get(0) - lastyb) > 20) ||
-					    (lastyb < 0 &&
-					     (geneBoundaryList.size() == 1 ||
-					      Math.abs(geneBoundaryList.get(1).get(0) -
-					               yBoundaries.get(1)) > 20)))) {
-						// coords for top left of circle
-						x = xBoundaries.get(0) + (w / 2.0) - 20;
-						y = yBoundaries.get(0) + (h / 2.0) - 20;
-
-						//LogBuffer.println("Ellipse created at [" + x + "x" + y + "] and is dimensions [" + w + "x" + h + "].");
-
-						indicatorCircleList.add(new Ellipse2D.Double(x, y, 40, 40));
-					//} else {
-						//LogBuffer.println("Selection was too big [" + w + "x" + h + "] or [(" + xBoundaries.get(1) + " - " + xBoundaries.get(0) + ") x (" + yBoundaries.get(1) + " - " + yBoundaries.get(0) + ")].");
-					}
-					lastyb = yBoundaries.get(1);
+					indicatorCircleList.add(new Ellipse2D.Double(x, y, 40, 40));
+				//} else {
+					//LogBuffer.println("Selection was too big [" + w + "x" + h + "] or [(" + xBoundaries.get(1) + " - " + xBoundaries.get(0) + ") x (" + yBoundaries.get(1) + " - " + yBoundaries.get(0) + ")].");
 				}
-				lastxb = xBoundaries.get(1);
+				lastyb = yBoundaries.get(1);
 			}
+			lastxb = xBoundaries.get(1);
 		}
+		
 	}
 
 	/**

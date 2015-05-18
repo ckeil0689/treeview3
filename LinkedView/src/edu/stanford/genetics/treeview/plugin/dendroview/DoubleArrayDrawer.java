@@ -249,12 +249,12 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 								val = DataModel.EMPTY;
 								count = 1;
 								break;
-							}
+							} 
 
-							if (!Helper.nearlyEqual(thisVal, DataModel.EMPTY)) {
-								count++;
-								val += thisVal;
-							}
+//							if (!Helper.nearlyEqual(thisVal, DataModel.EMPTY)) {
+							count++;
+							val += thisVal;
+							
 						}
 
 						if (Helper.nearlyEqual(val, DataModel.EMPTY)) {
@@ -266,7 +266,7 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 						val = DataModel.NODATA;
 
 					} else {
-						val /= count;
+						val /= count; // averaging here ?
 					}
 
 					/* Darken non-selected rows/ cols if there's a selection */
@@ -282,6 +282,7 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 					// || !(arrayInd >= a_min && arrayInd <= a_max);
 					// }
 
+					/* Getting the ARGB color based on the determined value */
 					final int t_color = colorExtractor.getARGBColor(val);
 					/* Selection dimming */
 					// , isBackground);
