@@ -30,6 +30,7 @@ import edu.stanford.genetics.treeview.WideComboBox;
 public class GUIFactory {
 
 	public static final Font FONTS = new Font("Sans Serif", Font.PLAIN, 14);
+	public static final Font FONTS_B = new Font("Sans Serif", Font.BOLD, 14);
 	public static final Font FONTM = new Font("Sans Serif", Font.PLAIN, 16);
 	public static final Font FONTL = new Font("Sans Serif", Font.PLAIN, 20);
 	public static final Font FONTXXL = new Font("Sans Serif", Font.PLAIN, 30);

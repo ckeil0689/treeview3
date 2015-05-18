@@ -334,8 +334,8 @@ public class DendroView implements Observer, DendroPanel {
 
 		globalOverviewPanel = GUIFactory.createJPanel(false, 
 				GUIFactory.NO_PADDING);
-		globalOverviewPanel.setBorder(
-				BorderFactory.createTitledBorder("Overview"));
+//		globalOverviewPanel.setBorder(
+//				BorderFactory.createTitledBorder("Overview"));
 		
 		crossPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 
