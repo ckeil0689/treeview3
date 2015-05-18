@@ -484,29 +484,29 @@ public class DendroView implements Observer, DendroPanel {
 
 		/* Scale x-axis */
 		scaleAddRightX = GUIFactory.createSquareBtn("+", 20);
-		scaleAddRightX.setToolTipText(StringRes.tt_xZoomIn);
+		scaleAddRightX.setToolTipText(StringRes.tt_xZoomIn_right);
 		
 		scaleRemoveRightX = GUIFactory.createSquareBtn("-", 20);
-		scaleRemoveRightX.setToolTipText(StringRes.tt_xZoomOut);
+		scaleRemoveRightX.setToolTipText(StringRes.tt_xZoomOut_right);
 		
 		scaleAddLeftX = GUIFactory.createSquareBtn("+", 20);
-		scaleAddLeftX.setToolTipText(StringRes.tt_xZoomIn);
+		scaleAddLeftX.setToolTipText(StringRes.tt_xZoomIn_left);
 		
 		scaleRemoveLeftX = GUIFactory.createSquareBtn("-", 20);
-		scaleRemoveLeftX.setToolTipText(StringRes.tt_xZoomOut);
+		scaleRemoveLeftX.setToolTipText(StringRes.tt_xZoomOut_left);
 
 		/* Scale y-axis */
 		scaleAddBottomY = GUIFactory.createSquareBtn("+", 20);
-		scaleAddBottomY.setToolTipText(StringRes.tt_yZoomIn);
+		scaleAddBottomY.setToolTipText(StringRes.tt_yZoomIn_bottom);
 		
 		scaleRemoveBottomY = GUIFactory.createSquareBtn("-", 20);
-		scaleRemoveBottomY.setToolTipText(StringRes.tt_yZoomOut);
+		scaleRemoveBottomY.setToolTipText(StringRes.tt_yZoomOut_bottom);
 		
 		scaleAddTopY = GUIFactory.createSquareBtn("+", 20);
-		scaleAddTopY.setToolTipText(StringRes.tt_yZoomIn);
+		scaleAddTopY.setToolTipText(StringRes.tt_yZoomIn_top);
 		
 		scaleRemoveTopY = GUIFactory.createSquareBtn("-", 20);
-		scaleRemoveTopY.setToolTipText(StringRes.tt_yZoomOut);
+		scaleRemoveTopY.setToolTipText(StringRes.tt_yZoomOut_top);
 
 		/* Scale both axes */
 		scaleIncXY = GUIFactory.createIconBtn(StringRes.icon_fullZoomIn);
