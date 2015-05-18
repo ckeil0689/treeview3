@@ -24,6 +24,7 @@ package edu.stanford.genetics.treeview;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.MemoryImageSource;
 
@@ -100,6 +101,7 @@ public abstract class ModelViewProduced extends ModelView {
 	@Override
 	public synchronized void paintComponent(final Graphics g) {
 
+		Graphics2D g2d = (Graphics2D) g;
 		// Rectangle clip = g.getClipBounds();
 		// System.out.println("Entering " + viewName() + " to clip " + clip );
 		// super.paintComponent(g);
@@ -135,8 +137,8 @@ public abstract class ModelViewProduced extends ModelView {
 			}
 		}
 
-		g.drawImage(offscreenBuffer, 0, 0, null);
-		paintComposite(g);
+		g2d.drawImage(offscreenBuffer, 0, 0, null);
+		paintComposite(g2d);
 		// System.out.println("Exiting " + viewName() + " to clip " + clip );
 	}
 

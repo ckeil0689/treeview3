@@ -119,12 +119,16 @@ public class StringRes {
 	// Tooltips
 	public static final String tt_searchRowCol = "Find row or column elements";
 	public static final String tt_showTrees = "Determine dendrogram visibility";
-	public static final String tt_xZoomIn = "Zoom in on rows";
+	public static final String tt_xZoomIn_left = "Zoom in on left-most column";
+	public static final String tt_xZoomIn_right = "Zoom in on right-most column";
 	public static final String tt_xyZoomIn = "Zoom in both axes";
-	public static final String tt_xZoomOut = "Zoom out of rows";
+	public static final String tt_xZoomOut_left = "Zoom out of left-most column";
+	public static final String tt_xZoomOut_right = "Zoom out of right-most column";
 	public static final String tt_xyZoomOut = "Zoom out both axes";
-	public static final String tt_yZoomIn = "Zoom in on columns";
-	public static final String tt_yZoomOut = "Zoom out of columns";
+	public static final String tt_yZoomIn_top = "Zoom in on top-most row";
+	public static final String tt_yZoomOut_top = "Zoom out top-most row";
+	public static final String tt_yZoomIn_bottom = "Zoom in on bottom-most row";
+	public static final String tt_yZoomOut_bottom = "Zoom out bottom-most row";
 	public static final String tt_home = "Zoom into the selected area";
 
 	// Labels

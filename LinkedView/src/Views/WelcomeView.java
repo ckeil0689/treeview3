@@ -167,16 +167,19 @@ public class WelcomeView {
 		
 		String filename;
 		if(fs != null) {
-			filename = fs.getRoot() + fs.getExt();
+			filename = fs.getCdt();
 		} else {
 			filename = "none";
 		}
 		
-		JLabel lastFile = new JLabel("Last file: " + filename);
+		JLabel last = new JLabel("Last file: ");
+		last.setFont(GUIFactory.FONTS_B);
+		JLabel filePath = new JLabel(filename);
 
-		loadPanel.add(loadButton, "pushx, alignx 50%, aligny 0%, wrap");
-		loadPanel.add(loadLastButton, "pushx, alignx 50%, aligny 0%, wrap");
-		loadPanel.add(lastFile, "pushx, alignx 50%, aligny 0%, wrap");
+		loadPanel.add(loadButton, "pushx, alignx 50%, aligny 0%, span, wrap");
+		loadPanel.add(loadLastButton, "pushx, alignx 50%, aligny 0%, span, wrap");
+		loadPanel.add(last, "pushx, alignx 100%, aligny 0%");
+		loadPanel.add(filePath, "pushx, alignx 0%, aligny 0%");
 
 		loadPanel.revalidate();
 		loadPanel.repaint();
