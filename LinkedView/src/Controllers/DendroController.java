@@ -613,8 +613,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			getInteractiveXMap().zoomIn();
-			getInteractiveYMap().zoomIn();
+			getInteractiveXMap().zoomInBegin();
+			getInteractiveYMap().zoomInBegin();
 
 			notifyAllMapObservers();
 		}
@@ -628,8 +628,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			getInteractiveXMap().zoomOut();
-			getInteractiveYMap().zoomOut();
+			getInteractiveXMap().zoomOutBegin();
+			getInteractiveYMap().zoomOutBegin();
 			
 			notifyAllMapObservers();
 		}
@@ -669,7 +669,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			 */
 			if (e.getSource() == dendroView.getXRightPlusButton()) {
 				// Adds column on right side
-				interactiveXmap.zoomIn();
+				interactiveXmap.zoomInEnd();
 				//Doing this here because many times zoomIn is called
 				//successively for each dimension
 				dendroView.getInteractiveMatrixView().updateAspectRatio();
@@ -708,38 +708,48 @@ public class DendroController implements ConfigNodePersistent, Observer {
 				
 			} else if(e.getSource() == dendroView.getXLeftPlusButton()) {
 				// Add a column on the left side
-				
+				interactiveXmap.zoomInBegin();
+				//Doing this here because many times zoomIn is called
+				//successively for each dimension
+				dendroView.getInteractiveMatrixView().updateAspectRatio();
 			} else if (e.getSource() == dendroView.getXMinusRightButton()) {
 				// Removes column on right side
-				getInteractiveXMap().zoomOut();
+				getInteractiveXMap().zoomOutEnd();
 				//Doing this here because many times zoomIn is called
 				//successively for each dimension
 				dendroView.getInteractiveMatrixView().updateAspectRatio();
 				
 			} else if (e.getSource() == dendroView.getXMinusLeftButton()) {
 				// Remove column on left side
-
-
-			} else if (e.getSource() == dendroView.getYPlusBottomButton()) {
-				// Adds a row to the bottom.
-				getInteractiveYMap().zoomIn();
+				interactiveXmap.zoomOutBegin();
 				//Doing this here because many times zoomIn is called
 				//successively for each dimension
 				dendroView.getInteractiveMatrixView().updateAspectRatio();
-				
+			} else if (e.getSource() == dendroView.getYPlusBottomButton()) {
+				// Adds a row to the bottom.
+				getInteractiveYMap().zoomInEnd();
+				//Doing this here because many times zoomIn is called
+				//successively for each dimension
+				dendroView.getInteractiveMatrixView().updateAspectRatio();
 			} else if (e.getSource() == dendroView.getYPlusTopButton()) {
 				// Add row to top here
-
+				getInteractiveYMap().zoomInBegin();
+				//Doing this here because many times zoomIn is called
+				//successively for each dimension
+				dendroView.getInteractiveMatrixView().updateAspectRatio();
 			} else if (e.getSource() == dendroView.getYMinusBottomButton()) {
 				// Removes row from bottom
-				getInteractiveYMap().zoomOut();
+				getInteractiveYMap().zoomOutEnd();
 				//Doing this here because many times zoomIn is called
 				//successively for each dimension
 				dendroView.getInteractiveMatrixView().updateAspectRatio();
 				
 			} else if (e.getSource() == dendroView.getYMinusTopButton()) {
 				// Remove row from top here
-
+				getInteractiveYMap().zoomOutBegin();
+				//Doing this here because many times zoomIn is called
+				//successively for each dimension
+				dendroView.getInteractiveMatrixView().updateAspectRatio();
 			} else if (e.getSource() == dendroView.getHomeButton()) {
 
 				if((e.getModifiers() & InputEvent.META_MASK)  != 0 ||
@@ -2036,10 +2046,18 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	private void setAdaptiveButtonStatus() {
 
 		/* Determine if either MapContainer is at minimum scale */
-		boolean isXMin = Helper.nearlyEqual(interactiveXmap.getMinScale(), 
-				interactiveXmap.getScale());
-		boolean isYMin = Helper.nearlyEqual(interactiveYmap.getMinScale(), 
-				interactiveYmap.getScale());
+		boolean isXMin   = Helper.nearlyEqual(interactiveXmap.getMinScale(), 
+											  interactiveXmap.getScale());
+		boolean isYMin   = Helper.nearlyEqual(interactiveYmap.getMinScale(), 
+											  interactiveYmap.getScale());
+		boolean atRight  = (interactiveXmap.getFirstVisible() +
+							interactiveXmap.getNumVisible()) ==
+						   (interactiveXmap.getMaxIndex() + 1);
+		boolean atLeft   = interactiveXmap.getFirstVisible() == 0;
+		boolean atTop    = interactiveYmap.getFirstVisible() == 0;
+		boolean atBottom = (interactiveYmap.getFirstVisible() +
+							interactiveYmap.getNumVisible()) ==
+						   (interactiveYmap.getMaxIndex() + 1);
 
 		int xTilesVisible = interactiveXmap.getNumVisible();
 		int yTilesVisible = interactiveYmap.getNumVisible();
@@ -2063,10 +2081,10 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 		/* Zoom-out buttons disabled if min scale for axis is reached. */
 		dendroView.getHomeButton().setEnabled(!(isXMin && isYMin));
-		dendroView.getYMinusBottomButton().setEnabled(!isYMin);
-		dendroView.getYMinusTopButton().setEnabled(!isYMin);
-		dendroView.getXMinusRightButton().setEnabled(!isXMin);
-		dendroView.getXMinusLeftButton().setEnabled(!isXMin);
+		dendroView.getYMinusBottomButton().setEnabled(!atTop);
+		dendroView.getYMinusTopButton().setEnabled(!atBottom);
+		dendroView.getXMinusRightButton().setEnabled(!atLeft);
+		dendroView.getXMinusLeftButton().setEnabled(!atRight);
 		dendroView.getXYMinusButton().setEnabled(!(isXMin && isYMin));
 
 		/* Zoom-in buttons disabled if visible tile number for axis is 1 or if

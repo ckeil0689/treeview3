@@ -665,15 +665,15 @@ MouseWheelListener {
 				}
 				//This should happen when the mouse is not over the heatmap
 				else {
-					xmap.zoomIn();
-					ymap.zoomIn();
+					xmap.zoomInBegin();
+					ymap.zoomInBegin();
 				}
 			} else {
 				if (status != null) {
 					smoothZoomFromPixel(e.getX(),e.getY());
 				} else {
-					xmap.zoomOut();
-					ymap.zoomOut();
+					xmap.zoomOutBegin();
+					ymap.zoomOutBegin();
 				}
 			}
 		} else if (e.isShiftDown()) {
