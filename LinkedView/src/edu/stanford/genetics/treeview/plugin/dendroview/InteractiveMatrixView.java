@@ -996,8 +996,9 @@ MouseWheelListener {
 
 			//Force an immediate repaint.  Found this in a thread here:
 			//https://community.oracle.com/thread/1663771
-			paintImmediately(redrawDims[0],redrawDims[1],
-							 redrawDims[2],redrawDims[3]);
+			paintImmediately(0,0,getWidth(),getHeight());
+			//paintImmediately(redrawDims[0],redrawDims[1],
+			//				 redrawDims[2],redrawDims[3]);
 
 			//Sleep a few milliseconds
 			try{
@@ -1706,7 +1707,7 @@ MouseWheelListener {
 			updateAspectRatio();
 		}
 
-		LogBuffer.println("Zoom redraw bounds initial: [" + startXPixel + "," + startYPixel + "," + (startXPixel + numSelectedXPixels - 1) + "," + (startYPixel + numSelectedYPixels - 1) + "].");
+		//LogBuffer.println("Zoom redraw bounds initial: [" + startXPixel + "," + startYPixel + "," + (startXPixel + numSelectedXPixels - 1) + "," + (startYPixel + numSelectedYPixels - 1) + "].");
 		//Now let's return the pixel indexes of the selection post-zoom
 		int[] redrawPixelBounds = new int[4];
 		redrawPixelBounds[0] = xmap.getPixel(selecXStartIndex);
@@ -1715,7 +1716,7 @@ MouseWheelListener {
 		redrawPixelBounds[1] = ymap.getPixel(selecYStartIndex);
 		redrawPixelBounds[3] = ymap.getPixel(selecYStartIndex + numYSelectedIndexes) - 1;//redrawPixelBounds[1] + (int) Math.round((double) numYSelectedIndexes *
 		//		pixelsPerYIndex);
-		LogBuffer.println("Zoom redraw bounds before fix: [" + redrawPixelBounds[0] + "," + redrawPixelBounds[1] + "," + redrawPixelBounds[2] + "," + redrawPixelBounds[3] + "].");
+		//LogBuffer.println("Zoom redraw bounds before fix: [" + redrawPixelBounds[0] + "," + redrawPixelBounds[1] + "," + redrawPixelBounds[2] + "," + redrawPixelBounds[3] + "].");
 		int maxWidth = getWidth();
 		int maxHeight = getHeight();
 		if(redrawPixelBounds[0] < 0) redrawPixelBounds[0] = 0;
@@ -1726,7 +1727,7 @@ MouseWheelListener {
 		if(redrawPixelBounds[1] > maxHeight) redrawPixelBounds[1] = maxHeight;
 		if(redrawPixelBounds[3] < 0) redrawPixelBounds[3] = 0;
 		if(redrawPixelBounds[3] > maxHeight) redrawPixelBounds[3] = maxHeight;
-		LogBuffer.println("Zoom redraw bounds after fix: [" + redrawPixelBounds[0] + "," + redrawPixelBounds[1] + "," + redrawPixelBounds[2] + "," + redrawPixelBounds[3] + "].");
+		//LogBuffer.println("Zoom redraw bounds after fix: [" + redrawPixelBounds[0] + "," + redrawPixelBounds[1] + "," + redrawPixelBounds[2] + "," + redrawPixelBounds[3] + "].");
 		return(redrawPixelBounds);
 	}
 

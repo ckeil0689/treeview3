@@ -414,7 +414,7 @@ public abstract class HeaderFinderBox {
 		private boolean changed = false;
 		JTextComponent editor = ((JTextField) searchTermBox.getEditor()
 				.getEditorComponent());
-
+		
 		// NOTE: command-w never worked to close the search window before adding
 		// anything in this class other than the seekAll function, though
 		// command-q WOULD quit the app
