@@ -971,13 +971,14 @@ MouseWheelListener {
 		//Zooming out is slower on large matrices because it just takes longer
 		//to draw large amounts of cells, so our cutoff wait time should be
 		//smaller if we are zooming out
-		int doneWaitingMillis = 150;
-		if((numXSelectedIndexes > 150 &&
-				xmap.getNumVisible() < numXSelectedIndexes) ||
-				(numYSelectedIndexes > 150 &&
-						ymap.getNumVisible() < numYSelectedIndexes)) {
-			doneWaitingMillis = 70;
-		}
+		int doneWaitingMillis = 500;
+//		int selectionSizeCutoff = 500;
+//		if((numXSelectedIndexes > selectionSizeCutoff &&
+//				xmap.getNumVisible() < numXSelectedIndexes) ||
+//				(numYSelectedIndexes > selectionSizeCutoff &&
+//						ymap.getNumVisible() < numYSelectedIndexes)) {
+//			doneWaitingMillis = 200;
+//		}
 
 		//Let's calculate the relative position of the center of the selection
 		//and gradually zoom toward that spot in a loop
@@ -993,6 +994,11 @@ MouseWheelListener {
 														 numXSelectedIndexes,
 														 selecYStartIndex,
 														 numYSelectedIndexes);
+
+			//LogBuffer.println("numVisible versus num selected: [x" +
+			//				  xmap.getNumVisible() + ":" + numXSelectedIndexes +
+			//				  ",y" + ymap.getNumVisible() + ":" +
+			//				  numYSelectedIndexes + "].");
 
 			//Force an immediate repaint.  Found this in a thread here:
 			//https://community.oracle.com/thread/1663771
@@ -1016,16 +1022,24 @@ MouseWheelListener {
 		//level or scroll position, so we should do a zoom & scroll here just to
 		//be certain. Scroll could be off because of the way it is separated
 		//from the zoom, so we will always do that
-		if(xmap.getNumVisible() != numXSelectedIndexes)
+		if(xmap.getNumVisible() != numXSelectedIndexes) {
+			//LogBuffer.println("Adjusting final X zoom");
 			xmap.zoomToSelected(selecXStartIndex,
 					(selecXStartIndex + numXSelectedIndexes - 1));
-		if(ymap.getNumVisible() != numYSelectedIndexes)
+		}
+		if(ymap.getNumVisible() != numYSelectedIndexes) {
+			//LogBuffer.println("Adjusting final Y zoom");
 			ymap.zoomToSelected(selecYStartIndex,
 					(selecYStartIndex + numYSelectedIndexes - 1));
-		if(xmap.getFirstVisible() != selecXStartIndex)
+		}
+		if(xmap.getFirstVisible() != selecXStartIndex) {
+			//LogBuffer.println("Adjusting final X scroll");
 			xmap.scrollToFirstIndex(selecXStartIndex);
-		if(ymap.getFirstVisible() != selecYStartIndex)
+		}
+		if(ymap.getFirstVisible() != selecYStartIndex) {
+			//LogBuffer.println("Adjusting final Y scroll");
 			ymap.scrollToFirstIndex(selecYStartIndex);
+		}
 
 		//We will update the aspect ratio just in case it didn't happen
 		//automatically
@@ -1045,9 +1059,9 @@ MouseWheelListener {
 	 * zoomTowardPixel.
 	 */
 	public int[] smoothZoomTowardSelection(int selecXStartIndex,
-										  int numXSelectedIndexes,
-										  int selecYStartIndex,
-										  int numYSelectedIndexes) {
+										   int numXSelectedIndexes,
+										   int selecYStartIndex,
+										   int numYSelectedIndexes) {
 		
 		//Find the pixel inside the selected area to "zoom toward" such that the
 		//selected area essentially expands to fill the screen
@@ -1103,12 +1117,16 @@ MouseWheelListener {
 		//fraction based on the size of the matrix we are going to draw at each
 		//increment so that we skip increments that take too much time to draw
 		double targetZoomFracX =
-				xmap.getOptimalZoomIncrement(numXSelectedIndexes);
+				xmap.getOptimalZoomIncrement(numXSelectedIndexes,
+						(prevXNumVisible < numXSelectedIndexes));
 		double targetZoomFracY =
-				ymap.getOptimalZoomIncrement(numYSelectedIndexes);
+				ymap.getOptimalZoomIncrement(numYSelectedIndexes,
+						(prevYNumVisible < numYSelectedIndexes));
 		//Select the larger zoom increment from the 2 dimensions
 		double targetZoomFrac = targetZoomFracX;
 		if(targetZoomFrac < targetZoomFracY) targetZoomFrac = targetZoomFracY;
+
+		//LogBuffer.println("targetZoomFrac: [" + targetZoomFrac + "].");
 
 		//If the starting aspect ratio is different from the target aspect
 		//ratio, we don't want to snap to that ratio on the first step - we want
@@ -1266,6 +1284,7 @@ MouseWheelListener {
 			if(numXCells >= numXSelectedIndexes) {
 				zoomXVal = xmap.getBestZoomInVal(xPxPos,targetZoomFrac);
 			} else {
+				//LogBuffer.println("Zooming out on the X axis 1.");
 				zoomXVal = xmap.getBestZoomOutVal(xPxPos,targetZoomFrac);
 			}
 			if(numYCells >= numYSelectedIndexes) {
@@ -1273,6 +1292,7 @@ MouseWheelListener {
 						targetZoomFrac +
 						(1 - targetZoomFrac) * targetZoomFracCorrection);
 			} else {
+				//LogBuffer.println("Zooming out on the Y axis 1.");
 				zoomYVal = ymap.getBestZoomOutVal(yPxPos,
 						targetZoomFrac +
 						(1 - targetZoomFrac) * targetZoomFracCorrection);
@@ -1333,7 +1353,7 @@ MouseWheelListener {
 						targetZoomFrac +
 						(1 - targetZoomFrac) * targetZoomFracCorrection);
 			} else {
-				//LogBuffer.println("Zooming out on the X axis.");
+				//LogBuffer.println("Zooming out on the X axis 2.");
 				zoomXVal = xmap.getBestZoomOutVal(xPxPos,
 						targetZoomFrac +
 						(1 - targetZoomFrac) * targetZoomFracCorrection);
@@ -1342,7 +1362,7 @@ MouseWheelListener {
 				//LogBuffer.println("Zooming in on the Y axis.");
 				zoomYVal = ymap.getBestZoomInVal(yPxPos,targetZoomFrac);
 			} else {
-				//LogBuffer.println("Zooming out on the Y axis.");
+				//LogBuffer.println("Zooming out on the Y axis 2.");
 				zoomYVal = ymap.getBestZoomOutVal(yPxPos,targetZoomFrac);
 			}
 
@@ -1431,7 +1451,9 @@ MouseWheelListener {
 		}
 
 		//LogBuffer.println("Should have zoomed by [x" + zoomXVal + ",y" +
-		//zoomYVal + "].");
+		//		zoomYVal + "] from [" + prevXNumVisible + ":" +
+		//		prevYNumVisible + "] to [" + xmap.getNumVisible() + ":" +
+		//		ymap.getNumVisible() + "].");
 
 		//Now that we have zoomed, we should scroll if the selection is off the
 		//screen.
@@ -1707,27 +1729,63 @@ MouseWheelListener {
 			updateAspectRatio();
 		}
 
-		//LogBuffer.println("Zoom redraw bounds initial: [" + startXPixel + "," + startYPixel + "," + (startXPixel + numSelectedXPixels - 1) + "," + (startYPixel + numSelectedYPixels - 1) + "].");
-		//Now let's return the pixel indexes of the selection post-zoom
+		//LogBuffer.println("Zoom redraw bounds initial: [" + startXPixel + "," +
+		//		startYPixel + "," + (startXPixel + numSelectedXPixels - 1) +
+		//		"," + (startYPixel + numSelectedYPixels - 1) +
+		//		"]. Panel dimensions: [" + getWidth() + "x" + getHeight() +
+		//		"].");
+		//Compute the area to redraw (only for zooming-out - see code at end)
 		int[] redrawPixelBounds = new int[4];
-		redrawPixelBounds[0] = xmap.getPixel(selecXStartIndex);
-		redrawPixelBounds[2] = xmap.getPixel(selecXStartIndex + numXSelectedIndexes) - 1;//redrawPixelBounds[0] + (int) Math.round((double) numXSelectedIndexes *
-		//		pixelsPerXIndex);
-		redrawPixelBounds[1] = ymap.getPixel(selecYStartIndex);
-		redrawPixelBounds[3] = ymap.getPixel(selecYStartIndex + numYSelectedIndexes) - 1;//redrawPixelBounds[1] + (int) Math.round((double) numYSelectedIndexes *
-		//		pixelsPerYIndex);
-		//LogBuffer.println("Zoom redraw bounds before fix: [" + redrawPixelBounds[0] + "," + redrawPixelBounds[1] + "," + redrawPixelBounds[2] + "," + redrawPixelBounds[3] + "].");
-		int maxWidth = getWidth();
+
+		pixelsPerXIndex = xmap.getScale();
+		if(prevXNumVisible > numXSelectedIndexes) {
+			//LogBuffer.println("Zoom redraw bounds initial X: [" + startXPixel +
+			//		"," + (startXPixel + numSelectedXPixels - 1) +
+			//		"]. Panel dimensions: [" + getWidth() + "].");
+			//Now let's return the pixel indexes of the selection post-zoom
+			redrawPixelBounds[0] = xmap.getPixel(selecXStartIndex);
+			redrawPixelBounds[2] = (int) Math.round((double) numXSelectedIndexes *
+					pixelsPerXIndex) + 1; //Added 1 because sometimes inaccurate
+		} else {
+			redrawPixelBounds[0] = xmap.getPixel(prevXFirstVisible);
+			redrawPixelBounds[2] = (int) Math.round((double) prevXNumVisible *
+					pixelsPerXIndex) + 1; //Added 1 because sometimes inaccurate
+		}
+		pixelsPerYIndex = ymap.getScale();
+		if(prevYNumVisible > numYSelectedIndexes) {
+			//LogBuffer.println("Zoom redraw bounds initial: [" + startYPixel +
+			//		"," + (startYPixel + numSelectedYPixels - 1) +
+			//		"]. Panel dimensions: [" + getHeight() + "].");
+			redrawPixelBounds[1] = ymap.getPixel(selecYStartIndex);
+			redrawPixelBounds[3] = (int) Math.round((double) numYSelectedIndexes *
+					pixelsPerYIndex) + 1; //Added 1 because sometimes inaccurate
+			//LogBuffer.println("Zoom redraw bounds before fix: [" +
+			//		redrawPixelBounds[0] + "," + redrawPixelBounds[1] + "," +
+			//		redrawPixelBounds[2] + "," + redrawPixelBounds[3] + "].");
+		} else {
+			redrawPixelBounds[1] = ymap.getPixel(prevYFirstVisible);
+			redrawPixelBounds[3] = (int) Math.round((double) prevYNumVisible *
+					pixelsPerYIndex) + 1; //Added 1 because sometimes inaccurate
+		}
+
+		int maxWidth  = getWidth();
 		int maxHeight = getHeight();
+
 		if(redrawPixelBounds[0] < 0) redrawPixelBounds[0] = 0;
-		if(redrawPixelBounds[0] > maxWidth) redrawPixelBounds[0] = maxWidth;
+		if(redrawPixelBounds[0] > maxWidth) redrawPixelBounds[0] = maxWidth - 1;
 		if(redrawPixelBounds[2] < 0) redrawPixelBounds[2] = 0;
-		if(redrawPixelBounds[2] > maxWidth) redrawPixelBounds[2] = maxWidth;
+		if((redrawPixelBounds[0] + redrawPixelBounds[2]) > maxWidth)
+				redrawPixelBounds[2] = maxWidth - redrawPixelBounds[0];
+
 		if(redrawPixelBounds[1] < 0) redrawPixelBounds[1] = 0;
-		if(redrawPixelBounds[1] > maxHeight) redrawPixelBounds[1] = maxHeight;
+		if(redrawPixelBounds[1] > maxHeight) redrawPixelBounds[1] =
+				maxHeight - 1;
 		if(redrawPixelBounds[3] < 0) redrawPixelBounds[3] = 0;
-		if(redrawPixelBounds[3] > maxHeight) redrawPixelBounds[3] = maxHeight;
-		//LogBuffer.println("Zoom redraw bounds after fix: [" + redrawPixelBounds[0] + "," + redrawPixelBounds[1] + "," + redrawPixelBounds[2] + "," + redrawPixelBounds[3] + "].");
+		if((redrawPixelBounds[1] + redrawPixelBounds[3]) > maxHeight)
+				redrawPixelBounds[3] = maxHeight - redrawPixelBounds[1];
+		//LogBuffer.println("Zoom redraw bounds after fix: [" +
+		//		redrawPixelBounds[0] + "," + redrawPixelBounds[1] + "," +
+		//		redrawPixelBounds[2] + "," + redrawPixelBounds[3] + "].");
 		return(redrawPixelBounds);
 	}
 

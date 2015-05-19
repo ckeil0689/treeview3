@@ -898,8 +898,12 @@ public class MapContainer extends Observable implements Observer,
 	//It uses relative data index hovered over to calculate the target position of the zoom (as opposed to the relative pixel position of the cursor)
 	public int getBestZoomInVal(int pixel,double targetZoomFrac) {
 		int cells = getNumVisible();
+		//If the targetZoomFrac is 1.0, return the remainder of this dimension
+		if((targetZoomFrac % 1) == 0 && ((int) Math.round(targetZoomFrac)) == 1) {
+			return(getMaxIndex() + 1 - cells);
+		}
 		int zoomVal = (int) Math.round((double) cells * targetZoomFrac);
-		int numPixels = getAvailablePixels();
+		//int numPixels = getAvailablePixels();
 
 		//LogBuffer.println("getBestZoomInVal: Called with cells [" + cells + "] targetZoomFrac [" + targetZoomFrac + "] and calculated zoomVal as [" + zoomVal + "].");
 		//If we're at the minimum zoom level, do not zoom in any more
@@ -991,7 +995,12 @@ public class MapContainer extends Observable implements Observer,
 	//This function performs the reverse of getBestZoomInVal, except it uses the relative pixel position of the cursor to calculate the zoom position that is targeted for smoothing
 	public int getBestZoomOutVal(int pixel,double targetZoomFrac) {
 		int cells = getNumVisible();
-		int zoomVal = (int) Math.round((double) cells * targetZoomFrac);
+		//If the targetZoomFrac is 1.0, return the remainder of this dimension
+		if((targetZoomFrac % 1) == 0 && ((int) Math.round(targetZoomFrac)) == 1) {
+			return(getMaxIndex() + 1 - cells);
+		}
+		//int zoomVal = (int) Math.round((double) cells * targetZoomFrac);
+		int zoomVal = (int) Math.round((double) cells / (1 - targetZoomFrac) - cells);
 		int numPixels = getAvailablePixels();
 		//LogBuffer.println("getBestZoomOutVal: Called with pixel [" + pixel + "] and targetZoomFrac [" + targetZoomFrac + "] resulting in target zoomVal [" + zoomVal + "].");
 
@@ -1000,9 +1009,10 @@ public class MapContainer extends Observable implements Observer,
 		if (zoomVal < 1) {
 			return(0);
 		}
-		//If the resulting zoom level is bigger than the max zoom-out
-		if ((zoomVal + cells) > (getMaxIndex() + 1)) {
-			zoomVal = getMaxIndex() - cells;
+		//If the resulting zoom level is bigger than or equal to full zoom-out
+		if ((zoomVal + cells) >= (getMaxIndex() + 1)) {
+			zoomVal = getMaxIndex() + 1 - cells;
+			return(zoomVal);
 		}
 		int smallThresh = 15;
 		int adjustWindow = 7;
@@ -1083,7 +1093,7 @@ public class MapContainer extends Observable implements Observer,
 	 * should zoom more when there are large abounts of squares to zoom
 	 * through
 	 */
-	public double getOptimalZoomIncrement(int targetNumIndexes) {
+	public double getOptimalZoomIncrement(int targetNumIndexes,boolean zoomingOut) {
 		//double maxZoomFrac = 0.5;
 		double maxZoomFrac = 0.6;
 		if(ZOOM_INCREMENT > maxZoomFrac) {
@@ -1103,18 +1113,45 @@ public class MapContainer extends Observable implements Observer,
 		//Basically, when the number of visible spots is 6000, the zoom increment will be 50%.
 		//When the number of visible spots is 100, the zoom increment will be 5%.  There's a log scale in between.
 		int largerXSize = getNumVisible();
-		if(targetNumIndexes > largerXSize) {
-			largerXSize = targetNumIndexes;
-		}
+		//if(targetNumIndexes > largerXSize) {
+		//	largerXSize = targetNumIndexes;
+		//}
 		for(int zf = 1;zf<=maxZF;zf++) {
+		//for(int zf = maxZF;zf > 0;zf--) {
 			double zmfc = (double) zf * ZOOM_INCREMENT;
-			if(a*Math.pow(b,zmfc) >= largerXSize) {
+			if(a*Math.pow(b,zmfc) >= largerXSize &&
+					//Only select this zoom fraction if the next zoom fraction
+					//will be larger - this is to reduce the number of steps in
+					//large zoom changes
+					a*Math.pow(b,zmfc) < (largerXSize +
+							(zf + 1) * ZOOM_INCREMENT * largerXSize)) {
+			//if(a*Math.pow(b,zmfc) <= largerXSize) {
 				targetZoomFrac = zmfc;
+				if(zoomingOut) targetZoomFrac += ZOOM_INCREMENT;
 				break;
 			}
+			//targetZoomFrac = zmfc;
 		}
 		if(targetZoomFrac > maxZoomFrac) {
 			targetZoomFrac = maxZoomFrac;
+		}
+		//If this step size is larger(zoomout) or smaller(zoomin) than what's
+		//remaining for the next step, just go all the way
+		//This is an approximation because I should actually be using the next
+		//step, not this one
+		if((zoomingOut &&
+				targetZoomFrac * largerXSize >
+				Math.abs(largerXSize + (zoomingOut ? 1 : -1) *
+						 (int) Math.round(targetZoomFrac * largerXSize) -
+				targetNumIndexes))) {
+			//The above seems only necessary for zoom out (for speed)
+			// ||
+		    //(!zoomingOut && targetZoomFrac * largerXSize <
+			//Math.abs(largerXSize + (zoomingOut ? 1 : -1) *
+			//(int) Math.round(targetZoomFrac * largerXSize) -
+			//targetNumIndexes))) {
+			//LogBuffer.println("Slamming to target");
+			targetZoomFrac = 1;
 		}
 		return(targetZoomFrac);
 	}
