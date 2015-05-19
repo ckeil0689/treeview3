@@ -22,6 +22,7 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
+import java.awt.Color;
 import java.awt.ScrollPane;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
@@ -194,7 +195,7 @@ public class DendroView implements Observer, DendroPanel {
 		/* main panel */
 
 		searchPanel = GUIFactory.createJPanel(false, GUIFactory.FILL, null);
-		dendroPane = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING_FILL);
+		dendroPane = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 //		dendroPane.setLayout(new MigLayout("debug"));
 
 		/* >>> Init all views --- they should be final <<< */
@@ -333,9 +334,7 @@ public class DendroView implements Observer, DendroPanel {
 		JPanel bottomPanel;
 
 		globalOverviewPanel = GUIFactory.createJPanel(false, 
-				GUIFactory.NO_PADDING);
-//		globalOverviewPanel.setBorder(
-//				BorderFactory.createTitledBorder("Overview"));
+				GUIFactory.NO_PADDING_FILL, Color.CYAN);
 		
 		crossPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 
@@ -372,7 +371,6 @@ public class DendroView implements Observer, DendroPanel {
 			rowDataPane.setDividerLocation(oldRowDiv);
 		} else {
 			rowDataPane.setDividerLocation(0.0);
-//			rowDataPane.setEnabled(false);
 		}
 
 		colDataPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, colTreeView,
@@ -391,7 +389,6 @@ public class DendroView implements Observer, DendroPanel {
 			colDataPane.setDividerLocation(oldColDiv);
 		} else {
 			colDataPane.setDividerLocation(0.0);
-//			colDataPane.setEnabled(false);
 		}
 
 		/* If trees in general are disabled */
@@ -447,7 +444,7 @@ public class DendroView implements Observer, DendroPanel {
 		
 		
 		/* Adding elements to the main JPanel */
-		dendroPane.add(globalOverviewPanel, "w 10%, h 19%");
+		dendroPane.add(globalOverviewPanel, "w 200:10%:, h 19%, grow, push");
 
 		/* Column tree view */
 		dendroPane.add(colDataPane, "w 75%, h 19%!");
@@ -457,7 +454,7 @@ public class DendroView implements Observer, DendroPanel {
 		dendroPane.add(navContainer, "span 1 3, w 220:10%:, h 100%, wrap");
 
 		/* Row tree view */
-		dendroPane.add(rowDataPane, "w 200:10%:, h 79%");
+		dendroPane.add(rowDataPane, "w 200:10%:, h 79%, grow");
 		
 		/* Matrix view */
 		dendroPane.add(interactiveMatrixView, "w 75%, h 79%, grow, push");
