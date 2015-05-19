@@ -14,6 +14,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -65,32 +66,8 @@ public class GUIFactory {
 
 		final JPanel panel = new JPanel();
 		panel.setOpaque(opaque);
-
-		switch (panel_mode) {
-		case NO_PADDING_FILL:
-			panel.setLayout(new MigLayout("ins 0", "[grow, fill]"));
-			break;
-
-		case NO_PADDING:
-			panel.setLayout(new MigLayout("ins 0"));
-			break;
-
-		case NO_PADDING_X:
-			panel.setLayout(new MigLayout("ins 5 0 5 0"));
-			break;
-
-		case NO_PADDING_Y:
-			panel.setLayout(new MigLayout("ins 0 5 0 5"));
-			break;
-
-		case FILL:
-			panel.setLayout(new MigLayout("", "[grow, fill]"));
-			break;
-
-		default:
-			panel.setLayout(new MigLayout());
-			break;
-		}
+		
+		setComponentLayoutMode(panel, panel_mode);
 
 		// specify background, otherwise default to theme's backgroundColor.
 		if (backgroundColor != null) {
@@ -111,6 +88,43 @@ public class GUIFactory {
 			final int panel_mode) {
 		
 		return createJPanel(opaque, panel_mode, null);
+	}
+	
+	/**
+	 * Used to set the layout manager for a JComponent.
+	 * @param comp JComponent which needs a layout manager.
+	 * @param panel_mode Specific mode that is supposed to be applied to
+	 * the new JComponent's layout.
+	 */
+	public static void setComponentLayoutMode(JComponent comp, 
+			final int panel_mode) {
+		
+		switch (panel_mode) {
+		case NO_PADDING_FILL:
+			comp.setLayout(new MigLayout("ins 0", "[grow, fill]"));
+			break;
+
+		case NO_PADDING:
+			comp.setLayout(new MigLayout("ins 0"));
+			break;
+
+		case NO_PADDING_X:
+			comp.setLayout(new MigLayout("ins 5 0 5 0"));
+			break;
+
+		case NO_PADDING_Y:
+			comp.setLayout(new MigLayout("ins 0 5 0 5"));
+			break;
+
+		case FILL:
+			comp.setLayout(new MigLayout("", "[grow, fill]"));
+			break;
+
+		default:
+			comp.setLayout(new MigLayout());
+			break;
+		}
+		
 	}
 
 	/**
