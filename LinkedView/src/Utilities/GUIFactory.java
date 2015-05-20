@@ -186,7 +186,7 @@ public class GUIFactory {
 	public static JButton createColorIconBtn(final String title, Icon icon) {
 
 		final JButton btn = new JButton(title, icon);
-		btn.setFocusPainted(false);
+		btn.setFocusPainted(true);
 
 		return btn;
 	}

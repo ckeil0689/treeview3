@@ -397,7 +397,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		if (map.getScale() > 10.0) {
 			
 			if(!isFixed) {
-				setDynamicFontSize();
+				adaptFontSizeToMapScale();
 			}
 
 			/* Rotate plane for array axis (not for zoomHint) */
@@ -538,30 +538,16 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	}
 	
 	/**
-	 * Sets a dynamic font size based on current scale of each independent
+	 * Sets a dynamic font size based on current scale of the dependent
 	 * axis map.
 	 */
-	private void setDynamicFontSize() {
+	private void adaptFontSizeToMapScale() {
 		
-		double scale = map.getScale();
-		
-		int multiple = (int) scale / 10;
-		
-		/* Guarantee max font size of 14 */
-		if(multiple > 10) {
-			multiple = 10;
-		}
-		
-		int newPoints;
-		if(multiple < 2) {
-			newPoints = 6;
-		} else {
-			/* rate of 2 is too much, rate of 1 too little... */
-			newPoints = 6 + 2 * multiple;
-		}
+		int squeeze = 1; // how much smaller the font is compared to tile scale
+		int newPoints = (int) map.getScale() - squeeze;
 		
 		if(newPoints != getPoints()) {
-			setPoints(newPoints);
+			setPoints(newPoints - 1);
 		}
 	}
 
