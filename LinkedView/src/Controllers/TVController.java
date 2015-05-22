@@ -332,7 +332,9 @@ public class TVController implements Observer {
 			 * which would void the updated ColorExtractor state if copying happens before.
 			 * Implement a nicer solution one day...
 			 */
-			copyOldPreferences(fileMenuSet.getRoot(), fileMenuSet.getExt());
+			Preferences loadedNode = getOldPreferences(fileMenuSet.getRoot(), 
+					fileMenuSet.getExt());
+			copyOldPreferencesTo(loadedNode);
 			
 			if (fileMenuSet != null) {
 				fileMenuSet = tvFrame.getFileMRU().addUnique(fileMenuSet);
@@ -380,8 +382,7 @@ public class TVController implements Observer {
 			return getTargetNode(root, srcName, srcExtension);
 			
 		} catch (BackingStoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogBuffer.logException(e);
 			return null;
 		}
 	}
@@ -392,23 +393,26 @@ public class TVController implements Observer {
 	 * @param srcName Source name of the post-clustered file.
 	 * @param srcExtension Source file extension of the post-clustered file.
 	 */
-	private void copyOldPreferences(String srcName, String srcExtension) {
+	private void copyOldPreferencesTo(final Preferences loadedNode) {
 		
-		if(oldNode != null) {
+		if(oldNode == null) {
+			return;
+		}
 			
-			try {
-				dendroController.importLabelPreferences(oldNode);
+		try {
+			dendroController.importLabelPreferences(oldNode);
+			
+			if(oldNode.nodeExists("ColorPresets")) {
+				dendroController.importColorPreferences(oldNode);
 				
-				if(oldNode.nodeExists("ColorPresets")) {
-					dendroController.importColorPreferences(oldNode);
-				}
-				
-			} catch (BackingStoreException e) {
-				LogBuffer.logException(e);
+				// set node here? maybe it disappears because it's a local var
 			}
 			
-			oldNode = null;
+		} catch (BackingStoreException e) {
+			LogBuffer.logException(e);
 		}
+		
+		oldNode = null;
 	}
 	
 	/**

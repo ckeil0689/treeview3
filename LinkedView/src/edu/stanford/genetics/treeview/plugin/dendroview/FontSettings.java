@@ -288,7 +288,8 @@ public class FontSettings implements SettingsPanel {
 		fontPanel.add(style_choice, "span, wrap");
 
 		/* Font size */
-		size_field = new NatField(client.getPoints(), 3);
+		// getLastSize() to avoid issues with hint label font size.
+		size_field = new NatField(client.getLastSize(), 3);
 		size_field.getDocument().addDocumentListener(
 				new DocumentChangeListener());
 		fontPanel.add(size_field);

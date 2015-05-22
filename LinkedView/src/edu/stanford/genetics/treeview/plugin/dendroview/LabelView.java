@@ -236,11 +236,12 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	
 	public void importSettingsFromNode(Preferences node) {
 		
+		setMin(node.getInt("min", d_min));
+		setMax(node.getInt("max", d_max));
+		
 		setFace(node.get("face", d_face));
 		setStyle(node.getInt("style", d_style));
 		setSavedPoints(node.getInt("size", d_size));
-		setMin(node.getInt("min", d_min));
-		setMax(node.getInt("max", d_max));
 		setJustifyOption(node.getBoolean("isRightJustified", d_justified));
 		setFixed(node.getBoolean("isFixed", d_fixed));
 
@@ -258,6 +259,12 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
 		return size;
 	}
+	
+	@Override 
+	public int getLastSize() {
+		
+		return last_size;
+	};
 	
 	@Override
 	public int getMin() {

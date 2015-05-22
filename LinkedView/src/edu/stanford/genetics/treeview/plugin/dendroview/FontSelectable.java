@@ -40,6 +40,11 @@ public abstract interface FontSelectable {
 	public abstract int getPoints();
 	
 	/**
+	 * @return The last used main font size (excludes setting size of hint label)
+	 */
+	public abstract int getLastSize();
+	
+	/**
 	 * @return The current minimum font size.
 	 */
 	public abstract int getMin();
