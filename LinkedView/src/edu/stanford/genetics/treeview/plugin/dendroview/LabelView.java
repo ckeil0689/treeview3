@@ -377,6 +377,10 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	@Override
 	public void setMin(final int i) {
 
+		if(i >= max) {
+			return;
+		}
+		
 		if (min != i) {
 			min = i;
 			if (configNode != null) {
@@ -391,6 +395,10 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	@Override
 	public void setMax(final int i) {
 
+		if(i <= min) {
+			return;
+		}
+		
 		if (max != i) {
 			max = i;
 			if (configNode != null) {
