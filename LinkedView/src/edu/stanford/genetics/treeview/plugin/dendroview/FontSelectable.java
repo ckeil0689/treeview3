@@ -38,6 +38,17 @@ public abstract interface FontSelectable {
 	 * @return The current point size
 	 */
 	public abstract int getPoints();
+	
+	/**
+	 * @return The current minimum font size.
+	 */
+	public abstract int getMin();
+	
+	/**
+	 * @return The current maximum font size.
+	 */
+	public abstract int getMax();
+	
 
 	/**
 	 * @return The current style
@@ -66,12 +77,36 @@ public abstract interface FontSelectable {
 	public abstract void setFace(String string);
 
 	/**
+	 * Sets the point size but also remembers it in an instsnce variable.
+	 *
+	 * @param i
+	 *            The new points value
+	 */
+	public abstract void setSavedPoints(int i);
+	
+	/**
 	 * Sets the point size
 	 *
 	 * @param i
 	 *            The new points value
 	 */
 	public abstract void setPoints(int i);
+	
+	/**
+	 * Sets a minimum point size
+	 *
+	 * @param i
+	 *            The new points value
+	 */
+	public abstract void setMin(int i);
+	
+	/**
+	 * Sets a maximum point size
+	 *
+	 * @param i
+	 *            The new points value
+	 */
+	public abstract void setMax(int i);
 	
 	/**
 	 * Sets whether the font size changes dynamically or remains fixed.
@@ -94,4 +129,5 @@ public abstract interface FontSelectable {
 	 *            The new style value
 	 */
 	public abstract void setJustifyOption(boolean isRightJustified);
+
 }

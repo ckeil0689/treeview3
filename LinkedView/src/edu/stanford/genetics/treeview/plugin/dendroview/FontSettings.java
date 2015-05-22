@@ -44,6 +44,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -73,6 +74,8 @@ public class FontSettings implements SettingsPanel {
 	private JComboBox<String> style_choice;
 	private JCheckBox fixedBox;
 	private NatField size_field;
+	private NatField min_field;
+	private NatField max_field;
 
 	public FontSettings(final FontSelectable fs, final FontSelectable fs2) {
 
@@ -252,16 +255,22 @@ public class FontSettings implements SettingsPanel {
 		final String string = (String) font_choice.getSelectedItem();
 		final int i = encode_style((String) style_choice.getSelectedItem());
 		final int size = size_field.getNat();
+		final int min = min_field.getNat();
+		final int max = max_field.getNat();
 		final boolean isFixed = fixedBox.isSelected();
 
 		client.setFace(string);
 		client.setStyle(i);
-		client.setPoints(size);
+		client.setSavedPoints(size);
+		client.setMin(min);
+		client.setMax(max);
 		client.setFixed(isFixed);
 
 		client2.setFace(string);
 		client2.setStyle(i);
-		client2.setPoints(size);
+		client2.setSavedPoints(size);
+		client2.setMin(min);
+		client2.setMax(max);
 		client2.setFixed(isFixed);
 	}
 
@@ -278,6 +287,7 @@ public class FontSettings implements SettingsPanel {
 		setupStyleChoice();
 		fontPanel.add(style_choice, "span, wrap");
 
+		/* Font size */
 		size_field = new NatField(client.getPoints(), 3);
 		size_field.getDocument().addDocumentListener(
 				new DocumentChangeListener());
@@ -286,7 +296,25 @@ public class FontSettings implements SettingsPanel {
 		fixedBox = new JCheckBox("Keep fixed");
 		fixedBox.setSelected(client.getFixed());
 		fixedBox.addActionListener(new SelectionListener());
-		fontPanel.add(fixedBox);
+		fontPanel.add(fixedBox, "wrap");
+		
+		/* Minimum font size */
+		JLabel minLabel = new JLabel("Min:");
+		minLabel.setFont(GUIFactory.FONTS);
+		min_field = new NatField(client.getMin(), 3);
+		min_field.getDocument().addDocumentListener(
+				new DocumentChangeListener());
+		fontPanel.add(minLabel);
+		fontPanel.add(min_field, "wrap");
+		
+		/* Maximum font size */
+		JLabel maxLabel = new JLabel("Max:");
+		maxLabel.setFont(GUIFactory.FONTS);
+		max_field = new NatField(client.getMax(), 3);
+		max_field.getDocument().addDocumentListener(
+				new DocumentChangeListener());
+		fontPanel.add(maxLabel);
+		fontPanel.add(max_field);
 	}
 
 	/**
