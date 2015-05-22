@@ -305,7 +305,7 @@ public class FontSettings implements SettingsPanel {
 		min_field.getDocument().addDocumentListener(
 				new DocumentChangeListener());
 		fontPanel.add(minLabel);
-		fontPanel.add(min_field, "wrap");
+		fontPanel.add(min_field);
 		
 		/* Maximum font size */
 		JLabel maxLabel = new JLabel("Max:");
