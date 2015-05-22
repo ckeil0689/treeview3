@@ -39,6 +39,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	protected final static int COL = 1;
 	
 	protected final static int HINTFONTSIZE = 14; 
+	protected final static double LOWER_BOUND = 10.0;
 
 	/* DataModel is an observer */
 	protected DataModel dataModel;
@@ -57,6 +58,8 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	protected final String d_face = "Courier";
 	protected final int d_style = 0;
 	protected final int d_size = 14;
+	protected final int d_min = 5;
+	protected final int d_max = 30;
 	protected boolean d_justified;
 	protected boolean d_fixed = false;
 
@@ -64,6 +67,9 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	protected String face;
 	protected int style;
 	protected int size;
+	protected int min;
+	protected int max;
+	protected int last_size;
 	protected boolean isFixed;
 
 	/* Panel sizing */
@@ -218,6 +224,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
 		if (parentNode != null) {
 			this.configNode = parentNode;
+			
 		} else {
 			LogBuffer.println("parentNode for LabelView was null.");
 			return;
@@ -229,9 +236,12 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	
 	public void importSettingsFromNode(Preferences node) {
 		
+		setMin(node.getInt("min", d_min));
+		setMax(node.getInt("max", d_max));
+		
 		setFace(node.get("face", d_face));
 		setStyle(node.getInt("style", d_style));
-		setPoints(node.getInt("size", d_size));
+		setSavedPoints(node.getInt("size", d_size));
 		setJustifyOption(node.getBoolean("isRightJustified", d_justified));
 		setFixed(node.getBoolean("isFixed", d_fixed));
 
@@ -248,6 +258,24 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	public int getPoints() {
 
 		return size;
+	}
+	
+	@Override 
+	public int getLastSize() {
+		
+		return last_size;
+	};
+	
+	@Override
+	public int getMin() {
+
+		return min;
+	}
+	
+	@Override
+	public int getMax() {
+
+		return max;
 	}
 
 	@Override
@@ -296,10 +324,31 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 			repaint();
 		}
 	}
+	
+	/**
+	 * Wrapper for setPoints which allows to save the newly set points to an
+	 * instance variable.
+	 * @param i
+	 */
+	@Override
+	public void setSavedPoints(final int i) {
+		
+		/* Stay within boundaries */
+		int new_i = i;
+		if(i > max) {
+			new_i = max;
+			
+		} else if(i < min) {
+			new_i = min;
+		}
+		
+		last_size = new_i;
+		setPoints(new_i);
+	}
 
 	@Override
 	public void setPoints(final int i) {
-
+		
 		if (size != i) {
 			size = i;
 			if (configNode != null) {
@@ -318,6 +367,42 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 			style = i;
 			if (configNode != null) {
 				configNode.putInt("style", style);
+			}
+			setFont(new Font(face, style, size));
+			adjustScrollBar();
+			repaint();
+		}
+	}
+	
+	@Override
+	public void setMin(final int i) {
+
+		if(i >= max) {
+			return;
+		}
+		
+		if (min != i) {
+			min = i;
+			if (configNode != null) {
+				configNode.putInt("min", min);
+			}
+			setFont(new Font(face, style, size));
+			adjustScrollBar();
+			repaint();
+		}
+	}
+	
+	@Override
+	public void setMax(final int i) {
+
+		if(i <= min) {
+			return;
+		}
+		
+		if (max != i) {
+			max = i;
+			if (configNode != null) {
+				configNode.putInt("max", max);
 			}
 			setFont(new Font(face, style, size));
 			adjustScrollBar();
@@ -394,11 +479,15 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		final AffineTransform orig = g2d.getTransform();
 		
 		/* Draw labels if zoom level allows it */
-		if (map.getScale() > 10.0) {
+		final boolean hasFixedOverlap = isFixed && map.getScale() < last_size;
+		
+		if (map.getScale() > LOWER_BOUND && !hasFixedOverlap) {
 			
-			if(!isFixed) {
+			if(isFixed) {
+				setSavedPoints(last_size);
+			} else {
 				adaptFontSizeToMapScale();
-			}
+			} 
 
 			/* Rotate plane for array axis (not for zoomHint) */
 			if (!isGeneAxis) {
@@ -544,10 +633,10 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	private void adaptFontSizeToMapScale() {
 		
 		int squeeze = 1; // how much smaller the font is compared to tile scale
-		int newPoints = (int) map.getScale() - squeeze;
+		int newPoints = (int) map.getScale();
 		
 		if(newPoints != getPoints()) {
-			setPoints(newPoints - 1);
+			setSavedPoints(newPoints - squeeze);
 		}
 	}
 

@@ -1871,10 +1871,24 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	 * Update the state of color extractor to reflect settings from an 
 	 * imported node.
 	 * @param node
+	 * @throws BackingStoreException 
 	 */
-	public void importColorPreferences(Preferences node) {
+	public void importColorPreferences(Preferences oldNode) 
+			throws BackingStoreException {
 		
-		colorExtractor.importPreferences(node);
+		LogBuffer.println("Importing color settings...");
+		
+		colorExtractor.importPreferences(oldNode);
+		
+		/* Update GradientChooser node */
+		String lastActive = oldNode.node("GradientChooser")
+				.get("activeColors", "RedGreen");
+		configNode.node("GradientChooser").put("activeColors", lastActive);
+		
+		/* Store copied node in new ColorPresets node */
+		final ColorPresets colorPresets = DendrogramFactory.getColorPresets();
+		colorPresets.setConfigNode(configNode);
+		colorPresets.addColorSet(colorExtractor.getActiveColorSet());
 	}
 	
 	/**
@@ -1885,8 +1899,10 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	public void importLabelPreferences(Preferences node) {
 		
 		LogBuffer.println("Importing labels...");
-		dendroView.getRowLabelView().importSettingsFromNode(node.node("RowLabelView"));
-		dendroView.getColumnLabelView().importSettingsFromNode(node.node("ColLabelView"));
+		dendroView.getRowLabelView().importSettingsFromNode(
+				node.node("RowLabelView"));
+		dendroView.getColumnLabelView().importSettingsFromNode(
+				node.node("ColLabelView"));
 	}
 
 	/**

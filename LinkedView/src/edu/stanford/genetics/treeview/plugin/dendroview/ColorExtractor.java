@@ -140,10 +140,12 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 		
 		String lastActive = "RedGreen";
 		try {
+			/* Check old Preferences for data */
 			if (node.nodeExists("GradientChooser")) {
 				lastActive = node.node("GradientChooser").get("activeColors", 
 						lastActive);
 			}
+			
 			boolean foundColorSet = false;
 
 			for (final ColorSet defaultColorSet2 : ColorPresets.defaultColorSets) {
@@ -304,6 +306,11 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	public boolean getLogTransform() {
 
 		return m_logTranform;
+	}
+	
+	public ColorSet getActiveColorSet() {
+
+		return colorSet;
 	}
 
 	/**
