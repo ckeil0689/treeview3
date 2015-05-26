@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
@@ -66,10 +65,10 @@ public class AboutDialog extends CustomDialog {
 				GUIFactory.FONTS);
 
 		final JPanel contentPanel = GUIFactory.createJPanel(false,
-				GUIFactory.DEFAULT, null);
+				GUIFactory.DEFAULT);
 
 		final JPanel detailPanel = GUIFactory.createJPanel(false,
-				GUIFactory.DEFAULT, null);
+				GUIFactory.DEFAULT);
 		detailPanel.setBorder(BorderFactory.createTitledBorder("Details"));
 
 		contentPanel.add(text, "span, grow, wrap");
@@ -108,5 +107,7 @@ public class AboutDialog extends CustomDialog {
 			}
 		});
 		detailPanel.add(yesB, "wrap");
+		
+		mainPanel.add(detailPanel, "push, grow");
 	}
 }
