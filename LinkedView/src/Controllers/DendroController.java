@@ -1032,48 +1032,17 @@ public class DendroController implements ConfigNodePersistent, Observer {
 				configNode.node("GlobalXMap").putInt("scale",
 						interactiveXmap.getNumVisible());
 				configNode.node("GlobalXMap").putInt("XScrollValue",
-						dendroView.getXScroll().getValue());
+						dendroView.getMatrixXScroll().getValue());
 			}
 
 			if (configNode.nodeExists("GlobalYMap") && interactiveYmap != null) {
 				configNode.node("GlobalYMap").putInt("scale",
 						interactiveYmap.getNumVisible());
 				configNode.node("GlobalYMap").putInt("YScrollValue",
-						dendroView.getYScroll().getValue());
+						dendroView.getMatrixYScroll().getValue());
 			}
 		} catch (final BackingStoreException e) {
 			LogBuffer.logException(e);
-		}
-	}
-
-	public void setSavedScale() {
-		
-//		/* 
-//		 * Do a reset before setting new scale to make sure screen dimensions
-//		 * are properly set.
-//		 */
-//		resetMatrixViews();
-
-		LogBuffer.println("Setting saved scale.");
-		
-		try {
-			if (configNode.nodeExists("GlobalXMap") && interactiveXmap != null) {
-				interactiveXmap.setLastScale();
-				dendroView.setXScroll(configNode.node("GlobalXMap").getInt(
-						"XScrollValue", 0));
-			}
-
-			if (configNode.nodeExists("GlobalYMap") && interactiveYmap != null) {
-				interactiveYmap.setLastScale();
-				dendroView.setYScroll(configNode.node("GlobalYMap").getInt(
-						"YScrollValue", 0));
-			}
-			
-			notifyAllMapObservers();
-
-		} catch (final BackingStoreException e) {
-			LogBuffer.logException(e);
-			resetMatrixViews();
 		}
 	}
 
@@ -1318,8 +1287,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		// the scrollbars "scroll" by communicating with the maps.
 		setupMapContainers();
 
-		interactiveXmap.setScrollbar(dendroView.getXScroll());
-		interactiveYmap.setScrollbar(dendroView.getYScroll());
+		interactiveXmap.setScrollbar(dendroView.getMatrixXScroll());
+		interactiveYmap.setScrollbar(dendroView.getMatrixYScroll());
 
 		// Drawers
 		dendroView.getInteractiveMatrixView().setArrayDrawer(arrayDrawer);
