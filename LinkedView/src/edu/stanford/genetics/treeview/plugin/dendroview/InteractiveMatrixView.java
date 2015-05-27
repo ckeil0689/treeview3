@@ -56,6 +56,9 @@ MouseWheelListener {
 	public static final int EQUAL = 1;
 	public static final int PROPORT = 2;
 
+	private static final int HORIZONTAL = 0;
+	private static final int VERTICAL = 1;
+
 	private final String[] statustext = new String[] { "Mouseover Selection",
 			"", "" };
 	private HeaderInfo arrayHI;
@@ -112,7 +115,7 @@ MouseWheelListener {
 	 * 
 	 * @return x-axis scroll bar (horizontal) for the InteractiveMatrixView.
 	 */
-	public JScrollBar getXScroll() {
+	public JScrollBar getXMapScroll() {
 
 		return scrollPane.getHorizontalScrollBar();
 	}
@@ -121,7 +124,7 @@ MouseWheelListener {
 	 * 
 	 * @return y-axis scroll bar (vertical) for the InteractiveMatrixView.
 	 */
-	public JScrollBar getYScroll() {
+	public JScrollBar getYMapScroll() {
 
 		return scrollPane.getVerticalScrollBar();
 	}

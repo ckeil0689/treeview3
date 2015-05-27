@@ -22,7 +22,7 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import java.awt.Color;
+import java.awt.Insets;
 import java.awt.ScrollPane;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
@@ -37,7 +37,6 @@ import java.util.Observer;
 import java.util.prefs.Preferences;
 
 import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -118,6 +117,9 @@ public class DendroView implements Observer, DendroPanel {
 	protected JScrollBar matrixXscrollbar;
 	protected JScrollBar matrixYscrollbar;
 
+	final JScrollBar colLabelScroll;
+	final JScrollBar rowLabelScroll;
+
 	protected final DataTicker dataTicker;
 
 	/* Some important class-wide JMenuItems */
@@ -191,12 +193,15 @@ public class DendroView implements Observer, DendroPanel {
 
 		this.tvFrame = tvFrame;
 		this.name = "DendroView";
+		boolean debug = false;
 
 		/* main panel */
 
-		searchPanel = GUIFactory.createJPanel(false, GUIFactory.FILL, null);
-		dendroPane = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
-//		dendroPane.setLayout(new MigLayout("debug"));
+		searchPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		searchPanel.setLayout(new MigLayout("gap 0!, insets 0"));
+		dendroPane = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		dendroPane.setLayout(new MigLayout("gap 0!, insets 0"));
+		if(debug) dendroPane.setLayout(new MigLayout("gap 0, insets 0, debug"));
 
 		/* >>> Init all views --- they should be final <<< */
 		/* data ticker panel */
@@ -206,13 +211,13 @@ public class DendroView implements Observer, DendroPanel {
 		globalMatrixView = new GlobalMatrixView();
 		interactiveMatrixView = new InteractiveMatrixView();
 
-		//Register the global matrix view with the interactive matrix view so that
-		//it can notify it when a selection changes
+		//Register the global matrix view with the interactive matrix view so
+		//that it can notify it when a selection changes
 		interactiveMatrixView.setGlobalMatrixView(globalMatrixView);
 
 		/* scrollbars, mostly used by maps */
-		matrixXscrollbar = interactiveMatrixView.getXScroll();
-		matrixYscrollbar = interactiveMatrixView.getYScroll();
+		matrixXscrollbar = interactiveMatrixView.getXMapScroll();
+		matrixYscrollbar = interactiveMatrixView.getYMapScroll();
 
 		/* Set up the gene label display */
 		rowLabelView = new RowLabelView();
@@ -220,6 +225,9 @@ public class DendroView implements Observer, DendroPanel {
 		/* Set up the array label display */
 		colLabelView = new ColumnLabelView();
 		// arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
+
+		colLabelScroll = colLabelView.getScrollBar();
+		rowLabelScroll = rowLabelView.getScrollBar();
 
 		// Set up row dendrogram
 		rowTreeView = new RowTreeView();
@@ -284,10 +292,8 @@ public class DendroView implements Observer, DendroPanel {
 				+ "(complex V), etc...";
 		searchPanel.setToolTipText(tooltip);
 
-		searchPanel.add(rowFinderBox.getSearchTermBox(), "pushx, w 50::, "
-				+ "span, wrap");
-		searchPanel.add(colFinderBox.getSearchTermBox(), "pushx, w 50::, "
-				+ "span, wrap");
+		searchPanel.add(rowFinderBox.getSearchTermBox(), "w 50::, wrap");
+		searchPanel.add(colFinderBox.getSearchTermBox(), "w 50::, wrap");
 
 		searchPanel.revalidate();
 		searchPanel.repaint();
@@ -316,8 +322,11 @@ public class DendroView implements Observer, DendroPanel {
 	 */
 	public void setupLayout() {
 
+		boolean debug = false;
+
 		/* Clear dendroPane first */
 		dendroPane.removeAll();
+		dendroPane.setLayout(new MigLayout("gapy 0!, gapx 0!, insets 0"));
 
 		/* Panels for layout setup */
 		JPanel globalOverviewPanel;
@@ -327,35 +336,104 @@ public class DendroView implements Observer, DendroPanel {
 		JPanel zoomXLeftPanel;
 		JPanel zoomYTopPanel;
 		JPanel rowLabelPanel;
+		JPanel rowTreePanel;
 		JPanel colLabelPanel;
 		JPanel columnNavPanel;
+		JPanel columnTreePanel;
 		JPanel rowNavPanel;
 		JPanel navContainer;
 		JPanel bottomPanel;
+		JPanel emptyPanel1;
+		JPanel emptyPanel2;
+		JPanel emptyPanel3;
+		JPanel emptyPanel4;
+		JPanel interactiveMatrixPanel;
 
-		globalOverviewPanel = GUIFactory.createJPanel(false, 
-				GUIFactory.NO_PADDING_FILL, Color.CYAN);
-		
-		crossPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
+		globalOverviewPanel = GUIFactory.createJPanel(false,
+				GUIFactory.NO_PADDING);
+		globalOverviewPanel.setLayout(new MigLayout("gap 0!, insets 0 0 5 5"));
+		if(debug) globalOverviewPanel.setLayout(new MigLayout("gap 0!, "
+				+ "insets 0 0 5 5, debug"));
 
-		navContainer = GUIFactory.createJPanel(false,
-				GUIFactory.DEFAULT);
-//		navContainer.setLayout(new MigLayout("debug"));
+		crossPanel   = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
 
-		bottomPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
+		navContainer = GUIFactory.createJPanel(false,GUIFactory.NO_PADDING);
+		navContainer.setLayout(new MigLayout("gap 0!, insets 0, w 220px!"));
+		if(debug) navContainer.setLayout(new MigLayout("gap 0!, insets 0, "
+				+ "w 220px!, debug"));
 
-		columnNavPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
-		rowNavPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
-		
-		zoomXRightPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
-		zoomYBottomPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
-		zoomXLeftPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
-		zoomYTopPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		bottomPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		emptyPanel1 = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		emptyPanel1.setLayout(new MigLayout("gap 0!, insets 0"));
+		if(debug) emptyPanel1.setLayout(new MigLayout("gap 0!, insets 0, "
+				+ "debug"));
+		emptyPanel2 = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		emptyPanel2.setLayout(new MigLayout("gap 0!, insets 0"));
+		if(debug) emptyPanel2.setLayout(new MigLayout("gap 0!, insets 0, "
+				+ "debug"));
+		interactiveMatrixPanel =
+				GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		interactiveMatrixPanel.setLayout(new MigLayout("gap 0!, insets 0"));
+		if(debug) interactiveMatrixPanel.setLayout(new MigLayout("gap 0!, "
+				+ "insets 0, debug"));
+
+		columnTreePanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		columnTreePanel.setLayout(new MigLayout("gap 0!, insets 5 0 3 0"));
+		if(debug) columnTreePanel.setLayout(new MigLayout("gap 0!, "
+				+ "insets 5 0 3 0, debug"));
+		emptyPanel3     = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		emptyPanel3.setLayout(new MigLayout("gap 0!, insets 0"));
+		if(debug) emptyPanel3.setLayout(new MigLayout("gap 0!, insets 0, "
+				+ "debug"));
+		columnNavPanel  = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		columnNavPanel.setLayout(new MigLayout("gap 0!, insets 0"));
+		if(debug) columnNavPanel.setLayout(new MigLayout("gap 0!, insets 0, "
+				+ "debug"));
+		rowNavPanel     = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		rowNavPanel.setLayout(new MigLayout("gap 0!, insets 0"));
+		if(debug) rowNavPanel.setLayout(new MigLayout("gap 0!, insets 0, "
+				+ "debug"));
+		rowTreePanel    = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		rowTreePanel.setLayout(new MigLayout("gap 0!, insets 0 5 0 3"));
+		if(debug) rowTreePanel.setLayout(new MigLayout("gap 0!, "
+				+ "insets 0 5 0 3, debug"));
+		emptyPanel4     = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		emptyPanel4.setLayout(new MigLayout("gap 0!, insets 0"));
+		if(debug) emptyPanel4.setLayout(new MigLayout("gap 0!, insets 0, "
+				+ "debug"));
+
+		zoomXRightPanel  = GUIFactory.createJPanel(false,GUIFactory.NO_PADDING);
+		zoomXRightPanel.setLayout(new MigLayout("gap 0!, insets 0"));
+		if(debug) zoomXRightPanel.setLayout(new MigLayout("gap 0!, insets 0, "
+				+ "debug"));
+		zoomYBottomPanel = GUIFactory.createJPanel(false,GUIFactory.NO_PADDING);
+		zoomYBottomPanel.setLayout(new MigLayout("gap 0!, insets 0"));
+		if(debug) zoomYBottomPanel.setLayout(new MigLayout("gap 0!, insets 0, "
+				+ "debug"));
+		zoomXLeftPanel   = GUIFactory.createJPanel(false,GUIFactory.NO_PADDING);
+		zoomXLeftPanel.setLayout(new MigLayout("gap 0!, insets 0"));
+		if(debug) zoomXLeftPanel.setLayout(new MigLayout("gap 0!, insets 0, "
+				+ "debug"));
+		zoomYTopPanel    = GUIFactory.createJPanel(false,GUIFactory.NO_PADDING);
+		zoomYTopPanel.setLayout(new MigLayout("gap 0!, insets 0"));
+		if(debug) zoomYTopPanel.setLayout(new MigLayout("gap 0!, insets 0, "
+				+ "debug"));
 
 		rowLabelPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		rowLabelPanel.setLayout(new MigLayout("gap 0!, insets 0"));
+		if(debug) rowLabelPanel.setLayout(new MigLayout("gap 0!, insets 0, "
+				+ "debug"));
 		colLabelPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		colLabelPanel.setLayout(new MigLayout("gap 0!, insets 0"));
+		if(debug) colLabelPanel.setLayout(new MigLayout("gap 0!, insets 0, "
+				+ "debug"));
 
-		rowDataPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rowTreeView,
+		columnTreePanel.add(colTreeView,"gap 0!, h 100%, w 100%, growx, push");
+		columnTreePanel.add(emptyPanel2,"gap 0!, w 15px!, h 100%, wrap");
+		rowTreePanel.add(rowTreeView,"gap 0!, w 100%, h 100%, growy, wrap");
+		rowTreePanel.add(emptyPanel4,"gap 0!, w 100%, h 15px!");
+
+		rowDataPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rowTreePanel,
 				rowLabelPanel);
 		rowDataPane.setResizeWeight(0.5);
 		rowDataPane.setOpaque(false);
@@ -373,7 +451,7 @@ public class DendroView implements Observer, DendroPanel {
 			rowDataPane.setDividerLocation(0.0);
 		}
 
-		colDataPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, colTreeView,
+		colDataPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, columnTreePanel,
 				colLabelPanel);
 		colDataPane.setResizeWeight(0.5);
 		colDataPane.setOpaque(false);
@@ -400,73 +478,81 @@ public class DendroView implements Observer, DendroPanel {
 				showTreesMenuItem.setText(StringRes.menu_hideTrees);
 			}
 		}
-		
-		globalOverviewPanel.add(globalMatrixView, "push, grow");
 
-		rowLabelPanel.add(rowLabelView.getComponent(), "push, grow");
-		colLabelPanel.add(colLabelView.getComponent(), "push, grow");
+		globalOverviewPanel.add(globalMatrixView, "gapy 0!, gapx 0!, h 200px, "
+				+ "w 200px");
+
+		rowLabelPanel.add(rowLabelView.getComponent(), "gapy 0!, gapleft 0!, "
+				+ "gapright 3!, w 100%, h 100%, growy, wrap");
+		rowLabelPanel.add(rowLabelScroll, "gapy 0!, gapx 0!, w 100%, h 15px!, "
+				+ "aligny center");
+		colLabelPanel.add(colLabelView.getComponent(), "gaptop 0!, "
+				+ "gapbottom 3!, gapx 0!, w 100%, h 100%, growx");
+		colLabelPanel.add(colLabelScroll, "gapy 0!, gapx 0!, h 100%, w 15px!");
+
+		zoomXRightPanel.add(scaleRemoveRightX,"gapy 0!, gapx 0!");
+		zoomXRightPanel.add(scaleAddRightX,"gapy 0!, gapx 0!");
 		
-		zoomXRightPanel.add(scaleRemoveRightX);
-		zoomXRightPanel.add(scaleAddRightX);
+		zoomYBottomPanel.add(scaleRemoveBottomY, "gapy 0!, gapx 0!, wrap");
+		zoomYBottomPanel.add(scaleAddBottomY,"gapy 0!, gapx 0!");
 		
-		zoomYBottomPanel.add(scaleRemoveBottomY, "wrap");
-		zoomYBottomPanel.add(scaleAddBottomY);
+		zoomXLeftPanel.add(scaleAddLeftX,"gapy 0!, gapx 0!");
+		zoomXLeftPanel.add(scaleRemoveLeftX,"gapy 0!, gapx 0!");
 		
-		zoomXLeftPanel.add(scaleAddLeftX);
-		zoomXLeftPanel.add(scaleRemoveLeftX);
-		
-		zoomYTopPanel.add(scaleAddTopY, "wrap");
-		zoomYTopPanel.add(scaleRemoveTopY);
+		zoomYTopPanel.add(scaleAddTopY,"gapy 0!, gapx 0!, wrap");
+		zoomYTopPanel.add(scaleRemoveTopY,"gapy 0!, gapx 0!");
 			
-		crossPanel.add(scaleIncXY);
-		crossPanel.add(zoomBtn, "wrap");
-		crossPanel.add(scaleDecXY);
-		crossPanel.add(scaleDefaultAll);
+		crossPanel.add(scaleIncXY,"gapy 0!, gapx 0!");
+		crossPanel.add(zoomBtn, "gapy 0!, gapx 0!, wrap");
+		crossPanel.add(scaleDecXY,"gapy 0!, gapx 0!");
+		crossPanel.add(scaleDefaultAll,"gapy 0!, gapx 0!");
 
-		navContainer.add(searchPanel, "pushx, alignx 50%, aligny 0%, h 50%, "
-				+ "wrap");
-		navContainer.add(crossPanel, "pushx, alignx 50%, wrap");
-		navContainer.add(dataTicker.getTickerPanel(), "pushx, growy, "
-				+ "wrap");
-		
-		/* Add the scrollbars (outside of LabelViews) */
-		final JScrollBar colLabelScroll = colLabelView.getScrollBar();
-		final JScrollBar rowLabelScroll = rowLabelView.getScrollBar();
-		
+		navContainer.add(searchPanel, "gapy 0!, gapx 0!, pushx, alignx 50%, "
+				+ "aligny 0%, h 200px, wrap");
+		navContainer.add(crossPanel, "gapy 0!, gapx 0!, pushx, alignx 50%, "
+				+ "pushy, growy, wrap");
+		navContainer.add(dataTicker.getTickerPanel(), "gapy 0!, gapx 0!, "
+				+ "pushx, growy, wrap");
+
+		interactiveMatrixPanel.add(interactiveMatrixView, "gaptop 0!, "
+				+ "gapbottom 0!, gapx 0!, w 100%, h 100%, grow");
+		interactiveMatrixPanel.add(rowNavPanel, "gapleft 0!, gapright 0!, "
+				+ "gapy 0!, w 15px!, h 100%, growy, wrap");
+		interactiveMatrixPanel.add(columnNavPanel, "gaptop 0!, gapbottom 0!, "
+				+ "gapx 0!, w 100%, h 15px!, growx, wrap");
+
 		/* Panels for scrollbars and axis-zoom buttons */
-		columnNavPanel.add(zoomXLeftPanel);
-		columnNavPanel.add(matrixXscrollbar, "growx, pushx");
-		columnNavPanel.add(zoomXRightPanel);
+		columnNavPanel.add(zoomXLeftPanel,"gapy 0!, gapx 0!, h 15px!");
+		columnNavPanel.add(matrixXscrollbar, "gapy 0!, gapx 0!, growx, pushx, "
+				+ "h 15px!");
+		columnNavPanel.add(zoomXRightPanel,"gapy 0!, gapx 0!, grow 0, h 15px!");
 		
-		rowNavPanel.add(zoomYTopPanel, "wrap");
-		rowNavPanel.add(matrixYscrollbar, "growy, pushy, wrap");
-		rowNavPanel.add(zoomYBottomPanel);
+		rowNavPanel.add(zoomYTopPanel, "gap 0px!, wrap");
+		rowNavPanel.add(matrixYscrollbar, "gap 0px!, growy, pushy, alignx center, "
+				+ "wrap");
+		rowNavPanel.add(zoomYBottomPanel,"gap 0px!");
 		
 		
 		/* Adding elements to the main JPanel */
-		dendroPane.add(globalOverviewPanel, "w 200:10%:, h 19%, grow, push");
+		dendroPane.add(globalOverviewPanel, "gapy 0!, gapx 0!, w 200px!, "
+				+ "h 200px!");
 
 		/* Column tree view */
-		dendroPane.add(colDataPane, "w 75%, h 19%!");
-		dendroPane.add(colLabelScroll, "h 19%!");
+		dendroPane.add(colDataPane, "gaptop 0!, gapbottom 0!, gapx 0!, "
+				+ "w 100%, h 200px!, growx");
 
 		/* Navigation panel */
-		dendroPane.add(navContainer, "span 1 3, w 220:10%:, h 100%, wrap");
+		dendroPane.add(navContainer, "gapy 0, gapx 0, span 1 3, w 220, h 100%, "
+				+ "wrap");
 
 		/* Row tree view */
-		dendroPane.add(rowDataPane, "w 200:10%:, h 79%, grow");
+		dendroPane.add(rowDataPane, "gapleft 0!, gapright 0!, gapy 0!, "
+				+ "w 200px, h 100%, growy, pushy");
 		
 		/* Matrix view */
-		dendroPane.add(interactiveMatrixView, "w 75%, h 79%, grow, push");
-		dendroPane.add(rowNavPanel, "growy, w 1%, h 95%, wrap");
-		
-		dendroPane.add(rowLabelScroll, "w 13%, h 1%");
-		
-		dendroPane.add(columnNavPanel, "growx, w 75%, h 1%, wrap");
+		dendroPane.add(interactiveMatrixPanel, "gapy 0!, gapx 0!, w 100%, "
+				+ "h 100%, grow, push");
 
-		/* Bottom panel for spacing */
-		dendroPane.add(bottomPanel, "span, h 1%");
-				
 		dendroPane.revalidate();
 		dendroPane.repaint();
 	}
@@ -480,30 +566,38 @@ public class DendroView implements Observer, DendroPanel {
 		scaleDefaultAll.setToolTipText("Reset the zoomed view");
 
 		/* Scale x-axis */
-		scaleAddRightX = GUIFactory.createSquareBtn("+", 20);
+		scaleAddRightX = GUIFactory.createSquareBtn("+", 14);
 		scaleAddRightX.setToolTipText(StringRes.tt_xZoomIn_right);
+		scaleAddRightX.setMargin(new Insets(0,0,0,0));
 		
-		scaleRemoveRightX = GUIFactory.createSquareBtn("-", 20);
+		scaleRemoveRightX = GUIFactory.createSquareBtn("-", 14);
 		scaleRemoveRightX.setToolTipText(StringRes.tt_xZoomOut_right);
+		scaleRemoveRightX.setMargin(new Insets(0,0,0,0));
 		
-		scaleAddLeftX = GUIFactory.createSquareBtn("+", 20);
+		scaleAddLeftX = GUIFactory.createSquareBtn("+", 14);
 		scaleAddLeftX.setToolTipText(StringRes.tt_xZoomIn_left);
-		
-		scaleRemoveLeftX = GUIFactory.createSquareBtn("-", 20);
+		scaleAddLeftX.setMargin(new Insets(0,0,0,0));
+
+		scaleRemoveLeftX = GUIFactory.createSquareBtn("-", 14);
 		scaleRemoveLeftX.setToolTipText(StringRes.tt_xZoomOut_left);
+		scaleRemoveLeftX.setMargin(new Insets(0,0,0,0));
 
 		/* Scale y-axis */
-		scaleAddBottomY = GUIFactory.createSquareBtn("+", 20);
+		scaleAddBottomY = GUIFactory.createSquareBtn("+", 14);
 		scaleAddBottomY.setToolTipText(StringRes.tt_yZoomIn_bottom);
+		scaleAddBottomY.setMargin(new Insets(0,0,0,0));
 		
-		scaleRemoveBottomY = GUIFactory.createSquareBtn("-", 20);
+		scaleRemoveBottomY = GUIFactory.createSquareBtn("-", 14);
 		scaleRemoveBottomY.setToolTipText(StringRes.tt_yZoomOut_bottom);
+		scaleRemoveBottomY.setMargin(new Insets(0,0,0,0));
 		
-		scaleAddTopY = GUIFactory.createSquareBtn("+", 20);
+		scaleAddTopY = GUIFactory.createSquareBtn("+", 14);
 		scaleAddTopY.setToolTipText(StringRes.tt_yZoomIn_top);
+		scaleAddTopY.setMargin(new Insets(0,0,0,0));
 		
-		scaleRemoveTopY = GUIFactory.createSquareBtn("-", 20);
+		scaleRemoveTopY = GUIFactory.createSquareBtn("-", 14);
 		scaleRemoveTopY.setToolTipText(StringRes.tt_yZoomOut_top);
+		scaleRemoveTopY.setMargin(new Insets(0,0,0,0));
 
 		/* Scale both axes */
 		scaleIncXY = GUIFactory.createIconBtn(StringRes.icon_fullZoomIn);
@@ -1265,24 +1359,24 @@ public class DendroView implements Observer, DendroPanel {
 		return zoomBtn;
 	}
 
-	public JScrollBar getXScroll() {
+	public JScrollBar getMatrixXScroll() {
 
 		return matrixXscrollbar;
 	}
 
-	public void setXScroll(final int i) {
-
-		matrixXscrollbar.setValue(i);
-	}
-
-	public JScrollBar getYScroll() {
+	public JScrollBar getMatrixYScroll() {
 
 		return matrixYscrollbar;
 	}
 
-	public void setYScroll(final int i) {
+	public JScrollBar getLabelXScroll() {
 
-		matrixYscrollbar.setValue(i);
+		return colLabelScroll;
+	}
+
+	public JScrollBar getLabelYScroll() {
+
+		return rowLabelScroll;
 	}
 
 	public InteractiveMatrixView getInteractiveMatrixView() {

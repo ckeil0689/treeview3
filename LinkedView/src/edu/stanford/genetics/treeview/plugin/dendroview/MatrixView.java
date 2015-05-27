@@ -54,7 +54,6 @@ public abstract class MatrixView extends ModelViewProduced {
 		panel = scrollPane;
 		panel.setBorder(BorderFactory.createEtchedBorder());
 		panel.setBackground(GUIFactory.ELEMENT_HOV);
-
 	}
 	
 	@Override
