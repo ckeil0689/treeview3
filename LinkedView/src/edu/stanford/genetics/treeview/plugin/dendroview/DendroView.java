@@ -36,6 +36,8 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.prefs.Preferences;
 
+import java.awt.Color;
+
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JButton;
@@ -226,8 +228,8 @@ public class DendroView implements Observer, DendroPanel {
 		colLabelView = new ColumnLabelView();
 		// arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
 
-		colLabelScroll = colLabelView.getScrollBar();
-		rowLabelScroll = rowLabelView.getScrollBar();
+		colLabelScroll = colLabelView.getSecondaryScrollBar();
+		rowLabelScroll = rowLabelView.getSecondaryScrollBar();
 
 		// Set up row dendrogram
 		rowTreeView = new RowTreeView();
@@ -1369,12 +1371,12 @@ public class DendroView implements Observer, DendroPanel {
 		return matrixYscrollbar;
 	}
 
-	public JScrollBar getLabelXScroll() {
+	public JScrollBar getColLabelLengthScroll() {
 
 		return colLabelScroll;
 	}
 
-	public JScrollBar getLabelYScroll() {
+	public JScrollBar getRowLabelLengthScroll() {
 
 		return rowLabelScroll;
 	}

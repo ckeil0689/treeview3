@@ -8,6 +8,8 @@ import java.awt.event.MouseEvent;
 import java.util.Observable;
 import java.util.prefs.Preferences;
 
+import javax.swing.JScrollBar;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
 import Utilities.StringRes;
@@ -118,13 +120,6 @@ public class ColumnLabelView extends LabelView {
 		oldHeight = maxlength;
 		
 		revalidate();
-		repaint();
-	}
-
-	@Override
-	public void mouseMoved(final MouseEvent e) {
-
-		hoverIndex = map.getIndex(e.getX());
 		repaint();
 	}
 
@@ -259,5 +254,38 @@ public class ColumnLabelView extends LabelView {
 	public void selectAnew(TreeSelectionI selection,int index) {
 		selection.deselectAllIndexes();
 		selection.setIndexSelection(index, true);
+	}
+
+	@Override
+	public JScrollBar getPrimaryScrollBar() {
+		return scrollPane.getHorizontalScrollBar();
+	}
+
+	@Override
+	public JScrollBar getSecondaryScrollBar() {
+		return scrollPane.getVerticalScrollBar();
+	}
+
+	public void setSecondaryScrollBarPolicyAlways() {
+		scrollPane.setHorizontalScrollBarPolicy(
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+	}
+
+	public void setSecondaryScrollBarPolicyNever() {
+		scrollPane.setHorizontalScrollBarPolicy(
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+	}
+
+	public void setSecondaryScrollBarPolicyAsNeeded() {
+		scrollPane.setHorizontalScrollBarPolicy(
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	}
+
+	public boolean isJustifiedToMatrixEdge() {
+		return(!isRightJustified);
+	}
+
+	public int getPrimaryHoverPosition(final MouseEvent e) {
+		return(e.getX());
 	}
 }

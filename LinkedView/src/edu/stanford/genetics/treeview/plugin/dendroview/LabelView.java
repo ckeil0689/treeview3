@@ -39,7 +39,12 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	protected final static int COL = 1;
 	
 	protected final static int HINTFONTSIZE = 14; 
-	protected final static double LOWER_BOUND = 10.0;
+	//The user sets the lower bound in the prefs
+	//protected final static double LOWER_BOUND = 10.0;
+
+	//This is the space between labels in pixels
+	protected final static int SQUEEZE = 1; 
+
 
 	/* DataModel is an observer */
 	protected DataModel dataModel;
@@ -59,7 +64,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	protected final int d_style = 0;
 	protected final int d_size = 14;
 	protected final int d_min = 5;
-	protected final int d_max = 30;
+	protected final int d_max = 18;
 	protected boolean d_justified;
 	protected boolean d_fixed = false;
 
@@ -257,7 +262,9 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	@Override
 	public int getPoints() {
 
-		return size;
+		if(size > 0)
+			return size;
+		return(d_size);
 	}
 	
 	@Override 
@@ -269,13 +276,17 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	@Override
 	public int getMin() {
 
-		return min;
+		if(min > 0)
+			return min;
+		return(d_min);
 	}
 	
 	@Override
 	public int getMax() {
 
-		return max;
+		if(max > 0)
+			return max;
+		return(d_max);
 	}
 
 	@Override
@@ -302,14 +313,8 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	 * @return The horizontal scrollbar for gene labels, the vertical scrollbar
 	 *         for array labels.
 	 */
-	public JScrollBar getScrollBar() {
-
-		if (isGeneAxis) {
-			return scrollPane.getHorizontalScrollBar();
-		}
-		
-		return scrollPane.getVerticalScrollBar();
-	}
+	protected abstract JScrollBar getSecondaryScrollBar();
+	protected abstract JScrollBar getPrimaryScrollBar();
 
 	@Override
 	public void setFace(final String string) {
@@ -377,10 +382,11 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	@Override
 	public void setMin(final int i) {
 
-		if(i >= max) {
+		LogBuffer.println("setMin(" + i + ") called");
+		if(i < 1 || i > max) {
 			return;
 		}
-		
+
 		if (min != i) {
 			min = i;
 			if (configNode != null) {
@@ -395,10 +401,11 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	@Override
 	public void setMax(final int i) {
 
-		if(i <= min) {
+		LogBuffer.println("setMax(" + i + ") called");
+		if(i < 1 || i < min) {
 			return;
 		}
-		
+
 		if (max != i) {
 			max = i;
 			if (configNode != null) {
@@ -461,7 +468,6 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	}
 
 	public void updateBuffer(final Graphics g, final Dimension offscreenSize) {
-
 		/* Shouldn't draw if there's no TreeSelection defined */
 		if (drawSelection == null) {
 			LogBuffer.println("drawSelection not defined. Can't draw labels.");
@@ -473,7 +479,11 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
 		/* Get label indices range */
 		final int start = map.getIndex(0);
-		final int end = map.getIndex(map.getUsedPixels()) - 1;
+		//This used to have getUsedPixels(), but on full zoom-out, the resulting
+		//data index was 119 instead of 133. I changed it to getAvailablePixels
+		//and I got the correct 133 result. I suspect used pixels assumes a
+		//scrollbar takes up space...
+		final int end = map.getIndex(map.getAvailablePixels()) - 1;
 		
 		final Graphics2D g2d = (Graphics2D) g;
 		final AffineTransform orig = g2d.getTransform();
@@ -481,7 +491,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		/* Draw labels if zoom level allows it */
 		final boolean hasFixedOverlap = isFixed && map.getScale() < last_size;
 		
-		if (map.getScale() > LOWER_BOUND && !hasFixedOverlap) {
+		if (map.getScale() >= (getMin() + SQUEEZE) && !hasFixedOverlap) {
 			
 			if(isFixed) {
 				setSavedPoints(last_size);
@@ -512,7 +522,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 						g.setColor(TreeColorer.getColor(strings[bgColorIndex]));
 
 					} catch (final Exception e) {
-						// ingore...
+						// ignore...
 					}
 					g.fillRect(0, map.getMiddlePixel(j) - ascent / 2, stringX,
 							ascent);
@@ -521,6 +531,8 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 			}
 
 			/* Draw the labels */
+			int maxStrLen = 0;
+			String maxStr = "";
 			final Color fore = GUIFactory.MAIN;
 			for (int j = start; j <= end; j++) {
 
@@ -549,6 +561,10 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 						g2d.setColor(Color.black);
 					}
 
+					if(maxStrLen < metrics.stringWidth(out)) {
+						maxStrLen = metrics.stringWidth(out);
+						maxStr = out;
+					}
 					/* Finally draw label (alignment-dependent) */
 					int xPos = 0;
 					if (isRightJustified) {
@@ -563,18 +579,133 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 					break;
 				}
 			}
+			LogBuffer.println((isGeneAxis ? "ROW" : "COL") + ": MaxStrLen: [" +
+			maxStrLen + "] MaxStr: [" + maxStr + "] Start Index: [" + start +
+			"] End Index: [" + end + "] height [" + offscreenSize.height +
+			"] width [" + offscreenSize.width + "]");
 
 			g2d.setTransform(orig);
 
+			//Set the size of the scrollpane to match the longest string
+			if(isGeneAxis) {
+				//+ 15 allows for the appearance & disappearance of the main
+				//scrollbar, which I believe is only for Macs since macs draw
+				//the scrollbar over the content when set AS_NEEDED
+				setPreferredSize(new Dimension((getSecondaryScrollBar().isVisible() ? maxStrLen + 15 : maxStrLen),
+						offscreenSize.height));
+			} else {
+				//+ 15 allows for the appearance & disappearance of the main
+				//scrollbar, which I believe is only for Macs since macs draw
+				//the scrollbar over the content when set AS_NEEDED
+				setPreferredSize(new Dimension(offscreenSize.width,
+						(getSecondaryScrollBar().isVisible() ? maxStrLen + 15 : maxStrLen)));
+			}
+
+			//if(getSecondaryScrollBar().getMaximum() != maxStrLen) {
+			//	getSecondaryScrollBar().setMaximum(maxStrLen);
+			//	scrollPane.revalidate();
+			//}
+
 		} else {
 			setPoints(HINTFONTSIZE);
-			
+			g2d.setColor(Color.black);
+
 			int xPos = getHintX(g2d, stringX);
 			int yPos = getHintY(g2d);
-			
-			g2d.setColor(Color.black);
-			g2d.drawString(zoomHint, xPos, yPos);
+			final FontMetrics metrics = getFontMetrics(g2d.getFont());
+			boolean isBeginJustified;
+			int scrollSize;
+
+			if (isGeneAxis) {
+				//Reduce the size of the scrollpane to just what is visible
+				setPreferredSize(
+						new Dimension(scrollPane.getViewport().getSize().width,
+								offscreenSize.height));
+
+				isBeginJustified = isRightJustified;
+				scrollSize = offscreenSize.width;
+				//After rotate, the current width will be the "height" and the
+				//zero point we need to calculate from is the bottom left of the
+				//panel
+				yPos = scrollPane.getViewport().getSize().width / 2;
+				//After rotate, this is the distance up from the bottom where to
+				//start the hint string
+				xPos = ((offscreenSize.height - metrics.stringWidth(zoomHint)) /
+						2);
+				g2d.rotate(Math.PI * 3 / 2);
+				//Need to translate the coordinates to/from? the rotated state
+				g2d.translate(-offscreenSize.height, 0);
+				LogBuffer.println("Row Hint position: [" + xPos + "/" + yPos +
+						"] stringX: [" + stringX + "] zoomHint: [" + zoomHint +
+						"] height [" + offscreenSize.height + "] width [" +
+						offscreenSize.width + "] + HintStrLen [" +
+						metrics.stringWidth(zoomHint) + "]");
+
+//				if(isRightJustified) {
+//					for(int i = offscreenSize.width - yPos;i > 0;i -= yPos * 2) {
+//						g2d.drawString(zoomHint, xPos, i);
+//					}
+//				} else {
+//					for(int i = yPos;i < offscreenSize.width;i += yPos * 2) {
+//						g2d.drawString(zoomHint, xPos, i);
+//					}
+//				}
+			} else {
+				//Reduce the size of the scrollpane to just what is visible
+				setPreferredSize(new Dimension(offscreenSize.width,
+						scrollPane.getViewport().getSize().height));
+
+				isBeginJustified = !isRightJustified;
+				scrollSize = offscreenSize.height;
+				//offscreenSize.height = scrollPane.getViewport().getSize().height;
+				//offscreenSize.setSize(offscreenSize.width, scrollPane.getViewport().getSize().height);
+				//setSize(offscreenSize.width,scrollPane.getViewport().getSize().height);
+				//scrollPane.getVerticalScrollBar().setMaximum(offscreenSize.height);
+				//revalidate();
+				//scrollPane.revalidate();
+				//scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+				xPos = (offscreenSize.width - metrics.stringWidth(zoomHint)) /
+						2;
+				yPos = scrollPane.getViewport().getSize().height / 2;
+				LogBuffer.println("Col Hint position: [" + xPos + "/" + yPos +
+						"] stringX: [" + stringX + "] zoomHint: [" + zoomHint +
+						"] height [" + offscreenSize.height + "] width [" +
+						offscreenSize.width + "] + HintStrLen [" +
+						metrics.stringWidth(zoomHint) + "]");
+
+//				if(!isRightJustified) {
+//					for(int i = offscreenSize.height - yPos;i > 0;i -= yPos * 2) {
+//						g2d.drawString(zoomHint, xPos, i);
+//					}
+//				} else {
+//					for(int i = yPos;i < offscreenSize.height;i += yPos * 2) {
+//						g2d.drawString(zoomHint, xPos, i);
+//					}
+//				}
+			}
+
+			if(isBeginJustified) {
+				for(int i = scrollSize - yPos;i > 0;i -= yPos * 2) {
+					g2d.drawString(zoomHint, xPos, i);
+				}
+			} else {
+				for(int i = yPos;i < scrollSize;i += yPos * 2) {
+					g2d.drawString(zoomHint, xPos, i);
+				}
+			}
+
+			//g2d.setColor(Color.black);
+			//g2d.drawString(zoomHint, xPos, yPos);
+			//scrollPane.revalidate();
+			//final FontMetrics metrics = getFontMetrics(g2d.getFont());
+			//int maxStrLen = metrics.stringWidth(zoomHint);
+			//if(getSecondaryScrollBar().getMaximum() != maxStrLen) {
+			//	getSecondaryScrollBar().setMaximum(maxStrLen);
+			//	scrollPane.revalidate();
+			//}
 		}
+		//revalidate();
+		//scrollPane.revalidate();
 	}
 	
 	/**
@@ -631,29 +762,110 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	 * axis map.
 	 */
 	private void adaptFontSizeToMapScale() {
+		int newPoints = (int) map.getScale() - SQUEEZE;
+		if(newPoints > getMax()) {
+			newPoints = getMax();
+		} else if(newPoints < getMin()) {
+			newPoints = getMin();
+		}
 		
-		int squeeze = 1; // how much smaller the font is compared to tile scale
-		int newPoints = (int) map.getScale();
-		
-		if(newPoints != getPoints()) {
-			setSavedPoints(newPoints - squeeze);
+		if(!isFixed && newPoints != getPoints()) {
+			LogBuffer.println("Adapting to new font size from [" + getPoints() + "] to [" + newPoints + "] for [" + (isGeneAxis ? "rows" : "cols") + "]");
+			setSavedPoints(newPoints);
 		}
 	}
 
-	@Override
-	public void mouseExited(final MouseEvent e) {
-
-		hoverIndex = -1;
-		repaint();
-	}
+//	@Override
+//	public void mouseExited(final MouseEvent e) {
+//
+//		hoverIndex = -1;
+//		repaint();
+//	}
 
 	@Override
 	public void mouseDragged(final MouseEvent e) {
 
 	}
 
+//	@Override
+//	public void mouseMoved(final MouseEvent e) {
+//
+//	}
+
+	protected abstract void setSecondaryScrollBarPolicyAsNeeded();
+	protected abstract void setSecondaryScrollBarPolicyAlways();
+	protected abstract void setSecondaryScrollBarPolicyNever();
+	protected abstract int getPrimaryHoverPosition(final MouseEvent e);
+	protected abstract boolean isJustifiedToMatrixEdge();
+
+	protected int shiftForScrollbar = 0;
+	protected int shiftedForScrollbar = 0;
+
 	@Override
 	public void mouseMoved(final MouseEvent e) {
 
+		if(shiftForScrollbar > 0) {
+			//Shift the scroll position to accommodate the scrollbar that
+			//appeared (I think this may only be for Macs, according to what I
+			//read.  They draw the scrollbar on top of content when it is set
+			//"AS_NEEDED")
+			getSecondaryScrollBar().setValue(shiftForScrollbar);
+			if(getSecondaryScrollBar().getValue() == shiftForScrollbar) {
+				shiftedForScrollbar = shiftForScrollbar;
+				shiftForScrollbar = 0;
+			}
+		}
+		hoverIndex = map.getIndex(getPrimaryHoverPosition(e));
+		repaint();
+	}
+
+	//@Override
+	public void mouseEntered(final MouseEvent e) {
+		//This method call is why these mouse functions
+		setSecondaryScrollBarPolicyAlways();
+		//scrollPane.setVerticalScrollBarPolicy(
+		//		ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		int ts = getSecondaryScrollBar().getValue();
+		int tw = getSecondaryScrollBar().getModel().getExtent();
+		int tm = getSecondaryScrollBar().getMaximum();
+		
+		//We do not want to shift the scrollbar if the user has manually left-
+		//justified his/her labels, so only shift to accommodate the scrollbar
+		//when the scroll position is more than half way
+		boolean nearBeginning = (ts < ((tm - tw) / 2));
+		LogBuffer.println("ENTER Setting temp scroll value: [" + ts +
+				"] width [" + tw + "] max [" + tm + "]");
+		if(isJustifiedToMatrixEdge() && !nearBeginning) {
+			LogBuffer.println("Adjusting scrollbar that is positioned near " +
+					"end. Now position: [" + ts + " + 15] New max: [" +
+					getSecondaryScrollBar().getMaximum() + " + 15]");
+			//Width of the vertical scrollbar is 15
+			int newWidth = getSecondaryScrollBar().getMaximum() + 15;
+			getSecondaryScrollBar().setMaximum(newWidth);
+			shiftForScrollbar = ts + 15;
+			getSecondaryScrollBar().setValue(shiftForScrollbar);
+		}
+		LogBuffer.println("ENTER New scroll values: [" +
+				getSecondaryScrollBar().getValue() + "] width [" +
+				getSecondaryScrollBar().getModel().getExtent() + "] max [" +
+				getSecondaryScrollBar().getMaximum() + "]");
+	}
+
+	//@Override
+	public void mouseExited(final MouseEvent e) {
+		int ts = getSecondaryScrollBar().getValue();
+		setSecondaryScrollBarPolicyNever();
+		//scrollPane.setVerticalScrollBarPolicy(
+		//		ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+		LogBuffer.println("EXIT Setting temp scroll value: [" + ts + "]");
+		if(shiftedForScrollbar > 0) {
+			LogBuffer.println("Adjusting scrollbar that is positioned near end.");
+			getSecondaryScrollBar().setValue(ts - 15);
+			shiftedForScrollbar = 0;
+		}
+		scrollPane.revalidate();
+		LogBuffer.println("EXIT New scroll values: [" + getSecondaryScrollBar().getValue() + "] width [" + getSecondaryScrollBar().getModel().getExtent() + "] max [" + getSecondaryScrollBar().getMaximum() + "]");
+		hoverIndex = -1;
+		repaint();
 	}
 }

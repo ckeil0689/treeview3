@@ -52,6 +52,7 @@ import javax.swing.event.DocumentListener;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 import Utilities.GUIFactory;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.NatField;
 import edu.stanford.genetics.treeview.SettingsPanel;
 
@@ -258,6 +259,8 @@ public class FontSettings implements SettingsPanel {
 		final int min = min_field.getNat();
 		final int max = max_field.getNat();
 		final boolean isFixed = fixedBox.isSelected();
+		
+		LogBuffer.println("synchronizeClient: Setting Min Font Size: [" + min + "]");
 
 		client.setFace(string);
 		client.setStyle(i);

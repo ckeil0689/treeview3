@@ -5,9 +5,13 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.Observable;
 import java.util.prefs.Preferences;
 
+import javax.swing.JScrollBar;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
 import Utilities.StringRes;
@@ -15,7 +19,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.UrlExtractor;
 
-public class RowLabelView extends LabelView {
+public class RowLabelView extends LabelView implements MouseWheelListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -26,6 +30,7 @@ public class RowLabelView extends LabelView {
 		super(LabelView.ROW);
 		d_justified = true;
 		zoomHint = StringRes.lbl_ZoomRowLabels;
+		addMouseWheelListener(this);
 	}
 
 	//public void generateView(final UrlExtractor uExtractor) {
@@ -168,12 +173,98 @@ public class RowLabelView extends LabelView {
 		repaint();
 	}
 
-	@Override
-	public void mouseMoved(final MouseEvent e) {
-
-		hoverIndex = map.getIndex(e.getY());
-		repaint();
+	public void setSecondaryScrollBarPolicyAlways() {
+		scrollPane.setVerticalScrollBarPolicy(
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 	}
+
+	public void setSecondaryScrollBarPolicyNever() {
+		scrollPane.setVerticalScrollBarPolicy(
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+	}
+
+	public void setSecondaryScrollBarPolicyAsNeeded() {
+		scrollPane.setVerticalScrollBarPolicy(
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+	}
+
+	public boolean isJustifiedToMatrixEdge() {
+		return(isRightJustified);
+	}
+
+	public int getPrimaryHoverPosition(final MouseEvent e) {
+		return(e.getY());
+	}
+
+//	protected int shiftForScrollbar = 0;
+//	protected int shiftedForScrollbar = 0;
+//
+//	@Override
+//	public void mouseMoved(final MouseEvent e) {
+//
+//		if(shiftForScrollbar > 0) {
+//			//Shift the scroll position to accommodate the scrollbar that
+//			//appeared (I think this may only be for Macs, according to what I
+//			//read.  They draw the scrollbar on top of content when it is set
+//			//"AS_NEEDED")
+//			getSecondaryScrollBar().setValue(shiftForScrollbar);
+//			if(getSecondaryScrollBar().getValue() == shiftForScrollbar) {
+//				shiftedForScrollbar = shiftForScrollbar;
+//				shiftForScrollbar = 0;
+//			}
+//		}
+//		hoverIndex = map.getIndex(getPrimaryHoverPosition(e));
+//		repaint();
+//	}
+//
+//	//@Override
+//	public void mouseEntered(final MouseEvent e) {
+//		//This method call is why these mouse functions
+//		setSecondaryScrollBarPolicyAlways();
+//		//scrollPane.setVerticalScrollBarPolicy(
+//		//		ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+//		int ts = getSecondaryScrollBar().getValue();
+//		int tw = getSecondaryScrollBar().getModel().getExtent();
+//		int tm = getSecondaryScrollBar().getMaximum();
+//		
+//		//We do not want to shift the scrollbar if the user has manually left-
+//		//justified his/her labels, so only shift to accommodate the scrollbar
+//		//when the scroll position is more than half way
+//		boolean nearBeginning = (ts < ((tm - tw) / 2));
+//		LogBuffer.println("ENTER Setting temp scroll value: [" + ts +
+//				"] width [" + tw + "] max [" + tm + "]");
+//		if(isJustifiedToMatrixEdge() && !nearBeginning) {
+//			LogBuffer.println("Adjusting scrollbar that is positioned near " +
+//					"end. Now position: [" + ts + " + 15] New max: [" +
+//					getSecondaryScrollBar().getMaximum() + " + 15]");
+//			//Width of the vertical scrollbar is 15
+//			int newWidth = getSecondaryScrollBar().getMaximum() + 15;
+//			getSecondaryScrollBar().setMaximum(newWidth);
+//			shiftForScrollbar = ts + 15;
+//			getSecondaryScrollBar().setValue(shiftForScrollbar);
+//		}
+//		LogBuffer.println("ENTER New scroll values: [" +
+//				getSecondaryScrollBar().getValue() + "] width [" +
+//				getSecondaryScrollBar().getModel().getExtent() + "] max [" +
+//				getSecondaryScrollBar().getMaximum() + "]");
+//	}
+//
+//	//@Override
+//	public void mouseExited(final MouseEvent e) {
+//		int ts = getSecondaryScrollBar().getValue();
+//		setSecondaryScrollBarPolicyNever();
+//		//scrollPane.setVerticalScrollBarPolicy(
+//		//		ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+//		LogBuffer.println("EXIT Setting temp scroll value: [" + ts + "]");
+//		if(shiftedForScrollbar > 0) {
+//			LogBuffer.println("Adjusting scrollbar that is positioned near end.");
+//			getSecondaryScrollBar().setValue(ts - 15);
+//			shiftedForScrollbar = 0;
+//		}
+//		scrollPane.revalidate();
+//		LogBuffer.println("EXIT New scroll values: [" + getSecondaryScrollBar().getValue() + "] width [" + getSecondaryScrollBar().getModel().getExtent() + "] max [" + getSecondaryScrollBar().getMaximum() + "]");
+//		super.mouseExited(e);
+//	}
 
 	@Override
 	public void mouseClicked(final MouseEvent e) {
@@ -311,5 +402,42 @@ public class RowLabelView extends LabelView {
 	public void selectAnew(TreeSelectionI selection,int index) {
 		selection.deselectAllIndexes();
 		selection.setIndexSelection(index, true);
+	}
+
+	@Override
+	public JScrollBar getPrimaryScrollBar() {
+		return scrollPane.getVerticalScrollBar();
+	}
+
+	@Override
+	public JScrollBar getSecondaryScrollBar() {
+		return scrollPane.getHorizontalScrollBar();
+	}
+
+	@Override
+	public void mouseWheelMoved(final MouseWheelEvent e) {
+
+		final int notches = e.getWheelRotation();
+		final int shift = (notches < 0) ? -3 : 3;
+
+		LogBuffer.println("Detected [" + (e.isShiftDown() ? "horizontal" : "vertical") + "] scroll event");
+		// On macs' magic mouse, horizontal scroll comes in as if the shift was
+		// down
+		if(e.isShiftDown()) {
+			final int j = scrollPane.getHorizontalScrollBar().getValue();
+			scrollPane.getHorizontalScrollBar().setValue(j + shift);
+		} else {
+			final int j = scrollPane.getVerticalScrollBar().getValue();
+			scrollPane.getVerticalScrollBar().setValue(j + shift);
+
+//			if (j != scrollPane.getVerticalScrollBar().getValue()) {
+//				setChanged();
+//			}
+//
+//			notifyObservers();
+		}
+
+		revalidate();
+		repaint();
 	}
 }
