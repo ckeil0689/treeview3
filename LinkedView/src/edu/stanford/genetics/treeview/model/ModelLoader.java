@@ -199,16 +199,25 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 					possibleLastLabelCol = i;
 				is_label_row = true;
 			}
-			//Else if the value is empty and this has either already been
-			//identified as a label row or we're on the first row and the
-			//previous value was also empty (implying it's still a label column)
-			else if((element.equalsIgnoreCase("") ||
-					 Pattern.matches("^[A-Z]{2,}$", element)) &&
+			//Else if the value is all-caps and this has either already been
+			//identified as a label row or data has not yet been identified and
+			//all previous columns qualified as labels
+			else if(Pattern.matches("^[A-Z]{2,}$", element) &&
 					(is_label_row ||
-					 (dataStartRow == 0 && (possibleLastLabelCol + 1) == i))) {
+					 (dataStartRow == 0 && (possibleLastLabelCol + 1) == i)) &&
+					 current_row == 0) {
 				possibleLastLabelCol = i;
 				is_label_row = true;
-			} else if(!hasData) {
+			}
+			//Else if the value is empty and this has either already been
+			//identified as a label row or data has not yet been identified and
+			//all previous columns qualified as labels
+			else if(element.equalsIgnoreCase("") &&
+					(is_label_row ||
+					 (dataStartRow == 0 && (possibleLastLabelCol + 1) == i)) &&
+					 current_row == 0) {
+				possibleLastLabelCol = i;
+//			} else if(!hasData) {
 //				LogBuffer.println("Column [" + i + "] Row [" + current_row +
 //						"] Value [" + element +
 //						"] hasn't matched a label. dataStartRow [" +
@@ -226,12 +235,16 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			if (Pattern.matches(fpRegex, element) && !is_label_row
 					&& i > lastLabelCol) {
 
+				//If the current column is greater than what you would expect
+				//using uncommon or empty label headers
 				if((possibleLastLabelCol + 1) < i) {
 					LogBuffer.println("WARNING: Assuming data starts in " +
 							"column [" + (possibleLastLabelCol + 2) +
 							"].");
 					dataStartCol = possibleLastLabelCol + 1;
-				} else if(lastLabelCol != possibleLastLabelCol) {
+				}
+				//
+				else if(lastLabelCol != possibleLastLabelCol) {
 					LogBuffer.println("WARNING: Assuming data starts in " +
 							"column [" + (i + 1) + "].");
 					dataStartCol = i;
