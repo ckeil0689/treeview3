@@ -71,11 +71,7 @@ public class StatsDialog extends CustomDialog {
 		contentPanel.add(sizeLabel, "tag label");
 		contentPanel.add(size);
 
-//<<<<<<< HEAD
-//		mainPanel.add(contentPanel, "push, grow, wrap");
-//		mainPanel.add(closeBtn, "span, al right");
-//=======
-		add(mainPanel);
-//>>>>>>> colorUpdate
+		mainPanel.add(contentPanel, "push, grow, wrap");
+		mainPanel.add(closeBtn, "span, al right");
 	}
 }

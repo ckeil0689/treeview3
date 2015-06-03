@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
@@ -38,9 +37,6 @@ public class AboutDialog extends CustomDialog {
 		this.tvFrame = tvFrame;
 
 		setupLayout();
-
-//		dialog.pack();
-//		dialog.setLocationRelativeTo(JFrame.getFrames()[0]);
 
 	}
 
@@ -108,5 +104,7 @@ public class AboutDialog extends CustomDialog {
 			}
 		});
 		detailPanel.add(yesB, "wrap");
+		
+		mainPanel.add(detailPanel, "push, grow");
 	}
 }
