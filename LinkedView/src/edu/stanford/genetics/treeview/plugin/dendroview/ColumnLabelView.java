@@ -5,6 +5,8 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.Observable;
 import java.util.prefs.Preferences;
 
@@ -17,7 +19,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.UrlExtractor;
 
-public class ColumnLabelView extends LabelView {
+public class ColumnLabelView extends LabelView implements MouseWheelListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -28,6 +30,7 @@ public class ColumnLabelView extends LabelView {
 		super(LabelView.COL);
 		d_justified = false;
 		zoomHint = StringRes.lbl_ZoomColLabels;
+		addMouseWheelListener(this);
 	}
 
 	public void generateView(final UrlExtractor uExtractor) {
@@ -287,5 +290,25 @@ public class ColumnLabelView extends LabelView {
 
 	public int getPrimaryHoverPosition(final MouseEvent e) {
 		return(e.getX());
+	}
+
+	@Override
+	public void mouseWheelMoved(final MouseWheelEvent e) {
+
+		final int notches = e.getWheelRotation();
+		final int shift = (notches < 0) ? -3 : 3;
+
+		LogBuffer.println("Detected [" + (e.isShiftDown() ? "horizontal" : "vertical") + "] scroll event");
+		// On macs' magic mouse, horizontal scroll comes in as if the shift was
+		// down
+		if(e.isShiftDown()) {
+			map.scrollBy(shift, false);
+		} else {
+			final int j = scrollPane.getVerticalScrollBar().getValue();
+			scrollPane.getVerticalScrollBar().setValue(j + shift);
+		}
+
+		revalidate();
+		repaint();
 	}
 }

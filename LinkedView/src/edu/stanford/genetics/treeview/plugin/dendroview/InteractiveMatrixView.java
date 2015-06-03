@@ -105,6 +105,8 @@ MouseWheelListener {
 
 		super();
 
+		setLabelPortMode(true);
+
 		/* Listeners for interactivity */
 		addMouseListener(new MatrixMouseListener());
 		addMouseMotionListener(new MatrixMouseListener());
@@ -680,9 +682,9 @@ MouseWheelListener {
 				}
 			}
 		} else if (e.isShiftDown()) {
-			xmap.scrollBy(shift);
+			xmap.scrollBy(shift,false);
 		} else {
-			ymap.scrollBy(shift);
+			ymap.scrollBy(shift,false);
 		}
 
 		revalidate();
@@ -1037,11 +1039,11 @@ MouseWheelListener {
 		}
 		if(xmap.getFirstVisible() != selecXStartIndex) {
 			//LogBuffer.println("Adjusting final X scroll");
-			xmap.scrollToFirstIndex(selecXStartIndex);
+			xmap.scrollToFirstIndex(selecXStartIndex,true);
 		}
 		if(ymap.getFirstVisible() != selecYStartIndex) {
 			//LogBuffer.println("Adjusting final Y scroll");
-			ymap.scrollToFirstIndex(selecYStartIndex);
+			ymap.scrollToFirstIndex(selecYStartIndex,true);
 		}
 
 		//We will update the aspect ratio just in case it didn't happen
@@ -1463,8 +1465,8 @@ MouseWheelListener {
 		//If zooming has finished, scroll all the way
 		if(xmap.getNumVisible() == numXSelectedIndexes &&
 				ymap.getNumVisible() == numYSelectedIndexes) {
-			xmap.scrollToFirstIndex(selecXStartIndex);
-			ymap.scrollToFirstIndex(selecYStartIndex);
+			xmap.scrollToFirstIndex(selecXStartIndex,true);
+			ymap.scrollToFirstIndex(selecYStartIndex,true);
 		}
 		else {
 			//LogBuffer.println("Correcting the scroll because (xPxPos <= 0 " +
@@ -1957,18 +1959,6 @@ MouseWheelListener {
 
 		geneSelection.notifyObservers();
 		arraySelection.notifyObservers();
-	}
-
-	/**
-	 * Scrolls to the center of the selected rectangle
-	 */
-	public void centerView(int scrollX, int scrollY) {
-
-		scrollX = scrollX + (xmap.getScroll().getVisibleAmount() / 2);
-		scrollY = scrollY + (ymap.getScroll().getVisibleAmount() / 2);
-
-		xmap.scrollToIndex(scrollX);
-		ymap.scrollToIndex(scrollY);
 	}
 
 	/**

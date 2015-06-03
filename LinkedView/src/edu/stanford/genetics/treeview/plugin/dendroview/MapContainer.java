@@ -70,11 +70,15 @@ public class MapContainer extends Observable implements Observer,
 
 	private double tileNumVisible;
 
-	// Track explicitly manipulated visible area (instead of the visible area)
-	// as
-	// is manipulated via indirect actions (such as resizing the window)
+	//Track explicitly manipulated visible area (instead of the visible area) as
+	//is manipulated via indirect actions (such as resizing the window)
 	private int numVisible;
 	private int firstVisible;
+
+	//Track the explicitly manipulated visible labels. These can change as a
+	//result of a scroll in the label pane
+	private int firstVisibleLabel;
+	private int numVisibleLabels;
 
 	public MapContainer(final String mapName) {
 
@@ -83,7 +87,6 @@ public class MapContainer extends Observable implements Observer,
 		this.nullMap = new NullMap();
 		this.current = nullMap;
 		this.mapName = mapName;
-	
 	}
 
 	public MapContainer(final String type, final String mapName) {
@@ -97,6 +100,7 @@ public class MapContainer extends Observable implements Observer,
 		 */
 //		this.numVisible = getAvailablePixels();
 		this.firstVisible = 0;
+		this.firstVisibleLabel = 0;
 	}
 
 	@Override
@@ -163,7 +167,6 @@ public class MapContainer extends Observable implements Observer,
 		// visible, not max index
 		this.tileNumVisible = getMaxIndex() + 1;
 		minScale = getCalculatedMinScale();
-		
 	}
 
 	/**
@@ -297,7 +300,7 @@ public class MapContainer extends Observable implements Observer,
 		}
 		//LogBuffer.println("zoomOut: firstVisible has been changed from [" + initialFirstVisible + "] to [" + newFirstVisible + "].");
 		if(newFirstVisible != firstVisible) {
-			scrollToFirstIndex(newFirstVisible);
+			scrollToFirstIndex(newFirstVisible,true);
 		}
 		//LogBuffer.println("zoomOut: Official new firstVisible: [" + initialFirstVisible + "].");
 		
@@ -389,7 +392,7 @@ public class MapContainer extends Observable implements Observer,
 		
 		if(!beginFixed && zoomVal != 0) {
 			newFirstVis += (zoomsIn ? zoomVal : -zoomVal);
-			scrollToFirstIndex(newFirstVis);
+			scrollToFirstIndex(newFirstVis,true);
 		}
 	}
 
@@ -449,7 +452,7 @@ public class MapContainer extends Observable implements Observer,
 		
 		int newFirstVisible = firstVisible + (prevNumVisible - numVisible) / 2;
 		//LogBuffer.println("zoomIn: firstVisible has been changed from [" + firstVisible + "] to [" + newFirstVisible + "].");
-		scrollToFirstIndex(newFirstVisible);
+		scrollToFirstIndex(newFirstVisible,true);
 
 		notifyObservers();
 	}
@@ -559,7 +562,7 @@ public class MapContainer extends Observable implements Observer,
 			}
 		}
 		//LogBuffer.println("zoomToward: firstVisible has been changed from [" + initialFirstVisible + "] to [" + newFirstVisible + "].");
-		scrollToFirstIndex(newFirstVisible);
+		scrollToFirstIndex(newFirstVisible,true);
 
 		notifyObservers();
 
@@ -672,7 +675,7 @@ public class MapContainer extends Observable implements Observer,
 			}
 		}
 
-		scrollToFirstIndex(newFirstVisible);
+		scrollToFirstIndex(newFirstVisible,true);
 		
 		//Catch and correct bad calculations - this is useless now that the whole-number result test was added above
 		if(dotOver != getIndex(pixelPos)) {
@@ -680,7 +683,7 @@ public class MapContainer extends Observable implements Observer,
 			newFirstVisible += correction;
 			//LogBuffer.println("Warning: The data cell hovered over has shifted. It was over [" + dotOver + "].  Now it is over: [" + getIndex(pixelPos) +
 			//		"].  Previous dotOver calculation: [firstVisible + (int) ((double) pixelPos / newScale))] = [" + firstVisible + " + (int) ((double) " + pixelPos + " / " + newScale + "))].  Correcting this retroactively...");
-			scrollToFirstIndex(newFirstVisible);
+			scrollToFirstIndex(newFirstVisible,true);
 		}
 
 		notifyObservers();
@@ -874,7 +877,7 @@ public class MapContainer extends Observable implements Observer,
 
 		//LogBuffer.println("zoomAwayPixel: Scrolling to new first visible index: [" + newFirstVisible + "].");
 		if(newFirstVisible != getFirstVisible())
-			scrollToFirstIndex(newFirstVisible);
+			scrollToFirstIndex(newFirstVisible,true);
 
 		int correction = dotOver - getIndex(pixelPos);
 		//Catch and correct bad calculations - this is useless now that the whole-number result test was added above
@@ -882,7 +885,7 @@ public class MapContainer extends Observable implements Observer,
 			newFirstVisible += correction;
 			LogBuffer.println("WARNING: The data cell hovered over has shifted. It was over [" + dotOver + "].  Now it is over: [" + getIndex(pixelPos) +
 					"].  Previous dotOver calculation: [firstVisible + (int) ((double) pixelPos / newScale))] = [" + firstVisible + " + (int) ((double) " + pixelPos + " / " + newScale + "))].  Correcting this retroactively...");
-			scrollToFirstIndex(newFirstVisible);
+			scrollToFirstIndex(newFirstVisible,true);
 			updateAspectRatio = 1;
 		}
 
@@ -1234,7 +1237,7 @@ public class MapContainer extends Observable implements Observer,
 	public void centerScrollOnSelection(final int startIndex, 
 			final int endIndex) {
 		
-		int scrollVal = (int) Math.round((endIndex + startIndex) / 2.0);;
+		int scrollVal = (int) Math.round((endIndex + startIndex) / 2.0);
 		
 		scrollToIndex(scrollVal);
 		
@@ -1271,10 +1274,10 @@ public class MapContainer extends Observable implements Observer,
 	public void adjustScrollToScreen() {
 		
 		if (getNumVisible() > 0 && getNumVisible() > 0) {
-			scrollToFirstIndex(getFirstVisible());
+			scrollToFirstIndex(getFirstVisible(),true);
 		} else {
 			setFirstVisible(0);
-			scrollToFirstIndex(0);
+			scrollToFirstIndex(0,true);
 		}
 
 		notifyObservers();
@@ -1359,6 +1362,7 @@ public class MapContainer extends Observable implements Observer,
 	public void scrollToIndex(final int i) {
 
 		final int j = scrollbar.getValue();
+		final int k = getFirstVisibleLabel();
 		// The getVisibleAmount return value can change by resizing the window,
 		// so use getNumVisible instead
 		// This assumes that getNumVisible is updated before this function is
@@ -1375,39 +1379,92 @@ public class MapContainer extends Observable implements Observer,
 		// change implicitly when the window is resized.
 		setFirstVisible(i - getNumVisible() / 2);
 
-		if (j != scrollbar.getValue()) {
+		setFirstVisibleLabel(i - getNumVisibleLabels() / 2);
+
+		//Image needs to be updated if either scroll position changes (because a
+		//scroll of the labels changes the blue box)
+		if (j != scrollbar.getValue() || k != getFirstVisibleLabel()) {
 			setChanged();
 		}
 	}
 
-	public void scrollToFirstIndex(final int i) {
+	public void pullLabels() {
+		//Pull the labels when the visible portion surpasses the visible
+		//labels
+		if(getFirstVisible() > getFirstVisibleLabel())
+			setFirstVisibleLabel(getFirstVisible());
+		else if((getFirstVisible() + getNumVisible()) <
+				(getFirstVisibleLabel() + getNumVisibleLabels()))
+			setFirstVisibleLabel(getFirstVisible() + getNumVisible() -
+					getNumVisibleLabels());
+	}
+
+	public void pushMatrix() {
+		//Push the visible matrix when the labels surpass the visible edge
+		if(getFirstVisible() + getNumVisible() <
+		   getFirstVisibleLabel() + getNumVisibleLabels()) {
+			int newVisPos = getFirstVisibleLabel() + getNumVisibleLabels() -
+					getNumVisible();
+			scrollbar.setValue(newVisPos);
+			setFirstVisible(newVisPos);
+		} else if(getFirstVisible() > getFirstVisibleLabel()) {
+			int newVisPos = getFirstVisibleLabel();
+			scrollbar.setValue(newVisPos);
+			setFirstVisible(newVisPos);
+		}
+	}
+
+	public void scrollToFirstIndex(final int i,boolean pullLabels) {
 
 		final int j = scrollbar.getValue();
-		scrollbar.setValue(i);
+		final int k = getFirstVisibleLabel();
 
-		// Keep track of the first visible index
-		setFirstVisible(i);
+		if(pullLabels) {
+			scrollbar.setValue(i);
+
+			// Keep track of the first visible index
+			setFirstVisible(i);
+
+			pullLabels();
+		} else {
+			setFirstVisibleLabel(i);
+
+			pushMatrix();
+		}
 
 		// LogBuffer.println("Current scrollbar value: [" + j +
 		// "].  Scrolling to: [" + i + "].");
 
-		if (j != i) {
+		if (j != scrollbar.getValue() || k != getFirstVisibleLabel()) {
 			setChanged();
 		}
 
 		notifyObservers();
 	}
 
-	public void scrollBy(final int i) {
+	public void scrollBy(final int i,boolean pullLabels) {
 
 		final int j = scrollbar.getValue();
-		scrollbar.setValue(j + i);
+		final int k = getFirstVisibleLabel();
 
-		// Keep track of the first visible index
-		setFirstVisible(j + i);
+		if(pullLabels) {
+			scrollbar.setValue(j + i);
 
-		if (j != scrollbar.getValue()) {
+			// Keep track of the first visible index
+			setFirstVisible(j + i);
+
+			pullLabels();
+		} else {
+			setFirstVisibleLabel(i + k);
+
+			pushMatrix();
+		}
+
+		if (j != scrollbar.getValue() || k != getFirstVisibleLabel()) {
 			setChanged();
+			LogBuffer.println("Matrix scroll: [" + j + " to " + scrollbar.getValue() + "] Label Port moved: [" + k + " to " + getFirstVisibleLabel() + "]");
+		} else {
+			LogBuffer.println("Neither scrollbar changed. Matrix: [" + j + "] Label Port: [" + k + "]");
 		}
 
 		notifyObservers();
@@ -1420,6 +1477,7 @@ public class MapContainer extends Observable implements Observer,
 
 	// This is a listener for scroll events. When a scroll happens, this
 	// executes.
+	/** TODO: See if this needs to update firstVisibleLabel */
 	@Override
 	public void adjustmentValueChanged(final AdjustmentEvent adjustmentEvent) {
 
@@ -1462,6 +1520,11 @@ public class MapContainer extends Observable implements Observer,
 			// extent + "," + 0 + "," + max + "]");
 			scrollbar.setValues(value, extent, 0, max);
 			scrollbar.setBlockIncrement(current.getViewableIndexes());
+
+			//Initialize the label scrollbar values if undefined
+			if(!(firstVisibleLabel > -1)) {
+				firstVisibleLabel = firstVisible;
+			}
 		}
 	}
 
@@ -1644,11 +1707,23 @@ public class MapContainer extends Observable implements Observer,
 		// LogBuffer.println("setNumVisible: numVisible has been set to [" + i +
 		// "].");
 		numVisible = i;
+
+		//If the number of visible squares has dipped below the number of
+		//visible labels
+		if(i < getNumVisibleLabels()) {
+			setNumVisibleLabels(i);
+		}
 	}
 
 	public void setFirstVisible(final int i) {
 		if (i >= 0) {
 			firstVisible = i;
+
+			//If the first visible square has gone above the first
+			//visible label
+			if(i > getFirstVisibleLabel()) {
+				setFirstVisibleLabel(i);
+			}
 		}
 	}
 
@@ -1715,7 +1790,7 @@ public class MapContainer extends Observable implements Observer,
 	}
 
 	/**
-	 * The purpose of these two functions (getNumVisible and getFirst visible),
+	 * The purpose of these two functions (getNumVisible and getFirstVisible),
 	 * other than to simply obtain values is to support the tracking of explicit
 	 * image manipulation by the user. The main reasons these were implemented
 	 * was because the image was being changed by implicit actions, such as
@@ -1734,6 +1809,53 @@ public class MapContainer extends Observable implements Observer,
 	public int getFirstVisible() {
 
 		return firstVisible;
+	}
+
+	/**
+	 * The purpose of these four functions ({g/s}etNumVisibleLabels and
+	 * {g/s}etFirstVisibleLabel), other than to simply obtain values is to support
+	 * the tracking of explicit label pane manipulation by the user. These
+	 * variables are manipulated only by actions that the user explicitly takes
+	 * to intentionally alter the label pane, meaning the range of labels they
+	 * are looking at.
+	 */
+	public int getNumVisibleLabels() {
+		if(numVisibleLabels > -1)
+			return(numVisibleLabels);
+		return(1);
+	}
+
+	public int getFirstVisibleLabel() {
+		if(firstVisibleLabel > -1)
+			return(firstVisibleLabel);
+		return(0);
+	}
+
+	public void setNumVisibleLabels(int s) {
+		if(s < 1)
+			numVisibleLabels = 1;
+		else if(s > (getMaxIndex() + 1))
+			numVisibleLabels = (getMaxIndex() + 1);
+		else
+			numVisibleLabels = s;
+		if(numVisibleLabels > numVisible) {
+			numVisible = getNumVisibleLabels();
+			pushMatrix();
+		}
+		if(firstVisibleLabel + numVisibleLabels - 1 > getMaxIndex()) {
+			firstVisibleLabel = firstVisibleLabel + numVisibleLabels - 1 -
+					getMaxIndex();
+		}
+	}
+
+	public void setFirstVisibleLabel(int p) {
+		if(p < 0)
+			firstVisibleLabel = 0;
+		else if(p > (getMaxIndex() - getNumVisibleLabels() + 1))
+			firstVisibleLabel = (getMaxIndex() - getNumVisibleLabels() + 1);
+		else
+			firstVisibleLabel = p;
+		pushMatrix();
 	}
 
 	private void switchMap(final IntegerMap integerMap) {

@@ -427,8 +427,8 @@ public class RowLabelView extends LabelView implements MouseWheelListener {
 			final int j = scrollPane.getHorizontalScrollBar().getValue();
 			scrollPane.getHorizontalScrollBar().setValue(j + shift);
 		} else {
-			final int j = scrollPane.getVerticalScrollBar().getValue();
-			scrollPane.getVerticalScrollBar().setValue(j + shift);
+			//scrollPane.getVerticalScrollBar().setValue(j + shift);
+			map.scrollBy(shift, false);
 
 //			if (j != scrollPane.getVerticalScrollBar().getValue()) {
 //				setChanged();

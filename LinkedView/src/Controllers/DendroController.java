@@ -475,7 +475,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		public void actionPerformed(final ActionEvent e) {
 
 			final int scrollBy = getInteractiveYMap().getNumVisible();
-			getInteractiveYMap().scrollBy(-scrollBy);
+			getInteractiveYMap().scrollBy(-scrollBy,false);
 		}
 	}
 
@@ -487,7 +487,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		public void actionPerformed(final ActionEvent e) {
 
 			final int scrollBy = getInteractiveYMap().getNumVisible();
-			getInteractiveYMap().scrollBy(scrollBy);
+			getInteractiveYMap().scrollBy(scrollBy,false);
 		}
 	}
 
@@ -499,7 +499,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		public void actionPerformed(final ActionEvent e) {
 
 			final int scrollBy = getInteractiveXMap().getNumVisible();
-			getInteractiveXMap().scrollBy(-scrollBy);
+			getInteractiveXMap().scrollBy(-scrollBy,false);
 		}
 	}
 
@@ -511,7 +511,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		public void actionPerformed(final ActionEvent e) {
 
 			final int scrollBy = getInteractiveXMap().getNumVisible();
-			getInteractiveXMap().scrollBy(scrollBy);
+			getInteractiveXMap().scrollBy(scrollBy,false);
 		}
 	}
 
@@ -522,7 +522,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			getInteractiveXMap().scrollBy(-1);
+			getInteractiveXMap().scrollBy(-1,false);
 		}
 	}
 
@@ -533,7 +533,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			getInteractiveXMap().scrollBy(1);
+			getInteractiveXMap().scrollBy(1,false);
 		}
 	}
 
@@ -544,7 +544,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			getInteractiveYMap().scrollBy(-1);
+			getInteractiveYMap().scrollBy(-1,false);
 		}
 	}
 
@@ -555,7 +555,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			getInteractiveYMap().scrollBy(1);
+			getInteractiveYMap().scrollBy(1,false);
 		}
 	}
 
@@ -597,9 +597,9 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 				//Then scroll
 				getInteractiveXMap().scrollToFirstIndex(
-						colSelection.getMinIndex());
+						colSelection.getMinIndex(),true);
 				getInteractiveYMap().scrollToFirstIndex(
-						rowSelection.getMinIndex());
+						rowSelection.getMinIndex(),true);
 			}
 			//zoomSelection();
 		}
@@ -1074,9 +1074,9 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 					//Then scroll
 					getInteractiveXMap().scrollToFirstIndex(
-							colSelection.getMinIndex());
+							colSelection.getMinIndex(),true);
 					getInteractiveYMap().scrollToFirstIndex(
-							rowSelection.getMinIndex());
+							rowSelection.getMinIndex(),true);
 
 					//zoomSelection();
 					//centerSelection();
