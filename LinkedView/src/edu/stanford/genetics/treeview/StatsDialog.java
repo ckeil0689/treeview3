@@ -70,7 +70,7 @@ public class StatsDialog extends CustomDialog {
 		contentPanel.add(cols, "wrap");
 		contentPanel.add(sizeLabel, "tag label");
 		contentPanel.add(size);
-
+		
 		mainPanel.add(contentPanel, "push, grow, wrap");
 		mainPanel.add(closeBtn, "span, al right");
 	}

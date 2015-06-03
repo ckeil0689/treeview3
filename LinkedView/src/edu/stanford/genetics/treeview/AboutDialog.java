@@ -62,10 +62,10 @@ public class AboutDialog extends CustomDialog {
 				GUIFactory.FONTS);
 
 		final JPanel contentPanel = GUIFactory.createJPanel(false,
-				GUIFactory.DEFAULT, null);
+				GUIFactory.DEFAULT);
 
 		final JPanel detailPanel = GUIFactory.createJPanel(false,
-				GUIFactory.DEFAULT, null);
+				GUIFactory.DEFAULT);
 		detailPanel.setBorder(BorderFactory.createTitledBorder("Details"));
 
 		contentPanel.add(text, "span, grow, wrap");

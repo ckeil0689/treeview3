@@ -234,28 +234,35 @@ public class RowLabelView extends LabelView {
 			int closest = -1;
 			for(int i = 0;i < selection.getNumIndexes();i++) {
 				if(!selection.isIndexSelected(i) &&
-				   (closest == -1 ||
-				    Math.abs(i - index) <
-				    Math.abs(closest - index))) {
+				   ((closest == -1 &&
+				     Math.abs(i - index) <
+				     Math.abs(0 - index)) ||
+				    (closest > -1 &&
+				     Math.abs(i - index) <
+				     Math.abs(closest - index)))) {
 					closest = i;
 					//LogBuffer.println("Closest index updated to [" +
 					//		closest + "] because index [" + index +
 					//		"] is closer [distance: " +
 					//		Math.abs(i - index) + "] to it.");
+				} else if(i == (selection.getNumIndexes() - 1) &&
+						  selection.isIndexSelected(i) &&
+						  ((closest == -1 &&
+						    Math.abs(i - index) <
+						    Math.abs(0 - index)) ||
+						   (closest > -1 &&
+						    Math.abs(i - index) <
+						    Math.abs(closest - index)))) {
+					closest = i + 1;
 				}
 			}
-			//If everything was selected, see whether the closest is 1 after the
-			//last index
-			if(closest == -1 &&
-			   (double) index / (double) selection.getNumIndexes() > 0.5) {
-				closest = selection.getNumIndexes();
-			}
+			//LogBuffer.println("Closest index: [" + closest + "].");
 			if(closest < index) {
 				for(int i = closest + 1;i <= index;i++)
-					selection.setIndexSelection(i, false);
+					selection.setIndexSelection(i,false);
 			} else {
 				for(int i = index;i < closest;i++)
-					selection.setIndexSelection(i, false);
+					selection.setIndexSelection(i,false);
 			}
 		}
 		//Else if other selections exist (implied that current index is not
