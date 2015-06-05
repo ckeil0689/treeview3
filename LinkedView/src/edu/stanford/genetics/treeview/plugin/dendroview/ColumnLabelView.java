@@ -56,6 +56,20 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener {
 	}
 
 	@Override
+	protected void justifyScrollBar() {
+
+		if (isRightJustified) {
+			scrollPane.getVerticalScrollBar().setValue(0);
+		} else {
+			final int scrollMax = scrollPane.getVerticalScrollBar()
+					.getMaximum();
+			scrollPane.getVerticalScrollBar().setValue(scrollMax);
+		}
+
+		repaint();
+	}
+
+	@Override
 	public void setConfigNode(final Preferences parentNode) {
 
 		if (parentNode != null) {
@@ -93,34 +107,34 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener {
 
 		offscreenValid = false;
 
-		final int start = 0;
-		final int end = headerInfo.getNumHeaders();
-
-		final FontMetrics fontMetrics = getFontMetrics(new Font(face, style,
-				size));
-		maxlength = 1;
-		for (int j = start; j < end; j++) {
-
-			final String out = headerSummary.getSummary(headerInfo, j);
-
-			if (out == null) {
-				continue;
-			}
-
-			final int length = fontMetrics.stringWidth(out);
-			if (maxlength < length) {
-				maxlength = length;
-			}
-		}
-
-		final Rectangle visible = getVisibleRect();
-		setPreferredSize(new Dimension(map.getUsedPixels(), maxlength));
-
-		if (maxlength > oldHeight) {
-			visible.y += maxlength - oldHeight;
-			scrollRectToVisible(visible);
-		}
-		oldHeight = maxlength;
+//		final int start = 0;
+//		final int end = headerInfo.getNumHeaders();
+//
+//		final FontMetrics fontMetrics = getFontMetrics(new Font(face, style,
+//				size));
+//		maxlength = 1;
+//		for (int j = start; j < end; j++) {
+//
+//			final String out = headerSummary.getSummary(headerInfo, j);
+//
+//			if (out == null) {
+//				continue;
+//			}
+//
+//			final int length = fontMetrics.stringWidth(out);
+//			if (maxlength < length) {
+//				maxlength = length;
+//			}
+//		}
+//
+//		final Rectangle visible = getVisibleRect();
+//		setPreferredSize(new Dimension(map.getUsedPixels(), maxlength));
+//
+//		if (maxlength > oldHeight) {
+//			visible.y += maxlength - oldHeight;
+//			scrollRectToVisible(visible);
+//		}
+//		oldHeight = maxlength;
 		
 		revalidate();
 		repaint();

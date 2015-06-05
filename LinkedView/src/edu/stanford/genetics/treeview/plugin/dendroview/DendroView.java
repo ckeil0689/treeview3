@@ -30,12 +30,13 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentListener;
 import java.awt.event.ContainerListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionAdapter;
 import java.beans.PropertyChangeListener;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.prefs.Preferences;
-
 import java.awt.Color;
 
 import javax.swing.ActionMap;
@@ -48,6 +49,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
+import javax.swing.plaf.basic.BasicSplitPaneDivider;
+
+import com.sun.glass.events.MouseEvent;
 
 import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
@@ -444,7 +448,7 @@ public class DendroView implements Observer, DendroPanel {
 				StringRes.icon_dragbar_vert_light));
 		rowDataPane.setBorder(null);
 		rowDataPane.setDividerSize(10);
-
+		
 		final double oldRowDiv = tvFrame.getConfigNode().getDouble("gtr_loc",
 				0.5d);
 		if (rowTreeView.isEnabled()) {

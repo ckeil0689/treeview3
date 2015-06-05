@@ -1,9 +1,13 @@
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
+import java.awt.Adjustable;
+import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Rectangle;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
@@ -14,12 +18,14 @@ import javax.swing.JScrollBar;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
+import com.sun.xml.internal.ws.util.StringUtils;
+
 import Utilities.StringRes;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.UrlExtractor;
 
-public class RowLabelView extends LabelView implements MouseWheelListener {
+public class RowLabelView extends LabelView implements MouseWheelListener, AdjustmentListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -31,6 +37,10 @@ public class RowLabelView extends LabelView implements MouseWheelListener {
 		d_justified = true;
 		zoomHint = StringRes.lbl_ZoomRowLabels;
 		addMouseWheelListener(this);
+
+		// Listen for value changes in the scroll pane's scrollbars
+		scrollPane.getHorizontalScrollBar().addAdjustmentListener(this);
+		scrollPane.getVerticalScrollBar().addAdjustmentListener(this);
 	}
 
 	//public void generateView(final UrlExtractor uExtractor) {
@@ -59,6 +69,20 @@ public class RowLabelView extends LabelView implements MouseWheelListener {
 	
 	@Override
 	protected void adjustScrollBar() {
+
+		if (isRightJustified) {
+			final int scrollMax = scrollPane.getHorizontalScrollBar()
+					.getMaximum();
+//			scrollPane.getHorizontalScrollBar().setValue(scrollMax);
+		} else {
+//			scrollPane.getHorizontalScrollBar().setValue(0);
+		}
+
+		repaint();
+	}
+
+	@Override
+	protected void justifyScrollBar() {
 
 		if (isRightJustified) {
 			final int scrollMax = scrollPane.getHorizontalScrollBar()
@@ -140,34 +164,35 @@ public class RowLabelView extends LabelView implements MouseWheelListener {
 
 		offscreenValid = false;
 
-		final int start = 0;
-		final int end = headerInfo.getNumHeaders();
+//		final int start = 0;
+//		final int end = headerInfo.getNumHeaders();
+//
+//		final FontMetrics fontMetrics = getFontMetrics(new Font(face, style,
+//				size));
+//		maxlength = 1;
+//		for (int j = start; j < end; j++) {
+//
+//			final String out = headerSummary.getSummary(headerInfo, j);
+//
+//			if (out == null) {
+//				continue;
+//			}
+//
+//			final int length = fontMetrics.stringWidth(out);
+//			if (maxlength < length) {
+//				maxlength = length;
+//			}
+//		}
 
-		final FontMetrics fontMetrics = getFontMetrics(new Font(face, style,
-				size));
-		maxlength = 1;
-		for (int j = start; j < end; j++) {
+		//final Rectangle visible = getVisibleRect();
+		//setPreferredSize(new Dimension(maxlength, map.getUsedPixels()));
 
-			final String out = headerSummary.getSummary(headerInfo, j);
-
-			if (out == null) {
-				continue;
-			}
-
-			final int length = fontMetrics.stringWidth(out);
-			if (maxlength < length) {
-				maxlength = length;
-			}
-		}
-
-		final Rectangle visible = getVisibleRect();
-		setPreferredSize(new Dimension(maxlength, map.getUsedPixels()));
-
-		if (maxlength > oldWidth) {
-			visible.y += maxlength - oldWidth;
-			scrollRectToVisible(visible);
-		}
-		oldWidth = maxlength;
+		//if (maxlength > oldWidth) {
+		//	visible.y += maxlength - oldWidth;
+//Commenting this out because the scrollbar keeps jumping around
+//			scrollRectToVisible(visible);
+		//}
+		//oldWidth = maxlength;
 		
 		revalidate();
 		repaint();
@@ -420,16 +445,21 @@ public class RowLabelView extends LabelView implements MouseWheelListener {
 		final int notches = e.getWheelRotation();
 		final int shift = (notches < 0) ? -3 : 3;
 
-		LogBuffer.println("Detected [" + (e.isShiftDown() ? "horizontal" : "vertical") + "] scroll event");
+		final int j = scrollPane.getHorizontalScrollBar().getValue();
+		//LogBuffer.println("Detected [" + (e.isShiftDown() ? "horizontal" : "vertical") + "] scroll event");
 		// On macs' magic mouse, horizontal scroll comes in as if the shift was
 		// down
 		if(e.isShiftDown()) {
-			final int j = scrollPane.getHorizontalScrollBar().getValue();
 			scrollPane.getHorizontalScrollBar().setValue(j + shift);
 		} else {
+			//Value of label length scrollbar
+			//int doesItChange = scrollPane.getHorizontalScrollBar().getValue();
 			//scrollPane.getVerticalScrollBar().setValue(j + shift);
 			map.scrollBy(shift, false);
 
+			//if(scrollPane.getHorizontalScrollBar().getValue() != doesItChange) {
+			//	LogBuffer.println("The fucking horizontal scroll changed from [" + doesItChange + "] to [" + scrollPane.getHorizontalScrollBar().getValue() + "] during a fucking vertical scroll!");
+			//}
 //			if (j != scrollPane.getVerticalScrollBar().getValue()) {
 //				setChanged();
 //			}
@@ -438,6 +468,51 @@ public class RowLabelView extends LabelView implements MouseWheelListener {
 		}
 
 		revalidate();
-		repaint();
+		//repaint();
+		//repaint wasn't always updating the last paint step, but paintImmediately (and an invokdeLater also) seems to work
+		//I think it's because the updateBuffer finds out if it needs to change anything from the map object
+		paintImmediately(0, 0, getWidth(), getHeight());
+	}
+
+	public void adjustmentValueChanged(AdjustmentEvent evt) {
+		Adjustable source = evt.getAdjustable();
+		if (evt.getValueIsAdjusting()) {
+			return;
+		}
+		int orient = source.getOrientation();
+		if (orient == Adjustable.HORIZONTAL) {
+			System.out.println("from horizontal scrollbar"); 
+//			StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+//			LogBuffer.println("Horizontal scroll came from: [" + Thread.currentThread().getStackTrace() +
+////				stackTraceElements[8].getClassName() + ":" + stackTraceElements[8].getMethodName() + ":" + stackTraceElements[8].getLineNumber() + "<-" +
+////				stackTraceElements[9].getClassName() + ":" + stackTraceElements[9].getMethodName() + ":" + stackTraceElements[9].getLineNumber() + "<-" +
+////				stackTraceElements[10].getClassName() + ":" + stackTraceElements[10].getMethodName() + ":" + stackTraceElements[10].getLineNumber() + "<-" +
+////				stackTraceElements[11].getClassName() + ":" + stackTraceElements[11].getMethodName() + ":" + stackTraceElements[11].getLineNumber() + "<-" +
+////				stackTraceElements[12].getClassName() + ":" + stackTraceElements[12].getMethodName() + ":" + stackTraceElements[12].getLineNumber() + "<-" +
+////				stackTraceElements[13].getClassName() + ":" + stackTraceElements[13].getMethodName() + ":" + stackTraceElements[13].getLineNumber() +
+//				"].");
+//			Thread.dumpStack();
+		} else {
+			System.out.println("from vertical scrollbar");
+		}
+		int type = evt.getAdjustmentType();
+		switch (type) {
+			case AdjustmentEvent.UNIT_INCREMENT:
+				System.out.println("Scrollbar was increased by one unit");
+				break;
+			case AdjustmentEvent.UNIT_DECREMENT:
+				System.out.println("Scrollbar was decreased by one unit");
+				break;
+			case AdjustmentEvent.BLOCK_INCREMENT:
+				System.out.println("Scrollbar was increased by one block");
+				break;
+			case AdjustmentEvent.BLOCK_DECREMENT:
+				System.out.println("Scrollbar was decreased by one block");
+				break;
+			case AdjustmentEvent.TRACK:
+				System.out.println("The knob on the scrollbar was dragged");
+				break;
+		}
+		int value = evt.getValue();
 	}
 }

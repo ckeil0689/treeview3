@@ -149,7 +149,7 @@ public class GlobalMatrixView extends MatrixView {
 	
 	/**
 	 * Sets a reference to the interactive x-MapContainer to keep track of
-	 * of currently visible tiles. 
+	 * currently visible tiles. 
 	 * @param m
 	 */
 	public void setInteractiveXMap(final MapContainer m) {

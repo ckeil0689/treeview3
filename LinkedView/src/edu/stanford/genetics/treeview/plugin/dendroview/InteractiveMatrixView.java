@@ -97,6 +97,16 @@ MouseWheelListener {
 	GlobalMatrixView globalMatrixView = null;
 
 	/**
+	 * Rectangle to track the labels currently visible in the label pane
+	 */
+	private Rectangle labelPortRect = new Rectangle();
+
+	/**
+	 * Circle to be used as indicator for the label panes
+	 */
+	private Ellipse2D.Double labelPortCircle = null;
+
+	/**
 	 * GlobalView also likes to have an globalxmap and globalymap (both of type
 	 * MapContainer) to help it figure out where to draw things. It also tries
 	 * to
@@ -295,7 +305,33 @@ MouseWheelListener {
 
 		Graphics2D g2 = (Graphics2D) g;
 		
+		if (labelPortRect != null) {
+
+			/* draw label port rectangles in blue */
+			//g2.setColor(Color.blue);
+			g2.setColor(new Color(30,144,251));
+
+			g2.drawRect(labelPortRect.x, labelPortRect.y,
+						labelPortRect.width, labelPortRect.height);
+
+			//LogBuffer.println("Preparing to draw labelPort ellipses.");
+			/*
+			 * draw blue label port circle if rectangle small enough.
+			 */
+			if (labelPortCircle != null) {
+				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+						RenderingHints.VALUE_ANTIALIAS_ON);
+				//g2.setColor(Color.blue);
+				g2.setColor(new Color(30,144,251));
+				g2.setStroke(new BasicStroke(3));
+				//LogBuffer.println("Drawing labelPort ellipse.");
+				g2.draw(labelPortCircle);
+			}
+		}
+
 		if (selectionRectList != null) {
+			//Reinitialize the graphics object
+			g2 = (Graphics2D) g;
 
 			/* draw all selection rectangles in yellow */
 			g2.setColor(Color.yellow);
@@ -322,6 +358,13 @@ MouseWheelListener {
 		}
 	}
 
+	public boolean isLabelPortVisible() {
+		return(xmap.getFirstVisible() != xmap.getFirstVisibleLabel() ||
+			   xmap.getNumVisible()   != xmap.getNumVisibleLabels() ||
+			   ymap.getFirstVisible() != ymap.getFirstVisibleLabel() ||
+			   ymap.getNumVisible()   != ymap.getNumVisibleLabels());
+	}
+
 	/**
 	 * Checks the selection of genes and arrays and calculates the appropriate
 	 * selection rectangle.
@@ -329,50 +372,69 @@ MouseWheelListener {
 	@Override
 	protected void recalculateOverlay() {
 
-		if ((geneSelection == null) || (arraySelection == null)) {
-			selectionRectList   = null;
-			indicatorCircleList = null;
-			return;
+		if(!inLabelPortMode() || !isLabelPortVisible()) {
+			labelPortRect   = null;
+			labelPortCircle = null;
+		} else {
+
+			labelPortRect =
+					new Rectangle(
+							xmap.getPixel(xmap.getFirstVisibleLabel()),
+							ymap.getPixel(ymap.getFirstVisibleLabel()),
+							(xmap.getPixel(xmap.getFirstVisibleLabel() +
+							 xmap.getNumVisibleLabels()) -
+							 xmap.getPixel(xmap.getFirstVisibleLabel())),
+							(ymap.getPixel(ymap.getFirstVisibleLabel() +
+							 ymap.getNumVisibleLabels()) -
+							 ymap.getPixel(ymap.getFirstVisibleLabel())));
+
+			setLabelPortCircleBounds();
 		}
 
-		selectionRectList = new ArrayList<Rectangle>();
+		if((geneSelection == null) || (arraySelection == null)) {
+			selectionRectList   = null;
+			indicatorCircleList = null;
+		} else {
 
-		final int[] selectedArrayIndexes = arraySelection.getSelectedIndexes();
-		final int[] selectedGeneIndexes  = geneSelection.getSelectedIndexes();
-
-		globalMatrixView.setIMVselectedIndexes(selectedArrayIndexes,
-											   selectedGeneIndexes);
-
-		if (selectedArrayIndexes.length > 0) {
-
-			// LogBuffer.println("Selected min array index: [" +
-			// selectedArrayIndexes[0] + "] Selected min gene index: [" +
-			// selectedGeneIndexes[0] + "].");
-
-			List<List<Integer>> arrayBoundaryList;
-			List<List<Integer>> geneBoundaryList;
-
-			arrayBoundaryList = findRectangleBoundaries(selectedArrayIndexes,
-					xmap);
-			geneBoundaryList = findRectangleBoundaries(selectedGeneIndexes,
-					ymap);
-
-			// Make the rectangles
-			if (selectionRectList != null) {
-				for (final List<Integer> xBoundaries : arrayBoundaryList) {
-
-					for (final List<Integer> yBoundaries : geneBoundaryList) {
-
-						selectionRectList.add(new Rectangle(xBoundaries.get(0),
-								yBoundaries.get(0), xBoundaries.get(1)
-								- xBoundaries.get(0), yBoundaries
-								.get(1) - yBoundaries.get(0)));
+			selectionRectList = new ArrayList<Rectangle>();
+	
+			final int[] selectedArrayIndexes = arraySelection.getSelectedIndexes();
+			final int[] selectedGeneIndexes  = geneSelection.getSelectedIndexes();
+	
+			globalMatrixView.setIMVselectedIndexes(selectedArrayIndexes,
+												   selectedGeneIndexes);
+	
+			if (selectedArrayIndexes.length > 0) {
+	
+				// LogBuffer.println("Selected min array index: [" +
+				// selectedArrayIndexes[0] + "] Selected min gene index: [" +
+				// selectedGeneIndexes[0] + "].");
+	
+				List<List<Integer>> arrayBoundaryList;
+				List<List<Integer>> geneBoundaryList;
+	
+				arrayBoundaryList = findRectangleBoundaries(selectedArrayIndexes,
+						xmap);
+				geneBoundaryList = findRectangleBoundaries(selectedGeneIndexes,
+						ymap);
+	
+				// Make the rectangles
+				if (selectionRectList != null) {
+					for (final List<Integer> xBoundaries : arrayBoundaryList) {
+	
+						for (final List<Integer> yBoundaries : geneBoundaryList) {
+	
+							selectionRectList.add(new Rectangle(xBoundaries.get(0),
+									yBoundaries.get(0), xBoundaries.get(1)
+									- xBoundaries.get(0), yBoundaries
+									.get(1) - yBoundaries.get(0)));
+						}
 					}
 				}
 			}
+			
+			setIndicatorCircleBounds();
 		}
-		
-		setIndicatorCircleBounds();
 	}
 
 	/**
@@ -1909,6 +1971,46 @@ MouseWheelListener {
 			lastxb = xBoundaries.get(1);
 		}
 		
+	}
+
+	private int getLabelPortLeftCoord() {
+		return(xmap.getPixel(xmap.getFirstVisibleLabel()));
+	}
+
+	private int getLabelPortTopCoord() {
+		return(xmap.getPixel(xmap.getFirstVisibleLabel()));
+	}
+
+	private int getLabelPortWidth() {
+		return(xmap.getPixel(xmap.getFirstVisibleLabel() +
+			   xmap.getNumVisibleLabels()) -
+			   xmap.getPixel(xmap.getFirstVisibleLabel()));
+	}
+
+	private int getLabelPortHeight() {
+		return(ymap.getPixel(ymap.getFirstVisibleLabel() +
+			   ymap.getNumVisibleLabels()) -
+			   ymap.getPixel(ymap.getFirstVisibleLabel()));
+	}
+
+	/**
+	 * Draws a circle if the labelPortRect is too small to be easily seen.
+	 */
+	private void setLabelPortCircleBounds() {
+
+		if (!inLabelPortMode() || !isLabelPortVisible() ||
+			getLabelPortWidth() >= 20 || getLabelPortHeight() >= 20) {
+			labelPortCircle = null;
+			return;
+		} 
+
+		// coords for top left of circle
+		int x = getLabelPortLeftCoord() +
+				(int) Math.round((double) getLabelPortWidth() / 2.0) - 20;
+		int y = getLabelPortTopCoord() +
+				(int) Math.round((double) getLabelPortHeight() / 2.0) - 20;
+
+		labelPortCircle = new Ellipse2D.Double(x, y, 40, 40);
 	}
 
 	/**
