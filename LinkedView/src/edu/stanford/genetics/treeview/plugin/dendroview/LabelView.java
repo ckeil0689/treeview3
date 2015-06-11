@@ -685,7 +685,8 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 								   xPos + ((isGeneAxis == isRightJustified) ? (drawLabelPort ? indicatorThickness : labelIndent) * (isGeneAxis ? -1 : 1) : 0),
 								   (drawLabelPort ?
 									stackPos + (int) Math.round((curFontSize + SQUEEZE) / 2) + (int) Math.floor(ascent / 2) - 1 :
-									map.getMiddlePixel(j) + ascent / 2));
+									//Offset of the labels preceding = start * (curFontSize + SQUEEZE)
+									start * (curFontSize + SQUEEZE) + map.getMiddlePixel(j) + ascent / 2));
 
 				} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 					LogBuffer.logException(e);
