@@ -132,10 +132,10 @@ public class StringRes {
 	public static final String tt_home = "Zoom into the selected area";
 
 	// Labels
-	public static final String lbl_ZoomColLabels = "Zoom matrix or shrink "
-			+ "labels to see column labels";
-	public static final String lbl_ZoomRowLabels = "Zoom matrix or shrink "
-			+ "labels to see row labels";
+	public static final String lbl_ZoomColLabels = "Hover, zoom, or change "
+			+ "font size to see labels";
+	public static final String lbl_ZoomRowLabels = "Hover, zoom, or change "
+			+ "font size to see labels";
 
 	/* Distance Measures */
 	public static final String cluster_DoNot = "Do not cluster";

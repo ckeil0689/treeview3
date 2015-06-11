@@ -29,6 +29,8 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -40,6 +42,7 @@ import java.util.Observable;
 
 import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.HeaderInfo;
@@ -71,6 +74,8 @@ MouseWheelListener {
 	private int overy;
 	
 	private double aspectRatio = -1;
+
+	boolean debug = false;
 
 	/**
 	 * Points to track candidate selected rows/cols should reflect where the
@@ -359,7 +364,10 @@ MouseWheelListener {
 	}
 
 	public boolean isLabelPortVisible() {
-		return(xmap.getFirstVisible() != xmap.getFirstVisibleLabel() ||
+		return(inLabelPortMode() &&
+			   (xmap.overALabelPortLinkedView() ||
+			    ymap.overALabelPortLinkedView()) &&
+			   xmap.getFirstVisible() != xmap.getFirstVisibleLabel() ||
 			   xmap.getNumVisible()   != xmap.getNumVisibleLabels() ||
 			   ymap.getFirstVisible() != ymap.getFirstVisibleLabel() ||
 			   ymap.getNumVisible()   != ymap.getNumVisibleLabels());
@@ -372,7 +380,8 @@ MouseWheelListener {
 	@Override
 	protected void recalculateOverlay() {
 
-		if(!inLabelPortMode() || !isLabelPortVisible()) {
+		if(!inLabelPortMode() || !isLabelPortVisible() ||
+				(!xmap.overALabelPortLinkedView() && !ymap.overALabelPortLinkedView())) {
 			labelPortRect   = null;
 			labelPortCircle = null;
 		} else {
@@ -574,6 +583,8 @@ MouseWheelListener {
 			final int oovery = overy;
 			overx = xmap.getIndex(e.getX());
 			overy = ymap.getIndex(e.getY());
+			xmap.setHoverIndex(overx);
+			ymap.setHoverIndex(overy);
 
 			/* Timed repaint to avoid constant unnecessary repainting. */
 
@@ -690,9 +701,41 @@ MouseWheelListener {
 					geneSelection.getSelectedIndexes());
 		}
 
+		//Timer to let the label pane linger a bit
+		final private int delay = 1000;
+		private javax.swing.Timer turnOffLabelPortTimer;
+		ActionListener turnOffLabelPort = new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				if (evt.getSource() == turnOffLabelPortTimer) {
+					/* Stop timer */
+					turnOffLabelPortTimer.stop();
+					turnOffLabelPortTimer = null;
+				
+					if(debug)
+						LogBuffer.println("mouseEvent in IMV - ACTED ON");
+					xmap.setOverInteractiveMatrix(false);
+					ymap.setOverInteractiveMatrix(false);
+					xmap.notifyObservers();
+					ymap.notifyObservers();
+					revalidate();
+					repaint();
+				}
+			}
+		};
+
 		@Override
 		public void mouseEntered(final MouseEvent e) {
-
+			if(debug)
+				LogBuffer.println("mouseEntered IMV");
+			if(this.turnOffLabelPortTimer != null) {
+				/* Event came too soon, swallow it by resetting the timer.. */
+				this.turnOffLabelPortTimer.stop();
+				this.turnOffLabelPortTimer = null;
+			}
+			xmap.setOverInteractiveMatrix(true);
+			ymap.setOverInteractiveMatrix(true);
 			hasMouse = true;
 			requestFocus();
 		}
@@ -700,8 +743,24 @@ MouseWheelListener {
 		@Override
 		public void mouseExited(final MouseEvent e) {
 
+			if(debug)
+				LogBuffer.println("mouseExited IMV");
+			//Turn off the "over a label port view" boolean after a bit
+			if(this.turnOffLabelPortTimer == null) {
+				LogBuffer.println("mouseExited IMV - starting timer");
+				/* Start waiting for delay millis to elapse and then
+				 * call actionPerformed of the ActionListener
+				 * "turnOffLabelPort". */
+				this.turnOffLabelPortTimer = new Timer(this.delay,
+						turnOffLabelPort);
+				this.turnOffLabelPortTimer.start();
+			}
+
+			//setOverInteractiveMatrix(false);
 			hasMouse = false;
 
+			xmap.setHoverIndex(-1);
+			ymap.setHoverIndex(-1);
 			// Display empty field
 			statustext[0] = "";
 			statustext[1] = "";

@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
@@ -13,6 +15,7 @@ import java.util.prefs.Preferences;
 import javax.swing.JScrollBar;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 import Utilities.StringRes;
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -44,29 +47,15 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener {
 	@Override
 	protected void adjustScrollBar() {
 
-		if (isRightJustified) {
-			scrollPane.getVerticalScrollBar().setValue(0);
-		} else {
-			final int scrollMax = scrollPane.getVerticalScrollBar()
-					.getMaximum();
-			scrollPane.getVerticalScrollBar().setValue(scrollMax);
-		}
-
-		repaint();
-	}
-
-	@Override
-	protected void justifyScrollBar() {
-
-		if (isRightJustified) {
-			scrollPane.getVerticalScrollBar().setValue(0);
-		} else {
-			final int scrollMax = scrollPane.getVerticalScrollBar()
-					.getMaximum();
-			scrollPane.getVerticalScrollBar().setValue(scrollMax);
-		}
-
-		repaint();
+//		if (isRightJustified) {
+//			scrollPane.getVerticalScrollBar().setValue(0);
+//		} else {
+//			final int scrollMax = scrollPane.getVerticalScrollBar()
+//					.getMaximum();
+//			scrollPane.getVerticalScrollBar().setValue(scrollMax);
+//		}
+//
+//		repaint();
 	}
 
 	@Override
@@ -140,6 +129,53 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener {
 		repaint();
 	}
 
+	//Timer to let the label pane linger a bit
+	final private int delay = 1000;
+	private javax.swing.Timer turnOffLabelPortTimer;
+	ActionListener turnOffLabelPort = new ActionListener() {
+		
+		@Override
+		public void actionPerformed(ActionEvent evt) {
+			if (evt.getSource() == turnOffLabelPortTimer) {
+				/* Stop timer */
+				turnOffLabelPortTimer.stop();
+				turnOffLabelPortTimer = null;
+			
+				map.setOverColLabels(false);
+				map.notifyObservers();
+				revalidate();
+				repaint();
+			}
+		}
+	};
+
+	@Override
+	public void mouseEntered(final MouseEvent e) {
+		if(this.turnOffLabelPortTimer != null) {
+			/* Event came too soon, swallow it by resetting the timer.. */
+			this.turnOffLabelPortTimer.stop();
+			this.turnOffLabelPortTimer = null;
+		}
+		map.setOverColLabels(true);
+		super.mouseEntered(e);
+	}
+
+	@Override
+	public void mouseExited(final MouseEvent e) {
+		//Turn off the "over a label port view" boolean after a bit
+		if(this.turnOffLabelPortTimer == null) {
+			/* Start waiting for delay millis to elapse and then
+			 * call actionPerformed of the ActionListener
+			 * "turnOffLabelPort". */
+			this.turnOffLabelPortTimer = new Timer(this.delay,
+					turnOffLabelPort);
+			this.turnOffLabelPortTimer.start();
+		}
+
+		//setOverColLabels(false);
+		super.mouseExited(e);
+	}
+
 	/**
 	 * Starts external browser if the urlExtractor is enabled.
 	 */
@@ -158,7 +194,7 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener {
 		// if (map.contains(index)) {
 		// viewFrame.displayURL(urlExtractor.getUrl(index));
 		// }
-		final int index = map.getIndex(e.getX());
+		final int index = getPrimaryHoverIndex(e);
 
 		if (SwingUtilities.isLeftMouseButton(e)) {
 			if (geneSelection.getNSelectedIndexes() > 0) {
@@ -319,7 +355,23 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener {
 			map.scrollBy(shift, false);
 		} else {
 			final int j = scrollPane.getVerticalScrollBar().getValue();
+			LogBuffer.println("Scrolling vertically from [" + j + "] by [" + shift + "]");
 			scrollPane.getVerticalScrollBar().setValue(j + shift);
+			lastScrollColPos = j + shift;
+			lastScrollColEndPos = lastScrollColPos + getSecondaryScrollBar().getModel().getExtent();
+			lastScrollColEndGap =
+					getSecondaryScrollBar().getMaximum() - lastScrollColEndPos;
+			if(lastScrollColEndGap < 0) {
+				lastScrollColPos -= lastScrollColEndGap;
+				lastScrollColEndPos -= lastScrollColEndGap;
+				lastScrollColEndGap = 0;
+			} else if(lastScrollColPos < 0) {
+				lastScrollColEndPos += lastScrollColPos;
+				lastScrollColEndGap += lastScrollColPos;
+				lastScrollColPos = 0;
+			}
+			//if(debug)
+			LogBuffer.println("New scroll position [" + lastScrollColPos + "] end pos: [" + lastScrollColEndPos + "] end gap: [" + lastScrollColEndGap + "] out of [" + getSecondaryScrollBar().getMaximum() + "]");
 		}
 
 		revalidate();

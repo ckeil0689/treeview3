@@ -78,7 +78,13 @@ public class MapContainer extends Observable implements Observer,
 	//Track the explicitly manipulated visible labels. These can change as a
 	//result of a scroll in the label pane
 	private int firstVisibleLabel;
-	private int numVisibleLabels;
+	private int numVisibleLabels; //Value fully controlled by LabelView class
+	private boolean overColLabels = false;
+	private boolean overRowLabels = false;
+	private boolean overInteractiveMatrix = false;
+	private int hoverIndex = -1;
+
+	boolean debug = false;
 
 	public MapContainer(final String mapName) {
 
@@ -1397,6 +1403,10 @@ public class MapContainer extends Observable implements Observer,
 				(getFirstVisibleLabel() + getNumVisibleLabels()))
 			setFirstVisibleLabel(getFirstVisible() + getNumVisible() -
 					getNumVisibleLabels());
+		//We do not need to handle changing the numVisibleLabels because when
+		//numVisible < numVisibleLabels, the port is turned off anyway.  Besides
+		//the dimension of the port is controlled by the font size in the 
+		//LabelView class - we shouldn't adjust it here.
 	}
 
 	public void pushMatrix() {
@@ -1462,9 +1472,11 @@ public class MapContainer extends Observable implements Observer,
 
 		if (j != scrollbar.getValue() || k != getFirstVisibleLabel()) {
 			setChanged();
-			LogBuffer.println("Matrix scroll: [" + j + " to " + scrollbar.getValue() + "] Label Port moved: [" + k + " to " + getFirstVisibleLabel() + "]");
+			if(debug)
+				LogBuffer.println("Matrix scroll: [" + j + " to " + scrollbar.getValue() + "] Label Port moved: [" + k + " to " + getFirstVisibleLabel() + "]");
 		} else {
-			LogBuffer.println("Neither scrollbar changed. Matrix: [" + j + "] Label Port: [" + k + "]");
+			if(debug)
+				LogBuffer.println("Neither scrollbar changed. Matrix: [" + j + "] Label Port: [" + k + "]");
 		}
 
 		notifyObservers();
@@ -1718,12 +1730,6 @@ public class MapContainer extends Observable implements Observer,
 	public void setFirstVisible(final int i) {
 		if (i >= 0) {
 			firstVisible = i;
-
-			//If the first visible square has gone above the first
-			//visible label
-			if(i > getFirstVisibleLabel()) {
-				setFirstVisibleLabel(i);
-			}
 		}
 	}
 
@@ -1855,7 +1861,6 @@ public class MapContainer extends Observable implements Observer,
 			firstVisibleLabel = (getMaxIndex() - getNumVisibleLabels() + 1);
 		else
 			firstVisibleLabel = p;
-		pushMatrix();
 	}
 
 	private void switchMap(final IntegerMap integerMap) {
@@ -1908,5 +1913,56 @@ public class MapContainer extends Observable implements Observer,
 		}
 
 		return hasAttribute;
+	}
+
+	/**
+	 * @param overColLabels the overColLabels to set
+	 */
+	public void setOverColLabels(boolean overColLabels) {
+		this.overColLabels = overColLabels;
+		setChanged();
+		notifyObservers();
+	}
+
+	/**
+	 * @param overRowLabels the overRowLabels to set
+	 */
+	public void setOverRowLabels(boolean overRowLabels) {
+		this.overRowLabels = overRowLabels;
+		setChanged();
+		notifyObservers();
+	}
+
+	/**
+	 * @param overInteractiveMatrix the overInteractiveMatrix to set
+	 */
+	public void setOverInteractiveMatrix(boolean overInteractiveMatrix) {
+		this.overInteractiveMatrix = overInteractiveMatrix;
+		setChanged();
+		notifyObservers();
+		if(debug)
+			LogBuffer.println("After overIMV: overCol: [" + (overColLabels ? "true" : "false") + "] overRow: [" + (overRowLabels ? "true" : "false") + "] overIMV: [" + (overInteractiveMatrix ? "true" : "false") + "]");
+	}
+
+	public boolean overALabelPortLinkedView() {
+		if(debug)
+			LogBuffer.println("Upon graphics Update: overCol: [" + (overColLabels ? "true" : "false") + "] overRow: [" + (overRowLabels ? "true" : "false") + "] overIMV: [" + (overInteractiveMatrix ? "true" : "false") + "]");
+		return(overColLabels || overRowLabels || overInteractiveMatrix);
+	}
+
+	/**
+	 * @return the hoverIndex
+	 */
+	public int getHoverIndex() {
+		return hoverIndex;
+	}
+
+	/**
+	 * @param hoverIndex the hoverIndex to set
+	 */
+	public void setHoverIndex(int hoverIndex) {
+		this.hoverIndex = hoverIndex;
+		setChanged();
+		notifyObservers();
 	}
 }

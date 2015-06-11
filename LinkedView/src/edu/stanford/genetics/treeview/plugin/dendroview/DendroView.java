@@ -384,9 +384,9 @@ public class DendroView implements Observer, DendroPanel {
 				+ "insets 0, debug"));
 
 		columnTreePanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
-		columnTreePanel.setLayout(new MigLayout("gap 0!, insets 5 0 3 0"));
+		columnTreePanel.setLayout(new MigLayout("gap 0!, insets 5 0 0 0"));
 		if(debug) columnTreePanel.setLayout(new MigLayout("gap 0!, "
-				+ "insets 5 0 3 0, debug"));
+				+ "insets 5 0 0 0, debug"));
 		emptyPanel3     = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
 		emptyPanel3.setLayout(new MigLayout("gap 0!, insets 0"));
 		if(debug) emptyPanel3.setLayout(new MigLayout("gap 0!, insets 0, "
@@ -400,9 +400,9 @@ public class DendroView implements Observer, DendroPanel {
 		if(debug) rowNavPanel.setLayout(new MigLayout("gap 0!, insets 0, "
 				+ "debug"));
 		rowTreePanel    = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
-		rowTreePanel.setLayout(new MigLayout("gap 0!, insets 0 5 0 3"));
+		rowTreePanel.setLayout(new MigLayout("gap 0!, insets 0 5 0 0"));
 		if(debug) rowTreePanel.setLayout(new MigLayout("gap 0!, "
-				+ "insets 0 5 0 3, debug"));
+				+ "insets 0 5 0 0, debug"));
 		emptyPanel4     = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
 		emptyPanel4.setLayout(new MigLayout("gap 0!, insets 0"));
 		if(debug) emptyPanel4.setLayout(new MigLayout("gap 0!, insets 0, "
@@ -489,11 +489,11 @@ public class DendroView implements Observer, DendroPanel {
 				+ "w 200px");
 
 		rowLabelPanel.add(rowLabelView.getComponent(), "gapy 0!, gapleft 0!, "
-				+ "gapright 3!, w 100%, h 100%, growy, wrap");
+				+ "gapright 0!, w 100%, h 100%, growy, wrap");
 		rowLabelPanel.add(rowLabelScroll, "gapy 0!, gapx 0!, w 100%, h 15px!, "
 				+ "aligny center");
 		colLabelPanel.add(colLabelView.getComponent(), "gaptop 0!, "
-				+ "gapbottom 3!, gapx 0!, w 100%, h 100%, growx");
+				+ "gapbottom 0!, gapx 0!, w 100%, h 100%, growx");
 		colLabelPanel.add(colLabelScroll, "gapy 0!, gapx 0!, h 100%, w 15px!");
 
 		zoomXRightPanel.add(scaleRemoveRightX,"gapy 0!, gapx 0!");
