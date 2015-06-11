@@ -534,11 +534,11 @@ public class DendroView implements Observer, DendroPanel {
 		
 		
 		/* Adding elements to the main JPanel */
-		dendroPane.add(globalOverviewPanel, "gapy 0!, gapx 0!, w 200px!, "
+		dendroPane.add(globalOverviewPanel, "gapleft 1!, gaptop 1!, gapbottom 0!, gapright 0!, w 200px!, "
 				+ "h 200px!");
 
 		/* Column tree view */
-		dendroPane.add(colDataPane, "gaptop 0!, gapbottom 0!, gapx 0!, "
+		dendroPane.add(colDataPane, "gaptop 2!, gapbottom 0!, gapx 0!, "
 				+ "w 100%, h 200px!, growx");
 
 		/* Navigation panel */
@@ -546,11 +546,11 @@ public class DendroView implements Observer, DendroPanel {
 				+ "wrap");
 
 		/* Row tree view */
-		dendroPane.add(rowDataPane, "gapleft 0!, gapright 0!, gapy 0!, "
+		dendroPane.add(rowDataPane, "gapleft 2!, gapright 0!, gaptop 0!, gapbottom 2!, "
 				+ "w 200px, h 100%, growy, pushy");
 		
 		/* Matrix view */
-		dendroPane.add(interactiveMatrixPanel, "gapy 0!, gapx 0!, w 100%, "
+		dendroPane.add(interactiveMatrixPanel, "gaptop 0!, gapbottom 2!, gapx 0!, w 100%, "
 				+ "h 100%, grow, push");
 
 		dendroPane.revalidate();
