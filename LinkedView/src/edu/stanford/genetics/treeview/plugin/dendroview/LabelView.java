@@ -741,7 +741,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 							secondaryScrollEndGap + matrixBarThickness,
 							start * (curFontSize + SQUEEZE),
 							labelBarThickness,
-							(end + 1) * (curFontSize + SQUEEZE) - start * (curFontSize + SQUEEZE) + 1);
+							(end + 1) * (curFontSize + SQUEEZE) - start * (curFontSize + SQUEEZE));
 					//Draw the matrix breadth bar
 					g.fillRect(
 							secondaryScrollEndGap,
