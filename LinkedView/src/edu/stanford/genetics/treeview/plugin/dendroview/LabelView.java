@@ -723,32 +723,32 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 							(end + 1) * (curFontSize + SQUEEZE));
 					//Switch to the label port color
 					g2d.setColor(labelPortColor);
-					//Draw the first border line
-					g2d.drawLine(
-							secondaryScrollEndGap + indicatorThickness -
-								(labelIndent + labelIndicatorProtrusion),
-							start * (curFontSize + SQUEEZE),
-							indicatorThickness + maxStrLen,
-							start * (curFontSize + SQUEEZE));
-					//Draw the second border line
-					g2d.drawLine(
-							secondaryScrollEndGap + indicatorThickness -
-								(labelIndent + labelIndicatorProtrusion),
-							(end + 1) * (curFontSize + SQUEEZE) - 1,
-							indicatorThickness + maxStrLen,
-							(end + 1) * (curFontSize + SQUEEZE) - 1);
-					//Draw the label breadth bar
-					g.fillRect(
-							secondaryScrollEndGap + matrixBarThickness,
-							start * (curFontSize + SQUEEZE),
-							labelBarThickness,
-							(end + 1) * (curFontSize + SQUEEZE) - start * (curFontSize + SQUEEZE));
-					//Draw the matrix breadth bar
-					g.fillRect(
-							secondaryScrollEndGap,
-							start * (curFontSize + SQUEEZE) + map.getPixel(start),
-							matrixBarThickness,
-							map.getPixel(end + 1) - map.getPixel(start) + 1);
+//					//Draw the first border line
+//					g2d.drawLine(
+//							secondaryScrollEndGap + indicatorThickness -
+//								(labelIndent + labelIndicatorProtrusion),
+//							start * (curFontSize + SQUEEZE),
+//							indicatorThickness + maxStrLen,
+//							start * (curFontSize + SQUEEZE));
+//					//Draw the second border line
+//					g2d.drawLine(
+//							secondaryScrollEndGap + indicatorThickness -
+//								(labelIndent + labelIndicatorProtrusion),
+//							(end + 1) * (curFontSize + SQUEEZE) - 1,
+//							indicatorThickness + maxStrLen,
+//							(end + 1) * (curFontSize + SQUEEZE) - 1);
+//					//Draw the label breadth bar
+//					g.fillRect(
+//							secondaryScrollEndGap + matrixBarThickness,
+//							start * (curFontSize + SQUEEZE),
+//							labelBarThickness,
+//							(end + 1) * (curFontSize + SQUEEZE) - start * (curFontSize + SQUEEZE));
+//					//Draw the matrix breadth bar
+//					g.fillRect(
+//							secondaryScrollEndGap,
+//							start * (curFontSize + SQUEEZE) + map.getPixel(start),
+//							matrixBarThickness,
+//							map.getPixel(end + 1) - map.getPixel(start) + 1);
 					//If there is a data index that is hovered over
 					int activeHoverDataIndex =
 							(hoverIndex == -1 ? matrixHoverIndex : hoverIndex);
@@ -757,7 +757,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 						g2d.setColor(Color.red);
 						//Draw the hover matrix position indicator
 						int matrixPixel = start * (curFontSize + SQUEEZE) + map.getPixel(activeHoverDataIndex);
-						LogBuffer.println("Hover matrix start: [" + start + "] activeHoverIndex: [" + activeHoverDataIndex + "]");
+						LogBuffer.println("Hover matrix start: [" + start + "] startpixel: [" + start * (curFontSize + SQUEEZE) + "] activeHoverIndex: [" + activeHoverDataIndex + "] data cell pixel [" + map.getPixel(activeHoverDataIndex) + "] matrixPixel: [" + matrixPixel + "]");
 						int labelPixel = activeHoverDataIndex * (curFontSize + SQUEEZE);
 						boolean outOfBounds = activeHoverDataIndex > end || activeHoverDataIndex < start;
 						boolean drawAMatrixPoint = ((int) Math.round(map.getScale()) > 2 && !outOfBounds);
@@ -870,32 +870,32 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 							(end + 1) * (curFontSize + SQUEEZE));
 					//Switch to the label port color
 					g2d.setColor(labelPortColor);
-					//Draw the first border line
-					g2d.drawLine(
-							secondaryScrollEndPos - indicatorThickness +
-								(labelIndent + labelIndicatorProtrusion),
-							start * (curFontSize + SQUEEZE),
-							0,
-							start * (curFontSize + SQUEEZE));
-					//Draw the second border line
-					g2d.drawLine(
-							secondaryScrollEndPos - indicatorThickness +
-								(labelIndent + labelIndicatorProtrusion),
-							(end + 1) * (curFontSize + SQUEEZE) - 1,
-							0,
-							(end + 1) * (curFontSize + SQUEEZE) - 1);
-					//Draw the label breadth bar
-					g.fillRect(
-							secondaryScrollEndPos - matrixBarThickness - labelBarThickness,
-							start * (curFontSize + SQUEEZE),
-							labelBarThickness,
-							(end + 1) * (curFontSize + SQUEEZE) - start * (curFontSize + SQUEEZE));
-					//Draw the matrix breadth bar
-					g.fillRect(
-							secondaryScrollEndPos - matrixBarThickness,
-							start * (curFontSize + SQUEEZE) + map.getPixel(start),
-							matrixBarThickness,
-							map.getPixel(end + 1) - map.getPixel(start) + 1);
+//					//Draw the first border line
+//					g2d.drawLine(
+//							secondaryScrollEndPos - indicatorThickness +
+//								(labelIndent + labelIndicatorProtrusion),
+//							start * (curFontSize + SQUEEZE),
+//							0,
+//							start * (curFontSize + SQUEEZE));
+//					//Draw the second border line
+//					g2d.drawLine(
+//							secondaryScrollEndPos - indicatorThickness +
+//								(labelIndent + labelIndicatorProtrusion),
+//							(end + 1) * (curFontSize + SQUEEZE) - 1,
+//							0,
+//							(end + 1) * (curFontSize + SQUEEZE) - 1);
+//					//Draw the label breadth bar
+//					g.fillRect(
+//							secondaryScrollEndPos - matrixBarThickness - labelBarThickness,
+//							start * (curFontSize + SQUEEZE),
+//							labelBarThickness,
+//							(end + 1) * (curFontSize + SQUEEZE) - start * (curFontSize + SQUEEZE));
+//					//Draw the matrix breadth bar
+//					g.fillRect(
+//							secondaryScrollEndPos - matrixBarThickness,
+//							start * (curFontSize + SQUEEZE) + map.getPixel(start),
+//							matrixBarThickness,
+//							map.getPixel(end + 1) - map.getPixel(start) + 1);
 					//If there is a data index that is hovered over
 					int activeHoverDataIndex =
 							(hoverIndex == -1 ? matrixHoverIndex : hoverIndex);
@@ -961,7 +961,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 			int labelStackSize = (map.getMaxIndex() + 1) * (curFontSize + SQUEEZE);
 			//Add a bit to the end of the label stack size so that when you're scrolled all the way to the right/bottom, things are lined up on the left/top
 			//Basically, add the height/width of the pane modulus the font height
-			labelStackSize += (isGeneAxis ? scrollPane.getViewport().getSize().width : scrollPane.getViewport().getSize().height) % (curFontSize + SQUEEZE);
+			labelStackSize += (isGeneAxis ? scrollPane.getViewport().getSize().height : scrollPane.getViewport().getSize().width) % (curFontSize + SQUEEZE);
 			int matrixSize = ((map.getPixel(map.getMaxIndex() + 1) - 1) - map.getPixel(0));
 			int fullPaneSize = 0;
 			if(!(drawLabelPort)) {
@@ -979,7 +979,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 				setPreferredSize(new Dimension(maxStrLen + (drawLabelPort ? indicatorThickness : 0),
 						fullPaneSize));
 				//if(debug)
-					LogBuffer.println("Resizing row labels panel to [" + (maxStrLen + (drawLabelPort ? indicatorThickness : 0)) + "x" + scrollPane.getViewport().getSize().height + "].");
+					LogBuffer.println("Resizing row labels panel to [" + (maxStrLen + (drawLabelPort ? indicatorThickness : 0)) + "x" + fullPaneSize + "].");
 			} else {
 				//+ 15 allows for the appearance & disappearance of the main
 				//scrollbar, which I believe is only for Macs since macs draw
@@ -989,7 +989,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 				setPreferredSize(new Dimension(fullPaneSize,
 						maxStrLen + (drawLabelPort ? indicatorThickness : 0)));
 				//if(debug)
-					LogBuffer.println("Resizing col labels panel to [" + scrollPane.getViewport().getSize().width + "x" + (maxStrLen + (drawLabelPort ? indicatorThickness : 0)) + "].");
+					LogBuffer.println("Resizing col labels panel to [" + fullPaneSize + "x" + (maxStrLen + (drawLabelPort ? indicatorThickness : 0)) + "].");
 			}
 
 			/* Scroll to the position that matches the matrix */
