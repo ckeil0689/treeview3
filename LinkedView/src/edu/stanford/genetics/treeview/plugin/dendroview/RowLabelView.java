@@ -281,7 +281,7 @@ public class RowLabelView extends LabelView implements MouseWheelListener/*, Adj
 //	}
 
 	//Timer to let the label pane linger a bit
-	final private int delay = 1000;
+	final private int delay = 0;
 	private javax.swing.Timer turnOffLabelPortTimer;
 	ActionListener turnOffLabelPort = new ActionListener() {
 		
@@ -315,12 +315,19 @@ public class RowLabelView extends LabelView implements MouseWheelListener/*, Adj
 	public void mouseExited(final MouseEvent e) {
 		//Turn off the "over a label port view" boolean after a bit
 		if(this.turnOffLabelPortTimer == null) {
-			/* Start waiting for delay millis to elapse and then
-			 * call actionPerformed of the ActionListener
-			 * "turnOffLabelPort". */
-			this.turnOffLabelPortTimer = new Timer(this.delay,
-					turnOffLabelPort);
-			this.turnOffLabelPortTimer.start();
+			if(delay == 0) {
+				map.setOverColLabels(false);
+				map.notifyObservers();
+				revalidate();
+				repaint();
+			} else {
+				/* Start waiting for delay millis to elapse and then
+				 * call actionPerformed of the ActionListener
+				 * "turnOffLabelPort". */
+				this.turnOffLabelPortTimer = new Timer(this.delay,
+						turnOffLabelPort);
+				this.turnOffLabelPortTimer.start();
+			}
 		}
 
 		//setOverRowLabels(false);

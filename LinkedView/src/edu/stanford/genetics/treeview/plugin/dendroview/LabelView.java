@@ -1510,11 +1510,11 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
 	public int getPrimaryHoverIndex(final MouseEvent e) {
 		int hoverIndex;
-		if(doDrawLabelPort()) {
-			hoverIndex = (int) Math.floor(getPrimaryHoverPosition(e) / (size + SQUEEZE));
-		} else {
+//		if(doDrawLabelPort()) {
+//			hoverIndex = (int) Math.floor(getPrimaryHoverPosition(e) / (size + SQUEEZE));
+//		} else {
 			hoverIndex = map.getIndex(getPrimaryHoverPosition(e));
-		}
+//		}
 		return(hoverIndex);
 	}
 
