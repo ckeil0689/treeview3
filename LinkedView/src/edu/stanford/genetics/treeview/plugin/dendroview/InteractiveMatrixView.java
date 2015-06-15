@@ -585,6 +585,10 @@ MouseWheelListener {
 			overy = ymap.getIndex(e.getY());
 			xmap.setHoverIndex(overx);
 			ymap.setHoverIndex(overy);
+			
+			//Make the label port follow the mouse
+			xmap.scrollLabelPortToIndex(overx);
+			ymap.scrollLabelPortToIndex(overy);
 
 			/* Timed repaint to avoid constant unnecessary repainting. */
 

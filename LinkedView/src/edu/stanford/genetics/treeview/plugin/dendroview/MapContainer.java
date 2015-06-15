@@ -1394,6 +1394,31 @@ public class MapContainer extends Observable implements Observer,
 		}
 	}
 
+	/*
+	 * This moves the label port as close as it can in the current scroll
+	 * position - this will not scroll the data matrix
+	 * param: data index
+	 */
+	public void scrollLabelPortToIndex(final int i) {
+
+		final int k = getFirstVisibleLabel();
+
+		// Keep track of the first visible index
+		// This used to be set using scrollbar.getVisibleAmount, but that can
+		// change implicitly when the window is resized.
+		setFirstVisible(i - getNumVisible() / 2);
+
+		setFirstVisibleLabel(i - getNumVisibleLabels() / 2);
+
+		pullLabels();
+
+		//Image needs to be updated if either scroll position changes (because a
+		//scroll of the labels changes the blue box)
+		if (k != getFirstVisibleLabel()) {
+			setChanged();
+		}
+	}
+
 	public void pullLabels() {
 		//Pull the labels when the visible portion surpasses the visible
 		//labels
