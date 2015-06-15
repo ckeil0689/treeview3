@@ -101,15 +101,15 @@ MouseWheelListener {
 
 	GlobalMatrixView globalMatrixView = null;
 
-	/**
-	 * Rectangle to track the labels currently visible in the label pane
-	 */
-	private Rectangle labelPortRect = new Rectangle();
-
-	/**
-	 * Circle to be used as indicator for the label panes
-	 */
-	private Ellipse2D.Double labelPortCircle = null;
+//	/**
+//	 * Rectangle to track the labels currently visible in the label pane
+//	 */
+//	private Rectangle labelPortRect = new Rectangle();
+//
+//	/**
+//	 * Circle to be used as indicator for the label panes
+//	 */
+//	private Ellipse2D.Double labelPortCircle = null;
 
 	/**
 	 * GlobalView also likes to have an globalxmap and globalymap (both of type
@@ -310,29 +310,29 @@ MouseWheelListener {
 
 		Graphics2D g2 = (Graphics2D) g;
 		
-		if (labelPortRect != null) {
-
-			/* draw label port rectangles in blue */
-			//g2.setColor(Color.blue);
-			g2.setColor(new Color(30,144,251));
-
-			g2.drawRect(labelPortRect.x, labelPortRect.y,
-						labelPortRect.width, labelPortRect.height);
-
-			//LogBuffer.println("Preparing to draw labelPort ellipses.");
-			/*
-			 * draw blue label port circle if rectangle small enough.
-			 */
-			if (labelPortCircle != null) {
-				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-						RenderingHints.VALUE_ANTIALIAS_ON);
-				//g2.setColor(Color.blue);
-				g2.setColor(new Color(30,144,251));
-				g2.setStroke(new BasicStroke(3));
-				//LogBuffer.println("Drawing labelPort ellipse.");
-				g2.draw(labelPortCircle);
-			}
-		}
+//		if (labelPortRect != null) {
+//
+//			/* draw label port rectangles in blue */
+//			//g2.setColor(Color.blue);
+//			g2.setColor(new Color(30,144,251));
+//
+//			g2.drawRect(labelPortRect.x, labelPortRect.y,
+//						labelPortRect.width, labelPortRect.height);
+//
+//			//LogBuffer.println("Preparing to draw labelPort ellipses.");
+//			/*
+//			 * draw blue label port circle if rectangle small enough.
+//			 */
+//			if (labelPortCircle != null) {
+//				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+//						RenderingHints.VALUE_ANTIALIAS_ON);
+//				//g2.setColor(Color.blue);
+//				g2.setColor(new Color(30,144,251));
+//				g2.setStroke(new BasicStroke(3));
+//				//LogBuffer.println("Drawing labelPort ellipse.");
+//				g2.draw(labelPortCircle);
+//			}
+//		}
 
 		if (selectionRectList != null) {
 			//Reinitialize the graphics object
@@ -363,15 +363,15 @@ MouseWheelListener {
 		}
 	}
 
-	public boolean isLabelPortVisible() {
-		return(inLabelPortMode() &&
-			   (xmap.overALabelPortLinkedView() ||
-			    ymap.overALabelPortLinkedView()) &&
-			   xmap.getFirstVisible() != xmap.getFirstVisibleLabel() ||
-			   xmap.getNumVisible()   != xmap.getNumVisibleLabels() ||
-			   ymap.getFirstVisible() != ymap.getFirstVisibleLabel() ||
-			   ymap.getNumVisible()   != ymap.getNumVisibleLabels());
-	}
+//	public boolean isLabelPortVisible() {
+//		return(inLabelPortMode() &&
+//			   (xmap.overALabelPortLinkedView() ||
+//			    ymap.overALabelPortLinkedView()) &&
+//			   xmap.getFirstVisible() != xmap.getFirstVisibleLabel() ||
+//			   xmap.getNumVisible()   != xmap.getNumVisibleLabels() ||
+//			   ymap.getFirstVisible() != ymap.getFirstVisibleLabel() ||
+//			   ymap.getNumVisible()   != ymap.getNumVisibleLabels());
+//	}
 
 	/**
 	 * Checks the selection of genes and arrays and calculates the appropriate
@@ -380,25 +380,25 @@ MouseWheelListener {
 	@Override
 	protected void recalculateOverlay() {
 
-		if(!inLabelPortMode() || !isLabelPortVisible() ||
-				(!xmap.overALabelPortLinkedView() && !ymap.overALabelPortLinkedView())) {
-			labelPortRect   = null;
-			labelPortCircle = null;
-		} else {
-
-			labelPortRect =
-					new Rectangle(
-							xmap.getPixel(xmap.getFirstVisibleLabel()),
-							ymap.getPixel(ymap.getFirstVisibleLabel()),
-							(xmap.getPixel(xmap.getFirstVisibleLabel() +
-							 xmap.getNumVisibleLabels()) -
-							 xmap.getPixel(xmap.getFirstVisibleLabel())),
-							(ymap.getPixel(ymap.getFirstVisibleLabel() +
-							 ymap.getNumVisibleLabels()) -
-							 ymap.getPixel(ymap.getFirstVisibleLabel())));
-
-			setLabelPortCircleBounds();
-		}
+//		if(!inLabelPortMode() || !isLabelPortVisible() ||
+//				(!xmap.overALabelPortLinkedView() && !ymap.overALabelPortLinkedView())) {
+//			labelPortRect   = null;
+//			labelPortCircle = null;
+//		} else {
+//
+//			labelPortRect =
+//					new Rectangle(
+//							xmap.getPixel(xmap.getFirstVisibleLabel()),
+//							ymap.getPixel(ymap.getFirstVisibleLabel()),
+//							(xmap.getPixel(xmap.getFirstVisibleLabel() +
+//							 xmap.getNumVisibleLabels()) -
+//							 xmap.getPixel(xmap.getFirstVisibleLabel())),
+//							(ymap.getPixel(ymap.getFirstVisibleLabel() +
+//							 ymap.getNumVisibleLabels()) -
+//							 ymap.getPixel(ymap.getFirstVisibleLabel())));
+//
+//			setLabelPortCircleBounds();
+//		}
 
 		if((geneSelection == null) || (arraySelection == null)) {
 			selectionRectList   = null;
@@ -586,9 +586,9 @@ MouseWheelListener {
 			xmap.setHoverIndex(overx);
 			ymap.setHoverIndex(overy);
 			
-			//Make the label port follow the mouse
-			xmap.scrollLabelPortToIndex(overx);
-			ymap.scrollLabelPortToIndex(overy);
+//			//Make the label port follow the mouse
+//			xmap.scrollLabelPortToIndex(overx);
+//			ymap.scrollLabelPortToIndex(overy);
 
 			/* Timed repaint to avoid constant unnecessary repainting. */
 
@@ -706,7 +706,7 @@ MouseWheelListener {
 		}
 
 		//Timer to let the label pane linger a bit
-		final private int delay = 1000;
+		final private int delay = 0;
 		private javax.swing.Timer turnOffLabelPortTimer;
 		ActionListener turnOffLabelPort = new ActionListener() {
 			
@@ -755,9 +755,20 @@ MouseWheelListener {
 				/* Start waiting for delay millis to elapse and then
 				 * call actionPerformed of the ActionListener
 				 * "turnOffLabelPort". */
-				this.turnOffLabelPortTimer = new Timer(this.delay,
-						turnOffLabelPort);
-				this.turnOffLabelPortTimer.start();
+				if(delay == 0) {
+					if(debug)
+						LogBuffer.println("mouseEvent in IMV - ACTED ON");
+					xmap.setOverInteractiveMatrix(false);
+					ymap.setOverInteractiveMatrix(false);
+					xmap.notifyObservers();
+					ymap.notifyObservers();
+					revalidate();
+					repaint();
+				} else {
+					this.turnOffLabelPortTimer = new Timer(this.delay,
+							turnOffLabelPort);
+					this.turnOffLabelPortTimer.start();
+				}
 			}
 
 			//setOverInteractiveMatrix(false);
@@ -1164,11 +1175,11 @@ MouseWheelListener {
 		}
 		if(xmap.getFirstVisible() != selecXStartIndex) {
 			//LogBuffer.println("Adjusting final X scroll");
-			xmap.scrollToFirstIndex(selecXStartIndex,true);
+			xmap.scrollToFirstIndex(selecXStartIndex/*,true*/);
 		}
 		if(ymap.getFirstVisible() != selecYStartIndex) {
 			//LogBuffer.println("Adjusting final Y scroll");
-			ymap.scrollToFirstIndex(selecYStartIndex,true);
+			ymap.scrollToFirstIndex(selecYStartIndex/*,true*/);
 		}
 
 		//We will update the aspect ratio just in case it didn't happen
@@ -1590,8 +1601,8 @@ MouseWheelListener {
 		//If zooming has finished, scroll all the way
 		if(xmap.getNumVisible() == numXSelectedIndexes &&
 				ymap.getNumVisible() == numYSelectedIndexes) {
-			xmap.scrollToFirstIndex(selecXStartIndex,true);
-			ymap.scrollToFirstIndex(selecYStartIndex,true);
+			xmap.scrollToFirstIndex(selecXStartIndex/*,true*/);
+			ymap.scrollToFirstIndex(selecYStartIndex/*,true*/);
 		}
 		else {
 			//LogBuffer.println("Correcting the scroll because (xPxPos <= 0 " +
@@ -2036,45 +2047,45 @@ MouseWheelListener {
 		
 	}
 
-	private int getLabelPortLeftCoord() {
-		return(xmap.getPixel(xmap.getFirstVisibleLabel()));
-	}
-
-	private int getLabelPortTopCoord() {
-		return(xmap.getPixel(xmap.getFirstVisibleLabel()));
-	}
-
-	private int getLabelPortWidth() {
-		return(xmap.getPixel(xmap.getFirstVisibleLabel() +
-			   xmap.getNumVisibleLabels()) -
-			   xmap.getPixel(xmap.getFirstVisibleLabel()));
-	}
-
-	private int getLabelPortHeight() {
-		return(ymap.getPixel(ymap.getFirstVisibleLabel() +
-			   ymap.getNumVisibleLabels()) -
-			   ymap.getPixel(ymap.getFirstVisibleLabel()));
-	}
-
-	/**
-	 * Draws a circle if the labelPortRect is too small to be easily seen.
-	 */
-	private void setLabelPortCircleBounds() {
-
-		if (!inLabelPortMode() || !isLabelPortVisible() ||
-			getLabelPortWidth() >= 20 || getLabelPortHeight() >= 20) {
-			labelPortCircle = null;
-			return;
-		} 
-
-		// coords for top left of circle
-		int x = getLabelPortLeftCoord() +
-				(int) Math.round((double) getLabelPortWidth() / 2.0) - 20;
-		int y = getLabelPortTopCoord() +
-				(int) Math.round((double) getLabelPortHeight() / 2.0) - 20;
-
-		labelPortCircle = new Ellipse2D.Double(x, y, 40, 40);
-	}
+//	private int getLabelPortLeftCoord() {
+//		return(xmap.getPixel(xmap.getFirstVisibleLabel()));
+//	}
+//
+//	private int getLabelPortTopCoord() {
+//		return(xmap.getPixel(xmap.getFirstVisibleLabel()));
+//	}
+//
+//	private int getLabelPortWidth() {
+//		return(xmap.getPixel(xmap.getFirstVisibleLabel() +
+//			   xmap.getNumVisibleLabels()) -
+//			   xmap.getPixel(xmap.getFirstVisibleLabel()));
+//	}
+//
+//	private int getLabelPortHeight() {
+//		return(ymap.getPixel(ymap.getFirstVisibleLabel() +
+//			   ymap.getNumVisibleLabels()) -
+//			   ymap.getPixel(ymap.getFirstVisibleLabel()));
+//	}
+//
+//	/**
+//	 * Draws a circle if the labelPortRect is too small to be easily seen.
+//	 */
+//	private void setLabelPortCircleBounds() {
+//
+//		if (!inLabelPortMode() || !isLabelPortVisible() ||
+//			getLabelPortWidth() >= 20 || getLabelPortHeight() >= 20) {
+//			labelPortCircle = null;
+//			return;
+//		} 
+//
+//		// coords for top left of circle
+//		int x = getLabelPortLeftCoord() +
+//				(int) Math.round((double) getLabelPortWidth() / 2.0) - 20;
+//		int y = getLabelPortTopCoord() +
+//				(int) Math.round((double) getLabelPortHeight() / 2.0) - 20;
+//
+//		labelPortCircle = new Ellipse2D.Double(x, y, 40, 40);
+//	}
 
 	/**
 	 * Selecting a rectangular area in GlobalView

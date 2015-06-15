@@ -597,9 +597,9 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 				//Then scroll
 				getInteractiveXMap().scrollToFirstIndex(
-						colSelection.getMinIndex(),true);
+						colSelection.getMinIndex()/*,true*/);
 				getInteractiveYMap().scrollToFirstIndex(
-						rowSelection.getMinIndex(),true);
+						rowSelection.getMinIndex()/*,true*/);
 			}
 			//zoomSelection();
 		}
@@ -1074,9 +1074,9 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 					//Then scroll
 					getInteractiveXMap().scrollToFirstIndex(
-							colSelection.getMinIndex(),true);
+							colSelection.getMinIndex()/*,true*/);
 					getInteractiveYMap().scrollToFirstIndex(
-							rowSelection.getMinIndex(),true);
+							rowSelection.getMinIndex()/*,true*/);
 
 					//zoomSelection();
 					//centerSelection();
