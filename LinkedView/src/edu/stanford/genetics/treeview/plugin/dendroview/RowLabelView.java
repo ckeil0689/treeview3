@@ -316,7 +316,7 @@ public class RowLabelView extends LabelView implements MouseWheelListener/*, Adj
 		//Turn off the "over a label port view" boolean after a bit
 		if(this.turnOffLabelPortTimer == null) {
 			if(delay == 0) {
-				map.setOverColLabels(false);
+				map.setOverRowLabels(false);
 				map.notifyObservers();
 				revalidate();
 				repaint();

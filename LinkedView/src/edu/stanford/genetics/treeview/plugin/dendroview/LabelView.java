@@ -7,11 +7,16 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 import java.util.Observable;
+
+import javax.swing.Timer;
+
 import java.util.prefs.Preferences;
 
 import javax.swing.JScrollBar;
@@ -490,6 +495,41 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		return "LabelView";
 	}
 
+	//This is an attempt to get the hovering of the mouse over the matrix to get
+	//the label panes to update more quickly and regularly, as the
+	//notifyObservers method called from MapContainer was resulting in sluggish
+	//updates
+	private int repaintInterval = 50;  // update every 50 milliseconds
+	private int lastHoverIndex = -1;
+	private Timer repaintTimer =
+			new Timer(repaintInterval, new ActionListener() {
+		/**
+		 * The timer "ticks" by calling this method every _timeslice milliseconds
+		 */
+		public void actionPerformed (ActionEvent e) {
+			repaint();
+			//paintImmediately(0,0,getWidth(),getHeight());
+		}
+	});
+
+	//Timer to wait a bit before stopping the slice _timer for painting
+	final private int delay = 1000;
+	private javax.swing.Timer turnOffRepaintTimer;
+	ActionListener turnOffRepaintListener = new ActionListener() {
+		
+		@Override
+		public void actionPerformed(ActionEvent evt) {
+			if (evt.getSource() == turnOffRepaintTimer) {
+				/* Stop timer */
+				turnOffRepaintTimer.stop();
+				turnOffRepaintTimer = null;
+			
+				repaintTimer.stop();
+				map.setLabelAnimeRunning(false);
+			}
+		}
+	};
+
 	/* inherit description */
 	@Override
 	public void updateBuffer(final Graphics g) {
@@ -505,6 +545,63 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
 	public void updateBuffer(final Graphics g, final Dimension offscreenSize) {
 
+		/* Manage future repaints with a pair of timers, because when
+		 * MapContainer calls notifyObservers, repaints are choppy and
+		 * sluggish...
+		 * 
+		 * NOTE: Only call notifyObservers from MapContainer when
+		 * map.labelAnimeRunning is false - otherwise, the repaints will be
+		 * choppy & slow.  The timers below will handle the smooth updates from
+		 * here on out
+		 */
+
+		//If the mouse is not hovering over the IMV, stop both timers, set the
+		//last hover index, and tell mapcontainer that the animation has stopped
+		if(map.getHoverIndex() == -1) {
+			repaintTimer.stop();
+			lastHoverIndex = -1;
+			map.setLabelAnimeRunning(false);
+			//Disable the turnOffRepaintTimer if it is running, because we've
+			//already stopped repaints
+			if(turnOffRepaintTimer != null) {
+				turnOffRepaintTimer.stop();
+				turnOffRepaintTimer = null;
+			}
+		}
+		//Else, assume the mouse is hovering, and if the animation is not
+		//running, start it up
+		else if(!map.isLabelAnimeRunning()) {
+			repaintTimer.start();
+			map.setLabelAnimeRunning(true);
+			lastHoverIndex = map.getHoverIndex();
+			//Disable any turnOffRepaintTimer that might have been left over
+			if(turnOffRepaintTimer != null) {
+				turnOffRepaintTimer.stop();
+				turnOffRepaintTimer = null;
+			}
+		}
+		//Else if the mouse hasn't moved, start the second timer to turn off the
+		//first after 1 second (this mitigates delays upon mouse motion after a
+		//brief period of no motion)
+		else if(map.getHoverIndex() == lastHoverIndex) {
+			if(turnOffRepaintTimer == null) {
+				turnOffRepaintTimer = new Timer(this.delay,
+												turnOffRepaintListener);
+				turnOffRepaintTimer.start();
+			}
+		}
+		//Else, disable the turnOffRepaintTimer and update the hover index
+		else {
+			//Disable the turnOffRepaintTimer because we have detected continued
+			//mouse motion
+			if(turnOffRepaintTimer != null) {
+				turnOffRepaintTimer.stop();
+				turnOffRepaintTimer = null;
+			}
+			lastHoverIndex = map.getHoverIndex();
+			map.setLabelAnimeRunning(true);
+		}
+		
 		if(debug)
 			LogBuffer.println("Updating the label pane graphics");
 		/** TODO: Make sure that the number of visible labels is up to date */

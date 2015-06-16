@@ -235,6 +235,11 @@ MouseWheelListener {
 	@Override
 	protected void updateBuffer(final Graphics g) {
 
+		if(xmap.hoverChanged() || ymap.hoverChanged()) {
+			xmap.unsetHoverChanged();
+			ymap.unsetHoverChanged();
+			return;
+		}
 		Graphics2D g2d = (Graphics2D) g;
 		
 		revalidateScreen();
@@ -266,6 +271,11 @@ MouseWheelListener {
 	@Override
 	protected void updatePixels() {
 
+		if(xmap.hoverChanged() || ymap.hoverChanged()) {
+			xmap.unsetHoverChanged();
+			ymap.unsetHoverChanged();
+			return;
+		}
 		if (!offscreenValid) {
 			
 			revalidateScreen();
@@ -308,6 +318,11 @@ MouseWheelListener {
 	@Override
 	public synchronized void paintComposite(final Graphics g) {
 
+		if(xmap.hoverChanged() || ymap.hoverChanged()) {
+			xmap.unsetHoverChanged();
+			ymap.unsetHoverChanged();
+			return;
+		}
 		Graphics2D g2 = (Graphics2D) g;
 		
 //		if (labelPortRect != null) {
@@ -380,6 +395,11 @@ MouseWheelListener {
 	@Override
 	protected void recalculateOverlay() {
 
+		if(xmap.hoverChanged() || ymap.hoverChanged()) {
+			xmap.unsetHoverChanged();
+			ymap.unsetHoverChanged();
+			return;
+		}
 //		if(!inLabelPortMode() || !isLabelPortVisible() ||
 //				(!xmap.overALabelPortLinkedView() && !ymap.overALabelPortLinkedView())) {
 //			labelPortRect   = null;
@@ -520,6 +540,11 @@ MouseWheelListener {
 	@Override
 	public void update(final Observable o, final Object arg) {
 
+		if(xmap.hoverChanged() || ymap.hoverChanged()) {
+			xmap.unsetHoverChanged();
+			ymap.unsetHoverChanged();
+			return;
+		}
 		if (o == geneSelection) {
 			updateSelection(geneSelection, arraySelection);
 			recalculateOverlay();
@@ -535,9 +560,16 @@ MouseWheelListener {
 			offscreenValid = false;
 			repaint();
 
-		} else {
+		} else// if(!xmap.hoverChanged() && !ymap.hoverChanged()) {
 			super.update(o, arg);
-		}
+//		} else {
+//			if(xmap.hoverChanged()) {
+//				xmap.unsetHoverChanged();
+//			}
+//			if(ymap.hoverChanged()) {
+//				ymap.unsetHoverChanged();
+//			}
+//		}
 	}
 	
 	/**
@@ -573,6 +605,8 @@ MouseWheelListener {
 
 		@Override
 		public void mouseMoved(final MouseEvent e) {
+			xmap.setHoverIndex(xmap.getIndex(e.getX()));
+			ymap.setHoverIndex(ymap.getIndex(e.getY()));
 
 			setDataStatus(e);
 		}
@@ -583,8 +617,6 @@ MouseWheelListener {
 			final int oovery = overy;
 			overx = xmap.getIndex(e.getX());
 			overy = ymap.getIndex(e.getY());
-			xmap.setHoverIndex(overx);
-			ymap.setHoverIndex(overy);
 			
 //			//Make the label port follow the mouse
 //			xmap.scrollLabelPortToIndex(overx);

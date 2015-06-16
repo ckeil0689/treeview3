@@ -22,6 +22,8 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.util.Observable;
@@ -30,6 +32,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.swing.JScrollBar;
+import javax.swing.Timer;
 
 import Utilities.Helper;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
@@ -83,6 +86,7 @@ public class MapContainer extends Observable implements Observer,
 	private boolean overRowLabels = false;
 	private boolean overInteractiveMatrix = false;
 	private int hoverIndex = -1;
+	private boolean hoverChanged = false;
 
 	boolean debug = false;
 
@@ -983,32 +987,47 @@ public class MapContainer extends Observable implements Observer,
 		double minDiffThresh = 0.005; //0=best possible ratio. "Good enough value" for when the ratio of the relative cell position of the cell under
 		//the cursor is really close to the ratio of the relative pixel position of the cursor
 
-		//The corresponding zoom-out function uses relative pixel position, but on zoom-in, it's more accurate to use the relative cell position the mouse is over
-		//double targetFrac = ((double) getIndex(pixel) + 1.0) / ((double) getMaxIndex() + 1.0);
-		double targetFrac = ((double) getIndex(pixel) + 1.0 - (double) firstVisible) / ((double) numVisible);
+		//The corresponding zoom-out function uses relative pixel position, but
+		//on zoom-in, it's more accurate to use the relative cell position the
+		//mouse is over
+		//double targetFrac = ((double) getIndex(pixel) + 1.0) /
+		//		((double) getMaxIndex() + 1.0);
+		double targetFrac = ((double) getIndex(pixel) + 1.0 -
+				(double) firstVisible) / ((double) numVisible);
 		double diff = 0.0;
-		//LogBuffer.println("getBestZoomInVal: minZoom: [" + zoomMin + "] maxZoom: [" + zoomMax + "].");
-		//Loop through the zoomVals and find which one will result in a ratio with the relative index that is closest to the pixelPos to pxAvail ratio
+		//LogBuffer.println("getBestZoomInVal: minZoom: [" + zoomMin +
+		//		"] maxZoom: [" + zoomMax + "].");
+		//Loop through the zoomVals and find which one will result in a ratio
+		//with the relative index that is closest to the pixelPos to pxAvail
+		//ratio
 		for(i = 0;i <= (zoomMax - zoomMin);i++) {
 			int z = zoomRange[i];
 			int relCell = (int) (targetFrac * (double) z);
-			//LogBuffer.println("getBestZoomInVal: [relCell = (int) (pixel / numPixels * z)] = [" + relCell + " = (int) (" + pixel + " / " + numPixels + " * " + z + ")].");
+			//LogBuffer.println("getBestZoomInVal: [relCell = (int) (pixel / " +
+			//		"numPixels * z)] = [" + relCell + " = (int) (" + pixel +
+			//		" / " + numPixels + " * " + z + ")].");
 			if(z == 0) continue;
 			diff = Math.abs(((double) relCell / (double) z) - targetFrac);
-			//LogBuffer.println("getBestZoomInVal: [diff = Math.abs((double) (relCell / z) - (double) (pixel / numPixels))] = [" +
-			//		diff + " = Math.abs((double) (" + relCell + " / " + z + ") - (double) (" + pixel + " / " + numPixels + ")].");
+			//LogBuffer.println("getBestZoomInVal: [diff = Math.abs((double) " +
+			//		"(relCell / z) - (double) (pixel / numPixels))] = [" +
+			//		diff + " = Math.abs((double) (" + relCell + " / " + z +
+			//		") - (double) (" + pixel + " / " + numPixels + ")].");
 			if(diff < minDiff) {
 				bestZoomVal = z;
 				minDiff = diff;
-				//Stop if the difference from the target is "good enough", i.e. close to zero
+				//Stop if the difference from the target is "good enough",
+				//i.e. close to zero
 				if(minDiff < minDiffThresh) {
 					break;
 				}
 			}
 		}
-		//LogBuffer.println("getBestZoomInVal: Selected zoomVal [" + bestZoomVal + "] instead of defaults [" + zoomVal + "] Diff: [" + diff + "].");
+		//LogBuffer.println("getBestZoomInVal: Selected zoomVal [" +
+		//		bestZoomVal + "] instead of defaults [" + zoomVal +
+		//		"] Diff: [" + diff + "].");
 		
-		//Do not force a zoom amount here because a minimum zoom should be enforced after this has been called
+		//Do not force a zoom amount here because a minimum zoom should be
+		//enforced after this has been called
 		if(bestZoomVal < 0) bestZoomVal = 0;
 		return(bestZoomVal);
 	}
@@ -1016,19 +1035,26 @@ public class MapContainer extends Observable implements Observer,
 	/* TODO: Merge this function with getBestZoomInVal - there are only subtle
 	 * differences that could be handled in an if statement. - Rob
 	 */
-	//This function performs the reverse of getBestZoomInVal, except it uses the relative pixel position of the cursor to calculate the zoom position that is targeted for smoothing
+	//This function performs the reverse of getBestZoomInVal, except it uses the
+	//relative pixel position of the cursor to calculate the zoom position that
+	//is targeted for smoothing
 	public int getBestZoomOutVal(int pixel,double targetZoomFrac) {
 		int cells = getNumVisible();
 		//If the targetZoomFrac is 1.0, return the remainder of this dimension
-		if((targetZoomFrac % 1) == 0 && ((int) Math.round(targetZoomFrac)) == 1) {
+		if((targetZoomFrac % 1) == 0 &&
+		   ((int) Math.round(targetZoomFrac)) == 1) {
 			return(getMaxIndex() + 1 - cells);
 		}
 		//int zoomVal = (int) Math.round((double) cells * targetZoomFrac);
-		int zoomVal = (int) Math.round((double) cells / (1 - targetZoomFrac) - cells);
+		int zoomVal = (int) Math.round((double) cells /
+				(1 - targetZoomFrac) - cells);
 		int numPixels = getAvailablePixels();
-		//LogBuffer.println("getBestZoomOutVal: Called with pixel [" + pixel + "] and targetZoomFrac [" + targetZoomFrac + "] resulting in target zoomVal [" + zoomVal + "].");
+		//LogBuffer.println("getBestZoomOutVal: Called with pixel [" + pixel +
+		//		"] and targetZoomFrac [" + targetZoomFrac +
+		//		"] resulting in target zoomVal [" + zoomVal + "].");
 
-		//If the closest zoom amount is 0, return 0 because it's the smoothest possible scroll value (and the math below will result in NaN)
+		//If the closest zoom amount is 0, return 0 because it's the smoothest
+		//possible scroll value (and the math below will result in NaN)
 		//The calling function is expected to handle cases resulting in no zoom
 		if (zoomVal < 1) {
 			return(0);
@@ -1040,17 +1066,21 @@ public class MapContainer extends Observable implements Observer,
 		}
 		int smallThresh = 15;
 		int adjustWindow = 7;
-		//If we're getting close to full zoom-out, search a smaller window so that the last bit of zoom-out isn't likely to be all on 1 axis
+		//If we're getting close to full zoom-out, search a smaller window so
+		//that the last bit of zoom-out isn't likely to be all on 1 axis
 		if(((getMaxIndex() + 1) - cells) <= smallThresh) {
 			adjustWindow = 3;
 		}
 		int bestZoomVal = zoomVal;
-		//Select the best zoom value within a range of 5 of the target zoom val to make the zooming as smooth as possible
+		//Select the best zoom value within a range of 5 of the target zoom val
+		//to make the zooming as smooth as possible
 		int zoomMin = zoomVal - adjustWindow;
 		if(zoomMin < 1) {
 			zoomMin = 1;
 		}
-		//IUf the minimum number of cells to zoom is larger than the current number of cells displayed on this axis - this mitigates occurrences of "zoom jumping"
+		//If the minimum number of cells to zoom is larger than the current
+		//number of cells displayed on this axis - this mitigates occurrences of
+		//"zoom jumping"
 		//if(zoomMin > cells) {
 		//	zoomMin = cells - 1;
 		//}
@@ -1060,12 +1090,16 @@ public class MapContainer extends Observable implements Observer,
 			zoomMax = getMaxIndex() + 1 - cells;
 		}
 
-		//Sort the range of zoom values such that the target zoomVal is first, then +1, -1, +2, -2,...
-		//We're arbitrarily using the target zoom value to start out - the sort is just a heuristic anyway - doesn't really matter that much other than to prefer the target values
+		//Sort the range of zoom values such that the target zoomVal is first,
+		//then +1, -1, +2, -2,...
+		//We're arbitrarily using the target zoom value to start out - the sort
+		//is just a heuristic anyway - doesn't really matter that much other
+		//than to prefer the target values
 		double minDiff = 1.0;
-		//LogBuffer.println("Creating array of size zoomMax - zoomMin + 2: [" + zoomMax + " - " + zoomMin + " + 2].");
-		int[] zoomRange = new int[zoomMax - zoomMin + 2]; //2 was just to be on the safe side.
-		int i = 0;
+		//LogBuffer.println("Creating array of size zoomMax - zoomMin + 2: [" +
+		//		zoomMax + " - " + zoomMin + " + 2].");
+		int[] zoomRange = new int[zoomMax - zoomMin + 2];	//2 was just to be
+		int i = 0;											//on the safe side.
 		for(int l = 0;l <= (zoomMax - zoomMin);l++) {
 			if(l >= 0 && (zoomVal + l) <= zoomMax) {
 				zoomRange[i] = zoomVal + l;
@@ -1080,33 +1114,51 @@ public class MapContainer extends Observable implements Observer,
 			if(i > (zoomMax - zoomMin)) break;
 		}
 		
-		double minDiffThresh = 0.005; //0=best possible ratio. "Good enough value" for when the ratio of the relative cell position of the cell under
-		//the cursor is really close to the ratio of the relative pixel position of the cursor
+		double minDiffThresh = 0.005;	//0=best possible ratio. "Good enough
+										//value" for when the ratio of the
+										//relative cell position of the cell
+										//under the cursor is really close to
+										//the ratio of the relative pixel
+										//position of the cursor
 
-		//LogBuffer.println("getBestZoomOutVal: minZoom: [" + zoomMin + "] maxZoom: [" + zoomMax + "].");
+		//LogBuffer.println("getBestZoomOutVal: minZoom: [" + zoomMin +
+		//		"] maxZoom: [" + zoomMax + "].");
 		double diff = 0.0;
-		//Loop through the zoomVals and find which one will result in a ratio with the relative index that is closest to the pixelPos to pxAvail ratio
+		//Loop through the zoomVals and find which one will result in a ratio
+		//with the relative index that is closest to the pixelPos to pxAvail
+		//ratio
 		for(i = 0;i <= (zoomMax - zoomMin);i++) {
 			int z = zoomRange[i];
-			int relCell = (int) ((double) (pixel + 1) / (double) numPixels * (double) z);
-			//LogBuffer.println("getBestZoomOutVal: [relCell = (int) (pixel / numPixels * z)] = [" + relCell + " = (int) (" + pixel + " / " + numPixels + " * " + z + ")].");
+			int relCell = (int) ((double) (pixel + 1) /
+					(double) numPixels * (double) z);
+			//LogBuffer.println("getBestZoomOutVal: [relCell = (int) (pixel " +
+			//		"/ numPixels * z)] = [" + relCell + " = (int) (" + pixel +
+			//		" / " + numPixels + " * " + z + ")].");
 			if(z == 0) continue;
-			diff = Math.abs(((double) relCell / (double) z) - ((double) (pixel + 1) / (double) numPixels));
-			//LogBuffer.println("getBestZoomOutVal: [diff = relCell / z - pixel / numPixels] = [" +
-			//		diff + " = " + relCell + " / " + z + " - " + pixel + " / " + numPixels + "]. target zoomVal: [" + zoomVal + "] targetZoomFrac: [" + targetZoomFrac + "].");
+			diff = Math.abs(((double) relCell / (double) z) -
+					((double) (pixel + 1) / (double) numPixels));
+			//LogBuffer.println("getBestZoomOutVal: [diff = relCell / z - " +
+			//		"pixel / numPixels] = [" +
+			//		diff + " = " + relCell + " / " + z + " - " + pixel + " / " +
+			//		numPixels + "]. target zoomVal: [" + zoomVal +
+			//		"] targetZoomFrac: [" + targetZoomFrac + "].");
 			if(diff < minDiff) {
 				bestZoomVal = z;
 				minDiff = diff;
-				//Stop if the difference from the target is "good enough", i.e. close to zero
+				//Stop if the difference from the target is "good enough",
+				//i.e. close to zero
 				if(minDiff < minDiffThresh) {
 					break;
 				}
 			}
 		}
 		
-		//Do not force a zoom amount here because a minimum zoom should be enforced after this has been called
+		//Do not force a zoom amount here because a minimum zoom should be
+		//enforced after this has been called
 		if(bestZoomVal < 0) bestZoomVal = 0;
-		//LogBuffer.println("getBestZoomOutVal: Selected zoomVal [" + bestZoomVal + "] instead of default [" + zoomVal + "] Difference in smoothness accuracy: [" + diff + "].");
+		//LogBuffer.println("getBestZoomOutVal: Selected zoomVal [" +
+		//bestZoomVal + "] instead of default [" + zoomVal +
+		//"] Difference in smoothness accuracy: [" + diff + "].");
 		return(bestZoomVal);
 	}
 	
@@ -1117,7 +1169,8 @@ public class MapContainer extends Observable implements Observer,
 	 * should zoom more when there are large abounts of squares to zoom
 	 * through
 	 */
-	public double getOptimalZoomIncrement(int targetNumIndexes,boolean zoomingOut) {
+	public double getOptimalZoomIncrement(int targetNumIndexes,
+										  boolean zoomingOut) {
 		//double maxZoomFrac = 0.5;
 		double maxZoomFrac = 0.6;
 		if(ZOOM_INCREMENT > maxZoomFrac) {
@@ -1386,24 +1439,19 @@ public class MapContainer extends Observable implements Observer,
 	public void scrollToIndex(final int i) {
 
 		final int j = scrollbar.getValue();
-//		final int k = getFirstVisibleLabel();
+
 		// The getVisibleAmount return value can change by resizing the window,
 		// so use getNumVisible instead
 		// This assumes that getNumVisible is updated before this function is
 		// called.
 		// scrollbar.setValue(i - scrollbar.getVisibleAmount() / 2);
 
-		// LogBuffer.println("scrollToIndex: Scrolling from [" + j +
-		// "] to (i - getNumVisible() / 2): [" + i + " - " + getNumVisible() +
-		// " / 2] or: [" + (i - getNumVisible() / 2) + "].");
 		scrollbar.setValue(i - getNumVisible() / 2);
 
 		// Keep track of the first visible index
 		// This used to be set using scrollbar.getVisibleAmount, but that can
 		// change implicitly when the window is resized.
 		setFirstVisible(i - getNumVisible() / 2);
-
-//		setFirstVisibleLabel(i - getNumVisibleLabels() / 2);
 
 		//Image needs to be updated if either scroll position changes (because a
 		//scroll of the labels changes the blue box)
@@ -1412,81 +1460,14 @@ public class MapContainer extends Observable implements Observer,
 		}
 	}
 
-//	/*
-//	 * This moves the label port as close as it can in the current scroll
-//	 * position - this will not scroll the data matrix
-//	 * param: data index
-//	 */
-//	public void scrollLabelPortToIndex(final int i) {
-//
-//		final int k = getFirstVisibleLabel();
-//
-//		// Keep track of the first visible index
-//		// This used to be set using scrollbar.getVisibleAmount, but that can
-//		// change implicitly when the window is resized.
-//		setFirstVisible(i - getNumVisible() / 2);
-//
-//		setFirstVisibleLabel(i - getNumVisibleLabels() / 2);
-//
-//		pullLabels();
-//
-//		//Image needs to be updated if either scroll position changes (because a
-//		//scroll of the labels changes the blue box)
-//		if (k != getFirstVisibleLabel()) {
-//			setChanged();
-//		}
-//	}
-
-//	public void pullLabels() {
-//		//Pull the labels when the visible portion surpasses the visible
-//		//labels
-//		if(getFirstVisible() > getFirstVisibleLabel())
-//			setFirstVisibleLabel(getFirstVisible());
-//		else if((getFirstVisible() + getNumVisible()) <
-//				(getFirstVisibleLabel() + getNumVisibleLabels()))
-//			setFirstVisibleLabel(getFirstVisible() + getNumVisible() -
-//					getNumVisibleLabels());
-//		//We do not need to handle changing the numVisibleLabels because when
-//		//numVisible < numVisibleLabels, the port is turned off anyway.  Besides
-//		//the dimension of the port is controlled by the font size in the 
-//		//LabelView class - we shouldn't adjust it here.
-//	}
-//
-//	public void pushMatrix() {
-//		//Push the visible matrix when the labels surpass the visible edge
-//		if(getFirstVisible() + getNumVisible() <
-//		   getFirstVisibleLabel() + getNumVisibleLabels()) {
-//			int newVisPos = getFirstVisibleLabel() + getNumVisibleLabels() -
-//					getNumVisible();
-//			scrollbar.setValue(newVisPos);
-//			setFirstVisible(newVisPos);
-//		} else if(getFirstVisible() > getFirstVisibleLabel()) {
-//			int newVisPos = getFirstVisibleLabel();
-//			scrollbar.setValue(newVisPos);
-//			setFirstVisible(newVisPos);
-//		}
-//	}
-
 	public void scrollToFirstIndex(final int i /* ,boolean pullLabels */) {
 
 		final int j = scrollbar.getValue();
-//		final int k = getFirstVisibleLabel();
 
-//		if(pullLabels) {
-			scrollbar.setValue(i);
+		scrollbar.setValue(i);
 
-			// Keep track of the first visible index
-			setFirstVisible(i);
-
-//			pullLabels();
-//		} else {
-//			setFirstVisibleLabel(i);
-//
-//			pushMatrix();
-//		}
-
-		// LogBuffer.println("Current scrollbar value: [" + j +
-		// "].  Scrolling to: [" + i + "].");
+		// Keep track of the first visible index
+		setFirstVisible(i);
 
 		if (j != scrollbar.getValue() /* || k != getFirstVisibleLabel() */) {
 			setChanged();
@@ -1498,28 +1479,14 @@ public class MapContainer extends Observable implements Observer,
 	public void scrollBy(final int i,boolean pullLabels) {
 
 		final int j = scrollbar.getValue();
-//		final int k = getFirstVisibleLabel();
 
-//		if(pullLabels) {
-			scrollbar.setValue(j + i);
+		scrollbar.setValue(j + i);
 
-			// Keep track of the first visible index
-			setFirstVisible(j + i);
-
-//			pullLabels();
-//		} else {
-//			setFirstVisibleLabel(i + k);
-//
-//			pushMatrix();
-//		}
+		// Keep track of the first visible index
+		setFirstVisible(j + i);
 
 		if (j != scrollbar.getValue() /* || k != getFirstVisibleLabel() */) {
 			setChanged();
-//			if(debug)
-//				LogBuffer.println("Matrix scroll: [" + j + " to " + scrollbar.getValue() + "] Label Port moved: [" + k + " to " + getFirstVisibleLabel() + "]");
-//		} else {
-//			if(debug)
-//				LogBuffer.println("Neither scrollbar changed. Matrix: [" + j + "] Label Port: [" + k + "]");
 		}
 
 		notifyObservers();
@@ -1855,60 +1822,12 @@ public class MapContainer extends Observable implements Observer,
 	 * spots they are looking at.
 	 */
 	public int getNumVisible() {
-
 		return numVisible;
 	}
 
 	public int getFirstVisible() {
-
 		return firstVisible;
 	}
-
-//	/**
-//	 * The purpose of these four functions ({g/s}etNumVisibleLabels and
-//	 * {g/s}etFirstVisibleLabel), other than to simply obtain values is to support
-//	 * the tracking of explicit label pane manipulation by the user. These
-//	 * variables are manipulated only by actions that the user explicitly takes
-//	 * to intentionally alter the label pane, meaning the range of labels they
-//	 * are looking at.
-//	 */
-//	public int getNumVisibleLabels() {
-//		if(numVisibleLabels > -1)
-//			return(numVisibleLabels);
-//		return(1);
-//	}
-//
-//	public int getFirstVisibleLabel() {
-//		if(firstVisibleLabel > -1)
-//			return(firstVisibleLabel);
-//		return(0);
-//	}
-//
-//	public void setNumVisibleLabels(int s) {
-//		if(s < 1)
-//			numVisibleLabels = 1;
-//		else if(s > (getMaxIndex() + 1))
-//			numVisibleLabels = (getMaxIndex() + 1);
-//		else
-//			numVisibleLabels = s;
-//		if(numVisibleLabels > numVisible) {
-//			numVisible = getNumVisibleLabels();
-//			pushMatrix();
-//		}
-//		if(firstVisibleLabel + numVisibleLabels - 1 > getMaxIndex()) {
-//			firstVisibleLabel = firstVisibleLabel + numVisibleLabels - 1 -
-//					getMaxIndex();
-//		}
-//	}
-//
-//	public void setFirstVisibleLabel(int p) {
-//		if(p < 0)
-//			firstVisibleLabel = 0;
-//		else if(p > (getMaxIndex() - getNumVisibleLabels() + 1))
-//			firstVisibleLabel = (getMaxIndex() - getNumVisibleLabels() + 1);
-//		else
-//			firstVisibleLabel = p;
-//	}
 
 	private void switchMap(final IntegerMap integerMap) {
 
@@ -1923,8 +1842,7 @@ public class MapContainer extends Observable implements Observer,
 			setupScrollbar();
 			// Added this, but took it out because it was to fix something that
 			// previously wasn't broken, so instead of try to patch it, I'm
-			// going to
-			// check out the old code to see what went wrong
+			// going to check out the old code to see what went wrong
 			// //Keep track of explicitly selected first visible data index -
 			// not sure if this one is an explicit change of the viewed data by
 			// the user...
@@ -1968,6 +1886,7 @@ public class MapContainer extends Observable implements Observer,
 	public void setOverColLabels(boolean overColLabels) {
 		this.overColLabels = overColLabels;
 		setChanged();
+		setHoverChanged();
 		notifyObservers();
 	}
 
@@ -1977,6 +1896,7 @@ public class MapContainer extends Observable implements Observer,
 	public void setOverRowLabels(boolean overRowLabels) {
 		this.overRowLabels = overRowLabels;
 		setChanged();
+		setHoverChanged();
 		notifyObservers();
 	}
 
@@ -1986,14 +1906,11 @@ public class MapContainer extends Observable implements Observer,
 	public void setOverInteractiveMatrix(boolean overInteractiveMatrix) {
 		this.overInteractiveMatrix = overInteractiveMatrix;
 		setChanged();
+		setHoverChanged();
 		notifyObservers();
-		if(debug)
-			LogBuffer.println("After overIMV: overCol: [" + (overColLabels ? "true" : "false") + "] overRow: [" + (overRowLabels ? "true" : "false") + "] overIMV: [" + (overInteractiveMatrix ? "true" : "false") + "]");
 	}
 
 	public boolean overALabelPortLinkedView() {
-		if(debug)
-			LogBuffer.println("Upon graphics Update: overCol: [" + (overColLabels ? "true" : "false") + "] overRow: [" + (overRowLabels ? "true" : "false") + "] overIMV: [" + (overInteractiveMatrix ? "true" : "false") + "]");
 		return(overColLabels || overRowLabels || overInteractiveMatrix);
 	}
 
@@ -2004,12 +1921,58 @@ public class MapContainer extends Observable implements Observer,
 		return hoverIndex;
 	}
 
+	/* This variable is used and managed from LabelView because running the
+	 * repaints on a timer is much smoother and snappier than via
+	 * notifyObservers */
+	private boolean labelAnimeRunning = false;
+	public void setLabelAnimeRunning(boolean state) {
+		labelAnimeRunning = state;
+	}
+	public boolean isLabelAnimeRunning() {
+		return(labelAnimeRunning);
+	}
+
 	/**
 	 * @param hoverIndex the hoverIndex to set
 	 */
 	public void setHoverIndex(int hoverIndex) {
 		this.hoverIndex = hoverIndex;
 		setChanged();
-		notifyObservers();
+		//setHoverChanged prevents the IMV (and other views) from repainting
+		//when no visual change has occurred (i.e. it's just a change in hover
+		//position of the mouse.  setChanged is called above though so that
+		//LabelView's update will be called
+		setHoverChanged();
+		//If LabelView is not controlling its own repaints anymore, start it
+		//back up with a call to notifyObservers
+		if(!labelAnimeRunning) {
+			notifyObservers();
+		}
+	}
+
+	/**
+	 * This is used to decide to not actually repaint because all that changed
+	 * is the hover position of the mouse - however, that DOES trigger a change
+	 * in the LabelView classes
+	 * @return hoverChanged
+	 */
+	public boolean hoverChanged() {
+		return(hoverChanged);
+	}
+
+	/**
+	 * This is used to distinguish between hover updates and actual visual
+	 * change updates - The LabelView classes views do change on hover changed
+	 */
+	public void setHoverChanged() {
+		hoverChanged = true;
+	}
+
+	/**
+	 * This is used to distinguish between hover updates and actual visual
+	 * change updates - The LabelView classes views do change on hover changed
+	 */
+	public void unsetHoverChanged() {
+		hoverChanged = false;
 	}
 }

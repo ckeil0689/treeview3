@@ -76,7 +76,6 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener {
 
 		if (o == map) {
 			selectionChanged(); // gene locations changed
-
 		} else if (o == geneSelection || o == arraySelection) {
 			selectionChanged(); // which genes are selected changed
 
@@ -127,6 +126,7 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener {
 		
 		revalidate();
 		repaint();
+//		paintImmediately(0,0,getWidth(),getHeight());
 	}
 
 	//Timer to let the label pane linger a bit
