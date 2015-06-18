@@ -14,14 +14,12 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 import java.util.Observable;
-
-import javax.swing.Timer;
-
 import java.util.prefs.Preferences;
 
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.Timer;
 
 import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
@@ -35,20 +33,18 @@ import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.UrlExtractor;
 
 public abstract class LabelView extends ModelView implements MouseListener,
-MouseMotionListener, FontSelectable, ConfigNodePersistent {
+    MouseMotionListener,FontSelectable,ConfigNodePersistent {
 
 	private static final long serialVersionUID = 1L;
 
 	/* Axis IDs */
 	protected final static int ROW = 0;
 	protected final static int COL = 1;
-	
-	protected final static int HINTFONTSIZE = 14; 
-	//The user sets the lower bound in the prefs
-	//protected final static double LOWER_BOUND = 10.0;
+
+	protected final static int HINTFONTSIZE = 14;
 
 	//This is the space between labels in pixels
-	protected final static int SQUEEZE = 1; 
+	protected final static int SQUEEZE = 1;
 
 
 	/* DataModel is an observer */
@@ -124,41 +120,42 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 //	int labelIndent = 3; //Distance label text starts after the end of the label indicator
 //	int indicatorThickness = matrixBarThickness + labelBarThickness + labelIndicatorProtrusion + labelIndent; //Should be assigned a value summing the following values if drawing a label port
 	int lastScrollRowEndGap = -1;
-	int lastScrollRowPos = -1;
+	int lastScrollRowPos    = -1;
 	int lastScrollRowEndPos = -1;
 	int lastScrollColEndGap = -1;
-	int lastScrollColPos = -1;
+	int lastScrollColPos    = -1;
 	int lastScrollColEndPos = -1;
-	int rowLabelPaneSize = -1;
-	int colLabelPaneSize = -1;
+	int rowLabelPaneSize    = -1;
+	int colLabelPaneSize    = -1;
 
 	protected boolean debug = true;
 
 	public LabelView(final int axis_id) {
-		
+
 		super();
 
-		this.isGeneAxis = (axis_id == ROW);
-		this.setLayout(new MigLayout());
+		isGeneAxis = axis_id == ROW;
+		setLayout(new MigLayout());
 
-		final String summary = (isGeneAxis) ? "GeneSummary" : "ArraySummary";
-		this.headerSummary = new HeaderSummary(summary);
+		final String summary = isGeneAxis ? "GeneSummary" : "ArraySummary";
+		headerSummary = new HeaderSummary(summary);
 
-		// this.urlExtractor = uExtractor;
+		//this.urlExtractor = uExtractor;
 
 		addMouseMotionListener(this);
 		addMouseListener(this);
 
 		setLabelPortMode(true);
 
-		scrollPane = new JScrollPane(this,
-				ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
-				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane =
+			new JScrollPane(this,
+			                ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
+			                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBorder(null);
 
 		panel = scrollPane;
 	}
-	
+
 	protected abstract void adjustScrollBar();
 
 	/**
@@ -168,8 +165,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	 *            A new mapcontainer.
 	 */
 	public void setMap(final MapContainer im) {
-
-		if (map != null) {
+		if(map != null) {
 			map.deleteObserver(this);
 		}
 
@@ -181,32 +177,26 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	}
 
 	public void setHeaderInfo(final HeaderInfo headerInfo) {
-
 		this.headerInfo = headerInfo;
 	}
 
 	public HeaderInfo getHeaderInfo() {
-
 		return headerInfo;
 	}
 
 	public void setHeaderSummary(final HeaderSummary headerSummary) {
-
 		this.headerSummary = headerSummary;
 	}
 
 	public HeaderSummary getHeaderSummary() {
-
 		return headerSummary;
 	}
 
 	public void setUrlExtractor(final UrlExtractor urlExtractor) {
-
 		this.urlExtractor = urlExtractor;
 	}
 
 	public UrlExtractor getUrlExtractor() {
-
 		return urlExtractor;
 	}
 
@@ -218,16 +208,15 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	 *            GlobalView
 	 */
 	public void setRowSelection(final TreeSelectionI geneSelection) {
-
-		if (this.geneSelection != null) {
+		if(this.geneSelection != null) {
 			this.geneSelection.deleteObserver(this);
 		}
 
 		this.geneSelection = geneSelection;
 		this.geneSelection.addObserver(this);
 
-		if (isGeneAxis) {
-			this.drawSelection = geneSelection;
+		if(isGeneAxis) {
+			drawSelection = geneSelection;
 		}
 	}
 
@@ -239,29 +228,25 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	 *            GlobalView
 	 */
 	public void setColSelection(final TreeSelectionI arraySelection) {
-
-		if (this.arraySelection != null) {
+		if(this.arraySelection != null) {
 			this.arraySelection.deleteObserver(this);
 		}
 		this.arraySelection = arraySelection;
 		this.arraySelection.addObserver(this);
 
-		if (!isGeneAxis) {
-			this.drawSelection = arraySelection;
+		if(!isGeneAxis) {
+			drawSelection = arraySelection;
 		}
 	}
 
 	@Override
-	public void update(final Observable o, final Object arg) {
-
-	}
+	public void update(final Observable o,final Object arg) {}
 
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
+		if(parentNode != null) {
+			configNode = parentNode;
 
-		if (parentNode != null) {
-			this.configNode = parentNode;
-			
 		} else {
 			LogBuffer.println("parentNode for LabelView was null.");
 			return;
@@ -270,19 +255,25 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		LogBuffer.println("Setting new label configNode");
 		importSettingsFromNode(configNode);
 	}
-	
-	public void importSettingsFromNode(Preferences node) {
-		
-		setMin(node.getInt("min", d_min));
-		setMax(node.getInt("max", d_max));
-		LogBuffer.println("Setting min font size from preferences to [" + min + "]");
-		setFace(node.get("face", d_face));
-		setStyle(node.getInt("style", d_style));
-		setSavedPoints(node.getInt("size", d_size));
-		setJustifyOption(node.getBoolean("isRightJustified", d_justified));
-		setFixed(node.getBoolean("isFixed", d_fixed));
 
-		/* TODO: I need to catch when the remembered scroll info has been reset when deciding where to draw the indicator - then I can uncomment the line below. This will cause the indicator to be drawn in the correct place when the font settings are changed and it will allow the scroll position to be reset properly. */
+	public void importSettingsFromNode(Preferences node) {
+		setMin(node.getInt("min",d_min));
+		setMax(node.getInt("max",d_max));
+		LogBuffer.println("Setting min font size from preferences to [" + min +
+		                  "]");
+		setFace(node.get("face",d_face));
+		setStyle(node.getInt("style",d_style));
+		setSavedPoints(node.getInt("size",d_size));
+		setJustifyOption(node.getBoolean("isRightJustified",d_justified));
+		setFixed(node.getBoolean("isFixed",d_fixed));
+
+		/*
+		 * TODO: I need to catch when the remembered scroll info has been reset
+		 * when deciding where to draw the indicator - then I can uncomment the
+		 * line below. This will cause the indicator to be drawn in the correct
+		 * place when the font settings are changed and it will allow the scroll
+		 * position to be reset properly.
+		 */
 		resetSecondaryScroll();
 
 		getHeaderSummary().setConfigNode(node);
@@ -290,49 +281,41 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
 	@Override
 	public String getFace() {
-
 		return face;
 	}
 
 	@Override
 	public int getPoints() {
-
 		return size;
 	}
-	
-	@Override 
+
+	@Override
 	public int getLastSize() {
-		
 		return last_size;
 	};
-	
+
 	@Override
 	public int getMin() {
-
 		return min;
 	}
-	
+
 	@Override
 	public int getMax() {
-
 		return max;
 	}
 
 	@Override
 	public int getStyle() {
-
 		return style;
 	}
-	
+
 	@Override
 	public boolean getFixed() {
-
 		return isFixed;
 	}
 
 	@Override
 	public boolean getJustifyOption() {
-
 		return isRightJustified;
 	}
 
@@ -347,49 +330,41 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
 	@Override
 	public void setFace(final String string) {
-
-		if ((face == null) || (!face.equals(string))) {
+		if(face == null || !face.equals(string)) {
 			face = string;
-			if (configNode != null) {
-				configNode.put("face", face);
+			if(configNode != null) {
+				configNode.put("face",face);
 			}
-			setFont(new Font(face, style, size));
+			setFont(new Font(face,style,size));
 			resetSecondaryScroll();
 			adjustScrollBar();
 			repaint();
 		}
 	}
-	
+
 	/**
 	 * Wrapper for setPoints which allows to save the newly set points to an
 	 * instance variable.
+	 * 
 	 * @param i
 	 */
 	@Override
 	public void setSavedPoints(final int i) {
-		
 		/* Stay within boundaries */
 		int new_i = i;
-//		if(i > max) {
-//			new_i = max;
-//			
-//		} else if(i < min) {
-//			new_i = min;
-//		}
-		
+
 		last_size = new_i;
 		setPoints(new_i);
 	}
 
 	@Override
 	public void setPoints(final int i) {
-		
-		if (size != i) {
+		if(size != i) {
 			size = i;
-			if (configNode != null) {
-				configNode.putInt("size", size);
+			if(configNode != null) {
+				configNode.putInt("size",size);
 			}
-			setFont(new Font(face, style, size));
+			setFont(new Font(face,style,size));
 			resetSecondaryScroll();
 			adjustScrollBar();
 			repaint();
@@ -398,56 +373,51 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
 	@Override
 	public void setStyle(final int i) {
-
-		if (style != i) {
+		if(style != i) {
 			style = i;
-			if (configNode != null) {
-				configNode.putInt("style", style);
+			if(configNode != null) {
+				configNode.putInt("style",style);
 			}
-			setFont(new Font(face, style, size));
+			setFont(new Font(face,style,size));
 			resetSecondaryScroll();
 			adjustScrollBar();
 			repaint();
 		}
 	}
-	
+
 	@Override
 	public void setMin(final int i) {
-
-		if(debug)
+		if(debug) {
 			LogBuffer.println("setMin(" + i + ") called");
-		if(i < 1 || (max > 0 && i > max)) {
-			return;
 		}
+		if(i < 1 || max > 0 && i > max) { return; }
 
-		if (min != i) {
+		if(min != i) {
 			min = i;
-			if (configNode != null) {
+			if(configNode != null) {
 				LogBuffer.println("Saving new min font size [" + min + "]");
-				configNode.putInt("min", min);
+				configNode.putInt("min",min);
 			}
-			setFont(new Font(face, style, size));
+			setFont(new Font(face,style,size));
 			resetSecondaryScroll();
 			adjustScrollBar();
 			repaint();
 		}
 	}
-	
+
 	@Override
 	public void setMax(final int i) {
-
-		if(debug)
+		if(debug) {
 			LogBuffer.println("setMax(" + i + ") called");
-		if(i < 1 || (min > 0 && i < min)) {
-			return;
 		}
+		if(i < 1 || min > 0 && i < min) { return; }
 
-		if (max != i) {
+		if(max != i) {
 			max = i;
-			if (configNode != null) {
-				configNode.putInt("max", max);
+			if(configNode != null) {
+				configNode.putInt("max",max);
 			}
-			setFont(new Font(face, style, size));
+			setFont(new Font(face,style,size));
 			resetSecondaryScroll();
 			adjustScrollBar();
 			repaint();
@@ -456,11 +426,10 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
 	@Override
 	public void setJustifyOption(final boolean isRightJustified) {
-
 		this.isRightJustified = isRightJustified;
 
-		if (configNode != null) {
-			configNode.putBoolean("isRightJustified", isRightJustified);
+		if(configNode != null) {
+			configNode.putBoolean("isRightJustified",isRightJustified);
 		}
 
 		resetSecondaryScroll();
@@ -476,22 +445,20 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 			}
 		});
 	}
-	
+
 	@Override
 	public void setFixed(boolean fixed) {
-		
-		this.isFixed = fixed;
+		isFixed = fixed;
 
 		resetSecondaryScroll();
 
-		if (configNode != null) {
-			configNode.putBoolean("isFixed", fixed);
+		if(configNode != null) {
+			configNode.putBoolean("isFixed",fixed);
 		}
 	};
 
 	@Override
 	public String viewName() {
-
 		return "LabelView";
 	}
 
@@ -502,28 +469,33 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	private int repaintInterval = 50;  // update every 50 milliseconds
 	private int lastHoverIndex = -1;
 	private Timer repaintTimer =
-			new Timer(repaintInterval, new ActionListener() {
-		/**
-		 * The timer "ticks" by calling this method every _timeslice milliseconds
-		 */
-		public void actionPerformed (ActionEvent e) {
-			repaint();
-			//paintImmediately(0,0,getWidth(),getHeight());
-		}
-	});
+		new Timer(repaintInterval,
+		          new ActionListener() {
+			/**
+			 * The timer "ticks" by calling
+			 * this method every _timeslice
+			 * milliseconds
+			 */
+			@Override
+			public void
+			actionPerformed(ActionEvent e) {
+				repaint();
+				//paintImmediately(0,0,getWidth(),getHeight());
+			}
+		});
 
 	//Timer to wait a bit before stopping the slice _timer for painting
 	final private int delay = 1000;
 	private javax.swing.Timer turnOffRepaintTimer;
 	ActionListener turnOffRepaintListener = new ActionListener() {
-		
+
 		@Override
 		public void actionPerformed(ActionEvent evt) {
-			if (evt.getSource() == turnOffRepaintTimer) {
+			if(evt.getSource() == turnOffRepaintTimer) {
 				/* Stop timer */
 				turnOffRepaintTimer.stop();
 				turnOffRepaintTimer = null;
-			
+
 				repaintTimer.stop();
 				map.setLabelAnimeRunning(false);
 			}
@@ -533,25 +505,24 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	/* inherit description */
 	@Override
 	public void updateBuffer(final Graphics g) {
-
-		updateBuffer(g, offscreenSize);
+		updateBuffer(g,offscreenSize);
 	}
 
 	public void updateBuffer(final Image buf) {
-
 		updateBuffer(buf.getGraphics(),
-				new Dimension(buf.getWidth(null), buf.getHeight(null)));
+		             new Dimension(buf.getWidth(null),buf.getHeight(null)));
 	}
 
-	public void updateBuffer(final Graphics g, final Dimension offscreenSize) {
+	public void updateBuffer(final Graphics g,final Dimension offscreenSize) {
 
-		/* Manage future repaints with a pair of timers, because when
+		/*
+		 * Manage future repaints with a pair of timers, because when
 		 * MapContainer calls notifyObservers, repaints are choppy and
 		 * sluggish...
 		 * 
 		 * NOTE: Only call notifyObservers from MapContainer when
 		 * map.labelAnimeRunning is false - otherwise, the repaints will be
-		 * choppy & slow.  The timers below will handle the smooth updates from
+		 * choppy & slow. The timers below will handle the smooth updates from
 		 * here on out
 		 */
 
@@ -585,8 +556,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		//brief period of no motion)
 		else if(map.getHoverIndex() == lastHoverIndex) {
 			if(turnOffRepaintTimer == null) {
-				turnOffRepaintTimer = new Timer(this.delay,
-												turnOffRepaintListener);
+				turnOffRepaintTimer = new Timer(delay,turnOffRepaintListener);
 				turnOffRepaintTimer.start();
 			}
 		}
@@ -601,44 +571,39 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 			lastHoverIndex = map.getHoverIndex();
 			map.setLabelAnimeRunning(true);
 		}
-		
-		if(debug)
+
+		if(debug) {
 			LogBuffer.println("Updating the label pane graphics");
+		}
 		/** TODO: Make sure that the number of visible labels is up to date */
 
 		/* Shouldn't draw if there's no TreeSelection defined */
-		if (drawSelection == null) {
+		if(drawSelection == null) {
 			LogBuffer.println("drawSelection not defined. Can't draw labels.");
 			return;
 		}
 
 		int matrixHoverIndex = map.getHoverIndex();
 
-		final int stringX = (isGeneAxis) ? offscreenSize.width
-				: offscreenSize.height;
-
-		/* Get label indices range */
-		//final int start = map.getIndex(0);
-		//This used to have getUsedPixels(), but on full zoom-out, the resulting
-		//data index was 119 instead of 133. I changed it to getAvailablePixels
-		//and I got the correct 133 result. I suspect used pixels assumes a
-		//scrollbar takes up space...
-		//final int end = map.getIndex(map.getAvailablePixels()) - 1;
+		final int stringX = isGeneAxis ? offscreenSize.width
+		                              : offscreenSize.height;
 
 		final Graphics2D g2d = (Graphics2D) g;
 		final AffineTransform orig = g2d.getTransform();
-		
+
 		/* Draw labels if zoom level allows it */
 		final boolean hasFixedOverlap = isFixed && map.getScale() < last_size;
 		boolean resetJustification =
-				(isGeneAxis ?
-				 scrollPane.getViewport().getSize().width  == offscreenSize.width :
-				 scrollPane.getViewport().getSize().height == offscreenSize.height);
-		if(resetJustification && debug)
-			LogBuffer.println("Resetting justification for " + (isGeneAxis ? "ROW" : "COL") + "s!!!!");
+			isGeneAxis ?
+			scrollPane.getViewport().getSize().width == offscreenSize.width :
+			scrollPane.getViewport().getSize().height == offscreenSize.height;
+		if(resetJustification && debug) {
+			LogBuffer.println("Resetting justification for " +
+			                  (isGeneAxis ? "ROW" : "COL") + "s!!!!");
+		}
 
-		if ((map.getScale() >= (getMin() + SQUEEZE) && !hasFixedOverlap) ||
-			doDrawLabelPort()) {
+		if(map.getScale() >= getMin() + SQUEEZE && !hasFixedOverlap ||
+		   doDrawLabelPort()) {
 
 			if(secondaryPaneSizeChanged()) {
 				adjustSecondaryScroll();
@@ -655,91 +620,71 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 			if(fittedFontSize < 1) {
 				fittedFontSize = 1;
 			}
-//			if(map.getScale() >= (getMin() + SQUEEZE) && !hasFixedOverlap) {
-//				//Update the number of visible labels to equal the number of
-//				//visible squares in the matrix
-//				map.setNumVisibleLabels(map.getNumVisible());
-//			} else {
-//				map.setNumVisibleLabels((int) Math.floor(
-//						map.getAvailablePixels() / (curFontSize + SQUEEZE)));
-//			}
-			//Shift the labels in case the number of labels in the label pane
-			//necessitates it (this only affects the stored values in map for
-			//firstVisibleLabel and numVisibleLabels)
-//			map.pullLabels();
 
 			boolean drawLabelPort = doDrawLabelPort();
-			if(drawLabelPort && debug)
+			if(drawLabelPort && debug) {
 				LogBuffer.println("Drawing a label port");
+			}
 
-//			//Drawing only visible labels
-//			final int start  = map.getFirstVisibleLabel();
-//			final int end    = map.getFirstVisibleLabel() +
-//					map.getNumVisibleLabels() - 1;
-			final int start  = map.getIndex(0);
-			final int end    = map.getIndex(map.getAvailablePixels()) - 1;
-			LogBuffer.println("Set end data index to [" + end + "] as first [" + map.getFirstVisible() + "] plus num [" + map.getNumVisible() + "] visible - 1");
-//			//offset = abs(pixel index of data index 0 (could be negative))
-//			//final int offset = Math.abs(map.getPixel(0));
-//			final int primaryScrollPos =
-//					map.getFirstVisibleLabel() * (curFontSize + SQUEEZE);
-//			final int secondaryScrollPos =
-//					getSecondaryScrollBar().getValue();
-//			final int secondaryScrollEndGap =
-//					getSecondaryScrollBar().getMaximum() - (secondaryScrollPos +
-//							getSecondaryScrollBar().getModel().getExtent());
-//			int secondaryScrollEndPos = secondaryScrollPos + getSecondaryScrollBar().getModel().getExtent();
-//			if(debug)
-//				LogBuffer.println("Secondary scroll Pos: [" + secondaryScrollPos + "] Secondary scroll end gap: [" + secondaryScrollEndGap + "].");
+			/* Get indices range */
+			final int start = map.getIndex(0);
+			final int end   = map.getIndex(map.getAvailablePixels()) - 1;
+			LogBuffer.println("Set end data index to [" + end +
+			                  "] as first [" +
+			                  map.getFirstVisible() +
+			                  "] plus num [" +
+			                  map.getNumVisible() +
+			                  "] visible - 1");
 
 			/* Rotate plane for array axis (not for zoomHint) */
-			if (!isGeneAxis) {
+			if(!isGeneAxis) {
 				g2d.rotate(Math.PI * 3 / 2);
-				g2d.translate(-offscreenSize.height, 0);
+				g2d.translate(-offscreenSize.height,0);
 			}
 
 			final int colorIndex = headerInfo.getIndex("FGCOLOR");
-			g.setFont(new Font(face, style, size));
+			g.setFont(new Font(face,style,size));
 
 			final FontMetrics metrics = getFontMetrics(g.getFont());
 			final int ascent = metrics.getAscent();
 
-			int matrixSize = ((map.getPixel(map.getMaxIndex() + 1) - 1) - map.getPixel(0));
+			int matrixSize   = map.getPixel(map.getMaxIndex() + 1) - 1 -
+			                   map.getPixel(0);
 			int fullPaneSize = matrixSize;
 
 			int activeHoverDataIndex =
-					(hoverIndex == -1 ? matrixHoverIndex : hoverIndex);
+				hoverIndex == -1 ? matrixHoverIndex : hoverIndex;
 
-			if(debug)
-				LogBuffer.println("Label port mode is " + (drawLabelPort ? "" : "in") + "active.  Map square size: [" + map.getScale() + "] Font size: [" + curFontSize + "] SQUEEZE: [" + SQUEEZE + "] ascent: [" + ascent + "]");
+			if(debug) {
+				LogBuffer.println("Label port mode is " +
+				                  (drawLabelPort ? "" : "in") +
+				                  "active.  Map square size: [" +
+				                  map.getScale() + "] Font size: [" +
+				                  curFontSize + "] SQUEEZE: [" + SQUEEZE +
+				                  "] ascent: [" + ascent + "]");
+			}
 
 			/* Draw label backgrounds first if color is defined */
 			final int bgColorIndex = headerInfo.getIndex("BGCOLOR");
 			Color bgColor = g.getColor();
-			if (bgColorIndex > 0) {
-				if(debug)
+			if(bgColorIndex > 0) {
+				if(debug) {
 					LogBuffer.println("BgLabel");
+				}
 				final Color back = g.getColor();
-//				int stackPos = start * (curFontSize + SQUEEZE);
-				for (int j = start; j <= end; j++) {
+				for(int j = start;j <= end;j++) {
 					final String[] strings = headerInfo.getHeader(j);
 					try {
 						g.setColor(TreeColorer.getColor(strings[bgColorIndex]));
 
-					} catch (final Exception e) {
+					}
+					catch(final Exception e) {
 						// ignore...
 					}
-//						g.fillRect(0,
-//								   (drawLabelPort ?
-//									stackPos + ascent / 2 :
-//									map.getMiddlePixel(j) - ascent / 2),
-//								   stringX,
-//								   ascent);
 					g.fillRect(0,
-							   map.getMiddlePixel(j) - ascent / 2,
-							   stringX,
-							   ascent);
-//					stackPos += curFontSize + SQUEEZE;
+					           map.getMiddlePixel(j) - ascent / 2,
+					           stringX,
+					           ascent);
 				}
 				g.setColor(back);
 			}
@@ -748,175 +693,197 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 			int maxStrLen = getJustifiedPosition(metrics);
 			final Color fore = GUIFactory.MAIN;
 			final Color labelPortColor = new Color(30,144,251);
-//			int stackPos = start * (curFontSize + SQUEEZE);
 			if(drawLabelPort) {
-				//See if the labels are going to be offset because they are near an edge
-				int hoverYPos = map.getMiddlePixel(activeHoverDataIndex) + ascent / 2;
+				//See if the labels are going to be offset because they are near
+				//an edge
+				int hoverYPos  = map.getMiddlePixel(activeHoverDataIndex) +
+				                 ascent / 2;
 				int edgeOffset = 0;
-				if((map.getMiddlePixel(activeHoverDataIndex) + ascent) > fullPaneSize) {
-					edgeOffset = map.getMiddlePixel(activeHoverDataIndex) + ascent - fullPaneSize;
-				} else if(map.getMiddlePixel(activeHoverDataIndex) - (int) Math.ceil(ascent / 2) < 0) {
-					edgeOffset = map.getMiddlePixel(activeHoverDataIndex) - (int) Math.ceil(ascent / 2);
+				if((map.getMiddlePixel(activeHoverDataIndex) + ascent) >
+				   fullPaneSize) {
+					edgeOffset = map.getMiddlePixel(activeHoverDataIndex) +
+					             ascent - fullPaneSize;
+				} else if(map.getMiddlePixel(activeHoverDataIndex) -
+				          (int) Math.ceil(ascent / 2) < 0) {
+					edgeOffset = map.getMiddlePixel(activeHoverDataIndex) -
+					             (int) Math.ceil(ascent / 2);
 				}
 
-				for (int j = activeHoverDataIndex; j >= start; j--) {
+				for(int j = activeHoverDataIndex;j >= start;j--) {
 					try {
-						String out = headerSummary.getSummary(headerInfo, j);
+						String out = headerSummary.getSummary(headerInfo,j);
 						final String[] headers = headerInfo.getHeader(j);
-	
-						if (out == null) {
+
+						if(out == null) {
 							out = "No Label";
 						}
-	
+
 						/* Set label color */
-						if(drawSelection.isIndexSelected(j) || j == activeHoverDataIndex) {
-							if (colorIndex > 0) {
+						if(drawSelection.isIndexSelected(j) ||
+						   j == activeHoverDataIndex) {
+							if(colorIndex > 0) {
 								g.setColor(TreeColorer
-										.getColor(headers[colorIndex]));
+								           .getColor(headers[colorIndex]));
 							}
-	
+
 							if(j == activeHoverDataIndex) {
 								g2d.setColor(Color.red);
 							} else {
 								g2d.setColor(fore);
 							}
-	
-							if (colorIndex > 0) {
+
+							if(colorIndex > 0) {
 								g.setColor(fore);
 							}
-	
+
 						} else {
 							g2d.setColor(Color.black);
 						}
-	
+
 						/* Finally draw label (alignment-dependent) */
 						int xPos = 0;
-						if (isRightJustified) {
+						if(isRightJustified) {
 							xPos = stringX - metrics.stringWidth(out);
 						}
 
 						int indexDiff = j - activeHoverDataIndex;
-						int yPos = hoverYPos + indexDiff * (curFontSize + SQUEEZE);
+						int yPos = hoverYPos + indexDiff *
+						           (curFontSize + SQUEEZE);
 						//Account for offsets from being near an edge
 						yPos -= edgeOffset;
 						if(yPos > -ascent / 2) {
 							g2d.drawString(out,xPos,yPos);
 						}
 
-					} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
+					}
+					catch(final java.lang.ArrayIndexOutOfBoundsException e) {
 						LogBuffer.logException(e);
 						break;
 					}
 				}
-				for (int j = activeHoverDataIndex + 1; j <= end; j++) {
+				for(int j = activeHoverDataIndex + 1;j <= end;j++) {
 					try {
-						String out = headerSummary.getSummary(headerInfo, j);
+						String out = headerSummary.getSummary(headerInfo,j);
 						final String[] headers = headerInfo.getHeader(j);
-	
-						if (out == null) {
+
+						if(out == null) {
 							out = "No Label";
 						}
-	
+
 						/* Set label color */
 						if(drawSelection.isIndexSelected(j)) {
-							if (colorIndex > 0) {
+							if(colorIndex > 0) {
 								g.setColor(TreeColorer
-										.getColor(headers[colorIndex]));
+								           .getColor(headers[colorIndex]));
 							}
-	
+
 							g2d.setColor(fore);
-	
-							if (colorIndex > 0) {
+
+							if(colorIndex > 0) {
 								g.setColor(fore);
 							}
-	
+
 						} else {
 							g2d.setColor(Color.black);
 						}
-	
+
 						/* Finally draw label (alignment-dependent) */
 						int xPos = 0;
-						if (isRightJustified) {
+						if(isRightJustified) {
 							xPos = stringX - metrics.stringWidth(out);
 						}
 
 						int indexDiff = j - activeHoverDataIndex;
-						int yPos = hoverYPos + indexDiff * (curFontSize + SQUEEZE);
+						int yPos = hoverYPos + indexDiff *
+						           (curFontSize + SQUEEZE);
 						yPos -= edgeOffset;
 						if(yPos < fullPaneSize + ascent / 2) {
 							g2d.drawString(out,xPos,yPos);
 						}
-	
-					} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
+
+					}
+					catch(final java.lang.ArrayIndexOutOfBoundsException e) {
 						LogBuffer.logException(e);
 						break;
 					}
 				}
 			} else {
-				for (int j = start; j <= end; j++) {
-	
-					if(debug)
+				for(int j = start;j <= end;j++) {
+
+					if(debug) {
 						LogBuffer.println("Getting data index [" + j + "]");
+					}
 					try {
-						String out = headerSummary.getSummary(headerInfo, j);
+						String out = headerSummary.getSummary(headerInfo,j);
 						final String[] headers = headerInfo.getHeader(j);
-	
-						if (out == null) {
+
+						if(out == null) {
 							out = "No Label";
 						}
-	
+
 						/* Set label color */
-						if(drawSelection.isIndexSelected(j) || j == activeHoverDataIndex) {
-							if (colorIndex > 0) {
+						if(drawSelection.isIndexSelected(j) ||
+						   j == activeHoverDataIndex) {
+							if(colorIndex > 0) {
 								g.setColor(TreeColorer
-										.getColor(headers[colorIndex]));
+								           .getColor(headers[colorIndex]));
 							}
-	
+
 							if(j == activeHoverDataIndex) {
 								g2d.setColor(Color.red);
 							} else {
 								g2d.setColor(fore);
 							}
-	
-							if (colorIndex > 0) {
+
+							if(colorIndex > 0) {
 								g.setColor(fore);
 							}
-	
+
 						} else {
 							g2d.setColor(Color.black);
 						}
-	
-	//					if(maxStrLen < metrics.stringWidth(out)) {
-	//						maxStrLen = metrics.stringWidth(out);
-	//					}
+
 						/* Finally draw label (alignment-dependent) */
 						int xPos = 0;
-						if (isRightJustified) {
+						if(isRightJustified) {
 							xPos = stringX - metrics.stringWidth(out);
 						}
-	
-	//					if(debug)
-	//						LogBuffer.println("Drawing " + (isGeneAxis ? "ROW" : "COL") + " label at X pixel [" +
-	//								(xPos + (drawLabelPort ? indicatorThickness : labelIndent) * (isGeneAxis ? -1 : 1)) +
-	//								"] xPos [" +
-	//								xPos + "] indicatorThickness [" + indicatorThickness * (isGeneAxis ? -1 : 1) + "].");
-						g2d.drawString(out,
-									   xPos,
-									   map.getMiddlePixel(j) + ascent / 2);
-	
-					} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
+
+//						if(debug) {
+//							LogBuffer.println("Drawing " +
+//							                  (isGeneAxis ? "ROW" : "COL") +
+//							                  " label at X pixel [" +
+//							                  (xPos +
+//							                   (drawLabelPort ?
+//							                    indicatorThickness :
+//							                    labelIndent) *
+//							                   (isGeneAxis ? -1 : 1)) +
+//							                  "] xPos [" + xPos +
+//							                  "] indicatorThickness [" +
+//							                  (indicatorThickness *
+//							                   (isGeneAxis ? -1 : 1)) + "].");
+//						}
+						g2d.drawString(out,xPos,map.getMiddlePixel(j) + ascent /
+						                        2);
+
+					}
+					catch(final java.lang.ArrayIndexOutOfBoundsException e) {
 						LogBuffer.logException(e);
 						break;
 					}
-	//				stackPos += curFontSize + SQUEEZE;
 				}
 			}
-			if(debug)
+			if(debug) {
 				LogBuffer.println((isGeneAxis ? "ROW" : "COL") +
-						": MaxStrLen: [" + maxStrLen + "]Start Index: [" +
-						start + "] End Index: [" + end + "] height [" +
-						offscreenSize.height + "] width [" +
-						offscreenSize.width + "]");
+				                  ": MaxStrLen: [" + maxStrLen +
+				                  "]Start Index: [" + start + "] End Index: [" +
+				                  end + "] height [" + offscreenSize.height +
+				                  "] width [" + offscreenSize.width + "]");
+			}
+
+			//I MIGHT resurect some or all of the following commented code
+			//depending on feedback from the next meeting (after 6/18/2015)
+			//Other associated commented code exists elsewhere too
 
 //			/* Draw the "position indicator" if the label port is active */
 //			//See variables initialized above the string drawing section
@@ -1170,120 +1137,152 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 //				}
 //			}
 
+			//I MIGHT resurect some or all of the preceding commented code
+			//depending on feedback from the next meeting (after 6/18/2015)
+			//Other associated commented code exists elsewhere too
+
 			g2d.setTransform(orig);
 
-//			/* Set the Pane size (for the new label length and the length of the
-//			 * label port (if active - otherwise set it to visible pane
-//			 * width)) */
-//			int labelStackSize = (map.getMaxIndex() + 1) * (curFontSize + SQUEEZE);
-//			//Add a bit to the end of the label stack size so that when you're scrolled all the way to the right/bottom, things are lined up on the left/top
-//			//Basically, add the height/width of the pane modulus the font height
-//			labelStackSize += (isGeneAxis ? scrollPane.getViewport().getSize().height : scrollPane.getViewport().getSize().width) % (curFontSize + SQUEEZE);
-//			int matrixSize = ((map.getPixel(map.getMaxIndex() + 1) - 1) - map.getPixel(0));
-//			int fullPaneSize = 0;
-//			if(!(drawLabelPort)) {
-//				fullPaneSize = matrixSize;
-//			} else {
-//				fullPaneSize = labelStackSize;
-//			}
 			//Set the size of the scrollpane to match the longest string
 			if(isGeneAxis) {
-				//+ 15 allows for the appearance & disappearance of the main
-				//scrollbar, which I believe is only for Macs since macs draw
-				//the scrollbar over the content when set AS_NEEDED
-//				setPreferredSize(new Dimension((getSecondaryScrollBar().isVisible() ? maxStrLen + 15 : maxStrLen),
-//						offscreenSize.height));
 				if(offscreenSize.height != fullPaneSize || offscreenSize.width != maxStrLen) {
-					setPreferredSize(new Dimension(maxStrLen /* + (drawLabelPort ? indicatorThickness : 0) */,
-									 fullPaneSize));
+					setPreferredSize(new Dimension(maxStrLen
+					                               /* + (drawLabelPort ?
+					                                *    indicatorThickness : 0)
+					                                */,
+					                               fullPaneSize));
 				}
-				//if(debug)
-					LogBuffer.println("Resizing row labels panel to [" + maxStrLen + "x" + fullPaneSize + "].");
+				if(debug) {
+					LogBuffer.println("Resizing row labels panel to [" +
+					                  maxStrLen + "x" + fullPaneSize + "].");
+				}
 			} else {
-				//+ 15 allows for the appearance & disappearance of the main
-				//scrollbar, which I believe is only for Macs since macs draw
-				//the scrollbar over the content when set AS_NEEDED
-//				setPreferredSize(new Dimension(offscreenSize.width,
-//						(getSecondaryScrollBar().isVisible() ? maxStrLen + 15 : maxStrLen)));
 				if(offscreenSize.height != maxStrLen || offscreenSize.width != fullPaneSize) {
 					setPreferredSize(new Dimension(fullPaneSize,
-									 maxStrLen /* + (drawLabelPort ? indicatorThickness : 0) */));
+					                               maxStrLen
+					                               /* + (drawLabelPort ?
+					                                * indicatorThickness : 0) */
+					                               ));
 				}
-				//if(debug)
-					LogBuffer.println("Resizing col labels panel to [" + fullPaneSize + "x" + maxStrLen + "].");
+				if(debug) {
+					LogBuffer.println("Resizing col labels panel to [" +
+					                  fullPaneSize + "x" + maxStrLen + "].");
+				}
 			}
 
-//			/* Scroll to the position that matches the matrix */
-//			getPrimaryScrollBar().setValue(primaryScrollPos);
-			/* Scroll to the position that is equivalent to the previous position */
+			/*
+			 * Scroll to the position that is equivalent to the previous
+			 * position
+			 */
 			if(isRightJustified) {
-//				getSecondaryScrollBar().setValue(maxStrLen +
-//						//Make space for the "position indicator"
-//						(drawLabelPort ? indicatorThickness : 0));
 				if(isGeneAxis) {
 					if(lastScrollRowPos == -1) {
-						LogBuffer.println("Scrolling to [" + (getSecondaryScrollBar().getMaximum() - getSecondaryScrollBar().getModel().getExtent()) + "] max - extent [" + getSecondaryScrollBar().getMaximum() + " - " + getSecondaryScrollBar().getModel().getExtent() + "] after drawing - first time rows right justified");
-						//getSecondaryScrollBar().setValue(getSecondaryScrollBar().getMaximum() - getSecondaryScrollBar().getModel().getExtent());
-						//It seems that the scrollbar max and extent are not updated in this scenario when the app first opens a file, so we will calculate the initial scroll position thusly
-						int tmpscrollpos = maxStrLen - scrollPane.getViewport().getSize().width;
+						LogBuffer.println("Scrolling to [" +
+						                  (getSecondaryScrollBar().getMaximum() -
+						                   getSecondaryScrollBar().getModel()
+						                   .getExtent()) +
+						                  "] max - extent [" +
+						                  getSecondaryScrollBar().getMaximum() +
+						                  " - " +
+						                  getSecondaryScrollBar().getModel()
+						                  .getExtent() +
+						                  "] after drawing - first time rows " +
+						                  "right justified");
+						//It seems that the scrollbar max and extent are not
+						//updated in this scenario when the app first opens a
+						//file, so we will calculate the initial scroll position
+						//thusly
+						int tmpscrollpos =
+							maxStrLen -
+						    scrollPane.getViewport().getSize().width;
 						getSecondaryScrollBar().setValue(tmpscrollpos);
-						//lastScrollRowPos = getSecondaryScrollBar().getMaximum() - getSecondaryScrollBar().getModel().getExtent();
 						lastScrollRowPos = tmpscrollpos;
-						//lastScrollRowEndPos = lastScrollRowPos + getSecondaryScrollBar().getModel().getExtent();
 						lastScrollRowEndPos = maxStrLen;
-						//lastScrollRowEndGap = getSecondaryScrollBar().getMaximum() - lastScrollRowEndPos;
 						lastScrollRowEndGap = 0;
 					} else {
-						LogBuffer.println("Scrolling to [" + lastScrollRowPos + "] after drawing - rememberred rows right justified");
+						LogBuffer.println("Scrolling to [" + lastScrollRowPos +
+						                  "] after drawing - rememberred " +
+						                  "rows right justified");
 						getSecondaryScrollBar().setValue(lastScrollRowPos);
 					}
 				} else {
-					/* TODO: Save column scroll position - below is copied from row logic above - edit it! */
+					/*
+					 * TODO: Save column scroll position - below is copied from
+					 * row logic above - edit it!
+					 */
 					if(lastScrollColPos == -1) {
-						LogBuffer.println("Scrolling to [0] after drawing - first time cols left justified");
+						LogBuffer.println("Scrolling to [0] after drawing - " +
+						                  "first time cols left justified");
 						getSecondaryScrollBar().setValue(0);
-						//It seems that the scrollbar max and extent are not updated in this scenario when the app first opens a file, so we will calculate the initial scroll position thusly
+						//It seems that the scrollbar max and extent are not
+						//updated in this scenario when the app first opens a
+						//file, so we will calculate the initial scroll position
+						//thusly
 						lastScrollColPos = 0;
-						//lastScrollColEndPos = getSecondaryScrollBar().getModel().getExtent();
-						lastScrollColEndPos = scrollPane.getViewport().getSize().width;
-						//lastScrollColEndGap = getSecondaryScrollBar().getMaximum() - lastScrollColEndPos;
-						lastScrollColEndGap = maxStrLen - scrollPane.getViewport().getSize().width;
+						lastScrollColEndPos =
+							scrollPane.getViewport().getSize().width;
+						lastScrollColEndGap = maxStrLen -
+							scrollPane.getViewport().getSize().width;
 					} else {
-						LogBuffer.println("Scrolling to [" + lastScrollColPos + "] after drawing - rememberred cols right justified");
+						LogBuffer.println("Scrolling to [" + lastScrollColPos +
+						                  "] after drawing - rememberred " +
+						                  "cols right justified");
 						getSecondaryScrollBar().setValue(lastScrollColPos);
 					}
 				}
 			} else {
 				if(isGeneAxis) {
 					if(lastScrollRowPos == -1) {
-						LogBuffer.println("Scrolling to [0] after drawing - first time rows left justified");
+						LogBuffer.println("Scrolling to [0] after drawing - " +
+						                  "first time rows left justified");
 						getSecondaryScrollBar().setValue(0);
-						//It seems that the scrollbar max and extent are not updated in this scenario when the app first opens a file, so we will calculate the initial scroll position thusly
+						//It seems that the scrollbar max and extent are not
+						//updated in this scenario when the app first opens a
+						//file, so we will calculate the initial scroll position
+						//thusly
 						lastScrollRowPos = 0;
-						//lastScrollRowEndPos = getSecondaryScrollBar().getModel().getExtent();
-						lastScrollRowEndPos = scrollPane.getViewport().getSize().width;
-						//lastScrollRowEndGap = getSecondaryScrollBar().getMaximum() - lastScrollRowEndPos;
-						lastScrollRowEndGap = maxStrLen - scrollPane.getViewport().getSize().width;
+						lastScrollRowEndPos =
+							scrollPane.getViewport().getSize().width;
+						lastScrollRowEndGap = maxStrLen -
+							scrollPane.getViewport().getSize().width;
 					} else {
-						LogBuffer.println("Scrolling to [" + lastScrollRowPos + "] after drawing - rememberred rows left justified");
+						LogBuffer.println("Scrolling to [" + lastScrollRowPos +
+						                  "] after drawing - rememberred " +
+						                  "rows left justified");
 						getSecondaryScrollBar().setValue(lastScrollRowPos);
 					}
 				} else {
-					/* TODO: Save column scroll position - below is copied from row logic above - edit it! */
+					/*
+					 * TODO: Save column scroll position - below is copied from
+					 * row logic above - edit it!
+					 */
 					if(lastScrollColPos == -1) {
-						LogBuffer.println("Scrolling to [" + (getSecondaryScrollBar().getMaximum() - getSecondaryScrollBar().getModel().getExtent()) + "] max - extent [" + getSecondaryScrollBar().getMaximum() + " - " + getSecondaryScrollBar().getModel().getExtent() + "] after drawing - first time cols right justified");
-						//getSecondaryScrollBar().setValue(getSecondaryScrollBar().getMaximum() - getSecondaryScrollBar().getModel().getExtent());
-						//It seems that the scrollbar max and extent are not updated in this scenario when the app first opens a file, so we will calculate the initial scroll position thusly
-						int tmpscrollpos = maxStrLen - scrollPane.getViewport().getSize().height;
+						LogBuffer.println("Scrolling to [" +
+						                  (getSecondaryScrollBar()
+						                   .getMaximum() -
+						                   getSecondaryScrollBar().getModel()
+						                   .getExtent()) +
+						                  "] max - extent [" +
+						                  getSecondaryScrollBar().getMaximum() +
+						                  " - " +
+						                  getSecondaryScrollBar().getModel()
+						                  .getExtent() +
+						                  "] after drawing - first time " +
+						                  "cols right justified");
+						//It seems that the scrollbar max and extent are not
+						//updated in this scenario when the app first opens a
+						//file, so we will calculate the initial scroll
+						//position thusly
+						int tmpscrollpos = maxStrLen -
+							scrollPane.getViewport().getSize().height;
 						getSecondaryScrollBar().setValue(tmpscrollpos);
-						//lastScrollColPos = getSecondaryScrollBar().getMaximum() - getSecondaryScrollBar().getModel().getExtent();
-						lastScrollColPos = tmpscrollpos;
-						//lastScrollColEndPos = lastScrollColPos + getSecondaryScrollBar().getModel().getExtent();
+						lastScrollColPos    = tmpscrollpos;
 						lastScrollColEndPos = maxStrLen;
-						//lastScrollColEndGap = getSecondaryScrollBar().getMaximum() - lastScrollColEndPos;
 						lastScrollColEndGap = 0;
 					} else {
-						LogBuffer.println("Scrolling to [" + lastScrollColPos + "] after drawing - rememberred cols left justified");
+						LogBuffer.println("Scrolling to [" + lastScrollColPos +
+						                  "] after drawing - rememberred " +
+						                  "cols left justified");
 						getSecondaryScrollBar().setValue(lastScrollColPos);
 					}
 				}
@@ -1292,26 +1291,22 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 //			lastScrollRowEndGap = secondaryScrollEndGap;
 //			lastScrollRowPos = secondaryScrollPos;
 //			lastScrollRowEndPos = secondaryScrollEndPos;
-
-			//if(getSecondaryScrollBar().getMaximum() != maxStrLen) {
-			//	getSecondaryScrollBar().setMaximum(maxStrLen);
-			//	scrollPane.revalidate();
-			//}
 		} else {
 			setPoints(HINTFONTSIZE);
 			g2d.setColor(Color.black);
 
-			int xPos = getHintX(g2d, stringX);
+			int xPos = getHintX(g2d,stringX);
 			int yPos = getHintY(g2d);
 			final FontMetrics metrics = getFontMetrics(g2d.getFont());
 			boolean isBeginJustified;
 			int scrollSize;
 
-			if (isGeneAxis) {
+			if(isGeneAxis) {
 				//Reduce the size of the scrollpane to just what is visible
-				setPreferredSize(
-						new Dimension(scrollPane.getViewport().getSize().width,
-								scrollPane.getViewport().getSize().height));
+				setPreferredSize(new Dimension(scrollPane.getViewport()
+				                                         .getSize().width,
+				                               scrollPane.getViewport()
+				                                         .getSize().height));
 
 				isBeginJustified = isRightJustified;
 				scrollSize = offscreenSize.width;
@@ -1321,69 +1316,50 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 				yPos = scrollPane.getViewport().getSize().width / 2;
 				//After rotate, this is the distance up from the bottom where to
 				//start the hint string
-				xPos = ((offscreenSize.height - metrics.stringWidth(zoomHint)) /
-						2);
+				xPos = (offscreenSize.height -
+				        metrics.stringWidth(zoomHint)) / 2;
 				g2d.rotate(Math.PI * 3 / 2);
 				//Need to translate the coordinates to/from? the rotated state
-				g2d.translate(-offscreenSize.height, 0);
-				if(debug)
-					LogBuffer.println("Row Hint position: [" + xPos + "/" + yPos +
-						"] stringX: [" + stringX + "] zoomHint: [" + zoomHint +
-						"] height [" + offscreenSize.height + "] width [" +
-						offscreenSize.width + "] + HintStrLen [" +
-						metrics.stringWidth(zoomHint) + "]");
-
-//				if(isRightJustified) {
-//					for(int i = offscreenSize.width - yPos;i > 0;i -= yPos * 2) {
-//						g2d.drawString(zoomHint, xPos, i);
-//					}
-//				} else {
-//					for(int i = yPos;i < offscreenSize.width;i += yPos * 2) {
-//						g2d.drawString(zoomHint, xPos, i);
-//					}
-//				}
+				g2d.translate(-offscreenSize.height,0);
+				if(debug) {
+					LogBuffer.println("Row Hint position: [" + xPos + "/" +
+					                  yPos + "] stringX: [" + stringX +
+					                  "] zoomHint: [" + zoomHint +
+					                  "] height [" + offscreenSize.height +
+					                  "] width [" + offscreenSize.width +
+					                  "] + HintStrLen [" +
+					                  metrics.stringWidth(zoomHint) + "]");
+				}
 			} else {
 				//Reduce the size of the scrollpane to just what is visible
-				setPreferredSize(new Dimension(scrollPane.getViewport().getSize().width,
-						scrollPane.getViewport().getSize().height));
+				setPreferredSize(new Dimension(scrollPane.getViewport()
+				                               .getSize().width,
+				                               scrollPane.getViewport()
+				                               .getSize().height));
 
 				isBeginJustified = !isRightJustified;
 				scrollSize = offscreenSize.height;
-				//offscreenSize.height = scrollPane.getViewport().getSize().height;
-				//offscreenSize.setSize(offscreenSize.width, scrollPane.getViewport().getSize().height);
-				//setSize(offscreenSize.width,scrollPane.getViewport().getSize().height);
-				//scrollPane.getVerticalScrollBar().setMaximum(offscreenSize.height);
-				//revalidate();
-				//scrollPane.revalidate();
-				//scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-				xPos = (offscreenSize.width - metrics.stringWidth(zoomHint)) /
-						2;
+				xPos = (offscreenSize.width -
+				        metrics.stringWidth(zoomHint)) / 2;
 				yPos = scrollPane.getViewport().getSize().height / 2;
-				if(debug)
-					LogBuffer.println("Col Hint position: [" + xPos + "/" + yPos +
-						"] stringX: [" + stringX + "] zoomHint: [" + zoomHint +
-						"] height [" + offscreenSize.height + "] width [" +
-						offscreenSize.width + "] + HintStrLen [" +
-						metrics.stringWidth(zoomHint) + "]");
-
-//				if(!isRightJustified) {
-//					for(int i = offscreenSize.height - yPos;i > 0;i -= yPos * 2) {
-//						g2d.drawString(zoomHint, xPos, i);
-//					}
-//				} else {
-//					for(int i = yPos;i < offscreenSize.height;i += yPos * 2) {
-//						g2d.drawString(zoomHint, xPos, i);
-//					}
-//				}
+				if(debug) {
+					LogBuffer.println("Col Hint position: [" + xPos + "/" +
+					                  yPos + "] stringX: [" + stringX +
+					                  "] zoomHint: [" + zoomHint +
+					                  "] height [" + offscreenSize.height +
+					                  "] width [" + offscreenSize.width +
+					                  "] + HintStrLen [" +
+					                  metrics.stringWidth(zoomHint) + "]");
+				}
 			}
 
 			if(isBeginJustified) {
 				for(int i = scrollSize - yPos;i > 0;i -= yPos * 2) {
-					g2d.drawString(zoomHint, xPos, i);
+					g2d.drawString(zoomHint,xPos,i);
 				}
 			} else {
 				for(int i = yPos;i < scrollSize;i += yPos * 2) {
-					g2d.drawString(zoomHint, xPos, i);
+					g2d.drawString(zoomHint,xPos,i);
 				}
 			}
 
@@ -1392,26 +1368,18 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 			//scrollbar still implies that the panel is its previous size and
 			//the hint is off center
 			getSecondaryScrollBar().setValue(0);
-
-			//g2d.setColor(Color.black);
-			//g2d.drawString(zoomHint, xPos, yPos);
-			//scrollPane.revalidate();
-			//final FontMetrics metrics = getFontMetrics(g2d.getFont());
-			//int maxStrLen = metrics.stringWidth(zoomHint);
-			//if(getSecondaryScrollBar().getMaximum() != maxStrLen) {
-			//	getSecondaryScrollBar().setMaximum(maxStrLen);
-			//	scrollPane.revalidate();
-			//}
 		}
-		//revalidate();
-		//scrollPane.revalidate();
 	}
 
 	public int getJustifiedPosition(FontMetrics metrics) {
-		int min = (isGeneAxis ? scrollPane.getViewport().getSize().width : scrollPane.getViewport().getSize().height) /* - indicatorThickness */;
+		int min =
+			isGeneAxis ? scrollPane.getViewport().getSize().width :
+						 scrollPane.getViewport().getSize().height
+						 /* - indicatorThickness */;
 		int len = getMaxStringLength(metrics);
-		return(len > min ? len : min);
+		return len > min ? len : min;
 	}
+
 	/**
 	 * Returns either the number of pixels in length the longest string is, or
 	 * the dimension of the panel the strings will be drawn in (minus the
@@ -1422,109 +1390,133 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		int end = map.getMaxIndex();
 		int maxStrLen = 0;
 		String maxStr = "";
-		if(lastDrawnFace == face && lastDrawnStyle == style &&
-		   longest_str_index > -1 && lastDrawnSize == size &&
-		   /* TODO: Assuming if the string is the same, it's the same overall data - it would be better to catch when the data changes */
-		   longest_str.equals(headerSummary.getSummary(headerInfo,longest_str_index))) {
+		if(lastDrawnFace == face  && lastDrawnStyle == style &&
+		   longest_str_index > -1 && lastDrawnSize  == size &&
+			/* TODO: Assuming if the string is the same, it's the same overall
+		     * data - it would be better to catch when the data changes */
+			longest_str.equals(headerSummary.getSummary(headerInfo,
+		                                               longest_str_index))) {
 			LogBuffer.println("Regurgitating maxstrlen");
-			if(debug)
+			if(debug) {
 				maxStr = headerSummary.getSummary(headerInfo,longest_str_index);
+			}
 			maxStrLen = longest_str_length;
 		} else if(lastDrawnFace == face && lastDrawnStyle == style &&
-				  longest_str_index > -1 && lastDrawnSize != size &&
-				  /* TODO: Assuming if the string is the same, it's the same overall data - it would be better to catch when the data changes */
-				  longest_str.equals(headerSummary.getSummary(headerInfo,longest_str_index))) {
+		          longest_str_index > -1 &&
+		          lastDrawnSize != size &&
+		          /* TODO: Assuming if the string is the same, it's the same
+				   * overall data - it would be better to catch when the data
+				   * changes */
+		          longest_str.equals(headerSummary.getSummary(headerInfo,
+		                                                      longest_str_index)
+		         )) {
 			LogBuffer.println("Refining maxstrlen");
 			maxStr = headerSummary.getSummary(headerInfo,longest_str_index);
 			maxStrLen = metrics.stringWidth(maxStr);
 		} else {
-			LogBuffer.println("Calculating maxstrlen because not [lastDrawnFace == face && lastDrawnStyle == style && longest_str_index > -1 && lastDrawnSize != size && longest_str.equals(headerSummary.getSummary(headerInfo,longest_str_index))]");
-			LogBuffer.println("Calculating maxstrlen because not [" + lastDrawnFace + " == " + face + " && " + lastDrawnStyle + " == " + style + " && " + longest_str_index + " > -1 && " + lastDrawnSize + " != " + size + " && " + longest_str + ".equals(headerSummary.getSummary(headerInfo," + longest_str_index + "))]");
-			for (int j = 0; j <= end; j++) {
+			LogBuffer.println("Calculating maxstrlen because not [" +
+			                  "lastDrawnFace == face && lastDrawnStyle == " +
+			                  "style && longest_str_index > -1 && " +
+			                  "lastDrawnSize != size && longest_str." +
+			                  "equals(headerSummary.getSummary(headerInfo," +
+			                  "longest_str_index))]");
+			LogBuffer.println("Calculating maxstrlen because not [" +
+			                  lastDrawnFace + " == " + face + " && " +
+			                  lastDrawnStyle + " == " + style + " && " +
+			                  longest_str_index + " > -1 && " + lastDrawnSize +
+			                  " != " + size + " && " + longest_str +
+			                  ".equals(headerSummary.getSummary(headerInfo," +
+			                  longest_str_index + "))]");
+			for(int j = 0;j <= end;j++) {
 				try {
-					String out = headerSummary.getSummary(headerInfo, j);
-	
-					if (out == null) {
+					String out = headerSummary.getSummary(headerInfo,j);
+
+					if(out == null) {
 						out = "No Label";
 					}
-	
+
 					if(maxStrLen < metrics.stringWidth(out)) {
 						maxStrLen = metrics.stringWidth(out);
 						longest_str_index = j;
-						if(debug)
+						if(debug) {
 							maxStr = out;
+						}
 					}
-	
-				} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
+
+				}
+				catch(final java.lang.ArrayIndexOutOfBoundsException e) {
 					LogBuffer.logException(e);
 					break;
 				}
 			}
 			longest_str = maxStr;
 		}
-		lastDrawnFace  = face;
+		lastDrawnFace = face;
 		lastDrawnStyle = style;
-		lastDrawnSize  = size;
+		lastDrawnSize = size;
 		longest_str_length = maxStrLen;
-		//if(debug)
+		if(debug) {
 			LogBuffer.println((isGeneAxis ? "ROW" : "COL") + ": MaxStrLen: [" +
-					maxStrLen + "] MaxStr: [" + maxStr + "] Start Index: [" +
-					0 + "] End Index: [" + end + "] height [" +
-					offscreenSize.height + "] width [" + offscreenSize.width +
-					"]");
+			                  maxStrLen + "] MaxStr: [" + maxStr +
+			                  "] Start Index: [" + 0 + "] End Index: [" + end +
+			                  "] height [" + offscreenSize.height +
+			                  "] width [" + offscreenSize.width + "]");
+		}
 
-		return(maxStrLen);
+		return maxStrLen;
 	}
 
 	/**
 	 * Gets x-position for the hint label based on axis and justification.
+	 * 
 	 * @param g2d
 	 * @param stringX
 	 * @return x-position for hint label.
 	 */
-	private int getHintX(Graphics2D g2d, int stringX) {
-		
+	private int getHintX(Graphics2D g2d,int stringX) {
+
 		int xPos = 0;
 		int offSet = 10;
 		final FontMetrics metrics = getFontMetrics(g2d.getFont());
-			
-		if (isGeneAxis) {
+
+		if(isGeneAxis) {
 			if(isRightJustified) {
 				xPos = stringX - metrics.stringWidth(zoomHint) - offSet;
 			} else {
 				xPos = offSet;
 			}
-			
+
 		} else {
-			xPos = (offscreenSize.width  - metrics.stringWidth(zoomHint)) / 2;
+			xPos = (offscreenSize.width - metrics.stringWidth(zoomHint)) / 2;
 		}
-		
+
 		return xPos;
 	}
-	
+
 	/**
 	 * Gets y-position for the hint label based on axis and justification.
+	 * 
 	 * @param g2d
 	 * @return y-position for hint label.
 	 */
 	private int getHintY(Graphics2D g2d) {
-		
+
 		int yPos = 0;
 		if(isGeneAxis) {
 			yPos = panel.getHeight() / 2;
-			
+
 		} else {
 			if(isRightJustified) {
 				yPos = panel.getHeight() / 2;
-				
+
 			} else {
-				yPos = (int) offscreenSize.getHeight() - (panel.getHeight() / 2);
+				yPos = (int) offscreenSize.getHeight() - panel.getHeight() / 2;
 			}
 		}
-		
+
 		return yPos;
 	}
-	
+
 	/**
 	 * Sets a dynamic font size based on current scale of the dependent
 	 * axis map.
@@ -1536,10 +1528,14 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		} else if(newPoints < getMin()) {
 			newPoints = getMin();
 		}
-		
+
 		if(!isFixed && newPoints != getPoints()) {
-			if(debug)
-				LogBuffer.println("Adapting to new font size from [" + getPoints() + "] to [" + newPoints + "] for [" + (isGeneAxis ? "rows" : "cols") + "]");
+			if(debug) {
+				LogBuffer.println("Adapting to new font size from [" +
+				                  getPoints() + "] to [" + newPoints +
+				                  "] for [" +
+				                  (isGeneAxis ? "rows" : "cols") + "]");
+			}
 			setSavedPoints(newPoints);
 		}
 	}
@@ -1552,121 +1548,44 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		if(newPoints < 1) {
 			newPoints = 1;
 		}
-		if(debug)
-			LogBuffer.println("Adapting to new font size from [" + getPoints() + "] to [" + newPoints + "] for [" + (isGeneAxis ? "rows" : "cols") + "]");
-		setFont(new Font(face, style, newPoints));
+		if(debug) {
+			LogBuffer.println("Adapting to new font size from [" + getPoints() +
+			                  "] to [" + newPoints + "] for [" +
+			                  (isGeneAxis ? "rows" : "cols") + "]");
+		}
+		setFont(new Font(face,style,newPoints));
 	}
-
-//	@Override
-//	public void mouseExited(final MouseEvent e) {
-//
-//		hoverIndex = -1;
-//		repaint();
-//	}
 
 	@Override
-	public void mouseDragged(final MouseEvent e) {
+	public void mouseDragged(final MouseEvent e) {}
 
-	}
-
-//	@Override
-//	public void mouseMoved(final MouseEvent e) {
-//
-//	}
-
-	protected abstract void setSecondaryScrollBarPolicyAsNeeded();
-	protected abstract void setSecondaryScrollBarPolicyAlways();
-	protected abstract void setSecondaryScrollBarPolicyNever();
-	protected abstract int getPrimaryHoverPosition(final MouseEvent e);
+	protected abstract void    setSecondaryScrollBarPolicyAsNeeded();
+	protected abstract void    setSecondaryScrollBarPolicyAlways();
+	protected abstract void    setSecondaryScrollBarPolicyNever();
+	protected abstract int     getPrimaryHoverPosition(final MouseEvent e);
 	protected abstract boolean isJustifiedToMatrixEdge();
-
-//	protected int shiftForScrollbar = 0;
-//	protected int shiftedForScrollbar = 0;
 
 	@Override
 	public void mouseMoved(final MouseEvent e) {
-
-//		if(shiftForScrollbar > 0) {
-//			//Shift the scroll position to accommodate the scrollbar that
-//			//appeared (I think this may only be for Macs, according to what I
-//			//read.  They draw the scrollbar on top of content when it is set
-//			//"AS_NEEDED")
-//			getSecondaryScrollBar().setValue(shiftForScrollbar);
-//			if(getSecondaryScrollBar().getValue() == shiftForScrollbar) {
-//				shiftedForScrollbar = shiftForScrollbar;
-//				shiftForScrollbar = 0;
-//			}
-//		}
-//		if(doDrawLabelPort()) {
-//			hoverIndex = (int) Math.floor(getPrimaryHoverPosition(e) / (size + SQUEEZE));
-//		} else {
-			hoverIndex = map.getIndex(getPrimaryHoverPosition(e));
-//		}
+		hoverIndex = map.getIndex(getPrimaryHoverPosition(e));
 		repaint();
 	}
 
 	public int getPrimaryHoverIndex(final MouseEvent e) {
-		int hoverIndex;
-//		if(doDrawLabelPort()) {
-//			hoverIndex = (int) Math.floor(getPrimaryHoverPosition(e) / (size + SQUEEZE));
-//		} else {
-			hoverIndex = map.getIndex(getPrimaryHoverPosition(e));
-//		}
-		return(hoverIndex);
+		return(map.getIndex(getPrimaryHoverPosition(e)));
 	}
 
 	public boolean doDrawLabelPort() {
 		return(inLabelPortMode() && map.overALabelPortLinkedView() &&
-			   ((!isFixed && map.getScale() < (getMin() + SQUEEZE)) ||
-			    (isFixed  && map.getScale() < last_size)));
+		       (!isFixed && map.getScale() < getMin() + SQUEEZE || isFixed &&
+		        map.getScale() < last_size));
 	}
 
-	//@Override
-	public void mouseEntered(final MouseEvent e) {
-		//This method call is why these mouse functions
-		//setSecondaryScrollBarPolicyAsNeeded();
-		//scrollPane.setVerticalScrollBarPolicy(
-		//		ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-//		int ts = getSecondaryScrollBar().getValue();
-//		int tw = getSecondaryScrollBar().getModel().getExtent();
-//		int tm = getSecondaryScrollBar().getMaximum();
-//		
-//		//We do not want to shift the scrollbar if the user has manually left-
-//		//justified his/her labels, so only shift to accommodate the scrollbar
-//		//when the scroll position is more than half way
-//		boolean nearBeginning = (ts < ((tm - tw) / 2));
-//		LogBuffer.println("ENTER Setting temp scroll value: [" + ts +
-//				"] width [" + tw + "] max [" + tm + "]");
-//		if(isJustifiedToMatrixEdge() && !nearBeginning) {
-//			LogBuffer.println("Adjusting scrollbar that is positioned near " +
-//					"end. Now position: [" + ts + " + 15] New max: [" +
-//					getSecondaryScrollBar().getMaximum() + " + 15]");
-//			//Width of the vertical scrollbar is 15
-//			int newWidth = getSecondaryScrollBar().getMaximum() + 15;
-//			getSecondaryScrollBar().setMaximum(newWidth);
-//			shiftForScrollbar = ts + 15;
-//			getSecondaryScrollBar().setValue(shiftForScrollbar);
-//		}
-//		LogBuffer.println("ENTER New scroll values: [" +
-//				getSecondaryScrollBar().getValue() + "] width [" +
-//				getSecondaryScrollBar().getModel().getExtent() + "] max [" +
-//				getSecondaryScrollBar().getMaximum() + "]");
-	}
+	@Override
+	public void mouseEntered(final MouseEvent e) {}
 
-	//@Override
+	@Override
 	public void mouseExited(final MouseEvent e) {
-//		int ts = getSecondaryScrollBar().getValue();
-		//setSecondaryScrollBarPolicyNever();
-		//scrollPane.setVerticalScrollBarPolicy(
-		//		ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-//		LogBuffer.println("EXIT Setting temp scroll value: [" + ts + "]");
-//		if(shiftedForScrollbar > 0) {
-//			LogBuffer.println("Adjusting scrollbar that is positioned near end.");
-//			getSecondaryScrollBar().setValue(ts - 15);
-//			shiftedForScrollbar = 0;
-//		}
-//		scrollPane.revalidate();
-//		LogBuffer.println("EXIT New scroll values: [" + getSecondaryScrollBar().getValue() + "] width [" + getSecondaryScrollBar().getModel().getExtent() + "] max [" + getSecondaryScrollBar().getMaximum() + "]");
 		hoverIndex = -1;
 		repaint();
 	}
@@ -1685,27 +1604,36 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		LogBuffer.println("Resetting last secondary scroll position values");
 		if(isGeneAxis) {
 			//Do not adjust if the scrollbars are not properly set
-			if(lastScrollRowPos == -1 || lastScrollRowEndPos == -1 || lastScrollRowEndGap == -1) {
+			if(lastScrollRowPos    == -1 ||
+			   lastScrollRowEndPos == -1 ||
+			   lastScrollRowEndGap == -1) {
 				return;
 			}
 			if(isRightJustified) {
-				lastScrollRowPos = lastScrollRowEndPos - getSecondaryScrollBar().getModel().getExtent();
+				lastScrollRowPos =
+					lastScrollRowEndPos -
+				    getSecondaryScrollBar().getModel().getExtent();
 			} else {
-				lastScrollRowEndPos = lastScrollRowPos + getSecondaryScrollBar().getModel().getExtent();
-				lastScrollRowEndGap = getSecondaryScrollBar().getMaximum() - lastScrollRowEndPos;
+				lastScrollRowEndPos =
+					lastScrollRowPos +
+					getSecondaryScrollBar().getModel().getExtent();
+				lastScrollRowEndGap = getSecondaryScrollBar().getMaximum() -
+				                      lastScrollRowEndPos;
 			}
 		} else {
 			//Do not adjust if the scrollbars are not properly set
-			if(lastScrollColPos == -1 || lastScrollColEndPos == -1 || lastScrollColEndGap == -1) {
-				return;
-			}
+			if(lastScrollColPos == -1 || lastScrollColEndPos == -1 ||
+			   lastScrollColEndGap == -1) { return; }
 			if(isRightJustified) {
 				LogBuffer.println("Adjusting columns for bottom justification");
-				lastScrollColEndPos = lastScrollColPos + getSecondaryScrollBar().getModel().getExtent();
-				lastScrollColEndGap = getSecondaryScrollBar().getMaximum() - lastScrollColEndPos;
+				lastScrollColEndPos = lastScrollColPos +
+					                  getSecondaryScrollBar().getModel().getExtent();
+				lastScrollColEndGap = getSecondaryScrollBar().getMaximum() -
+				                      lastScrollColEndPos;
 			} else {
 				LogBuffer.println("Adjusting columns for top justification");
-				lastScrollColPos = lastScrollColEndPos - getSecondaryScrollBar().getModel().getExtent();
+				lastScrollColPos = lastScrollColEndPos -
+				                   getSecondaryScrollBar().getModel().getExtent();
 			}
 		}
 	}
@@ -1723,6 +1651,6 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 				colLabelPaneSize = scrollPane.getViewport().getSize().height;
 			}
 		}
-		return(changed);
+		return changed;
 	}
 }
