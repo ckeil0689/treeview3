@@ -9,6 +9,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -128,8 +129,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	int rowLabelPaneSize    = -1;
 	int colLabelPaneSize    = -1;
 
-	protected boolean debug = true;
-
 	public LabelView(final int axis_id) {
 
 		super();
@@ -154,6 +153,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		scrollPane.setBorder(null);
 
 		panel = scrollPane;
+
+		debug = 0; //This is a verbosity level
 	}
 
 	protected abstract void adjustScrollBar();
@@ -259,8 +260,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	public void importSettingsFromNode(Preferences node) {
 		setMin(node.getInt("min",d_min));
 		setMax(node.getInt("max",d_max));
-		LogBuffer.println("Setting min font size from preferences to [" + min +
-		                  "]");
 		setFace(node.get("face",d_face));
 		setStyle(node.getInt("style",d_style));
 		setSavedPoints(node.getInt("size",d_size));
@@ -387,15 +386,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	@Override
 	public void setMin(final int i) {
-		if(debug) {
-			LogBuffer.println("setMin(" + i + ") called");
-		}
 		if(i < 1 || max > 0 && i > max) { return; }
 
 		if(min != i) {
 			min = i;
 			if(configNode != null) {
-				LogBuffer.println("Saving new min font size [" + min + "]");
 				configNode.putInt("min",min);
 			}
 			setFont(new Font(face,style,size));
@@ -407,9 +402,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	@Override
 	public void setMax(final int i) {
-		if(debug) {
-			LogBuffer.println("setMax(" + i + ") called");
-		}
 		if(i < 1 || min > 0 && i < min) { return; }
 
 		if(max != i) {
@@ -572,14 +564,13 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			map.setLabelAnimeRunning(true);
 		}
 
-		if(debug) {
-			LogBuffer.println("Updating the label pane graphics");
-		}
+		debug("Updating the label pane graphics",1);
 		/** TODO: Make sure that the number of visible labels is up to date */
 
 		/* Shouldn't draw if there's no TreeSelection defined */
 		if(drawSelection == null) {
-			LogBuffer.println("drawSelection not defined. Can't draw labels.");
+			LogBuffer.println("Error: drawSelection not defined. Can't draw " +
+			                  "labels.");
 			return;
 		}
 
@@ -593,14 +584,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		/* Draw labels if zoom level allows it */
 		final boolean hasFixedOverlap = isFixed && map.getScale() < last_size;
-		boolean resetJustification =
-			isGeneAxis ?
-			scrollPane.getViewport().getSize().width == offscreenSize.width :
-			scrollPane.getViewport().getSize().height == offscreenSize.height;
-		if(resetJustification && debug) {
-			LogBuffer.println("Resetting justification for " +
-			                  (isGeneAxis ? "ROW" : "COL") + "s!!!!");
-		}
+		debug("Resetting justification for " + (isGeneAxis ? "ROW" : "COL") +
+		      "s!!!!",1);
 
 		if(map.getScale() >= getMin() + SQUEEZE && !hasFixedOverlap ||
 		   doDrawLabelPort()) {
@@ -622,19 +607,17 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			}
 
 			boolean drawLabelPort = doDrawLabelPort();
-			if(drawLabelPort && debug) {
-				LogBuffer.println("Drawing a label port");
+			if(drawLabelPort) {
+				debug("Drawing a label port",2);
 			}
 
 			/* Get indices range */
 			final int start = map.getIndex(0);
 			final int end   = map.getIndex(map.getAvailablePixels()) - 1;
-			LogBuffer.println("Set end data index to [" + end +
-			                  "] as first [" +
-			                  map.getFirstVisible() +
-			                  "] plus num [" +
-			                  map.getNumVisible() +
-			                  "] visible - 1");
+
+			debug("Set end data index to [" + end + "] as first [" +
+			      map.getFirstVisible() + "] plus num [" + map.getNumVisible() +
+			      "] visible - 1",1);
 
 			/* Rotate plane for array axis (not for zoomHint) */
 			if(!isGeneAxis) {
@@ -655,22 +638,15 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			int activeHoverDataIndex =
 				hoverIndex == -1 ? matrixHoverIndex : hoverIndex;
 
-			if(debug) {
-				LogBuffer.println("Label port mode is " +
-				                  (drawLabelPort ? "" : "in") +
-				                  "active.  Map square size: [" +
-				                  map.getScale() + "] Font size: [" +
-				                  curFontSize + "] SQUEEZE: [" + SQUEEZE +
-				                  "] ascent: [" + ascent + "]");
-			}
+			debug("Label port mode is " + (drawLabelPort ? "" : "in") +
+			      "active.  Map square size: [" + map.getScale() +
+			      "] Font size: [" + curFontSize + "] SQUEEZE: [" + SQUEEZE +
+			      "] ascent: [" + ascent + "]",1);
 
 			/* Draw label backgrounds first if color is defined */
 			final int bgColorIndex = headerInfo.getIndex("BGCOLOR");
 			Color bgColor = g.getColor();
 			if(bgColorIndex > 0) {
-				if(debug) {
-					LogBuffer.println("BgLabel");
-				}
 				final Color back = g.getColor();
 				for(int j = start;j <= end;j++) {
 					final String[] strings = headerInfo.getHeader(j);
@@ -810,9 +786,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			} else {
 				for(int j = start;j <= end;j++) {
 
-					if(debug) {
-						LogBuffer.println("Getting data index [" + j + "]");
-					}
+					debug("Getting data index [" + j + "]",1);
+
 					try {
 						String out = headerSummary.getSummary(headerInfo,j);
 						final String[] headers = headerInfo.getHeader(j);
@@ -849,20 +824,18 @@ public abstract class LabelView extends ModelView implements MouseListener,
 							xPos = stringX - metrics.stringWidth(out);
 						}
 
-//						if(debug) {
-//							LogBuffer.println("Drawing " +
-//							                  (isGeneAxis ? "ROW" : "COL") +
-//							                  " label at X pixel [" +
-//							                  (xPos +
-//							                   (drawLabelPort ?
-//							                    indicatorThickness :
-//							                    labelIndent) *
-//							                   (isGeneAxis ? -1 : 1)) +
-//							                  "] xPos [" + xPos +
-//							                  "] indicatorThickness [" +
-//							                  (indicatorThickness *
-//							                   (isGeneAxis ? -1 : 1)) + "].");
-//						}
+//						debug("Drawing " +
+//						                  (isGeneAxis ? "ROW" : "COL") +
+//						                  " label at X pixel [" +
+//						                  (xPos +
+//						                   (drawLabelPort ?
+//						                    indicatorThickness :
+//						                    labelIndent) *
+//						                   (isGeneAxis ? -1 : 1)) +
+//						                  "] xPos [" + xPos +
+//						                  "] indicatorThickness [" +
+//						                  (indicatorThickness *
+//						                   (isGeneAxis ? -1 : 1)) + "].");
 						g2d.drawString(out,xPos,map.getMiddlePixel(j) + ascent /
 						                        2);
 
@@ -873,13 +846,10 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					}
 				}
 			}
-			if(debug) {
-				LogBuffer.println((isGeneAxis ? "ROW" : "COL") +
-				                  ": MaxStrLen: [" + maxStrLen +
-				                  "]Start Index: [" + start + "] End Index: [" +
-				                  end + "] height [" + offscreenSize.height +
-				                  "] width [" + offscreenSize.width + "]");
-			}
+			debug((isGeneAxis ? "ROW" : "COL") + ": MaxStrLen: [" + maxStrLen +
+			      "]Start Index: [" + start + "] End Index: [" + end +
+			      "] height [" + offscreenSize.height + "] width [" +
+			      offscreenSize.width + "]",1);
 
 			//I MIGHT resurect some or all of the following commented code
 			//depending on feedback from the next meeting (after 6/18/2015)
@@ -1152,10 +1122,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					                                */,
 					                               fullPaneSize));
 				}
-				if(debug) {
-					LogBuffer.println("Resizing row labels panel to [" +
-					                  maxStrLen + "x" + fullPaneSize + "].");
-				}
+				debug("Resizing row labels panel to [" + maxStrLen + "x" +
+				      fullPaneSize + "].",1);
 			} else {
 				if(offscreenSize.height != maxStrLen || offscreenSize.width != fullPaneSize) {
 					setPreferredSize(new Dimension(fullPaneSize,
@@ -1164,10 +1132,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					                                * indicatorThickness : 0) */
 					                               ));
 				}
-				if(debug) {
-					LogBuffer.println("Resizing col labels panel to [" +
-					                  fullPaneSize + "x" + maxStrLen + "].");
-				}
+				debug("Resizing col labels panel to [" + fullPaneSize + "x" +
+				      maxStrLen + "].",1);
 			}
 
 			/*
@@ -1177,17 +1143,14 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			if(isRightJustified) {
 				if(isGeneAxis) {
 					if(lastScrollRowPos == -1) {
-						LogBuffer.println("Scrolling to [" +
-						                  (getSecondaryScrollBar().getMaximum() -
-						                   getSecondaryScrollBar().getModel()
-						                   .getExtent()) +
-						                  "] max - extent [" +
-						                  getSecondaryScrollBar().getMaximum() +
-						                  " - " +
-						                  getSecondaryScrollBar().getModel()
-						                  .getExtent() +
-						                  "] after drawing - first time rows " +
-						                  "right justified");
+						debug("Scrolling to [" +
+						      (getSecondaryScrollBar().getMaximum() -
+						       getSecondaryScrollBar().getModel().getExtent()) +
+						      "] max - extent [" +
+						       getSecondaryScrollBar().getMaximum() + " - " +
+						       getSecondaryScrollBar().getModel().getExtent() +
+						       "] after drawing - first time rows right " +
+						       "justified",1);
 						//It seems that the scrollbar max and extent are not
 						//updated in this scenario when the app first opens a
 						//file, so we will calculate the initial scroll position
@@ -1200,9 +1163,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 						lastScrollRowEndPos = maxStrLen;
 						lastScrollRowEndGap = 0;
 					} else {
-						LogBuffer.println("Scrolling to [" + lastScrollRowPos +
-						                  "] after drawing - rememberred " +
-						                  "rows right justified");
+						debug("Scrolling to [" + lastScrollRowPos +
+						      "] after drawing - rememberred rows right " +
+						      "justified",1);
 						getSecondaryScrollBar().setValue(lastScrollRowPos);
 					}
 				} else {
@@ -1211,8 +1174,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					 * row logic above - edit it!
 					 */
 					if(lastScrollColPos == -1) {
-						LogBuffer.println("Scrolling to [0] after drawing - " +
-						                  "first time cols left justified");
+						debug("Scrolling to [0] after drawing - first time " +
+						      "cols left justified",1);
 						getSecondaryScrollBar().setValue(0);
 						//It seems that the scrollbar max and extent are not
 						//updated in this scenario when the app first opens a
@@ -1224,17 +1187,17 @@ public abstract class LabelView extends ModelView implements MouseListener,
 						lastScrollColEndGap = maxStrLen -
 							scrollPane.getViewport().getSize().width;
 					} else {
-						LogBuffer.println("Scrolling to [" + lastScrollColPos +
-						                  "] after drawing - rememberred " +
-						                  "cols right justified");
+						debug("Scrolling to [" + lastScrollColPos +
+						      "] after drawing - rememberred " +
+						      "cols right justified",1);
 						getSecondaryScrollBar().setValue(lastScrollColPos);
 					}
 				}
 			} else {
 				if(isGeneAxis) {
 					if(lastScrollRowPos == -1) {
-						LogBuffer.println("Scrolling to [0] after drawing - " +
-						                  "first time rows left justified");
+						debug("Scrolling to [0] after drawing - first time " +
+						      "rows left justified",1);
 						getSecondaryScrollBar().setValue(0);
 						//It seems that the scrollbar max and extent are not
 						//updated in this scenario when the app first opens a
@@ -1246,29 +1209,23 @@ public abstract class LabelView extends ModelView implements MouseListener,
 						lastScrollRowEndGap = maxStrLen -
 							scrollPane.getViewport().getSize().width;
 					} else {
-						LogBuffer.println("Scrolling to [" + lastScrollRowPos +
-						                  "] after drawing - rememberred " +
-						                  "rows left justified");
+						debug("Scrolling to [" + lastScrollRowPos +
+						      "] after drawing - rememberred " +
+						      "rows left justified",1);
 						getSecondaryScrollBar().setValue(lastScrollRowPos);
 					}
 				} else {
-					/*
-					 * TODO: Save column scroll position - below is copied from
-					 * row logic above - edit it!
-					 */
+					/* TODO: Save column scroll position - below is copied from
+					 * row logic above - edit it! */
 					if(lastScrollColPos == -1) {
-						LogBuffer.println("Scrolling to [" +
-						                  (getSecondaryScrollBar()
-						                   .getMaximum() -
-						                   getSecondaryScrollBar().getModel()
-						                   .getExtent()) +
-						                  "] max - extent [" +
-						                  getSecondaryScrollBar().getMaximum() +
-						                  " - " +
-						                  getSecondaryScrollBar().getModel()
-						                  .getExtent() +
-						                  "] after drawing - first time " +
-						                  "cols right justified");
+						debug("Scrolling to [" +
+						      (getSecondaryScrollBar().getMaximum() -
+						       getSecondaryScrollBar().getModel().getExtent()) +
+						      "] max - extent [" +
+						      getSecondaryScrollBar().getMaximum() + " - " +
+						      getSecondaryScrollBar().getModel().getExtent() +
+						      "] after drawing - first time " +
+						      "cols right justified",1);
 						//It seems that the scrollbar max and extent are not
 						//updated in this scenario when the app first opens a
 						//file, so we will calculate the initial scroll
@@ -1280,18 +1237,15 @@ public abstract class LabelView extends ModelView implements MouseListener,
 						lastScrollColEndPos = maxStrLen;
 						lastScrollColEndGap = 0;
 					} else {
-						LogBuffer.println("Scrolling to [" + lastScrollColPos +
-						                  "] after drawing - rememberred " +
-						                  "cols left justified");
+						debug("Scrolling to [" + lastScrollColPos +
+						      "] after drawing - rememberred " +
+						      "cols left justified",1);
 						getSecondaryScrollBar().setValue(lastScrollColPos);
 					}
 				}
 			}
-
-//			lastScrollRowEndGap = secondaryScrollEndGap;
-//			lastScrollRowPos = secondaryScrollPos;
-//			lastScrollRowEndPos = secondaryScrollEndPos;
 		} else {
+			debug("Label port NOT drawn",2);
 			setPoints(HINTFONTSIZE);
 			g2d.setColor(Color.black);
 
@@ -1321,15 +1275,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				g2d.rotate(Math.PI * 3 / 2);
 				//Need to translate the coordinates to/from? the rotated state
 				g2d.translate(-offscreenSize.height,0);
-				if(debug) {
-					LogBuffer.println("Row Hint position: [" + xPos + "/" +
-					                  yPos + "] stringX: [" + stringX +
-					                  "] zoomHint: [" + zoomHint +
-					                  "] height [" + offscreenSize.height +
-					                  "] width [" + offscreenSize.width +
-					                  "] + HintStrLen [" +
-					                  metrics.stringWidth(zoomHint) + "]");
-				}
+				debug("Row Hint position: [" + xPos + "/" + yPos +
+				      "] stringX: [" + stringX + "] zoomHint: [" + zoomHint +
+				      "] height [" + offscreenSize.height + "] width [" +
+				      offscreenSize.width + "] + HintStrLen [" +
+				      metrics.stringWidth(zoomHint) + "]",1);
 			} else {
 				//Reduce the size of the scrollpane to just what is visible
 				setPreferredSize(new Dimension(scrollPane.getViewport()
@@ -1342,15 +1292,12 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				xPos = (offscreenSize.width -
 				        metrics.stringWidth(zoomHint)) / 2;
 				yPos = scrollPane.getViewport().getSize().height / 2;
-				if(debug) {
-					LogBuffer.println("Col Hint position: [" + xPos + "/" +
-					                  yPos + "] stringX: [" + stringX +
-					                  "] zoomHint: [" + zoomHint +
-					                  "] height [" + offscreenSize.height +
-					                  "] width [" + offscreenSize.width +
-					                  "] + HintStrLen [" +
-					                  metrics.stringWidth(zoomHint) + "]");
-				}
+				debug("Col Hint position: [" + xPos + "/" + yPos +
+				      "] stringX: [" + stringX + "] zoomHint: [" + zoomHint +
+				      "] height [" + offscreenSize.height +
+				      "] width [" + offscreenSize.width +
+				      "] + HintStrLen [" + metrics.stringWidth(zoomHint) + "]",
+				      1);
 			}
 
 			if(isBeginJustified) {
@@ -1396,10 +1343,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		     * data - it would be better to catch when the data changes */
 			longest_str.equals(headerSummary.getSummary(headerInfo,
 		                                               longest_str_index))) {
-			LogBuffer.println("Regurgitating maxstrlen");
-			if(debug) {
-				maxStr = headerSummary.getSummary(headerInfo,longest_str_index);
-			}
+			debug("Regurgitating maxstrlen",1);
+			maxStr = headerSummary.getSummary(headerInfo,longest_str_index);
 			maxStrLen = longest_str_length;
 		} else if(lastDrawnFace == face && lastDrawnStyle == style &&
 		          longest_str_index > -1 &&
@@ -1410,23 +1355,20 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		          longest_str.equals(headerSummary.getSummary(headerInfo,
 		                                                      longest_str_index)
 		         )) {
-			LogBuffer.println("Refining maxstrlen");
+			debug("Refining maxstrlen",1);
 			maxStr = headerSummary.getSummary(headerInfo,longest_str_index);
 			maxStrLen = metrics.stringWidth(maxStr);
 		} else {
-			LogBuffer.println("Calculating maxstrlen because not [" +
-			                  "lastDrawnFace == face && lastDrawnStyle == " +
-			                  "style && longest_str_index > -1 && " +
-			                  "lastDrawnSize != size && longest_str." +
-			                  "equals(headerSummary.getSummary(headerInfo," +
-			                  "longest_str_index))]");
-			LogBuffer.println("Calculating maxstrlen because not [" +
-			                  lastDrawnFace + " == " + face + " && " +
-			                  lastDrawnStyle + " == " + style + " && " +
-			                  longest_str_index + " > -1 && " + lastDrawnSize +
-			                  " != " + size + " && " + longest_str +
-			                  ".equals(headerSummary.getSummary(headerInfo," +
-			                  longest_str_index + "))]");
+			debug("Calculating maxstrlen because not [lastDrawnFace == face " +
+			      "&& lastDrawnStyle == style && longest_str_index > -1 && " +
+			      "lastDrawnSize != size && longest_str.equals(headerSummary." +
+			      "getSummary(headerInfo,longest_str_index))]",1);
+			debug("Calculating maxstrlen because not [" + lastDrawnFace +
+			      " == " + face + " && " + lastDrawnStyle + " == " + style +
+			      " && " + longest_str_index + " > -1 && " + lastDrawnSize +
+			      " != " + size + " && " + longest_str +
+			      ".equals(headerSummary.getSummary(headerInfo," +
+			      longest_str_index + "))]",1);
 			for(int j = 0;j <= end;j++) {
 				try {
 					String out = headerSummary.getSummary(headerInfo,j);
@@ -1438,7 +1380,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					if(maxStrLen < metrics.stringWidth(out)) {
 						maxStrLen = metrics.stringWidth(out);
 						longest_str_index = j;
-						if(debug) {
+						if(debug != 0) {
 							maxStr = out;
 						}
 					}
@@ -1455,13 +1397,10 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		lastDrawnStyle = style;
 		lastDrawnSize = size;
 		longest_str_length = maxStrLen;
-		if(debug) {
-			LogBuffer.println((isGeneAxis ? "ROW" : "COL") + ": MaxStrLen: [" +
-			                  maxStrLen + "] MaxStr: [" + maxStr +
-			                  "] Start Index: [" + 0 + "] End Index: [" + end +
-			                  "] height [" + offscreenSize.height +
-			                  "] width [" + offscreenSize.width + "]");
-		}
+		debug((isGeneAxis ? "ROW" : "COL") + ": MaxStrLen: [" + maxStrLen +
+		      "] MaxStr: [" + maxStr + "] Start Index: [" + 0 +
+		      "] End Index: [" + end + "] height [" + offscreenSize.height +
+		      "] width [" + offscreenSize.width + "]",1);
 
 		return maxStrLen;
 	}
@@ -1530,12 +1469,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		}
 
 		if(!isFixed && newPoints != getPoints()) {
-			if(debug) {
-				LogBuffer.println("Adapting to new font size from [" +
-				                  getPoints() + "] to [" + newPoints +
-				                  "] for [" +
-				                  (isGeneAxis ? "rows" : "cols") + "]");
-			}
+			debug("Adapting to new font size from [" + getPoints() + "] to [" +
+			      newPoints + "] for [" + (isGeneAxis ? "rows" : "cols") + "]",
+			      1);
 			setSavedPoints(newPoints);
 		}
 	}
@@ -1548,11 +1484,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		if(newPoints < 1) {
 			newPoints = 1;
 		}
-		if(debug) {
-			LogBuffer.println("Adapting to new font size from [" + getPoints() +
-			                  "] to [" + newPoints + "] for [" +
-			                  (isGeneAxis ? "rows" : "cols") + "]");
-		}
+		debug("Adapting to new font size from [" + getPoints() + "] to [" +
+		      newPoints + "] for [" + (isGeneAxis ? "rows" : "cols") + "]",1);
 		setFont(new Font(face,style,newPoints));
 	}
 
@@ -1591,7 +1524,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	}
 
 	public void resetSecondaryScroll() {
-		LogBuffer.println("Resetting last secondary scroll position values");
+		debug("Resetting last secondary scroll position values",1);
 		lastScrollRowPos    = -1;
 		lastScrollRowEndGap = -1;
 		lastScrollRowEndPos = -1;
@@ -1601,7 +1534,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	}
 
 	public void adjustSecondaryScroll() {
-		LogBuffer.println("Resetting last secondary scroll position values");
+		debug("Resetting last secondary scroll position values",1);
 		if(isGeneAxis) {
 			//Do not adjust if the scrollbars are not properly set
 			if(lastScrollRowPos    == -1 ||
@@ -1625,15 +1558,17 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			if(lastScrollColPos == -1 || lastScrollColEndPos == -1 ||
 			   lastScrollColEndGap == -1) { return; }
 			if(isRightJustified) {
-				LogBuffer.println("Adjusting columns for bottom justification");
+				debug("Adjusting columns for bottom justification",1);
 				lastScrollColEndPos = lastScrollColPos +
-					                  getSecondaryScrollBar().getModel().getExtent();
+					                  getSecondaryScrollBar().getModel()
+					                  .getExtent();
 				lastScrollColEndGap = getSecondaryScrollBar().getMaximum() -
 				                      lastScrollColEndPos;
 			} else {
-				LogBuffer.println("Adjusting columns for top justification");
+				debug("Adjusting columns for top justification",1);
 				lastScrollColPos = lastScrollColEndPos -
-				                   getSecondaryScrollBar().getModel().getExtent();
+				                   getSecondaryScrollBar().getModel()
+				                   .getExtent();
 			}
 		}
 	}

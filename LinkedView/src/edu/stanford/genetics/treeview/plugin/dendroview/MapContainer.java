@@ -52,24 +52,23 @@ public class MapContainer extends Observable implements Observer,
 	 * #65. Besides, should be an int and it should prevent zooming past it
 	 * instead of bouncing back as it is currently doing... related to
 	 * calculation in zoomToSelected() */
-	private static final double MIN_TILE_NUM = 1.0;
-	private static final double ZOOM_INCREMENT = 0.05;
+	private static final double MIN_TILE_NUM        = 1.0;
+	private static final double ZOOM_INCREMENT      = 0.05;
 	private static final double ZOOM_INCREMENT_FAST = 0.15;
-	//"ZOOM_INCREMENT_SLOW" == single row/col on each side
 
-	private final String default_map = "Fixed";
-	private double default_scale = 1.0;
-	private double minScale;
-	private IntegerMap current = null;
+	private final String default_map   = "Fixed";
+	private double       default_scale = 1.0;
+	private double       minScale;
+	private IntegerMap   current       = null;
 	private final String mapName;
 
 	private FixedMap fixedMap = null;
-	private FillMap fillMap = null;
-	private NullMap nullMap = null;
+	private FillMap  fillMap  = null;
+	private NullMap  nullMap  = null;
 
-	private JScrollBar scrollbar = null;
-	private TreeDrawerNode selected = null;
-	private Preferences configNode = null;
+	private JScrollBar     scrollbar  = null;
+	private TreeDrawerNode selected   = null;
+	private Preferences    configNode = null;
 
 	private double tileNumVisible;
 
@@ -80,13 +79,15 @@ public class MapContainer extends Observable implements Observer,
 
 	//Track the explicitly manipulated visible labels. These can change as a
 	//result of a scroll in the label pane
-//	private int firstVisibleLabel;
-//	private int numVisibleLabels; //Value fully controlled by LabelView class
-	private boolean overColLabels = false;
-	private boolean overRowLabels = false;
-	private boolean overInteractiveMatrix = false;
-	private int hoverIndex = -1;
-	private boolean hoverChanged = false;
+	private boolean overColLabels          = false;
+	private boolean overColLabelsScrollbar = false;
+	private boolean overRowLabels          = false;
+	private boolean overRowLabelsScrollbar = false;
+	private boolean overInteractiveMatrix  = false;
+	private boolean colLabelsBeingScrolled = false;
+	private boolean rowLabelsBeingScrolled = false;
+	private int     hoverIndex             = -1;
+	private boolean hoverChanged           = false;
 
 	boolean debug = false;
 
@@ -108,9 +109,7 @@ public class MapContainer extends Observable implements Observer,
 		 * TODO Initial numVisible currently set in setIndexRange()
 		 * Default should NOT be zero, but max value! 
 		 */
-//		this.numVisible = getAvailablePixels();
 		this.firstVisible = 0;
-//		this.firstVisibleLabel = 0;
 	}
 
 	@Override
@@ -187,7 +186,7 @@ public class MapContainer extends Observable implements Observer,
 	 */
 	public void setLastScale() {
 
-		if (configNode != null) {
+		if(configNode != null) {
 			int lastNumVisible = configNode.getInt("scale", getMaxIndex());
 			double lastScale = getAvailablePixels() / lastNumVisible;
 			
@@ -201,9 +200,9 @@ public class MapContainer extends Observable implements Observer,
 	 */
 	public double getCalculatedMinScale() {
 
-		final double pixels = getAvailablePixels();
+		final double pixels  = getAvailablePixels();
 		final double divider = getMaxIndex() - getMinIndex() + 1;
-		return pixels / divider;
+		return(pixels / divider);
 	}
 	
 	/**
@@ -212,7 +211,6 @@ public class MapContainer extends Observable implements Observer,
 	 * and set first.
 	 */
 	public void zoomOutBegin() {
-		
 		incrementalZoom(false,true,true);
 	}
 	
@@ -222,7 +220,6 @@ public class MapContainer extends Observable implements Observer,
 	 * and set first.
 	 */
 	public void zoomInBegin() {
-		
 		incrementalZoom(true,true,true);
 	}
 	
@@ -232,7 +229,6 @@ public class MapContainer extends Observable implements Observer,
 	 * and set first.
 	 */
 	public void zoomOutEnd() {
-		
 		incrementalZoom(false,false,true);
 	}
 	
@@ -242,7 +238,6 @@ public class MapContainer extends Observable implements Observer,
 	 * and set first.
 	 */
 	public void zoomInEnd() {
-		
 		incrementalZoom(true,false,true);
 	}
 	
@@ -301,7 +296,8 @@ public class MapContainer extends Observable implements Observer,
 		}
 		setScale(newScale);
 
-		int newFirstVisible = initialFirstVisible - (numVisible - prevNumVisible) / 2;
+		int newFirstVisible = initialFirstVisible -
+		                      (numVisible - prevNumVisible) / 2;
 		if((newFirstVisible + numVisible) > (getMaxIndex() + 1)) {
 			newFirstVisible = (getMaxIndex() + 1) - numVisible;
 		}
@@ -715,7 +711,7 @@ public class MapContainer extends Observable implements Observer,
 
 	/* TODO: This function SHOULD be able to select a pixel offscreen, though I
 	 * have checks early-on to prevent that and return an edge pixel.  Make it
-	 * to it can return a negative pixel index or a pixel index larger than max.
+	 * so it can return a negative pixel index or a pixel index larger than max.
 	 * - Rob */
 	//Use this function to pick a pixel to zoom toward when zooming toward a selection
 	//Assumes that the full selection is visible on the screen
@@ -1891,10 +1887,50 @@ public class MapContainer extends Observable implements Observer,
 	}
 
 	/**
+	 * @param overColLabels the overColLabels to set
+	 */
+	public void setOverColLabelsScrollbar(boolean overColLabels) {
+		this.overColLabelsScrollbar = overColLabels;
+		setChanged();
+		setHoverChanged();
+		notifyObservers();
+	}
+
+	/**
+	 * @param overColLabels the overColLabels to set
+	 */
+	public void setColLabelsBeingScrolled(boolean overColLabels) {
+		this.colLabelsBeingScrolled = overColLabels;
+		setChanged();
+		setHoverChanged();
+		notifyObservers();
+	}
+
+	/**
+	 * @param overColLabels the overColLabels to set
+	 */
+	public void setRowLabelsBeingScrolled(boolean overRowLabels) {
+		this.rowLabelsBeingScrolled = overRowLabels;
+		setChanged();
+		setHoverChanged();
+		notifyObservers();
+	}
+
+	/**
 	 * @param overRowLabels the overRowLabels to set
 	 */
 	public void setOverRowLabels(boolean overRowLabels) {
 		this.overRowLabels = overRowLabels;
+		setChanged();
+		setHoverChanged();
+		notifyObservers();
+	}
+
+	/**
+	 * @param overRowLabels the overRowLabels to set
+	 */
+	public void setOverRowLabelsScrollbar(boolean overRowLabels) {
+		this.overRowLabelsScrollbar = overRowLabels;
 		setChanged();
 		setHoverChanged();
 		notifyObservers();
@@ -1910,8 +1946,16 @@ public class MapContainer extends Observable implements Observer,
 		notifyObservers();
 	}
 
+	//This function is used to determine whether the label port should be drawn
+	//or not.  When the mouse is hovered over a pane that activates the label
+	//port or if a scrollbar for such a pane is being scrolled, the label port
+	//is active.  These things must be tracked here in the data model because
+	//it's the common point of reference for all the classes in the view and is
+	//their only way to communicate with one another.
 	public boolean overALabelPortLinkedView() {
-		return(overColLabels || overRowLabels || overInteractiveMatrix);
+		return(overColLabels || overRowLabels || overInteractiveMatrix ||
+		       overColLabelsScrollbar || overRowLabelsScrollbar ||
+		       colLabelsBeingScrolled || rowLabelsBeingScrolled);
 	}
 
 	/**

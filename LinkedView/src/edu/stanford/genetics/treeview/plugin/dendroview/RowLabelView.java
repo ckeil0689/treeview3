@@ -1,15 +1,11 @@
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import java.awt.Adjustable;
-import java.awt.ComponentOrientation;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Rectangle;
+//import java.awt.Adjustable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
+import java.awt.event.MouseAdapter;
+//import java.awt.event.AdjustmentEvent;
+//import java.awt.event.AdjustmentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
@@ -21,18 +17,15 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import com.sun.xml.internal.ws.util.StringUtils;
-
 import Utilities.StringRes;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.UrlExtractor;
 
-public class RowLabelView extends LabelView implements MouseWheelListener/*, AdjustmentListener*/ {
+public class RowLabelView extends LabelView implements MouseWheelListener
+    /*, AdjustmentListener*/ {
 
 	private static final long serialVersionUID = 1L;
-
-	private int oldWidth = 0;
 
 	public RowLabelView() {
 
@@ -41,7 +34,76 @@ public class RowLabelView extends LabelView implements MouseWheelListener/*, Adj
 		zoomHint = StringRes.lbl_ZoomRowLabels;
 		addMouseWheelListener(this);
 
-		// Listen for value changes in the scroll pane's scrollbars
+		getSecondaryScrollBar().addMouseListener(new MouseAdapter() {
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				debug("The mouse has entered a row label pane scrollbar",2);
+				if(overScrollLabelPortOffTimer != null) {
+					/* Event came too soon, swallow by resetting the timer.. */
+					overScrollLabelPortOffTimer.stop();
+					overScrollLabelPortOffTimer = null;
+				}
+				map.setOverRowLabelsScrollbar(true);
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				debug("The mouse has exited a row label pane scrollbar",2);
+				//Turn off the "over a label port view" boolean after a bit
+				if(overScrollLabelPortOffTimer == null) {
+					if(labelPortOffDelay == 0) {
+						map.setOverRowLabelsScrollbar(false);
+						map.notifyObservers();
+						revalidate();
+						repaint();
+					} else {
+						/* Start waiting for delay millis to elapse and then
+						 * call actionPerformed of the ActionListener
+						 * "paneLabelPortOffListener". */
+						overScrollLabelPortOffTimer = new Timer(labelPortOffDelay,
+								scrollLabelPortOffListener);
+						overScrollLabelPortOffTimer.start();
+					}
+				}
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				debug("The mouse has clicked a row label scrollbar",2);
+				if(activeScrollLabelPortOffTimer != null) {
+					/* Event came too soon, swallow by resetting the timer.. */
+					activeScrollLabelPortOffTimer.stop();
+					activeScrollLabelPortOffTimer = null;
+				}
+				map.setRowLabelsBeingScrolled(true);
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				debug("The mouse has released a row label scrollbar",2);
+				//Turn off the "over a label port view" boolean after a bit
+				if(activeScrollLabelPortOffTimer == null) {
+					if(labelPortOffDelay == 0) {
+						map.setRowLabelsBeingScrolled(false);
+						map.notifyObservers();
+						revalidate();
+						repaint();
+					} else {
+						/* Start waiting for delay millis to elapse and then
+						 * call actionPerformed of the ActionListener
+						 * "paneLabelPortOffListener". */
+						activeScrollLabelPortOffTimer =
+							new Timer(labelPortOffDelay,
+							          activeLabelPortOffListener);
+						activeScrollLabelPortOffTimer.start();
+					}
+				}
+			}
+		});
+
+		debug = 2;
+		//Listen for value changes in the scroll pane's scrollbars
 //		scrollPane.getHorizontalScrollBar().addAdjustmentListener(this);
 //		scrollPane.getVerticalScrollBar().addAdjustmentListener(this);
 	}
@@ -53,6 +115,7 @@ public class RowLabelView extends LabelView implements MouseWheelListener/*, Adj
 	//	headerSummary.setIncluded(new int[] { 0 });
 	//	headerSummary.addObserver(this);
 	//}
+
 	public void generateView(final UrlExtractor uExtractor) {
 
 		super.setUrlExtractor(uExtractor);
@@ -71,18 +134,7 @@ public class RowLabelView extends LabelView implements MouseWheelListener/*, Adj
 
 	
 	@Override
-	protected void adjustScrollBar() {
-//
-//		if (isRightJustified) {
-//			final int scrollMax = scrollPane.getHorizontalScrollBar()
-//					.getMaximum();
-//			scrollPane.getHorizontalScrollBar().setValue(scrollMax);
-//		} else {
-//			scrollPane.getHorizontalScrollBar().setValue(0);
-//		}
-//
-//		repaint();
-	}
+	protected void adjustScrollBar() {}
 
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
@@ -91,7 +143,7 @@ public class RowLabelView extends LabelView implements MouseWheelListener/*, Adj
 			super.setConfigNode(parentNode.node("RowLabelView"));
 
 		} else {
-			LogBuffer.println("Could not find or create ArrayameView"
+			LogBuffer.println("Error: Could not find or create ArrayameView"
 					+ "node because parentNode was null.");
 			return;
 		}
@@ -110,79 +162,12 @@ public class RowLabelView extends LabelView implements MouseWheelListener/*, Adj
 			selectionChanged();
 
 		} else {
-			LogBuffer.println("LabelView got funny update!");
+			LogBuffer.println("Warning: LabelView got funny update!");
 		}
 	}
 
-	/**
-	 * This method is called when the selection is changed. It causes the
-	 * component to recalculate it's width, and call repaint.
-	 */
-	//protected void selectionChanged() {
-
-	//	maxlength = 1;
-	//	final FontMetrics fontMetrics = getFontMetrics(new Font(face, style,
-	//			size));
-
-	//	final int start = 0;
-	//	final int end = headerInfo.getNumHeaders();
-	//	
-//		LogBuffer.println("NumHeaders: " + end);
-
-	//	for (int j = start; j < end; j++) {
-
-	//		final int actualGene = j;
-	//		final String out = headerSummary.getSummary(headerInfo, actualGene);
-
-	//		if (out == null) {
-	//			continue;
-	//		}
-
-	//		final int length = fontMetrics.stringWidth(out);
-	//		if (maxlength < length) {
-	//			maxlength = length;
-	//		}
-
-	//	}
-
-	//	setPreferredSize(new Dimension(maxlength, map.getUsedPixels()));
-	//	revalidate();
-	//	repaint();
-	//}
 	protected void selectionChanged() {
-
 		offscreenValid = false;
-
-//		final int start = 0;
-//		final int end = headerInfo.getNumHeaders();
-//
-//		final FontMetrics fontMetrics = getFontMetrics(new Font(face, style,
-//				size));
-//		maxlength = 1;
-//		for (int j = start; j < end; j++) {
-//
-//			final String out = headerSummary.getSummary(headerInfo, j);
-//
-//			if (out == null) {
-//				continue;
-//			}
-//
-//			final int length = fontMetrics.stringWidth(out);
-//			if (maxlength < length) {
-//				maxlength = length;
-//			}
-//		}
-
-		//final Rectangle visible = getVisibleRect();
-		//setPreferredSize(new Dimension(maxlength, map.getUsedPixels()));
-
-		//if (maxlength > oldWidth) {
-		//	visible.y += maxlength - oldWidth;
-//Commenting this out because the scrollbar keeps jumping around
-//			scrollRectToVisible(visible);
-		//}
-		//oldWidth = maxlength;
-		
 		revalidate();
 		repaint();
 	}
@@ -210,87 +195,18 @@ public class RowLabelView extends LabelView implements MouseWheelListener/*, Adj
 		return(e.getY());
 	}
 
-//	protected int shiftForScrollbar = 0;
-//	protected int shiftedForScrollbar = 0;
-//
-//	@Override
-//	public void mouseMoved(final MouseEvent e) {
-//
-//		if(shiftForScrollbar > 0) {
-//			//Shift the scroll position to accommodate the scrollbar that
-//			//appeared (I think this may only be for Macs, according to what I
-//			//read.  They draw the scrollbar on top of content when it is set
-//			//"AS_NEEDED")
-//			getSecondaryScrollBar().setValue(shiftForScrollbar);
-//			if(getSecondaryScrollBar().getValue() == shiftForScrollbar) {
-//				shiftedForScrollbar = shiftForScrollbar;
-//				shiftForScrollbar = 0;
-//			}
-//		}
-//		hoverIndex = map.getIndex(getPrimaryHoverPosition(e));
-//		repaint();
-//	}
-//
-//	//@Override
-//	public void mouseEntered(final MouseEvent e) {
-//		//This method call is why these mouse functions
-//		setSecondaryScrollBarPolicyAlways();
-//		//scrollPane.setVerticalScrollBarPolicy(
-//		//		ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-//		int ts = getSecondaryScrollBar().getValue();
-//		int tw = getSecondaryScrollBar().getModel().getExtent();
-//		int tm = getSecondaryScrollBar().getMaximum();
-//		
-//		//We do not want to shift the scrollbar if the user has manually left-
-//		//justified his/her labels, so only shift to accommodate the scrollbar
-//		//when the scroll position is more than half way
-//		boolean nearBeginning = (ts < ((tm - tw) / 2));
-//		LogBuffer.println("ENTER Setting temp scroll value: [" + ts +
-//				"] width [" + tw + "] max [" + tm + "]");
-//		if(isJustifiedToMatrixEdge() && !nearBeginning) {
-//			LogBuffer.println("Adjusting scrollbar that is positioned near " +
-//					"end. Now position: [" + ts + " + 15] New max: [" +
-//					getSecondaryScrollBar().getMaximum() + " + 15]");
-//			//Width of the vertical scrollbar is 15
-//			int newWidth = getSecondaryScrollBar().getMaximum() + 15;
-//			getSecondaryScrollBar().setMaximum(newWidth);
-//			shiftForScrollbar = ts + 15;
-//			getSecondaryScrollBar().setValue(shiftForScrollbar);
-//		}
-//		LogBuffer.println("ENTER New scroll values: [" +
-//				getSecondaryScrollBar().getValue() + "] width [" +
-//				getSecondaryScrollBar().getModel().getExtent() + "] max [" +
-//				getSecondaryScrollBar().getMaximum() + "]");
-//	}
-//
-//	//@Override
-//	public void mouseExited(final MouseEvent e) {
-//		int ts = getSecondaryScrollBar().getValue();
-//		setSecondaryScrollBarPolicyNever();
-//		//scrollPane.setVerticalScrollBarPolicy(
-//		//		ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-//		LogBuffer.println("EXIT Setting temp scroll value: [" + ts + "]");
-//		if(shiftedForScrollbar > 0) {
-//			LogBuffer.println("Adjusting scrollbar that is positioned near end.");
-//			getSecondaryScrollBar().setValue(ts - 15);
-//			shiftedForScrollbar = 0;
-//		}
-//		scrollPane.revalidate();
-//		LogBuffer.println("EXIT New scroll values: [" + getSecondaryScrollBar().getValue() + "] width [" + getSecondaryScrollBar().getModel().getExtent() + "] max [" + getSecondaryScrollBar().getMaximum() + "]");
-//		super.mouseExited(e);
-//	}
-
-	//Timer to let the label pane linger a bit
-	final private int delay = 0;
-	private javax.swing.Timer turnOffLabelPortTimer;
-	ActionListener turnOffLabelPort = new ActionListener() {
+	//Timer to let the label pane linger a bit (prevents flashing when passing
+	//between panes which do not change the visibility of the label panes)
+	final private int labelPortOffDelay = 250;
+	private javax.swing.Timer paneLabelPortOffTimer;
+	ActionListener paneLabelPortOffListener = new ActionListener() {
 		
 		@Override
 		public void actionPerformed(ActionEvent evt) {
-			if (evt.getSource() == turnOffLabelPortTimer) {
+			if (evt.getSource() == paneLabelPortOffTimer) {
 				/* Stop timer */
-				turnOffLabelPortTimer.stop();
-				turnOffLabelPortTimer = null;
+				paneLabelPortOffTimer.stop();
+				paneLabelPortOffTimer = null;
 			
 				map.setOverRowLabels(false);
 				map.notifyObservers();
@@ -300,12 +216,50 @@ public class RowLabelView extends LabelView implements MouseWheelListener/*, Adj
 		}
 	};
 
+	//And this listener is for hovers over the secondary scrollbar, since they each are independent with regard to hovering on or off them
+	private javax.swing.Timer overScrollLabelPortOffTimer;
+	ActionListener scrollLabelPortOffListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent evt) {
+			if (evt.getSource() == overScrollLabelPortOffTimer) {
+				debug("You hovered off the secondary row scrollbar 1s ago, so the label port might turn off unless you're over another pane that activates it",2);
+				/* Stop timer */
+				overScrollLabelPortOffTimer.stop();
+				overScrollLabelPortOffTimer = null;
+			
+				map.setOverRowLabelsScrollbar(false);
+				map.notifyObservers();
+				revalidate();
+				repaint();
+			}
+		}
+	};
+
+	//And this listener is for click releases off the secondary scrollbar, because they can hover off the scrollbar and you don't want the knob and labels to disappear while dragging the knob
+	private javax.swing.Timer activeScrollLabelPortOffTimer;
+	ActionListener activeLabelPortOffListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent evt) {
+			if (evt.getSource() == activeScrollLabelPortOffTimer) {
+				debug("You released the secondary row scrollbar 1s ago, so the label port might turn off unless you're over another pane that activates it",2);
+				/* Stop timer */
+				activeScrollLabelPortOffTimer.stop();
+				activeScrollLabelPortOffTimer = null;
+			
+				map.setRowLabelsBeingScrolled(false);
+				map.notifyObservers();
+				revalidate();
+				repaint();
+			}
+		}
+	};
+
 	@Override
 	public void mouseEntered(final MouseEvent e) {
-		if(this.turnOffLabelPortTimer != null) {
+		if(paneLabelPortOffTimer != null) {
 			/* Event came too soon, swallow it by resetting the timer.. */
-			this.turnOffLabelPortTimer.stop();
-			this.turnOffLabelPortTimer = null;
+			paneLabelPortOffTimer.stop();
+			paneLabelPortOffTimer = null;
 		}
 		map.setOverRowLabels(true);
 		super.mouseEntered(e);
@@ -314,8 +268,8 @@ public class RowLabelView extends LabelView implements MouseWheelListener/*, Adj
 	@Override
 	public void mouseExited(final MouseEvent e) {
 		//Turn off the "over a label port view" boolean after a bit
-		if(this.turnOffLabelPortTimer == null) {
-			if(delay == 0) {
+		if(paneLabelPortOffTimer == null) {
+			if(labelPortOffDelay == 0) {
 				map.setOverRowLabels(false);
 				map.notifyObservers();
 				revalidate();
@@ -323,10 +277,10 @@ public class RowLabelView extends LabelView implements MouseWheelListener/*, Adj
 			} else {
 				/* Start waiting for delay millis to elapse and then
 				 * call actionPerformed of the ActionListener
-				 * "turnOffLabelPort". */
-				this.turnOffLabelPortTimer = new Timer(this.delay,
-						turnOffLabelPort);
-				this.turnOffLabelPortTimer.start();
+				 * "paneLabelPortOffListener". */
+				paneLabelPortOffTimer = new Timer(labelPortOffDelay,
+						paneLabelPortOffListener);
+				paneLabelPortOffTimer.start();
 			}
 		}
 
@@ -487,21 +441,22 @@ public class RowLabelView extends LabelView implements MouseWheelListener/*, Adj
 
 		final int notches = e.getWheelRotation();
 		final int shift = (notches < 0) ? -3 : 3;
-		if(debug)
-			LogBuffer.println("Scroll wheel event detected");
+		debug("Scroll wheel event detected",1);
 
 		final int j = scrollPane.getHorizontalScrollBar().getValue();
 		//LogBuffer.println("Detected [" + (e.isShiftDown() ? "horizontal" : "vertical") + "] scroll event");
 		// On macs' magic mouse, horizontal scroll comes in as if the shift was
 		// down
 		if(e.isShiftDown()) {
-			//if(debug)
-				LogBuffer.println("Scrolling horizontally from [" + j + "] by [" + shift + "]");
+			debug("Scrolling horizontally from [" + j + "] by [" + shift + "]",
+			      1);
 			scrollPane.getHorizontalScrollBar().setValue(j + shift);
 			lastScrollRowPos = j + shift;
-			lastScrollRowEndPos = lastScrollRowPos + getSecondaryScrollBar().getModel().getExtent();
-			lastScrollRowEndGap =
-					getSecondaryScrollBar().getMaximum() - lastScrollRowEndPos;
+			lastScrollRowEndPos = lastScrollRowPos +
+			                      getSecondaryScrollBar().getModel()
+			                      .getExtent();
+			lastScrollRowEndGap = getSecondaryScrollBar().getMaximum() -
+			                      lastScrollRowEndPos;
 			if(lastScrollRowEndGap < 0) {
 				lastScrollRowPos -= lastScrollRowEndGap;
 				lastScrollRowEndPos -= lastScrollRowEndGap;
@@ -511,22 +466,12 @@ public class RowLabelView extends LabelView implements MouseWheelListener/*, Adj
 				lastScrollRowEndGap += lastScrollRowPos;
 				lastScrollRowPos = 0;
 			}
-			//if(debug)
-			LogBuffer.println("New scroll position [" + lastScrollRowPos + "] end pos: [" + lastScrollRowEndPos + "] end gap: [" + lastScrollRowEndGap + "] out of [" + getSecondaryScrollBar().getMaximum() + "]");
+			debug("New scroll position [" + lastScrollRowPos + "] end pos: [" +
+			      lastScrollRowEndPos + "] end gap: [" + lastScrollRowEndGap +
+			      "] out of [" + getSecondaryScrollBar().getMaximum() + "]",1);
 		} else {
 			//Value of label length scrollbar
-			//int doesItChange = scrollPane.getHorizontalScrollBar().getValue();
-			//scrollPane.getVerticalScrollBar().setValue(j + shift);
 			map.scrollBy(shift, false);
-
-			//if(scrollPane.getHorizontalScrollBar().getValue() != doesItChange) {
-			//	LogBuffer.println("The fucking horizontal scroll changed from [" + doesItChange + "] to [" + scrollPane.getHorizontalScrollBar().getValue() + "] during a fucking vertical scroll!");
-			//}
-//			if (j != scrollPane.getVerticalScrollBar().getValue()) {
-//				setChanged();
-//			}
-//
-//			notifyObservers();
 		}
 
 		revalidate();

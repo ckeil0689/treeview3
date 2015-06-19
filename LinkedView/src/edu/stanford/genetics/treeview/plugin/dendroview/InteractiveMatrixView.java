@@ -280,7 +280,6 @@ MouseWheelListener {
 			
 			revalidateScreen();
 			
-			// LogBuffer.println("OFFSCREEN INVALID");
 			final Rectangle destRect = new Rectangle(0, 0,
 					xmap.getUsedPixels(), ymap.getUsedPixels());
 
@@ -334,7 +333,7 @@ MouseWheelListener {
 //			g2.drawRect(labelPortRect.x, labelPortRect.y,
 //						labelPortRect.width, labelPortRect.height);
 //
-//			//LogBuffer.println("Preparing to draw labelPort ellipses.");
+//			//debug("Preparing to draw labelPort ellipses.");
 //			/*
 //			 * draw blue label port circle if rectangle small enough.
 //			 */
@@ -344,7 +343,7 @@ MouseWheelListener {
 //				//g2.setColor(Color.blue);
 //				g2.setColor(new Color(30,144,251));
 //				g2.setStroke(new BasicStroke(3));
-//				//LogBuffer.println("Drawing labelPort ellipse.");
+//				//debug("Drawing labelPort ellipse.");
 //				g2.draw(labelPortCircle);
 //			}
 //		}
@@ -360,7 +359,7 @@ MouseWheelListener {
 				g2.drawRect(rect.x, rect.y, rect.width, rect.height);
 			}
 
-			//LogBuffer.println("Preparing to draw ellipses.");
+			//debug("Preparing to draw ellipses.");
 			/*
 			 * draw white selection circle if only 1 tile is selected and small
 			 * enough.
@@ -371,7 +370,7 @@ MouseWheelListener {
 				g2.setColor(Color.yellow);
 				g2.setStroke(new BasicStroke(3));
 				for(Ellipse2D.Double indicatorCircle : indicatorCircleList) {
-					//LogBuffer.println("Drawing ellipse.");
+					//debug("Drawing ellipse.");
 					g2.draw(indicatorCircle);
 				}
 			}
@@ -435,7 +434,7 @@ MouseWheelListener {
 	
 			if (selectedArrayIndexes.length > 0) {
 	
-				// LogBuffer.println("Selected min array index: [" +
+				// debug("Selected min array index: [" +
 				// selectedArrayIndexes[0] + "] Selected min gene index: [" +
 				// selectedGeneIndexes[0] + "].");
 	
@@ -726,7 +725,7 @@ MouseWheelListener {
 				arraySelection.setSelectedNode(null);
 				arraySelection.deselectAllIndexes();
 
-				//LogBuffer.println("Deselecting.");
+				//debug("Deselecting.");
 
 				geneSelection.notifyObservers();
 				arraySelection.notifyObservers();
@@ -737,8 +736,10 @@ MouseWheelListener {
 					geneSelection.getSelectedIndexes());
 		}
 
-		//Timer to let the label pane linger a bit
-		final private int delay = 0;
+		//Timer to let the label pane linger a bit (prevents flashing when
+		//passing between panes which do not change the visibility of the label
+		//panes)
+		final private int delay = 250;
 		private javax.swing.Timer turnOffLabelPortTimer;
 		ActionListener turnOffLabelPort = new ActionListener() {
 			
@@ -749,8 +750,7 @@ MouseWheelListener {
 					turnOffLabelPortTimer.stop();
 					turnOffLabelPortTimer = null;
 				
-					if(debug)
-						LogBuffer.println("mouseEvent in IMV - ACTED ON");
+					debug("mouseEvent in IMV - ACTED ON",1);
 					xmap.setOverInteractiveMatrix(false);
 					ymap.setOverInteractiveMatrix(false);
 					xmap.notifyObservers();
@@ -763,8 +763,7 @@ MouseWheelListener {
 
 		@Override
 		public void mouseEntered(final MouseEvent e) {
-			if(debug)
-				LogBuffer.println("mouseEntered IMV");
+			debug("mouseEntered IMV",1);
 			if(this.turnOffLabelPortTimer != null) {
 				/* Event came too soon, swallow it by resetting the timer.. */
 				this.turnOffLabelPortTimer.stop();
@@ -779,17 +778,15 @@ MouseWheelListener {
 		@Override
 		public void mouseExited(final MouseEvent e) {
 
-			if(debug)
-				LogBuffer.println("mouseExited IMV");
+			debug("mouseExited IMV",1);
 			//Turn off the "over a label port view" boolean after a bit
 			if(this.turnOffLabelPortTimer == null) {
-				LogBuffer.println("mouseExited IMV - starting timer");
+				debug("mouseExited IMV - starting timer",1);
 				/* Start waiting for delay millis to elapse and then
 				 * call actionPerformed of the ActionListener
 				 * "turnOffLabelPort". */
 				if(delay == 0) {
-					if(debug)
-						LogBuffer.println("mouseEvent in IMV - ACTED ON");
+					debug("mouseEvent in IMV - ACTED ON",1);
 					xmap.setOverInteractiveMatrix(false);
 					ymap.setOverInteractiveMatrix(false);
 					xmap.notifyObservers();
@@ -952,7 +949,7 @@ MouseWheelListener {
 				}
 			}
 		}
-		//LogBuffer.println("Aspect ratio.  Current: [" + numXCells + " / " +
+		//debug("Aspect ratio.  Current: [" + numXCells + " / " +
 		//numYCells + "] Target: [" + aspectRatio +
 		//"].  targetZoomFracCorrection: [" + targetZoomFracCorrection +
 		//"].  New zoomXVal: [" + zoomXVal + "] New zoomYVal: [" + zoomYVal +
@@ -1068,7 +1065,7 @@ MouseWheelListener {
 				}
 			}
 		}
-		//LogBuffer.println("Aspect ratio.  Current: [" + numXCells + " / " +
+		//debug("Aspect ratio.  Current: [" + numXCells + " / " +
 		//numYCells + "] Target: [" + aspectRatio +
 		//"].  targetZoomFracCorrection: [" + targetZoomFracCorrection +
 		//"].  New zoomXVal: [" + zoomXVal + "] New zoomYVal: [" + zoomYVal +
@@ -1104,7 +1101,7 @@ MouseWheelListener {
 			//If you've never seen this message and you use the home button a
 			//lot, you can probably remove this if-conditional and the prev*
 			//variables
-			//LogBuffer.println("smoothZoomTowardSelection bug still exists." +
+			//debug("smoothZoomTowardSelection bug still exists." +
 			//					"  Working around it.");
 
 			xmap.zoomOutCenter("fast");
@@ -1163,12 +1160,12 @@ MouseWheelListener {
 			if((System.currentTimeMillis() - startTime) > doneWaitingMillis)
 				break;
 
-			int[] redrawDims = smoothZoomTowardSelection(selecXStartIndex,
-														 numXSelectedIndexes,
-														 selecYStartIndex,
-														 numYSelectedIndexes);
+			smoothZoomTowardSelection(selecXStartIndex,
+									  numXSelectedIndexes,
+									  selecYStartIndex,
+									  numYSelectedIndexes);
 
-			//LogBuffer.println("numVisible versus num selected: [x" +
+			//debug("numVisible versus num selected: [x" +
 			//				  xmap.getNumVisible() + ":" + numXSelectedIndexes +
 			//				  ",y" + ymap.getNumVisible() + ":" +
 			//				  numYSelectedIndexes + "].");
@@ -1176,8 +1173,6 @@ MouseWheelListener {
 			//Force an immediate repaint.  Found this in a thread here:
 			//https://community.oracle.com/thread/1663771
 			paintImmediately(0,0,getWidth(),getHeight());
-			//paintImmediately(redrawDims[0],redrawDims[1],
-			//				 redrawDims[2],redrawDims[3]);
 
 			//Sleep a few milliseconds
 			try{
@@ -1196,21 +1191,21 @@ MouseWheelListener {
 		//be certain. Scroll could be off because of the way it is separated
 		//from the zoom, so we will always do that
 		if(xmap.getNumVisible() != numXSelectedIndexes) {
-			//LogBuffer.println("Adjusting final X zoom");
+			//debug("Adjusting final X zoom");
 			xmap.zoomToSelected(selecXStartIndex,
 					(selecXStartIndex + numXSelectedIndexes - 1));
 		}
 		if(ymap.getNumVisible() != numYSelectedIndexes) {
-			//LogBuffer.println("Adjusting final Y zoom");
+			//debug("Adjusting final Y zoom");
 			ymap.zoomToSelected(selecYStartIndex,
 					(selecYStartIndex + numYSelectedIndexes - 1));
 		}
 		if(xmap.getFirstVisible() != selecXStartIndex) {
-			//LogBuffer.println("Adjusting final X scroll");
+			//debug("Adjusting final X scroll");
 			xmap.scrollToFirstIndex(selecXStartIndex/*,true*/);
 		}
 		if(ymap.getFirstVisible() != selecYStartIndex) {
-			//LogBuffer.println("Adjusting final Y scroll");
+			//debug("Adjusting final Y scroll");
 			ymap.scrollToFirstIndex(selecYStartIndex/*,true*/);
 		}
 
@@ -1244,7 +1239,7 @@ MouseWheelListener {
 				pixelsPerXIndex);
 		int xPxPos = xmap.getZoomTowardPixelOfSelection(startXPixel,
 														numSelectedXPixels);
-		//LogBuffer.println("smoothZoomTowardSelection: Starting X index " +
+		//debug("smoothZoomTowardSelection: Starting X index " +
 		//"sent in: [" + selecXStartIndex + "] and pixel index obtained for " +
 		//"that data index: [" + startXPixel + "] and then pixel selected to " +
 		//"zoom toward is: [" + xPxPos + "].");
@@ -1254,12 +1249,12 @@ MouseWheelListener {
 				pixelsPerYIndex);
 		int yPxPos = ymap.getZoomTowardPixelOfSelection(startYPixel,
 														numSelectedYPixels);
-		//LogBuffer.println("smoothZoomTowardSelection: Starting Y index " +
+		//debug("smoothZoomTowardSelection: Starting Y index " +
 		//"sent in: [" + selecYStartIndex + "] and pixel index obtained for " +
 		//"that data index: [" + startYPixel + "] and then pixel selected to " +
 		//"zoom toward is: [" + yPxPos + "].");
 
-		//LogBuffer.println("Going to zoom toward pixel at: [x" + xPxPos +
+		//debug("Going to zoom toward pixel at: [x" + xPxPos +
 		//		",y" + yPxPos + "] determined from data cell at: [x" +
 		//		selecXStartIndex + ",y" + selecYStartIndex +
 		//		"].  Selected pixel start/number: [x" + startXPixel + "/" +
@@ -1299,7 +1294,7 @@ MouseWheelListener {
 		double targetZoomFrac = targetZoomFracX;
 		if(targetZoomFrac < targetZoomFracY) targetZoomFrac = targetZoomFracY;
 
-		//LogBuffer.println("targetZoomFrac: [" + targetZoomFrac + "].");
+		//debug("targetZoomFrac: [" + targetZoomFrac + "].");
 
 		//If the starting aspect ratio is different from the target aspect
 		//ratio, we don't want to snap to that ratio on the first step - we want
@@ -1315,7 +1310,7 @@ MouseWheelListener {
 			//1 - targetZoomFrac;
 			//(targetZoomFrac < 0.33 ? targetZoomFrac * 3.0 : targetZoomFrac);
 				
-		//LogBuffer.println("Zoom fraction: [" + targetZoomFrac +
+		//debug("Zoom fraction: [" + targetZoomFrac +
 		//		"] XtargetFrac: [" + targetZoomFracX + "] YtargetFrac: [" +
 		//		targetZoomFracY + "] Aspect Ratio fraction correction: [" +
 		//		aspectRatioFracCorrection + "].");
@@ -1326,7 +1321,7 @@ MouseWheelListener {
 		//zooming)
 		double numXCellsShouldHave = targetAspectRatio * numYCells;
 
-		//LogBuffer.println("numXCellsShouldHave before fractioning the " +
+		//debug("numXCellsShouldHave before fractioning the " +
 		//"targetAspectRatio: [" + numXCellsShouldHave + "].");
 
 		//To cause the targetAspectRatio to be arrived at gradually, let's
@@ -1335,7 +1330,7 @@ MouseWheelListener {
 				(numXCellsShouldHave -
 						numXCells) * aspectRatioFracCorrection;
 
-		//LogBuffer.println("numXCellsShouldHave after fractioning the " +
+		//debug("numXCellsShouldHave after fractioning the " +
 		//"targetAspectRatio: [" + numXCellsShouldHave + "].");
 
 		double targetZoomFracCorrection = 0.0;
@@ -1359,9 +1354,9 @@ MouseWheelListener {
 				zoomYVal = ymap.getBestZoomOutVal(yPxPos,targetZoomFrac);
 			}
 
-			//LogBuffer.println("Jumping to [" + numXCellsShouldHave +
+			//debug("Jumping to [" + numXCellsShouldHave +
 			//"] because it's an integer equal to the target number of cells.");
-			//LogBuffer.println("Zooming by [x" + zoomXVal + ",y" + zoomYVal +
+			//debug("Zooming by [x" + zoomXVal + ",y" + zoomYVal +
 			//"] target aspect ratio: [" + targetAspectRatio +
 			//"]. Target zoom frac: [" + targetZoomFrac + "]");
 			
@@ -1404,7 +1399,7 @@ MouseWheelListener {
 
 			double numYCellsShouldHave = numXCells / targetAspectRatio;
 
-			//LogBuffer.println("Actual number of cells that should be on " +
+			//debug("Actual number of cells that should be on " +
 			//"the Y axis: [" + numYCellsShouldHave + "]");
 			//if(numYCellsShouldHave < numYSelectedIndexes) {
 			//	numYCellsShouldHave = numYSelectedIndexes;
@@ -1412,10 +1407,10 @@ MouseWheelListener {
 			//	numYCellsShouldHave = (ymap.getMaxIndex() + 1);
 			//}
 
-			//LogBuffer.println("Zooming in on Y axis more: " +
+			//debug("Zooming in on Y axis more: " +
 			//"numYCellsShouldHave = numYCells - Math.abs(numYCellsShouldHave" +
 			//" - numYCells) * aspectRatioFracCorrection");
-			//LogBuffer.println("Zooming in on Y axis more: " +
+			//debug("Zooming in on Y axis more: " +
 			//"numYCellsShouldHave = " + numYCells + " - Math.abs(" +
 			//numYCellsShouldHave + " - " + numYCells + ") * " +
 			//aspectRatioFracCorrection);
@@ -1436,10 +1431,10 @@ MouseWheelListener {
 						Math.abs(numYCellsShouldHave - numYCells) /
 						numYCellsShouldHave;
 			}
-			//LogBuffer.println("Zooming in on Y axis more: " +
+			//debug("Zooming in on Y axis more: " +
 			//"targetZoomFracCorrection = Math.abs(numYCellsShouldHave - " +
 			//"numYCells) / numYCells");
-			//LogBuffer.println("Zooming in on Y axis more: " +
+			//debug("Zooming in on Y axis more: " +
 			//targetZoomFracCorrection + " = Math.abs(" + numYCellsShouldHave +
 			//" - " + numYCells + ") / " + numYCells);
 			
@@ -1457,7 +1452,7 @@ MouseWheelListener {
 			if(numXCells >= numXSelectedIndexes) {
 				zoomXVal = xmap.getBestZoomInVal(xPxPos,targetZoomFrac);
 			} else {
-				//LogBuffer.println("Zooming out on the X axis 1.");
+				//debug("Zooming out on the X axis 1.");
 				zoomXVal = xmap.getBestZoomOutVal(xPxPos,targetZoomFrac);
 			}
 			if(numYCells >= numYSelectedIndexes) {
@@ -1465,17 +1460,17 @@ MouseWheelListener {
 						targetZoomFrac +
 						(1 - targetZoomFrac) * targetZoomFracCorrection);
 			} else {
-				//LogBuffer.println("Zooming out on the Y axis 1.");
+				//debug("Zooming out on the Y axis 1.");
 				zoomYVal = ymap.getBestZoomOutVal(yPxPos,
 						targetZoomFrac +
 						(1 - targetZoomFrac) * targetZoomFracCorrection);
 			}
 
-			//LogBuffer.println("targetZoomFracCorrection: [" +
+			//debug("targetZoomFracCorrection: [" +
 			//		targetZoomFracCorrection + "].  Resulting zoomXVal: [" +
 			//		zoomXVal + "].");
 
-			//LogBuffer.println("Zooming more on the Y axis because the " +
+			//debug("Zooming more on the Y axis because the " +
 			//"number of X cells we should have [" + numXCellsShouldHave +
 			//"] is greater than the current number of cells [" + numXCells +
 			//"] and we are zooming in on the Y axis or the number of X " +
@@ -1501,7 +1496,7 @@ MouseWheelListener {
 			}
 		}
 		else {
-			//LogBuffer.println("Actual number of cells that should be on " +
+			//debug("Actual number of cells that should be on " +
 			//"the X axis: [" + numXCellsShouldHave + "]");
 			
 			//Could check for possible div by zero here, but should be
@@ -1521,29 +1516,29 @@ MouseWheelListener {
 			//		numXCellsShouldHave / (double) numXCells;
 
 			if(numXCells >= numXSelectedIndexes) {
-				//LogBuffer.println("Zooming in on the X axis.");
+				//debug("Zooming in on the X axis.");
 				zoomXVal = xmap.getBestZoomInVal(xPxPos,
 						targetZoomFrac +
 						(1 - targetZoomFrac) * targetZoomFracCorrection);
 			} else {
-				//LogBuffer.println("Zooming out on the X axis 2.");
+				//debug("Zooming out on the X axis 2.");
 				zoomXVal = xmap.getBestZoomOutVal(xPxPos,
 						targetZoomFrac +
 						(1 - targetZoomFrac) * targetZoomFracCorrection);
 			}
 			if(numYCells >= numYSelectedIndexes) {
-				//LogBuffer.println("Zooming in on the Y axis.");
+				//debug("Zooming in on the Y axis.");
 				zoomYVal = ymap.getBestZoomInVal(yPxPos,targetZoomFrac);
 			} else {
-				//LogBuffer.println("Zooming out on the Y axis 2.");
+				//debug("Zooming out on the Y axis 2.");
 				zoomYVal = ymap.getBestZoomOutVal(yPxPos,targetZoomFrac);
 			}
 
-			//LogBuffer.println("targetZoomFracCorrection: [" +
+			//debug("targetZoomFracCorrection: [" +
 			//		targetZoomFracCorrection + "].  Resulting zoomXVal: [" +
 			//		zoomXVal + "].");
 
-			//LogBuffer.println("Zooming more on the X axis because the " +
+			//debug("Zooming more on the X axis because the " +
 			//"number of X cells we should have [" + numXCellsShouldHave +
 			//"] is less than or equal to the target number of X cells [" +
 			//numXCells + "].");
@@ -1564,7 +1559,7 @@ MouseWheelListener {
 				}
 			}
 		}
-		//LogBuffer.println("Aspect ratio.  Current: [" + numXCells + " / " +
+		//debug("Aspect ratio.  Current: [" + numXCells + " / " +
 		//numYCells + "] Target: [" + targetAspectRatio +
 		//"].  targetZoomFracCorrection: [" + targetZoomFracCorrection +
 		//"].  New zoomXVal: [" + zoomXVal + "] New zoomYVal: [" + zoomYVal +
@@ -1589,7 +1584,7 @@ MouseWheelListener {
 				zoomXVal = numXCells - numXSelectedIndexes;
 			}
 
-			//LogBuffer.println("Zooming in on the x axis");
+			//debug("Zooming in on the x axis");
 			xmap.zoomTowardPixel(xPxPos,zoomXVal);
 		} else {
 			//Let's make sure that we're not going to zoom past our target area
@@ -1597,7 +1592,7 @@ MouseWheelListener {
 				zoomXVal = Math.abs(numXCells - numXSelectedIndexes);
 			}
 
-			//LogBuffer.println("Zooming out on the x axis with xPxPos [" +
+			//debug("Zooming out on the x axis with xPxPos [" +
 			//xPxPos + "] and zoomXVal [" + zoomXVal + "].");
 			xmap.zoomAwayPixel(xPxPos,zoomXVal);
 		}
@@ -1609,7 +1604,7 @@ MouseWheelListener {
 				zoomYVal = numYCells - numYSelectedIndexes;
 			}
 
-			//LogBuffer.println("Zooming in on the y axis");
+			//debug("Zooming in on the y axis");
 			ymap.zoomTowardPixel(yPxPos,zoomYVal);
 		}
 		//Else we were supposed to be zooming out
@@ -1619,11 +1614,11 @@ MouseWheelListener {
 				zoomYVal = Math.abs(numYCells - numYSelectedIndexes);
 			}
 
-			//LogBuffer.println("Zooming out on the y axis");
+			//debug("Zooming out on the y axis");
 			ymap.zoomAwayPixel(yPxPos,zoomYVal);
 		}
 
-		//LogBuffer.println("Should have zoomed by [x" + zoomXVal + ",y" +
+		//debug("Should have zoomed by [x" + zoomXVal + ",y" +
 		//		zoomYVal + "] from [" + prevXNumVisible + ":" +
 		//		prevYNumVisible + "] to [" + xmap.getNumVisible() + ":" +
 		//		ymap.getNumVisible() + "].");
@@ -1637,7 +1632,7 @@ MouseWheelListener {
 			ymap.scrollToFirstIndex(selecYStartIndex/*,true*/);
 		}
 		else {
-			//LogBuffer.println("Correcting the scroll because (xPxPos <= 0 " +
+			//debug("Correcting the scroll because (xPxPos <= 0 " +
 			//"|| yPxPos <= 0 || xPxPos >= (xPxNum - 1) || yPxPos >= (yPxNum " +
 			//"- 1)) = (" + xPxPos + " <= 0 || " + yPxPos + " <= 0 || " +
 			//xPxPos + " >= (" + xPxNum + " - 1) || " + yPxPos + " >= (" +
@@ -1677,14 +1672,14 @@ MouseWheelListener {
 						(int) Math.floor(numXSelectedIndexes / 2)) -
 						centerXIndex;
 
-				//LogBuffer.println("ScrollX difference before fractioning: " +
+				//debug("ScrollX difference before fractioning: " +
 				//scrollDistDirX + " = selecXStartIndex + " +
 				//"numXSelectedIndexes / 2) - centerXIndex /// " +
 				//selecXStartIndex + " + " + numXSelectedIndexes + " / 2) - " +
 				//centerXIndex + ".");
 				scrollDistDirX =
 						(int) Math.round(scrollDistDirX * scrollFrac);
-				//LogBuffer.println("ScrollX difference after fractioning: [" +
+				//debug("ScrollX difference after fractioning: [" +
 				//scrollDistDirX + "].");
 
 				/* TODO: Refactor the scrolling so that these checks do not have
@@ -1712,7 +1707,7 @@ MouseWheelListener {
 							(int) Math.round((1.0 - scrollFrac) *
 									Math.abs((double) selecFarEdge -
 											(double) prevFarEdge));
-					//LogBuffer.println("ScrollX difference after correcting " +
+					//debug("ScrollX difference after correcting " +
 					//"for far edge overscroll: [" + scrollDistDirX + "].");
 					newNearEdge = (selecXStartIndex +
 							(int) Math.floor(numXSelectedIndexes / 2)) -
@@ -1726,7 +1721,7 @@ MouseWheelListener {
 					   (selecXStartIndex >= prevXFirstVisible &&
 						selecXStartIndex < newNearEdge)) {
 						scrollDistDirX = 0;
-						//LogBuffer.println("ScrollX difference after " +
+						//debug("ScrollX difference after " +
 						//"correcting for far edge overscroll: [" +
 						//scrollDistDirX + "].");
 					}
@@ -1736,7 +1731,7 @@ MouseWheelListener {
 							(int) Math.round((1.0 - scrollFrac) *
 									((double) selecXStartIndex -
 											(double) prevXFirstVisible));
-					//LogBuffer.println("ScrollX difference after correcting " +
+					//debug("ScrollX difference after correcting " +
 					//"for near edge overscroll: [" + scrollDistDirX + "].");
 					newNearEdge = (selecXStartIndex +
 							(int) Math.floor(numXSelectedIndexes / 2)) -
@@ -1750,17 +1745,17 @@ MouseWheelListener {
 					   (selecFarEdge <= prevFarEdge &&
 					    selecFarEdge > newFarEdge)) {
 						scrollDistDirX = 0;
-						//LogBuffer.println("ScrollX difference after " +
+						//debug("ScrollX difference after " +
 						//"correcting for far edge overscroll: [" +
 						//scrollDistDirX + "].");
 					}
 				}
 	
-				//LogBuffer.println("Correcting the X scroll because the " +
+				//debug("Correcting the X scroll because the " +
 				//"pixel we are zooming to/from is on an edge.");
-				//LogBuffer.println("(selecXStartIndex + numXSelectedIndexes " +
+				//debug("(selecXStartIndex + numXSelectedIndexes " +
 				//"/ 2) - scrollDistDirX");
-				//LogBuffer.println(((selecXStartIndex + (int) Math.floor(" +
+				//debug(((selecXStartIndex + (int) Math.floor(" +
 				//"numXSelectedIndexes / 2)) - scrollDistDirX) + " = (" +
 				//selecXStartIndex + " + " + numXSelectedIndexes + " / 2) - " +
 				//scrollDistDirX);
@@ -1797,14 +1792,14 @@ MouseWheelListener {
 				int scrollDistDirY = (selecYStartIndex +
 						(int) Math.floor(numYSelectedIndexes / 2)) -
 						centerYIndex;
-				//LogBuffer.println("ScrollY difference before fractioning: " +
+				//debug("ScrollY difference before fractioning: " +
 				//scrollDistDirY + " = selecYStartIndex + " +
 				//"numYSelectedIndexes / 2) - centerYIndex /// " +
 				//selecYStartIndex + " + " + numYSelectedIndexes + " / 2) - " +
 				//centerYIndex + ".");
 				scrollDistDirY = (int) Math.round(scrollDistDirY *
 						scrollFrac);
-				//LogBuffer.println("ScrollY difference after fractioning: [" +
+				//debug("ScrollY difference after fractioning: [" +
 				//scrollDistDirY + "].");
 	
 				/* TODO: Refactor the scrolling so that these checks do not have
@@ -1832,7 +1827,7 @@ MouseWheelListener {
 							(int) Math.round((1.0 - scrollFrac) *
 									Math.abs((double) selecFarEdge -
 											(double) prevFarEdge));
-					//LogBuffer.println("ScrollY difference after correcting " +
+					//debug("ScrollY difference after correcting " +
 					//"for far edge overscroll: [" + scrollDistDirY + "].");
 					newNearEdge = (selecYStartIndex +
 							(int) Math.floor(numYSelectedIndexes / 2)) -
@@ -1846,7 +1841,7 @@ MouseWheelListener {
 					   (selecYStartIndex >= prevYFirstVisible &&
 						selecYStartIndex < newNearEdge)) {
 						scrollDistDirY = 0;
-						//LogBuffer.println("ScrollY difference after " +
+						//debug("ScrollY difference after " +
 						//"correcting for far edge overscroll: [" +
 						//scrollDistDirY + "].");
 					}
@@ -1856,7 +1851,7 @@ MouseWheelListener {
 							(int) Math.round((1.0 - scrollFrac) *
 									((double) selecYStartIndex -
 											(double) prevYFirstVisible));
-					//LogBuffer.println("ScrollY difference after correcting " +
+					//debug("ScrollY difference after correcting " +
 					//"for near edge overscroll: [" + scrollDistDirY +
 					//"] because (selecYStartIndex >= prevYFirstVisible && " +
 					//"selecYStartIndex < newNearEdge) = (" + selecYStartIndex +
@@ -1873,18 +1868,18 @@ MouseWheelListener {
 					if(selecYStartIndex < newNearEdge ||
 					   (selecFarEdge <= prevFarEdge &&
 					    selecFarEdge > newFarEdge)) {
-						//LogBuffer.println("ScrollY difference after " +
+						//debug("ScrollY difference after " +
 						//"correcting for far edge overscroll: [" +
 						//scrollDistDirY + "].");
 						scrollDistDirY = 0;
 					}
 				}
 				
-				//LogBuffer.println("Correcting the Y scroll because the " +
+				//debug("Correcting the Y scroll because the " +
 				//"pixel we are zooming to/from is on an edge.");
-				//LogBuffer.println("(selecYStartIndex + numYSelectedIndexes " +
+				//debug("(selecYStartIndex + numYSelectedIndexes " +
 				//"/ 2) - scrollDistDirY");
-				//LogBuffer.println(((selecYStartIndex +
+				//debug(((selecYStartIndex +
 				//(int) Math.floor((double) numYSelectedIndexes / 2.0)) -
 				//scrollDistDirY) + " = (" + selecYStartIndex + " + " +
 				//numYSelectedIndexes + " / 2) - " + scrollDistDirY);
@@ -1902,7 +1897,7 @@ MouseWheelListener {
 			updateAspectRatio();
 		}
 
-		//LogBuffer.println("Zoom redraw bounds initial: [" + startXPixel + "," +
+		//debug("Zoom redraw bounds initial: [" + startXPixel + "," +
 		//		startYPixel + "," + (startXPixel + numSelectedXPixels - 1) +
 		//		"," + (startYPixel + numSelectedYPixels - 1) +
 		//		"]. Panel dimensions: [" + getWidth() + "x" + getHeight() +
@@ -1912,7 +1907,7 @@ MouseWheelListener {
 
 		pixelsPerXIndex = xmap.getScale();
 		if(prevXNumVisible > numXSelectedIndexes) {
-			//LogBuffer.println("Zoom redraw bounds initial X: [" + startXPixel +
+			//debug("Zoom redraw bounds initial X: [" + startXPixel +
 			//		"," + (startXPixel + numSelectedXPixels - 1) +
 			//		"]. Panel dimensions: [" + getWidth() + "].");
 			//Now let's return the pixel indexes of the selection post-zoom
@@ -1926,13 +1921,13 @@ MouseWheelListener {
 		}
 		pixelsPerYIndex = ymap.getScale();
 		if(prevYNumVisible > numYSelectedIndexes) {
-			//LogBuffer.println("Zoom redraw bounds initial: [" + startYPixel +
+			//debug("Zoom redraw bounds initial: [" + startYPixel +
 			//		"," + (startYPixel + numSelectedYPixels - 1) +
 			//		"]. Panel dimensions: [" + getHeight() + "].");
 			redrawPixelBounds[1] = ymap.getPixel(selecYStartIndex);
 			redrawPixelBounds[3] = (int) Math.round((double) numYSelectedIndexes *
 					pixelsPerYIndex) + 1; //Added 1 because sometimes inaccurate
-			//LogBuffer.println("Zoom redraw bounds before fix: [" +
+			//debug("Zoom redraw bounds before fix: [" +
 			//		redrawPixelBounds[0] + "," + redrawPixelBounds[1] + "," +
 			//		redrawPixelBounds[2] + "," + redrawPixelBounds[3] + "].");
 		} else {
@@ -1956,7 +1951,7 @@ MouseWheelListener {
 		if(redrawPixelBounds[3] < 0) redrawPixelBounds[3] = 0;
 		if((redrawPixelBounds[1] + redrawPixelBounds[3]) > maxHeight)
 				redrawPixelBounds[3] = maxHeight - redrawPixelBounds[1];
-		//LogBuffer.println("Zoom redraw bounds after fix: [" +
+		//debug("Zoom redraw bounds after fix: [" +
 		//		redrawPixelBounds[0] + "," + redrawPixelBounds[1] + "," +
 		//		redrawPixelBounds[2] + "," + redrawPixelBounds[3] + "].");
 		return(redrawPixelBounds);
@@ -1968,13 +1963,13 @@ MouseWheelListener {
 	
 	public void updateAspectRatio() {
 		aspectRatio = getAspectRatio(xmap.getNumVisible(),ymap.getNumVisible());
-		//LogBuffer.println("Aspect Ratio updated to [" + aspectRatio + " : " +
+		//debug("Aspect Ratio updated to [" + aspectRatio + " : " +
 		//xmap.getNumVisible() + "/" + ymap.getNumVisible() + "].");
 	}
 
 	public void setAspectRatio(int numXDots,int numYDots) {
 		aspectRatio = getAspectRatio(numXDots,numYDots);
-		//LogBuffer.println("Aspect Ratio set to [" + aspectRatio + " : " +
+		//debug("Aspect Ratio set to [" + aspectRatio + " : " +
 		//xmap.getNumVisible() + "/" + ymap.getNumVisible() + "].");
 	}
 
@@ -2043,7 +2038,7 @@ MouseWheelListener {
 
 			for (final List<Integer> yBoundaries : geneBoundaryList) {
 
-				//LogBuffer.println("Preparing to create ellipse.");
+				//debug("Preparing to create ellipse.");
 
 				// Width and height of rectangle which spans the Ellipse2D object
 				h = (yBoundaries.get(1) - yBoundaries.get(0));
@@ -2066,11 +2061,11 @@ MouseWheelListener {
 					x = xBoundaries.get(0) + (w / 2.0) - 20;
 					y = yBoundaries.get(0) + (h / 2.0) - 20;
 
-					//LogBuffer.println("Ellipse created at [" + x + "x" + y + "] and is dimensions [" + w + "x" + h + "].");
+					//debug("Ellipse created at [" + x + "x" + y + "] and is dimensions [" + w + "x" + h + "].");
 
 					indicatorCircleList.add(new Ellipse2D.Double(x, y, 40, 40));
 				//} else {
-					//LogBuffer.println("Selection was too big [" + w + "x" + h + "] or [(" + xBoundaries.get(1) + " - " + xBoundaries.get(0) + ") x (" + yBoundaries.get(1) + " - " + yBoundaries.get(0) + ")].");
+					//debug("Selection was too big [" + w + "x" + h + "] or [(" + xBoundaries.get(1) + " - " + xBoundaries.get(0) + ") x (" + yBoundaries.get(1) + " - " + yBoundaries.get(0) + ")].");
 				}
 				lastyb = yBoundaries.get(1);
 			}
@@ -2160,7 +2155,7 @@ MouseWheelListener {
 			arraySelection.setIndexSelection(i, true);
 		}
 
-		//LogBuffer.println("Rectangle selected.");
+		//debug("Rectangle selected.");
 		globalMatrixView.setIMVselectedIndexes(
 				arraySelection.getSelectedIndexes(),
 				geneSelection.getSelectedIndexes());

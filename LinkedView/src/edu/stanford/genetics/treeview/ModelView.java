@@ -70,6 +70,8 @@ public abstract class ModelView extends JPanel implements Observer,
 	 * shown in the label pane(s) */
 	protected boolean labelPortMode = false;
 
+	public int debug; //This is a verbosity level
+
 	protected ModelView() {
 
 		super(false);
@@ -257,5 +259,11 @@ public abstract class ModelView extends JPanel implements Observer,
 
 	public void setLabelPortMode(boolean m) {
 		labelPortMode = m;
+	}
+
+	public void debug(String msg,int level) {
+		if(level == debug) {
+			LogBuffer.println(msg);
+		}
 	}
 }
