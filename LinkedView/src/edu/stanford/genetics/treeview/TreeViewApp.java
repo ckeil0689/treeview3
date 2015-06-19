@@ -63,11 +63,11 @@ public abstract class TreeViewApp {// implements WindowListener {
 	/** holds all open windows */
 	// protected java.util.Vector<Window> windows;
 
-	private final UrlPresets geneUrlPresets;
-	private final UrlPresets arrayUrlPresets;
+	private final UrlPresets rowUrlPresets;
+	private final UrlPresets columnUrlPresets;
 	// private boolean exitOnWindowsClosed = true;
 
-	/** holds global config */
+	/* holds global configuration settings */
 	private final Preferences globalConfig;
 
 	/**
@@ -78,16 +78,6 @@ public abstract class TreeViewApp {// implements WindowListener {
 
 		this(null, false);
 	}
-
-	// /**
-	// * Constructor for the TreeViewApp object. Opens up a globalConfig from
-	// the
-	// * default location.
-	// */
-	// public TreeViewApp(final boolean isApplet) {
-	//
-	// this(isApplet);
-	// }
 
 	/**
 	 * Constructor for the TreeViewApp object takes configuration from the
@@ -108,24 +98,23 @@ public abstract class TreeViewApp {// implements WindowListener {
 			globalConfig = setPreferences();
 		}
 
-		geneUrlPresets = new UrlPresets("GeneUrlPresets");
-		geneUrlPresets.setConfigNode(getGlobalConfig());
+		rowUrlPresets = new UrlPresets("GeneUrlPresets");
+		rowUrlPresets.setConfigNode(getGlobalConfig());
 
-		arrayUrlPresets = new UrlPresets("ArrayUrlPresets");
-		arrayUrlPresets.setConfigNode(getGlobalConfig());
+		columnUrlPresets = new UrlPresets("ArrayUrlPresets");
+		columnUrlPresets.setConfigNode(getGlobalConfig());
 
-		if (arrayUrlPresets.getPresetNames().length == 0) {
-			arrayUrlPresets.addPreset("Google",
+		if (columnUrlPresets.getPresetNames().length == 0) {
+			columnUrlPresets.addPreset("Google",
 					"http://www.google.com/search?hl=en&ie=ISO-8859-1"
 							+ "&q=HEADER");
-			arrayUrlPresets.setDefaultPreset(-1);
+			columnUrlPresets.setDefaultPreset(-1);
 		}
 
 		// Generate an XML file of the Preferences at this point, so it
 		// can be viewed and analyzed.
-		FileOutputStream fos;
 		try {
-			fos = new FileOutputStream("prefs.xml");
+			FileOutputStream fos = new FileOutputStream("prefs.xml");
 			globalConfig.exportSubtree(fos);
 			fos.close();
 
@@ -133,15 +122,10 @@ public abstract class TreeViewApp {// implements WindowListener {
 			ttm.setEnabled(true);
 
 		} catch (final IOException | BackingStoreException e1) {
-			e1.printStackTrace();
+			LogBuffer.logException(e1);
+			LogBuffer.println("Could not export preferences XML "
+					+ "file for viewing.");
 		}
-
-		// try {
-		// final ToolTipManager ttm = ToolTipManager.sharedInstance();
-		// ttm.setEnabled(true);
-		//
-		// } catch (final Exception e) {
-		// }
 	}
 
 	/**
@@ -149,14 +133,24 @@ public abstract class TreeViewApp {// implements WindowListener {
 	 */
 	public abstract URL getCodeBase();
 
-	public UrlPresets getGeneUrlPresets() {
+	/**
+	 * The returned object contains presets for the URLs used when searching
+	 * for row labels in online databases. 
+	 * @return URLPresets for row labels.
+	 */
+	public UrlPresets getRowLabelUrlPresets() {
 
-		return geneUrlPresets;
+		return rowUrlPresets;
 	}
 
-	public UrlPresets getArrayUrlPresets() {
+	/**
+	 * The returned object contains presets for the URLs used when searching
+	 * for column labels in online databases. 
+	 * @return URLPresets for column labels.
+	 */
+	public UrlPresets getColumnLabelUrlPresets() {
 
-		return arrayUrlPresets;
+		return columnUrlPresets;
 	}
 
 	/**

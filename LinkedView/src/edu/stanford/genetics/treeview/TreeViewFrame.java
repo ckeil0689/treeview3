@@ -1001,13 +1001,13 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	@Override
 	public UrlPresets getGeneUrlPresets() {
 
-		return treeView.getGeneUrlPresets();
+		return treeView.getRowLabelUrlPresets();
 	}
 
 	@Override
 	public UrlPresets getArrayUrlPresets() {
 
-		return treeView.getArrayUrlPresets();
+		return treeView.getColumnLabelUrlPresets();
 	}
 
 	@Override

@@ -16,14 +16,19 @@ import edu.stanford.genetics.treeview.LogBuffer;
 // public class TreeViewLauncher {
 public class TreeView3 {
 
+	/**
+	 * Sets up important system properties for Apple OS X systems.
+	 * This includes mostly properties related to the OS X menu bar. 
+	 */
 	private static void macSetup() {
+		
 		final String os = System.getProperty("os.name").toLowerCase();
 		final boolean isMac = os.startsWith("mac os x");
 
 		if (!isMac)
 			return;
 
-		LogBuffer.println("Running on a mac.");
+		LogBuffer.println("Running on a Mac.");
 
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
 		System.setProperty("com.apple.mrj.application.apple.menu.about.name",
@@ -42,16 +47,19 @@ public class TreeView3 {
 			 */
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
+			/* Application start-up after setting System and UIManager stuff. */
 			javax.swing.SwingUtilities.invokeLater(new Runnable() {
 
 				@Override
 				public void run() {
-					new LinkedViewApp();
+					LinkedViewApp lvApp = new LinkedViewApp();
+					lvApp.start();
 				}
 			});
 		} catch (final ClassNotFoundException | InstantiationException
 				| IllegalAccessException | UnsupportedLookAndFeelException e) {
 			LogBuffer.logException(e);
+			LogBuffer.println("Start up failed.");
 		}
 	}
 }

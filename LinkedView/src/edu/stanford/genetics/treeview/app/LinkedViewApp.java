@@ -73,6 +73,13 @@ public class LinkedViewApp extends TreeViewApp {
 		scanForPlugins();
 
 		/* added to circumvent standardStartup for now */
+//		start();
+	}
+
+	/**
+	 * Creates a new TreeViewFrame object and makes its JFrame visible.
+	 */
+	public void start() {
 		openNew().getAppFrame().setVisible(true);
 	}
 
@@ -124,7 +131,7 @@ public class LinkedViewApp extends TreeViewApp {
 	@Override
 	public TreeViewFrame openNew() {
 
-		/* setup Model, View, and Controller */
+		/* Setup MVC (Model, View, and Controller) */
 		// final LinkedViewFrame tvFrame = new LinkedViewFrame(this);
 		final DataModel model = new TVModel();
 		final TreeViewFrame tvFrame = new TreeViewFrame(this);
@@ -199,7 +206,7 @@ public class LinkedViewApp extends TreeViewApp {
 			}
 		} else {
 			if (args.getExportType() == null) {
-				openNew().getAppFrame().setVisible(true);
+				start();
 			} else {
 				System.err.println("Must specify file/url to load "
 						+ "(using -r) when specifying export with -x");
