@@ -287,25 +287,28 @@ public class PluginManager {
 	 * @return ith plugin, or null if no such plugin.
 	 */
 	public PluginFactory getPluginFactory(final int i) {
-		if ((i < pluginFactories.size()) && (i >= 0))
-			return (PluginFactory) pluginFactories.elementAt(i);
-		else {
-			System.out.println("returns null");
+		
+		if (i < 0 || i >= pluginFactories.size()) {
+			LogBuffer.println("There is no PluginFactory at " + i);
 			return null;
 		}
+		
+		return pluginFactories.elementAt(i);
 	}
 
 	public boolean pluginExists(final String qualified_name) {
-		final Enumeration e = pluginFactories.elements();
+		
+		final Enumeration<PluginFactory> e = pluginFactories.elements();
 		String s = null;
 		while (e.hasMoreElements()) {
-			s = ((PluginFactory) e.nextElement()).toString();
+			s = (e.nextElement()).toString();
 			/*
 			 * The toString function on an (Object) always adds some funny
 			 * strings to the end of the string, so we have to use "contains".
 			 */
-			if (s.indexOf(qualified_name) != -1)
+			if (s.indexOf(qualified_name) != -1) {
 				return true;
+			}
 		}
 		return false;
 	}
