@@ -19,7 +19,7 @@ import edu.stanford.genetics.treeview.core.PluginManager;
 
 public class AlignmentFactory extends PluginFactory {
 
-	private HeaderInfo geneHI;
+	private HeaderInfo rowHI;
 
 	static {
 		PluginManager.registerPlugin(new AlignmentFactory());
@@ -73,22 +73,21 @@ public class AlignmentFactory extends PluginFactory {
 	public boolean configurePlugin(final Preferences node,
 			final ViewFrame viewFrame) {
 
-		if (geneHI.getIndex("ALN") >= 0) {
-			node.put("headerName", "ALN");
-			return true;
-
-		} else {
+		if (rowHI.getIndex("ALN") < 0) {
 			JOptionPane.showMessageDialog(viewFrame.getAppFrame(),
 					new JTextArea("Cannot find aligned sequence.\n"
 							+ "Please put aligned sequence in column "
 							+ "titled \"ALN\"."));
 			return false;
 		}
+		
+		node.put("headerName", "ALN");
+		return true;
 	}
 
-	public void setGeneHeaderInfo(final HeaderInfo geneHI) {
+	public void setRowHeaderInfo(final HeaderInfo rowHI) {
 
-		this.geneHI = geneHI;
+		this.rowHI = rowHI;
 	}
 
 }
