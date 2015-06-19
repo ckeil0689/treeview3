@@ -33,8 +33,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -915,6 +913,12 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	public FileSet findFileSet(final JMenuItem menuItem) {
 
+		if (fileSetList.size() != fileMenuList.size()) {
+			LogBuffer.println("Sizes of FileSetList and FileMenuList in "
+					+ "TVFrame don't match.");
+			return null;
+		}
+		
 		int index = -1;
 		for (int i = 0; i < fileMenuList.size(); i++) {
 
@@ -924,15 +928,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 				break;
 			}
 		}
-
-		if (fileSetList.size() == fileMenuList.size())
-			return fileSetList.get(index);
-		else {
-			LogBuffer
-			.println("Sizes of FileSetList and FileMenuList in TVFrame"
-					+ "don't match.");
-			return null;
-		}
+		
+		return fileSetList.get(index);
 	}
 
 	/* Adding MenuActionListeners */

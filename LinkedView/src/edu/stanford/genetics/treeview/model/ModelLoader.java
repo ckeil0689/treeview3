@@ -259,14 +259,13 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 				hasData = true;
 				break;
 
-			} else {
-				/*
-				 * Concatenate empty String, otherwise this will store a
-				 * reference to the entire line from reader even when loading
-				 * method and SwingWorker are closed. Strings are immutable!
-				 */
-				labels[i] = element + "";
 			}
+			/*
+			 * Concatenate empty String, otherwise this will store a
+			 * reference to the entire line from reader even when loading
+			 * method and SwingWorker are closed. Strings are immutable!
+			 */
+			labels[i] = element + "";
 		}
 
 		return labels;
