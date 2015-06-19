@@ -65,7 +65,7 @@ import edu.stanford.genetics.treeview.core.FileMru;
 import edu.stanford.genetics.treeview.core.FileMruEditor;
 import edu.stanford.genetics.treeview.core.LogMessagesPanel;
 import edu.stanford.genetics.treeview.core.LogSettingsPanel;
-import edu.stanford.genetics.treeview.core.MenuHelpPluginsFrame;
+//import edu.stanford.genetics.treeview.core.MenuHelpPluginsFrame;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 
@@ -795,25 +795,25 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 * This method displays the current plugin info. I set it up as a method so
 	 * that it can be overridden by AppletViewFrame
 	 */
-	protected void displayPluginInfo() {
-
-		final MenuHelpPluginsFrame frame = new MenuHelpPluginsFrame(
-				"Current Plugins", this);
-		final File f_currdir = new File(".");
-
-		try {
-			frame.setSourceText(f_currdir.getCanonicalPath() + File.separator
-					+ "plugins" + File.separator);
-
-		} catch (final IOException e) {
-			frame.setSourceText("Unable to read default plugins directory.");
-			LogBuffer.println("IOException while trying to display "
-					+ "Plugin info: " + e.getMessage());
-		}
-
-		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		frame.setVisible(true);
-	}
+//	protected void displayPluginInfo() {
+//
+//		final MenuHelpPluginsFrame frame = new MenuHelpPluginsFrame(
+//				"Current Plugins", this);
+//		final File f_currdir = new File(".");
+//
+//		try {
+//			frame.setSourceText(f_currdir.getCanonicalPath() + File.separator
+//					+ "plugins" + File.separator);
+//
+//		} catch (final IOException e) {
+//			frame.setSourceText("Unable to read default plugins directory.");
+//			LogBuffer.println("IOException while trying to display "
+//					+ "Plugin info: " + e.getMessage());
+//		}
+//
+//		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+//		frame.setVisible(true);
+//	}
 
 	// @Override
 	// public MainPanel[] getMainPanelsByName(final String name) {

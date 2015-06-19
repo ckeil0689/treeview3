@@ -4,6 +4,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.TreeViewApp;
 
 /**
  * Launcher class which wraps the creation of the GUI as well as the main method
@@ -52,7 +53,7 @@ public class TreeView3 {
 
 				@Override
 				public void run() {
-					LinkedViewApp lvApp = new LinkedViewApp();
+					TreeViewApp lvApp = new LinkedViewApp();
 					lvApp.start();
 				}
 			});

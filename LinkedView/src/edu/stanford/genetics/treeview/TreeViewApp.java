@@ -128,11 +128,12 @@ public abstract class TreeViewApp {// implements WindowListener {
 		}
 	}
 
-	/**
-	 * URL of codebase
-	 */
+	/** URL of codebase */
 	public abstract URL getCodeBase();
-
+	
+	/** Starts up the application's setup process */
+	public abstract void start();
+	
 	/**
 	 * The returned object contains presets for the URLs used when searching
 	 * for row labels in online databases. 
@@ -161,10 +162,7 @@ public abstract class TreeViewApp {// implements WindowListener {
 	 */
 	public Preferences setPreferences() {
 
-		final Preferences configurations = Preferences.userRoot().node(
-				"TreeViewApp");
-
-		return configurations;
+		return Preferences.userRoot().node("TreeViewApp");
 	}
 
 	/**

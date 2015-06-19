@@ -22,7 +22,7 @@
 package edu.stanford.genetics.treeview.app;
 
 import java.io.File;
-import java.io.IOException;
+//import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.prefs.BackingStoreException;
@@ -39,8 +39,8 @@ import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.MainProgramArgs;
 import edu.stanford.genetics.treeview.TreeViewApp;
 import edu.stanford.genetics.treeview.TreeViewFrame;
-import edu.stanford.genetics.treeview.Util;
-import edu.stanford.genetics.treeview.core.PluginManager;
+//import edu.stanford.genetics.treeview.Util;
+//import edu.stanford.genetics.treeview.core.PluginManager;
 import edu.stanford.genetics.treeview.model.TVModel;
 
 /**
@@ -70,16 +70,14 @@ public class LinkedViewApp extends TreeViewApp {
 
 		/* load configurations in parent class */
 		super();
-		scanForPlugins();
-
-		/* added to circumvent standardStartup for now */
-//		start();
 	}
 
 	/**
 	 * Creates a new TreeViewFrame object and makes its JFrame visible.
 	 */
+	@Override
 	public void start() {
+		
 		openNew().getAppFrame().setVisible(true);
 	}
 
@@ -93,38 +91,42 @@ public class LinkedViewApp extends TreeViewApp {
 	public LinkedViewApp(final Preferences configurations) {
 
 		super(configurations, false);
-		scanForPlugins();
 	}
 
+	/**
+	 * @deprecated No features are used as plugins anymore. DendroView is 
+	 * now a native package rather than a plugin.
+	 */
 	private void scanForPlugins() {
 
-		final URL fileURL = getCodeBase();
-		String dir = Util.URLtoFilePath(fileURL.getPath() + "/plugins");
-		File[] files = PluginManager.getPluginManager().readdir(dir);
-		if (files == null) {
-			LogBuffer.println("Directory " + dir + " returned null");
-			final File f_currdir = new File(".");
-			try {
-				dir = f_currdir.getCanonicalPath() + File.separator + "plugins"
-						+ File.separator;
-				LogBuffer.println("failing over to " + dir);
-				files = PluginManager.getPluginManager().readdir(dir);
-				if (files != null) {
-					setCodeBase(f_currdir.toURI().toURL());
-				}
-			} catch (final IOException e1) {
-				// this might happen when the dir is bad.
-				e1.printStackTrace();
-			}
-		}
-		if (files == null || files.length == 0) {
-			LogBuffer.println("Directory " + dir + " contains no plugins");
-
-		} else {
-			PluginManager.getPluginManager().loadPlugins(files, false);
-		}
-		PluginManager.getPluginManager().pluginAssignConfigNodes(
-				getGlobalConfig().node("Plugins"));
+//		final URL fileURL = getCodeBase();
+//		String dir = Util.URLtoFilePath(fileURL.getPath() + "/plugins");
+//		File[] files = PluginManager.getPluginManager().readdir(dir);
+//		if (files == null) {
+//			LogBuffer.println("Directory " + dir + " returned null");
+//			final File f_currdir = new File(".");
+//			try {
+//				dir = f_currdir.getCanonicalPath() + File.separator + "plugins"
+//						+ File.separator;
+//				LogBuffer.println("failing over to " + dir);
+//				files = PluginManager.getPluginManager().readdir(dir);
+//				if (files != null) {
+//					setCodeBase(f_currdir.toURI().toURL());
+//				}
+//			} catch (final IOException e1) {
+//				// this might happen when the dir is bad.
+//				LogBuffer.logException(e1);
+//				LogBuffer.println("Directory for plugin probably bad: " + dir);
+//			}
+//		}
+//		if (files == null || files.length == 0) {
+//			LogBuffer.println("Directory " + dir + " contains no plugins");
+//
+//		} else {
+//			PluginManager.getPluginManager().loadPlugins(files, false);
+//		}
+//		PluginManager.getPluginManager().pluginAssignConfigNodes(
+//				getGlobalConfig().node("Plugins"));
 	}
 
 	/* inherit description */
@@ -214,6 +216,13 @@ public class LinkedViewApp extends TreeViewApp {
 		}
 	}
 
+	/**
+	 * @deprecated 
+	 * @param exportType
+	 * @param tvFrame
+	 * @return
+	 * @throws ExportException
+	 */
 	private boolean attemptExport(final String exportType,
 			final TreeViewFrame tvFrame) throws ExportException {
 
@@ -274,8 +283,7 @@ public class LinkedViewApp extends TreeViewApp {
 			// cheap_hack_i_re.html
 			URL location;
 			final String classLocation = LinkedViewApp.class.getName().replace(
-					'.', '/')
-					+ ".class";
+					'.', '/') + ".class";
 
 			final ClassLoader loader = LinkedViewApp.class.getClassLoader();
 			if (loader == null) {
@@ -304,12 +312,13 @@ public class LinkedViewApp extends TreeViewApp {
 				}
 			}
 
-			if (token == null)
+			if (token == null) {
 				return (new File(".")).toURI().toURL();
-			else
-				return new URL(token);
+			}
+			return new URL(token);
+			
 		} catch (final MalformedURLException e) {
-			e.printStackTrace();
+			LogBuffer.logException(e);
 			JOptionPane.showMessageDialog(null, e);
 			return null;
 		}

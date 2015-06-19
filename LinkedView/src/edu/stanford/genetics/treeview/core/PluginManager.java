@@ -42,7 +42,8 @@ public class PluginManager {
 	/**
 	 * holds list of all plugin factories
 	 */
-	private final java.util.Vector pluginFactories = new Vector();
+	private final Vector<PluginFactory> pluginFactories = 
+			new Vector<PluginFactory>();
 
 	public static PluginManager getPluginManager() {
 
@@ -69,7 +70,7 @@ public class PluginManager {
 	 * array of all classes to be declared NOTE: This method should probably be
 	 * moved into a PluginManager class
 	 */
-	private List getClassDeclarations(final JarFile jf)
+	private static List<String> getClassDeclarations(final JarFile jf)
 			throws NullPointerException, IOException {
 
 		ZipEntry ze = null;
@@ -77,13 +78,13 @@ public class PluginManager {
 			/*
 			 * See if class declarations file exists
 			 */
-			final Enumeration e = jf.entries();
+			final Enumeration<JarEntry> e = jf.entries();
 			JarEntry je = null;
 			String classfile = null;
 
 			for (; e.hasMoreElements();) {
 
-				je = (JarEntry) e.nextElement();
+				je = e.nextElement();
 				if (je.toString().indexOf(s_pluginclassfile) >= 0) {
 					classfile = je.toString();
 				}
@@ -107,7 +108,7 @@ public class PluginManager {
 		final BufferedReader br = new BufferedReader(new InputStreamReader(
 				jf.getInputStream(ze)));
 
-		final List al = new ArrayList();
+		final List<String> al = new ArrayList<String>();
 		String s = null;
 
 		while ((s = br.readLine()) != null) {
@@ -158,33 +159,36 @@ public class PluginManager {
 			final JarURLConnection conn = (JarURLConnection) jarURL
 					.openConnection();
 			final JarFile jarFile = conn.getJarFile();
-			final List al_classnames = getClassDeclarations(jarFile);
+			final List<String> al_classnames = getClassDeclarations(jarFile);
 			for (int j = 0; j < al_classnames.size(); j++) {
 				final Class thisClass = getClass();
 				final URLClassLoader urlcl = new URLClassLoader(
 						new URL[] { jarURL }, thisClass.getClassLoader());
-				if (!pluginExists((String) al_classnames.get(j))) {
-					final Class c = urlcl.loadClass((String) al_classnames
-							.get(j));
+				if (!pluginExists(al_classnames.get(j))) {
+					final Class c = urlcl.loadClass(al_classnames.get(j));
 					c.newInstance();
 					b_loadedPlugin |= true;
 
 				} else {
 					b_loadedPlugin |= false;
 				}
+				urlcl.close();
 			}
+			jarFile.close();
+			
 		} catch (final ClassNotFoundException e) {
-			e.printStackTrace();
-			LogBuffer.println("ClassNotFound " + e);
+			LogBuffer.logException(e);
 
 		} catch (final InstantiationException e) {
+			LogBuffer.logException(e);
 			Debug.print(e);
 
 		} catch (final IllegalAccessException e) {
+			LogBuffer.logException(e);
 			Debug.print(e);
 
 		} catch (final IOException e) {
-			e.printStackTrace();
+			LogBuffer.logException(e);
 		}
 		return b_loadedPlugin;
 	}
@@ -246,19 +250,21 @@ public class PluginManager {
 	}
 
 	public PluginFactory[] getPluginFactories() {
+		
 		final PluginFactory[] ret = new PluginFactory[pluginFactories.size()];
-		final Enumeration e = pluginFactories.elements();
+		final Enumeration<PluginFactory> e = pluginFactories.elements();
 		int i = 0;
 		while (e.hasMoreElements()) {
-			ret[i++] = (PluginFactory) e.nextElement();
+			ret[i++] = e.nextElement();
 		}
 		return ret;
 	}
 
 	public PluginFactory getPluginFactoryByName(final String name) {
-		final Enumeration e = pluginFactories.elements();
+		
+		final Enumeration<PluginFactory> e = pluginFactories.elements();
 		while (e.hasMoreElements()) {
-			final PluginFactory factory = (PluginFactory) e.nextElement();
+			final PluginFactory factory = e.nextElement();
 			if (name.equals(factory.getPluginName()))
 				return factory;
 		}
@@ -268,7 +274,7 @@ public class PluginManager {
 	public String[] getPluginNames() {
 		final String[] names = new String[pluginFactories.size()];
 		for (int i = 0; i < names.length; i++) {
-			names[i] = ((PluginFactory) pluginFactories.elementAt(i))
+			names[i] = (pluginFactories.elementAt(i))
 					.getPluginName();
 			LogBuffer.println("Pluginclassname ---- " + names[i]);
 		}
