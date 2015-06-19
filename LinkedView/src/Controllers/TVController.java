@@ -26,6 +26,7 @@ import ColorChooser.ColorChooserController;
 import Utilities.StringRes;
 import Views.ClusterDialog;
 import Views.ClusterView;
+import Views.LoadPreviewDialog;
 import edu.stanford.genetics.treeview.CdtFilter;
 import edu.stanford.genetics.treeview.DataMatrix;
 import edu.stanford.genetics.treeview.DataModel;
@@ -511,7 +512,10 @@ public class TVController implements Observer {
 
 			/* Only run loader, if JFileChooser wasn't canceled. */
 			if (file != null) {
-				loadData(tvFrame.getFileSet(file), false);
+//				loadData(tvFrame.getFileSet(file), false);
+				LoadPreviewDialog loadPreview = 
+						new LoadPreviewDialog(tvFrame.getFileSet(file));
+				loadPreview.setVisible(true);
 
 			} else {
 				LogBuffer.println("Selected file was null. Cannot begin"

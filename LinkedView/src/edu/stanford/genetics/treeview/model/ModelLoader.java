@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
@@ -439,26 +440,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		// Optional trailing "whitespace"
 	}
 
-	private List<String[]> extractTreeData(final BufferedReader reader) {
-
-		final List<String[]> treeData = new ArrayList<String[]>();
-		String line;
-
-		try {
-			while ((line = reader.readLine()) != null) {
-
-				// load line as String array
-				final String[] lineAsStrings = line.split("\\t", -1);
-				treeData.add(lineAsStrings);
-			}
-		} catch (final IOException e) {
-			LogBuffer.println("IOException during the "
-					+ "extraction of GTR file: " + e.getMessage());
-		}
-
-		return treeData;
-	}
-
 	/**
 	 * Parses the prefixes for the labels from the header data collected until
 	 * this point.
@@ -508,7 +489,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	 *            The row prefixes contain the right label.
 	 * @return The correct prefix
 	 */
-	private String assurePrefixNames(final String[] gPrefixes) {
+	private static String assurePrefixNames(final String[] gPrefixes) {
 
 		String finalPrefix = "OTHER";
 
@@ -646,8 +627,62 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		targetModel.hashATRs();
 		targetModel.aidFound(hasAID);
 	}
+	
+	/**
+	 * Small wrapper for <extractPreviewData> 
+	 * @param filename The path/ name of the file to be loaded.
+	 * @return String[][] The preview data in array format for use in JTable.
+	 */
+	public static String[][] loadPreviewData(final String filename) {
 
-	private List<String[]> loadTreeSet(final String loadingSet) {
+		String[][] previewData;
+		
+		try {
+			final BufferedReader br = new BufferedReader(new FileReader(
+					filename));
+
+			previewData = extractPreviewData(br);
+
+			br.close();
+
+		} catch (final IOException e) {
+			LogBuffer.logException(e);
+			return new String[0][];
+		}
+
+		return previewData;
+	}
+	
+	/**
+	 * Get a String array representation of the first <LIMIT> elements of 
+	 * data. This is for use in the data preview dialog only. The data
+	 * @param A BufferedReader object to read through the file.
+	 * @return String[][] The preview data in array format for use in JTable.
+	 * @author chris0689
+	 */
+	private static String[][] extractPreviewData(final BufferedReader reader) {
+
+		final int LIMIT = 20;
+		final String[][] previewData = new String[LIMIT][];
+		String line;
+		int count = 0;
+
+		try {
+			while ((line = reader.readLine()) != null && count < LIMIT) {
+
+				// load line as String array
+				final String[] lineAsStrings = line.split("\\t", -1);
+				previewData[count++] = Arrays.copyOfRange(lineAsStrings, 1, 
+						LIMIT);
+			}
+		} catch (final IOException e) {
+			LogBuffer.logException(e);
+		}
+
+		return previewData;
+	}
+
+	private static List<String[]> loadTreeSet(final String loadingSet) {
 
 		List<String[]> treeData = new ArrayList<String[]>();
 
@@ -669,8 +704,28 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 		return treeData;
 	}
+	
+	private static List<String[]> extractTreeData(final BufferedReader reader) {
 
-	/*
+		final List<String[]> treeData = new ArrayList<String[]>();
+		String line;
+
+		try {
+			while ((line = reader.readLine()) != null) {
+
+				// load line as String array
+				final String[] lineAsStrings = line.split("\\t", -1);
+				treeData.add(lineAsStrings);
+			}
+		} catch (final IOException e) {
+			LogBuffer.println("IOException during the "
+					+ "extraction of GTR file: " + e.getMessage());
+		}
+
+		return treeData;
+	}
+
+	/**
 	 * Encapsulates loading progress, so both label and progress bar can be
 	 * updated using publish() and only one SwingWorker.
 	 */
