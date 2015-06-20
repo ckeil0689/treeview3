@@ -654,6 +654,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	}
 	
 	/**
+	 * TODO put this into a PreviewLoader subclass which extends SwingWorker
 	 * Get a String array representation of the first <LIMIT> elements of 
 	 * data. This is for use in the data preview dialog only. The data
 	 * @param A BufferedReader object to read through the file.

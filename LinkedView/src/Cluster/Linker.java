@@ -36,9 +36,8 @@ public class Linker {
 		
 		if (linkMethod == SINGLE || linkMethod == COMPLETE) {
 			return singleCompleteLink(fusedClusters, currentClusters);
-		} else {
-			return averageLink(fusedClusters, currentClusters);
 		}
+		return averageLink(fusedClusters, currentClusters);
 	}
 	
 	/**

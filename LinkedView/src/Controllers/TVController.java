@@ -26,7 +26,8 @@ import ColorChooser.ColorChooserController;
 import Utilities.StringRes;
 import Views.ClusterDialog;
 import Views.ClusterView;
-import Views.LoadPreviewDialog;
+import Views.DataImportController;
+import Views.DataImportDialog;
 import edu.stanford.genetics.treeview.CdtFilter;
 import edu.stanford.genetics.treeview.DataMatrix;
 import edu.stanford.genetics.treeview.DataModel;
@@ -513,9 +514,18 @@ public class TVController implements Observer {
 			/* Only run loader, if JFileChooser wasn't canceled. */
 			if (file != null) {
 //				loadData(tvFrame.getFileSet(file), false);
-				LoadPreviewDialog loadPreview = 
-						new LoadPreviewDialog(tvFrame.getFileSet(file));
-				loadPreview.setVisible(true);
+				String filename = tvFrame.getFileSet(file).getCdt();
+				
+				DataImportDialog loadPreview = 
+						new DataImportDialog(filename);
+				
+				DataImportController importController = 
+						new DataImportController(loadPreview);
+				
+				importController.setFileSet(tvFrame.getFileSet(file));
+				importController.loadPreviewData();
+				importController.setDialogVisible();
+				
 
 			} else {
 				LogBuffer.println("Selected file was null. Cannot begin"
