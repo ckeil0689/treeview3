@@ -463,8 +463,8 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 			}
 			if(shift == 0) return;
 			debug("Scrolling vertically from [" + j + "] by [" + shift + "]",1);
-			getSecondaryScrollBar().setValue(j + shift);
 			lastScrollColPos = j + shift;
+			getSecondaryScrollBar().setValue(j + shift);
 			lastScrollColEndPos = lastScrollColPos +
 			                      getSecondaryScrollBar().getModel()
 			                      .getExtent();

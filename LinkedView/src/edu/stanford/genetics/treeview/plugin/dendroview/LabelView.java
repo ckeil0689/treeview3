@@ -954,7 +954,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 			/* Draw the "position indicator" if the label port is active */
 			//See variables initialized above the string drawing section
-			if(drawLabelPort && indicatorThickness > 0) {
+			if(drawLabelPort && indicatorThickness > 0 && (isGeneAxis ? !map.areRowLabelsBeingScrolled() : !map.areColLabelsBeingScrolled())) {
 				if(!isGeneAxis) {
 //					if(isRightJustified) {
 //						LogBuffer.println("Resetting justification via drawing for rows!  Will draw at maxstrlen + indicatorthickness - lastendgap [" + maxStrLen + " + " + indicatorThickness + " - " + lastScrollRowEndGap + " = " + (maxStrLen + indicatorThickness - lastScrollRowEndGap) + "] - indicatorThickness [" + indicatorThickness + "] instead of current [" + secondaryScrollPos + "] - indicatorThickness [" + indicatorThickness + "]. MaxStrLen: [" + maxStrLen + "]");
@@ -997,6 +997,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 //    							(end + 1) * (curFontSize + SQUEEZE) - start * (curFontSize + SQUEEZE));
 //					}
 					if(matrixBarThickness > 0) {
+						LogBuffer.println("Drawing matrix bar at x position [" + lastScrollColEndGap + "]");
     					//Draw the matrix breadth bar
     					g.fillRect(
     							lastScrollColEndGap,
@@ -1153,7 +1154,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 //							(end + 1) * (curFontSize + SQUEEZE) - start * (curFontSize + SQUEEZE));
 					if(matrixBarThickness > 0) {
 						//Draw the matrix breadth bar
-						debug("Drawing matrix bar from indes start [" + labelStart + "] to stop [" + labelEnd + "], pixel start [" + map.getPixel(labelStart) + "] to stop [" + (map.getPixel(labelEnd + 1)) + "]",4);
+						LogBuffer.println("Drawing matrix bar at x position [" + lastScrollColEndGap + "]");
+						debug("Drawing matrix bar from index start [" + labelStart + "] to stop [" + labelEnd + "], pixel start [" + map.getPixel(labelStart) + "] to stop [" + (map.getPixel(labelEnd + 1)) + "]",4);
 						g.fillRect(
 								lastScrollRowEndPos - matrixBarThickness,
 								/* start * (curFontSize + SQUEEZE) + */ map.getPixel(labelStart),

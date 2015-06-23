@@ -468,8 +468,8 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 			if(shift == 0) return;
 			debug("Scrolling horizontally from [" + j + "] by [" + shift + "]",
 			      2);
-			getSecondaryScrollBar().setValue(j + shift);
 			lastScrollRowPos = j + shift;
+			getSecondaryScrollBar().setValue(j + shift);
 			lastScrollRowEndPos = lastScrollRowPos +
 			                      getSecondaryScrollBar().getModel()
 			                      .getExtent();
