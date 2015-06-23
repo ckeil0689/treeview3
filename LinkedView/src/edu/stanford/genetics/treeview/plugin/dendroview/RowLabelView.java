@@ -1,11 +1,11 @@
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-//import java.awt.Adjustable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
-//import java.awt.event.AdjustmentEvent;
-//import java.awt.event.AdjustmentListener;
+import java.awt.event.AdjustmentListener;
+import java.awt.event.AdjustmentEvent;
+import java.awt.Adjustable;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
@@ -22,8 +22,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.UrlExtractor;
 
-public class RowLabelView extends LabelView implements MouseWheelListener
-    /*, AdjustmentListener*/ {
+public class RowLabelView extends LabelView implements MouseWheelListener, AdjustmentListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -44,6 +43,7 @@ public class RowLabelView extends LabelView implements MouseWheelListener
 					overScrollLabelPortOffTimer.stop();
 					overScrollLabelPortOffTimer = null;
 				}
+				setPrimaryHoverIndex(map.getMaxIndex());
 				map.setOverRowLabelsScrollbar(true);
 			}
 
@@ -55,7 +55,7 @@ public class RowLabelView extends LabelView implements MouseWheelListener
 					if(labelPortOffDelay == 0) {
 						map.setOverRowLabelsScrollbar(false);
 						map.notifyObservers();
-						revalidate();
+						//revalidate();
 						repaint();
 					} else {
 						/* Start waiting for delay millis to elapse and then
@@ -87,7 +87,7 @@ public class RowLabelView extends LabelView implements MouseWheelListener
 					if(labelPortOffDelay == 0) {
 						map.setRowLabelsBeingScrolled(false);
 						map.notifyObservers();
-						revalidate();
+						//revalidate();
 						repaint();
 					} else {
 						/* Start waiting for delay millis to elapse and then
@@ -102,10 +102,9 @@ public class RowLabelView extends LabelView implements MouseWheelListener
 			}
 		});
 
-		debug = 2;
+		debug = 0;
 		//Listen for value changes in the scroll pane's scrollbars
-//		scrollPane.getHorizontalScrollBar().addAdjustmentListener(this);
-//		scrollPane.getVerticalScrollBar().addAdjustmentListener(this);
+		getSecondaryScrollBar().addAdjustmentListener(this);
 	}
 
 	//public void generateView(final UrlExtractor uExtractor) {
@@ -210,7 +209,7 @@ public class RowLabelView extends LabelView implements MouseWheelListener
 			
 				map.setOverRowLabels(false);
 				map.notifyObservers();
-				revalidate();
+				//revalidate();
 				repaint();
 			}
 		}
@@ -229,7 +228,7 @@ public class RowLabelView extends LabelView implements MouseWheelListener
 			
 				map.setOverRowLabelsScrollbar(false);
 				map.notifyObservers();
-				revalidate();
+				//revalidate();
 				repaint();
 			}
 		}
@@ -248,7 +247,7 @@ public class RowLabelView extends LabelView implements MouseWheelListener
 			
 				map.setRowLabelsBeingScrolled(false);
 				map.notifyObservers();
-				revalidate();
+				//revalidate();
 				repaint();
 			}
 		}
@@ -266,13 +265,19 @@ public class RowLabelView extends LabelView implements MouseWheelListener
 	}
 
 	@Override
+	public void mouseMoved(final MouseEvent e) {
+		hoverPixel = e.getY();
+		super.mouseMoved(e);
+	}
+
+	@Override
 	public void mouseExited(final MouseEvent e) {
 		//Turn off the "over a label port view" boolean after a bit
 		if(paneLabelPortOffTimer == null) {
 			if(labelPortOffDelay == 0) {
 				map.setOverRowLabels(false);
 				map.notifyObservers();
-				revalidate();
+				//revalidate();
 				repaint();
 			} else {
 				/* Start waiting for delay millis to elapse and then
@@ -436,21 +441,34 @@ public class RowLabelView extends LabelView implements MouseWheelListener
 		return scrollPane.getHorizontalScrollBar();
 	}
 
+	public void setHoverPosition(final MouseEvent e) {
+		hoverPixel = e.getY();
+	}
+
+	/* TODO: Elminate this and use adjustmentValueChanged instead because it is more holistic */
 	@Override
 	public void mouseWheelMoved(final MouseWheelEvent e) {
 
 		final int notches = e.getWheelRotation();
-		final int shift = (notches < 0) ? -3 : 3;
+		int shift = (notches < 0) ? -3 : 3;
 		debug("Scroll wheel event detected",1);
 
-		final int j = scrollPane.getHorizontalScrollBar().getValue();
 		//LogBuffer.println("Detected [" + (e.isShiftDown() ? "horizontal" : "vertical") + "] scroll event");
 		// On macs' magic mouse, horizontal scroll comes in as if the shift was
 		// down
 		if(e.isShiftDown()) {
+			final int j = getSecondaryScrollBar().getValue();
+			/* TODO: If the following works, I need to copy it to ColumnLabelView's corresponding method */
+			if(j + shift < 0) {
+				shift = -j;
+			} else if(j + shift + getSecondaryScrollBar().getModel().getExtent()
+			          > getSecondaryScrollBar().getMaximum()) {
+				shift = getSecondaryScrollBar().getMaximum() - (j + getSecondaryScrollBar().getModel().getExtent());
+			}
+			if(shift == 0) return;
 			debug("Scrolling horizontally from [" + j + "] by [" + shift + "]",
-			      1);
-			scrollPane.getHorizontalScrollBar().setValue(j + shift);
+			      2);
+			getSecondaryScrollBar().setValue(j + shift);
 			lastScrollRowPos = j + shift;
 			lastScrollRowEndPos = lastScrollRowPos +
 			                      getSecondaryScrollBar().getModel()
@@ -458,68 +476,92 @@ public class RowLabelView extends LabelView implements MouseWheelListener
 			lastScrollRowEndGap = getSecondaryScrollBar().getMaximum() -
 			                      lastScrollRowEndPos;
 			if(lastScrollRowEndGap < 0) {
-				lastScrollRowPos -= lastScrollRowEndGap;
+				lastScrollRowPos    -= lastScrollRowEndGap;
 				lastScrollRowEndPos -= lastScrollRowEndGap;
-				lastScrollRowEndGap = 0;
+				lastScrollRowEndGap  = 0;
 			} else if(lastScrollRowPos < 0) {
 				lastScrollRowEndPos += lastScrollRowPos;
 				lastScrollRowEndGap += lastScrollRowPos;
-				lastScrollRowPos = 0;
+				lastScrollRowPos     = 0;
 			}
 			debug("New scroll position [" + lastScrollRowPos + "] end pos: [" +
 			      lastScrollRowEndPos + "] end gap: [" + lastScrollRowEndGap +
-			      "] out of [" + getSecondaryScrollBar().getMaximum() + "]",1);
+			      "] out of [" + getSecondaryScrollBar().getMaximum() + "]",2);
 		} else {
 			//Value of label length scrollbar
 			map.scrollBy(shift, false);
+			updatePrimaryHoverIndex();
 		}
 
-		revalidate();
+		//revalidate();
 		//repaint();
 		//repaint wasn't always updating the last paint step, but paintImmediately (and an invokdeLater also) seems to work
 		//I think it's because the updateBuffer finds out if it needs to change anything from the map object
 		paintImmediately(0, 0, getWidth(), getHeight());
 	}
 
-//	public void adjustmentValueChanged(AdjustmentEvent evt) {
-//		Adjustable source = evt.getAdjustable();
-//		if (evt.getValueIsAdjusting()) {
-//			return;
-//		}
-//		int orient = source.getOrientation();
-//		if (orient == Adjustable.HORIZONTAL) {
-//			System.out.println("from horizontal scrollbar"); 
-////			StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-////			LogBuffer.println("Horizontal scroll came from: [" + Thread.currentThread().getStackTrace() +
-//////				stackTraceElements[8].getClassName() + ":" + stackTraceElements[8].getMethodName() + ":" + stackTraceElements[8].getLineNumber() + "<-" +
-//////				stackTraceElements[9].getClassName() + ":" + stackTraceElements[9].getMethodName() + ":" + stackTraceElements[9].getLineNumber() + "<-" +
-//////				stackTraceElements[10].getClassName() + ":" + stackTraceElements[10].getMethodName() + ":" + stackTraceElements[10].getLineNumber() + "<-" +
-//////				stackTraceElements[11].getClassName() + ":" + stackTraceElements[11].getMethodName() + ":" + stackTraceElements[11].getLineNumber() + "<-" +
-//////				stackTraceElements[12].getClassName() + ":" + stackTraceElements[12].getMethodName() + ":" + stackTraceElements[12].getLineNumber() + "<-" +
-//////				stackTraceElements[13].getClassName() + ":" + stackTraceElements[13].getMethodName() + ":" + stackTraceElements[13].getLineNumber() +
-////				"].");
-////			Thread.dumpStack();
-//		} else {
-//			System.out.println("from vertical scrollbar");
-//		}
-//		int type = evt.getAdjustmentType();
-//		switch (type) {
-//			case AdjustmentEvent.UNIT_INCREMENT:
-//				System.out.println("Scrollbar was increased by one unit");
-//				break;
-//			case AdjustmentEvent.UNIT_DECREMENT:
-//				System.out.println("Scrollbar was decreased by one unit");
-//				break;
-//			case AdjustmentEvent.BLOCK_INCREMENT:
-//				System.out.println("Scrollbar was increased by one block");
-//				break;
-//			case AdjustmentEvent.BLOCK_DECREMENT:
-//				System.out.println("Scrollbar was decreased by one block");
-//				break;
-//			case AdjustmentEvent.TRACK:
-//				System.out.println("The knob on the scrollbar was dragged");
-//				break;
-//		}
-//		int value = evt.getValue();
-//	}
+	public void explicitSecondaryScrollTo(int pos,int endPos,int endGap) {
+		debug("Explicitly scrolling to [" + pos + "]",2);
+		if(pos < 0) pos = 0;
+		if(pos > (getSecondaryScrollBar().getMaximum() -
+		          getSecondaryScrollBar().getModel().getExtent())) {
+			pos = getSecondaryScrollBar().getMaximum() -
+			      getSecondaryScrollBar().getModel().getExtent();
+		}
+		if(endPos > 0) {
+			endPos += (pos - getSecondaryScrollBar().getValue());
+		} else {
+			endPos = pos + getSecondaryScrollBar().getModel().getExtent();
+		}
+		if(endGap == -1) {
+			endGap = getSecondaryScrollBar().getMaximum() - endPos;
+		}
+		getSecondaryScrollBar().setValue(pos);
+		lastScrollRowPos    = pos;
+		lastScrollRowEndPos = endPos;
+		lastScrollRowEndGap = endGap;
+	}
+
+	public void adjustmentValueChanged(AdjustmentEvent evt) {
+		Adjustable source = evt.getAdjustable();
+		int orient = source.getOrientation();
+		if(orient == Adjustable.HORIZONTAL) {
+			debug("scrollbar adjustment detected from horizontal scrollbar",2); 
+		}
+		int oldvalue = getSecondaryScrollBar().getValue();
+		boolean updateScroll = true;
+		if(!evt.getValueIsAdjusting() && map.areRowLabelsBeingScrolled()) {
+			System.out.println("The knob on the scrollbar is being dragged");
+			explicitSecondaryScrollTo(oldvalue,-1,-1);
+		} else {
+			int type = evt.getAdjustmentType();
+			int newvalue = evt.getValue();
+			updateScroll = (oldvalue != newvalue);
+			if(updateScroll) {
+				switch(type) {
+					case AdjustmentEvent.UNIT_INCREMENT:
+						System.out.println("Scrollbar was increased by one unit");
+						break;
+					case AdjustmentEvent.UNIT_DECREMENT:
+						System.out.println("Scrollbar was decreased by one unit");
+						break;
+					case AdjustmentEvent.BLOCK_INCREMENT:
+						System.out.println("Scrollbar was increased by one block");
+						break;
+					case AdjustmentEvent.BLOCK_DECREMENT:
+						System.out.println("Scrollbar was decreased by one block");
+						break;
+					case AdjustmentEvent.TRACK:
+						System.out.println("The mouse wheel scrolled the scrollbar");
+						updateScroll = false;
+						break;
+				}
+				debug("Scrolling from: [" + source.getValue() + " or (" + oldvalue + ")" + "] to: [" + newvalue + "] via [" + evt.getSource() + "]",2);
+				explicitSecondaryScrollTo(newvalue,-1,-1);
+			}
+		}
+		if(updateScroll) {
+			repaint();
+		}
+	}
 }

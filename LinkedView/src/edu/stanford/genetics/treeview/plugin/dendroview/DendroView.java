@@ -544,7 +544,7 @@ public class DendroView implements Observer, DendroPanel {
 				+ "h 200px!");
 
 		/* Column tree view */
-		dendroPane.add(colDataPane, "gaptop 2!, gapbottom 3!, gapx 0!, "
+		dendroPane.add(colDataPane, "gaptop 2!, gapbottom 1!, gapx 0!, "
 				+ "w 100%, h 200px!, growx");
 
 		/* Navigation panel */
@@ -552,7 +552,7 @@ public class DendroView implements Observer, DendroPanel {
 				+ "wrap");
 
 		/* Row tree view */
-		dendroPane.add(rowDataPane, "gapleft 2!, gapright 3!, gaptop 0!, gapbottom 2!, "
+		dendroPane.add(rowDataPane, "gapleft 2!, gapright 1!, gaptop 0!, gapbottom 2!, "
 				+ "w 200px, h 100%, growy, pushy");
 		
 		/* Matrix view */

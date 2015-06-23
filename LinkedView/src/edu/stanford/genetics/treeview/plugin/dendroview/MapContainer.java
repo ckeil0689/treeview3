@@ -88,6 +88,8 @@ public class MapContainer extends Observable implements Observer,
 	private boolean rowLabelsBeingScrolled = false;
 	private int     hoverIndex             = -1;
 	private boolean hoverChanged           = false;
+	private boolean selecting              = false;
+	private int     selectingStart         = -1;
 
 	boolean debug = false;
 
@@ -1917,6 +1919,20 @@ public class MapContainer extends Observable implements Observer,
 	}
 
 	/**
+	 * @return the rowLabelsBeingScrolled
+	 */
+	public boolean areRowLabelsBeingScrolled() {
+		return rowLabelsBeingScrolled;
+	}
+
+	/**
+	 * @return the rowLabelsBeingScrolled
+	 */
+	public boolean areColLabelsBeingScrolled() {
+		return colLabelsBeingScrolled;
+	}
+
+	/**
 	 * @param overRowLabels the overRowLabels to set
 	 */
 	public void setOverRowLabels(boolean overRowLabels) {
@@ -1986,7 +2002,7 @@ public class MapContainer extends Observable implements Observer,
 		//when no visual change has occurred (i.e. it's just a change in hover
 		//position of the mouse.  setChanged is called above though so that
 		//LabelView's update will be called
-		setHoverChanged();
+//		setHoverChanged();  //Commented this out because this method is not called from the mouse wheel listener
 		//If LabelView is not controlling its own repaints anymore, start it
 		//back up with a call to notifyObservers
 		if(!labelAnimeRunning) {
@@ -2018,5 +2034,33 @@ public class MapContainer extends Observable implements Observer,
 	 */
 	public void unsetHoverChanged() {
 		hoverChanged = false;
+	}
+
+	/**
+	 * @return the selectingStart
+	 */
+	public int getSelectingStart() {
+		return selectingStart;
+	}
+
+	/**
+	 * @param selectingStart the selectingStart to set
+	 */
+	public void setSelectingStart(int selectingStart) {
+		this.selectingStart = selectingStart;
+	}
+
+	/**
+	 * @return the selecting
+	 */
+	public boolean isSelecting() {
+		return selecting;
+	}
+
+	/**
+	 * @param selecting the selecting to set
+	 */
+	public void setSelecting(boolean selecting) {
+		this.selecting = selecting;
 	}
 }

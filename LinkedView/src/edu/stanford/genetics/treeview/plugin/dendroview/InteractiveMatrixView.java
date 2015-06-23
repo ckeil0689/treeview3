@@ -75,7 +75,7 @@ MouseWheelListener {
 	
 	private double aspectRatio = -1;
 
-	boolean debug = false;
+	//boolean debug = false;
 
 	/**
 	 * Points to track candidate selected rows/cols should reflect where the
@@ -121,6 +121,7 @@ MouseWheelListener {
 		super();
 
 		setLabelPortMode(true);
+		debug = 0;
 
 		/* Listeners for interactivity */
 		addMouseListener(new MatrixMouseListener());
@@ -635,6 +636,10 @@ MouseWheelListener {
 
 			// When left button is used
 			if (SwingUtilities.isLeftMouseButton(e)) {
+				debug("Mouse dragged. Updating hover indexes to [" + xmap.getIndex(e.getX()) + "x" + ymap.getIndex(e.getY()) + "]",4);
+				xmap.setHoverIndex(xmap.getIndex(e.getX()));
+				ymap.setHoverIndex(ymap.getIndex(e.getY()));
+
 				// rubber band?
 				drawBand(dragRect);
 				endPoint.setLocation(xmap.getIndex(e.getX()),
@@ -671,6 +676,11 @@ MouseWheelListener {
 
 			// When left button is used
 			if (SwingUtilities.isLeftMouseButton(e)) {
+				debug("Mouse released. No longer selecting",4);
+				xmap.setSelecting(false);
+				ymap.setSelecting(false);
+				xmap.setSelectingStart(-1);
+				ymap.setSelectingStart(-1);
 				mouseDragged(e);
 				drawBand(dragRect);
 
@@ -709,6 +719,12 @@ MouseWheelListener {
 
 			// if left button is used
 			if (SwingUtilities.isLeftMouseButton(e)) {
+				debug("Starting selecting, setting selection start to [" + xmap.getIndex(e.getX()) + "x" + ymap.getIndex(e.getY()) + "]",4);
+				xmap.setSelecting(true);
+				ymap.setSelecting(true);
+				xmap.setSelectingStart(xmap.getIndex(e.getX()));
+				ymap.setSelectingStart(ymap.getIndex(e.getY()));
+
 				startPoint.setLocation(xmap.getIndex(e.getX()),
 						ymap.getIndex(e.getY()));
 				endPoint.setLocation(startPoint.x, startPoint.y);
@@ -824,8 +840,8 @@ MouseWheelListener {
 		final int notches = e.getWheelRotation();
 		final int shift = (notches < 0) ? -3 : 3;
 
-		// On macs' magic mouse, horizontal scroll comes in as if the shift was
-		// down
+		//On macs' magic mouse, horizontal scroll comes in as if the shift was
+		//down
 		if (e.isAltDown()) {
 			if (notches < 0) {
 				//This ensures we only zoom toward the cursor when the cursor is
@@ -848,8 +864,12 @@ MouseWheelListener {
 			}
 		} else if (e.isShiftDown()) {
 			xmap.scrollBy(shift,false);
+			//Now we are hovered over a new index
+			xmap.setHoverIndex(xmap.getIndex(e.getX()));
 		} else {
 			ymap.scrollBy(shift,false);
+			//Now we are hovered over a new index
+			ymap.setHoverIndex(ymap.getIndex(e.getY()));
 		}
 
 		revalidate();

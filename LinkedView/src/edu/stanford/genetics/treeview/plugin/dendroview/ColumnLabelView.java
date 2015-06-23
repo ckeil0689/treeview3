@@ -1,8 +1,10 @@
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import java.awt.Color;
+import java.awt.Adjustable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -20,7 +22,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.UrlExtractor;
 
-public class ColumnLabelView extends LabelView implements MouseWheelListener {
+public class ColumnLabelView extends LabelView implements MouseWheelListener, AdjustmentListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -40,6 +42,7 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener {
 					overScrollLabelPortOffTimer.stop();
 					overScrollLabelPortOffTimer = null;
 				}
+				setPrimaryHoverIndex(map.getMaxIndex());
 				map.setOverColLabelsScrollbar(true);
 			}
 
@@ -98,7 +101,8 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener {
 			}
 		});
 
-		debug = 2;
+		debug = 0;
+		getSecondaryScrollBar().addAdjustmentListener(this);
 	}
 
 	public void generateView(final UrlExtractor uExtractor) {
@@ -218,6 +222,10 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener {
 		}
 		map.setOverColLabels(true);
 		super.mouseEntered(e);
+	}
+
+	public void setHoverPosition(final MouseEvent e) {
+		hoverPixel = e.getX();
 	}
 
 	@Override
@@ -406,14 +414,37 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener {
 	}
 
 	public int getPrimaryHoverPosition(final MouseEvent e) {
-		return(e.getX());
+		hoverPixel = e.getX();
+		return(hoverPixel);
 	}
 
+	public void explicitSecondaryScrollTo(int pos,int endPos,int endGap) {
+		if(pos < 0) pos = 0;
+		if(pos > (getSecondaryScrollBar().getMaximum() -
+		          getSecondaryScrollBar().getModel().getExtent())) {
+			pos = getSecondaryScrollBar().getMaximum() -
+			      getSecondaryScrollBar().getModel().getExtent();
+		}
+		if(endPos > 0) {
+			endPos += (pos - getSecondaryScrollBar().getValue());
+		} else {
+			endPos = pos + getSecondaryScrollBar().getModel().getExtent();
+		}
+		if(endGap == -1) {
+			endGap = getSecondaryScrollBar().getMaximum() - endPos;
+		}
+		getSecondaryScrollBar().setValue(pos);
+		lastScrollColPos    = pos;
+		lastScrollColEndPos = endPos;
+		lastScrollColEndGap = endGap;
+	}
+
+	/* TODO: Elminate this and use adjustmentValueChanged instead because it is more holistic */
 	@Override
 	public void mouseWheelMoved(final MouseWheelEvent e) {
 
 		final int notches = e.getWheelRotation();
-		final int shift = (notches < 0) ? -3 : 3;
+		int shift = (notches < 0) ? -3 : 3;
 
 		debug("Detected [" + (e.isShiftDown() ? "horizontal" : "vertical") +
 		      "] scroll event",1);
@@ -421,10 +452,18 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener {
 		// down
 		if(e.isShiftDown()) {
 			map.scrollBy(shift, false);
+			updatePrimaryHoverIndex();
 		} else {
-			final int j = scrollPane.getVerticalScrollBar().getValue();
+			final int j = getSecondaryScrollBar().getValue();
+			if(j + shift < 0) {
+				shift = -j;
+			} else if(j + shift + getSecondaryScrollBar().getModel().getExtent()
+			          > getSecondaryScrollBar().getMaximum()) {
+				shift = getSecondaryScrollBar().getMaximum() - (j + getSecondaryScrollBar().getModel().getExtent());
+			}
+			if(shift == 0) return;
 			debug("Scrolling vertically from [" + j + "] by [" + shift + "]",1);
-			scrollPane.getVerticalScrollBar().setValue(j + shift);
+			getSecondaryScrollBar().setValue(j + shift);
 			lastScrollColPos = j + shift;
 			lastScrollColEndPos = lastScrollColPos +
 			                      getSecondaryScrollBar().getModel()
@@ -440,12 +479,55 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener {
 				lastScrollColEndGap += lastScrollColPos;
 				lastScrollColPos = 0;
 			}
-			debug("New scroll position [" + lastScrollColPos + "] end pos: [" +
+			debug("New secondary col scroll position [" + lastScrollColPos + "] end pos: [" +
 			      lastScrollColEndPos + "] end gap: [" + lastScrollColEndGap +
 			      "] out of [" + getSecondaryScrollBar().getMaximum() + "]",1);
 		}
 
 		revalidate();
 		repaint();
+	}
+
+	public void adjustmentValueChanged(AdjustmentEvent evt) {
+		Adjustable source = evt.getAdjustable();
+		int orient = source.getOrientation();
+		if(orient == Adjustable.VERTICAL) {
+			debug("scrollbar adjustment detected from vertical scrollbar",2); 
+		}
+		int oldvalue = getSecondaryScrollBar().getValue();
+		boolean updateScroll = true;
+		if(!evt.getValueIsAdjusting() && map.areColLabelsBeingScrolled()) {
+			System.out.println("The knob on the scrollbar is being dragged");
+			explicitSecondaryScrollTo(oldvalue,-1,-1);
+		} else {
+			int type = evt.getAdjustmentType();
+			int newvalue = evt.getValue();
+			updateScroll = (oldvalue != newvalue);
+			if(updateScroll) {
+				switch(type) {
+					case AdjustmentEvent.UNIT_INCREMENT:
+						System.out.println("Scrollbar was increased by one unit");
+						break;
+					case AdjustmentEvent.UNIT_DECREMENT:
+						System.out.println("Scrollbar was decreased by one unit");
+						break;
+					case AdjustmentEvent.BLOCK_INCREMENT:
+						System.out.println("Scrollbar was increased by one block");
+						break;
+					case AdjustmentEvent.BLOCK_DECREMENT:
+						System.out.println("Scrollbar was decreased by one block");
+						break;
+					case AdjustmentEvent.TRACK:
+						System.out.println("The mouse wheel scrolled the scrollbar");
+						updateScroll = false;
+						break;
+				}
+				debug("Scrolling from: [" + source.getValue() + " or (" + oldvalue + ")" + "] to: [" + newvalue + "] via [" + evt.getSource() + "]",2);
+				explicitSecondaryScrollTo(newvalue,-1,-1);
+			}
+		}
+		if(updateScroll) {
+			repaint();
+		}
 	}
 }

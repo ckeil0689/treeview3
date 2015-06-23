@@ -91,12 +91,23 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	/* Keeps track of label index with mouse cursor on top */
 	protected int hoverIndex = -1;
 
+	//Keep track of where the mouse is so that the hover index can be updated
+	//during scrollwheel motion
+	protected int hoverPixel = -1;
+
 	/* Alignment status */
 	protected boolean isRightJustified;
 
 	/* Selection of row/ column indices */
 	protected TreeSelectionI arraySelection;
 	protected TreeSelectionI geneSelection;
+	protected Color textFGColor          = Color.black;
+	protected Color textBGColor;
+	protected Color selectionBorderColor = Color.yellow;
+	protected Color selectionTextBGColor = new Color(249,238,160); //soft yellow
+	protected Color selectionTextFGColor = Color.black;
+	protected Color hoverTextFGColor     = Color.red;
+	protected Color labelPortColor       = new Color(30,144,251);  //soft blue
 
 	/*
 	 * Stores a reference to the TreeSelection relevant for drawing -- allows to
@@ -114,20 +125,25 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	private boolean hasMouse;
 
 	/* "Position indicator" settings for when the label port is active */
-//	int matrixBarThickness = 7; //Thickness of the matrix position bar - Must be an odd number! (so red hover line is centered)
-//	int labelBarThickness = 7; //Must be an odd number! (so red hover line is centered)
-//	int labelIndicatorProtrusion = 3; //Distance label hover indicator protrudes from label bar - point on indicator
-//	int matrixIndicatorIntrusion = (labelIndicatorProtrusion > matrixBarThickness ? (int) Math.ceil(matrixBarThickness / 2) : labelIndicatorProtrusion); //Point on indicator
-//	int labelIndent = 3; //Distance label text starts after the end of the label indicator
-//	int indicatorThickness = matrixBarThickness + labelBarThickness + labelIndicatorProtrusion + labelIndent; //Should be assigned a value summing the following values if drawing a label port
-	int lastScrollRowEndGap = -1;
-	int lastScrollRowPos    = -1;
-	int lastScrollRowEndPos = -1;
-	int lastScrollColEndGap = -1;
-	int lastScrollColPos    = -1;
-	int lastScrollColEndPos = -1;
-	int rowLabelPaneSize    = -1;
-	int colLabelPaneSize    = -1;
+	int matrixBarThickness = 3; //Thickness of the matrix position bar - Must be an odd number! (so red hover line is centered)
+	int labelBarThickness = 0; //Must be an odd number! (so red hover line is centered)
+	int labelIndicatorProtrusion = 0; //Distance label hover indicator protrudes from label bar - point on indicator
+	int matrixIndicatorIntrusion = (labelIndicatorProtrusion > matrixBarThickness || labelIndicatorProtrusion == 0 ? (int) Math.ceil(matrixBarThickness / 2) : labelIndicatorProtrusion); //Point on indicator
+	int labelIndent = 3; //Distance label text starts after the end of the label indicator
+	int indicatorThickness = matrixBarThickness + labelBarThickness + labelIndicatorProtrusion + labelIndent; //Should be assigned a value summing the following values if drawing a label port
+	int lastScrollRowEndGap  = -1;
+	int lastScrollRowPos     = -1;
+	int lastScrollRowEndPos  = -1;
+	int lastScrollColEndGap  = -1;
+	int lastScrollColPos     = -1;
+	int lastScrollColEndPos  = -1;
+	int rowLabelPaneSize     = -1;
+	int colLabelPaneSize     = -1;
+	int rowLabelViewportSize = -1;
+	int colLabelViewportSize = -1;
+	/* TODO: Instead of resetting the justification position whenever the font
+	 * size changes, we should calculate and remember the relative position of
+	 * the scrollbar */
 
 	public LabelView(final int axis_id) {
 
@@ -153,8 +169,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		scrollPane.setBorder(null);
 
 		panel = scrollPane;
-
-		debug = 0; //This is a verbosity level
 	}
 
 	protected abstract void adjustScrollBar();
@@ -266,13 +280,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		setJustifyOption(node.getBoolean("isRightJustified",d_justified));
 		setFixed(node.getBoolean("isFixed",d_fixed));
 
-		/*
-		 * TODO: I need to catch when the remembered scroll info has been reset
-		 * when deciding where to draw the indicator - then I can uncomment the
-		 * line below. This will cause the indicator to be drawn in the correct
-		 * place when the font settings are changed and it will allow the scroll
-		 * position to be reset properly.
-		 */
+		//Signal that the secondary scroll position should be reset the next
+		//time it is needed
 		resetSecondaryScroll();
 
 		getHeaderSummary().setConfigNode(node);
@@ -326,6 +335,27 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 */
 	protected abstract JScrollBar getSecondaryScrollBar();
 	protected abstract JScrollBar getPrimaryScrollBar();
+	protected abstract void setHoverPosition(final MouseEvent e);
+
+	public int getHoverPixel() {
+		return(hoverPixel);
+	}
+
+	public void setHoverPixel(int pixelIndex) {
+		hoverPixel = pixelIndex;
+	}
+
+	/**
+	 * This is for updating the hover index when the mouse has not moved but the
+	 * data under it has (like when using the scroll wheel
+	 */
+	public void updatePrimaryHoverIndex() {
+		if(hoverPixel == -1) {
+			hoverIndex = -1;
+		} else {
+			hoverIndex = map.getIndex(hoverPixel);
+		}
+	}
 
 	@Override
 	public void setFace(final String string) {
@@ -368,6 +398,12 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			adjustScrollBar();
 			repaint();
 		}
+	}
+
+	public void setTemporaryPoints(final int i) {
+		debug("Setting temporary points",2);
+		setFont(new Font(face,style,i));
+		//repaint();
 	}
 
 	@Override
@@ -471,6 +507,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			@Override
 			public void
 			actionPerformed(ActionEvent e) {
+				//This shouldn't be necessary, but when I change setPoints() to setTemporaryPoints in the drawing of the HINT, the timer never stops despite stop being continually called, so I'm going to call stop in here if the map says that the animation is supposed to have been stopped...
+				if(!map.isLabelAnimeRunning()) repaintTimer.stop();
 				repaint();
 				//paintImmediately(0,0,getWidth(),getHeight());
 			}
@@ -521,6 +559,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//If the mouse is not hovering over the IMV, stop both timers, set the
 		//last hover index, and tell mapcontainer that the animation has stopped
 		if(map.getHoverIndex() == -1) {
+			debug("Not hovering over matrix - stopping animation",2);
 			repaintTimer.stop();
 			lastHoverIndex = -1;
 			map.setLabelAnimeRunning(false);
@@ -534,6 +573,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//Else, assume the mouse is hovering, and if the animation is not
 		//running, start it up
 		else if(!map.isLabelAnimeRunning()) {
+			debug("Hovering across matrix - starting up animation",2);
 			repaintTimer.start();
 			map.setLabelAnimeRunning(true);
 			lastHoverIndex = map.getHoverIndex();
@@ -547,6 +587,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//first after 1 second (this mitigates delays upon mouse motion after a
 		//brief period of no motion)
 		else if(map.getHoverIndex() == lastHoverIndex) {
+			debug("Hovering on one spot - stopping animation",2);
 			if(turnOffRepaintTimer == null) {
 				turnOffRepaintTimer = new Timer(delay,turnOffRepaintListener);
 				turnOffRepaintTimer.start();
@@ -554,6 +595,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		}
 		//Else, disable the turnOffRepaintTimer and update the hover index
 		else {
+			debug("Hovering across matrix - keeping animation going",2);
 			//Disable the turnOffRepaintTimer because we have detected continued
 			//mouse motion
 			if(turnOffRepaintTimer != null) {
@@ -565,7 +607,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		}
 
 		debug("Updating the label pane graphics",1);
-		/** TODO: Make sure that the number of visible labels is up to date */
 
 		/* Shouldn't draw if there's no TreeSelection defined */
 		if(drawSelection == null) {
@@ -576,8 +617,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		int matrixHoverIndex = map.getHoverIndex();
 
-		final int stringX = isGeneAxis ? offscreenSize.width
-		                              : offscreenSize.height;
+		final int stringX =
+			isGeneAxis ? offscreenSize.width : offscreenSize.height;
 
 		final Graphics2D g2d = (Graphics2D) g;
 		final AffineTransform orig = g2d.getTransform();
@@ -590,9 +631,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		if(map.getScale() >= getMin() + SQUEEZE && !hasFixedOverlap ||
 		   doDrawLabelPort()) {
 
-			if(secondaryPaneSizeChanged()) {
+			if(secondaryViewportSizeChanged()) {
 				adjustSecondaryScroll();
 			}
+
+			trackSecondaryPaneSize();
 
 			if(isFixed) {
 				setSavedPoints(last_size);
@@ -608,7 +651,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 			boolean drawLabelPort = doDrawLabelPort();
 			if(drawLabelPort) {
-				debug("Drawing a label port",2);
+				debug("Drawing a label port",1);
 			}
 
 			/* Get indices range */
@@ -630,6 +673,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 			final FontMetrics metrics = getFontMetrics(g.getFont());
 			final int ascent = metrics.getAscent();
+			int maxStrLen = getJustifiedPosition(metrics);
 
 			int matrixSize   = map.getPixel(map.getMaxIndex() + 1) - 1 -
 			                   map.getPixel(0);
@@ -638,37 +682,50 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			int activeHoverDataIndex =
 				hoverIndex == -1 ? matrixHoverIndex : hoverIndex;
 
+			int labelStart  = activeHoverDataIndex;
+			int labelEnd    = activeHoverDataIndex;
+
 			debug("Label port mode is " + (drawLabelPort ? "" : "in") +
 			      "active.  Map square size: [" + map.getScale() +
 			      "] Font size: [" + curFontSize + "] SQUEEZE: [" + SQUEEZE +
 			      "] ascent: [" + ascent + "]",1);
 
+			textBGColor = g.getColor();
 			/* Draw label backgrounds first if color is defined */
-			final int bgColorIndex = headerInfo.getIndex("BGCOLOR");
-			Color bgColor = g.getColor();
-			if(bgColorIndex > 0) {
-				final Color back = g.getColor();
-				for(int j = start;j <= end;j++) {
-					final String[] strings = headerInfo.getHeader(j);
-					try {
-						g.setColor(TreeColorer.getColor(strings[bgColorIndex]));
-
-					}
-					catch(final Exception e) {
-						// ignore...
-					}
-					g.fillRect(0,
-					           map.getMiddlePixel(j) - ascent / 2,
-					           stringX,
-					           ascent);
-				}
-				g.setColor(back);
-			}
+//			final int bgColorIndex = headerInfo.getIndex("BGCOLOR");
+//			Color bgColor = g.getColor();
+			//Let's draw the background to start fresh
+			/* If this blanking out of the background works for the drag of the scrollbar thumb, then I should only draw other backgrounds below in the loop only if they differ from the background color */
+//			g.fillRect(0,0,maxStrLen,
+//			           isGeneAxis ? scrollPane.getViewport().getSize().width :
+//			           scrollPane.getViewport().getSize().height);
+//			if(bgColorIndex > 0) {
+//				for(int j = start;j <= end;j++) {
+//					final String[] strings = headerInfo.getHeader(j);
+//					try {
+//						if(drawSelection.isIndexSelected(j)) {
+//							debug("Drawing yellow background for selected index [" + j + "]",3);
+//							g.setColor(Color.yellow);
+//						} else if(bgColorIndex > 0) {
+//							g.setColor(TreeColorer.getColor(strings[bgColorIndex]));
+//						}
+//					}
+//					catch(final Exception e) {
+//						// ignore...
+//					}
+//					if(drawSelection.isIndexSelected(j) || bgColorIndex > 0) {
+//						g.fillRect(0,
+//					           map.getMiddlePixel(j) - ascent / 2,
+//					           stringX,
+//					           ascent);
+//					}
+//				}
+//				g.setColor(bgColor);
+//			}
 
 			/* Draw the labels */
-			int maxStrLen = getJustifiedPosition(metrics);
 			final Color fore = GUIFactory.MAIN;
-			final Color labelPortColor = new Color(30,144,251);
+			int hoverStyle = Font.BOLD | style;
 			if(drawLabelPort) {
 				//See if the labels are going to be offset because they are near
 				//an edge
@@ -685,6 +742,10 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					             (int) Math.ceil(ascent / 2);
 				}
 
+				Color labelColor;
+				//Draw labels from the hovered index backward to the start index
+				//so that we show as many as there is room for, centered on
+				//where the mouse is
 				for(int j = activeHoverDataIndex;j >= start;j--) {
 					try {
 						String out = headerSummary.getSummary(headerInfo,j);
@@ -695,26 +756,26 @@ public abstract class LabelView extends ModelView implements MouseListener,
 						}
 
 						/* Set label color */
-						if(drawSelection.isIndexSelected(j) ||
-						   j == activeHoverDataIndex) {
-							if(colorIndex > 0) {
-								g.setColor(TreeColorer
-								           .getColor(headers[colorIndex]));
-							}
-
-							if(j == activeHoverDataIndex) {
-								g2d.setColor(Color.red);
-							} else {
-								g2d.setColor(fore);
-							}
-
-							if(colorIndex > 0) {
-								g.setColor(fore);
-							}
-
+						if(j == activeHoverDataIndex) {
+							labelColor = hoverTextFGColor;
+//							g2d.setColor(hoverTextFGColor);
 						} else {
-							g2d.setColor(Color.black);
+							if(drawSelection.isIndexSelected(j)) {
+								labelColor = textFGColor;
+								if(colorIndex > 0) {
+									g.setColor(TreeColorer
+									           .getColor(headers[colorIndex]));
+								} else {
+									labelColor = selectionTextFGColor;
+//									g.setColor(fore);
+								}
+
+							} else {
+								labelColor = textFGColor;
+//								g2d.setColor(Color.black);
+							}
 						}
+						g2d.setColor(labelColor);
 
 						/* Finally draw label (alignment-dependent) */
 						int xPos = 0;
@@ -726,17 +787,41 @@ public abstract class LabelView extends ModelView implements MouseListener,
 						int yPos = hoverYPos + indexDiff *
 						           (curFontSize + SQUEEZE);
 						//Account for offsets from being near an edge
+						debug("edgeOffset: [" + edgeOffset + "]",3);
 						yPos -= edgeOffset;
 						if(yPos > -ascent / 2) {
-							g2d.drawString(out,xPos,yPos);
+							drawLabelBackground(g,j,yPos - ascent);
+							if(yPos >= ascent){
+								labelStart = j;
+								if(j == activeHoverDataIndex) {
+									g2d.setColor(labelColor);
+								} else {
+									g2d.setColor(labelPortColor);
+								}
+							} else {
+								g2d.setColor(labelColor);
+							}
+							if(j == activeHoverDataIndex) {
+								debug("Drawing " +
+					                  (isGeneAxis ? "ROW" : "COL") + " hover font BOLD [" + hoverStyle + "].",5);
+								g2d.setFont(new Font(face,hoverStyle,size));
+							} else {
+								g2d.setFont(new Font(face,style,size));
+							}
+							g2d.drawString(out,
+							               xPos + ((isGeneAxis == isRightJustified) ? (drawLabelPort ? indicatorThickness : labelIndent) * (isGeneAxis ? -1 : 1) : 0),
+							               yPos);
 						}
 
 					}
 					catch(final java.lang.ArrayIndexOutOfBoundsException e) {
+						debug("There was a problem setting the font to bold",4);
 						LogBuffer.logException(e);
 						break;
 					}
 				}
+				//For hovering over the left-most index, we must do this:
+				g2d.setFont(new Font(face,style,size));
 				for(int j = activeHoverDataIndex + 1;j <= end;j++) {
 					try {
 						String out = headerSummary.getSummary(headerInfo,j);
@@ -753,14 +838,16 @@ public abstract class LabelView extends ModelView implements MouseListener,
 								           .getColor(headers[colorIndex]));
 							}
 
-							g2d.setColor(fore);
+							labelColor = selectionTextFGColor;
+//							g2d.setColor(fore);
 
 							if(colorIndex > 0) {
 								g.setColor(fore);
 							}
 
 						} else {
-							g2d.setColor(Color.black);
+							labelColor = Color.black;
+//							g2d.setColor(Color.black);
 						}
 
 						/* Finally draw label (alignment-dependent) */
@@ -772,9 +859,19 @@ public abstract class LabelView extends ModelView implements MouseListener,
 						int indexDiff = j - activeHoverDataIndex;
 						int yPos = hoverYPos + indexDiff *
 						           (curFontSize + SQUEEZE);
+						debug("edgeOffset: [" + edgeOffset + "]",3);
 						yPos -= edgeOffset;
 						if(yPos < fullPaneSize + ascent / 2) {
-							g2d.drawString(out,xPos,yPos);
+							drawLabelBackground(g,j,yPos - ascent);
+							if(yPos <= fullPaneSize) {
+								labelEnd = j;
+								g2d.setColor(labelPortColor);
+							} else {
+								g2d.setColor(labelColor);
+							}
+							g2d.drawString(out,
+							               xPos + ((isGeneAxis == isRightJustified) ? (drawLabelPort ? indicatorThickness : labelIndent) * (isGeneAxis ? -1 : 1) : 0),
+							               yPos);
 						}
 
 					}
@@ -805,7 +902,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 							}
 
 							if(j == activeHoverDataIndex) {
-								g2d.setColor(Color.red);
+								g2d.setColor(hoverTextFGColor);
 							} else {
 								g2d.setColor(fore);
 							}
@@ -819,9 +916,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 						}
 
 						/* Finally draw label (alignment-dependent) */
-						int xPos = 0;
+						int xPos = labelIndent;
 						if(isRightJustified) {
-							xPos = stringX - metrics.stringWidth(out);
+							xPos = stringX - metrics.stringWidth(out) - labelIndent;
 						}
 
 //						debug("Drawing " +
@@ -855,10 +952,10 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			//depending on feedback from the next meeting (after 6/18/2015)
 			//Other associated commented code exists elsewhere too
 
-//			/* Draw the "position indicator" if the label port is active */
-//			//See variables initialized above the string drawing section
-//			if(drawLabelPort) {
-//				if(!isGeneAxis) {
+			/* Draw the "position indicator" if the label port is active */
+			//See variables initialized above the string drawing section
+			if(drawLabelPort && indicatorThickness > 0) {
+				if(!isGeneAxis) {
 //					if(isRightJustified) {
 //						LogBuffer.println("Resetting justification via drawing for rows!  Will draw at maxstrlen + indicatorthickness - lastendgap [" + maxStrLen + " + " + indicatorThickness + " - " + lastScrollRowEndGap + " = " + (maxStrLen + indicatorThickness - lastScrollRowEndGap) + "] - indicatorThickness [" + indicatorThickness + "] instead of current [" + secondaryScrollPos + "] - indicatorThickness [" + indicatorThickness + "]. MaxStrLen: [" + maxStrLen + "]");
 //						secondaryScrollEndPos = maxStrLen + indicatorThickness - lastScrollRowEndGap;
@@ -866,59 +963,64 @@ public abstract class LabelView extends ModelView implements MouseListener,
 //						LogBuffer.println("Resetting justification via drawing for rows!  Will draw at lastScrollRowEndPos [" + lastScrollRowEndPos + "] instead of current [" + secondaryScrollEndPos + "] - indicatorThickness [" + indicatorThickness + "]. MaxStrLen: [" + maxStrLen + "]");
 //						secondaryScrollEndPos = (lastScrollRowEndPos == -1 ? scrollPane.getViewport().getSize().width : lastScrollRowEndPos);
 //					}
-//
-//					//Switch to the background color
-//					g2d.setColor(bgColor);
-//					//Draw a background box to blank-out and partially scrolled labels
-//					g.fillRect(
-//							secondaryScrollEndGap,
-//							start * (curFontSize + SQUEEZE) - 1,
-//							indicatorThickness,
-//							(end + 1) * (curFontSize + SQUEEZE));
-//					//Switch to the label port color
-//					g2d.setColor(labelPortColor);
-////					//Draw the first border line
-////					g2d.drawLine(
-////							secondaryScrollEndGap + indicatorThickness -
-////								(labelIndent + labelIndicatorProtrusion),
-////							start * (curFontSize + SQUEEZE),
-////							indicatorThickness + maxStrLen,
-////							start * (curFontSize + SQUEEZE));
-////					//Draw the second border line
-////					g2d.drawLine(
-////							secondaryScrollEndGap + indicatorThickness -
-////								(labelIndent + labelIndicatorProtrusion),
-////							(end + 1) * (curFontSize + SQUEEZE) - 1,
-////							indicatorThickness + maxStrLen,
-////							(end + 1) * (curFontSize + SQUEEZE) - 1);
-////					//Draw the label breadth bar
-////					g.fillRect(
-////							secondaryScrollEndGap + matrixBarThickness,
-////							start * (curFontSize + SQUEEZE),
-////							labelBarThickness,
-////							(end + 1) * (curFontSize + SQUEEZE) - start * (curFontSize + SQUEEZE));
-////					//Draw the matrix breadth bar
-////					g.fillRect(
-////							secondaryScrollEndGap,
-////							start * (curFontSize + SQUEEZE) + map.getPixel(start),
-////							matrixBarThickness,
-////							map.getPixel(end + 1) - map.getPixel(start) + 1);
+
+					//Switch to the background color
+					g2d.setColor(textBGColor);
+					//Draw a background box to blank-out and partially scrolled labels
+					g.fillRect(
+							lastScrollColEndGap,
+							0,//start * (curFontSize + SQUEEZE) - 1,
+							indicatorThickness,
+							offscreenSize.width);//(end + 1) * (curFontSize + SQUEEZE));
+					//Switch to the label port color
+					g2d.setColor(labelPortColor);
+//					//Draw the first border line
+//					g2d.drawLine(
+//							secondaryScrollEndGap + indicatorThickness -
+//								(labelIndent + labelIndicatorProtrusion),
+//							start * (curFontSize + SQUEEZE),
+//							indicatorThickness + maxStrLen,
+//							start * (curFontSize + SQUEEZE));
+//					//Draw the second border line
+//					g2d.drawLine(
+//							secondaryScrollEndGap + indicatorThickness -
+//								(labelIndent + labelIndicatorProtrusion),
+//							(end + 1) * (curFontSize + SQUEEZE) - 1,
+//							indicatorThickness + maxStrLen,
+//							(end + 1) * (curFontSize + SQUEEZE) - 1);
+//					if(labelBarThickness > 0) {
+//    					//Draw the label breadth bar
+//    					g.fillRect(
+//    							lastScrollColEndGap + matrixBarThickness,
+//    							start * (curFontSize + SQUEEZE),
+//    							labelBarThickness,
+//    							(end + 1) * (curFontSize + SQUEEZE) - start * (curFontSize + SQUEEZE));
+//					}
+					if(matrixBarThickness > 0) {
+    					//Draw the matrix breadth bar
+    					g.fillRect(
+    							lastScrollColEndGap,
+    							/* start * (curFontSize + SQUEEZE) + */ map.getPixel(labelStart),
+    							matrixBarThickness,
+    							map.getPixel(labelEnd + 1) - map.getPixel(labelStart));
+					}
 //					//If there is a data index that is hovered over
 //					int activeHoverDataIndex =
 //							(hoverIndex == -1 ? matrixHoverIndex : hoverIndex);
-//					if(activeHoverDataIndex > -1) {
-//						//Change to the hover color
-//						g2d.setColor(Color.red);
-//						//Draw the hover matrix position indicator
-//						int matrixPixel = start * (curFontSize + SQUEEZE) + map.getPixel(activeHoverDataIndex);
+					if(activeHoverDataIndex > -1) {
+						//Change to the hover color
+						g2d.setColor(hoverTextFGColor);
+						//Draw the hover matrix position indicator
+						int matrixPixel = /* start * (curFontSize + SQUEEZE) + */ map.getPixel(activeHoverDataIndex);
 //						LogBuffer.println("Hover matrix start: [" + start + "] startpixel: [" + start * (curFontSize + SQUEEZE) + "] activeHoverIndex: [" + activeHoverDataIndex + "] data cell pixel [" + map.getPixel(activeHoverDataIndex) + "] matrixPixel: [" + matrixPixel + "]");
 //						int labelPixel = activeHoverDataIndex * (curFontSize + SQUEEZE);
 //						boolean outOfBounds = activeHoverDataIndex > end || activeHoverDataIndex < start;
-//						boolean drawAMatrixPoint = ((int) Math.round(map.getScale()) > 2 && !outOfBounds);
+//						boolean drawAMatrixPoint = ((int) Math.round(map.getScale()) > 2);// && !outOfBounds && matrixBarThickness > 4);
 //						if(drawAMatrixPoint) {
+//							debug("Drawing point on matrix hover indicator",4);
 //							//Draw the base of the indicator
 //							g.fillRect(
-//									secondaryScrollEndGap + matrixIndicatorIntrusion,
+//									lastScrollColEndGap + matrixIndicatorIntrusion,
 //									matrixPixel,
 //									matrixBarThickness - matrixIndicatorIntrusion + 1,
 //									(int) Math.round(map.getScale()));
@@ -927,24 +1029,25 @@ public abstract class LabelView extends ModelView implements MouseListener,
 //							int baseWidth = (int) Math.floor(map.getScale());
 //							int center = matrixPixel + (int) Math.ceil((int) Math.floor(map.getScale()) / 2);
 //							if(baseWidth % 2 == 1) {
-//								int[] exes = {secondaryScrollEndGap + matrixIndicatorIntrusion,secondaryScrollEndGap + matrixIndicatorIntrusion,secondaryScrollEndGap};
+//								int[] exes = {lastScrollColEndGap + matrixIndicatorIntrusion,lastScrollColEndGap + matrixIndicatorIntrusion,lastScrollColEndGap};
 //								int[] whys = {matrixPixel,matrixPixel + (int) Math.ceil(map.getScale()) - 1,center};
 //								//g2d.setColor(Color.green);
 //								g.fillPolygon(exes, whys, 3);
 //							} else {
-//								int[] exes = {secondaryScrollEndGap + matrixIndicatorIntrusion,secondaryScrollEndGap + matrixIndicatorIntrusion,secondaryScrollEndGap,secondaryScrollEndGap};
+//								int[] exes = {lastScrollColEndGap + matrixIndicatorIntrusion,lastScrollColEndGap + matrixIndicatorIntrusion,lastScrollColEndGap,lastScrollColEndGap};
 //								int[] whys = {matrixPixel,matrixPixel + (int) Math.ceil(map.getScale()) - 1,center - 1,center};
 //								//g2d.setColor(Color.black);
 //								g.fillPolygon(exes, whys, 4);
 //							}
-//							//g2d.setColor(Color.red);
+//							//g2d.setColor(hoverTextFGColor);
 //						} else {
-//							g.fillRect(
-//									secondaryScrollEndGap,
-//									matrixPixel,
-//									(outOfBounds ?
-//											(int) Math.ceil(matrixBarThickness / 2) + 1 : matrixBarThickness + 1),
-//									(int) Math.round(map.getScale()));
+							g.fillRect(
+									lastScrollColEndGap,
+									matrixPixel,
+									/* (outOfBounds ?
+											(int) Math.ceil(matrixBarThickness / 2) + 1 : */ matrixBarThickness + 1 /* ) */,
+									map.getPixel(matrixPixel + 1) - map.getPixel(matrixPixel));
+									//(int) Math.round(map.getScale()));
 //						}
 //						if(!outOfBounds) {
 //							//Draw the hover label position indicator
@@ -953,32 +1056,36 @@ public abstract class LabelView extends ModelView implements MouseListener,
 ////									labelPixel,
 ////									(int) Math.ceil(labelBarThickness / 2) + labelIndicatorProtrusion + 1,
 ////									curFontSize + SQUEEZE);
-//							//Draw the base of the indicator
-//							g.fillRect(
-//									secondaryScrollEndGap + matrixBarThickness,
-//									labelPixel,
-//									labelBarThickness + 1,
-//									curFontSize + SQUEEZE);
-//							//Draw the point of the indicator
-//							//Do a 4 point polygon if there's an even number of pixels in order to have a stubby but symmetrical point
-//							if((curFontSize + SQUEEZE) % 2 == 1) {
-//								//g2d.setColor(Color.gray);
-//								int[] exes = {secondaryScrollEndGap + matrixBarThickness + labelBarThickness,secondaryScrollEndGap + matrixBarThickness + labelBarThickness,secondaryScrollEndGap + matrixBarThickness + labelBarThickness + labelIndicatorProtrusion + 1};
-//								int[] whys = {labelPixel - 1,labelPixel + curFontSize + SQUEEZE,labelPixel + (int) Math.ceil((curFontSize + SQUEEZE) / 2)};
-//								g.fillPolygon(exes, whys, 3);
-//							} else {
-//								//g2d.setColor(Color.green);
-//								int[] exes = {secondaryScrollEndGap + matrixBarThickness + labelBarThickness,secondaryScrollEndGap + matrixBarThickness + labelBarThickness,secondaryScrollEndGap + matrixBarThickness + labelBarThickness + labelIndicatorProtrusion,secondaryScrollEndGap + matrixBarThickness + labelBarThickness + labelIndicatorProtrusion};
-//								int[] whys = {labelPixel - 1,labelPixel + curFontSize + SQUEEZE,labelPixel + (int) (curFontSize + SQUEEZE) / 2 - 1,labelPixel + (int) (curFontSize + SQUEEZE) / 2};
-//								g.fillPolygon(exes, whys, 4);
+//							if(labelBarThickness > 0) {
+//    							//Draw the base of the indicator
+//    							g.fillRect(
+//    									lastScrollColEndGap + matrixBarThickness,
+//    									labelPixel,
+//    									labelBarThickness + 1,
+//    									curFontSize + SQUEEZE);
 //							}
-//							//g2d.setColor(Color.red);
+//							if(labelIndicatorProtrusion > 0) {
+//    							//Draw the point of the indicator
+//    							//Do a 4 point polygon if there's an even number of pixels in order to have a stubby but symmetrical point
+//    							if((curFontSize + SQUEEZE) % 2 == 1) {
+//    								//g2d.setColor(Color.gray);
+//    								int[] exes = {lastScrollColEndGap + matrixBarThickness + labelBarThickness,lastScrollColEndGap + matrixBarThickness + labelBarThickness,lastScrollColEndGap + matrixBarThickness + labelBarThickness + labelIndicatorProtrusion + 1};
+//    								int[] whys = {labelPixel - 1,labelPixel + curFontSize + SQUEEZE,labelPixel + (int) Math.ceil((curFontSize + SQUEEZE) / 2)};
+//    								g.fillPolygon(exes, whys, 3);
+//    							} else {
+//    								//g2d.setColor(Color.green);
+//    								int[] exes = {lastScrollColEndGap + matrixBarThickness + labelBarThickness,lastScrollColEndGap + matrixBarThickness + labelBarThickness,lastScrollColEndGap + matrixBarThickness + labelBarThickness + labelIndicatorProtrusion,lastScrollColEndGap + matrixBarThickness + labelBarThickness + labelIndicatorProtrusion};
+//    								int[] whys = {labelPixel - 1,labelPixel + curFontSize + SQUEEZE,labelPixel + (int) (curFontSize + SQUEEZE) / 2 - 1,labelPixel + (int) (curFontSize + SQUEEZE) / 2};
+//    								g.fillPolygon(exes, whys, 4);
+//    							}
+//							}
+//							//g2d.setColor(hoverTextFGColor);
 //						}
 //						//Draw the connection btwn hvr label & matrix pos indicators
 //						g2d.drawLine(
-//								secondaryScrollEndGap + (outOfBounds ? (int) Math.floor(matrixBarThickness / 2) : matrixBarThickness) + 1,
+//								lastScrollColEndGap + (outOfBounds ? (int) Math.floor(matrixBarThickness / 2) : matrixBarThickness) + 1,
 //								matrixPixel,
-//								secondaryScrollEndGap + (outOfBounds ? (int) Math.floor(matrixBarThickness / 2) : matrixBarThickness) + 1,
+//								lastScrollColEndGap + (outOfBounds ? (int) Math.floor(matrixBarThickness / 2) : matrixBarThickness) + 1,
 //								(outOfBounds ? (activeHoverDataIndex > end ? (end + 1) * (curFontSize + SQUEEZE) - 1 : 0) : labelPixel));
 //						if(activeHoverDataIndex > end) {
 //							//Draw an arrow off the right side
@@ -1001,76 +1108,80 @@ public abstract class LabelView extends ModelView implements MouseListener,
 //									 secondaryScrollEndGap + (int) Math.floor(matrixBarThickness / 2) + 3,
 //									 start * (curFontSize + SQUEEZE) + 2);
 //						}
-//					}
-//				} else {
-//					//int secondaryScrollEndPos = secondaryScrollPos + getSecondaryScrollBar().getModel().getExtent();
+					}
+				} else {
+					//int secondaryScrollEndPos = secondaryScrollPos + getSecondaryScrollBar().getModel().getExtent();
 //					if(isRightJustified) {
-//						LogBuffer.println("Resetting justification via drawing for rows!  Will draw at maxstrlen + indicatorthickness - lastendgap [" + maxStrLen + " + " + indicatorThickness + " - " + lastScrollRowEndGap + " = " + (maxStrLen + indicatorThickness - lastScrollRowEndGap) + "] - indicatorThickness [" + indicatorThickness + "] instead of current [" + secondaryScrollPos + "] - indicatorThickness [" + indicatorThickness + "]. MaxStrLen: [" + maxStrLen + "]");
-//						secondaryScrollEndPos = maxStrLen + indicatorThickness - lastScrollRowEndGap;
+////						LogBuffer.println("Resetting justification via drawing for rows!  Will draw at maxstrlen + indicatorthickness - lastendgap [" + maxStrLen + " + " + indicatorThickness + " - " + lastScrollRowEndGap + " = " + (maxStrLen + indicatorThickness - lastScrollRowEndGap) + "] - indicatorThickness [" + indicatorThickness + "] instead of current [" + secondaryScrollPos + "] - indicatorThickness [" + indicatorThickness + "]. MaxStrLen: [" + maxStrLen + "]");
+//						lastScrollRowEndPos = maxStrLen + indicatorThickness - lastScrollRowEndGap;
 //					} else {
-//						LogBuffer.println("Resetting justification via drawing for rows!  Will draw at lastScrollRowEndPos [" + (lastScrollRowEndPos == -1 ? scrollPane.getViewport().getSize().width : lastScrollRowEndPos) + "] instead of current [" + secondaryScrollEndPos + "] - indicatorThickness [" + indicatorThickness + "]. MaxStrLen: [" + maxStrLen + "]");
-//						secondaryScrollEndPos = (lastScrollRowEndPos == -1 ? scrollPane.getViewport().getSize().width : lastScrollRowEndPos);
+////						LogBuffer.println("Resetting justification via drawing for rows!  Will draw at lastScrollRowEndPos [" + (lastScrollRowEndPos == -1 ? scrollPane.getViewport().getSize().width : lastScrollRowEndPos) + "] instead of current [" + secondaryScrollEndPos + "] - indicatorThickness [" + indicatorThickness + "]. MaxStrLen: [" + maxStrLen + "]");
+//						lastScrollRowEndPos = (lastScrollRowEndPos == -1 ? scrollPane.getViewport().getSize().width : lastScrollRowEndPos);
 //					}
-//
-//					//Switch to the background color
-//					g2d.setColor(bgColor);
-//					//resetJustification = (secondaryScrollPos == 0 && secondaryScrollEndGap == 0);
-//					//Draw a background box to blank-out and partially scrolled labels
+
+					//Switch to the background color
+					g2d.setColor(textBGColor);
+					//resetJustification = (secondaryScrollPos == 0 && secondaryScrollEndGap == 0);
+					//Draw a background box to blank-out and partially scrolled labels
 //					LogBuffer.println("Starting indicator drawing at position [" + (secondaryScrollEndPos - indicatorThickness) + "]");
+					g.fillRect(
+							lastScrollRowEndPos - indicatorThickness,
+							0,//start * (curFontSize + SQUEEZE) - 1,
+							indicatorThickness,
+							offscreenSize.height);//(end + 1) * (curFontSize + SQUEEZE));
+					//Switch to the label port color
+					g2d.setColor(labelPortColor);
+//					//Draw the first border line
+//					g2d.drawLine(
+//							secondaryScrollEndPos - indicatorThickness +
+//								(labelIndent + labelIndicatorProtrusion),
+//							start * (curFontSize + SQUEEZE),
+//							0,
+//							start * (curFontSize + SQUEEZE));
+//					//Draw the second border line
+//					g2d.drawLine(
+//							secondaryScrollEndPos - indicatorThickness +
+//								(labelIndent + labelIndicatorProtrusion),
+//							(end + 1) * (curFontSize + SQUEEZE) - 1,
+//							0,
+//							(end + 1) * (curFontSize + SQUEEZE) - 1);
+//					//Draw the label breadth bar
 //					g.fillRect(
-//							secondaryScrollEndPos - indicatorThickness,
-//							start * (curFontSize + SQUEEZE) - 1,
-//							indicatorThickness,
-//							(end + 1) * (curFontSize + SQUEEZE));
-//					//Switch to the label port color
-//					g2d.setColor(labelPortColor);
-////					//Draw the first border line
-////					g2d.drawLine(
-////							secondaryScrollEndPos - indicatorThickness +
-////								(labelIndent + labelIndicatorProtrusion),
-////							start * (curFontSize + SQUEEZE),
-////							0,
-////							start * (curFontSize + SQUEEZE));
-////					//Draw the second border line
-////					g2d.drawLine(
-////							secondaryScrollEndPos - indicatorThickness +
-////								(labelIndent + labelIndicatorProtrusion),
-////							(end + 1) * (curFontSize + SQUEEZE) - 1,
-////							0,
-////							(end + 1) * (curFontSize + SQUEEZE) - 1);
-////					//Draw the label breadth bar
-////					g.fillRect(
-////							secondaryScrollEndPos - matrixBarThickness - labelBarThickness,
-////							start * (curFontSize + SQUEEZE),
-////							labelBarThickness,
-////							(end + 1) * (curFontSize + SQUEEZE) - start * (curFontSize + SQUEEZE));
-////					//Draw the matrix breadth bar
-////					g.fillRect(
-////							secondaryScrollEndPos - matrixBarThickness,
-////							start * (curFontSize + SQUEEZE) + map.getPixel(start),
-////							matrixBarThickness,
-////							map.getPixel(end + 1) - map.getPixel(start) + 1);
+//							secondaryScrollEndPos - matrixBarThickness - labelBarThickness,
+//							start * (curFontSize + SQUEEZE),
+//							labelBarThickness,
+//							(end + 1) * (curFontSize + SQUEEZE) - start * (curFontSize + SQUEEZE));
+					if(matrixBarThickness > 0) {
+						//Draw the matrix breadth bar
+						debug("Drawing matrix bar from indes start [" + labelStart + "] to stop [" + labelEnd + "], pixel start [" + map.getPixel(labelStart) + "] to stop [" + (map.getPixel(labelEnd + 1)) + "]",4);
+						g.fillRect(
+								lastScrollRowEndPos - matrixBarThickness,
+								/* start * (curFontSize + SQUEEZE) + */ map.getPixel(labelStart),
+								matrixBarThickness,
+								map.getPixel(labelEnd + 1) - map.getPixel(labelStart));
+					}
 //					//If there is a data index that is hovered over
 //					int activeHoverDataIndex =
 //							(hoverIndex == -1 ? matrixHoverIndex : hoverIndex);
-//					if(activeHoverDataIndex > -1) {
-//						//Change to the hover color
-//						g2d.setColor(Color.red);
-//						//Draw the hover matrix position indicator
-//						int matrixPixel = start * (curFontSize + SQUEEZE) + map.getPixel(activeHoverDataIndex);
+					if(activeHoverDataIndex > -1) {
+						//Change to the hover color
+						g2d.setColor(hoverTextFGColor);
+						//Draw the hover matrix position indicator
+						int matrixPixel = /* start * (curFontSize + SQUEEZE) + */ map.getPixel(activeHoverDataIndex);
 //						int labelPixel = activeHoverDataIndex * (curFontSize + SQUEEZE);
 //						boolean outOfBounds = activeHoverDataIndex > end || activeHoverDataIndex < start;
-//						g.fillRect(
-//								secondaryScrollEndPos - (outOfBounds ?
-//										(int) Math.ceil(matrixBarThickness / 2) : matrixBarThickness) - 1,
-//								matrixPixel,
-//								(outOfBounds ?
-//										(int) Math.ceil(matrixBarThickness / 2) : matrixBarThickness) + 1,
-//								(int) Math.round(map.getScale()));
+						g.fillRect(
+								lastScrollRowEndPos - /* (outOfBounds ?
+										(int) Math.ceil(matrixBarThickness / 2) : */ matrixBarThickness /* ) */ - 1,
+								matrixPixel,
+								/* (outOfBounds ?
+										(int) Math.ceil(matrixBarThickness / 2) : */ matrixBarThickness /* ) */ + 1,
+								map.getPixel(matrixPixel + 1) - map.getPixel(matrixPixel));
+								//(int) Math.round(map.getScale()));
 //						if(!outOfBounds) {
 //							//Draw the hover label position indicator
 //							g.fillRect(
-//									secondaryScrollEndPos - indicatorThickness + labelIndent,
+//									lastScrollRowEndPos - indicatorThickness + labelIndent,
 //									//secondaryScrollPos + matrixBarThickness + (int) Math.floor(labelBarThickness / 2),
 //									labelPixel,
 //									labelBarThickness + labelIndicatorProtrusion,
@@ -1103,9 +1214,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 //									 secondaryScrollEndPos - (int) Math.floor(matrixBarThickness / 2) - 3,
 //									 start * (curFontSize + SQUEEZE) + 2);
 //						}
-//					}
-//				}
-//			}
+					}
+				}
+			}
 
 			//I MIGHT resurect some or all of the preceding commented code
 			//depending on feedback from the next meeting (after 6/18/2015)
@@ -1117,19 +1228,19 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			if(isGeneAxis) {
 				if(offscreenSize.height != fullPaneSize || offscreenSize.width != maxStrLen) {
 					setPreferredSize(new Dimension(maxStrLen
-					                               /* + (drawLabelPort ?
-					                                *    indicatorThickness : 0)
-					                                */,
+					                                + (drawLabelPort ?
+					                                   indicatorThickness : labelIndent)
+					                                ,
 					                               fullPaneSize));
 				}
 				debug("Resizing row labels panel to [" + maxStrLen + "x" +
-				      fullPaneSize + "].",1);
+				      fullPaneSize + "].",2);
 			} else {
 				if(offscreenSize.height != maxStrLen || offscreenSize.width != fullPaneSize) {
 					setPreferredSize(new Dimension(fullPaneSize,
 					                               maxStrLen
-					                               /* + (drawLabelPort ?
-					                                * indicatorThickness : 0) */
+					                               + (drawLabelPort ?
+					                               indicatorThickness : labelIndent)
 					                               ));
 				}
 				debug("Resizing col labels panel to [" + fullPaneSize + "x" +
@@ -1140,113 +1251,14 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			 * Scroll to the position that is equivalent to the previous
 			 * position
 			 */
-			if(isRightJustified) {
-				if(isGeneAxis) {
-					if(lastScrollRowPos == -1) {
-						debug("Scrolling to [" +
-						      (getSecondaryScrollBar().getMaximum() -
-						       getSecondaryScrollBar().getModel().getExtent()) +
-						      "] max - extent [" +
-						       getSecondaryScrollBar().getMaximum() + " - " +
-						       getSecondaryScrollBar().getModel().getExtent() +
-						       "] after drawing - first time rows right " +
-						       "justified",1);
-						//It seems that the scrollbar max and extent are not
-						//updated in this scenario when the app first opens a
-						//file, so we will calculate the initial scroll position
-						//thusly
-						int tmpscrollpos =
-							maxStrLen -
-						    scrollPane.getViewport().getSize().width;
-						getSecondaryScrollBar().setValue(tmpscrollpos);
-						lastScrollRowPos = tmpscrollpos;
-						lastScrollRowEndPos = maxStrLen;
-						lastScrollRowEndGap = 0;
-					} else {
-						debug("Scrolling to [" + lastScrollRowPos +
-						      "] after drawing - rememberred rows right " +
-						      "justified",1);
-						getSecondaryScrollBar().setValue(lastScrollRowPos);
-					}
-				} else {
-					/*
-					 * TODO: Save column scroll position - below is copied from
-					 * row logic above - edit it!
-					 */
-					if(lastScrollColPos == -1) {
-						debug("Scrolling to [0] after drawing - first time " +
-						      "cols left justified",1);
-						getSecondaryScrollBar().setValue(0);
-						//It seems that the scrollbar max and extent are not
-						//updated in this scenario when the app first opens a
-						//file, so we will calculate the initial scroll position
-						//thusly
-						lastScrollColPos = 0;
-						lastScrollColEndPos =
-							scrollPane.getViewport().getSize().width;
-						lastScrollColEndGap = maxStrLen -
-							scrollPane.getViewport().getSize().width;
-					} else {
-						debug("Scrolling to [" + lastScrollColPos +
-						      "] after drawing - rememberred " +
-						      "cols right justified",1);
-						getSecondaryScrollBar().setValue(lastScrollColPos);
-					}
-				}
-			} else {
-				if(isGeneAxis) {
-					if(lastScrollRowPos == -1) {
-						debug("Scrolling to [0] after drawing - first time " +
-						      "rows left justified",1);
-						getSecondaryScrollBar().setValue(0);
-						//It seems that the scrollbar max and extent are not
-						//updated in this scenario when the app first opens a
-						//file, so we will calculate the initial scroll position
-						//thusly
-						lastScrollRowPos = 0;
-						lastScrollRowEndPos =
-							scrollPane.getViewport().getSize().width;
-						lastScrollRowEndGap = maxStrLen -
-							scrollPane.getViewport().getSize().width;
-					} else {
-						debug("Scrolling to [" + lastScrollRowPos +
-						      "] after drawing - rememberred " +
-						      "rows left justified",1);
-						getSecondaryScrollBar().setValue(lastScrollRowPos);
-					}
-				} else {
-					/* TODO: Save column scroll position - below is copied from
-					 * row logic above - edit it! */
-					if(lastScrollColPos == -1) {
-						debug("Scrolling to [" +
-						      (getSecondaryScrollBar().getMaximum() -
-						       getSecondaryScrollBar().getModel().getExtent()) +
-						      "] max - extent [" +
-						      getSecondaryScrollBar().getMaximum() + " - " +
-						      getSecondaryScrollBar().getModel().getExtent() +
-						      "] after drawing - first time " +
-						      "cols right justified",1);
-						//It seems that the scrollbar max and extent are not
-						//updated in this scenario when the app first opens a
-						//file, so we will calculate the initial scroll
-						//position thusly
-						int tmpscrollpos = maxStrLen -
-							scrollPane.getViewport().getSize().height;
-						getSecondaryScrollBar().setValue(tmpscrollpos);
-						lastScrollColPos    = tmpscrollpos;
-						lastScrollColEndPos = maxStrLen;
-						lastScrollColEndGap = 0;
-					} else {
-						debug("Scrolling to [" + lastScrollColPos +
-						      "] after drawing - rememberred " +
-						      "cols left justified",1);
-						getSecondaryScrollBar().setValue(lastScrollColPos);
-					}
-				}
-			}
+			secondaryReScroll(maxStrLen + (drawLabelPort ? indicatorThickness : labelIndent));
 		} else {
 			debug("Label port NOT drawn",2);
-			setPoints(HINTFONTSIZE);
+			//Set a temporary font size - we don't need to save this size in the
+			//prefs file. Besides, this font size would be saved as a new font
+			//size and the scrollbars would be re-justified and not remember
+			//their position
+			g.setFont(new Font(face,style,HINTFONTSIZE));
 			g2d.setColor(Color.black);
 
 			int xPos = getHintX(g2d,stringX);
@@ -1279,7 +1291,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				      "] stringX: [" + stringX + "] zoomHint: [" + zoomHint +
 				      "] height [" + offscreenSize.height + "] width [" +
 				      offscreenSize.width + "] + HintStrLen [" +
-				      metrics.stringWidth(zoomHint) + "]",1);
+				      metrics.stringWidth(zoomHint) + "]",3);
 			} else {
 				//Reduce the size of the scrollpane to just what is visible
 				setPreferredSize(new Dimension(scrollPane.getViewport()
@@ -1297,7 +1309,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				      "] height [" + offscreenSize.height +
 				      "] width [" + offscreenSize.width +
 				      "] + HintStrLen [" + metrics.stringWidth(zoomHint) + "]",
-				      1);
+				      3);
 			}
 
 			if(isBeginJustified) {
@@ -1310,19 +1322,225 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				}
 			}
 
-			//Adding this useless scroll actually causes the pane to update
-			//properly - and reflect the settings made above.  Without it, the
-			//scrollbar still implies that the panel is its previous size and
-			//the hint is off center
+			//Adding this useless scroll causes the pane size and scrollbar
+			//attributes to update correctly - and reflect the settings made
+			//above.  Without it, the scrollbar still implies that the panel is
+			//its previous size and the hint is off center. However, there is an
+			//unfortunate side-effect: the scroll position of the labels upon
+			//hover after this line has executed is briefly set to 0 instead of
+			//the rembered value
 			getSecondaryScrollBar().setValue(0);
 		}
 	}
 
+	public void drawLabelBackground(final Graphics g,int j,int yPos) {
+		final int bgColorIndex = headerInfo.getIndex("BGCOLOR");
+		final String[] strings = headerInfo.getHeader(j);
+		boolean isSelecting =
+			(map.isSelecting() &&
+		     ((j >= map.getSelectingStart() && j <= map.getHoverIndex()) ||
+		      (j <= map.getSelectingStart() && j >= map.getHoverIndex())));
+		try {
+			if(drawSelection.isIndexSelected(j) || isSelecting) {
+				debug("Drawing yellow background for selected index [" + j + "]",4);
+				g.setColor(selectionTextBGColor);
+			} else if(bgColorIndex > 0) {
+				g.setColor(TreeColorer.getColor(strings[bgColorIndex]));
+			}
+		}
+		catch(final Exception e) {
+			// ignore...
+		}
+		if(drawSelection.isIndexSelected(j) || isSelecting || bgColorIndex > 0) {
+			if(doDrawLabelPort()) {
+				g.fillRect(0,
+				           yPos,
+				           (isGeneAxis ? rowLabelPaneSize : colLabelPaneSize),
+				           size + SQUEEZE);
+			} else {
+				g.fillRect(0,
+				           yPos,
+				           (isGeneAxis ? rowLabelPaneSize : colLabelPaneSize),
+				           size + SQUEEZE);
+			}
+		}
+	}
+
+	/**
+	 * This method ensures that the secondary label pane scrollbar is positioned
+	 * to where it was before the labels were hidden behind the zoom/hover/font-
+	 * size "hint"
+	 */
+	private void secondaryReScroll(int secondaryPaneSize) {
+		if((isGeneAxis  && map.areRowLabelsBeingScrolled()) ||
+		   (!isGeneAxis && map.areColLabelsBeingScrolled())) {
+			return;
+		}
+		/*
+		 * Scroll to the position that is equivalent to the previous
+		 * position
+		 */
+		if(isRightJustified) {
+			if(isGeneAxis) {
+				if(lastScrollRowPos == -1) {
+					debug("Scrolling to [" +
+					      (getSecondaryScrollBar().getMaximum() -
+					       getSecondaryScrollBar().getModel().getExtent()) +
+					      "] max - extent [" +
+					       getSecondaryScrollBar().getMaximum() + " - " +
+					       getSecondaryScrollBar().getModel().getExtent() +
+					       "] after drawing - first time rows right " +
+					       "justified",2);
+					//It seems that the scrollbar max and extent are not
+					//updated in this scenario when the app first opens a
+					//file, so we will calculate the initial scroll position
+					//thusly
+					int tmpscrollpos =
+						secondaryPaneSize -
+					    scrollPane.getViewport().getSize().width;
+					getSecondaryScrollBar().setValue(tmpscrollpos);
+					lastScrollRowPos    = tmpscrollpos;
+					lastScrollRowEndPos = secondaryPaneSize;
+					lastScrollRowEndGap = 0;
+				} else {
+					debug("Scrolling to [" + lastScrollRowPos +
+					      "] after drawing - rememberred rows right " +
+					      "justified",2);
+					//Only change the other values if something about them has
+					//changed (because it triggers an updateBuffer call and
+					//updateBuffer calls this method, which would create an
+					//endless loop).  Setting just the scroll value does not
+					//call updateBuffer
+					if(getSecondaryScrollBar().getModel().getExtent() !=
+					   (lastScrollRowEndPos - lastScrollRowPos) ||
+					   getSecondaryScrollBar().getMinimum() != 0 ||
+					   getSecondaryScrollBar().getMaximum() != secondaryPaneSize) {
+						getSecondaryScrollBar().setValues(lastScrollRowPos,lastScrollRowEndPos - lastScrollRowPos,0,secondaryPaneSize);
+					} else {
+						getSecondaryScrollBar().setValue(lastScrollRowPos);
+					}
+					debug("ReScroll values, pane size: [" + secondaryPaneSize + "] pos [" + lastScrollRowPos + "] extent [" + (lastScrollRowEndPos - lastScrollRowPos) + "] min [" + "0" + "] max [" + (secondaryPaneSize - (lastScrollRowEndPos - lastScrollRowPos)) + "]",2);
+				}
+			} else {
+				if(lastScrollColPos == -1) {
+					debug("Scrolling to [0] after drawing - first time " +
+					      "cols left justified",2);
+					getSecondaryScrollBar().setValue(0);
+					//It seems that the scrollbar max and extent are not
+					//updated in this scenario when the app first opens a
+					//file, so we will calculate the initial scroll position
+					//thusly
+					lastScrollColPos = 0;
+					lastScrollColEndPos =
+						scrollPane.getViewport().getSize().width;
+					lastScrollColEndGap = secondaryPaneSize -
+						scrollPane.getViewport().getSize().width;
+				} else {
+					debug("Scrolling to [" + lastScrollColPos +
+					      "] after drawing - rememberred " +
+					      "cols right justified",2);
+					//Only change the other values if something about them has
+					//changed (because it triggers an updateBuffer call and
+					//updateBuffer calls this method, which would create an
+					//endless loop).  Setting just the scroll value does not
+					//call updateBuffer
+					if(getSecondaryScrollBar().getModel().getExtent() !=
+						   (lastScrollColEndPos - lastScrollColPos) ||
+						   getSecondaryScrollBar().getMinimum() != 0 ||
+						   getSecondaryScrollBar().getMaximum() != secondaryPaneSize) {
+							getSecondaryScrollBar().setValues(lastScrollColPos,lastScrollColEndPos - lastScrollColPos,0,secondaryPaneSize);
+					} else {
+						getSecondaryScrollBar().setValue(lastScrollColPos);
+					}
+					debug("ReScroll col values, pane size: [" + secondaryPaneSize + "] pos [" + lastScrollColPos + "] extent [" + (lastScrollColEndPos - lastScrollColPos) + "] min [" + "0" + "] max [" + secondaryPaneSize + "]",2);
+				}
+			}
+		} else {
+			if(isGeneAxis) {
+				if(lastScrollRowPos == -1) {
+					debug("Scrolling to [0] after drawing - first time " +
+					      "rows left justified",2);
+					getSecondaryScrollBar().setValue(0);
+					//It seems that the scrollbar max and extent are not
+					//updated in this scenario when the app first opens a
+					//file, so we will calculate the initial scroll position
+					//thusly
+					lastScrollRowPos = 0;
+					lastScrollRowEndPos =
+						scrollPane.getViewport().getSize().width;
+					lastScrollRowEndGap = secondaryPaneSize -
+						scrollPane.getViewport().getSize().width;
+				} else {
+					debug("Scrolling to [" + lastScrollRowPos +
+					      "] after drawing - rememberred " +
+					      "rows left justified",2);
+					//Only change the other values if something about them has
+					//changed (because it triggers an updateBuffer call and
+					//updateBuffer calls this method, which would create an
+					//endless loop).  Setting just the scroll value does not
+					//call updateBuffer
+					if(getSecondaryScrollBar().getModel().getExtent() !=
+						   (lastScrollRowEndPos - lastScrollRowPos) ||
+						   getSecondaryScrollBar().getMinimum() != 0 ||
+						   getSecondaryScrollBar().getMaximum() != secondaryPaneSize) {
+							getSecondaryScrollBar().setValues(lastScrollRowPos,lastScrollRowEndPos - lastScrollRowPos,0,secondaryPaneSize);
+					} else {
+						getSecondaryScrollBar().setValue(lastScrollRowPos);
+					}
+					debug("ReScroll values, pane size: [" + secondaryPaneSize + "] pos [" + lastScrollRowPos + "] extent [" + (lastScrollRowEndPos - lastScrollRowPos) + "] min [" + "0" + "] max [" + (secondaryPaneSize - (lastScrollRowEndPos - lastScrollRowPos)) + "]",2);
+				}
+			} else {
+				if(lastScrollColPos == -1) {
+					debug("Scrolling to [" +
+					      (getSecondaryScrollBar().getMaximum() -
+					       getSecondaryScrollBar().getModel().getExtent()) +
+					      "] max - extent [" +
+					      getSecondaryScrollBar().getMaximum() + " - " +
+					      getSecondaryScrollBar().getModel().getExtent() +
+					      "] after drawing - first time " +
+					      "cols right justified",1);
+					//It seems that the scrollbar max and extent are not
+					//updated in this scenario when the app first opens a
+					//file, so we will calculate the initial scroll
+					//position thusly
+					int tmpscrollpos = secondaryPaneSize -
+						scrollPane.getViewport().getSize().height;
+					getSecondaryScrollBar().setValue(tmpscrollpos);
+					lastScrollColPos    = tmpscrollpos;
+					lastScrollColEndPos = secondaryPaneSize;
+					lastScrollColEndGap = 0;
+				} else {
+					debug("Scrolling to [" + lastScrollColPos +
+					      "] after drawing - rememberred " +
+					      "cols left justified",1);
+					//Only change the other values if something about them has
+					//changed (because it triggers an updateBuffer call and
+					//updateBuffer calls this method, which would create an
+					//endless loop).  Setting just the scroll value does not
+					//call updateBuffer
+					if(getSecondaryScrollBar().getModel().getExtent() !=
+						   (lastScrollColEndPos - lastScrollColPos) ||
+						   getSecondaryScrollBar().getMinimum() != 0 ||
+						   getSecondaryScrollBar().getMaximum() != secondaryPaneSize) {
+							getSecondaryScrollBar().setValues(lastScrollColPos,lastScrollColEndPos - lastScrollColPos,0,secondaryPaneSize);
+					} else {
+						getSecondaryScrollBar().setValue(lastScrollColPos);
+					}
+					debug("ReScroll col values, pane size: [" + secondaryPaneSize + "] pos [" + lastScrollColPos + "] extent [" + (lastScrollColEndPos - lastScrollColPos) + "] min [" + "0" + "] max [" + secondaryPaneSize + "]",2);
+				}
+			}
+		}
+	}
+
+	protected abstract void explicitSecondaryScrollTo(int pos,
+	                                                  int endPos,
+	                                                  int endGap);
+
 	public int getJustifiedPosition(FontMetrics metrics) {
 		int min =
-			isGeneAxis ? scrollPane.getViewport().getSize().width :
-						 scrollPane.getViewport().getSize().height
-						 /* - indicatorThickness */;
+			(isGeneAxis ? scrollPane.getViewport().getSize().width :
+						  scrollPane.getViewport().getSize().height)
+					- (doDrawLabelPort() ? indicatorThickness : labelIndent);
 		int len = getMaxStringLength(metrics);
 		return len > min ? len : min;
 	}
@@ -1500,12 +1718,23 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	@Override
 	public void mouseMoved(final MouseEvent e) {
+		setHoverPosition(e);
 		hoverIndex = map.getIndex(getPrimaryHoverPosition(e));
 		repaint();
 	}
 
 	public int getPrimaryHoverIndex(final MouseEvent e) {
 		return(map.getIndex(getPrimaryHoverPosition(e)));
+	}
+
+	public void setPrimaryHoverIndex(final int i) {
+		hoverIndex = i;
+	}
+	public int getUpdatedPrimaryHoverIndex() {
+		if(hoverPixel == -1) {
+			return(-1);
+		}
+		return(map.getIndex(hoverPixel));
 	}
 
 	public boolean doDrawLabelPort() {
@@ -1519,12 +1748,13 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	@Override
 	public void mouseExited(final MouseEvent e) {
+		setHoverPixel(-1);
 		hoverIndex = -1;
 		repaint();
 	}
 
 	public void resetSecondaryScroll() {
-		debug("Resetting last secondary scroll position values",1);
+		debug("Resetting last secondary scroll position values",2);
 		lastScrollRowPos    = -1;
 		lastScrollRowEndGap = -1;
 		lastScrollRowEndPos = -1;
@@ -1533,8 +1763,14 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		lastScrollColEndPos = -1;
 	}
 
+	/**
+	 * This method corrects the stored scroll positions for when the viewport
+	 * size changes because the size of the knob will have changed and either
+	 * the end gap (when left justified) or the position (when right justified)
+	 * has changed
+	 */
 	public void adjustSecondaryScroll() {
-		debug("Resetting last secondary scroll position values",1);
+		debug("Resetting last secondary scroll position values",2);
 		if(isGeneAxis) {
 			//Do not adjust if the scrollbars are not properly set
 			if(lastScrollRowPos    == -1 ||
@@ -1573,19 +1809,31 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		}
 	}
 
-	public boolean secondaryPaneSizeChanged() {
+	public boolean secondaryViewportSizeChanged() {
 		boolean changed = false;
 		if(isGeneAxis) {
-			if(scrollPane.getViewport().getSize().width != rowLabelPaneSize) {
+			if(scrollPane.getViewport().getSize().width != rowLabelViewportSize) {
 				changed = true;
-				rowLabelPaneSize = scrollPane.getViewport().getSize().width;
+				rowLabelViewportSize = scrollPane.getViewport().getSize().width;
 			}
 		} else {
-			if(scrollPane.getViewport().getSize().height != colLabelPaneSize) {
+			if(scrollPane.getViewport().getSize().height != colLabelViewportSize) {
 				changed = true;
-				colLabelPaneSize = scrollPane.getViewport().getSize().height;
+				colLabelViewportSize = scrollPane.getViewport().getSize().height;
 			}
 		}
 		return changed;
+	}
+
+	public void trackSecondaryPaneSize() {
+		if(isGeneAxis) {
+			if(offscreenSize.width != rowLabelPaneSize) {
+				rowLabelPaneSize = offscreenSize.width;
+			}
+		} else {
+			if(offscreenSize.height != colLabelPaneSize) {
+				colLabelPaneSize = offscreenSize.height;
+			}
+		}
 	}
 }
