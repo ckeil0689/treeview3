@@ -36,14 +36,15 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 
 			@Override
 			public void mouseEntered(MouseEvent e) {
+				setPrimaryHoverIndex(map.getMaxIndex());
+				map.setOverColLabelsScrollbar(true);
+				paintImmediately(0,0,getWidth(),colLabelPaneSize);
 				debug("The mouse has entered a column label pane scrollbar",2);
 				if(overScrollLabelPortOffTimer != null) {
 					/* Event came too soon, swallow by resetting the timer.. */
 					overScrollLabelPortOffTimer.stop();
 					overScrollLabelPortOffTimer = null;
 				}
-				setPrimaryHoverIndex(map.getMaxIndex());
-				map.setOverColLabelsScrollbar(true);
 			}
 
 			@Override
@@ -69,13 +70,14 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 
 			@Override
 			public void mousePressed(MouseEvent e) {
-				debug("The mouse has clicked a column label scrollbar",2);
+				map.setColLabelsBeingScrolled(true);
+				paintImmediately(0,0,getWidth(),colLabelPaneSize);
+				debug("The mouse has clicked a column label scrollbar",6);
 				if(activeScrollLabelPortOffTimer != null) {
 					/* Event came too soon, swallow by resetting the timer.. */
 					activeScrollLabelPortOffTimer.stop();
 					activeScrollLabelPortOffTimer = null;
 				}
-				map.setColLabelsBeingScrolled(true);
 			}
 
 			@Override
@@ -101,7 +103,7 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 			}
 		});
 
-		debug = 0;
+		debug = 6;
 		getSecondaryScrollBar().addAdjustmentListener(this);
 	}
 
@@ -199,7 +201,7 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 		@Override
 		public void actionPerformed(ActionEvent evt) {
 			if (evt.getSource() == activeScrollLabelPortOffTimer) {
-				debug("You released the secondary col scrollbar 1s ago, so the label port might turn off unless you're over another pane that activates it",2);
+				debug("You released the secondary col scrollbar 1s ago, so the label port might turn off unless you're over another pane that activates it",6);
 				/* Stop timer */
 				activeScrollLabelPortOffTimer.stop();
 				activeScrollLabelPortOffTimer = null;
@@ -495,35 +497,44 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 			debug("scrollbar adjustment detected from vertical scrollbar",2); 
 		}
 		int oldvalue = getSecondaryScrollBar().getValue();
-		boolean updateScroll = true;
+		boolean updateScroll = false;
+		//This if conditional catches drags
 		if(!evt.getValueIsAdjusting() && map.areColLabelsBeingScrolled()) {
 			System.out.println("The knob on the scrollbar is being dragged");
+			updateScroll = true;
 			explicitSecondaryScrollTo(oldvalue,-1,-1);
-		} else {
-			int type = evt.getAdjustmentType();
+		}
+		//This gets ANY other scroll event, even programmatic scrolls called from
+		//the code, but we only want to do anything when the scrollbar is
+		//clicked - everything else is either the scroll wheel or a coded re-
+		//scroll that we don't want to change anything
+		else {
+			updateScroll = true;
 			int newvalue = evt.getValue();
-			updateScroll = (oldvalue != newvalue);
-			if(updateScroll) {
+			if(oldvalue != newvalue) {
+				int type = evt.getAdjustmentType();
 				switch(type) {
-					case AdjustmentEvent.UNIT_INCREMENT:
-						System.out.println("Scrollbar was increased by one unit");
-						break;
-					case AdjustmentEvent.UNIT_DECREMENT:
-						System.out.println("Scrollbar was decreased by one unit");
-						break;
-					case AdjustmentEvent.BLOCK_INCREMENT:
-						System.out.println("Scrollbar was increased by one block");
-						break;
-					case AdjustmentEvent.BLOCK_DECREMENT:
-						System.out.println("Scrollbar was decreased by one block");
-						break;
-					case AdjustmentEvent.TRACK:
-						System.out.println("The mouse wheel scrolled the scrollbar");
-						updateScroll = false;
-						break;
+    				case AdjustmentEvent.UNIT_INCREMENT:
+    					System.out.println("Scrollbar was increased by one unit");
+    					break;
+    				case AdjustmentEvent.UNIT_DECREMENT:
+    					System.out.println("Scrollbar was decreased by one unit");
+    					break;
+    				case AdjustmentEvent.BLOCK_INCREMENT:
+    					System.out.println("Scrollbar was increased by one block");
+    					break;
+    				case AdjustmentEvent.BLOCK_DECREMENT:
+    					System.out.println("Scrollbar was decreased by one block");
+    					break;
+    				case AdjustmentEvent.TRACK:
+    					System.out.println("A non-scrollbar scroll event was detected (a call from code or a mouse wheel event)");
+    					updateScroll = false;
+    					break;
 				}
-				debug("Scrolling from: [" + source.getValue() + " or (" + oldvalue + ")" + "] to: [" + newvalue + "] via [" + evt.getSource() + "]",2);
-				explicitSecondaryScrollTo(newvalue,-1,-1);
+				debug("Scrolling from: [" + source.getValue() + " or (" + oldvalue + ")" + "] to: [" + newvalue + "] via [" + evt.getSource() + "]",6);
+				if(updateScroll) {
+					explicitSecondaryScrollTo(newvalue,-1,-1);
+				}
 			}
 		}
 		if(updateScroll) {

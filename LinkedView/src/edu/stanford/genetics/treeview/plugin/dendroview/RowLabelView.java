@@ -70,13 +70,13 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 
 			@Override
 			public void mousePressed(MouseEvent e) {
+				map.setRowLabelsBeingScrolled(true);
 				debug("The mouse has clicked a row label scrollbar",2);
 				if(activeScrollLabelPortOffTimer != null) {
 					/* Event came too soon, swallow by resetting the timer.. */
 					activeScrollLabelPortOffTimer.stop();
 					activeScrollLabelPortOffTimer = null;
 				}
-				map.setRowLabelsBeingScrolled(true);
 			}
 
 			@Override
@@ -529,15 +529,22 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 			debug("scrollbar adjustment detected from horizontal scrollbar",2); 
 		}
 		int oldvalue = getSecondaryScrollBar().getValue();
-		boolean updateScroll = true;
+		boolean updateScroll = false;
+		//This if conditional catches drags
 		if(!evt.getValueIsAdjusting() && map.areRowLabelsBeingScrolled()) {
 			System.out.println("The knob on the scrollbar is being dragged");
+			updateScroll = true;
 			explicitSecondaryScrollTo(oldvalue,-1,-1);
-		} else {
-			int type = evt.getAdjustmentType();
+		}
+		//This gets ANY other scroll event, even programmatic scrolls called from
+		//the code, but we only want to do anything when the scrollbar is
+		//clicked - everything else is either the scroll wheel or a coded re-
+		//scroll that we don't want to change anything
+		else {
+			updateScroll = true;
 			int newvalue = evt.getValue();
-			updateScroll = (oldvalue != newvalue);
-			if(updateScroll) {
+			if(oldvalue != newvalue) {
+				int type = evt.getAdjustmentType();
 				switch(type) {
 					case AdjustmentEvent.UNIT_INCREMENT:
 						System.out.println("Scrollbar was increased by one unit");
@@ -552,12 +559,14 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 						System.out.println("Scrollbar was decreased by one block");
 						break;
 					case AdjustmentEvent.TRACK:
-						System.out.println("The mouse wheel scrolled the scrollbar");
+						System.out.println("A non-scrollbar scroll event was detected (a call from code or a mouse wheel event)");
 						updateScroll = false;
 						break;
 				}
 				debug("Scrolling from: [" + source.getValue() + " or (" + oldvalue + ")" + "] to: [" + newvalue + "] via [" + evt.getSource() + "]",2);
-				explicitSecondaryScrollTo(newvalue,-1,-1);
+				if(updateScroll) {
+					explicitSecondaryScrollTo(newvalue,-1,-1);
+				}
 			}
 		}
 		if(updateScroll) {

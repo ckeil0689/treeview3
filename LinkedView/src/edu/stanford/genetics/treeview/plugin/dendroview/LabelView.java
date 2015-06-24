@@ -1239,6 +1239,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				      fullPaneSize + "].",2);
 			} else {
 				if(offscreenSize.height != maxStrLen || offscreenSize.width != fullPaneSize) {
+					debug("Setting col pane height to [" + (maxStrLen
+                        + (drawLabelPort ?
+                        indicatorThickness : labelIndent)) + "]",6);
 					setPreferredSize(new Dimension(fullPaneSize,
 					                               maxStrLen
 					                               + (drawLabelPort ?
@@ -1331,7 +1334,13 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			//unfortunate side-effect: the scroll position of the labels upon
 			//hover after this line has executed is briefly set to 0 instead of
 			//the rembered value
-			getSecondaryScrollBar().setValue(0);
+			int secondaryLength =
+				(isGeneAxis ? scrollPane.getViewport().getSize().width :
+				 scrollPane.getViewport().getSize().height);
+			getSecondaryScrollBar().setValues(0,
+			                                  secondaryLength,
+			                                  0,
+			                                  secondaryLength);
 		}
 	}
 
@@ -1374,10 +1383,16 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 * size "hint"
 	 */
 	private void secondaryReScroll(int secondaryPaneSize) {
-		if((isGeneAxis  && map.areRowLabelsBeingScrolled()) ||
-		   (!isGeneAxis && map.areColLabelsBeingScrolled())) {
+		if((isGeneAxis  && (map.areRowLabelsBeingScrolled())) ||
+		   (!isGeneAxis && (map.areColLabelsBeingScrolled()))) {
+			debug("Not rescrolling because label knob is being dragged.",6);
 			return;
 		}
+
+		int curPos    = getSecondaryScrollBar().getValue();
+		int curExtent = getSecondaryScrollBar().getModel().getExtent();
+		int curMin    = getSecondaryScrollBar().getMinimum();
+		int curMax    = getSecondaryScrollBar().getMaximum();
 		/*
 		 * Scroll to the position that is equivalent to the previous
 		 * position
@@ -1392,7 +1407,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					       getSecondaryScrollBar().getMaximum() + " - " +
 					       getSecondaryScrollBar().getModel().getExtent() +
 					       "] after drawing - first time rows right " +
-					       "justified",2);
+					       "justified",6);
 					//It seems that the scrollbar max and extent are not
 					//updated in this scenario when the app first opens a
 					//file, so we will calculate the initial scroll position
@@ -1400,69 +1415,101 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					int tmpscrollpos =
 						secondaryPaneSize -
 					    scrollPane.getViewport().getSize().width;
-					getSecondaryScrollBar().setValue(tmpscrollpos);
+//					getSecondaryScrollBar().setValue(tmpscrollpos);
 					lastScrollRowPos    = tmpscrollpos;
 					lastScrollRowEndPos = secondaryPaneSize;
 					lastScrollRowEndGap = 0;
 				} else {
 					debug("Scrolling to [" + lastScrollRowPos +
 					      "] after drawing - rememberred rows right " +
-					      "justified",2);
-					//Only change the other values if something about them has
-					//changed (because it triggers an updateBuffer call and
-					//updateBuffer calls this method, which would create an
-					//endless loop).  Setting just the scroll value does not
-					//call updateBuffer
-					if(getSecondaryScrollBar().getModel().getExtent() !=
-					   (lastScrollRowEndPos - lastScrollRowPos) ||
-					   getSecondaryScrollBar().getMinimum() != 0 ||
-					   getSecondaryScrollBar().getMaximum() != secondaryPaneSize) {
-						getSecondaryScrollBar().setValues(lastScrollRowPos,lastScrollRowEndPos - lastScrollRowPos,0,secondaryPaneSize);
-					} else {
-						getSecondaryScrollBar().setValue(lastScrollRowPos);
-					}
-					debug("ReScroll values, pane size: [" + secondaryPaneSize + "] pos [" + lastScrollRowPos + "] extent [" + (lastScrollRowEndPos - lastScrollRowPos) + "] min [" + "0" + "] max [" + (secondaryPaneSize - (lastScrollRowEndPos - lastScrollRowPos)) + "]",2);
+					      "justified",6);
+//					//Only change the other values if something about them has
+//					//changed (because it triggers an updateBuffer call and
+//					//updateBuffer calls this method, which would create an
+//					//endless loop).  Setting just the scroll value does not
+//					//call updateBuffer
+//					if(curExtent != (lastScrollRowEndPos - lastScrollRowPos) ||
+//					   curMin != 0 || curMax != secondaryPaneSize) {
+//						getSecondaryScrollBar().setValues(lastScrollRowPos,lastScrollRowEndPos - lastScrollRowPos,0,secondaryPaneSize);
+//						debug("ReScroll values, pane size: [" + secondaryPaneSize + "] pos [" + lastScrollRowPos + "] extent [" + (lastScrollRowEndPos - lastScrollRowPos) + "] min [" + "0" + "] max [" + (secondaryPaneSize - (lastScrollRowEndPos - lastScrollRowPos)) + "]",6);
+//					} else if(curPos != lastScrollRowPos) {
+//						getSecondaryScrollBar().setValue(lastScrollRowPos);
+//						debug("ReScroll values, pane size: [" + secondaryPaneSize + "] pos [" + lastScrollRowPos + "] extent [" + (lastScrollRowEndPos - lastScrollRowPos) + "] min [" + "0" + "] max [" + (secondaryPaneSize - (lastScrollRowEndPos - lastScrollRowPos)) + "]",6);
+//					} else {
+//						debug("Already there",6);
+//					}
+				}
+				//Only change the other values if something about them has
+				//changed (because it triggers an updateBuffer call and
+				//updateBuffer calls this method, which would create an
+				//endless loop).  Setting just the scroll value does not
+				//call updateBuffer
+				if(curExtent != (lastScrollRowEndPos - lastScrollRowPos) ||
+				   curMin != 0 || curMax != secondaryPaneSize) {
+					getSecondaryScrollBar().setValues(lastScrollRowPos,lastScrollRowEndPos - lastScrollRowPos,0,secondaryPaneSize);
+					debug("ReScroll rows values, pane size: [" + secondaryPaneSize + "] pos [" + lastScrollRowPos + "] extent [" + (lastScrollRowEndPos - lastScrollRowPos) + "] min [" + "0" + "] max [" + (secondaryPaneSize - (lastScrollRowEndPos - lastScrollRowPos)) + "]",6);
+				} else if(curPos != lastScrollRowPos) {
+					getSecondaryScrollBar().setValue(lastScrollRowPos);
+					debug("ReScroll rows to pos, pane size: [" + secondaryPaneSize + "] pos [" + lastScrollRowPos + "] extent [" + (lastScrollRowEndPos - lastScrollRowPos) + "] min [" + "0" + "] max [" + (secondaryPaneSize - (lastScrollRowEndPos - lastScrollRowPos)) + "]",6);
+				} else {
+					debug("Already there",6);
 				}
 			} else {
 				if(lastScrollColPos == -1) {
 					debug("Scrolling to [0] after drawing - first time " +
-					      "cols left justified",2);
-					getSecondaryScrollBar().setValue(0);
+					      "cols right justified",6);
+//					getSecondaryScrollBar().setValue(0);
 					//It seems that the scrollbar max and extent are not
 					//updated in this scenario when the app first opens a
 					//file, so we will calculate the initial scroll position
 					//thusly
 					lastScrollColPos = 0;
 					lastScrollColEndPos =
-						scrollPane.getViewport().getSize().width;
+						scrollPane.getViewport().getSize().height;
 					lastScrollColEndGap = secondaryPaneSize -
-						scrollPane.getViewport().getSize().width;
+						scrollPane.getViewport().getSize().height;
 				} else {
 					debug("Scrolling to [" + lastScrollColPos +
 					      "] after drawing - rememberred " +
-					      "cols right justified",2);
-					//Only change the other values if something about them has
-					//changed (because it triggers an updateBuffer call and
-					//updateBuffer calls this method, which would create an
-					//endless loop).  Setting just the scroll value does not
-					//call updateBuffer
-					if(getSecondaryScrollBar().getModel().getExtent() !=
-						   (lastScrollColEndPos - lastScrollColPos) ||
-						   getSecondaryScrollBar().getMinimum() != 0 ||
-						   getSecondaryScrollBar().getMaximum() != secondaryPaneSize) {
-							getSecondaryScrollBar().setValues(lastScrollColPos,lastScrollColEndPos - lastScrollColPos,0,secondaryPaneSize);
-					} else {
-						getSecondaryScrollBar().setValue(lastScrollColPos);
-					}
-					debug("ReScroll col values, pane size: [" + secondaryPaneSize + "] pos [" + lastScrollColPos + "] extent [" + (lastScrollColEndPos - lastScrollColPos) + "] min [" + "0" + "] max [" + secondaryPaneSize + "]",2);
+					      "cols right justified",6);
+//					//Only change the other values if something about them has
+//					//changed (because it triggers an updateBuffer call and
+//					//updateBuffer calls this method, which would create an
+//					//endless loop).  Setting just the scroll value does not
+//					//call updateBuffer
+//					if(curExtent != (lastScrollColEndPos - lastScrollColPos) ||
+//					   curMin != 0 || curMax != secondaryPaneSize) {
+//						getSecondaryScrollBar().setValues(lastScrollColPos,lastScrollColEndPos - lastScrollColPos,0,secondaryPaneSize);
+//						debug("ReScroll col right just. values, pane size: [" + secondaryPaneSize + "] pos [" + lastScrollColPos + "] extent [" + (lastScrollColEndPos - lastScrollColPos) + "] min [" + "0" + "] max [" + secondaryPaneSize + "]",6);
+//					} else if(curPos != lastScrollColPos) {
+//						getSecondaryScrollBar().setValue(lastScrollColPos);
+//						debug("ReScroll col right just. values, pane size: [" + secondaryPaneSize + "] pos [" + lastScrollColPos + "] extent [" + (lastScrollColEndPos - lastScrollColPos) + "] min [" + "0" + "] max [" + secondaryPaneSize + "]",6);
+//					} else {
+//						debug("Already there",6);
+//					}
+				}
+				//Only change the other values if something about them has
+				//changed (because it triggers an updateBuffer call and
+				//updateBuffer calls this method, which would create an
+				//endless loop).  Setting just the scroll value does not
+				//call updateBuffer
+				if(curExtent != (lastScrollColEndPos - lastScrollColPos) ||
+				   curMin != 0 || curMax != secondaryPaneSize) {
+					getSecondaryScrollBar().setValues(lastScrollColPos,lastScrollColEndPos - lastScrollColPos,0,secondaryPaneSize);
+					debug("ReScroll col right just. values, pane size: [" + secondaryPaneSize + "] pos [" + lastScrollColPos + "] extent [" + (lastScrollColEndPos - lastScrollColPos) + "] min [" + "0" + "] max [" + secondaryPaneSize + "]",6);
+				} else if(curPos != lastScrollColPos) {
+					getSecondaryScrollBar().setValue(lastScrollColPos);
+					debug("ReScroll col right just. to pos, pane size: [" + secondaryPaneSize + "] pos [" + lastScrollColPos + "] extent [" + (lastScrollColEndPos - lastScrollColPos) + "] min [" + "0" + "] max [" + secondaryPaneSize + "]",6);
+				} else {
+					debug("Already there",6);
 				}
 			}
 		} else {
 			if(isGeneAxis) {
 				if(lastScrollRowPos == -1) {
 					debug("Scrolling to [0] after drawing - first time " +
-					      "rows left justified",2);
-					getSecondaryScrollBar().setValue(0);
+					      "rows left justified",6);
+//					getSecondaryScrollBar().setValue(0);
 					//It seems that the scrollbar max and extent are not
 					//updated in this scenario when the app first opens a
 					//file, so we will calculate the initial scroll position
@@ -1475,60 +1522,99 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				} else {
 					debug("Scrolling to [" + lastScrollRowPos +
 					      "] after drawing - rememberred " +
-					      "rows left justified",2);
-					//Only change the other values if something about them has
-					//changed (because it triggers an updateBuffer call and
-					//updateBuffer calls this method, which would create an
-					//endless loop).  Setting just the scroll value does not
-					//call updateBuffer
-					if(getSecondaryScrollBar().getModel().getExtent() !=
-						   (lastScrollRowEndPos - lastScrollRowPos) ||
-						   getSecondaryScrollBar().getMinimum() != 0 ||
-						   getSecondaryScrollBar().getMaximum() != secondaryPaneSize) {
-							getSecondaryScrollBar().setValues(lastScrollRowPos,lastScrollRowEndPos - lastScrollRowPos,0,secondaryPaneSize);
-					} else {
-						getSecondaryScrollBar().setValue(lastScrollRowPos);
-					}
-					debug("ReScroll values, pane size: [" + secondaryPaneSize + "] pos [" + lastScrollRowPos + "] extent [" + (lastScrollRowEndPos - lastScrollRowPos) + "] min [" + "0" + "] max [" + (secondaryPaneSize - (lastScrollRowEndPos - lastScrollRowPos)) + "]",2);
+					      "rows left justified",6);
+//					//Only change the other values if something about them has
+//					//changed (because it triggers an updateBuffer call and
+//					//updateBuffer calls this method, which would create an
+//					//endless loop).  Setting just the scroll value does not
+//					//call updateBuffer
+//					if(curExtent != (lastScrollRowEndPos - lastScrollRowPos) ||
+//					   curMin != 0 || curMax != secondaryPaneSize) {
+//						getSecondaryScrollBar().setValues(lastScrollRowPos,lastScrollRowEndPos - lastScrollRowPos,0,secondaryPaneSize);
+//						debug("ReScroll rows left just. values, pane size: [" + secondaryPaneSize + "] pos [" + lastScrollRowPos + "] extent [" + (lastScrollRowEndPos - lastScrollRowPos) + "] min [" + "0" + "] max [" + (secondaryPaneSize - (lastScrollRowEndPos - lastScrollRowPos)) + "]",6);
+//					} else if(curPos != lastScrollRowPos) {
+//						getSecondaryScrollBar().setValue(lastScrollRowPos);
+//						debug("ReScroll rows left just. values, pane size: [" + secondaryPaneSize + "] pos [" + lastScrollRowPos + "] extent [" + (lastScrollRowEndPos - lastScrollRowPos) + "] min [" + "0" + "] max [" + (secondaryPaneSize - (lastScrollRowEndPos - lastScrollRowPos)) + "]",6);
+//					} else {
+//						debug("Already there",6);
+//					}
+				}
+				//Only change the other values if something about them has
+				//changed (because it triggers an updateBuffer call and
+				//updateBuffer calls this method, which would create an
+				//endless loop).  Setting just the scroll value does not
+				//call updateBuffer
+				if(curExtent != (lastScrollRowEndPos - lastScrollRowPos) ||
+				   curMin != 0 || curMax != secondaryPaneSize) {
+					getSecondaryScrollBar().setValues(lastScrollRowPos,lastScrollRowEndPos - lastScrollRowPos,0,secondaryPaneSize);
+					debug("ReScroll rows left just. values, pane size: [" + secondaryPaneSize + "] pos [" + lastScrollRowPos + "] extent [" + (lastScrollRowEndPos - lastScrollRowPos) + "] min [" + "0" + "] max [" + (secondaryPaneSize - (lastScrollRowEndPos - lastScrollRowPos)) + "]",6);
+				} else if(curPos != lastScrollRowPos) {
+					getSecondaryScrollBar().setValue(lastScrollRowPos);
+					debug("ReScroll rows left just. to pos, pane size: [" + secondaryPaneSize + "] pos [" + lastScrollRowPos + "] extent [" + (lastScrollRowEndPos - lastScrollRowPos) + "] min [" + "0" + "] max [" + (secondaryPaneSize - (lastScrollRowEndPos - lastScrollRowPos)) + "]",6);
+				} else {
+					debug("Already there",6);
 				}
 			} else {
 				if(lastScrollColPos == -1) {
-					debug("Scrolling to [" +
-					      (getSecondaryScrollBar().getMaximum() -
-					       getSecondaryScrollBar().getModel().getExtent()) +
-					      "] max - extent [" +
-					      getSecondaryScrollBar().getMaximum() + " - " +
-					      getSecondaryScrollBar().getModel().getExtent() +
-					      "] after drawing - first time " +
-					      "cols right justified",1);
+//					debug("Scrolling to [" +
+//					      (getSecondaryScrollBar().getMaximum() -
+//					       getSecondaryScrollBar().getModel().getExtent()) +
+//					      "] max - extent [" +
+//					      getSecondaryScrollBar().getMaximum() + " - " +
+//					      getSecondaryScrollBar().getModel().getExtent() +
+//					      "] after drawing - first time " +
+//					      "cols left justified",6);
 					//It seems that the scrollbar max and extent are not
 					//updated in this scenario when the app first opens a
 					//file, so we will calculate the initial scroll
 					//position thusly
 					int tmpscrollpos = secondaryPaneSize -
 						scrollPane.getViewport().getSize().height;
-					getSecondaryScrollBar().setValue(tmpscrollpos);
+//					getSecondaryScrollBar().setValue(tmpscrollpos);
 					lastScrollColPos    = tmpscrollpos;
 					lastScrollColEndPos = secondaryPaneSize;
 					lastScrollColEndGap = 0;
+					debug("Set lastScrollColPos [" +
+						lastScrollColPos +
+					      "] lastScrollColEndPos [" +
+					      lastScrollColEndPos + "] lastScrollColEndGap [" +
+					      lastScrollColEndGap +
+					      "] after drawing - first time " +
+					      "cols left justified",6);
 				} else {
 					debug("Scrolling to [" + lastScrollColPos +
 					      "] after drawing - rememberred " +
-					      "cols left justified",1);
-					//Only change the other values if something about them has
-					//changed (because it triggers an updateBuffer call and
-					//updateBuffer calls this method, which would create an
-					//endless loop).  Setting just the scroll value does not
-					//call updateBuffer
-					if(getSecondaryScrollBar().getModel().getExtent() !=
-						   (lastScrollColEndPos - lastScrollColPos) ||
-						   getSecondaryScrollBar().getMinimum() != 0 ||
-						   getSecondaryScrollBar().getMaximum() != secondaryPaneSize) {
-							getSecondaryScrollBar().setValues(lastScrollColPos,lastScrollColEndPos - lastScrollColPos,0,secondaryPaneSize);
-					} else {
-						getSecondaryScrollBar().setValue(lastScrollColPos);
-					}
-					debug("ReScroll col values, pane size: [" + secondaryPaneSize + "] pos [" + lastScrollColPos + "] extent [" + (lastScrollColEndPos - lastScrollColPos) + "] min [" + "0" + "] max [" + secondaryPaneSize + "]",2);
+					      "cols left justified",6);
+//					//Only change the other values if something about them has
+//					//changed (because it triggers an updateBuffer call and
+//					//updateBuffer calls this method, which would create an
+//					//endless loop).  Setting just the scroll value does not
+//					//call updateBuffer
+//					if(curExtent != (lastScrollColEndPos - lastScrollColPos) ||
+//					   curMin != 0 || curMax != secondaryPaneSize) {
+//						getSecondaryScrollBar().setValues(lastScrollColPos,lastScrollColEndPos - lastScrollColPos,0,secondaryPaneSize);
+//						debug("ReScroll col left just. values, pane size: [" + secondaryPaneSize + "] pos [" + lastScrollColPos + "] extent [" + (lastScrollColEndPos - lastScrollColPos) + "] min [" + "0" + "] max [" + secondaryPaneSize + "]",6);
+//					} else if(curPos != lastScrollColPos) {
+//						getSecondaryScrollBar().setValue(lastScrollColPos);
+//						debug("ReScroll col left just. values, pane size: [" + secondaryPaneSize + "] pos [" + lastScrollColPos + "] extent [" + (lastScrollColEndPos - lastScrollColPos) + "] min [" + "0" + "] max [" + secondaryPaneSize + "]",6);
+//					} else {
+//						debug("Already there",6);
+//					}
+				}
+				//Only change the other values if something about them has
+				//changed (because it triggers an updateBuffer call and
+				//updateBuffer calls this method, which would create an
+				//endless loop).  Setting just the scroll value does not
+				//call updateBuffer
+				if(curExtent != (lastScrollColEndPos - lastScrollColPos) ||
+				   curMin != 0 || curMax != secondaryPaneSize) {
+					getSecondaryScrollBar().setValues(lastScrollColPos,lastScrollColEndPos - lastScrollColPos,0,secondaryPaneSize);
+					debug("ReScroll col left just. values, pane size: [" + secondaryPaneSize + "] pos [" + lastScrollColPos + "] extent [" + (lastScrollColEndPos - lastScrollColPos) + "] min [" + "0" + "] max [" + secondaryPaneSize + "]",6);
+				} else if(curPos != lastScrollColPos) {
+					getSecondaryScrollBar().setValue(lastScrollColPos);
+					debug("ReScroll col left just. to pos, pane size: [" + secondaryPaneSize + "] pos [" + lastScrollColPos + "] extent [" + (lastScrollColEndPos - lastScrollColPos) + "] min [" + "0" + "] max [" + secondaryPaneSize + "]",6);
+				} else {
+					debug("Already there",6);
 				}
 			}
 		}
