@@ -633,7 +633,8 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	 * @param filename The path/ name of the file to be loaded.
 	 * @return String[][] The preview data in array format for use in JTable.
 	 */
-	public static String[][] loadPreviewData(final String filename) {
+	public static String[][] loadPreviewData(final String filename, 
+			final String delimiter) {
 
 		String[][] previewData;
 		
@@ -641,7 +642,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			final BufferedReader br = new BufferedReader(new FileReader(
 					filename));
 
-			previewData = extractPreviewData(br);
+			previewData = extractPreviewData(br, delimiter);
 
 			br.close();
 
@@ -661,7 +662,8 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	 * @return String[][] The preview data in array format for use in JTable.
 	 * @author chris0689
 	 */
-	private static String[][] extractPreviewData(final BufferedReader reader) {
+	private static String[][] extractPreviewData(final BufferedReader reader,
+			final String delimiter) {
 
 		final int LIMIT = 20;
 		final String[][] previewData = new String[LIMIT][];
@@ -672,12 +674,13 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			while ((line = reader.readLine()) != null && count < LIMIT) {
 
 				// load line as String array
-				final String[] lineAsStrings = line.split("\\t", -1);
+				final String[] lineAsStrings = line.split(delimiter, -1);
 				previewData[count++] = Arrays.copyOfRange(lineAsStrings, 1, 
 						LIMIT);
 			}
 		} catch (final IOException e) {
 			LogBuffer.logException(e);
+			return new String[][]{{"N/A"}};
 		}
 
 		return previewData;

@@ -21,8 +21,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
-import ColorChooser.ColorChooserUI;
 import ColorChooser.ColorChooserController;
+import ColorChooser.ColorChooserUI;
 import Utilities.StringRes;
 import Views.ClusterDialog;
 import Views.ClusterView;
@@ -52,7 +52,6 @@ import edu.stanford.genetics.treeview.model.TVModel;
 //import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
 //=======
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
-import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
 //>>>>>>> colorUpdate
 import edu.stanford.genetics.treeview.plugin.dendroview.DoubleArrayDrawer;
 
@@ -522,8 +521,10 @@ public class TVController implements Observer {
 				DataImportController importController = 
 						new DataImportController(loadPreview);
 				
+				String[][] previewData;
 				importController.setFileSet(tvFrame.getFileSet(file));
-				importController.loadPreviewData();
+				previewData = importController.loadPreviewData();
+				loadPreview.setNewTable(previewData);
 				importController.setDialogVisible();
 				
 

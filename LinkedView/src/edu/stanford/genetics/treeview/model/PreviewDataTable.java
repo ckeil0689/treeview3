@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -30,6 +31,7 @@ public class PreviewDataTable extends JTable {
 		
 		setData(previewData);
 		setDefaultRenderer(String.class, renderer);
+		setBorder(BorderFactory.createMatteBorder(1, 1, 2, 1, new Color(230, 230, 230)));
 		setTableHeader(null);
 		setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		setDefaultColumnWidth();
@@ -48,9 +50,10 @@ public class PreviewDataTable extends JTable {
 		renderer.includeLabelsUpTo(maxRow, maxCol);
 	}
 	
-	private void setData(String[][] previewData) {
+	public void setData(String[][] previewData) {
 		
 		DefaultTableModel model = (DefaultTableModel) getModel();
+		model.setRowCount(0);
 		
 		for(String[] row : previewData) {
 			model.addRow(row);
