@@ -9,14 +9,13 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
-import Utilities.GUIFactory;
 
 public class PreviewDataTable extends JTable {
 
 	/** Keeping Eclipse happy...*/
 	private static final long serialVersionUID = 1L;
 	
-	private static final Color CELL_HIGHLIGHT = new Color(204, 255, 255);
+	private static final Color CELL_HIGHLIGHT = new Color(67, 134, 245);
 	
 	private static final int COLUMN_WIDTH = 100;
 	private static final int ROW_HEIGHT = 30;
@@ -27,11 +26,9 @@ public class PreviewDataTable extends JTable {
 		
 		super(getNewDefaultTableModel(headers, 0));
 		
-		// TODO implement custom table model for data refreshing
-		setData(previewData);
 		this.renderer = new LabelCellRenderer();
 		
-//		setModel(getNewDefaultTableModel());
+		setData(previewData);
 		setDefaultRenderer(String.class, renderer);
 		setTableHeader(null);
 		setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -108,10 +105,7 @@ public class PreviewDataTable extends JTable {
 		public LabelCellRenderer() {
 			
 			this.label_rows = new ArrayList<Integer>();
-//			label_rows.add(Integer.valueOf(0));
-			
 			this.label_cols = new ArrayList<Integer>();
-//			label_cols.add(Integer.valueOf(0));
 		}
 		
 		@Override
@@ -133,8 +127,10 @@ public class PreviewDataTable extends JTable {
 		       /* Apply highlighting (or not) */
 		       if (adjustRowComp || adjustColumnComp) {
 		    	   c.setBackground(PreviewDataTable.CELL_HIGHLIGHT); 
+		    	   c.setForeground(Color.WHITE);
 		    	   
 		       } else {
+		    	   c.setForeground(Color.BLACK);
 		    	   Color cellColor = Color.WHITE;
 		    	   if(row % 2 != 0) {
 		    		   cellColor = new Color(245, 245, 245);
