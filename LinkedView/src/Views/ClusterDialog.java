@@ -62,22 +62,4 @@ public class ClusterDialog extends CustomDialog {
 
 		return clusterView;
 	}
-
-	/**
-	 * Test method to check UI and UX.
-	 *
-	 * @param args
-	 */
-	public static void main(final String[] args) {
-
-		// SwingUtilities.invokeLater(new Runnable() {
-		//
-		// @Override
-		// public void run() {
-		//
-		// new JFrame(); // needs top level frame to center jDialog
-		// new ClusterDialog(ClusterView.KMEANS).setVisible(true);
-		// }
-		// });
-	}
 }

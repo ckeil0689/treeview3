@@ -139,6 +139,9 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	}
 
 	/* ---- Loading methods -------- */
+	// TODO turn this whole thing into a STATIC method which can ATTEMPT to 
+	// find data and then display it in the preview. Let users adjust first.
+	
 	private String[] findData(final String line, final int current_row) {
 
 		/* Flag for the current_row to avoid adding weights/labels as data. */
@@ -279,7 +282,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		final String[] labels = new String[dataStartCol];
 		final double[] dataValues = new double[lineAsStrings.length
 		                                       - dataStartCol];
-
+		
 		System.arraycopy(lineAsStrings, 0, labels, 0, dataStartCol);
 
 		/*

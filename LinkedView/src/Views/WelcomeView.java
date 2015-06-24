@@ -8,6 +8,7 @@ import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -163,13 +164,18 @@ public class WelcomeView {
 		loadButton = GUIFactory.createLargeBtn("Open...");
 		loadButton.requestFocusInWindow();
 		loadLastButton = GUIFactory.createBtn("Load last file");
-		loadLastButton.setEnabled(fs != null);
 		
 		String filename;
 		if(fs != null) {
 			filename = fs.getCdt();
+			loadLastButton.setEnabled(true);
+			((JFrame) JFrame.getFrames()[0]).getRootPane()
+			.setDefaultButton(loadLastButton);
 		} else {
 			filename = "none";
+			loadLastButton.setEnabled(false);
+			((JFrame) JFrame.getFrames()[0]).getRootPane()
+			.setDefaultButton(loadButton);
 		}
 		
 		JLabel last = new JLabel("Last file: ");

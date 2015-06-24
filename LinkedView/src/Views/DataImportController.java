@@ -6,6 +6,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.List;
 
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -71,28 +72,21 @@ public class DataImportController {
 		return previewData;
 	}
 	
-	private void setPreviewStatus() {
-		
-		if(previewDialog.allowsProceed()) {
-			previewDialog.setStatus(DataImportDialog.LABELS_READY);
-		} else {
-			previewDialog.setStatus(DataImportDialog.LABELS_HINT);
-		}
-	}
-	
 	private void updateSelectedDelimiter() {
 		
 		selectedDelimiter = "";
+		int addCount = 0;
 		
 		List<JCheckBox> delimiters = previewDialog.getDelimiterList();
 		
 		for(JCheckBox cb : delimiters) {
 			
 			if(cb.isSelected()) {
-				if(delimiters.indexOf(cb) > 0) {
-					selectedDelimiter += "|" + getDelimiter(delimiters.indexOf(cb));
+				final int idx = delimiters.indexOf(cb);
+				if(addCount++ > 0) {
+					selectedDelimiter += "|" + getDelimiter(idx);
 				} else {
-					selectedDelimiter += getDelimiter(delimiters.indexOf(cb));
+					selectedDelimiter += getDelimiter(idx);
 				}
 			}
 		}
@@ -161,7 +155,7 @@ public class DataImportController {
 					.getValue();
 			
 			previewDialog.updateTableLabels(maxRow, maxCol);
-			setPreviewStatus();
+			previewDialog.setPreviewStatus();
 		}
 	}
 	
@@ -171,7 +165,7 @@ public class DataImportController {
 		public void itemStateChanged(ItemEvent e) {
 			
 			previewDialog.setNoLabelSpinnerStatus();
-			setPreviewStatus();
+			previewDialog.setPreviewStatus();
 		}
 	}
 }

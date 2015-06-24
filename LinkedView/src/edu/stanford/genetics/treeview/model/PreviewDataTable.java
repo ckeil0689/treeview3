@@ -31,12 +31,16 @@ public class PreviewDataTable extends JTable {
 		
 		setData(previewData);
 		setDefaultRenderer(String.class, renderer);
-		setBorder(BorderFactory.createMatteBorder(1, 1, 2, 1, new Color(230, 230, 230)));
+		setBorder(BorderFactory.createMatteBorder(1, 1, 2, 1, 
+				new Color(230, 230, 230)));
 		setTableHeader(null);
 		setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		setDefaultColumnWidth();
 		setRowHeight(ROW_HEIGHT);
 		setPreferredScrollableViewportSize(getPreferredSize());
+		setFocusable(false);
+		setRowSelectionAllowed(false);
+		setColumnSelectionAllowed(false);
 	}
 	
 	/**
