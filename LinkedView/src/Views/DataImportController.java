@@ -33,6 +33,7 @@ public class DataImportController {
 	private void addAllListeners() {
 		
 		previewDialog.addDelimCheckBoxesListener(new DelimiterListener());
+		previewDialog.addSpinnerListeners(new LabelIncludeListener());
 	}
 	
 	public void setFileSet(FileSet fs) {
@@ -76,5 +77,19 @@ public class DataImportController {
 		}
 		
 		
+	}
+	
+	private class LabelIncludeListener implements ChangeListener {
+
+		@Override
+		public void stateChanged(final ChangeEvent e) {
+			
+			int maxRow = (Integer) previewDialog.getRowStartSpinner()
+					.getValue();
+			int maxCol = (Integer) previewDialog.getColStartSpinner()
+					.getValue();
+			
+			previewDialog.updateTableLabels(maxRow, maxCol);
+		}
 	}
 }
