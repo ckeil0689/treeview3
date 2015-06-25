@@ -725,6 +725,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 			/* Draw the labels */
 			final Color fore = GUIFactory.MAIN;
+			Color bgColor;
 			int hoverStyle = Font.BOLD | style;
 			if(drawLabelPort) {
 				//See if the labels are going to be offset because they are near
@@ -793,17 +794,14 @@ public abstract class LabelView extends ModelView implements MouseListener,
 						debug("edgeOffset: [" + edgeOffset + "]",3);
 						yPos -= edgeOffset;
 						if(yPos > -ascent / 2) {
-							drawLabelBackground(g,j,yPos - ascent);
+							bgColor = drawLabelBackground(g,j,yPos - ascent);
 							if(yPos >= ascent){
 								labelStart = j;
-								if(j == activeHoverDataIndex) {
-									g2d.setColor(labelColor);
-								} else {
-									g2d.setColor(labelPortColor);
+								if(j != activeHoverDataIndex) {
+									labelColor = labelPortColor;
 								}
-							} else {
-								g2d.setColor(labelColor);
 							}
+							g2d.setColor(labelColor);
 							if(j == activeHoverDataIndex) {
 								debug("Drawing " +
 					                  (isGeneAxis ? "ROW" : "COL") + " hover font BOLD [" + hoverStyle + "].",5);
@@ -814,7 +812,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 							g2d.drawString(out,
 							               xPos + ((isGeneAxis == isRightJustified) ? (drawLabelPort ? indicatorThickness : labelIndent) * (isGeneAxis ? -1 : 1) : 0),
 							               yPos);
-							drawOverrunArrows(metrics.stringWidth(out),g);
+							drawOverrunArrows(metrics.stringWidth(out),g,yPos - ascent,curFontSize,g2d.getColor(),bgColor);
 						}
 
 					}
@@ -868,16 +866,16 @@ public abstract class LabelView extends ModelView implements MouseListener,
 						debug("edgeOffset: [" + edgeOffset + "]",3);
 						yPos -= edgeOffset;
 						if(yPos < fullPaneSize + ascent / 2) {
-							drawLabelBackground(g,j,yPos - ascent);
+							bgColor = drawLabelBackground(g,j,yPos - ascent);
 							if(yPos <= fullPaneSize) {
 								labelEnd = j;
-								g2d.setColor(labelPortColor);
-							} else {
-								g2d.setColor(labelColor);
+								labelColor = labelPortColor;
 							}
+							g2d.setColor(labelColor);
 							g2d.drawString(out,
 							               xPos + ((isGeneAxis == isRightJustified) ? (drawLabelPort ? indicatorThickness : labelIndent) * (isGeneAxis ? -1 : 1) : 0),
 							               yPos);
+							drawOverrunArrows(metrics.stringWidth(out),g,yPos - ascent,curFontSize,labelColor,bgColor);
 						}
 
 					}
@@ -1350,9 +1348,10 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		}
 	}
 
-	public void drawLabelBackground(final Graphics g,int j,int yPos) {
+	public Color drawLabelBackground(final Graphics g,int j,int yPos) {
 		final int bgColorIndex = headerInfo.getIndex("BGCOLOR");
 		final String[] strings = headerInfo.getHeader(j);
+		Color bgColor = textBGColor;
 		boolean isSelecting =
 			(map.isSelecting() &&
 		     ((j >= map.getSelectingStart() && j <= map.getHoverIndex()) ||
@@ -1361,8 +1360,10 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			if(drawSelection.isIndexSelected(j) || isSelecting) {
 				debug("Drawing yellow background for selected index [" + j + "]",4);
 				g.setColor(selectionTextBGColor);
+				bgColor = selectionTextBGColor;
 			} else if(bgColorIndex > 0) {
 				g.setColor(TreeColorer.getColor(strings[bgColorIndex]));
+				bgColor = TreeColorer.getColor(strings[bgColorIndex]);
 			}
 		}
 		catch(final Exception e) {
@@ -1381,6 +1382,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				           size + SQUEEZE);
 			}
 		}
+		return(bgColor);
 	}
 
 	/**
@@ -1997,11 +1999,104 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	}
 
 	/**
-	 * This method computes the x coordinate of where the label should be drawn
-	 * in order to keep it at least partially in view at any scroll position
+	 * This method decides where to draw arrows when labels that run out of the
+	 * viewport view and calls the appropriate arrow drawing function
 	 * @return
 	 */
-	public void drawOverrunArrows(int labelLen,final Graphics g) {
+	public void drawOverrunArrows(int labelLen,final Graphics g,int yPos,int height,Color fgColor,Color bgColor) {
+		int paneSize = (isGeneAxis ? rowLabelPaneSize : colLabelPaneSize);
+		int indent = (doDrawLabelPort() ? indicatorThickness : labelIndent);
+		if(isGeneAxis) {
+			debug("Rows. Viewport size: [" + getSecondaryScrollBar().getModel().getExtent() + "] Pane Size: [" + paneSize + "]",7);
+			if(lastScrollRowEndPos != -1 && lastScrollRowPos != -1 &&
+				labelLen > (/* Extent */ lastScrollRowEndPos - lastScrollRowPos)) {
+				if(lastScrollRowPos == 0) {
+					//Draw arrow on right side
+					drawRightArrow(g,yPos,lastScrollRowEndPos - indent - 1,height,fgColor,bgColor);
+				} else if(lastScrollRowEndGap == 0) {
+					//Draw arrow on left side
+					drawLeftArrow(g,yPos,lastScrollRowPos,height,fgColor,bgColor);
+				} else {
+					//Draw Arrows on both sides
+					drawRightArrow(g,yPos,lastScrollRowEndPos - indent - 1,height,fgColor,bgColor);
+					drawLeftArrow(g,yPos,lastScrollRowPos,height,fgColor,bgColor);
+				}
+			}
+		} else {
+			debug("Columns. Viewport size: [" + getSecondaryScrollBar().getModel().getExtent() + "] Pane Size: [" + paneSize + "]",7);
+			if(lastScrollColEndPos != 0 && lastScrollColPos != -1 &&
+				(labelLen + indent) > (/* Extent */ lastScrollColEndPos - lastScrollColPos)) {
+				if(lastScrollColPos == 0) {
+					debug("Drawing left/down arrow at lastScrollColEndPos[" + lastScrollColEndPos + "]",7);
+					//Draw arrow on top
+					drawLeftArrow(g,yPos,paneSize - (lastScrollColEndPos - indent - 1),height,fgColor,bgColor);
+				} else if(lastScrollColEndGap == 0) {
+					//Draw arrow on bottom
+					drawRightArrow(g,yPos,paneSize - lastScrollColPos,height,fgColor,bgColor);
+				} else {
+					//Draw Arrows on both sides
+					debug("Drawing left/down arrow at lastScrollColEndPos[" + lastScrollColEndPos + "]",7);
+					drawRightArrow(g,yPos,paneSize - lastScrollColPos,height,fgColor,bgColor);
+					drawLeftArrow(g,yPos,paneSize - (lastScrollColEndPos - indent - 1),height,fgColor,bgColor);
+				}
+			}
+		}
+	}
 
+	/**
+	 * This method draws arrows for labels that run out of the
+	 * viewport view.  Call BEFORE rotating the column labels
+	 * @return
+	 */
+	public void drawLeftArrow(final Graphics g,int yTop,int xLeft,int height,Color fgColor,Color bgColor) {
+		//Drag a background box to cover up text that we're going to draw over
+		g.setColor(bgColor);
+		g.fillRect(xLeft - 1, //1 is a fudge factor - don't know why I need it
+		           yTop,(int) Math.floor(height / 2) + 2,height);
+		//Make the arrow a little smaller
+		height -= 2;
+		//Make sure there's an odd number of pixels
+		if(height % 2 == 0) {
+			height--;
+		}
+		if(height < 1) return;
+		//We can do a better job of drawing an equilateral triangle than the polygon method does by drawing smaller and smaller lines in a loop
+		g.setColor(fgColor);
+		int curheight = height;
+		int indent = 0;
+		for(int xcoord = xLeft + (int) Math.floor(height / 2);xcoord >= xLeft;xcoord--) {
+			g.drawLine(xcoord,yTop + indent,xcoord,yTop + indent + curheight);
+			curheight -= 2;
+			indent += 1;
+			if(height < 1) break; //Just in case
+		}
+	}
+
+	/**
+	 * This method draws arrows for labels that run out of the
+	 * viewport view.  Call BEFORE rotating the column labels
+	 * @return
+	 */
+	public void drawRightArrow(final Graphics g,int yTop,int xRight,int height,Color fgColor,Color bgColor) {
+		//Drag a background box to cover up text that we're going to draw over
+		g.setColor(bgColor);
+		g.fillRect(xRight - (int) Math.floor(height / 2) - 2,yTop,(int) Math.floor(height / 2) + 2,height);
+		//Make the arrow a little smaller
+		height -= 2;
+		//Make sure there's an odd number of pixels
+		if(height % 2 == 0) {
+			height--;
+		}
+		//We can do a better job of drawing an equilateral triangle than the polygon method does by drawing smaller and smaller lines in a loop
+		g.setColor(fgColor);
+		int curheight = height;
+		int indent = 0;
+		for(int xcoord = xRight - (int) Math.floor(height / 2);xcoord <= xRight;xcoord++) {
+			debug("Drawing RIGHT ARROW",7);
+			g.drawLine(xcoord,yTop + indent,xcoord,yTop + indent + curheight);
+			curheight -= 2;
+			indent += 1;
+			if(height < 1) break; //Just in case
+		}
 	}
 }

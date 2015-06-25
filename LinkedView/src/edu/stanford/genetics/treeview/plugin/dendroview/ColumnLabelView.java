@@ -441,7 +441,7 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 		lastScrollColEndGap = endGap;
 	}
 
-	/* TODO: Elminate this and use adjustmentValueChanged instead because it is more holistic */
+	/* TODO: Eliminate this and use adjustmentValueChanged instead because it is more holistic */
 	@Override
 	public void mouseWheelMoved(final MouseWheelEvent e) {
 
@@ -467,7 +467,6 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 			if(shift == 0) return;
 			debug("Scrolling vertically from [" + j + "] by [" + shift + "]",1);
 			lastScrollColPos = j + shift;
-			getSecondaryScrollBar().setValue(j + shift);
 			lastScrollColEndPos = lastScrollColPos +
 			                      getSecondaryScrollBar().getModel()
 			                      .getExtent();
@@ -482,13 +481,16 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 				lastScrollColEndGap += lastScrollColPos;
 				lastScrollColPos = 0;
 			}
+			getSecondaryScrollBar().setValue(j + shift);
 			debug("New secondary col scroll position [" + lastScrollColPos + "] end pos: [" +
 			      lastScrollColEndPos + "] end gap: [" + lastScrollColEndGap +
 			      "] out of [" + getSecondaryScrollBar().getMaximum() + "]",1);
+			//paintImmediately(0, 0, getWidth(), getHeight());
 		}
 
 		//revalidate();
 		//repaint();
+		//paintImmediately(0, 0, getWidth(), getHeight());
 	}
 
 	public void adjustmentValueChanged(AdjustmentEvent evt) {
@@ -532,14 +534,15 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
     					updateScroll = false;
     					break;
 				}
-				debug("Scrolling from: [" + source.getValue() + " or (" + oldvalue + ")" + "] to: [" + newvalue + "] via [" + evt.getSource() + "]",6);
 				if(updateScroll) {
+					debug("Scrolling from: [" + source.getValue() + " or (" + oldvalue + ")" + "] to: [" + newvalue + "] via [" + evt.getSource() + "]",7);
 					explicitSecondaryScrollTo(newvalue,-1,-1);
 				}
 			}
 		}
 		if(updateScroll) {
 			repaint();
+			//paintImmediately(0, 0, getWidth(), getHeight());
 		}
 	}
 }

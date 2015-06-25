@@ -488,6 +488,7 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 			debug("New scroll position [" + lastScrollRowPos + "] end pos: [" +
 			      lastScrollRowEndPos + "] end gap: [" + lastScrollRowEndGap +
 			      "] out of [" + getSecondaryScrollBar().getMaximum() + "]",2);
+			paintImmediately(0, 0, getWidth(), getHeight());
 		} else {
 			//Value of label length scrollbar
 			map.scrollBy(shift, false);
