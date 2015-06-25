@@ -71,6 +71,7 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 			@Override
 			public void mousePressed(MouseEvent e) {
 				map.setRowLabelsBeingScrolled(true);
+				updateDragScrollTimer.start();
 				debug("The mouse has clicked a row label scrollbar",2);
 				if(activeScrollLabelPortOffTimer != null) {
 					/* Event came too soon, swallow by resetting the timer.. */
@@ -81,6 +82,7 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
+				updateDragScrollTimer.stop();
 				debug("The mouse has released a row label scrollbar",2);
 				//Turn off the "over a label port view" boolean after a bit
 				if(activeScrollLabelPortOffTimer == null) {
@@ -575,4 +577,17 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 			repaint();
 		}
 	}
+
+	//This is an attempt to get the dragging of the scroll handle to correctly redraw the labels in the correct positions
+	private int updateDragScrollInterval = 10;  // update every X milliseconds
+	private Timer updateDragScrollTimer =
+		new Timer(updateDragScrollInterval,
+		          new ActionListener() {
+			@Override
+			public void
+			actionPerformed(ActionEvent e) {
+				explicitSecondaryScrollTo(getSecondaryScrollBar().getValue(),-1,-1);
+				repaint();
+			}
+		});
 }

@@ -71,6 +71,7 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 			@Override
 			public void mousePressed(MouseEvent e) {
 				map.setColLabelsBeingScrolled(true);
+				updateDragScrollTimer.start();
 				paintImmediately(0,0,getWidth(),colLabelPaneSize);
 				debug("The mouse has clicked a column label scrollbar",6);
 				if(activeScrollLabelPortOffTimer != null) {
@@ -83,6 +84,7 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				debug("The mouse has released a column label scrollbar",2);
+				updateDragScrollTimer.stop();
 				//Turn off the "over a label port view" boolean after a bit
 				if(activeScrollLabelPortOffTimer == null) {
 					if(labelPortOffDelay == 0) {
@@ -503,7 +505,7 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 		boolean updateScroll = false;
 		//This if conditional catches drags
 		if(!evt.getValueIsAdjusting() && map.areColLabelsBeingScrolled()) {
-			System.out.println("The knob on the scrollbar is being dragged");
+			debug("The knob on the scrollbar is being dragged",7);
 			updateScroll = true;
 			explicitSecondaryScrollTo(oldvalue,-1,-1);
 		}
@@ -545,4 +547,17 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 			//paintImmediately(0, 0, getWidth(), getHeight());
 		}
 	}
+
+	//This is an attempt to get the dragging of the scroll handle to correctly redraw the labels in the correct positions
+	private int updateDragScrollInterval = 10;  // update every X milliseconds
+	private Timer updateDragScrollTimer =
+		new Timer(updateDragScrollInterval,
+		          new ActionListener() {
+			@Override
+			public void
+			actionPerformed(ActionEvent e) {
+				explicitSecondaryScrollTo(getSecondaryScrollBar().getValue(),-1,-1);
+				repaint();
+			}
+		});
 }
