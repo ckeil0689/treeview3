@@ -103,7 +103,7 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 			}
 		});
 
-		debug = 6;
+		debug = 7;
 		getSecondaryScrollBar().addAdjustmentListener(this);
 	}
 
@@ -456,6 +456,7 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 			map.scrollBy(shift, false);
 			updatePrimaryHoverIndex();
 		} else {
+			shift = (notches < 0) ? -6 : 6;
 			final int j = getSecondaryScrollBar().getValue();
 			if(j + shift < 0) {
 				shift = -j;
@@ -486,8 +487,8 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 			      "] out of [" + getSecondaryScrollBar().getMaximum() + "]",1);
 		}
 
-		revalidate();
-		repaint();
+		//revalidate();
+		//repaint();
 	}
 
 	public void adjustmentValueChanged(AdjustmentEvent evt) {

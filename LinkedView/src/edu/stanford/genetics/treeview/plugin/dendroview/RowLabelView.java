@@ -102,7 +102,7 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 			}
 		});
 
-		debug = 0;
+		debug = 7;
 		//Listen for value changes in the scroll pane's scrollbars
 		getSecondaryScrollBar().addAdjustmentListener(this);
 	}
@@ -445,7 +445,7 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 		hoverPixel = e.getY();
 	}
 
-	/* TODO: Elminate this and use adjustmentValueChanged instead because it is more holistic */
+	/* TODO: Eliminate this and use adjustmentValueChanged instead because it is more holistic */
 	@Override
 	public void mouseWheelMoved(final MouseWheelEvent e) {
 
@@ -457,6 +457,7 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 		// On macs' magic mouse, horizontal scroll comes in as if the shift was
 		// down
 		if(e.isShiftDown()) {
+			shift = (notches < 0) ? -6 : 6;
 			final int j = getSecondaryScrollBar().getValue();
 			/* TODO: If the following works, I need to copy it to ColumnLabelView's corresponding method */
 			if(j + shift < 0) {
@@ -497,7 +498,7 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 		//repaint();
 		//repaint wasn't always updating the last paint step, but paintImmediately (and an invokdeLater also) seems to work
 		//I think it's because the updateBuffer finds out if it needs to change anything from the map object
-		paintImmediately(0, 0, getWidth(), getHeight());
+		//paintImmediately(0, 0, getWidth(), getHeight());
 	}
 
 	public void explicitSecondaryScrollTo(int pos,int endPos,int endGap) {
@@ -563,7 +564,7 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 						updateScroll = false;
 						break;
 				}
-				debug("Scrolling from: [" + source.getValue() + " or (" + oldvalue + ")" + "] to: [" + newvalue + "] via [" + evt.getSource() + "]",2);
+				debug("Scrolling from: [" + source.getValue() + " or (" + oldvalue + ")" + "] to: [" + newvalue + "] via [" + evt.getSource() + "]",7);
 				if(updateScroll) {
 					explicitSecondaryScrollTo(newvalue,-1,-1);
 				}

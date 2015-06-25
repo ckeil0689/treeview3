@@ -778,10 +778,13 @@ public abstract class LabelView extends ModelView implements MouseListener,
 						g2d.setColor(labelColor);
 
 						/* Finally draw label (alignment-dependent) */
-						int xPos = 0;
-						if(isRightJustified) {
-							xPos = stringX - metrics.stringWidth(out);
-						}
+//						int xPos = 0;
+//						if(isRightJustified) {
+//							xPos = stringX - metrics.stringWidth(out);
+//						}
+//						//Subtracting 10 pixels because the labels are being drawn under the divider bar
+						int xPos = getLabelOffset(metrics.stringWidth(out));
+						debug("Label offset: [" + getLabelOffset(metrics.stringWidth(out)) + "]",7);
 
 						int indexDiff = j - activeHoverDataIndex;
 						int yPos = hoverYPos + indexDiff *
@@ -811,6 +814,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 							g2d.drawString(out,
 							               xPos + ((isGeneAxis == isRightJustified) ? (drawLabelPort ? indicatorThickness : labelIndent) * (isGeneAxis ? -1 : 1) : 0),
 							               yPos);
+							drawOverrunArrows(metrics.stringWidth(out),g);
 						}
 
 					}
@@ -851,10 +855,12 @@ public abstract class LabelView extends ModelView implements MouseListener,
 						}
 
 						/* Finally draw label (alignment-dependent) */
-						int xPos = 0;
-						if(isRightJustified) {
-							xPos = stringX - metrics.stringWidth(out);
-						}
+//						int xPos = 0;
+//						if(isRightJustified) {
+//							xPos = stringX - metrics.stringWidth(out);
+//						}
+						int xPos = getLabelOffset(metrics.stringWidth(out));
+						debug("Label offset: [" + getLabelOffset(metrics.stringWidth(out)) + "]",7);
 
 						int indexDiff = j - activeHoverDataIndex;
 						int yPos = hoverYPos + indexDiff *
@@ -1923,5 +1929,79 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				colLabelPaneSize = offscreenSize.height;
 			}
 		}
+	}
+
+	/**
+	 * This method computes the x coordinate of where the label should be drawn
+	 * in order to keep it at least partially in view at any scroll position
+	 * @return
+	 */
+	public int getLabelOffset(int labelLen) {
+		int offset = 0;
+		int paneSize = (isGeneAxis ? rowLabelPaneSize : colLabelPaneSize);
+		int indent = (doDrawLabelPort() ? indicatorThickness : labelIndent);
+		if(isGeneAxis) {
+			if(isRightJustified) {
+				debug("Right justified rows. Viewport size: [" + getSecondaryScrollBar().getModel().getExtent() + "] Pane Size: [" + paneSize + "]",7);
+				if(lastScrollRowEndPos != -1 && lastScrollRowPos != -1 &&
+					labelLen > (/* Extent */ lastScrollRowEndPos - lastScrollRowPos)) {
+    				if(lastScrollRowPos != -1 &&
+    					lastScrollRowPos < (paneSize - labelLen)) {
+    					offset = lastScrollRowPos + indent;
+    				} else {
+    					offset = paneSize - labelLen;
+    				}
+				} else {
+					offset = lastScrollRowEndPos - labelLen;
+				}
+			} else {
+				labelLen += indent;
+				debug("Left justified rows. Viewport size: [" + getSecondaryScrollBar().getModel().getExtent() + "] Pane Size: [" + paneSize + "]",7);
+				if(lastScrollRowEndPos != -1 && lastScrollRowPos != -1 &&
+					labelLen > (/* Extent */ lastScrollRowEndPos - lastScrollRowPos)) {
+					if(lastScrollRowEndPos != -1 && lastScrollRowEndPos > labelLen) {
+						offset = lastScrollRowEndPos - labelLen;
+					}
+				} else {
+					offset = lastScrollRowPos;
+				}
+			}
+		} else {
+			if(isRightJustified) {
+				debug("Top justified columns. Viewport size: [" + getSecondaryScrollBar().getModel().getExtent() + "] Pane Size: [" + paneSize + "]",7);
+				if(lastScrollColEndPos != 0 && lastScrollColPos != -1 &&
+					(labelLen + indent) > (/* Extent */ lastScrollColEndPos - lastScrollColPos)) {
+					if(lastScrollColEndPos != -1 && (labelLen + indent) >= lastScrollColEndPos) {
+						offset = paneSize - labelLen;
+					} else {
+						offset = lastScrollColEndGap + indent;
+					}
+				} else {
+					offset = lastScrollColEndGap + (/* Extent */ lastScrollColEndPos - lastScrollColPos) - labelLen;
+				}
+				if(labelLen >= 390) debug("Got it! [" + labelLen + "]",7);
+			} else {
+				labelLen += indent;
+				debug("Bottom justified columns. Viewport size: [" + getSecondaryScrollBar().getModel().getExtent() + "] Pane Size: [" + paneSize + "]",7);
+				if(lastScrollColEndPos != -1 && lastScrollColPos != -1 &&
+					labelLen > (/* Extent */ lastScrollColEndPos - lastScrollColPos)) {
+					if(lastScrollColPos < (paneSize - labelLen)) {
+						offset = lastScrollColEndGap + (/* Extent */ lastScrollColEndPos - lastScrollColPos) - labelLen;
+					}
+				} else {
+					offset = lastScrollColEndGap;
+				}
+			}
+		}
+		return(offset);
+	}
+
+	/**
+	 * This method computes the x coordinate of where the label should be drawn
+	 * in order to keep it at least partially in view at any scroll position
+	 * @return
+	 */
+	public void drawOverrunArrows(int labelLen,final Graphics g) {
+
 	}
 }
