@@ -525,6 +525,7 @@ public class TVController implements Observer {
 				importController.setFileSet(tvFrame.getFileSet(file));
 				previewData = importController.loadPreviewData();
 				loadPreview.setNewTable(previewData);
+				
 				importController.setDialogVisible();
 				
 

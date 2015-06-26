@@ -235,6 +235,11 @@ public class DataImportDialog extends CustomDialog {
 		return columnNames;
 	}
 	
+	public void addDataDetectListener(ActionListener l) {
+		
+		findDataBtn.addActionListener(l);
+	}
+	
 	public void updateTableLabels(int maxRow, int maxCol) {
 		
 		dataTable.includeLabelsUpTo(maxRow, maxCol);
@@ -330,6 +335,12 @@ public class DataImportDialog extends CustomDialog {
 		
 		setStatus(message);
 		getRootPane().setDefaultButton(defaultBtn);
+	}
+	
+	public void setSpinnerValues(final int rowCount, final int columnCount) {
+		
+		rowDataStart.setValue(Integer.valueOf(rowCount));
+		columnDataStart.setValue(Integer.valueOf(columnCount));
 	}
 	
 	public JSpinner getRowStartSpinner() {

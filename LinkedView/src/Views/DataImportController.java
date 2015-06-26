@@ -4,9 +4,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -45,6 +45,7 @@ public class DataImportController {
 		previewDialog.addDelimCheckBoxesListener(new DelimiterListener());
 		previewDialog.addSpinnerListeners(new LabelIncludeListener());
 		previewDialog.addNoLabelListener(new NoLabelListener());
+		previewDialog.addDataDetectListener(new DataDetectionListener());
 	}
 	
 	public void setFileSet(FileSet fs) {
@@ -124,6 +125,24 @@ public class DataImportController {
 			} 
 			
 			previewDialog.setStatus(DataImportDialog.LABELS_WARNING);
+		}
+	}
+	
+	private class DataDetectionListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			String filename = fileSet.getCdt(); 
+			int[] dataStartCoords = ModelLoader.findDataStartCoords(filename, 
+					selectedDelimiter);
+			
+			int rowCount = dataStartCoords[0] + 1;
+			int columnCount = dataStartCoords[1] + 1;
+			
+			LogBuffer.println("Found data start: " + Arrays.toString(dataStartCoords));
+			
+			previewDialog.setSpinnerValues(rowCount, columnCount);
+			
 		}
 	}
 	

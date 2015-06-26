@@ -34,21 +34,21 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	protected TVModel targetModel;
 	private final FileSet fileSet;
 
+	private String[][] rowLabels;
+	private String[][] columnLabels;
+	
 	/* 2D array to hold numerical data */
 	private double[][] doubleData;
 
 	/* Holds pattern which recognizes data in a tab-delimited file */
-	private String fpRegex;
+	private static String fpRegex = setupPattern();
 
 	/* Total line number of file to be loaded */
 	private int row_num;
 
 	private int dataStartRow;
-	private int dataStartCol;
-	private int lastLabelCol;
-	private int possibleLastLabelCol;
+	private int dataStartColumn;
 
-	private boolean hasData = false;
 	private boolean hasGID = false;
 	private boolean hasAID = false;
 	private boolean hasEWeight = false;
@@ -61,6 +61,12 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		this.fileSet = model.getFileSet();
 
 		setupPattern();
+	}
+	
+	public void setDataCoords(int dataStartRow, int dataStartColumn) {
+		
+		this.dataStartRow = dataStartRow;
+		this.dataStartColumn = dataStartColumn;
 	}
 
 	@Override
@@ -94,38 +100,25 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		final String[][] stringLabels = new String[row_num][];
 
 		String line;
-		lastLabelCol         = -1;
-		possibleLastLabelCol = -1;
-		dataStartRow         = 0;
-		dataStartCol         = 0;
-		int current_row      = 0;
+		int current_row = 0;
 
+		ls.setStatus("Loading...");
+		
 		/* Read all lines and parse the data */
 		while ((line = reader.readLine()) != null) {
 
-			if (hasData) {
-				ls.setStatus("Loading...");
-				stringLabels[current_row] = fillDoubles(line, current_row);
-
-			} else {
-				stringLabels[current_row] = findData(line, current_row);
-				//Take care of the first row of data
-				if(hasData)
-					stringLabels[current_row] = fillDoubles(line, current_row);
-			}
-
+			stringLabels[current_row] = fillDoubles(line, current_row);
 			ls.setProgress(current_row++);
 			publish(ls);
 		}
-
-		reader.close();
 
 		ls.setStatus("Getting ready...");
 		publish(ls);
 
 		/* Parse tree and config files */
 		assignDataToModel(stringLabels);
-
+		
+		reader.close();
 		return null;
 	}
 
@@ -137,153 +130,123 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		/* Update GUI, set new DendroView */
 		controller.finishLoading();
 	}
+	
+	/** 
+	 * Check the labels for commonly used labels that are useful for TreeView.
+	 */
+	private void analyzeLabels(String[][] rowLabels, String[][] columnLabels) {
+//		/* Check string if it is the label for GIDs or AIDs. */
+//		if (element.equalsIgnoreCase("GID")) {
+//			if(i > lastLabelCol)
+//				lastLabelCol = i;
+//			if(i > possibleLastLabelCol)
+//				possibleLastLabelCol = i;
+//			hasGID = true;
+//			is_label_row = true;
+//		}
+//		else if (element.equalsIgnoreCase("AID")) {
+//			if(i > lastLabelCol)
+//				lastLabelCol = i;
+//			if(i > possibleLastLabelCol)
+//				possibleLastLabelCol = i;
+//			hasAID = true;
+//			is_label_row = true;
+//		}
+//		else if (element.equalsIgnoreCase("GWEIGHT")) {
+//			if(i > lastLabelCol)
+//				lastLabelCol = i;
+//			if(i > possibleLastLabelCol)
+//				possibleLastLabelCol = i;
+//			hasGWeight = true;
+//			is_label_row = true;
+//		}
+//		else if (element.equalsIgnoreCase("EWEIGHT")) {
+//			if(i > lastLabelCol)
+//				lastLabelCol = i;
+//			if(i > possibleLastLabelCol)
+//				possibleLastLabelCol = i;
+//			hasEWeight = true;
+//			is_label_row = true;
+//		}
+//		else if (element.equalsIgnoreCase("ORF")   ||
+//				 element.equalsIgnoreCase("GNAME") ||
+//				 element.equalsIgnoreCase("ID")    ||
+//				 element.equalsIgnoreCase("NAME")  ||
+//				 element.equalsIgnoreCase("UID")) {
+//			if(i > lastLabelCol)
+//				lastLabelCol = i;
+//			if(i > possibleLastLabelCol)
+//				possibleLastLabelCol = i;
+//			is_label_row = true;
+//		}
+	}
 
 	/* ---- Loading methods -------- */
 	// TODO turn this whole thing into a STATIC method which can ATTEMPT to 
 	// find data and then display it in the preview. Let users adjust first.
 	
-	private String[] findData(final String line, final int current_row) {
+	public static int[] findDataStartCoords(final String filename, 
+			final String delimiter) {
 
-		/* Flag for the current_row to avoid adding weights/labels as data. */
-		boolean is_label_row    = false;
-
-		// load line as String array
-		final String[] lineAsStrings = line.split("\\t", -1);
-		String[] labels;
-
-		// loop over String array to convert applicable String to double
-		// first find data start
-		labels = new String[lineAsStrings.length];
-
-		for (int i = 0; i < lineAsStrings.length; i++) {
-
-			final String element = lineAsStrings[i];
-
-			/* Check string if it is the label for GIDs or AIDs. */
-			if (element.equalsIgnoreCase("GID")) {
-				if(i > lastLabelCol)
-					lastLabelCol = i;
-				if(i > possibleLastLabelCol)
-					possibleLastLabelCol = i;
-				hasGID = true;
-				is_label_row = true;
-			}
-			else if (element.equalsIgnoreCase("AID")) {
-				if(i > lastLabelCol)
-					lastLabelCol = i;
-				if(i > possibleLastLabelCol)
-					possibleLastLabelCol = i;
-				hasAID = true;
-				is_label_row = true;
-			}
-			else if (element.equalsIgnoreCase("GWEIGHT")) {
-				if(i > lastLabelCol)
-					lastLabelCol = i;
-				if(i > possibleLastLabelCol)
-					possibleLastLabelCol = i;
-				hasGWeight = true;
-				is_label_row = true;
-			}
-			else if (element.equalsIgnoreCase("EWEIGHT")) {
-				if(i > lastLabelCol)
-					lastLabelCol = i;
-				if(i > possibleLastLabelCol)
-					possibleLastLabelCol = i;
-				hasEWeight = true;
-				is_label_row = true;
-			}
-			else if (element.equalsIgnoreCase("ORF")   ||
-					 element.equalsIgnoreCase("GNAME") ||
-					 element.equalsIgnoreCase("ID")    ||
-					 element.equalsIgnoreCase("NAME")  ||
-					 element.equalsIgnoreCase("UID")) {
-				if(i > lastLabelCol)
-					lastLabelCol = i;
-				if(i > possibleLastLabelCol)
-					possibleLastLabelCol = i;
-				is_label_row = true;
-			}
-			//Else if the value is all-caps and this has either already been
-			//identified as a label row or data has not yet been identified and
-			//all previous columns qualified as labels
-			else if(Pattern.matches("^[A-Z]{2,}$", element) &&
-					(is_label_row ||
-					 (dataStartRow == 0 && (possibleLastLabelCol + 1) == i)) &&
-					 current_row == 0) {
-				possibleLastLabelCol = i;
-				is_label_row = true;
-			}
-			//Else if the value is empty and this has either already been
-			//identified as a label row or data has not yet been identified and
-			//all previous columns qualified as labels
-			else if(element.equalsIgnoreCase("") &&
-					(is_label_row ||
-					 (dataStartRow == 0 && (possibleLastLabelCol + 1) == i)) &&
-					 current_row == 0) {
-				possibleLastLabelCol = i;
-//			} else if(!hasData) {
-//				LogBuffer.println("Column [" + i + "] Row [" + current_row +
-//						"] Value [" + element +
-//						"] hasn't matched a label. dataStartRow [" +
-//						dataStartRow + "] possibleLastLabelCol [" +
-//						possibleLastLabelCol + "] Matches pattern [" +
-//						(Pattern.matches("^[A-Z]{2,}$", element) ?
-//						 "YES" : "NO") + "]");
-			}
-
-			/*
-			 * If the current string matches the pattern and is not in a label
-			 * row and the index is greater than the last label column, we found
-			 * the data start!
-			 */
-			if (Pattern.matches(fpRegex, element) && !is_label_row
-					&& i > lastLabelCol) {
-
-				//If the current column is greater than what you would expect
-				//using uncommon or empty label headers
-				if((possibleLastLabelCol + 1) < i) {
-					LogBuffer.println("WARNING: Assuming data starts in " +
-							"column [" + (possibleLastLabelCol + 2) +
-							"].");
-					dataStartCol = possibleLastLabelCol + 1;
+		final int LIMIT = 20; // just check 20 first rows
+		int[] dataStartCoords = new int[2];
+		
+		try {
+			final BufferedReader br = new BufferedReader(new FileReader(
+					filename));
+			
+			String line;
+			int count = 0;
+			int lastLabelColumn = -1;
+			
+			while ((line = br.readLine()) != null && count++ < LIMIT) {
+		
+				// load line as String array
+				final String[] lineAsStrings = line.split(delimiter, -1);
+		
+				for (int i = 0; i < lineAsStrings.length; i++) {
+		
+					final String element = lineAsStrings[i];
+		
+					/*
+					 * If the current string matches the pattern and is not in a label
+					 * row and the index is greater than the last label column, we found
+					 * the data start!
+					 */
+					if (Pattern.matches(fpRegex, element) 
+							&& i > lastLabelColumn) {
+		
+						dataStartCoords[0] = count;
+						dataStartCoords[1] = i;
+						break;
+					}
+					
+					if(i > lastLabelColumn) {
+						lastLabelColumn = i;
+					}
+				
 				}
-				//
-				else if(lastLabelCol != possibleLastLabelCol) {
-					LogBuffer.println("WARNING: Assuming data starts in " +
-							"column [" + (i + 1) + "].");
-					dataStartCol = i;
-				} else {
-					dataStartCol = i;
-				}
-				dataStartRow = current_row;
-
-				/* Initialize data matrix */
-				doubleData = new double[row_num - dataStartRow][];
-
-				hasData = true;
-				break;
-
 			}
-			/*
-			 * Concatenate empty String, otherwise this will store a
-			 * reference to the entire line from reader even when loading
-			 * method and SwingWorker are closed. Strings are immutable!
-			 */
-			labels[i] = element + "";
+			br.close();
+			
+		} catch (final IOException e) {
+			LogBuffer.logException(e);
+			LogBuffer.println("Could not find data start coordinates.");
+			return new int[]{0, 0};
 		}
 
-		return labels;
+		return dataStartCoords;
 	}
 
 	private String[] fillDoubles(final String line, final int current_row) {
 
 		// load line as String array
 		final String[] lineAsStrings = line.split("\\t", -1);
-		final String[] labels = new String[dataStartCol];
+		final String[] labels = new String[dataStartColumn];
 		final double[] dataValues = new double[lineAsStrings.length
-		                                       - dataStartCol];
+		                                       - dataStartColumn];
 		
-		System.arraycopy(lineAsStrings, 0, labels, 0, dataStartCol);
+		System.arraycopy(lineAsStrings, 0, labels, 0, dataStartColumn);
 
 		/*
 		 * This ensures that references to immutable String (whole line from
@@ -294,9 +257,9 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			labels[i] += "";
 		}
 
-		for (int i = 0; i < lineAsStrings.length - dataStartCol; i++) {
+		for (int i = 0; i < lineAsStrings.length - dataStartColumn; i++) {
 
-			String element = lineAsStrings[i + dataStartCol];
+			String element = lineAsStrings[i + dataStartColumn];
 
 			// handle parseDouble error somehow?
 			// using the Pattern.matches method screws up
@@ -310,9 +273,8 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 				final double val = Double.parseDouble(element);
 				dataValues[i] = val;
 
-			} catch (final Exception e) {
-				final double val = DataModel.NODATA;
-				dataValues[i] = val;
+			} catch (final NumberFormatException e) {
+				dataValues[i] = DataModel.NODATA;
 			}
 		}
 
@@ -407,7 +369,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	 * Sets up regex patterns which will be used to differentiate between labels
 	 * and numerical data in tab-delimited table entries.
 	 */
-	private void setupPattern() {
+	private static String setupPattern() {
 
 		final String Digits = "(\\p{Digit}+)";
 		final String emptyDigits = "(\\p{Digit}*)";
@@ -417,7 +379,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		// signed decimal integer.
 		final String exp = "[eE][+-]?" + emptyDigits;
 
-		this.fpRegex = ("[\\x00-\\x20]*" + // Optional leading
+		return ("[\\x00-\\x20]*" + // Optional leading
 				// "whitespace"
 				"[+-]?(" + // Optional sign character
 				"NaN|" + // "NaN" string
@@ -452,7 +414,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	private void parsePrefixes(final String[][] stringLabels) {
 
 		/* lengths of prefix arrays */
-		final int nGenePrefix = dataStartCol;
+		final int nGenePrefix = dataStartColumn;
 		final int nExprPrefix = dataStartRow;
 
 		final String[] readGPrefixes = new String[nGenePrefix];
@@ -524,7 +486,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		final int nExpr = doubleData[0].length;
 
 		/* fill row header array */
-		final String[][] gHeaders = new String[nGene][dataStartCol];
+		final String[][] gHeaders = new String[nGene][dataStartColumn];
 
 		for (int i = 0; i < nGene; i++) {
 
@@ -539,7 +501,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 			for (int j = 0; j < nExpr; j++) {
 
-				aHeaders[j][i] = stringLabels[i][j + dataStartCol];
+				aHeaders[j][i] = stringLabels[i][j + dataStartColumn];
 			}
 		}
 		targetModel.setArrayHeaders(aHeaders);
