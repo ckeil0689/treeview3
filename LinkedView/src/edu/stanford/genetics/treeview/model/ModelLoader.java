@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.prefs.Preferences;
-import java.util.regex.Pattern;
 
 import javax.swing.SwingWorker;
 
@@ -28,6 +27,9 @@ import edu.stanford.genetics.treeview.model.ModelLoader.LoadStatus;
  */
 public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
+	final static String[] COMMON_LABELS = {"COMPLEX", "NAME", "ORF", "ID", 
+		"GID", "UID", "AID", "GWEIGHT", "EWEIGHT", "WEIGHT"};
+	
 	protected TVController controller;
 
 	/* Reference to the main model which will hold the data */
@@ -41,7 +43,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	private double[][] doubleData;
 
 	/* Holds pattern which recognizes data in a tab-delimited file */
-	private static String fpRegex = setupPattern();
+//	private static String fpRegex = setupPattern();
 
 	/* Total line number of file to be loaded */
 	private int row_num;
@@ -197,36 +199,43 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			
 			String line;
 			int count = 0;
-			int lastLabelColumn = -1;
+			int lastCommonLabelColumn = -1;
 			
-			while ((line = br.readLine()) != null && count++ < LIMIT) {
+			while ((line = br.readLine()) != null && count < LIMIT) {
 		
-				// load line as String array
 				final String[] lineAsStrings = line.split(delimiter, -1);
 		
 				for (int i = 0; i < lineAsStrings.length; i++) {
 		
-					final String element = lineAsStrings[i];
-		
-					/*
-					 * If the current string matches the pattern and is not in a label
-					 * row and the index is greater than the last label column, we found
-					 * the data start!
-					 */
-					if (Pattern.matches(fpRegex, element) 
-							&& i > lastLabelColumn) {
-		
+					String element = lineAsStrings[i];
+					
+					if (element.endsWith("e") || element.endsWith("E")) {
+						element += "+00";
+					}
+					
+					if(isDoubleParseable(element)) {
+						if(lastCommonLabelColumn < i 
+								&& hasCommonLabel(lineAsStrings)) {
+							break;
+						} 
+						
+						if(i <= lastCommonLabelColumn) {
+							continue;
+						}
+						
 						dataStartCoords[0] = count;
 						dataStartCoords[1] = i;
+						count = LIMIT;
 						break;
 					}
 					
-					if(i > lastLabelColumn) {
-						lastLabelColumn = i;
+					if(isCommonLabel(element) && lastCommonLabelColumn < i) {
+						lastCommonLabelColumn = i;
 					}
-				
 				}
+				count++;
 			}
+			
 			br.close();
 			
 		} catch (final IOException e) {
@@ -236,6 +245,39 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		}
 
 		return dataStartCoords;
+	}
+	
+	private static boolean hasCommonLabel(final String[] line) {
+		
+		for(String token : line) {
+			for(String label : ModelLoader.COMMON_LABELS) {
+				if(label.equalsIgnoreCase(token)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	private static boolean isCommonLabel(final String token) {
+		
+		for(String label : ModelLoader.COMMON_LABELS) {
+			if(label.equalsIgnoreCase(token)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static boolean isDoubleParseable(final String token) {
+		
+		try {
+			Double.parseDouble(token);
+			return true;
+			
+		} catch(NumberFormatException e) {
+			return false;
+		}
 	}
 
 	private String[] fillDoubles(final String line, final int current_row) {
@@ -640,7 +682,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 				// load line as String array
 				final String[] lineAsStrings = line.split(delimiter, -1);
-				previewData[count++] = Arrays.copyOfRange(lineAsStrings, 1, 
+				previewData[count++] = Arrays.copyOfRange(lineAsStrings, 0, 
 						LIMIT);
 			}
 		} catch (final IOException e) {

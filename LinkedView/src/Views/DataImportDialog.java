@@ -116,10 +116,11 @@ public class DataImportDialog extends CustomDialog {
 				GUIFactory.FONTS);
 		columnDataStart = new JSpinner(indexModel2);
 		
-		String note = "(Note: This may sometimes be inaccurate.)";
+		String note = "(Note: This may sometimes be inaccurate, "
+				+ "especially if labels are numeric!)";
 		JLabel noteLabel = GUIFactory.createLabel(note, GUIFactory.FONTS);
 		
-		findDataBtn = GUIFactory.createBtn("Auto-find data boundaries!");
+		findDataBtn = GUIFactory.createBtn("Auto-find labels!");
 		
 		indexPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 		indexPanel.add(rowSpinnerLabel);

@@ -136,8 +136,8 @@ public class DataImportController {
 			int[] dataStartCoords = ModelLoader.findDataStartCoords(filename, 
 					selectedDelimiter);
 			
-			int rowCount = dataStartCoords[0] + 1;
-			int columnCount = dataStartCoords[1] + 1;
+			int rowCount = dataStartCoords[0];
+			int columnCount = dataStartCoords[1];
 			
 			LogBuffer.println("Found data start: " + Arrays.toString(dataStartCoords));
 			
