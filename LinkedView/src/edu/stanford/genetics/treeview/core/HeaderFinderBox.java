@@ -186,7 +186,7 @@ public abstract class HeaderFinderBox {
 		// zoom level)
 		final String[][] ohA = otherHeaderInfo.getHeaderArray();
 		otherDataList = new ArrayList<String>();
-		otherDataHeaders = getHeaders(ohA);
+		otherDataHeaders = getHeaders(ohA); // TODO BUG this breaks if rows + col header number isnt equal!!
 		for (final String item : otherDataHeaders) {
 
 			otherDataList.add(item);

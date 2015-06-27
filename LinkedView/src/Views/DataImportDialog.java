@@ -19,6 +19,7 @@ import javax.swing.event.ChangeListener;
 
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
+import edu.stanford.genetics.treeview.model.DataInfo;
 import edu.stanford.genetics.treeview.model.PreviewDataTable;
 
 public class DataImportDialog extends CustomDialog {
@@ -31,6 +32,8 @@ public class DataImportDialog extends CustomDialog {
 	public static final int LABELS_WARNING = 3;
 
 	private PreviewDataTable dataTable;
+	
+	private DataInfo result;
 	
 	private JButton proceedBtn;
 	private JButton findDataBtn;
@@ -53,6 +56,7 @@ public class DataImportDialog extends CustomDialog {
 		super("Data Import - [" + filename + "]");
 		
 		this.delimiters = new ArrayList<JCheckBox>();
+		
 	}
 	
 	public void setupDialogComponents() {
@@ -74,7 +78,7 @@ public class DataImportDialog extends CustomDialog {
 		
 		final String welcome = "Let's get your data properly set up.";
 		final JLabel welcomeLabel = GUIFactory.createLabel(welcome, 
-				GUIFactory.FONTM_B);
+				GUIFactory.FONTXXL);
 		
 		final String noWorries = "Don't worry, this only pops up when "
 				+ "first loading a dataset.";
@@ -131,7 +135,6 @@ public class DataImportDialog extends CustomDialog {
 		indexPanel.add(findDataBtn, "span 2 1, align left, pushx");
 		indexPanel.add(noteLabel, "pushx, span 3 1");
 		
-		
 		final String previewText = "Preview (25x25):";
 		final JLabel preTableLine = GUIFactory.createLabel(previewText, 
 				GUIFactory.FONTS_B);
@@ -151,7 +154,7 @@ public class DataImportDialog extends CustomDialog {
 		
 		getRootPane().setDefaultButton(findDataBtn);
 		
-		mainPanel.add(welcomeLabel, "push, wrap");
+		mainPanel.add(welcomeLabel, "pushx, alignx 50%, wrap");
 		mainPanel.add(noWorriesLabel, "push, wrap");
 		
 		mainPanel.add(delimPanel, "h :80:, push, wrap");
@@ -172,6 +175,12 @@ public class DataImportDialog extends CustomDialog {
 		
 		mainPanel.revalidate();
 		mainPanel.repaint();
+	}
+	
+	public DataInfo showDialog() {
+		
+		setVisible(true);
+		return result;
 	}
 	
 	/**
@@ -342,6 +351,14 @@ public class DataImportDialog extends CustomDialog {
 		
 		rowDataStart.setValue(Integer.valueOf(rowCount));
 		columnDataStart.setValue(Integer.valueOf(columnCount));
+	}
+	
+	public void setResult(final String delimiter) {
+		
+		int rowNum = (Integer) rowDataStart.getValue();
+		int colNum = (Integer) columnDataStart.getValue();
+		
+		this.result = new DataInfo(new int[]{rowNum, colNum}, delimiter);
 	}
 	
 	public JSpinner getRowStartSpinner() {

@@ -35,9 +35,9 @@ public class NewKnnModelLoader extends ModelLoader {
 	/**
 	 * @param model
 	 */
-	public NewKnnModelLoader(final KnnModel model, final TVController controller) {
+	public NewKnnModelLoader(final KnnModel model, final TVController controller, final DataInfo dataStartCoords) {
 
-		super(model, controller);
+		super(model, controller, dataStartCoords);
 
 		/* TODO Not yet adapted to new loading code */
 		LogBuffer.println("KNNModel WAS DISABLED (commented out).");

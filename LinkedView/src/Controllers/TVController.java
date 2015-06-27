@@ -43,6 +43,7 @@ import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.UrlExtractor;
 import edu.stanford.genetics.treeview.UrlPresets;
 import edu.stanford.genetics.treeview.ViewFrame;
+import edu.stanford.genetics.treeview.model.DataInfo;
 import edu.stanford.genetics.treeview.model.DataModelWriter;
 import edu.stanford.genetics.treeview.model.ModelLoader;
 import edu.stanford.genetics.treeview.model.ReorderedDataModel;
@@ -208,7 +209,8 @@ public class TVController implements Observer {
 		public void actionPerformed(final ActionEvent arg0) {
 
 			final FileSet last = tvFrame.getFileMRU().getLast();
-			loadData(last, false);	
+			DataInfo dataInfo = new DataInfo(new int[]{0,0}, "\\t"); // TODO swap with stored values
+			loadData(last, false, dataInfo);	
 		}
 	}
 
@@ -262,11 +264,11 @@ public class TVController implements Observer {
 	 * file should be copied to the new one. It should only occur when a 
 	 * file is being clustered.
 	 */
-	public void loadData(final FileSet fileSet, final boolean isClusterFile) {
+	public void loadData(final FileSet fileSet, final boolean isClusterFile, 
+			final DataInfo dataInfo) {
 
 		/* Setting loading screen */
 		tvFrame.generateView(TreeViewFrame.PROGRESS_VIEW);
-
 
 		/* Loading TVModel */
 		final TVModel tvModel = (TVModel) model;
@@ -298,7 +300,8 @@ public class TVController implements Observer {
 
 			if (tvModel.getColumnHeaderInfo().getNumHeaders() == 0) {
 				/* ------ Load Process -------- */
-				final ModelLoader loader = new ModelLoader(tvModel, this);
+				final ModelLoader loader = new ModelLoader(tvModel, this, 
+						dataInfo);
 				loader.execute();
 
 			} else {
@@ -512,22 +515,13 @@ public class TVController implements Observer {
 
 			/* Only run loader, if JFileChooser wasn't canceled. */
 			if (file != null) {
-//				loadData(tvFrame.getFileSet(file), false);
 				String filename = tvFrame.getFileSet(file).getCdt();
 				
-				DataImportDialog loadPreview = 
-						new DataImportDialog(filename);
+				DataInfo dataInfo = useImportDialog(filename);
 				
-				DataImportController importController = 
-						new DataImportController(loadPreview);
-				
-				String[][] previewData;
-				importController.setFileSet(tvFrame.getFileSet(file));
-				previewData = importController.loadPreviewData();
-				loadPreview.setNewTable(previewData);
-				
-				importController.setDialogVisible();
-				
+				if(dataInfo != null) {
+					loadData(tvFrame.getFileSet(file), false, dataInfo);
+				}
 
 			} else {
 				LogBuffer.println("Selected file was null. Cannot begin"
@@ -537,6 +531,26 @@ public class TVController implements Observer {
 			LogBuffer.println("Loading the FileSet was interrupted.");
 			LogBuffer.logException(e);
 		}
+	}
+	
+	private DataInfo useImportDialog(final String filename) {
+		
+		DataImportDialog loadPreview = 
+				new DataImportDialog(filename);
+		
+		DataImportController importController = 
+				new DataImportController(loadPreview);
+		
+		String[][] previewData;
+		importController.setFileSet(tvFrame.getFileSet(file));
+		previewData = importController.loadPreviewData();
+		
+		loadPreview.setNewTable(previewData);
+		importController.initDialog();
+		
+		DataInfo dataInfo = loadPreview.showDialog();
+		
+		return dataInfo;
 	}
 
 	/**
@@ -858,37 +872,9 @@ public class TVController implements Observer {
 					.getSource());// tvFrame.getFileMenuSet();
 
 			tvFrame.generateView(TreeViewFrame.PROGRESS_VIEW);
-			loadData(fileMenuSet, false);
-			// new LoadWorker().execute();
-
-			// } catch (final LoadException e) {
-			// if (e.getType() == LoadException.INTPARSE) {
-			//
-			// } else {
-			// final int result = FileMruEditor.offerSearch(
-			// tvFrame.getFileMenuSet(),
-			// tvFrame, "Could not Load "
-			// + tvFrame.getFileMenuSet().getCdt());
-			//
-			// if (result == FileMruEditor.FIND) {
-			// tvFrame.getFileMRU().notifyFileSetModified();
-			// tvFrame.getFileMRU().notifyObservers();
-			//
-			// actionPerformed(actionEvent); // REPROCESS...
-			// return; // EARLY RETURN
-			//
-			// } else if (result == FileMruEditor.REMOVE) {
-			// tvFrame.getFileMRU().removeFileSet(
-			// tvFrame.getFileMenuSet());
-			// tvFrame.getFileMRU().notifyObservers();
-			// }
-			// }
-			// tvFrame.setLoaded(false);
-			// }
-			// dataModel.notifyObservers();
-			// }
-			// };
-			// SwingUtilities.invokeLater(update);
+			
+			DataInfo dataInfo = new DataInfo(new int[]{0,0}, "\\t"); // TODO swap with stored values
+			loadData(fileMenuSet, false, dataInfo);
 		}
 	}
 

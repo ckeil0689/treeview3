@@ -24,6 +24,7 @@ import Views.ClusterView;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.model.DataInfo;
 import edu.stanford.genetics.treeview.model.IntHeaderInfo;
 import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 
@@ -388,7 +389,8 @@ public class ClusterController {
 
 			clusterDialog.dispose();
 
-			tvController.loadData(fileSet, true);
+			DataInfo dataInfo = new DataInfo(new int[]{0,0}, "\\t"); // TODO replace with actual values
+			tvController.loadData(fileSet, true, dataInfo);
 
 		} else {
 			final String alert = "When trying to load the clustered file, no "

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.prefs.Preferences;
+import java.util.regex.Pattern;
 
 import javax.swing.SwingWorker;
 
@@ -27,23 +28,22 @@ import edu.stanford.genetics.treeview.model.ModelLoader.LoadStatus;
  */
 public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
-	final static String[] COMMON_LABELS = {"COMPLEX", "NAME", "ORF", "ID", 
-		"GID", "UID", "AID", "GWEIGHT", "EWEIGHT", "WEIGHT"};
+	/* For recognizing certain Strings in a file */
+	final static String COMMON_LABELS = "(?i)(COMPLEX|NAME|^.*ORF$|^.*ID$"
+			+ "|^.*WEIGHT$)";
+	final static String MISSING = "(?i)(^NA.?$|EMPTY|NONE|^MISS.*$)";
+	final static String DEFAULT_DELIM = "\\t";
 	
 	protected TVController controller;
 
 	/* Reference to the main model which will hold the data */
 	protected TVModel targetModel;
 	private final FileSet fileSet;
-
-	private String[][] rowLabels;
-	private String[][] columnLabels;
 	
 	/* 2D array to hold numerical data */
 	private double[][] doubleData;
-
-	/* Holds pattern which recognizes data in a tab-delimited file */
-//	private static String fpRegex = setupPattern();
+	
+	private String delimiter;
 
 	/* Total line number of file to be loaded */
 	private int row_num;
@@ -56,13 +56,20 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	private boolean hasEWeight = false;
 	private boolean hasGWeight = false;
 
-	public ModelLoader(final DataModel model, final TVController controller) {
+	public ModelLoader(final DataModel model, final TVController controller, 
+			final DataInfo dataInfo) {
 
 		this.controller = controller;
 		this.targetModel = (TVModel) model;
 		this.fileSet = model.getFileSet();
-
-		setupPattern();
+		this.dataStartRow = dataInfo.getDataCoords()[0];
+		this.dataStartColumn = dataInfo.getDataCoords()[1];
+		this.delimiter = dataInfo.getDelimiter(); 
+	}
+	
+	public void setDelimiter(final String delimiter) {
+		
+		this.delimiter = delimiter;
 	}
 	
 	public void setDataCoords(int dataStartRow, int dataStartColumn) {
@@ -89,6 +96,9 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		 * progress bar maximum.
 		 */
 		row_num = Helper.countFileLines(new File(fileSet.getCdt()));
+		doubleData = new double[row_num - dataStartRow][];
+		
+		final String[][] stringLabels = new String[row_num][];
 
 		final LoadStatus ls = new LoadStatus();
 		ls.setProgress(0);
@@ -98,25 +108,33 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		final File file = new File(fileSet.getCdt());
 		final BufferedReader reader = new BufferedReader(new FileReader(file));
 
-		/* Find data start */
-		final String[][] stringLabels = new String[row_num][];
-
 		String line;
-		int current_row = 0;
+		int row_idx = 0;
 
 		ls.setStatus("Loading...");
 		
 		/* Read all lines and parse the data */
 		while ((line = reader.readLine()) != null) {
 
-			stringLabels[current_row] = fillDoubles(line, current_row);
-			ls.setProgress(current_row++);
+			String[] lineAsStrings = line.split(delimiter, -1);
+			
+			if(row_idx < dataStartRow) {
+				stringLabels[row_idx] = lineAsStrings;
+				
+			} else {
+				String[] labels = partitionRow(lineAsStrings, row_idx);
+				stringLabels[row_idx] = labels;
+			}
+			
+			ls.setProgress(row_idx++);
 			publish(ls);
 		}
 
 		ls.setStatus("Getting ready...");
 		publish(ls);
 
+		analyzeLabels(stringLabels);
+		
 		/* Parse tree and config files */
 		assignDataToModel(stringLabels);
 		
@@ -136,51 +154,26 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	/** 
 	 * Check the labels for commonly used labels that are useful for TreeView.
 	 */
-	private void analyzeLabels(String[][] rowLabels, String[][] columnLabels) {
-//		/* Check string if it is the label for GIDs or AIDs. */
-//		if (element.equalsIgnoreCase("GID")) {
-//			if(i > lastLabelCol)
-//				lastLabelCol = i;
-//			if(i > possibleLastLabelCol)
-//				possibleLastLabelCol = i;
-//			hasGID = true;
-//			is_label_row = true;
-//		}
-//		else if (element.equalsIgnoreCase("AID")) {
-//			if(i > lastLabelCol)
-//				lastLabelCol = i;
-//			if(i > possibleLastLabelCol)
-//				possibleLastLabelCol = i;
-//			hasAID = true;
-//			is_label_row = true;
-//		}
-//		else if (element.equalsIgnoreCase("GWEIGHT")) {
-//			if(i > lastLabelCol)
-//				lastLabelCol = i;
-//			if(i > possibleLastLabelCol)
-//				possibleLastLabelCol = i;
-//			hasGWeight = true;
-//			is_label_row = true;
-//		}
-//		else if (element.equalsIgnoreCase("EWEIGHT")) {
-//			if(i > lastLabelCol)
-//				lastLabelCol = i;
-//			if(i > possibleLastLabelCol)
-//				possibleLastLabelCol = i;
-//			hasEWeight = true;
-//			is_label_row = true;
-//		}
-//		else if (element.equalsIgnoreCase("ORF")   ||
-//				 element.equalsIgnoreCase("GNAME") ||
-//				 element.equalsIgnoreCase("ID")    ||
-//				 element.equalsIgnoreCase("NAME")  ||
-//				 element.equalsIgnoreCase("UID")) {
-//			if(i > lastLabelCol)
-//				lastLabelCol = i;
-//			if(i > possibleLastLabelCol)
-//				possibleLastLabelCol = i;
-//			is_label_row = true;
-//		}
+	private void analyzeLabels(String[][] stringLabels) {
+		
+		for(int i = 0; i < dataStartRow; i++) {
+			
+			String[] labels = stringLabels[i];
+			for(int j = 0; j < dataStartColumn; j++) {
+				if("GID".equalsIgnoreCase(labels[j])) {
+					hasGID = true;
+				} 
+				else if("AID".equalsIgnoreCase(labels[j])){
+					hasAID = true;
+				}
+				else if("GWEIGHT".equalsIgnoreCase(labels[j])){
+					hasGWeight = true;
+				}
+				else if("EWEIGHT".equalsIgnoreCase(labels[j])){
+					hasEWeight = true;
+				}
+			}
+		}
 	}
 
 	/* ---- Loading methods -------- */
@@ -213,7 +206,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 						element += "+00";
 					}
 					
-					if(isDoubleParseable(element)) {
+					if(isDoubleParseable(element) || isNaN(element)) {
 						if(lastCommonLabelColumn < i 
 								&& hasCommonLabel(lineAsStrings)) {
 							break;
@@ -250,10 +243,8 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	private static boolean hasCommonLabel(final String[] line) {
 		
 		for(String token : line) {
-			for(String label : ModelLoader.COMMON_LABELS) {
-				if(label.equalsIgnoreCase(token)) {
-					return true;
-				}
+			if(Pattern.matches(COMMON_LABELS, token)) {
+				return true;
 			}
 		}
 		return false;
@@ -261,10 +252,16 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	
 	private static boolean isCommonLabel(final String token) {
 		
-		for(String label : ModelLoader.COMMON_LABELS) {
-			if(label.equalsIgnoreCase(token)) {
-				return true;
-			}
+		if(Pattern.matches(COMMON_LABELS, token)) {
+			return true;
+		}
+		return false;
+	}
+	
+	private static boolean isNaN(final String token) {
+		
+		if(Pattern.matches(MISSING, token)) {
+			return true;
 		}
 		return false;
 	}
@@ -280,10 +277,10 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		}
 	}
 
-	private String[] fillDoubles(final String line, final int current_row) {
+	private String[] partitionRow(final String[] lineAsStrings, 
+			final int row_idx) {
 
 		// load line as String array
-		final String[] lineAsStrings = line.split("\\t", -1);
 		final String[] labels = new String[dataStartColumn];
 		final double[] dataValues = new double[lineAsStrings.length
 		                                       - dataStartColumn];
@@ -321,7 +318,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		}
 
 		// Issue with length of stringLabels
-		doubleData[current_row - dataStartRow] = dataValues;
+		doubleData[row_idx - dataStartRow] = dataValues;
 
 		return labels;
 	}
@@ -405,46 +402,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			LogBuffer.logException(e);
 			targetModel.setDocumentConfig(null);
 		}
-	}
-
-	/**
-	 * Sets up regex patterns which will be used to differentiate between labels
-	 * and numerical data in tab-delimited table entries.
-	 */
-	private static String setupPattern() {
-
-		final String Digits = "(\\p{Digit}+)";
-		final String emptyDigits = "(\\p{Digit}*)";
-		final String HexDigits = "(\\p{XDigit}+)";
-
-		// an exponent is 'e' or 'E' followed by an optionally
-		// signed decimal integer.
-		final String exp = "[eE][+-]?" + emptyDigits;
-
-		return ("[\\x00-\\x20]*" + // Optional leading
-				// "whitespace"
-				"[+-]?(" + // Optional sign character
-				"NaN|" + // "NaN" string
-				"Infinity|" + // "Infinity" string
-				// Digits ._opt Digits_opt ExponentPart_opt
-				// FloatTypeSuffix_opt
-				"(((" + Digits + "(\\.)?(" + Digits + "?)(" + exp + ")?)|"
-				+
-				// . Digits ExponentPart_opt FloatTypeSuffix_opt
-				"(\\.(" + Digits + ")(" + exp + ")?)|"
-				+
-				// Hexadecimal strings
-				"(("
-				+
-				// 0[xX] HexDigits ._opt BinaryExponent FloatTypeSuffix_opt
-				"(0[xX]" + HexDigits
-				+ "(\\.)?)|"
-				+
-				// 0[xX] HexDigits_opt . HexDigits BinaryExponent
-				// FloatTypeSuffix_opt
-				"(0[xX]" + HexDigits + "?(\\.)" + HexDigits + ")"
-				+ ")[pP][+-]?" + Digits + "))" + "[fFdD]?))" + "[\\x00-\\x20]*");
-		// Optional trailing "whitespace"
 	}
 
 	/**
