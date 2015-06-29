@@ -30,7 +30,6 @@ import java.util.prefs.Preferences;
 import javax.swing.ToolTipManager;
 
 import Controllers.TVController;
-import edu.stanford.genetics.treeview.model.DataLoadInfo;
 import edu.stanford.genetics.treeview.model.TVModel;
 
 /**
@@ -211,8 +210,7 @@ public abstract class TreeViewApp {// implements WindowListener {
 		final TVController tvController = new TVController(tvFrame, model);
 
 		if (fileSet != null) {
-			DataLoadInfo dataInfo = new DataLoadInfo(new int[]{0,0}, "\\t"); // TODO replace with actual data
-			tvController.loadData(fileSet, false, dataInfo);
+			tvController.getDataInfoAndLoad(fileSet, false);
 			tvFrame.setLoaded(true);
 		}
 		// tvFrame.addWindowListener(this);

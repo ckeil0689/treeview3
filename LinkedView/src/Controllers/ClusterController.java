@@ -388,9 +388,10 @@ public class ClusterController {
 					file.getParent() + File.separator);
 
 			clusterDialog.dispose();
-
-			DataLoadInfo dataInfo = new DataLoadInfo(new int[]{0,0}, "\\t"); // TODO replace with actual values
-			tvController.loadData(fileSet, true, dataInfo);
+			
+			tvController.getDataInfoAndLoad(fileSet, true);
+//			DataLoadInfo dataInfo = new DataLoadInfo(new int[]{0,0}, "\\t"); // TODO replace with actual values
+//			tvController.loadData(fileSet, true, dataInfo);
 
 		} else {
 			final String alert = "When trying to load the clustered file, no "

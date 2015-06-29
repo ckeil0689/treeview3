@@ -209,8 +209,7 @@ public class TVController implements Observer {
 		public void actionPerformed(final ActionEvent arg0) {
 
 			final FileSet last = tvFrame.getFileMRU().getLast();
-			DataLoadInfo dataInfo = new DataLoadInfo(new int[]{0,0}, "\\t"); // TODO swap with stored values
-			loadData(last, false, dataInfo);	
+			getDataInfoAndLoad(last, false);
 		}
 	}
 
@@ -516,21 +515,8 @@ public class TVController implements Observer {
 			/* Only run loader, if JFileChooser wasn't canceled. */
 			if (file != null) {
 				FileSet fileSet = tvFrame.getFileSet(file);
-				String filename = fileSet.getCdt();
+				getDataInfoAndLoad(fileSet, false);
 				
-				Preferences node = getOldPreferences(fileSet.getRoot(), 
-						fileSet.getExt());
-				
-				DataLoadInfo dataInfo;
-				if(node == null) { // better way?
-					dataInfo = useImportDialog(filename);				
-				} else {
-					dataInfo = getDataLoadInfo(fileSet);
-				}
-				
-				if(dataInfo != null) {
-					loadData(tvFrame.getFileSet(file), false, dataInfo);
-				} // TODO else use default assumptions?
 			} else {
 				LogBuffer.println("No file was selected. Cannot begin"
 						+ " loading data.");
@@ -541,22 +527,39 @@ public class TVController implements Observer {
 		}
 	}
 	
+	public void getDataInfoAndLoad(FileSet fileSet, boolean isFromCluster) {
+		
+		Preferences node = getOldPreferences(fileSet.getRoot(), 
+				fileSet.getExt());
+		
+		DataLoadInfo dataInfo;
+		if(node == null) { // better way?
+			dataInfo = useImportDialog(fileSet);				
+		} else {
+			dataInfo = getDataLoadInfo(fileSet);
+		}
+		
+		if(dataInfo != null) {
+			loadData(fileSet, isFromCluster, dataInfo);
+		} // TODO else use default assumptions?
+	}
+	
 	/**
 	 * Show a dialog for the user to specify how his data should be loaded.
 	 * Retrieves the user chosen options and returns them in a DataInfo object.
 	 * @param filename
 	 * @return Options/ parameters for data loading.
 	 */
-	private DataLoadInfo useImportDialog(final String filename) {
+	private static DataLoadInfo useImportDialog(final FileSet fileSet) {
 		
 		DataImportDialog loadPreview = 
-				new DataImportDialog(filename);
+				new DataImportDialog(fileSet.getRoot() + fileSet.getExt());
 		
 		DataImportController importController = 
 				new DataImportController(loadPreview);
 		
 		String[][] previewData;
-		importController.setFileSet(tvFrame.getFileSet(file));
+		importController.setFileSet(fileSet);
 		previewData = importController.loadPreviewData();
 		
 		loadPreview.setNewTable(previewData);
@@ -901,8 +904,7 @@ public class TVController implements Observer {
 
 			tvFrame.generateView(TreeViewFrame.PROGRESS_VIEW);
 			
-			DataLoadInfo dataInfo = new DataLoadInfo(new int[]{0,0}, "\\t"); // TODO swap with stored values
-			loadData(fileMenuSet, false, dataInfo);
+			getDataInfoAndLoad(fileMenuSet, false);
 		}
 	}
 
