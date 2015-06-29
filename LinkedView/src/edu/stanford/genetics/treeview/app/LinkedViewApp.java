@@ -39,7 +39,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.MainProgramArgs;
 import edu.stanford.genetics.treeview.TreeViewApp;
 import edu.stanford.genetics.treeview.TreeViewFrame;
-import edu.stanford.genetics.treeview.model.DataInfo;
+import edu.stanford.genetics.treeview.model.DataLoadInfo;
 //import edu.stanford.genetics.treeview.Util;
 //import edu.stanford.genetics.treeview.core.PluginManager;
 import edu.stanford.genetics.treeview.model.TVModel;
@@ -154,7 +154,7 @@ public class LinkedViewApp extends TreeViewApp {
 		final DataModel model = new TVModel();
 		// new TVController(tvFrame, model).loadFileSet(fileSet);
 		
-		DataInfo dataInfo = new DataInfo(new int[]{0,0}, "\\t");
+		DataLoadInfo dataInfo = new DataLoadInfo(new int[]{0,0}, "\\t");
 		new TVController(tvFrame, model).loadData(fileSet, false, dataInfo); // TODO replace with actual data
 
 		tvFrame.setLoaded(true);

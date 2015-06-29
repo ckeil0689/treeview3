@@ -43,7 +43,7 @@ import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.UrlExtractor;
 import edu.stanford.genetics.treeview.UrlPresets;
 import edu.stanford.genetics.treeview.ViewFrame;
-import edu.stanford.genetics.treeview.model.DataInfo;
+import edu.stanford.genetics.treeview.model.DataLoadInfo;
 import edu.stanford.genetics.treeview.model.DataModelWriter;
 import edu.stanford.genetics.treeview.model.ModelLoader;
 import edu.stanford.genetics.treeview.model.ReorderedDataModel;
@@ -209,7 +209,7 @@ public class TVController implements Observer {
 		public void actionPerformed(final ActionEvent arg0) {
 
 			final FileSet last = tvFrame.getFileMRU().getLast();
-			DataInfo dataInfo = new DataInfo(new int[]{0,0}, "\\t"); // TODO swap with stored values
+			DataLoadInfo dataInfo = new DataLoadInfo(new int[]{0,0}, "\\t"); // TODO swap with stored values
 			loadData(last, false, dataInfo);	
 		}
 	}
@@ -265,7 +265,7 @@ public class TVController implements Observer {
 	 * file is being clustered.
 	 */
 	public void loadData(final FileSet fileSet, final boolean isClusterFile, 
-			final DataInfo dataInfo) {
+			final DataLoadInfo dataInfo) {
 
 		/* Setting loading screen */
 		tvFrame.generateView(TreeViewFrame.PROGRESS_VIEW);
@@ -360,7 +360,7 @@ public class TVController implements Observer {
 					"Alert", JOptionPane.WARNING_MESSAGE);
 			LogBuffer.println("Alert: " + message);
 
-			tvFrame.setLoadErrorMessage("Data in file unusable.");
+			tvFrame.setLoadErrorMessage("Data was not loaded.");
 
 			/* Set model status, which will update the view. */
 			((TVModel) model).setLoaded(false);
@@ -515,25 +515,39 @@ public class TVController implements Observer {
 
 			/* Only run loader, if JFileChooser wasn't canceled. */
 			if (file != null) {
-				String filename = tvFrame.getFileSet(file).getCdt();
+				FileSet fileSet = tvFrame.getFileSet(file);
+				String filename = fileSet.getCdt();
 				
-				DataInfo dataInfo = useImportDialog(filename);
+				Preferences node = getOldPreferences(fileSet.getRoot(), 
+						fileSet.getExt());
+				
+				DataLoadInfo dataInfo;
+				if(node == null) { // better way?
+					dataInfo = useImportDialog(filename);				
+				} else {
+					dataInfo = getDataLoadInfo(fileSet);
+				}
 				
 				if(dataInfo != null) {
 					loadData(tvFrame.getFileSet(file), false, dataInfo);
-				}
-
+				} // TODO else use default assumptions?
 			} else {
-				LogBuffer.println("Selected file was null. Cannot begin"
+				LogBuffer.println("No file was selected. Cannot begin"
 						+ " loading data.");
 			}
 		} catch (final LoadException e) {
-			LogBuffer.println("Loading the FileSet was interrupted.");
+			LogBuffer.println("Loading the file was interrupted.");
 			LogBuffer.logException(e);
 		}
 	}
 	
-	private DataInfo useImportDialog(final String filename) {
+	/**
+	 * Show a dialog for the user to specify how his data should be loaded.
+	 * Retrieves the user chosen options and returns them in a DataInfo object.
+	 * @param filename
+	 * @return Options/ parameters for data loading.
+	 */
+	private DataLoadInfo useImportDialog(final String filename) {
 		
 		DataImportDialog loadPreview = 
 				new DataImportDialog(filename);
@@ -548,9 +562,23 @@ public class TVController implements Observer {
 		loadPreview.setNewTable(previewData);
 		importController.initDialog();
 		
-		DataInfo dataInfo = loadPreview.showDialog();
+		DataLoadInfo dataInfo = loadPreview.showDialog();
 		
 		return dataInfo;
+	}
+	
+	public DataLoadInfo getDataLoadInfo(FileSet fileSet) {
+		
+		Preferences node = getOldPreferences(fileSet.getRoot(), 
+				fileSet.getExt());
+		
+		String delimiter = node.get("delimiter", 
+				ModelLoader.DEFAULT_DELIM);
+		int[] dataCoords = new int[]{node.getInt("rowCoord", 0), 
+				node.getInt("colCoord", 0)
+		};
+		
+		return new DataLoadInfo(dataCoords, delimiter);
 	}
 
 	/**
@@ -873,7 +901,7 @@ public class TVController implements Observer {
 
 			tvFrame.generateView(TreeViewFrame.PROGRESS_VIEW);
 			
-			DataInfo dataInfo = new DataInfo(new int[]{0,0}, "\\t"); // TODO swap with stored values
+			DataLoadInfo dataInfo = new DataLoadInfo(new int[]{0,0}, "\\t"); // TODO swap with stored values
 			loadData(fileMenuSet, false, dataInfo);
 		}
 	}

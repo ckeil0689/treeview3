@@ -1,11 +1,11 @@
 package edu.stanford.genetics.treeview.model;
 
-public class DataInfo {
+public class DataLoadInfo {
 
 	private int[] dataCoords;
 	private String delimiter;
 	
-	public DataInfo(int[] dataCoords, final String delimString) {
+	public DataLoadInfo(int[] dataCoords, final String delimString) {
 		
 		this.dataCoords = dataCoords;
 		this.delimiter = delimString;

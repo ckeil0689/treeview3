@@ -5,10 +5,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.prefs.Preferences;
-import java.util.regex.Pattern;
 
 import javax.swing.SwingWorker;
 
@@ -28,11 +26,7 @@ import edu.stanford.genetics.treeview.model.ModelLoader.LoadStatus;
  */
 public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
-	/* For recognizing certain Strings in a file */
-	final static String COMMON_LABELS = "(?i)(COMPLEX|NAME|^.*ORF$|^.*ID$"
-			+ "|^.*WEIGHT$)";
-	final static String MISSING = "(?i)(^NA.?$|EMPTY|NONE|^MISS.*$)";
-	final static String DEFAULT_DELIM = "\\t";
+	public final static String DEFAULT_DELIM = "\\t";
 	
 	protected TVController controller;
 
@@ -43,6 +37,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	/* 2D array to hold numerical data */
 	private double[][] doubleData;
 	
+	private DataLoadInfo dataInfo;
 	private String delimiter;
 
 	/* Total line number of file to be loaded */
@@ -57,11 +52,12 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	private boolean hasGWeight = false;
 
 	public ModelLoader(final DataModel model, final TVController controller, 
-			final DataInfo dataInfo) {
+			final DataLoadInfo dataInfo) {
 
 		this.controller = controller;
 		this.targetModel = (TVModel) model;
 		this.fileSet = model.getFileSet();
+		this.dataInfo = dataInfo;
 		this.dataStartRow = dataInfo.getDataCoords()[0];
 		this.dataStartColumn = dataInfo.getDataCoords()[1];
 		this.delimiter = dataInfo.getDelimiter(); 
@@ -138,6 +134,9 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		/* Parse tree and config files */
 		assignDataToModel(stringLabels);
 		
+		ls.setStatus("Done!");
+		publish(ls);
+		
 		reader.close();
 		return null;
 	}
@@ -173,107 +172,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 					hasEWeight = true;
 				}
 			}
-		}
-	}
-
-	/* ---- Loading methods -------- */
-	// TODO turn this whole thing into a STATIC method which can ATTEMPT to 
-	// find data and then display it in the preview. Let users adjust first.
-	
-	public static int[] findDataStartCoords(final String filename, 
-			final String delimiter) {
-
-		final int LIMIT = 20; // just check 20 first rows
-		int[] dataStartCoords = new int[2];
-		
-		try {
-			final BufferedReader br = new BufferedReader(new FileReader(
-					filename));
-			
-			String line;
-			int count = 0;
-			int lastCommonLabelColumn = -1;
-			
-			while ((line = br.readLine()) != null && count < LIMIT) {
-		
-				final String[] lineAsStrings = line.split(delimiter, -1);
-		
-				for (int i = 0; i < lineAsStrings.length; i++) {
-		
-					String element = lineAsStrings[i];
-					
-					if (element.endsWith("e") || element.endsWith("E")) {
-						element += "+00";
-					}
-					
-					if(isDoubleParseable(element) || isNaN(element)) {
-						if(lastCommonLabelColumn < i 
-								&& hasCommonLabel(lineAsStrings)) {
-							break;
-						} 
-						
-						if(i <= lastCommonLabelColumn) {
-							continue;
-						}
-						
-						dataStartCoords[0] = count;
-						dataStartCoords[1] = i;
-						count = LIMIT;
-						break;
-					}
-					
-					if(isCommonLabel(element) && lastCommonLabelColumn < i) {
-						lastCommonLabelColumn = i;
-					}
-				}
-				count++;
-			}
-			
-			br.close();
-			
-		} catch (final IOException e) {
-			LogBuffer.logException(e);
-			LogBuffer.println("Could not find data start coordinates.");
-			return new int[]{0, 0};
-		}
-
-		return dataStartCoords;
-	}
-	
-	private static boolean hasCommonLabel(final String[] line) {
-		
-		for(String token : line) {
-			if(Pattern.matches(COMMON_LABELS, token)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	private static boolean isCommonLabel(final String token) {
-		
-		if(Pattern.matches(COMMON_LABELS, token)) {
-			return true;
-		}
-		return false;
-	}
-	
-	private static boolean isNaN(final String token) {
-		
-		if(Pattern.matches(MISSING, token)) {
-			return true;
-		}
-		return false;
-	}
-
-	private static boolean isDoubleParseable(final String token) {
-		
-		try {
-			Double.parseDouble(token);
-			return true;
-			
-		} catch(NumberFormatException e) {
-			return false;
 		}
 	}
 
@@ -394,6 +292,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 						+ (childrenNodes.length + 1));
 				documentConfig.put("name", fileName);
 				documentConfig.put("extension", fileExt);
+				storeDataLoadInfo(documentConfig);
 			}
 
 			targetModel.setDocumentConfig(documentConfig);
@@ -402,6 +301,17 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			LogBuffer.logException(e);
 			targetModel.setDocumentConfig(null);
 		}
+	}
+	
+	private void storeDataLoadInfo(Preferences node) {
+		
+		final int rowCoord = dataInfo.getDataCoords()[0];
+		final int colCoord = dataInfo.getDataCoords()[1];
+		
+		node.putBoolean("firstLoad", false);
+		node.put("delimiter", dataInfo.getDelimiter());
+		node.putInt("rowCoord", rowCoord);
+		node.putInt("colCoord", colCoord);
 	}
 
 	/**
@@ -590,64 +500,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		targetModel.hashAIDs();
 		targetModel.hashATRs();
 		targetModel.aidFound(hasAID);
-	}
-	
-	/**
-	 * Small wrapper for <extractPreviewData> 
-	 * @param filename The path/ name of the file to be loaded.
-	 * @return String[][] The preview data in array format for use in JTable.
-	 */
-	public static String[][] loadPreviewData(final String filename, 
-			final String delimiter) {
-
-		String[][] previewData;
-		
-		try {
-			final BufferedReader br = new BufferedReader(new FileReader(
-					filename));
-
-			previewData = extractPreviewData(br, delimiter);
-
-			br.close();
-
-		} catch (final IOException e) {
-			LogBuffer.logException(e);
-			return new String[0][];
-		}
-
-		return previewData;
-	}
-	
-	/**
-	 * TODO put this into a PreviewLoader subclass which extends SwingWorker
-	 * Get a String array representation of the first <LIMIT> elements of 
-	 * data. This is for use in the data preview dialog only. The data
-	 * @param A BufferedReader object to read through the file.
-	 * @return String[][] The preview data in array format for use in JTable.
-	 * @author chris0689
-	 */
-	private static String[][] extractPreviewData(final BufferedReader reader,
-			final String delimiter) {
-
-		final int LIMIT = 20;
-		final String[][] previewData = new String[LIMIT][];
-		String line;
-		int count = 0;
-
-		try {
-			while ((line = reader.readLine()) != null && count < LIMIT) {
-
-				// load line as String array
-				final String[] lineAsStrings = line.split(delimiter, -1);
-				previewData[count++] = Arrays.copyOfRange(lineAsStrings, 0, 
-						LIMIT);
-			}
-		} catch (final IOException e) {
-			LogBuffer.logException(e);
-			return new String[][]{{"N/A"}};
-		}
-
-		return previewData;
 	}
 
 	private static List<String[]> loadTreeSet(final String loadingSet) {

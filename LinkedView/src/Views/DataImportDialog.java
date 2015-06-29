@@ -19,7 +19,7 @@ import javax.swing.event.ChangeListener;
 
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
-import edu.stanford.genetics.treeview.model.DataInfo;
+import edu.stanford.genetics.treeview.model.DataLoadInfo;
 import edu.stanford.genetics.treeview.model.PreviewDataTable;
 
 public class DataImportDialog extends CustomDialog {
@@ -33,7 +33,7 @@ public class DataImportDialog extends CustomDialog {
 
 	private PreviewDataTable dataTable;
 	
-	private DataInfo result;
+	private DataLoadInfo result;
 	
 	private JButton proceedBtn;
 	private JButton findDataBtn;
@@ -76,18 +76,9 @@ public class DataImportDialog extends CustomDialog {
 		JPanel indexPanel;
 		JPanel buttonPanel;
 		
-		final String welcome = "Let's get your data properly set up.";
-		final JLabel welcomeLabel = GUIFactory.createLabel(welcome, 
-				GUIFactory.FONTXXL);
-		
-		final String noWorries = "Don't worry, this only pops up when "
-				+ "first loading a dataset.";
-		final JLabel noWorriesLabel = GUIFactory.createLabel(noWorries, 
-				GUIFactory.FONTS);
-		
 		final String delimText = "1) Select delimiters for your dataset:";
 		final JLabel preDelimiterLine = GUIFactory.createLabel(delimText, 
-				GUIFactory.FONTS_B);
+				GUIFactory.FONTM_B);
 		
 		/* Delimiter panel */
 		delimPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
@@ -103,7 +94,7 @@ public class DataImportDialog extends CustomDialog {
 		
 		final String findDataStartText = "2) Select indices of first data cell:";
 		JLabel findDataStartLabel = GUIFactory.createLabel(findDataStartText, 
-				GUIFactory.FONTS_B);
+				GUIFactory.FONTM_B);
 		
 		SpinnerNumberModel indexModel = 
 				new SpinnerNumberModel(0, 0, 10, 1); // must be ints for Spinner listener
@@ -154,9 +145,6 @@ public class DataImportDialog extends CustomDialog {
 		
 		getRootPane().setDefaultButton(findDataBtn);
 		
-		mainPanel.add(welcomeLabel, "pushx, alignx 50%, wrap");
-		mainPanel.add(noWorriesLabel, "push, wrap");
-		
 		mainPanel.add(delimPanel, "h :80:, push, wrap");
 		
 		mainPanel.add(new JSeparator(SwingConstants.HORIZONTAL), "push, growx,"
@@ -177,7 +165,7 @@ public class DataImportDialog extends CustomDialog {
 		mainPanel.repaint();
 	}
 	
-	public DataInfo showDialog() {
+	public DataLoadInfo showDialog() {
 		
 		setVisible(true);
 		return result;
@@ -358,7 +346,7 @@ public class DataImportDialog extends CustomDialog {
 		int rowNum = (Integer) rowDataStart.getValue();
 		int colNum = (Integer) columnDataStart.getValue();
 		
-		this.result = new DataInfo(new int[]{rowNum, colNum}, delimiter);
+		this.result = new DataLoadInfo(new int[]{rowNum, colNum}, delimiter);
 	}
 	
 	public JSpinner getRowStartSpinner() {

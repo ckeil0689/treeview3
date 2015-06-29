@@ -12,7 +12,7 @@ import javax.swing.event.ChangeListener;
 
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.model.ModelLoader;
+import edu.stanford.genetics.treeview.model.PreviewLoader;
 
 public class DataImportController {
 
@@ -29,7 +29,6 @@ public class DataImportController {
 		
 		this.previewDialog = dialog;
 		this.selectedDelimiter = DataImportController.TAB_DELIM;
-
 	}
 	
 	public void initDialog() {
@@ -62,7 +61,7 @@ public class DataImportController {
 		}
 		
 		String filename = fileSet.getCdt(); 
-		previewData = ModelLoader.loadPreviewData(filename, selectedDelimiter);
+		previewData = PreviewLoader.loadPreviewData(filename, selectedDelimiter);
 		
 		if(previewData == null || previewData.length == 0) {
 			LogBuffer.println("No preview data could be loaded.");
@@ -134,7 +133,7 @@ public class DataImportController {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			String filename = fileSet.getCdt(); 
-			int[] dataStartCoords = ModelLoader.findDataStartCoords(filename, 
+			int[] dataStartCoords = PreviewLoader.findDataStartCoords(filename, 
 					selectedDelimiter);
 			
 			int rowCount = dataStartCoords[0];
