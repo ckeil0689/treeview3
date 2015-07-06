@@ -18,11 +18,11 @@ import edu.stanford.genetics.treeview.TreeViewApp;
 public class TreeView3 {
 
 	/**
-	 * Sets up important system properties for Apple OS X systems.
-	 * This includes mostly properties related to the OS X menu bar. 
+	 * Sets up important system properties for Apple OS X systems. This includes
+	 * mostly properties related to the OS X menu bar.
 	 */
 	private static void macSetup() {
-		
+
 		final String os = System.getProperty("os.name").toLowerCase();
 		final boolean isMac = os.startsWith("mac os x");
 

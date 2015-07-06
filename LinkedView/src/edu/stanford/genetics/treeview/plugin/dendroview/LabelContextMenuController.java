@@ -10,23 +10,24 @@ public class LabelContextMenuController {
 
 	private LabelContextMenu lCMenu;
 	private TVController tvController;
-	
-	public LabelContextMenuController(LabelContextMenu lCMenu, 
+
+	public LabelContextMenuController(LabelContextMenu lCMenu,
 			TVController tvController) {
-		
+
 		this.lCMenu = lCMenu;
 		this.tvController = tvController;
-		
+
 		addAllListeners();
 	}
-	
+
 	private void addAllListeners() {
-		
+
 		lCMenu.addStyleListener(new StyleMenuListener());
 	}
-	
+
 	/**
 	 * Listener which is used to open the label style editor.
+	 * 
 	 * @author chris0689
 	 *
 	 */
@@ -34,8 +35,9 @@ public class LabelContextMenuController {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			
-			tvController.openPrefMenu(StringRes.menu_RowAndCol);;	
+
+			tvController.openPrefMenu(StringRes.menu_RowAndCol);
+			;
 		}
 	}
 }

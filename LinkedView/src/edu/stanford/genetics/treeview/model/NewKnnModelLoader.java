@@ -35,7 +35,8 @@ public class NewKnnModelLoader extends ModelLoader {
 	/**
 	 * @param model
 	 */
-	public NewKnnModelLoader(final KnnModel model, final TVController controller, final DataLoadInfo dataStartCoords) {
+	public NewKnnModelLoader(final KnnModel model,
+			final TVController controller, final DataLoadInfo dataStartCoords) {
 
 		super(model, controller, dataStartCoords);
 

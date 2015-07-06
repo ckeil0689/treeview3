@@ -16,7 +16,7 @@ public class Thumb {
 
 	protected int x;
 	protected int y;
-	
+
 	protected double dataVal;
 
 	/* Thumb dimensions */
@@ -25,7 +25,7 @@ public class Thumb {
 
 	protected GeneralPath innerthumbPath;
 	protected GeneralPath outerthumbPath;
-	
+
 	protected Color thumbColor;
 	protected boolean selected = false;
 
@@ -38,9 +38,9 @@ public class Thumb {
 	 */
 	public Thumb(final int x, final int y) {
 
-		this(x, y,Color.GRAY);
+		this(x, y, Color.GRAY);
 	}
-	
+
 	/**
 	 * Constructs a thumb object if given the x/y-coordinates and a color.
 	 *
@@ -53,22 +53,24 @@ public class Thumb {
 		this.thumbColor = color;
 		setCoords(x, y);
 	}
-	
+
 	/**
-	 * Sets the data value which the thumb represents on the gradient. 
+	 * Sets the data value which the thumb represents on the gradient.
+	 * 
 	 * @param dataVal
 	 */
 	public void setDataValue(final double dataVal) {
-		
+
 		this.dataVal = dataVal;
 	}
-	
+
 	/**
 	 * Accessor for the thumb's associated data value.
+	 * 
 	 * @return
 	 */
 	public double getDataValue() {
-		
+
 		return dataVal;
 	}
 

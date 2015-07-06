@@ -21,8 +21,8 @@ public class ShortcutDialog extends CustomDialog {
 		setupData();
 
 		add(mainPanel);
-//		dialog.pack();
-//		dialog.setLocationRelativeTo(Frame.getFrames()[0]);
+		// dialog.pack();
+		// dialog.setLocationRelativeTo(Frame.getFrames()[0]);
 	}
 
 	private void setupData() {

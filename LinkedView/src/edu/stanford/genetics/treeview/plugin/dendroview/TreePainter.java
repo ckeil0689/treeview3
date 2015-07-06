@@ -71,14 +71,13 @@ public class TreePainter extends TreeDrawer {
 		if ((root == null) || (root.isLeaf()) || (xScaleEq == null)
 				|| (yScaleEq == null))
 			return;
-		else {
-			this.isLeft = isLeft;
-			// recursively drawtree...
-			final NodeDrawer nd = new NodeDrawer(graphics, xScaleEq, yScaleEq,
-					null, dest);
-			nd.isSelected = isSelected;
-			nd.draw(root);
-		}
+		this.isLeft = isLeft;
+		
+		// recursively drawtree...
+		final NodeDrawer nd = new NodeDrawer(graphics, xScaleEq, yScaleEq,
+				null, dest);
+		nd.isSelected = isSelected;
+		nd.draw(root);
 	}
 
 	public void paintSubtree(final Graphics graphics,
@@ -89,13 +88,12 @@ public class TreePainter extends TreeDrawer {
 
 		if ((root == null) || (root.isLeaf()))
 			return;
-		else {
-			this.isLeft = isLeft;
-			// recursively drawtree...
-			final NodeDrawer nd = new NodeDrawer(graphics, xScaleEq, yScaleEq,
-					selected, dest);
-			nd.draw(root);
-		}
+		
+		this.isLeft = isLeft;
+		// recursively drawtree...
+		final NodeDrawer nd = new NodeDrawer(graphics, xScaleEq, yScaleEq,
+				selected, dest);
+		nd.draw(root);
 	}
 
 	public void paintSingle(final Graphics graphics,
@@ -106,18 +104,16 @@ public class TreePainter extends TreeDrawer {
 
 		if ((root == null) || (root.isLeaf()))
 			return;
-		else {
-			this.isLeft = isLeft;
-			// just draw single..
-			final NodeDrawer nd = new NodeDrawer(graphics, xScaleEq, yScaleEq,
-					null, dest);
-			nd.isSelected = isSelected;
-			if (!root.isLeaf()) {
-				nd.drawSingle(root);
+		this.isLeft = isLeft;
+		// just draw single..
+		final NodeDrawer nd = new NodeDrawer(graphics, xScaleEq, yScaleEq,
+				null, dest);
+		nd.isSelected = isSelected;
+		if (!root.isLeaf()) {
+			nd.drawSingle(root);
 
-			} else {
-				LogBuffer.println("Root was leaf?");
-			}
+		} else {
+			LogBuffer.println("Root was leaf?");
 		}
 	}
 
@@ -165,7 +161,7 @@ public class TreePainter extends TreeDrawer {
 			selected = sel;
 			xT = xScaleEq;
 			yT = yScaleEq;
-			dest = d;
+			dest = d; // TODO if d is NULL this will crash and burn in else clause
 
 			// GTRView
 			if (isLeft && dest != null) {
@@ -267,11 +263,13 @@ public class TreePainter extends TreeDrawer {
 			if (xT == null) {
 				LogBuffer.println("xt in drawSingle in InvertedTreeDrawer "
 						+ "was null.");
+				return;
 			}
 
 			if (right == null) {
 				LogBuffer.println("right in drawSingle in InvertedTreeDrawer "
 						+ "was null.");
+				return;
 			}
 
 			int rx = 0;

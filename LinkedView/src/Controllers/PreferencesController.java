@@ -267,12 +267,17 @@ public class PreferencesController {
 		@Override
 		protected Void doInBackground() throws Exception {
 
-			HeaderInfo headerInfo = null;
+			HeaderInfo headerInfo;
 			if (type.equalsIgnoreCase(StringRes.main_rows)) {
 				headerInfo = model.getRowHeaderInfo();
 
 			} else if (type.equalsIgnoreCase(StringRes.main_cols)) {
 				headerInfo = model.getColumnHeaderInfo();
+				
+			} else {
+				LogBuffer.println("Could not set HeaderInfo"
+						+ " when trying to load new labels.");
+				return null;
 			}
 
 			/*

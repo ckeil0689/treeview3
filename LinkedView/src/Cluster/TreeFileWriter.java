@@ -5,6 +5,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
  * This class is specifically concerned with writing data to tree files.
+ * 
  * @author chris0689
  *
  */
@@ -12,30 +13,37 @@ public class TreeFileWriter {
 
 	/* Writer that generates the ATR/ GTR files for trees */
 	private ClusterFileWriter bufferedWriter;
-	
+
 	/**
-	 * Sets up a writer for tree files which keep track of the clustered
-	 * matrix elements.
-	 * @param axis The original matrix' axis which is clustered.
-	 * @param fileName The name of the file to be clustered.
-	 * @param linkMethod Identifier for link method used for clustering.
+	 * Sets up a writer for tree files which keep track of the clustered matrix
+	 * elements.
+	 * 
+	 * @param axis
+	 *            The original matrix' axis which is clustered.
+	 * @param fileName
+	 *            The name of the file to be clustered.
+	 * @param linkMethod
+	 *            Identifier for link method used for clustering.
 	 */
 	public TreeFileWriter(final int axis, String fileName, int linkMethod) {
-		
-		
+
 		String fileSuffix = (axis == ClusterController.ROW) ? ".gtr" : ".atr";
 
-		this.bufferedWriter = new ClusterFileWriter(fileName, fileSuffix, 
+		this.bufferedWriter = new ClusterFileWriter(fileName, fileSuffix,
 				linkMethod);
-		
+
 	}
-	
+
 	/**
 	 * Writes information about the newly clustered elements to a buffer.
-	 * @param link The pair of newly linked elements.
-	 * @param loopNum The current iteration step of clustering.
-	 * @param min The minimum value from the distance matrix associated with
-	 * the current cluster pair.
+	 * 
+	 * @param link
+	 *            The pair of newly linked elements.
+	 * @param loopNum
+	 *            The current iteration step of clustering.
+	 * @param min
+	 *            The minimum value from the distance matrix associated with the
+	 *            current cluster pair.
 	 * @return The ID of the newly formed tree node.
 	 */
 	public String writeData(final String[] link, int loopNum, double min) {
@@ -67,12 +75,12 @@ public class TreeFileWriter {
 
 		return nodeInfo[0];
 	}
-	
+
 	/**
 	 * Closes the file buffer and writes the tree file to disk.
 	 */
 	public void close() {
-		
+
 		bufferedWriter.closeWriter();
 	}
 }

@@ -54,16 +54,15 @@ public class ColorSet {
 
 	/* Default values for a ColorSet. */
 	private final static String default_name = "RedGreen";
-	private final static float[] default_fractions = 
-		{ 0.0f, 0.5f,  1.0f };
-	private final static String[] default_colors = 
-		{ "#FF0000", "#000000", "#00FF00" };
+	private final static float[] default_fractions = { 0.0f, 0.5f, 1.0f };
+	private final static String[] default_colors = { "#FF0000", "#000000",
+			"#00FF00" };
 	private final static String default_missingColor = "#FFFFFF";
 	private final static String default_emptyColor = "#FFFFFF";
-	
+
 	private final static double default_min = -1.0;
 	private final static double default_max = 1.0;
-	
+
 	private final String name;
 	private List<Color> colorList = new ArrayList<Color>();
 	private List<Double> fractionList = new ArrayList<Double>();
@@ -87,8 +86,8 @@ public class ColorSet {
 	 *            string representing initial empty color
 	 */
 	public ColorSet(final String name, final List<Color> colorList,
-			final List<Double> fractionList, final double min, final double max,
-			final String missing, final String empty) {
+			final List<Double> fractionList, final double min,
+			final double max, final String missing, final String empty) {
 
 		this.name = name;
 		this.colorList = colorList;
@@ -114,31 +113,32 @@ public class ColorSet {
 
 		try {
 			for (int i = 0; i < colorNum; i++) {
-				
+
 				colorList.add(decodeColor(colorSetNode.get("Color" + i + 1,
 						default_colors[0])));// default_colors[i])));
-				fractionList.add(new Double(colorSetNode.getFloat("Fraction" + i
-						+ 1, default_fractions[1])));
+				fractionList.add(new Double(colorSetNode.getFloat("Fraction"
+						+ i + 1, default_fractions[1])));
 			}
-			
-		} catch(ArrayIndexOutOfBoundsException e) {
+
+		} catch (ArrayIndexOutOfBoundsException e) {
 			LogBuffer.logException(e);
-			
+
 			/* Add defaults if there's an issue */
 			colorNum = default_colors.length;
 			for (int i = 0; i < colorNum; i++) {
-				
+
 				colorList.add(decodeColor(default_colors[i]));// default_colors[i])));
 				fractionList.add(new Double(default_fractions[i]));
 			}
 		}
-		
-		/* TODO this is bad... will screw up dataset colors on first load
-		 * since min/max by default have nothing to do with 
+
+		/*
+		 * TODO this is bad... will screw up dataset colors on first load since
+		 * min/max by default have nothing to do with
 		 */
 		this.min = colorSetNode.getDouble("min", default_min);
 		this.max = colorSetNode.getDouble("max", default_max);
-		
+
 		this.missing = decodeColor(colorSetNode.get("missing",
 				default_missingColor));
 		this.empty = decodeColor(colorSetNode.get("empty", default_emptyColor));
@@ -160,18 +160,17 @@ public class ColorSet {
 	 * @param empty
 	 *            string representing inital empty color
 	 */
-	public ColorSet(final String name, final String[] colors, 
+	public ColorSet(final String name, final String[] colors,
 			final String missing, final String empty) {
 
-		
 		final List<Color> newColorList = new ArrayList<Color>();
-		for(String color : colors) {
+		for (String color : colors) {
 			newColorList.add(decodeColor(color)); /* min in ColorChooser */
 		}
-		
+
 		final List<Double> newFractionList = new ArrayList<Double>();
-		for(int i = 0; i < default_fractions.length; i++) {
-			newFractionList.add((double)default_fractions[i]);
+		for (int i = 0; i < default_fractions.length; i++) {
+			newFractionList.add((double) default_fractions[i]);
 		}
 
 		this.name = name;
@@ -220,7 +219,7 @@ public class ColorSet {
 			colorSetNode.putFloat("Fraction" + i + 1, fractionList.get(i)
 					.floatValue());
 		}
-		
+
 		colorSetNode.putDouble("min", min);
 		colorSetNode.putDouble("max", max);
 
@@ -283,14 +282,14 @@ public class ColorSet {
 
 		return fractionList;
 	}
-	
+
 	public double getMin() {
-		
+
 		return min;
 	}
-	
+
 	public double getMax() {
-		
+
 		return max;
 	}
 
@@ -472,7 +471,8 @@ public class ColorSet {
 		stream.close();
 	}
 
-	private static Color unpackEisen(final InputStream stream) throws IOException {
+	private static Color unpackEisen(final InputStream stream)
+			throws IOException {
 
 		final int red = stream.read();
 		final int green = stream.read();

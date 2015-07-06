@@ -78,7 +78,7 @@ public class LinkedViewApp extends TreeViewApp {
 	 */
 	@Override
 	public void start() {
-		
+
 		openNew().getAppFrame().setVisible(true);
 	}
 
@@ -95,39 +95,39 @@ public class LinkedViewApp extends TreeViewApp {
 	}
 
 	/**
-	 * @deprecated No features are used as plugins anymore. DendroView is 
-	 * now a native package rather than a plugin.
+	 * @deprecated No features are used as plugins anymore. DendroView is now a
+	 *             native package rather than a plugin.
 	 */
 	private void scanForPlugins() {
 
-//		final URL fileURL = getCodeBase();
-//		String dir = Util.URLtoFilePath(fileURL.getPath() + "/plugins");
-//		File[] files = PluginManager.getPluginManager().readdir(dir);
-//		if (files == null) {
-//			LogBuffer.println("Directory " + dir + " returned null");
-//			final File f_currdir = new File(".");
-//			try {
-//				dir = f_currdir.getCanonicalPath() + File.separator + "plugins"
-//						+ File.separator;
-//				LogBuffer.println("failing over to " + dir);
-//				files = PluginManager.getPluginManager().readdir(dir);
-//				if (files != null) {
-//					setCodeBase(f_currdir.toURI().toURL());
-//				}
-//			} catch (final IOException e1) {
-//				// this might happen when the dir is bad.
-//				LogBuffer.logException(e1);
-//				LogBuffer.println("Directory for plugin probably bad: " + dir);
-//			}
-//		}
-//		if (files == null || files.length == 0) {
-//			LogBuffer.println("Directory " + dir + " contains no plugins");
-//
-//		} else {
-//			PluginManager.getPluginManager().loadPlugins(files, false);
-//		}
-//		PluginManager.getPluginManager().pluginAssignConfigNodes(
-//				getGlobalConfig().node("Plugins"));
+		// final URL fileURL = getCodeBase();
+		// String dir = Util.URLtoFilePath(fileURL.getPath() + "/plugins");
+		// File[] files = PluginManager.getPluginManager().readdir(dir);
+		// if (files == null) {
+		// LogBuffer.println("Directory " + dir + " returned null");
+		// final File f_currdir = new File(".");
+		// try {
+		// dir = f_currdir.getCanonicalPath() + File.separator + "plugins"
+		// + File.separator;
+		// LogBuffer.println("failing over to " + dir);
+		// files = PluginManager.getPluginManager().readdir(dir);
+		// if (files != null) {
+		// setCodeBase(f_currdir.toURI().toURL());
+		// }
+		// } catch (final IOException e1) {
+		// // this might happen when the dir is bad.
+		// LogBuffer.logException(e1);
+		// LogBuffer.println("Directory for plugin probably bad: " + dir);
+		// }
+		// }
+		// if (files == null || files.length == 0) {
+		// LogBuffer.println("Directory " + dir + " contains no plugins");
+		//
+		// } else {
+		// PluginManager.getPluginManager().loadPlugins(files, false);
+		// }
+		// PluginManager.getPluginManager().pluginAssignConfigNodes(
+		// getGlobalConfig().node("Plugins"));
 	}
 
 	/* inherit description */
@@ -155,7 +155,7 @@ public class LinkedViewApp extends TreeViewApp {
 		// new TVController(tvFrame, model).loadFileSet(fileSet);
 		final TVController tvController = new TVController(tvFrame, model);
 		tvController.getDataInfoAndLoad(fileSet, false);
-		
+
 		tvFrame.setLoaded(true);
 
 		// tvFrame.addWindowListener(this);
@@ -219,7 +219,7 @@ public class LinkedViewApp extends TreeViewApp {
 	}
 
 	/**
-	 * @deprecated 
+	 * @deprecated
 	 * @param exportType
 	 * @param tvFrame
 	 * @return
@@ -285,7 +285,8 @@ public class LinkedViewApp extends TreeViewApp {
 			// cheap_hack_i_re.html
 			URL location;
 			final String classLocation = LinkedViewApp.class.getName().replace(
-					'.', '/') + ".class";
+					'.', '/')
+					+ ".class";
 
 			final ClassLoader loader = LinkedViewApp.class.getClassLoader();
 			if (loader == null) {
@@ -318,7 +319,7 @@ public class LinkedViewApp extends TreeViewApp {
 				return (new File(".")).toURI().toURL();
 			}
 			return new URL(token);
-			
+
 		} catch (final MalformedURLException e) {
 			LogBuffer.logException(e);
 			JOptionPane.showMessageDialog(null, e);

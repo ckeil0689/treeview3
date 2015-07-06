@@ -10,36 +10,36 @@ public class Linker {
 	protected final static int AVG = 0;
 	protected final static int SINGLE = 1;
 	protected final static int COMPLETE = 2;
-	
+
 	private int linkMethod;
-	
+
 	/*
 	 * Deep copy of distance matrix because original will be mutated. The
 	 * mutation happens when a new row is formed from to rows that are being
 	 * clustered together.
 	 */
 	private DistanceMatrix distMatrixClone;
-	
+
 	public Linker(int linkMethod) {
-		
+
 		this.linkMethod = linkMethod;
 		this.distMatrixClone = new DistanceMatrix(0);
 	}
-	
+
 	public void cloneDistmatrix(DistanceMatrix origMatrix) {
-		
+
 		distMatrixClone.cloneFrom(origMatrix);
 	}
-	
-	public double[] link(final int[] fusedClusters, 
+
+	public double[] link(final int[] fusedClusters,
 			List<List<Integer>> currentClusters) {
-		
+
 		if (linkMethod == SINGLE || linkMethod == COMPLETE) {
 			return singleCompleteLink(fusedClusters, currentClusters);
 		}
 		return averageLink(fusedClusters, currentClusters);
 	}
-	
+
 	/**
 	 * Method used to generate a new row/col for the distance matrix which is
 	 * processed. The new row/col represents the joint row pair which has been
@@ -52,7 +52,7 @@ public class Linker {
 	 * @param fusedClusters
 	 * @return newRow
 	 */
-	private double[] singleCompleteLink(final int[] fusedClusters, 
+	private double[] singleCompleteLink(final int[] fusedClusters,
 			List<List<Integer>> currentClusters) {
 
 		/* Make a new row that has the same size as the number of clusters. */
@@ -166,7 +166,7 @@ public class Linker {
 	 * @param newRow
 	 * @return newRow
 	 */
-	private double[] averageLink(final int[] fusedGroup, 
+	private double[] averageLink(final int[] fusedGroup,
 			List<List<Integer>> currentClusters) {
 
 		final double[] newRow = new double[currentClusters.size()];
@@ -235,9 +235,9 @@ public class Linker {
 
 		return newRow;
 	}
-	
+
 	public void close() {
-		
+
 		distMatrixClone = null;
 	}
 }

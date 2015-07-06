@@ -76,7 +76,7 @@ public class WelcomeView {
 		 * Default serial version ID to keep Eclipse happy...
 		 */
 		private static final long serialVersionUID = 1L;
-		
+
 		private BufferedImage image;
 
 		public ImagePanel() {
@@ -86,11 +86,10 @@ public class WelcomeView {
 				final InputStream input = classLoader
 						.getResourceAsStream("logo_small.png");
 
-				if(input != null) {
+				if (input != null) {
 					image = ImageIO.read(input);
+					input.close();
 				}
-				
-				input.close();
 
 			} catch (final IOException ex) {
 				LogBuffer.logException(ex);
@@ -102,12 +101,11 @@ public class WelcomeView {
 		protected void paintComponent(final Graphics g) {
 
 			super.paintComponent(g);
-			
-			if(image != null) {
+
+			if (image != null) {
 				g.drawImage(image, 0, 0, null);
 			}
 		}
-
 	}
 
 	/**
@@ -164,26 +162,27 @@ public class WelcomeView {
 		loadButton = GUIFactory.createLargeBtn("Open...");
 		loadButton.requestFocusInWindow();
 		loadLastButton = GUIFactory.createBtn("Load last file");
-		
+
 		String filename;
-		if(fs != null) {
+		if (fs != null) {
 			filename = fs.getCdt();
 			loadLastButton.setEnabled(true);
-			((JFrame) JFrame.getFrames()[0]).getRootPane()
-			.setDefaultButton(loadLastButton);
+			((JFrame) JFrame.getFrames()[0]).getRootPane().setDefaultButton(
+					loadLastButton);
 		} else {
 			filename = "none";
 			loadLastButton.setEnabled(false);
-			((JFrame) JFrame.getFrames()[0]).getRootPane()
-			.setDefaultButton(loadButton);
+			((JFrame) JFrame.getFrames()[0]).getRootPane().setDefaultButton(
+					loadButton);
 		}
-		
+
 		JLabel last = new JLabel("Last file: ");
 		last.setFont(GUIFactory.FONTS_B);
 		JLabel filePath = new JLabel(filename);
 
 		loadPanel.add(loadButton, "pushx, alignx 50%, aligny 0%, span, wrap");
-		loadPanel.add(loadLastButton, "pushx, alignx 50%, aligny 0%, span, wrap");
+		loadPanel.add(loadLastButton,
+				"pushx, alignx 50%, aligny 0%, span, wrap");
 		loadPanel.add(last, "pushx, alignx 100%, aligny 0%");
 		loadPanel.add(filePath, "pushx, alignx 0%, aligny 0%");
 

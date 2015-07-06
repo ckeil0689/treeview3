@@ -105,9 +105,9 @@ public class ClusterController {
 			LogBuffer.println("Cannot add listeners, clusterView is null.");
 		}
 	}
-	
+
 	public void displayView() {
-		
+
 		clusterDialog.setVisible(true);
 	}
 
@@ -216,9 +216,9 @@ public class ClusterController {
 					.getDataMatrix();
 			processor = new ClusterProcessor(originalMatrix, fileName,
 					geneHeaderI, arrayHeaderI);
-			
+
 			/* Set zeroes invalid if they should be ignored. */
-			if(clusterView.isIgnoreZeroesChecked()) {
+			if (clusterView.isIgnoreZeroesChecked()) {
 				originalMatrix.setZeroesToMissing();
 			}
 
@@ -277,8 +277,8 @@ public class ClusterController {
 			if (isCancelled()) {
 				return null;
 			}
-			
-//			distMatrix.writeMatrix(axisPrefix);
+
+			// distMatrix.writeMatrix(axisPrefix);
 
 			publish("Clustering " + axisPrefix + " data...");
 
@@ -345,7 +345,7 @@ public class ClusterController {
 					reorderedCols, rowSimilarity, colSimilarity,
 					isHierarchical());
 
-			cdtGen.setupWriter(fileName, clusterView.getLinkMethod(), 
+			cdtGen.setupWriter(fileName, clusterView.getLinkMethod(),
 					clusterView.getSpinnerValues());
 
 			final IntHeaderInfo geneHeaderI = tvModel.getRowHeaderInfo();
@@ -388,10 +388,11 @@ public class ClusterController {
 					file.getParent() + File.separator);
 
 			clusterDialog.dispose();
-			
+
 			tvController.getDataInfoAndLoad(fileSet, true);
-//			DataLoadInfo dataInfo = new DataLoadInfo(new int[]{0,0}, "\\t"); // TODO replace with actual values
-//			tvController.loadData(fileSet, true, dataInfo);
+			// DataLoadInfo dataInfo = new DataLoadInfo(new int[]{0,0}, "\\t");
+			// // TODO replace with actual values
+			// tvController.loadData(fileSet, true, dataInfo);
 
 		} else {
 			final String alert = "When trying to load the clustered file, no "
@@ -534,7 +535,7 @@ public class ClusterController {
 		if (isHierarchical()) {
 			return distMeasure != DistMatrixCalculator.NO_CLUSTER;
 		}
-		
+
 		final Integer[] spinnerValues = clusterView.getSpinnerValues();
 
 		int groups;
@@ -556,9 +557,8 @@ public class ClusterController {
 			break;
 		}
 
-		return (distMeasure != DistMatrixCalculator.NO_CLUSTER 
-				&& (groups > 0 && iterations > 0));
-		
+		return (distMeasure != DistMatrixCalculator.NO_CLUSTER && (groups > 0 && iterations > 0));
+
 	}
 
 	/**

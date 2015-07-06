@@ -50,15 +50,15 @@ public class ClusterProcessor {
 		this.arrayHeaderI = arrayHeaderI;
 		this.pBarCount = 0;
 	}
-	
+
 	/**
-	 * Starts a SwingWorker thread to calculate the distance matrix 
-	 * for the loaded data.
+	 * Starts a SwingWorker thread to calculate the distance matrix for the
+	 * loaded data.
 	 *
 	 * @param distMeasure
 	 * @param axis
-	 * @return m * m distance matrix where m is the clustered axis length
-	 * of the original data matrix.
+	 * @return m * m distance matrix where m is the clustered axis length of the
+	 *         original data matrix.
 	 */
 	public double[][] calcDistance(final int distMeasure, final int axis) {
 
@@ -89,12 +89,10 @@ public class ClusterProcessor {
 	 * @param spinnerInput
 	 * @param hierarchical
 	 * @param axis
-<<<<<<< HEAD
+	 *            <<<<<<< HEAD
 	 * @return m x m distance matrix where m is the clustered axis length of the
-	 *         original data matrix.
-=======
-	 * @return Reordered matrix headers.
->>>>>>> origin/master
+	 *         original data matrix. =======
+	 * @return Reordered matrix headers. >>>>>>> origin/master
 	 */
 	public String[] clusterAxis(final DistanceMatrix distMatrix,
 			final int linkMethod, final Integer[] spinnerInput,
@@ -296,8 +294,8 @@ public class ClusterProcessor {
 
 			/* Hierarchical */
 			if (hier) {
-				final HierCluster clusterer = 
-						new HierCluster(linkMethod, distMatrix, axis);
+				final HierCluster clusterer = new HierCluster(linkMethod,
+						distMatrix, axis);
 
 				clusterer.setupFileWriter(axis, fileName);
 
@@ -344,9 +342,9 @@ public class ClusterProcessor {
 					iterations = spinnerInput[3];
 				}
 
-				final KMeansCluster clusterer = 
-						new KMeansCluster(distMatrix, axis, k);
-				
+				final KMeansCluster clusterer = new KMeansCluster(distMatrix,
+						axis, k);
+
 				clusterer.setupFileWriter(fileName);
 
 				/*

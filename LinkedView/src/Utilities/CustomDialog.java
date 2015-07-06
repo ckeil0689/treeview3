@@ -22,7 +22,7 @@ public class CustomDialog extends JDialog {
 	 * Default serial version ID to keep Eclipse happy...
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	protected JPanel mainPanel;
 	protected JButton closeBtn;
 
@@ -47,7 +47,7 @@ public class CustomDialog extends JDialog {
 
 		this.mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT,
 				null);
-		
+
 		getContentPane().add(mainPanel);
 	}
 
@@ -73,7 +73,7 @@ public class CustomDialog extends JDialog {
 		pack();
 		setLocationRelativeTo(JFrame.getFrames()[0]);
 		closeBtn.requestFocus();
-		
+
 		super.setVisible(visible);
 	}
 }

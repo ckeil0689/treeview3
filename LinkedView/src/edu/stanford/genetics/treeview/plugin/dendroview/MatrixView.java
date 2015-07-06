@@ -16,8 +16,8 @@ import edu.stanford.genetics.treeview.TreeSelectionI;
 
 /**
  * Basic skeleton for a MatrixView. Can be used as a basis for the interactive
- * MatrixView as well as the overview MatrixView since their only difference
- * is interactivity.
+ * MatrixView as well as the overview MatrixView since their only difference is
+ * interactivity.
  * 
  * @author chris0689
  *
@@ -26,27 +26,27 @@ public abstract class MatrixView extends ModelViewProduced {
 
 	protected MapContainer xmap;
 	protected MapContainer ymap;
-	
+
 	protected TreeSelectionI geneSelection;
 	protected TreeSelectionI arraySelection;
-	
+
 	protected boolean hasDrawn = false;
-	
+
 	protected ArrayDrawer drawer;
-	
+
 	protected final JScrollPane scrollPane;
-	
+
 	/**
 	 * Default so warnings do not pop up...
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	public MatrixView() {
-		
+
 		super();
-		
+
 		setLayout(new MigLayout());
-		
+
 		scrollPane = new JScrollPane(this,
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -55,17 +55,16 @@ public abstract class MatrixView extends ModelViewProduced {
 		panel.setBorder(BorderFactory.createEtchedBorder());
 		panel.setBackground(GUIFactory.ELEMENT_HOV);
 	}
-	
+
 	@Override
 	public Dimension getPreferredSize() {
 
-		return new Dimension(xmap.getRequiredPixels(),
-				ymap.getRequiredPixels());
+		return new Dimension(xmap.getRequiredPixels(), ymap.getRequiredPixels());
 	}
 
 	@Override
 	public void update(Observable o, Object arg) {
-		
+
 		if (o == xmap || o == ymap) {
 			recalculateOverlay();
 			offscreenValid = false;
@@ -76,13 +75,13 @@ public abstract class MatrixView extends ModelViewProduced {
 			 * different.
 			 */
 			offscreenValid = false;
-			
-		} else if(o == xmap || o == ymap) {
+
+		} else if (o == xmap || o == ymap) {
 			offscreenValid = false;
-			
-		} else if(o instanceof TreeSelectionI) {
+
+		} else if (o instanceof TreeSelectionI) {
 			return;
-			
+
 		} else {
 			LogBuffer.println(viewName() + " got weird update : " + o);
 			return;
@@ -99,7 +98,7 @@ public abstract class MatrixView extends ModelViewProduced {
 
 	@Override
 	public String viewName() {
-		
+
 		return "MatrixView";
 	}
 
@@ -108,20 +107,20 @@ public abstract class MatrixView extends ModelViewProduced {
 		// TODO Auto-generated method stub
 
 	}
-	
+
 	/**
-	 * Checks the selection or view of genes and arrays and calculates 
-	 * the appropriate selection or viewport rectangle.
+	 * Checks the selection or view of genes and arrays and calculates the
+	 * appropriate selection or viewport rectangle.
 	 */
 	protected abstract void recalculateOverlay();
-	
+
 	/**
-	 * Checks current availability of space on the screen (pixels) and
-	 * updates the MapContainers accordingly. Setting offScreenValid to false
-	 * results in a repaint by the drawer when updatePixels() is called.
+	 * Checks current availability of space on the screen (pixels) and updates
+	 * the MapContainers accordingly. Setting offScreenValid to false results in
+	 * a repaint by the drawer when updatePixels() is called.
 	 */
 	protected void revalidateScreen() {
-		
+
 		if (offscreenChanged) {
 			offscreenValid = false;
 			xmap.setAvailablePixels(offscreenSize.width);
@@ -135,22 +134,21 @@ public abstract class MatrixView extends ModelViewProduced {
 			}
 		}
 	}
-	
+
 	/**
 	 * Initiates a revalidation of the available screen space and sets the
 	 * MapContainers to minimum scale.
 	 */
 	public void resetView() {
-		
+
 		LogBuffer.println("Resetting view: " + viewName());
-		
+
 		xmap.setToMinScale();
 		ymap.setToMinScale();
-		
+
 		revalidateScreen();
 	}
-	
-	
+
 	/**
 	 * Set geneSelection
 	 *
@@ -184,7 +182,7 @@ public abstract class MatrixView extends ModelViewProduced {
 		this.arraySelection = arraySelection;
 		this.arraySelection.addObserver(this);
 	}
-	
+
 	/**
 	 * Set ArrayDrawer
 	 *
@@ -200,7 +198,7 @@ public abstract class MatrixView extends ModelViewProduced {
 		drawer = arrayDrawer;
 		drawer.addObserver(this);
 	}
-	
+
 	/**
 	 * DEPRECATE set the xmapping for this view
 	 *

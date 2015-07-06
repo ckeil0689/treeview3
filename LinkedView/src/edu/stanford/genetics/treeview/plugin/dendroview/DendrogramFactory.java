@@ -74,7 +74,7 @@ public class DendrogramFactory extends PluginFactory {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * 
 	 * @see edu.stanford.genetics.treeview
 	 * .PluginFactory#addPluginConfig(java.awt.Menu)

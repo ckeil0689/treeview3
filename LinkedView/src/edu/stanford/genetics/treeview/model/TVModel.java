@@ -574,18 +574,18 @@ public class TVModel extends Observable implements DataModel {
 
 			exprData = null;
 		}
-		
+
 		/**
-		 * Sets all zero values (0.0) in the data set to the defined 
-		 * very large double for missing data. Zeroes are therefore set
-		 * to 'missing' status. They will be ignored during clustering and
-		 * colored like missing values. 
+		 * Sets all zero values (0.0) in the data set to the defined very large
+		 * double for missing data. Zeroes are therefore set to 'missing'
+		 * status. They will be ignored during clustering and colored like
+		 * missing values.
 		 */
 		public void setZeroesToMissing() {
-			
-			for(int i = 0; i < exprData.length; i++) {
-				for(int j = 0; j < exprData[i].length; j++) {
-					if(Helper.nearlyEqual(0.0, exprData[i][j])) {
+
+			for (int i = 0; i < exprData.length; i++) {
+				for (int j = 0; j < exprData[i].length; j++) {
+					if (Helper.nearlyEqual(0.0, exprData[i][j])) {
 						exprData[i][j] = DataModel.NODATA;
 					}
 				}

@@ -180,7 +180,7 @@ public class UrlSettingsPanel implements SettingsPanel {
 	}
 
 	private class HeaderChoice extends JComboBox<String> implements
-	ItemListener {
+			ItemListener {
 
 		private static final long serialVersionUID = 1L;
 

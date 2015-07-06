@@ -30,15 +30,15 @@ import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.UrlExtractor;
 
 public abstract class LabelView extends ModelView implements MouseListener,
-MouseMotionListener, FontSelectable, ConfigNodePersistent {
+		MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
 	private static final long serialVersionUID = 1L;
 
 	/* Axis IDs */
 	protected final static int ROW = 0;
 	protected final static int COL = 1;
-	
-	protected final static int HINTFONTSIZE = 14; 
+
+	protected final static int HINTFONTSIZE = 14;
 	protected final static double LOWER_BOUND = 10.0;
 
 	/* DataModel is an observer */
@@ -100,7 +100,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 	protected String zoomHint;
 
 	public LabelView(final int axis_id) {
-		
+
 		super();
 
 		this.isGeneAxis = (axis_id == ROW);
@@ -121,7 +121,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
 		panel = scrollPane;
 	}
-	
+
 	protected abstract void adjustScrollBar();
 
 	/**
@@ -224,7 +224,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
 		if (parentNode != null) {
 			this.configNode = parentNode;
-			
+
 		} else {
 			LogBuffer.println("parentNode for LabelView was null.");
 			return;
@@ -233,12 +233,12 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		LogBuffer.println("Setting new label configNode");
 		importSettingsFromNode(configNode);
 	}
-	
+
 	public void importSettingsFromNode(Preferences node) {
-		
+
 		setMin(node.getInt("min", d_min));
 		setMax(node.getInt("max", d_max));
-		
+
 		setFace(node.get("face", d_face));
 		setStyle(node.getInt("style", d_style));
 		setSavedPoints(node.getInt("size", d_size));
@@ -259,19 +259,19 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
 		return size;
 	}
-	
-	@Override 
+
+	@Override
 	public int getLastSize() {
-		
+
 		return last_size;
 	};
-	
+
 	@Override
 	public int getMin() {
 
 		return min;
 	}
-	
+
 	@Override
 	public int getMax() {
 
@@ -283,7 +283,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
 		return style;
 	}
-	
+
 	@Override
 	public boolean getFixed() {
 
@@ -307,7 +307,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		if (isGeneAxis) {
 			return scrollPane.getHorizontalScrollBar();
 		}
-		
+
 		return scrollPane.getVerticalScrollBar();
 	}
 
@@ -324,31 +324,32 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 			repaint();
 		}
 	}
-	
+
 	/**
 	 * Wrapper for setPoints which allows to save the newly set points to an
 	 * instance variable.
+	 * 
 	 * @param i
 	 */
 	@Override
 	public void setSavedPoints(final int i) {
-		
+
 		/* Stay within boundaries */
 		int new_i = i;
-		if(i > max) {
+		if (i > max) {
 			new_i = max;
-			
-		} else if(i < min) {
+
+		} else if (i < min) {
 			new_i = min;
 		}
-		
+
 		last_size = new_i;
 		setPoints(new_i);
 	}
 
 	@Override
 	public void setPoints(final int i) {
-		
+
 		if (size != i) {
 			size = i;
 			if (configNode != null) {
@@ -373,14 +374,14 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 			repaint();
 		}
 	}
-	
+
 	@Override
 	public void setMin(final int i) {
 
-		if(i >= max) {
+		if (i >= max) {
 			return;
 		}
-		
+
 		if (min != i) {
 			min = i;
 			if (configNode != null) {
@@ -391,14 +392,14 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 			repaint();
 		}
 	}
-	
+
 	@Override
 	public void setMax(final int i) {
 
-		if(i <= min) {
+		if (i <= min) {
 			return;
 		}
-		
+
 		if (max != i) {
 			max = i;
 			if (configNode != null) {
@@ -418,7 +419,7 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		if (configNode != null) {
 			configNode.putBoolean("isRightJustified", isRightJustified);
 		}
-		
+
 		/**
 		 * Queue up this action so it will be run after LabelView is set up.
 		 */
@@ -430,12 +431,12 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 			}
 		});
 	}
-	
+
 	@Override
 	public void setFixed(boolean fixed) {
-		
+
 		this.isFixed = fixed;
-		
+
 		if (configNode != null) {
 			configNode.putBoolean("isFixed", fixed);
 		}
@@ -474,20 +475,20 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 		/* Get label indices range */
 		final int start = map.getIndex(0);
 		final int end = map.getIndex(map.getUsedPixels()) - 1;
-		
+
 		final Graphics2D g2d = (Graphics2D) g;
 		final AffineTransform orig = g2d.getTransform();
-		
+
 		/* Draw labels if zoom level allows it */
 		final boolean hasFixedOverlap = isFixed && map.getScale() < last_size;
-		
+
 		if (map.getScale() > LOWER_BOUND && !hasFixedOverlap) {
-			
-			if(isFixed) {
+
+			if (isFixed) {
 				setSavedPoints(last_size);
 			} else {
 				adaptFontSizeToMapScale();
-			} 
+			}
 
 			/* Rotate plane for array axis (not for zoomHint) */
 			if (!isGeneAxis) {
@@ -568,74 +569,77 @@ MouseMotionListener, FontSelectable, ConfigNodePersistent {
 
 		} else {
 			setPoints(HINTFONTSIZE);
-			
+
 			int xPos = getHintX(g2d, stringX);
 			int yPos = getHintY(g2d);
-			
+
 			g2d.setColor(Color.black);
 			g2d.drawString(zoomHint, xPos, yPos);
 		}
 	}
-	
+
 	/**
 	 * Gets x-position for the hint label based on axis and justification.
+	 * 
 	 * @param g2d
 	 * @param stringX
 	 * @return x-position for hint label.
 	 */
 	private int getHintX(Graphics2D g2d, int stringX) {
-		
+
 		int xPos = 0;
 		int offSet = 10;
 		final FontMetrics metrics = getFontMetrics(g2d.getFont());
-			
+
 		if (isGeneAxis) {
-			if(isRightJustified) {
+			if (isRightJustified) {
 				xPos = stringX - metrics.stringWidth(zoomHint) - offSet;
 			} else {
 				xPos = offSet;
 			}
-			
+
 		} else {
-			xPos = (offscreenSize.width  - metrics.stringWidth(zoomHint)) / 2;
+			xPos = (offscreenSize.width - metrics.stringWidth(zoomHint)) / 2;
 		}
-		
+
 		return xPos;
 	}
-	
+
 	/**
 	 * Gets y-position for the hint label based on axis and justification.
+	 * 
 	 * @param g2d
 	 * @return y-position for hint label.
 	 */
 	private int getHintY(Graphics2D g2d) {
-		
+
 		int yPos = 0;
-		if(isGeneAxis) {
+		if (isGeneAxis) {
 			yPos = panel.getHeight() / 2;
-			
+
 		} else {
-			if(isRightJustified) {
+			if (isRightJustified) {
 				yPos = panel.getHeight() / 2;
-				
+
 			} else {
-				yPos = (int) offscreenSize.getHeight() - (panel.getHeight() / 2);
+				yPos = (int) offscreenSize.getHeight()
+						- (panel.getHeight() / 2);
 			}
 		}
-		
+
 		return yPos;
 	}
-	
+
 	/**
-	 * Sets a dynamic font size based on current scale of the dependent
-	 * axis map.
+	 * Sets a dynamic font size based on current scale of the dependent axis
+	 * map.
 	 */
 	private void adaptFontSizeToMapScale() {
-		
+
 		int squeeze = 1; // how much smaller the font is compared to tile scale
 		int newPoints = (int) map.getScale();
-		
-		if(newPoints != getPoints()) {
+
+		if (newPoints != getPoints()) {
 			setSavedPoints(newPoints - squeeze);
 		}
 	}

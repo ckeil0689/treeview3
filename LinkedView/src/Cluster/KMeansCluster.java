@@ -15,7 +15,7 @@ import Controllers.ClusterController;
  *
  */
 public class KMeansCluster {
-	
+
 	protected final static int KMEANS = 3;
 
 	private ClusterFileWriter bufferedWriter; /* Writer to save data */
@@ -56,9 +56,10 @@ public class KMeansCluster {
 		this.distMatrix = distMatrix;
 		this.axis = axis;
 		this.k = k;
-		
+
 		prepare();
 	}
+
 	/**
 	 * Sets up a buffered writer used to save the data created during the
 	 * process of k-means clustering.
@@ -118,14 +119,13 @@ public class KMeansCluster {
 	 * @param headerArray
 	 *            Matrix labels from the tvModel.
 	 */
-	public void writeData(final int[][] kClusters, 
-			final String[][] headerArray) {
+	public void writeData(final int[][] kClusters, final String[][] headerArray) {
 
-		if(bufferedWriter == null) {
+		if (bufferedWriter == null) {
 			LogBuffer.println("Cannot write KMeans clustering data.");
 			return;
 		}
-		
+
 		/* The list containing the reordered gene names. */
 		reorderedList = new String[distMatrix.getSize()];
 

@@ -90,10 +90,11 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 
 		final String[] childrenNodes = getRootChildrenNodes();
 
-		if ((i < childrenNodes.length) && (i >= 0))
+		if ((i < childrenNodes.length) && (i >= 0)) {
 			return configNode.node(childrenNodes[i]);
-		else
-			return null;
+		}
+		
+		return null;
 	}
 
 	/**
@@ -208,7 +209,7 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 	}
 
 	/**
-	 * Sets confignode to be last in list
+	 * Sets configNode to be last in list
 	 *
 	 * @param configNode
 	 *            Node to move to end
@@ -224,16 +225,15 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 	 *
 	 * @return The last open FileSet
 	 */
-	public FileSet getLast() {
+	public synchronized FileSet getLast() {
 
 		final String lastNode = configNode.get("last_node", "no_last");
 
-		FileSet fileSet;
-		if (lastNode.equalsIgnoreCase("no_last"))
+		if (lastNode.equalsIgnoreCase("no_last")) {
 			return null;
+		}
 
-		fileSet = new FileSet(configNode.node(lastNode));
-		return fileSet;
+		return new FileSet(configNode.node(lastNode));
 	}
 
 	/**
@@ -268,7 +268,7 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 		final Preferences[] aconfigNode = getConfigs();
 		for (final Preferences element : aconfigNode) {
 			final FileSet fileSet2 = new FileSet(element);
-			if (fileSet2.equals(inSet)) {
+			if (fileSet2.equalsFileSet(inSet)) {
 				LogBuffer.println("Found Existing node in MRU list for "
 						+ inSet);
 				fileSet2.copyState(inSet);
@@ -329,7 +329,7 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 		int keeper = -1;
 		for (int i = nodes.length; i > 0; i--) {
 			final FileSet fileSet = new FileSet(nodes[i - 1]);
-			if (fileSet.equals(inSet)) {
+			if (fileSet.equalsFileSet(inSet)) {
 				if (keeper != -1) {
 					// delete node, keep the keeper
 					LogBuffer.println("Found duplicate of " + fileSet.getCdt()

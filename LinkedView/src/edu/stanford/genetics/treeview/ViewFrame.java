@@ -61,7 +61,7 @@ import edu.stanford.genetics.treeview.core.FileMru;
  * @version @version $Revision: 1.37 $ $Date: 2009-08-26 11:48:27 $
  */
 public abstract class ViewFrame extends Observable implements Observer,
-ConfigNodePersistent {
+		ConfigNodePersistent {
 	// extends JFrame implements Observer {
 
 	// Main application frame
@@ -291,7 +291,7 @@ ConfigNodePersistent {
 	 */
 	private class AppWindowPosListener extends ComponentAdapter {
 
-		//Timer to prevent repeatedly saving window dimensions upon resize
+		// Timer to prevent repeatedly saving window dimensions upon resize
 		private final int saveResizeDelay = 1000;
 		private javax.swing.Timer saveResizeTimer;
 		ActionListener saveWindowAttrs = new ActionListener() {
@@ -301,20 +301,21 @@ ConfigNodePersistent {
 					saveResizeTimer.stop();
 					saveResizeTimer = null;
 					LogBuffer.println("Saving window dimensions & position.");
-				
+
 					saveSettings();
 				}
 			}
 		};
 
 		public void componentMoved(ComponentEvent e) {
-			//Save the new dimensions/position if it's done changing
+			// Save the new dimensions/position if it's done changing
 			if (this.saveResizeTimer == null) {
-				/* Start waiting for saveResizeDelay millis to elapse and then
-				 * call actionPerformed of the ActionListener
-				 * "saveWindowAttrs". */
+				/*
+				 * Start waiting for saveResizeDelay millis to elapse and then
+				 * call actionPerformed of the ActionListener "saveWindowAttrs".
+				 */
 				this.saveResizeTimer = new Timer(this.saveResizeDelay,
-												 saveWindowAttrs);
+						saveWindowAttrs);
 				this.saveResizeTimer.start();
 			} else {
 				/* Event came too soon, swallow it by resetting the timer.. */
@@ -324,8 +325,8 @@ ConfigNodePersistent {
 	}
 
 	public void addAppWindowPosListener() {
-		
-		appFrame.addComponentListener( new AppWindowPosListener());
+
+		appFrame.addComponentListener(new AppWindowPosListener());
 	}
 
 	private void setupWindowPosListener() {
@@ -412,12 +413,13 @@ ConfigNodePersistent {
 		case JOptionPane.YES_OPTION:
 			LogBuffer.println("Saving settings before window close.");
 			appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			//Not sure a call to saveSettings is necessary anymore because added
-			//calls upon window resize and winow move in DendroController and
-			//ViewFrame respectively.  If it does something other than save
-			//those two things, then sure, there's reason to keep it.  However,
-			//note that resizing the window without data loaded does not save
-			//settings because it's tied to the matrix jpanel
+			// Not sure a call to saveSettings is necessary anymore because
+			// added
+			// calls upon window resize and winow move in DendroController and
+			// ViewFrame respectively. If it does something other than save
+			// those two things, then sure, there's reason to keep it. However,
+			// note that resizing the window without data loaded does not save
+			// settings because it's tied to the matrix jpanel
 			saveSettings();
 			appFrame.dispose();
 			LogBuffer.println("Will this print, and when?.");

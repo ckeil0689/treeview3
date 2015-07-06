@@ -42,8 +42,7 @@ public class PluginManager {
 	/**
 	 * holds list of all plugin factories
 	 */
-	private final Vector<PluginFactory> pluginFactories = 
-			new Vector<PluginFactory>();
+	private final Vector<PluginFactory> pluginFactories = new Vector<PluginFactory>();
 
 	public static PluginManager getPluginManager() {
 
@@ -175,7 +174,7 @@ public class PluginManager {
 				urlcl.close();
 			}
 			jarFile.close();
-			
+
 		} catch (final ClassNotFoundException e) {
 			LogBuffer.logException(e);
 
@@ -250,7 +249,7 @@ public class PluginManager {
 	}
 
 	public PluginFactory[] getPluginFactories() {
-		
+
 		final PluginFactory[] ret = new PluginFactory[pluginFactories.size()];
 		final Enumeration<PluginFactory> e = pluginFactories.elements();
 		int i = 0;
@@ -261,7 +260,7 @@ public class PluginManager {
 	}
 
 	public PluginFactory getPluginFactoryByName(final String name) {
-		
+
 		final Enumeration<PluginFactory> e = pluginFactories.elements();
 		while (e.hasMoreElements()) {
 			final PluginFactory factory = e.nextElement();
@@ -274,8 +273,7 @@ public class PluginManager {
 	public String[] getPluginNames() {
 		final String[] names = new String[pluginFactories.size()];
 		for (int i = 0; i < names.length; i++) {
-			names[i] = (pluginFactories.elementAt(i))
-					.getPluginName();
+			names[i] = (pluginFactories.elementAt(i)).getPluginName();
 			LogBuffer.println("Pluginclassname ---- " + names[i]);
 		}
 		return names;
@@ -287,17 +285,17 @@ public class PluginManager {
 	 * @return ith plugin, or null if no such plugin.
 	 */
 	public PluginFactory getPluginFactory(final int i) {
-		
+
 		if (i < 0 || i >= pluginFactories.size()) {
 			LogBuffer.println("There is no PluginFactory at " + i);
 			return null;
 		}
-		
+
 		return pluginFactories.elementAt(i);
 	}
 
 	public boolean pluginExists(final String qualified_name) {
-		
+
 		final Enumeration<PluginFactory> e = pluginFactories.elements();
 		String s = null;
 		while (e.hasMoreElements()) {

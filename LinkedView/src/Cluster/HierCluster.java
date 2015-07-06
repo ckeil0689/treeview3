@@ -69,7 +69,7 @@ public class HierCluster {
 	 */
 	private List<List<Integer>> currentClusters;
 	private int[][] rowIndexTable;
-	
+
 	private TreeFileWriter treeWriter;
 
 	private String[] links; // needed for connectNodes??? better way?
@@ -97,7 +97,7 @@ public class HierCluster {
 		this.linker = new Linker(linkMethod);
 		this.distMatrix = distMatrix;
 		this.initial_matrix_size = distMatrix.getSize();
-		
+
 		this.axisPrefix = (axis == ClusterController.ROW) ? "GENE" : "ARRY";
 
 		prepareCluster();
@@ -178,19 +178,18 @@ public class HierCluster {
 		final int[] newCluster = linkClosestClusters();
 
 		/* STEP 3: Write info about the new connection to file. */
-		
+
 		/* First determine if new cluster is linked to a previous node. */
 		final String[] link = connectNodes(newCluster, min_row_index,
 				min_col_index);
 		/*
-		 * Then write data to buffer and add the new node to links, 
-		 * so the next clusters can be checked in connectNodes() during 
-		 * future iterations.
+		 * Then write data to buffer and add the new node to links, so the next
+		 * clusters can be checked in connectNodes() during future iterations.
 		 */
 		links[iterNum] = treeWriter.writeData(link, iterNum, min);
-		
+
 		/* Record new node with its data, so it can be sorted later. */
-//		addNodeToList(link);
+		// addNodeToList(link);
 
 		/* STEP 4: Update the lists that keep track of clusters. */
 
@@ -237,7 +236,7 @@ public class HierCluster {
 		/* Get the two clusters to be fused */
 		/* Get the cluster at rowMinIndex */
 		final int[] row_cluster = new int[currentClusters.get(min_row_index)
-		                                  .size()];
+				.size()];
 		for (int i = 0; i < row_cluster.length; i++) {
 
 			row_cluster[i] = currentClusters.get(min_row_index).get(i);
@@ -245,7 +244,7 @@ public class HierCluster {
 
 		/* Get the cluster at colMinIndex */
 		final int[] col_cluster = new int[currentClusters.get(min_col_index)
-		                                  .size()];
+				.size()];
 		for (int i = 0; i < col_cluster.length; i++) {
 
 			col_cluster[i] = currentClusters.get(min_col_index).get(i);
@@ -253,82 +252,84 @@ public class HierCluster {
 
 		return Helper.concatIntArrays(row_cluster, col_cluster);
 	}
-	
+
 	private void addNodeToList(String[] link) {
-		
+
 		/* Add new node object to list */
 		int id = iterNum + 1;
 		double dist_val = 1 - min;
 		Node newNode = new Node(id, dist_val);
-		
+
 		/* Link to children */
 		int maxChildNum = 2;
 		List<Node> nodes = new ArrayList<Node>();
-		
-		for(int i = 0; i < maxChildNum; i++) {
-			
-			if(link[i].substring(0, "NODE".length()).equalsIgnoreCase("NODE")) {
+
+		for (int i = 0; i < maxChildNum; i++) {
+
+			if (link[i].substring(0, "NODE".length()).equalsIgnoreCase("NODE")) {
 				String index_s = link[i].replaceAll("[\\D]", "");
 				int index_i = Integer.parseInt(index_s);
 				nodes.add(nodeList.get(index_i - 1));
 			}
 		}
-		
+
 		nodes = orderNodes(nodes);
-		
+
 		/* Left child is the one with larger dist value */
-		if(nodes.size() > 0 && nodes.get(0) != null) {
+		if (nodes.size() > 0 && nodes.get(0) != null) {
 			newNode.setLeftChild(nodes.get(0));
 		}
-		
-		if(nodes.size() > 1 && nodes.get(1) != null) {
+
+		if (nodes.size() > 1 && nodes.get(1) != null) {
 			newNode.setRightChild(nodes.get(1));
 		}
-		
+
 		nodeList.add(newNode);
 	}
-	
+
 	/**
-	 * Order 2 nodes decreasing by their dist_value.
-	 * TODO replace with actual comparator later.
+	 * Order 2 nodes decreasing by their dist_value. TODO replace with actual
+	 * comparator later.
+	 * 
 	 * @param nodes
 	 * @return Ordered list of nodes.
 	 */
 	private List<Node> orderNodes(List<Node> nodes) {
-		
-		if(nodes.size() < 2) 
+
+		if (nodes.size() < 2)
 			return nodes;
-		
+
 		double val_1 = -1;
 		double val_2 = -1;
-		
-		if(nodes.get(0) != null) {
+
+		if (nodes.get(0) != null) {
 			val_1 = nodes.get(0).getDistValue();
 		}
-		
-		if(nodes.get(1) != null) {
+
+		if (nodes.get(1) != null) {
 			val_2 = nodes.get(1).getDistValue();
 		}
-		
-		if(val_2 > val_1) {
+
+		if (val_2 > val_1) {
 			Collections.swap(nodes, 0, 1);
 		}
-		
+
 		return nodes;
 	}
-	
+
 	private Node extractOrderedNodes(Node root, List<Node> nodeList) {
-		
-		if(root == null) return null;
-		
-		if(root.getLeftChild() == null && root.getRightChild() == null) {
+
+		if (root == null)
+			return null;
+
+		if (root.getLeftChild() == null && root.getRightChild() == null) {
 			nodeList.add(root);
 			return null;
 		}
-		
+
 		extractOrderedNodes(root.getLeftChild(), nodeList);
 		extractOrderedNodes(root.getRightChild(), nodeList);
-		
+
 		return root;
 	}
 
@@ -459,19 +460,19 @@ public class HierCluster {
 
 		// LogBuffer.println("Min-List: " + Arrays.toString(minList));
 		// LogBuffer.println("Link-List: " + Arrays.deepToString(links));
-//		LogBuffer.println("currentClusters: " + currentClusters);
-		
-//		List<Node> orderedNodes = new ArrayList<Node>();
-//		
-//		extractOrderedNodes(nodeList.get(0), orderedNodes);
-//		
-//		LogBuffer.println("Ordered nodes: " + orderedNodes);
+		// LogBuffer.println("currentClusters: " + currentClusters);
+
+		// List<Node> orderedNodes = new ArrayList<Node>();
+		//
+		// extractOrderedNodes(nodeList.get(0), orderedNodes);
+		//
+		// LogBuffer.println("Ordered nodes: " + orderedNodes);
 
 		treeWriter.close();
 		linker.close();
 		reorderRows(currentClusters.get(0));
 
-//		writeReordered();
+		// writeReordered();
 
 		/* Ensure garbage collection for large objects */
 		links = null;
@@ -512,7 +513,7 @@ public class HierCluster {
 	 * filePath where the cluster data could be saved anyways.
 	 */
 	public void setupFileWriter(final int axis, String fileName) {
-		
+
 		this.treeWriter = new TreeFileWriter(axis, fileName, linkMethod);
 	}
 
@@ -662,15 +663,15 @@ public class HierCluster {
 	public void reorderRows(final List<Integer> finalCluster) {
 
 		String element = "";
-		
+
 		int limit = finalCluster.size();
 
 		reorderedRows = new String[limit];
 
 		for (int i = 0; i < limit; i++) {
 
-			element = axisPrefix + finalCluster.get((limit -1) - i) + "X";
-//			element = axisPrefix + finalCluster.get(i) + "X";
+			element = axisPrefix + finalCluster.get((limit - 1) - i) + "X";
+			// element = axisPrefix + finalCluster.get(i) + "X";
 			reorderedRows[i] = element;
 		}
 	}

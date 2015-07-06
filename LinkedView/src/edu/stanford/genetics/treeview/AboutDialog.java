@@ -1,6 +1,5 @@
 package edu.stanford.genetics.treeview;
 
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -28,7 +27,7 @@ public class AboutDialog extends CustomDialog {
 	 * Default serial version ID to keep Eclipse happy...
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	private final TreeViewFrame tvFrame;
 
 	public AboutDialog(final TreeViewFrame tvFrame) {
@@ -104,7 +103,7 @@ public class AboutDialog extends CustomDialog {
 			}
 		});
 		detailPanel.add(yesB, "wrap");
-		
+
 		mainPanel.add(detailPanel, "push, grow");
 	}
 }

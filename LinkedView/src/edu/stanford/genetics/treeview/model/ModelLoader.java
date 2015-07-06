@@ -27,16 +27,16 @@ import edu.stanford.genetics.treeview.model.ModelLoader.LoadStatus;
 public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 	public final static String DEFAULT_DELIM = "\\t";
-	
+
 	protected TVController controller;
 
 	/* Reference to the main model which will hold the data */
 	protected TVModel targetModel;
 	private final FileSet fileSet;
-	
+
 	/* 2D array to hold numerical data */
 	private double[][] doubleData;
-	
+
 	private DataLoadInfo dataInfo;
 	private String delimiter;
 
@@ -51,7 +51,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	private boolean hasEWeight = false;
 	private boolean hasGWeight = false;
 
-	public ModelLoader(final DataModel model, final TVController controller, 
+	public ModelLoader(final DataModel model, final TVController controller,
 			final DataLoadInfo dataInfo) {
 
 		this.controller = controller;
@@ -60,16 +60,16 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		this.dataInfo = dataInfo;
 		this.dataStartRow = dataInfo.getDataCoords()[0];
 		this.dataStartColumn = dataInfo.getDataCoords()[1];
-		this.delimiter = dataInfo.getDelimiter(); 
+		this.delimiter = dataInfo.getDelimiter();
 	}
-	
+
 	public void setDelimiter(final String delimiter) {
-		
+
 		this.delimiter = delimiter;
 	}
-	
+
 	public void setDataCoords(int dataStartRow, int dataStartColumn) {
-		
+
 		this.dataStartRow = dataStartRow;
 		this.dataStartColumn = dataStartColumn;
 	}
@@ -93,7 +93,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		 */
 		row_num = Helper.countFileLines(new File(fileSet.getCdt()));
 		doubleData = new double[row_num - dataStartRow][];
-		
+
 		final String[][] stringLabels = new String[row_num][];
 
 		final LoadStatus ls = new LoadStatus();
@@ -108,20 +108,20 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		int row_idx = 0;
 
 		ls.setStatus("Loading...");
-		
+
 		/* Read all lines and parse the data */
 		while ((line = reader.readLine()) != null) {
 
 			String[] lineAsStrings = line.split(delimiter, -1);
-			
-			if(row_idx < dataStartRow) {
+
+			if (row_idx < dataStartRow) {
 				stringLabels[row_idx] = lineAsStrings;
-				
+
 			} else {
 				String[] labels = partitionRow(lineAsStrings, row_idx);
 				stringLabels[row_idx] = labels;
 			}
-			
+
 			ls.setProgress(row_idx++);
 			publish(ls);
 		}
@@ -130,13 +130,13 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		publish(ls);
 
 		analyzeLabels(stringLabels);
-		
+
 		/* Parse tree and config files */
 		assignDataToModel(stringLabels);
-		
+
 		ls.setStatus("Done!");
 		publish(ls);
-		
+
 		reader.close();
 		return null;
 	}
@@ -149,40 +149,37 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		/* Update GUI, set new DendroView */
 		controller.finishLoading();
 	}
-	
-	/** 
+
+	/**
 	 * Check the labels for commonly used labels that are useful for TreeView.
 	 */
 	private void analyzeLabels(String[][] stringLabels) {
-		
-		for(int i = 0; i < dataStartRow; i++) {
-			
+
+		for (int i = 0; i < dataStartRow; i++) {
+
 			String[] labels = stringLabels[i];
-			for(int j = 0; j < dataStartColumn; j++) {
-				if("GID".equalsIgnoreCase(labels[j])) {
+			for (int j = 0; j < dataStartColumn; j++) {
+				if ("GID".equalsIgnoreCase(labels[j])) {
 					hasGID = true;
-				} 
-				else if("AID".equalsIgnoreCase(labels[j])){
+				} else if ("AID".equalsIgnoreCase(labels[j])) {
 					hasAID = true;
-				}
-				else if("GWEIGHT".equalsIgnoreCase(labels[j])){
+				} else if ("GWEIGHT".equalsIgnoreCase(labels[j])) {
 					hasGWeight = true;
-				}
-				else if("EWEIGHT".equalsIgnoreCase(labels[j])){
+				} else if ("EWEIGHT".equalsIgnoreCase(labels[j])) {
 					hasEWeight = true;
 				}
 			}
 		}
 	}
 
-	private String[] partitionRow(final String[] lineAsStrings, 
+	private String[] partitionRow(final String[] lineAsStrings,
 			final int row_idx) {
 
 		// load line as String array
 		final String[] labels = new String[dataStartColumn];
 		final double[] dataValues = new double[lineAsStrings.length
-		                                       - dataStartColumn];
-		
+				- dataStartColumn];
+
 		System.arraycopy(lineAsStrings, 0, labels, 0, dataStartColumn);
 
 		/*
@@ -302,12 +299,12 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			targetModel.setDocumentConfig(null);
 		}
 	}
-	
+
 	private void storeDataLoadInfo(Preferences node) {
-		
+
 		final int rowCoord = dataInfo.getDataCoords()[0];
 		final int colCoord = dataInfo.getDataCoords()[1];
-		
+
 		node.putBoolean("firstLoad", false);
 		node.put("delimiter", dataInfo.getDelimiter());
 		node.putInt("rowCoord", rowCoord);
@@ -424,9 +421,9 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 		// First, load the GTR File
 		final List<String[]> gtrData = loadTreeSet(fileSet.getGtr());
-		
+
 		/* In case an gtr file exists but is empty */
-		if(gtrData.isEmpty()) {
+		if (gtrData.isEmpty()) {
 			LogBuffer.println("GTR file empty.");
 			targetModel.gidFound(false);
 			return;
@@ -467,12 +464,12 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		final List<String[]> atrData = loadTreeSet(fileSet.getAtr());
 
 		/* In case an atr file exists but is empty */
-		if(atrData.isEmpty()) {
+		if (atrData.isEmpty()) {
 			LogBuffer.println("ATR file empty.");
 			targetModel.aidFound(false);
 			return;
 		}
-		
+
 		final String[] firstRow = atrData.get(0);
 		if ( // decide if this is not an extended file..
 		(firstRow.length == 4)// is the length classic?
@@ -524,7 +521,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 		return treeData;
 	}
-	
+
 	private static List<String[]> extractTreeData(final BufferedReader reader) {
 
 		final List<String[]> treeData = new ArrayList<String[]>();

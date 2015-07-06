@@ -144,10 +144,10 @@ public class DistanceMatrix {
 
 	/**
 	 * Finds and returns the current minimum value in the cluster matrix. The
-	 * minimum value determines which rows/ columns are closest together and 
-	 * will be clustered. They will form a new row that replaces the other 
-	 * two and as a result a new minimum must be found at each step to 
-	 * determine the new row pair to be clustered. Complexity: O(n^2)
+	 * minimum value determines which rows/ columns are closest together and
+	 * will be clustered. They will form a new row that replaces the other two
+	 * and as a result a new minimum must be found at each step to determine the
+	 * new row pair to be clustered. Complexity: O(n^2)
 	 *
 	 * @return The minimum value in the current distance matrix.
 	 */
@@ -205,64 +205,63 @@ public class DistanceMatrix {
 
 		return min_col_index;
 	}
-	
+
 	/**
 	 * Writes the distance matrix values to a tab-delimited TXT-file.
+	 * 
 	 * @param axis
 	 */
 	public void writeMatrix(String axis) {
-		
+
 		String fileName = "test_distMatrix_" + axis + ".txt";
 		File file = new File(fileName);
 		try {
-			if(file.exists()) {
-				int n = JOptionPane.showConfirmDialog(
-					    Frame.getFrames()[0],
-					    "File already exists. Overwrite?",
-					    "Confirmation",
-					    JOptionPane.YES_NO_OPTION);
-				
-				switch(n) {
-				
+			if (file.exists()) {
+				int n = JOptionPane.showConfirmDialog(Frame.getFrames()[0],
+						"File already exists. Overwrite?", "Confirmation",
+						JOptionPane.YES_NO_OPTION);
+
+				switch (n) {
+
 				case JOptionPane.YES_OPTION:
 					file.createNewFile();
 					break;
 				case JOptionPane.NO_OPTION:
-				default: 
+				default:
 					file = getNewFile(fileName);
 					file.createNewFile();
 					break;
 				}
 			}
-			
+
 			BufferedWriter bw = new BufferedWriter((new OutputStreamWriter(
 					new FileOutputStream(file.getAbsoluteFile()), "UTF-8")));
-			
-			for(double[] row : matrix) {
-				for(double val : row) {
+
+			for (double[] row : matrix) {
+				for (double val : row) {
 					bw.write(Double.toString(val) + "\t");
 				}
 				bw.write("\n");
 			}
-			
+
 			bw.close();
-			
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
+
 	private File getNewFile(String oldName) {
-		
+
 		File file = new File(oldName);
 		int fileCount = 0;
-		
-		while(file.exists()) {
+
+		while (file.exists()) {
 			fileCount++;
 			file = new File("test_distMatrix_" + fileCount + ".txt");
 		}
-		
+
 		return file;
 	}
 }

@@ -249,12 +249,13 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 								val = DataModel.EMPTY;
 								count = 1;
 								break;
-							} 
+							}
 
-//							if (!Helper.nearlyEqual(thisVal, DataModel.EMPTY)) {
+							// if (!Helper.nearlyEqual(thisVal,
+							// DataModel.EMPTY)) {
 							count++;
 							val += thisVal;
-							
+
 						}
 
 						if (Helper.nearlyEqual(val, DataModel.EMPTY)) {

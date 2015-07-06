@@ -130,13 +130,14 @@ public abstract class TreeViewApp {// implements WindowListener {
 
 	/** URL of codebase */
 	public abstract URL getCodeBase();
-	
+
 	/** Starts up the application's setup process */
 	public abstract void start();
-	
+
 	/**
-	 * The returned object contains presets for the URLs used when searching
-	 * for row labels in online databases. 
+	 * The returned object contains presets for the URLs used when searching for
+	 * row labels in online databases.
+	 * 
 	 * @return URLPresets for row labels.
 	 */
 	public UrlPresets getRowLabelUrlPresets() {
@@ -145,8 +146,9 @@ public abstract class TreeViewApp {// implements WindowListener {
 	}
 
 	/**
-	 * The returned object contains presets for the URLs used when searching
-	 * for column labels in online databases. 
+	 * The returned object contains presets for the URLs used when searching for
+	 * column labels in online databases.
+	 * 
 	 * @return URLPresets for column labels.
 	 */
 	public UrlPresets getColumnLabelUrlPresets() {

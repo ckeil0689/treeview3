@@ -50,7 +50,7 @@ public class CdtWriter {
 								dataModel.getColumnHeaderInfo().getHeader(
 										column
 												- dataModel.getRowHeaderInfo()
-										.getNumNames(),
+														.getNumNames(),
 										headerrow));
 					}
 				}
@@ -75,7 +75,7 @@ public class CdtWriter {
 								dataModel.getDataMatrix().getValue(
 										column
 												- dataModel.getRowHeaderInfo()
-										.getNumNames(), gene));
+														.getNumNames(), gene));
 					}
 				}
 				out.write("\n");

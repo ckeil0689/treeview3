@@ -17,7 +17,7 @@ import javax.swing.JPanel;
  * and allows for change of color in the clicked area.
  */
 public class GradientBox {
-	
+
 	private ColorPicker colorPicker;
 
 	private final Rectangle2D gradientRect = new Rectangle2D.Float();
@@ -29,7 +29,7 @@ public class GradientBox {
 
 		this.colorPicker = colorPicker;
 	}
-	
+
 	protected void drawGradientBox(final Graphics2D g2) {
 
 		// Dimensions
@@ -40,7 +40,7 @@ public class GradientBox {
 
 		final int height = (int) gradientRect.getHeight();
 		final int width = (int) gradientRect.getWidth();
-		
+
 		float[] fractions = colorPicker.getFractions();
 		Color[] colors = colorPicker.getColors();
 
@@ -56,7 +56,7 @@ public class GradientBox {
 		g2.setPaint(gradient);
 		g2.fillRect((int) startX, (int) startY, width, height);
 	}
-	
+
 	/**
 	 * Checks if a passed Point is contained in the area of the gradient
 	 * rectangle.
@@ -68,26 +68,25 @@ public class GradientBox {
 
 		return gradientRect.contains(point);
 	}
-	
+
 	protected void setRect(int start, int left, int width, int height) {
-		
+
 		gradientRect.setRect(start, left, width, height);
 	}
-	
+
 	/**
 	 * Adds a color to the gradient.
 	 *
 	 * @param newCol
 	 */
 	protected void addColor(final Color newCol) {
-		
+
 		float[] fractions = colorPicker.getFractions();
-		
+
 		/* find largest diff between fractions and set index there */
 		int newColorIndex = findAddIndex(fractions);
 
-		final float halfDiff = (fractions[newColorIndex] 
-				- fractions[newColorIndex - 1]) / 2;
+		final float halfDiff = (fractions[newColorIndex] - fractions[newColorIndex - 1]) / 2;
 		final float addFrac = fractions[newColorIndex - 1] + halfDiff;
 
 		colorPicker.getColorList().add(newColorIndex, newCol);
@@ -96,29 +95,30 @@ public class GradientBox {
 		colorPicker.updateFractions();
 		colorPicker.updateColors();
 	}
-	
+
 	/**
-	 * Serves to find the largest space between fractions where a thumb can
-	 * be inserted.
+	 * Serves to find the largest space between fractions where a thumb can be
+	 * inserted.
+	 * 
 	 * @param fractions
 	 */
 	private static int findAddIndex(float[] fractions) {
-		
+
 		int newColIndex = 0;
 		float maxDiff = 0.0f;
-		
-		for(int i = 0; i < fractions.length - 1; i++) {
-			
+
+		for (int i = 0; i < fractions.length - 1; i++) {
+
 			float diff = fractions[i + 1] - fractions[i];
-			if(diff > maxDiff) {
+			if (diff > maxDiff) {
 				maxDiff = diff;
 				newColIndex = i;
 			}
 		}
-		
+
 		return newColIndex + 1;
 	}
-	
+
 	/**
 	 * Removes a color and its matching thumb from the gradient.
 	 */
@@ -127,7 +127,7 @@ public class GradientBox {
 		List<Thumb> thumbs = colorPicker.getThumbList();
 		List<Color> colorList = colorPicker.getColorList();
 		int removeIndex = 0;
-		
+
 		for (final Thumb t : thumbs) {
 
 			if (t.isSelected()) {
@@ -138,12 +138,11 @@ public class GradientBox {
 				break;
 			}
 		}
-		
+
 		colorPicker.updateFractions();
 		colorPicker.updateColors();
 	}
-	
-	
+
 	/**
 	 * Changes the gradient color in the area the mouse was clicked on.
 	 *
@@ -154,7 +153,7 @@ public class GradientBox {
 
 		List<Thumb> thumbs = colorPicker.getThumbList();
 		List<Color> colorList = colorPicker.getColorList();
-		
+
 		Color newCol = null;
 
 		final int clickPos = (int) point.getX();
@@ -176,7 +175,7 @@ public class GradientBox {
 		if (newCol != null) {
 			colorList.set(index, newCol);
 			thumbs.get(index).setColor(newCol);
-			
+
 			colorPicker.updateColors();
 		}
 	}

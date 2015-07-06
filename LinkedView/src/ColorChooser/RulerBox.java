@@ -7,9 +7,10 @@ import java.awt.geom.Rectangle2D;
 public class RulerBox {
 
 	private final Rectangle2D rulerRect = new Rectangle2D.Float();
-	
+
 	/**
 	 * Draws a ruler with markings.
+	 * 
 	 * @param g2
 	 */
 	protected void drawRulerBox(final Graphics2D g2) {
@@ -30,14 +31,14 @@ public class RulerBox {
 			}
 		}
 	}
-	
+
 	protected void setRect(int start_x, int start_y, int width, int height) {
-		
+
 		rulerRect.setRect(start_x, start_y, width, height);
 	}
-	
+
 	protected Rectangle2D getRulerRect() {
-		
+
 		return rulerRect;
 	}
 }

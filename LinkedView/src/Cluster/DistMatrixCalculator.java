@@ -200,7 +200,7 @@ public class DistMatrixCalculator {
 		 * Step 1: Go through each row. Step 2: Rank the values in the data
 		 * array by increasing numerical value. Step 3: For all identical
 		 * values, make rank the average rank.
-		 *
+		 * 
 		 * If the value is the same as the 'next' one in the sorted array (e.g.
 		 * 0.0 following 0.0), it doesn't matter to what index in the array it
 		 * corresponds to. All of the same values will be assigned the same

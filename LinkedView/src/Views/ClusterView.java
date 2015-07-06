@@ -75,7 +75,7 @@ public class ClusterView {
 	private JPanel optionsPanel;
 	private JPanel btnPanel;
 	private JPanel loadPanel;
-	
+
 	private JCheckBox ignoreZeroes;
 
 	private JComboBox<String> rowDistChooser;
@@ -91,7 +91,7 @@ public class ClusterView {
 	private JSpinner rowIterationsSettr;
 	private JSpinner colIterationsSettr;
 
-	private final String[] linkageMethods = { "Average Linkage", 
+	private final String[] linkageMethods = { "Average Linkage",
 			"Single Linkage", "Complete Linkage" };
 
 	private int clusterType;
@@ -209,7 +209,7 @@ public class ClusterView {
 		colClusterSettr = setupSpinner(CLUSTER_START);
 		rowIterationsSettr = setupSpinner(ITERATION_START);
 		colIterationsSettr = setupSpinner(ITERATION_START);
-		
+
 		ignoreZeroes = new JCheckBox("Ignore zeroes?");
 	}
 
@@ -332,7 +332,7 @@ public class ClusterView {
 			choicePanel.add(colIterationsSettr, "wrap");
 			choicePanel.add(req, "wrap");
 		}
-		
+
 		choicePanel.add(ignoreZeroes);
 
 		return choicePanel;
@@ -506,9 +506,9 @@ public class ClusterView {
 
 		return linkageChooser.getSelectedIndex();
 	}
-	
+
 	public boolean isIgnoreZeroesChecked() {
-		
+
 		return ignoreZeroes.isSelected();
 	}
 

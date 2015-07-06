@@ -383,7 +383,7 @@ public class CDTCreator {
 				file.getAbsolutePath().length() - fileType.length());
 
 		bw = new ClusterFileWriter(fileName, fileEnd, -1);
-			
+
 		filePath = bw.getFilePath();
 	}
 

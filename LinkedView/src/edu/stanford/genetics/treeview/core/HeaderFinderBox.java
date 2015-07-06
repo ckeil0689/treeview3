@@ -186,7 +186,8 @@ public abstract class HeaderFinderBox {
 		// zoom level)
 		final String[][] ohA = otherHeaderInfo.getHeaderArray();
 		otherDataList = new ArrayList<String>();
-		otherDataHeaders = getHeaders(ohA); // TODO BUG this breaks if rows + col header number isnt equal!!
+		otherDataHeaders = getHeaders(ohA); // TODO BUG this breaks if rows +
+											// col header number isnt equal!!
 		for (final String item : otherDataHeaders) {
 
 			otherDataList.add(item);
@@ -319,7 +320,7 @@ public abstract class HeaderFinderBox {
 		final String sub = searchTermBox.getSelectedItem().toString();
 
 		String wildcardsub = sub;
-		if (wildcardsub.substring(0, 1) != "*") {
+		if (!"*".equalsIgnoreCase(wildcardsub.substring(0, 1))) {
 			wildcardsub = "*" + wildcardsub;
 		}
 		if (wildcardsub.substring((wildcardsub.length() - 1),
@@ -414,7 +415,7 @@ public abstract class HeaderFinderBox {
 		private boolean changed = false;
 		JTextComponent editor = ((JTextField) searchTermBox.getEditor()
 				.getEditorComponent());
-		
+
 		// NOTE: command-w never worked to close the search window before adding
 		// anything in this class other than the seekAll function, though
 		// command-q WOULD quit the app
@@ -428,15 +429,15 @@ public abstract class HeaderFinderBox {
 			fullTextPressed = editor.getText();
 
 			if (debug) {
-				LogBuffer.println("Pressed - Selection start: [" +
-						selStartPressed + "] " + "Selection end: [" +
-						selEndPressed + "] " + "String length: [" +
-						lenPressed + "]. " + "Selected text: [" +
-						editor.getSelectedText() + "]. " + "Full text: [" +
-						editor.getText() + "]. " + "Selected index is: [" +
-						selIndexPressed + "]. " + "Character: [" +
-						e.getKeyChar() + "]. " + "When cast to int: [" +
-						(int) e.getKeyChar() + "].");
+				LogBuffer.println("Pressed - Selection start: ["
+						+ selStartPressed + "] " + "Selection end: ["
+						+ selEndPressed + "] " + "String length: ["
+						+ lenPressed + "]. " + "Selected text: ["
+						+ editor.getSelectedText() + "]. " + "Full text: ["
+						+ editor.getText() + "]. " + "Selected index is: ["
+						+ selIndexPressed + "]. " + "Character: ["
+						+ e.getKeyChar() + "]. " + "When cast to int: ["
+						+ (int) e.getKeyChar() + "].");
 			}
 		}
 
@@ -470,14 +471,14 @@ public abstract class HeaderFinderBox {
 			// typed
 
 			if (debug) {
-				LogBuffer.println("  Relsd - Selection start: [" + selStartRel +
-						"] " + "Selection end: [" + selEndRel + "] " +
-						"String length: [" + lenRel + "]. " +
-						"Selected text: [" + editor.getSelectedText() + "]. " +
-						"Full text: [" + editor.getText() + "]. " +
-						"Selected index is: [" + selIndexRel + "]. " +
-						"Character typed: [" + e.getKeyChar() + "]. " +
-						"When cast to int: [" + (int) e.getKeyChar() + "].");
+				LogBuffer.println("  Relsd - Selection start: [" + selStartRel
+						+ "] " + "Selection end: [" + selEndRel + "] "
+						+ "String length: [" + lenRel + "]. "
+						+ "Selected text: [" + editor.getSelectedText() + "]. "
+						+ "Full text: [" + editor.getText() + "]. "
+						+ "Selected index is: [" + selIndexRel + "]. "
+						+ "Character typed: [" + e.getKeyChar() + "]. "
+						+ "When cast to int: [" + (int) e.getKeyChar() + "].");
 			}
 
 			// If the contents of the text field have changed and nothing in the
@@ -497,13 +498,13 @@ public abstract class HeaderFinderBox {
 			// Else if no text changed, there was selected text, and a left or
 			// right arrow was pressed without modifiers
 			else if (!changed && lenPressed == lenRel) {
-				if (selStartPressed != selEndPressed &&
-					(e.getKeyCode() == KeyEvent.VK_RIGHT ||
-					 e.getKeyCode() == KeyEvent.VK_LEFT) &&
-					e.getModifiers() == 0) {
+				if (selStartPressed != selEndPressed
+						&& (e.getKeyCode() == KeyEvent.VK_RIGHT || e
+								.getKeyCode() == KeyEvent.VK_LEFT)
+						&& e.getModifiers() == 0) {
 					if (debug) {
 						LogBuffer
-						.println("Positioning cursor at edge of selection...");
+								.println("Positioning cursor at edge of selection...");
 					}
 					if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
 						editor.setSelectionStart(selEndPressed);
@@ -512,10 +513,9 @@ public abstract class HeaderFinderBox {
 						editor.setSelectionStart(selStartPressed);
 						editor.setSelectionEnd(selStartPressed);
 					}
-				} else if ((e.getKeyCode() == KeyEvent.VK_UP ||
-							e.getKeyCode() == KeyEvent.VK_DOWN) &&
-						   e.getModifiers() == 1 &&
-						   e.getModifiersEx() == InputEvent.SHIFT_DOWN_MASK) {
+				} else if ((e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_DOWN)
+						&& e.getModifiers() == 1
+						&& e.getModifiersEx() == InputEvent.SHIFT_DOWN_MASK) {
 					if (debug) {
 						LogBuffer.println("Expanding selection to end...");
 					}
@@ -529,14 +529,12 @@ public abstract class HeaderFinderBox {
 				}
 			} else {
 				if (debug) {
-					LogBuffer
-					.println("Nothing to do because changed is " +
-							(changed ? "" : "not ") +
-							"true, the length has " +
-							(lenPressed == lenRel ? "not " : "") +
-							"changed and not sideways arrow keys were " +
-							"pressed and there were " +
-							e.getModifiers() + " modifiers.");
+					LogBuffer.println("Nothing to do because changed is "
+							+ (changed ? "" : "not ") + "true, the length has "
+							+ (lenPressed == lenRel ? "not " : "")
+							+ "changed and not sideways arrow keys were "
+							+ "pressed and there were " + e.getModifiers()
+							+ " modifiers.");
 				}
 			}
 
@@ -562,14 +560,14 @@ public abstract class HeaderFinderBox {
 			// typed
 
 			if (debug) {
-				LogBuffer.println("  Typed - Selection start: [" +
-						selStartTyped + "] " + "Selection end: [" +
-						selEndTyped + "] " + "String length: [" + lenTyped +
-						"]. " + "Selected text: [" + editor.getSelectedText() +
-						"]. " + "Full text: [" + editor.getText() + "]. " +
-						"Selected index is: [" + selIndexTyped + "]. " +
-						"Character typed: [" + e.getKeyChar() + "]. " +
-						"When cast to int: [" + (int) e.getKeyChar() + "].");
+				LogBuffer.println("  Typed - Selection start: ["
+						+ selStartTyped + "] " + "Selection end: ["
+						+ selEndTyped + "] " + "String length: [" + lenTyped
+						+ "]. " + "Selected text: [" + editor.getSelectedText()
+						+ "]. " + "Full text: [" + editor.getText() + "]. "
+						+ "Selected index is: [" + selIndexTyped + "]. "
+						+ "Character typed: [" + e.getKeyChar() + "]. "
+						+ "When cast to int: [" + (int) e.getKeyChar() + "].");
 			}
 
 			// If the backspace was typed, there was a selection, and the
@@ -592,11 +590,11 @@ public abstract class HeaderFinderBox {
 			// matching string
 			// and the current backspace inadvertently does nothing (a bug of
 			// the parent class as well), so let's nip that in the bud.
-			else if (selStartPressed == selStartTyped &&
-					 selEndPressed == lenPressed &&
-					 selEndPressed != selStartPressed &&
-					 selEndTyped == selStartTyped && selIndexPressed > -1 &&
-					 selIndexTyped == -1 && (e.getKeyChar()) == 8) {
+			else if (selStartPressed == selStartTyped
+					&& selEndPressed == lenPressed
+					&& selEndPressed != selStartPressed
+					&& selEndTyped == selStartTyped && selIndexPressed > -1
+					&& selIndexTyped == -1 && (e.getKeyChar()) == 8) {
 				editor.setText(fullTextPressed);
 				selStartTyped = selStartPressed;
 				editor.setSelectionStart(selStartPressed);
@@ -645,8 +643,8 @@ public abstract class HeaderFinderBox {
 						} else if (selEndTyped == lenTyped) {
 							if (debug) {
 								LogBuffer
-								.println("Edited case 2a: substring(0, "
-										+ selStartTyped + ").");
+										.println("Edited case 2a: substring(0, "
+												+ selStartTyped + ").");
 							}
 							if (selStartTyped == 0) {
 								searchTermBox.setSelectedIndex(0);
@@ -685,8 +683,8 @@ public abstract class HeaderFinderBox {
 				if (searchTermBox.getSelectedIndex() == -1) {
 					if (debug) {
 						LogBuffer
-						.println("Trying to force editing manually selected " +
-								 "text to work");
+								.println("Trying to force editing manually selected "
+										+ "text to work");
 					}
 
 					if (lenTyped > 0) {
@@ -699,8 +697,8 @@ public abstract class HeaderFinderBox {
 								// and what was typed will be inserted between
 								// here and keyReleased
 								editor.setText(editor.getText().substring(0,
-										selStartTyped) +
-										editor.getText().substring(
+										selStartTyped)
+										+ editor.getText().substring(
 												(selEndTyped), lenTyped));
 							} else {
 								// Actually the default behavior appears to work
@@ -715,8 +713,8 @@ public abstract class HeaderFinderBox {
 						} else if (selEndTyped == lenTyped) {
 							if (debug) {
 								LogBuffer
-								.println("Edited case 2b: substring(0, " +
-										 selStartTyped + ").");
+										.println("Edited case 2b: substring(0, "
+												+ selStartTyped + ").");
 							}
 							if (selStartTyped == 0) {
 								searchTermBox.setSelectedIndex(0);
@@ -741,7 +739,7 @@ public abstract class HeaderFinderBox {
 							// (but apparently we need to delete the selected
 							// text manually)
 							editor.setText(/* e.getKeyChar() + */editor
-									.getText().substring(selEndTyped,lenTyped));
+									.getText().substring(selEndTyped, lenTyped));
 							if (searchTermBox.getSelectedIndex() == -1) {
 								editor.setSelectionStart(selStartTyped);
 								editor.setSelectionEnd(selStartTyped);
@@ -761,21 +759,20 @@ public abstract class HeaderFinderBox {
 			if ((e.getKeyChar()) != 27 && e.getKeyChar() != KeyEvent.VK_ENTER) {
 				// If the previous selected index is -1, try to force a matching
 				// index to be selected
-				if (searchTermBox.getSelectedIndex() == -1 &&
-					selIndexTyped == -1) {
+				if (searchTermBox.getSelectedIndex() == -1
+						&& selIndexTyped == -1) {
 
 					// Get the current text content
 					final String content = editor.getText();
 
 					if (debug) {
 						LogBuffer
-						.println("Trying to force a selection to be made 1.  " +
-								 "Current text: [" +
-								 content + "].");
+								.println("Trying to force a selection to be made 1.  "
+										+ "Current text: [" + content + "].");
 					}
 
 					// searchTermBox.setKeySelectionManager(
-					//		searchTermBox.getKeySelectionManager());
+					// searchTermBox.getKeySelectionManager());
 					// //Doesn't work
 					// searchTermBox.setEnabled(false);
 					// searchTermBox.setEnabled(true);
@@ -836,15 +833,15 @@ public abstract class HeaderFinderBox {
 						}
 					}
 				} else {
-					if ((e.getKeyChar()) == 8 &&                    // Backspace
-						searchTermBox.getSelectedIndex() > -1) {
+					if ((e.getKeyChar()) == 8 && // Backspace
+							searchTermBox.getSelectedIndex() > -1) {
 						if (selEndTyped == lenTyped) {
 							if (debug) {
-								LogBuffer.println("Trying to force the " +
-												  "selection to regress.  " +
-												  "Current selected index: [" +
-												  searchTermBox.
-												  getSelectedIndex() + "].");
+								LogBuffer.println("Trying to force the "
+										+ "selection to regress.  "
+										+ "Current selected index: ["
+										+ searchTermBox.getSelectedIndex()
+										+ "].");
 							}
 							// Put the cursor at 1 before the beginning of the
 							// previously selected text (because that text is
@@ -858,31 +855,29 @@ public abstract class HeaderFinderBox {
 										.length());
 
 								String content = "";
-								if (editor.getText().length() >=
-									(selStartTyped - 1) && selStartTyped > 1) {
+								if (editor.getText().length() >= (selStartTyped - 1)
+										&& selStartTyped > 1) {
 									if (debug) {
-										LogBuffer.println("Remaining text " +
-														  "length: [" +
-														  editor.getText().
-														  length() +
-														  "]. selStartTyped: " +
-														  "[" + selStartTyped +
-														  "]");
+										LogBuffer.println("Remaining text "
+												+ "length: ["
+												+ editor.getText().length()
+												+ "]. selStartTyped: " + "["
+												+ selStartTyped + "]");
 									}
 									// Get the current unselected text content
-									content = editor.getText().
-											substring(0,selStartTyped - 1);
+									content = editor.getText().substring(0,
+											selStartTyped - 1);
 								}
 
 								if (debug) {
 									LogBuffer
-									.println("Trying to force a selection to " +
-											 "be made 2.  Current text: [" +
-											 content + "].");
+											.println("Trying to force a selection to "
+													+ "be made 2.  Current text: ["
+													+ content + "].");
 								}
 
 								// searchTermBox.setKeySelectionManager(
-								//		searchTermBox.getKeySelectionManager());
+								// searchTermBox.getKeySelectionManager());
 								// //Doesn't work
 								// searchTermBox.setEnabled(false);
 								// searchTermBox.setEnabled(true);
@@ -892,7 +887,7 @@ public abstract class HeaderFinderBox {
 								// the default text field entry of
 								// "Search Row/Column Labels... ")
 								searchTermBox.selectWithKeyChar('S');
-								searchTermBox.setSelectedIndex(0);	// We're
+								searchTermBox.setSelectedIndex(0); // We're
 																	// doing
 																	// this just
 																	// in case
@@ -921,13 +916,13 @@ public abstract class HeaderFinderBox {
 				// causes the end of the selection to decrement instead of the
 				// beginning of the selection to decrement and the character
 				// preceding the selStart isn't removed. So...
-				if (selIndexTyped == -1 && selIndexPressed > -1 &&
-					(e.getKeyChar()) == 8 &&
-					selStartTyped == selStartPressed &&
-					(selEndTyped + 1) == selEndPressed) {
+				if (selIndexTyped == -1 && selIndexPressed > -1
+						&& (e.getKeyChar()) == 8
+						&& selStartTyped == selStartPressed
+						&& (selEndTyped + 1) == selEndPressed) {
 					if (debug) {
 						LogBuffer
-						.println("Trying to force a selection to be made 3");
+								.println("Trying to force a selection to be made 3");
 					}
 					if ((selStartTyped - 1) > 0) {
 						// Get the current text content

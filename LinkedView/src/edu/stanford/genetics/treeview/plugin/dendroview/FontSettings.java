@@ -293,12 +293,12 @@ public class FontSettings implements SettingsPanel {
 		size_field.getDocument().addDocumentListener(
 				new DocumentChangeListener());
 		fontPanel.add(size_field);
-		
+
 		fixedBox = new JCheckBox("Keep fixed");
 		fixedBox.setSelected(client.getFixed());
 		fixedBox.addActionListener(new SelectionListener());
 		fontPanel.add(fixedBox, "wrap");
-		
+
 		/* Minimum font size */
 		JLabel minLabel = new JLabel("Min:");
 		minLabel.setFont(GUIFactory.FONTS);
@@ -307,7 +307,7 @@ public class FontSettings implements SettingsPanel {
 				new DocumentChangeListener());
 		fontPanel.add(minLabel);
 		fontPanel.add(min_field);
-		
+
 		/* Maximum font size */
 		JLabel maxLabel = new JLabel("Max:");
 		maxLabel.setFont(GUIFactory.FONTS);

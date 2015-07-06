@@ -80,7 +80,7 @@ public class AlignmentFactory extends PluginFactory {
 							+ "titled \"ALN\"."));
 			return false;
 		}
-		
+
 		node.put("headerName", "ALN");
 		return true;
 	}

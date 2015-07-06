@@ -13,23 +13,23 @@ public class SquareButton extends JButton {
 	private static final long serialVersionUID = 1L;
 
 	private int size;
-	
+
 	public SquareButton(String s, int size) {
-		
+
 		super(s);
 		this.size = size;
-		this.setMargin(new Insets(0,0,0,0));
+		this.setMargin(new Insets(0, 0, 0, 0));
 	}
-	
+
 	@Override
 	public Dimension getPreferredSize() {
-				
+
 		return new Dimension(size, size);
 	}
-	
+
 	@Override
 	public Dimension getMinimumSize() {
-		
+
 		return new Dimension(size, size);
 	}
 }

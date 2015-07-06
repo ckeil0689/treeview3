@@ -36,7 +36,7 @@ public class AtrTVModelLoader extends ModelLoader { // TVModelLoader2 {
 	/**
 	 * @param targetModel
 	 */
-	public AtrTVModelLoader(final AtrTVModel targetModel, 
+	public AtrTVModelLoader(final AtrTVModel targetModel,
 			final DataLoadInfo dataStartCoords, final TVController controller) {
 		super(targetModel, controller, dataStartCoords);
 	}

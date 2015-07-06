@@ -67,7 +67,7 @@ public class GUIFactory {
 
 		final JPanel panel = new JPanel();
 		panel.setOpaque(opaque);
-		
+
 		setComponentLayoutMode(panel, panel_mode);
 
 		// specify background, otherwise default to theme's backgroundColor.
@@ -77,29 +77,34 @@ public class GUIFactory {
 
 		return panel;
 	}
-	
+
 	/**
-	 * Overloaded method to return a JPanel without background color 
+	 * Overloaded method to return a JPanel without background color
 	 * specification.
-	 * @param opaque Whether the JPanel should be opaque or not.
-	 * @param panel_mode Sets the main MigLayout constrains for panel insets.
+	 * 
+	 * @param opaque
+	 *            Whether the JPanel should be opaque or not.
+	 * @param panel_mode
+	 *            Sets the main MigLayout constrains for panel insets.
 	 * @return A JPanel.
 	 */
-	public static JPanel createJPanel(final boolean opaque,
-			final int panel_mode) {
-		
+	public static JPanel createJPanel(final boolean opaque, final int panel_mode) {
+
 		return createJPanel(opaque, panel_mode, null);
 	}
-	
+
 	/**
 	 * Used to set the layout manager for a JComponent.
-	 * @param comp JComponent which needs a layout manager.
-	 * @param panel_mode Specific mode that is supposed to be applied to
-	 * the new JComponent's layout.
+	 * 
+	 * @param comp
+	 *            JComponent which needs a layout manager.
+	 * @param panel_mode
+	 *            Specific mode that is supposed to be applied to the new
+	 *            JComponent's layout.
 	 */
-	public static void setComponentLayoutMode(JComponent comp, 
+	public static void setComponentLayoutMode(JComponent comp,
 			final int panel_mode) {
-		
+
 		switch (panel_mode) {
 		case NO_PADDING_FILL:
 			comp.setLayout(new MigLayout("ins 0", "[grow, fill]"));
@@ -125,7 +130,7 @@ public class GUIFactory {
 			comp.setLayout(new MigLayout());
 			break;
 		}
-		
+
 	}
 
 	/**
@@ -175,7 +180,7 @@ public class GUIFactory {
 
 		return createColorIconBtn(title, null);
 	}
-	
+
 	/**
 	 * Creates a button with a title and icon if desired. The method centralizes
 	 * the layout setting for buttons so that all buttons will look similar.
@@ -191,7 +196,7 @@ public class GUIFactory {
 
 		return btn;
 	}
-	
+
 	/**
 	 * Creates a button with a title and icon if desired. The method centralizes
 	 * the layout setting for buttons so that all buttons will look similar.
@@ -298,10 +303,9 @@ public class GUIFactory {
 
 		if (!subStr.equalsIgnoreCase("png")) {
 			iconType = "_dark.png";
-		} 
-		
-		LogBuffer.println("Icon image used: [" + iconFileName + "].");
+		}
 
+		LogBuffer.println("Icon image used: [" + iconFileName + "].");
 
 		try {
 			final ClassLoader classLoader = Thread.currentThread()
@@ -310,7 +314,7 @@ public class GUIFactory {
 					.getResourceAsStream(iconFileName + iconType);
 
 			img = ImageIO.read(input);
-			
+
 			input.close();
 
 		} catch (final IOException ex) {

@@ -8,7 +8,6 @@ import java.util.prefs.Preferences;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -29,13 +28,13 @@ import edu.stanford.genetics.treeview.plugin.dendroview.FontSettings;
  *
  */
 public class PreferencesMenu extends CustomDialog implements
-ConfigNodePersistent {
+		ConfigNodePersistent {
 
 	/**
 	 * Default serial version ID to keep Eclipse happy...
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	private final TreeViewFrame tvFrame;
 	private HeaderInfo geneHI;
 	private HeaderInfo arrayHI;
@@ -46,16 +45,6 @@ ConfigNodePersistent {
 
 	// Menus
 	private AnnotationPanel annotationSettings;
-
-	/**
-	 * Chained constructor
-	 *
-	 * @param viewFrame
-	 */
-	public PreferencesMenu() {
-
-		this(null);
-	}
 
 	/**
 	 * Main constructor for Preferences Menu
@@ -127,7 +116,7 @@ ConfigNodePersistent {
 					+ "Could not get selected indeces.");
 			return null;
 		}
-		
+
 		return new int[] { annotationSettings.getSelectedGeneIndex(),
 				annotationSettings.getSelectedArrayIndex() };
 	}
@@ -277,10 +266,10 @@ ConfigNodePersistent {
 			final JLabel cols = GUIFactory.setupHeader(StringRes.main_cols);
 
 			/* Label alignment */
-			JPanel justifyPanel = GUIFactory.createJPanel(false, 
+			JPanel justifyPanel = GUIFactory.createJPanel(false,
 					GUIFactory.DEFAULT, null);
-			justifyPanel.setBorder(BorderFactory.createTitledBorder(
-					"Label justification"));
+			justifyPanel.setBorder(BorderFactory
+					.createTitledBorder("Label justification"));
 
 			final ButtonGroup rowJustifyBtnGroup = new ButtonGroup();
 
@@ -329,9 +318,9 @@ ConfigNodePersistent {
 			justifyPanel.add(rowRadioBtnPanel, "pushx, alignx 50%, w 45%");
 			justifyPanel.add(colRadioBtnPanel, "pushx, alignx 50%, w 45%");
 			mainPanel.add(justifyPanel, "push, grow, alignx 50%, span, wrap");
-			
+
 			JPanel fontPanel = new FontPanel().makeFontPanel();
-			
+
 			mainPanel.add(fontPanel, "push, grow, alignx 50%, span");
 
 			// Commented out for version 3.0alpha1 because it doesn't work yet
@@ -413,8 +402,8 @@ ConfigNodePersistent {
 		mainPanel.revalidate();
 		mainPanel.repaint();
 
-//		dialog.pack();
-//		dialog.setLocationRelativeTo(tvFrame.getAppFrame());
+		// dialog.pack();
+		// dialog.setLocationRelativeTo(tvFrame.getAppFrame());
 	}
 
 	/**

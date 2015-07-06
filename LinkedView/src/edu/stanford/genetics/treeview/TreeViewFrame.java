@@ -567,16 +567,17 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		fileMenu.add(quitMenuItem);
 		stackMenuList.add(quitMenuItem);
 
-//		final JMenuItem saveMenuItem = new JMenuItem(StringRes.menu_Save,
-//				KeyEvent.VK_S);
-//		saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
-//				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-//		fileMenu.add(saveMenuItem);
-//		stackMenuList.add(saveMenuItem);
-//
-//		final JMenuItem saveAsMenuItem = new JMenuItem(StringRes.menu_SaveAs);
-//		fileMenu.add(saveAsMenuItem);
-//		stackMenuList.add(saveAsMenuItem);
+		// final JMenuItem saveMenuItem = new JMenuItem(StringRes.menu_Save,
+		// KeyEvent.VK_S);
+		// saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
+		// Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		// fileMenu.add(saveMenuItem);
+		// stackMenuList.add(saveMenuItem);
+		//
+		// final JMenuItem saveAsMenuItem = new
+		// JMenuItem(StringRes.menu_SaveAs);
+		// fileMenu.add(saveAsMenuItem);
+		// stackMenuList.add(saveAsMenuItem);
 
 		menuBar.add(fileMenu);
 
@@ -605,9 +606,10 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 			running.addClusterMenus(clusterMenu);
 			menuBar.add(clusterMenu);
 
-//			final JMenuItem fontMenuItem = new JMenuItem(StringRes.menu_Font);
-//			prefSubMenu.add(fontMenuItem);
-//			stackMenuList.add(fontMenuItem);
+			// final JMenuItem fontMenuItem = new
+			// JMenuItem(StringRes.menu_Font);
+			// prefSubMenu.add(fontMenuItem);
+			// stackMenuList.add(fontMenuItem);
 
 			final JMenuItem urlMenuItem = new JMenuItem(StringRes.menu_URL);
 			prefSubMenu.add(urlMenuItem);
@@ -671,10 +673,10 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		// }
 		// });
 
-//		final JMenuItem feedbackMenuItem = new JMenuItem(
-//				StringRes.menu_Feedback);
-//		helpMenu.add(feedbackMenuItem);
-//		stackMenuList.add(feedbackMenuItem);
+		// final JMenuItem feedbackMenuItem = new JMenuItem(
+		// StringRes.menu_Feedback);
+		// helpMenu.add(feedbackMenuItem);
+		// stackMenuList.add(feedbackMenuItem);
 
 		menuBar.add(helpMenu);
 	}
@@ -793,25 +795,25 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 * This method displays the current plugin info. I set it up as a method so
 	 * that it can be overridden by AppletViewFrame
 	 */
-//	protected void displayPluginInfo() {
-//
-//		final MenuHelpPluginsFrame frame = new MenuHelpPluginsFrame(
-//				"Current Plugins", this);
-//		final File f_currdir = new File(".");
-//
-//		try {
-//			frame.setSourceText(f_currdir.getCanonicalPath() + File.separator
-//					+ "plugins" + File.separator);
-//
-//		} catch (final IOException e) {
-//			frame.setSourceText("Unable to read default plugins directory.");
-//			LogBuffer.println("IOException while trying to display "
-//					+ "Plugin info: " + e.getMessage());
-//		}
-//
-//		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-//		frame.setVisible(true);
-//	}
+	// protected void displayPluginInfo() {
+	//
+	// final MenuHelpPluginsFrame frame = new MenuHelpPluginsFrame(
+	// "Current Plugins", this);
+	// final File f_currdir = new File(".");
+	//
+	// try {
+	// frame.setSourceText(f_currdir.getCanonicalPath() + File.separator
+	// + "plugins" + File.separator);
+	//
+	// } catch (final IOException e) {
+	// frame.setSourceText("Unable to read default plugins directory.");
+	// LogBuffer.println("IOException while trying to display "
+	// + "Plugin info: " + e.getMessage());
+	// }
+	//
+	// frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+	// frame.setVisible(true);
+	// }
 
 	// @Override
 	// public MainPanel[] getMainPanelsByName(final String name) {
@@ -918,7 +920,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 					+ "TVFrame don't match.");
 			return null;
 		}
-		
+
 		int index = -1;
 		for (int i = 0; i < fileMenuList.size(); i++) {
 
@@ -928,7 +930,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 				break;
 			}
 		}
-		
+
 		return fileSetList.get(index);
 	}
 

@@ -88,7 +88,7 @@ public final class Helper {
 			}
 		}
 	}
-	
+
 	/**
 	 * Checks if two int[] have elements in common.
 	 *

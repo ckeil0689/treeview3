@@ -140,7 +140,7 @@ public abstract class ModelView extends JPanel implements Observer,
 		// Call JComponent's paintComponent method to clear panel
 		// before every redraw.
 		Graphics2D g2d = (Graphics2D) g;
-		
+
 		super.paintComponent(g2d);
 
 		final Rectangle clip = g2d.getClipBounds();

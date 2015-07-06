@@ -70,7 +70,7 @@ public class TVController implements Observer {
 	private MenubarController menuController;
 	private File file;
 	private FileSet fileMenuSet;
-	
+
 	private Preferences oldNode;
 	private String[] clusterNodeSourceKeys;
 	private final String[] selectedLabels;
@@ -103,7 +103,7 @@ public class TVController implements Observer {
 					Frame.getFrames()[0],
 					"Are you sure you want to reset preferences and "
 							+ "close TreeView?", "Reset Preferences?",
-							JOptionPane.YES_NO_OPTION);
+					JOptionPane.YES_NO_OPTION);
 
 			switch (option) {
 
@@ -257,13 +257,16 @@ public class TVController implements Observer {
 
 	/**
 	 * Load data into the model.
-	 * @param fileSet The fileSet to be loaded.
-	 * @param isClusterFile Whether a clustered file is loaded or not. This
-	 * is important when figuring out whether preferences from the previous
-	 * file should be copied to the new one. It should only occur when a 
-	 * file is being clustered.
+	 * 
+	 * @param fileSet
+	 *            The fileSet to be loaded.
+	 * @param isClusterFile
+	 *            Whether a clustered file is loaded or not. This is important
+	 *            when figuring out whether preferences from the previous file
+	 *            should be copied to the new one. It should only occur when a
+	 *            file is being clustered.
 	 */
-	public void loadData(final FileSet fileSet, final boolean isClusterFile, 
+	public void loadData(final FileSet fileSet, final boolean isClusterFile,
 			final DataLoadInfo dataInfo) {
 
 		/* Setting loading screen */
@@ -271,16 +274,16 @@ public class TVController implements Observer {
 
 		/* Loading TVModel */
 		final TVModel tvModel = (TVModel) model;
-		
-		if(isClusterFile && clusterNodeSourceKeys != null) {
+
+		if (isClusterFile && clusterNodeSourceKeys != null) {
 			String srcName = clusterNodeSourceKeys[0];
 			String srcExtension = clusterNodeSourceKeys[1];
 			this.oldNode = getOldPreferences(srcName, srcExtension);
-			
+
 		} else {
 			this.oldNode = null;
 		}
-		
+
 		fileMenuSet = (fileSet != null) ? fileSet : tvFrame.getFileSet(file);
 
 		try {
@@ -299,7 +302,7 @@ public class TVController implements Observer {
 
 			if (tvModel.getColumnHeaderInfo().getNumHeaders() == 0) {
 				/* ------ Load Process -------- */
-				final ModelLoader loader = new ModelLoader(tvModel, this, 
+				final ModelLoader loader = new ModelLoader(tvModel, this,
 						dataInfo);
 				loader.execute();
 
@@ -330,15 +333,17 @@ public class TVController implements Observer {
 			setDataModel();
 
 			dendroController.setNewMatrix(tvFrame.getDendroView(), model);
-			
-			/* TODO Needs to happen after setNewMatrix because a new ColorExtractor object is created,
-			 * which would void the updated ColorExtractor state if copying happens before.
-			 * Implement a nicer solution one day...
+
+			/*
+			 * TODO Needs to happen after setNewMatrix because a new
+			 * ColorExtractor object is created, which would void the updated
+			 * ColorExtractor state if copying happens before. Implement a nicer
+			 * solution one day...
 			 */
-			Preferences loadedNode = getOldPreferences(fileMenuSet.getRoot(), 
+			Preferences loadedNode = getOldPreferences(fileMenuSet.getRoot(),
 					fileMenuSet.getExt());
 			copyOldPreferencesTo(loadedNode);
-			
+
 			if (fileMenuSet != null) {
 				fileMenuSet = tvFrame.getFileMRU().addUnique(fileMenuSet);
 				tvFrame.getFileMRU().setLast(fileMenuSet);
@@ -368,89 +373,93 @@ public class TVController implements Observer {
 		addViewListeners();
 		addMenuListeners();
 	}
-	
+
 	private Preferences getOldPreferences(String srcName, String srcExtension) {
-		
+
 		try {
 			/* First, get the relevant old node... */
 			Preferences root;
-			if(getConfigNode().nodeExists("File")) {
+			if (getConfigNode().nodeExists("File")) {
 				root = getConfigNode().node("File");
 			} else {
 				LogBuffer.println("File node not found. Could not"
 						+ " copy data.");
 				return null;
 			}
-			
+
 			return getTargetNode(root, srcName, srcExtension);
-			
+
 		} catch (BackingStoreException e) {
 			LogBuffer.logException(e);
 			return null;
 		}
 	}
-	
+
 	/**
-	 * Copies label and color data from the pre-clustered file to the 
+	 * Copies label and color data from the pre-clustered file to the
 	 * Preferences node of the post-clustered file.
-	 * @param srcName Source name of the post-clustered file.
-	 * @param srcExtension Source file extension of the post-clustered file.
+	 * 
+	 * @param srcName
+	 *            Source name of the post-clustered file.
+	 * @param srcExtension
+	 *            Source file extension of the post-clustered file.
 	 */
 	private void copyOldPreferencesTo(final Preferences loadedNode) {
-		
-		if(oldNode == null) {
+
+		if (oldNode == null) {
 			return;
 		}
-			
+
 		try {
 			dendroController.importLabelPreferences(oldNode);
-			
-			if(oldNode.nodeExists("ColorPresets")) {
+
+			if (oldNode.nodeExists("ColorPresets")) {
 				dendroController.importColorPreferences(oldNode);
-				
+
 				// set node here? maybe it disappears because it's a local var
 			}
-			
+
 		} catch (BackingStoreException e) {
 			LogBuffer.logException(e);
 		}
-		
+
 		oldNode = null;
 	}
-	
+
 	/**
 	 * Finds a specific sub-node in a root node.
+	 * 
 	 * @param root
 	 * @param srcName
 	 * @param srcExtension
 	 * @return The target Preferences node.
-	 * @throws BackingStoreException 
+	 * @throws BackingStoreException
 	 */
-	private static Preferences getTargetNode(Preferences root, String srcName, 
+	private static Preferences getTargetNode(Preferences root, String srcName,
 			String srcExtension) throws BackingStoreException {
-		
+
 		String[] fileNodes = root.childrenNames();
-		
+
 		Preferences targetNode = null;
-		for(String nodeName : fileNodes) {
+		for (String nodeName : fileNodes) {
 			Preferences node = root.node(nodeName);
 			String name = node.get("name", "none");
 			String extension = node.get("extension", ".txt");
-			
-			if(name.equalsIgnoreCase(srcName) 
+
+			if (name.equalsIgnoreCase(srcName)
 					&& extension.equalsIgnoreCase(srcExtension)) {
 				targetNode = node;
 				break;
 			}
 		}
-		
+
 		/* Interrupt if no node is found to copy old data. */
-		if(targetNode == null) {
+		if (targetNode == null) {
 			LogBuffer.println("Target node not found. Could not"
 					+ " copy data.");
 			return null;
 		}
-		
+
 		return targetNode;
 	}
 
@@ -516,7 +525,7 @@ public class TVController implements Observer {
 			if (file != null) {
 				FileSet fileSet = tvFrame.getFileSet(file);
 				getDataInfoAndLoad(fileSet, false);
-				
+
 			} else {
 				LogBuffer.println("No file was selected. Cannot begin"
 						+ " loading data.");
@@ -526,61 +535,60 @@ public class TVController implements Observer {
 			LogBuffer.logException(e);
 		}
 	}
-	
+
 	public void getDataInfoAndLoad(FileSet fileSet, boolean isFromCluster) {
-		
-		Preferences node = getOldPreferences(fileSet.getRoot(), 
+
+		Preferences node = getOldPreferences(fileSet.getRoot(),
 				fileSet.getExt());
-		
+
 		DataLoadInfo dataInfo;
-		if(node == null) { // better way?
-			dataInfo = useImportDialog(fileSet);				
+		if (node == null) { // better way?
+			dataInfo = useImportDialog(fileSet);
 		} else {
 			dataInfo = getDataLoadInfo(fileSet);
 		}
-		
-		if(dataInfo != null) {
+
+		if (dataInfo != null) {
 			loadData(fileSet, isFromCluster, dataInfo);
 		} // TODO else use default assumptions?
 	}
-	
+
 	/**
 	 * Show a dialog for the user to specify how his data should be loaded.
 	 * Retrieves the user chosen options and returns them in a DataInfo object.
+	 * 
 	 * @param filename
 	 * @return Options/ parameters for data loading.
 	 */
 	private static DataLoadInfo useImportDialog(final FileSet fileSet) {
-		
-		DataImportDialog loadPreview = 
-				new DataImportDialog(fileSet.getRoot() + fileSet.getExt());
-		
-		DataImportController importController = 
-				new DataImportController(loadPreview);
-		
+
+		DataImportDialog loadPreview = new DataImportDialog(fileSet.getRoot()
+				+ fileSet.getExt());
+
+		DataImportController importController = new DataImportController(
+				loadPreview);
+
 		String[][] previewData;
 		importController.setFileSet(fileSet);
 		previewData = importController.loadPreviewData();
-		
+
 		loadPreview.setNewTable(previewData);
 		importController.initDialog();
-		
+
 		DataLoadInfo dataInfo = loadPreview.showDialog();
-		
+
 		return dataInfo;
 	}
-	
+
 	public DataLoadInfo getDataLoadInfo(FileSet fileSet) {
-		
-		Preferences node = getOldPreferences(fileSet.getRoot(), 
+
+		Preferences node = getOldPreferences(fileSet.getRoot(),
 				fileSet.getExt());
-		
-		String delimiter = node.get("delimiter", 
-				ModelLoader.DEFAULT_DELIM);
-		int[] dataCoords = new int[]{node.getInt("rowCoord", 0), 
-				node.getInt("colCoord", 0)
-		};
-		
+
+		String delimiter = node.get("delimiter", ModelLoader.DEFAULT_DELIM);
+		int[] dataCoords = new int[] { node.getInt("rowCoord", 0),
+				node.getInt("colCoord", 0) };
+
 		return new DataLoadInfo(dataCoords, delimiter);
 	}
 
@@ -659,13 +667,13 @@ public class TVController implements Observer {
 	 */
 	public void setupClusterView(final int clusterType) {
 
-		/* 
+		/*
 		 * To quickly find Preferences node of pre-cluster file to carry over
 		 * settings like color and font.
 		 */
 		FileSet fs = ((TVModel) model).getFileSet();
-		this.clusterNodeSourceKeys = new String[]{fs.getRoot(), fs.getExt()};
-		
+		this.clusterNodeSourceKeys = new String[] { fs.getRoot(), fs.getExt() };
+
 		/* Erase selection */
 		dendroController.deselectAll();
 
@@ -673,7 +681,7 @@ public class TVController implements Observer {
 		final ClusterDialog clusterView = new ClusterDialog(clusterType);
 
 		/* Creating the Controller for this view. */
-		ClusterController cController = new ClusterController(clusterView, 
+		ClusterController cController = new ClusterController(clusterView,
 				TVController.this);
 
 		cController.displayView();
@@ -806,7 +814,7 @@ public class TVController implements Observer {
 			tvFrame.openSaveDialog(written.isEmpty(), null);
 			return false;
 		}
-		
+
 		String msg = "Model changes were written to ";
 		int i = 0;
 
@@ -827,7 +835,7 @@ public class TVController implements Observer {
 
 		tvFrame.openSaveDialog(written.isEmpty(), msg);
 		return true;
-		
+
 	}
 
 	/**
@@ -903,7 +911,7 @@ public class TVController implements Observer {
 					.getSource());// tvFrame.getFileMenuSet();
 
 			tvFrame.generateView(TreeViewFrame.PROGRESS_VIEW);
-			
+
 			getDataInfoAndLoad(fileMenuSet, false);
 		}
 	}
@@ -934,36 +942,36 @@ public class TVController implements Observer {
 
 		preferences.setVisible(true);
 	}
-	
-	/* TODO implement this and others to deprecate PreferencesMenu, which is
-	 * a remnant of a unified menu system (as opposed to separate dialogs) */
+
+	/*
+	 * TODO implement this and others to deprecate PreferencesMenu, which is a
+	 * remnant of a unified menu system (as opposed to separate dialogs)
+	 */
 	public void openLabelMenu() {
-		
-		
+
 	}
-	
+
 	/**
 	 * Opens up the color chooser dialog.
 	 */
 	public void openColorMenu() {
-		
+
 		final Double min = model.getDataMatrix().getMinVal();
 		final Double max = model.getDataMatrix().getMaxVal();
 
 		/* View */
 		ColorExtractor drawer = ((DoubleArrayDrawer) dendroController
 				.getArrayDrawer()).getColorExtractor();
-		
-		final ColorChooserUI gradientPick = 
-				new ColorChooserUI(drawer, min, max);
+
+		final ColorChooserUI gradientPick = new ColorChooserUI(drawer, min, max);
 
 		/* Controller */
-		ColorChooserController controller = 
-				new ColorChooserController(gradientPick);
-		
+		ColorChooserController controller = new ColorChooserController(
+				gradientPick);
+
 		/* Adding GradientColorChooser configurations to DendroView node. */
 		controller.setConfigNode(((TVModel) model).getDocumentConfig());
-		
+
 		gradientPick.setVisible(true);
 	}
 

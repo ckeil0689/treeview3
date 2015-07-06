@@ -75,20 +75,20 @@ public class FileSet {
 	 */
 	public boolean hasMoved() {
 
-		if (isUrl())
+		if (isUrl()) {
 			return false;
-		else {
-			try {
-				final File f = new File(getCdt());
-				return !(f.exists());
-
-			} catch (final Exception e) {
-				LogBuffer.println("Exception occurred when checking "
-						+ "whether a FileSet has moved: " + e.getMessage());
-			}
-
-			return true;
 		}
+		
+		try {
+			final File f = new File(getCdt());
+			return !(f.exists());
+
+		} catch (final Exception e) {
+			LogBuffer.println("Exception occurred when checking "
+					+ "whether a FileSet has moved: " + e.getMessage());
+		}
+
+		return true;
 	}
 
 	/**
@@ -115,7 +115,7 @@ public class FileSet {
 
 		node = Preferences.userRoot().node(StringRes.pnode_TVFrame)
 				.node("FileSet");
-		//this.getClass().getName());
+		// this.getClass().getName());
 		setCdt(cdt);
 		setDir(dir);
 	}
@@ -167,7 +167,7 @@ public class FileSet {
 	 *            FileSet to compare to
 	 * @return true if equal
 	 */
-	public boolean equals(final FileSet fileSet) {
+	public boolean equalsFileSet(final FileSet fileSet) {
 
 		return getCdt().equals(fileSet.getCdt());
 	}
