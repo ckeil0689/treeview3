@@ -57,7 +57,7 @@ public class EditThumbDialog extends CustomDialog {
 	public EditThumbDialog(Thumb thumb, int thumbIndex, ThumbBox thumbBox,
 			List<Color> colorList) {
 
-		super("Edit Thumb");
+		super("Edit Color");
 
 		this.t = thumb;
 		this.thumbBox = thumbBox;

@@ -88,7 +88,7 @@ public class ColorChooserUI extends CustomDialog {
 		contentPanel.setBorder(BorderFactory.createEtchedBorder());
 
 		addBtn = GUIFactory.createBtn("Add New Color");
-		editBtn = GUIFactory.createBtn("Edit Selected Thumb");
+		editBtn = GUIFactory.createBtn("Edit Selected Color");
 		removeBtn = GUIFactory.createBtn("Remove Selected Color");
 
 		setSelectionDependentBtnStatus(false, false);
