@@ -551,6 +551,7 @@ public class TVController implements Observer {
 	 */
 	public void getDataInfoAndLoad(FileSet fileSet, boolean isFromCluster) {
 
+		/* To check if file was loaded before */
 		Preferences node = getOldPreferences(fileSet.getRoot(),
 				fileSet.getExt());
 
