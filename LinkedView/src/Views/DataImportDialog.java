@@ -56,7 +56,6 @@ public class DataImportDialog extends CustomDialog {
 		super("Data Import - [" + filename + "]");
 
 		this.delimiters = new ArrayList<JCheckBox>();
-
 	}
 
 	public void setupDialogComponents() {

@@ -518,6 +518,7 @@ public class TVController implements Observer {
 	 */
 	public void openFile() {
 
+		String message;
 		try {
 			file = tvFrame.selectFile();
 
@@ -527,30 +528,47 @@ public class TVController implements Observer {
 				getDataInfoAndLoad(fileSet, false);
 
 			} else {
-				LogBuffer.println("No file was selected. Cannot begin"
-						+ " loading data.");
+				message = "No file was selected. Cannot begin "
+						+ "loading data.";
+				showWarning(message);
+				return;
 			}
 		} catch (final LoadException e) {
-			LogBuffer.println("Loading the file was interrupted.");
+			message = "Loading the file was interrupted";
+			showWarning(message);
 			LogBuffer.logException(e);
+			return;
 		}
 	}
 
+	/**
+	 * Used to retrieve information about the data for proper loading. 
+	 * Either through saved information (stored preferences) or by offering
+	 * a dialog to the user in which they can specify parameters.
+	 * @param fileSet FIle name + directory information object.
+	 * @param isFromCluster Whether the loading happens as a result of 
+	 * clustering.
+	 */
 	public void getDataInfoAndLoad(FileSet fileSet, boolean isFromCluster) {
 
 		Preferences node = getOldPreferences(fileSet.getRoot(),
 				fileSet.getExt());
 
 		DataLoadInfo dataInfo;
-		if (node == null) { // better way?
-			dataInfo = useImportDialog(fileSet);
-		} else {
+		if ((FileSet.TRV).equalsIgnoreCase(fileSet.getExt()) && node != null) { // better way?
 			dataInfo = getDataLoadInfo(fileSet);
+			
+		} else {
+			dataInfo = useImportDialog(fileSet);
 		}
 
 		if (dataInfo != null) {
 			loadData(fileSet, isFromCluster, dataInfo);
-		} // TODO else use default assumptions?
+			
+		} else {
+			String message = "Data loading was interrupted.";
+			showWarning(message);
+		}
 	}
 
 	/**
@@ -574,6 +592,9 @@ public class TVController implements Observer {
 
 		loadPreview.setNewTable(previewData);
 		importController.initDialog();
+		
+		/* Auto run before showing dialog */
+		importController.detectDataBoundaries();
 
 		DataLoadInfo dataInfo = loadPreview.showDialog();
 
@@ -973,6 +994,13 @@ public class TVController implements Observer {
 		controller.setConfigNode(((TVModel) model).getDocumentConfig());
 
 		gradientPick.setVisible(true);
+	}
+	
+	private void showWarning(final String message) {
+
+		JOptionPane.showMessageDialog(tvFrame.getAppFrame(), 
+				message, "Warning", JOptionPane.WARNING_MESSAGE);
+		LogBuffer.println(message);
 	}
 
 	/*

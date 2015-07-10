@@ -58,6 +58,7 @@ public class FileSet {
 	public static final int CLASSIC_STYLE = 1;
 	public static final int KMEANS_STYLE = 2;
 	public static final int LINKED_STYLE = 3;
+	public static final String TRV = ".trv";
 	private static final String validStyles = "auto|classic|kmeans|linked";
 	private static final String[] validStylesArray = { "Auto", "Classic",
 			"Kmeans", "Linked" };

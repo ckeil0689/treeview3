@@ -206,10 +206,7 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 	public void paint(final int[] pixels, final Rectangle source,
 			final Rectangle dest, final int scanSize) {
 
-		/* Code for selection dimming */
-		// , int[] gs, int[] as) {
-
-		paint(pixels, source, dest, scanSize, null);// , gs, as);
+		paint(pixels, source, dest, scanSize, null);
 	}
 
 	/**

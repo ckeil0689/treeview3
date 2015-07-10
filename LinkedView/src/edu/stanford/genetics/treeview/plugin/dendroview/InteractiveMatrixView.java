@@ -253,7 +253,6 @@ public class InteractiveMatrixView extends MatrixView implements
 
 			revalidateScreen();
 
-			// LogBuffer.println("OFFSCREEN INVALID");
 			final Rectangle destRect = new Rectangle(0, 0,
 					xmap.getUsedPixels(), ymap.getUsedPixels());
 
@@ -263,22 +262,9 @@ public class InteractiveMatrixView extends MatrixView implements
 							- ymap.getIndex(0));
 
 			if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
-				/*
-				 * In case selection dimming should be brought back, there is
-				 * this code below.
-				 */
-				// int[] geneSelections = new int[]
-				// {geneSelection.getMinIndex(),
-				// geneSelection.getMaxIndex()};
-				// int[] arraySelections = new int[]
-				// {arraySelection.getMinIndex(),
-				// arraySelection.getMaxIndex()};
-
 				/* Set new offscreenPixels (pixel colors) */
 				drawer.paint(offscreenPixels, sourceRect, destRect,
 						offscreenScanSize);
-
-				// , geneSelections, arraySelections);
 			}
 
 			offscreenSource.newPixels();
@@ -686,7 +672,6 @@ public class InteractiveMatrixView extends MatrixView implements
 			ymap.scrollBy(shift);
 		}
 
-		revalidate();
 		repaint();
 	}
 
@@ -699,6 +684,7 @@ public class InteractiveMatrixView extends MatrixView implements
 	 * @param yPxPos
 	 */
 	public void smoothZoomTowardPixel(int xPxPos, int yPxPos) {
+		
 		int zoomXVal = 0;
 		int zoomYVal = 0;
 		int numXCells = xmap.getNumVisible();

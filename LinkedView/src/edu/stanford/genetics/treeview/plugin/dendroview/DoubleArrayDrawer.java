@@ -158,6 +158,8 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 	/**
 	 * Paint the array values onto pixels. This method will do averaging if
 	 * multiple values map to the same pixel.
+	 * This updates the pixel array reference to contain new int values which
+	 * represent colors. These are then used by ModelViewProduced.
 	 *
 	 * @param pixels
 	 *            The pixel buffer to draw to.
@@ -178,23 +180,11 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 	public void paint(final int[] pixels, final Rectangle source,
 			final Rectangle dest, final int scanSize, final int[] geneOrder) {
 
-		/* Selection dimming code, selections passed from GlobalView */
-		// , int[] geneSelections, int[] arraySelections) {
 
 		if (dataMatrix == null) {
 			LogBuffer.println("Data matrix wasn't set, "
 					+ "can't be used in paint() in DoubleArrayDrawer.");
 		}
-
-		/*
-		 * Selection Dimming Set the selection ranges for rows and columns. All
-		 * values are -1 if no selection was made.
-		 */
-		// int g_min = geneSelections[0];
-		// int g_max = geneSelections[1];
-		//
-		// int a_min = arraySelections[0];
-		// int a_max = arraySelections[1];
 
 		// ynext will hold the first pixel of the next block.
 		int ynext = dest.y;
@@ -270,23 +260,8 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 						val /= count; // averaging here ?
 					}
 
-					/* Darken non-selected rows/ cols if there's a selection */
-					// boolean isBackground;
-					// int geneInd = gene + source.y;
-					// int arrayInd = array + source.x;
-
-					/* Selection Dimming */
-					// if(g_min == -1) {
-					// isBackground = false;
-					// } else {
-					// isBackground = !(geneInd >= g_min && geneInd <= g_max)
-					// || !(arrayInd >= a_min && arrayInd <= a_max);
-					// }
-
 					/* Getting the ARGB color based on the determined value */
 					final int t_color = colorExtractor.getARGBColor(val);
-					/* Selection dimming */
-					// , isBackground);
 
 					for (int x = xstart; x < xnext; x++) {
 
@@ -321,6 +296,7 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 		if (dataMatrix == null) {
 			LogBuffer.println("DataMatrix was not set in DoubleArrayDrawer,"
 					+ "can't be used in getValue().");
+			return DataModel.NODATA;
 		}
 		return dataMatrix.getValue(x, y);
 	}

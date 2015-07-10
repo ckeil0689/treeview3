@@ -90,8 +90,6 @@ public class DataImportController {
 				}
 			}
 		}
-
-		LogBuffer.println("New selectedDelimiter: " + selectedDelimiter);
 	}
 
 	private static String getDelimiter(final int idx) {
@@ -133,15 +131,26 @@ public class DataImportController {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			String filename = fileSet.getCdt();
-			int[] dataStartCoords = PreviewLoader.findDataStartCoords(filename,
-					selectedDelimiter);
-
-			int rowCount = dataStartCoords[0];
-			int columnCount = dataStartCoords[1];
-
-			previewDialog.setSpinnerValues(rowCount, columnCount);
+			
+			detectDataBoundaries();
 		}
+	}
+	
+	/**
+	 * Initiates data boundary detection with currently set fileSet object
+	 * and the selectedDelimiter. Then it updates the JSpinner values which
+	 * describe the data boundaries in the dialog.
+	 */
+	public void detectDataBoundaries() {
+		
+		String filename = fileSet.getCdt();
+		int[] dataStartCoords = PreviewLoader.findDataStartCoords(filename,
+				selectedDelimiter);
+
+		int rowCount = dataStartCoords[0];
+		int columnCount = dataStartCoords[1];
+
+		previewDialog.setSpinnerValues(rowCount, columnCount);
 	}
 
 	/**
