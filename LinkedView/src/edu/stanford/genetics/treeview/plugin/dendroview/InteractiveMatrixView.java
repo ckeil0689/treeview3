@@ -484,6 +484,8 @@ public class InteractiveMatrixView extends MatrixView implements
 	/* TODO move to a specified controller class */
 	private class MatrixMouseListener extends MouseAdapter {
 
+		boolean isMousePressed;
+		
 		@Override
 		public void mouseMoved(final MouseEvent e) {
 
@@ -509,6 +511,11 @@ public class InteractiveMatrixView extends MatrixView implements
 		@Override
 		public void mouseDragged(final MouseEvent e) {
 
+			// TODO dont draw when out of focus... doesnt recognize isMousePressed...
+			if (!enclosingWindow().isActive()) {
+				return;
+			}
+			
 			// When left button is used
 			if (SwingUtilities.isLeftMouseButton(e)) {
 				// rubber band?
@@ -542,8 +549,9 @@ public class InteractiveMatrixView extends MatrixView implements
 		@Override
 		public void mouseReleased(final MouseEvent e) {
 
-			if (!enclosingWindow().isActive())
+			if (!enclosingWindow().isActive() || !isMousePressed) {
 				return;
+			}
 
 			// When left button is used
 			if (SwingUtilities.isLeftMouseButton(e)) {
@@ -572,7 +580,8 @@ public class InteractiveMatrixView extends MatrixView implements
 			} else {
 				// do something else?
 			}
-
+			
+			isMousePressed = false;
 			repaint();
 		}
 
@@ -580,9 +589,12 @@ public class InteractiveMatrixView extends MatrixView implements
 		@Override
 		public void mousePressed(final MouseEvent e) {
 
-			if (!enclosingWindow().isActive())
+			if (!enclosingWindow().isActive()) {
 				return;
+			}
 
+			isMousePressed = true;
+			
 			// if left button is used
 			if (SwingUtilities.isLeftMouseButton(e)) {
 				startPoint.setLocation(xmap.getIndex(e.getX()),
@@ -615,6 +627,10 @@ public class InteractiveMatrixView extends MatrixView implements
 		@Override
 		public void mouseEntered(final MouseEvent e) {
 
+			if (!enclosingWindow().isActive()) {
+				return;
+			}
+			
 			hasMouse = true;
 			requestFocus();
 		}

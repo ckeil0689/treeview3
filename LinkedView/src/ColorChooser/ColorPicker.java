@@ -54,14 +54,21 @@ public class ColorPicker {
 	private final List<Color> colorList;
 
 	/* Data boundaries */
+	private final double mean;
+	private final double median;
+	
 	private double minVal;
 	private double maxVal;
 	private double range;
 
 	public ColorPicker(final ColorExtractor drawer, final double minVal,
-			final double maxVal) {
+			final double maxVal, final double mean, final double median) {
 
 		this.colorExtractor = drawer;
+		
+		this.mean = mean;
+		this.median = median;
+		
 		this.thumbList = new ArrayList<Thumb>();
 		this.colorList = new ArrayList<Color>();
 
@@ -369,6 +376,24 @@ public class ColorPicker {
 	protected double getMaxVal() {
 
 		return maxVal;
+	}
+	
+	/**
+	 * 
+	 * @return The data's mean.
+	 */
+	protected double getMean() {
+
+		return mean;
+	}
+	
+	/**
+	 * 
+	 * @return The data's median.
+	 */
+	protected double getMedian() {
+
+		return median;
 	}
 
 	/**

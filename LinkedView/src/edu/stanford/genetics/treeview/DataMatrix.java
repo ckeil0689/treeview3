@@ -46,12 +46,12 @@ public interface DataMatrix {
 	double getValue(int col, int row);
 
 	/**
-	 * Find the minimum and maximum value in the loaded dataset.
+	 * Find the minimum and maximum value in the loaded data set.
 	 */
-	void calculateMinMax();
+	void calculateBaseValues();
 
 	/**
-	 * Return the minimum value of the dataset. Used to calculate colors to draw
+	 * Return the minimum value of the data set. Used to calculate colors to draw
 	 * the pixels with DoubleArrayDrawer in DendroView.
 	 *
 	 * @return
@@ -59,12 +59,26 @@ public interface DataMatrix {
 	double getMinVal();
 
 	/**
-	 * Return the maximum value of the dataset. Used to calculate colors to draw
+	 * Return the maximum value of the data set. Used to calculate colors to draw
 	 * the pixels with DoubleArrayDrawer in DendroView.
 	 *
 	 * @return
 	 */
 	double getMaxVal();
+	
+	/**
+	 * Return the mean value of the data set.
+	 *
+	 * @return A double representing the mean value of the data set.
+	 */
+	double getMean();
+	
+	/**
+	 * Return the median value of the data set.
+	 *
+	 * @return A double representing the mean value of the data set.
+	 */
+	double getMedian();
 
 	/**
 	 * Sets the value attribute of an element in the DataMatrix object

@@ -33,6 +33,7 @@ import Utilities.Helper;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.ContrastSelectable;
 import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.model.TVModel;
 
 /**
  * The purpose of this class is to convert a data value into a color.
@@ -236,6 +237,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 		} else {
 			LogBuffer.println("Could not find or create ColorExtractor "
 					+ "node because parentNode was null.");
+			return;
 		}
 
 		importPreferences(parentNode);
@@ -475,15 +477,13 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	public float[] getFloatColor(double dval, final float[] fractionVals,
 			final List<Color> colorVals) {
 
-		if (Helper.nearlyEqual(dval, nodata))
+		if (TVModel.isMissing(dval)) {
 			return missingColor;
-		// return new Color(missingColor[0], missingColor[1],
-		// missingColor[2]);
-		else if (Helper.nearlyEqual(dval, empty))
-			// System.out.println("value " + dval + " was empty");
+			
+		} else if (TVModel.isEmpty(dval)) {
 			return emptyColor;
-		// return new Color(emptyColor[0], emptyColor[1], emptyColor[2]);
-		else {
+			
+		} else {
 
 			if (m_logTranform) {
 				dval = Math.log(dval / m_logCenter) / m_logBaseDivisor;

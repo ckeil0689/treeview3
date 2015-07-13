@@ -77,7 +77,7 @@ public class KnnArrayDrawer extends DoubleArrayDrawer {
 			for (int col = 0; col < nCol; col++) {
 
 				final double val = dataMatrix.getValue(row, col);
-				if (Helper.nearlyEqual(val, DataModel.NODATA)) {
+				if (Helper.nearlyEqual(val, DataModel.NAN)) {
 
 					// Math.abs(val - DataModel.NODATA) < EPSILON) {
 					continue;
@@ -176,7 +176,7 @@ public class KnnArrayDrawer extends DoubleArrayDrawer {
 								break;
 							}
 
-							if (!Helper.nearlyEqual(val, DataModel.NODATA)) {
+							if (!Helper.nearlyEqual(val, DataModel.NAN)) {
 								count++;
 								val += thisVal;
 							}
@@ -186,7 +186,7 @@ public class KnnArrayDrawer extends DoubleArrayDrawer {
 						}
 					}
 					if (count == 0) {
-						val = DataModel.NODATA;
+						val = DataModel.NAN;
 
 					} else {
 						val /= count;

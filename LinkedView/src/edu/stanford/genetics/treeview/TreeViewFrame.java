@@ -788,7 +788,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	@Override
 	public double noData() {
 
-		return DataModel.NODATA;
+		return DataModel.NAN;
 	}
 
 	/**

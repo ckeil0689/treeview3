@@ -762,7 +762,7 @@ public class TVController implements Observer {
 					model.getRowHeaderInfo(), def);
 
 			t.setDataMatrix(model.getDataMatrix(), model.getColumnHeaderInfo(),
-					DataModel.NODATA);
+					DataModel.NAN);
 
 			t.setConfigNode(tvFrame.getConfigNode());
 
@@ -784,7 +784,7 @@ public class TVController implements Observer {
 							+ source.getRoot() + "_data.cdt");
 
 			t.setDataMatrix(model.getDataMatrix(), model.getColumnHeaderInfo(),
-					DataModel.NODATA);
+					DataModel.NAN);
 
 			t.setConfigNode(tvFrame.getConfigNode());
 
@@ -978,14 +978,17 @@ public class TVController implements Observer {
 	 */
 	public void openColorMenu() {
 
-		final Double min = model.getDataMatrix().getMinVal();
-		final Double max = model.getDataMatrix().getMaxVal();
+		final double min = model.getDataMatrix().getMinVal();
+		final double max = model.getDataMatrix().getMaxVal();
+		final double mean = model.getDataMatrix().getMean();
+		final double median = model.getDataMatrix().getMedian();
 
 		/* View */
 		ColorExtractor drawer = ((DoubleArrayDrawer) dendroController
 				.getArrayDrawer()).getColorExtractor();
 
-		final ColorChooserUI gradientPick = new ColorChooserUI(drawer, min, max);
+		final ColorChooserUI gradientPick = new ColorChooserUI(drawer, 
+				min, max, mean, median);
 
 		/* Controller */
 		ColorChooserController controller = new ColorChooserController(

@@ -195,24 +195,28 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 			String element = lineAsStrings[i + dataStartColumn];
 
-			// handle parseDouble error somehow?
-			// using the Pattern.matches method screws up
-			// loading time by a factor of 1000....
+			/* no data value should ever be a word, so ending with e is
+			 * considered as exponent value notation */
 			if (element.endsWith("e") || element.endsWith("E")) {
 				element += "+00";
 			}
 
 			/* Trying to parse the String. If not possible add 0. */
 			try {
-				final double val = Double.parseDouble(element);
+				double val = Double.parseDouble(element);
+				
+//				/* NaN and Infinite treated as non-data values */
+//				if(Double.isNaN(val) || Double.isInfinite(val)) {
+//					val = DataModel.NAN;
+//				} 
+//				
 				dataValues[i] = val;
 
 			} catch (final NumberFormatException e) {
-				dataValues[i] = DataModel.NODATA;
+				dataValues[i] = DataModel.NAN;
 			}
 		}
 
-		// Issue with length of stringLabels
 		doubleData[row_idx - dataStartRow] = dataValues;
 
 		return labels;
@@ -414,7 +418,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 		/* set data in TVModel */
 		targetModel.setExprData(doubleData);
-		targetModel.getDataMatrix().calculateMinMax();
+		targetModel.getDataMatrix().calculateBaseValues();
 	}
 
 	private void parseGTR() {

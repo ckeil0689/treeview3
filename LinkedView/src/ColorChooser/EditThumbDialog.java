@@ -53,9 +53,10 @@ public class EditThumbDialog extends CustomDialog {
 	 *            The thumbBox in which the thumbs are painted.
 	 * @param colorList
 	 *            List of colors which may be updated by this dialog.
+	 *            
 	 */
 	public EditThumbDialog(Thumb thumb, int thumbIndex, ThumbBox thumbBox,
-			List<Color> colorList) {
+			List<Color> colorList, final double mean, final double median) {
 
 		super("Edit Color");
 
@@ -84,7 +85,12 @@ public class EditThumbDialog extends CustomDialog {
 		colorIcon = new ColorIcon(thumb.getColor());
 		colorButton = GUIFactory.createColorIconBtn("Change Color", colorIcon);
 		colorButton.addActionListener(new SetColorListener());
-
+		
+		final JLabel meanLabel = GUIFactory.createLabel("Mean: " + mean, 
+				GUIFactory.FONTS);
+		final JLabel medianLabel = GUIFactory.createLabel("Median: " + median, 
+				GUIFactory.FONTS);
+		
 		final JButton okButton = GUIFactory.createBtn("OK");
 		okButton.addActionListener(new SetValueListener());
 
@@ -92,9 +98,11 @@ public class EditThumbDialog extends CustomDialog {
 				null);
 
 		panel.add(colorButton, "push, alignx 0%, wrap");
-		panel.add(enterPrompt, "push, span, wrap");
-		panel.add(inputField, "push, growx, span, wrap");
-		panel.add(okButton, "pushx, alignx 50%");
+		panel.add(enterPrompt, "align left");
+		panel.add(inputField, "growx, wrap");
+		panel.add(meanLabel, "pushx");
+		panel.add(medianLabel, "pushx, wrap");
+		panel.add(okButton, "pushx, span, alignx 50%");
 
 		mainPanel.add(panel, "w 200::, h 150::");
 	}

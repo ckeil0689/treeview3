@@ -63,10 +63,11 @@ public class ColorChooserUI extends CustomDialog {
 	 *            Maximum boundary of the data.
 	 */
 	public ColorChooserUI(final ColorExtractor drawer, final double minVal,
-			final double maxVal) {
+			final double maxVal, final double mean, final double median) {
 
 		super("Choose matrix colors");
-		this.colorPicker = new ColorPicker(drawer, minVal, maxVal);
+		this.colorPicker = new ColorPicker(drawer, minVal, maxVal, 
+				mean, median);
 		this.gradientPanel = colorPicker.getContainerPanel();
 
 		setLayout();

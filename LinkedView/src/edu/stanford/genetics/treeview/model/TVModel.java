@@ -22,6 +22,7 @@
  */
 package edu.stanford.genetics.treeview.model;
 
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Observable;
 import java.util.prefs.Preferences;
@@ -158,18 +159,22 @@ public class TVModel extends Observable implements DataModel {
 
 		final int nexpr = nExpr();
 		final int ngene = nGene();
+		
 		if (x >= nexpr + 2) {
-			if (compareModel != null)
+			if (compareModel != null) {
 				return compareModel.getValue(x - (nexpr + 2), y); // check
 			// offsets
+			}
 
-		} else if (x >= nexpr && y < ngene)
+		} else if (x >= nexpr && y < ngene) {
 			return 0; // gray border
+		}
 
-		if ((x < nexpr && y < ngene) && (x >= 0 && y >= 0))
+		if ((x < nexpr && y < ngene) && (x >= 0 && y >= 0)) {
 			return dataMatrix.getValue(x, y);
+		}
 
-		return NODATA;
+		return DataModel.NAN;
 	}
 
 	@Override
@@ -177,7 +182,29 @@ public class TVModel extends Observable implements DataModel {
 
 		return aidFound;
 	}
-
+	
+	/**
+	 * Static implementation to check data values for NaN while retaining
+	 * the 'missing' name.
+	 * @param val
+	 * @return Whether the data is NaN or not
+	 */
+	public static boolean isMissing(final double val) {
+		
+		return Double.isNaN(val);
+	}
+	
+	/**
+	 * Static implementation to check data values for Infinity while retaining
+	 * the 'empty' name.
+	 * @param val
+	 * @return Whether the data is considered empty or not
+	 */
+	public static boolean isEmpty(final double val) {
+		
+		return Double.isInfinite(val);
+	}
+	
 	public void aidFound(final boolean newVal) {
 
 		aidFound = newVal;
@@ -203,10 +230,11 @@ public class TVModel extends Observable implements DataModel {
 	@Override
 	public String getSource() {
 
-		if (source == null)
+		if (source == null) {
 			return "No Data Loaded";
-		else
-			return source.getCdt();
+		}
+		
+		return source.getCdt();
 	}
 
 	@Override
@@ -248,16 +276,6 @@ public class TVModel extends Observable implements DataModel {
 
 		documentConfig = newVal;
 	}
-
-	// public void setFrame(final TreeViewFrame f) {
-	//
-	// tvFrame = f;
-	// }
-	//
-	// public TreeViewFrame getFrame() {
-	//
-	// return tvFrame;
-	// }
 
 	protected void hashAIDs() {
 
@@ -362,8 +380,9 @@ public class TVModel extends Observable implements DataModel {
 	 */
 	public void reorderGenes(final int[] ordering) {
 
-		if (ordering == null || ordering.length != dataMatrix.getNumRow())
+		if (ordering == null || ordering.length != dataMatrix.getNumRow()) {
 			return;
+		}
 
 		final DataMatrix data = getDataMatrix();
 		final double[] temp = new double[data.getNumRow()];
@@ -435,27 +454,6 @@ public class TVModel extends Observable implements DataModel {
 
 		return msg;
 	}
-
-	/*
-	 * // debug functions private String commonEscapes() { String err =
-	 * "Common escapes\n"; err += "ttype TT_EOL = " +
-	 * FlatFileStreamTokenizer.TT_EOL; err += " ttype TT_EOF = " +
-	 * FlatFileStreamTokenizer.TT_EOF; err += " ttype TT_NUMBER = " +
-	 * FlatFileStreamTokenizer.TT_NUMBER; err += " ttype TT_WORD = " +
-	 * FlatFileStreamTokenizer.TT_WORD; err += " '\t' = " + '\t'; err +=
-	 * " '\n' = " + '\n'; err += " '\r' = " + '\r';
-	 * 
-	 * return err; }
-	 * 
-	 * private void printStream(FlatFileStreamTokenizer st) throws IOException {
-	 * int tt = st.nextToken(); while (tt != st.TT_EOF) { String msg; switch(tt)
-	 * { case FlatFileStreamTokenizer.TT_WORD: msg = "Word: " + st.sval; break;
-	 * case FlatFileStreamTokenizer.TT_NUMBER: msg = "Number: " + st.nval;
-	 * break; case FlatFileStreamTokenizer.TT_EOL: msg = "EOL:"; break; case
-	 * FlatFileStreamTokenizer.TT_NULL: msg = "NULL:"; break; default: msg =
-	 * "INVALID TOKEN, tt=" + tt; break; } System.out.println(msg); tt =
-	 * st.nextToken(); } }
-	 */
 
 	@Override
 	public void removeAppended() {
@@ -569,6 +567,8 @@ public class TVModel extends Observable implements DataModel {
 		private double[][] exprData = null;
 		private double minVal = Double.MAX_VALUE;
 		private double maxVal = Double.MIN_VALUE;
+		private double mean = Double.NaN;
+		private double median = Double.NaN;
 
 		public void clear() {
 
@@ -585,44 +585,96 @@ public class TVModel extends Observable implements DataModel {
 
 			for (int i = 0; i < exprData.length; i++) {
 				for (int j = 0; j < exprData[i].length; j++) {
+					
 					if (Helper.nearlyEqual(0.0, exprData[i][j])) {
-						exprData[i][j] = DataModel.NODATA;
+						exprData[i][j] = DataModel.NAN;
 					}
 				}
 			}
 		}
 
-		/* finds the maximum and minimum values in the data */
+		/** 
+		 * Finds the maximum and minimum values in the data, as well as
+		 * mean, median.
+		 */
 		@Override
-		public void calculateMinMax() {
+		public void calculateBaseValues() {
 
 			if (exprData != null) {
 				final int nGene = nGene();
 				final int nExpr = nExpr();
+				
+				double sum = 0;
+				int skipped = 0;
 
 				for (int i = 0; i < nGene; i++) {
-
 					for (int j = 0; j < nExpr; j++) {
 
 						final double dataPoint = exprData[i][j];
-
-						if (dataPoint > maxVal && dataPoint != DataModel.NODATA
-								&& dataPoint != DataModel.EMPTY) {
-
-							maxVal = dataPoint;
-						}
-
-						if (dataPoint < minVal && dataPoint != DataModel.NODATA
-								&& dataPoint != DataModel.EMPTY) {
-
-							minVal = dataPoint;
+						
+						if(!Double.isNaN(dataPoint) 
+								&& !Double.isInfinite(dataPoint)) {
+							sum += dataPoint;
+							
+							if (dataPoint > maxVal) {
+								maxVal = dataPoint;
+							}
+							
+							if (dataPoint < minVal) {
+								minVal = dataPoint;
+							}
+						} else {
+							skipped++;
 						}
 					}
 				}
+				
+				mean = sum / ((nGene * nExpr) - skipped);
+				median = calculateMedian(exprData);
+				
 			} else {
-				// Log that exprdata is null
 				LogBuffer.println("ExprData in TVDataMatrix is null.");
 			}
+		}
+		
+		/**
+		 * Finds the median value of a 2D double array.
+		 * @param data
+		 * @return Median value.
+		 */
+		private double calculateMedian(double[][] data) {
+			
+			double median = Double.NaN;
+			final int nGene = nGene();
+			final int nExpr = nExpr();
+			
+			/* ROW ORDER 
+			 * Although allocating a second array kills RAM for large
+			 * matrices it needs to be done. Sorting the data is required
+			 * for median and the original data cannot be disturbed...
+			 */
+			double[] newData = new double[nGene * nExpr];
+			
+			for (int i = 0; i < nGene; i++) {
+				for (int j = 0; j < nExpr; j++) {
+
+					newData[nExpr * i + j] = exprData[i][j];
+				}
+			}
+			
+			Arrays.sort(newData); /* Good night cpu...*/
+			
+			/* Even length case */
+			if(newData.length % 2 == 0) {
+				int idxLeft = newData.length / 2;
+				int idxRight = (newData.length / 2) + 1;
+				median = (newData[idxLeft] + newData[idxRight]) / 2;
+				
+			} else {
+				median = newData[newData.length / 2];
+			}
+			
+			return median;
 		}
 
 		@Override
@@ -636,16 +688,30 @@ public class TVModel extends Observable implements DataModel {
 
 			return maxVal;
 		}
+		
+		@Override
+		public double getMean() {
+
+			return mean;
+		}
+		
+		@Override
+		public double getMedian() {
+
+			return median;
+		}
 
 		@Override
 		public double getValue(final int x, final int y) {
 
 			final int nexpr = nExpr();
 			final int ngene = nGene();
-			if ((x < nexpr) && (y < ngene) && (x >= 0) && (y >= 0))
+			
+			if ((x < nexpr) && (y < ngene) && (x >= 0) && (y >= 0)) {
 				return exprData[y][x];
-			else
-				return DataModel.NODATA;
+			}
+			
+			return DataModel.NAN;
 		}
 
 		public void setExprData(final double[][] newData) {
@@ -738,6 +804,9 @@ public class TVModel extends Observable implements DataModel {
 
 	class GeneHeaderInfo extends IntHeaderInfo {
 
+		/*
+		TODO ... oh god this all just throws out fixed values.
+		*/
 		public int getAIDIndex() {
 
 			return 1;
@@ -750,17 +819,19 @@ public class TVModel extends Observable implements DataModel {
 
 		public int getYorfIndex() {
 
-			if (getIndex("GID") == -1)
+			if (getIndex("GID") == -1) {
 				return 0;
-			else
-				return 1;
+			}
+			
+			return 1;
 		}
 
 		public int getNameIndex() {
 
-			if (getIndex("GID") == -1)
+			if (getIndex("GID") == -1) {
 				return 1;
-			else
+			}
+			
 				return 2;
 		}
 
@@ -772,14 +843,17 @@ public class TVModel extends Observable implements DataModel {
 
 			final int retval = super.getIndex(header);
 
-			if (retval != -1)
+			if (retval != -1) {
 				return retval;
+			}
 
-			if (header.equals("YORF"))
+			if (header.equals("YORF")) {
 				return getYorfIndex();
+			}
 
-			if (header.equals("NAME"))
+			if (header.equals("NAME")) {
 				return getNameIndex();
+			}
 
 			return -1;
 		}
@@ -794,32 +868,6 @@ public class TVModel extends Observable implements DataModel {
 
 		geneHeaderInfo.setHeaderArray(newVal);
 	}
-
-	// loading stuff follows...
-	// /**
-	// *
-	// *
-	// * @param fileSet
-	// * fileset to load
-	// * @throws ExecutionException
-	// * @throws InterruptedException
-	// *
-	// */
-	// public void loadNew(final FileSet fileSet) throws LoadException,
-	// InterruptedException, ExecutionException, OutOfMemoryError {
-	//
-	// resetState();
-	// setSource(fileSet);
-	//
-	// ModelLoader loader = new ModelLoader(this);
-	// loader.load();
-	// loader = null;
-	//
-	// if (!isLoaded()) {
-	// throw new LoadException("Loading Cancelled",
-	// LoadException.INTPARSE);
-	// }
-	// }
 
 	/**
 	 * @param b
@@ -860,9 +908,11 @@ public class TVModel extends Observable implements DataModel {
 
 	@Override
 	public String getFileName() {
-		if (source == null)
+		
+		if (source == null) {
 			return "No Data Loaded";
-		else
-			return source.getRoot() + source.getExt();
+		}
+
+		return source.getRoot() + source.getExt();
 	}
 }

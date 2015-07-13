@@ -333,10 +333,18 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	 */
 	private class PanelClickDeselector extends MouseAdapter {
 
+		/* 
+		 * mousePressed instead of mouseClicked because mousePressing is
+		 * apparently what makes a Window active. mouseClicked therefore
+		 * always returns true for isActive() and deselection happens even
+		 * though the window might be in the background. 
+		 */
 		@Override
-		public void mouseClicked(MouseEvent e) {
+		public void mousePressed(MouseEvent e) {
 
-			deselectAll();
+			if(tvFrame.getAppFrame().isActive()) {
+				deselectAll();
+			}
 		}
 	}
 
@@ -1267,7 +1275,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 				tvModel.getDataMatrix().getMinVal(), tvModel.getDataMatrix()
 						.getMaxVal());
 		colorExtractor.setDefaultColorSet(colorPresets.getDefaultColorSet());
-		colorExtractor.setMissing(DataModel.NODATA, DataModel.EMPTY);
+		colorExtractor.setMissing(DataModel.NAN, DataModel.EMPTY);
 
 		final DoubleArrayDrawer dArrayDrawer = new DoubleArrayDrawer();
 		dArrayDrawer.setColorExtractor(colorExtractor);

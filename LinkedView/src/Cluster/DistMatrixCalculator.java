@@ -130,8 +130,8 @@ public class DistMatrixCalculator {
 			for (int k = 0; k < row.length; k++) {
 
 				/* Skip missing data */
-				if (Helper.nearlyEqual(row[k], DataModel.NODATA)
-						|| Helper.nearlyEqual(otherRow[k], DataModel.NODATA)) {
+				if (Helper.nearlyEqual(row[k], DataModel.NAN)
+						|| Helper.nearlyEqual(otherRow[k], DataModel.NAN)) {
 					continue;
 				}
 
@@ -150,18 +150,20 @@ public class DistMatrixCalculator {
 		/* sum squared errors from mean */
 		for (int k = 0; k < row.length; k++) {
 
-			/* Skip missing data */
-			if (Helper.nearlyEqual(row[k], DataModel.NODATA)
-					|| Helper.nearlyEqual(otherRow[k], DataModel.NODATA)) {
+			xi = row[k];
+			yi = otherRow[k];
+			
+			/* Skip missing or NaN data */
+			if (Helper.nearlyEqual(xi, DataModel.NAN)
+					|| Helper.nearlyEqual(yi, DataModel.NAN)
+					|| Double.isNaN(xi) || Double.isNaN(yi)) {
 				continue;
 			}
 
 			// part x
-			xi = row[k];
 			sumX += (xi - mean_x) * (xi - mean_x);
 
 			// part y
-			yi = otherRow[k];
 			sumY += (yi - mean_y) * (yi - mean_y);
 
 			// part xy
@@ -320,8 +322,8 @@ public class DistMatrixCalculator {
 		for (int k = 0; k < row.length; k++) {
 
 			/* Skip missing data */
-			if (Helper.nearlyEqual(row[k], DataModel.NODATA)
-					|| Helper.nearlyEqual(otherRow[k], DataModel.NODATA)) {
+			if (Helper.nearlyEqual(row[k], DataModel.NAN)
+					|| Helper.nearlyEqual(otherRow[k], DataModel.NAN)) {
 				skipped++;
 				continue;
 			}
@@ -349,8 +351,8 @@ public class DistMatrixCalculator {
 		for (int k = 0; k < row.length; k++) {
 
 			/* Skip missing data */
-			if (Helper.nearlyEqual(row[k], DataModel.NODATA)
-					|| Helper.nearlyEqual(otherRow[k], DataModel.NODATA)) {
+			if (Helper.nearlyEqual(row[k], DataModel.NAN)
+					|| Helper.nearlyEqual(otherRow[k], DataModel.NAN)) {
 				continue;
 			}
 

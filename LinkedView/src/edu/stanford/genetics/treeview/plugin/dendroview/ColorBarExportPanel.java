@@ -189,10 +189,12 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 			defaultPath = sourceSet.getDir() + sourceSet.getRoot()
 					+ getInitialExtension();
 		}
-		if (configNode == null)
+		
+		if (configNode == null) {
 			return defaultPath;
-		else
-			return configNode.get("file", defaultPath);
+		}
+		
+		return configNode.get("file", defaultPath);
 	}
 
 	/**
@@ -226,13 +228,6 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 		test.pack();
 		test.setVisible(true);
 	}
-
-	// /* inherit description */
-	// @Override
-	// public void bindConfig(final Preferences configNode) {
-	//
-	// root = configNode;
-	// }
 
 	/* inherit description */
 	@Override
@@ -394,20 +389,24 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 	 * estimated height of box graphic alone.
 	 */
 	public int estimateHeight() {
-		if (drawVertical())
+		
+		if (drawVertical()) {
 			return (int) (getNumBoxes() * getYscale());
-		else
-			return (int) (getXscale() + textLength());
+		}
+		
+		return (int) (getXscale() + textLength());
 	}
 
 	/**
 	 * estimated width of box graphic alone.
 	 */
 	public int estimateWidth() {
-		if (drawVertical())
+		
+		if (drawVertical()) {
 			return (int) (getXscale() + textLength());
-		else
-			return (int) (getNumBoxes() * getXscale());
+		}
+		
+		return (int) (getNumBoxes() * getXscale());
 	}
 
 	class PreviewPanel extends JPanel {
@@ -1146,7 +1145,7 @@ class SimpleDataMatrix implements DataMatrix {
 	}
 
 	@Override
-	public void calculateMinMax() {
+	public void calculateBaseValues() {
 		// TODO Auto-generated method stub
 
 	}
@@ -1159,6 +1158,18 @@ class SimpleDataMatrix implements DataMatrix {
 
 	@Override
 	public double getMaxVal() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getMean() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getMedian() {
 		// TODO Auto-generated method stub
 		return 0;
 	}

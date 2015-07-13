@@ -29,6 +29,7 @@ import Utilities.Helper;
 import edu.stanford.genetics.treeview.DataMatrix;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.model.TVModel;
 
 /**
  * Class for Drawing A Colored Grid Representation of a Data Matrix.
@@ -139,7 +140,7 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 				final double val = dataMatrix.getValue(row, col);
 
 				/* don't skew calculations with missing data */
-				if (Helper.nearlyEqual(val, DataModel.NODATA)
+				if (Helper.nearlyEqual(val, DataModel.NAN)
 						|| Helper.nearlyEqual(val, DataModel.EMPTY)) {
 					continue;
 				}
@@ -235,7 +236,7 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 							final double thisVal = dataMatrix.getValue(j
 									+ source.x, actualGene);
 
-							if (Helper.nearlyEqual(thisVal, DataModel.EMPTY)) {
+							if (TVModel.isEmpty(thisVal)) {
 								val = DataModel.EMPTY;
 								count = 1;
 								break;
@@ -248,13 +249,13 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 
 						}
 
-						if (Helper.nearlyEqual(val, DataModel.EMPTY)) {
+						if (TVModel.isEmpty(val)) {
 							break;
 						}
 					}
 
 					if (count == 0) {
-						val = DataModel.NODATA;
+						val = DataModel.NAN;
 
 					} else {
 						val /= count; // averaging here ?
@@ -293,11 +294,13 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 	 */
 	public double getValue(final int x, final int y) {
 
+		double val = DataModel.NAN;
 		if (dataMatrix == null) {
 			LogBuffer.println("DataMatrix was not set in DoubleArrayDrawer,"
 					+ "can't be used in getValue().");
-			return DataModel.NODATA;
+			return val;
 		}
+		
 		return dataMatrix.getValue(x, y);
 	}
 
@@ -310,21 +313,23 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 	@Override
 	public boolean isMissing(final int x, final int y) {
 
-		return Helper.nearlyEqual(getValue(x, y), DataModel.NODATA);
+		return Double.isNaN(getValue(x, y));//Helper.nearlyEqual(getValue(x, y), DataModel.NAN);
 	}
 
 	@Override
 	public boolean isEmpty(final int x, final int y) {
 
-		return Helper.nearlyEqual(getValue(x, y), DataModel.EMPTY);
+		return Double.isInfinite(getValue(x, y));//Helper.nearlyEqual(getValue(x, y), DataModel.EMPTY);
 	}
 
 	/** how many rows are there to draw? */
 	@Override
 	public int getNumRow() {
 
-		if (dataMatrix != null)
+		if (dataMatrix != null) {
 			return dataMatrix.getNumRow();
+		}
+		
 		return 0;
 	}
 
@@ -332,8 +337,10 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 	@Override
 	public int getNumCol() {
 
-		if (dataMatrix != null)
+		if (dataMatrix != null) {
 			return dataMatrix.getNumCol();
+		}
+		
 		return 0;
 	}
 

@@ -165,7 +165,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 			} else {
 				final double val = dataMatrix.getValue(columnIndex
 						- selectedPrefix.length, rowIndex + top);
-				if (Math.abs(val - DataModel.NODATA) < PRECISION_LEVEL)
+				if (Math.abs(val - DataModel.NAN) < PRECISION_LEVEL)
 					return null;
 				if (Math.abs(val - DataModel.EMPTY) < PRECISION_LEVEL)
 					return null;

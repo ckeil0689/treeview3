@@ -36,8 +36,8 @@ import edu.stanford.genetics.treeview.model.IntHeaderInfo;
 
 public interface DataModel {
 
-	public final static double NODATA = -10000000;
-	public final static double EMPTY = -20000000;
+	public final static double NAN = Double.NaN;
+	public final static double EMPTY = Double.POSITIVE_INFINITY;
 
 	/**
 	 * Gets the documentConfig attribute of the DataModel object

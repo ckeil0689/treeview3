@@ -101,10 +101,11 @@ public class ReorderedDataModel extends Observable implements DataModel {
 				col = arrayIndex[col];
 			}
 
-			if ((row == -1) || (col == -1))
+			if ((row == -1) || (col == -1)) {
 				return DataModel.EMPTY;
-			else
-				return parent.getDataMatrix().getValue(col, row);
+			}
+			
+			return parent.getDataMatrix().getValue(col, row);
 		}
 
 		@Override
@@ -118,31 +119,33 @@ public class ReorderedDataModel extends Observable implements DataModel {
 				col = arrayIndex[col];
 			}
 
-			if ((row == -1) || (col == -1))
-				return;
-			else {
-				LogBuffer.getSingleton().log(
-						"Error: cannot modifiy " + "reordered data model");
+			if ((row == -1) || (col == -1)) {
 				return;
 			}
+			
+			LogBuffer.getSingleton().log(
+					"Error: cannot modifiy " + "reordered data model");
+			return;
 		}
 
 		@Override
 		public int getNumRow() {
 
-			if (geneIndex != null)
+			if (geneIndex != null) {
 				return geneIndex.length;
-			else
-				return parent.getDataMatrix().getNumRow();
+			}
+			
+			return parent.getDataMatrix().getNumRow();
 		}
 
 		@Override
 		public int getNumCol() {
 
-			if (arrayIndex != null)
+			if (arrayIndex != null) {
 				return arrayIndex.length;
-			else
-				return parent.getDataMatrix().getNumCol();
+			}
+			
+			return parent.getDataMatrix().getNumCol();
 		}
 
 		@Override
@@ -168,9 +171,9 @@ public class ReorderedDataModel extends Observable implements DataModel {
 		}
 
 		@Override
-		public void calculateMinMax() {
+		public void calculateBaseValues() {
 
-			parent.getDataMatrix().calculateMinMax();
+			parent.getDataMatrix().calculateBaseValues();
 		}
 
 		@Override
@@ -183,6 +186,18 @@ public class ReorderedDataModel extends Observable implements DataModel {
 		public double getMaxVal() {
 
 			return parent.getDataMatrix().getMaxVal();
+		}
+
+		@Override
+		public double getMean() {
+			
+			return parent.getDataMatrix().getMean();
+		}
+
+		@Override
+		public double getMedian() {
+			
+			return parent.getDataMatrix().getMedian();
 		}
 	}
 
@@ -225,10 +240,11 @@ public class ReorderedDataModel extends Observable implements DataModel {
 		public String getHeader(final int rowIndex, final int columnIndex) {
 
 			final String[] header = getHeader(rowIndex);
-			if (header != null)
+			if (header != null) {
 				return header[columnIndex];
-			else
-				return "";
+			}
+			
+			return "";
 		}
 
 		@Override
@@ -261,11 +277,11 @@ public class ReorderedDataModel extends Observable implements DataModel {
 			final int parentIndex = parentHeaderInfo.getHeaderIndex(id);
 			if (reorderedIndex[parentIndex] == parentIndex)
 				return parentIndex;
-			else {
-				for (int i = 0; i < reorderedIndex.length; i++)
+			for (int i = 0; i < reorderedIndex.length; i++) {
 
-					if (reorderedIndex[i] == parentIndex)
-						return i;
+				if (reorderedIndex[i] == parentIndex) {
+					return i;
+				}
 			}
 
 			return -1;
@@ -339,10 +355,10 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 	@Override
 	public String getFileName() {
-		if (source == null)
+		if (source == null) {
 			return "No Data Loaded";
-		else
-			return source;
+		}
+		return source;
 	}
 
 	public void setSource(final String string) {
@@ -400,10 +416,11 @@ public class ReorderedDataModel extends Observable implements DataModel {
 	@Override
 	public IntHeaderInfo getRowHeaderInfo() {
 
-		if (geneHeaderInfo == null)
+		if (geneHeaderInfo == null) {
 			return parent.getRowHeaderInfo();
-		else
-			return geneHeaderInfo;
+		}
+		
+		return geneHeaderInfo;
 	}
 
 	/*
@@ -414,10 +431,11 @@ public class ReorderedDataModel extends Observable implements DataModel {
 	@Override
 	public IntHeaderInfo getColumnHeaderInfo() {
 
-		if (arrayHeaderInfo == null)
+		if (arrayHeaderInfo == null) {
 			return parent.getColumnHeaderInfo();
-		else
-			return arrayHeaderInfo;
+		}
+		
+		return arrayHeaderInfo;
 	}
 
 	/*
@@ -428,10 +446,11 @@ public class ReorderedDataModel extends Observable implements DataModel {
 	@Override
 	public HeaderInfo getGtrHeaderInfo() {
 
-		if (gtrHeaderInfo == null)
+		if (gtrHeaderInfo == null) {
 			return parent.getGtrHeaderInfo();
-		else
-			return gtrHeaderInfo;
+		}
+		
+		return gtrHeaderInfo;
 	}
 
 	/*
@@ -442,10 +461,11 @@ public class ReorderedDataModel extends Observable implements DataModel {
 	@Override
 	public HeaderInfo getAtrHeaderInfo() {
 
-		if (atrHeaderInfo == null)
+		if (atrHeaderInfo == null) {
 			return parent.getAtrHeaderInfo();
-		else
-			return atrHeaderInfo;
+		}
+		
+		return atrHeaderInfo;
 	}
 
 	/*
@@ -492,20 +512,22 @@ public class ReorderedDataModel extends Observable implements DataModel {
 	@Override
 	public boolean aidFound() {
 
-		if (atrHeaderInfo == null)
+		if (atrHeaderInfo == null) {
 			return parent.aidFound();
-		else
-			return false;
+		}
+		
+		return false;
 	}
 
 	@Override
 	public boolean gidFound() {
 
 		// the following causes a mismatch if not all genes were selected.
-		if (gtrHeaderInfo == null)
+		if (gtrHeaderInfo == null) {
 			return parent.gidFound();
-		else
-			return false;
+		}
+		
+		return false;
 	}
 
 	@Override
