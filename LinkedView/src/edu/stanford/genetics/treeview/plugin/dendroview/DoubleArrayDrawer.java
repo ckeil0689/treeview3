@@ -241,9 +241,7 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 								count = 1;
 								break;
 							}
-
-							// if (!Helper.nearlyEqual(thisVal,
-							// DataModel.EMPTY)) {
+							
 							count++;
 							val += thisVal;
 
@@ -272,8 +270,7 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 						}
 					}
 				} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
-					LogBuffer
-							.println("ArrayIndexOutOfBoundsException in "
+					LogBuffer.println("ArrayIndexOutOfBoundsException in "
 									+ "paint() in DoubleArrayDrawer: "
 									+ e.getMessage());
 				}

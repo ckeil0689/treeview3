@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import edu.stanford.genetics.treeview.LogBuffer;
 
@@ -58,6 +60,24 @@ public final class Helper {
 		System.arraycopy(b, 0, c, a.length, b.length);
 
 		return c;
+	}
+	
+	/**
+	 * Utility to round double values to certain places.
+	 * @param value The value to be rounded.
+	 * @param places How many places after the comma the value should end
+	 * up with.
+	 * @return The rounded double.
+	 */
+	public static double roundDouble(final double value, final int places) {
+	   
+		if (places < 0) {
+	    	throw new IllegalArgumentException();
+	    }
+
+	    BigDecimal bd = new BigDecimal(value);
+	    bd = bd.setScale(places, RoundingMode.HALF_UP);
+	    return bd.doubleValue();
 	}
 
 	/**

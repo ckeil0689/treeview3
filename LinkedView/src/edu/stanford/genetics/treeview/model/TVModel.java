@@ -629,7 +629,9 @@ public class TVModel extends Observable implements DataModel {
 					}
 				}
 				
-				mean = sum / ((nGene * nExpr) - skipped);
+				double val = sum / ((nGene * nExpr) - skipped);
+				
+				mean = Helper.roundDouble(val, 4);
 				median = calculateMedian(exprData);
 				
 			} else {
@@ -645,6 +647,7 @@ public class TVModel extends Observable implements DataModel {
 		private double calculateMedian(double[][] data) {
 			
 			double median = Double.NaN;
+			
 			final int nGene = nGene();
 			final int nExpr = nExpr();
 			
@@ -674,7 +677,7 @@ public class TVModel extends Observable implements DataModel {
 				median = newData[newData.length / 2];
 			}
 			
-			return median;
+			return Helper.roundDouble(median, 4);
 		}
 
 		@Override

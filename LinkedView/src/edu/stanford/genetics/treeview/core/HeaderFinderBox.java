@@ -323,8 +323,8 @@ public abstract class HeaderFinderBox {
 		if (!"*".equalsIgnoreCase(wildcardsub.substring(0, 1))) {
 			wildcardsub = "*" + wildcardsub;
 		}
-		if (wildcardsub.substring((wildcardsub.length() - 1),
-				wildcardsub.length()) != "*") {
+		if ("*".equals(wildcardsub.substring((wildcardsub.length() - 1),
+				wildcardsub.length()))) {
 			wildcardsub = wildcardsub + "*";
 		}
 

@@ -294,7 +294,7 @@ public class HierCluster {
 	 * @param nodes
 	 * @return Ordered list of nodes.
 	 */
-	private List<Node> orderNodes(List<Node> nodes) {
+	private static List<Node> orderNodes(List<Node> nodes) {
 
 		if (nodes.size() < 2)
 			return nodes;
@@ -319,8 +319,9 @@ public class HierCluster {
 
 	private Node extractOrderedNodes(Node root, List<Node> nodeList) {
 
-		if (root == null)
-			return null;
+		if (root == null) {
+			return null; 
+		}
 
 		if (root.getLeftChild() == null && root.getRightChild() == null) {
 			nodeList.add(root);
@@ -490,7 +491,6 @@ public class HierCluster {
 
 			for (String element : reorderedRows) {
 				bw.write(element + "\n");
-
 				bw.write("\n");
 			}
 
@@ -499,9 +499,11 @@ public class HierCluster {
 		} catch (UnsupportedEncodingException | FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			
 		}
 	}
 
@@ -646,9 +648,7 @@ public class HierCluster {
 				 * If the current fusedGroup in geneIntegerTable does not have
 				 * any elements in common with geneGroups.get(column).
 				 */
-				else {
-					name = axisPrefix + currentClusters.get(index).get(0) + "X";
-				}
+				name = axisPrefix + currentClusters.get(index).get(0) + "X";
 			}
 		}
 
@@ -671,7 +671,6 @@ public class HierCluster {
 		for (int i = 0; i < limit; i++) {
 
 			element = axisPrefix + finalCluster.get((limit - 1) - i) + "X";
-			// element = axisPrefix + finalCluster.get(i) + "X";
 			reorderedRows[i] = element;
 		}
 	}

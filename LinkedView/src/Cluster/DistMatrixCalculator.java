@@ -1,14 +1,13 @@
 package Cluster;
 
 import java.awt.Frame;
-import java.math.BigDecimal;
 import java.util.Arrays;
 
 import javax.swing.JOptionPane;
 
 import Utilities.Helper;
-import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.model.TVModel;
 
 /**
  * This class is used to calculate a distance matrix based on input data. It
@@ -130,8 +129,8 @@ public class DistMatrixCalculator {
 			for (int k = 0; k < row.length; k++) {
 
 				/* Skip missing data */
-				if (Helper.nearlyEqual(row[k], DataModel.NAN)
-						|| Helper.nearlyEqual(otherRow[k], DataModel.NAN)) {
+				if (TVModel.isMissing((row[k])) 
+						|| TVModel.isMissing(otherRow[k])) {
 					continue;
 				}
 
@@ -154,9 +153,7 @@ public class DistMatrixCalculator {
 			yi = otherRow[k];
 			
 			/* Skip missing or NaN data */
-			if (Helper.nearlyEqual(xi, DataModel.NAN)
-					|| Helper.nearlyEqual(yi, DataModel.NAN)
-					|| Double.isNaN(xi) || Double.isNaN(yi)) {
+			if (TVModel.isMissing(xi) || TVModel.isMissing(yi)) {
 				continue;
 			}
 
@@ -187,8 +184,9 @@ public class DistMatrixCalculator {
 		 * using BigDecimal to correct for rounding errors caused by floating
 		 * point arithmetic (e.g. 0.0 would be -1.113274672357E-16)
 		 */
-		return new BigDecimal(String.valueOf(pearson)).setScale(10,
-				BigDecimal.ROUND_DOWN).doubleValue();
+		return Helper.roundDouble(pearson, 10);
+		//new BigDecimal(String.valueOf(pearson)).setScale(10,
+			//	BigDecimal.ROUND_DOWN).doubleValue();
 	}
 
 	/**
@@ -322,8 +320,7 @@ public class DistMatrixCalculator {
 		for (int k = 0; k < row.length; k++) {
 
 			/* Skip missing data */
-			if (Helper.nearlyEqual(row[k], DataModel.NAN)
-					|| Helper.nearlyEqual(otherRow[k], DataModel.NAN)) {
+			if (TVModel.isMissing(row[k]) || TVModel.isMissing(otherRow[k])) {
 				skipped++;
 				continue;
 			}
@@ -351,8 +348,7 @@ public class DistMatrixCalculator {
 		for (int k = 0; k < row.length; k++) {
 
 			/* Skip missing data */
-			if (Helper.nearlyEqual(row[k], DataModel.NAN)
-					|| Helper.nearlyEqual(otherRow[k], DataModel.NAN)) {
+			if (TVModel.isMissing(row[k]) || TVModel.isMissing(otherRow[k])) {
 				continue;
 			}
 
@@ -375,8 +371,9 @@ public class DistMatrixCalculator {
 
 		for (int i = 0; i < array.length; i++) {
 
-			if (Helper.nearlyEqual(array[i], value))
+			if (Helper.nearlyEqual(array[i], value)) {
 				return i;
+			}
 		}
 
 		return -1;
@@ -388,7 +385,7 @@ public class DistMatrixCalculator {
 	public void calcRow(final int index) {
 
 		/*
-		 * Switches JCombobox item indeces.
+		 * Switches JCombobox item indices.
 		 */
 		switch (distMeasure) {
 
@@ -423,7 +420,7 @@ public class DistMatrixCalculator {
 	 * Shows a pop-up alert if the selected distance measure could not be
 	 * matched to an defined method to execute the calculations.
 	 */
-	private void showDistAlert() {
+	private static void showDistAlert() {
 
 		final String message = "Could not start measuring distance, "
 				+ "because no match for the selected distance measure "

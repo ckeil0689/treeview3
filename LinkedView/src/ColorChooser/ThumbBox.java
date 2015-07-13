@@ -484,7 +484,7 @@ public class ThumbBox {
 		final float fraction = colorPicker.getFractions()[thumbIndex];
 		final double value = Math.abs((range) * fraction) + minVal;
 
-		return (double) Math.round(value * 1000) / 1000;
+		return Helper.roundDouble(value, 3);
 	}
 
 	/**
