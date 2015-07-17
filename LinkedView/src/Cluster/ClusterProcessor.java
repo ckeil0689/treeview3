@@ -110,9 +110,7 @@ public class ClusterProcessor {
 			return clusterTask.get();
 
 		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
 			LogBuffer.logException(e);
-			LogBuffer.println(e.getLocalizedMessage());
 			return new String[] { "No clustered data." };
 		}
 	}

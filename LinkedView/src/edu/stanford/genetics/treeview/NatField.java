@@ -105,10 +105,9 @@ public class NatField extends JTextField implements KeyListener {
 		}
 
 		if (revert) {
-			// System.out.println("Reverting value..");
-			setText(Integer.toString(val));
+			String string_val = Integer.toString(val);
+			setText(string_val);
 		} else {
-			// System.out.println("keeping value.." + new_val);
 			val = new_val;
 		}
 	}

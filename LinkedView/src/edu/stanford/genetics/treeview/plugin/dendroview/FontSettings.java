@@ -46,13 +46,15 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 import Utilities.GUIFactory;
-import edu.stanford.genetics.treeview.NatField;
 import edu.stanford.genetics.treeview.SettingsPanel;
 
 /**
@@ -69,13 +71,15 @@ public class FontSettings implements SettingsPanel {
 
 	private final FontSelectable client;
 	private final FontSelectable client2;
+	
 	private JPanel fontPanel;
 	private JComboBox<String> font_choice;
 	private JComboBox<String> style_choice;
 	private JCheckBox fixedBox;
-	private NatField size_field;
-	private NatField min_field;
-	private NatField max_field;
+	
+	private JSpinner size_field;
+	private JSpinner min_field;
+	private JSpinner max_field;
 
 	public FontSettings(final FontSelectable fs, final FontSelectable fs2) {
 
@@ -254,9 +258,9 @@ public class FontSettings implements SettingsPanel {
 
 		final String string = (String) font_choice.getSelectedItem();
 		final int i = encode_style((String) style_choice.getSelectedItem());
-		final int size = size_field.getNat();
-		final int min = min_field.getNat();
-		final int max = max_field.getNat();
+		final int size = (Integer) size_field.getValue();
+		final int min = (Integer) min_field.getValue();
+		final int max = (Integer) max_field.getValue();
 		final boolean isFixed = fixedBox.isSelected();
 
 		client.setFace(string);
@@ -287,11 +291,17 @@ public class FontSettings implements SettingsPanel {
 		setupStyleChoice();
 		fontPanel.add(style_choice, "span, wrap");
 
+		SpinnerModel size_model = new SpinnerNumberModel(client.getPoints(), 0, 
+				50, 1);
+		SpinnerModel min_model = new SpinnerNumberModel(client.getMin(), 0, 
+				50, 1);
+		SpinnerModel max_model = new SpinnerNumberModel(client.getMax(), 0, 
+				50, 1);
+		
 		/* Font size */
 		// getLastSize() to avoid issues with hint label font size.
-		size_field = new NatField(client.getLastSize(), 3);
-		size_field.getDocument().addDocumentListener(
-				new DocumentChangeListener());
+		size_field = new JSpinner(size_model);
+		size_field.addChangeListener(new FontSizeChangeListener());
 		fontPanel.add(size_field);
 
 		fixedBox = new JCheckBox("Keep fixed");
@@ -302,18 +312,16 @@ public class FontSettings implements SettingsPanel {
 		/* Minimum font size */
 		JLabel minLabel = new JLabel("Min:");
 		minLabel.setFont(GUIFactory.FONTS);
-		min_field = new NatField(client.getMin(), 3);
-		min_field.getDocument().addDocumentListener(
-				new DocumentChangeListener());
+		min_field = new JSpinner(min_model);
+		min_field.addChangeListener(new FontSizeChangeListener());
 		fontPanel.add(minLabel);
 		fontPanel.add(min_field);
 
 		/* Maximum font size */
 		JLabel maxLabel = new JLabel("Max:");
 		maxLabel.setFont(GUIFactory.FONTS);
-		max_field = new NatField(client.getMax(), 3);
-		max_field.getDocument().addDocumentListener(
-				new DocumentChangeListener());
+		max_field = new JSpinner(max_model);
+		max_field.addChangeListener(new FontSizeChangeListener());
 		fontPanel.add(maxLabel);
 		fontPanel.add(max_field);
 	}
@@ -334,24 +342,12 @@ public class FontSettings implements SettingsPanel {
 		}
 	}
 
-	class DocumentChangeListener implements DocumentListener {
+	class FontSizeChangeListener implements ChangeListener {
 
 		@Override
-		public void changedUpdate(final DocumentEvent arg0) {
-
-		}
-
-		@Override
-		public void insertUpdate(final DocumentEvent arg0) {
-
+		public void stateChanged(ChangeEvent e) {
+			
 			synchronizeClient();
 		}
-
-		@Override
-		public void removeUpdate(final DocumentEvent arg0) {
-
-			synchronizeClient();
-		}
-
 	}
 }
