@@ -258,10 +258,26 @@ public class FontSettings implements SettingsPanel {
 
 		final String string = (String) font_choice.getSelectedItem();
 		final int i = encode_style((String) style_choice.getSelectedItem());
-		final int size = (Integer) size_field.getValue();
+		int size = (Integer) size_field.getValue();
 		final int min = (Integer) min_field.getValue();
 		final int max = (Integer) max_field.getValue();
 		final boolean isFixed = fixedBox.isSelected();
+		
+		/* Correct for new boundaries */
+		if(size > max) {
+			size = max;
+		} else if(size < min) {
+			size = min;
+		}
+		
+		/* Update boundaries for spinners... */
+		SpinnerModel size_model = new SpinnerNumberModel(size, min, max, 1);
+		SpinnerModel min_model = new SpinnerNumberModel(min, 0, max, 1);
+		SpinnerModel max_model = new SpinnerNumberModel(max, min, 50, 1);
+		
+		size_field.setModel(size_model);
+		min_field.setModel(min_model);
+		max_field.setModel(max_model);
 
 		client.setFace(string);
 		client.setStyle(i);
