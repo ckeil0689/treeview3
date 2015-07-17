@@ -263,21 +263,8 @@ public class FontSettings implements SettingsPanel {
 		final int max = (Integer) max_field.getValue();
 		final boolean isFixed = fixedBox.isSelected();
 		
-		/* Correct for new boundaries */
-		if(size > max) {
-			size = max;
-		} else if(size < min) {
-			size = min;
-		}
-		
-		/* Update boundaries for spinners... */
-		SpinnerModel size_model = new SpinnerNumberModel(size, min, max, 1);
-		SpinnerModel min_model = new SpinnerNumberModel(min, 0, max, 1);
-		SpinnerModel max_model = new SpinnerNumberModel(max, min, 50, 1);
-		
-		size_field.setModel(size_model);
-		min_field.setModel(min_model);
-		max_field.setModel(max_model);
+		size = correctSize(size, min, max);
+		updateSpinnerModels(size, min, max);
 
 		client.setFace(string);
 		client.setStyle(i);
@@ -292,6 +279,44 @@ public class FontSettings implements SettingsPanel {
 		client2.setMin(min);
 		client2.setMax(max);
 		client2.setFixed(isFixed);
+	}
+	
+	/**
+	 * Makes sure that size stays within boundaries.
+	 * @param size
+	 * @param min Minimum boundary for size.
+	 * @param max Maximum boundary for size.
+	 * @return The bounded value of size.
+	 */
+	private static int correctSize(final int size, final int min, final int max) {
+		
+		if(size > max) {
+			return max;
+			
+		} else if(size < min) {
+			return min;
+			
+		} else {
+			return size;
+		}
+	}
+	
+	/**
+	 * Updates SpinnerModel boundaries.
+	 * @param size Current font size.
+	 * @param min Set minimum font size.
+	 * @param max Set maximum font size.
+	 */
+	private void updateSpinnerModels(final int size, final int min, 
+			final int max) {
+		
+		SpinnerModel size_model = new SpinnerNumberModel(size, min, max, 1);
+		SpinnerModel min_model = new SpinnerNumberModel(min, 0, max, 1);
+		SpinnerModel max_model = new SpinnerNumberModel(max, min, 50, 1);
+		
+		size_field.setModel(size_model);
+		min_field.setModel(min_model);
+		max_field.setModel(max_model);
 	}
 
 	/**
