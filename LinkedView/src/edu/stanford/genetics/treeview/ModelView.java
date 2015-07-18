@@ -148,8 +148,9 @@ public abstract class ModelView extends JPanel implements Observer,
 		g2d.fillRect(clip.x, clip.y, clip.width, clip.height);
 
 		final Dimension reqSize = getSize();
-		if (reqSize == null)
+		if (reqSize == null) {
 			return;
+		}
 
 		// monitor size changes
 		if ((offscreenSize == null) || (reqSize.width != offscreenSize.width)
@@ -215,7 +216,7 @@ public abstract class ModelView extends JPanel implements Observer,
 
 			try {
 				if (status != null) {
-					status.setMessages(getStatus());
+					status.setMessages(getStatus());	
 				}
 			} catch (final Exception ex) {
 				JOptionPane.showMessageDialog(this, ex.toString());

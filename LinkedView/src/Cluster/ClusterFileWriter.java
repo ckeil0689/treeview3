@@ -153,18 +153,18 @@ public class ClusterFileWriter {
 		fileName += "_" + linkName;
 		String fullFileID = dir + fileName + fileEnd;
 		
-		File file = new File(fullFileID);
+		File tempFile = new File(fullFileID);
 		
 		try {
 			/* Do not overwrite at the moment */
-			file = getNewFile(dir, fileName, fileEnd);
-			file.createNewFile();
+			tempFile = getNewFile(dir, fileName, fileEnd);
+			tempFile.createNewFile();
 			
 		} catch (IOException e) {
 			LogBuffer.logException(e);
 		}
 
-		this.file = file;
+		this.file = tempFile;
 	}
 
 	private static File getNewFile(String dir, String oldName, String fileEnd) {
@@ -222,7 +222,7 @@ public class ClusterFileWriter {
 			bw.write(content);
 
 		} catch (final IOException e) {
-
+			LogBuffer.logException(e);
 		}
 	}
 
@@ -235,18 +235,18 @@ public class ClusterFileWriter {
 			bw.close();
 
 		} catch (final IOException e) {
-
+			LogBuffer.logException(e);
 		}
 
 		LogBuffer.println("Done." + file.getAbsolutePath());
 	}
 
 	/**
-	 * A method to parse the String matrix into a tab-delimited string.
+	 * A method to parse a String array into one tab-delimited string.
 	 *
 	 * @param input
 	 * @param lastLine
-	 * @return
+	 * @return One tab-delimited String.
 	 */
 	public String doParse(final String[] input) {
 
@@ -276,5 +276,4 @@ public class ClusterFileWriter {
 
 		return file;
 	}
-
 }

@@ -14,7 +14,7 @@ import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import Cluster.CDTGenerator;
+import Cluster.ClusterFileGenerator;
 import Cluster.ClusterProcessor;
 import Cluster.DistMatrixCalculator;
 import Cluster.DistanceMatrix;
@@ -341,7 +341,7 @@ public class ClusterController {
 					.getDataMatrix();
 			final double[][] data = originalMatrix.getExprData();
 
-			final CDTGenerator cdtGen = new CDTGenerator(data, reorderedRows,
+			final ClusterFileGenerator cdtGen = new ClusterFileGenerator(data, reorderedRows,
 					reorderedCols, rowSimilarity, colSimilarity,
 					isHierarchical());
 
