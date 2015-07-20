@@ -130,12 +130,17 @@ public abstract class ModelViewProduced extends ModelView {
 			offscreenPixels[i] = backgoundInt;
 		}
 
+		long start = System.currentTimeMillis();
+		
 		if (isEnabled()) {
 			if ((offscreenSize.width > 0) && (offscreenSize.height > 0)) {
 				updatePixels();
 				offscreenValid = true;
 			}
 		}
+		
+		long end = System.currentTimeMillis() - start;
+		LogBuffer.println("UpdatePix: " + end + "ms");
 
 		g2d.drawImage(offscreenBuffer, 0, 0, null);
 		paintComposite(g2d);
