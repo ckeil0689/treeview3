@@ -89,6 +89,8 @@ public class MapContainer extends Observable implements Observer,
 	private int     hoverIndex             = -1;
 	private boolean hoverChanged           = false;
 	private boolean selecting              = false;
+	private boolean toggling               = false;
+	private boolean deselecting            = false;
 	private int     selectingStart         = -1;
 
 	boolean debug = false;
@@ -1962,16 +1964,21 @@ public class MapContainer extends Observable implements Observer,
 		notifyObservers();
 	}
 
+	public boolean isOverIMV() {
+		return(overInteractiveMatrix);
+	}
+
 	//This function is used to determine whether the label port should be drawn
 	//or not.  When the mouse is hovered over a pane that activates the label
-	//port or if a scrollbar for such a pane is being scrolled, the label port
-	//is active.  These things must be tracked here in the data model because
-	//it's the common point of reference for all the classes in the view and is
-	//their only way to communicate with one another.
+	//port or if a scrollbar for such a pane is being scrolled, or a selection
+	//is in the process of being made, the label port is active.  These things
+	//must be tracked here in the data model because it's the common point of
+	//reference for all the classes in the view and is their only way to
+	//communicate with one another.
 	public boolean overALabelPortLinkedView() {
 		return(overColLabels || overRowLabels || overInteractiveMatrix ||
 		       overColLabelsScrollbar || overRowLabelsScrollbar ||
-		       colLabelsBeingScrolled || rowLabelsBeingScrolled);
+		       colLabelsBeingScrolled || rowLabelsBeingScrolled || selecting);
 	}
 
 	/**
@@ -2062,5 +2069,21 @@ public class MapContainer extends Observable implements Observer,
 	 */
 	public void setSelecting(boolean selecting) {
 		this.selecting = selecting;
+	}
+
+	public boolean isToggling() {
+		return toggling;
+	}
+
+	public void setToggling(boolean toggling) {
+		this.toggling = toggling;
+	}
+
+	public boolean isDeSelecting() {
+		return deselecting;
+	}
+
+	public void setDeSelecting(boolean deselecting) {
+		this.deselecting = deselecting;
 	}
 }

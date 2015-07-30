@@ -7,6 +7,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -20,6 +21,7 @@ import java.util.prefs.Preferences;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import net.miginfocom.swing.MigLayout;
@@ -114,6 +116,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 * keep one paint method updateBuffer() for gene- and arraySelection
 	 */
 	protected TreeSelectionI drawSelection;
+	protected TreeSelectionI otherSelection;
 
 	/* Contains all the saved information */
 	protected Preferences configNode;
@@ -167,6 +170,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			                ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
 			                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBorder(null);
+
+		debug = 10;
+		//Debug modes:
+		//9 = debug repaint timer intervals and updates to label panels
+		//10 = Debug label drawing issues when split pane divider adjusted
 
 		panel = scrollPane;
 	}
@@ -232,6 +240,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		if(isGeneAxis) {
 			drawSelection = geneSelection;
+		} else {
+			otherSelection = geneSelection;
 		}
 	}
 
@@ -251,6 +261,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		if(!isGeneAxis) {
 			drawSelection = arraySelection;
+		} else {
+			otherSelection = arraySelection;
 		}
 	}
 
@@ -347,9 +359,13 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	/**
 	 * This is for updating the hover index when the mouse has not moved but the
-	 * data under it has (like when using the scroll wheel
+	 * data under it has (like when using the scroll wheel)
 	 */
-	public void updatePrimaryHoverIndex() {
+	abstract public void updatePrimaryHoverIndexDuringScrollDrag();
+	abstract public void forceUpdatePrimaryHoverIndex();
+	abstract public boolean areLabelsBeingScrolled();
+
+	public void updatePrimaryHoverIndexDuringScrollWheel() {
 		if(hoverPixel == -1) {
 			hoverIndex = -1;
 		} else {
@@ -494,7 +510,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	//the label panes to update more quickly and regularly, as the
 	//notifyObservers method called from MapContainer was resulting in sluggish
 	//updates
-	private int repaintInterval = 50;  // update every 50 milliseconds
+	private int repaintInterval = 50;      //update every 50 milliseconds
+	private int slowRepaintInterval = 1000;//update every 1s if mouse not moving
 	private int lastHoverIndex = -1;
 	private Timer repaintTimer =
 		new Timer(repaintInterval,
@@ -507,8 +524,14 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			@Override
 			public void
 			actionPerformed(ActionEvent e) {
-				//This shouldn't be necessary, but when I change setPoints() to setTemporaryPoints in the drawing of the HINT, the timer never stops despite stop being continually called, so I'm going to call stop in here if the map says that the animation is supposed to have been stopped...
-				if(!map.isLabelAnimeRunning()) repaintTimer.stop();
+				//This shouldn't be necessary, but when I change setPoints() to
+				//setTemporaryPoints in the drawing of the HINT, the timer never
+				//stops despite stop being continually called, so I'm going to
+				//call stop in here if the map says that the animation is
+				//supposed to have been stopped...
+				if(!map.isLabelAnimeRunning()) {
+					repaintTimer.stop();
+				}
 				repaint();
 				//paintImmediately(0,0,getWidth(),getHeight());
 			}
@@ -526,8 +549,16 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				turnOffRepaintTimer.stop();
 				turnOffRepaintTimer = null;
 
-				repaintTimer.stop();
-				map.setLabelAnimeRunning(false);
+				//If we are still over a label port view panel, just slow the
+				//repaint timer, because this was triggered by the mouse not
+				//moving
+				if(map.overALabelPortLinkedView()) {
+					debug("Slowing the repaint interval presumably because of lack of mouse movement",9);
+					repaintTimer.setDelay(slowRepaintInterval);
+				} else {
+					repaintTimer.stop();
+					map.setLabelAnimeRunning(false);
+				}
 			}
 		}
 	};
@@ -556,10 +587,69 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		 * here on out
 		 */
 
+		//Update the hover position before repainting in case the user is
+		//dragging the scrollbar (cursor can still hover over data during a
+		//scroll drag)
+		updatePrimaryHoverIndexDuringScrollDrag();
+
+		int matrixHoverIndex = map.getHoverIndex();
+
+		//We want to set active hover data index to the one stored for the
+		//IMV when the mouse is hovered over the IMV or to the hover index
+		//*here* when the cursor is hovered over this panel... HOWEVER, we
+		//are going to base this on the value of the IMV hover index being
+		//-1 because while drag-selecting, the user can hover off the edge,
+		//causing the index to be less than 0 or greater than the max.  In
+		//those cases, we want to set the hover index to whichever end they
+		//hovered off of.
+		int activeHoverDataIndex;
+
+		if(matrixHoverIndex > -1 && map.isOverIMV()) {
+			activeHoverDataIndex = matrixHoverIndex;
+		} else if(hoverIndex > -1 || map.isSelecting() || areLabelsBeingScrolled()) {
+			activeHoverDataIndex = hoverIndex;
+		} else {
+			forceUpdatePrimaryHoverIndex();
+			activeHoverDataIndex = hoverIndex;
+		}
+
+		//The code above is overridden by this, which is a test to see if always
+		//updating cursor location is better here or not instead of getting the
+		//complexities of which hover index to use (which has proven difficult
+		//to get just right in every scenario).
+		/** TODO: Clean out usage of hoverIndex in deference to this method */
+		forceUpdatePrimaryHoverIndex();
+		activeHoverDataIndex = hoverIndex;
+		if(isGeneAxis) {
+			debug("Gene axis forced hover index: [" + activeHoverDataIndex + "] isOverIMV? [" + (map.isOverIMV() ? "yes" : "no") + "]",9);
+			debug("Visible row label pane width: [" + scrollPane.getViewport().getSize().width + "] Content width: [" + offscreenSize.width + "]",10);
+		} else {
+			debug("Visible col label pane height: [" + scrollPane.getViewport().getSize().height + "] Content height: [" + offscreenSize.height + "]",10);
+		}
+
+		//Correct out of bounds situations, which can happen either when the
+		//user is selecting and drags the cursor off the edge, the delay
+		//hasn't expired for drawing labels upon hover off a label port view
+		//panel, or the user is dragging the scrollbar and hovers off a
+		//label port view pane.
+		if(activeHoverDataIndex < 0 ||
+		   activeHoverDataIndex > map.getMaxIndex()) {
+			if(map.isSelecting()) {
+				if(activeHoverDataIndex < 0) {
+					activeHoverDataIndex = 0;
+				} else {
+					activeHoverDataIndex = map.getMaxIndex();
+				}
+			} else {
+				forceUpdatePrimaryHoverIndex();
+				activeHoverDataIndex = hoverIndex;
+			}
+		}
+
 		//If the mouse is not hovering over the IMV, stop both timers, set the
 		//last hover index, and tell mapcontainer that the animation has stopped
-		if(map.getHoverIndex() == -1) {
-			debug("Not hovering over matrix - stopping animation",2);
+		if(activeHoverDataIndex < 0 || activeHoverDataIndex > map.getMaxIndex()) {
+			debug("Not hovering over matrix - stopping animation",9);
 			repaintTimer.stop();
 			lastHoverIndex = -1;
 			map.setLabelAnimeRunning(false);
@@ -573,10 +663,10 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//Else, assume the mouse is hovering, and if the animation is not
 		//running, start it up
 		else if(!map.isLabelAnimeRunning()) {
-			debug("Hovering across matrix - starting up animation",2);
+			debug("Hovering across matrix - starting up animation",9);
 			repaintTimer.start();
 			map.setLabelAnimeRunning(true);
-			lastHoverIndex = map.getHoverIndex();
+			lastHoverIndex = activeHoverDataIndex;
 			//Disable any turnOffRepaintTimer that might have been left over
 			if(turnOffRepaintTimer != null) {
 				turnOffRepaintTimer.stop();
@@ -586,27 +676,36 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//Else if the mouse hasn't moved, start the second timer to turn off the
 		//first after 1 second (this mitigates delays upon mouse motion after a
 		//brief period of no motion)
-		else if(map.getHoverIndex() == lastHoverIndex) {
-			debug("Hovering on one spot - stopping animation",2);
+		else if(activeHoverDataIndex == lastHoverIndex) {
+			debug("Hovering on one spot [" + lastHoverIndex + "] - stopping animation",9);
 			if(turnOffRepaintTimer == null) {
 				turnOffRepaintTimer = new Timer(delay,turnOffRepaintListener);
 				turnOffRepaintTimer.start();
 			}
 		}
-		//Else, disable the turnOffRepaintTimer and update the hover index
+		//Else, disable the turnOffRepaintTimer, update the hover index, and set
+		//the repaint interval to normal speed
 		else {
-			debug("Hovering across matrix - keeping animation going",2);
+			debug("Hovering across matrix - keeping animation going",9);
+			if(repaintTimer != null && !repaintTimer.isRunning()) {
+				repaintTimer.start();
+			} else if(repaintTimer.getDelay() == slowRepaintInterval) {
+				debug("Speeding up the repaint interval because mouse movement detected",9);
+				repaintTimer.setDelay(repaintInterval);
+				repaintTimer.restart();
+			}
 			//Disable the turnOffRepaintTimer because we have detected continued
 			//mouse motion
 			if(turnOffRepaintTimer != null) {
 				turnOffRepaintTimer.stop();
 				turnOffRepaintTimer = null;
 			}
-			lastHoverIndex = map.getHoverIndex();
+			lastHoverIndex = activeHoverDataIndex;
 			map.setLabelAnimeRunning(true);
 		}
 
 		debug("Updating the label pane graphics",1);
+		debug("Hover indexes are (local) [" + hoverIndex + "] and (matrix) [" + map.getHoverIndex() + "]",9);
 
 		/* Shouldn't draw if there's no TreeSelection defined */
 		if(drawSelection == null) {
@@ -615,7 +714,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			return;
 		}
 
-		int matrixHoverIndex = map.getHoverIndex();
+//		int matrixHoverIndex = map.getHoverIndex();
 
 		final int stringX =
 			isGeneAxis ? offscreenSize.width : offscreenSize.height;
@@ -672,15 +771,52 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			g.setFont(new Font(face,style,size));
 
 			final FontMetrics metrics = getFontMetrics(g.getFont());
-			final int ascent = metrics.getAscent();
-			int maxStrLen = getJustifiedPosition(metrics);
+			final int ascent          = metrics.getAscent();
+			int maxStrLen             = getJustifiedPosition(metrics);
 
 			int matrixSize   = map.getPixel(map.getMaxIndex() + 1) - 1 -
 			                   map.getPixel(0);
 			int fullPaneSize = matrixSize;
 
-			int activeHoverDataIndex =
-				hoverIndex == -1 ? matrixHoverIndex : hoverIndex;
+//			//We want to set active hover data index to the one stored for the
+//			//IMV when the mouse is hovered over the IMV or to the hover index
+//			//*here* when the cursor is hovered over this panel... HOWEVER, we
+//			//are going to base this on the value of the IMV hover index being
+//			//-1 because while drag-selecting, the user can hover off the edge,
+//			//causing the index to be less than 0 or greater than the max.  In
+//			//those cases, we want to set the hover index to whichever end they
+//			//hovered off of.
+//			int activeHoverDataIndex;
+//
+//			if(matrixHoverIndex > -1 && map.isOverIMV()) {
+//				activeHoverDataIndex = matrixHoverIndex;
+//			} else if(hoverIndex > -1 || map.isSelecting() || areLabelsBeingScrolled()) {
+//				activeHoverDataIndex = hoverIndex;
+//			} else {
+//				forceUpdatePrimaryHoverIndex();
+//				activeHoverDataIndex = hoverIndex;
+//			}
+//			forceUpdatePrimaryHoverIndex();
+//			activeHoverDataIndex = hoverIndex;
+//if(isGeneAxis) {debug("Gene axis forced hover index: [" + activeHoverDataIndex + "]",9);}
+//			//Correct out of bounds situations, which can happen either when the
+//			//user is selecting and drags the cursor off the edge, the delay
+//			//hasn't expired for drawing labels upon hover off a label port view
+//			//panel, or the user is dragging the scrollbar and hovers off a
+//			//label port view pane.
+//			if(activeHoverDataIndex < 0 ||
+//			   activeHoverDataIndex > map.getMaxIndex()) {
+//				if(map.isSelecting()) {
+//					if(activeHoverDataIndex < 0) {
+//						activeHoverDataIndex = 0;
+//					} else {
+//						activeHoverDataIndex = map.getMaxIndex();
+//					}
+//				} else {
+//					forceUpdatePrimaryHoverIndex();
+//					activeHoverDataIndex = hoverIndex;
+//				}
+//			}
 
 			int labelStart  = activeHoverDataIndex;
 			int labelEnd    = activeHoverDataIndex;
@@ -809,10 +945,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 							} else {
 								g2d.setFont(new Font(face,style,size));
 							}
+							int labelStrStart = xPos + ((isGeneAxis == isRightJustified) ? (drawLabelPort ? indicatorThickness : labelIndent) * (isGeneAxis ? -1 : 1) : 0);
 							g2d.drawString(out,
-							               xPos + ((isGeneAxis == isRightJustified) ? (drawLabelPort ? indicatorThickness : labelIndent) * (isGeneAxis ? -1 : 1) : 0),
+							               labelStrStart,
 							               yPos);
-							drawOverrunArrows(metrics.stringWidth(out),g,yPos - ascent,curFontSize,g2d.getColor(),bgColor);
+							drawOverrunArrows(metrics.stringWidth(out),g,yPos - ascent,curFontSize,g2d.getColor(),bgColor,xPos /* Don't include adjustments */);
 						}
 
 					}
@@ -872,10 +1009,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 								labelColor = labelPortColor;
 							}
 							g2d.setColor(labelColor);
+							int labelStrStart = xPos + ((isGeneAxis == isRightJustified) ? (drawLabelPort ? indicatorThickness : labelIndent) * (isGeneAxis ? -1 : 1) : 0);
 							g2d.drawString(out,
-							               xPos + ((isGeneAxis == isRightJustified) ? (drawLabelPort ? indicatorThickness : labelIndent) * (isGeneAxis ? -1 : 1) : 0),
+							               labelStrStart,
 							               yPos);
-							drawOverrunArrows(metrics.stringWidth(out),g,yPos - ascent,curFontSize,labelColor,bgColor);
+							drawOverrunArrows(metrics.stringWidth(out),g,yPos - ascent,curFontSize,labelColor,bgColor,xPos /* Don't include adjustments */);
 						}
 
 					}
@@ -958,7 +1096,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 			/* Draw the "position indicator" if the label port is active */
 			//See variables initialized above the string drawing section
-			if(drawLabelPort && indicatorThickness > 0 && (isGeneAxis ? !map.areRowLabelsBeingScrolled() : !map.areColLabelsBeingScrolled())) {
+			if(drawLabelPort && indicatorThickness > 0) {
 				if(!isGeneAxis) {
 //					if(isRightJustified) {
 //						LogBuffer.println("Resetting justification via drawing for rows!  Will draw at maxstrlen + indicatorthickness - lastendgap [" + maxStrLen + " + " + indicatorThickness + " - " + lastScrollRowEndGap + " = " + (maxStrLen + indicatorThickness - lastScrollRowEndGap) + "] - indicatorThickness [" + indicatorThickness + "] instead of current [" + secondaryScrollPos + "] - indicatorThickness [" + indicatorThickness + "]. MaxStrLen: [" + maxStrLen + "]");
@@ -1001,7 +1139,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 //    							(end + 1) * (curFontSize + SQUEEZE) - start * (curFontSize + SQUEEZE));
 //					}
 					if(matrixBarThickness > 0) {
-						LogBuffer.println("Drawing matrix bar at x position [" + lastScrollColEndGap + "]");
+						//LogBuffer.println("Drawing matrix bar at x position [" + lastScrollColEndGap + "]");
     					//Draw the matrix breadth bar
     					g.fillRect(
     							lastScrollColEndGap,
@@ -1158,7 +1296,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 //							(end + 1) * (curFontSize + SQUEEZE) - start * (curFontSize + SQUEEZE));
 					if(matrixBarThickness > 0) {
 						//Draw the matrix breadth bar
-						LogBuffer.println("Drawing matrix bar at x position [" + lastScrollColEndGap + "]");
+						//LogBuffer.println("Drawing matrix bar at x position [" + lastScrollColEndGap + "]");
 						debug("Drawing matrix bar from index start [" + labelStart + "] to stop [" + labelEnd + "], pixel start [" + map.getPixel(labelStart) + "] to stop [" + (map.getPixel(labelEnd + 1)) + "]",4);
 						g.fillRect(
 								lastScrollRowEndPos - matrixBarThickness,
@@ -1356,12 +1494,22 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			(map.isSelecting() &&
 		     ((j >= map.getSelectingStart() && j <= map.getHoverIndex()) ||
 		      (j <= map.getSelectingStart() && j >= map.getHoverIndex())));
+		boolean drawingSelectColor = false;
 		try {
-			if(drawSelection.isIndexSelected(j) || isSelecting) {
-				debug("Drawing yellow background for selected index [" + j + "]",4);
+			if((drawSelection.isIndexSelected(j) && !isSelecting) ||
+				(isSelecting &&
+				 ((!map.isDeSelecting() && !map.isToggling()) ||
+				  (map.isToggling() && !drawSelection.isIndexSelected(j))))) {
+				debug("Drawing yellow background for selected index [" + j +
+				      "] because isSelecting is [" +
+					(isSelecting ? "true" : "false") + "] isDeSelecting is [" +
+				      (map.isDeSelecting() ? "true" : "false") + "] and isToggling is [" +
+				      (map.isToggling() ? "true" : "false") + "]",7);
 				g.setColor(selectionTextBGColor);
 				bgColor = selectionTextBGColor;
+				drawingSelectColor = true;
 			} else if(bgColorIndex > 0) {
+				debug("Background color index is [" + bgColorIndex + "]",8);
 				g.setColor(TreeColorer.getColor(strings[bgColorIndex]));
 				bgColor = TreeColorer.getColor(strings[bgColorIndex]);
 			}
@@ -1369,19 +1517,19 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		catch(final Exception e) {
 			// ignore...
 		}
-		if(drawSelection.isIndexSelected(j) || isSelecting || bgColorIndex > 0) {
-			if(doDrawLabelPort()) {
+		//if(drawSelection.isIndexSelected(j) || isSelecting || bgColorIndex > 0) {
+			if(drawingSelectColor) {
 				g.fillRect(0,
 				           yPos,
 				           (isGeneAxis ? rowLabelPaneSize : colLabelPaneSize),
 				           size + SQUEEZE);
-			} else {
-				g.fillRect(0,
-				           yPos,
-				           (isGeneAxis ? rowLabelPaneSize : colLabelPaneSize),
-				           size + SQUEEZE);
-			}
-		}
+			} //else {
+			//	g.fillRect(0,
+			//	           yPos,
+			//	           (isGeneAxis ? rowLabelPaneSize : colLabelPaneSize),
+			//	           size + SQUEEZE);
+			//}
+		//}
 		return(bgColor);
 	}
 
@@ -1804,7 +1952,153 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	}
 
 	@Override
-	public void mouseDragged(final MouseEvent e) {}
+	public void mouseDragged(final MouseEvent e) {
+		setHoverPosition(e);
+		hoverIndex = map.getIndex(getPrimaryHoverPosition(e));
+		map.setHoverIndex(hoverIndex);
+		debug("Selecting from " + map.getSelectingStart() + " to " + map.getIndex(getPrimaryHoverPosition(e)),8);
+		//This is not necessary, but makes things a tad more responsive
+		if(repaintTimer != null &&
+		   repaintTimer.getDelay() == slowRepaintInterval) {
+			repaintTimer.setDelay(repaintInterval);
+			repaintTimer.restart();
+		}
+		repaint();
+
+		//Handle the temporary outlining of the matrix
+		//NOT SURE HOW TO DO THIS YET - CANNOT TALK DIRECTLY TO IMV
+	}
+
+	@Override
+	public void mousePressed(final MouseEvent e) {
+
+		if (!enclosingWindow().isActive())
+			return;
+
+		// if left button is used
+		if (SwingUtilities.isLeftMouseButton(e)) {
+			//Handle the temporary yellow highlighting of the labels
+			map.setSelecting(true);
+			debug("Selecting start: " + map.getIndex(getPrimaryHoverPosition(e)),8);
+			map.setSelectingStart(map.getIndex(getPrimaryHoverPosition(e)));
+			map.setHoverIndex(map.getIndex(getPrimaryHoverPosition(e)));
+			if(e.isMetaDown()) {
+				map.setToggling(true);
+			} else if(e.isAltDown()) {
+				map.setDeSelecting(true);
+			}
+			//Handle the temporary outlining of the matrix
+			//NOT SURE HOW TO DO THIS YET - CANNOT TALK DIRECTLY TO IMV
+		} else if (SwingUtilities.isRightMouseButton(e)) {
+			geneSelection.deselectAllIndexes();
+			arraySelection.deselectAllIndexes();
+		}
+
+		geneSelection.notifyObservers();
+		arraySelection.notifyObservers();
+	}
+
+	@Override
+	public void mouseReleased(final MouseEvent e) {
+
+		if (!enclosingWindow().isActive())
+			return;
+
+		//When left button is used
+		//This might interfere with mouseClicked - That should be checked...
+		if (SwingUtilities.isLeftMouseButton(e) && map.getSelectingStart() != map.getIndex(getPrimaryHoverPosition(e))) {
+			//Handle the temporary outlining of the matrix
+			//NOT SURE HOW TO DO THIS YET - CANNOT TALK DIRECTLY TO IMV
+
+			int hDI = map.getIndex(getPrimaryHoverPosition(e));
+			//If the user dragged off an edge, the index will be out of bounds, so fix it
+			if(hDI < 0) {
+				hDI = 0;
+			}
+			if(hDI > map.getMaxIndex()) {
+				hDI = map.getMaxIndex();
+			}
+			//Make the selection upon release
+			if(otherSelection.getNSelectedIndexes() > 0) {
+				if(e.isShiftDown()) {
+					drawSelection.selectIndexRange(map.getSelectingStart(),
+					                               hDI);
+				} else if(e.isMetaDown()) {
+					toggleSelectRange(map.getSelectingStart(),
+					                  hDI);
+				} else if(e.isAltDown()) {
+					deSelectRange(map.getSelectingStart(),
+					              hDI);
+				} else {
+					//Deselect everything
+					geneSelection.deselectAllIndexes();
+					arraySelection.deselectAllIndexes();
+
+					//Select what was dragged over
+					otherSelection.selectAllIndexes();
+					drawSelection.selectIndexRange(map.getSelectingStart(),
+					                               hDI);
+				}
+			} else {
+				//Assumes there is no selection at all & selects what was dragged over
+				otherSelection.selectAllIndexes();
+				drawSelection.selectIndexRange(map.getSelectingStart(),
+				                               map.getIndex(getPrimaryHoverPosition(e)));
+			}
+//			mouseDragged(e);
+		}
+
+		//Handle the temporary yellow highlighting of the labels
+		map.setSelecting(false);
+		map.setDeSelecting(false);
+		map.setToggling(false);
+		map.setHoverIndex(-1);
+		map.setSelectingStart(-1);
+
+		geneSelection.notifyObservers();
+		arraySelection.notifyObservers();
+//		repaint();
+	}
+
+	public void toggleSelectRange(int start,int end) {
+		debug("Toggling start index [" + start + "] to end index [" + end + "]",8);
+		if(start > end) {
+			int tmp = start;
+			start = end;
+			end = tmp;
+		}
+		//If the user dragged off an edge, the index will be out of bounds, so fix it
+		if(start < 0) {
+			start = 0;
+		}
+		if(end > map.getMaxIndex()) {
+			end = map.getMaxIndex();
+		}
+		for(int i = start;i <= end;i++) {
+			if(drawSelection.isIndexSelected(i))
+				drawSelection.setIndexSelection(i,false);
+			else
+				drawSelection.setIndexSelection(i,true);
+		}
+	}
+
+	public void deSelectRange(int start,int end) {
+		if(start > end) {
+			int tmp = start;
+			start = end;
+			end = tmp;
+		}
+		//If the user dragged off an edge, the index will be out of bounds, so fix it
+		if(start < 0) {
+			start = 0;
+		}
+		if(end > map.getMaxIndex()) {
+			end = map.getMaxIndex();
+		}
+		for(int i = start;i <= end;i++) {
+			drawSelection.setIndexSelection(i,false);
+		}
+	}
 
 	protected abstract void    setSecondaryScrollBarPolicyAsNeeded();
 	protected abstract void    setSecondaryScrollBarPolicyAlways();
@@ -1816,6 +2110,13 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	public void mouseMoved(final MouseEvent e) {
 		setHoverPosition(e);
 		hoverIndex = map.getIndex(getPrimaryHoverPosition(e));
+		debug("mouseMoved - updating hoverIndex to [" + hoverIndex + "]",9);
+		//This is not necessary, but makes things a tad more responsive
+		if(repaintTimer != null &&
+		   repaintTimer.getDelay() == slowRepaintInterval) {
+			repaintTimer.setDelay(repaintInterval);
+			repaintTimer.restart();
+		}
 		repaint();
 	}
 
@@ -1835,12 +2136,14 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	public boolean doDrawLabelPort() {
 		return(inLabelPortMode() && map.overALabelPortLinkedView() &&
-		       (!isFixed && map.getScale() < getMin() + SQUEEZE || isFixed &&
-		        map.getScale() < last_size));
+		       ((!isFixed && map.getScale() < getMin() + SQUEEZE) ||
+		        (isFixed && map.getScale() < last_size)));
 	}
 
 	@Override
-	public void mouseEntered(final MouseEvent e) {}
+	public void mouseEntered(final MouseEvent e) {
+		debug("Mouse entered a label view",9);
+	}
 
 	@Override
 	public void mouseExited(final MouseEvent e) {
@@ -2003,22 +2306,19 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 * viewport view and calls the appropriate arrow drawing function
 	 * @return
 	 */
-	public void drawOverrunArrows(int labelLen,final Graphics g,int yPos,int height,Color fgColor,Color bgColor) {
+	public void drawOverrunArrows(int labelLen,final Graphics g,int yPos,int height,Color fgColor,Color bgColor,int xPos /* NOT adjusted for indicator stuff */) {
 		int paneSize = (isGeneAxis ? rowLabelPaneSize : colLabelPaneSize);
 		int indent = (doDrawLabelPort() ? indicatorThickness : labelIndent);
 		if(isGeneAxis) {
 			debug("Rows. Viewport size: [" + getSecondaryScrollBar().getModel().getExtent() + "] Pane Size: [" + paneSize + "]",7);
 			if(lastScrollRowEndPos != -1 && lastScrollRowPos != -1 &&
 				labelLen > (/* Extent */ lastScrollRowEndPos - lastScrollRowPos)) {
-				if(lastScrollRowPos == 0) {
+				if(lastScrollRowEndPos < (xPos + labelLen) || lastScrollRowPos == 0) {
 					//Draw arrow on right side
 					drawRightArrow(g,yPos,lastScrollRowEndPos - indent - 1,height,fgColor,bgColor);
-				} else if(lastScrollRowEndGap == 0) {
+				}
+				if(lastScrollRowPos > xPos || lastScrollRowEndGap == 0) {
 					//Draw arrow on left side
-					drawLeftArrow(g,yPos,lastScrollRowPos,height,fgColor,bgColor);
-				} else {
-					//Draw Arrows on both sides
-					drawRightArrow(g,yPos,lastScrollRowEndPos - indent - 1,height,fgColor,bgColor);
 					drawLeftArrow(g,yPos,lastScrollRowPos,height,fgColor,bgColor);
 				}
 			}
@@ -2026,18 +2326,14 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			debug("Columns. Viewport size: [" + getSecondaryScrollBar().getModel().getExtent() + "] Pane Size: [" + paneSize + "]",7);
 			if(lastScrollColEndPos != 0 && lastScrollColPos != -1 &&
 				(labelLen + indent) > (/* Extent */ lastScrollColEndPos - lastScrollColPos)) {
-				if(lastScrollColPos == 0) {
+				if(lastScrollColEndPos < (xPos + labelLen) || lastScrollColPos == 0) {
 					debug("Drawing left/down arrow at lastScrollColEndPos[" + lastScrollColEndPos + "]",7);
 					//Draw arrow on top
 					drawLeftArrow(g,yPos,paneSize - (lastScrollColEndPos - indent - 1),height,fgColor,bgColor);
-				} else if(lastScrollColEndGap == 0) {
+				}
+				if(lastScrollColPos > xPos || lastScrollColEndGap == 0) {
 					//Draw arrow on bottom
 					drawRightArrow(g,yPos,paneSize - lastScrollColPos,height,fgColor,bgColor);
-				} else {
-					//Draw Arrows on both sides
-					debug("Drawing left/down arrow at lastScrollColEndPos[" + lastScrollColEndPos + "]",7);
-					drawRightArrow(g,yPos,paneSize - lastScrollColPos,height,fgColor,bgColor);
-					drawLeftArrow(g,yPos,paneSize - (lastScrollColEndPos - indent - 1),height,fgColor,bgColor);
 				}
 			}
 		}
@@ -2052,7 +2348,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//Drag a background box to cover up text that we're going to draw over
 		g.setColor(bgColor);
 		g.fillRect(xLeft - 1, //1 is a fudge factor - don't know why I need it
-		           yTop,(int) Math.floor(height / 2) + 2,height);
+		           yTop,(int) Math.floor(height / 2) + 1,height);
 		//Make the arrow a little smaller
 		height -= 2;
 		//Make sure there's an odd number of pixels
@@ -2080,7 +2376,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	public void drawRightArrow(final Graphics g,int yTop,int xRight,int height,Color fgColor,Color bgColor) {
 		//Drag a background box to cover up text that we're going to draw over
 		g.setColor(bgColor);
-		g.fillRect(xRight - (int) Math.floor(height / 2) - 2,yTop,(int) Math.floor(height / 2) + 2,height);
+		g.fillRect(xRight - (int) Math.floor(height / 2) - 1,yTop,(int) Math.floor(height / 2) + 3,height);
 		//Make the arrow a little smaller
 		height -= 2;
 		//Make sure there's an odd number of pixels

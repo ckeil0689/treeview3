@@ -6,6 +6,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.Adjustable;
+import java.awt.MouseInfo;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
@@ -104,7 +106,6 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 			}
 		});
 
-		debug = 7;
 		//Listen for value changes in the scroll pane's scrollbars
 		getSecondaryScrollBar().addAdjustmentListener(this);
 	}
@@ -266,11 +267,13 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 		super.mouseEntered(e);
 	}
 
-	@Override
-	public void mouseMoved(final MouseEvent e) {
-		hoverPixel = e.getY();
-		super.mouseMoved(e);
-	}
+	//This method was abstracted into the LabelView class
+//	@Override
+//	public void mouseMoved(final MouseEvent e) {
+//		debug("MouseMoved over the row label pane",9);
+//		hoverPixel = e.getY();
+//		super.mouseMoved(e);
+//	}
 
 	@Override
 	public void mouseExited(final MouseEvent e) {
@@ -322,10 +325,15 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 
 		if (SwingUtilities.isLeftMouseButton(e)) {
 			if (arraySelection.getNSelectedIndexes() > 0) {
-				if(e.isShiftDown()) {
+				if(e.isMetaDown() && e.isAltDown()) {
+					geneSelection.deselectAllIndexes();
+					arraySelection.deselectAllIndexes();
+				} else if(e.isShiftDown()) {
 					toggleSelectFromClosestToIndex(geneSelection,index);
 				} else if(e.isMetaDown()) {
 					toggleSelect(geneSelection,index);
+				} else if(e.isAltDown()) {
+					geneSelection.setIndexSelection(index, false);
 				} else {
 					selectAnew(geneSelection,index);
 				}
@@ -494,7 +502,7 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 		} else {
 			//Value of label length scrollbar
 			map.scrollBy(shift, false);
-			updatePrimaryHoverIndex();
+			updatePrimaryHoverIndexDuringScrollWheel();
 		}
 
 		//revalidate();
@@ -590,4 +598,28 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 				repaint();
 			}
 		});
+
+	public boolean areLabelsBeingScrolled() {
+		return(map.areRowLabelsBeingScrolled());
+	}
+
+	public void updatePrimaryHoverIndexDuringScrollDrag() {
+		//If the labels are being scrolled, you must manually retrieve the cursor position
+		if(areLabelsBeingScrolled()) {
+			forceUpdatePrimaryHoverIndex();
+		}
+	}
+
+	public void forceUpdatePrimaryHoverIndex() {
+		Point p = MouseInfo.getPointerInfo().getLocation();
+		SwingUtilities.convertPointFromScreen(p,getComponent());
+		debug("Cursor y coordinate relative to column labels: [" + p.y + "]",8);
+		int hDI = map.getIndex(p.y); //Hover Data Index
+		if(hDI > map.getMaxIndex()) {
+			hDI = map.getMaxIndex();
+		} else if (hDI < 0) {
+			hDI = 0;
+		}
+		hoverIndex = hDI;
+	}
 }

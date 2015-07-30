@@ -121,7 +121,7 @@ MouseWheelListener {
 		super();
 
 		setLabelPortMode(true);
-		debug = 0;
+		debug = 9;
 
 		/* Listeners for interactivity */
 		addMouseListener(new MatrixMouseListener());
@@ -605,6 +605,7 @@ MouseWheelListener {
 
 		@Override
 		public void mouseMoved(final MouseEvent e) {
+			debug("mouseMoved inside IMV",9);
 			xmap.setHoverIndex(xmap.getIndex(e.getX()));
 			ymap.setHoverIndex(ymap.getIndex(e.getY()));
 
@@ -779,7 +780,7 @@ MouseWheelListener {
 
 		@Override
 		public void mouseEntered(final MouseEvent e) {
-			debug("mouseEntered IMV",1);
+			debug("mouseEntered IMV",9);
 			if(this.turnOffLabelPortTimer != null) {
 				/* Event came too soon, swallow it by resetting the timer.. */
 				this.turnOffLabelPortTimer.stop();
@@ -828,6 +829,27 @@ MouseWheelListener {
 
 			status.setMessages(statustext);
 		}
+	}
+
+	public void startDragRect(int xIndex,int yIndex) {
+		startPoint.setLocation(xIndex,yIndex);
+		endPoint.setLocation(startPoint.x,startPoint.y);
+		dragRect.setLocation(startPoint.x,startPoint.y);
+		dragRect.setSize(endPoint.x - dragRect.x,endPoint.y - dragRect.y);
+		drawBand(dragRect);
+	}
+
+	public void updateDragRect(int xIndex,int yIndex) {
+		drawBand(dragRect);
+		endPoint.setLocation(xIndex,yIndex);
+		dragRect.setLocation(startPoint.x, startPoint.y);
+		dragRect.setSize(0, 0);
+		dragRect.add(endPoint.x, endPoint.y);
+	}
+
+	public void endDragRect(int xIndex,int yIndex) {
+		updateDragRect(xIndex,yIndex);
+		drawBand(dragRect);
 	}
 
 	/**

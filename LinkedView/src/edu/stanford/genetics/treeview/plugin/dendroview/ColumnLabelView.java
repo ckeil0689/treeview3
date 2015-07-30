@@ -1,6 +1,10 @@
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.Adjustable;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.MouseInfo;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
@@ -83,8 +87,9 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				debug("The mouse has released a column label scrollbar",2);
+				debug("The mouse has released a column label scrollbar",9);
 				updateDragScrollTimer.stop();
+				map.setHoverIndex(-1);
 				//Turn off the "over a label port view" boolean after a bit
 				if(activeScrollLabelPortOffTimer == null) {
 					if(labelPortOffDelay == 0) {
@@ -103,9 +108,10 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 					}
 				}
 			}
+
+			//I had mouseDragged here, but is NOT EVEN CALLED during a scrollbar drag!!! - Hence it's useless!
 		});
 
-		debug = 7;
 		getSecondaryScrollBar().addAdjustmentListener(this);
 	}
 
@@ -145,6 +151,50 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 		} else {
 			LogBuffer.println("Warning: LabelView got funny update!");
 		}
+	}
+
+//	//This catches scrollbar drag events and updates the cursor position because
+//	//there's not way to get cursor position directly from the scrollbar
+//	//dragging code
+//	@Override
+//	public void updateBuffer(final Graphics g,final Dimension offscreenSize) {
+//		if(areLabelsBeingScrolled()) {
+//			Point p = MouseInfo.getPointerInfo().getLocation();
+//			SwingUtilities.convertPointFromScreen(p,getComponent());
+//			debug("Cursor x coordinate relative to column labels: [" + p.x + "]",8);
+//			int hDI = map.getIndex(p.x); //Hover Data Index
+//			if(hDI > map.getMaxIndex()) {
+//				hDI = map.getMaxIndex();
+//			} else if (hDI < 0) {
+//				hDI = 0;
+//			}
+//			map.setHoverIndex(hDI);
+//		}
+//		super.updateBuffer(g,offscreenSize);
+//	}
+
+	public boolean areLabelsBeingScrolled() {
+		return(map.areColLabelsBeingScrolled());
+	}
+
+	public void updatePrimaryHoverIndexDuringScrollDrag() {
+		//If the labels are being scrolled, you must manually retrieve the cursor position
+		if(areLabelsBeingScrolled()) {
+			forceUpdatePrimaryHoverIndex();
+		}
+	}
+
+	public void forceUpdatePrimaryHoverIndex() {
+		Point p = MouseInfo.getPointerInfo().getLocation();
+		SwingUtilities.convertPointFromScreen(p,getComponent());
+		debug("Cursor x coordinate relative to column labels: [" + p.x + "]",8);
+		int hDI = map.getIndex(p.x); //Hover Data Index
+		if(hDI > map.getMaxIndex()) {
+			hDI = map.getMaxIndex();
+		} else if (hDI < 0) {
+			hDI = 0;
+		}
+		hoverIndex = hDI;
 	}
 
 	/**
@@ -277,10 +327,15 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 
 		if (SwingUtilities.isLeftMouseButton(e)) {
 			if (geneSelection.getNSelectedIndexes() > 0) {
-				if(e.isShiftDown()) {
+				if(e.isMetaDown() && e.isAltDown()) {
+					geneSelection.deselectAllIndexes();
+					arraySelection.deselectAllIndexes();
+				} else if(e.isShiftDown()) {
 					toggleSelectFromClosestToIndex(arraySelection,index);
 				} else if(e.isMetaDown()) {
 					toggleSelect(arraySelection,index);
+				} else if(e.isAltDown()) {
+					arraySelection.setIndexSelection(index, false);
 				} else {
 					selectAnew(arraySelection,index);
 				}
@@ -289,10 +344,12 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 				arraySelection.setIndexSelection(index, true);
 				geneSelection.selectAllIndexes();
 			}
-		} else {
-			geneSelection.deselectAllIndexes();
-			arraySelection.deselectAllIndexes();
 		}
+		//A right-click now brings up a contextual menu coded elsewhere
+		// else {
+		//	geneSelection.deselectAllIndexes();
+		//	arraySelection.deselectAllIndexes();
+		//}
 
 		geneSelection.notifyObservers();
 		arraySelection.notifyObservers();
@@ -456,7 +513,7 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 		// down
 		if(e.isShiftDown()) {
 			map.scrollBy(shift, false);
-			updatePrimaryHoverIndex();
+			updatePrimaryHoverIndexDuringScrollWheel();
 		} else {
 			shift = (notches < 0) ? -6 : 6;
 			final int j = getSecondaryScrollBar().getValue();
