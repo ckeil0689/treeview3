@@ -622,9 +622,10 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		activeHoverDataIndex = hoverIndex;
 		if(isGeneAxis) {
 			debug("Gene axis forced hover index: [" + activeHoverDataIndex + "] isOverIMV? [" + (map.isOverIMV() ? "yes" : "no") + "]",9);
-			debug("Visible row label pane width: [" + scrollPane.getViewport().getSize().width + "] Content width: [" + offscreenSize.width + "]",10);
-		} else {
-			debug("Visible col label pane height: [" + scrollPane.getViewport().getSize().height + "] Content height: [" + offscreenSize.height + "]",10);
+			if(scrollPane.getViewport().getSize().width != rowLabelViewportSize)
+				debug("Current visible row label pane width: [" + scrollPane.getViewport().getSize().width + "] Stored: [" + rowLabelViewportSize + "] Content width: [" + offscreenSize.width + "] Stored: [" + rowLabelPaneSize + "]",10);
+		} else if(scrollPane.getViewport().getSize().height != colLabelViewportSize) {
+			debug("Current visible col label pane height: [" + scrollPane.getViewport().getSize().height + "] Stored: [" + colLabelViewportSize + "] Content height: [" + offscreenSize.height + "] Stored: [" + colLabelPaneSize + "]",10);
 		}
 
 		//Correct out of bounds situations, which can happen either when the
@@ -730,8 +731,27 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		if(map.getScale() >= getMin() + SQUEEZE && !hasFixedOverlap ||
 		   doDrawLabelPort()) {
 
+			final FontMetrics metrics = getFontMetrics(g.getFont());
+			final int ascent          = metrics.getAscent();
+			int maxStrLen             = getLabelAreaSize(metrics);
+			int realMaxStrLen         = getMaxStringLength(metrics);
+			boolean drawLabelPort     = doDrawLabelPort();
+			if(drawLabelPort) {
+				debug("Drawing a label port",1);
+			}
+
 			if(secondaryViewportSizeChanged()) {
-				adjustSecondaryScroll();
+				if(isGeneAxis)
+					debug("Viewport size change detected. Previous scroll positions: lastScrollRowPos [" + lastScrollRowPos + "] lastScrollRowEndPos [" + lastScrollRowEndPos + "] lastScrollRowEndGap [" + lastScrollRowEndGap + "]",10);
+				else
+					debug("Viewport size change detected. Previous scroll positions: lastScrollColPos [" + lastScrollColPos + "] lastScrollColEndPos [" + lastScrollColEndPos + "] lastScrollColEndGap [" + lastScrollColEndGap + "]",10);
+
+				adjustSecondaryScroll(realMaxStrLen + (drawLabelPort ? indicatorThickness : 0));
+
+				if(isGeneAxis)
+					debug("Viewport size change detected. New scroll positions: lastScrollRowPos [" + lastScrollRowPos + "] lastScrollRowEndPos [" + lastScrollRowEndPos + "] lastScrollRowEndGap [" + lastScrollRowEndGap + "]",10);
+				else
+					debug("Viewport size change detected. New scroll positions: lastScrollColPos [" + lastScrollColPos + "] lastScrollColEndPos [" + lastScrollColEndPos + "] lastScrollColEndGap [" + lastScrollColEndGap + "]",10);
 			}
 
 			trackSecondaryPaneSize();
@@ -746,11 +766,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			int fittedFontSize = (int) Math.floor(map.getScale()) - SQUEEZE;
 			if(fittedFontSize < 1) {
 				fittedFontSize = 1;
-			}
-
-			boolean drawLabelPort = doDrawLabelPort();
-			if(drawLabelPort) {
-				debug("Drawing a label port",1);
 			}
 
 			/* Get indices range */
@@ -769,10 +784,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 			final int colorIndex = headerInfo.getIndex("FGCOLOR");
 			g.setFont(new Font(face,style,size));
-
-			final FontMetrics metrics = getFontMetrics(g.getFont());
-			final int ascent          = metrics.getAscent();
-			int maxStrLen             = getJustifiedPosition(metrics);
 
 			int matrixSize   = map.getPixel(map.getMaxIndex() + 1) - 1 -
 			                   map.getPixel(0);
@@ -949,7 +960,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 							g2d.drawString(out,
 							               labelStrStart,
 							               yPos);
-							drawOverrunArrows(metrics.stringWidth(out),g,yPos - ascent,curFontSize,g2d.getColor(),bgColor,xPos /* Don't include adjustments */);
+							drawOverrunArrows(metrics.stringWidth(out),g,yPos - ascent,curFontSize,g2d.getColor(),bgColor,labelStrStart);
 						}
 
 					}
@@ -1013,7 +1024,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 							g2d.drawString(out,
 							               labelStrStart,
 							               yPos);
-							drawOverrunArrows(metrics.stringWidth(out),g,yPos - ascent,curFontSize,labelColor,bgColor,xPos /* Don't include adjustments */);
+							drawOverrunArrows(metrics.stringWidth(out),g,yPos - ascent,curFontSize,labelColor,bgColor,labelStrStart);
 						}
 
 					}
@@ -1780,7 +1791,12 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	                                                  int endPos,
 	                                                  int endGap);
 
-	public int getJustifiedPosition(FontMetrics metrics) {
+	/**
+	 * Returns either the number of pixels in length the longest string is, or
+	 * the dimension of the panel the strings will be drawn in (minus the
+	 * indicator thickness) - whichever is larger)
+	 */
+	public int getLabelAreaSize(FontMetrics metrics) {
 		int min =
 			(isGeneAxis ? scrollPane.getViewport().getSize().width :
 						  scrollPane.getViewport().getSize().height)
@@ -1789,11 +1805,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		return len > min ? len : min;
 	}
 
-	/**
-	 * Returns either the number of pixels in length the longest string is, or
-	 * the dimension of the panel the strings will be drawn in (minus the
-	 * indicator thickness) - whichever is larger)
-	 */
 	public int getMaxStringLength(FontMetrics metrics) {
 		/* Draw the labels */
 		int end = map.getMaxIndex();
@@ -2168,9 +2179,16 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 * the end gap (when left justified) or the position (when right justified)
 	 * has changed
 	 */
-	public void adjustSecondaryScroll() {
-		debug("Resetting last secondary scroll position values",2);
+	public void adjustSecondaryScroll(int maxStrLen) {
+		debug("Resetting last secondary scroll position values",10);
 		if(isGeneAxis) {
+			//getSecondaryScrollBar().getModel().getExtent() and
+			//getSecondaryScrollBar().getMaximum() cannot be trusted because it
+			//does not appear to be updated after a split pane divider move, so
+			//we will determine the scroll position based on what we know the
+			//viewport and max str length to be
+			int extent = rowLabelViewportSize;
+			int scrollMax = (maxStrLen > rowLabelViewportSize ? maxStrLen : rowLabelViewportSize);
 			//Do not adjust if the scrollbars are not properly set
 			if(lastScrollRowPos    == -1 ||
 			   lastScrollRowEndPos == -1 ||
@@ -2178,32 +2196,84 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				return;
 			}
 			if(isRightJustified) {
-				lastScrollRowPos =
-					lastScrollRowEndPos -
-				    getSecondaryScrollBar().getModel().getExtent();
+				//lastScrollRowEndGap should not change unless the viewport is now larger than the content minus the previous gap size
+				if(lastScrollRowEndGap > 0 &&
+				   extent > (maxStrLen - lastScrollRowEndGap)) {
+					lastScrollRowEndGap = maxStrLen - extent;
+					if(lastScrollRowEndGap < 0) {
+						lastScrollRowEndGap = 0;
+					}
+				}
+				lastScrollRowEndPos = scrollMax - lastScrollRowEndGap;
+				lastScrollRowPos = lastScrollRowEndPos - extent;
+//				lastScrollRowPos =
+//					lastScrollRowEndPos -
+//				    getSecondaryScrollBar().getModel().getExtent();
 			} else {
-				lastScrollRowEndPos =
-					lastScrollRowPos +
-					getSecondaryScrollBar().getModel().getExtent();
-				lastScrollRowEndGap = getSecondaryScrollBar().getMaximum() -
-				                      lastScrollRowEndPos;
+				//lastScrollRowPos should not change unless the viewport is now larger than the content minus the previous position
+				if(lastScrollRowPos > 0 &&
+				   extent > (maxStrLen - lastScrollRowPos)) {
+					lastScrollRowPos = maxStrLen - extent;
+					if(lastScrollRowPos < 0) {
+						lastScrollRowPos = 0;
+					}
+				}
+				lastScrollRowEndPos = lastScrollRowPos + extent;
+//				lastScrollRowEndPos =
+//					lastScrollRowPos +
+//					getSecondaryScrollBar().getModel().getExtent();
+				lastScrollRowEndGap = scrollMax - lastScrollRowEndPos;
+//				lastScrollRowEndGap = getSecondaryScrollBar().getMaximum() -
+//				                      lastScrollRowEndPos;
 			}
 		} else {
+			//getSecondaryScrollBar().getModel().getExtent() and
+			//getSecondaryScrollBar().getMaximum() cannot be trusted because it
+			//does not appear to be updated after a split pane divider move, so
+			//we will determine the scroll position based on what we know the
+			//viewport and max str length to be
+			int extent = colLabelViewportSize;
+			int scrollMax = (maxStrLen > colLabelViewportSize ? maxStrLen : colLabelViewportSize);
 			//Do not adjust if the scrollbars are not properly set
-			if(lastScrollColPos == -1 || lastScrollColEndPos == -1 ||
-			   lastScrollColEndGap == -1) { return; }
+			if(lastScrollColPos    == -1 ||
+			   lastScrollColEndPos == -1 ||
+			   lastScrollColEndGap == -1) {
+				return;
+			}
 			if(isRightJustified) {
+				//Top Justified, but note that scroll position 0 is at the top and that's the end/right-side of the string
+				//lastScrollColPos should not change unless the viewport is now larger than the content minus the previous position
+				if(lastScrollColPos > 0 &&
+				   extent > (maxStrLen - lastScrollColPos)) {
+					lastScrollColPos = maxStrLen - extent;
+					if(lastScrollColPos < 0) {
+						lastScrollColPos = 0;
+					}
+				}
 				debug("Adjusting columns for bottom justification",1);
-				lastScrollColEndPos = lastScrollColPos +
-					                  getSecondaryScrollBar().getModel()
-					                  .getExtent();
-				lastScrollColEndGap = getSecondaryScrollBar().getMaximum() -
-				                      lastScrollColEndPos;
+				lastScrollColEndPos = lastScrollColPos + extent;
+//				lastScrollColEndPos = lastScrollColPos +
+//				                      getSecondaryScrollBar().getModel()
+//				                      .getExtent();
+				lastScrollColEndGap = scrollMax - lastScrollColEndPos;
+//				lastScrollColEndGap = getSecondaryScrollBar().getMaximum() -
+//				                      lastScrollColEndPos;
 			} else {
+				//Bottom justified, but note that the end scroll position is at the bottom and that's the beginning of the string
+				//lastScrollColEndGap should not change unless the viewport is now larger than the content minus the previous gap size
+				if(lastScrollColEndGap > 0 &&
+				   extent > (maxStrLen - lastScrollColEndGap)) {
+					lastScrollColEndGap = maxStrLen - extent;
+					if(lastScrollColEndGap < 0) {
+						lastScrollColEndGap = 0;
+					}
+				}
 				debug("Adjusting columns for top justification",1);
-				lastScrollColPos = lastScrollColEndPos -
-				                   getSecondaryScrollBar().getModel()
-				                   .getExtent();
+				lastScrollColEndPos = scrollMax - lastScrollColEndGap;
+				lastScrollColPos = lastScrollColEndPos - extent;
+//				lastScrollColPos = lastScrollColEndPos -
+//				                   getSecondaryScrollBar().getModel()
+//				                   .getExtent();
 			}
 		}
 	}
@@ -2306,34 +2376,46 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 * viewport view and calls the appropriate arrow drawing function
 	 * @return
 	 */
-	public void drawOverrunArrows(int labelLen,final Graphics g,int yPos,int height,Color fgColor,Color bgColor,int xPos /* NOT adjusted for indicator stuff */) {
+	public void drawOverrunArrows(int labelLen,final Graphics g,int yPos,int height,Color fgColor,Color bgColor,int xPos) {
 		int paneSize = (isGeneAxis ? rowLabelPaneSize : colLabelPaneSize);
-		int indent = (doDrawLabelPort() ? indicatorThickness : labelIndent);
+		int indent = (doDrawLabelPort() ? indicatorThickness : labelIndent) * (isGeneAxis ? -1 : 1);
+		int indentsize = Math.abs(indent);
 		if(isGeneAxis) {
 			debug("Rows. Viewport size: [" + getSecondaryScrollBar().getModel().getExtent() + "] Pane Size: [" + paneSize + "]",7);
 			if(lastScrollRowEndPos != -1 && lastScrollRowPos != -1 &&
-				labelLen > (/* Extent */ lastScrollRowEndPos - lastScrollRowPos)) {
-				if(lastScrollRowEndPos < (xPos + labelLen) || lastScrollRowPos == 0) {
+				(labelLen + indentsize) > (/* Extent */ lastScrollRowEndPos - lastScrollRowPos)) {
+				if((lastScrollRowEndPos - indentsize) < (xPos + labelLen)) {
 					//Draw arrow on right side
-					drawRightArrow(g,yPos,lastScrollRowEndPos - indent - 1,height,fgColor,bgColor);
+					drawRightArrow(g,yPos,lastScrollRowEndPos - indentsize - 1,height,fgColor,bgColor);
+					debug("Right overrun row arrow drawn at [" + lastScrollRowEndPos + " + " + indent + " - 1] because  (lastScrollRowEndPos < (xPos + labelLen + indent) || lastScrollRowPos == 0) [" + lastScrollRowEndPos + " < (" + xPos + " + " + labelLen + " + " + indent + ") || " + lastScrollRowPos + " == 0] lastScrollRowEndGap [" + lastScrollRowEndGap + "]",10);
+				} else {
+					debug("No overrun right row arrow drawn because NOT (lastScrollRowEndPos < (xPos + labelLen + indent) || lastScrollRowPos == 0) [" + lastScrollRowEndPos + " < (" + xPos + " + " + labelLen + " + " + indent + ") || " + lastScrollRowPos + " == 0] lastScrollRowEndGap [" + lastScrollRowEndGap + "]",10);
 				}
-				if(lastScrollRowPos > xPos || lastScrollRowEndGap == 0) {
+				if(lastScrollRowPos > xPos) {
 					//Draw arrow on left side
 					drawLeftArrow(g,yPos,lastScrollRowPos,height,fgColor,bgColor);
 				}
 			}
 		} else {
 			debug("Columns. Viewport size: [" + getSecondaryScrollBar().getModel().getExtent() + "] Pane Size: [" + paneSize + "]",7);
-			if(lastScrollColEndPos != 0 && lastScrollColPos != -1 &&
-				(labelLen + indent) > (/* Extent */ lastScrollColEndPos - lastScrollColPos)) {
-				if(lastScrollColEndPos < (xPos + labelLen) || lastScrollColPos == 0) {
+			if(lastScrollColEndPos != -1 && lastScrollColPos != -1 &&
+			   (labelLen + indentsize) > (/* Extent */ lastScrollColEndPos - lastScrollColPos)) {
+				if(lastScrollColPos > (lastScrollColEndPos + lastScrollColEndGap - (xPos + labelLen))) {
 					debug("Drawing left/down arrow at lastScrollColEndPos[" + lastScrollColEndPos + "]",7);
 					//Draw arrow on top
-					drawLeftArrow(g,yPos,paneSize - (lastScrollColEndPos - indent - 1),height,fgColor,bgColor);
-				}
-				if(lastScrollColPos > xPos || lastScrollColEndGap == 0) {
-					//Draw arrow on bottom
 					drawRightArrow(g,yPos,paneSize - lastScrollColPos,height,fgColor,bgColor);
+				}
+				//if(lastScrollColPos > xPos || lastScrollColEndGap == 0) {
+				//If the starting position of the string (from the bottom) is
+				//larger than the scroll end gap (which is also at the bottom)
+				//Note, the indent covers up what would otherwise be visible
+				//label, so we must add the indent size to the non-visible
+				//portion of the pane content
+				if((lastScrollColEndGap + indentsize) > xPos) {
+					//Draw arrow on bottom
+					drawLeftArrow(g,yPos,paneSize - (lastScrollColEndPos - indentsize - 1),height,fgColor,bgColor);
+				} else {
+					debug("No overrun arrow drawn because (lastScrollColEndGap != 0 && lastScrollColEndGap > xPos) [" + lastScrollColEndGap + " != 0 && " + lastScrollColEndGap + " > " + xPos + "] lastScrollColEndPos [" + lastScrollColEndPos + "] lastScrollColPos [" + lastScrollColPos + "]",10);
 				}
 			}
 		}

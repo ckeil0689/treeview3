@@ -121,7 +121,7 @@ MouseWheelListener {
 		super();
 
 		setLabelPortMode(true);
-		debug = 9;
+		debug = 10;
 
 		/* Listeners for interactivity */
 		addMouseListener(new MatrixMouseListener());
