@@ -129,8 +129,6 @@ public abstract class ModelViewProduced extends ModelView {
 		for (int i = 0; i < offscreenPixels.length; i++) {
 			offscreenPixels[i] = backgoundInt;
 		}
-
-		long start = System.currentTimeMillis();
 		
 		if (isEnabled()) {
 			if ((offscreenSize.width > 0) && (offscreenSize.height > 0)) {
@@ -138,9 +136,6 @@ public abstract class ModelViewProduced extends ModelView {
 				offscreenValid = true;
 			}
 		}
-		
-		long end = System.currentTimeMillis() - start;
-		LogBuffer.println("UpdatePix: " + end + "ms");
 
 		g2d.drawImage(offscreenBuffer, 0, 0, null);
 		paintComposite(g2d);
