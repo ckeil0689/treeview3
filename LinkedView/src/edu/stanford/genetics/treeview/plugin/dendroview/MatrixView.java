@@ -2,6 +2,7 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.util.Observable;
 
 import javax.swing.BorderFactory;
@@ -9,6 +10,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
 import net.miginfocom.swing.MigLayout;
+import ColorChooser.ColorChooserController;
 import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelViewProduced;
@@ -31,6 +33,7 @@ public abstract class MatrixView extends ModelViewProduced {
 	protected TreeSelectionI arraySelection;
 
 	protected boolean hasDrawn = false;
+	protected boolean pixelsChanged = false;
 
 	protected ArrayDrawer drawer;
 
@@ -81,6 +84,10 @@ public abstract class MatrixView extends ModelViewProduced {
 
 		} else if (o instanceof TreeSelectionI) {
 			return;
+			
+		} else if (o instanceof ColorChooserController) {
+			LogBuffer.println("Observer notified of pixel update.");
+			pixelsChanged = true;
 
 		} else {
 			LogBuffer.println(viewName() + " got weird update : " + o);
@@ -229,6 +236,32 @@ public abstract class MatrixView extends ModelViewProduced {
 
 		ymap = m;
 		ymap.addObserver(this);
+	}
+	
+	/**
+	 * Creates a new Image with a new set of 
+	 */
+	protected void adjustPixelsToMaps() {
+		
+		int x_tiles = xmap.getMaxIndex() + 1;
+		int y_tiles = ymap.getMaxIndex() + 1;
+		
+		int tileCount = x_tiles * y_tiles;
+		
+		if(offscreenPixels.length != tileCount) {
+			LogBuffer.println("Creating new Image.");
+			createNewBuffer(x_tiles, y_tiles);
+		}
+	}
+	
+	protected void setSubImage() {
+		
+		int x = xmap.getFirstVisible();
+		int y = ymap.getFirstVisible();
+		int w = xmap.getNumVisible();
+		int h = ymap.getNumVisible();
+		
+		paintImage = ((BufferedImage)offscreenImage).getSubimage(x, y, w, h);
 	}
 
 }

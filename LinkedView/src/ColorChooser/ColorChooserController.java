@@ -9,23 +9,31 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Observable;
 import java.util.prefs.Preferences;
 
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.SwingWorker;
 import javax.swing.Timer;
 
+import Utilities.CustomDialog;
+import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
 
-public class ColorChooserController implements ConfigNodePersistent {
+public class ColorChooserController extends Observable 
+implements ConfigNodePersistent {
 
 	public static final Integer DEFAULT_MULTI_CLICK_INTERVAL = 300;
 	private final ColorChooserUI colorChooserUI;
 	private final ColorPicker colorPicker;
+	
+	private CustomDialog drawColorsDialog;
 
 	/* Node for saved data */
 	private Preferences configNode;
@@ -55,6 +63,7 @@ public class ColorChooserController implements ConfigNodePersistent {
 			colorChooserUI.addPresetChoiceListener(new ColorSetListener());
 			colorChooserUI.addMissingListener(new MissingBtnListener());
 			colorChooserUI.addEditListener(new EditButtonListener());
+			colorChooserUI.addApplyChangeListener(new ApplyChangeListener());
 			colorChooserUI.addDialogCloseListener(new WindowCloseListener());
 		}
 	}
@@ -147,6 +156,7 @@ public class ColorChooserController implements ConfigNodePersistent {
 	 * Returns the system multi-click interval.
 	 */
 	public static int getMultiClickInterval() {
+		
 		Integer multiClickInterval = (Integer) Toolkit.getDefaultToolkit()
 				.getDesktopProperty("awt.multiClickInterval");
 
@@ -161,10 +171,47 @@ public class ColorChooserController implements ConfigNodePersistent {
 
 		@Override
 		public void windowClosed(final WindowEvent e) {
-
+			
 			if (colorChooserUI.isCustomSelected()) {
 				saveStatus();
 			}
+		}
+	}
+	
+	private class ApplyChangeListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+	
+			drawColorsDialog = new CustomDialog("Matrix Colors");
+			String text = "Updating colors...";
+			drawColorsDialog.setIndicatorPanel(text);
+			
+			new ColorChanger().execute();
+			
+			drawColorsDialog.setVisible(true);
+		}
+	}
+	
+	private class ColorChanger extends SwingWorker<Void, Void> {
+
+		@Override
+		protected Void doInBackground() throws Exception {
+				
+			colorPicker.setGradientColors();
+			return null;
+		}
+		
+		@Override
+		protected void done() {
+
+			LogBuffer.println("Changed colors.");
+			
+			// Close dialog
+			drawColorsDialog.dispose();
+			
+			setChanged();
+			notifyObservers();
 		}
 	}
 
@@ -209,9 +256,7 @@ public class ColorChooserController implements ConfigNodePersistent {
 			} else {
 				ThumbBox tb = colorPicker.getThumbBox();
 				tb.deselectAllThumbs();
-
 				tb.selectThumbAtPoint(lastEvent.getPoint());
-
 				updateSelectionBtnStatus();
 			}
 		}

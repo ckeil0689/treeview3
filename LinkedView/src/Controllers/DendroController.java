@@ -60,6 +60,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.InteractiveMatrixView;
 import edu.stanford.genetics.treeview.plugin.dendroview.LabelContextMenu;
 import edu.stanford.genetics.treeview.plugin.dendroview.LabelContextMenuController;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
+import edu.stanford.genetics.treeview.plugin.dendroview.MatrixView;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreeColorer;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreePainter;
 
@@ -1994,6 +1995,16 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	public MapContainer getInteractiveYMap() {
 
 		return interactiveYmap;
+	}
+	
+	public MatrixView getInteractiveMatrixView() {
+		
+		return dendroView.getInteractiveMatrixView();
+	}
+	
+	public MatrixView getGlobalMatrixView() {
+		
+		return dendroView.getGlobalMatrixView();
 	}
 
 	@Override

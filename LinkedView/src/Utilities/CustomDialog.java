@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
@@ -75,5 +76,20 @@ public class CustomDialog extends JDialog {
 		closeBtn.requestFocus();
 
 		super.setVisible(visible);
+	}
+	
+	/**
+	 * Allows to set a text to be displayed as indicator dialog.
+	 * The passed String is everything that will be displayed.
+	 * @param message The message to be displayed.
+	 */
+	public void setIndicatorPanel(final String message) {
+		
+		mainPanel.removeAll();
+		JLabel indicator = GUIFactory.createLabel(message, GUIFactory.FONTM);
+		mainPanel.add(indicator, "push");
+		
+		mainPanel.revalidate();
+		mainPanel.repaint();
 	}
 }

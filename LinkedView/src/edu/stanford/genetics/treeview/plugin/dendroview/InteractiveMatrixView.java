@@ -56,9 +56,6 @@ public class InteractiveMatrixView extends MatrixView implements
 	public static final int EQUAL = 1;
 	public static final int PROPORT = 2;
 
-	private static final int HORIZONTAL = 0;
-	private static final int VERTICAL = 1;
-
 	private final String[] statustext = new String[] { "Mouseover Selection",
 			"", "" };
 	private HeaderInfo arrayHI;
@@ -241,6 +238,25 @@ public class InteractiveMatrixView extends MatrixView implements
 			}
 		}
 	}
+	
+	@Override
+	protected void updateMatrix() {
+		
+		if (!offscreenValid) {
+
+			adjustPixelsToMaps();
+			revalidateScreen();
+			setSubImage();
+			
+			if(pixelsChanged) {
+				updatePixels();
+				pixelsChanged = false;
+			}
+		}
+			
+		xmap.notifyObservers();
+		ymap.notifyObservers();
+	}
 
 	/**
 	 * This method updates a pixel buffer. The alternative is to update the
@@ -249,29 +265,31 @@ public class InteractiveMatrixView extends MatrixView implements
 	@Override
 	protected void updatePixels() {
 
-		if (!offscreenValid) {
-
-			revalidateScreen();
+//		if (!offscreenValid) {
+//
+//			adjustPixelsToMaps();
+//			revalidateScreen();
+//			setSubImage();
 
 			final Rectangle destRect = new Rectangle(0, 0,
 					xmap.getUsedPixels(), ymap.getUsedPixels());
 
-			final Rectangle sourceRect = new Rectangle(xmap.getIndex(0),
-					ymap.getIndex(0), xmap.getIndex(destRect.width)
-							- xmap.getIndex(0), ymap.getIndex(destRect.height)
-							- ymap.getIndex(0));
+//			final Rectangle sourceRect = new Rectangle(xmap.getIndex(0),
+//					ymap.getIndex(0), xmap.getIndex(destRect.width)
+//							- xmap.getIndex(0), ymap.getIndex(destRect.height)
+//							- ymap.getIndex(0));
+			final Rectangle sourceRect = new Rectangle(0, 0, 
+					xmap.getMaxIndex() + 1, ymap.getMaxIndex() + 1);
 
 			if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
 				/* Set new offscreenPixels (pixel colors) */
 				drawer.paint(offscreenPixels, sourceRect, destRect,
 						offscreenScanSize);
 			}
-
-			offscreenSource.newPixels();
-		}
-
-		xmap.notifyObservers();
-		ymap.notifyObservers();
+//		}
+//
+//		xmap.notifyObservers();
+//		ymap.notifyObservers();
 	}
 
 	@Override

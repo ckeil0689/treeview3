@@ -185,99 +185,111 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 		if (dataMatrix == null) {
 			LogBuffer.println("Data matrix wasn't set, "
 					+ "can't be used in paint() in DoubleArrayDrawer.");
+			return;
+		}
+		
+		for(int row = 0; row < source.getHeight(); row++) {
+			for(int col = 0; col < source.getWidth(); col++) {
+				
+				double val = dataMatrix.getValue(col, row);
+				
+				final int t_color = colorExtractor.getARGBColor(val);
+				
+				pixels[col + row * scanSize] = t_color;
+			}
 		}
 
-		// ynext will hold the first pixel of the next block.
-		int ynext = dest.y;
-
-		// geneFirst holds first gene which contributes to this pixel.
-		int geneFirst = 0;
-
-		// gene will hold the last gene to contribute to this pixel.
-		for (int gene = 0; gene < source.height; gene++) {
-
-			final int ystart = ynext;
-			ynext = dest.y + (dest.height + gene * dest.height) / source.height;
-
-			// keep incrementing until block is at least one pixel high
-			if (ynext == ystart) {
-				continue;
-			}
-
-			// xnext will hold the first pixel of the next block.
-			int xnext = dest.x;
-
-			// arrayFirst holds first gene which contributes to this pixel.
-			int arrayFirst = 0;
-
-			for (int array = 0; array < source.width; array++) {
-
-				final int xstart = xnext;
-				xnext = dest.x + (dest.width + array * dest.width)
-						/ source.width;
-
-				if (xnext == xstart) {
-					continue;
-				}
-
-				try {
-					double val = 0;
-					int count = 0;
-
-					for (int i = geneFirst; i <= gene; i++) {
-
-						for (int j = arrayFirst; j <= array; j++) {
-
-							int actualGene = source.y + i;
-							if (geneOrder != null) {
-								actualGene = geneOrder[actualGene];
-							}
-
-							final double thisVal = dataMatrix.getValue(j
-									+ source.x, actualGene);
-
-							if (TVModel.isEmpty(thisVal)) {
-								val = DataModel.EMPTY;
-								count = 1;
-								break;
-							}
-							
-							count++;
-							val += thisVal;
-
-						}
-
-						if (TVModel.isEmpty(val)) {
-							break;
-						}
-					}
-
-					if (count == 0) {
-						val = DataModel.NAN;
-
-					} else {
-						val /= count; // averaging here ?
-					}
-
-					/* Getting the ARGB color based on the determined value */
-					final int t_color = colorExtractor.getARGBColor(val);
-
-					for (int x = xstart; x < xnext; x++) {
-
-						for (int y = ystart; y < ynext; y++) {
-
-							pixels[x + y * scanSize] = t_color;
-						}
-					}
-				} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
-					LogBuffer.println("ArrayIndexOutOfBoundsException in "
-									+ "paint() in DoubleArrayDrawer: "
-									+ e.getMessage());
-				}
-				arrayFirst = array + 1;
-			}
-			geneFirst = gene + 1;
-		}
+//		// ynext will hold the first pixel of the next block.
+//		int ynext = dest.y;
+//
+//		// geneFirst holds first gene which contributes to this pixel.
+//		int geneFirst = 0;
+//
+//		// gene will hold the last gene to contribute to this pixel.
+//		for (int gene = 0; gene < source.height; gene++) {
+//
+//			final int ystart = ynext;
+//			ynext = dest.y + (dest.height + gene * dest.height) / source.height;
+//
+//			// keep incrementing until block is at least one pixel high
+//			if (ynext == ystart) {
+//				continue;
+//			}
+//
+//			// xnext will hold the first pixel of the next block.
+//			int xnext = dest.x;
+//
+//			// arrayFirst holds first gene which contributes to this pixel.
+//			int arrayFirst = 0;
+//
+//			for (int array = 0; array < source.width; array++) {
+//
+//				final int xstart = xnext;
+//				xnext = dest.x + (dest.width + array * dest.width)
+//						/ source.width;
+//
+//				if (xnext == xstart) {
+//					continue;
+//				}
+//
+//				try {
+//					double val = 0;
+//					int count = 0;
+//
+//					for (int i = geneFirst; i <= gene; i++) {
+//
+//						for (int j = arrayFirst; j <= array; j++) {
+//
+//							int actualGene = source.y + i;
+//							if (geneOrder != null) {
+//								actualGene = geneOrder[actualGene];
+//							}
+//
+//							final double thisVal = dataMatrix.getValue(j
+//									+ source.x, actualGene);
+//
+//							if (TVModel.isEmpty(thisVal)) {
+//								val = DataModel.EMPTY;
+//								count = 1;
+//								break;
+//							}
+//							
+//							count++;
+//							val += thisVal;
+//
+//						}
+//
+//						if (TVModel.isEmpty(val)) {
+//							break;
+//						}
+//					}
+//
+//					if (count == 0) {
+//						val = DataModel.NAN;
+//
+//					} else {
+//						val /= count; // averaging here ?
+//					}
+//
+//					/* Getting the ARGB color based on the determined value */
+//					final int t_color = colorExtractor.getARGBColor(val);
+//
+//					for (int x = xstart; x < xnext; x++) {
+//
+//						for (int y = ystart; y < ynext; y++) {
+//
+//							pixels[x + y * scanSize] = t_color;
+//						}
+//					}
+//				} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
+//					LogBuffer.println("ArrayIndexOutOfBoundsException in "
+//									+ "paint() in DoubleArrayDrawer: "
+//									+ e.getMessage());
+//				}
+//				arrayFirst = array + 1;
+//			}
+//			geneFirst = gene + 1;
+//		}
 	}
 
 	/**
