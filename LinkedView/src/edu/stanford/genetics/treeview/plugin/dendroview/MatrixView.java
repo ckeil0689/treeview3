@@ -2,15 +2,19 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.awt.image.RasterFormatException;
 import java.util.Observable;
 
 import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingWorker;
 
 import net.miginfocom.swing.MigLayout;
 import ColorChooser.ColorChooserController;
+import Utilities.CustomDialog;
 import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelViewProduced;
@@ -38,6 +42,8 @@ public abstract class MatrixView extends ModelViewProduced {
 	protected ArrayDrawer drawer;
 
 	protected final JScrollPane scrollPane;
+	
+	private CustomDialog pixelUpdateDialog;
 
 	/**
 	 * Default so warnings do not pop up...
@@ -86,8 +92,8 @@ public abstract class MatrixView extends ModelViewProduced {
 			return;
 			
 		} else if (o instanceof ColorChooserController) {
-			LogBuffer.println("Observer notified of pixel update.");
 			pixelsChanged = true;
+			offscreenValid = false;
 
 		} else {
 			LogBuffer.println(viewName() + " got weird update : " + o);
@@ -96,11 +102,70 @@ public abstract class MatrixView extends ModelViewProduced {
 
 		repaint();
 	}
+	
+	@Override
+	protected void updateMatrix() {
+		
+		if (!offscreenValid) {
+
+			adjustPixelsToMaps();
+			revalidateScreen();
+			setSubImage();
+			
+			if(pixelsChanged) {
+				updatePixels();
+				pixelsChanged = false;
+			}
+		}
+			
+		xmap.notifyObservers();
+		ymap.notifyObservers();
+	}
 
 	@Override
 	protected void updatePixels() {
-		// TODO Auto-generated method stub
+		
+		pixelUpdateDialog = new CustomDialog("Matrix Colors");
+		String text = "Updating colors...";
+		pixelUpdateDialog.setIndicatorPanel(text);
+		
+		new PixelUpdater().execute();
+		
+		pixelUpdateDialog.setVisible(true);
 
+	}
+	
+	private class PixelUpdater extends SwingWorker<Void, Void> {
+
+		@Override
+		protected Void doInBackground() throws Exception {
+				
+			final Rectangle destRect = new Rectangle(0, 0,
+					xmap.getUsedPixels(), ymap.getUsedPixels());
+
+//			final Rectangle sourceRect = new Rectangle(xmap.getIndex(0),
+//					ymap.getIndex(0), xmap.getIndex(destRect.width)
+//							- xmap.getIndex(0), ymap.getIndex(destRect.height)
+//							- ymap.getIndex(0));
+			final Rectangle sourceRect = new Rectangle(0, 0, 
+					xmap.getMaxIndex() + 1, ymap.getMaxIndex() + 1);
+
+			if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
+				/* Set new offscreenPixels (pixel colors) */
+				drawer.paint(offscreenPixels, sourceRect, destRect,
+						offscreenScanSize);
+			}
+			return null;
+		}
+		
+		@Override
+		protected void done() {
+			
+			// Close dialog
+			pixelUpdateDialog.dispose();
+//			setChanged();
+//			notifyObservers();
+		}
 	}
 
 	@Override
@@ -147,8 +212,6 @@ public abstract class MatrixView extends ModelViewProduced {
 	 * MapContainers to minimum scale.
 	 */
 	public void resetView() {
-
-		LogBuffer.println("Resetting view: " + viewName());
 
 		xmap.setToMinScale();
 		ymap.setToMinScale();
@@ -243,13 +306,14 @@ public abstract class MatrixView extends ModelViewProduced {
 	 */
 	protected void adjustPixelsToMaps() {
 		
+		// correct for zero indexing
 		int x_tiles = xmap.getMaxIndex() + 1;
 		int y_tiles = ymap.getMaxIndex() + 1;
 		
 		int tileCount = x_tiles * y_tiles;
 		
 		if(offscreenPixels.length != tileCount) {
-			LogBuffer.println("Creating new Image.");
+			LogBuffer.println("Pixels will be adjusted to tile number.");
 			createNewBuffer(x_tiles, y_tiles);
 		}
 	}
@@ -261,7 +325,14 @@ public abstract class MatrixView extends ModelViewProduced {
 		int w = xmap.getNumVisible();
 		int h = ymap.getNumVisible();
 		
-		paintImage = ((BufferedImage)offscreenImage).getSubimage(x, y, w, h);
+		try {
+			paintImage = ((BufferedImage)offscreenImage).getSubimage(x, y, w, h);
+			
+		} catch(RasterFormatException e) {
+			LogBuffer.logException(e);
+			LogBuffer.println("x: " + x + " y: " + y + " w: " + w + " h: " + h);
+			paintImage = null;
+		}
 	}
 
 }

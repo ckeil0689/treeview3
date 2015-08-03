@@ -96,7 +96,6 @@ public abstract class ModelViewProduced extends ModelView {
 		offscreenImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 		WritableRaster raster = ((BufferedImage)offscreenImage).getRaster();
 		offscreenPixels = ((DataBufferInt)raster.getDataBuffer()).getData();
-		pixelsChanged = true;
 	}
 
 	/*
@@ -138,7 +137,7 @@ public abstract class ModelViewProduced extends ModelView {
 		g2d.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
 		
 		if (isEnabled()) {
-			if (pixelsChanged && (offscreenSize.width > 0) && (offscreenSize.height > 0)) {
+			if ((offscreenSize.width > 0) && (offscreenSize.height > 0)) {
 //				updatePixels();
 				updateMatrix();
 				offscreenValid = true;
@@ -162,5 +161,8 @@ public abstract class ModelViewProduced extends ModelView {
 	 */
 	abstract protected void updatePixels();
 	
+	/**
+	 * Method to adjust some matrix parameters regarding screen fit and mapping.
+	 */
 	abstract protected void updateMatrix();
 }

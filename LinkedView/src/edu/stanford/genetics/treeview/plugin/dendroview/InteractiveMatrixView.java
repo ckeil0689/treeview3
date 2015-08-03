@@ -238,59 +238,40 @@ public class InteractiveMatrixView extends MatrixView implements
 			}
 		}
 	}
-	
-	@Override
-	protected void updateMatrix() {
-		
-		if (!offscreenValid) {
-
-			adjustPixelsToMaps();
-			revalidateScreen();
-			setSubImage();
-			
-			if(pixelsChanged) {
-				updatePixels();
-				pixelsChanged = false;
-			}
-		}
-			
-		xmap.notifyObservers();
-		ymap.notifyObservers();
-	}
 
 	/**
 	 * This method updates a pixel buffer. The alternative is to update the
 	 * graphics object directly by calling updateBuffer.
 	 */
-	@Override
-	protected void updatePixels() {
-
-//		if (!offscreenValid) {
+//	@Override
+//	protected void updatePixels() {
 //
-//			adjustPixelsToMaps();
-//			revalidateScreen();
-//			setSubImage();
-
-			final Rectangle destRect = new Rectangle(0, 0,
-					xmap.getUsedPixels(), ymap.getUsedPixels());
-
-//			final Rectangle sourceRect = new Rectangle(xmap.getIndex(0),
-//					ymap.getIndex(0), xmap.getIndex(destRect.width)
-//							- xmap.getIndex(0), ymap.getIndex(destRect.height)
-//							- ymap.getIndex(0));
-			final Rectangle sourceRect = new Rectangle(0, 0, 
-					xmap.getMaxIndex() + 1, ymap.getMaxIndex() + 1);
-
-			if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
-				/* Set new offscreenPixels (pixel colors) */
-				drawer.paint(offscreenPixels, sourceRect, destRect,
-						offscreenScanSize);
-			}
-//		}
+////		if (!offscreenValid) {
+////
+////			adjustPixelsToMaps();
+////			revalidateScreen();
+////			setSubImage();
 //
-//		xmap.notifyObservers();
-//		ymap.notifyObservers();
-	}
+//			final Rectangle destRect = new Rectangle(0, 0,
+//					xmap.getUsedPixels(), ymap.getUsedPixels());
+//
+////			final Rectangle sourceRect = new Rectangle(xmap.getIndex(0),
+////					ymap.getIndex(0), xmap.getIndex(destRect.width)
+////							- xmap.getIndex(0), ymap.getIndex(destRect.height)
+////							- ymap.getIndex(0));
+//			final Rectangle sourceRect = new Rectangle(0, 0, 
+//					xmap.getMaxIndex() + 1, ymap.getMaxIndex() + 1);
+//
+//			if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
+//				/* Set new offscreenPixels (pixel colors) */
+//				drawer.paint(offscreenPixels, sourceRect, destRect,
+//						offscreenScanSize);
+//			}
+////		}
+////
+////		xmap.notifyObservers();
+////		ymap.notifyObservers();
+//	}
 
 	@Override
 	public synchronized void paintComposite(final Graphics g) {
@@ -430,7 +411,7 @@ public class InteractiveMatrixView extends MatrixView implements
 
 			sp = map.getPixel(selectionRange.get(0));
 			// last pixel of last block
-			ep = map.getPixel(selectionRange.get(selectionRange.size() - 1) + 1) - 1;
+			ep = map.getPixel(selectionRange.get(selectionRange.size() - 1) + 1);
 
 			if (ep < sp) {
 				ep = sp;

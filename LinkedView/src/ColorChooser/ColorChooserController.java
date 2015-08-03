@@ -33,7 +33,7 @@ implements ConfigNodePersistent {
 	private final ColorChooserUI colorChooserUI;
 	private final ColorPicker colorPicker;
 	
-	private CustomDialog drawColorsDialog;
+//	private CustomDialog drawColorsDialog;
 
 	/* Node for saved data */
 	private Preferences configNode;
@@ -183,13 +183,13 @@ implements ConfigNodePersistent {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 	
-			drawColorsDialog = new CustomDialog("Matrix Colors");
-			String text = "Updating colors...";
-			drawColorsDialog.setIndicatorPanel(text);
+//			drawColorsDialog = new CustomDialog("Matrix Colors");
+//			String text = "Updating colors...";
+//			drawColorsDialog.setIndicatorPanel(text);
 			
 			new ColorChanger().execute();
 			
-			drawColorsDialog.setVisible(true);
+//			drawColorsDialog.setVisible(true);
 		}
 	}
 	
@@ -208,8 +208,7 @@ implements ConfigNodePersistent {
 			LogBuffer.println("Changed colors.");
 			
 			// Close dialog
-			drawColorsDialog.dispose();
-			
+//			drawColorsDialog.dispose();
 			setChanged();
 			notifyObservers();
 		}

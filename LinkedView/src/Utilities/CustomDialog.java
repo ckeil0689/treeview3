@@ -86,6 +86,7 @@ public class CustomDialog extends JDialog {
 	public void setIndicatorPanel(final String message) {
 		
 		mainPanel.removeAll();
+		
 		JLabel indicator = GUIFactory.createLabel(message, GUIFactory.FONTM);
 		mainPanel.add(indicator, "push");
 		

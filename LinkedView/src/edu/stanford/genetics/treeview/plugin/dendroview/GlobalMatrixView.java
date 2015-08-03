@@ -97,57 +97,38 @@ public class GlobalMatrixView extends MatrixView {
 			}
 		}
 	}
-	
-	@Override
-	protected void updateMatrix() {
-		
-		if (!offscreenValid) {
 
-			adjustPixelsToMaps();
-			revalidateScreen();
-			setSubImage();
-			
-			if(pixelsChanged) {
-				updatePixels();
-				pixelsChanged = false;
-			}
-		}
-			
-		xmap.notifyObservers();
-		ymap.notifyObservers();
-	}
-
-	/**
-	 * This method updates a pixel buffer. The alternative is to update the
-	 * graphics object directly by calling updateBuffer.
-	 */
-	@Override
-	protected void updatePixels() {
-
-//		if (!offscreenValid) {
-
-//			revalidateScreen();
-//			adjustPixelsToMaps();
-//			setSubImage();
-
-			// LogBuffer.println("OFFSCREEN INVALID");
-			final Rectangle destRect = new Rectangle(0, 0,
-					xmap.getUsedPixels(), ymap.getUsedPixels());
-
-//			final Rectangle sourceRect = new Rectangle(xmap.getIndex(0),
-//					ymap.getIndex(0), xmap.getNumVisible(),
-//					ymap.getNumVisible());
-			final Rectangle sourceRect = new Rectangle(0, 0, 
-					xmap.getMaxIndex() + 1, ymap.getMaxIndex() + 1);
-
-			if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
-
-				/* Set new offscreenPixels (pixel colors) */
-				drawer.paint(offscreenPixels, sourceRect, destRect,
-						offscreenScanSize);
-			}
-//		}
-	}
+//	/**
+//	 * This method updates a pixel buffer. The alternative is to update the
+//	 * graphics object directly by calling updateBuffer.
+//	 */
+//	@Override
+//	protected void updatePixels() {
+//
+////		if (!offscreenValid) {
+//
+////			revalidateScreen();
+////			adjustPixelsToMaps();
+////			setSubImage();
+//
+//			// LogBuffer.println("OFFSCREEN INVALID");
+//			final Rectangle destRect = new Rectangle(0, 0,
+//					xmap.getUsedPixels(), ymap.getUsedPixels());
+//
+////			final Rectangle sourceRect = new Rectangle(xmap.getIndex(0),
+////					ymap.getIndex(0), xmap.getNumVisible(),
+////					ymap.getNumVisible());
+//			final Rectangle sourceRect = new Rectangle(0, 0, 
+//					xmap.getMaxIndex() + 1, ymap.getMaxIndex() + 1);
+//
+//			if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
+//
+//				/* Set new offscreenPixels (pixel colors) */
+//				drawer.paint(offscreenPixels, sourceRect, destRect,
+//						offscreenScanSize);
+//			}
+////		}
+//	}
 
 	@Override
 	public void update(Observable o, Object arg) {
