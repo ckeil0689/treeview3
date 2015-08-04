@@ -63,7 +63,7 @@ public abstract class MatrixView extends ModelViewProduced {
 		panel.setBorder(BorderFactory.createEtchedBorder());
 		panel.setBackground(GUIFactory.ELEMENT_HOV);
 		
-		pixelsChanged = true; // trigger pixel update upon first instantiation
+		//pixelsChanged = true; // trigger pixel update upon first instantiation
 	}
 
 	@Override
@@ -377,6 +377,11 @@ public abstract class MatrixView extends ModelViewProduced {
 			LogBuffer.println("x: " + x + " y: " + y + " w: " + w + " h: " + h);
 			paintImage = null;
 		}
+	}
+	
+	public void setPixelsChanged() {
+		
+		this.pixelsChanged = true;
 	}
 
 }

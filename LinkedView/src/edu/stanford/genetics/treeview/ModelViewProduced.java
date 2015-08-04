@@ -98,6 +98,7 @@ public abstract class ModelViewProduced extends ModelView {
 		offscreenImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 		WritableRaster raster = ((BufferedImage)offscreenImage).getRaster();
 		offscreenPixels = ((DataBufferInt)raster.getDataBuffer()).getData();
+		pixelsChanged = true;
 	}
 
 	/*
@@ -124,7 +125,7 @@ public abstract class ModelViewProduced extends ModelView {
 		if ((offscreenImage == null) || (reqSize.width != offscreenSize.width)
 				|| (reqSize.height != offscreenSize.height)) {
 			offscreenSize = reqSize;
-			ensureCapacity();//offscreenSize); ///dont call rn because the sizing should later be done by drawImage()
+			ensureCapacity();//offscreenSize); 
 			offscreenChanged = true;
 			offscreenValid = false;
 
@@ -138,8 +139,6 @@ public abstract class ModelViewProduced extends ModelView {
 		
 		if (isEnabled()) {
 			if ((offscreenSize.width > 0) && (offscreenSize.height > 0)) {
-//				updatePixels();
-				LogBuffer.println("Matrix Update");
 				updateMatrix();
 				offscreenValid = true;
 			}

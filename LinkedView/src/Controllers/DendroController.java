@@ -143,6 +143,10 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		 */
 		// setSavedScale();
 
+		/**
+		 * make sure pixel colors are calculated after new model was loaded. 
+		 */
+		dendroView.updateMatrixPixels();
 		/*
 		 * Needs to wait for repaint() called from resetMapContainer() and
 		 * component listener. TODO implement resetMapContainer/ setSavedScale

@@ -249,6 +249,12 @@ public class DendroView implements Observer, DendroPanel {
 		globalMatrixView.resetView();
 		globalMatrixView.repaint();
 	}
+	
+	public void updateMatrixPixels() {
+		
+		interactiveMatrixView.setPixelsChanged();
+		globalMatrixView.setPixelsChanged();
+	}
 
 	/**
 	 * Returns the dendroPane so it can be displayed in TVFrame.
