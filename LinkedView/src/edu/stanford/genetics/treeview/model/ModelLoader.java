@@ -227,6 +227,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		/* ----- Tree file and config stuff ---- */
 
 		// Parse the CDT File
+		/* TODO wrap in try-catch */
 		parseCDT(stringLabels);
 
 		// If present, parse ATR File

@@ -609,7 +609,7 @@ public class TVModel extends Observable implements DataModel {
 
 				for (int i = 0; i < nGene; i++) {
 					for (int j = 0; j < nExpr; j++) {
-
+						
 						final double dataPoint = exprData[i][j];
 						
 						if(!Double.isNaN(dataPoint) 
@@ -646,7 +646,7 @@ public class TVModel extends Observable implements DataModel {
 		 */
 		private double calculateMedian(double[][] data) {
 			
-			double median = Double.NaN;
+			double result = Double.NaN;
 			
 			final int nGene = nGene();
 			final int nExpr = nExpr();
@@ -660,24 +660,51 @@ public class TVModel extends Observable implements DataModel {
 			
 			for (int i = 0; i < nGene; i++) {
 				for (int j = 0; j < nExpr; j++) {
-
 					newData[nExpr * i + j] = exprData[i][j];
 				}
 			}
-			
 			Arrays.sort(newData); /* Good night cpu...*/
+			
+			newData = correctData(newData);
 			
 			/* Even length case */
 			if(newData.length % 2 == 0) {
 				int idxLeft = newData.length / 2;
 				int idxRight = (newData.length / 2) + 1;
-				median = (newData[idxLeft] + newData[idxRight]) / 2;
+				result = (newData[idxLeft] + newData[idxRight]) / 2;
 				
 			} else {
-				median = newData[newData.length / 2];
+				result = newData[newData.length / 2];
 			}
 			
-			return Helper.roundDouble(median, 4);
+			return Helper.roundDouble(result, 4);
+		}
+		
+		/**
+		 * This method truncates a sorted array at the first occurrence of
+		 * NaN or Infinity as defined in the Double class.
+		 * @param data
+		 * @return A truncated data array.
+		 */
+		private double[] correctData(final double[] data) {
+			
+			int idx = data.length;
+			
+			/* find first NaN or nfinity value */
+			for(int i = 0; i < data.length; i++) {
+				
+				double dataPoint = data[i];
+				if(Double.isNaN(dataPoint) 
+						|| Double.isInfinite(dataPoint)) {
+					idx = i;
+					break;
+				}
+			}
+			
+			double[] correctedData = new double[idx];
+			Arrays.copyOfRange(data, 0, idx);
+			
+			return correctedData;
 		}
 
 		@Override
