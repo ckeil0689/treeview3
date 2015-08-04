@@ -1982,6 +1982,20 @@ public class MapContainer extends Observable implements Observer,
 	}
 
 	/**
+	 * @return the overRowLabels
+	 */
+	public boolean isOverRowLabels() {
+		return overRowLabels;
+	}
+
+	/**
+	 * @return the overRowLabels
+	 */
+	public boolean isOverColLabels() {
+		return overColLabels;
+	}
+
+	/**
 	 * @return the hoverIndex
 	 */
 	public int getHoverIndex() {

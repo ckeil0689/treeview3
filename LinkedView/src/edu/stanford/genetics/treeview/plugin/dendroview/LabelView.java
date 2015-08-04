@@ -171,10 +171,15 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBorder(null);
 
-		debug = 10;
+		debug = 16;
 		//Debug modes:
 		//9 = debug repaint timer intervals and updates to label panels
 		//10 = Debug label drawing issues when split pane divider adjusted
+		//12 = Debug issues where strings and indicator bar are starting in the wrong place
+		//13 = Debug negative label start positions when right-justified and split pane divider position's resultant label viewport size is slightly smaller than the longest label(s)
+		//14 = Debug position indicator not always drawn when data is large (number of rows per pixel > 1).
+		//15 = Debug overrun arrow position in non-label-port mode
+		//16 = Debug issue where short top-justified column labels are not visible after dragging the split pane divider to make the label area larger
 
 		panel = scrollPane;
 	}
@@ -728,25 +733,31 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		debug("Resetting justification for " + (isGeneAxis ? "ROW" : "COL") +
 		      "s!!!!",1);
 
+		//If the scale can accommodate the minimum font size and and can
+		//accommodate a fixed-font-size (if the font has a fixed size) or the
+		//label port is enabled
 		if(map.getScale() >= getMin() + SQUEEZE && !hasFixedOverlap ||
 		   doDrawLabelPort()) {
 
+			int lastFontSize          = lastDrawnSize; //Changed in getMaxStringLength (and via getLabelAreaSize())
 			final FontMetrics metrics = getFontMetrics(g.getFont());
 			final int ascent          = metrics.getAscent();
 			int maxStrLen             = getLabelAreaSize(metrics);
 			int realMaxStrLen         = getMaxStringLength(metrics);
+			int paneSizeShouldBe      = getLabelPaneContentSize(metrics);
 			boolean drawLabelPort     = doDrawLabelPort();
 			if(drawLabelPort) {
 				debug("Drawing a label port",1);
 			}
 
-			if(secondaryViewportSizeChanged()) {
+			//If the label pane's secondary dimension changed sizes or if the font size has changed
+			if(secondaryViewportSizeChanged() || lastFontSize != size) {
 				if(isGeneAxis)
 					debug("Viewport size change detected. Previous scroll positions: lastScrollRowPos [" + lastScrollRowPos + "] lastScrollRowEndPos [" + lastScrollRowEndPos + "] lastScrollRowEndGap [" + lastScrollRowEndGap + "]",10);
 				else
 					debug("Viewport size change detected. Previous scroll positions: lastScrollColPos [" + lastScrollColPos + "] lastScrollColEndPos [" + lastScrollColEndPos + "] lastScrollColEndGap [" + lastScrollColEndGap + "]",10);
 
-				adjustSecondaryScroll(realMaxStrLen + (drawLabelPort ? indicatorThickness : 0));
+				adjustSecondaryScroll(realMaxStrLen + (drawLabelPort ? indicatorThickness : labelIndent));
 
 				if(isGeneAxis)
 					debug("Viewport size change detected. New scroll positions: lastScrollRowPos [" + lastScrollRowPos + "] lastScrollRowEndPos [" + lastScrollRowEndPos + "] lastScrollRowEndGap [" + lastScrollRowEndGap + "]",10);
@@ -754,7 +765,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					debug("Viewport size change detected. New scroll positions: lastScrollColPos [" + lastScrollColPos + "] lastScrollColEndPos [" + lastScrollColEndPos + "] lastScrollColEndGap [" + lastScrollColEndGap + "]",10);
 			}
 
-			trackSecondaryPaneSize();
+			trackSecondaryPaneSize(realMaxStrLen + (drawLabelPort ? indicatorThickness : labelIndent));
 
 			if(isFixed) {
 				setSavedPoints(last_size);
@@ -932,7 +943,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 //						}
 //						//Subtracting 10 pixels because the labels are being drawn under the divider bar
 						int xPos = getLabelOffset(metrics.stringWidth(out));
-						debug("Label offset: [" + getLabelOffset(metrics.stringWidth(out)) + "]",7);
+						debug("Label offset 1: [" + getLabelOffset(metrics.stringWidth(out)) + "]",11);
 
 						int indexDiff = j - activeHoverDataIndex;
 						int yPos = hoverYPos + indexDiff *
@@ -957,10 +968,33 @@ public abstract class LabelView extends ModelView implements MouseListener,
 								g2d.setFont(new Font(face,style,size));
 							}
 							int labelStrStart = xPos + ((isGeneAxis == isRightJustified) ? (drawLabelPort ? indicatorThickness : labelIndent) * (isGeneAxis ? -1 : 1) : 0);
+							if(labelStrStart < 0) {
+								//This should not be necessary, but there's a miscalculation somewhere and this fixes it
+								/** TODO: Fix the bug that this code works around - use debug mode 13 */
+								labelStrStart = 0;
+							}
+							debug("Printing label [" + out + "] starting at labelStrStart [" + labelStrStart +
+							      "] (originally [" + xPos + "] before offset for right-just.) and length [" + metrics.stringWidth(out) + "], which has been offset by [" + ((isGeneAxis == isRightJustified) ? (drawLabelPort ? indicatorThickness : labelIndent) * (isGeneAxis ? -1 : 1) : 0) + "]" +
+							      " and is inside the offscreen pane size [" + paneSizeShouldBe + "] Actual rowPaneSize: [" + rowLabelPaneSize + "] colPaneSize: [" + rowLabelPaneSize + "]",13);
 							g2d.drawString(out,
 							               labelStrStart,
 							               yPos);
-							drawOverrunArrows(metrics.stringWidth(out),g,yPos - ascent,curFontSize,g2d.getColor(),bgColor,labelStrStart);
+//							//Don't draw the overrun arrows on the currently
+//							//hovered index for 2 reasons: 1. allow the user to
+//							//see more of a label of interest without scrolling.
+//							//2. Avoid confusion whereby the user thinks the
+//							//arrow does something by clicking on it
+//							if(j != activeHoverDataIndex ||
+//							   (!map.isOverRowLabels() &&
+//								!map.isOverColLabels())) {
+								drawOverrunArrows(metrics.stringWidth(out),
+								                  g,
+								                  yPos - ascent,
+								                  curFontSize,
+								                  g2d.getColor(),
+								                  bgColor,
+								                  labelStrStart);
+//							}
 						}
 
 					}
@@ -1006,7 +1040,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 //							xPos = stringX - metrics.stringWidth(out);
 //						}
 						int xPos = getLabelOffset(metrics.stringWidth(out));
-						debug("Label offset: [" + getLabelOffset(metrics.stringWidth(out)) + "]",7);
+						debug("Label offset 2: [" + getLabelOffset(metrics.stringWidth(out)) + "]",11);
 
 						int indexDiff = j - activeHoverDataIndex;
 						int yPos = hoverYPos + indexDiff *
@@ -1021,6 +1055,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 							}
 							g2d.setColor(labelColor);
 							int labelStrStart = xPos + ((isGeneAxis == isRightJustified) ? (drawLabelPort ? indicatorThickness : labelIndent) * (isGeneAxis ? -1 : 1) : 0);
+							if(labelStrStart < 0) {
+								//This should not be necessary, but there's a miscalculation somewhere and this fixes it
+								/** TODO: Fix the bug that this code works around - use debug mode 13 */
+								labelStrStart = 0;
+							}
 							g2d.drawString(out,
 							               labelStrStart,
 							               yPos);
@@ -1046,8 +1085,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 							out = "No Label";
 						}
 
+						bgColor = drawLabelBackground(g,j,map.getPixel(j));
+
 						/* Set label color */
-						if(drawSelection.isIndexSelected(j) ||
+						if((drawSelection.isIndexSelected(j) &&
+							doDrawLabelPort()) ||
 						   j == activeHoverDataIndex) {
 							if(colorIndex > 0) {
 								g.setColor(TreeColorer
@@ -1069,10 +1111,25 @@ public abstract class LabelView extends ModelView implements MouseListener,
 						}
 
 						/* Finally draw label (alignment-dependent) */
-						int xPos = labelIndent;
-						if(isRightJustified) {
-							xPos = stringX - metrics.stringWidth(out) - labelIndent;
+						int xPos = getLabelOffset(metrics.stringWidth(out));
+						debug("Label offset 3: [" + getLabelOffset(metrics.stringWidth(out)) + "]",11);
+
+						if(isGeneAxis) {
+							xPos -= labelIndent;
 						}
+						/** TODO: Not sure why I need to not adjust for the indent when top-justified. Move all this logic into getLabelOffset */
+						else if(!isRightJustified) {
+							xPos += labelIndent;
+						}
+
+						if(xPos < 0) {
+							xPos = 0;
+						}
+
+						//						int xPos = labelIndent;
+//						if(isRightJustified) {
+//							xPos = stringX - metrics.stringWidth(out) - labelIndent;
+//						}
 
 //						debug("Drawing " +
 //						                  (isGeneAxis ? "ROW" : "COL") +
@@ -1087,8 +1144,15 @@ public abstract class LabelView extends ModelView implements MouseListener,
 //						                  (indicatorThickness *
 //						                   (isGeneAxis ? -1 : 1)) + "].");
 						g2d.drawString(out,xPos,map.getMiddlePixel(j) + ascent /
-						                        2);
+						               2);
 
+						drawOverrunArrows(metrics.stringWidth(out),
+						                  g,
+						                  map.getMiddlePixel(j) - ascent / 2,
+						                  curFontSize,
+						                  g2d.getColor(),
+						                  bgColor,
+						                  xPos);
 					}
 					catch(final java.lang.ArrayIndexOutOfBoundsException e) {
 						LogBuffer.logException(e);
@@ -1101,7 +1165,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			      "] height [" + offscreenSize.height + "] width [" +
 			      offscreenSize.width + "]",1);
 
-			//I MIGHT resurect some or all of the following commented code
+			//I MIGHT resurrect some or all of the following commented code
 			//depending on feedback from the next meeting (after 6/18/2015)
 			//Other associated commented code exists elsewhere too
 
@@ -1119,7 +1183,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 					//Switch to the background color
 					g2d.setColor(textBGColor);
-					//Draw a background box to blank-out and partially scrolled labels
+					//Draw a background box to blank-out any partially scrolled labels
 					g.fillRect(
 							lastScrollColEndGap,
 							0,//start * (curFontSize + SQUEEZE) - 1,
@@ -1195,12 +1259,18 @@ public abstract class LabelView extends ModelView implements MouseListener,
 //							}
 //							//g2d.setColor(hoverTextFGColor);
 //						} else {
+							int indwidth = map.getPixel(matrixPixel + 1) -
+								map.getPixel(matrixPixel);
+							if(indwidth < 1) {
+								indwidth = 1;
+							}
+							debug("Drawing position indicator 1",14);
 							g.fillRect(
 									lastScrollColEndGap,
 									matrixPixel,
 									/* (outOfBounds ?
 											(int) Math.ceil(matrixBarThickness / 2) + 1 : */ matrixBarThickness + 1 /* ) */,
-									map.getPixel(matrixPixel + 1) - map.getPixel(matrixPixel));
+									indwidth);
 									//(int) Math.round(map.getScale()));
 //						}
 //						if(!outOfBounds) {
@@ -1276,7 +1346,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					//Switch to the background color
 					g2d.setColor(textBGColor);
 					//resetJustification = (secondaryScrollPos == 0 && secondaryScrollEndGap == 0);
-					//Draw a background box to blank-out and partially scrolled labels
+					//Draw a background box to blank-out any partially scrolled labels
 //					LogBuffer.println("Starting indicator drawing at position [" + (secondaryScrollEndPos - indicatorThickness) + "]");
 					g.fillRect(
 							lastScrollRowEndPos - indicatorThickness,
@@ -1325,13 +1395,19 @@ public abstract class LabelView extends ModelView implements MouseListener,
 						int matrixPixel = /* start * (curFontSize + SQUEEZE) + */ map.getPixel(activeHoverDataIndex);
 //						int labelPixel = activeHoverDataIndex * (curFontSize + SQUEEZE);
 //						boolean outOfBounds = activeHoverDataIndex > end || activeHoverDataIndex < start;
+						int indwidth = map.getPixel(matrixPixel + 1) -
+							map.getPixel(matrixPixel);
+						if(indwidth < 1) {
+							indwidth = 1;
+						}
+						debug("Drawing position indicator",14);
 						g.fillRect(
 								lastScrollRowEndPos - /* (outOfBounds ?
 										(int) Math.ceil(matrixBarThickness / 2) : */ matrixBarThickness /* ) */ - 1,
 								matrixPixel,
 								/* (outOfBounds ?
 										(int) Math.ceil(matrixBarThickness / 2) : */ matrixBarThickness /* ) */ + 1,
-								map.getPixel(matrixPixel + 1) - map.getPixel(matrixPixel));
+								indwidth);
 								//(int) Math.round(map.getScale()));
 //						if(!outOfBounds) {
 //							//Draw the hover label position indicator
@@ -1371,9 +1447,28 @@ public abstract class LabelView extends ModelView implements MouseListener,
 //						}
 					}
 				}
+			} else {
+				//Switch to the background color
+				g2d.setColor(textBGColor);
+				//Draw a background box to blank-out any partially scrolled labels
+				if(isGeneAxis) {
+					debug("Blanking out the indent at position [" + (lastScrollRowEndPos - labelIndent) + "]",15);
+					g.fillRect(
+							lastScrollRowEndPos - labelIndent,
+							0,
+							labelIndent,
+							offscreenSize.height);//(end + 1) * (curFontSize + SQUEEZE));
+				} else {
+					debug("Blanking out the indent at position [" + lastScrollColEndGap + "]",15);
+					g.fillRect(
+							lastScrollColEndGap,
+							0,
+							labelIndent,
+							offscreenSize.width);//(end + 1) * (curFontSize + SQUEEZE));
+				}
 			}
 
-			//I MIGHT resurect some or all of the preceding commented code
+			//I MIGHT resurrect some or all of the preceding commented code
 			//depending on feedback from the next meeting (after 6/18/2015)
 			//Other associated commented code exists elsewhere too
 
@@ -1419,10 +1514,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			g.setFont(new Font(face,style,HINTFONTSIZE));
 			g2d.setColor(Color.black);
 
-			int xPos = getHintX(g2d,stringX);
+			int xPos = getHintX(g2d,(isGeneAxis ? offscreenSize.width : offscreenSize.height));
 			int yPos = getHintY(g2d);
 			final FontMetrics metrics = getFontMetrics(g2d.getFont());
-			boolean isBeginJustified;
 			int scrollSize;
 
 			if(isGeneAxis) {
@@ -1432,7 +1526,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				                               scrollPane.getViewport()
 				                                         .getSize().height));
 
-				isBeginJustified = isRightJustified;
 				scrollSize = offscreenSize.width;
 				//After rotate, the current width will be the "height" and the
 				//zero point we need to calculate from is the bottom left of the
@@ -1457,7 +1550,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				                               scrollPane.getViewport()
 				                               .getSize().height));
 
-				isBeginJustified = !isRightJustified;
 				scrollSize = offscreenSize.height;
 				xPos = (offscreenSize.width -
 				        metrics.stringWidth(zoomHint)) / 2;
@@ -1468,16 +1560,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				      "] width [" + offscreenSize.width +
 				      "] + HintStrLen [" + metrics.stringWidth(zoomHint) + "]",
 				      3);
-			}
-
-			if(isBeginJustified) {
-				for(int i = scrollSize - yPos;i > 0;i -= yPos * 2) {
-					g2d.drawString(zoomHint,xPos,i);
-				}
-			} else {
-				for(int i = yPos;i < scrollSize;i += yPos * 2) {
-					g2d.drawString(zoomHint,xPos,i);
-				}
 			}
 
 			//Adding this useless scroll causes the pane size and scrollbar
@@ -1494,6 +1576,10 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			                                  secondaryLength,
 			                                  0,
 			                                  secondaryLength);
+
+			for(int i = yPos;i < scrollSize;i += yPos * 2) {
+				g2d.drawString(zoomHint,xPos,i);
+			}
 		}
 	}
 
@@ -1533,7 +1619,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				g.fillRect(0,
 				           yPos,
 				           (isGeneAxis ? rowLabelPaneSize : colLabelPaneSize),
-				           size + SQUEEZE);
+				           (doDrawLabelPort() ? size + SQUEEZE : map.getPixel(j + 1) - map.getPixel(j)));
 			} //else {
 			//	g.fillRect(0,
 			//	           yPos,
@@ -1805,33 +1891,50 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		return len > min ? len : min;
 	}
 
+	public int getLabelPaneContentSize(FontMetrics metrics) {
+		int min =
+			(isGeneAxis ? scrollPane.getViewport().getSize().width :
+						  scrollPane.getViewport().getSize().height);
+		int len = getMaxStringLength(metrics)
+			+ (doDrawLabelPort() ? indicatorThickness : labelIndent);
+		return len > min ? len : min;
+	}
+
 	public int getMaxStringLength(FontMetrics metrics) {
 		/* Draw the labels */
 		int end = map.getMaxIndex();
 		int maxStrLen = 0;
 		String maxStr = "";
+		//If nothing about the font has changed, calculate the length of the longest string
 		if(lastDrawnFace == face  && lastDrawnStyle == style &&
 		   longest_str_index > -1 && lastDrawnSize  == size &&
 			/* TODO: Assuming if the string is the same, it's the same overall
 		     * data - it would be better to catch when the data changes */
 			longest_str.equals(headerSummary.getSummary(headerInfo,
-		                                               longest_str_index))) {
+			                                            longest_str_index))) {
 			debug("Regurgitating maxstrlen",1);
 			maxStr = headerSummary.getSummary(headerInfo,longest_str_index);
 			maxStrLen = longest_str_length;
-		} else if(lastDrawnFace == face && lastDrawnStyle == style &&
-		          longest_str_index > -1 &&
-		          lastDrawnSize != size &&
-		          /* TODO: Assuming if the string is the same, it's the same
-				   * overall data - it would be better to catch when the data
-				   * changes */
-		          longest_str.equals(headerSummary.getSummary(headerInfo,
-		                                                      longest_str_index)
-		         )) {
+			debug("Everything fontwise is the same, including size [" + size + "]. returning saved maxStrLen [" + maxStrLen + "]",12);
+		}
+		//Else if the font size only has changed, recalculate the longest
+		//string's length
+		else if(lastDrawnFace == face && lastDrawnStyle == style &&
+		        longest_str_index > -1 &&
+		        lastDrawnSize != size &&
+		        /* TODO: Assuming if the string is the same, it's the same
+				 * overall data - it would be better to catch when the data
+				 * changes */
+		        longest_str.equals(headerSummary.getSummary(headerInfo,
+		                                                    longest_str_index))
+		       ) {
 			debug("Refining maxstrlen",1);
 			maxStr = headerSummary.getSummary(headerInfo,longest_str_index);
 			maxStrLen = metrics.stringWidth(maxStr);
-		} else {
+			debug("Font size only changed. Recalculating length of longest string [" + maxStr + "] & returning maxStrLen [" + maxStrLen + "]",12);
+		}
+		//Else find the longest string and return its length
+		else {
 			debug("Calculating maxstrlen because not [lastDrawnFace == face " +
 			      "&& lastDrawnStyle == style && longest_str_index > -1 && " +
 			      "lastDrawnSize != size && longest_str.equals(headerSummary." +
@@ -1865,10 +1968,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				}
 			}
 			longest_str = maxStr;
+			debug("Full-on recalculating [" + maxStr + "] maxStrLen [" + maxStrLen + "] at face [" + face + "] style [" + style + "] size [" + size + "]",12);
 		}
-		lastDrawnFace = face;
+		lastDrawnFace  = face;
 		lastDrawnStyle = style;
-		lastDrawnSize = size;
+		lastDrawnSize  = size;
 		longest_str_length = maxStrLen;
 		debug((isGeneAxis ? "ROW" : "COL") + ": MaxStrLen: [" + maxStrLen +
 		      "] MaxStr: [" + maxStr + "] Start Index: [" + 0 +
@@ -2180,7 +2284,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 * has changed
 	 */
 	public void adjustSecondaryScroll(int maxStrLen) {
-		debug("Resetting last secondary scroll position values",10);
+		debug("Resetting last secondary scroll position values",12);
 		if(isGeneAxis) {
 			//getSecondaryScrollBar().getModel().getExtent() and
 			//getSecondaryScrollBar().getMaximum() cannot be trusted because it
@@ -2294,14 +2398,18 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		return changed;
 	}
 
-	public void trackSecondaryPaneSize() {
+	public void trackSecondaryPaneSize(int paneSize) {
 		if(isGeneAxis) {
-			if(offscreenSize.width != rowLabelPaneSize) {
-				rowLabelPaneSize = offscreenSize.width;
+			if(offscreenSize.width != rowLabelPaneSize ||
+			   paneSize != rowLabelPaneSize) {
+			   rowLabelPaneSize    = paneSize;
+			   offscreenSize.width = paneSize;
 			}
 		} else {
-			if(offscreenSize.height != colLabelPaneSize) {
-				colLabelPaneSize = offscreenSize.height;
+			if(offscreenSize.height != colLabelPaneSize ||
+			   paneSize != colLabelPaneSize) {
+				colLabelPaneSize     = paneSize;
+				offscreenSize.height = paneSize;
 			}
 		}
 	}
@@ -2317,7 +2425,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		int indent = (doDrawLabelPort() ? indicatorThickness : labelIndent);
 		if(isGeneAxis) {
 			if(isRightJustified) {
-				debug("Right justified rows. Viewport size: [" + getSecondaryScrollBar().getModel().getExtent() + "] Pane Size: [" + paneSize + "]",7);
+				debug("Right justified rows. Viewport size: [" + getSecondaryScrollBar().getModel().getExtent() + "] Pane Size: [" + paneSize + "]",11);
 				if(lastScrollRowEndPos != -1 && lastScrollRowPos != -1 &&
 					labelLen > (/* Extent */ lastScrollRowEndPos - lastScrollRowPos)) {
     				if(lastScrollRowPos != -1 &&
@@ -2331,7 +2439,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				}
 			} else {
 				labelLen += indent;
-				debug("Left justified rows. Viewport size: [" + getSecondaryScrollBar().getModel().getExtent() + "] Pane Size: [" + paneSize + "]",7);
+				debug("Left justified rows. Viewport size: [" + getSecondaryScrollBar().getModel().getExtent() + "] Pane Size: [" + paneSize + "]",11);
 				if(lastScrollRowEndPos != -1 && lastScrollRowPos != -1 &&
 					labelLen > (/* Extent */ lastScrollRowEndPos - lastScrollRowPos)) {
 					if(lastScrollRowEndPos != -1 && lastScrollRowEndPos > labelLen) {
@@ -2343,21 +2451,24 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			}
 		} else {
 			if(isRightJustified) {
-				debug("Top justified columns. Viewport size: [" + getSecondaryScrollBar().getModel().getExtent() + "] Pane Size: [" + paneSize + "]",7);
-				if(lastScrollColEndPos != 0 && lastScrollColPos != -1 &&
+				debug("Top justified columns. Viewport size: [" + getSecondaryScrollBar().getModel().getExtent() + "] Pane Size: [" + paneSize + "]",11);
+				if(lastScrollColEndPos != -1 && lastScrollColPos != -1 &&
 					(labelLen + indent) > (/* Extent */ lastScrollColEndPos - lastScrollColPos)) {
 					if(lastScrollColEndPos != -1 && (labelLen + indent) >= lastScrollColEndPos) {
 						offset = paneSize - labelLen;
+						debug("Setting offset to (paneSize - labelLen) [" + paneSize + " - " + labelLen + "] = [" + offset + "]",16);
 					} else {
 						offset = lastScrollColEndGap + indent;
+						debug("Setting offset to (lastScrollColEndGap + indent) [" + lastScrollColEndGap + " + " + indent + "] = [" + offset + "]",16);
 					}
 				} else {
 					offset = lastScrollColEndGap + (/* Extent */ lastScrollColEndPos - lastScrollColPos) - labelLen;
+					debug("Setting offset to (lastScrollColEndGap + (lastScrollColEndPos - lastScrollColPos) - labelLen) [" + lastScrollColEndGap + " + (" + lastScrollColEndPos + " - " + lastScrollColPos + ") - " + labelLen + "] = [" + offset + "]",16);
 				}
 				if(labelLen >= 390) debug("Got it! [" + labelLen + "]",7);
 			} else {
 				labelLen += indent;
-				debug("Bottom justified columns. Viewport size: [" + getSecondaryScrollBar().getModel().getExtent() + "] Pane Size: [" + paneSize + "]",7);
+				debug("Bottom justified columns. Viewport size: [" + getSecondaryScrollBar().getModel().getExtent() + "] Pane Size: [" + paneSize + "]",11);
 				if(lastScrollColEndPos != -1 && lastScrollColPos != -1 &&
 					labelLen > (/* Extent */ lastScrollColEndPos - lastScrollColPos)) {
 					if(lastScrollColPos < (paneSize - labelLen)) {
@@ -2414,6 +2525,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				if((lastScrollColEndGap + indentsize) > xPos) {
 					//Draw arrow on bottom
 					drawLeftArrow(g,yPos,paneSize - (lastScrollColEndPos - indentsize - 1),height,fgColor,bgColor);
+					debug("Drawing column left overrun arrow at position (paneSize - (lastScrollColEndPos - indentsize - 1)) [" + paneSize + " - (" + lastScrollColEndPos + " - " +indentsize + " - 1)] = [" + (paneSize - (lastScrollColEndPos - indentsize - 1)) + "]",15);
 				} else {
 					debug("No overrun arrow drawn because (lastScrollColEndGap != 0 && lastScrollColEndGap > xPos) [" + lastScrollColEndGap + " != 0 && " + lastScrollColEndGap + " > " + xPos + "] lastScrollColEndPos [" + lastScrollColEndPos + "] lastScrollColPos [" + lastScrollColPos + "]",10);
 				}
@@ -2429,8 +2541,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	public void drawLeftArrow(final Graphics g,int yTop,int xLeft,int height,Color fgColor,Color bgColor) {
 		//Drag a background box to cover up text that we're going to draw over
 		g.setColor(bgColor);
-		g.fillRect(xLeft - 1, //1 is a fudge factor - don't know why I need it
-		           yTop,(int) Math.floor(height / 2) + 1,height);
+		g.fillRect(xLeft - (isGeneAxis ? 0 : 1), //1 is a fudge factor for the x axis - don't know why I need it
+		           yTop,(int) Math.floor(height / 2) + 1,height + 1 /*Fudge factor to cover up underscores*/);
 		//Make the arrow a little smaller
 		height -= 2;
 		//Make sure there's an odd number of pixels
@@ -2458,14 +2570,18 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	public void drawRightArrow(final Graphics g,int yTop,int xRight,int height,Color fgColor,Color bgColor) {
 		//Drag a background box to cover up text that we're going to draw over
 		g.setColor(bgColor);
-		g.fillRect(xRight - (int) Math.floor(height / 2) - 1,yTop,(int) Math.floor(height / 2) + 3,height);
+		g.fillRect(xRight - (int) Math.floor(height / 2) -
+		           (isGeneAxis ? 0 : 1
+		                       /* Fudge factor for x axis - don't know why */),
+		           yTop,(int) Math.floor(height / 2) + 3,height + 1 /*Fudge factor to cover up underscores*/);
 		//Make the arrow a little smaller
 		height -= 2;
 		//Make sure there's an odd number of pixels
 		if(height % 2 == 0) {
 			height--;
 		}
-		//We can do a better job of drawing an equilateral triangle than the polygon method does by drawing smaller and smaller lines in a loop
+		//We can do a better job of drawing an equilateral triangle than the
+		//polygon method does by drawing smaller and smaller lines in a loop
 		g.setColor(fgColor);
 		int curheight = height;
 		int indent = 0;

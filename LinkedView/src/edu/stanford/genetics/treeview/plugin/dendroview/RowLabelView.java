@@ -497,7 +497,7 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 			}
 			debug("New scroll position [" + lastScrollRowPos + "] end pos: [" +
 			      lastScrollRowEndPos + "] end gap: [" + lastScrollRowEndGap +
-			      "] out of [" + getSecondaryScrollBar().getMaximum() + "]",2);
+			      "] out of [" + getSecondaryScrollBar().getMaximum() + "]",12);
 			paintImmediately(0, 0, getWidth(), getHeight());
 		} else {
 			//Value of label length scrollbar
@@ -513,7 +513,7 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 	}
 
 	public void explicitSecondaryScrollTo(int pos,int endPos,int endGap) {
-		debug("Explicitly scrolling to [" + pos + "]",2);
+		debug("Explicitly scrolling to [" + pos + "]",12);
 		if(pos < 0) pos = 0;
 		if(pos > (getSecondaryScrollBar().getMaximum() -
 		          getSecondaryScrollBar().getModel().getExtent())) {
