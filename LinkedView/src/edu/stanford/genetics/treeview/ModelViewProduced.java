@@ -58,11 +58,10 @@ public abstract class ModelViewProduced extends ModelView {
 	}
 
 	/**
-	 * this method sets up all the instance variables. XXX - THIS FAILS ON MAC
-	 * OS X since mac os x doesn't let you call getGraphics on the Image if it's
-	 * generated from a pixels array... hmm...
+	 * Ensures that the offscreenImage fits the screen dimensions. Creates a
+	 * new image with the current parameters saved in offscreenSize.
 	 */
-	protected void ensureCapacity() {//final Dimension req) {
+	protected void ensureCapacity() {
 
 		LogBuffer.println("Ensuring capacity");
 		Dimension req = offscreenSize;
@@ -154,6 +153,12 @@ public abstract class ModelViewProduced extends ModelView {
 		
 		paintComposite(g2d);
 	}
+	
+	/**
+	 * Set a reference for a selected subImage of the main BufferedImage
+	 * to be displayed in various forms.
+	 */
+	abstract protected void setSubImage();
 
 	/**
 	 * method to update the offscreenPixels. don't forget to call

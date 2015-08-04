@@ -62,8 +62,6 @@ public abstract class MatrixView extends ModelViewProduced {
 		panel = scrollPane;
 		panel.setBorder(BorderFactory.createEtchedBorder());
 		panel.setBackground(GUIFactory.ELEMENT_HOV);
-		
-		//pixelsChanged = true; // trigger pixel update upon first instantiation
 	}
 
 	@Override
@@ -126,13 +124,10 @@ public abstract class MatrixView extends ModelViewProduced {
 	@Override
 	protected void updatePixels() {
 		
+		/* TODO remove rectangle dependency of drawer. not needed. */
 		final Rectangle destRect = new Rectangle(0, 0,
 				xmap.getUsedPixels(), ymap.getUsedPixels());
-
-//				final Rectangle sourceRect = new Rectangle(xmap.getIndex(0),
-//						ymap.getIndex(0), xmap.getIndex(destRect.width)
-//								- xmap.getIndex(0), ymap.getIndex(destRect.height)
-//								- ymap.getIndex(0));
+		
 		final Rectangle sourceRect = new Rectangle(0, 0, 
 				xmap.getMaxIndex() + 1, ymap.getMaxIndex() + 1);
 
@@ -145,8 +140,6 @@ public abstract class MatrixView extends ModelViewProduced {
 
 	@Override
 	protected void updatePixelsWithHint() {
-		
-		LogBuffer.println("Updating pixels with hint..." + viewName());
 		
 		final HintDialog hint = new HintDialog("Updating Pixels...");
 		
@@ -346,6 +339,11 @@ public abstract class MatrixView extends ModelViewProduced {
 		}
 	}
 	
+	/**
+	 * If an image does not exist yet, it will be created here. Its dimensions
+	 * in pixels directly correspond to the axis dimensions of the loaded model.
+	 * This is relayed by the MapContainers.
+	 */
 	@Override
 	protected void ensureCapacity() {
 		
@@ -362,6 +360,7 @@ public abstract class MatrixView extends ModelViewProduced {
 	/**
 	 * Sets a reference for the sub image which is bound by the MapContainer.
 	 */
+	@Override
 	protected void setSubImage() {
 		
 		int x = xmap.getFirstVisible();
