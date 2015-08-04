@@ -138,6 +138,7 @@ public class DataImportDialog extends CustomDialog {
 		setStatus(DataImportDialog.LABELS_HINT);
 
 		proceedBtn = GUIFactory.createBtn("Proceed >");
+		proceedBtn.requestFocus();
 
 		buttonPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 		buttonPanel.add(closeBtn, "align left, pushx");

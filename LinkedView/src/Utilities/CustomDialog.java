@@ -71,7 +71,6 @@ public class CustomDialog extends JDialog {
 
 		pack();
 		setLocationRelativeTo(JFrame.getFrames()[0]);
-		closeBtn.requestFocus();
 
 		super.setVisible(visible);
 	}
