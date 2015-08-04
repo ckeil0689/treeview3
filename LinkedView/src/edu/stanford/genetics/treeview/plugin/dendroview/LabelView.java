@@ -178,7 +178,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBorder(null);
 
-		debug = 17;
+		debug = 0;
 		//Debug modes:
 		//9 = debug repaint timer intervals and updates to label panels
 		//10 = Debug label drawing issues when split pane divider adjusted

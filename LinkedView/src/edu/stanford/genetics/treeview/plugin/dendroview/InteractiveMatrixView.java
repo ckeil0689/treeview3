@@ -121,7 +121,7 @@ MouseWheelListener {
 		super();
 
 		setLabelPortMode(true);
-		debug = 10;
+		debug = 0;
 
 		/* Listeners for interactivity */
 		addMouseListener(new MatrixMouseListener());
@@ -378,16 +378,6 @@ MouseWheelListener {
 		}
 	}
 
-//	public boolean isLabelPortVisible() {
-//		return(inLabelPortMode() &&
-//			   (xmap.overALabelPortLinkedView() ||
-//			    ymap.overALabelPortLinkedView()) &&
-//			   xmap.getFirstVisible() != xmap.getFirstVisibleLabel() ||
-//			   xmap.getNumVisible()   != xmap.getNumVisibleLabels() ||
-//			   ymap.getFirstVisible() != ymap.getFirstVisibleLabel() ||
-//			   ymap.getNumVisible()   != ymap.getNumVisibleLabels());
-//	}
-
 	/**
 	 * Checks the selection of genes and arrays and calculates the appropriate
 	 * selection rectangle.
@@ -400,25 +390,6 @@ MouseWheelListener {
 			ymap.unsetHoverChanged();
 			return;
 		}
-//		if(!inLabelPortMode() || !isLabelPortVisible() ||
-//				(!xmap.overALabelPortLinkedView() && !ymap.overALabelPortLinkedView())) {
-//			labelPortRect   = null;
-//			labelPortCircle = null;
-//		} else {
-//
-//			labelPortRect =
-//					new Rectangle(
-//							xmap.getPixel(xmap.getFirstVisibleLabel()),
-//							ymap.getPixel(ymap.getFirstVisibleLabel()),
-//							(xmap.getPixel(xmap.getFirstVisibleLabel() +
-//							 xmap.getNumVisibleLabels()) -
-//							 xmap.getPixel(xmap.getFirstVisibleLabel())),
-//							(ymap.getPixel(ymap.getFirstVisibleLabel() +
-//							 ymap.getNumVisibleLabels()) -
-//							 ymap.getPixel(ymap.getFirstVisibleLabel())));
-//
-//			setLabelPortCircleBounds();
-//		}
 
 		if((geneSelection == null) || (arraySelection == null)) {
 			selectionRectList   = null;
@@ -427,8 +398,10 @@ MouseWheelListener {
 
 			selectionRectList = new ArrayList<Rectangle>();
 	
-			final int[] selectedArrayIndexes = arraySelection.getSelectedIndexes();
-			final int[] selectedGeneIndexes  = geneSelection.getSelectedIndexes();
+			final int[] selectedArrayIndexes =
+				arraySelection.getSelectedIndexes();
+			final int[] selectedGeneIndexes =
+				geneSelection.getSelectedIndexes();
 	
 			globalMatrixView.setIMVselectedIndexes(selectedArrayIndexes,
 												   selectedGeneIndexes);
@@ -442,18 +415,19 @@ MouseWheelListener {
 				List<List<Integer>> arrayBoundaryList;
 				List<List<Integer>> geneBoundaryList;
 	
-				arrayBoundaryList = findRectangleBoundaries(selectedArrayIndexes,
-						xmap);
-				geneBoundaryList = findRectangleBoundaries(selectedGeneIndexes,
-						ymap);
+				arrayBoundaryList =
+					findRectangleBoundaries(selectedArrayIndexes,xmap);
+				geneBoundaryList =
+					findRectangleBoundaries(selectedGeneIndexes,ymap);
 	
 				// Make the rectangles
 				if (selectionRectList != null) {
-					for (final List<Integer> xBoundaries : arrayBoundaryList) {
+					for(final List<Integer> xBoundaries : arrayBoundaryList) {
 	
-						for (final List<Integer> yBoundaries : geneBoundaryList) {
+						for(final List<Integer> yBoundaries : geneBoundaryList){
 	
-							selectionRectList.add(new Rectangle(xBoundaries.get(0),
+							selectionRectList
+								.add(new Rectangle(xBoundaries.get(0),
 									yBoundaries.get(0), xBoundaries.get(1)
 									- xBoundaries.get(0), yBoundaries
 									.get(1) - yBoundaries.get(0)));
@@ -637,7 +611,9 @@ MouseWheelListener {
 
 			// When left button is used
 			if (SwingUtilities.isLeftMouseButton(e)) {
-				debug("Mouse dragged. Updating hover indexes to [" + xmap.getIndex(e.getX()) + "x" + ymap.getIndex(e.getY()) + "]",4);
+				debug("Mouse dragged. Updating hover indexes to [" +
+				      xmap.getIndex(e.getX()) + "x" + ymap.getIndex(e.getY()) +
+				      "]",4);
 				xmap.setHoverIndex(xmap.getIndex(e.getX()));
 				ymap.setHoverIndex(ymap.getIndex(e.getY()));
 
@@ -720,7 +696,9 @@ MouseWheelListener {
 
 			// if left button is used
 			if (SwingUtilities.isLeftMouseButton(e)) {
-				debug("Starting selecting, setting selection start to [" + xmap.getIndex(e.getX()) + "x" + ymap.getIndex(e.getY()) + "]",4);
+				debug("Starting selecting, setting selection start to [" +
+				      xmap.getIndex(e.getX()) + "x" + ymap.getIndex(e.getY()) +
+				      "]",4);
 				xmap.setSelecting(true);
 				ymap.setSelecting(true);
 				xmap.setSelectingStart(xmap.getIndex(e.getX()));
@@ -853,8 +831,8 @@ MouseWheelListener {
 	}
 
 	/**
-	 * Zooming when the mouse wheel is used in conjunction with the alt/option key.
-	 * Vertical scrolling if the shift key is not pressed.
+	 * Zooming when the mouse wheel is used in conjunction with the alt/option
+	 * key.  Vertical scrolling if the shift key is not pressed.
 	 */
 	@Override
 	public void mouseWheelMoved(final MouseWheelEvent e) {
@@ -1954,8 +1932,9 @@ MouseWheelListener {
 			//		"]. Panel dimensions: [" + getWidth() + "].");
 			//Now let's return the pixel indexes of the selection post-zoom
 			redrawPixelBounds[0] = xmap.getPixel(selecXStartIndex);
-			redrawPixelBounds[2] = (int) Math.round((double) numXSelectedIndexes *
-					pixelsPerXIndex) + 1; //Added 1 because sometimes inaccurate
+			redrawPixelBounds[2] =
+				(int) Math.round((double) numXSelectedIndexes *
+				pixelsPerXIndex) + 1; //Added 1 because sometimes inaccurate
 		} else {
 			redrawPixelBounds[0] = xmap.getPixel(prevXFirstVisible);
 			redrawPixelBounds[2] = (int) Math.round((double) prevXNumVisible *
@@ -1967,8 +1946,9 @@ MouseWheelListener {
 			//		"," + (startYPixel + numSelectedYPixels - 1) +
 			//		"]. Panel dimensions: [" + getHeight() + "].");
 			redrawPixelBounds[1] = ymap.getPixel(selecYStartIndex);
-			redrawPixelBounds[3] = (int) Math.round((double) numYSelectedIndexes *
-					pixelsPerYIndex) + 1; //Added 1 because sometimes inaccurate
+			redrawPixelBounds[3] =
+				(int) Math.round((double) numYSelectedIndexes *
+				pixelsPerYIndex) + 1; //Added 1 because sometimes inaccurate
 			//debug("Zoom redraw bounds before fix: [" +
 			//		redrawPixelBounds[0] + "," + redrawPixelBounds[1] + "," +
 			//		redrawPixelBounds[2] + "," + redrawPixelBounds[3] + "].");
@@ -2080,13 +2060,14 @@ MouseWheelListener {
 
 			for (final List<Integer> yBoundaries : geneBoundaryList) {
 
-				//debug("Preparing to create ellipse.");
-
-				// Width and height of rectangle which spans the Ellipse2D object
+				//Width and height of rectangle which spans the Ellipse2D
+				//object
 				h = (yBoundaries.get(1) - yBoundaries.get(0));
 
 				if(w < 20 && h < 20 &&
-				   //This is not the first selection and the last selection is far away OR this is the first selection and the next selection either doesn't exists or is far away
+				   //This is not the first selection and the last selection is
+					//far away OR this is the first selection and the next
+					//selection either doesn't exists or is far away
 				   ((lastxb >= 0 &&
 				     Math.abs(xBoundaries.get(0) - lastxb) > 20) ||
 				    (lastxb < 0 &&
@@ -2103,11 +2084,7 @@ MouseWheelListener {
 					x = xBoundaries.get(0) + (w / 2.0) - 20;
 					y = yBoundaries.get(0) + (h / 2.0) - 20;
 
-					//debug("Ellipse created at [" + x + "x" + y + "] and is dimensions [" + w + "x" + h + "].");
-
 					indicatorCircleList.add(new Ellipse2D.Double(x, y, 40, 40));
-				//} else {
-					//debug("Selection was too big [" + w + "x" + h + "] or [(" + xBoundaries.get(1) + " - " + xBoundaries.get(0) + ") x (" + yBoundaries.get(1) + " - " + yBoundaries.get(0) + ")].");
 				}
 				lastyb = yBoundaries.get(1);
 			}

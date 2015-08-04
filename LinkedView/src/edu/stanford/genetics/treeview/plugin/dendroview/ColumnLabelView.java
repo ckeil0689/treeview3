@@ -26,7 +26,8 @@ import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.UrlExtractor;
 
-public class ColumnLabelView extends LabelView implements MouseWheelListener, AdjustmentListener {
+public class ColumnLabelView extends LabelView implements MouseWheelListener,
+	AdjustmentListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -65,8 +66,9 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 						/* Start waiting for delay millis to elapse and then
 						 * call actionPerformed of the ActionListener
 						 * "paneLabelPortOffListener". */
-						overScrollLabelPortOffTimer = new Timer(labelPortOffDelay,
-								scrollLabelPortOffListener);
+						overScrollLabelPortOffTimer =
+							new Timer(labelPortOffDelay,
+							          scrollLabelPortOffListener);
 						overScrollLabelPortOffTimer.start();
 					}
 				}
@@ -109,7 +111,8 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 				}
 			}
 
-			//I had mouseDragged here, but is NOT EVEN CALLED during a scrollbar drag!!! - Hence it's useless!
+			//I had mouseDragged here, but is NOT EVEN CALLED during a scrollbar
+			//drag!!! - Hence it's useless!
 		});
 
 		getSecondaryScrollBar().addAdjustmentListener(this);
@@ -153,32 +156,13 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 		}
 	}
 
-//	//This catches scrollbar drag events and updates the cursor position because
-//	//there's not way to get cursor position directly from the scrollbar
-//	//dragging code
-//	@Override
-//	public void updateBuffer(final Graphics g,final Dimension offscreenSize) {
-//		if(areLabelsBeingScrolled()) {
-//			Point p = MouseInfo.getPointerInfo().getLocation();
-//			SwingUtilities.convertPointFromScreen(p,getComponent());
-//			debug("Cursor x coordinate relative to column labels: [" + p.x + "]",8);
-//			int hDI = map.getIndex(p.x); //Hover Data Index
-//			if(hDI > map.getMaxIndex()) {
-//				hDI = map.getMaxIndex();
-//			} else if (hDI < 0) {
-//				hDI = 0;
-//			}
-//			map.setHoverIndex(hDI);
-//		}
-//		super.updateBuffer(g,offscreenSize);
-//	}
-
 	public boolean areLabelsBeingScrolled() {
 		return(map.areColLabelsBeingScrolled());
 	}
 
 	public void updatePrimaryHoverIndexDuringScrollDrag() {
-		//If the labels are being scrolled, you must manually retrieve the cursor position
+		//If the labels are being scrolled, you must manually retrieve the
+		//cursor position
 		if(areLabelsBeingScrolled()) {
 			forceUpdatePrimaryHoverIndex();
 		}
@@ -215,7 +199,9 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 		@Override
 		public void actionPerformed(ActionEvent evt) {
 			if (evt.getSource() == paneLabelPortOffTimer) {
-				debug("You hovered off the col label pane 1s ago, so the label port might turn off unless you're over another pane that activates it",2);
+				debug("You hovered off the col label pane 1s ago, so the " +
+				      "label port might turn off unless you're over another " +
+				      "pane that activates it",2);
 				/* Stop timer */
 				paneLabelPortOffTimer.stop();
 				paneLabelPortOffTimer = null;
@@ -228,13 +214,16 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 		}
 	};
 
-	//And this listener is for hovers over the secondary scrollbar, since they each are independent with regard to hovering on or off them
+	//And this listener is for hovers over the secondary scrollbar, since they
+	//each are independent with regard to hovering on or off them
 	private javax.swing.Timer overScrollLabelPortOffTimer;
 	ActionListener scrollLabelPortOffListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent evt) {
 			if (evt.getSource() == overScrollLabelPortOffTimer) {
-				debug("You hovered off the secondary col scrollbar 1s ago, so the label port might turn off unless you're over another pane that activates it",2);
+				debug("You hovered off the secondary col scrollbar 1s ago, " +
+				      "so the label port might turn off unless you're over " +
+				      "another pane that activates it",2);
 				/* Stop timer */
 				overScrollLabelPortOffTimer.stop();
 				overScrollLabelPortOffTimer = null;
@@ -247,13 +236,17 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 		}
 	};
 
-	//And this listener is for click releases off the secondary scrollbar, because they can hover off the scrollbar and you don't want the knob and labels to disappear while dragging the knob
+	//And this listener is for click releases off the secondary scrollbar,
+	//because they can hover off the scrollbar and you don't want the knob and
+	//labels to disappear while dragging the knob
 	private javax.swing.Timer activeScrollLabelPortOffTimer;
 	ActionListener activeLabelPortOffListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent evt) {
 			if (evt.getSource() == activeScrollLabelPortOffTimer) {
-				debug("You released the secondary col scrollbar 1s ago, so the label port might turn off unless you're over another pane that activates it",6);
+				debug("You released the secondary col scrollbar 1s ago, so " +
+				      "the label port might turn off unless you're over " +
+				      "another pane that activates it",6);
 				/* Stop timer */
 				activeScrollLabelPortOffTimer.stop();
 				activeScrollLabelPortOffTimer = null;
@@ -500,7 +493,8 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 		lastScrollColEndGap = endGap;
 	}
 
-	/* TODO: Eliminate this and use adjustmentValueChanged instead because it is more holistic */
+	/* TODO: Eliminate this and use adjustmentValueChanged instead because it is
+	 * more holistic */
 	@Override
 	public void mouseWheelMoved(final MouseWheelEvent e) {
 
@@ -521,7 +515,8 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 				shift = -j;
 			} else if(j + shift + getSecondaryScrollBar().getModel().getExtent()
 			          > getSecondaryScrollBar().getMaximum()) {
-				shift = getSecondaryScrollBar().getMaximum() - (j + getSecondaryScrollBar().getModel().getExtent());
+				shift = getSecondaryScrollBar().getMaximum() -
+					(j + getSecondaryScrollBar().getModel().getExtent());
 			}
 			if(shift == 0) return;
 			debug("Scrolling vertically from [" + j + "] by [" + shift + "]",1);
@@ -541,9 +536,10 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 				lastScrollColPos = 0;
 			}
 			getSecondaryScrollBar().setValue(j + shift);
-			debug("New secondary col scroll position [" + lastScrollColPos + "] end pos: [" +
-			      lastScrollColEndPos + "] end gap: [" + lastScrollColEndGap +
-			      "] out of [" + getSecondaryScrollBar().getMaximum() + "]",1);
+			debug("New secondary col scroll position [" + lastScrollColPos +
+			      "] end pos: [" + lastScrollColEndPos + "] end gap: [" +
+			      lastScrollColEndGap + "] out of [" +
+			      getSecondaryScrollBar().getMaximum() + "]",1);
 			//paintImmediately(0, 0, getWidth(), getHeight());
 		}
 
@@ -566,8 +562,8 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 			updateScroll = true;
 			explicitSecondaryScrollTo(oldvalue,-1,-1);
 		}
-		//This gets ANY other scroll event, even programmatic scrolls called from
-		//the code, but we only want to do anything when the scrollbar is
+		//This gets ANY other scroll event, even programmatic scrolls called
+		//from the code, but we only want to do anything when the scrollbar is
 		//clicked - everything else is either the scroll wheel or a coded re-
 		//scroll that we don't want to change anything
 		else {
@@ -577,24 +573,27 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 				int type = evt.getAdjustmentType();
 				switch(type) {
     				case AdjustmentEvent.UNIT_INCREMENT:
-    					System.out.println("Scrollbar was increased by one unit");
+    					debug("Scrollbar was increased by one unit",1);
     					break;
     				case AdjustmentEvent.UNIT_DECREMENT:
-    					System.out.println("Scrollbar was decreased by one unit");
+    					debug("Scrollbar was decreased by one unit",1);
     					break;
     				case AdjustmentEvent.BLOCK_INCREMENT:
-    					System.out.println("Scrollbar was increased by one block");
+    					debug("Scrollbar was increased by one block",1);
     					break;
     				case AdjustmentEvent.BLOCK_DECREMENT:
-    					System.out.println("Scrollbar was decreased by one block");
+    					debug("Scrollbar was decreased by one block",1);
     					break;
     				case AdjustmentEvent.TRACK:
-    					System.out.println("A non-scrollbar scroll event was detected (a call from code or a mouse wheel event)");
+    					debug("A non-scrollbar scroll event was detected (a " +
+    					      "call from code or a mouse wheel event)",1);
     					updateScroll = false;
     					break;
 				}
 				if(updateScroll) {
-					debug("Scrolling from: [" + source.getValue() + " or (" + oldvalue + ")" + "] to: [" + newvalue + "] via [" + evt.getSource() + "]",7);
+					debug("Scrolling from: [" + source.getValue() + " or (" +
+					      oldvalue + ")" + "] to: [" + newvalue + "] via [" +
+					      evt.getSource() + "]",7);
 					explicitSecondaryScrollTo(newvalue,-1,-1);
 				}
 			}
@@ -605,7 +604,8 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 		}
 	}
 
-	//This is an attempt to get the dragging of the scroll handle to correctly redraw the labels in the correct positions
+	//This is an attempt to get the dragging of the scroll handle to correctly
+	//redraw the labels in the correct positions
 	private int updateDragScrollInterval = 10;  // update every X milliseconds
 	private Timer updateDragScrollTimer =
 		new Timer(updateDragScrollInterval,
@@ -613,7 +613,9 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener, Ad
 			@Override
 			public void
 			actionPerformed(ActionEvent e) {
-				explicitSecondaryScrollTo(getSecondaryScrollBar().getValue(),-1,-1);
+				explicitSecondaryScrollTo(getSecondaryScrollBar().getValue(),
+				                          -1,
+				                          -1);
 				repaint();
 			}
 		});

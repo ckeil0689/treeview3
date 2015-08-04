@@ -24,7 +24,8 @@ import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.UrlExtractor;
 
-public class RowLabelView extends LabelView implements MouseWheelListener, AdjustmentListener {
+public class RowLabelView extends LabelView implements MouseWheelListener,
+	AdjustmentListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -63,8 +64,9 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 						/* Start waiting for delay millis to elapse and then
 						 * call actionPerformed of the ActionListener
 						 * "paneLabelPortOffListener". */
-						overScrollLabelPortOffTimer = new Timer(labelPortOffDelay,
-								scrollLabelPortOffListener);
+						overScrollLabelPortOffTimer =
+							new Timer(labelPortOffDelay,
+							          scrollLabelPortOffListener);
 						overScrollLabelPortOffTimer.start();
 					}
 				}
@@ -218,13 +220,16 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 		}
 	};
 
-	//And this listener is for hovers over the secondary scrollbar, since they each are independent with regard to hovering on or off them
+	//And this listener is for hovers over the secondary scrollbar, since they
+	//each are independent with regard to hovering on or off them
 	private javax.swing.Timer overScrollLabelPortOffTimer;
 	ActionListener scrollLabelPortOffListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent evt) {
 			if (evt.getSource() == overScrollLabelPortOffTimer) {
-				debug("You hovered off the secondary row scrollbar 1s ago, so the label port might turn off unless you're over another pane that activates it",2);
+				debug("You hovered off the secondary row scrollbar 1s ago, " +
+				      "so the label port might turn off unless you're over " +
+				      "another pane that activates it",2);
 				/* Stop timer */
 				overScrollLabelPortOffTimer.stop();
 				overScrollLabelPortOffTimer = null;
@@ -237,13 +242,17 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 		}
 	};
 
-	//And this listener is for click releases off the secondary scrollbar, because they can hover off the scrollbar and you don't want the knob and labels to disappear while dragging the knob
+	//And this listener is for click releases off the secondary scrollbar,
+	//because they can hover off the scrollbar and you don't want the knob and
+	//labels to disappear while dragging the knob
 	private javax.swing.Timer activeScrollLabelPortOffTimer;
 	ActionListener activeLabelPortOffListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent evt) {
 			if (evt.getSource() == activeScrollLabelPortOffTimer) {
-				debug("You released the secondary row scrollbar 1s ago, so the label port might turn off unless you're over another pane that activates it",2);
+				debug("You released the secondary row scrollbar 1s ago, so " +
+				      "the label port might turn off unless you're over " +
+				      "another pane that activates it",2);
 				/* Stop timer */
 				activeScrollLabelPortOffTimer.stop();
 				activeScrollLabelPortOffTimer = null;
@@ -455,7 +464,8 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 		hoverPixel = e.getY();
 	}
 
-	/* TODO: Eliminate this and use adjustmentValueChanged instead because it is more holistic */
+	/* TODO: Eliminate this and use adjustmentValueChanged instead because it is
+	 * more holistic */
 	@Override
 	public void mouseWheelMoved(final MouseWheelEvent e) {
 
@@ -463,18 +473,19 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 		int shift = (notches < 0) ? -3 : 3;
 		debug("Scroll wheel event detected",1);
 
-		//LogBuffer.println("Detected [" + (e.isShiftDown() ? "horizontal" : "vertical") + "] scroll event");
 		// On macs' magic mouse, horizontal scroll comes in as if the shift was
 		// down
 		if(e.isShiftDown()) {
 			shift = (notches < 0) ? -6 : 6;
 			final int j = getSecondaryScrollBar().getValue();
-			/* TODO: If the following works, I need to copy it to ColumnLabelView's corresponding method */
+			/* TODO: If the following works, I need to copy it to
+			 * ColumnLabelView's corresponding method */
 			if(j + shift < 0) {
 				shift = -j;
 			} else if(j + shift + getSecondaryScrollBar().getModel().getExtent()
 			          > getSecondaryScrollBar().getMaximum()) {
-				shift = getSecondaryScrollBar().getMaximum() - (j + getSecondaryScrollBar().getModel().getExtent());
+				shift = getSecondaryScrollBar().getMaximum() -
+					(j + getSecondaryScrollBar().getModel().getExtent());
 			}
 			if(shift == 0) return;
 			debug("Scrolling horizontally from [" + j + "] by [" + shift + "]",
@@ -507,8 +518,10 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 
 		//revalidate();
 		//repaint();
-		//repaint wasn't always updating the last paint step, but paintImmediately (and an invokdeLater also) seems to work
-		//I think it's because the updateBuffer finds out if it needs to change anything from the map object
+		//repaint wasn't always updating the last paint step, but
+		//paintImmediately (and an invokdeLater also) seems to work
+		//I think it's because the updateBuffer finds out if it needs to change
+		//anything from the map object
 		//paintImmediately(0, 0, getWidth(), getHeight());
 	}
 
@@ -548,8 +561,8 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 			updateScroll = true;
 			explicitSecondaryScrollTo(oldvalue,-1,-1);
 		}
-		//This gets ANY other scroll event, even programmatic scrolls called from
-		//the code, but we only want to do anything when the scrollbar is
+		//This gets ANY other scroll event, even programmatic scrolls called
+		//from the code, but we only want to do anything when the scrollbar is
 		//clicked - everything else is either the scroll wheel or a coded re-
 		//scroll that we don't want to change anything
 		else {
@@ -559,23 +572,26 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 				int type = evt.getAdjustmentType();
 				switch(type) {
 					case AdjustmentEvent.UNIT_INCREMENT:
-						System.out.println("Scrollbar was increased by one unit");
+						debug("Scrollbar was increased by one unit",1);
 						break;
 					case AdjustmentEvent.UNIT_DECREMENT:
-						System.out.println("Scrollbar was decreased by one unit");
+						debug("Scrollbar was decreased by one unit",1);
 						break;
 					case AdjustmentEvent.BLOCK_INCREMENT:
-						System.out.println("Scrollbar was increased by one block");
+						debug("Scrollbar was increased by one block",1);
 						break;
 					case AdjustmentEvent.BLOCK_DECREMENT:
-						System.out.println("Scrollbar was decreased by one block");
+						debug("Scrollbar was decreased by one block",1);
 						break;
 					case AdjustmentEvent.TRACK:
-						System.out.println("A non-scrollbar scroll event was detected (a call from code or a mouse wheel event)");
+						debug("A non-scrollbar scroll event was detected (a " +
+						      "call from code or a mouse wheel event)",1);
 						updateScroll = false;
 						break;
 				}
-				debug("Scrolling from: [" + source.getValue() + " or (" + oldvalue + ")" + "] to: [" + newvalue + "] via [" + evt.getSource() + "]",7);
+				debug("Scrolling from: [" + source.getValue() + " or (" +
+				      oldvalue + ")" + "] to: [" + newvalue + "] via [" +
+				      evt.getSource() + "]",7);
 				if(updateScroll) {
 					explicitSecondaryScrollTo(newvalue,-1,-1);
 				}
@@ -586,7 +602,8 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 		}
 	}
 
-	//This is an attempt to get the dragging of the scroll handle to correctly redraw the labels in the correct positions
+	//This is an attempt to get the dragging of the scroll handle to correctly
+	//redraw the labels in the correct positions
 	private int updateDragScrollInterval = 10;  // update every X milliseconds
 	private Timer updateDragScrollTimer =
 		new Timer(updateDragScrollInterval,
@@ -594,7 +611,9 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 			@Override
 			public void
 			actionPerformed(ActionEvent e) {
-				explicitSecondaryScrollTo(getSecondaryScrollBar().getValue(),-1,-1);
+				explicitSecondaryScrollTo(getSecondaryScrollBar().getValue(),
+				                          -1,
+				                          -1);
 				repaint();
 			}
 		});
@@ -604,7 +623,8 @@ public class RowLabelView extends LabelView implements MouseWheelListener, Adjus
 	}
 
 	public void updatePrimaryHoverIndexDuringScrollDrag() {
-		//If the labels are being scrolled, you must manually retrieve the cursor position
+		//If the labels are being scrolled, you must manually retrieve the
+		//cursor position
 		if(areLabelsBeingScrolled()) {
 			forceUpdatePrimaryHoverIndex();
 		}
