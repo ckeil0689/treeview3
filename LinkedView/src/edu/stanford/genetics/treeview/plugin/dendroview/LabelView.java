@@ -171,7 +171,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBorder(null);
 
-		debug = 16;
+		debug = 17;
 		//Debug modes:
 		//9 = debug repaint timer intervals and updates to label panels
 		//10 = Debug label drawing issues when split pane divider adjusted
@@ -180,6 +180,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//14 = Debug position indicator not always drawn when data is large (number of rows per pixel > 1).
 		//15 = Debug overrun arrow position in non-label-port mode
 		//16 = Debug issue where short top-justified column labels are not visible after dragging the split pane divider to make the label area larger
+		//17 = Debug row label highlight drawing position
 
 		panel = scrollPane;
 	}
@@ -765,7 +766,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					debug("Viewport size change detected. New scroll positions: lastScrollColPos [" + lastScrollColPos + "] lastScrollColEndPos [" + lastScrollColEndPos + "] lastScrollColEndGap [" + lastScrollColEndGap + "]",10);
 			}
 
-			trackSecondaryPaneSize(realMaxStrLen + (drawLabelPort ? indicatorThickness : labelIndent));
+			debug("Pane size should be [" + paneSizeShouldBe + "]",17);
+			trackSecondaryPaneSize(paneSizeShouldBe);
 
 			if(isFixed) {
 				setSavedPoints(last_size);
@@ -1605,19 +1607,21 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		catch(final Exception e) {
 			// ignore...
 		}
-		//if(drawSelection.isIndexSelected(j) || isSelecting || bgColorIndex > 0) {
-			if(drawingSelectColor) {
-				g.fillRect(0,
-				           yPos,
-				           (isGeneAxis ? rowLabelPaneSize : colLabelPaneSize),
-				           (doDrawLabelPort() ? size + SQUEEZE : map.getPixel(j + 1) - map.getPixel(j)));
-			} //else {
-			//	g.fillRect(0,
-			//	           yPos,
-			//	           (isGeneAxis ? rowLabelPaneSize : colLabelPaneSize),
-			//	           size + SQUEEZE);
-			//}
-		//}
+
+		if(drawingSelectColor) {
+			g.fillRect(0,
+			           yPos,
+			           (isGeneAxis ? rowLabelPaneSize : colLabelPaneSize),
+			           (doDrawLabelPort() ? size + SQUEEZE : map.getPixel(j + 1) - map.getPixel(j)));
+
+			debug("Drawing select color from x|y [0|" + yPos +
+			      "] to x|y (LabelPaneSize|(doDrawLabelPort() ? size + " +
+			      "SQUEEZE : map.getPixel(j + 1) - map.getPixel(j))) [" +
+			      (isGeneAxis ? rowLabelPaneSize : colLabelPaneSize) + "|" +
+			      (doDrawLabelPort() ? size + SQUEEZE :
+			       map.getPixel(j + 1) - map.getPixel(j)) + "]",17);
+		}
+
 		return(bgColor);
 	}
 
@@ -2368,17 +2372,20 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	}
 
 	public void trackSecondaryPaneSize(int paneSize) {
+		debug("trackSecondaryPaneSize: Pane size saved as [" + (isGeneAxis ? rowLabelPaneSize : colLabelPaneSize) + "]",17);
 		if(isGeneAxis) {
 			if(offscreenSize.width != rowLabelPaneSize ||
 			   paneSize != rowLabelPaneSize) {
 			   rowLabelPaneSize    = paneSize;
 			   offscreenSize.width = paneSize;
+				debug("trackSecondaryPaneSize: Changing row pane size to [" + paneSize + "]",17);
 			}
 		} else {
 			if(offscreenSize.height != colLabelPaneSize ||
 			   paneSize != colLabelPaneSize) {
 				colLabelPaneSize     = paneSize;
 				offscreenSize.height = paneSize;
+				debug("trackSecondaryPaneSize: Changing col pane size to [" + paneSize + "]",17);
 			}
 		}
 	}
