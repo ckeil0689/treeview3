@@ -14,12 +14,8 @@ import java.util.prefs.Preferences;
 
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.SwingWorker;
 import javax.swing.Timer;
 
-import Utilities.CustomDialog;
-import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets;
@@ -182,33 +178,8 @@ implements ConfigNodePersistent {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-	
-//			drawColorsDialog = new CustomDialog("Matrix Colors");
-//			String text = "Updating colors...";
-//			drawColorsDialog.setIndicatorPanel(text);
 			
-			new ColorChanger().execute();
-			
-//			drawColorsDialog.setVisible(true);
-		}
-	}
-	
-	private class ColorChanger extends SwingWorker<Void, Void> {
-
-		@Override
-		protected Void doInBackground() throws Exception {
-				
 			colorPicker.setGradientColors();
-			return null;
-		}
-		
-		@Override
-		protected void done() {
-
-			LogBuffer.println("Changed colors.");
-			
-			// Close dialog
-//			drawColorsDialog.dispose();
 			setChanged();
 			notifyObservers();
 		}

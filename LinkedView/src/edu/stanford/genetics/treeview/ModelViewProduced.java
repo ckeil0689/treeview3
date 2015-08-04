@@ -29,9 +29,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.awt.image.MemoryImageSource;
 import java.awt.image.WritableRaster;
-import java.util.Arrays;
 
 /**
  * superclass, to hold info and code common to all model views
@@ -64,8 +62,11 @@ public abstract class ModelViewProduced extends ModelView {
 	 * OS X since mac os x doesn't let you call getGraphics on the Image if it's
 	 * generated from a pixels array... hmm...
 	 */
-	protected void ensureCapacity(final Dimension req) {
+	protected void ensureCapacity() {//final Dimension req) {
 
+		LogBuffer.println("Ensuring capacity");
+		Dimension req = offscreenSize;
+		
 		if (offscreenImage == null) {
 			createNewBuffer(req.width, req.height);
 
@@ -90,7 +91,8 @@ public abstract class ModelViewProduced extends ModelView {
 	protected synchronized void createNewBuffer(final int w, final int h) {
 
 		// should I be copy over pixels instead?
-		LogBuffer.println("Creating new buffered image");
+		LogBuffer.println("Creating new image buffer: " + viewName());
+		LogBuffer.println("Pixels: " + (w * h));
 		
 		offscreenScanSize = w;
 		offscreenImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
@@ -122,7 +124,7 @@ public abstract class ModelViewProduced extends ModelView {
 		if ((offscreenImage == null) || (reqSize.width != offscreenSize.width)
 				|| (reqSize.height != offscreenSize.height)) {
 			offscreenSize = reqSize;
-			ensureCapacity(offscreenSize); ///dont call rn because the sizing should later be done by drawImage()
+			ensureCapacity();//offscreenSize); ///dont call rn because the sizing should later be done by drawImage()
 			offscreenChanged = true;
 			offscreenValid = false;
 
@@ -131,14 +133,13 @@ public abstract class ModelViewProduced extends ModelView {
 		}
 
 		// update offscreenBuffer if necessary
-//		final int backgoundInt = (255 << 24) | (255 << 16) | (255 << 8) | 255;
-//		Arrays.fill(offscreenPixels, backgoundInt);
 		g2d.setColor(Color.WHITE);
 		g2d.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
 		
 		if (isEnabled()) {
 			if ((offscreenSize.width > 0) && (offscreenSize.height > 0)) {
 //				updatePixels();
+				LogBuffer.println("Matrix Update");
 				updateMatrix();
 				offscreenValid = true;
 			}
@@ -160,6 +161,12 @@ public abstract class ModelViewProduced extends ModelView {
 	 * offscreenSource.newPixels(); !
 	 */
 	abstract protected void updatePixels();
+	
+	/**
+	 * Separate method than updatePixels which opens a hint dialog during
+	 * pixel updating. This requires some extra Swing EDT threading code.
+	 */
+	abstract protected void updatePixelsWithHint();
 	
 	/**
 	 * Method to adjust some matrix parameters regarding screen fit and mapping.

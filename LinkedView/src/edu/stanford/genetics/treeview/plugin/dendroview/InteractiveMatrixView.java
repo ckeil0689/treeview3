@@ -239,40 +239,6 @@ public class InteractiveMatrixView extends MatrixView implements
 		}
 	}
 
-	/**
-	 * This method updates a pixel buffer. The alternative is to update the
-	 * graphics object directly by calling updateBuffer.
-	 */
-//	@Override
-//	protected void updatePixels() {
-//
-////		if (!offscreenValid) {
-////
-////			adjustPixelsToMaps();
-////			revalidateScreen();
-////			setSubImage();
-//
-//			final Rectangle destRect = new Rectangle(0, 0,
-//					xmap.getUsedPixels(), ymap.getUsedPixels());
-//
-////			final Rectangle sourceRect = new Rectangle(xmap.getIndex(0),
-////					ymap.getIndex(0), xmap.getIndex(destRect.width)
-////							- xmap.getIndex(0), ymap.getIndex(destRect.height)
-////							- ymap.getIndex(0));
-//			final Rectangle sourceRect = new Rectangle(0, 0, 
-//					xmap.getMaxIndex() + 1, ymap.getMaxIndex() + 1);
-//
-//			if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
-//				/* Set new offscreenPixels (pixel colors) */
-//				drawer.paint(offscreenPixels, sourceRect, destRect,
-//						offscreenScanSize);
-//			}
-////		}
-////
-////		xmap.notifyObservers();
-////		ymap.notifyObservers();
-//	}
-
 	@Override
 	public synchronized void paintComposite(final Graphics g) {
 
