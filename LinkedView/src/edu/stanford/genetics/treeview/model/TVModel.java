@@ -690,7 +690,7 @@ public class TVModel extends Observable implements DataModel {
 			
 			int idx = data.length;
 			
-			/* find first NaN or nfinity value */
+			/* find first NaN or Infinity value */
 			for(int i = 0; i < data.length; i++) {
 				
 				double dataPoint = data[i];
