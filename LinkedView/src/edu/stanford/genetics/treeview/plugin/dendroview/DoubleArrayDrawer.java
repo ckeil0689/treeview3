@@ -230,13 +230,13 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 	@Override
 	public boolean isMissing(final int x, final int y) {
 
-		return Double.isNaN(getValue(x, y));//Helper.nearlyEqual(getValue(x, y), DataModel.NAN);
+		return Double.isNaN(getValue(x, y));
 	}
 
 	@Override
 	public boolean isEmpty(final int x, final int y) {
 
-		return Double.isInfinite(getValue(x, y));//Helper.nearlyEqual(getValue(x, y), DataModel.EMPTY);
+		return Double.isInfinite(getValue(x, y));
 	}
 
 	/** how many rows are there to draw? */
