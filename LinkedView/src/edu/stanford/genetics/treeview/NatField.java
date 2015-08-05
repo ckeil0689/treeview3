@@ -86,7 +86,7 @@ public class NatField extends JTextField implements KeyListener {
 			new_val = Integer.parseInt(getText());
 			revert = false;
 
-			if (new_val < 0) { // revert if negative
+			if (new_val < 0) { // revert if too small
 				revert = true;
 			}
 

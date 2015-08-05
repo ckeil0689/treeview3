@@ -69,8 +69,8 @@ public class FontSettings implements SettingsPanel {
 
 	private Font[] fonts;
 
-	private final FontSelectable client;
-	private final FontSelectable client2;
+	private final LabelView client;
+	private final LabelView client2;
 	
 	private JPanel fontPanel;
 	private JComboBox<String> font_choice;
@@ -81,7 +81,7 @@ public class FontSettings implements SettingsPanel {
 	private JSpinner min_field;
 	private JSpinner max_field;
 
-	public FontSettings(final FontSelectable fs, final FontSelectable fs2) {
+	public FontSettings(final LabelView fs, final LabelView fs2) {
 
 		client = fs;
 		client2 = fs2;
@@ -268,17 +268,19 @@ public class FontSettings implements SettingsPanel {
 
 		client.setFace(string);
 		client.setStyle(i);
+		client.setFixed(isFixed);
 		client.setSavedPoints(size);
 		client.setMin(min);
 		client.setMax(max);
-		client.setFixed(isFixed);
+		client.resetSecondaryScroll();
 
 		client2.setFace(string);
 		client2.setStyle(i);
+		client2.setFixed(isFixed);
 		client2.setSavedPoints(size);
 		client2.setMin(min);
 		client2.setMax(max);
-		client2.setFixed(isFixed);
+		client2.resetSecondaryScroll();
 	}
 	
 	/**

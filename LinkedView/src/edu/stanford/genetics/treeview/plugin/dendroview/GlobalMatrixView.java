@@ -24,9 +24,9 @@ public class GlobalMatrixView extends MatrixView {
 	private final int MIN_VIEWPORT_SIZE = 1;
 
 	/*
-	 * Also needs reference to interactive MapContainers to get knowledge about
-	 * which specific tiles are currently visible and update the viewport
-	 * rectangle through the observer pattern.
+	 * Also needs reference to interactive MapContainers to get knowledge
+	 * about which specific tiles are currently visible and update the 
+	 * viewport rectangle through the observer pattern.
 	 */
 	private MapContainer interactiveXmap;
 	private MapContainer interactiveYmap;
@@ -52,7 +52,7 @@ public class GlobalMatrixView extends MatrixView {
 	private List<Ellipse2D.Double> indicatorSelectionCircleList = null;
 
 	private int[] selectedIMVArrayIndexes = null;
-	private int[] selectedIMVGeneIndexes = null;
+	private int[] selectedIMVGeneIndexes  = null;
 
 	public GlobalMatrixView() {
 
@@ -80,7 +80,7 @@ public class GlobalMatrixView extends MatrixView {
 		final Graphics2D g2 = (Graphics2D) g;
 		if (viewPortRect != null || indicatorSelectionCircleList != null) {
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-					RenderingHints.VALUE_ANTIALIAS_ON);
+								RenderingHints.VALUE_ANTIALIAS_ON);
 			g2.setStroke(new BasicStroke(2));
 		}
 		if (viewPortRect != null) {
@@ -91,8 +91,8 @@ public class GlobalMatrixView extends MatrixView {
 		}
 		if (indicatorSelectionCircleList != null) {
 			g2.setColor(Color.yellow);
-			for (Ellipse2D.Double indicatorCircle : indicatorSelectionCircleList) {
-				// LogBuffer.println("Drawing ellipse.");
+			for(Ellipse2D.Double indicatorCircle : indicatorSelectionCircleList) {
+				//LogBuffer.println("Drawing ellipse.");
 				g2.draw(indicatorCircle);
 			}
 		}
@@ -148,9 +148,8 @@ public class GlobalMatrixView extends MatrixView {
 	}
 
 	/**
-	 * Sets a reference to the interactive x-MapContainer to keep track of of
-	 * currently visible tiles.
-	 * 
+	 * Sets a reference to the interactive x-MapContainer to keep track of
+	 * currently visible tiles. 
 	 * @param m
 	 */
 	public void setInteractiveXMap(final MapContainer m) {
@@ -164,7 +163,7 @@ public class GlobalMatrixView extends MatrixView {
 	}
 
 	/**
-	 * Sets a reference to the interactive y-MapContainer to keep track of of
+	 * Sets a reference to the interactive y-MapContainer to keep track of
 	 * currently visible tiles.
 	 * 
 	 * @param m
@@ -190,7 +189,7 @@ public class GlobalMatrixView extends MatrixView {
 
 		super.setXMap(m);
 
-		if (xmap.getMaxIndex() > MAP_SIZE_LIMIT) {
+		if(xmap.getMaxIndex() > MAP_SIZE_LIMIT) {
 			this.xViewMin = (xmap.getMaxIndex() / 100) * 2;
 
 		} else {
@@ -209,7 +208,7 @@ public class GlobalMatrixView extends MatrixView {
 
 		super.setYMap(m);
 
-		if (ymap.getMaxIndex() > MAP_SIZE_LIMIT) {
+		if(ymap.getMaxIndex() > MAP_SIZE_LIMIT) {
 			this.yViewMin = (ymap.getMaxIndex() / 100) * 2;
 
 		} else {
@@ -226,14 +225,14 @@ public class GlobalMatrixView extends MatrixView {
 
 		/* Assure minimum draw size for viewport rectangle */
 		int xRange;
-		if (interactiveXmap.getNumVisible() > xViewMin) {
+		if(interactiveXmap.getNumVisible() > xViewMin) {
 			xRange = interactiveXmap.getNumVisible();
 		} else {
 			xRange = xViewMin;
 		}
 
 		int yRange;
-		if (interactiveYmap.getNumVisible() > yViewMin) {
+		if(interactiveYmap.getNumVisible() > yViewMin) {
 			yRange = interactiveYmap.getNumVisible();
 		} else {
 			yRange = yViewMin;
@@ -262,25 +261,24 @@ public class GlobalMatrixView extends MatrixView {
 
 		setIndicatorVisibleCircleBounds();
 
-		// if ((geneSelection == null) || (arraySelection == null)) {
-		if ((selectedIMVGeneIndexes == null)
-				|| (selectedIMVArrayIndexes == null)) {
+		//if ((geneSelection == null) || (arraySelection == null)) {
+		if ((selectedIMVGeneIndexes == null) ||
+			(selectedIMVArrayIndexes == null)) {
 			selectionRectList = null;
 			indicatorSelectionCircleList = null;
-			// LogBuffer.println("Nothing appears to be selected.");
+			//LogBuffer.println("Nothing appears to be selected.");
 			return;
 		}
 
 		selectionRectList = new ArrayList<Rectangle>();
 
-		// final int[] selectedArrayIndexes =
-		// arraySelection.getSelectedIndexes();
-		// final int[] selectedGeneIndexes = geneSelection.getSelectedIndexes();
+		//final int[] selectedArrayIndexes = arraySelection.getSelectedIndexes();
+		//final int[] selectedGeneIndexes = geneSelection.getSelectedIndexes();
 
-		// LogBuffer.println("Num selected array indexes: [" +
-		// selectedIMVArrayIndexes.length + "].");
-		// Could check either genes or arrays here - it's assumed if one's
-		// populated, the other must be as well
+		//LogBuffer.println("Num selected array indexes: [" +
+		//		selectedIMVArrayIndexes.length + "].");
+		//Could check either genes or arrays here - it's assumed if one's
+		//populated, the other must be as well
 		if (selectedIMVArrayIndexes.length > 0) {
 
 			// LogBuffer.println("Selected min array index: [" +
@@ -291,7 +289,7 @@ public class GlobalMatrixView extends MatrixView {
 			List<List<Integer>> geneBoundaryList;
 
 			arrayBoundaryList = findRectangleBoundaries(
-					selectedIMVArrayIndexes, xmap);
+					selectedIMVArrayIndexes,xmap);
 			geneBoundaryList = findRectangleBoundaries(selectedIMVGeneIndexes,
 					ymap);
 
@@ -342,8 +340,9 @@ public class GlobalMatrixView extends MatrixView {
 
 				final int current = selectedIndexes[i];
 
-				if (rectangleRange.size() == 0
-						|| rectangleRange.get(rectangleRange.size() - 1) == current - 1) {
+				if (rectangleRange.size() == 0 ||
+					rectangleRange.get(rectangleRange.size() - 1) ==
+					current - 1) {
 					rectangleRange.add(current);
 					loopStart = i + 1;
 
@@ -366,7 +365,8 @@ public class GlobalMatrixView extends MatrixView {
 
 			sp = map.getPixel(selectionRange.get(0));
 			// last pixel of last block
-			ep = map.getPixel(selectionRange.get(selectionRange.size() - 1) + 1) - 1;
+			ep = map.getPixel(selectionRange.get(selectionRange.size() - 1) + 1)
+					- 1;
 
 			if (ep < sp) {
 				ep = sp;
@@ -383,8 +383,8 @@ public class GlobalMatrixView extends MatrixView {
 	}
 
 	/**
-	 * Draws a circle if the user is viewing a small area to indicate the
-	 * position of the view.
+	 * Draws a circle if the user is viewing a small area to
+	 * indicate the position of the view.
 	 */
 	private void setIndicatorVisibleCircleBounds() {
 
@@ -428,25 +428,25 @@ public class GlobalMatrixView extends MatrixView {
 		double w = 0;
 		double h = 0;
 
-		// if (geneSelection == null || arraySelection == null)
-		if (selectedIMVGeneIndexes == null || selectedIMVArrayIndexes == null
-				|| selectedIMVGeneIndexes.length == 0
-				|| selectedIMVArrayIndexes.length == 0) {
+		//if (geneSelection == null || arraySelection == null)
+		if (selectedIMVGeneIndexes == null || selectedIMVArrayIndexes == null ||
+				selectedIMVGeneIndexes.length == 0 ||
+				selectedIMVArrayIndexes.length == 0) {
 			indicatorSelectionCircleList = null;
 			return;
 		} else {// if ((selectedIMVGeneIndexes.length * ymap.getScale()) < 5 &&
 				// (selectedIMVArrayIndexes.length * xmap.getScale()) < 5) {
 
-			// Empty the list of
+			//Empty the list of
 			indicatorSelectionCircleList = new ArrayList<Ellipse2D.Double>();
 
 			List<List<Integer>> arrayBoundaryList;
 			List<List<Integer>> geneBoundaryList;
 
-			arrayBoundaryList = findRectangleBoundaries(
-					selectedIMVArrayIndexes, xmap);
-			geneBoundaryList = findRectangleBoundaries(selectedIMVGeneIndexes,
-					ymap);
+			arrayBoundaryList =
+					findRectangleBoundaries(selectedIMVArrayIndexes,xmap);
+			geneBoundaryList =
+					findRectangleBoundaries(selectedIMVGeneIndexes,ymap);
 
 			/*
 			 * TODO: Instead of just checking the last(/next) selection
@@ -468,45 +468,43 @@ public class GlobalMatrixView extends MatrixView {
 
 				for (final List<Integer> yBoundaries : geneBoundaryList) {
 
-					// LogBuffer.println("Preparing to create ellipse.");
+					//LogBuffer.println("Preparing to create ellipse.");
 
 					// Width and height of rectangle which spans the Ellipse2D
 					// object
 					h = (yBoundaries.get(1) - yBoundaries.get(0));
 
-					if (w < 5
-							&& h < 5
-							&&
-							// This is not the first selection and the last
-							// selection
-							// is far away OR this is the first selection and
-							// the next
-							// selection either doesn't exists or is far away
-							((lastxb >= 0 && Math.abs(xBoundaries.get(0)
-									- lastxb) > 5) || (lastxb < 0 && (arrayBoundaryList
-									.size() == 1 || Math.abs(arrayBoundaryList
-									.get(1).get(0) - xBoundaries.get(1)) > 5)))
-							&& ((lastyb >= 0 && Math.abs(yBoundaries.get(0)
-									- lastyb) > 5) || (lastyb < 0 && (geneBoundaryList
-									.size() == 1 || Math.abs(geneBoundaryList
-									.get(1).get(0) - yBoundaries.get(1)) > 5)))) {
+					if(w < 5 && h < 5 &&
+					   //This is not the first selection and the last selection
+					   //is far away OR this is the first selection and the next
+					   //selection either doesn't exists or is far away
+					   ((lastxb >= 0 &&
+					     Math.abs(xBoundaries.get(0) - lastxb) > 5) ||
+					    (lastxb < 0 &&
+					     (arrayBoundaryList.size() == 1 ||
+					      Math.abs(arrayBoundaryList.get(1).get(0) -
+					               xBoundaries.get(1)) > 5))) &&
+					   ((lastyb >= 0 &&
+					     Math.abs(yBoundaries.get(0) - lastyb) > 5) ||
+					    (lastyb < 0 &&
+					     (geneBoundaryList.size() == 1 ||
+					      Math.abs(geneBoundaryList.get(1).get(0) -
+					               yBoundaries.get(1)) > 5)))) {
 						// coords for top left of circle
 						x = xBoundaries.get(0) + (w / 2.0) - 5;
 						y = yBoundaries.get(0) + (h / 2.0) - 5;
 
-						// LogBuffer.println("Ellipse created at [" + x + "x" +
-						// y +
-						// "] and is dimensions [" + w + "x" + h + "].");
+						//LogBuffer.println("Ellipse created at [" + x + "x" + y +
+						//		"] and is dimensions [" + w + "x" + h + "].");
 
-						indicatorSelectionCircleList.add(new Ellipse2D.Double(
-								x, y, 10, 10));
-						// } else {
-						// LogBuffer.println("Selection was too big [" + w + "x"
-						// +
-						// h + "] or [(" + xBoundaries.get(1) + " - " +
-						// xBoundaries.get(0) + ") x (" +
-						// yBoundaries.get(1) + " - " +
-						// yBoundaries.get(0) + ")].");
+						indicatorSelectionCircleList.add(
+								new Ellipse2D.Double(x, y, 10, 10));
+					//} else {
+					//	LogBuffer.println("Selection was too big [" + w + "x" +
+					//			h + "] or [(" + xBoundaries.get(1) + " - " +
+					//			xBoundaries.get(0) + ") x (" +
+					//			yBoundaries.get(1) + " - " +
+					//			yBoundaries.get(0) + ")].");
 					}
 					lastyb = yBoundaries.get(1);
 				}
@@ -516,14 +514,14 @@ public class GlobalMatrixView extends MatrixView {
 	}
 
 	public void setIMVselectedIndexes(int[] selectedArrayIndexes,
-			int[] selectedGeneIndexes) {
+									  int[] selectedGeneIndexes) {
 		selectedIMVArrayIndexes = selectedArrayIndexes;
-		selectedIMVGeneIndexes = selectedGeneIndexes;
+		selectedIMVGeneIndexes  = selectedGeneIndexes;
 
 		recalculateOverlay();
 
-		// If the selected index arrays have been defined, repaint the screen
-		if (selectedIMVArrayIndexes != null && selectedIMVGeneIndexes != null) {
+		//If the selected index arrays have been defined, repaint the screen
+		if(selectedIMVArrayIndexes != null && selectedIMVGeneIndexes != null) {
 			repaint();
 		}
 	}

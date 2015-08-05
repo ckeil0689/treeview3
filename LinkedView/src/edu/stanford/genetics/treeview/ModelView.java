@@ -66,6 +66,12 @@ public abstract class ModelView extends JPanel implements Observer,
 
 	private String[] default_status = null;
 
+	/* Stores whether to draw a port around squares corresponding to what's
+	 * shown in the label pane(s) */
+	protected boolean labelPortMode = false;
+
+	public int debug; //This is a verbosity level
+
 	protected ModelView() {
 
 		super(false);
@@ -246,5 +252,19 @@ public abstract class ModelView extends JPanel implements Observer,
 
 	@Override
 	public void mouseReleased(final MouseEvent e) {
+	}
+
+	public boolean inLabelPortMode() {
+		return(labelPortMode);
+	}
+
+	public void setLabelPortMode(boolean m) {
+		labelPortMode = m;
+	}
+
+	public void debug(String msg,int level) {
+		if(level == debug) {
+			LogBuffer.println(msg);
+		}
 	}
 }
