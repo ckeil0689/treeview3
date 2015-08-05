@@ -224,9 +224,10 @@ public class ColorPicker {
 	protected void updateColors() {
 
 		updateBoundaryColors();
-
 		updateColorArray();
-		setGradientColors();
+		
+//		setGradientColors();
+		
 		containerPanel.repaint();
 	}
 
@@ -288,10 +289,10 @@ public class ColorPicker {
 	 */
 	protected void updateColorArray() {
 
+		/* TODO simplify */
 		colors = new Color[colorList.size()];
 
 		for (int i = 0; i < colors.length; i++) {
-
 			colors[i] = colorList.get(i);
 		}
 	}

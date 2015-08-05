@@ -59,9 +59,6 @@ public class InteractiveMatrixView extends MatrixView implements
 	public static final int EQUAL = 1;
 	public static final int PROPORT = 2;
 
-	private static final int HORIZONTAL = 0;
-	private static final int VERTICAL = 1;
-
 	private final String[] statustext = new String[] { "Mouseover Selection",
 			"", "" };
 	private HeaderInfo arrayHI;
@@ -253,43 +250,6 @@ public class InteractiveMatrixView extends MatrixView implements
 		}
 	}
 
-	/**
-	 * This method updates a pixel buffer. The alternative is to update the
-	 * graphics object directly by calling updateBuffer.
-	 */
-	@Override
-	protected void updatePixels() {
-
-		if(xmap.hoverChanged() || ymap.hoverChanged()) {
-			xmap.unsetHoverChanged();
-			ymap.unsetHoverChanged();
-			return;
-		}
-		if (!offscreenValid) {
-
-			revalidateScreen();
-
-			final Rectangle destRect = new Rectangle(0, 0,
-					xmap.getUsedPixels(), ymap.getUsedPixels());
-
-			final Rectangle sourceRect = new Rectangle(xmap.getIndex(0),
-					ymap.getIndex(0), xmap.getIndex(destRect.width)
-							- xmap.getIndex(0), ymap.getIndex(destRect.height)
-							- ymap.getIndex(0));
-
-			if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
-				/* Set new offscreenPixels (pixel colors) */
-				drawer.paint(offscreenPixels, sourceRect, destRect,
-						offscreenScanSize);
-			}
-
-			offscreenSource.newPixels();
-		}
-
-		xmap.notifyObservers();
-		ymap.notifyObservers();
-	}
-
 	@Override
 	public synchronized void paintComposite(final Graphics g) {
 
@@ -444,9 +404,8 @@ public class InteractiveMatrixView extends MatrixView implements
 			final List<Integer> boundaries = new ArrayList<Integer>(2);
 
 			sp = map.getPixel(selectionRange.get(0));
-			// last pixel of last block
-			ep = map.getPixel(selectionRange.get(selectionRange.size() - 1) + 1)
-					- 1;
+			ep = map.getPixel(selectionRange.get(selectionRange.size() - 1) + 1);
+			// removed + 1 here due to new image drawing (otherwise selection was not accurate by 1 pixel)
 
 			if (ep < sp) {
 				ep = sp;

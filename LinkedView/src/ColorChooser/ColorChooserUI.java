@@ -42,6 +42,7 @@ public class ColorChooserUI extends CustomDialog {
 	private JButton editBtn;
 	private JButton removeBtn;
 	private JButton missingBtn;
+	private JButton applyBtn;
 
 	private ColorIcon missingColorIcon;
 
@@ -91,6 +92,8 @@ public class ColorChooserUI extends CustomDialog {
 		addBtn = GUIFactory.createBtn("Add New Color");
 		editBtn = GUIFactory.createBtn("Edit Selected Color");
 		removeBtn = GUIFactory.createBtn("Remove Selected Color");
+		applyBtn = GUIFactory.createBtn("Apply");
+		getRootPane().setDefaultButton(applyBtn);
 
 		setSelectionDependentBtnStatus(false, false);
 
@@ -124,6 +127,7 @@ public class ColorChooserUI extends CustomDialog {
 
 		mainPanel.add(contentPanel, "push, grow, wrap");
 
+		mainPanel.add(applyBtn, "al right, pushx");
 		mainPanel.add(closeBtn, "al right, pushx");
 	}
 
@@ -219,6 +223,11 @@ public class ColorChooserUI extends CustomDialog {
 	protected void addEditListener(final ActionListener l) {
 
 		editBtn.addActionListener(l);
+	}
+	
+	protected void addApplyChangeListener(final ActionListener l) {
+		
+		applyBtn.addActionListener(l);
 	}
 
 	protected void addDialogCloseListener(final WindowListener l) {

@@ -2,14 +2,21 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+import java.awt.image.RasterFormatException;
 import java.util.Observable;
 
 import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 
 import net.miginfocom.swing.MigLayout;
+import ColorChooser.ColorChooserController;
 import Utilities.GUIFactory;
+import edu.stanford.genetics.treeview.HintDialog;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelViewProduced;
 import edu.stanford.genetics.treeview.TreeSelectionI;
@@ -31,6 +38,7 @@ public abstract class MatrixView extends ModelViewProduced {
 	protected TreeSelectionI arraySelection;
 
 	protected boolean hasDrawn = false;
+	protected boolean pixelsChanged = false;
 
 	protected ArrayDrawer drawer;
 
@@ -81,6 +89,10 @@ public abstract class MatrixView extends ModelViewProduced {
 
 		} else if (o instanceof TreeSelectionI) {
 			return;
+			
+		} else if (o instanceof ColorChooserController) {
+			updatePixelsWithHint();
+			offscreenValid = false;
 
 		} else {
 			LogBuffer.println(viewName() + " got weird update : " + o);
@@ -89,11 +101,99 @@ public abstract class MatrixView extends ModelViewProduced {
 
 		repaint();
 	}
+	
+	@Override
+	protected void updateMatrix() {
+		
+		if(xmap.hoverChanged() || ymap.hoverChanged()) {
+			xmap.unsetHoverChanged();
+			ymap.unsetHoverChanged();
+			return;
+		}
+		
+		if (!offscreenValid) {
 
+			adjustPixelsToMaps();
+			revalidateScreen();
+			setSubImage();
+			
+			if(pixelsChanged) {
+				updatePixels();
+				pixelsChanged = false;
+			}
+		}
+			
+		xmap.notifyObservers();
+		ymap.notifyObservers();
+	}
+	
 	@Override
 	protected void updatePixels() {
-		// TODO Auto-generated method stub
+		
+		/* TODO remove rectangle dependency of drawer. not needed. */
+		final Rectangle destRect = new Rectangle(0, 0,
+				xmap.getUsedPixels(), ymap.getUsedPixels());
+		
+		final Rectangle sourceRect = new Rectangle(0, 0, 
+				xmap.getMaxIndex() + 1, ymap.getMaxIndex() + 1);
 
+		if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
+			/* Set new offscreenPixels (pixel colors) */
+			drawer.paint(offscreenPixels, sourceRect, destRect,
+					offscreenScanSize);
+		}
+	}
+
+	@Override
+	protected void updatePixelsWithHint() {
+		
+		final HintDialog hint = new HintDialog("Updating Pixels...");
+		
+		final SwingWorker<Void, Void> pixelUpdater = 
+				new SwingWorker<Void, Void>() {
+			
+			@Override
+			protected Void doInBackground() throws Exception {
+				
+				final Rectangle destRect = new Rectangle(0, 0,
+						xmap.getUsedPixels(), ymap.getUsedPixels());
+				
+				final Rectangle sourceRect = new Rectangle(0, 0, 
+						xmap.getMaxIndex() + 1, ymap.getMaxIndex() + 1);
+
+				if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
+					/* Set new offscreenPixels (pixel colors) */
+					drawer.paint(offscreenPixels, sourceRect, destRect,
+							offscreenScanSize);
+				}
+				return null;
+			}
+			
+			@Override
+			protected void done() {
+				
+				hint.dispose();
+			}
+		};
+		
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				pixelUpdater.execute();
+			}
+		});
+
+		hint.setVisible(true);
+		
+		try {
+			pixelUpdater.get();
+			
+		} catch(Exception e) {
+			LogBuffer.logException(e);
+			LogBuffer.println("Issue when trying to update pixels.");
+			return;
+		}
 	}
 
 	@Override
@@ -140,8 +240,6 @@ public abstract class MatrixView extends ModelViewProduced {
 	 * MapContainers to minimum scale.
 	 */
 	public void resetView() {
-
-		LogBuffer.println("Resetting view: " + viewName());
 
 		xmap.setToMinScale();
 		ymap.setToMinScale();
@@ -229,6 +327,66 @@ public abstract class MatrixView extends ModelViewProduced {
 
 		ymap = m;
 		ymap.addObserver(this);
+	}
+	
+	/**
+	 * Creates a new Image with a new set of 
+	 */
+	protected void adjustPixelsToMaps() {
+		
+		// correct for zero indexing
+		int x_tiles = xmap.getMaxIndex() + 1;
+		int y_tiles = ymap.getMaxIndex() + 1;
+		
+		int tileCount = x_tiles * y_tiles;
+		
+		if(offscreenPixels.length != tileCount) {
+			createNewBuffer(x_tiles, y_tiles);
+		}
+	}
+	
+	/**
+	 * If an image does not exist yet, it will be created here. Its dimensions
+	 * in pixels directly correspond to the axis dimensions of the loaded model.
+	 * This is relayed by the MapContainers.
+	 */
+	@Override
+	protected void ensureCapacity() {
+		
+		/* Create new image only if one doesn't exist yet. 
+		 * This avoids unnecessary updates to the BufferedImage pixel raster. 
+		 */
+		if (offscreenImage == null) {
+			int x_tiles = xmap.getMaxIndex() + 1;
+			int y_tiles = ymap.getMaxIndex() + 1;
+			createNewBuffer(x_tiles, y_tiles);
+		}
+	}
+	
+	/**
+	 * Sets a reference for the sub image which is bound by the MapContainer.
+	 */
+	@Override
+	protected void setSubImage() {
+		
+		int x = xmap.getFirstVisible();
+		int y = ymap.getFirstVisible();
+		int w = xmap.getNumVisible();
+		int h = ymap.getNumVisible();
+		
+		try {
+			paintImage = ((BufferedImage)offscreenImage).getSubimage(x, y, w, h);
+			
+		} catch(RasterFormatException e) {
+			LogBuffer.logException(e);
+			LogBuffer.println("x: " + x + " y: " + y + " w: " + w + " h: " + h);
+			paintImage = null;
+		}
+	}
+	
+	public void setPixelsChanged() {
+		
+		this.pixelsChanged = true;
 	}
 
 }

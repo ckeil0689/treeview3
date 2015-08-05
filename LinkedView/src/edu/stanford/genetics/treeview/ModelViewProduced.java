@@ -22,11 +22,14 @@
  */
 package edu.stanford.genetics.treeview;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.image.MemoryImageSource;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
+import java.awt.image.WritableRaster;
 
 /**
  * superclass, to hold info and code common to all model views
@@ -40,12 +43,14 @@ public abstract class ModelViewProduced extends ModelView {
 
 	/* ARGB color integers for all pixels */
 	protected int[] offscreenPixels = null;
-
-	protected MemoryImageSource offscreenSource = null;
-	protected Image offscreenBuffer = null;
+	
+	protected Image offscreenImage = null;
+	protected Image paintImage = null;
 	protected Graphics offscreenGraphics = null;
 	protected int offscreenScanSize = 0;
 	protected boolean rotateOffscreen = false;
+	
+	protected boolean pixelsChanged;
 
 	protected ModelViewProduced() {
 
@@ -53,18 +58,20 @@ public abstract class ModelViewProduced extends ModelView {
 	}
 
 	/**
-	 * this method sets up all the instance variables. XXX - THIS FAILS ON MAC
-	 * OS X since mac os x doesn't let you call getGraphics on the Image if it's
-	 * generated from a pixels array... hmm...
+	 * Ensures that the offscreenImage fits the screen dimensions. Creates a
+	 * new image with the current parameters saved in offscreenSize.
 	 */
-	protected void ensureCapacity(final Dimension req) {
+	protected void ensureCapacity() {
 
-		if (offscreenBuffer == null) {
+		LogBuffer.println("Ensuring capacity");
+		Dimension req = offscreenSize;
+		
+		if (offscreenImage == null) {
 			createNewBuffer(req.width, req.height);
 
 		} else {
-			int w = offscreenBuffer.getWidth(null);
-			int h = offscreenBuffer.getHeight(null);
+			int w = offscreenImage.getWidth(null);
+			int h = offscreenImage.getHeight(null);
 			if ((w < req.width) || (h < req.height)) {
 				if (w < req.width) {
 					w = req.width;
@@ -80,14 +87,17 @@ public abstract class ModelViewProduced extends ModelView {
 		}
 	}
 
-	private synchronized void createNewBuffer(final int w, final int h) {
+	protected synchronized void createNewBuffer(final int w, final int h) {
 
 		// should I be copy over pixels instead?
-		offscreenPixels = new int[w * h];
+		LogBuffer.println("Creating new image buffer: " + viewName());
+		LogBuffer.println("Pixels: " + (w * h));
+		
 		offscreenScanSize = w;
-		offscreenSource = new MemoryImageSource(w, h, offscreenPixels, 0, w);
-		offscreenSource.setAnimated(true);
-		offscreenBuffer = createImage(offscreenSource);
+		offscreenImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+		WritableRaster raster = ((BufferedImage)offscreenImage).getRaster();
+		offscreenPixels = ((DataBufferInt)raster.getDataBuffer()).getData();
+		pixelsChanged = true;
 	}
 
 	/*
@@ -102,21 +112,19 @@ public abstract class ModelViewProduced extends ModelView {
 	public synchronized void paintComponent(final Graphics g) {
 
 		Graphics2D g2d = (Graphics2D) g;
-		// Rectangle clip = g.getClipBounds();
-		// System.out.println("Entering " + viewName() + " to clip " + clip );
-		// super.paintComponent(g);
 
 		final Dimension newsize = getSize();
-		if (newsize == null)
+		if (newsize == null) {
 			return;
+		}
 
 		Dimension reqSize;
 		reqSize = newsize;
 		// monitor size changes
-		if ((offscreenBuffer == null) || (reqSize.width != offscreenSize.width)
+		if ((offscreenImage == null) || (reqSize.width != offscreenSize.width)
 				|| (reqSize.height != offscreenSize.height)) {
 			offscreenSize = reqSize;
-			ensureCapacity(offscreenSize);
+			ensureCapacity();//offscreenSize); 
 			offscreenChanged = true;
 			offscreenValid = false;
 
@@ -125,26 +133,47 @@ public abstract class ModelViewProduced extends ModelView {
 		}
 
 		// update offscreenBuffer if necessary
-		final int backgoundInt = (255 << 24) | (255 << 16) | (255 << 8) | 255;
-		for (int i = 0; i < offscreenPixels.length; i++) {
-			offscreenPixels[i] = backgoundInt;
-		}
+		g2d.setColor(Color.WHITE);
+		g2d.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
 		
 		if (isEnabled()) {
 			if ((offscreenSize.width > 0) && (offscreenSize.height > 0)) {
-				updatePixels();
+				updateMatrix();
 				offscreenValid = true;
 			}
 		}
 
-		g2d.drawImage(offscreenBuffer, 0, 0, null);
+		if(paintImage != null) {
+			g2d.drawImage(paintImage, 0, 0, offscreenSize.width, 
+					offscreenSize.height, this);
+			
+		} else {
+			g2d.drawImage(offscreenImage, 0, 0, null);
+		}
+		
 		paintComposite(g2d);
-		// System.out.println("Exiting " + viewName() + " to clip " + clip );
 	}
+	
+	/**
+	 * Set a reference for a selected subImage of the main BufferedImage
+	 * to be displayed in various forms.
+	 */
+	abstract protected void setSubImage();
 
 	/**
 	 * method to update the offscreenPixels. don't forget to call
 	 * offscreenSource.newPixels(); !
 	 */
 	abstract protected void updatePixels();
+	
+	/**
+	 * Separate method than updatePixels which opens a hint dialog during
+	 * pixel updating. This requires some extra Swing EDT threading code.
+	 */
+	abstract protected void updatePixelsWithHint();
+	
+	/**
+	 * Method to adjust some matrix parameters regarding screen fit and mapping.
+	 */
+	abstract protected void updateMatrix();
 }

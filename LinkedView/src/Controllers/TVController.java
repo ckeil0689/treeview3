@@ -996,6 +996,9 @@ public class TVController implements Observer {
 
 		/* Adding GradientColorChooser configurations to DendroView node. */
 		controller.setConfigNode(((TVModel) model).getDocumentConfig());
+		
+		controller.addObserver(dendroController.getInteractiveMatrixView());
+		controller.addObserver(dendroController.getGlobalMatrixView());
 
 		gradientPick.setVisible(true);
 	}

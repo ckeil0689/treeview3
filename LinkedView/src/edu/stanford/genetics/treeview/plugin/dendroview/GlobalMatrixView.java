@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
-import edu.stanford.genetics.treeview.LogBuffer;
-
 public class GlobalMatrixView extends MatrixView {
 
 	/**
@@ -61,6 +59,7 @@ public class GlobalMatrixView extends MatrixView {
 
 	@Override
 	public synchronized void paintComposite(final Graphics g) {
+		
 		if (viewPortRect != null) {
 			/* draw visible rectangle in white */
 			g.setColor(Color.white);
@@ -77,6 +76,7 @@ public class GlobalMatrixView extends MatrixView {
 				g.drawRect(rect.x, rect.y, rect.width, rect.height);
 			}
 		}
+		
 		final Graphics2D g2 = (Graphics2D) g;
 		if (viewPortRect != null || indicatorSelectionCircleList != null) {
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -95,36 +95,6 @@ public class GlobalMatrixView extends MatrixView {
 				//LogBuffer.println("Drawing ellipse.");
 				g2.draw(indicatorCircle);
 			}
-		}
-	}
-
-	/**
-	 * This method updates a pixel buffer. The alternative is to update the
-	 * graphics object directly by calling updateBuffer.
-	 */
-	@Override
-	protected void updatePixels() {
-
-		if (!offscreenValid) {
-
-			revalidateScreen();
-
-			// LogBuffer.println("OFFSCREEN INVALID");
-			final Rectangle destRect = new Rectangle(0, 0,
-					xmap.getUsedPixels(), ymap.getUsedPixels());
-
-			final Rectangle sourceRect = new Rectangle(xmap.getIndex(0),
-					ymap.getIndex(0), xmap.getNumVisible(),
-					ymap.getNumVisible());
-
-			if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
-
-				/* Set new offscreenPixels (pixel colors) */
-				drawer.paint(offscreenPixels, sourceRect, destRect,
-						offscreenScanSize);
-			}
-
-			offscreenSource.newPixels();
 		}
 	}
 

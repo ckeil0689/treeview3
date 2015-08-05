@@ -204,7 +204,6 @@ public class ThumbBox {
 		double[] thumbDataVals = new double[colorPicker.getThumbNumber()];
 
 		for (int i = 0; i < thumbDataVals.length; i++) {
-
 			thumbDataVals[i] = getThumbDataVal(i);
 		}
 

@@ -45,8 +45,7 @@ public class CustomDialog extends JDialog {
 		this.closeBtn = GUIFactory.createBtn("Close");
 		closeBtn.addActionListener(new CloseListener());
 
-		this.mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT,
-				null);
+		this.mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 
 		getContentPane().add(mainPanel);
 	}
@@ -72,7 +71,6 @@ public class CustomDialog extends JDialog {
 
 		pack();
 		setLocationRelativeTo(JFrame.getFrames()[0]);
-		closeBtn.requestFocus();
 
 		super.setVisible(visible);
 	}
