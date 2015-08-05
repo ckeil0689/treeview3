@@ -30,14 +30,11 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentListener;
 import java.awt.event.ContainerListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionAdapter;
 import java.beans.PropertyChangeListener;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.prefs.Preferences;
-import java.awt.Color;
 
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
@@ -49,24 +46,21 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
-import javax.swing.plaf.basic.BasicSplitPaneDivider;
 
-import com.sun.glass.events.MouseEvent;
-
-import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
 import Utilities.Helper;
 import Utilities.StringRes;
 import edu.stanford.genetics.treeview.DataTicker;
 import edu.stanford.genetics.treeview.DendroPanel;
 import edu.stanford.genetics.treeview.HeaderInfo;
-import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.core.ColumnFinderBox;
 import edu.stanford.genetics.treeview.core.HeaderFinderBox;
 import edu.stanford.genetics.treeview.core.RowFinderBox;
+//import com.sun.glass.events.MouseEvent;
+import net.miginfocom.swing.MigLayout;
 
 /**
  * TODO Refactor this JavaDoc. It's not applicable to the current program
