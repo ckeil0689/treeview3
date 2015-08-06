@@ -38,7 +38,6 @@ public abstract class MatrixView extends ModelViewProduced {
 	protected TreeSelectionI arraySelection;
 
 	protected boolean hasDrawn = false;
-	protected boolean pixelsChanged = false;
 
 	protected ArrayDrawer drawer;
 
