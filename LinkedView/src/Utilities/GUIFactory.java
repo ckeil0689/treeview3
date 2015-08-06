@@ -50,6 +50,8 @@ public class GUIFactory {
 	public static final int NO_PADDING_X = 3;
 	public static final int NO_PADDING_Y = 4;
 	public static final int FILL = 5;
+	public static final int NO_GAPS = 6;
+	public static final int DEBUG = 7;
 
 	/**
 	 * Creates and returns a simple JPanel with MigLayout to be used as
@@ -125,12 +127,19 @@ public class GUIFactory {
 		case FILL:
 			comp.setLayout(new MigLayout("", "[grow, fill]"));
 			break;
+			
+		case NO_GAPS:
+			comp.setLayout(new MigLayout("gap rel 0", "grow"));
+			break;
+			
+		case DEBUG:
+			comp.setLayout(new MigLayout("debug"));
+			break;
 
 		default:
 			comp.setLayout(new MigLayout());
 			break;
 		}
-
 	}
 
 	/**

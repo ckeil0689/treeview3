@@ -438,21 +438,21 @@ public class DendroView implements Observer, DendroPanel {
 		globalOverviewPanel.add(globalMatrixView, "h 180!, w 180!");
 		
 		// Matrix - Comp 5
-		colNavPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		colNavPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS);
 		colNavPanel.add(scaleAddLeftX);
 		colNavPanel.add(scaleRemoveLeftX);
 
-		colNavPanel.add(matrixXscrollbar, "growx, pushx");
+		colNavPanel.add(matrixXscrollbar, "grow, push");
 		
 		colNavPanel.add(scaleRemoveRightX);
 		colNavPanel.add(scaleAddRightX);
 		
 		// Matrix - Comp 6
-		rowNavPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		rowNavPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS);
 		rowNavPanel.add(scaleAddTopY,"wrap");
 		rowNavPanel.add(scaleRemoveTopY,"wrap");
 		
-		rowNavPanel.add(matrixYscrollbar, "growy, pushy, alignx center, wrap");
+		rowNavPanel.add(matrixYscrollbar, "growy, pushy, wrap");
 		
 		rowNavPanel.add(scaleRemoveBottomY, "wrap");
 		rowNavPanel.add(scaleAddBottomY);
@@ -461,8 +461,8 @@ public class DendroView implements Observer, DendroPanel {
 		interactiveMatrixPanel = GUIFactory.createJPanel(false, 
 				GUIFactory.NO_PADDING);
 		interactiveMatrixPanel.add(interactiveMatrixView, "grow, push");
-		interactiveMatrixPanel.add(rowNavPanel, "w 15px!, h 100%, growy, wrap");
-		interactiveMatrixPanel.add(colNavPanel, "h 15px!, span, w 100%, growx");
+		interactiveMatrixPanel.add(rowNavPanel, "w 15!, h 100%, growy, wrap");
+		interactiveMatrixPanel.add(colNavPanel, "h 15!, span, w 100%, growx");
 
 		// Full matrix panel
 		matrixPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
@@ -486,37 +486,39 @@ public class DendroView implements Observer, DendroPanel {
 		scaleDefaultAll = GUIFactory.createIconBtn(StringRes.icon_home);
 		scaleDefaultAll.setToolTipText("Reset the zoomed view");
 
+		int btnSize = 14;
+		
 		/* Scale x-axis */
-		scaleAddRightX = GUIFactory.createSquareBtn("+", 14);
+		scaleAddRightX = GUIFactory.createSquareBtn("+", btnSize);
 		scaleAddRightX.setToolTipText(StringRes.tt_xZoomIn_right);
 		scaleAddRightX.setMargin(new Insets(0,0,0,0));
 
-		scaleRemoveRightX = GUIFactory.createSquareBtn("-", 14);
+		scaleRemoveRightX = GUIFactory.createSquareBtn("-", btnSize);
 		scaleRemoveRightX.setToolTipText(StringRes.tt_xZoomOut_right);
 		scaleRemoveRightX.setMargin(new Insets(0,0,0,0));
 
-		scaleAddLeftX = GUIFactory.createSquareBtn("+", 14);
+		scaleAddLeftX = GUIFactory.createSquareBtn("+", btnSize);
 		scaleAddLeftX.setToolTipText(StringRes.tt_xZoomIn_left);
 		scaleAddLeftX.setMargin(new Insets(0,0,0,0));
 
-		scaleRemoveLeftX = GUIFactory.createSquareBtn("-", 14);
+		scaleRemoveLeftX = GUIFactory.createSquareBtn("-", btnSize);
 		scaleRemoveLeftX.setToolTipText(StringRes.tt_xZoomOut_left);
 		scaleRemoveLeftX.setMargin(new Insets(0,0,0,0));
 
 		/* Scale y-axis */
-		scaleAddBottomY = GUIFactory.createSquareBtn("+", 14);
+		scaleAddBottomY = GUIFactory.createSquareBtn("+", btnSize);
 		scaleAddBottomY.setToolTipText(StringRes.tt_yZoomIn_bottom);
 		scaleAddBottomY.setMargin(new Insets(0,0,0,0));
 		
-		scaleRemoveBottomY = GUIFactory.createSquareBtn("-", 14);
+		scaleRemoveBottomY = GUIFactory.createSquareBtn("-", btnSize);
 		scaleRemoveBottomY.setToolTipText(StringRes.tt_yZoomOut_bottom);
 		scaleRemoveBottomY.setMargin(new Insets(0,0,0,0));
 		
-		scaleAddTopY = GUIFactory.createSquareBtn("+", 14);
+		scaleAddTopY = GUIFactory.createSquareBtn("+", btnSize);
 		scaleAddTopY.setToolTipText(StringRes.tt_yZoomIn_top);
 		scaleAddTopY.setMargin(new Insets(0,0,0,0));
 		
-		scaleRemoveTopY = GUIFactory.createSquareBtn("-", 14);
+		scaleRemoveTopY = GUIFactory.createSquareBtn("-", btnSize);
 		scaleRemoveTopY.setToolTipText(StringRes.tt_yZoomOut_top);
 		scaleRemoveTopY.setMargin(new Insets(0,0,0,0));
 

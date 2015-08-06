@@ -22,8 +22,6 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.util.Observable;
@@ -32,7 +30,6 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.swing.JScrollBar;
-import javax.swing.Timer;
 
 import Utilities.Helper;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
