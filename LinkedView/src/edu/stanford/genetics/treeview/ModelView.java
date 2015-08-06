@@ -34,7 +34,6 @@ import java.util.Observer;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 /**
@@ -51,7 +50,6 @@ public abstract class ModelView extends JPanel implements Observer,
 	protected ViewFrame viewFrame = null;
 	protected JFrame applicationFrame = null;
 
-	protected DataTicker status = null;
 	protected boolean hasMouse = false;
 
 	/* here so that subclass will work with BufferedModelView too */
@@ -63,8 +61,6 @@ public abstract class ModelView extends JPanel implements Observer,
 	 * holds actual thing to be displayed...
 	 */
 	protected JComponent panel;
-
-	private String[] default_status = null;
 
 	/* Stores whether to draw a port around squares corresponding to what's
 	 * shown in the label pane(s) */
@@ -94,26 +90,6 @@ public abstract class ModelView extends JPanel implements Observer,
 	public ViewFrame getViewFrame() {
 
 		return viewFrame;
-	}
-
-	public void setStatusPanel(final DataTicker s) {
-
-		status = s;
-	}
-
-	/**
-	 * Strings describing status to user, suitable for display.
-	 *
-	 * @return Array of strings, representing status
-	 */
-	public String[] getStatus() {
-
-		if (default_status == null) {
-			default_status = new String[] { "" };
-			// "No status info for " + viewName() };
-		}
-
-		return default_status;
 	}
 
 	public JComponent getComponent() {
@@ -216,19 +192,6 @@ public abstract class ModelView extends JPanel implements Observer,
 			return;
 		}
 
-		final Window frame = enclosingWindow();
-		if (frame.isActive()) {
-			requestFocus();
-
-			try {
-				if (status != null) {
-					status.setMessages(getStatus());	
-				}
-			} catch (final Exception ex) {
-				JOptionPane.showMessageDialog(this, ex.toString());
-			}
-		}
-
 		hasMouse = true;
 	}
 
@@ -255,10 +218,12 @@ public abstract class ModelView extends JPanel implements Observer,
 	}
 
 	public boolean inLabelPortMode() {
+		
 		return(labelPortMode);
 	}
 
 	public void setLabelPortMode(boolean m) {
+		
 		labelPortMode = m;
 	}
 

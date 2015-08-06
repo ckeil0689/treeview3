@@ -1388,8 +1388,6 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		dendroView.getColumnLabelView().setHeaderInfo(
 				tvModel.getColumnHeaderInfo());
 		dendroView.getRowLabelView().setHeaderInfo(tvModel.getRowHeaderInfo());
-		dendroView.getInteractiveMatrixView().setHeaders(
-				tvModel.getRowHeaderInfo(), tvModel.getColumnHeaderInfo());
 	}
 
 	/**
