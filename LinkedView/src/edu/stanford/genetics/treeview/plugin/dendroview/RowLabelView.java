@@ -647,4 +647,12 @@ public class RowLabelView extends LabelView implements MouseWheelListener,
 		}
 		hoverIndex = hDI;
 	}
+
+	protected int getPrimaryViewportSize() {
+		return(scrollPane.getViewport().getSize().height);
+	}
+
+	protected int getSecondaryViewportSize() {
+		return(rowLabelViewportSize);
+	}
 }

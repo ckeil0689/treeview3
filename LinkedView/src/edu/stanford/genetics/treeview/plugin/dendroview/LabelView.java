@@ -367,6 +367,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	protected abstract JScrollBar getSecondaryScrollBar();
 	protected abstract JScrollBar getPrimaryScrollBar();
 	protected abstract void setHoverPosition(final MouseEvent e);
+	protected abstract int getPrimaryViewportSize();
+	protected abstract int getSecondaryViewportSize();
 
 	public int getHoverPixel() {
 		return(hoverPixel);
@@ -827,8 +829,10 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			}
 
 			/* Get indices range */
-			final int start = map.getIndex(0);
-			final int end   = map.getIndex(map.getAvailablePixels()) - 1;
+			//final int start = map.getIndex(0);
+			//final int end   = map.getIndex(map.getAvailablePixels()) - 1;
+			final int start = map.getFirstVisible();
+			final int end   = start + map.getNumVisible() - 1;
 
 			debug("Set end data index to [" + end + "] as first [" +
 			      map.getFirstVisible() + "] plus num [" + map.getNumVisible() +
@@ -846,6 +850,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			int matrixSize   = map.getPixel(map.getMaxIndex() + 1) - 1 -
 			                   map.getPixel(0);
 			int fullPaneSize = matrixSize;
+			int viewportPrimarySize = (isGeneAxis ?
+			                    rowLabelViewportSize : colLabelViewportSize);
 			int labelStart   = activeHoverDataIndex;
 			int labelEnd     = activeHoverDataIndex;
 
@@ -1027,7 +1033,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 						yPos -= edgeOffset;
 						if(yPos < fullPaneSize + ascent / 2) {
 							bgColor = drawLabelBackground(g,j,yPos - ascent);
-							if(yPos <= fullPaneSize) {
+							if(yPos <= getPrimaryViewportSize()) {
 								labelEnd = j;
 								labelColor = labelPortColor;
 							}
@@ -1215,14 +1221,20 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 
 					if(matrixBarThickness > 0) {
-    					//Draw the matrix breadth bar
-    					g.fillRect(
-    							lastScrollColEndGap,
-    							/* start * (curFontSize + SQUEEZE) + */
-    							map.getPixel(labelStart),
-    							matrixBarThickness,
-    							map.getPixel(labelEnd + 1) -
-    							map.getPixel(labelStart));
+						debug("Drawing col matrix bar from index start [" +
+						      labelStart + "] to stop [" + labelEnd +
+						      "], pixel start [" + map.getPixel(labelStart) +
+						      "] to stop [" + (map.getPixel(labelEnd + 1)) +
+						      "]",4);
+
+						//Draw the matrix breadth bar
+						g.fillRect(
+								lastScrollColEndGap,
+								/* start * (curFontSize + SQUEEZE) + */
+								map.getPixel(labelStart),
+								matrixBarThickness,
+								map.getPixel(labelEnd + 1) -
+								map.getPixel(labelStart));
 					}
 
 
@@ -1425,7 +1437,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 					if(matrixBarThickness > 0) {
 						//Draw the matrix breadth bar
-						debug("Drawing matrix bar from index start [" +
+						debug("Drawing row matrix bar from index start [" +
 						      labelStart + "] to stop [" + labelEnd +
 						      "], pixel start [" + map.getPixel(labelStart) +
 						      "] to stop [" + (map.getPixel(labelEnd + 1)) +

@@ -625,4 +625,12 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener,
 				repaint();
 			}
 		});
+
+	protected int getPrimaryViewportSize() {
+		return(scrollPane.getViewport().getSize().width);
+	}
+
+	protected int getSecondaryViewportSize() {
+		return(colLabelViewportSize);
+	}
 }
