@@ -48,8 +48,6 @@ import javax.swing.JScrollBar;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 
-//import com.sun.glass.events.MouseEvent;
-import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
 import Utilities.Helper;
 import Utilities.StringRes;
@@ -61,6 +59,7 @@ import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.core.ColumnFinderBox;
 import edu.stanford.genetics.treeview.core.HeaderFinderBox;
 import edu.stanford.genetics.treeview.core.RowFinderBox;
+//import com.sun.glass.events.MouseEvent;
 
 /**
  * TODO Refactor this JavaDoc. It's not applicable to the current program
@@ -320,40 +319,72 @@ public class DendroView implements Observer, DendroPanel {
 
 		/* Panels for layout setup */
 		JPanel toolbarPanel;
-		JPanel navBtnPanel;
-		JPanel searchBarPanel;
-		JPanel colorValIndicatorPanel;
 		JPanel matrixPanel;
-		JPanel colLabelPanel;
-		JPanel colTreePanel;
-		JPanel colTreeEmptyPanel;
-		JPanel rowLabelPanel;
-		JPanel rowTreeEmptyPanel;
-		JPanel rowTreePanel;
-		JPanel globalOverviewPanel;
-		JPanel interactiveMatrixPanel;
-		JPanel colNavPanel;
-		JPanel rowNavPanel;
+				
+		toolbarPanel = createToolbarPanel();
 		
-		// Toolbar - Comp 1
+		setupRowDataPane();
+		setupColDataPane();
+		setDataPaneDividers();
+
+		matrixPanel = createMatrixPanel();
+		
+		dendroPane.add(matrixPanel, "grow, push, wrap");
+		dendroPane.add(toolbarPanel, "growx, h 40!, wrap");
+		
+		dendroPane.revalidate();
+		dendroPane.repaint();
+	}
+	
+	private static JPanel createColorValIndicatorPanel() {
+		
+		JPanel indicatorPanel;
 		String hint = ">>>> Placeholder for Color-Value Indicator <<<<";
 		JLabel indicatorPlaceHolder = GUIFactory.createLabel(hint, 
 				GUIFactory.FONTM);
 		
-		colorValIndicatorPanel = GUIFactory.createJPanel(false, 
+		indicatorPanel = GUIFactory.createJPanel(false, 
 				GUIFactory.DEFAULT);
-		colorValIndicatorPanel.add(indicatorPlaceHolder, "push");
+		indicatorPanel.add(indicatorPlaceHolder, "push");
 		
-		// Toolbar - Comp 2
-		navBtnPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
+		return indicatorPanel;
+	}
+	
+	private JPanel createNavBtnPanel() {
+		
+		JPanel navBtnPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 		navBtnPanel.add(scaleIncXY);
 		navBtnPanel.add(scaleDecXY);
 		navBtnPanel.add(zoomBtn);
 		navBtnPanel.add(scaleDefaultAll);
 		
-		// Toolbar - Comp 3
-		searchBarPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		return navBtnPanel;
+	}
+	
+	private JPanel createSearchBarPanel() {
+		
+		JPanel searchBarPanel = GUIFactory.createJPanel(false, 
+				GUIFactory.NO_PADDING);
 		searchBarPanel.add(searchPanel);
+		
+		return searchBarPanel;
+	}
+	
+	private JPanel createToolbarPanel() {
+		
+		JPanel navBtnPanel;
+		JPanel searchBarPanel;
+		JPanel colorValIndicatorPanel;
+		JPanel toolbarPanel;
+		
+		// Comp 1
+		colorValIndicatorPanel = createColorValIndicatorPanel();
+		
+		// Comp 2
+		navBtnPanel = createNavBtnPanel();
+		
+		// Comp 3
+		searchBarPanel = createSearchBarPanel();
 		
 		// Toolbar
 		toolbarPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
@@ -361,18 +392,42 @@ public class DendroView implements Observer, DendroPanel {
 		toolbarPanel.add(navBtnPanel, "al right, pushx");
 		toolbarPanel.add(searchBarPanel, "al right, pushx, w 160::");
 		
+		return toolbarPanel;
+	}
+	
+	private JPanel createRowTreePanel() {
 		
-		// Matrix - Comp 1
+		JPanel rowTreeEmptyPanel;
+		JPanel rowTreePanel;
+		
 		rowTreePanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
 		rowTreeEmptyPanel = GUIFactory.createJPanel(false, 
-				GUIFactory.NO_PADDING_FILL);
+				GUIFactory.NO_PADDING);
 		rowTreePanel.add(rowTreeView,"w 100%, h 100%, growy, wrap");
 		rowTreePanel.add(rowTreeEmptyPanel, "h 15!, w 100%");
 		
+		return rowTreePanel;
+	}
+	
+	private JPanel createRowLabelPanel() {
+		
+		JPanel rowLabelPanel;
+		
 		rowLabelPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
-		rowLabelPanel.add(rowLabelView.getComponent(), "w 100%, h 100%, growy, wrap");
-		rowLabelPanel.add(rowLabelScroll, "w 100%, h 15!, "
-				+ "aligny center");
+		rowLabelPanel.add(rowLabelView.getComponent(), "w 100%, h 100%, growy, "
+				+ "wrap");
+		rowLabelPanel.add(rowLabelScroll, "w 100%, h 15!, aligny center");
+		
+		return rowLabelPanel;
+	}
+	
+	private void setupRowDataPane() {
+		
+		JPanel rowLabelPanel;
+		JPanel rowTreePanel;
+		
+		rowTreePanel = createRowTreePanel();
+		rowLabelPanel = createRowLabelPanel();
 		
 		rowDataPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rowTreePanel,
 				rowLabelPanel);
@@ -391,18 +446,40 @@ public class DendroView implements Observer, DendroPanel {
 		} else {
 			rowDataPane.setDividerLocation(0.0);
 		}
-
-		// Matrix - Comp 2
+	}
+	
+	private JPanel createColTreePanel() {
+		
+		JPanel colTreePanel;
+		JPanel colTreeEmptyPanel;
+		
 		colTreePanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
 		colTreeEmptyPanel = GUIFactory.createJPanel(false, 
 				GUIFactory.NO_PADDING_FILL);
 		colTreePanel.add(colTreeView,"h 100%, w 100%, growx, push");
 		colTreePanel.add(colTreeEmptyPanel, "h 100%, w 15!");
 		
+		return colTreePanel;
+	}
+	
+	private JPanel createColLabelPanel() {
+		
+		JPanel colLabelPanel;
 		
 		colLabelPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
 		colLabelPanel.add(colLabelView.getComponent(), "w 100%, h 100%, growx");
 		colLabelPanel.add(colLabelScroll, "h 100%, w 15!");
+		
+		return colLabelPanel;
+	}
+	
+	private void setupColDataPane() {
+		
+		JPanel colTreePanel;
+		JPanel colLabelPanel;
+		
+		colTreePanel = createColTreePanel();
+		colLabelPanel = createColLabelPanel();
 		
 		colDataPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, colTreePanel,
 				colLabelPanel);
@@ -421,23 +498,23 @@ public class DendroView implements Observer, DendroPanel {
 		} else {
 			colDataPane.setDividerLocation(0.0);
 		}
-
-		/* If trees in general are disabled */
-		if (!treesEnabled() && showTreesMenuItem != null) {
-			showTreesMenuItem.setEnabled(false);
-		} else {
-			/* If trees are visible from the start */
-			if (oldRowDiv > 0.0 || oldColDiv > 0.0) {
-				showTreesMenuItem.setText(StringRes.menu_hideTrees);
-			}
-		}
+	}
+	
+	private JPanel createGlobalOverviewPanel() {
 		
-		// Matrix - Comp 3
+		JPanel globalOverviewPanel;
+		
 		globalOverviewPanel = GUIFactory.createJPanel(false,
 				GUIFactory.NO_PADDING_FILL);
 		globalOverviewPanel.add(globalMatrixView, "h 180!, w 180!");
 		
-		// Matrix - Comp 5
+		return globalOverviewPanel;
+	}
+	
+	private JPanel createColNavPanel() {
+		
+		JPanel colNavPanel;
+		
 		colNavPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS);
 		colNavPanel.add(scaleAddLeftX);
 		colNavPanel.add(scaleRemoveLeftX);
@@ -447,7 +524,13 @@ public class DendroView implements Observer, DendroPanel {
 		colNavPanel.add(scaleRemoveRightX);
 		colNavPanel.add(scaleAddRightX);
 		
-		// Matrix - Comp 6
+		return colNavPanel;
+	}
+	
+	private JPanel createRowNavPanel() {
+		
+		JPanel rowNavPanel;
+		
 		rowNavPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS);
 		rowNavPanel.add(scaleAddTopY,"wrap");
 		rowNavPanel.add(scaleRemoveTopY,"wrap");
@@ -457,25 +540,63 @@ public class DendroView implements Observer, DendroPanel {
 		rowNavPanel.add(scaleRemoveBottomY, "wrap");
 		rowNavPanel.add(scaleAddBottomY);
 		
-		// Matrix - Comp 7
+		return rowNavPanel;
+	}
+	
+	private JPanel createInteractiveMatrixPanel() {
+		
+		JPanel interactiveMatrixPanel;
+		JPanel colNavPanel;
+		JPanel rowNavPanel;
+		
+		colNavPanel = createColNavPanel();
+		rowNavPanel = createRowNavPanel();
+		
 		interactiveMatrixPanel = GUIFactory.createJPanel(false, 
 				GUIFactory.NO_PADDING);
 		interactiveMatrixPanel.add(interactiveMatrixView, "grow, push");
 		interactiveMatrixPanel.add(rowNavPanel, "w 15!, h 100%, growy, wrap");
 		interactiveMatrixPanel.add(colNavPanel, "h 15!, span, w 100%, growx");
-
-		// Full matrix panel
+		
+		return interactiveMatrixPanel;
+	}
+	
+	private JPanel createMatrixPanel() {
+		
+		JPanel matrixPanel;
+		
+		JPanel globalOverviewPanel;
+		JPanel interactiveMatrixPanel;
+		
+		globalOverviewPanel = createGlobalOverviewPanel();
+		interactiveMatrixPanel = createInteractiveMatrixPanel();
+		
 		matrixPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 		matrixPanel.add(globalOverviewPanel);
 		matrixPanel.add(colDataPane, "h 180!, growx, pushx, wrap");
 		matrixPanel.add(rowDataPane, "w 180!, growy, pushy");
 		matrixPanel.add(interactiveMatrixPanel, "grow, push");
 		
-		dendroPane.add(toolbarPanel, "growx, h 60!, wrap");
-		dendroPane.add(matrixPanel, "grow, push");
+		return matrixPanel;
+	}
+	
+	private void setDataPaneDividers() {
 		
-		dendroPane.revalidate();
-		dendroPane.repaint();
+		final double oldRowDiv = tvFrame.getConfigNode().getDouble("gtr_loc",
+				0.5d);
+		final double oldColDiv = tvFrame.getConfigNode().getDouble("atr_loc",
+				0.5d);
+		
+		/* If trees in general are disabled */
+		if (!treesEnabled() && showTreesMenuItem != null) {
+			showTreesMenuItem.setEnabled(false);
+			
+		} else {
+			/* If trees are visible from the start */
+			if (oldRowDiv > 0.0 || oldColDiv > 0.0) {
+				showTreesMenuItem.setText(StringRes.menu_hideTrees);
+			}
+		}
 	}
 
 	/**
