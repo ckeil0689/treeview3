@@ -59,17 +59,6 @@ public class InteractiveMatrixView extends MatrixView implements
 	public static final int EQUAL = 1;
 	public static final int PROPORT = 2;
 
-	private final String[] statustext = new String[] { "Mouseover Selection",
-			"", "" };
-	private HeaderInfo arrayHI;
-	private HeaderInfo geneHI;
-
-	private HeaderSummary geneSummary;
-	private HeaderSummary arraySummary;
-
-	private int overx;
-	private int overy;
-
 	private double aspectRatio = -1;
 
 	/**
@@ -134,66 +123,6 @@ public class InteractiveMatrixView extends MatrixView implements
 
 	public void setGlobalMatrixView(GlobalMatrixView gmv) {
 		globalMatrixView = gmv;
-	}
-
-	@Override
-	public String[] getStatus() {
-
-		try {
-			if (xmap.contains(overx) && ymap.contains(overy)) {
-				statustext[0] = "";
-
-				if (geneHI != null) {
-					final int realGene = overy;
-					try {
-						statustext[0] += geneSummary.getSummary(geneHI,
-								realGene);
-
-					} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
-						LogBuffer.println("ArrayIndexOutOfBoundsException "
-								+ "in getStatus() in GlobalView: "
-								+ e.getMessage());
-						statustext[0] += " (N/A)";
-					}
-				}
-				statustext[1] = "";
-				if (arrayHI != null) {
-					try {
-						statustext[1] += arraySummary
-								.getSummary(arrayHI, overx);
-
-					} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
-						LogBuffer.println("ArrayIndexOutOfBoundsException "
-								+ "in getStatus() in GlobalView: "
-								+ e.getMessage());
-						statustext[1] += " (N/A)";
-					}
-				}
-
-				if (drawer != null) {
-					if (drawer.isMissing(overx, overy)) {
-						statustext[2] = "No Data";
-
-					} else if (drawer.isEmpty(overx, overy)) {
-						statustext[2] = "";
-
-					} else {
-						statustext[2] = drawer.getSummary(overx, overy);
-					}
-				}
-			}
-		} catch (final ArrayIndexOutOfBoundsException e) {
-			LogBuffer.println("ArrayIndexOutOfBoundsException "
-					+ "in getStatus() in GlobalView: " + e.getMessage());
-		}
-		return statustext;
-	}
-
-	public void setHeaderSummary(final HeaderSummary gene,
-			final HeaderSummary array) {
-
-		this.geneSummary = gene;
-		this.arraySummary = array;
 	}
 
 	/**
@@ -493,27 +422,11 @@ public class InteractiveMatrixView extends MatrixView implements
 		
 		@Override
 		public void mouseMoved(final MouseEvent e) {
+			
 			debug("mouseMoved inside IMV",9);
+			
 			xmap.setHoverIndex(xmap.getIndex(e.getX()));
 			ymap.setHoverIndex(ymap.getIndex(e.getY()));
-
-			setDataStatus(e);
-		}
-
-		private void setDataStatus(final MouseEvent e) {
-
-			final int ooverx = overx;
-			final int oovery = overy;
-			overx = xmap.getIndex(e.getX());
-			overy = ymap.getIndex(e.getY());
-
-			/* Timed repaint to avoid constant unnecessary repainting. */
-
-			if (oovery != overy || ooverx != overx) {
-				if (status != null) {
-					status.setMessages(getStatus());
-				}
-			}
 		}
 
 		@Override
@@ -724,12 +637,6 @@ public class InteractiveMatrixView extends MatrixView implements
 
 			xmap.setHoverIndex(-1);
 			ymap.setHoverIndex(-1);
-			// Display empty field
-			statustext[0] = "";
-			statustext[1] = "";
-			statustext[2] = "";
-
-			status.setMessages(statustext);
 		}
 	}
 
@@ -770,7 +677,7 @@ public class InteractiveMatrixView extends MatrixView implements
 			if (notches < 0) {
 				//This ensures we only zoom toward the cursor when the cursor is
 				//over the map
-				if (status != null) {
+				if (hasMouse) {
 					smoothZoomTowardPixel(e.getX(),e.getY());
 				}
 				//This should happen when the mouse is not over the heatmap
@@ -779,7 +686,7 @@ public class InteractiveMatrixView extends MatrixView implements
 					ymap.zoomInBegin();
 				}
 			} else {
-				if (status != null) {
+				if (hasMouse) {
 					smoothZoomFromPixel(e.getX(),e.getY());
 				} else {
 					xmap.zoomOutBegin();
@@ -1855,11 +1762,11 @@ public class InteractiveMatrixView extends MatrixView implements
 			//Now let's return the pixel indexes of the selection post-zoom
 			redrawPixelBounds[0] = xmap.getPixel(selecXStartIndex);
 			redrawPixelBounds[2] =
-				(int) Math.round((double) numXSelectedIndexes *
+				(int) Math.round(numXSelectedIndexes *
 				pixelsPerXIndex) + 1; //Added 1 because sometimes inaccurate
 		} else {
 			redrawPixelBounds[0] = xmap.getPixel(prevXFirstVisible);
-			redrawPixelBounds[2] = (int) Math.round((double) prevXNumVisible *
+			redrawPixelBounds[2] = (int) Math.round(prevXNumVisible *
 					pixelsPerXIndex) + 1; //Added 1 because sometimes inaccurate
 		}
 		pixelsPerYIndex = ymap.getScale();
@@ -1869,14 +1776,14 @@ public class InteractiveMatrixView extends MatrixView implements
 			//		"]. Panel dimensions: [" + getHeight() + "].");
 			redrawPixelBounds[1] = ymap.getPixel(selecYStartIndex);
 			redrawPixelBounds[3] =
-				(int) Math.round((double) numYSelectedIndexes *
+				(int) Math.round(numYSelectedIndexes *
 				pixelsPerYIndex) + 1; //Added 1 because sometimes inaccurate
 			//debug("Zoom redraw bounds before fix: [" +
 			//		redrawPixelBounds[0] + "," + redrawPixelBounds[1] + "," +
 			//		redrawPixelBounds[2] + "," + redrawPixelBounds[3] + "].");
 		} else {
 			redrawPixelBounds[1] = ymap.getPixel(prevYFirstVisible);
-			redrawPixelBounds[3] = (int) Math.round((double) prevYNumVisible *
+			redrawPixelBounds[3] = (int) Math.round(prevYNumVisible *
 					pixelsPerYIndex) + 1; //Added 1 because sometimes inaccurate
 		}
 
@@ -2065,18 +1972,6 @@ public class InteractiveMatrixView extends MatrixView implements
 
 		geneSelection.notifyObservers();
 		arraySelection.notifyObservers();
-	}
-
-	/**
-	 * Sets the gene header instance variables of GlobalView.
-	 *
-	 * @param ghi
-	 * @param ahi
-	 */
-	public void setHeaders(final HeaderInfo ghi, final HeaderInfo ahi) {
-
-		geneHI = ghi;
-		arrayHI = ahi;
 	}
 
 	public TreeSelectionI getGeneSelection() {
