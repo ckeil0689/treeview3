@@ -22,6 +22,7 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
+import java.awt.Color;
 import java.awt.Insets;
 import java.awt.ScrollPane;
 import java.awt.Toolkit;
@@ -193,8 +194,8 @@ public class DendroView implements Observer, DendroPanel {
 
 		/* main panel */
 
-		searchPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
-		dendroPane = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		searchPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_NO_INS);
+		dendroPane = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 
 		/* Create the Global view (JPanel to display) */
 		globalMatrixView = new GlobalMatrixView();
@@ -284,8 +285,8 @@ public class DendroView implements Observer, DendroPanel {
 				+ "(complex V), etc...";
 		searchPanel.setToolTipText(tooltip);
 
-		searchPanel.add(rowFinderBox.getSearchTermBox(), "w 80::");
-		searchPanel.add(colFinderBox.getSearchTermBox(), "w 80::");
+		searchPanel.add(rowFinderBox.getSearchTermBox(), "w 80::, growx");
+		searchPanel.add(colFinderBox.getSearchTermBox(), "w 80::, growx");
 
 		searchPanel.revalidate();
 		searchPanel.repaint();
@@ -330,7 +331,7 @@ public class DendroView implements Observer, DendroPanel {
 		matrixPanel = createMatrixPanel();
 		
 		dendroPane.add(matrixPanel, "grow, push, wrap");
-		dendroPane.add(toolbarPanel, "growx, h 40!, wrap");
+		dendroPane.add(toolbarPanel, "growx, pushx, h 60!, wrap");
 		
 		dendroPane.revalidate();
 		dendroPane.repaint();
@@ -345,7 +346,7 @@ public class DendroView implements Observer, DendroPanel {
 		
 		indicatorPanel = GUIFactory.createJPanel(false, 
 				GUIFactory.DEFAULT);
-		indicatorPanel.add(indicatorPlaceHolder, "push");
+		indicatorPanel.add(indicatorPlaceHolder);
 		
 		return indicatorPanel;
 	}
@@ -364,7 +365,7 @@ public class DendroView implements Observer, DendroPanel {
 	private JPanel createSearchBarPanel() {
 		
 		JPanel searchBarPanel = GUIFactory.createJPanel(false, 
-				GUIFactory.NO_PADDING);
+				GUIFactory.NO_PADDING_FILL);
 		searchBarPanel.add(searchPanel);
 		
 		return searchBarPanel;
@@ -387,10 +388,10 @@ public class DendroView implements Observer, DendroPanel {
 		searchBarPanel = createSearchBarPanel();
 		
 		// Toolbar
-		toolbarPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
-		toolbarPanel.add(colorValIndicatorPanel, "pushx, growx");
-		toolbarPanel.add(navBtnPanel, "al right, pushx");
-		toolbarPanel.add(searchBarPanel, "al right, pushx, w 160::");
+		toolbarPanel = GUIFactory.createJPanel(false, GUIFactory.DEBUG);
+		toolbarPanel.add(colorValIndicatorPanel, "w 33%, pushx");
+		toolbarPanel.add(navBtnPanel, "al center, pushx");
+		toolbarPanel.add(searchBarPanel, "al right, pushx, w 160px:33%:");
 		
 		return toolbarPanel;
 	}
@@ -400,10 +401,10 @@ public class DendroView implements Observer, DendroPanel {
 		JPanel rowTreeEmptyPanel;
 		JPanel rowTreePanel;
 		
-		rowTreePanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		rowTreePanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 		rowTreeEmptyPanel = GUIFactory.createJPanel(false, 
-				GUIFactory.NO_PADDING);
-		rowTreePanel.add(rowTreeView,"w 100%, h 100%, growy, wrap");
+				GUIFactory.DEFAULT);
+		rowTreePanel.add(rowTreeView,"growy, pushy, wrap");
 		rowTreePanel.add(rowTreeEmptyPanel, "h 15!, w 100%");
 		
 		return rowTreePanel;
@@ -413,9 +414,9 @@ public class DendroView implements Observer, DendroPanel {
 		
 		JPanel rowLabelPanel;
 		
-		rowLabelPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
-		rowLabelPanel.add(rowLabelView.getComponent(), "w 100%, h 100%, growy, "
-				+ "wrap");
+		rowLabelPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
+		rowLabelPanel.add(rowLabelView.getComponent(), "w 100%, h 100%, pushy, "
+				+ "growy, wrap");
 		rowLabelPanel.add(rowLabelScroll, "w 100%, h 15!, aligny center");
 		
 		return rowLabelPanel;
@@ -453,11 +454,11 @@ public class DendroView implements Observer, DendroPanel {
 		JPanel colTreePanel;
 		JPanel colTreeEmptyPanel;
 		
-		colTreePanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
+		colTreePanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 		colTreeEmptyPanel = GUIFactory.createJPanel(false, 
-				GUIFactory.NO_PADDING_FILL);
-		colTreePanel.add(colTreeView,"h 100%, w 100%, growx, push");
-		colTreePanel.add(colTreeEmptyPanel, "h 100%, w 15!");
+				GUIFactory.DEFAULT);
+		colTreePanel.add(colTreeView, "h 100%, w 100%, growx, pushx");
+		colTreePanel.add(colTreeEmptyPanel, "h 100%, w 15!, alignx center");
 		
 		return colTreePanel;
 	}
@@ -466,9 +467,10 @@ public class DendroView implements Observer, DendroPanel {
 		
 		JPanel colLabelPanel;
 		
-		colLabelPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING);
-		colLabelPanel.add(colLabelView.getComponent(), "w 100%, h 100%, growx");
-		colLabelPanel.add(colLabelScroll, "h 100%, w 15!");
+		colLabelPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
+		colLabelPanel.add(colLabelView.getComponent(), "w 100%, h 100%, growx, "
+				+ "pushx");
+		colLabelPanel.add(colLabelScroll, "h 100%, w 15!, alignx center");
 		
 		return colLabelPanel;
 	}
@@ -505,7 +507,7 @@ public class DendroView implements Observer, DendroPanel {
 		JPanel globalOverviewPanel;
 		
 		globalOverviewPanel = GUIFactory.createJPanel(false,
-				GUIFactory.NO_PADDING_FILL);
+				GUIFactory.NO_GAPS_NO_INS_FILL);
 		globalOverviewPanel.add(globalMatrixView, "h 180!, w 180!");
 		
 		return globalOverviewPanel;
@@ -515,11 +517,11 @@ public class DendroView implements Observer, DendroPanel {
 		
 		JPanel colNavPanel;
 		
-		colNavPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS);
+		colNavPanel = GUIFactory.createJPanel(true, GUIFactory.NO_GAPS_NO_INS);
 		colNavPanel.add(scaleAddLeftX);
 		colNavPanel.add(scaleRemoveLeftX);
 
-		colNavPanel.add(matrixXscrollbar, "grow, push");
+		colNavPanel.add(matrixXscrollbar, "w 100%, growx, pushx");
 		
 		colNavPanel.add(scaleRemoveRightX);
 		colNavPanel.add(scaleAddRightX);
@@ -531,7 +533,8 @@ public class DendroView implements Observer, DendroPanel {
 		
 		JPanel rowNavPanel;
 		
-		rowNavPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS);
+		rowNavPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_NO_INS);
+		
 		rowNavPanel.add(scaleAddTopY,"wrap");
 		rowNavPanel.add(scaleRemoveTopY,"wrap");
 		
@@ -553,10 +556,10 @@ public class DendroView implements Observer, DendroPanel {
 		rowNavPanel = createRowNavPanel();
 		
 		interactiveMatrixPanel = GUIFactory.createJPanel(false, 
-				GUIFactory.NO_PADDING);
-		interactiveMatrixPanel.add(interactiveMatrixView, "grow, push");
-		interactiveMatrixPanel.add(rowNavPanel, "w 15!, h 100%, growy, wrap");
-		interactiveMatrixPanel.add(colNavPanel, "h 15!, span, w 100%, growx");
+				GUIFactory.NO_GAPS_NO_INS);
+		interactiveMatrixPanel.add(interactiveMatrixView, "push, grow");
+		interactiveMatrixPanel.add(rowNavPanel, "w 20!, h 100%, pushy, wrap");
+		interactiveMatrixPanel.add(colNavPanel, "h 20!, w 100%, pushx");
 		
 		return interactiveMatrixPanel;
 	}
@@ -571,11 +574,11 @@ public class DendroView implements Observer, DendroPanel {
 		globalOverviewPanel = createGlobalOverviewPanel();
 		interactiveMatrixPanel = createInteractiveMatrixPanel();
 		
-		matrixPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
+		matrixPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_NO_INS);
 		matrixPanel.add(globalOverviewPanel);
-		matrixPanel.add(colDataPane, "h 180!, growx, pushx, wrap");
-		matrixPanel.add(rowDataPane, "w 180!, growy, pushy");
-		matrixPanel.add(interactiveMatrixPanel, "grow, push");
+		matrixPanel.add(colDataPane, "h 180!, pushx, growx, wrap");
+		matrixPanel.add(rowDataPane, "w 180!, pushy, growy");
+		matrixPanel.add(interactiveMatrixPanel, "push, grow");
 		
 		return matrixPanel;
 	}
@@ -607,7 +610,7 @@ public class DendroView implements Observer, DendroPanel {
 		scaleDefaultAll = GUIFactory.createIconBtn(StringRes.icon_home);
 		scaleDefaultAll.setToolTipText("Reset the zoomed view");
 
-		int btnSize = 14;
+		int btnSize = 20;
 		
 		/* Scale x-axis */
 		scaleAddRightX = GUIFactory.createSquareBtn("+", btnSize);

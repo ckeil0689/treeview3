@@ -51,7 +51,9 @@ public class GUIFactory {
 	public static final int NO_PADDING_Y = 4;
 	public static final int FILL = 5;
 	public static final int NO_GAPS = 6;
-	public static final int DEBUG = 7;
+	public static final int NO_GAPS_NO_INS = 7;
+	public static final int NO_GAPS_NO_INS_FILL = 8;
+	public static final int DEBUG = 9;
 
 	/**
 	 * Creates and returns a simple JPanel with MigLayout to be used as
@@ -129,7 +131,15 @@ public class GUIFactory {
 			break;
 			
 		case NO_GAPS:
-			comp.setLayout(new MigLayout("gap rel 0", "grow"));
+			comp.setLayout(new MigLayout("gap 0!", "grow"));
+			break;
+			
+		case NO_GAPS_NO_INS:
+			comp.setLayout(new MigLayout("gap 0!, ins 0", "grow"));
+			break;
+			
+		case NO_GAPS_NO_INS_FILL:
+			comp.setLayout(new MigLayout("gap 0!, ins 0", "[grow, fill]"));
 			break;
 			
 		case DEBUG:
