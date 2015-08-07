@@ -123,7 +123,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	protected JScrollPane scrollPane;
 	protected String zoomHint;
-	private boolean hasMouse;
 
 	/* "Position indicator" settings for when the label port is active */
 	int matrixBarThickness = 3; //Thickness of matrix position bar - Must be odd
@@ -586,10 +585,12 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	/* inherit description */
 	@Override
 	public void updateBuffer(final Graphics g) {
-		updateBuffer(g,offscreenSize);
+		
+		updateBuffer(g, offscreenSize);
 	}
 
 	public void updateBuffer(final Image buf) {
+		
 		updateBuffer(buf.getGraphics(),
 		             new Dimension(buf.getWidth(null),buf.getHeight(null)));
 	}
@@ -1673,6 +1674,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 * @return
 	 */
 	public Color drawLabelBackground(final Graphics g,int j,int yPos) {
+		
+		if(j > headerInfo.getNumHeaders() - 1) {
+			return Color.black;
+		}
+		
 		final int bgColorIndex = headerInfo.getIndex("BGCOLOR");
 		final String[] strings = headerInfo.getHeader(j);
 		Color bgColor = textBGColor;

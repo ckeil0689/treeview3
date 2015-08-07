@@ -302,8 +302,12 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 		}
 
 		public boolean isSelected(final int i) {
-
-			return isSelected[i];
+			
+			if ((i >= 0) && (i < isSelected.length)) {
+				return isSelected[i];
+			}
+			
+			return false;
 		}
 
 		public int getMin() {
