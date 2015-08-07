@@ -69,14 +69,16 @@ public class IntHeaderInfo extends Observable implements HeaderInfo {
 	public String[] getHeader(final int gene) {
 
 		try {
-			if (getHeaderArray()[gene] == null)
+			if (getHeaderArray()[gene] == null) {
 				return new String[0];
-			else
-				return getHeaderArray()[gene];
+				
+			}
+			return getHeaderArray()[gene];
+			
 		} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 			LogBuffer.println("error: tried to retrieve header for  index "
 					+ gene + " but max is " + getHeaderArray().length);
-			e.printStackTrace();
+			LogBuffer.logException(e);
 			return new String[0];
 		}
 	}
