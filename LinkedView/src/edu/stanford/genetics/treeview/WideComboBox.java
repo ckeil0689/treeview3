@@ -19,7 +19,7 @@ public class WideComboBox extends AutoComboBox {
 		super(items);
 	}
 
-	public WideComboBox(final ComboBoxModel aModel) {
+	public WideComboBox(final ComboBoxModel<String> aModel) {
 
 		super(aModel);
 	}
