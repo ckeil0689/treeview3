@@ -22,7 +22,6 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import java.awt.Insets;
 import java.awt.ScrollPane;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
@@ -330,7 +329,7 @@ public class DendroView implements Observer, DendroPanel {
 		matrixPanel = createMatrixPanel();
 		
 		dendroPane.add(matrixPanel, "grow, push, wrap");
-		dendroPane.add(toolbarPanel, "growx, pushx, h 45!, wrap");
+		dendroPane.add(toolbarPanel, "grow, push, h 45!, wrap");
 		
 		dendroPane.revalidate();
 		dendroPane.repaint();
@@ -616,36 +615,28 @@ public class DendroView implements Observer, DendroPanel {
 		/* Scale x-axis */
 		scaleAddRightX = GUIFactory.createSquareBtn("+", btnSize);
 		scaleAddRightX.setToolTipText(StringRes.tt_xZoomIn_right);
-		scaleAddRightX.setMargin(new Insets(0,0,0,0));
 
 		scaleRemoveRightX = GUIFactory.createSquareBtn("-", btnSize);
 		scaleRemoveRightX.setToolTipText(StringRes.tt_xZoomOut_right);
-		scaleRemoveRightX.setMargin(new Insets(0,0,0,0));
 
 		scaleAddLeftX = GUIFactory.createSquareBtn("+", btnSize);
 		scaleAddLeftX.setToolTipText(StringRes.tt_xZoomIn_left);
-		scaleAddLeftX.setMargin(new Insets(0,0,0,0));
 
 		scaleRemoveLeftX = GUIFactory.createSquareBtn("-", btnSize);
 		scaleRemoveLeftX.setToolTipText(StringRes.tt_xZoomOut_left);
-		scaleRemoveLeftX.setMargin(new Insets(0,0,0,0));
 
 		/* Scale y-axis */
 		scaleAddBottomY = GUIFactory.createSquareBtn("+", btnSize);
 		scaleAddBottomY.setToolTipText(StringRes.tt_yZoomIn_bottom);
-		scaleAddBottomY.setMargin(new Insets(0,0,0,0));
 		
 		scaleRemoveBottomY = GUIFactory.createSquareBtn("-", btnSize);
 		scaleRemoveBottomY.setToolTipText(StringRes.tt_yZoomOut_bottom);
-		scaleRemoveBottomY.setMargin(new Insets(0,0,0,0));
 		
 		scaleAddTopY = GUIFactory.createSquareBtn("+", btnSize);
 		scaleAddTopY.setToolTipText(StringRes.tt_yZoomIn_top);
-		scaleAddTopY.setMargin(new Insets(0,0,0,0));
 		
 		scaleRemoveTopY = GUIFactory.createSquareBtn("-", btnSize);
 		scaleRemoveTopY.setToolTipText(StringRes.tt_yZoomOut_top);
-		scaleRemoveTopY.setMargin(new Insets(0,0,0,0));
 
 		/* Scale both axes */
 		scaleIncXY = GUIFactory.createIconBtn(StringRes.icon_fullZoomIn);

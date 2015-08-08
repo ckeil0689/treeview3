@@ -17,8 +17,10 @@ public class SquareButton extends JButton {
 	public SquareButton(String s, int size) {
 
 		super(s);
+		
 		this.size = size;
-		this.setMargin(new Insets(0, 0, 0, 0));
+		setFont(GUIFactory.FONTXS);
+		setMargin(new Insets(0, 0, 0, 0));
 	}
 
 	@Override

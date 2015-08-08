@@ -65,7 +65,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	protected final String d_face = "Courier";
 	protected final int d_style = 0;
 	protected final int d_size = 14;
-	protected final int d_min = 5;
+	protected final int d_min = 8;
 	protected final int d_max = 30;
 	protected boolean d_justified;
 	protected boolean d_fixed = false;
