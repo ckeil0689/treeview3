@@ -283,8 +283,8 @@ public class DendroView implements Observer, DendroPanel {
 				+ "(complex V), etc...";
 		searchPanel.setToolTipText(tooltip);
 
-		searchPanel.add(rowFinderBox.getSearchTermBox(), "w 80::, growx, pushx");
-		searchPanel.add(colFinderBox.getSearchTermBox(), "w 80::, growx, pushx");
+		searchPanel.add(rowFinderBox.getSearchTermBox(), "w 80::, growx, pushx, al right");
+		searchPanel.add(colFinderBox.getSearchTermBox(), "w 80::, growx, pushx, al right");
 
 		searchPanel.revalidate();
 		searchPanel.repaint();
@@ -364,7 +364,7 @@ public class DendroView implements Observer, DendroPanel {
 	private JPanel createSearchBarPanel() {
 		
 		JPanel searchBarPanel = GUIFactory.createJPanel(false, 
-				GUIFactory.NO_PADDING);
+				GUIFactory.NO_PADDING_FILL);
 		searchBarPanel.add(searchPanel);
 		
 		return searchBarPanel;
