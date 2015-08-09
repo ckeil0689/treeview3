@@ -52,10 +52,12 @@ public class GUIFactory {
 	public static final int NO_PADDING_Y = 4;
 	public static final int FILL = 5;
 	public static final int NO_GAPS = 6;
-	public static final int NO_GAPS_NO_INS = 7;
-	public static final int NO_GAPS_NO_INS_FILL = 8;
-	public static final int TINY_GAPS_INS = 9;
-	public static final int DEBUG = 10;
+	public static final int NO_GAPS_NO_INS_X = 7;
+	public static final int NO_GAPS_NO_INS_Y = 8;
+	public static final int NO_GAPS_NO_INS = 9;
+	public static final int NO_GAPS_NO_INS_FILL = 10;
+	public static final int TINY_GAPS_INS = 11;
+	public static final int DEBUG = 12;
 
 	/**
 	 * Creates and returns a simple JPanel with MigLayout to be used as
@@ -138,6 +140,14 @@ public class GUIFactory {
 			
 		case NO_GAPS_NO_INS:
 			comp.setLayout(new MigLayout("gap 0!, ins 0", "grow"));
+			break;
+			
+		case NO_GAPS_NO_INS_X:
+			comp.setLayout(new MigLayout("gapx 0!, ins 5 0 5 0", "grow"));
+			break;
+			
+		case NO_GAPS_NO_INS_Y:
+			comp.setLayout(new MigLayout("gapy 0!, ins 0 5 0 5", "grow"));
 			break;
 			
 		case NO_GAPS_NO_INS_FILL:
