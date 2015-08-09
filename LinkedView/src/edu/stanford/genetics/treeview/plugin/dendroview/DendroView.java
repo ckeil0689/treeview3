@@ -22,7 +22,6 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import java.awt.Color;
 import java.awt.ScrollPane;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
@@ -339,6 +338,7 @@ public class DendroView implements Observer, DendroPanel {
 	private static JPanel createColorValIndicatorPanel() {
 		
 		JPanel indicatorPanel;
+		
 		String hint = ">>>> Placeholder <<<<";
 		JLabel indicatorPlaceHolder = GUIFactory.createLabel(hint, 
 				GUIFactory.FONTM);
@@ -396,11 +396,10 @@ public class DendroView implements Observer, DendroPanel {
 	}
 	
 	private JPanel createRowTreePanel() {
-		
+	
 		JPanel rowTreePanel;
 		
-		rowTreePanel = GUIFactory.createJPanel(false, 
-				GUIFactory.NO_GAPS);
+		rowTreePanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS);
 		rowTreePanel.add(rowTreeView, "w 100%, pushy, growy, wrap");
 		
 		return rowTreePanel;
@@ -412,6 +411,7 @@ public class DendroView implements Observer, DendroPanel {
 		
 		rowLabelPanel = GUIFactory.createJPanel(false, 
 				GUIFactory.NO_GAPS_NO_INS);
+
 		rowLabelPanel.add(rowLabelView.getComponent(), "w 100%, pushy, growy, "
 				+ "wrap");
 		
@@ -497,8 +497,8 @@ public class DendroView implements Observer, DendroPanel {
 		
 		JPanel globalOverviewPanel;
 		
-		globalOverviewPanel = GUIFactory.createJPanel(true,
-				GUIFactory.NO_GAPS_NO_INS_FILL, Color.CYAN);
+		globalOverviewPanel = GUIFactory.createJPanel(false, 
+				GUIFactory.NO_GAPS_NO_INS_FILL);
 		globalOverviewPanel.add(globalMatrixView, "grow, push");
 		
 		return globalOverviewPanel;
