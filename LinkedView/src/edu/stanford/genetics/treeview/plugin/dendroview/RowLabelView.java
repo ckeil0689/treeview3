@@ -32,6 +32,7 @@ public class RowLabelView extends LabelView implements MouseWheelListener,
 	public RowLabelView() {
 
 		super(LabelView.ROW);
+		
 		d_justified = true;
 		zoomHint = StringRes.lbl_ZoomRowLabels;
 		addMouseWheelListener(this);
