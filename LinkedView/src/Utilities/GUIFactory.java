@@ -135,11 +135,11 @@ public class GUIFactory {
 			break;
 			
 		case NO_GAPS:
-			comp.setLayout(new MigLayout("gap 0!", "grow"));
+			comp.setLayout(new MigLayout("gap 0!"));
 			break;
 			
 		case NO_GAPS_NO_INS:
-			comp.setLayout(new MigLayout("gap 0!, ins 0", "grow"));
+			comp.setLayout(new MigLayout("gap 0!, ins 0"));
 			break;
 			
 		case NO_GAPS_NO_INS_X:
@@ -151,11 +151,11 @@ public class GUIFactory {
 			break;
 			
 		case NO_GAPS_NO_INS_FILL:
-			comp.setLayout(new MigLayout("gap 0!, ins 0", "[grow, fill]"));
+			comp.setLayout(new MigLayout("gap 0!, ins 0, debug", "grow"));
 			break;
 			
 		case TINY_GAPS_INS:
-			comp.setLayout(new MigLayout("gap 0!, ins 3", "[grow, fill]"));
+			comp.setLayout(new MigLayout("gap 1!, ins 3"));
 			break;
 			
 		case DEBUG:

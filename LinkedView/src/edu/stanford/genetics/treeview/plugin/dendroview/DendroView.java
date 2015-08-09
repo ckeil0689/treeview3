@@ -22,6 +22,7 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
+import java.awt.Color;
 import java.awt.ScrollPane;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
@@ -329,7 +330,7 @@ public class DendroView implements Observer, DendroPanel {
 		matrixPanel = createMatrixPanel();
 		
 		dendroPane.add(matrixPanel, "grow, push, wrap");
-		dendroPane.add(toolbarPanel, "growx, push, h 3%, wrap");
+		dendroPane.add(toolbarPanel, "growx, pushx, h 3%, wrap");
 		
 		dendroPane.revalidate();
 		dendroPane.repaint();
@@ -496,8 +497,8 @@ public class DendroView implements Observer, DendroPanel {
 		
 		JPanel globalOverviewPanel;
 		
-		globalOverviewPanel = GUIFactory.createJPanel(false,
-				GUIFactory.NO_GAPS_NO_INS_FILL);
+		globalOverviewPanel = GUIFactory.createJPanel(true,
+				GUIFactory.NO_GAPS_NO_INS_FILL, Color.CYAN);
 		globalOverviewPanel.add(globalMatrixView, "grow, push");
 		
 		return globalOverviewPanel;
@@ -564,12 +565,13 @@ public class DendroView implements Observer, DendroPanel {
 		globalOverviewPanel = createGlobalOverviewPanel();
 		interactiveMatrixPanel = createInteractiveMatrixPanel();
 		
-		matrixPanel = GUIFactory.createJPanel(false,
-				GUIFactory.NO_PADDING);
+		matrixPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_NO_INS);
 		matrixPanel.add(globalOverviewPanel, "h 160!, w 160!, grow 0");
-		matrixPanel.add(colDataPane, "h 160!, pushx, growx, growy 0, wrap");
-		matrixPanel.add(rowDataPane, "w 160!, pushy, growy, growx 0");
-		matrixPanel.add(interactiveMatrixPanel, "push, grow");
+		matrixPanel.add(colDataPane, "h 160!, pushx, "
+				+ "growx, growy 0, wrap");
+		matrixPanel.add(rowDataPane, "w 160!, pushy, growy, "
+				+ "growx 0");
+		matrixPanel.add(interactiveMatrixPanel, "grow");
 		
 		return matrixPanel;
 	}
