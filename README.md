@@ -56,13 +56,13 @@ The XML-protocol is available for download in the download section of this repos
 ### Code criteria to be eligible for merging into master ###
 In general, clean & concise & functional code. The goal is minimum effort required by other devs to understand code and what it is supposed to do.
 
-    1. Absolutely no debug code. If you need to retain debugging code beyond *ongoing* development for a specific issue (aka before merge into master) that means a test case for that part of the code should be written instead.
-    2. Reduce comments to an absolute minimum when the code itself (through flow and naming) is not sufficient to understand what is happening. 
-    3. BUT maintain documentation for all classes, functions (JavaDoc). Update JavaDoc when necessary.
-    4. Add author tag to every new function/ class/ interface etc. + JavaDoc.
-    5. Generally follows the [OOD principles](http://www.oodesign.com/design-principles.html) (e.g. "Single Responsibility Principle").
-    6. The shared Eclipse clean-up settings (via a downloadable XML-file loaded into Eclipse) has been run. This forces some code formatting & style to maintain continuity.
-    7. While there cannot be a hard limit for line count in methods/ classes, code should be organized in classes and methods so that responsibilities and knowledge are distributed as much as possible. To help others read and understand code, such organization is critical.
+1. Absolutely no debug code. If you need to retain debugging code beyond *ongoing* development for a specific issue (aka before merge into master) that means a test case for that part of the code should be written instead.
+2. Reduce comments to an absolute minimum when the code itself (through flow and naming) is not sufficient to understand what is happening. 
+3. BUT maintain documentation for all classes, functions (JavaDoc). Update JavaDoc when necessary.
+4. Add author tag to every new function/ class/ interface etc. + JavaDoc.
+5. Generally follows the [OOD principles](http://www.oodesign.com/design-principles.html) (e.g. "Single Responsibility Principle").
+6. The shared Eclipse clean-up settings (via a downloadable XML-file loaded into Eclipse) has been run. This forces some code formatting & style to maintain continuity.
+7. While there cannot be a hard limit for line count in methods/ classes, code should be organized in classes and methods so that responsibilities and knowledge are distributed as much as possible. To help others read and understand code, such organization is critical.
 
 ### General Git flow ### 
 
