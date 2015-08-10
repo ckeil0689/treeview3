@@ -22,9 +22,9 @@ This README would normally document whatever steps are necessary to get your app
 
 * Writing tests
 * Code review (**BEFORE** Merge)
-1. Have at least 1 other permanent contributor look at the code and point out criticism.
-2. Upload a test JAR/ Executable for at least 1 other contributor to thoroughly test for issues.
-3. Only merge into production branch if code / version have been reviewed and tested.
+    1. Have at least 1 other permanent contributor look at the code and point out criticism.
+    2. Upload a test JAR/ Executable for at least 1 other contributor to thoroughly test for issues.
+    3. Only merge into production branch if code / version have been reviewed and tested.
 * Other guidelines
     1. Oracle Code Conventions: http://www.oracle.com/technetwork/java/javase/documentation/codeconvtoc-136057.html
     2. Google Java Style: https://google-styleguide.googlecode.com/svn/trunk/javaguide.html
