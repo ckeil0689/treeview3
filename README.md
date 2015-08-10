@@ -55,6 +55,7 @@ The XML-protocol is available for download in the download section of this repos
 
 ### Code criteria to be eligible for merging into master ###
 In general, clean & concise & functional code. The goal is minimum effort required by other devs to understand code and what it is supposed to do.
+
     1. Absolutely no debug code. If you need to retain debugging code beyond *ongoing* development for a specific issue (aka before merge into master) that means a test case for that part of the code should be written instead.
     2. Reduce comments to an absolute minimum when the code itself (through flow and naming) is not sufficient to understand what is happening. 
     3. BUT maintain documentation for all classes, functions (JavaDoc). Update JavaDoc when necessary.
