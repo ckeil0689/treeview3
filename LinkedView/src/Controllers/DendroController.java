@@ -64,9 +64,16 @@ import edu.stanford.genetics.treeview.plugin.dendroview.MatrixView;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreeColorer;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreePainter;
 
-/* TODO separate some parts into dedicated GlobalView controller */
+/* TODO separate some parts into dedicated GlobalView controller 
+ * NOTES: 
+ * DendroController needs to listen to selection objects in order to
+ * update button statuses (focus, enabled, etc.)
+ * It needs to know nothing else about the data and user-matix interactions.
+ * In the future this will be handled by InteractiveMatrixViewController 
+ * in order to separate concerns. */
 /**
- * Controller class handling UI input and calculations related to DendroView.
+ * Controller class handling UI input and calculations related to the main
+ * TreeView interface (DendroView).
  *
  * @author chris0689
  *
@@ -127,12 +134,11 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		updateHeaderInfo();
 		bindComponentFunctions();
 
-		dendroView
-				.setupSearch(tvModel.getRowHeaderInfo(),
+		dendroView.setupSearch(tvModel.getRowHeaderInfo(),
 						tvModel.getColumnHeaderInfo(), interactiveXmap,
 						interactiveYmap);
+		
 		dendroView.setupLayout();
-
 		setObservables();
 
 		/*
@@ -184,6 +190,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 				"searchLabels");
 		action_map.put("searchLabels", new SearchLabelAction());
 
+		// for InteractiveMatrixVontroller ... 
 		/* Scroll through GlobalView with HOME, END, PgUP, PgDOWN */
 		input_map.put(KeyStroke.getKeyStroke("HOME"), "pageYToStart");
 		action_map.put("pageYToStart", new HomeKeyYAction());
@@ -321,7 +328,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	private void addDendroViewListeners() {
 
 		dendroView.addScaleListeners(new ScaleListener());
-		dendroView.addZoomListener(new ZoomListener());
+		dendroView.addZoomListener(new ZoomSelectionListener());
 		dendroView.addDividerListener(new DividerListener());
 		dendroView.addSplitPaneListener(new SplitPaneListener());
 		dendroView.addResizeListener(new AppFrameListener());
@@ -428,6 +435,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		}
 	}
 
+	// TODO move listeners below this point to InteractiveMatrixViewController
 	/* >>>>>>> Mapped Key Actions <<<<<<<<< */
 	/* TODO make all this key-scroll code more compact... */
 	/** Action to scroll the y-axis to top. */
@@ -572,6 +580,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		}
 	}
 
+	// TODO keep in this controller
 	/** Action to deselect everything */
 	private class DeselectAction extends AbstractAction {
 
@@ -584,7 +593,9 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		}
 	}
 
+	
 	/**
+	 * TODO move to IMVController
 	 * Zooms into the selected area
 	 */
 	private class ZoomAction extends AbstractAction {
@@ -610,11 +621,10 @@ public class DendroController implements ConfigNodePersistent, Observer {
 				getInteractiveYMap().scrollToFirstIndex(
 						rowSelection.getMinIndex()/*,true*/);
 			}
-			// zoomSelection();
 		}
 	}
 
-	/** Zooms into GlobalView by 1 scale step (depends on previous scale). */
+	/** Zooms into IMView by 1 scale step (depends on previous scale). */
 	private class ZoomInAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
@@ -629,7 +639,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		}
 	}
 
-	/** Zooms out of GlobalView by 1 scale step (depends on previous scale). */
+	/** Zooms out of IMView by 1 scale step (depends on previous scale). */
 	private class ZoomOutAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
@@ -644,7 +654,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		}
 	}
 
-	/** Resets the GlobalView to all zoomed-out state */
+	/** Resets the IMView to all zoomed-out state */
 	private class HomeAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
@@ -664,7 +674,11 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	 * Listener for the setScale-buttons in DendroView. Changes the scale in
 	 * xMap and yMap MapContainers, allowing the user to zoom in or out of each
 	 * individual axis in GlobalView.
-	 *
+	 * In this class (and not the matrixController) because DendroViews 
+	 * buttons are being used.
+	 * 
+	 * TODO Keep in this controller. 
+	 * Split to single button listeners (one per button).
 	 */
 	class ScaleListener implements ActionListener {
 
@@ -895,6 +909,9 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	}
 
 	/**
+	 * TODO keep here - this should change the canvas (JPanel) 
+	 * in DendroView to which the IMView should automatically adapt.
+	 * 
 	 * Sets the dimensions of the GlobalView axes. There are three options,
 	 * passed from the MenuBar when the user selects it. Fill: This fills all of
 	 * the available space on the screen with the matrix. Equal: Both axes are
@@ -1037,6 +1054,10 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		return newAxis;
 	}
 
+	/**
+	 * Stores MapContainer settings (scale + scroll values) in Preferences
+	 * nodes.
+	 */
 	public void saveSettings() {
 
 		try {
@@ -1059,18 +1080,21 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	}
 
 	/**
+	 * TODO Keep here - AL for ZoomSelection button. -> implement methods
+	 * in IMVController and call them from here.
 	 * The Zoom listener which allows the user to zoom into a selection.
 	 *
 	 */
-	private class ZoomListener implements ActionListener {
+	private class ZoomSelectionListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			final boolean genesSelected = rowSelection.getNSelectedIndexes() > 0;
-			final boolean arraysSelected = colSelection.getNSelectedIndexes() > 0;
+			// TODO replace with controller method
+			final boolean rowsSelected = rowSelection.getNSelectedIndexes() > 0;
+			final boolean colssSelected = colSelection.getNSelectedIndexes() > 0;
 
-			if (genesSelected || arraysSelected) {
+			if (rowsSelected || colssSelected) {
 				if ((arg0.getModifiers() & InputEvent.SHIFT_MASK) != 0
 						|| (arg0.getModifiers() & InputEvent.META_MASK) != 0) {
 
@@ -1084,12 +1108,10 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 					// Then scroll
 					getInteractiveXMap().scrollToFirstIndex(
-							colSelection.getMinIndex()/*,true*/);
+							colSelection.getMinIndex());
 					getInteractiveYMap().scrollToFirstIndex(
-							rowSelection.getMinIndex()/*,true*/);
+							rowSelection.getMinIndex());
 
-					// zoomSelection();
-					// centerSelection();
 				} else if ((arg0.getModifiers() & InputEvent.ALT_MASK) != 0) {
 					dendroView.getInteractiveMatrixView()
 							.smoothZoomTowardSelection(
@@ -1274,6 +1296,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			setColumnSelection(tvFrame.getColumnSelection());
 		}
 
+		// TODO moved to IMVController
 		final ColorPresets colorPresets = DendrogramFactory.getColorPresets();
 		colorPresets.setConfigNode(configNode);
 		colorExtractor = new ColorExtractor(

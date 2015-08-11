@@ -103,6 +103,7 @@ public class ColorPresets implements ConfigNodePersistent {
 		} else {
 			LogBuffer.println("Could not find or create ColorPresets "
 					+ "node because parentNode was null.");
+			return;
 		}
 	}
 
