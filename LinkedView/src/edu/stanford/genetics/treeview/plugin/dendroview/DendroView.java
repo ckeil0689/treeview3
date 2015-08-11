@@ -111,7 +111,6 @@ public class DendroView implements Observer, DendroPanel {
 	protected final ColumnLabelView colLabelView;
 
 	/* JScrollBars for GlobalView */
-	/* TODO one glorious day, update GlobalView to a scrollpane... */
 	protected JScrollBar matrixXscrollbar;
 	protected JScrollBar matrixYscrollbar;
 
@@ -283,8 +282,10 @@ public class DendroView implements Observer, DendroPanel {
 				+ "(complex V), etc...";
 		searchPanel.setToolTipText(tooltip);
 
-		searchPanel.add(rowFinderBox.getSearchTermBox(), "w 80::, growx, pushx, al right");
-		searchPanel.add(colFinderBox.getSearchTermBox(), "w 80::, growx, pushx, al right");
+		searchPanel.add(rowFinderBox.getSearchTermBox(), "w 80::, growx, "
+				+ "pushx, al right");
+		searchPanel.add(colFinderBox.getSearchTermBox(), "w 80::, growx, "
+				+ "pushx, al right");
 
 		searchPanel.revalidate();
 		searchPanel.repaint();
@@ -309,14 +310,12 @@ public class DendroView implements Observer, DendroPanel {
 	}
 
 	/**
-	 * Manages the component layout in TreeViewFrame
+	 * Organizes the main layout for DendroView.
 	 */
 	public void setupLayout() {
 
-		/* Clear dendroPane first */
 		dendroPane.removeAll();
 
-		/* Panels for layout setup */
 		JPanel toolbarPanel;
 		JPanel matrixPanel;
 				
@@ -335,10 +334,16 @@ public class DendroView implements Observer, DendroPanel {
 		dendroPane.repaint();
 	}
 	
+	/**
+	 * Creates a panel which contains the color-value indicator. This is
+	 * used to display the data value of the currently hovered matrix pixel.
+	 * @return JPanel containing the olor-value indicator.
+	 */
 	private static JPanel createColorValIndicatorPanel() {
 		
 		JPanel indicatorPanel;
 		
+		// until implementation of color-value indicator
 		String hint = ">>>> Placeholder <<<<";
 		JLabel indicatorPlaceHolder = GUIFactory.createLabel(hint, 
 				GUIFactory.FONTM);
@@ -350,9 +355,14 @@ public class DendroView implements Observer, DendroPanel {
 		return indicatorPanel;
 	}
 	
+	/**
+	 * Creates a JPanel to hold the main navigation buttons for the matrix.
+	 * @return A JPanel with all navigation buttons.
+	 */
 	private JPanel createNavBtnPanel() {
 		
-		JPanel navBtnPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
+		JPanel navBtnPanel = GUIFactory.createJPanel(false, 
+				GUIFactory.NO_PADDING);
 		navBtnPanel.add(scaleIncXY);
 		navBtnPanel.add(scaleDecXY);
 		navBtnPanel.add(zoomBtn);
@@ -361,6 +371,11 @@ public class DendroView implements Observer, DendroPanel {
 		return navBtnPanel;
 	}
 	
+	/**
+	 * Creates a button which contains search interface elements, such as 
+	 * search bars. 
+	 * @return A JPanel containing search bars.
+	 */
 	private JPanel createSearchBarPanel() {
 		
 		JPanel searchBarPanel = GUIFactory.createJPanel(false, 
@@ -370,6 +385,11 @@ public class DendroView implements Observer, DendroPanel {
 		return searchBarPanel;
 	}
 	
+	/**
+	 * A parent JPanel to organize main navigation + info UI elements in a 
+	 * toolbar like layout.
+	 * @return A JPanel containing all major UI navigation + info elements.
+	 */
 	private JPanel createToolbarPanel() {
 		
 		JPanel navBtnPanel;
@@ -395,6 +415,12 @@ public class DendroView implements Observer, DendroPanel {
 		return toolbarPanel;
 	}
 	
+	/**
+	 * Creates a panel to hold the row dendrogram. This will be added to
+	 * the left side of the corresponding JSplitPane. The dendrogram is only
+	 * drawn if a model was clustered and a gtr-file exists.
+	 * @return A JPanel with the row dendrogram.
+	 */
 	private JPanel createRowTreePanel() {
 	
 		JPanel rowTreePanel;
@@ -405,6 +431,10 @@ public class DendroView implements Observer, DendroPanel {
 		return rowTreePanel;
 	}
 	
+	/**
+	 * Creates a JPanel to hold the display of row labels.
+	 * @return A JPanel holding the row LabelView.
+	 */
 	private JPanel createRowLabelPanel() {
 		
 		JPanel rowLabelPanel;
@@ -418,6 +448,9 @@ public class DendroView implements Observer, DendroPanel {
 		return rowLabelPanel;
 	}
 	
+	/**
+	 * Sets up the JSplitPane used to show row dendrogram and labels.
+	 */
 	private void setupRowDataPane() {
 		
 		JPanel rowLabelPanel;
@@ -445,6 +478,12 @@ public class DendroView implements Observer, DendroPanel {
 		}
 	}
 	
+	/**
+	 * Creates a panel to hold the column dendrogram. This will be added to
+	 * the top side of the corresponding JSplitPane. The dendrogram is only
+	 * drawn if a model was clustered and a atr-file exists.
+	 * @return A JPanel with the column dendrogram.
+	 */
 	private JPanel createColTreePanel() {
 		
 		JPanel colTreePanel;
@@ -455,6 +494,10 @@ public class DendroView implements Observer, DendroPanel {
 		return colTreePanel;
 	}
 	
+	/**
+	 * Creates a JPanel to hold the display of column labels.
+	 * @return A JPanel holding the column LabelView.
+	 */
 	private JPanel createColLabelPanel() {
 		
 		JPanel colLabelPanel;
@@ -466,6 +509,9 @@ public class DendroView implements Observer, DendroPanel {
 		return colLabelPanel;
 	}
 	
+	/**
+	 * Sets up the JSplitPane used to show column dendrogram and labels.
+	 */
 	private void setupColDataPane() {
 		
 		JPanel colTreePanel;
